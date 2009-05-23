@@ -15,8 +15,9 @@ New System Drivers Supported (in no particular order):
 - Microbee Premium PC85 (not working) [Robbbert]
 - Microbee 64k (not working) [Robbbert]
 - Microprofessor III [Miodrag Milanovic]
-- NEC PC-8801MkII (not working), PC-8801MkIIFR, PC-8801MA, PC-8801MA2,
-  PC-8801MC [Fabio Priuli]
+- NEC PC-8001, PC-8001MkII, PC-8801, PC-8801MkII (all not working),
+  PC-8801MkIIFR,  PC-8801MkIIMR, PC-8801MH, PC-8801FA, PC-8801MA,
+  PC-8801MA2, PC-8801MC [Fabio Priuli]
 - NTS DreamWriter T200 (not working)  [Roberto Carlos
   Fernandez Gerhardt, Wilbert Pol]
  -PC/M Mugler [Miodrag Milanovic]
@@ -69,6 +70,7 @@ Skeleton drivers :
 - NEC PC-6600
 - NEC PC-6600SR
 - NEC PC-8500
+- NEC PC-88 VA
 - Olivetti L1 M20
 - Olivetti L1 M40
 - Philips VG-5000

@@ -623,13 +623,20 @@ const game_driver * const drivers[] =
 	DRIVER( pc6001sr )
 	DRIVER( pc6600 )
 	DRIVER( pc6600sr )
+	DRIVER( pc8001 )	/* PC-8001											*/
+	DRIVER( pc8001m2 )	/* PC-8001mkII										*/
+	DRIVER( pc8801 )	/* PC-8801											*/
 	DRIVER( pc88m2 )	/* PC-8801mkII (Low res display, VSYNC 15 kHz)		*/
 	DRIVER( pc88m2sl )	/* PC-8801mkIISR (Low res display, VSYNC 15 kHz)	*/
 	DRIVER( pc88m2sh )	/* PC-8801mkIISR (High res display, VSYNC 24 kHz)	*/
 	DRIVER( pc88m2fr )	/* PC-8801mkIIFR (High res display, VSYNC 24 kHz)	*/
-	DRIVER( pc88ma )	/* PC-8801MA (High res display, VSYNC 24 kHz)		*/
-	DRIVER( pc88ma2 )	/* PC-8801MA2 (High res display, VSYNC 24 kHz)		*/
-	DRIVER( pc88mc )	/* PC-8801MC (High res display, VSYNC 24 kHz)		*/
+	DRIVER( pc88m2mr )	/* PC-8801mkIIMR (High res display, VSYNC 24 kHz)	*/
+	DRIVER( pc8801mh )	/* PC-8801MH (High res display, VSYNC 24 kHz)		*/
+	DRIVER( pc8801fa )	/* PC-8801FA (High res display, VSYNC 24 kHz)		*/
+	DRIVER( pc8801ma )	/* PC-8801MA (High res display, VSYNC 24 kHz)		*/
+	DRIVER( pc8801ma2 )	/* PC-8801MA2 (High res display, VSYNC 24 kHz)		*/
+	DRIVER( pc8801mc )	/* PC-8801MC (High res display, VSYNC 24 kHz)		*/
+	DRIVER( pc88va )	/* PC-88 VA											*/
 
 	/* CANTAB */
 	DRIVER( jupiter )	/* Jupiter Ace										*/
@@ -1031,9 +1038,9 @@ const game_driver * const drivers[] =
 	DRIVER( pro128 )	/* 1986 Olivetti Prodest PC 128						*/
 
 	/* Cybiko, Inc. */
-//	DRIVER( cybikov1 )	/* Cybiko Wireless Intertainment System - Classic V1 */
-//	DRIVER( cybikov2 )	/* Cybiko Wireless Intertainment System - Classic V2 */
-//	DRIVER( cybikoxt )	/* Cybiko Wireless Intertainment System - Xtreme     */
+	DRIVER( cybikov1 )	/* Cybiko Wireless Intertainment System - Classic V1 */
+	DRIVER( cybikov2 )	/* Cybiko Wireless Intertainment System - Classic V2 */
+	DRIVER( cybikoxt )	/* Cybiko Wireless Intertainment System - Xtreme     */
 
 	/* Dick Smith */
 	DRIVER( super80 )

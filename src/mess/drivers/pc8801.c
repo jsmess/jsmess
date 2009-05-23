@@ -1,12 +1,10 @@
-/***************************************************************************
+/*****************************************************************************************************
 
+	NEC PC-8801 MESS Emulation
+	
+	PC-88xx Models (and similar machines like PC-80xx and PC-98DO)
 
-	Note: These emulations take a long time to start. Be patient!
-
-
-	NEC PC-88xx Models (and similar machines like PC-80xx and PC-98DO)
-
-    Model            | release |      CPU     |                      BIOS components                        |       |
+	Model            | release |      CPU     |                      BIOS components                        |       |
 	                 |         |     clock    | N-BASIC | N88-BASIC | N88-BASIC Enh |  Sound  |  CD |  Dict |  Disk | Notes
 	==================================================================================================================================
 	PC-8001          | 1979-03 |   z80A @ 4   |    X    |     -     |       -       |    -    |  -  |   -   |   -   |
@@ -69,13 +67,23 @@
 	TODO: 
 		- Shouldn't it be possible to switch resolution during emulation, like many MAME 
 		games do? If yes, there would be no need of separate LoRes and HiRes drivers.
+		- Add correct CPU to various computers (right now they all use the MkIISR settings)
+		- Dump the Sound BIOS
+		- We need to support no Expanded BASIC machines (early models). Right now emulation
+		always start from BASIC V2, so machines without it only shows a black screen
         - We need to emulate the differences in the new sets (MkIIFR, MA, MA2, MC) compared 
 		to MkIISR.
 
-***************************************************************************/
+	Usage:
+		These machines take a long time to start. Be patient (or press Insert to FastForward)
+
+
+
+*****************************************************************************************************/
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
+#include "cpu/v30mz/nec.h"
 #include "sound/beep.h"
 #include "machine/8255ppi.h"
 #include "includes/pc8801.h"
@@ -452,7 +460,7 @@ static INPUT_PORTS_START( pc88sr )
 INPUT_PORTS_END
 
 
-static ADDRESS_MAP_START( pc8801_mem , ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START( pc8801_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_RAMBANK(1)
 	AM_RANGE(0x6000, 0x7fff) AM_RAMBANK(2)
 	AM_RANGE(0x8000, 0x83ff) AM_RAMBANK(3)
@@ -519,6 +527,15 @@ static ADDRESS_MAP_START( pc88sr_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0xf4, 0xf7) AM_NOP										/* DMA 5'floppy (may be not released) */
 	AM_RANGE(0xf8, 0xfb) AM_NOP 									/* DMA 8'floppy (unknown -- not yet) */
 	AM_RANGE(0xfc, 0xff) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w )
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( pc88va_mem, ADDRESS_SPACE_PROGRAM, 8 )
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( pc88va_io, ADDRESS_SPACE_IO, 8)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( pc88va_v30_mem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static INTERRUPT_GEN( pc8801fd_interrupt )
@@ -620,11 +637,87 @@ static MACHINE_DRIVER_START( pc88srh )
 MACHINE_DRIVER_END
 
 
+static MACHINE_DRIVER_START( pc88va )
+	MDRV_CPU_ADD("maincpu", Z80, 8000000)        /* 8 MHz */
+	MDRV_CPU_PROGRAM_MAP(pc88va_mem)
+	MDRV_CPU_IO_MAP(pc88va_io)
+
+	MDRV_CPU_ADD("cpu2", V30MZ, 8000000)        /* 8 MHz */
+	MDRV_CPU_PROGRAM_MAP(pc88va_v30_mem)
+
+
+	/* No accurate at all, it's just skeleton code */
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(50)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	/*MDRV_ASPECT_RATIO(8, 5)*/
+	MDRV_SCREEN_SIZE(640, 440)
+	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
+	MDRV_PALETTE_LENGTH(32)
+	MDRV_PALETTE_INIT( pc8801 )
+MACHINE_DRIVER_END
+
+ROM_START( pc8001 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_SYSTEM_BIOS( 0, "v101", "N80-BASIC v1.01" )
+	ROMX_LOAD( "n80v101.rom", 0x00000, 0x6000, CRC(a2cc9f22) SHA1(6d2d838de7fea20ddf6601660d0525d5b17bf8a3), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "v102", "N80-BASIC v1.02" )
+	ROMX_LOAD( "n80v102.rom", 0x00000, 0x6000, CRC(ed01ca3f) SHA1(b34a98941499d5baf79e7c0e5578b81dbede4a58), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS( 2, "v110", "N80-BASIC v1.10" )
+	ROMX_LOAD( "n80v110.rom", 0x00000, 0x6000, CRC(1e02d93f) SHA1(4603cdb7a3833e7feb257b29d8052c872369e713), ROM_BIOS(3) )
+
+	/* hack - this should not be here, but we still don't support these early models*/
+	ROM_REGION( 0x10000, "sub", ROMREGION_ERASEFF)
+
+	ROM_REGION( 0x40000, "gfx1", 0)
+	ROM_LOAD( "font.rom", 0x0000, 0x0800, CRC(56653188) SHA1(84b90f69671d4b72e8f219e1fe7cd667e976cf7f) )
+ROM_END
+
+ROM_START( pc8001m2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "n80_2.rom", 0x00000, 0x8000, CRC(03cce7b6) SHA1(c12d34e42021110930fed45a8af98db52136f1fb) )
+
+	/* hack - this should not be here, but we still don't support these early models*/
+	ROM_REGION( 0x10000, "sub", ROMREGION_ERASEFF)
+
+	ROM_REGION( 0x40000, "gfx1", 0)
+	ROM_LOAD( "font.rom", 0x0000, 0x0800, CRC(56653188) SHA1(84b90f69671d4b72e8f219e1fe7cd667e976cf7f) )
+ROM_END
+
+ROM_START( pc8801 )
+	ROM_REGION( 0x18000, "maincpu", 0 )
+	ROM_LOAD( "n80.rom",   0x00000, 0x8000, CRC(5cb8b584) SHA1(063609dd518c124a4fc9ba35d1bae35771666a34) )
+	ROM_LOAD( "n88.rom",   0x08000, 0x8000, CRC(ffd68be0) SHA1(3518193b8207bdebf22c1380c2db8c554baff329) )
+	ROM_LOAD( "n88_0.rom", 0x10000, 0x2000, CRC(61984bab) SHA1(d1ae642aed4f0584eeb81ff50180db694e5101d4) )
+
+	/* hack - this should not be here, but we still don't support these early models*/
+	ROM_REGION( 0x10000, "sub", ROMREGION_ERASEFF)
+
+	ROM_REGION( 0x40000, "gfx1", 0)
+	ROM_LOAD( "font.rom", 0x0000, 0x0800, CRC(56653188) SHA1(84b90f69671d4b72e8f219e1fe7cd667e976cf7f) )
+ROM_END
+
+/* The dump only included "maincpu". Other roms arbitrariely taken from PC-8801 & PC-8801 MkIISR (there should be 
+at least 1 Kanji ROM). */
+ROM_START( pc88m2 )
+	ROM_REGION( 0x18000, "maincpu", 0 )
+	ROM_LOAD( "n80.rom",   0x00000, 0x8000, CRC(91d84b1a) SHA1(d8a1abb0df75936b3fc9d226ccdb664a9070ffb1) )
+	ROM_LOAD( "n88.rom",   0x08000, 0x8000, CRC(f35169eb) SHA1(ef1f067f819781d9fb2713836d195866f0f81501) )
+	ROM_LOAD( "n88_0.rom", 0x10000, 0x2000, CRC(5eb7a8d0) SHA1(95a70af83b0637a5a0f05e31fb0452bb2cb68055) )
+
+	/* hack - this should not be here, but we still don't support these early models*/
+	ROM_REGION( 0x10000, "sub", ROMREGION_ERASEFF)
+
+	/* should this be here? */
+	ROM_REGION( 0x40000, "gfx1", 0)
+	ROM_LOAD( "kanji1.rom", 0x00000, 0x20000, CRC(6178bd43) SHA1(82e11a177af6a5091dd67f50a2f4bafda84d6556) )
+ROM_END
+
 ROM_START( pc88m2sl )
 	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD( "n80.rom",   0x00000, 0x8000, CRC(27e1857d) SHA1(5b922ed9de07d2a729bdf1da7b57c50ddf08809a) )	// it should be v1.5
-	ROM_LOAD( "n88.rom",   0x08000, 0x8000, CRC(a0fc0473) SHA1(3b31fc68fa7f47b21c1a1cb027b86b9e87afbfff) )	// it should be v1.4
-	ROM_LOAD( "n88_0.rom", 0x10000, 0x2000, CRC(710a63ec) SHA1(d239c26ad7ac5efac6e947b0e9549b1534aa970d) )	// it should be v2.0
+	ROM_LOAD( "n80.rom",   0x00000, 0x8000, CRC(27e1857d) SHA1(5b922ed9de07d2a729bdf1da7b57c50ddf08809a) )
+	ROM_LOAD( "n88.rom",   0x08000, 0x8000, CRC(a0fc0473) SHA1(3b31fc68fa7f47b21c1a1cb027b86b9e87afbfff) )
+	ROM_LOAD( "n88_0.rom", 0x10000, 0x2000, CRC(710a63ec) SHA1(d239c26ad7ac5efac6e947b0e9549b1534aa970d) )
 	ROM_LOAD( "n88_1.rom", 0x12000, 0x2000, CRC(c0bd2aa6) SHA1(8528eef7946edf6501a6ccb1f416b60c64efac7c) )
 	ROM_LOAD( "n88_2.rom", 0x14000, 0x2000, CRC(af2b6efa) SHA1(b7c8bcea219b77d9cc3ee0efafe343cc307425d1) )
 	ROM_LOAD( "n88_3.rom", 0x16000, 0x2000, CRC(7713c519) SHA1(efce0b51cab9f0da6cf68507757f1245a2867a72) )
@@ -632,38 +725,23 @@ ROM_START( pc88m2sl )
 	ROM_REGION( 0x10000, "sub", 0)
 	ROM_LOAD( "disk.rom", 0x0000, 0x0800, CRC(2158d307) SHA1(bb7103a0818850a039c67ff666a31ce49a8d516f) )
 
+	/* No idea of the proper size: it has never been dumped */
+	ROM_REGION( 0x2000, "audiocpu", 0)
+	ROM_LOAD( "soundbios.rom", 0x0000, 0x2000, NO_DUMP )
+
 	ROM_REGION( 0x40000, "gfx1", 0)
 	ROM_LOAD( "kanji1.rom", 0x00000, 0x20000, CRC(6178bd43) SHA1(82e11a177af6a5091dd67f50a2f4bafda84d6556) )
-	ROM_LOAD( "kanji2.rom", 0x20000, 0x20000, CRC(154803cc) SHA1(7e6591cd465cbb35d6d3446c5a83b46d30fafe95) )
+	ROM_LOAD( "kanji2.rom", 0x20000, 0x20000, CRC(154803cc) SHA1(7e6591cd465cbb35d6d3446c5a83b46d30fafe95) )	// it should not be here
 ROM_END
 
 /* They differ for the monitor resolution */
 #define rom_pc88m2sh		rom_pc88m2sl
 
-
-/* The dump only included "maincpu". Other roms arbitrariely taken from PC-8801 MkIISR. */
-/* According to some sources, there should be no BASIC Expansion. Right now the driver requires such expansion 
-to be present (without n88_1, n88_2, n88_3, we start with a black screen) */
-ROM_START( pc88m2 )
-	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD( "n80.rom",   0x00000, 0x8000, CRC(91d84b1a) SHA1(d8a1abb0df75936b3fc9d226ccdb664a9070ffb1) )	// it should be v1.4
-	ROM_LOAD( "n88.rom",   0x08000, 0x8000, CRC(f35169eb) SHA1(ef1f067f819781d9fb2713836d195866f0f81501) )	// it should be v1.3
-	ROM_LOAD( "n88_0.rom", 0x10000, 0x2000, CRC(5eb7a8d0) SHA1(95a70af83b0637a5a0f05e31fb0452bb2cb68055) )	// I would have expected nothing here. Not sure why the dump included this.
-
-	ROM_REGION( 0x10000, "sub", 0)
-	ROM_LOAD( "disk.rom", 0x0000, 0x0800, CRC(2158d307) SHA1(bb7103a0818850a039c67ff666a31ce49a8d516f) )
-
-	ROM_REGION( 0x40000, "gfx1", 0)
-	ROM_LOAD( "kanji1.rom", 0x00000, 0x20000, CRC(6178bd43) SHA1(82e11a177af6a5091dd67f50a2f4bafda84d6556) )
-	ROM_LOAD( "kanji2.rom", 0x20000, 0x20000, CRC(154803cc) SHA1(7e6591cd465cbb35d6d3446c5a83b46d30fafe95) )
-ROM_END
-
-/* n80.rom and n88_0.rom not included in the dump. Assumed to be the same as PC-8801 MkIISR. */
 ROM_START( pc88m2fr )
 	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD( "n80.rom",   0x00000, 0x8000, CRC(27e1857d) SHA1(5b922ed9de07d2a729bdf1da7b57c50ddf08809a) )	// it should be a version v1.5-1.8
-	ROM_LOAD( "n88.rom",   0x08000, 0x8000, CRC(b9daf1aa) SHA1(696a480232bcf8c827c7aeea8329db5c44420d2a) )	// it should be a version v1.5-1.7
-	ROM_LOAD( "n88_0.rom", 0x10000, 0x2000, CRC(710a63ec) SHA1(d239c26ad7ac5efac6e947b0e9549b1534aa970d) )	// it is v2.1
+	ROM_LOAD( "n80.rom",   0x00000, 0x8000, CRC(27e1857d) SHA1(5b922ed9de07d2a729bdf1da7b57c50ddf08809a) )
+	ROM_LOAD( "n88.rom",   0x08000, 0x8000, CRC(b9daf1aa) SHA1(696a480232bcf8c827c7aeea8329db5c44420d2a) )
+	ROM_LOAD( "n88_0.rom", 0x10000, 0x2000, CRC(710a63ec) SHA1(d239c26ad7ac5efac6e947b0e9549b1534aa970d) )
 	ROM_LOAD( "n88_1.rom", 0x12000, 0x2000, CRC(e3e78a37) SHA1(85ecd287fe72b56e54c8b01ea7492ca4a69a7470) )
 	ROM_LOAD( "n88_2.rom", 0x14000, 0x2000, CRC(98c3a7b2) SHA1(fc4980762d3caa56964d0ae583424756f511d186) )
 	ROM_LOAD( "n88_3.rom", 0x16000, 0x2000, CRC(0ca08abd) SHA1(a5a42d0b7caa84c3bc6e337c9f37874d82f9c14b) )
@@ -671,16 +749,82 @@ ROM_START( pc88m2fr )
 	ROM_REGION( 0x10000, "sub", 0)
 	ROM_LOAD( "disk.rom", 0x0000, 0x0800, CRC(2163b304) SHA1(80da2dee49d4307f00895a129a5cfeff00cf5321) )
 
+	/* No idea of the proper size: it has never been dumped */
+	ROM_REGION( 0x2000, "audiocpu", 0)
+	ROM_LOAD( "soundbios.rom", 0x0000, 0x2000, NO_DUMP )
+
 	ROM_REGION( 0x40000, "gfx1", 0)
 	ROM_LOAD( "kanji1.rom", 0x00000, 0x20000, CRC(6178bd43) SHA1(82e11a177af6a5091dd67f50a2f4bafda84d6556) )
-	ROM_LOAD( "kanji2.rom", 0x20000, 0x20000, CRC(154803cc) SHA1(7e6591cd465cbb35d6d3446c5a83b46d30fafe95) )
 ROM_END
 
-ROM_START( pc88ma )
+ROM_START( pc88m2mr )
 	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD( "n80.rom",   0x00000, 0x8000, CRC(8a2a1e17) SHA1(06dae1db384aa29d81c5b6ed587877e7128fcb35) )	// it should be v1.8
-	ROM_LOAD( "n88.rom",   0x08000, 0x8000, CRC(73573432) SHA1(9b1346d44044eeea921c4cce69b5dc49dbc0b7e9) )	// it should be v1.9
-	ROM_LOAD( "n88_0.rom", 0x10000, 0x2000, CRC(a72697d7) SHA1(5aedbc5916d67ef28767a2b942864765eea81bb8) )	// it should be v2.3
+	ROM_LOAD( "n80.rom",   0x00000, 0x8000, CRC(f074b515) SHA1(ebe9cf4cf57f1602c887f609a728267f8d953dce) )
+	ROM_LOAD( "n88.rom",   0x08000, 0x8000, CRC(69caa38e) SHA1(3c64090237152ee77c76e04d6f36bad7297bea93) )
+	ROM_LOAD( "n88_0.rom", 0x10000, 0x2000, CRC(710a63ec) SHA1(d239c26ad7ac5efac6e947b0e9549b1534aa970d) )
+	ROM_LOAD( "n88_1.rom", 0x12000, 0x2000, CRC(e3e78a37) SHA1(85ecd287fe72b56e54c8b01ea7492ca4a69a7470) )
+	ROM_LOAD( "n88_2.rom", 0x14000, 0x2000, CRC(11176e0b) SHA1(f13f14f3d62df61498a23f7eb624e1a646caea45) )
+	ROM_LOAD( "n88_3.rom", 0x16000, 0x2000, CRC(0ca08abd) SHA1(a5a42d0b7caa84c3bc6e337c9f37874d82f9c14b) )
+
+	ROM_REGION( 0x10000, "sub", 0)
+	ROM_LOAD( "disk.rom", 0x0000, 0x2000, CRC(2447516b) SHA1(1492116f15c426f9796dc2bb6fcccf2656c0ca75) )
+
+	/* No idea of the proper size: it has never been dumped */
+	ROM_REGION( 0x2000, "audiocpu", 0)
+	ROM_LOAD( "soundbios.rom", 0x0000, 0x2000, NO_DUMP )
+
+	ROM_REGION( 0x40000, "gfx1", 0)
+	ROM_LOAD( "kanji1.rom", 0x00000, 0x20000, CRC(6178bd43) SHA1(82e11a177af6a5091dd67f50a2f4bafda84d6556) )
+	ROM_LOAD( "kanji2.rom", 0x20000, 0x20000, CRC(376eb677) SHA1(bcf96584e2ba362218b813be51ea21573d1a2a78) )
+ROM_END
+
+ROM_START( pc8801mh )
+	ROM_REGION( 0x18000, "maincpu", 0 )
+	ROM_LOAD( "n80.rom",   0x00000, 0x8000, CRC(8a2a1e17) SHA1(06dae1db384aa29d81c5b6ed587877e7128fcb35) )
+	ROM_LOAD( "n88.rom",   0x08000, 0x8000, CRC(64c5d162) SHA1(3e0aac76fb5d7edc99df26fa9f365fd991742a5d) )
+	ROM_LOAD( "n88_0.rom", 0x10000, 0x2000, CRC(deb384fb) SHA1(5f38cafa8aab16338038c82267800446fd082e79) )
+	ROM_LOAD( "n88_1.rom", 0x12000, 0x2000, CRC(7ad5d943) SHA1(4ae4d37409ff99411a623da9f6a44192170a854e) )
+	ROM_LOAD( "n88_2.rom", 0x14000, 0x2000, CRC(6aa6b6d8) SHA1(2a077ab444a4fd1470cafb06fd3a0f45420c39cc) )
+	ROM_LOAD( "n88_3.rom", 0x16000, 0x2000, CRC(692cbcd8) SHA1(af452aed79b072c4d17985830b7c5dca64d4b412) )
+
+	ROM_REGION( 0x10000, "sub", 0)
+	ROM_LOAD( "disk.rom", 0x0000, 0x2000, CRC(a222ecf0) SHA1(79e9c0786a14142f7a83690bf41fb4f60c5c1004) )
+
+	/* No idea of the proper size: it has never been dumped */
+	ROM_REGION( 0x2000, "audiocpu", 0)
+	ROM_LOAD( "soundbios.rom", 0x0000, 0x2000, NO_DUMP )
+
+	ROM_REGION( 0x40000, "gfx1", 0)
+	ROM_LOAD( "kanji1.rom", 0x00000, 0x20000, CRC(6178bd43) SHA1(82e11a177af6a5091dd67f50a2f4bafda84d6556) )
+	ROM_LOAD( "kanji2.rom", 0x20000, 0x20000, CRC(376eb677) SHA1(bcf96584e2ba362218b813be51ea21573d1a2a78) )
+ROM_END
+
+ROM_START( pc8801fa )
+	ROM_REGION( 0x18000, "maincpu", 0 )
+	ROM_LOAD( "n80.rom",   0x00000, 0x8000, CRC(8a2a1e17) SHA1(06dae1db384aa29d81c5b6ed587877e7128fcb35) )
+	ROM_LOAD( "n88.rom",   0x08000, 0x8000, CRC(73573432) SHA1(9b1346d44044eeea921c4cce69b5dc49dbc0b7e9) )
+	ROM_LOAD( "n88_0.rom", 0x10000, 0x2000, CRC(a72697d7) SHA1(5aedbc5916d67ef28767a2b942864765eea81bb8) )
+	ROM_LOAD( "n88_1.rom", 0x12000, 0x2000, CRC(7ad5d943) SHA1(4ae4d37409ff99411a623da9f6a44192170a854e) )
+	ROM_LOAD( "n88_2.rom", 0x14000, 0x2000, CRC(6aee9a4e) SHA1(e94278682ef9e9bbb82201f72c50382748dcea2a) )
+	ROM_LOAD( "n88_3.rom", 0x16000, 0x2000, CRC(692cbcd8) SHA1(af452aed79b072c4d17985830b7c5dca64d4b412) )
+
+	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_LOAD( "disk.rom", 0x0000, 0x0800, CRC(2163b304) SHA1(80da2dee49d4307f00895a129a5cfeff00cf5321) )
+
+	/* No idea of the proper size: it has never been dumped */
+	ROM_REGION( 0x2000, "audiocpu", 0)
+	ROM_LOAD( "soundbios.rom", 0x0000, 0x2000, NO_DUMP )
+
+	ROM_REGION( 0x40000, "gfx1", 0 )
+	ROM_LOAD( "kanji1.rom", 0x00000, 0x20000, CRC(6178bd43) SHA1(82e11a177af6a5091dd67f50a2f4bafda84d6556) )
+	ROM_LOAD( "kanji2.rom", 0x20000, 0x20000, CRC(376eb677) SHA1(bcf96584e2ba362218b813be51ea21573d1a2a78) )
+ROM_END
+
+ROM_START( pc8801ma )
+	ROM_REGION( 0x18000, "maincpu", 0 )
+	ROM_LOAD( "n80.rom",   0x00000, 0x8000, CRC(8a2a1e17) SHA1(06dae1db384aa29d81c5b6ed587877e7128fcb35) )
+	ROM_LOAD( "n88.rom",   0x08000, 0x8000, CRC(73573432) SHA1(9b1346d44044eeea921c4cce69b5dc49dbc0b7e9) )
+	ROM_LOAD( "n88_0.rom", 0x10000, 0x2000, CRC(a72697d7) SHA1(5aedbc5916d67ef28767a2b942864765eea81bb8) )
 	ROM_LOAD( "n88_1.rom", 0x12000, 0x2000, CRC(7ad5d943) SHA1(4ae4d37409ff99411a623da9f6a44192170a854e) )
 	ROM_LOAD( "n88_2.rom", 0x14000, 0x2000, CRC(6aee9a4e) SHA1(e94278682ef9e9bbb82201f72c50382748dcea2a) )
 	ROM_LOAD( "n88_3.rom", 0x16000, 0x2000, CRC(692cbcd8) SHA1(af452aed79b072c4d17985830b7c5dca64d4b412) )
@@ -688,8 +832,12 @@ ROM_START( pc88ma )
 	ROM_REGION( 0x10000, "sub", 0 )
 	ROM_LOAD( "disk.rom", 0x0000, 0x2000, CRC(a222ecf0) SHA1(79e9c0786a14142f7a83690bf41fb4f60c5c1004) )
 
+	/* No idea of the proper size: it has never been dumped */
+	ROM_REGION( 0x2000, "audiocpu", 0)
+	ROM_LOAD( "soundbios.rom", 0x0000, 0x2000, NO_DUMP )
+
 	ROM_REGION( 0x40000, "gfx1", 0 )
-	ROM_LOAD( "kanji1.rom", 0x00000, 0x20000, CRC(6178bd43) SHA1(82e11a177af6a5091dd67f50a2f4bafda84d6556) )	// not included in the dump. unsure if it should be the same of mkIISR
+	ROM_LOAD( "kanji1.rom", 0x00000, 0x20000, CRC(6178bd43) SHA1(82e11a177af6a5091dd67f50a2f4bafda84d6556) )
 	ROM_LOAD( "kanji2.rom", 0x20000, 0x20000, CRC(376eb677) SHA1(bcf96584e2ba362218b813be51ea21573d1a2a78) )
 
 	/* 32 banks, to be loaded at 0xc000 - 0xffff */
@@ -697,18 +845,21 @@ ROM_START( pc88ma )
 	ROM_LOAD( "jisyo.rom", 0x00000, 0x80000, CRC(a6108f4d) SHA1(3665db538598abb45d9dfe636423e6728a812b12) )
 ROM_END
 
-/* This dump only included n88, n88_2 and dictionary. Unsure about other dumps: they could be mismatched (come from PC-8801MA)! */
-ROM_START( pc88ma2 )
+ROM_START( pc8801ma2 )
 	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD( "n80.rom",   0x00000, 0x8000, CRC(8a2a1e17) SHA1(06dae1db384aa29d81c5b6ed587877e7128fcb35) )	// it should be v1.8
-	ROM_LOAD( "n88.rom",   0x08000, 0x8000, CRC(ae1a6ebc) SHA1(e53d628638f663099234e07837ffb1b0f86d480d) )	// it should be v1.91
-	ROM_LOAD( "n88_0.rom", 0x10000, 0x2000, CRC(a72697d7) SHA1(5aedbc5916d67ef28767a2b942864765eea81bb8) )	// it should be v2.3 (but n88_2 differs from ma)
+	ROM_LOAD( "n80.rom",   0x00000, 0x8000, CRC(8a2a1e17) SHA1(06dae1db384aa29d81c5b6ed587877e7128fcb35) )
+	ROM_LOAD( "n88.rom",   0x08000, 0x8000, CRC(ae1a6ebc) SHA1(e53d628638f663099234e07837ffb1b0f86d480d) )
+	ROM_LOAD( "n88_0.rom", 0x10000, 0x2000, CRC(a72697d7) SHA1(5aedbc5916d67ef28767a2b942864765eea81bb8) )
 	ROM_LOAD( "n88_1.rom", 0x12000, 0x2000, CRC(7ad5d943) SHA1(4ae4d37409ff99411a623da9f6a44192170a854e) )
 	ROM_LOAD( "n88_2.rom", 0x14000, 0x2000, CRC(1d6277b6) SHA1(dd9c3e50169b75bb707ef648f20d352e6a8bcfe4) )
 	ROM_LOAD( "n88_3.rom", 0x16000, 0x2000, CRC(692cbcd8) SHA1(af452aed79b072c4d17985830b7c5dca64d4b412) )
 
 	ROM_REGION( 0x10000, "sub", 0 )
 	ROM_LOAD( "disk.rom", 0x0000, 0x2000, CRC(a222ecf0) SHA1(79e9c0786a14142f7a83690bf41fb4f60c5c1004) )
+
+	/* No idea of the proper size: it has never been dumped */
+	ROM_REGION( 0x2000, "audiocpu", 0)
+	ROM_LOAD( "soundbios.rom", 0x0000, 0x2000, NO_DUMP )
 
 	ROM_REGION( 0x40000, "gfx1", 0 )
 	ROM_LOAD( "kanji1.rom", 0x00000, 0x20000, CRC(6178bd43) SHA1(82e11a177af6a5091dd67f50a2f4bafda84d6556) )
@@ -719,29 +870,56 @@ ROM_START( pc88ma2 )
 	ROM_LOAD( "jisyo.rom", 0x00000, 0x80000, CRC(856459af) SHA1(06241085fc1d62d4b2968ad9cdbdadc1e7d7990a) )
 ROM_END
 
-/* This dump only included n88, cdbios and dictionary. Unsure about other dumps: I took the 8801MA ones because the BASIC versions should be the same! */
-ROM_START( pc88mc )
+ROM_START( pc8801mc )
 	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD( "n80.rom",   0x00000, 0x8000, CRC(8a2a1e17) SHA1(06dae1db384aa29d81c5b6ed587877e7128fcb35) )	// it should be v1.8
-	ROM_LOAD( "n88.rom",   0x08000, 0x8000, CRC(356d5719) SHA1(5d9ba80d593a5119f52aae1ccd61a1457b4a89a1) )	// it should be v1.93
-	ROM_LOAD( "n88_0.rom", 0x10000, 0x2000, CRC(a72697d7) SHA1(5aedbc5916d67ef28767a2b942864765eea81bb8) )	// it should be v2.3
+	ROM_LOAD( "n80.rom",   0x00000, 0x8000, CRC(8a2a1e17) SHA1(06dae1db384aa29d81c5b6ed587877e7128fcb35) )
+	ROM_LOAD( "n88.rom",   0x08000, 0x8000, CRC(356d5719) SHA1(5d9ba80d593a5119f52aae1ccd61a1457b4a89a1) )
+	ROM_LOAD( "n88_0.rom", 0x10000, 0x2000, CRC(a72697d7) SHA1(5aedbc5916d67ef28767a2b942864765eea81bb8) )
 	ROM_LOAD( "n88_1.rom", 0x12000, 0x2000, CRC(7ad5d943) SHA1(4ae4d37409ff99411a623da9f6a44192170a854e) )
-	ROM_LOAD( "n88_2.rom", 0x14000, 0x2000, CRC(6aee9a4e) SHA1(e94278682ef9e9bbb82201f72c50382748dcea2a) )
+	ROM_LOAD( "n88_2.rom", 0x14000, 0x2000, CRC(1d6277b6) SHA1(dd9c3e50169b75bb707ef648f20d352e6a8bcfe4) )
 	ROM_LOAD( "n88_3.rom", 0x16000, 0x2000, CRC(692cbcd8) SHA1(af452aed79b072c4d17985830b7c5dca64d4b412) )
 
 	ROM_REGION( 0x10000, "sub", 0 )
-	ROM_LOAD( "disk.rom", 0x0000, 0x2000, CRC(a222ecf0) SHA1(79e9c0786a14142f7a83690bf41fb4f60c5c1004) )	// not included in the dump. unsure if it should be the same of ma
+	ROM_LOAD( "disk.rom", 0x0000, 0x2000, CRC(a222ecf0) SHA1(79e9c0786a14142f7a83690bf41fb4f60c5c1004) )
 
 	ROM_REGION( 0x10000, "cdrom", 0 )
 	ROM_LOAD( "cdbios.rom", 0x0000, 0x10000, CRC(5c230221) SHA1(6394a8a23f44ea35fcfc3e974cf940bc8f84d62a) )
 
+	/* No idea of the proper size: it has never been dumped */
+	ROM_REGION( 0x2000, "audiocpu", 0)
+	ROM_LOAD( "soundbios.rom", 0x0000, 0x2000, NO_DUMP )
+
 	ROM_REGION( 0x40000, "gfx1", 0 )
-	ROM_LOAD( "kanji1.rom", 0x00000, 0x20000, CRC(6178bd43) SHA1(82e11a177af6a5091dd67f50a2f4bafda84d6556) )	// not included in the dump. unsure if it should be the same of ma
-	ROM_LOAD( "kanji2.rom", 0x20000, 0x20000, CRC(376eb677) SHA1(bcf96584e2ba362218b813be51ea21573d1a2a78) )	// not included in the dump. unsure if it should be the same of ma
+	ROM_LOAD( "kanji1.rom", 0x00000, 0x20000, CRC(6178bd43) SHA1(82e11a177af6a5091dd67f50a2f4bafda84d6556) )
+	ROM_LOAD( "kanji2.rom", 0x20000, 0x20000, CRC(376eb677) SHA1(bcf96584e2ba362218b813be51ea21573d1a2a78) )
 
 	/* 32 banks, to be loaded at 0xc000 - 0xffff */
 	ROM_REGION( 0x80000, "dictionary", 0 )
 	ROM_LOAD( "jisyo.rom", 0x00000, 0x80000, CRC(bd6eb062) SHA1(deef0cc2a9734ba891a6d6c022aa70ffc66f783e) )
+ROM_END
+
+ROM_START( pc88va )
+	ROM_REGION( 0xb0000, "maincpu", 0 )
+	/* FWIW, varom00 contains some piece of N88-BASIC */
+	ROM_LOAD( "varom00.rom",   0x10000, 0x80000, CRC(98c9959a) SHA1(bcaea28c58816602ca1e8290f534360f1ca03fe8) )	// multiple banks to be loaded at 0x0000?
+	ROM_LOAD( "varom08.rom",   0x90000, 0x20000, CRC(eef6d4a0) SHA1(47e5f89f8b0ce18ff8d5d7b7aef8ca0a2a8e3345) )	// multiple banks to be loaded at 0x8000?
+
+	ROM_REGION( 0x20000, "cpu2", 0 )	// not sure, it may be the V30 program
+	ROM_LOAD( "varom1.rom", 0x0000, 0x20000, CRC(7e767f00) SHA1(dd4f4521bfbb068f15ab3bcdb8d47c7d82b9d1d4) )
+
+	ROM_REGION( 0x2000, "sub", 0 )		// not sure what this should do...
+	ROM_LOAD( "vasubsys.rom", 0x0000, 0x2000, CRC(08962850) SHA1(a9375aa480f85e1422a0e1385acb0ea170c5c2e0) )
+
+	/* No idea of the proper size: it has never been dumped */
+	ROM_REGION( 0x2000, "audiocpu", 0)
+	ROM_LOAD( "soundbios.rom", 0x0000, 0x2000, NO_DUMP )
+
+	ROM_REGION( 0x50000, "gfx1", 0 )
+	ROM_LOAD( "vafont.rom", 0x00000, 0x50000, CRC(b40d34e4) SHA1(a0227d1fbc2da5db4b46d8d2c7e7a9ac2d91379f) )
+
+	/* 32 banks, to be loaded at 0xc000 - 0xffff */
+	ROM_REGION( 0x80000, "dictionary", 0 )
+	ROM_LOAD( "vadic.rom", 0x00000, 0x80000, CRC(a6108f4d) SHA1(3665db538598abb45d9dfe636423e6728a812b12) )
 ROM_END
 
 
@@ -772,10 +950,20 @@ SYSTEM_CONFIG_END
 
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT    INIT  CONFIG  COMPANY FULLNAME */
-COMP( 1985, pc88m2sl, 0,        0,      pc88srl,  pc88sr,  0,    pc88,   "Nippon Electronic Company",  "PC-8801 MkIISR (Lores display, VSYNC 15KHz)", 0 )
-COMP( 1983, pc88m2,   pc88m2sl, 0,      pc88srl,  pc88sr,  0,    pc88,   "Nippon Electronic Company",  "PC-8801 MkII (Lores display, VSYNC 15KHz)", GAME_NOT_WORKING )	// This could be made parent, but I'm not 100% confident the dump is correct
-COMP( 1985, pc88m2sh, pc88m2sl, 0,      pc88srh,  pc88sr,  0,    pc88,   "Nippon Electronic Company",  "PC-8801 MkIISR (Hires display, VSYNC 24KHz)", 0 )
-COMP( 1985, pc88m2fr, pc88m2sl, 0,      pc88srh,  pc88sr,  0,    pc88,   "Nippon Electronic Company",  "PC-8801 MkIIFR (Hires display, VSYNC 24KHz)", 0 )
-COMP( 1987, pc88ma,   pc88m2sl, 0,      pc88srh,  pc88sr,  0,    pc88,   "Nippon Electronic Company",  "PC-8801 MA (Hires display, VSYNC 24KHz)", 0 )
-COMP( 1988, pc88ma2,  pc88m2sl, 0,      pc88srh,  pc88sr,  0,    pc88,   "Nippon Electronic Company",  "PC-8801 MA2 (Hires display, VSYNC 24KHz)", 0 )
-COMP( 1989, pc88mc,   pc88m2sl, 0,      pc88srh,  pc88sr,  0,    pc88,   "Nippon Electronic Company",  "PC-8801 MC (Hires display, VSYNC 24KHz)", 0 )
+
+COMP( 1979, pc8001,    0,        0,     pc88srl,  pc88sr,  0,    pc88,   "Nippon Electronic Company",  "PC-8001 (Lores display, VSYNC 15KHz)", GAME_NOT_WORKING )
+COMP( 1983, pc8001m2,  0,        0,     pc88srl,  pc88sr,  0,    pc88,   "Nippon Electronic Company",  "PC-8001 Mk2 (Lores display, VSYNC 15KHz)", GAME_NOT_WORKING )	// not sure about this dump
+
+COMP( 1981, pc8801,    0,        0,     pc88srl,  pc88sr,  0,    pc88,   "Nippon Electronic Company",  "PC-8801 (Lores display, VSYNC 15KHz)", GAME_NOT_WORKING )
+COMP( 1983, pc88m2,    pc8801,   0,     pc88srl,  pc88sr,  0,    pc88,   "Nippon Electronic Company",  "PC-8001 MkII (Lores display, VSYNC 15KHz)", GAME_NOT_WORKING )	// not sure about this dump
+COMP( 1985, pc88m2sl,  0,        0,     pc88srl,  pc88sr,  0,    pc88,   "Nippon Electronic Company",  "PC-8801 MkIISR (Lores display, VSYNC 15KHz)", 0 )
+COMP( 1985, pc88m2sh,  pc88m2sl, 0,     pc88srh,  pc88sr,  0,    pc88,   "Nippon Electronic Company",  "PC-8801 MkIISR (Hires display, VSYNC 24KHz)", 0 )
+COMP( 1985, pc88m2fr,  pc88m2sl, 0,     pc88srh,  pc88sr,  0,    pc88,   "Nippon Electronic Company",  "PC-8801 MkIIFR (Hires display, VSYNC 24KHz)", 0 )
+COMP( 1985, pc88m2mr,  pc88m2sl, 0,     pc88srh,  pc88sr,  0,    pc88,   "Nippon Electronic Company",  "PC-8801 MkIIMR (Hires display, VSYNC 24KHz)", 0 )
+COMP( 1986, pc8801mh,  pc88m2sl, 0,     pc88srh,  pc88sr,  0,    pc88,   "Nippon Electronic Company",  "PC-8801 MH (Hires display, VSYNC 24KHz)", 0 )
+COMP( 1987, pc8801fa,  pc88m2sl, 0,     pc88srh,  pc88sr,  0,    pc88,   "Nippon Electronic Company",  "PC-8801 FA (Hires display, VSYNC 24KHz)", 0 )
+COMP( 1987, pc8801ma,  pc88m2sl, 0,     pc88srh,  pc88sr,  0,    pc88,   "Nippon Electronic Company",  "PC-8801 MA (Hires display, VSYNC 24KHz)", 0 )
+COMP( 1988, pc8801ma2, pc88m2sl, 0,     pc88srh,  pc88sr,  0,    pc88,   "Nippon Electronic Company",  "PC-8801 MA2 (Hires display, VSYNC 24KHz)", 0 )
+COMP( 1989, pc8801mc,  pc88m2sl, 0,     pc88srh,  pc88sr,  0,    pc88,   "Nippon Electronic Company",  "PC-8801 MC (Hires display, VSYNC 24KHz)", 0 )
+
+COMP( 1987, pc88va,    0,        0,     pc88va,   pc88sr,  0,    0,      "Nippon Electronic Company",  "PC-88 VA", GAME_NOT_WORKING )

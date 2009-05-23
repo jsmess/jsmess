@@ -257,7 +257,7 @@ MACHINE_START( cybikoxt )
 	// real-time clock
 	nvram_system_load( machine, "rtc", cybiko_pcf8593_load, 0);
 	// multi-purpose flash
-	nvram_system_load( machine, "flash1", cybiko_sst39vfx_load, 1);
+	nvram_system_load( machine, "flash2", cybiko_sst39vfx_load, 1);
 	memory_set_bankptr( machine, 2, sst39vfx_get_base(flash2));
 	// serial port
 	cybiko_rs232_init();
