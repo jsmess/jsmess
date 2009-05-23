@@ -9,6 +9,7 @@
 #include "driver.h"
 #include "cpu/i8085/i8085.h"
 #include "devices/cassette.h"
+#include "sound/wave.h"
 #include "includes/poly88.h"
 
 static ADDRESS_MAP_START(poly88_mem, ADDRESS_SPACE_PROGRAM, 8)
@@ -24,11 +25,24 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( poly88_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE("uart", msm8251_status_r,msm8251_control_w)
 	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("uart", msm8251_data_r,msm8251_data_w)
+	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE("uart", msm8251_status_r,msm8251_control_w)	
 	AM_RANGE(0x04, 0x04) AM_WRITE(poly_baud_rate_w)
 	AM_RANGE(0x08, 0x08) AM_WRITE(poly_intr_w)
 	AM_RANGE(0xf8, 0xf8) AM_READ(poly_keyboard_r)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(poly8813_mem, ADDRESS_SPACE_PROGRAM, 8)
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x03ff) AM_ROM // Monitor ROM
+	AM_RANGE(0x0400, 0x0bff) AM_ROM // Disk System ROM
+	AM_RANGE(0x0c00, 0x0fff) AM_RAM // System RAM
+	AM_RANGE(0x1800, 0x1bff) AM_RAM AM_BASE(&poly_video_ram) // Video RAM
+	AM_RANGE(0x2000, 0xffff) AM_RAM // RAM	
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( poly8813_io , ADDRESS_SPACE_IO, 8)
+	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -151,6 +165,11 @@ static MACHINE_DRIVER_START( poly88 )
     MDRV_VIDEO_START(poly88)
     MDRV_VIDEO_UPDATE(poly88)
     
+	/* audio hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_WAVE_ADD("wave", "cassette")
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
     /* cassette */
 	MDRV_CASSETTE_ADD( "cassette", poly88_cassette_config )
 	
@@ -159,6 +178,14 @@ static MACHINE_DRIVER_START( poly88 )
 	
 	/* snapshot */
 	MDRV_SNAPSHOT_ADD("snapshot", poly88, "img", 0)	
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( poly8813 )
+	MDRV_IMPORT_FROM(poly88)
+	
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_PROGRAM_MAP(poly8813_mem)
+	MDRV_CPU_IO_MAP(poly8813_io)
 MACHINE_DRIVER_END
 
 static SYSTEM_CONFIG_START(poly88)
@@ -172,8 +199,15 @@ ROM_START( poly88 )
   	ROM_LOAD( "tbasic_2.rom", 0x0800, 0x0400, CRC(f2619232) SHA1(eb6fb0356d2fb153111cfddf39eab10253cb4c53))
 ROM_END
 
+ROM_START( poly8813 )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "poly8813-1.bin", 0x0000, 0x0400, CRC(7fd980a0) SHA1(a71d5999deb4323a11db1c0ea0dcb1dacfaf47ef))
+  	ROM_LOAD( "poly8813-2.rom", 0x0400, 0x0400, CRC(1ad7c06c) SHA1(c96b8f03c184de58dbdcee18d297dbccf2d77176))
+  	ROM_LOAD( "poly8813-3.rom", 0x0800, 0x0400, CRC(3df57e5b) SHA1(5b0c4febfc7515fc07e63dcb21d0ab32bc6a2e46))
+ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   				  FULLNAME       FLAGS */
-COMP( 1976, poly88,  0,     0, 		 poly88, 	poly88,  poly88, poly88,"PolyMorphic Systems",   "Poly-88",	 GAME_NOT_WORKING)
+COMP( 1976, poly88,  0,     0, 		 poly88, 	poly88,  poly88, poly88,"PolyMorphic Systems",   "Poly-88",	 0)
+COMP( 1977, poly8813,poly88,0, 		 poly8813, 	poly88,  poly88, poly88,"PolyMorphic Systems",   "Poly-8813",GAME_NOT_WORKING)
 

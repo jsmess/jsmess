@@ -1184,6 +1184,7 @@ const game_driver * const drivers[] =
 
 	/* PolyMorphic Systems */
 	DRIVER( poly88 )
+	DRIVER( poly8813 )
 		
 	/* Bondwell */
 	DRIVER( bw2 )

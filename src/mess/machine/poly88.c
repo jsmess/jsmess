@@ -16,10 +16,20 @@ static UINT8 intr = 0;
 static UINT8 last_code = 0;
 static UINT8 int_vector = 0;
 static emu_timer * poly88_cassette_timer;
+static emu_timer * poly88_usart_timer;
+
+static TIMER_CALLBACK(poly88_usart_timer_callback)
+{
+	int_vector = 0xe7;
+	cpu_set_input_line(cputag_get_cpu(machine, "maincpu"), 0, HOLD_LINE);	
+}
 
 WRITE8_HANDLER(poly_baud_rate_w)
 {
 	logerror("poly_baud_rate_w %02x\n",data);
+	poly88_usart_timer = timer_alloc(space->machine, poly88_usart_timer_callback, NULL);
+	timer_adjust_periodic(poly88_usart_timer, attotime_zero, 0, ATTOTIME_IN_HZ(300));
+	
 }
 
 static UINT8 row_number(UINT8 code) {
@@ -135,18 +145,16 @@ static void poly88_cassette_write(running_machine *machine, int id, unsigned lon
 static TIMER_CALLBACK(poly88_cassette_timer_callback)
 {
 	int data;
-//	int current_level;
-//	static int previous_level = 0;
+	int current_level;
+	static int previous_level = 0;
 	static int clk_level = 1;
 	static int clk_level_tape = 1;
 
-	//int_vector = 0xe7;
-	//cpu_set_input_line(cputag_get_cpu(machine, "maincpu"), 0, HOLD_LINE);	
 
 //	if (!(input_port_read(machine, "DSW0") & 0x02))	/* V.24 / Tape Switch */
 	//{
 		/* tape reading */
-/*		if (cassette_get_state(devtag_get_device(machine, "cassette"))&CASSETTE_PLAY)
+		if (cassette_get_state(devtag_get_device(machine, "cassette"))&CASSETTE_PLAY)
 		{
 					if (clk_level_tape)
 					{
@@ -160,16 +168,16 @@ static TIMER_CALLBACK(poly88_cassette_timer_callback)
 						if (previous_level!=current_level)
 						{
 							data = (!previous_level && current_level) ? 1 : 0;
-
-							set_out_data_bit(pmd85_cassette_serial_connection.State, data);
-							serial_connection_out(machine, &pmd85_cassette_serial_connection);
+//data = current_level;
+							set_out_data_bit(poly88_cassette_serial_connection.State, data);
+							serial_connection_out(machine, &poly88_cassette_serial_connection);
 							msm8251_receive_clock(devtag_get_device(machine, "uart"));
 
 							clk_level_tape = 1;
 						}
 					}
 		}
-		*/
+		
 		/* tape writing */
 		if (cassette_get_state(devtag_get_device(machine, "cassette"))&CASSETTE_RECORD)
 		{
@@ -202,7 +210,7 @@ static TIMER_CALLBACK( setup_machine_state )
 DRIVER_INIT ( poly88 )
 {
 	poly88_cassette_timer = timer_alloc(machine, poly88_cassette_timer_callback, NULL);
-	timer_adjust_periodic(poly88_cassette_timer, attotime_zero, 0, ATTOTIME_IN_HZ(2400));
+	timer_adjust_periodic(poly88_cassette_timer, attotime_zero, 0, ATTOTIME_IN_HZ(600));
 
 	serial_connection_init(machine, &poly88_cassette_serial_connection);
 	serial_connection_set_in_callback(machine, &poly88_cassette_serial_connection, poly88_cassette_write);
@@ -318,5 +326,6 @@ SNAPSHOT_LOAD( poly88 )
 		}
 		pos+=recordLen;
 	}	
+	device_reset(devtag_get_device(image->machine, "uart"));
 	return INIT_PASS;
 }
