@@ -623,8 +623,13 @@ const game_driver * const drivers[] =
 	DRIVER( pc6001sr )
 	DRIVER( pc6600 )
 	DRIVER( pc6600sr )
-	DRIVER( pc88srl )	/* PC-8801mkIISR(Low res display, VSYNC 15 kHz)		*/
-	DRIVER( pc88srh )	/* PC-8801mkIISR(High res display, VSYNC 24 kHz)		*/
+	DRIVER( pc88m2 )	/* PC-8801mkII (Low res display, VSYNC 15 kHz)		*/
+	DRIVER( pc88m2sl )	/* PC-8801mkIISR (Low res display, VSYNC 15 kHz)	*/
+	DRIVER( pc88m2sh )	/* PC-8801mkIISR (High res display, VSYNC 24 kHz)	*/
+	DRIVER( pc88m2fr )	/* PC-8801mkIIFR (High res display, VSYNC 24 kHz)	*/
+	DRIVER( pc88ma )	/* PC-8801MA (High res display, VSYNC 24 kHz)		*/
+	DRIVER( pc88ma2 )	/* PC-8801MA2 (High res display, VSYNC 24 kHz)		*/
+	DRIVER( pc88mc )	/* PC-8801MC (High res display, VSYNC 24 kHz)		*/
 
 	/* CANTAB */
 	DRIVER( jupiter )	/* Jupiter Ace										*/
