@@ -1405,6 +1405,7 @@ $(MESSOBJ)/skeleton.a: \
 	$(MESS_DRIVERS)/nanos.o \
 	$(MESS_DRIVERS)/a51xx.o \
 	$(MESS_DRIVERS)/x1.o	\
+	$(MESS_DRIVERS)/beehive.o \
 	
 #-------------------------------------------------
 # layout dependencies

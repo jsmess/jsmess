@@ -1336,6 +1336,7 @@ const game_driver * const drivers[] =
 	DRIVER( m40 )
 	DRIVER( nanos )
 	DRIVER( a5120 )
-	DRIVER( a5130 )	
+	DRIVER( a5130 )
+	DRIVER( beehive )	
 
 #endif /* DRIVER_RECURSIVE */
