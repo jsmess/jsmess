@@ -19,21 +19,6 @@ static ADDRESS_MAP_START(z1013_mem, ADDRESS_SPACE_PROGRAM, 8)
     AM_RANGE( 0xf000, 0xffff ) AM_ROM //  ROM     
 ADDRESS_MAP_END
 
-
-/* Wires on Z80 PIO are switched */
-READ8_DEVICE_HANDLER(z1013_z80pio_r)
-{
-	if ((offset & 1) ==0) return z80pio_d_r(device, offset >> 1); else return z80pio_c_r(device, offset >> 1);
-}
-
-WRITE8_DEVICE_HANDLER(z1013_z80pio_w)
-{
-	if ((offset & 1) ==0) 
-		z80pio_d_w(device, offset >> 1, data); 
-	else 
-		z80pio_c_w(device, offset >> 1, data);
-}
-
 static ADDRESS_MAP_START( z1013_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x00, 0x03 ) AM_DEVREADWRITE("z80pio", z1013_z80pio_r, z1013_z80pio_w)
@@ -159,6 +144,7 @@ static INPUT_PORTS_START( z1013_8x8 )
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Shift Lock") PORT_CODE(KEYCODE_CAPSLOCK)
 INPUT_PORTS_END
 
+INPUT_PORTS_EXTERN( k7659 );
 
 /* Machine driver */
 static MACHINE_DRIVER_START( z1013 )
@@ -189,24 +175,65 @@ static MACHINE_DRIVER_START( z1013 )
 	MDRV_SNAPSHOT_ADD("snapshot", z1013, "z80", 0)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( z1013k76 )
+	MDRV_IMPORT_FROM(z1013)
+	MDRV_Z80PIO_REMOVE("z80pio")
+	MDRV_Z80PIO_ADD("z80pio", z1013k7659_z80pio_intf)
+MACHINE_DRIVER_END
+
 /* ROM definition */
 ROM_START( z1013 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "mon_202.bin", 0xf000, 0x0800, CRC(5884EDAB) SHA1(c3a45ea5cc4da2b7c270068ba1e2d75916960709))
-	ROM_REGION(0x0800, "gfx1",0)
-	ROM_LOAD ("z1013font.bin",   0x0000, 0x0800, CRC(7023088F) SHA1(8b197a51c070efeba173d10be197bd41e764358c))
+	ROM_SYSTEM_BIOS( 0, "202", "Original" )
+	ROMX_LOAD( "mon_202.bin", 0xf000, 0x0800, CRC(5884edab) SHA1(c3a45ea5cc4da2b7c270068ba1e2d75916960709), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS( 1, "jm", "Jens Muller version" )
+	ROMX_LOAD( "mon_jm_1992.bin ", 0xf000, 0x0800, CRC(186d2888) SHA1(b52ccb557c41c96bace7db4c4f5031a0cd736168), ROM_BIOS(2))	
+	ROM_REGION(0x1000, "gfx1",0)
+	ROM_LOAD ("z1013font.bin",   0x0000, 0x0800, CRC(7023088f) SHA1(8b197a51c070efeba173d10be197bd41e764358c))
+	ROM_LOAD ("altfont.bin",     0x0800, 0x0800, CRC(2dc96f9c) SHA1(d0b9b0751cc1e91be731547f6442c649b6dd6979))
 ROM_END
 
 ROM_START( z1013a2 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "mon_a2.bin", 0xf000, 0x0800, CRC(98B19B10) SHA1(97e158f589198cb96aae1567ee0aa6e47824027e))	
-	ROM_REGION(0x0800, "gfx1",0)
-	ROM_LOAD ("z1013font.bin",   0x0000, 0x0800, CRC(7023088F) SHA1(8b197a51c070efeba173d10be197bd41e764358c))
+	ROM_LOAD( "mon_a2.bin", 0xf000, 0x0800, CRC(98b19b10) SHA1(97e158f589198cb96aae1567ee0aa6e47824027e))	
+	ROM_REGION(0x1000, "gfx1",0)
+	ROM_LOAD ("z1013font.bin",   0x0000, 0x0800, CRC(7023088f) SHA1(8b197a51c070efeba173d10be197bd41e764358c))
+	ROM_LOAD ("altfont.bin",     0x0800, 0x0800, CRC(2dc96f9c) SHA1(d0b9b0751cc1e91be731547f6442c649b6dd6979))
 ROM_END
 
+ROM_START( z1013k76 )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "mon_rb_k7659.bin", 0xf000, 0x1000, CRC(b3d88c45) SHA1(0bcd20338cf0706b384f40901b7f8498c6f6c320))	
+	ROM_REGION(0x1000, "gfx1",0)
+	ROM_LOAD ("z1013font.bin",   0x0000, 0x0800, CRC(7023088f) SHA1(8b197a51c070efeba173d10be197bd41e764358c))
+	ROM_LOAD ("altfont.bin",     0x0800, 0x0800, CRC(2dc96f9c) SHA1(d0b9b0751cc1e91be731547f6442c649b6dd6979))
+	ROM_REGION(0x1000, "k7659",0)
+	ROM_LOAD ("k7659n.bin", 0x0000, 0x0800, CRC(7454bf0a) SHA1(b97e7df93778fa371b96b6f4fb1a5b1c8b89d7ba) )	
+ROM_END
+
+ROM_START( z1013s60 )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_SYSTEM_BIOS( 0, "v1", "Version 1" )
+	ROMX_LOAD( "mon_rb_s6009.bin", 0xf000, 0x1000, CRC(b37faeed) SHA1(ce2e69af5378d39284e8b3be23da50416a0b0fbe), ROM_BIOS(1))	
+	ROM_SYSTEM_BIOS( 1, "v2", "Version 2" )
+	ROMX_LOAD( "4k-moni-k7652.bin", 0xf000, 0x1000, CRC(a1625fce) SHA1(f0847399502b38a73ad26b38ee2d85ba04ab85ec), ROM_BIOS(2))	
+	ROM_REGION(0x1000, "gfx1",0)
+	ROM_LOAD ("z1013font.bin",   0x0000, 0x0800, CRC(7023088f) SHA1(8b197a51c070efeba173d10be197bd41e764358c))
+	ROM_LOAD ("altfont.bin",     0x0800, 0x0800, CRC(2dc96f9c) SHA1(d0b9b0751cc1e91be731547f6442c649b6dd6979))
+ROM_END
+
+ROM_START( z1013k69 )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "4k-moni-k7669.bin", 0xf000, 0x1000, CRC(09cd2a7a) SHA1(0b8500320d464469868a6b48db31105f34710c41))	
+	ROM_REGION(0x1000, "gfx1",0)
+	ROM_LOAD ("z1013font.bin",   0x0000, 0x0800, CRC(7023088f) SHA1(8b197a51c070efeba173d10be197bd41e764358c))
+	ROM_LOAD ("altfont.bin",     0x0800, 0x0800, CRC(2dc96f9c) SHA1(d0b9b0751cc1e91be731547f6442c649b6dd6979))
+ROM_END
 /* Driver */
 
-/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT   INIT  CONFIG COMPANY                 FULLNAME   FLAGS */
-COMP( 1985, z1013,     0,      0, 	z1013, 	z1013_8x4, 	z1013, NULL,  "VEB Robotron Electronics Riesa", 	 "Z1013 (matrix 8x4)",		 0)
-COMP( 1985, z1013a2,   z1013,  0, 	z1013, 	z1013_8x8, 	z1013, NULL,  "VEB Robotron Electronics Riesa", 	 "Z1013 (matrix 8x8)",		 0)
-
+/*    YEAR  NAME   PARENT  COMPAT  MACHINE  	INPUT   	INIT  CONFIG COMPANY                 FULLNAME   FLAGS */
+COMP( 1985, z1013,     0,      0, 	z1013, 		z1013_8x4, 	z1013, NULL,  "VEB Robotron Electronics Riesa", 	 "Z1013 (matrix 8x4)",		 0)
+COMP( 1985, z1013a2,   z1013,  0, 	z1013, 		z1013_8x8, 	z1013, NULL,  "VEB Robotron Electronics Riesa", 	 "Z1013 (matrix 8x8)",		 0)
+COMP( 1985, z1013k76,  z1013,  0, 	z1013k76, 	k7659, 		z1013, NULL,  "VEB Robotron Electronics Riesa", 	 "Z1013 (K7659)",		 GAME_NOT_WORKING)
+COMP( 1985, z1013s60,  z1013,  0, 	z1013k76, 	z1013_8x8,  z1013, NULL,  "VEB Robotron Electronics Riesa", 	 "Z1013 (K7652/S6009)",	 GAME_NOT_WORKING)
+COMP( 1985, z1013k69,  z1013,  0, 	z1013k76, 	k7659, 		z1013, NULL,  "VEB Robotron Electronics Riesa", 	 "Z1013 (K7669)",		 GAME_NOT_WORKING)

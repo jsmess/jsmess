@@ -1126,6 +1126,9 @@ const game_driver * const drivers[] =
 	/* Z1013 */
 	DRIVER (z1013)
 	DRIVER (z1013a2)
+	DRIVER (z1013k76)
+	DRIVER (z1013s60)
+	DRIVER (z1013k69)
 	
 	/* LLC */
 	DRIVER (llc1)
