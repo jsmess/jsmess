@@ -137,26 +137,6 @@ static ADDRESS_MAP_START( mz80k_io, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
 
-ROM_START (mz80k)
-	ROM_REGION(0x10000,"maincpu",0)
-	ROM_SYSTEM_BIOS(0, "sp1002", "sp1002")
-	ROMX_LOAD("sp1002.rom",    0x0000, 0x1000, CRC(2223e677) SHA1(518ffbe2333582ab36e6d76d1e03879a246ffa1c), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS(1, "tc", "tc")
-	ROMX_LOAD("80ktc.rom",     0x0000, 0x1000, CRC(19ed6546) SHA1(2bbeff916c2fa8991e718070ca4195beb45e0848), ROM_BIOS(2))
-	ROM_LOAD ("mz80kfdif.rom", 0xf000, 0x0400, CRC(d36505e0) SHA1(1f60027e8739313962a37edbf98172df7062df49))
-	ROM_REGION(0x0800, "gfx1",0)
-	ROM_LOAD ("80kcg.rom", 0x0000, 0x0800, CRC(9b2fb88b) SHA1(6d4d120bd0e3a8c781c581e3c379a39db610a4d2))
-ROM_END
-
-ROM_START (mz80kj)
-	ROM_REGION(0x10000,"maincpu",0)
-	ROM_LOAD ("sp1002.rom",    0x0000, 0x1000, CRC(2223e677) SHA1(518ffbe2333582ab36e6d76d1e03879a246ffa1c))
-	// TC monitor not possible to be used on japanese version since chargen doesn't have upcase/lowecase, but japanese letters
-	ROM_LOAD ("mz80kfdif.rom", 0xf000, 0x0400, CRC(d36505e0) SHA1(1f60027e8739313962a37edbf98172df7062df49))
-	ROM_REGION(0x0800, "gfx1",0)
-	ROM_LOAD ("mz80k.jap", 0x0000, 0x0800, CRC(bffe3312) SHA1(7058e565f338f5ec2bba85c19c9671e5c4fe258e))
-ROM_END
-
 static GFXDECODE_START( mz80k )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, mz80k_charlayout, 0, 1 )
 GFXDECODE_END
@@ -215,6 +195,50 @@ static MACHINE_DRIVER_START( mz80kj )
 MACHINE_DRIVER_END
 
 
-/*    YEAR  NAME      PARENT    COMPAT  	MACHINE  INPUT     INIT    CONFIG  COMPANY FULLNAME */
-COMP( 1979, mz80kj, 	0,			0,		mz80kj, mz80k,	mz80k,		0,	"Sharp",  "MZ-80K (Japanese)", 0 )
-COMP( 1979, mz80k,		mz80kj,		0,		mz80k,  mz80k,	mz80k,		0,	"Sharp",  "MZ-80K", 0 )
+ROM_START( mz80k )
+	ROM_REGION( 0x10000, "maincpu", 0)
+	ROM_SYSTEM_BIOS( 0, "sp1002", "sp1002" )
+	ROMX_LOAD( "sp1002.rom",    0x0000, 0x1000, CRC(2223e677) SHA1(518ffbe2333582ab36e6d76d1e03879a246ffa1c), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "tc", "tc" )
+	ROMX_LOAD( "80ktc.rom",     0x0000, 0x1000, CRC(19ed6546) SHA1(2bbeff916c2fa8991e718070ca4195beb45e0848), ROM_BIOS(2) )
+	ROM_LOAD( "mz80kfdif.rom",  0xf000, 0x0400, CRC(d36505e0) SHA1(1f60027e8739313962a37edbf98172df7062df49) )
+
+	ROM_REGION( 0x0800, "gfx1", 0 )
+	ROM_LOAD ( "80kcg.rom", 0x0000, 0x0800, CRC(9b2fb88b) SHA1(6d4d120bd0e3a8c781c581e3c379a39db610a4d2) )
+ROM_END
+
+ROM_START( mz80kj )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sp1002.rom",    0x0000, 0x1000, CRC(2223e677) SHA1(518ffbe2333582ab36e6d76d1e03879a246ffa1c) )
+	// TC monitor not possible to be used on japanese version since chargen doesn't have upcase/lowecase, but japanese letters
+	ROM_LOAD( "mz80kfdif.rom", 0xf000, 0x1000, CRC(d36505e0) SHA1(1f60027e8739313962a37edbf98172df7062df49) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "mz80k.jpn", 0x0000, 0x1000, CRC(bffe3312) SHA1(7058e565f338f5ec2bba85c19c9671e5c4fe258e) )
+ROM_END
+
+ROM_START( mz80a )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sa1510.rom",  0x0000, 0x1000, CRC(ae63ab39) SHA1(3c2180c52fc470131ba668a6c16e77656adeccf8) )
+	ROM_LOAD( "mz80afi.rom", 0xf000, 0x0800, CRC(e3b3ddfb) SHA1(ec94cc3d236716f53e747f0c8ac9186d72bf9c10) )
+
+	ROM_REGION( 0x0800, "gfx1", 0 )
+	ROM_LOAD( "mz80acg.rom", 0x0000, 0x0800, CRC(a87c2e2b) SHA1(e8aefbdb48a63e5f96692af868c353ca7e1bfcd2) )
+ROM_END
+
+ROM_START( mz80b )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ipl.rom",  0x0000, 0x0800, CRC(80beeec0) SHA1(d2b8167cc77ad023a807198993cb5e7a94c9e19e) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "mzfont.rom", 0x0000, 0x0800, CRC(0631efc3) SHA1(99b206af5c9845995733d877e9e93e9681b982a8) )
+ROM_END
+
+
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE  INPUT   INIT   CONFIG  COMPANY    FULLNAME */
+COMP( 1979, mz80kj,   0,        0,      mz80kj,  mz80k,  mz80k, 0,      "Sharp",   "MZ-80K (Japanese)", 0 )
+COMP( 1979, mz80k,    mz80kj,   0,      mz80k,   mz80k,  mz80k, 0,      "Sharp",   "MZ-80K", 0 )
+
+// These may need a separate driver!
+COMP( 1982, mz80a,    0,        0,      mz80k,   mz80k,  mz80k, 0,      "Sharp",   "MZ-80A", GAME_NOT_WORKING )
+COMP( 1981, mz80b,    0,        0,      mz80k,   mz80k,  mz80k, 0,      "Sharp",   "MZ-80B", GAME_NOT_WORKING )

@@ -563,10 +563,14 @@ const game_driver * const drivers[] =
 
 	DRIVER( mz700 )		/* 1982 Sharp MZ700									*/
 	DRIVER( mz700j )	/* 1982 Sharp MZ700 Japan							*/
-	DRIVER( mz800 )		/* 1982 Sharp MZ800									*/
+	DRIVER( mz800 )		/* 1984 Sharp MZ800									*/
+	DRIVER( mz1500 )	/* 1984 Sharp MZ1500								*/
+	DRIVER( mz2500 )	/* 1985 Sharp MZ2500								*/
 
 	DRIVER( mz80kj )	/* 1979 Sharp MZ80K									*/
 	DRIVER( mz80k )		/* 1979 Sharp MZ80K									*/
+	DRIVER( mz80a )		/* 1982 Sharp MZ80A									*/
+	DRIVER( mz80b )		/* 1981 Sharp MZ80B									*/
 
 	DRIVER( x1 )		/* 1982 Sharp X1									*/
 	DRIVER( x1ck )		/* 1984 Sharp X1Ck									*/

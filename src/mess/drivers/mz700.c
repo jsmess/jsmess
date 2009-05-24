@@ -141,6 +141,13 @@ static ADDRESS_MAP_START( mz800_io, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
+static ADDRESS_MAP_START( mz2500_mem, ADDRESS_SPACE_PROGRAM, 8 )
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( mz2500_io, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+ADDRESS_MAP_END
+
 /***************************************************************************
     INPUT PORTS
 ***************************************************************************/
@@ -392,27 +399,78 @@ static MACHINE_DRIVER_START( mz800 )
 MACHINE_DRIVER_END
 
 
+static VIDEO_START( mz2500 )
+{
+}
+
+static VIDEO_UPDATE( mz2500 )
+{
+    return 0;
+}
+
+static MACHINE_DRIVER_START( mz2500 )
+	/* basic machine hardware */
+	MDRV_CPU_ADD("maincpu", Z80, 6000000)	/* 6MHz - unsure about the exact crystal */
+	MDRV_CPU_PROGRAM_MAP(mz2500_mem)
+	MDRV_CPU_IO_MAP(mz2500_io)
+
+	/* video hardware */
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_RAW_PARAMS(XTAL_17_73447MHz/2, 568, 0, 40*8, 312, 0, 25*8)
+
+	MDRV_GFXDECODE(mz700)
+	MDRV_PALETTE_LENGTH(256*2)
+	MDRV_PALETTE_INIT(mz700)
+
+	MDRV_VIDEO_START(mz2500)
+	MDRV_VIDEO_UPDATE(mz2500)
+MACHINE_DRIVER_END
+
+
+
 /***************************************************************************
     ROM DEFINITIONS
 ***************************************************************************/
 
 ROM_START( mz700 )
-	ROM_REGION(0x1000, "monitor", 0)
-	ROM_LOAD("1z-013a.rom", 0x0000, 0x1000, CRC(4c6c6b7b) SHA1(ef8f7399e86c1dc638a5cb83efdb73369c2b5735))
-	ROM_REGION(0x1000, "cgrom", 0)
-	ROM_LOAD("mz700fon.int", 0x0000, 0x1000, CRC(42b9e8fb) SHA1(5128ad179a702f8e0bd9910a58bad8fbe4c20167))
+	ROM_REGION( 0x1000, "monitor", 0 )
+	ROM_LOAD( "1z-013a.rom", 0x0000, 0x1000, CRC(4c6c6b7b) SHA1(ef8f7399e86c1dc638a5cb83efdb73369c2b5735) )
+
+	ROM_REGION( 0x1000, "cgrom", 0 )
+	ROM_LOAD( "mz700fon.int", 0x0000, 0x1000, CRC(42b9e8fb) SHA1(5128ad179a702f8e0bd9910a58bad8fbe4c20167) )
 ROM_END
 
 ROM_START( mz700j )
-	ROM_REGION(0x1000, "monitor", 0)
-	ROM_LOAD("1z-013a.rom", 0x0000, 0x1000, CRC(4c6c6b7b) SHA1(ef8f7399e86c1dc638a5cb83efdb73369c2b5735))
-	ROM_REGION(0x1000, "cgrom", 0)
-	ROM_LOAD("mz700fon.jap", 0x0000, 0x1000, CRC(425eedf5) SHA1(bd2cc750f2d2f63e50a59786668509e81a276e32))
+	ROM_REGION( 0x1000, "monitor", 0 )
+	ROM_LOAD( "1z-013a.rom", 0x0000, 0x1000, CRC(4c6c6b7b) SHA1(ef8f7399e86c1dc638a5cb83efdb73369c2b5735) )
+
+	ROM_REGION( 0x1000, "cgrom", 0 )
+	ROM_LOAD( "mz700fon.jpn", 0x0000, 0x1000, CRC(425eedf5) SHA1(bd2cc750f2d2f63e50a59786668509e81a276e32) )
 ROM_END
 
 ROM_START( mz800 )
-	ROM_REGION(0x4000, "monitor", 0)
-	ROM_LOAD("mz800.rom", 0x0000, 0x4000, CRC(600d17e1) SHA1(950ce4b51429916f8036e41ba6130fac149b36e4))
+	ROM_REGION( 0x4000, "monitor", 0 )
+	ROM_LOAD( "mz800.rom", 0x0000, 0x4000, CRC(600d17e1) SHA1(950ce4b51429916f8036e41ba6130fac149b36e4) )
+ROM_END
+
+ROM_START( mz1500 )
+	ROM_REGION( 0x4000, "monitor", 0 )
+	ROM_LOAD( "1z-009b.rom", 0x0000, 0x1000, CRC(ab1fbe6f) SHA1(7b10d7965c541393e33a265bcf71a00314d2db7a) )
+ROM_END
+
+ROM_START( mz2500 )
+	ROM_REGION( 0x8000, "monitor", 0 )
+	ROM_LOAD( "ipl.rom", 0x0000, 0x8000, CRC(7a659f20) SHA1(ccb3cfdf461feea9db8d8d3a8815f7e345d274f7) )
+
+	ROM_REGION( 0x1000, "cgrom", 0 )
+	ROM_LOAD( "cg.rom", 0x0000, 0x0800, CRC(a082326f) SHA1(dfa1a797b2159838d078650801c7291fa746ad81) )
+
+	ROM_REGION( 0x40000, "gfx1", 0 )
+	ROM_LOAD( "kanji.rom", 0x0000, 0x40000, CRC(dd426767) SHA1(cc8fae0cd1736bc11c110e1c84d3f620c5e35b80) )
+
+	ROM_REGION( 0x40000, "dictionary", 0 )
+	ROM_LOAD( "dict.rom", 0x00000, 0x40000, CRC(aa957c2b) SHA1(19a5ba85055f048a84ed4e8d471aaff70fcf0374) )
 ROM_END
 
 
@@ -430,6 +488,10 @@ SYSTEM_CONFIG_END
 ***************************************************************************/
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT    CONFIG  COMPANY      FULLNAME */
-COMP( 1982, mz700,	  0,		0,		mz700,	  mz700,	mz700,	mz700,	"Sharp",     "MZ-700", 0 )
-COMP( 1982, mz700j,   mz700,	0,		mz700,	  mz700,	mz700,	mz700,	"Sharp",     "MZ-700 (Japan)", 0 )
-COMP( 1982, mz800,	  0,		0,		mz800,	  mz800,	mz800,	mz700,	"Sharp",     "MZ-800", GAME_NOT_WORKING )
+COMP( 1982, mz700,    0,        0,      mz700,    mz700,    mz700,  mz700,  "Sharp",     "MZ-700", 0 )
+COMP( 1982, mz700j,   mz700,    0,      mz700,    mz700,    mz700,  mz700,  "Sharp",     "MZ-700 (Japan)", 0 )
+COMP( 1984, mz800,    0,        0,      mz800,    mz800,    mz800,  mz700,  "Sharp",     "MZ-800", GAME_NOT_WORKING )
+COMP( 1984, mz1500,   0,        0,      mz800,    mz800,    mz800,  mz700,  "Sharp",     "MZ-1500", GAME_NOT_WORKING )	// Japanese version of the MZ-800
+
+// MZ-2500 probably needs a separate driver...
+COMP( 1985, mz2500,   0,        0,      mz2500,   0,        0,      0,      "Sharp",     "MZ-2500", GAME_NOT_WORKING )
