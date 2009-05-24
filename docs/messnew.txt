@@ -7,6 +7,7 @@ New System Drivers Supported (in no particular order):
 - Amiga CD32 (not working)  [incog nito, Fabio Priuli]
 - Amstrad NC150  [Roberto Carlos Fernandez Gerhardt, Wilbert Pol]
 - Brailab 4 (not working) [Miodrag Milanovic]
+- BOB-85 [Miodrag Milanovic]
 - CD-I (not working)  [incog nito]
 - CIP-01 [Miodrag Milanovic]
 - Frael Bruc 100-1 [Miodrag Milanovic]
@@ -36,7 +37,6 @@ Skeleton drivers :
 - BIC A5105
 - BCS-3
 - BK-0011M
-- BOB-85
 - C-80
 - Camputers Lynx 48
 - Camputers Lynx 96
