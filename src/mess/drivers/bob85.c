@@ -7,7 +7,7 @@
 ****************************************************************************/
 
 #include "driver.h"
-#include "cpu/z80/z80.h"
+#include "cpu/i8085/i8085.h"
 
 static ADDRESS_MAP_START(bob85_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -39,7 +39,7 @@ static VIDEO_UPDATE( bob85 )
 
 static MACHINE_DRIVER_START( bob85 )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
+    MDRV_CPU_ADD("maincpu",8085A, 2500000)
     MDRV_CPU_PROGRAM_MAP(bob85_mem)
     MDRV_CPU_IO_MAP(bob85_io)
 
@@ -66,7 +66,6 @@ SYSTEM_CONFIG_END
 ROM_START( bob85 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "bob85.rom", 0x0000, 0x0300, CRC(adde33a8) SHA1(00f26dd0c52005e7705e6cc9cb11a20e572682c6))
-	ROM_FILL(6,1,0)	// there are one or more bad bytes at the start, this fixes the hung state
 ROM_END
 
 /* Driver */
