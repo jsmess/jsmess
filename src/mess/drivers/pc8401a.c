@@ -8,7 +8,10 @@
 
 	TODO:
 
-	- everything
+	- USART
+	- RTC
+	- keyboard
+	- 8255
 
 	- peripherals
 		* PC-8431A Dual Floppy Drive
@@ -31,8 +34,15 @@ static void pc8401a_bankswitch(running_machine *machine, UINT8 data)
 	switch (ram0000)
 	{
 	case 0: /* ROM 0000H to 7FFFH */
-		memory_install_readwrite8_handler(program, 0x0000, 0x7fff, 0, 0, SMH_BANK(1), SMH_UNMAP);
-		memory_set_bank(machine, 1, rombank);
+		if (rombank < 2)
+		{
+			memory_install_readwrite8_handler(program, 0x0000, 0x7fff, 0, 0, SMH_BANK(1), SMH_UNMAP);
+			memory_set_bank(machine, 1, rombank);
+		}
+		else
+		{
+			memory_install_readwrite8_handler(program, 0x0000, 0x7fff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		}
 		logerror("0x0000-0x7fff = ROM %u\n", rombank);
 		break;
 
@@ -99,7 +109,6 @@ static void pc8401a_bankswitch(running_machine *machine, UINT8 data)
 
 static WRITE8_HANDLER( mmr_w )
 {
-
 	/*
 
 		bit		description
@@ -115,7 +124,21 @@ static WRITE8_HANDLER( mmr_w )
 
 	*/
 
-	pc8401a_bankswitch(space->machine, data);
+	pc8401a_state *state = space->machine->driver_data;
+
+	if (data != state->mmr)
+	{
+		pc8401a_bankswitch(space->machine, data);
+	}
+
+	state->mmr = data;
+}
+
+static READ8_HANDLER( mmr_r )
+{
+	pc8401a_state *state = space->machine->driver_data;
+
+	return state->mmr;
 }
 
 /* Memory Maps */
@@ -130,8 +153,26 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc8401a_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x31, 0x31) AM_MASK(0xff) AM_WRITE(mmr_w)
-	AM_RANGE(0xfc, 0xff) AM_MASK(0xff) AM_DEVREADWRITE(PPI8255_TAG, ppi8255_r, ppi8255_w)
+	ADDRESS_MAP_GLOBAL_MASK(0xff) // WRONG
+	AM_RANGE(0x30, 0x30) AM_READWRITE(mmr_r, mmr_w)
+	AM_RANGE(0xfc, 0xff) AM_DEVREADWRITE(PPI8255_TAG, ppi8255_r, ppi8255_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( pc8500_io, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0xff) // WRONG
+//	AM_RANGE(0x10, 0x10)
+	AM_RANGE(0x30, 0x30) AM_READWRITE(mmr_r, mmr_w)
+//	AM_RANGE(0x31, 0x31)
+//	AM_RANGE(0x40, 0x41)
+//	AM_RANGE(0x50, 0x51)
+//	AM_RANGE(0x60, 0x61)
+//	AM_RANGE(0x70, 0x71)
+//	AM_RANGE(0x80, 0x80)
+//	AM_RANGE(0x90, 0x93)
+//	AM_RANGE(0x98, 0x99) AY-3-8910?
+//	AM_RANGE(0xb0, 0xb3) USART?
+	AM_RANGE(0xfc, 0xff) AM_DEVREADWRITE(PPI8255_TAG, ppi8255_r, ppi8255_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -217,6 +258,62 @@ static const ppi8255_interface pc8401a_ppi8255_interface =
 	DEVCB_HANDLER(pc8401a_ppi8255_c_w),
 };
 
+/* Video */
+
+static PALETTE_INIT( pc8401a )
+{
+	palette_set_color(machine, 0, MAKE_RGB(138, 146, 148));
+	palette_set_color(machine, 1, MAKE_RGB(92, 83, 88));
+}
+
+static VIDEO_UPDATE( pc8401a )
+{
+	pc8401a_state *state = screen->machine->driver_data;
+
+	int y, sx, x;
+	UINT16 addr = 0;
+
+	for (y = 0; y < 128; y++)
+	{
+		for (sx = 0; sx < 80; sx++)
+		{
+			UINT8 data = state->video_ram[addr];
+
+			for (x = 0; x < 6; x++)
+			{
+				*BITMAP_ADDR16(bitmap, y, (sx * 6) + x) = BIT(data, 7);
+				data <<= 1;
+			}
+		}
+	}
+
+	return 0;
+}
+
+static VIDEO_UPDATE( pc8500 )
+{
+	pc8401a_state *state = screen->machine->driver_data;
+
+	int y, sx, x;
+	UINT16 addr = 0;
+
+	for (y = 0; y < 200; y++)
+	{
+		for (sx = 0; sx < 80; sx++)
+		{
+			UINT8 data = state->video_ram[addr];
+
+			for (x = 0; x < 6; x++)
+			{
+				*BITMAP_ADDR16(bitmap, y, (sx * 6) + x) = BIT(data, 7);
+				data <<= 1;
+			}
+		}
+	}
+
+	return 0;
+}
+
 /* Machine Drivers */
 
 static MACHINE_DRIVER_START( pc8401a )
@@ -230,13 +327,17 @@ static MACHINE_DRIVER_START( pc8401a )
 	MDRV_MACHINE_START( pc8401a )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", LCD)
+	MDRV_SCREEN_ADD(SCREEN_TAG, LCD)
 	MDRV_SCREEN_REFRESH_RATE(44)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(480, 128)
 	MDRV_SCREEN_VISIBLE_AREA(0, 480-1, 0, 128-1)
+
 //	MDRV_DEFAULT_LAYOUT(layout_pc8401a)
+	
 	MDRV_PALETTE_LENGTH(2)
+	MDRV_PALETTE_INIT(pc8401a)
+	MDRV_VIDEO_UPDATE(pc8401a)
 
 	/* devices */
 	MDRV_PPI8255_ADD(PPI8255_TAG, pc8401a_ppi8255_interface)
@@ -253,18 +354,22 @@ static MACHINE_DRIVER_START( pc8500 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80_TAG, Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(pc8401a_mem)
-	MDRV_CPU_IO_MAP(pc8401a_io)
+	MDRV_CPU_IO_MAP(pc8500_io)
 	
 	MDRV_MACHINE_START( pc8401a )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", LCD)
+	MDRV_SCREEN_ADD(SCREEN_TAG, LCD)
 	MDRV_SCREEN_REFRESH_RATE(44)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(480, 200)
 	MDRV_SCREEN_VISIBLE_AREA(0, 480-1, 0, 200-1)
+
 //	MDRV_DEFAULT_LAYOUT(layout_pc8500)
+	
 	MDRV_PALETTE_LENGTH(2)
+	MDRV_PALETTE_INIT(pc8401a)
+	MDRV_VIDEO_UPDATE(pc8500)
 
 	/* devices */
 	MDRV_PPI8255_ADD(PPI8255_TAG, pc8401a_ppi8255_interface)
@@ -304,4 +409,4 @@ SYSTEM_CONFIG_END
 
 /*    YEAR  NAME		PARENT	COMPAT	MACHINE		INPUT		INIT	CONFIG		COMPANY	FULLNAME */
 COMP( 1984,	pc8401a,	0,		0,		pc8401a,	pc8401a,	0,		pc8401a,	"NEC",	"PC-8401A-LS", GAME_NOT_WORKING )
-COMP( 1983, pc8500,		0,		0,		pc8500,		pc8401a,	0,		pc8500,		"NEC",	"PC-8500", GAME_NOT_WORKING )
+COMP( 1985, pc8500,		0,		0,		pc8500,		pc8401a,	0,		pc8500,		"NEC",	"PC-8500", GAME_NOT_WORKING )

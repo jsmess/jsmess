@@ -10,6 +10,9 @@
 typedef struct _pc8401a_state pc8401a_state;
 struct _pc8401a_state
 {
+	/* memory state */
+	UINT8 mmr;				/* memory mapping register */
+
 	/* video state */
 	UINT8 *video_ram;		/* video RAM */
 };
