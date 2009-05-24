@@ -1298,6 +1298,9 @@ const game_driver * const drivers[] =
 
 	DRIVER( a5105 )
 	DRIVER( bcs3 )
+	DRIVER( bcs3a )
+	DRIVER( bcs3b )
+	DRIVER( bcs3c )
 	DRIVER( bob85 )
 	DRIVER( c80 )
 	DRIVER( mc1000 )
