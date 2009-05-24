@@ -491,6 +491,10 @@ static WRITE8_HANDLER( at_kbdc8042_p2_w )
 	
 	cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_RESET, ( data & 0x01 ) ? CLEAR_LINE : ASSERT_LINE );
 
+	/* OPT BUF FULL is connected to IR1 on the master 8259 */
+	if ( at_devices.pic8259_master )
+		pic8259_set_irq_line(at_devices.pic8259_master, 1, ( data & 0x10 ) ? ASSERT_LINE : CLEAR_LINE );
+
 	at_kbdc8042.clock_signal = ( data & 0x40 ) ? 1 : 0;
 	at_kbdc8042.data_signal = ( data & 0x80 ) ? 1 : 0;
 
@@ -540,7 +544,7 @@ ADDRESS_MAP_END
 
 
 MACHINE_DRIVER_START( at_kbdc8042 )
-	MDRV_CPU_ADD("kbdc8042", I8042, 4772720 )   /* Frequency is a wild guess */
+	MDRV_CPU_ADD("kbdc8042", I8042, XTAL_12MHz )
 	MDRV_CPU_IO_MAP( kbdc8042_io)
 MACHINE_DRIVER_END
 
