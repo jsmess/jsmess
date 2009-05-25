@@ -30,6 +30,7 @@ New System Drivers Supported (in no particular order):
 - Sharp Pocket Computer 1245,1250,1255,1260,1261/1262 [Miodrag Milanovic]
 - TK85 [Robbbert, Miodrag Milanovic]
 - Timex Sinclair 1500 [Robbbert, Miodrag Milanovic]
+- Votrax Type-'N-Talk (not working) [Lord Nightmare, Kevtris]
 
 Skeleton drivers : 
 ------------------
