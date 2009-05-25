@@ -8,6 +8,19 @@
     Nate Woods (current maintainer)
     Tim Lindner (VHD and other work)
 
+	Version information:
+
+	Basic	Extended Basic	Disk Extended
+coco	1.0	-		-
+cocoe	1.1	1.0		1.0
+coco2	1.2	1.1		1.1
+coco2b	1.3	1.1		1.1
+coco3	1.2	2.0		1.1
+coco3p	1.2	2.0		1.1
+coco3h	1.2	2.0		1.1
+
+
+
 ***************************************************************************/
 
 #include "driver.h"
