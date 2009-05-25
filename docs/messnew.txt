@@ -1,4 +1,4 @@
-﻿0.131.1
+0.131.1
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
@@ -27,6 +27,7 @@ New System Drivers Supported (in no particular order):
 - Pravetz 82, 8M and 8C [Miodrag Milanovic]
 - Ringo 470 (not working) [Miodrag Milanovic]
 - Samsung SPC-1000 [Miodrag Milanovic]
+- Sharp MZ-1500, MZ-80A (not working) [Fabio Priuli]
 - Sharp Pocket Computer 1245,1250,1255,1260,1261/1262 [Miodrag Milanovic]
 - TK85 [Robbbert, Miodrag Milanovic]
 - Timex Sinclair 1500 [Robbbert, Miodrag Milanovic]
@@ -89,6 +90,8 @@ Skeleton drivers :
 - Sega 32X
 - Sega CD
 - Sega Mega-CD
+- Sharp MZ-80B
+- Sharp MZ-2500
 - Sharp X1
 - Sharp X1 Turbo
 - Sharp X1 Turbo Z
@@ -161,6 +164,10 @@ Source Changes:
 - Converted the WAVE sound device to stereo. [Curt Coder]
 
 - Implemented following devices: PIO8155, RP5C01A, HD44102, HD61830. [Curt Coder]
+
+- Changed the Commodore Serial Bus implementation to be a device. More work is 
+  needed to make the code flexible enough to support all the possible devices 
+  which could have been connected to the real thing. [Fabio Priuli]
 
 
 0.131
