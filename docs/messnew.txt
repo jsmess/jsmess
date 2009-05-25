@@ -1,4 +1,4 @@
-0.131.1
+﻿0.131.1
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
@@ -21,7 +21,7 @@ New System Drivers Supported (in no particular order):
   PC-8801MA2, PC-8801MC [Fabio Priuli]
 - NTS DreamWriter T200 (not working)  [Roberto Carlos
   Fernandez Gerhardt, Wilbert Pol]
- -PC/M Mugler [Miodrag Milanovic]
+- PC/M Mugler [Miodrag Milanovic]
 - PolyMorphic Systems Poly-88 [Miodrag Milanovic]
 - PolyMorphic Systems Poly-8813 (not working) [Miodrag Milanovic]
 - Pravetz 82, 8M and 8C [Miodrag Milanovic]
@@ -36,6 +36,7 @@ Skeleton drivers :
 - Acorn 6809
 - BIC A5105
 - BCS-3
+- Beehive DM3270
 - BK-0011M
 - C-80
 - Camputers Lynx 48
@@ -94,6 +95,7 @@ Skeleton drivers :
 - SNK NeoGeo CD
 - SNK NeoGeo CDZ
 - Sony PocketStation
+- Sperry Univac UTS-20
 - System 2900
 - Tesla PMI-80
 - Tiki 100
