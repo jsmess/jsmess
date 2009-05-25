@@ -26,31 +26,31 @@
 
 enum
 {
-	HD61380_INSTRUCTION_MODE_CONTROL = 0,
-	HD61380_INSTRUCTION_CHARACTER_PITCH,
-	HD61380_INSTRUCTION_NUMBER_OF_CHARACTERS,
-	HD61380_INSTRUCTION_NUMBER_OF_TIME_DIVISIONS,
-	HD61380_INSTRUCTION_CURSOR_POSITION,
-	HD61380_INSTRUCTION_DISPLAY_START_LOW = 8,
-	HD61380_INSTRUCTION_DISPLAY_START_HIGH,
-	HD61380_INSTRUCTION_CURSOR_ADDRESS_LOW,
-	HD61380_INSTRUCTION_CURSOR_ADDRESS_HIGH,
-	HD61380_INSTRUCTION_DISPLAY_DATA_WRITE,
-	HD61380_INSTRUCTION_DISPLAY_DATA_READ,
-	HD61380_INSTRUCTION_CLEAR_BIT,					/* not supported */
-	HD61380_INSTRUCTION_SET_BIT						/* not supported */
+	HD61830_INSTRUCTION_MODE_CONTROL = 0,
+	HD61830_INSTRUCTION_CHARACTER_PITCH,
+	HD61830_INSTRUCTION_NUMBER_OF_CHARACTERS,
+	HD61830_INSTRUCTION_NUMBER_OF_TIME_DIVISIONS,
+	HD61830_INSTRUCTION_CURSOR_POSITION,
+	HD61830_INSTRUCTION_DISPLAY_START_LOW = 8,
+	HD61830_INSTRUCTION_DISPLAY_START_HIGH,
+	HD61830_INSTRUCTION_CURSOR_ADDRESS_LOW,
+	HD61830_INSTRUCTION_CURSOR_ADDRESS_HIGH,
+	HD61830_INSTRUCTION_DISPLAY_DATA_WRITE,
+	HD61830_INSTRUCTION_DISPLAY_DATA_READ,
+	HD61830_INSTRUCTION_CLEAR_BIT,					/* not supported */
+	HD61830_INSTRUCTION_SET_BIT						/* not supported */
 };
 
 static const int HD61830_CYCLES[] = {
 	4, 4, 4, 4, 4, -1, -1, -1, 4, 4, 4, 4, 6, 6, 36, 36
 };
 
-#define HD61380_MODE_EXTERNAL_CG	0x01	/* not supported */
-#define HD61380_MODE_GRAPHIC		0x02	/* text mode not supported */
-#define HD61380_MODE_CURSOR			0x04	/* not supported */
-#define HD61380_MODE_BLINK			0x08	/* not supported */
-#define HD61380_MODE_MASTER			0x10	/* not supported */
-#define HD61380_MODE_DISPLAY_ON		0x20
+#define HD61830_MODE_EXTERNAL_CG	0x01	/* not supported */
+#define HD61830_MODE_GRAPHIC		0x02	/* text mode not supported */
+#define HD61830_MODE_CURSOR			0x04	/* not supported */
+#define HD61830_MODE_BLINK			0x08	/* not supported */
+#define HD61830_MODE_MASTER			0x10	/* not supported */
+#define HD61830_MODE_DISPLAY_ON		0x20
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -186,21 +186,21 @@ WRITE8_DEVICE_HANDLER( hd61830_data_w )
 
 	switch (hd61830->ir)
 	{
-	case HD61380_INSTRUCTION_MODE_CONTROL:
+	case HD61830_INSTRUCTION_MODE_CONTROL:
 		hd61830->mcr = data;
 
 		if (LOG)
 		{
-			logerror("HD61380 '%s' %s CG\n", device->tag, (data & HD61380_MODE_EXTERNAL_CG) ? "External" : "Internal");
-			logerror("HD61380 '%s' %s Display Mode\n", device->tag, (data & HD61380_MODE_GRAPHIC) ? "Graphic" : "Character");
-			logerror("HD61380 '%s' %s Mode\n", device->tag, (data & HD61380_MODE_MASTER) ? "Master" : "Slave");
-			logerror("HD61380 '%s' Cursor %s\n", device->tag, (data & HD61380_MODE_CURSOR) ? "On" : "Off");
-			logerror("HD61380 '%s' Blink %s\n", device->tag, (data & HD61380_MODE_BLINK) ? "On" : "Off");
-			logerror("HD61380 '%s' Display %s\n", device->tag, (data & HD61380_MODE_DISPLAY_ON) ? "On" : "Off");
+			logerror("HD61380 '%s' %s CG\n", device->tag, (data & HD61830_MODE_EXTERNAL_CG) ? "External" : "Internal");
+			logerror("HD61380 '%s' %s Display Mode\n", device->tag, (data & HD61830_MODE_GRAPHIC) ? "Graphic" : "Character");
+			logerror("HD61380 '%s' %s Mode\n", device->tag, (data & HD61830_MODE_MASTER) ? "Master" : "Slave");
+			logerror("HD61380 '%s' Cursor %s\n", device->tag, (data & HD61830_MODE_CURSOR) ? "On" : "Off");
+			logerror("HD61380 '%s' Blink %s\n", device->tag, (data & HD61830_MODE_BLINK) ? "On" : "Off");
+			logerror("HD61380 '%s' Display %s\n", device->tag, (data & HD61830_MODE_DISPLAY_ON) ? "On" : "Off");
 		}
 		break;
 	
-	case HD61380_INSTRUCTION_CHARACTER_PITCH:
+	case HD61830_INSTRUCTION_CHARACTER_PITCH:
 		hd61830->hp = (data & 0x07) + 1;
 		hd61830->vp = (data >> 4) + 1;
 
@@ -208,37 +208,37 @@ WRITE8_DEVICE_HANDLER( hd61830_data_w )
 		if (LOG) logerror("HD61380 '%s' Vertical Character Pitch: %u\n", device->tag, hd61830->vp);
 		break;
 
-	case HD61380_INSTRUCTION_NUMBER_OF_CHARACTERS:
+	case HD61830_INSTRUCTION_NUMBER_OF_CHARACTERS:
 		hd61830->hn = (data & 0x7f) + 1;
 
 		if (LOG) logerror("HD61380 '%s' Number of Characters: %u\n", device->tag, hd61830->hn);
 		break;
 
-	case HD61380_INSTRUCTION_NUMBER_OF_TIME_DIVISIONS:
+	case HD61830_INSTRUCTION_NUMBER_OF_TIME_DIVISIONS:
 		hd61830->nx = (data & 0x7f) + 1;
 
 		if (LOG) logerror("HD61380 '%s' Number of Time Divisions: %u\n", device->tag, hd61830->nx);
 		break;
 
-	case HD61380_INSTRUCTION_CURSOR_POSITION:
+	case HD61830_INSTRUCTION_CURSOR_POSITION:
 		hd61830->cp = (data & 0x7f) + 1;
 
 		if (LOG) logerror("HD61380 '%s' Cursor Position: %u\n", device->tag, hd61830->cp);
 		break;
 
-	case HD61380_INSTRUCTION_DISPLAY_START_LOW:
+	case HD61830_INSTRUCTION_DISPLAY_START_LOW:
 		hd61830->dsa = (hd61830->dsa & 0xff00) | data;
 
 		if (LOG) logerror("HD61380 '%s' Display Start Address Low %04x\n", device->tag, hd61830->dsa);
 		break;
 
-	case HD61380_INSTRUCTION_DISPLAY_START_HIGH:
+	case HD61830_INSTRUCTION_DISPLAY_START_HIGH:
 		hd61830->dsa = (data << 8) | (hd61830->dsa & 0xff);
 
 		if (LOG) logerror("HD61380 '%s' Display Start Address High %04x\n", device->tag, hd61830->dsa);
 		break;
 
-	case HD61380_INSTRUCTION_CURSOR_ADDRESS_LOW:
+	case HD61830_INSTRUCTION_CURSOR_ADDRESS_LOW:
 		if (BIT(hd61830->cac, 7) && !BIT(data, 7))
 		{
 			hd61830->cac = (((hd61830->cac >> 8) + 1) << 8) | data;
@@ -251,13 +251,13 @@ WRITE8_DEVICE_HANDLER( hd61830_data_w )
 		if (LOG) logerror("HD61380 '%s' Cursor Address Low %02x: %04x\n", device->tag, data, hd61830->cac);
 		break;
 
-	case HD61380_INSTRUCTION_CURSOR_ADDRESS_HIGH:
+	case HD61830_INSTRUCTION_CURSOR_ADDRESS_HIGH:
 		hd61830->cac = (data << 8) | (hd61830->cac & 0xff);
 
 		if (LOG) logerror("HD61380 '%s' Cursor Address High %02x: %04x\n", device->tag, data, hd61830->cac);
 		break;
 
-	case HD61380_INSTRUCTION_DISPLAY_DATA_WRITE:
+	case HD61830_INSTRUCTION_DISPLAY_DATA_WRITE:
 		devcb_call_write8(&hd61830->out_rd_func, hd61830->cac, data);
 
 		if (LOG) logerror("HD61380 '%s' Display Data Write %02x -> %04x row %u col %u\n", device->tag, data, hd61830->cac, hd61830->cac / 40, hd61830->cac % 40);
@@ -265,7 +265,7 @@ WRITE8_DEVICE_HANDLER( hd61830_data_w )
 		hd61830->cac++;
 		break;
 
-	case HD61380_INSTRUCTION_CLEAR_BIT:
+	case HD61830_INSTRUCTION_CLEAR_BIT:
 		{
 		int nb = data & 0x07;
 		UINT8 data = devcb_call_read8(&hd61830->in_rd_func, hd61830->cac);
@@ -280,7 +280,7 @@ WRITE8_DEVICE_HANDLER( hd61830_data_w )
 		}
 		break;
 
-	case HD61380_INSTRUCTION_SET_BIT:
+	case HD61830_INSTRUCTION_SET_BIT:
 		{
 		int nb = data & 0x07;
 		UINT8 data = devcb_call_read8(&hd61830->in_rd_func, hd61830->cac);
@@ -353,7 +353,7 @@ void hd61830_update(const device_config *device, bitmap_t *bitmap, const rectang
 {
 	hd61830_t *hd61830 = get_safe_token(device);
 
-	if (hd61830->mcr & HD61380_MODE_GRAPHIC)
+	if (hd61830->mcr & HD61830_MODE_GRAPHIC)
 	{
 		update_graphics(hd61830, bitmap, cliprect);
 	}
@@ -401,7 +401,7 @@ static DEVICE_RESET( hd61830 )
 {
 	hd61830_t *hd61830 = get_safe_token(device);
 
-	hd61830->mcr = hd61830->mcr & ~(HD61380_MODE_MASTER | HD61380_MODE_DISPLAY_ON);
+	hd61830->mcr = hd61830->mcr & ~(HD61830_MODE_MASTER | HD61830_MODE_DISPLAY_ON);
 	hd61830->hp = 6;
 }
 
