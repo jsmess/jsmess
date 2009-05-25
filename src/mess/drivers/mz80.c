@@ -211,10 +211,10 @@ ROM_START( mz80kj )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sp1002.rom",    0x0000, 0x1000, CRC(2223e677) SHA1(518ffbe2333582ab36e6d76d1e03879a246ffa1c) )
 	// TC monitor not possible to be used on japanese version since chargen doesn't have upcase/lowecase, but japanese letters
-	ROM_LOAD( "mz80kfdif.rom", 0xf000, 0x1000, CRC(d36505e0) SHA1(1f60027e8739313962a37edbf98172df7062df49) )
+	ROM_LOAD( "mz80kfdif.rom", 0xf000, 0x0400, CRC(d36505e0) SHA1(1f60027e8739313962a37edbf98172df7062df49) )
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
-	ROM_LOAD( "mz80k.jpn", 0x0000, 0x1000, CRC(bffe3312) SHA1(7058e565f338f5ec2bba85c19c9671e5c4fe258e) )
+	ROM_LOAD( "mz80k.jpn", 0x0000, 0x0800, CRC(bffe3312) SHA1(7058e565f338f5ec2bba85c19c9671e5c4fe258e) )
 ROM_END
 
 ROM_START( mz80a )
