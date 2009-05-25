@@ -243,6 +243,9 @@ static MACHINE_DRIVER_START( c65 )
 	MDRV_CIA6526_ADD("cia_0", CIA6526R1, 3500000, c65_ntsc_cia0)
 	MDRV_CIA6526_ADD("cia_1", CIA6526R1, 3500000, c65_ntsc_cia1)
 	
+	/* floppy from serial bus */
+	MDRV_IMPORT_FROM(simulated_drive)
+
 	MDRV_IMPORT_FROM(c64_cartslot)
 MACHINE_DRIVER_END
 

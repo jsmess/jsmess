@@ -129,6 +129,7 @@ printers and other devices; most expansion modules; userport; rs232/v.24 interfa
 /* devices config */
 #include "includes/cbm.h"
 #include "includes/cbmdrive.h"
+#include "includes/cbmserb.h"	// needed for MDRV_CBM_SERBUS_REMOVE
 
 #include "includes/c16.h"
 
@@ -449,6 +450,9 @@ static MACHINE_DRIVER_START( c16 )
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", cbm_cassette_config )
 
+	/* floppy from serial bus */
+	MDRV_IMPORT_FROM(simulated_drive)
+
 	/* tpi */
 	MDRV_TPI6525_ADD("tpi6535_tpi_2", c16_tpi6525_tpi_2_intf)
 	MDRV_TPI6525_ADD("tpi6535_tpi_3", c16_tpi6525_tpi_3_intf)
@@ -468,6 +472,7 @@ static MACHINE_DRIVER_START( c16c )
 	/* emulation code currently supports only one drive */
 	MDRV_TPI6525_REMOVE("tpi6535_tpi_3")
 
+	MDRV_CBM_SERBUS_REMOVE("serial_bus")	// in the current code, serial bus device is tied to the floppy drive
 	MDRV_IMPORT_FROM( cpu_c1551 )
 #ifdef CPU_SYNC
 	MDRV_QUANTUM_TIME(HZ(60))
@@ -479,6 +484,8 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( c16v )
 	MDRV_IMPORT_FROM( c16 )
+
+	MDRV_CBM_SERBUS_REMOVE("serial_bus")	// in the current code, serial bus device is tied to the floppy drive
 	MDRV_IMPORT_FROM( cpu_vc1541 )
 #ifdef CPU_SYNC
 	MDRV_QUANTUM_TIME(HZ(60))
@@ -513,6 +520,7 @@ static MACHINE_DRIVER_START( plus4c )
 	MDRV_TPI6525_ADD("tpi6535_tpi_2", c16_tpi6525_tpi_2_c1551_intf)
 
 	/* emulation code currently supports only one drive */
+	MDRV_CBM_SERBUS_REMOVE("serial_bus")	// in the current code, serial bus device is tied to the floppy drive
 	MDRV_TPI6525_REMOVE("tpi6535_tpi_3")
 
 	MDRV_IMPORT_FROM( cpu_c1551 )
@@ -529,6 +537,8 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( plus4v )
 	MDRV_IMPORT_FROM( plus4 )
+
+	MDRV_CBM_SERBUS_REMOVE("serial_bus")	// in the current code, serial bus device is tied to the floppy drive
 	MDRV_IMPORT_FROM( cpu_vc1541 )
 
 	MDRV_SCREEN_MODIFY("screen")
@@ -733,4 +743,4 @@ COMP( 1984, plus4v,  c16,   0,  plus4v, plus4,  c16v,   plusv,   "Commodore Busi
 
 COMP( 1984, c232,    c16,   0,  c16,    c16,    c16,    c16,     "Commodore Business Machines Co.",  "Commodore 232 (Prototype)", 0)
 COMP( 1984, c264,    c16,   0,  c16,    plus4,  c16,    plus,    "Commodore Business Machines Co.",  "Commodore 264 (Prototype)", 0)
-COMP( 1984, c364,    c16,   0,  c364,   plus4,  c16,    plusv,   "Commodore Business Machines Co.",  "Commodore V364 (Prototype)", GAME_IMPERFECT_SOUND)
+COMP( 1984, c364,    c16,   0,  c364,   plus4,  c16,    plus,    "Commodore Business Machines Co.",  "Commodore V364 (Prototype)", GAME_IMPERFECT_SOUND)

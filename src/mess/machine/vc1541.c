@@ -156,6 +156,7 @@ Other info sources:
 #include "cpu/m6502/m6502.h"
 #include "machine/6525tpi.h"
 #include "machine/6522via.h"
+#include "includes/cbmserb.h"
 
 #include "includes/vc1541.h"
 
@@ -703,6 +704,213 @@ static TIMER_CALLBACK(c1551_drive_timer)
 }
 
 
+/**************************************
+
+	VC1541 Serial Bus Device Interface
+
+**************************************/
+
+/* 2009-05 FP - Note: I could use directly these functions as DEVICE_HANDLERs for 
+the serial bus device, but these are also used in the VIA interface above, so I 
+prefer to keep the handlers separated at this stage. Further work on the serial 
+bus emulation should allow to remove the duplicated code. */
+
+static void vc1541_serial_reset_write( running_machine *machine, int which, int level )
+{
+}
+
+static UINT8 vc1541_serial_atn_read( running_machine *machine, int which )
+{
+/* there is no more cpu_getactivecpu! */
+#ifdef CPU_SYNC
+		if (cpu_getactivecpu()==0) cpu_sync();
+#endif
+	return serial.atn[0];
+}
+
+static void vc1541_serial_atn_write( running_machine *machine, int which, int level )
+{
+	const device_config *via_0 = devtag_get_device(machine, "_1541_via_0");
+#if 0
+	int value;
+#endif
+	if (serial.atn[1 + which] != level)
+	{
+/* there is no more cpu_getactivecpu! */
+#ifdef CPU_SYNC
+		if (cpu_getactivecpu()==0) cpu_sync();
+#endif
+		serial.atn[1 + which] = level;
+		if (serial.atn[0] != level)
+		{
+			serial.atn[0] = serial.atn[1] && serial.atn[2];
+			if (serial.atn[0] == level)
+			{
+			#if 0
+				DBG_LOG(machine, 1, "vc1541",("%d:%.4x atn %s\n",
+									 cpu_getactivecpu (),
+									 activecpu_get_pc(),
+									 serial.atn[0]?"ATN":"atn"));
+			#endif
+				via_ca1_w (via_0, 0, !level);
+#if 0
+				value = vc1541_drive->vc1541_serial.data;
+				if (vc1541_drive->vc1541_serial.acka != !level) 
+					value = 0;
+				if (value != serial.data[2]) 
+				{
+					serial.data[2] = value;
+					if (serial.data[0] != value) 
+					{
+						serial.data[0] = serial.data[1] && serial.data[2];
+					}
+				}
+#endif
+			}
+		}
+	}
+}
+
+static UINT8 vc1541_serial_data_read( running_machine *machine, int which )
+{
+/* there is no more cpu_getactivecpu! */
+#ifdef CPU_SYNC
+		if (cpu_getactivecpu()==0) cpu_sync();
+#endif
+	return serial.data[0];
+}
+
+static void vc1541_serial_data_write( running_machine *machine, int which, int level )
+{
+	if (serial.data[1 + which] != level)
+	{
+/* there is no more cpu_getactivecpu! */
+#ifdef CPU_SYNC
+		if (cpu_getactivecpu()==0) cpu_sync();
+#endif
+		serial.data[1 + which] = level;
+		if (serial.data[0] != level)
+		{
+			serial.data[0] = serial.data[1] && serial.data[2];
+			#if 0
+			if (serial.data[0] == level)
+			{
+				DBG_LOG(machine, 1, "vc1541",("%d:%.4x data %s\n",
+									 cpu_getactivecpu (),
+									 activecpu_get_pc(),
+									 serial.data[0]?"DATA":"data"));
+			}
+			#endif
+		}
+	}
+}
+
+static UINT8 vc1541_serial_clock_read( running_machine *machine, int which )
+{
+/* there is no more cpu_getactivecpu! */
+#ifdef CPU_SYNC
+		if (cpu_getactivecpu()==0) cpu_sync();
+#endif
+	return serial.clock[0];
+}
+
+static void vc1541_serial_clock_write( running_machine *machine, int which, int level )
+{
+	if (serial.clock[1 + which] != level)
+	{
+/* there is no more cpu_getactivecpu! */
+#ifdef CPU_SYNC
+		if (cpu_getactivecpu()==0) cpu_sync();
+#endif
+		serial.clock[1 + which] = level;
+		if (serial.clock[0] != level)
+		{
+			serial.clock[0] = serial.clock[1] && serial.clock[2];
+			if (serial.clock[0] == level)
+			{
+/*				DBG_LOG(machine, 1, "vc1541",("%d:%.4x clock %s\n",
+									 cpu_getactivecpu (),
+									 activecpu_get_pc(),
+									 serial.clock[0]?"CLOCK":"clock"));*/
+			}
+		}
+	}
+}
+
+static UINT8 vc1541_serial_request_read( running_machine *machine, int which )
+{
+	return 1;
+}
+
+static void vc1541_serial_request_write( running_machine *machine, int which, int level )
+{
+}
+
+
+/* 2009-05 FP - TODO: better implementation of the DEVICE_HANDLERs below. Right now they are 
+redundant (see also my Note above)  */
+static READ8_DEVICE_HANDLER( emu_drive_atn_read )
+{
+	return vc1541_serial_atn_read(device->machine, 0);
+}
+
+static READ8_DEVICE_HANDLER( emu_drive_clock_read )
+{
+	return vc1541_serial_clock_read(device->machine, 0);
+}
+
+static READ8_DEVICE_HANDLER( emu_drive_data_read )
+{
+	return vc1541_serial_data_read(device->machine, 0);
+}
+
+static READ8_DEVICE_HANDLER( emu_drive_request_read )
+{
+	return vc1541_serial_request_read(device->machine, 0);
+}
+	
+static WRITE8_DEVICE_HANDLER( emu_drive_atn_write )
+{
+	vc1541_serial_atn_write(device->machine, 0, data);
+}
+
+static WRITE8_DEVICE_HANDLER( emu_drive_clock_write )
+{
+	vc1541_serial_clock_write(device->machine, 0, data);
+}
+
+static WRITE8_DEVICE_HANDLER( emu_drive_data_write )
+{
+	vc1541_serial_data_write(device->machine, 0, data);
+}
+
+static WRITE8_DEVICE_HANDLER( emu_drive_request_write )
+{
+	vc1541_serial_request_write(device->machine, 0, data);
+}
+
+static WRITE8_DEVICE_HANDLER( emu_drive_reset_write )
+{
+	vc1541_serial_reset_write(device->machine, 0, data);
+}
+
+
+static const cbm_serial_bus_interface cbm_emu_drive_interface =
+{
+	DEVCB_HANDLER(emu_drive_atn_read),
+	DEVCB_HANDLER(emu_drive_clock_read),
+	DEVCB_HANDLER(emu_drive_data_read),
+	DEVCB_HANDLER(emu_drive_request_read),
+	DEVCB_HANDLER(emu_drive_atn_write),
+	DEVCB_HANDLER(emu_drive_clock_write),
+	DEVCB_HANDLER(emu_drive_data_write),
+	DEVCB_HANDLER(emu_drive_request_write),
+
+	DEVCB_HANDLER(emu_drive_reset_write)
+};
+
+
+
 /**************************************************************************
  *	VIA 6522 at 0x1800
  *
@@ -1015,138 +1223,6 @@ static const via6522_interface vc1541_via1 =
 };
 
 
-void vc1541_serial_reset_write( running_machine *machine, int which, int level )
-{
-}
-
-int vc1541_serial_atn_read( running_machine *machine, int which )
-{
-/* there is no more cpu_getactivecpu! */
-#ifdef CPU_SYNC
-		if (cpu_getactivecpu()==0) cpu_sync();
-#endif
-	return serial.atn[0];
-}
-
-void vc1541_serial_atn_write( running_machine *machine, int which, int level )
-{
-	const device_config *via_0 = devtag_get_device(machine, "_1541_via_0");
-#if 0
-	int value;
-#endif
-	if (serial.atn[1 + which] != level)
-	{
-/* there is no more cpu_getactivecpu! */
-#ifdef CPU_SYNC
-		if (cpu_getactivecpu()==0) cpu_sync();
-#endif
-		serial.atn[1 + which] = level;
-		if (serial.atn[0] != level)
-		{
-			serial.atn[0] = serial.atn[1] && serial.atn[2];
-			if (serial.atn[0] == level)
-			{
-			#if 0
-				DBG_LOG(machine, 1, "vc1541",("%d:%.4x atn %s\n",
-									 cpu_getactivecpu (),
-									 activecpu_get_pc(),
-									 serial.atn[0]?"ATN":"atn"));
-			#endif
-				via_ca1_w (via_0, 0, !level);
-#if 0
-				value = vc1541_drive->vc1541_serial.data;
-				if (vc1541_drive->vc1541_serial.acka != !level) 
-					value = 0;
-				if (value != serial.data[2]) 
-				{
-					serial.data[2] = value;
-					if (serial.data[0] != value) 
-					{
-						serial.data[0] = serial.data[1] && serial.data[2];
-					}
-				}
-#endif
-			}
-		}
-	}
-}
-
-int vc1541_serial_data_read( running_machine *machine, int which )
-{
-/* there is no more cpu_getactivecpu! */
-#ifdef CPU_SYNC
-		if (cpu_getactivecpu()==0) cpu_sync();
-#endif
-	return serial.data[0];
-}
-
-void vc1541_serial_data_write( running_machine *machine, int which, int level )
-{
-	if (serial.data[1 + which] != level)
-	{
-/* there is no more cpu_getactivecpu! */
-#ifdef CPU_SYNC
-		if (cpu_getactivecpu()==0) cpu_sync();
-#endif
-		serial.data[1 + which] = level;
-		if (serial.data[0] != level)
-		{
-			serial.data[0] = serial.data[1] && serial.data[2];
-			#if 0
-			if (serial.data[0] == level)
-			{
-				DBG_LOG(machine, 1, "vc1541",("%d:%.4x data %s\n",
-									 cpu_getactivecpu (),
-									 activecpu_get_pc(),
-									 serial.data[0]?"DATA":"data"));
-			}
-			#endif
-		}
-	}
-}
-
-int vc1541_serial_clock_read( running_machine *machine, int which )
-{
-/* there is no more cpu_getactivecpu! */
-#ifdef CPU_SYNC
-		if (cpu_getactivecpu()==0) cpu_sync();
-#endif
-	return serial.clock[0];
-}
-
-void vc1541_serial_clock_write( running_machine *machine, int which, int level )
-{
-	if (serial.clock[1 + which] != level)
-	{
-/* there is no more cpu_getactivecpu! */
-#ifdef CPU_SYNC
-		if (cpu_getactivecpu()==0) cpu_sync();
-#endif
-		serial.clock[1 + which] = level;
-		if (serial.clock[0] != level)
-		{
-			serial.clock[0] = serial.clock[1] && serial.clock[2];
-			if (serial.clock[0] == level)
-			{
-/*				DBG_LOG(machine, 1, "vc1541",("%d:%.4x clock %s\n",
-									 cpu_getactivecpu (),
-									 activecpu_get_pc(),
-									 serial.clock[0]?"CLOCK":"clock"));*/
-			}
-		}
-	}
-}
-
-int vc1541_serial_request_read( running_machine *machine, int which )
-{
-	return 1;
-}
-
-void vc1541_serial_request_write( running_machine *machine, int which, int level )
-{
-}
-
-
 /**************************************
 
 	1541 / 1541B / 1541C / 1541II /
@@ -1341,7 +1417,7 @@ static WRITE8_HANDLER( c1551_port_w )
 				+ (int)(2 * (c1551_drive->track - (int)c1551_drive->track)) * 184 / 2;	// half track if needed (again, 184 comes from out loading choices)
 			}
 
-			if ( (c1551_drive->motor != (data & 0x04)) || (c1551_drive->frequency != (data & 0x60)) ) 
+			if ((c1551_drive->motor != (data & 0x04)) || (c1551_drive->frequency != (data & 0x60))) 
 			{
 				double tme;
 				c1551_drive->motor = data & 0x04;
@@ -1541,6 +1617,8 @@ MACHINE_DRIVER_START( cpu_vc1540 )
 
 	MDRV_VIA6522_ADD("_1541_via_0", 0, vc1541_via0)
 	MDRV_VIA6522_ADD("_1541_via_1", 0, vc1541_via1)
+
+	MDRV_CBM_SERBUS_ADD("serial_bus", cbm_emu_drive_interface)
 MACHINE_DRIVER_END
 
 MACHINE_DRIVER_START( cpu_vc1541 )
@@ -1553,6 +1631,8 @@ MACHINE_DRIVER_START( cpu_c1571 )
 
 	MDRV_VIA6522_ADD("_1541_via_0", 0, vc1541_via0)
 	MDRV_VIA6522_ADD("_1541_via_1", 0, vc1541_via1)
+
+	MDRV_CBM_SERBUS_ADD("serial_bus", cbm_emu_drive_interface)
 MACHINE_DRIVER_END
 
 MACHINE_DRIVER_START( cpu_c1571cr )
@@ -1561,6 +1641,8 @@ MACHINE_DRIVER_START( cpu_c1571cr )
 
 	MDRV_VIA6522_ADD("_1541_via_0", 0, vc1541_via0)
 	MDRV_VIA6522_ADD("_1541_via_1", 0, vc1541_via1)
+
+	MDRV_CBM_SERBUS_ADD("serial_bus", cbm_emu_drive_interface)
 MACHINE_DRIVER_END
 
 MACHINE_DRIVER_START( cpu_c1581 )
@@ -1582,6 +1664,9 @@ MACHINE_DRIVER_START( cpu_c1551 )
 
 	/* tpi */
 	MDRV_TPI6525_ADD("c1551_tpi", c1551_tpi_intf)
+
+	MDRV_CBM_SERBUS_ADD("serial_bus", cbm_emu_drive_interface)	// in the current code, serial bus device is tied to the floppy drive
+																// and c16 reads/writes to serial bus in m7501_port_r/w!
 MACHINE_DRIVER_END
 
 

@@ -112,12 +112,13 @@ static UINT8 read_cfg1(running_machine *machine)
 
 void c16_m7501_port_write(const device_config *device, UINT8 direction, UINT8 data)
 {
+	const device_config *serbus = devtag_get_device(device->machine, "serial_bus");
 	int dat, atn, clk;
 
 	/* bit zero then output 0 */
-	cbm_serial_atn_write (device->machine, atn = !(data & 0x04));
-	cbm_serial_clock_write (device->machine, clk = !(data & 0x02));
-	cbm_serial_data_write (device->machine, dat = !(data & 0x01));
+	cbm_serial_atn_write(serbus, 0, atn = !(data & 0x04));
+	cbm_serial_clock_write(serbus, 0, clk = !(data & 0x02));
+	cbm_serial_data_write(serbus, 0, dat = !(data & 0x01));
 
 	cassette_output(devtag_get_device(device->machine, "cassette"), !(data & 0x02) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
 	
@@ -128,11 +129,12 @@ UINT8 c16_m7501_port_read(const device_config *device, UINT8 direction)
 {
 	UINT8 data = 0xff;
 	UINT8 c16_port7501 = (UINT8) devtag_get_info_int(device->machine, "maincpu", CPUINFO_INT_M6510_PORT);
+	const device_config *serbus = devtag_get_device(device->machine, "serial_bus");
 
-	if ((c16_port7501 & 0x01) || !cbm_serial_data_read(device->machine))
+	if ((c16_port7501 & 0x01) || !cbm_serial_data_read(serbus, 0))
 		data &= ~0x80;
 
-	if ((c16_port7501 & 0x02) || !cbm_serial_clock_read(device->machine))
+	if ((c16_port7501 & 0x02) || !cbm_serial_clock_read(serbus, 0))
 		data &= ~0x40;
 
 //	data &= ~0x20; // port bit not in pinout
@@ -566,13 +568,10 @@ MACHINE_RESET( c16 )
 	}
 	if (has_vc1541)		/* vc1541 */
 	{
-		cbm_serial_config(machine, &cbm_emu_drive_interface);
 		drive_reset();
 	}
 	else								/* simulated drives */
 	{
-		cbm_serial_config(machine, &cbm_sim_drive_interface);
-		cbm_serial_reset_write(machine, 0);
 		cbm_drive_0_config(SERIAL, 8);
 		cbm_drive_1_config(SERIAL, 9);
 	}

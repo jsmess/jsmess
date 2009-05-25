@@ -180,11 +180,12 @@ to use an EEPROM reader, in order to obtain a dump of the whole content.
 #include "machine/cbmipt.h"
 #include "video/vic6567.h"
 #include "video/vdc8563.h"
-#include "includes/vc1541.h"
 
 /* devices config */
 #include "includes/cbm.h"
+#include "includes/cbmserb.h"	// needed for MDRV_CBM_SERBUS_REMOVE
 #include "includes/cbmdrive.h"
+#include "includes/vc1541.h"
 
 #include "includes/c128.h"
 #include "includes/c64.h"
@@ -635,22 +636,31 @@ static MACHINE_DRIVER_START( c128 )
 	MDRV_CIA6526_ADD("cia_0", CIA6526R1, VIC6567_CLOCK, c128_ntsc_cia0)
 	MDRV_CIA6526_ADD("cia_1", CIA6526R1, VIC6567_CLOCK, c128_ntsc_cia1)
 	
+	/* floppy from serial bus */
+	MDRV_IMPORT_FROM(simulated_drive)
+
 	MDRV_IMPORT_FROM(c64_cartslot)
 MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( c128d )
 	MDRV_IMPORT_FROM( c128 )
+
+	MDRV_CBM_SERBUS_REMOVE("serial_bus")	// in the current code, serial bus device is tied to the floppy drive
 	MDRV_IMPORT_FROM( cpu_c1571 )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( c128dcr )
 	MDRV_IMPORT_FROM( c128 )
+
+	MDRV_CBM_SERBUS_REMOVE("serial_bus")	// in the current code, serial bus device is tied to the floppy drive
 	MDRV_IMPORT_FROM( cpu_c1571cr )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( c128d81 )
 	MDRV_IMPORT_FROM( c128 )
+
+	MDRV_CBM_SERBUS_REMOVE("serial_bus")	// in the current code, serial bus device is tied to the floppy drive
 	MDRV_IMPORT_FROM( cpu_c1581 )
 MACHINE_DRIVER_END
 
@@ -678,11 +688,15 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( c128dpal )
 	MDRV_IMPORT_FROM( c128pal )
+
+	MDRV_CBM_SERBUS_REMOVE("serial_bus")	// in the current code, serial bus device is tied to the floppy drive
 	MDRV_IMPORT_FROM( cpu_c1571 )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( c128dcrp )
 	MDRV_IMPORT_FROM( c128pal )
+
+	MDRV_CBM_SERBUS_REMOVE("serial_bus")	// in the current code, serial bus device is tied to the floppy drive
 	MDRV_IMPORT_FROM( cpu_c1571cr )
 MACHINE_DRIVER_END
 

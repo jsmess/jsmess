@@ -82,21 +82,6 @@ READ8_DEVICE_HANDLER( c1551x_read_handshake );
 READ8_DEVICE_HANDLER( c1551x_read_status );
 
 
-/* serial bus for vic20, c64 & c16 with vc1541 and some printer */
-
-/* To be passed to serial bus emulation */
-void vc1541_serial_reset_write(running_machine *machine, int which, int level);
-int vc1541_serial_atn_read(running_machine *machine, int which);
-void vc1541_serial_atn_write(running_machine *machine, int which, int level);
-int vc1541_serial_data_read(running_machine *machine, int which);
-void vc1541_serial_data_write(running_machine *machine, int which, int level);
-int vc1541_serial_clock_read(running_machine *machine, int which);
-void vc1541_serial_clock_write(running_machine *machine, int which, int level);
-int vc1541_serial_request_read(running_machine *machine, int which);
-void vc1541_serial_request_write(running_machine *machine, int which, int level);
-
-
-
 /* Floppy drive ROMs */
 
 /****************************************************************************

@@ -1,343 +1,242 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <ctype.h>
-#include <string.h>
+/***************************************************************************
+
+    Commodore Serial Bus
+
+
+
+    2009-05 FP: Changed the implementation to be a MAME device. However, 
+    the main code has been kept the same as before (to reduce the risk of
+    regressions, at this early stage). More work will be eventually done
+    to improve emulation and to allow more devices (possibly of different 
+    kinds) to be connected to the bus like in the real thing.
+    Notice that, imho, the current implementation is not very satisfactory: 
+    it is not really emulating the serial bus, but (in some sense) the plug 
+    of the devices which would be connected to the serial bus. Hence, the 
+    provided handlers pass the serial state of the floppy drives to the CPU 
+    of the main machine. 
+    As a byproduct of this implementation, the serial_bus device is currently
+    tied to the floppy drives (i.e. you will find MDRV_CBM_SERBUS_ADD used
+    in the floppy drive MACHINE_DRIVERs, not in the main computer ones)
+
+    In other words, don't use this driver as an example of the right way
+    to implement serial devices in MAME/MESS!
+
+***************************************************************************/
+
 #include "driver.h"
-#include "image.h"
 
 #include "includes/cbmserb.h"
 
-/* with these we include the handlers for the interfaces below */
-#include "includes/vc1541.h"
-#include "includes/cbmdrive.h"
 
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
 
-/**************************************
-
-	Handlers for the simulated drive
-
-**************************************/
-
-
-static void sim_drive_reset_write (running_machine *machine, int level)
+typedef struct _cbm_serial_bus_t cbm_serial_bus_t;
+struct _cbm_serial_bus_t
 {
-	int i;
+	devcb_resolved_read8 read_atn_func;
+	devcb_resolved_read8 read_clock_func;
+	devcb_resolved_read8 read_data_func;
+	devcb_resolved_read8 read_request_func;
+	devcb_resolved_write8 write_atn_func;
+	devcb_resolved_write8 write_clock_func;
+	devcb_resolved_write8 write_data_func;
+	devcb_resolved_write8 write_request_func;
 
-	for (i = 0; i < cbm_serial.count; i++)
-		drive_reset_write (cbm_serial.drives[i], level);
-	/* init bus signals */
-}
-
-static int sim_drive_request_read (running_machine *machine)
-{
-	/* in c16 not connected */
-	return 1;
-}
-
-static void sim_drive_request_write (running_machine *machine, int level)
-{
-}
-
-static int sim_drive_atn_read (running_machine *machine)
-{
-	int i;
-
-	cbm_serial.atn[0] = cbm_serial.atn[1];
-	for (i = 0; i < cbm_serial.count; i++)
-		cbm_serial.atn[0] &= cbm_serial.atn[i + 2] =
-			vc1541_atn_read (machine, cbm_serial.drives[i]);
-	return cbm_serial.atn[0];
-}
-
-static int sim_drive_data_read (running_machine *machine)
-{
-	int i;
-
-	cbm_serial.data[0] = cbm_serial.data[1];
-	for (i = 0; i < cbm_serial.count; i++)
-		cbm_serial.data[0] &= cbm_serial.data[i + 2] =
-			vc1541_data_read (machine, cbm_serial.drives[i]);
-	return cbm_serial.data[0];
-}
-
-static int sim_drive_clock_read (running_machine *machine)
-{
-	int i;
-
-	cbm_serial.clock[0] = cbm_serial.clock[1];
-	for (i = 0; i < cbm_serial.count; i++)
-		cbm_serial.clock[0] &= cbm_serial.clock[i + 2] =
-			vc1541_clock_read (machine, cbm_serial.drives[i]);
-	return cbm_serial.clock[0];
-}
-
-static void sim_drive_data_write (running_machine *machine, int level)
-{
-	int i;
-
-	cbm_serial.data[0] =
-		cbm_serial.data[1] = level;
-	/* update line */
-	for (i = 0; i < cbm_serial.count; i++)
-		cbm_serial.data[0] &= cbm_serial.data[i + 2];
-	/* inform drives */
-	for (i = 0; i < cbm_serial.count; i++)
-		vc1541_data_write (machine, cbm_serial.drives[i], cbm_serial.data[0]);
-}
-
-static void sim_drive_clock_write (running_machine *machine, int level)
-{
-	int i;
-
-	cbm_serial.clock[0] =
-		cbm_serial.clock[1] = level;
-	/* update line */
-	for (i = 0; i < cbm_serial.count; i++)
-		cbm_serial.clock[0] &= cbm_serial.clock[i + 2];
-	/* inform drives */
-	for (i = 0; i < cbm_serial.count; i++)
-		vc1541_clock_write (machine, cbm_serial.drives[i], cbm_serial.clock[0]);
-}
-
-static void sim_drive_atn_write (running_machine *machine, int level)
-{
-	int i;
-
-	cbm_serial.atn[0] =
-		cbm_serial.atn[1] = level;
-	/* update line */
-	for (i = 0; i < cbm_serial.count; i++)
-		cbm_serial.atn[0] &= cbm_serial.atn[i + 2];
-	/* inform drives */
-	for (i = 0; i < cbm_serial.count; i++)
-		vc1541_atn_write (machine, cbm_serial.drives[i], cbm_serial.atn[0]);
-}
-
-
-const cbm_serial_interface cbm_sim_drive_interface =
-{
-	1,
-	sim_drive_reset_write,
-	sim_drive_request_read,
-	sim_drive_request_write,
-	sim_drive_atn_read,
-	sim_drive_data_read,
-	sim_drive_clock_read,
-	sim_drive_atn_write,
-	sim_drive_data_write,
-	sim_drive_clock_write
+	devcb_resolved_write8 write_reset_func;
 };
 
+/***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
 
-/**************************************
-
-	Handlers for the emulated drive
-
-**************************************/
-
-
-static void emu_drive_reset_write( running_machine *machine, int level )
+INLINE cbm_serial_bus_t *get_safe_token(const device_config *device)
 {
-	vc1541_serial_reset_write(machine, 0, level);
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CBM_SERBUS);
+	return (cbm_serial_bus_t *)device->token;
 }
 
-static int emu_drive_request_read( running_machine *machine )	
+INLINE const cbm_serial_bus_interface *get_interface(const device_config *device)
 {
-	return vc1541_serial_request_read(machine, 0);
-}
-	
-static void emu_drive_request_write( running_machine *machine, int level )
-{
-	vc1541_serial_request_write(machine, 0, level);
+	assert(device != NULL);
+	assert((device->type == CBM_SERBUS));
+	return (const cbm_serial_bus_interface *) device->static_config;
 }
 
-static int emu_drive_atn_read( running_machine *machine )
-{
-	return vc1541_serial_atn_read(machine, 0);
-}
-
-static int emu_drive_data_read( running_machine *machine )
-{
-	return vc1541_serial_data_read(machine, 0);
-}
-
-static int emu_drive_clock_read( running_machine *machine )
-{
-	return vc1541_serial_clock_read(machine, 0);
-}
-
-static void emu_drive_atn_write( running_machine *machine, int level )
-{
-	vc1541_serial_atn_write(machine, 0, level);
-}
-
-static void emu_drive_data_write( running_machine *machine, int level )
-{
-	vc1541_serial_data_write(machine, 0, level);
-}
-
-static void emu_drive_clock_write( running_machine *machine, int level )
-{
-	vc1541_serial_clock_write(machine, 0, level);
-}
-
-const cbm_serial_interface cbm_emu_drive_interface =
-{
-	2,
-	emu_drive_reset_write,
-	emu_drive_request_read,
-	emu_drive_request_write,
-	emu_drive_atn_read,
-	emu_drive_data_read,
-	emu_drive_clock_read,
-	emu_drive_atn_write,
-	emu_drive_data_write,
-	emu_drive_clock_write
-};
-
-
-/**************************************
-
-	Empty handlers
-
-**************************************/
-
-
-/* In sx64, c16v & vic20v we use these while fixing handlers for real emulation */
-
-static void fake_drive_reset_write( running_machine *machine, int level )
-{
-}
-
-static int fake_drive_request_read( running_machine *machine )	
-{
-	return 0;
-}
-	
-static void fake_drive_request_write( running_machine *machine, int level )
-{
-}
-
-static int fake_drive_atn_read( running_machine *machine )
-{
-	return 0;
-}
-
-static int fake_drive_data_read( running_machine *machine )
-{
-	return 0;
-}
-
-static int fake_drive_clock_read( running_machine *machine )
-{
-	return 0;
-}
-
-static void fake_drive_atn_write( running_machine *machine, int level )
-{
-}
-
-static void fake_drive_data_write( running_machine *machine, int level )
-{
-}
-
-static void fake_drive_clock_write( running_machine *machine, int level )
-{
-}
-
-const cbm_serial_interface cbm_fake_drive_interface =
-{
-	3,
-	fake_drive_reset_write,
-	fake_drive_request_read,
-	fake_drive_request_write,
-	fake_drive_atn_read,
-	fake_drive_data_read,
-	fake_drive_clock_read,
-	fake_drive_atn_write,
-	fake_drive_data_write,
-	fake_drive_clock_write
-};	
-	
-/**************************************
-
-	Serial communications
-
-**************************************/
-
-/* 2008-09 FP:
-	To make possible to test code for both simulated floppy drive and emulated floppy drive, I 
-	created this interface for the serial bus emulation. The implementation is maybe not the cleanest 
-	possible, but it works.
-	This is necessary because using simulation we support two drives (see the handlers above) while
-	the emulation only supports one drive (the handlers have a 'which' parameter, but the reset and
-	config functions are strictly for 1 drive). 
-	Eventually, we will remove the simulation and here we will have only the emu_drive_*** above 
-	renamed as cbm_serial_*** and the whole interface will be trashed.
- */
-/* To Do: Can we pass more directly the handlers from the interface to the drivers?	*/
-
-static cbm_serial_interface serial_intf_static= { 0 }, *serial_intf = &serial_intf_static;
-
-void cbm_serial_config(running_machine *machine, const cbm_serial_interface *intf)
-{
-	serial_intf->serial = intf->serial;
-	serial_intf->serial_reset_write = intf->serial_reset_write;
-	serial_intf->serial_request_read = intf->serial_request_read;
-	serial_intf->serial_request_write = intf->serial_request_write;
-	serial_intf->serial_atn_read = intf->serial_atn_read;
-	serial_intf->serial_data_read = intf->serial_data_read;
-	serial_intf->serial_clock_read = intf->serial_clock_read;
-	serial_intf->serial_atn_write = intf->serial_atn_write;
-	serial_intf->serial_data_write = intf->serial_data_write;
-	serial_intf->serial_clock_write = intf->serial_clock_write;
-
-	logerror("Serial interface in use: %d\n", serial_intf->serial);
-}
+/***************************************************************************
+    IMPLEMENTATION
+***************************************************************************/
 
 
 /* bus handling */
-void cbm_serial_reset_write (running_machine *machine, int level)
+READ8_DEVICE_HANDLER( cbm_serial_request_read )
 {
-	serial_intf->serial_reset_write(machine, level);
+	cbm_serial_bus_t *serbus = get_safe_token(device);
+	UINT8 val;
+
+	if (serbus->read_request_func.read != NULL)
+		val = devcb_call_read8(&serbus->read_request_func, offset);
+	else
+	{
+		logerror("%s:Serial Bus %s: Request is being read but has no handler\n", cpuexec_describe_context(device->machine), device->tag);
+		val = 0;
+	}
+
+	return val;
 }
 
-int cbm_serial_request_read (running_machine *machine)
+WRITE8_DEVICE_HANDLER( cbm_serial_request_write )
 {
-	return serial_intf->serial_request_read(machine);
+	cbm_serial_bus_t *serbus = get_safe_token(device);
+
+	if (serbus->write_request_func.write != NULL)
+		devcb_call_write8(&serbus->write_request_func, offset, data);
+	else
+		logerror("%s:Serial Bus %s: Request is being written but has no handler\n", cpuexec_describe_context(device->machine), device->tag);
 }
 
-void cbm_serial_request_write (running_machine *machine, int level)
+READ8_DEVICE_HANDLER( cbm_serial_atn_read )
 {
-	serial_intf->serial_request_write(machine, level);
+	cbm_serial_bus_t *serbus = get_safe_token(device);
+	UINT8 val;
+
+	if (serbus->read_atn_func.read != NULL)
+		val = devcb_call_read8(&serbus->read_atn_func, offset);
+	else
+	{
+		logerror("%s:Serial Bus %s: ATN is being read but has no handler\n", cpuexec_describe_context(device->machine), device->tag);
+		val = 0;
+	}
+
+	return val;
 }
 
-int cbm_serial_atn_read (running_machine *machine)
+READ8_DEVICE_HANDLER( cbm_serial_data_read )
 {
-	return serial_intf->serial_atn_read(machine);
+	cbm_serial_bus_t *serbus = get_safe_token(device);
+	UINT8 val;
+
+	if (serbus->read_data_func.read != NULL)
+		val = devcb_call_read8(&serbus->read_data_func, offset);
+	else
+	{
+		logerror("%s:Serial Bus %s: Data is being read but has no handler\n", cpuexec_describe_context(device->machine), device->tag);
+		val = 0;
+	}
+
+	return val;
 }
 
-int cbm_serial_data_read (running_machine *machine)
+READ8_DEVICE_HANDLER( cbm_serial_clock_read )
 {
-	return serial_intf->serial_data_read(machine);
+	cbm_serial_bus_t *serbus = get_safe_token(device);
+	UINT8 val;
+
+	if (serbus->read_clock_func.read != NULL)
+		val = devcb_call_read8(&serbus->read_clock_func, offset);
+	else
+	{
+		logerror("%s:Serial Bus %s: Clock is being read but has no handler\n", cpuexec_describe_context(device->machine), device->tag);
+		val = 0;
+	}
+
+	return val;
 }
 
-int cbm_serial_clock_read (running_machine *machine)
+WRITE8_DEVICE_HANDLER( cbm_serial_atn_write )
 {
-	return serial_intf->serial_clock_read(machine);
+	cbm_serial_bus_t *serbus = get_safe_token(device);
+
+	if (serbus->write_atn_func.write != NULL)
+		devcb_call_write8(&serbus->write_atn_func, offset, data);
+	else
+		logerror("%s:Serial Bus %s: ATN is being written but has no handler\n", cpuexec_describe_context(device->machine), device->tag);
 }
 
-void cbm_serial_data_write (running_machine *machine, int level)
+WRITE8_DEVICE_HANDLER( cbm_serial_data_write )
 {
-	serial_intf->serial_data_write(machine, level);
+	cbm_serial_bus_t *serbus = get_safe_token(device);
+
+	if (serbus->write_data_func.write != NULL)
+		devcb_call_write8(&serbus->write_data_func, offset, data);
+	else
+		logerror("%s:Serial Bus %s: Data is being written but has no handler\n", cpuexec_describe_context(device->machine), device->tag);
 }
 
-void cbm_serial_clock_write (running_machine *machine, int level)
+WRITE8_DEVICE_HANDLER( cbm_serial_clock_write )
 {
-	serial_intf->serial_clock_write(machine, level);
+	cbm_serial_bus_t *serbus = get_safe_token(device);
+
+	if (serbus->write_clock_func.write != NULL)
+		devcb_call_write8(&serbus->write_clock_func, offset, data);
+	else
+		logerror("%s:Serial Bus %s: Clock is being written but has no handler\n", cpuexec_describe_context(device->machine), device->tag);
 }
 
-void cbm_serial_atn_write (running_machine *machine, int level)
+
+/*-------------------------------------------------
+    DEVICE_START( cbm_serial_bus )
+-------------------------------------------------*/
+
+static DEVICE_START( cbm_serial_bus )
 {
-	serial_intf->serial_atn_write(machine, level);
+	cbm_serial_bus_t *serbus = get_safe_token(device);
+	const cbm_serial_bus_interface *intf = get_interface(device);
+
+	memset(serbus, 0, sizeof(*serbus));
+
+	devcb_resolve_read8(&serbus->read_atn_func, &intf->read_atn_func, device);
+	devcb_resolve_read8(&serbus->read_clock_func, &intf->read_clock_func, device);
+	devcb_resolve_read8(&serbus->read_data_func, &intf->read_data_func, device);
+	devcb_resolve_read8(&serbus->read_request_func, &intf->read_request_func, device);
+	devcb_resolve_write8(&serbus->write_atn_func, &intf->write_atn_func, device);
+	devcb_resolve_write8(&serbus->write_clock_func, &intf->write_clock_func, device);
+	devcb_resolve_write8(&serbus->write_data_func, &intf->write_data_func, device);
+	devcb_resolve_write8(&serbus->write_request_func, &intf->write_request_func, device);
+
+	devcb_resolve_write8(&serbus->write_reset_func, &intf->write_reset_func, device);
+}
+
+/*-------------------------------------------------
+    DEVICE_RESET( cbm_serial_bus )
+-------------------------------------------------*/
+
+static DEVICE_RESET( cbm_serial_bus )
+{
+	cbm_serial_bus_t *serbus = get_safe_token(device);
+
+	if (serbus->write_reset_func.write != NULL)
+		devcb_call_write8(&serbus->write_reset_func, 0, 0);
+	else
+		logerror("%s:Serial Bus %s: Reset is being written but has no handler\n", cpuexec_describe_context(device->machine), device->tag);
+}
+
+/*-------------------------------------------------
+    DEVICE_GET_INFO( cbm_serial_bus )
+-------------------------------------------------*/
+
+DEVICE_GET_INFO( cbm_serial_bus )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(cbm_serial_bus_t);			break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
+		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(cbm_serial_bus);	break;
+		case DEVINFO_FCT_STOP:							/* Nothing */								break;
+		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(cbm_serial_bus);	break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Commodore Serial Bus");	break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Commodore Serial Bus");	break;
+		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");						break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);					break;
+		case DEVINFO_STR_CREDITS:						/* Nothing */								break;
+	}
 }

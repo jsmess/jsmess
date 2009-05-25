@@ -330,11 +330,12 @@ the Edu64-1 used the full C64 BIOS. Confirmations are needed, anyway.
 
 #include "machine/cbmipt.h"
 #include "video/vic6567.h"
-#include "includes/vc1541.h"
 
 /* devices config */
 #include "includes/cbm.h"
+#include "includes/cbmserb.h"	// needed for MDRV_CBM_SERBUS_REMOVE
 #include "includes/cbmdrive.h"
+#include "includes/vc1541.h"
 
 #include "includes/c64.h"
 
@@ -520,6 +521,9 @@ static MACHINE_DRIVER_START( c64 )
 	MDRV_CIA6526_ADD("cia_0", CIA6526R1, VIC6567_CLOCK, c64_ntsc_cia0)
 	MDRV_CIA6526_ADD("cia_1", CIA6526R1, VIC6567_CLOCK, c64_ntsc_cia1)
 
+	/* floppy from serial bus */
+	MDRV_IMPORT_FROM(simulated_drive)
+
 	MDRV_IMPORT_FROM(c64_cartslot)
 MACHINE_DRIVER_END
 
@@ -558,6 +562,9 @@ static MACHINE_DRIVER_START( c64pal )
 	MDRV_CIA6526_ADD("cia_0", CIA6526R1, VIC6569_CLOCK, c64_pal_cia0)
 	MDRV_CIA6526_ADD("cia_1", CIA6526R1, VIC6569_CLOCK, c64_pal_cia1)
 	
+	/* floppy from serial bus */
+	MDRV_IMPORT_FROM(simulated_drive)
+
 	MDRV_IMPORT_FROM(c64_cartslot)
 MACHINE_DRIVER_END
 
@@ -571,8 +578,10 @@ static MACHINE_DRIVER_START( ultimax )
 	MDRV_SOUND_CONFIG(c64_sound_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	
+	MDRV_CBM_SERBUS_REMOVE("serial_bus")	// in the current code, serial bus device is tied to the floppy drive
 	MDRV_CARTSLOT_REMOVE("cart1")
 	MDRV_CARTSLOT_REMOVE("cart2")
+
 	MDRV_IMPORT_FROM(ultimax_cartslot)
 MACHINE_DRIVER_END
 
@@ -593,7 +602,9 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( sx64 )
 	MDRV_IMPORT_FROM( c64pal )
 
-	MDRV_IMPORT_FROM( cpu_vc1541 )
+	MDRV_CBM_SERBUS_REMOVE("serial_bus")	// in the current code, serial bus device is tied to the floppy drive
+	MDRV_IMPORT_FROM( cpu_vc1541 )			// so we need to remove the one from MDRV_IMPORT_FROM(simulated_drive)!
+
 	MDRV_SOUND_REMOVE( "dac" )
 	MDRV_CASSETTE_REMOVE( "cassette" )
 #ifdef CPU_SYNC

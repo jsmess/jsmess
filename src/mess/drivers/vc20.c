@@ -87,13 +87,14 @@ interface; no special expansion modules like ieee488 interface
 #include "sound/dac.h"
 
 #include "machine/6522via.h"
-#include "includes/vc1541.h"
 #include "machine/cbmipt.h"
 #include "video/vic6560.h"
 
 /* devices config */
 #include "includes/cbm.h"
+#include "includes/cbmserb.h"	// needed for MDRV_CBM_SERBUS_REMOVE
 #include "includes/cbmdrive.h"
+#include "includes/vc1541.h"
 
 #include "includes/vc20.h"
 
@@ -287,6 +288,9 @@ static MACHINE_DRIVER_START( vic20 )
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", cbm_cassette_config )
 
+	/* floppy from serial bus */
+	MDRV_IMPORT_FROM(simulated_drive)
+
 	/* via */
 	MDRV_VIA6522_ADD("via6522_0", 0, vc20_via0)
 	MDRV_VIA6522_ADD("via6522_1", 0, vc20_via1)
@@ -299,6 +303,8 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( vic20v )
 	MDRV_IMPORT_FROM( vic20 )
+
+	MDRV_CBM_SERBUS_REMOVE("serial_bus")	// in the current code, serial bus device is tied to the floppy drive
 	MDRV_IMPORT_FROM( cpu_vc1540 )
 #ifdef CPU_SYNC
 	MDRV_QUANTUM_TIME(HZ(60))
@@ -337,6 +343,8 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( vc20v )
 	MDRV_IMPORT_FROM( vc20 )
+
+	MDRV_CBM_SERBUS_REMOVE("serial_bus")	// in the current code, serial bus device is tied to the floppy drive
 	MDRV_IMPORT_FROM( cpu_vc1540 )
 #ifdef CPU_SYNC
 	MDRV_QUANTUM_TIME(HZ(60))

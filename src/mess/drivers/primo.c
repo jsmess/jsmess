@@ -111,6 +111,8 @@ Interrupts:
 #include "devices/cartslot.h"
 #include "formats/primoptp.h"
 
+#include "includes/cbmdrive.h"
+
 static ADDRESS_MAP_START( primoa_port, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x00, 0x3f ) AM_READWRITE( primo_be_1_r, primo_ki_1_w )
@@ -274,6 +276,11 @@ static MACHINE_DRIVER_START( primoa32 )
 	MDRV_QUICKLOAD_ADD("quickload", primo, "pp", 0)
 
 	MDRV_CASSETTE_ADD( "cassette", primo_cassette_config )
+
+	/* floppy from serial bus */
+	/* for some reason machine/primo.c sets up the serial bus
+	but no floppy drive has been apparently added... incomplete driver? */
+	MDRV_IMPORT_FROM(simulated_drive)
 
 	/* cartridge */
 	MDRV_CARTSLOT_ADD("cart1")

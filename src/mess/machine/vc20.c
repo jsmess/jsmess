@@ -109,6 +109,7 @@ static WRITE8_DEVICE_HANDLER( vc20_via0_write_ca2 )
 static READ8_DEVICE_HANDLER( vc20_via0_read_porta )
 {
 	UINT8 value = 0xff;
+	const device_config *serbus = devtag_get_device(device->machine, "serial_bus");
 
 	value &= ~(input_port_read(device->machine, "JOY") & 0x3c);
 
@@ -116,9 +117,9 @@ static READ8_DEVICE_HANDLER( vc20_via0_read_porta )
 	/* should be reduced to about 1 or 2 microseconds */
 	/*  if ((input_port_read(space->machine, "CTRLSEL") & 0x20 ) && (input_port_read(space->machine, "JOY") & 0x40) )  // i.e. LIGHTPEN_BUTTON
 		value &= ~0x20; */
-	if (!serial_clock || !cbm_serial_clock_read (device->machine))
+	if (!serial_clock || !cbm_serial_clock_read(serbus, 0))
 		value &= ~0x01;
-	if (!serial_data || !cbm_serial_data_read (device->machine))
+	if (!serial_data || !cbm_serial_data_read(serbus, 0))
 		value &= ~0x02;
 
 	if ((cassette_get_state(devtag_get_device(device->machine, "cassette")) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
@@ -131,9 +132,11 @@ static READ8_DEVICE_HANDLER( vc20_via0_read_porta )
 
 static WRITE8_DEVICE_HANDLER( vc20_via0_write_porta )
 {
-	running_machine *machine = device->machine;
-	cbm_serial_atn_write (machine, serial_atn = !(data & 0x80));
-	DBG_LOG (1, "serial out", ("atn %s\n", serial_atn ? "high" : "low"));
+	running_machine *machine = device->machine;		// used in DBG_LOG
+	const device_config *serbus = devtag_get_device(machine, "serial_bus");
+
+	cbm_serial_atn_write(serbus, 0, serial_atn = !(data & 0x80));
+	DBG_LOG(1, "serial out", ("atn %s\n", serial_atn ? "high" : "low"));
 }
 
 /* via 1 addr 0x9120
@@ -191,7 +194,9 @@ static READ8_DEVICE_HANDLER( vc20_via1_read_ca1 )
 
 static WRITE8_DEVICE_HANDLER( vc20_via1_write_ca2 )
 {
-	cbm_serial_clock_write (device->machine, serial_clock = !data);
+	const device_config *serbus = devtag_get_device(device->machine, "serial_bus");
+
+	cbm_serial_clock_write(serbus, 0, serial_clock = !data);
 }
 
 static READ8_DEVICE_HANDLER( vc20_via1_read_portb )
@@ -330,14 +335,17 @@ static WRITE8_DEVICE_HANDLER( vc20_via1_write_portb )
 
 static READ8_DEVICE_HANDLER( vc20_via1_read_cb1 )
 {
-	running_machine *machine = device->machine;
-	DBG_LOG (1, "serial in", ("request read\n"));
-	return cbm_serial_request_read (device->machine);
+	running_machine *machine = device->machine;		// used in DBG_LOG
+	const device_config *serbus = devtag_get_device(machine, "serial_bus");
+
+	DBG_LOG(1, "serial in", ("request read\n"));
+	return cbm_serial_request_read(serbus, 0);
 }
 
 static WRITE8_DEVICE_HANDLER( vc20_via1_write_cb2 )
 {
-	cbm_serial_data_write (device->machine, serial_data = !data);
+	const device_config *serbus = devtag_get_device(device->machine, "serial_bus");
+	cbm_serial_data_write(serbus, 0, serial_data = !data);
 }
 
 /* ieee 6522 number 1 (via4)
@@ -621,14 +629,10 @@ MACHINE_RESET( vic20 )
 
 	if (has_vc1541)
 	{
-		cbm_serial_config(machine, &cbm_emu_drive_interface);
 		drive_reset();
 	}
 	else
 	{
-		cbm_serial_config(machine, &cbm_sim_drive_interface);
-		cbm_serial_reset_write(machine, 0);
-
 		if (ieee) 
 		{
 			cbm_drive_0_config(IEEE, 8);

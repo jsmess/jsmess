@@ -187,11 +187,12 @@ const cia6526_interface c65_pal_cia0 =
 static READ8_DEVICE_HANDLER( c65_cia1_port_a_r )
 {
 	UINT8 value = 0xff;
+	const device_config *serbus = devtag_get_device(device->machine, "serial_bus");
 
-	if (!serial_clock || !cbm_serial_clock_read (device->machine))
+	if (!serial_clock || !cbm_serial_clock_read(serbus, 0))
 		value &= ~0x40;
 
-	if (!serial_data || !cbm_serial_data_read (device->machine))
+	if (!serial_data || !cbm_serial_data_read(serbus, 0))
 		value &= ~0x80;
 
 	return value;
@@ -200,10 +201,11 @@ static READ8_DEVICE_HANDLER( c65_cia1_port_a_r )
 static WRITE8_DEVICE_HANDLER( c65_cia1_port_a_w )
 {
 	static const int helper[4] = {0xc000, 0x8000, 0x4000, 0x0000};
+	const device_config *serbus = devtag_get_device(device->machine, "serial_bus");
 
-	cbm_serial_clock_write (device->machine, serial_clock = !(data & 0x10));
-	cbm_serial_data_write (device->machine, serial_data = !(data & 0x20));
-	cbm_serial_atn_write (device->machine, serial_atn = !(data & 0x08));
+	cbm_serial_clock_write(serbus, 0, serial_clock = !(data & 0x10));
+	cbm_serial_data_write(serbus, 0, serial_data = !(data & 0x20));
+	cbm_serial_atn_write(serbus, 0, serial_atn = !(data & 0x08));
 	c64_vicaddr = c64_memory + helper[data & 0x03];
 }
 
@@ -1040,8 +1042,6 @@ MACHINE_START( c65 )
 	/* clear upper memory */
 	memset(mess_ram + 128*1024, 0xff, mess_ram_size -  128*1024);
 
-	cbm_serial_config(machine, &cbm_sim_drive_interface);
-	cbm_serial_reset_write (machine, 0);
 	cbm_drive_0_config (SERIAL, 10);
 	cbm_drive_1_config (SERIAL, 11);
 	c64_vicaddr = c64_memory;

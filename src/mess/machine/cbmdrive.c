@@ -10,7 +10,7 @@
 #include "includes/cbmdrive.h"
 
 #define VERBOSE_LEVEL 0
-#define DBG_LOG(MACHINE,N,M,A) \
+#define DBG_LOG( MACHINE, N, M, A ) \
 	do { \
 		if(VERBOSE_LEVEL >= N) \
 		{ \
@@ -69,7 +69,7 @@ static const int d64_sectors_per_track[] =
 static int d64_offset[D64_MAX_TRACKS];		   /* offset of begin of track in d64 file */
 
 /* must be called before other functions */
-void cbm_drive_open_helper (void)
+void cbm_drive_open_helper( void )
 {
 	int i;
 
@@ -79,12 +79,12 @@ void cbm_drive_open_helper (void)
 }
 
 /* calculates offset to beginning of d64 file for sector beginning */
-static int d64_tracksector2offset (int track, int sector)
+static int d64_tracksector2offset( int track, int sector )
 {
 	return d64_offset[track - 1] + sector * 256;
 }
 
-static int cbm_compareNames (unsigned char *left, unsigned char *right)
+static int cbm_compareNames( unsigned char *left, unsigned char *right )
 {
 	int i;
 
@@ -106,24 +106,24 @@ static int cbm_compareNames (unsigned char *left, unsigned char *right)
 /* searches program with given name in directory
  * delivers -1 if not found
  * or pos in image of directory node */
-static int d64_find (CBM_Drive * drive, unsigned char *name)
+static int d64_find( CBM_Drive * drive, unsigned char *name )
 {
 	int pos, track, sector, i;
 
-	pos = d64_tracksector2offset (18, 0);
+	pos = d64_tracksector2offset(18, 0);
 	track = drive->image[pos];
 	sector = drive->image[pos + 1];
 
 	while ((track >= 1) && (track <= 35))
 	{
-		pos = d64_tracksector2offset (track, sector);
+		pos = d64_tracksector2offset(track, sector);
 		for (i = 2; i < 256; i += 32)
 		{
 			if (drive->image[pos + i] & 0x80)
 			{
-				if (mame_stricmp ((char *) name, (char *) "*") == 0)
+				if (mame_stricmp((char *) name, (char *) "*") == 0)
 					return pos + i;
-				if (cbm_compareNames (name, drive->image + pos + i + 3))
+				if (cbm_compareNames(name, drive->image + pos + i + 3))
 					return pos + i;
 			}
 		}
@@ -134,35 +134,35 @@ static int d64_find (CBM_Drive * drive, unsigned char *name)
 }
 
 /* reads file into buffer */
-static void d64_readprg (running_machine *machine, CBM_Drive * drive, int pos)
+static void d64_readprg( running_machine *machine, CBM_Drive * drive, int pos )
 {
 	int i;
 
 	for (i = 0; i < 16; i++)
-		drive->filename[i] = toupper (drive->image[pos + i + 3]);
+		drive->filename[i] = toupper(drive->image[pos + i + 3]);
 
 	drive->filename[i] = 0;
 
-	pos = d64_tracksector2offset (drive->image[pos + 1], drive->image[pos + 2]);
+	pos = d64_tracksector2offset(drive->image[pos + 1], drive->image[pos + 2]);
 
 	i = pos;
 	drive->size = 0;
 	while (drive->image[i] != 0)
 	{
 		drive->size += 254;
-		i = d64_tracksector2offset (drive->image[i], drive->image[i + 1]);
+		i = d64_tracksector2offset(drive->image[i], drive->image[i + 1]);
 	}
 	drive->size += drive->image[i + 1];
 
-	DBG_LOG (machine, 3, "d64 readprg", ("size %d\n", drive->size));
+	DBG_LOG(machine, 3, "d64 readprg", ("size %d\n", drive->size));
 
-	drive->buffer = (UINT8*)realloc (drive->buffer, drive->size);
+	drive->buffer = (UINT8*)realloc(drive->buffer, drive->size);
 	if (!drive->buffer)
 		fatalerror("out of memory %s %d\n", __FILE__, __LINE__);
 
 	drive->size--;
 
-	DBG_LOG (machine, 3, "d64 readprg", ("track: %d sector: %d\n",
+	DBG_LOG(machine, 3, "d64 readprg", ("track: %d sector: %d\n",
 								drive->image[pos + 1],
 								drive->image[pos + 2]));
 
@@ -170,53 +170,53 @@ static void d64_readprg (running_machine *machine, CBM_Drive * drive, int pos)
 	{
 		if (i + 254 < drive->size)
 		{							   /* not last sector */
-			memcpy (drive->buffer + i, drive->image + pos + 2, 254);
-			pos = d64_tracksector2offset (drive->image[pos + 0],
+			memcpy(drive->buffer + i, drive->image + pos + 2, 254);
+			pos = d64_tracksector2offset(drive->image[pos + 0],
 									  drive->image[pos + 1]);
-			DBG_LOG (machine, 3, "d64 readprg", ("track: %d sector: %d\n",
+			DBG_LOG(machine, 3, "d64 readprg", ("track: %d sector: %d\n",
 										drive->image[pos],
 										drive->image[pos + 1]));
 		}
 		else
 		{
-			memcpy (drive->buffer + i, drive->image + pos + 2, drive->size - i);
+			memcpy(drive->buffer + i, drive->image + pos + 2, drive->size - i);
 		}
 	}
 }
 
 /* reads sector into buffer */
-static void d64_read_sector (CBM_Drive * drive, int track, int sector)
+static void d64_read_sector( CBM_Drive * drive, int track, int sector )
 {
 	int pos;
 
-	snprintf (drive->filename, sizeof (drive->filename),
+	snprintf(drive->filename, sizeof (drive->filename),
 			  "track %d sector %d", track, sector);
 
 	pos = d64_tracksector2offset (track, sector);
 
-	drive->buffer = (UINT8*)realloc (drive->buffer,256);
+	drive->buffer = (UINT8*)realloc(drive->buffer,256);
 	if (!drive->buffer)
 		fatalerror("out of memory %s %d\n", __FILE__, __LINE__);
 
 	logerror("d64 read track %d sector %d\n", track, sector);
 
-	memcpy (drive->buffer, drive->image + pos, 256);
+	memcpy(drive->buffer, drive->image + pos, 256);
 	drive->size = 256;
 	drive->pos = 0;
 }
 
 /* reads directory into buffer */
-static void d64_read_directory (CBM_Drive * drive)
+static void d64_read_directory( CBM_Drive * drive )
 {
 	int pos, track, sector, i, j, blocksfree, addr = 0x0101/*0x1001*/;
 
-	drive->buffer = (UINT8*)realloc (drive->buffer, 8 * 18 * 25);
+	drive->buffer = (UINT8*)realloc(drive->buffer, 8 * 18 * 25);
 	if (!drive->buffer)
 		fatalerror("out of memory %s %d\n", __FILE__, __LINE__);
 
 	drive->size = 0;
 
-	pos = d64_tracksector2offset (18, 0);
+	pos = d64_tracksector2offset(18, 0);
 	track = drive->image[pos];
 	sector = drive->image[pos + 1];
 
@@ -247,7 +247,7 @@ static void d64_read_directory (CBM_Drive * drive)
 
 	while ((track >= 1) && (track <= 35))
 	{
-		pos = d64_tracksector2offset (track, sector);
+		pos = d64_tracksector2offset(track, sector);
 		for (i = 2; i < 256; i += 32)
 		{
 			if (drive->image[pos + i] & 0x80)
@@ -256,7 +256,7 @@ static void d64_read_directory (CBM_Drive * drive)
 				+ 256 * drive->image[pos + i + 29];
 				char dummy[10];
 
-				sprintf (dummy, "%d", blocks);
+				sprintf(dummy, "%d", blocks);
 				len = strlen (dummy);
 				addr += 29 - len;
 				drive->buffer[drive->size++] = addr & 0xff;
@@ -309,22 +309,22 @@ static void d64_read_directory (CBM_Drive * drive)
 	drive->buffer[drive->size++] = addr >> 8;
 	drive->buffer[drive->size++] = blocksfree & 0xff;
 	drive->buffer[drive->size++] = blocksfree >> 8;
-	memcpy (drive->buffer + drive->size, "BLOCKS FREE", 11);
+	memcpy(drive->buffer + drive->size, "BLOCKS FREE", 11);
 	drive->size += 11;
 	drive->buffer[drive->size++] = 0;
 
-	strcpy (drive->filename, "$");
+	strcpy(drive->filename, "$");
 }
 
-static int d64_command (running_machine *machine, CBM_Drive * drive, unsigned char *name)
+static int d64_command( running_machine *machine, CBM_Drive * drive, unsigned char *name )
 {
 	int pos;
 
 	/* name eventuell mit 0xa0 auffuellen */
 
-	if (mame_stricmp ((char *) name, (char *) "$") == 0)
+	if (mame_stricmp((char *) name, (char *) "$") == 0)
 	{
-		d64_read_directory (drive);
+		d64_read_directory(drive);
 	}
 	else
 	{
@@ -332,7 +332,7 @@ static int d64_command (running_machine *machine, CBM_Drive * drive, unsigned ch
 		{
 			return 1;
 		}
-		d64_readprg (machine, drive, pos);
+		d64_readprg(machine, drive, pos);
 	}
 	return 0;
 }
@@ -390,7 +390,7 @@ static int d64_command (running_machine *machine, CBM_Drive * drive, unsigned ch
  load
   20 f0 name 3f
  */
-static void cbm_command (running_machine *machine, CBM_Drive * drive)
+static void cbm_command( running_machine *machine, CBM_Drive * drive )
 {
 	unsigned char name[20], type = 'P', mode = 0;
 	int channel, head, track, sector;
@@ -447,7 +447,7 @@ static void cbm_command (running_machine *machine, CBM_Drive * drive)
 			drive->state = OPEN;
 			drive->pos = 0;
 		}
-		DBG_LOG (machine, 1, "cbm_open", ("%s %s type:%c %c\n", name,
+		DBG_LOG(machine, 1, "cbm_open", ("%s %s type:%c %c\n", name,
 								 rc ? "failed" : "success", type, mode ? mode : ' '));
 	}
 	else if ((drive->cmdpos == 1) && (drive->cmdbuffer[0] == 0x5f))
@@ -526,7 +526,7 @@ static void cbm_command (running_machine *machine, CBM_Drive * drive)
   * status 3 for file not found
   * or filedata ended with status 3
   */
-void c1551_state (running_machine *machine, CBM_Drive * drive)
+void c1551_state( running_machine *machine, CBM_Drive * drive )
 {
 	static int oldstate;
 
@@ -666,14 +666,14 @@ void c1551_state (running_machine *machine, CBM_Drive * drive)
 			drive->i.iec.state++;
 			if ((drive->state == 0) || (drive->state == OPEN))
 			{
-				DBG_LOG (machine, 1, "c1551", ("taken data %.2x\n",
+				DBG_LOG(machine, 1, "c1551", ("taken data %.2x\n",
 									  drive->i.iec.datain));
 				if (drive->cmdpos < sizeof (drive->cmdbuffer))
 					drive->cmdbuffer[drive->cmdpos++] = drive->i.iec.datain;
 			}
 			else if (drive->state == WRITING)
 			{
-				DBG_LOG (machine, 1, "c1551", ("written data %.2x\n", drive->i.iec.datain));
+				DBG_LOG(machine, 1, "c1551", ("written data %.2x\n", drive->i.iec.datain));
 			}
 			drive->i.iec.handshakeout = 1;
 		}
@@ -703,7 +703,7 @@ static int vc1541_time_greater(running_machine *machine, CBM_Drive * drive, atto
 		threshold) > 0;
 }
 
-void vc1541_state (running_machine *machine, CBM_Drive * drive)
+void vc1541_state( running_machine *machine, CBM_Drive * drive )
 {
 	int oldstate = drive->i.serial.state;
 
@@ -858,7 +858,7 @@ void vc1541_state (running_machine *machine, CBM_Drive * drive)
 				((drive->i.serial.value == 0x3f) || (drive->i.serial.value == 0x5f)
 				 || ((drive->i.serial.value & 0xf0) == 0x60)))
 			{
-				cbm_command (machine, drive);
+				cbm_command(machine, drive);
 			}
 			drive->i.serial.time = timer_get_time(machine);
 			drive->i.serial.data = 0;
@@ -1326,10 +1326,13 @@ void c2031_state(running_machine *machine, CBM_Drive *drive)
 	switch (drive->i.ieee.state)
 	{
 	case 0:
-		if (!cbm_ieee_dav_r(machine)) {
-			drive->i.ieee.state=10;
-		} else if (!cbm_ieee_atn_r(machine)) {
-			drive->i.ieee.state=11;
+		if (!cbm_ieee_dav_r(machine)) 
+		{
+			drive->i.ieee.state = 10;
+		} 
+		else if (!cbm_ieee_atn_r(machine)) 
+		{
+			drive->i.ieee.state = 11;
 			cbm_ieee_ndac_w(machine, 1, 0);
 			logerror("arsch\n");
 		}
@@ -1337,123 +1340,145 @@ void c2031_state(running_machine *machine, CBM_Drive *drive)
 	case 1:
 		break;
 	case 10:
-		if (cbm_ieee_dav_r(machine)) {
+		if (cbm_ieee_dav_r(machine)) 
+		{
 			drive->i.ieee.state++;
 			cbm_ieee_nrfd_w(machine, 1, 1);
 			cbm_ieee_ndac_w(machine, 1, 0);
 		}
 		break;
 	case 11:
-		if (!cbm_ieee_dav_r(machine)) {
+		if (!cbm_ieee_dav_r(machine)) 
+		{
 			cbm_ieee_nrfd_w(machine, 1, 0);
-			data=cbm_ieee_data_r(machine)^0xff;
+			data = cbm_ieee_data_r(machine) ^ 0xff;
 			cbm_ieee_ndac_w(machine, 1, 1);
 			logerror("byte received %.2x\n",data);
-			if (!cbm_ieee_atn_r(machine)&&((data&0x0f)==drive->i.ieee.device) ) {
-				if ((data&0xf0)==0x40)
-					drive->i.ieee.state=30;
+			if (!cbm_ieee_atn_r(machine) && ((data & 0x0f) == drive->i.ieee.device)) 
+			{
+				if ((data & 0xf0) == 0x40)
+					drive->i.ieee.state = 30;
 				else
-					drive->i.ieee.state=20;
+					drive->i.ieee.state = 20;
 				if (drive->cmdpos < sizeof (drive->cmdbuffer))
 					drive->cmdbuffer[drive->cmdpos++] = data;
-			} else if ((data&0xf)==0xf) {
+			} 
+			else if ((data&0xf) == 0xf) 
+			{
 				drive->i.ieee.state--;
-			} else {
+			} 
+			else 
+			{
 				drive->i.ieee.state++;
 			}
 		}
 		break;
 		/* wait until atn is released */
 	case 12:
-		if (cbm_ieee_atn_r(machine)) {
+		if (cbm_ieee_atn_r(machine)) 
+		{
 			drive->i.ieee.state++;
 			cbm_ieee_nrfd_w(machine, 1, 0);
 		}
 		break;
 	case 13:
-		if (!cbm_ieee_atn_r(machine)) {
-			drive->i.ieee.state=10;
+		if (!cbm_ieee_atn_r(machine)) 
+		{
+			drive->i.ieee.state = 10;
 /*			cbm_ieee_nrfd_w(machine, 1, 0); */
 		}
 		break;
 
 		/* receiving rest of command */
 	case 20:
-		if (cbm_ieee_dav_r(machine)) {
+		if (cbm_ieee_dav_r(machine)) 
+		{
 			drive->i.ieee.state++;
 			cbm_ieee_nrfd_w(machine, 1, 1);
 			cbm_ieee_ndac_w(machine, 1, 0);
 		}
 		break;
 	case 21:
-		if (!cbm_ieee_dav_r(machine)) {
+		if (!cbm_ieee_dav_r(machine)) 
+		{
 			cbm_ieee_nrfd_w(machine, 1, 0);
-			data=cbm_ieee_data_r(machine)^0xff;
+			data = cbm_ieee_data_r(machine) ^ 0xff;
 			logerror("byte received %.2x\n",data);
 			if (drive->cmdpos < sizeof (drive->cmdbuffer))
 				drive->cmdbuffer[drive->cmdpos++] = data;
-			if (!cbm_ieee_atn_r(machine)&&((data&0xf)==0xf)) {
+			if (!cbm_ieee_atn_r(machine) && ((data & 0xf) == 0xf)) 
+			{
 				cbm_command(machine, drive);
-				drive->i.ieee.state=10;
-			} else
-				drive->i.ieee.state=20;
+				drive->i.ieee.state = 10;
+			} 
+			else
+				drive->i.ieee.state = 20;
+
 			cbm_ieee_ndac_w(machine, 1, 1);
 		}
 		break;
 
 		/* read command */
 	case 30:
-		if (cbm_ieee_dav_r(machine)) {
+		if (cbm_ieee_dav_r(machine)) 
+		{
 			drive->i.ieee.state++;
 			cbm_ieee_nrfd_w(machine, 1, 1);
 			cbm_ieee_ndac_w(machine, 1, 0);
 		}
 		break;
 	case 31:
-		if (!cbm_ieee_dav_r(machine)) {
+		if (!cbm_ieee_dav_r(machine)) 
+		{
 			cbm_ieee_nrfd_w(machine, 1, 0);
-			data=cbm_ieee_data_r(machine)^0xff;
-			logerror("byte received %.2x\n",data);
+			data = cbm_ieee_data_r(machine) ^ 0xff;
+			logerror("byte received %.2x\n", data);
 			if (drive->cmdpos < sizeof (drive->cmdbuffer))
 				drive->cmdbuffer[drive->cmdpos++] = data;
 			cbm_command(machine, drive);
-			if (drive->state==READING)
+			if (drive->state == READING)
 				drive->i.ieee.state++;
 			else
-				drive->i.ieee.state=10;
+				drive->i.ieee.state = 10;
 			cbm_ieee_ndac_w(machine, 1, 1);
 		}
 		break;
 	case 32:
-		if (cbm_ieee_dav_r(machine)) {
+		if (cbm_ieee_dav_r(machine)) 
+		{
 			cbm_ieee_nrfd_w(machine, 1, 1);
-			drive->i.ieee.state=40;
+			drive->i.ieee.state = 40;
 		}
 		break;
 	case 40:
-		if (!cbm_ieee_ndac_r(machine)) {
-			cbm_ieee_data_w(machine, 1, drive->buffer[drive->pos++]^0xff);
-			if (drive->pos>=drive->size)
+		if (!cbm_ieee_ndac_r(machine)) 
+		{
+			cbm_ieee_data_w(machine, 1, drive->buffer[drive->pos++] ^ 0xff);
+			if (drive->pos >= drive->size)
 				cbm_ieee_eoi_w(machine, 1, 0);
 			cbm_ieee_dav_w(machine, 1, 0);
 			drive->i.ieee.state++;
 		}
 		break;
 	case 41:
-		if (!cbm_ieee_nrfd_r(machine)) {
+		if (!cbm_ieee_nrfd_r(machine)) 
+		{
 			drive->i.ieee.state++;
 		}
 		break;
 	case 42:
-		if (cbm_ieee_ndac_r(machine)) {
+		if (cbm_ieee_ndac_r(machine)) 
+		{
 			if (cbm_ieee_eoi_r(machine))
-				drive->i.ieee.state=40;
-			else {
+				drive->i.ieee.state = 40;
+
+			else 
+			{
 				cbm_ieee_data_w(machine, 1, 0xff);
 				cbm_ieee_ndac_w(machine, 1, 0);
 				cbm_ieee_nrfd_w(machine, 1, 0);
 				cbm_ieee_eoi_w(machine, 1, 1);
-				drive->i.ieee.state=10;
+				drive->i.ieee.state = 10;
 			}
 			cbm_ieee_dav_w(machine, 1, 1);
 		}
@@ -1466,117 +1491,6 @@ void c2031_state(running_machine *machine, CBM_Drive *drive)
 				 oldstate,
 				 drive->i.ieee.state, drive->state
 				 );
-}
-
-/***********************************************
-
-	Drive handling
-
-***********************************************/
-
-CBM_Drive cbm_drive[2];
-
-CBM_Serial cbm_serial;
-
-/* must be called before other functions */
-static void cbm_drive_open (void)
-{
-	int i;
-
-	memset(cbm_drive, 0, sizeof(cbm_drive));
-	memset(&cbm_serial, 0, sizeof(cbm_serial));
-
-	cbm_drive_open_helper ();
-
-	cbm_serial.count = 0;
-	for (i = 0; i < sizeof (cbm_serial.atn) / sizeof (int); i++)
-
-	{
-		cbm_serial.atn[i] =
-			cbm_serial.data[i] =
-			cbm_serial.clock[i] = 1;
-	}
-}
-
-static void cbm_drive_close (void)
-{
-	int i;
-
-	cbm_serial.count = 0;
-	for (i = 0; i < sizeof (cbm_drive) / sizeof (CBM_Drive); i++)
-	{
-		cbm_drive[i].interface = 0;
-		
-		if( cbm_drive[i].buffer ) {
-			free(cbm_drive[i].buffer);
-			cbm_drive[i].buffer = NULL;
-		}
-
-		if (cbm_drive[i].drive == D64_IMAGE)
-			cbm_drive[i].image = NULL;
-		cbm_drive[i].drive = 0;
-	}
-}
-
-
-
-static void cbm_drive_config (CBM_Drive * drive, int interface, int serialnr)
-{
-	int i;
-
-	if (interface==SERIAL)
-		drive->i.serial.device=serialnr;
-
-	if (interface==IEEE)
-		drive->i.ieee.device=serialnr;
-
-	if (drive->interface == interface)
-		return;
-
-	if (drive->interface == SERIAL)
-	{
-		for (i = 0; (i < cbm_serial.count) && (cbm_serial.drives[i] != drive); i++) ;
-		for (; i + 1 < cbm_serial.count; i++)
-			cbm_serial.drives[i] = cbm_serial.drives[i + 1];
-		cbm_serial.count--;
-	}
-
-	drive->interface = interface;
-
-	if (drive->interface == IEC)
-	{
-		drive->i.iec.handshakein =
-			drive->i.iec.handshakeout = 0;
-		drive->i.iec.status = 0;
-		drive->i.iec.dataout = drive->i.iec.datain = 0xff;
-		drive->i.iec.state = 0;
-	}
-	else if (drive->interface == SERIAL)
-	{
-		cbm_serial.drives[cbm_serial.count++] = drive;
-		drive_reset_write(drive, 0);
-	}
-}
-
-void cbm_drive_0_config (int interface, int serialnr)
-{
-	cbm_drive_config (cbm_drive, interface, serialnr);
-}
-void cbm_drive_1_config (int interface, int serialnr)
-{
-	cbm_drive_config (cbm_drive + 1, interface, serialnr);
-}
-
-
-void drive_reset_write (CBM_Drive * drive, int level)
-{
-	if (level == 0)
-	{
-		drive->i.serial.data =
-			drive->i.serial.clock =
-			drive->i.serial.atn = 1;
-		drive->i.serial.state = 0;
-	}
 }
 
 
@@ -1671,47 +1585,274 @@ READ8_DEVICE_HANDLER( c1551_1_read_status )
 
 /**************************************
 
-	VC1541
+	VC1541 Serial Bus Device Interface
 
 **************************************/
 
-int vc1541_atn_read (running_machine *machine, CBM_Drive * drive)
+static UINT8 vc1541_atn_read( running_machine *machine, CBM_Drive * drive )
 {
-	vc1541_state (machine, drive);
+	vc1541_state(machine, drive);
 	return drive->i.serial.atn;
 }
 
-int vc1541_data_read (running_machine *machine, CBM_Drive * drive)
+static UINT8 vc1541_data_read( running_machine *machine, CBM_Drive * drive )
 {
-	vc1541_state (machine, drive);
+	vc1541_state(machine, drive);
 	return drive->i.serial.data;
 }
 
-int vc1541_clock_read (running_machine *machine, CBM_Drive * drive)
+static UINT8 vc1541_clock_read( running_machine *machine, CBM_Drive * drive )
 {
-	vc1541_state (machine, drive);
+	vc1541_state(machine, drive);
 	return drive->i.serial.clock;
 }
 
-void vc1541_data_write (running_machine *machine, CBM_Drive * drive, int level)
+static void vc1541_data_write( running_machine *machine, CBM_Drive * drive, int level )
 {
-	vc1541_state (machine, drive);
+	vc1541_state(machine, drive);
 }
 
-void vc1541_clock_write (running_machine *machine, CBM_Drive * drive, int level)
+static void vc1541_clock_write( running_machine *machine, CBM_Drive * drive, int level )
 {
-	vc1541_state (machine, drive);
+	vc1541_state(machine, drive);
 }
 
-void vc1541_atn_write (running_machine *machine, CBM_Drive * drive, int level)
+static void vc1541_atn_write( running_machine *machine, CBM_Drive * drive, int level )
 {
-	vc1541_state (machine, drive);
+	vc1541_state(machine, drive);
+}
+
+void drive_reset_write( CBM_Drive * drive, int level )
+{
+	if (level == 0)
+	{
+		drive->i.serial.data =
+			drive->i.serial.clock =
+			drive->i.serial.atn = 1;
+		drive->i.serial.state = 0;
+	}
+}
+
+static READ8_DEVICE_HANDLER( sim_drive_atn_read )
+{
+	int i;
+
+	cbm_serial.atn[0] = cbm_serial.atn[1];
+	for (i = 0; i < cbm_serial.count; i++)
+		cbm_serial.atn[0] &= cbm_serial.atn[i + 2] =
+			vc1541_atn_read(device->machine, cbm_serial.drives[i]);
+	return cbm_serial.atn[0];
+}
+
+static READ8_DEVICE_HANDLER( sim_drive_clock_read )
+{
+	int i;
+
+	cbm_serial.clock[0] = cbm_serial.clock[1];
+	for (i = 0; i < cbm_serial.count; i++)
+		cbm_serial.clock[0] &= cbm_serial.clock[i + 2] =
+			vc1541_clock_read(device->machine, cbm_serial.drives[i]);
+	return cbm_serial.clock[0];
+}
+
+static READ8_DEVICE_HANDLER( sim_drive_data_read )
+{
+	int i;
+
+	cbm_serial.data[0] = cbm_serial.data[1];
+	for (i = 0; i < cbm_serial.count; i++)
+		cbm_serial.data[0] &= cbm_serial.data[i + 2] =
+			vc1541_data_read(device->machine, cbm_serial.drives[i]);
+	return cbm_serial.data[0];
+}
+
+static READ8_DEVICE_HANDLER( sim_drive_request_read )
+{
+	/* in c16 not connected */
+	return 1;
+}
+
+static WRITE8_DEVICE_HANDLER( sim_drive_atn_write )
+{
+	int i;
+
+	cbm_serial.atn[0] =
+		cbm_serial.atn[1] = data;
+	/* update line */
+	for (i = 0; i < cbm_serial.count; i++)
+		cbm_serial.atn[0] &= cbm_serial.atn[i + 2];
+	/* inform drives */
+	for (i = 0; i < cbm_serial.count; i++)
+		vc1541_atn_write(device->machine, cbm_serial.drives[i], cbm_serial.atn[0]);
+}
+
+static WRITE8_DEVICE_HANDLER( sim_drive_clock_write )
+{
+	int i;
+
+	cbm_serial.clock[0] =
+		cbm_serial.clock[1] = data;
+	/* update line */
+	for (i = 0; i < cbm_serial.count; i++)
+		cbm_serial.clock[0] &= cbm_serial.clock[i + 2];
+	/* inform drives */
+	for (i = 0; i < cbm_serial.count; i++)
+		vc1541_clock_write(device->machine, cbm_serial.drives[i], cbm_serial.clock[0]);
+}
+
+static WRITE8_DEVICE_HANDLER( sim_drive_data_write )
+{
+	int i;
+
+	cbm_serial.data[0] =
+		cbm_serial.data[1] = data;
+	/* update line */
+	for (i = 0; i < cbm_serial.count; i++)
+		cbm_serial.data[0] &= cbm_serial.data[i + 2];
+	/* inform drives */
+	for (i = 0; i < cbm_serial.count; i++)
+		vc1541_data_write(device->machine, cbm_serial.drives[i], cbm_serial.data[0]);
+}
+
+static WRITE8_DEVICE_HANDLER( sim_drive_request_write )
+{
+}
+
+static WRITE8_DEVICE_HANDLER( sim_drive_reset_write )
+{
+	int i;
+
+	for (i = 0; i < cbm_serial.count; i++)
+		drive_reset_write(cbm_serial.drives[i], data);
+	/* init bus signals */
+}
+
+static const cbm_serial_bus_interface cbm_sim_drive_interface =
+{
+	DEVCB_HANDLER(sim_drive_atn_read),
+	DEVCB_HANDLER(sim_drive_clock_read),
+	DEVCB_HANDLER(sim_drive_data_read),
+	DEVCB_HANDLER(sim_drive_request_read),
+	DEVCB_HANDLER(sim_drive_atn_write),
+	DEVCB_HANDLER(sim_drive_clock_write),
+	DEVCB_HANDLER(sim_drive_data_write),
+	DEVCB_HANDLER(sim_drive_request_write),
+
+	DEVCB_HANDLER(sim_drive_reset_write)
+};
+
+
+MACHINE_DRIVER_START( simulated_drive )
+	MDRV_CBM_SERBUS_ADD("serial_bus", cbm_sim_drive_interface)
+MACHINE_DRIVER_END
+
+
+
+/***********************************************
+
+	Drive handling
+
+***********************************************/
+
+CBM_Drive cbm_drive[2];
+
+CBM_Serial cbm_serial;
+
+/* must be called before other functions */
+static void cbm_drive_open (void)
+{
+	int i;
+
+	memset(cbm_drive, 0, sizeof(cbm_drive));
+	memset(&cbm_serial, 0, sizeof(cbm_serial));
+
+	cbm_drive_open_helper ();
+
+	cbm_serial.count = 0;
+	for (i = 0; i < sizeof(cbm_serial.atn) / sizeof(int); i++)
+
+	{
+		cbm_serial.atn[i] =
+			cbm_serial.data[i] =
+			cbm_serial.clock[i] = 1;
+	}
+}
+
+static void cbm_drive_close (void)
+{
+	int i;
+
+	cbm_serial.count = 0;
+	for (i = 0; i < sizeof(cbm_drive) / sizeof(CBM_Drive); i++)
+	{
+		cbm_drive[i].interface = 0;
+		
+		if( cbm_drive[i].buffer ) 
+		{
+			free(cbm_drive[i].buffer);
+			cbm_drive[i].buffer = NULL;
+		}
+
+		if (cbm_drive[i].drive == D64_IMAGE)
+			cbm_drive[i].image = NULL;
+		cbm_drive[i].drive = 0;
+	}
+}
+
+
+
+static void cbm_drive_config( CBM_Drive * drive, int interface, int serialnr )
+{
+	int i;
+
+	if (interface == SERIAL)
+		drive->i.serial.device = serialnr;
+
+	if (interface == IEEE)
+		drive->i.ieee.device = serialnr;
+
+	if (drive->interface == interface)
+		return;
+
+	if (drive->interface == SERIAL)
+	{
+		for (i = 0; (i < cbm_serial.count) && (cbm_serial.drives[i] != drive); i++);
+		for (; i + 1 < cbm_serial.count; i++)
+			cbm_serial.drives[i] = cbm_serial.drives[i + 1];
+		cbm_serial.count--;
+	}
+
+	drive->interface = interface;
+
+	if (drive->interface == IEC)
+	{
+		drive->i.iec.handshakein =
+			drive->i.iec.handshakeout = 0;
+		drive->i.iec.status = 0;
+		drive->i.iec.dataout = drive->i.iec.datain = 0xff;
+		drive->i.iec.state = 0;
+	}
+	else if (drive->interface == SERIAL)
+	{
+		cbm_serial.drives[cbm_serial.count++] = drive;
+		drive_reset_write(drive, 0);
+	}
+}
+
+void cbm_drive_0_config( int interface, int serialnr )
+{
+	cbm_drive_config(cbm_drive, interface, serialnr);
+}
+
+void cbm_drive_1_config( int interface, int serialnr )
+{
+	cbm_drive_config(cbm_drive + 1, interface, serialnr);
 }
 
 
 /**************************************
 
-	Device configurations
+	Floppy device configurations
 
 **************************************/
 

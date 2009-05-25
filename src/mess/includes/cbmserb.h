@@ -9,42 +9,56 @@
 
 /*----------- defined in machine/cbmserb.c -----------*/
 
-/* through this interface, we choose between simulated and emulated drives */
-/* this is temporarily needed in order to be able to compile the code for both, without breaking anything */
-typedef struct _cbm_serial_interface cbm_serial_interface;
-struct _cbm_serial_interface
+#include "devcb.h"
+
+/***************************************************************************
+    MACROS / CONSTANTS
+***************************************************************************/
+
+#define CBM_SERBUS		DEVICE_GET_INFO_NAME(cbm_serial_bus)
+
+#define MDRV_CBM_SERBUS_ADD(_tag, _config) \
+	MDRV_DEVICE_ADD(_tag, CBM_SERBUS, 0) \
+	MDRV_DEVICE_CONFIG(_config)
+
+#define MDRV_CBM_SERBUS_REMOVE(_tag) \
+	MDRV_DEVICE_REMOVE(_tag)
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+typedef struct _cbm_serial_bus_interface cbm_serial_bus_interface;
+struct _cbm_serial_bus_interface
 {
-	int serial;			/* This is just a parameter, to log which interface is in use */
-	void (*serial_reset_write)(running_machine *machine, int level);
-	int (*serial_request_read)(running_machine *machine);
-	void (*serial_request_write)(running_machine *machine, int level);
-	int (*serial_atn_read)(running_machine *machine);
-	int (*serial_data_read)(running_machine *machine);
-	int (*serial_clock_read)(running_machine *machine);
-	void (*serial_atn_write)(running_machine *machine, int level);
-	void (*serial_data_write)(running_machine *machine, int level);
-	void (*serial_clock_write)(running_machine *machine, int level);
+	devcb_read8 read_atn_func;
+	devcb_read8 read_clock_func;
+	devcb_read8 read_data_func;
+	devcb_read8 read_request_func;
+	devcb_write8 write_atn_func;
+	devcb_write8 write_clock_func;
+	devcb_write8 write_data_func;
+	devcb_write8 write_request_func;
+
+	devcb_write8 write_reset_func;
 };
 
-void cbm_serial_config(running_machine *machine, const cbm_serial_interface *intf);
+/***************************************************************************
+    PROTOTYPES
+***************************************************************************/
 
-extern const cbm_serial_interface cbm_sim_drive_interface;		/* serial = 1 */
-extern const cbm_serial_interface cbm_emu_drive_interface;		/* serial = 2 */
-extern const cbm_serial_interface cbm_fake_drive_interface;	/* serial = 3 */
+/* device interface */
+DEVICE_GET_INFO( cbm_serial_bus );
 
+READ8_DEVICE_HANDLER( cbm_serial_request_read );
+READ8_DEVICE_HANDLER( cbm_serial_atn_read );
+READ8_DEVICE_HANDLER( cbm_serial_data_read );
+READ8_DEVICE_HANDLER( cbm_serial_clock_read );
 
-/* Serial bus for vic20, c64 & c16 with vc1541 and some printer */
-
-/* To be passed directly to the drivers */
-void cbm_serial_reset_write (running_machine *machine, int level);
-int cbm_serial_atn_read (running_machine *machine);
-void cbm_serial_atn_write (running_machine *machine, int level);
-int cbm_serial_data_read (running_machine *machine);
-void cbm_serial_data_write (running_machine *machine, int level);
-int cbm_serial_clock_read (running_machine *machine);
-void cbm_serial_clock_write (running_machine *machine, int level);
-int cbm_serial_request_read (running_machine *machine);
-void cbm_serial_request_write (running_machine *machine, int level);
+WRITE8_DEVICE_HANDLER( cbm_serial_request_write );
+WRITE8_DEVICE_HANDLER( cbm_serial_atn_write );
+WRITE8_DEVICE_HANDLER( cbm_serial_data_write );
+WRITE8_DEVICE_HANDLER( cbm_serial_clock_write );
 
 
 #endif /* CBMSERB_H_ */
