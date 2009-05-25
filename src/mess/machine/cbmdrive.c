@@ -1320,41 +1320,42 @@ void vc1541_state( running_machine *machine, CBM_Drive * drive )
 
 void c2031_state(running_machine *machine, CBM_Drive *drive)
 {
+	const device_config *ieeebus = devtag_get_device(machine, "ieee_bus");
 	int oldstate = drive->i.ieee.state;
 	int data;
 
 	switch (drive->i.ieee.state)
 	{
 	case 0:
-		if (!cbm_ieee_dav_r(machine)) 
+		if (!cbm_ieee_dav_r(ieeebus, 0)) 
 		{
 			drive->i.ieee.state = 10;
 		} 
-		else if (!cbm_ieee_atn_r(machine)) 
+		else if (!cbm_ieee_atn_r(ieeebus, 0)) 
 		{
 			drive->i.ieee.state = 11;
-			cbm_ieee_ndac_w(machine, 1, 0);
+			cbm_ieee_ndac_w(ieeebus, 1, 0);
 			logerror("arsch\n");
 		}
 		break;
 	case 1:
 		break;
 	case 10:
-		if (cbm_ieee_dav_r(machine)) 
+		if (cbm_ieee_dav_r(ieeebus, 0)) 
 		{
 			drive->i.ieee.state++;
-			cbm_ieee_nrfd_w(machine, 1, 1);
-			cbm_ieee_ndac_w(machine, 1, 0);
+			cbm_ieee_nrfd_w(ieeebus, 1, 1);
+			cbm_ieee_ndac_w(ieeebus, 1, 0);
 		}
 		break;
 	case 11:
-		if (!cbm_ieee_dav_r(machine)) 
+		if (!cbm_ieee_dav_r(ieeebus, 0)) 
 		{
-			cbm_ieee_nrfd_w(machine, 1, 0);
-			data = cbm_ieee_data_r(machine) ^ 0xff;
-			cbm_ieee_ndac_w(machine, 1, 1);
+			cbm_ieee_nrfd_w(ieeebus, 1, 0);
+			data = cbm_ieee_data_r(ieeebus, 0) ^ 0xff;
+			cbm_ieee_ndac_w(ieeebus, 1, 1);
 			logerror("byte received %.2x\n",data);
-			if (!cbm_ieee_atn_r(machine) && ((data & 0x0f) == drive->i.ieee.device)) 
+			if (!cbm_ieee_atn_r(ieeebus, 0) && ((data & 0x0f) == drive->i.ieee.device)) 
 			{
 				if ((data & 0xf0) == 0x40)
 					drive->i.ieee.state = 30;
@@ -1375,38 +1376,38 @@ void c2031_state(running_machine *machine, CBM_Drive *drive)
 		break;
 		/* wait until atn is released */
 	case 12:
-		if (cbm_ieee_atn_r(machine)) 
+		if (cbm_ieee_atn_r(ieeebus, 0)) 
 		{
 			drive->i.ieee.state++;
-			cbm_ieee_nrfd_w(machine, 1, 0);
+			cbm_ieee_nrfd_w(ieeebus, 1, 0);
 		}
 		break;
 	case 13:
-		if (!cbm_ieee_atn_r(machine)) 
+		if (!cbm_ieee_atn_r(ieeebus, 0)) 
 		{
 			drive->i.ieee.state = 10;
-/*			cbm_ieee_nrfd_w(machine, 1, 0); */
+/*			cbm_ieee_nrfd_w(ieeebus, 1, 0); */
 		}
 		break;
 
 		/* receiving rest of command */
 	case 20:
-		if (cbm_ieee_dav_r(machine)) 
+		if (cbm_ieee_dav_r(ieeebus, 0)) 
 		{
 			drive->i.ieee.state++;
-			cbm_ieee_nrfd_w(machine, 1, 1);
-			cbm_ieee_ndac_w(machine, 1, 0);
+			cbm_ieee_nrfd_w(ieeebus, 1, 1);
+			cbm_ieee_ndac_w(ieeebus, 1, 0);
 		}
 		break;
 	case 21:
-		if (!cbm_ieee_dav_r(machine)) 
+		if (!cbm_ieee_dav_r(ieeebus, 0)) 
 		{
-			cbm_ieee_nrfd_w(machine, 1, 0);
-			data = cbm_ieee_data_r(machine) ^ 0xff;
+			cbm_ieee_nrfd_w(ieeebus, 1, 0);
+			data = cbm_ieee_data_r(ieeebus, 0) ^ 0xff;
 			logerror("byte received %.2x\n",data);
 			if (drive->cmdpos < sizeof (drive->cmdbuffer))
 				drive->cmdbuffer[drive->cmdpos++] = data;
-			if (!cbm_ieee_atn_r(machine) && ((data & 0xf) == 0xf)) 
+			if (!cbm_ieee_atn_r(ieeebus, 0) && ((data & 0xf) == 0xf)) 
 			{
 				cbm_command(machine, drive);
 				drive->i.ieee.state = 10;
@@ -1414,24 +1415,24 @@ void c2031_state(running_machine *machine, CBM_Drive *drive)
 			else
 				drive->i.ieee.state = 20;
 
-			cbm_ieee_ndac_w(machine, 1, 1);
+			cbm_ieee_ndac_w(ieeebus, 1, 1);
 		}
 		break;
 
 		/* read command */
 	case 30:
-		if (cbm_ieee_dav_r(machine)) 
+		if (cbm_ieee_dav_r(ieeebus, 0)) 
 		{
 			drive->i.ieee.state++;
-			cbm_ieee_nrfd_w(machine, 1, 1);
-			cbm_ieee_ndac_w(machine, 1, 0);
+			cbm_ieee_nrfd_w(ieeebus, 1, 1);
+			cbm_ieee_ndac_w(ieeebus, 1, 0);
 		}
 		break;
 	case 31:
-		if (!cbm_ieee_dav_r(machine)) 
+		if (!cbm_ieee_dav_r(ieeebus, 0)) 
 		{
-			cbm_ieee_nrfd_w(machine, 1, 0);
-			data = cbm_ieee_data_r(machine) ^ 0xff;
+			cbm_ieee_nrfd_w(ieeebus, 1, 0);
+			data = cbm_ieee_data_r(ieeebus, 0) ^ 0xff;
 			logerror("byte received %.2x\n", data);
 			if (drive->cmdpos < sizeof (drive->cmdbuffer))
 				drive->cmdbuffer[drive->cmdpos++] = data;
@@ -1440,47 +1441,47 @@ void c2031_state(running_machine *machine, CBM_Drive *drive)
 				drive->i.ieee.state++;
 			else
 				drive->i.ieee.state = 10;
-			cbm_ieee_ndac_w(machine, 1, 1);
+			cbm_ieee_ndac_w(ieeebus, 1, 1);
 		}
 		break;
 	case 32:
-		if (cbm_ieee_dav_r(machine)) 
+		if (cbm_ieee_dav_r(ieeebus, 0)) 
 		{
-			cbm_ieee_nrfd_w(machine, 1, 1);
+			cbm_ieee_nrfd_w(ieeebus, 1, 1);
 			drive->i.ieee.state = 40;
 		}
 		break;
 	case 40:
-		if (!cbm_ieee_ndac_r(machine)) 
+		if (!cbm_ieee_ndac_r(ieeebus, 0)) 
 		{
-			cbm_ieee_data_w(machine, 1, drive->buffer[drive->pos++] ^ 0xff);
+			cbm_ieee_data_w(ieeebus, 1, drive->buffer[drive->pos++] ^ 0xff);
 			if (drive->pos >= drive->size)
-				cbm_ieee_eoi_w(machine, 1, 0);
-			cbm_ieee_dav_w(machine, 1, 0);
+				cbm_ieee_eoi_w(ieeebus, 1, 0);
+			cbm_ieee_dav_w(ieeebus, 1, 0);
 			drive->i.ieee.state++;
 		}
 		break;
 	case 41:
-		if (!cbm_ieee_nrfd_r(machine)) 
+		if (!cbm_ieee_nrfd_r(ieeebus, 0)) 
 		{
 			drive->i.ieee.state++;
 		}
 		break;
 	case 42:
-		if (cbm_ieee_ndac_r(machine)) 
+		if (cbm_ieee_ndac_r(ieeebus, 0)) 
 		{
-			if (cbm_ieee_eoi_r(machine))
+			if (cbm_ieee_eoi_r(ieeebus, 0))
 				drive->i.ieee.state = 40;
 
 			else 
 			{
-				cbm_ieee_data_w(machine, 1, 0xff);
-				cbm_ieee_ndac_w(machine, 1, 0);
-				cbm_ieee_nrfd_w(machine, 1, 0);
-				cbm_ieee_eoi_w(machine, 1, 1);
+				cbm_ieee_data_w(ieeebus, 1, 0xff);
+				cbm_ieee_ndac_w(ieeebus, 1, 0);
+				cbm_ieee_nrfd_w(ieeebus, 1, 0);
+				cbm_ieee_eoi_w(ieeebus, 1, 1);
 				drive->i.ieee.state = 10;
 			}
-			cbm_ieee_dav_w(machine, 1, 1);
+			cbm_ieee_dav_w(ieeebus, 1, 1);
 		}
 		break;
 	}

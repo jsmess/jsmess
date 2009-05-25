@@ -104,6 +104,7 @@ Keyboard: Full-sized 102 key QWERTY (19 key numeric keypad!; 4 direction
 
 #include "includes/cbm.h"
 #include "includes/cbmb.h"
+#include "includes/cbmieeeb.h"
 #include "machine/cbmipt.h"
 #include "video/vic6567.h"
 #include "video/mc6845.h"
@@ -378,6 +379,9 @@ static MACHINE_DRIVER_START( cbm600 )
 	MDRV_TPI6525_ADD("tpi6525_0", cbmb_tpi_0_intf)
 	MDRV_TPI6525_ADD("tpi6525_1", cbmb_tpi_1_intf)
 
+	/* IEEE bus */
+	MDRV_CBM_IEEEBUS_ADD("ieee_bus")
+
 	MDRV_IMPORT_FROM(cbmb_cartslot)
 MACHINE_DRIVER_END
 
@@ -446,6 +450,9 @@ static MACHINE_DRIVER_START( p500 )
 	/* tpi */
 	MDRV_TPI6525_ADD("tpi6525_0", cbmb_tpi_0_intf)
 	MDRV_TPI6525_ADD("tpi6525_1", cbmb_tpi_1_intf)
+
+	/* IEEE bus */
+	MDRV_CBM_IEEEBUS_ADD("ieee_bus")
 
 	MDRV_IMPORT_FROM(cbmb_cartslot)
 MACHINE_DRIVER_END

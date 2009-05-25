@@ -95,6 +95,7 @@ interface; no special expansion modules like ieee488 interface
 #include "includes/cbmserb.h"	// needed for MDRV_CBM_SERBUS_REMOVE
 #include "includes/cbmdrive.h"
 #include "includes/vc1541.h"
+#include "includes/cbmieeeb.h"
 
 #include "includes/vc20.h"
 
@@ -290,6 +291,9 @@ static MACHINE_DRIVER_START( vic20 )
 
 	/* floppy from serial bus */
 	MDRV_IMPORT_FROM(simulated_drive)
+
+	/* IEEE bus */
+	MDRV_CBM_IEEEBUS_ADD("ieee_bus")
 
 	/* via */
 	MDRV_VIA6522_ADD("via6522_0", 0, vc20_via0)

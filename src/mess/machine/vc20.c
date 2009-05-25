@@ -361,20 +361,34 @@ static WRITE8_DEVICE_HANDLER( vc20_via1_write_cb2 )
  */
 static READ8_DEVICE_HANDLER( vc20_via2_read_portb )
 {
+	const device_config *ieeebus = devtag_get_device(device->machine, "ieee_bus");
 	UINT8 data = 0;
-	if (cbm_ieee_eoi_r(device->machine)) data |= 0x08;
-	if (cbm_ieee_dav_r(device->machine)) data |= 0x10;
-	if (cbm_ieee_nrfd_r(device->machine)) data |= 0x20;
-	if (cbm_ieee_ndac_r(device->machine)) data |= 0x40;
-	if (cbm_ieee_atn_r(device->machine)) data |= 0x80;
+
+	if (cbm_ieee_eoi_r(ieeebus, 0)) 
+		data |= 0x08;
+
+	if (cbm_ieee_dav_r(ieeebus, 0)) 
+		data |= 0x10;
+
+	if (cbm_ieee_nrfd_r(ieeebus, 0)) 
+		data |= 0x20;
+
+	if (cbm_ieee_ndac_r(ieeebus, 0)) 
+		data |= 0x40;
+
+	if (cbm_ieee_atn_r(ieeebus, 0)) 
+		data |= 0x80;
+
 	return data;
 }
 
 static WRITE8_DEVICE_HANDLER( vc20_via2_write_portb )
 {
-	cbm_ieee_dav_w(device->machine, 0, data & 0x01);
-	cbm_ieee_nrfd_w(device->machine, 0, data & 0x02);
-	cbm_ieee_ndac_w(device->machine, 0, data & 0x04);
+	const device_config *ieeebus = devtag_get_device(device->machine, "ieee_bus");
+
+	cbm_ieee_dav_write(ieeebus, 0, data & 0x01);
+	cbm_ieee_nrfd_write(ieeebus, 0, data & 0x02);
+	cbm_ieee_ndac_write(ieeebus, 0, data & 0x04);
 }
 
 /* ieee 6522 number 2 (via5)
@@ -386,27 +400,32 @@ static WRITE8_DEVICE_HANDLER( vc20_via2_write_portb )
 */
 static WRITE8_DEVICE_HANDLER( vc20_via3_write_porta )
 {
-	cbm_ieee_data_w(device->machine, 0, data);
+	const device_config *ieeebus = devtag_get_device(device->machine, "ieee_bus");
+	cbm_ieee_data_write(ieeebus, 0, data);
 }
 
 static READ8_DEVICE_HANDLER( vc20_via3_read_portb )
 {
-	return cbm_ieee_data_r(device->machine);
+	const device_config *ieeebus = devtag_get_device(device->machine, "ieee_bus");
+	return cbm_ieee_data_r(ieeebus, 0);
 }
 
 static WRITE8_DEVICE_HANDLER( vc20_via3_write_ca2 )
 {
-	cbm_ieee_atn_w(device->machine, 0, data);
+	const device_config *ieeebus = devtag_get_device(device->machine, "ieee_bus");
+	cbm_ieee_atn_write(ieeebus, 0, data);
 }
 
 static READ8_DEVICE_HANDLER( vc20_via3_read_cb1 )
 {
-	return cbm_ieee_srq_r(device->machine);
+	const device_config *ieeebus = devtag_get_device(device->machine, "ieee_bus");
+	return cbm_ieee_srq_r(ieeebus, 0);
 }
 
 static WRITE8_DEVICE_HANDLER( vc20_via3_write_cb2 )
 {
-	cbm_ieee_eoi_w(device->machine, 0, data);
+	const device_config *ieeebus = devtag_get_device(device->machine, "ieee_bus");
+	cbm_ieee_eoi_write(ieeebus, 0, data);
 }
 
 const via6522_interface vc20_via0 =
@@ -620,7 +639,6 @@ DRIVER_INIT( vic20i )
 	ieee = 1;
 	vc20_common_driver_init(machine);
 	vic6560_init(vic6560_dma_read, vic6560_dma_read_color);
-	cbm_ieee_open();
 }
 
 MACHINE_RESET( vic20 )

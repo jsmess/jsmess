@@ -389,11 +389,11 @@ normal keyboards?
 #include "includes/pet.h"
 #include "machine/cbmipt.h"
 #include "video/mc6845.h"
-#include "includes/cbmieeeb.h"
 
 /* devices config */
 #include "includes/cbm.h"
 #include "includes/cbmdrive.h"
+#include "includes/cbmieeeb.h"
 
 
 /*************************************
@@ -408,7 +408,7 @@ static ADDRESS_MAP_START(pet_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xe810, 0xe813) AM_DEVREADWRITE("pia_0", pia6821_r, pia6821_w)
 	AM_RANGE(0xe820, 0xe823) AM_DEVREADWRITE("pia_1", pia6821_r, pia6821_w)
 	AM_RANGE(0xe840, 0xe84f) AM_DEVREADWRITE("via6522_0", via_r, via_w)
-/*  AM_RANGE(0xe900, 0xe91f) AM_READ(cbm_ieee_state)    // for debugging */
+/*  AM_RANGE(0xe900, 0xe91f) AM_DEVREAD("ieee_bus", cbm_ieee_state)    // for debugging */
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -680,6 +680,9 @@ static MACHINE_DRIVER_START( pet_general )
 	/* pias */
 	MDRV_PIA6821_ADD( "pia_0", pet_pia0)
 	MDRV_PIA6821_ADD( "pia_1", pet_pia1)
+
+	/* IEEE bus */
+	MDRV_CBM_IEEEBUS_ADD("ieee_bus")
 MACHINE_DRIVER_END
 
 

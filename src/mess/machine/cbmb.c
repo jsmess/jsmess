@@ -70,26 +70,40 @@ UINT8 *cbmb_memory;
  */
 READ8_DEVICE_HANDLER( cbmb_tpi0_port_a_r )
 {
+	const device_config *ieeebus = devtag_get_device(device->machine, "ieee_bus");
 	int data = 0;
 
-	if (cbm_ieee_nrfd_r(device->machine)) data |= 0x80;
-	if (cbm_ieee_ndac_r(device->machine)) data |= 0x40;
-	if (cbm_ieee_eoi_r(device->machine)) data |= 0x20;
-	if (cbm_ieee_dav_r(device->machine)) data |= 0x10;
-	if (cbm_ieee_atn_r(device->machine)) data |= 0x08;
-/*  if (cbm_ieee_ren_r(device->machine)) data |= 0x04; */
+	if (cbm_ieee_nrfd_r(ieeebus, 0)) 
+		data |= 0x80;
+
+	if (cbm_ieee_ndac_r(ieeebus, 0)) 
+		data |= 0x40;
+
+	if (cbm_ieee_eoi_r(ieeebus, 0)) 
+		data |= 0x20;
+
+	if (cbm_ieee_dav_r(ieeebus, 0)) 
+		data |= 0x10;
+
+	if (cbm_ieee_atn_r(ieeebus, 0)) 
+		data |= 0x08;
+
+/*  if (cbm_ieee_ren_r(ieeebus, 0)) 
+		data |= 0x04; */
 
 	return data;
 }
 
 WRITE8_DEVICE_HANDLER( cbmb_tpi0_port_a_w )
 {
-	cbm_ieee_nrfd_w(device->machine, 0, data & 0x80);
-	cbm_ieee_ndac_w(device->machine, 0, data & 0x40);
-	cbm_ieee_eoi_w(device->machine, 0, data & 0x20);
-	cbm_ieee_dav_w(device->machine, 0, data & 0x10);
-	cbm_ieee_atn_w(device->machine, 0, data & 0x08);
-/*  cbm_ieee_ren_w(device->machine, 0, data & 0x04); */
+	const device_config *ieeebus = devtag_get_device(device->machine, "ieee_bus");
+
+	cbm_ieee_nrfd_write(ieeebus, 0, data & 0x80);
+	cbm_ieee_ndac_write(ieeebus, 0, data & 0x40);
+	cbm_ieee_eoi_write(ieeebus, 0, data & 0x20);
+	cbm_ieee_dav_write(ieeebus, 0, data & 0x10);
+	cbm_ieee_atn_write(ieeebus, 0, data & 0x08);
+/*  cbm_ieee_ren_write(ieeebus, 0, data & 0x04); */
 	logerror("cbm ieee %d %d\n", data & 0x02, data & 0x01);
 }
 
@@ -231,12 +245,14 @@ void cbmb_irq(const device_config *device, int level)
  */
 static READ8_DEVICE_HANDLER( cbmb_cia_port_a_r )
 {
-	return cbm_ieee_data_r(device->machine);
+	const device_config *ieeebus = devtag_get_device(device->machine, "ieee_bus");
+	return cbm_ieee_data_r(ieeebus, 0);
 }
 
 static WRITE8_DEVICE_HANDLER( cbmb_cia_port_a_w )
 {
-	cbm_ieee_data_w(device->machine, 0, data);
+	const device_config *ieeebus = devtag_get_device(device->machine, "ieee_bus");
+	cbm_ieee_data_write(ieeebus, 0, data);
 }
 
 const cia6526_interface cbmb_cia =
@@ -284,7 +300,6 @@ static void cbmb_common_driver_init(running_machine *machine)
 
 	state->p500 = 0;
 	state->cbm700 = 0;
-	cbm_ieee_open();
 }
 
 DRIVER_INIT( cbm600 )

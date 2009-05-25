@@ -1,7 +1,29 @@
-/*
- commodore ieee 488 (parallel) bus
-*/
+/***************************************************************************
 
+    Commodore IEEE 488 (Parallel) Bus
+
+
+
+    2009-05 FP: Changed the implementation to be a MAME device. However, 
+    the main code has been kept the same as before (to reduce the risk of
+    regressions, at this early stage). More work will be eventually done
+    to improve emulation and to allow more devices (possibly of different 
+    kinds) to be connected to the bus like in the real thing.
+    Notice that write handlers which are passed to the drivers, are always 
+    calling functions with the "device" parameter as 0. In turn, this calls 
+    c2031_state from machine/cbmdrive.c which calls again the functions with 
+    "device" parameter = 1! This forces the current code to export both the 
+    DEVICE_HANDLERs and the functions called by them. 
+    Eventually, proper emulation will remove the need of c2031_state (multiple 
+    devices would be identified by their tags) and it will allow to only export 
+    the DEVICE_HANDLERs, as it would be preferable.
+
+    As I have written in cbmserb.c, you should not use this driver as an 
+    example of the right way to implement parallel devices in MAME/MESS!
+
+***************************************************************************/
+
+/*     Documentation:       */
 /*
 
                                  IEEE-488
@@ -298,15 +320,48 @@ Pin  Signal              Abbreviation  Source
       My Commodore Site: http://www.worldaccess.nl/~rbaltiss/cbm.htm
  */
 
-#include "driver.h"
 
-#include "includes/cbmdrive.h"
-#include "includes/cbmserb.h"
+#include "driver.h"
 
 #include "includes/cbmieeeb.h"
 
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+typedef struct _cbm_ieee_bus_t cbm_ieee_bus_t;
+struct _cbm_ieee_bus_t
+{
+	struct {
+		UINT8 data;
+/*		int fic; */
+		int dav, nrfd, ndac, atn, eoi, ren;
+		int srq;
+	} bus[2];
+};
+
+/***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
+
+INLINE cbm_ieee_bus_t *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CBM_IEEEBUS);
+	return (cbm_ieee_bus_t *)device->token;
+}
+
+/***************************************************************************
+    IMPLEMENTATION
+***************************************************************************/
+
+/* This is needed for c2031_state - It will eventually disappear */
+#include "includes/cbmdrive.h"
+
+
 #define VERBOSE_LEVEL 0
-#define DBG_LOG(N,M,A) \
+#define DBG_LOG( N, M, A ) \
 	do { \
 		if(VERBOSE_LEVEL >= N) \
 		{ \
@@ -335,142 +390,259 @@ Pin  Signal              Abbreviation  Source
  srq serial request master input, other output
  */
 
-static struct {
-	struct {
-		UINT8 data;
-/*		int fic; */
-		int dav, nrfd, ndac, atn, eoi, ren;
-		int srq;
-	} bus[2];
-} cbmieee= { { { 0 } } };
+/* TODO - These functions are used in the write handlers but also in c2031_state, hence 
+cannot be static. However, it would be better if only the WRITE8_DEVICE_HANDLER would be
+made available to the rest of the source. */
 
-void cbm_ieee_open(void)
+void cbm_ieee_dav_w( const device_config *ieeedev, int device, int data )
 {
-	int i;
-	for (i=0; i<2; i++) {
-		cbmieee.bus[i].dav=1;
-		cbmieee.bus[i].nrfd=1;
-		cbmieee.bus[i].ndac=1;
-		cbmieee.bus[i].atn=1;
-		cbmieee.bus[i].eoi=1;
-		cbmieee.bus[i].srq=1;
+	cbm_ieee_bus_t *ieeebus = get_safe_token(ieeedev);
 
-		cbmieee.bus[i].data=0xff;
+//	DBG_LOG(1, "cbm ieee dav", ("%.4x dev:%d %d\n", activecpu_get_pc(), device, data));
+	ieeebus->bus[device].dav = data;
+	if (device == 0) 
+		c2031_state(ieeedev->machine, cbm_drive);
+}
+
+WRITE8_DEVICE_HANDLER( cbm_ieee_dav_write )
+{
+	cbm_ieee_dav_w(device, 0, data );
+}
+
+void cbm_ieee_nrfd_w( const device_config *ieeedev, int device, int data )
+{
+	cbm_ieee_bus_t *ieeebus = get_safe_token(ieeedev);
+
+//	DBG_LOG(1, "cbm ieee nrfd", ("%.4x dev:%d %d\n", activecpu_get_pc(), device, data));
+	ieeebus->bus[device].nrfd = data;
+	if (device == 0) 
+		c2031_state(ieeedev->machine, cbm_drive);
+}
+
+WRITE8_DEVICE_HANDLER( cbm_ieee_nrfd_write )
+{
+	cbm_ieee_nrfd_w(device, 0, data );	
+}
+
+void cbm_ieee_ndac_w( const device_config *ieeedev, int device, int data )
+{
+	cbm_ieee_bus_t *ieeebus = get_safe_token(ieeedev);
+
+//	DBG_LOG(1, "cbm ieee ndac",("%.4x dev:%d %d\n", activecpu_get_pc(), device, data));
+	ieeebus->bus[device].ndac = data;
+	if (device == 0) 
+		c2031_state(ieeedev->machine, cbm_drive);
+}
+
+WRITE8_DEVICE_HANDLER( cbm_ieee_ndac_write )
+{
+	cbm_ieee_ndac_w(device, 0, data );	
+}
+
+void cbm_ieee_atn_w( const device_config *ieeedev, int device, int data )
+{
+	cbm_ieee_bus_t *ieeebus = get_safe_token(ieeedev);
+
+//	DBG_LOG(1, "cbm ieee atn",("%.4x dev:%d %d\n", activecpu_get_pc(), device, data));
+	ieeebus->bus[device].atn = data;
+	if (device == 0) 
+		c2031_state(ieeedev->machine, cbm_drive);
+}
+
+WRITE8_DEVICE_HANDLER( cbm_ieee_atn_write )
+{
+	cbm_ieee_atn_w(device, 0, data );	
+}
+
+void cbm_ieee_eoi_w( const device_config *ieeedev, int device, int data )
+{
+	cbm_ieee_bus_t *ieeebus = get_safe_token(ieeedev);
+
+//	DBG_LOG(1, "cbm ieee eoi", ("%.4x dev:%d %d\n", activecpu_get_pc(), device, data));
+	ieeebus->bus[device].eoi = data;
+	if (device == 0) 
+		c2031_state(ieeedev->machine, cbm_drive);
+}
+
+WRITE8_DEVICE_HANDLER( cbm_ieee_eoi_write )
+{
+	cbm_ieee_eoi_w(device, 0, data );	
+}
+
+void cbm_ieee_data_w( const device_config *ieeedev, int device, int data )
+{
+	cbm_ieee_bus_t *ieeebus = get_safe_token(ieeedev);
+
+//	DBG_LOG(1, "cbm ieee data", ("%.4x dev:%d %.2x\n", activecpu_get_pc(), device, data));
+	ieeebus->bus[device].data = data;
+	if (device == 0) 
+		c2031_state(ieeedev->machine, cbm_drive);
+}
+
+WRITE8_DEVICE_HANDLER( cbm_ieee_data_write )
+{
+	cbm_ieee_data_w(device, 0, data );	
+}
+
+
+READ8_DEVICE_HANDLER( cbm_ieee_srq_r )
+{
+	running_machine *machine = device->machine;
+	cbm_ieee_bus_t *ieeebus = get_safe_token(device);
+	int data = ieeebus->bus[1].srq;
+
+	DBG_LOG(1, "cbm ieee srq", ("read %d\n", data));
+	return data;
+}
+
+READ8_DEVICE_HANDLER( cbm_ieee_dav_r )
+{
+	running_machine *machine = device->machine;
+	cbm_ieee_bus_t *ieeebus = get_safe_token(device);
+	int data = ieeebus->bus[0].dav && ieeebus->bus[1].dav;
+
+	DBG_LOG(1, "cbm ieee dav", ("read %d\n", data));
+	return data;
+}
+
+READ8_DEVICE_HANDLER( cbm_ieee_nrfd_r )
+{
+	running_machine *machine = device->machine;
+	cbm_ieee_bus_t *ieeebus = get_safe_token(device);
+	int data = ieeebus->bus[0].nrfd && ieeebus->bus[1].nrfd;
+
+	DBG_LOG(1, "cbm ieee nrfd", ("read %d\n", data));
+	return data;
+}
+
+READ8_DEVICE_HANDLER( cbm_ieee_ndac_r )
+{
+	running_machine *machine = device->machine;
+	cbm_ieee_bus_t *ieeebus = get_safe_token(device);
+	int data = ieeebus->bus[0].ndac && ieeebus->bus[1].ndac;
+
+	DBG_LOG(1,"cbm ieee ndac", ("read %d\n", data));
+	return data;
+}
+
+READ8_DEVICE_HANDLER( cbm_ieee_atn_r )
+{
+	running_machine *machine = device->machine;
+	cbm_ieee_bus_t *ieeebus = get_safe_token(device);
+	int data = ieeebus->bus[0].atn && ieeebus->bus[1].atn;
+
+	DBG_LOG(1,"cbm ieee atn", ("read %d\n", data));
+	return data;
+}
+
+READ8_DEVICE_HANDLER( cbm_ieee_eoi_r )
+{
+//	running_machine *machine = device->machine;
+	cbm_ieee_bus_t *ieeebus = get_safe_token(device);
+	int data = ieeebus->bus[0].eoi && ieeebus->bus[1].eoi;
+
+/*	DBG_LOG(1, "cbm ieee eoi", ("read %d\n", data)); */
+	return data;
+}
+
+READ8_DEVICE_HANDLER( cbm_ieee_data_r )
+{
+	running_machine *machine = device->machine;
+	cbm_ieee_bus_t *ieeebus = get_safe_token(device);
+	int data = ieeebus->bus[0].data & ieeebus->bus[1].data;
+
+	DBG_LOG(1, "cbm ieee data", ("read %.2x\n", data));
+	return data;
+}
+
+
+READ8_DEVICE_HANDLER( cbm_ieee_state )
+{
+	cbm_ieee_bus_t *ieeebus = get_safe_token(device);
+
+	switch (offset) 
+	{
+		case 0: return ieeebus->bus[0].data;
+		case 1: return ieeebus->bus[0].atn;
+		case 2: return ieeebus->bus[0].dav;
+		case 3: return ieeebus->bus[0].ndac;
+		case 4: return ieeebus->bus[0].nrfd;
+		case 5: return ieeebus->bus[0].eoi;
+		case 6: return ieeebus->bus[0].ren;
+		case 7: return ieeebus->bus[0].srq;
+
+		case 0x10: return ieeebus->bus[1].data;
+		case 0x11: return ieeebus->bus[1].atn;
+		case 0x12: return ieeebus->bus[1].dav;
+		case 0x13: return ieeebus->bus[1].ndac;
+		case 0x14: return ieeebus->bus[1].nrfd;
+		case 0x15: return ieeebus->bus[1].eoi;
+		case 0x16: return ieeebus->bus[1].ren;
+		case 0x17: return ieeebus->bus[1].srq;
 	}
-}
 
-void cbm_ieee_dav_w(running_machine *machine, int device, int data)
-{
-//	DBG_LOG(1,"cbm ieee dav",("%.4x dev:%d %d\n", activecpu_get_pc(), device, data));
-	cbmieee.bus[device].dav=data;
-	if (device==0) c2031_state(machine, cbm_drive);
-}
-
-void cbm_ieee_nrfd_w(running_machine *machine, int device, int data)
-{
-//	DBG_LOG(1,"cbm ieee nrfd",("%.4x dev:%d %d\n", activecpu_get_pc(), device, data));
-	cbmieee.bus[device].nrfd=data;
-	if (device==0) c2031_state(machine, cbm_drive);
-}
-
-void cbm_ieee_ndac_w(running_machine *machine, int device, int data)
-{
-//	DBG_LOG(1,"cbm ieee ndac",("%.4x dev:%d %d\n", activecpu_get_pc(), device, data));
-	cbmieee.bus[device].ndac=data;
-	if (device==0) c2031_state(machine, cbm_drive);
-}
-
-void cbm_ieee_atn_w(running_machine *machine, int device, int data)
-{
-//	DBG_LOG(1,"cbm ieee atn",("%.4x dev:%d %d\n", activecpu_get_pc(), device, data));
-	cbmieee.bus[device].atn=data;
-	if (device==0) c2031_state(machine, cbm_drive);
-}
-
-void cbm_ieee_eoi_w(running_machine *machine, int device, int data)
-{
-//	DBG_LOG(1,"cbm ieee eoi",("%.4x dev:%d %d\n", activecpu_get_pc(), device, data));
-	cbmieee.bus[device].eoi=data;
-	if (device==0) c2031_state(machine, cbm_drive);
-}
-
-void cbm_ieee_data_w(running_machine *machine, int device, int data)
-{
-//	DBG_LOG(1,"cbm ieee data",("%.4x dev:%d %.2x\n", activecpu_get_pc(), device, data));
-	cbmieee.bus[device].data=data;
-	if (device==0) c2031_state(machine, cbm_drive);
-}
-
-int cbm_ieee_srq_r(running_machine *machine)
-{
-	int data=cbmieee.bus[1].srq;
-	DBG_LOG(1,"cbm ieee srq",("read %d\n", data));
-	return data;
-}
-
-int cbm_ieee_dav_r(running_machine *machine)
-{
-	int data=cbmieee.bus[0].dav&&cbmieee.bus[1].dav;
-	DBG_LOG(1,"cbm ieee dav",("read %d\n", data));
-	return data;
-}
-
-int cbm_ieee_nrfd_r(running_machine *machine)
-{
-	int data=cbmieee.bus[0].nrfd && cbmieee.bus[1].nrfd;
-	DBG_LOG(1,"cbm ieee nrfd",("read %d\n", data));
-	return data;
-}
-
-int cbm_ieee_ndac_r(running_machine *machine)
-{
-	int data=cbmieee.bus[0].ndac&&cbmieee.bus[1].ndac;
-	DBG_LOG(1,"cbm ieee ndac",("read %d\n", data));
-	return data;
-}
-
-int cbm_ieee_atn_r(running_machine *machine)
-{
-	int data=cbmieee.bus[0].atn&&cbmieee.bus[1].atn;
-	DBG_LOG(1,"cbm ieee atn",("read %d\n", data));
-	return data;
-}
-
-int cbm_ieee_eoi_r(running_machine *machine)
-{
-	int data=cbmieee.bus[0].eoi&&cbmieee.bus[1].eoi;
-/*	DBG_LOG(1,"cbm ieee eoi",("read %d\n", data)); */
-	return data;
-}
-
-int cbm_ieee_data_r(running_machine *machine)
-{
-	int data=cbmieee.bus[0].data&cbmieee.bus[1].data;
-	DBG_LOG(1,"cbm ieee data",("read %.2x\n", data));
-	return data;
-}
-
-
-READ8_HANDLER(cbm_ieee_state)
-{
-	switch (offset) {
-	case 0: return cbmieee.bus[0].data;
-	case 1: return cbmieee.bus[0].atn;
-	case 2: return cbmieee.bus[0].dav;
-	case 3: return cbmieee.bus[0].ndac;
-	case 4: return cbmieee.bus[0].nrfd;
-	case 5: return cbmieee.bus[0].eoi;
-	case 6: return cbmieee.bus[0].ren;
-	case 7: return cbmieee.bus[0].srq;
-
-	case 0x10: return cbmieee.bus[1].data;
-	case 0x11: return cbmieee.bus[1].atn;
-	case 0x12: return cbmieee.bus[1].dav;
-	case 0x13: return cbmieee.bus[1].ndac;
-	case 0x14: return cbmieee.bus[1].nrfd;
-	case 0x15: return cbmieee.bus[1].eoi;
-	case 0x16: return cbmieee.bus[1].ren;
-	case 0x17: return cbmieee.bus[1].srq;
-	}
 	return 0;
+}
+
+/*-------------------------------------------------
+    DEVICE_START( cbm_ieee_bus )
+-------------------------------------------------*/
+
+static DEVICE_START( cbm_ieee_bus )
+{
+	cbm_ieee_bus_t *ieeebus = get_safe_token(device);
+
+	memset(ieeebus, 0, sizeof(*ieeebus));
+
+	/* register for state saving */
+	// We need to save here ieeebus->bus[i]!
+}
+
+/*-------------------------------------------------
+    DEVICE_RESET( cbm_ieee_bus )
+-------------------------------------------------*/
+
+static DEVICE_RESET( cbm_ieee_bus )
+{
+	cbm_ieee_bus_t *ieeebus = get_safe_token(device);
+	int i;
+
+	for (i = 0; i < 2; i++) 
+	{
+		ieeebus->bus[i].dav = 1;
+		ieeebus->bus[i].nrfd = 1;
+		ieeebus->bus[i].ndac = 1;
+		ieeebus->bus[i].atn = 1;
+		ieeebus->bus[i].eoi = 1;
+		ieeebus->bus[i].srq = 1;
+
+		ieeebus->bus[i].data = 0xff;
+	}
+}
+
+/*-------------------------------------------------
+    DEVICE_GET_INFO( cbm_ieee_bus )
+-------------------------------------------------*/
+
+DEVICE_GET_INFO( cbm_ieee_bus )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(cbm_ieee_bus_t);			break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
+		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(cbm_ieee_bus);	break;
+		case DEVINFO_FCT_STOP:							/* Nothing */									break;
+		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(cbm_ieee_bus);	break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Commodore IEEE Bus");		break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Commodore IEEE Bus");		break;
+		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");						break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);					break;
+		case DEVINFO_STR_CREDITS:						/* Nothing */								break;
+	}
 }
