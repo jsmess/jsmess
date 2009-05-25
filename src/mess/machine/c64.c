@@ -33,12 +33,12 @@
 #include "devices/cartslot.h"
 
 #define VERBOSE_LEVEL 0
-#define DBG_LOG(N,M,A) \
+#define DBG_LOG( MACHINE, N, M, A ) \
 	do { \
 		if(VERBOSE_LEVEL >= N) \
 		{ \
 			if( M ) \
-				logerror("%11.6f: %-24s", attotime_to_double(timer_get_time(machine)), (char*) M ); \
+				logerror("%11.6f: %-24s", attotime_to_double(timer_get_time(MACHINE)), (char*) M ); \
 			logerror A; \
 		} \
 	} while (0)
@@ -127,7 +127,7 @@ static void c64_irq (running_machine *machine, int level)
 
 	if (level != old_level)
 	{
-		DBG_LOG (3, "mos6510", ("irq %s\n", level ? "start" : "end"));
+		DBG_LOG(machine, 3, "mos6510", ("irq %s\n", level ? "start" : "end"));
 		cputag_set_input_line(machine, "maincpu", M6510_IRQ_LINE, level);
 		old_level = level;
 	}
@@ -263,7 +263,6 @@ static UINT8 *c64_io_ram_r_ptr;
 
 WRITE8_HANDLER( c64_write_io )
 {
-	running_machine *machine = space->machine;
 	const device_config *cia_0 = devtag_get_device(space->machine, "cia_0");
 	const device_config *cia_1 = devtag_get_device(space->machine, "cia_1");
 	const device_config *sid = devtag_get_device(space->machine, "sid6581");
@@ -282,17 +281,17 @@ WRITE8_HANDLER( c64_write_io )
 		if (c64_cia1_on)
 			cia_w(cia_1, offset, data);
 		else
-			DBG_LOG (1, "io write", ("%.3x %.2x\n", offset, data));
+			DBG_LOG(space->machine, 1, "io write", ("%.3x %.2x\n", offset, data));
 	}
 	else if (offset < 0xf00)
 	{
 		/* i/o 1 */
-			DBG_LOG (1, "io write", ("%.3x %.2x\n", offset, data));
+			DBG_LOG(space->machine, 1, "io write", ("%.3x %.2x\n", offset, data));
 	}
 	else
 	{
 		/* i/o 2 */
-			DBG_LOG (1, "io write", ("%.3x %.2x\n", offset, data));
+			DBG_LOG(space->machine, 1, "io write", ("%.3x %.2x\n", offset, data));
 	}
 }
 
@@ -310,7 +309,6 @@ WRITE8_HANDLER(c64_ioarea_w)
 
 READ8_HANDLER( c64_read_io )
 {
-	running_machine *machine = space->machine;
 	const device_config *cia_0 = devtag_get_device(space->machine, "cia_0");
 	const device_config *cia_1 = devtag_get_device(space->machine, "cia_1");
 	const device_config *sid = devtag_get_device(space->machine, "sid6581");
@@ -342,7 +340,7 @@ READ8_HANDLER( c64_read_io )
 	else if (c64_cia1_on && (offset < 0xe00))
 		return cia_r(cia_1, offset);
 
-	DBG_LOG (1, "io read", ("%.3x\n", offset));
+	DBG_LOG(space->machine, 1, "io read", ("%.3x\n", offset));
 
 	return 0xff;
 }
@@ -481,7 +479,7 @@ static void c64_bankswitch(running_machine *machine, int reset)
 	if (!c64_game && c64_exrom)
 		ultimax_mode = 1;
 
-	DBG_LOG (1, "bankswitch", ("%d\n", data & 7));
+	DBG_LOG(machine, 1, "bankswitch", ("%d\n", data & 7));
 	loram  = (data & 1) ? 1 : 0;
 	hiram  = (data & 2) ? 1 : 0;
 	charen = (data & 4) ? 1 : 0;

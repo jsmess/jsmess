@@ -26,12 +26,12 @@
 
 
 #define VERBOSE_LEVEL 0
-#define DBG_LOG(N,M,A) \
+#define DBG_LOG( MACHINE, N, M, A ) \
 	do { \
 		if(VERBOSE_LEVEL >= N) \
 		{ \
 			if( M ) \
-				logerror("%11.6f: %-24s", attotime_to_double(timer_get_time(machine)), (char*) M ); \
+				logerror("%11.6f: %-24s", attotime_to_double(timer_get_time(MACHINE)), (char*) M ); \
 			logerror A; \
 		} \
 	} while (0)
@@ -364,19 +364,17 @@ READ8_HANDLER(c16_fd1x_r)
   */
 WRITE8_HANDLER(c16_6551_port_w)
 {
-	running_machine *machine = space->machine;
 	offset &= 0x03;
-	DBG_LOG (3, "6551", ("port write %.2x %.2x\n", offset, data));
+	DBG_LOG(space->machine, 3, "6551", ("port write %.2x %.2x\n", offset, data));
 	port6529 = data;
 }
 
 READ8_HANDLER(c16_6551_port_r)
 {
-	running_machine *machine = space->machine;
 	int data = 0x00;
 
 	offset &= 0x03;
-	DBG_LOG (3, "6551", ("port read %.2x %.2x\n", offset, data));
+	DBG_LOG(space->machine, 3, "6551", ("port read %.2x %.2x\n", offset, data));
 	return data;
 }
 
@@ -429,7 +427,7 @@ void c16_interrupt (running_machine *machine, int level)
 
 	if (level != old_level)
 	{
-		DBG_LOG (3, "mos7501", ("irq %s\n", level ? "start" : "end"));
+		DBG_LOG(machine, 3, "mos7501", ("irq %s\n", level ? "start" : "end"));
 		cputag_set_input_line(machine, "maincpu", M6510_IRQ_LINE, level);
 		old_level = level;
 	}

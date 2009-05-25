@@ -162,7 +162,7 @@ Other info sources:
 
 
 #define VERBOSE_LEVEL 0
-#define DBG_LOG(MACHINE,N,M,A) \
+#define DBG_LOG( MACHINE, N, M, A ) \
 	do { \
 		if(VERBOSE_LEVEL >= N) \
 		{ \

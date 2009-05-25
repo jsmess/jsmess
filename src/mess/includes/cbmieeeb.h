@@ -28,8 +28,6 @@
 
 DEVICE_GET_INFO( cbm_ieee_bus );
 
-void cbm_ieee_open(void);
-
 void cbm_ieee_dav_w(const device_config *ieeedev, int device, int data);
 void cbm_ieee_nrfd_w(const device_config *ieeedev, int device, int data);
 void cbm_ieee_ndac_w(const device_config *ieeedev, int device, int data);

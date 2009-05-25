@@ -30,12 +30,12 @@
 
 
 #define VERBOSE_LEVEL 0
-#define DBG_LOG(N,M,A) \
+#define DBG_LOG( MACHINE, N, M, A ) \
 	do { \
 		if(VERBOSE_LEVEL >= N) \
 		{ \
 			if( M ) \
-				logerror("%11.6f: %-24s", attotime_to_double(timer_get_time(machine)), (char*) M ); \
+				logerror("%11.6f: %-24s", attotime_to_double(timer_get_time(MACHINE)), (char*) M ); \
 			logerror A; \
 		} \
 	} while (0)
@@ -154,7 +154,7 @@ static void c128_irq (running_machine *machine, int level)
 
 	if (level != old_level)
 	{
-		DBG_LOG (3, "mos6510", ("irq %s\n", level ? "start" : "end"));
+		DBG_LOG(machine, 3, "mos6510", ("irq %s\n", level ? "start" : "end"));
 
 		if (0) // && (cpu_getactivecpu() == 0))
 		{
@@ -304,20 +304,17 @@ static void c128_set_m8502_read_handler(running_machine *machine, UINT16 start, 
 
 static WRITE8_HANDLER(c128_dma8726_port_w)
 {
-	running_machine *machine = space->machine;
-	DBG_LOG(1,"dma write",("%.3x %.2x\n",offset,data));
+	DBG_LOG(space->machine, 1, "dma write", ("%.3x %.2x\n",offset,data));
 }
 
 static READ8_HANDLER(c128_dma8726_port_r)
 {
-	running_machine *machine = space->machine;
-	DBG_LOG(1,"dma read",("%.3x\n",offset));
+	DBG_LOG(space->machine, 1, "dma read", ("%.3x\n",offset));
 	return 0xff;
 }
 
 WRITE8_HANDLER( c128_write_d000 )
 {
-	running_machine *machine = space->machine;
 	const device_config *cia_0 = devtag_get_device(space->machine, "cia_0");
 	const device_config *cia_1 = devtag_get_device(space->machine, "cia_1");
 	const device_config *sid = devtag_get_device(space->machine, "sid6581");
@@ -336,16 +333,16 @@ WRITE8_HANDLER( c128_write_d000 )
 		switch ((offset&0xf00)>>8)
 		{
 		case 0:case 1: case 2: case 3:
-			vic2_port_w (space, offset & 0x3ff, data);
+			vic2_port_w(space, offset & 0x3ff, data);
 			break;
 		case 4:
 			sid6581_w(sid, offset & 0x3f, data);
 			break;
 		case 5:
-			c128_mmu8722_port_w (space, offset & 0xff, data);
+			c128_mmu8722_port_w(space, offset & 0xff, data);
 			break;
 		case 6:case 7:
-			vdc8563_port_w (space, offset & 0xff, data);
+			vdc8563_port_w(space, offset & 0xff, data);
 			break;
 		case 8: case 9: case 0xa: case 0xb:
 		    if (c64mode)
@@ -363,7 +360,7 @@ WRITE8_HANDLER( c128_write_d000 )
 			c128_dma8726_port_w(space, offset&0xff,data);
 			break;
 		case 0xe:
-			DBG_LOG (1, "io write", ("%.3x %.2x\n", offset, data));
+			DBG_LOG(space->machine, 1, "io write", ("%.3x %.2x\n", offset, data));
 			break;
 		}
 	}
@@ -373,19 +370,18 @@ WRITE8_HANDLER( c128_write_d000 )
 
 static READ8_HANDLER( c128_read_io )
 {
-	running_machine *machine = space->machine;
 	const device_config *cia_0 = devtag_get_device(space->machine, "cia_0");
 	const device_config *cia_1 = devtag_get_device(space->machine, "cia_1");
 	const device_config *sid = devtag_get_device(space->machine, "sid6581");
 
 	if (offset < 0x400)
-		return vic2_port_r (space, offset & 0x3ff);
+		return vic2_port_r(space, offset & 0x3ff);
 	else if (offset < 0x500)
-		return sid6581_r (sid, offset & 0xff);
+		return sid6581_r(sid, offset & 0xff);
 	else if (offset < 0x600)
-		return c128_mmu8722_port_r (space, offset & 0xff);
+		return c128_mmu8722_port_r(space, offset & 0xff);
 	else if (offset < 0x800)
-		return vdc8563_port_r (space, offset & 0xff);
+		return vdc8563_port_r(space, offset & 0xff);
 	else if (offset < 0xc00)
 		return c64_colorram[offset & 0x3ff];
 	else if (offset == 0xc00)
@@ -404,7 +400,7 @@ static READ8_HANDLER( c128_read_io )
 		return cia_r(cia_1, offset);
 	else if ((offset >= 0xf00) & (offset <= 0xfff))
 		return c128_dma8726_port_r(space, offset&0xff);
-	DBG_LOG (1, "io read", ("%.3x\n", offset));
+	DBG_LOG(space->machine, 1, "io read", ("%.3x\n", offset));
 	return 0xff;
 }
 
@@ -418,10 +414,10 @@ void c128_bankswitch_64(running_machine *machine, int reset)
 		return;
 
 	data = (UINT8) devtag_get_info_int(machine, "maincpu", CPUINFO_INT_M6510_PORT) & 0x07;
-	if ((data == old)&&(exrom==c64_exrom)&&(game==c64_game)&&!reset)
+	if ((data == old) && (exrom == c64_exrom) && (game == c64_game) && !reset)
 		return;
 
-	DBG_LOG (1, "bankswitch", ("%d\n", data & 7));
+	DBG_LOG(machine, 1, "bankswitch", ("%d\n", data & 7));
 	loram = (data & 1) ? 1 : 0;
 	hiram = (data & 2) ? 1 : 0;
 	charen = (data & 4) ? 1 : 0;
@@ -785,7 +781,7 @@ static void c128_bankswitch (running_machine *machine, int reset)
 	{
 		if (!MMU_CPU8502)
 		{
-//			DBG_LOG (1, "switching to z80", ("active %d\n",cpu_getactivecpu()) );
+//			DBG_LOG(machine, 1, "switching to z80", ("active %d\n",cpu_getactivecpu()) );
 //			memory_set_context(machine, 0);
 			c128_bankswitch_z80(machine);
 //			memory_set_context(machine, 1);
@@ -794,7 +790,7 @@ static void c128_bankswitch (running_machine *machine, int reset)
 		}
 		else
 		{
-//			DBG_LOG (1, "switching to m6502", ("active %d\n",cpu_getactivecpu()) );
+//			DBG_LOG(machine, 1, "switching to m6502", ("active %d\n",cpu_getactivecpu()) );
 //			memory_set_context(machine, 1);
 			c128_bankswitch_128(machine, reset);
 //			memory_set_context(machine, 0);

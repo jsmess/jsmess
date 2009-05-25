@@ -26,12 +26,12 @@ drivers 8 & 9 as in pet.c ? */
 #define IEEE9ON 0
 
 #define VERBOSE_LEVEL 0
-#define DBG_LOG(N,M,A) \
+#define DBG_LOG( MACHINE, N, M, A ) \
 	do { \
 		if(VERBOSE_LEVEL >= N) \
 		{ \
 			if( M ) \
-				logerror("%11.6f: %-24s", attotime_to_double(timer_get_time(machine)), (char*) M ); \
+				logerror("%11.6f: %-24s", attotime_to_double(timer_get_time(MACHINE)), (char*) M ); \
 			logerror A; \
 		} \
 	} while (0)
@@ -224,11 +224,10 @@ READ8_DEVICE_HANDLER( cbmb_keyboard_line_c )
 void cbmb_irq(const device_config *device, int level)
 {
 	static int old_level = 0;
-	running_machine *machine = device->machine;
 
 	if (level != old_level)
 	{
-		DBG_LOG (3, "mos6509", ("irq %s\n", level ? "start" : "end"));
+		DBG_LOG(device->machine, 3, "mos6509", ("irq %s\n", level ? "start" : "end"));
 		cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, level);
 		old_level = level;
 	}

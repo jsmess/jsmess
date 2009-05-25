@@ -21,12 +21,12 @@
 #include "devices/cassette.h"
 
 #define VERBOSE_LEVEL 0
-#define DBG_LOG(N,M,A) \
+#define DBG_LOG( MACHINE, N, M, A ) \
 	do { \
 		if(VERBOSE_LEVEL >= N) \
 		{ \
 			if( M ) \
-				logerror("%11.6f: %-24s", attotime_to_double(timer_get_time(machine)), (char*) M ); \
+				logerror("%11.6f: %-24s", attotime_to_double(timer_get_time(MACHINE)), (char*) M ); \
 			logerror A; \
 		} \
 	} while (0)
@@ -174,14 +174,13 @@ static WRITE_LINE_DEVICE_HANDLER( pet_irq )
 {
 	int level = state ? 1 : 0;
 	static int old_level = 0;
-	running_machine *machine = device->machine;
-	pet_state *driver_state = machine->driver_data;
+	pet_state *driver_state = device->machine->driver_data;
 	if (level != old_level)
 	{
-		DBG_LOG (3, "mos6502", ("irq %s\n", level ? "start" : "end"));
+		DBG_LOG(device->machine, 3, "mos6502", ("irq %s\n", level ? "start" : "end"));
 		if (driver_state->superpet)
-			cputag_set_input_line(machine, "m6809", M6809_IRQ_LINE, level);
-		cputag_set_input_line(machine, "maincpu", M6502_IRQ_LINE, level);
+			cputag_set_input_line(device->machine, "m6809", M6809_IRQ_LINE, level);
+		cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, level);
 		old_level = level;
 	}
 }
@@ -280,8 +279,7 @@ const pia6821_interface pet_pia1 =
 
 static WRITE8_DEVICE_HANDLER( pet_address_line_11 )
 {
-	running_machine *machine = device->machine;
-	DBG_LOG (1, "address line", ("%d\n", data));
+	DBG_LOG(device->machine, 1, "address line", ("%d\n", data));
 	if (data) pet_font |= 1;
 	else pet_font &= ~1;
 }

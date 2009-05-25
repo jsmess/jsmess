@@ -165,9 +165,9 @@ Source Changes:
 
 - Implemented following devices: PIO8155, RP5C01A, HD44102, HD61830. [Curt Coder]
 
-- Changed the Commodore Serial Bus implementation to be a device. More work is 
-  needed to make the code flexible enough to support all the possible devices 
-  which could have been connected to the real thing. [Fabio Priuli]
+- Changed the Commodore Serial Bus and IEEE Bus implementations to be devices. 
+  More work is needed to make the code flexible enough to support all the possible 
+  devices which could have been connected to the real thing. [Fabio Priuli]
 
 
 0.131

@@ -361,12 +361,12 @@ INLINE cbm_ieee_bus_t *get_safe_token(const device_config *device)
 
 
 #define VERBOSE_LEVEL 0
-#define DBG_LOG( N, M, A ) \
+#define DBG_LOG( MACHINE, N, M, A ) \
 	do { \
 		if(VERBOSE_LEVEL >= N) \
 		{ \
 			if( M ) \
-				logerror("%11.6f: %-24s", attotime_to_double(timer_get_time(machine)), (char*) M ); \
+				logerror("%11.6f: %-24s", attotime_to_double(timer_get_time(MACHINE)), (char*) M ); \
 			logerror A; \
 		} \
 	} while (0)
@@ -398,7 +398,7 @@ void cbm_ieee_dav_w( const device_config *ieeedev, int device, int data )
 {
 	cbm_ieee_bus_t *ieeebus = get_safe_token(ieeedev);
 
-//	DBG_LOG(1, "cbm ieee dav", ("%.4x dev:%d %d\n", activecpu_get_pc(), device, data));
+//	DBG_LOG(ieeedev->machine, 1, "cbm ieee dav", ("%.4x dev:%d %d\n", activecpu_get_pc(), device, data));
 	ieeebus->bus[device].dav = data;
 	if (device == 0) 
 		c2031_state(ieeedev->machine, cbm_drive);
@@ -413,7 +413,7 @@ void cbm_ieee_nrfd_w( const device_config *ieeedev, int device, int data )
 {
 	cbm_ieee_bus_t *ieeebus = get_safe_token(ieeedev);
 
-//	DBG_LOG(1, "cbm ieee nrfd", ("%.4x dev:%d %d\n", activecpu_get_pc(), device, data));
+//	DBG_LOG(ieeedev->machine, 1, "cbm ieee nrfd", ("%.4x dev:%d %d\n", activecpu_get_pc(), device, data));
 	ieeebus->bus[device].nrfd = data;
 	if (device == 0) 
 		c2031_state(ieeedev->machine, cbm_drive);
@@ -428,7 +428,7 @@ void cbm_ieee_ndac_w( const device_config *ieeedev, int device, int data )
 {
 	cbm_ieee_bus_t *ieeebus = get_safe_token(ieeedev);
 
-//	DBG_LOG(1, "cbm ieee ndac",("%.4x dev:%d %d\n", activecpu_get_pc(), device, data));
+//	DBG_LOG(ieeedev->machine, 1, "cbm ieee ndac",("%.4x dev:%d %d\n", activecpu_get_pc(), device, data));
 	ieeebus->bus[device].ndac = data;
 	if (device == 0) 
 		c2031_state(ieeedev->machine, cbm_drive);
@@ -443,7 +443,7 @@ void cbm_ieee_atn_w( const device_config *ieeedev, int device, int data )
 {
 	cbm_ieee_bus_t *ieeebus = get_safe_token(ieeedev);
 
-//	DBG_LOG(1, "cbm ieee atn",("%.4x dev:%d %d\n", activecpu_get_pc(), device, data));
+//	DBG_LOG(ieeedev->machine, 1, "cbm ieee atn",("%.4x dev:%d %d\n", activecpu_get_pc(), device, data));
 	ieeebus->bus[device].atn = data;
 	if (device == 0) 
 		c2031_state(ieeedev->machine, cbm_drive);
@@ -458,7 +458,7 @@ void cbm_ieee_eoi_w( const device_config *ieeedev, int device, int data )
 {
 	cbm_ieee_bus_t *ieeebus = get_safe_token(ieeedev);
 
-//	DBG_LOG(1, "cbm ieee eoi", ("%.4x dev:%d %d\n", activecpu_get_pc(), device, data));
+//	DBG_LOG(ieeedev->machine, 1, "cbm ieee eoi", ("%.4x dev:%d %d\n", activecpu_get_pc(), device, data));
 	ieeebus->bus[device].eoi = data;
 	if (device == 0) 
 		c2031_state(ieeedev->machine, cbm_drive);
@@ -473,7 +473,7 @@ void cbm_ieee_data_w( const device_config *ieeedev, int device, int data )
 {
 	cbm_ieee_bus_t *ieeebus = get_safe_token(ieeedev);
 
-//	DBG_LOG(1, "cbm ieee data", ("%.4x dev:%d %.2x\n", activecpu_get_pc(), device, data));
+//	DBG_LOG(ieeedev->machine, 1, "cbm ieee data", ("%.4x dev:%d %.2x\n", activecpu_get_pc(), device, data));
 	ieeebus->bus[device].data = data;
 	if (device == 0) 
 		c2031_state(ieeedev->machine, cbm_drive);
@@ -487,71 +487,64 @@ WRITE8_DEVICE_HANDLER( cbm_ieee_data_write )
 
 READ8_DEVICE_HANDLER( cbm_ieee_srq_r )
 {
-	running_machine *machine = device->machine;
 	cbm_ieee_bus_t *ieeebus = get_safe_token(device);
 	int data = ieeebus->bus[1].srq;
 
-	DBG_LOG(1, "cbm ieee srq", ("read %d\n", data));
+	DBG_LOG(device->machine, 1, "cbm ieee srq", ("read %d\n", data));
 	return data;
 }
 
 READ8_DEVICE_HANDLER( cbm_ieee_dav_r )
 {
-	running_machine *machine = device->machine;
 	cbm_ieee_bus_t *ieeebus = get_safe_token(device);
 	int data = ieeebus->bus[0].dav && ieeebus->bus[1].dav;
 
-	DBG_LOG(1, "cbm ieee dav", ("read %d\n", data));
+	DBG_LOG(device->machine, 1, "cbm ieee dav", ("read %d\n", data));
 	return data;
 }
 
 READ8_DEVICE_HANDLER( cbm_ieee_nrfd_r )
 {
-	running_machine *machine = device->machine;
 	cbm_ieee_bus_t *ieeebus = get_safe_token(device);
 	int data = ieeebus->bus[0].nrfd && ieeebus->bus[1].nrfd;
 
-	DBG_LOG(1, "cbm ieee nrfd", ("read %d\n", data));
+	DBG_LOG(device->machine, 1, "cbm ieee nrfd", ("read %d\n", data));
 	return data;
 }
 
 READ8_DEVICE_HANDLER( cbm_ieee_ndac_r )
 {
-	running_machine *machine = device->machine;
 	cbm_ieee_bus_t *ieeebus = get_safe_token(device);
 	int data = ieeebus->bus[0].ndac && ieeebus->bus[1].ndac;
 
-	DBG_LOG(1,"cbm ieee ndac", ("read %d\n", data));
+	DBG_LOG(device->machine, 1,"cbm ieee ndac", ("read %d\n", data));
 	return data;
 }
 
 READ8_DEVICE_HANDLER( cbm_ieee_atn_r )
 {
-	running_machine *machine = device->machine;
 	cbm_ieee_bus_t *ieeebus = get_safe_token(device);
 	int data = ieeebus->bus[0].atn && ieeebus->bus[1].atn;
 
-	DBG_LOG(1,"cbm ieee atn", ("read %d\n", data));
+	DBG_LOG(device->machine, 1,"cbm ieee atn", ("read %d\n", data));
 	return data;
 }
 
 READ8_DEVICE_HANDLER( cbm_ieee_eoi_r )
 {
-//	running_machine *machine = device->machine;
 	cbm_ieee_bus_t *ieeebus = get_safe_token(device);
 	int data = ieeebus->bus[0].eoi && ieeebus->bus[1].eoi;
 
-/*	DBG_LOG(1, "cbm ieee eoi", ("read %d\n", data)); */
+/*	DBG_LOG(device->machine, 1, "cbm ieee eoi", ("read %d\n", data)); */
 	return data;
 }
 
 READ8_DEVICE_HANDLER( cbm_ieee_data_r )
 {
-	running_machine *machine = device->machine;
 	cbm_ieee_bus_t *ieeebus = get_safe_token(device);
 	int data = ieeebus->bus[0].data & ieeebus->bus[1].data;
 
-	DBG_LOG(1, "cbm ieee data", ("read %.2x\n", data));
+	DBG_LOG(device->machine, 1, "cbm ieee data", ("read %.2x\n", data));
 	return data;
 }
 

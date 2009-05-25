@@ -31,12 +31,12 @@
 
 
 #define VERBOSE_LEVEL 0
-#define DBG_LOG(N,M,A) \
+#define DBG_LOG(MACHINE, N, M, A) \
 	do { \
 		if(VERBOSE_LEVEL >= N) \
 		{ \
 			if( M ) \
-				logerror("%11.6f: %-24s", attotime_to_double(timer_get_time(machine)), (char*) M ); \
+				logerror("%11.6f: %-24s", attotime_to_double(timer_get_time(MACHINE)), (char*) M ); \
 			logerror A; \
 		} \
 	} while (0)
@@ -80,13 +80,12 @@ static void vc20_via0_irq (const device_config *device, int level)
 
 static READ8_DEVICE_HANDLER( vc20_via0_read_ca1 )
 {
-	return !( input_port_read(device->machine, "SPECIAL") & 0x02 );
+	return !(input_port_read(device->machine, "SPECIAL") & 0x02);
 }
 
 static READ8_DEVICE_HANDLER( vc20_via0_read_ca2 )
 {
-	running_machine *machine = device->machine;
-	DBG_LOG (1, "tape", ("motor read %d\n", via0_ca2));
+	DBG_LOG(device->machine, 1, "tape", ("motor read %d\n", via0_ca2));
 	return via0_ca2;
 }
 
@@ -132,11 +131,10 @@ static READ8_DEVICE_HANDLER( vc20_via0_read_porta )
 
 static WRITE8_DEVICE_HANDLER( vc20_via0_write_porta )
 {
-	running_machine *machine = device->machine;		// used in DBG_LOG
-	const device_config *serbus = devtag_get_device(machine, "serial_bus");
+	const device_config *serbus = devtag_get_device(device->machine, "serial_bus");
 
 	cbm_serial_atn_write(serbus, 0, serial_atn = !(data & 0x80));
-	DBG_LOG(1, "serial out", ("atn %s\n", serial_atn ? "high" : "low"));
+	DBG_LOG(device->machine, 1, "serial out", ("atn %s\n", serial_atn ? "high" : "low"));
 }
 
 /* via 1 addr 0x9120
@@ -335,10 +333,9 @@ static WRITE8_DEVICE_HANDLER( vc20_via1_write_portb )
 
 static READ8_DEVICE_HANDLER( vc20_via1_read_cb1 )
 {
-	running_machine *machine = device->machine;		// used in DBG_LOG
-	const device_config *serbus = devtag_get_device(machine, "serial_bus");
+	const device_config *serbus = devtag_get_device(device->machine, "serial_bus");
 
-	DBG_LOG(1, "serial in", ("request read\n"));
+	DBG_LOG(device->machine, 1, "serial in", ("request read\n"));
 	return cbm_serial_request_read(serbus, 0);
 }
 

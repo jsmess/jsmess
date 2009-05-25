@@ -839,7 +839,7 @@ void vc1541_state( running_machine *machine, CBM_Drive * drive )
 			{
 				if (drive->cmdpos < sizeof (drive->cmdbuffer))
 					drive->cmdbuffer[drive->cmdpos++] = drive->i.serial.value;
-				DBG_LOG (machine, 1, "serial read", ("%s %s %.2x\n",
+				DBG_LOG(machine, 1, "serial read", ("%s %s %.2x\n",
 							drive->i.serial.broadcast ? "broad" : "",
 							drive->i.serial.last ? "last" : "",
 											drive->i.serial.value));
@@ -1195,7 +1195,7 @@ void vc1541_state( running_machine *machine, CBM_Drive * drive )
 		}
 		if (vc1541_time_greater(machine, drive, ATTOTIME_IN_USEC(20)))
 		{
-			DBG_LOG (machine, 1, "vc1541", ("%.2x written\n", drive->i.serial.value));
+			DBG_LOG(machine, 1, "vc1541", ("%.2x written\n", drive->i.serial.value));
 			drive->i.serial.data = 1;
 			drive->i.serial.clock = 0;
 			drive->i.serial.state++;
