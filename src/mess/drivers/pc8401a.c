@@ -4,6 +4,7 @@
 #include "machine/8255ppi.h"
 #include "machine/upd1990a.h"
 #include "sound/ay8910.h"
+#include "video/sed1330.h"
 #include "cpu/z80/z80.h"
 
 /*
@@ -383,7 +384,8 @@ static ADDRESS_MAP_START( pc8500_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x40, 0x40) AM_READWRITE(rtc_r, rtc_ctrl_w)
 //	AM_RANGE(0x41, 0x41)
 //	AM_RANGE(0x50, 0x51) USART?
-//	AM_RANGE(0x60, 0x61) LCD controller (60=data, 61=cmd)
+	AM_RANGE(0x60, 0x60) AM_DEVREADWRITE(SED1330_TAG, sed1330_data_r, sed1330_data_w)
+	AM_RANGE(0x61, 0x61) AM_DEVREADWRITE(SED1330_TAG, sed1330_status_r, sed1330_command_w)
 //	AM_RANGE(0x70, 0x71)
 //	AM_RANGE(0x80, 0x80) modem status, set to 0xff to boot
 //	AM_RANGE(0x90, 0x93)
@@ -555,27 +557,31 @@ static VIDEO_UPDATE( pc8500 )
 {
 	pc8401a_state *state = screen->machine->driver_data;
 
-	int y, sx, x;
-	UINT16 addr = 0;
-
-	for (y = 0; y < 200; y++)
-	{
-		for (sx = 0; sx < 80; sx++)
-		{
-			UINT8 data = state->video_ram[addr & PC8500_VIDEORAM_MASK];
-
-			for (x = 0; x < 6; x++)
-			{
-				*BITMAP_ADDR16(bitmap, y, (sx * 6) + x) = BIT(data, 0);
-				data >>= 1;
-			}
-
-			addr++;
-		}
-	}
+	sed1330_update(state->sed1330, bitmap, cliprect);
 
 	return 0;
 }
+
+static READ8_DEVICE_HANDLER( pc8500_sed1330_vd_r )
+{
+	pc8401a_state *state = device->machine->driver_data;
+
+	return state->video_ram[offset & PC8500_VIDEORAM_MASK];
+}
+
+static WRITE8_DEVICE_HANDLER( pc8500_sed1330_vd_w )
+{
+	pc8401a_state *state = device->machine->driver_data;
+
+	state->video_ram[offset & PC8500_VIDEORAM_MASK] = data;
+}
+
+static SED1330_INTERFACE( pc8500_sed1330_config )
+{
+	SCREEN_TAG,
+	DEVCB_DEVICE_HANDLER(SED1330_TAG, pc8500_sed1330_vd_r),
+	DEVCB_DEVICE_HANDLER(SED1330_TAG, pc8500_sed1330_vd_w)
+};
 
 /* uPD1990A Interface */
 
@@ -672,6 +678,8 @@ static MACHINE_DRIVER_START( pc8500 )
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(pc8401a)
 	MDRV_VIDEO_UPDATE(pc8500)
+
+	MDRV_SED1330_ADD(SED1330_TAG, 0, pc8500_sed1330_config)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

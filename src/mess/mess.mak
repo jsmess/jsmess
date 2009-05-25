@@ -758,7 +758,8 @@ $(MESSOBJ)/pc.a:	   \
 	$(MESS_VIDEO)/pc_t1t.o	 
 
 $(MESSOBJ)/pc8401a.a:	   \
-	$(MESS_DRIVERS)/pc8401a.o
+	$(MESS_DRIVERS)/pc8401a.o \
+	$(MESS_VIDEO)/sed1330.o
 
 $(MESSOBJ)/at.a:	   \
 	$(MESS_MACHINE)/pc_ide.o   \

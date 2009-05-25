@@ -6,6 +6,7 @@
 #define PPI8255_TAG		"ppi8255"
 #define UPD1990A_TAG	"upd1990a"
 #define AY8910_TAG		"ay8910"
+#define SED1330_TAG		"sed1330"
 
 #define PC8401A_VIDEORAM_SIZE	0x2000
 #define PC8401A_VIDEORAM_MASK	0x1fff
@@ -26,6 +27,7 @@ struct _pc8401a_state
 	UINT8 *video_ram;		/* video RAM */
 
 	const device_config *upd1990a;
+	const device_config *sed1330;
 };
 
 #endif
