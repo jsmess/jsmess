@@ -8,26 +8,34 @@
 #define AY8910_TAG		"ay8910"
 #define SED1330_TAG		"sed1330"
 
-#define PC8401A_VIDEORAM_SIZE	0x2000
-#define PC8401A_VIDEORAM_MASK	0x1fff
-#define PC8500_VIDEORAM_SIZE	0x4000
-#define PC8500_VIDEORAM_MASK	0x3fff
+#define PC8401A_CRT_VIDEORAM_SIZE	0x2000
+#define PC8401A_LCD_VIDEORAM_SIZE	0x2000
+#define PC8401A_LCD_VIDEORAM_MASK	0x1fff
+#define PC8500_LCD_VIDEORAM_SIZE	0x4000
+#define PC8500_LCD_VIDEORAM_MASK	0x3fff
 
 typedef struct _pc8401a_state pc8401a_state;
 struct _pc8401a_state
 {
 	/* clock state */
-	int upd1990a_data;		/* RTC data output */
+	int rtc_data;			/* RTC data output */
+	int rtc_tp;				/* RTC timing pulse output */
 
 	/* memory state */
 	UINT8 mmr;				/* memory mapping register */
 	UINT32 io_addr;			/* I/O ROM address counter */
 
 	/* video state */
-	UINT8 *video_ram;		/* video RAM */
+	UINT8 *video_ram;		/* LCD video RAM */
+	UINT8 *crt_ram;			/* CRT video RAM */
 
 	const device_config *upd1990a;
 	const device_config *sed1330;
 };
+
+/* ---------- defined in video/pc8401a.c ---------- */
+
+MACHINE_DRIVER_EXTERN( pc8401a_video );
+MACHINE_DRIVER_EXTERN( pc8500_video );
 
 #endif

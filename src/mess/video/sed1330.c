@@ -31,7 +31,7 @@
     PARAMETERS
 ***************************************************************************/
 
-#define LOG 1
+#define LOG 0
 
 #define SED1330_INSTRUCTION_SYSTEM_SET		0x40
 #define SED1330_INSTRUCTION_SLEEP_IN		0x53	/* unimplemented */
@@ -430,7 +430,6 @@ WRITE8_DEVICE_HANDLER( sed1330_data_w )
 		default:
 			logerror("SED1330 '%s' Invalid parameter byte %02x\n", device->tag, data);
 		}
-//		sed1330->cd = SED1330_CSRDIR_DOWN; // HACK
 		break;
 
 	case SED1330_INSTRUCTION_CGRAM_ADR:
