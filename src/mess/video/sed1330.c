@@ -11,9 +11,11 @@
 
 	TODO:
 
-	- CSRDIR is +1 or +AP, but no command is written to select?
-	- garbage on screen
-	- FX > 8
+	- save states
+	- pc8500 writes data expecting the CSRDIR to be +1 or +AP but does not set it
+	- reset behavior
+	- internal chargen ROM
+	- display off
 
 */
 
@@ -27,7 +29,7 @@
 #define LOG 0
 
 #define SED1330_INSTRUCTION_SYSTEM_SET		0x40
-#define SED1330_INSTRUCTION_SLEEP_IN		0x53
+#define SED1330_INSTRUCTION_SLEEP_IN		0x53	/* not implemented */
 #define SED1330_INSTRUCTION_DISP_ON			0x59
 #define SED1330_INSTRUCTION_DISP_OFF		0x58
 #define SED1330_INSTRUCTION_SCROLL			0x44
@@ -72,6 +74,7 @@ struct _sed1330_t
 	int bf;						/* busy flag */
 
 	UINT8 ir;					/* instruction register */
+	UINT8 dor;					/* data output register */
 
 	int d;						/* display enabled */
 
@@ -137,6 +140,28 @@ INLINE const sed1330_interface *get_interface(const device_config *device)
 	return (const sed1330_interface *) device->static_config;
 }
 
+INLINE void increment_csr(sed1330_t *sed1330)
+{
+	switch (sed1330->cd)
+	{
+	case SED1330_CSRDIR_RIGHT:
+		sed1330->csr++;
+		break;
+
+	case SED1330_CSRDIR_LEFT:
+		sed1330->csr--;
+		break;
+
+	case SED1330_CSRDIR_UP:
+		sed1330->csr -= sed1330->ap;
+		break;
+
+	case SED1330_CSRDIR_DOWN:
+		sed1330->csr += sed1330->ap;
+		break;
+	}
+}
+
 /***************************************************************************
     IMPLEMENTATION
 ***************************************************************************/
@@ -178,7 +203,7 @@ READ8_DEVICE_HANDLER( sed1330_status_r )
 
 	if (LOG) logerror("SED1330 '%s' Status Read: %s\n", device->tag, sed1330->bf ? "busy" : "ready");
 
-	return !sed1330->bf << 6;
+	return sed1330->bf << 6;
 }
 
 /*-------------------------------------------------
@@ -199,9 +224,18 @@ WRITE8_DEVICE_HANDLER( sed1330_command_w )
 
 READ8_DEVICE_HANDLER( sed1330_data_r )
 {
-//	sed1330_t *sed1330 = get_safe_token(device);
-//logerror("SED1330 '%s' read data\n");
-	return 0;
+	sed1330_t *sed1330 = get_safe_token(device);
+	
+	UINT8 data = sed1330->dor;
+
+	if (LOG) logerror("SED1330 '%s' Memory Read %02x from %04x\n", device->tag, data, sed1330->csr);
+
+	sed1330->dor = devcb_call_read8(&sed1330->in_vd_func, sed1330->csr);
+
+	sed1330->csr++;
+//	increment_csr(sed1330);
+
+	return data;
 }
 
 /*-------------------------------------------------
@@ -368,6 +402,7 @@ WRITE8_DEVICE_HANDLER( sed1330_data_w )
 		default:
 			logerror("SED1330 '%s' Invalid parameter byte %02x\n", device->tag, data);
 		}
+		sed1330->cd = SED1330_CSRDIR_DOWN; // HACK
 		break;
 
 	case SED1330_INSTRUCTION_CGRAM_ADR:
@@ -463,35 +498,18 @@ WRITE8_DEVICE_HANDLER( sed1330_data_w )
 		break;
 */
 	case SED1330_INSTRUCTION_MWRITE:
-		if (LOG) if (data) logerror("SED1330 '%s' Memory Write %02x to %04x\n", device->tag, data, sed1330->csr);
+		if (LOG) logerror("SED1330 '%s' Memory Write %02x to %04x\n", device->tag, data, sed1330->csr);
 
 		devcb_call_write8(&sed1330->out_vd_func, sed1330->csr, data);
-/*
-		switch (sed1330->cd)
-		{
-		case SED1330_CSRDIR_RIGHT:
-			sed1330->csr++;
-			break;
 
-		case SED1330_CSRDIR_LEFT:
-			sed1330->csr--;
-			break;
-
-		case SED1330_CSRDIR_UP:
-			sed1330->csr -= sed1330->ap;
-			break;
-
-		case SED1330_CSRDIR_DOWN:
-			sed1330->csr += sed1330->ap;
-			break;
-		}
-*/
-		sed1330->csr += sed1330->ap; // HACK
+		increment_csr(sed1330);
 		break;
-/*
+
 	case SED1330_INSTRUCTION_MREAD:
+		sed1330->dor = devcb_call_read8(&sed1330->in_vd_func, sed1330->csr);
+		increment_csr(sed1330);
 		break;
-*/
+
 	default:
 		logerror("SED1330 '%s' Unsupported instruction %02x\n", device->tag, sed1330->ir);
 	}
@@ -569,7 +587,7 @@ void sed1330_update(const device_config *device, bitmap_t *bitmap, const rectang
 	}
 	else
 	{
-		//fillbitmap(bitmap, 0);
+		bitmap_fill(bitmap, cliprect, 0);
 	}
 }
 

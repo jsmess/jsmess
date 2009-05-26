@@ -6,6 +6,7 @@
 #include "sound/ay8910.h"
 #include "video/sed1330.h"
 #include "cpu/z80/z80.h"
+#include "pc8500.lh"
 
 /*
 
@@ -52,23 +53,23 @@ static void pc8401a_bankswitch(running_machine *machine, UINT8 data)
 			/* ROM cartridge */
 			memory_install_readwrite8_handler(program, 0x0000, 0x7fff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 		}
-		logerror("0x0000-0x7fff = ROM %u\n", rombank);
+		//logerror("0x0000-0x7fff = ROM %u\n", rombank);
 		break;
 
 	case 1: /* RAM 0000H to 7FFFH */
 		memory_install_readwrite8_handler(program, 0x0000, 0x7fff, 0, 0, SMH_BANK(1), SMH_BANK(1));
 		memory_set_bank(machine, 1, 4);
-		logerror("0x0000-0x7fff = RAM 0-7fff\n");
+		//logerror("0x0000-0x7fff = RAM 0-7fff\n");
 		break;
 
 	case 2:	/* RAM 8000H to FFFFH */
 		memory_install_readwrite8_handler(program, 0x0000, 0x7fff, 0, 0, SMH_BANK(1), SMH_BANK(1));
 		memory_set_bank(machine, 1, 5);
-		logerror("0x0000-0x7fff = RAM 8000-ffff\n");
+		//logerror("0x0000-0x7fff = RAM 8000-ffff\n");
 		break;
 
 	case 3: /* invalid */
-		logerror("0x0000-0x7fff = invalid\n");
+		//logerror("0x0000-0x7fff = invalid\n");
 		break;
 	}
 
@@ -77,19 +78,19 @@ static void pc8401a_bankswitch(running_machine *machine, UINT8 data)
 	case 0: /* cell addresses 0000H to 03FFFH */
 		memory_install_readwrite8_handler(program, 0x8000, 0xbfff, 0, 0, SMH_BANK(3), SMH_BANK(3));
 		memory_set_bank(machine, 3, 0);
-		logerror("0x8000-0xbfff = RAM 0-3fff\n");
+		//logerror("0x8000-0xbfff = RAM 0-3fff\n");
 		break;
 
 	case 1: /* cell addresses 4000H to 7FFFH */
 		memory_install_readwrite8_handler(program, 0x8000, 0xbfff, 0, 0, SMH_BANK(3), SMH_BANK(3));
 		memory_set_bank(machine, 3, 1);
-		logerror("0x8000-0xbfff = RAM 4000-7fff\n");
+		//logerror("0x8000-0xbfff = RAM 4000-7fff\n");
 		break;
 
 	case 2: /* cell addresses 8000H to BFFFH */
 		memory_install_readwrite8_handler(program, 0x8000, 0xbfff, 0, 0, SMH_BANK(3), SMH_BANK(3));
 		memory_set_bank(machine, 3, 2);
-		logerror("0x8000-0xbfff = RAM 8000-bfff\n");
+		//logerror("0x8000-0xbfff = RAM 8000-bfff\n");
 		break;
 
 	case 3: /* RAM cartridge */
@@ -102,7 +103,7 @@ static void pc8401a_bankswitch(running_machine *machine, UINT8 data)
 		{
 			memory_install_readwrite8_handler(program, 0x8000, 0xbfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 		}
-		logerror("0x8000-0xbfff = RAM cartridge\n");
+		//logerror("0x8000-0xbfff = RAM cartridge\n");
 		break;
 	}
 
@@ -112,14 +113,14 @@ static void pc8401a_bankswitch(running_machine *machine, UINT8 data)
 		memory_install_readwrite8_handler(program, 0xc000, 0xdfff, 0, 0, SMH_BANK(4), SMH_BANK(4));
 		memory_install_readwrite8_handler(program, 0xe000, 0xe7ff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 		memory_set_bank(machine, 4, 1);
-		logerror("0xc000-0xdfff = video RAM\n");
+		//logerror("0xc000-0xdfff = video RAM\n");
 	}
 	else
 	{
 		/* RAM */
 		memory_install_readwrite8_handler(program, 0xc000, 0xe7ff, 0, 0, SMH_BANK(4), SMH_BANK(4));
 		memory_set_bank(machine, 4, 0);
-		logerror("0xc000-0e7fff = RAM c000-e7fff\n");
+		//logerror("0xc000-0e7fff = RAM c000-e7fff\n");
 	}
 }
 
@@ -172,23 +173,23 @@ static void pc8500_bankswitch(running_machine *machine, UINT8 data)
 			/* ROM cartridge */
 			memory_install_readwrite8_handler(program, 0x0000, 0x7fff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 		}
-		logerror("0x0000-0x7fff = ROM %u\n", rombank);
+		//logerror("0x0000-0x7fff = ROM %u\n", rombank);
 		break;
 
 	case 1: /* RAM 0000H to 7FFFH */
 		memory_install_readwrite8_handler(program, 0x0000, 0x7fff, 0, 0, SMH_BANK(1), SMH_BANK(1));
 		memory_set_bank(machine, 1, 4);
-		logerror("0x0000-0x7fff = RAM 0-7fff\n");
+		//logerror("0x0000-0x7fff = RAM 0-7fff\n");
 		break;
 
 	case 2:	/* RAM 8000H to FFFFH */
 		memory_install_readwrite8_handler(program, 0x0000, 0x7fff, 0, 0, SMH_BANK(1), SMH_BANK(1));
 		memory_set_bank(machine, 1, 5);
-		logerror("0x0000-0x7fff = RAM 8000-ffff\n");
+		//logerror("0x0000-0x7fff = RAM 8000-ffff\n");
 		break;
 
 	case 3: /* invalid */
-		logerror("0x0000-0x7fff = invalid\n");
+		//logerror("0x0000-0x7fff = invalid\n");
 		break;
 	}
 
@@ -197,19 +198,19 @@ static void pc8500_bankswitch(running_machine *machine, UINT8 data)
 	case 0: /* cell addresses 0000H to 03FFFH */
 		memory_install_readwrite8_handler(program, 0x8000, 0xbfff, 0, 0, SMH_BANK(3), SMH_BANK(3));
 		memory_set_bank(machine, 3, 0);
-		logerror("0x8000-0xbfff = RAM 0-3fff\n");
+		//logerror("0x8000-0xbfff = RAM 0-3fff\n");
 		break;
 
 	case 1: /* cell addresses 4000H to 7FFFH */
 		memory_install_readwrite8_handler(program, 0x8000, 0xbfff, 0, 0, SMH_BANK(3), SMH_BANK(3));
 		memory_set_bank(machine, 3, 1);
-		logerror("0x8000-0xbfff = RAM 4000-7fff\n");
+		//logerror("0x8000-0xbfff = RAM 4000-7fff\n");
 		break;
 
 	case 2: /* cell addresses 8000H to BFFFH */
 		memory_install_readwrite8_handler(program, 0x8000, 0xbfff, 0, 0, SMH_BANK(3), SMH_BANK(3));
 		memory_set_bank(machine, 3, 2);
-		logerror("0x8000-0xbfff = RAM 8000-bfff\n");
+		//logerror("0x8000-0xbfff = RAM 8000-bfff\n");
 		break;
 
 	case 3: /* RAM cartridge */
@@ -222,7 +223,7 @@ static void pc8500_bankswitch(running_machine *machine, UINT8 data)
 		{
 			memory_install_readwrite8_handler(program, 0x8000, 0xbfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 		}
-		logerror("0x8000-0xbfff = RAM cartridge\n");
+		//logerror("0x8000-0xbfff = RAM cartridge\n");
 		break;
 	}
 
@@ -232,14 +233,14 @@ static void pc8500_bankswitch(running_machine *machine, UINT8 data)
 		memory_install_readwrite8_handler(program, 0xc000, 0xdfff, 0, 0, SMH_BANK(4), SMH_BANK(4));
 		memory_install_readwrite8_handler(program, 0xe000, 0xe7ff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 		memory_set_bank(machine, 4, 1);
-		logerror("0xc000-0xdfff = video RAM\n");
+		//logerror("0xc000-0xdfff = video RAM\n");
 	}
 	else
 	{
 		/* RAM */
 		memory_install_readwrite8_handler(program, 0xc000, 0xe7ff, 0, 0, SMH_BANK(4), SMH_BANK(4));
 		memory_set_bank(machine, 4, 0);
-		logerror("0xc000-0e7fff = RAM c000-e7fff\n");
+		//logerror("0xc000-0e7fff = RAM c000-e7fff\n");
 	}
 }
 
@@ -279,9 +280,24 @@ static READ8_HANDLER( mmr_r )
 
 static READ8_HANDLER( rtc_r )
 {
+	/*
+
+		bit		description
+
+		0		
+		1		RTC DATA OUT
+		2		
+		3		
+		4		
+		5		
+		6		
+		7
+
+	*/
+
 	pc8401a_state *state = space->machine->driver_data;
 
-	return state->upd1990a_data;
+	return state->upd1990a_data << 1;
 }
 
 static WRITE8_HANDLER( rtc_cmd_w )
@@ -307,7 +323,7 @@ static WRITE8_HANDLER( rtc_cmd_w )
 	upd1990a_c1_w(state->upd1990a, BIT(data, 1));
 	upd1990a_c2_w(state->upd1990a, BIT(data, 2));
 	upd1990a_data_w(state->upd1990a, BIT(data, 3));
-//	logerror("10 %02x\n", data);
+//	//logerror("10 %02x\n", data);
 }
 
 static WRITE8_HANDLER( rtc_ctrl_w )
@@ -340,7 +356,7 @@ static READ8_HANDLER( io_rom_data_r )
 
 	UINT8 *iorom = memory_region(space->machine, "iorom");
 
-	logerror("I/O ROM read from %05x\n", state->io_addr);
+	//logerror("I/O ROM read from %05x\n", state->io_addr);
 
 	return iorom[state->io_addr];
 }
@@ -401,8 +417,8 @@ static ADDRESS_MAP_START( pc8500_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x40, 0x40) AM_READWRITE(rtc_r, rtc_ctrl_w)
 //	AM_RANGE(0x41, 0x41)
 //	AM_RANGE(0x50, 0x51) USART?
-	AM_RANGE(0x60, 0x60) AM_DEVREADWRITE(SED1330_TAG, sed1330_data_r, sed1330_data_w)
-	AM_RANGE(0x61, 0x61) AM_DEVREADWRITE(SED1330_TAG, sed1330_status_r, sed1330_command_w)
+	AM_RANGE(0x60, 0x60) AM_DEVREADWRITE(SED1330_TAG, sed1330_status_r, sed1330_data_w)
+	AM_RANGE(0x61, 0x61) AM_DEVREADWRITE(SED1330_TAG, sed1330_data_r, sed1330_command_w)
 //	AM_RANGE(0x70, 0x71)
 //	AM_RANGE(0x80, 0x80) modem status, set to 0xff to boot
 //	AM_RANGE(0x90, 0x93)
@@ -541,8 +557,8 @@ static const ppi8255_interface pc8401a_ppi8255_interface =
 
 static PALETTE_INIT( pc8401a )
 {
-	palette_set_color(machine, 0, MAKE_RGB(138, 146, 148));
-	palette_set_color(machine, 1, MAKE_RGB(92, 83, 88));
+	palette_set_color(machine, 0, MAKE_RGB(39, 108, 51));
+	palette_set_color(machine, 1, MAKE_RGB(16, 37, 84));
 }
 
 static VIDEO_UPDATE( pc8401a )
@@ -691,7 +707,7 @@ static MACHINE_DRIVER_START( pc8500 )
 	MDRV_SCREEN_SIZE(480, 208)
 	MDRV_SCREEN_VISIBLE_AREA(0, 480-1, 0, 200-1)
 
-//	MDRV_DEFAULT_LAYOUT(layout_pc8500)
+	MDRV_DEFAULT_LAYOUT(layout_pc8500)
 	
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(pc8401a)
