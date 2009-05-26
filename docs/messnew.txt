@@ -54,6 +54,8 @@ Skeleton drivers :
 - Epson QX-10
 - FK-1
 - Fujitsu FM7
+- Fujitsu FM77AV
+- Fujitsu FM77AV40SX
 - Heathkit ET-3400
 - Hubler/Everts MC
 - Interact Family Computer
@@ -74,6 +76,8 @@ Skeleton drivers :
 - NEC PC-6600SR
 - NEC PC-8500
 - NEC PC-88 VA
+- NEC PC-9801
+- NEC PC-9821
 - Olivetti L1 M20
 - Olivetti L1 M40
 - Philips VG-5000

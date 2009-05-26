@@ -228,7 +228,7 @@ const game_driver * const drivers[] =
 	DRIVER( bbcm)		/* 198? BBC Master									*/
 	DRIVER( bbcbc )		/* 1985 BBC Bridge Companion						*/
 	DRIVER( electron )	/* 1983 Acorn Electron								*/
-//	DRIVER( a310 )		/* 1988 Acorn Archimedes 310						*/
+	DRIVER( a310 )		/* 1988 Acorn Archimedes 310						*/
 	DRIVER( a6809 )
 
 	/* CAMBRIDGE COMPUTERS */
@@ -641,6 +641,8 @@ const game_driver * const drivers[] =
 	DRIVER( pc8801ma2 )	/* PC-8801MA2 (High res display, VSYNC 24 kHz)		*/
 	DRIVER( pc8801mc )	/* PC-8801MC (High res display, VSYNC 24 kHz)		*/
 	DRIVER( pc88va )	/* PC-88 VA											*/
+	DRIVER( pc9801 )	/* PC-9801											*/
+	DRIVER( pc9821 )	/* PC-9821											*/
 
 	/* CANTAB */
 	DRIVER( jupiter )	/* Jupiter Ace										*/
@@ -1254,6 +1256,8 @@ const game_driver * const drivers[] =
 
 	/* Fujitsu */
 	DRIVER( fm7 )
+	DRIVER( fm77av )
+	DRIVER( fm7740sx )
 	DRIVER( fmtowns )   /* 1989 Fujitsu FM-Towns */
 	DRIVER( fmtownsa )
 	DRIVER( fmtmarty )  /* 1993 Fujitsu FM-Towns Marty */
