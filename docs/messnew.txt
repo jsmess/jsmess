@@ -33,7 +33,7 @@ New System Drivers Supported (in no particular order):
 - Timex Sinclair 1500 [Robbbert, Miodrag Milanovic]
 - Votrax Type-'N-Talk (not working) [Lord Nightmare, Kevtris]
 - Palm IIIc,Palm m100,Palm m130,Palm m505,Palm m515 
-  Palm V, Palm Vx,Visor Egde (not working) [Miodrag Milanovic]
+  Palm V, Palm Vx,Visor Edge (not working) [Miodrag Milanovic]
   
 Skeleton drivers : 
 ------------------

@@ -440,7 +440,7 @@ COMP( 2001, palmm505, pilot1k,  0,       palm,     palm,     palm,     palmiii, 
 COMP( 2001, palmm515, pilot1k,  0,       palm,     palm,     palm,     palmiii,  "Palm Inc.", "Palm m515", GAME_NOT_WORKING )
 COMP( 1999, palmv,    pilot1k,  0,       palm,     palm,     palm,     palmv,  	 "3Com", "Palm V", GAME_NOT_WORKING )
 COMP( 1999, palmvx,   pilot1k,  0,       palm,     palm,     palm,     palmvx,   "Palm Inc.", "Palm Vx", GAME_NOT_WORKING )
-COMP( 2001, visor,    pilot1k,  0,       palm,     palm,     palm,     palmvx,   "Handspring", "Visor Egde", GAME_NOT_WORKING )
+COMP( 2001, visor,    pilot1k,  0,       palm,     palm,     palm,     palmvx,   "Handspring", "Visor Edge", GAME_NOT_WORKING )
 
 static const char *lookup_trap(UINT16 opcode)
 {
