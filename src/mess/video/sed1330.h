@@ -1,6 +1,6 @@
 /**********************************************************************
 
-    SED1330 LCD Controller emulation
+    Seiko-Epson SED1330 LCD Controller emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.

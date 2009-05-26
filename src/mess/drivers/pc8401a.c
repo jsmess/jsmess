@@ -9,9 +9,11 @@
 
 /*
 
+	NEC PC-8401A-LS "Starlet"
+	NEC PC-8500 "Studley"
+
 	TODO:
 
-	- LCD controller
 	- keyboard
 	- 8251 USART
 	- 8255 ports
@@ -22,6 +24,7 @@
 		* PC-8441A CRT / Disk Interface
 		* PC-8461A 1200 Baud Modem
 		* PC-8407A 128KB RAM Expansion
+		* PC-8508A ROM/RAM Cartridge
 
 */
 
@@ -90,8 +93,15 @@ static void pc8401a_bankswitch(running_machine *machine, UINT8 data)
 		break;
 
 	case 3: /* RAM cartridge */
-		memory_install_readwrite8_handler(program, 0x8000, 0xbfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
-//		memory_set_bank(machine, 3, 3); // TODO or 4
+		if (mess_ram_size > 64)
+		{
+			memory_install_readwrite8_handler(program, 0x8000, 0xbfff, 0, 0, SMH_BANK(3), SMH_BANK(3));
+			memory_set_bank(machine, 3, 3); // TODO or 4
+		}
+		else
+		{
+			memory_install_readwrite8_handler(program, 0x8000, 0xbfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		}
 		logerror("0x8000-0xbfff = RAM cartridge\n");
 		break;
 	}
@@ -203,8 +213,15 @@ static void pc8500_bankswitch(running_machine *machine, UINT8 data)
 		break;
 
 	case 3: /* RAM cartridge */
-		memory_install_readwrite8_handler(program, 0x8000, 0xbfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
-//		memory_set_bank(machine, 3, 3); // TODO or 4
+		if (mess_ram_size > 64)
+		{
+			memory_install_readwrite8_handler(program, 0x8000, 0xbfff, 0, 0, SMH_BANK(3), SMH_BANK(3));
+			memory_set_bank(machine, 3, 3); // TODO or 4
+		}
+		else
+		{
+			memory_install_readwrite8_handler(program, 0x8000, 0xbfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		}
 		logerror("0x8000-0xbfff = RAM cartridge\n");
 		break;
 	}
@@ -443,6 +460,7 @@ static MACHINE_START( pc8500 )
 
 	/* find devices */
 	state->upd1990a = devtag_get_device(machine, UPD1990A_TAG);
+	state->sed1330 = devtag_get_device(machine, SED1330_TAG);
 
 	/* initialize RTC */
 	upd1990a_cs_w(state->upd1990a, 1);
@@ -562,16 +580,16 @@ static VIDEO_UPDATE( pc8500 )
 	return 0;
 }
 
-static READ8_DEVICE_HANDLER( pc8500_sed1330_vd_r )
+static READ8_HANDLER( pc8500_sed1330_vd_r )
 {
-	pc8401a_state *state = device->machine->driver_data;
+	pc8401a_state *state = space->machine->driver_data;
 
 	return state->video_ram[offset & PC8500_VIDEORAM_MASK];
 }
 
-static WRITE8_DEVICE_HANDLER( pc8500_sed1330_vd_w )
+static WRITE8_HANDLER( pc8500_sed1330_vd_w )
 {
-	pc8401a_state *state = device->machine->driver_data;
+	pc8401a_state *state = space->machine->driver_data;
 
 	state->video_ram[offset & PC8500_VIDEORAM_MASK] = data;
 }
@@ -579,8 +597,8 @@ static WRITE8_DEVICE_HANDLER( pc8500_sed1330_vd_w )
 static SED1330_INTERFACE( pc8500_sed1330_config )
 {
 	SCREEN_TAG,
-	DEVCB_DEVICE_HANDLER(SED1330_TAG, pc8500_sed1330_vd_r),
-	DEVCB_DEVICE_HANDLER(SED1330_TAG, pc8500_sed1330_vd_w)
+	DEVCB_MEMORY_HANDLER(Z80_TAG, PROGRAM, pc8500_sed1330_vd_r),
+	DEVCB_MEMORY_HANDLER(Z80_TAG, PROGRAM, pc8500_sed1330_vd_w)
 };
 
 /* uPD1990A Interface */
@@ -616,7 +634,7 @@ static MACHINE_DRIVER_START( pc8401a )
 	MDRV_DRIVER_DATA(pc8401a_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80_TAG, Z80, 4000000)
+	MDRV_CPU_ADD(Z80_TAG, Z80, 4000000) // NEC uPD70008C
 	MDRV_CPU_PROGRAM_MAP(pc8401a_mem)
 	MDRV_CPU_IO_MAP(pc8401a_io)
 	
@@ -660,7 +678,7 @@ static MACHINE_DRIVER_START( pc8500 )
 	MDRV_DRIVER_DATA(pc8401a_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80_TAG, Z80, 4000000)
+	MDRV_CPU_ADD(Z80_TAG, Z80, 4000000) // NEC uPD70008C
 	MDRV_CPU_PROGRAM_MAP(pc8401a_mem)
 	MDRV_CPU_IO_MAP(pc8500_io)
 	
@@ -670,7 +688,7 @@ static MACHINE_DRIVER_START( pc8500 )
 	MDRV_SCREEN_ADD(SCREEN_TAG, LCD)
 	MDRV_SCREEN_REFRESH_RATE(44)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(480, 200)
+	MDRV_SCREEN_SIZE(480, 208)
 	MDRV_SCREEN_VISIBLE_AREA(0, 480-1, 0, 200-1)
 
 //	MDRV_DEFAULT_LAYOUT(layout_pc8500)
@@ -737,4 +755,7 @@ SYSTEM_CONFIG_END
 
 /*    YEAR  NAME		PARENT	COMPAT	MACHINE		INPUT		INIT	CONFIG		COMPANY	FULLNAME */
 COMP( 1984,	pc8401a,	0,		0,		pc8401a,	pc8401a,	0,		pc8401a,	"NEC",	"PC-8401A-LS", GAME_NOT_WORKING )
+/*
+COMP( 1984,	pc8401bd,	pc8401a,0,		pc8401a,	pc8401a,	0,		pc8401a,	"NEC",	"PC-8401BD", GAME_NOT_WORKING )
+*/
 COMP( 1985, pc8500,		0,		0,		pc8500,		pc8401a,	0,		pc8500,		"NEC",	"PC-8500", GAME_NOT_WORKING )
