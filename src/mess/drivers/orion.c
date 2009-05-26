@@ -294,6 +294,8 @@ ROM_START( orionz80 )
     ROMX_LOAD( "m34zrk.bin",  0x0f800, 0x0800, CRC(787c3903) SHA1(476c1c0b88e5efb582292eebec15e24d054c8851), ROM_BIOS(4) )
     ROM_SYSTEM_BIOS( 4, "m35zrkd", "Version 3.5 zrkd" )
     ROMX_LOAD( "m35zrkd.bin", 0x0f800, 0x0800, CRC(9368b38f) SHA1(64a77f22119d40c9b18b64d78ad12acc6fff9efb), ROM_BIOS(5) )
+    ROM_SYSTEM_BIOS( 5, "peter", "Peterburg '91" )
+    ROMX_LOAD( "peter.bin",   0x0f800, 0x0800, CRC(df9b1d8c) SHA1(c7f1e074e58ad1c1799cf522161b4f4cffa5aefa), ROM_BIOS(6) )
     ROM_CART_LOAD("cart", 0x10000, 0x10000, ROM_FILL_FF | ROM_OPTIONAL)
 ROM_END
 
