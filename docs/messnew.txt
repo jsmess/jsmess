@@ -32,7 +32,9 @@ New System Drivers Supported (in no particular order):
 - TK85 [Robbbert, Miodrag Milanovic]
 - Timex Sinclair 1500 [Robbbert, Miodrag Milanovic]
 - Votrax Type-'N-Talk (not working) [Lord Nightmare, Kevtris]
-
+- Palm IIIc,Palm m100,Palm m130,Palm m505,Palm m515 
+  Palm V, Palm Vx,Visor Egde (not working) [Miodrag Milanovic]
+  
 Skeleton drivers : 
 ------------------
 - Acorn 6809

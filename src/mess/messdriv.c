@@ -498,7 +498,15 @@ const game_driver * const drivers[] =
 	DRIVER( pilot5k )	/* Pilot 5000 */
 	DRIVER( palmpers )	/* Palm Pilot Personal */
 	DRIVER( palmpro )	/* Palm Pilot Professional */
-	DRIVER( palmiii )   	/* Palm III */
+	DRIVER( palmiii )   /* Palm III */
+	DRIVER( palmiiic)   /* Palm IIIc */
+	DRIVER( palmv )   	/* Palm V */
+	DRIVER( palmvx )   	/* Palm Vx */
+	DRIVER( palmm100 )	/* Palm m100 */
+	DRIVER( palmm130 )	/* Palm m130 */
+	DRIVER( palmm505 )	/* Palm m505 */
+	DRIVER( palmm515 )	/* Palm m515 */
+	DRIVER( visor )		/* Palm Visor Edge */
 
 	/* OSBORNE */
 	DRIVER( osborne1 )	/* 1981 Osborne-1									*/
