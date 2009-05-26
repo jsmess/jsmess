@@ -11,11 +11,12 @@
 
 	TODO:
 
-	- pc8500 writes data expecting the CSRDIR to be +1 or +AP but does not set it
 	- reset behavior
 	- busy flag timing
 	- cursor flashing
+	- display page flashing
 	- internal chargen ROM
+	- horizontal dot scroll
 	- XOR/AND/Priority-OR compositions
 	- text mode character display
 	- single panel text mode
@@ -30,7 +31,7 @@
     PARAMETERS
 ***************************************************************************/
 
-#define LOG 0
+#define LOG 1
 
 #define SED1330_INSTRUCTION_SYSTEM_SET		0x40
 #define SED1330_INSTRUCTION_SLEEP_IN		0x53	/* unimplemented */
@@ -52,18 +53,18 @@
 
 #define SED1330_CSRDIR_RIGHT				0x00
 #define SED1330_CSRDIR_LEFT					0x01
-#define SED1330_CSRDIR_UP					0x10
-#define SED1330_CSRDIR_DOWN					0x11
+#define SED1330_CSRDIR_UP					0x02
+#define SED1330_CSRDIR_DOWN					0x03
 
 #define SED1330_MX_OR						0x00
 #define SED1330_MX_XOR						0x01	/* unimplemented */
-#define SED1330_MX_AND						0x10	/* unimplemented */
-#define SED1330_MX_PRIORITY_OR				0x11	/* unimplemented */
+#define SED1330_MX_AND						0x02	/* unimplemented */
+#define SED1330_MX_PRIORITY_OR				0x03	/* unimplemented */
 
 #define SED1330_FC_OFF						0x00	/* unimplemented */
-#define SED1330_FC_NO_FLASH					0x01	/* unimplemented */
-#define SED1330_FC_FLASH_32					0x10	/* unimplemented */
-#define SED1330_FC_FLASH_16					0x11	/* unimplemented */
+#define SED1330_FC_SOLID					0x01	/* unimplemented */
+#define SED1330_FC_FLASH_32					0x02	/* unimplemented */
+#define SED1330_FC_FLASH_64					0x03	/* unimplemented */
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -75,8 +76,8 @@ struct _sed1330_t
 	devcb_resolved_read8		in_vd_func;
 	devcb_resolved_write8		out_vd_func;
 
-	/* registers */
 	int bf;						/* busy flag */
+
 	UINT8 ir;					/* instruction register */
 	UINT8 dor;					/* data output register */
 	int pbc;					/* parameter byte counter */
@@ -106,6 +107,7 @@ struct _sed1330_t
 	int sl1;					/* display block 1 height in lines */
 	int sl2;					/* display block 2 height in lines */
 	int hdotscr;				/* horizontal dot scroll in pixels */
+	int fp;						/* display page flash control */
 
 	UINT16 csr;					/* cursor address register */
 	int cd;						/* cursor increment direction */
@@ -113,17 +115,13 @@ struct _sed1330_t
 	int cry;					/* cursor height or location */
 	int cm;						/* cursor shape (0=underscore, 1=block) */
 	int fc;						/* cursor flash control */
-	int fp;						/* cursor flash control */
 
 	int mx;						/* screen layer composition method */
-	int dm;						/* display mode for screen blocks 1, 3 */
+	int dm;						/* display mode for pages 1, 3 */
 	int ov;						/* graphics mode layer composition */
 
 	/* devices */
 	const device_config *screen;
-
-	/* timers */
-	emu_timer *busy_timer;
 };
 
 /***************************************************************************
@@ -171,33 +169,6 @@ INLINE void increment_csr(sed1330_t *sed1330)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    TIMER_CALLBACK( busy_tick )
--------------------------------------------------*/
-
-static TIMER_CALLBACK( busy_tick )
-{
-	const device_config *device = ptr;
-	sed1330_t *sed1330 = get_safe_token(device);
-
-	/* clear busy flag */
-	sed1330->bf = 0;
-}
-
-/*-------------------------------------------------
-    set_busy_flag - set busy flag and arm timer
-					to clear it later
--------------------------------------------------*/
-#ifdef UNUSED_FUNCTION
-static void set_busy_flag(sed1330_t *sed1330, int period)
-{
-	/* set busy flag */
-	sed1330->bf = 1;
-
-	/* adjust busy timer */
-	timer_adjust_oneshot(sed1330->busy_timer, ATTOTIME_IN_USEC(period), 0);
-}
-#endif
-/*-------------------------------------------------
     sed1330_status_r - status read
 -------------------------------------------------*/
 
@@ -220,6 +191,31 @@ WRITE8_DEVICE_HANDLER( sed1330_command_w )
 
 	sed1330->ir = data;
 	sed1330->pbc = 0;
+
+	switch (sed1330->ir)
+	{
+/*
+	case SED1330_INSTRUCTION_SLEEP_IN:
+		break;
+*/
+	case SED1330_INSTRUCTION_CSRDIR_RIGHT:
+	case SED1330_INSTRUCTION_CSRDIR_LEFT:
+	case SED1330_INSTRUCTION_CSRDIR_UP:
+	case SED1330_INSTRUCTION_CSRDIR_DOWN:
+		sed1330->cd = data & 0x03;
+
+		if (LOG)
+		{
+			switch (sed1330->cd)
+			{
+			case SED1330_CSRDIR_RIGHT:	logerror("SED1330 '%s' Cursor Direction: Right\n", device->tag);	break;
+			case SED1330_CSRDIR_LEFT:	logerror("SED1330 '%s' Cursor Direction: Left\n", device->tag);		break;
+			case SED1330_CSRDIR_UP:		logerror("SED1330 '%s' Cursor Direction: Up\n", device->tag);		break;
+			case SED1330_CSRDIR_DOWN:	logerror("SED1330 '%s' Cursor Direction: Down\n", device->tag);		break;
+			}
+		}
+		break;
+	}
 }
 
 /*-------------------------------------------------
@@ -315,10 +311,7 @@ WRITE8_DEVICE_HANDLER( sed1330_data_w )
 			logerror("SED1330 '%s' Invalid parameter byte %02x\n", device->tag, data);
 		}
 		break;
-/*
-	case SED1330_INSTRUCTION_SLEEP_IN:
-		break;
-*/
+
 	case SED1330_INSTRUCTION_DISP_ON:
 	case SED1330_INSTRUCTION_DISP_OFF:
 		sed1330->d = BIT(data, 0);
@@ -327,6 +320,38 @@ WRITE8_DEVICE_HANDLER( sed1330_data_w )
 		if (LOG)
 		{
 			logerror("SED1330 '%s' Display: %s\n", device->tag, BIT(data, 0) ? "enabled" : "disabled");
+
+			switch (sed1330->fc)
+			{
+			case SED1330_FC_OFF:		logerror("SED1330 '%s' Cursor: disabled\n", device->tag);	break;
+			case SED1330_FC_SOLID:		logerror("SED1330 '%s' Cursor: solid\n", device->tag);		break;
+			case SED1330_FC_FLASH_32:	logerror("SED1330 '%s' Cursor: fFR/32\n", device->tag);		break;
+			case SED1330_FC_FLASH_64:	logerror("SED1330 '%s' Cursor: fFR/64\n", device->tag);		break;
+			}
+			
+			switch (sed1330->fp & 0x03)
+			{
+			case SED1330_FC_OFF:		logerror("SED1330 '%s' Display Page 1: disabled\n", device->tag);		break;
+			case SED1330_FC_SOLID:		logerror("SED1330 '%s' Display Page 1: enabled\n", device->tag);		break;
+			case SED1330_FC_FLASH_32:	logerror("SED1330 '%s' Display Page 1: flash fFR/32\n", device->tag);	break;
+			case SED1330_FC_FLASH_64:	logerror("SED1330 '%s' Display Page 1: flash fFR/64\n", device->tag);	break;
+			}
+			
+			switch ((sed1330->fp >> 2) & 0x03)
+			{
+			case SED1330_FC_OFF:		logerror("SED1330 '%s' Display Page 2/4: disabled\n", device->tag);		break;
+			case SED1330_FC_SOLID:		logerror("SED1330 '%s' Display Page 2/4: enabled\n", device->tag);		break;
+			case SED1330_FC_FLASH_32:	logerror("SED1330 '%s' Display Page 2/4: flash fFR/32\n", device->tag);	break;
+			case SED1330_FC_FLASH_64:	logerror("SED1330 '%s' Display Page 2/4: flash fFR/64\n", device->tag);	break;
+			}
+
+			switch ((sed1330->fp >> 4) & 0x03)
+			{
+			case SED1330_FC_OFF:		logerror("SED1330 '%s' Display Page 3: disabled\n", device->tag);		break;
+			case SED1330_FC_SOLID:		logerror("SED1330 '%s' Display Page 3: enabled\n", device->tag);		break;
+			case SED1330_FC_FLASH_32:	logerror("SED1330 '%s' Display Page 3: flash fFR/32\n", device->tag);	break;
+			case SED1330_FC_FLASH_64:	logerror("SED1330 '%s' Display Page 3: flash fFR/64\n", device->tag);	break;
+			}
 		}
 		break;
 
@@ -344,7 +369,7 @@ WRITE8_DEVICE_HANDLER( sed1330_data_w )
 
 		case 2:
 			sed1330->sl1 = data + 1;
-			if (LOG) logerror("SED1330 '%s' Display Page 1 Screen Lines: %u\n", device->tag, sed1330->sl1);
+			if (LOG) logerror("SED1330 '%s' Display Block 1 Screen Lines: %u\n", device->tag, sed1330->sl1);
 			break;
 
 		case 3:
@@ -358,7 +383,7 @@ WRITE8_DEVICE_HANDLER( sed1330_data_w )
 
 		case 5:
 			sed1330->sl2 = data + 1;
-			if (LOG) logerror("SED1330 '%s' Display Page 2 Screen Lines: %u\n", device->tag, sed1330->sl2);
+			if (LOG) logerror("SED1330 '%s' Display Block 2 Screen Lines: %u\n", device->tag, sed1330->sl2);
 			break;
 
 		case 6:
@@ -405,7 +430,7 @@ WRITE8_DEVICE_HANDLER( sed1330_data_w )
 		default:
 			logerror("SED1330 '%s' Invalid parameter byte %02x\n", device->tag, data);
 		}
-		sed1330->cd = SED1330_CSRDIR_DOWN; // HACK
+//		sed1330->cd = SED1330_CSRDIR_DOWN; // HACK
 		break;
 
 	case SED1330_INSTRUCTION_CGRAM_ADR:
@@ -425,23 +450,6 @@ WRITE8_DEVICE_HANDLER( sed1330_data_w )
 		}
 		break;
 
-	case SED1330_INSTRUCTION_CSRDIR_RIGHT:
-	case SED1330_INSTRUCTION_CSRDIR_LEFT:
-	case SED1330_INSTRUCTION_CSRDIR_UP:
-	case SED1330_INSTRUCTION_CSRDIR_DOWN:
-		sed1330->cd = data & 0x03;
-		if (LOG)
-		{
-			switch (sed1330->cd)
-			{
-			case SED1330_CSRDIR_RIGHT:	logerror("SED1330 '%s' Cursor Direction: Right\n", device->tag);	break;
-			case SED1330_CSRDIR_LEFT:	logerror("SED1330 '%s' Cursor Direction: Left\n", device->tag);		break;
-			case SED1330_CSRDIR_UP:		logerror("SED1330 '%s' Cursor Direction: Up\n", device->tag);		break;
-			case SED1330_CSRDIR_DOWN:	logerror("SED1330 '%s' Cursor Direction: Down\n", device->tag);		break;
-			}
-		}
-		break;
-
 	case SED1330_INSTRUCTION_HDOT_SCR:
 		sed1330->hdotscr = data & 0x07;
 		if (LOG) logerror("SED1330 '%s' Horizontal Dot Scroll: %u\n", device->tag, sed1330->hdotscr);
@@ -456,21 +464,10 @@ WRITE8_DEVICE_HANDLER( sed1330_data_w )
 		{
 			switch (sed1330->mx)
 			{
-			case SED1330_MX_OR:
-				logerror("SED1330 '%s' Layered Screen Composition Method: OR\n", device->tag);
-				break;
-			
-			case SED1330_MX_XOR:
-				logerror("SED1330 '%s' Layered Screen Composition Method: Exclusive-OR\n", device->tag);
-				break;
-			
-			case SED1330_MX_AND:
-				logerror("SED1330 '%s' Layered Screen Composition Method: AND\n", device->tag);
-				break;
-
-			case SED1330_MX_PRIORITY_OR:
-				logerror("SED1330 '%s' Layered Screen Composition Method: Priority-OR\n", device->tag);
-				break;
+			case SED1330_MX_OR:				logerror("SED1330 '%s' Display Composition Method: OR\n", device->tag);				break;
+			case SED1330_MX_XOR:			logerror("SED1330 '%s' Display Composition Method: Exclusive-OR\n", device->tag);	break;
+			case SED1330_MX_AND:			logerror("SED1330 '%s' Display Composition Method: AND\n", device->tag);			break;
+			case SED1330_MX_PRIORITY_OR:	logerror("SED1330 '%s' Display Composition Method: Priority-OR\n", device->tag);	break;
 			}
 
 			logerror("SED1330 '%s' Display Page 1 Mode: %s\n", device->tag, BIT(data, 2) ? "Graphics" : "Text");
@@ -484,12 +481,11 @@ WRITE8_DEVICE_HANDLER( sed1330_data_w )
 		{
 		case 0:
 			sed1330->csr = (sed1330->csr & 0xff00) | data;
-			if (LOG) logerror("SED1330 '%s' Cursor Address Low %02x %04x %u\n", device->tag, data, sed1330->csr, sed1330->csr/80);
 			break;
 
 		case 1:		
 			sed1330->csr = (data << 8) | (sed1330->csr & 0xff);
-			if (LOG) logerror("SED1330 '%s' Cursor Address High %02x %04x %u\n", device->tag, data, sed1330->csr, sed1330->csr/80);
+			if (LOG) logerror("SED1330 '%s' Cursor Address %04x\n", device->tag, sed1330->csr);
 			break;
 
 		default:
@@ -501,7 +497,7 @@ WRITE8_DEVICE_HANDLER( sed1330_data_w )
 		break;
 */
 	case SED1330_INSTRUCTION_MWRITE:
-		if (LOG) logerror("SED1330 '%s' Memory Write %02x to %04x\n", device->tag, data, sed1330->csr);
+		if (LOG) logerror("SED1330 '%s' Memory Write %02x to %04x (row %u col %u line %u)\n", device->tag, data, sed1330->csr, sed1330->csr/80/8, sed1330->csr%80, sed1330->csr/80);
 
 		devcb_call_write8(&sed1330->out_vd_func, sed1330->csr, data);
 
@@ -538,7 +534,7 @@ static void draw_text_scanline(sed1330_t *sed1330, bitmap_t *bitmap, const recta
 				{
 					for (x = 0; x < sed1330->crx; x++)
 					{
-						*BITMAP_ADDR16(bitmap, y, sed1330->hdotscr + (sx * sed1330->fx) + x) = 1;
+						*BITMAP_ADDR16(bitmap, y, (sx * sed1330->fx) + x) = 1;
 					}
 				}
 			}
@@ -549,7 +545,7 @@ static void draw_text_scanline(sed1330_t *sed1330, bitmap_t *bitmap, const recta
 				{
 					for (x = 0; x < sed1330->crx; x++)
 					{
-						*BITMAP_ADDR16(bitmap, y, sed1330->hdotscr + (sx * sed1330->fx) + x) = 1;
+						*BITMAP_ADDR16(bitmap, y, (sx * sed1330->fx) + x) = 1;
 					}
 				}
 			}
@@ -571,7 +567,7 @@ static void draw_graphics_scanline(sed1330_t *sed1330, bitmap_t *bitmap, const r
 
 		for (x = 0; x < sed1330->fx; x++)
 		{
-			*BITMAP_ADDR16(bitmap, y, sed1330->hdotscr + (sx * sed1330->fx) + x) = BIT(data, 7);
+			*BITMAP_ADDR16(bitmap, y, (sx * sed1330->fx) + x) = BIT(data, 7);
 			data <<= 1;
 		}
 	}
@@ -654,9 +650,6 @@ static DEVICE_START( sed1330 )
 	/* get the screen device */
 	sed1330->screen = devtag_get_device(device->machine, intf->screen_tag);
 	assert(sed1330->screen != NULL);
-
-	/* create the busy timer */
-	sed1330->busy_timer = timer_alloc(device->machine, busy_tick, (void *)device);
 
 	/* register for state saving */
 	state_save_register_device_item(device, 0, sed1330->bf);
