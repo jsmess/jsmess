@@ -200,7 +200,7 @@ WRITE8_DEVICE_HANDLER( sed1330_command_w )
 READ8_DEVICE_HANDLER( sed1330_data_r )
 {
 //	sed1330_t *sed1330 = get_safe_token(device);
-logerror("SED1330 '%s' read data\n");
+//logerror("SED1330 '%s' read data\n");
 	return 0;
 }
 
