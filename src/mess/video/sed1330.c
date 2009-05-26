@@ -1,6 +1,6 @@
 /**********************************************************************
 
-    Seiko-Epson SED1330 LCD Timing Controller emulation
+    Seiko-Epson SED1330 LCD Controller emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -11,11 +11,15 @@
 
 	TODO:
 
-	- save states
 	- pc8500 writes data expecting the CSRDIR to be +1 or +AP but does not set it
 	- reset behavior
+	- busy flag timing
+	- cursor flashing
 	- internal chargen ROM
-	- display off
+	- XOR/AND/Priority-OR compositions
+	- text mode character display
+	- single panel text mode
+	- single/dual panel graphics mode
 
 */
 
@@ -29,7 +33,7 @@
 #define LOG 0
 
 #define SED1330_INSTRUCTION_SYSTEM_SET		0x40
-#define SED1330_INSTRUCTION_SLEEP_IN		0x53	/* not implemented */
+#define SED1330_INSTRUCTION_SLEEP_IN		0x53	/* unimplemented */
 #define SED1330_INSTRUCTION_DISP_ON			0x59
 #define SED1330_INSTRUCTION_DISP_OFF		0x58
 #define SED1330_INSTRUCTION_SCROLL			0x44
@@ -42,24 +46,24 @@
 #define SED1330_INSTRUCTION_HDOT_SCR		0x5a
 #define SED1330_INSTRUCTION_OVLAY			0x5b
 #define SED1330_INSTRUCTION_CSRW			0x46
-#define SED1330_INSTRUCTION_CSRR			0x47
+#define SED1330_INSTRUCTION_CSRR			0x47	/* unimplemented */
 #define SED1330_INSTRUCTION_MWRITE			0x42
-#define SED1330_INSTRUCTION_MREAD			0x43
+#define SED1330_INSTRUCTION_MREAD			0x43	/* unimplemented */
 
-#define SED1330_CSRDIR_RIGHT	0x00
-#define SED1330_CSRDIR_LEFT		0x01
-#define SED1330_CSRDIR_UP		0x10
-#define SED1330_CSRDIR_DOWN		0x11
+#define SED1330_CSRDIR_RIGHT				0x00
+#define SED1330_CSRDIR_LEFT					0x01
+#define SED1330_CSRDIR_UP					0x10
+#define SED1330_CSRDIR_DOWN					0x11
 
-#define SED1330_MX_OR			0x00
-#define SED1330_MX_XOR			0x01
-#define SED1330_MX_AND			0x10
-#define SED1330_MX_PRIORITY_OR	0x11
+#define SED1330_MX_OR						0x00
+#define SED1330_MX_XOR						0x01	/* unimplemented */
+#define SED1330_MX_AND						0x10	/* unimplemented */
+#define SED1330_MX_PRIORITY_OR				0x11	/* unimplemented */
 
-#define SED1330_FC_OFF			0x00
-#define SED1330_FC_NO_FLASH		0x01
-#define SED1330_FC_FLASH_32		0x10
-#define SED1330_FC_FLASH_16		0x11
+#define SED1330_FC_OFF						0x00	/* unimplemented */
+#define SED1330_FC_NO_FLASH					0x01	/* unimplemented */
+#define SED1330_FC_FLASH_32					0x10	/* unimplemented */
+#define SED1330_FC_FLASH_16					0x11	/* unimplemented */
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -71,49 +75,49 @@ struct _sed1330_t
 	devcb_resolved_read8		in_vd_func;
 	devcb_resolved_write8		out_vd_func;
 
+	/* registers */
 	int bf;						/* busy flag */
-
 	UINT8 ir;					/* instruction register */
 	UINT8 dor;					/* data output register */
+	int pbc;					/* parameter byte counter */
 
 	int d;						/* display enabled */
+	int sleep;					/* sleep mode */
 
-	int m0;						/*  */
-	int m1;						/*  */
-	int m2;						/*  */
-	int ws;						/*  */
-	int iv;						/*  */
-	int fx;						/* horizontal character size */
-	int fy;						/* vertical character size */
-	int wf;						/* AC frame drive waveform period */
-	int cr;						/* address range covered by 1 display line */
-	int tcr;					/* line length (including horizontal blanking) */
+	UINT16 sag;					/* character generator RAM start address */
+	int m0;						/* character generator ROM (0=internal, 1=external) */
+	int m1;						/* character generator RAM D6 correction (0=no, 1=yes) */
+	int m2;						/* height of character bitmaps (0=8, 1=16 pixels) */
+	int ws;						/* LCD drive method (0=single, 1=dual panel) */
+	int iv;						/* screen origin compensation for inverse display (0=yes, 1=no) */
+	int wf;						/* AC frame drive waveform period (0=16-line, 1=2-frame) */
+
+	int fx;						/* character width in pixels */
+	int fy;						/* character height in pixels */
+	int cr;						/* visible line width in characters */
+	int tcr;					/* total line width in characters (including horizontal blanking) */
 	int lf;						/* frame height in lines */
-	UINT16 ap;					/* horizontal address pitch of the virtual screen */
+	UINT16 ap;					/* virtual screen line width in characters */
 
-	UINT16 sad1;				/* scroll start address */
-	UINT16 sad2;				/* scroll start address */
-	UINT16 sad3;				/* scroll start address */
-	UINT16 sad4;				/* scroll start address */
-	int sl1;					/* scroll block screen lines */
-	int sl2;					/* scroll block screen lines */
-	int hdotscr;				/* horizontal dot scroll */
+	UINT16 sad1;				/* display page 1 start address */
+	UINT16 sad2;				/* display page 2 start address */
+	UINT16 sad3;				/* display page 3 start address */
+	UINT16 sad4;				/* display page 4 start address */
+	int sl1;					/* display block 1 height in lines */
+	int sl2;					/* display block 2 height in lines */
+	int hdotscr;				/* horizontal dot scroll in pixels */
 
 	UINT16 csr;					/* cursor address register */
-	int cd;						/* cursor direction */
-	int crx;					/* horizontal cursor size */
-	int cry;					/* vertical cursor size/location */
+	int cd;						/* cursor increment direction */
+	int crx;					/* cursor width */
+	int cry;					/* cursor height or location */
 	int cm;						/* cursor shape (0=underscore, 1=block) */
 	int fc;						/* cursor flash control */
 	int fp;						/* cursor flash control */
 
-	UINT16 sag;					/* character generator RAM start address */
-
 	int mx;						/* screen layer composition method */
 	int dm;						/* display mode for screen blocks 1, 3 */
 	int ov;						/* graphics mode layer composition */
-
-	int pbc;					/* parameter byte counter */
 
 	/* devices */
 	const device_config *screen;
@@ -232,8 +236,7 @@ READ8_DEVICE_HANDLER( sed1330_data_r )
 
 	sed1330->dor = devcb_call_read8(&sed1330->in_vd_func, sed1330->csr);
 
-	sed1330->csr++;
-//	increment_csr(sed1330);
+	increment_csr(sed1330);
 
 	return data;
 }
@@ -504,17 +507,54 @@ WRITE8_DEVICE_HANDLER( sed1330_data_w )
 
 		increment_csr(sed1330);
 		break;
-
+/*
 	case SED1330_INSTRUCTION_MREAD:
-		sed1330->dor = devcb_call_read8(&sed1330->in_vd_func, sed1330->csr);
-		increment_csr(sed1330);
 		break;
-
+*/
 	default:
 		logerror("SED1330 '%s' Unsupported instruction %02x\n", device->tag, sed1330->ir);
 	}
 
 	sed1330->pbc++;
+}
+
+/*-------------------------------------------------
+    draw_text_scanline - draw one scanline
+	(currently this only draws the text cursor)
+-------------------------------------------------*/
+
+static void draw_text_scanline(sed1330_t *sed1330, bitmap_t *bitmap, const rectangle *cliprect, int y, UINT16 va)
+{
+	int sx, x;
+
+	for (sx = 0; sx < sed1330->cr; sx++)
+	{
+		if ((va + sx) == sed1330->csr)
+		{
+			if (sed1330->cm)
+			{
+				/* block cursor */
+				if (y % sed1330->fy < sed1330->cry)
+				{
+					for (x = 0; x < sed1330->crx; x++)
+					{
+						*BITMAP_ADDR16(bitmap, y, sed1330->hdotscr + (sx * sed1330->fx) + x) = 1;
+					}
+				}
+			}
+			else
+			{
+				/* underscore cursor */
+				if (y % sed1330->fy == sed1330->cry)
+				{
+					for (x = 0; x < sed1330->crx; x++)
+					{
+						*BITMAP_ADDR16(bitmap, y, sed1330->hdotscr + (sx * sed1330->fx) + x) = 1;
+					}
+				}
+			}
+		}
+	}
 }
 
 /*-------------------------------------------------
@@ -553,16 +593,27 @@ static void update_text(sed1330_t *sed1330, bitmap_t *bitmap, const rectangle *c
 {
 	int y;
 	
-	for (y = 0; y < sed1330->sl1; y++)
+	if (sed1330->ws)
 	{
-		UINT16 sad2 = sed1330->sad2 + (y * sed1330->ap);
-		UINT16 sad4 = sed1330->sad4 + (y * sed1330->ap);
+		for (y = 0; y < sed1330->sl1; y++)
+		{
+			UINT16 sad1 = sed1330->sad1 + ((y / sed1330->fy) * sed1330->ap);
+			UINT16 sad2 = sed1330->sad2 + (y * sed1330->ap);
+			UINT16 sad3 = sed1330->sad3 + ((y / sed1330->fy) * sed1330->ap);
+			UINT16 sad4 = sed1330->sad4 + (y * sed1330->ap);
 
-		/* draw graphics display page 2 scanline */
-		draw_graphics_scanline(sed1330, bitmap, cliprect, y, sad2);
+			/* draw graphics display page 2 scanline */
+			draw_graphics_scanline(sed1330, bitmap, cliprect, y, sad2);
 
-		/* draw graphics display page 4 scanline */
-		draw_graphics_scanline(sed1330, bitmap, cliprect, y + sed1330->sl1, sad4);
+			/* draw text display page 1 scanline */
+			draw_text_scanline(sed1330, bitmap, cliprect, y, sad1);
+
+			/* draw graphics display page 4 scanline */
+			draw_graphics_scanline(sed1330, bitmap, cliprect, y + sed1330->sl1, sad4);
+
+			/* draw text display page 3 scanline */
+			draw_text_scanline(sed1330, bitmap, cliprect, y + sed1330->sl1, sad3);
+		}
 	}
 }
 
@@ -584,10 +635,6 @@ void sed1330_update(const device_config *device, bitmap_t *bitmap, const rectang
 		{
 			update_text(sed1330, bitmap, cliprect);
 		}
-	}
-	else
-	{
-		bitmap_fill(bitmap, cliprect, 0);
 	}
 }
 
@@ -612,7 +659,42 @@ static DEVICE_START( sed1330 )
 	sed1330->busy_timer = timer_alloc(device->machine, busy_tick, (void *)device);
 
 	/* register for state saving */
-//	state_save_register_device_item(device, 0, sed1330->);
+	state_save_register_device_item(device, 0, sed1330->bf);
+	state_save_register_device_item(device, 0, sed1330->ir);
+	state_save_register_device_item(device, 0, sed1330->dor);
+	state_save_register_device_item(device, 0, sed1330->pbc);
+	state_save_register_device_item(device, 0, sed1330->d);
+	state_save_register_device_item(device, 0, sed1330->sleep);
+	state_save_register_device_item(device, 0, sed1330->sag);
+	state_save_register_device_item(device, 0, sed1330->m0);
+	state_save_register_device_item(device, 0, sed1330->m1);
+	state_save_register_device_item(device, 0, sed1330->m2);
+	state_save_register_device_item(device, 0, sed1330->ws);
+	state_save_register_device_item(device, 0, sed1330->iv);
+	state_save_register_device_item(device, 0, sed1330->wf);
+	state_save_register_device_item(device, 0, sed1330->fx);
+	state_save_register_device_item(device, 0, sed1330->fy);
+	state_save_register_device_item(device, 0, sed1330->cr);
+	state_save_register_device_item(device, 0, sed1330->tcr);
+	state_save_register_device_item(device, 0, sed1330->lf);
+	state_save_register_device_item(device, 0, sed1330->ap);
+	state_save_register_device_item(device, 0, sed1330->sad1);
+	state_save_register_device_item(device, 0, sed1330->sad2);
+	state_save_register_device_item(device, 0, sed1330->sad3);
+	state_save_register_device_item(device, 0, sed1330->sad4);
+	state_save_register_device_item(device, 0, sed1330->sl1);
+	state_save_register_device_item(device, 0, sed1330->sl2);
+	state_save_register_device_item(device, 0, sed1330->hdotscr);
+	state_save_register_device_item(device, 0, sed1330->csr);
+	state_save_register_device_item(device, 0, sed1330->cd);
+	state_save_register_device_item(device, 0, sed1330->crx);
+	state_save_register_device_item(device, 0, sed1330->cry);
+	state_save_register_device_item(device, 0, sed1330->cm);
+	state_save_register_device_item(device, 0, sed1330->fc);
+	state_save_register_device_item(device, 0, sed1330->fp);
+	state_save_register_device_item(device, 0, sed1330->mx);
+	state_save_register_device_item(device, 0, sed1330->dm);
+	state_save_register_device_item(device, 0, sed1330->ov);
 }
 
 /*-------------------------------------------------
