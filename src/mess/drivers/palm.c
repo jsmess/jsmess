@@ -323,10 +323,12 @@ ROM_START( palmvx )
 	ROM_REGION16_BE( 0x208000, "bios", 0 )
     ROM_SYSTEM_BIOS( 0, "3.3e", "Palm OS 3.3 (English)" ) 
     ROMX_LOAD( "palmvx33-en.rom", 0x000000, 0x200000, CRC(3fc0cc6d) SHA1(6873d5fa99ac372f9587c769940c9b3ac1745a0a), ROM_GROUPWORD | ROM_BIOS(1) ) 
-    ROM_SYSTEM_BIOS( 1, "4.1e", "Palm OS 4.1 (English)" ) 
-    ROMX_LOAD( "palmvx41-en.rom", 0x000000, 0x200000, CRC(e59f4dff) SHA1(5e3000db318eeb8cd1f4d9729d0c9ebca560fa4a), ROM_GROUPWORD | ROM_BIOS(2) ) 
+    ROM_SYSTEM_BIOS( 1, "4.0e", "Palm OS 4.0 (English)" ) 
+    ROMX_LOAD( "palmvx40-en.rom", 0x000000, 0x200000, CRC(488e4638) SHA1(10a10fc8617743ebd5df19c1e99ca040ac1da4f5), ROM_GROUPWORD | ROM_BIOS(2) ) 
+    ROM_SYSTEM_BIOS( 2, "4.1e", "Palm OS 4.1 (English)" ) 
+    ROMX_LOAD( "palmvx41-en.rom", 0x000000, 0x200000, CRC(e59f4dff) SHA1(5e3000db318eeb8cd1f4d9729d0c9ebca560fa4a), ROM_GROUPWORD | ROM_BIOS(3) ) 
     ROM_DEFAULT_BIOS( "4.1e" )
-ROM_END
+ROM_END  
 
 ROM_START( palmiiic )
 	ROM_REGION16_BE( 0x208000, "bios", 0 )
@@ -363,7 +365,10 @@ ROM_START( palmm505 )
     ROM_SYSTEM_BIOS( 0, "4.0e", "Palm OS 4.0 (English)" ) 
     ROMX_LOAD( "palmos40-en-m505.rom", 0x008000, 0x400000, CRC(822a4679) SHA1(a4f5e9f7edb1926647ea07969200c5c5e1521bdf), ROM_GROUPWORD | ROM_BIOS(1) ) 
     ROM_RELOAD(0x000000, 0x004000) 
-    ROM_DEFAULT_BIOS( "4.0e" )
+    ROM_SYSTEM_BIOS( 1, "4.1e", "Palm OS 4.1 (English)" ) 
+    ROMX_LOAD( "palmos41-en-m505.rom", 0x008000, 0x400000, CRC(d248202a) SHA1(65e1bd08b244c589b4cd10fe573e0376aba90e5f), ROM_GROUPWORD | ROM_BIOS(2) ) 
+    ROM_RELOAD(0x000000, 0x004000) 
+    ROM_DEFAULT_BIOS( "4.1e" )
 ROM_END
 
 ROM_START( palmm515 )
