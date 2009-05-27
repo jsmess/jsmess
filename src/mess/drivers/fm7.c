@@ -29,10 +29,54 @@
 
 #include "driver.h"
 #include "cpu/m6809/m6809.h"
+#include "sound/ay8910.h"
+
+UINT8* shared_ram;
+
+READ8_HANDLER( mainmem_r )
+{
+	UINT8* RAM = memory_region(space->machine,"maincpu");
+
+	return RAM[offset];
+}
+
+WRITE8_HANDLER( mainmem_w )
+{
+	UINT8* RAM = memory_region(space->machine,"maincpu");
+
+	RAM[offset] = data;
+}
+
+READ8_HANDLER( vector_r )
+{
+	UINT8* RAM = memory_region(space->machine,"maincpu");
+
+	return RAM[0xfff0+offset];
+}
+
+WRITE8_HANDLER( vector_w )
+{
+	UINT8* RAM = memory_region(space->machine,"maincpu");
+	
+	RAM[0xfff0+offset] = data;
+}
+
+READ8_HANDLER( shared_r )
+{
+	return shared_ram[offset];
+}
+
+WRITE8_HANDLER( shared_w )
+{
+	shared_ram[offset] = data;
+}
+
+READ8_HANDLER( fm7_fd04_r )
+{
+	return 0xff;
+}
 
 
-static ADDRESS_MAP_START( fm7_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_UNMAP_HIGH
 /*
    0000 - 7FFF: (RAM) BASIC working area, user's area
    8000 - FBFF: (ROM) F-BASIC ROM
@@ -41,14 +85,21 @@ static ADDRESS_MAP_START( fm7_mem, ADDRESS_SPACE_PROGRAM, 8 )
    FE00 - FFEF: Boot rom
    FFF0 - FFFF: Interrupt vector table
 */
+// The FM-7 has only 64kB RAM, so we'll worry about banking when we do the later models
+static ADDRESS_MAP_START( fm7_mem, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000,0x7fff) AM_READWRITE(mainmem_r,mainmem_w)
+	AM_RANGE(0x8000,0xfbff) AM_ROM // also F-BASIC ROM, when enabled
+	AM_RANGE(0xfc00,0xfc7f) AM_RAM
+	AM_RANGE(0xfc80,0xfcff) AM_READWRITE(shared_r,shared_w) // shared RAM with sub-CPU
+	// I/O space (FD00-FDFF)
+	AM_RANGE(0xfd04,0xfd04) AM_READ(fm7_fd04_r)
+	AM_RANGE(0xfd0d,0xfd0d) AM_DEVWRITE("psg",ay8910_address_w)
+	AM_RANGE(0xfd0e,0xfd0e) AM_DEVREADWRITE("psg",ay8910_r,ay8910_data_w)
+	// Boot ROM
+	AM_RANGE(0xfe00,0xffef) AM_ROM AM_REGION("basic",0x0000)
+	AM_RANGE(0xfff0,0xffff) AM_READWRITE(vector_r,vector_w) 
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fm7_io , ADDRESS_SPACE_IO, 8)
-	ADDRESS_MAP_UNMAP_HIGH
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( fm7_sub_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_UNMAP_HIGH
 /*
    0000 - 3FFF: Video RAM bank 0 (Blue plane)
    4000 - 7FFF: Video RAM bank 1 (Red plane)
@@ -58,13 +109,16 @@ static ADDRESS_MAP_START( fm7_sub_mem, ADDRESS_SPACE_PROGRAM, 8 )
    C400 - FFDF: (ROM) Graphics command code
    FFF0 - FFFF: Interrupt vector table
 */
+static ADDRESS_MAP_START( fm7_sub_mem, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000,0xbfff) AM_RAM // VRAM
+	AM_RANGE(0xc000,0xcfff) AM_RAM // Console RAM
+	AM_RANGE(0xd000,0xd37f) AM_RAM // Work RAM
+	AM_RANGE(0xd380,0xd3ff) AM_READWRITE(shared_r,shared_w) // shared RAM
+	// I/O space (D400-D7FF)
+	AM_RANGE(0xd800,0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fm77av_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_UNMAP_HIGH
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( fm77av_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
 
@@ -76,6 +130,22 @@ ADDRESS_MAP_END
 INPUT_PORTS_START( fm7 )
 INPUT_PORTS_END
 
+static DRIVER_INIT(fm7)
+{
+	shared_ram = auto_alloc_array(machine,UINT8,0x80);
+}
+
+static MACHINE_START(fm7)
+{
+	// The FM-7 has no initialisation ROM, and no other obvious
+	// way to set the reset vector, so for now this will have to do.
+	UINT8* RAM = memory_region(machine,"maincpu");
+	
+	RAM[0xfffe] = 0xfe;
+	RAM[0xffff] = 0x00; 
+	
+	memset(shared_ram,0xff,0x80);
+}
 
 static MACHINE_RESET(fm7)
 {
@@ -90,24 +160,39 @@ static VIDEO_UPDATE( fm7 )
 	return 0;
 }
 
+static const ay8910_interface fm7_psg_intf =
+{
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	DEVCB_NULL,	/* portA read */
+	DEVCB_NULL,	/* portB read */
+	DEVCB_NULL,					/* portA write */
+	DEVCB_NULL					/* portB write */
+};
+
 static MACHINE_DRIVER_START( fm7 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, XTAL_2MHz)
 	MDRV_CPU_PROGRAM_MAP(fm7_mem)
-	MDRV_CPU_IO_MAP(fm7_io)
 
 	MDRV_CPU_ADD("sub", M6809, XTAL_2MHz)
 	MDRV_CPU_PROGRAM_MAP(fm7_sub_mem)
+	
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD("psg", AY8910, 1000000)  // clock speed unknown
+	MDRV_SOUND_CONFIG(fm7_psg_intf)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS,"mono",1.0)
 
+	MDRV_MACHINE_START(fm7)
 	MDRV_MACHINE_RESET(fm7)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
+	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(640, 480)
-	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MDRV_SCREEN_SIZE(640, 200)
+	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(black_and_white)
 
@@ -119,7 +204,6 @@ static MACHINE_DRIVER_START( fm77av )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809E, XTAL_2MHz)
 	MDRV_CPU_PROGRAM_MAP(fm77av_mem)
-	MDRV_CPU_IO_MAP(fm77av_io)
 
 	MDRV_CPU_ADD("sub", M6809, XTAL_2MHz)
 	MDRV_CPU_PROGRAM_MAP(fm77av_sub_mem)
@@ -143,15 +227,17 @@ MACHINE_DRIVER_END
 /* ROM definition */
 ROM_START( fm7 )
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "fbasic30.rom", 0x38000,  0x7c00, CRC(a96d19b6) SHA1(8d5f0cfe7e0d39bf2ab7e4c798a13004769c28b2) )
-	/* These must be loaded at 0x3fe00, but I'm not sure if they existed together in the real thing */
-	ROM_SYSTEM_BIOS(0, "basic", "Basic" )
-	ROMX_LOAD( "boot_bas.rom", 0x3fe00,  0x0200, CRC(c70f0c74) SHA1(53b63a301cba7e3030e79c59a4d4291eab6e64b0), ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS(1, "dos", "DOS" )
-	ROMX_LOAD( "boot_dos.rom", 0x3fe00,  0x0200, CRC(198614ff) SHA1(037e5881bd3fed472a210ee894a6446965a8d2ef), ROM_BIOS(2) )
+	ROM_LOAD( "fbasic30.rom", 0x8000,  0x7c00, CRC(a96d19b6) SHA1(8d5f0cfe7e0d39bf2ab7e4c798a13004769c28b2) )
 
 	ROM_REGION( 0x20000, "sub", 0 )
-	ROM_LOAD( "subsys_c.rom", 0x1d800,  0x2800, CRC(24cec93f) SHA1(50b7283db6fe1342c6063fc94046283f4feddc1c) )
+	ROM_LOAD( "subsys_c.rom", 0xd800,  0x2800, CRC(24cec93f) SHA1(50b7283db6fe1342c6063fc94046283f4feddc1c) )
+
+	// either one of these boot ROMs are selectable via DIP switch
+	ROM_REGION( 0x200, "basic", 0 )
+	ROM_LOAD( "boot_bas.rom", 0x0000,  0x0200, CRC(c70f0c74) SHA1(53b63a301cba7e3030e79c59a4d4291eab6e64b0) )
+
+	ROM_REGION( 0x200, "dos", 0 )	
+	ROM_LOAD( "boot_dos.rom", 0x0000,  0x0200, CRC(198614ff) SHA1(037e5881bd3fed472a210ee894a6446965a8d2ef) )
 
 	// optional Kanji rom?
 ROM_END
@@ -206,6 +292,6 @@ SYSTEM_CONFIG_END
 /* Driver */
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT   INIT  CONFIG  COMPANY      FULLNAME        FLAGS */
-COMP( 1982, fm7,      0,      0,      fm7,     fm7,    0,    fm7,    "Fujitsu",   "FM-7",         GAME_NOT_WORKING)
+COMP( 1982, fm7,      0,      0,      fm7,     fm7,    fm7,  fm7,    "Fujitsu",   "FM-7",         GAME_NOT_WORKING)
 COMP( 1985, fm77av,   fm7,    0,      fm77av,  fm7,    0,    fm7,    "Fujitsu",   "FM-77AV",      GAME_NOT_WORKING)
 COMP( 1985, fm7740sx, fm7,    0,      fm77av,  fm7,    0,    fm7,    "Fujitsu",   "FM-77AV40SX",  GAME_NOT_WORKING)
