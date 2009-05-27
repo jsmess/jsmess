@@ -1411,6 +1411,7 @@ $(MESSOBJ)/skeleton.a: \
 	$(MESS_DRIVERS)/beehive.o \
 	$(MESS_DRIVERS)/univac.o \
 	$(MESS_DRIVERS)/pc98.o \
+	$(MESS_DRIVERS)/uknc.o \
 	
 #-------------------------------------------------
 # layout dependencies

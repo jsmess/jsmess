@@ -1358,5 +1358,6 @@ const game_driver * const drivers[] =
 	DRIVER( a5130 )
 	DRIVER( beehive )	
 	DRIVER( uts20 )	
+	DRIVER( uknc )	
 
 #endif /* DRIVER_RECURSIVE */
