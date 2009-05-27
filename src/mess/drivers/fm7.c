@@ -109,8 +109,10 @@ ADDRESS_MAP_END
    C400 - FFDF: (ROM) Graphics command code
    FFF0 - FFFF: Interrupt vector table
 */
+
+UINT8 *fm7_video_ram;
 static ADDRESS_MAP_START( fm7_sub_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000,0xbfff) AM_RAM // VRAM
+	AM_RANGE(0x0000,0xbfff) AM_RAM AM_BASE(&fm7_video_ram) // VRAM
 	AM_RANGE(0xc000,0xcfff) AM_RAM // Console RAM
 	AM_RANGE(0xd000,0xd37f) AM_RAM // Work RAM
 	AM_RANGE(0xd380,0xd3ff) AM_READWRITE(shared_r,shared_w) // shared RAM
@@ -157,8 +159,43 @@ static VIDEO_START( fm7 )
 
 static VIDEO_UPDATE( fm7 )
 {
+    UINT8 code_r,code_g,code_b;
+    UINT8 col;
+    int y, x, b;
+
+    for (y = 0; y < 200; y++)
+    {
+	    for (x = 0; x < 80; x++)
+	    {
+            code_r = fm7_video_ram[0x4000 + y*80 + x];
+            code_g = fm7_video_ram[0x8000 + y*80 + x];
+            code_b = fm7_video_ram[0x0000 + y*80 + x];
+            for (b = 0; b < 8; b++)
+            {
+                col = (((code_r >> b) & 0x01) ? 4 : 0) + (((code_g >> b) & 0x01) ? 2 : 0) + (((code_b >> b) & 0x01) ? 1 : 0);
+                *BITMAP_ADDR16(bitmap, y,  x*8+(7-b)) =  col;
+            }
+        }
+    }   
 	return 0;
 }
+
+static const rgb_t fm7_palette[8] = {
+	MAKE_RGB(0x00, 0x00, 0x00), // 0
+	MAKE_RGB(0x00, 0x00, 0x80), // 1
+	MAKE_RGB(0x00, 0x80, 0x00), // 2
+	MAKE_RGB(0x00, 0x80, 0x80), // 3
+	MAKE_RGB(0x80, 0x00, 0x00), // 4
+	MAKE_RGB(0x80, 0x00, 0x80), // 5
+	MAKE_RGB(0x80, 0x80, 0x00), // 6
+	MAKE_RGB(0x80, 0x80, 0x80), // 7
+};
+
+PALETTE_INIT( fm7 )
+{
+	palette_set_colors(machine, 0, fm7_palette, ARRAY_LENGTH(fm7_palette));
+}
+
 
 static const ay8910_interface fm7_psg_intf =
 {
@@ -193,8 +230,8 @@ static MACHINE_DRIVER_START( fm7 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(640, 200)
 	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
-	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(black_and_white)
+	MDRV_PALETTE_LENGTH(8)
+	MDRV_PALETTE_INIT(fm7)
 
 	MDRV_VIDEO_START(fm7)
 	MDRV_VIDEO_UPDATE(fm7)
@@ -215,10 +252,10 @@ static MACHINE_DRIVER_START( fm77av )
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(640, 480)
-	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(black_and_white)
+	MDRV_SCREEN_SIZE(640, 200)
+	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
+	MDRV_PALETTE_LENGTH(8)
+	MDRV_PALETTE_INIT(fm7)
 
 	MDRV_VIDEO_START(fm7)
 	MDRV_VIDEO_UPDATE(fm7)
