@@ -226,11 +226,9 @@ READ8_DEVICE_HANDLER( sed1330_data_r )
 {
 	sed1330_t *sed1330 = get_safe_token(device);
 	
-	UINT8 data = sed1330->dor;
+	UINT8 data = devcb_call_read8(&sed1330->in_vd_func, sed1330->csr);
 
 	if (LOG) logerror("SED1330 '%s' Memory Read %02x from %04x\n", device->tag, data, sed1330->csr);
-
-	sed1330->dor = devcb_call_read8(&sed1330->in_vd_func, sed1330->csr);
 
 	increment_csr(sed1330);
 
