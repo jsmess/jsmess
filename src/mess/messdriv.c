@@ -507,6 +507,10 @@ const game_driver * const drivers[] =
 	DRIVER( palmm505 )	/* Palm m505 */
 	DRIVER( palmm515 )	/* Palm m515 */
 	DRIVER( visor )		/* Palm Visor Edge */
+	DRIVER( spt1500 )   /* Symbol SPT 1500 */
+	DRIVER( spt1700 )   /* Symbol SPT 1700 */
+	DRIVER( spt1740 )   /* Symbol SPT 1740 */
+	
 
 	/* OSBORNE */
 	DRIVER( osborne1 )	/* 1981 Osborne-1									*/

@@ -387,6 +387,39 @@ ROM_START( visor )
     ROM_DEFAULT_BIOS( "3.52e" )
 ROM_END
 
+ROM_START( spt1500 )
+	ROM_REGION16_BE( 0x208000, "bios", 0 )
+    ROM_SYSTEM_BIOS( 0, "4.1pim", "Version 4.1 (pim)" ) 
+  	ROMX_LOAD( "spt1500v41-pim.rom",      0x008000, 0x200000, CRC(29e50eaf) SHA1(3e920887bdf74f8f83935977b02f22d5217723eb), ROM_GROUPWORD | ROM_BIOS(1) )
+  	ROM_RELOAD(0x000000, 0x004000) 
+  	ROM_SYSTEM_BIOS( 1, "4.1pim", "Version 4.1 (pimnoft)" ) 
+  	ROMX_LOAD( "spt1500v41-pimnoft.rom",  0x008000, 0x200000, CRC(4b44f284) SHA1(4412e946444706628b94d2303b02580817e1d370), ROM_GROUPWORD | ROM_BIOS(2) )
+  	ROM_RELOAD(0x000000, 0x004000) 
+  	ROM_SYSTEM_BIOS( 2, "4.1pim", "Version 4.1 (nopimnoft)" ) 
+  	ROMX_LOAD( "spt1500v41-nopimnoft.rom",0x008000, 0x200000, CRC(4ba19190) SHA1(d713c1390b82eb4e5fbb39aa10433757c5c49e02), ROM_GROUPWORD | ROM_BIOS(3) )
+  	ROM_RELOAD(0x000000, 0x004000) 
+ROM_END
+  
+ROM_START( spt1700 )
+	ROM_REGION16_BE( 0x208000, "bios", 0 )
+	ROM_SYSTEM_BIOS( 0, "1.03pim", "Version 1.03 (pim)" ) 
+	ROMX_LOAD( "spt1700v103-pim.rom",     0x008000, 0x200000, CRC(9df4ee50) SHA1(243a19796f15219cbd73e116f7dfb236b3d238cd), ROM_GROUPWORD | ROM_BIOS(1) )
+	ROM_RELOAD(0x000000, 0x004000) 
+ROM_END
+	
+ROM_START( spt1740 )
+	ROM_REGION16_BE( 0x208000, "bios", 0 )
+	ROM_SYSTEM_BIOS( 0, "1.03pim", "Version 1.03 (pim)" ) 
+	ROMX_LOAD( "spt1740v103-pim.rom",     0x008000, 0x200000, CRC(c29f341c) SHA1(b56d7f8a0c15b1105972e24ed52c846b5e27b195), ROM_GROUPWORD | ROM_BIOS(1) )
+	ROM_RELOAD(0x000000, 0x004000) 
+	ROM_SYSTEM_BIOS( 1, "1.03pim", "Version 1.03 (pimnoft)" ) 
+	ROMX_LOAD( "spt1740v103-pimnoft.rom", 0x008000, 0x200000, CRC(b2d49d5c) SHA1(c133dc021b6797cdb93b666c5b315b00b5bb0917), ROM_GROUPWORD | ROM_BIOS(2) )
+	ROM_RELOAD(0x000000, 0x004000) 
+	ROM_SYSTEM_BIOS( 2, "1.03pim", "Version 1.03 (nopim)" ) 
+	ROMX_LOAD( "spt1740v103-nopim.rom",   0x008000, 0x200000, CRC(8ea7e652) SHA1(2a4b5d6a426e627b3cb82c47109cfe2497eba29a), ROM_GROUPWORD | ROM_BIOS(3) )
+	ROM_RELOAD(0x000000, 0x004000) 
+ROM_END
+
 static SYSTEM_CONFIG_START( pilot1k )
     CONFIG_RAM_DEFAULT  (0x020000)      // 128k
     CONFIG_RAM      (0x080000)      // 512k
@@ -441,7 +474,9 @@ COMP( 2001, palmm515, pilot1k,  0,       palm,     palm,     palm,     palmiii, 
 COMP( 1999, palmv,    pilot1k,  0,       palm,     palm,     palm,     palmv,  	 "3Com", "Palm V", GAME_NOT_WORKING )
 COMP( 1999, palmvx,   pilot1k,  0,       palm,     palm,     palm,     palmvx,   "Palm Inc.", "Palm Vx", GAME_NOT_WORKING )
 COMP( 2001, visor,    pilot1k,  0,       palm,     palm,     palm,     palmvx,   "Handspring", "Visor Edge", GAME_NOT_WORKING )
-
+COMP( 19??, spt1500,  pilot1k,  0,       palm,     palm,     palm,     palmvx,   "Symbol", "SPT 1500", GAME_NOT_WORKING )
+COMP( 19??, spt1700,  pilot1k,  0,       palm,     palm,     palm,     palmvx,   "Symbol", "SPT 1700", GAME_NOT_WORKING )
+COMP( 19??, spt1740,  pilot1k,  0,       palm,     palm,     palm,     palmvx,   "Symbol", "SPT 1740", GAME_NOT_WORKING )
 static const char *lookup_trap(UINT16 opcode)
 {
     static const struct
