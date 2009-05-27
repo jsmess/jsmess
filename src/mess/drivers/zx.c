@@ -520,6 +520,12 @@ ROM_START( tk85 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "tk85.rom", 0x0000, 0x2800, CRC(8972d756) SHA1(7b961a1733fc047eb682150a32e17bca10a018d2) )
 ROM_END
+
+ROM_START( zx97 )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+  	ROM_LOAD( "zx97.rom", 0x0000, 0x8000, CRC(5cf49744) SHA1(b2a486efdc7b2bc3dc8e5a441ea5532bfa3207bd))
+ROM_END
+  	
 /* System Configuration */
 
 static SYSTEM_CONFIG_START(zx80)
@@ -549,7 +555,8 @@ COMP( 1981, zx81,       0,      0,      zx81,       zx81,       zx,     zx81,   
 COMP( 1982, ts1000,     zx81,   0,      ts1000,     zx81,       zx,     zx81,    "Timex Sinclair",           "Timex Sinclair 1000", 0 )
 COMP( 1983, ts1500,     zx81,   0,      ts1000,     zx81,       zx,     pc8300,  "Timex Sinclair",           "Timex Sinclair 1500", 0 )
 COMP( 1983, tk85,     	zx81,   0,      ts1000,     zx81,       zx,     zx81,    "Microdigital",             "TK85",                0 )
-COMP( 1983, ringo470,   zx81,   0,      ts1000,     zx81,       zx,     zx81,    "Ritas do Brasil Ltda",     "Ringo 470", GAME_NOT_WORKING )
+COMP( 1983, ringo470,   zx81,   0,      ts1000,     zx81,       zx,     zx81,    "Ritas do Brasil Ltda",     "Ringo 470", 			GAME_NOT_WORKING )
 COMP( 1984, pc8300,     zx81,   0,      pc8300,     pc8300,     zx,     pc8300,  "Your Computer",            "PC8300",              0 )
 COMP( 1983, pow3000,    zx81,   0,      pow3000,    pow3000,    zx,     pow3000, "Creon Enterprises",        "Power 3000",          0 )
 COMP( 1982, lambda,     zx81,   0,      pow3000,    pow3000,    zx,     pow3000, "Lambda Electronics Ltd",   "Lambda 8300",         0 )
+COMP( 19??, zx97,       zx81,   0,      zx81,    	zx81,    	zx,     zx81, 	  "???",   					 "ZX97",         		GAME_NOT_WORKING )

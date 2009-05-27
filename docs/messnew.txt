@@ -35,6 +35,7 @@ New System Drivers Supported (in no particular order):
 - Palm IIIc,Palm m100,Palm m130,Palm m505,Palm m515 
   Palm V, Palm Vx,Visor Edge (not working) [Miodrag Milanovic]
 - HP38G, HP39G, HP49G (partialy working) [Miodrag Milanovic]
+- ZX97 (not working) [Miodrag Milanovic]
 
 Skeleton drivers : 
 ------------------
