@@ -618,15 +618,19 @@ const game_driver * const drivers[] =
 	DRIVER( avigo )		/*													*/
 
 	/* TEXAS INSTRUMENTS CALCULATORS */
+	DRIVER( ti73 )		/* 1990 TI-73 										*/
 	DRIVER( ti81 )		/* 1990 TI-81 (Z80 2 MHz)							*/
 	DRIVER( ti85 )		/* 1992 TI-85 (Z80 6 MHz)							*/
 	DRIVER( ti82 )		/* 1993 TI-82 (Z80 6 MHz)							*/
 	DRIVER( ti83 )		/* 1996 TI-83 (Z80 6 MHz)							*/
 	DRIVER( ti86 )		/* 1997 TI-86 (Z80 6 MHz)							*/
 	DRIVER( ti83p )		/* 1999 TI-83 Plus (Z80 6 MHz)						*/
-//	DRIVER( ti83pse )	/* 2001 TI-83 Plus Silver Edition					*/
+	DRIVER( ti83pse )	/* 2001 TI-83 Plus Silver Edition					*/
 //	DRIVER( ti84p )		/* 2004 TI-84 Plus									*/
-//	DRIVER( ti84pse )	/* 2004 TI-84 Plus Silver Edition					*/
+	DRIVER( ti84pse )	/* 2004 TI-84 Plus Silver Edition					*/
+	DRIVER( ti89 )		/* 1998 TI-89 										*/
+	DRIVER( ti92 )		/* 1995 TI-92 										*/
+	DRIVER( ti92p )		/* 1999 TI-92 Plus									*/
 
 	/* NEC */
     DRIVER( pc6001 )

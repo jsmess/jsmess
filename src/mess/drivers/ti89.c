@@ -1,0 +1,101 @@
+/***************************************************************************
+   
+        TI-89
+
+        12/05/2009 Skeleton driver.
+
+****************************************************************************/
+
+#include "driver.h"
+#include "cpu/m68000/m68000.h"
+
+static ADDRESS_MAP_START(ti89_mem, ADDRESS_SPACE_PROGRAM, 16 )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x000000, 0x1fffff) AM_ROM
+	AM_RANGE(0x200000, 0x2fffff) AM_RAM
+ADDRESS_MAP_END
+
+/* Input ports */
+INPUT_PORTS_START( ti89 )
+INPUT_PORTS_END
+
+
+static MACHINE_RESET(ti89) 
+{	
+}
+
+static VIDEO_START( ti89 )
+{
+}
+
+static VIDEO_UPDATE( ti89 )
+{
+    return 0;
+}
+
+static MACHINE_DRIVER_START( ti89 )
+    /* basic machine hardware */
+    MDRV_CPU_ADD("maincpu",M68000, XTAL_10MHz)
+    MDRV_CPU_PROGRAM_MAP(ti89_mem)
+
+    MDRV_MACHINE_RESET(ti89)
+	
+    /* video hardware */
+    MDRV_SCREEN_ADD("screen", RASTER)
+    MDRV_SCREEN_REFRESH_RATE(50)
+    MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+    MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+    MDRV_SCREEN_SIZE(640, 480)
+    MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+    MDRV_PALETTE_LENGTH(2)
+    MDRV_PALETTE_INIT(black_and_white)
+
+    MDRV_VIDEO_START(ti89)
+    MDRV_VIDEO_UPDATE(ti89)
+MACHINE_DRIVER_END
+
+static SYSTEM_CONFIG_START(ti89)
+SYSTEM_CONFIG_END
+
+/* ROM definition */
+ROM_START( ti89 )
+  ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+  ROM_SYSTEM_BIOS( 0, "v100", "V 1.00" )
+  ROMX_LOAD( "ti89v100.rom",   0x000000, 0x200000, CRC(cdd69d34) SHA1(1686362b0997bb9597f39b443490d4d8d85b56cc), ROM_BIOS(1))
+  ROM_SYSTEM_BIOS( 1, "v203-1", "V 2.03-1" )
+  ROMX_LOAD( "ti89v203-1.rom", 0x000000, 0x200000, CRC(d79068f7) SHA1(5b6f571417889b11ae19eef99a5fda4f027d5ec2), ROM_BIOS(2))
+  ROM_SYSTEM_BIOS( 2, "v203-2", "V 2.03-2" )
+  ROMX_LOAD( "ti89v203-2.rom", 0x000000, 0x200000, CRC(04d5d76d) SHA1(14ca44b64c29aa1bf274508ca40fe69224f5a7cc), ROM_BIOS(3))
+  ROM_SYSTEM_BIOS( 3, "v205-1", "V 2.05-1" )
+  ROMX_LOAD( "ti89v205-1.rom", 0x000000, 0x200000, CRC(e58a23f9) SHA1(d4cb23fb4b414a43802c37dc3c572a8ede670e0f), ROM_BIOS(4))
+  ROM_SYSTEM_BIOS( 4, "v205-2", "V 2.05-2" )
+  ROMX_LOAD( "ti89v205-2.rom", 0x000000, 0x200000, CRC(37c4653c) SHA1(f48d00a57430230e489e243383513485009b1b98), ROM_BIOS(5))
+  ROM_SYSTEM_BIOS( 5, "v205-3", "V 2.05-3" )
+  ROMX_LOAD( "ti89v205-3.rom", 0x000000, 0x200000, CRC(a8ba976c) SHA1(38bd25ada5e2066c64761d1008a9327a37d68654), ROM_BIOS(6))
+  ROM_SYSTEM_BIOS( 6, "v209-1", "V 2.09-1" )
+  ROMX_LOAD( "ti89v209-1.rom", 0x000000, 0x200000, CRC(f76f9c15) SHA1(66409ef4b20190a3b7c0d48cbd30257580b47dcd), ROM_BIOS(7))
+  ROM_SYSTEM_BIOS( 7, "v209-2", "V 2.09-2" )
+  ROMX_LOAD( "ti89v209-2.rom", 0x000000, 0x200000, CRC(242a238f) SHA1(9668df314a0180ef210796e9cb651c5e9f17eb07), ROM_BIOS(8))
+ROM_END
+
+ROM_START( ti92 )
+  ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+  ROM_SYSTEM_BIOS( 0, "v21", "V 2.1" )
+  ROMX_LOAD( "ti92v21.rom",    0x000000, 0x200000, CRC(5afb5863) SHA1(bf7b260d37d1502cc4b08dea5e1d55b523f27925), ROM_BIOS(1))
+ROM_END
+
+ROM_START( ti92p )
+  ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+  ROM_SYSTEM_BIOS( 0, "v205", "V 2.05" )
+  ROMX_LOAD( "ti92pv205.rom",  0x000000, 0x200000, CRC(13ef4d57) SHA1(6ef290bb0dda72f645cd3eca9cc1185f6a2d32dc), ROM_BIOS(1))
+  ROM_SYSTEM_BIOS( 1, "v209", "V 2.09" )
+  ROMX_LOAD( "ti92pv209.rom",  0x000000, 0x200000, CRC(4851ad52) SHA1(10e6c2cdc60623bf0be7ea72a9ec840259fb37c3), ROM_BIOS(2))
+ROM_END
+
+/* Driver */
+
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
+COMP( 1998, ti89,  0,       0, 	ti89, 	ti89, 	 0,  	  ti89,  	 "ti89",   "TI-89",		 GAME_NOT_WORKING)
+COMP( 1995, ti92,  0,       0, 	ti89, 	ti89, 	 0,  	  ti89,  	 "ti92",   "TI-92",		 GAME_NOT_WORKING)
+COMP( 1999, ti92p, 0,       0, 	ti89, 	ti89, 	 0,  	  ti89,  	 "ti92p",  "TI-92 Plus", GAME_NOT_WORKING)
+

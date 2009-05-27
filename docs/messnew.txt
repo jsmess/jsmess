@@ -108,6 +108,12 @@ Skeleton drivers :
 - Sperry Univac UTS-20
 - System 2900
 - Tesla PMI-80
+- TI-73
+- TI-83 Plus Silver Edition
+- TI-84 Plus Silver Edition
+- TI-89
+- TI-92
+- TI-92 Plus
 - Tiki 100
 - VCS-80
 - Visual 1050

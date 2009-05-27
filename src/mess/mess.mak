@@ -680,6 +680,7 @@ $(MESSOBJ)/ti85.a: \
 	$(MESS_FORMATS)/ti85_ser.o	\
 	$(MESS_VIDEO)/ti85.o		\
 	$(MESS_MACHINE)/ti85.o		\
+	$(MESS_DRIVERS)/ti89.o		\
 
 $(MESSOBJ)/rca.a: \
 	$(MESS_DRIVERS)/vip.o  \

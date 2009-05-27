@@ -398,6 +398,12 @@ static MACHINE_DRIVER_START( ti86d )
 	MDRV_SNAPSHOT_ADD("snapshot", ti8x, "sav", 0)
 MACHINE_DRIVER_END
 
+ROM_START (ti73)
+	ROM_REGION (0x90000, "maincpu",0)
+	ROM_DEFAULT_BIOS("v16")
+	ROM_SYSTEM_BIOS( 0, "v16", "V 1.6" )
+	ROMX_LOAD( "ti73v160.rom", 0x10000, 0x80000, CRC(bb0e3a16) SHA1(d62c2c7532698962818a747a7f32e35e41dfe338), ROM_BIOS(1) )
+ROM_END
 
 ROM_START (ti81)
 	ROM_REGION (0x18000, "maincpu",0)
@@ -405,26 +411,6 @@ ROM_START (ti81)
 	ROM_SYSTEM_BIOS( 0, "v18", "V 1.8K" )
 	ROMX_LOAD( "ti81v18k.bin", 0x10000, 0x8000, CRC(94ac58e2) SHA1(ba915cfe2fe50a452ef8287db8f2244e29056d54), ROM_BIOS(1) )
 	//No dumps 1.0, 1.6K (?) and 2.0 from ticalc.org, less sure about 1.6K
-ROM_END
-
-ROM_START (ti85)
-	ROM_REGION (0x30000, "maincpu",0)
-	ROM_DEFAULT_BIOS("v100")
-	ROM_SYSTEM_BIOS( 0, "v30a", "V 3.0A" )
-	ROMX_LOAD( "ti85v30a.bin", 0x10000, 0x20000, CRC(de4c0b1a) SHA1(f4cf4b8309372dbe26187bb279545f5d4bd48fc1), ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS( 1, "v40",  "V 4.0" )
-	ROMX_LOAD( "ti85v40.bin",  0x10000, 0x20000, CRC(a1723a17) SHA1(ff5866636bb3f206a6bf39cc9c9dc8308332aaf0), ROM_BIOS(2) )
-	ROM_SYSTEM_BIOS( 2, "v50",  "V 5.0" )
-	ROMX_LOAD( "ti85v50.bin",  0x10000, 0x20000, CRC(781fa403) SHA1(bf20d520d8efd7e5ae269789ca4b3c71848ac32a), ROM_BIOS(3) )
-	ROM_SYSTEM_BIOS( 3, "v60",  "V 6.0" )
-	ROMX_LOAD( "ti85v60.bin",  0x10000, 0x20000, CRC(b694a117) SHA1(36d58e2723e5ae4ffe0f8da691fa9a83bfe9e06b), ROM_BIOS(4) )
-	ROM_SYSTEM_BIOS( 4, "v80",  "V 8.0" )
-	ROMX_LOAD( "ti85v80.bin",  0x10000, 0x20000, CRC(7f296338) SHA1(765d5c612b6ffc0d1ded8f79bcbe880b1b562a98), ROM_BIOS(5) )
-	ROM_SYSTEM_BIOS( 5, "v90",  "V 9.0" )
-	ROMX_LOAD( "ti85v90.bin",  0x10000, 0x20000, CRC(6a0a94d0) SHA1(7742bf8a6929a21d06f306b494fc03b1fbdfe3e4), ROM_BIOS(6) )
-	ROM_SYSTEM_BIOS( 6, "v100", "V 10.0" )
-	ROMX_LOAD( "ti85v100.bin", 0x10000, 0x20000, CRC(053325b0) SHA1(36da1080c34e7b53cbe8463be5804e30e4a50dc8), ROM_BIOS(7) )
-	//No_dumps 1.0, 2.0 and 7.0 according to ticalc.org
 ROM_END
 
 ROM_START (ti82)
@@ -458,7 +444,52 @@ ROM_START (ti83)
 	ROMX_LOAD( "ti83v108.bin", 0x10000, 0x40000, CRC(0c6aafcc) SHA1(9c74f0b61655e9e160e92164db472ad7ee02b0f8), ROM_BIOS(6) )
 	ROM_SYSTEM_BIOS( 6, "v110", "V 1.10" )
 	ROMX_LOAD( "ti83v110.bin", 0x10000, 0x40000, CRC(7faee2d2) SHA1(25b373b58523647bb7b904001d391615e0b79bee), ROM_BIOS(7) )
+	ROM_SYSTEM_BIOS( 7, "v110-2", "V 1.10 (2)" )
+    ROMX_LOAD( "ti83v110-2.rom", 0x10000, 0x40000, CRC(56182912) SHA1(4c77fb77f023502b685a49a8013568b494384b25), ROM_BIOS(7) )
 	//Rom versions according to ticalc.org 1.02, 1.03, 1.04, 1.06, 1.07, 1.08, 1.10
+ROM_END
+
+ROM_START (ti83p)
+	ROM_REGION (0x90000, "maincpu",0)
+	ROM_DEFAULT_BIOS("v112")
+	ROM_SYSTEM_BIOS( 0, "v103", "V 1.03" )
+	ROMX_LOAD( "ti83pv103.bin", 0x10000, 0x80000, CRC(da466be0) SHA1(37eaeeb9fb5c18fb494e322b75070e80cc4d858e), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "v110", "V 1.10" )
+	ROMX_LOAD( "ti83pv110.bin", 0x10000, 0x80000, CRC(62683990) SHA1(F86CDEFE4ED5EF9965CD9EB667CB859E2CB10E19), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS( 2, "v112", "V 1.12" )
+	ROMX_LOAD( "ti83pv112.bin", 0x10000, 0x80000, CRC(ddca5026) SHA1(6615df5554076b6b81bd128bf847d2ff046e556b), ROM_BIOS(3) )
+	ROM_SYSTEM_BIOS( 3, "v110-2", "V 1.10-2" )
+    ROMX_LOAD( "ti83pv110-2.rom", 0x10000, 0x80000, CRC(504b9879) SHA1(8841d501870e8fc7173642d8a438205a040640fc), ROM_BIOS(4) )
+    ROM_SYSTEM_BIOS( 4, "v112-2", "V 1.12-2" )
+    ROMX_LOAD( "ti83pv112-2.rom", 0x10000, 0x80000, CRC(2126de12) SHA1(cbedc3a8cf8335eebf2b279d58720d8e7f86c569), ROM_BIOS(5) )
+    ROM_SYSTEM_BIOS( 5, "v113", "V 1.13" )
+    ROMX_LOAD( "ti83pv113.rom", 0x10000, 0x80000, CRC(30a243aa) SHA1(9b79e994ea1ce7af05b68f8ecee8b1b1fc3f0810), ROM_BIOS(6) )
+    ROM_SYSTEM_BIOS( 6, "v114", "V 1.14" )
+    ROMX_LOAD( "ti83pv114.rom", 0x10000, 0x80000, CRC(b32059c7) SHA1(46c66ba0421c03fc42f5afb06c7d3af812786140), ROM_BIOS(7) )
+    ROM_SYSTEM_BIOS( 7, "v115", "V 1.15" )
+    ROMX_LOAD( "ti83pv115.rom", 0x10000, 0x80000, CRC(9288029b) SHA1(8bd05fd47cab4028f275d1cc5383fd4f0e193474), ROM_BIOS(8) )
+    ROM_SYSTEM_BIOS( 8, "v116", "V 1.16" )
+    ROMX_LOAD( "ti83pv116.rom", 0x10000, 0x80000, CRC(0b7cd006) SHA1(290bc81159ea061d8ccb56a6f63e042f150afb32), ROM_BIOS(9) )
+ROM_END
+
+ROM_START (ti85)
+	ROM_REGION (0x30000, "maincpu",0)
+	ROM_DEFAULT_BIOS("v100")
+	ROM_SYSTEM_BIOS( 0, "v30a", "V 3.0A" )
+	ROMX_LOAD( "ti85v30a.bin", 0x10000, 0x20000, CRC(de4c0b1a) SHA1(f4cf4b8309372dbe26187bb279545f5d4bd48fc1), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "v40",  "V 4.0" )
+	ROMX_LOAD( "ti85v40.bin",  0x10000, 0x20000, CRC(a1723a17) SHA1(ff5866636bb3f206a6bf39cc9c9dc8308332aaf0), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS( 2, "v50",  "V 5.0" )
+	ROMX_LOAD( "ti85v50.bin",  0x10000, 0x20000, CRC(781fa403) SHA1(bf20d520d8efd7e5ae269789ca4b3c71848ac32a), ROM_BIOS(3) )
+	ROM_SYSTEM_BIOS( 3, "v60",  "V 6.0" )
+	ROMX_LOAD( "ti85v60.bin",  0x10000, 0x20000, CRC(b694a117) SHA1(36d58e2723e5ae4ffe0f8da691fa9a83bfe9e06b), ROM_BIOS(4) )
+	ROM_SYSTEM_BIOS( 4, "v80",  "V 8.0" )
+	ROMX_LOAD( "ti85v80.bin",  0x10000, 0x20000, CRC(7f296338) SHA1(765d5c612b6ffc0d1ded8f79bcbe880b1b562a98), ROM_BIOS(5) )
+	ROM_SYSTEM_BIOS( 5, "v90",  "V 9.0" )
+	ROMX_LOAD( "ti85v90.bin",  0x10000, 0x20000, CRC(6a0a94d0) SHA1(7742bf8a6929a21d06f306b494fc03b1fbdfe3e4), ROM_BIOS(6) )
+	ROM_SYSTEM_BIOS( 6, "v100", "V 10.0" )
+	ROMX_LOAD( "ti85v100.bin", 0x10000, 0x20000, CRC(053325b0) SHA1(36da1080c34e7b53cbe8463be5804e30e4a50dc8), ROM_BIOS(7) )
+	//No_dumps 1.0, 2.0 and 7.0 according to ticalc.org
 ROM_END
 
 ROM_START (ti86)
@@ -477,17 +508,21 @@ ROM_START (ti86)
 	//Rom versions according to ticalc.org 1.2, 1.3, 1.4, 1.5, 1.6 
 ROM_END
 
-ROM_START (ti83p)
-	ROM_REGION (0x90000, "maincpu",0)
-	ROM_DEFAULT_BIOS("v112")
-	ROM_SYSTEM_BIOS( 0, "v103", "V 1.03" )
-	ROMX_LOAD( "ti83pv103.bin", 0x10000, 0x80000, CRC(da466be0) SHA1(37eaeeb9fb5c18fb494e322b75070e80cc4d858e), ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS( 1, "v110", "V 1.10" )
-	ROMX_LOAD( "ti83pv110.bin", 0x10000, 0x80000, CRC(62683990) SHA1(F86CDEFE4ED5EF9965CD9EB667CB859E2CB10E19), ROM_BIOS(2) )
-	ROM_SYSTEM_BIOS( 2, "v112", "V 1.12" )
-	ROMX_LOAD( "ti83pv112.bin", 0x10000, 0x80000, CRC(ddca5026) SHA1(6615df5554076b6b81bd128bf847d2ff046e556b), ROM_BIOS(3) )
+
+ROM_START (ti83pse)
+	ROM_REGION (0x210000, "maincpu",0)
+	ROM_DEFAULT_BIOS("v116")
+	ROM_SYSTEM_BIOS( 0, "v116", "V 1.16" )
+	ROMX_LOAD( "ti83psev116.rom", 0x10000, 0x200000, CRC(d2570863) SHA1(d4214b3c0ebb26e10fe95294ac72a90d2ba99537), ROM_BIOS(1) )
 ROM_END
 
+ROM_START (ti84pse)
+	ROM_REGION (0x210000, "maincpu",0)
+	ROM_DEFAULT_BIOS("v241")
+	ROM_SYSTEM_BIOS( 0, "v241", "V 2.41" )
+	ROMX_LOAD( "ti84sev241.rom", 0x10000, 0x200000, CRC(5758db36) SHA1(7daa4f22e9b5dc8a1cc8fd31bceece9fa8b43515), ROM_BIOS(1) )
+ROM_END
+  
 static void ti85_serial_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* serial */
@@ -541,14 +576,14 @@ static SYSTEM_CONFIG_START(ti86)
 SYSTEM_CONFIG_END
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY                 FULLNAME                        FLAGS */
+COMP( 1988, ti73,       0,      0,      ti85,   ti85,   0,      NULL,   "Texas Instruments",    "TI-73",                        GAME_NOT_WORKING )
 COMP( 1990, ti81,       0,      0,      ti81,   ti81,   0,      NULL,   "Texas Instruments",    "TI-81",                        0 )
 COMP( 1992, ti85,       0,      0,      ti85d,  ti85,   0,      ti85,   "Texas Instruments",    "TI-85",                        0 )
 COMP( 1993, ti82,       0,      0,      ti85,   ti85,   0,      NULL,   "Texas Instruments",    "TI-82",                        GAME_NOT_WORKING )
 COMP( 1996, ti83,       0,      0,      ti85,   ti85,   0,      NULL,   "Texas Instruments",    "TI-83",                        GAME_NOT_WORKING )
 COMP( 1997, ti86,       0,      0,      ti86d,  ti85,   0,      ti86,   "Texas Instruments",    "TI-86",                        0 )
 COMP( 1999, ti83p,      0,      0,      ti85,   ti85,   0,      NULL,   "Texas Instruments",    "TI-83 Plus",                   GAME_NOT_WORKING )
-/*
 COMP( 2001, ti83pse,    0,      0,      ti85,   ti85,   0,      NULL,   "Texas Instruments",    "TI-83 Plus Silver Edition",    GAME_NOT_WORKING )
-COMP( 2004, ti84p,      0,      0,      ti85,   ti85,   0,      NULL,   "Texas Instruments",    "TI-84 Plus",                   GAME_NOT_WORKING )
+//COMP( 2004, ti84p,      0,      0,      ti85,   ti85,   0,      NULL,   "Texas Instruments",    "TI-84 Plus",                   GAME_NOT_WORKING )
 COMP( 2004, ti84pse,    0,      0,      ti85,   ti85,   0,      NULL,   "Texas Instruments",    "TI-84 Plus Silver Edition",    GAME_NOT_WORKING )
-*/
+
