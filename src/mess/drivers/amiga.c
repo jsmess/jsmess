@@ -18,10 +18,11 @@ would commence ($C00000).
 
 /* Core includes */
 #include "driver.h"
-#include "cpu/m68000/m68000.h"
 #include "includes/amiga.h"
 
 /* Components */
+#include "cpu/m68000/m68000.h"
+#include "cpu/m6502/m6502.h"
 #include "machine/6525tpi.h"
 #include "machine/6526cia.h"
 #include "machine/amigafdc.h"
@@ -107,6 +108,25 @@ static ADDRESS_MAP_START(amiga_mem, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION("user1", 0)	/* System ROM - mirror */
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START(keyboard_mem, ADDRESS_SPACE_PROGRAM, 8)
+	AM_RANGE(0x0000, 0x003f) AM_RAM /* internal user ram */
+	AM_RANGE(0x0040, 0x007f) AM_NOP /* unassigned */
+	AM_RANGE(0x0080, 0x0080) AM_NOP /* port a */
+	AM_RANGE(0x0081, 0x0081) AM_NOP /* port b */
+	AM_RANGE(0x0082, 0x0082) AM_NOP /* port c */
+	AM_RANGE(0x0083, 0x0083) AM_NOP /* port d */
+	AM_RANGE(0x0084, 0x0085) AM_NOP /* latch */
+	AM_RANGE(0x0086, 0x0087) AM_NOP /* count */
+	AM_RANGE(0x0088, 0x0088) AM_NOP /* upper latch & transfer latch to counter */
+	AM_RANGE(0x0089, 0x0089) AM_NOP /* clear pa0 pos edge detected */
+	AM_RANGE(0x008a, 0x008a) AM_NOP /* clear pa1 neg edge detected */
+	AM_RANGE(0x008b, 0x008e) AM_NOP /* unassigned */
+	AM_RANGE(0x008f, 0x008f) AM_NOP /* control register */
+	AM_RANGE(0x0090, 0x07ff) AM_NOP /* unassigned */
+	AM_RANGE(0x0800, 0x0fff) AM_ROM AM_REGION("keyboard", 0) /* internal mask rom */
+ADDRESS_MAP_END
+
+
 /*
  * CDTV memory map (source: http://www.l8r.net/technical/cdtv-technical.html)
  *
@@ -132,7 +152,6 @@ ADDRESS_MAP_END
  *
  */
 
-
 static ADDRESS_MAP_START(cdtv_mem, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x000000, 0x0fffff) AM_RAMBANK(1) AM_BASE(&amiga_chip_ram) AM_SIZE(&amiga_chip_ram_size)
 	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE(amiga_cia_r, amiga_cia_w)
@@ -143,6 +162,23 @@ static ADDRESS_MAP_START(cdtv_mem, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0xf00000, 0xffffff) AM_ROM AM_REGION("user1", 0)	/* CDTV & System ROM */
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START(cdtv_rcmcu_mem, ADDRESS_SPACE_PROGRAM, 8)
+	AM_RANGE(0x0000, 0x003f) AM_RAM /* internal user ram */
+	AM_RANGE(0x0040, 0x007f) AM_NOP /* unassigned */
+	AM_RANGE(0x0080, 0x0080) AM_NOP /* port a */
+	AM_RANGE(0x0081, 0x0081) AM_NOP /* port b */
+	AM_RANGE(0x0082, 0x0082) AM_NOP /* port c */
+	AM_RANGE(0x0083, 0x0083) AM_NOP /* port d */
+	AM_RANGE(0x0084, 0x0085) AM_NOP /* latch */
+	AM_RANGE(0x0086, 0x0087) AM_NOP /* count */
+	AM_RANGE(0x0088, 0x0088) AM_NOP /* upper latch & transfer latch to counter */
+	AM_RANGE(0x0089, 0x0089) AM_NOP /* clear pa0 pos edge detected */
+	AM_RANGE(0x008a, 0x008a) AM_NOP /* clear pa1 neg edge detected */
+	AM_RANGE(0x008b, 0x008e) AM_NOP /* unassigned */
+	AM_RANGE(0x008f, 0x008f) AM_NOP /* control register */
+	AM_RANGE(0x0090, 0x07ff) AM_NOP /* unassigned */
+	AM_RANGE(0x0800, 0x0fff) AM_ROM AM_REGION("rcmcu", 0) /* internal mask rom */
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(a1000_mem, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x000000, 0x03ffff) AM_MIRROR(0xc0000) AM_RAMBANK(1) AM_BASE(&amiga_chip_ram) AM_SIZE(&amiga_chip_ram_size)
@@ -330,6 +366,9 @@ static MACHINE_DRIVER_START( ntsc )
 	MDRV_CPU_ADD("maincpu", M68000, AMIGA_68000_NTSC_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(amiga_mem)
 
+	MDRV_CPU_ADD("keyboard", M6502, XTAL_1MHz) /* 1 MHz? */
+	MDRV_CPU_PROGRAM_MAP(keyboard_mem)
+
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(59.997)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
@@ -381,6 +420,14 @@ static MACHINE_DRIVER_START( cdtv )
 	MDRV_IMPORT_FROM(ntsc)
 	MDRV_CPU_REPLACE("maincpu", M68000, CDTV_CLOCK_X1 / 4)
 	MDRV_CPU_PROGRAM_MAP(cdtv_mem)
+
+	MDRV_CPU_REMOVE("keyboard")
+
+	MDRV_CPU_ADD("rcmcu", M6502, XTAL_1MHz) /* 1 MHz? */
+	MDRV_CPU_PROGRAM_MAP(cdtv_rcmcu_mem)
+
+//	MDRV_CPU_ADD("lcd", LC6554, XTAL_4MHz) /* 4 MHz? */
+//	MDRV_CPU_PROGRAM_MAP(cdtv_lcd_mem)
 
 	MDRV_MACHINE_START( cdtv )
 	MDRV_MACHINE_RESET( cdtv )
@@ -646,6 +693,10 @@ static DRIVER_INIT( cdtv )
 ROM_START(a500n)
 	AMIGA_BIOS
 	AMIGA_CART
+
+	/* keyboard controller, mos 6500/1 mcu */
+	ROM_REGION(0x800, "keyboard", 0)
+	ROM_LOAD("328191-02.ic1", 0x000, 0x800, NO_DUMP)
 ROM_END
 
 #define rom_a500p    rom_a500n
@@ -654,6 +705,10 @@ ROM_START(a1000n)
 	ROM_REGION16_BE(0x080000, "user1", 0)
 	ROM_LOAD16_BYTE("252179-01.u5n", 0x000000, 0x001000, CRC(42553bc4) SHA1(8855a97f7a44e3f62d1c88d938fee1f4c606af5b))
 	ROM_LOAD16_BYTE("252180-01.u5p", 0x000001, 0x001000, CRC(8e5b9a37) SHA1(d10f1564b99f5ffe108fa042362e877f569de2c3))
+
+	/* keyboard controller, mos 6500/1 mcu */
+	ROM_REGION(0x800, "keyboard", 0)
+	ROM_LOAD("328191-01.bin", 0x000, 0x800, NO_DUMP)
 ROM_END
 
 #define rom_a1000p    rom_a1000n
@@ -665,6 +720,14 @@ ROM_START(cdtv)
 	ROM_COPY("user1", 0x000000, 0x040000, 0x040000)
 	ROMX_LOAD(      "315093-02.u13", 0x080000, 0x040000, CRC(c4f0f55f) SHA1(891e9a547772fe0c6c19b610baf8bc4ea7fcb785), ROM_GROUPWORD)
 	ROM_COPY("user1", 0x080000, 0x0c0000, 0x040000)
+
+	/* remote control input converter, mos 6500/1 mcu */
+	ROM_REGION(0x800, "rcmcu", 0)
+	ROM_LOAD("252609-02.u75", 0x000, 0x800, NO_DUMP)
+
+	/* lcd controller, sanyo lc6554h */
+	ROM_REGION(0x1000, "lcd", 0)
+	ROM_LOAD("252608-01.u62", 0x000, 0x1000, NO_DUMP)
 ROM_END
 
 
