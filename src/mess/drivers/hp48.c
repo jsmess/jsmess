@@ -885,7 +885,20 @@ ROM_END
 
 ROM_START ( hp49g )
 	ROM_REGION( 0x200000, "maincpu", 0 )
-	ROM_LOAD( "hp49g.rom", 0x00000, 0x200000, CRC(b0b9561b) SHA1(2015c6a29fa95e0f012b3572bd54280d58908320))
+	ROM_SYSTEM_BIOS( 0, "unk1", "Version unk 1" )
+	ROMX_LOAD( "hp49g-1.rom", 0x00000, 0x200000, CRC(b0b9561b) SHA1(2015c6a29fa95e0f012b3572bd54280d58908320), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS( 1, "unk2", "Version unk 2" )
+    ROMX_LOAD( "hp49g-2.rom", 0x00000, 0x200000, CRC(b52a1ec8) SHA1(dd4e2225bd2fd8f3be3ed9ebde61ff69b5570366), ROM_BIOS(2))		
+    ROM_SYSTEM_BIOS( 2, "1", "Version 1.00" )
+    ROMX_LOAD( "hp49gv100.rom", 0x00000, 0x200000, CRC(64c9826a) SHA1(da25371b97d439fc0003cb786dba143ee2be9160), ROM_BIOS(3))
+    ROM_SYSTEM_BIOS( 3, "1", "Version 1.05" )
+    ROMX_LOAD( "hp49gv105.rom", 0x00000, 0x200000, CRC(cf777cac) SHA1(b1d063b6e95083799aa990e4a2718214a38a372f), ROM_BIOS(4))
+    ROM_SYSTEM_BIOS( 4, "1", "Version 1.16" )
+    ROMX_LOAD( "hp49gv116.rom", 0x00000, 0x200000, CRC(dcc0b39c) SHA1(46f64b4731f5964eb114060b733aab2b23b4180c), ROM_BIOS(5))
+    ROM_SYSTEM_BIOS( 5, "1", "Version 1.18" )
+    ROMX_LOAD( "hp49gv118.rom", 0x00000, 0x200000, CRC(73a6a195) SHA1(3f283fe15a64c5cbc8c1b1254e10965957f58a84), ROM_BIOS(6))
+    ROM_SYSTEM_BIOS( 6, "1", "Version 1.19" )
+    ROMX_LOAD( "hp49gv119.rom", 0x00000, 0x200000, CRC(75218a18) SHA1(ec0f661f0aa7158d1f6df61f24410260b5324fa9), ROM_BIOS(7))
 ROM_END
 
 /**************************** memory *******************************/
