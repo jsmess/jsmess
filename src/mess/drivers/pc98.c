@@ -8,7 +8,7 @@
 
 	Models:
 
-	                  |  CPU                          |   RAM    |            Drives                                     | CBus| Release |
+                      |  CPU                          |   RAM    |            Drives                                     | CBus| Release |
     PC-9801           |  8086 @ 5                     |  128 KB  | -                                                     |  6  | 1982/10 |
     PC-9801F1         |  8086-2 @ 5/8                 |  128 KB  | 5"2DDx1                                               |  4  | 1983/10 |
     PC-9801F2         |  8086-2 @ 5/8                 |  128 KB  | 5"2DDx2                                               |  4  | 1983/10 |  
@@ -207,22 +207,14 @@
 ***************************************************************************************/
 
 #include "driver.h"
-#include "cpu/z80/z80.h"
+#include "cpu/i386/i386.h"
 
-static ADDRESS_MAP_START( pc9801_mem, ADDRESS_SPACE_PROGRAM, 8)
-	ADDRESS_MAP_UNMAP_HIGH
+static ADDRESS_MAP_START( pc9801_mem, ADDRESS_SPACE_PROGRAM, 32)
+	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc9801_io , ADDRESS_SPACE_IO, 8)
-	ADDRESS_MAP_UNMAP_HIGH
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( pc9821_mem, ADDRESS_SPACE_PROGRAM, 8)
-	ADDRESS_MAP_UNMAP_HIGH
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( pc9821_io , ADDRESS_SPACE_IO, 8)
-	ADDRESS_MAP_UNMAP_HIGH
+static ADDRESS_MAP_START( pc9821_mem, ADDRESS_SPACE_PROGRAM, 32)
+	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -256,11 +248,12 @@ static VIDEO_UPDATE( pc9821 )
 	return 0;
 }
 
+/* I suspect the dump for pc9801 comes from a i386 later model... the original machine would use a i8086 @ 5Mhz CPU (see notes at top) */
+/* More investigations are required, but in the meanwhile I set a I386 as main CPU */
 static MACHINE_DRIVER_START( pc9801 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)		// i8086 @ 5 MHz actually
+	MDRV_CPU_ADD("maincpu", I386, 16000000)
 	MDRV_CPU_PROGRAM_MAP(pc9801_mem)
-	MDRV_CPU_IO_MAP(pc9801_io)
 
 	MDRV_MACHINE_RESET(pc9801)
 
@@ -280,9 +273,8 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( pc9821 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)		// i386 @ 16MHz? actually
+	MDRV_CPU_ADD("maincpu", I486, 25000000)
 	MDRV_CPU_PROGRAM_MAP(pc9821_mem)
-	MDRV_CPU_IO_MAP(pc9821_io)
 
 	MDRV_MACHINE_RESET(pc9821)
 
@@ -304,21 +296,22 @@ MACHINE_DRIVER_END
 /* ROM definition */
 
 
-/* I stringly suspect this dump comes from a later machine, like an i80286-based one, but I could be wrong... */
+/* I strongly suspect this dump comes from a later machine, like an i386-based one, but I could be wrong... */
 ROM_START( pc9801 )
-	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD( "00000.rom", 0x00000, 0x8000, CRC(6e299128) SHA1(d0e7d016c005cdce53ea5ecac01c6f883b752b80) )
-	ROM_LOAD( "c0000.rom", 0xc0000, 0x8000, CRC(1b43eabd) SHA1(ca711c69165e1fa5be72993b9a7870ef6d485249) )
-	ROM_LOAD( "c8000.rom", 0xc8000, 0x8000, CRC(f2a262b0) SHA1(fe97d2068d18bbb7425d9774e2e56982df2aa1fb) )
-	ROM_LOAD( "d0000.rom", 0xd0000, 0x8000, CRC(1b43eabd) SHA1(ca711c69165e1fa5be72993b9a7870ef6d485249) )
-	ROM_LOAD( "d8000.rom", 0xd8000, 0x8000, CRC(5dda57cc) SHA1(d0dead41c5b763008a4d777aedddce651eb6dcbb) )
-	ROM_LOAD( "e8000.rom", 0xe8000, 0x8000, CRC(4e32081e) SHA1(e23571273b7cad01aa116cb7414c5115a1093f85) )
-	ROM_LOAD( "f0000.rom", 0xf0000, 0x8000, CRC(4da85a6c) SHA1(18dccfaf6329387c0c64cc4c91b32c25cde8bd5a) )
-	ROM_LOAD( "f8000.rom", 0xf8000, 0x8000, CRC(2b1e45b1) SHA1(1fec35f17d96b2e2359e3c71670575ad9ff5007e) )
-
-	ROM_REGION( 0x20000, "bios", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "bios.rom", 0x00000, 0x18000, CRC(315d2703) SHA1(4f208d1dbb68373080d23bff5636bb6b71eb7565) )
 	ROM_LOAD( "itf.rom",  0x00000, 0x08000, CRC(c1815325) SHA1(a2fb11c000ed7c976520622cfb7940ed6ddc904e) )
+
+	/* where shall we load this? */
+	ROM_REGION( 0x100000, "memory", 0 )
+	ROM_LOAD( "00000.rom", 0x00000, 0x8000, CRC(6e299128) SHA1(d0e7d016c005cdce53ea5ecac01c6f883b752b80) )
+	ROM_LOAD( "c0000.rom", 0xc0000, 0x8000, CRC(1b43eabd) SHA1(ca711c69165e1fa5be72993b9a7870ef6d485249) )	// 0xff everywhere
+	ROM_LOAD( "c8000.rom", 0xc8000, 0x8000, CRC(f2a262b0) SHA1(fe97d2068d18bbb7425d9774e2e56982df2aa1fb) )
+	ROM_LOAD( "d0000.rom", 0xd0000, 0x8000, CRC(1b43eabd) SHA1(ca711c69165e1fa5be72993b9a7870ef6d485249) )	// 0xff everywhere
+	ROM_LOAD( "d8000.rom", 0xd8000, 0x8000, CRC(5dda57cc) SHA1(d0dead41c5b763008a4d777aedddce651eb6dcbb) )
+	ROM_LOAD( "e8000.rom", 0xe8000, 0x8000, CRC(4e32081e) SHA1(e23571273b7cad01aa116cb7414c5115a1093f85) )	// contains n-88 basic (86) v2.0
+	ROM_LOAD( "f0000.rom", 0xf0000, 0x8000, CRC(4da85a6c) SHA1(18dccfaf6329387c0c64cc4c91b32c25cde8bd5a) )
+	ROM_LOAD( "f8000.rom", 0xf8000, 0x8000, CRC(2b1e45b1) SHA1(1fec35f17d96b2e2359e3c71670575ad9ff5007e) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "sound.rom", 0x0000, 0x4000, CRC(80eabfde) SHA1(e09c54152c8093e1724842c711aed6417169db23) )
@@ -345,4 +338,4 @@ SYSTEM_CONFIG_END
 
 /*    YEAR  NAME      PARENT   COMPAT MACHINE   INPUT     INIT    CONFIG     COMPANY                        FULLNAME    FLAGS */
 COMP( 1981, pc9801,   0,       0,     pc9801,   pc9801,   0,      pc9801,    "Nippon Electronic Company",   "PC-9801",  GAME_NOT_WORKING )
-COMP( 1992, pc9821,   0,       0,     pc9821,   pc9801,   0,      pc9801,    "Nippon Electronic Company",   "PC-9821 (98MATE)",  GAME_NOT_WORKING )	// US version of PC-6001
+COMP( 1993, pc9821,   0,       0,     pc9821,   pc9801,   0,      pc9801,    "Nippon Electronic Company",   "PC-9821 (98MATE)",  GAME_NOT_WORKING )	// US version of PC-6001
