@@ -979,11 +979,14 @@ const game_driver * const drivers[] =
 	DRIVER( comquest )	/* Comquest Plus German								*/
 
 	/* Hewlett Packard */
+	DRIVER( hp38g )
+	DRIVER( hp39g )
 	DRIVER( hp48s )		/* HP 48S */
 	DRIVER( hp48sx )	/* HP 48SX */
 	DRIVER( hp48g )		/* HP 48G */
 	DRIVER( hp48gx )	/* HP 48GX */
 	DRIVER( hp48gp )        /* HP 48G+ */
+	DRIVER( hp49g )
 
 	/* SpectraVideo */
 	DRIVER( svi318 )	/* SVI-318 (PAL)									*/

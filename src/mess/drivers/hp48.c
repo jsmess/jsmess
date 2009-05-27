@@ -873,6 +873,20 @@ ROM_END
 
 #define rom_hp48s rom_hp48sx
 
+ROM_START ( hp38g )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "hp38g.rom", 0x00000, 0x80000, CRC(31d9affc) SHA1(bab3f5907a16cbb087943fd77230514af8fd5ac0))
+ROM_END
+
+ROM_START ( hp39g )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "hp39g.rom", 0x00000, 0x100000, CRC(28268fdc) SHA1(57a2b19075fe60307a9affa79d8e7cb550c621c3))
+ROM_END
+
+ROM_START ( hp49g )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD( "hp49g.rom", 0x00000, 0x200000, CRC(b0b9561b) SHA1(2015c6a29fa95e0f012b3572bd54280d58908320))
+ROM_END
 
 /**************************** memory *******************************/
 
@@ -1006,10 +1020,13 @@ static MACHINE_DRIVER_START ( hp48s )
 MACHINE_DRIVER_END
 
 
-
-
 COMP ( 1990, hp48sx, 0     , 0, hp48sx, hp48sx, hp48, NULL, "Hewlett Packard", "HP48SX", 0 )
 COMP ( 1991, hp48s , hp48sx, 0, hp48s,  hp48sx, hp48, NULL, "Hewlett Packard", "HP48S", 0 )
 COMP ( 1993, hp48gx, 0     , 0, hp48gx, hp48gx, hp48, NULL, "Hewlett Packard", "HP48GX", 0 )
 COMP ( 1993, hp48g , hp48gx, 0, hp48g,  hp48gx, hp48, NULL, "Hewlett Packard", "HP48G", 0 )
 COMP ( 1998, hp48gp, hp48gx, 0, hp48gp, hp48gx, hp48, NULL, "Hewlett Packard", "HP48G+", 0 )
+
+COMP ( 1995, hp38g , hp48gx, 0, hp48g,  hp48gx, hp48, NULL, "Hewlett Packard", "HP38G", 0 )
+COMP ( 2000, hp39g , hp48gx, 0, hp48g,  hp48gx, hp48, NULL, "Hewlett Packard", "HP39G", GAME_NOT_WORKING )
+COMP ( 1999, hp49g , hp48gx, 0, hp48g,  hp48gx, hp48, NULL, "Hewlett Packard", "HP49G", 0 )
+
