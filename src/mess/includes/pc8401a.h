@@ -2,11 +2,14 @@
 #define __PC8401A__
 
 #define SCREEN_TAG		"screen"
+#define CRT_SCREEN_TAG	"screen2"
+
 #define Z80_TAG			"z80"
 #define PPI8255_TAG		"ppi8255"
 #define UPD1990A_TAG	"upd1990a"
 #define AY8910_TAG		"ay8910"
 #define SED1330_TAG		"sed1330"
+#define MC6845_TAG		"mc6845"
 
 #define PC8401A_CRT_VIDEORAM_SIZE	0x2000
 #define PC8401A_LCD_VIDEORAM_SIZE	0x2000
@@ -31,6 +34,8 @@ struct _pc8401a_state
 
 	const device_config *upd1990a;
 	const device_config *sed1330;
+	const device_config *mc6845;
+	const device_config *lcd;
 };
 
 /* ---------- defined in video/pc8401a.c ---------- */
