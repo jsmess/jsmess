@@ -23,12 +23,12 @@ static void replace_lt_gt(char *line)
 	if (!strchr(src, '<') && !strchr(src, '>'))
 		return;
 
-    while( *src )
+	while( *src )
 	{
 		if( *src == '<' )
 			dst += sprintf(dst, "&lt;");
 		else
-        if( *src == '>' )
+		if( *src == '>' )
 			dst += sprintf(dst, "&gt;");
 		else
 			*dst++ = *src;
@@ -54,8 +54,8 @@ static void a_href_url(char *line)
 	/* terminate URL */
 	c = *url_end;
 	*url_end = '\0';
-    /* terminate buffer right before the URL */
-    buff[(int)(url_beg - line)] = '\0';
+	/* terminate buffer right before the URL */
+	buff[(int)(url_beg - line)] = '\0';
 	/* add <a href=" to the buffer */
 	strcat(buff, "<a href=\"");
 	strcat(buff, url_beg);
@@ -85,7 +85,7 @@ int CLIB_DECL main(int ac, char **av)
 
 	tm = time(NULL);
 
-    if( ac > 1 )
+	if( ac > 1 )
 	{
 		strcpy(dat_filename, av[1]);
 		if( ac > 2 )
@@ -98,7 +98,7 @@ int CLIB_DECL main(int ac, char **av)
 		}
 	}
 
-    dat = fopen(dat_filename, "r");
+	dat = fopen(dat_filename, "r");
 	if( !dat )
 	{
 		fprintf(stderr, "cannot open input file '%s'.\n", dat_filename);
@@ -111,12 +111,12 @@ int CLIB_DECL main(int ac, char **av)
 		fclose(dat);
 		fprintf(stderr, "cannot create output file '%s'.\n", html_filename);
 		return 1;
-    }
+	}
 
 	osd_mkdir(html_directory);
 
 	/* Head of the index html file */
-    	fprintf(html, "<html>\n");
+	fprintf(html, "<html>\n");
 	fprintf(html, "<head>\n");
 	fprintf(html, "<title>Contents of %s</title>\n", dat_filename);
 	fprintf(html, "</head>\n");
@@ -125,7 +125,7 @@ int CLIB_DECL main(int ac, char **av)
 	fprintf(html, "<hr>\n");
 	fprintf(html, "<p>\n");
 
-    while( !feof(dat) )
+	while( !feof(dat) )
 	{
 		char line[1024], *eol;
 
@@ -135,8 +135,8 @@ int CLIB_DECL main(int ac, char **av)
 			*eol = '\0';
 		eol = strchr(line, '\r');
 		if( eol )
-            *eol = '\0';
-        if( line[0] != '#' )
+			*eol = '\0';
+		if( line[0] != '#' )
 		{
 			if( line[0] == '$' )
 			{
@@ -150,33 +150,35 @@ int CLIB_DECL main(int ac, char **av)
 
 					systemcount++;
 
-                    			html_system = fopen(system_filename, "w");
+					html_system = fopen(system_filename, "w");
 
 					if( !html_system )
 					{
+						fclose(html);
+						fclose(dat);
 						fprintf(stderr, "cannot create system_name file '%s'.\n", system_filename);
 						return 1;
-                    			}
+					}
 
 					/* Head of the system html code */
 					fprintf(html_system, "<html>\n");
-                    			fprintf(html_system, "<head>\n");
+					fprintf(html_system, "<head>\n");
 					fprintf(html_system, "<title>Info for %s</title>\n", system_name);
-			                fprintf(html_system, "</head>\n");
-                    			fprintf(html_system, "<body leftmargin= 20 rightmargin = 20>\n");
+					fprintf(html_system, "</head>\n");
+					fprintf(html_system, "<body leftmargin= 20 rightmargin = 20>\n");
 					fprintf(html_system, "<table width=100%%>\n");
 					fprintf(html_system, "<tr>\n");
 					fprintf(html_system, "<td width=25%%><h4><a href=\"../%s\">Back to index</a></h4></td>\n", html_filename);
 					fprintf(html_system, "<td><h1>Info for %s</h1></td>\n", system_name);
 					fprintf(html_system, "</tr>\n");
 					fprintf(html_system, "</table>\n");
-                    			fprintf(html_system, "<hr>\n");
+					fprintf(html_system, "<hr>\n");
 					linecount = 0;
 					emptycount = 0;
-                }
+				}
 				else
 				if( mame_strnicmp(line + 1, "bio", 3) == 0 )
-                {
+				{
 					/* that's just fine... */
 				}
 				else
@@ -204,7 +206,7 @@ int CLIB_DECL main(int ac, char **av)
 					}
 					else
 					{
-                        			replace_lt_gt(line);
+						replace_lt_gt(line);
 						a_href_url(line);
 						emptycount = 0;
 						if ( linecount == 0 )
@@ -222,15 +224,15 @@ int CLIB_DECL main(int ac, char **av)
 							int ul = 0;
 							while( line[ul] && isspace(line[ul]) )
 								ul++;
-                            /* lines beginning with a dash are lists!? */
+							/* lines beginning with a dash are lists!? */
 							if( ul > 0 && line[ul] == '-' )
-                            {
+							{
 								if( ulcount == 0 )
 									fprintf(html_system, "<ul>\n");
 								fprintf(html_system, "<li>%s\n", line + ul + 1);
 								ulcount++;
-                            }
-                            else
+							}
+							else
 							{
 								if( ulcount )
 									fprintf(html_system, "</ul>\n");
@@ -250,11 +252,11 @@ int CLIB_DECL main(int ac, char **av)
 	}
 
 	fprintf(html, "</p>\n");
-    fprintf(html, "<hr>\n");
+	fprintf(html, "<hr>\n");
 	fprintf(html, "<center><font size=-2>Generated on %s</font></center>\n", ctime(&tm));
 	fprintf(html, "</body>\n");
 	fprintf(html, "</html>\n");
-    fclose(html);
+	fclose(html);
 	fclose(dat);
 	return 0;
 }
