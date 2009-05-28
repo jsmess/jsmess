@@ -860,6 +860,7 @@ $(MESSOBJ)/vtech.a :   \
 	$(MESS_FORMATS)/vt_cas.o	\
 	$(MESS_FORMATS)/vt_dsk.o	\
 	$(MESS_DRIVERS)/crvision.o	\
+	$(MESS_DRIVERS)/socrates.o	\
 
 $(MESSOBJ)/super80.a :   \
 	$(MESS_DRIVERS)/super80.o	\
@@ -1445,6 +1446,7 @@ $(MESS_DRIVERS)/palm.o:		$(MESS_LAYOUT)/palm.lh
 $(MESS_VIDEO)/pc8401a.o:	$(MESS_LAYOUT)/pc8500.lh
 $(MESS_DRIVERS)/pokemini.o:	$(MESS_LAYOUT)/pokemini.lh
 $(MESS_DRIVERS)/px4.o:		$(MESS_LAYOUT)/px4.lh
+$(MESS_DRIVERS)/socrates.o:	$(MESS_LAYOUT)/socrates.lh
 $(MESS_DRIVERS)/svi318.o:	$(MESS_LAYOUT)/sv328806.lh
 $(MESS_DRIVERS)/svision.o:	$(MESS_LAYOUT)/svision.lh
 $(MESS_DRIVERS)/sym1.o:		$(MESS_LAYOUT)/sym1.lh

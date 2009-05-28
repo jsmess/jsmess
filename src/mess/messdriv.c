@@ -739,7 +739,7 @@ const game_driver * const drivers[] =
 	DRIVER( cgenie )	/* Colour Genie EG2000								*/
 	/* system 80 trs80 compatible */
 
-	/* VIDEO TECHNOLOGY */
+	/* VIDEO TECHNOLOGY  */
 	DRIVER( crvision )	/* 1981 creatiVision								*/
 	DRIVER( fnvision )	/* 1983 FunVision									*/
 	DRIVER( crvisioj )
@@ -761,6 +761,8 @@ const game_driver * const drivers[] =
 	DRIVER( laser350 )	/* 1984? Laser 350									*/
 	DRIVER( laser500 )	/* 1984? Laser 500									*/
 	DRIVER( laser700 )	/* 1984? Laser 700									*/
+	DRIVER( socrates )	/* 1986 Socrates Educational Video System */
+	DRIVER( socratfc )	/* 1986 Socrates SAITOUT */
 
 	/* TANGERINE */
 	DRIVER( microtan )	/* 1979 Microtan 65									*/
