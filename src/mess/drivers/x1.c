@@ -219,9 +219,9 @@ ROM_START( x1turboz )
 	/* I strongly suspect this is not genuine */
 	ROMX_LOAD("fnt1616.x1", 0x01800, 0x4ac00, BAD_DUMP CRC(46826745) SHA1(b9e6c320611f0842df6f45673c47c3e23bc14272), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "font2", "Font set 2" )
-	ROMX_LOAD("fnt0816_a.x1", 0x0800, 0x1000, BAD_DUMP CRC(98db5a6b) SHA1(5128ad179a702f8e0bd9910a58bad8fbe4c20167), ROM_BIOS(2) )
+	ROMX_LOAD("fnt0816_a.x1", 0x0800, 0x1000, BAD_DUMP CRC(98db5a6b) SHA1(adf1492ef326b0f8820a3caa1915ad5ab8138f49), ROM_BIOS(2) )
 	/* I strongly suspect this is not genuine */
-	ROMX_LOAD("fnt1616_a.x1", 0x01800, 0x4ac00, BAD_DUMP CRC(bc5689ae) SHA1(5128ad179a702f8e0bd9910a58bad8fbe4c20167), ROM_BIOS(2) )
+	ROMX_LOAD("fnt1616_a.x1", 0x01800, 0x4ac00, BAD_DUMP CRC(bc5689ae) SHA1(a414116e261eb92bbdd407f63c8513257cd5a86f), ROM_BIOS(2) )
 
 	ROM_REGION(0x4ac00, "kanji", 0)
 	/* This is clearly a bad dump: size does not make sense and from 0x28000 on there are only 0xff */
