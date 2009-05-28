@@ -108,10 +108,11 @@ struct _m6847_vdg
 	/* callbacks */
 	void (*horizontal_sync_callback)(running_machine *machine, int line);
 	void (*field_sync_callback)(running_machine *machine, int line);
-	UINT8 (*get_attributes)(running_machine *machine, UINT8 video_byte,UINT8 attr);
+	UINT8 (*get_attributes)(running_machine *machine, UINT8 c,int scanline, int pos);
 	const UINT8 *(*get_video_ram)(running_machine *machine, int scanline);
 	int (*new_frame_callback)(void);	/* returns whether the M6847 is in charge of this frame */
 	void (*custom_prepare_scanline)(int scanline);
+	UINT8 (*get_char_rom)(running_machine *machine, UINT8 ch,int line);
 
 	/* timers */
 	emu_timer *fs_rise_timer;
@@ -1181,7 +1182,7 @@ static void (*const graphics_modes[8])(UINT32 *line, const m6847_pixel *video_da
 
 
 
-static void text_mode(int scanline, UINT32 *RESTRICT line, const m6847_pixel *RESTRICT video_data)
+static void text_mode(running_machine *machine, int scanline, UINT32 *RESTRICT line, const m6847_pixel *RESTRICT video_data)
 {
 	int x;
 	UINT8 byte, attr;
@@ -1198,7 +1199,16 @@ static void text_mode(int scanline, UINT32 *RESTRICT line, const m6847_pixel *RE
 
 		bg_color = color(m6847->colordata[attr_index][(byte & 0x7F) / 16][0]);
 		fg_color = color(m6847->colordata[attr_index][(byte & 0x7F) / 16][1]);
-		char_data = m6847->fontdata[attr_index][byte & 0x7F][scanline % 12];
+		
+		if( attr & M6847_INTEXT) {	
+			if (m6847->get_char_rom) {
+				char_data = m6847->get_char_rom(machine,byte,scanline % 12);
+			} else {
+				char_data = 0xff;
+			}
+		} else {
+			char_data = m6847->fontdata[attr_index][byte & 0x7F][scanline % 12];
+		}
 
 		line[x*8+0] = (char_data & 0x80) ? fg_color : bg_color;
 		line[x*8+1] = (char_data & 0x40) ? fg_color : bg_color;
@@ -1247,7 +1257,7 @@ static void render_scanline(running_machine *machine, bitmap_t *bitmap, int scan
 		else
 		{
 			/* text/semigraphics */
-			text_mode(scanline, line + 32, video_data);
+			text_mode(machine, scanline, line + 32, video_data);
 		}
 
 		/* right border */
@@ -1513,7 +1523,7 @@ INLINE void prepare_scanline(running_machine *machine, int xpos)
 		else
 		{
 			/* has the border color changed? */
-			attrs = (*m6847->get_attributes)(machine, 0x00, 0x00);
+			attrs = (*m6847->get_attributes)(machine, 0, 0, 0);
 			if (attrs != m6847->attrs[scanline])
 			{
 				m6847->dirty = TRUE;
@@ -1542,7 +1552,7 @@ INLINE void prepare_scanline(running_machine *machine, int xpos)
 				for (i = xpos; i < 32; i++)
 				{
 					data = video_ram[i];
-					attr = (*m6847->get_attributes)(machine, video_ram[i],video_ram[i + 0x0800]);
+					attr = (*m6847->get_attributes)(machine, data, scanline, i);
 
 					if ((data != scanline_data[i].data)	|| (attr != scanline_data[i].attr))
 					{
@@ -1835,6 +1845,7 @@ void m6847_init(running_machine *machine, const m6847_config *cfg)
 	m6847->new_frame_callback = cfg->new_frame_callback;
 	m6847->custom_prepare_scanline = cfg->custom_prepare_scanline;
 	m6847->has_lowercase = v->has_lowercase;
+	m6847->get_char_rom = cfg->get_char_rom;
 
 	/* assert our assumptions */
 	assert((v->scanlines_per_frame * FACTOR_SCANLINES_PER_FRAME)

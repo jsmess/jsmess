@@ -202,9 +202,11 @@ static MACHINE_RESET(spc1000)
 }
 
 
-static ATTR_CONST UINT8 spc1000_get_attributes(running_machine *machine, UINT8 c, UINT8 attr)
+static ATTR_CONST UINT8 spc1000_get_attributes(running_machine *machine, UINT8 c, int scanline, int pos)
 {
 	UINT8 result = 0x00;
+	UINT8 attr = spc1000_video_ram [(scanline / 12) * 0x20 + pos + 0x0800];
+
 	//if (c & 0x40)             result |= M6847_INTEXT;
 	if (attr & 0x01)				result |= M6847_INV;
 	if (attr & 0x02)				result |= M6847_CSS;

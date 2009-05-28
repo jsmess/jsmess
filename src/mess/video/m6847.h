@@ -53,8 +53,9 @@ struct _m6847_config
 	/* callbacks */
 	void (*horizontal_sync_callback)(running_machine *machine, int line);
 	void (*field_sync_callback)(running_machine *machine,int line);
-	UINT8 (*get_attributes)(running_machine *machine, UINT8 video_byte,UINT8 attr) ATTR_CONST;
+	UINT8 (*get_attributes)(running_machine *machine, UINT8 c, int scanline, int pos) ATTR_CONST;
 	const UINT8 *(*get_video_ram)(running_machine *machine, int scanline);
+	UINT8 (*get_char_rom)(running_machine *machine, UINT8 ch, int line);
 
 	/* needed for the CoCo 3 */
 	int (*new_frame_callback)(void);	/* returns whether the M6847 is in charge of this frame */

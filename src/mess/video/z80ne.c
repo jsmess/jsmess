@@ -29,12 +29,12 @@
  * 1  0    0     1     1   Semigraphic 6
  * 1  1    1     0     0   Inverted Alphanumeric
  */
-static ATTR_CONST UINT8 lx388_get_attributes(running_machine *machine, UINT8 video_byte, UINT8 attr)
+static ATTR_CONST UINT8 lx388_get_attributes(running_machine *machine, UINT8 c, int scanline, int pos)
 {
 	UINT8 result = 0x00;
-	if (video_byte & 0x80)
+	if (c & 0x80)
 	{
-		if (video_byte & 0x40)
+		if (c & 0x40)
 			result |= M6847_INV;
 		else
 			result |= M6847_INTEXT | M6847_AS;

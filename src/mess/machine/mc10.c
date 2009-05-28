@@ -167,7 +167,7 @@ WRITE8_HANDLER ( mc10_port2_w )
 *****************************************************************************/
 
 
-static ATTR_CONST UINT8 mc10_get_attributes(running_machine *machine, UINT8 c, UINT8 attr)
+static ATTR_CONST UINT8 mc10_get_attributes(running_machine *machine, UINT8 c, int scanline, int pos)
 {
 	UINT8 result = 0x00;
 	if (c & 0x40)			result |= M6847_INV;

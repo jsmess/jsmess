@@ -60,54 +60,200 @@
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
+#include "machine/8255ppi.h"
+#include "machine/msm8251.h"
+#include "video/m6847.h"
+#include "sound/ay8910.h"
+
+UINT8 *pc6001_ram;
+UINT8 *pc6001_video_ram;
+
+WRITE8_HANDLER ( pc6001_system_latch_w )
+{
+	UINT16 startaddr[] = {0xC000, 0xE000, 0x8000, 0xA000 };
+	
+	pc6001_video_ram =  pc6001_ram + startaddr[(data >> 1) & 0x03] - 0x8000;
+}
+
+
+static ATTR_CONST UINT8 pc6001_get_attributes(running_machine *machine, UINT8 c,int scanline, int pos)
+{
+	UINT8 result = 0x00;
+	UINT8 val = pc6001_video_ram [(scanline / 12) * 0x20 + pos];
+	if (val & 0x01) {
+		result |= M6847_INV;
+	}
+	result |= M6847_INTEXT; // always use external ROM
+	return result;
+}
+
+static const UINT8 *pc6001_get_video_ram(running_machine *machine, int scanline)
+{
+	return pc6001_video_ram +0x0200+ (scanline / 12) * 0x20;
+}
+
+static UINT8 pc6001_get_char_rom(running_machine *machine, UINT8 ch, int line)
+{
+	UINT8 *gfx = memory_region(machine, "gfx1");
+	return gfx[ch*16+line];
+}
+
+UINT8 port_c_8255;
+
+READ8_DEVICE_HANDLER(nec_ppi8255_r) {
+	if (offset==2) {
+		return port_c_8255;
+	} else {
+		return ppi8255_r(device,offset);
+	}
+}
+
+WRITE8_DEVICE_HANDLER(nec_ppi8255_w) {
+	if (offset==3) {
+		if(data & 1) {
+			port_c_8255 |=   1<<((data>>1)&0x07);
+		} else {
+			port_c_8255 &= ~(1<<((data>>1)&0x07));
+		}
+		switch(data) {
+        	case 0x08: port_c_8255 |= 0x88; break;
+         	case 0x09: port_c_8255 &= 0xf7; break;
+         	case 0x0c: port_c_8255 |= 0x28; break;
+         	case 0x0d: port_c_8255 &= 0xf7; break;
+         	default: break;
+		}
+		port_c_8255 |= 0xa8;
+	}
+	ppi8255_w(device,offset,data);
+}
 
 static ADDRESS_MAP_START(pc6001_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0xffff) AM_RAM AM_BASE(&pc6001_ram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc6001_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("uart", msm8251_data_r,msm8251_data_w)
+	AM_RANGE(0x81, 0x81) AM_DEVREADWRITE("uart", msm8251_status_r,msm8251_control_w)
+	AM_RANGE(0x90, 0x93) AM_DEVREADWRITE("ppi8255", nec_ppi8255_r, nec_ppi8255_w)
+	AM_RANGE(0xB0, 0xB0) AM_WRITE(pc6001_system_latch_w)
+	AM_RANGE(0xA0, 0xA0) AM_DEVWRITE("ay8910", ay8910_address_w)
+	AM_RANGE(0xA1, 0xA1) AM_DEVWRITE("ay8910", ay8910_data_w)	
 ADDRESS_MAP_END
 
 /* Input ports */
 INPUT_PORTS_START( pc6001 )
+	PORT_START("LINE0")
+		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1)
+		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2") PORT_CODE(KEYCODE_2)
+		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3") PORT_CODE(KEYCODE_3)
+		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4") PORT_CODE(KEYCODE_4)		
+		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5") PORT_CODE(KEYCODE_5)
+		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6") PORT_CODE(KEYCODE_6)
+		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7") PORT_CODE(KEYCODE_7)
+		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8") PORT_CODE(KEYCODE_8)	
 INPUT_PORTS_END
-
 
 static MACHINE_RESET(pc6001)
 {
+	port_c_8255=0;
+	pc6001_video_ram =  pc6001_ram;
 }
 
 static VIDEO_START( pc6001 )
 {
+	m6847_config cfg;
+
+	memset(&cfg, 0, sizeof(cfg));
+	cfg.type = M6847_VERSION_M6847T1_NTSC;
+	cfg.get_attributes = pc6001_get_attributes;
+	cfg.get_video_ram = pc6001_get_video_ram;
+	cfg.get_char_rom = pc6001_get_char_rom;
+	m6847_init(machine, &cfg);
 }
 
-static VIDEO_UPDATE( pc6001 )
+
+static READ8_DEVICE_HANDLER (pc6001_8255_porta_r )
 {
 	return 0;
 }
+static WRITE8_DEVICE_HANDLER (pc6001_8255_porta_w )
+{	
+}
 
+static READ8_DEVICE_HANDLER (pc6001_8255_portb_r )
+{
+	return 0;
+}
+static WRITE8_DEVICE_HANDLER (pc6001_8255_portb_w )
+{	
+}
+
+static WRITE8_DEVICE_HANDLER (pc6001_8255_portc_w )
+{		
+}
+
+static READ8_DEVICE_HANDLER (pc6001_8255_portc_r )
+{	
+	return 0;
+}
+
+const ppi8255_interface pc6001_ppi8255_interface =
+{
+	DEVCB_HANDLER(pc6001_8255_porta_r),
+	DEVCB_HANDLER(pc6001_8255_portb_r),
+	DEVCB_HANDLER(pc6001_8255_portc_r),
+	DEVCB_HANDLER(pc6001_8255_porta_w),
+	DEVCB_HANDLER(pc6001_8255_portb_w),
+	DEVCB_HANDLER(pc6001_8255_portc_w)
+};
+
+const msm8251_interface pc6001_usart_interface=
+{
+	NULL,
+	NULL,
+	NULL
+};
+
+
+static const ay8910_interface pc6001_ay_interface =
+{
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	DEVCB_NULL
+};
 
 static MACHINE_DRIVER_START( pc6001 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
+	MDRV_CPU_ADD("maincpu",Z80, 7987200 /2)
 	MDRV_CPU_PROGRAM_MAP(pc6001_mem)
 	MDRV_CPU_IO_MAP(pc6001_io)
 
+//	MDRV_CPU_ADD("subcpu", I8049, 7987200)
+	
 	MDRV_MACHINE_RESET(pc6001)
 
-	/* video hardware */
+	/* video hardware */	
 	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(640, 480)
-	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(black_and_white)
-
+	MDRV_SCREEN_REFRESH_RATE(M6847_NTSC_FRAMES_PER_SECOND)
 	MDRV_VIDEO_START(pc6001)
-	MDRV_VIDEO_UPDATE(pc6001)
+	MDRV_VIDEO_UPDATE(m6847)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MDRV_SCREEN_SIZE(320, 25+192+26)
+	MDRV_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
+
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD("ay8910", AY8910, XTAL_4MHz/2)
+	MDRV_SOUND_CONFIG(pc6001_ay_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	
+	MDRV_PPI8255_ADD( "ppi8255", pc6001_ppi8255_interface )
+	/* uart */
+	MDRV_MSM8251_ADD("uart", pc6001_usart_interface)
+	
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( pc6001sr )
