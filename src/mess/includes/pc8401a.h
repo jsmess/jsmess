@@ -20,6 +20,9 @@
 typedef struct _pc8401a_state pc8401a_state;
 struct _pc8401a_state
 {
+	/* keyboard state */
+	int key_strobe;			/* key pressed */
+
 	/* clock state */
 	int rtc_data;			/* RTC data output */
 	int rtc_tp;				/* RTC timing pulse output */
