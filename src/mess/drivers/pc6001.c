@@ -127,6 +127,10 @@ WRITE8_DEVICE_HANDLER(nec_ppi8255_w) {
 	ppi8255_w(device,offset,data);
 }
 
+WRITE8_DEVICE_HANDLER(pc6100_ay8910_address_w) {
+	ay8910_address_w(device,offset,data & 0x0f);
+}
+
 static ADDRESS_MAP_START(pc6001_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
@@ -140,7 +144,7 @@ static ADDRESS_MAP_START( pc6001_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x81, 0x81) AM_DEVREADWRITE("uart", msm8251_status_r,msm8251_control_w)
 	AM_RANGE(0x90, 0x93) AM_DEVREADWRITE("ppi8255", nec_ppi8255_r, nec_ppi8255_w)
 	AM_RANGE(0xB0, 0xB0) AM_WRITE(pc6001_system_latch_w)
-	AM_RANGE(0xA0, 0xA0) AM_DEVWRITE("ay8910", ay8910_address_w)
+	AM_RANGE(0xA0, 0xA0) AM_DEVWRITE("ay8910", pc6100_ay8910_address_w)
 	AM_RANGE(0xA1, 0xA1) AM_DEVWRITE("ay8910", ay8910_data_w)	
 ADDRESS_MAP_END
 
@@ -157,10 +161,25 @@ INPUT_PORTS_START( pc6001 )
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8") PORT_CODE(KEYCODE_8)	
 INPUT_PORTS_END
 
+UINT8 irq_vector = 0x00;
+
+INTERRUPT_GEN( pc6001_interrupt )
+{
+	irq_vector = 0x16;
+	cpu_set_input_line(device, 0, HOLD_LINE);
+}
+
+static IRQ_CALLBACK ( pc6001_irq_callback )
+{
+	return irq_vector;
+}
+
 static MACHINE_RESET(pc6001)
 {
 	port_c_8255=0;
 	pc6001_video_ram =  pc6001_ram;
+	
+	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"),pc6001_irq_callback);
 }
 
 static VIDEO_START( pc6001 )
@@ -182,6 +201,7 @@ static READ8_DEVICE_HANDLER (pc6001_8255_porta_r )
 }
 static WRITE8_DEVICE_HANDLER (pc6001_8255_porta_w )
 {	
+//	logerror("pc6001_8255_porta_w %02x\n",data);	
 }
 
 static READ8_DEVICE_HANDLER (pc6001_8255_portb_r )
@@ -190,16 +210,20 @@ static READ8_DEVICE_HANDLER (pc6001_8255_portb_r )
 }
 static WRITE8_DEVICE_HANDLER (pc6001_8255_portb_w )
 {	
+	//logerror("pc6001_8255_portb_w %02x\n",data);	
 }
 
 static WRITE8_DEVICE_HANDLER (pc6001_8255_portc_w )
 {		
+	//logerror("pc6001_8255_portc_w %02x\n",data);	
 }
 
 static READ8_DEVICE_HANDLER (pc6001_8255_portc_r )
 {	
-	return 0;
+	return 0x88;
 }
+
+
 
 const ppi8255_interface pc6001_ppi8255_interface =
 {
@@ -231,6 +255,7 @@ static MACHINE_DRIVER_START( pc6001 )
 	MDRV_CPU_ADD("maincpu",Z80, 7987200 /2)
 	MDRV_CPU_PROGRAM_MAP(pc6001_mem)
 	MDRV_CPU_IO_MAP(pc6001_io)
+	MDRV_CPU_VBLANK_INT("screen", pc6001_interrupt)
 
 //	MDRV_CPU_ADD("subcpu", I8049, 7987200)
 	
