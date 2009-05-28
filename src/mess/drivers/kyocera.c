@@ -77,6 +77,7 @@
 #include "machine/upd1990a.h"
 #include "machine/8155pio.h"
 #include "machine/rp5c01a.h"
+#include "machine/msm8251.h"
 #include "video/hd61830.h"
 #include "sound/speaker.h"
 
@@ -539,7 +540,8 @@ static ADDRESS_MAP_START( tandy200_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x90, 0x9f) AM_DEVREADWRITE(RP5C01A_TAG, rp5c01a_r, rp5c01a_w)
 //	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0f) AM_DEVWRITE(TCM5089_TAG, tcm5089_w)
 	AM_RANGE(0xb0, 0xb7) AM_MIRROR(0x08) AM_DEVREADWRITE(PIO8155_TAG, pio8155_r, pio8155_w)
-//	AM_RANGE(0xc0, 0xc1) AM_MIRROR(0x0e) AM_DEVREADWRITE(UART8251_TAG, uart8251_r, uart8251_w)
+	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x0e) AM_DEVREADWRITE(MSM8251_TAG, msm8251_data_r, msm8251_data_w)
+	AM_RANGE(0xc1, 0xc1) AM_MIRROR(0x0e) AM_DEVREADWRITE(MSM8251_TAG, msm8251_status_r, msm8251_control_w)
 	AM_RANGE(0xd0, 0xd0) AM_MIRROR(0x0f) AM_READWRITE(tandy200_bank_r, tandy200_bank_w)
 	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x0f) AM_READWRITE(tandy200_stbk_r, tandy200_stbk_w)
 	AM_RANGE(0xf0, 0xf0) AM_MIRROR(0x0e) AM_DEVREADWRITE(HD61830_TAG, hd61830_data_r, hd61830_data_w)
@@ -1099,6 +1101,14 @@ static PIO8155_INTERFACE( tandy200_8155_intf )
 	DEVCB_LINE(tandy200_8155_to_w)			/* timer output */
 };
 
+/* MSM8251 Interface */
+
+static msm8251_interface tandy200_msm8251_interface = {
+	NULL,
+	NULL,
+	NULL
+};
+
 /* Machine Drivers */
 
 static MACHINE_START( kc85 )
@@ -1405,7 +1415,7 @@ static MACHINE_DRIVER_START( tandy200 )
 	/* devices */
 	MDRV_PIO8155_ADD(PIO8155_TAG, XTAL_4_9152MHz/2, tandy200_8155_intf)
 	MDRV_RP5C01A_ADD(RP5C01A_TAG, XTAL_32_768kHz, tandy200_rp5c01a_intf)
-//	MDRV_UART8251_ADD(UART8251_TAG, XTAL_4_9152MHz/2, tandy200_8255_intf)
+	MDRV_MSM8251_ADD(MSM8251_TAG, /*XTAL_4_9152MHz/2,*/ tandy200_msm8251_interface)
 //	MDRV_MC14412_ADD(MC14412_TAG, XTAL_1MHz)
 
 	/* printer */

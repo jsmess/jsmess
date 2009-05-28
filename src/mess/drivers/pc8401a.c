@@ -3,6 +3,7 @@
 #include "cpu/z80/z80.h"
 #include "devices/cartslot.h"
 #include "machine/8255ppi.h"
+#include "machine/msm8251.h"
 #include "machine/upd1990a.h"
 #include "video/sed1330.h"
 #include "video/mc6845.h"
@@ -379,7 +380,8 @@ static ADDRESS_MAP_START( pc8500_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x08, 0x08) AM_READ_PORT("KEY8")
 	AM_RANGE(0x09, 0x09) AM_READ_PORT("KEY9")
 	AM_RANGE(0x10, 0x10) AM_WRITE(rtc_cmd_w)
-//	AM_RANGE(0x20, 0x21) AM_DEVREADWRITE(UART8251_TAG, uart8251_r, uart8251_w)
+	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE(MSM8251_TAG, msm8251_data_r, msm8251_data_w)
+	AM_RANGE(0x21, 0x21) AM_DEVREADWRITE(MSM8251_TAG, msm8251_status_r, msm8251_control_w)
 	AM_RANGE(0x30, 0x30) AM_READWRITE(mmr_r, mmr_w)
 //	AM_RANGE(0x31, 0x31)
 	AM_RANGE(0x40, 0x40) AM_READWRITE(rtc_r, rtc_ctrl_w)
@@ -618,6 +620,14 @@ static UPD1990A_INTERFACE( pc8401a_upd1990a_intf )
 	DEVCB_LINE(pc8401a_upd1990a_tp_w)
 };
 
+/* MSM8251 Interface */
+
+static msm8251_interface pc8401a_msm8251_interface = {
+	NULL,
+	NULL,
+	NULL
+};
+
 /* Machine Drivers */
 
 static MACHINE_DRIVER_START( common )
@@ -636,6 +646,7 @@ static MACHINE_DRIVER_START( common )
 	/* devices */
 	MDRV_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, pc8401a_upd1990a_intf)
 	MDRV_PPI8255_ADD(PPI8255_TAG, pc8401a_ppi8255_interface)
+	MDRV_MSM8251_ADD(MSM8251_TAG, pc8401a_msm8251_interface)
 
 	/* option ROM cartridge */
 	MDRV_CARTSLOT_ADD("cart")

@@ -10,6 +10,7 @@
 #define AY8910_TAG		"ay8910"
 #define SED1330_TAG		"sed1330"
 #define MC6845_TAG		"mc6845"
+#define MSM8251_TAG		"msm8251"
 
 #define PC8401A_CRT_VIDEORAM_SIZE	0x2000
 #define PC8401A_LCD_VIDEORAM_SIZE	0x2000

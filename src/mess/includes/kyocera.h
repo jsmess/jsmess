@@ -15,7 +15,7 @@
 #define RP5C01A_TAG		"m301"
 #define TCM5089_TAG		"m11"
 #define HD61830_TAG		"m18"
-#define UART8251_TAG	"m20"
+#define MSM8251_TAG		"m20"
 
 #define TANDY200_VIDEORAM_SIZE	0x2000
 #define TANDY200_VIDEORAM_MASK	0x1fff
