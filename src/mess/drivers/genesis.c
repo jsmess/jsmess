@@ -575,10 +575,6 @@ ROM_END
 80001d  byte  Games write 'G'
 80001f  byte  Games write 'A'
 
-
-TODO: MAME/hazeMD code should allow to handle VDP without the z80 (Pico has no z80 CPU).
-  Currently, this is not possible, so we leave the z80 there, even if not used.
-
 */
 
 #define PICO_PENX	1
@@ -728,8 +724,11 @@ INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( pico )
 	MDRV_IMPORT_FROM(megadriv)
+
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(_pico_mem)
+
+	MDRV_CPU_REMOVE("genesis_snd_z80")
 
 	MDRV_MACHINE_RESET( ms_megadriv )
 	
@@ -738,8 +737,11 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( picopal )
 	MDRV_IMPORT_FROM(megadpal)
+
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(_pico_mem)
+
+	MDRV_CPU_REMOVE("genesis_snd_z80")
 
 	MDRV_MACHINE_RESET( ms_megadriv )
 	
