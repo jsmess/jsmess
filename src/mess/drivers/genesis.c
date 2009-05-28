@@ -338,6 +338,14 @@ static MACHINE_DRIVER_START( ms_megadriv )
 	MDRV_IMPORT_FROM( genesis_cartslot )
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( ms_megadpal )
+	MDRV_IMPORT_FROM(megadpal)
+
+	MDRV_MACHINE_RESET( ms_megadriv )
+	
+	MDRV_IMPORT_FROM( genesis_cartslot )
+MACHINE_DRIVER_END
+
 static MACHINE_DRIVER_START( ms_megdsvp )
 	MDRV_IMPORT_FROM(megdsvp)
 
@@ -473,6 +481,8 @@ ROM_START( megacdj )
 	ROMX_LOAD( "laseractive_bios_1_02_j.bin", 0x000000,  0x020000, CRC(00eedb3a) SHA1(26237b333db4a4c6770297fa5e655ea95840d5d9), ROM_BIOS(4) )
 	ROM_SYSTEM_BIOS(4, "xeye", "JVC X'eye")
 	ROMX_LOAD( "xeye_bios_j.bin", 0x000000,  0x020000, CRC(290f8e33) SHA1(651f14d5a5e0ecb974a60c0f43b1d2006323fb09), ROM_BIOS(5) )
+	ROM_SYSTEM_BIOS(5, "mcd2", "Mega-CD 2 v2.00C")
+	ROMX_LOAD( "megacd2_bios_2_00c_j.bin", 0x000000,  0x020000, CRC(dd6cc972) SHA1(d203cfe22c03ae479dd8ca33840cf8d9776eb3ff), ROM_BIOS(6) )
 ROM_END
 
 ROM_START( segacd )
@@ -487,8 +497,10 @@ ROM_START( segacd )
 	ROMX_LOAD( "segacd_model2_bios_2_00w_u.bin", 0x000000,  0x020000, CRC(9f6f6276) SHA1(5adb6c3af218c60868e6b723ec47e36bbdf5e6f0), ROM_BIOS(4) )
 	ROM_SYSTEM_BIOS(4, "v102las", "Pioneer LaserActive v1.02")
 	ROMX_LOAD( "laseractive_bios_1_02_u.bin", 0x000000,  0x020000, CRC(3b10cf41) SHA1(8af162223bb12fc19b414f126022910372790103), ROM_BIOS(5) )
-	ROM_SYSTEM_BIOS(5, "v221", "CDX v2.21")
-	ROMX_LOAD( "segacdx_bios_2_21_u.bin", 0x000000,  0x020000, CRC(d48c44b5) SHA1(2b125c0545afa089b617f2558e686ea723bdc06e), ROM_BIOS(6) )
+	ROM_SYSTEM_BIOS(5, "v104las", "Pioneer LaserActive v1.04")
+	ROMX_LOAD( "laseractive_bios_1_04_u.bin", 0x000000,  0x020000, CRC(50cd3d23) SHA1(aa811861f8874775075bd3f53008c8aaf59b07db), ROM_BIOS(6) )
+	ROM_SYSTEM_BIOS(6, "v221", "CDX v2.21")
+	ROMX_LOAD( "segacdx_bios_2_21_u.bin", 0x000000,  0x020000, CRC(d48c44b5) SHA1(2b125c0545afa089b617f2558e686ea723bdc06e), ROM_BIOS(7) )
 ROM_END
 
 /* some games use the 32x and SegaCD together to give better quality FMV */
@@ -724,6 +736,16 @@ static MACHINE_DRIVER_START( pico )
 	MDRV_IMPORT_FROM( pico_cartslot )
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( picopal )
+	MDRV_IMPORT_FROM(megadpal)
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_PROGRAM_MAP(_pico_mem)
+
+	MDRV_MACHINE_RESET( ms_megadriv )
+	
+	MDRV_IMPORT_FROM( pico_cartslot )
+MACHINE_DRIVER_END
+
 
 
 ROM_START( pico )
@@ -750,9 +772,9 @@ ROM_END
 /*    YEAR  NAME        PARENT     COMPAT  MACHINE          INPUT   INIT     CONFIG COMPANY   FULLNAME */
 CONS( 1989, genesis,    0,         0,      ms_megadriv,     md,     genesis,   0,   "Sega",   "Genesis (USA, NTSC)", 0)
 CONS( 1993, gensvp,     genesis,   0,      ms_megdsvp,      md_sel, gensvp,    0,   "Sega",   "Genesis (USA, NTSC, w/SVP)", 0)
-CONS( 1990, megadriv,   genesis,   0,      ms_megadriv,     md,     md_eur,    0,   "Sega",   "Mega Drive (Europe, PAL)", 0)
+CONS( 1990, megadriv,   genesis,   0,      ms_megadpal,     md,     md_eur,    0,   "Sega",   "Mega Drive (Europe, PAL)", 0)
 CONS( 1988, megadrij,   genesis,   0,      ms_megadriv,     md,     md_jpn,    0,   "Sega",   "Mega Drive (Japan, NTSC)", 0)
-CONS( 1994, pico,       0,         0,      pico,            pico,   md_eur,    0,   "Sega",   "Pico (Europe, PAL)", 0)
+CONS( 1994, pico,       0,         0,      picopal,         pico,   md_eur,    0,   "Sega",   "Pico (Europe, PAL)", 0)
 CONS( 1994, picou,      pico,      0,      pico,            pico,   genesis,   0,   "Sega",   "Pico (USA, NTSC)", 0)
 CONS( 1993, picoj,      pico,      0,      pico,            pico,   md_jpn,    0,   "Sega",   "Pico (Japan, NTSC)", 0)
 
