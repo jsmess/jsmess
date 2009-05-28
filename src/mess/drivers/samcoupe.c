@@ -289,31 +289,27 @@ static READ8_HANDLER( samcoupe_attributes_r )
 }
 
 
-static READ8_HANDLER( samcoupe_lpt1_busy_r )
+static READ8_DEVICE_HANDLER( samcoupe_lpt1_busy_r )
 {
-	const device_config *printer = devtag_get_device(space->machine, "lpt1");
-	return centronics_busy_r(printer);
+	return centronics_busy_r(device);
 }
 
 
-static WRITE8_HANDLER( samcoupe_lpt1_strobe_w )
+static WRITE8_DEVICE_HANDLER( samcoupe_lpt1_strobe_w )
 {
-	const device_config *printer = devtag_get_device(space->machine, "lpt1");
-	centronics_strobe_w(printer, data);
+	centronics_strobe_w(device, data);
 }
 
 
-static READ8_HANDLER( samcoupe_lpt2_busy_r )
+static READ8_DEVICE_HANDLER( samcoupe_lpt2_busy_r )
 {
-	const device_config *printer = devtag_get_device(space->machine, "lpt2");
-	return centronics_busy_r(printer);
+	return centronics_busy_r(device);
 }
 
 
-static WRITE8_HANDLER( samcoupe_lpt2_strobe_w )
+static WRITE8_DEVICE_HANDLER( samcoupe_lpt2_strobe_w )
 {
-	const device_config *printer = devtag_get_device(space->machine, "lpt2");
-	centronics_strobe_w(printer, data);
+	centronics_strobe_w(device, data);
 }
 
 
@@ -333,22 +329,22 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( samcoupe_io, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x80, 0x81) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_WRITE(samcoupe_ext_mem_w)
-	AM_RANGE(0xe0, 0xe7) AM_MIRROR(0xff10) AM_MASK(0xffff) AM_READWRITE(samcoupe_disk_r, samcoupe_disk_w)
-	AM_RANGE(0xe8, 0xe8) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_DEVWRITE("lpt1", centronics_data_w)
-	AM_RANGE(0xe9, 0xe9) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(samcoupe_lpt1_busy_r, samcoupe_lpt1_strobe_w)
-	AM_RANGE(0xea, 0xea) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_DEVWRITE("lpt2", centronics_data_w)
-	AM_RANGE(0xeb, 0xeb) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(samcoupe_lpt2_busy_r, samcoupe_lpt2_strobe_w)
-	AM_RANGE(0xf8, 0xf8) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(samcoupe_pen_r, samcoupe_clut_w)
-	AM_RANGE(0xf9, 0xf9) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(samcoupe_status_r, samcoupe_line_int_w)
-	AM_RANGE(0xfa, 0xfa) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(samcoupe_lmpr_r, samcoupe_lmpr_w)
-	AM_RANGE(0xfb, 0xfb) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(samcoupe_hmpr_r, samcoupe_hmpr_w)
-	AM_RANGE(0xfc, 0xfc) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(samcoupe_vmpr_r, samcoupe_vmpr_w)
-	AM_RANGE(0xfd, 0xfd) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(samcoupe_midi_r, samcoupe_midi_w)
-	AM_RANGE(0xfe, 0xfe) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(samcoupe_keyboard_r, samcoupe_border_w)
-	AM_RANGE(0xff, 0xff) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READ(samcoupe_attributes_r)
-	AM_RANGE(0xff, 0xff) AM_MIRROR(0xfe00) AM_MASK(0xffff) AM_DEVWRITE("saa1099", saa1099_data_w)
-	AM_RANGE(0x1ff, 0x1ff) AM_MIRROR(0xfe00) AM_MASK(0xffff) AM_DEVWRITE("saa1099", saa1099_control_w)
+	AM_RANGE(0x0080, 0x0081) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_WRITE(samcoupe_ext_mem_w)
+	AM_RANGE(0x00e0, 0x00e7) AM_MIRROR(0xff10) AM_MASK(0xffff) AM_READWRITE(samcoupe_disk_r, samcoupe_disk_w)
+	AM_RANGE(0x00e8, 0x00e8) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_DEVWRITE("lpt1", centronics_data_w)
+	AM_RANGE(0x00e9, 0x00e9) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_DEVREADWRITE("lpt1", samcoupe_lpt1_busy_r, samcoupe_lpt1_strobe_w)
+	AM_RANGE(0x00ea, 0x00ea) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_DEVWRITE("lpt2", centronics_data_w)
+	AM_RANGE(0x00eb, 0x00eb) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_DEVREADWRITE("lpt2", samcoupe_lpt2_busy_r, samcoupe_lpt2_strobe_w)
+	AM_RANGE(0x00f8, 0x00f8) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(samcoupe_pen_r, samcoupe_clut_w)
+	AM_RANGE(0x00f9, 0x00f9) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(samcoupe_status_r, samcoupe_line_int_w)
+	AM_RANGE(0x00fa, 0x00fa) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(samcoupe_lmpr_r, samcoupe_lmpr_w)
+	AM_RANGE(0x00fb, 0x00fb) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(samcoupe_hmpr_r, samcoupe_hmpr_w)
+	AM_RANGE(0x00fc, 0x00fc) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(samcoupe_vmpr_r, samcoupe_vmpr_w)
+	AM_RANGE(0x00fd, 0x00fd) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(samcoupe_midi_r, samcoupe_midi_w)
+	AM_RANGE(0x00fe, 0x00fe) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(samcoupe_keyboard_r, samcoupe_border_w)
+	AM_RANGE(0x00ff, 0x00ff) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READ(samcoupe_attributes_r)
+	AM_RANGE(0x00ff, 0x00ff) AM_MIRROR(0xfe00) AM_MASK(0xffff) AM_DEVWRITE("saa1099", saa1099_data_w)
+	AM_RANGE(0x01ff, 0x01ff) AM_MIRROR(0xfe00) AM_MASK(0xffff) AM_DEVWRITE("saa1099", saa1099_control_w)
 ADDRESS_MAP_END
 
 

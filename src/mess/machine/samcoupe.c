@@ -148,17 +148,15 @@ WRITE8_HANDLER( samcoupe_ext_mem_w )
 }
 
 
-static READ8_HANDLER( samcoupe_rtc_r )
+static READ8_DEVICE_HANDLER( samcoupe_rtc_r )
 {
-	const device_config *rtc = devtag_get_device(space->machine, "sambus_clock");
-	return msm6242_r(rtc, offset >> 12);
+	return msm6242_r(device, offset >> 12);
 }
 
 
-static WRITE8_HANDLER( samcoupe_rtc_w )
+static WRITE8_DEVICE_HANDLER( samcoupe_rtc_w )
 {
-	const device_config *rtc = devtag_get_device(space->machine, "sambus_clock");
-	msm6242_w(rtc, offset >> 12, data);
+	msm6242_w(device, offset >> 12, data);
 }
 
 
@@ -177,7 +175,8 @@ MACHINE_RESET( samcoupe )
 	if (input_port_read(machine, "config") & 0x01)
 	{
 		/* install RTC */
-		memory_install_readwrite8_handler(spaceio, 0xef, 0xef, 0xffff, 0xff00, samcoupe_rtc_r, samcoupe_rtc_w);
+		const device_config *rtc = devtag_get_device(machine, "rtc");
+		memory_install_readwrite8_device_handler(spaceio, rtc, 0xef, 0xef, 0xffff, 0xff00, samcoupe_rtc_r, samcoupe_rtc_w);
 	}
 	else
 	{
