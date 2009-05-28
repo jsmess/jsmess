@@ -31,7 +31,68 @@
 #include "cpu/m6809/m6809.h"
 #include "sound/ay8910.h"
 
+// Interrupt flags
+#define IRQ_FLAG_KEY      0x01
+#define IRQ_FLAG_PRINTER  0x02
+#define IRQ_FLAG_TIMER    0x04
+#define IRQ_FLAG_UNKNOWN  0x08
+// the following are not read in port 0xfd03
+#define IRQ_FLAG_MFD      0x10
+#define IRQ_FLAG_TXRDY    0x20
+#define IRQ_FLAG_RXRDY    0x40
+#define IRQ_FLAG_SYNDET   0x80
+
 UINT8* shared_ram;
+UINT8* fm7_video_ram;
+static UINT8 irq_flags;  // active IRQ flags
+static UINT8 irq_mask;  // IRQ mask 
+emu_timer* fm7_timer;  // main timer, triggered every 2.0345ms?
+static UINT8 sub_busy;
+static UINT8 basic_rom_en;
+static UINT8 fm7_attn_irq;
+
+/*
+ * I/O port 0xfd02
+ * 
+ * On read: returns cassette data (bit 7) and printer status (bits 0-5)
+ * On write: sets IRQ masks 
+ *   bit 0 - keypress
+ *   bit 1 - printer
+ *   bit 2 - timer
+ *   bit 3 - not used
+ *   bit 4 - MFD
+ *   bit 5 - TXRDY
+ *   bit 6 - RXRDY
+ *   bit 7 - SYNDET
+ * 
+ */
+WRITE8_HANDLER( fm7_irq_mask_w )
+{
+	irq_mask = data;
+	logerror("IRQ mask set: 0x%02x\n",irq_mask);
+}
+
+/*
+ * I/O port 0xfd03
+ * 
+ * On read: returns which IRQ is currently active (typically read by IRQ handler)
+ *   bit 0 - keypress
+ *   bit 1 - printer
+ *   bit 2 - timer
+ *   bit 3 - ???
+ * On write: Buzzer/Speaker On/Off
+ *   bit 0 - speaker on/off
+ *   bit 1 - ??buzzer on/off
+ *   bit 2 - ??buzzer on/off
+ */
+READ8_HANDLER( fm7_irq_cause_r )
+{
+	UINT8 ret = irq_flags;
+	
+	irq_flags = 0;  // clear flags
+	logerror("IRQ flags read: 0x%02x\n",ret);
+	return ret;
+}
 
 READ8_HANDLER( mainmem_r )
 {
@@ -73,9 +134,108 @@ WRITE8_HANDLER( shared_w )
 
 READ8_HANDLER( fm7_fd04_r )
 {
+	UINT8 ret = 0xff;
+	
+	if(fm7_attn_irq != 0)
+	{
+		ret &= ~0x01;
+		fm7_attn_irq = 0;
+	}
+	return ret;
+}
+/*
+ * Sub-CPU interface (port 0xfd05)
+ * 
+ * Read:
+ *   bit 7: Sub-CPU busy
+ *   bit 0: EXTDET (?)
+ * Write:
+ *   bit 7: Sub-CPU halt
+ *   bit 6: Sub-CPU cancel IRQ
+ */
+
+READ8_HANDLER( fm7_subintf_r )
+{
+	return sub_busy & 0x80;
+}
+
+WRITE8_HANDLER( fm7_subintf_w )
+{
+	cputag_set_input_line(space->machine,"sub",INPUT_LINE_HALT,(data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
+	if(data & 0x40)
+		cputag_set_input_line(space->machine,"sub",M6809_IRQ_LINE,ASSERT_LINE);
+}
+
+READ8_HANDLER( fm7_sub_busyflag_r )
+{
+	sub_busy = 0x00;
+	return 0x00;
+}
+
+WRITE8_HANDLER( fm7_sub_busyflag_w )
+{
+	sub_busy = 0x80;
+}
+
+READ8_HANDLER( fm7_rom_en_r )
+{
+	UINT8* RAM = memory_region(space->machine,"maincpu");
+	
+	basic_rom_en = 1;
+	memory_set_bankptr(space->machine,1,RAM+0x38000);
+	logerror("BASIC ROM enabled\n");
+	return 0x00;
+}
+
+WRITE8_HANDLER( fm7_rom_en_w )
+{
+	UINT8* RAM = memory_region(space->machine,"maincpu");
+	
+	basic_rom_en = 0;
+	memory_set_bankptr(space->machine,1,RAM+0x8000);
+	logerror("BASIC ROM disabled\n");
+}
+
+/*
+ * Sub-CPU port 0xd402
+ *   Read-only: Acknowledge Cancel IRQ
+ */
+READ8_HANDLER( fm7_cancel_ack )
+{
+	cputag_set_input_line(space->machine,"sub",M6809_IRQ_LINE,CLEAR_LINE);
+	return 0x00;
+}
+
+/*
+ * Reading from 0xd404 (sub-CPU) causes an "Attention" FIRQ on the main CPU 
+ */
+READ8_HANDLER( fm7_attn_irq_r )
+{
+	fm7_attn_irq = 1;
+	cputag_set_input_line(space->machine,"maincpu",M6809_FIRQ_LINE,ASSERT_LINE);
 	return 0xff;
 }
 
+static TIMER_CALLBACK( fm7_timer_irq )
+{
+	if(~irq_mask & IRQ_FLAG_TIMER)
+	{
+		irq_flags |= IRQ_FLAG_TIMER;
+		cputag_set_input_line(machine,"maincpu",M6809_IRQ_LINE,ASSERT_LINE);
+	}
+}
+
+static IRQ_CALLBACK(fm7_irq_ack)
+{
+	cputag_set_input_line(device->machine,"maincpu",irqline,CLEAR_LINE);
+	return -1;
+}
+
+static IRQ_CALLBACK(fm7_sub_irq_ack)
+{
+	cputag_set_input_line(device->machine,"sub",irqline,CLEAR_LINE);
+	return -1;
+}
 
 /*
    0000 - 7FFF: (RAM) BASIC working area, user's area
@@ -88,13 +248,17 @@ READ8_HANDLER( fm7_fd04_r )
 // The FM-7 has only 64kB RAM, so we'll worry about banking when we do the later models
 static ADDRESS_MAP_START( fm7_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000,0x7fff) AM_READWRITE(mainmem_r,mainmem_w)
-	AM_RANGE(0x8000,0xfbff) AM_ROM // also F-BASIC ROM, when enabled
+	AM_RANGE(0x8000,0xfbff) AM_RAMBANK(1) // also F-BASIC ROM, when enabled
 	AM_RANGE(0xfc00,0xfc7f) AM_RAM
 	AM_RANGE(0xfc80,0xfcff) AM_READWRITE(shared_r,shared_w) // shared RAM with sub-CPU
 	// I/O space (FD00-FDFF)
+	AM_RANGE(0xfd02,0xfd02) AM_WRITE(fm7_irq_mask_w)  // IRQ mask
+	AM_RANGE(0xfd03,0xfd03) AM_READ(fm7_irq_cause_r)  // IRQ flags
 	AM_RANGE(0xfd04,0xfd04) AM_READ(fm7_fd04_r)
+	AM_RANGE(0xfd05,0xfd05) AM_READWRITE(fm7_subintf_r,fm7_subintf_w)
 	AM_RANGE(0xfd0d,0xfd0d) AM_DEVWRITE("psg",ay8910_address_w)
 	AM_RANGE(0xfd0e,0xfd0e) AM_DEVREADWRITE("psg",ay8910_r,ay8910_data_w)
+	AM_RANGE(0xfd0f,0xfd0f) AM_READWRITE(fm7_rom_en_r,fm7_rom_en_w)
 	// Boot ROM
 	AM_RANGE(0xfe00,0xffef) AM_ROM AM_REGION("basic",0x0000)
 	AM_RANGE(0xfff0,0xffff) AM_READWRITE(vector_r,vector_w) 
@@ -110,13 +274,15 @@ ADDRESS_MAP_END
    FFF0 - FFFF: Interrupt vector table
 */
 
-UINT8 *fm7_video_ram;
 static ADDRESS_MAP_START( fm7_sub_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000,0xbfff) AM_RAM AM_BASE(&fm7_video_ram) // VRAM
 	AM_RANGE(0xc000,0xcfff) AM_RAM // Console RAM
 	AM_RANGE(0xd000,0xd37f) AM_RAM // Work RAM
 	AM_RANGE(0xd380,0xd3ff) AM_READWRITE(shared_r,shared_w) // shared RAM
 	// I/O space (D400-D7FF)
+	AM_RANGE(0xd402,0xd402) AM_READ(fm7_cancel_ack)
+	AM_RANGE(0xd404,0xd404) AM_READ(fm7_attn_irq_r)
+	AM_RANGE(0xd40a,0xd40a) AM_READWRITE(fm7_sub_busyflag_r,fm7_sub_busyflag_w)
 	AM_RANGE(0xd800,0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -136,6 +302,9 @@ INPUT_PORTS_END
 static DRIVER_INIT(fm7)
 {
 	shared_ram = auto_alloc_array(machine,UINT8,0x80);
+	fm7_timer = timer_alloc(machine,fm7_timer_irq,NULL);
+	cpu_set_irq_callback(cputag_get_cpu(machine,"maincpu"),fm7_irq_ack);
+	cpu_set_irq_callback(cputag_get_cpu(machine,"sub"),fm7_sub_irq_ack);
 }
 
 static MACHINE_START(fm7)
@@ -152,6 +321,15 @@ static MACHINE_START(fm7)
 
 static MACHINE_RESET(fm7)
 {
+	UINT8* RAM = memory_region(machine,"maincpu");
+	
+	timer_adjust_periodic(fm7_timer,attotime_zero,0,ATTOTIME_IN_USEC(2034));
+	irq_mask = 0xff;
+	irq_flags = 0x00;
+	fm7_attn_irq = 0;
+	sub_busy = 0x80;  // busy at reset
+	basic_rom_en = 1;  // enabled at reset
+	memory_set_bankptr(machine,1,RAM+0x38000);
 }
 
 static VIDEO_START( fm7 )
@@ -265,7 +443,7 @@ MACHINE_DRIVER_END
 /* ROM definition */
 ROM_START( fm7 )
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "fbasic30.rom", 0x8000,  0x7c00, CRC(a96d19b6) SHA1(8d5f0cfe7e0d39bf2ab7e4c798a13004769c28b2) )
+	ROM_LOAD( "fbasic30.rom", 0x38000,  0x7c00, CRC(a96d19b6) SHA1(8d5f0cfe7e0d39bf2ab7e4c798a13004769c28b2) )
 
 	ROM_REGION( 0x20000, "sub", 0 )
 	ROM_LOAD( "subsys_c.rom", 0xd800,  0x2800, CRC(24cec93f) SHA1(50b7283db6fe1342c6063fc94046283f4feddc1c) )
