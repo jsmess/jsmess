@@ -1413,6 +1413,7 @@ $(MESSOBJ)/skeleton.a: \
 	$(MESS_DRIVERS)/univac.o \
 	$(MESS_DRIVERS)/pc98.o \
 	$(MESS_DRIVERS)/uknc.o \
+	$(MESS_DRIVERS)/x07.o \
 	
 #-------------------------------------------------
 # layout dependencies

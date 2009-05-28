@@ -11,6 +11,7 @@ New System Drivers Supported (in no particular order):
 - CD-I (not working)  [incog nito]
 - CIP-01 [Miodrag Milanovic]
 - Frael Bruc 100-1 [Miodrag Milanovic]
+- HP38G, HP39G, HP49G (partialy working) [Miodrag Milanovic]
 - MC80.21/22 (not working) [Miodrag Milanovic]
 - MC80.30/31 (not working) [Miodrag Milanovic]
 - Microbee Premium PC85 (not working) [Robbbert]
@@ -21,6 +22,9 @@ New System Drivers Supported (in no particular order):
   PC-8801MA2, PC-8801MC [Fabio Priuli]
 - NTS DreamWriter T200 (not working)  [Roberto Carlos
   Fernandez Gerhardt, Wilbert Pol]
+- Palm IIIc,Palm m100,Palm m130,Palm m505,Palm m515 
+  Palm V, Palm Vx,Visor Edge,Symbol SPT1500,
+  Symbol SPT1700, Symbol SPT1740 (not working) [Miodrag Milanovic]
 - PC/M Mugler [Miodrag Milanovic]
 - PolyMorphic Systems Poly-88 [Miodrag Milanovic]
 - PolyMorphic Systems Poly-8813 (not working) [Miodrag Milanovic]
@@ -32,10 +36,6 @@ New System Drivers Supported (in no particular order):
 - TK85 [Robbbert, Miodrag Milanovic]
 - Timex Sinclair 1500 [Robbbert, Miodrag Milanovic]
 - Votrax Type-'N-Talk (not working) [Lord Nightmare, Kevtris]
-- Palm IIIc,Palm m100,Palm m130,Palm m505,Palm m515 
-  Palm V, Palm Vx,Visor Edge,Symbol SPT1500,
-  Symbol SPT1700, Symbol SPT1740 (not working) [Miodrag Milanovic]
-- HP38G, HP39G, HP49G (partialy working) [Miodrag Milanovic]
 - ZX97 (not working) [Miodrag Milanovic]
 
 Skeleton drivers : 
@@ -49,6 +49,7 @@ Skeleton drivers :
 - Camputers Lynx 48
 - Camputers Lynx 96
 - Camputers Lynx 128
+- Canon X-07
 - CCE MC-1000
 - Chess-Master	
 - DEC VK-100
@@ -121,6 +122,7 @@ Skeleton drivers :
 - UKNC
 - VCS-80
 - Visual 1050
+- V-Tech Socrates 
 - Xerox 820
 - XOR-100-12
 

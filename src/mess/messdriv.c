@@ -1366,5 +1366,6 @@ const game_driver * const drivers[] =
 	DRIVER( uts20 )	
 	DRIVER( uknc )	
 	DRIVER( zx97)
+	DRIVER( x07)
 
 #endif /* DRIVER_RECURSIVE */
