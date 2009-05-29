@@ -47,6 +47,7 @@ UINT8* fm7_video_ram;
 static UINT8 irq_flags;  // active IRQ flags
 static UINT8 irq_mask;  // IRQ mask 
 emu_timer* fm7_timer;  // main timer, triggered every 2.0345ms?
+emu_timer* fm7_subtimer;  // sub-CPU timer, every 1 second?
 static UINT8 sub_busy;
 static UINT8 basic_rom_en;
 static UINT8 attn_irq;
@@ -158,7 +159,12 @@ READ8_HANDLER( fm7_fd04_r )
 
 READ8_HANDLER( fm7_subintf_r )
 {
-	return sub_busy & 0x80;
+	UINT8 ret = 0;
+	
+	if(sub_busy != 0)
+		ret |= 0x80;
+		
+	return ret;
 }
 
 WRITE8_HANDLER( fm7_subintf_w )
@@ -251,13 +257,39 @@ WRITE8_HANDLER( fm7_crt_w )
 	crt_enable = 0;
 }
 
+READ8_HANDLER( fm7_fdc_r )
+{
+	switch(offset)
+	{
+		case 0:
+			return 0x80;  // drive not ready
+		default:
+			logerror("FDC: read from 0x%04x\n",offset+0xfd18);
+	}
+	return 0x00;
+}
+
+WRITE8_HANDLER( fm7_fdc_w )
+{
+	switch(offset)
+	{
+		default:
+			logerror("FDC: wrote %02x to 0x%04x\n",data,offset+0xfd18);
+	}
+}
+
 static TIMER_CALLBACK( fm7_timer_irq )
 {
-	if(~irq_mask & IRQ_FLAG_TIMER)
+	if(irq_mask & IRQ_FLAG_TIMER)
 	{
 		irq_flags |= IRQ_FLAG_TIMER;
 		cputag_set_input_line(machine,"maincpu",M6809_IRQ_LINE,ASSERT_LINE);
 	}
+}
+
+static TIMER_CALLBACK( fm7_subtimer_irq )
+{
+	cputag_set_input_line(machine,"sub",INPUT_LINE_NMI,PULSE_LINE);
 }
 
 static IRQ_CALLBACK(fm7_irq_ack)
@@ -294,6 +326,7 @@ static ADDRESS_MAP_START( fm7_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfd0d,0xfd0d) AM_DEVWRITE("psg",ay8910_address_w)
 	AM_RANGE(0xfd0e,0xfd0e) AM_DEVREADWRITE("psg",ay8910_r,ay8910_data_w)
 	AM_RANGE(0xfd0f,0xfd0f) AM_READWRITE(fm7_rom_en_r,fm7_rom_en_w)
+	AM_RANGE(0xfd18,0xfd1f) AM_READWRITE(fm7_fdc_r,fm7_fdc_w)
 	// Boot ROM
 	AM_RANGE(0xfe00,0xffef) AM_ROM AM_REGION("basic",0x0000)
 	AM_RANGE(0xfff0,0xffff) AM_READWRITE(vector_r,vector_w) 
@@ -341,6 +374,7 @@ static DRIVER_INIT(fm7)
 	shared_ram = auto_alloc_array(machine,UINT8,0x80);
 	fm7_video_ram = auto_alloc_array(machine,UINT8,0xc000);
 	fm7_timer = timer_alloc(machine,fm7_timer_irq,NULL);
+	fm7_subtimer = timer_alloc(machine,fm7_subtimer_irq,NULL);
 	cpu_set_irq_callback(cputag_get_cpu(machine,"maincpu"),fm7_irq_ack);
 	cpu_set_irq_callback(cputag_get_cpu(machine,"sub"),fm7_sub_irq_ack);
 }
@@ -361,7 +395,8 @@ static MACHINE_RESET(fm7)
 {
 	UINT8* RAM = memory_region(machine,"maincpu");
 	
-	timer_adjust_periodic(fm7_timer,attotime_zero,0,ATTOTIME_IN_USEC(2034));
+	timer_adjust_periodic(fm7_timer,ATTOTIME_IN_USEC(2034),0,ATTOTIME_IN_USEC(2034));
+	timer_adjust_periodic(fm7_subtimer,ATTOTIME_IN_MSEC(20),0,ATTOTIME_IN_MSEC(20));
 	irq_mask = 0xff;
 	irq_flags = 0x00;
 	attn_irq = 0;
