@@ -61,7 +61,7 @@
 #define SED1330_MX_AND						0x02	/* unimplemented */
 #define SED1330_MX_PRIORITY_OR				0x03	/* unimplemented */
 
-#define SED1330_FC_OFF						0x00	/* unimplemented */
+#define SED1330_FC_OFF						0x00
 #define SED1330_FC_SOLID					0x01	/* unimplemented */
 #define SED1330_FC_FLASH_32					0x02	/* unimplemented */
 #define SED1330_FC_FLASH_64					0x03	/* unimplemented */
@@ -524,6 +524,8 @@ static void draw_text_scanline(sed1330_t *sed1330, bitmap_t *bitmap, const recta
 	{
 		if ((va + sx) == sed1330->csr)
 		{
+			if (sed1330->fc == SED1330_FC_OFF) continue;
+
 			if (sed1330->cm)
 			{
 				/* block cursor */
