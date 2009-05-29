@@ -49,7 +49,9 @@ static UINT8 irq_mask;  // IRQ mask
 emu_timer* fm7_timer;  // main timer, triggered every 2.0345ms?
 static UINT8 sub_busy;
 static UINT8 basic_rom_en;
-static UINT8 fm7_attn_irq;
+static UINT8 attn_irq;
+static UINT8 vram_access;  // VRAM access flag
+static UINT8 crt_enable;
 
 /*
  * I/O port 0xfd02
@@ -136,10 +138,10 @@ READ8_HANDLER( fm7_fd04_r )
 {
 	UINT8 ret = 0xff;
 	
-	if(fm7_attn_irq != 0)
+	if(attn_irq != 0)
 	{
 		ret &= ~0x01;
-		fm7_attn_irq = 0;
+		attn_irq = 0;
 	}
 	return ret;
 }
@@ -211,9 +213,42 @@ READ8_HANDLER( fm7_cancel_ack )
  */
 READ8_HANDLER( fm7_attn_irq_r )
 {
-	fm7_attn_irq = 1;
+	attn_irq = 1;
 	cputag_set_input_line(space->machine,"maincpu",M6809_FIRQ_LINE,ASSERT_LINE);
 	return 0xff;
+}
+
+READ8_HANDLER( fm7_vram_access_r )
+{
+	vram_access = 1;
+	return 0xff;
+}
+
+WRITE8_HANDLER( fm7_vram_access_w )
+{
+	vram_access = 0;
+}
+
+READ8_HANDLER( fm7_vram_r )
+{
+	return fm7_video_ram[offset];
+}
+
+WRITE8_HANDLER( fm7_vram_w )
+{
+	if(vram_access != 0)
+		fm7_video_ram[offset] = data;
+}
+
+READ8_HANDLER( fm7_crt_r )
+{
+	crt_enable = 1;
+	return 0xff;
+}
+
+WRITE8_HANDLER( fm7_crt_w )
+{
+	crt_enable = 0;
 }
 
 static TIMER_CALLBACK( fm7_timer_irq )
@@ -275,13 +310,15 @@ ADDRESS_MAP_END
 */
 
 static ADDRESS_MAP_START( fm7_sub_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000,0xbfff) AM_RAM AM_BASE(&fm7_video_ram) // VRAM
+	AM_RANGE(0x0000,0xbfff) AM_READWRITE(fm7_vram_r,fm7_vram_w) // VRAM
 	AM_RANGE(0xc000,0xcfff) AM_RAM // Console RAM
 	AM_RANGE(0xd000,0xd37f) AM_RAM // Work RAM
 	AM_RANGE(0xd380,0xd3ff) AM_READWRITE(shared_r,shared_w) // shared RAM
 	// I/O space (D400-D7FF)
 	AM_RANGE(0xd402,0xd402) AM_READ(fm7_cancel_ack)
 	AM_RANGE(0xd404,0xd404) AM_READ(fm7_attn_irq_r)
+	AM_RANGE(0xd408,0xd408) AM_READWRITE(fm7_crt_r,fm7_crt_w)
+	AM_RANGE(0xd409,0xd409) AM_READWRITE(fm7_vram_access_r,fm7_vram_access_w)
 	AM_RANGE(0xd40a,0xd40a) AM_READWRITE(fm7_sub_busyflag_r,fm7_sub_busyflag_w)
 	AM_RANGE(0xd800,0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -302,6 +339,7 @@ INPUT_PORTS_END
 static DRIVER_INIT(fm7)
 {
 	shared_ram = auto_alloc_array(machine,UINT8,0x80);
+	fm7_video_ram = auto_alloc_array(machine,UINT8,0xc000);
 	fm7_timer = timer_alloc(machine,fm7_timer_irq,NULL);
 	cpu_set_irq_callback(cputag_get_cpu(machine,"maincpu"),fm7_irq_ack);
 	cpu_set_irq_callback(cputag_get_cpu(machine,"sub"),fm7_sub_irq_ack);
@@ -326,9 +364,11 @@ static MACHINE_RESET(fm7)
 	timer_adjust_periodic(fm7_timer,attotime_zero,0,ATTOTIME_IN_USEC(2034));
 	irq_mask = 0xff;
 	irq_flags = 0x00;
-	fm7_attn_irq = 0;
+	attn_irq = 0;
 	sub_busy = 0x80;  // busy at reset
 	basic_rom_en = 1;  // enabled at reset
+	vram_access = 0;
+	crt_enable = 0;
 	memory_set_bankptr(machine,1,RAM+0x38000);
 }
 
@@ -341,6 +381,9 @@ static VIDEO_UPDATE( fm7 )
     UINT8 code_r,code_g,code_b;
     UINT8 col;
     int y, x, b;
+
+	if(crt_enable == 0)
+		return 0;
 
     for (y = 0; y < 200; y++)
     {
