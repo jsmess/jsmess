@@ -698,20 +698,22 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "cpu/mb88xx/mb88xx.h"
 #include "machine/atari_vg.h"
-#include "machine/namcoio.h"
+#include "machine/namco06.h"
 #include "machine/namco50.h"
+#include "machine/namco51.h"
+#include "machine/namco53.h"
 #include "includes/galaga.h"
 #include "sound/namco.h"
-#include "sound/namco52.h"
+#include "audio/namco52.h"
 #include "machine/rescap.h"
 #include "sound/samples.h"
 #include "audio/namco54.h"
-#include "nam_cust.h"
 
 #define MASTER_CLOCK (XTAL_18_432MHz)
 
 
 static emu_timer *cpu3_interrupt_timer;
+static UINT8 custom_mod;
 
 
 
@@ -743,66 +745,120 @@ static WRITE8_HANDLER( bosco_latch_w )
 	switch (offset)
 	{
 		case 0x00:	/* IRQ1 */
-			cpu_interrupt_enable(space->machine->cpu[0],bit);
+			cpu_interrupt_enable(cputag_get_cpu(space->machine, "maincpu"), bit);
 			if (!bit)
-				cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
+				cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 			break;
 
 		case 0x01:	/* IRQ2 */
-			cpu_interrupt_enable(space->machine->cpu[1],bit);
+			cpu_interrupt_enable(cputag_get_cpu(space->machine, "sub"), bit);
 			if (!bit)
-				cpu_set_input_line(space->machine->cpu[1], 0, CLEAR_LINE);
+				cputag_set_input_line(space->machine, "sub", 0, CLEAR_LINE);
 			break;
 
 		case 0x02:	/* NMION */
-			cpu_interrupt_enable(space->machine->cpu[2],!bit);
+			cpu_interrupt_enable(cputag_get_cpu(space->machine, "sub2"), !bit);
 			break;
 
 		case 0x03:	/* RESET */
-			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
-			cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+			cputag_set_input_line(space->machine, "sub", INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+			cputag_set_input_line(space->machine, "sub2", INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 0x04:	/* n.c. */
 			break;
 
 		case 0x05:	/* MOD 0 (xevious: n.c.) */
+			custom_mod = (custom_mod & ~0x01) | (bit << 0);
+			break;
+
 		case 0x06:	/* MOD 1 (xevious: n.c.) */
+			custom_mod = (custom_mod & ~0x02) | (bit << 1);
+			break;
+
 		case 0x07:	/* MOD 2 (xevious: n.c.) */
+			custom_mod = (custom_mod & ~0x04) | (bit << 2);
 			break;
 	}
 }
 
+static CUSTOM_INPUT( shifted_port_r ) { return input_port_read(field->port->machine, param) >> 4; }
 
-static READ8_HANDLER( in0_l )	{ return input_port_read(space->machine, "IN0"); }		// fire and start buttons
-static READ8_HANDLER( in0_h )	{ return input_port_read(space->machine, "IN0") >> 4; }	// coins
-static READ8_HANDLER( in1_l )	{ return input_port_read(space->machine, "IN1"); }		// P1 joystick
-static READ8_HANDLER( in1_h )	{ return input_port_read(space->machine, "IN1") >> 4; }	// P2 joystick
-static READ8_HANDLER( dipA_l )	{ return input_port_read(space->machine, "DSWA"); }		// dips A
-static READ8_HANDLER( dipA_h )	{ return input_port_read(space->machine, "DSWA") >> 4; }	// dips A
-static READ8_HANDLER( dipB_l )	{ return input_port_read(space->machine, "DSWB"); }		// dips B
-static READ8_HANDLER( dipB_h )	{ return input_port_read(space->machine, "DSWB") >> 4; }	// dips B
-static WRITE8_HANDLER( out_0 )
+static WRITE8_DEVICE_HANDLER( out_0 )
 {
 	set_led_status(1,data & 1);
 	set_led_status(0,data & 2);
 	coin_counter_w(1,~data & 4);
 	coin_counter_w(0,~data & 8);
 }
-static WRITE8_HANDLER( out_1 )
+
+static WRITE8_DEVICE_HANDLER( out_1 )
 {
 	coin_lockout_global_w(data & 1);
 }
 
-static const struct namcoio_interface intf0 =
+static const namco_51xx_interface namco_51xx_intf =
 {
-	{ in0_l, in0_h, in1_l, in1_h },	/* port read handlers */
-	{ out_0, out_1 }				/* port write handlers */
+	{	/* port read handlers */
+		DEVCB_INPUT_PORT("IN0L"),
+		DEVCB_INPUT_PORT("IN0H"),
+		DEVCB_INPUT_PORT("IN1L"),
+		DEVCB_INPUT_PORT("IN1H")
+	},
+	{	/* port write handlers */
+		DEVCB_HANDLER(out_0),
+		DEVCB_HANDLER(out_1)
+	}
 };
-static const struct namcoio_interface intf1 =
+
+
+static READ8_DEVICE_HANDLER( namco_52xx_rom_r )
 {
-	{ dipA_l, dipA_h, dipB_l, dipB_h },	/* port read handlers */
-	{ NULL, NULL }						/* port write handlers */
+	UINT32 length = memory_region_length(device->machine, "52xx");
+//printf("ROM read %04X\n", offset);
+	if (!(offset & 0x1000))
+		offset = (offset & 0xfff) | 0x0000;
+	else if (!(offset & 0x2000))
+		offset = (offset & 0xfff) | 0x1000;
+	else if (!(offset & 0x4000))
+		offset = (offset & 0xfff) | 0x2000;
+	else if (!(offset & 0x8000))
+		offset = (offset & 0xfff) | 0x3000;
+	return (offset < length) ? memory_region(device->machine, "52xx")[offset] : 0xff;
+}
+
+static READ8_DEVICE_HANDLER( namco_52xx_si_r )
+{
+	/* pulled to GND */
+	return 0;
+}
+
+static const namco_52xx_interface namco_52xx_intf =
+{
+	"discrete",							/* name of the discrete sound device */
+	NODE_04,							/* index of the first node */
+	ATTOSECONDS_IN_NSEC(PERIOD_OF_555_ASTABLE_NSEC(RES_K(33), RES_K(10), CAP_U(0.0047))),	/* external clock rate */
+	DEVCB_HANDLER(namco_52xx_rom_r),	/* ROM read handler */
+	DEVCB_HANDLER(namco_52xx_si_r)		/* SI (pin 6) read handler */
+};
+
+
+static READ8_DEVICE_HANDLER( custom_mod_r )
+{
+	/* MOD0-2 is connected to K1-3; K0 is left unconnected */
+	return custom_mod << 1;
+}
+
+static const namco_53xx_interface namco_53xx_intf =
+{
+	DEVCB_HANDLER(custom_mod_r),		/* K port */
+	{
+		DEVCB_INPUT_PORT("DSWA"),		/* R0 port */
+		DEVCB_INPUT_PORT("DSWA_HI"),	/* R1 port */
+		DEVCB_INPUT_PORT("DSWB"),		/* R2 port */
+		DEVCB_INPUT_PORT("DSWB_HI")		/* R3 port */
+	},
+	DEVCB_NULL							/* P port */
 };
 
 
@@ -810,7 +866,7 @@ static TIMER_CALLBACK( cpu3_interrupt_callback )
 {
 	int scanline = param;
 
-	nmi_line_pulse(machine->cpu[2]);
+	nmi_line_pulse(cputag_get_cpu(machine, "sub2"));
 
 	scanline = scanline + 128;
 	if (scanline >= 272)
@@ -829,7 +885,7 @@ static MACHINE_START( galaga )
 
 static void bosco_latch_reset(running_machine *machine)
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int i;
 
 	/* Reset all latches */
@@ -842,18 +898,6 @@ static MACHINE_RESET( bosco )
 	/* Reset all latches */
 	bosco_latch_reset(machine);
 
-	namco_06xx_init(machine, 0, 0,
-		NAMCOIO_51XX, &intf0,
-		NAMCOIO_NONE, NULL,
-		NAMCOIO_50XX, NULL,
-		NAMCOIO_54XX, NULL);
-
-	namco_06xx_init(machine, 1, 1,
-		NAMCOIO_50XX_2, NULL,
-		NAMCOIO_52XX, NULL,
-		NAMCOIO_NONE, NULL,
-		NAMCOIO_NONE, NULL);
-
 	timer_adjust_oneshot(cpu3_interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, 64, 0), 64);
 }
 
@@ -862,12 +906,6 @@ static MACHINE_RESET( galaga )
 	/* Reset all latches */
 	bosco_latch_reset(machine);
 
-	namco_06xx_init(machine, 0, 0,
-		NAMCOIO_51XX, &intf0,
-		NAMCOIO_NONE, NULL,
-		NAMCOIO_NONE, NULL,
-		NAMCOIO_54XX, NULL);
-
 	timer_adjust_oneshot(cpu3_interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, 64, 0), 64);
 }
 
@@ -875,12 +913,6 @@ static MACHINE_RESET( xevious )
 {
 	/* Reset all latches */
 	bosco_latch_reset(machine);
-
-	namco_06xx_init(machine, 0, 0,
-		NAMCOIO_51XX, &intf0,
-		NAMCOIO_NONE, NULL,
-		NAMCOIO_50XX, NULL,
-		NAMCOIO_54XX, NULL);
 
 	timer_adjust_oneshot(cpu3_interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, 64, 0), 64);
 }
@@ -900,12 +932,6 @@ static MACHINE_RESET( digdug )
 	/* Reset all latches */
 	bosco_latch_reset(machine);
 
-	namco_06xx_init(machine, 0, 0,
-		NAMCOIO_51XX, &intf0,
-		NAMCOIO_53XX_DIGDUG, &intf1,
-		NAMCOIO_NONE, NULL,
-		NAMCOIO_NONE, NULL);
-
 	timer_adjust_oneshot(cpu3_interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, 64, 0), 64);
 }
 
@@ -918,12 +944,12 @@ static ADDRESS_MAP_START( bosco_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6800, 0x681f) AM_DEVWRITE("namco", pacman_sound_w) AM_BASE(&namco_soundregs)
 	AM_RANGE(0x6820, 0x6827) AM_WRITE(bosco_latch_w)						/* misc latches */
 	AM_RANGE(0x6830, 0x6830) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x7000, 0x70ff) AM_READWRITE(namco_06xx_0_data_r, namco_06xx_0_data_w)
-	AM_RANGE(0x7100, 0x7100) AM_READWRITE(namco_06xx_0_ctrl_r, namco_06xx_0_ctrl_w)
+	AM_RANGE(0x7000, 0x70ff) AM_DEVREADWRITE("06xx_0", namco_06xx_data_r, namco_06xx_data_w)
+	AM_RANGE(0x7100, 0x7100) AM_DEVREADWRITE("06xx_0", namco_06xx_ctrl_r, namco_06xx_ctrl_w)
 	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(bosco_videoram_r, bosco_videoram_w) AM_BASE(&bosco_videoram)	/* + sprite registers */
-	AM_RANGE(0x9000, 0x90ff) AM_READWRITE(namco_06xx_1_data_r, namco_06xx_1_data_w)
-	AM_RANGE(0x9100, 0x9100) AM_READWRITE(namco_06xx_1_ctrl_r, namco_06xx_1_ctrl_w)
+	AM_RANGE(0x9000, 0x90ff) AM_DEVREADWRITE("06xx_1", namco_06xx_data_r, namco_06xx_data_w)
+	AM_RANGE(0x9100, 0x9100) AM_DEVREADWRITE("06xx_1", namco_06xx_ctrl_r, namco_06xx_ctrl_w)
 	AM_RANGE(0x9800, 0x980f) AM_WRITE(SMH_RAM) AM_SHARE(2) AM_BASE(&bosco_radarattr)
 	AM_RANGE(0x9810, 0x9810) AM_WRITE(bosco_scrollx_w)
 	AM_RANGE(0x9820, 0x9820) AM_WRITE(bosco_scrolly_w)
@@ -940,8 +966,8 @@ static ADDRESS_MAP_START( galaga_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6800, 0x681f) AM_DEVWRITE("namco", pacman_sound_w) AM_BASE(&namco_soundregs)
 	AM_RANGE(0x6820, 0x6827) AM_WRITE(bosco_latch_w)						/* misc latches */
 	AM_RANGE(0x6830, 0x6830) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x7000, 0x70ff) AM_READWRITE(namco_06xx_0_data_r, namco_06xx_0_data_w)
-	AM_RANGE(0x7100, 0x7100) AM_READWRITE(namco_06xx_0_ctrl_r, namco_06xx_0_ctrl_w)
+	AM_RANGE(0x7000, 0x70ff) AM_DEVREADWRITE("06xx", namco_06xx_data_r, namco_06xx_data_w)
+	AM_RANGE(0x7100, 0x7100) AM_DEVREADWRITE("06xx", namco_06xx_ctrl_r, namco_06xx_ctrl_w)
 	AM_RANGE(0x8000, 0x87ff) AM_READWRITE(galaga_videoram_r, galaga_videoram_w) AM_BASE(&galaga_videoram)
 	AM_RANGE(0x8800, 0x8bff) AM_RAM AM_SHARE(1) AM_BASE(&galaga_ram1)
 	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_SHARE(2) AM_BASE(&galaga_ram2)
@@ -957,8 +983,8 @@ static ADDRESS_MAP_START( xevious_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6800, 0x681f) AM_DEVWRITE("namco", pacman_sound_w) AM_BASE(&namco_soundregs)
 	AM_RANGE(0x6820, 0x6827) AM_WRITE(bosco_latch_w)	/* misc latches */
 	AM_RANGE(0x6830, 0x6830) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x7000, 0x70ff) AM_READWRITE(namco_06xx_0_data_r, namco_06xx_0_data_w)
-	AM_RANGE(0x7100, 0x7100) AM_READWRITE(namco_06xx_0_ctrl_r, namco_06xx_0_ctrl_w)
+	AM_RANGE(0x7000, 0x70ff) AM_DEVREADWRITE("06xx", namco_06xx_data_r, namco_06xx_data_w)
+	AM_RANGE(0x7100, 0x7100) AM_DEVREADWRITE("06xx", namco_06xx_ctrl_r, namco_06xx_ctrl_w)
 	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_SHARE(1)							/* work RAM */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE(2) AM_BASE(&xevious_sr1)	/* work RAM + sprite registers */
 	AM_RANGE(0x9000, 0x97ff) AM_RAM AM_SHARE(3) AM_BASE(&xevious_sr2)	/* work RAM + sprite registers */
@@ -977,8 +1003,8 @@ static ADDRESS_MAP_START( digdug_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6800, 0x681f) AM_DEVWRITE("namco", pacman_sound_w) AM_BASE(&namco_soundregs)
 	AM_RANGE(0x6820, 0x6827) AM_WRITE(bosco_latch_w)						/* misc latches */
 	AM_RANGE(0x6830, 0x6830) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x7000, 0x70ff) AM_READWRITE(namco_06xx_0_data_r, namco_06xx_0_data_w)
-	AM_RANGE(0x7100, 0x7100) AM_READWRITE(namco_06xx_0_ctrl_r, namco_06xx_0_ctrl_w)
+	AM_RANGE(0x7000, 0x70ff) AM_DEVREADWRITE("06xx", namco_06xx_data_r, namco_06xx_data_w)
+	AM_RANGE(0x7100, 0x7100) AM_DEVREADWRITE("06xx", namco_06xx_ctrl_r, namco_06xx_ctrl_w)
 	AM_RANGE(0x8000, 0x83ff) AM_READWRITE(digdug_videoram_r, digdug_videoram_w) AM_BASE(&digdug_videoram)	/* tilemap RAM (bottom half of RAM 0 */
 	AM_RANGE(0x8400, 0x87ff) AM_RAM AM_SHARE(1)							/* work RAM (top half for RAM 0 */
 	AM_RANGE(0x8800, 0x8bff) AM_RAM AM_SHARE(2) AM_BASE(&digdug_objram)	/* work RAM + sprite registers */
@@ -1015,25 +1041,29 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( bosco )
-	PORT_START("IN0")
+	PORT_START("IN0L")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START("IN1")
+	PORT_START("IN0H")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )
+
+	PORT_START("IN1L")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
+
+	PORT_START("IN1H")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 
 	PORT_START("DSWA")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
@@ -1118,25 +1148,29 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( galaga )
-	PORT_START("IN0")
+	PORT_START("IN0L")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START("IN1")
+	PORT_START("IN0H")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )
+
+	PORT_START("IN1L")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
+
+	PORT_START("IN1H")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
 
 	PORT_START("DSWA")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
@@ -1223,38 +1257,44 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( gatsbee )
 	PORT_INCLUDE( galaga )
 
-	PORT_MODIFY("IN1")
+	PORT_MODIFY("IN1L")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_COCKTAIL
+
+	PORT_MODIFY("IN1L")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_COCKTAIL
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( xevious )
-	PORT_START("IN0")
+	PORT_START("IN0L")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START("IN1")
+	PORT_START("IN0H")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )
+
+	PORT_START("IN1L")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
+
+	PORT_START("IN1H")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 
 	PORT_START("DSWA")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
@@ -1388,25 +1428,29 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( digdug )
-	PORT_START("IN0")
+	PORT_START("IN0L")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START("IN1")
+	PORT_START("IN0H")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )
+
+	PORT_START("IN1L")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
+
+	PORT_START("IN1H")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
 
 	PORT_START("DSWA")
 	PORT_DIPNAME( 0x07, 0x01, DEF_STR( Coin_B ) )
@@ -1441,6 +1485,9 @@ static INPUT_PORTS_START( digdug )
 	PORT_DIPSETTING(    0x80, "3" )
 	PORT_DIPSETTING(    0xc0, "5" )
 
+	PORT_START("DSWA_HI")
+	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM(shifted_port_r, "DSWA")
+
 	PORT_START("DSWB")
 	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) )
@@ -1464,6 +1511,9 @@ static INPUT_PORTS_START( digdug )
 	PORT_DIPSETTING(    0x02, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Hardest ) )
+
+	PORT_START("DSWB_HI")
+	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM(shifted_port_r, "DSWB")
 INPUT_PORTS_END
 
 
@@ -1589,20 +1639,6 @@ static const namco_interface namco_config =
 	0				/* stereo */
 };
 
-/* Only used by bosco.  After filtering the 4V 52xx output,
- * the signal is 1V, or 25%.  The relative volume between
- * 52xx & 54xx is the same.
- */
-static const namco_52xx_interface namco_52xx_config =
-{
-	4000,			/* Playback frequency - from 555 timer 6M */
-	80,				/* High pass filter fc */
-	0.3,			/* High pass filter Q */
-	2400,			/* Low pass filter fc */
-	0.9,			/* Low pass filter Q */
-	.25				/* Combined gain of both filters */
-};
-
 static const char *const battles_sample_names[] =
 {
 	"*battles",
@@ -1633,20 +1669,14 @@ static MACHINE_DRIVER_START( bosco )
 	MDRV_CPU_ADD("sub2", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(bosco_map)
 
-	MDRV_CPU_ADD(CPUTAG_50XX, MB8842, MASTER_CLOCK/12/6)	/* 1.536 MHz, internally divided by 6 */
-	MDRV_CPU_PROGRAM_MAP(namco_50xx_map_program)
-	MDRV_CPU_DATA_MAP(namco_50xx_map_data)
-	MDRV_CPU_IO_MAP(namco_50xx_map_io)
+	MDRV_NAMCO_50XX_ADD("50xx_1", MASTER_CLOCK/12)	/* 1.536 MHz */
+	MDRV_NAMCO_50XX_ADD("50xx_2", MASTER_CLOCK/12)	/* 1.536 MHz */
+	MDRV_NAMCO_51XX_ADD("51xx", MASTER_CLOCK/12, namco_51xx_intf)		/* 1.536 MHz */
+	MDRV_NAMCO_52XX_ADD("52xx", MASTER_CLOCK/12, namco_52xx_intf)		/* 1.536 MHz */
+	MDRV_NAMCO_54XX_ADD("54xx", MASTER_CLOCK/12, "discrete", NODE_01)	/* 1.536 MHz */
 
-	MDRV_CPU_ADD(CPUTAG_50XX_2, MB8842, MASTER_CLOCK/12/6)	/* 1.536 MHz, internally divided by 6 */
-	MDRV_CPU_PROGRAM_MAP(namco_50xx_2_map_program)
-	MDRV_CPU_DATA_MAP(namco_50xx_2_map_data)
-	MDRV_CPU_IO_MAP(namco_50xx_2_map_io)
-
-	MDRV_CPU_ADD(CPUTAG_54XX, MB8844, MASTER_CLOCK/12/6)	/* 1.536 MHz, internally divided by 6 */
-	MDRV_CPU_PROGRAM_MAP(namco_54xx_map_program)
-	MDRV_CPU_DATA_MAP(namco_54xx_map_data)
-	MDRV_CPU_IO_MAP(namco_54xx_map_io)
+	MDRV_NAMCO_06XX_ADD("06xx_0", "maincpu", "51xx",   NULL,   "50xx_1", "54xx")
+	MDRV_NAMCO_06XX_ADD("06xx_1", "sub",     "50xx_2", "52xx", NULL,     NULL)
 
 	MDRV_WATCHDOG_VBLANK_INIT(8)
 	MDRV_QUANTUM_TIME(HZ(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
@@ -1677,10 +1707,6 @@ static MACHINE_DRIVER_START( bosco )
 	MDRV_SOUND_CONFIG(namco_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90 * 10.0 / 16.0)
 
-	MDRV_SOUND_ADD("namco52", NAMCO_52XX, MASTER_CLOCK/12)	/* 1.536 MHz */
-	MDRV_SOUND_CONFIG(namco_52xx_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
-
 	/* discrete circuit on the 54XX outputs */
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(bosco)
@@ -1702,10 +1728,10 @@ static MACHINE_DRIVER_START( galaga )
 	MDRV_CPU_ADD("sub2", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(galaga_map)
 
-	MDRV_CPU_ADD(CPUTAG_54XX, MB8844, MASTER_CLOCK/12/6)	/* 1.536 MHz, internally divided by 6 */
-	MDRV_CPU_PROGRAM_MAP(namco_54xx_map_program)
-	MDRV_CPU_DATA_MAP(namco_54xx_map_data)
-	MDRV_CPU_IO_MAP(namco_54xx_map_io)
+	MDRV_NAMCO_51XX_ADD("51xx", MASTER_CLOCK/12, namco_51xx_intf)		/* 1.536 MHz */
+	MDRV_NAMCO_54XX_ADD("54xx", MASTER_CLOCK/12, "discrete", NODE_01)	/* 1.536 MHz */
+
+	MDRV_NAMCO_06XX_ADD("06xx", "maincpu", "51xx", NULL, NULL, "54xx")
 
 	MDRV_WATCHDOG_VBLANK_INIT(8)
 	MDRV_QUANTUM_TIME(HZ(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
@@ -1747,7 +1773,7 @@ static MACHINE_DRIVER_START( galagab )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(galaga)
 
-	MDRV_CPU_REMOVE(CPUTAG_54XX)
+	MDRV_NAMCO_54XX_REMOVE("54xx")
 
 	MDRV_CPU_ADD("sub3", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(galaga_mem4)
@@ -1771,15 +1797,11 @@ static MACHINE_DRIVER_START( xevious )
 	MDRV_CPU_ADD("sub2", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(xevious_map)
 
-	MDRV_CPU_ADD(CPUTAG_50XX, MB8842, MASTER_CLOCK/12/6)	/* 1.536 MHz, internally divided by 6 */
-	MDRV_CPU_PROGRAM_MAP(namco_50xx_map_program)
-	MDRV_CPU_DATA_MAP(namco_50xx_map_data)
-	MDRV_CPU_IO_MAP(namco_50xx_map_io)
+	MDRV_NAMCO_50XX_ADD("50xx", MASTER_CLOCK/12)	/* 1.536 MHz */
+	MDRV_NAMCO_51XX_ADD("51xx", MASTER_CLOCK/12, namco_51xx_intf)		/* 1.536 MHz */
+	MDRV_NAMCO_54XX_ADD("54xx", MASTER_CLOCK/12, "discrete", NODE_01)	/* 1.536 MHz */
 
-	MDRV_CPU_ADD(CPUTAG_54XX, MB8844, MASTER_CLOCK/12/6)	/* 1.536 MHz, internally divided by 6 */
-	MDRV_CPU_PROGRAM_MAP(namco_54xx_map_program)
-	MDRV_CPU_DATA_MAP(namco_54xx_map_data)
-	MDRV_CPU_IO_MAP(namco_54xx_map_io)
+	MDRV_NAMCO_06XX_ADD("06xx", "maincpu", "51xx", NULL, "50xx", "54xx")
 
 	MDRV_WATCHDOG_VBLANK_INIT(8)
 	MDRV_QUANTUM_TIME(HZ(60000))	/* 1000 CPU slices per frame - an high value to ensure proper */
@@ -1820,8 +1842,8 @@ static MACHINE_DRIVER_START( battles )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( xevious )
 
-	MDRV_CPU_REMOVE(CPUTAG_50XX)
-	MDRV_CPU_REMOVE(CPUTAG_54XX)
+	MDRV_NAMCO_50XX_REMOVE("50xx")
+	MDRV_NAMCO_54XX_REMOVE("54xx")
 
 	MDRV_CPU_ADD("sub3", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(battles_mem4)
@@ -1854,6 +1876,11 @@ static MACHINE_DRIVER_START( digdug )
 
 	MDRV_CPU_ADD("sub2", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(digdug_map)
+
+	MDRV_NAMCO_51XX_ADD("51xx", MASTER_CLOCK/12, namco_51xx_intf)		/* 1.536 MHz */
+	MDRV_NAMCO_53XX_ADD("53xx", MASTER_CLOCK/12, namco_53xx_intf)		/* 1.536 MHz */
+
+	MDRV_NAMCO_06XX_ADD("06xx", "maincpu", "51xx", "53xx", NULL, NULL)
 
 	MDRV_QUANTUM_TIME(HZ(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
@@ -1912,14 +1939,6 @@ Namco/Midway, 1981
 
 */
 
-#define BOSCO_CUSTOMS \
-	ROM_REGION_NAMCO_50XX( CPUTAG_50XX ) \
-	ROM_REGION_NAMCO_50XX( CPUTAG_50XX_2 ) \
-	ROM_REGION_NAMCO_54XX( CPUTAG_54XX ) \
-	ROM_REGION_NAMCO_51XX( "51xx" ) \
-	ROM_REGION_NAMCO_52XX( "52xx" ) \
-
-
 ROM_START( bosco )
 	ROM_REGION( 0x10000, "maincpu", 0 )	/* 64k for code for the first CPU  */
 	ROM_LOAD( "bos3_1.bin",   0x0000, 0x1000, CRC(96021267) SHA1(bd49b0caabcccf9df45a272d767456a4fc8a7c07) )
@@ -1933,8 +1952,6 @@ ROM_START( bosco )
 
 	ROM_REGION( 0x10000, "sub2", 0 )	/* 64k for the third CPU  */
 	ROM_LOAD( "2900.3e",      0x0000, 0x1000, CRC(d45a4911) SHA1(547236adca9174f5cc0ec05b9649618bb92ba630) )
-
-	BOSCO_CUSTOMS
 
 	ROM_REGION( 0x1000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "5300.5d",      0x0000, 0x1000, CRC(a956d3c5) SHA1(c5a9d7b1f9b4acda8fb9762414e085cb5fb80c9e) )
@@ -1955,7 +1972,7 @@ ROM_START( bosco )
 	ROM_LOAD( "prom.1d",      0x0000, 0x0100, CRC(de2316c6) SHA1(0e55c56046331888d1d3f0d9823d2ceb203e7d3f) )
 	ROM_LOAD( "prom.5c",      0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )	/* timing - not used */
 
-	ROM_REGION( 0x3000, "namco52", 0 )	/* ROMs for digitised speech */
+	ROM_REGION( 0x3000, "52xx", 0 )	/* ROMs for digitised speech */
 	ROM_LOAD( "4900.5n",      0x0000, 0x1000, CRC(09acc978) SHA1(2b264aaeb6eba70ad91593413dca733990e5467b) )
 	ROM_LOAD( "5000.5m",      0x1000, 0x1000, CRC(e571e959) SHA1(9c81d7bec73bc605f7dd9a089171b0f34c4bb09a) )
 	ROM_LOAD( "5100.5l",      0x2000, 0x1000, CRC(17ac9511) SHA1(266f3fae90d2fe38d109096d352863a52b379899) )
@@ -1975,8 +1992,6 @@ ROM_START( boscoo )
 	ROM_REGION( 0x10000, "sub2", 0 )	/* 64k for the third CPU  */
 	ROM_LOAD( "2900.3e",      0x0000, 0x1000, CRC(d45a4911) SHA1(547236adca9174f5cc0ec05b9649618bb92ba630) )
 
-	BOSCO_CUSTOMS
-
 	ROM_REGION( 0x1000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "5300.5d",      0x0000, 0x1000, CRC(a956d3c5) SHA1(c5a9d7b1f9b4acda8fb9762414e085cb5fb80c9e) )
 
@@ -1996,7 +2011,7 @@ ROM_START( boscoo )
 	ROM_LOAD( "prom.1d",      0x0000, 0x0100, CRC(de2316c6) SHA1(0e55c56046331888d1d3f0d9823d2ceb203e7d3f) )
 	ROM_LOAD( "prom.5c",      0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )	/* timing - not used */
 
-	ROM_REGION( 0x3000, "namco52", 0 )	/* ROMs for digitised speech */
+	ROM_REGION( 0x3000, "52xx", 0 )	/* ROMs for digitised speech */
 	ROM_LOAD( "4900.5n",      0x0000, 0x1000, CRC(09acc978) SHA1(2b264aaeb6eba70ad91593413dca733990e5467b) )
 	ROM_LOAD( "5000.5m",      0x1000, 0x1000, CRC(e571e959) SHA1(9c81d7bec73bc605f7dd9a089171b0f34c4bb09a) )
 	ROM_LOAD( "5100.5l",      0x2000, 0x1000, CRC(17ac9511) SHA1(266f3fae90d2fe38d109096d352863a52b379899) )
@@ -2016,8 +2031,6 @@ ROM_START( boscoo2 )
 	ROM_REGION( 0x10000, "sub2", 0 )	/* 64k for the third CPU  */
 	ROM_LOAD( "2900.3e",      0x0000, 0x1000, CRC(d45a4911) SHA1(547236adca9174f5cc0ec05b9649618bb92ba630) )
 
-	BOSCO_CUSTOMS
-
 	ROM_REGION( 0x1000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "5300.5d",      0x0000, 0x1000, CRC(a956d3c5) SHA1(c5a9d7b1f9b4acda8fb9762414e085cb5fb80c9e) )
 
@@ -2037,7 +2050,7 @@ ROM_START( boscoo2 )
 	ROM_LOAD( "prom.1d",      0x0000, 0x0100, CRC(de2316c6) SHA1(0e55c56046331888d1d3f0d9823d2ceb203e7d3f) )
 	ROM_LOAD( "prom.5c",      0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )	/* timing - not used */
 
-	ROM_REGION( 0x3000, "namco52", 0 )	/* ROMs for digitised speech */
+	ROM_REGION( 0x3000, "52xx", 0 )	/* ROMs for digitised speech */
 	ROM_LOAD( "4900.5n",      0x0000, 0x1000, CRC(09acc978) SHA1(2b264aaeb6eba70ad91593413dca733990e5467b) )
 	ROM_LOAD( "5000.5m",      0x1000, 0x1000, CRC(e571e959) SHA1(9c81d7bec73bc605f7dd9a089171b0f34c4bb09a) )
 	ROM_LOAD( "5100.5l",      0x2000, 0x1000, CRC(17ac9511) SHA1(266f3fae90d2fe38d109096d352863a52b379899) )
@@ -2064,8 +2077,6 @@ ROM_START( boscomd )
 	ROM_REGION( 0x10000, "sub2", 0 )	/* 64k for the third CPU  */
 	ROM_LOAD( "2900.3e",      0x0000, 0x1000, CRC(d45a4911) SHA1(547236adca9174f5cc0ec05b9649618bb92ba630) )
 
-	BOSCO_CUSTOMS
-
 	ROM_REGION( 0x1000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "5300.5d",      0x0000, 0x1000, CRC(a956d3c5) SHA1(c5a9d7b1f9b4acda8fb9762414e085cb5fb80c9e) )
 
@@ -2085,7 +2096,7 @@ ROM_START( boscomd )
 	ROM_LOAD( "prom.1d",      0x0000, 0x0100, CRC(de2316c6) SHA1(0e55c56046331888d1d3f0d9823d2ceb203e7d3f) )
 	ROM_LOAD( "prom.5c",      0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )	/* timing - not used */
 
-	ROM_REGION( 0x3000, "namco52", 0 )	/* ROMs for digitised speech */
+	ROM_REGION( 0x3000, "52xx", 0 )	/* ROMs for digitised speech */
 	ROM_LOAD( "4900.5n",      0x0000, 0x1000, CRC(09acc978) SHA1(2b264aaeb6eba70ad91593413dca733990e5467b) )
 	ROM_LOAD( "5000.5m",      0x1000, 0x1000, CRC(e571e959) SHA1(9c81d7bec73bc605f7dd9a089171b0f34c4bb09a) )
 	ROM_LOAD( "5100.5l",      0x2000, 0x1000, CRC(17ac9511) SHA1(266f3fae90d2fe38d109096d352863a52b379899) )
@@ -2108,8 +2119,6 @@ ROM_START( boscomdo )
 	ROM_REGION( 0x10000, "sub2", 0 )	/* 64k for the third CPU  */
 	ROM_LOAD( "2900.3e",      0x0000, 0x1000, CRC(d45a4911) SHA1(547236adca9174f5cc0ec05b9649618bb92ba630) )
 
-	BOSCO_CUSTOMS
-
 	ROM_REGION( 0x1000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "5300.5d",      0x0000, 0x1000, CRC(a956d3c5) SHA1(c5a9d7b1f9b4acda8fb9762414e085cb5fb80c9e) )
 
@@ -2129,7 +2138,7 @@ ROM_START( boscomdo )
 	ROM_LOAD( "prom.1d",      0x0000, 0x0100, CRC(de2316c6) SHA1(0e55c56046331888d1d3f0d9823d2ceb203e7d3f) )
 	ROM_LOAD( "prom.5c",      0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )	/* timing - not used */
 
-	ROM_REGION( 0x3000, "namco52", 0 )	/* ROMs for digitised speech */
+	ROM_REGION( 0x3000, "52xx", 0 )	/* ROMs for digitised speech */
 	ROM_LOAD( "4900.5n",      0x0000, 0x1000, CRC(09acc978) SHA1(2b264aaeb6eba70ad91593413dca733990e5467b) )
 	ROM_LOAD( "5000.5m",      0x1000, 0x1000, CRC(e571e959) SHA1(9c81d7bec73bc605f7dd9a089171b0f34c4bb09a) )
 	ROM_LOAD( "5100.5l",      0x2000, 0x1000, CRC(17ac9511) SHA1(266f3fae90d2fe38d109096d352863a52b379899) )
@@ -2305,11 +2314,6 @@ Notes:
 
 */
 
-#define GALAGA_CUSTOMS \
-	ROM_REGION_NAMCO_54XX( CPUTAG_54XX ) \
-	ROM_REGION_NAMCO_51XX( "51xx" ) \
-
-
 ROM_START( galaga )
 	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64k for code for the first CPU  */
 	ROM_LOAD( "gg1-1b.3p",    0x0000, 0x1000, CRC(ab036c9f) SHA1(ca7f5da42d4e76fd89bb0b35198a23c01462fbfe) )
@@ -2322,8 +2326,6 @@ ROM_START( galaga )
 
 	ROM_REGION( 0x10000, "sub2", 0 )     /* 64k for the third CPU  */
 	ROM_LOAD( "gg1-7b.2c",    0x0000, 0x1000, CRC(d016686b) SHA1(44c1a04fba3c7c826ff484185cb881b4b22e6657) )
-
-	GALAGA_CUSTOMS
 
 	ROM_REGION( 0x1000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "gg1-9.4l",     0x0000, 0x1000, CRC(58b2f47c) SHA1(62f1279a784ab2f8218c4137c7accda00e6a3490) )
@@ -2355,8 +2357,6 @@ ROM_START( galagao )
 	ROM_REGION( 0x10000, "sub2", 0 )     /* 64k for the third CPU  */
 	ROM_LOAD( "gg1-7",        0x0000, 0x1000, CRC(8995088d) SHA1(d6cb439de0718826d1a0363c9d77de8740b18ecf) )
 
-	GALAGA_CUSTOMS
-
 	ROM_REGION( 0x1000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "gg1-9.4l",     0x0000, 0x1000, CRC(58b2f47c) SHA1(62f1279a784ab2f8218c4137c7accda00e6a3490) )
 
@@ -2386,8 +2386,6 @@ ROM_START( galagamw )
 
 	ROM_REGION( 0x10000, "sub2", 0 )     /* 64k for the third CPU  */
 	ROM_LOAD( "3700g.bin",    0x0000, 0x1000, CRC(b07f0aa4) SHA1(7528644a8480d0be2d0d37069515ed319e94778f) )
-
-	GALAGA_CUSTOMS
 
 	ROM_REGION( 0x1000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "gg1-9.4l",     0x0000, 0x1000, CRC(58b2f47c) SHA1(62f1279a784ab2f8218c4137c7accda00e6a3490) )
@@ -2419,8 +2417,6 @@ ROM_START( galagamf )
 	ROM_REGION( 0x10000, "sub2", 0 )     /* 64k for the third CPU  */
 	ROM_LOAD( "3700g.bin",    0x0000, 0x1000, CRC(b07f0aa4) SHA1(7528644a8480d0be2d0d37069515ed319e94778f) )
 
-	GALAGA_CUSTOMS
-
 	ROM_REGION( 0x1000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "gg1-9.4l",     0x0000, 0x1000, CRC(58b2f47c) SHA1(62f1279a784ab2f8218c4137c7accda00e6a3490) )
 
@@ -2450,8 +2446,6 @@ ROM_START( galagamk )
 
 	ROM_REGION( 0x10000, "sub2", 0 )     /* 64k for the third CPU  */
 	ROM_LOAD( "gg1-7b.2c",    0x0000, 0x1000, CRC(d016686b) SHA1(44c1a04fba3c7c826ff484185cb881b4b22e6657) )
-
-	GALAGA_CUSTOMS
 
 	ROM_REGION( 0x1000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "gg1-9.4l",     0x0000, 0x1000, CRC(58b2f47c) SHA1(62f1279a784ab2f8218c4137c7accda00e6a3490) )
@@ -2540,11 +2534,6 @@ ROM_END
   Xevious & clones
 **********************************************************************************************/
 
-#define XEVIOUS_CUSTOMS \
-	ROM_REGION_NAMCO_50XX( CPUTAG_50XX ) \
-	ROM_REGION_NAMCO_54XX( CPUTAG_54XX ) \
-	ROM_REGION_NAMCO_51XX( "51xx" ) \
-
 /*
     Xevious - Namco Version
 
@@ -2564,8 +2553,6 @@ ROM_START( xevious )
 
 	ROM_REGION( 0x10000, "sub2", 0 )
 	ROM_LOAD( "xvi_7.2c",     0x0000, 0x1000, CRC(dd35cf1c) SHA1(f8d1f8e019d8198308443c2e7e815d0d04b23d14) )
-
-	XEVIOUS_CUSTOMS
 
 	ROM_REGION( 0x1000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "xvi_12.3b",    0x0000, 0x1000, CRC(088c8b26) SHA1(9c3b61dfca2f84673a78f7f66e363777a8f47a59) )	/* foreground characters */
@@ -2619,8 +2606,6 @@ ROM_START( xeviousa )
 	ROM_REGION( 0x10000, "sub2", 0 )
 	ROM_LOAD( "xvi_7.2c",     0x0000, 0x1000, CRC(dd35cf1c) SHA1(f8d1f8e019d8198308443c2e7e815d0d04b23d14) )
 
-	XEVIOUS_CUSTOMS
-
 	ROM_REGION( 0x1000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "xvi_12.3b",    0x0000, 0x1000, CRC(088c8b26) SHA1(9c3b61dfca2f84673a78f7f66e363777a8f47a59) )	/* foreground characters */
 
@@ -2668,8 +2653,6 @@ ROM_START( xeviousb )
 
 	ROM_REGION( 0x10000, "sub2", 0 )
 	ROM_LOAD( "xvi_7.2c",     0x0000, 0x1000, CRC(dd35cf1c) SHA1(f8d1f8e019d8198308443c2e7e815d0d04b23d14) )
-
-	XEVIOUS_CUSTOMS
 
 	ROM_REGION( 0x1000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "xvi_12.3b",    0x0000, 0x1000, CRC(088c8b26) SHA1(9c3b61dfca2f84673a78f7f66e363777a8f47a59) )	/* foreground characters */
@@ -2721,8 +2704,6 @@ ROM_START( xeviousc )
 
 	ROM_REGION( 0x10000, "sub2", 0 )
 	ROM_LOAD( "xvi_7.2c",     0x0000, 0x1000, CRC(dd35cf1c) SHA1(f8d1f8e019d8198308443c2e7e815d0d04b23d14) )
-
-	XEVIOUS_CUSTOMS
 
 	ROM_REGION( 0x1000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "xvi_12.3b",    0x0000, 0x1000, CRC(088c8b26) SHA1(9c3b61dfca2f84673a78f7f66e363777a8f47a59) )	/* foreground characters */
@@ -2780,9 +2761,6 @@ ROM_START( xevios )
 
 	ROM_REGION( 0x10000, "sub2", 0 )
 	ROM_LOAD( "xvi_7.2c",     0x0000, 0x1000, CRC(dd35cf1c) SHA1(f8d1f8e019d8198308443c2e7e815d0d04b23d14) )
-
-	/* This is a bootleg, it probably shouldn't be loading these, see 'unknown roms' below */
-	XEVIOUS_CUSTOMS
 
 	ROM_REGION( 0x1000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "xvi_12.3b",    0x0000, 0x1000, CRC(088c8b26) SHA1(9c3b61dfca2f84673a78f7f66e363777a8f47a59) )	/* foreground characters */
@@ -2886,8 +2864,6 @@ ROM_START( sxevious )
 	ROM_REGION( 0x10000, "sub2", 0 )
 	ROM_LOAD( "xvi_7.2c",     0x0000, 0x1000, CRC(dd35cf1c) SHA1(f8d1f8e019d8198308443c2e7e815d0d04b23d14) )
 
-	XEVIOUS_CUSTOMS
-
 	ROM_REGION( 0x1000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "xvi_12.3b",    0x0000, 0x1000, CRC(088c8b26) SHA1(9c3b61dfca2f84673a78f7f66e363777a8f47a59) )	/* foreground characters */
 
@@ -2936,8 +2912,6 @@ ROM_START( sxeviousj )
 	ROM_REGION( 0x10000, "sub2", 0 )
 	ROM_LOAD( "xvi_7.2c",     0x0000, 0x1000, CRC(dd35cf1c) SHA1(f8d1f8e019d8198308443c2e7e815d0d04b23d14) )
 
-	XEVIOUS_CUSTOMS
-
 	ROM_REGION( 0x1000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "xvi_12.3b",    0x0000, 0x1000, CRC(088c8b26) SHA1(9c3b61dfca2f84673a78f7f66e363777a8f47a59) )	/* foreground characters */
 
@@ -2976,10 +2950,6 @@ ROM_END
   Dig Dug & clones
 **********************************************************************************************/
 
-#define DIGDUG_CUSTOMS \
-	ROM_REGION_NAMCO_51XX( "51xx" ) \
-	ROM_REGION_NAMCO_53XX( "53xx" ) \
-
 ROM_START( digdug )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* 64k for code for the first CPU  */
 	ROM_LOAD( "dd1a.1",       0x0000, 0x1000, CRC(a80ec984) SHA1(86689980410b9429cd7582c7a76342721c87d030) )
@@ -2993,8 +2963,6 @@ ROM_START( digdug )
 
 	ROM_REGION( 0x10000, "sub2", 0 ) /* 64k for the third CPU  */
 	ROM_LOAD( "136007.107",   0x0000, 0x1000, CRC(a41bce72) SHA1(2b9b74f56aa7939d9d47cf29497ae11f10d78598) )
-
-	DIGDUG_CUSTOMS
 
 	ROM_REGION( 0x1000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "dd1.9",        0x0000, 0x0800, CRC(f14a6fe1) SHA1(0aa63300c2cb887196de590aceb98f3cf06fead4) )
@@ -3034,8 +3002,6 @@ ROM_START( digdugb )
 
 	ROM_REGION( 0x10000, "sub2", 0 )	/* 64k for the third CPU  */
 	ROM_LOAD( "136007.107",   0x0000, 0x1000, CRC(a41bce72) SHA1(2b9b74f56aa7939d9d47cf29497ae11f10d78598) )
-
-	DIGDUG_CUSTOMS
 
 	ROM_REGION( 0x1000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "dd1.9",        0x0000, 0x0800, CRC(f14a6fe1) SHA1(0aa63300c2cb887196de590aceb98f3cf06fead4) )
@@ -3095,8 +3061,6 @@ ROM_START( digdugat )
 	ROM_REGION( 0x10000, "sub2", 0 )	/* 64k for the third CPU  */
 	ROM_LOAD( "136007.107",   0x0000, 0x1000, CRC(a41bce72) SHA1(2b9b74f56aa7939d9d47cf29497ae11f10d78598) )
 
-	DIGDUG_CUSTOMS
-
 	ROM_REGION( 0x1000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "136007.108",   0x0000, 0x0800, CRC(3d24a3af) SHA1(857ae93e2a41258a129dcecbaed2df359540b735) )
 
@@ -3135,8 +3099,6 @@ ROM_START( digduga1 )
 
 	ROM_REGION( 0x10000, "sub2", 0 )	/* 64k for the third CPU  */
 	ROM_LOAD( "136007.107",   0x0000, 0x1000, CRC(a41bce72) SHA1(2b9b74f56aa7939d9d47cf29497ae11f10d78598) )
-
-	DIGDUG_CUSTOMS
 
 	ROM_REGION( 0x1000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "136007.108",   0x0000, 0x0800, CRC(3d24a3af) SHA1(857ae93e2a41258a129dcecbaed2df359540b735) )
@@ -3278,8 +3240,6 @@ ROM_START( digsid )
 	ROM_REGION( 0x10000, "sub2", 0 )	/* 64k for the third CPU  */
 	ROM_LOAD( "digdug6.6",   0x0000, 0x1000, CRC(a41bce72) SHA1(2b9b74f56aa7939d9d47cf29497ae11f10d78598) )
 
-	DIGDUG_CUSTOMS
-
 	ROM_REGION( 0x1000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "digdug8.8",        0x0000, 0x0800, CRC(f14a6fe1) SHA1(0aa63300c2cb887196de590aceb98f3cf06fead4) )
 
@@ -3328,7 +3288,7 @@ static DRIVER_INIT (gatsbee)
 	DRIVER_INIT_CALL(galaga);
 
 	/* Gatsbee has a larger character ROM, we need a handler for banking */
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1000, 0x1000, 0, 0, gatsbee_bank_w);
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1000, 0x1000, 0, 0, gatsbee_bank_w);
 }
 
 
@@ -3369,8 +3329,8 @@ static DRIVER_INIT( xevios )
 static DRIVER_INIT( battles )
 {
 	/* replace the Namco I/O handlers with interface to the 4th CPU */
-	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x7000, 0x700f, 0, 0, battles_customio_data0_r, battles_customio_data0_w );
-	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x7100, 0x7100, 0, 0, battles_customio0_r, battles_customio0_w );
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x7000, 0x700f, 0, 0, battles_customio_data0_r, battles_customio_data0_w );
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x7100, 0x7100, 0, 0, battles_customio0_r, battles_customio0_w );
 
 	DRIVER_INIT_CALL(xevious);
 }

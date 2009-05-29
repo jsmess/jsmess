@@ -572,10 +572,10 @@ static const sid6581_interface c128_sound_interface =
 
 static const m6502_interface c128_m8502_interface =
 {
-	NULL,
-	NULL,
-	c128_m6510_port_read,
-	c128_m6510_port_write
+	NULL,					/* read_indexed_func */
+	NULL,					/* write_indexed_func */
+	c128_m6510_port_read,	/* port_read_func */
+	c128_m6510_port_write,	/* port_write_func */
 };
 
 
@@ -584,7 +584,6 @@ static const m6502_interface c128_m8502_interface =
  *  Machine driver
  *
  *************************************/
-
 
 static MACHINE_DRIVER_START( c128 )
 	/* basic machine hardware */

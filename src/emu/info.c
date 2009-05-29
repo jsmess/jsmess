@@ -79,7 +79,7 @@ enum {cjoy, cdoublejoy, cAD_stick, cdial, ctrackball, cpaddle, clightgun, cpedal
 	int nplayer = 0;
 	int nbutton = 0;
 	int ncoin = 0;
-	int controlsyes = 0;
+	//int controlsyes = 0;
 	int analogcontrol = 0;
 	int i;
 	const char* service = 0;
@@ -135,7 +135,7 @@ enum {cjoy, cdoublejoy, cAD_stick, cdial, ctrackball, cpaddle, clightgun, cpedal
 						else
 							control[cjoy].Xway = "joy8way";
 					}
-					controlsyes = 1;
+					//controlsyes = 1;
 					break;
 
 				case IPT_JOYSTICK_UP:
@@ -154,7 +154,7 @@ enum {cjoy, cdoublejoy, cAD_stick, cdial, ctrackball, cpaddle, clightgun, cpedal
 						else
 							control[cjoy].Xway = "joy8way";
 					}
-					controlsyes = 1;
+					//controlsyes = 1;
 					break;
 
 				case IPT_JOYSTICKRIGHT_UP:
@@ -175,7 +175,7 @@ enum {cjoy, cdoublejoy, cAD_stick, cdial, ctrackball, cpaddle, clightgun, cpedal
 						else
 							control[cdoublejoy].Xway = "doublejoy8way";
 					}
-					controlsyes = 1;
+					//controlsyes = 1;
 					break;
 
 				case IPT_JOYSTICKRIGHT_LEFT:
@@ -196,7 +196,7 @@ enum {cjoy, cdoublejoy, cAD_stick, cdial, ctrackball, cpaddle, clightgun, cpedal
 						else
 							control[cdoublejoy].Xway = "doublejoy8way";
 					}
-					controlsyes = 1;
+					//controlsyes = 1;
 					break;
 
 				/* mark as an analog input, and get analog stats after switch */
@@ -265,7 +265,7 @@ enum {cjoy, cdoublejoy, cAD_stick, cdial, ctrackball, cpaddle, clightgun, cpedal
 			/* get the analog stats */
 			if (analogcontrol)
 			{
-				controlsyes = 1;
+				//controlsyes = 1;
 				control[analogcontrol].analog = 1;
 
 				if (field->min)
@@ -361,6 +361,7 @@ static void print_game_rom(FILE *out, const game_driver *game, const machine_con
 {
 	const game_driver *clone_of = driver_get_clone(game);
 	int rom_type;
+	machine_config *pconfig = (clone_of != NULL) ? machine_config_alloc(clone_of->machine_config) : NULL;
 
 	/* iterate over 3 different ROM "types": BIOS, ROMs, DISKs */
 	for (rom_type = 0; rom_type < 3; rom_type++)
@@ -395,16 +396,18 @@ static void print_game_rom(FILE *out, const game_driver *game, const machine_con
 					/* if we have a valid ROM and we are a clone, see if we can find the parent ROM */
 					if (!ROM_NOGOODDUMP(rom) && clone_of != NULL)
 					{
+						const rom_source *psource;
 						const rom_entry *pregion, *prom;
 
 						/* scan the clone_of ROM for a matching ROM entry */
-						for (pregion = rom_first_region(clone_of, NULL); pregion != NULL; pregion = rom_next_region(pregion))
-							for (prom = rom_first_file(pregion); prom != NULL; prom = rom_next_file(prom))
-								if (hash_data_is_equal(ROM_GETHASHDATA(rom), ROM_GETHASHDATA(prom), 0))
-								{
-									parent_rom = prom;
-									break;
-								}
+						for (psource = rom_first_source(clone_of, pconfig); psource != NULL; psource = rom_next_source(clone_of, pconfig, psource))
+							for (pregion = rom_first_region(clone_of, psource); pregion != NULL; pregion = rom_next_region(pregion))
+								for (prom = rom_first_file(pregion); prom != NULL; prom = rom_next_file(prom))
+									if (hash_data_is_equal(ROM_GETHASHDATA(rom), ROM_GETHASHDATA(prom), 0))
+									{
+										parent_rom = prom;
+										break;
+									}
 					}
 
 					/* scan for a BIOS name */
@@ -474,6 +477,9 @@ static void print_game_rom(FILE *out, const game_driver *game, const machine_con
 				}
 			}
 	}
+
+	if (pconfig != NULL)
+		machine_config_free(pconfig);
 }
 
 

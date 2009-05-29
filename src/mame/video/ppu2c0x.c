@@ -199,21 +199,23 @@ void ppu2c0x_init_palette(running_machine *machine, int first_entry )
 	/* Loop through the emphasis modes (8 total) */
 	for (colorEmphasis = 0; colorEmphasis < 8; colorEmphasis ++)
 	{
-		double r_mod = 0.0;
-		double g_mod = 0.0;
-		double b_mod = 0.0;
+		/*
+        double r_mod = 0.0;
+        double g_mod = 0.0;
+        double b_mod = 0.0;
 
-		switch (colorEmphasis)
-		{
-			case 0: r_mod = 1.0; g_mod = 1.0; b_mod = 1.0; break;
-			case 1: r_mod = 1.24; g_mod = .915; b_mod = .743; break;
-			case 2: r_mod = .794; g_mod = 1.09; b_mod = .882; break;
-			case 3: r_mod = .905; g_mod = 1.03; b_mod = 1.28; break;
-			case 4: r_mod = .741; g_mod = .987; b_mod = 1.0; break;
-			case 5: r_mod = 1.02; g_mod = .908; b_mod = .979; break;
-			case 6: r_mod = 1.02; g_mod = .98; b_mod = .653; break;
-			case 7: r_mod = .75; g_mod = .75; b_mod = .75; break;
-		}
+        switch (colorEmphasis)
+        {
+            case 0: r_mod = 1.0; g_mod = 1.0; b_mod = 1.0; break;
+            case 1: r_mod = 1.24; g_mod = .915; b_mod = .743; break;
+            case 2: r_mod = .794; g_mod = 1.09; b_mod = .882; break;
+            case 3: r_mod = .905; g_mod = 1.03; b_mod = 1.28; break;
+            case 4: r_mod = .741; g_mod = .987; b_mod = 1.0; break;
+            case 5: r_mod = 1.02; g_mod = .908; b_mod = .979; break;
+            case 6: r_mod = 1.02; g_mod = .98; b_mod = .653; break;
+            case 7: r_mod = .75; g_mod = .75; b_mod = .75; break;
+        }
+        */
 
 		/* loop through the 4 intensities */
 		for (colorIntensity = 0; colorIntensity < 4; colorIntensity++)
@@ -894,7 +896,7 @@ logerror("vlbank starting\n");
 			// a game can read the high bit of $2002 before the NMI is called (potentially resetting the bit
 			// via a read from $2002 in the NMI handler).
 			// B-Wings is an example game that needs this.
-			timer_adjust_oneshot(this_ppu->nmi_timer, cpu_clocks_to_attotime(device->machine->cpu[0], 4), 0);
+			timer_adjust_oneshot(this_ppu->nmi_timer, cputag_clocks_to_attotime(device->machine, "maincpu", 4), 0);
 		}
 	}
 
@@ -922,7 +924,7 @@ logerror("vlbank ending\n");
 		next_scanline = 0;
 
 	// Call us back when the hblank starts for this scanline
-	timer_adjust_oneshot(this_ppu->hblank_timer, cpu_clocks_to_attotime(device->machine->cpu[0], 86.67), 0); // ??? FIXME - hardcoding NTSC, need better calculation
+	timer_adjust_oneshot(this_ppu->hblank_timer, cputag_clocks_to_attotime(device->machine, "maincpu", 86.67), 0); // ??? FIXME - hardcoding NTSC, need better calculation
 
 	// trigger again at the start of the next scanline
 	timer_adjust_oneshot(this_ppu->scanline_timer, video_screen_get_time_until_pos(device->machine->primary_screen, next_scanline * this_ppu->scan_scale, 0), 0);
@@ -950,7 +952,7 @@ static DEVICE_RESET( ppu2c0x )
 	timer_adjust_oneshot(this_ppu->nmi_timer, attotime_never, 0);
 
 	// Call us back when the hblank starts for this scanline
-	timer_adjust_oneshot(this_ppu->hblank_timer, cpu_clocks_to_attotime(device->machine->cpu[0], 86.67), 0); // ??? FIXME - hardcoding NTSC, need better calculation
+	timer_adjust_oneshot(this_ppu->hblank_timer, cputag_clocks_to_attotime(device->machine, "maincpu", 86.67), 0); // ??? FIXME - hardcoding NTSC, need better calculation
 
 	// Call us back at the start of the next scanline
 	timer_adjust_oneshot(this_ppu->scanline_timer, video_screen_get_time_until_pos(device->machine->primary_screen, 1, 0), 0);

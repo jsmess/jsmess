@@ -32,20 +32,21 @@ ADDRESS_MAP_END
 /* the Apple /// does some weird tricks whereby it monitors the SYNC pin
  * on the CPU to check for indexed instructions and directs them to
  * different memory locations */
-static const m6502_interface apple3_m6502_intf =
+static const m6502_interface apple3_m6502_interface =
 {
-	apple3_indexed_read,
-	apple3_indexed_write,
-	NULL,
-	NULL
+	apple3_indexed_read,	/* read_indexed_func */
+	apple3_indexed_write,	/* write_indexed_func */
+	NULL,					/* port_read_func */
+	NULL,					/* port_write_func */
 };
+
 
 
 static MACHINE_DRIVER_START( apple3 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 2000000)        /* 2 MHz */
 	MDRV_CPU_PROGRAM_MAP(apple3_map)
-	MDRV_CPU_CONFIG( apple3_m6502_intf )
+	MDRV_CPU_CONFIG( apple3_m6502_interface )
 	MDRV_CPU_PERIODIC_INT(apple3_interrupt, 192)
 	MDRV_QUANTUM_TIME(HZ(60))
 

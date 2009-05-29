@@ -1314,6 +1314,12 @@ void mame_parse_ini_files(core_options *options, const game_driver *driver)
 		machine_config *config;
 		astring *sourcename;
 
+		/* parse "vertical.ini" or "horizont.ini" */
+		if (driver->flags & ORIENTATION_SWAP_XY)
+			parse_ini_file(options, "vertical");
+		else
+			parse_ini_file(options, "horizont");
+
 		/* parse "vector.ini" for vector games */
 		config = machine_config_alloc(driver->machine_config);
 		for (device = video_screen_first(config); device != NULL; device = video_screen_next(device))

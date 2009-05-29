@@ -800,6 +800,7 @@ $(MAMEOBJ)/konami.a: \
 	$(DRIVERS)/konamigx.o $(MACHINE)/konamigx.o $(VIDEO)/konamigx.o \
 	$(DRIVERS)/konamim2.o \
 	$(DRIVERS)/ksys573.o $(MACHINE)/zs01.o \
+	$(DRIVERS)/twinkle.o \
 	$(DRIVERS)/labyrunr.o $(VIDEO)/labyrunr.o \
 	$(DRIVERS)/lethal.o $(VIDEO)/lethal.o \
 	$(DRIVERS)/mainevt.o $(VIDEO)/mainevt.o \
@@ -939,7 +940,11 @@ $(MAMEOBJ)/namco.a: \
 	$(DRIVERS)/warpwarp.o $(AUDIO)/warpwarp.o $(VIDEO)/warpwarp.o \
 	$(MACHINE)/namcoio.o \
 	$(AUDIO)/geebee.o \
+	$(MACHINE)/namco06.o \
 	$(MACHINE)/namco50.o \
+	$(MACHINE)/namco51.o \
+	$(MACHINE)/namco53.o \
+	$(AUDIO)/namco52.o \
 	$(AUDIO)/namco54.o \
 	$(AUDIO)/namcoc7x.o \
 	$(VIDEO)/bosco.o \

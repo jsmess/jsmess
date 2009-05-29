@@ -176,7 +176,7 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
-- The core is based on MAME 0.131u2.  This incorporates all features of the
+- The core is based on MAME 0.131u3.  This incorporates all features of the
   update to this core.  [MAME team]
 
 - Converted the WAVE sound device to stereo. [Curt Coder]

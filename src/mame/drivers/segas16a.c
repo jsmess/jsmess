@@ -165,6 +165,7 @@ Tetris         -         -         -         -         EPR12169  EPR12170  -    
 static UINT16 *workram;
 
 static UINT8 video_control;
+static UINT8 mcu_control;
 static UINT8 mj_input_num;
 
 static read16_space_func custom_io_r;
@@ -244,6 +245,17 @@ static TIMER_CALLBACK( suspend_i8751 )
  *
  *************************************/
 
+static MACHINE_START( system16a )
+{
+	state_save_register_global(machine, video_control);
+	state_save_register_global(machine, mcu_control);
+	state_save_register_global(machine, mj_input_num);
+
+	state_save_register_global(machine, n7751_command);
+	state_save_register_global(machine, n7751_rom_address);
+}
+
+
 static MACHINE_RESET( system16a )
 {
 	fd1094_machine_init(cputag_get_cpu(machine, "maincpu"));
@@ -251,6 +263,8 @@ static MACHINE_RESET( system16a )
 	/* if we have a fake i8751 handler, disable the actual 8751 */
 	if (i8751_vblank_hook != NULL)
 		timer_call_after_resynch(machine, NULL, 0, suspend_i8751);
+
+	mcu_control = 0x00;
 }
 
 
@@ -344,11 +358,18 @@ static WRITE8_DEVICE_HANDLER( video_control_w )
         D1 : Coin meter #2
         D0 : Coin meter #1
     */
+	const device_config *mcu = cputag_get_cpu(device->machine, "mcu");
+
 	if (((video_control ^ data) & 0x0c) && lamp_changed_w)
 		(*lamp_changed_w)(video_control ^ data, data);
 	video_control = data;
+
 	segaic16_tilemap_set_flip(device->machine, 0, data & 0x80);
 	segaic16_sprites_set_flip(device->machine, 0, data & 0x80);
+
+	if (mcu != NULL)
+		cpu_set_input_line(mcu, MCS51_INT1_LINE, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+
 	segaic16_set_display_enable(device->machine, data & 0x10);
 	set_led_status(1, data & 0x08);
 	set_led_status(0, data & 0x04);
@@ -504,7 +525,7 @@ static INTERRUPT_GEN( i8751_main_cpu_vblank )
  *
  *************************************/
 
-static void bodyslam_i8751_sim(running_machine *machine)
+static void dumpmtmt_i8751_sim(running_machine *machine)
 {
 	UINT8 flag = workram[0x200/2] >> 8;
 	UINT8 tick = workram[0x200/2] & 0xff;
@@ -552,6 +573,7 @@ static void bodyslam_i8751_sim(running_machine *machine)
 static void quartet_i8751_sim(running_machine *machine)
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+
 	/* signal a VBLANK to the main CPU */
 	cputag_set_input_line(machine, "maincpu", 4, HOLD_LINE);
 
@@ -696,6 +718,8 @@ static READ16_HANDLER( mjleague_custom_io_r )
 	return standard_io_r(space, offset, mem_mask);
 }
 
+
+
 /*************************************
  *
  *  Passing Shot custom I/O
@@ -729,6 +753,8 @@ static READ16_HANDLER( pshot16a_custom_io_r )
 	}
 	return standard_io_r(space, offset, mem_mask);
 }
+
+
 
 /*************************************
  *
@@ -785,6 +811,142 @@ static void sjryuko_lamp_changed_w(UINT8 changed, UINT8 newval)
 {
 	if ((changed & 4) && (newval & 4))
 		mj_input_num = (mj_input_num + 1) % 6;
+}
+
+
+
+/*************************************
+ *
+ *  MCU I/O
+ *
+ *************************************/
+
+INLINE UINT8 maincpu_byte_r(running_machine *machine, offs_t offset)
+{
+	return memory_read_byte(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), offset);
+}
+
+
+INLINE void maincpu_byte_w(running_machine *machine, offs_t offset, UINT8 data)
+{
+	memory_write_byte(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), offset, data);
+}
+
+
+static WRITE8_HANDLER( mcu_control_w )
+{
+	const device_config *maincpu = cputag_get_cpu(space->machine, "maincpu");
+	int irqline;
+
+	cpu_set_input_line(maincpu, INPUT_LINE_RESET, (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+	for (irqline = 1; irqline <= 7; irqline++)
+		cpu_set_input_line(maincpu, irqline, ((~data & 7) == irqline) ? ASSERT_LINE : CLEAR_LINE);
+
+	if (data & 0x40)
+		segaic16_set_display_enable(space->machine, 1);
+
+	if ((mcu_control ^ data) & 0x40)
+		cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(10));
+
+	mcu_control = data;
+}
+
+
+static WRITE8_HANDLER( mcu_io_w )
+{
+	/*
+        1.00 0... = work RAM (accessed @ $4000+x) or I/O (accessed @ $8000+x)
+        1.00 1... = text RAM (accessed @ $8000+x)
+        1.01 1... = palette RAM
+        1.10 1... = checksum #0
+        1.11 0... = checksum #1
+        1.11 1... = checksum #2
+    */
+	switch ((mcu_control >> 3) & 7)
+	{
+		case 0:
+			if (offset >= 0x4000 && offset < 0x8000)
+				maincpu_byte_w(space->machine, 0xc70001 ^ (offset & 0x3fff), data);
+			else if (offset >= 0x8000 && offset < 0xc000)
+				maincpu_byte_w(space->machine, 0xc40001 ^ (offset & 0x3fff), data);
+			else
+				logerror("%03X: MCU movx write mode %02X offset %04X = %02X\n",
+						 cpu_get_pc(space->cpu), mcu_control, offset, data);
+			break;
+
+		case 1:
+			if (offset >= 0x8000 && offset < 0x9000)
+				maincpu_byte_w(space->machine, 0x410001 ^ (offset & 0xfff), data);
+			else
+				logerror("%03X: MCU movx write mode %02X offset %04X = %02X\n",
+						 cpu_get_pc(space->cpu), mcu_control, offset, data);
+			break;
+
+		case 3:
+			maincpu_byte_w(space->machine, 0x840001 ^ offset, data);
+			break;
+
+		case 5:
+		case 6:
+		case 7:
+			/* ROM */
+
+		default:
+			logerror("%03X: MCU movx write mode %02X offset %04X = %02X\n",
+					 cpu_get_pc(space->cpu), mcu_control, offset, data);
+			break;
+	}
+}
+
+
+static READ8_HANDLER( mcu_io_r )
+{
+	switch ((mcu_control >> 3) & 7)
+	{
+		case 0:
+			if (offset >= 0x0000 && offset < 0x3fff)
+				return watchdog_reset_r(space, 0);		/* unsure about this one */
+			else if (offset >= 0x4000 && offset < 0x8000)
+				return maincpu_byte_r(space->machine, 0xc70001 ^ (offset & 0x3fff));
+			else if (offset >= 0x8000 && offset < 0xc000)
+				return maincpu_byte_r(space->machine, 0xc40001 ^ (offset & 0x3fff));
+			logerror("%03X: MCU movx read mode %02X offset %04X\n",
+					 cpu_get_pc(space->cpu), mcu_control, offset);
+			return 0xff;
+
+		case 1:
+			if (offset >= 0x8000 && offset < 0x9000)
+				return maincpu_byte_r(space->machine, 0x410001 ^ (offset & 0xfff));
+			logerror("%03X: MCU movx read mode %02X offset %04X\n",
+					 cpu_get_pc(space->cpu), mcu_control, offset);
+			return 0xff;
+
+		case 3:
+			return maincpu_byte_r(space->machine, 0x840001 ^ offset);
+
+		case 5:
+			return memory_region(space->machine, "maincpu")[0x00000 + offset];
+		case 6:
+			return memory_region(space->machine, "maincpu")[0x10000 + offset];
+		case 7:
+			return memory_region(space->machine, "maincpu")[0x20000 + offset];
+
+		default:
+			logerror("%03X: MCU movx read mode %02X offset %04X\n",
+					 cpu_get_pc(space->cpu), mcu_control, offset);
+			return 0xff;
+	}
+}
+
+
+static INTERRUPT_GEN( mcu_irq_assert )
+{
+	/* toggle the INT0 line on the MCU */
+	cpu_set_input_line(device, MCS51_INT0_LINE, ASSERT_LINE);
+	cpu_set_input_line(device, MCS51_INT0_LINE, CLEAR_LINE);
+
+	/* boost interleave to ensure that the MCU can break the M68000 out of a STOP */
+	cpuexec_boost_interleave(device->machine, attotime_zero, ATTOTIME_IN_USEC(100));
 }
 
 
@@ -870,8 +1032,11 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( mcu_io_map, ADDRESS_SPACE_DATA, 8 )
+static ADDRESS_MAP_START( mcu_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mcu_io_r, mcu_io_w)
+	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READNOP AM_WRITE(mcu_control_w)
+	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READNOP	/* read during jb int0 */
 ADDRESS_MAP_END
 
 
@@ -1170,6 +1335,16 @@ static INPUT_PORTS_START( bodyslam )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0c, 0x0c, "Timer Speed" ) PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPSETTING(    0x0c, "Slowest" )
+	PORT_DIPSETTING(    0x08, "Slow" )
+	PORT_DIPSETTING(    0x04, "Fast" )
+	PORT_DIPSETTING(    0x00, "Fastest" )
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:7,8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 INPUT_PORTS_END
 
 
@@ -1753,6 +1928,7 @@ static MACHINE_DRIVER_START( system16a )
 
 	MDRV_I8243_ADD("n7751_8243", NULL, n7751_rom_offset_w)
 
+	MDRV_MACHINE_START(system16a)
 	MDRV_MACHINE_RESET(system16a)
 	MDRV_NVRAM_HANDLER(system16a)
 
@@ -1800,7 +1976,7 @@ static MACHINE_DRIVER_START( system16a_8751 )
 
 	MDRV_CPU_ADD("mcu", I8751, 8000000)
 	MDRV_CPU_IO_MAP(mcu_io_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_pulse)
+	MDRV_CPU_VBLANK_INT("screen", mcu_irq_assert)
 MACHINE_DRIVER_END
 
 
@@ -1867,7 +2043,7 @@ ROM_END
  **************************************************************************************************************************
  **************************************************************************************************************************
     Action Fighter, Sega System 16A
-    CPU: FD1089A 317-0018
+    CPU: FD1089A 317-0018?@(dedicated cabinet version uses 317-0014)
  */
 ROM_START( afighter )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
@@ -2183,14 +2359,14 @@ ROM_START( bodyslam )
 	ROM_LOAD( "epr-10031.c3", 0x10000, 0x8000, CRC(ea3c4472) SHA1(ad8eac2d3d14fd6aba713f4d624861c17aabf757) )
 	ROM_LOAD( "epr-10032.c4", 0x18000, 0x8000, CRC(0aabebce) SHA1(fab12df8f4eab270be491c6c025d832c338e1e83) )
 
-	ROM_REGION( 0x10000, "mcu", 0 )	/* Intel i8751 protection MCU */
-	ROM_LOAD( "317-0015.mcu", 0x00000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x1000, "mcu", 0 )	/* Intel i8751 protection MCU */
+	ROM_LOAD( "317-0015.bin", 0x0000, 0x1000, CRC(833869e2) SHA1(2675fda669351e958be28ca28de276abb2bbc99a) )
 ROM_END
 
 /**************************************************************************************************************************
     Dump Matsumoto, pre-System 16
     CPU: 68000
-    i8751 317-00xx (unknown)
+    i8751 317-0011A
  */
 ROM_START( dumpmtmt )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
@@ -2228,7 +2404,7 @@ ROM_START( dumpmtmt )
 	ROM_LOAD( "epr-7713.c3", 0x10000, 0x8000, CRC(33f292e7) SHA1(4358cd3922a0dcbf109d2d697c7b8c4e090c3d52) )
 	ROM_LOAD( "epr-7714.c4", 0x18000, 0x8000, CRC(8fd48c47) SHA1(1cba63a9e7e0b477683b7758d124f4949558ba7a) )
 
-	ROM_REGION( 0x10000, "mcu", 0 )	/* protection MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )	/* protection MCU */
 	ROM_LOAD( "317-00xx.mcu", 0x00000, 0x1000, NO_DUMP )
 ROM_END
 
@@ -2300,7 +2476,7 @@ ROM_END
  **************************************************************************************************************************
  **************************************************************************************************************************
     Major League, pre-System 16
-    CPU: 68000
+    CPU: 68000 (version uses i8751(315-5158C) known to be exist)
  */
 ROM_START( mjleague )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
@@ -2431,7 +2607,7 @@ ROM_START( quartet )
 	ROM_LOAD( "epr-7474.3c", 0x10000, 0x8000, CRC(dbf853b8) SHA1(e82f497e1144f23f3233b5c45ef182bfc7923715) )
 	ROM_LOAD( "epr-7476.4c", 0x18000, 0x8000, CRC(5eba655a) SHA1(6713ef12037cba3139d0f469c82bd90b44bae8ce) )
 
-	ROM_REGION( 0x10000, "mcu", 0 )	/* Intel i8751 protection MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )	/* Intel i8751 protection MCU */
 	ROM_LOAD( "315-5194.mcu", 0x00000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x0500, "plds", ROMREGION_DISPOSE )
@@ -2481,7 +2657,7 @@ ROM_START( quartet1 )
 	ROM_LOAD( "epr-7474.3c", 0x10000, 0x8000, CRC(dbf853b8) SHA1(e82f497e1144f23f3233b5c45ef182bfc7923715) )
 	ROM_LOAD( "epr-7476.4c", 0x18000, 0x8000, CRC(5eba655a) SHA1(6713ef12037cba3139d0f469c82bd90b44bae8ce) )
 
-	ROM_REGION( 0x10000, "mcu", 0 )	/* Intel i8751 protection MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )	/* Intel i8751 protection MCU */
 	ROM_LOAD( "315-5194.mcu", 0x00000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x0500, "plds", ROMREGION_DISPOSE )
@@ -2537,8 +2713,8 @@ ROM_START( quart21 )
 	ROM_LOAD( "epr-7474.3c", 0x10000, 0x8000, CRC(dbf853b8) SHA1(e82f497e1144f23f3233b5c45ef182bfc7923715) )
 	ROM_LOAD( "epr-7476.4c", 0x18000, 0x8000, CRC(5eba655a) SHA1(6713ef12037cba3139d0f469c82bd90b44bae8ce) )
 
-	ROM_REGION( 0x10000, "mcu", 0 )	/* Intel i8751 protection MCU */
-	ROM_LOAD( "317-0010.mcu", 0x00000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x1000, "mcu", 0 )	/* Intel i8751 protection MCU */
+	ROM_LOAD( "317-0010.bin", 0x00000, 0x1000, CRC(8c2033ea) SHA1(4a60d141517a5d5d065f40f71be4d2ee3be18384) )
 ROM_END
 
 /**************************************************************************************************************************
@@ -2714,6 +2890,54 @@ ROM_START( shinobls )
 	ROM_LOAD( "b9", 0x0000, 0x8000, CRC(6d7966da) SHA1(90f55a99f784c21d7c135e630f4e8b1d4d043d66) )
 ROM_END
 
+/* Shinobi bootleg by 'Beta' (7751 replaced by what? Sample rom is different, but no extra sound CPU rom present, missing?) */
+/* otherwise it seems to run fine on System 16A */
+ROM_START( shinoblb )
+	ROM_REGION( 0x040000, "maincpu", 0 ) /* 68000 code */
+	ROM_LOAD16_BYTE( "4.3k", 0x000000, 0x10000, CRC(c178a39c) SHA1(05ff1679cdfc3618df8b3fabdeab64b1f2299aa3) )
+	ROM_LOAD16_BYTE( "2.3n", 0x000001, 0x10000, CRC(5ad8ebf2) SHA1(b22e0c8d4b27c553abface17c625e207d19417ab) )
+	ROM_LOAD16_BYTE( "5.2k", 0x020000, 0x10000, CRC(a2a620bd) SHA1(f8b135ce14d6c5eac5e40ddfd5ad2f1e6f2bc7a6) )
+	ROM_LOAD16_BYTE( "3.2n", 0x020001, 0x10000, CRC(a3ceda52) SHA1(97a1c52a162fb1d43b3f8f16613b70ce582a8d26) )
+
+	ROM_REGION( 0x30000, "gfx1", ROMREGION_DISPOSE ) /* tiles */
+	ROM_LOAD( "8.3b", 0x00000, 0x10000, CRC(46627e7d) SHA1(66bb5b22a2100e7b9df303007a837bc2d52cf7ba) )
+	ROM_LOAD( "7.4b", 0x10000, 0x10000, CRC(87d0f321) SHA1(885b38eaff2dcaeab4eeaa20cc8a2885d520abd6) )
+	ROM_LOAD( "6.5b", 0x20000, 0x10000, CRC(efb4af87) SHA1(0b8a905023e1bc808fd2b1c3cfa3778cde79e659) )
+
+	ROM_REGION16_BE( 0x080000, "gfx2", 0 ) /* sprites */
+	ROM_LOAD16_BYTE( "9.6r",  0x00001, 0x08000, CRC(611f413a) SHA1(180f83216e2dfbfd77b0fb3be83c3042954d12df) )
+	ROM_CONTINUE(             0x40001, 0x08000 )
+	ROM_LOAD16_BYTE( "13.8r", 0x00000, 0x08000, CRC(5eb00fc1) SHA1(97e02eee74f61fabcad2a9e24f1868cafaac1d51) )
+	ROM_CONTINUE(             0x40000, 0x08000 )
+	ROM_LOAD16_BYTE( "10.6q", 0x10001, 0x08000, CRC(3c0797c0) SHA1(df18c7987281bd9379026c6cf7f96f6ae49fd7f9) )
+	ROM_CONTINUE(             0x50001, 0x08000 )
+	ROM_LOAD16_BYTE( "14.8q", 0x10000, 0x08000, CRC(25307ef8) SHA1(91ffbe436f80d583524ee113a8b7c0cf5d8ab286) )
+	ROM_CONTINUE(             0x50000, 0x08000 )
+	ROM_LOAD16_BYTE( "11.6p", 0x20001, 0x08000, CRC(c29ac34e) SHA1(b5e9b8c3233a7d6797f91531a0d9123febcf1660) )
+	ROM_CONTINUE(             0x60001, 0x08000 )
+	ROM_LOAD16_BYTE( "15.8p", 0x20000, 0x08000, CRC(04a437f8) SHA1(ea5fed64443236e3404fab243761e60e2e48c84c) )
+	ROM_CONTINUE(             0x60000, 0x08000 )
+	ROM_LOAD16_BYTE( "12.6n", 0x30001, 0x08000, CRC(41f41063) SHA1(5cc461e9738dddf9eea06831fce3702d94674163) )
+	ROM_CONTINUE(             0x70001, 0x08000 )
+	ROM_LOAD16_BYTE( "16.8n", 0x30000, 0x08000, CRC(b6e1fd72) SHA1(eb86e4bf880bd1a1d9bcab3f2f2e917bcaa06172) )
+	ROM_CONTINUE(             0x70000, 0x08000 )
+
+	ROM_REGION( 0x20000, "soundcpu", 0 ) /* sound CPU */
+	ROM_LOAD( "1.5s", 0x0000, 0x8000, CRC(dd50b745) SHA1(52e1977569d3713ad864d607170c9a61cd059a65) )
+
+	/* these 2 n7751 roms weren't present in this set, it's possible it didn't have them */
+	ROM_REGION( 0x1000, "n7751", 0 )      /* 4k for 7751 onboard ROM */
+	ROM_LOAD( "7751.bin",     0x0000, 0x0400, CRC(6a9534fc) SHA1(67ad94674db5c2aab75785668f610f6f4eccd158) ) /* 7751 - U34 */
+
+	ROM_REGION( 0x08000, "n7751data", 0 ) /* 7751 sound data */
+	ROM_LOAD( "b9", 0x0000, 0x8000, CRC(6d7966da) SHA1(90f55a99f784c21d7c135e630f4e8b1d4d043d66) )
+
+	ROM_REGION( 0x08000, "samples", 0 )
+	/* sound samples (played by what?, not the same as the original) */
+	/* marked as 'bad dump' pending investigation, we might actually be missing a cpu rom to play them */
+	ROM_LOAD( "17.6u", 0x0000, 0x8000, BAD_DUMP CRC(b7a6890c) SHA1(6431df82c7dbe454cabc6084c1a677ebb42ae4b3) )
+ROM_END
+
 /**************************************************************************************************************************
     Shinobi, Sega System 16A
     CPU: FD1094 (317-0050)
@@ -2766,7 +2990,7 @@ ROM_END
  **************************************************************************************************************************
  **************************************************************************************************************************
     Sukeban Jansi Ryuko, Sega System 16A
-    CPU: FD1089B (317-5021)
+    CPU: FD1089B (317-5021, also 317-5018 known to be exist)
 
      (JPN Ver.)
     (c)1988 White Board
@@ -3043,7 +3267,7 @@ ROM_END
  **************************************************************************************************************************
  **************************************************************************************************************************
     Wonder Boy III, Sega System 16A
-    CPU: FD1089A (317-unknown)
+    CPU: FD1089A (317-0086)
  */
 ROM_START( wb35 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
@@ -3115,10 +3339,10 @@ static DRIVER_INIT( fd1089b_16a )
 }
 
 
-static DRIVER_INIT( bodyslam )
+static DRIVER_INIT( dumpmtmt )
 {
 	system16a_generic_init(machine);
-	i8751_vblank_hook = bodyslam_i8751_sim;
+	i8751_vblank_hook = dumpmtmt_i8751_sim;
 }
 
 
@@ -3158,6 +3382,7 @@ static DRIVER_INIT( sjryukoa )
 }
 
 
+
 /*************************************
  *
  *  Game driver(s)
@@ -3165,12 +3390,12 @@ static DRIVER_INIT( sjryukoa )
  *************************************/
 
 /* "Pre-System 16" */
-GAME( 1986, bodyslam, 0,        system16a_8751,   bodyslam, bodyslam,    ROT0,   "Sega",           "Body Slam (8751 317-0015)", 0 )
-GAME( 1986, dumpmtmt, bodyslam, system16a_8751,   bodyslam, bodyslam,    ROT0,   "Sega",           "Dump Matsumoto (Japan, 8751 317-unknown)", 0 )
+GAME( 1986, bodyslam, 0,        system16a_8751,   bodyslam, generic_16a, ROT0,   "Sega",           "Body Slam (8751 317-0015)", 0 )
+GAME( 1986, dumpmtmt, bodyslam, system16a_8751,   bodyslam, dumpmtmt,    ROT0,   "Sega",           "Dump Matsumoto (Japan, 8751 317-unknown)", GAME_UNEMULATED_PROTECTION )
 GAME( 1985, mjleague, 0,        system16a,        mjleague, mjleague,    ROT270, "Sega",           "Major League", 0 )
-GAME( 1986, quartet,  0,        system16a_8751,   quartet,  quartet,     ROT0,   "Sega",           "Quartet (Rev A, 8751 315-5194)", 0 )
-GAME( 1986, quartet1, quartet,  system16a_8751,   quartet,  quartet,     ROT0,   "Sega",           "Quartet (8751 315-5194)", 0 )
-GAME( 1986, quart21,  quartet,  system16a_8751,   quart2,   quartet,     ROT0,   "Sega",           "Quartet 2 (8751 317-0010)", 0 )
+GAME( 1986, quartet,  0,        system16a_8751,   quartet,  quartet,     ROT0,   "Sega",           "Quartet (Rev A, 8751 315-5194)", GAME_UNEMULATED_PROTECTION )
+GAME( 1986, quartet1, quartet,  system16a_8751,   quartet,  quartet,     ROT0,   "Sega",           "Quartet (8751 315-5194)", GAME_UNEMULATED_PROTECTION )
+GAME( 1986, quart21,  quartet,  system16a_8751,   quart2,   generic_16a, ROT0,   "Sega",           "Quartet 2 (8751 317-0010)", 0 )
 GAME( 1986, quart2,   quartet,  system16a,        quart2,   generic_16a, ROT0,   "Sega",           "Quartet 2 (unprotected)", 0 )
 
 /* System 16A */
@@ -3188,6 +3413,7 @@ GAME( 1987, sdi,      0,        system16a_no7751, sdi,      sdi,         ROT0,  
 GAME( 1987, shinobi,  0,        system16a,        shinobi,  generic_16a, ROT0,   "Sega",           "Shinobi (set 6, System 16A, unprotected)", 0 )
 GAME( 1987, shinobi1, shinobi,  system16a,        shinobi,  generic_16a, ROT0,   "Sega",           "Shinobi (set 1, System 16A, FD1094 317-0050)", 0 )
 GAME( 1987, shinobls, shinobi,  system16a,        shinobi,  generic_16a, ROT0,   "[Sega] (Star bootleg)", "Shinobi (Star bootleg, System 16A)", 0 )
+GAME( 1987, shinoblb, shinobi,  system16a,        shinobi,  generic_16a, ROT0,   "[Sega] (Beta bootleg)", "Shinobi (Beta bootleg)", 0 ) // should have different sound hw? using original ATM
 GAME( 1987, sjryuko1, sjryuko,  system16a,        sjryuko,  sjryukoa,    ROT0,   "White Board",    "Sukeban Jansi Ryuko (set 1, System 16A, FD1089B 317-5021)", 0 )
 GAME( 1988, tetris,   0,        system16a_no7751, tetris,   generic_16a, ROT0,   "Sega",           "Tetris (set 4, Japan, System 16A, FD1094 317-0093)", 0 )
 GAME( 1988, tetris3,  tetris,   system16a_no7751, tetris,   generic_16a, ROT0,   "Sega",           "Tetris (set 3, Japan, System 16A, FD1094 317-0093a)", 0 )

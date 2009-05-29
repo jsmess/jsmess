@@ -403,15 +403,13 @@ static const tpi6525_interface c16_tpi6525_tpi_3_intf =
 	NULL	
 };
 
-
 static const m6502_interface c16_m7501_interface =
 {
-	NULL,
-	NULL,
-	c16_m7501_port_read,
-	c16_m7501_port_write
+	NULL,					/* read_indexed_func */
+	NULL,					/* write_indexed_func */
+	c16_m7501_port_read,	/* port_read_func */
+	c16_m7501_port_write	/* port_write_func */
 };
-
 
 static MACHINE_DRIVER_START( c16 )
 	/* basic machine hardware */

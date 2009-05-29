@@ -42,19 +42,19 @@ PALETTE_INIT( tryout )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	int code, attr;
+	int code, attr, color;
 
 	code = videoram[tile_index];
 	attr = videoram[tile_index + 0x400];
-
 	code |= ((attr & 0x03) << 8);
+	color = ((attr & 0x4)>>2)+6;
 
-	SET_TILE_INFO(0, code, 6, 0);
+	SET_TILE_INFO(0, code, color, 0);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	SET_TILE_INFO(2, tryout_vram[tile_index] & 0x7f, 0, 0);
+	SET_TILE_INFO(2, tryout_vram[tile_index] & 0x7f, 2, 0);
 }
 
 READ8_HANDLER( tryout_vram_r )
@@ -89,13 +89,6 @@ WRITE8_HANDLER( tryout_vram_w )
 	if ((bank==0 || bank==2 || bank==4 || bank==6) && (offset&0x7ff)<0x400) {
 		int newoff=offset&0x3ff;
 
-		switch (newoff&0x300){
-		case 0x000: newoff=(newoff&0xff) | 0x100; break;
-		case 0x100: newoff=(newoff&0xff) | 0x200; break;
-		case 0x200: newoff=(newoff&0xff) | 0x000; break;
-		case 0x300: newoff=(newoff&0xff) | 0x300; break;
-		}
-
 		tryout_vram[newoff]=data;
 		tilemap_mark_tile_dirty(bg_tilemap,newoff);
 		return;
@@ -115,28 +108,28 @@ WRITE8_HANDLER( tryout_vram_w )
 
 	switch (offset&0x1c00) {
 	case 0x0400:
-		tryout_vram_gfx[(offset&0x3ff) + 0x0000 + ((offset&0x2000)>>1)]=(data&0xf);
-		tryout_vram_gfx[(offset&0x3ff) + 0x2000 + ((offset&0x2000)>>1)]=(data&0xf0)>>4;
+		tryout_vram_gfx[(offset&0x3ff) + 0x0000 + ((offset&0x2000)>>1)]=(~data&0xf);
+		tryout_vram_gfx[(offset&0x3ff) + 0x2000 + ((offset&0x2000)>>1)]=(~data&0xf0)>>4;
 		break;
 	case 0x0800:
-		tryout_vram_gfx[(offset&0x3ff) + 0x4000 + ((offset&0x2000)>>1)]=(data&0xf);
-		tryout_vram_gfx[(offset&0x3ff) + 0x4400 + ((offset&0x2000)>>1)]=(data&0xf0)>>4;
+		tryout_vram_gfx[(offset&0x3ff) + 0x4000 + ((offset&0x2000)>>1)]=(~data&0xf);
+		tryout_vram_gfx[(offset&0x3ff) + 0x4400 + ((offset&0x2000)>>1)]=(~data&0xf0)>>4;
 		break;
 	case 0x0c00:
-		tryout_vram_gfx[(offset&0x3ff) + 0x0400 + ((offset&0x2000)>>1)]=(data&0xf);
-		tryout_vram_gfx[(offset&0x3ff) + 0x2400 + ((offset&0x2000)>>1)]=(data&0xf0)>>4;
+		tryout_vram_gfx[(offset&0x3ff) + 0x0400 + ((offset&0x2000)>>1)]=(~data&0xf);
+		tryout_vram_gfx[(offset&0x3ff) + 0x2400 + ((offset&0x2000)>>1)]=(~data&0xf0)>>4;
 		break;
 	case 0x1400:
-		tryout_vram_gfx[(offset&0x3ff) + 0x0800 + ((offset&0x2000)>>1)]=(data&0xf);
-		tryout_vram_gfx[(offset&0x3ff) + 0x2800 + ((offset&0x2000)>>1)]=(data&0xf0)>>4;
+		tryout_vram_gfx[(offset&0x3ff) + 0x0800 + ((offset&0x2000)>>1)]=(~data&0xf);
+		tryout_vram_gfx[(offset&0x3ff) + 0x2800 + ((offset&0x2000)>>1)]=(~data&0xf0)>>4;
 		break;
 	case 0x1800:
-		tryout_vram_gfx[(offset&0x3ff) + 0x4800 + ((offset&0x2000)>>1)]=(data&0xf);
-		tryout_vram_gfx[(offset&0x3ff) + 0x4c00 + ((offset&0x2000)>>1)]=(data&0xf0)>>4;
+		tryout_vram_gfx[(offset&0x3ff) + 0x4800 + ((offset&0x2000)>>1)]=(~data&0xf);
+		tryout_vram_gfx[(offset&0x3ff) + 0x4c00 + ((offset&0x2000)>>1)]=(~data&0xf0)>>4;
 		break;
 	case 0x1c00:
-		tryout_vram_gfx[(offset&0x3ff) + 0x0c00 + ((offset&0x2000)>>1)]=(data&0xf);
-		tryout_vram_gfx[(offset&0x3ff) + 0x2c00 + ((offset&0x2000)>>1)]=(data&0xf0)>>4;
+		tryout_vram_gfx[(offset&0x3ff) + 0x0c00 + ((offset&0x2000)>>1)]=(~data&0xf);
+		tryout_vram_gfx[(offset&0x3ff) + 0x2c00 + ((offset&0x2000)>>1)]=(~data&0xf0)>>4;
 		break;
 	}
 
@@ -195,8 +188,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 		sprite = spriteram[offs+1] + ((spriteram_2[offs]&7)<<8);
 		x = spriteram[offs+3]-3;
 		y = spriteram[offs+2];
-		color = (spriteram[offs] & 8)>>3;
-		fx = 0;
+		color = 0;//(spriteram[offs] & 8)>>3;
+		fx = (spriteram[offs] & 8)>>3;
 		fy = 0;
 		inc = 16;
 
@@ -236,29 +229,33 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 VIDEO_UPDATE( tryout )
 {
-//  UINT8* mem=memory_region(machine, REGION_CPU1);
-
-	int scrollx;
+	int scrollx = 0;
 
 	if (!flip_screen_get(screen->machine))
 		tilemap_set_scrollx(fg_tilemap, 0, 16); /* Assumed hard-wired */
 	else
 		tilemap_set_scrollx(fg_tilemap, 0, -8); /* Assumed hard-wired */
 
-	if(tryout_gfx_control[0] == 0xc)
-		scrollx = tryout_gfx_control[1];
-	if(tryout_gfx_control[0] == 0x8 && !tryout_gfx_control[1])
-		scrollx = 0x100;
-	else
-		scrollx = tryout_gfx_control[1] | ((tryout_gfx_control[0]&1)<<8) | ((tryout_gfx_control[0]&4)<<7);
+	scrollx = tryout_gfx_control[1] + ((tryout_gfx_control[0]&1)<<8) + ((tryout_gfx_control[0]&4)<<7) - ((tryout_gfx_control[0] & 2) ? 0 : 0x100);
 
-	tilemap_set_scrollx(bg_tilemap, 0, scrollx);
+	/* wrap-around */
+	if(tryout_gfx_control[1] == 0) { scrollx+=0x100; }
+
+	tilemap_set_scrollx(bg_tilemap, 0, scrollx+2); /* why +2? hard-wired? */
 	tilemap_set_scrolly(bg_tilemap, 0, -tryout_gfx_control[2]);
 
-	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
-	draw_sprites(screen->machine, bitmap,cliprect);
+	if(!(tryout_gfx_control[0] & 0x8)) // screen disable
+	{
+		/* TODO: Color might be different, needs a video from an original pcb. */
+		bitmap_fill(bitmap, cliprect, screen->machine->pens[0x10]);
+	}
+	else
+	{
+		tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
+		tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
+		draw_sprites(screen->machine, bitmap,cliprect);
+	}
 
-//  popmessage("%02x %02x %02x - %04x",mem[0xe402],mem[0xe403],mem[0xe404], ((tryout_gfx_control[0]&1)<<8) | ((tryout_gfx_control[0]&4)<<7));
+//  popmessage("%02x %02x %02x %02x",tryout_gfx_control[0],tryout_gfx_control[1],tryout_gfx_control[2],scrollx);
 	return 0;
 }

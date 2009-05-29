@@ -1233,8 +1233,8 @@ static const struct gfx_range mapper_cps2_table[] =
 static const struct CPS1config cps1_config_table[]=
 {
 	/* name       CPSB         gfx mapper   in2  in3  out2   kludge */
-	{"forgottn", CPS_B_01,     mapper_LWCHR },
-	{"forgott1", CPS_B_01,     mapper_LW621 },
+	{"forgottn", CPS_B_01,     mapper_LW621 },
+	{"forgottu", CPS_B_01,     mapper_LWCHR },
 	{"lostwrld", CPS_B_01,     mapper_LWCHR },
 	{"ghouls",   CPS_B_01,     mapper_DM620 },
 	{"ghoulsu",  CPS_B_01,     mapper_DM620 },

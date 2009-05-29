@@ -21,6 +21,60 @@ Board Parts:
     6301 @ 6f and 7f (PROM's)
     6331 @ 1f and 2f (PROM's)
 
+Jail Break
+Konami 1986
+
+PCB Layout
+----------
+
+GX507
+PWB 300394A
+|----------------------------------------|
+| KONAMI-1   507P03.11D    6264     4416 |
+|            507P02.9D    |-------| 4416 |
+|                         |KONAMI | 4416 |
+|       507L01.8C         |005849 | 4416 |
+|                         |-------|      |
+| VLM5030                       507J13.7F|
+|                    SN76489    507J12.6F|
+| 3.579545MHz        18.432MHz           |
+| DSW3                          507J09.5F|
+|                               507L08.4F|
+| DSW2                          507J07.3F|
+|           UPC324                       |
+| DSW1                          507J11.2F|
+|      LA4460                   507J10.1F|
+|             005273 005273              |
+|             005273 005273              |
+|     VOL           18-WAY        CN1    |
+|----------------------------------------|
+Notes:
+      KONAMI1   - Custom encrypted 6809 CPU, clock 1.536MHz [18.432/12] (DIP42)
+      VLM5030   - Sanyo VLM5030 speech chip, clock 3.579545MHz (DIP40)
+      SN76489   - Texas Instruments SN76489 noise generator IC, clock 1.536MHz [18.432/12] (DIP16)
+      UPC324    - NEC UPC324 op amp. Also compatible with LM324 and Mitsubishi M5224P (DIP14)
+      LA4460    - Power amp IC
+      DSW1/2    - 8-position dip switches
+      DSW3      - 4-position dip switch
+      CN1       - 4-pin connector for monitors that require separate syncs. Pin 1 is negative vertical sync output.
+                  Horizontal sync is taken from the regular composite sync on the PCB on pin B14.
+      18-WAY    - 18-way edge connector. Pinout matches standard Konami 18-way pinout (Scramble/Frogger/Yie-Ar Kung Fu etc)
+      6264      - 8kx8 SRAM (DIP28)
+      4416      - 16kx4 DRAM (DIP18)
+      005849    - Konami custom graphics generator (PGA179)
+      005273    - Konami custom resistor array (SIL10)
+      507J12/13 - MMI 63S141 256x4 Bipolar PROM (= 82S129 & 6301 etc)
+      507J10/11 - MMI 63S081 32x8 Bipolar PROM (= 82S123 & 6331 etc)
+      All ROMs type 27C128. Pin 26 of 8C is tied high, the lower half is empty.
+
+      Measurements
+      ------------
+      Xtal  - 3.57867MHz
+      OSC   - 18.43199MHz
+      HSync - 15.5185kHz
+      VSync - 60.6059Hz
+
+
 ***************************************************************************/
 
 /*
@@ -143,8 +197,8 @@ static INPUT_PORTS_START( jailbrek )
 	PORT_DIPNAME( 0x30, 0x10, DEF_STR( Difficulty ) )  PORT_DIPLOCATION( "SW2:5,6" )
 	PORT_DIPSETTING(    0x30, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x10, "Difficult" )
-	PORT_DIPSETTING(    0x00, "Very Difficult" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Difficult ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Very_Difficult ) )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )        PORT_DIPLOCATION( "SW2:7" )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION( "SW2:8" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )

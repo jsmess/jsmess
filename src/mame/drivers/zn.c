@@ -141,6 +141,7 @@ static const struct
 	{ "stridr2a", cp10, cp13 }, /* OK ( random crashes on bosses ) */
 	{ "shiryu2",  cp10, cp13 }, /* OK ( random crashes on bosses ) */
 	{ "beastrzr", et01, et02 }, /* OK */
+	{ "bldyroar", et01, et02 }, /* OK */
 	{ "beastrzb", et01, et02 }, /* OK */
 	{ "bldyror2", et01, et03 }, /* OK */
 	{ "bam2",     et01, et05 },
@@ -167,6 +168,7 @@ static const struct
 	{ "raystorm", tt01, tt04 }, /* OK */
 	{ "raystorj", tt01, tt04 }, /* OK */
 	{ "ftimpact", tt01, tt05 }, /* OK */
+	{ "ftimpactj",tt01, tt05 }, /* OK */
 	{ "ftimpcta", tt01, tt05 }, /* OK */
 	{ "mgcldate", tt01, tt06 }, /* OK */
 	{ "mgcldtex", tt01, tt06 }, /* OK */
@@ -3778,6 +3780,24 @@ ROM_START( ftimpact )
 	ROM_LOAD( "e25-05.28",    0x0040000, 0x200000, CRC(3fb57636) SHA1(aa38bfac11ecf10fd55143cf4525a2a529be8bb6) )
 ROM_END
 
+ROM_START( ftimpactj )
+	TAITOFX1_BIOS
+
+	ROM_REGION32_LE( 0x01000000, "user2", 0 )
+	ROM_LOAD16_BYTE( "e25-06.4",     0x0000001, 0x080000, CRC(3a59deeb) SHA1(4377c5829fb5b6f5d0120caf992b1ee714897641) )
+	ROM_LOAD16_BYTE( "e25-07.3",     0x0000000, 0x080000, CRC(829be1cc) SHA1(64b139d7c3696ab2f0b9a4842c19a38fe6a8cede) )
+	ROM_LOAD( "e25-01.1",            0x0400000, 0x400000, CRC(8cc4be0c) SHA1(9ca15558a83b7e332e50accf1f7852444a7ce730) )
+	ROM_LOAD( "e25-02.2",            0x0800000, 0x400000, CRC(8e8b4c82) SHA1(55c9d4d3a08fc3226a75ab3a674be433af83e289) )
+	ROM_LOAD( "e25-03.12",           0x0c00000, 0x400000, CRC(43b1c085) SHA1(6e53550e9be0d2f415fc6b4f3b8a71185c5370b2) )
+
+	ROM_REGION( 0x080000, "cpu1", 0 )
+	ROM_LOAD( "e25-10.14",    0x0000000, 0x080000, CRC(2b2ad1b1) SHA1(6d064d0b6805d43ce42929ac8f5645b56384f53c) )
+
+	ROM_REGION( 0x600000, "unknown", 0 )
+	ROM_LOAD( "e25-04.27",    0x0000000, 0x400000, CRC(09a66d35) SHA1(f0df24bc9bfc9eb0f5150dc035c19fc5b8a39bf9) )
+	ROM_LOAD( "e25-05.28",    0x0040000, 0x200000, CRC(3fb57636) SHA1(aa38bfac11ecf10fd55143cf4525a2a529be8bb6) )
+ROM_END
+
 ROM_START( ftimpcta )
 	TAITOFX1_BIOS
 
@@ -3858,7 +3878,7 @@ ROM_START( mgcldate )
 	ROM_LOAD( "e32-03.12",           0x0c00000, 0x200000, CRC(190d1618) SHA1(838a651d32752015baa7e8caea62fd739631b8be) )
 
 	ROM_REGION( 0x2c000, "audiocpu", 0 )     /* 64k for Z80 code */
-	ROM_LOAD( "e32-10.22",           0x0000000, 0x004000, CRC(adf3feb5) SHA1(bae5bc3fad99a92a3492be1b775dab861007eb3b) )
+	ROM_LOAD( "e32-07.22",           0x0000000, 0x004000, CRC(adf3feb5) SHA1(bae5bc3fad99a92a3492be1b775dab861007eb3b) )
 	ROM_CONTINUE(                    0x0010000, 0x01c000 ) /* banked stuff */
 
 	ROM_REGION( 0x400000, "ym", 0 )
@@ -4023,22 +4043,41 @@ ROM_START( beastrzr )
 	PSARC95_BIOS
 
 	ROM_REGION32_LE( 0x1800000, "user2", 0 )
-	ROM_LOAD16_BYTE( "broar.213",    0x000001, 0x080000, CRC(2c586534) SHA1(a38dfc3a45446d24a1caac89b0f560989d46ded5) )
-	ROM_LOAD16_BYTE( "broar.212",    0x000000, 0x080000, CRC(1c85d7fb) SHA1(aa406a42c424cc16a9e5330c68dda9acf8760088) )
-	ROM_LOAD16_BYTE( "broar.215",    0x100001, 0x080000, CRC(31c8e055) SHA1(2811789ab6221b972d1e3ffe98916587990f7564) )
-	ROM_LOAD16_BYTE( "broar.214",    0x100000, 0x080000, CRC(1cdc450a) SHA1(9215e5fec52f7c5c0070feb621eb9c77f98e2362) )
-	ROM_LOAD( "rabroar1.217",        0x400000, 0x400000, CRC(11f1ba36) SHA1(d41ae686c2c607640cbadf906215c89134758050) )
-	ROM_LOAD( "rabroar2.216",        0x800000, 0x400000, CRC(d46d46b7) SHA1(1c42cb5dcda4b26c08c4ecf95efeadaf3a1d1dd2) )
+	ROM_LOAD16_BYTE( "b.roar_u0213",   0x000001, 0x080000, CRC(2c586534) SHA1(a38dfc3a45446d24a1caac89b0f560989d46ded5) ) /* For U0212 & U0213, 8ing used indentical rom labels */
+	ROM_LOAD16_BYTE( "b.roar_u0212",   0x000000, 0x080000, CRC(1c85d7fb) SHA1(aa406a42c424cc16a9e5330c68dda9acf8760088) ) /* even though the content changes between versions   */
+	ROM_LOAD16_BYTE( "b.roar-u0215",   0x100001, 0x080000, CRC(31c8e055) SHA1(2811789ab6221b972d1e3ffe98916587990f7564) )
+	ROM_LOAD16_BYTE( "b.roar-u0214",   0x100000, 0x080000, CRC(1cdc450a) SHA1(9215e5fec52f7c5c0070feb621eb9c77f98e2362) )
+	ROM_LOAD( "ra-b-roar_rom-1.u0217", 0x400000, 0x400000, CRC(11f1ba36) SHA1(d41ae686c2c607640cbadf906215c89134758050) )
+	ROM_LOAD( "ra-b.roar_rom-2.u0216", 0x800000, 0x400000, CRC(d46d46b7) SHA1(1c42cb5dcda4b26c08c4ecf95efeadaf3a1d1dd2) )
 
 	ROM_REGION( 0x080000, "audiocpu", 0 )
-	ROM_LOAD16_BYTE( "broar.046",    0x000001, 0x040000, CRC(d4bb261a) SHA1(9a295b1354ef15f37ea09bb209cf0cb98437c462) )
-	ROM_LOAD16_BYTE( "broar.042",    0x000000, 0x040000, CRC(4d537f88) SHA1(1760367d70a81606e29885ea315185d2c2a9409b) )
+	ROM_LOAD16_BYTE( "b.roar-u046",  0x000001, 0x040000, CRC(d4bb261a) SHA1(9a295b1354ef15f37ea09bb209cf0cb98437c462) )
+	ROM_LOAD16_BYTE( "b.roar-u042",  0x000000, 0x040000, CRC(4d537f88) SHA1(1760367d70a81606e29885ea315185d2c2a9409b) )
 
 	ROM_REGION( 0x400000, "ymf", 0 )
-	ROM_LOAD( "rabroar3.snd",        0x000000, 0x400000, CRC(b74cc4d1) SHA1(eb5485582a12959ae06927a2f1d8a7e63e0f956f) )
+	ROM_LOAD( "ra-b.roar3_rom-3.u0326", 0x000000, 0x400000, CRC(b74cc4d1) SHA1(eb5485582a12959ae06927a2f1d8a7e63e0f956f) )
 ROM_END
 
-ROM_START( beastrzb )
+ROM_START( bldyroar )
+	PSARC95_BIOS
+
+	ROM_REGION32_LE( 0x1800000, "user2", 0 )
+	ROM_LOAD16_BYTE( "b.roar-u0213",   0x000001, 0x080000, CRC(63769342) SHA1(7231188073b997b039467db85ce7c85383daf591) ) /* For U0212 & U0213, 8ing used indentical rom labels */
+	ROM_LOAD16_BYTE( "b.roar-u0212",   0x000000, 0x080000, CRC(966b7169) SHA1(63e025cacb84e89d30b40ed6cfa5c63d84c298c4) ) /* even though the content changes between versions   */
+	ROM_LOAD16_BYTE( "b.roar-u0215",   0x100001, 0x080000, CRC(31c8e055) SHA1(2811789ab6221b972d1e3ffe98916587990f7564) )
+	ROM_LOAD16_BYTE( "b.roar-u0214",   0x100000, 0x080000, CRC(1cdc450a) SHA1(9215e5fec52f7c5c0070feb621eb9c77f98e2362) )
+	ROM_LOAD( "ra-b-roar_rom-1.u0217", 0x400000, 0x400000, CRC(11f1ba36) SHA1(d41ae686c2c607640cbadf906215c89134758050) )
+	ROM_LOAD( "ra-b.roar_rom-2.u0216", 0x800000, 0x400000, CRC(d46d46b7) SHA1(1c42cb5dcda4b26c08c4ecf95efeadaf3a1d1dd2) )
+
+	ROM_REGION( 0x080000, "audiocpu", 0 )
+	ROM_LOAD16_BYTE( "b.roar-u046",  0x000001, 0x040000, CRC(d4bb261a) SHA1(9a295b1354ef15f37ea09bb209cf0cb98437c462) )
+	ROM_LOAD16_BYTE( "b.roar-u042",  0x000000, 0x040000, CRC(4d537f88) SHA1(1760367d70a81606e29885ea315185d2c2a9409b) )
+
+	ROM_REGION( 0x400000, "ymf", 0 )
+	ROM_LOAD( "ra-b.roar3_rom-3.u0326", 0x000000, 0x400000, CRC(b74cc4d1) SHA1(eb5485582a12959ae06927a2f1d8a7e63e0f956f) )
+ROM_END
+
+ROM_START( beastrzb ) /* bootleg board */
 	PSARC95_BIOS
 
 	ROM_REGION32_LE( 0x1800000, "user2", 0 )
@@ -4348,6 +4387,7 @@ GAME( 1996, mgcldate, mgcldtex, coh1000ta,zn, coh1000ta, ROT0, "Taito", "Magical
 GAME( 1996, raystorm, taitofx1, coh1000tb,zn, coh1000tb, ROT0, "Taito", "Ray Storm (Ver 2.06A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1996, raystorj, raystorm, coh1000tb,zn, coh1000tb, ROT0, "Taito", "Ray Storm (Ver 2.05J)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1996, ftimpact, ftimpcta, coh1000tb,zn, coh1000tb, ROT0, "Taito", "Fighters' Impact (Ver 2.02O)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, ftimpactj,ftimpcta, coh1000tb,zn, coh1000tb, ROT0, "Taito", "Fighters' Impact (Ver 2.02J)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1997, ftimpcta, taitofx1, coh1000tb,zn, coh1000tb, ROT0, "Taito", "Fighters' Impact A (Ver 2.00J)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1997, mgcldtex, taitofx1, coh1000ta,zn, coh1000ta, ROT0, "Taito", "Magical Date EX / Magical Date - sotsugyou kokuhaku daisakusen (Ver 2.01J)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1997, gdarius,  gdarius2, coh1000tb,zn, coh1000tb, ROT0, "Taito", "G-Darius (Ver 2.01J)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
@@ -4362,6 +4402,7 @@ GAME( 1997, gdarius2, taitofx1, coh1000tb,zn, coh1000tb, ROT0, "Taito", "G-Dariu
 GAME( 1997, psarc95,  0,        coh1002e, zn,   coh1002e, ROT0, "Sony/Eighting/Raizing", "PS Arcade 95", GAME_IS_BIOS_ROOT )
 
 GAME( 1997, beastrzr, psarc95,  coh1002e, zn,   coh1002e, ROT0, "Eighting/Raizing", "Beastorizer (USA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1997, bldyroar, beastrzr, coh1002e, zn,   coh1002e, ROT0, "Eighting/Raizing", "Bloody Roar (JAPAN)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1997, beastrzb, psarc95,  coh1002e, zn,   coh1002e, ROT0, "Eighting/Raizing", "Beastorizer (USA Bootleg)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1998, bldyror2, psarc95,  coh1002e, zn6b, coh1002e, ROT0, "Eighting/Raizing", "Bloody Roar 2 (JAPAN)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 2000, brvblade, tps,      coh1002e, zn,   coh1002e, ROT270, "Eighting/Raizing", "Brave Blade (JAPAN)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )

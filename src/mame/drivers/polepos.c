@@ -212,19 +212,27 @@ Notes:
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
+#include "cpu/z8000/z8000.h"
 #include "cpu/mb88xx/mb88xx.h"
 #include "deprecat.h"
-#include "machine/namcoio.h"
+#include "machine/namco06.h"
+#include "machine/namco51.h"
+#include "machine/namco53.h"
 #include "sound/namco.h"
-#include "sound/namco52.h"
 #include "sound/samples.h"
+#include "audio/namco52.h"
 #include "audio/namco54.h"
 #include "polepos.h"
-#include "nam_cust.h"
 
 #include "polepos.lh"
 
 #define POLEPOS_TOGGLE	PORT_TOGGLE
+
+
+static UINT8 steer_last;
+static UINT8 steer_delta;
+static INT16 steer_accum;
+
 
 
 /*************************************************************************************/
@@ -320,7 +328,7 @@ static WRITE8_HANDLER( polepos_latch_w )
 			break;
 
 		case 0x06:	/* SB0 */
-			auto_start_mask = 0xfb | (bit << 2);
+			auto_start_mask = !bit;
 			break;
 
 		case 0x07:	/* CHACL */
@@ -339,15 +347,10 @@ static WRITE16_HANDLER( polepos_z8002_nvi_enable_w )
 }
 
 
-static READ8_HANDLER( in0_l )	{ return input_port_read(space->machine, "IN0") & auto_start_mask; }	// fire and start buttons
-static READ8_HANDLER( in0_h )	{ return input_port_read(space->machine, "IN0") >> 4; }				// coins
-static READ8_HANDLER( dipA_l )	{ return input_port_read(space->machine, "DSWA"); }					// dips A
-static READ8_HANDLER( dipA_h )	{ return input_port_read(space->machine, "DSWA") >> 4; }				// dips A
-static READ8_HANDLER( dipB_l )	{ return input_port_read(space->machine, "DSWB"); }					// dips B
-static READ8_HANDLER( dipB_h )	{ return input_port_read(space->machine, "DSWB") >> 4; }				// dips B
-static READ8_HANDLER( in1_l )	{ return input_port_read(space->machine, "STEER"); }					// wheel
-static READ8_HANDLER( in1_h )	{ return input_port_read(space->machine, "STEER") >> 4; }				// wheel
-static WRITE8_HANDLER( out_0 )
+static CUSTOM_INPUT( shifted_port_r ) { return input_port_read(field->port->machine, param) >> 4; }
+static CUSTOM_INPUT( auto_start_r ) { return auto_start_mask; }
+
+static WRITE8_DEVICE_HANDLER( out_0 )
 {
 // no start lamps in pole position
 //  set_led_status(1,data & 1);
@@ -355,24 +358,98 @@ static WRITE8_HANDLER( out_0 )
 	coin_counter_w(1,~data & 4);
 	coin_counter_w(0,~data & 8);
 }
-static WRITE8_HANDLER( out_1 )
+
+static WRITE8_DEVICE_HANDLER( out_1 )
 {
 	coin_lockout_global_w(data & 1);
 }
 
-static const struct namcoio_interface intf0 =
+static const namco_51xx_interface namco_51xx_intf =
 {
-	{ in0_l, in0_h, dipB_l, dipB_h },	/* port read handlers */
-	{ out_0, out_1 }					/* port write handlers */
-};
-static const struct namcoio_interface intf1 =
-{
-	{ in1_l, in1_h, dipA_l, dipA_h },	/* port read handlers */
-	{ NULL, NULL }						/* port write handlers */
+	{	/* port read handlers */
+		DEVCB_INPUT_PORT("IN0L"),
+		DEVCB_INPUT_PORT("IN0H"),
+		DEVCB_INPUT_PORT("DSWB"),
+		DEVCB_INPUT_PORT("DSWB_HI")
+	},
+	{	/* port write handlers */
+		DEVCB_HANDLER(out_0),
+		DEVCB_HANDLER(out_1)
+	}
 };
 
 
-#include "cpu/z8000/z8000.h"
+static READ8_DEVICE_HANDLER( namco_52xx_rom_r )
+{
+	UINT32 length = memory_region_length(device->machine, "52xx");
+logerror("ROM @ %04X\n", offset);
+	return (offset < length) ? memory_region(device->machine, "52xx")[offset] : 0xff;
+}
+
+static READ8_DEVICE_HANDLER( namco_52xx_si_r )
+{
+	/* pulled to +5V */
+	return 1;
+}
+
+static const namco_52xx_interface namco_52xx_intf =
+{
+	"discrete",							/* name of the discrete sound device */
+	NODE_04,							/* index of the first node */
+	0,									/* external clock rate */
+	DEVCB_HANDLER(namco_52xx_rom_r),	/* ROM read handler */
+	DEVCB_HANDLER(namco_52xx_si_r)		/* SI (pin 6) read handler */
+};
+
+
+static READ8_DEVICE_HANDLER( namco_53xx_k_r )
+{
+	/* hardwired to 0 */
+	return 0;
+}
+
+static READ8_DEVICE_HANDLER( steering_changed_r )
+{
+	/* read the current steering value and update our delta */
+	UINT8 steer_new = input_port_read(device->machine, "STEER");
+	steer_accum += (INT8)(steer_new - steer_last);
+	steer_last = steer_new;
+
+	/* if we have delta, clock things */
+	if (steer_accum < 0)
+	{
+		steer_delta = 1;
+		steer_accum++;
+	}
+	else if (steer_accum > 0)
+	{
+		steer_delta = 0;
+		steer_accum--;
+	}
+	else
+		steer_delta ^= 1;
+
+	return steer_accum & 1;
+}
+
+static READ8_DEVICE_HANDLER( steering_delta_r )
+{
+	return steer_delta;
+}
+
+static const namco_53xx_interface namco_53xx_intf =
+{
+	DEVCB_HANDLER(namco_53xx_k_r),			/* K port */
+	{
+		DEVCB_HANDLER(steering_changed_r),	/* R0 port */
+		DEVCB_HANDLER(steering_delta_r),	/* R1 port */
+		DEVCB_INPUT_PORT("DSWA"),			/* R2 port */
+		DEVCB_INPUT_PORT("DSWA_HI")			/* R3 port */
+	},
+	DEVCB_NULL								/* P port (connected to test socket) */
+};
+
+
 static MACHINE_RESET( polepos )
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
@@ -381,12 +458,6 @@ static MACHINE_RESET( polepos )
 	/* Reset all latches */
 	for (i = 0; i < 8; i++)
 		polepos_latch_w(space, i, 0);
-
-	namco_06xx_init(machine, 0, 0,
-		NAMCOIO_51XX, &intf0,
-		NAMCOIO_53XX_POLEPOS, &intf1,
-		NAMCOIO_52XX, NULL,
-		NAMCOIO_54XX, NULL);
 
 	/* set the interrupt vectors (this shouldn't be needed) */
 	cpu_set_input_line_vector(cputag_get_cpu(machine, "sub"), 0, Z8000_NVI);
@@ -401,23 +472,23 @@ static MACHINE_RESET( polepos )
 
 static ADDRESS_MAP_START( z80_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)	/* Battery Backup */
+	AM_RANGE(0x3000, 0x37ff) AM_MIRROR(0x0800) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)	/* Battery Backup */
 	AM_RANGE(0x4000, 0x47ff) AM_READWRITE(polepos_sprite_r, polepos_sprite_w)				/* Motion Object */
 	AM_RANGE(0x4800, 0x4bff) AM_READWRITE(polepos_road_r, polepos_road_w) 				/* Road Memory */
 	AM_RANGE(0x4c00, 0x4fff) AM_READWRITE(polepos_alpha_r, polepos_alpha_w)				/* Alphanumeric (char ram) */
 	AM_RANGE(0x5000, 0x57ff) AM_READWRITE(polepos_view_r, polepos_view_w) 				/* Background Memory */
 
-	AM_RANGE(0x8000, 0x83ff) AM_READ(SMH_RAM)						/* Sound Memory */
-	AM_RANGE(0x8000, 0x83bf) AM_WRITE(SMH_RAM)						/* Sound Memory */
-	AM_RANGE(0x83c0, 0x83ff) AM_DEVWRITE("namco", polepos_sound_w) AM_BASE(&polepos_soundregs)/* Sound data */
+	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x0c00) AM_READ(SMH_RAM)						/* Sound Memory */
+	AM_RANGE(0x8000, 0x83bf) AM_MIRROR(0x0c00) AM_WRITE(SMH_RAM)						/* Sound Memory */
+	AM_RANGE(0x83c0, 0x83ff) AM_MIRROR(0x0c00) AM_DEVWRITE("namco", polepos_sound_w) AM_BASE(&polepos_soundregs)/* Sound data */
 
-	AM_RANGE(0x9000, 0x90ff) AM_READWRITE(namco_06xx_0_data_r, namco_06xx_0_data_w)
-	AM_RANGE(0x9100, 0x9100) AM_READWRITE(namco_06xx_0_ctrl_r, namco_06xx_0_ctrl_w)
-	AM_RANGE(0xa000, 0xa000) AM_READ(polepos_ready_r)					/* READY */
-	AM_RANGE(0xa000, 0xa007) AM_WRITE(polepos_latch_w)				/* misc latches */
-	AM_RANGE(0xa100, 0xa100) AM_WRITE(watchdog_reset_w)				/* Watchdog */
-	AM_RANGE(0xa200, 0xa200) AM_WRITE(polepos_engine_sound_lsb_w) 	/* Car Sound ( Lower Nibble ) */
-	AM_RANGE(0xa300, 0xa300) AM_WRITE(polepos_engine_sound_msb_w) 	/* Car Sound ( Upper Nibble ) */
+	AM_RANGE(0x9000, 0x9000) AM_MIRROR(0x0eff) AM_DEVREADWRITE("06xx", namco_06xx_data_r, namco_06xx_data_w)
+	AM_RANGE(0x9100, 0x9100) AM_MIRROR(0x0eff) AM_DEVREADWRITE("06xx", namco_06xx_ctrl_r, namco_06xx_ctrl_w)
+	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x0cff) AM_READ(polepos_ready_r)					/* READY */
+	AM_RANGE(0xa000, 0xa007) AM_MIRROR(0x0cf8) AM_WRITE(polepos_latch_w)				/* misc latches */
+	AM_RANGE(0xa100, 0xa100) AM_MIRROR(0x0cff) AM_WRITE(watchdog_reset_w)				/* Watchdog */
+	AM_RANGE(0xa200, 0xa200) AM_MIRROR(0x0cff) AM_WRITE(polepos_engine_sound_lsb_w) 	/* Car Sound ( Lower Nibble ) */
+	AM_RANGE(0xa300, 0xa300) AM_MIRROR(0x0cff) AM_WRITE(polepos_engine_sound_msb_w) 	/* Car Sound ( Upper Nibble ) */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( z80_io, ADDRESS_SPACE_IO, 8 )
@@ -429,13 +500,13 @@ ADDRESS_MAP_END
 /* the same memory map is used by both Z8002 CPUs; all RAM areas are shared */
 static ADDRESS_MAP_START( z8002_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x6000, 0x6003) AM_WRITE(polepos_z8002_nvi_enable_w)	/* NVI enable - *NOT* shared by the two CPUs */
+	AM_RANGE(0x6000, 0x6001) AM_MIRROR(0x1ffe) AM_WRITE(polepos_z8002_nvi_enable_w)	/* NVI enable - *NOT* shared by the two CPUs */
 	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(polepos_sprite16_r, polepos_sprite16_w) AM_BASE(&polepos_sprite16_memory)	/* Motion Object */
 	AM_RANGE(0x9000, 0x97ff) AM_READWRITE(polepos_road16_r, polepos_road16_w) AM_BASE(&polepos_road16_memory)		/* Road Memory */
 	AM_RANGE(0x9800, 0x9fff) AM_READWRITE(polepos_alpha16_r, polepos_alpha16_w) AM_BASE(&polepos_alpha16_memory) 	/* Alphanumeric (char ram) */
 	AM_RANGE(0xa000, 0xafff) AM_READWRITE(polepos_view16_r, polepos_view16_w) AM_BASE(&polepos_view16_memory)		/* Background memory */
-	AM_RANGE(0xc000, 0xc001) AM_WRITE(polepos_view16_hscroll_w)						/* Background horz scroll position */
-	AM_RANGE(0xc100, 0xc101) AM_WRITE(polepos_road16_vscroll_w)						/* Road vertical position */
+	AM_RANGE(0xc000, 0xc001) AM_MIRROR(0x38fe) AM_WRITE(polepos_view16_hscroll_w)						/* Background horz scroll position */
+	AM_RANGE(0xc100, 0xc101) AM_MIRROR(0x38fe) AM_WRITE(polepos_road16_vscroll_w)						/* Road vertical position */
 ADDRESS_MAP_END
 
 
@@ -445,15 +516,17 @@ ADDRESS_MAP_END
  *********************************************************************/
 
 static INPUT_PORTS_START( polepos )
-	PORT_START("IN0")
+	PORT_START("IN0L")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Gear Change") PORT_CODE(KEYCODE_SPACE) POLEPOS_TOGGLE /* Gear */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL )	// start 1, program controlled
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(auto_start_r, NULL)	// start 1, program controlled
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
+
+	PORT_START("IN0H")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )
 
 	PORT_START("DSWA")
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )
@@ -478,6 +551,9 @@ static INPUT_PORTS_START( polepos )
 	PORT_DIPNAME( 0x80, 0x80, "Nr. of Laps" )
 	PORT_DIPSETTING(	0x80, "3" )
 	PORT_DIPSETTING(	0x00, "4" )
+
+	PORT_START("DSWA_HI")
+	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM(shifted_port_r, "DSWA")
 
 	PORT_START("DSWB")
 	PORT_DIPNAME( 0x07, 0x07, "Extended Rank" )
@@ -505,6 +581,9 @@ static INPUT_PORTS_START( polepos )
 	PORT_DIPSETTING(	0x80, DEF_STR( Off ))
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 
+	PORT_START("DSWB_HI")
+	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM(shifted_port_r, "DSWB")
+
 	PORT_START("BRAKE")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0,0x90) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
 
@@ -517,15 +596,17 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( poleposa )
-	PORT_START("IN0")
+	PORT_START("IN0L")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Gear Change") PORT_CODE(KEYCODE_SPACE) POLEPOS_TOGGLE /* Gear */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL )	// start 1, program controlled
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(auto_start_r, NULL) // start 1, program controlled
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
+
+	PORT_START("IN0H")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )
 
 	PORT_START("DSWA")
 	PORT_DIPNAME( 0xe0, 0xe0, DEF_STR( Coin_A ) )
@@ -550,6 +631,9 @@ static INPUT_PORTS_START( poleposa )
 	PORT_DIPNAME( 0x01, 0x01, "Nr. of Laps" )
 	PORT_DIPSETTING(	0x01, "3" )
 	PORT_DIPSETTING(	0x00, "4" )
+
+	PORT_START("DSWA_HI")
+	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM(shifted_port_r, "DSWA")
 
 	PORT_START("DSWB")
 	PORT_DIPNAME( 0xe0, 0xe0, "Practice Rank" )
@@ -577,6 +661,9 @@ static INPUT_PORTS_START( poleposa )
 	PORT_DIPSETTING(	0x01, DEF_STR( Off ))
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 
+	PORT_START("DSWB_HI")
+	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM(shifted_port_r, "DSWB")
+
 	PORT_START("BRAKE")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0,0x90) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
 
@@ -593,7 +680,7 @@ static INPUT_PORTS_START( topracra )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL )	// start 1, program controlled
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(auto_start_r, NULL)	// start 1, program controlled
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Gear Change") PORT_CODE(KEYCODE_SPACE) POLEPOS_TOGGLE /* Gear */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -623,6 +710,9 @@ static INPUT_PORTS_START( topracra )
 	PORT_DIPSETTING(	0x80, "3" )
 	PORT_DIPSETTING(	0x00, "4" )
 
+	PORT_START("DSWA_HI")
+	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM(shifted_port_r, "DSWA")
+
 	PORT_START("DSWB")
 	PORT_DIPNAME( 0x07, 0x07, "Extended Rank" )
 	PORT_DIPSETTING(	0x07, "A" )
@@ -649,6 +739,9 @@ static INPUT_PORTS_START( topracra )
 	PORT_DIPSETTING(	0x80, DEF_STR( Off ))
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 
+	PORT_START("DSWB_HI")
+	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM(shifted_port_r, "DSWB")
+
 	PORT_START("BRAKE")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0,0x90) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
 
@@ -661,15 +754,17 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( polepos2 )
-	PORT_START("IN0")
+	PORT_START("IN0L")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Gear Change") PORT_CODE(KEYCODE_SPACE) POLEPOS_TOGGLE /* Gear */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL )	// start 1, program controlled
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(auto_start_r, NULL)	// start 1, program controlled
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
+
+	PORT_START("IN0H")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )
 
 	PORT_START("DSWA")
 	PORT_DIPNAME( 0xe0, 0xe0, DEF_STR( Coin_A ) )
@@ -696,6 +791,9 @@ static INPUT_PORTS_START( polepos2 )
 	PORT_DIPSETTING(	0x01, DEF_STR( Off ))
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 
+	PORT_START("DSWA_HI")
+	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM(shifted_port_r, "DSWA")
+
 	PORT_START("DSWB")
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Game_Time ) )
 	PORT_DIPSETTING(	0x80, "90 secs." )
@@ -718,6 +816,9 @@ static INPUT_PORTS_START( polepos2 )
 	PORT_DIPNAME( 0x01, 0x01, "Speed" )
 	PORT_DIPSETTING(	0x01, "Average" )
 	PORT_DIPSETTING(	0x00, DEF_STR( High ) )
+
+	PORT_START("DSWB_HI")
+	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM(shifted_port_r, "DSWB")
 
 	PORT_START("BRAKE")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0,0x90) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
@@ -795,36 +896,6 @@ static const namco_interface namco_config =
 	1				/* stereo */
 };
 
-/* The 52xx output is 4Vpp.  After filtering it is 2Vpp.
- * The output of the 54xx is 4Vpp.  After filtering it is clamped to +1.5/-2.
- * So we need to make the 52xx volume 50% of the 54xx volume.
- * 52xx and 54xx ouputs are mixed together to create an output called GAINx.
- * This has a total resistance to the final op-amp of 13605 when the unemulated 4066
- * panning circuit is at full volume.  The engine sound has a resistance of 17492.
- * These values include 250 ohms of the 4066 when needed.
- * This all means that the engine sound is 77% of the 54xx.
- *
- * Jan 13/05 D.R. - not sure about the following info.
- * The Sound Buffers and Multiplexer circuit on sheet 7B is not emulated.
- * Basically it is a quadraphonic 16 level mixer with a 4-bit DAC (R81-85).
- * It mixes/pans the combined 52xx & 54xx output.
- * The 4 speaker sit down game uses the full quad output.
- * The 2 speaker stand up game combine RF-RR and LF-LR through the speakers.
- *
- * I set the base 54xx level at 80 and the other sounds realtive to that,
- * to allow headroom when more the one effect is played.
- */
-
-static const namco_52xx_interface namco_52xx_config =
-{
-	0,				/* Use internal Playback frequency */
-	100,			/* High pass filter fc */
-	0.3,			/* High pass filter Q */
-	1200,			/* Low pass filter fc */
-	0.8,			/* Low pass filter Q */
-	.5				/* Combined gain of both filters */
-};
-
 
 /*********************************************************************
  * Machine driver
@@ -846,10 +917,12 @@ static MACHINE_DRIVER_START( polepos )
 	MDRV_CPU_PROGRAM_MAP(z8002_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
-	MDRV_CPU_ADD(CPUTAG_54XX, MB8844, 18432000/12/6)	/* 1.536 MHz, internally divided by 6 */
-	MDRV_CPU_PROGRAM_MAP(namco_54xx_map_program)
-	MDRV_CPU_DATA_MAP(namco_54xx_map_data)
-	MDRV_CPU_IO_MAP(namco_54xx_map_io)
+	MDRV_NAMCO_51XX_ADD("51xx", 18432000/12, namco_51xx_intf)		/* 1.536 MHz */
+	MDRV_NAMCO_52XX_ADD("52xx", 18432000/12, namco_52xx_intf)		/* 1.536 MHz */
+	MDRV_NAMCO_53XX_ADD("53xx", 18432000/12, namco_53xx_intf)		/* 1.536 MHz */
+	MDRV_NAMCO_54XX_ADD("54xx", 18432000/12, "discrete", NODE_01)	/* 1.536 MHz */
+
+	MDRV_NAMCO_06XX_ADD("06xx", "maincpu", "51xx", "53xx", "52xx", "54xx")
 
 	MDRV_WATCHDOG_VBLANK_INIT(16)	// 128V clocks the same as VBLANK
 
@@ -882,11 +955,6 @@ static MACHINE_DRIVER_START( polepos )
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.80)
 
-	MDRV_SOUND_ADD("namco52", NAMCO_52XX, 24576000/16)	/* 1.536 MHz */
-	MDRV_SOUND_CONFIG(namco_52xx_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
-
 	/* discrete circuit on the 54XX outputs */
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(polepos)
@@ -903,12 +971,6 @@ MACHINE_DRIVER_END
 /*********************************************************************
  * ROM definitions
  *********************************************************************/
-
-#define POLEPOS_CUSTOMS \
-	ROM_REGION_NAMCO_54XX( CPUTAG_54XX ) \
-	ROM_REGION_NAMCO_51XX( "51xx" ) \
-	ROM_REGION_NAMCO_52XX( "52xx" ) \
-	ROM_REGION_NAMCO_53XX( "53xx" ) \
 
 /*
     Pole Position - Namco Version
@@ -929,8 +991,6 @@ ROM_START( polepos )
 	ROM_REGION( 0x10000, "sub2", 0 )
 	ROM_LOAD16_BYTE( "pp1_5b.4m",     0x0001, 0x2000, CRC(5cdf5294) SHA1(dbdf327a541fd71aadafda9c925fa4cf7f7c4a24) )
 	ROM_LOAD16_BYTE( "pp1_6b.4l",     0x0000, 0x2000, CRC(81696272) SHA1(27041a7c24297a6f317537c44922b51d2b2278a6) )
-
-	POLEPOS_CUSTOMS
 
 	/* graphics data */
 	ROM_REGION( 0x01000, "gfx1", ROMREGION_DISPOSE ) 	/* 2bpp alpha layer */
@@ -982,7 +1042,7 @@ ROM_START( polepos )
 	ROM_LOAD( "136014.110",   0x0000, 0x2000, CRC(b5ad4d5f) SHA1(c07e77a050200d6fe9952031f971ca35f4d15ff8) )    /* engine sound */
 	ROM_LOAD( "136014.111",   0x2000, 0x2000, CRC(8fdd2f6f) SHA1(3818dc94c60cd78c4212ab7a4367cf3d98166ee6) )    /* engine sound */
 
-	ROM_REGION( 0x8000, "namco52", 0 )
+	ROM_REGION( 0x8000, "52xx", 0 )
 	ROM_LOAD( "pp1_11.2e",    0x0000, 0x2000, CRC(45b9bfeb) SHA1(ff8c690471944d414931fb88666594ef608997f8) )    /* voice */
 	ROM_LOAD( "pp1_12.2f",    0x2000, 0x2000, CRC(a31b4be5) SHA1(38298093bb97ea8647fe187359cae05b65e1c616) )    /* voice */
 	ROM_LOAD( "pp1_13.1e",    0x4000, 0x2000, CRC(a4237466) SHA1(88a397276038cc2fc05f2c18472e6b7cef167f2e) )    /* voice */
@@ -1015,8 +1075,6 @@ ROM_START( poleposa )
 	ROM_REGION( 0x10000, "sub2", 0 )
 	ROM_LOAD16_BYTE( "136014.203",   0x0001, 0x2000, CRC(eedea6e7) SHA1(e1459c5e3f824e589e624c3acb18a183fd160df6) )
 	ROM_LOAD16_BYTE( "136014.204",   0x0000, 0x2000, CRC(c52c98ed) SHA1(2e33c487deaf8afb941e07e511a9828d2d8f6b31) )
-
-	POLEPOS_CUSTOMS
 
 	/* graphics data */
 	ROM_REGION( 0x01000, "gfx1", ROMREGION_DISPOSE ) 	/* 2bpp alpha layer */
@@ -1068,7 +1126,7 @@ ROM_START( poleposa )
 	ROM_LOAD( "136014.110",   0x0000, 0x2000, CRC(b5ad4d5f) SHA1(c07e77a050200d6fe9952031f971ca35f4d15ff8) )    /* engine sound */
 	ROM_LOAD( "136014.111",   0x2000, 0x2000, CRC(8fdd2f6f) SHA1(3818dc94c60cd78c4212ab7a4367cf3d98166ee6) )    /* engine sound */
 
-	ROM_REGION( 0x6000, "namco52", 0 )
+	ROM_REGION( 0x6000, "52xx", 0 )
 	ROM_LOAD( "136014.106",   0x0000, 0x2000, CRC(5b4cf05e) SHA1(52342572940489175607bbf5b6cfd05ee9b0f004) )    /* voice */
 
 	/* unknown or unused (P)ROM data */
@@ -1096,8 +1154,6 @@ ROM_START( polepos1 )
 	ROM_REGION( 0x10000, "sub2", 0 )
 	ROM_LOAD16_BYTE( "136014.103",   0x0001, 0x2000, CRC(af4fc019) SHA1(1bb6c0f3ffada2e1df72e1767581f8e8bb2b18f9) )
 	ROM_LOAD16_BYTE( "136014.104",   0x0000, 0x2000, CRC(ba0045f3) SHA1(aedb8d8c56407963aa4ffb66243288c8fd6d845a) )
-
-	POLEPOS_CUSTOMS
 
 	/* graphics data */
 	ROM_REGION( 0x01000, "gfx1", ROMREGION_DISPOSE ) 	/* 2bpp alpha layer */
@@ -1149,7 +1205,7 @@ ROM_START( polepos1 )
 	ROM_LOAD( "136014.110",   0x0000, 0x2000, CRC(b5ad4d5f) SHA1(c07e77a050200d6fe9952031f971ca35f4d15ff8) )    /* engine sound */
 	ROM_LOAD( "136014.111",   0x2000, 0x2000, CRC(8fdd2f6f) SHA1(3818dc94c60cd78c4212ab7a4367cf3d98166ee6) )    /* engine sound */
 
-	ROM_REGION( 0x6000, "namco52", 0 )
+	ROM_REGION( 0x6000, "52xx", 0 )
 	ROM_LOAD( "136014.106",   0x0000, 0x2000, CRC(5b4cf05e) SHA1(52342572940489175607bbf5b6cfd05ee9b0f004) )    /* voice */
 
 	/* unknown or unused (P)ROM data */
@@ -1275,9 +1331,6 @@ ROM_START( topracer )
 	ROM_LOAD16_BYTE( "tr5b.bin",     0x0001, 0x2000, CRC(4e5f7b9c) SHA1(d26b1f24dd9ef00388987890bc5b95d4db403815) )
 	ROM_LOAD16_BYTE( "tr6b.bin",     0x0000, 0x2000, CRC(9d038ada) SHA1(7a9496c3fb93fd1945393656f8510a0c6421a9ab) )
 
-	/* this is a bootleg, should we really be loading these? */
-	POLEPOS_CUSTOMS
-
 	/* graphics data */
 	ROM_REGION( 0x01000, "gfx1", ROMREGION_DISPOSE ) 	/* 2bpp alpha layer */
 	ROM_LOAD( "tr28.bin",     0x0000, 0x1000, CRC(b8217c96) SHA1(aba311bc3c4b118ba322a00e33e2d5cbe7bc6e4a) )
@@ -1328,7 +1381,7 @@ ROM_START( topracer )
 	ROM_LOAD( "136014.110",   0x0000, 0x2000, CRC(b5ad4d5f) SHA1(c07e77a050200d6fe9952031f971ca35f4d15ff8) )    /* engine sound */
 	ROM_LOAD( "136014.111",   0x2000, 0x2000, CRC(8fdd2f6f) SHA1(3818dc94c60cd78c4212ab7a4367cf3d98166ee6) )    /* engine sound */
 
-	ROM_REGION( 0x6000, "namco52", 0 )
+	ROM_REGION( 0x6000, "52xx", 0 )
 	ROM_LOAD( "136014.106",   0x0000, 0x2000, CRC(5b4cf05e) SHA1(52342572940489175607bbf5b6cfd05ee9b0f004) )    /* voice */
 
 	/* unknown or unused (P)ROM data */
@@ -1351,9 +1404,6 @@ ROM_START( topracra )
 	ROM_REGION( 0x10000, "sub2", 0 )
 	ROM_LOAD16_BYTE( "tr5b.bin",     0x0001, 0x2000, CRC(4e5f7b9c) SHA1(d26b1f24dd9ef00388987890bc5b95d4db403815) )
 	ROM_LOAD16_BYTE( "pole-d",       0x0000, 0x2000, CRC(932bb5a7) SHA1(8045fe1f9b4b1973ec0d6705adf3ba3891bddaa1) )
-
-	/* this is a bootleg, should we really be loading these? */
-	POLEPOS_CUSTOMS
 
 	/* graphics data */
 	ROM_REGION( 0x01000, "gfx1", ROMREGION_DISPOSE ) 	/* 2bpp alpha layer */
@@ -1405,7 +1455,7 @@ ROM_START( topracra )
 	ROM_LOAD( "136014.110",   0x0000, 0x2000, CRC(b5ad4d5f) SHA1(c07e77a050200d6fe9952031f971ca35f4d15ff8) )    /* engine sound */
 	ROM_LOAD( "136014.111",   0x2000, 0x2000, CRC(8fdd2f6f) SHA1(3818dc94c60cd78c4212ab7a4367cf3d98166ee6) )    /* engine sound */
 
-	ROM_REGION( 0x8000, "namco52", 0 )
+	ROM_REGION( 0x8000, "52xx", 0 )
 	ROM_LOAD( "pp1_11.2e",    0x0000, 0x2000, CRC(45b9bfeb) SHA1(ff8c690471944d414931fb88666594ef608997f8) )    /* voice */
 	ROM_LOAD( "pp1_12.2f",    0x2000, 0x2000, CRC(a31b4be5) SHA1(38298093bb97ea8647fe187359cae05b65e1c616) )    /* voice */
 	ROM_LOAD( "pp1_13.1e",    0x4000, 0x2000, CRC(a4237466) SHA1(88a397276038cc2fc05f2c18472e6b7cef167f2e) )    /* voice */
@@ -1431,9 +1481,6 @@ ROM_START( topracrb )
 	ROM_REGION( 0x10000, "sub2", 0 )
 	ROM_LOAD16_BYTE( "tr5b.f7",     0x0001, 0x2000, CRC(4e5f7b9c) SHA1(d26b1f24dd9ef00388987890bc5b95d4db403815) )
 	ROM_LOAD16_BYTE( "tr6b.f5",     0x0000, 0x2000, CRC(b3641d0c) SHA1(38ce172b2e38895749cbd3cc1c0e2c0fe8be744a) )
-
-	/* this is a bootleg, should we really be loading these? */
-	POLEPOS_CUSTOMS
 
 	/* graphics data */
 	ROM_REGION( 0x01000, "gfx1", ROMREGION_DISPOSE ) 	/* 2bpp alpha layer */
@@ -1485,7 +1532,7 @@ ROM_START( topracrb )
 	ROM_LOAD( "tr15.a8",      0x0000, 0x2000, CRC(b5ad4d5f) SHA1(c07e77a050200d6fe9952031f971ca35f4d15ff8) )    /* engine sound */
 	ROM_LOAD( "tr16.b9",      0x2000, 0x2000, CRC(8fdd2f6f) SHA1(3818dc94c60cd78c4212ab7a4367cf3d98166ee6) )    /* engine sound */
 
-	ROM_REGION( 0x6000, "namco52", 0 )
+	ROM_REGION( 0x6000, "52xx", 0 )
 	ROM_LOAD( "tr11.b1",      0x0000, 0x2000, CRC(5b4cf05e) SHA1(52342572940489175607bbf5b6cfd05ee9b0f004) )    /* voice */
 
 	/* unknown or unused (P)ROM data */
@@ -1515,8 +1562,6 @@ ROM_START( polepos2 )
 	ROM_LOAD16_BYTE( "pp4_6.4l",      0x0000, 0x2000, CRC(38d04e0f) SHA1(5527cb1864248208b10d219a50ad742f286a119f) )
 	ROM_LOAD16_BYTE( "pp4_7.3m",      0x4001, 0x1000, CRC(ad1c8994) SHA1(2877de9641516767170c0109900955cc7d1ff402) )
 	ROM_LOAD16_BYTE( "pp4_8.3l",      0x4000, 0x1000, CRC(ef25a2ee) SHA1(45959355cad1a48f19ae14193374e03d4f9965c7) )
-
-	POLEPOS_CUSTOMS
 
 	/* graphics data */
 	ROM_REGION( 0x02000, "gfx1", ROMREGION_DISPOSE ) 	/* 2bpp alpha layer */
@@ -1570,7 +1615,7 @@ ROM_START( polepos2 )
 	ROM_LOAD( "136014.181",   0x0000, 0x2000, CRC(7d93bc1c) SHA1(dad7c0aa24aef593c84e21f7f8858ca7ada86364) )    /* engine sound */
 	ROM_LOAD( "136014.182",   0x2000, 0x2000, CRC(7d93bc1c) SHA1(dad7c0aa24aef593c84e21f7f8858ca7ada86364) )    /* engine sound */
 
-	ROM_REGION( 0x8000, "namco52", 0 )
+	ROM_REGION( 0x8000, "52xx", 0 )
 	ROM_LOAD( "pp1_11.2e",     0x0000, 0x2000, CRC(45b9bfeb) SHA1(ff8c690471944d414931fb88666594ef608997f8) )    /* voice */
 	ROM_LOAD( "pp1_12.2f",     0x2000, 0x2000, CRC(a31b4be5) SHA1(38298093bb97ea8647fe187359cae05b65e1c616) )    /* voice */
 	ROM_LOAD( "pp1_13.1e",     0x4000, 0x2000, CRC(a4237466) SHA1(88a397276038cc2fc05f2c18472e6b7cef167f2e) )    /* voice */
@@ -1610,8 +1655,6 @@ ROM_START( poleps2a )
 	ROM_LOAD16_BYTE( "136014.184",   0x4001, 0x2000, CRC(d893c4ed) SHA1(60d39abefbb0c8df68864a30b1f5fcbf4780c86c) )
 	ROM_LOAD16_BYTE( "136014.185",   0x4000, 0x2000, CRC(899de75e) SHA1(4a16535115e37a3d342b2cb53f610a87c0d0abe1) )
 
-	POLEPOS_CUSTOMS
-
 	/* graphics data */
 	ROM_REGION( 0x02000, "gfx1", ROMREGION_DISPOSE ) 	/* 2bpp alpha layer */
 	ROM_LOAD( "136014.172",   0x0000, 0x2000, CRC(fbe5e72f) SHA1(07965d6e98ac1332ac6192b5e9cc927dd9eb706f) )
@@ -1664,7 +1707,7 @@ ROM_START( poleps2a )
 	ROM_LOAD( "136014.181",   0x0000, 0x2000, CRC(7d93bc1c) SHA1(dad7c0aa24aef593c84e21f7f8858ca7ada86364) )    /* engine sound */
 	ROM_LOAD( "136014.182",   0x2000, 0x2000, CRC(7d93bc1c) SHA1(dad7c0aa24aef593c84e21f7f8858ca7ada86364) )    /* engine sound */
 
-	ROM_REGION( 0x6000, "namco52", 0 )
+	ROM_REGION( 0x6000, "52xx", 0 )
 	ROM_LOAD( "136014.106",   0x0000, 0x2000, CRC(5b4cf05e) SHA1(52342572940489175607bbf5b6cfd05ee9b0f004) )    /* voice */
 
 	/* unknown or unused (P)ROM data */
@@ -1696,9 +1739,6 @@ ROM_START( poleps2b )
 	ROM_LOAD16_BYTE( "136014.184",   0x4001, 0x2000, CRC(d893c4ed) SHA1(60d39abefbb0c8df68864a30b1f5fcbf4780c86c) )
 	ROM_LOAD16_BYTE( "136014.185",   0x4000, 0x2000, CRC(899de75e) SHA1(4a16535115e37a3d342b2cb53f610a87c0d0abe1) )
 
-	/* this is a bootleg, should we really be loading these? */
-	POLEPOS_CUSTOMS
-
 	/* graphics data */
 	ROM_REGION( 0x02000, "gfx1", ROMREGION_DISPOSE ) 	/* 2bpp alpha layer */
 	ROM_LOAD( "136014.172",   0x0000, 0x2000, CRC(fbe5e72f) SHA1(07965d6e98ac1332ac6192b5e9cc927dd9eb706f) )
@@ -1751,7 +1791,7 @@ ROM_START( poleps2b )
 	ROM_LOAD( "136014.181",   0x0000, 0x2000, CRC(7d93bc1c) SHA1(dad7c0aa24aef593c84e21f7f8858ca7ada86364) )    /* engine sound */
 	ROM_LOAD( "136014.182",   0x2000, 0x2000, CRC(7d93bc1c) SHA1(dad7c0aa24aef593c84e21f7f8858ca7ada86364) )    /* engine sound */
 
-	ROM_REGION( 0x6000, "namco52", 0 )
+	ROM_REGION( 0x6000, "52xx", 0 )
 	ROM_LOAD( "136014.106",   0x0000, 0x2000, CRC(5b4cf05e) SHA1(52342572940489175607bbf5b6cfd05ee9b0f004) )    /* voice */
 
 	/* unknown or unused (P)ROM data */

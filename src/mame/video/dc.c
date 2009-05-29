@@ -23,7 +23,7 @@ static int vblc=0;
 
 #define NUM_BUFFERS 4
 
-static UINT32 pvrctrl_regs[0x100/4];
+UINT32 pvrctrl_regs[0x100/4];
 static UINT32 pvrta_regs[0x2000/4];
 static const int pvr_parconfseq[] = {1,2,3,2,3,4,5,6,5,6,7,8,9,10,11,12,13,14,13,14,15,16,17,16,17,0,0,0,0,0,18,19,20,19,20,21,22,23,22,23};
 static const int pvr_wordsvertex[24]  = {8,8,8,8,8,16,16,8,8,8, 8, 8,8,8,8,8,16,16, 8,16,16,8,16,16};
@@ -35,7 +35,8 @@ static int dilatechose[64];
 static float wbuffer[480][640];
 static UINT32 debug_dip_status;
 
-UINT64 *dc_texture_ram;
+UINT64 *dc_framebuffer_ram; // '32-bit access area'
+UINT64 *dc_texture_ram; // '64-bit access area'
 static UINT32 tafifo_buff[32];
 
 static emu_timer *vbout_timer;
@@ -971,7 +972,9 @@ WRITE64_HANDLER( pvr_ctrl_w )
 	mame_printf_verbose("PVRCTRL: [%08x=%x] write %llx to %x (reg %x), mask %llx\n", 0x5f7c00+reg*4, dat, data>>shift, offset, reg, mem_mask);
 	#endif
 
-	pvrctrl_regs[reg] |= dat;
+//  pvrctrl_regs[reg] |= dat;
+	pvrctrl_regs[reg] = dat;
+
 }
 
 READ64_HANDLER( pvr_ta_r )
@@ -1207,7 +1210,7 @@ WRITE64_HANDLER( pvr_ta_w )
 		mame_printf_verbose("PVRTA: [%08x=%x] write %llx to %x (reg %x %x), mask %llx\n", 0x5f8000+reg*4, dat, data>>shift, offset, reg, (reg*4)+0x8000, mem_mask);
 	#endif
 }
-void process_ta_fifo(running_machine* machine)
+static void process_ta_fifo(running_machine* machine)
 {
 	UINT32 a;
 
@@ -1597,7 +1600,7 @@ static void computedilated(void)
 			dilatechose[(b << 3) + a]=3+(a < b ? a : b);
 }
 
-void render_hline(bitmap_t *bitmap, texinfo *ti, int y, float xl, float xr, float ul, float ur, float vl, float vr, float wl, float wr)
+static void render_hline(bitmap_t *bitmap, texinfo *ti, int y, float xl, float xr, float ul, float ur, float vl, float vr, float wl, float wr)
 {
 	int xxl, xxr;
 	float dx, ddx, dudx, dvdx, dwdx;
@@ -1682,7 +1685,7 @@ void render_hline(bitmap_t *bitmap, texinfo *ti, int y, float xl, float xr, floa
 	}
 }
 
-void render_span(bitmap_t *bitmap, texinfo *ti,
+static void render_span(bitmap_t *bitmap, texinfo *ti,
                  float y0, float y1,
                  float xl, float xr,
                  float ul, float ur,

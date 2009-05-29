@@ -90,6 +90,11 @@ Noted added by ClawGrip 28-Mar-2008:
 
 #define TEST_DIPS false /* enable to test unmapped dip switches */
 
+#define MASTER_CLOCK XTAL_14_31818MHz/2
+#define SOUND_CLOCK XTAL_20MHz/4
+#define YM2203_CLOCK XTAL_20MHz/16
+#define MSM5205_CLOCK XTAL_384kHz
+
 extern UINT8 *wc90b_fgvideoram,*wc90b_bgvideoram,*wc90b_txvideoram;
 
 extern UINT8 *wc90b_scroll1x;
@@ -108,36 +113,22 @@ VIDEO_UPDATE( wc90b );
 
 static int msm5205next;
 
-static UINT8 *wc90b_shared;
-
-static READ8_HANDLER( wc90b_shared_r )
-{
-	return wc90b_shared[offset];
-}
-
-static WRITE8_HANDLER( wc90b_shared_w )
-{
-	wc90b_shared[offset] = data;
-}
-
 static WRITE8_HANDLER( wc90b_bankswitch_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(space->machine, "maincpu");
-
+	UINT8 *ROM = memory_region(space->machine, "maincpu");
 
 	bankaddress = 0x10000 + ((data & 0xf8) << 8);
-	memory_set_bankptr(space->machine, 1,&RAM[bankaddress]);
+	memory_set_bankptr(space->machine, 1,&ROM[bankaddress]);
 }
 
 static WRITE8_HANDLER( wc90b_bankswitch1_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(space->machine, "sub");
-
+	UINT8 *ROM = memory_region(space->machine, "sub");
 
 	bankaddress = 0x10000 + ((data & 0xf8) << 8);
-	memory_set_bankptr(space->machine, 2,&RAM[bankaddress]);
+	memory_set_bankptr(space->machine, 2,&ROM[bankaddress]);
 }
 
 static WRITE8_HANDLER( wc90b_sound_command_w )
@@ -149,11 +140,11 @@ static WRITE8_HANDLER( wc90b_sound_command_w )
 static WRITE8_DEVICE_HANDLER( adpcm_control_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(device->machine, "sub");
+	UINT8 *ROM = memory_region(device->machine, "audiocpu");
 
 	/* the code writes either 2 or 3 in the bottom two bits */
 	bankaddress = 0x10000 + (data & 0x01) * 0x4000;
-	memory_set_bankptr(device->machine, 3,&RAM[bankaddress]);
+	memory_set_bankptr(device->machine, 3,&ROM[bankaddress]);
 
 	msm5205_reset_w(device,data & 0x08);
 }
@@ -171,7 +162,7 @@ static ADDRESS_MAP_START( wc90b_map1, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(wc90b_bgvideoram_w) AM_BASE(&wc90b_bgvideoram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(wc90b_txvideoram_w) AM_BASE(&wc90b_txvideoram)
 	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK(1)
-	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(wc90b_shared_r, wc90b_shared_w) AM_BASE(&wc90b_shared)
+	AM_RANGE(0xf800, 0xfbff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(wc90b_bankswitch_w)
 	AM_RANGE(0xfd00, 0xfd00) AM_WRITE(wc90b_sound_command_w)
 	AM_RANGE(0xfd04, 0xfd04) AM_WRITEONLY AM_BASE(&wc90b_scroll1y)
@@ -193,7 +184,7 @@ static ADDRESS_MAP_START( wc90b_map2, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_be_w) AM_BASE(&paletteram)
 	AM_RANGE(0xe800, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK(2)
-	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(wc90b_shared_r, wc90b_shared_w)
+	AM_RANGE(0xf800, 0xfbff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(wc90b_bankswitch1_w)
 ADDRESS_MAP_END
 
@@ -351,7 +342,8 @@ GFXDECODE_END
 /* handler called by the 2203 emulator when the internal timers cause an IRQ */
 static void irqhandler(const device_config *device, int irq)
 {
-	cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
+	/* NMI writes to MSM ports *only*! -AS */
+	//cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -368,32 +360,34 @@ static void adpcm_int(const device_config *device)
 {
 	static int toggle = 0;
 
-	msm5205_data_w(device, msm5205next);
-	msm5205next >>= 4;
-
 	toggle ^= 1;
 	if(toggle)
+	{
+		msm5205_data_w(device, (msm5205next & 0xf0) >> 4);
 		cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+	}
+	else
+		msm5205_data_w(device, (msm5205next & 0x0f) >> 0);
 }
 
 static const msm5205_interface msm5205_config =
 {
-	adpcm_int,	            /* interrupt function */
-	MSM5205_S96_4B		/* 4KHz 4-bit */
+	adpcm_int,		/* interrupt function */
+	MSM5205_S96_4B	/* 4KHz 4-bit */
 };
 
 static MACHINE_DRIVER_START( wc90b )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, XTAL_14MHz/2)
+	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(wc90b_map1)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("sub", Z80, XTAL_14MHz/2)
+	MDRV_CPU_ADD("sub", Z80, MASTER_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(wc90b_map2)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audiocpu", Z80, XTAL_19_6608MHz/8)
+	MDRV_CPU_ADD("audiocpu", Z80, SOUND_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(sound_cpu)
 	/* IRQs are triggered by the main CPU */
 
@@ -414,11 +408,11 @@ static MACHINE_DRIVER_START( wc90b )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2203, 2510000/2)
+	MDRV_SOUND_ADD("ym", YM2203, YM2203_CLOCK)
 	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MDRV_SOUND_ADD("msm", MSM5205, 384000)
+	MDRV_SOUND_ADD("msm", MSM5205, MSM5205_CLOCK)
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
@@ -565,6 +559,6 @@ ROM_END
 #endif
 
 
-GAME( 1989, wc90b1,  wc90, wc90b, wc90b, 0, ROT0, "bootleg", "Euro League", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND )
+GAME( 1989, wc90b1, wc90, wc90b, wc90b, 0, ROT0, "bootleg", "Euro League (Italian hack of Tecmo World Cup '90)", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND )
 GAME( 1989, wc90b2, wc90, wc90b, wc90b, 0, ROT0, "bootleg", "Worldcup '90", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND )
 //GAME( 1989, wc90ba,  wc90, wc90b, wc90b, 0, ROT0, "bootleg", "Euro League (alt version)", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND )

@@ -717,7 +717,7 @@ DRIVER_INIT( apple3 )
 	memory_region(machine, "maincpu")[0x0685] = 0x00;
 
 	apple3_enable_mask = 0;
-	apple3_update_drives((device_config*)devtag_get_device(machine, "fdc"));
+	apple3_update_drives(devtag_get_device(machine, "fdc"));
 
 	AY3600_init(machine);
 

@@ -63,7 +63,11 @@ extern VIDEO_UPDATE( c128 );
 
 void c128_bankswitch_64 (running_machine *machine, int reset);
 
+UINT8 c128_m6510_port_read(const device_config *device, UINT8 direction);
+void c128_m6510_port_write(const device_config *device, UINT8 direction, UINT8 data);
+
 extern const cia6526_interface c128_ntsc_cia0, c128_pal_cia0;
 extern const cia6526_interface c128_ntsc_cia1, c128_pal_cia1;
+
 
 #endif /* C128_H_ */
