@@ -58,6 +58,7 @@ unsigned int key_delay;
 unsigned int key_repeat;
 static UINT16 current_scancode;
 static UINT32 key_data[4];
+static UINT16 vram_offset;
 
 /* key scancode conversion table
  * The FM-7 expects different scancodes when shift,ctrl or graph is held, or
@@ -390,6 +391,23 @@ WRITE8_HANDLER( fm7_fdc_w )
 	}
 }
 
+WRITE8_HANDLER( fm7_vram_offset_w )
+{
+	UINT16 new_offset = 0;
+	
+	switch(offset)
+	{
+		case 0:
+			new_offset = (data << 8) | (vram_offset & 0x00ff); 
+			break;
+		case 1:  // low 5 bits are used on FM-77AV and later only
+			new_offset = (vram_offset & 0xff00) | (data & 0xe0);
+			break;
+	}
+	
+	vram_offset = new_offset;
+}
+
 READ8_HANDLER( fm7_keyboard_r)
 {
 	switch(offset)
@@ -496,7 +514,8 @@ static ADDRESS_MAP_START( fm7_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfd18,0xfd1f) AM_READWRITE(fm7_fdc_r,fm7_fdc_w)
 	AM_RANGE(0xfd24,0xfd2b) AM_RAM
 	// Boot ROM
-	AM_RANGE(0xfe00,0xffef) AM_ROM AM_REGION("basic",0x0000)
+	AM_RANGE(0xfe00,0xffdf) AM_ROM AM_REGION("basic",0x0000)
+	AM_RANGE(0xffe0,0xffef) AM_RAM
 	AM_RANGE(0xfff0,0xffff) AM_READWRITE(vector_r,vector_w) 
 ADDRESS_MAP_END
 
@@ -522,6 +541,7 @@ static ADDRESS_MAP_START( fm7_sub_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd408,0xd408) AM_READWRITE(fm7_crt_r,fm7_crt_w)
 	AM_RANGE(0xd409,0xd409) AM_READWRITE(fm7_vram_access_r,fm7_vram_access_w)
 	AM_RANGE(0xd40a,0xd40a) AM_READWRITE(fm7_sub_busyflag_r,fm7_sub_busyflag_w)
+	AM_RANGE(0xd40e,0xd40f) AM_WRITE(fm7_vram_offset_w)
 	AM_RANGE(0xd800,0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -672,9 +692,9 @@ static MACHINE_RESET(fm7)
 {
 	UINT8* RAM = memory_region(machine,"maincpu");
 	
-	timer_adjust_periodic(fm7_timer,ATTOTIME_IN_USEC(2034),0,ATTOTIME_IN_USEC(2034));
+	timer_adjust_periodic(fm7_timer,ATTOTIME_IN_NSEC(2034500),0,ATTOTIME_IN_NSEC(2034500));
 	timer_adjust_periodic(fm7_subtimer,ATTOTIME_IN_MSEC(20),0,ATTOTIME_IN_MSEC(20));
-	timer_adjust_periodic(fm7_keyboard_timer,ATTOTIME_IN_MSEC(10),0,ATTOTIME_IN_MSEC(10));
+	timer_adjust_periodic(fm7_keyboard_timer,attotime_zero,0,ATTOTIME_IN_MSEC(10));
 	irq_mask = 0xff;
 	irq_flags = 0x00;
 	attn_irq = 0;
@@ -685,6 +705,7 @@ static MACHINE_RESET(fm7)
 	memory_set_bankptr(machine,1,RAM+0x38000);
 	key_delay = 700;  // 700ms on FM-7
 	key_repeat = 70;  // 70ms on FM-7
+	vram_offset = 0x0000;
 }
 
 static VIDEO_START( fm7 )
@@ -704,16 +725,16 @@ static VIDEO_UPDATE( fm7 )
     {
 	    for (x = 0; x < 80; x++)
 	    {
-            code_r = fm7_video_ram[0x4000 + y*80 + x];
-            code_g = fm7_video_ram[0x8000 + y*80 + x];
-            code_b = fm7_video_ram[0x0000 + y*80 + x];
+            code_r = fm7_video_ram[0x4000 + ((y*80 + x + vram_offset) & 0x3fff)];
+            code_g = fm7_video_ram[0x8000 + ((y*80 + x + vram_offset) & 0x3fff)];
+            code_b = fm7_video_ram[0x0000 + ((y*80 + x + vram_offset) & 0x3fff)];
             for (b = 0; b < 8; b++)
             {
                 col = (((code_r >> b) & 0x01) ? 4 : 0) + (((code_g >> b) & 0x01) ? 2 : 0) + (((code_b >> b) & 0x01) ? 1 : 0);
                 *BITMAP_ADDR16(bitmap, y,  x*8+(7-b)) =  col;
             }
         }
-    }   
+    }
 	return 0;
 }
 
@@ -748,9 +769,11 @@ static MACHINE_DRIVER_START( fm7 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, XTAL_2MHz)
 	MDRV_CPU_PROGRAM_MAP(fm7_mem)
+	MDRV_QUANTUM_PERFECT_CPU("maincpu")
 
 	MDRV_CPU_ADD("sub", M6809, XTAL_2MHz)
 	MDRV_CPU_PROGRAM_MAP(fm7_sub_mem)
+	MDRV_QUANTUM_PERFECT_CPU("sub")
 	
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("psg", AY8910, 1000000)  // clock speed unknown
@@ -762,6 +785,7 @@ static MACHINE_DRIVER_START( fm7 )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
+	
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
