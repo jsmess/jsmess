@@ -761,8 +761,8 @@ const game_driver * const drivers[] =
 	DRIVER( laser350 )	/* 1984? Laser 350									*/
 	DRIVER( laser500 )	/* 1984? Laser 500									*/
 	DRIVER( laser700 )	/* 1984? Laser 700									*/
-	DRIVER( socrates )	/* 1986 Socrates Educational Video System */
-	DRIVER( socratfc )	/* 1986 Socrates SAITOUT */
+	DRIVER( socrates )	/* 1988 Socrates Educational Video System */
+	DRIVER( socratfc )	/* 1988 Socrates SAITOUT */
 
 	/* TANGERINE */
 	DRIVER( microtan )	/* 1979 Microtan 65									*/
@@ -1289,8 +1289,8 @@ const game_driver * const drivers[] =
 	DRIVER( camply128 )
 
 	/* Votrax */
-	DRIVER( votrtnt ) /* Votrax Type-N-Talk */
-	DRIVER( votrpss ) /* Votrax Personal Speech System */
+	DRIVER( votrtnt ) /* 1980 Votrax Type-'N-Talk */
+	DRIVER( votrpss ) /* 1982 Votrax Personal Speech System */
 
 /****************Games*******************************************************/
 	/* Computer Electronic */

@@ -196,5 +196,5 @@ SYSTEM_CONFIG_END
 ******************************************************************************/
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT CONFIG      COMPANY                     FULLNAME                            FLAGS */
-COMP( 1986, socrates,   0,          0,      socrates,   0, 0,   socrates,   "V-tech",        "Socrates Educational Video System",                        GAME_NOT_WORKING )
-COMP( 1986, socratfc,   socrates,   0,      socrates,   0, 0,   socrates,   "V-tech",        "Socrates SAITOUT",                        GAME_NOT_WORKING )
+COMP( 1988, socrates,   0,          0,      socrates,   0, 0,   socrates,   "V-tech",        "Socrates Educational Video System",                        GAME_NOT_WORKING )
+COMP( 1988, socratfc,   socrates,   0,      socrates,   0, 0,   socrates,   "V-tech",        "Socrates SAITOUT",                        GAME_NOT_WORKING )

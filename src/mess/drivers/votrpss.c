@@ -194,5 +194,5 @@ SYSTEM_CONFIG_END
 ******************************************************************************/
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT CONFIG      COMPANY                     FULLNAME                            FLAGS */
-COMP( 1983, votrpss,   0,          0,      votrpss,   votrpss, 0,   votrpss,   "Votrax",        "Personal Speech System",                        GAME_NOT_WORKING )
+COMP( 1982, votrpss,   0,          0,      votrpss,   votrpss, 0,   votrpss,   "Votrax",        "Personal Speech System",                        GAME_NOT_WORKING )
 

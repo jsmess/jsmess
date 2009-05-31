@@ -1,6 +1,6 @@
 /******************************************************************************
 *
-*  Votrax Type-N-Talk Driver
+*  Votrax Type 'N Talk Driver
 *  By Jonathan Gevaryahu AKA Lord Nightmare
 *  with loads of help (dumping, code disassembly, schematics, and other
 *  documentation) from Kevin 'kevtris' Horton
@@ -122,5 +122,5 @@ static ACIA6850_INTERFACE( acia_intf )
 ******************************************************************************/
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT CONFIG      COMPANY                     FULLNAME                            FLAGS */
-COMP( 1981, votrtnt,   0,          0,      votrtnt,   votrtnt, 0,   votrtnt,   "Votrax",        "Type-N-Talk",                        GAME_NOT_WORKING )
+COMP( 1980, votrtnt,   0,          0,      votrtnt,   votrtnt, 0,   votrtnt,   "Votrax",        "Type 'N Talk",                        GAME_NOT_WORKING )
 
