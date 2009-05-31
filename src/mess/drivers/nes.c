@@ -11,6 +11,8 @@
   Todo: Famicom driver has hardcoded famicom disk-system, needs removing and 
         adding as it's own driver.
 
+	Most games don't work, possibly an issue with mappers?
+
 ***************************************************************************/
 
 #include "driver.h"
@@ -250,6 +252,12 @@ static MACHINE_DRIVER_START( nes )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", N2A03, NTSC_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(nes_map)
+
+	MDRV_DRIVER_DATA( nes_state )
+
+	MDRV_MACHINE_START( nes )
+	MDRV_MACHINE_RESET( nes )
+
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60.098)
 	// This isn't used so much to calulate the vblank duration (the PPU code tracks that manually) but to determine
@@ -257,12 +265,6 @@ static MACHINE_DRIVER_START( nes )
 	// non-rendering scanlines, we compensate. This ends up being 2500 cycles for the non-rendering portion, 2273
 	// cycles for the actual vblank period.
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC((113.66/(NTSC_CLOCK/1000000)) * (PPU_VBLANK_LAST_SCANLINE_NTSC-PPU_VBLANK_FIRST_SCANLINE+1+2)))
-
-	MDRV_DRIVER_DATA( nes_state )
-
-	MDRV_MACHINE_START( nes )
-	MDRV_MACHINE_RESET( nes )
-
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 262)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
@@ -278,7 +280,7 @@ static MACHINE_DRIVER_START( nes )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("nessound", NES, NTSC_CLOCK)
 	MDRV_SOUND_CONFIG(nes_apu_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 	
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("nes")
@@ -305,7 +307,7 @@ static MACHINE_DRIVER_START( nespal )
     /* sound hardware */
 	MDRV_SOUND_REPLACE("nessound", NES, PAL_CLOCK)
 	MDRV_SOUND_CONFIG(nes_apu_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( dendy )
@@ -326,7 +328,7 @@ static MACHINE_DRIVER_START( dendy )
     /* sound hardware */
 	MDRV_SOUND_REPLACE("nessound", NES, 26601712/15) /* 26.601712MHz / 15 == 1.77344746666... MHz */
 	MDRV_SOUND_CONFIG(nes_apu_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( famicom )
@@ -372,9 +374,9 @@ SYSTEM_CONFIG_END
 ***************************************************************************/
 
 /*     YEAR  NAME      PARENT    COMPAT MACHINE   INPUT     INIT      CONFIG    COMPANY   	FULLNAME */
-CONS( 1983, famicom,   0,        0,	famicom,  famicom,  0,	      famicom,	"Nintendo",	"Famicom" , GAME_NOT_WORKING)
-CONS( 1986, famitwin,  famicom,  0,	famicom,  famicom,  0,	      famicom,	"Sharp",	"Famicom Twin" , GAME_NOT_WORKING)
-CONS( 1985, nes,       famicom,  0,	nes,      nes,      0,        0,	"Nintendo",	"Nintendo Entertainment System (NTSC)" , GAME_NOT_WORKING)
-CONS( 1987, nespal,    famicom,  0,	nespal,   nes,      0,	      0,	"Nintendo",	"Nintendo Entertainment System (PAL)" , GAME_NOT_WORKING)
-CONS( 199?, dendy,     famicom,  0,	dendy,    nes,      0,        0,	"Steepler",	"Dendy Classic" , GAME_NOT_WORKING)
+CONS( 1983, famicom,   0,        0,	famicom,  famicom,  0,	      famicom,	"Nintendo",	"Famicom" , 0 )
+CONS( 1986, famitwin,  famicom,  0,	famicom,  famicom,  0,	      famicom,	"Sharp",	"Famicom Twin" , 0 )
+CONS( 1985, nes,       famicom,  0,	nes,      nes,      0,        0,	"Nintendo",	"Nintendo Entertainment System (NTSC)" , 0 )
+CONS( 1987, nespal,    famicom,  0,	nespal,   nes,      0,	      0,	"Nintendo",	"Nintendo Entertainment System (PAL)" , 0 )
+CONS( 199?, dendy,     famicom,  0,	dendy,    nes,      0,        0,	"Steepler",	"Dendy Classic" , 0 )
 

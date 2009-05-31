@@ -124,6 +124,11 @@ static void init_nes_core (running_machine *machine)
 			memory_install_read8_handler(space, 0xa000, 0xbfff, 0, 0, SMH_BANK(2));
 			memory_install_read8_handler(space, 0xc000, 0xdfff, 0, 0, SMH_BANK(3));
 			memory_install_read8_handler(space, 0xe000, 0xffff, 0, 0, SMH_BANK(4));
+			memory_set_bankptr(machine, 1, memory_region(machine, "maincpu") + 0x6000);
+			memory_set_bankptr(machine, 2, memory_region(machine, "maincpu") + 0x8000);
+			memory_set_bankptr(machine, 3, memory_region(machine, "maincpu") + 0xa000);
+			memory_set_bankptr(machine, 4, memory_region(machine, "maincpu") + 0xc000);
+			memory_set_bankptr(machine, 5, memory_region(machine, "maincpu") + 0xe000);
 
 			memory_install_write8_handler(space, 0x6000, 0x7fff, 0, 0, nes_mid_mapper_w);
 			memory_install_write8_handler(space, 0x8000, 0xffff, 0, 0, nes_mapper_w);
