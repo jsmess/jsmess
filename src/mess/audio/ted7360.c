@@ -205,7 +205,7 @@ DEVICE_GET_INFO( ted7360_sound )
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(ted7360_sound);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "Ted7360 Sound");				break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "7360 TED");				break;
 		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);						break;
 	}
 }

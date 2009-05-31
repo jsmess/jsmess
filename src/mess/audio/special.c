@@ -70,7 +70,7 @@ DEVICE_GET_INFO( specimx_sound )
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(specimx_sound);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "SpeciMX Sound");				break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Specialist MX Custom");				break;
 		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);						break;
 	}
 }

@@ -829,7 +829,7 @@ DEVICE_GET_INFO( dave_sound )
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(dave_sound);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "Dave Sound");				break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Dave");				break;
 		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);						break;
 	}
 }

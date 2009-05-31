@@ -98,7 +98,7 @@ DEVICE_GET_INFO( dai_sound )
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(dai_sound);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "Dai Sound");				break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Dai Custom");				break;
 		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);						break;
 	}
 }

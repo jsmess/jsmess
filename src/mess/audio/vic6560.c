@@ -293,7 +293,7 @@ DEVICE_GET_INFO( vic6560_sound )
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(vic6560_sound);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "Vic6560 Sound");				break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "6560 VIC");				break;
 		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);						break;
 	}
 }

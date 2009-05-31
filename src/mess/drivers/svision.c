@@ -560,7 +560,7 @@ ROM_END
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        CONFIG      COMPANY     FULLNAME */
 // marketed under a ton of firms and names
-CONS(1992,	svision,	0,	0,	svision,	svision,	svision,	0,	"Watara",	"Supervision", 0)
+CONS(1992,	svision,	0,	0,	svision,	svision,	svision,	0,	"Watara",	"Super Vision", 0)
 // svdual 2 connected via communication port
 CONS( 1992, svisions,      svision,          0,svision,  svisions,    svisions,   0, "Watara", "Super Vision (PeT Communication Simulation)", 0 )
 
