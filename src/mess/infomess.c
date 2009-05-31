@@ -21,6 +21,39 @@
  *
  *************************************/
 
+/*-------------------------------------------------
+    print_game_categories - print the Categories
+    settings for a system
+-------------------------------------------------*/
+
+void print_game_categories(FILE *out, const game_driver *game, const input_port_config *portlist)
+{
+	const input_port_config *port;
+	const input_field_config *field;
+
+	/* iterate looking for Categories */
+	for (port = portlist; port != NULL; port = port->next)
+		for (field = port->fieldlist; field != NULL; field = field->next)
+			if (field->type == IPT_CATEGORY)
+			{
+				const input_setting_config *setting;
+
+				/* output the category name information */
+				fprintf(out, "\t\t<category name=\"%s\">\n", xml_normalize_string(input_field_name(field)));
+
+				/* loop over item settings */
+				for (setting = field->settinglist; setting != NULL; setting = setting->next)
+				{
+					fprintf(out, "\t\t\t<item name=\"%s\"", xml_normalize_string(setting->name));
+					if (setting->value == field->defvalue)
+						fprintf(out, " default=\"yes\"");
+					fprintf(out, "/>\n");
+				}
+
+				/* terminate the category entry */
+				fprintf(out, "\t\t</category>\n");
+			}
+}
 
 /*-------------------------------------------------
     print_game_device - prints out all info on
