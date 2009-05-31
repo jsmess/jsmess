@@ -213,7 +213,7 @@ static MACHINE_DRIVER_START( nes )
 
 	MDRV_PPU2C02_ADD( "ppu", nes_ppu_interface )
 
-    /* sound hardware */
+	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("nessound", NES, NTSC_CLOCK)
 	MDRV_SOUND_CONFIG(nes_apu_interface)
@@ -241,7 +241,7 @@ static MACHINE_DRIVER_START( nespal )
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC((106.53/(PAL_CLOCK/1000000)) * (PPU_VBLANK_LAST_SCANLINE_PAL-PPU_VBLANK_FIRST_SCANLINE+1+2)))
 	MDRV_VIDEO_START(nes_pal)
 
-    /* sound hardware */
+	/* sound hardware */
 	MDRV_SOUND_REPLACE("nessound", NES, PAL_CLOCK)
 	MDRV_SOUND_CONFIG(nes_apu_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
@@ -262,7 +262,7 @@ static MACHINE_DRIVER_START( dendy )
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC((106.53/(PAL_CLOCK/1000000)) * (PPU_VBLANK_LAST_SCANLINE_PAL-PPU_VBLANK_FIRST_SCANLINE+1+2)))
 	MDRV_VIDEO_START(nes_pal)
 
-    /* sound hardware */
+	/* sound hardware */
 	MDRV_SOUND_REPLACE("nessound", NES, 26601712/15) /* 26.601712MHz / 15 == 1.77344746666... MHz */
 	MDRV_SOUND_CONFIG(nes_apu_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
@@ -280,71 +280,89 @@ MACHINE_DRIVER_END
 
 
 ROM_START( nes )
-    ROM_REGION( 0x10000, "maincpu",0 )  /* Main RAM + program banks */
+	ROM_REGION( 0x10000, "maincpu", 0 )  /* Main RAM + program banks */
 	ROM_FILL( 0x0000, 0x10000, 0x00 )
-    ROM_REGION( 0x2000,  "gfx1",0 )  /* VROM */
+	ROM_REGION( 0x2000,  "gfx1", 0 )  /* VROM */
 	ROM_FILL( 0x0000, 0x2000, 0x00 )
-    ROM_REGION( 0x2000,  "gfx2",0 )  /* VRAM */
+	ROM_REGION( 0x2000,  "gfx2", 0 )  /* VRAM */
 	ROM_FILL( 0x0000, 0x2000, 0x00 )
-    ROM_REGION( 0x10000, "user1",0 ) /* WRAM */
+	ROM_REGION( 0x10000, "user1", 0 ) /* WRAM */
 	ROM_FILL( 0x0000, 0x10000, 0x00 )
 ROM_END
 
 ROM_START( nespal )
-    ROM_REGION( 0x10000, "maincpu",0 )  /* Main RAM + program banks */
+	ROM_REGION( 0x10000, "maincpu", 0 )  /* Main RAM + program banks */
 	ROM_FILL( 0x0000, 0x10000, 0x00 )
-    ROM_REGION( 0x2000,  "gfx1",0 )  /* VROM */
+	ROM_REGION( 0x2000,  "gfx1", 0 )  /* VROM */
 	ROM_FILL( 0x0000, 0x2000, 0x00 )
-    ROM_REGION( 0x2000,  "gfx2",0 )  /* VRAM */
+	ROM_REGION( 0x2000,  "gfx2", 0 )  /* VRAM */
 	ROM_FILL( 0x0000, 0x2000, 0x00 )
-    ROM_REGION( 0x10000, "user1",0 ) /* WRAM */
+	ROM_REGION( 0x10000, "user1", 0 ) /* WRAM */
 	ROM_FILL( 0x0000, 0x10000, 0x00 )
 ROM_END
 
 ROM_START( famicom )
-    ROM_REGION( 0x10000, "maincpu",0 )  /* Main RAM + program banks */
-    ROM_LOAD_OPTIONAL ("disksys.rom", 0xe000, 0x2000, CRC(5e607dcf) SHA1(57fe1bdee955bb48d357e463ccbf129496930b62))
+	ROM_REGION( 0x10000, "maincpu", 0 )  /* Main RAM + program banks */
+	ROM_LOAD_OPTIONAL( "disksys.rom", 0xe000, 0x2000, CRC(5e607dcf) SHA1(57fe1bdee955bb48d357e463ccbf129496930b62) )
 
-    ROM_REGION( 0x2000,  "gfx1",0 )  /* VROM */
+	ROM_REGION( 0x2000,  "gfx1", 0 )  /* VROM */
 	ROM_FILL( 0x0000, 0x2000, 0x00 )
-    ROM_REGION( 0x2000,  "gfx2",0 )  /* VRAM */
+	ROM_REGION( 0x2000,  "gfx2", 0 )  /* VRAM */
 	ROM_FILL( 0x0000, 0x2000, 0x00 )
-    ROM_REGION( 0x10000, "user1",0 ) /* WRAM */
+	ROM_REGION( 0x10000, "user1", 0 ) /* WRAM */
 	ROM_FILL( 0x0000, 0x10000, 0x00 )
 ROM_END
 
 ROM_START( famitwin )
-    ROM_REGION( 0x10000, "maincpu",0 )  /* Main RAM + program banks */
-    ROM_LOAD_OPTIONAL ("disksyst.rom", 0xe000, 0x2000, CRC(4df24a6c) SHA1(e4e41472c454f928e53eb10e0509bf7d1146ecc1))
+	ROM_REGION( 0x10000, "maincpu", 0 )  /* Main RAM + program banks */
+	ROM_LOAD_OPTIONAL( "disksyst.rom", 0xe000, 0x2000, CRC(4df24a6c) SHA1(e4e41472c454f928e53eb10e0509bf7d1146ecc1) )
 
-    ROM_REGION( 0x2000,  "gfx1",0 )  /* VROM */
+	ROM_REGION( 0x2000,  "gfx1", 0 )  /* VROM */
 	ROM_FILL( 0x0000, 0x2000, 0x00 )
-    ROM_REGION( 0x2000,  "gfx2",0 )  /* VRAM */
+	ROM_REGION( 0x2000,  "gfx2", 0 )  /* VRAM */
 	ROM_FILL( 0x0000, 0x2000, 0x00 )
-    ROM_REGION( 0x10000, "user1",0 ) /* WRAM */
+	ROM_REGION( 0x10000, "user1", 0 ) /* WRAM */
 	ROM_FILL( 0x0000, 0x10000, 0x00 )
 ROM_END
 
 ROM_START( m82 )
-    ROM_REGION( 0x10000, "maincpu",0 )  /* Main RAM + program banks */
-    ROM_LOAD_OPTIONAL ("m82_v1_0.bin", 0xe000, 0x2000, CRC(7d56840a) SHA1(cbd2d14fa073273ba58367758f40d67fd8a9106d))
+	ROM_REGION( 0x10000, "maincpu", 0 )  /* Main RAM + program banks */
+	ROM_LOAD( "m82_v1_0.bin", 0xe000, 0x2000, CRC(7d56840a) SHA1(cbd2d14fa073273ba58367758f40d67fd8a9106d) )
 
-    ROM_REGION( 0x2000,  "gfx1",0 )  /* VROM */
+	ROM_REGION( 0x2000,  "gfx1", 0 )  /* VROM */
 	ROM_FILL( 0x0000, 0x2000, 0x00 )
-    ROM_REGION( 0x2000,  "gfx2",0 )  /* VRAM */
+	ROM_REGION( 0x2000,  "gfx2", 0 )  /* VRAM */
 	ROM_FILL( 0x0000, 0x2000, 0x00 )
-    ROM_REGION( 0x10000, "user1",0 ) /* WRAM */
+	ROM_REGION( 0x10000, "user1", 0 ) /* WRAM */
+	ROM_FILL( 0x0000, 0x10000, 0x00 )
+ROM_END
+
+// see http://www.disgruntleddesigner.com/chrisc/drpcjr/index.html
+// and http://www.disgruntleddesigner.com/chrisc/drpcjr/DrPCJrMemMap.txt
+ROM_START( drpcjr )
+	ROM_REGION( 0x18000, "maincpu", 0 )  /* Main RAM + program banks */
+	/* 4 banks to be mapped in 0xe000-0xffff (or 8 banks to be mapped in 0xe000-0xefff & 0xf000-0xffff). 
+	Banks selected by writing at 0x4180 */
+	ROM_LOAD("drpcjr_bios.bin", 0x10000, 0x8000, CRC(c8fbef89) SHA1(2cb0a817b31400cdf27817d09bae7e69f41b062b) )	// bios vers. 1.0a
+	// Not sure if we should support this: hacked version 1.5a by Chris Covell with bugfixes and GameGenie support
+//	ROM_LOAD("drpcjr_v1_5_gg.bin", 0x10000, 0x8000, CRC(98f2033b) SHA1(93c114da787a19279d1a46667c2f69b49e25d4f1) )
+
+	ROM_REGION( 0x2000,  "gfx1", 0 )  /* VROM */
+	ROM_FILL( 0x0000, 0x2000, 0x00 )
+	ROM_REGION( 0x2000,  "gfx2", 0 )  /* VRAM */
+	ROM_FILL( 0x0000, 0x2000, 0x00 )
+	ROM_REGION( 0x10000, "user1", 0 ) /* WRAM */
 	ROM_FILL( 0x0000, 0x10000, 0x00 )
 ROM_END
 
 ROM_START( dendy )
-    ROM_REGION( 0x10000, "maincpu",0 )  /* Main RAM + program banks */
+	ROM_REGION( 0x10000, "maincpu", 0 )  /* Main RAM + program banks */
 	ROM_FILL( 0x0000, 0x10000, 0x00 )
-    ROM_REGION( 0x2000,  "gfx1",0 )  /* VROM */
+	ROM_REGION( 0x2000,  "gfx1", 0 )  /* VROM */
 	ROM_FILL( 0x0000, 0x2000, 0x00 )
-    ROM_REGION( 0x2000,  "gfx2",0 )  /* VRAM */
+	ROM_REGION( 0x2000,  "gfx2", 0 )  /* VRAM */
 	ROM_FILL( 0x0000, 0x2000, 0x00 )
-    ROM_REGION( 0x10000, "user1",0 ) /* WRAM */
+	ROM_REGION( 0x10000, "user1", 0 ) /* WRAM */
 	ROM_FILL( 0x0000, 0x10000, 0x00 )
 ROM_END
 
@@ -390,4 +408,5 @@ CONS( 1987, nespal,    nes,    0,     nespal,   nes,     0,     0,       "Ninten
 CONS( 1983, famicom,   nes,    0,     famicom,  famicom, 0,     famicom, "Nintendo",  "Famicom Disk System", GAME_NOT_WORKING )
 CONS( 1986, famitwin,  nes,    0,     famicom,  famicom, 0,     famicom, "Sharp",     "Famicom Twin", GAME_NOT_WORKING )
 CONS( 198?, m82,       nes,    0,     nes,      nes,     0,     0,       "Nintendo",  "M82 Display Unit", GAME_NOT_WORKING )
+CONS( 1996, drpcjr,    nes,    0,     famicom,  nes,     0,     0,       "Bung",      "Doctor PC Jr", GAME_NOT_WORKING )
 CONS( 199?, dendy,     nes,    0,     dendy,    nes,     0,     0,       "Steepler",  "Dendy Classic", GAME_NOT_WORKING )

@@ -57,6 +57,7 @@ const game_driver * const drivers[] =
 	DRIVER( m82 )		/* Nintendo M82 Display Unit						*/
 	DRIVER( famicom )
 	DRIVER( famitwin )	/* Sharp Famicom Twin System						*/
+	DRIVER( drpcjr )	/* Bung Doctor PC Jr								*/
 	DRIVER( dendy )		/* Dendy Classic russian famiclone					*/
 	DRIVER( gameboy )	/* Nintendo Game Boy Handheld						*/
 	DRIVER( supergb )	/* Nintendo Super Game Boy SNES Cartridge			*/
@@ -65,6 +66,7 @@ const game_driver * const drivers[] =
 	DRIVER( gbcolor )	/* Nintendo Game Boy Color Handheld					*/
 	DRIVER( snes )		/* Nintendo Super Nintendo NTSC						*/
 	DRIVER( snespal )	/* Nintendo Super Nintendo PAL						*/
+	DRIVER( sfcbox )	/* Nintendo Super Famicom Box						*/
 	DRIVER( n64 )		/* Nintendo N64										*/
 	DRIVER( pokemini )	/* Nintendo Pokemon Mini							*/
 

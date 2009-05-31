@@ -228,17 +228,32 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START(snes)
-	ROM_REGION(0x100,           "user5", 0)		/* IPL ROM */
-	ROM_LOAD("spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0))	/* boot rom */
-	ROM_REGION(0x800,           "user6", 0)		/* add-on chip ROMs (DSP, SFX, etc) */
-	ROM_LOAD("dsp1data.bin", 0x000000, 0x000800, CRC(4b02d66d) SHA1(1534f4403d2a0f68ba6e35186fe7595d33de34b1))
+	ROM_REGION( 0x100, "user5", 0 )		/* IPL ROM */
+	ROM_LOAD( "spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) )	/* boot rom */
+	ROM_REGION( 0x800, "user6", 0 )		/* add-on chip ROMs (DSP, SFX, etc) */
+	ROM_LOAD( "dsp1data.bin", 0x000000, 0x000800, CRC(4b02d66d) SHA1(1534f4403d2a0f68ba6e35186fe7595d33de34b1) )
 ROM_END
 
 ROM_START(snespal)
-	ROM_REGION(0x100,           "user5", 0)		/* IPL ROM */
-	ROM_LOAD("spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0))	/* boot rom */
-	ROM_REGION(0x800,           "user6", 0)		/* add-on chip ROMs (DSP, SFX, etc) */
-	ROM_LOAD("dsp1data.bin", 0x000000, 0x000800, CRC(4b02d66d) SHA1(1534f4403d2a0f68ba6e35186fe7595d33de34b1))
+	ROM_REGION( 0x100, "user5", 0 )		/* IPL ROM */
+	ROM_LOAD( "spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) )	/* boot rom */
+	ROM_REGION( 0x800, "user6", 0 )		/* add-on chip ROMs (DSP, SFX, etc) */
+	ROM_LOAD( "dsp1data.bin", 0x000000, 0x000800, CRC(4b02d66d) SHA1(1534f4403d2a0f68ba6e35186fe7595d33de34b1) )
+ROM_END
+
+ROM_START(sfcbox)
+	/* atm, we only load these here, but we don't really emulate anything */
+	ROM_REGION( 0x10000, "grom", 0 )
+	ROM_LOAD( "grom1-1.bin", 0x0000, 0x8000, CRC(333bf9a7) SHA1(5d0cd9ca29e5580c3eebe9f136839987c879f979) )
+	ROM_LOAD( "grom1-3.bin", 0x8000, 0x8000, CRC(ebec4c1c) SHA1(d638ef1486b4c0b3d4d5b666929ca7947e16efad) )
+
+	ROM_REGION( 0x80000, "atrom", 0 )
+	ROM_LOAD( "atrom-4s-0.smc", 0x00000, 0x80000, CRC(ad3ec05c) SHA1(a3d336db585fe02a37c323422d9db6a33fd489a6) )
+
+	ROM_REGION( 0x100, "user5", 0 )		/* IPL ROM */
+	ROM_LOAD( "spc700.rom", 0x00, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) )	/* boot rom */
+
+	ROM_REGION( 0x800, "user6", ROMREGION_ERASE00 )		/* add-on chip ROMs (DSP, SFX, etc) */
 ROM_END
 
 /***************************************************************************
@@ -247,6 +262,7 @@ ROM_END
 
 ***************************************************************************/
 
-/*     YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  INIT  CONFIG  COMPANY     FULLNAME                                      FLAGS */
-CONS( 1989, snes,    0,      0,      snes,    snes,  0,    0,   "Nintendo", "Super Nintendo Entertainment System (NTSC)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  INIT  CONFIG  COMPANY     FULLNAME                                      FLAGS */
+CONS( 1989, snes,    0,      0,      snes,    snes,  0,    0,   "Nintendo", "Super Nintendo Entertainment System / Super Famicom (NTSC)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 CONS( 1991, snespal, snes,   0,      snespal, snes,  0,    0,   "Nintendo", "Super Nintendo Entertainment System (PAL)",  GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+CONS( 199?, sfcbox,  snes,   0,      snes,    snes,  0,    0,   "Nintendo", "Super Famicom Box (NTSC)", GAME_NOT_WORKING )

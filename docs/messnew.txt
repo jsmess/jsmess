@@ -20,6 +20,7 @@ New System Drivers Supported (in no particular order):
 - NEC PC-8001, PC-8001MkII, PC-8801, PC-8801MkII (all not working),
   PC-8801MkIIFR,  PC-8801MkIIMR, PC-8801MH, PC-8801FA, PC-8801MA,
   PC-8801MA2, PC-8801MC [Fabio Priuli]
+- Nintendo M82 Display Unit (not working) [Andy Welburn, Fabio Priuli]
 - NTS DreamWriter T200 (not working)  [Roberto Carlos
   Fernandez Gerhardt, Wilbert Pol]
 - Palm IIIc,Palm m100,Palm m130,Palm m505,Palm m515 
@@ -33,6 +34,7 @@ New System Drivers Supported (in no particular order):
 - Samsung SPC-1000 [Miodrag Milanovic]
 - Sharp MZ-1500, MZ-80A (not working) [Fabio Priuli]
 - Sharp Pocket Computer 1245,1250,1255,1260,1261/1262 [Miodrag Milanovic]
+- Steepler Dendy Classic (not working) [incog nito]
 - TK85 [Robbbert, Miodrag Milanovic]
 - Timex Sinclair 1500 [Robbbert, Miodrag Milanovic]
 - Votrax Type-'N-Talk (not working) [Lord Nightmare, Kevtris]
@@ -45,6 +47,7 @@ Skeleton drivers :
 - BCS-3
 - Beehive DM3270
 - BK-0011M
+- Bung Doctor PC Jr
 - C-80
 - Camputers Lynx 48
 - Camputers Lynx 96
@@ -84,6 +87,7 @@ Skeleton drivers :
 - NEC PC-88 VA
 - NEC PC-9801
 - NEC PC-9821
+- Nintendo Super Famicom Box
 - Olivetti L1 M20
 - Olivetti L1 M40
 - Philips VG-5000
