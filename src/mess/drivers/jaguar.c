@@ -108,6 +108,7 @@ static MACHINE_RESET( jaguar )
 	memset(jaguar_shared_ram, 0, 0x200000);
 	memcpy(jaguar_shared_ram, rom_base, 0x10);
 	rom_base[0x53c / 4] = 0x67000002;
+	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), REG_GENPC, rom_base[1]);
 
 #if 0
 	/* set up main CPU RAM/ROM banks */
@@ -137,7 +138,6 @@ static MACHINE_RESET( jaguar )
 
 	joystick_data = 0xffffffff;
 }
-
 
 
 /*************************************
