@@ -8,11 +8,6 @@
   Based in part on the old xNes code, by Nicolas Hamel, Chuck Mason, Brad Oliver,
   Richard Bannister and Jeff Mitchell.
 
-  Todo: Famicom driver has hardcoded famicom disk-system, needs removing and 
-        adding as it's own driver.
-
-	Most games don't work, possibly an issue with mappers?
-
 ***************************************************************************/
 
 #include "driver.h"
@@ -173,64 +168,6 @@ static const nes_interface nes_apu_interface =
 };
 
 
-ROM_START( nes )
-    ROM_REGION( 0x10000, "maincpu",0 )  /* Main RAM + program banks */
-	ROM_FILL( 0x0000, 0x10000, 0x00 )
-    ROM_REGION( 0x2000,  "gfx1",0 )  /* VROM */
-	ROM_FILL( 0x0000, 0x2000, 0x00 )
-    ROM_REGION( 0x2000,  "gfx2",0 )  /* VRAM */
-	ROM_FILL( 0x0000, 0x2000, 0x00 )
-    ROM_REGION( 0x10000, "user1",0 ) /* WRAM */
-	ROM_FILL( 0x0000, 0x10000, 0x00 )
-ROM_END
-
-ROM_START( nespal )
-    ROM_REGION( 0x10000, "maincpu",0 )  /* Main RAM + program banks */
-	ROM_FILL( 0x0000, 0x10000, 0x00 )
-    ROM_REGION( 0x2000,  "gfx1",0 )  /* VROM */
-	ROM_FILL( 0x0000, 0x2000, 0x00 )
-    ROM_REGION( 0x2000,  "gfx2",0 )  /* VRAM */
-	ROM_FILL( 0x0000, 0x2000, 0x00 )
-    ROM_REGION( 0x10000, "user1",0 ) /* WRAM */
-	ROM_FILL( 0x0000, 0x10000, 0x00 )
-ROM_END
-
-ROM_START( famicom )
-    ROM_REGION( 0x10000, "maincpu",0 )  /* Main RAM + program banks */
-    ROM_LOAD_OPTIONAL ("disksys.rom", 0xe000, 0x2000, CRC(5e607dcf) SHA1(57fe1bdee955bb48d357e463ccbf129496930b62))
-
-    ROM_REGION( 0x2000,  "gfx1",0 )  /* VROM */
-	ROM_FILL( 0x0000, 0x2000, 0x00 )
-    ROM_REGION( 0x2000,  "gfx2",0 )  /* VRAM */
-	ROM_FILL( 0x0000, 0x2000, 0x00 )
-    ROM_REGION( 0x10000, "user1",0 ) /* WRAM */
-	ROM_FILL( 0x0000, 0x10000, 0x00 )
-ROM_END
-
-ROM_START( famitwin )
-    ROM_REGION( 0x10000, "maincpu",0 )  /* Main RAM + program banks */
-    ROM_LOAD_OPTIONAL ("disksyst.rom", 0xe000, 0x2000, CRC(4df24a6c) SHA1(e4e41472c454f928e53eb10e0509bf7d1146ecc1))
-
-    ROM_REGION( 0x2000,  "gfx1",0 )  /* VROM */
-	ROM_FILL( 0x0000, 0x2000, 0x00 )
-    ROM_REGION( 0x2000,  "gfx2",0 )  /* VRAM */
-	ROM_FILL( 0x0000, 0x2000, 0x00 )
-    ROM_REGION( 0x10000, "user1",0 ) /* WRAM */
-	ROM_FILL( 0x0000, 0x10000, 0x00 )
-ROM_END
-
-ROM_START( dendy )
-    ROM_REGION( 0x10000, "maincpu",0 )  /* Main RAM + program banks */
-	ROM_FILL( 0x0000, 0x10000, 0x00 )
-    ROM_REGION( 0x2000,  "gfx1",0 )  /* VROM */
-	ROM_FILL( 0x0000, 0x2000, 0x00 )
-    ROM_REGION( 0x2000,  "gfx2",0 )  /* VRAM */
-	ROM_FILL( 0x0000, 0x2000, 0x00 )
-    ROM_REGION( 0x10000, "user1",0 ) /* WRAM */
-	ROM_FILL( 0x0000, 0x10000, 0x00 )
-ROM_END
-
-
 static void ppu_nmi(const device_config *device, int *ppu_regs)
 {
 	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
@@ -341,6 +278,77 @@ static MACHINE_DRIVER_START( famicom )
 	MDRV_CARTSLOT_PARTIALHASH(nes_partialhash)
 MACHINE_DRIVER_END
 
+
+ROM_START( nes )
+    ROM_REGION( 0x10000, "maincpu",0 )  /* Main RAM + program banks */
+	ROM_FILL( 0x0000, 0x10000, 0x00 )
+    ROM_REGION( 0x2000,  "gfx1",0 )  /* VROM */
+	ROM_FILL( 0x0000, 0x2000, 0x00 )
+    ROM_REGION( 0x2000,  "gfx2",0 )  /* VRAM */
+	ROM_FILL( 0x0000, 0x2000, 0x00 )
+    ROM_REGION( 0x10000, "user1",0 ) /* WRAM */
+	ROM_FILL( 0x0000, 0x10000, 0x00 )
+ROM_END
+
+ROM_START( nespal )
+    ROM_REGION( 0x10000, "maincpu",0 )  /* Main RAM + program banks */
+	ROM_FILL( 0x0000, 0x10000, 0x00 )
+    ROM_REGION( 0x2000,  "gfx1",0 )  /* VROM */
+	ROM_FILL( 0x0000, 0x2000, 0x00 )
+    ROM_REGION( 0x2000,  "gfx2",0 )  /* VRAM */
+	ROM_FILL( 0x0000, 0x2000, 0x00 )
+    ROM_REGION( 0x10000, "user1",0 ) /* WRAM */
+	ROM_FILL( 0x0000, 0x10000, 0x00 )
+ROM_END
+
+ROM_START( famicom )
+    ROM_REGION( 0x10000, "maincpu",0 )  /* Main RAM + program banks */
+    ROM_LOAD_OPTIONAL ("disksys.rom", 0xe000, 0x2000, CRC(5e607dcf) SHA1(57fe1bdee955bb48d357e463ccbf129496930b62))
+
+    ROM_REGION( 0x2000,  "gfx1",0 )  /* VROM */
+	ROM_FILL( 0x0000, 0x2000, 0x00 )
+    ROM_REGION( 0x2000,  "gfx2",0 )  /* VRAM */
+	ROM_FILL( 0x0000, 0x2000, 0x00 )
+    ROM_REGION( 0x10000, "user1",0 ) /* WRAM */
+	ROM_FILL( 0x0000, 0x10000, 0x00 )
+ROM_END
+
+ROM_START( famitwin )
+    ROM_REGION( 0x10000, "maincpu",0 )  /* Main RAM + program banks */
+    ROM_LOAD_OPTIONAL ("disksyst.rom", 0xe000, 0x2000, CRC(4df24a6c) SHA1(e4e41472c454f928e53eb10e0509bf7d1146ecc1))
+
+    ROM_REGION( 0x2000,  "gfx1",0 )  /* VROM */
+	ROM_FILL( 0x0000, 0x2000, 0x00 )
+    ROM_REGION( 0x2000,  "gfx2",0 )  /* VRAM */
+	ROM_FILL( 0x0000, 0x2000, 0x00 )
+    ROM_REGION( 0x10000, "user1",0 ) /* WRAM */
+	ROM_FILL( 0x0000, 0x10000, 0x00 )
+ROM_END
+
+ROM_START( m82 )
+    ROM_REGION( 0x10000, "maincpu",0 )  /* Main RAM + program banks */
+    ROM_LOAD_OPTIONAL ("m82_v1_0.bin", 0xe000, 0x2000, CRC(7d56840a) SHA1(cbd2d14fa073273ba58367758f40d67fd8a9106d))
+
+    ROM_REGION( 0x2000,  "gfx1",0 )  /* VROM */
+	ROM_FILL( 0x0000, 0x2000, 0x00 )
+    ROM_REGION( 0x2000,  "gfx2",0 )  /* VRAM */
+	ROM_FILL( 0x0000, 0x2000, 0x00 )
+    ROM_REGION( 0x10000, "user1",0 ) /* WRAM */
+	ROM_FILL( 0x0000, 0x10000, 0x00 )
+ROM_END
+
+ROM_START( dendy )
+    ROM_REGION( 0x10000, "maincpu",0 )  /* Main RAM + program banks */
+	ROM_FILL( 0x0000, 0x10000, 0x00 )
+    ROM_REGION( 0x2000,  "gfx1",0 )  /* VROM */
+	ROM_FILL( 0x0000, 0x2000, 0x00 )
+    ROM_REGION( 0x2000,  "gfx2",0 )  /* VRAM */
+	ROM_FILL( 0x0000, 0x2000, 0x00 )
+    ROM_REGION( 0x10000, "user1",0 ) /* WRAM */
+	ROM_FILL( 0x0000, 0x10000, 0x00 )
+ROM_END
+
+
 static void famicom_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
@@ -349,12 +357,12 @@ static void famicom_floppy_getinfo(const mess_device_class *devclass, UINT32 sta
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case MESS_DEVINFO_INT_TYPE:							info->i = IO_FLOPPY; break;
 		case MESS_DEVINFO_INT_READABLE:						info->i = 1; break;
-		case MESS_DEVINFO_INT_WRITEABLE:						info->i = 0; break;
-		case MESS_DEVINFO_INT_CREATABLE:						info->i = 0; break;
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
+		case MESS_DEVINFO_INT_WRITEABLE:					info->i = 0; break;
+		case MESS_DEVINFO_INT_CREATABLE:					info->i = 0; break;
+		case MESS_DEVINFO_INT_COUNT:						info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_START:							info->start = DEVICE_START_NAME(nes_disk); break;
+		case MESS_DEVINFO_PTR_START:						info->start = DEVICE_START_NAME(nes_disk); break;
 		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(nes_disk); break;
 		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(nes_disk); break;
 
@@ -373,10 +381,13 @@ SYSTEM_CONFIG_END
 
 ***************************************************************************/
 
-/*     YEAR  NAME      PARENT    COMPAT MACHINE   INPUT     INIT      CONFIG    COMPANY   	FULLNAME */
-CONS( 1983, famicom,   0,        0,	famicom,  famicom,  0,	      famicom,	"Nintendo",	"Famicom" , 0 )
-CONS( 1986, famitwin,  famicom,  0,	famicom,  famicom,  0,	      famicom,	"Sharp",	"Famicom Twin" , 0 )
-CONS( 1985, nes,       famicom,  0,	nes,      nes,      0,        0,	"Nintendo",	"Nintendo Entertainment System (NTSC)" , 0 )
-CONS( 1987, nespal,    famicom,  0,	nespal,   nes,      0,	      0,	"Nintendo",	"Nintendo Entertainment System (PAL)" , 0 )
-CONS( 199?, dendy,     famicom,  0,	dendy,    nes,      0,        0,	"Steepler",	"Dendy Classic" , 0 )
+/* Since 0.130u4, most of the games do not show graphics correctly. Conversion of PPU to a device showed some of the 
+limitations of the previous implementation. Systems regressed to GAME_NOT_WORKING status until a proper fix is found */
 
+/*     YEAR  NAME      PARENT  COMPAT MACHINE   INPUT    INIT   CONFIG   COMPANY       FULLNAME */
+CONS( 1985, nes,       0,      0,     nes,      nes,     0,     0,       "Nintendo",  "Nintendo Entertainment System / Famicom (NTSC)", GAME_NOT_WORKING )
+CONS( 1987, nespal,    nes,    0,     nespal,   nes,     0,     0,       "Nintendo",  "Nintendo Entertainment System (PAL)", GAME_NOT_WORKING )
+CONS( 1983, famicom,   nes,    0,     famicom,  famicom, 0,     famicom, "Nintendo",  "Famicom Disk System", GAME_NOT_WORKING )
+CONS( 1986, famitwin,  nes,    0,     famicom,  famicom, 0,     famicom, "Sharp",     "Famicom Twin", GAME_NOT_WORKING )
+CONS( 198?, m82,       nes,    0,     nes,      nes,     0,     0,       "Nintendo",  "M82 Display Unit", GAME_NOT_WORKING )
+CONS( 199?, dendy,     nes,    0,     dendy,    nes,     0,     0,       "Steepler",  "Dendy Classic", GAME_NOT_WORKING )

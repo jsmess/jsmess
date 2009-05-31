@@ -53,10 +53,11 @@ const game_driver * const drivers[] =
 
 	/* NINTENDO */
 	DRIVER( nes )		/* Nintendo Entertainment System					*/
-	DRIVER( dendy )		/* Dendy Classic russian famiclone					*/
 	DRIVER( nespal )	/* Nintendo Entertainment System					*/
+	DRIVER( m82 )		/* Nintendo M82 Display Unit						*/
 	DRIVER( famicom )
 	DRIVER( famitwin )	/* Sharp Famicom Twin System						*/
+	DRIVER( dendy )		/* Dendy Classic russian famiclone					*/
 	DRIVER( gameboy )	/* Nintendo Game Boy Handheld						*/
 	DRIVER( supergb )	/* Nintendo Super Game Boy SNES Cartridge			*/
 	DRIVER( gbpocket )	/* Nintendo Game Boy Pocket Handheld				*/
