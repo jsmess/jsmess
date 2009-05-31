@@ -1389,7 +1389,6 @@ $(MESSOBJ)/skeleton.a: \
 	$(MESS_DRIVERS)/jr200.o \
 	$(MESS_DRIVERS)/hec2hrp.o \
 	$(MESS_DRIVERS)/hec2hrx.o \
-	$(MESS_DRIVERS)/hector1.o \
 	$(MESS_DRIVERS)/poly880.o \
 	$(MESS_DRIVERS)/sc1.o \
 	$(MESS_DRIVERS)/sc2.o \
