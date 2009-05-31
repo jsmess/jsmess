@@ -350,13 +350,19 @@ WRITE8_HANDLER( fm7_vram_access_w )
 
 READ8_HANDLER( fm7_vram_r )
 {
-	return fm7_video_ram[offset];
+	int offs;
+	
+	offs = (offset & 0xc000) | ((offset + vram_offset) & 0x3fff);
+	return fm7_video_ram[offs];
 }
 
 WRITE8_HANDLER( fm7_vram_w )
 {
+	int offs;
+	
+	offs = (offset & 0xc000) | ((offset + vram_offset) & 0x3fff);
 	if(vram_access != 0)
-		fm7_video_ram[offset] = data;
+		fm7_video_ram[offs] = data;
 }
 
 READ8_HANDLER( fm7_crt_r )
