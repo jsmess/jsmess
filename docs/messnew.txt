@@ -38,7 +38,7 @@ New System Drivers Supported (in no particular order):
 - TK85 [Robbbert, Miodrag Milanovic]
 - Timex Sinclair 1500 [Robbbert, Miodrag Milanovic]
 - Votrax Type-'N-Talk (not working) [Lord Nightmare, Kevtris]
-- Xerox 820 (not working) [Robbbert, Curt Coder]
+- Xerox 820 [Robbbert, Curt Coder]
 - ZX97 (not working) [Miodrag Milanovic]
 
 Skeleton drivers : 

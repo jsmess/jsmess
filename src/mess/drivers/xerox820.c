@@ -11,7 +11,6 @@
 
 	TODO:
 
-	- floppy
 	- add xtals.h
 	- baud A/B (COM8116 chip)
 	- type in Monitor v1.0 from manual
@@ -360,7 +359,7 @@ static WRITE8_DEVICE_HANDLER( xerox820_pio_port_a_w )
 
 		0		_DVSEL1			drive select 1
 		1		_DVSEL2			drive select 2
-		2						side select
+		2		_DVSEL3			side select
 		3		
 		4		
 		5
@@ -372,7 +371,8 @@ static WRITE8_DEVICE_HANDLER( xerox820_pio_port_a_w )
 	xerox820_state *state = device->machine->driver_data;
 
 	/* drive select */
-	wd17xx_set_drive(state->wd1771, data & 0x03);
+	if (BIT(data, 0)) wd17xx_set_drive(state->wd1771, 0);
+	if (BIT(data, 1)) wd17xx_set_drive(state->wd1771, 1);
 
 	floppy_drive_set_motor_state(get_floppy_image(device->machine, 0), 1);
 	floppy_drive_set_motor_state(get_floppy_image(device->machine, 1), 1);
@@ -710,13 +710,13 @@ static DEVICE_IMAGE_LOAD( xerox820_floppy )
 		switch (image_length(image))
 		{
 		case 77*1*26*128: // 250K 8" SSSD
-			basicdsk_set_geometry(image, 77, 1, 26, 128, 0, 0, FALSE);
+			basicdsk_set_geometry(image, 77, 1, 26, 128, 1, 0, FALSE);
 			state->_8n5 = 1;
 			state->dsdd = 0;
 			return INIT_PASS;
 
 		case 77*1*26*256: // 500K 8" SSDD
-			basicdsk_set_geometry(image, 77, 1, 26, 256, 0, 0, FALSE);
+			basicdsk_set_geometry(image, 77, 1, 26, 256, 1, 0, FALSE);
 			state->_8n5 = 1;
 			state->dsdd = 0;
 			return INIT_PASS;
