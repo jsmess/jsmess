@@ -12,7 +12,7 @@
 	TODO:
 
 	- add xtals.h
-	- baud A/B (COM8116 chip)
+	- COM8116
 	- type in Monitor v1.0 from manual
 	- proper keyboard emulation (MCU?)
 
@@ -30,6 +30,7 @@
 #include "machine/z80ctc.h"
 #include "machine/z80sio.h"
 #include "machine/wd17xx.h"
+#include "machine/com8116.h"
 #include "devices/basicdsk.h"
 
 INLINE const device_config *get_floppy_image(running_machine *machine, int drive)
@@ -170,20 +171,6 @@ static WRITE8_DEVICE_HANDLER(z80pio_alt_w)
 		z80pio_d_w(device, channel, data);
 }
 
-static WRITE8_HANDLER( bauda_w )
-{
-//	xerox820_state *state = space->machine->driver_data;
-
-//	com8116_str_w(state->com8116, data & 0x0f);
-}
-
-static WRITE8_HANDLER( baudb_w )
-{
-//	xerox820_state *state = space->machine->driver_data;
-
-//	com8116_stt_w(state->com8116, data & 0x0f);
-}
-
 static WRITE8_HANDLER( scroll_w )
 {
 	xerox820_state *state = space->machine->driver_data;
@@ -203,11 +190,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( xerox820_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x03) AM_WRITE(bauda_w)
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0x03) AM_DEVWRITE(COM8116_TAG, com8116_str_w)
 	AM_RANGE(0x04, 0x04) AM_MIRROR(0x02) AM_DEVREADWRITE(Z80SIO_TAG, z80sio_d_r, z80sio_d_w)
 	AM_RANGE(0x05, 0x05) AM_MIRROR(0x02) AM_DEVREADWRITE(Z80SIO_TAG, z80sio_c_r, z80sio_c_w)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE(Z80GPPIO_TAG, z80pio_alt_r, z80pio_alt_w)
-	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0x03) AM_WRITE(baudb_w)
+	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0x03) AM_DEVWRITE(COM8116_TAG, com8116_stt_w)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE(WD1771_TAG, wd17xx_r, wd17xx_w)
 	AM_RANGE(0x14, 0x14) AM_MIRROR(0x03) AM_WRITE(scroll_w)
 	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_r, z80ctc_w)
@@ -506,8 +493,6 @@ static WD17XX_CALLBACK( wd1771_callback )
 	case WD17XX_DRQ_SET: driver_state->fdc_drq = 1; break;
 	}
 
-	logerror("halt %u FDC IRQ %u DRQ %u\n", halt, driver_state->fdc_irq, driver_state->fdc_drq);
-
 	if (halt && (driver_state->fdc_irq | driver_state->fdc_drq))
 	{
 		cputag_set_input_line(device->machine, Z80_TAG, INPUT_LINE_NMI, ASSERT_LINE);
@@ -522,6 +507,17 @@ static const wd17xx_interface wd1771_intf =
 {
 	wd1771_callback, 
 	NULL
+};
+
+/* COM8116 Interface */
+
+static COM8116_INTERFACE( com8116_intf )
+{
+	DEVCB_NULL,		/* fX/4 output */
+	DEVCB_NULL,		/* fR output */
+	DEVCB_NULL,		/* fT output */
+	{},				/* receiver ROM */
+	{}				/* transmitter ROM */
 };
 
 /* Video */
@@ -654,7 +650,7 @@ static MACHINE_DRIVER_START( xerox820 )
 	MDRV_Z80PIO_ADD(Z80GPPIO_TAG, gppio_intf)
 	MDRV_Z80CTC_ADD(Z80CTC_TAG, XTAL_20MHz/8, ctc_intf)
 	MDRV_WD1773_ADD(WD1771_TAG, wd1771_intf) // workaround wd17xx.c ready state bug, should be MDRV_WD177X_ADD
-//	MDRV_COM8116_ADD(COM8116_TAG, 5068800, com8116_intf)
+	MDRV_COM8116_ADD(COM8116_TAG, 5068800, com8116_intf)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( xerox820ii )

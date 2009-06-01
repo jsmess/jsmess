@@ -1375,6 +1375,7 @@ $(MESSOBJ)/heathkit.a: \
 	
 $(MESSOBJ)/xerox.a: \
 	$(MESS_DRIVERS)/xerox820.o \
+	$(MESS_MACHINE)/com8116.o
 
 $(MESSOBJ)/skeleton.a: \
 	$(MESS_DRIVERS)/a6809.o \

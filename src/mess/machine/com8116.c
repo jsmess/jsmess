@@ -1,0 +1,182 @@
+/**********************************************************************
+
+	COM8116 - Dual Baud Rate Generator (Programmable Divider) emulation
+
+	Copyright MESS Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
+
+*********************************************************************/
+
+/*
+
+	TODO:
+
+	- everything
+
+*/
+
+#include "driver.h"
+#include "com8116.h"
+
+/***************************************************************************
+    PARAMETERS
+***************************************************************************/
+
+#define LOG 0
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+typedef struct _com8116_t com8116_t;
+struct _com8116_t
+{
+	devcb_resolved_write_line	out_fx4_func;
+	devcb_resolved_write_line	out_fr_func;
+	devcb_resolved_write_line	out_ft_func;
+
+	/* timers */
+	emu_timer *fx4_timer;
+	emu_timer *fr_timer;
+	emu_timer *ft_timer;
+};
+
+/***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
+
+INLINE com8116_t *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == COM8116);
+	return (com8116_t *)device->token;
+}
+
+INLINE const com8116_interface *get_interface(const device_config *device)
+{
+	assert(device != NULL);
+	assert((device->type == COM8116));
+	return (const com8116_interface *) device->static_config;
+}
+
+/***************************************************************************
+    IMPLEMENTATION
+***************************************************************************/
+
+/*-------------------------------------------------
+    com8116_str_w - receiver strobe write
+-------------------------------------------------*/
+
+WRITE8_DEVICE_HANDLER( com8116_str_w )
+{
+//	com8116_t *com8116 = get_safe_token(device);
+
+	if (LOG) logerror("COM8116 '%s' Receiver Divider %01x\n", device->tag, data & 0x0f);
+
+//	timer_adjust_periodic(com8116->fr_timer, attotime_zero, 0, ATTOTIME_IN_HZ(1));
+}
+
+/*-------------------------------------------------
+    com8116_stt_w - transmitter strobe write
+-------------------------------------------------*/
+
+WRITE8_DEVICE_HANDLER( com8116_stt_w )
+{
+//	com8116_t *com8116 = get_safe_token(device);
+
+	if (LOG) logerror("COM8116 '%s' Transmitter Divider %01x\n", device->tag, data & 0x0f);
+
+//	timer_adjust_periodic(com8116->ft_timer, attotime_zero, 0, ATTOTIME_IN_HZ(1));
+}
+
+/*-------------------------------------------------
+    TIMER_CALLBACK( fx4_tick )
+-------------------------------------------------*/
+
+static TIMER_CALLBACK( fx4_tick )
+{
+	const device_config *device = ptr;
+	com8116_t *com8116 = get_safe_token(device);
+
+	devcb_call_write_line(&com8116->out_fx4_func, 1);
+}
+
+/*-------------------------------------------------
+    TIMER_CALLBACK( fr_tick )
+-------------------------------------------------*/
+
+static TIMER_CALLBACK( fr_tick )
+{
+	const device_config *device = ptr;
+	com8116_t *com8116 = get_safe_token(device);
+
+	devcb_call_write_line(&com8116->out_fr_func, 1);
+}
+
+/*-------------------------------------------------
+    TIMER_CALLBACK( ft_tick )
+-------------------------------------------------*/
+
+static TIMER_CALLBACK( ft_tick )
+{
+	const device_config *device = ptr;
+	com8116_t *com8116 = get_safe_token(device);
+
+	devcb_call_write_line(&com8116->out_ft_func, 1);
+}
+
+/*-------------------------------------------------
+    DEVICE_START( com8116 )
+-------------------------------------------------*/
+
+static DEVICE_START( com8116 )
+{
+	com8116_t *com8116 = get_safe_token(device);
+	const com8116_interface *intf = get_interface(device);
+
+	/* resolve callbacks */
+	devcb_resolve_write_line(&com8116->out_fx4_func, &intf->out_fx4_func, device);
+	devcb_resolve_write_line(&com8116->out_fr_func, &intf->out_fr_func, device);
+	devcb_resolve_write_line(&com8116->out_ft_func, &intf->out_ft_func, device);
+
+	/* create the timers */
+	if (com8116->out_fx4_func.target)
+	{
+		com8116->fx4_timer = timer_alloc(device->machine, fx4_tick, (void *)device);
+		timer_adjust_periodic(com8116->fx4_timer, attotime_zero, 0, ATTOTIME_IN_HZ(device->clock / 4));
+	}
+
+	com8116->fr_timer = timer_alloc(device->machine, fr_tick, (void *)device);
+	com8116->ft_timer = timer_alloc(device->machine, ft_tick, (void *)device);
+
+	/* register for state saving */
+//    state_save_register_global(device->machine, com8116->);
+}
+
+/*-------------------------------------------------
+    DEVICE_GET_INFO( com8116 )
+-------------------------------------------------*/
+
+DEVICE_GET_INFO( com8116 )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(com8116_t);				break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
+		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(com8116);	break;
+		case DEVINFO_FCT_STOP:							/* Nothing */								break;
+		case DEVINFO_FCT_RESET:							/* Nothing */								break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "COM8116");					break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "COM8116");					break;
+		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");						break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);					break;
+		case DEVINFO_STR_CREDITS:						/* Nothing */								break;
+	}
+}

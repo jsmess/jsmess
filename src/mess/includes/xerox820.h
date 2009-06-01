@@ -36,7 +36,6 @@ struct _xerox820_state
 	/* devices */
 	const device_config *kbpio;
 	const device_config *z80ctc;
-	const device_config *com8116;
 	const device_config *wd1771;
 };
 
