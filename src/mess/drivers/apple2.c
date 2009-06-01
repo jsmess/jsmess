@@ -715,6 +715,34 @@ ROM_START(prav8m)
 	ROM_LOAD ( "341-0027-a.p5", 0x4500, 0x0100, CRC(ce7144f6) SHA1(d4181c9f046aafc3fb326b381baac809d9e38d16)) /* 341-0027-a "P5A" State machine PROM (Disk II ROM - DOS 3.3 version?) */
 ROM_END
 
+ROM_START( agat7 )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_SYSTEM_BIOS( 0, "v1", "Version 1" )
+	ROMX_LOAD( "monitor7.rom", 0x3800, 0x0800, CRC(71fda0b) SHA1(6089d46b7addc4e2ae096b2cf81124681bd2b27a), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS( 1, "v2", "Version 2" )
+	ROMX_LOAD( "agat_pzu.bin", 0x3800, 0x0800, CRC(c605163d) SHA1(b30fd1b264a347a9de69bb9e3105483254994d06), ROM_BIOS(2))
+	// Floppy controllers
+	ROM_LOAD( "shugart7.rom", 0x4500, 0x0100, CRC(c6e4850c) SHA1(71626d3d2d4bbeeac2b77585b45a5566d20b8d34))
+	ROM_LOAD( "teac.rom", 	  0x4500, 0x0100, CRC(94266928) SHA1(5d369bad6cdd6a70b0bb16480eba69640de87a2e))
+	ROM_REGION(0x0800,"gfx1",0)
+	ROM_LOAD( "agathe7.fnt", 0x0000, 0x0800, CRC(fcffb490) SHA1(0bda26ae7ad75f74da835c0cf6d9928f9508844c))  
+ROM_END
+
+ROM_START( agat9 )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_SYSTEM_BIOS( 0, "v1", "Version 1" )
+  	ROMX_LOAD( "monitor9.rom", 0x3800, 0x0800, CRC(b90bb66a) SHA1(02217f0785913b41fc25eabcff70fa814799c69a), ROM_BIOS(1))
+  	ROM_SYSTEM_BIOS( 1, "v2", "Version 2" )
+  	ROMX_LOAD( "monitor91.rom", 0x3800, 0x0800, CRC(89b10fc1) SHA1(7fe1ede32b5525255f82597ca9c3c2034c5996fa), ROM_BIOS(2))
+	// Floppy controllers
+  	ROM_LOAD( "shugart9.rom", 0x4500, 0x0100, CRC(964a0ce2) SHA1(bf955189ebffe874c20ef649a3db8177dc16af61))
+  	ROM_LOAD( "teac.rom", 	  0x4500, 0x0100, CRC(94266928) SHA1(5d369bad6cdd6a70b0bb16480eba69640de87a2e))
+  	// Printer card
+  	ROM_LOAD( "cm6337.rom", 0x8000, 0x0100, CRC(73be16ec) SHA1(ead1abbef5b86f1def0b956147d5b267f0d544b5))
+  	ROM_LOAD( "cm6337p.rom", 0x8100, 0x0800, CRC(9120f11f) SHA1(78107653491e88d5ea12e07367c4c028771a4aca))
+  	ROM_REGION(0x0800,"gfx1",0)
+  	ROM_LOAD( "agathe9.fnt", 0x0000, 0x0800, CRC(8c55c984) SHA1(5a5a202000576b88b4ae2e180dd2d1b9b337b594))
+ROM_END
 ROM_START(apple2jp)
 	ROM_REGION(0x0800,"gfx1",0)
 	ROM_LOAD ( "a2jp.chr", 0x0000, 0x0800, BAD_DUMP CRC(487104b5) SHA1(0a382be58db5215c4a3de53b19a72fab660d5da2)) // not confirmed as the actual rom on motherboard
@@ -951,3 +979,5 @@ COMP( 1986, apple2c3, apple2c,  0,	apple2c_iwm,	apple2e,  0,   apple2e,	"Apple C
 COMP( 1986, apple2c4, apple2c,  0,	apple2c_iwm,	apple2e,  0,   apple2e,	"Apple Computer", "Apple //c (rev 4)" , GAME_NOT_WORKING )
 COMP( 1988, apple2cp, apple2c,  0,	apple2c_iwm,	apple2e,  0,   apple2e,	"Apple Computer", "Apple //c Plus" , 0)
 COMP( 1984, ivelultr, apple2,   0,	apple2p,	apple2p,  0,   apple2p,	"Ivasim", "Ivel Ultra" , 0)
+COMP( 1983, agat7, apple2,   0,	apple2p,	apple2p,  0,   apple2p,	"Agat", "Agat-7" , GAME_NOT_WORKING)
+COMP( 1984, agat9, apple2,   0,	apple2p,	apple2p,  0,   apple2p,	"Agat", "Agat-9" , GAME_NOT_WORKING)

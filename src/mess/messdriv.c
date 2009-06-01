@@ -287,6 +287,8 @@ const game_driver * const drivers[] =
 	DRIVER( las128ex )	/* ??? 1987 Laser 128 EX							*/
 	DRIVER( las3000 )	/* ??? 1983 Laser 3000								*/
 	DRIVER( ivelultr )	/* Ivasim Ivel Ultra								*/
+	DRIVER( agat7 )		/* Agat-7											*/
+	DRIVER( agat9 )		/* Agat-9											*/
 
 /*
  * Lisa 				 January			 1983

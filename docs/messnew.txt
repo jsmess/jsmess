@@ -43,6 +43,8 @@ New System Drivers Supported (in no particular order):
 
 Skeleton drivers : 
 ------------------
+- Agat-7
+- Agat-9
 - Acorn 6809
 - BIC A5105
 - BCS-3
