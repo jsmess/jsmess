@@ -497,12 +497,12 @@ ROM_START(pc8300)
 	ROM_LOAD( "8300_org.rom", 0x0000, 0x2000, CRC(a350f2b1) SHA1(6a9be484556cc27a9cd9d71085d2027c6243333f) )
 
 	ROM_REGION( 0x200, "gfx1", 0 )
-	ROM_LOAD( "8300_fnt.bin",0x0000, 0x0200, CRC(6bd0408c) SHA1(34a7a5afee511dc8bba28eccf305c873d80a557a) )
+	ROM_LOAD( "8300_fnt.bin", 0x0000, 0x0200, CRC(6bd0408c) SHA1(34a7a5afee511dc8bba28eccf305c873d80a557a) )
 ROM_END
 
 ROM_START(pow3000)
 	ROM_REGION( 0x10000, "maincpu",0 )
-	ROM_LOAD("pow3000.rom", 0x0000, 0x2000, CRC(8a49b2c3) SHA1(9b22daf2f3a991aa6a358ef95b091654c3ca1bdf) )
+	ROM_LOAD( "pow3000.rom", 0x0000, 0x2000, CRC(8a49b2c3) SHA1(9b22daf2f3a991aa6a358ef95b091654c3ca1bdf) )
 
 	ROM_REGION( 0x200, "gfx1", 0 )
 	ROM_LOAD( "pow3000.chr", 0x0000, 0x0200, CRC(1c42fe46) SHA1(5b30ba77c8f57065d106db69964c9ff2e4221760) )
@@ -510,22 +510,25 @@ ROM_END
 
 ROM_START(lambda)
 	ROM_REGION( 0x10000, "maincpu",0 )
-	ROM_LOAD("lambda.rom", 0x0000, 0x2000, CRC(8a49b2c3) SHA1(9b22daf2f3a991aa6a358ef95b091654c3ca1bdf) )
+	ROM_LOAD( "lambda.rom", 0x0000, 0x2000, CRC(8a49b2c3) SHA1(9b22daf2f3a991aa6a358ef95b091654c3ca1bdf) )
 
 	ROM_REGION( 0x200, "gfx1", 0 )
 	ROM_LOAD( "8300_fnt.bin", 0x0000, 0x0200, CRC(6bd0408c) SHA1(34a7a5afee511dc8bba28eccf305c873d80a557a) )
 ROM_END
 
 ROM_START( tk85 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "tk85.rom", 0x0000, 0x2800, CRC(8972d756) SHA1(7b961a1733fc047eb682150a32e17bca10a018d2) )
 ROM_END
 
+/* This homebrew has 192k of RAM and 32k of ROM via bankswitching. One of the primary bankswitching lines is /M1,
+	which is not emulated by MAME's z80. */
 ROM_START( zx97 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-  	ROM_LOAD( "zx97.rom", 0x0000, 0x8000, CRC(5cf49744) SHA1(b2a486efdc7b2bc3dc8e5a441ea5532bfa3207bd))
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "zx97.rom", 0x0000, 0x2000, CRC(5cf49744) SHA1(b2a486efdc7b2bc3dc8e5a441ea5532bfa3207bd) )
+	ROM_IGNORE( 0x6000 )	/* Unemulated bankswitched part */
 ROM_END
-  	
+
 /* System Configuration */
 
 static SYSTEM_CONFIG_START(zx80)
@@ -555,8 +558,8 @@ COMP( 1981, zx81,       0,      0,      zx81,       zx81,       zx,     zx81,   
 COMP( 1982, ts1000,     zx81,   0,      ts1000,     zx81,       zx,     zx81,    "Timex Sinclair",           "Timex Sinclair 1000", 0 )
 COMP( 1983, ts1500,     zx81,   0,      ts1000,     zx81,       zx,     pc8300,  "Timex Sinclair",           "Timex Sinclair 1500", 0 )
 COMP( 1983, tk85,     	zx81,   0,      ts1000,     zx81,       zx,     zx81,    "Microdigital",             "TK85",                0 )
-COMP( 1983, ringo470,   zx81,   0,      ts1000,     zx81,       zx,     zx81,    "Ritas do Brasil Ltda",     "Ringo 470", 			GAME_NOT_WORKING )
+COMP( 1983, ringo470,   zx81,   0,      ts1000,     zx81,       zx,     zx81,    "Ritas do Brasil Ltda",     "Ringo 470", GAME_NOT_WORKING )
 COMP( 1984, pc8300,     zx81,   0,      pc8300,     pc8300,     zx,     pc8300,  "Your Computer",            "PC8300",              0 )
 COMP( 1983, pow3000,    zx81,   0,      pow3000,    pow3000,    zx,     pow3000, "Creon Enterprises",        "Power 3000",          0 )
 COMP( 1982, lambda,     zx81,   0,      pow3000,    pow3000,    zx,     pow3000, "Lambda Electronics Ltd",   "Lambda 8300",         0 )
-COMP( 19??, zx97,       zx81,   0,      zx81,    	zx81,    	zx,     zx81, 	  "???",   					 "ZX97",         		GAME_NOT_WORKING )
+COMP( 1997, zx97,       zx81,   0,      zx81,       zx81,    	zx,     zx81,    "Wilf Rigter",		     "ZX97",	  GAME_NOT_WORKING )
