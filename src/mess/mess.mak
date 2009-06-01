@@ -282,6 +282,7 @@ DRVLIBS = \
 	$(MESSOBJ)/glasgow.a \
 	$(MESSOBJ)/gmaster.a \
 	$(MESSOBJ)/grundy.a \
+	$(MESSOBJ)/heathkit.a \
 	$(MESSOBJ)/homelab.a \
 	$(MESSOBJ)/hp48.a \
 	$(MESSOBJ)/intv.a \
@@ -1365,6 +1366,12 @@ $(MESSOBJ)/kyocera.a: \
 	$(MESS_MACHINE)/rp5c01a.o \
 	$(MESS_MACHINE)/8155pio.o
 
+$(MESSOBJ)/heathkit.a: \
+	$(MESS_DRIVERS)/et3400.o \
+	$(MESS_DRIVERS)/h8.o \
+	$(MESS_DRIVERS)/h19.o \
+	$(MESS_DRIVERS)/h89.o \
+
 $(MESSOBJ)/skeleton.a: \
 	$(MESS_DRIVERS)/a6809.o \
 	$(MESS_DRIVERS)/a5105.o \
@@ -1381,7 +1388,6 @@ $(MESSOBJ)/skeleton.a: \
 	$(MESS_DRIVERS)/fk1.o \
 	$(MESS_DRIVERS)/fm7.o \
 	$(MESS_DRIVERS)/fmtowns.o \
-	$(MESS_DRIVERS)/et3400.o \
 	$(MESS_DRIVERS)/huebler.o \
 	$(MESS_DRIVERS)/interact.o \
 	$(MESS_DRIVERS)/sc80.o \

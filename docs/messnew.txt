@@ -72,6 +72,9 @@ Skeleton drivers :
 - SC-80
 - LC-80
 - National JR200
+- Heathkit H8
+- Heathkit H19
+- Heathkit H89
 - Hector 2HR+
 - Hector 2HRX
 - Hector 1
