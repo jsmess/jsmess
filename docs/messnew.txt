@@ -102,6 +102,9 @@ Skeleton drivers :
 - Philips VG-8010F
 - Plydin-601 
 - Plydin-601A
+- PK8000 Vesta
+- PK8000 Sura/Hobby
+- PK6812c
 - Poly-Computer 880
 - Robotron A5120
 - Robotron A5130
@@ -129,9 +132,11 @@ Skeleton drivers :
 - TI-92
 - TI-92 Plus
 - Tiki 100
+- Unior
 - UKNC
 - VCS-80
 - Visual 1050
+- Vector 1200
 - V-Tech Socrates 
 - XOR-100-12
 

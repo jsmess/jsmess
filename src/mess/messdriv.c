@@ -1375,5 +1375,10 @@ const game_driver * const drivers[] =
 	DRIVER( uknc )	
 	DRIVER( zx97)
 	DRIVER( x07)
+	DRIVER( vesta)
+	DRIVER( hobby)
+	DRIVER( unior)
+	DRIVER( vec1200)
+	DRIVER( pk6128c)		
 
 #endif /* DRIVER_RECURSIVE */
