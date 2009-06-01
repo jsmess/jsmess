@@ -371,6 +371,7 @@ DRVLIBS = \
 	$(MESSOBJ)/votrax.a \
 	$(MESSOBJ)/vtech.a \
 	$(MESSOBJ)/z80ne.a \
+	$(MESSOBJ)/xerox.a \
 	$(MESSOBJ)/shared.a \
 
 
@@ -1371,6 +1372,9 @@ $(MESSOBJ)/heathkit.a: \
 	$(MESS_DRIVERS)/h8.o \
 	$(MESS_DRIVERS)/h19.o \
 	$(MESS_DRIVERS)/h89.o \
+	
+$(MESSOBJ)/xerox.a: \
+	$(MESS_DRIVERS)/xerox820.o \
 
 $(MESSOBJ)/skeleton.a: \
 	$(MESS_DRIVERS)/a6809.o \
@@ -1403,7 +1407,6 @@ $(MESSOBJ)/skeleton.a: \
 	$(MESS_DRIVERS)/tiki100.o \
 	$(MESS_DRIVERS)/vcs80.o \
 	$(MESS_DRIVERS)/v1050.o \
-	$(MESS_DRIVERS)/xerox820.o \
 	$(MESS_DRIVERS)/xor100.o \
 	$(MESS_DRIVERS)/iq151.o \
 	$(MESS_DRIVERS)/pc6001.o \
