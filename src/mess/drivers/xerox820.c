@@ -339,7 +339,7 @@ static READ8_DEVICE_HANDLER( xerox820_pio_port_a_r )
 		1
 		2
 		3		PBRDY			keyboard data available
-		4		R/W5			8"/5.25" disk select (0=5.25", 1=8")
+		4		8/N5			8"/5.25" disk select (0=5.25", 1=8")
 		5		400/460			double sided disk detect (only on Etch 2 PCB) (0=SS, 1=DS)
 		6
 		7
@@ -387,8 +387,6 @@ static WRITE8_DEVICE_HANDLER( xerox820_pio_port_a_w )
 
 	/* bank switching */
 	xerox820_bankswitch(device->machine, BIT(data, 7));
-	
-	logerror("PA %02x\n", data);
 };
 
 static READ8_DEVICE_HANDLER( xerox820_pio_port_b_r )
@@ -655,7 +653,7 @@ static MACHINE_DRIVER_START( xerox820 )
 	MDRV_Z80PIO_ADD(Z80KBPIO_TAG, kbpio_intf)
 	MDRV_Z80PIO_ADD(Z80GPPIO_TAG, gppio_intf)
 	MDRV_Z80CTC_ADD(Z80CTC_TAG, XTAL_20MHz/8, ctc_intf)
-	MDRV_WD177X_ADD(WD1771_TAG, wd1771_intf)
+	MDRV_WD1773_ADD(WD1771_TAG, wd1771_intf) // workaround wd17xx.c ready state bug, should be MDRV_WD177X_ADD
 //	MDRV_COM8116_ADD(COM8116_TAG, 5068800, com8116_intf)
 MACHINE_DRIVER_END
 
