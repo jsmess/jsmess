@@ -4,21 +4,15 @@
 
         12/05/2009 Skeleton driver.
 
-The incorrect processor is being used here.
-
 ****************************************************************************/
 
 #include "driver.h"
-#include "cpu/z80/z80.h"
+#include "cpu/m6800/m6800.h"
 
 static ADDRESS_MAP_START(et3400_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x03ff ) AM_ROM
-	AM_RANGE( 0x0400, 0x3fff ) AM_RAM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( et3400_io , ADDRESS_SPACE_IO, 8)
-	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE( 0x0000, 0x00ff ) AM_RAM
+	AM_RANGE( 0xfc00, 0xffff ) AM_ROM
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -41,9 +35,8 @@ static VIDEO_UPDATE( et3400 )
 
 static MACHINE_DRIVER_START( et3400 )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
+    MDRV_CPU_ADD("maincpu", M6800, XTAL_1MHz ) 
     MDRV_CPU_PROGRAM_MAP(et3400_mem)
-    MDRV_CPU_IO_MAP(et3400_io)
 
     MDRV_MACHINE_RESET(et3400)
 
@@ -67,12 +60,12 @@ SYSTEM_CONFIG_END
 /* ROM definition */
 ROM_START( et3400 )
     ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-  ROM_LOAD( "et3400.bin", 0x0000, 0x0400, CRC(2eff1f58) SHA1(38b655de7393d7a92b08276f7c14a99eaa2a4a9f))
+  ROM_LOAD( "et3400.bin", 0xfc00, 0x0400, CRC(2eff1f58) SHA1(38b655de7393d7a92b08276f7c14a99eaa2a4a9f))
 
 ROM_END
 
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( ????, et3400,  0,       0, 	et3400, 	et3400, 	 0,  	  et3400,  	 "Heathkit",   "ET-3400",		GAME_NOT_WORKING)
+COMP( 1976, et3400,  0,       0, 	et3400, 	et3400, 	 0,  	  et3400,  	 "Heath, Inc.",   "Heathkit ET-3400",		GAME_NOT_WORKING)
 
