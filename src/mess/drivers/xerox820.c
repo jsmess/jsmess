@@ -11,7 +11,6 @@
 
 	TODO:
 
-	- add xtals.h
 	- COM8116
 	- type in Monitor v1.0 from manual
 	- proper keyboard emulation (MCU?)
@@ -154,21 +153,6 @@ static void xerox820_bankswitch(running_machine *machine, int bank)
 
 	memory_set_bank(machine, 1, bank);
 	memory_set_bank(machine, 2, bank);
-}
-
-static READ8_DEVICE_HANDLER(z80pio_alt_r)
-{
-	int channel = BIT(offset, 1);
-	return (offset & 1) ? z80pio_c_r(device, channel) : z80pio_d_r(device, channel);
-}
-
-static WRITE8_DEVICE_HANDLER(z80pio_alt_w)
-{
-	int channel = BIT(offset, 1);
-	if (offset & 1)
-		z80pio_c_w(device, channel, data);
-	else
-		z80pio_d_w(device, channel, data);
 }
 
 static WRITE8_HANDLER( scroll_w )
@@ -632,7 +616,7 @@ static MACHINE_DRIVER_START( xerox820 )
     /* video hardware */
     MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(10694250, 700, 0, 560, 260, 0, 240)
+	MDRV_SCREEN_RAW_PARAMS(XTAL_10_69425MHz, 700, 0, 560, 260, 0, 240)
 
 	MDRV_PALETTE_LENGTH(2)
     MDRV_PALETTE_INIT(black_and_white)
@@ -650,7 +634,7 @@ static MACHINE_DRIVER_START( xerox820 )
 	MDRV_Z80PIO_ADD(Z80GPPIO_TAG, gppio_intf)
 	MDRV_Z80CTC_ADD(Z80CTC_TAG, XTAL_20MHz/8, ctc_intf)
 	MDRV_WD1773_ADD(WD1771_TAG, wd1771_intf) // workaround wd17xx.c ready state bug, should be MDRV_WD177X_ADD
-	MDRV_COM8116_ADD(COM8116_TAG, 5068800, com8116_intf)
+	MDRV_COM8116_ADD(COM8116_TAG, XTAL_5_0688MHz, com8116_intf)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( xerox820ii )

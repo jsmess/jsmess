@@ -216,21 +216,6 @@ static TIMER_DEVICE_CALLBACK( abc80_keyboard_tick )
 	abc80_keyboard_scan(timer->machine);
 }
 
-static READ8_DEVICE_HANDLER(z80pio_alt_r)
-{
-	int channel = BIT(offset, 1);
-	return (offset & 1) ? z80pio_c_r(device, channel) : z80pio_d_r(device, channel);
-}
-
-static WRITE8_DEVICE_HANDLER(z80pio_alt_w)
-{
-	int channel = BIT(offset, 1);
-	if (offset & 1)
-		z80pio_c_w(device, channel, data);
-	else
-		z80pio_d_w(device, channel, data);
-}
-
 /* Memory Maps */
 
 static ADDRESS_MAP_START( abc80_map, ADDRESS_SPACE_PROGRAM, 8 )
