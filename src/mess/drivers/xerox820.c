@@ -342,13 +342,16 @@ static WRITE8_DEVICE_HANDLER( xerox820_pio_port_a_w )
 	xerox820_state *state = device->machine->driver_data;
 
 	/* drive select */
-	if (BIT(data, 0)) wd17xx_set_drive(state->wd1771, 0);
-	if (BIT(data, 1)) wd17xx_set_drive(state->wd1771, 1);
+	int dvsel1 = BIT(data, 0);
+	int dvsel2 = BIT(data, 1);
 
-	floppy_drive_set_motor_state(get_floppy_image(device->machine, 0), 1);
-	floppy_drive_set_motor_state(get_floppy_image(device->machine, 1), 1);
-	floppy_drive_set_ready_state(get_floppy_image(device->machine, 0), 1, 0);
-	floppy_drive_set_ready_state(get_floppy_image(device->machine, 1), 1, 0);
+	if (dvsel1) wd17xx_set_drive(state->wd1771, 0);
+	if (dvsel2) wd17xx_set_drive(state->wd1771, 1);
+
+	floppy_drive_set_motor_state(get_floppy_image(device->machine, 0), dvsel1);
+	floppy_drive_set_motor_state(get_floppy_image(device->machine, 1), dvsel2);
+	floppy_drive_set_ready_state(get_floppy_image(device->machine, 0), dvsel1, 1);
+	floppy_drive_set_ready_state(get_floppy_image(device->machine, 1), dvsel2, 1);
 
 	/* side select */
 	wd17xx_set_side(state->wd1771, BIT(data, 2));
@@ -648,12 +651,18 @@ ROM_START( xerox820 )
 
 	ROM_REGION( 0x1000, "monitor", 0 )
 	ROM_DEFAULT_BIOS( "v20" )
-	ROM_SYSTEM_BIOS( 0, "v10", "Monitor v1.0" )
+	ROM_SYSTEM_BIOS( 0, "v10", "Xerox Monitor v1.0" )
 	ROMX_LOAD( "x820v10.u64", 0x0000, 0x0800, NO_DUMP, ROM_BIOS(1) )
 	ROMX_LOAD( "x820v10.u63", 0x0800, 0x0800, NO_DUMP, ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS( 1, "v20", "Monitor v2.0" )
+	ROM_SYSTEM_BIOS( 1, "v20", "Xerox Monitor v2.0" )
 	ROMX_LOAD( "x820v20.u64", 0x0000, 0x0800, CRC(2fc227e2) SHA1(b4ea0ae23d281a687956e8a514cb364a1372678e), ROM_BIOS(2) )
 	ROMX_LOAD( "x820v20.u63", 0x0800, 0x0800, CRC(bc11f834) SHA1(4fd2b209a6e6ff9b0c41800eb5228c34a0d7f7ef), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS( 2, "smart23", "MICROCode SmartROM v2.3" )
+	ROMX_LOAD( "mxkx25a.u64", 0x0000, 0x0800, CRC(7ec5f100) SHA1(5d0ff35a51aa18afc0d9c20ef99ff5d9d3f2075b), ROM_BIOS(3) )
+	ROMX_LOAD( "mxkx25b.u63", 0x0800, 0x0800, CRC(a7543798) SHA1(886e617e1003d13f86f33085cbd49391b77291a3), ROM_BIOS(3) )
+	ROM_SYSTEM_BIOS( 3, "plus2", "MICROCode Plus2 v0.2a" )
+	ROMX_LOAD( "p2x25a.u64",  0x0000, 0x0800, CRC(3ccd7a8f) SHA1(6e46c88f03fc7289595dd6bec95e23bb13969525), ROM_BIOS(4) )
+	ROMX_LOAD( "p2x25b.u63",  0x0800, 0x0800, CRC(1e580391) SHA1(e91f8ce82586df33c0d6d02eb005e8079f4de67d), ROM_BIOS(4) )
 
 	ROM_REGION( 0x800, "chargen", 0 )
 	ROM_LOAD( "x820.u92", 0x0000, 0x0800, CRC(b823fa98) SHA1(ad0ea346aa257a53ad5701f4201896a2b3a0f928) )
