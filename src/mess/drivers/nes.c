@@ -176,7 +176,7 @@ static void ppu_nmi(const device_config *device, int *ppu_regs)
 
 static ppu2c0x_interface nes_ppu_interface =
 {
-	NULL/*"gfx1"*/,
+	"gfx1",
 	0,
 	0,
 	PPU_MIRROR_NONE,
@@ -326,8 +326,9 @@ ROM_START( famitwin )
 ROM_END
 
 ROM_START( m82 )
-	ROM_REGION( 0x10000, "maincpu", 0 )  /* Main RAM + program banks */
-	ROM_LOAD( "m82_v1_0.bin", 0xe000, 0x2000, CRC(7d56840a) SHA1(cbd2d14fa073273ba58367758f40d67fd8a9106d) )
+	ROM_REGION( 0x14000, "maincpu", 0 )  /* Main RAM + program banks */
+	/* Banks to be mapped at 0xe000? More investigations needed... */
+	ROM_LOAD( "m82_v1_0.bin", 0x10000, 0x4000, CRC(7d56840a) SHA1(cbd2d14fa073273ba58367758f40d67fd8a9106d) )
 
 	ROM_REGION( 0x2000,  "gfx1", 0 )  /* VROM */
 	ROM_FILL( 0x0000, 0x2000, 0x00 )
