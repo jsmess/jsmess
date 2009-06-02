@@ -22,7 +22,7 @@ static ADDRESS_MAP_START( beehive_io , ADDRESS_SPACE_IO, 8)
 ADDRESS_MAP_END
 
 /* Input ports */
-INPUT_PORTS_START( beehive )
+static INPUT_PORTS_START( beehive )
 INPUT_PORTS_END
 
 

@@ -99,7 +99,7 @@ static ADDRESS_MAP_START( bcs3_io, ADDRESS_SPACE_IO, 8)
 ADDRESS_MAP_END
 
 /* Input ports */
-INPUT_PORTS_START( bcs3 )
+static INPUT_PORTS_START( bcs3 )
 	PORT_START("LINE0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("U") PORT_CODE(KEYCODE_U) PORT_CHAR('H')
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("K :") PORT_CODE(KEYCODE_K) PORT_CHAR('K') PORT_CHAR(':')
@@ -482,6 +482,6 @@ ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
 COMP( ????, bcs3,   0,       0,      bcs3, 	bcs3, 	 0,  	  bcs3,  "Eckhard Schiller",   "BCS 3 rev 2.4", GAME_NOT_WORKING)
-COMP( ????, bcs3a,  bcs3,    0,      bcs3a, 	bcs3, 	 0,  	  bcs3,  "Eckhard Schiller",   "BCS 3 rev 3.1 30-column", GAME_NOT_WORKING)
+COMP( ????, bcs3a,  bcs3,    0,      bcs3a, 	bcs3, 	 0,  	  bcs3,  "Eckhard Schiller",   "BCS 3 rev 3.1 29-column", GAME_NOT_WORKING)
 COMP( ????, bcs3b,  bcs3,    0,      bcs3b, 	bcs3, 	 0,  	  bcs3,  "Eckhard Schiller",   "BCS 3 rev 3.1 40-column", GAME_NOT_WORKING)
 COMP( ????, bcs3c,  bcs3,    0,      bcs3c, 	bcs3, 	 0,  	  bcs3,  "Eckhard Schiller",   "BCS 3 rev 3.3", GAME_NOT_WORKING)

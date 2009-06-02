@@ -65,16 +65,23 @@
 #include "cpu/z80/z80.h"
 #include "video/mc6845.h"
 
+static const device_config *mc6845;
+
 static ADDRESS_MAP_START( camplynx_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000,0x3fff) AM_ROM	/* for Lynx 48k only */
+	AM_RANGE(0x4000,0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( camplynx_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x86, 0x86) AM_DEVWRITE("crtc", mc6845_address_w)
+	AM_RANGE(0x87, 0x87) AM_DEVREADWRITE("crtc", mc6845_register_r,mc6845_register_w)
 ADDRESS_MAP_END
 
 /* Input ports */
-INPUT_PORTS_START( camplynx )
+static INPUT_PORTS_START( camplynx )
 INPUT_PORTS_END
 
 
@@ -82,12 +89,18 @@ static MACHINE_RESET( camplynx )
 {
 }
 
+static MC6845_UPDATE_ROW( camplynx_update_row )
+{
+}
+
 static VIDEO_START( camplynx )
 {
+	mc6845 = devtag_get_device(machine, "crtc");
 }
 
 static VIDEO_UPDATE( camplynx )
 {
+	mc6845_update(mc6845, bitmap, cliprect);
 	return 0;
 }
 
@@ -96,7 +109,7 @@ static const mc6845_interface camplynx_crtc6845_interface = {
 	"screen",
 	8 /*?*/,
 	NULL,
-	NULL,
+	camplynx_update_row,
 	NULL,
 	NULL,
 	NULL,
@@ -122,7 +135,7 @@ static MACHINE_DRIVER_START( camplynx )
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(black_and_white)
 
-	MDRV_MC6845_ADD("crtc", MC6845, XTAL_4MHz /*?*/, camplynx_crtc6845_interface)
+	MDRV_MC6845_ADD("crtc", MC6845, XTAL_12MHz / 8 /*? dot clock divided by dots per char */, camplynx_crtc6845_interface)
 
 	MDRV_VIDEO_START(camplynx)
 	MDRV_VIDEO_UPDATE(camplynx)
@@ -157,7 +170,7 @@ static SYSTEM_CONFIG_START(camp48)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(camp96)
-	CONFIG_RAM_DEFAULT(94 * 1024)
+	CONFIG_RAM_DEFAULT(96 * 1024)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(camp128)

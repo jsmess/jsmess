@@ -89,7 +89,7 @@ static ADDRESS_MAP_START( spc1000_io , ADDRESS_SPACE_IO, 8)
 ADDRESS_MAP_END
 
 /* Input ports */
-INPUT_PORTS_START( spc1000 )
+static INPUT_PORTS_START( spc1000 )
 	PORT_START("LINE0")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_RSHIFT) PORT_CODE(KEYCODE_LSHIFT)
@@ -226,7 +226,7 @@ static const UINT8 *spc1000_get_video_ram(running_machine *machine, int scanline
 	return spc1000_video_ram + (scanline / 12) * 0x20;
 }
 
-VIDEO_START( spc1000 )
+static VIDEO_START( spc1000 )
 {
 	m6847_config cfg;
 

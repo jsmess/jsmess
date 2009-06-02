@@ -24,7 +24,7 @@ static ADDRESS_MAP_START(hec2hrp_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000,0x3fff) AM_ROM
 	AM_RANGE(0x4000,0xffff) AM_RAM
-	AM_RANGE(0xc000,0xf7ff) AM_READWRITE(hector_videoram_r,hector_videoram_w) AM_SIZE(&videoram_size) AM_BASE(&videoram)
+	AM_RANGE(0xc000,0xf7ff) AM_READWRITE(hector_videoram_r,hector_videoram_w) AM_BASE(&videoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hec2hrp_io , ADDRESS_SPACE_IO, 8)

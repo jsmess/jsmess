@@ -28,7 +28,11 @@
 
 #include "driver.h"
 #include "cpu/i8085/i8085.h"
-//#include "cpu/z80/z80.h"			// later Hector models used Z80A @ 4mhz
+
+static READ8_HANDLER( interact_keyboard_r )
+{
+	return 0x80;	// test only
+}
 
 static READ8_HANDLER( interact_videoram_r )
 {
@@ -43,16 +47,13 @@ static WRITE8_HANDLER( interact_videoram_w )
 static ADDRESS_MAP_START(interact_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000,0x0fff) AM_ROM
-	AM_RANGE(0x4000,0x47ff) AM_RAM AM_READWRITE(interact_videoram_r,interact_videoram_w) AM_SIZE(&videoram_size) AM_BASE(&videoram)
+	AM_RANGE(0x3800,0x3807) AM_READ(interact_keyboard_r)
+	AM_RANGE(0x4000,0x47ff) AM_RAM AM_READWRITE(interact_videoram_r,interact_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x4800,0x7fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( interact_io , ADDRESS_SPACE_IO, 8)
-	ADDRESS_MAP_UNMAP_HIGH
-ADDRESS_MAP_END
-
 /* Input ports */
-INPUT_PORTS_START( interact )
+static INPUT_PORTS_START( interact )
 INPUT_PORTS_END
 
 
@@ -96,7 +97,7 @@ static MACHINE_DRIVER_START( interact )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",8080, XTAL_2MHz)
 	MDRV_CPU_PROGRAM_MAP(interact_mem)
-	MDRV_CPU_IO_MAP(interact_io)
+//	MDRV_CPU_VBLANK_INT("maincpu", interact_interrupt)
 
 	MDRV_MACHINE_RESET(interact)
 

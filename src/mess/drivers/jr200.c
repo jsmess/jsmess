@@ -4,7 +4,7 @@
 
         12/05/2009 Skeleton driver.
 
-	The roms contain code for some other processor - its definitely not Z80.
+	The incorrect processor is used here.
 
 ****************************************************************************/
 
@@ -20,7 +20,7 @@ static ADDRESS_MAP_START( jr200_io , ADDRESS_SPACE_IO, 8)
 ADDRESS_MAP_END
 
 /* Input ports */
-INPUT_PORTS_START( jr200 )
+static INPUT_PORTS_START( jr200 )
 INPUT_PORTS_END
 
 

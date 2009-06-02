@@ -127,7 +127,7 @@ static ADDRESS_MAP_START( vt100_io , ADDRESS_SPACE_IO, 8)
 ADDRESS_MAP_END
 
 /* Input ports */
-INPUT_PORTS_START( vt100 )
+static INPUT_PORTS_START( vt100 )
 	PORT_START("LINE0")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED) 
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Right") PORT_CODE(KEYCODE_RIGHT)
@@ -244,7 +244,7 @@ INPUT_PORTS_START( vt100 )
 		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED) // Always return 0x7f on last scan line
 INPUT_PORTS_END
 
-VIDEO_UPDATE( vt100 )
+static VIDEO_UPDATE( vt100 )
 {
 	const device_config	*devconf = devtag_get_device(screen->machine, "vt100_video");
 	vt_video_update( devconf, bitmap, cliprect);
@@ -295,14 +295,14 @@ static WRITE8_DEVICE_HANDLER (vt100_clear_video_interrupt)
 	vt100_vertical_int = 0;	
 }
 
-const vt_video_interface vt100_video_interface = {
+static const vt_video_interface vt100_video_interface = {
 	"screen",
 	"gfx1",
 	DEVCB_HANDLER(vt100_read_video_ram_r),
 	DEVCB_HANDLER(vt100_clear_video_interrupt)
 };
 
-INTERRUPT_GEN( vt100_vertical_interrupt )
+static INTERRUPT_GEN( vt100_vertical_interrupt )
 {
 	vt100_vertical_int = 1;
 	cpu_set_input_line(device, 0, HOLD_LINE);

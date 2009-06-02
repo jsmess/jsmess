@@ -45,7 +45,7 @@ static VIDEO_UPDATE( px8 )
     INPUT PORTS
 ***************************************************************************/
 
-INPUT_PORTS_START( px8 )
+static INPUT_PORTS_START( px8 )
 INPUT_PORTS_END
 
 

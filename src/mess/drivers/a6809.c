@@ -11,6 +11,9 @@
 
 static ADDRESS_MAP_START(a6809_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000,0xf7ff) AM_RAM
+	AM_RANGE(0x0400,0x07ff) AM_BASE(&videoram)
+	AM_RANGE(0xf800,0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( a6809_io , ADDRESS_SPACE_IO, 8)
@@ -18,7 +21,7 @@ static ADDRESS_MAP_START( a6809_io , ADDRESS_SPACE_IO, 8)
 ADDRESS_MAP_END
 
 /* Input ports */
-INPUT_PORTS_START( a6809 )
+static INPUT_PORTS_START( a6809 )
 INPUT_PORTS_END
 
 
@@ -62,10 +65,12 @@ SYSTEM_CONFIG_END
 
 /* ROM definition */
 ROM_START( a6809 )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-  ROM_LOAD( "acorn6809.bin", 0x0000, 0x0800, CRC(5fa5b632) SHA1(b14a884bf82a7a8c23bc03c2e112728dd1a74896))
-  ROM_LOAD( "acorn6809.ic11", 0x0000, 0x0100, CRC(7908317d) SHA1(e0f1e5bd3a8598d3b62bc432dd1f3892ed7e66d8))
-
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "acorn6809.bin", 0xf800, 0x0800, CRC(5fa5b632) SHA1(b14a884bf82a7a8c23bc03c2e112728dd1a74896) )
+	/* This looks like some sort of prom */
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "acorn6809.ic11", 0x0000, 0x0100, CRC(7908317d) SHA1(e0f1e5bd3a8598d3b62bc432dd1f3892ed7e66d8) )
+	/* Character generator is missing */
 ROM_END
 
 /* Driver */

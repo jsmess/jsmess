@@ -22,7 +22,7 @@ static ADDRESS_MAP_START(uknc_sub_mem, ADDRESS_SPACE_PROGRAM, 16)
 ADDRESS_MAP_END
 
 /* Input ports */
-INPUT_PORTS_START( uknc )
+static INPUT_PORTS_START( uknc )
 INPUT_PORTS_END
 
 

@@ -35,7 +35,7 @@ static ADDRESS_MAP_START( nanos_io , ADDRESS_SPACE_IO, 8)
 ADDRESS_MAP_END
 
 /* Input ports */
-INPUT_PORTS_START( nanos )
+static INPUT_PORTS_START( nanos )
 INPUT_PORTS_END
 
 

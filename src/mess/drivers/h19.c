@@ -27,7 +27,7 @@ static ADDRESS_MAP_START( h19_io , ADDRESS_SPACE_IO, 8)
 ADDRESS_MAP_END
 
 /* Input ports */
-INPUT_PORTS_START( h19 )
+static INPUT_PORTS_START( h19 )
 INPUT_PORTS_END
 
 
@@ -39,7 +39,7 @@ VIDEO_START( h19 )
 {
 }
 
-VIDEO_UPDATE( h19 )
+static VIDEO_UPDATE( h19 )
 {
 	const device_config *mc6845 = devtag_get_device(screen->machine, "crtc");
 	mc6845_update(mc6845, bitmap, cliprect);
