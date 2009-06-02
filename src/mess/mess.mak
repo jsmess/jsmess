@@ -119,6 +119,7 @@ CPUS += LR35902
 CPUS += TMS7000
 CPUS += SM8500
 CPUS += MINX
+CPUS += SSEM
 
 
 
@@ -299,6 +300,7 @@ DRVLIBS = \
 	$(MESSOBJ)/magnavox.a \
 	$(MESSOBJ)/mbee.a \
 	$(MESSOBJ)/mc10.a \
+	$(MESSOBJ)/mchester.a \
 	$(MESSOBJ)/memotech.a \
 	$(MESSOBJ)/mephisto.a \
 	$(MESSOBJ)/mikro80.a \
@@ -589,6 +591,9 @@ $(MESSOBJ)/mc10.a:	\
 	$(MESS_MACHINE)/mc10.o		\
 	$(MESS_DRIVERS)/mc10.o		\
 
+$(MESSOBJ)/mchester.a:	\
+	$(MESS_DRIVERS)/ssem.o		\
+	
 $(MESSOBJ)/dgn_beta.a:	\
 	$(MESS_MACHINE)/dgn_beta.o	\
 	$(MESS_VIDEO)/dgn_beta.o	\

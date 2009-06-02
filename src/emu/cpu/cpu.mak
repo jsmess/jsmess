@@ -719,6 +719,21 @@ $(CPUOBJ)/mb86233/mb86233.o:	$(CPUSRC)/mb86233/mb86233.c \
 
 
 #-------------------------------------------------
+# Manchester Small-Scale Experimental Machine
+#-------------------------------------------------
+
+ifneq ($(filter SSEM,$(CPUS)),)
+OBJDIRS += $(CPUOBJ)/ssem
+CPUOBJS += $(CPUOBJ)/ssem/ssem.o
+DBGOBJS += $(CPUOBJ)/ssem/ssemdasm.o
+endif
+
+$(CPUOBJ)/ssem/ssem.o:	$(CPUSRC)/ssem/ssem.c \
+			$(CPUSRC)/ssem/ssem.h
+
+
+
+#-------------------------------------------------
 # Microchip PIC16C5x
 #-------------------------------------------------
 
