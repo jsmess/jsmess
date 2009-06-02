@@ -516,8 +516,8 @@ static COM8116_INTERFACE( com8116_intf )
 	DEVCB_NULL,		/* fX/4 output */
 	DEVCB_NULL,		/* fR output */
 	DEVCB_NULL,		/* fT output */
-	{},				/* receiver ROM */
-	{}				/* transmitter ROM */
+	{0},			/* receiver ROM */
+	{0}				/* transmitter ROM */
 };
 
 /* Video */
