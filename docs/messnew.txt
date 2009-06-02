@@ -60,6 +60,7 @@ Skeleton drivers :
 - Chess-Master	
 - DEC VK-100
 - Dunfield 6809 Portable
+- Elektronika MK-85
 - Elektronika MK-90
 - Elwro 800 Junior
 - Epson PX-8

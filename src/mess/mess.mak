@@ -1391,6 +1391,7 @@ $(MESSOBJ)/skeleton.a: \
 	$(MESS_DRIVERS)/mc1000.o \
 	$(MESS_DRIVERS)/vk100.o \
 	$(MESS_DRIVERS)/d6809.o \
+	$(MESS_DRIVERS)/mk85.o \
 	$(MESS_DRIVERS)/mk90.o \
 	$(MESS_DRIVERS)/elwro800.o \
 	$(MESS_DRIVERS)/px8.o \

@@ -11,8 +11,9 @@
 
 static ADDRESS_MAP_START(mk90_mem, ADDRESS_SPACE_PROGRAM, 16)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x7fff ) AM_RAM
-	AM_RANGE( 0x8000, 0xffff ) AM_ROM
+	AM_RANGE( 0x0000, 0x3fff ) AM_RAM // RAM
+	AM_RANGE( 0x4000, 0x7fff ) AM_ROM // Extension ROM
+	AM_RANGE( 0x8000, 0xffff ) AM_ROM // Main ROM
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -35,7 +36,7 @@ static VIDEO_UPDATE( mk90 )
 
 static const struct t11_setup t11_data =
 {
-	0x36ff			/* initial mode word has DAL15,14,11,8 pulled low */
+	1 << 13			/* start from 8000 */
 };
 
 static MACHINE_DRIVER_START( mk90 )
@@ -66,7 +67,11 @@ SYSTEM_CONFIG_END
 /* ROM definition */
 ROM_START( mk90 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "rom.bin", 0x8000, 0x8000, CRC(d8b3a5f5) SHA1(8f7ab2d97c7466392b6354c0ea7017531c2133ae))
+	ROM_SYSTEM_BIOS(0, "bas1", "Basic 1")
+    ROMX_LOAD( "mk90ro10.bin",  0x8000, 0x8000, CRC(fac18038) SHA1(639f09a1be5f781f897603d0f799f7c6efd1b67f), ROM_BIOS(1))
+    ROM_SYSTEM_BIOS(1, "bas2", "Basic 2")
+    ROMX_LOAD( "mk90ro20.bin",  0x8000, 0x8000, CRC(d8b3a5f5) SHA1(8f7ab2d97c7466392b6354c0ea7017531c2133ae), ROM_BIOS(2))
+    ROMX_LOAD( "mk90ro20t.bin", 0x4000, 0x4000, CRC(0f4b9434) SHA1(c74bbde6d201913c9e67ef8e2abe14b784187f8d), ROM_BIOS(2))	// Expansion ROM
 ROM_END
 
 /* Driver */

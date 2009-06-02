@@ -1337,6 +1337,7 @@ const game_driver * const drivers[] =
     DRIVER( mc1000 )
     DRIVER( vk100 )
     DRIVER( d6809 )
+    DRIVER( mk85 )
     DRIVER( mk90 )
     DRIVER( elwro800 )
     DRIVER( fk1 )
