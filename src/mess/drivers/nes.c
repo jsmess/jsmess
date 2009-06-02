@@ -176,7 +176,7 @@ static void ppu_nmi(const device_config *device, int *ppu_regs)
 
 static ppu2c0x_interface nes_ppu_interface =
 {
-	"gfx1",
+	NULL,//"gfx1",
 	0,
 	0,
 	PPU_MIRROR_NONE,
