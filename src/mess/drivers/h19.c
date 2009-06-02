@@ -10,15 +10,20 @@
 #include "cpu/z80/z80.h"
 #include "video/mc6845.h"
 
+UINT8 *video_ram;
+
 static ADDRESS_MAP_START(h19_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0xffff) AM_RAM
+	AM_RANGE(0x2000, 0xf7ff) AM_RAM
+	AM_RANGE(0xf800, 0xffff) AM_RAM AM_BASE(&video_ram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( h19_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x60, 0x60) AM_DEVWRITE("crtc", mc6845_address_w)
+	AM_RANGE(0x61, 0x61) AM_DEVREADWRITE("crtc", mc6845_register_r , mc6845_register_w)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -41,12 +46,36 @@ VIDEO_UPDATE( h19 )
 	return 0;
 }
 
+static MC6845_UPDATE_ROW( h19_update_row )
+{
+	UINT8 *charrom = memory_region(device->machine, "chargen");
+
+	int column, bit;
+
+	for (column = 0; column < x_count; column++)
+	{
+		UINT8 code = video_ram[((ma + column) & 0x7ff)];
+		UINT16 addr = code << 4 | (ra & 0x0f);
+		UINT8 data = charrom[addr & 0x7ff];
+
+		for (bit = 0; bit < 8; bit++)
+		{
+			int x = (column * 8) + bit;
+			int color = BIT(data, 7) ? 1 : 0;
+				
+			*BITMAP_ADDR16(bitmap, y, x) = color;
+
+			data <<= 1;
+		}
+	}
+}
+
 static const mc6845_interface h19_crtc6845_interface =
 {
 	"screen",
 	8 /*?*/,
 	NULL,
-	NULL,
+	h19_update_row,
 	NULL,
 	NULL,
 	NULL,
@@ -83,11 +112,16 @@ SYSTEM_CONFIG_END
 /* ROM definition */
 ROM_START( h19 )
     ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+    // Original
+    ROM_SYSTEM_BIOS(0, "orig", "Original")
+    ROMX_LOAD( "2732_444-46_h19code.bin", 0x0000, 0x1000, CRC(F4447DA0) SHA1(fb4093d5b763be21a9580a0defebed664b1f7a7b), ROM_BIOS(1))
     // Super H19 ROM (
-    ROM_LOAD( "2732_super19_h447.bin", 0x0000, 0x1000, CRC(68FBFF54) SHA1(c0aa7199900709d717b07e43305dfdf36824da9b))
+    ROM_SYSTEM_BIOS(1, "super", "Super 19")
+    ROMX_LOAD( "2732_super19_h447.bin", 0x0000, 0x1000, CRC(68FBFF54) SHA1(c0aa7199900709d717b07e43305dfdf36824da9b), ROM_BIOS(2))
     // Watzman ROM
-    ROM_LOAD( "watzman.bin", 0x0000, 0x1000, CRC(8168b6dc) SHA1(bfaebb9d766edbe545d24bc2b6630be4f3aa0ce9))
-	ROM_REGION( 0x0800, "gfx1", 0 )
+    ROM_SYSTEM_BIOS(2, "watzman", "Watzman")
+	ROMX_LOAD( "watzman.bin", 0x0000, 0x1000, CRC(8168b6dc) SHA1(bfaebb9d766edbe545d24bc2b6630be4f3aa0ce9), ROM_BIOS(3))
+	ROM_REGION( 0x0800, "chargen", 0 )
 	// Original font dump
   	ROM_LOAD( "2716_444-29_h19font.bin", 0x0000, 0x0800, CRC(d595ac1d) SHA1(130fb4ea8754106340c318592eec2d8a0deaf3d0))
   	ROM_REGION( 0x0800, "keyboard", 0 )
