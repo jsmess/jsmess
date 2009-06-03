@@ -56,11 +56,11 @@ struct _com8116_interface
 	/* this gets called for every change of the fT pin (pin 17) */
 	devcb_write_line		out_ft_func;
 
-	/* receiver divisor ROM */
-	UINT32 fr_dividers[16];
+	/* receiver divisor ROM (19-bit) */
+	UINT32 fr_divisors[16];
 
-	/* transmitter divisor ROM */
-	UINT32 ft_dividers[16];
+	/* transmitter divisor ROM (19-bit) */
+	UINT32 ft_divisors[16];
 };
 
 /***************************************************************************

@@ -11,7 +11,10 @@
 
 	TODO:
 
-	- COM8116
+	- Big Board
+	- Big Board II
+	- Xerox 820-II
+	- Xerox 16/8
 	- type in Monitor v1.0 from manual
 	- proper keyboard emulation (MCU?)
 
@@ -142,24 +145,26 @@ static void xerox820_bankswitch(running_machine *machine, int bank)
 	{
 		/* ROM */
 		memory_install_readwrite8_handler(program, 0x0000, 0x0fff, 0, 0, SMH_BANK(1), SMH_UNMAP);
+		memory_install_readwrite8_handler(program, 0x1000, 0x2fff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 	}
 	else
 	{
 		/* RAM */
 		memory_install_readwrite8_handler(program, 0x0000, 0x0fff, 0, 0, SMH_BANK(1), SMH_BANK(1));
+		memory_install_readwrite8_handler(program, 0x1000, 0x2fff, 0, 0, SMH_BANK(2), SMH_BANK(2));
 	}
 
-	memory_install_readwrite8_handler(program, 0x3000, 0x3fff, 0, 0, SMH_BANK(2), SMH_BANK(2));
+	memory_install_readwrite8_handler(program, 0x3000, 0x3fff, 0, 0, SMH_BANK(3), SMH_BANK(3));
 
 	memory_set_bank(machine, 1, bank);
-	memory_set_bank(machine, 2, bank);
+	memory_set_bank(machine, 3, bank);
 }
 
 static WRITE8_HANDLER( scroll_w )
 {
 	xerox820_state *state = space->machine->driver_data;
 
-	state->scroll = data;
+	state->scroll = (offset >> 8) & 0x1f;
 }
 
 /* Memory Maps */
@@ -167,22 +172,21 @@ static WRITE8_HANDLER( scroll_w )
 static ADDRESS_MAP_START( xerox820_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK(1)
-	AM_RANGE(0x1000, 0x2fff) AM_RAM
-	AM_RANGE(0x3000, 0x3fff) AM_RAMBANK(2)
+	AM_RANGE(0x1000, 0x2fff) AM_RAMBANK(2)
+	AM_RANGE(0x3000, 0x3fff) AM_RAMBANK(3)
 	AM_RANGE(0x4000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( xerox820_io, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x03) AM_DEVWRITE(COM8116_TAG, com8116_str_w)
-	AM_RANGE(0x04, 0x04) AM_MIRROR(0x02) AM_DEVREADWRITE(Z80SIO_TAG, z80sio_d_r, z80sio_d_w)
-	AM_RANGE(0x05, 0x05) AM_MIRROR(0x02) AM_DEVREADWRITE(Z80SIO_TAG, z80sio_c_r, z80sio_c_w)
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE(Z80GPPIO_TAG, z80pio_alt_r, z80pio_alt_w)
-	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0x03) AM_DEVWRITE(COM8116_TAG, com8116_stt_w)
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE(WD1771_TAG, wd17xx_r, wd17xx_w)
-	AM_RANGE(0x14, 0x14) AM_MIRROR(0x03) AM_WRITE(scroll_w)
-	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_r, z80ctc_w)
-	AM_RANGE(0x1c, 0x1f) AM_DEVREADWRITE(Z80KBPIO_TAG, z80pio_alt_r, z80pio_alt_w)
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff03) AM_DEVWRITE(COM8116_TAG, com8116_str_w)
+	AM_RANGE(0x04, 0x04) AM_MIRROR(0xff02) AM_DEVREADWRITE(Z80SIO_TAG, z80sio_d_r, z80sio_d_w)
+	AM_RANGE(0x05, 0x05) AM_MIRROR(0xff02) AM_DEVREADWRITE(Z80SIO_TAG, z80sio_c_r, z80sio_c_w)
+	AM_RANGE(0x08, 0x0b) AM_MIRROR(0xff00) AM_DEVREADWRITE(Z80GPPIO_TAG, z80pio_alt_r, z80pio_alt_w)
+	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0xff03) AM_DEVWRITE(COM8116_TAG, com8116_stt_w)
+	AM_RANGE(0x10, 0x13) AM_MIRROR(0xff00) AM_DEVREADWRITE(WD1771_TAG, wd17xx_r, wd17xx_w)
+	AM_RANGE(0x14, 0x14) AM_MIRROR(0xff03) AM_MASK(0xff00) AM_WRITE(scroll_w)
+	AM_RANGE(0x18, 0x1b) AM_MIRROR(0xff00) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_r, z80ctc_w)
+	AM_RANGE(0x1c, 0x1f) AM_MIRROR(0xff00) AM_DEVREADWRITE(Z80KBPIO_TAG, z80pio_alt_r, z80pio_alt_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -503,8 +507,8 @@ static COM8116_INTERFACE( com8116_intf )
 	DEVCB_NULL,		/* fX/4 output */
 	DEVCB_NULL,		/* fR output */
 	DEVCB_NULL,		/* fT output */
-	{0},			/* receiver ROM */
-	{0}				/* transmitter ROM */
+	{ 101376, 67584, 46080, 37686, 33792, 16896, 8448, 4224, 2816, 2534, 2112, 1408, 1056, 704, 528, 264 },			/* receiver divisor ROM */
+	{ 101376, 67584, 46080, 37686, 33792, 16896, 8448, 4224, 2816, 2534, 2112, 1408, 1056, 704, 528, 264 },			/* transmitter divisor ROM */
 };
 
 /* Video */
@@ -576,7 +580,6 @@ static MACHINE_START( xerox820 )
 	state->kbpio = devtag_get_device(machine, Z80KBPIO_TAG);
 	state->z80ctc = devtag_get_device(machine, Z80CTC_TAG);
 	state->wd1771 = devtag_get_device(machine, WD1771_TAG);
-//	state->com8116 = devtag_get_device(machine, COM8116_TAG);
 
 	/* allocate video memory */
 	state->video_ram = auto_alloc_array(machine, UINT8, XEROX820_LCD_VIDEORAM_SIZE);
@@ -585,8 +588,11 @@ static MACHINE_START( xerox820 )
 	memory_configure_bank(machine, 1, 0, 1, memory_region(machine, Z80_TAG), 0);
 	memory_configure_bank(machine, 1, 1, 1, memory_region(machine, "monitor"), 0);
 
-	memory_configure_bank(machine, 2, 0, 1, memory_region(machine, Z80_TAG) + 0x3000, 0);
-	memory_configure_bank(machine, 2, 1, 1, state->video_ram, 0);
+	memory_configure_bank(machine, 2, 0, 1, memory_region(machine, Z80_TAG) + 0x1000, 0);
+	memory_set_bank(machine, 2, 0);
+
+	memory_configure_bank(machine, 3, 0, 1, memory_region(machine, Z80_TAG) + 0x3000, 0);
+	memory_configure_bank(machine, 3, 1, 1, state->video_ram, 0);
 
 	/* bank switch */
 	xerox820_bankswitch(machine, 1);
@@ -707,6 +713,18 @@ static DEVICE_IMAGE_LOAD( xerox820_floppy )
 			state->_8n5 = 1;
 			state->dsdd = 0;
 			return INIT_PASS;
+
+		case 40*1*18*128: // 90K 5.25" SSSD
+			basicdsk_set_geometry(image, 40, 1, 18, 128, 1, 0, FALSE);
+			state->_8n5 = 0;
+			state->dsdd = 0;
+			return INIT_PASS;
+
+		case 40*2*18*128: // 180K 5.25" DSSD
+			basicdsk_set_geometry(image, 40, 2, 18, 128, 1, 0, FALSE);
+			state->_8n5 = 0;
+			state->dsdd = 1;
+			return INIT_PASS;
 		}
 	}
 
@@ -738,14 +756,17 @@ SYSTEM_CONFIG_END
 /*
 static SYSTEM_CONFIG_START( xerox820ii )
 	CONFIG_RAM_DEFAULT	(64 * 1024)
-	CONFIG_DEVICE(xerox820_floppy_getinfo)
+	CONFIG_DEVICE(xerox820ii_floppy_getinfo)
 //	CONFIG_DEVICE(xerox820_harddisk_getinfo) 10MB
 SYSTEM_CONFIG_END
 */
 /* System Drivers */
 
-/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT		INIT	CONFIG		COMPANY		FULLNAME		FLAGS */
-COMP( 1981, xerox820,	0,			0,		xerox820,	xerox820,	0,		xerox820,	"Xerox",	"Xerox 820",	GAME_NOT_WORKING)
+/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT		INIT	CONFIG		COMPANY							FULLNAME		FLAGS */
+COMP( 1981, xerox820,	0,			0,		xerox820,	xerox820,	0,		xerox820,	"Xerox",						"Xerox 820",	0)
 /*
-COMP( 1983, xerox820ii,	xerox820,	0,		xerox820ii,	xerox820,	0,		xerox820ii,	"Xerox",	"Xerox 820-II",	GAME_NOT_WORKING)
+COMP( 1980, bigboard,	0,			0,		bigboard,	bigboard,	0,		bigboard,	"Digital Research Computers",	"Big Board",	GAME_NOT_WORKING)
+COMP( 1983, bigbord2,	0,			0,		bigbord2,	bigboard,	0,		bigbord2,	"Digital Research Computers",	"Big Board II",	GAME_NOT_WORKING)
+COMP( 1983, xerox820ii,	0,			0,		xerox820ii,	xerox820,	0,		xerox820ii,	"Xerox",						"Xerox 820-II",	GAME_NOT_WORKING)
+COMP( 1983, xerox168,	0,			0,		xerox168,	xerox168,	0,		xerox816,	"Xerox",						"Xerox 16/8",	GAME_NOT_WORKING)
 */

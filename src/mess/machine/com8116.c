@@ -7,14 +7,6 @@
 
 *********************************************************************/
 
-/*
-
-	TODO:
-
-	- everything
-
-*/
-
 #include "driver.h"
 #include "com8116.h"
 
@@ -34,6 +26,12 @@ struct _com8116_t
 	devcb_resolved_write_line	out_fx4_func;
 	devcb_resolved_write_line	out_fr_func;
 	devcb_resolved_write_line	out_ft_func;
+
+	UINT32 fr_divisors[16];		/* receiver divisor ROM */
+	UINT32 ft_divisors[16];		/* transmitter divisor ROM */
+
+	int fr;						/* receiver frequency */
+	int ft;						/* transmitter frequency */
 
 	/* timers */
 	emu_timer *fx4_timer;
@@ -70,11 +68,13 @@ INLINE const com8116_interface *get_interface(const device_config *device)
 
 WRITE8_DEVICE_HANDLER( com8116_str_w )
 {
-//	com8116_t *com8116 = get_safe_token(device);
+	com8116_t *com8116 = get_safe_token(device);
 
 	if (LOG) logerror("COM8116 '%s' Receiver Divider %01x\n", device->tag, data & 0x0f);
 
-//	timer_adjust_periodic(com8116->fr_timer, attotime_zero, 0, ATTOTIME_IN_HZ(1));
+	com8116->fr = data & 0x0f;
+
+	timer_adjust_periodic(com8116->fr_timer, attotime_zero, 0, ATTOTIME_IN_HZ(device->clock / com8116->fr_divisors[com8116->fr] / 2));
 }
 
 /*-------------------------------------------------
@@ -83,11 +83,13 @@ WRITE8_DEVICE_HANDLER( com8116_str_w )
 
 WRITE8_DEVICE_HANDLER( com8116_stt_w )
 {
-//	com8116_t *com8116 = get_safe_token(device);
+	com8116_t *com8116 = get_safe_token(device);
 
 	if (LOG) logerror("COM8116 '%s' Transmitter Divider %01x\n", device->tag, data & 0x0f);
 
-//	timer_adjust_periodic(com8116->ft_timer, attotime_zero, 0, ATTOTIME_IN_HZ(1));
+	com8116->ft = data & 0x0f;
+
+	timer_adjust_periodic(com8116->ft_timer, attotime_zero, 0, ATTOTIME_IN_HZ(device->clock / com8116->ft_divisors[com8116->fr] / 2));
 }
 
 /*-------------------------------------------------
@@ -134,11 +136,21 @@ static DEVICE_START( com8116 )
 {
 	com8116_t *com8116 = get_safe_token(device);
 	const com8116_interface *intf = get_interface(device);
+	int i;
 
 	/* resolve callbacks */
 	devcb_resolve_write_line(&com8116->out_fx4_func, &intf->out_fx4_func, device);
 	devcb_resolve_write_line(&com8116->out_fr_func, &intf->out_fr_func, device);
 	devcb_resolve_write_line(&com8116->out_ft_func, &intf->out_ft_func, device);
+
+	for (i = 0; i < 16; i++)
+	{
+		assert(intf->fr_divisors[i] != 0);
+		assert(intf->ft_divisors[i] != 0);
+
+		com8116->fr_divisors[i] = intf->fr_divisors[i];
+		com8116->ft_divisors[i] = intf->ft_divisors[i];
+	}
 
 	/* create the timers */
 	if (com8116->out_fx4_func.target)
@@ -151,7 +163,8 @@ static DEVICE_START( com8116 )
 	com8116->ft_timer = timer_alloc(device->machine, ft_tick, (void *)device);
 
 	/* register for state saving */
-//    state_save_register_global(device->machine, com8116->);
+    state_save_register_global(device->machine, com8116->fr);
+    state_save_register_global(device->machine, com8116->ft);
 }
 
 /*-------------------------------------------------
