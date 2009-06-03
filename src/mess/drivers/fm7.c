@@ -63,6 +63,7 @@ unsigned int key_repeat;
 static UINT16 current_scancode;
 static UINT32 key_data[4];
 static UINT16 vram_offset;
+static UINT8 break_flag;
 
 /* key scancode conversion table
  * The FM-7 expects different scancodes when shift,ctrl or graph is held, or
@@ -260,6 +261,10 @@ READ8_HANDLER( fm7_fd04_r )
 	{
 		ret &= ~0x01;
 		attn_irq = 0;
+	}
+	if(break_flag != 0)
+	{
+		ret &= ~0x02;
 	}
 	return ret;
 }
@@ -524,6 +529,14 @@ static TIMER_CALLBACK( fm7_keyboard_poll )
 	if(modifiers & 0x01)
 		mod = 2;  // ctrl (overrides shift, if also pressed)
 	
+	if(input_port_read(machine,"key3") & 0x40000)
+	{
+		break_flag = 1;
+		cputag_set_input_line(machine,"maincpu",M6809_FIRQ_LINE,ASSERT_LINE);
+	}
+	else
+		break_flag = 0;
+		
 	for(x=0;x<3;x++)
 	{
 		keys = input_port_read(machine,portnames[x]);
@@ -771,6 +784,7 @@ static MACHINE_RESET(fm7)
 	key_delay = 700;  // 700ms on FM-7
 	key_repeat = 70;  // 70ms on FM-7
 	vram_offset = 0x0000;
+	break_flag = 0;
 }
 
 static VIDEO_START( fm7 )
