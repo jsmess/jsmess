@@ -26,6 +26,7 @@ struct _xerox820_state
 	UINT8 *char_rom;					/* character ROM */
 	UINT8 scroll;						/* vertical scroll */
 	int ncset2;							/* national character set */
+	int vatt;							/* X120 video attribute */
 
 	/* floppy state */
 	int fdc_irq;						/* interrupt request */

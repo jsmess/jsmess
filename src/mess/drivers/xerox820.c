@@ -11,10 +11,11 @@
 
 	TODO:
 
-	- Big Board
-	- Big Board II
+	- Big Board (+ Italian version MK-82)
+	- Big Board II (+ Italian version MK-83)
 	- Xerox 820-II
 	- Xerox 16/8
+	- Emerald Microware X120 board
 	- type in Monitor v1.0 from manual
 	- proper keyboard emulation (MCU?)
 
@@ -73,7 +74,7 @@ static const UINT8 xerox820_keycodes[3][9][8] =
 	/* control */
 	{
 	{ 0x9e, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x97 },
-	{ 0x98, 0x99, 0x90, 0x1f, 0x0a, 0x88, 0xff, 0xad },
+	{ 0x98, 0x99, 0x90, 0x1f, 0x9a, 0x88, 0xff, 0xad },
 	{ 0xb7, 0xb8, 0xb9, 0x89, 0x11, 0x17, 0x05, 0x12 },
 	{ 0x14, 0x19, 0x15, 0x09, 0x0f, 0x10, 0x1b, 0x1d },
 	{ 0x9b, 0xab, 0xb4, 0xb5, 0xb6, 0x01, 0x13, 0x04 },
@@ -166,6 +167,26 @@ static WRITE8_HANDLER( scroll_w )
 
 	state->scroll = (offset >> 8) & 0x1f;
 }
+
+#ifdef UNUSED_CODE
+static WRITE8_HANDLER( x120_system_w )
+{
+	/*
+
+		bit		signal		description
+
+		0		DSEL0		drive select bit 0 (01=A, 10=B, 00=C, 11=D)
+		1		DSEL1		drive select bit 1
+		2		SIDE		side select
+		3		VATT		video attribute (0=inverse, 1=blinking)
+		4		BELL		bell trigger
+		5		DENSITY		density (0=double, 1=single)
+		6		_MOTOR		disk motor (0=on, 1=off)
+		7		BANK		memory bank switch (0=RAM, 1=ROM/video)
+
+	*/
+}
+#endif
 
 /* Memory Maps */
 
@@ -603,6 +624,7 @@ static MACHINE_START( xerox820 )
 	state_save_register_global(machine, state->keydata);
 	state_save_register_global(machine, state->scroll);
 	state_save_register_global(machine, state->ncset2);
+	state_save_register_global(machine, state->vatt);
 	state_save_register_global(machine, state->fdc_irq);
 	state_save_register_global(machine, state->fdc_drq);
 	state_save_register_global(machine, state->_8n5);
@@ -768,5 +790,5 @@ COMP( 1981, xerox820,	0,			0,		xerox820,	xerox820,	0,		xerox820,	"Xerox",						"
 COMP( 1980, bigboard,	0,			0,		bigboard,	bigboard,	0,		bigboard,	"Digital Research Computers",	"Big Board",	GAME_NOT_WORKING)
 COMP( 1983, bigbord2,	0,			0,		bigbord2,	bigboard,	0,		bigbord2,	"Digital Research Computers",	"Big Board II",	GAME_NOT_WORKING)
 COMP( 1983, xerox820ii,	0,			0,		xerox820ii,	xerox820,	0,		xerox820ii,	"Xerox",						"Xerox 820-II",	GAME_NOT_WORKING)
-COMP( 1983, xerox168,	0,			0,		xerox168,	xerox168,	0,		xerox816,	"Xerox",						"Xerox 16/8",	GAME_NOT_WORKING)
+COMP( 1983, xerox168,	0,			0,		xerox168,	xerox168,	0,		xerox168,	"Xerox",						"Xerox 16/8",	GAME_NOT_WORKING)
 */
