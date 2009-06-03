@@ -30,6 +30,10 @@
 #include "driver.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/ay8910.h"
+#include "sound/wave.h"
+
+#include "devices/cassette.h"
+#include "formats/fm7_cas.h"
 
 // Interrupt flags
 #define IRQ_FLAG_KEY      0x01
@@ -283,8 +287,10 @@ READ8_HANDLER( fm7_subintf_r )
 WRITE8_HANDLER( fm7_subintf_w )
 {
 	cputag_set_input_line(space->machine,"sub",INPUT_LINE_HALT,(data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
+	sub_busy = data & 0x80;
 	if(data & 0x40)
 		cputag_set_input_line(space->machine,"sub",M6809_IRQ_LINE,ASSERT_LINE);
+	//popmessage("Sub CPU Interface write: %02x\n",data);
 }
 
 READ8_HANDLER( fm7_sub_busyflag_r )
@@ -416,10 +422,13 @@ WRITE8_HANDLER( fm7_vram_offset_w )
 
 READ8_HANDLER( fm7_keyboard_r)
 {
+	UINT8 ret;
 	switch(offset)
 	{
 		case 0:
-			return (current_scancode >> 1) & 0x80;
+			ret = (current_scancode >> 1) & 0x80;
+			ret |= 0x01; // 1 = 2MHz, 0 = 1.2MHz
+			return ret;
 		case 1:
 			return current_scancode & 0xff;
 		default:
@@ -427,9 +436,49 @@ READ8_HANDLER( fm7_keyboard_r)
 	}
 }
 
+READ8_HANDLER( fm7_cassette_printer_r )
+{
+	// bit 7: cassette input
+	// bit 3: printer PE
+	// bit 2: printer acknowledge
+	// bit 1: printer error
+	// bit 0: printer busy
+	UINT8 ret = 0x00;
+	double data = cassette_input(devtag_get_device(space->machine,"cass")); 
+	
+	if(data > 0.03)
+		ret |= 0x80;
+	
+	ret |= 0x40;
+
+	return ret;
+}
+
+WRITE8_HANDLER( fm7_cassette_printer_w )
+{
+	static UINT8 prev;
+	switch(offset)
+	{
+		case 0:
+		// bit 7: printer online
+		// bit 6: printer strobe
+		// bit 1: cassette motor
+		// bit 0: cassette output
+			if((data & 0x01) != (prev & 0x01))
+				cassette_output(devtag_get_device(space->machine,"cass"),(data & 0x01) ? +1.0 : -1.0);
+			if((data & 0x02) != (prev & 0x02))
+				cassette_change_state(devtag_get_device(space->machine, "cass" ),(data & 0x02) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
+			prev = data;
+			break;
+		case 1:
+		// Printer data
+			break;
+	}
+}
+
 static TIMER_CALLBACK( fm7_timer_irq )
 {
-	if(~irq_mask & IRQ_FLAG_TIMER)
+	if(irq_mask & IRQ_FLAG_TIMER)
 	{
 		irq_flags |= IRQ_FLAG_TIMER;
 		cputag_set_input_line(machine,"maincpu",M6809_IRQ_LINE,ASSERT_LINE);
@@ -451,10 +500,10 @@ void key_press(running_machine* machine, UINT16 scancode)
 	if(scancode == 0)
 		return;
 	
-	if(~irq_mask & IRQ_FLAG_KEY)
+	if(irq_mask & IRQ_FLAG_KEY)
 	{
 		irq_flags |= IRQ_FLAG_KEY;
-		cputag_set_input_line(machine,"maincpu",M6809_IRQ_LINE,ASSERT_LINE);
+//		cputag_set_input_line(machine,"maincpu",M6809_IRQ_LINE,ASSERT_LINE);
 	}
 	cputag_set_input_line(machine,"sub",M6809_FIRQ_LINE,ASSERT_LINE);
 	logerror("KEY: sent scancode 0x%03x\n",scancode);
@@ -519,8 +568,8 @@ static ADDRESS_MAP_START( fm7_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfc00,0xfc7f) AM_RAM
 	AM_RANGE(0xfc80,0xfcff) AM_READWRITE(shared_r,shared_w) // shared RAM with sub-CPU
 	// I/O space (FD00-FDFF)
-	AM_RANGE(0xfd00,0xfd01) AM_READ(fm7_keyboard_r)
-	AM_RANGE(0xfd02,0xfd02) AM_WRITE(fm7_irq_mask_w)  // IRQ mask
+	AM_RANGE(0xfd00,0xfd01) AM_READWRITE(fm7_keyboard_r,fm7_cassette_printer_w)
+	AM_RANGE(0xfd02,0xfd02) AM_READWRITE(fm7_cassette_printer_r,fm7_irq_mask_w)  // IRQ mask
 	AM_RANGE(0xfd03,0xfd03) AM_READ(fm7_irq_cause_r)  // IRQ flags
 	AM_RANGE(0xfd04,0xfd04) AM_READ(fm7_fd04_r)
 	AM_RANGE(0xfd05,0xfd05) AM_READWRITE(fm7_subintf_r,fm7_subintf_w)
@@ -781,6 +830,13 @@ static const ay8910_interface fm7_psg_intf =
 	DEVCB_NULL					/* portB write */
 };
 
+static const cassette_config fm7_cassette_config =
+{
+	fm7_cassette_formats,
+	NULL,
+	CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED
+};
+
 static MACHINE_DRIVER_START( fm7 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, XTAL_2MHz)
@@ -795,6 +851,8 @@ static MACHINE_DRIVER_START( fm7 )
 	MDRV_SOUND_ADD("psg", AY8910, 1000000)  // clock speed unknown
 	MDRV_SOUND_CONFIG(fm7_psg_intf)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS,"mono",1.0)
+	MDRV_SOUND_WAVE_ADD("wave","cass")
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.20)
 
 	MDRV_MACHINE_START(fm7)
 	MDRV_MACHINE_RESET(fm7)
@@ -812,6 +870,8 @@ static MACHINE_DRIVER_START( fm7 )
 
 	MDRV_VIDEO_START(fm7)
 	MDRV_VIDEO_UPDATE(fm7)
+	
+	MDRV_CASSETTE_ADD("cass",fm7_cassette_config)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( fm77av )
