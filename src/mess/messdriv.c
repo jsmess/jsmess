@@ -550,7 +550,13 @@ const game_driver * const drivers[] =
     DRIVER( sp3ezcf )   /* 2002 ZX Spectrum +3e ZXCF                */
     DRIVER( sp3eata )   /* 2002 ZX Spectrum +3e ZXATASP             */
     DRIVER( scorpion )
+    DRIVER( profi )
+    DRIVER( kay1024 )
+    DRIVER( quorum )
     DRIVER( pentagon )
+    DRIVER( pent1024 )
+    DRIVER( atm )
+    DRIVER( atm2 )
 
     DRIVER( ql )        /* 1984 Sinclair QL (UK)                            */
     DRIVER( ql_us )     /* 1984 Sinclair QL (USA)                           */

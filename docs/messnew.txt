@@ -73,6 +73,7 @@ Skeleton drivers :
 - Hubler/Everts MC
 - Interact Family Computer
 - IQ-151
+- Kay 1024
 - SC-80
 - LC-80
 - National JR200
@@ -83,6 +84,8 @@ Skeleton drivers :
 - Hector 2HRX
 - Hector 1
 - Jaguar CD
+- MicroArt ATM
+- MicroArt ATM 2 Turbo
 - Nanos
 - NEC PC-6001
 - NEC PC-6001A
@@ -106,7 +109,9 @@ Skeleton drivers :
 - PK8000 Vesta
 - PK8000 Sura/Hobby
 - PK6812c
+- Profi
 - Poly-Computer 880
+- Quorum
 - Robotron A5120
 - Robotron A5130
 - Schachcomputer SC1

@@ -154,6 +154,8 @@ http://www.z88forever.org.uk/zxplus3e/
 #include "sound/speaker.h"
 #include "sound/ay8910.h"
 #include "formats/tzx_cas.h"
+#include "machine/beta.h"
+
 
 static const ay8910_interface spectrum_ay_interface =
 {
@@ -634,6 +636,8 @@ static MACHINE_DRIVER_START( ts2068 )
 	MDRV_CARTSLOT_NOT_MANDATORY
 	MDRV_CARTSLOT_LOAD(timex_cart)
 	MDRV_CARTSLOT_UNLOAD(timex_cart)
+	
+	MDRV_BETA_DISK_REMOVE(BETA_DISK_TAG)
 MACHINE_DRIVER_END
 
 

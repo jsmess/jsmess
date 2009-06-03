@@ -639,6 +639,7 @@ $(MESSOBJ)/sinclair.a: \
 	$(MESS_DRIVERS)/timex.o		\
 	$(MESS_DRIVERS)/specpls3.o		\
 	$(MESS_DRIVERS)/scorpion.o		\
+	$(MESS_DRIVERS)/atm.o		\
 	$(MESS_DRIVERS)/pentagon.o		\
 	$(MESS_MACHINE)/spectrum.o		\
 	$(MESS_MACHINE)/beta.o		\
