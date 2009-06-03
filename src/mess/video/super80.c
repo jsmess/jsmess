@@ -1,6 +1,6 @@
 /* Super80.c written by Robbbert, 2005-2009. See the MESS wiki for documentation. */
 
-/* Notes on using MAME MC6845 device (MMD).
+/* Notes on using MAME MC6845 Device (MMD).
 	1. Speed of MMD is about 20% slower than pre-MMD coding
 	2. Undocumented cursor start and end-lines is not supported by MMD, so we do it here
 	3. MMD doesn't support auto-screen-resize, so we do it here. */
@@ -16,17 +16,9 @@ static UINT16 vidpg=0xfe00;	/* Home position of video page being displayed */
 static UINT8 current_palette;	/* for super80m and super80v */
 static UINT8 current_charset;	/* for super80m */
 
-static UINT8 mc6845_cursor[16];				// cursor shape
-static UINT8 mc6845_reg[20];				/* registers */
-static UINT8 mc6845_ind;				/* register index */
-static const UINT8 mc6845_mask[]={0xff,0xff,0xff,0x0f,0x7f,0x1f,0x7f,0x7f,3,0x1f,0x7f,0x1f,0x3f,0xff,0x3f,0xff,0,0};
-
-static const device_config *mc6845;
+static const UINT8 *FNT;
 static UINT8 chr,col,gfx,fg,bg;
 static UINT16 mem,x;
-static UINT8 framecnt=0;
-static UINT8 speed,flash;
-static UINT16 cursor;
 static UINT8 options;
 
 
@@ -79,26 +71,230 @@ static void palette_set_colors_rgb(running_machine *machine, const UINT8 *colors
 	while (color_count--)
 	{
 		r = *colors++; g = *colors++; b = *colors++;
-		colortable_palette_set_color(machine->colortable, 15 - color_count, MAKE_RGB(r, g, b));
+		palette_set_color(machine, 15-color_count, MAKE_RGB(r, g, b));
 	}
 }
 
 PALETTE_INIT( super80m )
 {
-	int i;
-	machine->colortable = colortable_alloc(machine, 16);
 	palette_set_colors_rgb(machine, super80_rgb_palette);
-
-	for( i = 0; i < 256; i++ )
-	{
-		colortable_entry_set_value(machine->colortable, i*2, i>>4);
-		colortable_entry_set_value(machine->colortable, i*2+1, i&15);
-	}
 }
 
 
-/**************************** VIDEO *****************************************************************/
-/* the following are for super80v */
+
+VIDEO_EOF( super80m )
+{
+	/* if we chose another palette or colour mode, enable it */
+	UINT8 chosen_palette = (input_port_read(machine, "CONFIG") & 0x60)>>5;				// read colour dipswitches
+
+	if (chosen_palette != current_palette)						// any changes?
+	{
+		current_palette = chosen_palette;					// save new palette
+		if (!current_palette)
+			palette_set_colors_rgb(machine, super80_comp_palette);		// composite colour
+		else
+			palette_set_colors_rgb(machine, super80_rgb_palette);		// rgb and b&w
+	}
+}
+
+VIDEO_UPDATE( super80 )
+{
+	UINT8 y,ra,chr=32,gfx,screen_on=0;
+	UINT16 sy=0,ma=vidpg,x;
+	UINT8 *RAM = memory_region(screen->machine, "maincpu");
+
+	if ((super80_mhz == 1) || (!(input_port_read(screen->machine, "CONFIG") & 4)))	/* bit 2 of port F0 is high, OR user turned on config switch */
+		screen_on++;
+
+	for (y = 0; y < 16; y++)
+	{
+		for (ra = 0; ra < 10; ra++)
+		{
+			UINT16  *p = BITMAP_ADDR16(bitmap, sy++, 0);
+
+			for (x = 0; x < 32; x++)	// done this way to avoid x overflowing on page FF
+			{
+				if (screen_on)
+					chr = RAM[ma | x] & 0x3f;
+
+				/* get pattern of pixels for that character scanline */
+				gfx = FNT[(chr<<4) | ((ra & 8) >> 3) | ((ra & 7) << 1)];
+
+				/* Display a scanline of a character (8 pixels) */
+				*p = ( gfx & 0x80 ) ? 1 : 0; p++;
+				*p = ( gfx & 0x40 ) ? 1 : 0; p++;
+				*p = ( gfx & 0x20 ) ? 1 : 0; p++;
+				*p = ( gfx & 0x10 ) ? 1 : 0; p++;
+				*p = ( gfx & 0x08 ) ? 1 : 0; p++;
+				*p = ( gfx & 0x04 ) ? 1 : 0; p++;
+				*p = ( gfx & 0x02 ) ? 1 : 0; p++;
+				*p = ( gfx & 0x01 ) ? 1 : 0; p++;
+			}
+		}
+		ma+=32;
+	}
+	return 0;
+}
+
+VIDEO_UPDATE( super80d )
+{
+	UINT8 y,ra,chr=32,gfx,screen_on=0;
+	UINT16 sy=0,ma=vidpg,x;
+	UINT8 *RAM = memory_region(screen->machine, "maincpu");
+
+	if ((super80_mhz == 1) || (!(input_port_read(screen->machine, "CONFIG") & 4)))	/* bit 2 of port F0 is high, OR user turned on config switch */
+		screen_on++;
+
+	for (y = 0; y < 16; y++)
+	{
+		for (ra = 0; ra < 10; ra++)
+		{
+			UINT16  *p = BITMAP_ADDR16(bitmap, sy++, 0);
+
+			for (x = 0; x < 32; x++)
+			{
+				if (screen_on)
+					chr = RAM[ma | x];
+
+				/* get pattern of pixels for that character scanline */
+				gfx = FNT[((chr & 0x7f)<<4) | ((ra & 8) >> 3) | ((ra & 7) << 1)] ^ ((chr & 0x80) ? 0xff : 0);
+
+				/* Display a scanline of a character (8 pixels) */
+				*p = ( gfx & 0x80 ) ? 1 : 0; p++;
+				*p = ( gfx & 0x40 ) ? 1 : 0; p++;
+				*p = ( gfx & 0x20 ) ? 1 : 0; p++;
+				*p = ( gfx & 0x10 ) ? 1 : 0; p++;
+				*p = ( gfx & 0x08 ) ? 1 : 0; p++;
+				*p = ( gfx & 0x04 ) ? 1 : 0; p++;
+				*p = ( gfx & 0x02 ) ? 1 : 0; p++;
+				*p = ( gfx & 0x01 ) ? 1 : 0; p++;
+			}
+		}
+		ma+=32;
+	}
+	return 0;
+}
+
+VIDEO_UPDATE( super80e )
+{
+	UINT8 y,ra,chr=32,gfx,screen_on=0;
+	UINT16 sy=0,ma=vidpg,x;
+	UINT8 *RAM = memory_region(screen->machine, "maincpu");
+
+	if ((super80_mhz == 1) || (!(input_port_read(screen->machine, "CONFIG") & 4)))	/* bit 2 of port F0 is high, OR user turned on config switch */
+		screen_on++;
+
+	for (y = 0; y < 16; y++)
+	{
+		for (ra = 0; ra < 10; ra++)
+		{
+			UINT16  *p = BITMAP_ADDR16(bitmap, sy++, 0);
+
+			for (x = 0; x < 32; x++)
+			{
+				if (screen_on)
+					chr = RAM[ma | x];
+
+				/* get pattern of pixels for that character scanline */
+				gfx = FNT[(chr<<4) | ((ra & 8) >> 3) | ((ra & 7) << 1)];
+
+				/* Display a scanline of a character (8 pixels) */
+				*p = ( gfx & 0x80 ) ? 1 : 0; p++;
+				*p = ( gfx & 0x40 ) ? 1 : 0; p++;
+				*p = ( gfx & 0x20 ) ? 1 : 0; p++;
+				*p = ( gfx & 0x10 ) ? 1 : 0; p++;
+				*p = ( gfx & 0x08 ) ? 1 : 0; p++;
+				*p = ( gfx & 0x04 ) ? 1 : 0; p++;
+				*p = ( gfx & 0x02 ) ? 1 : 0; p++;
+				*p = ( gfx & 0x01 ) ? 1 : 0; p++;
+			}
+		}
+		ma+=32;
+	}
+	return 0;
+}
+
+VIDEO_UPDATE( super80m )
+{
+	UINT8 y,ra,chr=32,gfx,screen_on=0;
+	UINT16 sy=0,ma=vidpg,x;
+	UINT8 col, bg=0, fg=0, options=input_port_read(screen->machine, "CONFIG");
+	UINT8 *RAM = memory_region(screen->machine, "maincpu");
+
+	/* get selected character generator */
+	UINT8 cgen = current_charset ^ ((options & 0x10)>>4);	/* bit 0 of port F1 and cgen config switch */
+
+	if ((super80_mhz == 1) || (!(options & 4)))	/* bit 2 of port F0 is high, OR user turned on config switch */
+		screen_on++;
+
+	if (screen_on)
+	{
+		if ((options & 0x60) == 0x60)
+			fg = 15;	/* b&w */
+		else
+			fg = 5;		/* green */
+	}
+
+	for (y = 0; y < 16; y++)
+	{
+		for (ra = 0; ra < 10; ra++)
+		{
+			UINT16  *p = BITMAP_ADDR16(bitmap, sy++, 0);
+
+			for (x = 0; x < 32; x++)
+			{
+				if (screen_on)
+					chr = RAM[ma | x];
+
+				if (!(options & 0x40))
+				{
+		 			col = RAM[0xfe00 | ma | x];	/* byte of colour to display */
+					fg = col & 0x0f;
+					bg = (col & 0xf0) >> 4;
+				}
+
+				/* get pattern of pixels for that character scanline */
+				if (cgen)
+					gfx = FNT[(chr<<4) | ((ra & 8) >> 3) | ((ra & 7) << 1)];
+				else
+					gfx = FNT[0x1000 | ((chr & 0x7f)<<4) | ((ra & 8) >> 3) | ((ra & 7) << 1)] ^ ((chr & 0x80) ? 0xff : 0);
+
+				/* Display a scanline of a character (8 pixels) */
+				*p = ( gfx & 0x80 ) ? fg : bg; p++;
+				*p = ( gfx & 0x40 ) ? fg : bg; p++;
+				*p = ( gfx & 0x20 ) ? fg : bg; p++;
+				*p = ( gfx & 0x10 ) ? fg : bg; p++;
+				*p = ( gfx & 0x08 ) ? fg : bg; p++;
+				*p = ( gfx & 0x04 ) ? fg : bg; p++;
+				*p = ( gfx & 0x02 ) ? fg : bg; p++;
+				*p = ( gfx & 0x01 ) ? fg : bg; p++;
+			}
+		}
+		ma+=32;
+	}
+	return 0;
+}
+
+VIDEO_START( super80 )
+{
+	FNT = memory_region(machine, "gfx1");
+}
+
+/*---------------------------------------------------------------
+
+	Super-80R and Super-80V
+
+---------------------------------------------------------------*/
+
+static UINT8 mc6845_cursor[16];				// cursor shape
+static UINT8 mc6845_reg[20];				/* registers */
+static UINT8 mc6845_ind;				/* register index */
+static const UINT8 mc6845_mask[]={0xff,0xff,0xff,0x0f,0x7f,0x1f,0x7f,0x7f,3,0x1f,0x7f,0x1f,0x3f,0xff,0x3f,0xff,0,0};
+static const device_config *mc6845;
+static UINT8 framecnt=0;
+static UINT8 speed,flash;
+static UINT16 cursor;
+
 READ8_HANDLER( super80v_low_r )
 {
 	if (!super80v_vid_col)
@@ -192,93 +388,16 @@ static void mc6845_screen_configure(running_machine *machine)
 		video_screen_set_visarea(machine->primary_screen, 0, width, 0, height);
 }
 
-VIDEO_EOF( super80m )
-{
-	/* if we chose another palette or colour mode, enable it */
-	UINT8 chosen_palette = (input_port_read(machine, "CONFIG") & 0x60)>>5;				// read colour dipswitches
-
-	if (chosen_palette != current_palette)						// any changes?
-	{
-		current_palette = chosen_palette;					// save new palette
-		if (!current_palette)
-			palette_set_colors_rgb(machine, super80_comp_palette);		// composite colour
-		else
-			palette_set_colors_rgb(machine, super80_rgb_palette);		// rgb and b&w
-	}
-}
-
-VIDEO_UPDATE( super80 )
-{
-	UINT8 x, y, code=32, screen_on=0;
-	UINT8 mask = screen->machine->gfx[0]->total_elements - 1;	/* 0x3F for super80; 0xFF for super80d & super80e */
-	UINT8 *RAM = memory_region(screen->machine, "maincpu");
-
-	if ((super80_mhz == 1) || (!(input_port_read(screen->machine, "CONFIG") & 4)))	/* bit 2 of port F0 is high, OR user turned on config switch */
-		screen_on++;
-
-	/* display the picture */
-	for (y=0; y<16; y++)
-	{
-		for (x=0; x<32; x++)
-		{
-			if (screen_on)
-				code = RAM[vidpg | x | (y<<5)];		/* get character to display */
-
-			drawgfx(bitmap, screen->machine->gfx[0], code & mask, 0, 0, 0, x*8, y*10, cliprect, TRANSPARENCY_NONE, 0);
-		}
-	}
-
-	return 0;
-}
-
-VIDEO_UPDATE( super80m )
-{
-	UINT8 x, y, code=32, col=0, screen_on=0, options=input_port_read(screen->machine, "CONFIG");
-	UINT8 *RAM = memory_region(screen->machine, "maincpu");
-
-	/* get selected character generator */
-	UINT8 cgen = current_charset ^ ((options & 0x10)>>4);	/* bit 0 of port F1 and cgen config switch */
-
-	if ((super80_mhz == 1) || (!(options & 4)))	/* bit 2 of port F0 is high, OR user turned on config switch */
-		screen_on++;
-
-	if (screen_on)
-	{
-		if ((options & 0x60) == 0x60)
-			col = 15;		/* b&w */
-		else
-			col = 5;		/* green */
-	}
-
-	/* display the picture */
-	for (y=0; y<16; y++)
-	{
-		for (x=0; x<32; x++)
-		{
-			if (screen_on)
-			{
-				code = RAM[vidpg | x | (y<<5)];		/* get character to display */
-
-				if (!(options & 0x40)) col = RAM[0xfe00 | x | (y<<5)];	/* byte of colour to display */
-			}
-
-			drawgfx(bitmap, screen->machine->gfx[cgen], code, col, 0, 0, x*8, y*10,	cliprect, TRANSPARENCY_NONE, 0);
-		}
-	}
-
-	return 0;
-}
-
-
 VIDEO_START( super80v )
 {
 	mc6845 = devtag_get_device(machine, "crtc");
+	FNT = memory_region(machine, "gfx1");
 }
 
 VIDEO_UPDATE( super80v )
 {
 	framecnt++;
-	speed = mc6845_reg[10]&0x20, flash = mc6845_reg[10]&0x40;				// cursor modes
+	speed = mc6845_reg[10]&0x20, flash = mc6845_reg[10]&0x40, bg=0;			// cursor modes
 	cursor = (mc6845_reg[14]<<8) | mc6845_reg[15];					// get cursor position
 	options=input_port_read(screen->machine, "CONFIG");
 	mc6845_update(mc6845, bitmap, cliprect);
@@ -297,9 +416,15 @@ MC6845_UPDATE_ROW( super80v_update_row )
 		chr = videoram[mem];
 
 		/* get colour or b&w */
-		col = 5;					/* green */
-		if ((options & 0x60) == 0x60) col = 15;		/* b&w */
-		if (!(options & 0x40)) col = colorram[mem];			// read a byte of colour
+		fg = 5;						/* green */
+		if ((options & 0x60) == 0x60) fg = 15;		/* b&w */
+
+		if (!(options & 0x40))
+		{
+ 			col = colorram[mem];					/* byte of colour to display */
+			fg = col & 0x0f;
+			bg = (col & 0xf0) >> 4;
+		}
 
 		/* if inverse mode, replace any pcgram chrs with inverse chrs */
 		if ((!super80v_rom_pcg) && (chr & 0x80))			// is it a high chr in inverse mode
@@ -317,8 +442,6 @@ MC6845_UPDATE_ROW( super80v_update_row )
 
 		/* get pattern of pixels for that character scanline */
 		gfx = pcgram[(chr<<4) | ra] ^ inv;
-		fg = ((col & 0x0f) << 1) + 1;
-		bg = ((col & 0xf0) >> 3) + 1;
 
 		/* Display a scanline of a character (7 pixels) */
 		*p = ( gfx & 0x80 ) ? fg : bg; p++;
@@ -335,7 +458,8 @@ MC6845_UPDATE_ROW( super80v_update_row )
 
 WRITE8_HANDLER( super80v_10_w )
 {
-	if (data < 18) mc6845_ind = data; else mc6845_ind = 19;		/* make sure if you try using an invalid register your write will go nowhere */
+	data &= 0x1f;
+	mc6845_ind = data;
 	mc6845_address_w( mc6845, 0, data );
 }
 

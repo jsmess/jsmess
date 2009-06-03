@@ -550,67 +550,6 @@ static INPUT_PORTS_START( super80r )
 	PORT_CONFSETTING(    0x40, "Green")
 INPUT_PORTS_END
 
-/**************************** GRAPHICS DECODE *****************************************************************/
-
-static const gfx_layout super80_charlayout =
-{
-	8,10,					/* 8 x 10 characters */
-	64,					/* 64 characters */
-	1,						/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes; 1 bit per pixel */
-	/* x offsets */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	/* y offsets */
-	{  0*8,  2*8,  4*8,  6*8,  8*8, 10*8, 12*8, 14*8,
-	   1*8,  3*8,  5*8,  7*8,  9*8, 11*8, 13*8, 15*8 },
-	8*16					/* every char takes 16 bytes */
-};
-
-static const gfx_layout super80d_charlayout =
-{
-	8,10,					/* 8 x 10 characters */
-	256,					/* 256 characters */
-	1,						/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes; 1 bit per pixel */
-	/* x offsets */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	/* y offsets */
-	{  0*8,  2*8,  4*8,  6*8,  8*8, 10*8, 12*8, 14*8,
-	   1*8,  3*8,  5*8,  7*8,  9*8, 11*8, 13*8, 15*8 },
-	8*16					/* every char takes 16 bytes */
-};
-
-/* for documentation only - not needed by video update */
-static const gfx_layout super80v_charlayout =
-{
-	8,16,					/* 8 x 16 characters */
-	257,					/* 256 characters + cursor character */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes; 1 bit per pixel */
-	/* x offsets */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	/* y offsets triple height: use each line three times */
-	{  0*8,  1*8,  2*8,  3*8,  4*8,  5*8,  6*8,  7*8,
-	   8*8,  9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	   8*16					/* every char takes 16 bytes */
-};
-
-static GFXDECODE_START( super80 )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, super80_charlayout, 0, 1 )
-GFXDECODE_END
-
-static GFXDECODE_START( super80d )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, super80d_charlayout, 0, 1 )
-GFXDECODE_END
-
-static GFXDECODE_START( super80m )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, super80d_charlayout, 0, 256 )
-	GFXDECODE_ENTRY( "gfx2", 0x0000, super80d_charlayout, 0, 256 )
-GFXDECODE_END
-
-static GFXDECODE_START( super80v )
-	GFXDECODE_ENTRY( "maincpu", 0xf000, super80v_charlayout, 0, 256 )
-GFXDECODE_END
 
 /**************************** BASIC MACHINE CONSTRUCTION ***********************************************************/
 
@@ -705,7 +644,6 @@ static MACHINE_DRIVER_START( super80 )
 
 	MDRV_Z80PIO_ADD( "z80pio", super80_pio_intf )
 
-	MDRV_GFXDECODE(super80)
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(48.8)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -713,6 +651,7 @@ static MACHINE_DRIVER_START( super80 )
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(black_and_white)
 
+	MDRV_VIDEO_START(super80)
 	MDRV_VIDEO_UPDATE(super80)
 
 	/* sound hardware */
@@ -737,7 +676,12 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( super80d )
 	MDRV_IMPORT_FROM(super80)
-	MDRV_GFXDECODE(super80d)
+	MDRV_VIDEO_UPDATE(super80d)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( super80e )
+	MDRV_IMPORT_FROM(super80)
+	MDRV_VIDEO_UPDATE(super80e)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( super80m )
@@ -745,8 +689,7 @@ static MACHINE_DRIVER_START( super80m )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(super80m_map)
 
-	MDRV_GFXDECODE(super80m)
-	MDRV_PALETTE_LENGTH(256*2)
+	MDRV_PALETTE_LENGTH(16)
 	MDRV_PALETTE_INIT(super80m)
 	MDRV_VIDEO_EOF(super80m)
 	MDRV_VIDEO_UPDATE(super80m)
@@ -763,13 +706,12 @@ static MACHINE_DRIVER_START( super80v )
 
 	MDRV_Z80PIO_ADD( "z80pio", super80_pio_intf )
 
-	MDRV_GFXDECODE(super80v)
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(SUPER80V_SCREEN_WIDTH, SUPER80V_SCREEN_HEIGHT)
 	MDRV_SCREEN_VISIBLE_AREA(0, SUPER80V_SCREEN_WIDTH-1, 0, SUPER80V_SCREEN_HEIGHT-1)
-	MDRV_PALETTE_LENGTH(256*2)
+	MDRV_PALETTE_LENGTH(16)
 	MDRV_PALETTE_INIT(super80m)
 
 	MDRV_MC6845_ADD("crtc", MC6845, MASTER_CLOCK / SUPER80V_DOTS, super80v_crtc)
@@ -817,14 +759,6 @@ static DRIVER_INIT( super80 )
 	driver_init_common(machine);
 }
 
-static DRIVER_INIT( super80d )
-{
-	UINT8 *RAM = memory_region(machine, "gfx1");
-	UINT16 i;	/* create inverse characters */
-	for (i = 0x0800; i < 0x1000; i++) RAM[i] = ~RAM[i];
-	DRIVER_INIT_CALL( super80 );
-}
-
 static DRIVER_INIT( super80v )
 {
 	pcgram = memory_region(machine, "maincpu")+0xf000;
@@ -843,7 +777,7 @@ ROM_START( super80 )
 	ROM_LOAD("super80.u42",   0xe000, 0x1000, CRC(a1c6cb75) SHA1(d644ca3b399c1a8902f365c6095e0bbdcea6733b) )
 	ROM_FILL( 0xf000, 0x1000, 0xff)	/* This makes the screen show the FF character when O F1 F0 entered */
 
-	ROM_REGION(0x0400, "gfx1", ROMREGION_DISPOSE)
+	ROM_REGION(0x0400, "gfx1", 0)	// 2513 prom
 	ROM_LOAD("super80.u27",   0x0000, 0x0400, CRC(d1e4b3c6) SHA1(3667b97c6136da4761937958f281609690af4081) )
 ROM_END
 
@@ -859,9 +793,8 @@ ROM_START( super80d )
 	ROM_LOAD("super80.u42",	  0xe000, 0x1000, CRC(a1c6cb75) SHA1(d644ca3b399c1a8902f365c6095e0bbdcea6733b) )
 	ROM_FILL( 0xf000, 0x1000, 0xff)
 
-	ROM_REGION(0x1000, "gfx1", ROMREGION_DISPOSE)
+	ROM_REGION(0x0800, "gfx1", 0)	// 2716 eprom
 	ROM_LOAD("super80d.u27",  0x0000, 0x0800, CRC(cb4c81e2) SHA1(8096f21c914fa76df5d23f74b1f7f83bd8645783) )
-	ROM_RELOAD(               0x0800, 0x0800 )
 ROM_END
 
 ROM_START( super80e )
@@ -871,7 +804,7 @@ ROM_START( super80e )
 	ROM_LOAD("super80.u42",	  0xe000, 0x1000, CRC(a1c6cb75) SHA1(d644ca3b399c1a8902f365c6095e0bbdcea6733b) )
 	ROM_FILL( 0xf000, 0x1000, 0xff)
 
-	ROM_REGION(0x1000, "gfx1", ROMREGION_DISPOSE)
+	ROM_REGION(0x1000, "gfx1", 0)	// 2732 eprom
 	ROM_LOAD("super80e.u27",  0x0000, 0x1000, CRC(ebe763a7) SHA1(ffaa6d6a2c5dacc5a6651514e6707175a32e83e8) )
 ROM_END
 
@@ -880,13 +813,24 @@ ROM_START( super80m )
 	ROM_LOAD("s80-8r0.u26",	  0xc000, 0x1000, CRC(48d410d8) SHA1(750d984abc013a3344628300288f6d1ba140a95f) )
 	ROM_LOAD("s80-8r0.u33",   0xd000, 0x1000, CRC(9765793e) SHA1(4951b127888c1f3153004cc9fb386099b408f52c) )
 	ROM_LOAD("s80-8r0.u42",   0xe000, 0x1000, CRC(5f65d94b) SHA1(fe26b54dec14e1c4911d996c9ebd084a38dcb691) )
-
-	ROM_REGION(0x1000, "gfx1", ROMREGION_DISPOSE)
-	ROM_LOAD("super80d.u27",  0x0000, 0x0800, CRC(cb4c81e2) SHA1(8096f21c914fa76df5d23f74b1f7f83bd8645783) )
-	ROM_RELOAD(               0x0800, 0x0800 )
-
-	ROM_REGION(0x1000, "gfx2", ROMREGION_DISPOSE)
+#if 0
+	/* Temporary patch to fix crash when lprinting a tab */
+	ROM_FILL(0xcc44,1,0x46)
+	ROM_FILL(0xcc45,1,0xc5)
+	ROM_FILL(0xcc46,1,0x06)
+	ROM_FILL(0xcc47,1,0x20)
+	ROM_FILL(0xcc48,1,0xcd)
+	ROM_FILL(0xcc49,1,0xc7)
+	ROM_FILL(0xcc4a,1,0xcb)
+	ROM_FILL(0xcc4b,1,0xc1)
+	ROM_FILL(0xcc4c,1,0x10)
+	ROM_FILL(0xcc4d,1,0xf7)
+	ROM_FILL(0xcc4e,1,0x00)
+	ROM_FILL(0xcc4f,1,0x00)
+#endif
+	ROM_REGION(0x1800, "gfx1", 0)
 	ROM_LOAD("super80e.u27",  0x0000, 0x1000, CRC(ebe763a7) SHA1(ffaa6d6a2c5dacc5a6651514e6707175a32e83e8) )
+	ROM_LOAD("super80d.u27",  0x1000, 0x0800, CRC(cb4c81e2) SHA1(8096f21c914fa76df5d23f74b1f7f83bd8645783) )
 ROM_END
 
 ROM_START( super80r )
@@ -911,8 +855,8 @@ ROM_END
 
 /*    YEAR  NAME      PARENT COMPAT MACHINE INPUT     INIT       CONFIG   COMPANY       FULLNAME */
 COMP( 1981, super80,  0,       0, super80,  super80,  super80,  0, "Dick Smith Electronics","Super-80 (V1.2)" , 0)
-COMP( 1981, super80d, super80, 0, super80d, super80d, super80d, 0, "Dick Smith Electronics","Super-80 (V2.2)" , 0)
-COMP( 1981, super80e, super80, 0, super80d, super80d, super80,  0, "Dick Smith Electronics","Super-80 (El Graphix 4)" , 0)
-COMP( 1981, super80m, super80, 0, super80m, super80m, super80d, 0, "Dick Smith Electronics","Super-80 (8R0)" , 0)
+COMP( 1981, super80d, super80, 0, super80d, super80d, super80,  0, "Dick Smith Electronics","Super-80 (V2.2)" , 0)
+COMP( 1981, super80e, super80, 0, super80e, super80d, super80,  0, "Dick Smith Electronics","Super-80 (El Graphix 4)" , 0)
+COMP( 1981, super80m, super80, 0, super80m, super80m, super80,  0, "Dick Smith Electronics","Super-80 (8R0)" , 0)
 COMP( 1981, super80r, super80, 0, super80r, super80r, super80v, 0, "Dick Smith Electronics","Super-80 (with VDUEB)" , 0)
 COMP( 1981, super80v, super80, 0, super80v, super80v, super80v, 0, "Dick Smith Electronics","Super-80 (with enhanced VDUEB)" , 0)
