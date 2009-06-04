@@ -4,6 +4,7 @@
 	GRIP-1/2/3 (Grafik-Interface-Prozessor)
 
 	http://www.prof80.de/
+	http://oldcomputers.dyndns.org/public/pub/rechner/conitec/info.html
 
 */
 
@@ -11,6 +12,7 @@
 
 	TODO:
 
+	- Z80 STI
 	- everything
 
 */
@@ -25,7 +27,7 @@
 #include "machine/upd1990a.h"
 #include "machine/ctronics.h"
 
-/* Read/Write Handlers */
+/* PROF-80 */
 
 static void prof80_bankswitch(running_machine *machine)
 {
@@ -245,9 +247,67 @@ static WRITE8_HANDLER( mmu_w )
 	prof80_bankswitch(space->machine);
 }
 
+/* GRIP */
+
 static WRITE8_HANDLER( page_w )
 {
 	memory_set_bank(space->machine, 17, BIT(data, 7));
+}
+
+static READ8_HANDLER( grip_status_r )
+{
+	/*
+
+		bit		signal		description
+
+		0		LPA0
+		1		LPA1
+		2		LPA2
+		3		SENSE
+		4		JS0
+		5		JS1
+		6		_ERROR
+		7		LPS
+
+	*/
+
+	prof80_state *state = space->machine->driver_data;
+
+	return (state->lps << 7) | (centronics_fault_r(state->centronics) << 6);
+}
+
+static READ8_HANDLER( lrs_r )
+{
+	prof80_state *state = space->machine->driver_data;
+
+	state->lps = 0;
+
+	return 0;
+}
+
+static WRITE8_HANDLER( lrs_w )
+{
+	prof80_state *state = space->machine->driver_data;
+
+	state->lps = 0;
+}
+
+static READ8_HANDLER( stb_r )
+{
+	prof80_state *state = space->machine->driver_data;
+
+	centronics_strobe_w(state->centronics, 0);
+	centronics_strobe_w(state->centronics, 1);
+
+	return 0;
+}
+
+static WRITE8_HANDLER( stb_w )
+{
+	prof80_state *state = space->machine->driver_data;
+
+	centronics_strobe_w(state->centronics, 0);
+	centronics_strobe_w(state->centronics, 1);
 }
 
 /* Memory Maps */
@@ -287,7 +347,7 @@ static ADDRESS_MAP_START( grip_mem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( grip_io, ADDRESS_SPACE_IO, 8 )
-//	AM_RANGE(0x00, 0x00) AM_READWRITE(stb_r, stb_w)
+	AM_RANGE(0x00, 0x00) AM_READWRITE(stb_r, stb_w)
 //	AM_RANGE(0x10, 0x10) AM_WRITE(cc3_w)
 //	AM_RANGE(0x11, 0x11) AM_WRITE(vol0_w)
 //	AM_RANGE(0x12, 0x12) AM_WRITE(rts_w)
@@ -297,8 +357,8 @@ static ADDRESS_MAP_START( grip_io, ADDRESS_SPACE_IO, 8 )
 //	AM_RANGE(0x16, 0x16) AM_WRITE(flash_w)
 //	AM_RANGE(0x17, 0x17) AM_WRITE(vol1_w)
 //	AM_RANGE(0x20, 0x2f) AM_DEVREADWRITE(Z80STI_TAG, z80sti_r, z80sti_w)
-//	AM_RANGE(0x30, 0x30) AM_READWRITE(lrs_r, lrs_w)
-//	AM_RANGE(0x40, 0x40) AM_READ(status_r)
+	AM_RANGE(0x30, 0x30) AM_READWRITE(lrs_r, lrs_w)
+	AM_RANGE(0x40, 0x40) AM_READ(grip_status_r)
 	AM_RANGE(0x50, 0x50) AM_DEVWRITE(MC6845_TAG, mc6845_address_w)
 	AM_RANGE(0x52, 0x52) AM_DEVWRITE(MC6845_TAG, mc6845_register_w)
 	AM_RANGE(0x53, 0x53) AM_DEVREAD(MC6845_TAG, mc6845_register_r)
@@ -404,6 +464,7 @@ static MACHINE_START( prof80 )
 	state->nec765 = devtag_get_device(machine, NEC765_TAG);
 	state->upd1990a = devtag_get_device(machine, UPD1990A_TAG);
 	state->mc6845 = devtag_get_device(machine, MC6845_TAG);
+	state->centronics = devtag_get_device(machine, "centronics");
 
 	/* initialize RTC */
 	upd1990a_cs_w(state->upd1990a, 1);

@@ -23,6 +23,7 @@ struct _prof80_state
 	/* video state */
 	UINT8 *video_ram;		/* video RAM */
 	int vsync;				/* vertical sync */
+	int lps;				/* light pen sense */
 
 	/* clock state */
 	int rtc_data;			/* RTC data output */
@@ -34,6 +35,7 @@ struct _prof80_state
 	const device_config *nec765;
 	const device_config *upd1990a;
 	const device_config *mc6845;
+	const device_config *centronics;
 };
 
 #endif
