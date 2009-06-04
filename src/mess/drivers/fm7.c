@@ -64,6 +64,7 @@ static UINT16 current_scancode;
 static UINT32 key_data[4];
 static UINT16 vram_offset;
 static UINT8 break_flag;
+static UINT8 fm7_pal[8];
 
 /* key scancode conversion table
  * The FM-7 expects different scancodes when shift,ctrl or graph is held, or
@@ -481,6 +482,26 @@ WRITE8_HANDLER( fm7_cassette_printer_w )
 	}
 }
 
+static READ8_HANDLER( fm7_palette_r)
+{
+	return fm7_pal[offset];
+}
+
+static WRITE8_HANDLER( fm7_palette_w )
+{
+	UINT8 r = 0,g = 0,b = 0;
+	
+	if(data & 0x04)
+		g = 0xff;
+	if(data & 0x02)
+		r = 0xff;
+	if(data & 0x01)
+		b = 0xff;
+		
+	palette_set_color(space->machine,offset,MAKE_RGB(r,g,b));
+	fm7_pal[offset] = data & 0x07;
+}
+
 static TIMER_CALLBACK( fm7_timer_irq )
 {
 	if(irq_mask & IRQ_FLAG_TIMER)
@@ -592,6 +613,7 @@ static ADDRESS_MAP_START( fm7_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfd0f,0xfd0f) AM_READWRITE(fm7_rom_en_r,fm7_rom_en_w)
 	AM_RANGE(0xfd18,0xfd1f) AM_READWRITE(fm7_fdc_r,fm7_fdc_w)
 	AM_RANGE(0xfd24,0xfd2b) AM_RAM
+	AM_RANGE(0xfd38,0xfd3f) AM_READWRITE(fm7_palette_r,fm7_palette_w)
 	// Boot ROM
 	AM_RANGE(0xfe00,0xffdf) AM_ROM AM_REGION("basic",0x0000)
 	AM_RANGE(0xffe0,0xffef) AM_RAM
@@ -817,7 +839,7 @@ static VIDEO_UPDATE( fm7 )
 	return 0;
 }
 
-static const rgb_t fm7_palette[8] = {
+static const rgb_t fm7_initial_palette[8] = {
 	MAKE_RGB(0x00, 0x00, 0x00), // 0
 	MAKE_RGB(0x00, 0x00, 0xff), // 1
 	MAKE_RGB(0x00, 0xff, 0x00), // 2
@@ -830,7 +852,11 @@ static const rgb_t fm7_palette[8] = {
 
 PALETTE_INIT( fm7 )
 {
-	palette_set_colors(machine, 0, fm7_palette, ARRAY_LENGTH(fm7_palette));
+	int x;
+	
+	palette_set_colors(machine, 0, fm7_initial_palette, ARRAY_LENGTH(fm7_initial_palette));
+	for(x=0;x<8;x++)
+		fm7_pal[x] = x;
 }
 
 
