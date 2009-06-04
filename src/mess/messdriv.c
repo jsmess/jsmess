@@ -1391,5 +1391,8 @@ const game_driver * const drivers[] =
     DRIVER( vec1200)
     DRIVER( pk6128c)
 	DRIVER( prof80 )
+    DRIVER( tvc64 )
+    DRIVER( tvc64p )
+    DRIVER( tvc64pru )
 
 #endif /* DRIVER_RECURSIVE */

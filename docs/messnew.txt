@@ -145,6 +145,7 @@ Skeleton drivers :
 - UKNC
 - VCS-80
 - Visual 1050
+- Videotone TVC64,TVC64+,TVC64+ russian
 - Vector 1200
 - V-Tech Socrates 
 - XOR-100-12
