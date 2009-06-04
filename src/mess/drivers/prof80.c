@@ -11,7 +11,7 @@
 
 	TODO:
 
-	- GRIP video RAM banking
+	- everything
 
 */
 
@@ -240,12 +240,14 @@ static WRITE8_HANDLER( mmu_w )
 
 	state->mmu[bank] = data & 0x0f;
 
+	logerror("MMU bank %u block %u\n", bank, data & 0x0f);
+
 	prof80_bankswitch(space->machine);
 }
 
 static WRITE8_HANDLER( page_w )
 {
-//	memory_set_bank(space->machine, 17, BIT(data, 7));
+	memory_set_bank(space->machine, 17, BIT(data, 7));
 }
 
 /* Memory Maps */
@@ -301,7 +303,7 @@ static ADDRESS_MAP_START( grip_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x52, 0x52) AM_DEVWRITE(MC6845_TAG, mc6845_register_w)
 	AM_RANGE(0x53, 0x53) AM_DEVREAD(MC6845_TAG, mc6845_register_r)
 	AM_RANGE(0x60, 0x60) AM_DEVWRITE("centronics", centronics_data_w)
-	AM_RANGE(0x70, 0x73) AM_DEVREADWRITE("ppi8255", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x70, 0x73) AM_DEVREADWRITE(PPI8255_TAG, ppi8255_r, ppi8255_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -421,8 +423,8 @@ static MACHINE_START( prof80 )
 	}
 
 	/* setup GRIP memory banking */
-//	memory_configure_bank(machine, 17, 0, 2, state->video_ram, 0x8000);
-//	memory_set_bank(machine, 17, 0);
+	memory_configure_bank(machine, 17, 0, 2, state->video_ram, 0x8000);
+	memory_set_bank(machine, 17, 0);
 
 	/* bank switch */
 	prof80_bankswitch(machine);
@@ -456,7 +458,11 @@ static MACHINE_DRIVER_START( prof80 )
     MDRV_CPU_ADD(Z80_TAG, Z80, XTAL_6MHz)
     MDRV_CPU_PROGRAM_MAP(prof80_mem)
     MDRV_CPU_IO_MAP(prof80_io)
- 
+
+    MDRV_CPU_ADD("grip", Z80, XTAL_16MHz/4)
+    MDRV_CPU_PROGRAM_MAP(grip_mem)
+    MDRV_CPU_IO_MAP(grip_io)
+
 	MDRV_MACHINE_START(prof80)
 	MDRV_MACHINE_RESET(prof80)
 
@@ -490,14 +496,12 @@ ROM_START( prof80 )
 	ROM_DEFAULT_BIOS( "v17" )
 	
 	ROM_SYSTEM_BIOS( 0, "v15", "v1.5" )
-	ROMX_LOAD( "prof80v15.z7", 0xf0000, 0x00800, CRC(8f74134c) SHA1(83f9dcdbbe1a2f50006b41d406364f4d580daa1f), ROM_BIOS(1) )
+	ROMX_LOAD( "prof80v15.z7", 0xf0000, 0x02000, CRC(8f74134c) SHA1(83f9dcdbbe1a2f50006b41d406364f4d580daa1f), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "v16", "v1.6" )
-	ROMX_LOAD( "prof80v16.z7", 0xf0000, 0x00800, CRC(7d3927b3) SHA1(bcc15fd04dbf1d6640115be595255c7b9d2a7281), ROM_BIOS(2) )
+	ROMX_LOAD( "prof80v16.z7", 0xf0000, 0x02000, CRC(7d3927b3) SHA1(bcc15fd04dbf1d6640115be595255c7b9d2a7281), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 2, "v17", "v1.7" )
-	ROMX_LOAD( "prof80v17.z7", 0xf0000, 0x00800, CRC(53305ff4) SHA1(3ea209093ac5ac8a5db618a47d75b705965cdf44), ROM_BIOS(3) )
+	ROMX_LOAD( "prof80v17.z7", 0xf0000, 0x02000, CRC(53305ff4) SHA1(3ea209093ac5ac8a5db618a47d75b705965cdf44), ROM_BIOS(3) )
 
-	ROM_COPY( Z80_TAG, 0xf0000, 0xf0800, 0x00800 )
-	ROM_COPY( Z80_TAG, 0xf0000, 0xf1000, 0x01000 )
 	ROM_COPY( Z80_TAG, 0xf0000, 0xf2000, 0x02000 )
 	ROM_COPY( Z80_TAG, 0xf0000, 0xf4000, 0x04000 )
 	ROM_COPY( Z80_TAG, 0xf0000, 0xf8000, 0x08000 ) // block 15
@@ -506,7 +510,9 @@ ROM_START( prof80 )
 	ROM_COPY( Z80_TAG, 0xf0000, 0x60000, 0x10000 ) // block 6
 
 	ROM_REGION( 0x10000, "grip", 0 )
-	ROM_LOAD( "grip.z2", 0x0000, 0x4000, NO_DUMP )
+	ROM_LOAD( "grip21.z2", 0x0000, 0x4000, CRC(7f6a37dd) SHA1(2e89f0b0c378257ff7e41c50d57d90865c6e214b) )
+	ROM_LOAD( "grip26.z2", 0x0000, 0x4000, CRC(a1c424f0) SHA1(83942bc75b9475f044f936b8d9d7540551d87db9) )
+	ROM_LOAD( "grip31.z2", 0x0000, 0x4000, CRC(e0e4e8ab) SHA1(73d3d14c9b06fed0c187fb0fffe5ec035d8dd256) )
 ROM_END
 
 /* System Configurations */
