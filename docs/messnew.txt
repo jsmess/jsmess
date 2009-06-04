@@ -112,6 +112,7 @@ Skeleton drivers :
 - PK8000 Sura/Hobby
 - PK6812c
 - Profi
+- PROF-80
 - Poly-Computer 880
 - Quorum
 - Robotron A5120

@@ -1390,5 +1390,6 @@ const game_driver * const drivers[] =
     DRIVER( unior)
     DRIVER( vec1200)
     DRIVER( pk6128c)
+	DRIVER( prof80 )
 
 #endif /* DRIVER_RECURSIVE */

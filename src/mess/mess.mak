@@ -1433,6 +1433,7 @@ $(MESSOBJ)/skeleton.a: \
 	$(MESS_DRIVERS)/x07.o \
 	$(MESS_DRIVERS)/pk8000.o \
 	$(MESS_DRIVERS)/unior.o \
+	$(MESS_DRIVERS)/prof80.o \
 	
 #-------------------------------------------------
 # layout dependencies
