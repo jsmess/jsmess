@@ -1,3 +1,6 @@
+#include "video/mc6845.h"
+#include "machine/z80pio.h"
+
 /*----- super80 ----------*/
 
 
@@ -23,6 +26,20 @@ VIDEO_UPDATE( super80v );
 MC6845_UPDATE_ROW( super80v_update_row );
 
 extern UINT8 *pcgram;
-extern UINT8 super80v_vid_col;
-extern UINT8 super80v_rom_pcg;
-extern UINT8 super80_mhz;
+
+/*------- machine -------*/
+
+READ8_HANDLER( super80_dc_r );
+READ8_HANDLER( super80_f2_r );
+WRITE8_HANDLER( super80_dc_w );
+WRITE8_HANDLER( super80_f0_w );
+WRITE8_HANDLER( super80r_f0_w );
+READ8_DEVICE_HANDLER( super80_pio_r );
+WRITE8_DEVICE_HANDLER( super80_pio_w );
+MACHINE_RESET( super80 );
+DRIVER_INIT( super80 );
+DRIVER_INIT( super80v );
+
+extern UINT8 super80_shared;
+extern const z80pio_interface super80_pio_intf;
+

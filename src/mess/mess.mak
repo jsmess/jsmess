@@ -872,6 +872,7 @@ $(MESSOBJ)/vtech.a :   \
 
 $(MESSOBJ)/super80.a :   \
 	$(MESS_DRIVERS)/super80.o	\
+	$(MESS_MACHINE)/super80.o	\
 	$(MESS_VIDEO)/super80.o
 
 $(MESSOBJ)/jupiter.a : \
