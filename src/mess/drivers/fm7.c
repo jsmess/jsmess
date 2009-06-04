@@ -66,6 +66,7 @@ static UINT16 vram_offset;
 static UINT8 break_flag;
 static UINT8 fm7_pal[8];
 static UINT8 fm7_psg_regsel;
+static UINT8 psg_data;
 
 /* key scancode conversion table
  * The FM-7 expects different scancodes when shift,ctrl or graph is held, or
@@ -488,6 +489,29 @@ static WRITE8_HANDLER( fm7_palette_w )
 	palette_set_color(space->machine,offset,MAKE_RGB(r,g,b));
 	fm7_pal[offset] = data & 0x07;
 }
+static void fm7_update_psg(running_machine* machine)
+{
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+
+	switch(fm7_psg_regsel)
+	{
+		case 0x00:
+			// High impedance
+			break;
+		case 0x01:
+			// Data read
+			psg_data = ay8910_r(devtag_get_device(space->machine,"psg"),0);
+			break;
+		case 0x02:
+			// Data write
+			ay8910_data_w(devtag_get_device(space->machine,"psg"),0,psg_data);
+			break;
+		case 0x03:
+			// Address latch
+			ay8910_address_w(devtag_get_device(space->machine,"psg"),0,psg_data);
+			break;
+	}
+}
 
 static READ8_HANDLER( fm7_psg_select_r )
 {
@@ -496,57 +520,24 @@ static READ8_HANDLER( fm7_psg_select_r )
 
 static WRITE8_HANDLER( fm7_psg_select_w )
 {
-	static UINT8 prev;
 	/* 
 	 * bit 0 = BC1
 	 * bit 1 = BDIR
-	 * 
-	 * function is selected when both bits are set to 0
 	 */
-	if((data & 0x03) == 0x00)
-		fm7_psg_regsel = prev & 0x03;
-	prev = data;
+	fm7_psg_regsel = data & 0x03;
+	fm7_update_psg(space->machine);
 }
 
 static READ8_HANDLER( fm7_psg_data_r )
 {
-	switch(fm7_psg_regsel)
-	{
-		case 0x00:
-			// High impedance
-			return 0xff;
-		case 0x01:
-			// Data read
-			return ay8910_r(devtag_get_device(space->machine,"psg"),0);
-		case 0x02:
-			// Data write
-		case 0x03:
-			// Address latch
-			logerror("PSG: Read from data register when Data Read is not selected\n");
-	}
-	return 0xff;
+	fm7_update_psg(space->machine);
+	return psg_data;
 }
 
 static WRITE8_HANDLER( fm7_psg_data_w )
 {
-	switch(fm7_psg_regsel)
-	{
-		case 0x00:
-			// High impedance
-			break;
-		case 0x01:
-			// Data read
-			logerror("PSG: Read from data register when Data Read is not selected\n");
-			break;
-		case 0x02:
-			// Data write
-			ay8910_data_w(devtag_get_device(space->machine,"psg"),0,data);
-			break;
-		case 0x03:
-			// Address latch
-			ay8910_address_w(devtag_get_device(space->machine,"psg"),0,data);
-			break;
-	}
+	psg_data = data;
+	fm7_update_psg(space->machine);
 }
 
 static TIMER_CALLBACK( fm7_timer_irq )
