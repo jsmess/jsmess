@@ -65,6 +65,7 @@ static UINT32 key_data[4];
 static UINT16 vram_offset;
 static UINT8 break_flag;
 static UINT8 fm7_pal[8];
+static UINT8 fm7_psg_regsel;
 
 /* key scancode conversion table
  * The FM-7 expects different scancodes when shift,ctrl or graph is held, or
@@ -214,20 +215,6 @@ READ8_HANDLER( fm7_irq_cause_r )
 	irq_flags = 0;  // clear flags
 	logerror("IRQ flags read: 0x%02x\n",ret);
 	return ret;
-}
-
-READ8_HANDLER( mainmem_r )
-{
-	UINT8* RAM = memory_region(space->machine,"maincpu");
-
-	return RAM[offset];
-}
-
-WRITE8_HANDLER( mainmem_w )
-{
-	UINT8* RAM = memory_region(space->machine,"maincpu");
-
-	RAM[offset] = data;
 }
 
 READ8_HANDLER( vector_r )
@@ -502,6 +489,66 @@ static WRITE8_HANDLER( fm7_palette_w )
 	fm7_pal[offset] = data & 0x07;
 }
 
+static READ8_HANDLER( fm7_psg_select_r )
+{
+	return 0xff;
+}
+
+static WRITE8_HANDLER( fm7_psg_select_w )
+{
+	static UINT8 prev;
+	/* 
+	 * bit 0 = BC1
+	 * bit 1 = BDIR
+	 * 
+	 * function is selected when both bits are set to 0
+	 */
+	if((data & 0x03) == 0x00)
+		fm7_psg_regsel = prev & 0x03;
+	prev = data;
+}
+
+static READ8_HANDLER( fm7_psg_data_r )
+{
+	switch(fm7_psg_regsel)
+	{
+		case 0x00:
+			// High impedance
+			return 0xff;
+		case 0x01:
+			// Data read
+			return ay8910_r(devtag_get_device(space->machine,"psg"),0);
+		case 0x02:
+			// Data write
+		case 0x03:
+			// Address latch
+			logerror("PSG: Read from data register when Data Read is not selected\n");
+	}
+	return 0xff;
+}
+
+static WRITE8_HANDLER( fm7_psg_data_w )
+{
+	switch(fm7_psg_regsel)
+	{
+		case 0x00:
+			// High impedance
+			break;
+		case 0x01:
+			// Data read
+			logerror("PSG: Read from data register when Data Read is not selected\n");
+			break;
+		case 0x02:
+			// Data write
+			ay8910_data_w(devtag_get_device(space->machine,"psg"),0,data);
+			break;
+		case 0x03:
+			// Address latch
+			ay8910_address_w(devtag_get_device(space->machine,"psg"),0,data);
+			break;
+	}
+}
+
 static TIMER_CALLBACK( fm7_timer_irq )
 {
 	if(irq_mask & IRQ_FLAG_TIMER)
@@ -597,7 +644,7 @@ static IRQ_CALLBACK(fm7_sub_irq_ack)
 */
 // The FM-7 has only 64kB RAM, so we'll worry about banking when we do the later models
 static ADDRESS_MAP_START( fm7_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000,0x7fff) AM_READWRITE(mainmem_r,mainmem_w)
+	AM_RANGE(0x0000,0x7fff) AM_RAM 
 	AM_RANGE(0x8000,0xfbff) AM_RAMBANK(1) // also F-BASIC ROM, when enabled
 	AM_RANGE(0xfc00,0xfc7f) AM_RAM
 	AM_RANGE(0xfc80,0xfcff) AM_READWRITE(shared_r,shared_w) // shared RAM with sub-CPU
@@ -608,8 +655,8 @@ static ADDRESS_MAP_START( fm7_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfd04,0xfd04) AM_READ(fm7_fd04_r)
 	AM_RANGE(0xfd05,0xfd05) AM_READWRITE(fm7_subintf_r,fm7_subintf_w)
 	AM_RANGE(0xfd07,0xfd07) AM_RAM
-	AM_RANGE(0xfd0d,0xfd0d) AM_DEVWRITE("psg",ay8910_address_w)
-	AM_RANGE(0xfd0e,0xfd0e) AM_DEVREADWRITE("psg",ay8910_r,ay8910_data_w)
+	AM_RANGE(0xfd0d,0xfd0d) AM_READWRITE(fm7_psg_select_r,fm7_psg_select_w)
+	AM_RANGE(0xfd0e,0xfd0e) AM_READWRITE(fm7_psg_data_r, fm7_psg_data_w)
 	AM_RANGE(0xfd0f,0xfd0f) AM_READWRITE(fm7_rom_en_r,fm7_rom_en_w)
 	AM_RANGE(0xfd18,0xfd1f) AM_READWRITE(fm7_fdc_r,fm7_fdc_w)
 	AM_RANGE(0xfd24,0xfd2b) AM_RAM
@@ -807,6 +854,7 @@ static MACHINE_RESET(fm7)
 	key_repeat = 70;  // 70ms on FM-7
 	vram_offset = 0x0000;
 	break_flag = 0;
+	fm7_psg_regsel = 0;
 }
 
 static VIDEO_START( fm7 )
