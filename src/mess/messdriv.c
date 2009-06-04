@@ -700,9 +700,11 @@ const game_driver * const drivers[] =
 
     /* VEB MIKROELEKTRONIK */
     /* KC compact is partial CPC compatible */
-    DRIVER( kc85_4 )    /* VEB KC 85/4                                      */
+    DRIVER( kc85_2 )    /* VEB KC 85/2                                      */
     DRIVER( kc85_3 )    /* VEB KC 85/3                                      */
+    DRIVER( kc85_4 )    /* VEB KC 85/4                                      */    
     DRIVER( kc85_4d )   /* VEB KC 85/4 with disk interface                  */
+    DRIVER( kc85_5 )    /* VEB KC 85/5                                      */
     DRIVER( mc8020 )    /* MC 80.2x                                         */
     DRIVER( mc8030 )    /* MC 80.3x                                         */
 

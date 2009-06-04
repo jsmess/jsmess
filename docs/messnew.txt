@@ -74,6 +74,8 @@ Skeleton drivers :
 - Interact Family Computer
 - IQ-151
 - Kay 1024
+- KC 85/2
+- KC 85/5
 - SC-80
 - LC-80
 - National JR200
