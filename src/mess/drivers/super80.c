@@ -10,6 +10,7 @@
 #include "devices/z80bin.h"
 #include "sound/speaker.h"
 #include "machine/ctronics.h"
+#include "super80.lh"
 #include "super80.h"
 
 UINT8 *pcgram;
@@ -396,6 +397,7 @@ static MACHINE_DRIVER_START( super80 )
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(black_and_white)
 
+	MDRV_DEFAULT_LAYOUT( layout_super80 )
 	MDRV_VIDEO_START(super80)
 	MDRV_VIDEO_UPDATE(super80)
 
@@ -461,6 +463,7 @@ static MACHINE_DRIVER_START( super80v )
 
 	MDRV_MC6845_ADD("crtc", MC6845, MASTER_CLOCK / SUPER80V_DOTS, super80v_crtc)
 
+	MDRV_DEFAULT_LAYOUT( layout_super80 )
 	MDRV_VIDEO_START(super80v)
 	MDRV_VIDEO_EOF(super80m)
 	MDRV_VIDEO_UPDATE(super80v)

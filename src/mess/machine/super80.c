@@ -204,7 +204,7 @@ WRITE8_HANDLER( super80_f0_w )
 	super80_shared = data;
 	speaker_level_w(super80_speaker, (data & 8) ? 0 : 1);				/* bit 3 - speaker */
 	if (bits & 2) super80_cassette_motor(space->machine, data & 2 ? 1 : 0);	/* bit 1 - cassette motor */
-	if (bits & 1) cassette_output(super80_cassette, (data & 1) ? -1.0 : +1.0);	/* bit 0 - cass out */
+	cassette_output(super80_cassette, (data & 1) ? -1.0 : +1.0);	/* bit 0 - cass out */
 
 	last_data = data;
 }

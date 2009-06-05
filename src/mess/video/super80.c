@@ -102,6 +102,8 @@ VIDEO_UPDATE( super80 )
 	UINT16 sy=0,ma=vidpg,x;
 	UINT8 *RAM = memory_region(screen->machine, "maincpu");
 
+	output_set_value("cass_led",(super80_shared & 0x20) ? 1 : 0);
+
 	if ((super80_shared & 4) || (!(input_port_read(screen->machine, "CONFIG") & 4)))	/* bit 2 of port F0 is high, OR user turned on config switch */
 		screen_on++;
 
@@ -141,6 +143,8 @@ VIDEO_UPDATE( super80d )
 	UINT16 sy=0,ma=vidpg,x;
 	UINT8 *RAM = memory_region(screen->machine, "maincpu");
 
+	output_set_value("cass_led",(super80_shared & 0x20) ? 1 : 0);
+
 	if ((super80_shared & 4) || (!(input_port_read(screen->machine, "CONFIG") & 4)))	/* bit 2 of port F0 is high, OR user turned on config switch */
 		screen_on++;
 
@@ -179,6 +183,8 @@ VIDEO_UPDATE( super80e )
 	UINT8 y,ra,chr=32,gfx,screen_on=0;
 	UINT16 sy=0,ma=vidpg,x;
 	UINT8 *RAM = memory_region(screen->machine, "maincpu");
+
+	output_set_value("cass_led",(super80_shared & 0x20) ? 1 : 0);
 
 	if ((super80_shared & 4) || (!(input_port_read(screen->machine, "CONFIG") & 4)))	/* bit 2 of port F0 is high, OR user turned on config switch */
 		screen_on++;
@@ -222,6 +228,8 @@ VIDEO_UPDATE( super80m )
 
 	/* get selected character generator */
 	UINT8 cgen = current_charset ^ ((options & 0x10)>>4);	/* bit 0 of port F1 and cgen config switch */
+
+	output_set_value("cass_led",(super80_shared & 0x20) ? 1 : 0);
 
 	if ((super80_shared & 4) || (!(options & 4)))	/* bit 2 of port F0 is high, OR user turned on config switch */
 		screen_on++;
@@ -399,6 +407,7 @@ VIDEO_UPDATE( super80v )
 	speed = mc6845_reg[10]&0x20, flash = mc6845_reg[10]&0x40, bg=0;			// cursor modes
 	cursor = (mc6845_reg[14]<<8) | mc6845_reg[15];					// get cursor position
 	options=input_port_read(screen->machine, "CONFIG");
+	output_set_value("cass_led",(super80_shared & 0x20) ? 1 : 0);
 	mc6845_update(mc6845, bitmap, cliprect);
 	return 0;
 }
