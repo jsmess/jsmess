@@ -374,8 +374,7 @@ DRVLIBS = \
 	$(MESSOBJ)/xerox.a \
 	$(MESSOBJ)/z80ne.a \
 	$(MESSOBJ)/shared.a \
-
-#	$(MESSOBJ)/snk.a \
+	$(MESSOBJ)/snk.a \
 
 
 
@@ -1469,6 +1468,7 @@ $(MESS_VIDEO)/pc8401a.o:	$(MESS_LAYOUT)/pc8500.lh
 $(MESS_DRIVERS)/pokemini.o:	$(MESS_LAYOUT)/pokemini.lh
 $(MESS_DRIVERS)/px4.o:		$(MESS_LAYOUT)/px4.lh
 $(MESS_DRIVERS)/socrates.o:	$(MESS_LAYOUT)/socrates.lh
+$(MESS_DRIVERS)/super80.o:	$(MESS_LAYOUT)/super80.lh
 $(MESS_DRIVERS)/svi318.o:	$(MESS_LAYOUT)/sv328806.lh
 $(MESS_DRIVERS)/svision.o:	$(MESS_LAYOUT)/svision.lh
 $(MESS_DRIVERS)/sym1.o:		$(MESS_LAYOUT)/sym1.lh

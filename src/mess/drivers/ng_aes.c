@@ -85,7 +85,7 @@ static UINT8 el_value;
  *
  *************************************/
 
-static void calendar_clock(void);
+//static void calendar_clock(void);
 
 
 
@@ -193,10 +193,12 @@ static TIMER_CALLBACK( display_position_vblank_callback )
 
 static TIMER_CALLBACK( vblank_interrupt_callback )
 {
+	const device_config *upd4990a = devtag_get_device(machine, "upd4990a");
+
 	if (LOG_VIDEO_SYSTEM) logerror("+++ VBLANK @ %d,%d\n", video_screen_get_vpos(machine->primary_screen), video_screen_get_hpos(machine->primary_screen));
 
 	/* add a timer tick to the pd4990a */
-	calendar_clock();
+	upd4990a_addretrace(upd4990a);
 
 	vblank_interrupt_pending = 1;
 
@@ -302,12 +304,14 @@ cpu #0 (PC=00C18C40): unmapped memory word write to 00380000 = 0000 & 00FF
 
 static WRITE16_HANDLER( io_control_w )
 {
+	const device_config *upd4990a = devtag_get_device(space->machine, "upd4990a");
+
 	switch (offset)
 	{
 	case 0x00: select_controller(data & 0x00ff); break;
-	case 0x18: logerror("AES has written to output_latch: %d\n", data & 0x00ff); break;	// LED-related in MVS. unused in AES?
-	case 0x20: logerror("AES has written to output_data: %d\n", data & 0x00ff); break;	// LED-related in MVS. unused in AES?
-	case 0x28: pd4990a_control_16_w(space, 0, data, mem_mask); break;
+//	case 0x18: set_output_latch(space->machine, data & 0x00ff); break;
+//	case 0x20: set_output_data(data & 0x00ff); break;
+	case 0x28: upd4990a_control_16_w(upd4990a, 0, data, mem_mask); break;
 //  case 0x30: break; // coin counters
 //  case 0x31: break; // coin counters
 //  case 0x32: break; // coin lockout
@@ -355,7 +359,7 @@ READ16_HANDLER( neogeo_unmapped_r )
  *  uPD4990A calendar chip
  *
  *************************************/
-
+#if 0
 static void calendar_init(running_machine *machine)
 {
 	/* set the celander IC to 'right now' */
@@ -377,14 +381,14 @@ static void calendar_init(running_machine *machine)
 
 static void calendar_clock(void)
 {
-	pd4990a_addretrace();
+//	pd4990a_addretrace();
 }
-
+#endif
 
 static CUSTOM_INPUT( get_calendar_status )
 {
-	const address_space *space = cputag_get_address_space(field->port->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	return (pd4990a_databit_r(space, 0) << 1) | pd4990a_testbit_r(space, 0);
+	const device_config *upd4990a = devtag_get_device(field->port->machine, "upd4990a");
+	return (upd4990a_databit_r(upd4990a, 0) << 1) | upd4990a_testbit_r(upd4990a, 0);
 }
 
 
@@ -849,7 +853,7 @@ static MACHINE_START( neogeo )
 	create_interrupt_timers(machine);
 
 	/* initialize the celander IC to 'right now' */
-	calendar_init(machine);
+//	calendar_init(machine);
 
 	/* initialize the memcard data structure */
 	memcard_data = auto_alloc_array_clear(machine, UINT8, MEMCARD_SIZE);
@@ -1268,6 +1272,9 @@ static MACHINE_DRIVER_START( neogeo )
 	MDRV_SOUND_ROUTE(0, "rspeaker", 0.60)
 	MDRV_SOUND_ROUTE(1, "lspeaker",  1.0)
 	MDRV_SOUND_ROUTE(2, "rspeaker", 1.0)
+
+	/* NEC uPD4990A RTC */
+	MDRV_UPD4990A_ADD("upd4990a")
 
 //	MDRV_AES_CARTRIDGE_ADD("aes_multicart")
 MACHINE_DRIVER_END
