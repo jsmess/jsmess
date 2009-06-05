@@ -24,6 +24,7 @@ struct _prof80_state
 	UINT8 *video_ram;		/* video RAM */
 	int vsync;				/* vertical sync */
 	int lps;				/* light pen sense */
+	int page;				/* video page */
 
 	/* clock state */
 	int rtc_data;			/* RTC data output */
@@ -31,10 +32,15 @@ struct _prof80_state
 	/* floppy state */
 	int	fdc_index;			/* floppy index hole sensor */
 
+	/* ECB bus state */
+	UINT8 ecb_data;			/* ECB bus data */
+	UINT8 ecb_status;		/* ECB bus status */
+
 	/* devices */
 	const device_config *nec765;
 	const device_config *upd1990a;
 	const device_config *mc6845;
+	const device_config *ppi8255;
 	const device_config *centronics;
 };
 

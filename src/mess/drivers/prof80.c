@@ -1,7 +1,7 @@
 /*
 
 	PROF-80 (Prozessor RAM-Floppy Kontroller)
-	GRIP-1/2/3 (Grafik-Interface-Prozessor)
+	GRIP-1/2/3/5 (Grafik-Interface-Prozessor)
 
 	http://www.prof80.de/
 	http://oldcomputers.dyndns.org/public/pub/rechner/conitec/info.html
@@ -13,8 +13,11 @@
 	TODO:
 
 	- Z80 STI
-	- everything
-
+	- PROF-GRIP communications
+	- UNIO card (Z80-STI, Z80-SIO, 2x centronics)
+	- GRIP-COLOR (192kB color RAM)
+	- GRIP 1/2/3/5 selection
+	
 */
 
 #include "driver.h"
@@ -227,11 +230,19 @@ static READ8_HANDLER( fdc_status_r )
 
 static WRITE8_HANDLER( fdc_w )
 {
+	prof80_state *state = space->machine->driver_data;
+
+	nec765_data_w(state->nec765, 0, data);
 }
 
 static READ8_HANDLER( fdc_r )
 {
-	return 0;
+	prof80_state *state = space->machine->driver_data;
+
+	UINT8 data = nec765_data_r(state->nec765, 0);
+	data = nec765_status_r(state->nec765, 0); // TODO how to choose which read?
+
+	return data;
 }
 
 static WRITE8_HANDLER( mmu_w )
@@ -251,7 +262,11 @@ static WRITE8_HANDLER( mmu_w )
 
 static WRITE8_HANDLER( page_w )
 {
-	memory_set_bank(space->machine, 17, BIT(data, 7));
+	prof80_state *state = space->machine->driver_data;
+
+	state->page = BIT(data, 7);
+
+	memory_set_bank(space->machine, 17, state->page);
 }
 
 static READ8_HANDLER( grip_status_r )
@@ -310,6 +325,33 @@ static WRITE8_HANDLER( stb_w )
 	centronics_strobe_w(state->centronics, 1);
 }
 
+static READ8_HANDLER( gripc_r )
+{
+	prof80_state *state = space->machine->driver_data;
+
+	return state->ecb_status;
+}
+
+static READ8_HANDLER( gripd_r )
+{
+	prof80_state *state = space->machine->driver_data;
+
+	/* trigger GRIP 8255 port C */
+	ppi8255_set_port_c(state->ppi8255, 0x44);
+
+	return state->ecb_data;
+}
+
+static WRITE8_HANDLER( gripd_w )
+{
+	prof80_state *state = space->machine->driver_data;
+
+	state->ecb_data = data;
+
+	/* trigger GRIP 8255 port C */
+	ppi8255_set_port_c(state->ppi8255, 0x14);
+}
+
 /* Memory Maps */
 
 static ADDRESS_MAP_START( prof80_mem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -332,6 +374,14 @@ static ADDRESS_MAP_START( prof80_mem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( prof80_io, ADDRESS_SPACE_IO, 8 )
+//	AM_RANGE(0x80, 0x8f) AM_MIRROR(0xff00) AM_DEVREADWRITE(Z80STI_TAG, z80sti_r, z80sti_w)
+//	AM_RANGE(0x94, 0x95) AM_MIRROR(0xff00) AM_DEVREADWRITE(Z80SIO_TAG, z80sio_d_r, z80sio_d_w)
+//	AM_RANGE(0x96, 0x97) AM_MIRROR(0xff00) AM_DEVREADWRITE(Z80SIO_TAG, z80sio_c_r, z80sio_c_w)
+//	AM_RANGE(0x9e, 0x9e) AM_MIRROR(0xff00) AM_WRITE(unio_w) (4=_STB1, 6=_STB2, 8=INIT)
+//	AM_RANGE(0x9c, 0x9c) AM_MIRROR(0xff00) AM_DEVWRITE("centronics1", centronics_data_w)
+//	AM_RANGE(0x9d, 0x9d) AM_MIRROR(0xff00) AM_DEVWRITE("centronics2", centronics_data_w)
+	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0xff00) AM_READ(gripc_r)
+	AM_RANGE(0xc1, 0xc1) AM_MIRROR(0xff00) AM_READWRITE(gripd_r, gripd_w)
 	AM_RANGE(0xd8, 0xd8) AM_MIRROR(0xff00) AM_WRITE(flr_w)
 	AM_RANGE(0xda, 0xda) AM_MIRROR(0xff00) AM_READ(status_r)
 	AM_RANGE(0xdb, 0xdb) AM_MIRROR(0xff00) AM_READ(status2_r)
@@ -347,6 +397,7 @@ static ADDRESS_MAP_START( grip_mem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( grip_io, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(stb_r, stb_w)
 //	AM_RANGE(0x10, 0x10) AM_WRITE(cc3_w)
 //	AM_RANGE(0x11, 0x11) AM_WRITE(vol0_w)
@@ -375,6 +426,21 @@ INPUT_PORTS_END
 
 static MC6845_UPDATE_ROW( grip_update_row )
 {
+	prof80_state *state = device->machine->driver_data;
+	int column, bit;
+
+	for (column = 0; column < x_count; column++)
+	{
+		UINT16 address = (state->page << 12) | ((ma + column) << 3) | (ra & 0x07);
+		UINT8 data = state->video_ram[address];
+
+		for (bit = 0; bit < 8; bit++)
+		{
+			int x = (column * 8) + bit;
+			*BITMAP_ADDR16(bitmap, y, x) = BIT(data, 7);
+			data <<= 1;
+		}
+	}
 }
 
 static MC6845_ON_VSYNC_CHANGED( grip_vsync_changed )
@@ -443,14 +509,120 @@ static const struct nec765_interface prof80_nec765_interface =
 
 /* PPI8255 Interface */
 
+static READ8_DEVICE_HANDLER( grip_ppi8255_a_r )
+{
+	/*
+
+        bit		description
+
+        PA0     ECB bus
+        PA1     ECB bus
+        PA2     ECB bus
+        PA3     ECB bus
+        PA4     ECB bus
+        PA5     ECB bus
+        PA6     ECB bus
+        PA7     ECB bus
+    
+	*/
+
+	prof80_state *state = device->machine->driver_data;
+
+	return state->ecb_data;
+}
+
+static WRITE8_DEVICE_HANDLER( grip_ppi8255_a_w )
+{
+	/*
+
+        bit		description
+
+        PA0     ECB bus
+        PA1     ECB bus
+        PA2     ECB bus
+        PA3     ECB bus
+        PA4     ECB bus
+        PA5     ECB bus
+        PA6     ECB bus
+        PA7     ECB bus
+    
+	*/
+
+	prof80_state *state = device->machine->driver_data;
+
+	state->ecb_data = data;
+}
+
+static READ8_DEVICE_HANDLER( grip_ppi8255_b_r )
+{
+	/*
+
+        bit		description
+
+        PB0     Keyboard input
+        PB1     Keyboard input
+        PB2     Keyboard input
+        PB3     Keyboard input
+        PB4     Keyboard input
+        PB5     Keyboard input
+        PB6     Keyboard input
+        PB7     Keyboard input
+    
+	*/
+
+	return 0;
+}
+
+static READ8_DEVICE_HANDLER( grip_ppi8255_c_r )
+{
+	/*
+
+        bit		signal		description
+
+        PC0     STI I4
+        PC1     KBF
+        PC2     _KBSTB
+        PC3     STI I7
+        PC4					1 when PROF-80 reads port 0xc0
+        PC5     PA6
+        PC6					1 when PROF-80 writes port 0xc0
+        PC7     PA7
+    
+	*/
+
+	return 0x04;
+}
+
+static WRITE8_DEVICE_HANDLER( grip_ppi8255_c_w )
+{
+	/*
+
+        bit		signal		description
+
+        PC0     STI I4
+        PC1     KBF
+        PC2     _KBSTB
+        PC3     STI I7
+        PC4					1 when PROF-80 reads port 0xc0
+        PC5     PA6
+        PC6					1 when PROF-80 writes port 0xc0
+        PC7     PA7
+    
+	*/
+
+	prof80_state *state = device->machine->driver_data;
+
+	state->ecb_status = (BIT(data, 7) << 7) | (BIT(data, 5) << 6);
+}
+
 static const ppi8255_interface grip_ppi8255_interface =
 {
-	DEVCB_NULL,	// Port A read
-	DEVCB_NULL,	// Port B read
-	DEVCB_NULL,	// Port C read
-	DEVCB_NULL,	// Port A write
-	DEVCB_NULL,	// Port B write
-	DEVCB_NULL,	// Port C write
+	DEVCB_HANDLER(grip_ppi8255_a_r),	// Port A read
+	DEVCB_HANDLER(grip_ppi8255_b_r),	// Port B read
+	DEVCB_HANDLER(grip_ppi8255_c_r),	// Port C read
+	DEVCB_HANDLER(grip_ppi8255_a_w),	// Port A write
+	DEVCB_NULL,							// Port B write
+	DEVCB_HANDLER(grip_ppi8255_c_w)		// Port C write
 };
 
 /* Machine Initialization */
@@ -464,6 +636,7 @@ static MACHINE_START( prof80 )
 	state->nec765 = devtag_get_device(machine, NEC765_TAG);
 	state->upd1990a = devtag_get_device(machine, UPD1990A_TAG);
 	state->mc6845 = devtag_get_device(machine, MC6845_TAG);
+	state->ppi8255 = devtag_get_device(machine, PPI8255_TAG);
 	state->centronics = devtag_get_device(machine, "centronics");
 
 	/* initialize RTC */
@@ -535,6 +708,7 @@ static MACHINE_DRIVER_START( prof80 )
     MDRV_SCREEN_SIZE(640, 480)
     MDRV_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
     MDRV_PALETTE_LENGTH(2)
+    MDRV_PALETTE_INIT(black_and_white)
  
     MDRV_VIDEO_START(prof80)
     MDRV_VIDEO_UPDATE(prof80)
