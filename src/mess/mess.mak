@@ -314,8 +314,8 @@ DRVLIBS = \
 	$(MESSOBJ)/necpc.a \
 	$(MESSOBJ)/nintendo.a \
 	$(MESSOBJ)/nokia.a \
-	$(MESSOBJ)/ondra.a \
 	$(MESSOBJ)/olivetti.a \
+	$(MESSOBJ)/ondra.a \
 	$(MESSOBJ)/orion.a \
 	$(MESSOBJ)/osborne.a \
 	$(MESSOBJ)/osi.a \
@@ -323,9 +323,9 @@ DRVLIBS = \
 	$(MESSOBJ)/palm.a \
 	$(MESSOBJ)/pasogo.a \
 	$(MESSOBJ)/pc.a \
+	$(MESSOBJ)/pc8401a.a \
 	$(MESSOBJ)/pcm.a \
 	$(MESSOBJ)/pcshare.a \
-	$(MESSOBJ)/pc8401a.a \
 	$(MESSOBJ)/pdp1.a \
 	$(MESSOBJ)/pel.a \
 	$(MESSOBJ)/pk8020.a \
@@ -345,7 +345,6 @@ DRVLIBS = \
 	$(MESSOBJ)/sharp.a \
 	$(MESSOBJ)/sinclair.a \
 	$(MESSOBJ)/skeleton.a \
-	$(MESSOBJ)/snk.a \
 	$(MESSOBJ)/sony.a \
 	$(MESSOBJ)/sord.a \
 	$(MESSOBJ)/special.a \
@@ -372,10 +371,11 @@ DRVLIBS = \
 	$(MESSOBJ)/vector06.a \
 	$(MESSOBJ)/votrax.a \
 	$(MESSOBJ)/vtech.a \
-	$(MESSOBJ)/z80ne.a \
 	$(MESSOBJ)/xerox.a \
+	$(MESSOBJ)/z80ne.a \
 	$(MESSOBJ)/shared.a \
 
+#	$(MESSOBJ)/snk.a \
 
 
 

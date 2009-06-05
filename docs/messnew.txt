@@ -189,6 +189,8 @@ System Driver Changes:
 
 - [SYM1] Added BASIC and Assembler ROM's, and version 1.0 monitor [Miodrag Milanovic]
 
+
+
 User Interface Changes:
 -----------------------
 (none)
@@ -203,7 +205,7 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
-- The core is based on MAME 0.131u3.  This incorporates all features of the
+- The core is based on MAME 0.131u4.  This incorporates all features of the
   update to this core.  [MAME team]
 
 - Converted the WAVE sound device to stereo. [Curt Coder]
@@ -213,6 +215,7 @@ Source Changes:
 - Changed the Commodore Serial Bus and IEEE Bus implementations to be devices. 
   More work is needed to make the code flexible enough to support all the possible 
   devices which could have been connected to the real thing. [Fabio Priuli]
+
 
 
 0.131

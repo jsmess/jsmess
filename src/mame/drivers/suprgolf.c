@@ -1,18 +1,20 @@
-/***************************************************************************
+/************************************************************************************
 
- Super Golf
+ Super Crowns Golf
  preliminary WIP driver
- by Tomasz Slanina
+ by Tomasz Slanina & Angelo Salese
 
- maybe vidram banking
- plenty of things unknown still
+ TODO:
+ - remove the patch and understand what needs to be modified for the gfxs, game
+   doesn't crash anymore;
+ - inputs not fully understood, sometimes analog inputs gets stuck;
 
- sometimes extra bits are written to bank registers..
+ Notes:
+ - The game uses special control panel with 1 golf club shaped device to select shot
+ strength (0,1,2,3), and 6 buttons (direction L&R, select angle of club head, club
+ select, shot, and power to use items). -YO
 
- its a z80 game.. i wonder if there is a palette or it should have proms
-               -- the rest of the hardware makes me fear so
-
-***************************************************************************/
+************************************************************************************/
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
@@ -21,11 +23,12 @@
 
 static tilemap *suprgolf_tilemap;
 static UINT8 *suprgolf_bg_vram;
-static UINT8 *suprgolf_bg_pen;
+static UINT16 *suprgolf_bg_fb,*suprgolf_fg_fb;
 static int suprgolf_rom_bank;
 static UINT8 suprgolf_bg_bank;
-static UINT8 suprgolf_vreg;
+static UINT8 suprgolf_vreg_bank;
 static UINT8 msm5205next,msm_nmi_mask;
+static UINT8 suprgolf_vreg_pen;
 
 static TILE_GET_INFO( get_tile_info )
 {
@@ -37,6 +40,173 @@ static TILE_GET_INFO( get_tile_info )
 		code,
 		color,
 		0);
+}
+
+static VIDEO_START( suprgolf )
+{
+	suprgolf_tilemap = tilemap_create( machine, get_tile_info,tilemap_scan_rows,8,8,32,32 );
+	paletteram = auto_alloc_array(machine, UINT8, 0x1000);
+	suprgolf_bg_vram = auto_alloc_array(machine, UINT8, 0x2000*0x20);
+	suprgolf_bg_fb = auto_alloc_array(machine, UINT16, 0x2000*0x20);
+	suprgolf_fg_fb = auto_alloc_array(machine, UINT16, 0x2000*0x20);
+
+	tilemap_set_transparent_pen(suprgolf_tilemap,15);
+}
+
+static VIDEO_UPDATE( suprgolf )
+{
+	int x,y,count,color;
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+
+	{
+		count = 0;
+
+		for(y=0;y<256;y++)
+		{
+			for(x=0;x<512;x++)
+			{
+				color = suprgolf_bg_fb[count];
+
+				if(x <= cliprect->max_x && y <= cliprect->max_y)
+					*BITMAP_ADDR16(bitmap, y, x) = screen->machine->pens[(color & 0x7ff)];
+
+				count++;
+			}
+		}
+	}
+
+	{
+		count = 0;
+
+		for(y=0;y<256;y++)
+		{
+			for(x=0;x<512;x++)
+			{
+				color = suprgolf_fg_fb[count];
+
+				if(((suprgolf_fg_fb[count] & 0x0f) != 0x0f) && (x <= cliprect->max_x && y <= cliprect->max_y))
+					*BITMAP_ADDR16(bitmap, y, x) = screen->machine->pens[(color & 0x7ff)];
+
+				count++;
+			}
+		}
+	}
+
+	tilemap_draw(bitmap,cliprect,suprgolf_tilemap,0,0);
+
+	return 0;
+}
+
+static UINT8 palette_switch;
+
+static READ8_HANDLER( suprgolf_videoram_r )
+{
+	if(palette_switch)
+		return paletteram[offset];
+	else
+		return videoram[offset];
+}
+
+static WRITE8_HANDLER( suprgolf_videoram_w )
+{
+	if(palette_switch)
+	{
+		int r,g,b,datax;
+		paletteram[offset] = data;
+		offset>>=1;
+		datax=paletteram[offset*2]+256*paletteram[offset*2+1];
+
+		b = (datax & 0x8000) ? 0 : ((datax)&0x001f)>>0;
+		g = (datax & 0x8000) ? 0 : ((datax)&0x03e0)>>5;
+		r = (datax & 0x8000) ? 0 : ((datax)&0x7c00)>>10;
+
+		palette_set_color_rgb(space->machine, offset, pal5bit(r), pal5bit(g), pal5bit(b));
+	}
+	else
+	{
+		videoram[offset] = data;
+		tilemap_mark_tile_dirty(suprgolf_tilemap, (offset & 0x7fe) >> 1);
+	}
+}
+
+static READ8_HANDLER( suprgolf_vregs_r )
+{
+	return suprgolf_vreg_bank;
+}
+
+static UINT8 suprgolf_bg_vreg_test;
+
+static WRITE8_HANDLER( suprgolf_vregs_w )
+{
+	//bits 0,1,2 and probably 3 controls the background vram banking
+	suprgolf_vreg_bank = data;
+	palette_switch = (data & 0x80);
+	suprgolf_bg_bank = (data & 0x1f);
+
+	suprgolf_bg_vreg_test = data & 0x20;
+
+	//if(data & 0x60)
+	//  printf("Video regs with data %02x activated\n",data);
+}
+
+static READ8_HANDLER( suprgolf_bg_vram_r )
+{
+	return suprgolf_bg_vram[offset+suprgolf_bg_bank*0x2000];
+}
+
+static WRITE8_HANDLER( suprgolf_bg_vram_w )
+{
+	static UINT8 hi_nibble,lo_nibble;
+	static UINT8 hi_dirty_dot,lo_dirty_dot; // helpers
+
+	hi_nibble = data & 0xf0;
+	lo_nibble = data & 0x0f;
+	hi_dirty_dot = 1;
+	lo_dirty_dot = 1;
+
+	if(hi_nibble == 0xf0)
+	{
+		hi_nibble = suprgolf_bg_vram[offset+suprgolf_bg_bank*0x2000] & 0xf0;
+		if(!(suprgolf_vreg_pen & 0x80) && (!(suprgolf_bg_bank & 0x10)))
+			hi_dirty_dot = 0;
+	}
+
+	if(lo_nibble == 0x0f)
+	{
+		lo_nibble = suprgolf_bg_vram[offset+suprgolf_bg_bank*0x2000] & 0x0f;
+		if(!(suprgolf_vreg_pen & 0x80) && (!(suprgolf_bg_bank & 0x10)))
+			lo_dirty_dot = 0;
+	}
+
+	if(suprgolf_vreg_pen & 0x80 || suprgolf_bg_bank & 0x10)
+		suprgolf_bg_vram[offset+suprgolf_bg_bank*0x2000] = data;
+	else
+		suprgolf_bg_vram[offset+suprgolf_bg_bank*0x2000] = hi_nibble|lo_nibble;
+
+	if(suprgolf_bg_bank & 0x10)
+	{
+		if(hi_dirty_dot)
+			suprgolf_fg_fb[(offset+(suprgolf_bg_bank & 0x0f)*0x2000)*2+1] = (suprgolf_vreg_pen & 0x7f)<<4 | ((suprgolf_bg_vram[offset+suprgolf_bg_bank*0x2000] & 0xf0)>>4);
+		if(lo_dirty_dot)
+			suprgolf_fg_fb[(offset+(suprgolf_bg_bank & 0x0f)*0x2000)*2+0] = (suprgolf_vreg_pen & 0x7f)<<4 | ((suprgolf_bg_vram[offset+suprgolf_bg_bank*0x2000] & 0x0f)>>0);
+	}
+	else
+	{
+		if(hi_dirty_dot)
+			suprgolf_bg_fb[(offset+(suprgolf_bg_bank & 0x0f)*0x2000)*2+1] = (suprgolf_vreg_pen & 0x7f)<<4 | ((suprgolf_bg_vram[offset+suprgolf_bg_bank*0x2000] & 0xf0)>>4);
+		if(lo_dirty_dot)
+			suprgolf_bg_fb[(offset+(suprgolf_bg_bank & 0x0f)*0x2000)*2+0] = (suprgolf_vreg_pen & 0x7f)<<4 | ((suprgolf_bg_vram[offset+suprgolf_bg_bank*0x2000] & 0x0f)>>0);
+	}
+}
+
+static WRITE8_HANDLER( suprgolf_pen_w )
+{
+	suprgolf_vreg_pen = data;
+}
+
+static WRITE8_HANDLER( adpcm_data_w )
+{
+	msm5205next = data;
 }
 
 static READ8_HANDLER( rom_bank_select_r )
@@ -70,150 +240,27 @@ static WRITE8_HANDLER( rom2_bank_select_w )
 		printf("Rom bank select 2 with data %02x activated\n",data);
 }
 
-static MACHINE_RESET( suprgolf )
+static READ8_HANDLER( pedal_extra_bits_r )
 {
+	static UINT8 p1_pedal_hi,p1_sht_sw,p2_pedal_hi,p2_sht_sw;
 
+	/* TODO: check this */
+	p1_pedal_hi = (input_port_read(space->machine, "P1_PEDAL") & 0x10)>>3;
+	p1_sht_sw = (input_port_read(space->machine, "P1_PEDAL") & 0x80)>>7;
+	p2_pedal_hi = (input_port_read(space->machine, "P2_PEDAL") & 0x10)<<1;
+	p2_sht_sw = (input_port_read(space->machine, "P2_PEDAL") & 0x80)>>3;
+
+	return p1_pedal_hi | p1_sht_sw | p2_pedal_hi | p2_sht_sw;
 }
 
-static VIDEO_START( suprgolf )
+static READ8_HANDLER( p1_r )
 {
-	suprgolf_tilemap = tilemap_create( machine, get_tile_info,tilemap_scan_rows,8,8,32,32 );
-	paletteram = auto_alloc_array(machine, UINT8, 0x1000);
-	suprgolf_bg_vram = auto_alloc_array(machine, UINT8, 0x2000*0x20);
-	suprgolf_bg_pen = auto_alloc_array(machine, UINT8, 0x2000*0x20);
-
-	tilemap_set_transparent_pen(suprgolf_tilemap,15);
+	return (input_port_read(space->machine, "P1") & 0xf0) | ((input_port_read(space->machine, "P1_PEDAL") & 0xf));
 }
 
-/* TODO: fix this.*/
-static void bg_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect,UINT8 starting_offs)
+static READ8_HANDLER( p2_r )
 {
-	int x,y,trans;
-	UINT32 count;
-
-	count = starting_offs<<16;
-	trans = starting_offs;
-
-	for(y=0;y<256;y++)
-	{
-		for(x=0;x<512;x+=2)
-		{
-			UINT16 color;
-
-			color = ((suprgolf_bg_pen[count] & 0xff)<<4) | ((suprgolf_bg_vram[count] & 0xf0)>>4);
-			//color+= ((suprgolf_bg_pen[count+0x10000])<<4);
-			//if((x)<video_screen_get_visible_area(machine)->max_x && ((y)+0)<video_screen_get_visible_area(machine)->max_y)
-			if(x+1 < 256)
-			{
-				if(trans)
-				{
-					if((suprgolf_bg_vram[count] & 0xf0) != 0xf0)
-						*BITMAP_ADDR32(bitmap, y, x+1) = machine->pens[(color & 0x7ff)];
-				}
-				else
-					*BITMAP_ADDR32(bitmap, y, x+1) = machine->pens[(color & 0x7ff)];
-			}
-
-			color = ((suprgolf_bg_pen[count] & 0xff)<<4) | (suprgolf_bg_vram[count] & 0x0f);
-			//color+= ((suprgolf_bg_pen[count+0x10000])<<4);
-
-			//if((x+1)<video_screen_get_visible_area(screen)->max_x && ((y)+0)<video_screen_get_visible_area(screen)->max_y)
-			if(x < 256)
-			{
-				if(trans)
-				{
-					if((suprgolf_bg_vram[count] & 0x0f) != 0x0f)
-						*BITMAP_ADDR32(bitmap, y, x) = machine->pens[(color & 0x7ff)];
-				}
-				else
-					*BITMAP_ADDR32(bitmap, y, x) = machine->pens[(color & 0x7ff)];
-			}
-
-			count++;
-		}
-	}
-}
-
-static VIDEO_UPDATE( suprgolf )
-{
-	bg_draw(screen->machine,bitmap,cliprect,0);
-	//bg_draw(screen->machine,bitmap,cliprect,1);
-	bg_draw(screen->machine,bitmap,cliprect,2); //this probably should be putted over the fg tilemap too.
-
-	tilemap_draw(bitmap,cliprect,suprgolf_tilemap,0,0);
-	return 0;
-}
-
-static UINT8 palette_switch;
-
-static READ8_HANDLER( suprgolf_videoram_r )
-{
-	if(palette_switch)
-		return paletteram[offset];
-	else
-		return videoram[offset];
-}
-
-static WRITE8_HANDLER( suprgolf_videoram_w )
-{
-	if(palette_switch)
-	{
-		int r,g,b,datax;
-		paletteram[offset] = data;
-		offset>>=1;
-		datax=paletteram[offset*2]+256*paletteram[offset*2+1];
-
-		b=(datax & 0x8000) ? 0 : ((datax)&0x001f)>>0;
-		g=(datax & 0x8000) ? 0 : ((datax)&0x03e0)>>5;
-		r=(datax & 0x8000) ? 0 : ((datax)&0x7c00)>>10;
-
-		palette_set_color_rgb(space->machine, offset, pal5bit(r), pal5bit(g), pal5bit(b));
-	}
-	else
-	{
-		videoram[offset] = data;
-		tilemap_mark_tile_dirty(suprgolf_tilemap, (offset & 0x7fe) >> 1);
-	}
-}
-
-static READ8_HANDLER( suprgolf_vregs_r )
-{
-	return suprgolf_vreg;
-}
-
-static WRITE8_HANDLER( suprgolf_vregs_w )
-{
-	//bits 0,1,2 and probably 3 controls the background vram banking
-	suprgolf_vreg = data;
-	palette_switch = (data & 0x80);
-	suprgolf_bg_bank = (data & 0x1f);
-
-	//if(data & 0x60)
-	//  printf("Video regs with data %02x activated\n",data);
-}
-
-static UINT8 pen;
-
-static READ8_HANDLER( suprgolf_bg_vram_r )
-{
-	return suprgolf_bg_vram[offset+suprgolf_bg_bank*0x2000];
-}
-
-static WRITE8_HANDLER( suprgolf_bg_vram_w )
-{
-	suprgolf_bg_vram[offset+suprgolf_bg_bank*0x2000] = data;
-	suprgolf_bg_pen[offset+suprgolf_bg_bank*0x2000] = data ? pen : 0;
-}
-
-/* maybe bit 7 isn't actually for the pen? */
-static WRITE8_HANDLER( suprgolf_pen_w )
-{
-	pen = data;
-}
-
-static WRITE8_HANDLER( adpcm_data_w )
-{
-	msm5205next = data;
+	return (input_port_read(space->machine, "P2") & 0xf0) | ((input_port_read(space->machine, "P2_PEDAL") & 0xf));
 }
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -227,15 +274,16 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
+
 static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2")
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2") // ??
+	AM_RANGE(0x00, 0x00) AM_READ(p1_r)
+	AM_RANGE(0x01, 0x01) AM_READ(p2_r)
+	AM_RANGE(0x02, 0x02) AM_READ(pedal_extra_bits_r)
 //  AM_RANGE(0x03, 0x03)
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x05, 0x05) AM_READ(rom_bank_select_r) AM_WRITE(rom_bank_select_w)
-	AM_RANGE(0x06, 0x06) AM_READWRITE( suprgolf_vregs_r,suprgolf_vregs_w ) // game locks up or crashes? if this doesn't return right values?
+	AM_RANGE(0x06, 0x06) AM_READWRITE( suprgolf_vregs_r,suprgolf_vregs_w )
 //  AM_RANGE(0x07, 0x07)
 	AM_RANGE(0x08, 0x09) AM_DEVREADWRITE("ym", ym2203_r, ym2203_w)
 	AM_RANGE(0x0c, 0x0c) AM_WRITE(adpcm_data_w)
@@ -243,58 +291,26 @@ static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 
 static INPUT_PORTS_START( suprgolf )
 	PORT_START("P1")
-	PORT_DIPNAME( 0x01, 0x01, "0" ) //USED!
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_SPECIAL ) /* low port of P1 Pedal */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)	    /* D.L */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)	    /* D.R */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)			/* CNT */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)			/* CNT - shot switch */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)			/* SEL */
 
+	PORT_START("P1_PEDAL")
+	PORT_BIT( 0x1f, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0x1f) PORT_SENSITIVITY(5) PORT_KEYDELTA(5) PORT_PLAYER(1)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)			/* release power? */
+
 	PORT_START("P2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) //USED!
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_SPECIAL ) /* low port of P2 Pedal */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)	    /* D.L */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)	    /* D.R */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)			/* CNT */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)			/* CNT - shot switch */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)			/* SEL */
 
-	PORT_START("IN2")
-	PORT_DIPNAME( 0x01, 0x01, "2" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_START("P2_PEDAL")
+	PORT_BIT( 0x1f, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0x1f) PORT_SENSITIVITY(5) PORT_KEYDELTA(5) PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)			/* release power? */
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )               			/* 1P */
@@ -310,79 +326,45 @@ static INPUT_PORTS_START( suprgolf )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
 
-	PORT_START("IN4")
-	PORT_DIPNAME( 0x01, 0x01, "4" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Tutorial" )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
+	/* According to the manual, 4 and 5 are for Indoor Practice tries, but doesn't suit well...different version? */
+	PORT_DIPNAME( 0x08, 0x08, "Indoor Practice" )  PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x30, 0x30, "Number of Balls" )
+	PORT_DIPNAME( 0x30, 0x30, "Number of Balls" ) PORT_DIPLOCATION("SW1:5,6")
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x10, "2" )
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x20, "4" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x00, "SW1:7" )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("DSW1")
-	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x02, 0x02, "DSW1" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Flip_Screen ) )
+	PORT_SERVICE( 0x01, IP_ACTIVE_LOW ) PORT_DIPLOCATION("SW2:1")
+	PORT_DIPNAME( 0x06, 0x00, "Percentage of wind over 10m/s" ) PORT_DIPLOCATION("SW2:2,3")
+	PORT_DIPSETTING(    0x00, "30%" )
+	PORT_DIPSETTING(    0x04, "40%" )
+	PORT_DIPSETTING(    0x02, "50%" )
+	PORT_DIPSETTING(    0x06, "60%" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x00, "SW2:6" )
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x00, "SW2:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "SW2:8" )
 INPUT_PORTS_END
 
 static WRITE8_DEVICE_HANDLER( suprgolf_writeA )
@@ -453,6 +435,11 @@ static GFXDECODE_START( suprgolf )
 	GFXDECODE_ENTRY( "gfx1", 0, gfxlayout,   0, 0x80 )
 GFXDECODE_END
 
+static MACHINE_RESET( suprgolf )
+{
+	msm_nmi_mask = 0;
+}
+
 static MACHINE_DRIVER_START( suprgolf )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,4000000) /* guess */
@@ -469,12 +456,12 @@ static MACHINE_DRIVER_START( suprgolf )
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 191)
 
 	MDRV_GFXDECODE(suprgolf)
-	MDRV_PALETTE_LENGTH(0x1000)
+	MDRV_PALETTE_LENGTH(0x800)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -543,7 +530,7 @@ ROM_START( suprgolf )
 
 	ROM_REGION( 0x70000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "cg18.3k",0x60000, 0x10000, CRC(36edd88e) SHA1(374c95721198a88831d6f7e0b71d05e2f8465271) )
-	ROM_LOAD( "cg17.5f",0x50000, 0x10000, CRC(d27f87b5) SHA1(5b2927e89615589540e3853593aeff517584b6a0))
+	ROM_LOAD( "cg17.5f",0x50000, 0x10000, CRC(d27f87b5) SHA1(5b2927e89615589540e3853593aeff517584b6a0) )
 	ROM_LOAD( "cg16.5g",0x40000, 0x10000, CRC(0498aa2e) SHA1(988965c3a584dac17ad8c7e504fa1f1e49775611) )
 	ROM_LOAD( "cg15.5j",0x30000, 0x10000, CRC(0fb88270) SHA1(d85a7f1bc5b3c4b13bbd887cea4c055541cbb737) )
 	ROM_LOAD( "cg14.5k",0x20000, 0x10000, CRC(ca12e01d) SHA1(9c627fb527c8966e16dc6bdb99ec0b9728b5c5f9) )
@@ -551,4 +538,12 @@ ROM_START( suprgolf )
 	ROM_LOAD( "cg12.6k",0x00000, 0x10000, CRC(5707b3d5) SHA1(9102a40fefb6426f2cd9d92d66fdc77e078e3f4c) )
 ROM_END
 
-GAME( 1989, suprgolf, 0, suprgolf,  suprgolf,  0, ROT0, "Nasco", "Super Crowns Golf (Japan)", GAME_NOT_WORKING | GAME_NO_COCKTAIL )
+static DRIVER_INIT( suprgolf )
+{
+	UINT8 *ROM = memory_region(machine, "user2");
+
+	ROM[0x74f4-0x4000] = 0x00;
+	ROM[0x74f5-0x4000] = 0x00;
+}
+
+GAME( 1989, suprgolf, 0, suprgolf,  suprgolf,  suprgolf, ROT0, "Nasco", "Super Crowns Golf (Japan)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL )

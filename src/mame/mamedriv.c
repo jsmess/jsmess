@@ -2519,6 +2519,7 @@ V-V                           TP-027
 	DRIVER( nemoj )		/* 20/11/1990 (c) 1990 (Japan) */
 	DRIVER( sf2 )		/* 22/05/1991 (c) 1991 (World) */
 	DRIVER( sf2eb )		/* 14/02/1991 (c) 1991 (World) */
+	DRIVER( sf2ebbl )	/* 14/02/1991 (c) 1991 (World, bootleg) */
 	DRIVER( sf2ua )		/* 06/02/1991 (c) 1991 (US)    */
 	DRIVER( sf2ub )		/* 14/02/1991 (c) 1991 (US)    */
 	DRIVER( sf2ud )		/* 18/03/1991 (c) 1991 (US)    */
@@ -5341,6 +5342,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( moobl )		/* bootleg */
 	DRIVER( bucky )		/* GX173 (c) 1992 (World) */
 	DRIVER( buckyua )	/* GX173 (c) 1992 (US) */
+	DRIVER( buckyaa )	/* GX173 (c) 1992 (Asia) */
 	DRIVER( gaiapols )	/* GX123 (c) 1993 (Europe) */
 	DRIVER( gaiapolu )	/* GX123 (c) 1993 (US) */
 	DRIVER( gaiapolj )	/* GX123 (c) 1993 (Japan) */
@@ -6724,7 +6726,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( crusnw20 )	/* (c) 1996 Midway */
 	DRIVER( crusnw17 )	/* (c) 1996 Midway */
 	DRIVER( crusnw13 )	/* (c) 1996 Midway */
-	DRIVER( offroadc )	/* (c) 1997 Midway (v1.40) */
+	DRIVER( offroadc )	/* (c) 1997 Midway (v1.63) */
+	DRIVER( offrodc4 )	/* (c) 1997 Midway (v1.40) */
 	DRIVER( offrodc3 )	/* (c) 1997 Midway (v1.30) */
 	DRIVER( offrodc1 )	/* (c) 1997 Midway (v1.10) */
 	DRIVER( wargods )	/* (c) 1996 Midway */
@@ -6778,8 +6781,10 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( tm3ka )		/* (c) 1997 Midway Games */
 	DRIVER( tm4k )		/* (c) 1998 Midway Games */
 	DRIVER( tm5k )		/* (c) 1998 Midway Games */
+	DRIVER( tm5kca )	/* (c) 1998 Midway Games */
 	DRIVER( tm7k )		/* (c) 1999 Midway Games */
 	DRIVER( tm7ka )		/* (c) 1999 Midway Games */
+	DRIVER( tm7keval )	/* (c) 1999 Midway Games */
 	DRIVER( tm8k )		/* (c) 2000 Midway Games */
 	DRIVER( galgbios )  /* (c) 1998 Creative Electonics & Software (CES) */
 

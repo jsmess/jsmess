@@ -1,3 +1,9 @@
+/*
+    Manchester Small-Scale Experimental Machine (SSEM) emulator
+
+    Written by MooglyGuy
+*/
+
 #pragma once
 
 #ifndef __SSEM_H__

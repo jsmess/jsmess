@@ -210,11 +210,11 @@ const game_driver * const drivers[] =
     DRIVER( pasogo )    /* KOEI PasoGo                                      */
 
     /* SNK */
-    DRIVER( ngp )       /* NeoGeo Pocket                                    */
-    DRIVER( ngpc )      /* NeoGeo Pocket Color                              */
-    DRIVER( aes )       /* NeoGeo AES                                       */
-    DRIVER( neocd )     /* NeoGeo CD                                        */
-    DRIVER( neocdz )    /* NeoGeo CDZ                                       */
+//0131u4    DRIVER( ngp )       /* NeoGeo Pocket                                    */
+//0131u4    DRIVER( ngpc )      /* NeoGeo Pocket Color                              */
+//0131u4    DRIVER( aes )       /* NeoGeo AES                                       */
+//0131u4    DRIVER( neocd )     /* NeoGeo CD                                        */
+//0131u4    DRIVER( neocdz )    /* NeoGeo CDZ                                       */
 
     /* Philips */
     DRIVER( cdi )       /* Philips CD-i                                     */
