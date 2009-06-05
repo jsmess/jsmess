@@ -12,7 +12,7 @@
 
 	TODO:
 
-	- Z80 STI
+	- Z80 STI (Mostek MK3801) push-model
 	- PROF-GRIP communications
 	- UNIO card (Z80-STI, Z80-SIO, 2x centronics)
 	- GRIP-COLOR (192kB color RAM)
@@ -28,6 +28,7 @@
 #include "machine/8255ppi.h"
 #include "machine/nec765.h"
 #include "machine/upd1990a.h"
+#include "machine/z80sti.h"
 #include "machine/ctronics.h"
 
 /* PROF-80 */
@@ -407,7 +408,7 @@ static ADDRESS_MAP_START( grip_io, ADDRESS_SPACE_IO, 8 )
 //	AM_RANGE(0x15, 0x15) AM_WRITE(cc2_w)
 //	AM_RANGE(0x16, 0x16) AM_WRITE(flash_w)
 //	AM_RANGE(0x17, 0x17) AM_WRITE(vol1_w)
-//	AM_RANGE(0x20, 0x2f) AM_DEVREADWRITE(Z80STI_TAG, z80sti_r, z80sti_w)
+	AM_RANGE(0x20, 0x2f) AM_DEVREADWRITE(Z80STI_TAG, z80sti_r, z80sti_w)
 	AM_RANGE(0x30, 0x30) AM_READWRITE(lrs_r, lrs_w)
 	AM_RANGE(0x40, 0x40) AM_READ(grip_status_r)
 	AM_RANGE(0x50, 0x50) AM_DEVWRITE(MC6845_TAG, mc6845_address_w)
@@ -443,11 +444,11 @@ static MC6845_UPDATE_ROW( grip_update_row )
 	}
 }
 
-static MC6845_ON_VSYNC_CHANGED( grip_vsync_changed )
+static MC6845_ON_DE_CHANGED( grip_on_de_changed )
 {
 	prof80_state *state = device->machine->driver_data;
 
-	state->vsync = vsync;
+	z80sti_i1_w(state->z80sti, display_enabled);
 }
 
 static const mc6845_interface grip_mc6845_interface = 
@@ -457,9 +458,10 @@ static const mc6845_interface grip_mc6845_interface =
 	NULL,
 	grip_update_row,
 	NULL,
+	grip_on_de_changed,
 	NULL,
 	NULL,
-	grip_vsync_changed
+	NULL
 };
 
 static VIDEO_START( prof80 )
@@ -625,6 +627,28 @@ static const ppi8255_interface grip_ppi8255_interface =
 	DEVCB_HANDLER(grip_ppi8255_c_w)		// Port C write
 };
 
+/* Z80-STI Interface */
+
+static WRITE_LINE_DEVICE_HANDLER( grip_z80sti_irq_w )
+{
+	cputag_set_input_line(device->machine, "grip", INPUT_LINE_IRQ0, state);
+}
+
+static Z80STI_INTERFACE( grip_z80sti_interface )
+{
+	0,
+	0,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_LINE(grip_z80sti_irq_w)
+};
+
 /* Machine Initialization */
 
 static MACHINE_START( prof80 )
@@ -637,6 +661,7 @@ static MACHINE_START( prof80 )
 	state->upd1990a = devtag_get_device(machine, UPD1990A_TAG);
 	state->mc6845 = devtag_get_device(machine, MC6845_TAG);
 	state->ppi8255 = devtag_get_device(machine, PPI8255_TAG);
+	state->z80sti = devtag_get_device(machine, Z80STI_TAG);
 	state->centronics = devtag_get_device(machine, "centronics");
 
 	/* initialize RTC */
@@ -667,7 +692,6 @@ static MACHINE_START( prof80 )
 	state_save_register_global_array(machine, state->mmu);
 	state_save_register_global(machine, state->mme);
 	state_save_register_global_pointer(machine, state->video_ram, GRIP_VIDEORAM_SIZE);
-	state_save_register_global(machine, state->vsync);
 	state_save_register_global(machine, state->rtc_data);
 	state_save_register_global(machine, state->fdc_index);
 }
@@ -719,6 +743,7 @@ static MACHINE_DRIVER_START( prof80 )
 	MDRV_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, prof80_upd1990a_intf)
 	MDRV_NEC765A_ADD(NEC765_TAG, prof80_nec765_interface)
 	MDRV_PPI8255_ADD(PPI8255_TAG, grip_ppi8255_interface)
+	MDRV_Z80STI_ADD(Z80STI_TAG, XTAL_16MHz/4, grip_z80sti_interface)
 
 	/* printer */
 	MDRV_CENTRONICS_ADD("centronics", standard_centronics)

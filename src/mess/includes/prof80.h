@@ -22,7 +22,6 @@ struct _prof80_state
 
 	/* video state */
 	UINT8 *video_ram;		/* video RAM */
-	int vsync;				/* vertical sync */
 	int lps;				/* light pen sense */
 	int page;				/* video page */
 
@@ -41,6 +40,7 @@ struct _prof80_state
 	const device_config *upd1990a;
 	const device_config *mc6845;
 	const device_config *ppi8255;
+	const device_config *z80sti;
 	const device_config *centronics;
 };
 

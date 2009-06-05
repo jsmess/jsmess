@@ -266,6 +266,7 @@ DRVLIBS = \
 	$(MESSOBJ)/compis.a \
 	$(MESSOBJ)/comx.a \
 	$(MESSOBJ)/concept.a \
+	$(MESSOBJ)/conitec.a \
 	$(MESSOBJ)/cpschngr.a \
 	$(MESSOBJ)/cybiko.a \
 	$(MESSOBJ)/dai.a \
@@ -1383,6 +1384,10 @@ $(MESSOBJ)/xerox.a: \
 	$(MESS_DRIVERS)/xerox820.o \
 	$(MESS_MACHINE)/com8116.o
 
+$(MESSOBJ)/conitec.a: \
+	$(MESS_DRIVERS)/prof80.o \
+	$(MESS_MACHINE)/z80sti.o
+
 $(MESSOBJ)/skeleton.a: \
 	$(MESS_DRIVERS)/a6809.o \
 	$(MESS_DRIVERS)/a5105.o \
@@ -1432,7 +1437,6 @@ $(MESSOBJ)/skeleton.a: \
 	$(MESS_DRIVERS)/x07.o \
 	$(MESS_DRIVERS)/pk8000.o \
 	$(MESS_DRIVERS)/unior.o \
-	$(MESS_DRIVERS)/prof80.o \
 	$(MESS_DRIVERS)/tvc.o \
 	
 #-------------------------------------------------
