@@ -489,6 +489,7 @@ static WRITE8_HANDLER( fm7_palette_w )
 	palette_set_color(space->machine,offset,MAKE_RGB(r,g,b));
 	fm7_pal[offset] = data & 0x07;
 }
+
 static void fm7_update_psg(running_machine* machine)
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
@@ -865,8 +866,8 @@ static VIDEO_UPDATE( fm7 )
     {
 	    for (x = 0; x < 80; x++)
 	    {
-            code_r = fm7_video_ram[0x4000 + ((y*80 + x + vram_offset) & 0x3fff)];
-            code_g = fm7_video_ram[0x8000 + ((y*80 + x + vram_offset) & 0x3fff)];
+            code_r = fm7_video_ram[0x8000 + ((y*80 + x + vram_offset) & 0x3fff)];
+            code_g = fm7_video_ram[0x4000 + ((y*80 + x + vram_offset) & 0x3fff)];
             code_b = fm7_video_ram[0x0000 + ((y*80 + x + vram_offset) & 0x3fff)];
             for (b = 0; b < 8; b++)
             {
@@ -881,10 +882,10 @@ static VIDEO_UPDATE( fm7 )
 static const rgb_t fm7_initial_palette[8] = {
 	MAKE_RGB(0x00, 0x00, 0x00), // 0
 	MAKE_RGB(0x00, 0x00, 0xff), // 1
-	MAKE_RGB(0x00, 0xff, 0x00), // 2
-	MAKE_RGB(0x00, 0xff, 0xff), // 3
-	MAKE_RGB(0xff, 0x00, 0x00), // 4
-	MAKE_RGB(0xff, 0x00, 0xff), // 5
+	MAKE_RGB(0xff, 0x00, 0x00), // 2
+	MAKE_RGB(0xff, 0x00, 0xff), // 3
+	MAKE_RGB(0x00, 0xff, 0x00), // 4
+	MAKE_RGB(0x00, 0xff, 0xff), // 5
 	MAKE_RGB(0xff, 0xff, 0x00), // 6
 	MAKE_RGB(0xff, 0xff, 0xff), // 7
 };
