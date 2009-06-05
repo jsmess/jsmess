@@ -176,7 +176,7 @@ static MACHINE_RESET( sord_m5_fd5 )
 	floppy_drive_set_geometry(image_from_devtype_and_index(machine, IO_FLOPPY, 0), FLOPPY_DRIVE_SS_40);
 	floppy_drive_set_geometry(image_from_devtype_and_index(machine, IO_FLOPPY, 1), FLOPPY_DRIVE_SS_40);
 	MACHINE_RESET_CALL(sord_m5);
-	ppi8255_set_port_c((device_config*)devtag_get_device(machine, "ppi8255"), 0x50);
+	ppi8255_set_port_c(devtag_get_device(machine, "ppi8255"), 0x50);
 }
 
 
@@ -293,7 +293,7 @@ static void sord_m5_ctc_interrupt(const device_config *device, int state)
 	cputag_set_input_line(device->machine, "maincpu", 0, state);
 }
 
-static const z80ctc_interface	sord_m5_ctc_intf =
+static const z80ctc_interface sord_m5_ctc_intf =
 {
 	0,
 	sord_m5_ctc_interrupt,
@@ -302,53 +302,30 @@ static const z80ctc_interface	sord_m5_ctc_intf =
 	0
 };
 
-static READ8_HANDLER ( sord_keyboard_r )
-{
-	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7",
-										"LINE8", "LINE9", "LINE10", "LINE11", "LINE12", "LINE13", "LINE14", "LINE15",
-										"RESET"};
 
-	return input_port_read(space->machine, keynames[offset]);
-}
-
-static ADDRESS_MAP_START( sord_m5_mem , ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x0000, 0x01fff) AM_ROM	/* internal rom */
-	AM_RANGE(0x2000, 0x06fff) AM_ROMBANK(1)
-	AM_RANGE(0x7000, 0x0ffff) AM_RAM
+static ADDRESS_MAP_START( sord_m5_mem, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM	/* internal rom */
+	AM_RANGE(0x2000, 0x6fff) AM_ROM /* cartridge */
+	AM_RANGE(0x7000, 0x7fff) AM_RAM /* internal ram */
+	AM_RANGE(0x8000, 0xffff) AM_RAM /* 32k expand box */
 ADDRESS_MAP_END
 
 
-
-static READ8_DEVICE_HANDLER(sord_ctc_r)
-{
-	unsigned char data;
-
-	data = z80ctc_r(device, offset & 0x03);
-
-	logerror("sord ctc r: %04x %02x\n",(offset & 0x03), data);
-
-	return data;
-}
-
-static WRITE8_DEVICE_HANDLER(sord_ctc_w)
-{
-	logerror("sord ctc w: %04x %02x\n",(offset & 0x03), data);
-
-	z80ctc_w(device, offset & 0x03, data);
-}
-
-static READ8_HANDLER(sord_sys_r)
+/* read */
+/* bit 0 is cassette read data */
+/* bit 1 is printer busy */
+/* bit 7 is the reset/halt key */
+static READ8_HANDLER( sord_sys_r )
 {
 	const device_config *printer = devtag_get_device(space->machine, "centronics");
 	UINT8 data = 0;
 
 	/* cassette read */
-	if (cassette_input(cassette_device_image(space->machine)) >=0)
-		data |=(1<<0);
+	if (cassette_input(cassette_device_image(space->machine)) >= 0)
+		data |= 1;
 
 	data |= centronics_busy_r(printer) << 1;
-
-	/* bit 7 must be 0 for saving and loading to work */
+	data |= input_port_read(space->machine, "reset");
 
 	logerror("sys read: %02x\n",data);
 
@@ -358,12 +335,7 @@ static READ8_HANDLER(sord_sys_r)
 /* write */
 /* bit 0 is strobe to printer or cassette write data */
 /* bit 1 is cassette remote */
-
-/* read */
-/* bit 0 is cassette read data */
-/* bit 1 is printer busy */
-
-static WRITE8_HANDLER(sord_sys_w)
+static WRITE8_HANDLER( sord_sys_w )
 {
 	const device_config *printer = devtag_get_device(space->machine, "centronics");
 
@@ -382,27 +354,41 @@ static WRITE8_HANDLER(sord_sys_w)
 }
 
 
-static ADDRESS_MAP_START( sord_m5_io , ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( sord_m5_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x0f)					AM_DEVREADWRITE("z80ctc", sord_ctc_r,			sord_ctc_w)
-	AM_RANGE(0x10, 0x10) AM_MIRROR(0x0e)	AM_READWRITE(TMS9928A_vram_r,		TMS9928A_vram_w)
-	AM_RANGE(0x11, 0x11) AM_MIRROR(0x0e)	AM_READWRITE(TMS9928A_register_r,	TMS9928A_register_w)
-	AM_RANGE(0x20, 0x2f)					AM_DEVWRITE("sn76489a",	sn76496_w)
-	AM_RANGE(0x30, 0x3f)					AM_READ(sord_keyboard_r)
-	AM_RANGE(0x40, 0x40)					AM_DEVWRITE("centronics", centronics_data_w)
-	AM_RANGE(0x50, 0x50)					AM_READWRITE(sord_sys_r,			sord_sys_w)
+	AM_RANGE(0x00, 0x03) AM_MIRROR(0x0c) AM_DEVREADWRITE("z80ctc", z80ctc_r, z80ctc_w)
+	AM_RANGE(0x10, 0x10) AM_MIRROR(0x0e) AM_READWRITE(TMS9928A_vram_r, TMS9928A_vram_w)
+	AM_RANGE(0x11, 0x11) AM_MIRROR(0x0e) AM_READWRITE(TMS9928A_register_r, TMS9928A_register_w)
+	AM_RANGE(0x20, 0x2f) AM_DEVWRITE("sn76489a", sn76496_w)
+	AM_RANGE(0x30, 0x30) AM_READ_PORT("keyboard_row_0")
+	AM_RANGE(0x31, 0x31) AM_READ_PORT("keyboard_row_1")
+	AM_RANGE(0x32, 0x32) AM_READ_PORT("keyboard_row_2")
+	AM_RANGE(0x33, 0x33) AM_READ_PORT("keyboard_row_3")
+	AM_RANGE(0x34, 0x34) AM_READ_PORT("keyboard_row_4")
+	AM_RANGE(0x35, 0x35) AM_READ_PORT("keyboard_row_5")
+	AM_RANGE(0x36, 0x36) AM_READ_PORT("keyboard_row_6")
+	AM_RANGE(0x37, 0x37) AM_READ_PORT("joypad_direction")
+	AM_RANGE(0x40, 0x40) AM_DEVWRITE("centronics", centronics_data_w)
+	AM_RANGE(0x50, 0x50) AM_READWRITE(sord_sys_r, sord_sys_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( srdm5fd5_io , ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( srdm5fd5_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x0f)					AM_DEVREADWRITE("z80ctc", sord_ctc_r,			sord_ctc_w)
-	AM_RANGE(0x10, 0x10) AM_MIRROR(0x0e)	AM_READWRITE(TMS9928A_vram_r,		TMS9928A_vram_w)
-	AM_RANGE(0x11, 0x11) AM_MIRROR(0x0e)	AM_READWRITE(TMS9928A_register_r,	TMS9928A_register_w)
-	AM_RANGE(0x20, 0x2f)					AM_DEVWRITE("sn76489a",	sn76496_w)
-	AM_RANGE(0x30, 0x3f)					AM_READ(sord_keyboard_r)
-	AM_RANGE(0x40, 0x40)					AM_DEVWRITE("centronics", centronics_data_w)
-	AM_RANGE(0x50, 0x50)					AM_READWRITE(sord_sys_r,			sord_sys_w)
-	AM_RANGE(0x70, 0x73)					AM_DEVREADWRITE("ppi8255", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x00, 0x03) AM_MIRROR(0x0c) AM_DEVREADWRITE("z80ctc", z80ctc_r, z80ctc_w)
+	AM_RANGE(0x10, 0x10) AM_MIRROR(0x0e) AM_READWRITE(TMS9928A_vram_r, TMS9928A_vram_w)
+	AM_RANGE(0x11, 0x11) AM_MIRROR(0x0e) AM_READWRITE(TMS9928A_register_r, TMS9928A_register_w)
+	AM_RANGE(0x20, 0x2f) AM_DEVWRITE("sn76489a", sn76496_w)
+	AM_RANGE(0x30, 0x30) AM_READ_PORT("keyboard_row_0")
+	AM_RANGE(0x31, 0x31) AM_READ_PORT("keyboard_row_1")
+	AM_RANGE(0x32, 0x32) AM_READ_PORT("keyboard_row_2")
+	AM_RANGE(0x33, 0x33) AM_READ_PORT("keyboard_row_3")
+	AM_RANGE(0x34, 0x34) AM_READ_PORT("keyboard_row_4")
+	AM_RANGE(0x35, 0x35) AM_READ_PORT("keyboard_row_5")
+	AM_RANGE(0x36, 0x36) AM_READ_PORT("keyboard_row_6")
+	AM_RANGE(0x37, 0x37) AM_READ_PORT("joypad_direction")
+	AM_RANGE(0x40, 0x40) AM_DEVWRITE("centronics", centronics_data_w)
+	AM_RANGE(0x50, 0x50) AM_READWRITE(sord_sys_r, sord_sys_w)
+	AM_RANGE(0x70, 0x73) AM_DEVREADWRITE("ppi8255", ppi8255_r, ppi8255_w)
 ADDRESS_MAP_END
 
 
@@ -431,11 +417,7 @@ static MACHINE_START( sord_m5 )
 
 static MACHINE_RESET( sord_m5 )
 {
-//  cassette_timer = timer_pulse(machine, TIME_IN_HZ(11025), NULL, 0, cassette_timer_callback);
-	TMS9928A_reset ();
-
-	/* should be done in a special callback to work properly! */
-	memory_set_bankptr(machine, 1, memory_region(machine, "user1"));
+	TMS9928A_reset();
 }
 
 /* 2008-05 FP:
@@ -444,7 +426,7 @@ Small note about natural keyboard: currently
 - "Func" is mapped to 'F1'
 */
 static INPUT_PORTS_START(sord_m5)
-	PORT_START("LINE0")
+	PORT_START("keyboard_row_0")
 	PORT_BIT (0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Ctrl") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
 	PORT_BIT (0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Func") PORT_CODE(KEYCODE_TAB) PORT_CHAR(UCHAR_MAMEKEY(F1))
 	PORT_BIT (0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT)		PORT_CHAR(UCHAR_SHIFT_1)
@@ -454,7 +436,7 @@ static INPUT_PORTS_START(sord_m5)
 	PORT_BIT (0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE)		PORT_CHAR(' ')
 	PORT_BIT (0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER)		PORT_CHAR(13)
 
-	PORT_START("LINE1")
+	PORT_START("keyboard_row_1")
 	PORT_BIT (0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1) 			PORT_CHAR('1') PORT_CHAR('!')
 	PORT_BIT (0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2) 			PORT_CHAR('2') PORT_CHAR('"')
 	PORT_BIT (0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3) 			PORT_CHAR('3') PORT_CHAR('#')
@@ -464,7 +446,7 @@ static INPUT_PORTS_START(sord_m5)
 	PORT_BIT (0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7) 			PORT_CHAR('7') PORT_CHAR('\'')
 	PORT_BIT (0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8) 			PORT_CHAR('8') PORT_CHAR('(')
 
-	PORT_START("LINE2")
+	PORT_START("keyboard_row_2")
 	PORT_BIT (0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q) 			PORT_CHAR('q') PORT_CHAR('Q')
 	PORT_BIT (0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_W) 			PORT_CHAR('w') PORT_CHAR('W')
 	PORT_BIT (0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_E) 			PORT_CHAR('e') PORT_CHAR('E')
@@ -474,7 +456,7 @@ static INPUT_PORTS_START(sord_m5)
 	PORT_BIT (0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_U) 			PORT_CHAR('u') PORT_CHAR('U')
 	PORT_BIT (0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_I) 			PORT_CHAR('i') PORT_CHAR('I')
 
-	PORT_START("LINE3")
+	PORT_START("keyboard_row_3")
 	PORT_BIT (0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_A) 			PORT_CHAR('a') PORT_CHAR('A')
 	PORT_BIT (0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_S) 			PORT_CHAR('s') PORT_CHAR('S')
 	PORT_BIT (0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_D) 			PORT_CHAR('d') PORT_CHAR('D')
@@ -484,7 +466,7 @@ static INPUT_PORTS_START(sord_m5)
 	PORT_BIT (0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_J) 			PORT_CHAR('j') PORT_CHAR('J')
 	PORT_BIT (0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_K) 			PORT_CHAR('k') PORT_CHAR('K')
 
-	PORT_START("LINE4")
+	PORT_START("keyboard_row_4")
 	PORT_BIT (0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z) 			PORT_CHAR('z') PORT_CHAR('Z')
 	PORT_BIT (0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_X) 			PORT_CHAR('x') PORT_CHAR('X')
 	PORT_BIT (0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_C) 			PORT_CHAR('c') PORT_CHAR('C')
@@ -494,7 +476,7 @@ static INPUT_PORTS_START(sord_m5)
 	PORT_BIT (0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_M)			PORT_CHAR('m') PORT_CHAR('M')
 	PORT_BIT (0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA) 		PORT_CHAR(',') PORT_CHAR('<')
 
-	PORT_START("LINE5")
+	PORT_START("keyboard_row_5")
 	PORT_BIT (0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9) 			PORT_CHAR('9') PORT_CHAR(')')
 	PORT_BIT (0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0) 			PORT_CHAR('0')
 	PORT_BIT (0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS) 		PORT_CHAR('-') PORT_CHAR('=')
@@ -504,7 +486,7 @@ static INPUT_PORTS_START(sord_m5)
 	PORT_BIT (0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("_  Triangle") PORT_CODE(KEYCODE_TILDE) PORT_CHAR('_')
 	PORT_BIT (0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH2)	PORT_CHAR('\\') PORT_CHAR('|')
 
-	PORT_START("LINE6")
+	PORT_START("keyboard_row_6")
 	PORT_BIT (0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_O) 			PORT_CHAR('o') PORT_CHAR('O')
 	PORT_BIT (0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_P)			PORT_CHAR('p') PORT_CHAR('P')
 	PORT_BIT (0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE)	PORT_CHAR('@') PORT_CHAR('`') PORT_CHAR(UCHAR_MAMEKEY(UP))
@@ -514,50 +496,18 @@ static INPUT_PORTS_START(sord_m5)
 	PORT_BIT (0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE)		PORT_CHAR(':') PORT_CHAR('*') PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
 	PORT_BIT (0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH)	PORT_CHAR(']') PORT_CHAR('}')
 
-	PORT_START("LINE7")
-	PORT_BIT (0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Joystick 1 Right") PORT_CODE(JOYCODE_X_RIGHT_SWITCH)
-	PORT_BIT (0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Joystick 1 Up") PORT_CODE(JOYCODE_Y_UP_SWITCH)
-	PORT_BIT (0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Joystick 1 Left") PORT_CODE(JOYCODE_X_LEFT_SWITCH)
-	PORT_BIT (0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Joystick 1 Down") PORT_CODE(JOYCODE_Y_DOWN_SWITCH)
-	PORT_BIT (0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Joystick 2 Right") PORT_CODE(JOYCODE_X_RIGHT_SWITCH)
-	PORT_BIT (0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Joystick 2 Up") PORT_CODE(JOYCODE_Y_UP_SWITCH)
-	PORT_BIT (0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Joystick 2 Left") PORT_CODE(JOYCODE_X_LEFT_SWITCH)
-	PORT_BIT (0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Joystick 2 Down") PORT_CODE(JOYCODE_Y_DOWN_SWITCH)
+	PORT_START("joypad_direction")
+	PORT_BIT (0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT) PORT_PLAYER(1)
+	PORT_BIT (0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP)    PORT_PLAYER(1)
+	PORT_BIT (0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT)  PORT_PLAYER(1)
+	PORT_BIT (0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN)  PORT_PLAYER(1)
+	PORT_BIT (0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT) PORT_PLAYER(2)
+	PORT_BIT (0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP)    PORT_PLAYER(2)
+	PORT_BIT (0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT)  PORT_PLAYER(2)
+	PORT_BIT (0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN)  PORT_PLAYER(2)
 
-	PORT_START("LINE8")
-	PORT_BIT (0x0ff, 0x000, IPT_UNUSED)
-
-	PORT_START("LINE9")
-	PORT_BIT (0x0ff, 0x000, IPT_UNUSED)
-
-	PORT_START("LINE10")
-	PORT_BIT (0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RSHIFT") PORT_CODE(KEYCODE_2_PAD)
-	PORT_BIT (0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RSHIFT") PORT_CODE(KEYCODE_3_PAD)
-	PORT_BIT (0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RSHIFT") PORT_CODE(KEYCODE_4_PAD)
-	PORT_BIT (0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RSHIFT") PORT_CODE(KEYCODE_5_PAD)
-	PORT_BIT (0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RSHIFT") PORT_CODE(KEYCODE_6_PAD)
-	PORT_BIT (0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RSHIFT") PORT_CODE(KEYCODE_7_PAD)
-	PORT_BIT (0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RSHIFT") PORT_CODE(KEYCODE_8_PAD)
-	PORT_BIT (0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RSHIFT") PORT_CODE(KEYCODE_9_PAD)
-	/*  PORT_BIT (0x0ff, 0x000, IPT_UNUSED) */
-
-	PORT_START("LINE11")
-	PORT_BIT (0x0ff, 0x000, IPT_UNUSED)
-
-	PORT_START("LINE12")
-	PORT_BIT (0x0ff, 0x000, IPT_UNUSED)
-
-	PORT_START("LINE13")
-	PORT_BIT (0x0ff, 0x000, IPT_UNUSED)
-
-	PORT_START("LINE14")
-	PORT_BIT (0x0ff, 0x000, IPT_UNUSED)
-
-	PORT_START("LINE15")
-	PORT_BIT (0x0ff, 0x000, IPT_UNUSED)
-
-	PORT_START("RESET")
-	PORT_BIT (0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Reset") PORT_CODE(KEYCODE_ESC) PORT_CHAR(UCHAR_MAMEKEY(ESC)) // 1st line, 1st key from right!
+	PORT_START("reset")
+	PORT_BIT (0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Reset") PORT_CODE(KEYCODE_ESC) PORT_CHAR(UCHAR_MAMEKEY(ESC)) // 1st line, 1st key from right!
 INPUT_PORTS_END
 
 
@@ -584,7 +534,7 @@ static const cassette_config sordm5_cassette_config =
 
 static MACHINE_DRIVER_START( sord_m5 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 3800000)
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_14_31818MHz/4)
 	MDRV_CPU_PROGRAM_MAP(sord_m5_mem)
 	MDRV_CPU_IO_MAP(sord_m5_io)
 	MDRV_CPU_VBLANK_INT("screen", sord_interrupt)
@@ -596,7 +546,7 @@ static MACHINE_DRIVER_START( sord_m5 )
 
 	MDRV_PPI8255_ADD( "ppi8255", sord_ppi8255_interface )
 
-	MDRV_Z80CTC_ADD( "z80ctc", 3800000, sord_m5_ctc_intf )
+	MDRV_Z80CTC_ADD( "z80ctc", XTAL_14_31818MHz/4, sord_m5_ctc_intf )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM(tms9928a)
@@ -606,7 +556,7 @@ static MACHINE_DRIVER_START( sord_m5 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("sn76489a", SN76489A, 3579545)	/* 3.579545 MHz */
+	MDRV_SOUND_ADD("sn76489a", SN76489A, XTAL_14_31818MHz/4)	/* 3.579545 MHz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* printer */
@@ -624,10 +574,10 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( sord_m5_fd5 )
 	MDRV_IMPORT_FROM( sord_m5 )
 
-	MDRV_CPU_REPLACE("maincpu", Z80, 3800000)
+	MDRV_CPU_REPLACE("maincpu", Z80, XTAL_14_31818MHz/4)
 	MDRV_CPU_IO_MAP(srdm5fd5_io)
 
-	MDRV_CPU_ADD("floppy", Z80, 3800000)
+	MDRV_CPU_ADD("floppy", Z80, XTAL_14_31818MHz/4)
 	MDRV_CPU_PROGRAM_MAP(sord_fd5_mem)
 	MDRV_CPU_IO_MAP(sord_fd5_io)
 
@@ -644,22 +594,21 @@ MACHINE_DRIVER_END
 
 ***************************************************************************/
 
-ROM_START(sordm5)
-	ROM_REGION(0x010000, "maincpu", 0)
-	ROM_LOAD("sordint.rom",0x0000, 0x02000, CRC(78848d39) SHA1(ac042c4ae8272ad6abe09ae83492ef9a0026d0b2))
-	ROM_REGION(0x5000, "user1", 0)
-	ROM_CART_LOAD("cart", 0x0000, 0x5000, ROM_NOMIRROR)
-ROM_END
-
-
-ROM_START(srdm5fd5)
+ROM_START( sordm5 )
 	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("sordint.rom",0x0000, 0x02000, CRC(78848d39) SHA1(ac042c4ae8272ad6abe09ae83492ef9a0026d0b2))
-	ROM_REGION(0x10000, "floppy", 0)
-	ROM_LOAD("sordfd5.rom",0x0000, 0x04000, NO_DUMP)
-	ROM_REGION(0x5000, "user1", 0)
-	ROM_CART_LOAD("cart", 0x0000, 0x5000, ROM_NOMIRROR | ROM_OPTIONAL)
+	ROM_LOAD("sordint.rom", 0x0000, 0x2000, CRC(78848d39) SHA1(ac042c4ae8272ad6abe09ae83492ef9a0026d0b2))
+	ROM_CART_LOAD("cart", 0x2000, 0x5000, ROM_NOMIRROR)
 ROM_END
+
+
+ROM_START( srdm5fd5 )
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("sordint.rom",0x0000, 0x2000, CRC(78848d39) SHA1(ac042c4ae8272ad6abe09ae83492ef9a0026d0b2))
+	ROM_CART_LOAD("cart", 0x2000, 0x5000, ROM_NOMIRROR | ROM_OPTIONAL)
+	ROM_REGION(0x4000, "floppy", 0)
+	ROM_LOAD("sordfd5.rom",0x0000, 0x4000, NO_DUMP)
+ROM_END
+
 
 static FLOPPY_OPTIONS_START( sordm5 )
 	FLOPPY_OPTION( sordm5, "dsk", "Sord M5 disk image", basicdsk_identify_default, basicdsk_construct_default,
