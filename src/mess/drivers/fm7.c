@@ -54,6 +54,7 @@ emu_timer* fm7_timer;  // main timer, triggered every 2.0345ms?
 emu_timer* fm7_subtimer;  // sub-CPU timer, every 1 second?
 emu_timer* fm7_keyboard_timer;
 static UINT8 sub_busy;
+static UINT8 sub_halt;
 static UINT8 basic_rom_en;
 static UINT8 attn_irq;
 static UINT8 vram_access;  // VRAM access flag
@@ -232,16 +233,6 @@ WRITE8_HANDLER( vector_w )
 	RAM[0xfff0+offset] = data;
 }
 
-READ8_HANDLER( shared_r )
-{
-	return shared_ram[offset];
-}
-
-WRITE8_HANDLER( shared_w )
-{
-	shared_ram[offset] = data;
-}
-
 READ8_HANDLER( fm7_fd04_r )
 {
 	UINT8 ret = 0xff;
@@ -281,6 +272,7 @@ READ8_HANDLER( fm7_subintf_r )
 WRITE8_HANDLER( fm7_subintf_w )
 {
 	cputag_set_input_line(space->machine,"sub",INPUT_LINE_HALT,(data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
+	sub_halt = data & 0x80;
 	sub_busy = data & 0x80;
 	if(data & 0x40)
 		cputag_set_input_line(space->machine,"sub",M6809_IRQ_LINE,ASSERT_LINE);
@@ -289,7 +281,8 @@ WRITE8_HANDLER( fm7_subintf_w )
 
 READ8_HANDLER( fm7_sub_busyflag_r )
 {
-	sub_busy = 0x00;
+	if(sub_halt == 0)  // Sub CPU is still busy when halted
+		sub_busy = 0x00;
 	return 0x00;
 }
 
@@ -568,7 +561,7 @@ void key_press(running_machine* machine, UINT16 scancode)
 	if(irq_mask & IRQ_FLAG_KEY)
 	{
 		irq_flags |= IRQ_FLAG_KEY;
-//		cputag_set_input_line(machine,"maincpu",M6809_IRQ_LINE,ASSERT_LINE);
+		cputag_set_input_line(machine,"maincpu",M6809_IRQ_LINE,ASSERT_LINE);
 	}
 	cputag_set_input_line(machine,"sub",M6809_FIRQ_LINE,ASSERT_LINE);
 	logerror("KEY: sent scancode 0x%03x\n",scancode);
@@ -639,7 +632,7 @@ static ADDRESS_MAP_START( fm7_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000,0x7fff) AM_RAM 
 	AM_RANGE(0x8000,0xfbff) AM_RAMBANK(1) // also F-BASIC ROM, when enabled
 	AM_RANGE(0xfc00,0xfc7f) AM_RAM
-	AM_RANGE(0xfc80,0xfcff) AM_READWRITE(shared_r,shared_w) // shared RAM with sub-CPU
+	AM_RANGE(0xfc80,0xfcff) AM_RAM AM_SHARE(2) AM_BASE(&shared_ram) // shared RAM with sub-CPU
 	// I/O space (FD00-FDFF)
 	AM_RANGE(0xfd00,0xfd01) AM_READWRITE(fm7_keyboard_r,fm7_cassette_printer_w)
 	AM_RANGE(0xfd02,0xfd02) AM_READWRITE(fm7_cassette_printer_r,fm7_irq_mask_w)  // IRQ mask
@@ -673,7 +666,7 @@ static ADDRESS_MAP_START( fm7_sub_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000,0xbfff) AM_READWRITE(fm7_vram_r,fm7_vram_w) // VRAM
 	AM_RANGE(0xc000,0xcfff) AM_RAM // Console RAM
 	AM_RANGE(0xd000,0xd37f) AM_RAM // Work RAM
-	AM_RANGE(0xd380,0xd3ff) AM_READWRITE(shared_r,shared_w) // shared RAM
+	AM_RANGE(0xd380,0xd3ff) AM_RAM AM_SHARE(2) AM_BASE(&shared_ram)
 	// I/O space (D400-D7FF)
 	AM_RANGE(0xd400,0xd401) AM_READ(fm7_keyboard_r)
 	AM_RANGE(0xd402,0xd402) AM_READ(fm7_cancel_ack)
@@ -806,7 +799,7 @@ INPUT_PORTS_END
 
 static DRIVER_INIT(fm7)
 {
-	shared_ram = auto_alloc_array(machine,UINT8,0x80);
+//	shared_ram = auto_alloc_array(machine,UINT8,0x80);
 	fm7_video_ram = auto_alloc_array(machine,UINT8,0xc000);
 	fm7_timer = timer_alloc(machine,fm7_timer_irq,NULL);
 	fm7_subtimer = timer_alloc(machine,fm7_subtimer_irq,NULL);
