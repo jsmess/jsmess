@@ -263,7 +263,7 @@ READ8_HANDLER( fm7_subintf_r )
 {
 	UINT8 ret = 0;
 	
-	if(sub_busy != 0)
+	if(sub_busy != 0 || sub_halt != 0)
 		ret |= 0x80;
 		
 	return ret;
@@ -271,9 +271,8 @@ READ8_HANDLER( fm7_subintf_r )
 
 WRITE8_HANDLER( fm7_subintf_w )
 {
-	cputag_set_input_line(space->machine,"sub",INPUT_LINE_HALT,(data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
 	sub_halt = data & 0x80;
-	sub_busy = data & 0x80;
+	cputag_set_input_line(space->machine,"sub",INPUT_LINE_HALT,(data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
 	if(data & 0x40)
 		cputag_set_input_line(space->machine,"sub",M6809_IRQ_LINE,ASSERT_LINE);
 	//popmessage("Sub CPU Interface write: %02x\n",data);
@@ -281,7 +280,7 @@ WRITE8_HANDLER( fm7_subintf_w )
 
 READ8_HANDLER( fm7_sub_busyflag_r )
 {
-	if(sub_halt == 0)  // Sub CPU is still busy when halted
+	if(sub_halt == 0)
 		sub_busy = 0x00;
 	return 0x00;
 }
