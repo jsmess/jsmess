@@ -2,7 +2,7 @@
 
     Mostek Z80STI Serial Timer Interrupt Controller emulation
 
-    Copyright (c) 2008, The MESS Team.
+    Copyright (c) 2009, The MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
 
 ***************************************************************************/
@@ -48,6 +48,15 @@ enum
 	Z80STI_REGISTER_UDR
 };
 
+enum
+{
+	Z80STI_TIMER_A = 0,
+	Z80STI_TIMER_B,
+	Z80STI_TIMER_C,
+	Z80STI_TIMER_D,
+	Z80STI_MAX_TIMERS
+};
+
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
@@ -63,7 +72,37 @@ struct _z80sti_t
 	devcb_resolved_write_line	out_tbo_func;
 	devcb_resolved_write_line	out_tco_func;
 	devcb_resolved_write_line	out_tdo_func;
-	devcb_resolved_write_line	out_irq_func;
+	devcb_resolved_write_line	out_int_func;
+
+	/* I/O state */
+	UINT8 gpip;							/* general purpose I/O register */
+	UINT8 aer;							/* active edge register */
+	UINT8 ddr;							/* data direction register */
+
+	/* interrupt state */
+	UINT16 ier;							/* interrupt enable register */
+	UINT16 ipr;							/* interrupt pending register */
+	UINT16 isr;							/* interrupt in-service register */
+	UINT16 imr;							/* interrupt mask register */
+	UINT8 pvr;							/*  */
+
+	/* timer state */
+	UINT8 tabc;							/*  */
+	UINT8 tcdc;							/*  */
+	UINT8 tdr[Z80STI_MAX_TIMERS];		/* timer data registers */
+	UINT8 tmc[Z80STI_MAX_TIMERS];		/* timer main counters */
+
+	/* serial state */
+	UINT8 scr;							/* synchronous character register */
+	UINT8 ucr;							/* USART control register */
+	UINT8 tsr;							/* transmitter status register */
+	UINT8 rsr;							/* receiver status register */
+	UINT8 udr;							/* USART data register */
+
+	/* timers */
+	emu_timer *timer[Z80STI_MAX_TIMERS];	/* counter timers */
+	emu_timer *rx_timer;					/* serial receive timer */
+	emu_timer *tx_timer;					/* serial transmit timer */
 };
 
 /***************************************************************************
@@ -97,6 +136,78 @@ INLINE const z80sti_interface *get_interface(const device_config *device)
 ***************************************************************************/
 
 /*-------------------------------------------------
+    check_interrupts - set the interrupt request
+	line state
+-------------------------------------------------*/
+#ifdef UNUSED_CODE
+static void check_interrupts(const device_config *device)
+{
+	z80sti_t *z80sti = get_safe_token(device);
+
+	if (z80sti->ipr & z80sti->imr)
+	{
+		devcb_call_write_line(&z80sti->out_int_func, ASSERT_LINE);
+	}
+	else
+	{
+		devcb_call_write_line(&z80sti->out_int_func, CLEAR_LINE);
+	}
+}
+
+/*-------------------------------------------------
+    take_interrupt - mark an interrupt pending
+-------------------------------------------------*/
+
+static void take_interrupt(const device_config *device, UINT16 mask)
+{
+	z80sti_t *z80sti = get_safe_token(device);
+
+	z80sti->ipr |= mask;
+
+	check_interrupts(device);
+}
+#endif
+/*-------------------------------------------------
+    serial_receive - receive serial bit
+-------------------------------------------------*/
+
+static void serial_receive(z80sti_t *z80sti)
+{
+}
+
+/*-------------------------------------------------
+    TIMER_CALLBACK( rx_tick )
+-------------------------------------------------*/
+
+static TIMER_CALLBACK( rx_tick )
+{
+	const device_config *device = ptr;
+	z80sti_t *z80sti = get_safe_token(device);
+
+	serial_receive(z80sti);
+}
+
+/*-------------------------------------------------
+    serial_transmit - transmit serial bit
+-------------------------------------------------*/
+
+static void serial_transmit(z80sti_t *z80sti)
+{
+}
+
+/*-------------------------------------------------
+    TIMER_CALLBACK( tx_tick )
+-------------------------------------------------*/
+
+static TIMER_CALLBACK( tx_tick )
+{
+	const device_config *device = ptr;
+	z80sti_t *z80sti = get_safe_token(device);
+
+	serial_transmit(z80sti);
+}
+
+/*-------------------------------------------------
     z80sti_r - register read
 -------------------------------------------------*/
 
@@ -119,6 +230,12 @@ WRITE8_DEVICE_HANDLER( z80sti_w )
 
 WRITE_LINE_DEVICE_HANDLER( z80sti_rc_w )
 {
+	z80sti_t *z80sti = get_safe_token(device);
+
+	if (state)
+	{
+		serial_receive(z80sti);
+	}
 }
 
 /*-------------------------------------------------
@@ -127,7 +244,30 @@ WRITE_LINE_DEVICE_HANDLER( z80sti_rc_w )
 
 WRITE_LINE_DEVICE_HANDLER( z80sti_tc_w )
 {
+	z80sti_t *z80sti = get_safe_token(device);
+
+	if (state)
+	{
+		serial_transmit(z80sti);
+	}
 }
+
+/*-------------------------------------------------
+    timer_count - timer count down
+-------------------------------------------------*/
+
+static void timer_count(z80sti_t *z80sti, int index)
+{
+}
+
+/*-------------------------------------------------
+    TIMER_CALLBACK( timer_a )
+-------------------------------------------------*/
+
+static TIMER_CALLBACK( timer_a ) { z80sti_t *z80sti = get_safe_token(ptr); timer_count(z80sti, Z80STI_TIMER_A); }
+static TIMER_CALLBACK( timer_b ) { z80sti_t *z80sti = get_safe_token(ptr); timer_count(z80sti, Z80STI_TIMER_B); }
+static TIMER_CALLBACK( timer_c ) { z80sti_t *z80sti = get_safe_token(ptr); timer_count(z80sti, Z80STI_TIMER_C); }
+static TIMER_CALLBACK( timer_d ) { z80sti_t *z80sti = get_safe_token(ptr); timer_count(z80sti, Z80STI_TIMER_D); }
 
 /*-------------------------------------------------
     z80sti_i0_w - input 0 write
@@ -237,7 +377,46 @@ static DEVICE_START( z80sti )
 	devcb_resolve_write_line(&z80sti->out_tbo_func, &intf->out_tbo_func, device);
 	devcb_resolve_write_line(&z80sti->out_tco_func, &intf->out_tco_func, device);
 	devcb_resolve_write_line(&z80sti->out_tdo_func, &intf->out_tdo_func, device);
-	devcb_resolve_write_line(&z80sti->out_irq_func, &intf->out_irq_func, device);
+	devcb_resolve_write_line(&z80sti->out_int_func, &intf->out_int_func, device);
+
+	/* create the counter timers */
+	z80sti->timer[Z80STI_TIMER_A] = timer_alloc(device->machine, timer_a, (void *)device);
+	z80sti->timer[Z80STI_TIMER_B] = timer_alloc(device->machine, timer_b, (void *)device);
+	z80sti->timer[Z80STI_TIMER_C] = timer_alloc(device->machine, timer_c, (void *)device);
+	z80sti->timer[Z80STI_TIMER_D] = timer_alloc(device->machine, timer_d, (void *)device);
+
+	/* create serial receive clock timer */
+	if (intf->rx_clock > 0)
+	{
+		z80sti->rx_timer = timer_alloc(device->machine, rx_tick, (void *)device);
+		timer_adjust_periodic(z80sti->rx_timer, attotime_zero, 0, ATTOTIME_IN_HZ(intf->rx_clock));
+	}
+
+	/* create serial transmit clock timer */
+	if (intf->tx_clock > 0)
+	{
+		z80sti->tx_timer = timer_alloc(device->machine, tx_tick, (void *)device);
+		timer_adjust_periodic(z80sti->tx_timer, attotime_zero, 0, ATTOTIME_IN_HZ(intf->tx_clock));
+	}
+
+	/* register for state saving */
+	state_save_register_device_item(device, 0, z80sti->gpip);
+	state_save_register_device_item(device, 0, z80sti->aer);
+	state_save_register_device_item(device, 0, z80sti->ddr);
+	state_save_register_device_item(device, 0, z80sti->ier);
+	state_save_register_device_item(device, 0, z80sti->ipr);
+	state_save_register_device_item(device, 0, z80sti->isr);
+	state_save_register_device_item(device, 0, z80sti->imr);
+	state_save_register_device_item(device, 0, z80sti->pvr);
+	state_save_register_device_item(device, 0, z80sti->tabc);
+	state_save_register_device_item(device, 0, z80sti->tcdc);
+	state_save_register_device_item_array(device, 0, z80sti->tdr);
+	state_save_register_device_item_array(device, 0, z80sti->tmc);
+	state_save_register_device_item(device, 0, z80sti->scr);
+	state_save_register_device_item(device, 0, z80sti->ucr);
+	state_save_register_device_item(device, 0, z80sti->rsr);
+	state_save_register_device_item(device, 0, z80sti->tsr);
+	state_save_register_device_item(device, 0, z80sti->udr);
 }
 
 /*-------------------------------------------------

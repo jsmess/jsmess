@@ -46,10 +46,6 @@
 	MDRV_DEVICE_ADD((_tag), Z80STI, _clock)	\
 	MDRV_DEVICE_CONFIG(_config)
 
-#define MDRV_MK68901_ADD(_tag, _clock, _config) \
-	MDRV_DEVICE_ADD((_tag), MK68901, _clock)	\
-	MDRV_DEVICE_CONFIG(_config)
-
 #define Z80STI_INTERFACE(name) const z80sti_interface (name) =
 
 /***************************************************************************
@@ -62,10 +58,10 @@ struct _z80sti_interface
 	int	rx_clock;			/* serial receive clock */
 	int	tx_clock;			/* serial transmit clock */
 
-	/* this is called on each read of the I/O pins */
+	/* this is called on each read of the GPIO pins */
 	devcb_read8				in_gpio_func;
 
-	/* this is called on each write of the I/O pins */
+	/* this is called on each write of the GPIO pins */
 	devcb_write8			out_gpio_func;
 
 	/* this gets called for each read of the SI pin (pin 38) */
@@ -87,7 +83,7 @@ struct _z80sti_interface
 	devcb_write_line		out_tdo_func;
 
 	/* this gets called on each change of the interrupt line (pin 17) */
-	devcb_write_line		out_irq_func;
+	devcb_write_line		out_int_func;
 };
 
 /***************************************************************************
