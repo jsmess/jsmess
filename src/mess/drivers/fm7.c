@@ -436,6 +436,8 @@ READ8_HANDLER( fm7_cassette_printer_r )
 		ret |= 0x80;
 	
 	ret |= 0x40;
+	
+	ret |= 0x3f;  // Printer status, joystick inputs
 
 	return ret;
 }
@@ -531,6 +533,21 @@ static WRITE8_HANDLER( fm7_psg_data_w )
 {
 	psg_data = data;
 	fm7_update_psg(space->machine);
+}
+
+// Shared RAM is only usable on the main CPU if the sub CPU is halted
+static READ8_HANDLER( fm7_main_shared_r )
+{
+	if(sub_halt != 0)
+		return shared_ram[offset];
+	else
+		return 0xff;
+}
+
+static WRITE8_HANDLER( fm7_main_shared_w )
+{
+	if(sub_halt != 0)
+		shared_ram[offset] = data;
 }
 
 static TIMER_CALLBACK( fm7_timer_irq )
@@ -631,7 +648,7 @@ static ADDRESS_MAP_START( fm7_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000,0x7fff) AM_RAM 
 	AM_RANGE(0x8000,0xfbff) AM_RAMBANK(1) // also F-BASIC ROM, when enabled
 	AM_RANGE(0xfc00,0xfc7f) AM_RAM
-	AM_RANGE(0xfc80,0xfcff) AM_RAM AM_SHARE(2) AM_BASE(&shared_ram) // shared RAM with sub-CPU
+	AM_RANGE(0xfc80,0xfcff) AM_RAM AM_READWRITE(fm7_main_shared_r,fm7_main_shared_w)
 	// I/O space (FD00-FDFF)
 	AM_RANGE(0xfd00,0xfd01) AM_READWRITE(fm7_keyboard_r,fm7_cassette_printer_w)
 	AM_RANGE(0xfd02,0xfd02) AM_READWRITE(fm7_cassette_printer_r,fm7_irq_mask_w)  // IRQ mask
@@ -665,7 +682,7 @@ static ADDRESS_MAP_START( fm7_sub_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000,0xbfff) AM_READWRITE(fm7_vram_r,fm7_vram_w) // VRAM
 	AM_RANGE(0xc000,0xcfff) AM_RAM // Console RAM
 	AM_RANGE(0xd000,0xd37f) AM_RAM // Work RAM
-	AM_RANGE(0xd380,0xd3ff) AM_RAM AM_SHARE(2) AM_BASE(&shared_ram)
+	AM_RANGE(0xd380,0xd3ff) AM_RAM AM_BASE(&shared_ram)
 	// I/O space (D400-D7FF)
 	AM_RANGE(0xd400,0xd401) AM_READ(fm7_keyboard_r)
 	AM_RANGE(0xd402,0xd402) AM_READ(fm7_cancel_ack)
