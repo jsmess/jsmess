@@ -716,19 +716,25 @@ static char *GameInfoScreen(UINT nIndex)
 	else
 	{
 		const device_config *screen = video_screen_first(config);
-		const screen_config *scrconfig = screen->inline_config;
 
-		if (drivers[nIndex]->flags & ORIENTATION_SWAP_XY)
-		{
-			sprintf(buf,"%d x %d (V) %f Hz",
-			scrconfig->visarea.max_y - scrconfig->visarea.min_y + 1,
+		if (screen != NULL)
+		{		
+			const screen_config *scrconfig = screen->inline_config;
+
+			if (drivers[nIndex]->flags & ORIENTATION_SWAP_XY)
+			{
+				sprintf(buf,"%d x %d (V) %f Hz",
+				scrconfig->visarea.max_y - scrconfig->visarea.min_y + 1,
 					scrconfig->visarea.max_x - scrconfig->visarea.min_x + 1,
 					ATTOSECONDS_TO_HZ(scrconfig->refresh));
-		} else {
-			sprintf(buf,"%d x %d (H) %f Hz",
+			}
+			else
+			{
+				sprintf(buf,"%d x %d (H) %f Hz",
 					scrconfig->visarea.max_x - scrconfig->visarea.min_x + 1,
 					scrconfig->visarea.max_y - scrconfig->visarea.min_y + 1,
 					ATTOSECONDS_TO_HZ(scrconfig->refresh));
+			}
 		}
 	}
 	/* Free the structure */
