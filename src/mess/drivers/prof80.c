@@ -23,6 +23,7 @@
 #include "driver.h"
 #include "includes/prof80.h"
 #include "cpu/z80/z80.h"
+#include "cpu/z80/z80daisy.h"
 #include "devices/basicdsk.h"
 #include "video/mc6845.h"
 #include "machine/8255ppi.h"
@@ -649,6 +650,14 @@ static Z80STI_INTERFACE( grip_z80sti_interface )
 	DEVCB_LINE(grip_z80sti_irq_w)
 };
 
+/* Z80 Daisy Chain */
+
+static const z80_daisy_chain grip_daisy_chain[] =
+{
+	{ Z80STI_TAG },
+	{ NULL }
+};
+
 /* Machine Initialization */
 
 static MACHINE_START( prof80 )
@@ -718,6 +727,7 @@ static MACHINE_DRIVER_START( prof80 )
     MDRV_CPU_IO_MAP(prof80_io)
 
     MDRV_CPU_ADD("grip", Z80, XTAL_16MHz/4)
+	MDRV_CPU_CONFIG(grip_daisy_chain)
     MDRV_CPU_PROGRAM_MAP(grip_mem)
     MDRV_CPU_IO_MAP(grip_io)
 
