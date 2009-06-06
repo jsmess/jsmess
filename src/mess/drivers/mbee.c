@@ -119,7 +119,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(mbeeppc_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK(1)
 	AM_RANGE(0x1000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xbfff) AM_ROM
+	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK(6)
+	AM_RANGE(0xa000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK(4)
 	AM_RANGE(0xe000, 0xefff) AM_ROMBANK(5)
 	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(SMH_BANK(2), mbee_videoram_w) AM_SIZE(&videoram_size)
@@ -165,54 +166,37 @@ static ADDRESS_MAP_START(mbeeic_io, ADDRESS_SPACE_IO, 8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mbeepc_io, ADDRESS_SPACE_IO, 8)
-	ADDRESS_MAP_GLOBAL_MASK(0x1ff)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000, 0x003) AM_MIRROR(0x10) AM_DEVREADWRITE("z80pio", mbee_pio_r, mbee_pio_w)
-	AM_RANGE(0x008, 0x008) AM_MIRROR(0x10) AM_READWRITE(mbee_pcg_color_latch_r, mbee_pcg_color_latch_w)
-	AM_RANGE(0x00a, 0x00a) AM_MIRROR(0x10) AM_READWRITE(mbee_color_bank_r, mbee_color_bank_w)
-	AM_RANGE(0x00b, 0x00b) AM_MIRROR(0x10) AM_READWRITE(mbee_video_bank_r, mbee_video_bank_w)
-	AM_RANGE(0x00c, 0x00c) AM_MIRROR(0x10) AM_READWRITE(m6545_status_r, m6545_index_w)
-	AM_RANGE(0x00d, 0x00d) AM_MIRROR(0x10) AM_READWRITE(m6545_data_r, m6545_data_w)
-	AM_RANGE(0x100, 0x103) AM_MIRROR(0x10) AM_DEVREADWRITE("z80pio", mbee_pio_r, mbee_pio_w)
-	AM_RANGE(0x108, 0x108) AM_MIRROR(0x10) AM_READWRITE(mbee_pcg_color_latch_r, mbee_pcg_color_latch_w)
-	AM_RANGE(0x10a, 0x10a) AM_MIRROR(0x10) AM_READWRITE(mbee_bank_netrom_r, mbee_color_bank_w)
-	AM_RANGE(0x10b, 0x10b) AM_MIRROR(0x10) AM_READWRITE(mbee_video_bank_r, mbee_video_bank_w)
-	AM_RANGE(0x10c, 0x10c) AM_MIRROR(0x10) AM_READWRITE(m6545_status_r, m6545_index_w)
-	AM_RANGE(0x10d, 0x10d) AM_MIRROR(0x10) AM_READWRITE(m6545_data_r, m6545_data_w)
+	AM_RANGE(0x0000, 0x0003) AM_MIRROR(0xff10) AM_DEVREADWRITE("z80pio", mbee_pio_r, mbee_pio_w)
+	AM_RANGE(0x0008, 0x0008) AM_MIRROR(0xff10) AM_READWRITE(mbee_pcg_color_latch_r, mbee_pcg_color_latch_w)
+	AM_RANGE(0x000a, 0x000a) AM_MIRROR(0xfe10) AM_READWRITE(mbee_color_bank_r, mbee_color_bank_w)
+	AM_RANGE(0x000b, 0x000b) AM_MIRROR(0xff10) AM_READWRITE(mbee_video_bank_r, mbee_video_bank_w)
+	AM_RANGE(0x000c, 0x000c) AM_MIRROR(0xff10) AM_READWRITE(m6545_status_r, m6545_index_w)
+	AM_RANGE(0x000d, 0x000d) AM_MIRROR(0xff10) AM_READWRITE(m6545_data_r, m6545_data_w)
+	AM_RANGE(0x010a, 0x010a) AM_MIRROR(0xfe10) AM_READWRITE(mbee_bank_netrom_r, mbee_color_bank_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mbeepc85_io, ADDRESS_SPACE_IO, 8)
-	ADDRESS_MAP_GLOBAL_MASK(0x1ff)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000, 0x003) AM_MIRROR(0x10) AM_DEVREADWRITE("z80pio", mbee_pio_r, mbee_pio_w)
-	AM_RANGE(0x008, 0x008) AM_MIRROR(0x10) AM_READWRITE(mbee_pcg_color_latch_r, mbee_pcg_color_latch_w)
-	AM_RANGE(0x00a, 0x00a) AM_MIRROR(0x10) AM_READWRITE(mbee_color_bank_r, mbee_color_bank_w)
-	AM_RANGE(0x00b, 0x00b) AM_MIRROR(0x10) AM_READWRITE(mbee_video_bank_r, mbee_video_bank_w)
-	AM_RANGE(0x00c, 0x00c) AM_MIRROR(0x10) AM_READWRITE(m6545_status_r, m6545_index_w)
-	AM_RANGE(0x00d, 0x00d) AM_MIRROR(0x10) AM_READWRITE(m6545_data_r, m6545_data_w)
-	AM_RANGE(0x100, 0x103) AM_MIRROR(0x10) AM_DEVREADWRITE("z80pio", mbee_pio_r, mbee_pio_w)
-	AM_RANGE(0x108, 0x108) AM_MIRROR(0x10) AM_READWRITE(mbee_pcg_color_latch_r, mbee_pcg_color_latch_w)
-	AM_RANGE(0x10a, 0x10a) AM_MIRROR(0x10) AM_READWRITE(mbee_bank_netrom_r, mbee_color_bank_w)
-	AM_RANGE(0x10b, 0x10b) AM_MIRROR(0x10) AM_READWRITE(mbee_video_bank_r, mbee_video_bank_w)
-	AM_RANGE(0x10c, 0x10c) AM_MIRROR(0x10) AM_READWRITE(m6545_status_r, m6545_index_w)
-	AM_RANGE(0x10d, 0x10d) AM_MIRROR(0x10) AM_READWRITE(m6545_data_r, m6545_data_w)
+	AM_RANGE(0x0000, 0x0003) AM_MIRROR(0xff10) AM_DEVREADWRITE("z80pio", mbee_pio_r, mbee_pio_w)
+	AM_RANGE(0x0008, 0x0008) AM_MIRROR(0xff10) AM_READWRITE(mbee_pcg_color_latch_r, mbee_pcg_color_latch_w)
+	AM_RANGE(0x000a, 0x000a) AM_MIRROR(0xfe10) AM_READWRITE(mbee_color_bank_r, mbee_color_bank_w)
+	AM_RANGE(0x000b, 0x000b) AM_MIRROR(0xff10) AM_READWRITE(mbee_video_bank_r, mbee_video_bank_w)
+	AM_RANGE(0x000c, 0x000c) AM_MIRROR(0xff10) AM_READWRITE(m6545_status_r, m6545_index_w)
+	AM_RANGE(0x000d, 0x000d) AM_MIRROR(0xff10) AM_READWRITE(m6545_data_r, m6545_data_w)
+	AM_RANGE(0x010a, 0x010a) AM_MIRROR(0xfe10) AM_READWRITE(mbee_bank_netrom_r, mbee_color_bank_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mbeeppc_io, ADDRESS_SPACE_IO, 8)
-	ADDRESS_MAP_GLOBAL_MASK(0x1ff)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000, 0x003) AM_MIRROR(0x10) AM_DEVREADWRITE("z80pio", mbee_pio_r, mbee_pio_w)
-	AM_RANGE(0x008, 0x008) AM_MIRROR(0x10) AM_READWRITE(mbee_pcg_color_latch_r, mbee_pcg_color_latch_w)
-	AM_RANGE(0x00a, 0x00a) AM_MIRROR(0x10) AM_READWRITE(mbee_color_bank_r, mbee_color_bank_w)
-	AM_RANGE(0x00b, 0x00b) AM_MIRROR(0x10) AM_READWRITE(mbee_video_bank_r, mbee_video_bank_w)
-	AM_RANGE(0x00c, 0x00c) AM_MIRROR(0x10) AM_READWRITE(m6545_status_r, m6545_index_w)
-	AM_RANGE(0x00d, 0x00d) AM_MIRROR(0x10) AM_READWRITE(m6545_data_r, m6545_data_w)
-	AM_RANGE(0x100, 0x103) AM_MIRROR(0x10) AM_DEVREADWRITE("z80pio", mbee_pio_r, mbee_pio_w)
-	AM_RANGE(0x108, 0x108) AM_MIRROR(0x10) AM_READWRITE(mbee_pcg_color_latch_r, mbee_pcg_color_latch_w)
-	AM_RANGE(0x10a, 0x10a) AM_MIRROR(0x10) AM_READWRITE(mbee_bank_netrom_r, mbee_color_bank_w)
-	AM_RANGE(0x10b, 0x10b) AM_MIRROR(0x10) AM_READWRITE(mbee_video_bank_r, mbee_video_bank_w)
-	AM_RANGE(0x10c, 0x10c) AM_MIRROR(0x10) AM_READWRITE(m6545_status_r, m6545_index_w)
-	AM_RANGE(0x10d, 0x10d) AM_MIRROR(0x10) AM_READWRITE(m6545_data_r, m6545_data_w)
+	AM_RANGE(0x0000, 0x0003) AM_MIRROR(0xff00) AM_DEVREADWRITE("z80pio", mbee_pio_r, mbee_pio_w)
+	AM_RANGE(0x0008, 0x0008) AM_MIRROR(0xff00) AM_READWRITE(mbee_pcg_color_latch_r, mbee_pcg_color_latch_w)
+	AM_RANGE(0x000a, 0x000a) AM_MIRROR(0xfe00) AM_READWRITE(mbee_color_bank_r, mbee_0a_w)
+	AM_RANGE(0x000b, 0x000b) AM_MIRROR(0xff00) AM_READWRITE(mbee_video_bank_r, mbee_video_bank_w)
+	AM_RANGE(0x000c, 0x000c) AM_MIRROR(0xff00) AM_READWRITE(m6545_status_r, m6545_index_w)
+	AM_RANGE(0x000d, 0x000d) AM_MIRROR(0xff00) AM_READWRITE(m6545_data_r, m6545_data_w)
+	AM_RANGE(0x001c, 0x001c) AM_MIRROR(0xff00) AM_WRITE(mbee_1c_w)
+	AM_RANGE(0x010a, 0x010a) AM_MIRROR(0xfe00) AM_READWRITE(mbee_bank_netrom_r, mbee_0a_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mbee56_io, ADDRESS_SPACE_IO, 8)
@@ -515,15 +499,17 @@ static DRIVER_INIT( mbeepc85 )
 static DRIVER_INIT( mbeeppc )
 {
 	UINT8 *RAM = memory_region(machine, "maincpu");
-	memory_configure_bank(machine, 1, 0, 2, &RAM[0x0000],  0x8000);
+	memory_configure_bank(machine, 1, 0, 2, &RAM[0x0000],  0x30000);
 	memory_configure_bank(machine, 2, 0, 2, &RAM[0x11000], 0x4000);
 	memory_configure_bank(machine, 3, 0, 2, &RAM[0x11800], 0x4000);
 	memory_configure_bank(machine, 4, 0, 8, &RAM[0x20000], 0x2000);
 	memory_configure_bank(machine, 5, 0, 2, &RAM[0x18000], 0x1000);
+	memory_configure_bank(machine, 6, 0, 2, &RAM[0x30000], 0x2000);
 	memory_set_bank(machine, 2, 1);
 	memory_set_bank(machine, 3, 0);
 	memory_set_bank(machine, 4, 5);
 	memory_set_bank(machine, 5, 0);
+	memory_set_bank(machine, 6, 0);
 	mbee_size = 0x8000;
 }
 
@@ -632,8 +618,7 @@ ROM_START( mbeepc85 )
 ROM_END
 
 ROM_START( mbeeppc )
-	ROM_REGION(0x30000,"maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD("bas529a.rom",           0x8000,  0x4000, CRC(fe8242e1) SHA1(ff790edf4fcc7a134d451dbad7779157b07f6abf) )
+	ROM_REGION(0x40000,"maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD("bas529b.rom",           0xa000,  0x2000, CRC(a1bd986b) SHA1(5d79f210c9042db5aefc85a0bdf45210cb9e9899) )
 	ROM_LOAD("charrom.bin",           0x11000, 0x1000, CRC(1f9fcee4) SHA1(e57ac94e03638075dde68a0a8c834a4f84ba47b0) )
 	ROM_RELOAD( 0x17000, 0x1000 )
@@ -648,6 +633,7 @@ ROM_START( mbeeppc )
 	ROM_LOAD_OPTIONAL("vtex235.rom",  0x28000, 0x2000, CRC(8c30ecb2) SHA1(cf068462d7def885bdb5d3a265851b88c727c0d7) ) // 4
 	ROM_LOAD("ppcshell.rom",          0x2a000, 0x2000, CRC(1e793555) SHA1(ddeaa081ec4408e80e3fb192865d87daa035c701) ) // 5
 	ROM_LOAD_OPTIONAL("ozlogo.rom",   0x2c000, 0x2000, CRC(47c3ef69) SHA1(8274d27c323ca4a6cc9e7d24946ae9c0531c3112) ) // 6
+	ROM_LOAD("bas529a.rom",           0x30000, 0x4000, CRC(fe8242e1) SHA1(ff790edf4fcc7a134d451dbad7779157b07f6abf) )
 
 	ROM_REGION( 0x0040, "proms", 0 )
 	ROM_LOAD( "82s123.ic7",           0x0000,  0x0020, CRC(61b9c16c) SHA1(0ee72377831c21339360c376f7248861d476dc20) )
@@ -692,7 +678,7 @@ COMP( 1982, mbee,     0,	0,	mbee,     mbee,     mbee,     0,	"Applied Technology
 COMP( 1982, mbeeic,   mbee,	0,	mbeeic,   mbee,     mbeeic,   mbeeic,	"Applied Technology",  "Microbee 32 IC" , 0)
 COMP( 1982, mbeepc,   mbee,	0,	mbeepc,   mbee,     mbeepc,   mbeeic,	"Applied Technology",  "Microbee 32 Personal Communicator" , 0)
 COMP( 1985, mbeepc85, mbee,	0,	mbeepc85, mbee,     mbeepc85, mbeeic,	"Applied Technology",  "Microbee 32 PC85" , 0)
-COMP( 1985, mbeeppc,  mbee,	0,	mbeepc85, mbee,     mbeeppc,  mbeeic,	"Applied Technology",  "Microbee 32 Premium PC85" , GAME_NOT_WORKING)
+COMP( 1985, mbeeppc,  mbee,	0,	mbeeppc,  mbee,     mbeeppc,  mbeeic,	"Applied Technology",  "Microbee 32 Premium PC85" , GAME_NOT_WORKING)
 COMP( 1986, mbee56,   mbee,	0,	mbee56,   mbee,     mbee56,   mbeeic,	"Applied Technology",  "Microbee 56k" , GAME_NOT_WORKING)
-COMP( 1986, mbee64,   mbee,	0,	mbee56,   mbee,     mbee64,   mbeeic,	"Applied Technology",  "Microbee 64k" , GAME_NOT_WORKING)
+COMP( 1986, mbee64,   mbee,	0,	mbee64,   mbee,     mbee64,   mbeeic,	"Applied Technology",  "Microbee 64k" , GAME_NOT_WORKING)
 

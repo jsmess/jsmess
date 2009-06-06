@@ -143,11 +143,27 @@ WRITE8_HANDLER ( mbee_color_bank_w )
 	memory_set_bank(space->machine, 4, data & 7);
 }
 
+WRITE8_HANDLER ( mbee_0a_w )
+{
+	m6545_color_bank = data;
+	memory_set_bank(space->machine, 4, (data&15) >> 1);
+}
+
 READ8_HANDLER ( mbee_bank_netrom_r )
 {
 /* Read of port 10A - set Telcom rom to 2nd half */
 	memory_set_bank(space->machine, 5, 1);
 	return m6545_color_bank;
+}
+
+WRITE8_HANDLER( mbee_1c_w )
+{
+/*	d7 extended graphics - not emulated
+	d5 bankswitch basic rom
+	d4 select attribute ram - not emulated
+	d3..d0 select videoram bank - not emulated */
+
+	memory_set_bank(space->machine, 6, (data & 0x20) ? 1 : 0);
 }
 
 READ8_HANDLER ( mbee_video_bank_r )
