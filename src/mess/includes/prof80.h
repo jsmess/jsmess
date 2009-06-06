@@ -1,14 +1,22 @@
 #ifndef __PROF80__
 #define __PROF80__
 
-#define SCREEN_TAG		"screen"
+#define SCREEN_TAG				"screen"
 
-#define Z80_TAG			"z1"
-#define NEC765_TAG		"z38"
-#define UPD1990A_TAG	"z43"
-#define MC6845_TAG		"z30"
-#define PPI8255_TAG		"z6"
-#define Z80STI_TAG		"z9"
+#define Z80_TAG					"z1"
+#define NEC765_TAG				"z38"
+#define UPD1990A_TAG			"z43"
+#define MC6845_TAG				"z30"
+#define PPI8255_TAG				"z6"
+#define Z80STI_TAG				"z9"
+
+#define GRIP_Z80_TAG			"grip_z1"
+
+#define UNIO_Z80STI_TAG			"z5"
+#define UNIO_Z80SIO_TAG			"z15"
+#define UNIO_Z80PIO_TAG			"z13"
+#define UNIO_CENTRONICS1_TAG	"n3"
+#define UNIO_CENTRONICS2_TAG	"n4"
 
 #define GRIP_VIDEORAM_SIZE	0x10000
 #define GRIP_VIDEORAM_MASK	0xffff

@@ -1,7 +1,8 @@
 /*
 
 	PROF-80 (Prozessor RAM-Floppy Kontroller)
-	GRIP-1/2/3/5 (Grafik-Interface-Prozessor)
+	GRIP-1/2/3/4/5 (Grafik-Interface-Prozessor)
+	UNIO-1 (?)
 
 	http://www.prof80.de/
 	http://oldcomputers.dyndns.org/public/pub/rechner/conitec/info.html
@@ -12,11 +13,14 @@
 
 	TODO:
 
+	- PPI8255 Mode 2 is broken
+	- MC6845 DE callback is broken
 	- Z80 STI (Mostek MK3801) push-model
-	- PROF-GRIP communications
+	- RAM banking
+	- floppy access
 	- UNIO card (Z80-STI, Z80-SIO, 2x centronics)
 	- GRIP-COLOR (192kB color RAM)
-	- GRIP 1/2/3/5 selection
+	- GRIP 1/2/3/4/5 selection
 	
 */
 
@@ -260,6 +264,37 @@ static WRITE8_HANDLER( mmu_w )
 	prof80_bankswitch(space->machine);
 }
 
+static READ8_HANDLER( gripc_r )
+{
+	prof80_state *state = space->machine->driver_data;
+
+	return state->ecb_status;
+}
+
+static READ8_HANDLER( gripd_r )
+{
+	prof80_state *state = space->machine->driver_data;
+
+	/* trigger GRIP 8255 port C bit 6 (_ACKA) */
+	ppi8255_set_port_c(state->ppi8255, 0x54);
+	ppi8255_set_port_c(state->ppi8255, 0x14);
+	ppi8255_set_port_c(state->ppi8255, 0x54);
+
+	return state->ecb_data;
+}
+
+static WRITE8_HANDLER( gripd_w )
+{
+	prof80_state *state = space->machine->driver_data;
+
+	state->ecb_data = data;
+
+	/* trigger GRIP 8255 port C bit 4 (_STBA) */
+	ppi8255_set_port_c(state->ppi8255, 0x54);
+	ppi8255_set_port_c(state->ppi8255, 0x44);
+	ppi8255_set_port_c(state->ppi8255, 0x54);
+}
+
 /* GRIP */
 
 static WRITE8_HANDLER( page_w )
@@ -327,31 +362,27 @@ static WRITE8_HANDLER( stb_w )
 	centronics_strobe_w(state->centronics, 1);
 }
 
-static READ8_HANDLER( gripc_r )
+/* UNIO */
+
+static WRITE8_HANDLER( unio_ctrl_w )
 {
-	prof80_state *state = space->machine->driver_data;
+//	prof80_state *state = space->machine->driver_data;
 
-	return state->ecb_status;
-}
+//	int flag = BIT(data, 0);
+	int flad = (data >> 1) & 0x07;
 
-static READ8_HANDLER( gripd_r )
-{
-	prof80_state *state = space->machine->driver_data;
-
-	/* trigger GRIP 8255 port C */
-	ppi8255_set_port_c(state->ppi8255, 0x44);
-
-	return state->ecb_data;
-}
-
-static WRITE8_HANDLER( gripd_w )
-{
-	prof80_state *state = space->machine->driver_data;
-
-	state->ecb_data = data;
-
-	/* trigger GRIP 8255 port C */
-	ppi8255_set_port_c(state->ppi8255, 0x14);
+	switch (flad)
+	{
+	case 0: /* CG1 */
+	case 1: /* CG2 */
+	case 2: /* _STB1 */
+	case 3: /* _STB2 */
+	case 4: /* _INIT */
+	case 5: /* JSO0 */
+	case 6: /* JSO1 */
+	case 7: /* JSO2 */
+		break;
+	}
 }
 
 /* Memory Maps */
@@ -376,12 +407,12 @@ static ADDRESS_MAP_START( prof80_mem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( prof80_io, ADDRESS_SPACE_IO, 8 )
-//	AM_RANGE(0x80, 0x8f) AM_MIRROR(0xff00) AM_DEVREADWRITE(Z80STI_TAG, z80sti_r, z80sti_w)
-//	AM_RANGE(0x94, 0x95) AM_MIRROR(0xff00) AM_DEVREADWRITE(Z80SIO_TAG, z80sio_d_r, z80sio_d_w)
-//	AM_RANGE(0x96, 0x97) AM_MIRROR(0xff00) AM_DEVREADWRITE(Z80SIO_TAG, z80sio_c_r, z80sio_c_w)
-//	AM_RANGE(0x9e, 0x9e) AM_MIRROR(0xff00) AM_WRITE(unio_w) (4=_STB1, 6=_STB2, 8=INIT)
-//	AM_RANGE(0x9c, 0x9c) AM_MIRROR(0xff00) AM_DEVWRITE("centronics1", centronics_data_w)
-//	AM_RANGE(0x9d, 0x9d) AM_MIRROR(0xff00) AM_DEVWRITE("centronics2", centronics_data_w)
+//	AM_RANGE(0x80, 0x8f) AM_MIRROR(0xff00) AM_DEVREADWRITE(UNIO_Z80STI_TAG, z80sti_r, z80sti_w)
+//	AM_RANGE(0x94, 0x95) AM_MIRROR(0xff00) AM_DEVREADWRITE(UNIO_Z80SIO_TAG, z80sio_d_r, z80sio_d_w)
+//	AM_RANGE(0x96, 0x97) AM_MIRROR(0xff00) AM_DEVREADWRITE(UNIO_Z80SIO_TAG, z80sio_c_r, z80sio_c_w)
+	AM_RANGE(0x9e, 0x9e) AM_MIRROR(0xff00) AM_WRITE(unio_ctrl_w)
+//	AM_RANGE(0x9c, 0x9c) AM_MIRROR(0xff00) AM_DEVWRITE(UNIO_CENTRONICS1_TAG, centronics_data_w)
+//	AM_RANGE(0x9d, 0x9d) AM_MIRROR(0xff00) AM_DEVWRITE(UNIO_CENTRONICS1_TAG, centronics_data_w)
 	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0xff00) AM_READ(gripc_r)
 	AM_RANGE(0xc1, 0xc1) AM_MIRROR(0xff00) AM_READWRITE(gripd_r, gripd_w)
 	AM_RANGE(0xd8, 0xd8) AM_MIRROR(0xff00) AM_WRITE(flr_w)
@@ -449,6 +480,8 @@ static MC6845_ON_DE_CHANGED( grip_on_de_changed )
 {
 	prof80_state *state = device->machine->driver_data;
 
+//	logerror("DE changed to %u\n", display_enabled);
+	
 	z80sti_i1_w(state->z80sti, display_enabled);
 }
 
@@ -582,18 +615,18 @@ static READ8_DEVICE_HANDLER( grip_ppi8255_c_r )
 
         bit		signal		description
 
-        PC0     STI I4
-        PC1     KBF
-        PC2     _KBSTB
-        PC3     STI I7
-        PC4					1 when PROF-80 reads port 0xc0
-        PC5     PA6
-        PC6					1 when PROF-80 writes port 0xc0
-        PC7     PA7
+		PC0     INTRB		interrupt B output (keyboard)
+        PC1     KBF			input buffer B full output (keyboard)
+        PC2     _KBSTB		strobe B input (keyboard)
+        PC3     INTRA		interrupt A output (PROF-80)
+        PC4		_STBA		strobe A input (PROF-80)
+        PC5     IBFA		input buffer A full output (PROF-80)
+        PC6		_ACKA		acknowledge A input (PROF-80)
+        PC7     _OBFA		output buffer full output (PROF-80)
     
 	*/
 
-	return 0x04;
+	return 0x54;
 }
 
 static WRITE8_DEVICE_HANDLER( grip_ppi8255_c_w )
@@ -602,20 +635,28 @@ static WRITE8_DEVICE_HANDLER( grip_ppi8255_c_w )
 
         bit		signal		description
 
-        PC0     STI I4
-        PC1     KBF
-        PC2     _KBSTB
-        PC3     STI I7
-        PC4					1 when PROF-80 reads port 0xc0
-        PC5     PA6
-        PC6					1 when PROF-80 writes port 0xc0
-        PC7     PA7
+		PC0     INTRB		interrupt B output (keyboard)
+        PC1     KBF			input buffer B full output (keyboard)
+        PC2     _KBSTB		strobe B input (keyboard)
+        PC3     INTRA		interrupt A output (PROF-80)
+        PC4		_STBA		strobe A input (PROF-80)
+        PC5     IBFA		input buffer A full output (PROF-80)
+        PC6		_ACKA		acknowledge A input (PROF-80)
+        PC7     _OBFA		output buffer full output (PROF-80)
     
 	*/
 
 	prof80_state *state = device->machine->driver_data;
 
-	state->ecb_status = (BIT(data, 7) << 7) | (BIT(data, 5) << 6);
+	/* keyboard interrupt */
+	z80sti_i4_w(state->z80sti, BIT(data, 0));
+
+	/* PROF-80 interrupt */
+	z80sti_i7_w(state->z80sti, BIT(data, 3));
+
+	/* PROF-80 handshaking */
+	state->ecb_status = (!BIT(data, 7) << 7) | (!BIT(data, 5) << 6);
+	logerror("IBF %u OBF %u status %02x\n", BIT(data, 5), BIT(data, 7), state->ecb_status);
 }
 
 static const ppi8255_interface grip_ppi8255_interface =
@@ -630,24 +671,53 @@ static const ppi8255_interface grip_ppi8255_interface =
 
 /* Z80-STI Interface */
 
+static READ8_DEVICE_HANDLER( grip_z80sti_gpio_r )
+{
+	/*
+
+        bit		signal		description
+
+        I0		CTS			RS-232 clear to send input
+        I1		DE			MC6845 display enable input
+        I2		CURSOR		MC6845 cursor input
+        I3		BUSY		Centronics busy input
+        I4		PC0			PPI8255 PC0 input
+        I5		SKBD		Serial keyboard input
+        I6		EXIN		External interrupt input
+        I7		PC3			PPI8255 PC3 input
+    
+	*/
+
+//	prof80_state *state = device->machine->driver_data;
+
+//	return state->pc3 << 7 | state->exin << 6 | state->skbd << 5 | state->pc0 << 4 | busy << 3 | state->cursor << 2 | state->de << 1 | state->cts;
+
+	return 0;
+}
+
+static WRITE_LINE_DEVICE_HANDLER( grip_z80sti_tbo_w )
+{
+	// connected to speaker
+}
+
 static WRITE_LINE_DEVICE_HANDLER( grip_z80sti_irq_w )
 {
-	cputag_set_input_line(device->machine, "grip", INPUT_LINE_IRQ0, state);
+	cputag_set_input_line(device->machine, GRIP_Z80_TAG, INPUT_LINE_IRQ0, state);
 }
 
 static Z80STI_INTERFACE( grip_z80sti_interface )
 {
-	0,
-	0,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_LINE(grip_z80sti_irq_w)
+	0,									/* serial receive clock */
+	0,									/* serial transmit clock */
+	DEVCB_DEVICE_HANDLER(Z80STI_TAG, grip_z80sti_gpio_r),	/* GPIO read */
+	DEVCB_NULL,							/* GPIO write */
+	DEVCB_NULL,							/* serial input */
+	DEVCB_NULL,							/* serial output */
+	DEVCB_NULL,							/* timer A output */
+	DEVCB_LINE(grip_z80sti_tbo_w),		/* timer B output */
+	DEVCB_LINE(z80sti_tc_w),			/* timer C output */
+	DEVCB_LINE(z80sti_rc_w),			/* timer D output */
+	DEVCB_LINE(grip_z80sti_irq_w)		/* interrupt */
 };
 
 /* Z80 Daisy Chain */
@@ -707,6 +777,8 @@ static MACHINE_START( prof80 )
 
 static MACHINE_RESET( prof80 )
 {
+	prof80_state *state = machine->driver_data;
+
 	int i;
 
 	for (i = 0; i < 8; i++)
@@ -714,6 +786,8 @@ static MACHINE_RESET( prof80 )
 	// write all zeroes 0 flr_W
 		//UINT8 data = (i << 4) | (i << 1);
 	}
+
+	state->ecb_status = 0x40;
 }
 
 /* Machine Drivers */
@@ -726,7 +800,7 @@ static MACHINE_DRIVER_START( prof80 )
     MDRV_CPU_PROGRAM_MAP(prof80_mem)
     MDRV_CPU_IO_MAP(prof80_io)
 
-    MDRV_CPU_ADD("grip", Z80, XTAL_16MHz/4)
+    MDRV_CPU_ADD(GRIP_Z80_TAG, Z80, XTAL_16MHz/4)
 	MDRV_CPU_CONFIG(grip_daisy_chain)
     MDRV_CPU_PROGRAM_MAP(grip_mem)
     MDRV_CPU_IO_MAP(grip_io)
@@ -779,7 +853,7 @@ ROM_START( prof80 )
 	ROM_COPY( Z80_TAG, 0xf0000, 0x70000, 0x10000 ) // block 7
 	ROM_COPY( Z80_TAG, 0xf0000, 0x60000, 0x10000 ) // block 6
 
-	ROM_REGION( 0x10000, "grip", 0 )
+	ROM_REGION( 0x10000, GRIP_Z80_TAG, 0 )
 	ROM_LOAD( "grip21.z2", 0x0000, 0x4000, CRC(7f6a37dd) SHA1(2e89f0b0c378257ff7e41c50d57d90865c6e214b) )
 	ROM_LOAD( "grip26.z2", 0x0000, 0x4000, CRC(a1c424f0) SHA1(83942bc75b9475f044f936b8d9d7540551d87db9) )
 	ROM_LOAD( "grip31.z2", 0x0000, 0x4000, CRC(e0e4e8ab) SHA1(73d3d14c9b06fed0c187fb0fffe5ec035d8dd256) )

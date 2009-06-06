@@ -1,6 +1,6 @@
 /**********************************************************************
 
-    Mostek MK3801 Serial Timer Interrupt Controller emulation
+    Mostek MK3801 Serial Timer Interrupt Controller (Z80-STI) emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -82,7 +82,7 @@ struct _z80sti_interface
 	/* this gets called for each change of the TDO pin (pin 4) */
 	devcb_write_line		out_tdo_func;
 
-	/* this gets called on each change of the interrupt line (pin 17) */
+	/* this gets called on each change of the _INT pin (pin 17) */
 	devcb_write_line		out_int_func;
 };
 
@@ -103,7 +103,7 @@ WRITE_LINE_DEVICE_HANDLER( z80sti_rc_w );
 /* transmit clock */
 WRITE_LINE_DEVICE_HANDLER( z80sti_tc_w );
 
-/* input write */
+/* GPIP input lines */
 WRITE_LINE_DEVICE_HANDLER( z80sti_i0_w );
 WRITE_LINE_DEVICE_HANDLER( z80sti_i1_w );
 WRITE_LINE_DEVICE_HANDLER( z80sti_i2_w );
