@@ -1349,6 +1349,7 @@ $(MESSOBJ)/nakajima.a: \
 $(MESSOBJ)/snk.a: \
 	$(MESS_DRIVERS)/ngp.o \
 	$(MESS_VIDEO)/k1ge.o \
+	$(MESS_DEVICES)/aescart.o	\
 	$(MESS_DRIVERS)/ng_aes.o \
 	$(MAME_VIDEO)/neogeo.o \
 	$(MAME_MACHINE)/neoprot.o

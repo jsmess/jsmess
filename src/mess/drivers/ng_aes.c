@@ -17,13 +17,13 @@
           Andrew Prime
           Zsolt Vasvari
 
+    MESS cartridge support by R. Belmont based on work by Michael Zapf
+
     Current status:
-        - There is no cart support, hence it's not possible to play anything.
-          ATM, this is simply the MAME driver stripped of the LED code
+    	- Cartridges run.
 
     ToDo : 
         - Change input code to allow selection of the mahjong panel in PORT_CATEGORY.
-        - Add xml support for carts (the system is useless without)
         - Clean up code, to reduce duplication of MAME source
 
 ****************************************************************************/
@@ -34,6 +34,7 @@
 #include "machine/pd4990a.h"
 #include "cpu/z80/z80.h"
 #include "sound/2610intf.h"
+#include "devices/aescart.h"
 
 
 #define LOG_VIDEO_SYSTEM		(0)
@@ -778,53 +779,6 @@ static WRITE16_HANDLER( system_control_w )
 	}
 }
 
-
-
-/*************************************
- *
- *  Watchdog
- *
- *
- *    - The watchdog timer will reset the system after ~0.13 seconds
- *     On an MV-1F MVS system, the following code was used to test:
- *        000100  203C 0001 4F51             MOVE.L   #0x14F51,D0
- *        000106  13C0 0030 0001             MOVE.B   D0,0x300001
- *        00010C  5380                       SUBQ.L   #1,D0
- *        00010E  64FC                       BCC.S    *-0x2 [0x10C]
- *        000110  13C0 0030 0001             MOVE.B   D0,0x300001
- *        000116  60F8                       BRA.S    *-0x6 [0x110]
- *     This code loops long enough to sometimes cause a reset, sometimes not.
- *     The move takes 16 cycles, subq 8, bcc 10 if taken and 8 if not taken, so:
- *     (0x14F51 * 18 + 14) cycles / 12000000 cycles per second = 0.128762 seconds
- *     Newer games force a reset using the following code (this from kof99):
- *        009CDA  203C 0003 0D40             MOVE.L   #0x30D40,D0
- *        009CE0  5380                       SUBQ.L   #1,D0
- *        009CE2  64FC                       BCC.S    *-0x2 [0x9CE0]
- *     Note however that there is a valid code path after this loop.
- *
- *     The watchdog is used as a form of protecetion on a number of games,
- *     previously this was implemented as a specific hack which locked a single
- *     address of SRAM.
- *
- *     What actually happens is if the game doesn't find valid data in the
- *     backup ram it will initialize it, then sit in a loop.  The watchdog
- *     should then reset the system while it is in this loop.  If the watchdog
- *     fails to reset the system the code will continue and set a value in
- *     backup ram to indiate that the protection check has failed.
- *
- *************************************/
-
-static WRITE16_HANDLER( watchdog_w )
-{
-	/* only an LSB write resets the watchdog */
-	if (ACCESSING_BITS_0_7)
-	{
-		watchdog_reset16_w(space, offset, data, mem_mask);
-	}
-}
-
-
-
 /*************************************
  *
  *  Machine initialization
@@ -907,6 +861,9 @@ static MACHINE_RESET( neogeo )
 
 	/* trigger the IRQ3 that was set by MACHINE_START */
 	update_interrupts(machine);
+
+	/* AES apparently always uses the cartridge's fixed bank mode */
+	neogeo_set_fixed_layer_source(1);
 }
 
 
@@ -926,7 +883,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x2ffff0, 0x2fffff) AM_WRITE(main_cpu_bank_select_w)
 	AM_RANGE(0x300000, 0x300001) AM_MIRROR(0x01ff7e) AM_READ_PORT("IN0")
 	AM_RANGE(0x300080, 0x300081) AM_MIRROR(0x01ff7e) AM_READ_PORT("IN4")
-	AM_RANGE(0x300000, 0x300001) AM_MIRROR(0x01ffe0) AM_READWRITE(neogeo_unmapped_r, watchdog_w)
+	AM_RANGE(0x300000, 0x300001) AM_MIRROR(0x01ffe0) AM_READ(neogeo_unmapped_r) AM_WRITENOP	// AES has no watchdog
 	AM_RANGE(0x320000, 0x320001) AM_MIRROR(0x01fffe) AM_READ_PORT("IN3") AM_WRITE(audio_command_w)
 	AM_RANGE(0x340000, 0x340001) AM_MIRROR(0x01fffe) AM_READ_PORT("IN1")
 	AM_RANGE(0x360000, 0x37ffff) AM_READ(neogeo_unmapped_r)
@@ -1247,8 +1204,6 @@ static MACHINE_DRIVER_START( neogeo )
 	MDRV_CPU_PROGRAM_MAP(audio_map)
 	MDRV_CPU_IO_MAP(auido_io_map)
 
-	MDRV_WATCHDOG_TIME_INIT(USEC(128762))
-
 	MDRV_MACHINE_START(neogeo)
 	MDRV_MACHINE_RESET(neogeo)
 	MDRV_NVRAM_HANDLER(neogeo)
@@ -1276,14 +1231,14 @@ static MACHINE_DRIVER_START( neogeo )
 	/* NEC uPD4990A RTC */
 	MDRV_UPD4990A_ADD("upd4990a")
 
-//	MDRV_AES_CARTRIDGE_ADD("aes_multicart")
+	MDRV_AES_CARTRIDGE_ADD("aes_multicart")
 MACHINE_DRIVER_END
 
 /*************************************
  *
  *  Driver initalization
  *
- *************************************/
+ *************************************/
 
 static DRIVER_INIT( neogeo )
 {
@@ -1296,17 +1251,13 @@ ROM_START( aes )
 	ROMX_LOAD("neo-po.bin",  0x00000, 0x020000, CRC(16d0c132) SHA1(4e4a440cae46f3889d20234aebd7f8d5f522e22c), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(1))	/* AES Console (Japan) Bios */
 	ROM_SYSTEM_BIOS( 1, "asia-aes",   "Asia AES" )
 	ROMX_LOAD("neo-epo.bin", 0x00000, 0x020000, CRC(d27a71f1) SHA1(1b3b22092f30c4d1b2c15f04d1670eb1e9fbea07), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(2))	/* AES Console (Asia?) Bios */
-#if 0
-	ROM_SYSTEM_BIOS( 2, "uni-bios_2_3","Universe Bios (Hack, Ver. 2.3)" )
-	ROMX_LOAD("uni-bios_2_3.rom",  0x00000, 0x020000, CRC(27664eb5) SHA1(5b02900a3ccf3df168bdcfc98458136fd2b92ac0), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(3))	/* Universe Bios v2.3 (hack) */
-#endif	
 
-	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x20000, "audiobios", 0 )
 	ROM_LOAD( "sm1.sm1", 0x00000, 0x20000, CRC(94416d67) SHA1(42f9d7ddd6c0931fd64226a60dc73602b2819dcf) )
 
-	ROM_REGION( 0x50000, "audiocpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x90000, "audiocpu", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x20000, "zoomy", 0 )
 	ROM_LOAD( "000-lo.lo", 0x00000, 0x20000, CRC(5a86cff2) SHA1(5992277debadeb64d1c1c64b0a92d9293eaf7e4a) )
@@ -1316,11 +1267,11 @@ ROM_START( aes )
 
 	ROM_REGION( 0x20000, "fixed", ROMREGION_ERASEFF )
 
-	ROM_REGION( 0x10000, "ym", ROMREGION_ERASEFF )
+	ROM_REGION( 0x400000, "ym", ROMREGION_ERASEFF )
 
-//	NO_DELTAT_REGION
+	ROM_REGION( 0x200000, "ym.deltat", ROMREGION_ERASEFF )
 
-	ROM_REGION( 0x100000, "sprites", ROMREGION_DISPOSE | ROMREGION_ERASEFF )
+	ROM_REGION( 0x900000, "sprites", ROMREGION_ERASEFF )
 ROM_END
 
 ROM_START( neocd )
@@ -1372,6 +1323,6 @@ ROM_START( neocdz )
 ROM_END
 
 
-CONS( 1990, aes,    0,   0,   neogeo,   aes,   neogeo,   0, "SNK", "Neo-Geo AES", GAME_NOT_WORKING )
+CONS( 1990, aes,    0,   0,   neogeo,   aes,   neogeo,   0, "SNK", "Neo-Geo AES", 0)
 CONS( 1994, neocd,  aes, 0,   neogeo,   aes,   neogeo,   0, "SNK", "Neo-Geo CD", GAME_NOT_WORKING )
 CONS( 1996, neocdz, aes, 0,   neogeo,   aes,   neogeo,   0, "SNK", "Neo-Geo CDZ", GAME_NOT_WORKING )
