@@ -422,6 +422,21 @@ READ8_HANDLER( fm7_keyboard_r)
 	}
 }
 
+READ8_HANDLER( fm7_sub_keyboard_r)
+{
+	UINT8 ret;
+	switch(offset)
+	{
+		case 0:
+			ret = (current_scancode >> 1) & 0x80;
+			return ret;
+		case 1:
+			return current_scancode & 0xff;
+		default:
+			return 0x00;
+	}
+}
+
 READ8_HANDLER( fm7_cassette_printer_r )
 {
 	// bit 7: cassette input
@@ -550,6 +565,16 @@ static WRITE8_HANDLER( fm7_main_shared_w )
 		shared_ram[offset] = data;
 }
 
+static READ8_HANDLER( fm7_unknown_r )
+{
+	// Port 0xFDFC is read by Dig Dug.  Controller port, perhaps?
+	// Must return 0xff for it to read the keyboard.
+	// Mappy uses ports FD15 and FD16.  On the FM77AV, this is the YM2203,
+	// but on the FM-7, this is nothing, so we return 0xff for it to
+	// read the keyboard correctly.
+	return 0xff;
+}
+
 static TIMER_CALLBACK( fm7_timer_irq )
 {
 	if(irq_mask & IRQ_FLAG_TIMER)
@@ -579,7 +604,10 @@ void key_press(running_machine* machine, UINT16 scancode)
 		irq_flags |= IRQ_FLAG_KEY;
 		cputag_set_input_line(machine,"maincpu",M6809_IRQ_LINE,ASSERT_LINE);
 	}
-	cputag_set_input_line(machine,"sub",M6809_FIRQ_LINE,ASSERT_LINE);
+	else
+	{
+		cputag_set_input_line(machine,"sub",M6809_FIRQ_LINE,ASSERT_LINE);
+	}
 	logerror("KEY: sent scancode 0x%03x\n",scancode);
 }
 
@@ -659,9 +687,11 @@ static ADDRESS_MAP_START( fm7_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfd0d,0xfd0d) AM_READWRITE(fm7_psg_select_r,fm7_psg_select_w)
 	AM_RANGE(0xfd0e,0xfd0e) AM_READWRITE(fm7_psg_data_r, fm7_psg_data_w)
 	AM_RANGE(0xfd0f,0xfd0f) AM_READWRITE(fm7_rom_en_r,fm7_rom_en_w)
+	AM_RANGE(0xfd15,0xfd16) AM_READ(fm7_unknown_r)
 	AM_RANGE(0xfd18,0xfd1f) AM_READWRITE(fm7_fdc_r,fm7_fdc_w)
 	AM_RANGE(0xfd24,0xfd2b) AM_RAM
 	AM_RANGE(0xfd38,0xfd3f) AM_READWRITE(fm7_palette_r,fm7_palette_w)
+	AM_RANGE(0xfdf0,0xfdff) AM_READ(fm7_unknown_r)
 	// Boot ROM
 	AM_RANGE(0xfe00,0xffdf) AM_ROM AM_REGION("basic",0x0000)
 	AM_RANGE(0xffe0,0xffef) AM_RAM
@@ -684,7 +714,7 @@ static ADDRESS_MAP_START( fm7_sub_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd000,0xd37f) AM_RAM // Work RAM
 	AM_RANGE(0xd380,0xd3ff) AM_RAM AM_BASE(&shared_ram)
 	// I/O space (D400-D7FF)
-	AM_RANGE(0xd400,0xd401) AM_READ(fm7_keyboard_r)
+	AM_RANGE(0xd400,0xd401) AM_READ(fm7_sub_keyboard_r)
 	AM_RANGE(0xd402,0xd402) AM_READ(fm7_cancel_ack)
 	AM_RANGE(0xd404,0xd404) AM_READ(fm7_attn_irq_r)
 	AM_RANGE(0xd408,0xd408) AM_READWRITE(fm7_crt_r,fm7_crt_w)
