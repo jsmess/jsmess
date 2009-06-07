@@ -34,6 +34,7 @@ New System Drivers Supported (in no particular order):
 - Samsung SPC-1000 [Miodrag Milanovic]
 - Sharp MZ-1500, MZ-80A (not working) [Fabio Priuli]
 - Sharp Pocket Computer 1245,1250,1255,1260,1261/1262 [Miodrag Milanovic]
+- SNK NeoGeo AES [R. Belmont, Fabio Priuli]
 - Steepler Dendy Classic (not working) [incog nito]
 - TK85 [Robbbert, Miodrag Milanovic]
 - Timex Sinclair 1500 [Robbbert, Miodrag Milanovic]
@@ -127,7 +128,6 @@ Skeleton drivers :
 - Sharp X1
 - Sharp X1 Turbo
 - Sharp X1 Turbo Z
-- SNK NeoGeo AES
 - SNK NeoGeo CD
 - SNK NeoGeo CDZ
 - Sony PocketStation
