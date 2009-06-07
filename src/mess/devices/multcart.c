@@ -13,6 +13,7 @@
 #include "xmlfile.h"
 #include "driver.h"
 #include "compcfg.h"
+#include "hash.h"
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -79,6 +80,24 @@ static const zip_file_header *find_file(zip_file *zip, const char *filename)
 	return NULL;
 }
 
+static const zip_file_header *find_file_crc(zip_file *zip, const char *filename, UINT32 crc)
+{
+	const zip_file_header *header;
+	for (header = zip_file_first_file(zip); header != NULL; header = zip_file_next_file(zip))
+	{
+		// if the CRC and name both match, we're good
+		// if the CRC matches and the name doesn't, we're still good
+		if ((!core_stricmp(header->filename, filename)) && (header->crc == crc))
+		{
+			return header;
+		}
+		else if (header->crc == crc)
+		{
+			return header;
+		}
+	}	     
+	return NULL;
+}
 
 /*-------------------------------------------------
     find_pcb_and_resource_nodes
@@ -137,17 +156,26 @@ static multicart_resource_type get_resource_type(const char *s)
 static multicart_open_error load_rom_resource(multicart_load_state *state, xml_data_node *resource_node,
 	multicart_resource *resource)
 {
-	const char *file;
+	const char *file, *crcstr, *sha1;
 	const zip_file_header *header;
 	zip_error ziperr;
+	UINT32 crc;
 
 	/* locate the 'file' attribute */
 	file = xml_get_attribute_string(resource_node, "file", NULL);
 	if (file == NULL)
 		return MCERR_XML_ERROR;
 
-	/* locate the file in the ZIP file */
-	header = find_file(state->zip, file);
+	if (!(crcstr = xml_get_attribute_string(resource_node, "crc", NULL)))
+	{
+		/* locate the file in the ZIP file */
+		header = find_file(state->zip, file);
+	}
+	else	/* CRC tag is present, use it */
+	{
+		crc = strtoul(crcstr, NULL, 16);
+		header = find_file_crc(state->zip, file, crc);
+	}
 	if (header == NULL)
 		return MCERR_INVALID_FILE_REF;
 	resource->length = header->uncompressed_length;
@@ -161,6 +189,20 @@ static multicart_open_error load_rom_resource(multicart_load_state *state, xml_d
 	ziperr = zip_file_decompress(state->zip, resource->ptr, resource->length);
 	if (ziperr != ZIPERR_NONE)
 		return MCERR_ZIP_ERROR;
+
+	/* check SHA1 now */
+	if ((sha1 = xml_get_attribute_string(resource_node, "sha1", NULL)))
+	{
+		char calc_sha[256];
+
+		memset(calc_sha, 0, sizeof(calc_sha));
+		hash_compute(&calc_sha[0], resource->ptr, resource->length, HASH_SHA1);
+
+		if ((strncmp(sha1, &calc_sha[2], 20)))
+		{
+			return MCERR_INVALID_FILE_REF;
+		}
+	}
 
 	return MCERR_NONE;
 }
@@ -562,4 +604,3 @@ void multicart_close(multicart *cart)
 	save_ram_resources(cart);
 	pool_free(cart->data->pool);
 }
-
