@@ -74,7 +74,6 @@ file_error osd_get_full_path(char **dst, const char *path)
 		{
 			sprintf(*dst, "%s%s%s", path_buffer, PATH_SEPARATOR, path);
 		}
-		printf("osd_get_full_path: cwd [%s] path [%s] out [%s]\n", path_buffer, path, *dst);
 	}
 
 	return err;
