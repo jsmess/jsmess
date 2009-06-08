@@ -20,6 +20,7 @@ enum
 {
 	TI_NOT_INITIALIZED,
 	TI_81,
+	TI_82,
 	TI_85,
 	TI_86
 };
@@ -61,6 +62,15 @@ static UINT8 ti85_white_in = 0x01;
 
 static UINT8 ti85_red_out = 0x00;
 static UINT8 ti85_white_out = 0x00;
+
+static UINT8 ti82_video_mode;
+static UINT8 ti82_video_x;
+static UINT8 ti82_video_y;
+static UINT8 ti82_video_dir;
+static UINT8 ti82_video_scroll;
+static UINT8 ti82_video_bit;
+static UINT8 ti82_video_col;
+UINT8 ti82_video_buffer[0x300];
 
 enum
 {
@@ -203,6 +213,49 @@ MACHINE_START( ti81 )
 	memory_install_write8_handler(space, 0x4000, 0x7fff, 0, 0, SMH_UNMAP);
 	memory_set_bankptr(machine, 1, mem + 0x010000);
 	memory_set_bankptr(machine, 2, mem + 0x014000);
+}
+
+MACHINE_START( ti82 )
+{
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	UINT8 *mem = memory_region(machine, "maincpu");
+
+	ti85_timer_interrupt_mask = 0;
+	ti85_timer_interrupt_status = 0;
+	ti85_ON_interrupt_mask = 0;
+	ti85_ON_interrupt_status = 0;
+	ti85_ON_pressed = 0;
+	ti85_memory_page_0x4000 = 0;
+	ti85_LCD_status = 0;
+	ti85_LCD_mask = 0;
+	ti85_power_mode = 0;
+	ti85_keypad_mask = 0;
+	ti85_video_buffer_width = 0;
+	ti85_interrupt_speed = 0;
+	ti85_port4_bit0 = 0;
+	ti82_video_mode = 0;
+	ti82_video_x = 0;
+	ti82_video_y = 0;
+	ti82_video_dir = 0;
+	ti82_video_scroll = 0;
+	ti82_video_bit = 0;
+	ti82_video_col = 0;
+	memset(ti82_video_buffer, 0x00, 0x300);
+
+	if (ti_calculator_model == TI_82)
+		memset(mem+0x8000, 0, sizeof(unsigned char)*0x8000);
+
+	ti_calculator_model = TI_82;
+
+	timer_pulse(machine, ATTOTIME_IN_HZ(200), NULL, 0, ti85_timer_callback);
+
+	memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
+	memory_install_write8_handler(space, 0x4000, 0x7fff, 0, 0, SMH_UNMAP);
+	memory_set_bankptr(machine, 1, mem + 0x010000);
+	memory_set_bankptr(machine, 2, mem + 0x014000);
+
+	add_reset_callback(machine, ti85_reset_serial);
+	add_exit_callback(machine, ti85_free_serial_data_memory);
 }
 
 MACHINE_START( ti85 )
@@ -360,6 +413,55 @@ READ8_HANDLER ( ti85_port_0007_r )
 		| ti85_PCR;
 }
 
+ READ8_HANDLER ( ti82_port_0002_r )
+{
+	return ti85_memory_page_0x4000;
+}
+
+ READ8_HANDLER ( ti82_port_0010_r )
+{
+	return 0x00;
+}
+
+ READ8_HANDLER ( ti82_port_0011_r )
+{
+    UINT8* ti82_video;
+	UINT8 ti82_port11;
+	
+	if(ti82_video_dir == 4)
+		++ti82_video_y;
+	if(ti82_video_dir == 5)
+		--ti82_video_y;
+	if(ti82_video_dir == 6)
+		++ti82_video_x;
+	if(ti82_video_dir == 7)
+		--ti82_video_x;
+
+	if(ti82_video_mode)
+		ti82_port11 = ti82_video_buffer[(12*ti82_video_y)+ti82_video_x];
+	else
+	{
+		ti82_video_col = ti82_video_x * 6;                                                                                                
+		ti82_video_bit = ti82_video_col & 7;
+		ti82_video = &ti82_video_buffer[(ti82_video_y*12)+(ti82_video_col>>3)];
+		ti82_port11 = ((((*ti82_video)<<8)+ti82_video[1])>>(10-ti82_video_bit));
+	}
+
+	if(ti82_video_dir == 4)
+		ti82_video_y-=2;
+	if(ti82_video_dir == 5)
+		ti82_video_y+=2;
+	if(ti82_video_dir == 6)
+		ti82_video_x-=2;
+	if(ti82_video_dir == 7)
+		ti82_video_x+=2;
+
+	ti82_video_x &= 15;
+	ti82_video_y &= 63;
+
+	return ti82_port11;
+}
+
 READ8_HANDLER ( ti86_port_0005_r )
 {
 	return ti85_memory_page_0x4000;
@@ -439,44 +541,59 @@ WRITE8_HANDLER ( ti86_port_0006_w )
 	update_ti86_memory(space->machine);
 }
 
+WRITE8_HANDLER ( ti82_port_0002_w )
+{
+	ti85_memory_page_0x4000 = (data & 0x07);
+	update_ti85_memory(space->machine);
+}
+
+WRITE8_HANDLER ( ti82_port_0010_w)
+ {	
+	if (data == 0x00 || data == 0x01)
+		ti82_video_mode = data;
+	if (data >= 0x04 && data <= 0x07)
+		ti82_video_dir = data;
+	if (data >= 0x20 && data <= 0x30)
+		ti82_video_x = data - 0x20;
+	if (data >= 0x40 && data <= 0x7F)
+		ti82_video_scroll = data - 0x40;
+	if (data >= 0x80 && data <= 0xBF)
+		ti82_video_y = data - 0x80;
+	if (data >= 0xD8)
+		ti85_LCD_contrast = data - 0xD8;
+}
+
+WRITE8_HANDLER ( ti82_port_0011_w )
+{
+	UINT8* ti82_video;
+	
+	if(ti82_video_mode)
+		ti82_video_buffer[(12*ti82_video_y)+ti82_video_x] = data;
+	else
+	{
+		data = data<<0x02;
+		ti82_video_col = ti82_video_x * 6;                                                                                                
+		ti82_video_bit = ti82_video_col & 0x07;
+		ti82_video = &ti82_video_buffer[(ti82_video_y*12)+(ti82_video_col>>3)];
+		*ti82_video = (*ti82_video & ~(0xFC>>ti82_video_bit)) | (data>>ti82_video_bit);
+		if(ti82_video_bit>0x02)
+			ti82_video[1] = (ti82_video[1] & ~(0xFC<<(8-ti82_video_bit))) | (data<<(8-ti82_video_bit));
+	}
+
+	if(ti82_video_dir == 0x04)
+		--ti82_video_y;
+	if(ti82_video_dir == 0x05)
+		++ti82_video_y;
+	if(ti82_video_dir == 0x06)
+		--ti82_video_x;
+	if(ti82_video_dir == 0x07)
+		++ti82_video_x;
+	
+	ti82_video_x &= 15;
+	ti82_video_y &= 63;
+}
 
 /* NVRAM functions */
-NVRAM_HANDLER( ti81 )
-{
-	UINT8 *mem = memory_region(machine, "maincpu");
-
-	if (read_or_write)
-		mame_fwrite(file, mem+0x8000, sizeof(unsigned char)*0x8000);
-	else
-	{
-		if (file)
-		{
-			mame_fread(file, mem+0x8000, sizeof(unsigned char)*0x8000);
-			cpu_set_reg(cputag_get_cpu(machine, "maincpu"), Z80_PC,0x0239);
-		}
-		else
-			memset(mem+0x8000, 0, sizeof(unsigned char)*0x8000);
-	}
-}
-
-NVRAM_HANDLER( ti85 )
-{
-	UINT8 *mem = memory_region(machine, "maincpu");
-
-	if (read_or_write)
-		mame_fwrite(file, mem+0x8000, sizeof(unsigned char)*0x8000);
-	else
-	{
-		if (file)
-		{
-			mame_fread(file, mem+0x8000, sizeof(unsigned char)*0x8000);
-			cpu_set_reg(cputag_get_cpu(machine, "maincpu"), Z80_PC,0x0b5f);
-		}
-		else
-			memset(mem+0x8000, 0, sizeof(unsigned char)*0x8000);
-	}
-}
-
 NVRAM_HANDLER( ti86 )
 {
 	if (read_or_write)

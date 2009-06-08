@@ -13,6 +13,11 @@
 #define TI81_SCREEN_Y_SIZE	  64
 #define TI81_NUMBER_OF_FRAMES	   6
 
+#define TI82_VIDEO_MEMORY_SIZE	 768
+#define TI82_SCREEN_X_SIZE	  12
+#define TI82_SCREEN_Y_SIZE	  64
+#define TI82_NUMBER_OF_FRAMES	   6
+
 #define TI85_VIDEO_MEMORY_SIZE	1024
 #define TI85_SCREEN_X_SIZE	  16
 #define TI85_SCREEN_Y_SIZE	  64
@@ -132,6 +137,13 @@ PALETTE_INIT( ti85 )
 		ti_screen_y_size = TI85_SCREEN_Y_SIZE;
 		ti_number_of_frames = TI85_NUMBER_OF_FRAMES;
 	}
+	else if (!strncmp(machine->gamedrv->name, "ti82", 4))
+	{
+		ti_video_memory_size = TI82_VIDEO_MEMORY_SIZE;
+		ti_screen_x_size = TI82_SCREEN_X_SIZE;
+		ti_screen_y_size = TI82_SCREEN_Y_SIZE;
+		ti_number_of_frames = TI82_NUMBER_OF_FRAMES;
+	}
 	else if (!strncmp(machine->gamedrv->name, "ti86", 4))
 	{
 		ti_video_memory_size = TI86_VIDEO_MEMORY_SIZE;
@@ -175,6 +187,44 @@ VIDEO_UPDATE( ti85 )
         for (y=0; y<ti_screen_y_size; y++)
 		for (x=0; x<ti_screen_x_size; x++)
 			*(ti85_frames+(ti_number_of_frames-1)*ti_video_memory_size+y*ti_screen_x_size+x) = memory_read_byte(space, lcdmem+y*ti_screen_x_size+x);
+
+       	for (y=0; y<ti_screen_y_size; y++)
+		for (x=0; x<ti_screen_x_size; x++)
+			for (b=0; b<8; b++)
+			{
+				brightnes = ((*(ti85_frames+0*ti_video_memory_size+y*ti_screen_x_size+x)>>(7-b)) & 0x01)
+					  + ((*(ti85_frames+1*ti_video_memory_size+y*ti_screen_x_size+x)>>(7-b)) & 0x01)
+					  + ((*(ti85_frames+2*ti_video_memory_size+y*ti_screen_x_size+x)>>(7-b)) & 0x01)
+					  + ((*(ti85_frames+3*ti_video_memory_size+y*ti_screen_x_size+x)>>(7-b)) & 0x01)
+					  + ((*(ti85_frames+4*ti_video_memory_size+y*ti_screen_x_size+x)>>(7-b)) & 0x01)
+					  + ((*(ti85_frames+5*ti_video_memory_size+y*ti_screen_x_size+x)>>(7-b)) & 0x01);
+
+				*BITMAP_ADDR16(bitmap, y, x*8+b) = ti85_palette[ti85_LCD_contrast&0x1f][brightnes];
+	                }
+	return 0;
+}
+
+VIDEO_UPDATE( ti82 )
+{
+	//for now use the ti85_palette
+
+	int x,y,b;
+	int brightnes;
+
+	if (!ti85_LCD_status || !ti85_timer_interrupt_mask)
+	{
+		for (y=0; y<ti_screen_y_size; y++)
+			for (x=0; x<ti_screen_x_size; x++)
+				for (b=0; b<8; b++)
+					*BITMAP_ADDR16(bitmap, y, x*8+b) = ti85_palette[ti85_LCD_contrast&0x1f][6];
+		return 0;
+	}
+
+	memcpy (ti85_frames, ti85_frames+ti_video_memory_size, sizeof (UINT8) * (ti_number_of_frames-1) * ti_video_memory_size);
+
+        for (y=0; y<ti_screen_y_size; y++)
+		for (x=0; x<ti_screen_x_size; x++)
+			*(ti85_frames+(ti_number_of_frames-1)*ti_video_memory_size+y*ti_screen_x_size+x) = ti82_video_buffer[ y*ti_screen_x_size+x];
 
        	for (y=0; y<ti_screen_y_size; y++)
 		for (x=0; x<ti_screen_x_size; x++)

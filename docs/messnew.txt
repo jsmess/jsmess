@@ -189,7 +189,7 @@ System Driver Changes:
 
 - [SYM1] Added BASIC and Assembler ROM's, and version 1.0 monitor [Miodrag Milanovic]
 
-
+- [TI85] Bug 1711 fixed, and TI-82 progress in emulation [Xander]
 
 User Interface Changes:
 -----------------------
