@@ -177,7 +177,7 @@ const UINT16 fm7_key_list[0x60][5] =
 };
 
 /*
- * I/O port 0xfd02
+ * Main CPU: I/O port 0xfd02
  * 
  * On read: returns cassette data (bit 7) and printer status (bits 0-5)
  * On write: sets IRQ masks 
@@ -198,7 +198,7 @@ WRITE8_HANDLER( fm7_irq_mask_w )
 }
 
 /*
- * I/O port 0xfd03
+ * Main CPU: I/O port 0xfd03
  * 
  * On read: returns which IRQ is currently active (typically read by IRQ handler)
  *   bit 0 - keypress
@@ -233,6 +233,12 @@ WRITE8_HANDLER( vector_w )
 	RAM[0xfff0+offset] = data;
 }
 
+/*
+ * Main CPU: I/O port 0xfd04
+ * 
+ *  bit 0 - attention IRQ active, clears flag when read.
+ *  bit 1 - break key active
+ */
 READ8_HANDLER( fm7_fd04_r )
 {
 	UINT8 ret = 0xff;
@@ -248,11 +254,12 @@ READ8_HANDLER( fm7_fd04_r )
 	}
 	return ret;
 }
+
 /*
- * Sub-CPU interface (port 0xfd05)
+ * Main CPU: Sub-CPU interface (port 0xfd05)
  * 
  * Read:
- *   bit 7: Sub-CPU busy
+ *   bit 7: Sub-CPU busy (or halted)
  *   bit 0: EXTDET (?)
  * Write:
  *   bit 7: Sub-CPU halt
@@ -290,6 +297,12 @@ WRITE8_HANDLER( fm7_sub_busyflag_w )
 	sub_busy = 0x80;
 }
 
+/* 
+ *  Main CPU: I/O port 0xfd0f
+ * 
+ *  On read, enables BASIC ROM at 0x8000 (default)
+ *  On write, disables BASIC ROM, enables RAM (if more than 32kB)
+ */
 READ8_HANDLER( fm7_rom_en_r )
 {
 	UINT8* RAM = memory_region(space->machine,"maincpu");
@@ -329,6 +342,12 @@ READ8_HANDLER( fm7_attn_irq_r )
 	return 0xff;
 }
 
+/*
+ *  Sub CPU: I/O port 0xd409
+ * 
+ *  On read, enables VRAM access
+ *  On write, disables VRAM access
+ */
 READ8_HANDLER( fm7_vram_access_r )
 {
 	vram_access = 1;
@@ -357,6 +376,12 @@ WRITE8_HANDLER( fm7_vram_w )
 		fm7_video_ram[offs] = data;
 }
 
+/*
+ *  Sub CPU: I/O port 0xd408
+ * 
+ *  On read, enables the CRT display
+ *  On write, disables the CRT display
+ */
 READ8_HANDLER( fm7_crt_r )
 {
 	crt_enable = 1;
@@ -368,6 +393,11 @@ WRITE8_HANDLER( fm7_crt_w )
 	crt_enable = 0;
 }
 
+/*
+ *  Main CPU: I/O ports 0xfd18 - 0xfd1f
+ *  Floppy Disk Controller
+ *  TODO: Implement FDC
+ */
 READ8_HANDLER( fm7_fdc_r )
 {
 	switch(offset)
@@ -389,6 +419,12 @@ WRITE8_HANDLER( fm7_fdc_w )
 	}
 }
 
+/*
+ *  Sub CPU: I/O ports 0xd40e - 0xd40f
+ * 
+ *  0xd40e: bits 0-6 - offset in bytes (high byte) (bit 6 is used for 400 line video only)
+ *  0xd40f: bits 0-7 - offset in bytes (low byte)
+ */
 WRITE8_HANDLER( fm7_vram_offset_w )
 {
 	UINT16 new_offset = 0;
@@ -406,6 +442,14 @@ WRITE8_HANDLER( fm7_vram_offset_w )
 	vram_offset = new_offset;
 }
 
+/*
+ *  Main CPU: I/O ports 0xfd00-0xfd01
+ *  Sub CPU: I/O ports 0xd400-0xd401
+ * 
+ *  The scancode of the last key pressed is stored in fd/d401, with the 9th
+ *  bit (MSB) in bit 7 of fd/d400.  0xfd00 also holds a flag for the main
+ *  CPU clock speed in bit 0 (0 = 1.2MHz, 1 = 2MHz)
+ */
 READ8_HANDLER( fm7_keyboard_r)
 {
 	UINT8 ret;
@@ -479,6 +523,14 @@ WRITE8_HANDLER( fm7_cassette_printer_w )
 	}
 }
 
+/*
+ *  Main CPU: I/O ports 0xfd38-0xfd3f
+ *  Colour palette.
+ *  Each port represents one of eight colours.  Palette is 3-bit.
+ *  bit 2 = Green
+ *  bit 1 = Red
+ *  bit 0 = Blue
+ */
 static READ8_HANDLER( fm7_palette_r)
 {
 	return fm7_pal[offset];
@@ -499,6 +551,13 @@ static WRITE8_HANDLER( fm7_palette_w )
 	fm7_pal[offset] = data & 0x07;
 }
 
+/*
+ *  Main CPU: I/O ports 0xfd0d-0xfd0e
+ *  PSG (AY-3-891x)
+ *  0xfd0d - function select (bit 1 = BDIR, bit 0 = BC1)
+ *  0xfd0e - data register
+ *  PSG I/O ports are not connected to anything.
+ */
 static void fm7_update_psg(running_machine* machine)
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
@@ -530,10 +589,6 @@ static READ8_HANDLER( fm7_psg_select_r )
 
 static WRITE8_HANDLER( fm7_psg_select_w )
 {
-	/* 
-	 * bit 0 = BC1
-	 * bit 1 = BDIR
-	 */
 	fm7_psg_regsel = data & 0x03;
 	fm7_update_psg(space->machine);
 }
@@ -665,8 +720,9 @@ static IRQ_CALLBACK(fm7_sub_irq_ack)
 
 /*
    0000 - 7FFF: (RAM) BASIC working area, user's area
-   8000 - FBFF: (ROM) F-BASIC ROM
-   FC00 - FC7F: Shared RAM between main and sub CPU
+   8000 - FBFF: (ROM) F-BASIC ROM, extra user RAM
+   FC00 - FC7F: more RAM, if 64kB is installed
+   FC80 - FCFF: Shared RAM between main and sub CPU, available only when sub CPU is halted
    FD00 - FDFF: I/O space (6809 uses memory-mapped I/O)
    FE00 - FFEF: Boot rom
    FFF0 - FFFF: Interrupt vector table
@@ -691,7 +747,7 @@ static ADDRESS_MAP_START( fm7_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfd18,0xfd1f) AM_READWRITE(fm7_fdc_r,fm7_fdc_w)
 	AM_RANGE(0xfd24,0xfd2b) AM_RAM
 	AM_RANGE(0xfd38,0xfd3f) AM_READWRITE(fm7_palette_r,fm7_palette_w)
-	AM_RANGE(0xfdf0,0xfdff) AM_READ(fm7_unknown_r)
+	AM_RANGE(0xfd40,0xfdff) AM_READ(fm7_unknown_r)
 	// Boot ROM
 	AM_RANGE(0xfe00,0xffdf) AM_ROM AM_REGION("basic",0x0000)
 	AM_RANGE(0xffe0,0xffef) AM_RAM
@@ -702,9 +758,10 @@ ADDRESS_MAP_END
    0000 - 3FFF: Video RAM bank 0 (Blue plane)
    4000 - 7FFF: Video RAM bank 1 (Red plane)
    8000 - BFFF: Video RAM bank 2 (Green plane)
-   C000 - C2FF: (RAM) working area
-   C300 - C37F: Shared RAM between main and sub CPU
-   C400 - FFDF: (ROM) Graphics command code
+   D000 - D37F: (RAM) working area
+   D380 - D3FF: Shared RAM between main and sub CPU
+   D400 - D4FF: I/O ports
+   D800 - FFDF: (ROM) Graphics command code
    FFF0 - FFFF: Interrupt vector table
 */
 
