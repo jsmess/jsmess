@@ -62,6 +62,7 @@ FOLDERDATA g_folderData[] =
 	{"Sound",           "sound",             FOLDER_SND,          IDI_SOUND,                0,             0,            CreateSoundFolders },
 	{"Imperfect",       "imperfect",         FOLDER_DEFICIENCY,   IDI_FOLDER,               0,             0,            CreateDeficiencyFolders },
   	{"Dumping Status",  "dumping",           FOLDER_DUMPING,      IDI_FOLDER,               0,             0,            CreateDumpingFolders },
+  	{"Screens",         "screens",           FOLDER_SCREENS,      IDI_FOLDER,               0,             0,            CreateScreenFolders },
 	{"Working",         "working",           FOLDER_WORKING,      IDI_WORKING,              F_WORKING,     F_NONWORKING, NULL,                       DriverIsBroken,          FALSE },
 	{"Not Working",     "nonworking",        FOLDER_NONWORKING,   IDI_NONWORKING,           F_NONWORKING,  F_WORKING,    NULL,                       DriverIsBroken,          TRUE },
 	{"Originals",       "originals",         FOLDER_ORIGINAL,     IDI_FOLDER,               F_ORIGINALS,   F_CLONES,     NULL,                       DriverIsClone,           FALSE },
@@ -119,6 +120,7 @@ DIRECTORYINFO g_directoryInfo[] =
 	{ "Background Images",     GetBgDir,        SetBgDir,        FALSE, 0 },
 	{ "Comment Files",         GetCommentDir,   SetCommentDir,   FALSE, DIRDLG_COMMENT },
 	{ "Fonts",                 GetFontDir,      SetFontDir,      FALSE, 0 },
+	{ "Crosshairs",           GetCrosshairDir,      SetCrosshairDir,      FALSE, 0 },
 	{ NULL }
 };
 

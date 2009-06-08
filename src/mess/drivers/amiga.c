@@ -421,7 +421,7 @@ static MACHINE_DRIVER_START( cdtv )
 	MDRV_CPU_REPLACE("maincpu", M68000, CDTV_CLOCK_X1 / 4)
 	MDRV_CPU_PROGRAM_MAP(cdtv_mem)
 
-	MDRV_CPU_REMOVE("keyboard")
+	MDRV_DEVICE_REMOVE("keyboard")
 
 	MDRV_CPU_ADD("rcmcu", M6502, XTAL_1MHz) /* 1 MHz? */
 	MDRV_CPU_PROGRAM_MAP(cdtv_rcmcu_mem)
@@ -443,8 +443,8 @@ static MACHINE_DRIVER_START( cdtv )
 	MDRV_TPI6525_ADD("tpi6525", cdtv_tpi_intf)
 
 	/* cia */
-	MDRV_CIA8520_REMOVE("cia_0")
-	MDRV_CIA8520_REMOVE("cia_1")
+	MDRV_DEVICE_REMOVE("cia_0")
+	MDRV_DEVICE_REMOVE("cia_1")
 	MDRV_CIA8520_ADD("cia_0", CDTV_CLOCK_X1 / 40, cia_0_cdtv_intf)
 	MDRV_CIA8520_ADD("cia_1", CDTV_CLOCK_X1 / 4, cia_1_cdtv_intf)
 MACHINE_DRIVER_END
@@ -462,7 +462,7 @@ static MACHINE_DRIVER_START( pal )
 	MDRV_SCREEN_VISIBLE_AREA(214, (228*4)-1, 34, 312-1)
 
 	/* cia */
-	MDRV_CIA8520_REMOVE("cia_0")
+	MDRV_DEVICE_REMOVE("cia_0")
 	MDRV_CIA8520_ADD("cia_0", AMIGA_68000_PAL_CLOCK / 10, cia_0_pal_intf)
 MACHINE_DRIVER_END
 

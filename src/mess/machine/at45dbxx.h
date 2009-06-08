@@ -25,24 +25,15 @@
 #define MDRV_AT45DB041_ADD(_tag) \
 	MDRV_DEVICE_ADD(_tag, AT45DB041, 0) \
 
-#define MDRV_AT45DB041_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag)
-
 #define AT45DB081		DEVICE_GET_INFO_NAME(at45db081)
 
 #define MDRV_AT45DB081_ADD(_tag) \
 	MDRV_DEVICE_ADD(_tag, AT45DB081, 0) \
 
-#define MDRV_AT45DB081_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag)
-
 #define AT45DB161		DEVICE_GET_INFO_NAME(at45db161)
 
 #define MDRV_AT45DB161_ADD(_tag) \
 	MDRV_DEVICE_ADD(_tag, AT45DB161, 0) \
-
-#define MDRV_AT45DB161_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag)
 
 
 /***************************************************************************

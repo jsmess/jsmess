@@ -46,15 +46,9 @@ typedef double (*adc080x_input_read) (const device_config *device, int channel);
 	MDRV_DEVICE_ADD(_tag, ADC0808, _clock) \
 	MDRV_DEVICE_CONFIG(_intrf)
 
-#define MDRV_ADC0808_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag)
-
 #define MDRV_ADC0809_ADD(_tag, _clock, _intrf) \
 	MDRV_DEVICE_ADD(_tag, ADC0809, _clock) \
 	MDRV_DEVICE_CONFIG(_intrf)
-
-#define MDRV_ADC0809_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag)
 
 
 /* interface */

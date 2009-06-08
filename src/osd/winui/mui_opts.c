@@ -289,7 +289,7 @@ static const options_entry regSettings[] =
 
 	{ NULL,									NULL,       OPTION_HEADER,     "INTERFACE OPTIONS" },
 	{ MUIOPTION_LANGUAGE,					"english",  0,                 NULL },
-	{ MUIOPTION_CHECK_GAME,					"1",        OPTION_BOOLEAN,    NULL },
+	{ MUIOPTION_CHECK_GAME,					"0",        OPTION_BOOLEAN,    NULL },
 	{ MUIOPTION_JOYSTICK_IN_INTERFACE,		"1",        OPTION_BOOLEAN,    NULL },
 	{ MUIOPTION_KEYBOARD_IN_INTERFACE,		"0",        OPTION_BOOLEAN,    NULL },
 	{ MUIOPTION_RANDOM_BACKGROUND,			"0",        OPTION_BOOLEAN,    NULL },
@@ -1388,6 +1388,16 @@ void SetFontDir(const char* paths)
 	options_set_string(global, OPTION_FONTPATH, paths, OPTION_PRIORITY_CMDLINE);
 }
 
+const char* GetCrosshairDir(void)
+{
+	return options_get_string(global, OPTION_CRSSHAIRPATH);
+}
+
+void SetCrosshairDir(const char* paths)
+{
+	options_set_string(global, OPTION_CRSSHAIRPATH, paths, OPTION_PRIORITY_CMDLINE);
+}
+
 const char* GetFlyerDir(void)
 {
 	return options_get_string(settings, MUIOPTION_FLYER_DIRECTORY);
@@ -1562,6 +1572,10 @@ void ResetAllGameOptions(void)
 
 	/* finally vector.ini */
 	save_options(OPTIONS_VECTOR, NULL, 0);
+	/* finally horizont.ini */
+	save_options(OPTIONS_HORIZONTAL, NULL, 0);
+	/* finally vertical.ini */
+	save_options(OPTIONS_VERTICAL, NULL, 0);
 }
 
 static void GetDriverOptionName(int driver_index, const char *option_name, char *buffer, size_t buffer_len)
@@ -2727,13 +2741,30 @@ core_options * load_options(OPTIONS_TYPE opt_type, int game_num)
 		{
 			ui_parse_ini_file(opts, "vector");
 		}
-
-		machine_config_free(config);
-
 		if (opt_type == OPTIONS_VECTOR)
 		{
 			return opts;
 		}
+		/* parse "horizont.ini" for horizontal games */
+		if (!DriverIsVertical(game_num))
+		{
+			ui_parse_ini_file(opts, "horizont");
+		}
+		if (opt_type == OPTIONS_HORIZONTAL)
+		{
+			return opts;
+		}
+		/* parse "vertical.ini" for vertical games */
+		if (DriverIsVertical(game_num))
+		{
+			ui_parse_ini_file(opts, "vertical");
+		}
+		if (opt_type == OPTIONS_VERTICAL)
+		{
+			return opts;
+		}
+		machine_config_free(config);
+
 
 		/* then parse "<sourcefile>.ini" */
 		basename = core_filename_extract_base(astring_alloc(), driver->source_file, TRUE);
@@ -2773,7 +2804,7 @@ core_options * load_options(OPTIONS_TYPE opt_type, int game_num)
 
 /*
  * Save ini file based on game_num and passed in opt_type.  If opts are
- * NULL, the ini wiil be removed.
+ * NULL, the ini will be removed.
  *
  * game_num must be valid or the driver cannot be expanded and anything
  * with a higher priority than OPTIONS_VECTOR will not be saved.
@@ -2786,7 +2817,14 @@ void save_options(OPTIONS_TYPE opt_type, core_options *opts, int game_num)
 
 	if (OPTIONS_GLOBAL != opt_type && NULL != opts && !options_equal(opts, global))
 	{
-		baseopts = load_options(opt_type - 1, game_num);
+		if (OPTIONS_VERTICAL == opt_type) {
+			//since VERTICAL and HORIZONTAL are equally ranked
+			//we need to subtract 2 from vertical to also get to global
+			baseopts = load_options(opt_type - 2, game_num);
+		}
+		else {
+			baseopts = load_options(opt_type - 1, game_num);
+		}
 	}
 
 	if (game_num >= 0)
@@ -2804,6 +2842,12 @@ void save_options(OPTIONS_TYPE opt_type, core_options *opts, int game_num)
 	} else if (opt_type == OPTIONS_VECTOR)
 	{
 		filename = astring_cpyc(astring_alloc(), "vector");
+	} else if (opt_type == OPTIONS_VERTICAL)
+	{
+		filename = astring_cpyc(astring_alloc(), "vertical");
+	} else if (opt_type == OPTIONS_HORIZONTAL)
+	{
+		filename = astring_cpyc(astring_alloc(), "horizont");
 	} else if (driver != NULL)
 	{
 		astring *basename, *srcname;

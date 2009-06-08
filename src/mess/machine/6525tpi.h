@@ -59,9 +59,6 @@ struct _tpi6525_interface
 	MDRV_DEVICE_ADD(_tag, TPI6525, 0) \
 	MDRV_DEVICE_CONFIG(_intrf)
 
-#define MDRV_TPI6525_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag)
-
 
 /***************************************************************************
     FUNCTION PROTOTYPES

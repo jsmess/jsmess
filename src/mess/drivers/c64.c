@@ -333,7 +333,7 @@ the Edu64-1 used the full C64 BIOS. Confirmations are needed, anyway.
 
 /* devices config */
 #include "includes/cbm.h"
-#include "includes/cbmserb.h"	// needed for MDRV_CBM_SERBUS_REMOVE
+#include "includes/cbmserb.h"	// needed for MDRV_DEVICE_REMOVE
 #include "includes/cbmdrive.h"
 #include "includes/vc1541.h"
 
@@ -578,9 +578,9 @@ static MACHINE_DRIVER_START( ultimax )
 	MDRV_SOUND_CONFIG(c64_sound_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	
-	MDRV_CBM_SERBUS_REMOVE("serial_bus")	// in the current code, serial bus device is tied to the floppy drive
-	MDRV_CARTSLOT_REMOVE("cart1")
-	MDRV_CARTSLOT_REMOVE("cart2")
+	MDRV_DEVICE_REMOVE("serial_bus")	// in the current code, serial bus device is tied to the floppy drive
+	MDRV_DEVICE_REMOVE("cart1")
+	MDRV_DEVICE_REMOVE("cart2")
 
 	MDRV_IMPORT_FROM(ultimax_cartslot)
 MACHINE_DRIVER_END
@@ -593,20 +593,20 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( c64gs )
 	MDRV_IMPORT_FROM( c64pal )
-	MDRV_SOUND_REMOVE( "dac" )
-	MDRV_CASSETTE_REMOVE( "cassette" )
-	MDRV_QUICKLOAD_REMOVE( "quickload" )
+	MDRV_DEVICE_REMOVE( "dac" )
+	MDRV_DEVICE_REMOVE( "cassette" )
+	MDRV_DEVICE_REMOVE( "quickload" )
 MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( sx64 )
 	MDRV_IMPORT_FROM( c64pal )
 
-	MDRV_CBM_SERBUS_REMOVE("serial_bus")	// in the current code, serial bus device is tied to the floppy drive
+	MDRV_DEVICE_REMOVE("serial_bus")	// in the current code, serial bus device is tied to the floppy drive
 	MDRV_IMPORT_FROM( cpu_vc1541 )			// so we need to remove the one from MDRV_IMPORT_FROM(simulated_drive)!
 
-	MDRV_SOUND_REMOVE( "dac" )
-	MDRV_CASSETTE_REMOVE( "cassette" )
+	MDRV_DEVICE_REMOVE( "dac" )
+	MDRV_DEVICE_REMOVE( "cassette" )
 #ifdef CPU_SYNC
 	MDRV_QUANTUM_TIME(HZ(60))
 #else

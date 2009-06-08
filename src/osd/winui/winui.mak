@@ -34,6 +34,16 @@
 # uncomment next line to enable a Unicode build
 # UNICODE = 1
 
+# set this to the minimum Direct3D version to support (8 or 9)
+ifndef DIRECT3D
+DIRECT3D = 8
+endif
+
+# set this to the minimum DirectInput version to support (7 or 8)
+ifndef DIRECTINPUT
+DIRECTINPUT = 7
+endif
+ 
 
 
 ###########################################################################
@@ -135,7 +145,7 @@ LD += /ENTRY:wmainCRTStartup
 endif
 
 # add some VC++-specific defines
-DEFS += -D_CRT_SECURE_NO_DEPRECATE -DXML_STATIC -D__inline__=__inline -Dsnprintf=_snprintf
+DEFS += -D_CRT_SECURE_NO_DEPRECATE -D_CRT_NONSTDC_NO_DEPRECATE -DXML_STATIC -D__inline__=__inline -Dsnprintf=_snprintf
 
 # make msvcprep into a pre-build step
 # OSPREBUILD = $(VCONV)
@@ -193,6 +203,7 @@ CFLAGS += -include $(WINSRC)/winprefix.h -I$(WINSRC)
 ifdef WIN95_MULTIMON
 CFLAGS += -DWIN95_MULTIMON
 endif
+ 
 
 # add the windows libaries, 3 additional libs at the end for UI
 LIBS += \
@@ -200,12 +211,20 @@ LIBS += \
 	-lgdi32 \
 	-lddraw \
 	-ldsound \
-	-ldinput \
 	-ldxguid \
 	-lwinmm \
 	-ladvapi32 \
 	-lcomctl32 \
 	-lshlwapi \
+
+
+ifeq ($(DIRECTINPUT),7)
+LIBS += -ldinput
+CFLAGS += -DDIRECTINPUT_VERSION=0x0700
+else
+LIBS += -ldinput8
+CFLAGS += -DDIRECTINPUT_VERSION=0x0800
+endif
 
 # add -mwindows for UI
 LDFLAGSEMULATOR += \
@@ -252,7 +271,6 @@ $(LIBOCORE): $(OSDCOREOBJS)
 #-------------------------------------------------
 
 OSDOBJS = \
-	$(WINOBJ)/d3d8intf.o \
 	$(WINOBJ)/d3d9intf.o \
 	$(WINOBJ)/drawd3d.o \
 	$(WINOBJ)/drawdd.o \
@@ -264,6 +282,13 @@ OSDOBJS = \
 	$(WINOBJ)/video.o \
 	$(WINOBJ)/window.o \
 	$(WINOBJ)/winmain.o \
+
+
+ifeq ($(DIRECT3D),8)
+OSDOBJS += $(WINOBJ)/d3d8intf.o
+else
+CFLAGS += -DDIRECT3D_VERSION=0x0900
+endif
 
 
 # add UI objs

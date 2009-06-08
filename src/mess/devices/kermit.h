@@ -27,9 +27,6 @@ typedef struct {
   MDRV_DEVICE_ADD(_tag, KERMIT, 0)	      \
   MDRV_DEVICE_CONFIG(_intrf)
 
-#define MDRV_KERMIT_REMOVE(_tag)		\
-  MDRV_DEVICE_REMOVE(_tag)
-
 
 extern DEVICE_GET_INFO( kermit );
 

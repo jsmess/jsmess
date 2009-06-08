@@ -1691,15 +1691,15 @@ static MACHINE_DRIVER_START( nc200 )
 	MDRV_DEFAULT_LAYOUT(layout_nc200)
 
 	/* printer */
-	MDRV_CENTRONICS_REMOVE("centronics")
+	MDRV_DEVICE_REMOVE("centronics")
 	MDRV_CENTRONICS_ADD("centronics", nc200_centronics_config)
 
 	/* uart */
-	MDRV_MSM8251_REMOVE("uart")
+	MDRV_DEVICE_REMOVE("uart")
 	MDRV_MSM8251_ADD("uart", nc200_uart_interface)
 
 	/* no rtc */
-	MDRV_TC8521_REMOVE("rtc")
+	MDRV_DEVICE_REMOVE("rtc")
 
 	MDRV_NEC765A_ADD("nec765", nc200_nec765_interface)
 MACHINE_DRIVER_END

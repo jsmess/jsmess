@@ -623,7 +623,7 @@ static MACHINE_DRIVER_START( mato )
 	MDRV_PPI8255_ADD( "ppi8255_0", mato_ppi8255_interface )
 
 	/* no uart */
-	MDRV_MSM8251_REMOVE( "uart" )
+	MDRV_DEVICE_REMOVE( "uart" )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( c2717 )

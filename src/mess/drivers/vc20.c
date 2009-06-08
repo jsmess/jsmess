@@ -92,7 +92,7 @@ interface; no special expansion modules like ieee488 interface
 
 /* devices config */
 #include "includes/cbm.h"
-#include "includes/cbmserb.h"	// needed for MDRV_CBM_SERBUS_REMOVE
+#include "includes/cbmserb.h"	// needed for MDRV_DEVICE_REMOVE
 #include "includes/cbmdrive.h"
 #include "includes/vc1541.h"
 #include "includes/cbmieeeb.h"
@@ -308,7 +308,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( vic20v )
 	MDRV_IMPORT_FROM( vic20 )
 
-	MDRV_CBM_SERBUS_REMOVE("serial_bus")	// in the current code, serial bus device is tied to the floppy drive
+	MDRV_DEVICE_REMOVE("serial_bus")	// in the current code, serial bus device is tied to the floppy drive
 	MDRV_IMPORT_FROM( cpu_vc1540 )
 #ifdef CPU_SYNC
 	MDRV_QUANTUM_TIME(HZ(60))
@@ -348,7 +348,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( vc20v )
 	MDRV_IMPORT_FROM( vc20 )
 
-	MDRV_CBM_SERBUS_REMOVE("serial_bus")	// in the current code, serial bus device is tied to the floppy drive
+	MDRV_DEVICE_REMOVE("serial_bus")	// in the current code, serial bus device is tied to the floppy drive
 	MDRV_IMPORT_FROM( cpu_vc1540 )
 #ifdef CPU_SYNC
 	MDRV_QUANTUM_TIME(HZ(60))

@@ -398,7 +398,7 @@ static void update_lamps(void)
 	}
 
 	/* Lamp smoothing, this draws lamps only at the peaks of the AC power that would light them */
-	if ((multiplex_smooth == (input_strobe - 1))||((multiplex_smooth == 7) && (input_strobe == 0))||(multiplex_smooth == input_strobe))
+	if ((multiplex_smooth == (input_strobe - 1))||((multiplex_smooth == 7) && (input_strobe == 0)))
 	{
 		draw_lamps();
 		mpu4_draw_led(input_strobe, led_segs[input_strobe]);
@@ -1891,7 +1891,7 @@ static MACHINE_DRIVER_START( mod4yam )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(mod4_yam_map)
 
-	MDRV_SOUND_REMOVE("ay8913")
+	MDRV_DEVICE_REMOVE("ay8913")
 	MDRV_SOUND_ADD("ym2413", YM2413, MPU4_MASTER_CLOCK/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_DRIVER_END
@@ -1905,7 +1905,7 @@ static MACHINE_DRIVER_START( mod4oki )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(mod4_oki_map)
 
-	MDRV_SOUND_REMOVE("ay8913")
+	MDRV_DEVICE_REMOVE("ay8913")
 	MDRV_SOUND_ADD("msm6376", OKIM6376, 4000000) //?
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

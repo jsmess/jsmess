@@ -290,14 +290,14 @@ static MACHINE_DRIVER_START( cybikoxt )
 	MDRV_CPU_PROGRAM_MAP(cybikoxt_mem )
 	MDRV_CPU_IO_MAP(cybikoxt_io )
 	// sound
-	MDRV_SPEAKER_REMOVE("mono")
-	MDRV_SOUND_REMOVE("speaker")
+	MDRV_DEVICE_REMOVE("mono")
+	MDRV_DEVICE_REMOVE("speaker")
 	// machine
 	MDRV_MACHINE_START(cybikoxt)
 	MDRV_MACHINE_RESET(cybikoxt)
 	// non-volatile ram
 //  MDRV_NVRAM_HANDLER(cybikoxt)
-	MDRV_AT45DB041_REMOVE("flash1")
+	MDRV_DEVICE_REMOVE("flash1")
 	MDRV_SST39VF020_ADD("flash2", 16, ENDIANNESS_BIG)
 MACHINE_DRIVER_END
 

@@ -489,6 +489,58 @@ void CreateSourceFolders(int parent_index)
 	SetNumOptionFolders(k-1);
 }
 
+void CreateScreenFolders(int parent_index)
+{
+	int i,jj, k=0;
+	int nGames = driver_list_get_count(drivers);
+	int start_folder = numFolders;
+	LPTREEFOLDER lpFolder = treeFolders[parent_index];
+
+	// no games in top level folder
+	SetAllBits(lpFolder->m_lpGameBits,FALSE);
+	for (jj = 0; jj < nGames; jj++)
+	{
+		int screens = DriverNumScreens(jj);
+		char s[2];
+		itoa(screens, s, 10);
+                			
+		// look for an existant screens treefolder for this game
+		// (likely to be the previous one, so start at the end)
+		for (i=numFolders-1;i>=start_folder;i--)
+		{
+			if (strcmp(treeFolders[i]->m_lpTitle,s) == 0)
+			{
+				AddGame(treeFolders[i],jj);
+				break;
+			}
+		}
+		if (i == start_folder-1)
+		{
+			// nope, it's a screen file we haven't seen before, make it.
+			LPTREEFOLDER lpTemp;
+			lpTemp = NewFolder(s, next_folder_id, parent_index, IDI_FOLDER, 
+				               GetFolderFlags(numFolders));
+			ExtraFolderData[next_folder_id] = malloc(sizeof(EXFOLDERDATA) );
+			memset(ExtraFolderData[next_folder_id], 0, sizeof(EXFOLDERDATA));
+
+			ExtraFolderData[next_folder_id]->m_nFolderId = next_folder_id;
+			ExtraFolderData[next_folder_id]->m_nIconId = IDI_SOURCE;
+			ExtraFolderData[next_folder_id]->m_nParent = lpFolder->m_nFolderId;
+			ExtraFolderData[next_folder_id]->m_nSubIconId = -1;
+			strcpy( ExtraFolderData[next_folder_id]->m_szTitle, s );
+			ExtraFolderData[next_folder_id]->m_dwFlags = 0;
+
+			// Increment next_folder_id here in case code is added above
+			next_folder_id++;
+
+			AddFolder(lpTemp);
+			AddGame(lpTemp,jj);
+		}
+	}
+	SetNumOptionFolders(k-1);
+}
+
+
 void CreateManufacturerFolders(int parent_index)
 {
 	int i,jj;
@@ -1427,7 +1479,9 @@ void SelectTreeViewFolder(int folder_id)
  * of FOLDER_SOURCE.
  */
 static BOOL FolderHasIni(LPTREEFOLDER lpFolder) {
-	if (FOLDER_VECTOR == lpFolder->m_nFolderId) {
+	if (FOLDER_VECTOR == lpFolder->m_nFolderId ||
+		FOLDER_VERTICAL == lpFolder->m_nFolderId ||
+		FOLDER_HORIZONTAL == lpFolder->m_nFolderId) {
 		return TRUE;
 	}
 	if (lpFolder->m_nParent != -1

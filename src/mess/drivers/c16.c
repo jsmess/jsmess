@@ -129,7 +129,7 @@ printers and other devices; most expansion modules; userport; rs232/v.24 interfa
 /* devices config */
 #include "includes/cbm.h"
 #include "includes/cbmdrive.h"
-#include "includes/cbmserb.h"	// needed for MDRV_CBM_SERBUS_REMOVE
+#include "includes/cbmserb.h"
 
 #include "includes/c16.h"
 
@@ -464,13 +464,13 @@ static MACHINE_DRIVER_START( c16c )
 
 	/* c16c uses 'real' floppy drive emulation from machine/vc1541.c... 
 	still in progress, atm */
-	MDRV_TPI6525_REMOVE("tpi6535_tpi_2")
+	MDRV_DEVICE_REMOVE("tpi6535_tpi_2")
 	MDRV_TPI6525_ADD("tpi6535_tpi_2", c16_tpi6525_tpi_2_c1551_intf)
 
 	/* emulation code currently supports only one drive */
-	MDRV_TPI6525_REMOVE("tpi6535_tpi_3")
+	MDRV_DEVICE_REMOVE("tpi6535_tpi_3")
 
-	MDRV_CBM_SERBUS_REMOVE("serial_bus")	// in the current code, serial bus device is tied to the floppy drive
+	MDRV_DEVICE_REMOVE("serial_bus")	// in the current code, serial bus device is tied to the floppy drive
 	MDRV_IMPORT_FROM( cpu_c1551 )
 #ifdef CPU_SYNC
 	MDRV_QUANTUM_TIME(HZ(60))
@@ -483,7 +483,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( c16v )
 	MDRV_IMPORT_FROM( c16 )
 
-	MDRV_CBM_SERBUS_REMOVE("serial_bus")	// in the current code, serial bus device is tied to the floppy drive
+	MDRV_DEVICE_REMOVE("serial_bus")	// in the current code, serial bus device is tied to the floppy drive
 	MDRV_IMPORT_FROM( cpu_vc1541 )
 #ifdef CPU_SYNC
 	MDRV_QUANTUM_TIME(HZ(60))
@@ -492,8 +492,8 @@ static MACHINE_DRIVER_START( c16v )
 #endif
 
 	/* no c1551 in this driver */
-	MDRV_TPI6525_REMOVE("tpi6535_tpi_2")
-	MDRV_TPI6525_REMOVE("tpi6535_tpi_3")
+	MDRV_DEVICE_REMOVE("tpi6535_tpi_2")
+	MDRV_DEVICE_REMOVE("tpi6535_tpi_3")
 MACHINE_DRIVER_END
 
 
@@ -514,12 +514,12 @@ static MACHINE_DRIVER_START( plus4c )
 
 	/* plus4c uses 'real' floppy drive emulation from machine/vc1541.c... 
 	still in progress, atm */
-	MDRV_TPI6525_REMOVE("tpi6535_tpi_2")
+	MDRV_DEVICE_REMOVE("tpi6535_tpi_2")
 	MDRV_TPI6525_ADD("tpi6535_tpi_2", c16_tpi6525_tpi_2_c1551_intf)
 
 	/* emulation code currently supports only one drive */
-	MDRV_CBM_SERBUS_REMOVE("serial_bus")	// in the current code, serial bus device is tied to the floppy drive
-	MDRV_TPI6525_REMOVE("tpi6535_tpi_3")
+	MDRV_DEVICE_REMOVE("serial_bus")	// in the current code, serial bus device is tied to the floppy drive
+	MDRV_DEVICE_REMOVE("tpi6535_tpi_3")
 
 	MDRV_IMPORT_FROM( cpu_c1551 )
 
@@ -536,7 +536,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( plus4v )
 	MDRV_IMPORT_FROM( plus4 )
 
-	MDRV_CBM_SERBUS_REMOVE("serial_bus")	// in the current code, serial bus device is tied to the floppy drive
+	MDRV_DEVICE_REMOVE("serial_bus")	// in the current code, serial bus device is tied to the floppy drive
 	MDRV_IMPORT_FROM( cpu_vc1541 )
 
 	MDRV_SCREEN_MODIFY("screen")
@@ -548,8 +548,8 @@ static MACHINE_DRIVER_START( plus4v )
 #endif
 
 	/* no c1551 in this driver */
-	MDRV_TPI6525_REMOVE("tpi6535_tpi_2")
-	MDRV_TPI6525_REMOVE("tpi6535_tpi_3")
+	MDRV_DEVICE_REMOVE("tpi6535_tpi_2")
+	MDRV_DEVICE_REMOVE("tpi6535_tpi_3")
 MACHINE_DRIVER_END
 
 

@@ -400,7 +400,7 @@ static MACHINE_DRIVER_START( cbm700 )
 	MDRV_SCREEN_VISIBLE_AREA(0, 720 - 1, 0, 350 - 1)
 	MDRV_GFXDECODE( cbm700 )
 
-	MDRV_MC6845_REMOVE("crtc")
+	MDRV_DEVICE_REMOVE("crtc")
 	MDRV_MC6845_ADD("crtc", MC6845, XTAL_18MHz / 8 /*? I do not know if this is correct, please verify */, cbm700_crtc)
 
 	MDRV_VIDEO_START( cbm700 )

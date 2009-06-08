@@ -96,17 +96,6 @@
 #include "sound/2612intf.h"
 #include "sound/rf5c68.h"
 
-extern VIDEO_START( system16a_bootleg );
-extern VIDEO_UPDATE( system16a_bootleg );
-extern VIDEO_UPDATE( system16a_bootleg_passht4b );
-extern WRITE16_HANDLER( system16a_bootleg_tilemapselect_w );
-extern WRITE16_HANDLER( system16a_bootleg_bgscrolly_w );
-extern WRITE16_HANDLER( system16a_bootleg_bgscrollx_w );
-extern WRITE16_HANDLER( system16a_bootleg_fgscrolly_w );
-extern WRITE16_HANDLER( system16a_bootleg_fgscrollx_w );
-extern UINT16* system16a_bootleg_bg0_tileram;
-extern UINT16* system16a_bootleg_bg1_tileram;
-
 /***************************************************************************/
 
 static UINT16 coinctrl;
@@ -875,7 +864,7 @@ ADDRESS_MAP_END
 
 static UINT16 datsu_page[4];
 
-void datsu_set_pages(void)
+static void datsu_set_pages(void)
 {
 	UINT16 page;
 
@@ -1841,7 +1830,7 @@ static MACHINE_DRIVER_START( tturfbl )
 	MDRV_CPU_PROGRAM_MAP(tturfbl_sound_map)
 	MDRV_CPU_IO_MAP(tturfbl_sound_io_map)
 
-	MDRV_SOUND_REMOVE("7759")
+	MDRV_DEVICE_REMOVE("7759")
 	MDRV_SOUND_ADD("5205", MSM5205, 220000)
 	MDRV_SOUND_CONFIG(tturfbl_msm5205_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
@@ -2127,7 +2116,7 @@ ROM_END
 
 static UINT8 *decrypted_region;
 
-DRIVER_INIT( goldnabl )
+static DRIVER_INIT( goldnabl )
 {
 	int i;
 	UINT8 *ROM = memory_region(machine, "maincpu");
@@ -2157,7 +2146,7 @@ DRIVER_INIT( goldnabl )
 }
 
 
-DRIVER_INIT( bayrouteb1 )
+static DRIVER_INIT( bayrouteb1 )
 {
 	// it has the same encryption as the golden axe bootleg!
 	//
@@ -3347,7 +3336,7 @@ static MACHINE_DRIVER_START( shdancbl )
 	MDRV_CPU_MODIFY("soundcpu")
 	MDRV_CPU_PROGRAM_MAP(shdancbl_sound_map)
 	MDRV_CPU_IO_MAP(shdancbl_sound_io_map)
-	MDRV_SOUND_REMOVE("5c68")
+	MDRV_DEVICE_REMOVE("5c68")
 
 	MDRV_SOUND_ADD("5205", MSM5205, 200000)
 	MDRV_SOUND_CONFIG(shdancbl_msm5205_interface)

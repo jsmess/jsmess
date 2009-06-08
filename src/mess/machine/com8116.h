@@ -34,9 +34,6 @@
 	MDRV_DEVICE_ADD(_tag, COM8116, _clock) \
 	MDRV_DEVICE_CONFIG(_config)
 
-#define MDRV_COM8116_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag)
-
 #define COM8116_INTERFACE(name) \
 	const com8116_interface (name)=
 

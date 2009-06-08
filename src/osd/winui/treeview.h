@@ -73,6 +73,7 @@ typedef struct
 void CreateManufacturerFolders(int parent_index);
 void CreateYearFolders(int parent_index);
 void CreateSourceFolders(int parent_index);
+void CreateScreenFolders(int parent_index);
 void CreateCPUFolders(int parent_index);
 void CreateSoundFolders(int parent_index);
 void CreateOrientationFolders(int parent_index);
@@ -115,6 +116,7 @@ enum
 	FOLDER_BIOS,
 	FOLDER_HORIZONTAL,
 	FOLDER_VERTICAL,
+	FOLDER_SCREENS,
 #ifdef MESS
 	FOLDER_CONSOLE,
 	FOLDER_COMPUTER,

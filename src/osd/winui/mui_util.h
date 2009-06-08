@@ -42,8 +42,8 @@ BOOL DriverIsBroken(int driver_index);
 BOOL DriverIsHarddisk(int driver_index);
 BOOL DriverHasOptionalBIOS(int driver_index);
 BOOL DriverIsStereo(int driver_index);
-BOOL DriverIsMultiMon(int driver_index);
 BOOL DriverIsVector(int driver_index);
+int  DriverNumScreens(int driver_index);
 BOOL DriverIsBios(int driver_index);
 BOOL DriverUsesRoms(int driver_index);
 BOOL DriverUsesSamples(int driver_index);
@@ -55,6 +55,7 @@ BOOL DriverIsVertical(int driver_index);
 
 int isDriverVector(const machine_config *config);
 int numberOfSpeakers(const machine_config *config);
+int numberOfScreens(const machine_config *config);
 
 void FlushFileCaches(void);
 

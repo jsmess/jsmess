@@ -432,7 +432,7 @@ static WRITE8_HANDLER( videomode_w )
 
 static CUSTOM_INPUT( dakkochn_mux_data_r )
 {
-	static const char *ports[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6" };
+	static const char *const ports[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6" };
 	return input_port_read(field->port->machine, ports[dakkochn_mux_data]);
 }
 
@@ -2150,7 +2150,7 @@ static MACHINE_DRIVER_START( sys1pio )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(system1_pio_io_map)
 
-	MDRV_PPI8255_REMOVE("ppi")
+	MDRV_DEVICE_REMOVE("ppi")
 	MDRV_Z80PIO_ADD("pio", pio_interface)
 MACHINE_DRIVER_END
 

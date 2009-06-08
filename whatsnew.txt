@@ -1,966 +1,1170 @@
-0.131
+0.132
 -----
 
 
 MAMETesters Bugs Fixed
 ----------------------
-- 02399: [Known Issues/To-Do's] qmhayaku : Sound CPU is running at 4MHz in 
-         real machine. (Luigi30)
-- 03115: [Graphics] nss_smw: Tilemap issue when displaying game map 
-         (Angelo Salese)
-- 00767: [DIP/Input] bshark, bsharkj: Analog stick input is broken since 
-         0.112u4. (Derrick Renaud)
-- 03070: [DIP/Input] harddriv, racedriv, steeltal and clones: Games map 
-         some P1 inputs to P2 controls (Fabio Priuli)
-- 03105: [Documentation] quizmeku: Year is listed as 1994, but title 
-         screen shows 1992. (Fabio Priuli)
+- 03013: [Misc.] [debug] "Error: free a non-existant block" on 
+         TMS57002 source generation (Atari Ace)
+- 03241: [DIP/Input] aladbl: Unable to "Press Start" (Fabio Priuli)
+- 03238: [Crash/Freeze] gtmr and clones: Access Violation (Tafoid)
 
 
 
 Source Changes
 --------------
-Removed the last use of PORT_PLAYER(2) for P1 inputs. [Fabio Priuli]
+Fixed colors in the Aristocrat Mark-IV driver. [Angelo Salese]
 
-Merged memory maps in the suna8, supbtime, superchs, suprnova, 
-suprslam, subs, suna16, stepstag, stfight, strnskill drivers. 
-[Aaron Giles]
+Hooked up 2nd player mahjong panel in mjkjidai. [Angelo Salese]
 
-Numerous improvements to the roul driver. [robiza]
+Watchdog hooked up in twinkle.c so test mode exits. [smf]
 
-Merged findout.c memory map. [Angelo Salese]
+Fixed for good the colors in 86 Lions. [Angelo Salese]
 
-Added basic implementation of the TMS9927 video controller.
-[Aaron Giles]
+Fixed address line swapping in Mirax. [Olivier Galibert]
 
-Status games driver rewrite: [Aaron Giles]
- - Reduced multiple drivers down to a primary one with minor tweaks
- - Hooked up TMS9927 video generator
- - Fixed statriv2v character generator to be more accurate
- - Fixed incorrect colors
- - Correct video timing
+Fixed rom 2 decryption in Mirax. [Tomasz Slanina]
 
-Miscellaneous Naomi work and improvements. Some refactoring done,
-new games hooked up. Moved NAOMI DRIVER_INITs to specific 
-machine/naomi.c & includes/naomi.h files, in preparation to add 
-per-game JVS settings. [Angelo Salese, David Haywood]
+Improved the video emulation in Mirax. [Angelo Salese]
 
-Changed generic NVRAM behavior so that all the variants look for a 
-memory region named "nvram". If it is found and is of the same length 
-as the generic_nvram_size, data is copied from there instead of 
-filling the RAM with the fallback pattern. [Aaron Giles]
+Fixed a minor typo in the SSEM debugging features. [MooglyGuy]
 
-Fixed mouse/lightgun buttons to individually select when using 
--mouse/-multimouse and -lightgun. Meaning you will not receive Mouse 
-Button 0 Gun Button 0 when selecting in the UI. [Derrick Renaud]
+Fixed a number of year listings known to be unknown or incorrect the 
+current MAME source. The source for these changes come from the book:
+Arcade TV Game List (Edition: Domestic and Overseas, 1971 - 2005).
+[Tafoid, Fujix]
 
-Merged memory map and attempted to add proper colors in Carrera.
+Update ghosteo driver with information out of eolith.c about QS1000 
+and added the sample rom, with a note about it NOT being dumped from 
+this PCB but is a common sample rom used by Eolith. [Brian Troha]
+
+Fixed minor cycle counting inaccuracy in Z80 core. [Marshmellow]
+
+Added the concept of device contracts. A contract is a well-defined
+set of interfaces supported by a device, and identified by a unique
+string identifier. A device may support any number of contracts,
+described in a list via the DEVICE_CONTRACT_LIST* macros. The purpose 
+of contracts is to provide a means for devices to expose a standard 
+set of interfaces to other parts of the system. For example, the PCI 
+device should expose a contract that includes functions for 
+configuration register access, and 32-bit I/O. Then any device with 
+a PCI interface should implement the PCI contract, so that the PCI 
+bus device can route things appropriately. [Aaron Giles]
+
+Removed the MDRV_<devtype>_REMOVE macros. A simple DEVICE_REMOVE
+works now that device types are not needed. [Aaron Giles]
+
+Verified clocks on Samurai Aces pcb. [Corrado Tomaselli]
+
+Added missing static and const qualifiers throughout the source.
+[Atari Ace]
+
+Changed several internal interfaces to be more consistent, namely
+(1) passing device_config as a const always, (2) passing
+running_machine as a non-const always, (3) eliminating running_machine
+where possible, (4) passing machine/device first, and (5) preferring
+(screen, bitmap, cliprect) over (machine, bitmap, cliprect) when all
+are needed for rendering. [Atari Ace]
+
+
+
+New games added or promoted from NOT_WORKING status
+---------------------------------------------------
+Mirax [Olivier Galibert, Angelo Salese, Tomasz Slanina]
+Super Crowns Golf [Angelo Salese, Tomasz Slanina]
+Jockey Club [Andrew Welburn, Dumping Union]
+
+
+
+New clones added
+----------------
+Shadow Force (Japan Version 3) [Guru]
+
+
+
+New games marked as GAME_NOT_WORKING
+------------------------------------
+Enchanted Forest [Palindrome]
+Janputer [alien_mame, Dumping Union]
+Dolphin Treasure [AGEMAME]
+
+
+
+
+0.131u4
+-------
+
+
+MAMETesters Bugs Fixed
+----------------------
+- 02730: [Crash/Freeze] fiveside: Doesn't past rom check 
+         (Angelo Salese)
+- 03226: [Crash/Freeze] dadandrn, mmaulers: Game sits at black screen.
+         (Tafoid)
+- 03222: [Sound] ctribe + clones: Music is missing (ShimaPong)
+- 03221: [Crash/Freeze] demonwld + clones: Game fails to start 
+         (Tafoid)
+- 03217: [Misc.] All sets in twinkle.c: Beatmania IIDX chds were 
+         added in chdformat < 4 (smf)
+- 03218: [Crash/Freeze] anteatgb: Game sits at POST screen (Tafoid)
+
+
+
+Source Changes
+--------------
+Fixed megadrive PAL refresh rate (for MESS). [Enik Land]
+
+Simplified megadriv.c input reading. [Fabio Priuli]
+
+Fixed NMI firing in Goal 92 (same sound hook-up as Euro League).
 [Angelo Salese]
 
-Fixed verbose output of RAW device names for XP. [Derrick Renaud]
+Replaced almost all remaining cpu[num] occurrences in src/mame/ with 
+tags. [Fabio Priuli]
 
-When using RawInput - Fixed UI selection of Gun axis so Gun 1 is not 
-always selected with the desired gun. [Derrick Renaud]
+Converted Dallas DS1302 RTC to a device. [Fabio Priuli]
 
-Fixed XF flag in the 8085A core. [Aaron Giles]
+Fix coin issue sqixr1. [ShimaPong]
 
-Fixed frontend messages to leave enough space for clone longer names.
+Updated Intruder & Moon Base roms with PCB locations. [Brian Troha]
+
+Corrected some rom names & added some PCB locations to pipedrm. Added 
+dipswitch locations. [Brian Troha]
+
+Corrected dipswitches in Konami's Wizz Quiz and added dipswitch 
+locations. [Brian Troha]
+
+Significant improvements to the Super Crowns Golf video. Also hooked
+up inputs and DIP switches. [Angelo Salese, Yasuhiro Ogawa]
+
+Decrypted Mirax main program roms. [Olivier Galibert]
+
+Cleaned up Namco 5xxx docs, listing both MB88xx pin IDs and Namco 
+custom IDs where appropriate. [Aaron Giles]
+
+Added clocks to the Namco 06xx in anticipation of improved device
+interconnection. [Aaron Giles]
+
+Added new file devtempl.h which can be used to generate the
+DEVICE_GET_INFO function. Updated all the Namco I/O devices to use 
+this, along with the 6821pia and voodoo. [Aaron Giles]
+
+Updated galaga driver to use computed video timing. [Aaron Giles]
+
+Added configuration settings and analog adjusters to xml output (see 
+e.g. mario or crbaloon). Also, added port categories for MESS.
 [Fabio Priuli]
 
-Added Toshiba TLCS-900/H cpu core. [Wilbert Pol]
+Correct BPROM names, added PCB location and documented the BPROM type 
+for Moon Base. [Smitdogg, Dumping Union]
 
-Added T6W28 sound core (SNK(?) custom sn76489a clone). [Wilbert Pol]
+Corrected rom names for Wing Shooting Championship and added 
+documentation of the new game features of v2.00. 
+[Brian Troha, Dumping Union]
 
-removed YM2151 from gijoe which is not present on real PCB.
-[Yasuhiro Ogawa]
+Converted DS1302 to use devtemplate. [Fabio Priuli]
 
-Fixed P2 gun reload in Lethal Enforcers II. [Derrick Renaud]
+Converted ADC083x converters to be MAME devices. [Fabio Priuli]
 
-Fixed bug where repeating axis values were being selected for button 
-input in UI. [Derrick Renaud]
+Converted Fujitsu MB3773 to be a MAME device. [Fabio Priuli]
 
-Documented PALs from Xenophobe board. [Kevin Eshbach]
+Converted NEC uPD4701 to be a MAME device. [Fabio Priuli]
 
-Crystallized 1945kiii.c, maygay1b.c, maygayv1.c, mwarr.c, n8080.c
-(20.16MHz crystal confirmed with schematics), pacman.c, panicr.c,
-rallyx.c. [Luigi30]
+Tekken Tag Tournament Japanese versions: Mark the in-practice undumped
+roms as NO_DUMP. The versions used in the source were from where from
+the export version and they're incompatible with the japanese program
+roms. [Olivier Galibert]
 
+Converted ADC1213x converters to be MAME devices. [Fabio Priuli]
 
+Converted RP5H01 to be a MAME device. [Fabio Priuli]
 
-New games added or promoted from NOT_WORKING status
----------------------------------------------------
-Fantastic Journey [Olivier Galibert]
-Super Lucky Roulette [robiza]
-Status Blackjack [Aaron Giles]
-Status Fun Casino [Aaron Giles]
-Multi Game 2 [Mariusz Wojcieszek]
+Added DIP Locations and verified defaults for Speed Rumbler/Rush and 
+Crash (using Speed Rumbler manual). [Tafoid]
 
+Fixed digitalker mode 2. [Olivier Galibert]
 
+Partially converted NEC uPD4990A RTC to be a MAME device. Moved clock 
+init to device_start. [Fabio Priuli]
 
-New clones added
-----------------
-Asterix (Japan) [Chack'n]
-Ashura Blaster (World) [Tirino73]
+Added CPU core for the Manchester Small-Scale Experimental Machine 
+(SSEM) from 1948. [MooglyGuy]
 
+Updated the dipswitches and listed the dipswitches in the hvyunit 
+driver. [Brian Troha]
 
+Added documentation about the Galaxian bootleg hardware known as 
+Artic Multi-System. [Brian Troha]
 
-New games marked as GAME_NOT_WORKING
-------------------------------------
-Marvel vs. Capcom 2 [Guru]
-Zombie Revenge [Guru]
-Guilty Gear X [Guru]
-Virtua Striker 4 (Japan) [Guru]
-Virtua NBA [Guru]
-Giant Gram Zen-Nippon Pro Wresring 2 [Guru]
-Dengen Tenshi Taisen Janshi Shangri-la [Guru]
-Virtua Striker 4 ver. 2006 (Rev D) (Japan) 
-   [Alex's Rom Dumping Project]
-The Key Of Avalon - The Wizard Master - Server (GDT-0005C) (V4.001) 
-   [Alex's Rom Dumping Project]
-Virtua Striker 2002 (GDT-0001) [Alex's Rom Dumping Project]
-Derby Owners Club II [Guru]
-Wild Riders [Guru]
-WWF Royal Rumble [Guru]
-Quiz Ah Megamisama [Guru]
-Dynamite Baseball Naomi [Guru]
-Dynamite Baseball '99 [Guru]
-Death Crimson OX [Guru]
-Tripple Draw [Aaron Giles]
-Casino Strip [Aaron Giles]
-
-
-
-0.130u4
--------
-
-
-MAMETesters Bugs Fixed
-----------------------
-- 03106: [Sound] mouja: Sound Effects/Voice missing (Angelo Salese)
-- 03065: [Crash/Freeze] All sets in namcos12.c: [debug] MAME asserts 
-         during load time (Aaron Giles)
-- 03069: [Crash/Freeze] All sets in midzeus.c: [debug] MAME asserts 
-         during load time (Aaron Giles)
-
-
-
-Source Changes
---------------
-Documented the www.segaresurrection.com decrypted Ninja Kids II sound 
-rom so it doesn't show up as newly "found" bootleg version.
-[Brian Troha]
-
-Converted downtown, gondo, hbarrel, midres, timesold, topgunbl to use 
-IPT_POSITIONAL. [Derrick Renaud]
-
-Fixed Analog Settings to return to default when IPT_UI_SELECT (enter) 
-pressed. Fixed misplaced brackets, allowing upper/lower case 
-extensions for crosshair graphics and ldplayer chd files. 
-[Derrick Renaud]
-
-Naomi updates: [Angelo Salese, David Haywood]
- * Added H-Blank IN interrupt hook-up
- * Generate a few more interrupts (ISP end of render, VIDEO end of 
-    render)
- * Some minor improvements to the irq system
- * Added a bunch of Maple-DMA fixes, now moeru boots too
-
-Factored out MESS-specific code from machine/atari.c (cart init, 
-loading & unloading) [Fabio Priuli]
-
-Correctly implemented 'trail' function in ninjakd2. [kanikani]
-
-Changed galgbios service switch to be a toggle. [David Haywood]
-
-Fixed CPU_GET_INFO issues spotted by -validate in MESS debug build.
-[Fabio Priuli]
-
-Added Dip Locations to jalmah.c. [Fabio Priuli]
-
-Improved test mode behaviour on the jalmah.c. [Angelo Salese]
-
-Added display of frame number to the beamx/y info in the register 
-view in the debugger. [Aaron Giles]
-
-munch mobile improvements: [robiza]
- * implemented priorities
- * removed unnecessary tile index check
-
-Memory map merging for naughtyb.c, ssrj.c. [Angelo Salese]
-
-Converted jangou & nightgal drivers to use resistors with the color 
-proms. [Angelo Salese]
-
-Reverted to older behavior for how modified input port fields are 
-handled. The originally intended behavior is that a new field that 
-intersected a previous field would completely wipe out the original 
-field. Recently a change was made that changed the behavior to only 
-remove a portion of the bits from the original field. This is actually 
-problematic behavior, so the original behavior was restored.
-[Aaron Giles]
-
-Fixed auto-center bug on analog joysticks. [Derrick Renaud]
-
-Fixed UI when modifying the inc/dec/analog fields of an analog control
-in sequence. [Derrick Renaud]
-
-Corrected System 1 Z80 clocking: [Aaron Giles]
- * each opcode fetch is 2 cycles with /M1 low, so each byte of
-    opcode fetching causes slightly longer delays than the previous
-    tables
- * implemented approximate wait state timing for videoram access;
-    further accuracy will rely on getting a dump of the PAL16R4
-    that controls the horizontal video timing
-
-Merged memory maps in taito_l.c, taito_x.c, taito_b.c, taito_f2.c,
-taito_f3.c, surpratk.c, system16.c, system18.c. Also removed some word 
-handlers in favor of using READ8/WRITE8 directly in address maps. 
-Removed some additional unnecessary handlers in favor of using 
-AM_READ_PORT. [Aaron Giles]
-
-Changed the PPU2C0x implementation to be a device. [Nathan Woods]
-
-Simplified the gun port handling in the Sammy Outdoor Shooting games.
-[Derrick Renaud]
-
-Small System 1 update: [Aaron Giles]
- * correct video timing
- * removed "small" video drivers for games that properly mask the
-    scrolling areas
-
-Correct sound ROM for T-Mek 4.4 [Lars Bull]
-
-Partial fix to bug MT 3070 (harddriv & racedriv do not show anymore 
-P2 inputs for analog controls). Still thinking about steeltal.
-[Fabio Priuli]
-
-
-
-New games added or promoted from NOT_WORKING status
----------------------------------------------------
-Tekken Tag Tournament (world versions) [Olivier Galibert]
-
-
-
-New clones added
-----------------
-Might! Pang (Euro 000925) [Corrado Tomaselli]
-Night Warriors: Darkstalkers' Revenge (Asia 950302?) 
-  [Smitdogg Jones, Nicola Salmoria]
-Trivia Master (set 4) [SoftwareThis]
-Wolf Fang -Kuhga 2001- (Rohga Japan Ver.) [Team Japump!!!]
-Mystic Warriors (JAA) [Guru]
-
-
-
-New games marked as GAME_NOT_WORKING
-------------------------------------
-The Typing of the Dead [Alex's Rom Dumping Project]
-OutTrigger [Guru]
-Cannon Spike / Gun Spike
-Heavy Metal Geomatrix
-Super Lucky Roulette? [robiza, Angelo Salese]
-
-
-
-0.130u3
--------
-
-
-MAMETesters Bugs Fixed
-----------------------
-- 01030: [Side-by-side] starjack: "Star Jacker" side-by-side test. 
-         (Aaron Giles)
-- 00983: [Graphics] pitfall2: Once you lose your last life, any object 
-         not in the background shows up on the high score and continue 
-         screens. (Aaron Giles)
-- 00984: [Graphics] 4dwarrio: The game resolution changes in the 2nd 
-         players turn in the cocktail mode. (Aaron Giles)
-- 00257: [Graphics] wbmlb, wbmljb: When the player sprite reaches the 
-         right side of the playfield, some garbage gfx appear on the 
-         left side. (Aaron Giles)
-- 00303: [Graphics] regulus: In cocktail mode when it is player 2's 
-         turn graphics from the top of the screen flash at the bottom 
-         of the screen (Aaron Giles)
-- 00256: [Graphics] seganinj: [possible] Sprites leaving on the left 
-         side on the screen aren't clipped properly. (Aaron Giles)
-- 03098: [Color/Palette] all sets in mcatadv.c: Palette regression
-         (Christophe Jaillet, Fabio Priuli)
-- 03087: [Graphics] daireika: Graphic artifacts on attract mode. 
-         (Angelo Salese)
-- 03093: [Graphics] mazinger: the boss of 4th level is black (robiza)
-- 03092: [Sound] spuzbobl: Some sound samples are being played 
-         indefinitely (David Haywood)
-- 01163: [DIP/Input] popbounc: [possible] MAME doesn't support paddle 
-         input. (Fabio Priuli)
-- 02187: [Documentation] All games of "Technos": Fix for manufacturer. 
-         (Fabio Priuli)
-- 02558: [Graphics] Graphic priority is not fully understood. 
-         (Angelo Salese)
-- 02557: [Graphics] All games in jalmah.c: There are square gaps 
-         during gameplay. (Angelo Salese)
-- 00598: [DIP/Input] popbounc: Regardless of whether the "paddle" or 
-         "joystick" option is activated in the dipswitch, the controls 
-         are broken. (Fabio Priuli)
-- 00947: [Graphics] batsugun: At the level 4 boss there's a sprite 
-         problem. (robiza)
-- 02562: [Interface] Ability to choose arbitrarily named crosshair 
-         pictures (Derrick Renaud)
-
-
-
-Source Changes
---------------
-Crosshair update: [Derrick Renaud]
- * Added Crosshair Options menu
-    - ability to individually enable/disable crosshairs
-    - ability for them to automatically disappear after a set amount 
-       of time (this is now the default)
-    - ability to select crosshair graphic
-    - all settings are saved in the cfg file
- * Removed F1 toggle for crosshairs
- * Added new command option -crsshairpath
-    - store all selectable graphics here
-    - see config.txt for further info
-
-Merged memory maps, renamed sets in the following drivers: vendetta,
-videopkr, wrally, vball, unico, tsamuri, triplhnt, toypop, tnzs,
-topshoot, topspeed, tecmo, tecmo16, tecmosys, terracre, thoop2,
-tunderx, tiamc1, timelimt, taito_z. [Aaron Giles]
-
-Added direct mode JVS command, used by the i/o for the later Naomi 
-games [ElSemi, Angelo Salese]
-
-hyprduel fix [Hau]
-
-Force cpu resyncs main<->protection on pgm. [David Haywood]
-
-trackfld cleanups: [Aaron Giles]
- - derived clocks where possible
- - complete memory maps from the schematics
- - hooked up proper sound command latching
- - reimplemented 6802-based ADPCM samples for the bootlegs
- - merged memory maps
- - extended NVRAM to the full RAM range (according to schematics)
- - created common include file and modified drivers to use it instead 
-    of explicit externs
-
-Removed msb/lsb handlers from taitosnd. Updated all drivers to
-call the 8-bit versions directly from the address maps. [Aaron Giles]
-
-Did bulk replace of AM_READ/WRITE(SMH_NOP) -> AM_READ/WRITENOP.
-[Aaron Giles]
-
-Reverted recent TMS32025 timing change which busted Cool Pool sound.
-[Olivier Galibert]
-
-exctsccr update: [Uki]
- - verified clock frequency (including 4KHz NMI)
- - position 6A is not populated in JAPAN ver.
- - sound tempo is wrong in all sets (with or without this change)
- - clock for AY-3-8910 is 14.31818M/8 except for main melody
-
-taito_l input updates: [Fabio Priuli]
- * added plgirls cheat dip-switch [found by Gatinho]
- * added plgirls2 coin mode B
-
-Fixed crshrace coinage dips. [stephh, Fabio Priuli]
-
-Fixed mechattu coinage dips. [Fabio Priuli]
-
-Redumped GFX ROM of kakumei2. [Uki]
-
-Improved the Wave-DMA behaviour in Naomi, added PVR-DMA support. 
-[Angel Salese]
-
-Naomi video cleanups/reworking. [David Haywood]
-
-DIPSW update [kanikani]
- - added DIP location to following drivers: djmain.c, fitfight.c, 
-    gaiden.c, hornet.c, namcos1.c, namcos86.c, nwk-tr.c, skykid.c, 
-    zr107.c
- - enabled some DIPSW settings
-
-PGM update [XingXing]
- - added video ram mirroring (fixes a glitch in kovsh)
- - corrected some set names
-
-neogeo fixes: [Fabio Priuli]
- * fixed popbounc controls bug (MT 598)
- * removed use of sprintf
- * added a note about service menu browsing when mahjong panel is ON
-
-Konami inputs improvements: [Fabio Priuli]
- * Added source file konamipt.h to unify Konami inputs where possible 
-    (e.g. most 80s-90s games were using basically the same coinage 
-    settings and joystick inputs). 
- * While at it, verified all 0x00 coinage effects in drivers which now 
-    use konamipt.h (fixing a few mistakes: hexion, mikie, crimfgtj...) 
- * Added finalizb service coin. Removed roadf coin4 & asterix coin3 
-    (neither used by the games nor present in service mode). 
- * Fixed gberetb coin inputs (they were switched). 
- * Added port_condition to hcrash so that brake appears only when 
-    present in the chosen cabinet. 
- * Cleaned up mystwarr.c & moo.c input handlers.
- * Verified 0x00 coinage settings in remaining Konami drivers (and two 
-    Banpresto ones using same coinage settings)
-
-Fixed the priority system in the jalmah.c driver [Uki, Angelo Salese]
-
-Simulate 'keyoff' in the SPU. The envelopes aren't actually emulated, 
-but the sound is silenced after a key-off (by placing the sound in a 
-'release' state)  This prevents audiable sound from looping forever.
-[David Haywood]
-
-Build the IDE features table only when there is a CHD available.
+Added alternate read/write handlers to the Z80 PIO implementation.
 [Curt Coder]
 
-Added device-based implementations of the eeprom and i2c deevices.
-[Samuele Zannoli]
+Converted Motorola 6840PTM to be a MAME device. [Fabio Priuli]
 
-Added diplocations to finalizr.c, gradius3.c, pandoras.c, rollerg.c 
-and ultraman.c based on Guru's notes (thanks to AJG, who fwded them 
-to me). [Fabio Priuli]
+Fixed VIA address map in 86 Lions. [Palindrome]
 
-Dumped 1 BPROM of suchipi [Uki]
+Fixed ROM filenames of CVS Hunchback and Logger. [Andrew Welburn]
 
-Changed Z80 cycle table definitions to be per-device. Removed
-old set_info constants for the tables; they are now set up via
-the z80_set_cycle_tables function. [Aaron Giles]
-
-m90: reduced volume for all games, removed wrong graphics flag and 
-added no cocktail flag for risky challenge. [robiza]
-
-Reduced volume for bombrman, added wrong graphics flag for quizf1.
-[robiza]
-
-Removed old hardcoded keyboard handling for Atari 8bit systems and 
-used more reasonable key matrix scan. No regressions expected in MAME 
-(tested maxaflex.c games). [Fabio Priuli]
-
-Many Naomi tweaks and improvements, plus a number of new sets added
-but with no credit specified. [David Haywood]
-
-Corrected names for Champion Italian PK boards (thank f205v for 
-spotting this). [Mirko Buffoni]
-
-Sega System 1/2 rewrite: [Aaron Giles]
- * accurate collision detection in all games
- * correct full memory maps
- * hooked up 8255 and Z80 PIO correctly
- * unified many hacked variants into common hardware models
- * proper mixing using the mixing PROM
- * converted to tilemaps
- * fixed shtngmst sprites
- * correct Z80 timing
- * proper sound interrupt signaling and feedback
- * full description of video hardware
- * proper input hookup in dakkochn
- * cleaned up rendering code
- * fixed cocktail mode in pretty much all games
- * fixed stuck sprites in some games
- * partial 8751 simulation for choplift
- * proper global muting (attract sound off works in older games)
- * yes, the Pitfall 2 title is missing; more work to be done
-
-Put tables used for RGB utilities in a single object file rather 
-than compiling them as statics in every object that uses them.
-[Vas Crabb]
-
-Added small workaround to get Thunder Hoop 2 past the "bad 
-coprocessor" screen, but the game still has issues. [Peter Ferrie]
-
-Fixed incorrect DIP location for dealer in epos.c. [Tafoid]
-
-
-
-New games added or promoted from NOT_WORKING status
----------------------------------------------------
-Unknown Poker [robiza, Angelo Salese]
+Verified clocks and corrected 6502 cpu speed on "the deep". 
+[Corrado Tomaselli]
 
 
 
 New clones added
 ----------------
-Exciting Soccer (Japan) [Uki]
-Super Megatouch IV Tournament Edition 
-  (9255-51-01 ROB, Standard version) [Brian Troha]
-Pit Fighter (rev 7) [Smitdogg]
-Chase H.Q. (US) [Smitdogg]
-Crush Roller (bootleg?) [Tafoid, f205v]
+Off Road Challenge v1.63 [Tormod, Smitdogg, Dumping Union]
+Touchmaster 5000 (v7.10 California) [Tormod, Smitdogg, Dumping Union]
+Touchmaster 7000 (v8.1X Evaluation) [Incog, Smitdogg, Dumping Untion]
+Bucky O'Hare (ver AA) [Irongiant]
+Street Fighter II - The World Warrior (World 910214, TAB Austria 
+   bootleg) [TeamEurope]
 
 
 
-New games marked as GAME_NOT_WORKING
-------------------------------------
-Key of Avalon 1.30 - Client [Alex's Rom Dumping Project]
-Key of Avalon 2.0 - Client [Alex's Rom Dumping Project]
-Sega Network Taisen Mahjong MJ 2 [Alex's Rom Dumping Project]
-Sega Network Taisen Mahjong MJ 3 (Rev D) [Alex's Rom Dumping Project]
-Triforce DIMM Updater [Alex's Rom Dumping Project]
-Virtua Fighter 4 Final Tuned (Rev D) [Alex's Rom Dumping Project]
-Virtua Fighter 4 Final Tuned (Rev A) [Alex's Rom Dumping Project]
-Initial D : Arcade Stage Ver. 3 (Japan) (Rev B) [Alex's Rom Dumping Project]
-Virtua Fighter 4 Evolution (Rev A) [Alex's Rom Dumping Project]
-Wangan Midnight Maximum Tune 2 (Japan?) [Alex's Rom Dumping Project]
-
-
-
-0.130u2
+0.131u3
 -------
-
-(Due to an oversight, credit for the new Neo Geo BIOS was incorrectly
-given in the previous whatsnew. Thanks to Massimiliano Macri for the
-donation.)
-
 
 
 MAMETesters Bugs Fixed
 ----------------------
-- 02382: [Graphics] peke1012: Bad ROM dump causes graphics glitches
-         (Jim Stolis)
-- 02977: [Crash/Freeze] rdft2j2: Access Violation (Haze)
-- 03071: [Sound] tndrcade tndrcadj: music problem (Phil Bennett)
-- 03063: [Misc.] psyvaria, psyvarrv, usagi, nightrai, xiistag: Some 
-         G-Net cards were dumped without restoring them to defaults 
-         first (Guru)
-- 03068: [DIP/Input] leprechn: Lives are incorrect in Dip Settings 
-         (Tafoid)
-- 03024: [DIP/Input] jrpacmbl: All inputs perform wrong function in-
-         game (Fabio Priuli)
-- 02972: [Documentation] shuttlei: Year is listed as 197?, confirmed 
-         as 1979. (incog)
-- 02978: [Documentation] suprgolf: Year is listed as 19??, confirmed 
-         as 1989. (incog)
-- 02970: [Documentation] sfbonus, sfbonusa, sfbonusb, sfbonusd, 
-         sfbonusv: The year is 2003 according to the attract mode. 
-         (incog)
-- 02968: [Documentation] parrot3: The year is 2003 according to the 
-         attract mode. (incog)
-- 02969: [Documentation] parrot3b: The year is 2004 according to the 
-         attract mode. (incog)
-- 02999: [DIP/Input] taotaida: need more 3 buttons (Fabio Priuli)
-- 03029: [DIP/Input] jitsupro, kazan, p47, rodland, stdragon and 
-         clones: "Demo sounds" dip-switch inverted (Fabio Priuli)
-- 03042: [Documentation] mjclub: Dip-Switch settings for mjclub 
-         (Fabio Priuli)
-- 03031: [DIP/Input] seganinj and clones: Player 1 button 3 not 
-         present (Fabio Priuli)
-- 03048: [Sound] equites and clone: strange noise ingame 
-         (Phil Bennett)
-- 03035: [Save/Restore] frogg, froggrmc: Autosave does not work 
-         correctly (couriersud)
-- 02172: [DIP/Input] some driving games: MAME allocates Player 2 - 4 
-         inputs for deficient Player 1 inputs. (Fabio Priuli)
+- 03101: [Sound] jantotsu: Game gives incorrect calls (Angelo Salese)
+- 03196: [DIP/Input] daisyari: Game resets itself after full strip of
+         girl (Tafoid)
+- 02329: [Graphics] iganinju, plusalph and others: Very bad sprite lag
+         (Angelo Salese)
+- 03190: [Documentation] 86lions: 'Wrong' colours seem fixed when you 
+         swap R/B values (Angelo Salese)
+- 03149: [Crash/Freeze] All sets in cps3.c: Access Violation 
+         (Aaron Giles)
+- 03187: [Documentation] scin: Game title is different as shown in 
+         picture (Fabio Priuli)
+- 03176: [Graphics] cheekyms: Graphic Regression (Pierpaolo Prazzoli)
+- 03182: [Sound] Many sets in system1.c: Missing Sound (Aaron Giles)
+- 03178: [DIP/Input] dragngun: Unable to move Crosshair (Fabio Priuli)
 
 
 
 Source Changes
 --------------
-Added board description to Zodiack. [Guru]
+Fixed Oki banking in Grand Cross. [Angelo Salese]
 
-Demoted some games to have the GAME_NOT_WORKING flag:
- - Alligator Hunt (protected version);
- - Glass;
- - Great Guns;
- - Name Club Ver. 3;
- - Snow Board Championship;
- - Tetris Korean bootleg;
- - Thunder Hoop 2: TH Strikes Back;
- - Touryuu Densetsu Elan-Doree / Elan Doree - Legend of Dragoon;
- - World Grand Prix;
- - World Rally 2 - Twin Racing;
+Added basic ADPCM support to Grand Cross [Angelo Salese]
 
-Some various Naomi improvements and SH4 hacks to get more Naomi games
-booting farther. [David Haywood, Angelo Salese]
+Fixed title screen display in Joshi Volleyball [Angelo Salese]
 
-Added a PCB layout for the large single plane PCB that Incredible 
-Technologies used for the Golden Tee 3D series (3D through Classic), 
-Shuffleshot, World Class Bowling and World Class Bowling Deluxe. 
-[Guru]
+Fixed sound mute for system 2 games. [Aaron Giles]
 
-Added PCB layout & hardwared documentation for Atari's Badlands [Guru]
+The logic for detecting merged roms did not check all the rom sources
+in the parent, leading to cases where roms from devices aren't
+detected as merged (e.g. ldv1000 in superdqs). This fixes it.
+[Atari Ace]
 
-WIP driver for Cubo CD32 [Mariusz Wojcieszek]:
- - AGA palette
- - AGA bitplane data fetching
- - support for up to 8 standard bitplanes
- - HAM8 mode
+Added save state to artmagic.c and runaway.c. [Xander]
 
-Further annotated the game lists is mamedriv.c. [Yasuhiro Ogawa]
+Added newly-dumped PROMs to Robocop. [Irongiant]
 
-Fixed pending IRQs handling in the TLCS-90 CPU core [Luca Elia]
+Added static qualifiers to recently-added code. [Atari Ace]
 
-Updated video timing in bestbest to match PCB [Guru]
+Added missing coin lockout to lottofun. [Luigi30]
 
-ejsakura fix: added ymz280b_r to memory map to prevent musics to stop
-while playing [Cs9ph7Rg0]
+Improved lamp output in MPU4.c. Redrawing now only occurs on the peaks
+of the 50Hz AC Power. [AGEMAME]
 
-nemesis.c fix [Hau]
- - Fixed screen priority problems in Kitten Kaboodle.
- - Added flip screen & cocktail support.
- - Merged memory maps in hyprduel.c
+Updated the megatech.c parts list with info from more carts and
+fixed some errors in the notes for the rom definitions, and arranged
+them in correct order. [Smitdogg]
 
-CPU cores are now enabled on a per cpu core family basis instead of 
-per cpu core variant. As a result CPUDEFS is no longer needed in the 
-makefile. [Wilbert Pol]
+Added LSHIFT and RSHIFT as alises to << and >> for cheat files. 
+[Pugsy]
 
-TMS320C25 fixes and enhancements: [Olivier Galibert]
- - accept IRQs on IDLE
- - actually count irq processing and instruction fetching cycles
- - add support for external serial frame sync with internal
-    triggering (aka TXM=1 and FSM=1).
+Added Guru-readme(TM) for Triforce. [Guru]
 
-Updated G-Net CHDs (reset to factory default settings and clear 
-high-score table) [Guru]
+Added Guru-readme(TM) for Sega model3 and I/O board. [Guru]
 
-Added description of G-Net card/PCB [Guru]
+Moved the configuration of m6502-family callbacks to the cpu 
+configuration. [Wilbert Pol]
 
-Fixed crash due to recent cheat engine changes. [Pugsy]
-
-Fixed the sprite collision code of the mcu simulation in 
-'machine\mexico86.c'. [Aladar]
-
-Improved sound banking in galpani2 driver. [Luis Faria]
-
-Gameplan improvements: [Tafoid]
- - verified and simplified the DIPs, adding locations
- - adjusted clocks in Leprechaun and Pirate Treasure based on info
-    from the manual
-
-Implemented model2 inputs through direct AM_READ_PORT access rather 
-than using read handlers. The patch also fixes daytona brakes (which 
-were previously labeled with the wrong tag). [Fabio Priuli]
-
-Simplified input handling in Taito F3 games. [Fabio Priuli]
-
-Various PGM fixes and improvements [XingXing]
-
-Fixed rdft2j2 set, it was using rdft roms instead of the rdft2 ones.
+Split Naomi video ram access into 32-bit / 64-bit areas pending more 
+information on how they actually mirror (it's not a straight mirror).
 [David Haywood]
 
-Additional PGM improvements: [David Haywood]
- - Added emulation of the earlier type of ARM (ASIC27A, 5585E type)
-    Used this for protection emulation on Photo Y2k, Knights of 
-    Valour Superheroes instead of old simulation code
- - Disabled protection simulation for several sets. This demotes 
-    Knights of Valour / Knights of Valour Plus to NOT working as there 
-    is no dump of the internal rom.
- - Photo Y2k still works because it's using the emulation added above, 
-    but You can no longer change region as this is supplied by the 
-    ASIC27A device which is now emulated.  This is correct.
- - Added several new sets, several of which are re-releases of the 
-    games using the ASIC 27A instead of the previous protection 
-    devices. (oldss, killbldp)
- - Removed per-game speedup hacks, as they're no longer needed for the 
-    ARM based games to boot correctly.
+psattack CF card redump and ID metadata added to create a CHD. [Guru]
 
-Fixed core_strwildcmp by increasing the limit from 8 to 16 characters.
-[smf]
+H8 series MCU updates: [R. Belmont]
+ - Implemented 8-bit timers and free-running counter for H8/3334
+ - Added bld #imm, @Rd instruction
+ - Improvements to interrupts and the serial ports
 
-Verified and simplified munchmo DIPs, and added locations. Also fixed
-clock speeds and AY-8910 clock to match recordings. [Tafoid]
+Namco System 23 update: [R. Belmont]
+ - Changes and documentation added on how the I/O board is hooked up.
+The H8/3334 based TSS-I/O board sometimes handshakes successfully in 
+Time Crisis 2 now but timing-related problems remain.
 
-Verified DIPs and added locations for Road Fighter. Adjusted defaults
-to match the manual. [Tafoid]
+Namco System Super 22 update: [R. Belmont]
+ - Reimplemented SPOT RAM - Tokyo Wars relied on some details not 
+    previously seen
+ - Fixed uninitialized RAM area that caused random sprite colors 
+    since 0.120 (thanks to Phil Bennett for debugging the problem)
+ - Updated Guru Readme(tm)
 
-In bublbobl, emulated CPU1 (slave) <-> AUDIOCPU communications and
-AUDIOCPU reset at startup, previously this was disabled. [Mamesick]
+Fixed Aliens P2 inputs. [stephh]
 
-Added samples emulation to Rough Ranger (V2.0), write ports A & B of 
-YM2203 are used. [Mamesick]
+Gladiator coinage fix. [Tafoid]
 
-Added game-specific kludge to get music in SD Gundam Psycho Salamander.
-[Mamesick]
-
-Fixed G-NET on big-endian hosts. [R. Belmont]
-
-
-
-New games added or promoted from NOT_WORKING status
----------------------------------------------------
-Hidden Catch 3 [Pierpaolo Prazzoli, Tomasz Slanina]
-Iron Fortress [Smitdogg Jones, Dumping Project]
-Mahjong Vegas (unprotected set) [Luca Elia, Uki]
-E-Jan Sakurasou [Cs9ph7Rg0]
-Kollon [Guru]
-Otenki Kororin [Guru]
-Shikigami no Shiro [Guru]
-Magical Error wo Sagase [Hau]
-Knights of Valour Superheroes [XingXing, David Haywood]
-
-
-
-New clones added
-----------------
-Super Puzzle Bobble (2.04J) [Guru]
-Zooo [Guru]
-Operation Wolf (Japan) [Guru]
-Puzz Loop (Asia) [Brian Troha]
-
-
-
-0.130u1
--------
-
-IMPORTANT NOTE: The CHD format has undergone a change with this
-release. The main reason for this change is to include some of the
-key metadata into the hashes for the CHDs. This ensures that the
-metadata is valid and prevents abuse.
-
-The first impact you will find is that all of your CHD differencing
-files are invalid. Just delete your "diff" directory contents 
-entirely.
-
-The second impact is that all your existing CHDs will warn you that
-they have incorrect hashes. This is expected. Your old CHDs should
-still work fine, so if you can live with the "bad ROM" warnings, you
-don't really need to do anything. However, if this bugs you or you
-want to be "clean", you can update your CHDs, using this command
-line:
-
-   chdman -update <chdfile> <newchdfile>
-   
-for each one of your CHDs. This will take a while, but will produce
-CHDs that match the new checksums posted in the drivers.
-
-
-
-MAMETesters Bugs Fixed
-----------------------
-- 03017: [Crash/Freeze] bmfinal: crash after cutting edge logo 
-         (Phil Bennett)
-- 02875: [Sound] Any Game that uses AY-3-8910: Envelope Fix causes 
-         notes tones to be played back incorrectly (couriersud)
-- 03026: [Graphics] retofinv, retofin1, retofin2: The remaining lives 
-         are not shown. (Pierpaolo Prazzoli)
-- 02981: [Cheat System] CHEAT.C: MAX_ARGUMENTS doesn't seem to work. 
-         (Pugsy)
-- 00827: [Graphics] wc90b1, wc90b2: On the Credit display screen, the 
-         PCB shows the upper part of the stadium. (robiza)
-- 00230: [Graphics] troangel: I just checked mame emulation against my 
-         pcb. (robiza)
-- 03018: [Sound] f1gpstr2: Sounds not playing (Phil Bennett)
-
-
-
-Source Changes
---------------
-Fixed C140 ROM loading in winrun, winrun91 and driveyes [Phil Bennett]
-
-Added Champion Italian PK blue board and promoted Champion Italian 
-PK green board (previously citalian) and Champion Italian Cup 
-(previously citaliana) to GAME_WORKING status 
-[Mirko Buffoni, David Haywood]
- - Added cpokerpk (also known as CPK blue board for the color of the 
-    board)
- - Renamed citalian -> cpokerpkg (green board, can be seen in rom too)
- - Renamed citaliana -> citalcup
- - added PAL decryption, making all games playable
- - Updated input ports and fixed gfx layout to use 6 bitplanes like 
-    all others
- - Changed number10 and cpokerpk video udpate to not use transparency
-
-Updated CHD format to version 4. Checksums are now computed and
-stored separately for raw data and metadata, and metadata is now
-checksummed by default. [Aaron Giles]
-
-Updated chdman to support a generic metadata addition system:
-  chdman -addmetatext <chdfile> <tag> [<index>] <sourcefile>
-  chdman -addmetabin <chdfile> <tag> [<index>] <sourcefile>
-[Aaron Giles]
-
-Changed the CHD verify interfaces to pass back a structure containing
-all the necessary data for verification and fixing. [Aaron Giles]
-
-NeoGeo update [Johnboy]
- - maglordh - Renamed p1 to correct chip label (MichaelNet)
- - Renamed maglordh to maglord (MVS) and maglord to maglordh (AES)
- - whp - Renamed several roms to correct chip label (MichaelNet)
- - kof2001 - Renamed p's to correct chip label; added note (MichaelNet)
- - Added mv1c bios, redump/reverification required
- - Updated documentation (see neogeo.c)
- - cyberlip - Added correct m1 (Guru/Smitdogg)
- - eightman - Removed BAD_DUMP from m1, is correct (Guru/Smitdogg)
-
-Merged Casino Winner and Royal Casino drivers [Angelo Salese]
- * Fixes Royal Casino colors;
- * Added flip screen support to the driver;
- * Changed Casino Winner to be a clone of Royal Casino;
- * Cleaned-up the driver;
-
-Fixed Midnight Landing gfx bitplanes [Angelo Salese]
-
-PGM updates: [Xing Xing, David Haywood] 
- - added kov2p205, martmasc romset
- - fixed some descriptions
- - experimental video change with a view to fix priorities on kov2
-
-Modified cdrom.c to expose metadata read/write functions, and changed
-chdman to use them. Also changed chdman to parse old-style metadata 
-and convert it to new-style metadata. [Aaron Giles]
-
-Fixed regressed sound in the deco MLC driver. [Angelo Salese]
-
-Preliminary protection simulation in olds100a [XingXing]
-
-Added an older Japanese neogeo bios [Corrado Tomaselli]
-
-Improvements to Counter Steer [Angelo Salese]
-
-Added new function core_fload() to load a file into an allocated 
-buffer. Updated src2html, regrep, and chdman tools to use this 
-function where appropriate. [Aaron Giles]
-
-Fix f1gpstr2 sound regression [Phil Bennett]
-
-Added default nvrams to sfbonus.c using rom_load_optional. This should 
-save some time renaming and reparenting these in the future.
-[David Haywood]
-
-Minor video/psx.c changes that were needed for raycrisis. 
-[David Haywood]
-
-Fixed Heavy Unit main CPU bankswitch. This fixes the enemy appearing 
-in attract mode. [Mamesick]
-
-Added text tilemap flickering to pzletime. It allows to see the 
-selected options. [Pierpaolo Prazzoli]
-
-Changed the CPU cores to use the get_safe_token() pattern like other
-devices. [Aaron Giles]
-
-System16 update [kanikani]
- - Enabled some buttons previously marked as 'unused'.
-   Manuals say 'No Connection', but programs read them and do 
-   something. i.e. button2 in Tetris: can rotate the piece 
-
-More Counter Steer progress. [Angelo Salese]
-
-Added PCB layout for Jumping Break and additional information. 
-Corrected the sound clocks on PCBs that only have a 28MHz OSC. Only 
-Super Lup Lup Puzzle has the 14.318180MHz OSC. Rearranged the rom 
-def section to group the F-E1-16-0xx PCB based games in order.
-[Brian Troha]
-
-troangel: better support of line scroll with wrap. The scroll offsets 
-are split in LOW byte and HIGH byte. [robiza]
-
-Add specific support for NEC VR4300/4310 CPUs. [R. Belmont]
-
-Fixed paletteram in Super Crowns Golf. Hooked up text background. 
+Fixed regressed sound in wc90b.c. Also fixed nested NMIs, improving 
+msm sound, and converted memory maps to current standards. 
 [Angelo Salese]
 
-Updated CHD hashes. [Yasuhiro Ogawa, Aaron Giles, David Haywood]
+Corrected the 202 entry in the LFO Frequency Table (and comments for 
+it) for the YMF271 based on a formula by Olivier Galibert. 
+[Brian Troha, Roman Scherzer]
 
-Added default eeprom to skullfng, so that it appears less broken by 
-default. (doesn't boot without one) [David Haywood]
+Added PCB rom locations to Dog Fight (Thunderbolt) romdef as well as 
+the bprom type. [Brian Troha]
 
-wc90b1 and wc90b2: fix fg and bg vertical scroll [robiza]
+Fixed ROM filename for Battle Zone. [Andrew Welburn]
 
-Implemented a multi-sprite bit in toaplan2 driver. [robiza]
+Added basic MSM support for Super Crowns Golf, and fixed NMI 
+generation. Also found & hooked up the flip screen bit, and cleaned
+up the memory maps. [Angelo Salese]
 
-Changed mapping of start key in multfish.c to standard key (1) like 
-other gambling games, added extra set. [David Haywood]
+Hooked up sprite buffering in the Jaleco Mega System 1 driver. 
+[Angelo Salese]
 
-Fixed bug where chdman -extract would not truncate to the logical 
-size. [Aaron Giles]
+Corrected Euro League clock speeds. [Mike Coates]
 
-Silenced out heavy accesses to Sound RAM expansion area for Stress 
-Busters [Angelo Salese]
+Fixed ADPCM stop flag in Jantotsu, and cleaned up some routines in the 
+driver. Added an heuristic table for the msm samples. Fixed MSM
+frequency. [Angelo Salese]
 
-Added better descriptions and dates to a number of drivers in the
-mamedriv.c file. [Yasuhiro Ogawa]
+Hooked up sound in Super Shanghai Dragon's Eye. [Angelo Salese]
 
-Minor hack to fix start countdown sound bug in the Buggy Boys.
-[Phil Bennett]
+Fixed some dip-switches quirks in the Mexico 86 driver and enabled the 
+single board 4 players mode. [Angelo Salese]
 
-Added idle skipping and a number of new sets to the Naomi driver.
-[David Haywood]
+Improved timing of communication between the main and sound cpus in 
+the megadriv driver. [Wilbert Pol]
 
-Burger Time: Added resistor values measured on real pcb [Anoid]
+Fixed flickering in Super Shanghai Dragon's Eye on girl presentation 
+screens. Split memory maps for the different sshangha version, and 
+fixed sound in the parent set. [Angelo Salese]
 
-Adjusted volume in the galaxian driver. [couriersud]
+Added I8751 ROM to sqixu [Dr. Decapitator, Nicola Salmoria]
 
-Adjusted Volume and removed dc component from sound in the gyruss
-driver. [couriersud]
+Fixed sqix/sqixa bootleg MCU bad dump by comparison with the original.
+[Nicola Salmoria]
 
-AY-3-8910 improvements: [couriersud]
- * Fixed Gyruss audio regression
- * Measured RU and RD on AY-3-8910
- * Modelled ZX Spectrum audio circuit in SwitcherCAD and derived 
-    resistor values for AY-3-8910
+Fixed coin lockout in Tetris (Arkanoid HW) and removed the 
+GAME_WRONG_COLORS flag since the colors are correct. [Angelo Salese]
 
-MIPS III: Update RA before executing the delay slot. [R. Belmont]
+Added MSM hook-up for Ganbare Chinsan Ooshoubu. [Angelo Salese]
 
-Added inputs for galaxia and astrowar. Galaxia is semi-playable.
-Note: After inserting a coin, it can take a few seconds to respond.
-[Robbbert]
+Fixed background colors in Tryout and cleaned-up the NMI firings on 
+coin insertion. [Angelo Salese]
 
-Fixed build of ldplayer on OS X. Since the CUSTOM sound module no 
-longer exists, I arbitrarily changed it to WAVE, as ar gets upset if 
-it has no input files. I also removed the -all_load flag for ldplayer 
-from the main makefile as it upsets the linker on OS X. [Vas Crabb]
+Cleaned-up the Mazer Blazer driver. [Angelo Salese]
 
-Fix build for PPC64 Linux. (This slightly messes up static branch 
-prediction hints on OS X and AIX, but OS X for PPC64 is dead, and 
-no-one builds MAME for AIX, and it will still build, anyway.)
-[Vas Crabb]
+Fixed foreground color offsets in Tryout, game colors should now be 
+100% accurate. Also fixed flip X on the sprites, fixed scrolling
+issues, and added screen disable flag. [Angelo Salese]
 
-Paramaterise the arguments to check for NULL in the ATTR_NONNULL macro 
-rather than just checking the first argument. This requires compiler 
-support for C99 variadic macros (MSVC2005 and GCC4 have this AFAIK).
-[Vas Crabb]
+Disabled unused variables in the project that were only assigned to
+but never used. [Oliver Stoeneberg]
 
-Z80PIO: When outputting from a port to the hardware in pio mode 3, 
-only those bits defined by the mask should be output. Mame currently 
-outputs everything. [Robbbert]
+Removed the pulse input on the touchscreen for the touchmaster
+drivers, making centipede returns (tm4k), breakout3k (tm3k),
+wordsearch (tm8k) and possibly other games playable do to the need for
+"dragging" the screen. An example of this is the word search game
+where it is necessary to drag from the start letter to the end to
+highlight the selection, which is not possible with a pulse input.
+[Mike Green]
 
-Changed the One-Shot List or Selectable value cheats to display "Set" 
-instead of "Off". Also stopped the cheat options being activated in 
-order when you are going through the possibilities in this case. 
-These cheats are now activated by pressing ENTER after you have 
-chosen an option. [Pugsy]
+Corrected the clock speed for Pirate Ship Higemaru. [Stefan Lindberg]
+
+Hand-tuned bgm OKI sound chip frequency in mirage.c. [Angelo Salese]
+
+Added readmes to Jail Break, Ninja Warriors, Operation Wolf and 
+Rainbow Islands. [Guru]
+
+Fixed sound banking and priorities in Mirage Youjuu Mahjongden. 
+[Angelo Salese]
+
+Decoded color proms and fixed bitplanes in Mirax. [Angelo Salese]
+
+CPUs actually take some time to reset. Changed the 68000/68010 to
+eat an appropriate number of cycles after a reset. [Aaron Giles]
+
+Sega System 16A changes: [Aaron Giles, Dr. Decapitator]
+ * Added MCU dumps to quart21 and bodyslam
+ * Hooked up MCU in these games
+ * Marked games using simulated MCU as "unemulated protection"
+    as the MCUs clearly do more than what we are simulating
+
+Eliminated SMH_* usage in all memory maps in drivers beginning with 
+A and B. [MooglyGuy]
+
+Added some security custom info to the Sega drivers 
+(from http://www.higenekodo.jp/sega_n.htm). [Yasuhiro Ogawa]
+
+Converted the Namco 50xx, 51xx, 52xx, 53xx, 54xx, and 06xx into 
+proper devices. [Aaron Giles]
+
+Added DERIVED_CLOCK() macro which can be used by sub-devices to
+derive their clock from the parent device. [Aaron Giles]
+
+Tweaked some of the laserdisc interfaces to use ROM_NAME() and
+MACHINE_DRIVER_NAME() macros. [Aaron Giles]
+
+Changed the Namco 52xx and 53xx devices to run the actual MCU instead
+of simulating the behavior. Hooked them up properly in bosco, digdug,
+and polepos. [Aaron Giles]
+
+Fixed Bronx regression. [Angelo Salese]
+
+Guessed ADPCM PAL shuffling in Idol Janshi Suchie-Pai Special, it 
+sounds better but I'm not sure if it's 100% accurate (I need a 
+side-by-side test). [Angelo Salese]
+
+Added mirrors to Pole Position memory maps. [Aaron Giles]
+
+DIP switch changes: [kanikani]
+ - added DIPLOCATION to scontra and thunderx
+ - added some DEF_STRs (Difficult, Very Difficult, etc.) and modified 
+    drivers using them
+
+Added internal memory maps and internal clock divider to the MB88xx
+CPUs. Removed now-redundant memory maps from drivers and removed
+explicitly-specified clock dividers. [Aaron Giles]
+
+Continued changing CPU references from numbers to tags in drivers.
+[Fabio Priuli]
+
+Preliminary work on beatmania iidx, still lots to do. [smf]
+
+Several MB88xx changes/fixes: [Aaron Giles]
+ - internal timer support now works; prescaler is guessed based
+    on Pole Position sample playback frequency
+ - external counter support works
+ - a basic mechanism for reading serial input has been added; it
+    is not sufficient for a full implementation, but good enough
+    to sample the SI pin at startup
+ - fixed TSTS/TSTV to clear their respective flags
+ - fixed CI and CYI to compute imm-reg instead of reg-imm
+ - added masking of the PA register upon RTI/RTS to prevent bogus
+    PC values
+
+Fixes compilation with ARM7_DEBUG_CORE enabled. 
+[Reijo Tomperi, Oliver Stoeneberg]
+
+Added support for parsing horizont.ini or vertical.ini based on the
+game's orientation. [Krick]
+
+Made a pass at shuffling/improving the system 16 and 18 bootlegs.
+Some games are probably more broken now, but they are better
+structured for future improvements. [David Haywood]
+
+Fixed a few potential memory leaks detected by cppcheck and also added
+an errormessage to verinfo. [Oliver Stoeneberg]
+
+Added Guru-readme(TM) for TWINKLE hardware. [Guru]
 
 
 
 New games added or promoted from NOT_WORKING status
 ---------------------------------------------------
-Buggy Boy/Speed Buggy (cockpit) [Phil Bennett]
-Chaos Heat [Olivier Galibert]
-Ray Crisis [Olivier Galibert, David Haywood]
-Chaos Heat [Olivier Galibert, David Haywood]
-Flip Maze [Olivier Galibert, David Haywood]
-Super Puzzle Bobble [Olivier Galibert, David Haywood]
-Soutenryu [Olivier Galibert, David Haywood]
-Shanghai Shoryu Sairin [Olivier Galibert, David Haywood]
-Psyvariar -Medium Unit- [Olivier Galibert, David Haywood]
-Psyvariar -Revision- [Olivier Galibert, David Haywood]
-Zoku Otenamihaiken [Olivier Galibert, David Haywood]
-Usagi [Olivier Galibert, David Haywood, Angelo Salese]
-Mahjong Oh [Olivier Galibert, David Haywood, Angelo Salese]
-XII Stag [Olivier Galibert, David Haywood]
-Jumping Break [Pierpaolo Prazzoli]
-Champion Super III [Mirko Buffoni, David Haywood, Angelo Salese]
-Champion Super 2 [Mirko Buffoni, David Haywood]
+Aqua Jet (Rev. AJ2 Ver.B) [Guru, R. Belmont, Phil Bennett]
 
 
 
 New clones added
 ----------------
-Millennium 4000 (version 1.5) [Mirko Buffoni]
-American Poker II (bootleg, v4) [Mirko Buffoni]
+Wizard Fire (Over Sea v2.1) [Irongiant]
+US AAF Mustang (TAB Austria bootleg) [Klaus Sommer]
+Chaos Heat (World) [Tormod / Brian Troha]
+Bloody Roar (Japan) [D. Alves, Smitdogg, Dumping Union]
+Fighters' Impact (Japan) [TH60]
+Ehrgeiz (Japan) [Uki]
+Super Qix (World, Rev 2) [Stefan Lindberg]
+High Impact Football (rev LA5 02/15/91) 
+  [Tormod, Smitdogg, Dumping Union]
+Intruder [Smitdogg, jmurjr, ranger_lennier]
+Pro. Sports (alternate) [Smitdogg] -- not working
+Forgotten Worlds (World) [Corrado Tomaselli]
+Cherry Bonus III (alt) [David Haywood]
 
 
 
 New games marked as GAME_NOT_WORKING
 ------------------------------------
-Go By RC [Olivier Galibert, David Haywood]
-Space Invaders Anniversary [Olivier Galibert, David Haywood]
-Night Raid [Olivier Galibert, David Haywood]
-Tokyo Cop (Italy) [David Haywood]
-California Chase [Angelo Salese]
-Street Games II [Guru, Angelo Salese]
-Street Games [Smitdogg, Angelo Salese]
-Bonanza [Smitdogg, Angelo Salese]
-Thunderbirds [AGEMAME]
-
+Alpine Racer 2 (Rev. ARS2 Ver.A) [Guru]
+Tokyo Wars (Rev. TW2 Ver.A) [Guru, R. Belmont, Phil Bennett]
+Microman Battle Charge [Guru]
+Technical Bowling [Guru]
+Enchanted Forest (E - 23/06/95, Local) [AGEMAME]
+Golden Pyramids (B - 13-05-97, USA) [AGEMAME]
+Queen of the Nile (B - 13-05-97, NSW/ACT) [AGEMAME]
+Super Cherry Master / New Cherry Gold '99 [David Haywood]
+Super Cherry Master / Super Cherry Gold [David Haywood]
+Super Cherry Master / Grand Cherry Master [David Haywood]
+
+
+
+0.131u2
+-------
+
+
+MAMETesters Bugs Fixed
+----------------------
+- 03173: [Sound] Many sets using atarijsa.c: Audio samples are 
+         incorrectly pitched (Phil Bennett)
+- 03171: [Crash/Freeze] pang, spang, pompingw, pkladies: Ram error 
+         during the boot checking of the games. (Pierpaolo Prazzoli)
+- 03170: [Sound] mtrap and clones: Sound effects cycle constantly 
+         while playing (Fabio Priuli)
+- 03169: [Crash/Freeze] All sets in hvyunit.c: Access Violation 
+         (Angelo Salese)
+- 03168: [Sound] All sets in halleys.c: Audio is missing completely 
+         (Fabio Priuli)
+- 03167: [Color/Palette] fromancr, fromanc4: Second screen has 
+         incorrect palette/colors (Fabio Priuli)
+- 03166: [Graphics] tattass, tattassa: Missing Graphics (Fabio Priuli)
+- 03153: [Crash/Freeze] penbros: Access Violation (Mamesick)
+- 03163: [Graphics] sailormn, sailormo: Playfield Graphics regression 
+         (Mamesick)
+- 03150: [Crash/Freeze] metmqstr, nmaster: Access Violation (Mamesick)
+- 03162: [Sound] baddudes, hbarrel, birdtry, robocop, hippodrm, 
+         ffantasa : Game has no sound at all (Angelo Salese)
+- 03147: [Misc.] shtngmst, shtngmst1: wrong sha1 values for shooting 
+         master ic74 (Nicola Salmoria)
+- 03160: [Crash/Freeze] tubepb: Access Violation (Fabio Priuli)
+- 03152: [Crash/Freeze] All Sets in nss.c: Access Violation 
+         (Fabio Priuli)
+- 03151: [Crash/Freeze] jajamaru, mightybj, topgun, vsgshoe: Access 
+         Violation (Fabio Priuli)
+- 03154: [Crash/Freeze] All sets in pooyan.c: Access Violation
+         (Fabio Priuli)
+- 03157: [Crash/Freeze] All Sets in policetr.c: Access Violation 
+         (Fabio Priuli)
+- 03159: [Crash/Freeze] superchs: Access Violation (Fabio Priuli)
+- 03148: [Crash/Freeze] All sets in konamigx.c: Access Violation
+         (Fabio Priuli)
+- 03146: [Compiling] cpu\vtlb.c 64 bit warning: 64bit vs compile 
+         warnings (smf)
+
+
+
+Source Changes
+--------------
+Added notes to several drivers indicating specifically that an MCU
+is needed for decapping. [Angelo Salese]
+
+Naomi renderer: add all 64 blending modes, and made it anal-retentive 
+where it comes to position precision. [Olivier Galibert]
+
+Converted Irem M14 HW to tilemaps and cleaned-up the driver.
+[Angelo Salese]
+
+Renamed yumefuda.c/hanaroku.c drivers to albazg.c/albazc.c (like they 
+should be properly named). [Angelo Salese]
+
+Added MCU no dumps for the Grand Striker driver. [Angelo Salese]
+
+Fixed background colors in Alien Command. [Angelo Salese]
+
+Added profile markers to naomi, to see what % of cpu time things are 
+using. [David Haywood]
+
+Lowered the AY-8910 volumes in the adp driver. [Angelo Salese]
+
+Some Maple fixes, now Street Fighter Zero 3 Upper should be fully 
+playable. [Angelo Salese]
+
+Added cart info documentation update for the two resent Mega-Tech cart 
+dumps: Shadow Dancer & Streets of Rage. [Brian Troha]
+
+Merged memory maps in the following remaining drivers and cleaned up 
+some comments: homedata.c, intrscti.c, inufuku.c, irobot.c, jack.c, 
+kaneko16.c, naughtyb.c, scobra.c, scramble.c, slapfght.c, spaceg.c.
+[MooglyGuy]
+
+Fixed Naomi bug in computedilated, was causing bad portraits in 
+shikgam2. [David Haywood]
+
+Removed second parameter from MDRV_CPU_PROGRAM_MAP, MDRV_CPU_DATA_MAP,
+and MDRV_CPU_IO_MAP. For the remaining drivers that used multiple
+address maps, converted them to use AM_IMPORT_FROM to import the base
+map. [Aaron Giles]
+
+Added bilinear filtering to Naomi video emulation. Textures are still 
+a bit crawly since we're always using the lowest MIP level. 
+[MooglyGuy, Aaron Giles]
+
+Short-circuit the naomi rendering in non-textured cases, prevents a 
+lot of bad graphics. [David Haywood]
+
+Fixed tubepb regression. [Fabio Priuli]
+
+Added MC-8123 key for Gigas. Of course the game still doesn't work 
+because the program ROM is missing. [Nicola Salmoria]
+
+Applied some of the Naomi exclusive texture mode rules. 
+[David Haywood]
+
+Added a work-around for the UART FIFO read only status register on the 
+SH-4 to make Tetris Kiwamemichi happy to boot. It crashes shortly 
+after that like La Keyboard though (jumps to an unmapped address).
+[Angelo Salese]
+
+Hacked the Naomi YUV interrupt to fire when the base register is 
+written.  (Currently looking at implementing properly, but this 
+prevents KuruCham and SS2005 from hanging). [David Haywood]
+
+Converted namcos2.c, niyanpai.c and nbmj9195.c to use AM_IMPORT_FROM
+instead of macros. [Angelo Salese]
+
+Fixed regression for mitchell.c games. [Pierpaolo Prazzoli]
+
+Added MCU no-dump to Air Buster. [Angelo Salese]
+
+Commented out the ACIA irq, was causing missing bgms in Street 
+Fighter Zero 3 Upper. [Angelo Salese]
+
+Improved the debugging on the Naomi Wave DMA handler. [Angelo Salese]
+
+Converted DJ Boy memory maps to current standards. [Angelo Salese]
+
+Fixed pipedrm tag problem. [Fabio Priuli]
+
+Fixed ninjakd2 DIPSW and notes. [kanikani]
+
+Fixed a couple of bugs in cave.c and seta2.c introduced with the
+memory map merges. [Fabio Priuli]
+
+MCS-51 fixes: [Aaron Giles]
+ * jb int0,<self> loops are now broken out of if int0 comes and is 
+    taken
+ * externally-clocked counters only count when enabled
+ * internal RAM no longer wraps when accessed out of bounds
+
+System 1 changes: [Aaron Giles]
+ * hooked up 8751 properly
+ * removed old 8751 hacks
+ * shuffled Shooting Master sets
+
+Fixed tattass regression from map merging. [Fabio Priuli]
+
+Fixed P2 palette write handlers for fromancr and fromanc4. 
+[Fabio Priuli]
+
+Fixed halleys.c sound: ay8910 write handlers work on two bytes.
+[Fabio Priuli]
+
+Marked polystar, hellngt and totlvice CHDs as bad. Will be replaced 
+soon. [Guru]
+
+Added missing YMZ280B ROM to evilngt/hellngt. [Guru]
+
+Fixed regression on homedata.c driver. [Angelo Salese]
+
+Fixed Legend of Makai regression. [Angelo Salese]
+
+Removed "BAD_DUMP" from the Red Baron AVG bprom, it has been verified 
+correct (contents and label) by the Dumping Union. [Smitdogg]
+
+Improved the single board 4p mode in Kick N Run / Mexico 86. It 
+basically works but 2p mode is broken so I still keep it as disabled 
+by default. [Angelo Salese]
+
+Fixed Kiki Kai Kai exception. [Angelo Salese]
+
+Dumped io board rom to Dynamic Golf. [Guru]
+
+Fixed King Derby sprites wrap-around and flip x positioning.
+[Angelo Salese]
+
+
+
+New games added or promoted from NOT_WORKING status
+---------------------------------------------------
+PT Reach Mahjong [Angelo Salese]
+Otenami Haiken (V2.04J) [Joerg Hartenberger, Guru]
+Shanghai Sangokuhai Tougi (Ver 2.01J) [Joerg Hartenberger, Guru]
+Choplifter (8751 315-5151) [The Decapping Project, Aaron Giles]
+Shooting Master (EVG, 8751 315-5159a) 
+  [The Decapping Project, Aaron Giles]
+Noboranka [The Decapping Project, Aaron Giles]
+
+
+
+New clones added
+----------------
+Samurai Nihon-ichi (set 3, harder) [f205v]
+Hatris (US) [Andrew Welburn]
+
+
+
+New games marked as GAME_NOT_WORKING
+------------------------------------
+IQ Pipe [SoftwareThis]
+
+
+
+0.131u1
+-------
+
+
+MAMETesters Bugs Fixed
+----------------------
+- 03144: [DIP/Input] piratpet: [possible] Button 2 skips level 
+         (Fabio Priuli)
+- 03126: [Gameplay] sbishi: When Player 2 plays alone, strange things 
+         happen. (David Haywood)
+- 03143: [Graphics] screwloo: screwy graphics area on one screen 
+         (Pierpaolo Prazzoli)
+- 03129: [DIP/Input] xmen: Directional controls re-arranged 
+         (Fabio Priuli)
+- 00487: [Misc.] groundfx: It has wrong default NVRAM settings, 
+         especially about the lap number (1) and the coin/credit 
+         settings (1/2). (Angelo Salese)
+- 03104: [Graphics] captaven and clones: No enemies appear in the 
+         second phase. (Pierpaolo Prazzoli)
+
+
+
+Source Changes
+--------------
+Deprecated device_set_info. Almost all devices had a NULL or empty 
+function here. Remaining devices have been converted to have 
+device-specific functions to do the same thing with proper type 
+checking. CPUs still have a set_info function but it is CPU-specific 
+now and no longer piggybacks on the general device function.
+[Aaron Giles]
+
+Changed UI to ignore selection from lightguns when off screen. This 
+stops selection of Gun X Gun Y if you move the gun out of range.
+[Derrick Renaud]
+
+Moved stv_vdp2_dynamic_res_change() function outside of VIDEO_UPDATE 
+in ST-V. [Angelo Salese]
+
+Memory map merging for the NMK16 driver and cleaned-up some unneeded 
+video code. [Angelo Salese]
+
+Made Hyper Pacman run with protection code from decapped MCU rather 
+than simulation. [Guru, David Haywood]
+
+Added a large gfx decode using macros to allow the textures on hng64 
+to be viewed, handy for verifying the dumps. [David Haywood]
+
+Audited code and added savestate support to the following drivers: 
+[MooglyGuy]
+ - dotrikun.c (dotrikun, dotriku2)
+ - espial.c (espial, netwars)
+ - zodiack.c (zodiack, dogfight, moguchan, percuss, bounty)
+
+Merged memory maps in the Dottori Kun driver [MooglyGuy]
+
+Merged memory maps for the following drivers: [MooglyGuy]
+ - battlex.c, buggychl.c, bwing.c, carjmbre.c, cbuster.c, chaknpop.c
+ - changela.c, chqflag.c, circus.c, cischeat.c
+ - cave.c, circusc.c, citycon.c, cninja.c, combatsc.c, compgolf.c, 
+    contra.c, cop01.c, cosmic.c, cps2.c, crimfght.c, crospang.c, 
+    crshrace.c, and cshooter.c
+ - ssv.c
+ - dambustr.c, darius.c, darkhors.c, darkseal.c, dassault.c, dbz.c, 
+    dcon.c, dday.c, ddenlovr.c, ddragon3.c, ddrible.c, dec0.c, dec8.c, 
+    deco32.c, deco_mlc.c, deniam.c, dietgo.c, discoboy.c, diverboy.c, 
+    dogfgt.c, dooyong.c, dragrace.c, dribling.c, drmicro.c
+ - egghunt.c, epos.c, esd16.c, espial.c, exedexes.c, exzisus.c
+ - f1gp.c, fastlane.c, firetrap.c, flkatck.c, flstory.c, freekick.c, 
+    fromanc2.c, fromance.c, funkybee.c, funkyjet.c, funybubl.c, 
+    fuukifg2.c, fuukifg3.c
+ - gaelco.c, gaelco2.c, gaiden.c, galaga.c, galastrm.c, galaxold.c, 
+    galivan.c, gaplus.c, gbusters.c, gcpinbal.c, genesis.c, gijoe.c, 
+    ginganin.c, glass.c, gng.c, goal92.c, goindol.c, gomoku.c, 
+    gotcha.c, gotya.c, gridlee.c, gstriker.c, gumbo.c, gunbustr.c
+ - halleys.c, hanaawas.c, hanaroku.c, hcastle.c, hexa.c, hexion.c, 
+    higemaru.c, hnayayoi.c, holeland.c, homedata.c, hshavoc.c, 
+    hyhoo.c, hyperspt.c
+
+Merged memory map in ltcasino.c, Lemmings, quizdna.c, pushman.c,
+popper.c, sshangha.c. [Angelo Salese]
+
+Added irq acks to the snowbros.c driver and merged memory maps on it.
+[Angelo Salese]
+
+TLCS-900/H cpu core fixes: [Wilbert Pol]
+ - Reimplemented hdma
+ - Fixed bugs in the EX (mem), R instructions.
+
+Merged memory map and worked out some sound related stuff in Pass.
+[Angelo Salese]
+
+Hooked up standard paletteram16_xbgr() function instead of a custom 
+one in sshangha.c driver. [Angelo Salese]
+
+Replaced the use of CPU numbers with tags where possible across most
+drivers. [Fabio Priuli]
+
+hng64.c improvements / changes: [David Haywood]
+ - Stripped out some old HNG64 code / some improvements
+ - disabled the floor stuff in Fatal Fury Wild Ambition (looking for a 
+    cleaner implementation)
+ - disabled zooming code for the same reasons (it was causing many 
+    issues)
+ - understood and implemented the 'auto-animate' registers for the 
+    tilemaps (animated waterfalls etc. in Fatal Fury Wild Ambition)
+ - reorganized graphic decoding
+ - documented + hooked up 4bpp/8bpp select on layers.
+ - fixed tile flipping
+ - fixed a bug in the hng64 dma
+
+goldstar.c improvements / changes: [David Haywood]
+ - added scroll registers for the girl when enabled in attract mode
+ - documented how you can swap the blue/green bonus colours (but left 
+    the code disabled, I think versions with it swapped probably just 
+    have different proms)
+ - added gfxdecode for cmasterc
+
+Memory maps merges for the following drivers: [Angelo Salese]
+ * groundfx.c
+ * lastduel.c
+ * macrossp.c
+ * madmotor.c (also cleaned-up some video variables in it)
+ * mcatadv.c (also reduced a 1.0 clipping out volume setting)
+ * moo.c
+
+Changed the way memory allocation is handled. Rather than allocating 
+in terms of bytes, allocations are now done in terms of objects. This 
+is done via new set of macros that replace the malloc_or_die() macro:
+
+  alloc_or_die(t) - allocate memory for an object of type 't'
+  alloc_array_or_die(t,c) - allocate memory for an array of 'c' objects of type 't'
+  alloc_clear_or_die(t) - same as alloc_or_die but clears the memory
+  alloc_array_clear_or_die(t,c) - alloc_array_or_die with clearing
+
+All original callers of malloc_or_die have been updated to call these
+new macros. If you just need an array of bytes, you can use
+alloc_array_or_die(UINT8, numbytes). [Aaron Giles]
+
+Made a similar change to the auto_* allocation macros. In addition,
+added 'machine' as a required parameter to the auto-allocation macros,
+as the resource pools will eventually be owned by the machine object.
+The new macros are:
+
+  auto_alloc(m,t) - allocate memory for an object of type 't'
+  auto_alloc_array(m,t,c) - allocate memory for an array of 'c' objects of type 't'
+  auto_alloc_clear(m,t) - allocate and clear
+  auto_alloc_array_clear(m,t,c) - allocate and clear
+
+All original calls or auto_malloc have been updated to use the new
+macros. In addition, auto_realloc(), auto_strdup(), 
+auto_astring_alloc(), and auto_bitmap_alloc() have been updated to 
+take a machine parameter. [Aaron Giles]
+
+Changed validity check allocations to not rely on auto_alloc* anymore
+because they are not done in the context of a machine. [Aaron Giles]
+
+Removed of SMH_BANKn macros. Just use SMH_BANK(n) instead, which is 
+what the previous macros mapped to anyhow. [Aaron Giles]
+
+Added missing casts and made other tweaks to appease some more strict 
+settings on the compiler. [Aaron Giles]
+
+Merged memory maps in the seta.c, sf.c, nbmj8688.c, megasys1.c 
+drivers. [Angelo Salese]
+
+Merged memory maps in the overdriv.c and demoted it tothe GNW flag.
+[Angelo Salese]
+
+Added engine noise hook-up to Chequered Flag. [Angelo Salese]
+
+Fixed nested NMIs on Chequered Flag sound cpu, this fixes the sound 
+loops and the music tempo. [Phil Bennett]
+
+Memory maps merges for the following drivers: [Angelo Salese]
+ * metlclsh.c
+ * mexico86.c (also added a basic hook-up for the 4p communication cpu,
+   disabled by default)
+ * mirage.c
+ * mjkjidai.c
+ * mjsister.c
+ * mogura.c
+ * news.c
+ * ohmygod.c
+ * ojankohs.c (also cleaned-up some video variables in it)
+ * oneshot.c
+ * opwolf.c
+
+Fixed player controls in the 4 player version of tank force (thanks to 
+tip posted by sxevious on mantis #3127) [David Haywood] 
+
+Memory maps merges for the following drivers: [Angelo Salese]
+ * mayumi.c (also cleaned-up the video routines)
+ * mazerbla.c
+ * momoko.c
+ * mosaic.c
+ * mouser.c
+ * mrflea.c
+ * mrjong.c (also cleaned-up the spriteram routines)
+ * srmp2.c
+ * shaolins.c
+ * shisen.c
+ * shootout.c (and cleaned-up the NMIs on coin insertions)
+ * sidearms.c
+ * sidepckt.c (merged the two per-game memory maps and moved the 
+    protection simulation hook-up to be called on DRIVER_INIT)
+ * skyarmy.c
+ * skyfox.c (and cleaned-up the NMIs on coin insertions)
+ * skyraid.c
+ * slapfght.c (also cleaned-up the ram sharing)
+ * slapshot.c
+ * spbactn.c
+ * spcforce.c
+ * spdodgeb.c
+ * speedspn.c
+ * senjyo.c
+ * seta2.c
+ * sfkick.c
+ * shangha3.c
+ * puckpkmn.c
+ * punchout.c
+ * qdrmfgp.c
+ * quizpani.c
+ * rabbit.c
+ * rainbow.c
+ * rcorsair.c
+ * redclash.c (also cleaned-up the irq/nmi generation on coin 
+    insertion)
+ * renegade.c
+ * rmhaihai.c
+ * rockrage.c
+ * rocnrope.c
+ * rollerg.c
+ * rollrace.c
+ * runaway.c
+ * rungun.c
+ * sangho.c
+ * sauro.c (also cleaned-up a video function)
+ * sbasketb.c
+ * sbugger.c
+ * scregg.c
+ * segae.c
+ * powerins.c
+ * psikyo.c
+ * psikyo4.c
+ * psikyosh.c
+ * rohga.c
+ * sbugger.c
+ * spy.c
+ * nycaptor.c
+ * olibochu.c
+ * othldrby.c
+ * pandoras.c
+ * parodius.c
+ * pbaction.c
+ * pcktgal.c
+ * pingpong.c
+ * pirates.c
+ * pitnrun.c
+ * pktgaldx.
+ * pokechmp.c
+ * popeye.c
+ * nbmj9195.c
+ * niyanpai.c
+ * ninjaw.c
+ * metro.c
+ * mitchell.c
+ * ms32.c
+ * msisaac.c
+ * mugsmash.c
+ * lkage.c
+ * lsasquad.c
+ * lwings.c
+ * m62.c
+ * m90.c
+ * magmax.c
+ * mainevt.c
+ * marinedt.c
+ * markham.c
+ * mastboy.c
+ * matmania.c
+ * megadriv.c 
+ * megazone.c
+ * karnov.c
+ * kchamp.c
+ * kingobox.c
+ * klax.c
+ * koikoi.c
+ * konamigq.c
+ * ladyfrog.c
+ * liberate.c
+
+Modified my coin_insertion() function to use ASSERT & CLEAR instead 
+of PULSE_LINE in cntsteer.c & ssozumo.c. [Angelo Salese]
+
+Made sure that both the RESET and BUSREQ lines are honored by the 
+megadriv sound cpu. [Wilbert Pol]
+
+Properly hooked-up player 2 mahjong panel in mj4simai. [Angelo Salese]
+
+Moved paletteram_IIBBGGRR_w() from senjyo.c to emu/video/generic.c.
+[Angelo Salese]
+
+Removed deprecat.h dependancy for usgames.c. [Angelo Salese]
+
+Add READY line readback to the SN76496 core, cleaned up the structs a 
+bit, cleaned up comments, added more TODOs, Fixed some unsaved 
+savestate related stuff. [Lord Nightmare]
+
+Added sn76496 ready line hook-up for spcforce.c, doesn't make a 
+difference since it's not actually used. [Angelo Salese]
+
+Added RTC emulation for hng64 driver [Angelo Salese]
+
+Fixed sprite trail for mnight and robokid [kanikani]
+
+Factored out some more MESS specific code for Atari 8bit. 
+[Fabio Priuli]
+
+Splitted Naomi / Atomiswave memory maps and improved sorting of the 
+driver. [Angelo Salese]
+
+Added sound to Pocket Gal Deluxe (bootleg) [Angelo Salese]
+
+lordgun - Fix: P1 Button2 is really P2 Button1. [Cananas]
+
+Changed Lunar Lander thrust control to a pedal. This more accurately 
+emulates the control. Note: the current code uses IPT_PADDLE. This 
+causes the game to start with the thrust at 50%. This is not correct.
+The control is really a hand operated pedal. [Derrick Renaud]
+
+Merged memory maps for nycaptor, nbmj8991, nbmj8891, mystwarr. 
+[Angelo Salese]
+
+First layer of memory map merging for namcos2.c and namcos21.c, needs 
+a second hand in order to remove all the SMH references (they both 
+are macroized to hell). [Angelo Salese]
+
+Fixed Yellow Cab (Japan) booting, promoted to working status 
+[Angelo Salese]
+
+Attempted to fix colors in Koi Koi Part 2 [Angelo Salese]
+
+Lowered DAC volume in Karate Champ from 0.50 to 0.15, it was having 
+sound clipping problems since day one. [Angelo Salese]
+
+Cleaned-up HNG64 system ports. [Angelo Salese]
+
+Changed the z80_bank_addr in megadriv.c into a simple 9 bit shift 
+register. Fixes mantis 2817.  [Enik Land]
+
+Improved interrupt handling for the 8/16 bit H8s. [R. Belmont]
+
+System 23: hooked up serial comms between subcpu and I/O board.
+[R. Belmont]
+
+Added a driver for Irem M14 HW. [Angelo Salese]
+
+Removed deprecat.h dependancy for kopunch.c. [Angelo Salese]
+
+Naomi: hacked up 3D renderer. Still quite preliminary but allows most
+games to show graphics. [Olivier Galibert, David Haywood]
+
+Converted the WAVE sound device to stereo (for MESS). [Curt Coder]
+
+Various improvements to Parent Jack driver. [Tomasz Slanina]
+
+Modified mahjong games in Naomi to be loaded with a specific 
+configuration, will add the proper JVS hook-up later. [Angelo Salese]
+
+Added proper MCU dump for Black Tiger. 
+[Dr. Decapitator, Guru, Angelo Salese]
+
+Fixed display of the i8085's SP register when in the debugger. 
+[MooglyGuy]
+
+Added proper MCU dump for Meikyuu Hunter G. 
+[Dr. Decapitator, Guru, Angelo Salese]
+
+Moved Taito 'skip to next level' buttons from BUTTON_2 to Q/W keys.
+[Fabio Priuli]
+
+Fix MCS51 disassembler to work properly when there are two memory
+arguments (the second would overwrite the first). [Aaron Giles]
+
+Added and began hooking up the 8751's for the System 1 games. Still 
+some work to do. [Aaron Giles]
+
+Added proper JVS I/O board init string for Idol Janshi Suchie-Pai 3 
+to allow it to boot. [Angelo Salese]
+
+Corrected sauro main cpu to 5Mhz and YM3812 to 2.5Mhz as verified on 
+the pcb. [Corrado Tomaselli]
+
+Improved protection emulation in galpani2 driver: [Luis Faria]
+ - modified somewhat the protection handling, geeting rid of the need 
+    to call galpani2_mcu_run from VIDEO_UPDATE, as that function is 
+    performed by CPU2's INT7 and it now works. And added support for 
+    command 2, making gp2se go into demo mode and allowing to go 
+    ingame, nice skulls! ;-) Unfortunately, this set is still not 
+    playable because of missing gals in the background and sometimes 
+    there's an ADDRESS ERROR, causing a reset. Included in these 
+    changes, I added support for MCU triggering by CPU2.
+ - changed some 8 bit writes disguised as 16 bit to AM_WRITE8 and 
+    AM_DEVWRITE8 and some AM_WRITE(SMH_NOP)s to AM_WRITENOP.
+ - "crystallized" the clocks of the M68000s and OKIs, deriving the 
+    latter from the former.
+ - fixed a Copy&Paste mistake I made in the previous submission, in 
+    the sound rom mappings for galpani2/2t/2g.
+ - reduced the input port definition duplication by using PORT_INCLUDE 
+    where applicable instead of defining everything again.
+ - reduced the CPU#2 Code region size to the effectively used size, 
+    and expanded the CPU#2 Backgrounds Data region size to the maximum 
+    usable size, making it the same for all sets.
+
+Fixed bug when setting breakpoints on Z80 CPUs at addresses A-F.
+[Xander Xander]
+
+
+
+New games added or promoted from NOT_WORKING status
+---------------------------------------------------
+Pit Boss Supertouch 30 [Mariusz Wojcieszek]
+
+
+
+New clones added
+----------------
+Legend of Kage (oldest) [Uki]
+Final Star Force (Japan) [Uki]
+Yellow Cab (Japan) [Uki]
+Zero Team (set 4) - not working [Uki]
+The Combatribes (Japan) [Chack'n]
+Super Xevious (Japan) [TH60]
+Crazy Kong 2 (Japan) [Team Japump!!!]
+Aliens (Asia) [Irongiant]
+Noraut Joker Poker [Alan Griffin]
+Pit Fighter (Rev 5) [Smitdogg, The Dumping Union]
+Cabal (bootleg set 2) [Klaus]
+Special Criminal Investigation (Negro Torino hack) [Corrado Tomaselli]
+Cruis'n World v1.7 [MSN]
+
+
+
+New games marked as GAME_NOT_WORKING
+------------------------------------
+Ferrari F355 Challenge [Guru]
+Samurai Shodown 64 [Guru]
+Dancing Stage Featuring Disney's Rave [smf/Mike DX]
+Xtreme Rally / Off Beat Racer! [Guru]
+Beast Busters 2nd Nightmare [Guru]
+Skimaxx [Phil Bennett]
+Panic Park (PNP2 Ver. A) [Guru]
+Triple Star 2000 [f205v]
+Super Star [f205v]
+Gigas [Andy Welburn]
+Shadow Dancer (Mega-Tech) 
+  [Smitdogg, cricri_pingouin, incog, B. Sparks, ANY]
+Streets of Rage (Mega-Tech)
+  [Smitdogg, cricri_pingouin, incog, B. Sparks, ANY]

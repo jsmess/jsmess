@@ -206,10 +206,10 @@ static MACHINE_DRIVER_START(raaspec)
 	MDRV_VIDEO_START(raaspec)
 
 	/* via */
-	MDRV_VIA6522_REMOVE("via6522_0")
+	MDRV_DEVICE_REMOVE("via6522_0")
 	MDRV_VIA6522_ADD("via6522_0", 0, spectrum1_via6522_interface)
 	
-	MDRV_CARTSLOT_REMOVE("cart")
+	MDRV_DEVICE_REMOVE("cart")
 MACHINE_DRIVER_END
 
 ROM_START(raaspec)

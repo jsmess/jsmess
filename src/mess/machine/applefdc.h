@@ -81,9 +81,6 @@ UINT8 applefdc_get_lines(const device_config *device);
 #define MDRV_APPLEFDC_MODIFY(_tag, _intrf) \
   MDRV_DEVICE_MODIFY(_tag)	      \
   MDRV_DEVICE_CONFIG(_intrf)
-
-#define MDRV_APPLEFDC_REMOVE(_tag)		\
-  MDRV_DEVICE_REMOVE(_tag)
   
 #define MDRV_IWM_ADD(_tag, _intrf) \
 	MDRV_DEVICE_ADD(_tag, IWM, 0) \
@@ -92,9 +89,6 @@ UINT8 applefdc_get_lines(const device_config *device);
 #define MDRV_IWM_MODIFY(_tag, _intrf) \
   MDRV_DEVICE_MODIFY(_tag)	      \
   MDRV_DEVICE_CONFIG(_intrf)
-
-#define MDRV_IWM_REMOVE(_tag)		\
-  MDRV_DEVICE_REMOVE(_tag)
   
 #define MDRV_SWIM_ADD(_tag, _intrf) \
 	MDRV_DEVICE_ADD(_tag, SWIM, 0) \
@@ -103,9 +97,6 @@ UINT8 applefdc_get_lines(const device_config *device);
 #define MDRV_SWIM_MODIFY(_tag, _intrf) \
   MDRV_DEVICE_MODIFY(_tag)	      \
   MDRV_DEVICE_CONFIG(_intrf)
-
-#define MDRV_SWIM_REMOVE(_tag)		\
-  MDRV_DEVICE_REMOVE(_tag)
   
 
 #endif /* __APPLEFDC_H__ */

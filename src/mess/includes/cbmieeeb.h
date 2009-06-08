@@ -19,9 +19,6 @@
 #define MDRV_CBM_IEEEBUS_ADD(_tag) \
 	MDRV_DEVICE_ADD(_tag, CBM_IEEEBUS, 0)
 
-#define MDRV_CBM_IEEEBUS_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag)
-
 /***************************************************************************
     PROTOTYPES
 ***************************************************************************/

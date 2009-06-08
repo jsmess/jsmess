@@ -183,7 +183,7 @@ to use an EEPROM reader, in order to obtain a dump of the whole content.
 
 /* devices config */
 #include "includes/cbm.h"
-#include "includes/cbmserb.h"	// needed for MDRV_CBM_SERBUS_REMOVE
+#include "includes/cbmserb.h"
 #include "includes/cbmdrive.h"
 #include "includes/vc1541.h"
 
@@ -645,21 +645,21 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( c128d )
 	MDRV_IMPORT_FROM( c128 )
 
-	MDRV_CBM_SERBUS_REMOVE("serial_bus")	// in the current code, serial bus device is tied to the floppy drive
+	MDRV_DEVICE_REMOVE("serial_bus")	// in the current code, serial bus device is tied to the floppy drive
 	MDRV_IMPORT_FROM( cpu_c1571 )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( c128dcr )
 	MDRV_IMPORT_FROM( c128 )
 
-	MDRV_CBM_SERBUS_REMOVE("serial_bus")	// in the current code, serial bus device is tied to the floppy drive
+	MDRV_DEVICE_REMOVE("serial_bus")	// in the current code, serial bus device is tied to the floppy drive
 	MDRV_IMPORT_FROM( cpu_c1571cr )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( c128d81 )
 	MDRV_IMPORT_FROM( c128 )
 
-	MDRV_CBM_SERBUS_REMOVE("serial_bus")	// in the current code, serial bus device is tied to the floppy drive
+	MDRV_DEVICE_REMOVE("serial_bus")	// in the current code, serial bus device is tied to the floppy drive
 	MDRV_IMPORT_FROM( cpu_c1581 )
 MACHINE_DRIVER_END
 
@@ -679,8 +679,8 @@ static MACHINE_DRIVER_START( c128pal )
 	MDRV_SOUND_CONFIG(c128_sound_interface)
 
 	/* cia */
-	MDRV_CIA6526_REMOVE("cia_0")
-	MDRV_CIA6526_REMOVE("cia_1")
+	MDRV_DEVICE_REMOVE("cia_0")
+	MDRV_DEVICE_REMOVE("cia_1")
 	MDRV_CIA6526_ADD("cia_0", CIA6526R1, VIC6569_CLOCK, c128_pal_cia0)
 	MDRV_CIA6526_ADD("cia_1", CIA6526R1, VIC6569_CLOCK, c128_pal_cia1)
 MACHINE_DRIVER_END
@@ -688,14 +688,14 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( c128dpal )
 	MDRV_IMPORT_FROM( c128pal )
 
-	MDRV_CBM_SERBUS_REMOVE("serial_bus")	// in the current code, serial bus device is tied to the floppy drive
+	MDRV_DEVICE_REMOVE("serial_bus")	// in the current code, serial bus device is tied to the floppy drive
 	MDRV_IMPORT_FROM( cpu_c1571 )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( c128dcrp )
 	MDRV_IMPORT_FROM( c128pal )
 
-	MDRV_CBM_SERBUS_REMOVE("serial_bus")	// in the current code, serial bus device is tied to the floppy drive
+	MDRV_DEVICE_REMOVE("serial_bus")	// in the current code, serial bus device is tied to the floppy drive
 	MDRV_IMPORT_FROM( cpu_c1571cr )
 MACHINE_DRIVER_END
 

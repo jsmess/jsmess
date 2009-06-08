@@ -1,4 +1,4 @@
-﻿0.131.1
+﻿0.132
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
@@ -41,6 +41,8 @@ New System Drivers Supported (in no particular order):
 - Votrax Type-'N-Talk (not working) [Lord Nightmare, Kevtris]
 - Xerox 820 [Robbbert, Curt Coder]
 - ZX97 (not working) [Miodrag Milanovic]
+
+
 
 Skeleton drivers : 
 ------------------
@@ -150,6 +152,8 @@ Skeleton drivers :
 - V-Tech Socrates 
 - XOR-100-12
 
+
+
 System Driver Changes:
 ----------------------
 - [ATARI] Added proper labels and dumps to Atari 400, 800 and XE/XL. A
@@ -191,6 +195,8 @@ System Driver Changes:
 
 - [TI85] Bug 1711 fixed, and TI-82 progress in emulation [Xander]
 
+
+
 User Interface Changes:
 -----------------------
 (none)
@@ -205,7 +211,7 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
-- The core is based on MAME 0.131u4.  This incorporates all features of the
+- The core is based on MAME 0.132.  This incorporates all features of the
   update to this core.  [MAME team]
 
 - Converted the WAVE sound device to stereo. [Curt Coder]

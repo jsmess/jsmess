@@ -67,9 +67,6 @@ READ_LINE_DEVICE_HANDLER( centronics_fault_r );
 	MDRV_DEVICE_ADD(_tag, CENTRONICS, 0) \
 	MDRV_DEVICE_CONFIG(_intf)
 
-#define MDRV_CENTRONICS_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag)
-
 
 /***************************************************************************
     DEFAULT INTERFACES

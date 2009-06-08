@@ -35,8 +35,10 @@ built-in defaults
 program    ini (executable root filename ini)
 debug      ini (if running a debug build)
 vector     ini (really is vector.ini!)
+vertical     ini (really is vertical.ini!)
+horizont     ini (really is horizont.ini!)
 driver     ini (source code root filename in which this driver is found)
-granparent ini (grandparent, not sure these exist, but it is possible)
+grandparent ini (grandparent, not sure these exist, but it is possible)
 parent     ini (where parent is the name of the parent driver)
 game       ini (where game is the driver name for this game)
 
@@ -250,6 +252,8 @@ static HICON g_hIcon = NULL;
 #define HIGHLIGHT_COLOR RGB(0,196,0)
 static HBRUSH highlight_brush = NULL;
 static HBRUSH background_brush = NULL;
+
+#define ORIENTATION_COLOR RGB( 190, 128, 0) //LIGHT BROWN
 #define VECTOR_COLOR RGB( 190, 0, 0) //DARK RED
 #define FOLDER_COLOR RGB( 0, 128, 0 ) // DARK GREEN
 #define PARENT_COLOR RGB( 190, 128, 192 ) // PURPLE
@@ -515,6 +519,12 @@ void InitPropertyPageToPage(HINSTANCE hInst, HWND hWnd, HICON hIcon, OPTIONS_TYP
 	if (opt_type > OPTIONS_GLOBAL)
 	{
 		default_type -= 1;
+		if (OPTIONS_VERTICAL == opt_type) {
+			//since VERTICAL and HORIZONTAL are equally ranked
+			//we need to subtract 2 from vertical to also get to correct default
+			default_type -= 1;
+		}
+
 	}
 	pDefaultOpts = load_options(default_type, game_num);
 
@@ -562,6 +572,8 @@ void InitPropertyPageToPage(HINSTANCE hInst, HWND hWnd, HICON hIcon, OPTIONS_TYP
 		t_description = tstring_from_utf8(ModifyThe(drivers[g_nGame]->description));
 		break;
 	case OPTIONS_VECTOR:
+	case OPTIONS_VERTICAL:
+	case OPTIONS_HORIZONTAL:
 	case OPTIONS_SOURCE:
 		t_description = tstring_from_utf8(GetFolderNameByID(g_nFolder));
 		break;
@@ -708,6 +720,7 @@ static char *GameInfoScreen(UINT nIndex)
 {
 	static char buf[1024];
 	machine_config *config = machine_config_alloc(drivers[nIndex]->machine_config);
+	memset(buf, '\0', 1024);
 
 	if (isDriverVector(config))
 	{
@@ -716,24 +729,27 @@ static char *GameInfoScreen(UINT nIndex)
 	else
 	{
 		const device_config *screen = video_screen_first(config);
+		if (screen == NULL) {
+			strcpy(buf, "Screenless Game"); 
+		}
+		else {
+			for (; screen != NULL; screen = video_screen_next(screen)) {
+				const screen_config *scrconfig = screen->inline_config;
+				char tmpbuf[256];
 
-		if (screen != NULL)
-		{		
-			const screen_config *scrconfig = screen->inline_config;
-
-			if (drivers[nIndex]->flags & ORIENTATION_SWAP_XY)
-			{
-				sprintf(buf,"%d x %d (V) %f Hz",
-				scrconfig->visarea.max_y - scrconfig->visarea.min_y + 1,
-					scrconfig->visarea.max_x - scrconfig->visarea.min_x + 1,
-					ATTOSECONDS_TO_HZ(scrconfig->refresh));
-			}
-			else
-			{
-				sprintf(buf,"%d x %d (H) %f Hz",
-					scrconfig->visarea.max_x - scrconfig->visarea.min_x + 1,
+				if (drivers[nIndex]->flags & ORIENTATION_SWAP_XY)
+				{
+					sprintf(tmpbuf,"%d x %d (V) %f Hz\n",
 					scrconfig->visarea.max_y - scrconfig->visarea.min_y + 1,
-					ATTOSECONDS_TO_HZ(scrconfig->refresh));
+							scrconfig->visarea.max_x - scrconfig->visarea.min_x + 1,
+							ATTOSECONDS_TO_HZ(scrconfig->refresh));
+				} else {
+					sprintf(tmpbuf,"%d x %d (H) %f Hz\n",
+							scrconfig->visarea.max_x - scrconfig->visarea.min_x + 1,
+							scrconfig->visarea.max_y - scrconfig->visarea.min_y + 1,
+							ATTOSECONDS_TO_HZ(scrconfig->refresh));
+				}
+				strcat(buf, tmpbuf);
 			}
 		}
 	}
@@ -948,7 +964,8 @@ char *GameInfoTitle(OPTIONS_TYPE opt_type, UINT nIndex)
 
 	if (OPTIONS_GLOBAL == opt_type)
 		strcpy(buf, "Global game options\nDefault options used by all games");
-	else if (OPTIONS_SOURCE == opt_type || OPTIONS_VECTOR == opt_type)
+	else if (OPTIONS_SOURCE == opt_type || OPTIONS_VECTOR == opt_type ||
+		OPTIONS_VERTICAL == opt_type || OPTIONS_HORIZONTAL == opt_type)
 		strcpy(buf, "Global folder options\nDefault options used by all games in the folder");
 	else
 		sprintf(buf, "%s\n\"%s\"", ModifyThe(drivers[nIndex]->description), drivers[nIndex]->name); 
@@ -1334,93 +1351,116 @@ INT_PTR CALLBACK GameOptionsProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPar
 			}
 		}
 		break;
+
 #if 0
-	/* FIXME - Not sure what to do here. */
+	/* FIXME 
+	 * We need to figure out in which ini of our hierarchy the current value is set, then apply the corresponding colouring.
+	 * Is there an easy way to figure this out?
+	 * The actual colour coding should still work
+	 */
 	case WM_CTLCOLORSTATIC :
 	case WM_CTLCOLOREDIT :
-		
-		if( g_nGame >= 0 )
 		{
-			if( DriverIsClone(g_nGame) )
+			int nParentIndex = 0;
+			if( g_nGame >= 0 )
 			{
-				nParentIndex = GetParentIndex( drivers[g_nGame] );
+				if( DriverIsClone(g_nGame) )
+				{
+					nParentIndex = GetParentIndex( drivers[g_nGame] );
+				}
 			}
-		}
-		//Set the Coloring of the elements
-		if (GetWindowLong((HWND)lParam, GWL_ID) < 0)
-			break;
-		if (IsControlOptionValue(hDlg,(HWND)lParam, GetDefaultOptions( -1, FALSE) ) )
-		{
-			//Normal Black case
-			SetTextColor((HDC)wParam,COLOR_WINDOWTEXT);
-		}
-		else if (IsControlOptionValue(hDlg,(HWND)lParam, GetVectorOptions() )  && DriverIsVector(g_nFolderGame) )
-		{
-			SetTextColor((HDC)wParam,VECTOR_COLOR);
-		}
-		else if (IsControlOptionValue(hDlg,(HWND)lParam, GetSourceOptions(g_nFolderGame ) ) )
-		{
-			SetTextColor((HDC)wParam,FOLDER_COLOR);
-		}
-		else if ((nParentIndex >=0) && (IsControlOptionValue(hDlg,(HWND)lParam, GetGameOptions(nParentIndex, g_nFolder ) ) ) )
-		{
-			SetTextColor((HDC)wParam,PARENT_COLOR);
-		}
-//		else if ( (g_nGame >= 0) && (IsControlOptionValue(hDlg,(HWND)lParam, GetGameOptions(g_nGame, g_nFolder) ) ) )
-		else if ( (g_nGame >= 0) && (IsControlOptionValue(hDlg,(HWND)lParam, pOrigOpts ) ) )
-		{
-			SetTextColor((HDC)wParam,GAME_COLOR);
-		}
-		else
-		{
-			switch ( g_nPropertyMode )
-			{
-				case OPTIONS_GAME:
-					SetTextColor((HDC)wParam,GAME_COLOR);
-					break;
-				case OPTIONS_SOURCE:
-					SetTextColor((HDC)wParam,FOLDER_COLOR);
-					break;
-				case OPTIONS_VECTOR:
-					SetTextColor((HDC)wParam,VECTOR_COLOR);
-					break;
-				default:
-				case OPTIONS_GLOBAL:
-					SetTextColor((HDC)wParam,COLOR_WINDOWTEXT);
-					break;
+			//Set the Coloring of the elements
+			if (GetWindowLong((HWND)lParam, GWL_ID) < 0) {
+				break;
 			}
-		}
-		if( Msg == WM_CTLCOLORSTATIC )
-		{
-			if (SafeIsAppThemed())
+			if (IsControlOptionValue(hDlg,(HWND)lParam, GetDefaultOptions( -1, FALSE) ) )
 			{
-				HWND hWnd = PropSheet_GetTabControl(GetParent(hDlg));
-				// Set the background mode to transparent
-				SetBkMode((HDC)wParam, TRANSPARENT);
-
-				// Get the controls window dimensions
-				GetWindowRect((HWND)lParam, &rc);
-
-				// Map the coordinates to coordinates with the upper left corner of dialog control as base
-				MapWindowPoints(NULL, hWnd, (LPPOINT)(&rc), 2);
-
-				// Adjust the position of the brush for this control (else we see the top left of the brush as background)
-				SetBrushOrgEx((HDC)wParam, -rc.left, -rc.top, NULL);
-
-				// Return the brush
-				return (INT_PTR)(hBkBrush);
+				//Normal Black case
+				SetTextColor((HDC)wParam,COLOR_WINDOWTEXT);
+			}
+			else if (IsControlOptionValue(hDlg,(HWND)lParam, GetHorizontalOptions() )  && !DriverIsVertical(g_nFolderGame) )
+			{
+				SetTextColor((HDC)wParam,ORIENTATION_COLOR);
+			}
+			else if (IsControlOptionValue(hDlg,(HWND)lParam, GetVerticalOptions() )  && DriverIsVertical(g_nFolderGame) )
+			{
+				SetTextColor((HDC)wParam,ORIENTATION_COLOR);
+			}
+			else if (IsControlOptionValue(hDlg,(HWND)lParam, GetVectorOptions() )  && DriverIsVector(g_nFolderGame) )
+			{
+				SetTextColor((HDC)wParam,VECTOR_COLOR);
+			}
+			else if (IsControlOptionValue(hDlg,(HWND)lParam, GetSourceOptions(g_nFolderGame ) ) )
+			{
+				SetTextColor((HDC)wParam,FOLDER_COLOR);
+			}
+			else if ((nParentIndex >=0) && (IsControlOptionValue(hDlg,(HWND)lParam, GetGameOptions(nParentIndex, g_nFolder ) ) ) )
+			{
+				SetTextColor((HDC)wParam,PARENT_COLOR);
+			}
+			else if ( (g_nGame >= 0) && (IsControlOptionValue(hDlg,(HWND)lParam, pOrigOpts ) ) )
+			{
+				SetTextColor((HDC)wParam,GAME_COLOR);
 			}
 			else
 			{
-				SetBkColor((HDC) wParam,GetSysColor(COLOR_3DFACE) );
+				switch ( g_nPropertyMode )
+				{
+					case OPTIONS_GAME:
+						SetTextColor((HDC)wParam,GAME_COLOR);
+						break;
+					case OPTIONS_SOURCE:
+						SetTextColor((HDC)wParam,FOLDER_COLOR);
+						break;
+					case OPTIONS_VECTOR:
+						SetTextColor((HDC)wParam,VECTOR_COLOR);
+						break;
+					case OPTIONS_HORIZONTAL:
+						SetTextColor((HDC)wParam,ORIENTATION_COLOR);
+						break;
+					case OPTIONS_VERTICAL:
+						SetTextColor((HDC)wParam,ORIENTATION_COLOR);
+						break;
+					default:
+					case OPTIONS_GLOBAL:
+						SetTextColor((HDC)wParam,COLOR_WINDOWTEXT);
+						break;
+				}
 			}
+			if( Msg == WM_CTLCOLORSTATIC )
+			{
+				if (SafeIsAppThemed())
+				{
+					RECT rc;
+					HWND hWnd = PropSheet_GetTabControl(GetParent(hDlg));
+					// Set the background mode to transparent
+					SetBkMode((HDC)wParam, TRANSPARENT);
+
+					// Get the controls window dimensions
+					GetWindowRect((HWND)lParam, &rc);
+
+					// Map the coordinates to coordinates with the upper left corner of dialog control as base
+					MapWindowPoints(NULL, hWnd, (LPPOINT)(&rc), 2);
+
+					// Adjust the position of the brush for this control (else we see the top left of the brush as background)
+					SetBrushOrgEx((HDC)wParam, -rc.left, -rc.top, NULL);
+
+					// Return the brush
+					return (INT_PTR)(hBkBrush);
+				}
+				else
+				{
+					SetBkColor((HDC) wParam,GetSysColor(COLOR_3DFACE) );
+				}
+			}
+			else {
+				SetBkColor((HDC)wParam,RGB(255,255,255) );
+			}
+			UnrealizeObject(background_brush);
+			return (DWORD)background_brush;
 		}
-		else
-			SetBkColor((HDC)wParam,RGB(255,255,255) );
-		UnrealizeObject(background_brush);
-		return (DWORD)background_brush;
 		break;
-#endif // 0 Not sure what to do here
+#endif
 
 	case WM_HELP:
 		/* User clicked the ? from the upper right on a control */
@@ -2605,15 +2645,18 @@ static void SetSamplesEnabled(HWND hWnd, int nIndex, BOOL bSoundEnabled)
 	if (hCtrl)
 	{
 		const device_config *sound;
-		for (sound = sound_first(config); sound != NULL; sound = sound_next(sound))
+		if (config != NULL)
 		{
-			if (sound_get_type(sound) == SOUND_SAMPLES
-#if HAS_VLM5030
-				||  sound_get_type(sound) == SOUND_VLM5030
-#endif
-				)
+			for (sound = sound_first(config); sound != NULL; sound = sound_next(sound))
 			{
-				enabled = TRUE;
+				if (sound_get_type(sound) == SOUND_SAMPLES
+#if HAS_VLM5030
+					||  sound_get_type(sound) == SOUND_VLM5030
+#endif
+					)
+				{
+					enabled = TRUE;
+				}
 			}
 		}
 

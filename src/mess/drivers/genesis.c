@@ -728,7 +728,7 @@ static MACHINE_DRIVER_START( pico )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(_pico_mem)
 
-	MDRV_CPU_REMOVE("genesis_snd_z80")
+	MDRV_DEVICE_REMOVE("genesis_snd_z80")
 
 	MDRV_MACHINE_RESET( ms_megadriv )
 	
@@ -741,7 +741,7 @@ static MACHINE_DRIVER_START( picopal )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(_pico_mem)
 
-	MDRV_CPU_REMOVE("genesis_snd_z80")
+	MDRV_DEVICE_REMOVE("genesis_snd_z80")
 
 	MDRV_MACHINE_RESET( ms_megadriv )
 	

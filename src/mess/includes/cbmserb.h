@@ -21,9 +21,6 @@
 	MDRV_DEVICE_ADD(_tag, CBM_SERBUS, 0) \
 	MDRV_DEVICE_CONFIG(_config)
 
-#define MDRV_CBM_SERBUS_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag)
-
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/

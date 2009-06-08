@@ -86,9 +86,6 @@ int cartslot_get_resource_length(const device_config *device, const char *socket
 #define MDRV_CARTSLOT_ADD(_tag) 										\
 	MDRV_DEVICE_ADD(_tag, CARTSLOT, 0)									\
 
-#define MDRV_CARTSLOT_REMOVE(_tag)										\
-	MDRV_DEVICE_REMOVE(_tag)
-
 #define MDRV_CARTSLOT_MODIFY(_tag)										\
 	MDRV_DEVICE_MODIFY(_tag)									\
 

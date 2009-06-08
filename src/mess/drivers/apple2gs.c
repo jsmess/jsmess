@@ -177,7 +177,7 @@ static MACHINE_DRIVER_START( apple2gs )
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	/* replace the old-style FDC with an IWM */
-	MDRV_APPLEFDC_REMOVE("fdc")
+	MDRV_DEVICE_REMOVE("fdc")
 	MDRV_IWM_ADD("fdc", apple2_fdc_interface)
 	/* SCC */
 	MDRV_SCC8530_ADD("scc")
