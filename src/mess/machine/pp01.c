@@ -35,12 +35,18 @@ static void pp01_video_w(UINT8 block,UINT16 offset,UINT8 data,UINT8 part)
 		// Copy mode
 		if(BIT(pp01_video_write_mode,0)) {
 			mess_ram[0x6000+offset+addroffset] = data;
+		} else {
+			mess_ram[0x6000+offset+addroffset] = 0;
 		}
 		if(BIT(pp01_video_write_mode,1)) {
 			mess_ram[0xa000+offset+addroffset] = data;
+		} else {
+			mess_ram[0xa000+offset+addroffset] = 0;
 		}
 		if(BIT(pp01_video_write_mode,2)) {
 			mess_ram[0xe000+offset+addroffset] = data;
+		} else {
+			mess_ram[0xe000+offset+addroffset] = 0;
 		}
 	} else {
 		if (block==0) {
