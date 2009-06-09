@@ -71,6 +71,7 @@ static ADDRESS_MAP_START( camplynx_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000,0x3fff) AM_ROM	/* for Lynx 48k only */
 	AM_RANGE(0x4000,0xffff) AM_RAM
+	AM_RANGE(0xc000,0xffff) AM_BASE(&videoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( camplynx_io , ADDRESS_SPACE_IO, 8)
@@ -91,6 +92,24 @@ static MACHINE_RESET( camplynx )
 
 static MC6845_UPDATE_ROW( camplynx_update_row )
 {
+	UINT8 gfx,x,fg=1,bg=0;
+	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
+
+	for (x = 0; x < x_count; x++)
+	{
+		UINT8 inv=0;
+		if (x == cursor_x) inv=0xff;
+		gfx = videoram[ma+x] ^ inv;
+
+		*p = ( gfx & 0x80 ) ? fg : bg; p++;
+		*p = ( gfx & 0x40 ) ? fg : bg; p++;
+		*p = ( gfx & 0x20 ) ? fg : bg; p++;
+		*p = ( gfx & 0x10 ) ? fg : bg; p++;
+		*p = ( gfx & 0x08 ) ? fg : bg; p++;
+		*p = ( gfx & 0x04 ) ? fg : bg; p++;
+		*p = ( gfx & 0x02 ) ? fg : bg; p++;
+		*p = ( gfx & 0x01 ) ? fg : bg; p++;
+	}
 }
 
 static VIDEO_START( camplynx )
