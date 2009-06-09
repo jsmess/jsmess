@@ -69,14 +69,26 @@ static const device_config *mc6845;
 
 static ADDRESS_MAP_START( camplynx_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000,0x3fff) AM_ROM	/* for Lynx 48k only */
-	AM_RANGE(0x4000,0xffff) AM_RAM
-	AM_RANGE(0xc000,0xffff) AM_BASE(&videoram)
+	AM_RANGE(0x0000,0x5fff) AM_ROM
+	AM_RANGE(0x6000,0xffff) AM_RAM
+	AM_RANGE(0xc000,0xcfff) AM_BASE(&videoram)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( camp96_mem, ADDRESS_SPACE_PROGRAM, 8)
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000,0x5fff) AM_ROM
+	AM_RANGE(0x6000,0xdfff) AM_RAM
+	AM_RANGE(0xe000,0xffff) AM_ROM
+	AM_RANGE(0xc000,0xcfff) AM_BASE(&videoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( camplynx_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	/* AM_NOP = unknown */
+	AM_RANGE(0x7f, 0x7f) AM_NOP
+	AM_RANGE(0x80, 0x80) AM_NOP
+	AM_RANGE(0x84, 0x84) AM_NOP
 	AM_RANGE(0x86, 0x86) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x87, 0x87) AM_DEVREADWRITE("crtc", mc6845_register_r,mc6845_register_w)
 ADDRESS_MAP_END
@@ -160,27 +172,35 @@ static MACHINE_DRIVER_START( camplynx )
 	MDRV_VIDEO_UPDATE(camplynx)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( camp96 )
+	MDRV_IMPORT_FROM( camplynx )
+	MDRV_CPU_MODIFY( "maincpu" )
+	MDRV_CPU_PROGRAM_MAP(camp96_mem)
+MACHINE_DRIVER_END
+
 /* ROM definition */
 ROM_START( camplynx )
-	ROM_REGION( 0x4000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "lynx48-1.rom", 0x0000, 0x2000, CRC(56feec44) SHA1(7ded5184561168e159a30fa8e9d3fde5e52aa91a) )
 	ROM_LOAD( "lynx48-2.rom", 0x2000, 0x2000, CRC(d894562e) SHA1(c08a78ecb4eb05baa4c52488fce3648cd2688744) )
+	ROM_FILL(0x8cf,1,0xc9)	// cheap rotten hack
 ROM_END
 
 ROM_START( camply96 )
-	ROM_REGION( 0x8000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "lynx96-1.rom", 0x0000, 0x2000, CRC(56feec44) SHA1(7ded5184561168e159a30fa8e9d3fde5e52aa91a) )
 	ROM_LOAD( "lynx96-2.rom", 0x2000, 0x2000, CRC(d894562e) SHA1(c08a78ecb4eb05baa4c52488fce3648cd2688744) )
 	ROM_LOAD( "lynx96-3.rom", 0x4000, 0x2000, CRC(21f11709) SHA1(f86a729b01de286197c550974f7825c12815a4f4) )
-	ROM_LOAD( "dosrom.rom", 0x6000, 0x2000, CRC(011e106a) SHA1(e77f0ca99790551a7122945f3194516b2390fb69) )
+	ROM_LOAD( "dosrom.rom", 0xe000, 0x2000, CRC(011e106a) SHA1(e77f0ca99790551a7122945f3194516b2390fb69) )
+	ROM_FILL(0x8cf,1,0xc9)	// cheap rotten hack
 ROM_END
 
 ROM_START( camply128 )
-	ROM_REGION( 0x8000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "lynx128-1.rom", 0x0000, 0x2000, CRC(65d292ce) SHA1(36567c2fbd9cf72f758e8cb80c21cb4d82040752) )
 	ROM_LOAD( "lynx128-2.rom", 0x2000, 0x2000, CRC(23288773) SHA1(e12a7ebea3fae5eb375c03e848dbb81070d9d189) )
 	ROM_LOAD( "lynx128-3.rom", 0x4000, 0x2000, CRC(9827b9e9) SHA1(1092367b2af51c72ce9be367179240d692aeb131) )
-	ROM_LOAD( "dosrom.rom", 0x6000, 0x2000, CRC(011e106a) SHA1(e77f0ca99790551a7122945f3194516b2390fb69) )
+	ROM_LOAD( "dosrom.rom", 0xe000, 0x2000, CRC(011e106a) SHA1(e77f0ca99790551a7122945f3194516b2390fb69) )
 ROM_END
 
 
@@ -200,5 +220,5 @@ SYSTEM_CONFIG_END
 /* Driver */
 /*    YEAR  NAME       PARENT     COMPAT   MACHINE    INPUT     INIT  CONFIG    COMPANY       FULLNAME     FLAGS */
 COMP( 1983, camplynx,  0,         0,       camplynx,  camplynx, 0,    camp48,   "Camputers",  "Lynx 48",   GAME_NOT_WORKING)
-COMP( 1983, camply96,  camplynx,  0,       camplynx,  camplynx, 0,    camp96,   "Camputers",  "Lynx 96",   GAME_NOT_WORKING)
-COMP( 1983, camply128, camplynx,  0,       camplynx,  camplynx, 0,    camp128,  "Camputers",  "Lynx 128",  GAME_NOT_WORKING)
+COMP( 1983, camply96,  camplynx,  0,       camp96,    camplynx, 0,    camp96,   "Camputers",  "Lynx 96",   GAME_NOT_WORKING)
+COMP( 1983, camply128, camplynx,  0,       camp96,    camplynx, 0,    camp128,  "Camputers",  "Lynx 128",  GAME_NOT_WORKING)
