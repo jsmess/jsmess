@@ -13,7 +13,6 @@
 
 	TODO:
 
-	- PPI8255 Mode 2 is broken
 	- MC6845 DE callback is broken
 	- Z80 STI (Mostek MK3801) push-model
 	- RAM banking
@@ -74,7 +73,7 @@ static void prof80_bankswitch(running_machine *machine)
 			memory_install_readwrite8_handler(program, start_addr, end_addr, 0, 0, SMH_BANK(bank + 1), SMH_UNMAP);
 		}
 		
-		logerror("Segment %u address %04x-%04x block %u\n", bank, start_addr, end_addr, block);
+		//logerror("Segment %u address %04x-%04x block %u\n", bank, start_addr, end_addr, block);
 	}
 }
 
@@ -259,7 +258,7 @@ static WRITE8_HANDLER( mmu_w )
 
 	state->mmu[bank] = data & 0x0f;
 
-	logerror("MMU bank %u block %u\n", bank, data & 0x0f);
+	//logerror("MMU bank %u block %u\n", bank, data & 0x0f);
 
 	prof80_bankswitch(space->machine);
 }
@@ -275,10 +274,14 @@ static READ8_HANDLER( gripd_r )
 {
 	prof80_state *state = space->machine->driver_data;
 
+	logerror("Read GRIP data %02x\n", state->ecb_data);
+
 	/* trigger GRIP 8255 port C bit 6 (_ACKA) */
 	ppi8255_set_port_c(state->ppi8255, 0x54);
 	ppi8255_set_port_c(state->ppi8255, 0x14);
 	ppi8255_set_port_c(state->ppi8255, 0x54);
+
+	logerror("Read GRIP data %02x\n", state->ecb_data);
 
 	return state->ecb_data;
 }
@@ -286,6 +289,8 @@ static READ8_HANDLER( gripd_r )
 static WRITE8_HANDLER( gripd_w )
 {
 	prof80_state *state = space->machine->driver_data;
+
+	logerror("Write GRIP data %02x\n", data);
 
 	state->ecb_data = data;
 
@@ -306,7 +311,7 @@ static WRITE8_HANDLER( page_w )
 	memory_set_bank(space->machine, 17, state->page);
 }
 
-static READ8_HANDLER( grip_status_r )
+static READ8_HANDLER( stat_r )
 {
 	/*
 
@@ -344,7 +349,7 @@ static WRITE8_HANDLER( lrs_w )
 	state->lps = 0;
 }
 
-static READ8_HANDLER( stb_r )
+static READ8_HANDLER( cxstb_r )
 {
 	prof80_state *state = space->machine->driver_data;
 
@@ -354,7 +359,7 @@ static READ8_HANDLER( stb_r )
 	return 0;
 }
 
-static WRITE8_HANDLER( stb_w )
+static WRITE8_HANDLER( cxstb_w )
 {
 	prof80_state *state = space->machine->driver_data;
 
@@ -431,8 +436,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( grip_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(stb_r, stb_w)
-//	AM_RANGE(0x10, 0x10) AM_WRITE(cc3_w)
+	AM_RANGE(0x00, 0x00) AM_READWRITE(cxstb_r, cxstb_w)
+//	AM_RANGE(0x10, 0x10) AM_WRITE(ccon_w)
 //	AM_RANGE(0x11, 0x11) AM_WRITE(vol0_w)
 //	AM_RANGE(0x12, 0x12) AM_WRITE(rts_w)
 	AM_RANGE(0x13, 0x13) AM_WRITE(page_w)
@@ -442,12 +447,20 @@ static ADDRESS_MAP_START( grip_io, ADDRESS_SPACE_IO, 8 )
 //	AM_RANGE(0x17, 0x17) AM_WRITE(vol1_w)
 	AM_RANGE(0x20, 0x2f) AM_DEVREADWRITE(Z80STI_TAG, z80sti_r, z80sti_w)
 	AM_RANGE(0x30, 0x30) AM_READWRITE(lrs_r, lrs_w)
-	AM_RANGE(0x40, 0x40) AM_READ(grip_status_r)
+	AM_RANGE(0x40, 0x40) AM_READ(stat_r)
 	AM_RANGE(0x50, 0x50) AM_DEVWRITE(MC6845_TAG, mc6845_address_w)
 	AM_RANGE(0x52, 0x52) AM_DEVWRITE(MC6845_TAG, mc6845_register_w)
 	AM_RANGE(0x53, 0x53) AM_DEVREAD(MC6845_TAG, mc6845_register_r)
 	AM_RANGE(0x60, 0x60) AM_DEVWRITE("centronics", centronics_data_w)
 	AM_RANGE(0x70, 0x73) AM_DEVREADWRITE(PPI8255_TAG, ppi8255_r, ppi8255_w)
+//	AM_RANGE(0x80, 0x80) AM_WRITE(bl2out_w)
+//	AM_RANGE(0x90, 0x90) AM_WRITE(gr2out_w)
+//	AM_RANGE(0xa0, 0xa0) AM_WRITE(rd2out_w)
+//	AM_RANGE(0xb0, 0xb0) AM_WRITE(clrg2_w)
+//	AM_RANGE(0xc0, 0xc0) AM_WRITE(bluout_w)
+//	AM_RANGE(0xd0, 0xd0) AM_WRITE(grnout_w)
+//	AM_RANGE(0xe0, 0xe0) AM_WRITE(redout_w)
+//	AM_RANGE(0xf0, 0xf0) AM_WRITE(clrg1_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -586,6 +599,8 @@ static WRITE8_DEVICE_HANDLER( grip_ppi8255_a_w )
 
 	prof80_state *state = device->machine->driver_data;
 
+	logerror("8255 PA write %02x\n", data);
+
 	state->ecb_data = data;
 }
 
@@ -656,7 +671,8 @@ static WRITE8_DEVICE_HANDLER( grip_ppi8255_c_w )
 
 	/* PROF-80 handshaking */
 	state->ecb_status = (!BIT(data, 7) << 7) | (!BIT(data, 5) << 6);
-	logerror("IBF %u OBF %u status %02x\n", BIT(data, 5), BIT(data, 7), state->ecb_status);
+
+	logerror("8255 PC write %02x\n", data);
 }
 
 static const ppi8255_interface grip_ppi8255_interface =
@@ -857,6 +873,7 @@ ROM_START( prof80 )
 	ROM_LOAD( "grip21.z2", 0x0000, 0x4000, CRC(7f6a37dd) SHA1(2e89f0b0c378257ff7e41c50d57d90865c6e214b) )
 	ROM_LOAD( "grip26.z2", 0x0000, 0x4000, CRC(a1c424f0) SHA1(83942bc75b9475f044f936b8d9d7540551d87db9) )
 	ROM_LOAD( "grip31.z2", 0x0000, 0x4000, CRC(e0e4e8ab) SHA1(73d3d14c9b06fed0c187fb0fffe5ec035d8dd256) )
+	ROM_LOAD( "grip25.z2", 0x0000, 0x4000, CRC(49ebb284) SHA1(0a7eaaf89da6db2750f820146c8f480b7157c6c7) )
 ROM_END
 
 /* System Configurations */

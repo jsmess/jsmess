@@ -420,35 +420,37 @@ WRITE8_DEVICE_HANDLER( z80sti_w )
 
 	case Z80STI_REGISTER_IPRB:
 		LOG(("Z80STI '%s' Interrupt Pending Register B: %x\n", device->tag, data));
-		z80sti->ipr = (z80sti->ipr & 0xff00) | data;
+		z80sti->ipr &= (z80sti->ipr & 0xff00) | data;
 		check_interrupts(z80sti);
 		break;
 
 	case Z80STI_REGISTER_IPRA:
 		LOG(("Z80STI '%s' Interrupt Pending Register A: %x\n", device->tag, data));
-		z80sti->ipr = (data << 8) | (z80sti->ipr & 0xff);
+		z80sti->ipr &= (data << 8) | (z80sti->ipr & 0xff);
 		check_interrupts(z80sti);
 		break;
 
 	case Z80STI_REGISTER_ISRB:
 		LOG(("Z80STI '%s' Interrupt In-Service Register B: %x\n", device->tag, data));
-		z80sti->isr = (z80sti->isr & 0xff00) | data;
+		z80sti->isr &= (z80sti->isr & 0xff00) | data;
 		break;
 
 	case Z80STI_REGISTER_ISRA:
 		LOG(("Z80STI '%s' Interrupt In-Service Register A: %x\n", device->tag, data));
-		z80sti->isr = (data << 8) | (z80sti->isr & 0xff);
+		z80sti->isr &= (data << 8) | (z80sti->isr & 0xff);
 		break;
 
 	case Z80STI_REGISTER_IMRB:
 		LOG(("Z80STI '%s' Interrupt Mask Register B: %x\n", device->tag, data));
-		z80sti->imr = (data << 8) | (z80sti->imr & 0xff);
+		z80sti->imr &= (z80sti->imr & 0xff00) | data;
+		z80sti->isr &= z80sti->imr;
 		check_interrupts(z80sti);
 		break;
 
 	case Z80STI_REGISTER_IMRA:
 		LOG(("Z80STI '%s' Interrupt Mask Register A: %x\n", device->tag, data));
 		z80sti->imr = (data << 8) | (z80sti->imr & 0xff);
+		z80sti->isr &= z80sti->imr;
 		check_interrupts(z80sti);
 		break;
 
@@ -679,7 +681,7 @@ static int z80sti_irq_ack(const device_config *device)
 			z80sti->int_state[i] = Z80_DAISY_IEO;
 
 			/* clear interrupt pending register bit */
-			z80sti->ipr = (z80sti->ipr) & ~(1 << i);
+			z80sti->ipr &= ~(1 << i);
 
 			/* set interrupt in-service register bit */
 			z80sti->isr |= (1 << i);
@@ -718,7 +720,7 @@ static void z80sti_irq_reti(const device_config *device)
 			z80sti->int_state[i] &= ~Z80_DAISY_IEO;
 
 			/* clear interrupt in-service register bit */
-			z80sti->isr = z80sti->isr & ~(1 << i);
+			z80sti->isr &= ~(1 << i);
 
 			check_interrupts(z80sti);
 			return;
