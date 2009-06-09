@@ -212,7 +212,7 @@ WRITE8_HANDLER( fm7_irq_mask_w )
  */
 READ8_HANDLER( fm7_irq_cause_r )
 {
-	UINT8 ret = irq_flags;
+	UINT8 ret = ~irq_flags;
 	
 	irq_flags = 0;  // clear flags
 	logerror("IRQ flags read: 0x%02x\n",ret);
@@ -584,6 +584,7 @@ static void fm7_update_psg(running_machine* machine)
 
 static READ8_HANDLER( fm7_psg_select_r )
 {
+	logerror("PSG: select register read\n");
 	return 0xff;
 }
 
@@ -591,11 +592,13 @@ static WRITE8_HANDLER( fm7_psg_select_w )
 {
 	fm7_psg_regsel = data & 0x03;
 	fm7_update_psg(space->machine);
+	logerror("PSG: select register write 0x%02x\n",data);
 }
 
 static READ8_HANDLER( fm7_psg_data_r )
 {
 	fm7_update_psg(space->machine);
+	logerror("PSG: data register read\n");
 	return psg_data;
 }
 
@@ -603,6 +606,7 @@ static WRITE8_HANDLER( fm7_psg_data_w )
 {
 	psg_data = data;
 	fm7_update_psg(space->machine);
+	logerror("PSG: data register write 0x%02x\n",data);
 }
 
 // Shared RAM is only usable on the main CPU if the sub CPU is halted
