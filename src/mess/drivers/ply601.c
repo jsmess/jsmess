@@ -8,9 +8,39 @@
 
 #include "driver.h"
 #include "cpu/m6800/m6800.h"
+#include "video/mc6845.h"
 
+UINT8 rom_page;
+
+static READ8_HANDLER (rom_page_r)
+{
+	return rom_page;
+}
+
+static WRITE8_HANDLER (rom_page_w)
+{
+	rom_page =data;
+	if (data & 8) {
+	    int chip = (data >> 4) % 5;
+	    int page = data & 7;	    
+	    memory_set_bankptr(space->machine, 2, memory_region(space->machine, "romdisk") + chip*0x10000 + page * 0x2000);
+	} else {
+    	memory_set_bankptr(space->machine, 2, mess_ram + 0xc000);
+	}	
+} 
+    
 static ADDRESS_MAP_START(ply601_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE( 0x0000, 0xbfff ) AM_RAMBANK(1)
+	AM_RANGE( 0xc000, 0xdfff ) AM_RAMBANK(2)
+	AM_RANGE( 0xe000, 0xe5ff ) AM_RAMBANK(3)
+	AM_RANGE( 0xe600, 0xe600 ) AM_DEVWRITE("crtc", mc6845_address_w)
+	AM_RANGE( 0xe601, 0xe601 ) AM_DEVREADWRITE("crtc", mc6845_register_r , mc6845_register_w)
+	AM_RANGE( 0xe604, 0xe604 ) AM_DEVWRITE("crtc", mc6845_address_w)
+	AM_RANGE( 0xe605, 0xe605 ) AM_DEVREADWRITE("crtc", mc6845_register_r , mc6845_register_w)
+	AM_RANGE( 0xe6f0, 0xe6f0 ) AM_READWRITE(rom_page_r, rom_page_w)
+	AM_RANGE( 0xe700, 0xefff ) AM_RAMBANK(4)
+	AM_RANGE( 0xf000, 0xffff ) AM_READWRITE(SMH_BANK(5), SMH_BANK(6))
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -20,6 +50,13 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(ply601)
 {
+	memory_set_bankptr(machine, 1, mess_ram + 0x0000);
+	memory_set_bankptr(machine, 2, mess_ram + 0xc000);	
+	memory_set_bankptr(machine, 3, mess_ram + 0xe000);	
+	memory_set_bankptr(machine, 4, mess_ram + 0xe700);	
+	memory_set_bankptr(machine, 5, memory_region(machine, "maincpu") + 0xf000);	
+	memory_set_bankptr(machine, 6, mess_ram + 0xf000);	
+	device_reset(cputag_get_cpu(machine, "maincpu"));
 }
 
 static VIDEO_START( ply601 )
@@ -28,62 +65,115 @@ static VIDEO_START( ply601 )
 
 static VIDEO_UPDATE( ply601 )
 {
-    return 0;
+	const device_config *mc6845 = devtag_get_device(screen->machine, "crtc");
+	mc6845_update(mc6845, bitmap, cliprect);
+	return 0;
+}
+
+static MC6845_UPDATE_ROW( ply601_update_row )
+{
+	UINT8 *charrom = memory_region(device->machine, "gfx1");
+
+	int column, bit;
+	UINT8 data;
+
+	for (column = 0; column < x_count; column++)
+	{
+		UINT8 code = mess_ram[(((ma + column) & 0x0fff) + 0xf000)];		
+		code = ((code << 1) | (code >> 7)) & 0xff;
+		data = charrom[((code << 3) | (ra & 0x07)) & 0x7ff];
+
+		for (bit = 0; bit < 8; bit++)
+		{
+			int x = (column * 8) + bit;
+			int color = BIT(data, 7) ? 1 : 0;
+				
+			*BITMAP_ADDR16(bitmap, y, x) = color;
+
+			data <<= 1;
+		}
+	}
+}
+
+static const mc6845_interface ply601_crtc6845_interface =
+{
+	"screen",
+	8 /*?*/,
+	NULL,
+	ply601_update_row,
+	NULL,
+	NULL,
+	NULL,
+	NULL
+};
+
+static DRIVER_INIT(ply601)
+{
+	memset(mess_ram, 0, 64 * 1024);
 }
 
 static MACHINE_DRIVER_START( ply601 )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu",M6800, XTAL_4MHz)
+    MDRV_CPU_ADD("maincpu",M6800, XTAL_1MHz)
     MDRV_CPU_PROGRAM_MAP(ply601_mem)
 
     MDRV_MACHINE_RESET(ply601)
 
-    /* video hardware */
-    MDRV_SCREEN_ADD("screen", RASTER)
-    MDRV_SCREEN_REFRESH_RATE(50)
-    MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MDRV_SCREEN_SIZE(640, 480)
-    MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-    MDRV_PALETTE_LENGTH(2)
-    MDRV_PALETTE_INIT(black_and_white)
+    /* video hardware */ 
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(640, 200)
+	MDRV_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 200 - 1)
+	MDRV_PALETTE_LENGTH(2)
+	MDRV_PALETTE_INIT(black_and_white)
 
-    MDRV_VIDEO_START(ply601)
-    MDRV_VIDEO_UPDATE(ply601)
+	MDRV_MC6845_ADD("crtc", MC6845, XTAL_1MHz, ply601_crtc6845_interface) // clk taken from schematics
+
+	MDRV_VIDEO_START( ply601 )
+	MDRV_VIDEO_UPDATE( ply601 )	
 MACHINE_DRIVER_END
 
 static SYSTEM_CONFIG_START(ply601)
+	CONFIG_RAM_DEFAULT(64 * 1024)
 SYSTEM_CONFIG_END
 
 /* ROM definition */
 ROM_START( ply601 )
   ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-  ROM_LOAD( "bios.rom",   0x0000, 0x1000, CRC(41fe4c4b) SHA1(d8ca92aea0eb283e8d7779cb976bcdfa03e81aea))
+  ROM_LOAD( "bios.rom",   0xf000, 0x1000, CRC(41fe4c4b) SHA1(d8ca92aea0eb283e8d7779cb976bcdfa03e81aea))
+  ROM_REGION(0x0800, "gfx1",0)
   ROM_LOAD( "video.rom",  0x0000, 0x0800, CRC(1c23ba43) SHA1(eb1cfc139858abd0aedbbf3d523f8ba55d27a11d))
-
-  ROM_LOAD( "str$08.rom", 0x0000, 0x2000, CRC(60a00fff) SHA1(0ddb01aad65f0a1c784e1830912250750b57e30e))
-  ROM_LOAD( "str$09.rom", 0x0000, 0x2000, CRC(cd496e11) SHA1(ee9de325d218dbc21128b605cb557c8b15533804))
-  ROM_LOAD( "str$0b.rom", 0x0000, 0x2000, CRC(4cae092e) SHA1(d18154595e15f5adc9f8d1bc7e0ceb41ee38c47f))
-  ROM_LOAD( "str$0c.rom", 0x0000, 0x2000, CRC(912dc572) SHA1(9ffa59a2a9478c7026c5713ab4ff90fdb1210f3e))
-  ROM_LOAD( "str$0d.rom", 0x0000, 0x2000, CRC(e52f9386) SHA1(3e596de9bbdebf0c5e23740a1104b76b5185422d))
-  ROM_LOAD( "str$0f.rom", 0x0000, 0x2000, CRC(42aafbec) SHA1(b3bde7ebc05bf54942db75e47b5817f61b9a7b41))
+  ROM_REGION(0x50000, "romdisk",ROMREGION_ERASEFF)
+  ROM_LOAD( "rom0.rom", 0x00000, 0x10000, CRC(60103920) SHA1(ee5b4ee5b513c4a0204da751e53d63b8c6c0aab9))
+  ROM_LOAD( "rom1.rom", 0x10000, 0x10000, CRC(cb4a9b22) SHA1(dd09e4ba35b8d1a6f60e6e262aaf2f156367e385))
+  ROM_LOAD( "rom2.rom", 0x20000, 0x08000, CRC(0b7684bf) SHA1(c02ad1f2a6f484cd9d178d8b060c21c0d4e53442))
+  ROM_COPY("romdisk", 0x20000, 0x28000, 0x08000)
+  ROM_LOAD( "rom3.rom", 0x30000, 0x08000, CRC(e4a86dfa) SHA1(96e6bb9ffd66f81fca63bf7491fbba81c4ff1fd2))
+  ROM_COPY("romdisk", 0x30000, 0x38000, 0x08000)
+  ROM_LOAD( "rom4.rom", 0x40000, 0x08000, CRC(d88ac21d) SHA1(022db11fdcf8db81ce9efd9cd9fa50ebca88e79e))
+  ROM_COPY("romdisk", 0x40000, 0x48000, 0x08000)
 ROM_END
 
 ROM_START( ply601a )
   ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-  ROM_LOAD( "bios_a.rom", 0x0000, 0x1000, CRC(e018b11e) SHA1(884d59abd5fa5af1295d1b5a53693facc7945b63))
+  ROM_LOAD( "bios_a.rom", 0xf000, 0x1000, CRC(e018b11e) SHA1(884d59abd5fa5af1295d1b5a53693facc7945b63))
+  ROM_REGION(0x0800, "gfx1",0)
   ROM_LOAD( "video.rom",  0x0000, 0x0800, CRC(1c23ba43) SHA1(eb1cfc139858abd0aedbbf3d523f8ba55d27a11d))
-
-  ROM_LOAD( "str$08.rom", 0x0000, 0x2000, CRC(60a00fff) SHA1(0ddb01aad65f0a1c784e1830912250750b57e30e))
-  ROM_LOAD( "str$09.rom", 0x0000, 0x2000, CRC(cd496e11) SHA1(ee9de325d218dbc21128b605cb557c8b15533804))
-  ROM_LOAD( "str$0b.rom", 0x0000, 0x2000, CRC(4cae092e) SHA1(d18154595e15f5adc9f8d1bc7e0ceb41ee38c47f))
-  ROM_LOAD( "str$0c.rom", 0x0000, 0x2000, CRC(912dc572) SHA1(9ffa59a2a9478c7026c5713ab4ff90fdb1210f3e))
-  ROM_LOAD( "str$0d.rom", 0x0000, 0x2000, CRC(e52f9386) SHA1(3e596de9bbdebf0c5e23740a1104b76b5185422d))
-  ROM_LOAD( "str$0f.rom", 0x0000, 0x2000, CRC(42aafbec) SHA1(b3bde7ebc05bf54942db75e47b5817f61b9a7b41))
+  ROM_REGION(0x50000, "romdisk",ROMREGION_ERASEFF)
+  ROM_LOAD( "rom0.rom", 0x00000, 0x10000, CRC(60103920) SHA1(ee5b4ee5b513c4a0204da751e53d63b8c6c0aab9))
+  ROM_LOAD( "rom1.rom", 0x10000, 0x10000, CRC(cb4a9b22) SHA1(dd09e4ba35b8d1a6f60e6e262aaf2f156367e385))
+  ROM_LOAD( "rom2.rom", 0x20000, 0x08000, CRC(0b7684bf) SHA1(c02ad1f2a6f484cd9d178d8b060c21c0d4e53442))
+  ROM_COPY("romdisk", 0x20000, 0x28000, 0x08000)
+  ROM_LOAD( "rom3.rom", 0x30000, 0x08000, CRC(e4a86dfa) SHA1(96e6bb9ffd66f81fca63bf7491fbba81c4ff1fd2))
+  ROM_COPY("romdisk", 0x30000, 0x38000, 0x08000)
+  ROM_LOAD( "rom4.rom", 0x40000, 0x08000, CRC(d88ac21d) SHA1(022db11fdcf8db81ce9efd9cd9fa50ebca88e79e))
+  ROM_COPY("romdisk", 0x40000, 0x48000, 0x08000)
 ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( ????, ply601,  0,       0, 	ply601, 	ply601, 	 0,  	  ply601,  	 "Mikroelektronika",   "Plydin-601",		GAME_NOT_WORKING)
-COMP( ????, ply601a, ply601,  0, 	ply601, 	ply601, 	 0,  	  ply601,  	 "Mikroelektronika",   "Plydin-601A",		GAME_NOT_WORKING)
+COMP( ????, ply601,  0,       0, 	ply601, 	ply601, ply601,  	  ply601,  	 "Mikroelektronika",   "Plydin-601",		GAME_NOT_WORKING)
+COMP( ????, ply601a, ply601,  0, 	ply601, 	ply601, ply601,  	  ply601,  	 "Mikroelektronika",   "Plydin-601A",		GAME_NOT_WORKING)
 
