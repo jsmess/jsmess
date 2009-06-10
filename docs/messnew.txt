@@ -4,6 +4,9 @@ New System Drivers Supported (in no particular order):
 ------------------------------------------------------
 (none)
 
+Skeleton drivers : 
+------------------
+- Intel SDK-86
 
 
 System Driver Changes:

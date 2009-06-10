@@ -1396,5 +1396,6 @@ const game_driver * const drivers[] =
     DRIVER( tvc64pru )
     DRIVER( bw12 )
     DRIVER( bw14 )
+    DRIVER( sdk86 )
 
 #endif /* DRIVER_RECURSIVE */

@@ -1440,6 +1440,7 @@ $(MESSOBJ)/skeleton.a: \
 	$(MESS_DRIVERS)/unior.o \
 	$(MESS_DRIVERS)/tvc.o \
 	$(MESS_DRIVERS)/bondwell.o \
+	$(MESS_DRIVERS)/sdk86.o \
 	
 #-------------------------------------------------
 # layout dependencies
