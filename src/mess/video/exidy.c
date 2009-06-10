@@ -12,50 +12,35 @@
 
 VIDEO_UPDATE( exidy )
 {
-	int x,y;
-	UINT16 pens[2];
+	UINT8 y,ra,chr,gfx;
+	UINT16 sy=0,ma=0xf080,x;
+	UINT8 *RAM = memory_region(screen->machine, "maincpu");
 
-	pens[0] = 0;
-	pens[1] = 1;
-
-	for (y=0; y<EXIDY_SCREEN_HEIGHT>>3; y++)
+	for (y = 0; y < 30; y++)
 	{
-		for (x=0; x<EXIDY_SCREEN_WIDTH>>3; x++)
+		for (ra = 0; ra < 8; ra++)
 		{
-			int cheight, cwidth;
-			int char_addr;
-			int ch;
+			UINT16  *p = BITMAP_ADDR16(bitmap, sy++, 0);
 
-			/* get char from z80 address space */
-			ch = memory_read_byte(cputag_get_address_space(screen->machine,"maincpu",ADDRESS_SPACE_PROGRAM), 0x0f080 + (y<<6) + x) & 0x0ff;
-
-			/* prom at 0x0f800, user chars from 0x0fc00 */
-			char_addr = 0x0f800 | (ch<<3);
-
-			for (cheight=0; cheight<8; cheight++)
+			for (x = ma; x < ma+64; x++)
 			{
-				int byte;
-				int px,py;
+				chr = RAM[x];
 
-				/* read byte of graphics data from z80 memory */
-				/* either prom or ram */
-				byte = memory_read_byte(cputag_get_address_space(screen->machine,"maincpu",ADDRESS_SPACE_PROGRAM), char_addr|cheight);
+				/* get pattern of pixels for that character scanline */
+				gfx = RAM[0xf800 | (chr<<3) | ra];
 
-				px = (x<<3);
-				py = (y<<3)|cheight;
-				for (cwidth=0; cwidth<8; cwidth++)
-				{
-					int pen;
-
-					pen = (byte>>7) & 0x001;
-					pen = pens[pen];
-
-					*BITMAP_ADDR16(bitmap, py, px) = pen;
-					px++;
-					byte = byte<<1;
-				}
+				/* Display a scanline of a character (8 pixels) */
+				*p = ( gfx & 0x80 ) ? 1 : 0; p++;
+				*p = ( gfx & 0x40 ) ? 1 : 0; p++;
+				*p = ( gfx & 0x20 ) ? 1 : 0; p++;
+				*p = ( gfx & 0x10 ) ? 1 : 0; p++;
+				*p = ( gfx & 0x08 ) ? 1 : 0; p++;
+				*p = ( gfx & 0x04 ) ? 1 : 0; p++;
+				*p = ( gfx & 0x02 ) ? 1 : 0; p++;
+				*p = ( gfx & 0x01 ) ? 1 : 0; p++;
 			}
 		}
+		ma+=64;
 	}
 	return 0;
 }

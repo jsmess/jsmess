@@ -969,9 +969,10 @@ $(MESSOBJ)/aquarius.a: \
 	$(MESS_VIDEO)/aquarius.o \
 
 $(MESSOBJ)/exidy.a:    \
-	$(MESS_MACHINE)/ay31015.o   \
-	$(MESS_DRIVERS)/exidy.o		\
-	$(MESS_VIDEO)/exidy.o      \
+	$(MESS_MACHINE)/ay31015.o \
+	$(MESS_MACHINE)/exidy.o   \
+	$(MESS_DRIVERS)/exidy.o   \
+	$(MESS_VIDEO)/exidy.o     \
 
 $(MESSOBJ)/galaxy.a:   \
 	$(MESS_VIDEO)/galaxy.o   \
