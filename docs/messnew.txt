@@ -7,6 +7,7 @@ New System Drivers Supported (in no particular order):
 Skeleton drivers : 
 ------------------
 - Intel SDK-86
+- Nintendo Virtual Boy
 
 
 System Driver Changes:
