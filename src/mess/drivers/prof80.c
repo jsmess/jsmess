@@ -14,12 +14,13 @@
 	TODO:
 
 	- MC6845 DE callback is broken
-	- Z80 STI (Mostek MK3801) push-model
-	- RAM banking
-	- floppy access
+	- PROF-80 RAM banking
+	- PROF-80 floppy access
 	- UNIO card (Z80-STI, Z80-SIO, 2x centronics)
 	- GRIP-COLOR (192kB color RAM)
-	- GRIP 1/2/3/4/5 selection
+	- GRIP selection
+	- GRIP-5 (HD6345, 256KB RAM)
+	- XR color card
 	
 */
 
@@ -463,6 +464,48 @@ static ADDRESS_MAP_START( grip_io, ADDRESS_SPACE_IO, 8 )
 //	AM_RANGE(0xf0, 0xf0) AM_WRITE(clrg1_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( grip5_mem, ADDRESS_SPACE_PROGRAM, 8 )
+    AM_RANGE(0x0000, 0x3fff) AM_ROMBANK(18)
+    AM_RANGE(0x4000, 0x47ff) AM_RAM
+    AM_RANGE(0x8000, 0xffff) AM_RAMBANK(17)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( grip5_io, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x00) AM_READWRITE(cxstb_r, cxstb_w)
+//	AM_RANGE(0x10, 0x10) AM_WRITE(eprom_w)
+//	AM_RANGE(0x11, 0x11) AM_WRITE(vol0_w)
+//	AM_RANGE(0x12, 0x12) AM_WRITE(rts_w)
+	AM_RANGE(0x13, 0x13) AM_WRITE(page_w)
+//	AM_RANGE(0x14, 0x14) AM_WRITE(str_w)
+//	AM_RANGE(0x15, 0x15) AM_WRITE(intl_w)
+//	AM_RANGE(0x16, 0x16) AM_WRITE(dpage_w)
+//	AM_RANGE(0x17, 0x17) AM_WRITE(vol1_w)
+	AM_RANGE(0x20, 0x2f) AM_DEVREADWRITE(Z80STI_TAG, z80sti_r, z80sti_w)
+	AM_RANGE(0x30, 0x30) AM_READWRITE(lrs_r, lrs_w)
+	AM_RANGE(0x40, 0x40) AM_READ(stat_r)
+	AM_RANGE(0x50, 0x50) AM_DEVWRITE(MC6845_TAG, mc6845_address_w)
+	AM_RANGE(0x52, 0x52) AM_DEVWRITE(MC6845_TAG, mc6845_register_w)
+	AM_RANGE(0x53, 0x53) AM_DEVREAD(MC6845_TAG, mc6845_register_r)
+	AM_RANGE(0x60, 0x60) AM_DEVWRITE("centronics", centronics_data_w)
+	AM_RANGE(0x70, 0x73) AM_DEVREADWRITE(PPI8255_TAG, ppi8255_r, ppi8255_w)
+
+//	AM_RANGE(0x80, 0x80) AM_WRITE(xrflgs_w)
+//	AM_RANGE(0xc0, 0xc0) AM_WRITE(xrclrg_w)
+//	AM_RANGE(0xe0, 0xe0) AM_WRITE(xrclu0_w)
+//	AM_RANGE(0xe1, 0xe1) AM_WRITE(xrclu1_w)
+//	AM_RANGE(0xe2, 0xe2) AM_WRITE(xrclu2_w)
+
+//	AM_RANGE(0x80, 0x80) AM_WRITE(bl2out_w)
+//	AM_RANGE(0x90, 0x90) AM_WRITE(gr2out_w)
+//	AM_RANGE(0xa0, 0xa0) AM_WRITE(rd2out_w)
+//	AM_RANGE(0xb0, 0xb0) AM_WRITE(clrg2_w)
+//	AM_RANGE(0xc0, 0xc0) AM_WRITE(bluout_w)
+//	AM_RANGE(0xd0, 0xd0) AM_WRITE(grnout_w)
+//	AM_RANGE(0xe0, 0xe0) AM_WRITE(redout_w)
+//	AM_RANGE(0xf0, 0xf0) AM_WRITE(clrg1_w)
+ADDRESS_MAP_END
+
 /* Input Ports */
 
 INPUT_PORTS_START( prof80 )
@@ -874,6 +917,9 @@ ROM_START( prof80 )
 	ROM_LOAD( "grip26.z2", 0x0000, 0x4000, CRC(a1c424f0) SHA1(83942bc75b9475f044f936b8d9d7540551d87db9) )
 	ROM_LOAD( "grip31.z2", 0x0000, 0x4000, CRC(e0e4e8ab) SHA1(73d3d14c9b06fed0c187fb0fffe5ec035d8dd256) )
 	ROM_LOAD( "grip25.z2", 0x0000, 0x4000, CRC(49ebb284) SHA1(0a7eaaf89da6db2750f820146c8f480b7157c6c7) )
+
+	ROM_REGION( 0x8000, "grip5", 0 )
+	ROM_LOAD( "grip562.z2", 0x0000, 0x8000, CRC(74be0455) SHA1(1c423ecca6363345a8690ddc45dbafdf277490d3) )
 ROM_END
 
 /* System Configurations */
