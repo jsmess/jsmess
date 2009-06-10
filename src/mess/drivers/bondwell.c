@@ -99,6 +99,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( ????, bw12,  0,       0, 	bw12, 	bw12, 	 0,  	  bw12,  	 "Bondwell",   "BW 12",		GAME_NOT_WORKING)
-COMP( ????, bw14,  bw12,    0, 	bw12, 	bw12, 	 0,  	  bw14,  	 "Bondwell",   "BW 14",		GAME_NOT_WORKING)
-
+COMP( 1984, bw12,  0,       0, 	bw12, 	bw12, 	 0,  	  bw12,  	 "Bondwell",   "BW 12",		GAME_NOT_WORKING)
+COMP( 1984, bw14,  bw12,    0, 	bw12, 	bw12, 	 0,  	  bw14,  	 "Bondwell",   "BW 14",		GAME_NOT_WORKING)
