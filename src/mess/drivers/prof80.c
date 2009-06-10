@@ -13,7 +13,16 @@
 
 	TODO:
 
-	- MC6845 DE callback is broken
+	- the characters are drawn to screen during vsync in a background process, which is controlled by 2 interrupts (CUR and DE)
+
+		'grip_z1' (00001162):M6845 reg 0x0e = 0x0d
+		'grip_z1' (00001162):M6845 reg 0x0f = 0x1f	--> cursor address 0xd1f, total characters (96x50) 0xd20
+
+		MC6845 CUR 0->1 on the last character of screen -> STI I2 interrupt (turns off display, enables DE int)
+		MC6845 DE 0->1 on the first character of screen -> STI I1 interrupt (turns on display, enabled CUR int)
+
+	- implement MC6845 CUR callback
+	- fix MC6845 DE callback
 	- PROF-80 RAM banking
 	- PROF-80 floppy access
 	- UNIO card (Z80-STI, Z80-SIO, 2x centronics)
