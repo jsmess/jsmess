@@ -118,7 +118,7 @@ static const int INT_LEVEL_TIMER[] =
 /* interrupt vectors */
 static const UINT8 INT_VECTOR[] =
 {
-	0x00, 0x01, 0x04, 0x06, 0x08, 0x0a, 0x0c, 0x0e, 
+	0x00, 0x02, 0x04, 0x06, 0x08, 0x0a, 0x0c, 0x0e, 
 	0x10, 0x12, 0x14, 0x16, 0x18, 0x1a, 0x1c, 0x1e
 };
 
@@ -442,7 +442,7 @@ WRITE8_DEVICE_HANDLER( z80sti_w )
 
 	case Z80STI_REGISTER_IMRB:
 		LOG(("Z80STI '%s' Interrupt Mask Register B: %x\n", device->tag, data));
-		z80sti->imr &= (z80sti->imr & 0xff00) | data;
+		z80sti->imr = (z80sti->imr & 0xff00) | data;
 		z80sti->isr &= z80sti->imr;
 		check_interrupts(z80sti);
 		break;
