@@ -58,7 +58,7 @@ static ADDRESS_MAP_START(pockstat_mem, ADDRESS_SPACE_PROGRAM, 32)
 ADDRESS_MAP_END
 
 /* Input ports */
-INPUT_PORTS_START( pockstat )
+static INPUT_PORTS_START( pockstat )
 INPUT_PORTS_END
 
 

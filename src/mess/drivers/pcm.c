@@ -9,7 +9,7 @@
 #include "driver.h"
 #include "cpu/z80/z80.h"
 
-UINT8 *pcm_video_ram;
+static UINT8 *pcm_video_ram;
 
 static ADDRESS_MAP_START(pcm_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH

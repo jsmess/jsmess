@@ -73,7 +73,7 @@ static WRITE8_DEVICE_HANDLER(pk8000_80_porta_w)
 	pk8000_set_bank(device->machine,data);
 }
 
-const ppi8255_interface pk8000_ppi8255_interface_1 =
+static const ppi8255_interface pk8000_ppi8255_interface_1 =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,

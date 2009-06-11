@@ -79,9 +79,9 @@
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
 
-UINT8 ftimer;
-UINT8 nmi_mask;
-UINT8 compat_mode;
+static UINT8 ftimer;
+static UINT8 nmi_mask;
+static UINT8 compat_mode;
 
 static READ8_HANDLER(towns_system_r)
 {
@@ -367,7 +367,7 @@ static ADDRESS_MAP_START( towns_io , ADDRESS_SPACE_IO, 32)
 ADDRESS_MAP_END
 
 /* Input ports */
-INPUT_PORTS_START( towns )
+static INPUT_PORTS_START( towns )
 INPUT_PORTS_END
 
 
@@ -405,13 +405,13 @@ const struct pit8253_config towns_pit8253_config =
 	}
 };
 
-const struct pic8259_interface towns_pic8259_master_config = 
+static const struct pic8259_interface towns_pic8259_master_config = 
 {
 	NULL
 };
 
 
-const struct pic8259_interface towns_pic8259_slave_config = 
+static const struct pic8259_interface towns_pic8259_slave_config = 
 {
 	NULL
 };

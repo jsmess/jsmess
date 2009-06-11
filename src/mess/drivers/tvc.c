@@ -10,7 +10,7 @@
 #include "cpu/z80/z80.h"
 #include "video/mc6845.h"
 
-UINT8 tvc_video_mode = 0;
+static UINT8 tvc_video_mode = 0;
 
 static void tvc_set_mem_page(running_machine *machine, UINT8 data)
 {
@@ -69,7 +69,7 @@ static WRITE8_HANDLER( tvc_video_mode_w )
 	tvc_video_mode = data & 0x03;
 }
 
-UINT8 col[4]= {0,1,2,3};
+static UINT8 col[4]= {0,1,2,3};
 
 static WRITE8_HANDLER( tvc_palette_w )
 {
@@ -98,7 +98,7 @@ static ADDRESS_MAP_START( tvc_io , ADDRESS_SPACE_IO, 8)
 ADDRESS_MAP_END
 
 /* Input ports */
-INPUT_PORTS_START( tvc )
+static INPUT_PORTS_START( tvc )
 INPUT_PORTS_END
 
 

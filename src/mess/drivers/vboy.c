@@ -23,7 +23,7 @@ static ADDRESS_MAP_START( vboy_io , ADDRESS_SPACE_IO, 8)
 ADDRESS_MAP_END
 
 /* Input ports */
-INPUT_PORTS_START( vboy )
+static INPUT_PORTS_START( vboy )
 INPUT_PORTS_END
 
 

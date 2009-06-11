@@ -517,7 +517,7 @@ ADDRESS_MAP_END
 
 /* Input Ports */
 
-INPUT_PORTS_START( prof80 )
+static INPUT_PORTS_START( prof80 )
 INPUT_PORTS_END
 
 /* Video */

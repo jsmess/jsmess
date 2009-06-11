@@ -9,7 +9,7 @@
 #include "driver.h"
 #include "cpu/z80/z80.h"
 
-UINT8 *bw_videoram;
+static UINT8 *bw_videoram;
 
 static ADDRESS_MAP_START(bw12_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -23,7 +23,7 @@ static ADDRESS_MAP_START( bw12_io , ADDRESS_SPACE_IO, 8)
 ADDRESS_MAP_END
 
 /* Input ports */
-INPUT_PORTS_START( bw12 )
+static INPUT_PORTS_START( bw12 )
 INPUT_PORTS_END
 
 

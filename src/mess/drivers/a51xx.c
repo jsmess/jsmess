@@ -50,7 +50,7 @@ static VIDEO_UPDATE( a5120 )
 
 
 /* Input ports */
-INPUT_PORTS_START( a5130 )
+static INPUT_PORTS_START( a5130 )
 INPUT_PORTS_END
 
 

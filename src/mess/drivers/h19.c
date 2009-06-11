@@ -10,7 +10,7 @@
 #include "cpu/z80/z80.h"
 #include "video/mc6845.h"
 
-UINT8 *video_ram;
+static UINT8 *video_ram;
 
 static ADDRESS_MAP_START(h19_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -35,7 +35,7 @@ static MACHINE_RESET(h19)
 {
 }
 
-VIDEO_START( h19 )
+static VIDEO_START( h19 )
 {
 }
 
