@@ -1398,5 +1398,6 @@ const game_driver * const drivers[] =
     DRIVER( bw14 )
     DRIVER( sdk86 )
     DRIVER( vboy )
+    DRIVER( zrt80 )
 
 #endif /* DRIVER_RECURSIVE */

@@ -8,6 +8,7 @@ Skeleton drivers :
 ------------------
 - Intel SDK-86
 - Nintendo Virtual Boy
+- ZRT-80
 
 
 System Driver Changes:

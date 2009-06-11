@@ -1443,6 +1443,7 @@ $(MESSOBJ)/skeleton.a: \
 	$(MESS_DRIVERS)/bondwell.o \
 	$(MESS_DRIVERS)/sdk86.o \
 	$(MESS_DRIVERS)/vboy.o \
+	$(MESS_DRIVERS)/zrt80.o \
 	
 #-------------------------------------------------
 # layout dependencies
