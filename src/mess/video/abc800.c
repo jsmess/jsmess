@@ -110,11 +110,11 @@ static MC6845_UPDATE_ROW( abc800m_update_row )
 	}
 }
 
-static MC6845_ON_VSYNC_CHANGED(abc800_vsync_changed)
+static WRITE_LINE_DEVICE_HANDLER( abc800_vsync_changed )
 {
-	abc800_state *state = device->machine->driver_data;
+	abc800_state *driver_state = device->machine->driver_data;
 
-	z80dart_rib_w(state->z80dart, vsync);
+	z80dart_rib_w(driver_state->z80dart, state);
 }
 
 /* MC6845 Interfaces */
@@ -125,9 +125,11 @@ static const mc6845_interface abc800m_mc6845_interface = {
 	NULL,
 	abc800m_update_row,
 	NULL,
-	NULL,
-	NULL,
-	abc800_vsync_changed
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_LINE(abc800_vsync_changed),
+	NULL
 };
 
 /* ABC 800 C */

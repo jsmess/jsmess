@@ -209,10 +209,13 @@ static const mc6845_interface tvc_crtc6845_interface =
 	NULL,
 	tvc_update_row,
 	NULL,
-	NULL,
-	NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	NULL
 };
+
 static MACHINE_DRIVER_START( tvc )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, 3125000)

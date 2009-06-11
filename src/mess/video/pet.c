@@ -102,7 +102,7 @@ MC6845_UPDATE_ROW( pet80_update_row )
 	}
 }
 
-MC6845_ON_DE_CHANGED( pet_display_enable_changed )
+WRITE_LINE_DEVICE_HANDLER( pet_display_enable_changed )
 {
 }
 

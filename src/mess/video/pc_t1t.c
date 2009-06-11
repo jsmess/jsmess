@@ -25,9 +25,9 @@ static VIDEO_START( pc_t1t );
 static VIDEO_START( pc_pcjr );
 static VIDEO_UPDATE( mc6845_t1000 );
 static MC6845_UPDATE_ROW( t1000_update_row );
-static MC6845_ON_DE_CHANGED( t1000_de_changed );
-static MC6845_ON_VSYNC_CHANGED( t1000_vsync_changed );
-static MC6845_ON_VSYNC_CHANGED( pcjr_vsync_changed );
+static WRITE_LINE_DEVICE_HANDLER( t1000_de_changed );
+static WRITE_LINE_DEVICE_HANDLER( t1000_vsync_changed );
+static WRITE_LINE_DEVICE_HANDLER( pcjr_vsync_changed );
 
 
 static const mc6845_interface mc6845_t1000_intf = {
@@ -36,9 +36,11 @@ static const mc6845_interface mc6845_t1000_intf = {
 	NULL,					/* begin_update */
 	t1000_update_row,		/* update_row */
 	NULL,					/* end_update */
-	t1000_de_changed,		/* on_de_chaged */
-	NULL,					/* on_hsync_changed */
-	t1000_vsync_changed		/* on_vsync_changed */
+	DEVCB_LINE(t1000_de_changed),		/* on_de_changed */
+	DEVCB_NULL,					/* on_cur_changed */
+	DEVCB_NULL,					/* on_hsync_changed */
+	DEVCB_LINE(t1000_vsync_changed),		/* on_vsync_changed */
+	NULL,
 };
 
 
@@ -62,9 +64,11 @@ static const mc6845_interface mc6845_pcjr_intf = {
 	NULL,					/* begin_update */
 	t1000_update_row,		/* update_row */
 	NULL,					/* end_update */
-	t1000_de_changed,		/* on_de_chaged */
-	NULL,					/* on_hsync_changed */
-	pcjr_vsync_changed		/* on_vsync_changed */
+	DEVCB_LINE(t1000_de_changed),		/* on_de_chaged */
+	DEVCB_NULL,					/* on_cur_changed */
+	DEVCB_NULL,					/* on_hsync_changed */
+	DEVCB_LINE(pcjr_vsync_changed),		/* on_vsync_changed */
+	NULL
 };
 
 
@@ -861,29 +865,29 @@ WRITE8_HANDLER( pc_pcjr_w )
 }
 
 
-static MC6845_ON_DE_CHANGED( t1000_de_changed )
+static WRITE_LINE_DEVICE_HANDLER( t1000_de_changed )
 {
-	pcjr.display_enable = display_enabled ? 1 : 0;
+	pcjr.display_enable = state ? 1 : 0;
 }
 
 
-static MC6845_ON_VSYNC_CHANGED( t1000_vsync_changed )
+static WRITE_LINE_DEVICE_HANDLER( t1000_vsync_changed )
 {
-	pcjr.vsync = vsync ? 8 : 0;
-	if ( vsync )
+	pcjr.vsync = state ? 8 : 0;
+	if ( state )
 	{
 		pcjr.pc_framecnt++;
 	}
 }
 
 
-static MC6845_ON_VSYNC_CHANGED( pcjr_vsync_changed )
+static WRITE_LINE_DEVICE_HANDLER( pcjr_vsync_changed )
 {
-	pcjr.vsync = vsync ? 8 : 0;
-	if ( vsync )
+	pcjr.vsync = state ? 8 : 0;
+	if ( state )
 	{
 		pcjr.pc_framecnt++;
 	}
-	pic8259_set_irq_line(devtag_get_device(device->machine, "pic8259_master"), 5, vsync);
+	pic8259_set_irq_line(devtag_get_device(device->machine, "pic8259_master"), 5, state);
 }
 

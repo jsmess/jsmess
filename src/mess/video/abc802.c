@@ -176,26 +176,26 @@ static MC6845_UPDATE_ROW( abc802_update_row )
 	}
 }
 
-static MC6845_ON_VSYNC_CHANGED(abc802_vsync_changed)
+static WRITE_LINE_DEVICE_HANDLER( abc802_vsync_changed )
 {
-	abc802_state *state = device->machine->driver_data;
+	abc802_state *driver_state = device->machine->driver_data;
 
-	if (!vsync)
+	if (!state)
 	{
 		/* flash clock */
-		if (state->flshclk_ctr & 0x20)
+		if (driver_state->flshclk_ctr & 0x20)
 		{
-			state->flshclk = !state->flshclk;
-			state->flshclk_ctr = 0;
+			driver_state->flshclk = !driver_state->flshclk;
+			driver_state->flshclk_ctr = 0;
 		}
 		else
 		{
-			state->flshclk_ctr++;
+			driver_state->flshclk_ctr++;
 		}
 	}
 
 	/* signal _DEW to DART */
-	z80dart_rib_w(state->z80dart, !vsync);
+	z80dart_rib_w(driver_state->z80dart, !state);
 }
 
 /* MC6845 Interfaces */
@@ -206,9 +206,11 @@ static const mc6845_interface abc802_mc6845_interface = {
 	NULL,
 	abc802_update_row,
 	NULL,
-	NULL,
-	NULL,
-	abc802_vsync_changed
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_LINE(abc802_vsync_changed),
+	NULL
 };
 
 /* Video Start */

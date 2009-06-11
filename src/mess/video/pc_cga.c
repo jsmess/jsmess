@@ -185,8 +185,8 @@ static WRITE16_HANDLER( pc_cga16le_w );
 static READ32_HANDLER( pc_cga32le_r );
 static WRITE32_HANDLER( pc_cga32le_w );
 static MC6845_UPDATE_ROW( cga_update_row );
-static MC6845_ON_HSYNC_CHANGED( cga_hsync_changed );
-static MC6845_ON_VSYNC_CHANGED( cga_vsync_changed );
+static WRITE_LINE_DEVICE_HANDLER( cga_hsync_changed );
+static WRITE_LINE_DEVICE_HANDLER( cga_vsync_changed );
 static VIDEO_START( pc1512 );
 static VIDEO_UPDATE( mc6845_pc1512 );
 
@@ -198,9 +198,11 @@ static const mc6845_interface mc6845_cga_intf =
 	NULL,				/* begin_update */
 	cga_update_row,		/* update_row */
 	NULL,				/* end_update */
-	NULL,				/* on_de_chaged */
-	cga_hsync_changed,	/* on_hsync_changed */
-	cga_vsync_changed	/* on_vsync_changed */
+	DEVCB_NULL,				/* on_de_changed */
+	DEVCB_NULL,				/* on_cur_changed */
+	DEVCB_LINE(cga_hsync_changed),	/* on_hsync_changed */
+	DEVCB_LINE(cga_vsync_changed),	/* on_vsync_changed */
+	NULL
 };
 
 
@@ -986,16 +988,16 @@ static MC6845_UPDATE_ROW( cga_update_row )
 }
 
 
-static MC6845_ON_HSYNC_CHANGED( cga_hsync_changed )
+static WRITE_LINE_DEVICE_HANDLER( cga_hsync_changed )
 {
-	cga.hsync = hsync ? 1 : 0;
+	cga.hsync = state ? 1 : 0;
 }
 
 
-static MC6845_ON_VSYNC_CHANGED( cga_vsync_changed )
+static WRITE_LINE_DEVICE_HANDLER( cga_vsync_changed )
 {
-	cga.vsync = vsync ? 8 : 0;
-	if ( vsync )
+	cga.vsync = state ? 8 : 0;
+	if ( state )
 	{
 		cga.frame++;
 	}

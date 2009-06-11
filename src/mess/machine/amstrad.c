@@ -1192,9 +1192,9 @@ static MC6845_UPDATE_ROW( amstrad_plus_update_row )
 }
 
 
-static MC6845_ON_HSYNC_CHANGED( amstrad_hsync_changed )
+static WRITE_LINE_DEVICE_HANDLER( amstrad_hsync_changed )
 {
-	if ( hsync )
+	if ( state )
 	{
 		amstrad_CRTC_HS_Counter++;
 
@@ -1218,13 +1218,13 @@ static MC6845_ON_HSYNC_CHANGED( amstrad_hsync_changed )
 			cputag_set_input_line(device->machine, "maincpu", 0, ASSERT_LINE);
 		}
 	}
-	amstrad_CRTC_HS = hsync ? 1 : 0;
+	amstrad_CRTC_HS = state ? 1 : 0;
 }
 
 
-static MC6845_ON_HSYNC_CHANGED( amstrad_plus_hsync_changed )
+static WRITE_LINE_DEVICE_HANDLER( amstrad_plus_hsync_changed )
 {
-	if ( hsync )
+	if ( state )
 	{
 		amstrad_CRTC_HS_Counter++;
 
@@ -1280,19 +1280,19 @@ static MC6845_ON_HSYNC_CHANGED( amstrad_plus_hsync_changed )
 			amstrad_plus_handle_dma(device->machine);  // a DMA command is handled at the leading edge of HSYNC (every 64us)
 		}
 	}
-	amstrad_CRTC_HS = hsync ? 1 : 0;
+	amstrad_CRTC_HS = state ? 1 : 0;
 }
 
 
-static MC6845_ON_VSYNC_CHANGED( amstrad_vsync_changed )
+static WRITE_LINE_DEVICE_HANDLER( amstrad_vsync_changed )
 {
-	if ( ! amstrad_CRTC_VS && vsync )
+	if ( ! amstrad_CRTC_VS && state )
 	{
 		/* Reset the amstrad_CRTC_HS_After_VS_Counter */
 		amstrad_CRTC_HS_After_VS_Counter = 2;
 	}
 
-	amstrad_CRTC_VS = vsync ? 1 : 0;
+	amstrad_CRTC_VS = state ? 1 : 0;
 }
 
 
@@ -1320,9 +1320,11 @@ const mc6845_interface mc6845_amstrad_intf =
 	NULL,						/* begin_update */
 	amstrad_update_row,			/* update_row */
 	NULL,						/* end_update */
-	NULL,						/* on_de_changed */
-	amstrad_hsync_changed,		/* on_hsync_changed */
-	amstrad_vsync_changed		/* on_vsync_changed */
+	DEVCB_NULL,					/* on_de_changed */
+	DEVCB_NULL,					/* on_cur_changed */
+	DEVCB_LINE(amstrad_hsync_changed),		/* on_hsync_changed */
+	DEVCB_LINE(amstrad_vsync_changed),		/* on_vsync_changed */
+	NULL
 };
 
 
@@ -1333,9 +1335,11 @@ const mc6845_interface mc6845_amstrad_plus_intf =
 	NULL,						/* begin_update */
 	amstrad_plus_update_row,	/* update_row */
 	NULL,						/* end_update */
-	NULL,						/* on_de_changed */
-	amstrad_plus_hsync_changed,	/* on_hsync_changed */
-	amstrad_vsync_changed		/* on_vsync_changed */
+	DEVCB_NULL,					/* on_de_changed */
+	DEVCB_NULL,					/* on_cur_changed */
+	DEVCB_LINE(amstrad_plus_hsync_changed),	/* on_hsync_changed */
+	DEVCB_LINE(amstrad_vsync_changed),		/* on_vsync_changed */
+	NULL
 };
 
 

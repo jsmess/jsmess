@@ -165,8 +165,10 @@ static const mc6845_interface zrt80_crtc6845_interface =
 	NULL,
 	zrt80_update_row,
 	NULL,
-	NULL,
-	NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	NULL
 };
 

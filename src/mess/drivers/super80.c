@@ -367,8 +367,10 @@ static const mc6845_interface super80v_crtc = {
 	NULL,
 	super80v_update_row,		/* handler to display a scanline */
 	NULL,
-	NULL,
-	NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	NULL
 };
 

@@ -290,8 +290,10 @@ static const mc6845_interface cbm600_crtc = {
 	NULL,
 	cbm600_update_row,
 	NULL,
-	cbmb_display_enable_changed,
-	NULL,
+	DEVCB_LINE(cbmb_display_enable_changed),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	NULL
 };
 
@@ -301,8 +303,10 @@ static const mc6845_interface cbm700_crtc = {
 	NULL,
 	cbm700_update_row,
 	NULL,
-	cbmb_display_enable_changed,
-	NULL,
+	DEVCB_LINE(cbmb_display_enable_changed),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	NULL
 };
 

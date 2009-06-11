@@ -322,56 +322,56 @@ static MC6845_UPDATE_ROW( abc806_update_row )
 	}
 }
 
-static MC6845_ON_HSYNC_CHANGED(abc806_hsync_changed)
+static WRITE_LINE_DEVICE_HANDLER( abc806_hsync_changed )
 {
-	abc806_state *state = device->machine->driver_data;
+	abc806_state *driver_state = device->machine->driver_data;
 
 	int vsync;
 
-	if (!hsync)
+	if (!state)
 	{
-		state->v50_addr++;
+		driver_state->v50_addr++;
 
 		/* clock current vsync value into the shift register */
-		state->vsync_shift <<= 1;
-		state->vsync_shift = (state->vsync_shift & 0xfffffffel) | state->vsync;
+		driver_state->vsync_shift <<= 1;
+		driver_state->vsync_shift = (driver_state->vsync_shift & 0xfffffffel) | driver_state->vsync;
 
-		vsync = BIT(state->vsync_shift, state->sync);
+		vsync = BIT(driver_state->vsync_shift, driver_state->sync);
 
-		if (!state->d_vsync && vsync)
+		if (!driver_state->d_vsync && vsync)
 		{
 			/* clear V50 address */
-			state->v50_addr = 0;
+			driver_state->v50_addr = 0;
 		}
-		else if (state->d_vsync && !vsync)
+		else if (driver_state->d_vsync && !vsync)
 		{
 			/* flash clock */
-			if (state->flshclk_ctr & 0x20)
+			if (driver_state->flshclk_ctr & 0x20)
 			{
-				state->flshclk = !state->flshclk;
-				state->flshclk_ctr = 0;
+				driver_state->flshclk = !driver_state->flshclk;
+				driver_state->flshclk_ctr = 0;
 			}
 			else
 			{
-				state->flshclk_ctr++;
+				driver_state->flshclk_ctr++;
 			}
 		}
 
-		if (state->d_vsync != vsync)
+		if (driver_state->d_vsync != vsync)
 		{
 			/* signal _DEW to DART */
-			z80dart_rib_w(state->z80dart, !vsync);
+			z80dart_rib_w(driver_state->z80dart, !vsync);
 		}
 
-		state->d_vsync = vsync;
+		driver_state->d_vsync = vsync;
 	}
 }
 
-static MC6845_ON_VSYNC_CHANGED(abc806_vsync_changed)
+static WRITE_LINE_DEVICE_HANDLER( abc806_vsync_changed )
 {
-	abc806_state *state = device->machine->driver_data;
+	abc806_state *driver_state = device->machine->driver_data;
 
-	state->vsync = vsync;
+	driver_state->vsync = state;
 }
 
 /* MC6845 Interfaces */
@@ -382,9 +382,11 @@ static const mc6845_interface abc806_mc6845_interface = {
 	NULL,
 	abc806_update_row,
 	NULL,
-	NULL,
-	abc806_hsync_changed,
-	abc806_vsync_changed
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_LINE(abc806_hsync_changed),
+	DEVCB_LINE(abc806_vsync_changed),
+	NULL
 };
 
 /* HR */

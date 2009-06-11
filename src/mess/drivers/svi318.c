@@ -338,8 +338,10 @@ static const mc6845_interface svi806_crtc6845_interface =
 	NULL,
 	svi806_crtc6845_update_row,
 	NULL,
-	NULL,
-	NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	NULL
 };
 

@@ -124,8 +124,10 @@ static const mc6845_interface kaypro2x_crtc = {
 	NULL,
 	kaypro2x_update_row,		/* handler to display a scanline */
 	NULL,
-	NULL,
-	NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	NULL
 };
 

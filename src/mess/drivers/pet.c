@@ -605,8 +605,10 @@ static const mc6845_interface crtc_pet40 = {
 	NULL,
 	pet40_update_row,
 	NULL,
-	pet_display_enable_changed,
-	NULL,
+	DEVCB_LINE(pet_display_enable_changed),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	NULL
 };
 
@@ -616,8 +618,10 @@ static const mc6845_interface crtc_pet80 = {
 	NULL,
 	pet80_update_row,
 	NULL,
-	pet_display_enable_changed,
-	NULL,
+	DEVCB_LINE(pet_display_enable_changed),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	NULL
 };
 

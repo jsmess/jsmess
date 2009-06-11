@@ -60,8 +60,8 @@ static VIDEO_UPDATE( mc6845_mda );
 static READ8_HANDLER( pc_MDA_r );
 static WRITE8_HANDLER( pc_MDA_w );
 static MC6845_UPDATE_ROW( mda_update_row );
-static MC6845_ON_HSYNC_CHANGED( mda_hsync_changed );
-static MC6845_ON_VSYNC_CHANGED( mda_vsync_changed );
+static WRITE_LINE_DEVICE_HANDLER( mda_hsync_changed );
+static WRITE_LINE_DEVICE_HANDLER( mda_vsync_changed );
 
 static const mc6845_interface mc6845_mda_intf =
 {
@@ -70,9 +70,11 @@ static const mc6845_interface mc6845_mda_intf =
 	NULL,				/* begin_update */
 	mda_update_row,		/* update_row */
 	NULL,				/* end_update */
-	NULL,				/* on_de_changed */
-	mda_hsync_changed,	/* on_hsync_changed */
-	mda_vsync_changed	/* on_vsync_changed */
+	DEVCB_NULL,				/* on_de_changed */
+	DEVCB_NULL,				/* on_cur_changed */
+	DEVCB_LINE(mda_hsync_changed),	/* on_hsync_changed */
+	DEVCB_LINE(mda_vsync_changed),	/* on_vsync_changed */
+	NULL
 };
 
 MACHINE_DRIVER_START( pcvideo_mda )
@@ -298,16 +300,16 @@ static MC6845_UPDATE_ROW( mda_update_row )
 }
 
 
-static MC6845_ON_HSYNC_CHANGED( mda_hsync_changed )
+static WRITE_LINE_DEVICE_HANDLER( mda_hsync_changed )
 {
-	mda.hsync = hsync ? 1 : 0;
+	mda.hsync = state ? 1 : 0;
 }
 
 
-static MC6845_ON_VSYNC_CHANGED( mda_vsync_changed )
+static WRITE_LINE_DEVICE_HANDLER( mda_vsync_changed )
 {
-	mda.vsync = vsync ? 0x80 : 0;
-	if ( vsync )
+	mda.vsync = state ? 0x80 : 0;
+	if ( state )
 	{
 		mda.pc_framecnt++;
 	}
@@ -426,9 +428,11 @@ static const mc6845_interface mc6845_hercules_intf =
 	NULL,					/* begin_update */
 	mda_update_row,			/* update_row */
 	NULL,					/* end_update */
-	NULL,					/* on_de_changed */
-	mda_hsync_changed,		/* on_hsync_changed */
-	mda_vsync_changed		/* on_vsync_changed */
+	DEVCB_NULL,				/* on_de_changed */
+	DEVCB_NULL,				/* on_cur_changed */
+	DEVCB_LINE(mda_hsync_changed),		/* on_hsync_changed */
+	DEVCB_LINE(mda_vsync_changed),		/* on_vsync_changed */
+	NULL
 };
 
 MACHINE_DRIVER_START( pcvideo_hercules )

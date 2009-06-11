@@ -184,11 +184,11 @@ static MC6845_UPDATE_ROW( comx35_update_row )
 	}
 }
 
-static MC6845_ON_HSYNC_CHANGED( comx35_hsync_changed )
+static WRITE_LINE_DEVICE_HANDLER( comx35_hsync_changed )
 {
-	comx35_state *state = device->machine->driver_data;
+	comx35_state *driver_state = device->machine->driver_data;
 
-	state->cdp1802_ef4 = hsync;
+	driver_state->cdp1802_ef4 = state;
 }
 
 static const mc6845_interface comx35_mc6845_interface =
@@ -198,8 +198,10 @@ static const mc6845_interface comx35_mc6845_interface =
 	NULL,
 	comx35_update_row,
 	NULL,
-	NULL,
-	comx35_hsync_changed,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_LINE(comx35_hsync_changed),
+	DEVCB_NULL,
 	NULL
 };
 

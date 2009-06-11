@@ -95,7 +95,7 @@ MC6845_UPDATE_ROW( cbm700_update_row )
 	}
 }
 
-MC6845_ON_DE_CHANGED( cbmb_display_enable_changed )
+WRITE_LINE_DEVICE_HANDLER( cbmb_display_enable_changed )
 {
 }
 

@@ -145,8 +145,10 @@ static const mc6845_interface camplynx_crtc6845_interface = {
 	NULL,
 	camplynx_update_row,
 	NULL,
-	NULL,
-	NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	NULL
 };
 

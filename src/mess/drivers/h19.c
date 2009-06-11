@@ -77,8 +77,10 @@ static const mc6845_interface h19_crtc6845_interface =
 	NULL,
 	h19_update_row,
 	NULL,
-	NULL,
-	NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	NULL
 };
 

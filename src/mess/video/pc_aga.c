@@ -27,8 +27,8 @@ static VIDEO_START( pc_aga );
 static VIDEO_UPDATE( mc6845_aga );
 static PALETTE_INIT( pc_aga );
 static MC6845_UPDATE_ROW( aga_update_row );
-static MC6845_ON_HSYNC_CHANGED( aga_hsync_changed );
-static MC6845_ON_VSYNC_CHANGED( aga_vsync_changed );
+static WRITE_LINE_DEVICE_HANDLER( aga_hsync_changed );
+static WRITE_LINE_DEVICE_HANDLER( aga_vsync_changed );
 static VIDEO_START( pc200 );
 
 
@@ -38,9 +38,11 @@ static const mc6845_interface mc6845_aga_intf = {
 	NULL,				/* begin_update */
 	aga_update_row,		/* update_row */
 	NULL,				/* end_update */
-	NULL,				/* on_de_chaged */
-	aga_hsync_changed,	/* on_hsync_changed */
-	aga_vsync_changed	/* on_vsync_changed */
+	DEVCB_NULL,			/* on_de_chaged */
+	DEVCB_NULL,			/* on_cur_chaged */
+	DEVCB_LINE(aga_hsync_changed),	/* on_hsync_changed */
+	DEVCB_LINE(aga_vsync_changed),	/* on_vsync_changed */
+	NULL
 };
 
 
@@ -101,14 +103,14 @@ static MC6845_UPDATE_ROW( aga_update_row ) {
 }
 
 
-static MC6845_ON_HSYNC_CHANGED( aga_hsync_changed ) {
-	aga.hsync = hsync ? 1 : 0;
+static WRITE_LINE_DEVICE_HANDLER( aga_hsync_changed ) {
+	aga.hsync = state ? 1 : 0;
 }
 
 
-static MC6845_ON_VSYNC_CHANGED( aga_vsync_changed ) {
-	aga.vsync = vsync ? 8 : 0;
-	if ( vsync ) {
+static WRITE_LINE_DEVICE_HANDLER( aga_vsync_changed ) {
+	aga.vsync = state ? 8 : 0;
+	if ( state ) {
 		aga.pc_framecnt++;
 	}
 }

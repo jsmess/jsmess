@@ -70,7 +70,7 @@ VIDEO_START( cbmb_crtc );
 VIDEO_UPDATE( cbmb_crtc );
 MC6845_UPDATE_ROW( cbm600_update_row );
 MC6845_UPDATE_ROW( cbm700_update_row );
-MC6845_ON_DE_CHANGED( cbmb_display_enable_changed );
+WRITE_LINE_DEVICE_HANDLER( cbmb_display_enable_changed );
 
 void cbm600_vh_init(running_machine *machine);
 void cbm700_vh_init(running_machine *machine);

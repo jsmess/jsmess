@@ -247,10 +247,10 @@ static MC6845_UPDATE_ROW( einstein_6845_update_row )
 	}
 }
 
-static MC6845_ON_DE_CHANGED( einstein_6845_display_enable_changed )
+static WRITE_LINE_DEVICE_HANDLER( einstein_6845_display_enable_changed )
 {
 	/* TODO: Implement me properly */
-	if ( display_enabled ) {
+	if ( state ) {
 		Einstein_scr_y = ( Einstein_scr_y + 1 ) % 240 /*?*/;
 	}
 }
@@ -261,8 +261,10 @@ static const mc6845_interface einstein_crtc6845_interface = {
 	NULL,
 	einstein_6845_update_row,
 	NULL,
-	einstein_6845_display_enable_changed,
-	NULL,
+	DEVCB_LINE(einstein_6845_display_enable_changed),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	NULL
 };
 

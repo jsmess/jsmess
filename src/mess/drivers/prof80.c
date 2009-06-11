@@ -21,8 +21,6 @@
 		MC6845 CUR 0->1 on the last character of screen -> STI I2 interrupt (turns off display, enables DE int)
 		MC6845 DE 0->1 on the first character of screen -> STI I1 interrupt (turns on display, enabled CUR int)
 
-	- implement MC6845 CUR callback
-	- fix MC6845 DE callback
 	- PROF-80 RAM banking
 	- PROF-80 floppy access
 	- UNIO card (Z80-STI, Z80-SIO, 2x centronics)
@@ -541,13 +539,18 @@ static MC6845_UPDATE_ROW( grip_update_row )
 	}
 }
 
-static MC6845_ON_DE_CHANGED( grip_on_de_changed )
+static WRITE_LINE_DEVICE_HANDLER( grip_de_w )
 {
-	prof80_state *state = device->machine->driver_data;
+	prof80_state *driver_state = device->machine->driver_data;
 
-//	logerror("DE changed to %u\n", display_enabled);
-	
-	z80sti_i1_w(state->z80sti, display_enabled);
+	z80sti_i1_w(driver_state->z80sti, state);
+}
+
+static WRITE_LINE_DEVICE_HANDLER( grip_cur_w )
+{
+	prof80_state *driver_state = device->machine->driver_data;
+
+	z80sti_i2_w(driver_state->z80sti, state);
 }
 
 static const mc6845_interface grip_mc6845_interface = 
@@ -557,9 +560,10 @@ static const mc6845_interface grip_mc6845_interface =
 	NULL,
 	grip_update_row,
 	NULL,
-	grip_on_de_changed,
-	NULL,
-	NULL,
+	DEVCB_LINE(grip_de_w),
+	DEVCB_LINE(grip_cur_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
 	NULL
 };
 
@@ -889,7 +893,7 @@ static MACHINE_DRIVER_START( prof80 )
     MDRV_VIDEO_START(prof80)
     MDRV_VIDEO_UPDATE(prof80)
 
-	MDRV_MC6845_ADD(MC6845_TAG, MC6845, XTAL_16MHz, grip_mc6845_interface)
+	MDRV_MC6845_ADD(MC6845_TAG, MC6845, XTAL_16MHz/4, grip_mc6845_interface)
 
 	/* devices */
 	MDRV_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, prof80_upd1990a_intf)

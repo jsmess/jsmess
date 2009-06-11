@@ -102,8 +102,10 @@ static const mc6845_interface ply601_crtc6845_interface =
 	NULL,
 	ply601_update_row,
 	NULL,
-	NULL,
-	NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	NULL
 };
 
