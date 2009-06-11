@@ -1400,4 +1400,12 @@ const game_driver * const drivers[] =
     DRIVER( vboy )
     DRIVER( zrt80 )
 	DRIVER( exp85 )
+	DRIVER( z9001 )
+	DRIVER( kc85_111 )
+	DRIVER( kc87_10 )
+	DRIVER( kc87_11 )
+	DRIVER( kc87_20 )
+	DRIVER( kc87_21 )
+
 #endif /* DRIVER_RECURSIVE */
+    
