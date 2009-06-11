@@ -105,22 +105,25 @@ static MACHINE_RESET( camplynx )
 static MC6845_UPDATE_ROW( camplynx_update_row )
 {
 	UINT8 gfx,x,fg=1,bg=0;
-	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
 
-	for (x = 0; x < x_count; x++)
+	if (!ra)
 	{
-		UINT8 inv=0;
-		if (x == cursor_x) inv=0xff;
-		gfx = videoram[ma+x] ^ inv;
+		UINT16  *p = BITMAP_ADDR16(bitmap, y>>2, 0);
 
-		*p = ( gfx & 0x80 ) ? fg : bg; p++;
-		*p = ( gfx & 0x40 ) ? fg : bg; p++;
-		*p = ( gfx & 0x20 ) ? fg : bg; p++;
-		*p = ( gfx & 0x10 ) ? fg : bg; p++;
-		*p = ( gfx & 0x08 ) ? fg : bg; p++;
-		*p = ( gfx & 0x04 ) ? fg : bg; p++;
-		*p = ( gfx & 0x02 ) ? fg : bg; p++;
-		*p = ( gfx & 0x01 ) ? fg : bg; p++;
+		for (x = 0; x < x_count; x++)
+		{
+			gfx = videoram[ma+x];
+			if (x == cursor_x) gfx^=0xff;	// not used - cursor is generated in software
+
+			*p = ( gfx & 0x80 ) ? fg : bg; p++;
+			*p = ( gfx & 0x40 ) ? fg : bg; p++;
+			*p = ( gfx & 0x20 ) ? fg : bg; p++;
+			*p = ( gfx & 0x10 ) ? fg : bg; p++;
+			*p = ( gfx & 0x08 ) ? fg : bg; p++;
+			*p = ( gfx & 0x04 ) ? fg : bg; p++;
+			*p = ( gfx & 0x02 ) ? fg : bg; p++;
+			*p = ( gfx & 0x01 ) ? fg : bg; p++;
+		}
 	}
 }
 
@@ -161,8 +164,8 @@ static MACHINE_DRIVER_START( camplynx )
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(640, 480)
-	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MDRV_SCREEN_SIZE(1024, 768)
+	MDRV_SCREEN_VISIBLE_AREA(0, 1023, 0, 767)
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(black_and_white)
 
