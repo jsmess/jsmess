@@ -11,6 +11,7 @@ Skeleton drivers :
 - ZRT-80
 - Netronics Explorer 85
 - Robotron Z9001 / KC85/1 / KC87
+- Canon Cat
 
 System Driver Changes:
 ----------------------
