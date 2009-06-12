@@ -80,5 +80,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   	FULLNAME       FLAGS */
-COMP( 1995, vboy,   0,      0, 		 vboy, 		vboy, 	 0,  	 vboy, 	"Nintendo", "Virtual Boy", GAME_NOT_WORKING)
+CONS( 1995, vboy,   0,      0, 		 vboy, 		vboy, 	 0,  	 vboy, 	"Nintendo", "Virtual Boy", GAME_NOT_WORKING)
 
