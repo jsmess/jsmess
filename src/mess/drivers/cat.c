@@ -9,10 +9,12 @@
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
 
+UINT16 *cat_video_ram;
+
 static ADDRESS_MAP_START(cat_mem, ADDRESS_SPACE_PROGRAM, 16)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x0003ffff) AM_ROM // 256 KB ROM
-	AM_RANGE(0x00040000, 0x00ffffff) AM_RAM // 256 KB RAM but not sure about mapping
+	AM_RANGE(0x00400000, 0x0045ffff) AM_RAM AM_BASE(&cat_video_ram) // 384 KB RAM
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -30,7 +32,23 @@ static VIDEO_START( cat )
 
 static VIDEO_UPDATE( cat )
 {
-    return 0;
+	UINT16 code;
+	int y, x, b;
+	
+	int addr = 0;	
+	for (y = 0; y < 344; y++)
+	{
+		int horpos = 0;
+		for (x = 0; x < 42; x++)
+		{			
+			code = cat_video_ram[addr++];
+			for (b = 15; b >= 0; b--)
+			{				
+				*BITMAP_ADDR16(bitmap, y, horpos++) =  (code >> b) & 0x01;
+			}
+		}
+	}
+	return 0;
 }
 
 static MACHINE_DRIVER_START( cat )
@@ -45,8 +63,8 @@ static MACHINE_DRIVER_START( cat )
     MDRV_SCREEN_REFRESH_RATE(50)
     MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
     MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MDRV_SCREEN_SIZE(640, 480)
-    MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+    MDRV_SCREEN_SIZE(672, 344)
+    MDRV_SCREEN_VISIBLE_AREA(0, 672-1, 0, 344-1)
     MDRV_PALETTE_LENGTH(2)
     MDRV_PALETTE_INIT(black_and_white)
 
