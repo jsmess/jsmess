@@ -1407,6 +1407,7 @@ const game_driver * const drivers[] =
 	DRIVER( kc87_20 )
 	DRIVER( kc87_21 )
 	DRIVER( cat )
+	DRIVER( swyft )
 
 #endif /* DRIVER_RECURSIVE */
     
