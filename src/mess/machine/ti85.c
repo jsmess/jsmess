@@ -472,6 +472,31 @@ READ8_HANDLER ( ti86_port_0005_r )
 	return ti86_memory_page_0x8000;
 }
 
+READ8_HANDLER ( ti83_port_0000_r )
+{
+	return ((ti85_memory_page_0x4000 & 0x08) << 1) | 0x0C;
+}
+
+ READ8_HANDLER ( ti83_port_0002_r )
+{
+	return (ti85_memory_page_0x4000 & 0x07); 
+}
+
+ READ8_HANDLER ( ti83_port_0003_r )
+{
+	int data = 0;
+
+	if (ti85_LCD_status)
+		data |= ti85_LCD_mask;
+	if (ti85_ON_interrupt_status)
+		data |= 0x01;
+	if (!ti85_ON_pressed)
+		data |= 0x08;
+	ti85_ON_interrupt_status = 0;
+	ti85_timer_interrupt_status = 0;
+	return data;
+}
+
 WRITE8_HANDLER ( ti81_port_0007_w )
 {
 	ti81_port_7_data = data;
@@ -591,6 +616,27 @@ WRITE8_HANDLER ( ti82_port_0011_w )
 	
 	ti82_video_x &= 15;
 	ti82_video_y &= 63;
+}
+
+WRITE8_HANDLER ( ti83_port_0000_w )
+{
+	ti85_memory_page_0x4000 = (ti85_memory_page_0x4000 & 7) | ((data & 16) >> 1);
+	update_ti85_memory(space->machine);	
+}
+
+WRITE8_HANDLER ( ti83_port_0002_w )
+{
+	ti85_memory_page_0x4000 = (ti85_memory_page_0x4000 & 8) | (data & 7);
+	update_ti85_memory(space->machine);
+}
+
+WRITE8_HANDLER ( ti83_port_0003_w )
+{	
+		if (ti85_LCD_status && !(data&0x08))	ti85_timer_interrupt_mask = 0;
+		ti85_ON_interrupt_mask = data&0x01;
+		//ti85_timer_interrupt_mask = data&0x04;
+		ti85_LCD_mask = data&0x02;
+		ti85_LCD_status = data&0x08;
 }
 
 /* NVRAM functions */

@@ -71,7 +71,8 @@ To do:
 - port 7 (TI-86)
 - port 4 (all models)
 - artwork (all models)
-- add TI-82, TI-83 and TI-83+ drivers
+- port 0 link (TI-82 and TI-83)
+- add TI-73, TI-83+ and T84+ drivers
 
 
 TI-81 memory map
@@ -86,7 +87,14 @@ TI-82 memory map
         0000-3fff ROM 0
         4000-7fff ROM 1-7 (switched)
         8000-ffff RAM
-		
+
+TI-83 memory map
+
+    CPU: Z80 6MHz
+        0000-3fff ROM 0
+        4000-7fff ROM 1-7 (switched)
+        8000-ffff RAM
+
 TI-85 memory map
 
     CPU: Z80 6MHz
@@ -118,14 +126,23 @@ TI-81 ports:
     7: ?
 
 TI-82 ports:
-    0: Video buffer offset (write only)
+    0: Link
     1: Keypad
     2: Memory page
     3: ON status, LCD power
     4: Video buffer width, interrupt control (write only)
     10: Controll port for the display controller
     11: Data port for the display controller
-	
+
+TI-83 ports:
+    0: Link + Memory page
+    1: Keypad
+    2: Memory page
+    3: ON status, LCD power
+    4: Video buffer width, interrupt control (write only)
+    10: Controll port for the display controller
+    11: Data port for the display controller
+
 TI-85 ports:
     0: Video buffer offset (write only)
     1: Keypad
@@ -185,6 +202,17 @@ static ADDRESS_MAP_START( ti82_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0001, 0x0001) AM_READWRITE( ti85_port_0001_r, ti85_port_0001_w )
 	AM_RANGE(0x0002, 0x0002) AM_READWRITE( ti82_port_0002_r, ti82_port_0002_w )
 	AM_RANGE(0x0003, 0x0003) AM_READWRITE( ti85_port_0003_r, ti85_port_0003_w )
+	AM_RANGE(0x0004, 0x0004) AM_READWRITE( ti85_port_0004_r, ti85_port_0004_w )
+	AM_RANGE(0x0010, 0x0010) AM_READWRITE( ti82_port_0010_r, ti82_port_0010_w )
+	AM_RANGE(0x0011, 0x0011) AM_READWRITE( ti82_port_0011_r, ti82_port_0011_w )
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( ti83_io, ADDRESS_SPACE_IO, 8)
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x0000, 0x0000) AM_READWRITE( ti83_port_0000_r, ti83_port_0000_w )
+	AM_RANGE(0x0001, 0x0001) AM_READWRITE( ti85_port_0001_r, ti85_port_0001_w )
+	AM_RANGE(0x0002, 0x0002) AM_READWRITE( ti83_port_0002_r, ti83_port_0002_w )
+	AM_RANGE(0x0003, 0x0003) AM_READWRITE( ti83_port_0003_r, ti83_port_0003_w )
 	AM_RANGE(0x0004, 0x0004) AM_READWRITE( ti85_port_0004_r, ti85_port_0004_w )
 	AM_RANGE(0x0010, 0x0010) AM_READWRITE( ti82_port_0010_r, ti82_port_0010_w )
 	AM_RANGE(0x0011, 0x0011) AM_READWRITE( ti82_port_0011_r, ti82_port_0011_w )
@@ -375,7 +403,7 @@ static INPUT_PORTS_START (ti82)
 		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("6") PORT_CODE(KEYCODE_6)
 		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("5") PORT_CODE(KEYCODE_5)
 		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("4") PORT_CODE(KEYCODE_4)
-		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("LN") PORT_CODE(KEYCODE_COMMA)
+		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("LN") PORT_CODE(KEYCODE_BACKSLASH)
 		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ZOOM") PORT_CODE(KEYCODE_F3)
 	PORT_START("BIT3")   /* bit 3 */
 		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Up") PORT_CODE(KEYCODE_UP)
@@ -383,21 +411,21 @@ static INPUT_PORTS_START (ti82)
 		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("9") PORT_CODE(KEYCODE_9)
 		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("8") PORT_CODE(KEYCODE_8)
 		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("7") PORT_CODE(KEYCODE_7)
-		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("LOG") PORT_CODE(KEYCODE_COLON)
+		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("LOG") PORT_CODE(KEYCODE_QUOTE)
 		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("WINDOW") PORT_CODE(KEYCODE_F2)
 	PORT_START("BIT4")   /* bit 4 */
-		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("/") PORT_CODE(KEYCODE_SLASH)    //
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("/") PORT_CODE(KEYCODE_SLASH)
 		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(")") PORT_CODE(KEYCODE_CLOSEBRACE)
 		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(") PORT_CODE(KEYCODE_OPENBRACE)
-		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(",") PORT_CODE(KEYCODE_END)//
-		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("^2") PORT_CODE(KEYCODE_BACKSLASH)
+		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(",") PORT_CODE(KEYCODE_END)
+		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("x^2") PORT_CODE(KEYCODE_COLON)
 		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Y=") PORT_CODE(KEYCODE_F1)
 	PORT_START("BIT5")   /* bit 5 */
 		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("^") PORT_CODE(KEYCODE_P)
 		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("TAN") PORT_CODE(KEYCODE_PGUP)
 		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("COS") PORT_CODE(KEYCODE_HOME)
 		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("SIN") PORT_CODE(KEYCODE_INSERT)
-		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("^-1") PORT_CODE(KEYCODE_QUOTE)
+		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("x^-1") PORT_CODE(KEYCODE_COMMA)
 		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("2nd") PORT_CODE(KEYCODE_LALT)
 	PORT_START("BIT6")   /* bit 6 */
 		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("CLEAR") PORT_CODE(KEYCODE_PGDN)
@@ -408,7 +436,7 @@ static INPUT_PORTS_START (ti82)
 		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("MODE") PORT_CODE(KEYCODE_ESC)
 	PORT_START("BIT7")   /* bit 7 */
 		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("STAT") PORT_CODE(KEYCODE_TILDE)
-		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("x-VAR") PORT_CODE(KEYCODE_LCONTROL)
+		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("x-VAR") PORT_CODE(KEYCODE_X)
 		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ALPHA") PORT_CODE(KEYCODE_CAPSLOCK)
 		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("DEL") PORT_CODE(KEYCODE_DEL)
 	PORT_START("ON")   /* ON */
@@ -481,6 +509,15 @@ static MACHINE_DRIVER_START( ti82 )
 	MDRV_VIDEO_UPDATE( ti82 )
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( ti83 )
+	MDRV_IMPORT_FROM( ti81 )
+	MDRV_CPU_REPLACE("maincpu", Z80, 6000000)		/* 6 MHz */
+	MDRV_CPU_PROGRAM_MAP(ti85_mem)
+	MDRV_CPU_IO_MAP(ti83_io)
+
+	MDRV_MACHINE_START( ti82 )
+	MDRV_VIDEO_UPDATE( ti82 )
+MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ti86 )
 	MDRV_IMPORT_FROM( ti85 )
@@ -546,7 +583,7 @@ ROM_START (ti83)
 	ROM_SYSTEM_BIOS( 6, "v110", "V 1.10" )
 	ROMX_LOAD( "ti83v110.bin", 0x10000, 0x40000, CRC(7faee2d2) SHA1(25b373b58523647bb7b904001d391615e0b79bee), ROM_BIOS(7) )
 	ROM_SYSTEM_BIOS( 7, "v110-2", "V 1.10 (2)" )
-    ROMX_LOAD( "ti83v110-2.rom", 0x10000, 0x40000, CRC(56182912) SHA1(4c77fb77f023502b685a49a8013568b494384b25), ROM_BIOS(7) )
+    ROMX_LOAD( "ti83v110-2.rom", 0x10000, 0x40000, CRC(56182912) SHA1(4c77fb77f023502b685a49a8013568b494384b25), ROM_BIOS(8) )
 	//Rom versions according to ticalc.org 1.02, 1.03, 1.04, 1.06, 1.07, 1.08, 1.10
 ROM_END
 
@@ -681,11 +718,12 @@ COMP( 1988, ti73,       0,      0,      ti85,   ti85,   0,      NULL,   "Texas I
 COMP( 1990, ti81,       0,      0,      ti81,   ti81,   0,      NULL,   "Texas Instruments",    "TI-81",                        0 )
 COMP( 1992, ti85,       0,      0,      ti85d,  ti85,   0,      ti85,   "Texas Instruments",    "TI-85",                        0 )
 COMP( 1993, ti82,       0,      0,      ti82,   ti82,   0,      NULL,   "Texas Instruments",    "TI-82",                        0 )
-COMP( 1996, ti83,       0,      0,      ti82,   ti82,   0,      NULL,   "Texas Instruments",    "TI-83",                        GAME_NOT_WORKING )
+COMP( 1996, ti83,       0,      0,      ti83,   ti82,   0,      NULL,   "Texas Instruments",    "TI-83",                        0 )
 COMP( 1997, ti86,       0,      0,      ti86d,  ti85,   0,      ti86,   "Texas Instruments",    "TI-86",                        0 )
-COMP( 1999, ti83p,      0,      0,      ti85,   ti85,   0,      NULL,   "Texas Instruments",    "TI-83 Plus",                   GAME_NOT_WORKING )
+COMP( 1999, ti83p,      0,      0,      ti83,   ti82,   0,      NULL,   "Texas Instruments",    "TI-83 Plus",                   GAME_NOT_WORKING )
 COMP( 2001, ti83pse,    0,      0,      ti85,   ti85,   0,      NULL,   "Texas Instruments",    "TI-83 Plus Silver Edition",    GAME_NOT_WORKING )
 //COMP( 2004, ti84p,      0,      0,      ti85,   ti85,   0,      NULL,   "Texas Instruments",    "TI-84 Plus",                   GAME_NOT_WORKING )
 COMP( 2004, ti84pse,    0,      0,      ti85,   ti85,   0,      NULL,   "Texas Instruments",    "TI-84 Plus Silver Edition",    GAME_NOT_WORKING )
+
 
 

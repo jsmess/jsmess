@@ -14,7 +14,7 @@ Skeleton drivers :
 
 System Driver Changes:
 ----------------------
-(none)
+- [TI85] TI-83 now works [Xander]
 
 
 

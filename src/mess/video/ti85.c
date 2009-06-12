@@ -18,6 +18,11 @@
 #define TI82_SCREEN_Y_SIZE	  64
 #define TI82_NUMBER_OF_FRAMES	   6
 
+#define TI83_VIDEO_MEMORY_SIZE	 768
+#define TI83_SCREEN_X_SIZE	  12
+#define TI83_SCREEN_Y_SIZE	  64
+#define TI83_NUMBER_OF_FRAMES	   6
+
 #define TI85_VIDEO_MEMORY_SIZE	1024
 #define TI85_SCREEN_X_SIZE	  16
 #define TI85_SCREEN_Y_SIZE	  64
@@ -144,6 +149,13 @@ PALETTE_INIT( ti85 )
 		ti_screen_y_size = TI82_SCREEN_Y_SIZE;
 		ti_number_of_frames = TI82_NUMBER_OF_FRAMES;
 	}
+	else if (!strncmp(machine->gamedrv->name, "ti83", 4))
+	{
+		ti_video_memory_size = TI83_VIDEO_MEMORY_SIZE;
+		ti_screen_x_size = TI83_SCREEN_X_SIZE;
+		ti_screen_y_size = TI83_SCREEN_Y_SIZE;
+		ti_number_of_frames = TI83_NUMBER_OF_FRAMES;
+	}
 	else if (!strncmp(machine->gamedrv->name, "ti86", 4))
 	{
 		ti_video_memory_size = TI86_VIDEO_MEMORY_SIZE;
@@ -241,4 +253,5 @@ VIDEO_UPDATE( ti82 )
 	                }
 	return 0;
 }
+
 

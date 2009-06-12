@@ -20,6 +20,7 @@ extern UINT8 ti82_video_buffer[0x300];
 
 MACHINE_START( ti81 );
 MACHINE_START( ti82 );
+MACHINE_START( ti83 );
 MACHINE_START( ti85 );
 MACHINE_START( ti86 );
 
@@ -45,6 +46,9 @@ WRITE8_HANDLER( ti81_port_0007_w);
  READ8_HANDLER( ti82_port_0002_r);
  READ8_HANDLER( ti82_port_0010_r);
  READ8_HANDLER( ti82_port_0011_r);
+ READ8_HANDLER( ti83_port_0000_r);
+ READ8_HANDLER( ti83_port_0002_r);
+ READ8_HANDLER( ti83_port_0003_r);
 WRITE8_HANDLER( ti85_port_0000_w);
 WRITE8_HANDLER( ti85_port_0001_w);
 WRITE8_HANDLER( ti85_port_0002_w);
@@ -58,7 +62,9 @@ WRITE8_HANDLER( ti86_port_0006_w);
 WRITE8_HANDLER( ti82_port_0002_w);
 WRITE8_HANDLER( ti82_port_0010_w);
 WRITE8_HANDLER( ti82_port_0011_w);
-
+WRITE8_HANDLER( ti83_port_0000_w);
+WRITE8_HANDLER( ti83_port_0002_w);
+WRITE8_HANDLER( ti83_port_0003_w);
 
 /*----------- defined in video/ti85.c -----------*/
 
