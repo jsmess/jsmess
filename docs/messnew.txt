@@ -2,7 +2,7 @@
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
-(none)
+- MMD-1 [Miodrag Milanovic]
 
 Skeleton drivers : 
 ------------------
@@ -13,7 +13,6 @@ Skeleton drivers :
 - Robotron Z9001 / KC85/1 / KC87
 - Canon Cat
 - Swyft
-- MMD-1
 
 System Driver Changes:
 ----------------------
