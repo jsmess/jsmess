@@ -1447,6 +1447,7 @@ $(MESSOBJ)/skeleton.a: \
 	$(MESS_DRIVERS)/exp85.o \
 	$(MESS_DRIVERS)/z9001.o \
 	$(MESS_DRIVERS)/cat.o \
+	$(MESS_DRIVERS)/mmd1.o \
 	
 #-------------------------------------------------
 # layout dependencies
