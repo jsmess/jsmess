@@ -86,6 +86,14 @@ static VIDEO_UPDATE( mm1 )
 	return 0;
 }
 
+static DMA8237_HRQ_CHANGED( dma_hrq_changed )
+{
+	cputag_set_input_line( device->machine, I8085_TAG, INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE );
+
+	/* Assert HLDA */
+	dma8237_set_hlda( device, state );
+}
+
 static DMA8237_MEM_READ( memory_dma_r )
 {
 	const address_space *program = cputag_get_address_space(device->machine, I8085_TAG, ADDRESS_SPACE_PROGRAM);
@@ -136,8 +144,8 @@ static DMA8237_OUT_EOP( dma_eop_w )
 
 static const struct dma8237_interface mm1_dma8237_intf =
 {
-	I8085_TAG,
-	1.0e-6, // 1us???
+	XTAL_14_31818MHz/3, /* this needs to be verified */
+	dma_hrq_changed,
 	memory_dma_r,
 	memory_dma_w,
 	{ NULL, NULL, NULL, NULL },

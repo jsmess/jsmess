@@ -59,10 +59,15 @@
 	} while (0)
 
 static struct {
+	const device_config *maincpu;
 	const device_config	*pic8259_master;
 	const device_config	*pic8259_slave;
 	const device_config	*dma8237;
 	const device_config	*pit8253;
+	/* U73 is an LS74 - dual flip flop */
+	/* Q2 is set by OUT1 from the 8253 and goes to DRQ1 on the 8237 */
+	UINT8	u73_q2;
+	UINT8	out1;
 } pc_devices;
 
 /*************************************************************************
@@ -94,6 +99,15 @@ WRITE8_HANDLER(pc_page_w)
 		dma_offset[0][0] = dma_offset[0][1] = data;
 		break;
 	}
+}
+
+
+static DMA8237_HRQ_CHANGED( pc_dma_hrq_changed )
+{
+	cpu_set_input_line(pc_devices.maincpu, INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+
+	/* Assert HLDA */
+	dma8237_set_hlda( device, state );
 }
 
 
@@ -141,22 +155,29 @@ static DMA8237_CHANNEL_WRITE( pc_dma8237_hdc_dack_w )
 }
 
 
+static DMA8237_CHANNEL_WRITE( pc_dma8237_0_dack_w )
+{
+	pc_devices.u73_q2 = 0;
+	dma8237_drq_write( pc_devices.dma8237, 0, pc_devices.u73_q2 );
+}
+
+
 static DMA8237_OUT_EOP( pc_dma8237_out_eop )
 {
-	pc_fdc_set_tc_state( device->machine, state );
+	pc_fdc_set_tc_state( device->machine, state == ASSERT_LINE ? 0 : 1 );
 }
 
 
 const struct dma8237_interface ibm5150_dma8237_config =
 {
-	0,
-	1.0e-6, // 1us
+	XTAL_14_31818MHz/3,
 
+	pc_dma_hrq_changed,
 	pc_dma_read_byte,
 	pc_dma_write_byte,
 
-	{ 0, 0, pc_dma8237_fdc_dack_r, pc_dma8237_hdc_dack_r },
-	{ 0, 0, pc_dma8237_fdc_dack_w, pc_dma8237_hdc_dack_w },
+	{ NULL, NULL, pc_dma8237_fdc_dack_r, pc_dma8237_hdc_dack_r },
+	{ pc_dma8237_0_dack_w, NULL, pc_dma8237_fdc_dack_w, pc_dma8237_hdc_dack_w },
 	pc_dma8237_out_eop
 };
 
@@ -271,7 +292,7 @@ void pc_speaker_set_input(running_machine *machine, UINT8 data)
  *
  *************************************************************/
 
-static PIT8253_OUTPUT_CHANGED( ibm5150_timer0_w )
+static PIT8253_OUTPUT_CHANGED( ibm5150_pit8253_out0_changed )
 {
 	pic8259_set_irq_line(pc_devices.pic8259_master, 0, state);
 }
@@ -279,7 +300,13 @@ static PIT8253_OUTPUT_CHANGED( ibm5150_timer0_w )
 
 static PIT8253_OUTPUT_CHANGED( ibm5150_pit8253_out1_changed )
 {
-	/* Trigger DMA channel #0 */
+ 	/* Trigger DMA channel #0 */
+	if ( pc_devices.out1 == 0 && state == 1 && pc_devices.u73_q2 == 0 )
+	{
+		pc_devices.u73_q2 = 1;
+		dma8237_drq_write( pc_devices.dma8237, 0, pc_devices.u73_q2 );
+	}
+	pc_devices.out1 = state;
 }
 
 
@@ -294,7 +321,7 @@ const struct pit8253_config ibm5150_pit8253_config =
 	{
 		{
 			XTAL_14_31818MHz/12,				/* heartbeat IRQ */
-			ibm5150_timer0_w
+			ibm5150_pit8253_out0_changed
 		}, {
 			XTAL_14_31818MHz/12,				/* dram refresh */
 			ibm5150_pit8253_out1_changed
@@ -317,7 +344,7 @@ const struct pit8253_config pcjr_pit8253_config =
 	{
 		{
 			XTAL_14_31818MHz/12,              /* heartbeat IRQ */
-			ibm5150_timer0_w
+			ibm5150_pit8253_out0_changed
 		}, {
 			XTAL_14_31818MHz/12,              /* dram refresh */
 			NULL
@@ -1322,12 +1349,16 @@ MACHINE_START( pc )
 MACHINE_RESET( pc )
 {
 	const device_config *speaker = devtag_get_device(machine, "speaker");
-	cpu_set_irq_callback(machine->cpu[0], pc_irq_callback);
+
+	pc_devices.maincpu = devtag_get_device(machine, "maincpu" );
+	cpu_set_irq_callback(pc_devices.maincpu, pc_irq_callback);
 
 	pc_devices.pic8259_master = devtag_get_device(machine, "pic8259_master");
 	pc_devices.pic8259_slave = devtag_get_device(machine, "pic8259_slave");
 	pc_devices.dma8237 = devtag_get_device(machine, "dma8237");
 	pc_devices.pit8253 = devtag_get_device(machine, "pit8253");
+	pc_devices.u73_q2 = 0;
+	pc_devices.out1 = 0;
 	pc_mouse_set_serial_port( devtag_get_device(machine, "ins8250_0") );
 	pc_hdc_set_dma8237_device( pc_devices.dma8237 );
 	speaker_level_w( speaker, 0 );

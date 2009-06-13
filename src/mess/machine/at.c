@@ -37,6 +37,7 @@
 #define LOG_KBDC	0
 
 static struct {
+	const device_config *maincpu;
 	const device_config	*pic8259_master;
 	const device_config	*pic8259_slave;
 	const device_config	*dma8237_1;
@@ -245,6 +246,14 @@ WRITE8_HANDLER(at_page8_w)
 }
 
 
+static DMA8237_HRQ_CHANGED( pc_dma_hrq_changed )
+{
+	cpu_set_input_line(at_devices.maincpu, INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+
+	/* Assert HLDA */
+	dma8237_set_hlda( device, state );
+}
+
 static DMA8237_MEM_READ( pc_dma_read_byte )
 {
 	UINT8 result;
@@ -292,9 +301,9 @@ static DMA8237_OUT_EOP( at_dma8237_out_eop ) {
 
 const struct dma8237_interface at_dma8237_1_config =
 {
-	0,
-	1.0e-6, // 1us
+	XTAL_14_31818MHz/3,
 
+	pc_dma_hrq_changed,
 	pc_dma_read_byte,
 	pc_dma_write_byte,
 
@@ -307,9 +316,9 @@ const struct dma8237_interface at_dma8237_1_config =
 /* TODO: How is this hooked up in the actual machine? */
 const struct dma8237_interface at_dma8237_2_config =
 {
-	0, 
-	1.0e-6, // 1us 
+	XTAL_14_31818MHz/3,
 
+	pc_dma_hrq_changed,
 	pc_dma_read_byte,
 	pc_dma_write_byte,
 
@@ -613,6 +622,7 @@ WRITE8_HANDLER(at_kbdc8042_w)
 		break;
 
 	case 4:		/* A2 is wired to 8042 A0 */
+printf("8042 command %02x\n", data );
 		upi41_master_w( cputag_get_cpu(space->machine, "kbdc8042"), 1, data );
 		break;
     }
@@ -774,6 +784,7 @@ MACHINE_START( at )
 
 MACHINE_RESET( at )
 {
+	at_devices.maincpu = devtag_get_device(machine, "maincpu");
 	at_devices.pic8259_master = devtag_get_device(machine, "pic8259_master");
 	at_devices.pic8259_slave = devtag_get_device(machine, "pic8259_slave");
 	at_devices.dma8237_1 = devtag_get_device(machine, "dma8237_1");
