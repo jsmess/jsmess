@@ -87,7 +87,7 @@ static const device_config *mc6845;
 static WRITE8_HANDLER( camplynx_bank_w )
 {
 /* This is very incomplete, just enough to get the computer working.
-	Also, as it happens twice for every scanline of every character,
+	Also, as it happens 6 times for every scanline of every character,
 	it causes a huge slowdown. */
 
 	if (!data)
@@ -116,8 +116,6 @@ static ADDRESS_MAP_START( camp96_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x6000,0xdfff) AM_RAM
 	AM_RANGE(0x6000,0x7fff) AM_RAM
 	AM_RANGE(0x8000,0xffff) AM_RAMBANK(1)
-//	AM_RANGE(0xe000,0xffff) AM_ROM
-//	AM_RANGE(0x8000,0x9fff) AM_BASE(&videoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( camplynx_io , ADDRESS_SPACE_IO, 8)
@@ -224,7 +222,7 @@ static MACHINE_RESET( camplynx )
 {
 }
 
-static const UINT8 camplynx_palette[16*3] =
+static const UINT8 camplynx_palette[8*3] =
 {
 	0x00, 0x00, 0x00,	/*  0 Black		*/
 	0x00, 0x00, 0xff,	/*  1 Blue		*/
