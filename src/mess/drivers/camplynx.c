@@ -62,8 +62,8 @@
 
 	The work so far is without the benefit of manuals, schematic etc [Robbbert]
 
-	Sound is working. The cassette save also uses the sound dac, but the
-	output should be redirected to the cassette. This isn't done yet.
+	Cassette operation is strange indeed. Save takes the dac output and directs
+	it to the tape. Load takes over line 0 of the keyboard and uses bits 0 and 5.
 
 	To Do:
 	128k, 96k: everything
@@ -84,25 +84,46 @@
 
 static const device_config *mc6845;
 
+static WRITE8_HANDLER( camplynx_bank_w )
+{
+/* This is very incomplete, just enough to get the computer working.
+	Also, as it happens twice for every scanline of every character,
+	it causes a huge slowdown. */
+
+	if (!data)
+		memory_set_bank(space->machine, 1, 0);
+	else
+	if (data & 2)
+		memory_set_bank(space->machine, 1, 1);
+	else
+	if (data & 4)
+		memory_set_bank(space->machine, 1, 2);
+	else
+		logerror("cannot understand bankswitch command %X\n",data);
+}
+
+
 static ADDRESS_MAP_START( camplynx_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000,0x5fff) AM_ROM
-	AM_RANGE(0x6000,0xffff) AM_RAM
-	AM_RANGE(0x8000,0x9fff) AM_BASE(&videoram)
+	AM_RANGE(0x6000,0x7fff) AM_RAM
+	AM_RANGE(0x8000,0xffff) AM_RAMBANK(1)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( camp96_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000,0x5fff) AM_ROM
 	AM_RANGE(0x6000,0xdfff) AM_RAM
-	AM_RANGE(0xe000,0xffff) AM_ROM
-	AM_RANGE(0x8000,0x9fff) AM_BASE(&videoram)
+	AM_RANGE(0x6000,0x7fff) AM_RAM
+	AM_RANGE(0x8000,0xffff) AM_RAMBANK(1)
+//	AM_RANGE(0xe000,0xffff) AM_ROM
+//	AM_RANGE(0x8000,0x9fff) AM_BASE(&videoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( camplynx_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x007f,0x007f) AM_MIRROR(0xff00) AM_WRITE(SMH_NOP)	/* these 2 seem to be */
-	AM_RANGE(0x0080,0x0080) AM_MIRROR(0xff00) AM_WRITE(SMH_NOP)	/* for bankswitching */
+	AM_RANGE(0x007f,0x007f) AM_MIRROR(0xff00) AM_WRITE(camplynx_bank_w)
+	AM_RANGE(0x0080,0x0080) AM_MIRROR(0xff00) AM_WRITE(SMH_NOP)		/* to be emulated */
 	AM_RANGE(0x0080,0x0080) AM_READ_PORT("LINE0")
 	AM_RANGE(0x0180,0x0180) AM_READ_PORT("LINE1")
 	AM_RANGE(0x0280,0x0280) AM_READ_PORT("LINE2")
@@ -203,25 +224,49 @@ static MACHINE_RESET( camplynx )
 {
 }
 
+static const UINT8 camplynx_palette[16*3] =
+{
+	0x00, 0x00, 0x00,	/*  0 Black		*/
+	0x00, 0x00, 0xff,	/*  1 Blue		*/
+	0xff, 0x00, 0x00,	/*  2 Red		*/
+	0xff, 0x00, 0xff,	/*  3 Magenta		*/
+	0x00, 0xff, 0x00,	/*  4 Green		*/
+	0x00, 0xff, 0xff,	/*  5 Cyan		*/
+	0xff, 0xff, 0x00,	/*  6 Yellow		*/
+	0xff, 0xff, 0xff,	/*  7 White		*/
+};
+
+static PALETTE_INIT( camplynx )
+{
+	UINT8 r, b, g, i=0, color_count = 8;
+
+	while (color_count--)
+	{
+		r = camplynx_palette[i++]; g = camplynx_palette[i++]; b = camplynx_palette[i++];
+		palette_set_color(machine, 7-color_count, MAKE_RGB(r, g, b));
+	}
+}
+
 static MC6845_UPDATE_ROW( camplynx_update_row )
 {
-	UINT8 gfx,fg=1,bg=0;
-
+	UINT8 *RAM = memory_region(device->machine, "maincpu");
+	UINT8 r,g,b;
 	UINT16 x, *p = BITMAP_ADDR16(bitmap, y, 0);
 
 	for (x = (y << 5); x < x_count + (y << 5); x++)
 	{
-		gfx = videoram[x];
-			if (x == cursor_x) gfx^=0xff;	// not used - cursor is generated in software
+		r = RAM[0x14000|x];
+		g = RAM[0x1c000|x];
+		b = RAM[0x10000|x];
 
-			*p = ( gfx & 0x80 ) ? fg : bg; p++;
-			*p = ( gfx & 0x40 ) ? fg : bg; p++;
-			*p = ( gfx & 0x20 ) ? fg : bg; p++;
-			*p = ( gfx & 0x10 ) ? fg : bg; p++;
-			*p = ( gfx & 0x08 ) ? fg : bg; p++;
-			*p = ( gfx & 0x04 ) ? fg : bg; p++;
-			*p = ( gfx & 0x02 ) ? fg : bg; p++;
-			*p = ( gfx & 0x01 ) ? fg : bg; p++;
+		*p = ((r & 0x80) ? 2 : 0) | ((g & 0x80) ? 4 : 0) | ((b & 0x80) ? 1 : 0); p++;
+		*p = ((r & 0x40) ? 2 : 0) | ((g & 0x40) ? 4 : 0) | ((b & 0x40) ? 1 : 0); p++;
+		*p = ((r & 0x20) ? 2 : 0) | ((g & 0x20) ? 4 : 0) | ((b & 0x20) ? 1 : 0); p++;
+		*p = ((r & 0x10) ? 2 : 0) | ((g & 0x10) ? 4 : 0) | ((b & 0x10) ? 1 : 0); p++;
+		*p = ((r & 0x08) ? 2 : 0) | ((g & 0x08) ? 4 : 0) | ((b & 0x08) ? 1 : 0); p++;
+		*p = ((r & 0x04) ? 2 : 0) | ((g & 0x04) ? 4 : 0) | ((b & 0x04) ? 1 : 0); p++;
+		*p = ((r & 0x02) ? 2 : 0) | ((g & 0x02) ? 4 : 0) | ((b & 0x02) ? 1 : 0); p++;
+		*p = ((r & 0x01) ? 2 : 0) | ((g & 0x01) ? 4 : 0) | ((b & 0x01) ? 1 : 0); p++;
 	}
 }
 
@@ -266,8 +311,8 @@ static MACHINE_DRIVER_START( camplynx )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(512, 480)
 	MDRV_SCREEN_VISIBLE_AREA(0, 511, 0, 479)
-	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(black_and_white)
+	MDRV_PALETTE_LENGTH(8)
+	MDRV_PALETTE_INIT(camplynx)
 
 	MDRV_MC6845_ADD("crtc", MC6845, XTAL_12MHz / 8 /*? dot clock divided by dots per char */, camplynx_crtc6845_interface)
 
@@ -287,21 +332,25 @@ static MACHINE_DRIVER_START( camp96 )
 	MDRV_CPU_PROGRAM_MAP(camp96_mem)
 MACHINE_DRIVER_END
 
+static DRIVER_INIT( camplynx )
+{
+	UINT8 *RAM = memory_region(machine, "maincpu");
+	memory_configure_bank(machine, 1, 0, 3, &RAM[0x8000],  0x8000);
+}
+
 /* ROM definition */
 ROM_START( camplynx )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x30000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "lynx48-1.rom", 0x0000, 0x2000, CRC(56feec44) SHA1(7ded5184561168e159a30fa8e9d3fde5e52aa91a) )
 	ROM_LOAD( "lynx48-2.rom", 0x2000, 0x2000, CRC(d894562e) SHA1(c08a78ecb4eb05baa4c52488fce3648cd2688744) )
-	ROM_FILL(0x8cf,1,0xc9)	// cheap rotten hack
 ROM_END
 
 ROM_START( camply96 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x30000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "lynx96-1.rom", 0x0000, 0x2000, CRC(56feec44) SHA1(7ded5184561168e159a30fa8e9d3fde5e52aa91a) )
 	ROM_LOAD( "lynx96-2.rom", 0x2000, 0x2000, CRC(d894562e) SHA1(c08a78ecb4eb05baa4c52488fce3648cd2688744) )
 	ROM_LOAD( "lynx96-3.rom", 0x4000, 0x2000, CRC(21f11709) SHA1(f86a729b01de286197c550974f7825c12815a4f4) )
 	ROM_LOAD( "dosrom.rom", 0xe000, 0x2000, CRC(011e106a) SHA1(e77f0ca99790551a7122945f3194516b2390fb69) )
-	ROM_FILL(0x8cf,1,0xc9)	// cheap rotten hack
 ROM_END
 
 ROM_START( camply128 )
@@ -328,6 +377,6 @@ SYSTEM_CONFIG_END
 
 /* Driver */
 /*    YEAR  NAME       PARENT     COMPAT   MACHINE    INPUT     INIT  CONFIG    COMPANY       FULLNAME     FLAGS */
-COMP( 1983, camplynx,  0,         0,       camplynx,  camplynx, 0,    camp48,   "Camputers",  "Lynx 48",   GAME_NOT_WORKING)
-COMP( 1983, camply96,  camplynx,  0,       camp96,    camplynx, 0,    camp96,   "Camputers",  "Lynx 96",   GAME_NOT_WORKING)
+COMP( 1983, camplynx,  0,         0,       camplynx,  camplynx, camplynx,    camp48,   "Camputers",  "Lynx 48",   GAME_NOT_WORKING)
+COMP( 1983, camply96,  camplynx,  0,       camp96,    camplynx, camplynx,    camp96,   "Camputers",  "Lynx 96",   GAME_NOT_WORKING)
 COMP( 1983, camply128, camplynx,  0,       camp96,    camplynx, 0,    camp128,  "Camputers",  "Lynx 128",  GAME_NOT_WORKING)
