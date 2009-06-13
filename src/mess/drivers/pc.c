@@ -2591,8 +2591,8 @@ COMP(  1986,	pc1512,		ibm5150,	0,	pc1512,     pc1512,		pc1512,		ibm5160, "Amstra
 COMP(  198?,	pc1512v2,	ibm5150,	0,	pc1512,     pc1512,		pc1512,		ibm5160, "Amstrad plc",  "Amstrad PC1512 (version 2)", GAME_NOT_WORKING)
 COMP(  1987,	pc1640,		ibm5150,	0,	pc1640,     pc1640,		pc1640,		ibm5160, "Amstrad plc",  "Amstrad PC1640 / PC6400 (US)", GAME_NOT_WORKING )
 // pc2086 pc1512 with vga??
-COMP(  1987,	pc,			ibm5150,	0,	pccga,		pccga,		pccga,		ibm5160, "MESS",  "PC (CGA)" , 0)
-COMP ( 1987,	pcmda,		ibm5150,	0,	pcmda,      pcmda,		ibm5150,    ibm5160, "MESS",  "PC (MDA)" , 0)
-COMP ( 1987,    pcherc,		ibm5150,	0,	pcherc,     pcmda,      ibm5150,	ibm5160, "MESS",  "PC (Hercules)" , 0)
+COMP(  1987,	pc,			ibm5150,	0,	pccga,		pccga,		pccga,		ibm5160, "Generic",  "PC (CGA)" , 0)
+COMP ( 1987,	pcmda,		ibm5150,	0,	pcmda,      pcmda,		ibm5150,    ibm5160, "Generic",  "PC (MDA)" , 0)
+COMP ( 1987,    pcherc,		ibm5150,	0,	pcherc,     pcmda,      ibm5150,	ibm5160, "Generic",  "PC (Hercules)" , 0)
 COMP ( 1987,	xtvga,		ibm5150,	0,	xtvga,      xtvga,		pc_vga,		ibm5160, "",  "PC/XT (VGA, MF2 Keyboard)" , GAME_NOT_WORKING)
 
