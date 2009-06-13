@@ -80,7 +80,7 @@ static UINT32 d77_get_sector_offset(floppy_image* floppy, int head, int track, i
 	if(offset > tag->image_size)
 		return 0;
 
-	logerror("d77_get_sector_offset - returns %08x\n",offset+16);
+	logerror("d77_get_sector_offset - track %i, side %i, returns %08x\n",track,head,offset+16);
 	return offset + 16;	
 }
 
@@ -134,7 +134,6 @@ static floperr_t d77_read_sector(floppy_image *floppy, int head, int track, int 
 
 static floperr_t d77_read_indexed_sector(floppy_image *floppy, int head, int track, int sector, void *buffer, size_t buffer_len)
 {
-	logerror("D77: about to read track %i, sector %02x, side %i\n",track,sector,head);
 	return d77_read_sector(floppy,head,track,sector,buffer,buffer_len);
 }
 

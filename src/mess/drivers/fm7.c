@@ -844,7 +844,7 @@ static ADDRESS_MAP_START( fm7_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfd38,0xfd3f) AM_READWRITE(fm7_palette_r,fm7_palette_w)
 	AM_RANGE(0xfd40,0xfdff) AM_READ(fm7_unknown_r)
 	// Boot ROM
-	AM_RANGE(0xfe00,0xffdf) AM_ROM AM_REGION("basic",0x0000)
+	AM_RANGE(0xfe00,0xffdf) AM_ROMBANK(2)
 	AM_RANGE(0xffe0,0xffef) AM_RAM
 	AM_RANGE(0xfff0,0xffff) AM_READWRITE(vector_r,vector_w) 
 ADDRESS_MAP_END
@@ -993,6 +993,20 @@ INPUT_PORTS_START( fm7 )
   PORT_BIT(0x00000008,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("CAP") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE 
   PORT_BIT(0x00000010,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("GRAPH") PORT_CODE(KEYCODE_RALT) 
   PORT_BIT(0x00000020,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Kana") PORT_CODE(KEYCODE_RCONTROL) PORT_TOGGLE
+
+  PORT_START("DSW")
+  PORT_DIPNAME(0x01,0x00,"Switch A") PORT_DIPLOCATION("SWA:1")
+  PORT_DIPSETTING(0x00,DEF_STR( Off ))
+  PORT_DIPSETTING(0x01,DEF_STR( On ))
+  PORT_DIPNAME(0x02,0x00,"Boot mode") PORT_DIPLOCATION("SWA:2")
+  PORT_DIPSETTING(0x00,"BASIC")
+  PORT_DIPSETTING(0x02,"DOS")
+  PORT_DIPNAME(0x04,0x00,"FM-8 Compatibility mode") PORT_DIPLOCATION("SWA:3")
+  PORT_DIPSETTING(0x00,DEF_STR( Off ))
+  PORT_DIPSETTING(0x04,DEF_STR( On ))
+  PORT_DIPNAME(0x08,0x00,"Switch D") PORT_DIPLOCATION("SWA:4")
+  PORT_DIPSETTING(0x00,DEF_STR( Off ))
+  PORT_DIPSETTING(0x08,DEF_STR( On ))
 INPUT_PORTS_END
 
 static DRIVER_INIT(fm7)
@@ -1040,6 +1054,16 @@ static MACHINE_RESET(fm7)
 	fm7_psg_regsel = 0;
 	fdc_side = 0;
 	fdc_drive = 0;
+	
+	// set boot mode
+	if(input_port_read(machine,"DSW") & 0x02)
+	{  // DOS mode
+		memory_set_bankptr(machine,2,memory_region(machine,"dos"));
+	}
+	else
+	{  // BASIC mode
+		memory_set_bankptr(machine,2,memory_region(machine,"basic"));
+	}
 }
 
 static VIDEO_START( fm7 )
