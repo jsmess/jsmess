@@ -275,12 +275,13 @@ READ8_HANDLER( fm7_fd04_r )
 
 READ8_HANDLER( fm7_subintf_r )
 {
-	UINT8 ret = 0;
+	UINT8 ret = 0x00;
 	
 	if(sub_busy != 0 || sub_halt != 0)
 		ret |= 0x80;
 		
-//	ret |= 0x01; // EXTDET (not implemented yet)
+	ret |= 0x7e;
+	//ret |= 0x01; // EXTDET (not implemented yet)
 	
 	return ret;
 }
@@ -444,9 +445,12 @@ READ8_HANDLER( fm7_fdc_r )
 		case 3:
 			return wd17xx_data_r(dev,offset);
 		case 4:
-			return fdc_side;
+			return fdc_side | 0xfe;
 		case 5:
 			return fdc_drive;
+		case 6:
+			// FM-7 always returns 0xff for this register
+			return 0xff;
 		case 7:
 			if(fdc_irq_flag != 0)
 				ret |= 0x40;
@@ -490,8 +494,16 @@ WRITE8_HANDLER( fm7_fdc_w )
 			else
 			{
 				wd17xx_set_drive(dev,data & 0x03);
+				floppy_drive_set_motor_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, data & 0x03), data & 0x80);
+				floppy_drive_set_ready_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, data & 0x03), data & 0x80,0);
 				logerror("FDC: wrote %02x to 0x%04x (drive)\n",data,offset+0xfd18);
 			}
+			break;
+		case 6:
+			// FM77AV and later only. FM-7 returns 0xff;
+			// bit 6 = 320k(1)/640k(0) FDD
+			// bits 2,3 = logical drive 
+			logerror("FDC: mode write - %02x\n",data);
 			break;
 		default:
 			logerror("FDC: wrote %02x to 0x%04x\n",data,offset+0xfd18);
@@ -822,13 +834,13 @@ static ADDRESS_MAP_START( fm7_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfd03,0xfd03) AM_READ(fm7_irq_cause_r)  // IRQ flags
 	AM_RANGE(0xfd04,0xfd04) AM_READ(fm7_fd04_r)
 	AM_RANGE(0xfd05,0xfd05) AM_READWRITE(fm7_subintf_r,fm7_subintf_w)
-	AM_RANGE(0xfd07,0xfd07) AM_RAM
+	AM_RANGE(0xfd06,0xfd0c) AM_READ(fm7_unknown_r)
 	AM_RANGE(0xfd0d,0xfd0d) AM_READWRITE(fm7_psg_select_r,fm7_psg_select_w)
 	AM_RANGE(0xfd0e,0xfd0e) AM_READWRITE(fm7_psg_data_r, fm7_psg_data_w)
 	AM_RANGE(0xfd0f,0xfd0f) AM_READWRITE(fm7_rom_en_r,fm7_rom_en_w)
-	AM_RANGE(0xfd15,0xfd16) AM_READ(fm7_unknown_r)
+	AM_RANGE(0xfd10,0xfd17) AM_READ(fm7_unknown_r)
 	AM_RANGE(0xfd18,0xfd1f) AM_READWRITE(fm7_fdc_r,fm7_fdc_w)
-	AM_RANGE(0xfd24,0xfd2b) AM_RAM
+	AM_RANGE(0xfd24,0xfd37) AM_READ(fm7_unknown_r)
 	AM_RANGE(0xfd38,0xfd3f) AM_READWRITE(fm7_palette_r,fm7_palette_w)
 	AM_RANGE(0xfd40,0xfdff) AM_READ(fm7_unknown_r)
 	// Boot ROM

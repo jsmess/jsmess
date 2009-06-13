@@ -47,20 +47,16 @@ static struct d77_tag *get_d77_tag(floppy_image *floppy)
 
 static int d77_get_tracks_per_disk(floppy_image *floppy)
 {
-	logerror("d77_get_tracks_per_disk\n");
 	return 82;  // 82 tracks per side
 }
 
 static int d77_get_heads_per_disk(floppy_image *floppy)
 {
-	logerror("d77_get_heads_per_disk\n");
 	return 2;  // 2 heads
 }
 
 static floperr_t d77_get_sector_length(floppy_image *floppy, int head, int track, int sector, UINT32 *sector_length)
 {
-	logerror("d77_get_sector_length\n");
-	
 	*sector_length = 256;  // 256 byte sectors
 	return FLOPPY_ERROR_SUCCESS;
 }
@@ -68,7 +64,6 @@ static floperr_t d77_get_sector_length(floppy_image *floppy, int head, int track
 static floperr_t d77_read_track(floppy_image *floppy, int head, int track, UINT64 offset, void *buffer, size_t buflen)
 {
 //	floperr_t err;
-	logerror("d77_read_track\n");
 	
 	return FLOPPY_ERROR_UNSUPPORTED;
 }
@@ -100,6 +95,9 @@ static floperr_t d77_get_indexed_sector_info(floppy_image *floppy, int head, int
 	
 	if(offset > tag->image_size)
 		return FLOPPY_ERROR_SEEKERROR;
+		
+	if(sector_index >= 16)
+		return FLOPPY_ERROR_SEEKERROR;
 
 	floppy_image_read(floppy,sector_hdr,offset,16);
 
@@ -120,7 +118,6 @@ static floperr_t d77_read_sector(floppy_image *floppy, int head, int track, int 
 	UINT64 offset;
 	UINT8 sector_data[256];
 	
-	logerror("d77_read_sector\n");
 	offset = d77_get_sector_offset(floppy,head,track,sector);
 	if(offset == 0)
 		return FLOPPY_ERROR_SEEKERROR;
@@ -137,7 +134,7 @@ static floperr_t d77_read_sector(floppy_image *floppy, int head, int track, int 
 
 static floperr_t d77_read_indexed_sector(floppy_image *floppy, int head, int track, int sector, void *buffer, size_t buffer_len)
 {
-	logerror("d77_read_indexed_sector\n");
+	logerror("D77: about to read track %i, sector %02x, side %i\n",track,sector,head);
 	return d77_read_sector(floppy,head,track,sector,buffer,buffer_len);
 }
 
@@ -146,7 +143,6 @@ static void d77_get_header(floppy_image* floppy,UINT32* size, UINT8* prot, UINT8
 	UINT8 header[D77_HEADER_LEN];
 	int x,s;
 	
-	logerror("d77_get_header\n");
 	floppy_image_read(floppy,header,0,D77_HEADER_LEN);
 
 	if(prot)
@@ -179,7 +175,6 @@ static void d77_get_header(floppy_image* floppy,UINT32* size, UINT8* prot, UINT8
 FLOPPY_IDENTIFY(fm7_d77_identify)
 {
 	UINT32 size;
-	logerror("d77_identify\n");
 	
 	d77_get_header(floppy,&size,NULL,NULL,NULL);	
 	
@@ -204,7 +199,6 @@ FLOPPY_CONSTRUCT(fm7_d77_construct)
 	UINT32 offs[164];
 	int x;
 	
-	logerror("d77_construct\n");
 	if(params)
 	{
 		// create
