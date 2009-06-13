@@ -62,21 +62,25 @@
 
 	The work so far is without the benefit of manuals, schematic etc [Robbbert]
 
+	Sound is working. The cassette save also uses the sound dac, but the
+	output should be redirected to the cassette. This isn't done yet.
+
 	To Do:
 	128k, 96k: everything
 
 	48k:
 	- find Break key
 	- colour
-	- sound
 	- banking
 	- devices (cassette, disk)
+	- find out the mc6845 clock frequency
 
 ****************************************************************************/
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "video/mc6845.h"
+#include "sound/dac.h"
 
 static const device_config *mc6845;
 
@@ -109,7 +113,7 @@ static ADDRESS_MAP_START( camplynx_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0780,0x0780) AM_READ_PORT("LINE7")
 	AM_RANGE(0x0880,0x0880) AM_READ_PORT("LINE8")
 	AM_RANGE(0x0980,0x0980) AM_READ_PORT("LINE9")
-	AM_RANGE(0x0084,0x0084) AM_MIRROR(0xff00) AM_NOP	/* unknown purpose */
+	AM_RANGE(0x0084,0x0084) AM_MIRROR(0xff00) AM_DEVWRITE("dac", dac_w)	/* 6-bit dac */
 	AM_RANGE(0x0086,0x0086) AM_MIRROR(0xff00) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x0087,0x0087) AM_MIRROR(0xff00) AM_DEVREADWRITE("crtc", mc6845_register_r,mc6845_register_w)
 ADDRESS_MAP_END
@@ -269,6 +273,12 @@ static MACHINE_DRIVER_START( camplynx )
 
 	MDRV_VIDEO_START(camplynx)
 	MDRV_VIDEO_UPDATE(camplynx)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD("dac", DAC, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( camp96 )
