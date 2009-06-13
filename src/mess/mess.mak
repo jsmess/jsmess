@@ -1407,6 +1407,7 @@ $(MESSOBJ)/skeleton.a: \
 	$(MESS_DRIVERS)/fk1.o \
 	$(MESS_DRIVERS)/fm7.o \
 	$(MESS_FORMATS)/fm7_cas.o \
+	$(MESS_FORMATS)/fm7_dsk.o \
 	$(MESS_DRIVERS)/fmtowns.o \
 	$(MESS_DRIVERS)/huebler.o \
 	$(MESS_DRIVERS)/interact.o \

@@ -34,6 +34,9 @@
 
 #include "devices/cassette.h"
 #include "formats/fm7_cas.h"
+#include "machine/wd17xx.h"
+#include "devices/mflopimg.h"
+#include "formats/fm7_dsk.h"
 
 // Interrupt flags
 #define IRQ_FLAG_KEY      0x01
@@ -68,6 +71,10 @@ static UINT8 break_flag;
 static UINT8 fm7_pal[8];
 static UINT8 fm7_psg_regsel;
 static UINT8 psg_data;
+static UINT8 fdc_side;
+static UINT8 fdc_drive;
+static UINT8 fdc_irq_flag;
+static UINT8 fdc_drq_flag;
 
 /* key scancode conversion table
  * The FM-7 expects different scancodes when shift,ctrl or graph is held, or
@@ -207,8 +214,8 @@ WRITE8_HANDLER( fm7_irq_mask_w )
  *   bit 3 - ???
  * On write: Buzzer/Speaker On/Off
  *   bit 0 - speaker on/off
- *   bit 1 - ??buzzer on/off
- *   bit 2 - ??buzzer on/off
+ *   bit 6 - ??buzzer on/off
+ *   bit 7 - ??buzzer on/off
  */
 READ8_HANDLER( fm7_irq_cause_r )
 {
@@ -273,7 +280,7 @@ READ8_HANDLER( fm7_subintf_r )
 	if(sub_busy != 0 || sub_halt != 0)
 		ret |= 0x80;
 		
-	ret |= 0x01; // EXTDET (not implemented yet)
+//	ret |= 0x01; // EXTDET (not implemented yet)
 	
 	return ret;
 }
@@ -400,25 +407,92 @@ WRITE8_HANDLER( fm7_crt_w )
 
 /*
  *  Main CPU: I/O ports 0xfd18 - 0xfd1f
- *  Floppy Disk Controller
- *  TODO: Implement FDC
+ *  Floppy Disk Controller (MB8877A)
  */
+WD17XX_CALLBACK( fm7_fdc_irq )
+{
+	switch(state)
+	{
+		case WD17XX_IRQ_CLR:
+			fdc_irq_flag = 0;
+			break;
+		case WD17XX_IRQ_SET:
+			fdc_irq_flag = 1;
+			break;
+		case WD17XX_DRQ_CLR:
+			fdc_drq_flag = 0;
+			break;
+		case WD17XX_DRQ_SET:
+			fdc_drq_flag = 1;
+			break;
+	}
+}
+ 
 READ8_HANDLER( fm7_fdc_r )
 {
+	const device_config* dev = devtag_get_device(space->machine,"fdc");
+	UINT8 ret = 0;
+	
 	switch(offset)
 	{
 		case 0:
-			return 0x80;  // drive not ready
-		default:
-			logerror("FDC: read from 0x%04x\n",offset+0xfd18);
+			return wd17xx_status_r(dev,offset);
+		case 1:
+			return wd17xx_track_r(dev,offset);
+		case 2:
+			return wd17xx_sector_r(dev,offset);
+		case 3:
+			return wd17xx_data_r(dev,offset);
+		case 4:
+			return fdc_side;
+		case 5:
+			return fdc_drive;
+		case 7:
+			if(fdc_irq_flag != 0)
+				ret |= 0x40;
+			if(fdc_drq_flag != 0)
+				ret |= 0x80;
+			return ret;
 	}
+	logerror("FDC: read from 0x%04x\n",offset+0xfd18);
+
 	return 0x00;
 }
 
 WRITE8_HANDLER( fm7_fdc_w )
 {
+	const device_config* dev = devtag_get_device(space->machine,"fdc");
 	switch(offset)
 	{
+		case 0:
+			wd17xx_command_w(dev,offset,data);
+			break;
+		case 1:
+			wd17xx_track_w(dev,offset,data);
+			break;
+		case 2:
+			wd17xx_sector_w(dev,offset,data);
+			break;
+		case 3:
+			wd17xx_data_w(dev,offset,data);
+			break;
+		case 4:
+			fdc_side = data & 0x01;
+			wd17xx_set_side(dev,data & 0x01);
+			logerror("FDC: wrote %02x to 0x%04x (side)\n",data,offset+0xfd18);
+			break;
+		case 5:
+			fdc_drive = data;
+			if((data & 0x03) > 0x01)
+			{
+				fdc_drive = 0;
+			}
+			else
+			{
+				wd17xx_set_drive(dev,data & 0x03);
+				logerror("FDC: wrote %02x to 0x%04x (drive)\n",data,offset+0xfd18);
+			}
+			break;
 		default:
 			logerror("FDC: wrote %02x to 0x%04x\n",data,offset+0xfd18);
 	}
@@ -536,7 +610,7 @@ WRITE8_HANDLER( fm7_cassette_printer_w )
  *  bit 1 = Red
  *  bit 0 = Blue
  */
-static READ8_HANDLER( fm7_palette_r)
+static READ8_HANDLER( fm7_palette_r )
 {
 	return fm7_pal[offset];
 }
@@ -952,6 +1026,8 @@ static MACHINE_RESET(fm7)
 	vram_offset = 0x0000;
 	break_flag = 0;
 	fm7_psg_regsel = 0;
+	fdc_side = 0;
+	fdc_drive = 0;
 }
 
 static VIDEO_START( fm7 )
@@ -1004,6 +1080,23 @@ PALETTE_INIT( fm7 )
 		fm7_pal[x] = x;
 }
 
+//static DEVICE_IMAGE_LOAD( fm7_floppy )
+//{
+//	if (device_load_basicdsk_floppy(image)==INIT_PASS)
+//	{
+		/* drive, tracks, heads, sectors per track, sector length, first sector id */
+//		basicdsk_set_geometry(image, 40, 2, 16, 256, 0x01, 0x2c0, FALSE);
+//		return INIT_PASS;
+//	}
+
+//	return INIT_FAIL;
+//}
+
+static const wd17xx_interface fm7_mb8877a_interface =
+{
+	fm7_fdc_irq,
+	NULL
+};
 
 static const ay8910_interface fm7_psg_intf =
 {
@@ -1021,6 +1114,31 @@ static const cassette_config fm7_cassette_config =
 	NULL,
 	CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED
 };
+
+static void fm7_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+{
+	switch(state)
+	{
+	case MESS_DEVINFO_INT_READABLE:
+		info->i = 1;
+		break;
+	case MESS_DEVINFO_INT_WRITEABLE:
+		info->i = 0;
+		break;
+	case MESS_DEVINFO_INT_CREATABLE:
+		info->i = 0;
+		break;
+	case MESS_DEVINFO_INT_COUNT:
+		info->i = 2;
+		break;
+	case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				
+		info->p = (void *) floppyoptions_fm7; 
+		break;
+	default:
+		floppy_device_getinfo(devclass, state, info);
+		break;
+	}
+}
 
 static MACHINE_DRIVER_START( fm7 )
 	/* basic machine hardware */
@@ -1057,6 +1175,8 @@ static MACHINE_DRIVER_START( fm7 )
 	MDRV_VIDEO_UPDATE(fm7)
 	
 	MDRV_CASSETTE_ADD("cass",fm7_cassette_config)
+	
+	MDRV_MB8877_ADD("fdc",fm7_mb8877a_interface)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( fm77av )
@@ -1145,6 +1265,7 @@ ROM_END
 
 
 static SYSTEM_CONFIG_START(fm7)
+	CONFIG_DEVICE(fm7_floppy_getinfo)
 SYSTEM_CONFIG_END
 
 
