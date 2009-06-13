@@ -1476,7 +1476,8 @@ $(MESS_DRIVERS)/mephisto.o:	$(MESS_LAYOUT)/mephisto.lh
 $(MESS_DRIVERS)/mk1.o:		$(MESS_LAYOUT)/mk1.lh
 $(MESS_DRIVERS)/mk2.o:		$(MESS_LAYOUT)/mk2.lh
 $(MESS_DRIVERS)/mpf1.o:		$(MESS_LAYOUT)/mpf1.lh
-$(MESS_DRIVERS)/mmd1.o:		$(MESS_LAYOUT)/mmd1.lh
+$(MESS_DRIVERS)/mmd1.o:		$(MESS_LAYOUT)/mmd1.lh \
+							$(MESS_LAYOUT)/mmd2.lh
 $(MESS_DRIVERS)/nc.o:		$(MESS_LAYOUT)/nc200.lh
 $(MESS_DRIVERS)/ngp.o:		$(MESS_LAYOUT)/ngp.lh
 $(MESS_DRIVERS)/palm.o:		$(MESS_LAYOUT)/palm.lh

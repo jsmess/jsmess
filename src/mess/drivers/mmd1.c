@@ -1,6 +1,6 @@
 /***************************************************************************
    
-        MMD-1 driver by Miodrag Milanovic
+        MMD-1 & MMD-2 driver by Miodrag Milanovic
 		
         12/05/2009 Initial version
 
@@ -9,6 +9,7 @@
 #include "driver.h"
 #include "cpu/i8085/i8085.h"
 #include "mmd1.lh"
+#include "mmd2.lh"
 
 WRITE8_HANDLER (mmd1_port0_w)
 {
@@ -86,6 +87,25 @@ static ADDRESS_MAP_START( mmd1_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE( 0x02, 0x02 ) AM_WRITE(mmd1_port2_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START(mmd2_mem, ADDRESS_SPACE_PROGRAM, 8)
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE( 0x0000, 0x03ff ) AM_RAM // WE0
+	AM_RANGE( 0x0400, 0x07ff ) AM_RAM // WE1
+	AM_RANGE( 0x0800, 0x0bff ) AM_RAM // WE2
+	AM_RANGE( 0x0c00, 0x0fff ) AM_RAM // WE3
+	
+	AM_RANGE( 0xd800, 0xdfff ) AM_ROM // ROM label 330
+	AM_RANGE( 0xe000, 0xe7ff ) AM_ROM // ROM label 340
+	AM_RANGE( 0xe800, 0xefff ) AM_RAM // ROM label 350
+	AM_RANGE( 0xf000, 0xf7ff ) AM_RAM // ROM label 360
+	AM_RANGE( 0xfc00, 0xfcff ) AM_RAM // System RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( mmd2_io , ADDRESS_SPACE_IO, 8)
+	ADDRESS_MAP_UNMAP_HIGH
+ADDRESS_MAP_END
+
+
 /* Input ports */
 INPUT_PORTS_START( mmd1 )
 	PORT_START("LINE1")
@@ -111,7 +131,33 @@ INPUT_PORTS_START( mmd1 )
 INPUT_PORTS_END
 
 
+INPUT_PORTS_START( mmd2 )
+/*
+DIP switches: 
+WE 0      - Write enable for addresses $0000..$03FF 
+WE 1      - Write enable for addresses $0400..$07FF 
+WE 2      - Write enable for addresses $0800..$0BFF 
+WE 3      - Write enable for addresses $0C00..$0FFF 
+SPARE     - ??? 
+HEX OCT   - choose display and entry to be in Hexadecimal or Octal 
+PUP RESET - ??? 
+EXEC USER - update binary LED's with data entry? Or not?
+(in either setting, outputs to ports 0,1,2 still show) 
+
+Keyboard
+0  1  2  3   	PREV  STORE  NEXT  STEP  
+4  5  6  7   	HIGH  LOW  GO  OPTION  
+8  9  A  B   	LOAD  DUMP  PROM  COPY  
+C  D  E  F   	MEM  REGS  AUX  CANCEL  
+
+*/
+INPUT_PORTS_END
+
 static MACHINE_RESET(mmd1) 
+{	
+}
+
+static MACHINE_RESET(mmd2) 
 {	
 }
 
@@ -127,7 +173,19 @@ static MACHINE_DRIVER_START( mmd1 )
 	MDRV_DEFAULT_LAYOUT(layout_mmd1)
 MACHINE_DRIVER_END
 
-static SYSTEM_CONFIG_START(mmd1)
+static MACHINE_DRIVER_START( mmd2 )
+    /* basic machine hardware */
+    MDRV_CPU_ADD("maincpu",8080, 6750000 / 9)
+    MDRV_CPU_PROGRAM_MAP(mmd2_mem)
+    MDRV_CPU_IO_MAP(mmd2_io)	
+
+    MDRV_MACHINE_RESET(mmd2)
+	
+	/* video hardware */
+	MDRV_DEFAULT_LAYOUT(layout_mmd2)
+MACHINE_DRIVER_END
+
+static SYSTEM_CONFIG_START(mmd2)
 SYSTEM_CONFIG_END
 
 /* ROM definition */
@@ -136,8 +194,17 @@ ROM_START( mmd1 )
     ROM_LOAD( "kex.ic15", 0x0000, 0x0100, CRC(434f6923) SHA1(a2af60deda54c8d3f175b894b47ff554eb37e9cb))
 ROM_END
 
+ROM_START( mmd2 )
+    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "mmd2330.bin", 0xd800, 0x0800, CRC(69a77199) SHA1(6c83093b2c32a558c969f4fe8474b234023cc348))
+	ROM_LOAD( "mmd2340.bin", 0xe000, 0x0800, CRC(70681bd6) SHA1(c37e3cf34a75e8538471030bb49b8aed45d00ec3))
+	ROM_LOAD( "mmd2350.bin", 0xe800, 0x0800, CRC(359f577c) SHA1(9405ca0c1977721e4540a4017907c06dab08d398))
+	ROM_LOAD( "mmd2360.bin", 0xf000, 0x0800, CRC(967e69b8) SHA1(c21ec8bef955806a2c6e1b1c8e9068662fb88038))
+ROM_END
+
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( 1976, mmd1,  0,       0, 	mmd1, 	mmd1, 	 0,  	  mmd1,  	 "E&L Instruments, Inc.",   "MMD-1",		0)
+COMP( 1976, mmd1,  0,       0, 	mmd1, 	mmd1, 	 0,  	  0,  	 	"E&L Instruments, Inc.",   "MMD-1",		0)
+COMP( 1976, mmd2,  mmd1,    0, 	mmd2, 	mmd2, 	 0,  	  mmd2,  	 "E&L Instruments, Inc.",   "MMD-2",		GAME_NOT_WORKING)
 

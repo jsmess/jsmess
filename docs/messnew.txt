@@ -13,6 +13,7 @@ Skeleton drivers :
 - Robotron Z9001 / KC85/1 / KC87
 - Canon Cat
 - Swyft
+- MMD-2
 
 System Driver Changes:
 ----------------------

@@ -1409,6 +1409,7 @@ const game_driver * const drivers[] =
 	DRIVER( cat )
 	DRIVER( swyft )
 	DRIVER( mmd1 )
+	DRIVER( mmd2 )
 
 #endif /* DRIVER_RECURSIVE */
     
