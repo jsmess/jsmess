@@ -34,7 +34,7 @@ DEVICE_IMAGE_UNLOAD( ti85_serial );
 
 WRITE8_HANDLER( ti81_port_0007_w);
  READ8_HANDLER( ti85_port_0000_r);
- READ8_HANDLER( ti85_port_0001_r);
+ READ8_HANDLER( ti8x_keypad_r);
  READ8_HANDLER( ti85_port_0002_r);
  READ8_HANDLER( ti85_port_0003_r);
  READ8_HANDLER( ti85_port_0004_r);
@@ -50,7 +50,7 @@ WRITE8_HANDLER( ti81_port_0007_w);
  READ8_HANDLER( ti83_port_0002_r);
  READ8_HANDLER( ti83_port_0003_r);
 WRITE8_HANDLER( ti85_port_0000_w);
-WRITE8_HANDLER( ti85_port_0001_w);
+WRITE8_HANDLER( ti8x_keypad_w);
 WRITE8_HANDLER( ti85_port_0002_w);
 WRITE8_HANDLER( ti85_port_0003_w);
 WRITE8_HANDLER( ti85_port_0004_w);

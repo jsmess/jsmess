@@ -70,6 +70,7 @@ static UINT8 ti82_video_dir;
 static UINT8 ti82_video_scroll;
 static UINT8 ti82_video_bit;
 static UINT8 ti82_video_col;
+static UINT8 ti8x_port2;
 UINT8 ti82_video_buffer[0x300];
 
 enum
@@ -344,7 +345,7 @@ READ8_HANDLER ( ti85_port_0000_r )
 	return 0xff;
 }
 
-READ8_HANDLER ( ti85_port_0001_r )
+READ8_HANDLER ( ti8x_keypad_r )
 {
 	int data = 0xff;
 	int port;
@@ -415,7 +416,7 @@ READ8_HANDLER ( ti85_port_0007_r )
 
  READ8_HANDLER ( ti82_port_0002_r )
 {
-	return ti85_memory_page_0x4000;
+	return ti8x_port2;
 }
 
  READ8_HANDLER ( ti82_port_0010_r )
@@ -479,7 +480,7 @@ READ8_HANDLER ( ti83_port_0000_r )
 
  READ8_HANDLER ( ti83_port_0002_r )
 {
-	return (ti85_memory_page_0x4000 & 0x07); 
+	return ti8x_port2; 
 }
 
  READ8_HANDLER ( ti83_port_0003_r )
@@ -507,7 +508,7 @@ WRITE8_HANDLER ( ti85_port_0000_w )
 	ti85_LCD_memory_base = data;
 }
 
-WRITE8_HANDLER ( ti85_port_0001_w )
+WRITE8_HANDLER ( ti8x_keypad_w )
 {
 	ti85_keypad_mask = data&0x7f;
 }
@@ -570,6 +571,7 @@ WRITE8_HANDLER ( ti82_port_0002_w )
 {
 	ti85_memory_page_0x4000 = (data & 0x07);
 	update_ti85_memory(space->machine);
+	ti8x_port2 = data;
 }
 
 WRITE8_HANDLER ( ti82_port_0010_w)
@@ -628,6 +630,7 @@ WRITE8_HANDLER ( ti83_port_0002_w )
 {
 	ti85_memory_page_0x4000 = (ti85_memory_page_0x4000 & 8) | (data & 7);
 	update_ti85_memory(space->machine);
+	ti8x_port2 = data;
 }
 
 WRITE8_HANDLER ( ti83_port_0003_w )

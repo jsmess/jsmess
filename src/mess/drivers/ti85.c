@@ -176,7 +176,7 @@ TI-86 ports:
 static ADDRESS_MAP_START( ti81_io, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE( ti85_port_0000_r, ti85_port_0000_w )
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE( ti85_port_0001_r, ti85_port_0001_w )
+	AM_RANGE(0x0001, 0x0001) AM_READWRITE( ti8x_keypad_r, ti8x_keypad_w )
 	AM_RANGE(0x0002, 0x0002) AM_READWRITE( ti85_port_0002_r, ti85_port_0002_w )
 	AM_RANGE(0x0003, 0x0003) AM_READWRITE( ti85_port_0003_r, ti85_port_0003_w )
 	AM_RANGE(0x0004, 0x0004) AM_READWRITE( ti85_port_0004_r, ti85_port_0004_w )
@@ -187,7 +187,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( ti85_io, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE( ti85_port_0000_r, ti85_port_0000_w )
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE( ti85_port_0001_r, ti85_port_0001_w )
+	AM_RANGE(0x0001, 0x0001) AM_READWRITE( ti8x_keypad_r, ti8x_keypad_w )
 	AM_RANGE(0x0002, 0x0002) AM_READWRITE( ti85_port_0002_r, ti85_port_0002_w )
 	AM_RANGE(0x0003, 0x0003) AM_READWRITE( ti85_port_0003_r, ti85_port_0003_w )
 	AM_RANGE(0x0004, 0x0004) AM_READWRITE( ti85_port_0004_r, ti85_port_0004_w )
@@ -199,7 +199,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( ti82_io, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE( ti85_port_0000_r, ti85_port_0000_w )
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE( ti85_port_0001_r, ti85_port_0001_w )
+	AM_RANGE(0x0001, 0x0001) AM_READWRITE( ti8x_keypad_r, ti8x_keypad_w )
 	AM_RANGE(0x0002, 0x0002) AM_READWRITE( ti82_port_0002_r, ti82_port_0002_w )
 	AM_RANGE(0x0003, 0x0003) AM_READWRITE( ti85_port_0003_r, ti85_port_0003_w )
 	AM_RANGE(0x0004, 0x0004) AM_READWRITE( ti85_port_0004_r, ti85_port_0004_w )
@@ -210,18 +210,19 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( ti83_io, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE( ti83_port_0000_r, ti83_port_0000_w )
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE( ti85_port_0001_r, ti85_port_0001_w )
+	AM_RANGE(0x0001, 0x0001) AM_READWRITE( ti8x_keypad_r, ti8x_keypad_w )
 	AM_RANGE(0x0002, 0x0002) AM_READWRITE( ti83_port_0002_r, ti83_port_0002_w )
 	AM_RANGE(0x0003, 0x0003) AM_READWRITE( ti83_port_0003_r, ti83_port_0003_w )
 	AM_RANGE(0x0004, 0x0004) AM_READWRITE( ti85_port_0004_r, ti85_port_0004_w )
 	AM_RANGE(0x0010, 0x0010) AM_READWRITE( ti82_port_0010_r, ti82_port_0010_w )
 	AM_RANGE(0x0011, 0x0011) AM_READWRITE( ti82_port_0011_r, ti82_port_0011_w )
+	AM_RANGE(0x0014, 0x0014) AM_READ_PORT( "BATTERY" )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ti86_io, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE( ti85_port_0000_r, ti85_port_0000_w )
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE( ti85_port_0001_r, ti85_port_0001_w )
+	AM_RANGE(0x0001, 0x0001) AM_READWRITE( ti8x_keypad_r, ti8x_keypad_w )
 	AM_RANGE(0x0002, 0x0002) AM_READWRITE( ti85_port_0002_r, ti85_port_0002_w )
 	AM_RANGE(0x0003, 0x0003) AM_READWRITE( ti85_port_0003_r, ti85_port_0003_w )
 	AM_RANGE(0x0004, 0x0004) AM_READWRITE( ti85_port_0006_r, ti85_port_0006_w )
@@ -445,6 +446,15 @@ static INPUT_PORTS_START (ti82)
 		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Receive data") PORT_CODE(KEYCODE_R)
 	PORT_START("DUMP")   /* screen dump requesting */
 		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Screen dump request") PORT_CODE(KEYCODE_S)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START (ti83)
+	PORT_INCLUDE( ti82 )
+	
+	PORT_START("BATTERY")
+		PORT_DIPNAME( 0x01, 0x01, "Battery Status" )
+		PORT_DIPSETTING( 0x01, DEF_STR( Normal ) )
+		PORT_DIPSETTING( 0x00, "Low Battery" )
 INPUT_PORTS_END
 
 /* machine definition */
@@ -714,13 +724,13 @@ static SYSTEM_CONFIG_START(ti86)
 SYSTEM_CONFIG_END
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY                 FULLNAME                        FLAGS */
-COMP( 1988, ti73,       0,      0,      ti85,   ti85,   0,      NULL,   "Texas Instruments",    "TI-73",                        GAME_NOT_WORKING )
+COMP( 1998, ti73,       0,      0,      ti85,   ti85,   0,      NULL,   "Texas Instruments",    "TI-73",                        GAME_NOT_WORKING )
 COMP( 1990, ti81,       0,      0,      ti81,   ti81,   0,      NULL,   "Texas Instruments",    "TI-81",                        0 )
 COMP( 1992, ti85,       0,      0,      ti85d,  ti85,   0,      ti85,   "Texas Instruments",    "TI-85",                        0 )
 COMP( 1993, ti82,       0,      0,      ti82,   ti82,   0,      NULL,   "Texas Instruments",    "TI-82",                        0 )
-COMP( 1996, ti83,       0,      0,      ti83,   ti82,   0,      NULL,   "Texas Instruments",    "TI-83",                        0 )
+COMP( 1996, ti83,       0,      0,      ti83,   ti83,   0,      NULL,   "Texas Instruments",    "TI-83",                        0 )
 COMP( 1997, ti86,       0,      0,      ti86d,  ti85,   0,      ti86,   "Texas Instruments",    "TI-86",                        0 )
-COMP( 1999, ti83p,      0,      0,      ti83,   ti82,   0,      NULL,   "Texas Instruments",    "TI-83 Plus",                   GAME_NOT_WORKING )
+COMP( 1999, ti83p,      0,      0,      ti83,   ti83,   0,      NULL,   "Texas Instruments",    "TI-83 Plus",                   GAME_NOT_WORKING )
 COMP( 2001, ti83pse,    0,      0,      ti85,   ti85,   0,      NULL,   "Texas Instruments",    "TI-83 Plus Silver Edition",    GAME_NOT_WORKING )
 //COMP( 2004, ti84p,      0,      0,      ti85,   ti85,   0,      NULL,   "Texas Instruments",    "TI-84 Plus",                   GAME_NOT_WORKING )
 COMP( 2004, ti84pse,    0,      0,      ti85,   ti85,   0,      NULL,   "Texas Instruments",    "TI-84 Plus Silver Edition",    GAME_NOT_WORKING )
