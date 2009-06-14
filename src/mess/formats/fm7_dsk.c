@@ -96,10 +96,10 @@ static floperr_t d77_get_indexed_sector_info(floppy_image *floppy, int head, int
 	if(offset > tag->image_size)
 		return FLOPPY_ERROR_SEEKERROR;
 		
-	if(sector_index >= 16)
-		return FLOPPY_ERROR_SEEKERROR;
-
 	floppy_image_read(floppy,sector_hdr,offset,16);
+
+	if(sector_index >= sector_hdr[4])
+		return FLOPPY_ERROR_SEEKERROR;
 
 	if(sector_length)
 		*sector_length = 256;
