@@ -95,7 +95,7 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( 1998, ti89,  0,       0, 	ti89, 	ti89, 	 0,  	  ti89,  	 "ti89",   "TI-89",		 GAME_NOT_WORKING)
-COMP( 1995, ti92,  0,       0, 	ti89, 	ti89, 	 0,  	  ti89,  	 "ti92",   "TI-92",		 GAME_NOT_WORKING)
-COMP( 1999, ti92p, 0,       0, 	ti89, 	ti89, 	 0,  	  ti89,  	 "ti92p",  "TI-92 Plus", GAME_NOT_WORKING)
+COMP( 1998, ti89,  0,       0, 	ti89, 	ti89, 	 0,  	  ti89,	"Texas Instruments",	"TI-89",		 GAME_NOT_WORKING)
+COMP( 1995, ti92,  0,       0, 	ti89, 	ti89, 	 0,  	  ti89,	"Texas Instruments",	"TI-92",		 GAME_NOT_WORKING)
+COMP( 1999, ti92p, 0,       0, 	ti89, 	ti89, 	 0,  	  ti89,	"Texas Instruments",	"TI-92 Plus", GAME_NOT_WORKING)
 
