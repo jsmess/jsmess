@@ -1200,7 +1200,7 @@ static void text_mode(running_machine *machine, int scanline, UINT32 *RESTRICT l
 		bg_color = color(m6847->colordata[attr_index][(byte & 0x7F) / 16][0]);
 		fg_color = color(m6847->colordata[attr_index][(byte & 0x7F) / 16][1]);
 		
-		if( attr & M6847_INTEXT) {	
+		if( attr & M6847_INTEXT && !(attr & M6847_AS)) {
 			if (m6847->get_char_rom) {
 				char_data = m6847->get_char_rom(machine,byte,scanline % 12);
 			} else {
