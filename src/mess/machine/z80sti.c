@@ -419,15 +419,33 @@ WRITE8_DEVICE_HANDLER( z80sti_w )
 		break;
 
 	case Z80STI_REGISTER_IPRB:
+		{
+		int i;
 		LOG(("Z80STI '%s' Interrupt Pending Register B: %x\n", device->tag, data));
 		z80sti->ipr &= (z80sti->ipr & 0xff00) | data;
+		
+		for (i = 0; i < 16; i++)
+		{
+			if (!BIT(z80sti->ipr, i) && (z80sti->int_state[i] == Z80_DAISY_INT)) z80sti->int_state[i] = 0;
+		}
+
 		check_interrupts(z80sti);
+		}
 		break;
 
 	case Z80STI_REGISTER_IPRA:
+		{
+		int i;
 		LOG(("Z80STI '%s' Interrupt Pending Register A: %x\n", device->tag, data));
 		z80sti->ipr &= (data << 8) | (z80sti->ipr & 0xff);
+		
+		for (i = 0; i < 16; i++)
+		{
+			if (!BIT(z80sti->ipr, i) && (z80sti->int_state[i] == Z80_DAISY_INT)) z80sti->int_state[i] = 0;
+		}
+
 		check_interrupts(z80sti);
+		}
 		break;
 
 	case Z80STI_REGISTER_ISRB:

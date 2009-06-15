@@ -533,8 +533,7 @@ static MC6845_UPDATE_ROW( grip_update_row )
 		for (bit = 0; bit < 8; bit++)
 		{
 			int x = (column * 8) + bit;
-			*BITMAP_ADDR16(bitmap, y, x) = BIT(data, 7);
-			data <<= 1;
+			*BITMAP_ADDR16(bitmap, y, x) = BIT(data, bit);
 		}
 	}
 }
