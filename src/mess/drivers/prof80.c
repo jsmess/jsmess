@@ -13,19 +13,13 @@
 
 	TODO:
 
-	- the characters are drawn to screen during vsync in a background process, which is controlled by 2 interrupts (CUR and DE)
-
-		'grip_z1' (00001162):M6845 reg 0x0e = 0x0d
-		'grip_z1' (00001162):M6845 reg 0x0f = 0x1f	--> cursor address 0xd1f, total characters (96x50) 0xd20
-
-		MC6845 CUR 0->1 on the last character of screen -> STI I2 interrupt (turns off display, enables DE int)
-		MC6845 DE 0->1 on the first character of screen -> STI I1 interrupt (turns on display, enabled CUR int)
-
+	- grip31 does not work
+	- write all 0 to flr_w on reset
 	- PROF-80 RAM banking
 	- PROF-80 floppy access
+	- GRIP model selection
 	- UNIO card (Z80-STI, Z80-SIO, 2x centronics)
 	- GRIP-COLOR (192kB color RAM)
-	- GRIP selection
 	- GRIP-5 (HD6345, 256KB RAM)
 	- XR color card
 	
@@ -282,14 +276,10 @@ static READ8_HANDLER( gripd_r )
 {
 	prof80_state *state = space->machine->driver_data;
 
-	logerror("Read GRIP data %02x\n", state->ecb_data);
-
 	/* trigger GRIP 8255 port C bit 6 (_ACKA) */
 	ppi8255_set_port_c(state->ppi8255, 0x54);
 	ppi8255_set_port_c(state->ppi8255, 0x14);
 	ppi8255_set_port_c(state->ppi8255, 0x54);
-
-	logerror("Read GRIP data %02x\n", state->ecb_data);
 
 	return state->ecb_data;
 }
@@ -297,8 +287,6 @@ static READ8_HANDLER( gripd_r )
 static WRITE8_HANDLER( gripd_w )
 {
 	prof80_state *state = space->machine->driver_data;
-
-	logerror("Write GRIP data %02x\n", data);
 
 	state->ecb_data = data;
 
@@ -309,6 +297,13 @@ static WRITE8_HANDLER( gripd_w )
 }
 
 /* GRIP */
+
+static WRITE8_HANDLER( flash_w )
+{
+	prof80_state *state = space->machine->driver_data;
+
+	state->flash = BIT(data, 7);
+}
 
 static WRITE8_HANDLER( page_w )
 {
@@ -451,7 +446,7 @@ static ADDRESS_MAP_START( grip_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x13, 0x13) AM_WRITE(page_w)
 //	AM_RANGE(0x14, 0x14) AM_WRITE(cc1_w)
 //	AM_RANGE(0x15, 0x15) AM_WRITE(cc2_w)
-//	AM_RANGE(0x16, 0x16) AM_WRITE(flash_w)
+	AM_RANGE(0x16, 0x16) AM_WRITE(flash_w)
 //	AM_RANGE(0x17, 0x17) AM_WRITE(vol1_w)
 	AM_RANGE(0x20, 0x2f) AM_DEVREADWRITE(Z80STI_TAG, z80sti_r, z80sti_w)
 	AM_RANGE(0x30, 0x30) AM_READWRITE(lrs_r, lrs_w)
@@ -533,7 +528,9 @@ static MC6845_UPDATE_ROW( grip_update_row )
 		for (bit = 0; bit < 8; bit++)
 		{
 			int x = (column * 8) + bit;
-			*BITMAP_ADDR16(bitmap, y, x) = BIT(data, bit);
+			int color = state->flash ? 0 : BIT(data, bit);
+
+			*BITMAP_ADDR16(bitmap, y, x) = color;
 		}
 	}
 }
@@ -654,8 +651,6 @@ static WRITE8_DEVICE_HANDLER( grip_ppi8255_a_w )
 
 	prof80_state *state = device->machine->driver_data;
 
-	logerror("8255 PA write %02x\n", data);
-
 	state->ecb_data = data;
 }
 
@@ -726,8 +721,6 @@ static WRITE8_DEVICE_HANDLER( grip_ppi8255_c_w )
 
 	/* PROF-80 handshaking */
 	state->ecb_status = (!BIT(data, 7) << 7) | (!BIT(data, 5) << 6);
-
-	logerror("8255 PC write %02x\n", data);
 }
 
 static const ppi8255_interface grip_ppi8255_interface =

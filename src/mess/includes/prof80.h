@@ -32,6 +32,7 @@ struct _prof80_state
 	UINT8 *video_ram;		/* video RAM */
 	int lps;				/* light pen sense */
 	int page;				/* video page */
+	int flash;				/* flash */
 
 	/* clock state */
 	int rtc_data;			/* RTC data output */
