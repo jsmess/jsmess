@@ -2,6 +2,7 @@
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
+- Canon Cat [Miodrag Milanovic]
 - MMD-1 [Miodrag Milanovic]
 
 Skeleton drivers : 
@@ -11,7 +12,6 @@ Skeleton drivers :
 - ZRT-80
 - Netronics Explorer 85
 - Robotron Z9001 / KC85/1 / KC87
-- Canon Cat
 - Swyft
 - MMD-2
 - MPF-1 Plus
