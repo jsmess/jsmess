@@ -62,18 +62,16 @@
 
 	The work so far is without the benefit of manuals, schematic etc [Robbbert]
 
+	48k, 96k:
 	Cassette operation is strange indeed. Save takes the dac output and directs
 	it to the tape. Load takes over line 0 of the keyboard and uses bits 0 and 5.
 
 	To Do:
-	128k, 96k: everything
-
-	48k:
 	- find Break key
-	- colour
-	- banking
+	- banking (it is incomplete atm)
 	- devices (cassette, disk)
 	- find out the mc6845 clock frequency
+	- check out the roms (48k, 96k), they could be wrong
 
 ****************************************************************************/
 
@@ -84,12 +82,12 @@
 
 static const device_config *mc6845;
 
+/* These bankswitch handlers are very incomplete, just enough to get the
+	computer working. Also, as it happens 6 times for every scanline
+	of every character, it causes a huge slowdown. */
+
 static WRITE8_HANDLER( camplynx_bank_w )
 {
-/* This is very incomplete, just enough to get the computer working.
-	Also, as it happens 6 times for every scanline of every character,
-	it causes a huge slowdown. */
-
 	if (!data)
 		memory_set_bank(space->machine, 1, 0);
 	else
@@ -99,7 +97,7 @@ static WRITE8_HANDLER( camplynx_bank_w )
 	if (data & 4)
 		memory_set_bank(space->machine, 1, 2);
 	else
-		logerror("cannot understand bankswitch command %X\n",data);
+		logerror("%04X: Cannot understand bankswitch command %X\n",cpu_get_pc(space->cpu), data);
 }
 
 static WRITE8_HANDLER( lynx128_bank_w )
@@ -127,7 +125,7 @@ static WRITE8_HANDLER( lynx128_bank_w )
 		memory_set_bankptr(mem->machine, 18, memory_region(mem->machine, "maincpu") + 0x1e000);
 	}
 	else
-	if (data == 0xc0)
+	if ((data == 0xc0) || (data == 0xe0))
 	{
 		memory_set_bankptr(mem->machine, 1, memory_region(mem->machine, "maincpu") + 0x00000);
 		memory_set_bankptr(mem->machine, 2, memory_region(mem->machine, "maincpu") + 0x02000);
@@ -147,16 +145,16 @@ static WRITE8_HANDLER( lynx128_bank_w )
 		memory_set_bankptr(mem->machine, 18, memory_region(mem->machine, "maincpu") + 0x2e000);
 	}
 	else
-	if (data == 0xe0)
+	if ((data == 0xce) || (data == 0xee))
 	{
-		memory_set_bankptr(mem->machine, 1, memory_region(mem->machine, "maincpu") + 0x00000);
-		memory_set_bankptr(mem->machine, 2, memory_region(mem->machine, "maincpu") + 0x02000);
-		memory_set_bankptr(mem->machine, 3, memory_region(mem->machine, "maincpu") + 0x04000);
-		memory_set_bankptr(mem->machine, 4, memory_region(mem->machine, "maincpu") + 0x16000);
-		memory_set_bankptr(mem->machine, 5, memory_region(mem->machine, "maincpu") + 0x18000);
-		memory_set_bankptr(mem->machine, 6, memory_region(mem->machine, "maincpu") + 0x1a000);
-		memory_set_bankptr(mem->machine, 7, memory_region(mem->machine, "maincpu") + 0x0c000);
-		memory_set_bankptr(mem->machine, 8, memory_region(mem->machine, "maincpu") + 0x0e000);
+		memory_set_bankptr(mem->machine, 1, memory_region(mem->machine, "maincpu") + 0x20000);
+		memory_set_bankptr(mem->machine, 2, memory_region(mem->machine, "maincpu") + 0x22000);
+		memory_set_bankptr(mem->machine, 3, memory_region(mem->machine, "maincpu") + 0x24000);
+		memory_set_bankptr(mem->machine, 4, memory_region(mem->machine, "maincpu") + 0x26000);
+		memory_set_bankptr(mem->machine, 5, memory_region(mem->machine, "maincpu") + 0x28000);
+		memory_set_bankptr(mem->machine, 6, memory_region(mem->machine, "maincpu") + 0x2a000);
+		memory_set_bankptr(mem->machine, 7, memory_region(mem->machine, "maincpu") + 0x2c000);
+		memory_set_bankptr(mem->machine, 8, memory_region(mem->machine, "maincpu") + 0x2e000);
 		memory_set_bankptr(mem->machine, 11, memory_region(mem->machine, "maincpu") + 0x20000);
 		memory_set_bankptr(mem->machine, 12, memory_region(mem->machine, "maincpu") + 0x22000);
 		memory_set_bankptr(mem->machine, 13, memory_region(mem->machine, "maincpu") + 0x24000);
@@ -167,7 +165,7 @@ static WRITE8_HANDLER( lynx128_bank_w )
 		memory_set_bankptr(mem->machine, 18, memory_region(mem->machine, "maincpu") + 0x2e000);
 	}
 	else
-		logerror("cannot understand bankswitch command %X\n",data);
+		logerror("%04X: Cannot understand bankswitch command %X\n",cpu_get_pc(space->cpu), data);
 }
 
 static ADDRESS_MAP_START( camplynx_mem, ADDRESS_SPACE_PROGRAM, 8)
@@ -185,14 +183,6 @@ static ADDRESS_MAP_START( lynx96_mem, ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lynx128_mem, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x0000,0x1fff) AM_RAMBANK(1)
-	AM_RANGE(0x2000,0x3fff) AM_RAMBANK(2)
-	AM_RANGE(0x4000,0x5fff) AM_RAMBANK(3)
-	AM_RANGE(0x6000,0x7fff) AM_RAMBANK(4)
-	AM_RANGE(0x8000,0x9fff) AM_RAMBANK(5)
-	AM_RANGE(0xa000,0xbfff) AM_RAMBANK(6)
-	AM_RANGE(0xc000,0xdfff) AM_RAMBANK(7)
-	AM_RANGE(0xe000,0xffff) AM_RAMBANK(8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( camplynx_io , ADDRESS_SPACE_IO, 8)
@@ -393,7 +383,7 @@ static MC6845_UPDATE_ROW( lynx128_update_row )
 	UINT8 r,g,b;
 	UINT16 x, *p = BITMAP_ADDR16(bitmap, y, 0);
 
-	for (x = (y << 5); x < x_count + (y << 5); x++)
+	for (x = (y << 6); x < x_count + (y << 6); x++)
 	{
 		r = RAM[0x20100+x];
 		g = RAM[0x28100+x];
@@ -436,14 +426,14 @@ static const mc6845_interface camplynx_crtc6845_interface = {
 };
 
 static const mc6845_interface lynx128_crtc6845_interface = {
-	"screen",
-	8,
+	"screen",			/* screen name */
+	8,				/* dots per character */
 	NULL,
-	lynx128_update_row,
+	lynx128_update_row,		/* callback to display one scanline */
 	NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(lynx128_irq),
+	DEVCB_HANDLER(lynx128_irq),	/* callback when cursor pin changes state */
 	DEVCB_NULL,
 	NULL
 };
