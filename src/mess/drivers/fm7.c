@@ -37,6 +37,7 @@
 #include "machine/wd17xx.h"
 #include "devices/mflopimg.h"
 #include "formats/fm7_dsk.h"
+#include "machine/ctronics.h"
 
 // Interrupt flags
 #define IRQ_FLAG_KEY      0x01
@@ -575,19 +576,29 @@ READ8_HANDLER( fm7_sub_keyboard_r)
 READ8_HANDLER( fm7_cassette_printer_r )
 {
 	// bit 7: cassette input
+	// bit 5: printer DET2
+	// bit 4: printer DTT1
 	// bit 3: printer PE
 	// bit 2: printer acknowledge
 	// bit 1: printer error
 	// bit 0: printer busy
 	UINT8 ret = 0x00;
 	double data = cassette_input(devtag_get_device(space->machine,"cass")); 
+	const device_config* printer_dev = devtag_get_device(space->machine,"printer");
 	
 	if(data > 0.03)
 		ret |= 0x80;
 	
 	ret |= 0x40;
 	
-	ret |= 0x3f;  // Printer status, joystick inputs
+	if(centronics_pe_r(printer_dev))
+		ret |= 0x08;
+	if(centronics_ack_r(printer_dev))
+		ret |= 0x04;
+	if(centronics_fault_r(printer_dev))
+		ret |= 0x02;
+	if(centronics_busy_r(printer_dev))
+		ret |= 0x01;
 
 	return ret;
 }
@@ -598,7 +609,7 @@ WRITE8_HANDLER( fm7_cassette_printer_w )
 	switch(offset)
 	{
 		case 0:
-		// bit 7: printer online
+		// bit 7: SLCTIN (select?)
 		// bit 6: printer strobe
 		// bit 1: cassette motor
 		// bit 0: cassette output
@@ -606,10 +617,12 @@ WRITE8_HANDLER( fm7_cassette_printer_w )
 				cassette_output(devtag_get_device(space->machine,"cass"),(data & 0x01) ? +1.0 : -1.0);
 			if((data & 0x02) != (prev & 0x02))
 				cassette_change_state(devtag_get_device(space->machine, "cass" ),(data & 0x02) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
+			centronics_strobe_w(devtag_get_device(space->machine,"printer"),!(data & 0x40));
 			prev = data;
 			break;
 		case 1:
 		// Printer data
+			centronics_data_w(devtag_get_device(space->machine,"printer"),0,data);
 			break;
 	}
 }
@@ -1213,6 +1226,8 @@ static MACHINE_DRIVER_START( fm7 )
 	MDRV_CASSETTE_ADD("cass",fm7_cassette_config)
 	
 	MDRV_MB8877_ADD("fdc",fm7_mb8877a_interface)
+	
+	MDRV_CENTRONICS_ADD("printer",standard_centronics)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( fm77av )
