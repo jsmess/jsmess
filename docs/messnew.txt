@@ -18,9 +18,13 @@ Skeleton drivers :
 
 System Driver Changes:
 ----------------------
-- [GENESIS] Save RAM emulation improved for several games [Enik]
+- [GENESIS] Save RAM emulation improved for several games (bugs #1691, #1696,
+  #1823, #1824) [Enik]
+
 - [TI85] TI-83 now works [Xander]
-- [TI85] Fixed TI-82/TI-83 on/off and NVRAM, added a DSW to TI-83 for the battery status [Xander]
+
+- [TI85] Fixed TI-82/TI-83 on/off and NVRAM, added a DSW to TI-83 for the
+  battery status [Xander]
 
 
 User Interface Changes:
