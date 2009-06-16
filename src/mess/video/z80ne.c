@@ -8,12 +8,7 @@
 
 ***************************************************************************/
 
-#include "driver.h"
-#include "video/m6847.h"
-#include "includes/z80ne.h"
-
-
-/*
+/* MC6847 pin connections:
  * GM0 to GND
  * GM1 to GND
  * GM2 to GND
@@ -29,6 +24,36 @@
  * 1  0    0     1     1   Semigraphic 6
  * 1  1    1     0     0   Inverted Alphanumeric
  */
+
+
+#include "driver.h"
+#include "video/m6847.h"
+#include "includes/z80ne.h"
+
+#define M6847_RGB(r,g,b)	((r << 16) | (g << 8) | (b << 0))
+
+static const UINT32 lx388palette[] =
+{
+	M6847_RGB(0x00, 0xff, 0x00),	/* GREEN */
+	M6847_RGB(0x00, 0xff, 0x00),	/* YELLOW in original, here GREEN */
+	M6847_RGB(0x00, 0x00, 0xff),	/* BLUE */
+	M6847_RGB(0xff, 0x00, 0x00),	/* RED */
+	M6847_RGB(0xff, 0xff, 0xff),	/* BUFF */
+	M6847_RGB(0x00, 0xff, 0xff),	/* CYAN */
+	M6847_RGB(0xff, 0x00, 0xff),	/* MAGENTA */
+	M6847_RGB(0xff, 0x80, 0x00),	/* ORANGE */
+
+	M6847_RGB(0x00, 0x20, 0x00),	/* BLACK in original, here DARK green */
+	M6847_RGB(0x00, 0xff, 0x00),	/* GREEN */
+	M6847_RGB(0x00, 0x00, 0x00),	/* BLACK */
+	M6847_RGB(0xff, 0xff, 0xff),	/* BUFF */
+
+	M6847_RGB(0x00, 0x20, 0x00),	/* ALPHANUMERIC DARK GREEN */
+	M6847_RGB(0x00, 0xff, 0x00),	/* ALPHANUMERIC BRIGHT GREEN */
+	M6847_RGB(0x40, 0x10, 0x00),	/* ALPHANUMERIC DARK ORANGE */
+	M6847_RGB(0xff, 0xc4, 0x18)		/* ALPHANUMERIC BRIGHT ORANGE */
+};
+
 static ATTR_CONST UINT8 lx388_get_attributes(running_machine *machine, UINT8 c, int scanline, int pos)
 {
 	UINT8 result = 0x00;
@@ -55,5 +80,6 @@ VIDEO_START(lx388)
 	cfg.type = M6847_VERSION_ORIGINAL_PAL;
 	cfg.get_attributes = lx388_get_attributes;
 	cfg.get_video_ram = lx388_get_video_ram;
+	cfg.custom_palette = lx388palette;
 	m6847_init(machine, &cfg);
 }

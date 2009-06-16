@@ -4,6 +4,7 @@ New System Drivers Supported (in no particular order):
 ------------------------------------------------------
 - Canon Cat [Miodrag Milanovic]
 - MMD-1 [Miodrag Milanovic]
+- Nuova Elettronica Z80NE + LX.388 + LX.390  [Roberto Lavarone]
 
 Skeleton drivers : 
 ------------------
@@ -43,6 +44,13 @@ Source Changes:
 ----------------
 - Added support for passing around 'deleted address mark' information
   to the floppy system. [Roberto Lavarone]
+
+- Changes to the wd17xx implementation:
+  - Added support for head loaded feedback from floppy drive.
+  - Busy flag was cleared too early.
+  - Added support for the WD1771.  [Roberto Lavarone]
+
+- Added natural keyboard support to KR2376.  [Roberto Lavarone]
 
 
 

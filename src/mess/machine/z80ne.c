@@ -1,9 +1,9 @@
 /***********************************************************************
 
-	machine/z80ne.c
+    machine/z80ne.c
 
-	Functions to emulate general aspects of the machine (RAM, ROM,
-	interrupts, I/O ports)
+    Functions to emulate general aspects of the machine (RAM, ROM,
+    interrupts, I/O ports)
 
 ***********************************************************************/
 
@@ -15,20 +15,25 @@
 /* Components */
 #include "machine/ay31015.h"
 #include "machine/kr2376.h"
-#include "machine/wd17xx.h"
 #include "video/m6847.h"
 
 /* Devices */
 #include "devices/basicdsk.h"
 #include "devices/cassette.h"
+#include "devices/flopdrv.h"
+
+#define VERBOSE 0
+#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 static UINT8 lx383_scan_counter;
 static UINT8 lx383_key[LX383_KEYS];
 static int   lx383_downsampler;
 static int   nmi_delay_counter;
+static int   reset_delay_counter;
 static const device_config *z80ne_ay31015;
 static UINT8 lx385_ctrl = 0x1f;
 static const device_config *lx388_kr2376;
+
 
 
 
@@ -60,6 +65,82 @@ static struct {
 	int wave_short;
 	int wave_long;
 } cass_data;
+
+static struct _wd17xx_state {
+	int drq;
+	int intrq;
+	UINT8 drive; /* current drive */
+	UINT8 head;  /* current head */
+} wd17xx_state;
+
+
+DEVICE_IMAGE_LOAD( z80ne_floppy )
+{
+	static UINT8 pdrive[4*16];
+	int i;
+	int tracks; 	/* total tracks count per drive */
+	int heads;		/* total heads count per drive */
+	int spt;		/* sector per track count per drive */
+	int dir_sector; /* first directory sector (aka DDSL) */
+	int dir_length; /* length of directory in sectors (aka DDGA) */
+	int id = image_index_in_device(image);
+
+	if (device_load_basicdsk_floppy(image) != INIT_PASS)
+		return INIT_FAIL;
+
+	if (image_index_in_device(image) == 0)        /* first floppy? */
+	{
+		image_fseek(image, 0, SEEK_SET);
+		image_fread(image, pdrive, 2);
+#if 0
+		if (pdrive[0] != 0x00 || pdrive[1] != 0xfe)
+		{
+			basicdsk_read_sectormap(image, &tracks[id], &heads[id], &spt[id]);
+		}
+		else
+#endif
+
+		image_fseek(image, 2 * 256, SEEK_SET);
+		image_fread(image, pdrive, 4*16);
+	}
+
+	tracks = pdrive[id*16+3] + 1;
+	heads = (pdrive[id*16+7] & 0x40) ? 2 : 1;
+	spt = pdrive[id*16+4] / heads;
+	dir_sector = 5 * pdrive[id*16+0] * pdrive[id*16+5];
+	dir_length = 5 * pdrive[id*16+9];
+
+    /* set geometry so disk image can be read */
+	basicdsk_set_geometry(image, tracks, heads, spt, 256, 0, 0, FALSE);
+
+	/* mark directory sectors with deleted data address mark */
+	/* assumption dir_sector is a sector offset */
+	for (i = 0; i < dir_length; i++)
+	{
+		int track, side, sector_id;
+		int track_offset, sector_offset;
+
+		/* calc sector offset */
+		sector_offset = dir_sector + i;
+
+		/* get track offset */
+		track_offset = sector_offset / spt;
+
+		/* calc track */
+		track = track_offset / heads;
+
+		/* calc side */
+		side = track_offset % heads;
+
+		/* calc sector id - first sector id is 0! */
+		sector_id = sector_offset % spt;
+
+		/* set deleted data address mark for sector specified */
+		basicdsk_set_ddam(image, track, side, sector_id, 1);
+	}
+	return INIT_PASS;
+}
+
 
 static const device_config *cassette_device_image(running_machine *machine)
 {
@@ -109,7 +190,9 @@ DRIVER_INIT( z80ne )
 {
 	/* first two entries point to rom on reset */
 	UINT8 *RAM = memory_region(machine, "z80ne");
-	memory_configure_bank(machine, 1, 0, 2, &RAM[0x0000], 0x8000);
+	memory_configure_bank(machine, 1, 0, 1, &RAM[0x00000], 0x0400); /* RAM   at 0x0000 */
+	memory_configure_bank(machine, 1, 1, 1, &RAM[0x14000], 0x0400); /* ep382 at 0x0000 */
+	memory_configure_bank(machine, 2, 0, 1, &RAM[0x14000], 0x0400); /* ep382 at 0x8000 */
 }
 
 DRIVER_INIT( z80net )
@@ -121,38 +204,52 @@ DRIVER_INIT( z80netb )
 {
 }
 
-/* after the first 3 bytes have been read from ROM, switch the ram back in */
-static TIMER_CALLBACK(z80ne_reset_address_decoder)
+DRIVER_INIT( z80netf )
 {
-	memory_set_bank(machine, 1, 0);
+	/* first two entries point to rom on reset */
+	UINT8 *RAM = memory_region(machine, "z80ne");
+	memory_configure_bank(machine, 1, 0, 1, &RAM[0x00000], 0x0400); /* RAM   at 0x0000-0x03FF */
+	memory_configure_bank(machine, 1, 1, 3, &RAM[0x14400], 0x0400); /* ep390, ep1390, ep2390 at 0x0000-0x03FF */
+	memory_configure_bank(machine, 1, 4, 1, &RAM[0x14000], 0x0400); /* ep382 at 0x0000-0x03FF */
+	memory_configure_bank(machine, 1, 5, 1, &RAM[0x10000], 0x0400); /* ep548 at 0x0000-0x03FF */
+
+	memory_configure_bank(machine, 2, 0, 1, &RAM[0x00400], 0x3C00); /* RAM   at 0x0400 */
+	memory_configure_bank(machine, 2, 1, 1, &RAM[0x10400], 0x3C00); /* ep548 at 0x0400-0x3FFF */
+
+	memory_configure_bank(machine, 3, 0, 1, &RAM[0x08000], 0x0400); /* RAM   at 0x8000 */
+	memory_configure_bank(machine, 3, 1, 1, &RAM[0x14000], 0x0400); /* ep382 at 0x8000 */
+
+	memory_configure_bank(machine, 4, 0, 1, &RAM[0x0F000], 0x0400); /* RAM   at 0xF000 */
+	memory_configure_bank(machine, 4, 1, 3, &RAM[0x14400], 0x0400); /* ep390, ep1390, ep2390 at 0xF000 */
+
 }
 
 static TIMER_CALLBACK( z80ne_kbd_scan )
 {
 	/*
-	 * NE555 is connected to a 74LS93 binary counter
-	 * 74LS93 output:
-	 *   QA-QC: column index for LEDs and keyboard
-	 *   QD:    keyboard row select
-	 *
-	 * Port F0 input bit assignment:
-	 *   0	QA	bits 0..3 of row counter
-	 *   1	QB
-	 *   2	QC
-	 *   3	QD
-	 *   4	Control button pressed, active high
-	 *   5  Always low
-	 *   6  Always low
-	 *   7  Selected button pressed, active low
-	 *
-	 *
-	 */
+     * NE555 is connected to a 74LS93 binary counter
+     * 74LS93 output:
+     *   QA-QC: column index for LEDs and keyboard
+     *   QD:    keyboard row select
+     *
+     * Port F0 input bit assignment:
+     *   0  QA  bits 0..3 of row counter
+     *   1  QB
+     *   2  QC
+     *   3  QD
+     *   4  Control button pressed, active high
+     *   5  Always low
+     *   6  Always low
+     *   7  Selected button pressed, active low
+     *
+     *
+     */
 
 	static UINT16 key_bits;
 	static UINT8 ctrl, rst;
 	static UINT8 i;
 
-	// 4-bit counter
+	/* 4-bit counter */
 	--lx383_scan_counter;
 	lx383_scan_counter &= 0x0f;
 
@@ -174,7 +271,6 @@ static TIMER_CALLBACK( z80ne_kbd_scan )
 /*
  * Handle NMI delay for single step instruction
  */
-//static offs_t nmi_delay_count(ATTR_UNUSED const address_space *space, ATTR_UNUSED offs_t address, direct_read_data *direct)
 static DIRECT_UPDATE_HANDLER( nmi_delay_count )
 {
 	nmi_delay_counter--;
@@ -187,12 +283,115 @@ static DIRECT_UPDATE_HANDLER( nmi_delay_count )
 	return address;
 }
 
+/*
+ * Handle delayed ROM/RAM banking at RESET
+ * after the first reset_delay_counter bytes have been read from ROM, switch the RAM back in
+ */
+static DIRECT_UPDATE_HANDLER( reset_delay_count )
+{
+	/*
+     * TODO: when debugger is active, his memory access causes this callback
+     *
+     */
+	if(!space->debugger_access)
+		reset_delay_counter--;
+
+	if (!reset_delay_counter)
+	{
+		/* remove this callback */
+		memory_set_direct_update_handler( space, NULL );
+		/* and switch to RAM bank at address 0x0000 */
+		memory_set_bank( space->machine, 1, 0 ); /* RAM at 0x0000 (bank 1) */
+	}
+	return address;
+}
+
+void reset_lx388(running_machine *machine)
+{
+	lx388_kr2376 = devtag_get_device(machine, "lx388_kr2376");
+	kr2376_set_input_pin( lx388_kr2376, KR2376_DSII, 0);
+	kr2376_set_input_pin( lx388_kr2376, KR2376_PII, 0);
+}
+
+void reset_lx382_banking(running_machine *machine)
+{
+	const address_space *space = cputag_get_address_space(machine, "z80ne", ADDRESS_SPACE_PROGRAM);
+
+	/* switch to ROM bank at address 0x0000 */
+    memory_set_bank(machine, 1, 1);
+    memory_set_bank(machine, 2, 0);  /* ep382 at 0x8000 */
+
+	/* after the first 3 bytes have been read from ROM, switch the RAM back in */
+	reset_delay_counter = 2;
+	memory_set_direct_update_handler(space, reset_delay_count);
+}
+
+void reset_lx390_banking(running_machine *machine)
+{
+	const address_space *space = cputag_get_address_space(machine, "z80ne", ADDRESS_SPACE_PROGRAM);
+	reset_delay_counter = 0;
+
+	switch (input_port_read(machine, "CONFIG") & 0x07) {
+	case 0x01: /* EP382 Hex Monitor */
+		if (VERBOSE)
+			logerror("reset_lx390_banking: banking ep382\n");
+	    memory_set_bank(machine, 1, 4);  /* ep382 at 0x0000 for 3 cycles, then RAM */
+	    memory_set_bank(machine, 2, 0);  /* RAM   at 0x0400 */
+	    memory_set_bank(machine, 3, 1);  /* ep382 at 0x8000 */
+	    memory_set_bank(machine, 4, 0);  /* RAM   at 0xF000 */
+		/* after the first 3 bytes have been read from ROM, switch the RAM back in */
+		reset_delay_counter = 2;
+		memory_set_direct_update_handler(space, reset_delay_count);
+	    break;
+	case 0x02: /* EP548  16k BASIC */
+		if (VERBOSE)
+			logerror("reset_lx390_banking: banking ep548\n");
+	    memory_set_bank(machine, 1, 5);  /* ep548 at 0x0000-0x03FF */
+	    memory_set_bank(machine, 2, 1);  /* ep548 at 0x0400-0x3FFF */
+	    memory_set_bank(machine, 3, 0);  /* RAM   at 0x8000 */
+	    memory_set_bank(machine, 4, 0);  /* RAM   at 0xF000 */
+		memory_set_direct_update_handler( space, NULL );
+	    break;
+	case 0x03: /* EP390  Boot Loader for 5.5k floppy BASIC */
+		if (VERBOSE)
+			logerror("reset_lx390_banking: banking ep390\n");
+	    memory_set_bank(machine, 1, 1);  /* ep390 at 0x0000-0 x03FF for 3 cycles, then RAM */
+	    memory_set_bank(machine, 2, 0);  /* RAM   at 0x0400-0x3FFF */
+	    memory_set_bank(machine, 3, 0);  /* RAM   at 0x8000 */
+	    memory_set_bank(machine, 4, 1);  /* ep390 at 0xF000 */
+		memory_set_direct_update_handler( space, NULL );
+	    break;
+	case 0x04: /* EP1390 Boot Loader for NE DOS 1.0/1.5 */
+		if (VERBOSE)
+			logerror("reset_lx390_banking: banking ep1390\n");
+	    memory_set_bank(machine, 1, 2);  /* ep1390 at 0x0000-0x03FF for 3 cycles, then RAM */
+	    memory_set_bank(machine, 2, 0);  /* RAM   at 0x0400-0x3FFF */
+	    memory_set_bank(machine, 3, 0);  /* RAM   at 0x8000 */
+	    memory_set_bank(machine, 4, 2);  /* ep1390 at 0xF000 */
+		memory_set_direct_update_handler( space, NULL );
+	    break;
+	case 0x05: /* EP2390 Boot Loader for NE DOS G.1 */
+		if (VERBOSE)
+			logerror("reset_lx390_banking: banking ep2390\n");
+	    memory_set_bank(machine, 1, 3);  /* ep2390 at 0x0000-0x03FF for 3 cycles, then RAM */
+	    memory_set_bank(machine, 2, 0);  /* RAM   at 0x0400-0x3FFF */
+	    memory_set_bank(machine, 3, 0);  /* RAM   at 0x8000 */
+	    memory_set_bank(machine, 4, 3);  /* ep2390 at 0xF000 */
+		memory_set_direct_update_handler( space, NULL );
+	    break;
+	}
+
+    /* TODO: in real hardware the ENH bus line is pulled down
+     * until a I/O read is performed on a address with A0 address bit low and A1 or A2 address bit high
+     */
+}
+
 MACHINE_RESET(z80ne_base)
 {
 	int i;
 	const address_space *space = cputag_get_address_space(machine, "z80ne", ADDRESS_SPACE_PROGRAM);
 
-	logerror("In MACHINE_RESET z80ne_base\n");
+	LOG(("In MACHINE_RESET z80ne_base\n"));
 
 	for ( i=0; i<LX383_KEYS; i++)
     	lx383_key[i] = 0xf0 | i;
@@ -221,7 +420,6 @@ MACHINE_RESET(z80ne_base)
 		cass_data.wave_short = LX385_TAPE_SAMPLE_FREQ / (9600 * 2);
 		cass_data.wave_long = LX385_TAPE_SAMPLE_FREQ / (4800 * 2);
 	}
-//	cass_data.output.length = 0;
 	cass_data.wave_length = cass_data.wave_short;
 	cass_data.output.length = cass_data.wave_length;
 	cass_data.output.level = 1;
@@ -239,7 +437,6 @@ MACHINE_RESET(z80ne_base)
 	ay31015_set_receiver_clock( z80ne_ay31015, cass_data.speed * 16.0);
 	ay31015_set_transmitter_clock( z80ne_ay31015, cass_data.speed * 16.0);
 
-	memory_set_direct_update_handler( space, NULL );
 	nmi_delay_counter = 0;
 	lx385_ctrl_w(space, 0, 0);
 
@@ -247,35 +444,35 @@ MACHINE_RESET(z80ne_base)
 
 MACHINE_RESET(z80ne)
 {
-//	UINT8 *RAM = memory_region(machine, "z80ne");
-//	memory_configure_bank(machine, 1, 0, 2, &RAM[0x0000], 0x8000);
-
-	/* after the first 3 bytes have been read from ROM, switch the ram back in */
-	timer_set(machine, ATTOTIME_IN_USEC(6), NULL, 0, z80ne_reset_address_decoder);
-    memory_set_bank(machine, 1, 1);
-
-	logerror("In MACHINE_RESET z80ne\n");
+	LOG(("In MACHINE_RESET z80ne\n"));
+	reset_lx382_banking(machine);
 	MACHINE_RESET_CALL( z80ne_base );
 }
 
 MACHINE_RESET(z80net)
 {
+	LOG(("In MACHINE_RESET z80net\n"));
 	MACHINE_RESET_CALL( z80ne );
-	logerror("In MACHINE_RESET z80net\n");
-
-	lx388_kr2376 = devtag_get_device(machine, "lx388_kr2376");
-	kr2376_set_input_pin( lx388_kr2376, KR2376_DSII, 0);
-	kr2376_set_input_pin( lx388_kr2376, KR2376_PII, 0);
+	reset_lx388(machine);
 }
 
 MACHINE_RESET(z80netb)
 {
+	LOG(("In MACHINE_RESET z80netb\n"));
 	MACHINE_RESET_CALL( z80ne_base );
-	logerror("In MACHINE_RESET z80netb\n");
+	reset_lx388(machine);
+}
 
-	lx388_kr2376 = devtag_get_device(machine, "lx388_kr2376");
-	kr2376_set_input_pin( lx388_kr2376, KR2376_DSII, 0);
-	kr2376_set_input_pin( lx388_kr2376, KR2376_PII, 0);
+MACHINE_RESET(z80netf)
+{
+	const device_config *z80ne_fdc;
+
+	LOG(("In MACHINE_RESET z80netf\n"));
+	reset_lx390_banking(machine);
+	MACHINE_RESET_CALL( z80ne_base );
+	reset_lx388(machine);
+	z80ne_fdc = devtag_get_device(machine, "wd1771");
+	wd17xx_set_density (z80ne_fdc, DEN_FM_HI); /* Datarate 64 usec */
 }
 
 INPUT_CHANGED( z80ne_reset )
@@ -286,8 +483,6 @@ INPUT_CHANGED( z80ne_reset )
 	if ( ! BIT(rst, 0))
 	{
 		running_machine *machine = field->port->machine;
-		//MACHINE_RESET_CALL(z80ne);
-		//device_reset(cputag_get_cpu(machine, "z80ne"));
 		mame_schedule_soft_reset(machine);
 	}
 }
@@ -305,7 +500,7 @@ INPUT_CHANGED( z80ne_nmi )
 
 MACHINE_START( z80ne )
 {
-	logerror("In MACHINE_START z80ne\n");
+	LOG(("In MACHINE_START z80ne\n"));
 	state_save_register_item( machine, "z80ne", NULL, 0, lx383_scan_counter );
 	state_save_register_item( machine, "z80ne", NULL, 0, lx383_downsampler );
 	state_save_register_item_array( machine, "z80ne", NULL, 0, lx383_key );
@@ -316,13 +511,19 @@ MACHINE_START( z80ne )
 MACHINE_START( z80net )
 {
 	MACHINE_START_CALL( z80ne );
-	logerror("In MACHINE_START z80net\n");
+	LOG(("In MACHINE_START z80net\n"));
 }
 
 MACHINE_START( z80netb )
 {
 	MACHINE_START_CALL( z80net );
-	logerror("In MACHINE_START z80netb\n");
+	LOG(("In MACHINE_START z80netb\n"));
+}
+
+MACHINE_START( z80netf )
+{
+	MACHINE_START_CALL( z80net );
+	LOG(("In MACHINE_START z80netf\n"));
 }
 
 /******************************************************************************
@@ -333,52 +534,51 @@ MACHINE_START( z80netb )
 READ8_HANDLER( lx383_r )
 {
 	/*
-	 * Keyboard scanning
-	 *
-	 * IC14 NE555 astable oscillator
-	 * IC13 74LS93 binary counter
-	 * IC5  74LS240 tri-state buffer
-	 *
-	 * l'oscillatore NE555 alimenta il clock del contatore 74LS93
-	 * 		D0 - Q(A) --\
-	 * 		D1 - Q(B)    |-- column
-	 * 		D2 - Q(C) --/
-	 * 		D3 - Q(D)        row
-	 *      D4 - CTRL
-	 *      D5 - 0
-	 *      D6 - 0
-	 *      D7 - ~KEY Pressed
-	 */
+     * Keyboard scanning
+     *
+     * IC14 NE555 astable oscillator
+     * IC13 74LS93 binary counter
+     * IC5  74LS240 tri-state buffer
+     *
+     * l'oscillatore NE555 alimenta il clock del contatore 74LS93
+     *      D0 - Q(A) --\
+     *      D1 - Q(B)    |-- column
+     *      D2 - Q(C) --/
+     *      D3 - Q(D)        row
+     *      D4 - CTRL
+     *      D5 - 0
+     *      D6 - 0
+     *      D7 - ~KEY Pressed
+     */
     return lx383_key[lx383_scan_counter];
 }
 
-//#define ATTR_UNUSED __attribute__((__unused__))
 WRITE8_HANDLER( lx383_w )
 {
 	/*
-	 * First 8 locations (F0-F7) are mapped to a dual-port 8-byte RAM
-	 * The 1KHz NE-555 astable oscillator circuit drive
-	 * a 4-bit 74LS93 binary counter.
-	 * The 3 least sigificant bits of the counter are connected
-	 * both to the read addres of the dual-port ram and to
-	 * a 74LS156 3 to 8 binary decoder driving the cathode
-	 * of 8 7-segments LEDS.
-	 * The data output of the dual-port ram drive the anodes
-	 * of the LEDS through 74LS07 buffers.
-	 * LED segments - dual-port RAM bit:
-	 *   A   0x01
-	 *   B   0x02
-	 *   C   0x04
-	 *   D   0x08
-	 *   E   0x10
-	 *   F   0x20
-	 *   G   0x40
-	 *   P   0x80 (represented by DP in original schematics)
-	 *
-	 *   A write in the range F0-FF starts a 74LS90 counter
-	 *   that trigger the NMI line of the CPU afther 2 instruction
-	 *   fetch cycles for single step execution.
-	 */
+     * First 8 locations (F0-F7) are mapped to a dual-port 8-byte RAM
+     * The 1KHz NE-555 astable oscillator circuit drive
+     * a 4-bit 74LS93 binary counter.
+     * The 3 least sigificant bits of the counter are connected
+     * both to the read addres of the dual-port ram and to
+     * a 74LS156 3 to 8 binary decoder driving the cathode
+     * of 8 7-segments LEDS.
+     * The data output of the dual-port ram drive the anodes
+     * of the LEDS through 74LS07 buffers.
+     * LED segments - dual-port RAM bit:
+     *   A   0x01
+     *   B   0x02
+     *   C   0x04
+     *   D   0x08
+     *   E   0x10
+     *   F   0x20
+     *   G   0x40
+     *   P   0x80 (represented by DP in original schematics)
+     *
+     *   A write in the range F0-FF starts a 74LS90 counter
+     *   that trigger the NMI line of the CPU afther 2 instruction
+     *   fetch cycles for single step execution.
+     */
 
 	if ( offset < 8 )
     	output_set_digit_value( offset, data ^ 0xff );
@@ -441,7 +641,6 @@ READ8_HANDLER(lx385_ctrl_r)
 {
 	/* set unused bits high */
 	UINT8 data = 0xc0;
-//	UINT8 olddata = 0xc0;
 
 	ay31015_set_input_pin( z80ne_ay31015, AY31015_SWE, 0 );
 	data |= (ay31015_get_output_pin( z80ne_ay31015, AY31015_OR   ) ? 0x01 : 0);
@@ -454,6 +653,7 @@ READ8_HANDLER(lx385_ctrl_r)
 
 	return data;
 }
+
 WRITE8_HANDLER(lx385_data_w)
 {
 	ay31015_set_transmit_data( z80ne_ay31015, data );
@@ -464,12 +664,12 @@ WRITE8_HANDLER(lx385_data_w)
 WRITE8_HANDLER(lx385_ctrl_w)
 {
 	/* Translate data to control signals
-	 *     0 bit1=0, bit0=0   UART Reset pulse
-	 *     1 bit1=0, bit0=1   UART RDAV (Reset Data Available) pulse
-	 *     2 UART Tx Clock Enable (active high)
-	 *     3 *TAPEA Enable (active low) (at reset: low)
-	 *     4 *TAPEB Enable (active low) (at reset: low)
-	 */
+     *     0 bit1=0, bit0=0   UART Reset pulse
+     *     1 bit1=0, bit0=1   UART RDAV (Reset Data Available) pulse
+     *     2 UART Tx Clock Enable (active high)
+     *     3 *TAPEA Enable (active low) (at reset: low)
+     *     4 *TAPEB Enable (active low) (at reset: low)
+     */
 	UINT8 uart_reset, uart_rdav, uart_tx_clock;
 	UINT8 motor_a, motor_b;
 	UINT8 changed_bits = (lx385_ctrl ^ data) & 0x1C;
@@ -531,4 +731,189 @@ READ8_HANDLER(lx388_read_field_sync)
 
 	data = m6847_get_field_sync(space->machine) ? 0x00 : 0x80;
 	return data;
+}
+
+/*
+ * DRQ INTRQ IC9B.10 IC8B.*Q
+ *  0    0     1       0
+ *  0    1     0       x
+ *  1    0     0       x
+ *  1    1     0       x
+ *
+ */
+static WD17XX_CALLBACK( z80ne_fdc_callback )
+{
+	switch (state)
+	{
+		case WD17XX_IRQ_CLR:
+			wd17xx_state.intrq = FALSE;
+			break;
+		case WD17XX_IRQ_SET:
+			wd17xx_state.intrq = TRUE;
+			output_set_value("drv0", 0);
+			output_set_value("drv1", 0);
+			break;
+		case WD17XX_DRQ_CLR:
+			wd17xx_state.drq = FALSE;
+			break;
+		case WD17XX_DRQ_SET:
+			wd17xx_state.drq = TRUE;
+			break;
+	}
+}
+
+const wd17xx_interface z80ne_wd17xx_interface = { z80ne_fdc_callback, NULL };
+
+WRITE8_DEVICE_HANDLER(lx390_motor_w)
+{
+	/* Selection of drive and parameters
+     A write also causes the selected drive motor to turn on for about 3 seconds.
+     When the motor turns off, the drive is deselected.
+        d7 Unused             (trs80: 1=MFM, 0=FM)
+        d6 (trs80: 1=Wait)
+        d5 0=Side 0, 1=Side 1 (trs80: 1=Write Precompensation enabled)
+        d4 Unused             (trs80: 0=Side 0, 1=Side 1)
+        d3 1=select drive 3
+        d2 1=select drive 2
+        d1 1=select drive 1
+        d0 1=select drive 0 */
+
+		UINT8 drive = 255;
+
+		if (data & 1)
+			drive = 0;
+		else
+		if (data & 2)
+			drive = 1;
+		else
+		if (data & 4)
+			drive = 2;
+		else
+		if (data & 8)
+			drive = 3;
+
+		wd17xx_state.head = (data & 32) ? 1 : 0;
+		wd17xx_state.drive = data & 0x0F;
+
+		/* no drive selected, turn off all leds */
+		if (!wd17xx_state.drive)
+		{
+			output_set_value("drv0", 0);
+			output_set_value("drv1", 0);
+		}
+
+		if (drive < 4)
+		{
+			LOG(("lx390_motor_w, set drive %1d\n", drive));
+			wd17xx_set_drive(device,drive);
+			LOG(("lx390_motor_w, set side %1d\n", wd17xx_state.head));
+			wd17xx_set_side(device, wd17xx_state.head);
+		}
+}
+
+READ8_DEVICE_HANDLER(lx390_reset_bank)
+{
+	offs_t pc;
+
+	/* if PC is not in range, we are under integrated debugger control, DON'T SWAP */
+	pc = cpu_get_pc(cputag_get_cpu(device->machine, "z80ne"));
+	if((pc >= 0xf000) && (pc <=0xffff))
+	{
+		LOG(("lx390_reset_bank, reset memory bank 1\n"));
+		memory_set_bank(device->machine, 1, 0); /* RAM at 0x0000 (bank 1) */
+	}
+	else
+	{
+		LOG(("lx390_reset_bank, bypass because in debugger\n"));
+	}
+	return 0xff;
+}
+
+READ8_DEVICE_HANDLER(lx390_fdc_r)
+{
+	UINT8 d;
+
+	switch(offset)
+	{
+	case 0:
+		d = wd17xx_status_r(device, 0);
+		LOG(("lx390_fdc_r, WD17xx status: %02x\n", d));
+		break;
+	case 1:
+		d = wd17xx_track_r(device, 0);
+		LOG(("lx390_fdc_r, WD17xx track:  %02x\n", d));
+		break;
+	case 2:
+		d = wd17xx_sector_r(device, 0);
+		LOG(("lx390_fdc_r, WD17xx sector: %02x\n", d));
+		break;
+	case 3:
+		if(!wd17xx_state.drq && !wd17xx_state.intrq)
+		{
+			d = wd17xx_data_r(device, 0);
+			LOG(("lx390_fdc_r, WD17xx data3, ready:  %02x\n", d));
+		}
+		else
+		{
+			d = 0xff;
+			LOG(("lx390_fdc_r, WD17xx data3,  busy: intrq %01x drq %01x \n", wd17xx_state.intrq, wd17xx_state.drq));
+		}
+		break;
+	case 6:
+		d = 0xff;
+		lx390_reset_bank(device, 0);
+		break;
+	case 7:
+		d = wd17xx_data_r(device, 3);
+		LOG(("lx390_fdc_r, WD17xx data7, force:  %02x\n", d));
+		break;
+	default:
+		d = 0x00;
+	}
+	return d;
+}
+
+WRITE8_DEVICE_HANDLER(lx390_fdc_w)
+{
+	UINT8 d;
+
+	d = data;
+	switch(offset)
+	{
+	case 0:
+		LOG(("lx390_fdc_w, WD17xx command: %02x\n", d));
+		wd17xx_command_w(device, offset, d);
+		if (wd17xx_state.drive & 1)
+			output_set_value("drv0", 2);
+		else if (wd17xx_state.drive & 2)
+			output_set_value("drv1", 2);
+		break;
+	case 1:
+		LOG(("lx390_fdc_w, WD17xx track:   %02x\n", d));
+		wd17xx_track_w(device, offset, d);
+		break;
+	case 2:
+		LOG(("lx390_fdc_w, WD17xx sector:  %02x\n", d));
+		wd17xx_sector_w(device, offset, d);
+		break;
+	case 3:
+		if(!wd17xx_state.drq && !wd17xx_state.intrq)
+		{
+			LOG(("lx390_fdc_w, WD17xx data3, ready:   %02x\n", d));
+			wd17xx_data_w(device, 0, d);
+		}
+		else
+		{
+			LOG(("lx390_fdc_w, WD17xx data3,  busy:   %02x\n", d));
+		}
+		break;
+	case 6:
+		LOG(("lx390_fdc_w, motor_w:   %02x\n", d));
+		lx390_motor_w(device, 0, d);
+		break;
+	case 7:
+		LOG(("lx390_fdc_w, WD17xx data7, force:   %02x\n", d));
+		wd17xx_data_w(device, 3, d);
+		break;
+	}
 }

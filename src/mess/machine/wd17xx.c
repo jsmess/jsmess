@@ -1,46 +1,51 @@
 /***************************************************************************
 
-	wd17xx.c
+    wd17xx.c
 
-	Implementations of the Western Digitial 17xx and 19xx families of
-	floppy disk controllers
+    Implementations of the Western Digitial 17xx and 19xx families of
+    floppy disk controllers
 
 
-	Kevin Thacker
-		- Removed disk image code and replaced it with floppy drive functions.
-		  Any disc image is now useable with this code.
-		- Fixed write protect
+    Kevin Thacker
+        - Removed disk image code and replaced it with floppy drive functions.
+          Any disc image is now useable with this code.
+        - Fixed write protect
 
-	2005-Apr-16 P.Harvey-Smith:
-		- Increased the delay in wd17xx_timed_read_sector_request and
-		  wd17xx_timed_write_sector_request, to 40us to more closely match
-		  what happens on the real hardware, this has fixed the NitrOS9 boot
-		  problems.
+    2005-Apr-16 P.Harvey-Smith:
+        - Increased the delay in wd17xx_timed_read_sector_request and
+          wd17xx_timed_write_sector_request, to 40us to more closely match
+          what happens on the real hardware, this has fixed the NitrOS9 boot
+          problems.
 
-	2007-Nov-01 Wilbert Pol:
-		Needed these changes to get the MB8877 for Osborne-1 to work:
-		- Added support for multiple record read
-		- Changed the wd17xx_read_id to not return after DATADONEDELAY, but
-		  the host should read the id data through the data register. This
-		  was accomplished by making this change in the wd17xx_read_id
-		  function:
-			-               wd17xx_complete_command(device, DELAY_DATADONE);
-			+               wd17xx_set_data_request();
+    2007-Nov-01 Wilbert Pol:
+        Needed these changes to get the MB8877 for Osborne-1 to work:
+        - Added support for multiple record read
+        - Changed the wd17xx_read_id to not return after DATADONEDELAY, but
+          the host should read the id data through the data register. This
+          was accomplished by making this change in the wd17xx_read_id
+          function:
+            -               wd17xx_complete_command(device, DELAY_DATADONE);
+            +               wd17xx_set_data_request();
 
-	2009-May-10 Robbbert:
-		Further change to get the Kaypro II to work
-		- When wd17xx_read_id has generated the 6 data bytes, it should make
-		  an IRQ and turn off the busy status. The timing for Osborne is
-		  critical, it must be between 300 and 700 usec, I've settled on 400.
-		  The Kaypro doesn't care timewise, but the busy flag must turn off
-		  sometime or it hangs.
-			-		w->status |= STA_2_BUSY;
-			+		wd17xx_set_busy(device, ATTOTIME_IN_USEC(400));
+    2009-May-10 Robbbert:
+        Further change to get the Kaypro II to work
+        - When wd17xx_read_id has generated the 6 data bytes, it should make
+          an IRQ and turn off the busy status. The timing for Osborne is
+          critical, it must be between 300 and 700 usec, I've settled on 400.
+          The Kaypro doesn't care timewise, but the busy flag must turn off
+          sometime or it hangs.
+            -       w->status |= STA_2_BUSY;
+            +       wd17xx_set_busy(device, ATTOTIME_IN_USEC(400));
 
-	TODO:
-		- Multiple record write
-		- What happens if a track is read that doesn't have any id's on it?
-	     (e.g. unformatted disc)
+    2009-June-4 Roberto Lavarone:
+        - Initial support for wd1771
+        - Added simulation of head loaded feedback from drive
+        - Bugfix: busy flag was cleared too early
+
+    TODO:
+        - Multiple record write
+        - What happens if a track is read that doesn't have any id's on it?
+         (e.g. unformatted disc)
 
 ***************************************************************************/
 
@@ -52,7 +57,7 @@
 
 /***************************************************************************
 
-	Parameters
+    Parameters
 
 ***************************************************************************/
 
@@ -68,6 +73,7 @@
 typedef enum
 {
 	WD_TYPE_1770,
+	WD_TYPE_1771,
 	WD_TYPE_1772,
 	WD_TYPE_1773,
 	WD_TYPE_179X,
@@ -82,7 +88,7 @@ typedef enum
 
 /***************************************************************************
 
-	Constants
+    Constants
 
 ***************************************************************************/
 
@@ -159,7 +165,7 @@ typedef enum
 
 /***************************************************************************
 
-	Structures
+    Structures
 
 ***************************************************************************/
 
@@ -200,8 +206,9 @@ struct _wd17xx_t
 	emu_timer	*timer, *timer_rs, *timer_ws, *timer_rid;
 	int		data_direction;
 
-	UINT8   ipl;					/* index pulse */	
-	
+	UINT8   ipl;					/* index pulse */
+	int     hld_count;				/* head loaded counter */
+
 	emu_timer *busy_timer;
 
 	/* this is the drive currently selected */
@@ -212,7 +219,7 @@ struct _wd17xx_t
 
 	/* pause time when writing/reading sector */
 	int pause_time;
-	
+
 	/* Pointer to interface */
 	const wd17xx_interface *intf;
 };
@@ -228,7 +235,7 @@ INLINE wd17xx_t *get_safe_token(const device_config *device)
 
 /***************************************************************************
 
-	Read track stuff
+    Read track stuff
 
 ***************************************************************************/
 
@@ -236,43 +243,43 @@ INLINE wd17xx_t *get_safe_token(const device_config *device)
 #define TRKSIZE_DD		6144
 #if 0
 static const UINT8 track_DD[][2] = {
-	{16, 0x4e}, 	/* 16 * 4E (track lead in)				 */
-	{ 8, 0x00}, 	/*	8 * 00 (pre DAM)					 */
-	{ 3, 0xf5}, 	/*	3 * F5 (clear CRC)					 */
+	{16, 0x4e}, 	/* 16 * 4E (track lead in)               */
+	{ 8, 0x00}, 	/*  8 * 00 (pre DAM)                     */
+	{ 3, 0xf5}, 	/*  3 * F5 (clear CRC)                   */
 
-	{ 1, 0xfe}, 	/* *** sector *** FE (DAM)				 */
-	{ 1, 0x80}, 	/*	4 bytes track,head,sector,seclen	 */
-	{ 1, 0xf7}, 	/*	1 * F7 (CRC)						 */
-	{22, 0x4e}, 	/* 22 * 4E (sector lead in) 			 */
-	{12, 0x00}, 	/* 12 * 00 (pre AM) 					 */
-	{ 3, 0xf5}, 	/*	3 * F5 (clear CRC)					 */
-	{ 1, 0xfb}, 	/*	1 * FB (AM) 						 */
-	{ 1, 0x81}, 	/*	x bytes sector data 				 */
-	{ 1, 0xf7}, 	/*	1 * F7 (CRC)						 */
-	{16, 0x4e}, 	/* 16 * 4E (sector lead out)			 */
-	{ 8, 0x00}, 	/*	8 * 00 (post sector)				 */
-	{ 0, 0x00}, 	/* end of data							 */
+	{ 1, 0xfe}, 	/* *** sector *** FE (DAM)               */
+	{ 1, 0x80}, 	/*  4 bytes track,head,sector,seclen     */
+	{ 1, 0xf7}, 	/*  1 * F7 (CRC)                         */
+	{22, 0x4e}, 	/* 22 * 4E (sector lead in)              */
+	{12, 0x00}, 	/* 12 * 00 (pre AM)                      */
+	{ 3, 0xf5}, 	/*  3 * F5 (clear CRC)                   */
+	{ 1, 0xfb}, 	/*  1 * FB (AM)                          */
+	{ 1, 0x81}, 	/*  x bytes sector data                  */
+	{ 1, 0xf7}, 	/*  1 * F7 (CRC)                         */
+	{16, 0x4e}, 	/* 16 * 4E (sector lead out)             */
+	{ 8, 0x00}, 	/*  8 * 00 (post sector)                 */
+	{ 0, 0x00}, 	/* end of data                           */
 };
 #endif
 /* structure describing a single density track */
 #define TRKSIZE_SD		3172
 #if 0
 static const UINT8 track_SD[][2] = {
-	{16, 0xff}, 	/* 16 * FF (track lead in)				 */
-	{ 8, 0x00}, 	/*	8 * 00 (pre DAM)					 */
-	{ 1, 0xfc}, 	/*	1 * FC (clear CRC)					 */
+	{16, 0xff}, 	/* 16 * FF (track lead in)               */
+	{ 8, 0x00}, 	/*  8 * 00 (pre DAM)                     */
+	{ 1, 0xfc}, 	/*  1 * FC (clear CRC)                   */
 
-	{11, 0xff}, 	/* *** sector *** 11 * FF				 */
-	{ 6, 0x00}, 	/*	6 * 00 (pre DAM)					 */
-	{ 1, 0xfe}, 	/*	1 * FE (DAM)						 */
-	{ 1, 0x80}, 	/*	4 bytes track,head,sector,seclen	 */
-	{ 1, 0xf7}, 	/*	1 * F7 (CRC)						 */
-	{10, 0xff}, 	/* 10 * FF (sector lead in) 			 */
-	{ 4, 0x00}, 	/*	4 * 00 (pre AM) 					 */
-	{ 1, 0xfb}, 	/*	1 * FB (AM) 						 */
-	{ 1, 0x81}, 	/*	x bytes sector data 				 */
-	{ 1, 0xf7}, 	/*	1 * F7 (CRC)						 */
-	{ 0, 0x00}, 	/* end of data							 */
+	{11, 0xff}, 	/* *** sector *** 11 * FF                */
+	{ 6, 0x00}, 	/*  6 * 00 (pre DAM)                     */
+	{ 1, 0xfe}, 	/*  1 * FE (DAM)                         */
+	{ 1, 0x80}, 	/*  4 bytes track,head,sector,seclen     */
+	{ 1, 0xf7}, 	/*  1 * F7 (CRC)                         */
+	{10, 0xff}, 	/* 10 * FF (sector lead in)              */
+	{ 4, 0x00}, 	/*  4 * 00 (pre AM)                      */
+	{ 1, 0xfb}, 	/*  1 * FB (AM)                          */
+	{ 1, 0x81}, 	/*  x bytes sector data                  */
+	{ 1, 0xf7}, 	/*  1 * F7 (CRC)                         */
+	{ 0, 0x00}, 	/* end of data                           */
 };
 #endif
 
@@ -280,7 +287,7 @@ static const UINT8 track_SD[][2] = {
 
 /***************************************************************************
 
-	Prototypes
+    Prototypes
 
 ***************************************************************************/
 
@@ -303,6 +310,11 @@ static const device_config *wd17xx_current_image(const device_config *device)
 void wd17xx_set_drive(const device_config *device,UINT8 drive)
 {
 	wd17xx_t *w = get_safe_token(device);
+	if (VERBOSE)
+	{
+		if (drive != w->current_drive)
+			logerror("wd17xx_set_drive: $%02x\n", drive);
+	}
 	w->current_drive = drive;
 }
 
@@ -359,7 +371,7 @@ static void wd17xx_restore(const device_config *device)
 {
 	UINT8 step_counter;
 	wd17xx_t *w = get_safe_token(device);
-	
+
 	if (w->current_drive >= device_count(device->machine, IO_FLOPPY))
 		return;
 
@@ -559,7 +571,10 @@ static void read_track(const device_config *device)
 	}
 #endif
 
-	w->data_count = (w->density) ? TRKSIZE_DD : TRKSIZE_SD;
+	if (w->type == WD_TYPE_1771)
+		w->data_count = TRKSIZE_SD;
+	else
+		w->data_count = (w->density) ? TRKSIZE_DD : TRKSIZE_SD;
 
 	floppy_drive_read_track_data_info_buffer( wd17xx_current_image(device), w->hd, (char *)w->buffer, &(w->data_count) );
 
@@ -638,14 +653,16 @@ static void wd17xx_read_id(const device_config *device)
 
 		wd17xx_set_data_request(device);
 
-		logerror("read id succeeded.\n");
+		if (VERBOSE)
+			logerror("read id succeeded.\n");
 	}
 	else
 	{
 		/* record not found */
 		w->status |= STA_2_REC_N_FND;
 		//w->sector = w->track_reg;
-		logerror("read id failed\n");
+		if (VERBOSE)
+			logerror("read id failed\n");
 
 		wd17xx_complete_command(device, DELAY_ERROR);
 	}
@@ -659,6 +676,9 @@ static void wd17xx_index_pulse_callback(const device_config *controller, const d
 	if ( img != wd17xx_current_image(controller) )
 		return;
 	w->ipl = state;
+
+	if (w->hld_count)
+		w->hld_count--;
 }
 
 
@@ -676,7 +696,7 @@ static int wd17xx_locate_sector(const device_config *device)
 	UINT8 revolution_count;
 	chrn_id id;
 	wd17xx_t *w = get_safe_token(device);
-	
+
 	revolution_count = 0;
 
 	w->status &= ~STA_2_REC_N_FND;
@@ -771,7 +791,7 @@ static void wd17xx_callback(const device_config *device, wd17xx_state_t state)
 {
 	wd17xx_t *w = get_safe_token(device);
 	void *param = NULL;
-	if (w->intf->callback_param) 
+	if (w->intf->callback_param)
 		param = (*w->intf->callback_param)(device);
 	if (w->intf->callback)
 		(*w->intf->callback)(device, state, param);
@@ -837,8 +857,11 @@ static void wd17xx_complete_command(const device_config *device, int delay)
 
 	w->data_count = 0;
 
+	w->hld_count = 2;
+
 	/* clear busy bit */
-	w->status &= ~STA_2_BUSY;
+	/* RL - removed, busy bit must be on until wd17xx_misc_timer_callback() is fired */
+	/* w->status &= ~STA_2_BUSY; */
 
 	usecs = floppy_drive_get_datarate_in_us(w->density);
 	usecs *= delay;
@@ -853,9 +876,9 @@ static void wd17xx_write_sector(const device_config *device)
 {
 	wd17xx_t *w = get_safe_token(device);
 	/* at this point, the disc is write enabled, and data
-	 * has been transfered into our buffer - now write it to
-	 * the disc image or to the real disc
-	 */
+     * has been transfered into our buffer - now write it to
+     * the disc image or to the real disc
+     */
 
 	/* side compare? */
 	if (w->write_cmd & 0x02)
@@ -869,7 +892,7 @@ static void wd17xx_write_sector(const device_config *device)
 		w->data_count = w->sector_length;
 
 		/* write data */
-		floppy_drive_write_sector_data(wd17xx_current_image(device), w->hd, w->sector_data_id, (char *)w->buffer, w->sector_length,w->write_cmd & 0x01);
+		floppy_drive_write_sector_data(wd17xx_current_image(device), w->hd, w->sector_data_id, (char *)w->buffer, w->sector_length, w->write_cmd & 0x01);
 	}
 }
 
@@ -884,7 +907,8 @@ static void wd17xx_verify_seek(const device_config *device)
 
 	revolution_count = 0;
 
-	logerror("doing seek verify\n");
+	if (VERBOSE)
+		logerror("doing seek verify\n");
 
 	w->status &= ~STA_1_SEEK_ERR;
 
@@ -896,7 +920,8 @@ static void wd17xx_verify_seek(const device_config *device)
 			/* compare track */
 			if (id.C == w->track_reg)
 			{
-				logerror("seek verify succeeded!\n");
+				if (VERBOSE)
+					logerror("seek verify succeeded!\n");
 				return;
 			}
 		}
@@ -911,7 +936,8 @@ static void wd17xx_verify_seek(const device_config *device)
 
 	w->status |= STA_1_SEEK_ERR;
 
-	logerror("failed seek verify!\n");
+	if (VERBOSE)
+		logerror("failed seek verify!\n");
 }
 
 
@@ -921,7 +947,7 @@ static void wd17xx_clear_data_request(const device_config *device)
 {
 	wd17xx_t *w = get_safe_token(device);
 
-//	w->status_drq = 0;
+//  w->status_drq = 0;
 	wd17xx_callback(device, WD17XX_DRQ_CLR);
 	w->status &= ~STA_2_DRQ;
 }
@@ -936,11 +962,11 @@ static void wd17xx_set_data_request(const device_config *device)
 	if (w->status & STA_2_DRQ)
 	{
 		w->status |= STA_2_LOST_DAT;
-//		return;
+//      return;
 	}
 
 	/* set drq */
-//	w->status_drq = STA_2_DRQ;
+//  w->status_drq = STA_2_DRQ;
 	wd17xx_callback(device, WD17XX_DRQ_SET);
 	w->status |= STA_2_DRQ;
 }
@@ -1074,11 +1100,6 @@ void wd17xx_set_pause_time(const device_config *device,int usec)
 	int result = w->status;
 
 	wd17xx_callback(device, WD17XX_IRQ_CLR);
-//	if (w->busy_count)
-//	{
-//		if (!--w->busy_count)
-//			w->status &= ~STA_1_BUSY;
-//	}
 
 	/* type 1 command or force int command? */
 	if ((w->command_type==TYPE_I) || (w->command_type==TYPE_IV))
@@ -1092,11 +1113,11 @@ void wd17xx_set_pause_time(const device_config *device,int usec)
 		if (floppy_drive_get_flag_state(wd17xx_current_image(device), FLOPPY_DRIVE_HEAD_AT_TRACK_0))
 			result |= STA_1_TRACK0;
 
-	//	floppy_drive_set_ready_state(wd17xx_current_image(device), 1,1);
+	//  floppy_drive_set_ready_state(wd17xx_current_image(device), 1,1);
 		w->status &= ~STA_1_NOT_READY;
 
 		/* TODO: What is this?  We need some more info on this */
-		if ((w->type == WD_TYPE_179X) || (w->type == WD_TYPE_1793) || (w->type == WD_TYPE_1773))
+		if ((w->type == WD_TYPE_179X) || (w->type == WD_TYPE_1793) || (w->type == WD_TYPE_1773) || (w->type == WD_TYPE_1771))
 		{
 			if (!floppy_drive_get_flag_state(wd17xx_current_image(device), FLOPPY_DRIVE_READY))
 				w->status |= STA_1_NOT_READY;
@@ -1106,10 +1127,18 @@ void wd17xx_set_pause_time(const device_config *device,int usec)
 			if (floppy_drive_get_flag_state(wd17xx_current_image(device), FLOPPY_DRIVE_READY))
 				w->status |= STA_1_NOT_READY;
 		}
+
+		if (w->command_type==TYPE_I)
+		{
+			if (w->hld_count)
+				w->status |= STA_1_HD_LOADED;
+			else
+				w->status &= ~ STA_1_HD_LOADED;
+		}
 	}
 
 	/* eventually set data request bit */
-//	w->status |= w->status_drq;
+//  w->status |= w->status_drq;
 
 	if (VERBOSE)
 	{
@@ -1205,7 +1234,7 @@ READ8_DEVICE_HANDLER ( wd17xx_sector_r )
 			else
 			{
 				/* Delay the INTRQ 3 byte times because we need to read two CRC bytes and
-				   compare them with a calculated CRC */
+                   compare them with a calculated CRC */
 				wd17xx_complete_command(device, DELAY_DATADONE);
 
 				if (VERBOSE)
@@ -1259,8 +1288,8 @@ WRITE8_DEVICE_HANDLER ( wd17xx_command_w )
 		}
 
 
-//		w->status_ipl = STA_1_IPL;
-/*		w->status_ipl = 0; */
+//      w->status_ipl = STA_1_IPL;
+/*      w->status_ipl = 0; */
 
 		w->busy_count = 0;
 		w->command_type = TYPE_IV;
@@ -1315,7 +1344,7 @@ WRITE8_DEVICE_HANDLER ( wd17xx_command_w )
 			w->status &= ~STA_2_LOST_DAT;
 			wd17xx_clear_data_request(device);
 #if 1
-//			w->status = seek(w, w->track, w->head, w->sector);
+//          w->status = seek(w, w->track, w->head, w->sector);
 			if (w->status == 0)
 				read_track(device);
 #endif
@@ -1350,7 +1379,10 @@ WRITE8_DEVICE_HANDLER ( wd17xx_command_w )
 				{
 				w->command = data & ~FDC_MASK_TYPE_III;
 				w->data_offset = 0;
-				w->data_count = (w->density) ? TRKSIZE_DD : TRKSIZE_SD;
+				if (w->type == WD_TYPE_1771)
+					w->data_count = TRKSIZE_SD;
+				else
+					w->data_count = (w->density) ? TRKSIZE_DD : TRKSIZE_SD;
 				wd17xx_set_data_request(device);
 				w->status |= STA_2_BUSY;
 				w->busy_count = 0;
@@ -1513,20 +1545,22 @@ WRITE8_DEVICE_HANDLER ( wd17xx_command_w )
 		wd17xx_set_busy(device, ATTOTIME_IN_USEC(100));
 	}
 
-//	if (w->busy_count==0)
-//		w->status &= ~STA_1_BUSY;
-
-//	/* toggle index pulse at read */
-//	w->status_ipl = STA_1_IPL;
-
-	/* 0 is enable spin up sequence, 1 is disable spin up sequence */
-	if ((data & FDC_STEP_HDLOAD)==0)
-		w->status |= STA_1_HD_LOADED;
-
-	if (data & FDC_STEP_VERIFY)
+	if (w->command_type == TYPE_I)
 	{
-		/* verify seek */
-		wd17xx_verify_seek(device);
+		/* 0 is enable spin up sequence, 1 is disable spin up sequence */
+		if (data & FDC_STEP_HDLOAD)
+		{
+			w->status |= STA_1_HD_LOADED;
+			w->hld_count = 2;
+		}
+		else
+			w->status &= ~STA_1_HD_LOADED;
+
+		if (data & FDC_STEP_VERIFY)
+		{
+			/* verify seek */
+			wd17xx_verify_seek(device);
+		}
 	}
 }
 
@@ -1652,7 +1686,7 @@ static void common_start(const device_config *device, wd17xx_type_t device_type)
 	assert(device->static_config != NULL);
 
 	w->intf = device->static_config;
-	
+
 	w->status = STA_1_TRACK0;
 	w->type = device_type;
 	w->density = DEN_MFM_LO;
@@ -1667,7 +1701,7 @@ static DEVICE_RESET( wd17xx )
 {
 	wd17xx_t *w = get_safe_token(device);
 	int i;
-	
+
 	for (i = 0; i < device_count(device->machine, IO_FLOPPY); i++)
 	{
 		const device_config *img = image_from_devtype_and_index(device->machine, IO_FLOPPY, i);
@@ -1678,11 +1712,12 @@ static DEVICE_RESET( wd17xx )
 
 	w->current_drive = 0;
 	w->hd = 0;
+	w->hld_count = 0;
 
 	wd17xx_restore(device);
 }
 
-void wd17xx_reset(const device_config *device) 
+void wd17xx_reset(const device_config *device)
 {
 	device_reset_wd17xx(device);
 }
@@ -1690,6 +1725,10 @@ void wd17xx_reset(const device_config *device)
 static DEVICE_START( wd1770 )
 {
 	common_start(device, WD_TYPE_1770);
+}
+static DEVICE_START( wd1771 )
+{
+	common_start(device, WD_TYPE_1771);
 }
 static DEVICE_START( wd1772 )
 {
@@ -1744,6 +1783,19 @@ DEVICE_GET_INFO( wd1770 )
 }
 
 
+DEVICE_GET_INFO( wd1771 )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "WD1771");				break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(wd1771);	break;
+
+		default: 										DEVICE_GET_INFO_CALL(wd1770);				break;
+	}
+}
 DEVICE_GET_INFO( wd1772 )
 {
 	switch (state)

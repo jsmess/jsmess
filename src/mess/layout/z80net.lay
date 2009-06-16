@@ -8,14 +8,14 @@
         <rect>
             <bounds left="0" top="0" right="1" bottom="1" />
             <color red="0.15" green="0.15" blue="0.15" />
-        </rect> 
+        </rect>
     </element>
 
     <element name="digit_back">
         <rect>
             <bounds left="0" top="0" right="1" bottom="1" />
             <color red="0.584" green="0.631" blue="0.690" />
-        </rect> 
+        </rect>
     </element>
 
     <element name="digit" defstate="0">
@@ -28,7 +28,7 @@
         <rect>
             <bounds left="0" top="0" right="1" bottom="1" />
             <color red="0.0" green="0.0" blue="0.0" />
-        </rect> 
+        </rect>
     </element>
 
     <element name="pushbutton" defstate="1">
@@ -665,6 +665,5 @@
         </bezel>
 
     </view>
-
 
 </mamelayout>

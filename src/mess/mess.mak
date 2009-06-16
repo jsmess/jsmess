@@ -1358,6 +1358,7 @@ $(MESSOBJ)/snk.a: \
 $(MESSOBJ)/z80ne.a:	\
 	$(MESS_DRIVERS)/z80ne.o     \
 	$(MESS_VIDEO)/z80ne.o       \
+	$(MESS_FORMATS)/z80ne_dsk.o \
 	$(MESS_MACHINE)/z80ne.o     \
 	$(MESS_MACHINE)/kr2376.o	\
 
@@ -1497,7 +1498,8 @@ $(MESS_DRIVERS)/vt100.o:	$(MESS_LAYOUT)/vt100.lh
 $(MESS_DRIVERS)/x68k.o:		$(MESS_LAYOUT)/x68000.lh
 $(MESS_DRIVERS)/z80ne.o:	$(MESS_LAYOUT)/z80ne.lh   \
 							$(MESS_LAYOUT)/z80net.lh  \
-							$(MESS_LAYOUT)/z80netb.lh
+							$(MESS_LAYOUT)/z80netb.lh \
+							$(MESS_LAYOUT)/z80netf.lh
 
 #-------------------------------------------------
 # MESS-specific tools

@@ -1,89 +1,89 @@
 /******************************************************************************
-	Nuova Elettronica Z80NE system driver
+    Nuova Elettronica Z80NE system driver
 
-	Preliminary driver
+    Preliminary driver
 
-	Roberto Lavarone, 2009-01-05
+    Roberto Lavarone, 2009-01-05
 
-	Thanks go to:
-		Roberto Bazzano: www.z80ne.com
+    Thanks go to:
+        Roberto Bazzano: www.z80ne.com
 
-	Z80NE memory map
+    Z80NE memory map
 
-		LX.382 CPU board
-			range     short     description
-			0000-03FF RAM
-			8000-83FF EPROM     firmware
+        LX.382 CPU board
+            range     short     description
+            0000-03FF RAM
+            8000-83FF EPROM     firmware
 
-		LX.383 HEX keyboard and display controller for LX.384 hex keyboard and display
-			range     short     description
-			F0-F7     I/O       7-segment LED dual-port RAM write
-			F0        I/O       keyboard read
-			F8        I/O       enable single step for next instruction
+        LX.383 HEX keyboard and display controller for LX.384 hex keyboard and display
+            range     short     description
+            F0-F7     I/O       7-segment LED dual-port RAM write
+            F0        I/O       keyboard read
+            F8        I/O       enable single step for next instruction
 
-		LX.385 Cassette interface
-			range     short     description
-			EE        I/O       UART Data Read/Write
-			EF        I/O       UART Status/Control - Cassette Tape Control
+        LX.385 Cassette interface
+            range     short     description
+            EE        I/O       UART Data Read/Write
+            EF        I/O       UART Status/Control - Cassette Tape Control
 
-		LX.392 32K Memory expansion board
-			range     short     description
+        LX.392 32K Memory expansion board
+            range     short     description
 
 
-		LX.389 Printer Interface
-			range     short     description
-			02-03
-			06-07
-			0A-0B
-			0E-0F
-			12-13
-			16-17
-			1A-1B
-			1E-1F
+        LX.389 Printer Interface
+            range     short     description
+            02-03
+            06-07
+            0A-0B
+            0E-0F
+            12-13
+            16-17
+            1A-1B
+            1E-1F
 
-		LX.548 16K Basic eprom
-			range     short     description
-			0000-3FFF EPROM     firmware
+        LX.548 16K Basic eprom
+            range     short     description
+            0000-3FFF EPROM     firmware
 
-		LX.388 Video Interface
-			range     short     description
-			EC00-EDFF RAM
-			EA        I/O       keyboard
-			EB        I/O       video retrace
+        LX.388 Video Interface
+            range     short     description
+            EC00-EDFF RAM
+            EA        I/O       keyboard
+            EB        I/O       video retrace
 
-		LX.529 Graphics Video and Printer Interface
-			range     short     description
-			80        I/O       PIO 0 port A data (ram 0)
-			81        I/O       PIO 0 port A control (ram 0)
-			82        I/O       PIO 0 port B data (printer)
-			83        I/O       PIO 0 port B control (printer)
-			84        I/O       PIO 1 port A data (ram 1)
-			85        I/O       PIO 1 port A control (ram 1)
-			86        I/O       PIO 1 port B data (keyboard)
-			87        I/O       PIO 1 port B control (keyboard)
-			88        I/O       PIO 2 port A data (ram 2)
-			89        I/O       PIO 2 port A control (ram 2)
-			8A        I/O       PIO 2 port B data (printer busy + 40/80 video chars)
-			8B        I/O       PIO 2 port B control (printer busy + 40/40 video chars)
-			8C        I/O       SY6845 address and status register
-			8D        I/O       SY6845 data register
-			8E        I/O       RAM 3 character attribute
-			8F        I/O       beeper
+        LX.529 Graphics Video and Printer Interface
+            range     short     description
+            80        I/O       PIO 0 port A data (ram 0)
+            81        I/O       PIO 0 port A control (ram 0)
+            82        I/O       PIO 0 port B data (printer)
+            83        I/O       PIO 0 port B control (printer)
+            84        I/O       PIO 1 port A data (ram 1)
+            85        I/O       PIO 1 port A control (ram 1)
+            86        I/O       PIO 1 port B data (keyboard)
+            87        I/O       PIO 1 port B control (keyboard)
+            88        I/O       PIO 2 port A data (ram 2)
+            89        I/O       PIO 2 port A control (ram 2)
+            8A        I/O       PIO 2 port B data (printer busy + 40/80 video chars)
+            8B        I/O       PIO 2 port B control (printer busy + 40/40 video chars)
+            8C        I/O       SY6845 address and status register
+            8D        I/O       SY6845 data register
+            8E        I/O       RAM 3 character attribute
+            8F        I/O       beeper
 
-		LX.390 Floppy Interface
-			range     short     description
-			F000-F3FF EPROM     firmware
-			D0        I/O       command/status register
-			D1        I/O       trace register
-			D2        I/O       sector register
-			D3        I/O       data register (write only if controller idle)
-			D6        I/O       drive select / drive side one select
-			D7        I/O       data register (write always)
+        LX.390 Floppy Interface
+            range     short     description
+            F000-F3FF EPROM     firmware
+            D0        I/O       command/status register
+            D1        I/O       trace register
+            D2        I/O       sector register
+            D3        I/O       data register (write only if controller idle)
+            D6        I/O       drive select / drive side one select
+            D7        I/O       data register (write always)
 
-		LX.394-395 EPROM Programmer
-			range     short     description
-			9000-9FFF EPROM     EPROM to be written
-			8400-8FFF EPROM     firmware
+        LX.394-395 EPROM Programmer
+            range     short     description
+            9000-9FFF EPROM     EPROM to be written
+            8400-8FFF EPROM     firmware
 
 
 ******************************************************************************/
@@ -92,18 +92,21 @@
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "includes/z80ne.h"
+#include "devices/basicdsk.h"
+#include "devices/mflopimg.h"
 #include "devices/cassette.h"
+#include "formats/z80ne_dsk.h"
 
 /* peripheral chips */
 #include "machine/ay31015.h"
 #include "machine/kr2376.h"
 #include "video/m6847.h"
-#include "machine/wd17xx.h"
 
 /* Layout */
 #include "z80ne.lh"
 #include "z80net.lh"
 #include "z80netb.lh"
+#include "z80netf.lh"
 
 
 /******************************************************************************
@@ -113,25 +116,19 @@
 
 /* LX.382 CPU Board RAM */
 /* LX.382 CPU Board EPROM */
-#if 0
 static ADDRESS_MAP_START( z80ne_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x03ff ) AM_RAMBANK(1)
-	AM_RANGE( 0x0400, 0x7fff ) AM_READWRITE(SMH_NOP, SMH_NOP)
-	AM_RANGE( 0x8000, 0x83ff ) AM_ROM
-	AM_RANGE( 0x8400, 0xebff ) AM_READWRITE(SMH_NOP, SMH_NOP)
-	AM_RANGE( 0xec00, 0xedff ) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size) /* (6847) */
-	AM_RANGE( 0xee00, 0xffff ) AM_READWRITE(SMH_NOP, SMH_NOP)
-
+	AM_RANGE( 0x0400, 0x7fff ) AM_RAM
+	AM_RANGE( 0x8000, 0x83ff ) AM_ROMBANK(2)
+	AM_RANGE( 0x8400, 0xffff ) AM_READWRITE(SMH_NOP, SMH_NOP)
 ADDRESS_MAP_END
-#endif
 
-static ADDRESS_MAP_START( z80ne_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE( 0x0000, 0x7fff ) AM_RAMBANK(1)
-	AM_RANGE( 0x8000, 0x83ff ) AM_ROM
-//	AM_RANGE( 0x8400, 0xebff ) AM_READWRITE(SMH_NOP, SMH_NOP)
+static ADDRESS_MAP_START( z80net_mem, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE( 0x0000, 0x03ff ) AM_RAMBANK(1)
+	AM_RANGE( 0x0400, 0x7fff ) AM_RAM
+	AM_RANGE( 0x8000, 0x83ff ) AM_ROMBANK(2)
 	AM_RANGE( 0x8400, 0xebff ) AM_RAM
 	AM_RANGE( 0xec00, 0xedff ) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size) /* (6847) */
-//	AM_RANGE( 0xee00, 0xffff ) AM_READWRITE(SMH_NOP, SMH_NOP)
 	AM_RANGE( 0xee00, 0xffff ) AM_RAM
 ADDRESS_MAP_END
 
@@ -158,6 +155,29 @@ static ADDRESS_MAP_START( z80net_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xf0, 0xff) AM_READWRITE( lx383_r, lx383_w )
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( z80netf_mem, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE( 0x0000, 0x03ff ) AM_RAMBANK(1)
+	AM_RANGE( 0x0400, 0x3fff ) AM_RAMBANK(2)
+	AM_RANGE( 0x4000, 0x7fff ) AM_RAM
+	AM_RANGE( 0x8000, 0x83ff ) AM_RAMBANK(3)
+	AM_RANGE( 0x8400, 0xdfff ) AM_RAM
+	AM_RANGE( 0xe000, 0xebff ) AM_READWRITE(SMH_NOP, SMH_NOP)
+	AM_RANGE( 0xec00, 0xedff ) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size) /* (6847) */
+	AM_RANGE( 0xee00, 0xefff ) AM_READWRITE(SMH_NOP, SMH_NOP)
+	AM_RANGE( 0xf000, 0xf3ff ) AM_RAMBANK(4)
+	AM_RANGE( 0xf400, 0xffff ) AM_READWRITE(SMH_NOP, SMH_NOP)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( z80netf_io, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0xd0, 0xd7) AM_DEVREADWRITE("wd1771", lx390_fdc_r, lx390_fdc_w)
+	AM_RANGE(0xea, 0xea) AM_READ( lx388_data_r )
+	AM_RANGE(0xeb, 0xeb) AM_READ( lx388_read_field_sync )
+	AM_RANGE(0xee, 0xee) AM_READWRITE( lx385_data_r, lx385_data_w )
+	AM_RANGE(0xef, 0xef) AM_READWRITE( lx385_ctrl_r, lx385_ctrl_w )
+	AM_RANGE(0xf0, 0xff) AM_READWRITE( lx383_r, lx383_w )
+ADDRESS_MAP_END
+
 
 
 /******************************************************************************
@@ -167,48 +187,51 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( z80ne )
 /* LX.384 Hex Keyboard and Display */
+/*
+ * In natural mode the CTRL key is mapped on shift
+ */
 PORT_START("ROW0")			/* IN0 keys row 0 */
-PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("0") PORT_CODE(KEYCODE_0)
-PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("1") PORT_CODE(KEYCODE_1)
-PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("2") PORT_CODE(KEYCODE_2)
-PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("3") PORT_CODE(KEYCODE_3)
-PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("4") PORT_CODE(KEYCODE_4)
-PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("5") PORT_CODE(KEYCODE_5)
-PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("6") PORT_CODE(KEYCODE_6)
-PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("7") PORT_CODE(KEYCODE_7)
+PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 0") PORT_CODE(KEYCODE_0)          //PORT_CHAR('0') PORT_CHAR('=')
+PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 1") PORT_CODE(KEYCODE_1)          //PORT_CHAR('1') PORT_CHAR('!')
+PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 2") PORT_CODE(KEYCODE_2)          //PORT_CHAR('2') PORT_CHAR('"')
+PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 3") PORT_CODE(KEYCODE_3)          //PORT_CHAR('3') PORT_CHAR(0x00a3) // ??
+PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 4") PORT_CODE(KEYCODE_4)          //PORT_CHAR('4') PORT_CHAR('$')
+PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 5") PORT_CODE(KEYCODE_5)          //PORT_CHAR('5') PORT_CHAR('%')
+PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 6") PORT_CODE(KEYCODE_6)          //PORT_CHAR('6') PORT_CHAR('&')
+PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 7") PORT_CODE(KEYCODE_7)          //PORT_CHAR('7') PORT_CHAR('/')
 
 PORT_START("ROW1")			/* IN1 keys row 1 */
-PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("8") PORT_CODE(KEYCODE_8)
-PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("9") PORT_CODE(KEYCODE_9)
-PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("A") PORT_CODE(KEYCODE_A)
-PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("B") PORT_CODE(KEYCODE_B)
-PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("C") PORT_CODE(KEYCODE_C)
-PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("D") PORT_CODE(KEYCODE_D)
-PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("E") PORT_CODE(KEYCODE_E)
-PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F") PORT_CODE(KEYCODE_F)
+PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 8") PORT_CODE(KEYCODE_8)          //PORT_CHAR('8') PORT_CHAR('(')
+PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 9") PORT_CODE(KEYCODE_9)          //PORT_CHAR('9') PORT_CHAR(')')
+PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 A") PORT_CODE(KEYCODE_A)          //PORT_CHAR('a') PORT_CHAR('A')
+PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 B") PORT_CODE(KEYCODE_B)          //PORT_CHAR('b') PORT_CHAR('B')
+PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 C") PORT_CODE(KEYCODE_C)          //PORT_CHAR('c') PORT_CHAR('C')
+PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 D") PORT_CODE(KEYCODE_D)          //PORT_CHAR('d') PORT_CHAR('D')
+PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 E") PORT_CODE(KEYCODE_E)          //PORT_CHAR('e') PORT_CHAR('E')
+PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 F") PORT_CODE(KEYCODE_F)          //PORT_CHAR('f') PORT_CHAR('F')
 
 PORT_START("CTRL")			/* CONTROL key */
-PORT_BIT( 0x80, 0x80, IPT_UNUSED )
-PORT_BIT( 0x40, 0x40, IPT_UNUSED )
-PORT_BIT( 0x20, 0x20, IPT_UNUSED )
-PORT_BIT( 0x10, 0x10, IPT_KEYBOARD ) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL)
-PORT_BIT( 0x08, 0x08, IPT_UNUSED )
-PORT_BIT( 0x04, 0x04, IPT_UNUSED )
-PORT_BIT( 0x02, 0x02, IPT_UNUSED )
-PORT_BIT( 0x01, 0x01, IPT_UNUSED )
+PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 CTRL") PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL) //PORT_CHAR(UCHAR_SHIFT_1)
+PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 
 PORT_START("RST")			/* RESET key */
-PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F3) PORT_CHAR(UCHAR_MAMEKEY(F10)) PORT_CHANGED(z80ne_reset, NULL)
+PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 Reset")  PORT_CODE(KEYCODE_F3) PORT_CHANGED(z80ne_reset, NULL)
 
 /* Settings */
 PORT_START("LX.385")
-PORT_DIPNAME(0x07, 0x01	, "LX.385: P1,P3 Data Rate")
-PORT_DIPSETTING( 0x01, "A-B: 300 bps")
-PORT_DIPSETTING( 0x02, "A-C: 600 bps")
-PORT_DIPSETTING( 0x04, "A-D: 1200 bps")
-PORT_DIPNAME( 0x08, 0x00, "LX.385: P4 Parity Check")
-PORT_DIPSETTING( 0x00, "Parity Check Enabled")
-PORT_DIPSETTING( 0x08, "Parity Check Disabled")
+PORT_CONFNAME(0x07, 0x01	, "LX.385 Cassette: P1,P3 Data Rate")
+PORT_CONFSETTING( 0x01, "A-B: 300 bps")
+PORT_CONFSETTING( 0x02, "A-C: 600 bps")
+PORT_CONFSETTING( 0x04, "A-D: 1200 bps")
+PORT_CONFNAME( 0x08, 0x00, "LX.385: P4 Parity Check")
+PORT_CONFSETTING( 0x00, "Parity Check Enabled")
+PORT_CONFSETTING( 0x08, "Parity Check Disabled")
 
 INPUT_PORTS_END
 
@@ -219,113 +242,114 @@ PORT_INCLUDE( z80ne )
 
 /* LX.388 Keyboard BREAK key */
 PORT_START("LX388_BRK")
-PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Break") PORT_CODE(KEYCODE_STOP) PORT_CHANGED(z80ne_nmi, NULL)
+PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Break") PORT_CODE(KEYCODE_INSERT) PORT_CHAR(UCHAR_MAMEKEY(INSERT)) PORT_CHANGED(z80ne_nmi, NULL)
 
 /* LX.388 Keyboard (Encoded by KR2376) */
+
 PORT_START("X0")
-PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD )
-PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD )
-PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD )
-PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD )
-PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD )
-PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD )
-PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD )
-PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD )
-PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD )
-PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD )
-PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD )
+PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNUSED )
+PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNUSED )
+PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_UNUSED )
+PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_UNUSED )
+PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNUSED )
+PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_UNUSED )
+PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNUSED )
+PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNUSED )
+PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_UNUSED )
+PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_UNUSED )
+PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 PORT_START("X1")
-PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD )
-PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD )
-PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD )
-PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD )
-PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD )
-PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD )
-PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD )
-PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD )
-PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD )
-PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD )
-PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD )
+PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNUSED )
+PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNUSED )
+PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_UNUSED )
+PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_UNUSED )
+PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNUSED )
+PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_UNUSED )
+PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNUSED )
+PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNUSED )
+PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_UNUSED )
+PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_UNUSED )
+PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 
 PORT_START("X2")
-PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('=')
-PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD )
-PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD )
-PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD )
-PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD )
-PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD )
-PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD )
-PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD )
-PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Space") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
-PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD )
-PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD )
+PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS)      PORT_CHAR('-') PORT_CHAR('=')
+PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNUSED )
+PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_UNUSED )
+PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_UNUSED )
+PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNUSED )
+PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_UNUSED )
+PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNUSED )
+PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNUSED )
+PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SPACE)      PORT_CHAR(' ')
+PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_UNUSED )
+PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD )                               PORT_CHAR('_')
 
 PORT_START("X3")
-PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CHAR('0')
-PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON) PORT_CHAR(':') PORT_CHAR('*')
-PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_CHAR('P')
-PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("- Delete") PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('_')
-PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR('@') PORT_CHAR('`')
-PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Delete") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
-PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('[') PORT_CHAR('{')
+PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0)          PORT_CHAR('0')
+PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON)      PORT_CHAR(':') PORT_CHAR('*')
+PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P)          PORT_CHAR('p') PORT_CHAR('P')
+PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_UNUSED )
+PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR('`') PORT_CHAR('@')
+PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSPACE)  PORT_CHAR(8)                   PORT_NAME("Del")
+PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR('[') PORT_CHAR('{')
 PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']') PORT_CHAR('}')
-PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Carriage Return") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
-PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Line Feed") PORT_CODE(KEYCODE_HOME) PORT_CHAR(UCHAR_MAMEKEY(HOME)) PORT_CHAR(10)
-PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL)
+PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER)      PORT_CHAR(13)                  PORT_NAME("CR")
+PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_HOME)       PORT_CHAR(UCHAR_MAMEKEY(HOME)) PORT_CHAR(10) PORT_NAME("LF")
+PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 PORT_START("X4")
-PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH2) PORT_CHAR(';') PORT_CHAR('+')
-PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
-PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')
-PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')
-PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_CHAR('M')
-PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N) PORT_CHAR('N')
-PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('B')
-PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V) PORT_CHAR('V')
-PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('C')
-PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_CHAR('X')
-PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z) PORT_CHAR('Z')
+PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON)      PORT_CHAR(';') PORT_CHAR('+')
+PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH)      PORT_CHAR('/') PORT_CHAR('?')
+PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP)       PORT_CHAR('.') PORT_CHAR('>')
+PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA)      PORT_CHAR(',') PORT_CHAR('<')
+PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M)          PORT_CHAR('m') PORT_CHAR('M')
+PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N)          PORT_CHAR('n') PORT_CHAR('N')
+PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B)          PORT_CHAR('b') PORT_CHAR('B')
+PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V)          PORT_CHAR('v') PORT_CHAR('V')
+PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C)          PORT_CHAR('c') PORT_CHAR('C')
+PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X)          PORT_CHAR('x') PORT_CHAR('X')
+PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z)          PORT_CHAR('z') PORT_CHAR('Z')
 
 
 PORT_START("X5")
-PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_CHAR('L')
-PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K) PORT_CHAR('K')
-PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_CHAR('J')
-PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H) PORT_CHAR('H')
-PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_CHAR('G')
-PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F')
-PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('D')
-PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_CHAR('S')
-PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('A')
-PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD )
-PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Escape") PORT_CODE(KEYCODE_ESC) PORT_CHAR(UCHAR_MAMEKEY(ESC))
+PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L)          PORT_CHAR('l') PORT_CHAR('L')
+PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K)          PORT_CHAR('k') PORT_CHAR('K')
+PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J)          PORT_CHAR('j') PORT_CHAR('J')
+PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H)          PORT_CHAR('h') PORT_CHAR('H')
+PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G)          PORT_CHAR('c') PORT_CHAR('G')
+PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F)          PORT_CHAR('f') PORT_CHAR('F')
+PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D)          PORT_CHAR('d') PORT_CHAR('D')
+PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S)          PORT_CHAR('s') PORT_CHAR('S')
+PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A)          PORT_CHAR('a') PORT_CHAR('A')
+PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_UNUSED )
+PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ESC)        PORT_CHAR(UCHAR_MAMEKEY(ESC))
 
 
 PORT_START("X6")
-PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O) PORT_CHAR('O')
-PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I) PORT_CHAR('I')
-PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U) PORT_CHAR('U')
-PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_CHAR('Y')
-PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T) PORT_CHAR('T')
-PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_CHAR('R')
-PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('E')
-PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W) PORT_CHAR('W')
-PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_CHAR('Q')
+PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O)          PORT_CHAR('o') PORT_CHAR('O')
+PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I)          PORT_CHAR('i') PORT_CHAR('I')
+PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U)          PORT_CHAR('u') PORT_CHAR('U')
+PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y)          PORT_CHAR('y') PORT_CHAR('Y')
+PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T)          PORT_CHAR('t') PORT_CHAR('T')
+PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R)          PORT_CHAR('r') PORT_CHAR('R')
+PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E)          PORT_CHAR('e') PORT_CHAR('E')
+PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W)          PORT_CHAR('w') PORT_CHAR('W')
+PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q)          PORT_CHAR('q') PORT_CHAR('Q')
 
 PORT_START("X7")
-PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR(')')
-PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(')
-PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR(0xFFFD)
-PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('&')
-PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')
-PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')
-PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#')
-PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('"')
-PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
-PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_TILDE) PORT_CHAR('^') PORT_CHAR('~')
-PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('\\') PORT_CHAR('|')
+PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9)          PORT_CHAR('9') PORT_CHAR(')')
+PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8)          PORT_CHAR('8') PORT_CHAR('(')
+PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7)          PORT_CHAR('7') PORT_CHAR('\'')
+PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6)          PORT_CHAR('6') PORT_CHAR('&')
+PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5)          PORT_CHAR('5') PORT_CHAR('%')
+PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4)          PORT_CHAR('4') PORT_CHAR('$')
+PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3)          PORT_CHAR('3') PORT_CHAR('#')
+PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2)          PORT_CHAR('2') PORT_CHAR('"')
+PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1)          PORT_CHAR('1') PORT_CHAR('!')
+PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_TILDE)      PORT_CHAR('^') PORT_CHAR('~')
+PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH)  PORT_CHAR('\\') PORT_CHAR('|')
 
 PORT_START("MODIFIERS")
 PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
@@ -333,6 +357,26 @@ PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Ctrl") PORT_CODE(KEYCO
 PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Alpha Lock") PORT_CODE(KEYCODE_CAPSLOCK) PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
 
 INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( z80netf )
+
+PORT_INCLUDE( z80net )
+
+/* Settings */
+PORT_START("CONFIG")
+PORT_CONFNAME(0x07, 0x01, "Boot EPROM")
+PORT_CONFSETTING(   0x01, "EP382  Hex Monitor")
+PORT_CONFSETTING(   0x02, "EP548  16k BASIC")
+PORT_CONFSETTING(   0x03, "EP390  Boot Loader for 5.5k floppy BASIC")
+PORT_CONFSETTING(   0x04, "EP1390 Boot Loader for NE DOS 1.0/1.5")
+PORT_CONFSETTING(   0x05, "EP2390 Boot Loader for NE DOS G.1")
+PORT_BIT(0xf8, 0xf8, IPT_UNUSED)
+
+INPUT_PORTS_END
+
+
+
 
 /******************************************************************************
  Machine Drivers
@@ -390,6 +434,7 @@ static MACHINE_DRIVER_START( z80net )
 	MDRV_IMPORT_FROM( z80ne )
 
 	MDRV_CPU_MODIFY("z80ne")
+	MDRV_CPU_PROGRAM_MAP(z80net_mem)
 	MDRV_CPU_IO_MAP(z80net_io)
 
 	MDRV_MACHINE_START( z80net )
@@ -408,7 +453,6 @@ static MACHINE_DRIVER_START( z80net )
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
 
 	MDRV_DEFAULT_LAYOUT(layout_z80net)
-	//MDRV_WD179X_ADD("wd179x", z80ne_wd17xx_interface )
 
 MACHINE_DRIVER_END
 
@@ -440,19 +484,50 @@ static MACHINE_DRIVER_START( z80netb )
 	MDRV_DEFAULT_LAYOUT(layout_z80netb)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( z80netf )
+	/* basic machine hardware */
+	MDRV_CPU_ADD("z80ne", Z80, Z80NE_CPU_SPEED_HZ)
+	MDRV_CPU_PROGRAM_MAP(z80netf_mem)
+	MDRV_CPU_IO_MAP(z80netf_io)
+
+	MDRV_MACHINE_START(z80netf)
+	MDRV_MACHINE_RESET(z80netf)
+
+	MDRV_AY31015_ADD( "ay_3_1015", z80ne_ay31015_config )
+
+	MDRV_CASSETTE_ADD( "cassettea", z80ne_cassettea_config )
+	MDRV_CASSETTE_ADD( "cassetteb", z80ne_cassetteb_config )
+
+	MDRV_KR2376_ADD( "lx388_kr2376", lx388_kr2376_interface)
+
+	/* video hardware */
+	MDRV_SCREEN_ADD("lx388", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(M6847_PAL_FRAMES_PER_SECOND)
+
+	MDRV_VIDEO_START(lx388)
+	MDRV_VIDEO_UPDATE(m6847)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MDRV_SCREEN_SIZE(320, 25+192+26)
+	MDRV_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
+
+	MDRV_WD1771_ADD("wd1771", z80ne_wd17xx_interface)
+
+	MDRV_DEFAULT_LAYOUT(layout_z80netf)
+MACHINE_DRIVER_END
+
 /******************************************************************************
  ROM Definitions
 ******************************************************************************/
 
 
 ROM_START( z80ne )
-	ROM_REGION(0x10000, "z80ne", 0)
-	ROM_LOAD( "ep382.ic5", 0x8000, 0x0400, CRC(61bc5f39) SHA1(a93779a598736302a2fdd94be2fb0bbddea7a72c) )
+	ROM_REGION(0x20000, "z80ne", 0)
+	ROM_LOAD( "ep382.ic5", 0x14000, 0x0400, CRC(61bc5f39) SHA1(a93779a598736302a2fdd94be2fb0bbddea7a72c) )
 ROM_END
 
 ROM_START( z80net )
-	ROM_REGION(0x10000, "z80ne", 0)
-	ROM_LOAD( "ep382.ic5", 0x8000, 0x0400, CRC(61bc5f39) SHA1(a93779a598736302a2fdd94be2fb0bbddea7a72c) )
+	ROM_REGION(0x20000, "z80ne", 0)
+	ROM_LOAD( "ep382.ic5", 0x14000, 0x0400, CRC(61bc5f39) SHA1(a93779a598736302a2fdd94be2fb0bbddea7a72c) )
 ROM_END
 
 ROM_START( z80netb )
@@ -470,6 +545,29 @@ ROM_START( z80netb )
 	ROM_LOAD( "548-8.ic8", 0x3800, 0x0800, CRC(f381b594) SHA1(2de7a8941ba48d463974c73d62e994d3cbe2868d) )
 ROM_END
 
+ROM_START( z80netf )
+	ROM_REGION(0x20000, "z80ne", 0) /* 64k for code  64k for banked code */
+	/* ep548 banked at 0x0000 - 0x3FFF */
+	ROM_LOAD(  "548-1.ic1", 0x10000, 0x0800, CRC(868cad39) SHA1(0ea8af010786a080f823a879a4211f5712d260da) )
+	ROM_LOAD(  "548-2.ic2", 0x10800, 0x0800, CRC(ac297d99) SHA1(ccf31d3f9d02c3b68a0ee3be4984424df0e83ab0) )
+	ROM_LOAD(  "548-3.ic3", 0x11000, 0x0800, CRC(9c1fe511) SHA1(ff5b6e49a137c2ff9cb760c39bfd85ce4b52bb7d) )
+	ROM_LOAD(  "548-4.ic4", 0x11800, 0x0800, CRC(cb5e0de3) SHA1(0beaa8927faaf61f6c3fc0ea1d3d5670f901aae3) )
+	ROM_LOAD(  "548-5.ic5", 0x12000, 0x0800, CRC(0bd4559c) SHA1(e736a3124819ffb43e96a8114cd188f18d538053) )
+	ROM_LOAD(  "548-6.ic6", 0x12800, 0x0800, CRC(6d663034) SHA1(57588be4e360658dbb313946d7a608e36c1fdd68) )
+	ROM_LOAD(  "548-7.ic7", 0x13000, 0x0800, CRC(0bab06c0) SHA1(d52f1519c798e91f25648e996b1db174d90ce0f5) )
+	ROM_LOAD(  "548-8.ic8", 0x13800, 0x0800, CRC(f381b594) SHA1(2de7a8941ba48d463974c73d62e994d3cbe2868d) )
+
+	/* ep382 - banked at 0x0000 - 0x03FF */
+	ROM_LOAD(  "ep382.ic5", 0x14000, 0x0400, CRC(61bc5f39) SHA1(a93779a598736302a2fdd94be2fb0bbddea7a72c) )
+
+	/* ep390 - banked at 0x0000 - 0x03FF */
+	ROM_LOAD(  "ep390.ic6", 0x14400, 0x0400, CRC(e4dd7de9) SHA1(523caa97112a9e67cc078c1a70ceee94ec232093) )
+	/* ep1390 - banked at 0x0000 - 0x03FF */
+	ROM_LOAD( "ep1390.ic6", 0x14800, 0x0400, CRC(dc2cbc1d) SHA1(e23418b8f8261a17892f3a73ec09c72bb02e1d0b) )
+	/* ep2390 - banked at 0x0000 - 0x03FF */
+	ROM_LOAD( "ep2390.ic6", 0x14C00, 0x0400, CRC(28d28eee) SHA1(b80f75c1ac4905ae369ecbc9b9ce120cc85502ed) )
+ROM_END
+
 
 /******************************************************************************
  System Config
@@ -478,7 +576,6 @@ ROM_END
 
 static SYSTEM_CONFIG_START( z80ne )
 	CONFIG_RAM_DEFAULT( 32 * 1024 )
-	CONFIG_RAM( 1 * 1024 )
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START( z80net )
@@ -492,7 +589,48 @@ static SYSTEM_CONFIG_START( z80netb )
 SYSTEM_CONFIG_END
 
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT     CONFIG   COMPANY     		 	FULLNAME                      FLAGS */
-COMP( 1980,	z80ne,    0,        0,      z80ne,    z80ne,    z80ne,   z80ne,   "Nuova Elettronica",	"Z80NE",                      GAME_NO_SOUND )
+static void z80netf_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+{
+	/* floppy */
+	switch(state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case MESS_DEVINFO_INT_COUNT:			info->i = 4; break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+/*      case MESS_DEVINFO_PTR_LOAD:         info->load = DEVICE_IMAGE_LOAD_NAME(z80ne_floppy); break; */
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+
+		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:	info->p = (void *) floppyoptions_z80ne; break;
+
+		case MESS_DEVINFO_STR_NAME+0:						strcpy(info->s = device_temp_str(), "floppydisk0"); break;
+		case MESS_DEVINFO_STR_NAME+1:						strcpy(info->s = device_temp_str(), "floppydisk1"); break;
+		case MESS_DEVINFO_STR_NAME+2:						strcpy(info->s = device_temp_str(), "floppydisk2"); break;
+		case MESS_DEVINFO_STR_NAME+3:						strcpy(info->s = device_temp_str(), "floppydisk3"); break;
+		case MESS_DEVINFO_STR_SHORT_NAME+0:					strcpy(info->s = device_temp_str(), "flop0"); break;
+		case MESS_DEVINFO_STR_SHORT_NAME+1:					strcpy(info->s = device_temp_str(), "flop1"); break;
+		case MESS_DEVINFO_STR_SHORT_NAME+2:					strcpy(info->s = device_temp_str(), "flop2"); break;
+		case MESS_DEVINFO_STR_SHORT_NAME+3:					strcpy(info->s = device_temp_str(), "flop3"); break;
+		case MESS_DEVINFO_STR_DESCRIPTION+0:					strcpy(info->s = device_temp_str(), "Floppy #0"); break;
+		case MESS_DEVINFO_STR_DESCRIPTION+1:					strcpy(info->s = device_temp_str(), "Floppy #1"); break;
+		case MESS_DEVINFO_STR_DESCRIPTION+2:					strcpy(info->s = device_temp_str(), "Floppy #2"); break;
+		case MESS_DEVINFO_STR_DESCRIPTION+3:					strcpy(info->s = device_temp_str(), "Floppy #3"); break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:		strcpy(info->s = device_temp_str(), "zmk"); break;
+
+		default:					floppy_device_getinfo(devclass, state, info); break;
+	}
+}
+
+
+static SYSTEM_CONFIG_START( z80netf )
+	CONFIG_RAM_DEFAULT( 56 * 1024 )
+	CONFIG_DEVICE(z80netf_floppy_getinfo)
+SYSTEM_CONFIG_END
+
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT     CONFIG   COMPANY               FULLNAME                      FLAGS */
+COMP( 1980,	z80ne,    0,        0,      z80ne,    z80ne,    z80ne,   z80ne,   "Nuova Elettronica",	"Z80NE",                      GAME_NO_SOUND | GAME_COMPUTER)
 COMP( 1980,	z80net,   z80ne,    0,      z80net,   z80net,   z80net,  z80net,  "Nuova Elettronica",	"Z80NE + LX.388",             GAME_NO_SOUND | GAME_COMPUTER)
 COMP( 1980,	z80netb,  z80ne,    0,      z80netb,  z80net,   z80netb, z80netb, "Nuova Elettronica",	"Z80NE + LX.388 + Basic 16k", GAME_NO_SOUND | GAME_COMPUTER)
+COMP( 1980,	z80netf,  z80ne,    0,      z80netf,  z80netf,  z80netf, z80netf, "Nuova Elettronica",	"Z80NE + LX.388 + LX.390",    GAME_NO_SOUND | GAME_COMPUTER)

@@ -1265,6 +1265,7 @@ const game_driver * const drivers[] =
     DRIVER( z80ne )         /* 1980 - Z80NE */
     DRIVER( z80net )        /* 1980 - Z80NE + LX388 Video Interface */
     DRIVER( z80netb )       /* 1980 - Z80NE + LX388 Video Interface + 16Kb BASIC */
+    DRIVER( z80netf )		/* 1980 - Z80NE + LX.388 Video Interface + LX.390 FD Controller */
 
     /* Talking Electronics Magazine */
     DRIVER( tec1 )          /* Talking Electronics Computer */

@@ -1,9 +1,9 @@
 /*********************************************************************
 
-	wd17xx.h
+    wd17xx.h
 
-	Implementations of the Western Digital 17xx and 19xx families of
-	floppy disk controllers
+    Implementations of the Western Digital 17xx and 19xx families of
+    floppy disk controllers
 
 *********************************************************************/
 
@@ -17,6 +17,7 @@
 ***************************************************************************/
 
 #define WD1770		DEVICE_GET_INFO_NAME(wd1770)
+#define WD1771		DEVICE_GET_INFO_NAME(wd1771)
 #define WD1772		DEVICE_GET_INFO_NAME(wd1772)
 #define WD1773		DEVICE_GET_INFO_NAME(wd1773)
 #define WD179X		DEVICE_GET_INFO_NAME(wd179x)
@@ -59,6 +60,7 @@ struct _wd17xx_interface
 
 /* device interface */
 extern DEVICE_GET_INFO(wd1770);
+extern DEVICE_GET_INFO(wd1771);
 extern DEVICE_GET_INFO(wd1772);
 extern DEVICE_GET_INFO(wd1773);
 extern DEVICE_GET_INFO(wd179x);
@@ -99,6 +101,10 @@ extern const wd17xx_interface default_wd17xx_interface;
 	MDRV_DEVICE_ADD(_tag, WD1770, 0) \
 	MDRV_DEVICE_CONFIG(_intrf)
 
+#define MDRV_WD1771_ADD(_tag, _intrf) \
+	MDRV_DEVICE_ADD(_tag, WD1771, 0) \
+	MDRV_DEVICE_CONFIG(_intrf)
+
 #define MDRV_WD1772_ADD(_tag, _intrf) \
 	MDRV_DEVICE_ADD(_tag, WD1772, 0) \
 	MDRV_DEVICE_CONFIG(_intrf)
@@ -127,7 +133,7 @@ extern const wd17xx_interface default_wd17xx_interface;
 	MDRV_DEVICE_ADD(_tag, MB8877, 0) \
 	MDRV_DEVICE_CONFIG(_intrf)
 
-	
+
 #endif /* WD179X_H */
 
 
