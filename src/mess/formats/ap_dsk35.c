@@ -463,7 +463,7 @@ static floperr_t apple35_read_sector(floppy_image *floppy, int head, int track, 
 
 
 
-static floperr_t apple35_write_sector(floppy_image *floppy, int head, int track, int sector, const void *buffer, size_t buflen)
+static floperr_t apple35_write_sector(floppy_image *floppy, int head, int track, int sector, const void *buffer, size_t buflen, int ddam)
 {
 	UINT32 data_offset;
 
@@ -499,7 +499,7 @@ static floperr_t apple35_read_sector_td(floppy_image *floppy, int head, int trac
 
 
 
-static floperr_t apple35_write_sector_td(floppy_image *floppy, int head, int track, int sector, const void *buffer, size_t buflen)
+static floperr_t apple35_write_sector_td(floppy_image *floppy, int head, int track, int sector, const void *buffer, size_t buflen, int ddam)
 {
 	floperr_t err;
 	UINT32 tag_offset = 0;
@@ -507,7 +507,7 @@ static floperr_t apple35_write_sector_td(floppy_image *floppy, int head, int tra
 	assert(buflen == 524);
 
 	/* first write the sector */
-	err = apple35_write_sector(floppy, head, track, sector, ((const UINT8 *) buffer) + 12, 512);
+	err = apple35_write_sector(floppy, head, track, sector, ((const UINT8 *) buffer) + 12, 512, 0);
 	if (err)
 		return err;
 
@@ -734,7 +734,7 @@ static floperr_t apple35_write_track(floppy_image *floppy, int head, int track, 
 			sony_denibblize35(sector_data, nibble_data, checksum);
 
 			/* write the sector */
-			err = apple35_write_sector_td(floppy, head, track, sector, sector_data, sizeof(sector_data) / sizeof(sector_data[0]));
+			err = apple35_write_sector_td(floppy, head, track, sector, sector_data, sizeof(sector_data) / sizeof(sector_data[0]), 0);
 			if (err)
 				return err;
 

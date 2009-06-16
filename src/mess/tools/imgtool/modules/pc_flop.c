@@ -138,7 +138,7 @@ static imgtoolerr_t fat_image_writeblock(imgtool_image *image, const void *buffe
 	if (err)
 		return err;
 
-	ferr = floppy_write_sector(imgtool_floppy(image), head, track, sector, 0, buffer, block_size);
+	ferr = floppy_write_sector(imgtool_floppy(image), head, track, sector, 0, buffer, block_size, 0);	/* TODO: pass ddam argument from imgtool */
 	if (ferr)
 		return imgtool_floppy_error(ferr);
 	return IMGTOOLERR_SUCCESS;

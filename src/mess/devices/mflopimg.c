@@ -117,13 +117,14 @@ static void flopimg_get_id_callback(const device_config *image, chrn_id *id, int
 {
 	mess_flopimg *flopimg;
 	int cylinder, sector, N;
+	unsigned long flags;
 	UINT32 sector_length;
 
 	flopimg = get_flopimg(image);
 	if (!flopimg || !flopimg->floppy)
 		return;
 
-	floppy_get_indexed_sector_info(flopimg->floppy, side, flopimg->track, id_index, &cylinder, &side, &sector, &sector_length);
+	floppy_get_indexed_sector_info(flopimg->floppy, side, flopimg->track, id_index, &cylinder, &side, &sector, &sector_length, &flags);
 
 	N = compute_log2(sector_length);
 
@@ -131,7 +132,7 @@ static void flopimg_get_id_callback(const device_config *image, chrn_id *id, int
 	id->H = side;
 	id->R = sector;
 	id->data_id = id_index;
-	id->flags = 0;
+	id->flags = flags;
 	id->N = ((N >= 7) && (N <= 10)) ? N - 7 : 0;
 }
 
@@ -164,7 +165,7 @@ static void flopimg_read_sector_data_into_buffer(const device_config *image, int
 
 
 
-static void flopimg_write_sector_data_from_buffer(const device_config *image, int side, int index1, const char *ptr, int length,int ddam)
+static void flopimg_write_sector_data_from_buffer(const device_config *image, int side, int index1, const char *ptr, int length, int ddam)
 {
 	mess_flopimg *flopimg;
 
@@ -175,7 +176,7 @@ static void flopimg_write_sector_data_from_buffer(const device_config *image, in
 	if (LOG_FLOPPY)
 		log_readwrite("sector_write", side, flopimg->track, index1, ptr, length);
 
-	floppy_write_indexed_sector(flopimg->floppy, side, flopimg->track, index1, 0, ptr, length);
+	floppy_write_indexed_sector(flopimg->floppy, side, flopimg->track, index1, 0, ptr, length, ddam);
 }
 
 

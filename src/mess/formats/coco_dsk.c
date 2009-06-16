@@ -398,19 +398,19 @@ static floperr_t coco_os9_post_format(floppy_image *floppy, option_resolution *p
 	if (total_sectors % 8)
 		header[0x0100 + (total_sectors / 8)] = 0xFF >> (total_sectors % 8);
 
-	err = floppy_write_sector(floppy, 0, 0, 1, 0, &header[0x0000], 256);
+	err = floppy_write_sector(floppy, 0, 0, 1, 0, &header[0x0000], 256, 0);
 	if (err)
 		return err;
 
-	err = floppy_write_sector(floppy, 0, 0, 2, 0, &header[0x0100], 256);
+	err = floppy_write_sector(floppy, 0, 0, 2, 0, &header[0x0100], 256, 0);
 	if (err)
 		return err;
 
-	err = floppy_write_sector(floppy, 0, 0, 3, 0, &header[0x0200], 256);
+	err = floppy_write_sector(floppy, 0, 0, 3, 0, &header[0x0200], 256, 0);
 	if (err)
 		return err;
 
-	err = floppy_write_sector(floppy, 0, 0, 4, 0, &header[0x0300], 256);
+	err = floppy_write_sector(floppy, 0, 0, 4, 0, &header[0x0300], 256, 0);
 	if (err)
 		return err;
 
@@ -971,7 +971,7 @@ static floperr_t coco_dmk_get_sector_length(floppy_image *floppy, int head, int 
 
 
 
-static floperr_t coco_dmk_get_indexed_sector_info(floppy_image *floppy, int head, int track, int sector_index, int *cylinder, int *side, int *sector, UINT32 *sector_length)
+static floperr_t coco_dmk_get_indexed_sector_info(floppy_image *floppy, int head, int track, int sector_index, int *cylinder, int *side, int *sector, UINT32 *sector_length, unsigned long *flags)
 {
 	floperr_t err;
 	UINT32 idam_offset;
@@ -1002,6 +1002,9 @@ static floperr_t coco_dmk_get_indexed_sector_info(floppy_image *floppy, int head
 		*sector = dmk_idam_sector(&track_data[idam_offset]);
 	if (sector_length)
 		*sector_length = 128 << dmk_idam_sectorlength(&track_data[idam_offset]);
+	if (flags)
+		/* TODO: read DAM or DDAM and determine flags */
+		*flags = 0;
 	return FLOPPY_ERROR_SUCCESS;
 }
 
@@ -1034,7 +1037,7 @@ static floperr_t internal_coco_dmk_read_sector(floppy_image *floppy, int head, i
 
 
 
-static floperr_t internal_coco_dmk_write_sector(floppy_image *floppy, int head, int track, int sector, int sector_is_index, const void *buffer, size_t buflen)
+static floperr_t internal_coco_dmk_write_sector(floppy_image *floppy, int head, int track, int sector, int sector_is_index, const void *buffer, size_t buflen, int ddam)
 {
 	floperr_t err;
 	UINT32 sector_length;
@@ -1063,9 +1066,9 @@ static floperr_t coco_dmk_read_sector(floppy_image *floppy, int head, int track,
 	return internal_coco_dmk_read_sector(floppy, head, track, sector, FALSE, buffer, buflen);
 }
 
-static floperr_t coco_dmk_write_sector(floppy_image *floppy, int head, int track, int sector, const void *buffer, size_t buflen)
+static floperr_t coco_dmk_write_sector(floppy_image *floppy, int head, int track, int sector, const void *buffer, size_t buflen, int ddam)
 {
-	return internal_coco_dmk_write_sector(floppy, head, track, sector, FALSE, buffer, buflen);
+	return internal_coco_dmk_write_sector(floppy, head, track, sector, FALSE, buffer, buflen, ddam);
 }
 
 static floperr_t coco_dmk_read_indexed_sector(floppy_image *floppy, int head, int track, int sector, void *buffer, size_t buflen)
@@ -1073,9 +1076,9 @@ static floperr_t coco_dmk_read_indexed_sector(floppy_image *floppy, int head, in
 	return internal_coco_dmk_read_sector(floppy, head, track, sector, TRUE, buffer, buflen);
 }
 
-static floperr_t coco_dmk_write_indexed_sector(floppy_image *floppy, int head, int track, int sector, const void *buffer, size_t buflen)
+static floperr_t coco_dmk_write_indexed_sector(floppy_image *floppy, int head, int track, int sector, const void *buffer, size_t buflen, int ddam)
 {
-	return internal_coco_dmk_write_sector(floppy, head, track, sector, TRUE, buffer, buflen);
+	return internal_coco_dmk_write_sector(floppy, head, track, sector, TRUE, buffer, buflen, ddam);
 }
 
 

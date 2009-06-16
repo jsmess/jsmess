@@ -360,7 +360,7 @@ static imgtoolerr_t	pc_chd_image_readsector(imgtool_image *image, UINT32 track, 
 
 
 
-static imgtoolerr_t	pc_chd_image_writesector(imgtool_image *image, UINT32 track, UINT32 head, UINT32 sector, const void *buffer, size_t len)
+static imgtoolerr_t	pc_chd_image_writesector(imgtool_image *image, UINT32 track, UINT32 head, UINT32 sector, const void *buffer, size_t len, int ddam)
 {
 	pc_chd_image_info *info;
 	info = pc_chd_get_image_info(image);

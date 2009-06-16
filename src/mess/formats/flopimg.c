@@ -414,7 +414,7 @@ UINT64 floppy_image_size(floppy_image *floppy)
 *********************************************************************/
 
 static floperr_t floppy_readwrite_sector(floppy_image *floppy, int head, int track, int sector, int offset,
-	void *buffer, size_t buffer_len, int writing, int indexed)
+	void *buffer, size_t buffer_len, int writing, int indexed, int ddam)
 {
 	floperr_t err;
 	const struct FloppyCallbacks *fmt;
@@ -424,7 +424,7 @@ static floperr_t floppy_readwrite_sector(floppy_image *floppy, int head, int tra
 	UINT32 sector_length;
 	UINT8 *buffer_ptr = buffer;
 	floperr_t (*read_sector)(floppy_image *floppy, int head, int track, int sector, void *buffer, size_t buflen);
-	floperr_t (*write_sector)(floppy_image *floppy, int head, int track, int sector, const void *buffer, size_t buflen);
+	floperr_t (*write_sector)(floppy_image *floppy, int head, int track, int sector, const void *buffer, size_t buflen, int ddam);
 
 	fmt = floppy_callbacks(floppy);
 
@@ -462,7 +462,7 @@ static floperr_t floppy_readwrite_sector(floppy_image *floppy, int head, int tra
 	{
 		/* find out the size of this sector */
 		if (indexed)
-			err = fmt->get_indexed_sector_info(floppy, head, track, sector, NULL, NULL, NULL, &sector_length);
+			err = fmt->get_indexed_sector_info(floppy, head, track, sector, NULL, NULL, NULL, &sector_length, NULL);
 		else
 			err = fmt->get_sector_length(floppy, head, track, sector, &sector_length);
 		if (err)
@@ -495,7 +495,7 @@ static floperr_t floppy_readwrite_sector(floppy_image *floppy, int head, int tra
 				{
 					memcpy(alloc_buf + offset, buffer_ptr, this_buffer_len);
 
-					err = write_sector(floppy, head, track, sector, alloc_buf, sector_length);
+					err = write_sector(floppy, head, track, sector, alloc_buf, sector_length, ddam);
 					if (err)
 						goto done;
 				}
@@ -511,7 +511,7 @@ static floperr_t floppy_readwrite_sector(floppy_image *floppy, int head, int tra
 				this_buffer_len = sector_length;
 
 				if (writing)
-					err = write_sector(floppy, head, track, sector, buffer_ptr, sector_length);
+					err = write_sector(floppy, head, track, sector, buffer_ptr, sector_length, ddam);
 				else
 					err = read_sector(floppy, head, track, sector, buffer_ptr, sector_length);
 				if (err)
@@ -542,28 +542,28 @@ done:
 
 floperr_t floppy_read_sector(floppy_image *floppy, int head, int track, int sector, int offset,	void *buffer, size_t buffer_len)
 {
-	return floppy_readwrite_sector(floppy, head, track, sector, offset, buffer, buffer_len, FALSE, FALSE);
+	return floppy_readwrite_sector(floppy, head, track, sector, offset, buffer, buffer_len, FALSE, FALSE, 0);
 }
 
 
 
-floperr_t floppy_write_sector(floppy_image *floppy, int head, int track, int sector, int offset, const void *buffer, size_t buffer_len)
+floperr_t floppy_write_sector(floppy_image *floppy, int head, int track, int sector, int offset, const void *buffer, size_t buffer_len, int ddam)
 {
-	return floppy_readwrite_sector(floppy, head, track, sector, offset, (void *) buffer, buffer_len, TRUE, FALSE);
+	return floppy_readwrite_sector(floppy, head, track, sector, offset, (void *) buffer, buffer_len, TRUE, FALSE, ddam);
 }
 
 
 
 floperr_t floppy_read_indexed_sector(floppy_image *floppy, int head, int track, int sector_index, int offset,	void *buffer, size_t buffer_len)
 {
-	return floppy_readwrite_sector(floppy, head, track, sector_index, offset, buffer, buffer_len, FALSE, TRUE);
+	return floppy_readwrite_sector(floppy, head, track, sector_index, offset, buffer, buffer_len, FALSE, TRUE, 0);
 }
 
 
 
-floperr_t floppy_write_indexed_sector(floppy_image *floppy, int head, int track, int sector_index, int offset, const void *buffer, size_t buffer_len)
+floperr_t floppy_write_indexed_sector(floppy_image *floppy, int head, int track, int sector_index, int offset, const void *buffer, size_t buffer_len, int ddam)
 {
-	return floppy_readwrite_sector(floppy, head, track, sector_index, offset, (void *) buffer, buffer_len, TRUE, TRUE);
+	return floppy_readwrite_sector(floppy, head, track, sector_index, offset, (void *) buffer, buffer_len, TRUE, TRUE, ddam);
 }
 
 
@@ -587,7 +587,7 @@ floperr_t floppy_clear_sector(floppy_image *floppy, int head, int track, int sec
 
 	memset(buffer, data, length);
 
-	err = floppy_write_sector(floppy, head, track, sector, 0, buffer, length);
+	err = floppy_write_sector(floppy, head, track, sector, 0, buffer, length, 0);
 	if (err)
 		goto done;
 
@@ -787,7 +787,7 @@ floperr_t floppy_get_sector_length(floppy_image *floppy, int head, int track, in
 
 
 
-floperr_t floppy_get_indexed_sector_info(floppy_image *floppy, int head, int track, int sector_index, int *cylinder, int *side, int *sector, UINT32 *sector_length)
+floperr_t floppy_get_indexed_sector_info(floppy_image *floppy, int head, int track, int sector_index, int *cylinder, int *side, int *sector, UINT32 *sector_length, unsigned long *flags)
 {
 	const struct FloppyCallbacks *fmt;
 
@@ -795,7 +795,7 @@ floperr_t floppy_get_indexed_sector_info(floppy_image *floppy, int head, int tra
 	if (!fmt->get_indexed_sector_info)
 		return FLOPPY_ERROR_UNSUPPORTED;
 
-	return fmt->get_indexed_sector_info(floppy, head, track, sector_index, cylinder, side, sector, sector_length);
+	return fmt->get_indexed_sector_info(floppy, head, track, sector_index, cylinder, side, sector, sector_length, flags);
 }
 
 
@@ -807,7 +807,7 @@ floperr_t floppy_get_sector_count(floppy_image *floppy, int head, int track, int
 
 	do
 	{
-		err = floppy_get_indexed_sector_info(floppy, head, track, sector_index, NULL, NULL, NULL, NULL);
+		err = floppy_get_indexed_sector_info(floppy, head, track, sector_index, NULL, NULL, NULL, NULL, NULL);
 		if (!err)
 			sector_index++;
 	}

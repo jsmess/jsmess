@@ -330,13 +330,13 @@ static imgtoolerr_t prodos_save_block_525(imgtool_image *image,
 
 	/* read first sector */
 	ferr = floppy_write_sector(imgtool_floppy(image), head, track,
-		sector1, 0, ((const UINT8 *) buffer) + 0, 256);
+		sector1, 0, ((const UINT8 *) buffer) + 0, 256, 0);	/* TODO: pass ddam argument from imgtool */
 	if (ferr)
 		return imgtool_floppy_error(ferr);
 
 	/* read second sector */
 	ferr = floppy_write_sector(imgtool_floppy(image), head, track,
-		sector2, 0, ((const UINT8 *) buffer) + 256, 256);
+		sector2, 0, ((const UINT8 *) buffer) + 256, 256, 0);	/* TODO: pass ddam argument from imgtool */
 	if (ferr)
 		return imgtool_floppy_error(ferr);
 
@@ -408,7 +408,7 @@ static imgtoolerr_t prodos_save_block_35(imgtool_image *image,
 	if (err)
 		return err;
 
-	ferr = floppy_write_sector(imgtool_floppy(image), head, track, sector, 0, buffer, 512);
+	ferr = floppy_write_sector(imgtool_floppy(image), head, track, sector, 0, buffer, 512, 0);	/* TODO: pass ddam argument from imgtool */
 	if (ferr)
 		return imgtool_floppy_error(ferr);
 

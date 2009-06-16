@@ -163,7 +163,7 @@ static UINT32 d77_get_sector_offset(floppy_image* floppy, int head, int track, i
 	return 0;
 }
 
-static floperr_t d77_get_indexed_sector_info(floppy_image *floppy, int head, int track, int sector_index, int *cylinder, int *side, int *sector, UINT32 *sector_length)
+static floperr_t d77_get_indexed_sector_info(floppy_image *floppy, int head, int track, int sector_index, int *cylinder, int *side, int *sector, UINT32 *sector_length, unsigned long *flags)
 {
 	struct d77_tag* tag = get_d77_tag(floppy);
 	UINT32 offset;

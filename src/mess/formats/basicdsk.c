@@ -13,11 +13,11 @@
 #include "basicdsk.h"
 
 static floperr_t basicdsk_read_sector(floppy_image *floppy, int head, int track, int sector, void *buffer, size_t buflen);
-static floperr_t basicdsk_write_sector(floppy_image *floppy, int head, int track, int sector, const void *buffer, size_t buflen);
+static floperr_t basicdsk_write_sector(floppy_image *floppy, int head, int track, int sector, const void *buffer, size_t buflen, int ddam);
 static floperr_t basicdsk_read_indexed_sector(floppy_image *floppy, int head, int track, int sector, void *buffer, size_t buflen);
-static floperr_t basicdsk_write_indexed_sector(floppy_image *floppy, int head, int track, int sector, const void *buffer, size_t buflen);
+static floperr_t basicdsk_write_indexed_sector(floppy_image *floppy, int head, int track, int sector, const void *buffer, size_t buflen, int ddam);
 static floperr_t basicdsk_get_sector_length(floppy_image *floppy, int head, int track, int sector, UINT32 *sector_length);
-static floperr_t basicdsk_get_indexed_sector_info(floppy_image *floppy, int head, int track, int sector_index, int *cylinder, int *side, int *sector, UINT32 *sector_length);
+static floperr_t basicdsk_get_indexed_sector_info(floppy_image *floppy, int head, int track, int sector_index, int *cylinder, int *side, int *sector, UINT32 *sector_length, unsigned long *flags);
 static int basicdsk_get_heads_per_disk(floppy_image *floppy);
 static int basicdsk_get_tracks_per_disk(floppy_image *floppy);
 static floperr_t basicdsk_format_track(floppy_image *floppy, int head, int track, option_resolution *params);
@@ -131,7 +131,7 @@ static floperr_t internal_basicdsk_read_sector(floppy_image *floppy, int head, i
 
 
 
-static floperr_t internal_basicdsk_write_sector(floppy_image *floppy, int head, int track, int sector, int sector_is_index, const void *buffer, size_t buflen)
+static floperr_t internal_basicdsk_write_sector(floppy_image *floppy, int head, int track, int sector, int sector_is_index, const void *buffer, size_t buflen, int ddam)
 {
 	UINT64 offset;
 	floperr_t err;
@@ -151,9 +151,9 @@ static floperr_t basicdsk_read_sector(floppy_image *floppy, int head, int track,
 	return internal_basicdsk_read_sector(floppy, head, track, sector, FALSE, buffer, buflen);
 }
 
-static floperr_t basicdsk_write_sector(floppy_image *floppy, int head, int track, int sector, const void *buffer, size_t buflen)
+static floperr_t basicdsk_write_sector(floppy_image *floppy, int head, int track, int sector, const void *buffer, size_t buflen, int ddam)
 {
-	return internal_basicdsk_write_sector(floppy, head, track, sector, FALSE, buffer, buflen);
+	return internal_basicdsk_write_sector(floppy, head, track, sector, FALSE, buffer, buflen, ddam);
 }
 
 static floperr_t basicdsk_read_indexed_sector(floppy_image *floppy, int head, int track, int sector, void *buffer, size_t buflen)
@@ -161,9 +161,9 @@ static floperr_t basicdsk_read_indexed_sector(floppy_image *floppy, int head, in
 	return internal_basicdsk_read_sector(floppy, head, track, sector, TRUE, buffer, buflen);
 }
 
-static floperr_t basicdsk_write_indexed_sector(floppy_image *floppy, int head, int track, int sector, const void *buffer, size_t buflen)
+static floperr_t basicdsk_write_indexed_sector(floppy_image *floppy, int head, int track, int sector, const void *buffer, size_t buflen, int ddam)
 {
-	return internal_basicdsk_write_sector(floppy, head, track, sector, TRUE, buffer, buflen);
+	return internal_basicdsk_write_sector(floppy, head, track, sector, TRUE, buffer, buflen, ddam);
 }
 
 
@@ -202,7 +202,7 @@ static floperr_t basicdsk_format_track(floppy_image *floppy, int head, int track
 
 	for (sector = 0; sector < geometry->sectors; sector++)
 	{
-		err = basicdsk_write_sector(floppy, head, track, sector + geometry->first_sector_id, buffer, sector_length);
+		err = basicdsk_write_sector(floppy, head, track, sector + geometry->first_sector_id, buffer, sector_length, 0);
 		if (err)
 			goto done;
 	}
@@ -244,7 +244,7 @@ static floperr_t basicdsk_get_sector_length(floppy_image *floppy, int head, int 
 
 
 
-static floperr_t basicdsk_get_indexed_sector_info(floppy_image *floppy, int head, int track, int sector_index, int *cylinder, int *side, int *sector, UINT32 *sector_length)
+static floperr_t basicdsk_get_indexed_sector_info(floppy_image *floppy, int head, int track, int sector_index, int *cylinder, int *side, int *sector, UINT32 *sector_length, unsigned long *flags)
 {
 	sector_index += get_geometry(floppy)->first_sector_id;
 	if (cylinder)
@@ -253,6 +253,9 @@ static floperr_t basicdsk_get_indexed_sector_info(floppy_image *floppy, int head
 		*side = head;
 	if (sector)
 		*sector = sector_index;
+	if (flags)
+		/* TODO: read DAM or DDAM and determine flags */
+		*flags = 0;
 	return basicdsk_get_sector_length(floppy, head, track, sector_index, sector_length);
 }
 

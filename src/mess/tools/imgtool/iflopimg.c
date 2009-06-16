@@ -227,11 +227,11 @@ static imgtoolerr_t imgtool_floppy_read_sector(imgtool_image *image, UINT32 trac
 
 
 
-static imgtoolerr_t imgtool_floppy_write_sector(imgtool_image *image, UINT32 track, UINT32 head, UINT32 sector, const void *buffer, size_t len)
+static imgtoolerr_t imgtool_floppy_write_sector(imgtool_image *image, UINT32 track, UINT32 head, UINT32 sector, const void *buffer, size_t len, int ddam)
 {
 	floperr_t ferr;
 
-	ferr = floppy_write_sector(get_floppy(image), head, track, sector, 0, buffer, len);
+	ferr = floppy_write_sector(get_floppy(image), head, track, sector, 0, buffer, len, ddam);
 	if (ferr)
 		return imgtool_floppy_error(ferr);
 
@@ -337,7 +337,7 @@ static imgtoolerr_t imgtool_floppy_transfer_sector_tofrom_stream(imgtool_image *
 	else
 	{
 		stream_read(f, buffer, length);
-		err = floppy_write_sector(floppy, head, track, sector, offset, buffer, length);
+		err = floppy_write_sector(floppy, head, track, sector, offset, buffer, length, 0);	/* TODO: pass ddam argument from imgtool */
 		if (err)
 			goto done;
 	}

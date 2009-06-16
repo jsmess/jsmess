@@ -34,7 +34,7 @@ static floperr_t apple2_dsk_write_track(floppy_image *floppy, int head, int trac
 static floperr_t apple2_nib_read_track(floppy_image *floppy, int head, int track, UINT64 offset, void *buffer, size_t buflen);
 static floperr_t apple2_nib_write_track(floppy_image *floppy, int head, int track, UINT64 offset, const void *buffer, size_t buflen);
 static floperr_t apple2_nib_read_sector(floppy_image *floppy, int head, int track, int sector, void *buffer, size_t buflen);
-static floperr_t apple2_nib_write_sector(floppy_image *floppy, int head, int track, int sector, const void *buffer, size_t buflen);
+static floperr_t apple2_nib_write_sector(floppy_image *floppy, int head, int track, int sector, const void *buffer, size_t buflen, int ddam);
 static floperr_t apple2_nib_get_sector_length(floppy_image *floppy, int head, int track, int sector, UINT32 *sector_length);
 
 
@@ -229,7 +229,7 @@ static floperr_t apple2_dsk_write_track(floppy_image *floppy, int head, int trac
 		nibble += sector * APPLE2_SMALL_NIBBLE_SIZE;
 
 		disk_decode_nib(sector_buffer, nibble, NULL, NULL, NULL);
-		floppy_write_sector(floppy, head, track, sector, 0, sector_buffer, sizeof(sector_buffer));
+		floppy_write_sector(floppy, head, track, sector, 0, sector_buffer, sizeof(sector_buffer), 0);
 	}
 
 	return FLOPPY_ERROR_SUCCESS;
@@ -448,7 +448,7 @@ static void disk_encode_nib(UINT8 *nibble, const UINT8 *data, int volume, int tr
 
 
 
-static floperr_t apple2_nib_write_sector(floppy_image *floppy, int head, int track, int sector, const void *buffer, size_t buflen)
+static floperr_t apple2_nib_write_sector(floppy_image *floppy, int head, int track, int sector, const void *buffer, size_t buflen, int ddam)
 {
 	floperr_t err;
 	UINT8 *track_data;

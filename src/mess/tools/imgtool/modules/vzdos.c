@@ -147,7 +147,7 @@ static imgtoolerr_t vzdos_write_sector_data(imgtool_image *img, int track, int s
 	memcpy(buffer, data, DATA_SIZE + 2);
 	place_integer_le(buffer, DATA_SIZE + 2, 2, chksum16(data, DATA_SIZE + 2));
 
-	ret = floppy_write_sector(imgtool_floppy(img), 0, track, sector_order[sector], data_start, buffer, sizeof(buffer));
+	ret = floppy_write_sector(imgtool_floppy(img), 0, track, sector_order[sector], data_start, buffer, sizeof(buffer), 0);	/* TODO: pass ddam argument from imgtool */
 	if (ret) return ret;
 
 	return IMGTOOLERR_SUCCESS;
@@ -376,7 +376,7 @@ static imgtoolerr_t vzdos_write_formatted_sector(imgtool_image *img, int track, 
 	sector_data[11] = (UINT8) sector;			/* current sector */
 	sector_data[12] = (UINT8) track + sector;	/* checksum-8 */
 
-	ret = floppy_write_sector(imgtool_floppy(img), 0, track, sector_order[sector], 0, sector_data, sizeof(sector_data));
+	ret = floppy_write_sector(imgtool_floppy(img), 0, track, sector_order[sector], 0, sector_data, sizeof(sector_data), 0);	/* TODO: pass ddam argument from imgtool */
 	if (ret) return ret;
 
 	return IMGTOOLERR_SUCCESS;

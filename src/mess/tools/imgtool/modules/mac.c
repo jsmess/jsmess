@@ -682,7 +682,7 @@ static imgtoolerr_t image_write_block(mac_l1_imgref *image, UINT32 block, const 
 	if (err)
 		return err;
 
-	ferr = floppy_write_sector(imgtool_floppy(image->image), head, track, sector, 0, src, 512);
+	ferr = floppy_write_sector(imgtool_floppy(image->image), head, track, sector, 0, src, 512, 0);	/* TODO: pass ddam argument from imgtool */
 	if (ferr)
 		return imgtool_floppy_error(ferr);
 

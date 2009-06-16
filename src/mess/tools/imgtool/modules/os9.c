@@ -175,7 +175,7 @@ static imgtoolerr_t os9_write_lsn(imgtool_image *img, UINT32 lsn, int offset, co
 	if (err)
 		return err;
 
-	ferr = floppy_write_sector(imgtool_floppy(img), head, track, sector, offset, buffer, buffer_len);
+	ferr = floppy_write_sector(imgtool_floppy(img), head, track, sector, offset, buffer, buffer_len, 0);	/* TODO: pass ddam argument from imgtool */
 	if (ferr)
 		return imgtool_floppy_error(ferr);
 
@@ -774,7 +774,7 @@ static imgtoolerr_t os9_diskimage_create(imgtool_image *img, imgtool_stream *str
 	place_integer_be(header, 0x3f+0x0d, 1, 3); /* sector interleave factor */
 	place_integer_be(header, 0x3f+0x0e, 1, 8); /* default sectors per allocation */
 
-	err = floppy_write_sector(imgtool_floppy(img), 0, 0, first_sector_id, 0, header, sector_bytes);
+	err = floppy_write_sector(imgtool_floppy(img), 0, 0, first_sector_id, 0, header, sector_bytes, 0);	/* TODO: pass ddam argument from imgtool */
 	if (err)
 		goto done;
 
@@ -804,7 +804,7 @@ static imgtoolerr_t os9_diskimage_create(imgtool_image *img, imgtool_stream *str
 			}
 		}
 
-		err = floppy_write_sector(imgtool_floppy(img), 0, 0, first_sector_id + 1 + i, 0, header, sector_bytes);
+		err = floppy_write_sector(imgtool_floppy(img), 0, 0, first_sector_id + 1 + i, 0, header, sector_bytes, 0);	/* TODO: pass ddam argument from imgtool */
 		if (err)
 			goto done;
 	}
@@ -829,7 +829,7 @@ static imgtoolerr_t os9_diskimage_create(imgtool_image *img, imgtool_stream *str
 	place_integer_be(header, 0x10, 3, 1 + allocation_bitmap_lsns + 1);
 	place_integer_be(header, 0x13, 2, 8);
 
-	err = floppy_write_sector(imgtool_floppy(img), 0, 0, first_sector_id + 1 + allocation_bitmap_lsns, 0, header, sector_bytes);
+	err = floppy_write_sector(imgtool_floppy(img), 0, 0, first_sector_id + 1 + allocation_bitmap_lsns, 0, header, sector_bytes, 0);	/* TODO: pass ddam argument from imgtool */
 	if (err)
 		goto done;
 
@@ -839,7 +839,7 @@ static imgtoolerr_t os9_diskimage_create(imgtool_image *img, imgtool_stream *str
 	header[0x1F] = 1 + allocation_bitmap_lsns;
 	header[0x20] = 0xAE;
 	header[0x3F] = 1 + allocation_bitmap_lsns;
-	err = floppy_write_sector(imgtool_floppy(img), 0, 0, first_sector_id + 2 + allocation_bitmap_lsns, 0, header, sector_bytes);
+	err = floppy_write_sector(imgtool_floppy(img), 0, 0, first_sector_id + 2 + allocation_bitmap_lsns, 0, header, sector_bytes, 0);	/* TOOD: pass ddam argument from imgtool */
 	if (err)
 		goto done;
 

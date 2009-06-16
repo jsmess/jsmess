@@ -835,7 +835,7 @@ static imgtoolerr_t thom_read_sector(imgtool_image* img, UINT32 track,
 
 static imgtoolerr_t thom_write_sector(imgtool_image *img, UINT32 track,
 				      UINT32 head, UINT32 sector,
-				      const void *buf, size_t len)
+				      const void *buf, size_t len, int ddam)
 {
   thom_floppy* f = (thom_floppy*) imgtool_image_extra_bytes( img );
   if ( stream_isreadonly( f->stream ) ) return IMGTOOLERR_WRITEERROR;

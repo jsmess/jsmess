@@ -57,7 +57,7 @@ static floperr_t put_rsdos_dirent(imgtool_image *f, int index_loc, const struct 
 {
 	if (index_loc >= MAX_DIRENTS)
 		return IMGTOOLERR_FILENOTFOUND;
-	return floppy_write_sector(imgtool_floppy(f), 0, 17, 3, index_loc * 32, (void *) ent, sizeof(*ent));
+	return floppy_write_sector(imgtool_floppy(f), 0, 17, 3, index_loc * 32, (void *) ent, sizeof(*ent), 0);	/* TODO: pass ddam argument from imgtool */
 }
 
 
@@ -145,7 +145,7 @@ static floperr_t get_granule_map(imgtool_image *img, UINT8 *granule_map, UINT8 *
 
 static floperr_t put_granule_map(imgtool_image *img, const UINT8 *granule_map, UINT8 granule_count)
 {
-	return floppy_write_sector(imgtool_floppy(img), 0, 17, 2, 0, granule_map, granule_count);
+	return floppy_write_sector(imgtool_floppy(img), 0, 17, 2, 0, granule_map, granule_count, 0);	/* TODO: pass ddam argument from imgtool */
 }
 
 

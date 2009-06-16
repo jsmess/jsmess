@@ -357,7 +357,8 @@ static floperr_t coupe_sdf_get_sector_length(floppy_image *floppy,
 
 static floperr_t coupe_sdf_get_indexed_sector_info(floppy_image *floppy,
 	int head, int track, int sector_index,
-	int *cylinder, int *side, int *sector, UINT32 *sector_length)
+	int *cylinder, int *side, int *sector, UINT32 *sector_length,
+	unsigned long *flags)
 {
 	floperr_t err;
 	UINT8 buffer[SDF_TRACKSIZE];
@@ -376,6 +377,7 @@ static floperr_t coupe_sdf_get_indexed_sector_info(floppy_image *floppy,
 	if (side)          *side          = buffer[offset + 3];
 	if (sector)        *sector        = buffer[offset + 4];
 	if (sector_length) *sector_length = 128 << buffer[offset + 5];
+	if (flags)			*flags        = 0;	/* TODO: read DAM or DDAM and determine flags */
 
 	return FLOPPY_ERROR_SUCCESS;
 }
@@ -398,7 +400,7 @@ static floperr_t coupe_sdf_read_indexed_sector(floppy_image *floppy,
 
 
 static floperr_t coupe_sdf_write_indexed_sector(floppy_image *floppy,
-	int head, int track, int sector, const void *buffer, size_t buflen)
+	int head, int track, int sector, const void *buffer, size_t buflen, int ddam)
 {
 	floperr_t err;
 	UINT64 offset;

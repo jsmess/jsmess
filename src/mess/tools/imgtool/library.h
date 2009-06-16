@@ -277,7 +277,7 @@ union imgtoolinfo
 	imgtoolerr_t	(*get_sector_size)	(imgtool_image *image, UINT32 track, UINT32 head, UINT32 sector, UINT32 *sector_size);
 	imgtoolerr_t	(*get_geometry)		(imgtool_image *image, UINT32 *tracks, UINT32 *heads, UINT32 *sectors);
 	imgtoolerr_t	(*read_sector)		(imgtool_image *image, UINT32 track, UINT32 head, UINT32 sector, void *buffer, size_t len);
-	imgtoolerr_t	(*write_sector)		(imgtool_image *image, UINT32 track, UINT32 head, UINT32 sector, const void *buffer, size_t len);
+	imgtoolerr_t	(*write_sector)		(imgtool_image *image, UINT32 track, UINT32 head, UINT32 sector, const void *buffer, size_t len, int ddam);
 	imgtoolerr_t	(*read_block)		(imgtool_image *image, void *buffer, UINT64 block);
 	imgtoolerr_t	(*write_block)		(imgtool_image *image, const void *buffer, UINT64 block);
 	imgtoolerr_t	(*list_partitions)	(imgtool_image *image, imgtool_partition_info *partitions, size_t len);

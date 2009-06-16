@@ -37,7 +37,8 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
-(none)
+- Added support for passing around 'deleted address mark' information
+  to the floppy system. [Roberto Lavarone]
 
 
 
