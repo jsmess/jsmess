@@ -1297,9 +1297,9 @@ const game_driver * const drivers[] =
     DRIVER( fmtmarty )  /* 1993 Fujitsu FM-Towns Marty */
 
     /* Camputers */
-    DRIVER( camplynx )
-    DRIVER( camply96 )
-    DRIVER( camply128 )
+    DRIVER( lynx48k )
+    DRIVER( lynx96k )
+    DRIVER( lynx128k )
 
     /* Votrax */
     DRIVER( votrtnt ) /* 1980 Votrax Type-'N-Talk */

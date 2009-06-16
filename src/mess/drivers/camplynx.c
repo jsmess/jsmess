@@ -60,6 +60,8 @@
 
 
 
+	48k and 96k are basically the same machine. 128k is different.
+
 	The work so far is without the benefit of manuals, schematic etc [Robbbert]
 
 	48k, 96k:
@@ -69,9 +71,8 @@
 	To Do:
 	- find Break key
 	- banking (it is incomplete atm)
-	- devices (cassette, disk)
+	- devices (cassette, disk, printer, joysticks)
 	- find out the mc6845 clock frequency
-	- check out the roms (48k, 96k), they could be wrong
 
 ****************************************************************************/
 
@@ -86,7 +87,7 @@ static const device_config *mc6845;
 	computer working. Also, as it happens 6 times for every scanline
 	of every character, it causes a huge slowdown. */
 
-static WRITE8_HANDLER( camplynx_bank_w )
+static WRITE8_HANDLER( lynx48k_bank_w )
 {
 	if (!data)
 		memory_set_bank(space->machine, 1, 0);
@@ -100,12 +101,15 @@ static WRITE8_HANDLER( camplynx_bank_w )
 		logerror("%04X: Cannot understand bankswitch command %X\n",cpu_get_pc(space->cpu), data);
 }
 
-static WRITE8_HANDLER( lynx128_bank_w )
+static WRITE8_HANDLER( lynx128k_bank_w )
 {
 	/* get address space */
 	const address_space *mem = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
-	if (data == 0)
+	/* Set read banks */
+	UINT8 bank = data & 0x0f;
+
+	if (!bank)
 	{
 		memory_set_bankptr(mem->machine, 1, memory_region(mem->machine, "maincpu") + 0x00000);
 		memory_set_bankptr(mem->machine, 2, memory_region(mem->machine, "maincpu") + 0x02000);
@@ -115,6 +119,27 @@ static WRITE8_HANDLER( lynx128_bank_w )
 		memory_set_bankptr(mem->machine, 6, memory_region(mem->machine, "maincpu") + 0x1a000);
 		memory_set_bankptr(mem->machine, 7, memory_region(mem->machine, "maincpu") + 0x0c000);
 		memory_set_bankptr(mem->machine, 8, memory_region(mem->machine, "maincpu") + 0x0e000);
+	}
+	else
+	if (bank == 0x0e)
+	{
+		memory_set_bankptr(mem->machine, 1, memory_region(mem->machine, "maincpu") + 0x20000);
+		memory_set_bankptr(mem->machine, 2, memory_region(mem->machine, "maincpu") + 0x22000);
+		memory_set_bankptr(mem->machine, 3, memory_region(mem->machine, "maincpu") + 0x24000);
+		memory_set_bankptr(mem->machine, 4, memory_region(mem->machine, "maincpu") + 0x26000);
+		memory_set_bankptr(mem->machine, 5, memory_region(mem->machine, "maincpu") + 0x28000);
+		memory_set_bankptr(mem->machine, 6, memory_region(mem->machine, "maincpu") + 0x2a000);
+		memory_set_bankptr(mem->machine, 7, memory_region(mem->machine, "maincpu") + 0x2c000);
+		memory_set_bankptr(mem->machine, 8, memory_region(mem->machine, "maincpu") + 0x2e000);
+	}
+	else
+		logerror("%04X: Cannot understand bankswitch command %X\n",cpu_get_pc(space->cpu), data);
+
+	/* Set write banks */
+	bank = data & 0xd0;
+
+	if (!bank)
+	{
 		memory_set_bankptr(mem->machine, 11, memory_region(mem->machine, "maincpu") + 0x10000);
 		memory_set_bankptr(mem->machine, 12, memory_region(mem->machine, "maincpu") + 0x12000);
 		memory_set_bankptr(mem->machine, 13, memory_region(mem->machine, "maincpu") + 0x14000);
@@ -125,36 +150,8 @@ static WRITE8_HANDLER( lynx128_bank_w )
 		memory_set_bankptr(mem->machine, 18, memory_region(mem->machine, "maincpu") + 0x1e000);
 	}
 	else
-	if ((data == 0xc0) || (data == 0xe0))
+	if (bank == 0xc0)
 	{
-		memory_set_bankptr(mem->machine, 1, memory_region(mem->machine, "maincpu") + 0x00000);
-		memory_set_bankptr(mem->machine, 2, memory_region(mem->machine, "maincpu") + 0x02000);
-		memory_set_bankptr(mem->machine, 3, memory_region(mem->machine, "maincpu") + 0x04000);
-		memory_set_bankptr(mem->machine, 4, memory_region(mem->machine, "maincpu") + 0x16000);
-		memory_set_bankptr(mem->machine, 5, memory_region(mem->machine, "maincpu") + 0x18000);
-		memory_set_bankptr(mem->machine, 6, memory_region(mem->machine, "maincpu") + 0x1a000);
-		memory_set_bankptr(mem->machine, 7, memory_region(mem->machine, "maincpu") + 0x0c000);
-		memory_set_bankptr(mem->machine, 8, memory_region(mem->machine, "maincpu") + 0x0e000);
-		memory_set_bankptr(mem->machine, 11, memory_region(mem->machine, "maincpu") + 0x20000);
-		memory_set_bankptr(mem->machine, 12, memory_region(mem->machine, "maincpu") + 0x22000);
-		memory_set_bankptr(mem->machine, 13, memory_region(mem->machine, "maincpu") + 0x24000);
-		memory_set_bankptr(mem->machine, 14, memory_region(mem->machine, "maincpu") + 0x26000);
-		memory_set_bankptr(mem->machine, 15, memory_region(mem->machine, "maincpu") + 0x28000);
-		memory_set_bankptr(mem->machine, 16, memory_region(mem->machine, "maincpu") + 0x2a000);
-		memory_set_bankptr(mem->machine, 17, memory_region(mem->machine, "maincpu") + 0x2c000);
-		memory_set_bankptr(mem->machine, 18, memory_region(mem->machine, "maincpu") + 0x2e000);
-	}
-	else
-	if ((data == 0xce) || (data == 0xee))
-	{
-		memory_set_bankptr(mem->machine, 1, memory_region(mem->machine, "maincpu") + 0x20000);
-		memory_set_bankptr(mem->machine, 2, memory_region(mem->machine, "maincpu") + 0x22000);
-		memory_set_bankptr(mem->machine, 3, memory_region(mem->machine, "maincpu") + 0x24000);
-		memory_set_bankptr(mem->machine, 4, memory_region(mem->machine, "maincpu") + 0x26000);
-		memory_set_bankptr(mem->machine, 5, memory_region(mem->machine, "maincpu") + 0x28000);
-		memory_set_bankptr(mem->machine, 6, memory_region(mem->machine, "maincpu") + 0x2a000);
-		memory_set_bankptr(mem->machine, 7, memory_region(mem->machine, "maincpu") + 0x2c000);
-		memory_set_bankptr(mem->machine, 8, memory_region(mem->machine, "maincpu") + 0x2e000);
 		memory_set_bankptr(mem->machine, 11, memory_region(mem->machine, "maincpu") + 0x20000);
 		memory_set_bankptr(mem->machine, 12, memory_region(mem->machine, "maincpu") + 0x22000);
 		memory_set_bankptr(mem->machine, 13, memory_region(mem->machine, "maincpu") + 0x24000);
@@ -168,26 +165,19 @@ static WRITE8_HANDLER( lynx128_bank_w )
 		logerror("%04X: Cannot understand bankswitch command %X\n",cpu_get_pc(space->cpu), data);
 }
 
-static ADDRESS_MAP_START( camplynx_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START( lynx48k_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000,0x5fff) AM_ROM
 	AM_RANGE(0x6000,0x7fff) AM_RAM
 	AM_RANGE(0x8000,0xffff) AM_RAMBANK(1)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lynx96_mem, ADDRESS_SPACE_PROGRAM, 8)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000,0x5fff) AM_ROM
-	AM_RANGE(0x6000,0x7fff) AM_RAM
-	AM_RANGE(0x8000,0xffff) AM_RAMBANK(1)
+static ADDRESS_MAP_START( lynx128k_mem, ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lynx128_mem, ADDRESS_SPACE_PROGRAM, 8)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( camplynx_io , ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( lynx48k_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x007f,0x007f) AM_MIRROR(0xff00) AM_WRITE(camplynx_bank_w)
+	AM_RANGE(0x007f,0x007f) AM_MIRROR(0xff00) AM_WRITE(lynx48k_bank_w)
 	AM_RANGE(0x0080,0x0080) AM_MIRROR(0xff00) AM_WRITE(SMH_NOP)		/* to be emulated */
 	AM_RANGE(0x0080,0x0080) AM_READ_PORT("LINE0")
 	AM_RANGE(0x0180,0x0180) AM_READ_PORT("LINE1")
@@ -204,15 +194,15 @@ static ADDRESS_MAP_START( camplynx_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0087,0x0087) AM_MIRROR(0xff00) AM_DEVREADWRITE("crtc", mc6845_register_r,mc6845_register_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lynx128_io , ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( lynx128k_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 //	AM_RANGE(0x0050,0x0053) AM_MIRROR(0xff80) AM_READ(wd179x_r)	// uses a 1793
 //	AM_RANGE(0x0054,0x0057) AM_MIRROR(0xff80) AM_WRITE(wd179x_w)
-//	AM_RANGE(0x0058,0x0058) AM_MIRROR(0xff80) AM_WRITE(lynx128_disk_w)
-//	AM_RANGE(0x007a,0x007b) AM_MIRROR(0xff80) AM_READ(lynx128_joysticks_r)
-//	AM_RANGE(0x007c,0x007c) AM_MIRROR(0xff80) AM_READ(lynx128_printer_r)
-//	AM_RANGE(0x007d,0x007d) AM_MIRROR(0xff80) AM_WRITE(lynx128_printer_init_w)	// this is rw
-//	AM_RANGE(0x007e,0x007e) AM_MIRROR(0xff80) AM_WRITE(lynx128_printer_w)
+//	AM_RANGE(0x0058,0x0058) AM_MIRROR(0xff80) AM_WRITE(lynx128k_disk_w)
+//	AM_RANGE(0x007a,0x007b) AM_MIRROR(0xff80) AM_READ(lynx128k_joysticks_r)
+//	AM_RANGE(0x007c,0x007c) AM_MIRROR(0xff80) AM_READ(lynx128k_printer_r)
+//	AM_RANGE(0x007d,0x007d) AM_MIRROR(0xff80) AM_WRITE(lynx128k_printer_init_w)	// this is rw
+//	AM_RANGE(0x007e,0x007e) AM_MIRROR(0xff80) AM_WRITE(lynx128k_printer_w)
 	AM_RANGE(0x0080,0x0080) AM_MIRROR(0xff00) AM_WRITE(SMH_NOP)		/* to be emulated */
 	AM_RANGE(0x0080,0x0080) AM_READ_PORT("LINE0")
 	AM_RANGE(0x0180,0x0180) AM_READ_PORT("LINE1")
@@ -224,14 +214,14 @@ static ADDRESS_MAP_START( lynx128_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0780,0x0780) AM_READ_PORT("LINE7")
 	AM_RANGE(0x0880,0x0880) AM_READ_PORT("LINE8")
 	AM_RANGE(0x0980,0x0980) AM_READ_PORT("LINE9")
-	AM_RANGE(0x0082,0x0082) AM_MIRROR(0xff00) AM_WRITE(lynx128_bank_w)	// read=serial buffer
+	AM_RANGE(0x0082,0x0082) AM_MIRROR(0xff00) AM_WRITE(lynx128k_bank_w)	// read=serial buffer
 	AM_RANGE(0x0084,0x0084) AM_MIRROR(0xff00) AM_DEVWRITE("dac", dac_w)	/* 6-bit dac. Read="single-step", causes a NMI */
 	AM_RANGE(0x0086,0x0086) AM_MIRROR(0xff00) AM_DEVREADWRITE("crtc", mc6845_status_r,mc6845_address_w)
 	AM_RANGE(0x0087,0x0087) AM_MIRROR(0xff00) AM_DEVREADWRITE("crtc", mc6845_register_r,mc6845_register_w)
 ADDRESS_MAP_END
 
 /* Input ports */
-static INPUT_PORTS_START( camplynx )
+static INPUT_PORTS_START( lynx48k )
 	PORT_START("LINE0")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Esc") PORT_CODE(KEYCODE_ESC) PORT_CHAR(27)
@@ -311,7 +301,7 @@ static INPUT_PORTS_START( camplynx )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET( lynx128 )
+static MACHINE_RESET( lynx128k )
 {
 	const address_space *mem = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	memory_install_readwrite8_handler (mem, 0x0000, 0x1fff, 0, 0, SMH_BANK(1), SMH_BANK(11));
@@ -322,16 +312,16 @@ static MACHINE_RESET( lynx128 )
 	memory_install_readwrite8_handler (mem, 0xa000, 0xbfff, 0, 0, SMH_BANK(6), SMH_BANK(16));
 	memory_install_readwrite8_handler (mem, 0xc000, 0xdfff, 0, 0, SMH_BANK(7), SMH_BANK(17));
 	memory_install_readwrite8_handler (mem, 0xe000, 0xffff, 0, 0, SMH_BANK(8), SMH_BANK(18));
-	lynx128_bank_w(mem, 0, 0);
+	lynx128k_bank_w(mem, 0, 0);
 }
 
-static WRITE8_DEVICE_HANDLER( lynx128_irq )
+static WRITE8_DEVICE_HANDLER( lynx128k_irq )
 {
 	cputag_set_input_line(device->machine, "maincpu", 0, data);
 }
 
 
-static const UINT8 camplynx_palette[8*3] =
+static const UINT8 lynx48k_palette[8*3] =
 {
 	0x00, 0x00, 0x00,	/*  0 Black		*/
 	0x00, 0x00, 0xff,	/*  1 Blue		*/
@@ -343,18 +333,18 @@ static const UINT8 camplynx_palette[8*3] =
 	0xff, 0xff, 0xff,	/*  7 White		*/
 };
 
-static PALETTE_INIT( camplynx )
+static PALETTE_INIT( lynx48k )
 {
 	UINT8 r, b, g, i=0, color_count = 8;
 
 	while (color_count--)
 	{
-		r = camplynx_palette[i++]; g = camplynx_palette[i++]; b = camplynx_palette[i++];
+		r = lynx48k_palette[i++]; g = lynx48k_palette[i++]; b = lynx48k_palette[i++];
 		palette_set_color(machine, 7-color_count, MAKE_RGB(r, g, b));
 	}
 }
 
-static MC6845_UPDATE_ROW( camplynx_update_row )
+static MC6845_UPDATE_ROW( lynx48k_update_row )
 {
 	UINT8 *RAM = memory_region(device->machine, "maincpu");
 	UINT8 r,g,b;
@@ -377,7 +367,7 @@ static MC6845_UPDATE_ROW( camplynx_update_row )
 	}
 }
 
-static MC6845_UPDATE_ROW( lynx128_update_row )
+static MC6845_UPDATE_ROW( lynx128k_update_row )
 {
 	UINT8 *RAM = memory_region(device->machine, "maincpu");
 	UINT8 r,g,b;
@@ -400,23 +390,23 @@ static MC6845_UPDATE_ROW( lynx128_update_row )
 	}
 }
 
-static VIDEO_START( camplynx )
+static VIDEO_START( lynx48k )
 {
 	mc6845 = devtag_get_device(machine, "crtc");
 }
 
-static VIDEO_UPDATE( camplynx )
+static VIDEO_UPDATE( lynx48k )
 {
 	mc6845_update(mc6845, bitmap, cliprect);
 	return 0;
 }
 
 
-static const mc6845_interface camplynx_crtc6845_interface = {
+static const mc6845_interface lynx48k_crtc6845_interface = {
 	"screen",
 	8,
 	NULL,
-	camplynx_update_row,
+	lynx48k_update_row,
 	NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -425,25 +415,25 @@ static const mc6845_interface camplynx_crtc6845_interface = {
 	NULL
 };
 
-static const mc6845_interface lynx128_crtc6845_interface = {
+static const mc6845_interface lynx128k_crtc6845_interface = {
 	"screen",			/* screen name */
 	8,				/* dots per character */
 	NULL,
-	lynx128_update_row,		/* callback to display one scanline */
+	lynx128k_update_row,		/* callback to display one scanline */
 	NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(lynx128_irq),	/* callback when cursor pin changes state */
+	DEVCB_HANDLER(lynx128k_irq),	/* callback when cursor pin changes state */
 	DEVCB_NULL,
 	NULL
 };
 
 
-static MACHINE_DRIVER_START( camplynx )
+static MACHINE_DRIVER_START( lynx48k )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_4MHz)
-	MDRV_CPU_PROGRAM_MAP(camplynx_mem)
-	MDRV_CPU_IO_MAP(camplynx_io)
+	MDRV_CPU_PROGRAM_MAP(lynx48k_mem)
+	MDRV_CPU_IO_MAP(lynx48k_io)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -453,12 +443,12 @@ static MACHINE_DRIVER_START( camplynx )
 	MDRV_SCREEN_SIZE(512, 480)
 	MDRV_SCREEN_VISIBLE_AREA(0, 511, 0, 479)
 	MDRV_PALETTE_LENGTH(8)
-	MDRV_PALETTE_INIT(camplynx)
+	MDRV_PALETTE_INIT(lynx48k)
 
-	MDRV_MC6845_ADD("crtc", MC6845, XTAL_12MHz / 8 /*? dot clock divided by dots per char */, camplynx_crtc6845_interface)
+	MDRV_MC6845_ADD("crtc", MC6845, XTAL_12MHz / 8 /*? dot clock divided by dots per char */, lynx48k_crtc6845_interface)
 
-	MDRV_VIDEO_START(camplynx)
-	MDRV_VIDEO_UPDATE(camplynx)
+	MDRV_VIDEO_START(lynx48k)
+	MDRV_VIDEO_UPDATE(lynx48k)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -467,19 +457,13 @@ static MACHINE_DRIVER_START( camplynx )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( lynx96 )
-	MDRV_IMPORT_FROM( camplynx )
-	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_PROGRAM_MAP(lynx96_mem)
-MACHINE_DRIVER_END
-
-static MACHINE_DRIVER_START( lynx128 )
+static MACHINE_DRIVER_START( lynx128k )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, XTAL_4MHz)
-	MDRV_CPU_PROGRAM_MAP(lynx128_mem)
-	MDRV_CPU_IO_MAP(lynx128_io)
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_6MHz)
+	MDRV_CPU_PROGRAM_MAP(lynx128k_mem)
+	MDRV_CPU_IO_MAP(lynx128k_io)
 
-	MDRV_MACHINE_RESET(lynx128)
+	MDRV_MACHINE_RESET(lynx128k)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -489,12 +473,12 @@ static MACHINE_DRIVER_START( lynx128 )
 	MDRV_SCREEN_SIZE(512, 480)
 	MDRV_SCREEN_VISIBLE_AREA(0, 511, 0, 479)
 	MDRV_PALETTE_LENGTH(8)
-	MDRV_PALETTE_INIT(camplynx)
+	MDRV_PALETTE_INIT(lynx48k)
 
-	MDRV_MC6845_ADD("crtc", MC6845, XTAL_12MHz / 8 /*? dot clock divided by dots per char */, lynx128_crtc6845_interface)
+	MDRV_MC6845_ADD("crtc", MC6845, XTAL_12MHz / 8 /*? dot clock divided by dots per char */, lynx128k_crtc6845_interface)
 
-	MDRV_VIDEO_START(camplynx)
-	MDRV_VIDEO_UPDATE(camplynx)
+	MDRV_VIDEO_START(lynx48k)
+	MDRV_VIDEO_UPDATE(lynx48k)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -503,7 +487,7 @@ static MACHINE_DRIVER_START( lynx128 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
 MACHINE_DRIVER_END
 
-static DRIVER_INIT( camplynx )
+static DRIVER_INIT( lynx48k )
 {
 	UINT8 *RAM = memory_region(machine, "maincpu");
 	memory_configure_bank(machine, 1, 0, 3, &RAM[0x8000],  0x8000);
@@ -511,31 +495,35 @@ static DRIVER_INIT( camplynx )
 
 
 /* ROM definition */
-ROM_START( camplynx )
+ROM_START( lynx48k )
 	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "lynx48-1.rom", 0x0000, 0x2000, CRC(56feec44) SHA1(7ded5184561168e159a30fa8e9d3fde5e52aa91a) )
-	ROM_LOAD( "lynx48-2.rom", 0x2000, 0x2000, CRC(d894562e) SHA1(c08a78ecb4eb05baa4c52488fce3648cd2688744) )
+	ROM_SYSTEM_BIOS(0, "1", "Set1")
+	ROMX_LOAD( "lynx48-1.rom", 0x0000, 0x2000, CRC(56feec44) SHA1(7ded5184561168e159a30fa8e9d3fde5e52aa91a), ROM_BIOS(1) )
+	ROMX_LOAD( "lynx48-2.rom", 0x2000, 0x2000, CRC(d894562e) SHA1(c08a78ecb4eb05baa4c52488fce3648cd2688744), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS(1, "2", "Set2")
+	ROMX_LOAD( "lynx4811.rom", 0x0000, 0x2000, CRC(a933e577) SHA1(c7b30a28d99b38dbe63a1314c78e3e614287143b), ROM_BIOS(2) )
+	ROMX_LOAD( "lynx4812.rom", 0x2000, 0x2000, CRC(3d3fdd0e) SHA1(259d124f05367a96f891790f9418cc9c7798e2f8), ROM_BIOS(2) )
 ROM_END
 
-ROM_START( camply96 )
+ROM_START( lynx96k )
 	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "lynx96-1.rom", 0x0000, 0x2000, CRC(56feec44) SHA1(7ded5184561168e159a30fa8e9d3fde5e52aa91a) )
-	ROM_LOAD( "lynx96-2.rom", 0x2000, 0x2000, CRC(d894562e) SHA1(c08a78ecb4eb05baa4c52488fce3648cd2688744) )
-	ROM_LOAD( "lynx96-3.rom", 0x4000, 0x2000, CRC(21f11709) SHA1(f86a729b01de286197c550974f7825c12815a4f4) )
-	ROM_LOAD( "dosrom.rom", 0xe000, 0x2000, CRC(011e106a) SHA1(e77f0ca99790551a7122945f3194516b2390fb69) )
+	ROM_LOAD( "lynx9646.rom",  0x0000, 0x2000, CRC(f86c5514) SHA1(77a4af7557382003d697d08f364839e2dc28f063) )
+	ROM_LOAD( "lynx9645.rom",  0x2000, 0x2000, CRC(f596b9a3) SHA1(3fca46bd68422d34c6cd801dd904507e52bd8846) )
+	ROM_LOAD( "lynx9644.rom",  0x4000, 0x1000, CRC(4b96b0de) SHA1(c372a8d26399b9b45e615b674d61ccda76491b8b) )
+	ROM_LOAD( "dosrom.rom",    0xe000, 0x2000, CRC(011e106a) SHA1(e77f0ca99790551a7122945f3194516b2390fb69) )
 ROM_END
 
-ROM_START( camply128 )
+ROM_START( lynx128k )
 	ROM_REGION( 0x50000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "lynx128-1.rom", 0x0000, 0x2000, CRC(65d292ce) SHA1(36567c2fbd9cf72f758e8cb80c21cb4d82040752) )
 	ROM_LOAD( "lynx128-2.rom", 0x2000, 0x2000, CRC(23288773) SHA1(e12a7ebea3fae5eb375c03e848dbb81070d9d189) )
 	ROM_LOAD( "lynx128-3.rom", 0x4000, 0x2000, CRC(9827b9e9) SHA1(1092367b2af51c72ce9be367179240d692aeb131) )
-	ROM_LOAD( "dosrom.rom", 0xe000, 0x2000, CRC(011e106a) SHA1(e77f0ca99790551a7122945f3194516b2390fb69) )
+	ROM_LOAD( "dosrom.rom",    0xe000, 0x2000, CRC(011e106a) SHA1(e77f0ca99790551a7122945f3194516b2390fb69) )
 ROM_END
 
 
 /* Driver */
-/*    YEAR  NAME       PARENT     COMPAT   MACHINE    INPUT     INIT	   CONFIG    COMPANY       FULLNAME     FLAGS */
-COMP( 1983, camplynx,  0,         0,       camplynx,  camplynx, camplynx,    0,   "Camputers",  "Lynx 48",   GAME_NOT_WORKING)
-COMP( 1983, camply96,  camplynx,  0,       lynx96,    camplynx, camplynx,    0,   "Camputers",  "Lynx 96",   GAME_NOT_WORKING)
-COMP( 1983, camply128, camplynx,  0,       lynx128,   camplynx, 0,           0,   "Camputers",  "Lynx 128",  GAME_NOT_WORKING)
+/*    YEAR  NAME       PARENT     COMPAT   MACHINE    INPUT     INIT   CONFIG    COMPANY       FULLNAME     FLAGS */
+COMP( 1983, lynx48k,  0,         0,       lynx48k,  lynx48k, lynx48k,    0,   "Camputers",  "Lynx 48k",   GAME_NOT_WORKING)
+COMP( 1983, lynx96k,  lynx48k,   0,       lynx48k,  lynx48k, lynx48k,    0,   "Camputers",  "Lynx 96k",   GAME_NOT_WORKING)
+COMP( 1983, lynx128k, lynx48k,   0,       lynx128k, lynx48k, 0,          0,   "Camputers",  "Lynx 128k",  GAME_NOT_WORKING)
