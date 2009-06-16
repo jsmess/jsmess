@@ -11,6 +11,9 @@
 		not detected, however. E.g. Sonic 3. Also some games seem false
 		positives (e.g. Wonderboy 5: according to its headers it should
 		have 1byte of SRAM). Better detection routines would be welcome.
+	2009-06: Changed SRAM code, fixing more games, including Sonic 3. The
+		false positives seem only some of the games using EEPROM. Todo
+		list in mess/drivers/genesis.c includes EEPROM emulation.
 
 ***************************************************************************/
 
@@ -41,7 +44,8 @@ static int genesis_sram_start = 0;
 static int genesis_sram_end = 0;
 static int genesis_sram_active = 0;
 static int genesis_sram_readonly = 0;
-static int has_sram = 0;
+static int has_serial_eeprom = 0;
+static int sram_handlers_installed = 0;
 
 
 enum 
@@ -571,19 +575,49 @@ static WRITE16_HANDLER( genesis_TMSS_bank_w )
  *
  *************************************/
 
+static void alloc_sram(running_machine *machine)
+{
+	genesis_sram = alloc_array_or_die(UINT16, (genesis_sram_end - genesis_sram_start) / sizeof(UINT16));
+	image_battery_load(devtag_get_device(machine, "cart"), genesis_sram, genesis_sram_end - genesis_sram_start);
+	memcpy(megadriv_backupram, genesis_sram, genesis_sram_end - genesis_sram_start);
+}
 
 static READ16_HANDLER( genesis_sram_read )
 {
-	return genesis_sram_active ? genesis_sram[offset] : 0;
+	UINT8 *ROM;
+	int rom_offset;
+
+	if (genesis_sram_active)
+	{
+		if (genesis_sram == NULL)
+			alloc_sram(space->machine);
+		return genesis_sram[offset];
+	}
+	else
+	{
+		ROM = memory_region(space->machine, "maincpu");
+		rom_offset = genesis_sram_start + (offset<<1);
+
+		return (UINT16) ROM[rom_offset] | (ROM[rom_offset+1] << 8);
+	}
 }
 
 static WRITE16_HANDLER( genesis_sram_write )
 {
 	if (genesis_sram_active)
 	{
+		if (genesis_sram == NULL)
+			alloc_sram(space->machine);
 		if (!genesis_sram_readonly)
 			genesis_sram[offset] = data;
 	}
+}
+
+static void install_sram_rw_handlers(running_machine *machine)
+{
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), genesis_sram_start & 0x3fffff, genesis_sram_end & 0x3fffff, 0, 0, genesis_sram_read);
+	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), genesis_sram_start & 0x3fffff, genesis_sram_end & 0x3fffff, 0, 0, genesis_sram_write);
+	sram_handlers_installed = 1;
 }
 
 static WRITE16_HANDLER( genesis_sram_toggle )
@@ -594,9 +628,9 @@ static WRITE16_HANDLER( genesis_sram_toggle )
 	*/
 	genesis_sram_active = (data & 1) ? 1 : 0;
 	genesis_sram_readonly = (data & 2) ? 1 : 0;
-		
-	if (genesis_sram_active)
-		memcpy(megadriv_backupram, genesis_sram, genesis_sram_end - genesis_sram_start);
+
+	if (genesis_sram_active && !sram_handlers_installed)
+		install_sram_rw_handlers (space->machine);
 }
 
 
@@ -807,11 +841,17 @@ static void setup_megadriv_custom_mappers(running_machine *machine)
 		memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa13000, 0xa13039, 0, 0, s19in1_bank);
 	}
 
-	if (has_sram)
+	/* Disable SRAM handlers if it's a game using EEPROM to save
+	progresses. Currently EEPROM is not emulated. */
+	if (!has_serial_eeprom)
 	{
-        memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), genesis_sram_start & 0x3fffff, genesis_sram_end & 0x3fffff, 0, 0, genesis_sram_read);
-        memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), genesis_sram_start & 0x3fffff, genesis_sram_end & 0x3fffff, 0, 0, genesis_sram_write);
-        memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa130f0, 0xa130f1, 0, 0, genesis_sram_toggle);
+		memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa130f0, 0xa130f1, 0, 0, genesis_sram_toggle);
+
+		/* Sonic 1 included in Sonic Classics doesn't have SRAM and
+		does lots of ROM access at this range, then only install read/
+		write handlers if SRAM is active to not slow down emulation. */
+		if (genesis_sram_active)
+			install_sram_rw_handlers (machine);
 	}
 
 
@@ -955,7 +995,7 @@ static int genesis_is_SMD(unsigned char *buf,unsigned int len)
 static DEVICE_IMAGE_LOAD( genesis_cart )
 {
 	unsigned char *ROM, *rawROM, *tmpROMnew, *tmpROM, *secondhalf;
-	int relocate, length, ptr, x;
+	int relocate, length, ptr, x, sram_detected;
 #ifdef LSB_FIRST
 	unsigned char fliptemp;
 #endif
@@ -1183,43 +1223,58 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 
 	/* check if cart has battery save */
 	genesis_sram = NULL;
+	sram_detected = sram_handlers_installed = has_serial_eeprom = 0;
+
+	/* For games using SRAM, unfortunately there are ROMs without info
+	about it in header. The solution adopted is do the mapping anyway,
+	then active SRAM later if the game will access it. */
 	
-	/* This is not enough! some games (e.g. Sonic 3) are not detected */
 	if (ROM[0x1b1] == 'R' && ROM[0x1b0] == 'A')
 	{
-		has_sram = 1;
+		/* SRAM info found in header */
 		genesis_sram_start = (ROM[0x1b5] << 24 | ROM[0x1b4] << 16 | ROM[0x1b7] << 8 | ROM[0x1b6]);
 		genesis_sram_end = (ROM[0x1b9] << 24 | ROM[0x1b8] << 16 | ROM[0x1bb] << 8 | ROM[0x1ba]);
 
 		if ((genesis_sram_start > genesis_sram_end) || ((genesis_sram_end - genesis_sram_start) >= 0x10000))	// we assume at most 64k of SRAM (HazeMD uses at most 64k). is this correct?
 			genesis_sram_end = genesis_sram_start + 0x10000;
 
-		/* This fixes Wonderboy 5, but we need more info on the SRAM and a better detection routine! */
-		if ((genesis_sram_end - genesis_sram_start) < 0x800 )
-			has_sram = 0;
-
-		if (genesis_sram_start & 1)
-			genesis_sram_start -= 1;
-
-		if (!(genesis_sram_end & 1))
-			genesis_sram_end += 1;
-		
-		if ( has_sram )
-		{
-			genesis_sram = alloc_array_or_die(UINT16, (genesis_sram_end - genesis_sram_start) / sizeof(UINT16));
-			image_battery_load(devtag_get_device(image->machine, "cart"), genesis_sram, genesis_sram_end - genesis_sram_start);
-
-			megadriv_backupram = (UINT16*)ROM + ((genesis_sram_start & 0x3fffff) / 2);
-			memmove(&megadriv_backupram[0], genesis_sram, genesis_sram_end - genesis_sram_start);
-
-			if (genesis_last_loaded_image_length < genesis_sram_start)
-				genesis_sram_active = 1;
-		}
+		/* for some games using serial EEPROM, SRAM will be detected
+		as size 0 or 1. Currently EEPROM is not emulated. */
+		if ((genesis_sram_end - genesis_sram_start) < 2)
+			has_serial_eeprom = 1;
+		else
+			sram_detected = 1;
+	}
+	else
+	{
+		/* set default SRAM positions, with size = 64k */
+		genesis_sram_start = 0x200000;
+		genesis_sram_end = genesis_sram_start + 0x10000;
 	}
 
-	logerror("SRAM detected? %s\n", has_sram ? "Yes" : "No");
-	if (has_sram)
-		logerror("SRAM starting location %X - SRAM Length %X\n", genesis_sram_start, genesis_sram_end - genesis_sram_start);
+	if (genesis_sram_start & 1)
+		genesis_sram_start -= 1;
+
+	if (!(genesis_sram_end & 1))
+		genesis_sram_end += 1;
+
+	/* calculate backup RAM location */
+	megadriv_backupram = (UINT16*) (ROM + (genesis_sram_start & 0x3fffff));
+
+	/* Until serial EEPROM is emulated, clears one byte at beginning of
+	backup RAM, but only if the value is 0xFFFF, to not break MLBPA Sports
+	Talk Baseball. With this hack some games at least run (NBA Jam, Evander
+	Holyfield's Real Deal Boxing, Greatest Heavyweights of the Ring) */
+	if (has_serial_eeprom && megadriv_backupram[0] == 0xFFFF)
+		megadriv_backupram[0] = 0xFF00;
+
+	/* Info from DGen: If SRAM does not overlap main ROM, set it active by
+	default since a few games can't manage to properly switch it on/off. */
+	if (genesis_last_loaded_image_length <= genesis_sram_start)
+		genesis_sram_active = 1;
+
+	if (sram_detected)
+		logerror("SRAM detected from header: starting location %X - SRAM Length %X\n", genesis_sram_start, genesis_sram_end - genesis_sram_start);
 
 	return INIT_PASS;
 }
@@ -1230,7 +1285,7 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 static DEVICE_IMAGE_UNLOAD( genesis_cart )
 {
 	/* Write out the battery file if necessary */
-	if (has_sram && (genesis_sram != NULL) && (genesis_sram_end - genesis_sram_start > 0))
+	if ((genesis_sram != NULL) && (genesis_sram_end - genesis_sram_start > 0))
 	{
 		image_battery_save(image, genesis_sram, genesis_sram_end - genesis_sram_start);
 	}
