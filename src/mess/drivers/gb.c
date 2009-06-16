@@ -9,7 +9,7 @@
   Anthony Kruize              2002
   Wilbert Pol                 2004 (Megaduck/Cougar Boy)
 
-  Todo list:
+  TODO list:
   Done entries kept for historical reasons, besides that it's nice to see
   what is already done instead of what has to be done.
 
