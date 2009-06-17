@@ -202,6 +202,8 @@ static floperr_t d77_get_indexed_sector_info(floppy_image *floppy, int head, int
 		*side = sector_hdr[1];
 	if(sector)
 		*sector = sector_hdr[2];
+	if(flags)
+		*flags = 0;
 	
 	return FLOPPY_ERROR_SUCCESS;
 }
