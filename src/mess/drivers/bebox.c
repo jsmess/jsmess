@@ -129,7 +129,7 @@ static MACHINE_DRIVER_START( bebox )
 
 	/* pci */
 	MDRV_PCI_BUS_ADD("pcibus", 0)
-	MDRV_PCI_BUS_DEVICE(1, NULL, mpc105_pci_read, mpc105_pci_write)
+	MDRV_PCI_BUS_DEVICE(0, NULL, mpc105_pci_read, mpc105_pci_write)
 	MDRV_PCI_BUS_DEVICE(1, NULL, cirrus5430_pci_read, cirrus5430_pci_write)
 	/*MDRV_PCI_BUS_DEVICE(12, NULL, scsi53c810_pci_read, scsi53c810_pci_write)*/
 
