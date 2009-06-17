@@ -861,7 +861,8 @@ static void wd17xx_complete_command(const device_config *device, int delay)
 
 	/* clear busy bit */
 	/* RL - removed, busy bit must be on until wd17xx_misc_timer_callback() is fired */
-	/* w->status &= ~STA_2_BUSY; */
+	/* Robbbert - put back in, it broke too many systems */
+	w->status &= ~STA_2_BUSY;
 
 	usecs = floppy_drive_get_datarate_in_us(w->density);
 	usecs *= delay;
