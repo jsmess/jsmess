@@ -585,21 +585,39 @@ READ8_HANDLER( fm7_cassette_printer_r )
 	UINT8 ret = 0x00;
 	double data = cassette_input(devtag_get_device(space->machine,"cass")); 
 	const device_config* printer_dev = devtag_get_device(space->machine,"printer");
+	UINT8 pdata;
+	int x;
 	
 	if(data > 0.03)
 		ret |= 0x80;
 	
-	ret |= 0x40;
+	if(cassette_get_state(devtag_get_device(space->machine,"cass")) & CASSETTE_MOTOR_DISABLED)
+		ret |= 0x80;  // cassette input is high when not in use.
 	
-	if(centronics_pe_r(printer_dev))
-		ret |= 0x08;
-	if(centronics_ack_r(printer_dev))
-		ret |= 0x04;
-	if(centronics_fault_r(printer_dev))
-		ret |= 0x02;
-	if(centronics_busy_r(printer_dev))
-		ret |= 0x01;
+	ret |= 0x70;
 
+	if(input_port_read(space->machine,"config") & 0x01)
+	{
+		ret |= 0x0f;
+		pdata = centronics_data_r(printer_dev,0);
+		for(x=0;x<6;x++)
+		{
+			if(~pdata & (1<<x))
+				if(input_port_read(space->machine,"lptjoy") & (1 << x))
+					ret &= ~0x08;
+		}
+	}
+	else
+	{		
+		if(centronics_pe_r(printer_dev))
+			ret |= 0x08;
+		if(centronics_ack_r(printer_dev))
+			ret |= 0x04;
+		if(centronics_fault_r(printer_dev))
+			ret |= 0x02;
+		if(centronics_busy_r(printer_dev))
+			ret |= 0x01;
+	}
 	return ret;
 }
 
@@ -1007,6 +1025,14 @@ INPUT_PORTS_START( fm7 )
   PORT_BIT(0x00000010,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("GRAPH") PORT_CODE(KEYCODE_RALT) 
   PORT_BIT(0x00000020,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Kana") PORT_CODE(KEYCODE_RCONTROL) PORT_TOGGLE
 
+  PORT_START("lptjoy")
+  PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_JOYSTICK_RIGHT) PORT_NAME("LPT Joystick Right") PORT_8WAY PORT_PLAYER(1)
+  PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_JOYSTICK_LEFT) PORT_NAME("LPT Joystick Left") PORT_8WAY PORT_PLAYER(1)
+  PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_JOYSTICK_UP) PORT_NAME("LPT Joystick Up") PORT_8WAY PORT_PLAYER(1)
+  PORT_BIT(0x08,IP_ACTIVE_HIGH,IPT_JOYSTICK_DOWN) PORT_NAME("LPT Joystick Down") PORT_8WAY PORT_PLAYER(1)
+  PORT_BIT(0x10,IP_ACTIVE_HIGH,IPT_BUTTON2) PORT_NAME("LPT Joystick Button 2") PORT_PLAYER(1)
+  PORT_BIT(0x20,IP_ACTIVE_HIGH,IPT_BUTTON1) PORT_NAME("LPT Joystick Button 1") PORT_PLAYER(1)
+
   PORT_START("DSW")
   PORT_DIPNAME(0x01,0x00,"Switch A") PORT_DIPLOCATION("SWA:1")
   PORT_DIPSETTING(0x00,DEF_STR( Off ))
@@ -1020,6 +1046,11 @@ INPUT_PORTS_START( fm7 )
   PORT_DIPNAME(0x08,0x00,"Switch D") PORT_DIPLOCATION("SWA:4")
   PORT_DIPSETTING(0x00,DEF_STR( Off ))
   PORT_DIPSETTING(0x08,DEF_STR( On ))
+
+  PORT_START("config")
+  PORT_CONFNAME(0x01,0x00,"Printer port device")
+  PORT_CONFSETTING(0x00,"Printer")
+  PORT_CONFSETTING(0x01,"Dempa Shinbunsha Joystick")
 INPUT_PORTS_END
 
 static DRIVER_INIT(fm7)
