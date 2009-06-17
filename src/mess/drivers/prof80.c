@@ -13,8 +13,8 @@
 
 	TODO:
 
+	- keyboard
 	- grip31 does not work
-	- write all 0 to flr_w on reset
 	- PROF-80 RAM banking
 	- PROF-80 floppy access
 	- GRIP model selection
@@ -36,6 +36,106 @@
 #include "machine/upd1990a.h"
 #include "machine/z80sti.h"
 #include "machine/ctronics.h"
+
+/* Keyboard HACK */
+
+static const UINT8 prof80_keycodes[3][9][8] =
+{
+	/* unshifted */
+	{
+	{ 0x1e, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37 },
+	{ 0x38, 0x39, 0x30, 0x2d, 0x3d, 0x08, 0x7f, 0x2d },
+	{ 0x37, 0x38, 0x39, 0x09, 0x71, 0x77, 0x65, 0x72 },
+	{ 0x74, 0x79, 0x75, 0x69, 0x6f, 0x70, 0x5b, 0x5d },
+	{ 0x1b, 0x2b, 0x34, 0x35, 0x36, 0x61, 0x73, 0x64 },
+	{ 0x66, 0x67, 0x68, 0x6a, 0x6b, 0x6c, 0x3b, 0x27 },
+	{ 0x0d, 0x0a, 0x01, 0x31, 0x32, 0x33, 0x7a, 0x78 },
+	{ 0x63, 0x76, 0x62, 0x6e, 0x6d, 0x2c, 0x2e, 0x2f },
+	{ 0x04, 0x02, 0x03, 0x30, 0x2e, 0x20, 0x00, 0x00 }
+	},
+
+	/* shifted */
+	{
+	{ 0x1e, 0x21, 0x40, 0x23, 0x24, 0x25, 0x5e, 0x26 },
+	{ 0x2a, 0x28, 0x29, 0x5f, 0x2b, 0x08, 0x7f, 0x2d },
+	{ 0x37, 0x38, 0x39, 0x09, 0x51, 0x57, 0x45, 0x52 },
+	{ 0x54, 0x59, 0x55, 0x49, 0x4f, 0x50, 0x7b, 0x7d },
+	{ 0x1b, 0x2b, 0x34, 0x35, 0x36, 0x41, 0x53, 0x44 },
+	{ 0x46, 0x47, 0x48, 0x4a, 0x4b, 0x4c, 0x3a, 0x22 },
+	{ 0x0d, 0x0a, 0x01, 0x31, 0x32, 0x33, 0x5a, 0x58 },
+	{ 0x43, 0x56, 0x42, 0x4e, 0x4d, 0x3c, 0x3e, 0x3f },
+	{ 0x04, 0x02, 0x03, 0x30, 0x2e, 0x20, 0x00, 0x00 }
+	},
+
+	/* control */
+	{
+	{ 0x9e, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x97 },
+	{ 0x98, 0x99, 0x90, 0x1f, 0x9a, 0x88, 0xff, 0xad },
+	{ 0xb7, 0xb8, 0xb9, 0x89, 0x11, 0x17, 0x05, 0x12 },
+	{ 0x14, 0x19, 0x15, 0x09, 0x0f, 0x10, 0x1b, 0x1d },
+	{ 0x9b, 0xab, 0xb4, 0xb5, 0xb6, 0x01, 0x13, 0x04 },
+	{ 0x06, 0x07, 0x08, 0x0a, 0x0b, 0x0c, 0x7e, 0x60 },
+	{ 0x8d, 0x8a, 0x81, 0xb1, 0xb2, 0xb3, 0x1a, 0x18 },
+	{ 0x03, 0x16, 0x02, 0x0e, 0x0d, 0x1c, 0x7c, 0x5c },
+	{ 0x84, 0x82, 0x83, 0xb0, 0xae, 0x00, 0x00, 0x00 }
+	}
+};
+
+static void prof80_keyboard_scan(running_machine *machine)
+{
+	prof80_state *state = machine->driver_data;
+
+	static const char *const keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7", "ROW8" };
+	int table = 0, row, col;
+	int keydata = -1;
+
+	if (input_port_read(machine, "ROW9") & 0x07)
+	{
+		/* shift, upper case */
+		table = 1;
+	}
+
+	if (input_port_read(machine, "ROW9") & 0x18)
+	{
+		/* ctrl */
+		table = 2;
+	}
+
+	/* scan keyboard */
+	for (row = 0; row < 9; row++)
+	{
+		UINT8 data = input_port_read(machine, keynames[row]);
+
+		for (col = 0; col < 8; col++)
+		{
+			if (!BIT(data, col))
+			{
+				/* latch key data */
+				keydata = ~prof80_keycodes[table][row][col];
+				
+				if (state->keydata != keydata)
+				{
+					state->keydata = keydata;
+
+					/* trigger GRIP 8255 port C bit 2 (_STBB) */
+					ppi8255_set_port_c(state->ppi8255, 0x54);
+					ppi8255_set_port_c(state->ppi8255, 0x50);
+					ppi8255_set_port_c(state->ppi8255, 0x54);
+					return;
+				}
+			}
+		}
+	}
+
+	state->keydata = keydata;
+}
+
+static TIMER_DEVICE_CALLBACK( prof80_keyboard_tick )
+{
+	prof80_state *state = timer->machine->driver_data;
+
+	if (!state->kbf) prof80_keyboard_scan(timer->machine);
+}
 
 /* PROF-80 */
 
@@ -79,30 +179,9 @@ static void prof80_bankswitch(running_machine *machine)
 	}
 }
 
-static WRITE8_HANDLER( flr_w )
+static void ls259_w(running_machine *machine, int fa, int sa, int fb, int sb)
 {
-	/*
-
-		bit		description
-
-		0		FB
-		1		SB0
-		2		SB1
-		3		SB2
-		4		SA0
-		5		SA1
-		6		SA2
-		7		FA
-
-	*/
-
-	prof80_state *state = space->machine->driver_data;
-
-	int fa = BIT(data, 7);
-	int sa = (data >> 4) & 0x07;
-
-	int fb = BIT(data, 0);
-	int sb = (data >> 1) & 0x07;
+	prof80_state *state = machine->driver_data;
 
 	switch (sa)
 	{
@@ -169,6 +248,32 @@ static WRITE8_HANDLER( flr_w )
 		state->mme = fb;
 		break;
 	}
+}
+
+static WRITE8_HANDLER( flr_w )
+{
+	/*
+
+		bit		description
+
+		0		FB
+		1		SB0
+		2		SB1
+		3		SB2
+		4		SA0
+		5		SA1
+		6		SA2
+		7		FA
+
+	*/
+
+	int fa = BIT(data, 7);
+	int sa = (data >> 4) & 0x07;
+
+	int fb = BIT(data, 0);
+	int sb = (data >> 1) & 0x07;
+
+	ls259_w(space->machine, fa, sa, fb, sb);
 }
 
 static READ8_HANDLER( status_r )
@@ -269,7 +374,7 @@ static READ8_HANDLER( gripc_r )
 {
 	prof80_state *state = space->machine->driver_data;
 
-	return state->ecb_status;
+	return state->gripc;
 }
 
 static READ8_HANDLER( gripd_r )
@@ -281,14 +386,14 @@ static READ8_HANDLER( gripd_r )
 	ppi8255_set_port_c(state->ppi8255, 0x14);
 	ppi8255_set_port_c(state->ppi8255, 0x54);
 
-	return state->ecb_data;
+	return state->gripd;
 }
 
 static WRITE8_HANDLER( gripd_w )
 {
 	prof80_state *state = space->machine->driver_data;
 
-	state->ecb_data = data;
+	state->gripd = data;
 
 	/* trigger GRIP 8255 port C bit 4 (_STBA) */
 	ppi8255_set_port_c(state->ppi8255, 0x54);
@@ -511,6 +616,102 @@ ADDRESS_MAP_END
 /* Input Ports */
 
 static INPUT_PORTS_START( prof80 )
+	PORT_START("ROW0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("HELP") PORT_CODE(KEYCODE_TILDE)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('@')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('^')
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('&')
+
+	PORT_START("ROW1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('*')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR('(')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR(')')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('_')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('=') PORT_CHAR('+')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("BACKSPACE") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("DEL") PORT_CODE(KEYCODE_DEL)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad -") PORT_CODE(KEYCODE_MINUS_PAD)
+
+	PORT_START("ROW2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 7") PORT_CODE(KEYCODE_7_PAD)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 8") PORT_CODE(KEYCODE_8_PAD)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 9") PORT_CODE(KEYCODE_9_PAD)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("TAB") PORT_CODE(KEYCODE_TAB) PORT_CHAR('\t')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_CHAR('q') PORT_CHAR('Q')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W) PORT_CHAR('w') PORT_CHAR('W')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('e') PORT_CHAR('E')
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_CHAR('r') PORT_CHAR('R')
+	
+	PORT_START("ROW3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T) PORT_CHAR('t') PORT_CHAR('T')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_CHAR('y') PORT_CHAR('Y')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U) PORT_CHAR('u') PORT_CHAR('U')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I) PORT_CHAR('i') PORT_CHAR('I')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O) PORT_CHAR('o') PORT_CHAR('O')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('[') PORT_CHAR('{')
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']') PORT_CHAR('}')
+	
+	PORT_START("ROW4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("ESC") PORT_CODE(KEYCODE_ESC) PORT_CHAR(UCHAR_MAMEKEY(ESC))
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad +") PORT_CODE(KEYCODE_PLUS_PAD)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 4") PORT_CODE(KEYCODE_4_PAD)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 5") PORT_CODE(KEYCODE_5_PAD)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 6") PORT_CODE(KEYCODE_6_PAD)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('a') PORT_CHAR('A')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_CHAR('s') PORT_CHAR('S')
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('d') PORT_CHAR('D')
+	
+	PORT_START("ROW5")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('f') PORT_CHAR('F')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_CHAR('g') PORT_CHAR('G')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H) PORT_CHAR('h') PORT_CHAR('H')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_CHAR('j') PORT_CHAR('J')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K) PORT_CHAR('k') PORT_CHAR('K')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_CHAR('l') PORT_CHAR('L')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR(':')
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR('\'') PORT_CHAR('"')
+	
+	PORT_START("ROW6")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RETURN") PORT_CODE(KEYCODE_ENTER) PORT_CHAR('\r')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LINE FEED") PORT_CODE(KEYCODE_ENTER_PAD)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x91") PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 1") PORT_CODE(KEYCODE_1_PAD)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 2") PORT_CODE(KEYCODE_2_PAD)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 3") PORT_CODE(KEYCODE_3_PAD)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z) PORT_CHAR('z') PORT_CHAR('Z')
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X')
+	
+	PORT_START("ROW7")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('c') PORT_CHAR('C')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V) PORT_CHAR('v') PORT_CHAR('V')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('b') PORT_CHAR('B')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N) PORT_CHAR('n') PORT_CHAR('N')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_CHAR('m') PORT_CHAR('M')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
+	
+	PORT_START("ROW8")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x90") PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x93") PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x92") PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 0") PORT_CODE(KEYCODE_0_PAD)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad .") PORT_CODE(KEYCODE_ASTERISK)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SPACE") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+
+	PORT_START("ROW9")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("LOCK") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("LEFT SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("RIGHT SHIFT") PORT_CODE(KEYCODE_RSHIFT)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("LEFT CTRL") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("RIGHT CTRL") PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_MAMEKEY(RCONTROL))
 INPUT_PORTS_END
 
 /* Video */
@@ -629,7 +830,7 @@ static READ8_DEVICE_HANDLER( grip_ppi8255_a_r )
 
 	prof80_state *state = device->machine->driver_data;
 
-	return state->ecb_data;
+	return state->gripd;
 }
 
 static WRITE8_DEVICE_HANDLER( grip_ppi8255_a_w )
@@ -651,7 +852,7 @@ static WRITE8_DEVICE_HANDLER( grip_ppi8255_a_w )
 
 	prof80_state *state = device->machine->driver_data;
 
-	state->ecb_data = data;
+	state->gripd = data;
 }
 
 static READ8_DEVICE_HANDLER( grip_ppi8255_b_r )
@@ -671,27 +872,9 @@ static READ8_DEVICE_HANDLER( grip_ppi8255_b_r )
     
 	*/
 
-	return 0;
-}
+	prof80_state *state = device->machine->driver_data;
 
-static READ8_DEVICE_HANDLER( grip_ppi8255_c_r )
-{
-	/*
-
-        bit		signal		description
-
-		PC0     INTRB		interrupt B output (keyboard)
-        PC1     KBF			input buffer B full output (keyboard)
-        PC2     _KBSTB		strobe B input (keyboard)
-        PC3     INTRA		interrupt A output (PROF-80)
-        PC4		_STBA		strobe A input (PROF-80)
-        PC5     IBFA		input buffer A full output (PROF-80)
-        PC6		_ACKA		acknowledge A input (PROF-80)
-        PC7     _OBFA		output buffer full output (PROF-80)
-    
-	*/
-
-	return 0x54;
+	return state->keydata;
 }
 
 static WRITE8_DEVICE_HANDLER( grip_ppi8255_c_w )
@@ -716,18 +899,21 @@ static WRITE8_DEVICE_HANDLER( grip_ppi8255_c_w )
 	/* keyboard interrupt */
 	z80sti_i4_w(state->z80sti, BIT(data, 0));
 
+	/* keyboard buffer full */
+	state->kbf = BIT(data, 1);
+
 	/* PROF-80 interrupt */
 	z80sti_i7_w(state->z80sti, BIT(data, 3));
 
 	/* PROF-80 handshaking */
-	state->ecb_status = (!BIT(data, 7) << 7) | (!BIT(data, 5) << 6);
+	state->gripc = (!BIT(data, 7) << 7) | (!BIT(data, 5) << 6) | (ppi8255_get_port_a(state->ppi8255) & 0x3f);
 }
 
 static const ppi8255_interface grip_ppi8255_interface =
 {
 	DEVCB_HANDLER(grip_ppi8255_a_r),	// Port A read
 	DEVCB_HANDLER(grip_ppi8255_b_r),	// Port B read
-	DEVCB_HANDLER(grip_ppi8255_c_r),	// Port C read
+	DEVCB_NULL,							// Port C read
 	DEVCB_HANDLER(grip_ppi8255_a_w),	// Port A write
 	DEVCB_NULL,							// Port B write
 	DEVCB_HANDLER(grip_ppi8255_c_w)		// Port C write
@@ -752,11 +938,9 @@ static READ8_DEVICE_HANDLER( grip_z80sti_gpio_r )
     
 	*/
 
-//	prof80_state *state = device->machine->driver_data;
+	prof80_state *state = device->machine->driver_data;
 
-//	return state->pc3 << 7 | state->exin << 6 | state->skbd << 5 | state->pc0 << 4 | busy << 3 | state->cursor << 2 | state->de << 1 | state->cts;
-
-	return 0;
+	return centronics_busy_r(state->centronics) << 3;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( grip_z80sti_tbo_w )
@@ -834,9 +1018,16 @@ static MACHINE_START( prof80 )
 	/* register for state saving */
 	state_save_register_global_array(machine, state->mmu);
 	state_save_register_global(machine, state->mme);
+	state_save_register_global(machine, state->keydata);
+	state_save_register_global(machine, state->kbf);
 	state_save_register_global_pointer(machine, state->video_ram, GRIP_VIDEORAM_SIZE);
+	state_save_register_global(machine, state->lps);
+	state_save_register_global(machine, state->page);
+	state_save_register_global(machine, state->flash);
 	state_save_register_global(machine, state->rtc_data);
 	state_save_register_global(machine, state->fdc_index);
+	state_save_register_global(machine, state->gripd);
+	state_save_register_global(machine, state->gripc);
 }
 
 static MACHINE_RESET( prof80 )
@@ -847,11 +1038,10 @@ static MACHINE_RESET( prof80 )
 
 	for (i = 0; i < 8; i++)
 	{
-	// write all zeroes 0 flr_W
-		//UINT8 data = (i << 4) | (i << 1);
+		ls259_w(machine, 0, i, 0, i);
 	}
 
-	state->ecb_status = 0x40;
+	state->gripc = 0x40;
 }
 
 /* Machine Drivers */
@@ -871,6 +1061,9 @@ static MACHINE_DRIVER_START( prof80 )
 
 	MDRV_MACHINE_START(prof80)
 	MDRV_MACHINE_RESET(prof80)
+
+	/* keyboard hack */
+	MDRV_TIMER_ADD_PERIODIC("keyboard", prof80_keyboard_tick, HZ(50))
 
     /* video hardware */
     MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)

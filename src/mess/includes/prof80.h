@@ -28,6 +28,10 @@ struct _prof80_state
 	UINT8 mmu[16];			/* MMU block register */
 	int mme;				/* MMU enable */
 
+	/* keyboard state */
+	UINT8 keydata;			/* keyboard data */
+	int kbf;				/* keyboard buffer full */
+
 	/* video state */
 	UINT8 *video_ram;		/* video RAM */
 	int lps;				/* light pen sense */
@@ -40,9 +44,9 @@ struct _prof80_state
 	/* floppy state */
 	int	fdc_index;			/* floppy index hole sensor */
 
-	/* ECB bus state */
-	UINT8 ecb_data;			/* ECB bus data */
-	UINT8 ecb_status;		/* ECB bus status */
+	/* GRIP state */
+	UINT8 gripd;			/* GRIP data */
+	UINT8 gripc;			/* GRIP status */
 
 	/* devices */
 	const device_config *nec765;
