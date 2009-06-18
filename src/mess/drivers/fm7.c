@@ -584,7 +584,7 @@ READ8_HANDLER( fm7_cassette_printer_r )
 	// bit 0: printer busy
 	UINT8 ret = 0x00;
 	double data = cassette_input(devtag_get_device(space->machine,"cass")); 
-	const device_config* printer_dev = devtag_get_device(space->machine,"printer");
+	const device_config* printer_dev = devtag_get_device(space->machine,"lpt");
 	UINT8 pdata;
 	int x;
 	
@@ -608,15 +608,20 @@ READ8_HANDLER( fm7_cassette_printer_r )
 		}
 	}
 	else
-	{		
-		if(centronics_pe_r(printer_dev))
-			ret |= 0x08;
-		if(centronics_ack_r(printer_dev))
-			ret |= 0x04;
-		if(centronics_fault_r(printer_dev))
-			ret |= 0x02;
-		if(centronics_busy_r(printer_dev))
-			ret |= 0x01;
+	{	
+		if(image_exists(devtag_get_device(space->machine,"lpt:printer")))
+		{
+			if(centronics_pe_r(printer_dev))
+				ret |= 0x08;
+			if(centronics_ack_r(printer_dev))
+				ret |= 0x04;
+			if(centronics_fault_r(printer_dev))
+				ret |= 0x02;
+			if(centronics_busy_r(printer_dev))
+				ret |= 0x01;
+		}
+		else
+			ret |= 0x0f;
 	}
 	return ret;
 }
@@ -635,12 +640,12 @@ WRITE8_HANDLER( fm7_cassette_printer_w )
 				cassette_output(devtag_get_device(space->machine,"cass"),(data & 0x01) ? +1.0 : -1.0);
 			if((data & 0x02) != (prev & 0x02))
 				cassette_change_state(devtag_get_device(space->machine, "cass" ),(data & 0x02) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
-			centronics_strobe_w(devtag_get_device(space->machine,"printer"),!(data & 0x40));
+			centronics_strobe_w(devtag_get_device(space->machine,"lpt"),!(data & 0x40));
 			prev = data;
 			break;
 		case 1:
 		// Printer data
-			centronics_data_w(devtag_get_device(space->machine,"printer"),0,data);
+			centronics_data_w(devtag_get_device(space->machine,"lpt"),0,data);
 			break;
 	}
 }
@@ -1258,7 +1263,7 @@ static MACHINE_DRIVER_START( fm7 )
 	
 	MDRV_MB8877_ADD("fdc",fm7_mb8877a_interface)
 	
-	MDRV_CENTRONICS_ADD("printer",standard_centronics)
+	MDRV_CENTRONICS_ADD("lpt",standard_centronics)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( fm77av )
