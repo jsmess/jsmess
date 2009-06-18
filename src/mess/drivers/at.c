@@ -1099,4 +1099,4 @@ COMP ( 1989, neat,     ibm5170, 0,       ibm5170a,  atcga,	atcga,	    ibmat,   "
 COMP ( 1988, at386,    ibm5170, 0,       at386,     atcga,	at386,	    ibmat,   "MITAC INC",  "PC/AT 386(CGA, MF2 Keyboard)", GAME_NOT_WORKING )
 COMP ( 1990, at486,    ibm5170, 0,       at486,     atcga,	at386,	    ibmat,   "",  "PC/AT 486(CGA, MF2 Keyboard)", GAME_NOT_WORKING )
 COMP ( 1990, at586,    ibm5170, 0,       at586,     atcga,	at586,	    ibmat,   "",  "PC/AT 586(CGA, MF2 Keyboard)", GAME_NOT_WORKING )
-COMP ( 1987, atvga,    0,       0,       atvga,     atvga,	at_vga,     ibmat,   "",  "PC/AT (VGA, MF2 Keyboard)" , GAME_NOT_WORKING )
+COMP ( 1987, atvga,    ibm5170, 0,       atvga,     atvga,	at_vga,     ibmat,   "",  "PC/AT (VGA, MF2 Keyboard)" , GAME_NOT_WORKING )
