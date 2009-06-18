@@ -768,39 +768,35 @@ MROM PCB
 |----------------------------|
 Notes:
            * - Denotes those devices are on the other side of the PCB
-      CN1    - This connector plugs into the main board.
+         CN1 - This connector plugs into the main board.
       XC9536 - Xilinx XC9536 in-system programmable CPLD (PLCC44), stamped with a
                game code. This code is different for each different game.
                The last 3 digits seems to be for the usage.
                F01 = CPLD/protection device and M01 = MASKROM
 
-               Game (sorted by code)            Code
-               ------------------------------------------
-               Dolphin Blue                     AX0401F01
-               Demolish Fist                    AX0601F01
-               Guilt Gear Isuka                 AX1201F01
-               Knights Of Valour Seven Spirits  AX1301F01
-               Salaryman Kintaro                AX1401F01
-               Fist Of The North Star           AX1901F01
-               King Of Fighters NEOWAVE         AX2201F01
-
+               Game (sorted by code)                 Code
+               -----------------------------------------------
+               Sports Shooting USA                   AX0101F01
+               Dolphin Blue                          AX0401F01
+               Demolish Fist                         AX0601F01
+               Guilt Gear Isuka                      AX1201F01
+               Knights Of Valour Seven Spirits       AX1301F01
+               Salaryman Kintaro                     AX1401F01
+               Ranger Mission                        AX1601F01
+               Rumble Fish                           AX1801F01
+               Fist Of The North Star                AX1901F01
+               Victory Furlong : Horse Racing        AX2001F01
+               King Of Fighters NEOWAVE              AX2201F01
 
         IC18 - Fujitsu 29DL640E 64M TSOP48 FlashROM. This ROM has no additional custom markings
                The name in the archive has been devised purely for convenience.
                This ROM holds the main program.
 
-IC10 to IC17 - Custom-badged 128M TSOP48 maskROMs. I suspect they are Macronix
+IC10 to IC17 - Custom-badged 128M TSOP48 mask ROMs. I suspect they are Macronix
                ROMs because the ROM on the main board is also a custom Macronix
                ROM and they have a history of producing custom ROMs for other
                companies that hide their ROM types like Nintendo etc.
-               The ROMs match a pinout that is identical to....
-               Macronix MX26F128J3 (TSOP48)
-               Oki MR27V12800 (TSOP48)
-               More importantly the size is standard TSOP48 20mm long.
-               They have been read as Oki MR27V12800
-               The pinout also matches the same ROMs found on Namco Mr Driller 2
-               and some Namco and Capcom NAOMI carts where these ROMs are used,
-               although in all cases those ROMs are 18mm long, not 20mm.
+               They could also be Oki MR27V12800.
 
                IC10 - Not Populated for 7 ROMs or less (ROM 01 if 8 ROMs are populated)
                IC11 - ROM 01 (or ROM 02 if 8 ROMs are populated)
@@ -813,17 +809,20 @@ IC10 to IC17 - Custom-badged 128M TSOP48 maskROMs. I suspect they are Macronix
 
                ROM Codes
                ---------
-                                                                          Number
-               Game (sorted by code)            Code                      of ROMs
-               ------------------------------------------------------------------
-               Dolphin Blue                     AX0401M01 to AX0405M01    5
-               Demolish Fist                    AX0601M01 to AX0607M01    7
-               Guilty Gear Isuka                AX1201M01 to AX1208M01    8
-               Knights Of Valour Seven Spirits  AX1301M01 to AX1307M01    7
-               Salaryman Kintaro                AX1401M01 to AX1407M01    7
-               Fist Of The North Star           AX1901M01 to AX1907M01    7
-               King Of Fighters NEOWAVE         AX2201M01 to AX2206M01    6
-
+                                                                               Number
+               Game (sorted by code)                 Code                      of ROMs
+               -----------------------------------------------------------------------
+               Sports Shooting USA                   AX0101M01 to AX0104M01    4
+               Dolphin Blue                          AX0401M01 to AX0405M01    5
+               Demolish Fist                         AX0601M01 to AX0607M01    7
+               Guilty Gear Isuka                     AX1201M01 to AX1208M01    8
+               Knights Of Valour Seven Spirits       AX1301M01 to AX1307M01    7
+               Salaryman Kintaro                     AX1401M01 to AX1407M01    7
+               Ranger Mission                        AX1601M01 to AX1605M01    5
+               Rumble Fish                           AX1801M01 to AX1807M01    7
+               Fist Of The North Star                AX1901M01 to AX1907M01    7
+               Victory Furlong : Horse Racing        AX2001M01 to AX2007M01    7
+               King Of Fighters NEOWAVE              AX2201M01 to AX2206M01    6
 
 
 Type 2 ROM Board:
@@ -855,10 +854,11 @@ Notes:
                The last 3 digits seems to be for the usage.
                F01 = CPLD/protection device and M01 = MASKROM
 
-               Game (sorted by code)            Code
-               ------------------------------------------
-               Neogeo Battle Coliseum           AX3301F01
-
+               Game (sorted by code)                 Code
+               -----------------------------------------------
+               Samurai Spirits Tenkaichi Kenkakuden  AX2901F01
+               Neogeo Battle Coliseum                AX3301F01
+               Rumble Fish 2                         AX3401F01
 
  FMEM1/FMEM2 - Fujitsu 29DL640E 64M TSOP48 FlashROM. This ROM has no additional custom markings
                The name in the archive has been devised purely for convenience.
@@ -867,15 +867,37 @@ Notes:
                is a TSOP48, using the middle pins. The other 2 pins on each side of the ROM
                are not connected to anything.
 
-       MROM* - Custom-badged SSOP70 maskROMs. These may be OKI MR26V25605 or MR26V25655 (256M)
+       MROM* - Custom-badged SSOP70 mask ROMs. These may be OKI MR26V25605 or MR26V25655 (256M)
                or possibly 26V51253 (512M) or something else similar.
 
                ROM Codes
                ---------
-                                                                          Number
-               Game (sorted by code)            Code                      of ROMs
-               ------------------------------------------------------------------
-               Neogeo Battle Coliseum           AX3301M01 to AX3307M01    7
+                                                                               Number
+               Game (sorted by code)                 Code                      of ROMs
+               -----------------------------------------------------------------------
+               Samurai Spirits Tenkaichi Kenkakuden  AX2901M01 to AX2907M01    7
+               Neogeo Battle Coliseum                AX3301M01 to AX3307M01    7
+               Rumble Fish 2                         AX3401M01 to AX3405M01    5
+
+
+               Other games not dumped (some may have been cancelled)
+               ----------------------
+               Chase 1929
+               Dirty Pigskin
+               Extreme Hunting
+               Extreme Hunting 2: Tournament Edition
+               Faster Than Speed
+               Force Five
+               Guilty Gear X Version 1.5
+               Kenju
+               Maximum Speed
+               Metal Slug 6
+               Premier Eleven
+               Sushi Bar
+               The King Of Fighters XI
+
+
+
 
 
 */
@@ -4033,7 +4055,7 @@ ROM_START( trgheart )
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0036a", 0, SHA1(91f1e19136997cb1e2edfb1ad342b9427d1d3bfb) )
-\
+
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
 	//PIC16C622A (317-5121-JPN)
 	//(sticker 253-5509-5121J)
@@ -4497,14 +4519,14 @@ GAME( 2005, ggxxsla,   naomigd,  naomigd,  naomi,    ggxxsla, ROT0,   "Arc Syste
 GAME( 2006, kurucham,  naomigd,  naomigd,  naomi,    naomi,   ROT0,   "Able",                   "Kurukuru Chameleon (GDL-0034)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2005, undefeat,  naomigd,  naomigd,  naomi,    naomi,   ROT270, "G-Rev",                  "Under Defeat (GDL-0035)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 //GDL-0036 Trigger Heart Exelica
-GAME( 2005, trgheart,  naomigd,  naomigd,  naomi,    naomi,   ROT270, "Warashi",                "Trigger Heart Exelica (Rev A) (GDL-0036A)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-GAME( 2005, jingystm,  naomigd,  naomigd,  naomi,    naomi,   ROT0,   "Atrativa Japan",         "Jingi Storm - The Arcade (GDL-0037)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+//GAME( 2005, trgheart,  naomigd,  naomigd,  naomi,    naomi,   ROT270, "Warashi",                "Trigger Heart Exelica (Rev A) (GDL-0036A)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+//GAME( 2005, jingystm,  naomigd,  naomigd,  naomi,    naomi,   ROT0,   "Atrativa Japan",         "Jingi Storm - The Arcade (GDL-0037)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 //GDL-0038 Senko No Ronde Special
-GAME( 2006, meltyb,    naomigd,  naomigd,  naomi,    naomi,   ROT0,   "Ecole Software",         "Melty Blood Act Cadenza Ver B (GDL-0039)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-GAME( 2006, meltyba,   meltyb,   naomigd,  naomi,    naomi,   ROT0,   "Ecole Software",         "Melty Blood Act Cadenza Ver B (Rev A) (GDL-0039A)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-GAME( 2006, karous,    naomigd,  naomigd,  naomi,    naomi,   ROT270, "Milestone",              "Karous (GDL-0040)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+//GAME( 2006, meltyb,    naomigd,  naomigd,  naomi,    naomi,   ROT0,   "Ecole Software",         "Melty Blood Act Cadenza Ver B (GDL-0039)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+//GAME( 2006, meltyba,   meltyb,   naomigd,  naomi,    naomi,   ROT0,   "Ecole Software",         "Melty Blood Act Cadenza Ver B (Rev A) (GDL-0039A)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+//GAME( 2006, karous,    naomigd,  naomigd,  naomi,    naomi,   ROT270, "Milestone",              "Karous (GDL-0040)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 //GDL-0041 Guilty Gear XX Accent Core
-GAME( 2006, takoron,   naomigd,  naomigd,  naomi,    naomi,   ROT0,   "Compile",                "Noukone Puzzle Takoron (GDL-0042)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+//GAME( 2006, takoron,   naomigd,  naomigd,  naomi,    naomi,   ROT0,   "Compile",                "Noukone Puzzle Takoron (GDL-0042)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 
 
 /* GDS-xxxx (Sega first party games) */
@@ -4988,6 +5010,32 @@ static DRIVER_INIT(demofist)
 #endif
 }
 
+static DRIVER_INIT(sprtshot)
+{
+  	int i;
+	UINT16 *src = (UINT16 *)(memory_region(machine, "user1"));
+
+	long rom_size = memory_region_length(machine, "user1");
+
+	for(i=0; i<rom_size/2; i++)
+	{
+		src[i] = atomiswave_decrypt(src[i], i*2, &df_key);	// $$$TODO: need key
+	}
+}
+
+static DRIVER_INIT(rangrmsn)
+{
+  	int i;
+	UINT16 *src = (UINT16 *)(memory_region(machine, "user1"));
+
+	long rom_size = memory_region_length(machine, "user1");
+
+	for(i=0; i<rom_size/2; i++)
+	{
+		src[i] = atomiswave_decrypt(src[i], i*2, &df_key);	// $$$TODO: need key
+	}
+}
+
 ROM_START( fotns )
 	ROM_REGION( 0x200000, "maincpu", 0)
 	AW_BIOS
@@ -5018,8 +5066,37 @@ ROM_START( demofist )
 	ROM_LOAD("ic17", 0x7000000, 0x1000000,  NO_DUMP )
 ROM_END
 
+ROM_START( rangrmsn )
+	ROM_REGION( 0x200000, "maincpu", 0)
+	AW_BIOS
+
+	ROM_REGION( 0x8000000, "user1", ROMREGION_ERASE)
+        ROM_LOAD( "ax1601p01.ic18", 0x0000000, 0x0800000, CRC(00a74fbb) SHA1(57cc1eedd22d1f553956a825e69a597309ee2bef) )
+        ROM_LOAD( "ax1601m01.ic11", 0x1000000, 0x1000000, CRC(f34eed33) SHA1(1c171fb8aa95877f81ed78652d4a9ff80f7713ff) )
+        ROM_LOAD( "ax1602m01.ic12", 0x2000000, 0x1000000, CRC(a7d59efb) SHA1(a40938ce1399babefc8cf02f579a86cf08e211ef) )
+        ROM_LOAD( "ax1603m01.ic13", 0x3000000, 0x1000000, CRC(7c0aa241) SHA1(3e0e5ff3307dcfa52998fb9b4b14bf54bd056a99) )
+        ROM_LOAD( "ax1604m01.ic14", 0x4000000, 0x1000000, CRC(d2369144) SHA1(da1eae9957d27d1682c4191780cf51b32dfe6659) )
+        ROM_LOAD( "ax1605m01.ic15", 0x5000000, 0x1000000, CRC(0c11c1f9) SHA1(0585db60618c5b97f9b7c203baf7e5ac90883ca6) )
+ROM_END
+
+ROM_START( sprtshot )
+	ROM_REGION( 0x200000, "maincpu", 0)
+	AW_BIOS
+
+	ROM_REGION( 0x8000000, "user1", ROMREGION_ERASE)
+        ROM_LOAD( "ax0101p01.ic18", 0x0000000, 0x800000, CRC(b3642b5d) SHA1(85eabd9551aefb825ae8eb6422092fb5a58d60f6) )
+        ROM_LOAD( "ax0101m01.ic11", 0x1000000, 0x1000000, CRC(1e39184d) SHA1(663e0cb9f43a0f89d9841e04b3d009f6c5e88d5e) )
+        ROM_LOAD( "ax0102m01.ic12", 0x2000000, 0x1000000, CRC(700764d1) SHA1(310f1606f7bbed1012c119f1ef5d89d231d8489e) )
+        ROM_LOAD( "ax0103m01.ic13", 0x3000000, 0x1000000, CRC(6144e7a8) SHA1(4d4341082f008dfd93ef5bf32a44c80869ef02a8) )
+        ROM_LOAD( "ax0104m01.ic14", 0x4000000, 0x1000000, CRC(ccb72150) SHA1(a1032d321c27f9ff43da41f20b8687bf1958ddc9) )
+ROM_END
+
+
 /* Atomiswave */
 GAME( 2001, awbios,   0,        naomi,    naomi,    0,        ROT0, "Sammy",                           "Atomiswave Bios", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
 
-GAME( 2005, fotns,    awbios,   naomi,    naomi,    fotns,    ROT0, "Arc System Works",                "Fist Of The North Star", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+GAME( 2002, sprtshot, awbios,   naomi,    naomi,    sprtshot, ROT0, "Sammy",                           "Sports Shooting USA", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2003, demofist, awbios,   naomi,    naomi,    demofist, ROT0, "Polygon Magic / Dimps",           "Demolish Fist", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+GAME( 2004, rangrmsn, awbios,   naomi,    naomi,    rangrmsn, ROT0, "Sammy",                           "Ranger Mission", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+GAME( 2005, fotns,    awbios,   naomi,    naomi,    fotns,    ROT0, "Arc System Works",                "Fist Of The North Star", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+

@@ -435,7 +435,7 @@ int TMS9928A_interrupt(running_machine *machine) {
     /* when skipping frames, calculate sprite collision */
     if (video_skip_this_frame() ) {
 		if (TMS_SPRITES_ENABLED) {
-			draw_sprites (NULL, NULL, NULL);
+			draw_sprites (machine->primary_screen, NULL, NULL);
 		}
     }
 
@@ -670,7 +670,9 @@ static void draw_sprites (const device_config *screen, bitmap_t *bitmap, const r
     int p,x,y,size,i,j,large,yy,xx,limit[192],
         illegalsprite,illegalspriteline;
     UINT16 line,line2;
+    const pen_t *pens;
 
+    pens = screen->machine->pens;
     attributeptr = tms.vMem + tms.spriteattribute;
     size = (tms.Regs[1] & 2) ? 16 : 8;
     large = (int)(tms.Regs[1] & 1);
@@ -726,7 +728,7 @@ static void draw_sprites (const device_config *screen, bitmap_t *bitmap, const r
                             {
                                 tms.dBackMem[yy*256+xx] |= 0x02;
                                 if (bitmap)
-                                    *BITMAP_ADDR16(bitmap, TOP_BORDER+yy, LEFT_BORDER+xx) = c;
+                                    *BITMAP_ADDR16(bitmap, TOP_BORDER+yy, LEFT_BORDER+xx) = pens[c];
                             }
                         }
                     }
@@ -765,7 +767,7 @@ static void draw_sprites (const device_config *screen, bitmap_t *bitmap, const r
                                     {
                                         tms.dBackMem[yy*256+xx] |= 0x02;
                                         if (bitmap)
-                                            *BITMAP_ADDR16(bitmap, TOP_BORDER+yy, LEFT_BORDER+xx) = c;
+                                            *BITMAP_ADDR16(bitmap, TOP_BORDER+yy, LEFT_BORDER+xx) = pens[c];
                                     }
                                 }
                                 if (((xx+1) >=0) && ((xx+1) < 256)) {
@@ -778,7 +780,7 @@ static void draw_sprites (const device_config *screen, bitmap_t *bitmap, const r
                                     {
                                         tms.dBackMem[yy*256+xx+1] |= 0x02;
                                         if (bitmap)
-                                            *BITMAP_ADDR16(bitmap, TOP_BORDER+yy, LEFT_BORDER+xx+1) = c;
+                                            *BITMAP_ADDR16(bitmap, TOP_BORDER+yy, LEFT_BORDER+xx+1) = pens[c];
                                     }
                                 }
                             }

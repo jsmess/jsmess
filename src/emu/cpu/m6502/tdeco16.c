@@ -142,7 +142,7 @@ OP(14) { RD_DUM; ILL; }									/* 2 ILL / 3 trb zpg ?? */
 OP(34) { RD_DUM; ILL; }									/* 2 ILL / 4 bit zpx ?? */
 OP(54) { RD_DUM; ILL; } 								/* 2 ILL */
 OP(74) { RD_DUM; ILL; }									/* 2 ILL / 4 stz zpx ?? */
-OP(94) { RD_DUM; ILL; }									/* 2 ILL / 4 sty zpx ?? */
+#define deco16_94 m6502_94								/* 4 sty zpx */
 #define deco16_b4 m6502_b4								/* 4 ldy zpx */
 OP(d4) { RD_DUM; ILL; } 								/* 2 ILL */
 OP(f4) { RD_DUM; ILL; }	 								/* 2 ILL */
@@ -272,9 +272,9 @@ OP(0b) { int tmp; cpustate->icount -= 1; RD_IMM;
 	  			}
 OP(2b) { RD_DUM; ILL; } 								/* 2 ILL */
 OP(4b) { int tmp; cpustate->icount -= 1; RD_IMM;
-	logerror("%04x: OP4B %02x\n",PCW,tmp);
-
-//  cpustate->a=memory_read_byte_8le(cpustate->io,0);
+	//logerror("%04x: OP4B %02x\n",PCW,tmp);
+	/* TODO: Maybe it's just read I/O 0 and do a logic AND with bit 1? */
+	cpustate->a=memory_read_byte_8le(cpustate->io,1);
 
 //tilt??
 
@@ -364,7 +364,9 @@ OP(2f) { RD_DUM; ILL; }									/* 2 ILL / 5 BBR2 ZPG ?? */
 OP(4f) { RD_DUM; ILL; }									/* 2 ILL / 5 BBR4 ZPG ?? */
 OP(6f) { RD_DUM; ILL; }									/* 2 ILL / 5 BBR6 ZPG ?? */
 OP(8f) { int tmp; cpustate->icount -= 1; RD_IMM;
+	#ifdef MAME_DEBUG
 	logerror("%04x: BANK (8F) %02x\n",PCW,tmp);
+	#endif
 
 	memory_write_byte_8le(cpustate->io,0,tmp);
 

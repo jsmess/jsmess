@@ -6,6 +6,8 @@ New System Drivers Supported (in no particular order):
 - MMD-1 [Miodrag Milanovic]
 - Nuova Elettronica Z80NE + LX.388 + LX.390  [Roberto Lavarone]
 
+
+
 Skeleton drivers : 
 ------------------
 - Intel SDK-86
@@ -17,6 +19,8 @@ Skeleton drivers :
 - MMD-2
 - MPF-1 Plus
 
+
+
 System Driver Changes:
 ----------------------
 - [GENESIS] Save RAM emulation improved for several games (bugs #1691, #1696,
@@ -26,6 +30,7 @@ System Driver Changes:
 
 - [TI85] Fixed TI-82/TI-83 on/off and NVRAM, added a DSW to TI-83 for the
   battery status [Xander]
+
 
 
 User Interface Changes:
@@ -42,6 +47,9 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
+- The core is based on MAME 0.132u1.  This incorporates all features of the
+  update to this core.  [MAME team]
+
 - Added support for passing around 'deleted address mark' information
   to the floppy system. [Roberto Lavarone]
 

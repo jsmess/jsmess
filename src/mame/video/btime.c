@@ -19,6 +19,7 @@ UINT8 *lnc_charbank;
 UINT8 *bnj_backgroundram;
 UINT8 *zoar_scrollram;
 UINT8 *deco_charram;
+UINT8 *progolf_fg_fb;
 size_t bnj_backgroundram_size;
 
 static UINT8 btime_palette = 0;
@@ -402,7 +403,7 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
 		offs_t offs;
         offs_t tileoffset = tmap[i & 3] * 0x100;
 
-        // Skip if this title is completely off the screen
+        // Skip if this tile is completely off the screen
         if (scroll > 256)  break;
         if (scroll < -256) continue;
 
@@ -582,15 +583,6 @@ VIDEO_UPDATE( disco )
 {
     draw_chars(screen->machine, bitmap, cliprect, TRANSPARENCY_NONE, btime_palette, -1);
     draw_sprites(screen->machine, bitmap, cliprect, btime_palette, 0, 0, spriteram, 1);
-
-	return 0;
-}
-
-
-VIDEO_UPDATE( progolf )
-{
-	draw_chars(screen->machine, bitmap, cliprect, TRANSPARENCY_NONE, /*btime_palette*/0, -1);
-//  draw_sprites(screen->machine, bitmap, cliprect, 0/*btime_palette*/, 0, 0, spriteram, 1);
 
 	return 0;
 }

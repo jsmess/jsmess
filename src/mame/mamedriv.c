@@ -1224,6 +1224,7 @@ const game_driver * const drivers[] =
 	DRIVER( polarisa )	/* PS  (c) 1980 Taito */
 	DRIVER( ballbomb )	/* TN  (c) 1980 Taito */
 	DRIVER( indianbt )	/* (c) 1980 Taito */
+	DRIVER( steelwkr )	/* (c) 1980 Taito */
 	DRIVER( m79amb )	/* (c) 1977 RamTek */
 	DRIVER( alieninv )	/* bootleg */
 	DRIVER( tst_invd )	/* Test ROM */
@@ -3201,9 +3202,11 @@ V-V                           TP-027
 
 	/* Konami Twinkle games */
 	DRIVER( gq863 )
+	DRIVER( bmiidx )
 	DRIVER( bmiidxc )
 	DRIVER( bmiidxca )
 	DRIVER( bmiidxc2 )
+	DRIVER( bmiidx3 )
 	DRIVER( bmiidx4 )
 	DRIVER( bmiidx6 )
 	DRIVER( bmiidx7 )
@@ -3638,9 +3641,9 @@ DokiDoki Penguin Land *not confirmed
 	DRIVER( dumpmtmt )	/* (c) 1986 (Japan) */
 	DRIVER( mjleague )	/* (c) 1985 */
 	DRIVER( quartet )	/* (c) 1986 (8751) */
-	DRIVER( quartet1 )	/* (c) 1986 (8751) */
-	DRIVER( quart21 )	/* (c) 1986 (8751) */
-	DRIVER( quart2 )	/* (c) 1986 */
+	DRIVER( quarteta )	/* (c) 1986 (8751) */
+	DRIVER( quartet2 )	/* (c) 1986 (8751) */
+	DRIVER( quartet2a )	/* (c) 1986 */
 
 	/* System16A */
 	DRIVER( aceattaa )	/* (c) 1988 (FD1094, decrypted) */
@@ -4506,14 +4509,14 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	/* Atomiswave (Dreamcast-based) games */
 	DRIVER( awbios )
 						/* 2002.12 Maximum Speed */
-						/* 2002.12 Sports Shooting USA */
+	DRIVER( sprtshot )			/* 2002.12 Sports Shooting USA */
 						/* 2003.03 Guilty Gear X ver.1.5 */
 	DRIVER( demofist )	/* 2003.06 Demolish Fist */
 						/* 2003.08 Dolphin Blue */
 						/* 2003.12 Guilty Gear Isuka */
 						/* 2003.12 Sangoku Senki Shichisei Tensei (IGS) */
 						/* 2004.03 The Rumble Fish */
-						/* 2004.03 Ranger Mission */
+	DRIVER( rangrmsn )			/* 2004.03 Ranger Mission */
 						/* 2004.06 Salary Man Kintarou Net Select */
 						/* 2004.07 The King of Fighters Neo Wave */
 						/* 2004.09 Extreme Hunting */
@@ -6739,6 +6742,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( invasnab )	/* (c) 1999 Midway */
 	DRIVER( invasnv4 )	/* (c) 1999 Midway */
 	DRIVER( crusnexo )	/* (c) 1999 Midway */
+	DRIVER( crusnexa )	/* (c) 1999 Midway */
 	DRIVER( thegrid )	/* (c) 2001 Midway */
 	DRIVER( thegrida )	/* (c) 2001 Midway */
 
@@ -7092,6 +7096,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( bigstrik )	/* (c) 1992 */
 	DRIVER( bigstrkb )	/* bootleg on different hardware */
 	DRIVER( bestleag )	/* bootleg, by Playmark? */
+	DRIVER( bestleaw )	/* bootleg */
 	DRIVER( chimerab )	/* (c) 1993 */
 	DRIVER( cybattlr )	/* (c) 1993 */
 	DRIVER( hayaosi1 )	/* (c) 1993 */
@@ -7176,6 +7181,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( taotaido )	/* (c) 1993 Video System Co. */
 	DRIVER( taotaida )	/* (c) 1993 Video System Co. */
 	DRIVER( gstriker )	/* (c) [1993] Human */
+	DRIVER( gstrikea )	/* (c) [1993] Human */
 	DRIVER( vgoalsoc )	/* (c) 199? Temco */
 	DRIVER( vgoalsca )	/* (c) 199? Temco */
 	DRIVER( twrldc94 )      /* (c) 1994 Tecmo */
@@ -7729,6 +7735,7 @@ Other Sun games
 	DRIVER( gakusai2 )	/* (c) 1998 MakeSoft */
 	DRIVER( blzntrnd )	/* (c) 1994 Human Amusement */
 	DRIVER( gstrik2 )	/* (c) 1996 Human Amusement */
+	DRIVER( gstrik2e )
 	DRIVER( hyprduel )	/* (c) 1993 Technosoft (World) */
 	DRIVER( hyprdelj )	/* (c) 1993 Technosoft (Japan) */
 	DRIVER( magerror )	/* (c) 1994 Technosoft (Japan) (Arcade TV Game List - P.100, Left, 13 from Bottom) */
@@ -8319,7 +8326,13 @@ Other Sun games
 
 	/* JPM Give us a Break hardware */
 	DRIVER( guab )		/* (c) 1986 */
-	DRIVER( guab3 )		/* (c) 1986 */
+	DRIVER( guab3a )	/* (c) 1986 */
+	DRIVER( guab4 )		/* (c) 1986 */
+	DRIVER( guab6 )		/* (c) 1986 */
+	DRIVER( guab6a )	/* (c) 1986 */
+	DRIVER( guab7 )		/* (c) 1986 */
+	DRIVER( guab21 )	/* (c) 1986 */
+	DRIVER( guab43 )	/* (c) 1986 */
 	DRIVER( tenup )		/* (c) 1988 */
 	DRIVER( tenup3 )	/* (c) 1988 */
 
@@ -8669,8 +8682,9 @@ Other Sun games
 	DRIVER( ssfindo )	/* (c) 1999 Icarus */
 	DRIVER( ppcar )		/* (c) 1999 Icarus */
 	DRIVER( imolagp )	/* (c) 1981 Leante Games */
-	DRIVER( dambust )	/* (c) 19?? GAT */
-	DRIVER( dambustr )	/* (c) 19?? GAT */
+	DRIVER( dambustr )	/* (c) 1981 South West Research */
+	DRIVER( dambusta )	/* (c) 1981 South West Research */
+	DRIVER( dambust )	/* (c) 1981 South West Research */
 	DRIVER( gunpey )	/* (c) 2000 Banpresto */
 	DRIVER( spaceg )	/* (c) 19?? */
 	DRIVER( wldarrow )	/* (c) 1982 */
@@ -9408,6 +9422,7 @@ Other Sun games
 	//DRIVER( mfish_11 )
 	DRIVER( mfish_12 )
 	DRIVER( mfish_12a )
+	//DRIVER( mfish_13 )
 
 	/* Crazy Monkey */
 	//DRIVER( crzmon )
