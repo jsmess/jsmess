@@ -499,7 +499,7 @@ const struct pic8259_interface bebox_pic8259_slave_config = {
 
 static const device_config *ide_device(running_machine *machine)
 {
-	return devtag_get_device(machine, "ide_controller");
+	return devtag_get_device(machine, "ide");
 }
 
 static READ8_HANDLER( bebox_800001F0_8_r ) { return ide_controller_r(ide_device(space->machine), offset + 0x1F0, 1); }

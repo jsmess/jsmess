@@ -598,51 +598,53 @@ static void vga_cpu_interface(running_machine *machine)
 				break;
 		}
 	}
-
-	buswidth = cpu_get_databus_width(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	switch(buswidth)
+	else
 	{
-		case 8:
-			sel = vga.gc.data[6] & 0x0c;
-			if (sel)
-			{
-				memory_install_read8_handler(space,  0xa0000, 0xaffff, 0, 0, (sel == 0x04) ? read_handler  : SMH_NOP);
-				memory_install_read8_handler(space,  0xb0000, 0xb7fff, 0, 0, (sel == 0x08) ? read_handler  : SMH_NOP);
-				memory_install_read8_handler(space,  0xb8000, 0xbffff, 0, 0, (sel == 0x0C) ? read_handler  : SMH_NOP);
-				memory_install_write8_handler(space, 0xa0000, 0xaffff, 0, 0, (sel == 0x04) ? write_handler : SMH_NOP);
-				memory_install_write8_handler(space, 0xb0000, 0xb7fff, 0, 0, (sel == 0x08) ? write_handler : SMH_NOP);
-				memory_install_write8_handler(space, 0xb8000, 0xbffff, 0, 0, (sel == 0x0C) ? write_handler : SMH_NOP);
-			}
-			else
-			{
-				memory_set_bankptr(machine,1, vga.memory);
-				memory_install_read8_handler(space,  0xa0000, 0xbffff, 0, 0, SMH_BANK(1) );
-				memory_install_write8_handler(space, 0xa0000, 0xbffff, 0, 0, SMH_BANK(1) );
-			}
-			break;
+		buswidth = cpu_get_databus_width(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+		switch(buswidth)
+		{
+			case 8:
+				sel = vga.gc.data[6] & 0x0c;
+				if (sel)
+				{
+					memory_install_read8_handler(space,  0xa0000, 0xaffff, 0, 0, (sel == 0x04) ? read_handler  : SMH_NOP);
+					memory_install_read8_handler(space,  0xb0000, 0xb7fff, 0, 0, (sel == 0x08) ? read_handler  : SMH_NOP);
+					memory_install_read8_handler(space,  0xb8000, 0xbffff, 0, 0, (sel == 0x0C) ? read_handler  : SMH_NOP);
+					memory_install_write8_handler(space, 0xa0000, 0xaffff, 0, 0, (sel == 0x04) ? write_handler : SMH_NOP);
+					memory_install_write8_handler(space, 0xb0000, 0xb7fff, 0, 0, (sel == 0x08) ? write_handler : SMH_NOP);
+					memory_install_write8_handler(space, 0xb8000, 0xbffff, 0, 0, (sel == 0x0C) ? write_handler : SMH_NOP);
+				}
+				else
+				{
+					memory_set_bankptr(machine,1, vga.memory);
+					memory_install_read8_handler(space,  0xa0000, 0xbffff, 0, 0, SMH_BANK(1) );
+					memory_install_write8_handler(space, 0xa0000, 0xbffff, 0, 0, SMH_BANK(1) );
+				}
+				break;
 
-		case 64:
-			sel = vga.gc.data[6] & 0x0c;
-			if (sel)
-			{
-				memory_install_read64_handler(space,  0xa0000, 0xaffff, 0, 0, (sel == 0x04) ? read_handler64  : SMH_NOP);
-				memory_install_read64_handler(space,  0xb0000, 0xb7fff, 0, 0, (sel == 0x08) ? read_handler64  : SMH_NOP);
-				memory_install_read64_handler(space,  0xb8000, 0xbffff, 0, 0, (sel == 0x0C) ? read_handler64  : SMH_NOP);
-				memory_install_write64_handler(space, 0xa0000, 0xaffff, 0, 0, (sel == 0x04) ? write_handler64 : SMH_NOP);
-				memory_install_write64_handler(space, 0xb0000, 0xb7fff, 0, 0, (sel == 0x08) ? write_handler64 : SMH_NOP);
-				memory_install_write64_handler(space, 0xb8000, 0xbffff, 0, 0, (sel == 0x0C) ? write_handler64 : SMH_NOP);
-			}
-			else
-			{
-				memory_set_bankptr(machine,1, vga.memory);
-				memory_install_read64_handler(space,  0xa0000, 0xbffff, 0, 0, SMH_BANK(1) );
-				memory_install_write64_handler(space, 0xa0000, 0xbffff, 0, 0, SMH_BANK(1) );
-			}
-			break;
+			case 64:
+				sel = vga.gc.data[6] & 0x0c;
+				if (sel)
+				{
+					memory_install_read64_handler(space,  0xa0000, 0xaffff, 0, 0, (sel == 0x04) ? read_handler64  : SMH_NOP);
+					memory_install_read64_handler(space,  0xb0000, 0xb7fff, 0, 0, (sel == 0x08) ? read_handler64  : SMH_NOP);
+					memory_install_read64_handler(space,  0xb8000, 0xbffff, 0, 0, (sel == 0x0C) ? read_handler64  : SMH_NOP);
+					memory_install_write64_handler(space, 0xa0000, 0xaffff, 0, 0, (sel == 0x04) ? write_handler64 : SMH_NOP);
+					memory_install_write64_handler(space, 0xb0000, 0xb7fff, 0, 0, (sel == 0x08) ? write_handler64 : SMH_NOP);
+					memory_install_write64_handler(space, 0xb8000, 0xbffff, 0, 0, (sel == 0x0C) ? write_handler64 : SMH_NOP);
+				}
+				else
+				{
+					memory_set_bankptr(machine,1, vga.memory);
+					memory_install_read64_handler(space,  0xa0000, 0xbffff, 0, 0, SMH_BANK(1) );
+					memory_install_write64_handler(space, 0xa0000, 0xbffff, 0, 0, SMH_BANK(1) );
+				}
+				break;
 
-		default:
-			fatalerror("VGA:  Bus width %d not supported\n", buswidth);
-			break;
+			default:
+				fatalerror("VGA:  Bus width %d not supported\n", buswidth);
+				break;
+		}
 	}
 }
 
