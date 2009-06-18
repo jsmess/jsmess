@@ -43,6 +43,7 @@ struct _prof80_state
 
 	/* floppy state */
 	int	fdc_index;			/* floppy index hole sensor */
+	int motor;				/* floppy motor */
 
 	/* GRIP state */
 	UINT8 gripd;			/* GRIP data */
@@ -55,6 +56,9 @@ struct _prof80_state
 	const device_config *ppi8255;
 	const device_config *z80sti;
 	const device_config *centronics;
+
+	/* timers */
+	emu_timer	*floppy_motor_off_timer;
 };
 
 #endif

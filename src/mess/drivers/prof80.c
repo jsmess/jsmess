@@ -14,9 +14,13 @@
 	TODO:
 
 	- keyboard
+	- GRIP does not send keys back to PROF-80
+	- GRIP jumpers
+	- NE555 timeout
+	- INUSE led
 	- grip31 does not work
 	- PROF-80 RAM banking
-	- PROF-80 floppy access
+	- PROF-80 floppy format
 	- GRIP model selection
 	- UNIO card (Z80-STI, Z80-SIO, 2x centronics)
 	- GRIP-COLOR (192kB color RAM)
@@ -36,6 +40,11 @@
 #include "machine/upd1990a.h"
 #include "machine/z80sti.h"
 #include "machine/ctronics.h"
+
+INLINE const device_config *get_floppy_image(running_machine *machine, int drive)
+{
+	return image_from_devtype_and_index(machine, IO_FLOPPY, drive);
+}
 
 /* Keyboard HACK */
 
@@ -179,6 +188,18 @@ static void prof80_bankswitch(running_machine *machine)
 	}
 }
 
+static TIMER_CALLBACK( floppy_motor_off_tick )
+{
+	prof80_state *state = machine->driver_data;
+
+	floppy_drive_set_motor_state(get_floppy_image(machine, 0), 0);
+	floppy_drive_set_motor_state(get_floppy_image(machine, 1), 0);
+	floppy_drive_set_ready_state(get_floppy_image(machine, 0), 0, 1);
+	floppy_drive_set_ready_state(get_floppy_image(machine, 1), 0, 1);
+
+	state->motor = 0;
+}
+
 static void ls259_w(running_machine *machine, int fa, int sa, int fb, int sb)
 {
 	prof80_state *state = machine->driver_data;
@@ -212,6 +233,25 @@ static void ls259_w(running_machine *machine, int fa, int sa, int fb, int sb)
 
 	case 6:
 		/* _MOTOR */
+		if (fa)
+		{
+			/* trigger floppy motor off NE555 timer */
+//			attotime duration = 0; // TODO: NE555 R=10M C=6.8uF
+			timer_adjust_oneshot(state->floppy_motor_off_timer, ATTOTIME_IN_SEC(10), 0);
+		}
+		else
+		{
+			/* turn on floppy motor */
+			floppy_drive_set_motor_state(get_floppy_image(machine, 0), 1);
+			floppy_drive_set_motor_state(get_floppy_image(machine, 1), 1);
+			floppy_drive_set_ready_state(get_floppy_image(machine, 0), 1, 1);
+			floppy_drive_set_ready_state(get_floppy_image(machine, 1), 1, 1);
+
+			state->motor = 1;
+
+			/* reset floppy motor off NE555 timer */
+			timer_enable(state->floppy_motor_off_timer, 0);
+		}
 		break;
 
 	case 7:
@@ -235,6 +275,11 @@ static void ls259_w(running_machine *machine, int fa, int sa, int fb, int sb)
 		break;
 
 	case 4: /* _MSTOP */
+		if (!fb)
+		{
+			/* turn floppy motor off immediately */
+			timer_adjust_oneshot(state->floppy_motor_off_timer, attotime_zero, 0);
+		}
 		break;
 
 	case 5: /* TXP */
@@ -304,12 +349,12 @@ static READ8_HANDLER( status2_r )
 
 		bit		signal		description
 
-		0		MOTOR
+		0		_MOTOR		floppy motor (0=on, 1=off)
 		1
 		2
 		3
-		4		x
-		5		x
+		4		JS4
+		5		JS5
 		6
 		7		_TDO
 
@@ -317,44 +362,7 @@ static READ8_HANDLER( status2_r )
 
 	prof80_state *state = space->machine->driver_data;
 
-	return (!state->rtc_data << 7);
-}
-
-static READ8_HANDLER( fdc_status_r )
-{
-	/*
-
-		bit		signal		description
-
-		0		FDB1
-		1		FDB2
-		2		FDB3
-		3		FDB4
-		4		CB
-		5		EXM
-		6		DIO
-		7		RQM
-
-	*/
-
-	return 0;
-}
-
-static WRITE8_HANDLER( fdc_w )
-{
-	prof80_state *state = space->machine->driver_data;
-
-	nec765_data_w(state->nec765, 0, data);
-}
-
-static READ8_HANDLER( fdc_r )
-{
-	prof80_state *state = space->machine->driver_data;
-
-	UINT8 data = nec765_data_r(state->nec765, 0);
-	data = nec765_status_r(state->nec765, 0); // TODO how to choose which read?
-
-	return data;
+	return (!state->rtc_data << 7) | !state->motor;
 }
 
 static WRITE8_HANDLER( mmu_w )
@@ -531,8 +539,8 @@ static ADDRESS_MAP_START( prof80_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xd8, 0xd8) AM_MIRROR(0xff00) AM_WRITE(flr_w)
 	AM_RANGE(0xda, 0xda) AM_MIRROR(0xff00) AM_READ(status_r)
 	AM_RANGE(0xdb, 0xdb) AM_MIRROR(0xff00) AM_READ(status2_r)
-	AM_RANGE(0xdc, 0xdc) AM_MIRROR(0xff00) AM_READ(fdc_status_r)
-	AM_RANGE(0xdd, 0xdd) AM_MIRROR(0xff00) AM_READWRITE(fdc_r, fdc_w)
+	AM_RANGE(0xdc, 0xdc) AM_MIRROR(0xff00) AM_DEVREAD(NEC765_TAG, nec765_status_r)
+	AM_RANGE(0xdd, 0xdd) AM_MIRROR(0xff00) AM_DEVREADWRITE(NEC765_TAG, nec765_data_r, nec765_data_w)
 	AM_RANGE(0xde, 0xde) AM_MIRROR(0xff01) AM_MASK(0xff00) AM_WRITE(mmu_w)
 ADDRESS_MAP_END
 
@@ -712,6 +720,68 @@ static INPUT_PORTS_START( prof80 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("RIGHT SHIFT") PORT_CODE(KEYCODE_RSHIFT)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("LEFT CTRL") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("RIGHT CTRL") PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_MAMEKEY(RCONTROL))
+
+	PORT_START("J1")
+	PORT_CONFNAME( 0x01, 0x00, "J1 RDY/HDLD")
+	PORT_CONFSETTING( 0x00, "HDLD" )
+	PORT_CONFSETTING( 0x01, "READY" )
+
+	PORT_START("J2")
+	PORT_CONFNAME( 0x01, 0x01, "J2 RDY/DCHG")
+	PORT_CONFSETTING( 0x00, "DCHG" )
+	PORT_CONFSETTING( 0x01, "READY" )
+
+	PORT_START("J3")
+	PORT_CONFNAME( 0x01, 0x00, "J3 Port Address")
+	PORT_CONFSETTING( 0x00, "D8-DF" )
+	PORT_CONFSETTING( 0x01, "E8-EF" )
+
+	PORT_START("J4")
+	PORT_CONFNAME( 0x07, 0x00, "J4 Console")
+	PORT_CONFSETTING( 0x00, "GRIP-1" )
+	PORT_CONFSETTING( 0x01, "V24 DUPLEX" )
+	PORT_CONFSETTING( 0x02, "USER1" )
+	PORT_CONFSETTING( 0x03, "USER2" )
+	PORT_CONFSETTING( 0x04, "CP/M" )
+
+	PORT_START("J5")
+	PORT_CONFNAME( 0x07, 0x00, "J5 Baud")
+	PORT_CONFSETTING( 0x00, "9600" )
+	PORT_CONFSETTING( 0x01, "4800" )
+	PORT_CONFSETTING( 0x02, "2400" )
+	PORT_CONFSETTING( 0x03, "1200" )
+	PORT_CONFSETTING( 0x04, "300" )
+
+	PORT_START("J6")
+	PORT_CONFNAME( 0x01, 0x01, "J6 Interrupt")
+	PORT_CONFSETTING( 0x00, "Serial" )
+	PORT_CONFSETTING( 0x01, "ECB" )
+
+	PORT_START("J7")
+	PORT_CONFNAME( 0x01, 0x01, "J7 DMA MMU")
+	PORT_CONFSETTING( 0x00, "PROF" )
+	PORT_CONFSETTING( 0x01, "DMA Card" )
+
+	PORT_START("J8")
+	PORT_CONFNAME( 0x01, 0x01, "J8 Active Mode")
+	PORT_CONFSETTING( 0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING( 0x01, DEF_STR( On ) )
+
+	PORT_START("J9")
+	PORT_CONFNAME( 0x01, 0x00, "J9 EPROM Type")
+	PORT_CONFSETTING( 0x00, "2732/2764" )
+	PORT_CONFSETTING( 0x01, "27128" )
+
+	PORT_START("J10")
+	PORT_CONFNAME( 0x03, 0x00, "J10 Wait States")
+	PORT_CONFSETTING( 0x00, "On all memory accesses" )
+	PORT_CONFSETTING( 0x01, "On internal memory accesses" )
+	PORT_CONFSETTING( 0x02, DEF_STR( None ) )
+
+	PORT_START("L1")
+	PORT_CONFNAME( 0x01, 0x00, "L1 Write Polarity")
+	PORT_CONFSETTING( 0x00, "Inverted" )
+	PORT_CONFSETTING( 0x01, "Normal" )
 INPUT_PORTS_END
 
 /* Video */
@@ -998,6 +1068,9 @@ static MACHINE_START( prof80 )
 	/* configure FDC */
 	floppy_drive_set_index_pulse_callback(image_from_devtype_and_index(machine, IO_FLOPPY, 0), prof80_fdc_index_callback);
 
+	/* allocate floppy motor off timer */
+	state->floppy_motor_off_timer = timer_alloc(machine, floppy_motor_off_tick, NULL);
+
 	/* allocate video RAM */
 	state->video_ram = auto_alloc_array(machine, UINT8, GRIP_VIDEORAM_SIZE);
 
@@ -1135,7 +1208,7 @@ static void prof80_floppy_getinfo(const mess_device_class *devclass, UINT32 stat
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:					info->i = 1; break;
+		case MESS_DEVINFO_INT_COUNT:					info->i = 2; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case MESS_DEVINFO_PTR_LOAD:						info->load = DEVICE_IMAGE_LOAD_NAME(prof80_floppy); break;
