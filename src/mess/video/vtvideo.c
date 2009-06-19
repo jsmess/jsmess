@@ -152,7 +152,7 @@ WRITE8_DEVICE_HANDLER( dc011_w )
 
 WRITE8_DEVICE_HANDLER( vt_video_brightness_w )
 {
-	palette_set_color_rgb(device->machine, 1, data, data, data);
+	//palette_set_color_rgb(device->machine, 1, data, data, data);
 }
 
 void vt_video_display_char(const device_config *device,bitmap_t *bitmap, UINT8 code, 
@@ -180,6 +180,11 @@ void vt_video_display_char(const device_config *device,bitmap_t *bitmap, UINT8 c
 		if (j==0) j=15; else j=j-1;
 		
 		line = vt->gfx[(code & 0x7f)*16 + j];
+		if (vt->basic_attribute==1) {
+			if ((code & 0x80)==0x80) {
+				line = line ^ 0xff;
+			}	
+		} 
 		
 		for (b = 0; b < 8; b++)
 		{
@@ -297,7 +302,7 @@ static DEVICE_RESET( vt_video )
 	palette_set_color_rgb(device->machine, 0, 0x00, 0x00, 0x00); // black
 	palette_set_color_rgb(device->machine, 1, 0xff, 0xff, 0xff); // white
 
-	vt->height = 24;
+	vt->height = 25;
 	vt->lba7 = 0;
 
 	vt->scroll_latch = 0;

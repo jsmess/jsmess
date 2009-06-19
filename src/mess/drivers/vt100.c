@@ -44,7 +44,8 @@ ADDRESS_MAP_END
 static READ8_HANDLER(vt100_flags_r)
 {
 	UINT8 retVal = 0;	
-	retVal |=  lba7_r(devtag_get_device(space->machine, "vt100_video"),0) * 0x40;	
+ 	retVal |= lba7_r(devtag_get_device(space->machine, "vt100_video"),0) * 0x40;	
+	retVal |= vt100_keyboard_int * 0x80;	
 	return retVal;
 }
 
@@ -89,7 +90,7 @@ static WRITE8_HANDLER(vt100_keyboard_w)
 
 static READ8_HANDLER(vt100_keyboard_r)
 {
-	return 0xff;
+	return 0x7f;
 }
 static WRITE8_HANDLER(vt100_baud_rate_w)
 {
@@ -98,6 +99,10 @@ static WRITE8_HANDLER(vt100_baud_rate_w)
 	
 	vt100_send_baud_rate = baud_rate[(data >>4) & 0x0f];
 	vt100_recv_baud_rate = baud_rate[data & 0x0f];
+}
+
+static WRITE8_HANDLER(vt100_nvr_latch_w)
+{
 }
 
 static ADDRESS_MAP_START( vt100_io , ADDRESS_SPACE_IO, 8)
@@ -113,7 +118,7 @@ static ADDRESS_MAP_START( vt100_io , ADDRESS_SPACE_IO, 8)
 	// 0x42 Brightness D/A latch
 	AM_RANGE (0x42, 0x42) AM_DEVWRITE("vt100_video", vt_video_brightness_w)
 	// 0x62 NVR latch
-	// AM_RANGE (0x62, 0x62) 
+	AM_RANGE (0x62, 0x62) AM_WRITE(vt100_nvr_latch_w)
 	// 0x82 Keyboard UART data output
 	AM_RANGE (0x82, 0x82) AM_READ(vt100_keyboard_r)
 	// 0x82 Keyboard UART data input
@@ -260,9 +265,7 @@ static VIDEO_UPDATE( vt100 )
 static IRQ_CALLBACK(vt100_irq_callback)
 {	
 	UINT8 retVal = 0xc7 | (0x08 * vt100_keyboard_int) | (0x10 * vt100_receiver_int) | (0x20 * vt100_vertical_int);
-	vt100_keyboard_int = 0;
 	vt100_receiver_int = 0;
-
 	return retVal;
 } 
 
@@ -280,7 +283,7 @@ static MACHINE_RESET(vt100)
 	output_set_value("l4_led", 	  1);	
 	
 	vt100_key_scan = 0;
-	timer_pulse(machine, ATTOTIME_IN_HZ(24), NULL, 0, keyboard_callback);	
+	timer_pulse(machine, ATTOTIME_IN_HZ(240), NULL, 0, keyboard_callback);	
 	
 	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), vt100_irq_callback);	
 }
@@ -324,12 +327,12 @@ static MACHINE_DRIVER_START( vt100 )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(80*10, 24*10)
-	MDRV_SCREEN_VISIBLE_AREA(0, 80*10-1, 0, 24*10-1)
+	MDRV_SCREEN_SIZE(80*10, 30*10)
+	MDRV_SCREEN_VISIBLE_AREA(0, 80*10-1, 0, 30*10-1)
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(black_and_white)
 
-	MDRV_DEFAULT_LAYOUT( layout_vt100 )
+	//MDRV_DEFAULT_LAYOUT( layout_vt100 )
 	MDRV_VIDEO_START(generic_bitmapped)
 	MDRV_VIDEO_UPDATE(vt100)
 	
