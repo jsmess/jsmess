@@ -913,12 +913,45 @@ static ADDRESS_MAP_START( fm7_sub_mem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fm77av_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000,0x7fff) AM_RAM 
+	AM_RANGE(0x8000,0xfbff) AM_RAMBANK(1) // also F-BASIC ROM, when enabled
+	AM_RANGE(0xfc00,0xfc7f) AM_RAM
+	AM_RANGE(0xfc80,0xfcff) AM_RAM AM_READWRITE(fm7_main_shared_r,fm7_main_shared_w)
+	// I/O space (FD00-FDFF)
+	AM_RANGE(0xfd00,0xfd01) AM_READWRITE(fm7_keyboard_r,fm7_cassette_printer_w)
+	AM_RANGE(0xfd02,0xfd02) AM_READWRITE(fm7_cassette_printer_r,fm7_irq_mask_w)  // IRQ mask
+	AM_RANGE(0xfd03,0xfd03) AM_READ(fm7_irq_cause_r)  // IRQ flags
+	AM_RANGE(0xfd04,0xfd04) AM_READ(fm7_fd04_r)
+	AM_RANGE(0xfd05,0xfd05) AM_READWRITE(fm7_subintf_r,fm7_subintf_w)
+	AM_RANGE(0xfd06,0xfd0c) AM_READ(fm7_unknown_r)
+	AM_RANGE(0xfd0d,0xfd0d) AM_READWRITE(fm7_psg_select_r,fm7_psg_select_w)
+	AM_RANGE(0xfd0e,0xfd0e) AM_READWRITE(fm7_psg_data_r, fm7_psg_data_w)
+	AM_RANGE(0xfd0f,0xfd0f) AM_READWRITE(fm7_rom_en_r,fm7_rom_en_w)
+	AM_RANGE(0xfd10,0xfd17) AM_READ(fm7_unknown_r)
+	AM_RANGE(0xfd18,0xfd1f) AM_READWRITE(fm7_fdc_r,fm7_fdc_w)
+	AM_RANGE(0xfd24,0xfd37) AM_READ(fm7_unknown_r)
+	AM_RANGE(0xfd38,0xfd3f) AM_READWRITE(fm7_palette_r,fm7_palette_w)
+	AM_RANGE(0xfd40,0xfdff) AM_READ(fm7_unknown_r)
+	// Boot ROM
+	AM_RANGE(0xfe00,0xffdf) AM_ROMBANK(2)
+	AM_RANGE(0xffe0,0xffef) AM_RAM
+	AM_RANGE(0xfff0,0xffff) AM_READWRITE(vector_r,vector_w) 
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fm77av_sub_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000,0xbfff) AM_RAM AM_BASE(&fm7_video_ram) // VRAM
+	AM_RANGE(0x0000,0xbfff) AM_READWRITE(fm7_vram_r,fm7_vram_w) // VRAM
+	AM_RANGE(0xc000,0xcfff) AM_RAM // Console RAM
+	AM_RANGE(0xd000,0xd37f) AM_RAM // Work RAM
+	AM_RANGE(0xd380,0xd3ff) AM_RAM AM_BASE(&shared_ram)
+	// I/O space (D400-D7FF)
+	AM_RANGE(0xd400,0xd401) AM_READ(fm7_sub_keyboard_r)
+	AM_RANGE(0xd402,0xd402) AM_READ(fm7_cancel_ack)
+	AM_RANGE(0xd404,0xd404) AM_READ(fm7_attn_irq_r)
+	AM_RANGE(0xd408,0xd408) AM_READWRITE(fm7_crt_r,fm7_crt_w)
+	AM_RANGE(0xd409,0xd409) AM_READWRITE(fm7_vram_access_r,fm7_vram_access_w)
+	AM_RANGE(0xd40a,0xd40a) AM_READWRITE(fm7_sub_busyflag_r,fm7_sub_busyflag_w)
+	AM_RANGE(0xd40e,0xd40f) AM_WRITE(fm7_vram_offset_w)
+	AM_RANGE(0xd800,0xffff) AM_ROM
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -1324,6 +1357,13 @@ ROM_START( fm77av )
 	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD( "kanji.rom", 0x0000, 0x20000, CRC(62402ac9) SHA1(bf52d22b119d54410dad4949b0687bb0edf3e143) )
 
+	// either one of these boot ROMs are selectable via DIP switch
+	ROM_REGION( 0x200, "basic", 0 )
+	ROM_LOAD( "boot_bas.rom", 0x0000,  0x0200, CRC(c70f0c74) SHA1(53b63a301cba7e3030e79c59a4d4291eab6e64b0) )
+
+	ROM_REGION( 0x200, "dos", 0 )	
+	ROM_LOAD( "boot_dos.rom", 0x0000,  0x0200, CRC(198614ff) SHA1(037e5881bd3fed472a210ee894a6446965a8d2ef) )
+
 	// optional dict rom?
 ROM_END
 
@@ -1348,6 +1388,13 @@ ROM_START( fm7740sx )
 	ROM_REGION( 0x4c000, "additional", 0 )
 	ROM_LOAD( "dicrom.rom", 0x00000, 0x40000, CRC(b142acbc) SHA1(fe9f92a8a2750bcba0a1d2895e75e83858e4f97f) )
 	ROM_LOAD( "extsub.rom", 0x40000, 0x0c000, CRC(0f7fcce3) SHA1(a1304457eeb400b4edd3c20af948d66a04df255e) )
+
+	// either one of these boot ROMs are selectable via DIP switch
+	ROM_REGION( 0x200, "basic", 0 )
+	ROM_LOAD( "boot_bas.rom", 0x0000,  0x0200, CRC(c70f0c74) SHA1(53b63a301cba7e3030e79c59a4d4291eab6e64b0) )
+
+	ROM_REGION( 0x200, "dos", 0 )	
+	ROM_LOAD( "boot_dos.rom", 0x0000,  0x0200, CRC(198614ff) SHA1(037e5881bd3fed472a210ee894a6446965a8d2ef) )
 ROM_END
 
 
@@ -1360,5 +1407,5 @@ SYSTEM_CONFIG_END
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT   INIT  CONFIG  COMPANY      FULLNAME        FLAGS */
 COMP( 1982, fm7,      0,      0,      fm7,     fm7,    fm7,  fm7,    "Fujitsu",   "FM-7",         GAME_NOT_WORKING)
-COMP( 1985, fm77av,   fm7,    0,      fm77av,  fm7,    0,    fm7,    "Fujitsu",   "FM-77AV",      GAME_NOT_WORKING)
-COMP( 1985, fm7740sx, fm7,    0,      fm77av,  fm7,    0,    fm7,    "Fujitsu",   "FM-77AV40SX",  GAME_NOT_WORKING)
+COMP( 1985, fm77av,   fm7,    0,      fm77av,  fm7,    fm7,  fm7,    "Fujitsu",   "FM-77AV",      GAME_NOT_WORKING)
+COMP( 1985, fm7740sx, fm7,    0,      fm77av,  fm7,    fm7,  fm7,    "Fujitsu",   "FM-77AV40SX",  GAME_NOT_WORKING)
