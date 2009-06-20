@@ -229,6 +229,20 @@ $(CPUOBJ)/jaguar/jaguar.o:	$(CPUSRC)/jaguar/jaguar.c \
 
 
 #-------------------------------------------------
+# Atmela 8-bit AVR series
+#-------------------------------------------------
+
+ifneq ($(filter AVR8,$(CPUS)),)
+OBJDIRS += $(CPUOBJ)/avr8
+CPUOBJS += $(CPUOBJ)/avr8/avr8.o
+DBGOBJS += $(CPUOBJ)/avr8/avr8dasm.o
+endif
+
+$(CPUOBJ)/avr8/avr8.o:	$(CPUSRC)/avr8/avr8.c \
+
+
+
+#-------------------------------------------------
 # Simutrek Cube Quest bit-sliced CPUs
 #-------------------------------------------------
 

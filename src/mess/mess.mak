@@ -120,6 +120,7 @@ CPUS += TMS7000
 CPUS += SM8500
 CPUS += MINX
 CPUS += SSEM
+CPUS += AVR8
 
 
 
@@ -285,6 +286,7 @@ DRVLIBS = \
 	$(MESSOBJ)/gmaster.a \
 	$(MESSOBJ)/grundy.a \
 	$(MESSOBJ)/heathkit.a \
+	$(MESSOBJ)/homebrew.a \
 	$(MESSOBJ)/homelab.a \
 	$(MESSOBJ)/hp48.a \
 	$(MESSOBJ)/intv.a \
@@ -1382,6 +1384,9 @@ $(MESSOBJ)/heathkit.a: \
 	$(MESS_DRIVERS)/h8.o \
 	$(MESS_DRIVERS)/h19.o \
 	$(MESS_DRIVERS)/h89.o \
+	
+$(MESSOBJ)/homebrew.a: \
+	$(MESS_DRIVERS)/craft.o \
 	
 $(MESSOBJ)/xerox.a: \
 	$(MESS_DRIVERS)/xerox820.o \

@@ -702,7 +702,7 @@ const game_driver * const drivers[] =
     /* KC compact is partial CPC compatible */
     DRIVER( kc85_2 )    /* VEB KC 85/2                                      */
     DRIVER( kc85_3 )    /* VEB KC 85/3                                      */
-    DRIVER( kc85_4 )    /* VEB KC 85/4                                      */    
+    DRIVER( kc85_4 )    /* VEB KC 85/4                                      */
     DRIVER( kc85_4d )   /* VEB KC 85/4 with disk interface                  */
     DRIVER( kc85_5 )    /* VEB KC 85/5                                      */
     DRIVER( mc8020 )    /* MC 80.2x                                         */
@@ -1265,7 +1265,7 @@ const game_driver * const drivers[] =
     DRIVER( z80ne )         /* 1980 - Z80NE */
     DRIVER( z80net )        /* 1980 - Z80NE + LX388 Video Interface */
     DRIVER( z80netb )       /* 1980 - Z80NE + LX388 Video Interface + 16Kb BASIC */
-    DRIVER( z80netf )		/* 1980 - Z80NE + LX.388 Video Interface + LX.390 FD Controller */
+    DRIVER( z80netf )       /* 1980 - Z80NE + LX.388 Video Interface + LX.390 FD Controller */
 
     /* Talking Electronics Magazine */
     DRIVER( tec1 )          /* Talking Electronics Computer */
@@ -1280,7 +1280,7 @@ const game_driver * const drivers[] =
 //  DRIVER( npc8201 )
     DRIVER( npc8201a )
 //  DRIVER( npc8300 )
-//	DRIVER( pc8401a )
+//  DRIVER( pc8401a )
     DRIVER( pc8500 )
 
     /* Nakajima manufactured eletronic typewriters */
@@ -1333,6 +1333,7 @@ const game_driver * const drivers[] =
 
     DRIVER( ex800 )
     DRIVER( ssem ) /* Manchester Small-Scale Experimental Machine, "Baby" */
+    DRIVER( craft ) /* Craft, by [lft] */
 
 /*********** To sort (mostly skeleton drivers) ******************************/
 
@@ -1391,7 +1392,7 @@ const game_driver * const drivers[] =
     DRIVER( unior)
     DRIVER( vec1200)
     DRIVER( pk6128c)
-	DRIVER( prof80 )
+    DRIVER( prof80 )
     DRIVER( tvc64 )
     DRIVER( tvc64p )
     DRIVER( tvc64pru )
@@ -1400,18 +1401,18 @@ const game_driver * const drivers[] =
     DRIVER( sdk86 )
     DRIVER( vboy )
     DRIVER( zrt80 )
-	DRIVER( exp85 )
-	DRIVER( z9001 )
-	DRIVER( kc85_111 )
-	DRIVER( kc87_10 )
-	DRIVER( kc87_11 )
-	DRIVER( kc87_20 )
-	DRIVER( kc87_21 )
-	DRIVER( cat )
-	DRIVER( swyft )
-	DRIVER( mmd1 )
-	DRIVER( mmd2 )
-	DRIVER( mpf1p )
+    DRIVER( exp85 )
+    DRIVER( z9001 )
+    DRIVER( kc85_111 )
+    DRIVER( kc87_10 )
+    DRIVER( kc87_11 )
+    DRIVER( kc87_20 )
+    DRIVER( kc87_21 )
+    DRIVER( cat )
+    DRIVER( swyft )
+    DRIVER( mmd1 )
+    DRIVER( mmd2 )
+    DRIVER( mpf1p )
 
 #endif /* DRIVER_RECURSIVE */
-    
+
