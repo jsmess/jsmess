@@ -360,7 +360,7 @@ static UINT32 z80ne_dmk_get_track_size(floppy_image *floppy, int head, int track
 	return get_dmk_tag(floppy)->track_size;
 }
 
-void * my_memmem(UINT8 *haystack, size_t haystacklen,
+UINT8 * my_memmem(UINT8 *haystack, size_t haystacklen,
 		UINT8 *needle, size_t needlelen)
 {
         register UINT8 *h = haystack;
@@ -369,17 +369,17 @@ void * my_memmem(UINT8 *haystack, size_t haystacklen,
         register size_t nl = needlelen;
         register size_t i;
 
-        if (nl == 0) return (void *) haystack;    /* The first occurrence of the empty string is deemed to occur at
+        if (nl == 0) return haystack;    /* The first occurrence of the empty string is deemed to occur at
                                                      the beginning of the string.  */
         if (hl < nl)
         	return NULL;
 
         for( i = 0; (i < hl) && (i + nl <= hl ); i++ )
-                if (h[i] == *n) /* first match */
-                        if ( !memcmp(&h[i]+1, n + 1, nl - 1) )
-                                return (void *)(haystack+i);    /* returns a pointer to the substring */
+        	if (h[i] == *n) /* first match */
+        		if ( !memcmp(&h[i]+1, n + 1, nl - 1) )
+        			return (haystack+i);    /* returns a pointer to the substring */
 
-        return (void *)NULL;    /* not found */
+        return (UINT8 *)NULL;    /* not found */
 }
 
 
@@ -483,16 +483,16 @@ static floperr_t z80ne_dmk_seek_sector_in_track(floppy_image *floppy, int head, 
 	offs = idam_offset + 2 * DMK_IDAM_LEN;
 
 	/* find pattern 0x0000FB; this represents the start of a data sector */
-	sec_data = my_memmem(&track_data[offs], 2 * (DMK_ID_GAP_LEN + DMK_DAM_LEN), (UINT8 *)needle_data, 10);
+	sec_data = my_memmem(&track_data[offs], 4 * (DMK_ID_GAP_LEN + DMK_DAM_LEN), (UINT8 *)needle_data, 10);
 	if(!sec_data)
 	{
 		/* find pattern 0x0000FA; this represents the start of a deleted data sector (used for system sectors) */
-		sec_data = my_memmem(&track_data[offs], 2 * (DMK_ID_GAP_LEN + DMK_DAM_LEN), (UINT8 *)needle_deleted_data_fa, 10);
+		sec_data = my_memmem(&track_data[offs], 4 * (DMK_ID_GAP_LEN + DMK_DAM_LEN), (UINT8 *)needle_deleted_data_fa, 10);
 	}
 	if(!sec_data)
 	{
 		/* find pattern 0x0000F8; this represents the start of a deleted data sector (used for system sectors) */
-		sec_data = my_memmem(&track_data[offs], 2 * (DMK_ID_GAP_LEN + DMK_DAM_LEN), (UINT8 *)needle_deleted_data_f8, 10);
+		sec_data = my_memmem(&track_data[offs], 4 * (DMK_ID_GAP_LEN + DMK_DAM_LEN), (UINT8 *)needle_deleted_data_f8, 10);
 	}
 
 	if(sec_data)
@@ -557,13 +557,13 @@ static floperr_t z80ne_dmk_get_indexed_sector_info(floppy_image *floppy, int hea
 
 	/* determine type of data sector */
 	/* find pattern 0x0000FB; this represents the start of a data sector */
-	if ( my_memmem(&track_data[idam_offset+14], 2 * (DMK_ID_GAP_LEN + DMK_DAM_LEN), (UINT8 *)needle_data, 10) )
+	if ( my_memmem(&track_data[idam_offset+14], 4 * (DMK_ID_GAP_LEN + DMK_DAM_LEN), (UINT8 *)needle_data, 10) )
 		dam = 0;
 	/* find pattern 0x0000FA; this represents the start of a deleted data sector (used for system sectors) */
-	else if ( my_memmem(&track_data[idam_offset+14], 2 * (DMK_ID_GAP_LEN + DMK_DAM_LEN), (UINT8 *)needle_deleted_data_fa, 10) )
+	else if ( my_memmem(&track_data[idam_offset+14], 4 * (DMK_ID_GAP_LEN + DMK_DAM_LEN), (UINT8 *)needle_deleted_data_fa, 10) )
 		dam = ID_FLAG_DELETED_DATA;
 	/* find pattern 0x0000F8; this represents the start of a deleted data sector (used for system sectors) */
-	else if ( my_memmem(&track_data[idam_offset+14], 2 * (DMK_ID_GAP_LEN + DMK_DAM_LEN), (UINT8 *)needle_deleted_data_f8, 10) )
+	else if ( my_memmem(&track_data[idam_offset+14], 4 * (DMK_ID_GAP_LEN + DMK_DAM_LEN), (UINT8 *)needle_deleted_data_f8, 10) )
 		dam = ID_FLAG_DELETED_DATA;
 	else
 		return FLOPPY_ERROR_SEEKERROR;
