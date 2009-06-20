@@ -25,6 +25,13 @@
 	memory map info from http://www.nausicaa.net/~lgreenf/fm7page.htm
 	see also http://retropc.net/ryu/xm7/xm7.shtml
 
+
+	Known issues:
+	 - Beeper is not implemented
+	 - Optional Kanji ROM use is not implemented
+	 - Other optional hardware is not implemented (RS232, Z80 card...)
+	 - FM-77AV and later aren't working (extra features not yet implemented)
+
 ************************************************************************************************/
 
 #include "driver.h"
@@ -1160,6 +1167,6 @@ SYSTEM_CONFIG_END
 /* Driver */
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT   INIT  CONFIG  COMPANY      FULLNAME        FLAGS */
-COMP( 1982, fm7,      0,      0,      fm7,     fm7,    fm7,  fm7,    "Fujitsu",   "FM-7",         GAME_NOT_WORKING)
+COMP( 1982, fm7,      0,      0,      fm7,     fm7,    fm7,  fm7,    "Fujitsu",   "FM-7",         GAME_IMPERFECT_SOUND)
 COMP( 1985, fm77av,   fm7,    0,      fm77av,  fm7,    fm7,  fm7,    "Fujitsu",   "FM-77AV",      GAME_NOT_WORKING)
 COMP( 1985, fm7740sx, fm7,    0,      fm77av,  fm7,    fm7,  fm7,    "Fujitsu",   "FM-77AV40SX",  GAME_NOT_WORKING)
