@@ -1407,6 +1407,7 @@ $(MESSOBJ)/skeleton.a: \
 	$(MESS_DRIVERS)/qx10.o \
 	$(MESS_DRIVERS)/fk1.o \
 	$(MESS_DRIVERS)/fm7.o \
+	$(MESS_VIDEO)/fm7.o \
 	$(MESS_FORMATS)/fm7_cas.o \
 	$(MESS_FORMATS)/fm7_dsk.o \
 	$(MESS_DRIVERS)/fmtowns.o \

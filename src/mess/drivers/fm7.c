@@ -39,43 +39,29 @@
 #include "formats/fm7_dsk.h"
 #include "machine/ctronics.h"
 
-// Interrupt flags
-#define IRQ_FLAG_KEY      0x01
-#define IRQ_FLAG_PRINTER  0x02
-#define IRQ_FLAG_TIMER    0x04
-#define IRQ_FLAG_UNKNOWN  0x08
-// the following are not read in port 0xfd03
-#define IRQ_FLAG_MFD      0x10
-#define IRQ_FLAG_TXRDY    0x20
-#define IRQ_FLAG_RXRDY    0x40
-#define IRQ_FLAG_SYNDET   0x80
+#include "includes/fm7.h"
 
-UINT8* shared_ram;
 UINT8* fm7_video_ram;
+UINT8* shared_ram;
 static UINT8 irq_flags;  // active IRQ flags
 static UINT8 irq_mask;  // IRQ mask 
-emu_timer* fm7_timer;  // main timer, triggered every 2.0345ms?
-emu_timer* fm7_subtimer;  // sub-CPU timer, every 1 second?
+emu_timer* fm7_timer;  // main timer, triggered every 2.0345ms
+emu_timer* fm7_subtimer;  // sub-CPU timer, triggered every 20ms
 emu_timer* fm7_keyboard_timer;
-static UINT8 sub_busy;
-static UINT8 sub_halt;
 static UINT8 basic_rom_en;
-static UINT8 attn_irq;
-static UINT8 vram_access;  // VRAM access flag
-static UINT8 crt_enable;
 unsigned int key_delay;
 unsigned int key_repeat;
 static UINT16 current_scancode;
 static UINT32 key_data[4];
-static UINT16 vram_offset;
 static UINT8 break_flag;
-static UINT8 fm7_pal[8];
 static UINT8 fm7_psg_regsel;
 static UINT8 psg_data;
 static UINT8 fdc_side;
 static UINT8 fdc_drive;
 static UINT8 fdc_irq_flag;
 static UINT8 fdc_drq_flag;
+
+extern struct fm7_video_flags fm7_video;
 
 /* key scancode conversion table
  * The FM-7 expects different scancodes when shift,ctrl or graph is held, or
@@ -251,64 +237,16 @@ READ8_HANDLER( fm7_fd04_r )
 {
 	UINT8 ret = 0xff;
 	
-	if(attn_irq != 0)
+	if(fm7_video.attn_irq != 0)
 	{
 		ret &= ~0x01;
-		attn_irq = 0;
+		fm7_video.attn_irq = 0;
 	}
 	if(break_flag != 0)
 	{
 		ret &= ~0x02;
 	}
 	return ret;
-}
-
-/*
- * Main CPU: Sub-CPU interface (port 0xfd05)
- * 
- * Read:
- *   bit 7: Sub-CPU busy (or halted)
- *   bit 0: EXTDET (?)
- * Write:
- *   bit 7: Sub-CPU halt
- *   bit 6: Sub-CPU cancel IRQ
- */
-
-READ8_HANDLER( fm7_subintf_r )
-{
-	UINT8 ret = 0x00;
-	
-	if(sub_busy != 0 || sub_halt != 0)
-		ret |= 0x80;
-		
-	ret |= 0x7e;
-	//ret |= 0x01; // EXTDET (not implemented yet)
-	
-	return ret;
-}
-
-WRITE8_HANDLER( fm7_subintf_w )
-{
-	sub_halt = data & 0x80;
-	if(data & 0x80)
-		sub_busy = data & 0x80;
-
-	cputag_set_input_line(space->machine,"sub",INPUT_LINE_HALT,(data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
-	if(data & 0x40)
-		cputag_set_input_line(space->machine,"sub",M6809_IRQ_LINE,ASSERT_LINE);
-	//popmessage("Sub CPU Interface write: %02x\n",data);
-}
-
-READ8_HANDLER( fm7_sub_busyflag_r )
-{
-	if(sub_halt == 0)
-		sub_busy = 0x00;
-	return 0x00;
-}
-
-WRITE8_HANDLER( fm7_sub_busyflag_w )
-{
-	sub_busy = 0x80;
 }
 
 /* 
@@ -334,77 +272,6 @@ WRITE8_HANDLER( fm7_rom_en_w )
 	basic_rom_en = 0;
 	memory_set_bankptr(space->machine,1,RAM+0x8000);
 	logerror("BASIC ROM disabled\n");
-}
-
-/*
- * Sub-CPU port 0xd402
- *   Read-only: Acknowledge Cancel IRQ
- */
-READ8_HANDLER( fm7_cancel_ack )
-{
-	cputag_set_input_line(space->machine,"sub",M6809_IRQ_LINE,CLEAR_LINE);
-	return 0x00;
-}
-
-/*
- * Reading from 0xd404 (sub-CPU) causes an "Attention" FIRQ on the main CPU 
- */
-READ8_HANDLER( fm7_attn_irq_r )
-{
-	attn_irq = 1;
-	cputag_set_input_line(space->machine,"maincpu",M6809_FIRQ_LINE,ASSERT_LINE);
-	return 0xff;
-}
-
-/*
- *  Sub CPU: I/O port 0xd409
- * 
- *  On read, enables VRAM access
- *  On write, disables VRAM access
- */
-READ8_HANDLER( fm7_vram_access_r )
-{
-	vram_access = 1;
-	return 0xff;
-}
-
-WRITE8_HANDLER( fm7_vram_access_w )
-{
-	vram_access = 0;
-}
-
-READ8_HANDLER( fm7_vram_r )
-{
-	int offs;
-	
-	offs = (offset & 0xc000) | ((offset + vram_offset) & 0x3fff);
-	return fm7_video_ram[offs];
-}
-
-WRITE8_HANDLER( fm7_vram_w )
-{
-	int offs;
-	
-	offs = (offset & 0xc000) | ((offset + vram_offset) & 0x3fff);
-	if(vram_access != 0)
-		fm7_video_ram[offs] = data;
-}
-
-/*
- *  Sub CPU: I/O port 0xd408
- * 
- *  On read, enables the CRT display
- *  On write, disables the CRT display
- */
-READ8_HANDLER( fm7_crt_r )
-{
-	crt_enable = 1;
-	return 0xff;
-}
-
-WRITE8_HANDLER( fm7_crt_w )
-{
-	crt_enable = 0;
 }
 
 /*
@@ -509,29 +376,6 @@ WRITE8_HANDLER( fm7_fdc_w )
 		default:
 			logerror("FDC: wrote %02x to 0x%04x\n",data,offset+0xfd18);
 	}
-}
-
-/*
- *  Sub CPU: I/O ports 0xd40e - 0xd40f
- * 
- *  0xd40e: bits 0-6 - offset in bytes (high byte) (bit 6 is used for 400 line video only)
- *  0xd40f: bits 0-7 - offset in bytes (low byte)
- */
-WRITE8_HANDLER( fm7_vram_offset_w )
-{
-	UINT16 new_offset = 0;
-	
-	switch(offset)
-	{
-		case 0:
-			new_offset = (data << 8) | (vram_offset & 0x00ff); 
-			break;
-		case 1:  // low 5 bits are used on FM-77AV and later only
-			new_offset = (vram_offset & 0xff00) | (data & 0xe0);
-			break;
-	}
-	
-	vram_offset = new_offset;
 }
 
 /*
@@ -651,34 +495,6 @@ WRITE8_HANDLER( fm7_cassette_printer_w )
 }
 
 /*
- *  Main CPU: I/O ports 0xfd38-0xfd3f
- *  Colour palette.
- *  Each port represents one of eight colours.  Palette is 3-bit.
- *  bit 2 = Green
- *  bit 1 = Red
- *  bit 0 = Blue
- */
-static READ8_HANDLER( fm7_palette_r )
-{
-	return fm7_pal[offset];
-}
-
-static WRITE8_HANDLER( fm7_palette_w )
-{
-	UINT8 r = 0,g = 0,b = 0;
-	
-	if(data & 0x04)
-		g = 0xff;
-	if(data & 0x02)
-		r = 0xff;
-	if(data & 0x01)
-		b = 0xff;
-		
-	palette_set_color(space->machine,offset,MAKE_RGB(r,g,b));
-	fm7_pal[offset] = data & 0x07;
-}
-
-/*
  *  Main CPU: I/O ports 0xfd0d-0xfd0e
  *  PSG (AY-3-891x)
  *  0xfd0d - function select (bit 1 = BDIR, bit 0 = BC1)
@@ -735,7 +551,7 @@ static WRITE8_HANDLER( fm7_psg_data_w )
 // Shared RAM is only usable on the main CPU if the sub CPU is halted
 static READ8_HANDLER( fm7_main_shared_r )
 {
-	if(sub_halt != 0)
+	if(fm7_video.sub_halt != 0)
 		return shared_ram[offset];
 	else
 		return 0xff;
@@ -743,7 +559,7 @@ static READ8_HANDLER( fm7_main_shared_r )
 
 static WRITE8_HANDLER( fm7_main_shared_w )
 {
-	if(sub_halt != 0)
+	if(fm7_video.sub_halt != 0)
 		shared_ram[offset] = data;
 }
 
@@ -1123,15 +939,15 @@ static MACHINE_RESET(fm7)
 	timer_adjust_periodic(fm7_keyboard_timer,attotime_zero,0,ATTOTIME_IN_MSEC(10));
 	irq_mask = 0xff;
 	irq_flags = 0x00;
-	attn_irq = 0;
-	sub_busy = 0x80;  // busy at reset
+	fm7_video.attn_irq = 0;
+	fm7_video.sub_busy = 0x80;  // busy at reset
 	basic_rom_en = 1;  // enabled at reset
-	vram_access = 0;
-	crt_enable = 0;
+	fm7_video.vram_access = 0;
+	fm7_video.crt_enable = 0;
 	memory_set_bankptr(machine,1,RAM+0x38000);
 	key_delay = 700;  // 700ms on FM-7
 	key_repeat = 70;  // 70ms on FM-7
-	vram_offset = 0x0000;
+	fm7_video.vram_offset = 0x0000;
 	break_flag = 0;
 	fm7_psg_regsel = 0;
 	fdc_side = 0;
@@ -1147,68 +963,6 @@ static MACHINE_RESET(fm7)
 		memory_set_bankptr(machine,2,memory_region(machine,"basic"));
 	}
 }
-
-static VIDEO_START( fm7 )
-{
-}
-
-static VIDEO_UPDATE( fm7 )
-{
-    UINT8 code_r,code_g,code_b;
-    UINT8 col;
-    int y, x, b;
-
-	if(crt_enable == 0)
-		return 0;
-
-    for (y = 0; y < 200; y++)
-    {
-	    for (x = 0; x < 80; x++)
-	    {
-            code_r = fm7_video_ram[0x8000 + ((y*80 + x + vram_offset) & 0x3fff)];
-            code_g = fm7_video_ram[0x4000 + ((y*80 + x + vram_offset) & 0x3fff)];
-            code_b = fm7_video_ram[0x0000 + ((y*80 + x + vram_offset) & 0x3fff)];
-            for (b = 0; b < 8; b++)
-            {
-                col = (((code_r >> b) & 0x01) ? 4 : 0) + (((code_g >> b) & 0x01) ? 2 : 0) + (((code_b >> b) & 0x01) ? 1 : 0);
-                *BITMAP_ADDR16(bitmap, y,  x*8+(7-b)) =  col;
-            }
-        }
-    }
-	return 0;
-}
-
-static const rgb_t fm7_initial_palette[8] = {
-	MAKE_RGB(0x00, 0x00, 0x00), // 0
-	MAKE_RGB(0x00, 0x00, 0xff), // 1
-	MAKE_RGB(0xff, 0x00, 0x00), // 2
-	MAKE_RGB(0xff, 0x00, 0xff), // 3
-	MAKE_RGB(0x00, 0xff, 0x00), // 4
-	MAKE_RGB(0x00, 0xff, 0xff), // 5
-	MAKE_RGB(0xff, 0xff, 0x00), // 6
-	MAKE_RGB(0xff, 0xff, 0xff), // 7
-};
-
-PALETTE_INIT( fm7 )
-{
-	int x;
-	
-	palette_set_colors(machine, 0, fm7_initial_palette, ARRAY_LENGTH(fm7_initial_palette));
-	for(x=0;x<8;x++)
-		fm7_pal[x] = x;
-}
-
-//static DEVICE_IMAGE_LOAD( fm7_floppy )
-//{
-//	if (device_load_basicdsk_floppy(image)==INIT_PASS)
-//	{
-		/* drive, tracks, heads, sectors per track, sector length, first sector id */
-//		basicdsk_set_geometry(image, 40, 2, 16, 256, 0x01, 0x2c0, FALSE);
-//		return INIT_PASS;
-//	}
-
-//	return INIT_FAIL;
-//}
 
 static const wd17xx_interface fm7_mb8877a_interface =
 {
