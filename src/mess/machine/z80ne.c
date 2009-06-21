@@ -741,28 +741,6 @@ READ8_HANDLER(lx388_read_field_sync)
  *  1    1     0       x
  *
  */
-static WD17XX_CALLBACK( z80ne_fdc_callback )
-{
-	switch (state)
-	{
-		case WD17XX_IRQ_CLR:
-			wd17xx_state.intrq = FALSE;
-			break;
-		case WD17XX_IRQ_SET:
-			wd17xx_state.intrq = TRUE;
-			output_set_value("drv0", 0);
-			output_set_value("drv1", 0);
-			break;
-		case WD17XX_DRQ_CLR:
-			wd17xx_state.drq = FALSE;
-			break;
-		case WD17XX_DRQ_SET:
-			wd17xx_state.drq = TRUE;
-			break;
-	}
-}
-
-const wd17xx_interface z80ne_wd17xx_interface = { z80ne_fdc_callback, NULL };
 
 WRITE8_DEVICE_HANDLER(lx390_motor_w)
 {
@@ -848,16 +826,8 @@ READ8_DEVICE_HANDLER(lx390_fdc_r)
 		LOG(("lx390_fdc_r, WD17xx sector: %02x\n", d));
 		break;
 	case 3:
-		if(!wd17xx_state.drq && !wd17xx_state.intrq)
-		{
-			d = wd17xx_data_r(device, 0);
-			LOG(("lx390_fdc_r, WD17xx data3, ready:  %02x\n", d));
-		}
-		else
-		{
-			d = 0xff;
-			LOG(("lx390_fdc_r, WD17xx data3,  busy: intrq %01x drq %01x \n", wd17xx_state.intrq, wd17xx_state.drq));
-		}
+		d = wd17xx_data_r(device, 0);
+		LOG(("lx390_fdc_r, WD17xx data3:  %02x\n", d));
 		break;
 	case 6:
 		d = 0xff;
@@ -897,15 +867,8 @@ WRITE8_DEVICE_HANDLER(lx390_fdc_w)
 		wd17xx_sector_w(device, offset, d);
 		break;
 	case 3:
-		if(!wd17xx_state.drq && !wd17xx_state.intrq)
-		{
-			LOG(("lx390_fdc_w, WD17xx data3, ready:   %02x\n", d));
-			wd17xx_data_w(device, 0, d);
-		}
-		else
-		{
-			LOG(("lx390_fdc_w, WD17xx data3,  busy:   %02x\n", d));
-		}
+		wd17xx_data_w(device, 0, d);
+		LOG(("lx390_fdc_w, WD17xx data3:   %02x\n", d));
 		break;
 	case 6:
 		LOG(("lx390_fdc_w, motor_w:   %02x\n", d));

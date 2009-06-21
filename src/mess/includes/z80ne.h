@@ -56,7 +56,6 @@ MACHINE_START(z80net);
 MACHINE_START(z80netb);
 MACHINE_START(z80netf);
 
-extern const wd17xx_interface z80ne_wd17xx_interface;
 DEVICE_IMAGE_LOAD( z80ne_floppy );
 
 INPUT_CHANGED(z80ne_reset);

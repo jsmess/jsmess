@@ -42,6 +42,19 @@
         - Added simulation of head loaded feedback from drive
         - Bugfix: busy flag was cleared too early
 
+    2009-June-21 Robbbert:
+	- The Bugfix above, while valid, caused the Osborne1 to fail. This
+	  is because the delay must not exceed 14usec (found by extensive testing).
+	- The minimum delay is 1usec, need by z80netf while formatting a disk.
+	- http://www.bannister.org/forums/ubbthreads.php?ubb=showflat&Number=50889#Post50889
+	  explains the problems, testing done, and the test procedure for the z80netf.
+	- Thus, the delay is set to 10usec, and all the disks I have (not many)
+	  seem to work.
+	- Note to anyone who wants to change something: Make sure that the
+	  Osborne1 boots up! It is extremely sensitive to timing!
+	- For testing only: The osborne1 rom can be patched to make it much
+	  more stable, by changing the byte at 0x0da7 from 0x28 to 0x18.
+
     TODO:
         - Multiple record write
         - What happens if a track is read that doesn't have any id's on it?
@@ -859,13 +872,17 @@ static void wd17xx_complete_command(const device_config *device, int delay)
 
 	w->hld_count = 2;
 
+#if 0
 	/* clear busy bit */
 	/* RL - removed, busy bit must be on until wd17xx_misc_timer_callback() is fired */
-	/* Robbbert - put back in, it broke too many systems */
+	/* Robbbert - adjusted delay value (see notes above) to fix the osborne1 */
 	w->status &= ~STA_2_BUSY;
 
 	usecs = floppy_drive_get_datarate_in_us(w->density);
 	usecs *= delay;
+#endif
+
+	usecs = 10;
 
 	/* set new timer */
 	timer_adjust_oneshot(w->timer, ATTOTIME_IN_USEC(usecs), MISCCALLBACK_COMMAND);
