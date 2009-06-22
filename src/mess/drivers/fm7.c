@@ -929,8 +929,7 @@ static ADDRESS_MAP_START( fm77av_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfd80,0xfd93) AM_READWRITE(fm7_mmr_r,fm7_mmr_w)
 	AM_RANGE(0xfd94,0xfdff) AM_READ(fm7_unknown_r)
 	// Boot ROM (RAM on FM77AV and later)
-	AM_RANGE(0xfe00,0xffdf) AM_RAM
-	AM_RANGE(0xffe0,0xffef) AM_RAM
+	AM_RANGE(0xfe00,0xffef) AM_RAM
 	AM_RANGE(0xfff0,0xffff) AM_READWRITE(vector_r,vector_w) 
 ADDRESS_MAP_END
 
@@ -1284,7 +1283,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( fm77av )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6809E, XTAL_2MHz)
+	MDRV_CPU_ADD("maincpu", M6809, XTAL_2MHz)  // actually MB68B09E, but the 6809E core runs too slowly
 	MDRV_CPU_PROGRAM_MAP(fm77av_mem)
 	MDRV_QUANTUM_PERFECT_CPU("maincpu")
 
