@@ -1045,7 +1045,7 @@ static  READ8_HANDLER(bwg_mem_r)
 	else if (bwg_rtc_enable)
 	{
 		if (! (offset & 1))
-			reply = mm58274c_r((device_config*)devtag_get_device(space->machine, "mm58274c_floppy"), (offset - 0x1FE0) >> 1);
+			reply = mm58274c_r(devtag_get_device(space->machine, "mm58274c_floppy"), (offset - 0x1FE0) >> 1);
 	}
 	else
 	{
@@ -1088,7 +1088,7 @@ static WRITE8_HANDLER(bwg_mem_w)
 	else if (bwg_rtc_enable)
 	{
 		if (! (offset & 1))
-			mm58274c_w((device_config*)devtag_get_device(space->machine, "mm58274c_floppy"), (offset - 0x1FE0) >> 1, data);
+			mm58274c_w(devtag_get_device(space->machine, "mm58274c_floppy"), (offset - 0x1FE0) >> 1, data);
 	}
 	else
 	{
@@ -1414,7 +1414,7 @@ static  READ8_HANDLER(hfdc_mem_r)
 	{
 		/* rtc */
 		if (! (offset & 1))
-			reply = mm58274c_r((device_config*)devtag_get_device(space->machine, "mm58274c_floppy"), (offset - 0x1FE0) >> 1);
+			reply = mm58274c_r(devtag_get_device(space->machine, "mm58274c_floppy"), (offset - 0x1FE0) >> 1);
 	}
 	else if (offset < 0x1400)
 	{
@@ -1464,7 +1464,7 @@ static WRITE8_HANDLER(hfdc_mem_w)
 	{
 		/* rtc */
 		if (! (offset & 1))
-			mm58274c_w((device_config*)devtag_get_device(space->machine, "mm58274c_floppy"), (offset - 0x1FE0) >> 1, data);
+			mm58274c_w(devtag_get_device(space->machine, "mm58274c_floppy"), (offset - 0x1FE0) >> 1, data);
 	}
 	else if (offset < 0x1400)
 	{

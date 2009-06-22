@@ -800,7 +800,7 @@ static MACHINE_DRIVER_START( pc1255 )
 	MDRV_CPU_PROGRAM_MAP( pc1255_mem)
 MACHINE_DRIVER_END
 
-NVRAM_HANDLER( pc1260 )
+static NVRAM_HANDLER( pc1260 )
 {
 	const device_config *main_cpu = cputag_get_cpu(machine, "maincpu");
 	UINT8 *ram = memory_region(machine, "maincpu") + 0x4000;

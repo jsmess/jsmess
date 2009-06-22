@@ -20,7 +20,7 @@ static ADDRESS_MAP_START( chessmst_io , ADDRESS_SPACE_IO, 8)
 ADDRESS_MAP_END
 
 /* Input ports */
-INPUT_PORTS_START( chessmst )
+static INPUT_PORTS_START( chessmst )
 INPUT_PORTS_END
 
 

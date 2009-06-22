@@ -90,9 +90,9 @@ struct dmk_tag
 #define dmk_idam_crc(x)				(((x)[5] << 8) + (x)[6])
 #define dmk_idam_set_crc(x, crc)	(x)[5] = ((crc) >> 8); (x)[6] = ((crc) >> 0);
 
-const char *needle_data = "\x00\x00\x00\x00\x00\x00\x00\x00\xFB\xFB";
-const char *needle_deleted_data_fa = "\x00\x00\x00\x00\x00\x00\x00\x00\xFA\xFA";
-const char *needle_deleted_data_f8 = "\x00\x00\x00\x00\x00\x00\x00\x00\xF8\xF8";
+static const char needle_data[] = "\x00\x00\x00\x00\x00\x00\x00\x00\xFB\xFB";
+static const char needle_deleted_data_fa[] = "\x00\x00\x00\x00\x00\x00\x00\x00\xFA\xFA";
+static const char needle_deleted_data_f8[] = "\x00\x00\x00\x00\x00\x00\x00\x00\xF8\xF8";
 
 
 static struct dmk_tag *get_dmk_tag(floppy_image *floppy)
@@ -360,7 +360,7 @@ static UINT32 z80ne_dmk_get_track_size(floppy_image *floppy, int head, int track
 	return get_dmk_tag(floppy)->track_size;
 }
 
-UINT8 * my_memmem(UINT8 *haystack, size_t haystacklen,
+static UINT8 * my_memmem(UINT8 *haystack, size_t haystacklen,
 		UINT8 *needle, size_t needlelen)
 {
         register UINT8 *h = haystack;

@@ -738,7 +738,7 @@ static DEVICE_IMAGE_UNLOAD( ngp_cart )
 }
 
 
-static k1ge_interface ngp_k1ge_interface =
+static const k1ge_interface ngp_k1ge_interface =
 {
 	"screen",
 	"vram",
@@ -747,7 +747,7 @@ static k1ge_interface ngp_k1ge_interface =
 };
 
 
-static tlcs900_interface ngp_tlcs900_interface =
+static const tlcs900_interface ngp_tlcs900_interface =
 {
 	DEVCB_NULL,
 	DEVCB_HANDLER( ngp_tlcs900_to3 )

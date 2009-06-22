@@ -119,10 +119,10 @@ static UINT32 bebox_interrupts;
 static UINT32 bebox_crossproc_interrupts;
 
 static struct {
-	device_config	*pic8259_master;
-	device_config	*pic8259_slave;
-	device_config	*dma8237_1;
-	device_config	*dma8237_2;
+	const device_config	*pic8259_master;
+	const device_config	*pic8259_slave;
+	const device_config	*dma8237_1;
+	const device_config	*dma8237_2;
 } bebox_devices;
 
 
@@ -431,9 +431,9 @@ static const device_config *bebox_fdc_get_image(running_machine *machine, int fl
 	return image_from_devtype_and_index(machine, IO_FLOPPY, 0);
 }
 
-static device_config * bebox_get_device(running_machine *machine )
+static const device_config * bebox_get_device(running_machine *machine )
 {
-	return (device_config*)devtag_get_device(machine, "smc37c78");
+	return devtag_get_device(machine, "smc37c78");
 }
 
 
@@ -872,7 +872,7 @@ static void bebox_keyboard_interrupt(running_machine *machine,int state)
 }
 
 static int bebox_get_out2(running_machine *machine) {
-	return pit8253_get_output((device_config*)devtag_get_device(machine, "pit8254"), 2 );
+	return pit8253_get_output(devtag_get_device(machine, "pit8254"), 2 );
 }
 
 static const struct kbdc8042_interface bebox_8042_interface =
@@ -1061,10 +1061,10 @@ static const struct LSI53C810interface scsi53c810_intf =
 
 
 static TIMER_CALLBACK( bebox_get_devices ) {
-	bebox_devices.pic8259_master = (device_config*)devtag_get_device(machine, "pic8259_master");
-	bebox_devices.pic8259_slave = (device_config*)devtag_get_device(machine, "pic8259_slave");
-	bebox_devices.dma8237_1 = (device_config*)devtag_get_device(machine, "dma8237_1");
-	bebox_devices.dma8237_2 = (device_config*)devtag_get_device(machine, "dma8237_2");
+	bebox_devices.pic8259_master = devtag_get_device(machine, "pic8259_master");
+	bebox_devices.pic8259_slave = devtag_get_device(machine, "pic8259_slave");
+	bebox_devices.dma8237_1 = devtag_get_device(machine, "dma8237_1");
+	bebox_devices.dma8237_2 = devtag_get_device(machine, "dma8237_2");
 }
 
 

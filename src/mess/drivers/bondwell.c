@@ -131,7 +131,7 @@ static const z80ctc_interface bw12_ctc_intf =
 };
 
 
-const z80sio_interface bw12_z80sio_intf =
+static const z80sio_interface bw12_z80sio_intf =
 {
 	0,	/* interrupt handler */
 	0,			/* DTR changed handler */

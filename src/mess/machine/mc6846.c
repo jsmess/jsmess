@@ -201,7 +201,7 @@ INLINE void mc6846_timer_launch ( const device_config *device )
 
 static TIMER_CALLBACK( mc6846_timer_expire )
 {
-	device_config* device = (device_config*) ptr;
+	const device_config* device = (const device_config*) ptr;
 	mc6846_t* mc6846 = get_safe_token( device );
 	int delay = FACTOR * (mc6846->latch+1);
 
@@ -246,7 +246,7 @@ static TIMER_CALLBACK( mc6846_timer_expire )
 
 static TIMER_CALLBACK( mc6846_timer_one_shot )
 {
-	device_config* device = (device_config*) ptr;
+	const device_config* device = (const device_config*) ptr;
 	mc6846_t* mc6846 = get_safe_token( device );
 	LOG (( "%f: mc6846 timer one shot called\n", attotime_to_double(timer_get_time(device->machine)) ));
 

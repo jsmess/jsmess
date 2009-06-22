@@ -625,7 +625,7 @@ long myo;
 				return acia6850_data_r(acia, 0);
 		}
 		if ((myo>=0x10) && (myo<=0x17)) return 0xfe;						/* Serial System Chip */
-		if ((myo>=0x18) && (myo<=0x1f)) return uPD7002_r((device_config*)devtag_get_device(space->machine, "upd7002"), myo-0x18);			/* A to D converter */
+		if ((myo>=0x18) && (myo<=0x1f)) return uPD7002_r(devtag_get_device(space->machine, "upd7002"), myo-0x18);			/* A to D converter */
 		if ((myo>=0x20) && (myo<=0x23)) return 0xfe;						/* VideoULA */
 		if ((myo>=0x24) && (myo<=0x27)) return bbcm_wd1770l_read(space, myo-0x24); /* 1770 */
 		if ((myo>=0x28) && (myo<=0x2f)) return bbcm_wd1770_read(space, myo-0x28);  /* disc control latch */
@@ -664,7 +664,7 @@ long myo;
 				return acia6850_data_w(acia, 0, data);
 		}
 		if ((myo>=0x10) && (myo<=0x17)) BBC_SerialULA_w(space, myo-0x10,data);		/* Serial System Chip */
-		if ((myo>=0x18) && (myo<=0x1f)) uPD7002_w((device_config*)devtag_get_device(space->machine, "upd7002"),myo-0x18,data);			/* A to D converter */
+		if ((myo>=0x18) && (myo<=0x1f)) uPD7002_w(devtag_get_device(space->machine, "upd7002"),myo-0x18,data);			/* A to D converter */
 		if ((myo>=0x20) && (myo<=0x23)) bbc_videoULA_w(space, myo-0x20,data);			/* VideoULA */
 		if ((myo>=0x24) && (myo<=0x27)) bbcm_wd1770l_write(space, myo-0x24,data); 	/* 1770 */
 		if ((myo>=0x28) && (myo<=0x2f)) bbcm_wd1770_write(space, myo-0x28,data);  	/* disc control latch */
@@ -1239,7 +1239,7 @@ static READ8_DEVICE_HANDLER( bbcb_via_system_read_ca1 )
 /* joystick EOC */
 static READ8_DEVICE_HANDLER( bbcb_via_system_read_cb1 )
 {
-	return uPD7002_EOC_r((device_config*)devtag_get_device(device->machine, "upd7002"),0);
+	return uPD7002_EOC_r(devtag_get_device(device->machine, "upd7002"),0);
 }
 
 
@@ -1519,7 +1519,7 @@ const i8271_interface bbc_i8271_interface=
 static READ8_HANDLER( bbc_i8271_read )
 {
 	int ret;
-	device_config *i8271 = (device_config*)devtag_get_device(space->machine, "i8271");
+	const device_config *i8271 = devtag_get_device(space->machine, "i8271");
 	ret=0x0ff;
 	logerror("i8271 read %d  ",offset);
 	switch (offset)
@@ -1545,7 +1545,7 @@ static READ8_HANDLER( bbc_i8271_read )
 
 static WRITE8_HANDLER( bbc_i8271_write )
 {
-	device_config *i8271 = (device_config*)devtag_get_device(space->machine, "i8271");
+	const device_config *i8271 = devtag_get_device(space->machine, "i8271");
 	logerror("i8271 write  %d  %d\n",offset,data);
 
 	switch (offset)

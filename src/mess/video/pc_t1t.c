@@ -169,7 +169,7 @@ static VIDEO_START( pc_pcjr )
 
 static VIDEO_UPDATE( mc6845_t1000 )
 {
-	const device_config	*devconf = devtag_get_device(screen->machine, T1000_MC6845_NAME);
+	const device_config *devconf = devtag_get_device(screen->machine, T1000_MC6845_NAME);
 	mc6845_update( devconf, bitmap, cliprect);
 	return 0;
 }
@@ -738,16 +738,16 @@ static int pc_t1t_bank_r(void)
 
 WRITE8_HANDLER ( pc_T1T_w )
 {
-	device_config	*devconf;
+	const device_config *devconf;
 
 	switch( offset )
 	{
 		case 0: case 2: case 4: case 6:
-			devconf = (device_config *) devtag_get_device(space->machine, T1000_MC6845_NAME);
+			devconf = devtag_get_device(space->machine, T1000_MC6845_NAME);
 			mc6845_address_w( devconf, offset, data );
 			break;
 		case 1: case 3: case 5: case 7:
-			devconf = (device_config *) devtag_get_device(space->machine, T1000_MC6845_NAME);
+			devconf = devtag_get_device(space->machine, T1000_MC6845_NAME);
 			mc6845_register_w( devconf, offset, data );
 			break;
 		case 8:
@@ -778,7 +778,7 @@ WRITE8_HANDLER ( pc_T1T_w )
 
 WRITE8_HANDLER( pc_pcjr_w )
 {
-	const device_config	*devconf;
+	const device_config *devconf;
 
 	switch( offset )
 	{
@@ -818,7 +818,7 @@ WRITE8_HANDLER( pc_pcjr_w )
 
  READ8_HANDLER ( pc_T1T_r )
 {
-	device_config	*devconf;
+	const device_config *devconf;
 	int				data = 0xff;
 
 	switch( offset )
@@ -828,7 +828,7 @@ WRITE8_HANDLER( pc_pcjr_w )
 			break;
 
 		case 1: case 3: case 5: case 7:
-			devconf = (device_config *) devtag_get_device(space->machine, T1000_MC6845_NAME);
+			devconf = devtag_get_device(space->machine, T1000_MC6845_NAME);
 			data = mc6845_register_r( devconf, offset );
 			break;
 

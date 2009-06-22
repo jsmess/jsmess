@@ -29,7 +29,7 @@ struct pc_fdc_interface
 	void (*pc_fdc_interrupt)(running_machine*,int);
 	void (*pc_fdc_dma_drq)(running_machine*,int,int);	
 	const device_config *(*get_image)(running_machine*, int floppy_index);
-	device_config *(*get_device)(running_machine*);
+	const device_config *(*get_device)(running_machine*);
 };
 
 extern const nec765_interface pc_fdc_nec765_connected_interface;

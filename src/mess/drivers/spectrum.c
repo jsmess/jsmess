@@ -310,7 +310,7 @@ ADDRESS_MAP_END
 
 /****************************************************************************************************/
 
-INPUT_PORTS_START( spec_joys )
+static INPUT_PORTS_START( spec_joys )
 	PORT_START("JOY_INTF")
 	PORT_CATEGORY_CLASS( 0x0f, 0x01, "Joystick Interface")
 	PORT_CATEGORY_ITEM(  0x00, "None (No Joystick)",	0 )

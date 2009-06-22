@@ -13,7 +13,7 @@
 
 UINT8 code = 0;
 
-UINT8 llc1_key_state = 0;
+static UINT8 llc1_key_state = 0;
 
 static READ8_DEVICE_HANDLER (llc1_port_b_r)
 {	

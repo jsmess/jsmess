@@ -174,7 +174,7 @@ static void c128_cia0_interrupt (const device_config *device, int level)
 	c128_irq (device->machine, level || vicirq);
 }
 
-void c128_vic_interrupt (running_machine *machine, int level)
+static void c128_vic_interrupt (running_machine *machine, int level)
 {
 	const device_config *cia_0 = devtag_get_device(machine, "cia_0");
 #if 1

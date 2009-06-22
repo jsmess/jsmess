@@ -14,12 +14,15 @@
 #define FH 12
 
 
+/*----------- defined in drivers/trs80.c -----------*/
+
+extern UINT8 trs80_model4;
+extern UINT8 *gfxram;
+
 /*----------- defined in machine/trs80.c -----------*/
 
 extern const wd17xx_interface trs80_wd17xx_interface;
 extern UINT8 trs80_mode;
-extern UINT8 trs80_model4;
-extern UINT8 *gfxram;
 
 DEVICE_IMAGE_LOAD( trs80_floppy );
 QUICKLOAD_LOAD( trs80_cmd );
@@ -41,14 +44,11 @@ WRITE8_HANDLER ( trs80m4_e8_w );
 WRITE8_HANDLER ( trs80m4_e4_w );
 WRITE8_HANDLER ( trs80m4_e0_w );
 WRITE8_HANDLER ( trs80m4_90_w );
-WRITE8_HANDLER ( trs80m4_88_w );
 WRITE8_HANDLER ( trs80m4_84_w );
 READ8_HANDLER ( lnw80_fe_r );
 READ8_HANDLER ( trs80_ff_r );
-READ8_HANDLER ( trs80_fe_r );
 READ8_HANDLER ( sys80_f9_r );
 READ8_HANDLER ( trs80m4_ff_r );
-READ8_HANDLER ( trs80m4_f4_r );
 READ8_HANDLER ( trs80m4_ec_r );
 READ8_HANDLER ( trs80m4_eb_r );
 READ8_HANDLER ( trs80m4_ea_r );
@@ -60,7 +60,6 @@ INTERRUPT_GEN( trs80_rtc_interrupt );
 INTERRUPT_GEN( trs80_fdc_interrupt );
 
 READ8_HANDLER( trs80_irq_status_r );
-WRITE8_HANDLER( trs80_irq_mask_w );
 
 READ8_HANDLER( trs80_printer_r );
 WRITE8_HANDLER( trs80_printer_w );
@@ -76,11 +75,12 @@ READ8_DEVICE_HANDLER (trs80_wd179x_r);
 
 VIDEO_START( trs80 );
 VIDEO_UPDATE( trs80 );
-VIDEO_UPDATE( model1 );
 VIDEO_UPDATE( ht1080z );
 VIDEO_UPDATE( lnw80 );
 VIDEO_UPDATE( radionic );
 VIDEO_UPDATE( trs80m4 );
+
+WRITE8_HANDLER ( trs80m4_88_w );
 
 READ8_HANDLER( trs80_videoram_r );
 WRITE8_HANDLER( trs80_videoram_w );

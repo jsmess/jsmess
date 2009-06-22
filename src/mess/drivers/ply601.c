@@ -10,7 +10,7 @@
 #include "cpu/m6800/m6800.h"
 #include "video/mc6845.h"
 
-UINT8 rom_page;
+static UINT8 rom_page;
 
 static READ8_HANDLER (rom_page_r)
 {

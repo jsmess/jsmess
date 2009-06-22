@@ -102,7 +102,7 @@ static WD17XX_CALLBACK( betadisk_wd179x_callback )
 	}
 }
 
-const wd17xx_interface beta_wd17xx_interface = { betadisk_wd179x_callback, NULL };
+static const wd17xx_interface beta_wd17xx_interface = { betadisk_wd179x_callback, NULL };
 
 READ8_DEVICE_HANDLER(betadisk_status_r)
 {

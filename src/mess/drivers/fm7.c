@@ -88,7 +88,7 @@ extern struct fm7_video_flags fm7_video;
  * when kana is active.
  */
  // TODO: fill in shift,ctrl,graph and kana code
-const UINT16 fm7_key_list[0x60][5] =  
+static const UINT16 fm7_key_list[0x60][5] =  
 { // norm  shift ctrl  graph kana
 	{0x00, 0x00, 0x00, 0x00, 0x00},
 	{0x1b, 0x1b, 0x1b, 0x1b, 0x1b},  // ESC
@@ -205,7 +205,7 @@ const UINT16 fm7_key_list[0x60][5] =
  *   bit 7 - SYNDET
  * 
  */
-WRITE8_HANDLER( fm7_irq_mask_w )
+static WRITE8_HANDLER( fm7_irq_mask_w )
 {
 	irq_mask = data;
 	logerror("IRQ mask set: 0x%02x\n",irq_mask);
@@ -224,7 +224,7 @@ WRITE8_HANDLER( fm7_irq_mask_w )
  *   bit 6 - ??buzzer on/off
  *   bit 7 - ??buzzer on/off
  */
-READ8_HANDLER( fm7_irq_cause_r )
+static READ8_HANDLER( fm7_irq_cause_r )
 {
 	UINT8 ret = ~irq_flags;
 	
@@ -233,14 +233,14 @@ READ8_HANDLER( fm7_irq_cause_r )
 	return ret;
 }
 
-READ8_HANDLER( vector_r )
+static READ8_HANDLER( vector_r )
 {
 	UINT8* RAM = memory_region(space->machine,"maincpu");
 
 	return RAM[0xfff0+offset];
 }
 
-WRITE8_HANDLER( vector_w )
+static WRITE8_HANDLER( vector_w )
 {
 	UINT8* RAM = memory_region(space->machine,"maincpu");
 	
@@ -253,7 +253,7 @@ WRITE8_HANDLER( vector_w )
  *  bit 0 - attention IRQ active, clears flag when read.
  *  bit 1 - break key active
  */
-READ8_HANDLER( fm7_fd04_r )
+static READ8_HANDLER( fm7_fd04_r )
 {
 	UINT8 ret = 0xff;
 	
@@ -275,7 +275,7 @@ READ8_HANDLER( fm7_fd04_r )
  *  On read, enables BASIC ROM at 0x8000 (default)
  *  On write, disables BASIC ROM, enables RAM (if more than 32kB)
  */
-READ8_HANDLER( fm7_rom_en_r )
+static READ8_HANDLER( fm7_rom_en_r )
 {
 	UINT8* RAM = memory_region(space->machine,"maincpu");
 	
@@ -286,7 +286,7 @@ READ8_HANDLER( fm7_rom_en_r )
 	return 0x00;
 }
 
-WRITE8_HANDLER( fm7_rom_en_w )
+static WRITE8_HANDLER( fm7_rom_en_w )
 {
 	UINT8* RAM = memory_region(space->machine,"maincpu");
 	
@@ -300,7 +300,7 @@ WRITE8_HANDLER( fm7_rom_en_w )
  *  Main CPU: I/O ports 0xfd18 - 0xfd1f
  *  Floppy Disk Controller (MB8877A)
  */
-WD17XX_CALLBACK( fm7_fdc_irq )
+static WD17XX_CALLBACK( fm7_fdc_irq )
 {
 	switch(state)
 	{
@@ -319,7 +319,7 @@ WD17XX_CALLBACK( fm7_fdc_irq )
 	}
 }
  
-READ8_HANDLER( fm7_fdc_r )
+static READ8_HANDLER( fm7_fdc_r )
 {
 	const device_config* dev = devtag_get_device(space->machine,"fdc");
 	UINT8 ret = 0;
@@ -353,7 +353,7 @@ READ8_HANDLER( fm7_fdc_r )
 	return 0x00;
 }
 
-WRITE8_HANDLER( fm7_fdc_w )
+static WRITE8_HANDLER( fm7_fdc_w )
 {
 	const device_config* dev = devtag_get_device(space->machine,"fdc");
 	switch(offset)
@@ -408,7 +408,7 @@ WRITE8_HANDLER( fm7_fdc_w )
  *  bit (MSB) in bit 7 of fd/d400.  0xfd00 also holds a flag for the main
  *  CPU clock speed in bit 0 (0 = 1.2MHz, 1 = 2MHz)
  */
-READ8_HANDLER( fm7_keyboard_r)
+static READ8_HANDLER( fm7_keyboard_r)
 {
 	UINT8 ret;
 	switch(offset)
@@ -424,7 +424,7 @@ READ8_HANDLER( fm7_keyboard_r)
 	}
 }
 
-READ8_HANDLER( fm7_sub_keyboard_r)
+static READ8_HANDLER( fm7_sub_keyboard_r)
 {
 	UINT8 ret;
 	switch(offset)
@@ -439,7 +439,7 @@ READ8_HANDLER( fm7_sub_keyboard_r)
 	}
 }
 
-READ8_HANDLER( fm7_cassette_printer_r )
+static READ8_HANDLER( fm7_cassette_printer_r )
 {
 	// bit 7: cassette input
 	// bit 5: printer DET2
@@ -492,7 +492,7 @@ READ8_HANDLER( fm7_cassette_printer_r )
 	return ret;
 }
 
-WRITE8_HANDLER( fm7_cassette_printer_w )
+static WRITE8_HANDLER( fm7_cassette_printer_w )
 {
 	static UINT8 prev;
 	switch(offset)
@@ -752,7 +752,7 @@ static TIMER_CALLBACK( fm7_subtimer_irq )
 // When a key is pressed or released, an IRQ is generated on the main CPU,
 // and an FIRQ on the sub CPU.  Both CPUs have ports to read keyboard data.
 // Scancodes are 9 bits.
-void key_press(running_machine* machine, UINT16 scancode)
+static void key_press(running_machine* machine, UINT16 scancode)
 {
 	current_scancode = scancode;
 
@@ -952,7 +952,7 @@ static ADDRESS_MAP_START( fm77av_sub_mem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 /* Input ports */
-INPUT_PORTS_START( fm7 )
+static INPUT_PORTS_START( fm7 )
 
   PORT_START("key1")
   PORT_BIT(0x00000001,IP_ACTIVE_HIGH,IPT_UNUSED)

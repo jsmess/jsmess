@@ -332,7 +332,7 @@ static void mc6854_tfifo_terminate( const device_config *device )
 /* call-back to refill the bit-stream from the FIFO */
 static TIMER_CALLBACK(mc6854_tfifo_cb)
 {
-	device_config* device = (device_config*) ptr;
+	const device_config* device = (const device_config*) ptr;
 	mc6854_t* mc6854 = get_safe_token( device );
 	int i, data = mc6854->tfifo[ FIFO_SIZE - 1 ];
 

@@ -17,6 +17,10 @@
 #include "devices/basicdsk.h"
 
 
+/*----------- defined in drivers/mbee.c -----------*/
+
+extern size_t mbee_size;
+
 /*----------- defined in machine/mbee.c -----------*/
 
 extern const wd17xx_interface mbee_wd17xx_interface;
@@ -37,7 +41,6 @@ QUICKLOAD_LOAD( mbee );
 /*----------- defined in video/mbee.c -----------*/
 
 extern UINT8 *mbee_pcgram;
-extern size_t mbee_size;
 
 READ8_HANDLER ( m6545_status_r );
 WRITE8_HANDLER ( m6545_index_w );

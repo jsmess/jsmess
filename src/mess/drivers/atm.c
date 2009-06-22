@@ -12,7 +12,7 @@
 #include "machine/beta.h"
 
 static int ROMSelection;
-static device_config* beta;
+static const device_config* beta;
 
 static DIRECT_UPDATE_HANDLER( atm_direct )
 {	
@@ -95,7 +95,7 @@ ADDRESS_MAP_END
 static MACHINE_RESET( atm )
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	beta = (device_config*)devtag_get_device(machine, BETA_DISK_TAG);
+	beta = devtag_get_device(machine, BETA_DISK_TAG);
 	
 	memory_install_read8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_BANK(1));
 	memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);

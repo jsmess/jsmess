@@ -1113,9 +1113,9 @@ static void pc_fdc_dma_drq(running_machine *machine, int state, int read_)
 	dma8237_drq_write( pc_devices.dma8237, FDC_DMA, state);
 }
 
-static device_config * pc_get_device(running_machine *machine )
+static const device_config * pc_get_device(running_machine *machine )
 {
-	return (device_config*)devtag_get_device(machine, "nec765");
+	return devtag_get_device(machine, "nec765");
 }
 
 static const struct pc_fdc_interface fdc_interface_nc =

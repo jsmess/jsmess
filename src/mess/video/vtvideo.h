@@ -54,9 +54,6 @@ WRITE8_DEVICE_HANDLER ( dc011_w );
 WRITE8_DEVICE_HANDLER ( vt_video_brightness_w );
 
 
-/* palette initialization */
-PALETTE_INIT( vt_video );
-
 /* screen update */
 void vt_video_update(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect);
 

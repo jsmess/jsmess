@@ -13,7 +13,7 @@
 
 static UINT8 memory_block[16];
 UINT8 pp01_video_scroll;
-UINT8 pp01_video_write_mode;
+static UINT8 pp01_video_write_mode;
 
 WRITE8_HANDLER (pp01_video_write_mode_w)
 {
@@ -202,7 +202,7 @@ static WRITE8_DEVICE_HANDLER (pp01_8255_porta_w )
 	pp01_video_scroll = data;
 }
 
-UINT8 pp01_key_line = 0;
+static UINT8 pp01_key_line = 0;
 static READ8_DEVICE_HANDLER (pp01_8255_portb_r )
 {
 	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7",

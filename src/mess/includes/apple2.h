@@ -57,47 +57,6 @@
     OTHER
 ***************************************************************************/
 
-/*----------- defined in drivers/apple2.c -----------*/
-
-MACHINE_DRIVER_EXTERN( apple2e );
-INPUT_PORTS_EXTERN( apple2ep );
-PALETTE_INIT( apple2 );
-
-
-/*----------- defined in machine/apple2.c -----------*/
-
-extern UINT32 a2;
-
-extern const applefdc_interface apple2_fdc_interface;
-
-void apple2_iwm_setdiskreg(running_machine *machine, UINT8 data);
-UINT8 apple2_iwm_getdiskreg(void);
-
-void apple2_init_common(running_machine *machine);
-MACHINE_START( apple2 );
-UINT8 apple2_getfloatingbusvalue(running_machine *machine);
-READ8_HANDLER( apple2_c0xx_r );
-WRITE8_HANDLER( apple2_c0xx_w );
-
-INTERRUPT_GEN( apple2_interrupt );
-
-void apple2_setvar(running_machine *machine, UINT32 val, UINT32 mask);
-
-int apple2_pressed_specialkey(running_machine *machine, UINT8 key);
-
-
-/*----------- defined in video/apple2.c -----------*/
-
-void apple2_video_start(running_machine *machine, const UINT8 *vram, size_t vram_size, UINT32 ignored_softswitches, int hires_modulo);
-VIDEO_START( apple2 );
-VIDEO_START( apple2p );
-VIDEO_START( apple2e );
-VIDEO_UPDATE( apple2 );
-void apple2_set_fgcolor(int color);
-void apple2_set_bgcolor(int color);
-int apple2_get_fgcolor(void);
-int apple2_get_bgcolor(void);
-
 /* -----------------------------------------------------------------------
  * New Apple II memory manager
  * ----------------------------------------------------------------------- */
@@ -143,10 +102,49 @@ struct _apple2_memmap_config
 };
 
 
+/*----------- defined in drivers/apple2.c -----------*/
+
+MACHINE_DRIVER_EXTERN( apple2e );
+INPUT_PORTS_EXTERN( apple2ep );
+PALETTE_INIT( apple2 );
+
+
 /*----------- defined in machine/apple2.c -----------*/
+
+extern UINT32 a2;
+
+extern const applefdc_interface apple2_fdc_interface;
+
+void apple2_iwm_setdiskreg(running_machine *machine, UINT8 data);
+UINT8 apple2_iwm_getdiskreg(void);
+
+void apple2_init_common(running_machine *machine);
+MACHINE_START( apple2 );
+UINT8 apple2_getfloatingbusvalue(running_machine *machine);
+READ8_HANDLER( apple2_c0xx_r );
+WRITE8_HANDLER( apple2_c0xx_w );
+
+INTERRUPT_GEN( apple2_interrupt );
+
+void apple2_setvar(running_machine *machine, UINT32 val, UINT32 mask);
+
+int apple2_pressed_specialkey(running_machine *machine, UINT8 key);
 
 void apple2_setup_memory(running_machine *machine, const apple2_memmap_config *config);
 void apple2_update_memory(running_machine *machine);
 
+
+
+/*----------- defined in video/apple2.c -----------*/
+
+void apple2_video_start(running_machine *machine, const UINT8 *vram, size_t vram_size, UINT32 ignored_softswitches, int hires_modulo);
+VIDEO_START( apple2 );
+VIDEO_START( apple2p );
+VIDEO_START( apple2e );
+VIDEO_UPDATE( apple2 );
+void apple2_set_fgcolor(int color);
+void apple2_set_bgcolor(int color);
+int apple2_get_fgcolor(void);
+int apple2_get_bgcolor(void);
 
 #endif /* APPLE2_H_ */

@@ -65,10 +65,10 @@
 #include "video/m6847.h"
 #include "sound/ay8910.h"
 
-UINT8 *pc6001_ram;
-UINT8 *pc6001_video_ram;
+static UINT8 *pc6001_ram;
+static UINT8 *pc6001_video_ram;
 
-WRITE8_HANDLER ( pc6001_system_latch_w )
+static WRITE8_HANDLER ( pc6001_system_latch_w )
 {
 	UINT16 startaddr[] = {0xC000, 0xE000, 0x8000, 0xA000 };
 	
@@ -98,9 +98,9 @@ static UINT8 pc6001_get_char_rom(running_machine *machine, UINT8 ch, int line)
 	return gfx[ch*16+line];
 }
 
-UINT8 port_c_8255;
+static UINT8 port_c_8255;
 
-READ8_DEVICE_HANDLER(nec_ppi8255_r) {
+static READ8_DEVICE_HANDLER(nec_ppi8255_r) {
 	if (offset==2) {
 		return port_c_8255;
 	} else {
@@ -108,7 +108,7 @@ READ8_DEVICE_HANDLER(nec_ppi8255_r) {
 	}
 }
 
-WRITE8_DEVICE_HANDLER(nec_ppi8255_w) {
+static WRITE8_DEVICE_HANDLER(nec_ppi8255_w) {
 	if (offset==3) {
 		if(data & 1) {
 			port_c_8255 |=   1<<((data>>1)&0x07);
@@ -127,7 +127,7 @@ WRITE8_DEVICE_HANDLER(nec_ppi8255_w) {
 	ppi8255_w(device,offset,data);
 }
 
-WRITE8_DEVICE_HANDLER(pc6100_ay8910_address_w) {
+static WRITE8_DEVICE_HANDLER(pc6100_ay8910_address_w) {
 	ay8910_address_w(device,offset,data & 0x0f);
 }
 
@@ -149,7 +149,7 @@ static ADDRESS_MAP_START( pc6001_io , ADDRESS_SPACE_IO, 8)
 ADDRESS_MAP_END
 
 /* Input ports */
-INPUT_PORTS_START( pc6001 )
+static INPUT_PORTS_START( pc6001 )
 	PORT_START("LINE0")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2") PORT_CODE(KEYCODE_2)
@@ -161,9 +161,9 @@ INPUT_PORTS_START( pc6001 )
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8") PORT_CODE(KEYCODE_8)	
 INPUT_PORTS_END
 
-UINT8 irq_vector = 0x00;
+static UINT8 irq_vector = 0x00;
 
-INTERRUPT_GEN( pc6001_interrupt )
+static INTERRUPT_GEN( pc6001_interrupt )
 {
 	irq_vector = 0x16;
 	cpu_set_input_line(device, 0, HOLD_LINE);
@@ -225,7 +225,7 @@ static READ8_DEVICE_HANDLER (pc6001_8255_portc_r )
 
 
 
-const ppi8255_interface pc6001_ppi8255_interface =
+static const ppi8255_interface pc6001_ppi8255_interface =
 {
 	DEVCB_HANDLER(pc6001_8255_porta_r),
 	DEVCB_HANDLER(pc6001_8255_portb_r),
@@ -235,7 +235,7 @@ const ppi8255_interface pc6001_ppi8255_interface =
 	DEVCB_HANDLER(pc6001_8255_portc_w)
 };
 
-const msm8251_interface pc6001_usart_interface=
+static const msm8251_interface pc6001_usart_interface=
 {
 	NULL,
 	NULL,

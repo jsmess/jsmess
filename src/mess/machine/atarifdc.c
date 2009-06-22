@@ -35,7 +35,7 @@ typedef struct {
 	int  serin_delay;
 }	ATARI_FDC;
  
-ATARI_FDC atari_fdc;
+static ATARI_FDC atari_fdc;
 
 typedef struct _atari_drive atari_drive;
 struct _atari_drive

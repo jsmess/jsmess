@@ -15,7 +15,7 @@ static const device_config *kaypro2x_z80sio;
 static const device_config *kaypro_printer;
 static const device_config *kaypro_fdc;
 
-UINT8 kaypro_system_port;
+static UINT8 kaypro_system_port;
 
 
 /***********************************************************

@@ -387,7 +387,7 @@ static VIDEO_UPDATE( towns )
     return 0;
 }
 
-const struct pit8253_config towns_pit8253_config =
+static const struct pit8253_config towns_pit8253_config =
 {
 	{
 		{

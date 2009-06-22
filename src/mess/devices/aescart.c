@@ -363,7 +363,7 @@ static DEVICE_GET_INFO(aes_cart_common)
 	}
 }
 
-DEVICE_GET_INFO(aes_cartridge_pcb_none)
+static DEVICE_GET_INFO(aes_cartridge_pcb_none)
 {
 	switch(state)
 	{

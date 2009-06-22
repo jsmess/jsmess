@@ -79,22 +79,22 @@ MACHINE_START( orion128 )
 
 READ8_HANDLER ( orion128_system_r ) 
 {
-	return ppi8255_r((device_config*)devtag_get_device(space->machine, "ppi8255_2"), offset & 3);
+	return ppi8255_r(devtag_get_device(space->machine, "ppi8255_2"), offset & 3);
 }
 
 WRITE8_HANDLER ( orion128_system_w ) 
 {
-	ppi8255_w((device_config*)devtag_get_device(space->machine, "ppi8255_2"), offset & 3, data);	
+	ppi8255_w(devtag_get_device(space->machine, "ppi8255_2"), offset & 3, data);	
 }
 
 READ8_HANDLER ( orion128_romdisk_r ) 
 {
-	return ppi8255_r((device_config*)devtag_get_device(space->machine, "ppi8255_1"), offset & 3);	
+	return ppi8255_r(devtag_get_device(space->machine, "ppi8255_1"), offset & 3);	
 }
 
 WRITE8_HANDLER ( orion128_romdisk_w ) 
 {	
-	ppi8255_w((device_config*)devtag_get_device(space->machine, "ppi8255_1"), offset & 3, data);	
+	ppi8255_w(devtag_get_device(space->machine, "ppi8255_1"), offset & 3, data);	
 }
 
 static void orion_set_video_mode(running_machine *machine, int width) 

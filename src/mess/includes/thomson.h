@@ -104,10 +104,6 @@ extern const mc6846_interface to7_timer;
 /* speech synthesis */
 extern const mea8000_interface to7_speech;
 
-/* floppy */
-extern const mc6843_interface to7_6843_itf;
-extern const mc6854_interface to7_network_iface;
-
 /* modem */
 extern const acia6850_interface to7_modem;
 

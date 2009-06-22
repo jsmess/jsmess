@@ -34,7 +34,7 @@ static ADDRESS_MAP_START( zrt80_io , ADDRESS_SPACE_IO, 8)
 ADDRESS_MAP_END
 
 /* Input ports */
-INPUT_PORTS_START( zrt80 )
+static INPUT_PORTS_START( zrt80 )
 	PORT_START("DIPSW1")
 		PORT_DIPNAME( 0x01, 0x01, "Composite Sync" )
 		PORT_DIPSETTING(    0x01, "Negative" )
@@ -120,7 +120,7 @@ static MACHINE_RESET(zrt80)
 {	
 }
 
-VIDEO_START( zrt80 )
+static VIDEO_START( zrt80 )
 {
 }
 

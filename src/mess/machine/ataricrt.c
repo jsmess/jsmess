@@ -18,7 +18,7 @@ static int atari = 0;
  *
  *************************************/
 
-/* 2009-04 FP: is this used anywhere? */
+#ifdef UNUSED_CODE
 DRIVER_INIT( atari )
 {
 	offs_t ram_top;
@@ -42,6 +42,7 @@ DRIVER_INIT( atari )
 		0x0000, ram_top, 0, 0, SMH_BANK(2));
 	memory_set_bankptr(machine, 2, mess_ram);
 }
+#endif
 
 
 static void a800_setbank(running_machine *machine, int n)

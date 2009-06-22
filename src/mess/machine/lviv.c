@@ -147,10 +147,10 @@ static WRITE8_DEVICE_HANDLER ( lviv_ppi_1_portc_w )	/* kayboard scaning */
 		switch ((offset >> 4) & 0x3)
 		{
 		case 0:
-			return ppi8255_r((device_config*)devtag_get_device(space->machine, "ppi8255_0"), offset & 3);
+			return ppi8255_r(devtag_get_device(space->machine, "ppi8255_0"), offset & 3);
 
 		case 1:
-			return ppi8255_r((device_config*)devtag_get_device(space->machine, "ppi8255_1"), offset & 3);
+			return ppi8255_r(devtag_get_device(space->machine, "ppi8255_1"), offset & 3);
 
 		case 2:
 		case 3:
@@ -183,11 +183,11 @@ WRITE8_HANDLER ( lviv_io_w )
 		switch ((offset >> 4) & 0x3)
 		{
 		case 0:
-			ppi8255_w((device_config*)devtag_get_device(space->machine, "ppi8255_0"), offset & 3, data);
+			ppi8255_w(devtag_get_device(space->machine, "ppi8255_0"), offset & 3, data);
 			break;
 
 		case 1:
-			ppi8255_w((device_config*)devtag_get_device(space->machine, "ppi8255_1"), offset & 3, data);
+			ppi8255_w(devtag_get_device(space->machine, "ppi8255_1"), offset & 3, data);
 			break;
 
 		case 2:

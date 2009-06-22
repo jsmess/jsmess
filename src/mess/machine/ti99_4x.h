@@ -157,7 +157,7 @@ MACHINE_START( ti99_4a_50hz );
 MACHINE_START( ti99_4ev_60hz );
 MACHINE_RESET( ti99 );
 
-DEVICE_START( ti99_cart );
+// DEVICE_START( ti99_cart );
 // DEVICE_IMAGE_LOAD( ti99_cart );
 // DEVICE_IMAGE_UNLOAD( ti99_cart );
 
@@ -172,11 +172,6 @@ int is_99_8(void);
 READ16_HANDLER ( ti99_nop_8_r );
 WRITE16_HANDLER ( ti99_nop_8_w );
 
-READ8_HANDLER ( ti99_cart_cru_r );
-WRITE8_HANDLER ( ti99_cart_cru_w );
-
-READ16_HANDLER ( ti99_cart_r );
-WRITE16_HANDLER ( ti99_cart_w );
 READ16_HANDLER ( ti99_4p_cart_r );
 WRITE16_HANDLER ( ti99_4p_cart_w );
 

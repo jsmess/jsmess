@@ -13,13 +13,13 @@
 #include "video/vtvideo.h"
 #include "vt100.lh"
 
-UINT8 *vt100_ram;
-UINT8 vt100_keyboard_int;
-UINT8 vt100_receiver_int;
-UINT8 vt100_vertical_int;
+static UINT8 *vt100_ram;
+static UINT8 vt100_keyboard_int;
+static UINT8 vt100_receiver_int;
+static UINT8 vt100_vertical_int;
 
-double vt100_send_baud_rate;
-double vt100_recv_baud_rate;
+static double vt100_send_baud_rate;
+static double vt100_recv_baud_rate;
 
 static ADDRESS_MAP_START(vt100_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -49,7 +49,7 @@ static READ8_HANDLER(vt100_flags_r)
 	return retVal;
 }
 
-UINT8 vt100_key_scan = 0;
+static UINT8 vt100_key_scan = 0;
 
 static TIMER_CALLBACK(keyboard_callback)
 {

@@ -11,6 +11,7 @@
 #include "video/mc6845.h"
 #include "devices/snapquik.h"
 
+/*----------- defined in machine/amstrad.c -----------*/
 
 READ8_HANDLER ( amstrad_cpc_io_r );
 WRITE8_HANDLER ( amstrad_cpc_io_w );

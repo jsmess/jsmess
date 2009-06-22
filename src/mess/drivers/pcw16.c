@@ -1202,9 +1202,9 @@ static void	pcw16_fdc_interrupt(running_machine *machine, int state)
 	pcw16_trigger_fdc_int(machine);
 }
 
-static device_config * pcw16_get_device(running_machine *machine )
+static const device_config * pcw16_get_device(running_machine *machine)
 {
-	return (device_config*)devtag_get_device(machine, "nec765");
+	return devtag_get_device(machine, "nec765");
 }
 
 static const struct pc_fdc_interface pcw16_fdc_interface=

@@ -479,7 +479,7 @@ static READ8_HANDLER ( pc_aga_mda_r )
 	UINT8 data = 0xFF;
 
 	if ( aga.mode == AGA_MONO ) {
-		device_config   *devconf = (device_config *) devtag_get_device(space->machine, MDA_MC6845_NAME);
+		const device_config *devconf = devtag_get_device(space->machine, MDA_MC6845_NAME);
 		switch( offset )
 		{
 		case 0: case 2: case 4: case 6:
@@ -501,7 +501,7 @@ static READ8_HANDLER ( pc_aga_mda_r )
 static WRITE8_HANDLER ( pc_aga_mda_w )
 {
 	if ( aga.mode == AGA_MONO ) {
-		device_config   *devconf = (device_config *) devtag_get_device(space->machine, AGA_MC6845_NAME);
+		const device_config *devconf = devtag_get_device(space->machine, AGA_MC6845_NAME);
 		switch( offset )
 		{
 			case 0: case 2: case 4: case 6:
@@ -534,7 +534,7 @@ static READ8_HANDLER ( pc_aga_cga_r )
 	UINT8 data = 0xFF;
 
 	if ( aga.mode == AGA_COLOR ) {
-		device_config	*devconf = (device_config *) devtag_get_device(space->machine, AGA_MC6845_NAME);
+		const device_config *devconf = devtag_get_device(space->machine, AGA_MC6845_NAME);
 		switch( offset ) {
 		case 0: case 2: case 4: case 6:
 			/* return last written mc6845 address value here? */
@@ -580,7 +580,7 @@ static void pc_aga_set_palette_luts(void) {
 static WRITE8_HANDLER ( pc_aga_cga_w )
 {
 	if ( aga.mode == AGA_COLOR ) {
-		device_config	*devconf = (device_config *) devtag_get_device(space->machine, AGA_MC6845_NAME);
+		const device_config *devconf = devtag_get_device(space->machine, AGA_MC6845_NAME);
 
 		switch(offset) {
 		case 0: case 2: case 4: case 6:
@@ -661,7 +661,7 @@ static WRITE16_HANDLER ( pc16le_aga_cga_w ) { write16le_with_write8_handler(pc_a
 
 void pc_aga_set_mode(running_machine *machine, AGA_MODE mode)
 {
-	device_config	*devconf = (device_config *) devtag_get_device(machine, AGA_MC6845_NAME);
+	const device_config *devconf = devtag_get_device(machine, AGA_MC6845_NAME);
 
 	aga.mode = mode;
 

@@ -373,7 +373,7 @@ static INPUT_PORTS_START( trs80 )
 	PORT_BIT(0x80, 0x00, IPT_UNUSED)
 INPUT_PORTS_END
 
-INPUT_PORTS_START( trs80m3 )
+static INPUT_PORTS_START( trs80m3 )
 	PORT_INCLUDE (trs80)
 	PORT_START("E9")	// these are the power-on uart settings
 	PORT_BIT(0x07, IP_ACTIVE_LOW, IPT_UNUSED )

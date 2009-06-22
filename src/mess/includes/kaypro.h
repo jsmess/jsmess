@@ -7,9 +7,8 @@
 #include "devices/snapquik.h"
 
 
-/* machine.c */
+/*----------- defined in machine/kaypro.c -----------*/
 
-extern UINT8 kaypro2x_system_port;
 extern const z80pio_interface kayproii_pio_g_intf;
 extern const z80pio_interface kayproii_pio_s_intf;
 extern const z80sio_interface kaypro_sio_intf;
@@ -39,7 +38,8 @@ MACHINE_RESET( kaypro2x );
 QUICKLOAD_LOAD( kayproii );
 QUICKLOAD_LOAD( kaypro2x );
 
-/* video.c */
+/*----------- defined in video/kaypro.c -----------*/
+
 
 MC6845_UPDATE_ROW( kaypro2x_update_row );
 PALETTE_INIT( kaypro );

@@ -116,7 +116,7 @@ static ADDRESS_MAP_START(cat_mem, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x00860000, 0x00860001) AM_WRITE(cat_test_mode_w) // Test mode 	
 ADDRESS_MAP_END
 
-UINT16 *swyft_video_ram;
+static UINT16 *swyft_video_ram;
 
 static ADDRESS_MAP_START(swyft_mem, ADDRESS_SPACE_PROGRAM, 16)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -125,7 +125,7 @@ static ADDRESS_MAP_START(swyft_mem, ADDRESS_SPACE_PROGRAM, 16)
 ADDRESS_MAP_END
 
 /* Input ports */
-INPUT_PORTS_START( cat )
+static INPUT_PORTS_START( cat )
 	PORT_START("DIPSW1")
 		PORT_DIPNAME( 0x8000, 0x8000, "Mode" )
 		PORT_DIPSETTING(    0x8000, DEF_STR( Normal ) )
@@ -221,7 +221,7 @@ INPUT_PORTS_START( cat )
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("UNDO") PORT_CODE(KEYCODE_BACKSLASH)
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("+-") PORT_CODE(KEYCODE_TILDE)
 INPUT_PORTS_END
-INPUT_PORTS_START( swyft )
+static INPUT_PORTS_START( swyft )
 INPUT_PORTS_END
 
 
@@ -317,7 +317,7 @@ static void duart_tx(const device_config *device, int channel, UINT8 data)
 {
 }
 
-UINT8 duart_inp = 0x0e;
+static UINT8 duart_inp = 0x0e;
 
 static UINT8 duart_input(const device_config *device)
 {

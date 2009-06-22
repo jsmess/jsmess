@@ -132,12 +132,12 @@ MACHINE_RESET( special )
 
 READ8_HANDLER( specialist_keyboard_r )
 {	
-	return ppi8255_r((device_config*)devtag_get_device(space->machine, "ppi8255"), (offset & 3));
+	return ppi8255_r(devtag_get_device(space->machine, "ppi8255"), (offset & 3));
 }
 
 WRITE8_HANDLER( specialist_keyboard_w )
 {	
-	ppi8255_w((device_config*)devtag_get_device(space->machine, "ppi8255"), (offset & 3) , data );
+	ppi8255_w(devtag_get_device(space->machine, "ppi8255"), (offset & 3) , data );
 }
 
 
@@ -259,7 +259,7 @@ MACHINE_START( specimx )
 
 static TIMER_CALLBACK( setup_pit8253_gates ) 
 {
-	device_config *pit8253 = (device_config*)devtag_get_device(machine, "pit8253");
+	const device_config *pit8253 = devtag_get_device(machine, "pit8253");
 
 	pit8253_gate_w(pit8253, 0, 0);
 	pit8253_gate_w(pit8253, 1, 0);

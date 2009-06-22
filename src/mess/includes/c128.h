@@ -43,10 +43,6 @@ WRITE8_HANDLER(c128_write_ff00);
 WRITE8_HANDLER(c128_write_ff05);
 
 
-void c128_m6510_port_write(const device_config *device, UINT8 direction, UINT8 data);
-UINT8 c128_m6510_port_read(const device_config *device, UINT8 direction);
-
-
 extern DRIVER_INIT( c128 );
 extern DRIVER_INIT( c128pal );
 extern DRIVER_INIT( c128d );

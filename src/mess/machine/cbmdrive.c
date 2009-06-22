@@ -1623,7 +1623,7 @@ static void vc1541_atn_write( running_machine *machine, CBM_Drive * drive, int l
 	vc1541_state(machine, drive);
 }
 
-void drive_reset_write( CBM_Drive * drive, int level )
+static void drive_reset_write( CBM_Drive * drive, int level )
 {
 	if (level == 0)
 	{

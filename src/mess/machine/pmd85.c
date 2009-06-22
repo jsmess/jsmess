@@ -520,7 +520,7 @@ READ8_HANDLER ( pmd85_io_r )
 							switch (offset & 0x80)
 							{
 								case 0x80:	/* ROM module 8255 */
-										return ppi8255_r((device_config*)devtag_get_device(space->machine, "ppi8255_3"), offset & 0x03);
+										return ppi8255_r(devtag_get_device(space->machine, "ppi8255_3"), offset & 0x03);
 							}
 						}
 						break;
@@ -540,11 +540,11 @@ READ8_HANDLER ( pmd85_io_r )
 										}
 										break;
 								case 0x40:      /* 8255 (GPIO/0, GPIO/1) */
-										return ppi8255_r((device_config*)devtag_get_device(space->machine, "ppi8255_1"), offset & 0x03);
+										return ppi8255_r(devtag_get_device(space->machine, "ppi8255_1"), offset & 0x03);
 								case 0x50:	/* 8253 */
-										return pit8253_r( (device_config*)devtag_get_device(space->machine, "pit8253"), offset & 0x03);
+										return pit8253_r( devtag_get_device(space->machine, "pit8253"), offset & 0x03);
 								case 0x70:	/* 8255 (IMS-2) */
-										return ppi8255_r((device_config*)devtag_get_device(space->machine, "ppi8255_2"), offset & 0x03);
+										return ppi8255_r(devtag_get_device(space->machine, "ppi8255_2"), offset & 0x03);
 							}
 							break;
 					case 0x80:	/* external interfaces */
@@ -594,7 +594,7 @@ WRITE8_HANDLER ( pmd85_io_w )
 							switch (offset & 0x80)
 							{
 								case 0x80:	/* ROM module 8255 */
-										ppi8255_w((device_config*)devtag_get_device(space->machine, "ppi8255_3"), offset & 0x03, data);
+										ppi8255_w(devtag_get_device(space->machine, "ppi8255_3"), offset & 0x03, data);
 										break;
 							}
 						}
@@ -615,14 +615,14 @@ WRITE8_HANDLER ( pmd85_io_w )
 										}
 										break;
 								case 0x40:      /* 8255 (GPIO/0, GPIO/0) */
-										ppi8255_w((device_config*)devtag_get_device(space->machine, "ppi8255_1"), offset & 0x03, data);
+										ppi8255_w(devtag_get_device(space->machine, "ppi8255_1"), offset & 0x03, data);
 										break;
 								case 0x50:	/* 8253 */
-										pit8253_w((device_config*)devtag_get_device(space->machine, "pit8253"), offset & 0x03, data);
+										pit8253_w(devtag_get_device(space->machine, "pit8253"), offset & 0x03, data);
 										logerror ("8253 writing. Address: %02x, Data: %02x\n", offset, data);
 										break;
 								case 0x70:	/* 8255 (IMS-2) */
-										ppi8255_w((device_config*)devtag_get_device(space->machine, "ppi8255_2"), offset & 0x03, data);
+										ppi8255_w(devtag_get_device(space->machine, "ppi8255_2"), offset & 0x03, data);
 										break;
 							}
 							break;
@@ -656,7 +656,7 @@ WRITE8_HANDLER ( pmd85_io_w )
 				switch (offset & 0x80)
 				{
 					case 0x80:	/* Motherboard 8255 */
-							return ppi8255_r((device_config*)devtag_get_device(space->machine, "ppi8255_0"), offset & 0x03);
+							return ppi8255_r(devtag_get_device(space->machine, "ppi8255_0"), offset & 0x03);
 				}
 				break;
 	}
@@ -679,7 +679,7 @@ WRITE8_HANDLER ( mato_io_w )
 				switch (offset & 0x80)
 				{
 					case 0x80:	/* Motherboard 8255 */
-							ppi8255_w((device_config*)devtag_get_device(space->machine, "ppi8255_0"), offset & 0x03, data);
+							ppi8255_w(devtag_get_device(space->machine, "ppi8255_0"), offset & 0x03, data);
 							break;
 				}
 				break;
@@ -901,7 +901,7 @@ DRIVER_INIT ( c2717 )
 
 static TIMER_CALLBACK( setup_machine_state ) 
 {
-	device_config *pit8253 = (device_config*)devtag_get_device(machine, "pit8253");
+	const device_config *pit8253 = devtag_get_device(machine, "pit8253");
 
 	pit8253_gate_w(pit8253, 0, 1);
 	pit8253_gate_w(pit8253, 1, 1);

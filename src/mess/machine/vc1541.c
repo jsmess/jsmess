@@ -1755,7 +1755,7 @@ void c1551_drive_reset (void)
 /* Floppy loading clean-up, part 1: with cbm_floppy_image_loading we can finally split c1551 from vc1541
    Both struct have a GCR_data gcr component where we store the floppy data, but remaining parts are finally separated!
    Later, everything should be changed to use devices for the drives...      */
-void cbm_floppy_image_loading( int format, int id1, int id2, UINT8 *copy, GCR_data gcr )
+static void cbm_floppy_image_loading( int format, int id1, int id2, UINT8 *copy, GCR_data gcr )
 {
 	UINT8 sector_checksum;
 	int i = 0, j, k, l, pos;

@@ -306,14 +306,14 @@ static DIRECT_UPDATE_HANDLER( reset_delay_count )
 	return address;
 }
 
-void reset_lx388(running_machine *machine)
+static void reset_lx388(running_machine *machine)
 {
 	lx388_kr2376 = devtag_get_device(machine, "lx388_kr2376");
 	kr2376_set_input_pin( lx388_kr2376, KR2376_DSII, 0);
 	kr2376_set_input_pin( lx388_kr2376, KR2376_PII, 0);
 }
 
-void reset_lx382_banking(running_machine *machine)
+static void reset_lx382_banking(running_machine *machine)
 {
 	const address_space *space = cputag_get_address_space(machine, "z80ne", ADDRESS_SPACE_PROGRAM);
 
@@ -326,7 +326,7 @@ void reset_lx382_banking(running_machine *machine)
 	memory_set_direct_update_handler(space, reset_delay_count);
 }
 
-void reset_lx390_banking(running_machine *machine)
+static void reset_lx390_banking(running_machine *machine)
 {
 	const address_space *space = cputag_get_address_space(machine, "z80ne", ADDRESS_SPACE_PROGRAM);
 	reset_delay_counter = 0;
@@ -386,7 +386,7 @@ void reset_lx390_banking(running_machine *machine)
      */
 }
 
-MACHINE_RESET(z80ne_base)
+static MACHINE_RESET(z80ne_base)
 {
 	int i;
 	const address_space *space = cputag_get_address_space(machine, "z80ne", ADDRESS_SPACE_PROGRAM);

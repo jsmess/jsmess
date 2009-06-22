@@ -391,7 +391,7 @@ static void mc6843_cont_SW( const device_config *device )
 /* bottom halves, called to continue / finish a command after some delay */
 static TIMER_CALLBACK( mc6843_cont )
 {
-	device_config* device = (device_config*) ptr;
+	const device_config* device = (const device_config*) ptr;
 	mc6843_t* mc6843 = get_safe_token( device );
 	int cmd = mc6843->CMR & 0x0f;
 

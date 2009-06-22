@@ -29,6 +29,8 @@
 
 VIDEO_START(lx388);
 
+/*----------- defined in machine/z80ne.c -----------*/
+
 READ8_HANDLER(lx383_r);
 WRITE8_HANDLER(lx383_w);
 READ8_HANDLER(lx385_data_r);

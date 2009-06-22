@@ -329,7 +329,7 @@ READ16_HANDLER(concept_io_r)
 		/* calendar R/W */
 		VLOG(("concept_io_r: Calendar read at address 0x03%4.4x\n", offset << 1));
 		if (!clock_enable)
-			return mm58274c_r((device_config*)devtag_get_device(space->machine, "mm58274c"), clock_address);
+			return mm58274c_r(devtag_get_device(space->machine, "mm58274c"), clock_address);
 		break;
 
 	case 7:
@@ -471,7 +471,7 @@ WRITE16_HANDLER(concept_io_w)
 		/* calendar R/W */
 		LOG(("concept_io_w: Calendar written to at address 0x03%4.4x, data: 0x%4.4x\n", offset << 1, data));
 		if (!clock_enable)
-			mm58274c_w((device_config*)devtag_get_device(space->machine, "mm58274c"), clock_address, data & 0xf);
+			mm58274c_w(devtag_get_device(space->machine, "mm58274c"), clock_address, data & 0xf);
 		break;
 
 	case 7:

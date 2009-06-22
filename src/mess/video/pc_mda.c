@@ -365,7 +365,7 @@ static int pc_mda_status_r(void)
  *************************************************************************/
 WRITE8_HANDLER ( pc_MDA_w )
 {
-	device_config   *devconf = (device_config *) devtag_get_device(space->machine, MDA_MC6845_NAME);
+	const device_config *devconf = devtag_get_device(space->machine, MDA_MC6845_NAME);
 	switch( offset )
 	{
 		case 0: case 2: case 4: case 6:
@@ -382,7 +382,7 @@ WRITE8_HANDLER ( pc_MDA_w )
 
  READ8_HANDLER ( pc_MDA_r )
 {
-	device_config   *devconf = (device_config *) devtag_get_device(space->machine, MDA_MC6845_NAME);
+	const device_config *devconf = devtag_get_device(space->machine, MDA_MC6845_NAME);
 	int data = 0xff;
 	switch( offset )
 	{
@@ -532,7 +532,7 @@ static VIDEO_UPDATE( mc6845_hercules )
 
 static void hercules_mode_control_w(running_machine *machine, int data)
 {
-	device_config	*devconf = (device_config *) devtag_get_device(machine, HERCULES_MC6845_NAME);
+	const device_config *devconf = devtag_get_device(machine, HERCULES_MC6845_NAME);
 
 	MDA_LOG(1,"hercules_mode_control_w",("$%02x: colums %d, gfx %d, enable %d, blink %d\n",
 		data, (data&1)?80:40, (data>>1)&1, (data>>3)&1, (data>>5)&1));
@@ -568,7 +568,7 @@ static void hercules_config_w(running_machine *machine, int data)
 
 static WRITE8_HANDLER ( pc_hercules_w )
 {
-	device_config   *devconf = (device_config *) devtag_get_device(space->machine, HERCULES_MC6845_NAME);
+	const device_config *devconf = devtag_get_device(space->machine, HERCULES_MC6845_NAME);
 
 	switch( offset )
 	{
@@ -608,7 +608,7 @@ static int pc_hercules_status_r(void)
 
 static READ8_HANDLER ( pc_hercules_r )
 {
-	device_config	*devconf = (device_config *) devtag_get_device(space->machine, HERCULES_MC6845_NAME);
+	const device_config *devconf = devtag_get_device(space->machine, HERCULES_MC6845_NAME);
 	int data = 0xff;
 
 	switch( offset )

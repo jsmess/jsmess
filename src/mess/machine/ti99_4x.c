@@ -226,7 +226,7 @@ GPL ports:
 */
 
 /* descriptor for console GROMs */
-GROM_port_t console_GROMs;
+static GROM_port_t console_GROMs;
 
 /* true if hsgpl is enabled (i.e. has_hsgpl is true and hsgpl cru bit crdena is
 set) */
@@ -258,7 +258,7 @@ static UINT8 *sRAM_ptr_8;
 /* NPW 23-Feb-2004 - externs no longer needed because we now use cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),) */
 
 /* Link to the cartridge system. */
-const device_config *cartslots;
+static const device_config *cartslots;
 
 /*===========================================================================*/
 /*
@@ -1084,7 +1084,7 @@ WRITE16_HANDLER ( ti99_grom_w )
 	GROM read for TI-99/8
 	For comments, see the handler for TI-99/4A
 */
-READ8_HANDLER ( ti99_grom_r8 )
+static READ8_HANDLER ( ti99_grom_r8 )
 {
 	UINT8 reply;
 
@@ -1119,7 +1119,7 @@ READ8_HANDLER ( ti99_grom_r8 )
 	GROM write for TI-99/8
 	For comments, see the handler for TI-99/4A
 */
-WRITE8_HANDLER ( ti99_grom_w8 )
+static WRITE8_HANDLER ( ti99_grom_w8 )
 {
 	cpu_adjust_icount(space->machine->cpu[0],-4/*20+3*/);		/* from 4 to 23? */
 

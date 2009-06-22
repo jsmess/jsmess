@@ -60,6 +60,8 @@ Source Changes:
 
 - Added natural keyboard support to KR2376.  [Roberto Lavarone]
 
+- Static/const/include improvements.  [Atari Ace]
+
 
 
 0.132

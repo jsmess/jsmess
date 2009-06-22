@@ -480,7 +480,7 @@ static void mea8000_stop_frame( running_machine *machine, mea8000_t* mea8000 )
 /* next sample in frame, sampling at 64 kHz */
 static TIMER_CALLBACK( mea8000_timer_expire )
 {
-	device_config* device = (device_config*) ptr;
+	const device_config* device = (const device_config*) ptr;
 	mea8000_t* mea8000 = get_safe_token( device );
 	int pos = mea8000->framepos % SUPERSAMPLING;
 

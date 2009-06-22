@@ -166,7 +166,7 @@ typedef struct
     UINT8 res20[57];
 } avr8_regs;
 
-avr8_regs regs;
+static avr8_regs regs;
 
 static READ8_HANDLER( avr8_read )
 {

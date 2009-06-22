@@ -184,7 +184,7 @@ WRITE8_HANDLER ( tandy1000_pio_w )
 	switch (offset) {
 	case 1:
 		tandy_ppi.portb = data;
-		pit8253_gate_w( (device_config*)devtag_get_device(space->machine, "pit8253"), 2, data & 1);
+		pit8253_gate_w( devtag_get_device(space->machine, "pit8253"), 2, data & 1);
 		pc_speaker_set_spkrdata( space->machine, data & 0x02 );
 		pc_keyb_set_clock(data&0x40);
 		if ( data & 0x80 ) {

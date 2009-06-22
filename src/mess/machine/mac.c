@@ -1324,7 +1324,7 @@ static int adb_keybaddr = 2;
 static int adb_keybinitialized, adb_keyb_wanted_srq;
 
 #if LOG_ADB
-static const char *adb_statenames[4] = { "NEW", "EVEN", "ODD", "IDLE" };
+static const char *const adb_statenames[4] = { "NEW", "EVEN", "ODD", "IDLE" };
 #endif
 
 static void mac_adb_pollmouse(running_machine *machine)

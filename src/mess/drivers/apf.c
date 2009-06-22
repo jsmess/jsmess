@@ -351,27 +351,27 @@ static WRITE8_HANDLER(serial_w)
 
 static WRITE8_HANDLER(apf_wd179x_command_w)
 {	
-	wd17xx_command_w((device_config*)devtag_get_device(space->machine, "wd179x"), offset,~data);
+	wd17xx_command_w(devtag_get_device(space->machine, "wd179x"), offset,~data);
 }
 
 static WRITE8_HANDLER(apf_wd179x_track_w)
 {
-	wd17xx_track_w((device_config*)devtag_get_device(space->machine, "wd179x"), offset,~data);
+	wd17xx_track_w(devtag_get_device(space->machine, "wd179x"), offset,~data);
 }
 
 static WRITE8_HANDLER(apf_wd179x_sector_w)
 {
-	wd17xx_sector_w((device_config*)devtag_get_device(space->machine, "wd179x"), offset,~data);
+	wd17xx_sector_w(devtag_get_device(space->machine, "wd179x"), offset,~data);
 }
 
 static WRITE8_HANDLER(apf_wd179x_data_w)
 {
-	wd17xx_data_w((device_config*)devtag_get_device(space->machine, "wd179x"), offset,~data);
+	wd17xx_data_w(devtag_get_device(space->machine, "wd179x"), offset,~data);
 }
 
 static READ8_HANDLER(apf_wd179x_status_r)
 {
-	return ~wd17xx_status_r((device_config*)devtag_get_device(space->machine, "wd179x"), offset);
+	return ~wd17xx_status_r(devtag_get_device(space->machine, "wd179x"), offset);
 }
 
 static READ8_HANDLER(apf_wd179x_track_r)

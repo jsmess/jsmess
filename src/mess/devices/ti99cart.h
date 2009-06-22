@@ -90,9 +90,7 @@ DEVICE_GET_INFO(ti99_multicart);
 
 /* cartridge PCB types */
 DEVICE_GET_INFO(ti99_cartridge_pcb_std);
-DEVICE_GET_INFO(ti99_cartridge_pcb_exbas);
 DEVICE_GET_INFO(ti99_cartridge_pcb_minimem);
-DEVICE_GET_INFO(ti99_cartridge_pcb_supersp);
 DEVICE_GET_INFO(ti99_cartridge_pcb_mbx);
 
 READ16_DEVICE_HANDLER(ti99_multicart_r);

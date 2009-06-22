@@ -10,8 +10,8 @@
 #include "includes/z1013.h"
 #include "cpu/z80/z80.h"
 
-UINT8 z1013_keyboard_line;
-UINT8 z1013_keyboard_part;
+static UINT8 z1013_keyboard_line;
+static UINT8 z1013_keyboard_part;
 
 /* Wires on Z80 PIO are switched */
 READ8_DEVICE_HANDLER(z1013_z80pio_r)

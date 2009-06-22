@@ -69,7 +69,4 @@ WRITE8_DEVICE_HANDLER( upd7220_dack_w );
 /* light pen strobe */
 void upd7220_lpen_w(const device_config *device, int state);
 
-/* screen update */
-void upd7220_update(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect);
-
 #endif

@@ -139,6 +139,8 @@ struct _mc68328_interface
     MDRV_DEVICE_ADD("dragonball", MC68328, 0) \
     MDRV_DEVICE_CONFIG(_intrf)
 
+/*----------- defined in machine/mc68328.c -----------*/
+
 /***************************************************************************
     READ/WRITE HANDLERS
 ***************************************************************************/
@@ -153,7 +155,6 @@ READ16_DEVICE_HANDLER(  mc68328_r );
 
 void mc68328_set_penirq_line(const device_config *device, int state);
 void mc68328_set_port_d_lines(const device_config *device, UINT8 state, int bit);
-INPUT_CHANGED( mc68328_port_d_input );
 
 /***************************************************************************
     DEVICE INTERFACE
@@ -161,6 +162,8 @@ INPUT_CHANGED( mc68328_port_d_input );
 
 #define MC68328 DEVICE_GET_INFO_NAME(mc68328)
 DEVICE_GET_INFO( mc68328 );
+
+/*----------- defined in video/mc68328.c -----------*/
 
 /***************************************************************************
     VIDEO INTERFACE

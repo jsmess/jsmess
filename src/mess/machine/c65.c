@@ -125,7 +125,7 @@ static void c65_cia0_interrupt (const device_config *device, int level)
 }
 
 /* is this correct for c65 as well as c64? */
-void c65_vic_interrupt (running_machine *machine, int level)
+static void c65_vic_interrupt (running_machine *machine, int level)
 {
 	const device_config *cia_0 = devtag_get_device(machine, "cia_0");
 #if 1

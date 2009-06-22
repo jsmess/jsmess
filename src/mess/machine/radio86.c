@@ -143,7 +143,7 @@ READ8_DEVICE_HANDLER(radio86_dma_read_byte)
 
 WRITE8_DEVICE_HANDLER(radio86_write_video)
 {
-	i8275_dack_set_data((device_config*)devtag_get_device(device->machine, "i8275"),data);
+	i8275_dack_set_data(devtag_get_device(device->machine, "i8275"),data);
 }
 
 const dma8257_interface radio86_dma =

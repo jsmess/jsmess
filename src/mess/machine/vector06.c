@@ -124,20 +124,20 @@ const ppi8255_interface vector06_ppi8255_interface =
 };
 
 READ8_HANDLER(vector_8255_1_r) {
-	return ppi8255_r((device_config*)devtag_get_device(space->machine, "ppi8255"), (offset ^ 0x03));
+	return ppi8255_r(devtag_get_device(space->machine, "ppi8255"), (offset ^ 0x03));
 }
 
 WRITE8_HANDLER(vector_8255_1_w) {
-	ppi8255_w((device_config*)devtag_get_device(space->machine, "ppi8255"), (offset ^0x03) , data );
+	ppi8255_w(devtag_get_device(space->machine, "ppi8255"), (offset ^0x03) , data );
 
 }
 
 READ8_HANDLER(vector_8255_2_r) {
-	return ppi8255_r((device_config*)devtag_get_device(space->machine, "ppi8255_2"), (offset ^ 0x03));
+	return ppi8255_r(devtag_get_device(space->machine, "ppi8255_2"), (offset ^ 0x03));
 }
 
 WRITE8_HANDLER(vector_8255_2_w) {
-	ppi8255_w((device_config*)devtag_get_device(space->machine, "ppi8255_2"), (offset ^0x03) , data );
+	ppi8255_w(devtag_get_device(space->machine, "ppi8255_2"), (offset ^0x03) , data );
 
 }
 

@@ -174,7 +174,7 @@ static READ8_HANDLER( apple3_c0xx_r )
 				apple3_flags |= VAR_EXTA0 << ((offset - 0xD0) / 2);
 			else
 				apple3_flags &= ~(VAR_EXTA0 << ((offset - 0xD0) / 2));
-			apple3_update_drives((device_config*)devtag_get_device(space->machine, "fdc"));
+			apple3_update_drives(devtag_get_device(space->machine, "fdc"));
 			result = 0x00;
 			break;
 
@@ -238,7 +238,7 @@ static WRITE8_HANDLER( apple3_c0xx_w )
 				apple3_flags |= VAR_EXTA0 << ((offset - 0xD0) / 2);
 			else
 				apple3_flags &= ~(VAR_EXTA0 << ((offset - 0xD0) / 2));
-			apple3_update_drives((device_config*)devtag_get_device(space->machine, "fdc"));
+			apple3_update_drives(devtag_get_device(space->machine, "fdc"));
 			break;
 
 		case 0xDB:

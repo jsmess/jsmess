@@ -11,7 +11,7 @@
 #include "mmd1.lh"
 #include "mmd2.lh"
 
-WRITE8_HANDLER (mmd1_port0_w)
+static WRITE8_HANDLER (mmd1_port0_w)
 {
 	output_set_value("p0_7", BIT(data,7) ? 0 : 1);
 	output_set_value("p0_6", BIT(data,6) ? 0 : 1);
@@ -23,7 +23,7 @@ WRITE8_HANDLER (mmd1_port0_w)
 	output_set_value("p0_0", BIT(data,0) ? 0 : 1);
 }
 
-WRITE8_HANDLER (mmd1_port1_w)
+static WRITE8_HANDLER (mmd1_port1_w)
 {
 	output_set_value("p1_7", BIT(data,7) ? 0 : 1);
 	output_set_value("p1_6", BIT(data,6) ? 0 : 1);
@@ -35,7 +35,7 @@ WRITE8_HANDLER (mmd1_port1_w)
 	output_set_value("p1_0", BIT(data,0) ? 0 : 1);
 }
 
-WRITE8_HANDLER (mmd1_port2_w)
+static WRITE8_HANDLER (mmd1_port2_w)
 {
 	output_set_value("p2_7", BIT(data,7) ? 0 : 1);
 	output_set_value("p2_6", BIT(data,6) ? 0 : 1);
@@ -47,7 +47,7 @@ WRITE8_HANDLER (mmd1_port2_w)
 	output_set_value("p2_0", BIT(data,0) ? 0 : 1);
 }
 
-READ8_HANDLER (mmd1_keyboard_r)
+static READ8_HANDLER (mmd1_keyboard_r)
 {
 	UINT8 line1 = input_port_read(space->machine,"LINE1");
 	UINT8 line2 = input_port_read(space->machine,"LINE2");
@@ -107,7 +107,7 @@ ADDRESS_MAP_END
 
 
 /* Input ports */
-INPUT_PORTS_START( mmd1 )
+static INPUT_PORTS_START( mmd1 )
 	PORT_START("LINE1")
 			PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0") PORT_CODE(KEYCODE_0)
 			PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1)
@@ -131,7 +131,7 @@ INPUT_PORTS_START( mmd1 )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( mmd2 )
+static INPUT_PORTS_START( mmd2 )
 /*
 DIP switches: 
 WE 0      - Write enable for addresses $0000..$03FF 

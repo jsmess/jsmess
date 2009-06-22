@@ -96,7 +96,7 @@ const struct SupportedCassetteFormats formats[] = {
 };  
 
 
-const char *get_extension(const char *name)
+static const char *get_extension(const char *name)
 {
 	const char *s;
 	s = name;
@@ -105,13 +105,13 @@ const char *get_extension(const char *name)
 	return s ? s+1 : NULL;
 }
 
-void display_usage(void)
+static void display_usage(void)
 {
 	fprintf(stderr, "Usage: \n");
 	fprintf(stderr, "		castool.exe convert <format> <inputfile> <outputfile.wav>\n");
 }
 
-void display_formats(void)
+static void display_formats(void)
 {
 	int i,j;
 	fprintf(stderr, "Supported formats:\n\n");

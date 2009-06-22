@@ -155,7 +155,7 @@ WRITE8_DEVICE_HANDLER( vt_video_brightness_w )
 	//palette_set_color_rgb(device->machine, 1, data, data, data);
 }
 
-void vt_video_display_char(const device_config *device,bitmap_t *bitmap, UINT8 code, 
+static void vt_video_display_char(const device_config *device,bitmap_t *bitmap, UINT8 code, 
 	int x, int y,UINT8 scroll_region,UINT8 display_type) 
 {					
 	UINT8 line=0;

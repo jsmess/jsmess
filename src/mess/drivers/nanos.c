@@ -130,7 +130,7 @@ static WRITE8_DEVICE_HANDLER (nanos_port_b_w)
 	}
 }
 
-const z80pio_interface nanos_z80pio_intf =
+static const z80pio_interface nanos_z80pio_intf =
 {
 	DEVCB_NULL,	/* callback when change interrupt status */
 	DEVCB_HANDLER(nanos_port_a_r),
