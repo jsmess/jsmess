@@ -33,6 +33,42 @@ Notes:
 
 */
 
+/*
+
+COMX-35 80-Column Card
+
+PCB Layout
+----------
+
+	|---------------|
+	|      CN1      |
+|---|				|---------------------------|
+|												|
+|  MC14174	LS86	LS175	LS10	LS161		|
+|									14.31818MHz	|
+|							LS245	LS04		|
+|	ROM1		6845						CN2	|
+|							LS374	LS165		|
+|LD1 LS138	LS157	LS157						|
+|LD2						6116	  ROM2   SW1|
+|	 LS126	LS32	LS157						|
+|-----------------------------------------------|
+
+Notes:
+    All IC's shown.
+
+	6845	- Motorola MC6845P CRT Controller
+	6116	- Motorola MCM6116P15 2Kx8 Asynchronous CMOS Static RAM
+    ROM1    - Mitsubishi 2Kx8 EPROM "C"
+    ROM2    - Mitsubishi 2Kx8 EPROM "P"
+    CN1		- COMX-35 bus PCB edge connector
+	CN2		- RCA video output connector
+    LD1		- LED
+    LD2		- LED
+	SW1		- switch
+
+*/
+
 #include "driver.h"
 #include "cpu/cdp1802/cdp1802.h"
 #include "machine/wd17xx.h"

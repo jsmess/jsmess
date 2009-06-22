@@ -445,10 +445,10 @@ ROM_START( comx35p )
 	ROM_LOAD( "thermal.bin",			0x0000, 0x1000, CRC(41a72ba8) SHA1(3a8760c78bd8c7bec2dbf26657b930c9a6814803) )
 
 	ROM_REGION( 0x2000, "80column", 0 )
-	ROM_LOAD( "80column.u3",			0x0000, 0x0800, CRC(b417d30a) SHA1(d428b0467945ecb9aec884211d0f4b1d8d56d738) )
+	ROM_LOAD( "p.cl1",					0x0000, 0x0800, CRC(b417d30a) SHA1(d428b0467945ecb9aec884211d0f4b1d8d56d738) )
 
 	ROM_REGION( 0x800, "chargen", 0 )
-	ROM_LOAD( "chargen.bin",			0x0000, 0x0800, CRC(69dd7b07) SHA1(71d368adbb299103d165eab8359a97769e463e26) )
+	ROM_LOAD( "c.cl4",					0x0000, 0x0800, CRC(69dd7b07) SHA1(71d368adbb299103d165eab8359a97769e463e26) )
 ROM_END
 
 #define rom_comx35n rom_comx35p
