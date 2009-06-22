@@ -18,6 +18,11 @@
 #define IRQ_FLAG_RXRDY    0x40
 #define IRQ_FLAG_SYNDET   0x80
 
+// system types
+#define SYS_FM7        1
+#define SYS_FM77AV     2
+#define SYS_FM77AV40EX 3
+
 struct fm7_video_flags
 {
 	UINT8 sub_busy;
@@ -27,6 +32,7 @@ struct fm7_video_flags
 	UINT8 crt_enable;
 	UINT16 vram_offset;
 	UINT8 fm7_pal[8];
+	UINT8 subrom;  // currently active sub CPU ROM (AV only)
 };
 
 READ8_HANDLER( fm7_subintf_r );
@@ -44,6 +50,7 @@ WRITE8_HANDLER( fm7_vram_w );
 READ8_HANDLER( fm7_crt_r );
 WRITE8_HANDLER( fm7_crt_w );
 WRITE8_HANDLER( fm7_vram_offset_w );
+READ8_HANDLER( fm77av_video_flags_r );
 
 READ8_HANDLER( fm7_palette_r );
 WRITE8_HANDLER( fm7_palette_w );

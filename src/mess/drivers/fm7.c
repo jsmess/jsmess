@@ -28,6 +28,7 @@
 
 	Known issues:
 	 - Beeper is not implemented
+	 - Keyboard repeat is not implemented
 	 - Optional Kanji ROM use is not implemented
 	 - Other optional hardware is not implemented (RS232, Z80 card...)
 	 - FM-77AV and later aren't working (extra features not yet implemented)
@@ -37,6 +38,7 @@
 #include "driver.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/ay8910.h"
+#include "sound/2203intf.h"
 #include "sound/wave.h"
 
 #include "devices/cassette.h"
@@ -56,6 +58,7 @@ emu_timer* fm7_timer;  // main timer, triggered every 2.0345ms
 emu_timer* fm7_subtimer;  // sub-CPU timer, triggered every 20ms
 emu_timer* fm7_keyboard_timer;
 static UINT8 basic_rom_en;
+static UINT8 init_rom_en;  // AV only
 unsigned int key_delay;
 unsigned int key_repeat;
 static UINT16 current_scancode;
@@ -67,6 +70,16 @@ static UINT8 fdc_side;
 static UINT8 fdc_drive;
 static UINT8 fdc_irq_flag;
 static UINT8 fdc_drq_flag;
+static UINT8 fm7_type;
+
+struct mmr
+{
+	UINT8 bank_addr[8][16];
+	UINT8 segment;
+	UINT8 window_offset;
+	UINT8 enabled;
+	UINT8 mode;
+} fm7_mmr;
 
 extern struct fm7_video_flags fm7_video;
 
@@ -267,7 +280,8 @@ READ8_HANDLER( fm7_rom_en_r )
 	UINT8* RAM = memory_region(space->machine,"maincpu");
 	
 	basic_rom_en = 1;
-	memory_set_bankptr(space->machine,1,RAM+0x38000);
+	if(fm7_type == SYS_FM7)
+		memory_set_bankptr(space->machine,1,RAM+0x38000);
 	logerror("BASIC ROM enabled\n");
 	return 0x00;
 }
@@ -277,7 +291,8 @@ WRITE8_HANDLER( fm7_rom_en_w )
 	UINT8* RAM = memory_region(space->machine,"maincpu");
 	
 	basic_rom_en = 0;
-	memory_set_bankptr(space->machine,1,RAM+0x8000);
+	if(fm7_type == SYS_FM7)
+		memory_set_bankptr(space->machine,1,RAM+0x8000);
 	logerror("BASIC ROM disabled\n");
 }
 
@@ -502,6 +517,20 @@ WRITE8_HANDLER( fm7_cassette_printer_w )
 }
 
 /*
+ *  Main CPU: 0xfd0b
+ *   - bit 0: Boot mode: 0=BASIC, 1=DOS 
+ */
+READ8_HANDLER( fm77av_boot_mode_r )
+{
+	UINT8 ret = 0xff;
+	
+	if(input_port_read(space->machine,"DSW") & 0x02)
+		ret &= ~0x01;
+	
+	return 0xff;
+}
+
+/*
  *  Main CPU: I/O ports 0xfd0d-0xfd0e
  *  PSG (AY-3-891x)
  *  0xfd0d - function select (bit 1 = BDIR, bit 0 = BC1)
@@ -512,23 +541,47 @@ static void fm7_update_psg(running_machine* machine)
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
-	switch(fm7_psg_regsel)
+	if(fm7_type == SYS_FM7)
 	{
-		case 0x00:
-			// High impedance
-			break;
-		case 0x01:
-			// Data read
-			psg_data = ay8910_r(devtag_get_device(space->machine,"psg"),0);
-			break;
-		case 0x02:
-			// Data write
-			ay8910_data_w(devtag_get_device(space->machine,"psg"),0,psg_data);
-			break;
-		case 0x03:
-			// Address latch
-			ay8910_address_w(devtag_get_device(space->machine,"psg"),0,psg_data);
-			break;
+		switch(fm7_psg_regsel)
+		{
+			case 0x00:
+				// High impedance
+				break;
+			case 0x01:
+				// Data read
+				psg_data = ay8910_r(devtag_get_device(space->machine,"psg"),0);
+				break;
+			case 0x02:
+				// Data write
+				ay8910_data_w(devtag_get_device(space->machine,"psg"),0,psg_data);
+				break;
+			case 0x03:
+				// Address latch
+				ay8910_address_w(devtag_get_device(space->machine,"psg"),0,psg_data);
+				break;
+		}
+	}
+	else
+	{	// FM-77AV and later use a YM2203
+		switch(fm7_psg_regsel)
+		{
+			case 0x00:
+				// High impedance
+				break;
+			case 0x01:
+				// Data read
+				psg_data = ym2203_r(devtag_get_device(space->machine,"ym"),0);
+				break;
+			case 0x02:
+				// Data write
+				ym2203_w(devtag_get_device(space->machine,"ym"),1,psg_data);
+				break;
+			case 0x03:
+				// Address latch
+				ym2203_w(devtag_get_device(space->machine,"ym"),0,psg_data);
+				break;
+		}
 	}
 }
 
@@ -578,6 +631,108 @@ static READ8_HANDLER( fm7_unknown_r )
 	// but on the FM-7, this is nothing, so we return 0xff for it to
 	// read the keyboard correctly.
 	return 0xff;
+}
+
+/*
+ * Memory Management Register
+ * Main CPU: 0xfd80 - 0xfd93  (FM-77L4, FM-77AV and later only)
+ * 
+ * fd80-fd8f (R/W): RAM bank select for current segment (A19-A12)
+ * fd90 (W/O): segment select register (3-bit, default = 0)
+ * fd92 (W/O): window offset register (OA15-OA8)
+ * fd93 (R/W): mode select register
+ * 				- bit 7: MMR enable/disable
+ * 				- bit 6: window enable/disable
+ * 				- bit 0: boot RAM read-write/read-only 
+ * 
+ */
+static READ8_HANDLER( fm7_mmr_r )
+{
+	if(offset < 0x10)
+	{
+		return fm7_mmr.bank_addr[fm7_mmr.segment][offset];
+	}
+	if(offset == 0x13)
+		return fm7_mmr.mode;
+	return 0xff;
+}
+
+static void fm7_update_bank(running_machine* machine, int bank, UINT8 physical)
+{
+	UINT8* RAM = memory_region(machine,"maincpu");
+	
+	if(physical > 0x10 && physical <= 0x1f)
+	{
+		RAM = memory_region(machine,"sub");
+		memory_set_bankptr(machine,bank+1,RAM+(physical<<12)-0x10000);
+	}
+	if(physical == 0x36 || physical == 0x37)
+	{
+		if(init_rom_en)
+		{
+			RAM = memory_region(machine,"init");
+			memory_set_bankptr(machine,bank+1,RAM+(physical<<12)-0x36000);
+			return;
+		}
+	}
+	if(physical > 0x37 && physical <= 0x3f)
+	{
+		if(basic_rom_en)
+		{
+			RAM = memory_region(machine,"fbasic");
+			memory_set_bankptr(machine,bank+1,RAM+(physical<<12)-0x38000);
+			return;
+		}
+	}
+	
+	memory_set_bankptr(machine,bank+1,RAM+(physical<<12));
+}
+
+static void fm7_mmr_refresh(running_machine* machine)
+{
+	int x;
+	
+	if(fm7_mmr.enabled)
+	{
+		for(x=0;x<16;x++)
+			fm7_update_bank(machine,x,fm7_mmr.bank_addr[fm7_mmr.segment][x]);
+	}
+	else
+	{
+		// when MMR is disabled, 0x30000-0x3ffff is banked in
+		for(x=0;x<16;x++)
+			fm7_update_bank(machine,x,0x30+x);
+	}
+}
+
+static WRITE8_HANDLER( fm7_mmr_w )
+{
+	if(offset < 0x10)
+	{
+		fm7_mmr.bank_addr[fm7_mmr.segment][offset] = data;
+		if(fm7_mmr.enabled)
+			fm7_update_bank(space->machine,offset,data);
+		logerror("MMR: Segment %i set to bank 0x%02x\n",fm7_mmr.segment,data);
+		return;
+	}
+	switch(offset)
+	{
+		case 0x10:
+			fm7_mmr.segment = data & 0x07;
+			fm7_mmr_refresh(space->machine);
+			logerror("MMR: Active segment set to %i\n",fm7_mmr.segment);
+			break;
+		case 0x12:
+			fm7_mmr.window_offset = data;
+			logerror("MMR: Window offset set to %02x\n",data);
+			break;
+		case 0x13:
+			fm7_mmr.mode = data;
+			fm7_mmr.enabled = data & 0x80;
+			fm7_mmr_refresh(space->machine);
+			logerror("MMR: Mode register set to %02x\n",data);
+			break;
+	}
 }
 
 static TIMER_CALLBACK( fm7_timer_irq )
@@ -703,7 +858,7 @@ static ADDRESS_MAP_START( fm7_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfd38,0xfd3f) AM_READWRITE(fm7_palette_r,fm7_palette_w)
 	AM_RANGE(0xfd40,0xfdff) AM_READ(fm7_unknown_r)
 	// Boot ROM
-	AM_RANGE(0xfe00,0xffdf) AM_ROMBANK(2)
+	AM_RANGE(0xfe00,0xffdf) AM_ROMBANK(17)
 	AM_RANGE(0xffe0,0xffef) AM_RAM
 	AM_RANGE(0xfff0,0xffff) AM_READWRITE(vector_r,vector_w) 
 ADDRESS_MAP_END
@@ -736,8 +891,22 @@ static ADDRESS_MAP_START( fm7_sub_mem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fm77av_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000,0x7fff) AM_RAM 
-	AM_RANGE(0x8000,0xfbff) AM_RAMBANK(1) // also F-BASIC ROM, when enabled
+	AM_RANGE(0x0000,0x0fff) AM_RAMBANK(1)
+	AM_RANGE(0x1000,0x1fff) AM_RAMBANK(2)
+	AM_RANGE(0x2000,0x2fff) AM_RAMBANK(3)
+	AM_RANGE(0x3000,0x3fff) AM_RAMBANK(4)
+	AM_RANGE(0x4000,0x4fff) AM_RAMBANK(5)
+	AM_RANGE(0x5000,0x5fff) AM_RAMBANK(6)
+	AM_RANGE(0x6000,0x6fff) AM_RAMBANK(7)
+	AM_RANGE(0x7000,0x7fff) AM_RAMBANK(8)
+	AM_RANGE(0x8000,0x8fff) AM_RAMBANK(9)
+	AM_RANGE(0x9000,0x9fff) AM_RAMBANK(10)
+	AM_RANGE(0xa000,0xafff) AM_RAMBANK(11)
+	AM_RANGE(0xb000,0xbfff) AM_RAMBANK(12)
+	AM_RANGE(0xc000,0xcfff) AM_RAMBANK(13)
+	AM_RANGE(0xd000,0xdfff) AM_RAMBANK(14)
+	AM_RANGE(0xe000,0xefff) AM_RAMBANK(15)
+	AM_RANGE(0xf000,0xfbff) AM_RAMBANK(16) 
 	AM_RANGE(0xfc00,0xfc7f) AM_RAM
 	AM_RANGE(0xfc80,0xfcff) AM_RAM AM_READWRITE(fm7_main_shared_r,fm7_main_shared_w)
 	// I/O space (FD00-FDFF)
@@ -746,7 +915,9 @@ static ADDRESS_MAP_START( fm77av_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfd03,0xfd03) AM_READ(fm7_irq_cause_r)  // IRQ flags
 	AM_RANGE(0xfd04,0xfd04) AM_READ(fm7_fd04_r)
 	AM_RANGE(0xfd05,0xfd05) AM_READWRITE(fm7_subintf_r,fm7_subintf_w)
-	AM_RANGE(0xfd06,0xfd0c) AM_READ(fm7_unknown_r)
+	AM_RANGE(0xfd06,0xfd0a) AM_READ(fm7_unknown_r)
+	AM_RANGE(0xfd0b,0xfd0b) AM_READ(fm77av_boot_mode_r)
+	AM_RANGE(0xfd0c,0xfd0c) AM_READ(fm7_unknown_r)
 	AM_RANGE(0xfd0d,0xfd0d) AM_READWRITE(fm7_psg_select_r,fm7_psg_select_w)
 	AM_RANGE(0xfd0e,0xfd0e) AM_READWRITE(fm7_psg_data_r, fm7_psg_data_w)
 	AM_RANGE(0xfd0f,0xfd0f) AM_READWRITE(fm7_rom_en_r,fm7_rom_en_w)
@@ -754,9 +925,11 @@ static ADDRESS_MAP_START( fm77av_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfd18,0xfd1f) AM_READWRITE(fm7_fdc_r,fm7_fdc_w)
 	AM_RANGE(0xfd24,0xfd37) AM_READ(fm7_unknown_r)
 	AM_RANGE(0xfd38,0xfd3f) AM_READWRITE(fm7_palette_r,fm7_palette_w)
-	AM_RANGE(0xfd40,0xfdff) AM_READ(fm7_unknown_r)
-	// Boot ROM
-	AM_RANGE(0xfe00,0xffdf) AM_ROMBANK(2)
+	AM_RANGE(0xfd40,0xfd7f) AM_READ(fm7_unknown_r)
+	AM_RANGE(0xfd80,0xfd93) AM_READWRITE(fm7_mmr_r,fm7_mmr_w)
+	AM_RANGE(0xfd94,0xfdff) AM_READ(fm7_unknown_r)
+	// Boot ROM (RAM on FM77AV and later)
+	AM_RANGE(0xfe00,0xffdf) AM_RAM
 	AM_RANGE(0xffe0,0xffef) AM_RAM
 	AM_RANGE(0xfff0,0xffff) AM_READWRITE(vector_r,vector_w) 
 ADDRESS_MAP_END
@@ -774,7 +947,9 @@ static ADDRESS_MAP_START( fm77av_sub_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd409,0xd409) AM_READWRITE(fm7_vram_access_r,fm7_vram_access_w)
 	AM_RANGE(0xd40a,0xd40a) AM_READWRITE(fm7_sub_busyflag_r,fm7_sub_busyflag_w)
 	AM_RANGE(0xd40e,0xd40f) AM_WRITE(fm7_vram_offset_w)
-	AM_RANGE(0xd800,0xffff) AM_ROM
+	AM_RANGE(0xd430,0xd430) AM_READ(fm77av_video_flags_r)
+	AM_RANGE(0xd800,0xdfff) AM_ROMBANK(20)
+	AM_RANGE(0xe000,0xffff) AM_ROMBANK(21)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -935,6 +1110,25 @@ static MACHINE_START(fm7)
 	RAM[0xffff] = 0x00; 
 	
 	memset(shared_ram,0xff,0x80);
+	fm7_type = SYS_FM7;
+}
+
+static MACHINE_START(fm77av)
+{
+	UINT8* RAM = memory_region(machine,"maincpu");
+	UINT8* ROM = memory_region(machine,"init");
+
+	memset(shared_ram,0xff,0x80);
+
+	// last part of Initiate ROM is visible at the end of RAM too (interrupt vectors)	
+	memcpy(RAM+0xfff0,ROM+0x1ff0,16);
+
+	RAM = memory_region(machine,"subsys_c");
+	fm7_video.subrom = 0;  // default sub CPU ROM is type C.
+	memory_set_bankptr(machine,20,RAM);
+	memory_set_bankptr(machine,21,RAM+0x800);
+	
+	fm7_type = SYS_FM77AV;
 }
 
 static MACHINE_RESET(fm7)
@@ -949,9 +1143,14 @@ static MACHINE_RESET(fm7)
 	fm7_video.attn_irq = 0;
 	fm7_video.sub_busy = 0x80;  // busy at reset
 	basic_rom_en = 1;  // enabled at reset
+	if(fm7_type == SYS_FM7)
+		init_rom_en = 0;
+	else
+		init_rom_en = 1;
 	fm7_video.vram_access = 0;
 	fm7_video.crt_enable = 0;
-	memory_set_bankptr(machine,1,RAM+0x38000);
+	if(fm7_type == SYS_FM7)
+		memory_set_bankptr(machine,1,RAM+0x38000);
 	key_delay = 700;  // 700ms on FM-7
 	key_repeat = 70;  // 70ms on FM-7
 	fm7_video.vram_offset = 0x0000;
@@ -959,15 +1158,25 @@ static MACHINE_RESET(fm7)
 	fm7_psg_regsel = 0;
 	fdc_side = 0;
 	fdc_drive = 0;
+	fm7_mmr.mode = 0;
+	fm7_mmr.segment = 0;
+	fm7_mmr.enabled = 0;
 	
-	// set boot mode
-	if(!(input_port_read(machine,"DSW") & 0x02))
-	{  // DOS mode
-		memory_set_bankptr(machine,2,memory_region(machine,"dos"));
+	// set boot mode (FM-7 only, AV and later has boot RAM instead)
+	if(fm7_type == SYS_FM7)
+	{
+		if(!(input_port_read(machine,"DSW") & 0x02))
+		{  // DOS mode
+			memory_set_bankptr(machine,17,memory_region(machine,"dos"));
+		}
+		else
+		{  // BASIC mode
+			memory_set_bankptr(machine,17,memory_region(machine,"basic"));
+		}
 	}
-	else
-	{  // BASIC mode
-		memory_set_bankptr(machine,2,memory_region(machine,"basic"));
+	if(fm7_type != SYS_FM7)  // set default RAM banks
+	{
+		fm7_mmr_refresh(machine);
 	}
 }
 
@@ -985,6 +1194,19 @@ static const ay8910_interface fm7_psg_intf =
 	DEVCB_NULL,	/* portB read */
 	DEVCB_NULL,					/* portA write */
 	DEVCB_NULL					/* portB write */
+};
+
+static const ym2203_interface fm7_ym_intf =
+{
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		DEVCB_NULL,	// Joystick A (TODO)
+		DEVCB_NULL,	// Joystick B (TODO)
+		DEVCB_NULL,					/* portA write */
+		DEVCB_NULL					/* portB write */
+	},
+	NULL  // TODO
 };
 
 static const cassette_config fm7_cassette_config =
@@ -1064,15 +1286,25 @@ static MACHINE_DRIVER_START( fm77av )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809E, XTAL_2MHz)
 	MDRV_CPU_PROGRAM_MAP(fm77av_mem)
+	MDRV_QUANTUM_PERFECT_CPU("maincpu")
 
 	MDRV_CPU_ADD("sub", M6809, XTAL_2MHz)
 	MDRV_CPU_PROGRAM_MAP(fm77av_sub_mem)
+	MDRV_QUANTUM_PERFECT_CPU("sub")
 
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD("ym", YM2203, 1200000)  // 1.2MHz
+	MDRV_SOUND_CONFIG(fm7_ym_intf)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS,"mono",1.0)
+	MDRV_SOUND_WAVE_ADD("wave","cass")
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.20)
+
+	MDRV_MACHINE_START(fm77av)
 	MDRV_MACHINE_RESET(fm7)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
+	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(640, 200)
@@ -1082,6 +1314,12 @@ static MACHINE_DRIVER_START( fm77av )
 
 	MDRV_VIDEO_START(fm7)
 	MDRV_VIDEO_UPDATE(fm7)
+
+	MDRV_CASSETTE_ADD("cass",fm7_cassette_config)
+	
+	MDRV_MB8877_ADD("fdc",fm7_mb8877a_interface)
+	
+	MDRV_CENTRONICS_ADD("lpt",standard_centronics)
 MACHINE_DRIVER_END
 
 /* ROM definition */
@@ -1104,45 +1342,58 @@ ROM_END
 
 ROM_START( fm77av )
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "initiate.rom", 0x36000,  0x2000, CRC(785cb06c) SHA1(b65987e98a9564a82c85eadb86f0204eee5a5c93) )
-	ROM_LOAD( "fbasic30.rom", 0x38000,  0x7c00, CRC(a96d19b6) SHA1(8d5f0cfe7e0d39bf2ab7e4c798a13004769c28b2) )
+	ROM_FILL(0x0000,0x40000,0xff)
 
-	ROM_REGION( 0x22000, "sub", 0 )
-	ROM_SYSTEM_BIOS(0, "mona", "Monitor Type A" )
-	ROMX_LOAD( "subsys_a.rom", 0x1e000,  0x2000, CRC(e8014fbb) SHA1(038cb0b42aee9e933b20fccd6f19942e2f476c83), ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS(1, "monb", "Monitor Type B" )
-	ROMX_LOAD( "subsys_b.rom", 0x1e000,  0x2000, CRC(9be69fac) SHA1(0305bdd44e7d9b7b6a17675aff0a3330a08d21a8), ROM_BIOS(2) )
-	/* 4 0x800 banks to be banked at 1d800 */
-	ROM_LOAD( "subsyscg.rom", 0x20000,  0x2000, CRC(e9f16c42) SHA1(8ab466b1546d023ba54987790a79e9815d2b7bb2) )
+	ROM_REGION( 0x2000, "init", 0 )
+	ROM_LOAD( "initiate.rom", 0x0000,  0x2000, CRC(785cb06c) SHA1(b65987e98a9564a82c85eadb86f0204eee5a5c93) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_REGION( 0x7c00, "fbasic", 0 )
+	ROM_LOAD( "fbasic30.rom", 0x0000,  0x7c00, CRC(a96d19b6) SHA1(8d5f0cfe7e0d39bf2ab7e4c798a13004769c28b2) )
+
+	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_FILL(0x0000,0x10000,0xff)
+
+	// sub CPU ROMs	
+	ROM_REGION( 0x2800, "subsys_c", 0 )
+	ROM_LOAD( "subsys_c.rom", 0x0000,  0x2800, CRC(24cec93f) SHA1(50b7283db6fe1342c6063fc94046283f4feddc1c) )
+	ROM_REGION( 0x2000, "subsys_a", 0 )
+	ROM_LOAD( "subsys_a.rom", 0x0000,  0x2000, CRC(e8014fbb) SHA1(038cb0b42aee9e933b20fccd6f19942e2f476c83) )
+	ROM_REGION( 0x2000, "subsys_b", 0 )
+	ROM_LOAD( "subsys_b.rom", 0x0000,  0x2000, CRC(9be69fac) SHA1(0305bdd44e7d9b7b6a17675aff0a3330a08d21a8) )
+	ROM_REGION( 0x2000, "subsyscg", 0 )
+	ROM_LOAD( "subsyscg.rom", 0x0000,  0x2000, CRC(e9f16c42) SHA1(8ab466b1546d023ba54987790a79e9815d2b7bb2) )
+
+	ROM_REGION( 0x20000, "kanji1", 0 )
 	ROM_LOAD( "kanji.rom", 0x0000, 0x20000, CRC(62402ac9) SHA1(bf52d22b119d54410dad4949b0687bb0edf3e143) )
-
-	// either one of these boot ROMs are selectable via DIP switch
-	ROM_REGION( 0x200, "basic", 0 )
-	ROM_LOAD( "boot_bas.rom", 0x0000,  0x0200, CRC(c70f0c74) SHA1(53b63a301cba7e3030e79c59a4d4291eab6e64b0) )
-
-	ROM_REGION( 0x200, "dos", 0 )	
-	ROM_LOAD( "boot_dos.rom", 0x0000,  0x0200, CRC(198614ff) SHA1(037e5881bd3fed472a210ee894a6446965a8d2ef) )
 
 	// optional dict rom?
 ROM_END
 
 ROM_START( fm7740sx )
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "initiate.rom", 0x36000,  0x2000, CRC(785cb06c) SHA1(b65987e98a9564a82c85eadb86f0204eee5a5c93) )
-	ROM_LOAD( "fbasic30.rom", 0x38000,  0x7c00, CRC(a96d19b6) SHA1(8d5f0cfe7e0d39bf2ab7e4c798a13004769c28b2) )
+	ROM_FILL(0x0000,0x40000,0xff)
 
-	ROM_REGION( 0x22000, "sub", 0 )
-	ROM_SYSTEM_BIOS(0, "mona", "Monitor Type A" )
-	ROMX_LOAD( "subsys_a.rom", 0x1e000,  0x2000, CRC(e8014fbb) SHA1(038cb0b42aee9e933b20fccd6f19942e2f476c83), ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS(1, "monb", "Monitor Type B" )
-	ROMX_LOAD( "subsys_b.rom", 0x1e000,  0x2000, CRC(9be69fac) SHA1(0305bdd44e7d9b7b6a17675aff0a3330a08d21a8), ROM_BIOS(2) )
-	/* 4 0x800 banks to be banked at 1d800 */
-	ROM_LOAD( "subsyscg.rom", 0x20000,  0x2000, CRC(e9f16c42) SHA1(8ab466b1546d023ba54987790a79e9815d2b7bb2) )
+	ROM_REGION( 0x2000, "init", 0 )
+	ROM_LOAD( "initiate.rom", 0x0000,  0x2000, CRC(785cb06c) SHA1(b65987e98a9564a82c85eadb86f0204eee5a5c93) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )
-	ROM_LOAD( "kanji.rom",  0x0000, 0x20000, CRC(62402ac9) SHA1(bf52d22b119d54410dad4949b0687bb0edf3e143) )
+	ROM_REGION( 0x7c00, "fbasic", 0 )
+	ROM_LOAD( "fbasic30.rom", 0x0000,  0x7c00, CRC(a96d19b6) SHA1(8d5f0cfe7e0d39bf2ab7e4c798a13004769c28b2) )
+
+	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_FILL(0x0000,0x10000,0xff)
+
+	// sub CPU ROMs	
+	ROM_REGION( 0x2800, "subsys_c", 0 )
+	ROM_LOAD( "subsys_c.rom", 0x0000,  0x2800, CRC(24cec93f) SHA1(50b7283db6fe1342c6063fc94046283f4feddc1c) )
+	ROM_REGION( 0x2000, "subsys_a", 0 )
+	ROM_LOAD( "subsys_a.rom", 0x0000,  0x2000, CRC(e8014fbb) SHA1(038cb0b42aee9e933b20fccd6f19942e2f476c83) )
+	ROM_REGION( 0x2000, "subsys_b", 0 )
+	ROM_LOAD( "subsys_b.rom", 0x0000,  0x2000, CRC(9be69fac) SHA1(0305bdd44e7d9b7b6a17675aff0a3330a08d21a8) )
+	ROM_REGION( 0x2000, "subsyscg", 0 )
+	ROM_LOAD( "subsyscg.rom", 0x0000,  0x2000, CRC(e9f16c42) SHA1(8ab466b1546d023ba54987790a79e9815d2b7bb2) )
+
+	ROM_REGION( 0x20000, "kanji1", 0 )
+	ROM_LOAD( "kanji.rom", 0x0000, 0x20000, CRC(62402ac9) SHA1(bf52d22b119d54410dad4949b0687bb0edf3e143) )
 	ROM_LOAD( "kanji2.rom", 0x0000, 0x20000, CRC(38644251) SHA1(ebfdc43c38e1380709ed08575c346b2467ad1592) )
 
 	/* These should be loaded at 2e000-2ffff of maincpu, but I'm not sure if it is correct */
@@ -1150,12 +1401,6 @@ ROM_START( fm7740sx )
 	ROM_LOAD( "dicrom.rom", 0x00000, 0x40000, CRC(b142acbc) SHA1(fe9f92a8a2750bcba0a1d2895e75e83858e4f97f) )
 	ROM_LOAD( "extsub.rom", 0x40000, 0x0c000, CRC(0f7fcce3) SHA1(a1304457eeb400b4edd3c20af948d66a04df255e) )
 
-	// either one of these boot ROMs are selectable via DIP switch
-	ROM_REGION( 0x200, "basic", 0 )
-	ROM_LOAD( "boot_bas.rom", 0x0000,  0x0200, CRC(c70f0c74) SHA1(53b63a301cba7e3030e79c59a4d4291eab6e64b0) )
-
-	ROM_REGION( 0x200, "dos", 0 )	
-	ROM_LOAD( "boot_dos.rom", 0x0000,  0x0200, CRC(198614ff) SHA1(037e5881bd3fed472a210ee894a6446965a8d2ef) )
 ROM_END
 
 

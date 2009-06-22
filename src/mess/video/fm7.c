@@ -183,6 +183,24 @@ WRITE8_HANDLER( fm7_palette_w )
 	fm7_video.fm7_pal[offset] = data & 0x07;
 }
 
+/*
+ *   Sub CPU: 0xd430 - BUSY/NMI/Bank register (FM77AV series only)
+ * 
+ *   On read:  bit 7 - 0 if in VBlank
+ *             bit 4 - busy(0)/ready(1)
+ *             bit 2 - VSync status (1 if active?)
+ *             bit 0 - RESET
+ */
+READ8_HANDLER( fm77av_video_flags_r )
+{
+	UINT8 ret = 0xff;
+	
+	if(video_screen_get_vblank(space->machine->primary_screen))
+		ret &= ~0x80;
+	
+	return ret;
+}
+
 VIDEO_START( fm7 )
 {
 }
