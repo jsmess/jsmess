@@ -23,6 +23,8 @@ Skeleton drivers :
 
 System Driver Changes:
 ----------------------
+- [EINSTEIN] Largely rewritten and lots of cleanups.  [Dirk Best]
+
 - [GENESIS] Save RAM emulation improved for several games (bugs #1691, #1696,
   #1823, #1824) [Enik]
 
