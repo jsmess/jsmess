@@ -556,7 +556,7 @@ READ8_HANDLER( fm77av_boot_mode_r )
 
 /*
  *  Main CPU: I/O ports 0xfd0d-0xfd0e
- *  PSG AY-3-891x (FM-7),YM2203 - (FM-77AV and later)
+ *  PSG AY-3-891x (FM-7), YM2203 - (FM-77AV and later)
  *  0xfd0d - function select (bit 1 = BDIR, bit 0 = BC1)
  *  0xfd0e - data register
  *  AY I/O ports are not connected to anything.
@@ -736,7 +736,7 @@ static WRITE8_HANDLER( fm7_mmr_w )
 		fm7_mmr.bank_addr[fm7_mmr.segment][offset] = data;
 		if(fm7_mmr.enabled)
 			fm7_update_bank(space->machine,offset,data);
-		logerror("MMR: Segment %i set to bank 0x%02x\n",fm7_mmr.segment,data);
+		logerror("MMR: Segment %i, bank %i, set to  0x%02x\n",fm7_mmr.segment,offset,data);
 		return;
 	}
 	switch(offset)
@@ -946,7 +946,13 @@ static ADDRESS_MAP_START( fm77av_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfd0e,0xfd0e) AM_READWRITE(fm7_psg_data_r, fm7_psg_data_w)
 	AM_RANGE(0xfd0f,0xfd0f) AM_READWRITE(fm7_rom_en_r,fm7_rom_en_w)
 	AM_RANGE(0xfd10,0xfd10) AM_WRITE(fm7_init_en_w)
-	AM_RANGE(0xfd11,0xfd17) AM_READ(fm7_unknown_r)
+	AM_RANGE(0xfd11,0xfd11) AM_READ(fm7_unknown_r)
+	AM_RANGE(0xfd12,0xfd12) AM_READWRITE(fm77av_sub_modestatus_r,fm77av_sub_modestatus_w)
+	AM_RANGE(0xfd13,0xfd13) AM_WRITE(fm77av_sub_bank_w)
+	AM_RANGE(0xfd14,0xfd14) AM_READ(fm7_unknown_r)
+	AM_RANGE(0xfd15,0xfd15) AM_DEVREADWRITE("ym",ym2203_status_port_r,ym2203_control_port_w)
+	AM_RANGE(0xfd16,0xfd16) AM_DEVREADWRITE("ym",ym2203_read_port_r,ym2203_write_port_w)
+	AM_RANGE(0xfd17,0xfd17) AM_READ(fm7_unknown_r)
 	AM_RANGE(0xfd18,0xfd1f) AM_READWRITE(fm7_fdc_r,fm7_fdc_w)
 	AM_RANGE(0xfd24,0xfd2f) AM_READ(fm7_unknown_r)
 	AM_RANGE(0xfd30,0xfd34) AM_WRITE(fm77av_analog_palette_w)

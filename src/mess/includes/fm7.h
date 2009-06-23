@@ -37,6 +37,7 @@ struct fm7_video_flags
 	UINT8 fm77av_pal_g[4096];
 	UINT8 fm77av_pal_b[4096];
 	UINT8 subrom;  // currently active sub CPU ROM (AV only)
+	UINT8 modestatus;
 };
 
 void fm7_mmr_refresh(running_machine*);
@@ -45,6 +46,9 @@ READ8_HANDLER( fm7_subintf_r );
 WRITE8_HANDLER( fm7_subintf_w );
 READ8_HANDLER( fm7_sub_busyflag_r );
 WRITE8_HANDLER( fm7_sub_busyflag_w );
+READ8_HANDLER( fm77av_sub_modestatus_r );
+WRITE8_HANDLER( fm77av_sub_modestatus_w );
+WRITE8_HANDLER( fm77av_sub_bank_w );
 
 READ8_HANDLER( fm7_cancel_ack );
 READ8_HANDLER( fm7_attn_irq_r );

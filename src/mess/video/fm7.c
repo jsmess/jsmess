@@ -251,6 +251,68 @@ READ8_HANDLER( fm77av_video_flags_r )
 	return ret;
 }
 
+/*
+ *  Main CPU: port 0xfd12 
+ *  Sub mode status register  (FM-77AV or later)
+ *  bit 6 (R/W) - Video mode width(?) 0=640 (default) 1=320.
+ *  bit 1 (R/O) - DISPTMG status (0=blank)
+ *  bit 0 (R/O) - VSync status (1=sync?)
+ */
+READ8_HANDLER( fm77av_sub_modestatus_r )
+{
+	UINT8 ret = 0x00;
+	
+	ret |= 0xbc;
+	ret |= (fm7_video.modestatus & 0x40);
+	if(!video_screen_get_vblank(space->machine->primary_screen))
+		ret |= 0x02;
+	
+	return ret;
+}
+
+WRITE8_HANDLER( fm77av_sub_modestatus_w )
+{
+	fm7_video.modestatus = data & 0x40;
+}
+
+/*
+ *  Main CPU: port 0xfd13
+ *  Sub Bank select register
+ * 
+ *  bits 1 and 0 select which subsys ROM to be banked into sub CPU space
+ *  on the FM-77AV40 and later, bit 2 can also selected to bank in sub monitor RAM.
+ */
+WRITE8_HANDLER( fm77av_sub_bank_w )
+{
+	UINT8* RAM = memory_region(space->machine,"sub");
+	UINT8* ROM;
+	
+	fm7_video.subrom = data & 0x03;
+	switch (data & 0x03)
+	{
+		case 0x00:  // Type C, 640x200 (as used on the FM-7)
+			ROM = memory_region(space->machine,"subsys_c");
+			memory_set_bankptr(space->machine,20,ROM);
+			memory_set_bankptr(space->machine,21,ROM+0x800);
+			break;
+		case 0x01:  // Type A, 640x200
+			ROM = memory_region(space->machine,"subsys_a");
+			memory_set_bankptr(space->machine,20,RAM+0xd800);
+			memory_set_bankptr(space->machine,21,ROM);
+			break;
+		case 0x02:  // Type B, 320x200
+			ROM = memory_region(space->machine,"subsys_b");
+			memory_set_bankptr(space->machine,20,RAM+0xd800);
+			memory_set_bankptr(space->machine,21,ROM);
+			break;
+		case 0x03:  // CG Font?
+			ROM = memory_region(space->machine,"subsyscg");
+			memory_set_bankptr(space->machine,20,RAM+0xd800);
+			memory_set_bankptr(space->machine,21,ROM);
+			break;
+	}
+}
+
 VIDEO_START( fm7 )
 {
 }
