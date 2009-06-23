@@ -14,9 +14,8 @@
 	TODO:
 
 	- keyboard
+	- NE555 timeout is 10x too high
 	- GRIP does not send keys back to PROF-80
-	- NE555 timeout
-	- INUSE led
 	- grip31 does not work
 	- PROF-80 RAM banking
 	- PROF-80 floppy format
@@ -39,6 +38,7 @@
 #include "machine/upd1990a.h"
 #include "machine/z80sti.h"
 #include "machine/ctronics.h"
+#include "machine/rescap.h"
 
 INLINE const device_config *get_floppy_image(running_machine *machine, int drive)
 {
@@ -205,38 +205,37 @@ static void ls259_w(running_machine *machine, int fa, int sa, int fb, int sb)
 
 	switch (sa)
 	{
-	case 0:
+	case 0: /* C0/TDI */
 		upd1990a_data_w(state->upd1990a, fa);
 		upd1990a_c0_w(state->upd1990a, fa);
 		break;
 
-	case 1:
+	case 1: /* C1 */
 		upd1990a_c1_w(state->upd1990a, fa);
 		break;
 
-	case 2:
+	case 2: /* C2 */
 		upd1990a_c2_w(state->upd1990a, fa);
 		break;
 
-	case 3:
-		/* READY */
+	case 3:	/* READY */
 		break;
 
-	case 4:
+	case 4: /* TCK */
 		upd1990a_clk_w(state->upd1990a, fa);
 		break;
 
-	case 5:
-		/* IN USE */
+	case 5:	/* IN USE */
+		output_set_led_value(0, fa);
 		break;
 
-	case 6:
-		/* _MOTOR */
+	case 6:	/* _MOTOR */
 		if (fa)
 		{
 			/* trigger floppy motor off NE555 timer */
-//			attotime duration = 0; // TODO: NE555 R=10M C=6.8uF
-			timer_adjust_oneshot(state->floppy_motor_off_timer, ATTOTIME_IN_SEC(10), 0);
+			int t = 110 * RES_M(10) * CAP_U(6.8); // t = 1.1 * R8 * C6
+
+			timer_adjust_oneshot(state->floppy_motor_off_timer, ATTOTIME_IN_MSEC(t), 0);
 		}
 		else
 		{
@@ -253,8 +252,7 @@ static void ls259_w(running_machine *machine, int fa, int sa, int fb, int sb)
 		}
 		break;
 
-	case 7:
-		/* SELECT */
+	case 7:	/* SELECT */
 		break;
 	}
 
@@ -276,7 +274,7 @@ static void ls259_w(running_machine *machine, int fa, int sa, int fb, int sb)
 	case 4: /* _MSTOP */
 		if (!fb)
 		{
-			/* turn floppy motor off immediately */
+			/* immediately turn off floppy motor */
 			timer_adjust_oneshot(state->floppy_motor_off_timer, attotime_zero, 0);
 		}
 		break;
@@ -439,7 +437,7 @@ static READ8_HANDLER( stat_r )
 		4		JS0
 		5		JS1
 		6		_ERROR
-		7		LPS
+		7		LPSTB		light pen strobe
 
 	*/
 
