@@ -184,6 +184,56 @@ WRITE8_HANDLER( fm7_palette_w )
 }
 
 /*
+ *  Main CPU: 0xfd30 - 0xfd34
+ *  Analog colour palette (FM-77AV and later only)
+ *  All ports are write-only.
+ * 
+ *  fd30: colour select(?) high 4 bits (LC11-LC8)
+ *  fd31: colour select(?) low 8 bits (LC7-LC0)
+ *  fd32: blue level (4 bits)
+ *  fd33: red level (4 bits)
+ *  fd34: green level (4 bits) 
+ */
+WRITE8_HANDLER( fm77av_analog_palette_w )
+{
+	int val;
+	
+	switch(offset)
+	{
+		case 0:
+			val = ((data & 0x0f) << 8) | (fm7_video.fm77av_pal_selected & 0x00ff);
+			fm7_video.fm77av_pal_selected = val;
+			break;
+		case 1:
+			val = data | (fm7_video.fm77av_pal_selected & 0x0f00);
+			fm7_video.fm77av_pal_selected = val;
+			break;
+		case 2:
+			fm7_video.fm77av_pal_b[fm7_video.fm77av_pal_selected] = (data & 0x0f) << 4;
+			palette_set_color(space->machine,fm7_video.fm77av_pal_selected+8,
+				MAKE_RGB(fm7_video.fm77av_pal_r[fm7_video.fm77av_pal_selected],
+				fm7_video.fm77av_pal_g[fm7_video.fm77av_pal_selected],
+				fm7_video.fm77av_pal_b[fm7_video.fm77av_pal_selected]));
+			break;
+		case 3:
+			fm7_video.fm77av_pal_r[fm7_video.fm77av_pal_selected] = (data & 0x0f) << 4;
+			palette_set_color(space->machine,fm7_video.fm77av_pal_selected+8,
+				MAKE_RGB(fm7_video.fm77av_pal_r[fm7_video.fm77av_pal_selected],
+				fm7_video.fm77av_pal_g[fm7_video.fm77av_pal_selected],
+				fm7_video.fm77av_pal_b[fm7_video.fm77av_pal_selected]));
+			break;
+		case 4:
+			fm7_video.fm77av_pal_g[fm7_video.fm77av_pal_selected] = (data & 0x0f) << 4;
+			palette_set_color(space->machine,fm7_video.fm77av_pal_selected+8,
+				MAKE_RGB(fm7_video.fm77av_pal_r[fm7_video.fm77av_pal_selected],
+				fm7_video.fm77av_pal_g[fm7_video.fm77av_pal_selected],
+				fm7_video.fm77av_pal_b[fm7_video.fm77av_pal_selected]));
+			break;
+	}
+}
+
+
+/*
  *   Sub CPU: 0xd430 - BUSY/NMI/Bank register (FM77AV series only)
  * 
  *   On read:  bit 7 - 0 if in VBlank

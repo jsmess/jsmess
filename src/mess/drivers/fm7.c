@@ -282,6 +282,8 @@ static READ8_HANDLER( fm7_rom_en_r )
 	basic_rom_en = 1;
 	if(fm7_type == SYS_FM7)
 		memory_set_bankptr(space->machine,1,RAM+0x38000);
+	else
+		fm7_mmr_refresh(space->machine);
 	logerror("BASIC ROM enabled\n");
 	return 0x00;
 }
@@ -293,7 +295,29 @@ static WRITE8_HANDLER( fm7_rom_en_w )
 	basic_rom_en = 0;
 	if(fm7_type == SYS_FM7)
 		memory_set_bankptr(space->machine,1,RAM+0x8000);
+	else
+		fm7_mmr_refresh(space->machine);
 	logerror("BASIC ROM disabled\n");
+}
+
+/*
+ *  Main CPU: port 0xfd10
+ *  Initiate ROM enable. (FM-77AV and later only)
+ *  Port is write-only.  Initiate ROM is on by default.
+ * 
+ */
+WRITE8_HANDLER( fm7_init_en_w )
+{
+	if(data & 0x02)
+	{
+		init_rom_en = 0;
+		fm7_mmr_refresh(space->machine);
+	}
+	else
+	{
+		init_rom_en = 1;
+		fm7_mmr_refresh(space->machine);
+	}
 }
 
 /*
@@ -532,10 +556,10 @@ READ8_HANDLER( fm77av_boot_mode_r )
 
 /*
  *  Main CPU: I/O ports 0xfd0d-0xfd0e
- *  PSG (AY-3-891x)
+ *  PSG AY-3-891x (FM-7),YM2203 - (FM-77AV and later)
  *  0xfd0d - function select (bit 1 = BDIR, bit 0 = BC1)
  *  0xfd0e - data register
- *  PSG I/O ports are not connected to anything.
+ *  AY I/O ports are not connected to anything.
  */
 static void fm7_update_psg(running_machine* machine)
 {
@@ -688,7 +712,7 @@ static void fm7_update_bank(running_machine* machine, int bank, UINT8 physical)
 	memory_set_bankptr(machine,bank+1,RAM+(physical<<12));
 }
 
-static void fm7_mmr_refresh(running_machine* machine)
+void fm7_mmr_refresh(running_machine* machine)
 {
 	int x;
 	
@@ -921,9 +945,12 @@ static ADDRESS_MAP_START( fm77av_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfd0d,0xfd0d) AM_READWRITE(fm7_psg_select_r,fm7_psg_select_w)
 	AM_RANGE(0xfd0e,0xfd0e) AM_READWRITE(fm7_psg_data_r, fm7_psg_data_w)
 	AM_RANGE(0xfd0f,0xfd0f) AM_READWRITE(fm7_rom_en_r,fm7_rom_en_w)
-	AM_RANGE(0xfd10,0xfd17) AM_READ(fm7_unknown_r)
+	AM_RANGE(0xfd10,0xfd10) AM_WRITE(fm7_init_en_w)
+	AM_RANGE(0xfd11,0xfd17) AM_READ(fm7_unknown_r)
 	AM_RANGE(0xfd18,0xfd1f) AM_READWRITE(fm7_fdc_r,fm7_fdc_w)
-	AM_RANGE(0xfd24,0xfd37) AM_READ(fm7_unknown_r)
+	AM_RANGE(0xfd24,0xfd2f) AM_READ(fm7_unknown_r)
+	AM_RANGE(0xfd30,0xfd34) AM_WRITE(fm77av_analog_palette_w)
+	AM_RANGE(0xfd35,0xfd37) AM_READ(fm7_unknown_r)
 	AM_RANGE(0xfd38,0xfd3f) AM_READWRITE(fm7_palette_r,fm7_palette_w)
 	AM_RANGE(0xfd40,0xfd7f) AM_READ(fm7_unknown_r)
 	AM_RANGE(0xfd80,0xfd93) AM_READWRITE(fm7_mmr_r,fm7_mmr_w)
@@ -1308,7 +1335,7 @@ static MACHINE_DRIVER_START( fm77av )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(640, 200)
 	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
-	MDRV_PALETTE_LENGTH(8)
+	MDRV_PALETTE_LENGTH(8 + 4096)
 	MDRV_PALETTE_INIT(fm7)
 
 	MDRV_VIDEO_START(fm7)

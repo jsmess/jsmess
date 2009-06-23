@@ -32,8 +32,14 @@ struct fm7_video_flags
 	UINT8 crt_enable;
 	UINT16 vram_offset;
 	UINT8 fm7_pal[8];
+	UINT16 fm77av_pal_selected;
+	UINT8 fm77av_pal_r[4096];
+	UINT8 fm77av_pal_g[4096];
+	UINT8 fm77av_pal_b[4096];
 	UINT8 subrom;  // currently active sub CPU ROM (AV only)
 };
+
+void fm7_mmr_refresh(running_machine*);
 
 READ8_HANDLER( fm7_subintf_r );
 WRITE8_HANDLER( fm7_subintf_w );
@@ -52,6 +58,7 @@ WRITE8_HANDLER( fm7_crt_w );
 WRITE8_HANDLER( fm7_vram_offset_w );
 READ8_HANDLER( fm77av_video_flags_r );
 
+WRITE8_HANDLER( fm77av_analog_palette_w );
 READ8_HANDLER( fm7_palette_r );
 WRITE8_HANDLER( fm7_palette_w );
 
