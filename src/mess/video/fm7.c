@@ -248,6 +248,9 @@ READ8_HANDLER( fm77av_video_flags_r )
 	if(video_screen_get_vblank(space->machine->primary_screen))
 		ret &= ~0x80;
 	
+	if(!fm7_video.sub_reset)
+		ret &= ~0x01;
+		
 	return ret;
 }
 
@@ -294,23 +297,31 @@ WRITE8_HANDLER( fm77av_sub_bank_w )
 			ROM = memory_region(space->machine,"subsys_c");
 			memory_set_bankptr(space->machine,20,ROM);
 			memory_set_bankptr(space->machine,21,ROM+0x800);
+			logerror("VID: Sub ROM Type C selected\n");
 			break;
 		case 0x01:  // Type A, 640x200
 			ROM = memory_region(space->machine,"subsys_a");
 			memory_set_bankptr(space->machine,20,RAM+0xd800);
 			memory_set_bankptr(space->machine,21,ROM);
+			logerror("VID: Sub ROM Type A selected\n");
 			break;
 		case 0x02:  // Type B, 320x200
 			ROM = memory_region(space->machine,"subsys_b");
 			memory_set_bankptr(space->machine,20,RAM+0xd800);
 			memory_set_bankptr(space->machine,21,ROM);
+			logerror("VID: Sub ROM Type B selected\n");
 			break;
 		case 0x03:  // CG Font?
 			ROM = memory_region(space->machine,"subsyscg");
 			memory_set_bankptr(space->machine,20,RAM+0xd800);
 			memory_set_bankptr(space->machine,21,ROM);
+			logerror("VID: Sub ROM CG selected\n");
 			break;
 	}
+	// reset sub CPU, set busy flag, set reset flag
+	cputag_set_input_line(space->machine,"sub",INPUT_LINE_RESET,PULSE_LINE);
+	fm7_video.sub_busy = 0x80;
+	fm7_video.sub_reset = 1;
 }
 
 VIDEO_START( fm7 )

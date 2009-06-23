@@ -27,6 +27,7 @@ struct fm7_video_flags
 {
 	UINT8 sub_busy;
 	UINT8 sub_halt;
+	UINT8 sub_reset;  // high if reset caused by subrom change
 	UINT8 attn_irq;
 	UINT8 vram_access;  // VRAM access flag
 	UINT8 crt_enable;

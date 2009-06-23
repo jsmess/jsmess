@@ -1186,6 +1186,7 @@ static MACHINE_RESET(fm7)
 	key_delay = 700;  // 700ms on FM-7
 	key_repeat = 70;  // 70ms on FM-7
 	fm7_video.vram_offset = 0x0000;
+	fm7_video.sub_reset = 0;
 	break_flag = 0;
 	fm7_psg_regsel = 0;
 	fdc_side = 0;
