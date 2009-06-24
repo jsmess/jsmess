@@ -466,7 +466,7 @@ const game_driver * const drivers[] =
     DRIVER( pcmda )     /* 1987 PC with MDA                                 */
     DRIVER( pcherc )    /* 1987 PC with Hercules (for testing hercules)     */
     DRIVER( pc )        /* 1987 PC with CGA                                 */
-    DRIVER( bondwell )  /* 1985 Bondwell (CGA)                              */
+    DRIVER( bw230 )		/* 1985 Bondwell (CGA)                              */
     DRIVER( europc )    /* 1988 Schneider Euro PC (CGA or Hercules)         */
 
     /* pc junior */

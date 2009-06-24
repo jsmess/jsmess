@@ -2106,7 +2106,7 @@ ROM_START( ibmpca )
 ROM_END
 #endif
 
-ROM_START( bondwell )
+ROM_START( bw230 )
 	ROM_REGION(0x100000,"maincpu", 0)
 	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) /* WDC IDE Superbios 2.0 (06/28/89) Expansion Rom C8000-C9FFF  */ // taken from other machine
 	ROM_LOAD("bondwell.bin", 0xfe000, 0x2000, CRC(d435a405) SHA1(a57c705d1144c7b61940b6f5c05d785c272fc9bb))
@@ -2573,7 +2573,7 @@ SYSTEM_CONFIG_END
 /*     YEAR     NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        CONFIG   COMPANY     FULLNAME */
 COMP(  1981,	ibm5150,	0,			0,	ibm5150,    ibm5150,    ibm5150,    ibm5150, "International Business Machines",  "IBM PC 5150" , 0)
 COMP(  1984,	dgone,		ibm5150,	0,	pccga,      pccga,	    pccga,	    ibm5160, "Data General",  "Data General/One" , GAME_NOT_WORKING)	/* CGA, 2x 3.5" disk drives */
-COMP(  1985,	bondwell,	ibm5150,	0,	pccga,		bondwell,   bondwell,	ibm5160, "Bondwell Holding",  "BW230 (PRO28 Series)", 0 )
+COMP(  1985,	bw230,		ibm5150,	0,	pccga,		bondwell,   bondwell,	ibm5160, "Bondwell Holding",  "BW230 (PRO28 Series)", 0 )
 COMP(  1988,	europc,		ibm5150,	0,	europc,     europc,		europc,     ibm5160, "Schneider Rdf. AG",  "EURO PC", GAME_NOT_WORKING)
 
 // pcjr (better graphics, better sound)

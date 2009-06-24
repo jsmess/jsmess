@@ -1254,6 +1254,7 @@ $(MESSOBJ)/comx.a:				\
 	
 $(MESSOBJ)/bondwell.a: \
 	$(MESS_DRIVERS)/bw2.o \
+	$(MESS_DRIVERS)/bw12.o \
 
 $(MESSOBJ)/irisha.a:      \
 	$(MESS_DRIVERS)/irisha.o \
@@ -1448,7 +1449,6 @@ $(MESSOBJ)/skeleton.a: \
 	$(MESS_DRIVERS)/pk8000.o \
 	$(MESS_DRIVERS)/unior.o \
 	$(MESS_DRIVERS)/tvc.o \
-	$(MESS_DRIVERS)/bondwell.o \
 	$(MESS_DRIVERS)/sdk86.o \
 	$(MESS_DRIVERS)/vboy.o \
 	$(MESS_DRIVERS)/zrt80.o \
