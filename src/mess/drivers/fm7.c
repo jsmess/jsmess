@@ -878,7 +878,8 @@ static ADDRESS_MAP_START( fm7_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfd0f,0xfd0f) AM_READWRITE(fm7_rom_en_r,fm7_rom_en_w)
 	AM_RANGE(0xfd10,0xfd17) AM_READ(fm7_unknown_r)
 	AM_RANGE(0xfd18,0xfd1f) AM_READWRITE(fm7_fdc_r,fm7_fdc_w)
-	AM_RANGE(0xfd24,0xfd37) AM_READ(fm7_unknown_r)
+	AM_RANGE(0xfd24,0xfd36) AM_READ(fm7_unknown_r)
+	AM_RANGE(0xfd37,0xfd37) AM_WRITE(fm7_multipage_w)
 	AM_RANGE(0xfd38,0xfd3f) AM_READWRITE(fm7_palette_r,fm7_palette_w)
 	AM_RANGE(0xfd40,0xfdff) AM_READ(fm7_unknown_r)
 	// Boot ROM
@@ -956,7 +957,8 @@ static ADDRESS_MAP_START( fm77av_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfd18,0xfd1f) AM_READWRITE(fm7_fdc_r,fm7_fdc_w)
 	AM_RANGE(0xfd24,0xfd2f) AM_READ(fm7_unknown_r)
 	AM_RANGE(0xfd30,0xfd34) AM_WRITE(fm77av_analog_palette_w)
-	AM_RANGE(0xfd35,0xfd37) AM_READ(fm7_unknown_r)
+	AM_RANGE(0xfd35,0xfd36) AM_READ(fm7_unknown_r)
+	AM_RANGE(0xfd37,0xfd37) AM_WRITE(fm7_multipage_w)
 	AM_RANGE(0xfd38,0xfd3f) AM_READWRITE(fm7_palette_r,fm7_palette_w)
 	AM_RANGE(0xfd40,0xfd7f) AM_READ(fm7_unknown_r)
 	AM_RANGE(0xfd80,0xfd93) AM_READWRITE(fm7_mmr_r,fm7_mmr_w)
@@ -1179,14 +1181,10 @@ static MACHINE_RESET(fm7)
 		init_rom_en = 0;
 	else
 		init_rom_en = 1;
-	fm7_video.vram_access = 0;
-	fm7_video.crt_enable = 0;
 	if(fm7_type == SYS_FM7)
 		memory_set_bankptr(machine,1,RAM+0x38000);
 	key_delay = 700;  // 700ms on FM-7
 	key_repeat = 70;  // 70ms on FM-7
-	fm7_video.vram_offset = 0x0000;
-	fm7_video.sub_reset = 0;
 	break_flag = 0;
 	fm7_psg_regsel = 0;
 	fdc_side = 0;

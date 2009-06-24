@@ -39,6 +39,7 @@ struct fm7_video_flags
 	UINT8 fm77av_pal_b[4096];
 	UINT8 subrom;  // currently active sub CPU ROM (AV only)
 	UINT8 modestatus;
+	UINT8 multi_page;
 };
 
 void fm7_mmr_refresh(running_machine*);
@@ -64,6 +65,7 @@ WRITE8_HANDLER( fm7_vram_offset_w );
 READ8_HANDLER( fm77av_video_flags_r );
 
 WRITE8_HANDLER( fm77av_analog_palette_w );
+WRITE8_HANDLER( fm7_multipage_w );
 READ8_HANDLER( fm7_palette_r );
 WRITE8_HANDLER( fm7_palette_w );
 

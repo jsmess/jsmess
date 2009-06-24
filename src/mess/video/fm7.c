@@ -102,6 +102,13 @@ READ8_HANDLER( fm7_vram_r )
 {
 	int offs;
 	
+	if(offset < 0x4000 && (fm7_video.multi_page & 0x01))
+		return 0xff;
+	if((offset < 0x8000 && offset >=0x4000) && (fm7_video.multi_page & 0x02))
+		return 0xff;
+	if((offset < 0xc000 && offset >=0x8000) && (fm7_video.multi_page & 0x04))
+		return 0xff;
+	
 	offs = (offset & 0xc000) | ((offset + fm7_video.vram_offset) & 0x3fff);
 	return fm7_video_ram[offs];
 }
@@ -110,6 +117,13 @@ WRITE8_HANDLER( fm7_vram_w )
 {
 	int offs;
 	
+	if(offset < 0x4000 && (fm7_video.multi_page & 0x01))
+		return;
+	if((offset < 0x8000 && offset >=0x4000) && (fm7_video.multi_page & 0x02))
+		return;
+	if((offset < 0xc000 && offset >=0x8000) && (fm7_video.multi_page & 0x04))
+		return;
+		
 	offs = (offset & 0xc000) | ((offset + fm7_video.vram_offset) & 0x3fff);
 	if(fm7_video.vram_access != 0)
 		fm7_video_ram[offs] = data;
@@ -153,6 +167,19 @@ WRITE8_HANDLER( fm7_vram_offset_w )
 	}
 	
 	fm7_video.vram_offset = new_offset;
+}
+
+/*
+ *  Main CPU: port 0xfd37
+ *  Multipage
+ * 	Port is write-only
+ * 
+ * 	bits 6-4: VRAM planes to display (G,R,B) (1=disable)
+ *  bits 2-0: VRAM CPU access (G,R,B) (1=disable)
+ */
+WRITE8_HANDLER( fm7_multipage_w )
+{
+	fm7_video.multi_page = data & 0x77;
 }
 
 /*
@@ -326,11 +353,16 @@ WRITE8_HANDLER( fm77av_sub_bank_w )
 
 VIDEO_START( fm7 )
 {
+	fm7_video.vram_access = 0;
+	fm7_video.crt_enable = 0;
+	fm7_video.vram_offset = 0x0000;
+	fm7_video.sub_reset = 0;
+	fm7_video.multi_page = 0;
 }
 
 VIDEO_UPDATE( fm7 )
 {
-    UINT8 code_r,code_g,code_b;
+    UINT8 code_r = 0,code_g = 0,code_b = 0;
     UINT8 col;
     int y, x, b;
 
@@ -341,9 +373,12 @@ VIDEO_UPDATE( fm7 )
     {
 	    for (x = 0; x < 80; x++)
 	    {
-            code_r = fm7_video_ram[0x8000 + ((y*80 + x + fm7_video.vram_offset) & 0x3fff)];
-            code_g = fm7_video_ram[0x4000 + ((y*80 + x + fm7_video.vram_offset) & 0x3fff)];
-            code_b = fm7_video_ram[0x0000 + ((y*80 + x + fm7_video.vram_offset) & 0x3fff)];
+	    	if(!(fm7_video.multi_page & 0x40))
+            	code_r = fm7_video_ram[0x8000 + ((y*80 + x + fm7_video.vram_offset) & 0x3fff)];
+	    	if(!(fm7_video.multi_page & 0x20))
+    	        code_g = fm7_video_ram[0x4000 + ((y*80 + x + fm7_video.vram_offset) & 0x3fff)];
+	    	if(!(fm7_video.multi_page & 0x10))
+	            code_b = fm7_video_ram[0x0000 + ((y*80 + x + fm7_video.vram_offset) & 0x3fff)];
             for (b = 0; b < 8; b++)
             {
                 col = (((code_r >> b) & 0x01) ? 4 : 0) + (((code_g >> b) & 0x01) ? 2 : 0) + (((code_b >> b) & 0x01) ? 1 : 0);
