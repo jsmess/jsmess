@@ -547,7 +547,7 @@ ROM_START( bw12 )
 	ROM_LOAD( "bw14boot.ic41", 0x0000, 0x1000, CRC(782fe341) SHA1(eefe5ad6b1ef77a1caf0af743b74de5fa1c4c19d) )
 
 	ROM_REGION(0x1000, "chargen", 0)
-	ROM_LOAD( "bw14char.ic1", 0x0000, 0x1000, CRC(f9dd68b5) SHA1(50132b759a6d84c22c387c39c0f57535cd380411) )
+	ROM_LOAD( "bw14char.ic1",  0x0000, 0x1000, CRC(f9dd68b5) SHA1(50132b759a6d84c22c387c39c0f57535cd380411) )
 ROM_END
 
 #define rom_bw14 rom_bw12
@@ -561,21 +561,38 @@ static DEVICE_IMAGE_LOAD( bw12_floppy )
 		return INIT_FAIL;
 	}
 
-	switch (image_length(image))
+	if (DEVICE_IMAGE_LOAD_NAME(basicdsk_floppy)(image) == INIT_PASS)
 	{
-	case 40*1*18*256: /* 180KB BW 12 SSDD */
-		basicdsk_set_geometry(image, 40, 1, 18, 256, 1, 0, FALSE);
-		break;
-	
-	case 40*2*18*256: /* 360KB BW 14 DSDD */
-		basicdsk_set_geometry(image, 40, 2, 18, 256, 1, 0, FALSE);
-		break;
+		switch (image_length(image))
+		{
+		case 40*1*18*256: /* 180KB BW 12 SSDD */
+			basicdsk_set_geometry(image, 40, 1, 18, 256, 1, 0, FALSE);
+			break;
+		
+		case 40*2*18*256: /* 360KB BW 14 DSDD */
+			basicdsk_set_geometry(image, 40, 2, 18, 256, 1, 0, FALSE);
+			break;
 
-	default:
-		return INIT_FAIL;
+		case 40*1*17*256: /* SVI-328 SSDD */
+			basicdsk_set_geometry(image, 40, 1, 17, 256, 1, 0, FALSE);
+			break;
+
+		case 40*2*17*256: /* SVI-328 DSDD */
+			basicdsk_set_geometry(image, 40, 2, 17, 256, 1, 0, FALSE);
+			break;
+
+		case 40*1*10*512: /* Kaypro II SSDD */
+			basicdsk_set_geometry(image, 40, 1, 10, 512, 1, 0, FALSE);
+			break;
+
+		default:
+			return INIT_FAIL;
+		}
+
+		return INIT_PASS;
 	}
 
-	return device_load_basicdsk_floppy(image);
+	return INIT_FAIL;
 }
 
 static void bw12_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
