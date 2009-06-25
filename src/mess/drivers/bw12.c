@@ -40,8 +40,8 @@
 
 	TODO:
 
-	- nec765 access violation
 	- keyboard
+	- floppy motor off timer
 
 */
 
@@ -88,8 +88,8 @@ static TIMER_CALLBACK( floppy_motor_off_tick )
 
 	floppy_drive_set_motor_state(get_floppy_image(machine, 0), 0);
 	floppy_drive_set_motor_state(get_floppy_image(machine, 1), 0);
-	floppy_drive_set_ready_state(get_floppy_image(machine, 0), 0, 1);
-	floppy_drive_set_ready_state(get_floppy_image(machine, 1), 0, 1);
+	floppy_drive_set_ready_state(get_floppy_image(machine, 0), 0, 0);
+	floppy_drive_set_ready_state(get_floppy_image(machine, 1), 0, 0);
 
 	state->motor_on = 0;
 }
@@ -101,9 +101,9 @@ static void bw12_set_floppy_motor_off_timer(running_machine *machine)
 	if (state->motor0 || state->motor1)
 	{
 		/* trigger floppy motor off NE556 timer */
-		int t = 1100 * RES_K(100) * CAP_U(4.7); // t = 1.1 * R18 * C11
+//		int t = 1100 * RES_K(100) * CAP_U(4.7); // t = 1.1 * R18 * C11
 
-		timer_adjust_oneshot(state->floppy_motor_off_timer, ATTOTIME_IN_MSEC(t), 0);
+//		timer_adjust_oneshot(state->floppy_motor_off_timer, ATTOTIME_IN_MSEC(t), 0);
 		
 		state->motor_on = 1;
 	}
@@ -141,7 +141,7 @@ static void ls259_w(running_machine *machine, int address, int data)
 		if (data)
 		{
 			floppy_drive_set_motor_state(get_floppy_image(machine, 0), 1);
-			floppy_drive_set_ready_state(get_floppy_image(machine, 0), 1, 1);
+			floppy_drive_set_ready_state(get_floppy_image(machine, 0), 1, 0);
 		}
 
 		bw12_set_floppy_motor_off_timer(machine);
@@ -153,7 +153,7 @@ static void ls259_w(running_machine *machine, int address, int data)
 		if (data)
 		{
 			floppy_drive_set_motor_state(get_floppy_image(machine, 1), 1);
-			floppy_drive_set_ready_state(get_floppy_image(machine, 1), 1, 1);
+			floppy_drive_set_ready_state(get_floppy_image(machine, 1), 1, 0);
 		}
 
 		bw12_set_floppy_motor_off_timer(machine);
@@ -316,11 +316,26 @@ static NEC765_INTERRUPT( bw12_nec765_interrupt )
 	driver_state->fdcint = state;
 }
 
-static const nec765_interface bw12_nec765_interface =
+static NEC765_GET_IMAGE( bw12_nec765_get_image )
+{
+	switch (floppy_index)
+	{
+	case 1: /* drive A */
+		return get_floppy_image(device->machine, 0);
+
+	case 2: /* drive B */
+		return get_floppy_image(device->machine, 1);
+
+	default:
+		return NULL;
+	}
+}
+
+static const struct nec765_interface bw12_nec765_interface =
 {
 	bw12_nec765_interrupt,		/* interrupt */
 	NULL,						/* DMA request */
-	NULL,						/* image lookup */
+	bw12_nec765_get_image,		/* image lookup */
 	NEC765_RDY_PIN_CONNECTED	/* ready pin */
 };
 

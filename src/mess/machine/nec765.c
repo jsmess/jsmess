@@ -1847,19 +1847,22 @@ static void nec765_setup_command(const device_config *device)
 
 			fdc->nec765_status[3] = fdc->drive | (fdc->side<<2);
 
-			if (floppy_drive_get_flag_state(img, FLOPPY_DRIVE_DISK_WRITE_PROTECTED))
+			if (img)
 			{
-				fdc->nec765_status[3] |= 0x40;
-			}
+				if (floppy_drive_get_flag_state(img, FLOPPY_DRIVE_DISK_WRITE_PROTECTED))
+				{
+					fdc->nec765_status[3] |= 0x40;
+				}
 
-			if (floppy_drive_get_flag_state(img, FLOPPY_DRIVE_READY))
-			{
-				fdc->nec765_status[3] |= 0x20;
-			}
+				if (floppy_drive_get_flag_state(img, FLOPPY_DRIVE_READY))
+				{
+					fdc->nec765_status[3] |= 0x20;
+				}
 
-			if (floppy_drive_get_flag_state(img, FLOPPY_DRIVE_HEAD_AT_TRACK_0))
-			{
-				fdc->nec765_status[3] |= 0x10;
+				if (floppy_drive_get_flag_state(img, FLOPPY_DRIVE_HEAD_AT_TRACK_0))
+				{
+					fdc->nec765_status[3] |= 0x10;
+				}
 			}
 
 			fdc->nec765_status[3] |= 0x08;
