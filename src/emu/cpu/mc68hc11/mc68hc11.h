@@ -30,4 +30,14 @@ CPU_GET_INFO( mc68hc11 );
 #define MC68HC11_IO_AD6				0x16
 #define MC68HC11_IO_AD7				0x17
 
+#define MC68HC11_IRQ_LINE			0
+
+typedef struct _hc11_config hc11_config;
+struct _hc11_config
+{
+	int has_io; // I/O enable flag
+	int internal_ram_size;
+};
+
+
 #endif /* __MC68HC11_H__ */

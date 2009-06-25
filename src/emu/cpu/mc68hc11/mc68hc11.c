@@ -1,7 +1,13 @@
 /*
    Motorola MC68HC11 emulator
 
-   Written by Ville Linde
+   Written by Ville Linde & Angelo Salese
+
+TODO:
+- Interrupts handling is really bare-bones, just to make Hit Poker happy;
+- Complete opcodes hook-up;
+- Emulate the MC68HC12 (same as HC11 with a bunch of new opcodes);
+
  */
 
 #include "debugger.h"
@@ -53,6 +59,7 @@ struct _hc11_state
 	int ad_channel;
 
 	cpu_irq_callback irq_callback;
+	UINT8 irq_state[2];
 	const device_config *device;
 	const address_space *program;
 	const address_space *io;
@@ -60,7 +67,9 @@ struct _hc11_state
 	int ram_position;
 	int reg_position;
 	UINT8 *internal_ram;
+	int has_io; // I/O enable flag
 	int internal_ram_size;
+	UINT8 wait_state,stop_state;
 };
 
 INLINE hc11_state *get_safe_token(const device_config *device)
@@ -86,6 +95,8 @@ static UINT8 hc11_regs_r(hc11_state *cpustate, UINT32 address)
 		case 0x00:		/* PORTA */
 			return memory_read_byte(cpustate->io, MC68HC11_IO_PORTA);
 		case 0x01:		/* DDRA */
+			return 0;
+		case 0x02:		/* PIOC */
 			return 0;
 		case 0x09:		/* DDRD */
 			return 0;
@@ -167,7 +178,7 @@ static UINT8 hc11_regs_r(hc11_state *cpustate, UINT32 address)
 			return 0;
 	}
 
-	fatalerror("HC11: regs_r %02X", reg);
+	logerror("HC11: regs_r %02X\n", reg);
 	return 0; // Dummy
 }
 
@@ -256,7 +267,8 @@ static void hc11_regs_w(hc11_state *cpustate, UINT32 address, UINT8 value)
 			return;
 
 	}
-	fatalerror("HC11: regs_w %02X, %02X", reg, value);
+
+	logerror("HC11: regs_w %02X, %02X\n", reg, value);
 }
 
 /*****************************************************************************/
@@ -276,7 +288,7 @@ INLINE UINT16 FETCH16(hc11_state *cpustate)
 
 INLINE UINT8 READ8(hc11_state *cpustate, UINT32 address)
 {
-	if(address >= cpustate->reg_position && address < cpustate->reg_position+0x100)
+	if(address >= cpustate->reg_position && address < cpustate->reg_position+0x100 && cpustate->has_io)
 	{
 		return hc11_regs_r(cpustate, address);
 	}
@@ -289,7 +301,7 @@ INLINE UINT8 READ8(hc11_state *cpustate, UINT32 address)
 
 INLINE void WRITE8(hc11_state *cpustate, UINT32 address, UINT8 value)
 {
-	if(address >= cpustate->reg_position && address < cpustate->reg_position+0x100)
+	if(address >= cpustate->reg_position && address < cpustate->reg_position+0x100 && cpustate->has_io)
 	{
 		hc11_regs_w(cpustate, address, value);
 		return;
@@ -328,6 +340,8 @@ static CPU_INIT( hc11 )
 	hc11_state *cpustate = get_safe_token(device);
 	int i;
 
+	const hc11_config *conf = (const hc11_config *)device->static_config;
+
 	/* clear the opcode tables */
 	for(i=0; i < 256; i++) {
 		hc11_optable[i] = HC11OP(invalid);
@@ -355,7 +369,18 @@ static CPU_INIT( hc11 )
 		}
 	}
 
-	cpustate->internal_ram_size = 1280;		/* FIXME: this is for MC68HC11M0 */
+	if(conf)
+	{
+		cpustate->has_io = conf->has_io;
+		cpustate->internal_ram_size = conf->internal_ram_size;
+	}
+	else
+	{
+		/* defaults it to the HC11M0 version for now (I might strip this down on a later date) */
+		cpustate->has_io = 1;
+		cpustate->internal_ram_size = 1280;
+	}
+
 	cpustate->internal_ram = auto_alloc_array(device->machine, UINT8, cpustate->internal_ram_size);
 
 	cpustate->reg_position = 0;
@@ -370,11 +395,69 @@ static CPU_RESET( hc11 )
 {
 	hc11_state *cpustate = get_safe_token(device);
 	cpustate->pc = READ16(cpustate, 0xfffe);
+	cpustate->wait_state = 0;
+	cpustate->stop_state = 0;
 }
 
 static CPU_EXIT( hc11 )
 {
 
+}
+
+/*
+IRQ table vectors:
+0xffd6: SCI
+0xffd8: SPI
+0xffda: Pulse Accumulator Input Edge
+0xffdc: Pulse Accumulator Overflow
+0xffde: Timer Overflow
+0xffe0: Timer Output Capture 5
+0xffe2: Timer Output Capture 4
+0xffe4: Timer Output Capture 3
+0xffe6: Timer Output Capture 2
+0xffe8: Timer Output Capture 1
+0xffea: Timer Input Capture 3
+0xffec: Timer Input Capture 2
+0xffee: Timer Input Capture 1
+0xfff0: Real Time Int
+0xfff2: IRQ
+0xfff4: XIRQ
+0xfff6: SWI (Trap IRQ)
+0xfff8: Illegal Opcode (NMI)
+0xfffa: CO-Processor Fail
+0xfffc: Clock Monitor
+0xfffe: RESET
+*/
+
+static void check_irq_lines(hc11_state *cpustate)
+{
+	if( cpustate->irq_state[MC68HC11_IRQ_LINE]!=CLEAR_LINE && (!(cpustate->ccr & CC_I)) )
+	{
+		UINT16 pc_vector;
+
+		if(cpustate->wait_state == 0)
+		{
+			PUSH16(cpustate, cpustate->pc);
+			PUSH16(cpustate, cpustate->iy);
+			PUSH16(cpustate, cpustate->ix);
+			PUSH8(cpustate, REG_A);
+			PUSH8(cpustate, REG_B);
+			PUSH8(cpustate, cpustate->ccr);
+		}
+		pc_vector = READ16(cpustate, 0xfff2);
+		SET_PC(cpustate, pc_vector);
+		cpustate->ccr |= CC_I; //irq taken, mask the flag
+		if(cpustate->wait_state == 1) { cpustate->wait_state = 2; }
+		if(cpustate->stop_state == 1) { cpustate->stop_state = 2; }
+		(void)(*cpustate->irq_callback)(cpustate->device, MC68HC11_IRQ_LINE);
+	}
+}
+
+static void set_irq_line(hc11_state *cpustate, int irqline, int state)
+{
+	cpustate->irq_state[irqline] = state;
+	if (state == CLEAR_LINE) return;
+	check_irq_lines(cpustate);
 }
 
 static CPU_EXECUTE( hc11 )
@@ -386,6 +469,8 @@ static CPU_EXECUTE( hc11 )
 	while(cpustate->icount > 0)
 	{
 		UINT8 op;
+
+		check_irq_lines(cpustate);
 
 		cpustate->ppc = cpustate->pc;
 		debugger_instruction_hook(device, cpustate->pc);
@@ -405,9 +490,11 @@ static CPU_SET_INFO( mc68hc11 )
 
 	switch (state)
 	{
+		case CPUINFO_INT_INPUT_STATE + MC68HC11_IRQ_LINE:	set_irq_line(cpustate, MC68HC11_IRQ_LINE, info->i);		break;
+
 		/* --- the following bits of info are set as 64-bit signed integers --- */
 		case CPUINFO_INT_PC:							cpustate->pc = info->i;						break;
-		case CPUINFO_INT_REGISTER + HC11_PC:			cpustate->pc = info->i; 						break;
+		case CPUINFO_INT_REGISTER + HC11_PC:			cpustate->pc = info->i; 					break;
 		case CPUINFO_INT_REGISTER + HC11_SP:			cpustate->sp = info->i;						break;
 		case CPUINFO_INT_REGISTER + HC11_A:				cpustate->d.d8.a = info->i;					break;
 		case CPUINFO_INT_REGISTER + HC11_B:				cpustate->d.d8.b = info->i;					break;
@@ -423,38 +510,38 @@ CPU_GET_INFO( mc68hc11 )
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(hc11_state);			break;
-		case CPUINFO_INT_INPUT_LINES:					info->i = 1;							break;
-		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
-		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
-		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
-		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 1;							break;
-		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 5;							break;
-		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;							break;
-		case CPUINFO_INT_MAX_CYCLES:					info->i = 41;							break;
+		case CPUINFO_INT_CONTEXT_SIZE:						info->i = sizeof(hc11_state);	break;
+		case CPUINFO_INT_INPUT_LINES:						info->i = 1;					break;
+		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:				info->i = 0;					break;
+		case CPUINFO_INT_ENDIANNESS:						info->i = ENDIANNESS_BIG;		break;
+		case CPUINFO_INT_CLOCK_MULTIPLIER:					info->i = 1;					break;
+		case CPUINFO_INT_CLOCK_DIVIDER:						info->i = 1;					break;
+		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:				info->i = 1;					break;
+		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:				info->i = 5;					break;
+		case CPUINFO_INT_MIN_CYCLES:						info->i = 1;					break;
+		case CPUINFO_INT_MAX_CYCLES:						info->i = 41;					break;
 
-		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 16;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:				info->i = 8;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: 			info->i = 16;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: 			info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_DATA:				info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 				info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 				info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_IO:					info->i = 8;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 					info->i = 8;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 					info->i = 0;					break;
 
-		case CPUINFO_INT_INPUT_STATE:					info->i = CLEAR_LINE;					break;
+		case CPUINFO_INT_INPUT_STATE + MC68HC11_IRQ_LINE:	info->i = cpustate->irq_state[MC68HC11_IRQ_LINE]; break;
 
-		case CPUINFO_INT_PREVIOUSPC:					/* not implemented */					break;
+		case CPUINFO_INT_PREVIOUSPC:						/* not implemented */			break;
 
 		case CPUINFO_INT_PC:	/* intentional fallthrough */
-		case CPUINFO_INT_REGISTER + HC11_PC:			info->i = cpustate->pc;						break;
-		case CPUINFO_INT_REGISTER + HC11_SP:			info->i = cpustate->sp;						break;
-		case CPUINFO_INT_REGISTER + HC11_A:				info->i = cpustate->d.d8.a;					break;
-		case CPUINFO_INT_REGISTER + HC11_B:				info->i = cpustate->d.d8.b;					break;
-		case CPUINFO_INT_REGISTER + HC11_IX:			info->i = cpustate->ix;						break;
-		case CPUINFO_INT_REGISTER + HC11_IY:			info->i = cpustate->iy;						break;
+		case CPUINFO_INT_REGISTER + HC11_PC:			info->i = cpustate->pc;				break;
+		case CPUINFO_INT_REGISTER + HC11_SP:			info->i = cpustate->sp;				break;
+		case CPUINFO_INT_REGISTER + HC11_A:				info->i = cpustate->d.d8.a;			break;
+		case CPUINFO_INT_REGISTER + HC11_B:				info->i = cpustate->d.d8.b;			break;
+		case CPUINFO_INT_REGISTER + HC11_IX:			info->i = cpustate->ix;				break;
+		case CPUINFO_INT_REGISTER + HC11_IY:			info->i = cpustate->iy;				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(mc68hc11);		break;

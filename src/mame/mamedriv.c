@@ -1216,6 +1216,7 @@ const game_driver * const drivers[] =
 	DRIVER( schaser )	/* RT  Taito */
 	DRIVER( schasrcv )	/* RT  Taito */
 	DRIVER( lupin3 )	/* LP  (c) 1980 Taito */
+	DRIVER( lupin3a )	/* LP  (c) 1980 Taito */
 	DRIVER( intruder )	/* (c) 1980 GamePlan (Taito) */
 	DRIVER( spclaser )	/* (c) 1980 GamePlan (Taito) */
 	DRIVER( laser )		/* (c) 1980 Leisure Time Electronics Inc. */
@@ -3547,7 +3548,6 @@ V-V                           TP-027
 	DRIVER( myherok )	/* 834-5755 (c) 1985 Coreland / Sega (S1) */
 	DRIVER( shtngmst )	/* 834-5719/5720 (c) 1985 (S2) */
 	DRIVER( shtngmste )	/* 834-5719/5720 (c) 1985 (S2) */
- 	DRIVER( shtngmstu )	/* 834-5719/5720 (c) 1985 (S2) */
 	DRIVER( choplift )	/* 834-5795 (c) 1985, (c) 1982 Dan Gorlin (S2) */
 	DRIVER( chopliftu )	/* 834-5795 (c) 1985, (c) 1982 Dan Gorlin (S2) */
 	DRIVER( chopliftbl )/* bootleg (S2) */
@@ -5622,6 +5622,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( llander )	/* 0345xx           no copyright notice */
 	DRIVER( llander1 )	/* 0345xx           no copyright notice */
 	DRIVER( asteroid )	/* 035127-035145    (c) 1979 */
+	DRIVER( asteroi2 )	/* 035127-035145    (c) 1979 */
 	DRIVER( asteroi1 )	/* 035127-035145    no copyright notice */
 	DRIVER( asteroib )	/* (bootleg) */
 	DRIVER( asterock )	/* Sidam bootleg    (c) 1979 */
@@ -6670,6 +6671,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( hiimpact )	/* (c) 1990 Williams */
 	DRIVER( hiimpac4 )	/* (c) 1990 Williams */
 	DRIVER( hiimpac3 )	/* (c) 1990 Williams */
+	DRIVER( hiimpac1 )	/* (c) 1990 Williams */
 	DRIVER( hiimpacp )	/* (c) 1990 Williams */
 	DRIVER( shimpact )	/* (c) 1991 Midway */
 	DRIVER( shimpap6 )	/* (c) 1991 Midway */
@@ -9536,5 +9538,8 @@ Other Sun games
 	DRIVER( m_honmon )
 
 	DRIVER( roul )
+
+	/* Accept LTD. */
+	DRIVER( hitpoker ) /* (c) 1997 */
 
 #endif	/* DRIVER_RECURSIVE */

@@ -229,7 +229,7 @@ $(CPUOBJ)/jaguar/jaguar.o:	$(CPUSRC)/jaguar/jaguar.c \
 
 
 #-------------------------------------------------
-# Atmela 8-bit AVR series
+# Atmel 8-bit AVR
 #-------------------------------------------------
 
 ifneq ($(filter AVR8,$(CPUS)),)
@@ -238,7 +238,8 @@ CPUOBJS += $(CPUOBJ)/avr8/avr8.o
 DBGOBJS += $(CPUOBJ)/avr8/avr8dasm.o
 endif
 
-$(CPUOBJ)/avr8/avr8.o:	$(CPUSRC)/avr8/avr8.c \
+$(CPUOBJ)/avr8/avr8.o: 	$(CPUSRC)/avr8/avr8.c \
+			$(CPUSRC)/avr8/avr8.h
 
 
 
