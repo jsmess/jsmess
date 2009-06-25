@@ -80,5 +80,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( ????, h8,  0,       0, 	h8, 	h8, 	 0,  	  h8,  	 "Heath, Inc.",   "Heathkit H8",		GAME_NOT_WORKING)
-
+COMP( 1977, h8,  0,       0, 	h8, 	h8, 	 0,  	  h8,  	 "Heath, Inc.",   "Heathkit H8",		GAME_NOT_WORKING)
