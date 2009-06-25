@@ -22,8 +22,10 @@ struct _ay3600_t
 	devcb_resolved_read_line	in_shift_func;
 	devcb_resolved_read_line	in_control_func;
 
+	UINT16 b;					/* output buffer */
+
 	/* timers */
-	emu_timer *scan_timer;			/* keyboard scan timer */
+	emu_timer *scan_timer;		/* keyboard scan timer */
 };
 
 /***************************************************************************
@@ -55,9 +57,40 @@ INLINE const ay3600_interface *get_interface(const device_config *device)
 
 static TIMER_CALLBACK( ay3600_scan_tick )
 {
-//	const device_config *device = ptr;
+	const device_config *device = ptr;
+	ay3600_t *ay3600 = get_safe_token(device);
+	const ay3600_interface *intf = get_interface(device);
 
+	int x, y;
 
+	for (x = 0; x < 9; x++)
+	{
+		UINT16 data = intf->in_y_func(device, x);
+
+		for (y = 0; y < 10; y++)
+		{
+			if (BIT(data, y))
+			{
+				int b = (x * 10) + y;
+
+				if (b > 63)
+				{
+					b -= 63;
+					b = 0x100 | b;
+				}
+
+				b |= (devcb_call_read_line(&ay3600->in_shift_func) << 6);
+				b |= (devcb_call_read_line(&ay3600->in_control_func) << 7);
+
+				if (ay3600->b != b)
+				{
+					ay3600->b = b;
+
+					devcb_call_write_line(&ay3600->out_data_ready_func, 1);
+				}
+			}
+		}
+	}
 }
 
 /*-------------------------------------------------
@@ -66,7 +99,11 @@ static TIMER_CALLBACK( ay3600_scan_tick )
 
 UINT16 ay3600_b_r(const device_config *device)
 {
-	return 0;
+	ay3600_t *ay3600 = get_safe_token(device);
+
+	devcb_call_write_line(&ay3600->out_data_ready_func, 0);
+
+	return ay3600->b;
 }
 
 /*-------------------------------------------------
@@ -88,7 +125,7 @@ static DEVICE_START( ay3600 )
 	timer_adjust_periodic(ay3600->scan_timer, attotime_zero, 0, ATTOTIME_IN_HZ(60));
 
 	/* register for state saving */
-//	state_save_register_device_item(device, 0, ay3600->);
+	state_save_register_device_item(device, 0, ay3600->b);
 }
 
 /*-------------------------------------------------

@@ -41,8 +41,52 @@
 
 	TODO:
 
-	- keyboard
 	- floppy motor off timer
+	- nec765.c is broken, CPU keeps polling for RQM=0
+
+		nec765_setup_command(): Setting up command 0x06 (Read Data)
+		sector c: 00 h: 00 r: 00 n: 01
+		basicdsk seek track:0 head:0 sector:0-> offset #0x00000000
+		nec765_set_int(): state=1
+		nec765_set_int(): state=0
+		EXECUTION PHASE READ: c3
+		DATA R: c3
+		nec765_set_int(): state=1
+		nec765 status r: f0
+		nec765_set_int(): state=0
+		EXECUTION PHASE READ: 5c
+		DATA R: 5c
+		nec765_set_int(): state=1
+		nec765 status r: f0
+		nec765_set_int(): state=0
+		EXECUTION PHASE READ: d7
+		DATA R: d7
+		nec765_set_int(): state=1
+		nec765 status r: f0
+		nec765_set_int(): state=0
+		EXECUTION PHASE READ: c3
+		DATA R: c3
+		nec765_set_int(): state=1
+		nec765 status r: f0
+		nec765_set_int(): state=0
+		EXECUTION PHASE READ: 58
+		DATA R: 58
+		nec765_set_int(): state=1
+		nec765 status r: f0
+		nec765_set_int(): state=0
+		EXECUTION PHASE READ: d7
+		DATA R: d7
+		nec765_set_int(): state=1
+		nec765 status r: f0
+		nec765_set_int(): state=0
+		EXECUTION PHASE READ: 7f
+		DATA R: 7f
+		nec765_set_int(): state=1
+		nec765 status r: f0
+		nec765 status r: f0
+		nec765 status r: f0
+		nec765 status r: f0
+		...
 
 */
 
@@ -101,12 +145,19 @@ static void bw12_set_floppy_motor_off_timer(running_machine *machine)
 
 	if (state->motor0 || state->motor1)
 	{
-		/* trigger floppy motor off NE556 timer */
-//		int t = 1100 * RES_K(100) * CAP_U(4.7); // t = 1.1 * R18 * C11
-
-//		timer_adjust_oneshot(state->floppy_motor_off_timer, ATTOTIME_IN_MSEC(t), 0);
-		
 		state->motor_on = 1;
+		timer_enable(state->floppy_motor_off_timer, 0);
+	}
+	else
+	{
+		/* trigger floppy motor off NE556 timer */
+		/*
+
+			R18 = RES_K(100)
+			C11 = CAP_U(4.7)
+
+		*/
+		timer_adjust_oneshot(state->floppy_motor_off_timer, attotime_zero, 0);
 	}
 }
 
@@ -649,10 +700,11 @@ static WRITE_LINE_DEVICE_HANDLER( bw2_ay3600_data_ready_w )
 
 static AY3600_INTERFACE( bw12_ay3600_intf )
 {
-	bw2_ay3600_y_r,						/* Y input */
-	DEVCB_LINE(bw2_ay3600_shift_r),		/* shift */
-	DEVCB_LINE(bw2_ay3600_control_r),	/* control */
-	DEVCB_LINE(bw2_ay3600_data_ready_w)	/* data ready */
+	bw2_ay3600_y_r,							/* Y input */
+	DEVCB_LINE(bw2_ay3600_shift_r),			/* shift */
+	DEVCB_LINE(bw2_ay3600_control_r),		/* control */
+	DEVCB_LINE(bw2_ay3600_data_ready_w),	/* data ready */
+	DEVCB_NULL								/* any key down */
 };
 
 /* Machine Initialization */
@@ -736,6 +788,7 @@ static MACHINE_DRIVER_START( bw12 )
 	MDRV_PIA6821_ADD(PIA6821_TAG, bw12_pia_config)
 	MDRV_Z80SIO_ADD(Z80SIO_TAG, XTAL_16MHz/4, bw12_z80sio_intf) /* Z80-SIO/0 */
 	MDRV_PIT8253_ADD(PIT8253_TAG, bw12_pit8253_intf)
+	MDRV_AY3600PRO002_ADD(AY3600_TAG, bw12_ay3600_intf)
 
 	/* printer */
 	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, bw12_centronics_intf)
@@ -767,23 +820,23 @@ static DEVICE_IMAGE_LOAD( bw12_floppy )
 		switch (image_length(image))
 		{
 		case 40*1*18*256: /* 180KB BW 12 SSDD */
-			basicdsk_set_geometry(image, 40, 1, 18, 256, 1, 0, FALSE);
+			basicdsk_set_geometry(image, 40, 1, 18, 256, 0, 0, FALSE);
 			break;
 		
 		case 40*2*18*256: /* 360KB BW 14 DSDD */
-			basicdsk_set_geometry(image, 40, 2, 18, 256, 1, 0, FALSE);
+			basicdsk_set_geometry(image, 40, 2, 18, 256, 0, 0, FALSE);
 			break;
 
 		case 40*1*17*256: /* SVI-328 SSDD */
-			basicdsk_set_geometry(image, 40, 1, 17, 256, 1, 0, FALSE);
+			basicdsk_set_geometry(image, 40, 1, 17, 256, 0, 0, FALSE);
 			break;
 
 		case 40*2*17*256: /* SVI-328 DSDD */
-			basicdsk_set_geometry(image, 40, 2, 17, 256, 1, 0, FALSE);
+			basicdsk_set_geometry(image, 40, 2, 17, 256, 0, 0, FALSE);
 			break;
 
 		case 40*1*10*512: /* Kaypro II SSDD */
-			basicdsk_set_geometry(image, 40, 1, 10, 512, 1, 0, FALSE);
+			basicdsk_set_geometry(image, 40, 1, 10, 512, 0, 0, FALSE);
 			break;
 
 		default:

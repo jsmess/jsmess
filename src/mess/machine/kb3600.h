@@ -41,7 +41,7 @@
 				    B2	10 |  AY-5-3600	 | 31  X4
 				    B1	11 |   PRO 002	 | 30  X3
 					X8	12 |			 | 29  X2
-				   AKO	13 |			 | 28  X1
+				   AKD	13 |			 | 28  X1
 				  CTRL	14 |			 | 27  X0
 				 SHIFT	15 |			 | 26  Y9
 			DATA READY	16 |			 | 25  Y8
@@ -85,8 +85,11 @@ struct _ay3600_interface
 	devcb_read_line		in_shift_func;
 	devcb_read_line		in_control_func;
 
-	/* this gets called for every change of the DATA READY pin (pin 16) */
+	/* this gets called for every change of the DATA READY pin */
 	devcb_write_line	out_data_ready_func;
+
+	/* this gets called for every change of the AKD pin */
+	devcb_write_line	out_akd_func;
 };
 
 /***************************************************************************
