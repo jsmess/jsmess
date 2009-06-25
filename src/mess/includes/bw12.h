@@ -9,6 +9,7 @@
 #define PIT8253_TAG		"ic34"
 #define PIA6821_TAG		"ic16"
 #define MC1408_TAG		"ic4"
+#define AY3600_TAG		"ic74"
 #define CENTRONICS_TAG	"centronics"
 
 #define BW12_VIDEORAM_MASK	0x7ff
@@ -39,6 +40,7 @@ struct _bw12_state
 	int motor1;
 
 	/* devices */
+	const device_config *pia6821;
 	const device_config *mc6845;
 	const device_config *nec765;
 	const device_config *centronics;

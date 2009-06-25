@@ -1252,9 +1252,10 @@ $(MESSOBJ)/comx.a:				\
 	$(MESS_MACHINE)/comx35.o	\
 	$(MESS_MACHINE)/cdp1871.o	\
 	
-$(MESSOBJ)/bondwell.a: \
-	$(MESS_DRIVERS)/bw2.o \
-	$(MESS_DRIVERS)/bw12.o \
+$(MESSOBJ)/bondwell.a:			\
+	$(MESS_DRIVERS)/bw2.o		\
+	$(MESS_DRIVERS)/bw12.o		\
+	$(MESS_MACHINE)/kb3600.o	\
 
 $(MESSOBJ)/irisha.a:      \
 	$(MESS_DRIVERS)/irisha.o \
