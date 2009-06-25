@@ -55,6 +55,11 @@
 	- For testing only: The osborne1 rom can be patched to make it much
 	  more stable, by changing the byte at 0x0da7 from 0x28 to 0x18.
 
+    2009-June-25 Robbbert:
+	- Turns out kayproii not working, 10usec is too short.. but 11usec is ok.
+	  Setting it to 12usec.
+	  Really, this whole thing needs a complete rewrite.
+
     TODO:
         - Multiple record write
         - What happens if a track is read that doesn't have any id's on it?
@@ -882,7 +887,7 @@ static void wd17xx_complete_command(const device_config *device, int delay)
 	usecs *= delay;
 #endif
 
-	usecs = 10;
+	usecs = 12;
 
 	/* set new timer */
 	timer_adjust_oneshot(w->timer, ATTOTIME_IN_USEC(usecs), MISCCALLBACK_COMMAND);
