@@ -23,7 +23,7 @@
  *   - 2008-02-25: Converted to the new device interface.  [Dirk Best]
  *   - 2008-12-18: Cleanups.  [Dirk Best]
  *
- * 
+ *
  * We use the following order for the segments:
  *
  *   000 111
@@ -181,31 +181,28 @@ DEVICE_GET_INFO( dl1416 )
 *****************************************************************************/
 
 /* write enable, active low */
-void dl1416_set_input_w(const device_config *device, int data)
+WRITE_LINE_DEVICE_HANDLER( dl1416_wr_w )
 {
 	dl1416_state *chip = get_safe_token(device);
-	chip->write_enable = !data;
+	chip->write_enable = !state;
 }
-
 
 /* chip enable, active low */
-void dl1416_set_input_ce(const device_config *device, int data)
+WRITE_LINE_DEVICE_HANDLER( dl1416_ce_w )
 {
 	dl1416_state *chip = get_safe_token(device);
-	chip->chip_enable = !data;
+	chip->chip_enable = !state;
 }
-
 
 /* cursor enable, active low */
-void dl1416_set_input_cu(const device_config *device, int data)
+WRITE_LINE_DEVICE_HANDLER( dl1416_cu_w )
 {
 	dl1416_state *chip = get_safe_token(device);
-	chip->cursor_enable = !data;
+	chip->cursor_enable = !state;
 }
 
-
 /* data */
-WRITE8_DEVICE_HANDLER( dl1416_w )
+WRITE8_DEVICE_HANDLER( dl1416_data_w )
 {
 	dl1416_state *chip = get_safe_token(device);
 	const dl1416_interface *intf = device->inline_config;

@@ -14,6 +14,8 @@
 #ifndef DL1416_H_
 #define DL1416_H_
 
+#include "devcb.h"
+
 
 /***************************************************************************
     CONSTANTS
@@ -62,10 +64,10 @@ struct _dl1416_interface
 ***************************************************************************/
 
 /* inputs */
-void dl1416_set_input_w(const device_config *device, int data); /* write enable */
-void dl1416_set_input_ce(const device_config *device, int data); /* chip enable */
-void dl1416_set_input_cu(const device_config *device, int data); /* cursor enable */
-WRITE8_DEVICE_HANDLER( dl1416_w );
+WRITE_LINE_DEVICE_HANDLER( dl1416_wr_w ); /* write enable */
+WRITE_LINE_DEVICE_HANDLER( dl1416_ce_w ); /* chip enable */
+WRITE_LINE_DEVICE_HANDLER( dl1416_cu_w ); /* cursor enable */
+WRITE8_DEVICE_HANDLER( dl1416_data_w );
 
 /* device get info callback */
 #define DL1416 DEVICE_GET_INFO_NAME(dl1416)

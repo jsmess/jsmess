@@ -65,10 +65,10 @@ static UINT8 riot_port_a;
 
 static void dl1416_update(const device_config *device, int index)
 {
-	dl1416_set_input_ce(device, pia_a & (0x04 << index));
-	dl1416_set_input_w(device, pia_a & 0x80);
-	dl1416_set_input_cu(device, pia_b & 0x80);
-	dl1416_w(device, pia_a & 0x03, pia_b & 0x7f);
+	dl1416_ce_w(device, pia_a & (0x04 << index));
+	dl1416_wr_w(device, BIT(pia_a, 7));
+	dl1416_cu_w(device, BIT(pia_b, 7));
+	dl1416_data_w(device, pia_a & 0x03, pia_b & 0x7f);
 }
 
 static void aim65_pia(running_machine *machine)
