@@ -42,6 +42,7 @@ struct fm7_video_flags
 	UINT8 modestatus;
 	UINT8 multi_page;
 	UINT8 fine_offset;
+	UINT8 nmi_mask;
 };
 
 void fm7_mmr_refresh(const address_space*);

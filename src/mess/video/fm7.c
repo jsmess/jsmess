@@ -418,8 +418,12 @@ READ8_HANDLER( fm77av_video_flags_r )
 
 WRITE8_HANDLER( fm77av_video_flags_w )
 {
+	UINT8* RAM = memory_region(space->machine,"subsyscg");
+
 	fm7_video.cgrom = data & 0x03;
+	memory_set_bankptr(space->machine,20,RAM+(fm7_video.cgrom*0x800));
 	fm7_video.fine_offset = data & 0x04;
+	fm7_video.nmi_mask = data & 0x80;
 }
 
 /*
@@ -472,6 +476,10 @@ WRITE8_HANDLER( fm77av_sub_bank_w )
 {
 //	UINT8* RAM = memory_region(space->machine,"sub");
 	UINT8* ROM;
+	static int prev;
+	
+	if((data & 0x03) == (prev & 0x03))
+		return;
 	
 	fm7_video.subrom = data & 0x03;
 	switch (data & 0x03)
@@ -505,6 +513,7 @@ WRITE8_HANDLER( fm77av_sub_bank_w )
 	cputag_set_input_line(space->machine,"sub",INPUT_LINE_RESET,PULSE_LINE);
 	fm7_video.sub_busy = 0x80;
 	fm7_video.sub_reset = 1;
+	prev = data;
 }
 
 VIDEO_START( fm7 )
@@ -517,6 +526,7 @@ VIDEO_START( fm7 )
 	fm7_video.subrom = 0;
 	fm7_video.cgrom = 0;
 	fm7_video.fine_offset = 0;
+	fm7_video.nmi_mask = 0;
 }
 
 VIDEO_UPDATE( fm7 )

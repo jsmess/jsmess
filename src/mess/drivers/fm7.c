@@ -666,6 +666,16 @@ static READ8_HANDLER( fm7_fmirq_r )
 	return ret;
 }
 
+static READ8_DEVICE_HANDLER( fm77av_joy_1_r )
+{
+	return input_port_read(device->machine,"joy1");
+}
+
+static READ8_DEVICE_HANDLER( fm77av_joy_2_r )
+{
+	return input_port_read(device->machine,"joy2");
+}
+
 static READ8_HANDLER( fm7_unknown_r )
 {
 	// Port 0xFDFC is read by Dig Dug.  Controller port, perhaps?
@@ -767,8 +777,6 @@ static void fm7_update_bank(const address_space* space, int bank, UINT8 physical
 		
 		// sub monitor CGROM
 		memory_install_readwrite8_handler(space,(bank*0x1000)+0x800,(bank*0x1000)+size,0,0,SMH_BANK(20),SMH_UNMAP);
-		RAM = memory_region(space->machine,"subsyscg");
-		memory_set_bankptr(space->machine,20,RAM+(fm7_video.cgrom*0x800));
 		return;
 	}
 	if(physical == 0x36 || physical == 0x37)
@@ -786,7 +794,7 @@ static void fm7_update_bank(const address_space* space, int bank, UINT8 physical
 		if(basic_rom_en)
 		{
 			RAM = memory_region(space->machine,"fbasic");
-			memory_install_readwrite8_handler(space,bank*0x1000,(bank*0x1000)+size,0,0,SMH_BANK(bank+1),SMH_BANK(bank+1));
+			memory_install_readwrite8_handler(space,bank*0x1000,(bank*0x1000)+size,0,0,SMH_BANK(bank+1),SMH_UNMAP);
 			memory_set_bankptr(space->machine,bank+1,RAM+(physical<<12)-0x38000);
 			return;
 		}
@@ -853,7 +861,8 @@ static TIMER_CALLBACK( fm7_timer_irq )
 
 static TIMER_CALLBACK( fm7_subtimer_irq )
 {
-	cputag_set_input_line(machine,"sub",INPUT_LINE_NMI,PULSE_LINE);
+//	if(fm7_video.nmi_mask == 0)
+		cputag_set_input_line(machine,"sub",INPUT_LINE_NMI,PULSE_LINE);
 }
 
 // When a key is pressed or released, an IRQ is generated on the main CPU,
@@ -1065,7 +1074,8 @@ static ADDRESS_MAP_START( fm77av_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfd80,0xfd93) AM_READWRITE(fm7_mmr_r,fm7_mmr_w)
 	AM_RANGE(0xfd94,0xfdff) AM_READ(fm7_unknown_r)
 	// Boot ROM (RAM on FM77AV and later)
-	AM_RANGE(0xfe00,0xffef) AM_RAM_WRITE(fm77av_bootram_w) AM_BASE(&fm7_boot_ram)
+	AM_RANGE(0xfe00,0xffdf) AM_RAM_WRITE(fm77av_bootram_w) AM_BASE(&fm7_boot_ram)
+	AM_RANGE(0xffe0,0xffef) AM_RAM
 	AM_RANGE(0xfff0,0xffff) AM_READWRITE(vector_r,vector_w) 
 ADDRESS_MAP_END
 
@@ -1204,6 +1214,23 @@ static INPUT_PORTS_START( fm7 )
   PORT_BIT(0x08,IP_ACTIVE_HIGH,IPT_JOYSTICK_DOWN) PORT_NAME("LPT Joystick Down") PORT_8WAY PORT_PLAYER(1)
   PORT_BIT(0x10,IP_ACTIVE_HIGH,IPT_BUTTON2) PORT_NAME("LPT Joystick Button 2") PORT_PLAYER(1)
   PORT_BIT(0x20,IP_ACTIVE_HIGH,IPT_BUTTON1) PORT_NAME("LPT Joystick Button 1") PORT_PLAYER(1)
+  
+  PORT_START("joy1")
+  PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_JOYSTICK_RIGHT) PORT_NAME("Joystick Right") PORT_8WAY PORT_PLAYER(1)
+  PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_JOYSTICK_LEFT) PORT_NAME("Joystick Left") PORT_8WAY PORT_PLAYER(1)
+  PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_JOYSTICK_UP) PORT_NAME("Joystick Up") PORT_8WAY PORT_PLAYER(1)
+  PORT_BIT(0x08,IP_ACTIVE_HIGH,IPT_JOYSTICK_DOWN) PORT_NAME("Joystick Down") PORT_8WAY PORT_PLAYER(1)
+  PORT_BIT(0x10,IP_ACTIVE_HIGH,IPT_BUTTON2) PORT_NAME("Joystick Button 2") PORT_PLAYER(1)
+  PORT_BIT(0x20,IP_ACTIVE_HIGH,IPT_BUTTON1) PORT_NAME("Joystick Button 1") PORT_PLAYER(1)
+
+  PORT_START("joy2")
+  PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_JOYSTICK_RIGHT) PORT_NAME("Joystick Right") PORT_8WAY PORT_PLAYER(2)
+  PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_JOYSTICK_LEFT) PORT_NAME("Joystick Left") PORT_8WAY PORT_PLAYER(2)
+  PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_JOYSTICK_UP) PORT_NAME("Joystick Up") PORT_8WAY PORT_PLAYER(2)
+  PORT_BIT(0x08,IP_ACTIVE_HIGH,IPT_JOYSTICK_DOWN) PORT_NAME("Joystick Down") PORT_8WAY PORT_PLAYER(2)
+  PORT_BIT(0x10,IP_ACTIVE_HIGH,IPT_BUTTON2) PORT_NAME("Joystick Button 2") PORT_PLAYER(2)
+  PORT_BIT(0x20,IP_ACTIVE_HIGH,IPT_BUTTON1) PORT_NAME("Joystick Button 1") PORT_PLAYER(2)
+  
 
   PORT_START("DSW")
   PORT_DIPNAME(0x01,0x01,"Switch A") PORT_DIPLOCATION("SWA:1")
@@ -1335,8 +1362,8 @@ static const ym2203_interface fm7_ym_intf =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		DEVCB_NULL,	// Joystick A (TODO)
-		DEVCB_NULL,	// Joystick B (TODO)
+		DEVCB_HANDLER(fm77av_joy_1_r),
+		DEVCB_HANDLER(fm77av_joy_2_r),
 		DEVCB_NULL,					/* portA write */
 		DEVCB_NULL					/* portB write */
 	},
