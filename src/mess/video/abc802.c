@@ -9,14 +9,6 @@
 #include "machine/z80dart.h"
 #include "video/mc6845.h"
 
-/* Palette Initialization */
-
-static PALETTE_INIT( abc802 )
-{
-	palette_set_color_rgb(machine, 0, 0x00, 0x00, 0x00); // black
-	palette_set_color_rgb(machine, 1, 0xff, 0x81, 0x00); // amber
-}
-
 /* Character Memory */
 
 READ8_HANDLER( abc802_charram_r )
@@ -272,7 +264,7 @@ MACHINE_DRIVER_START( abc802_video )
 
 	MDRV_PALETTE_LENGTH(2)
 
-	MDRV_PALETTE_INIT(abc802)
+	MDRV_PALETTE_INIT(monochrome_amber)
 	MDRV_VIDEO_START(abc802)
 	MDRV_VIDEO_UPDATE(abc802)
 MACHINE_DRIVER_END

@@ -358,12 +358,6 @@ INPUT_PORTS_END
 
 /* Video */
 
-static PALETTE_INIT( bw12 )
-{
-	palette_set_color_rgb(machine, 0, 0x00, 0x00, 0x00); /* black */
-	palette_set_color_rgb(machine, 1, 0xf7, 0xaa, 0x00); /* amber */
-}
-
 static MC6845_UPDATE_ROW( bw12_update_row )
 {
 	bw12_state *state = device->machine->driver_data;
@@ -744,7 +738,7 @@ static MACHINE_DRIVER_START( bw12 )
 	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 
 	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(bw12)
+	MDRV_PALETTE_INIT(monochrome_amber)
 
     MDRV_VIDEO_START(bw12)
     MDRV_VIDEO_UPDATE(bw12)
