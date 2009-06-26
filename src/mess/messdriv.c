@@ -1413,6 +1413,7 @@ const game_driver * const drivers[] =
     DRIVER( mmd1 )
     DRIVER( mmd2 )
     DRIVER( mpf1p )
+	DRIVER( stopthie )
 
 #endif /* DRIVER_RECURSIVE */
 

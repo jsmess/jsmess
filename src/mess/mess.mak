@@ -121,6 +121,7 @@ CPUS += SM8500
 CPUS += MINX
 CPUS += SSEM
 CPUS += AVR8
+CPUS += TMS0980
 
 
 
@@ -1457,6 +1458,7 @@ $(MESSOBJ)/skeleton.a: \
 	$(MESS_DRIVERS)/z9001.o \
 	$(MESS_DRIVERS)/cat.o \
 	$(MESS_DRIVERS)/mmd1.o \
+	$(MESS_DRIVERS)/stopthie.o \
 	
 #-------------------------------------------------
 # layout dependencies
@@ -1494,6 +1496,7 @@ $(MESS_VIDEO)/pc8401a.o:	$(MESS_LAYOUT)/pc8500.lh
 $(MESS_DRIVERS)/pokemini.o:	$(MESS_LAYOUT)/pokemini.lh
 $(MESS_DRIVERS)/px4.o:		$(MESS_LAYOUT)/px4.lh
 $(MESS_DRIVERS)/socrates.o:	$(MESS_LAYOUT)/socrates.lh
+$(MESS_DRIVERS)/stopthie.o:	$(MESS_LAYOUT)/stopthie.lh
 $(MESS_DRIVERS)/super80.o:	$(MESS_LAYOUT)/super80.lh
 $(MESS_DRIVERS)/svi318.o:	$(MESS_LAYOUT)/sv328806.lh
 $(MESS_DRIVERS)/svision.o:	$(MESS_LAYOUT)/svision.lh
