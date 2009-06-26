@@ -71,6 +71,8 @@ typedef enum
 /* state of nec765 FDD READY input */
 #define NEC765_FDD_READY 0x040
 
+#define NEC765_MF	0x40
+
 #define NEC765_RESET 0x080
 
 typedef struct _nec765_t nec765_t;
@@ -353,8 +355,16 @@ static void nec765_timer_func(const device_config *device, int timer_type)
 
 		if (!(fdc->nec765_flags & NEC765_DMA_MODE))
 		{
-			/* for pcw */
-			timer_reset(fdc->timer, ATTOTIME_IN_USEC(27));
+			if (fdc->nec765_command_bytes[0] & NEC765_MF)
+			{
+				/* MFM */
+				timer_reset(fdc->timer, ATTOTIME_IN_USEC(13));
+			}
+			else
+			{
+				/* FM */
+				timer_reset(fdc->timer, ATTOTIME_IN_USEC(27));
+			}
 		}
 		else
 		{
