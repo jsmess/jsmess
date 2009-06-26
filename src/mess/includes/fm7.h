@@ -11,7 +11,7 @@
 #define IRQ_FLAG_KEY      0x01
 #define IRQ_FLAG_PRINTER  0x02
 #define IRQ_FLAG_TIMER    0x04
-#define IRQ_FLAG_UNKNOWN  0x08
+#define IRQ_FLAG_OTHER    0x08
 // the following are not read in port 0xfd03
 #define IRQ_FLAG_MFD      0x10
 #define IRQ_FLAG_TXRDY    0x20
@@ -38,11 +38,13 @@ struct fm7_video_flags
 	UINT8 fm77av_pal_g[4096];
 	UINT8 fm77av_pal_b[4096];
 	UINT8 subrom;  // currently active sub CPU ROM (AV only)
+	UINT8 cgrom;  // currently active CGROM (AV only)
 	UINT8 modestatus;
 	UINT8 multi_page;
+	UINT8 fine_offset;
 };
 
-void fm7_mmr_refresh(running_machine*);
+void fm7_mmr_refresh(const address_space*);
 
 READ8_HANDLER( fm7_subintf_r );
 WRITE8_HANDLER( fm7_subintf_w );
@@ -63,11 +65,38 @@ READ8_HANDLER( fm7_crt_r );
 WRITE8_HANDLER( fm7_crt_w );
 WRITE8_HANDLER( fm7_vram_offset_w );
 READ8_HANDLER( fm77av_video_flags_r );
+WRITE8_HANDLER( fm77av_video_flags_w );
 
 WRITE8_HANDLER( fm77av_analog_palette_w );
 WRITE8_HANDLER( fm7_multipage_w );
 READ8_HANDLER( fm7_palette_r );
 WRITE8_HANDLER( fm7_palette_w );
+
+READ8_HANDLER( fm7_vram0_r );
+READ8_HANDLER( fm7_vram1_r );
+READ8_HANDLER( fm7_vram2_r );
+READ8_HANDLER( fm7_vram3_r );
+READ8_HANDLER( fm7_vram4_r );
+READ8_HANDLER( fm7_vram5_r );
+READ8_HANDLER( fm7_vram6_r );
+READ8_HANDLER( fm7_vram7_r );
+READ8_HANDLER( fm7_vram8_r );
+READ8_HANDLER( fm7_vram9_r );
+READ8_HANDLER( fm7_vramA_r );
+READ8_HANDLER( fm7_vramB_r );
+WRITE8_HANDLER( fm7_vram0_w );
+WRITE8_HANDLER( fm7_vram1_w );
+WRITE8_HANDLER( fm7_vram2_w );
+WRITE8_HANDLER( fm7_vram3_w );
+WRITE8_HANDLER( fm7_vram4_w );
+WRITE8_HANDLER( fm7_vram5_w );
+WRITE8_HANDLER( fm7_vram6_w );
+WRITE8_HANDLER( fm7_vram7_w );
+WRITE8_HANDLER( fm7_vram8_w );
+WRITE8_HANDLER( fm7_vram9_w );
+WRITE8_HANDLER( fm7_vramA_w );
+WRITE8_HANDLER( fm7_vramB_w );
+
 
 VIDEO_START( fm7 );
 VIDEO_UPDATE( fm7 );

@@ -52,6 +52,8 @@
 
 UINT8* fm7_video_ram;
 UINT8* shared_ram;
+UINT8* fm7_boot_ram;  // Boot RAM (AV only)
+UINT8 fm7_type;
 static UINT8 irq_flags;  // active IRQ flags
 static UINT8 irq_mask;  // IRQ mask 
 emu_timer* fm7_timer;  // main timer, triggered every 2.0345ms
@@ -70,7 +72,7 @@ static UINT8 fdc_side;
 static UINT8 fdc_drive;
 static UINT8 fdc_irq_flag;
 static UINT8 fdc_drq_flag;
-static UINT8 fm7_type;
+static UINT8 fm77av_ym_irq;
 
 struct mmr
 {
@@ -283,7 +285,7 @@ static READ8_HANDLER( fm7_rom_en_r )
 	if(fm7_type == SYS_FM7)
 		memory_set_bankptr(space->machine,1,RAM+0x38000);
 	else
-		fm7_mmr_refresh(space->machine);
+		fm7_mmr_refresh(space);
 	logerror("BASIC ROM enabled\n");
 	return 0x00;
 }
@@ -296,7 +298,7 @@ static WRITE8_HANDLER( fm7_rom_en_w )
 	if(fm7_type == SYS_FM7)
 		memory_set_bankptr(space->machine,1,RAM+0x8000);
 	else
-		fm7_mmr_refresh(space->machine);
+		fm7_mmr_refresh(space);
 	logerror("BASIC ROM disabled\n");
 }
 
@@ -311,12 +313,12 @@ WRITE8_HANDLER( fm7_init_en_w )
 	if(data & 0x02)
 	{
 		init_rom_en = 0;
-		fm7_mmr_refresh(space->machine);
+		fm7_mmr_refresh(space);
 	}
 	else
 	{
 		init_rom_en = 1;
-		fm7_mmr_refresh(space->machine);
+		fm7_mmr_refresh(space);
 	}
 }
 
@@ -626,6 +628,13 @@ static READ8_HANDLER( fm7_psg_data_r )
 	return psg_data;
 }
 
+static WRITE8_HANDLER( fm77av_bootram_w )
+{
+	if(!(fm7_mmr.mode & 0x01))
+		return;
+	fm7_boot_ram[offset] = data;
+}
+
 static WRITE8_HANDLER( fm7_psg_data_w )
 {
 	psg_data = data;
@@ -645,6 +654,16 @@ static WRITE8_HANDLER( fm7_main_shared_w )
 {
 	if(fm7_video.sub_halt != 0)
 		shared_ram[offset] = data;
+}
+
+static READ8_HANDLER( fm7_fmirq_r )
+{
+	UINT8 ret = 0xff;
+	
+	if(fm77av_ym_irq == 0)
+		ret &= ~0x08;
+		
+	return ret;
 }
 
 static READ8_HANDLER( fm7_unknown_r )
@@ -681,21 +700,84 @@ static READ8_HANDLER( fm7_mmr_r )
 	return 0xff;
 }
 
-static void fm7_update_bank(running_machine* machine, int bank, UINT8 physical)
+static void fm7_update_bank(const address_space* space, int bank, UINT8 physical)
 {
-	UINT8* RAM = memory_region(machine,"maincpu");
+	UINT8* RAM = memory_region(space->machine,"maincpu");
+	UINT16 size = 0xfff;
 	
-	if(physical > 0x10 && physical <= 0x1f)
+	if(bank == 15)
+		size = 0xbff;
+	
+	if(physical >= 0x10 && physical <= 0x1b)
 	{
-		RAM = memory_region(machine,"sub");
-		memory_set_bankptr(machine,bank+1,RAM+(physical<<12)-0x10000);
+		switch(physical)
+		{
+			case 0x10:
+				memory_install_readwrite8_handler(space,bank*0x1000,(bank*0x1000)+size,0,0,fm7_vram0_r,fm7_vram0_w);
+				break;
+			case 0x11:
+				memory_install_readwrite8_handler(space,bank*0x1000,(bank*0x1000)+size,0,0,fm7_vram1_r,fm7_vram1_w);
+				break;
+			case 0x12:
+				memory_install_readwrite8_handler(space,bank*0x1000,(bank*0x1000)+size,0,0,fm7_vram2_r,fm7_vram2_w);
+				break;
+			case 0x13:
+				memory_install_readwrite8_handler(space,bank*0x1000,(bank*0x1000)+size,0,0,fm7_vram3_r,fm7_vram3_w);
+				break;
+			case 0x14:
+				memory_install_readwrite8_handler(space,bank*0x1000,(bank*0x1000)+size,0,0,fm7_vram4_r,fm7_vram4_w);
+				break;
+			case 0x15:
+				memory_install_readwrite8_handler(space,bank*0x1000,(bank*0x1000)+size,0,0,fm7_vram5_r,fm7_vram5_w);
+				break;
+			case 0x16:
+				memory_install_readwrite8_handler(space,bank*0x1000,(bank*0x1000)+size,0,0,fm7_vram6_r,fm7_vram6_w);
+				break;
+			case 0x17:
+				memory_install_readwrite8_handler(space,bank*0x1000,(bank*0x1000)+size,0,0,fm7_vram7_r,fm7_vram7_w);
+				break;
+			case 0x18:
+				memory_install_readwrite8_handler(space,bank*0x1000,(bank*0x1000)+size,0,0,fm7_vram8_r,fm7_vram8_w);
+				break;
+			case 0x19:
+				memory_install_readwrite8_handler(space,bank*0x1000,(bank*0x1000)+size,0,0,fm7_vram9_r,fm7_vram9_w);
+				break;
+			case 0x1a:
+				memory_install_readwrite8_handler(space,bank*0x1000,(bank*0x1000)+size,0,0,fm7_vramA_r,fm7_vramA_w);
+				break;
+			case 0x1b:
+				memory_install_readwrite8_handler(space,bank*0x1000,(bank*0x1000)+size,0,0,fm7_vramB_r,fm7_vramB_w);
+				break;
+		}
+//		memory_set_bankptr(space->machine,bank+1,RAM+(physical<<12)-0x10000);
+		return;
+	}
+	if(physical == 0x1d)
+	{
+		// special case - the sub CPU's I/O ports are available on this RAM page
+		// work RAM
+		memory_install_readwrite8_handler(space,bank*0x1000,(bank*0x1000)+0x800,0,0,SMH_BANK(bank+1),SMH_BANK(bank+1));
+		memory_set_bankptr(space->machine,bank+1,RAM+(physical<<12));
+		//memory_install_readwrite8_handler(space,(bank*0x1000)+0x380,(bank*0x1000)+0x3ff,0,0,SMH_BANK(bank+1),SMH_BANK(bank+1));
+		// various sub CPU I/O ports
+		memory_install_readwrite8_handler(space,(bank*0x1000)+0x409,(bank*0x1000)+0x409,0,0,fm7_vram_access_r,fm7_vram_access_w);
+		memory_install_readwrite8_handler(space,(bank*0x1000)+0x40a,(bank*0x1000)+0x40a,0,0,fm7_sub_busyflag_r,fm7_sub_busyflag_w);
+		memory_install_write8_handler(space,(bank*0x1000)+0x40e,(bank*0x1000)+0x40f,0,0,fm7_vram_offset_w);
+		memory_install_readwrite8_handler(space,(bank*0x1000)+0x430,(bank*0x1000)+0x430,0,0,fm77av_video_flags_r,fm77av_video_flags_w);
+		
+		// sub monitor CGROM
+		memory_install_readwrite8_handler(space,(bank*0x1000)+0x800,(bank*0x1000)+size,0,0,SMH_BANK(20),SMH_UNMAP);
+		RAM = memory_region(space->machine,"subsyscg");
+		memory_set_bankptr(space->machine,20,RAM+(fm7_video.cgrom*0x800));
+		return;
 	}
 	if(physical == 0x36 || physical == 0x37)
 	{
 		if(init_rom_en)
 		{
-			RAM = memory_region(machine,"init");
-			memory_set_bankptr(machine,bank+1,RAM+(physical<<12)-0x36000);
+			RAM = memory_region(space->machine,"init");
+			memory_install_readwrite8_handler(space,bank*0x1000,(bank*0x1000)+size,0,0,SMH_BANK(bank+1),SMH_BANK(bank+1));
+			memory_set_bankptr(space->machine,bank+1,RAM+(physical<<12)-0x36000);
 			return;
 		}
 	}
@@ -703,29 +785,30 @@ static void fm7_update_bank(running_machine* machine, int bank, UINT8 physical)
 	{
 		if(basic_rom_en)
 		{
-			RAM = memory_region(machine,"fbasic");
-			memory_set_bankptr(machine,bank+1,RAM+(physical<<12)-0x38000);
+			RAM = memory_region(space->machine,"fbasic");
+			memory_install_readwrite8_handler(space,bank*0x1000,(bank*0x1000)+size,0,0,SMH_BANK(bank+1),SMH_BANK(bank+1));
+			memory_set_bankptr(space->machine,bank+1,RAM+(physical<<12)-0x38000);
 			return;
 		}
 	}
-	
-	memory_set_bankptr(machine,bank+1,RAM+(physical<<12));
+	memory_install_readwrite8_handler(space,bank*0x1000,(bank*0x1000)+size,0,0,SMH_BANK(bank+1),SMH_BANK(bank+1));
+	memory_set_bankptr(space->machine,bank+1,RAM+(physical<<12));
 }
 
-void fm7_mmr_refresh(running_machine* machine)
+void fm7_mmr_refresh(const address_space* space)
 {
 	int x;
 	
 	if(fm7_mmr.enabled)
 	{
 		for(x=0;x<16;x++)
-			fm7_update_bank(machine,x,fm7_mmr.bank_addr[fm7_mmr.segment][x]);
+			fm7_update_bank(space,x,fm7_mmr.bank_addr[fm7_mmr.segment][x]);
 	}
 	else
 	{
 		// when MMR is disabled, 0x30000-0x3ffff is banked in
 		for(x=0;x<16;x++)
-			fm7_update_bank(machine,x,0x30+x);
+			fm7_update_bank(space,x,0x30+x);
 	}
 }
 
@@ -735,7 +818,7 @@ static WRITE8_HANDLER( fm7_mmr_w )
 	{
 		fm7_mmr.bank_addr[fm7_mmr.segment][offset] = data;
 		if(fm7_mmr.enabled)
-			fm7_update_bank(space->machine,offset,data);
+			fm7_update_bank(space,offset,data);
 		logerror("MMR: Segment %i, bank %i, set to  0x%02x\n",fm7_mmr.segment,offset,data);
 		return;
 	}
@@ -743,7 +826,7 @@ static WRITE8_HANDLER( fm7_mmr_w )
 	{
 		case 0x10:
 			fm7_mmr.segment = data & 0x07;
-			fm7_mmr_refresh(space->machine);
+			fm7_mmr_refresh(space);
 			logerror("MMR: Active segment set to %i\n",fm7_mmr.segment);
 			break;
 		case 0x12:
@@ -753,7 +836,7 @@ static WRITE8_HANDLER( fm7_mmr_w )
 		case 0x13:
 			fm7_mmr.mode = data;
 			fm7_mmr.enabled = data & 0x80;
-			fm7_mmr_refresh(space->machine);
+			fm7_mmr_refresh(space);
 			logerror("MMR: Mode register set to %02x\n",data);
 			break;
 	}
@@ -849,6 +932,24 @@ static IRQ_CALLBACK(fm7_sub_irq_ack)
 {
 	cputag_set_input_line(device->machine,"sub",irqline,CLEAR_LINE);
 	return -1;
+}
+
+void fm77av_fmirq(const device_config* device,int irq)
+{
+	if(irq == 1)
+	{
+		if(irq_mask & IRQ_FLAG_OTHER)
+		{		
+			irq_flags |= IRQ_FLAG_OTHER;
+			cputag_set_input_line(device->machine,"maincpu",M6809_IRQ_LINE,ASSERT_LINE);
+		}
+		fm77av_ym_irq = 1;
+	}
+	else
+	{
+//		cputag_set_input_line(device->machine,"maincpu",M6809_IRQ_LINE,CLEAR_LINE);
+		fm77av_ym_irq = 0;
+	}
 }
 
 /*
@@ -953,7 +1054,7 @@ static ADDRESS_MAP_START( fm77av_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfd14,0xfd14) AM_READ(fm7_unknown_r)
 	AM_RANGE(0xfd15,0xfd15) AM_DEVREADWRITE("ym",ym2203_status_port_r,ym2203_control_port_w)
 	AM_RANGE(0xfd16,0xfd16) AM_DEVREADWRITE("ym",ym2203_read_port_r,ym2203_write_port_w)
-	AM_RANGE(0xfd17,0xfd17) AM_READ(fm7_unknown_r)
+	AM_RANGE(0xfd17,0xfd17) AM_READ(fm7_fmirq_r)
 	AM_RANGE(0xfd18,0xfd1f) AM_READWRITE(fm7_fdc_r,fm7_fdc_w)
 	AM_RANGE(0xfd24,0xfd2f) AM_READ(fm7_unknown_r)
 	AM_RANGE(0xfd30,0xfd34) AM_WRITE(fm77av_analog_palette_w)
@@ -964,14 +1065,14 @@ static ADDRESS_MAP_START( fm77av_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfd80,0xfd93) AM_READWRITE(fm7_mmr_r,fm7_mmr_w)
 	AM_RANGE(0xfd94,0xfdff) AM_READ(fm7_unknown_r)
 	// Boot ROM (RAM on FM77AV and later)
-	AM_RANGE(0xfe00,0xffef) AM_RAM
+	AM_RANGE(0xfe00,0xffef) AM_RAM_WRITE(fm77av_bootram_w) AM_BASE(&fm7_boot_ram)
 	AM_RANGE(0xfff0,0xffff) AM_READWRITE(vector_r,vector_w) 
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fm77av_sub_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000,0xbfff) AM_READWRITE(fm7_vram_r,fm7_vram_w) // VRAM
-	AM_RANGE(0xc000,0xcfff) AM_RAM // Console RAM
-	AM_RANGE(0xd000,0xd37f) AM_RAM // Work RAM
+	AM_RANGE(0xc000,0xcfff) AM_RAM AM_REGION("maincpu",0x1c000) // Console RAM
+	AM_RANGE(0xd000,0xd37f) AM_RAM AM_REGION("maincpu",0x1d000) // Work RAM
 	AM_RANGE(0xd380,0xd3ff) AM_RAM AM_BASE(&shared_ram)
 	// I/O space (D400-D7FF)
 	AM_RANGE(0xd400,0xd401) AM_READ(fm7_sub_keyboard_r)
@@ -981,7 +1082,8 @@ static ADDRESS_MAP_START( fm77av_sub_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd409,0xd409) AM_READWRITE(fm7_vram_access_r,fm7_vram_access_w)
 	AM_RANGE(0xd40a,0xd40a) AM_READWRITE(fm7_sub_busyflag_r,fm7_sub_busyflag_w)
 	AM_RANGE(0xd40e,0xd40f) AM_WRITE(fm7_vram_offset_w)
-	AM_RANGE(0xd430,0xd430) AM_READ(fm77av_video_flags_r)
+	AM_RANGE(0xd430,0xd430) AM_READWRITE(fm77av_video_flags_r,fm77av_video_flags_w)
+	AM_RANGE(0xd500,0xd7ff) AM_RAM AM_REGION("maincpu",0x1d500) // Work RAM
 	AM_RANGE(0xd800,0xdfff) AM_ROMBANK(20)
 	AM_RANGE(0xe000,0xffff) AM_ROMBANK(21)
 ADDRESS_MAP_END
@@ -1157,9 +1259,10 @@ static MACHINE_START(fm77av)
 	// last part of Initiate ROM is visible at the end of RAM too (interrupt vectors)	
 	memcpy(RAM+0xfff0,ROM+0x1ff0,16);
 
-	RAM = memory_region(machine,"subsys_c");
 	fm7_video.subrom = 0;  // default sub CPU ROM is type C.
+	RAM = memory_region(machine,"subsyscg");
 	memory_set_bankptr(machine,20,RAM);
+	RAM = memory_region(machine,"subsys_c");
 	memory_set_bankptr(machine,21,RAM+0x800);
 	
 	fm7_type = SYS_FM77AV;
@@ -1192,7 +1295,7 @@ static MACHINE_RESET(fm7)
 	fm7_mmr.mode = 0;
 	fm7_mmr.segment = 0;
 	fm7_mmr.enabled = 0;
-	
+	fm77av_ym_irq = 0;
 	// set boot mode (FM-7 only, AV and later has boot RAM instead)
 	if(fm7_type == SYS_FM7)
 	{
@@ -1207,7 +1310,7 @@ static MACHINE_RESET(fm7)
 	}
 	if(fm7_type != SYS_FM7)  // set default RAM banks
 	{
-		fm7_mmr_refresh(machine);
+		fm7_mmr_refresh(cpu_get_address_space(cputag_get_cpu(machine,"maincpu"),ADDRESS_SPACE_PROGRAM));
 	}
 }
 
@@ -1237,7 +1340,7 @@ static const ym2203_interface fm7_ym_intf =
 		DEVCB_NULL,					/* portA write */
 		DEVCB_NULL					/* portB write */
 	},
-	NULL  // TODO
+	fm77av_fmirq
 };
 
 static const cassette_config fm7_cassette_config =
