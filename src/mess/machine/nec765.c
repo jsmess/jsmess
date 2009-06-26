@@ -910,8 +910,11 @@ static int nec765_get_matching_sector(const device_config *device)
 	}
 	while (index_count!=2);
 
-	/* no data - specified sector ID was not found */
-    fdc->nec765_status[1] |= NEC765_ST1_NO_DATA;
+	if (fdc->nec765_command_bytes[4] != fdc->nec765_command_bytes[6])
+	{
+		/* no data - specified sector ID was not found */
+		fdc->nec765_status[1] |= NEC765_ST1_NO_DATA;
+	}
 
 	return 0;
 }
