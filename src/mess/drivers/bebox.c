@@ -81,6 +81,27 @@ static ADDRESS_MAP_START( bebox_mem, ADDRESS_SPACE_PROGRAM, 64 )
 	AM_RANGE(0xFFF04000, 0xFFFFFFFF) AM_READWRITE( bebox_flash_r, bebox_flash_w )
 ADDRESS_MAP_END
 
+// The following is a gross hack to let the BeBox boot ROM identify the processors correctly.
+// This needs to be done in a better way if someone comes up with one.
+
+static READ64_HANDLER(bb_slave_64be_r)
+{
+	const device_config *device = devtag_get_device(space->machine, "pcibus");
+
+	if (cpu_get_pc(space->cpu) == 0xfff02e94)
+	{
+		return 0x108000ff;	// indicate slave CPU
+	}
+
+	return pci_64be_r(device, offset, mem_mask);
+}
+
+static ADDRESS_MAP_START( bebox_slave_mem, ADDRESS_SPACE_PROGRAM, 64 )
+	AM_RANGE(0x80000cf8, 0x80000cff) AM_READ(bb_slave_64be_r)
+	AM_RANGE(0x80000cf8, 0x80000cff) AM_DEVWRITE("pcibus", pci_64be_w )
+	AM_IMPORT_FROM(bebox_mem)
+ADDRESS_MAP_END
+
 
 static MACHINE_DRIVER_START( bebox )
 	/* basic machine hardware */
@@ -88,7 +109,7 @@ static MACHINE_DRIVER_START( bebox )
 	MDRV_CPU_PROGRAM_MAP(bebox_mem)
 
 	MDRV_CPU_ADD("ppc2", PPC603, 66000000)	/* 66 MHz */
-	MDRV_CPU_PROGRAM_MAP(bebox_mem)
+	MDRV_CPU_PROGRAM_MAP(bebox_slave_mem)
 
 	MDRV_QUANTUM_TIME(HZ(60))
 
