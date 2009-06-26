@@ -41,52 +41,8 @@
 
 	TODO:
 
+	- Osborne 1 DD disk format
 	- floppy motor off timer
-	- nec765.c is broken, CPU keeps polling for RQM=0
-
-		nec765_setup_command(): Setting up command 0x06 (Read Data)
-		sector c: 00 h: 00 r: 00 n: 01
-		basicdsk seek track:0 head:0 sector:0-> offset #0x00000000
-		nec765_set_int(): state=1
-		nec765_set_int(): state=0
-		EXECUTION PHASE READ: c3
-		DATA R: c3
-		nec765_set_int(): state=1
-		nec765 status r: f0
-		nec765_set_int(): state=0
-		EXECUTION PHASE READ: 5c
-		DATA R: 5c
-		nec765_set_int(): state=1
-		nec765 status r: f0
-		nec765_set_int(): state=0
-		EXECUTION PHASE READ: d7
-		DATA R: d7
-		nec765_set_int(): state=1
-		nec765 status r: f0
-		nec765_set_int(): state=0
-		EXECUTION PHASE READ: c3
-		DATA R: c3
-		nec765_set_int(): state=1
-		nec765 status r: f0
-		nec765_set_int(): state=0
-		EXECUTION PHASE READ: 58
-		DATA R: 58
-		nec765_set_int(): state=1
-		nec765 status r: f0
-		nec765_set_int(): state=0
-		EXECUTION PHASE READ: d7
-		DATA R: d7
-		nec765_set_int(): state=1
-		nec765 status r: f0
-		nec765_set_int(): state=0
-		EXECUTION PHASE READ: 7f
-		DATA R: 7f
-		nec765_set_int(): state=1
-		nec765 status r: f0
-		nec765 status r: f0
-		nec765 status r: f0
-		nec765 status r: f0
-		...
 
 */
 
@@ -571,8 +527,12 @@ static WRITE_LINE_DEVICE_HANDLER( bw12_pia6821_cb2_w )
 	if (state)
 	{
 		/* keyboard shift clock */
-		driver_state->key_sin = BIT(driver_state->key_data, 0);
-		driver_state->key_data >>= 1;
+		driver_state->key_shift++;
+		
+		if (driver_state->key_shift < 10)
+		{
+			driver_state->key_sin = driver_state->key_data[driver_state->key_shift];
+		}
 	}
 }
 
@@ -694,7 +654,20 @@ static WRITE_LINE_DEVICE_HANDLER( bw2_ay3600_data_ready_w )
 
 	if (state)
 	{
-		driver_state->key_data = BITSWAP16(ay3600_b_r(device), 15, 14, 13, 12, 11, 10, 9, 2, 5, 7, 8, 6, 4, 3, 1, 0);
+		UINT16 data = ay3600_b_r(device);
+
+		driver_state->key_data[0] = BIT(data, 6);
+		driver_state->key_data[1] = BIT(data, 3);
+		driver_state->key_data[2] = BIT(data, 1);
+		driver_state->key_data[3] = BIT(data, 0);
+		driver_state->key_data[4] = BIT(data, 2);
+		driver_state->key_data[5] = BIT(data, 4);
+		driver_state->key_data[6] = BIT(data, 5);
+		driver_state->key_data[7] = BIT(data, 7);
+		driver_state->key_data[8] = BIT(data, 8);
+
+		driver_state->key_shift = 0;
+		driver_state->key_sin = driver_state->key_data[driver_state->key_shift];
 	}
 }
 
@@ -729,9 +702,10 @@ static MACHINE_START( bw12 )
 	/* register for state saving */
 	state_save_register_global(machine, state->bank);
 	state_save_register_global(machine, state->pit_out2);
-	state_save_register_global(machine, state->key_data);
+	state_save_register_global_array(machine, state->key_data);
 	state_save_register_global(machine, state->key_sin);
 	state_save_register_global(machine, state->key_stb);
+	state_save_register_global(machine, state->key_shift);
 	state_save_register_global(machine, state->fdcint);
 	state_save_register_global(machine, state->motor_on);
 	state_save_register_global(machine, state->motor0);
@@ -879,5 +853,5 @@ SYSTEM_CONFIG_END
 /* System Drivers */
 
 /*    YEAR  NAME	PARENT	COMPAT	MACHINE		INPUT		INIT	CONFIG		COMPANY	FULLNAME */
-COMP( 1984, bw12,  0,       0, 	bw12, 	bw12, 	 0,  	  bw12,  	 "Bondwell",   "BW 12",		GAME_NOT_WORKING )
-COMP( 1984, bw14,  bw12,    0, 	bw12, 	bw12, 	 0,  	  bw14,  	 "Bondwell",   "BW 14",		GAME_NOT_WORKING )
+COMP( 1984, bw12,  0,       0, 	bw12, 	bw12, 	 0,  	  bw12,  	 "Bondwell",   "BW 12",		0 )
+COMP( 1984, bw14,  bw12,    0, 	bw12, 	bw12, 	 0,  	  bw14,  	 "Bondwell",   "BW 14",		0 )

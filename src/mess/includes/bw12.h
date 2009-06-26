@@ -29,9 +29,10 @@ struct _bw12_state
 	int pit_out2;
 
 	/* keyboard state */
-	UINT16 key_data;
+	int key_data[9];
 	int key_sin;
 	int key_stb;
+	int key_shift;
 
 	/* floppy state */
 	int fdcint;

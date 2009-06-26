@@ -7,6 +7,15 @@
 
 **********************************************************************/
 
+/*
+	
+	TODO:
+
+	- more accurate emulation of real chip
+	- any key down
+
+*/
+
 #include "driver.h"
 #include "kb3600.h"
 
@@ -22,7 +31,7 @@ struct _ay3600_t
 	devcb_resolved_read_line	in_shift_func;
 	devcb_resolved_read_line	in_control_func;
 
-	UINT16 b;					/* output buffer */
+	int b;						/* output buffer */
 
 	/* timers */
 	emu_timer *scan_timer;		/* keyboard scan timer */
@@ -62,6 +71,7 @@ static TIMER_CALLBACK( ay3600_scan_tick )
 	const ay3600_interface *intf = get_interface(device);
 
 	int x, y;
+	int akd = 0;
 
 	for (x = 0; x < 9; x++)
 	{
@@ -73,9 +83,11 @@ static TIMER_CALLBACK( ay3600_scan_tick )
 			{
 				int b = (x * 10) + y;
 
+				akd = 1;
+
 				if (b > 63)
 				{
-					b -= 63;
+					b -= 64;
 					b = 0x100 | b;
 				}
 
@@ -87,9 +99,15 @@ static TIMER_CALLBACK( ay3600_scan_tick )
 					ay3600->b = b;
 
 					devcb_call_write_line(&ay3600->out_data_ready_func, 1);
+					return;
 				}
 			}
 		}
+	}
+	
+	if (!akd)
+	{
+		ay3600->b = -1;
 	}
 }
 
@@ -101,9 +119,11 @@ UINT16 ay3600_b_r(const device_config *device)
 {
 	ay3600_t *ay3600 = get_safe_token(device);
 
+	UINT16 data = ay3600->b;
+
 	devcb_call_write_line(&ay3600->out_data_ready_func, 0);
 
-	return ay3600->b;
+	return data;
 }
 
 /*-------------------------------------------------

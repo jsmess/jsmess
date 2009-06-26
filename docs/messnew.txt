@@ -23,10 +23,15 @@ Skeleton drivers :
 
 System Driver Changes:
 ----------------------
+- [BW12] System is now fully working. Disk operations are very slow, so set
+  maximum speed to unlimited while loading. [Curt Coder, Tomas Karlsson]
+
 - [EINSTEIN] Largely rewritten and lots of cleanups.  [Dirk Best]
 
 - [GENESIS] Save RAM emulation improved for several games (bugs #1691, #1696,
   #1823, #1824) [Enik]
+
+- [PC] Renamed bondwell to bw230. [Curt Coder]
 
 - [TI85] TI-83 now works [Xander]
 
@@ -59,6 +64,10 @@ Source Changes:
   - Added support for head loaded feedback from floppy drive.
   - Busy flag was cleared too early.
   - Added support for the WD1771.  [Roberto Lavarone]
+  
+- Changes to the NEC765 implementation:
+  - Fixed interrupt timing in FM/MFM modes.
+  - NO DATA error flag is no longer set during EOT condition. [Curt Coder]
 
 - Added natural keyboard support to KR2376.  [Roberto Lavarone]
 
