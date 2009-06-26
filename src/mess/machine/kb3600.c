@@ -12,7 +12,6 @@
 	TODO:
 
 	- more accurate emulation of real chip
-	- any key down
 
 */
 
@@ -26,12 +25,14 @@
 typedef struct _ay3600_t ay3600_t;
 struct _ay3600_t
 {
-	devcb_resolved_write_line	out_data_ready_func;
-
 	devcb_resolved_read_line	in_shift_func;
 	devcb_resolved_read_line	in_control_func;
 
+	devcb_resolved_write_line	out_data_ready_func;
+	devcb_resolved_write_line	out_ako_func;
+
 	int b;						/* output buffer */
+	int ako;					/* any key down */
 
 	/* timers */
 	emu_timer *scan_timer;		/* keyboard scan timer */
@@ -71,7 +72,7 @@ static TIMER_CALLBACK( ay3600_scan_tick )
 	const ay3600_interface *intf = get_interface(device);
 
 	int x, y;
-	int akd = 0;
+	int ako = 0;
 
 	for (x = 0; x < 9; x++)
 	{
@@ -83,7 +84,7 @@ static TIMER_CALLBACK( ay3600_scan_tick )
 			{
 				int b = (x * 10) + y;
 
-				akd = 1;
+				ako = 1;
 
 				if (b > 63)
 				{
@@ -105,9 +106,15 @@ static TIMER_CALLBACK( ay3600_scan_tick )
 		}
 	}
 	
-	if (!akd)
+	if (!ako)
 	{
 		ay3600->b = -1;
+	}
+
+	if (ako != ay3600->ako)
+	{
+		devcb_call_write_line(&ay3600->out_ako_func, ako);
+		ay3600->ako = ako;
 	}
 }
 
@@ -136,9 +143,10 @@ static DEVICE_START( ay3600 )
 	const ay3600_interface *intf = get_interface(device);
 
 	/* resolve callbacks */
-	devcb_resolve_write_line(&ay3600->out_data_ready_func, &intf->out_data_ready_func, device);
 	devcb_resolve_read_line(&ay3600->in_shift_func, &intf->in_shift_func, device);
 	devcb_resolve_read_line(&ay3600->in_control_func, &intf->in_control_func, device);
+	devcb_resolve_write_line(&ay3600->out_data_ready_func, &intf->out_data_ready_func, device);
+	devcb_resolve_write_line(&ay3600->out_ako_func, &intf->out_ako_func, device);
 
 	/* create the timers */
 	ay3600->scan_timer = timer_alloc(device->machine, ay3600_scan_tick, (void *)device);
@@ -146,6 +154,7 @@ static DEVICE_START( ay3600 )
 
 	/* register for state saving */
 	state_save_register_device_item(device, 0, ay3600->b);
+	state_save_register_device_item(device, 0, ay3600->ako);
 }
 
 /*-------------------------------------------------
