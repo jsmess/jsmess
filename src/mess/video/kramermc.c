@@ -37,8 +37,7 @@ VIDEO_UPDATE( kramermc )
 		for(x = 0; x < 64; x++ )
 		{
 			int code = memory_read_byte(space, KRAMERMC_VIDEO_MEMORY + x + y*64);
-			drawgfx(bitmap, screen->machine->gfx[0],  code , 0, 0,0, x*8,y*8,
-				NULL, TRANSPARENCY_NONE, 0);
+			drawgfx_opaque(bitmap, NULL, screen->machine->gfx[0],  code , 0, 0,0, x*8,y*8);
 		}
 	}
 	return 0;

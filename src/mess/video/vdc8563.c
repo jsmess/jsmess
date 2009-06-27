@@ -430,10 +430,9 @@ static void vdc8563_monotext_screenrefresh (running_machine *machine, bitmap_t *
 		 y++, rect.min_y+=height, rect.max_y+=height) {
 		for (x=0; x<w; x++, i=(i+1)&vdc.mask) {
 			if (vdc.dirty[i]) {
-				drawgfx(bitmap,machine->gfx[0],
+				drawgfx_opaque(bitmap,&rect,machine->gfx[0],
 						vdc.ram[i], FRAMECOLOR|(MONOCOLOR<<4), 0, 0,
-						machine->gfx[0]->width*x+8,height*y+height,
-						&rect,TRANSPARENCY_NONE,0);
+						machine->gfx[0]->width*x+8,height*y+height);
 				if ((vdc.cursor_on)&&(i==(CRTC6845_CURSOR_POS&vdc.mask))) {
 					int k=height-CRTC6845_CURSOR_TOP;
 					if (CRTC6845_CURSOR_BOTTOM<height) k=CRTC6845_CURSOR_BOTTOM-CRTC6845_CURSOR_TOP+1;
@@ -534,10 +533,9 @@ static void vdc8563_graphic_screenrefresh (running_machine *machine, bitmap_t *b
 			for (j=0; j<height; j++) {
 				k=((i<<4)+j)&vdc.mask;
 				if (vdc.dirty[k]) {
-					drawgfx(bitmap,machine->gfx[1],
+					drawgfx_opaque(bitmap,&rect,machine->gfx[1],
 							vdc.ram[k], FRAMECOLOR|(MONOCOLOR<<4), 0, 0,
-							machine->gfx[0]->width*x+8,height*y+height+j,
-							&rect,TRANSPARENCY_NONE,0);
+							machine->gfx[0]->width*x+8,height*y+height+j);
 					vdc.dirty[k]=0;
 				}
 			}

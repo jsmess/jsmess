@@ -131,18 +131,16 @@ VIDEO_UPDATE( pc1251 )
 	for (x=RIGHT,y=DOWN, i=0; i<60; x+=3) 
 	{
 		for (j=0; j<5; j++, i++, x+=3)
-			drawgfx(bitmap, screen->machine->gfx[0], pc1251_lcd.reg[i],
+			drawgfx_opaque(bitmap, 0, screen->machine->gfx[0], pc1251_lcd.reg[i],
 					PC1251_CONTRAST,0,0,
-					x,y,
-					0, TRANSPARENCY_NONE,0);
+					x,y);
 	}
 	for (i=0x7b; i>=0x40; x+=3) 
 	{
 		for (j=0; j<5; j++, i--, x+=3)
-			drawgfx(bitmap, screen->machine->gfx[0], pc1251_lcd.reg[i],
+			drawgfx_opaque(bitmap, 0, screen->machine->gfx[0], pc1251_lcd.reg[i],
 					PC1251_CONTRAST,0,0,
-					x,y,
-					0, TRANSPARENCY_NONE,0);
+					x,y);
 	}
 
 	pocketc_draw_special(bitmap, RIGHT+134, DOWN-10, de,

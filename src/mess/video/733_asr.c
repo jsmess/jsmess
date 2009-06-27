@@ -212,8 +212,8 @@ void asr733_reset(running_machine *machine, int unit)
 /* write a single char on screen */
 static void asr_draw_char(running_machine *machine, int unit, int character, int x, int y, int color)
 {
-	drawgfx(asr[unit].bitmap, machine->gfx[0], character-32, color, 0, 0,
-				x+1, y, NULL, /*TRANSPARENCY_PEN*/TRANSPARENCY_NONE, 0);
+	drawgfx_opaque(asr[unit].bitmap, NULL, machine->gfx[0], character-32, color, 0, 0,
+				x+1, y);
 }
 
 static void asr_linefeed(running_machine *machine, int unit)

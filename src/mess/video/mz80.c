@@ -51,8 +51,7 @@ VIDEO_UPDATE( mz80k )
 		for(x = 0; x < 40; x++ )
 		{
 			int code = memory_read_byte(space,0xD000 + x + y*40);		
-			drawgfx(bitmap, screen->machine->gfx[0],  code , 0, 0,0, x*8,y*8,
-				NULL, TRANSPARENCY_NONE, 0);
+			drawgfx_opaque(bitmap, NULL, screen->machine->gfx[0],  code , 0, 0,0, x*8,y*8);
 		}
 	}
 	return 0;

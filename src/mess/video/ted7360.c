@@ -1166,8 +1166,8 @@ static void ted7360_drawlines (running_machine *machine, int first, int last)
 					ted7360_draw_cursor (ybegin, yend, yoff, xoff,
 							attr & 0x7f);
 #else
-					drawgfx (ted7360_bitmap, cursorelement, 0, attr & 0x7f, 0, 0,
-						xoff, yoff, 0, TRANSPARENCY_NONE, 0);
+					drawgfx_opaque (ted7360_bitmap, 0, cursorelement, 0, attr & 0x7f, 0, 0,
+						xoff, yoff);
 #endif
 				}
 				else if (REVERSEON && (ch & 0x80))

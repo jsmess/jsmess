@@ -169,44 +169,38 @@ VIDEO_UPDATE( pc1403 )
 	{
 		for (x=RIGHT, y=DOWN, i=0; i<6*5; x+=2) {
 			for (j=0; j<5; j++, i++, x+=2)
-			drawgfx(bitmap, screen->machine->gfx[0], pc1403_lcd.reg[i],CONTRAST,0,0,
-				x,y,
-				0, TRANSPARENCY_NONE,0);
+			drawgfx_opaque(bitmap, 0, screen->machine->gfx[0], pc1403_lcd.reg[i],CONTRAST,0,0,
+				x,y);
 		}
 		for (i=9*5; i<12*5; x+=2) 
 		{
 			for (j=0; j<5; j++, i++, x+=2)
-			drawgfx(bitmap, screen->machine->gfx[0], pc1403_lcd.reg[i],CONTRAST,0,0,
-				x,y,
-				0, TRANSPARENCY_NONE,0);
+			drawgfx_opaque(bitmap, 0, screen->machine->gfx[0], pc1403_lcd.reg[i],CONTRAST,0,0,
+				x,y);
 		}
 		for (i=6*5; i<9*5; x+=2) 
 		{
 			for (j=0; j<5; j++, i++, x+=2)
-			drawgfx(bitmap, screen->machine->gfx[0], pc1403_lcd.reg[i],CONTRAST,0,0,
-				x,y,
-				0, TRANSPARENCY_NONE,0);
+			drawgfx_opaque(bitmap, 0, screen->machine->gfx[0], pc1403_lcd.reg[i],CONTRAST,0,0,
+				x,y);
 		}
 		for (i=0x7b-3*5; i>0x7b-6*5; x+=2) 
 		{
 			for (j=0; j<5; j++, i--, x+=2)
-				drawgfx(bitmap, screen->machine->gfx[0], pc1403_lcd.reg[i],CONTRAST,0,0,
-				x,y,
-				0, TRANSPARENCY_NONE,0);
+				drawgfx_opaque(bitmap, 0, screen->machine->gfx[0], pc1403_lcd.reg[i],CONTRAST,0,0,
+				x,y);
 		}
 		for (i=0x7b; i>0x7b-3*5; x+=2) 
 		{
 			for (j=0; j<5; j++, i--, x+=2)
-			drawgfx(bitmap, screen->machine->gfx[0], pc1403_lcd.reg[i],CONTRAST,0,0,
-				x,y,
-				0, TRANSPARENCY_NONE,0);
+			drawgfx_opaque(bitmap, 0, screen->machine->gfx[0], pc1403_lcd.reg[i],CONTRAST,0,0,
+				x,y);
 		}
 		for (i=0x7b-6*5; i>0x7b-12*5; x+=2) 
 		{
 			for (j=0; j<5; j++, i--, x+=2)
-			drawgfx(bitmap, screen->machine->gfx[0], pc1403_lcd.reg[i],CONTRAST,0,0,
-				x,y,
-				0, TRANSPARENCY_NONE,0);
+			drawgfx_opaque(bitmap, 0, screen->machine->gfx[0], pc1403_lcd.reg[i],CONTRAST,0,0,
+				x,y);
 		}
 	}
     /* if display is off, busy is always visible? it seems to behave like that. */

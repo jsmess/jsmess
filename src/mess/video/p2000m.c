@@ -42,9 +42,8 @@ VIDEO_UPDATE( p2000m )
 			if (code < 32) code = 32;
 		}
 
-		drawgfx (bitmap, screen->machine->gfx[0], code,
-			videoram[offs + 2048] & 0x08 ? 0 : 1, 0, 0, sx, sy,
-			NULL, TRANSPARENCY_NONE, 0);
+		drawgfx_opaque (bitmap, NULL, screen->machine->gfx[0], code,
+			videoram[offs + 2048] & 0x08 ? 0 : 1, 0, 0, sx, sy);
 
 		if (videoram[offs] & 0x80)
 		{

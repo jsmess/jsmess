@@ -61,9 +61,9 @@ VIDEO_UPDATE( mekd2 )
         int sy = 408;
         int sx = width - 212 + x * 30 + ((x >= 4) ? 6 : 0);
 
-        drawgfx (bitmap, screen->machine->gfx[0],
+        drawgfx_transpen (bitmap, NULL, screen->machine->gfx[0],
                  videoram[2 * x + 0], videoram[2 * x + 1],
-                 0, 0, sx, sy, NULL, TRANSPARENCY_PEN, 0);
+                 0, 0, sx, sy, 0);
     }
 
     for (y = 0; y < 6; y++)
@@ -87,10 +87,10 @@ VIDEO_UPDATE( mekd2 )
             color = (input_port_read(screen->machine, keynames[code / 7]) & (0x40 >> (code % 7))) ? 0 : 1;
 
             videoram[6 * 2 + code] = color;
-            drawgfx (bitmap, screen->machine->gfx[1],
+            drawgfx_opaque (bitmap, NULL,
+                     screen->machine->gfx[1],
                      layout[y][x], color,
-                     0, 0, sx, sy, NULL,
-                     TRANSPARENCY_NONE, 0);
+                     0, 0, sx, sy);
         }
     }
 

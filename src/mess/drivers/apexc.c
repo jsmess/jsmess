@@ -508,8 +508,8 @@ static void apexc_draw_led(bitmap_t *bitmap, int x, int y, int state)
 /* write a single char on screen */
 static void apexc_draw_char(running_machine *machine, bitmap_t *bitmap, char character, int x, int y, int color)
 {
-	drawgfx(bitmap, machine->gfx[0], character-32, color, 0, 0,
-				x+1, y, NULL, TRANSPARENCY_PEN, 0);
+	drawgfx_transpen(bitmap, NULL, machine->gfx[0], character-32, color, 0, 0,
+				x+1, y, 0);
 }
 
 /* write a string on screen */

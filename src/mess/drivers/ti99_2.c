@@ -145,8 +145,8 @@ static VIDEO_UPDATE(ti99_2)
 	for (i = 0; i < 768; i++)
 	{
 		/* Is the char code masked or not ??? */
-		drawgfx(bitmap, screen->machine->gfx[0], videoram[i] & 0x7F, 0,
-			0, 0, sx, sy, cliprect, TRANSPARENCY_NONE, 0);
+		drawgfx_opaque(bitmap, cliprect, screen->machine->gfx[0], videoram[i] & 0x7F, 0,
+			0, 0, sx, sy);
 
 		sx += 8;
 		if (sx == 256)

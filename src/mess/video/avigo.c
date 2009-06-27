@@ -176,7 +176,7 @@ VIDEO_UPDATE( avigo )
 	r.max_y = AVIGO_SCREEN_HEIGHT;
 
 	/* draw stylus marker */
-	drawgfx (bitmap, stylus_pointer, 0, 0, 0, 0, stylus_x, stylus_y, &r, TRANSPARENCY_PEN, 0);
+	drawgfx_transpen (bitmap, &r, stylus_pointer, 0, 0, 0, 0, stylus_x, stylus_y, 0);
 #if 0
 	{
 

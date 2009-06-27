@@ -148,15 +148,13 @@ VIDEO_UPDATE( pc1401 )
     if (pc1401_portc&1) {
 		for (x=RIGHT,y=DOWN,i=0; i<0x28;x+=2) {
 			for (j=0; j<5;j++,i++,x+=2)
-			drawgfx(bitmap, screen->machine->gfx[0], pc1401_lcd.reg[i],CONTRAST,0,0,
-				x,y,
-				0, TRANSPARENCY_NONE,0);
+			drawgfx_opaque(bitmap, 0, screen->machine->gfx[0], pc1401_lcd.reg[i],CONTRAST,0,0,
+				x,y);
 		}
 		for (i=0x67; i>=0x40;x+=2) {
 			for (j=0; j<5;j++,i--,x+=2)
-			drawgfx(bitmap, screen->machine->gfx[0], pc1401_lcd.reg[i],CONTRAST,0,0,
-				x,y,
-				0, TRANSPARENCY_NONE,0);
+			drawgfx_opaque(bitmap, 0, screen->machine->gfx[0], pc1401_lcd.reg[i],CONTRAST,0,0,
+				x,y);
 		}
     }
 

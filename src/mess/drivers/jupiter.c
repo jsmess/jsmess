@@ -287,8 +287,8 @@ static VIDEO_UPDATE( jupiter )
 		sy = (offs / 32) << 3;
 		sx = (offs % 32) << 3;
 
-		drawgfx(bitmap, ( code & 0x80 ) ? screen->machine->gfx[1] : screen->machine->gfx[0],
-			code & 0x7f, 0, 0,0, sx,sy, NULL, TRANSPARENCY_NONE, 0);
+		drawgfx_opaque(bitmap, NULL, ( code & 0x80 ) ? screen->machine->gfx[1] : screen->machine->gfx[0],
+			code & 0x7f, 0, 0,0, sx,sy);
 	}
 
 	return 0;

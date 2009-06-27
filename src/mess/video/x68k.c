@@ -959,7 +959,7 @@ static void x68k_draw_sprites(running_machine *machine, bitmap_t* bitmap, int pr
 
 			sx += sprite_shift;
 
-			drawgfx(bitmap,machine->gfx[1],code,colour+0x10,xflip,yflip,x68k_sys.crtc.hbegin+sx,x68k_sys.crtc.vbegin+sy,&cliprect,TRANSPARENCY_PEN,0x00);
+			drawgfx_transpen(bitmap,&cliprect,machine->gfx[1],code,colour+0x10,xflip,yflip,x68k_sys.crtc.hbegin+sx,x68k_sys.crtc.vbegin+sy,0x00);
 		}
 	}
 }
