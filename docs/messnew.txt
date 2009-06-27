@@ -33,6 +33,8 @@ System Driver Changes:
 
 - [PC] Renamed bondwell to bw230. [Curt Coder]
 
+- [SEGA CD] Split up sets and added new dumps. [Justin Kerk, TmEE]
+
 - [TI85] TI-83 now works [Xander]
 
 - [TI85] Fixed TI-82/TI-83 on/off and NVRAM, added a DSW to TI-83 for the

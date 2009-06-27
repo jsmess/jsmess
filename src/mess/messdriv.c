@@ -99,9 +99,19 @@ const game_driver * const drivers[] =
     DRIVER( pico )      /* 1994 Sega Pico (Europe)                          */
     DRIVER( picou )     /* 1994 Sega Pico (USA)                             */
     DRIVER( picoj )     /* 1993 Sega Pico (Japan)                           */
+    DRIVER( segacd )    /* 1992 Sega Sega CD (USA)                          */
     DRIVER( megacd )    /* 1993 Sega Mega-CD (Europe)                       */
     DRIVER( megacdj )   /* 1991 Sega Mega-CD (Japan)                        */
-    DRIVER( segacd )    /* 1992 Sega Sega CD (USA)                          */
+    DRIVER( segacd2 )   /* 1993 Sega Sega CD 2 (USA)                        */
+    DRIVER( megacd2 )   /* 1993 Sega Mega-CD 2 (Europe)                     */
+    DRIVER( megacd2j )  /* 1993 Sega Mega-CD 2 (Japan)                      */
+    DRIVER( laseract )  /* 1993 Pioneer LaserActive (USA)                   */
+    DRIVER( laseractj ) /* 1993 Pioneer LaserActive (Japan)                 */
+    DRIVER( xeye )      /* 1993 JVC X'eye (USA)                             */
+    DRIVER( xeyej )     /* 1993 JVC X'eye (Japan)                           */
+    DRIVER( wmega )     /* 1993 Sega Wondermega (Japan)                     */
+    DRIVER( cdx )       /* 1994 Sega CDX (USA)                              */
+    DRIVER( multmega )  /* 1994 Sega Multi-Mega (Europe)                    */
     DRIVER( 32x )       /* 1994 Sega 32X (USA)                              */
     DRIVER( 32x_scd )   /* 1994 Sega Sega CD (USA w/32X addon)              */
 
