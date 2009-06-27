@@ -24,5 +24,5 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT   INIT    CONFIG  COMPANY            FULLNAME      FLAGS */
-CONS( 1979, stopthie,   0,      0,      stopthie,   0,      0,      0,      "Parker Brothers", "Stop the Thief", GAME_NOT_WORKING )
+CONS( 1979, stopthie,   0,      0,      stopthie,   0,      0,      0,      "Parker Brothers", "Stop Thief", GAME_NOT_WORKING )
 
