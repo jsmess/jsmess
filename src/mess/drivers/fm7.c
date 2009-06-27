@@ -607,6 +607,14 @@ static void fm7_update_psg(running_machine* machine)
 				// Address latch
 				ym2203_w(devtag_get_device(space->machine,"ym"),0,psg_data);
 				break;
+			case 0x04:
+				// Status register
+				psg_data = ym2203_r(devtag_get_device(space->machine,"ym"),1);
+				break;
+			case 0x09:
+				// Joystick port read
+				psg_data = input_port_read(space->machine,"joy1");
+				break;
 		}
 	}
 }
@@ -622,10 +630,22 @@ static WRITE8_HANDLER( fm7_psg_select_w )
 	fm7_update_psg(space->machine);
 }
 
+static WRITE8_HANDLER( fm77av_ym_select_w )
+{
+	fm7_psg_regsel = data & 0x0f;
+	fm7_update_psg(space->machine);
+}
+
 static READ8_HANDLER( fm7_psg_data_r )
 {
 	fm7_update_psg(space->machine);
 	return psg_data;
+}
+
+static WRITE8_HANDLER( fm7_psg_data_w )
+{
+	psg_data = data;
+	fm7_update_psg(space->machine);
 }
 
 static WRITE8_HANDLER( fm77av_bootram_w )
@@ -633,12 +653,6 @@ static WRITE8_HANDLER( fm77av_bootram_w )
 	if(!(fm7_mmr.mode & 0x01))
 		return;
 	fm7_boot_ram[offset] = data;
-}
-
-static WRITE8_HANDLER( fm7_psg_data_w )
-{
-	psg_data = data;
-	fm7_update_psg(space->machine);
 }
 
 // Shared RAM is only usable on the main CPU if the sub CPU is halted
@@ -1061,8 +1075,8 @@ static ADDRESS_MAP_START( fm77av_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfd12,0xfd12) AM_READWRITE(fm77av_sub_modestatus_r,fm77av_sub_modestatus_w)
 	AM_RANGE(0xfd13,0xfd13) AM_WRITE(fm77av_sub_bank_w)
 	AM_RANGE(0xfd14,0xfd14) AM_READ(fm7_unknown_r)
-	AM_RANGE(0xfd15,0xfd15) AM_DEVREADWRITE("ym",ym2203_status_port_r,ym2203_control_port_w)
-	AM_RANGE(0xfd16,0xfd16) AM_DEVREADWRITE("ym",ym2203_read_port_r,ym2203_write_port_w)
+	AM_RANGE(0xfd15,0xfd15) AM_READWRITE(fm7_psg_select_r,fm77av_ym_select_w)
+	AM_RANGE(0xfd16,0xfd16) AM_READWRITE(fm7_psg_data_r,fm7_psg_data_w)
 	AM_RANGE(0xfd17,0xfd17) AM_READ(fm7_fmirq_r)
 	AM_RANGE(0xfd18,0xfd1f) AM_READWRITE(fm7_fdc_r,fm7_fdc_w)
 	AM_RANGE(0xfd24,0xfd2f) AM_READ(fm7_unknown_r)
@@ -1216,20 +1230,24 @@ static INPUT_PORTS_START( fm7 )
   PORT_BIT(0x20,IP_ACTIVE_HIGH,IPT_BUTTON1) PORT_NAME("LPT Joystick Button 1") PORT_PLAYER(1)
   
   PORT_START("joy1")
-  PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_JOYSTICK_RIGHT) PORT_NAME("Joystick Right") PORT_8WAY PORT_PLAYER(1)
-  PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_JOYSTICK_LEFT) PORT_NAME("Joystick Left") PORT_8WAY PORT_PLAYER(1)
-  PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_JOYSTICK_UP) PORT_NAME("Joystick Up") PORT_8WAY PORT_PLAYER(1)
-  PORT_BIT(0x08,IP_ACTIVE_HIGH,IPT_JOYSTICK_DOWN) PORT_NAME("Joystick Down") PORT_8WAY PORT_PLAYER(1)
-  PORT_BIT(0x10,IP_ACTIVE_HIGH,IPT_BUTTON2) PORT_NAME("Joystick Button 2") PORT_PLAYER(1)
-  PORT_BIT(0x20,IP_ACTIVE_HIGH,IPT_BUTTON1) PORT_NAME("Joystick Button 1") PORT_PLAYER(1)
+  PORT_BIT(0x01,IP_ACTIVE_LOW,IPT_JOYSTICK_UP) PORT_NAME("1P Joystick Up") PORT_8WAY PORT_PLAYER(1)
+  PORT_BIT(0x02,IP_ACTIVE_LOW,IPT_JOYSTICK_DOWN) PORT_NAME("1P Joystick Down") PORT_8WAY PORT_PLAYER(1)
+  PORT_BIT(0x04,IP_ACTIVE_LOW,IPT_JOYSTICK_LEFT) PORT_NAME("1P Joystick Left") PORT_8WAY PORT_PLAYER(1)
+  PORT_BIT(0x08,IP_ACTIVE_LOW,IPT_JOYSTICK_RIGHT) PORT_NAME("1P Joystick Right") PORT_8WAY PORT_PLAYER(1)
+  PORT_BIT(0x10,IP_ACTIVE_LOW,IPT_BUTTON2) PORT_NAME("1P Joystick Button 2") PORT_PLAYER(1)
+  PORT_BIT(0x20,IP_ACTIVE_LOW,IPT_BUTTON1) PORT_NAME("1P Joystick Button 1") PORT_PLAYER(1)
+  PORT_BIT(0x40,IP_ACTIVE_LOW,IPT_UNUSED)
+  PORT_BIT(0x80,IP_ACTIVE_LOW,IPT_UNUSED)
 
   PORT_START("joy2")
-  PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_JOYSTICK_RIGHT) PORT_NAME("Joystick Right") PORT_8WAY PORT_PLAYER(2)
-  PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_JOYSTICK_LEFT) PORT_NAME("Joystick Left") PORT_8WAY PORT_PLAYER(2)
-  PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_JOYSTICK_UP) PORT_NAME("Joystick Up") PORT_8WAY PORT_PLAYER(2)
-  PORT_BIT(0x08,IP_ACTIVE_HIGH,IPT_JOYSTICK_DOWN) PORT_NAME("Joystick Down") PORT_8WAY PORT_PLAYER(2)
-  PORT_BIT(0x10,IP_ACTIVE_HIGH,IPT_BUTTON2) PORT_NAME("Joystick Button 2") PORT_PLAYER(2)
-  PORT_BIT(0x20,IP_ACTIVE_HIGH,IPT_BUTTON1) PORT_NAME("Joystick Button 1") PORT_PLAYER(2)
+  PORT_BIT(0x01,IP_ACTIVE_LOW,IPT_JOYSTICK_UP) PORT_NAME("2P Joystick Up") PORT_8WAY PORT_PLAYER(2)
+  PORT_BIT(0x02,IP_ACTIVE_LOW,IPT_JOYSTICK_DOWN) PORT_NAME("2P Joystick Down") PORT_8WAY PORT_PLAYER(2)
+  PORT_BIT(0x04,IP_ACTIVE_LOW,IPT_JOYSTICK_LEFT) PORT_NAME("2P Joystick Left") PORT_8WAY PORT_PLAYER(2)
+  PORT_BIT(0x08,IP_ACTIVE_LOW,IPT_JOYSTICK_RIGHT) PORT_NAME("2P Joystick Right") PORT_8WAY PORT_PLAYER(2)
+  PORT_BIT(0x10,IP_ACTIVE_LOW,IPT_BUTTON2) PORT_NAME("2P Joystick Button 2") PORT_PLAYER(2)
+  PORT_BIT(0x20,IP_ACTIVE_LOW,IPT_BUTTON1) PORT_NAME("2P Joystick Button 1") PORT_PLAYER(2)
+  PORT_BIT(0x40,IP_ACTIVE_LOW,IPT_UNUSED)
+  PORT_BIT(0x80,IP_ACTIVE_LOW,IPT_UNUSED)
   
 
   PORT_START("DSW")

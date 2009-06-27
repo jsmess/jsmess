@@ -126,11 +126,26 @@ WRITE8_HANDLER( fm7_vram_w )
 		return;
 		
 	offs = (offset & 0xc000) | ((offset + fm7_video.vram_offset) & 0x3fff);
-//	if(fm7_video.vram_access != 0)
+	if(fm7_video.vram_access != 0)
 		fm7_video_ram[offs] = data;
 }
 
 // not pretty, but it should work.
+WRITE8_HANDLER( fm7_vram_banked_w )
+{
+	int offs;
+	
+	if(offset < 0x4000 && (fm7_video.multi_page & 0x01))
+		return;
+	if((offset < 0x8000 && offset >=0x4000) && (fm7_video.multi_page & 0x02))
+		return;
+	if((offset < 0xc000 && offset >=0x8000) && (fm7_video.multi_page & 0x04))
+		return;
+		
+	offs = (offset & 0xc000) | ((offset + fm7_video.vram_offset) & 0x3fff);
+	fm7_video_ram[offs] = data;
+}
+
 READ8_HANDLER( fm7_vram0_r )
 {
 	return fm7_vram_r(space,offset);
@@ -193,62 +208,62 @@ READ8_HANDLER( fm7_vramB_r )
 
 WRITE8_HANDLER( fm7_vram0_w )
 {
-	fm7_vram_w(space,offset,data);
+	fm7_vram_banked_w(space,offset,data);
 }
 
 WRITE8_HANDLER( fm7_vram1_w )
 {
-	fm7_vram_w(space,offset+0x1000,data);
+	fm7_vram_banked_w(space,offset+0x1000,data);
 }
 
 WRITE8_HANDLER( fm7_vram2_w )
 {
-	fm7_vram_w(space,offset+0x2000,data);
+	fm7_vram_banked_w(space,offset+0x2000,data);
 }
 
 WRITE8_HANDLER( fm7_vram3_w )
 {
-	fm7_vram_w(space,offset+0x3000,data);
+	fm7_vram_banked_w(space,offset+0x3000,data);
 }
 
 WRITE8_HANDLER( fm7_vram4_w )
 {
-	fm7_vram_w(space,offset+0x4000,data);
+	fm7_vram_banked_w(space,offset+0x4000,data);
 }
 
 WRITE8_HANDLER( fm7_vram5_w )
 {
-	fm7_vram_w(space,offset+0x5000,data);
+	fm7_vram_banked_w(space,offset+0x5000,data);
 }
 
 WRITE8_HANDLER( fm7_vram6_w )
 {
-	fm7_vram_w(space,offset+0x6000,data);
+	fm7_vram_banked_w(space,offset+0x6000,data);
 }
 
 WRITE8_HANDLER( fm7_vram7_w )
 {
-	fm7_vram_w(space,offset+0x7000,data);
+	fm7_vram_banked_w(space,offset+0x7000,data);
 }
 
 WRITE8_HANDLER( fm7_vram8_w )
 {
-	fm7_vram_w(space,offset+0x8000,data);
+	fm7_vram_banked_w(space,offset+0x8000,data);
 }
 
 WRITE8_HANDLER( fm7_vram9_w )
 {
-	fm7_vram_w(space,offset+0x9000,data);
+	fm7_vram_banked_w(space,offset+0x9000,data);
 }
 
 WRITE8_HANDLER( fm7_vramA_w )
 {
-	fm7_vram_w(space,offset+0xa000,data);
+	fm7_vram_banked_w(space,offset+0xa000,data);
 }
 
 WRITE8_HANDLER( fm7_vramB_w )
 {
-	fm7_vram_w(space,offset+0xb000,data);
+	fm7_vram_banked_w(space,offset+0xb000,data);
 }
 
 /*
