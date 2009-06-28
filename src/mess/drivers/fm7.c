@@ -65,6 +65,7 @@ unsigned int key_delay;
 unsigned int key_repeat;
 static UINT16 current_scancode;
 static UINT32 key_data[4];
+static UINT8 key_scan_mode;
 static UINT8 break_flag;
 static UINT8 fm7_psg_regsel;
 static UINT8 psg_data;
@@ -73,6 +74,18 @@ static UINT8 fdc_drive;
 static UINT8 fdc_irq_flag;
 static UINT8 fdc_drq_flag;
 static UINT8 fm77av_ym_irq;
+
+struct key_encoder
+{
+	UINT8 buffer[12];
+	UINT8 tx_count;
+	UINT8 rx_count;
+	UINT8 command_length;
+	UINT8 answer_length;
+	UINT8 latch;  // 0=ready to receive
+	UINT8 ack;
+	UINT8 position;
+} fm7_encoder;
 
 struct mmr
 {
@@ -465,6 +478,196 @@ static READ8_HANDLER( fm7_sub_keyboard_r)
 	}
 }
 
+/*
+ *  Sub CPU: port 0xd431, 0xd432
+ *  Keyboard encoder
+ * 
+ *  d431 (R/W): Data register (8 bit)
+ *  d432 (R/O): Status register
+ *              bit 0 - ACK
+ *              bit 7 - LATCH (0 if ready to receive)
+ * 
+ *  Encoder commands:
+ * 		00 xx    : Set scancode format (FM-7, FM16B(?), Scan(Make/Break))
+ *  	01       : Get scancode format
+ * 		02 xx    : Set LED status
+ * 		03       : Get LED status
+ * 		04 xx    : Enable/Disable key repeat
+ * 		05 xx xx : Set repeat rate and time
+ * 		80 00    : Get RTC
+ * 		80 01 xx xx xx xx xx xx xx : Set RTC
+ * 		81 xx    : Video digitise
+ * 		82 xx    : Set video mode(?)
+ * 		83       : Get video mode(?)
+ * 		84 xx    : Video brightness (monitor?)
+ * 
+ *  ACK is received after 5us.
+ */
+static READ8_HANDLER( fm77av_key_encoder_r )
+{
+	UINT8 ret = 0xff;
+	switch(offset)
+	{
+		case 0x00:  // data register
+			if(fm7_encoder.rx_count > 0)
+			{
+				ret = fm7_encoder.buffer[fm7_encoder.position];
+				fm7_encoder.position++;
+				fm7_encoder.rx_count--;
+				fm7_encoder.latch = 0;
+			}
+			if(fm7_encoder.rx_count > 0)
+				fm7_encoder.latch = 1;  // more data to receive
+			break;
+		case 0x01:  // status register
+			if(fm7_encoder.latch != 0)
+				ret &= ~0x7f;
+			if(fm7_encoder.ack == 0)
+				ret &= ~0x01;
+			break;
+	}
+	
+	return ret;
+}
+
+static void fm77av_encoder_setup_command(void)
+{
+	switch(fm7_encoder.buffer[0])
+	{
+		case 0:  // set scancode format
+			fm7_encoder.tx_count = 2;
+			break;
+		case 1:  // get scancode format
+			fm7_encoder.tx_count = 1;
+			break;
+		case 2:  // set LED
+			fm7_encoder.tx_count = 2;
+			break;
+		case 3:  // get LED
+			fm7_encoder.tx_count = 1;
+			break;
+		case 4:  // enable repeat
+			fm7_encoder.tx_count = 2;
+			break;
+		case 5:  // set repeat rate
+			fm7_encoder.tx_count = 3;
+			break;
+		case 0x80:  // get/set RTC (at least two bytes, 9 if byte two = 0x01)
+			fm7_encoder.tx_count = 2;
+			break;
+		case 0x81:  // digitise
+			fm7_encoder.tx_count = 2;
+			break;
+		case 0x82:  // set screen mode
+			fm7_encoder.tx_count = 2;
+			break;
+		case 0x83:  // get screen mode
+			fm7_encoder.tx_count = 1;
+			break;
+		case 0x84:  // set monitor brightness
+			fm7_encoder.tx_count = 2;
+			break;
+		default:
+			fm7_encoder.tx_count = 0;
+			fm7_encoder.rx_count = 0;
+			fm7_encoder.position = 0;
+			logerror("ENC: Unknown command 0x%02x sent, ignoring\n",fm7_encoder.buffer[0]);
+	}
+}
+
+static TIMER_CALLBACK( fm77av_encoder_ack )
+{
+	fm7_encoder.ack = 1;
+}
+
+static void fm77av_encoder_handle_command(void)
+{
+	switch(fm7_encoder.buffer[0])
+	{
+		case 0:  // set keyboard scancode mode
+			key_scan_mode = fm7_encoder.buffer[1];
+			fm7_encoder.rx_count = 0;
+			logerror("ENC: Keyboard set to mode %i\n",fm7_encoder.buffer[1]);
+			break;
+		case 1:  // get keyboard scancode mode
+			fm7_encoder.buffer[0] = key_scan_mode;
+			fm7_encoder.rx_count = 1;
+			logerror("ENC: Command %02x recieved\n",fm7_encoder.buffer[0]);
+			break;
+		case 2:  // set LEDs
+			fm7_encoder.rx_count = 0;
+			logerror("ENC: Command %02x recieved\n",fm7_encoder.buffer[0]);
+			break;
+		case 3:  // get LEDs
+			fm7_encoder.rx_count = 1;
+			logerror("ENC: Command %02x recieved\n",fm7_encoder.buffer[0]);
+			break;
+		case 4:  // enable key repeat
+			fm7_encoder.rx_count = 0;
+			logerror("ENC: Command %02x recieved\n",fm7_encoder.buffer[0]);
+			break;
+		case 5:  // set key repeat rate
+			key_repeat = fm7_encoder.buffer[2] * 10;
+			key_delay = fm7_encoder.buffer[1] * 10;
+			fm7_encoder.rx_count = 0;
+			logerror("ENC: Keyboard repeat rate set to %i/%i\n",fm7_encoder.buffer[1],fm7_encoder.buffer[2]);
+			break;
+		case 0x80:  // get/set RTC
+			if(fm7_encoder.buffer[1] == 0x01)
+				fm7_encoder.rx_count = 0;
+			else
+				fm7_encoder.rx_count = 7;
+			logerror("ENC: Command %02x %02x recieved\n",fm7_encoder.buffer[0],fm7_encoder.buffer[1]);
+			break;
+		case 0x81:  // digitise
+			fm7_encoder.rx_count = 0;
+			logerror("ENC: Command %02x recieved\n",fm7_encoder.buffer[0]);
+			break;
+		case 0x82:  // set screen mode
+			fm7_encoder.rx_count = 0;
+			logerror("ENC: Command %02x recieved\n",fm7_encoder.buffer[0]);
+			break;
+		case 0x83:  // get screen mode
+			fm7_encoder.rx_count = 1;
+			logerror("ENC: Command %02x recieved\n",fm7_encoder.buffer[0]);
+			break;
+		case 0x84:  // set monitor brightness
+			fm7_encoder.rx_count = 0;
+			logerror("ENC: Command %02x recieved\n",fm7_encoder.buffer[0]);
+			break;
+	}
+	fm7_encoder.position = 0;
+}
+
+static WRITE8_HANDLER( fm77av_key_encoder_w )
+{
+	fm7_encoder.ack = 0;
+	if(offset == 0) // data register
+	{
+		if(fm7_encoder.position == 0)  // first byte
+		{
+			fm77av_encoder_setup_command();
+		}
+		if(fm7_encoder.position == 1)  // second byte
+		{
+			if(fm7_encoder.buffer[0] == 0x80 || fm7_encoder.buffer[1] == 0x01)
+			{
+				fm7_encoder.tx_count = 8; // 80 01 command is 9 bytes  
+			}
+		}
+		fm7_encoder.buffer[fm7_encoder.position] = data;
+		fm7_encoder.position++;
+		fm7_encoder.tx_count--;
+		if(fm7_encoder.tx_count == 0)  // last byte
+			fm77av_encoder_handle_command();
+		
+		// wait 5us to set ACK flag
+		timer_set(space->machine,ATTOTIME_IN_USEC(5),NULL,0,fm77av_encoder_ack);
+			
+		//logerror("ENC: write 0x%02x to data register, moved to pos %i\n",data,fm7_encoder.position);
+	}
+}
+
 static READ8_HANDLER( fm7_cassette_printer_r )
 {
 	// bit 7: cassette input
@@ -784,10 +987,12 @@ static void fm7_update_bank(const address_space* space, int bank, UINT8 physical
 		memory_set_bankptr(space->machine,bank+1,RAM+(physical<<12));
 		//memory_install_readwrite8_handler(space,(bank*0x1000)+0x380,(bank*0x1000)+0x3ff,0,0,SMH_BANK(bank+1),SMH_BANK(bank+1));
 		// various sub CPU I/O ports
+		memory_install_readwrite8_handler(space,(bank*0x1000)+0x400,(bank*0x1000)+0x4ff,0,0,SMH_UNMAP,SMH_UNMAP);
 		memory_install_readwrite8_handler(space,(bank*0x1000)+0x409,(bank*0x1000)+0x409,0,0,fm7_vram_access_r,fm7_vram_access_w);
 		memory_install_readwrite8_handler(space,(bank*0x1000)+0x40a,(bank*0x1000)+0x40a,0,0,fm7_sub_busyflag_r,fm7_sub_busyflag_w);
 		memory_install_write8_handler(space,(bank*0x1000)+0x40e,(bank*0x1000)+0x40f,0,0,fm7_vram_offset_w);
 		memory_install_readwrite8_handler(space,(bank*0x1000)+0x430,(bank*0x1000)+0x430,0,0,fm77av_video_flags_r,fm77av_video_flags_w);
+		memory_install_readwrite8_handler(space,(bank*0x1000)+0x431,(bank*0x1000)+0x432,0,0,fm77av_key_encoder_r,fm77av_key_encoder_w);
 		
 		// sub monitor CGROM
 		memory_install_readwrite8_handler(space,(bank*0x1000)+0x800,(bank*0x1000)+size,0,0,SMH_BANK(20),SMH_UNMAP);
@@ -808,7 +1013,7 @@ static void fm7_update_bank(const address_space* space, int bank, UINT8 physical
 		if(basic_rom_en)
 		{
 			RAM = memory_region(space->machine,"fbasic");
-			memory_install_readwrite8_handler(space,bank*0x1000,(bank*0x1000)+size,0,0,SMH_BANK(bank+1),SMH_UNMAP);
+			memory_install_readwrite8_handler(space,bank*0x1000,(bank*0x1000)+size,0,0,SMH_BANK(bank+1),SMH_BANK(bank+1));
 			memory_set_bankptr(space->machine,bank+1,RAM+(physical<<12)-0x38000);
 			return;
 		}
@@ -1107,6 +1312,7 @@ static ADDRESS_MAP_START( fm77av_sub_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd40a,0xd40a) AM_READWRITE(fm7_sub_busyflag_r,fm7_sub_busyflag_w)
 	AM_RANGE(0xd40e,0xd40f) AM_WRITE(fm7_vram_offset_w)
 	AM_RANGE(0xd430,0xd430) AM_READWRITE(fm77av_video_flags_r,fm77av_video_flags_w)
+	AM_RANGE(0xd431,0xd432) AM_READWRITE(fm77av_key_encoder_r,fm77av_key_encoder_w)
 	AM_RANGE(0xd500,0xd7ff) AM_RAM AM_REGION("maincpu",0x1d500) // Work RAM
 	AM_RANGE(0xd800,0xdfff) AM_ROMBANK(20)
 	AM_RANGE(0xe000,0xffff) AM_ROMBANK(21)
@@ -1334,6 +1540,7 @@ static MACHINE_RESET(fm7)
 	key_delay = 700;  // 700ms on FM-7
 	key_repeat = 70;  // 70ms on FM-7
 	break_flag = 0;
+	key_scan_mode = KEY_MODE_FM7;
 	fm7_psg_regsel = 0;
 	fdc_side = 0;
 	fdc_drive = 0;

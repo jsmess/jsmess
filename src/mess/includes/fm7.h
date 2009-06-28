@@ -23,6 +23,11 @@
 #define SYS_FM77AV     2
 #define SYS_FM77AV40EX 3
 
+// keyboard scancode formats
+#define KEY_MODE_FM7   0 // FM-7 ASCII type code
+#define KEY_MODE_FM16B 1 // FM-16B (FM-77AV and later only)
+#define KEY_MODE_SCAN  2 // Scancode Make/Break (PC-like)
+
 struct fm7_video_flags
 {
 	UINT8 sub_busy;
