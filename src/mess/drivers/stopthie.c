@@ -5,8 +5,48 @@
 #include "stopthie.lh"
 
 
+#define LOG 1
+
+//static INPUT_PORTS_START( stopthie )
+//INPUT_PORTS_END
+
+
+static READ8_DEVICE_HANDLER( stopthie_read_k )
+{
+	UINT8 data = 0xFF;
+
+	if (LOG)
+		logerror( "stopthie_read_k\n" );
+
+	return data;
+}
+
+
+static WRITE8_DEVICE_HANDLER( stopthie_write_o )
+{
+	if (LOG)
+		logerror( "stopthie_write_o: write %02x\n", data );
+}
+
+
+static WRITE16_DEVICE_HANDLER( stopthie_write_r )
+{
+	if (LOG)
+		logerror( "stopthie_write_r: write %04x\n", data );
+}
+
+
+static const tms0980_config stopthie_tms0980_config =
+{
+	stopthie_read_k,
+	stopthie_write_o,
+	stopthie_write_r
+};
+
+
 static MACHINE_DRIVER_START( stopthie )
 	MDRV_CPU_ADD( "maincpu", TMS0980, 5000000 )	/* Clock is wrong */
+	MDRV_CPU_CONFIG( stopthie_tms0980_config )
 
 	MDRV_DEFAULT_LAYOUT(layout_stopthie)
 MACHINE_DRIVER_END
