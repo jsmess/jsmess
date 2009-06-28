@@ -518,16 +518,10 @@ ROM_END
 
 ROM_START( xeye )
 	ROM_REGION16_BE( 0x400000, "maincpu", ROMREGION_ERASE00 )
-	/* 2.00 (NA NTSC), 3 bad bytes according to X-CulT */
-	ROM_LOAD( "us_xeye_931227.bin", 0x000000,  0x020000, BAD_DUMP CRC(4e18b45c) SHA1(615f11b4a81cf957ae55fe99b453c4d8355eab46) )
+	/* confirmed good with a chip dump */
+	ROM_LOAD( "xeye-g304.bin", 0x000000,  0x020000, CRC(290f8e33) SHA1(651f14d5a5e0ecb974a60c0f43b1d2006323fb09) )
 ROM_END
 
-ROM_START( xeyej )
-	ROM_REGION16_BE( 0x400000, "maincpu", ROMREGION_ERASE00 )
-	/* what is this dump? there shouldn't be a Japan version of the X'eye */
-	ROM_LOAD( "xeye_bios_j.bin", 0x000000,  0x020000, CRC(290f8e33) SHA1(651f14d5a5e0ecb974a60c0f43b1d2006323fb09) )
-ROM_END
-	
 ROM_START( wmega )
 	ROM_REGION16_BE( 0x400000, "maincpu", ROMREGION_ERASE00 )
 	/* 1.00 (Japan NTSC) Sega BIOS, 3 bad bytes according to X-CulT */
@@ -834,7 +828,6 @@ CONS( 1993, megacd2j,   segacd2,   0,      genesis_scd,     md,     md_jpn,    0
 CONS( 1993, laseract,   0,         0,      genesis_scd,     md,     genesis,   0,   "Pioneer","LaserActive (USA, NTSC)", GAME_NOT_WORKING )
 CONS( 1993, laseractj,  laseract,  0,      genesis_scd,     md,     md_jpn,    0,   "Pioneer","LaserActive (Japan, NTSC)", GAME_NOT_WORKING )
 CONS( 1993, xeye,       0,         0,      genesis_scd,     md,     genesis,   0,   "JVC",    "X'eye (USA, NTSC)", GAME_NOT_WORKING )
-CONS( 1993, xeyej,      xeye,      0,      genesis_scd,     md,     md_jpn,    0,   "JVC",    "X'eye (Japan, NTSC)", GAME_NOT_WORKING )
 CONS( 1992, wmega,      xeye,      0,      genesis_scd,     md,     md_jpn,    0,   "Sega",   "Wondermega (Japan, NTSC)", GAME_NOT_WORKING )
 CONS( 1994, cdx,        0,         0,      genesis_scd,     md,     genesis,   0,   "Sega",   "CDX (USA, NTSC)", GAME_NOT_WORKING )
 CONS( 1994, multmega,   cdx,       0,      genesis_scd,     md,     md_eur,    0,   "Sega",   "Multi-Mega (Europe, PAL)", GAME_NOT_WORKING )
