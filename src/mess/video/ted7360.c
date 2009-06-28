@@ -951,6 +951,7 @@ VIDEO_START( ted7360 )
 	int width = video_screen_get_width(screen);
 	int height = video_screen_get_height(screen);
 
+	// FIXME: this element needs to be placed in machine->gfx[], so it will be free'd
 	cursorelement = gfx_element_alloc(machine, &cursorlayout, cursormask, machine->config->total_colors / 16, 0);
 	/* 7-Sep-2007 - After 0.118u5, you cannot revector the color table */
 	/* cursorelement->colortable = cursorcolortable; */
