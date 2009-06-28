@@ -88,7 +88,8 @@ static READ64_HANDLER(bb_slave_64be_r)
 {
 	const device_config *device = devtag_get_device(space->machine, "pcibus");
 
-	if (cpu_get_pc(space->cpu) == 0xfff02e94)
+	// 2e94 is the real address, 2e84 is where the PC appears to be under full DRC
+	if ((cpu_get_pc(space->cpu) == 0xfff02e94) || (cpu_get_pc(space->cpu) == 0xfff02e84))
 	{
 		return 0x108000ff;	// indicate slave CPU
 	}
@@ -192,7 +193,7 @@ static void bebox_floppy_getinfo(const mess_device_class *devclass, UINT32 state
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_pc; break;
 
-		default:										floppy_device_getinfo(devclass, state, info); break;
+		default:			floppy_device_getinfo(devclass, state, info); break;
 	}
 }
 
