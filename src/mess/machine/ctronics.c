@@ -106,6 +106,7 @@ static DEVICE_START( centronics )
 	if (!centronics->printer->started)
 	{
 		device_delay_init(device);
+		astring_free(tempstring);
 		return;
 	}
 

@@ -97,6 +97,7 @@ static DEVICE_START(coco_cartridge)
 		if (cococart->pcb == NULL)
 		{
 			device_delay_init(device);
+			astring_free(tempstring);
 			return;
 		}
 

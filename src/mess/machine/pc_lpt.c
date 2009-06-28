@@ -90,6 +90,7 @@ static DEVICE_START( pc_lpt )
 	if (!lpt->centronics->started)
 	{
 		device_delay_init(device);
+		astring_free(tempstring);
 		return;
 	}
 
