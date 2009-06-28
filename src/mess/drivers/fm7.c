@@ -800,7 +800,7 @@ static void fm7_update_psg(running_machine* machine)
 				break;
 			case 0x01:
 				// Data read
-				psg_data = ym2203_r(devtag_get_device(space->machine,"ym"),0);
+				psg_data = ym2203_r(devtag_get_device(space->machine,"ym"),1);
 				break;
 			case 0x02:
 				// Data write
@@ -812,7 +812,7 @@ static void fm7_update_psg(running_machine* machine)
 				break;
 			case 0x04:
 				// Status register
-				psg_data = ym2203_r(devtag_get_device(space->machine,"ym"),1);
+				psg_data = ym2203_r(devtag_get_device(space->machine,"ym"),0);
 				break;
 			case 0x09:
 				// Joystick port read
