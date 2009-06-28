@@ -291,21 +291,27 @@ static WRITE32_HANDLER( joystick_w )
 
 
 static ADDRESS_MAP_START( jaguar_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x000000, 0x1fffff) AM_RAM AM_BASE(&jaguar_shared_ram) AM_SHARE(1) AM_MIRROR(0x200000)
+	AM_RANGE(0x000000, 0x1fffff) AM_RAM AM_BASE(&jaguar_shared_ram) AM_SHARE(1)// AM_MIRROR(0x200000)
 	AM_RANGE(0x800000, 0xdfffff) AM_ROM AM_BASE(&cart_base) AM_SIZE(&cart_size)
 	AM_RANGE(0xe00000, 0xe1ffff) AM_ROM AM_BASE(&rom_base) AM_SIZE(&rom_size)
 	AM_RANGE(0xf00000, 0xf003ff) AM_READWRITE(jaguar_tom_regs32_r, jaguar_tom_regs32_w)
 	AM_RANGE(0xf00400, 0xf007ff) AM_RAM AM_BASE(&jaguar_gpu_clut) AM_SHARE(2)
-	AM_RANGE(0xf02100, 0xf021ff) AM_READWRITE(gpuctrl_r, gpuctrl_w)
-	AM_RANGE(0xf02200, 0xf022ff) AM_READWRITE(jaguar_blitter_r, jaguar_blitter_w)
+	AM_RANGE(0xf02100, 0xf021ff) AM_MIRROR(0x008000) AM_READWRITE(gpuctrl_r, gpuctrl_w)
+	AM_RANGE(0xf02200, 0xf022ff) AM_MIRROR(0x008000) AM_READWRITE(jaguar_blitter_r, jaguar_blitter_w)
 	AM_RANGE(0xf03000, 0xf03fff) AM_MIRROR(0x008000) AM_RAM AM_BASE(&jaguar_gpu_ram) AM_SHARE(3)
 	AM_RANGE(0xf10000, 0xf103ff) AM_READWRITE(jaguar_jerry_regs32_r, jaguar_jerry_regs32_w)
 	AM_RANGE(0xf14000, 0xf14003) AM_READWRITE(joystick_r, joystick_w)
-	AM_RANGE(0xf16000, 0xf1600b) AM_READ(cojag_gun_input_r)	// GPI02
-//  AM_RANGE(0xf17800, 0xf17803) AM_WRITE(latch_w)  // GPI04
+	AM_RANGE(0xf14800, 0xf14fff) AM_NOP			// GPI00
+	AM_RANGE(0xf15000, 0xf15fff) AM_NOP			// GPI01
+	//AM_RANGE(0xf16000, 0xf1600b) AM_READ(cojag_gun_input_r)	// GPI02
+	AM_RANGE(0xf17000, 0xf177ff) AM_NOP			// GPI03
+	//AM_RANGE(0xf17800, 0xf17803) AM_WRITE(latch_w)	// GPI04
+	AM_RANGE(0xf17800, 0xf17bff) AM_NOP			// GPI04
+	AM_RANGE(0xf17c00, 0xf17fff) AM_NOP			// GPI05
 	AM_RANGE(0xf1a100, 0xf1a13f) AM_READWRITE(dspctrl_r, dspctrl_w)
 	AM_RANGE(0xf1a140, 0xf1a17f) AM_READWRITE(jaguar_serial_r, jaguar_serial_w)
 	AM_RANGE(0xf1b000, 0xf1cfff) AM_RAM AM_BASE(&jaguar_dsp_ram) AM_SHARE(4)
+	//AM_SHARE(0xf1d00, 0xf1dfff) AM_READ(jaguar_wave_table_r) //p78
 ADDRESS_MAP_END
 
 
@@ -492,7 +498,7 @@ static MACHINE_DRIVER_START( jaguar )
 	/* cartridge */
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("jag,abs,bin,rom,j64")
-	MDRV_CARTSLOT_MANDATORY
+	//MDRV_CARTSLOT_MANDATORY
 MACHINE_DRIVER_END
 
 
