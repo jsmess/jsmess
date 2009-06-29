@@ -642,7 +642,7 @@ static UINT32 *process_bitmap(running_machine *machine, UINT32 *objdata, int vc,
 				break;
 
 			default:
-				fprintf(stderr, "Unhandled bitmap source depth = %d\n", depthlog);
+				fprintf(stderr, "Standard bitmap: Unhandled bitmap source depth = %d\n", depthlog);
 				break;
 		}
 
@@ -805,7 +805,7 @@ static UINT32 *process_scaled_bitmap(running_machine *machine, UINT32 *objdata, 
 					break;
 
 				default:
-					fprintf(stderr, "Unhandled scaled bitmap source depth = %d\n", depthlog);
+					fprintf(stderr, "Scaled Bitmap: Unhandled scaled bitmap source depth = %d\n", depthlog);
 					break;
 			}
 		}
@@ -831,7 +831,7 @@ static UINT32 *process_scaled_bitmap(running_machine *machine, UINT32 *objdata, 
 
 /*************************************
  *
- *  Brach object processor
+ *  Branch object processor
  *
  *************************************/
 
@@ -909,7 +909,7 @@ static void process_object_list(running_machine *machine, int vc, UINT16 *_scanl
 
 	/* erase the scanline first */
 	scanline = _scanline;
-	for (x = 0; x < 336; x++)
+	for (x = 0; x < 360; x++)
 		scanline[x] = gpu_regs[BG];
 
 	logit = LOG_OBJECTS;
@@ -934,6 +934,19 @@ static void process_object_list(running_machine *machine, int vc, UINT16 *_scanl
 					logerror("scaled = %08X-%08X %08X-%08X %08X-%08X\n", objdata[0], objdata[1], objdata[2], objdata[3], objdata[4], objdata[5]);
 				objdata = process_scaled_bitmap(machine, objdata, vc, logit);
 				break;
+
+			/* interrupt gpu - this is guesswork */
+			case 2:
+			{
+				done = 1;
+
+				if (logit)
+					logerror("int gpu   = %08X-%08X\n", objdata[0], objdata[1]);
+				
+				cpu_irq_state |= 4;
+				update_cpu_irq(machine);
+				break;
+			}
 
 			/* branch */
 			case 3:

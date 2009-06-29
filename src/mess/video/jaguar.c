@@ -464,7 +464,7 @@ static void jaguar_set_palette(UINT16 vmode)
 
 		/* others */
 		default:	// RGB24, DIRECT16
-			logerror("Can't handle mode %X\n", vmode);
+			printf("Can't handle mode %X\n", vmode);
 			break;
 	}
 }
@@ -549,46 +549,8 @@ static void blitter_run(running_machine *machine)
 		return;
 	}
 #endif
-
-
-if (LOG_BLITTER_STATS)
-{
-static UINT32 blitter_stats[1000][4];
-static UINT64 blitter_pixels[1000];
-static int blitter_count = 0;
-static int reps = 0;
-int i;
-for (i = 0; i < blitter_count; i++)
-	if (blitter_stats[i][0] == (blitter_regs[B_CMD] & STATIC_COMMAND_MASK) &&
-		blitter_stats[i][1] == (blitter_regs[A1_FLAGS] & STATIC_FLAGS_MASK) &&
-		blitter_stats[i][2] == (blitter_regs[A2_FLAGS] & STATIC_FLAGS_MASK))
-		break;
-if (i == blitter_count)
-{
-	blitter_stats[i][0] = blitter_regs[B_CMD] & STATIC_COMMAND_MASK;
-	blitter_stats[i][1] = blitter_regs[A1_FLAGS] & STATIC_FLAGS_MASK;
-	blitter_stats[i][2] = blitter_regs[A2_FLAGS] & STATIC_FLAGS_MASK;
-	blitter_stats[i][3] = 0;
-	blitter_pixels[i] = 0;
-	blitter_count++;
-}
-blitter_stats[i][3]++;
-blitter_pixels[i] += (blitter_regs[B_COUNT] & 0xffff) * (blitter_regs[B_COUNT] >> 16);
-if (++reps % 100 == 99)
-{
-	mame_printf_debug("---\nBlitter stats:\n");
-	for (i = 0; i < blitter_count; i++)
-		mame_printf_debug("  CMD=%08X A1=%08X A2=%08X %6d times, %08X%08X pixels\n",
-				blitter_stats[i][0], blitter_stats[i][1], blitter_stats[i][2],
-				blitter_stats[i][3], (UINT32)(blitter_pixels[i] >> 32), (UINT32)(blitter_pixels[i]));
-	mame_printf_debug("---\n");
-}
-}
-
 	generic_blitter(machine, blitter_regs[B_CMD], blitter_regs[A1_FLAGS], blitter_regs[A2_FLAGS]);
-//	profiler_mark(PROFILER_END);
 }
-
 
 READ32_HANDLER( jaguar_blitter_r )
 {
@@ -737,6 +699,7 @@ WRITE32_HANDLER( jaguar_tom_regs32_w )
 
 
 
+
 /*************************************
  *
  *  Gun input
@@ -857,14 +820,11 @@ VIDEO_START( cojag )
 VIDEO_UPDATE( cojag )
 {
 	/* if not enabled, just blank */
-	if (!(gpu_regs[VMODE] & 1))
-	{
+	if (gpu_regs[VMODE] & 1)
+		copybitmap(bitmap, screen_bitmap, 0, 0, 0, 0, cliprect);
+	else
 		bitmap_fill(bitmap, cliprect, 0);
-		return 0;
-	}
 
-	/* render the object list */
-	copybitmap(bitmap, screen_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }
 
