@@ -297,8 +297,8 @@ INPUT_PORTS_END
 
 
 ROM_START( lisa ) /* with twiggy drives, io40 i/o rom; technically any of the bootroms will work on this. */
-	ROM_DEFAULT_BIOS( "revh" )
 	ROM_REGION16_BE(0x204000,"maincpu",0)	/* 68k rom and ram */
+	ROM_DEFAULT_BIOS( "revh" )
 	
 	ROM_SYSTEM_BIOS( 0, "revh", "LISA Bootrom Rev H (2/24/84)")
 	ROMX_LOAD( "341-0175-h", 0x000000, 0x2000, CRC(adfd4516) SHA1(97a89ce1218b8aa38f69f92f6f363f435c887914), ROM_SKIP(1) | ROM_BIOS(1)) /* 341-0175-H LISA Bootrom Rev H (2/24/84) (High) */
@@ -346,8 +346,8 @@ ROM_START( lisa ) /* with twiggy drives, io40 i/o rom; technically any of the bo
 ROM_END
 
 ROM_START( lisa2 ) /* internal apple codename was 'pepsi'; has one SSDD 400K drive, ioa8 i/o rom */
-	ROM_DEFAULT_BIOS( "revh" )
 	ROM_REGION16_BE(0x204000,"maincpu",0)	/* 68k rom and ram */
+	ROM_DEFAULT_BIOS( "revh" )
 
 	ROM_SYSTEM_BIOS( 0, "revh", "LISA Bootrom Rev H (2/24/84)")
 	ROMX_LOAD( "341-0175-h", 0x000000, 0x2000, CRC(adfd4516) SHA1(97a89ce1218b8aa38f69f92f6f363f435c887914), ROM_SKIP(1) | ROM_BIOS(1)) /* 341-0175-H LISA Bootrom Rev H (2/24/84) (High) */
@@ -382,8 +382,8 @@ ROM_START( lisa2 ) /* internal apple codename was 'pepsi'; has one SSDD 400K dri
 ROM_END
 
 ROM_START( lisa210 ) /* newer motherboard and i/o board; has io88 i/o rom, built in widget hdd */
-	ROM_DEFAULT_BIOS( "revh" )
 	ROM_REGION16_BE(0x204000,"maincpu", 0)	/* 68k rom and ram */
+	ROM_DEFAULT_BIOS( "revh" )
 	ROM_SYSTEM_BIOS( 0, "revh", "LISA Bootrom Rev H (2/24/84)")
 	ROMX_LOAD( "341-0175-h", 0x000000, 0x2000, CRC(adfd4516) SHA1(97a89ce1218b8aa38f69f92f6f363f435c887914), ROM_SKIP(1) | ROM_BIOS(1)) /* 341-0175-H LISA Bootrom Rev H (2/24/84) (High) */
 	ROMX_LOAD( "341-0176-h", 0x000001, 0x2000, CRC(546d6603) SHA1(2a81e4d483f50ae8a2519621daeb7feb440a3e4d), ROM_SKIP(1) | ROM_BIOS(1)) /* 341-0176-H LISA Bootrom Rev H (2/24/84) (Low) */
