@@ -564,7 +564,9 @@ VIDEO_UPDATE( fm7 )
 {
     UINT8 code_r = 0,code_g = 0,code_b = 0;
 	UINT8 code_r2 = 0,code_g2 = 0,code_b2 = 0;
-    UINT8 col;
+	UINT8 code_r3 = 0,code_g3 = 0,code_b3 = 0;
+	UINT8 code_r4 = 0,code_g4 = 0,code_b4 = 0;
+    UINT16 col;
     int y, x, b;
     UINT16 page = 0x0000;
     
@@ -582,23 +584,30 @@ VIDEO_UPDATE( fm7 )
 		    {
 		    	if(!(fm7_video.multi_page & 0x40))
 		    	{
-	            	code_r = fm7_video_ram[page + 0x8000 + ((y*40 + x + fm7_video.vram_offset) & 0x1fff)];
-	            	code_r2 = fm7_video_ram[page + 0xa000 + ((y*40 + x + fm7_video.vram_offset) & 0x1fff)];
+	            	code_r = fm7_video_ram[0x8000 + ((y*40 + x + fm7_video.vram_offset) & 0x1fff)];
+	            	code_r2 = fm7_video_ram[0xa000 + ((y*40 + x + fm7_video.vram_offset) & 0x1fff)];
+	            	code_r3 = fm7_video_ram[0x14000 + ((y*40 + x + fm7_video.vram_offset) & 0x1fff)];
+	            	code_r4 = fm7_video_ram[0x16000 + ((y*40 + x + fm7_video.vram_offset) & 0x1fff)];
 		    	}
 		    	if(!(fm7_video.multi_page & 0x20))
 		    	{
-	    	        code_g = fm7_video_ram[page + 0x4000 + ((y*40 + x + fm7_video.vram_offset) & 0x1fff)];
-	    	        code_g2 = fm7_video_ram[page + 0x6000 + ((y*40 + x + fm7_video.vram_offset) & 0x1fff)];
+	    	        code_g = fm7_video_ram[0x4000 + ((y*40 + x + fm7_video.vram_offset) & 0x1fff)];
+	    	        code_g2 = fm7_video_ram[0x6000 + ((y*40 + x + fm7_video.vram_offset) & 0x1fff)];
+	            	code_g3 = fm7_video_ram[0x10000 + ((y*40 + x + fm7_video.vram_offset) & 0x1fff)];
+	            	code_g4 = fm7_video_ram[0x12000 + ((y*40 + x + fm7_video.vram_offset) & 0x1fff)];
 		    	}
 		    	if(!(fm7_video.multi_page & 0x10))
 		    	{
-		            code_b = fm7_video_ram[page + 0x0000 + ((y*40 + x + fm7_video.vram_offset) & 0x1fff)];
-		            code_b2 = fm7_video_ram[page + 0x2000 + ((y*40 + x + fm7_video.vram_offset) & 0x1fff)];
+		            code_b = fm7_video_ram[0x0000 + ((y*40 + x + fm7_video.vram_offset) & 0x1fff)];
+		            code_b2 = fm7_video_ram[0x2000 + ((y*40 + x + fm7_video.vram_offset) & 0x1fff)];
+	            	code_b3 = fm7_video_ram[0xc000 + ((y*40 + x + fm7_video.vram_offset) & 0x1fff)];
+	            	code_b4 = fm7_video_ram[0xe000 + ((y*40 + x + fm7_video.vram_offset) & 0x1fff)];
 		    	}
 	            for (b = 0; b < 8; b++)
 	            {
-					col = (((code_r >> b) & 0x01) ? 16 : 0) + (((code_g >> b) & 0x01) ? 4 : 0) + (((code_b >> b) & 0x01) ? 1 : 0);
-					col |= (((code_r2 >> b) & 0x01) ? 32 : 0) + (((code_g2 >> b) & 0x01) ? 8 : 0) + (((code_b2 >> b) & 0x01) ? 2 : 0);
+	            	col = (((code_b >> b) & 0x01) ? 8 : 0) | (((code_b2 >> b) & 0x01) ? 4 : 0) | (((code_b3 >> b) & 0x01) ? 2 : 0) | (((code_b4 >> b) & 0x01) ? 1 : 0); 
+	            	col |= (((code_g >> b) & 0x01) ? 128 : 0) | (((code_g2 >> b) & 0x01) ? 64 : 0) | (((code_g3 >> b) & 0x01) ? 32 : 0) | (((code_g4 >> b) & 0x01) ? 16 : 0);
+	            	col |= (((code_r >> b) & 0x01) ? 2048 : 0) | (((code_r2 >> b) & 0x01) ? 1024 : 0) | (((code_r3 >> b) & 0x01) ? 512 : 0) | (((code_r4 >> b) & 0x01) ? 256 : 0); 
 					col += 8;  // use analog palette
 	                *BITMAP_ADDR16(bitmap, y,  x*8+(7-b)) =  col;
 	            }
