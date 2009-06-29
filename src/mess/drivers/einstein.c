@@ -61,7 +61,7 @@
 #include "devices/basicdsk.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
-#include "einstei2.lh"
+#include "rendlay.h"
 
 
 /***************************************************************************
@@ -909,7 +909,7 @@ static MACHINE_DRIVER_START( einstei2 )
 	MDRV_MACHINE_RESET(einstein2)
 
     /* video hardware */
-	MDRV_DEFAULT_LAYOUT(layout_einstei2)
+	MDRV_DEFAULT_LAYOUT(layout_dualhsxs)
 
 	MDRV_SCREEN_ADD("80column", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
