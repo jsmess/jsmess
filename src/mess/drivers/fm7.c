@@ -1479,7 +1479,7 @@ INPUT_PORTS_END
 static DRIVER_INIT(fm7)
 {
 //	shared_ram = auto_alloc_array(machine,UINT8,0x80);
-	fm7_video_ram = auto_alloc_array(machine,UINT8,0xc000);
+	fm7_video_ram = auto_alloc_array(machine,UINT8,0x18000);  // 2 pages on some systems
 	fm7_timer = timer_alloc(machine,fm7_timer_irq,NULL);
 	fm7_subtimer = timer_alloc(machine,fm7_subtimer_irq,NULL);
 	fm7_keyboard_timer = timer_alloc(machine,fm7_keyboard_poll,NULL);

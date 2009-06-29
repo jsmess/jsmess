@@ -102,6 +102,7 @@ WRITE8_HANDLER( fm7_vram_access_w )
 READ8_HANDLER( fm7_vram_r )
 {
 	int offs;
+	UINT16 page = 0x0000;
 	
 	if(offset < 0x4000 && (fm7_video.multi_page & 0x01))
 		return 0xff;
@@ -110,13 +111,17 @@ READ8_HANDLER( fm7_vram_r )
 	if((offset < 0xc000 && offset >=0x8000) && (fm7_video.multi_page & 0x04))
 		return 0xff;
 	
+	if(fm7_video.active_video_page != 0)
+		page = 0xc000;
+
 	offs = (offset & 0xc000) | ((offset + fm7_video.vram_offset) & 0x3fff);
-	return fm7_video_ram[offs];
+	return fm7_video_ram[offs + page];
 }
 
 WRITE8_HANDLER( fm7_vram_w )
 {
 	int offs;
+	UINT16 page = 0x0000;
 	
 	if(offset < 0x4000 && (fm7_video.multi_page & 0x01))
 		return;
@@ -125,15 +130,19 @@ WRITE8_HANDLER( fm7_vram_w )
 	if((offset < 0xc000 && offset >=0x8000) && (fm7_video.multi_page & 0x04))
 		return;
 		
+	if(fm7_video.active_video_page != 0)
+		page = 0xc000;
+
 	offs = (offset & 0xc000) | ((offset + fm7_video.vram_offset) & 0x3fff);
 	if(fm7_video.vram_access != 0)
-		fm7_video_ram[offs] = data;
+		fm7_video_ram[offs+page] = data;
 }
 
 // not pretty, but it should work.
 WRITE8_HANDLER( fm7_vram_banked_w )
 {
 	int offs;
+	UINT16 page = 0x0000;
 	
 	if(offset < 0x4000 && (fm7_video.multi_page & 0x01))
 		return;
@@ -142,8 +151,11 @@ WRITE8_HANDLER( fm7_vram_banked_w )
 	if((offset < 0xc000 && offset >=0x8000) && (fm7_video.multi_page & 0x04))
 		return;
 		
+	if(fm7_video.active_video_page != 0)
+		page = 0xc000;
+
 	offs = (offset & 0xc000) | ((offset + fm7_video.vram_offset) & 0x3fff);
-	fm7_video_ram[offs] = data;
+	fm7_video_ram[offs+page] = data;
 }
 
 READ8_HANDLER( fm7_vram0_r )
@@ -438,6 +450,8 @@ WRITE8_HANDLER( fm77av_video_flags_w )
 	fm7_video.cgrom = data & 0x03;
 	memory_set_bankptr(space->machine,20,RAM+(fm7_video.cgrom*0x800));
 	fm7_video.fine_offset = data & 0x04;
+	fm7_video.active_video_page = data & 0x20;
+	fm7_video.display_video_page = data & 0x40;
 	fm7_video.nmi_mask = data & 0x80;
 }
 
@@ -542,13 +556,20 @@ VIDEO_START( fm7 )
 	fm7_video.cgrom = 0;
 	fm7_video.fine_offset = 0;
 	fm7_video.nmi_mask = 0;
+	fm7_video.active_video_page = 0;
+	fm7_video.display_video_page = 0;
 }
 
 VIDEO_UPDATE( fm7 )
 {
     UINT8 code_r = 0,code_g = 0,code_b = 0;
+	UINT8 code_r2 = 0,code_g2 = 0,code_b2 = 0;
     UINT8 col;
     int y, x, b;
+    UINT16 page = 0x0000;
+    
+    if(fm7_video.display_video_page != 0)
+    	page = 0xc000;
 
 	if(fm7_video.crt_enable == 0)
 		return 0;
@@ -560,14 +581,25 @@ VIDEO_UPDATE( fm7 )
 		    for (x = 0; x < 40; x++)
 		    {
 		    	if(!(fm7_video.multi_page & 0x40))
-	            	code_r = fm7_video_ram[0x4000 + ((y*40 + x + fm7_video.vram_offset) & 0x1fff)];
+		    	{
+	            	code_r = fm7_video_ram[page + 0x8000 + ((y*40 + x + fm7_video.vram_offset) & 0x1fff)];
+	            	code_r2 = fm7_video_ram[page + 0xa000 + ((y*40 + x + fm7_video.vram_offset) & 0x1fff)];
+		    	}
 		    	if(!(fm7_video.multi_page & 0x20))
-	    	        code_g = fm7_video_ram[0x2000 + ((y*40 + x + fm7_video.vram_offset) & 0x1fff)];
+		    	{
+	    	        code_g = fm7_video_ram[page + 0x4000 + ((y*40 + x + fm7_video.vram_offset) & 0x1fff)];
+	    	        code_g2 = fm7_video_ram[page + 0x6000 + ((y*40 + x + fm7_video.vram_offset) & 0x1fff)];
+		    	}
 		    	if(!(fm7_video.multi_page & 0x10))
-		            code_b = fm7_video_ram[0x0000 + ((y*40 + x + fm7_video.vram_offset) & 0x1fff)];
+		    	{
+		            code_b = fm7_video_ram[page + 0x0000 + ((y*40 + x + fm7_video.vram_offset) & 0x1fff)];
+		            code_b2 = fm7_video_ram[page + 0x2000 + ((y*40 + x + fm7_video.vram_offset) & 0x1fff)];
+		    	}
 	            for (b = 0; b < 8; b++)
 	            {
-	                col = (((code_r >> b) & 0x01) ? 4 : 0) + (((code_g >> b) & 0x01) ? 2 : 0) + (((code_b >> b) & 0x01) ? 1 : 0);
+					col = (((code_r >> b) & 0x01) ? 16 : 0) + (((code_g >> b) & 0x01) ? 4 : 0) + (((code_b >> b) & 0x01) ? 1 : 0);
+					col |= (((code_r2 >> b) & 0x01) ? 32 : 0) + (((code_g2 >> b) & 0x01) ? 8 : 0) + (((code_b2 >> b) & 0x01) ? 2 : 0);
+					col += 8;  // use analog palette
 	                *BITMAP_ADDR16(bitmap, y,  x*8+(7-b)) =  col;
 	            }
 	        }

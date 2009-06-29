@@ -48,6 +48,8 @@ struct fm7_video_flags
 	UINT8 multi_page;
 	UINT8 fine_offset;
 	UINT8 nmi_mask;
+	UINT8 active_video_page;
+	UINT8 display_video_page;
 };
 
 void fm7_mmr_refresh(const address_space*);
