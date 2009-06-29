@@ -12,6 +12,7 @@ struct fm7_video_flags fm7_video;
 
 extern UINT8* fm7_video_ram;
 extern emu_timer* fm7_subtimer;
+extern emu_timer* fm77av_vsync_timer;
 extern UINT8 fm7_type;
 
 /*
@@ -437,6 +438,9 @@ READ8_HANDLER( fm77av_video_flags_r )
 	if(video_screen_get_vblank(space->machine->primary_screen))
 		ret &= ~0x80;
 	
+	if(fm7_video.vsync_flag == 0)
+		ret &= ~0x04;
+
 	if(!fm7_video.sub_reset)
 		ret &= ~0x01;
 		
@@ -468,8 +472,12 @@ READ8_HANDLER( fm77av_sub_modestatus_r )
 	
 	ret |= 0xbc;
 	ret |= (fm7_video.modestatus & 0x40);
+	
 	if(!video_screen_get_vblank(space->machine->primary_screen))
 		ret |= 0x02;
+		
+	if(fm7_video.vsync_flag != 0)
+		ret |= 0x01;
 	
 	return ret;
 }
@@ -545,6 +553,20 @@ WRITE8_HANDLER( fm77av_sub_bank_w )
 	prev = data;
 }
 
+TIMER_CALLBACK( fm77av_vsync )
+{
+	if(param == 0)  // start of vsync
+	{
+		fm7_video.vsync_flag = 1;
+		timer_adjust_oneshot(fm77av_vsync_timer,ATTOTIME_IN_USEC(510),1);  // VSync length for 200 line modes = 0.51ms
+	}
+	else
+	{
+		fm7_video.vsync_flag = 0;
+		timer_adjust_oneshot(fm77av_vsync_timer,video_screen_get_time_until_vblank_end(machine->primary_screen),0);
+	}
+}
+
 VIDEO_START( fm7 )
 {
 	fm7_video.vram_access = 0;
@@ -558,6 +580,7 @@ VIDEO_START( fm7 )
 	fm7_video.nmi_mask = 0;
 	fm7_video.active_video_page = 0;
 	fm7_video.display_video_page = 0;
+	fm7_video.vsync_flag = 0;
 }
 
 VIDEO_UPDATE( fm7 )

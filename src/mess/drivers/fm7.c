@@ -59,6 +59,7 @@ static UINT8 irq_mask;  // IRQ mask
 emu_timer* fm7_timer;  // main timer, triggered every 2.0345ms
 emu_timer* fm7_subtimer;  // sub-CPU timer, triggered every 20ms
 emu_timer* fm7_keyboard_timer;
+emu_timer* fm77av_vsync_timer;
 static UINT8 basic_rom_en;
 static UINT8 init_rom_en;  // AV only
 unsigned int key_delay;
@@ -1483,6 +1484,8 @@ static DRIVER_INIT(fm7)
 	fm7_timer = timer_alloc(machine,fm7_timer_irq,NULL);
 	fm7_subtimer = timer_alloc(machine,fm7_subtimer_irq,NULL);
 	fm7_keyboard_timer = timer_alloc(machine,fm7_keyboard_poll,NULL);
+	if(fm7_type != SYS_FM7)
+		fm77av_vsync_timer = timer_alloc(machine,fm77av_vsync,NULL);
 	cpu_set_irq_callback(cputag_get_cpu(machine,"maincpu"),fm7_irq_ack);
 	cpu_set_irq_callback(cputag_get_cpu(machine,"sub"),fm7_sub_irq_ack);
 }
@@ -1526,6 +1529,9 @@ static MACHINE_RESET(fm7)
 	timer_adjust_periodic(fm7_timer,ATTOTIME_IN_NSEC(2034500),0,ATTOTIME_IN_NSEC(2034500));
 	timer_adjust_periodic(fm7_subtimer,ATTOTIME_IN_MSEC(20),0,ATTOTIME_IN_MSEC(20));
 	timer_adjust_periodic(fm7_keyboard_timer,attotime_zero,0,ATTOTIME_IN_MSEC(10));
+	if(fm7_type != SYS_FM7)
+		timer_adjust_oneshot(fm77av_vsync_timer,video_screen_get_time_until_vblank_end(machine->primary_screen),0);
+		
 	irq_mask = 0xff;
 	irq_flags = 0x00;
 	fm7_video.attn_irq = 0;

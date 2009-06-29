@@ -50,9 +50,12 @@ struct fm7_video_flags
 	UINT8 nmi_mask;
 	UINT8 active_video_page;
 	UINT8 display_video_page;
+	UINT8 vsync_flag;
 };
 
 void fm7_mmr_refresh(const address_space*);
+
+TIMER_CALLBACK( fm77av_vsync );
 
 READ8_HANDLER( fm7_subintf_r );
 WRITE8_HANDLER( fm7_subintf_w );
