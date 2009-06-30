@@ -18,7 +18,8 @@ Skeleton drivers :
 - Swyft
 - MMD-2
 - MPF-1 Plus
-
+- DEC VT220
+- DEC VT320
 
 
 System Driver Changes:

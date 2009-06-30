@@ -1235,8 +1235,10 @@ const game_driver * const drivers[] =
 
     DRIVER( pcm )   /* PC/M Mugler                          */
 
-    /* DEC VT100 */
+    /* DEC */
     DRIVER(vt100)
+    DRIVER(vt220)
+    DRIVER(vt320)
 
     /* Ei Nis */
     DRIVER(pecom64)
