@@ -309,7 +309,7 @@ WRITE8_HANDLER( fm7_vram_offset_w )
 	switch(offset)
 	{
 		case 0:
-			new_offset = (data << 8) | (fm7_video.vram_offset & 0x00ff); 
+			new_offset = ((data & 0x3f) << 8) | (fm7_video.vram_offset & 0x00ff); 
 			break;
 		case 1:  // low 5 bits are used on FM-77AV and later only
 			if(fm7_type == SYS_FM7)

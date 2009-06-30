@@ -849,7 +849,7 @@ static READ8_HANDLER( fm7_psg_data_r )
 static WRITE8_HANDLER( fm7_psg_data_w )
 {
 	psg_data = data;
-	fm7_update_psg(space->machine);
+//	fm7_update_psg(space->machine);
 }
 
 static WRITE8_HANDLER( fm77av_bootram_w )
@@ -1548,6 +1548,7 @@ static MACHINE_RESET(fm7)
 	break_flag = 0;
 	key_scan_mode = KEY_MODE_FM7;
 	fm7_psg_regsel = 0;
+	psg_data = 0;
 	fdc_side = 0;
 	fdc_drive = 0;
 	fm7_mmr.mode = 0;
