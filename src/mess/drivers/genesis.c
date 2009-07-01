@@ -524,8 +524,8 @@ ROM_END
 
 ROM_START( wmega )
 	ROM_REGION16_BE( 0x400000, "maincpu", ROMREGION_ERASE00 )
-	/* 1.00 (Japan NTSC) Sega BIOS, 3 bad bytes according to X-CulT */
-	ROM_LOAD( "jp_wmg_920206.bin", 0x000000,  0x020000, BAD_DUMP CRC(b508dd72) SHA1(c94689bc60e85701f7b34f0b1f691fad91f99ffb) )
+	/* 1.00 (Japan NTSC) Sega BIOS, chip-dumped */
+	ROM_LOAD( "wondermega-g301.bin", 0x000000,  0x020000, CRC(d21fe71d) SHA1(3fc9358072f74bd24e3e297ea11b2bf15a7af891) )
 ROM_END
 
 ROM_START( cdx )
