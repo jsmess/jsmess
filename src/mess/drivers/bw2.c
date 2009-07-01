@@ -38,7 +38,7 @@
 #include "machine/pit8253.h"
 #include "devices/basicdsk.h"
 #include "video/msm6255.h"
-#include "bw2.lh"
+
 
 static const device_config *get_floppy_image(running_machine *machine, int drive)
 {
@@ -827,7 +827,7 @@ static MACHINE_DRIVER_START( bw2 )
 	MDRV_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
 	MDRV_SCREEN_SIZE( 640, 200 )
 	MDRV_SCREEN_VISIBLE_AREA( 0, 640-1, 0, 200-1 )
-	MDRV_DEFAULT_LAYOUT( layout_bw2 )
+	MDRV_DEFAULT_LAYOUT( layout_lcd )
 
 	MDRV_PALETTE_LENGTH( 2 )
 	MDRV_PALETTE_INIT( bw2 )

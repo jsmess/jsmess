@@ -13,7 +13,6 @@ The LCD is likely to be a SSD1828 LCD.
 #include "includes/pokemini.h"
 #include "cpu/minx/minx.h"
 #include "devices/cartslot.h"
-#include "pokemini.lh"
 
 
 static ADDRESS_MAP_START( pokemini_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -72,7 +71,7 @@ static MACHINE_DRIVER_START( pokemini )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE( 96, 64 )
 	MDRV_SCREEN_VISIBLE_AREA( 0, 95, 0, 63 )
-	MDRV_DEFAULT_LAYOUT(layout_pokemini)
+	MDRV_DEFAULT_LAYOUT(layout_lcd)
 	MDRV_PALETTE_LENGTH( 4 )
 	MDRV_PALETTE_INIT( pokemini )
 	MDRV_SCREEN_REFRESH_RATE( 72 )

@@ -8,7 +8,7 @@
 #include "devices/cartslot.h"
 
 #include "includes/gmaster.h"
-#include "gmaster.lh"
+
 
 #define MAIN_XTAL 	12000000
 
@@ -18,7 +18,7 @@ static struct {
     int x, y;
   /*bool*/int mode; // true read does not increase address
   /*bool*/int delayed;
-    UINT8 pixels[8][64/*>=62 sure*/];    
+    UINT8 pixels[8][64/*>=62 sure*/];
 } gmaster_video;
 
 typedef struct {
@@ -29,19 +29,19 @@ static GMASTER gmaster;
 static READ8_HANDLER( gmaster_io_r )
 {
     UINT8 data = 0;
-    if (gmaster.ports[2] & 1) 
+    if (gmaster.ports[2] & 1)
 	{
 		data = memory_region(space->machine, "maincpu")[0x4000 + offset];
 		logerror("%.4x external memory %.4x read %.2x\n", (int)cpu_get_reg(space->cpu, CPUINFO_INT_PC), 0x4000 + offset, data);
-    } 
-	else 
+    }
+	else
 	{
-		switch (offset) 
+		switch (offset)
 		{
 		case 1:
 			data=gmaster_video.pixels[gmaster_video.y][gmaster_video.x];
 			logerror("%.4x lcd x:%.2x y:%.2x %.4x read %.2x\n", (int)cpu_get_reg(space->cpu, CPUINFO_INT_PC), gmaster_video.x, gmaster_video.y, 0x4000 + offset, data);
-			if (!(gmaster_video.mode) && gmaster_video.delayed) 
+			if (!(gmaster_video.mode) && gmaster_video.delayed)
 				gmaster_video.x++;
 			gmaster_video.delayed = TRUE;
 			break;
@@ -56,30 +56,30 @@ static READ8_HANDLER( gmaster_io_r )
 
 static WRITE8_HANDLER( gmaster_io_w )
 {
-    if (gmaster.ports[2] & 1) 
+    if (gmaster.ports[2] & 1)
 	{
 		memory_region(space->machine, "maincpu")[0x4000 + offset] = data;
 		logerror("%.4x external memory %.4x written %.2x\n", (int)cpu_get_reg(space->cpu, CPUINFO_INT_PC), 0x4000 + offset, data);
-    } 
-	else 
+    }
+	else
 	{
-		switch (offset) 
+		switch (offset)
 		{
 		case 0:
 			gmaster_video.delayed=FALSE;
 			logerror("%.4x lcd %.4x written %.2x\n", (int)cpu_get_reg(space->cpu, CPUINFO_INT_PC), 0x4000 + offset, data);
 			// e2 af a4 a0 a9 falling block init for both halves
-			if ((data & 0xfc) == 0xb8) 
+			if ((data & 0xfc) == 0xb8)
 			{
 				gmaster_video.index = 0;
 				gmaster_video.data[gmaster_video.index] = data;
 				gmaster_video.y = BLITTER_Y;
-			} 
-			else if ((data & 0xc0) == 0) 
+			}
+			else if ((data & 0xc0) == 0)
 			{
 				gmaster_video.x = data;
-			} 
-			else if ((data & 0xf0) == 0xe0) 
+			}
+			else if ((data & 0xf0) == 0xe0)
 			{
 				gmaster_video.mode = (data & 0xe) ? FALSE : TRUE;
 			}
@@ -118,7 +118,7 @@ static READ8_HANDLER( gmaster_port_r )
 {
 //	UINT8 data = gmaster.ports[offset];
     UINT8 data = 0xff;
-    switch (offset) 
+    switch (offset)
 	{
 	case UPD7810_PORTA:
 		data = input_port_read(space->machine, "JOY");
@@ -133,7 +133,7 @@ static WRITE8_HANDLER( gmaster_port_w )
 {
     gmaster.ports[offset] = data;
     logerror("%.4x port %d written %.2x\n", (int)cpu_get_reg(space->cpu, CPUINFO_INT_PC), offset, data);
-    switch (offset) 
+    switch (offset)
 	{
 		case UPD7810_PORTC:
 			gmaster_video.y = BLITTER_Y;
@@ -180,7 +180,7 @@ static PALETTE_INIT( gmaster )
 {
 	int i;
 
-	for ( i = 0; i < 2; i++ ) 
+	for ( i = 0; i < 2; i++ )
 	{
 		palette_set_color_rgb(machine, i, gmaster_palette[i][0], gmaster_palette[i][1], gmaster_palette[i][2]);
 	}
@@ -190,9 +190,9 @@ static VIDEO_UPDATE( gmaster )
 {
     int x,y;
 //	plot_box(bitmap, 0, 0, 64/*bitmap->width*/, bitmap->height, 0); //xmess rounds up to 64 pixel
-    for (y = 0; y < ARRAY_LENGTH(gmaster_video.pixels); y++) 
+    for (y = 0; y < ARRAY_LENGTH(gmaster_video.pixels); y++)
 	{
-		for (x = 0; x < ARRAY_LENGTH(gmaster_video.pixels[0]); x++) 
+		for (x = 0; x < ARRAY_LENGTH(gmaster_video.pixels[0]); x++)
 		{
 			UINT8 d = gmaster_video.pixels[y][x];
 			UINT16 *line;
@@ -244,7 +244,7 @@ static MACHINE_DRIVER_START( gmaster )
 	MDRV_PALETTE_LENGTH(sizeof(gmaster_palette)/sizeof(gmaster_palette[0]))
 	MDRV_VIDEO_UPDATE(gmaster)
 	MDRV_PALETTE_INIT(gmaster)
-	MDRV_DEFAULT_LAYOUT(layout_gmaster)
+	MDRV_DEFAULT_LAYOUT(layout_lcd)
 
 	MDRV_SPEAKER_STANDARD_MONO("speaker")
 	MDRV_SOUND_ADD("custom", GMASTER, 0)
@@ -278,20 +278,20 @@ static int gmaster_load_rom(running_machine *machine, int id)
 		printf("%s requires Cartridge!\n", machine->gamedrv->name);
 		return 0;
 	}
-	
+
 	if (!(cartfile = (FILE*)image_fopen(IO_CARTSLOT, id, OSD_FILETYPE_IMAGE_R, 0)))
 	{
 		logerror("%s not found\n",device_filename(IO_CARTSLOT,id));
 		return 1;
 	}
 	size=osd_fsize(cartfile);
-	if (size>0x8000) 
+	if (size>0x8000)
 	{
 	    logerror("%s: size %d not yet supported\n",device_filename(IO_CARTSLOT,id), size);
 	    return 1;
 	}
 
-	if (osd_fread(cartfile, rom+0x8000, size)!=size) 
+	if (osd_fread(cartfile, rom+0x8000, size)!=size)
 	{
 		logerror("%s load error\n",device_filename(IO_CARTSLOT,id));
 		osd_fclose(cartfile);
@@ -303,6 +303,6 @@ static int gmaster_load_rom(running_machine *machine, int id)
 }
 #endif
 
-/*    YEAR      NAME            PARENT  MACHINE   INPUT     INIT                
+/*    YEAR      NAME            PARENT  MACHINE   INPUT     INIT
 	  COMPANY                 FULLNAME */
 CONS( 1990, gmaster,       0,          0, gmaster,  gmaster,    gmaster,   0, "Hartung", "Game Master", GAME_IMPERFECT_SOUND)

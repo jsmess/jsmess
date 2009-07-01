@@ -59,30 +59,30 @@ The relation between block number and flash chip is as follows:
  8 | 080000-01ffff | 80000-8ffff | 78000-79fff
  9 | 090000-01ffff | 90000-9ffff | 7a000-7bfff
 10 | 0a0000-01ffff | a0000-affff | 7c000-7ffff
-11 | 0b0000-01ffff | b0000-bffff | 
-12 | 0c0000-01ffff | c0000-cffff | 
-13 | 0d0000-01ffff | d0000-dffff | 
-14 | 0e0000-01ffff | e0000-effff | 
-15 | 0f0000-01ffff | f0000-f7fff | 
-16 | 100000-10ffff | f8000-f9fff | 
-17 | 110000-11ffff | fa000-fbfff | 
-18 | 120000-12ffff | fc000-fffff | 
-19 | 130000-13ffff |             | 
+11 | 0b0000-01ffff | b0000-bffff |
+12 | 0c0000-01ffff | c0000-cffff |
+13 | 0d0000-01ffff | d0000-dffff |
+14 | 0e0000-01ffff | e0000-effff |
+15 | 0f0000-01ffff | f0000-f7fff |
+16 | 100000-10ffff | f8000-f9fff |
+17 | 110000-11ffff | fa000-fbfff |
+18 | 120000-12ffff | fc000-fffff |
+19 | 130000-13ffff |             |
 20 | 140000-14ffff |             |
-21 | 150000-15ffff |             | 
-22 | 160000-16ffff |             | 
-23 | 170000-17ffff |             | 
-24 | 180000-18ffff |             | 
-25 | 190000-19ffff |             | 
-26 | 1a0000-1affff |             | 
-27 | 1b0000-1bffff |             | 
-28 | 1c0000-1cffff |             | 
-29 | 1d0000-1dffff |             | 
-30 | 1e0000-1effff |             | 
-31 | 1f0000-1f7fff |             | 
-32 | 1f8000-1f9fff |             | 
-33 | 1fa000-1fbfff |             | 
-34 | 1fc000-1fffff |             | 
+21 | 150000-15ffff |             |
+22 | 160000-16ffff |             |
+23 | 170000-17ffff |             |
+24 | 180000-18ffff |             |
+25 | 190000-19ffff |             |
+26 | 1a0000-1affff |             |
+27 | 1b0000-1bffff |             |
+28 | 1c0000-1cffff |             |
+29 | 1d0000-1dffff |             |
+30 | 1e0000-1effff |             |
+31 | 1f0000-1f7fff |             |
+32 | 1f8000-1f9fff |             |
+33 | 1fa000-1fbfff |             |
+34 | 1fc000-1fffff |             |
 
 The last block is always reserved for use by the system. The Neogeo Pocket Color
 bios does some tests on this last block to see if the flash functionality is
@@ -101,7 +101,6 @@ the Neogeo Pocket.
 #include "sound/t6w28.h"
 #include "sound/dac.h"
 #include "video/k1ge.h"
-#include "ngp.lh"
 
 
 enum flash_state
@@ -768,7 +767,7 @@ static MACHINE_DRIVER_START( ngp_common )
 	MDRV_SCREEN_ADD( "screen", LCD )
 	MDRV_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
 	MDRV_SCREEN_RAW_PARAMS( XTAL_6_144MHz, 515, 0, 160 /*480*/, 199, 0, 152 )
-	MDRV_DEFAULT_LAYOUT(layout_ngp)
+	MDRV_DEFAULT_LAYOUT(layout_lcd)
 
 	MDRV_MACHINE_START( ngp )
 	MDRV_MACHINE_RESET( ngp )

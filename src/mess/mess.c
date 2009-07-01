@@ -17,6 +17,8 @@
 #include "hash.h"
 #include "messopts.h"
 
+#include "lcd.lh"
+
 /* Globals */
 UINT32 mess_ram_size;
 UINT8 *mess_ram;
@@ -146,7 +148,7 @@ void mess_predevice_init(running_machine *machine)
 			{
 				/* retrieve image error message */
 				const char *image_err = image_error(image);
-				
+
 				/* unload all images */
 				image_unload_all(machine);
 

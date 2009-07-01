@@ -16,13 +16,11 @@
 #include "includes/cybiko.h"
 
 /* Components */
-#include "cpu/h83002/h8.h"	// support 
+#include "cpu/h83002/h8.h"	// support
 #include "video/hd66421.h"
 #include "machine/pcf8593.h"
 #include "machine/at45dbxx.h"
 #include "machine/sst39vfx.h"
-/* Layout */
-#include "cybiko.lh"
 
 
 /* Until support for the H8Sxxxx variants used by cybiko is added, we use H8_3002 (even if opcodes differ) */
@@ -209,7 +207,7 @@ static INPUT_PORTS_START( cybiko )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U) PORT_CHAR('U')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_CHAR('J')
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N) PORT_CHAR('N')
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) 
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("A8")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('_')
@@ -252,7 +250,7 @@ static MACHINE_DRIVER_START( cybikov1 )
 	MDRV_PALETTE_INIT(hd66421)
 	MDRV_VIDEO_START(hd66421)
 	MDRV_VIDEO_UPDATE(hd66421)
-	MDRV_DEFAULT_LAYOUT(layout_cybiko)
+	MDRV_DEFAULT_LAYOUT(layout_lcd)
 	// sound
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)

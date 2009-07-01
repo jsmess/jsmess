@@ -3,7 +3,7 @@
 #include "sound/speaker.h"
 #include "devices/cartslot.h"
 #include "includes/gamepock.h"
-#include "gamepock.lh"
+
 
 static ADDRESS_MAP_START(gamepock_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -70,7 +70,7 @@ static MACHINE_DRIVER_START( gamepock )
 	MDRV_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
 	MDRV_SCREEN_SIZE( 75, 64 )
 	MDRV_SCREEN_VISIBLE_AREA( 0, 74, 0, 63 )
-	MDRV_DEFAULT_LAYOUT(layout_gamepock)
+	MDRV_DEFAULT_LAYOUT(layout_lcd)
 
 	MDRV_PALETTE_LENGTH( 2 )
 	MDRV_PALETTE_INIT(black_and_white)

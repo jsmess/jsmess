@@ -24,7 +24,7 @@
 #include "formats/svi_cas.h"
 #include "sound/dac.h"
 #include "sound/ay8910.h"
-#include "sv328806.lh"
+#include "rendlay.h"
 
 static ADDRESS_MAP_START( svi318_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x7fff) AM_READWRITE( SMH_BANK(1), svi318_writemem1 )
@@ -362,7 +362,7 @@ static MACHINE_DRIVER_START( svi328_806 )
 	MDRV_INS8250_ADD( "ins8250_1", svi318_ins8250_interface[1] )
 
 	/* Video hardware */
-	MDRV_DEFAULT_LAYOUT( layout_sv328806 )
+	MDRV_DEFAULT_LAYOUT( layout_dualhsxs )
 
 	MDRV_IMPORT_FROM(tms9928a)
 	MDRV_SCREEN_MODIFY("screen")

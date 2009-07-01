@@ -19,7 +19,7 @@ Todo:
 #include "includes/gamecom.h"
 #include "cpu/sm8500/sm8500.h"
 #include "devices/cartslot.h"
-#include "gamecom.lh"
+
 
 static ADDRESS_MAP_START(gamecom_mem_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x03FF )  AM_READWRITE( gamecom_internal_r, gamecom_internal_w ) /* CPU internal register file and RAM */
@@ -108,13 +108,13 @@ static MACHINE_DRIVER_START( gamecom )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE( 200, 200 )
 	MDRV_SCREEN_VISIBLE_AREA( 0, 199, 0, 159 )
-	MDRV_DEFAULT_LAYOUT(layout_gamecom)
+	MDRV_DEFAULT_LAYOUT(layout_lcd)
 	MDRV_GFXDECODE( gamecom )
 	MDRV_PALETTE_LENGTH( GAMECOM_PALETTE_LENGTH )
 	MDRV_PALETTE_INIT( gamecom )
 
 	/* sound hardware */
-#if 0	
+#if 0
 	MDRV_SPEAKER_STANDARD_STEREO( "left", "right" )
 	/* MDRV_SOUND_ADD( "custom", CUSTOM, 0 ) */
 	/* MDRV_SOUND_CONFIG */

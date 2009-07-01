@@ -1466,40 +1466,26 @@ $(MESSOBJ)/skeleton.a: \
 # layout dependencies
 #-------------------------------------------------
 
-$(OBJ)/render.o:	$(MESS_LAYOUT)/horizont.lh \
-					$(MESS_LAYOUT)/vertical.lh \
+$(MESSOBJ)/mess.o:	$(MESS_LAYOUT)/lcd.lh
 
 $(MESS_DRIVERS)/acrnsys1.o:	$(MESS_LAYOUT)/acrnsys1.lh
 $(MESS_DRIVERS)/aim65.o:	$(MESS_LAYOUT)/aim65.lh
 $(MESS_DRIVERS)/bob85.o:	$(MESS_LAYOUT)/bob85.lh
-$(MESS_DRIVERS)/bw2.o:		$(MESS_LAYOUT)/bw2.lh
 $(MESS_DRIVERS)/coco.o:		$(MESS_LAYOUT)/coco3.lh
-$(MESS_DRIVERS)/cybiko.o:	$(MESS_LAYOUT)/cybiko.lh
 $(MESS_DRIVERS)/ex800.o:	$(MESS_LAYOUT)/ex800.lh
-$(MESS_DRIVERS)/gamecom.o:	$(MESS_LAYOUT)/gamecom.lh
-$(MESS_DRIVERS)/gamepock.o:	$(MESS_LAYOUT)/gamepock.lh
-$(MESS_DRIVERS)/gb.o:		$(MESS_LAYOUT)/gb.lh
 $(MESS_DRIVERS)/glasgow.o:	$(MESS_LAYOUT)/glasgow.lh
-$(MESS_DRIVERS)/gmaster.o:	$(MESS_LAYOUT)/gmaster.lh
 $(MESS_DRIVERS)/kim1.o:		$(MESS_LAYOUT)/kim1.lh
-$(MESS_VIDEO)/kyocera.o:	$(MESS_LAYOUT)/kc85.lh \
-							$(MESS_LAYOUT)/tandy200.lh
 $(MESS_DRIVERS)/mephisto.o:	$(MESS_LAYOUT)/mephisto.lh
 $(MESS_DRIVERS)/mk1.o:		$(MESS_LAYOUT)/mk1.lh
 $(MESS_DRIVERS)/mk2.o:		$(MESS_LAYOUT)/mk2.lh
 $(MESS_DRIVERS)/mpf1.o:		$(MESS_LAYOUT)/mpf1.lh
 $(MESS_DRIVERS)/mmd1.o:		$(MESS_LAYOUT)/mmd1.lh \
 							$(MESS_LAYOUT)/mmd2.lh
-$(MESS_DRIVERS)/nc.o:		$(MESS_LAYOUT)/nc200.lh
-$(MESS_DRIVERS)/ngp.o:		$(MESS_LAYOUT)/ngp.lh
-$(MESS_DRIVERS)/palm.o:		$(MESS_LAYOUT)/palm.lh
 $(MESS_VIDEO)/pc8401a.o:	$(MESS_LAYOUT)/pc8500.lh
-$(MESS_DRIVERS)/pokemini.o:	$(MESS_LAYOUT)/pokemini.lh
 $(MESS_DRIVERS)/px4.o:		$(MESS_LAYOUT)/px4.lh
 $(MESS_DRIVERS)/socrates.o:	$(MESS_LAYOUT)/socrates.lh
 $(MESS_DRIVERS)/stopthie.o:	$(MESS_LAYOUT)/stopthie.lh
 $(MESS_DRIVERS)/super80.o:	$(MESS_LAYOUT)/super80.lh
-$(MESS_DRIVERS)/svi318.o:	$(MESS_LAYOUT)/sv328806.lh
 $(MESS_DRIVERS)/svision.o:	$(MESS_LAYOUT)/svision.lh
 $(MESS_DRIVERS)/sym1.o:		$(MESS_LAYOUT)/sym1.lh
 $(MESS_DRIVERS)/tec1.o:		$(MESS_LAYOUT)/tec1.lh

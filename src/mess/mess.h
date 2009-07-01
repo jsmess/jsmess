@@ -31,13 +31,19 @@ struct SystemConfigurationParamBlock;
 #define LCD_FRAMES_PER_SECOND	30
 
 
-
 /**************************************************************************/
 
 /* Win32 defines this for vararg functions */
 #ifndef DECL_SPEC
 #define DECL_SPEC
 #endif
+
+
+/**************************************************************************/
+
+/* mess specific layout files */
+extern const char layout_lcd[];	/* generic 1:1 lcd screen layout */
+
 
 /***************************************************************************/
 

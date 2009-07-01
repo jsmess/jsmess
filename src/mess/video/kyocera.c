@@ -2,8 +2,7 @@
 #include "includes/kyocera.h"
 #include "video/hd44102.h"
 #include "video/hd61830.h"
-#include "kc85.lh"
-#include "tandy200.lh"
+
 
 READ8_HANDLER( kc85_lcd_status_r )
 {
@@ -58,7 +57,7 @@ WRITE8_HANDLER( kc85_lcd_data_w )
 {
 	kc85_state *state = space->machine->driver_data;
 	int i;
-	
+
 	for (i = 0; i < 10; i++)
 	{
 		if (state->lcd_cs2[i])
@@ -77,7 +76,7 @@ static PALETTE_INIT( kc85 )
 static VIDEO_START( kc85 )
 {
 	kc85_state *state = machine->driver_data;
-	
+
 	/* find devices */
 	state->hd44102[0] = devtag_get_device(machine, "m1");
 	state->hd44102[1] = devtag_get_device(machine, "m2");
@@ -159,7 +158,7 @@ MACHINE_DRIVER_START( kc85_video )
 	MDRV_SCREEN_SIZE(240, 64)
 	MDRV_SCREEN_VISIBLE_AREA(0, 240-1, 0, 64-1)
 
-	MDRV_DEFAULT_LAYOUT(layout_kc85)
+	MDRV_DEFAULT_LAYOUT(layout_lcd)
 
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(kc85)
@@ -189,7 +188,7 @@ MACHINE_DRIVER_START( tandy200_video )
 	MDRV_SCREEN_SIZE(240, 128)
 	MDRV_SCREEN_VISIBLE_AREA(0, 240-1, 0, 128-1)
 
-	MDRV_DEFAULT_LAYOUT(layout_tandy200)
+	MDRV_DEFAULT_LAYOUT(layout_lcd)
 
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(kc85)
