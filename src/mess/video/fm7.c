@@ -11,6 +11,7 @@
 struct fm7_video_flags fm7_video;
 
 extern UINT8* fm7_video_ram;
+extern UINT8* shared_ram;
 extern emu_timer* fm7_subtimer;
 extern emu_timer* fm77av_vsync_timer;
 extern UINT8 fm7_type;
@@ -144,6 +145,9 @@ WRITE8_HANDLER( fm7_vram_banked_w )
 {
 	int offs;
 	UINT16 page = 0x0000;
+
+	if(!fm7_video.sub_halt)  // no access if sub CPU is not halted.
+		return;
 	
 	if(offset < 0x4000 && (fm7_video.multi_page & 0x01))
 		return;
@@ -161,61 +165,85 @@ WRITE8_HANDLER( fm7_vram_banked_w )
 
 READ8_HANDLER( fm7_vram0_r )
 {
+	if(!fm7_video.sub_halt)  // no access if sub CPU is not halted.
+		return 0xff;
 	return fm7_vram_r(space,offset);
 }
 
 READ8_HANDLER( fm7_vram1_r )
 {
+	if(!fm7_video.sub_halt)  // no access if sub CPU is not halted.
+		return 0xff;
 	return fm7_vram_r(space,offset+0x1000);
 }
 
 READ8_HANDLER( fm7_vram2_r )
 {
+	if(!fm7_video.sub_halt)  // no access if sub CPU is not halted.
+		return 0xff;
 	return fm7_vram_r(space,offset+0x2000);
 }
 
 READ8_HANDLER( fm7_vram3_r )
 {
+	if(!fm7_video.sub_halt)  // no access if sub CPU is not halted.
+		return 0xff;
 	return fm7_vram_r(space,offset+0x3000);
 }
 
 READ8_HANDLER( fm7_vram4_r )
 {
+	if(!fm7_video.sub_halt)  // no access if sub CPU is not halted.
+		return 0xff;
 	return fm7_vram_r(space,offset+0x4000);
 }
 
 READ8_HANDLER( fm7_vram5_r )
 {
+	if(!fm7_video.sub_halt)  // no access if sub CPU is not halted.
+		return 0xff;
 	return fm7_vram_r(space,offset+0x5000);
 }
 
 READ8_HANDLER( fm7_vram6_r )
 {
+	if(!fm7_video.sub_halt)  // no access if sub CPU is not halted.
+		return 0xff;
 	return fm7_vram_r(space,offset+0x6000);
 }
 
 READ8_HANDLER( fm7_vram7_r )
 {
+	if(!fm7_video.sub_halt)  // no access if sub CPU is not halted.
+		return 0xff;
 	return fm7_vram_r(space,offset+0x7000);
 }
 
 READ8_HANDLER( fm7_vram8_r )
 {
+	if(!fm7_video.sub_halt)  // no access if sub CPU is not halted.
+		return 0xff;
 	return fm7_vram_r(space,offset+0x8000);
 }
 
 READ8_HANDLER( fm7_vram9_r )
 {
+	if(!fm7_video.sub_halt)  // no access if sub CPU is not halted.
+		return 0xff;
 	return fm7_vram_r(space,offset+0x9000);
 }
 
 READ8_HANDLER( fm7_vramA_r )
 {
+	if(!fm7_video.sub_halt)  // no access if sub CPU is not halted.
+		return 0xff;
 	return fm7_vram_r(space,offset+0xa000);
 }
 
 READ8_HANDLER( fm7_vramB_r )
 {
+	if(!fm7_video.sub_halt)  // no access if sub CPU is not halted.
+		return 0xff;
 	return fm7_vram_r(space,offset+0xb000);
 }
 
@@ -565,6 +593,115 @@ TIMER_CALLBACK( fm77av_vsync )
 		fm7_video.vsync_flag = 0;
 		timer_adjust_oneshot(fm77av_vsync_timer,video_screen_get_time_until_vblank_end(machine->primary_screen),0);
 	}
+}
+
+// called when banked into main CPU space by the MMR, available only if sub CPU is halted
+READ8_HANDLER( fm7_sub_ram_ports_banked_r )
+{
+	UINT8* RAM = memory_region(space->machine,"maincpu");
+	UINT8* ROM;
+	
+	if(!fm7_video.sub_halt)
+		return 0xff;
+		
+	if(offset < 0x380)  // work RAM
+		return RAM[0x1d000+offset];
+	if(offset >= 0x380 && offset < 0x400) // shared RAM
+		return shared_ram[offset-0x380];
+	if(offset >= 0x500 && offset < 0x800) // work RAM
+		return RAM[0x1d000+offset];
+	if(offset > 0x800) // CGROM
+	{
+		ROM = memory_region(space->machine,"subsyscg");
+		return ROM[(fm7_video.cgrom*0x800)+(offset-0x800)];
+	}
+	
+	switch(offset)
+	{
+		case 0x400:
+		case 0x401:
+			return fm7_sub_keyboard_r(space,offset-0x400);
+		case 0x402:
+			return fm7_cancel_ack(space,0);
+		case 0x404:
+			return fm7_attn_irq_r(space,0);
+		case 0x408:
+			return fm7_crt_r(space,0);
+		case 0x409:
+			return fm7_vram_access_r(space,0);
+		case 0x40a:
+			return fm7_sub_busyflag_r(space,0);
+		case 0x430:
+			return fm77av_video_flags_r(space,0);
+		case 0x431:
+		case 0x432:
+			return fm77av_key_encoder_r(space,offset-0x431);
+		default:
+			logerror("Unmapped read from sub CPU port 0xd%03x via MMR banking\n",offset);
+			return 0xff; 
+	}
+	return 0xff;
+}
+
+WRITE8_HANDLER( fm7_sub_ram_ports_banked_w )
+{
+	UINT8* RAM = memory_region(space->machine,"maincpu");
+
+	if(!fm7_video.sub_halt)
+		return;
+
+	if(offset < 0x380)  // work RAM
+		RAM[0x1d000+offset] = data;
+	if(offset >= 0x380 && offset < 0x400) // shared RAM
+		shared_ram[offset-0x380] = data;
+	if(offset >= 0x500 && offset < 0x800) // work RAM
+		RAM[0x1d000+offset] = data;
+		
+	switch(offset)
+	{
+		case 0x408:
+			fm7_crt_w(space,0,data);
+			break;
+		case 0x409:
+			fm7_vram_access_w(space,0,data);
+			break;
+		case 0x40a:
+			fm7_sub_busyflag_w(space,0,data);
+			break;
+		case 0x40e:
+		case 0x40f:
+			fm7_vram_offset_w(space,offset-0x40e,data);
+			break;
+		case 0x430:
+			fm77av_video_flags_w(space,0,data);
+			break;
+		case 0x431:
+		case 0x432:
+			fm77av_key_encoder_w(space,offset-0x431,data);
+			break;
+		default:
+			logerror("Unmapped write of 0x%02x to sub CPU port 0xd%03x via MMR banking\n",data,offset);
+	}
+}
+
+READ8_HANDLER( fm7_console_ram_banked_r )
+{
+	UINT8* RAM = memory_region(space->machine,"maincpu");
+	
+	if(!fm7_video.sub_halt)
+		return 0xff;
+		
+	return RAM[0x1c000+offset];
+}
+
+WRITE8_HANDLER( fm7_console_ram_banked_w )
+{
+	UINT8* RAM = memory_region(space->machine,"maincpu");
+	
+	if(!fm7_video.sub_halt)
+		return;
+		
+	RAM[0x1c000+offset] = data;
 }
 
 VIDEO_START( fm7 )

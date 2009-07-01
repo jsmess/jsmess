@@ -83,6 +83,10 @@ WRITE8_HANDLER( fm7_multipage_w );
 READ8_HANDLER( fm7_palette_r );
 WRITE8_HANDLER( fm7_palette_w );
 
+READ8_HANDLER( fm7_sub_keyboard_r );
+READ8_HANDLER( fm77av_key_encoder_r );
+WRITE8_HANDLER( fm77av_key_encoder_w );
+
 READ8_HANDLER( fm7_vram0_r );
 READ8_HANDLER( fm7_vram1_r );
 READ8_HANDLER( fm7_vram2_r );
@@ -108,6 +112,10 @@ WRITE8_HANDLER( fm7_vram9_w );
 WRITE8_HANDLER( fm7_vramA_w );
 WRITE8_HANDLER( fm7_vramB_w );
 
+READ8_HANDLER( fm7_sub_ram_ports_banked_r );
+WRITE8_HANDLER( fm7_sub_ram_ports_banked_w );
+READ8_HANDLER( fm7_console_ram_banked_r );
+WRITE8_HANDLER( fm7_console_ram_banked_w );
 
 VIDEO_START( fm7 );
 VIDEO_UPDATE( fm7 );

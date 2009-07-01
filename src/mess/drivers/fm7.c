@@ -464,7 +464,7 @@ static READ8_HANDLER( fm7_keyboard_r)
 	}
 }
 
-static READ8_HANDLER( fm7_sub_keyboard_r)
+READ8_HANDLER( fm7_sub_keyboard_r)
 {
 	UINT8 ret;
 	switch(offset)
@@ -504,7 +504,7 @@ static READ8_HANDLER( fm7_sub_keyboard_r)
  * 
  *  ACK is received after 5us.
  */
-static READ8_HANDLER( fm77av_key_encoder_r )
+READ8_HANDLER( fm77av_key_encoder_r )
 {
 	UINT8 ret = 0xff;
 	switch(offset)
@@ -640,7 +640,7 @@ static void fm77av_encoder_handle_command(void)
 	fm7_encoder.position = 0;
 }
 
-static WRITE8_HANDLER( fm77av_key_encoder_w )
+WRITE8_HANDLER( fm77av_key_encoder_w )
 {
 	fm7_encoder.ack = 0;
 	if(offset == 0) // data register
@@ -980,23 +980,14 @@ static void fm7_update_bank(const address_space* space, int bank, UINT8 physical
 //		memory_set_bankptr(space->machine,bank+1,RAM+(physical<<12)-0x10000);
 		return;
 	}
+	if(physical == 0x1c)
+	{
+		memory_install_readwrite8_handler(space,bank*0x1000,(bank*0x1000)+size,0,0,fm7_console_ram_banked_r,fm7_console_ram_banked_w);
+		return;
+	}
 	if(physical == 0x1d)
 	{
-		// special case - the sub CPU's I/O ports are available on this RAM page
-		// work RAM
-		memory_install_readwrite8_handler(space,bank*0x1000,(bank*0x1000)+0x800,0,0,SMH_BANK(bank+1),SMH_BANK(bank+1));
-		memory_set_bankptr(space->machine,bank+1,RAM+(physical<<12));
-		//memory_install_readwrite8_handler(space,(bank*0x1000)+0x380,(bank*0x1000)+0x3ff,0,0,SMH_BANK(bank+1),SMH_BANK(bank+1));
-		// various sub CPU I/O ports
-		memory_install_readwrite8_handler(space,(bank*0x1000)+0x400,(bank*0x1000)+0x4ff,0,0,SMH_UNMAP,SMH_UNMAP);
-		memory_install_readwrite8_handler(space,(bank*0x1000)+0x409,(bank*0x1000)+0x409,0,0,fm7_vram_access_r,fm7_vram_access_w);
-		memory_install_readwrite8_handler(space,(bank*0x1000)+0x40a,(bank*0x1000)+0x40a,0,0,fm7_sub_busyflag_r,fm7_sub_busyflag_w);
-		memory_install_write8_handler(space,(bank*0x1000)+0x40e,(bank*0x1000)+0x40f,0,0,fm7_vram_offset_w);
-		memory_install_readwrite8_handler(space,(bank*0x1000)+0x430,(bank*0x1000)+0x430,0,0,fm77av_video_flags_r,fm77av_video_flags_w);
-		memory_install_readwrite8_handler(space,(bank*0x1000)+0x431,(bank*0x1000)+0x432,0,0,fm77av_key_encoder_r,fm77av_key_encoder_w);
-		
-		// sub monitor CGROM
-		memory_install_readwrite8_handler(space,(bank*0x1000)+0x800,(bank*0x1000)+size,0,0,SMH_BANK(20),SMH_UNMAP);
+		memory_install_readwrite8_handler(space,bank*0x1000,(bank*0x1000)+size,0,0,fm7_sub_ram_ports_banked_r,fm7_sub_ram_ports_banked_w);
 		return;
 	}
 	if(physical == 0x36 || physical == 0x37)
@@ -1234,7 +1225,7 @@ static ADDRESS_MAP_START( fm7_sub_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000,0xcfff) AM_RAM // Console RAM
 	AM_RANGE(0xd000,0xd37f) AM_RAM // Work RAM
 	AM_RANGE(0xd380,0xd3ff) AM_RAM AM_BASE(&shared_ram)
-	// I/O space (D400-D7FF)
+	// I/O space (D400-D4FF)
 	AM_RANGE(0xd400,0xd401) AM_READ(fm7_sub_keyboard_r)
 	AM_RANGE(0xd402,0xd402) AM_READ(fm7_cancel_ack)
 	AM_RANGE(0xd404,0xd404) AM_READ(fm7_attn_irq_r)
@@ -1304,7 +1295,7 @@ static ADDRESS_MAP_START( fm77av_sub_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000,0xcfff) AM_RAM AM_REGION("maincpu",0x1c000) // Console RAM
 	AM_RANGE(0xd000,0xd37f) AM_RAM AM_REGION("maincpu",0x1d000) // Work RAM
 	AM_RANGE(0xd380,0xd3ff) AM_RAM AM_BASE(&shared_ram)
-	// I/O space (D400-D7FF)
+	// I/O space (D400-D4FF)
 	AM_RANGE(0xd400,0xd401) AM_READ(fm7_sub_keyboard_r)
 	AM_RANGE(0xd402,0xd402) AM_READ(fm7_cancel_ack)
 	AM_RANGE(0xd404,0xd404) AM_READ(fm7_attn_irq_r)
