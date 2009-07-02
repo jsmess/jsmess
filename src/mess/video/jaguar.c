@@ -136,9 +136,6 @@
 
 #include "driver.h"
 #include "memconv.h"
-#include "profiler.h"
-#include "machine/atarigen.h"
-#include "cpu/mips/r3000.h"
 #include "cpu/m68000/m68000.h"
 #include "includes/jaguar.h"
 #include "jagblit.h"
@@ -146,7 +143,7 @@
 
 #define ENABLE_BORDERS		0
 
-#define LOG_BLITS			0
+#define LOG_BLITS		0
 #define LOG_BAD_BLITS		0
 #define LOG_BLITTER_STATS	0
 #define LOG_BLITTER_WRITE	0
@@ -328,9 +325,9 @@ void jaguar_gpu_resume(running_machine *machine)
 static void update_cpu_irq(running_machine *machine)
 {
 	if (cpu_irq_state & gpu_regs[INT1] & 0x1f)
-		cputag_set_input_line(machine, "maincpu", cojag_is_r3000 ? R3000_IRQ4 : M68K_IRQ_6, ASSERT_LINE);
+		cputag_set_input_line(machine, "maincpu", M68K_IRQ_6, ASSERT_LINE);
 	else
-		cputag_set_input_line(machine, "maincpu", cojag_is_r3000 ? R3000_IRQ4 : M68K_IRQ_6, CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", M68K_IRQ_6, CLEAR_LINE);
 }
 
 
@@ -497,8 +494,6 @@ static void blitter_run(running_machine *machine)
 	UINT32 a1flags = blitter_regs[A1_FLAGS] & STATIC_FLAGS_MASK;
 	UINT32 a2flags = blitter_regs[A2_FLAGS] & STATIC_FLAGS_MASK;
 
-//	profiler_mark(PROFILER_USER1);
-
 	if (a1flags == a2flags)
 	{
 		if (command == 0x09800001 && a1flags == 0x010020)
@@ -598,7 +593,7 @@ READ16_HANDLER( jaguar_tom_regs_r )
 			return video_screen_get_hpos(space->machine->primary_screen) % (video_screen_get_width(space->machine->primary_screen) / 2);
 
 		case VC:
-			return video_screen_get_vpos(space->machine->primary_screen) * 2 + gpu_regs[VBE];
+			return (video_screen_get_vpos(space->machine->primary_screen) << 1) + gpu_regs[VBE];
 
 	}
 
