@@ -340,7 +340,11 @@ static int drawogl_xy_to_render_target(sdl_window_info *window, int x, int y, in
 
 
 // OGL 1.3
+#ifdef GL_ARB_multitexture
+static PFNGLACTIVETEXTUREARBPROC pfn_glActiveTexture	= NULL;       
+#else
 static PFNGLACTIVETEXTUREPROC pfn_glActiveTexture	= NULL;
+#endif
 
 // VBO
 static PFNGLGENBUFFERSPROC pfn_glGenBuffers		= NULL;
@@ -1027,12 +1031,16 @@ static void loadGLExtensions(sdl_window_info *window)
  
 	if ( sdl->useglsl )
 	{
+		#ifdef GL_ARB_multitexture 
+		pfn_glActiveTexture = (PFNGLACTIVETEXTUREARBPROC) SDL_GL_GetProcAddress("glActiveTextureARB");
+		#else
 		pfn_glActiveTexture = (PFNGLACTIVETEXTUREPROC) SDL_GL_GetProcAddress("glActiveTexture");
+		#endif
 		if (!pfn_glActiveTexture)
 		{
 			if (_once)
 			{
-				mame_printf_warning("OpenGL: GLSL disabled, glActiveTexture not supported\n");
+				mame_printf_warning("OpenGL: GLSL disabled, glActiveTexture(ARB) not supported\n");
 			}
 			sdl->useglsl = 0;
 		}
