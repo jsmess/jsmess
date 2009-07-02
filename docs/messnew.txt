@@ -20,6 +20,7 @@ Skeleton drivers :
 - MPF-1 Plus
 - DEC VT220
 - DEC VT320
+- DEC VT520
 
 
 

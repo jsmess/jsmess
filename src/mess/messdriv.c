@@ -1239,6 +1239,7 @@ const game_driver * const drivers[] =
     DRIVER(vt100)
     DRIVER(vt220)
     DRIVER(vt320)
+    DRIVER(vt520)
 
     /* Ei Nis */
     DRIVER(pecom64)
