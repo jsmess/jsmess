@@ -414,11 +414,12 @@ const game_driver * const drivers[] =
 	DRIVER( hyhoo )		/* (c) 1987 */
 	DRIVER( hyhoo2 )	/* (c) 1987 */
 
-	DRIVER( jangou )    /* (c) 1983 */
-	DRIVER( macha )     /* (c) 1983 Logitec */
+	DRIVER( jangou )	/* (c) 1983 */
+	DRIVER( macha )		/* (c) 1983 Logitec */
 	/* Jangou Night   *//* (c) 1983 */
-	DRIVER( jngolady )  /* (c) 1984 */
-	DRIVER( cntrygrl )  /* (c) 1984 Royal Denshi */
+	DRIVER( jngolady )	/* (c) 1984 */
+	DRIVER( cntrygrl )	/* (c) 1984 Royal Denshi */
+	DRIVER( fruitbun )	/* (c) 1984 */
 	DRIVER( luckygrl )  /* (c) 1984 Wing? */
 	DRIVER( nightgal )  /* (c) 1984 */
 	DRIVER( ngtbunny )  /* (c) 1984 */
@@ -989,6 +990,7 @@ const game_driver * const drivers[] =
 	DRIVER( dkong3j )	/* (c) 1983 Nintendo */
 	DRIVER( dkong3b )	/* bootleg */
 	DRIVER( mario )		/* (c) 1983 Nintendo of America */
+	DRIVER( marioe )	/* (c) 1983 Nintendo of America */
 	DRIVER( marioo )	/* (c) 1983 Nintendo of America */
 	DRIVER( marioj )	/* (c) 1983 Nintendo */
 	DRIVER( masao )		/* bootleg */
@@ -2478,14 +2480,15 @@ V-V                           TP-027
 	DRIVER( forgottn )	/*  7/1988 (c) 1988 (World) */
 	DRIVER( forgottu )	/*  7/1988 (c) 1988 (US) */
 	DRIVER( lostwrld )	/*  7/1988 (c) 1988 (Japan) */
+	DRIVER( lostwrldo )	/*  7/1988 (c) 1988 (Japan) */
 	DRIVER( ghouls )	/* 12/1988 (c) 1988 (World) */
 	DRIVER( ghoulsu )	/* 12/1988 (c) 1988 (US) */
 	DRIVER( daimakai )	/* 12/1988 (c) 1988 (Japan) */
-	DRIVER( daimakr2 )	/* unknown release date, still (c) 1988 (Japan) */
+	DRIVER( daimakair )	/* 12/1988 (c) 1988 (Japan) */
 	DRIVER( strider )	/*  3/1989 (c) 1989 (not explicitly stated but should be US) */
 	DRIVER( stridrua )	/*  3/1989 (c) 1989 (not explicitly stated but should be US) */
 	DRIVER( striderj )	/*  3/1989 (c) 1989 */
-	DRIVER( stridrja )	/*  3/1989 (c) 1989 */
+	DRIVER( striderjr )	/*  3/1989 (c) 1989 */
 	DRIVER( dynwar )	/*  4/1989 (c) 1989 (World) */
 	DRIVER( dynwaru )	/*  4/1989 (c) 1989 (US) */
 	DRIVER( dynwarj )	/*  4/1989 (c) 1989 (Japan) */
@@ -2941,7 +2944,10 @@ V-V                           TP-027
 	DRIVER( beastrzr )	/* Beastorizer (USA) */
 	DRIVER( bldyroar )	/* Bloody Roar (JAPAN) */
 	DRIVER( beastrzb )	/* Beastorizer (USA Bootleg) */
-	DRIVER( bldyror2 )	/* Bloody Roar 2 (JAPAN) */
+	DRIVER( bldyror2 )	/* Bloody Roar 2 (WORLD) */
+	DRIVER( bldyror2u )	/* Bloody Roar 2 (USA) */
+	DRIVER( bldyror2a )	/* Bloody Roar 2 (ASIA) */
+	DRIVER( bldyror2j )	/* Bloody Roar 2 (JAPAN) */
 	DRIVER( brvblade )	/* Brave Blade (JAPAN) */
 	DRIVER( bam2 )		/* Bust a Move 2 (JAPANESE ROM ver. 1999/07/17 10:00:00) */
 
@@ -3141,6 +3147,7 @@ V-V                           TP-027
 	DRIVER( ddrjb )		/* 1998 - Dance Dance Revolution (GC845 VER. JAB) */
 	DRIVER( ddra )		/* 1999 - Dance Dance Revolution (GN845 VER. AAA) */
 	DRIVER( fbait2bc )	/* 1998 - Fisherman's Bait 2 - A Bass Challenge (GE865 VER. UAB) */
+	DRIVER( bassang2 )	/* 1998 - Bass Angler 2 (GE865 VER. JAA) */
 	DRIVER( drmn )		/* 1999 - DrumMania (GQ881 VER. JAD) */
 	DRIVER( gtrfrks )	/* 1999 - Guitar Freaks (GQ886 VER. EAC) */
 	DRIVER( gtrfrksu )	/* 1999 - Guitar Freaks (GQ886 VER. UAC) */
@@ -3166,6 +3173,8 @@ V-V                           TP-027
 	DRIVER( ddrsbm )	/* 1999 - Dance Dance Revolution Solo Bass Mix (GQ894 VER. JAA) */
 	DRIVER( ddrs2k )	/* 1999 - Dance Dance Revolution Solo 2000 (GC905 VER. AAA) */
 	DRIVER( ddrs2kj )	/* 1999 - Dance Dance Revolution Solo 2000 (GC905 VER. JAA) */
+	DRIVER( hyperbbc )	/* 1999 - Hyper Bishi Bashi Champ (GX908 1999/08/24 VER. JAA) */
+	DRIVER( hyperbbck )	/* 1999 - Hyper Bishi Bashi Champ (GX908 1999/08/24 VER. KAA) */
 	DRIVER( dsfdct )	/* 1999 - Dancing Stage featuring Dreams Come True (GC910 VER. JCA) */
 	DRIVER( dsfdcta )	/* 1999 - Dancing Stage featuring Dreams Come True (GC910 VER. JAA) */
 	DRIVER( drmn2m )	/* 1999 - DrumMania 2nd Mix (GE912 VER. JAB) */
@@ -3604,6 +3613,7 @@ DokiDoki Penguin Land *not confirmed
 	DRIVER( zoom909 )	/* (c) 1982 Sega */
 	DRIVER( kopunch )	/* 834-0103 (c) 1981 Sega */
 	DRIVER( suprloco )	/* (c) 1982 Sega */
+	DRIVER( suprlocoa )	/* (c) 1982 Sega */
 	DRIVER( dotrikun )	/* cabinet test board */
 	DRIVER( dotriku2 )	/* cabinet test board */
 	DRIVER( spcpostn )	/* (c) 1986 Sega / Nasco" */
@@ -4136,11 +4146,12 @@ DokiDoki Penguin Land *not confirmed
 	DRIVER( dirtdvla )
 	DRIVER( swtrilgy )	/* 1998.11 Star Wars Trilogy Arcade */
 	DRIVER( swtrilga )
-						/* 1998.11 Magical Trocco Adventure */
+						/* 1998.11 Magical Torokko Adventure (Japan) */
 						/* 1998.12 L.A. Machine Guns */
 	DRIVER( dayto2pe )	/* 1998.12 Daytone USA 2 Power Edition */
 						/* 1998.12 Virtua Striker 2 ver.99 */
 	DRIVER( spikeofe )	/* 1999.01 Spikeout Final Edition */
+	DRIVER( magtruck )	/* 1999.03 Magical Truck Adventure (US) */
 	DRIVER( eca )		/* 1999.10 Kyukyuusya Emergency Call Ambulance */
 	DRIVER( ecax )
 
@@ -5102,7 +5113,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( tp84b )		/* GX388 (c) 1984 */
 	DRIVER( hyperspt )	/* GX330 (c) 1984 + Centuri */
 	DRIVER( hpolym84 )	/* GX330 (c) 1984 */
-	DRIVER( sbasketb )	/* GX405 (c) 1984 (Version H, Unprotected) */
+	DRIVER( sbasketb )	/* GX405 (c) 1984 (Version I, Encrypted) */
+	DRIVER( sbasketh )	/* GX405 (c) 1984 (Version H, Unprotected) */
 	DRIVER( sbasketg )	/* GX405 (c) 1984 (Version G, Encrypted) */
 	DRIVER( sbaskete )	/* GX405 (c) 1984 (Version E, Encrypted) */
 	DRIVER( mikie )		/* GX469 (c) 1984 */
@@ -6270,6 +6282,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 				/* 0220 Choutetsu Brikin'ger - iron clad (MVS existance seems to have been confirmed) */
 	DRIVER( magdrop2 )	/* 0221 (c) 1996 Data East Corporation */
 	DRIVER( samsho4 )	/* 0222 (c) 1996 SNK */
+	DRIVER( samsho4k )	/* Censored Korean release of samsho4 */
 	DRIVER( rbffspec )	/* 0223 (c) 1996 SNK */
 	DRIVER( twinspri )	/* 0224 (c) 1996 ADK */
 	DRIVER( wakuwak7 )	/* 0225 (c) 1996 Sunsoft */
@@ -6616,6 +6629,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( macross2 )	/* (c) 1993 Banpresto */
 	DRIVER( sabotenb )	/* (c) 1992 NMK / Tecmo */
 	DRIVER( sabotnba )	/* (c) 1992 NMK / Tecmo */
+	DRIVER( cactus )	/* bootleg */
 	DRIVER( nouryoku )	/* (c) 1995 Tecmo */
 	DRIVER( raphero )	/* (c) 1994 Media Trading Corp */
 
@@ -6982,7 +6996,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( rfjetj )	/* (c) 1998 Seibu Kaihatsu */
 	DRIVER( rfjetus )	/* (c) 1998 Seibu Kaihatsu (Fabtek license) */
 
-	DRIVER( ejsakura )	/* (c) 1999 Seibu Kaihatsu */
+	DRIVER( ejsakura )		/* (c) 1999 Seibu Kaihatsu */
+	DRIVER( ejsakura12 )	/* (c) 1999 Seibu Kaihatsu */
 
 	/* Seibu System SH2B games */
 	DRIVER( feversoc )  /* (c) 2000 */
@@ -8159,14 +8174,18 @@ Other Sun games
 	DRIVER( lemnangl ) 	/* (c) 1990 Home Data */
 	DRIVER( mjkinjas ) 	/* (c) 1991 Home Data */
 	DRIVER( battlcry ) 	/* (c) 1991 Home Data */
-	DRIVER( jogakuen )	/* Windom corporation */
-	DRIVER( mjikaga )	/* Mitchell */
+	DRIVER( jogakuen )	/* (c) 1992 Windom corporation */
+	DRIVER( mjikaga )	/* (c) 1991 Mitchell */
+	DRIVER( siseikat )	/* (c) 1991 Matoba */
 
 	/* Art & Magic games */
 	DRIVER( ultennis )	/* (c) 1993 */
 	DRIVER( cheesech )	/* (c) 1994 */
 	DRIVER( stonebal )	/* (c) 1994 */
 	DRIVER( stoneba2 )	/* (c) 1994 */
+
+	/* Dynamo games */
+	DRIVER( skeetsht )	/* (c) 1991 */
 
 	/* Taiyo games */
 	DRIVER( dynamski )	/* (c) 1984 Taiyo */

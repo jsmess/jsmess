@@ -37,28 +37,81 @@
 
   The games that run on this system include...
 
-  Game                                  Year    Hardware Code     CD Code
-  --------------------------------------------------------------------------
-  *Anime Champ                          2000
-  Bass Angler                           1998    GE765 JA          765 JA A02
-  *Bass Angler 2                        1999
-  Dark Horse Legend                     1998    GX706 JA          706 JA A02
-  *Dark Horse 2                         ?
-  *Fighting Mania                       2000
-  Fisherman's Bait                      1998    GE765 UA          765 UA B02
-  Fisherman's Bait 2                    1998    GC865 UA          865 UA B02
-  Fisherman's Bait Marlin Challenge     1999
-  *Gun Mania                            2001
-  *Gun Mania Zone Plus                  2001
-  *Gachaga Champ                        1999
-  *Hyper Bishi Bashi                    1999
-  *Hyper Bishi Bashi Champ              2000
-  Jikkyo Pawafuru Pro Yakyu             1998    GX802 JA          802 JA B02
-  *Kick & Kick                          2001
-  Konami 80's Arcade Gallery            1998    GC826 JA          826 JA A01
-  Konami 80's AC Special                1998    GC826 UA          826 UA A01
-  Salary Man Champ                      2001
-  *Step Champ                           1999
+  Game                                         Year       Hardware Code     CD Code
+  ---------------------------------------------------------------------------------
+  *Anime Champ                                  2000.12
+  Bass Angler                                   1998.03    GE765 JA          765 JA A02
+  Bass Angler 2                                 1998.07    GC865 JA          865 JA A02
+  *DAM-DDR Dance Dance Revolution for DAM       1999.11
+  *DAM-DDR Dance Dance Revolution for DAM 2nd   2000.07
+  Dance Dance Revolution                        1998.09    GC845 JA          845 JA(missing)/UA A01 / 845 JA A02
+  Dance Dance Revolution Internet Ranking ver.  1998.11    GC845 JB          845 JB A01 / 845 JA/UA A02
+  Dance Dance Revolution 2ndMIX                 1999.01    GC895 JA          895 JA A02
+  Dance Dance Revolution 2ndMIX LINK version    1999.04    GE885 JA          885 JA A02
+  DDR 2ndMIX with bmIIDX CLUB ver.              1999.05    GN896 JA          896 JA A01
+  DDR 2ndMIX AND bmIIDX substream CLUB ver. 2   1999.05    GE984 JA          984 JA A01
+  Dance Dance Revolution Solo BASS MIX          1999.08    GQ894 JA          894 JA A02
+  Dance Dance Revolution 3rdMIX                 1999.10    GN887 AA/JA/KA    887 AA/JA/KA A02
+  Dance Dance Revolution Solo 2000              1999.12    GC905 AA/JA       905 AA/JA A02
+  Dance Dance Revolution 3rdMIX PLUS            2000.06    GCA22 JA          A22 JA A02
+  Dance Dance Revolution 4thMIX                 2000.08    GCA34 JA          A34 JA A02
+  *Dance Dance Revolution Kids                  2000.12
+  Dance Dance Revolution 5thMIX                 2001.03    GCA27 JA          A27 JA A02
+  DDRMAX Dance Dance Revolution 6thMIX          2001.10    GCB19 JA          B19 JA A02
+  DDRMAX2 Dance Dance Revolution 7thMIX         2002.03    GCB20 JA          B20 JA A02
+  Dance Dance Revolution EXTREME                2002.12    GCC36 JA          C36 JA A02
+  Dance Maniax                                  2000.06    GE874 JA          874 JA A(needs redump)
+  Dance Maniax 2ndMIX                           2000.12    GCA39 JA          A39 JA A02
+  *Dance Maniax 2ndMIX APPEND J PARADISE        2001.04
+  Dancing Stage                                 1999.08    GN845 EA          845 EA(needs redump)
+  Dancing Stage Euro Mix                        2000       GE936 EA          936 EA A(needs redump)
+  Dancing Stage Euro Mix 2                      2000       G*C23 EA          C23 EA A02
+  Dancing Stage featuring Disney's Rave         2000.11    GCA37 JA          A37 JA A02
+  Dancing Stage featuring DREAMS COME TRUE      1999.12    GC910 JA          910 JA/JC A02
+  Dancing Stage featuring TRUE KiSS DESTiNATiON 1999.07    G*884 JA          884 JA A02
+  Dark Horse Legend                             1998.03    GX706 JA          706 JA A02
+  drummania                                     1999.07    GQ881 JA          881 JA D01 / 881 JA A02(missing, audio CD)
+  drummania 2ndMIX                              2000.03    GE912 JA          912 JA B02
+  drummania 3rdMIX                              2000.09    GCA23 JA          A23 JA A02
+  drummania 4thMIX                              2001.03    GEA25 JA          A25 JA A02
+  drummania 5thMIX                              2001.09    GCB05 JA          B05 JA A02
+  drummania 6thMIX                              2002.02    GCB16 JA          B16 JA A02
+  drummania 7thMIX                              2002.08    GCC07 JA          C07 JA A02
+  drummania 7thMIX power-up ver.                2002.08    GEC07 JB          C07 JC A02
+  drummania 8thMIX                              2003.04    GCC38 JA          C38 JA A02
+  drummania 9thMIX                              2003.10    GCD09 JA          D09 JA A02
+  *drummania 10thMIX                            2004.04
+  *Fighting Mania                               2000
+  Fisherman's Bait                              1998.06    GE765 UA          765 UA B02
+  Fisherman's Bait 2                            1998       GC865 UA          865 UA B02
+  Fisherman's Bait Marlin Challenge             1999       GX889             889 AA/EA/JA/UA(needs redump)
+  GUITARFREAKS                                  1999.02    GQ886 EA/JA/UA    886 ** C02
+  GUITARFREAKS 2ndMIX                           1999.07    GQ883 JA          929 JB B02(needs redump)
+  *GUITARFREAKS 2ndMIX Link ver.                1999.09
+  GUITARFREAKS 3rdMIX                           2000.04    GE949 JA          949 JA C01 / 949 JA C02
+  GUITARFREAKS 4thMIX                           2000.08    GEA24 JA          A24 JA A02
+  GUITARFREAKS 5thMIX                           2001.03    GCA26 JA          A26 JA A02
+  GUITARFREAKS 6thMIX                           2001.09    GCB06 JA          B06 JA A02
+  GUITARFREAKS 7thMIX                           2002.02    GCB17 JA          B17 JA A02
+  GUITARFREAKS 8thMIX                           2002.08    GCC08 JA          C08 JA A02
+  GUITARFREAKS 8thMIX power-up ver.             2002.11    GEC08 JB          C08 JB A02
+  GUITARFREAKS 9thMIX                           2003.04    GCC39 JA          C39 JA A02
+  GUITARFREAKS 10thMIX                          2003.10    GCD10 JA          D10 JA A02
+  *GUITARFREAKS 11thMIX                         2004.04
+  *Gun Mania                                    2000.07
+  *Gun Mania Zone Plus                          2000.10
+  *Gachaga Champ                                1999.01
+  Hyper Bishi Bashi Champ                       1998.07    GC908 JA          908    A02
+  Jikkyou Powerful Pro Yakyuu EX                1998.04    GX802 JA          802 JA B02
+  *Jikkyou Powerful Pro Yakyuu EX 98            1998.08
+  *Kick & Kick                                  2001
+  Konami 80's Arcade Gallery                    1998.11    GC826 JA          826 JA A01
+  Konami 80's AC Special                        1998       GC826 UA          826 UA A01
+  *Mambo a GoGo                                 2001.06
+  Punchmania Hokuto no Ken                      2000.03                      918 JA B02
+  Punchmania Hokuto no Ken 2                    2000.12                      A09 JA A02
+  Salary Man Champ                              2001.02    GCA18 JA          A18 JA(needs redump)
+  *Step Champ                                   1999.12
 
   Note:
        Not all games listed above are confirmed to run on System 573.
@@ -1038,9 +1091,7 @@ static void cdrom_dma_write( running_machine *machine, UINT32 n_address, INT32 n
 }
 
 static UINT32 m_n_security_control;
-static void (*security_bit7_write)( running_machine *machine, int data );
-static void (*security_bit6_write)( running_machine *machine, int data );
-static void (*security_bit5_write)( running_machine *machine, int data );
+static void (*security_callback)( running_machine *machine, int data );
 
 static WRITE32_HANDLER( security_w )
 {
@@ -1079,19 +1130,9 @@ static WRITE32_HANDLER( security_w )
 			ds2401_write( machine, security_cart_number, !( ( data >> 4 ) & 1 ) );
 		}
 
-		if( security_bit5_write != NULL )
+		if( security_callback != NULL )
 		{
-			security_bit5_write( machine, ( data >> 5 ) & 1 );
-		}
-
-		if( security_bit6_write != NULL )
-		{
-			security_bit6_write( machine, ( data >> 6 ) & 1 );
-		}
-
-		if( security_bit7_write != NULL )
-		{
-			security_bit7_write( machine, ( data >> 7 ) & 1 );
+			security_callback( machine, data & 0xff );
 		}
 	}
 }
@@ -2695,37 +2736,29 @@ static DRIVER_INIT( dmx )
 
 static int salarymc_lamp_bits;
 static int salarymc_lamp_shift;
-static int salarymc_lamp_data;
 static int salarymc_lamp_clk;
 
-static void salarymc_lamp_data_write( running_machine *machine, int data )
+static void salarymc_lamp_callback( running_machine *machine, int data )
 {
-	salarymc_lamp_data = data;
-}
+	int d = ( data >> 7 ) & 1;
+	int rst = ( data >> 6 ) & 1;
+	int clk = ( data >> 5 ) & 1;
 
-static void salarymc_lamp_rst_write( running_machine *machine, int data )
-{
-	if( data )
+	if( rst )
 	{
 		salarymc_lamp_bits = 0;
 		salarymc_lamp_shift = 0;
 	}
-}
 
-static void salarymc_lamp_clk_write( running_machine *machine, int data )
-{
-	if( salarymc_lamp_clk != data )
+	if( salarymc_lamp_clk != clk )
 	{
-		salarymc_lamp_clk = data;
+		salarymc_lamp_clk = clk;
 
 		if( salarymc_lamp_clk )
 		{
 			salarymc_lamp_shift <<= 1;
 
-			if( salarymc_lamp_data )
-			{
-				salarymc_lamp_shift |= 1;
-			}
+			salarymc_lamp_shift |= d;
 
 			salarymc_lamp_bits++;
 			if( salarymc_lamp_bits == 16 )
@@ -2754,16 +2787,54 @@ static DRIVER_INIT( salarymc )
 {
 	DRIVER_INIT_CALL(konami573);
 
-	security_bit7_write = salarymc_lamp_data_write;
-	security_bit6_write = salarymc_lamp_rst_write;
-	security_bit5_write = salarymc_lamp_clk_write;
+	security_callback = salarymc_lamp_callback;
 
 	state_save_register_global(machine,  salarymc_lamp_bits );
 	state_save_register_global(machine,  salarymc_lamp_shift );
-	state_save_register_global(machine,  salarymc_lamp_data );
 	state_save_register_global(machine,  salarymc_lamp_clk );
 }
 
+/* Hyper Bishi Bashi Champ */
+
+static int hyperbbc_lamp_strobe1;
+static int hyperbbc_lamp_strobe2;
+
+static void hyperbbc_lamp_callback( running_machine *machine, int data )
+{
+	int red = ( data >> 6 ) & 1;
+	int blue = ( data >> 5 ) & 1;
+	int green = ( data >> 4 ) & 1;
+	int strobe1 = ( data >> 3 ) & 1;
+	int strobe2 = ( data >> 0 ) & 1;
+
+	if( strobe1 && !hyperbbc_lamp_strobe1 )
+	{
+		output_set_value( "player 1 red", red );
+		output_set_value( "player 1 green", green );
+		output_set_value( "player 1 blue", blue );
+	}
+
+	hyperbbc_lamp_strobe1 = strobe1;
+
+	if( strobe2 && !hyperbbc_lamp_strobe2 )
+	{
+		output_set_value( "player 2 red", red );
+		output_set_value( "player 2 green", green );
+		output_set_value( "player 2 blue", blue );
+	}
+
+	hyperbbc_lamp_strobe2 = strobe2;
+}
+
+static DRIVER_INIT( hyperbbc )
+{
+	DRIVER_INIT_CALL(konami573);
+
+	security_callback = hyperbbc_lamp_callback;
+
+	state_save_register_global(machine,  hyperbbc_lamp_strobe1 );
+	state_save_register_global(machine,  hyperbbc_lamp_strobe2 );
+}
 
 
 /* ADC0834 Interface */
@@ -3090,6 +3161,12 @@ static INPUT_PORTS_START( drmn )
 	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_UNUSED ) /* P2 BUTTON6 */
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( hyperbbc )
+	PORT_INCLUDE( konami573 )
+
+	PORT_MODIFY("IN2")
+	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_START2 ) /* P1 UP */
+INPUT_PORTS_END
 
 #define SYS573_BIOS_A ROM_LOAD( "700a01.22g",   0x0000000, 0x080000, CRC(11812ef8) SHA1(e1284add4aaddd5337bd7f4e27614460d52b5b48))
 
@@ -3115,6 +3192,20 @@ ROM_START( bassangl )
 
 	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "765jaa02", 0, SHA1(4291711b1025733cb97f6da5dc3b03c189fcc37c) )
+ROM_END
+
+ROM_START( bassang2 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
+	SYS573_BIOS_A
+
+	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
+	ROM_LOAD( "gc865ja.u1", 0x000000, 0x000224, BAD_DUMP CRC(095cbfb5) SHA1(529ce0a7b0986cf7e64c37f466d6c2dac95cea7f) )
+
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
+	ROM_FILL( 0x0000000, 0x1000000, 0xff )
+
+	DISK_REGION( "cdrom0" )
+	DISK_IMAGE_READONLY( "865jaa02", 0, SHA1(b98d9aa54f13aa73bea580d6494cb6a7f3217be3) )
 ROM_END
 
 ROM_START( cr589fw )
@@ -3825,7 +3916,7 @@ ROM_START( drmn2m )
 	ROM_LOAD( "gn912ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "912jab", 0, BAD_DUMP SHA1(294d2b70d48f888704ad24e47ef9c122172941d5) )
+	DISK_IMAGE_READONLY( "912jab02", 0, SHA1(19dfae94b63468d3e16d3cc4a3eeae60d5dff1d7) )
 ROM_END
 
 ROM_START( drmn2mpu )
@@ -3848,10 +3939,10 @@ ROM_START( drmn2mpu )
 	ROM_LOAD( "gn912ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "912jab",  0, BAD_DUMP SHA1(294d2b70d48f888704ad24e47ef9c122172941d5) )
+	DISK_IMAGE_READONLY( "912jab02", 0, SHA1(19dfae94b63468d3e16d3cc4a3eeae60d5dff1d7) )
 
 	DISK_REGION( "cdrom1" )
-	DISK_IMAGE_READONLY( "912za01", 1, BAD_DUMP SHA1(916c34b91a984f3f6e7248088b3b946e3d5682a6) )
+	DISK_IMAGE_READONLY( "912za01",  1, SHA1(033a310006efe164cc6a8276de42a5d555f9fea9) )
 ROM_END
 
 ROM_START( drmn3m )
@@ -4435,6 +4526,34 @@ ROM_START( gtfrk11m )
 	DISK_IMAGE_READONLY( "d39jaa02", 0, SHA1(7a87ee331ba0301bb8724c398e6c77cfb9c172a7) )
 ROM_END
 
+ROM_START( hyperbbc )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
+	SYS573_BIOS_A
+
+	ROM_REGION( 0x0000084, "user2", 0 ) /* security cart eeprom */
+	ROM_LOAD( "gx908ja.u1",  0x000000, 0x000084, BAD_DUMP CRC(fb6c0635) SHA1(0d974462a0a244ffb1a651adb316242cde427756) )
+
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
+	ROM_FILL( 0x0000000, 0x1000000, 0xff )
+
+	DISK_REGION( "cdrom0" )
+	DISK_IMAGE_READONLY( "908a02", 0, SHA1(573194ca9938c30415fc88dcc0c0152dd3024d71) )
+ROM_END
+
+ROM_START( hyperbbck )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
+	SYS573_BIOS_A
+
+	ROM_REGION( 0x0000084, "user2", 0 ) /* security cart eeprom */
+	ROM_LOAD( "gx908ka.u1",  0x000000, 0x000084, BAD_DUMP CRC(f4f37fe1) SHA1(30f90cdb2d092e4f8d6c14cfd4ca4945e6d352cb) )
+
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
+	ROM_FILL( 0x0000000, 0x1000000, 0xff )
+
+	DISK_REGION( "cdrom0" )
+	DISK_IMAGE_READONLY( "908a02", 0, SHA1(573194ca9938c30415fc88dcc0c0152dd3024d71) )
+ROM_END
+
 ROM_START( konam80a )
 	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
@@ -4578,6 +4697,7 @@ GAME( 1998, ddrja,    dstage,   konami573, ddr,       ddr,        ROT0, "Konami"
 GAME( 1998, ddrjb,    dstage,   konami573, ddr,       ddr,        ROT0, "Konami", "Dance Dance Revolution (GC845 VER. JAB)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1999, ddra,     dstage,   konami573, ddr,       ddr,        ROT0, "Konami", "Dance Dance Revolution (GN845 VER. AAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1998, fbait2bc, sys573,   k573bait,  fbaitbc,   ge765pwbba, ROT0, "Konami", "Fisherman's Bait 2 - A Bass Challenge (GE865 VER. UAB)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, bassang2, fbait2bc, k573bait,  fbaitbc,   ge765pwbba, ROT0, "Konami", "Bass Angler 2 (GE865 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1999, drmn,     sys573,   konami573, drmn,      drmn,       ROT0, "Konami", "DrumMania (GQ881 VER. JAD)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1999, gtrfrks,  sys573,   konami573, gtrfrks,   gtrfrks,    ROT0, "Konami", "Guitar Freaks (GQ886 VER. EAC)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1999, gtrfrksu, gtrfrks,  konami573, gtrfrks,   gtrfrks,    ROT0, "Konami", "Guitar Freaks (GQ886 VER. UAC)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
@@ -4603,6 +4723,8 @@ GAME( 1999, ddr3mj,   ddr3mk,   konami573, ddr,       ddrdigital, ROT0, "Konami"
 GAME( 1999, ddrsbm,   sys573,   konami573, ddrsolo,   ddrsolo,    ROT0, "Konami", "Dance Dance Revolution Solo Bass Mix (GQ894 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1999, ddrs2k,   sys573,   konami573, ddrsolo,   ddrsolo,    ROT0, "Konami", "Dance Dance Revolution Solo 2000 (GC905 VER. AAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.3 */
 GAME( 1999, ddrs2kj,  ddrs2k,   konami573, ddrsolo,   ddrsolo,    ROT0, "Konami", "Dance Dance Revolution Solo 2000 (GC905 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.2 */
+GAME( 1999, hyperbbc, sys573,   konami573, hyperbbc,  hyperbbc,   ROT0, "Konami", "Hyper Bishi Bashi Champ (GX908 1999/08/24 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1999, hyperbbck,hyperbbc, konami573, hyperbbc,  hyperbbc,   ROT0, "Konami", "Hyper Bishi Bashi Champ (GX908 1999/08/24 VER. KAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1999, dsfdct,   sys573,   konami573, ddr,       ddrdigital, ROT0, "Konami", "Dancing Stage featuring Dreams Come True (GC910 VER. JCA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1999, dsfdcta,  dsfdct,   konami573, ddr,       ddr,        ROT0, "Konami", "Dancing Stage featuring Dreams Come True (GC910 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1999, drmn2m,   sys573,   konami573, drmn,      drmndigital,ROT0, "Konami", "DrumMania 2nd Mix (GE912 VER. JAB)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.5 */
@@ -4613,7 +4735,7 @@ GAME( 2000, dsem,     sys573,   konami573, ddr,       ddrdigital, ROT0, "Konami"
 GAME( 2000, gtrfrk3m, sys573,   konami573, gtrfrks,   gtrfrkdigital,ROT0, "Konami", "Guitar Freaks 3rd Mix (GE949 VER. JAC)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.4 */
 GAME( 2000, gtfrk3ma, gtrfrk3m, konami573, gtrfrks,   gtrfrkdigital,ROT0, "Konami", "Guitar Freaks 3rd Mix (GE949 VER. JAB)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.4 */
 GAME( 2000, gtfrk3mb, gtrfrk3m, konami573, gtrfrks,   gtrfrkdigital,ROT0, "Konami", "Guitar Freaks 3rd Mix - security cassette versionup (949JAZ02)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.4 */
-GAME( 2000, salarymc, sys573,   konami573, konami573, salarymc,   ROT0, "Konami", "Salary Man Champ (GCA18 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 2000, salarymc, sys573,   konami573, hyperbbc,  salarymc,   ROT0, "Konami", "Salary Man Champ (GCA18 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 2000, ddr3mp,   sys573,   konami573, ddr,       ddrdigital, ROT0, "Konami", "Dance Dance Revolution 3rd Mix Plus (G*A22 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.6 */
 GAME( 2000, pcnfrk3m, sys573,   konami573, drmn,      drmndigital,ROT0, "Konami", "Percussion Freaks 3rd Mix (G*A23 VER. KAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.8 */
 GAME( 2000, drmn3m,   pcnfrk3m, konami573, drmn,      drmndigital,ROT0, "Konami", "DrumMania 3rd Mix (G*A23 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.8 */

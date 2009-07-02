@@ -664,13 +664,12 @@ static void cischeat_draw_road(running_machine *machine, bitmap_t *bitmap, const
 
 		for (sx = -(xscroll%TILE_SIZE) ; sx <= max_x ; sx +=TILE_SIZE)
 		{
-			drawgfx(bitmap,gfx,
+			drawgfx_transpen(bitmap,&rect,gfx,
 					curr_code++,
 					attr,
 					0,0,
 					sx,sy,
-					&rect,
-					transparency,15);
+					transparency ? 15 : -1);
 
 			/* wrap around */
 			if (curr_code%(X_SIZE/TILE_SIZE)==0)	curr_code = code;
@@ -771,14 +770,13 @@ static void f1gpstar_draw_road(running_machine *machine, bitmap_t *bitmap, const
 		/* Draw the line */
 		for (sx = xstart ; sx <= max_x ; sx += xdim)
 		{
-			drawgfxzoom(bitmap,gfx,
+			drawgfxzoom_transpen(bitmap,&rect,gfx,
 						code++,
 						attr >> 8,
 						0,0,
 						sx / 0x10000, sy,
-						&rect,
-						transparency,15,
-						xscale, 1 << 16);
+						xscale, 1 << 16,
+						transparency ? 15 : -1);
 
 			/* stop when the end of the line of gfx is reached */
 			if ((code % (X_SIZE/TILE_SIZE)) == 0)	break;
@@ -1172,8 +1170,8 @@ VIDEO_UPDATE( bigrun )
 
 	for (i = 7; i >= 4; i--)
 	{											/* bitmap, road, min_priority, max_priority, transparency */
-		if (megasys1_active_layers & 0x10)	cischeat_draw_road(screen->machine,bitmap,cliprect,0,i,i,TRANSPARENCY_NONE);
-		if (megasys1_active_layers & 0x20)	cischeat_draw_road(screen->machine,bitmap,cliprect,1,i,i,TRANSPARENCY_PEN);
+		if (megasys1_active_layers & 0x10)	cischeat_draw_road(screen->machine,bitmap,cliprect,0,i,i,FALSE);
+		if (megasys1_active_layers & 0x20)	cischeat_draw_road(screen->machine,bitmap,cliprect,1,i,i,TRUE);
 	}
 
 	flag = 0;
@@ -1182,8 +1180,8 @@ VIDEO_UPDATE( bigrun )
 
 	for (i = 3; i >= 0; i--)
 	{											/* bitmap, road, min_priority, max_priority, transparency */
-		if (megasys1_active_layers & 0x10)	cischeat_draw_road(screen->machine,bitmap,cliprect,0,i,i,TRANSPARENCY_PEN);
-		if (megasys1_active_layers & 0x20)	cischeat_draw_road(screen->machine,bitmap,cliprect,1,i,i,TRANSPARENCY_PEN);
+		if (megasys1_active_layers & 0x10)	cischeat_draw_road(screen->machine,bitmap,cliprect,0,i,i,TRUE);
+		if (megasys1_active_layers & 0x20)	cischeat_draw_road(screen->machine,bitmap,cliprect,1,i,i,TRUE);
 	}
 
 	if (megasys1_active_layers & 0x08)	bigrun_draw_sprites(screen->machine,bitmap,cliprect,15,0);
@@ -1224,8 +1222,8 @@ VIDEO_UPDATE( cischeat )
 	bitmap_fill(bitmap,cliprect,0);
 
 										/* bitmap, road, priority, transparency */
-	if (megasys1_active_layers & 0x10)	cischeat_draw_road(screen->machine,bitmap,cliprect,0,7,5,TRANSPARENCY_NONE);
-	if (megasys1_active_layers & 0x20)	cischeat_draw_road(screen->machine,bitmap,cliprect,1,7,5,TRANSPARENCY_PEN);
+	if (megasys1_active_layers & 0x10)	cischeat_draw_road(screen->machine,bitmap,cliprect,0,7,5,FALSE);
+	if (megasys1_active_layers & 0x20)	cischeat_draw_road(screen->machine,bitmap,cliprect,1,7,5,TRUE);
 
 	flag = 0;
 	cischeat_tmap_DRAW(0)
@@ -1233,11 +1231,11 @@ VIDEO_UPDATE( cischeat )
 	cischeat_tmap_DRAW(1)
 
 	if (megasys1_active_layers & 0x08)	cischeat_draw_sprites(screen->machine,bitmap,cliprect,15,3);
-	if (megasys1_active_layers & 0x10)	cischeat_draw_road(screen->machine,bitmap,cliprect,0,4,1,TRANSPARENCY_PEN);
-	if (megasys1_active_layers & 0x20)	cischeat_draw_road(screen->machine,bitmap,cliprect,1,4,1,TRANSPARENCY_PEN);
+	if (megasys1_active_layers & 0x10)	cischeat_draw_road(screen->machine,bitmap,cliprect,0,4,1,TRUE);
+	if (megasys1_active_layers & 0x20)	cischeat_draw_road(screen->machine,bitmap,cliprect,1,4,1,TRUE);
 	if (megasys1_active_layers & 0x08)	cischeat_draw_sprites(screen->machine,bitmap,cliprect,2,2);
-	if (megasys1_active_layers & 0x10)	cischeat_draw_road(screen->machine,bitmap,cliprect,0,0,0,TRANSPARENCY_PEN);
-	if (megasys1_active_layers & 0x20)	cischeat_draw_road(screen->machine,bitmap,cliprect,1,0,0,TRANSPARENCY_PEN);
+	if (megasys1_active_layers & 0x10)	cischeat_draw_road(screen->machine,bitmap,cliprect,0,0,0,TRUE);
+	if (megasys1_active_layers & 0x20)	cischeat_draw_road(screen->machine,bitmap,cliprect,1,0,0,TRUE);
 	if (megasys1_active_layers & 0x08)	cischeat_draw_sprites(screen->machine,bitmap,cliprect,1,0);
 	cischeat_tmap_DRAW(2)
 
@@ -1282,8 +1280,8 @@ VIDEO_UPDATE( f1gpstar )
 /*  1: clouds 5, grad 7, road 0     2: clouds 5, grad 7, road 0, tunnel roof 0 */
 
 	/* road 1!! 0!! */					/* bitmap, road, min_priority, max_priority, transparency */
-	if (megasys1_active_layers & 0x20)	f1gpstar_draw_road(screen->machine,bitmap,cliprect,1,6,7,TRANSPARENCY_PEN);
-	if (megasys1_active_layers & 0x10)	f1gpstar_draw_road(screen->machine,bitmap,cliprect,0,6,7,TRANSPARENCY_PEN);
+	if (megasys1_active_layers & 0x20)	f1gpstar_draw_road(screen->machine,bitmap,cliprect,1,6,7,TRUE);
+	if (megasys1_active_layers & 0x10)	f1gpstar_draw_road(screen->machine,bitmap,cliprect,0,6,7,TRUE);
 
 	flag = 0;
 	cischeat_tmap_DRAW(0)
@@ -1291,14 +1289,14 @@ VIDEO_UPDATE( f1gpstar )
 	cischeat_tmap_DRAW(1)
 
 	/* road 1!! 0!! */					/* bitmap, road, min_priority, max_priority, transparency */
-	if (megasys1_active_layers & 0x20)	f1gpstar_draw_road(screen->machine,bitmap,cliprect,1,1,5,TRANSPARENCY_PEN);
-	if (megasys1_active_layers & 0x10)	f1gpstar_draw_road(screen->machine,bitmap,cliprect,0,1,5,TRANSPARENCY_PEN);
+	if (megasys1_active_layers & 0x20)	f1gpstar_draw_road(screen->machine,bitmap,cliprect,1,1,5,TRUE);
+	if (megasys1_active_layers & 0x10)	f1gpstar_draw_road(screen->machine,bitmap,cliprect,0,1,5,TRUE);
 
 	if (megasys1_active_layers & 0x08)	cischeat_draw_sprites(screen->machine,bitmap,cliprect,15,2);
 
 	/* road 1!! 0!! */					/* bitmap, road, min_priority, max_priority, transparency */
-	if (megasys1_active_layers & 0x20)	f1gpstar_draw_road(screen->machine,bitmap,cliprect,1,0,0,TRANSPARENCY_PEN);
-	if (megasys1_active_layers & 0x10)	f1gpstar_draw_road(screen->machine,bitmap,cliprect,0,0,0,TRANSPARENCY_PEN);
+	if (megasys1_active_layers & 0x20)	f1gpstar_draw_road(screen->machine,bitmap,cliprect,1,0,0,TRUE);
+	if (megasys1_active_layers & 0x10)	f1gpstar_draw_road(screen->machine,bitmap,cliprect,0,0,0,TRUE);
 
 	if (megasys1_active_layers & 0x08)	cischeat_draw_sprites(screen->machine,bitmap,cliprect,1,1);
 	cischeat_tmap_DRAW(2)

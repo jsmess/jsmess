@@ -220,8 +220,6 @@ static void dynamski_draw_background(running_machine *machine, bitmap_t *bitmap,
 	int attr;
 	int temp;
 
-	int transparency = pri?TRANSPARENCY_PEN:TRANSPARENCY_NONE;
-
 	for( i=0; i<0x400; i++ )
 	{
 		sx = (i%32)*8;
@@ -253,15 +251,15 @@ static void dynamski_draw_background(running_machine *machine, bitmap_t *bitmap,
 		if( pri==0 || (attr>>7)==pri )
 		{
 			tile += ((attr>>5)&0x3)*256;
-			drawgfx(
+			drawgfx_transpen(
 				bitmap,
+				cliprect,
 				machine->gfx[0],
 				tile,
 				attr & 0x0f,
 				0,0,//xflip,yflip,
 				sx,sy,
-				cliprect,
-				transparency,3 );
+				pri?3:-1 );
 		}
 	}
 }

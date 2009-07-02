@@ -215,7 +215,7 @@ static READ8_HANDLER( test_r )
 /* overlap empty rom addresses */
 static ADDRESS_MAP_START( hitpoker_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM // stack ram
-	AM_RANGE(0x1000, 0x103f) AM_READWRITE(hitpoker_pic_r,hitpoker_pic_w) AM_BASE(&hitpoker_sys_regs) // protection
+	AM_RANGE(0x1000, 0x103f) AM_RAM // internal I/O
 	AM_RANGE(0x8000, 0xb5ff) AM_READWRITE(hitpoker_vram_r,hitpoker_vram_w)
 	AM_RANGE(0xb600, 0xbdff) AM_RAM
 	AM_RANGE(0xbe0a, 0xbe0a) AM_READ_PORT("IN0")
@@ -235,8 +235,8 @@ static ADDRESS_MAP_START( hitpoker_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xbf00, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-/* unused, to be removed */
 static ADDRESS_MAP_START( hitpoker_io, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(MC68HC11_IO_PORTA, MC68HC11_IO_PORTA) AM_READWRITE(hitpoker_pic_r,hitpoker_pic_w) AM_BASE(&hitpoker_sys_regs)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( hitpoker )
@@ -447,19 +447,23 @@ static const ay8910_interface ay8910_config =
 	DEVCB_NULL
 };
 
-/* For whatever reason the MCU capabilities are disabled, might be a version without it or the engineers programmed the MCU to not have it. */
 static const hc11_config hitpoker_config =
 {
-	0, //has internal I/O
-	0  //internal RAM size
+	0, //has extended internal I/O
+	0x100  //internal RAM size
 };
+
+static INTERRUPT_GEN( hitpoker_irq )
+{
+	cpu_set_input_line(device, MC68HC11_IRQ_LINE, HOLD_LINE);
+}
 
 static MACHINE_DRIVER_START( hitpoker )
 	MDRV_CPU_ADD("maincpu", MC68HC11,1000000)
 	MDRV_CPU_PROGRAM_MAP(hitpoker_map)
 	MDRV_CPU_IO_MAP(hitpoker_io)
 	MDRV_CPU_CONFIG(hitpoker_config)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", hitpoker_irq)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

@@ -1298,7 +1298,7 @@ void K007121_sprites_draw(int chip,bitmap_t *bitmap,const rectangle *cliprect, g
 {
 	const gfx_element *gfx = gfxs[chip];
 	int flipscreen = K007121_flipscreen[chip];
-	int i,num,inc,offs[5],trans;
+	int i,num,inc,offs[5];
 	int is_flakatck = (ctable == NULL);
 
 #if 0
@@ -1329,9 +1329,6 @@ if (input_code_pressed(KEYCODE_D))
 		offs[2] = 0x06;
 		offs[3] = 0x04;
 		offs[4] = 0x08;
-		/* Flak Attack doesn't use a lookup PROM, it maps the color code directly */
-		/* to a palette entry */
-		trans = TRANSPARENCY_PEN;
 	}
 	else	/* all others */
 	{
@@ -1344,7 +1341,6 @@ if (input_code_pressed(KEYCODE_D))
 		offs[2] = 0x02;
 		offs[3] = 0x03;
 		offs[4] = 0x04;
-		trans = TRANSPARENCY_PENS;
 		/* when using priority buffer, draw front to back */
 		if (pri_mask != -1)
 		{
@@ -1364,10 +1360,10 @@ if (input_code_pressed(KEYCODE_D))
 		int yflip = source[offs[4]] & 0x20;		/* flip y */
 		int color = base_color + ((source[offs[1]] & 0xf0) >> 4);
 		int width,height;
-		int transparent_color;
+		int transparent_mask;
 		static const int x_offset[4] = {0x0,0x1,0x4,0x5};
 		static const int y_offset[4] = {0x0,0x2,0x8,0xa};
-		int x,y, ex, ey;
+		int x,y, ex, ey, flipx, flipy, destx, desty;
 
 		if (attr & 0x01) sx -= 256;
 		if (sy >= 240) sy -= 256;
@@ -1376,10 +1372,12 @@ if (input_code_pressed(KEYCODE_D))
 		number = number << 2;
 		number += (sprite_bank >> 2) & 3;
 
-		if (trans == TRANSPARENCY_PEN)
-			transparent_color = 0;
+		/* Flak Attack doesn't use a lookup PROM, it maps the color code directly */
+		/* to a palette entry */
+		if (is_flakatck)
+			transparent_mask = 1 << 0;
 		else
-			transparent_color = colortable_get_transpen_mask(ctable, gfx, color, 0);
+			transparent_mask = colortable_get_transpen_mask(ctable, gfx, color, 0);
 
 		if (!is_flakatck || source[0x00])	/* Flak Attack needs this */
 		{
@@ -1406,40 +1404,34 @@ if (input_code_pressed(KEYCODE_D))
 
 					if (flipscreen)
 					{
-						if (pri_mask != -1)
-							pdrawgfx(bitmap,gfx,
-								number + x_offset[ex] + y_offset[ey],
-								color,
-								!xflip,!yflip,
-								248-(sx+x*8),248-(sy+y*8),
-								cliprect,trans,transparent_color,
-								pri_mask);
-						else
-							drawgfx(bitmap,gfx,
-								number + x_offset[ex] + y_offset[ey],
-								color,
-								!xflip,!yflip,
-								248-(sx+x*8),248-(sy+y*8),
-								cliprect,trans,transparent_color);
+						flipx = !xflip;
+						flipy = !yflip;
+						destx = 248-(sx+x*8);
+						desty = 248-(sy+y*8);
 					}
 					else
 					{
-						if (pri_mask != -1)
-							pdrawgfx(bitmap,gfx,
-								number + x_offset[ex] + y_offset[ey],
-								color,
-								xflip,yflip,
-								global_x_offset+sx+x*8,sy+y*8,
-								cliprect,trans,transparent_color,
-								pri_mask);
-						else
-							drawgfx(bitmap,gfx,
-								number + x_offset[ex] + y_offset[ey],
-								color,
-								xflip,yflip,
-								global_x_offset+sx+x*8,sy+y*8,
-								cliprect,trans,transparent_color);
+						flipx = xflip;
+						flipy = yflip;
+						destx = global_x_offset+sx+x*8;
+						desty = sy+y*8;
 					}
+
+					if (pri_mask != -1)
+						pdrawgfx_transmask(bitmap,cliprect,gfx,
+							number + x_offset[ex] + y_offset[ey],
+							color,
+							flipx,flipy,
+							destx,desty,
+							priority_bitmap,pri_mask,
+							transparent_mask);
+					else
+						drawgfx_transmask(bitmap,cliprect,gfx,
+							number + x_offset[ex] + y_offset[ey],
+							color,
+							flipx,flipy,
+							destx,desty,
+							transparent_mask);
 				}
 			}
 		}

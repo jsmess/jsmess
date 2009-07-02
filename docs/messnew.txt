@@ -22,6 +22,7 @@ Skeleton drivers :
 - DEC VT320
 
 
+
 System Driver Changes:
 ----------------------
 - [BW12] System is now fully working. Disk operations are very slow, so set
@@ -57,7 +58,7 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
-- The core is based on MAME 0.132u2.  This incorporates all features of the
+- The core is based on MAME 0.132u3.  This incorporates all features of the
   update to this core.  [MAME team]
 
 - Added support for passing around 'deleted address mark' information

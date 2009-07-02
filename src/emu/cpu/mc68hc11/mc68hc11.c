@@ -64,12 +64,17 @@ struct _hc11_state
 	const address_space *program;
 	const address_space *io;
 	int icount;
+
 	int ram_position;
 	int reg_position;
 	UINT8 *internal_ram;
-	int has_io; // I/O enable flag
+
+	int has_extended_io; // extended I/O enable flag
 	int internal_ram_size;
+
 	UINT8 wait_state,stop_state;
+
+	UINT8 tflg1;
 };
 
 INLINE hc11_state *get_safe_token(const device_config *device)
@@ -98,8 +103,18 @@ static UINT8 hc11_regs_r(hc11_state *cpustate, UINT32 address)
 			return 0;
 		case 0x02:		/* PIOC */
 			return 0;
+		case 0x03:		/* PORTC */
+			return memory_read_byte(cpustate->io, MC68HC11_IO_PORTC);
+		case 0x04:		/* PORTB */
+			return memory_read_byte(cpustate->io, MC68HC11_IO_PORTB);
+		case 0x08:		/* PORTD */
+			return memory_read_byte(cpustate->io, MC68HC11_IO_PORTD);
 		case 0x09:		/* DDRD */
 			return 0;
+		case 0x0a:		/* PORTE */
+			return memory_read_byte(cpustate->io, MC68HC11_IO_PORTE);
+		case 0x23:
+			return cpustate->tflg1;
 		case 0x28:		/* SPCR1 */
 			return 0;
 		case 0x30:		/* ADCTL */
@@ -194,13 +209,25 @@ static void hc11_regs_w(hc11_state *cpustate, UINT32 address, UINT8 value)
 		case 0x01:		/* DDRA */
 			//mame_printf_debug("HC11: ddra = %02X\n", value);
 			return;
+		case 0x03:		/* PORTC */
+			memory_write_byte(cpustate->io, MC68HC11_IO_PORTC, value);
+			return;
+		case 0x04:		/* PORTC */
+			memory_write_byte(cpustate->io, MC68HC11_IO_PORTB, value);
+			return;
 		case 0x08:		/* PORTD */
-			memory_write_byte(cpustate->io, MC68HC11_IO_PORTD, value);
+			memory_write_byte(cpustate->io, MC68HC11_IO_PORTD, value); //mask & 0x3f?
 			return;
 		case 0x09:		/* DDRD */
 			//mame_printf_debug("HC11: ddrd = %02X\n", value);
 			return;
+		case 0x0a:		/* PORTE */
+			memory_write_byte(cpustate->io, MC68HC11_IO_PORTE, value);
+			return;
 		case 0x22:		/* TMSK1 */
+			return;
+		case 0x23:
+			cpustate->tflg1 = value;
 			return;
 		case 0x24:		/* TMSK2 */
 			return;
@@ -212,6 +239,8 @@ static void hc11_regs_w(hc11_state *cpustate, UINT32 address, UINT8 value)
 		case 0x38:		/* OPT2 */
 			return;
 		case 0x39:		/* OPTION */
+			return;
+		case 0x3a:		/* COPRST (watchdog) */
 			return;
 
 		case 0x3d:		/* INIT */
@@ -288,7 +317,7 @@ INLINE UINT16 FETCH16(hc11_state *cpustate)
 
 INLINE UINT8 READ8(hc11_state *cpustate, UINT32 address)
 {
-	if(address >= cpustate->reg_position && address < cpustate->reg_position+0x100 && cpustate->has_io)
+	if(address >= cpustate->reg_position && address < cpustate->reg_position+(cpustate->has_extended_io ? 0x100 : 0x40))
 	{
 		return hc11_regs_r(cpustate, address);
 	}
@@ -301,7 +330,7 @@ INLINE UINT8 READ8(hc11_state *cpustate, UINT32 address)
 
 INLINE void WRITE8(hc11_state *cpustate, UINT32 address, UINT8 value)
 {
-	if(address >= cpustate->reg_position && address < cpustate->reg_position+0x100 && cpustate->has_io)
+	if(address >= cpustate->reg_position && address < cpustate->reg_position+(cpustate->has_extended_io ? 0x100 : 0x40))
 	{
 		hc11_regs_w(cpustate, address, value);
 		return;
@@ -371,13 +400,13 @@ static CPU_INIT( hc11 )
 
 	if(conf)
 	{
-		cpustate->has_io = conf->has_io;
+		cpustate->has_extended_io = conf->has_extended_io;
 		cpustate->internal_ram_size = conf->internal_ram_size;
 	}
 	else
 	{
 		/* defaults it to the HC11M0 version for now (I might strip this down on a later date) */
-		cpustate->has_io = 1;
+		cpustate->has_extended_io = 1;
 		cpustate->internal_ram_size = 1280;
 	}
 
@@ -397,6 +426,9 @@ static CPU_RESET( hc11 )
 	cpustate->pc = READ16(cpustate, 0xfffe);
 	cpustate->wait_state = 0;
 	cpustate->stop_state = 0;
+	cpustate->ccr = CC_X | CC_I | CC_S;
+	cpustate->reg_position = 0x1000;
+	cpustate->ram_position = 0;
 }
 
 static CPU_EXIT( hc11 )

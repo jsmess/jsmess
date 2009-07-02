@@ -245,6 +245,23 @@ static void amiga_chip_ram32_w(offs_t offset, UINT16 data)
 }
 
 
+void amiga_chip_ram_w8(offs_t offset, UINT8 data)
+{
+	UINT16 dat;
+
+	dat = amiga_chip_ram_r(offset);
+	if (offset & 0x01)
+	{
+		dat &= 0xff00;
+		dat |= data;
+	}
+	else
+	{
+		dat &= 0x00ff;
+		dat |= ((UINT16)data) << 8;
+	}
+	amiga_chip_ram_w(offset,dat);
+}
 
 /*************************************
  *
@@ -1486,6 +1503,15 @@ WRITE16_HANDLER( amiga_custom_w )
 				data &= 0xfff;
 				CUSTOM_REG(offset + 32) = (data >> 1) & 0x777;
 			}
+			break;
+		case REG_DIWSTRT:
+		case REG_DIWSTOP:
+			if (IS_AGA(amiga_intf))
+				aga_diwhigh_written(0);
+			break;
+		case REG_DIWHIGH:
+			if (IS_AGA(amiga_intf))
+				aga_diwhigh_written(1);
 			break;
 
 		default:
