@@ -10,11 +10,25 @@
 #include "cpu/mcs51/mcs51.h"
 
 static ADDRESS_MAP_START(vt520_mem, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x0000, 0xffff) AM_ROM
+	AM_RANGE(0x0000, 0xffff) AM_RAMBANK(1)
 ADDRESS_MAP_END
+
+/*
+	On the boardthere is TC160G41AF (1222) custom chip 
+	doing probably all video/uart logic
+	there is 43.430MHz xtal near by 
+*/
+
+static READ8_HANDLER(vt520_some_r)
+{
+	//bit 5 0
+	//bit 6 1
+	return 0x40;
+}
 
 static ADDRESS_MAP_START( vt520_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x7ffb, 0x7ffb) AM_READ(vt520_some_r)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -24,6 +38,10 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(vt520) 
 {	
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	UINT8 *rom = memory_region(machine, "maincpu");
+	memory_install_write8_handler(space, 0x0000, 0xffff, 0, 0, SMH_UNMAP);
+	memory_set_bankptr(machine, 1, rom + 0x70000);
 }
 
 static VIDEO_START( vt520 )
@@ -48,8 +66,8 @@ static MACHINE_DRIVER_START( vt520 )
     MDRV_SCREEN_REFRESH_RATE(50)
     MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
     MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MDRV_SCREEN_SIZE(640, 480)
-    MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+    MDRV_SCREEN_SIZE(802, 480)
+    MDRV_SCREEN_VISIBLE_AREA(0, 802-1, 0, 480-1)
     MDRV_PALETTE_LENGTH(2)
     MDRV_PALETTE_INIT(black_and_white)
 
@@ -58,13 +76,15 @@ static MACHINE_DRIVER_START( vt520 )
 MACHINE_DRIVER_END
 
 static SYSTEM_CONFIG_START(vt520)
+	// On the board there are two M5M44256BJ-7 chips
+	// Which are DRAM 256K x 4bit
+	CONFIG_RAM_DEFAULT(256 * 1024)
 SYSTEM_CONFIG_END
 
 /* ROM definition */
 ROM_START( vt520 )
     ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASEFF )
-  ROM_LOAD( "23-010ed-00__9739_d.e20.bin", 0x0000, 0x80000, CRC(2502cc22) SHA1(0437c3107412f69e09d050fef003f2a81d8a3163))
-
+	ROM_LOAD( "23-010ed-00__9739_d.e20.bin", 0x0000, 0x80000, CRC(2502cc22) SHA1(0437c3107412f69e09d050fef003f2a81d8a3163))
 ROM_END
 
 /* Driver */
