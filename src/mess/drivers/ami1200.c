@@ -1,4 +1,4 @@
-/* 
+/*
     Amiga 1200 / CD32
 
     Preliminary MAME driver by Mariusz Wojcieszek
@@ -23,12 +23,12 @@
      * Gamepad, Serial port, 2 Gameports, Interfaces for keyboard
 
 	2009-05 Fabio Priuli:
-	Amiga 1200 support is just sketched (I basically took cd32 and removed Akiko). I connected 
-	the floppy drive in the same way as in amiga.c but it seems to be not working, since I 
-	tried to load WB3.1 with no success. However, this problem may be due to anything: maybe 
-	the floppy code must be connected elsewhere, or the .adf image is broken, or I made some 
+	Amiga 1200 support is just sketched (I basically took cd32 and removed Akiko). I connected
+	the floppy drive in the same way as in amiga.c but it seems to be not working, since I
+	tried to load WB3.1 with no success. However, this problem may be due to anything: maybe
+	the floppy code must be connected elsewhere, or the .adf image is broken, or I made some
 	stupid mistake in the CIA interfaces.
-	Later, it could be wise to re-factor this source and merge the non-AGA code with 
+	Later, it could be wise to re-factor this source and merge the non-AGA code with
 	mess/drivers/amiga.c
 */
 
@@ -43,6 +43,14 @@
 #include "includes/amiga.h"
 #include "includes/cubocd32.h"
 #include "devices/chd_cd.h"
+
+
+#define A1200PAL_XTAL_X1  XTAL_28_37516MHz
+#define A1200PAL_XTAL_X2  XTAL_4_433619MHz
+#define CD32PAL_XTAL_X1   XTAL_28_37516MHz
+#define CD32PAL_XTAL_X2   XTAL_4_433619MHz
+#define CD32PAL_XTAL_X3   XTAL_16_9344MHz
+
 
 static void handle_cd32_joystick_cia(UINT8 pra, UINT8 dra);
 
@@ -83,10 +91,13 @@ static WRITE32_HANDLER( aga_overlay_w )
 static WRITE8_DEVICE_HANDLER( cd32_cia_0_porta_w )
 {
 	/* bit 1 = cd audio mute */
-	sound_set_output_gain(devtag_get_device(device->machine, "cdda"), 0, ( data & 1 ) ? 0.0 : 1.0 );
+	const device_config *cdda = devtag_get_device(device->machine, "cdda");
+
+	if (cdda != NULL)
+		sound_set_output_gain(cdda, 0, BIT(data, 0) ? 0.0 : 1.0 );
 
 	/* bit 2 = Power Led on Amiga */
-	set_led_status(0, (data & 2) ? 0 : 1);
+	set_led_status(0, !BIT(data, 1));
 
 	handle_cd32_joystick_cia(data, cia_r(device, 2));
 }
@@ -434,7 +445,7 @@ static MACHINE_DRIVER_START( a1200n )
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(512*2, 312)
-	MDRV_SCREEN_VISIBLE_AREA((129-8)*2, (449+8-1)*2, 44-8, 300+8-1)
+	MDRV_SCREEN_VISIBLE_AREA((129-8-8)*2, (449+8-1+8)*2, 44-8, 300+8-1)
 
 	MDRV_VIDEO_START(amiga_aga)
 	MDRV_VIDEO_UPDATE(amiga_aga)
@@ -442,15 +453,11 @@ static MACHINE_DRIVER_START( a1200n )
 	/* sound hardware */
     MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-    MDRV_SOUND_ADD("amiga", AMIGA, 3579545)
+    MDRV_SOUND_ADD("amiga", AMIGA, XTAL_28_63636MHz/8)
     MDRV_SOUND_ROUTE(0, "lspeaker", 0.25)
     MDRV_SOUND_ROUTE(1, "rspeaker", 0.25)
     MDRV_SOUND_ROUTE(2, "rspeaker", 0.25)
     MDRV_SOUND_ROUTE(3, "lspeaker", 0.25)
-
-    MDRV_SOUND_ADD( "cdda", CDDA, 0 )
-	MDRV_SOUND_ROUTE( 0, "lspeaker", 0.50 )
-	MDRV_SOUND_ROUTE( 1, "rspeaker", 0.50 )
 
 	/* cia */
 	MDRV_CIA8520_ADD("cia_0", AMIGA_68EC020_NTSC_CLOCK / 10, a1200_cia_0_intf)
@@ -461,23 +468,27 @@ static MACHINE_DRIVER_START( a1200p )
 	MDRV_IMPORT_FROM(a1200n)
 
 	/* adjust for PAL specs */
-	MDRV_CPU_REPLACE("maincpu", M68EC020, AMIGA_68EC020_PAL_CLOCK)
+	MDRV_CPU_REPLACE("maincpu", M68EC020, A1200PAL_XTAL_X1/2) /* 14.18758 MHz */
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(50)
 
+	/* sound hardware */
+	MDRV_SOUND_MODIFY("amiga")
+	MDRV_SOUND_CLOCK(A1200PAL_XTAL_X1/8) /* 3.546895 MHz */
+
 	/* cia */
-	MDRV_DEVICE_REMOVE("cia_0")
-	MDRV_DEVICE_REMOVE("cia_1")
-	MDRV_CIA8520_ADD("cia_0", AMIGA_68EC020_PAL_CLOCK / 10, a1200_cia_0_intf)
-	MDRV_CIA8520_ADD("cia_1", AMIGA_68EC020_PAL_CLOCK / 10, a1200_cia_1_intf)
+	MDRV_DEVICE_MODIFY("cia_0")
+	MDRV_DEVICE_CLOCK(A1200PAL_XTAL_X1/20)
+	MDRV_DEVICE_MODIFY("cia_1")
+	MDRV_DEVICE_CLOCK(A1200PAL_XTAL_X1/20)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( cd32 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68EC020, AMIGA_68EC020_PAL_CLOCK) /* 14.3 Mhz */
+	MDRV_CPU_ADD("maincpu", M68EC020, AMIGA_68EC020_NTSC_CLOCK) /* 14.3 Mhz */
 	MDRV_CPU_PROGRAM_MAP(cd32_map)
 
 	MDRV_MACHINE_RESET(amiga)
@@ -491,7 +502,7 @@ static MACHINE_DRIVER_START( cd32 )
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(512*2, 312)
-	MDRV_SCREEN_VISIBLE_AREA((129-8)*2, (449+8-1)*2, 44-8, 300+8-1)
+	MDRV_SCREEN_VISIBLE_AREA((129-8-8)*2, (449+8-1+8)*2, 44-8, 300+8-1)
 
 	MDRV_VIDEO_START(amiga_aga)
 	MDRV_VIDEO_UPDATE(amiga_aga)
@@ -499,7 +510,7 @@ static MACHINE_DRIVER_START( cd32 )
 	/* sound hardware */
     MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-    MDRV_SOUND_ADD("amiga", AMIGA, 3579545)
+    MDRV_SOUND_ADD("amiga", AMIGA, XTAL_28_63636MHz/8)
     MDRV_SOUND_ROUTE(0, "lspeaker", 0.25)
     MDRV_SOUND_ROUTE(1, "rspeaker", 0.25)
     MDRV_SOUND_ROUTE(2, "rspeaker", 0.25)
@@ -514,22 +525,29 @@ static MACHINE_DRIVER_START( cd32 )
 	MDRV_CIA8520_ADD("cia_1", AMIGA_68EC020_PAL_CLOCK / 10, cd32_cia_1_intf)
 MACHINE_DRIVER_END
 
-ROM_START(a1200n)
+
+/***************************************************************************
+    ROM DEFINITIONS
+***************************************************************************/
+
+ROM_START( a1200n )
 	ROM_REGION32_BE(0x080000, "user1", 0)
-	ROM_SYSTEM_BIOS(0, "kick31", "Kickstart 3.1 40.068")
-	ROMX_LOAD( "391773-01.u6a", 0x000000, 0x040000, CRC(08dbf275) SHA1(b8800f5f909298109ea69690b1b8523fa22ddb37), ROM_GROUPWORD | ROM_REVERSE | ROM_SKIP(2) | ROM_BIOS(1) )	// ROM_LOAD32_WORD_SWAP!
-	ROMX_LOAD( "391774-01.u6b", 0x000002, 0x040000, CRC(16c07bf8) SHA1(90e331be1970b0e53f53a9b0390b51b59b3869c2), ROM_GROUPWORD | ROM_REVERSE | ROM_SKIP(2) | ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS(1, "kick30", "Kickstart 3.0 39.106")
-	ROMX_LOAD( "391523-01.u6a", 0x000000, 0x040000, CRC(c742a412) SHA1(999eb81c65dfd07a71ee19315d99c7eb858ab186), ROM_GROUPWORD | ROM_REVERSE | ROM_SKIP(2) | ROM_BIOS(2) )
-	ROMX_LOAD( "391524-01.u6b", 0x000002, 0x040000, CRC(d55c6ec6) SHA1(3341108d3a402882b5ef9d3b242cbf3c8ab1a3e9), ROM_GROUPWORD | ROM_REVERSE | ROM_SKIP(2) | ROM_BIOS(2) )
+	ROM_DEFAULT_BIOS("kick31")
+	ROM_SYSTEM_BIOS(0, "kick30", "Kickstart 3.0 (39.106)")
+	ROMX_LOAD("391523-01.u6a", 0x000000, 0x040000, CRC(c742a412) SHA1(999eb81c65dfd07a71ee19315d99c7eb858ab186), ROM_GROUPWORD | ROM_REVERSE | ROM_SKIP(2) | ROM_BIOS(1))
+	ROMX_LOAD("391524-01.u6b", 0x000002, 0x040000, CRC(d55c6ec6) SHA1(3341108d3a402882b5ef9d3b242cbf3c8ab1a3e9), ROM_GROUPWORD | ROM_REVERSE | ROM_SKIP(2) | ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(1, "kick31", "Kickstart 3.1 (40.068)")
+	ROMX_LOAD("391773-01.u6a", 0x000000, 0x040000, CRC(08dbf275) SHA1(b8800f5f909298109ea69690b1b8523fa22ddb37), ROM_GROUPWORD | ROM_REVERSE | ROM_SKIP(2) | ROM_BIOS(2))	// ROM_LOAD32_WORD_SWAP!
+	ROMX_LOAD("391774-01.u6b", 0x000002, 0x040000, CRC(16c07bf8) SHA1(90e331be1970b0e53f53a9b0390b51b59b3869c2), ROM_GROUPWORD | ROM_REVERSE | ROM_SKIP(2) | ROM_BIOS(2))
 ROM_END
 
 #define rom_a1200p    rom_a1200n
 
-ROM_START(cd32)
+ROM_START( cd32 )
 	ROM_REGION32_BE(0x100000, "user1",0)
-	ROM_LOAD("391640-03.u6a", 0x000000, 0x100000, CRC(d3837ae4) SHA1(06807db3181637455f4d46582d9972afec8956d9) )
+	ROM_LOAD("391640-03.u6a", 0x000000, 0x100000, CRC(d3837ae4) SHA1(06807db3181637455f4d46582d9972afec8956d9))
 ROM_END
+
 
 /***************************************************************************************************/
 
@@ -542,7 +560,7 @@ static UINT16 a1200_read_dskbytr(running_machine *machine)
 
 static void a1200_write_dsklen(running_machine *machine, UINT16 data)
 {
-	if ( data & 0x8000 ) 
+	if ( data & 0x8000 )
 	{
 		if ( CUSTOM_REG(REG_DSKLEN) & 0x8000 )
 			amiga_fdc_setup_dma(machine);
@@ -616,4 +634,4 @@ SYSTEM_CONFIG_END
 /*	  YEAR  NAME     PARENT   COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY       FULLNAME */
 COMP( 1992, a1200n,  0,       0,      a1200n, a1200,  a1200,  a1200,  "Commodore",  "Amiga 1200 (NTSC)" , GAME_NOT_WORKING )
 COMP( 1992, a1200p,  a1200n,  0,      a1200p, a1200,  a1200,  a1200,  "Commodore",  "Amiga 1200 (PAL)" , GAME_NOT_WORKING )
-CONS( 1993, cd32,    0,       0,      cd32,   cd32,   cd32,   0,      "Commodore",  "Amiga CD32" , GAME_NOT_WORKING )
+CONS( 1993, cd32,    0,       0,      cd32,   cd32,   cd32,   0,      "Commodore",  "Amiga CD32 (NTSC)" , GAME_NOT_WORKING )
