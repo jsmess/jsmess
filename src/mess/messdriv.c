@@ -1381,6 +1381,7 @@ const game_driver * const drivers[] =
     DRIVER( chessmst )
     DRIVER( sys2900 )
     DRIVER( pmi80 )
+    DRIVER( kontiki )
     DRIVER( tiki100 )
     DRIVER( vcs80 )
     DRIVER( v1050 )

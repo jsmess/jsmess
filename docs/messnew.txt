@@ -42,6 +42,8 @@ System Driver Changes:
 
 - [TI85] Fixed TI-82/TI-83 on/off and NVRAM, added a DSW to TI-83 for the
   battery status [Xander]
+  
+- [TIKI100] System is now working, except DS disks and scroll. [Curt Coder]
 
 
 
