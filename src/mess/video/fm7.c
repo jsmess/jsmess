@@ -120,6 +120,53 @@ WRITE8_HANDLER( fm7_vram_access_w )
 	fm7_video.vram_access = 0;
 }
 
+static void fm7_alu_function_compare(UINT32 offset)
+{
+	// COMPARE - compares which colors match those in the compare registers
+	// can be used on its own, or when bit 6 of the command register is high.
+	
+	UINT8 red,green,blue;
+	UINT8 dat = 0;
+	UINT8 colour;
+	UINT8 banks;
+	int x,y;
+	int match;
+	int page = 0;
+	
+	if(offset >= 0xc000)
+		page = 1;
+	
+	blue = fm7_video_ram[(offset & 0x3fff) + (page * 0xc000)];
+	red = fm7_video_ram[(offset & 0x3fff) + 0x4000 + (page * 0xc000)];
+	green = fm7_video_ram[(offset & 0x3fff) + 0x8000 + (page * 0xc000)];
+
+	banks = (~fm7_alu.bank_disable) & 0x07;
+	
+	for(x=0;x<8;x++) // loop through each pixel
+	{
+		colour = 0;
+		if(blue & (1 << x))
+			colour |= 1;
+		if(red & (1 << x))
+			colour |= 2;
+		if(green & (1 << x))
+			colour |= 4;
+			
+		match = 0;
+		for(y=0;y<8;y++)  // loop through each compare register
+		{
+			if(!(fm7_alu.compare[y] & 0x80)) // don't compare if register is masked
+			{
+				if((fm7_alu.compare[y] & banks) == (colour & banks))
+					match = 1;
+			}
+		}
+		if(match != 0)
+			dat |= (1 << x);
+	}
+	fm7_alu.compare_data = dat;
+}
+
 static void fm7_alu_function_pset(UINT32 offset)
 {
 	// PSET - simply sets the pixels to the selected logical colour
@@ -128,21 +175,163 @@ static void fm7_alu_function_pset(UINT32 offset)
 	int page = 0;
 	UINT8 mask;
 	
-	if(offset > 0xc000)
+	if(fm7_alu.command & 0x40)
+		fm7_alu_function_compare(offset);
+	
+	if(offset >= 0xc000)
 		page = 1;
 	
 	for(x=0;x<3;x++) // cycle through banks
 	{
-		if(fm7_alu.lcolour & (1 << x))
-			dat = 0xff;
-		else
-			dat = 0;
-
-		mask = (fm7_video_ram[(offset & 0x3fff) + (x * 0x4000) + (page * 0xc000)]) & fm7_alu.mask;
-		dat &= ~fm7_alu.mask;
-		dat |= mask;
+		if(!(fm7_alu.bank_disable & (1 << x)))
+		{
+			if(fm7_alu.lcolour & (1 << x))
+				dat = 0xff;
+			else
+				dat = 0;
+	
+			mask = (fm7_video_ram[(offset & 0x3fff) + (x * 0x4000) + (page * 0xc000)]) & fm7_alu.mask;
+			dat &= ~fm7_alu.mask;
+			dat |= mask;
 			
-		fm7_video_ram[(offset & 0x3fff) + (x * 0x4000) + (page * 0xc000)] = dat;
+			fm7_video_ram[(offset & 0x3fff) + (x * 0x4000) + (page * 0xc000)] = dat;
+		}
+	}
+}
+
+static void fm7_alu_function_or(UINT32 offset)
+{
+	int x;
+	UINT8 dat;
+	int page = 0;
+	UINT8 mask;
+	
+	if(fm7_alu.command & 0x40)
+		fm7_alu_function_compare(offset);
+	
+	if(offset >= 0xc000)
+		page = 1;
+	
+	for(x=0;x<3;x++) // cycle through banks
+	{
+		if(!(fm7_alu.bank_disable & (1 << x)))
+		{
+			if(fm7_alu.lcolour & (1 << x))
+				dat = 0xff;
+			else
+				dat = 0;
+	
+			mask = (fm7_video_ram[(offset & 0x3fff) + (x * 0x4000) + (page * 0xc000)]);
+			dat |= mask;
+			
+			mask &= fm7_alu.mask;
+			dat &= ~fm7_alu.mask;
+			dat |= mask;
+				
+			fm7_video_ram[(offset & 0x3fff) + (x * 0x4000) + (page * 0xc000)] = dat;
+		}
+	}
+}
+
+static void fm7_alu_function_and(UINT32 offset)
+{
+	int x;
+	UINT8 dat;
+	int page = 0;
+	UINT8 mask;
+	
+	if(fm7_alu.command & 0x40)
+		fm7_alu_function_compare(offset);
+	
+	if(offset >= 0xc000)
+		page = 1;
+	
+	for(x=0;x<3;x++) // cycle through banks
+	{
+		if(!(fm7_alu.bank_disable & (1 << x)))
+		{
+			if(fm7_alu.lcolour & (1 << x))
+				dat = 0xff;
+			else
+				dat = 0;
+	
+			mask = (fm7_video_ram[(offset & 0x3fff) + (x * 0x4000) + (page * 0xc000)]);
+			dat &= mask;
+			
+			mask &= fm7_alu.mask;
+			dat &= ~fm7_alu.mask;
+			dat |= mask;
+				
+			fm7_video_ram[(offset & 0x3fff) + (x * 0x4000) + (page * 0xc000)] = dat;
+		}
+	}
+}
+
+static void fm7_alu_function_xor(UINT32 offset)
+{
+	int x;
+	UINT8 dat;
+	int page = 0;
+	UINT8 mask;
+	
+	if(fm7_alu.command & 0x40)
+		fm7_alu_function_compare(offset);
+	
+	if(offset >= 0xc000)
+		page = 1;
+	
+	for(x=0;x<3;x++) // cycle through banks
+	{
+		if(!(fm7_alu.bank_disable & (1 << x)))
+		{
+			if(fm7_alu.lcolour & (1 << x))
+				dat = 0xff;
+			else
+				dat = 0;
+	
+			mask = (fm7_video_ram[(offset & 0x3fff) + (x * 0x4000) + (page * 0xc000)]);
+			dat ^= mask;
+			
+			mask &= fm7_alu.mask;
+			dat &= ~fm7_alu.mask;
+			dat |= mask;
+				
+			fm7_video_ram[(offset & 0x3fff) + (x * 0x4000) + (page * 0xc000)] = dat;
+		}
+	}
+}
+
+static void fm7_alu_function_not(UINT32 offset)
+{
+	int x;
+	UINT8 dat;
+	int page = 0;
+	UINT8 mask;
+	
+	if(fm7_alu.command & 0x40)
+		fm7_alu_function_compare(offset);
+	
+	if(offset >= 0xc000)
+		page = 1;
+	
+	for(x=0;x<3;x++) // cycle through banks
+	{
+		if(!(fm7_alu.bank_disable & (1 << x)))
+		{
+			if(fm7_alu.lcolour & (1 << x))
+				dat = 0xff;
+			else
+				dat = 0;
+	
+			mask = (fm7_video_ram[(offset & 0x3fff) + (x * 0x4000) + (page * 0xc000)]);
+			dat = ~mask;
+			
+			mask &= fm7_alu.mask;
+			dat &= ~fm7_alu.mask;
+			dat |= mask;
+				
+			fm7_video_ram[(offset & 0x3fff) + (x * 0x4000) + (page * 0xc000)] = dat;
+		}
 	}
 }
 
@@ -154,28 +343,34 @@ static void fm7_alu_function_tilepaint(UINT32 offset)
 	int page = 0;
 	UINT8 mask;
 	
-	if(offset > 0xc000)
+	if(fm7_alu.command & 0x40)
+		fm7_alu_function_compare(offset);
+	
+	if(offset >= 0xc000)
 		page = 1;
 	
 	for(x=0;x<3;x++) // cycle through banks
 	{
-		switch(x)
+		if(!(fm7_alu.bank_disable & (1 << x)))
 		{
-			case 0:
-				dat = fm7_alu.tilepaint_b;
-				break;
-			case 1:
-				dat = fm7_alu.tilepaint_r;
-				break;
-			case 2:
-				dat = fm7_alu.tilepaint_g;
-				break;
+			switch(x)
+			{
+				case 0:
+					dat = fm7_alu.tilepaint_b;
+					break;
+				case 1:
+					dat = fm7_alu.tilepaint_r;
+					break;
+				case 2:
+					dat = fm7_alu.tilepaint_g;
+					break;
+			}
+			dat &= ~fm7_alu.mask;
+			mask = (fm7_video_ram[(offset & 0x3fff) + (x * 0x4000) + (page * 0xc000)]) & fm7_alu.mask;
+			dat |= mask;
+	
+			fm7_video_ram[(offset & 0x3fff) + (x * 0x4000) + (page * 0xc000)] = dat;
 		}
-		dat &= ~fm7_alu.mask;
-		mask = (fm7_video_ram[(offset & 0x3fff) + (x * 0x4000) + (page * 0xc000)]) & fm7_alu.mask;
-		dat |= mask;
-
-		fm7_video_ram[(offset & 0x3fff) + (x * 0x4000) + (page * 0xc000)] = dat;
 	}	
 }
 
@@ -186,19 +381,27 @@ static void fm7_alu_function(UINT32 offset)
 		case 0x00: // PSET
 			fm7_alu_function_pset(offset);
 			break;
+		case 0x02: // OR
+			fm7_alu_function_or(offset);
+			break;
+		case 0x03: // AND
+			fm7_alu_function_and(offset);
+			break;
+		case 0x04: // XOR
+			fm7_alu_function_xor(offset);
+			break;
+		case 0x05: // NOT
+			fm7_alu_function_not(offset);
+			break;
 		case 0x06: // TILEPAINT
 			fm7_alu_function_tilepaint(offset);
 			break;
-		case 0x02: // OR
-		case 0x03: // AND
-		case 0x04: // XOR
-		case 0x05: // NOT
 		case 0x07: // COMPARE
-			logerror("ALU: Unimplemented draw mode %i used\n",fm7_alu.command & 0x07);
+			fm7_alu_function_compare(offset);
 			break;
 		case 0x01:
 		default:
-			logerror("ALU: Invalid draw mode %i used\n",fm7_alu.command & 0x07);
+			popmessage("ALU: Invalid draw mode %i used\n",fm7_alu.command & 0x07);
 	}
 }
 
@@ -210,17 +413,17 @@ READ8_HANDLER( fm7_vram_r )
 	if(fm7_video.active_video_page != 0)
 		page = 0xc000;
 
-	if(fm7_alu.command & 0x80) // ALU active, writes to VRAM even when reading it (go figure)
-	{
-		fm7_alu_function(offset+page);
-	}
-	
 	if(offset < 0x4000 && (fm7_video.multi_page & 0x01))
 		return 0xff;
 	if((offset < 0x8000 && offset >=0x4000) && (fm7_video.multi_page & 0x02))
 		return 0xff;
 	if((offset < 0xc000 && offset >=0x8000) && (fm7_video.multi_page & 0x04))
 		return 0xff;
+	
+	if(fm7_alu.command & 0x80) // ALU active, writes to VRAM even when reading it (go figure)
+	{
+		fm7_alu_function(offset+page);
+	}
 	
 	offs = (offset & 0xc000) | ((offset + fm7_video.vram_offset) & 0x3fff);
 	return fm7_video_ram[offs + page];
@@ -234,18 +437,18 @@ WRITE8_HANDLER( fm7_vram_w )
 	if(fm7_video.active_video_page != 0)
 		page = 0xc000;
 
-	if(fm7_alu.command & 0x80) // ALU active
-	{
-		fm7_alu_function(offset+page);
-		return;
-	}
-	
 	if(offset < 0x4000 && (fm7_video.multi_page & 0x01))
 		return;
 	if((offset < 0x8000 && offset >=0x4000) && (fm7_video.multi_page & 0x02))
 		return;
 	if((offset < 0xc000 && offset >=0x8000) && (fm7_video.multi_page & 0x04))
 		return;
+
+	if(fm7_alu.command & 0x80) // ALU active
+	{
+		fm7_alu_function(offset+page);
+		return;
+	}
 		
 	offs = (offset & 0xc000) | ((offset + fm7_video.vram_offset) & 0x3fff);
 	if(fm7_video.vram_access != 0)
@@ -264,12 +467,6 @@ WRITE8_HANDLER( fm7_vram_banked_w )
 	if(fm7_video.active_video_page != 0)
 		page = 0xc000;
 
-	if(fm7_alu.command & 0x80) // ALU active
-	{
-		fm7_alu_function(offset+page);
-		return;
-	}
-	
 	if(offset < 0x4000 && (fm7_video.multi_page & 0x01))
 		return;
 	if((offset < 0x8000 && offset >=0x4000) && (fm7_video.multi_page & 0x02))
@@ -277,6 +474,12 @@ WRITE8_HANDLER( fm7_vram_banked_w )
 	if((offset < 0xc000 && offset >=0x8000) && (fm7_video.multi_page & 0x04))
 		return;
 		
+	if(fm7_alu.command & 0x80) // ALU active
+	{
+		fm7_alu_function(offset+page);
+		return;
+	}
+	
 	offs = (offset & 0xc000) | ((offset + fm7_video.vram_offset) & 0x3fff);
 	fm7_video_ram[offs+page] = data;
 }
