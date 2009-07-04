@@ -807,10 +807,12 @@ static void fm7_update_psg(running_machine* machine)
 			case 0x02:
 				// Data write
 				ym2203_w(devtag_get_device(space->machine,"ym"),1,psg_data);
+				logerror("YM: data write 0x%02x\n",psg_data);
 				break;
 			case 0x03:
 				// Address latch
 				ym2203_w(devtag_get_device(space->machine,"ym"),0,psg_data);
+				logerror("YM: address latch 0x%02x\n",psg_data);
 				break;
 			case 0x04:
 				// Status register
@@ -1018,6 +1020,8 @@ static void fm7_update_bank(const address_space* space, int bank, UINT8 physical
 void fm7_mmr_refresh(const address_space* space)
 {
 	int x;
+	UINT16 window_addr;
+	UINT8* RAM = memory_region(space->machine,"maincpu");
 	
 	if(fm7_mmr.enabled)
 	{
@@ -1029,6 +1033,17 @@ void fm7_mmr_refresh(const address_space* space)
 		// when MMR is disabled, 0x30000-0x3ffff is banked in
 		for(x=0;x<16;x++)
 			fm7_update_bank(space,x,0x30+x);
+	}
+
+	if(fm7_mmr.mode & 0x40)
+	{
+		// Handle window offset (is this even close to right?)
+		window_addr = ((fm7_mmr.window_offset << 8) + 0x7c00) & 0xffff;
+		if(window_addr < 0xfc00)
+		{
+			memory_install_readwrite8_handler(space,window_addr,window_addr+0x3ff,0,0,SMH_BANK(24),SMH_BANK(24));
+			memory_set_bankptr(space->machine,24,RAM+window_addr);
+		}
 	}
 }
 
@@ -1051,6 +1066,7 @@ static WRITE8_HANDLER( fm7_mmr_w )
 			break;
 		case 0x12:
 			fm7_mmr.window_offset = data;
+			fm7_mmr_refresh(space);
 			logerror("MMR: Window offset set to %02x\n",data);
 			break;
 		case 0x13:
@@ -1358,6 +1374,7 @@ static ADDRESS_MAP_START( fm77av_sub_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd409,0xd409) AM_READWRITE(fm7_vram_access_r,fm7_vram_access_w)
 	AM_RANGE(0xd40a,0xd40a) AM_READWRITE(fm7_sub_busyflag_r,fm7_sub_busyflag_w)
 	AM_RANGE(0xd40e,0xd40f) AM_WRITE(fm7_vram_offset_w)
+	AM_RANGE(0xd410,0xd42b) AM_READWRITE(fm77av_alu_r, fm77av_alu_w)
 	AM_RANGE(0xd430,0xd430) AM_READWRITE(fm77av_video_flags_r,fm77av_video_flags_w)
 	AM_RANGE(0xd431,0xd432) AM_READWRITE(fm77av_key_encoder_r,fm77av_key_encoder_w)
 	AM_RANGE(0xd500,0xd7ff) AM_RAM AM_REGION("maincpu",0x1d500) // Work RAM
@@ -1572,6 +1589,7 @@ static MACHINE_START(fm77av)
 static MACHINE_RESET(fm7)
 {
 	UINT8* RAM = memory_region(machine,"maincpu");
+	UINT8* ROM = memory_region(machine,"init");
 	
 	timer_adjust_periodic(fm7_timer,ATTOTIME_IN_NSEC(2034500),0,ATTOTIME_IN_NSEC(2034500));
 	timer_adjust_periodic(fm7_subtimer,ATTOTIME_IN_MSEC(20),0,ATTOTIME_IN_MSEC(20));
@@ -1587,7 +1605,11 @@ static MACHINE_RESET(fm7)
 	if(fm7_type == SYS_FM7)
 		init_rom_en = 0;
 	else
+	{
 		init_rom_en = 1;
+		// last part of Initiate ROM is visible at the end of RAM too (interrupt vectors)	
+		memcpy(RAM+0xfff0,ROM+0x1ff0,16);
+	}	
 	if(fm7_type == SYS_FM7)
 		memory_set_bankptr(machine,1,RAM+0x38000);
 	key_delay = 700;  // 700ms on FM-7

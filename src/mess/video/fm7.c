@@ -10,6 +10,25 @@
 
 struct fm7_video_flags fm7_video;
 
+struct fm7_alu_flags
+{
+	UINT8 command;
+	UINT8 lcolour;
+	UINT8 mask;
+	UINT8 compare_data;
+	UINT8 compare[8];
+	UINT8 bank_disable;
+	UINT8 tilepaint_b;
+	UINT8 tilepaint_r;
+	UINT8 tilepaint_g;
+	UINT16 addr_offset;
+	UINT16 line_style;
+	UINT16 x0;
+	UINT16 x1;
+	UINT16 y0;
+	UINT16 y1;
+} fm7_alu;
+
 extern UINT8* fm7_video_ram;
 extern UINT8* shared_ram;
 extern emu_timer* fm7_subtimer;
@@ -581,6 +600,171 @@ WRITE8_HANDLER( fm77av_sub_bank_w )
 	prev = data;
 }
 
+/*
+ *  Sub CPU: ports 0xd410-0xd42b (FM-77AV and later only)
+ *  Video operations
+ * 
+ *  0xd410 (R/W): Command register
+ *                bit 7: 0=DIS 1=Start
+ *                bits 6-5: MBIT1, MBIT2
+ *                bits 2-0: Draw mode
+ *                  0 0 0 - PSET
+ *                  0 1 0 - OR
+ *                  0 1 1 - AND
+ *                  1 0 0 - XOR
+ *                  1 0 1 - NOT
+ *                  1 1 0 - TILEPAINT
+ *                  1 1 1 - COMPARE
+ *  0xd411 (R/W): Logical colour (bits 2-0, G-R-B)
+ *  0xd412 (R/W): Mask register
+ *  0xd413 (R)  : Compare data (?)
+ *  0xd413-1a(W): Compare registers (bits 2-0, G-R-B, 1=mask (bit 7))
+ *  0xd41b (R/W): Bank disable register (bits 2-0, G-R-B, 1=disable, bit 3 must always be 1)
+ *  0xd41c-1e(W): Tilepaint registers (B-R-G)
+ *  0xd420-21(W): Line Address offset register (High-Low, A13-A1)
+ *  0xd422-23(W): Line style pattern register (High-Low, P15-P0)
+ *  0xd424-25(W): Line X0 (High-Low, X9-X0)
+ *  0xd426-27(W): Line Y0 (High-Low, Y8-Y0)
+ *  0xd428-29(W): Line X1 (High-Low, X9-X0)
+ *  0xd42a-2b(W): Line Y1 (High-Low, Y8-Y0) 
+ */
+READ8_HANDLER( fm77av_alu_r )
+{
+	switch(offset)
+	{
+		case 0x00:
+			logerror("ALU: read from command register\n");
+			return fm7_alu.command;
+		case 0x01:
+			logerror("ALU: read from logical colour\n");
+			return fm7_alu.lcolour;
+		case 0x02:
+			logerror("ALU: read from mask register\n");
+			return fm7_alu.mask;
+		case 0x03:
+			logerror("ALU: read from compare data register\n");
+			return fm7_alu.compare_data;
+		case 0x0b:
+			logerror("ALU: read from bank disable register\n");
+			return 0xf7 | fm7_alu.bank_disable;
+		default:
+			logerror("ALU: read from invalid register 0x%02x\n",offset);
+			return 0xff;
+	}
+	return 0xff;
+}
+
+WRITE8_HANDLER( fm77av_alu_w )
+{
+	UINT16 dat;
+	
+	switch(offset)
+	{
+		case 0x00:
+			fm7_alu.command = data;
+			// TODO: if bit 7 is active, then start operation
+			logerror("ALU: write to command register - %02x\n",data);
+			break;
+		case 0x01:
+			fm7_alu.lcolour = data & 0x03;
+			logerror("ALU: write to logical colour - %02x\n",data);
+			break;
+		case 0x02:
+			fm7_alu.mask = data;
+			logerror("ALU: write to mask register - %02x\n",data);
+			break;
+		case 0x03:
+		case 0x04:
+		case 0x05:
+		case 0x06:
+		case 0x07:
+		case 0x08:
+		case 0x09:
+		case 0x0a:
+			fm7_alu.compare[offset-3] = data;
+			logerror("ALU: write to compare register %i - %02x\n",offset-3,data);
+			break;
+		case 0x0b:
+			fm7_alu.bank_disable = data & 0x03;
+			logerror("ALU: write to bank disable register - %02x\n",data);
+			break;
+		case 0x0c:
+			fm7_alu.tilepaint_b = data;
+			logerror("ALU: write to tilepaint (blue) register - %02x\n",data);
+			break;
+		case 0x0d:
+			fm7_alu.tilepaint_r = data;
+			logerror("ALU: write to tilepaint (red) register - %02x\n",data);
+			break;
+		case 0x0e:
+			fm7_alu.tilepaint_g = data;
+			logerror("ALU: write to tilepaint (green) register - %02x\n",data);
+			break;
+		case 0x10:
+			dat = ((data & 0x1f) << 8) | (fm7_alu.addr_offset & 0x00ff);
+			fm7_alu.addr_offset = dat;
+			logerror("ALU: write to address offset (high) register - %02x (%04x)\n",data,fm7_alu.addr_offset);
+			break;
+		case 0x11:
+			dat = (fm7_alu.addr_offset & 0xff00) | data;
+			fm7_alu.addr_offset = dat;
+			logerror("ALU: write to address offset (low) register - %02x (%04x)\n",data,fm7_alu.addr_offset);
+			break;
+		case 0x12:
+			dat = (data << 8) | (fm7_alu.line_style & 0x00ff);
+			fm7_alu.line_style = dat;
+			logerror("ALU: write to line style (high) register - %02x (%04x)\n",data,fm7_alu.line_style);
+			break;
+		case 0x13:
+			dat = (fm7_alu.line_style & 0xff00) | data;
+			fm7_alu.line_style = dat;
+			logerror("ALU: write to line style (low) register - %02x (%04x)\n",data,fm7_alu.line_style);
+			break;
+		case 0x14:
+			dat = ((data & 0x03) << 8) | (fm7_alu.x0 & 0x00ff);
+			fm7_alu.x0 = dat;
+			logerror("ALU: write to X0 (high) register - %02x (%04x)\n",data,fm7_alu.x0);
+			break;
+		case 0x15:
+			dat = (fm7_alu.x0 & 0xff00) | data;
+			fm7_alu.x0 = dat;
+			logerror("ALU: write to X0 (low) register - %02x (%04x)\n",data,fm7_alu.x0);
+			break;
+		case 0x16:
+			dat = ((data & 0x01) << 8) | (fm7_alu.y0 & 0x00ff);
+			fm7_alu.y0 = dat;
+			logerror("ALU: write to Y0 (high) register - %02x (%04x)\n",data,fm7_alu.y0);
+			break;
+		case 0x17:
+			dat = (fm7_alu.y0 & 0xff00) | data;
+			fm7_alu.y0 = dat;
+			logerror("ALU: write to Y0 (low) register - %02x (%04x)\n",data,fm7_alu.y0);
+			break;
+		case 0x18:
+			dat = ((data & 0x03) << 8) | (fm7_alu.x1 & 0x00ff);
+			fm7_alu.x1 = dat;
+			logerror("ALU: write to X1 (high) register - %02x (%04x)\n",data,fm7_alu.x1);
+			break;
+		case 0x19:
+			dat = (fm7_alu.x1 & 0xff00) | data;
+			fm7_alu.x1 = dat;
+			logerror("ALU: write to X1 (low) register - %02x (%04x)\n",data,fm7_alu.x1);
+			break;
+		case 0x1a:
+			dat = ((data & 0x01) << 8) | (fm7_alu.y1 & 0x00ff);
+			fm7_alu.y1 = dat;
+			logerror("ALU: write to Y1 (high) register - %02x (%04x)\n",data,fm7_alu.y1);
+			break;
+		case 0x1b:
+			dat = (fm7_alu.y1 & 0xff00) | data;
+			fm7_alu.y1 = dat;
+			logerror("ALU: write to Y1 (low) register - %02x (%04x)\n",data,fm7_alu.y1);
+			break;
+		default:
+			logerror("ALU: write 0x%02x to invalid register 0x%02x\n",data,offset);
+	}
+}
+
 TIMER_CALLBACK( fm77av_vsync )
 {
 	if(param == 0)  // start of vsync
@@ -615,6 +799,9 @@ READ8_HANDLER( fm7_sub_ram_ports_banked_r )
 		ROM = memory_region(space->machine,"subsyscg");
 		return ROM[(fm7_video.cgrom*0x800)+(offset-0x800)];
 	}
+	
+	if(offset >= 0x410 && offset <= 0x42b)
+		return fm77av_alu_r(space,offset-0x410);
 	
 	switch(offset)
 	{
@@ -656,6 +843,12 @@ WRITE8_HANDLER( fm7_sub_ram_ports_banked_w )
 		shared_ram[offset-0x380] = data;
 	if(offset >= 0x500 && offset < 0x800) // work RAM
 		RAM[0x1d000+offset] = data;
+		
+	if(offset >= 0x410 && offset <= 0x42b)
+	{
+		fm77av_alu_w(space,offset-0x410,data);
+		return;
+	}
 		
 	switch(offset)
 	{

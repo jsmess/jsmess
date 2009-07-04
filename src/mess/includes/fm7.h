@@ -77,6 +77,8 @@ WRITE8_HANDLER( fm7_crt_w );
 WRITE8_HANDLER( fm7_vram_offset_w );
 READ8_HANDLER( fm77av_video_flags_r );
 WRITE8_HANDLER( fm77av_video_flags_w );
+READ8_HANDLER( fm77av_alu_r );
+WRITE8_HANDLER( fm77av_alu_w );
 
 WRITE8_HANDLER( fm77av_analog_palette_w );
 WRITE8_HANDLER( fm7_multipage_w );
