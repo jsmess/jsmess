@@ -429,8 +429,8 @@ ROM_START( comx35p )
 	ROM_SYSTEM_BIOS( 3, "basic101", "COMX BASIC V1.01" )
 	ROMX_LOAD( "comx_11.u21",			0x0000, 0x4000, CRC(609d89cd) SHA1(799646810510d8236fbfafaff7a73d5170990f16), ROM_BIOS(4) )
 
-	ROM_REGION( 0x2000, "fdc", 0 )
-	ROM_LOAD( "fdc.f4",					0x0000, 0x2000, CRC(cf4ecd2e) SHA1(290e19bdc89e3c8059e63d5ae3cca4daa194e1fe) )
+	ROM_REGION( 0x2000, "fdc", 0 ) /* Disc Controller Card */
+	ROM_LOAD( "d.o.s. v1.2.f4",			0x0000, 0x2000, CRC(cf4ecd2e) SHA1(290e19bdc89e3c8059e63d5ae3cca4daa194e1fe) )
 
 	ROM_REGION( 0x2000, "printer", 0 )
 	ROM_LOAD( "printer.bin",			0x0000, 0x0800, CRC(3bbc2b2e) SHA1(08bf7ea4174713ab24969c553affd5c1401876b8) )
@@ -444,10 +444,10 @@ ROM_START( comx35p )
 	ROM_REGION( 0x2000, "thermal", 0 )
 	ROM_LOAD( "thermal.bin",			0x0000, 0x1000, CRC(41a72ba8) SHA1(3a8760c78bd8c7bec2dbf26657b930c9a6814803) )
 
-	ROM_REGION( 0x2000, "80column", 0 )
+	ROM_REGION( 0x2000, "80column", 0 ) /* 80 Column Card */
 	ROM_LOAD( "p.cl1",					0x0000, 0x0800, CRC(b417d30a) SHA1(d428b0467945ecb9aec884211d0f4b1d8d56d738) )
 
-	ROM_REGION( 0x800, "chargen", 0 )
+	ROM_REGION( 0x800, "chargen", 0 ) /* 80 Column Card */
 	ROM_LOAD( "c.cl4",					0x0000, 0x0800, CRC(69dd7b07) SHA1(71d368adbb299103d165eab8359a97769e463e26) )
 ROM_END
 
