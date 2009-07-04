@@ -12,7 +12,6 @@
 
 	TODO:
 
-	- vertical scroll
 	- palette RAM should be written during HBLANK
 	- double sided disks have t0s0,t0s1,t1s0,t1s1... format
 	- DART clocks
@@ -42,6 +41,24 @@ INLINE const device_config *get_floppy_image(running_machine *machine, int drive
 
 /* Memory Banking */
 
+static READ8_HANDLER( gfxram_r )
+{
+	tiki100_state *state = space->machine->driver_data;
+
+	UINT16 addr = (offset + (state->scroll << 7)) & TIKI100_VIDEORAM_MASK;
+
+	return state->video_ram[addr];
+}
+
+static WRITE8_HANDLER( gfxram_w )
+{
+	tiki100_state *state = space->machine->driver_data;
+
+	UINT16 addr = (offset + (state->scroll << 7)) & TIKI100_VIDEORAM_MASK;
+
+	state->video_ram[addr] = data;
+}
+
 static void tiki100_bankswitch(running_machine *machine)
 {
 	tiki100_state *state = machine->driver_data;
@@ -52,15 +69,12 @@ static void tiki100_bankswitch(running_machine *machine)
 		if (!state->rome)
 		{
 			/* reserved */
-			memory_install_readwrite8_handler(program, 0x0000, 0x3fff, 0, 0, SMH_UNMAP, SMH_UNMAP);
-			memory_install_readwrite8_handler(program, 0x4000, 0x7fff, 0, 0, SMH_UNMAP, SMH_UNMAP);
-			memory_install_readwrite8_handler(program, 0x8000, 0xffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+			memory_install_readwrite8_handler(program, 0x0000, 0xffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 		}
 		else
 		{
 			/* GFXRAM, GFXRAM, RAM */
-			memory_install_readwrite8_handler(program, 0x0000, 0x3fff, 0, 0, SMH_BANK(1), SMH_BANK(1));
-			memory_install_readwrite8_handler(program, 0x4000, 0x7fff, 0, 0, SMH_BANK(2), SMH_BANK(2));
+			memory_install_readwrite8_handler(program, 0x0000, 0x7fff, 0, 0, gfxram_r, gfxram_w);
 			memory_install_readwrite8_handler(program, 0x8000, 0xffff, 0, 0, SMH_BANK(3), SMH_BANK(3));
 
 			memory_set_bank(machine, 1, BANK_VIDEO_RAM);
@@ -131,7 +145,7 @@ static WRITE8_HANDLER( video_mode_w )
 		4		mode select bit 0
 		5		mode select bit 1
 		6		unused
-		7		write color
+		7		write color during HBLANK
 
 	*/
 
@@ -278,7 +292,7 @@ static INPUT_PORTS_START( tiki100 )
 	PORT_START("ROW2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("GRAFIKK") PORT_CODE(KEYCODE_LALT) PORT_CHAR(UCHAR_MAMEKEY(LALT))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("ANGRE")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("ANGRE") PORT_CODE(KEYCODE_DEL) PORT_CHAR(UCHAR_MAMEKEY(DEL))
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('a') PORT_CHAR('A')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH2) PORT_CHAR('<') PORT_CHAR('>')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z) PORT_CHAR('z') PORT_CHAR('Z')
@@ -340,7 +354,7 @@ static INPUT_PORTS_START( tiki100 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('^') PORT_CHAR('|')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('\'') PORT_CHAR('*')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x90") PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("UTVID")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("UTVID") PORT_CODE(KEYCODE_INSERT) PORT_CHAR(UCHAR_MAMEKEY(INSERT))
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F1") PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1))
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F4") PORT_CODE(KEYCODE_F4) PORT_CHAR(UCHAR_MAMEKEY(F4))
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SIDEOPP") PORT_CODE(KEYCODE_PGUP) PORT_CHAR(UCHAR_MAMEKEY(PGUP))
@@ -387,12 +401,6 @@ static INPUT_PORTS_START( tiki100 )
 INPUT_PORTS_END
 
 /* Video */
-
-static VIDEO_START( tiki100 )
-{
-//	tiki100_state *state = machine->driver_data;
-	
-}
 
 static VIDEO_UPDATE( tiki100 )
 {
@@ -604,7 +612,13 @@ static MACHINE_START( tiki100 )
 	tiki100_bankswitch(machine);
 
 	/* register for state saving */
-//	state_save_register_global(machine, state->);
+	state_save_register_global(machine, state->rome);
+	state_save_register_global(machine, state->vire);
+	state_save_register_global_pointer(machine, state->video_ram, TIKI100_VIDEORAM_SIZE);
+	state_save_register_global(machine, state->scroll);
+	state_save_register_global(machine, state->mode);
+	state_save_register_global(machine, state->palette);
+	state_save_register_global(machine, state->keylatch);
 }
 
 /* Machine Driver */
@@ -629,9 +643,7 @@ static MACHINE_DRIVER_START( tiki100 )
     MDRV_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 256-1)
     
 	MDRV_PALETTE_LENGTH(16)
-//  MDRV_PALETTE_INIT(tiki100)
 
-    MDRV_VIDEO_START(tiki100)
     MDRV_VIDEO_UPDATE(tiki100)
 
 	/* devices */
@@ -729,5 +741,5 @@ SYSTEM_CONFIG_END
 /* System Drivers */
 
 /*    YEAR	NAME		PARENT		COMPAT	MACHINE		INPUT		INIT	CONFIG		COMPANY				FULLNAME		FLAGS */
-COMP( 1984, kontiki,	0,			0,		tiki100,	tiki100,	0,		tiki100,	"Kontiki Data A/S",	"KONTIKI 100",	GAME_IMPERFECT_GRAPHICS )
-COMP( 1984, tiki100,	kontiki,	0,		tiki100,	tiki100,	0,		tiki100,	"Tiki Data A/S",	"TIKI 100",		GAME_IMPERFECT_GRAPHICS )
+COMP( 1984, kontiki,	0,			0,		tiki100,	tiki100,	0,		tiki100,	"Kontiki Data A/S",	"KONTIKI 100",	GAME_SUPPORTS_SAVE )
+COMP( 1984, tiki100,	kontiki,	0,		tiki100,	tiki100,	0,		tiki100,	"Tiki Data A/S",	"TIKI 100",		GAME_SUPPORTS_SAVE )
