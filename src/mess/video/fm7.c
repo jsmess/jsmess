@@ -146,6 +146,39 @@ static void fm7_alu_function_pset(UINT32 offset)
 	}
 }
 
+static void fm7_alu_function_tilepaint(UINT32 offset)
+{
+	// TILEPAINT - writes to VRAM based on the tilepaint colour registers
+	int x;
+	UINT8 dat;
+	int page = 0;
+	UINT8 mask;
+	
+	if(offset > 0xc000)
+		page = 1;
+	
+	for(x=0;x<3;x++) // cycle through banks
+	{
+		switch(x)
+		{
+			case 0:
+				dat = fm7_alu.tilepaint_b;
+				break;
+			case 1:
+				dat = fm7_alu.tilepaint_r;
+				break;
+			case 2:
+				dat = fm7_alu.tilepaint_g;
+				break;
+		}
+		dat &= ~fm7_alu.mask;
+		mask = (fm7_video_ram[(offset & 0x3fff) + (x * 0x4000) + (page * 0xc000)]) & fm7_alu.mask;
+		dat |= mask;
+
+		fm7_video_ram[(offset & 0x3fff) + (x * 0x4000) + (page * 0xc000)] = dat;
+	}	
+}
+
 static void fm7_alu_function(UINT32 offset)
 {
 	switch(fm7_alu.command & 0x07)
@@ -153,11 +186,13 @@ static void fm7_alu_function(UINT32 offset)
 		case 0x00: // PSET
 			fm7_alu_function_pset(offset);
 			break;
+		case 0x06: // TILEPAINT
+			fm7_alu_function_tilepaint(offset);
+			break;
 		case 0x02: // OR
 		case 0x03: // AND
 		case 0x04: // XOR
 		case 0x05: // NOT
-		case 0x06: // TILEPAINT
 		case 0x07: // COMPARE
 			logerror("ALU: Unimplemented draw mode %i used\n",fm7_alu.command & 0x07);
 			break;
