@@ -18,7 +18,8 @@
 
 	TODO:
 
-	- video
+	- 60 Hz interrupt from NE555
+	- Z80 _WAIT on 6847 _FS or _HS
 	- joystick
 	- tape
 	- 80-column card (MC6845)
@@ -77,6 +78,10 @@ static void mc1000_bankswitch(running_machine *machine)
 			memory_install_readwrite8_handler(program, 0x8000, 0x97ff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 		}
 	}
+	else
+	{
+		memory_install_readwrite8_handler(program, 0x8000, 0x97ff, 0, 0, SMH_BANK(4), SMH_BANK(4));
+	}
 
 	memory_set_bank(machine, 4, state->mc6847_bank);
 
@@ -113,8 +118,6 @@ static WRITE8_HANDLER( mc6845_ctrl_w )
 
 	state->mc6845_bank = BIT(data, 0);
 
-	memory_set_bank(space->machine, 1, 0);
-
 	mc1000_bankswitch(space->machine);
 }
 
@@ -142,8 +145,6 @@ static WRITE8_HANDLER( mc6847_attr_w )
 	mc1000_bankswitch(space->machine);
 
 	state->mc6847_attr = data;
-
-	logerror("MC6847 %02x\n", data);
 }
 
 /* Memory Maps */
@@ -181,6 +182,7 @@ static INPUT_PORTS_START( mc1000 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CHAR('0')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(')
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("ROW1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('a') PORT_CHAR('A')
@@ -189,6 +191,7 @@ static INPUT_PORTS_START( mc1000 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_CHAR('y') PORT_CHAR('Y')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('1')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR('9')
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("ROW2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('b') PORT_CHAR('B')
@@ -197,6 +200,7 @@ static INPUT_PORTS_START( mc1000 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z) PORT_CHAR('z') PORT_CHAR('Z')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('"')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(':') PORT_CHAR('*')
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("ROW3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('c') PORT_CHAR('C')
@@ -205,6 +209,7 @@ static INPUT_PORTS_START( mc1000 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RETURN") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR('+')
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("ROW4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('d') PORT_CHAR('D')
@@ -213,6 +218,7 @@ static INPUT_PORTS_START( mc1000 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SPACE") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("ROW5")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('e') PORT_CHAR('E')
@@ -221,6 +227,7 @@ static INPUT_PORTS_START( mc1000 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RUBOUT") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('=')
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("ROW6")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('f') PORT_CHAR('F')
@@ -229,6 +236,7 @@ static INPUT_PORTS_START( mc1000 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('^')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('&')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("ROW7")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_CHAR('g') PORT_CHAR('G')
@@ -237,6 +245,7 @@ static INPUT_PORTS_START( mc1000 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RESET")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('\'')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("MODIFIERS")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
@@ -247,12 +256,23 @@ INPUT_PORTS_END
 
 /* Video */
 
+static void mc1000_hsync(running_machine *machine, int data)
+{
+	// Z80 WAIT
+}
+	
+static void mc1000_vsync(running_machine *machine, int data)
+{
+	// Z80 WAIT
+}
+
 static ATTR_CONST UINT8 mc1000_get_attributes(running_machine *machine, UINT8 c, int scanline, int pos)
 {
 	mc1000_state *state = machine->driver_data;
 
 	UINT8 data = 0;
 
+	data |= BIT(c, 7) ? M6847_INV : 0;
 	data |= BIT(state->mc6847_attr, 1) ? M6847_CSS : 0;
 	data |= BIT(state->mc6847_attr, 2) ? M6847_GM0 : 0;
 	data |= BIT(state->mc6847_attr, 3) ? M6847_GM1 : 0;
@@ -268,7 +288,7 @@ static const UINT8 *mc1000_get_video_ram(running_machine *machine, int scanline)
 {
 	mc1000_state *state = machine->driver_data;
 
-	return state->mc6847_video_ram + scanline*32;
+	return state->mc6847_video_ram + (scanline / 12) * 0x20;
 }
 
 static VIDEO_START( mc1000 )
@@ -277,7 +297,9 @@ static VIDEO_START( mc1000 )
 
 	memset(&cfg, 0, sizeof(cfg));
 
-	cfg.type = M6847_VERSION_ORIGINAL_PAL;
+	cfg.type = M6847_VERSION_ORIGINAL_NTSC;
+	cfg.horizontal_sync_callback = mc1000_hsync;
+	cfg.field_sync_callback = mc1000_vsync;
 	cfg.get_attributes = mc1000_get_attributes;
 	cfg.get_video_ram = mc1000_get_video_ram;
 
@@ -312,7 +334,7 @@ static READ8_DEVICE_HANDLER( keydata_r )
 
 	data &= ((input_port_read(device->machine, "MODIFIERS") & 0xc0) | 0x3f);
 
-	data &= (((cassette_input(cassette_device_image(device->machine)) < +0.0) << 7) | 0x7f);
+//	data &= (((cassette_input(cassette_device_image(device->machine)) < +0.0) << 7) | 0x7f);
 
 	return data;
 }
@@ -327,7 +349,7 @@ static const ay8910_interface ay8910_intf =
 	DEVCB_NULL
 };
 
-/* Machine Start */
+/* Machine Initialization */
 
 static MACHINE_START( mc1000 )
 {
@@ -346,6 +368,8 @@ static MACHINE_START( mc1000 )
 	memory_configure_bank(machine, 1, 1, 1, memory_region(machine, Z80_TAG) + 0xc000, 0);
 	memory_set_bank(machine, 1, 1);
 
+	state->rom0000 = 1;
+
 	memory_configure_bank(machine, 2, 0, 1, memory_region(machine, Z80_TAG) + 0x2000, 0);
 	memory_configure_bank(machine, 2, 1, 1, state->mc6845_video_ram, 0);
 	memory_set_bank(machine, 2, 0);
@@ -353,14 +377,23 @@ static MACHINE_START( mc1000 )
 	memory_configure_bank(machine, 3, 0, 1, memory_region(machine, Z80_TAG) + 0x4000, 0);
 	memory_set_bank(machine, 3, 0);
 
-	memory_configure_bank(machine, 4, 0, 1, memory_region(machine, Z80_TAG) + 0x8000, 0);
-	memory_configure_bank(machine, 4, 1, 1, state->mc6847_video_ram, 0);
+	memory_configure_bank(machine, 4, 0, 1, state->mc6847_video_ram, 0);
+	memory_configure_bank(machine, 4, 1, 1, memory_region(machine, Z80_TAG) + 0x8000, 0);
 	memory_set_bank(machine, 4, 0);
 
 	memory_configure_bank(machine, 5, 0, 1, memory_region(machine, Z80_TAG) + 0x9800, 0);
 	memory_set_bank(machine, 5, 0);
 
 	mc1000_bankswitch(machine);
+}
+
+static MACHINE_RESET( mc1000 )
+{
+	mc1000_state *state = machine->driver_data;
+
+	memory_set_bank(machine, 1, 1);
+
+	state->rom0000 = 1;
 }
 
 /* Machine Driver */
@@ -372,11 +405,6 @@ static const cassette_config mc1000_cassette_config =
 	CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED
 };
 
-static INTERRUPT_GEN( mc1000_int )
-{
-	cputag_set_input_line(device->machine, Z80_TAG, INPUT_LINE_IRQ0, ASSERT_LINE);
-}
-
 static MACHINE_DRIVER_START( mc1000 )
 	MDRV_DRIVER_DATA(mc1000_state)
 
@@ -384,9 +412,9 @@ static MACHINE_DRIVER_START( mc1000 )
     MDRV_CPU_ADD(Z80_TAG, Z80, 3579545)
     MDRV_CPU_PROGRAM_MAP(mc1000_mem)
     MDRV_CPU_IO_MAP(mc1000_io)
-	MDRV_CPU_VBLANK_INT(SCREEN_TAG, mc1000_int)
 
     MDRV_MACHINE_START(mc1000)
+    MDRV_MACHINE_RESET(mc1000)
 
     /* video hardware */
     MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
@@ -426,7 +454,30 @@ static SYSTEM_CONFIG_START( mc1000 )
 	CONFIG_RAM		  ( 48 * 1024 )
 SYSTEM_CONFIG_END
 
+/* Driver Initialization */
+
+static DIRECT_UPDATE_HANDLER( mc1000_direct_update_handler )
+{
+	mc1000_state *state = space->machine->driver_data;
+
+	if (state->rom0000)
+	{
+		if (address >= 0xc000)
+		{
+			memory_set_bank(space->machine, 1, 0);
+			state->rom0000 = 0;
+		}
+	}
+
+	return address;
+}
+
+static DRIVER_INIT( mc1000 )
+{
+	memory_set_direct_update_handler(cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM), mc1000_direct_update_handler);
+}
+
 /* System Drivers */
 
-/*    YEAR	NAME		PARENT		COMPAT	MACHINE		INPUT		INIT	CONFIG		COMPANY				FULLNAME		FLAGS */
-COMP( 1985,	mc1000,		0,			0,		mc1000,		mc1000,		0,		mc1000,		"CCE",				"MC-1000",		GAME_NOT_WORKING)
+/*    YEAR	NAME		PARENT		COMPAT	MACHINE		INPUT		INIT		CONFIG		COMPANY				FULLNAME		FLAGS */
+COMP( 1985,	mc1000,		0,			0,		mc1000,		mc1000,		mc1000,		mc1000,		"CCE",				"MC-1000",		0 )

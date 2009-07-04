@@ -34,6 +34,8 @@ System Driver Changes:
 - [GENESIS] Save RAM emulation improved for several games (bugs #1691, #1696,
   #1823, #1824) [Enik]
 
+- [MC1000] System is now basically working. [Curt Coder]
+
 - [PC] Renamed bondwell to bw230. [Curt Coder]
 
 - [SEGA CD] Split up sets and added new dumps. [Justin Kerk, TmEE]
@@ -43,7 +45,7 @@ System Driver Changes:
 - [TI85] Fixed TI-82/TI-83 on/off and NVRAM, added a DSW to TI-83 for the
   battery status [Xander]
   
-- [TIKI100] System is now working, except DS disks and scroll. [Curt Coder]
+- [TIKI100] System is now working, except for double sided disks. [Curt Coder]
 
 
 

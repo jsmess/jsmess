@@ -16,6 +16,7 @@ typedef struct _mc1000_state mc1000_state;
 struct _mc1000_state
 {
 	/* memory state */
+	int rom0000;
 	int mc6845_bank;
 	int mc6847_bank;
 
