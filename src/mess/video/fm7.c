@@ -120,10 +120,65 @@ WRITE8_HANDLER( fm7_vram_access_w )
 	fm7_video.vram_access = 0;
 }
 
+static void fm7_alu_function_pset(UINT32 offset)
+{
+	// PSET - simply sets the pixels to the selected logical colour
+	int x;
+	UINT8 dat;
+	int page = 0;
+	UINT8 mask;
+	
+	if(offset > 0xc000)
+		page = 1;
+	
+	for(x=0;x<3;x++) // cycle through banks
+	{
+		if(fm7_alu.lcolour & (1 << x))
+			dat = 0xff;
+		else
+			dat = 0;
+
+		mask = (fm7_video_ram[(offset & 0x3fff) + (x * 0x4000) + (page * 0xc000)]) & fm7_alu.mask;
+		dat &= ~fm7_alu.mask;
+		dat |= mask;
+			
+		fm7_video_ram[(offset & 0x3fff) + (x * 0x4000) + (page * 0xc000)] = dat;
+	}
+}
+
+static void fm7_alu_function(UINT32 offset)
+{
+	switch(fm7_alu.command & 0x07)
+	{
+		case 0x00: // PSET
+			fm7_alu_function_pset(offset);
+			break;
+		case 0x02: // OR
+		case 0x03: // AND
+		case 0x04: // XOR
+		case 0x05: // NOT
+		case 0x06: // TILEPAINT
+		case 0x07: // COMPARE
+			logerror("ALU: Unimplemented draw mode %i used\n",fm7_alu.command & 0x07);
+			break;
+		case 0x01:
+		default:
+			logerror("ALU: Invalid draw mode %i used\n",fm7_alu.command & 0x07);
+	}
+}
+
 READ8_HANDLER( fm7_vram_r )
 {
 	int offs;
 	UINT16 page = 0x0000;
+
+	if(fm7_video.active_video_page != 0)
+		page = 0xc000;
+
+	if(fm7_alu.command & 0x80) // ALU active, writes to VRAM even when reading it (go figure)
+	{
+		fm7_alu_function(offset+page);
+	}
 	
 	if(offset < 0x4000 && (fm7_video.multi_page & 0x01))
 		return 0xff;
@@ -132,9 +187,6 @@ READ8_HANDLER( fm7_vram_r )
 	if((offset < 0xc000 && offset >=0x8000) && (fm7_video.multi_page & 0x04))
 		return 0xff;
 	
-	if(fm7_video.active_video_page != 0)
-		page = 0xc000;
-
 	offs = (offset & 0xc000) | ((offset + fm7_video.vram_offset) & 0x3fff);
 	return fm7_video_ram[offs + page];
 }
@@ -144,6 +196,15 @@ WRITE8_HANDLER( fm7_vram_w )
 	int offs;
 	UINT16 page = 0x0000;
 	
+	if(fm7_video.active_video_page != 0)
+		page = 0xc000;
+
+	if(fm7_alu.command & 0x80) // ALU active
+	{
+		fm7_alu_function(offset+page);
+		return;
+	}
+	
 	if(offset < 0x4000 && (fm7_video.multi_page & 0x01))
 		return;
 	if((offset < 0x8000 && offset >=0x4000) && (fm7_video.multi_page & 0x02))
@@ -151,9 +212,6 @@ WRITE8_HANDLER( fm7_vram_w )
 	if((offset < 0xc000 && offset >=0x8000) && (fm7_video.multi_page & 0x04))
 		return;
 		
-	if(fm7_video.active_video_page != 0)
-		page = 0xc000;
-
 	offs = (offset & 0xc000) | ((offset + fm7_video.vram_offset) & 0x3fff);
 	if(fm7_video.vram_access != 0)
 		fm7_video_ram[offs+page] = data;
@@ -167,6 +225,15 @@ WRITE8_HANDLER( fm7_vram_banked_w )
 
 	if(!fm7_video.sub_halt)  // no access if sub CPU is not halted.
 		return;
+
+	if(fm7_video.active_video_page != 0)
+		page = 0xc000;
+
+	if(fm7_alu.command & 0x80) // ALU active
+	{
+		fm7_alu_function(offset+page);
+		return;
+	}
 	
 	if(offset < 0x4000 && (fm7_video.multi_page & 0x01))
 		return;
@@ -175,9 +242,6 @@ WRITE8_HANDLER( fm7_vram_banked_w )
 	if((offset < 0xc000 && offset >=0x8000) && (fm7_video.multi_page & 0x04))
 		return;
 		
-	if(fm7_video.active_video_page != 0)
-		page = 0xc000;
-
 	offs = (offset & 0xc000) | ((offset + fm7_video.vram_offset) & 0x3fff);
 	fm7_video_ram[offs+page] = data;
 }
