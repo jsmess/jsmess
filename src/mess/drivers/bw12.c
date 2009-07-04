@@ -847,5 +847,5 @@ SYSTEM_CONFIG_END
 /* System Drivers */
 
 /*    YEAR	NAME	PARENT	COMPAT	MACHINE	INPUT	INIT	CONFIG	COMPANY								FULLNAME		FLAGS */
-COMP( 1984,	bw12,	0,		0,		bw12, 	bw12,	0,		bw12,	"Bondwell International Limited",   "Bondwell 12",	0 )
-COMP( 1984,	bw14,	bw12,	0,		bw12,	bw12,	0,		bw14,	"Bondwell International Limited",   "Bondwell 14",	0 )
+COMP( 1984,	bw12,	0,		0,		bw12, 	bw12,	0,		bw12,	"Bondwell International Limited",   "Bondwell 12",	GAME_SUPPORTS_SAVE )
+COMP( 1984,	bw14,	bw12,	0,		bw12,	bw12,	0,		bw14,	"Bondwell International Limited",   "Bondwell 14",	GAME_SUPPORTS_SAVE )
