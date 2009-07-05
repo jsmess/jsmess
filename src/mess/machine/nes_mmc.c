@@ -82,6 +82,8 @@ int MMC5_vram_control;
 
 static int mapper41_chr, mapper41_reg2;
 
+static int mapper154_reg;
+
 static int mapper45_data[4], mapper45_cmd;
 
 static int mapper64_data[0x10], mapper64_cmd;
@@ -4246,6 +4248,11 @@ static WRITE8_HANDLER( mapper101_w )
 
 	/* ??? */
 }
+static WRITE8_HANDLER( mapper107_w )
+{
+	prg32(space, data>>1);
+	chr8(space->machine, data);
+}
 
 static WRITE8_HANDLER( mapper112_w )
 {
@@ -4339,6 +4346,64 @@ static WRITE8_HANDLER( mapper144_w )
 
 	/* Switch 32k prg bank */
 	prg32 (space, data & 0x07);
+}
+static WRITE8_HANDLER( mapper154_w )
+{
+	nes_state *state = space->machine->driver_data;
+
+	switch(offset&1)
+	{
+	case 0:
+		{
+			(data&0x40)?ppu2c0x_set_mirroring(state->ppu,PPU_MIRROR_HIGH):ppu2c0x_set_mirroring(state->ppu,PPU_MIRROR_LOW);
+			mapper154_reg=data&7;
+			break;
+		}
+	case 1:
+		{
+			switch(mapper154_reg)
+			{
+				case 0:chr2_0(space->machine,(data)>>1);break;
+				case 1:chr2_2(space->machine,(data)>>1);break;
+				case 2:chr1_4(space->machine,(data)|0x40);break;
+				case 3:chr1_5(space->machine,(data)|0x40);break;
+				case 4:chr1_6(space->machine,(data)|0x40);break;
+				case 5:chr1_7(space->machine,(data)|0x40);break;
+				case 6:prg8_89(space,data);break;
+				case 7:prg8_ab(space,data);break;
+
+			}
+			break;
+		}
+	}
+}
+static WRITE8_HANDLER( mapper88_w )
+{
+	switch(offset&0x8001)
+	{
+	case 0x8000:
+		{
+			//(data&0x40)?ppu2c0x_set_mirroring(state->ppu,PPU_MIRROR_HIGH):ppu2c0x_set_mirroring(state->ppu,PPU_MIRROR_LOW);
+			mapper154_reg=data&7;
+			break;
+		}
+	case 0x8001:
+		{
+			switch(mapper154_reg)
+			{
+				case 0:chr2_0(space->machine,(data&0x3F)>>1);break;
+				case 1:chr2_2(space->machine,(data&0x3F)>>1);break;
+				case 2:chr1_4(space->machine,(data&0x3F)|0x40);break;
+				case 3:chr1_5(space->machine,(data&0x3F)|0x40);break;
+				case 4:chr1_6(space->machine,(data&0x3F)|0x40);break;
+				case 5:chr1_7(space->machine,(data&0x3F)|0x40);break;
+				case 6:prg8_89(space,data);break;
+				case 7:prg8_ab(space,data);break;
+
+			}
+			break;
+		}
+	}
 }
 static WRITE8_HANDLER( mapper180_w )
 {
@@ -4449,7 +4514,7 @@ static WRITE8_HANDLER( mapper193_m_w )
 		chr2_6( space->machine, data >> 1 );
 		break;
 	case 3:
-		prg16_89ab( space, data );
+		prg8_89(space, data);
 		break;
 	}
 }
@@ -5308,6 +5373,7 @@ int mapper_reset (running_machine *machine, int mapperNum)
 			prg16_89ab( space, nes.prg_chunks-1 );
 			prg16_cdef( space, nes.prg_chunks-1 );
 			break;
+		case 107:
 		case 113:
 		case 133:
 			prg32(space, 0);
@@ -5317,6 +5383,12 @@ int mapper_reset (running_machine *machine, int mapperNum)
 		case 144:
 			prg32(space, 0);
 			break;
+		case 154:
+		case 88:
+			prg16_89ab (space, nes.prg_chunks-2);
+			prg16_cdef (space, nes.prg_chunks-1);
+			break;
+
 		case 180:
 			prg16_89ab(space, 0);
 			prg16_cdef(space, 0);
@@ -5331,6 +5403,7 @@ int mapper_reset (running_machine *machine, int mapperNum)
 			break;
 		case 193:
 			prg32( space, ( nes.prg_chunks - 1 ) >> 1 );
+			ppu2c0x_set_mirroring(state->ppu, PPU_MIRROR_VERT);
 			break;
 		case 200:
 			prg16_89ab( space, nes.prg_chunks - 1 );
@@ -5459,7 +5532,7 @@ static const mmc mmc_list[] =
 	{ 85, "Konami VRC 7",			NULL, NULL, NULL, konami_vrc7_w, NULL, NULL, konami_irq },
 	{ 86, "Jaleco Early Mapper 2",	NULL, NULL, NULL, mapper86_w, NULL, NULL, NULL },
 	{ 87, "74161/32 VROM sw-a",		NULL, NULL, mapper87_m_w, NULL, NULL, NULL, NULL },
-	{ 88, "Namco 118",				NULL, NULL, NULL, mapper4_w, NULL, NULL, mapper4_irq },
+	{ 88, "Namco 118",				NULL, NULL, NULL, mapper88_w, NULL, NULL, NULL },
 	{ 89, "Sunsoft Early",			NULL, NULL, NULL, mapper89_w, NULL, NULL, NULL },
 // 90 - pirate mapper
 	{ 91, "HK-SF3 (bootleg)",		NULL, NULL, mapper91_m_w, NULL, NULL, NULL, NULL },
@@ -5472,6 +5545,7 @@ static const mmc mmc_list[] =
 // 99 - vs. system
 // 100 - images hacked to work with nesticle
 	{ 101, "?? LS161",				NULL, NULL, mapper101_m_w, mapper101_w, NULL, NULL, NULL },
+	{ 107, "Magic Dragon",			NULL, NULL, NULL, mapper107_w, NULL, NULL, NULL },
 	{ 112, "Asper",					NULL, NULL, NULL, mapper112_w, NULL, NULL, NULL },
 	{ 113, "Sachen/Hacker/Nina",	mapper113_l_w, NULL, NULL, NULL, NULL, NULL, NULL },
 	{ 118, "MMC3?",					NULL, NULL, NULL, mapper118_w, NULL, NULL, mapper4_irq },
@@ -5479,6 +5553,7 @@ static const mmc mmc_list[] =
 	{ 133, "Sachen",				mapper133_l_w, NULL, NULL, NULL, NULL, NULL, NULL },
 	{ 140, "Jaleco",                        NULL, NULL, mapper_140_m_w, NULL, NULL, NULL, NULL },
 	{ 144, "AGCI 50282",			NULL, NULL, NULL, mapper144_w, NULL, NULL, NULL }, //Death Race only
+	{ 154, "Devil Man",				NULL, NULL, NULL, mapper154_w, NULL, NULL, NULL },
 	{ 180, "Nihon Bussan - PRG HI",	NULL, NULL, NULL, mapper180_w, NULL, NULL, NULL },
 	{ 182, "Super games",			NULL, NULL, NULL, mapper182_w, NULL, NULL, mapper182_irq },
 	{ 184, "Sunsoft VROM/4K",		NULL, NULL, mapper184_m_w, NULL, NULL, NULL, NULL },
