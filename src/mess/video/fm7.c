@@ -367,7 +367,7 @@ static void fm7_alu_function_tilepaint(UINT32 offset)
 {
 	// TILEPAINT - writes to VRAM based on the tilepaint colour registers
 	int x;
-	UINT8 dat;
+	UINT8 dat = 0;
 	int page = 0;
 	UINT8 mask;
 	
@@ -1168,11 +1168,20 @@ WRITE8_HANDLER( fm7_sub_ram_ports_banked_w )
 		return;
 
 	if(offset < 0x380)  // work RAM
+	{
 		RAM[0x1d000+offset] = data;
+		return;
+	}
 	if(offset >= 0x380 && offset < 0x400) // shared RAM
+	{
 		shared_ram[offset-0x380] = data;
+		return;
+	}
 	if(offset >= 0x500 && offset < 0x800) // work RAM
+	{
 		RAM[0x1d000+offset] = data;
+		return;
+	}
 		
 	if(offset >= 0x410 && offset <= 0x42b)
 	{
