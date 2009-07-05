@@ -8,6 +8,18 @@ New System Drivers Supported (in no particular order):
 
 
 
+Systems Promoted from GAME_NOT_WORKING:
+---------------------------------------
+- Bondwell 12 [Curt Coder, Tomas Karlsson]
+- Bondwell 14 [Curt Coder, Tomas Karlsson]
+- CCE MC-1000 [Curt Coder]
+- TI-83 [Xander]
+- KONTIKI 100 [Curt Coder]
+- TIKI 100 [Curt Coder]
+- VCS-80 [Curt Coder]
+
+
+
 Skeleton drivers : 
 ------------------
 - Intel SDK-86
