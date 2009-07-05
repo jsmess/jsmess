@@ -375,11 +375,6 @@ static TIMER_DEVICE_CALLBACK( z80pio_astb_tick )
 	z80pio_astb_w(state->z80pio, state->z80pio_astb);
 }
 
-static void abc80_pio_interrupt(const device_config *device, int state)
-{
-	cputag_set_input_line(device->machine, Z80_TAG, INPUT_LINE_IRQ0, state);
-}
-
 static READ8_DEVICE_HANDLER( abc80_pio_port_a_r )
 {
 	/*
@@ -453,7 +448,7 @@ static WRITE8_DEVICE_HANDLER( abc80_pio_port_b_w )
 
 static const z80pio_interface abc80_pio_intf =
 {
-	DEVCB_LINE(abc80_pio_interrupt),		/* callback when change interrupt status */
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0), /* callback when change interrupt status */
 	DEVCB_HANDLER(abc80_pio_port_a_r),			/* port A read callback */
 	DEVCB_HANDLER(abc80_pio_port_b_r),			/* port B read callback */
 	DEVCB_NULL,						/* port A write callback */
