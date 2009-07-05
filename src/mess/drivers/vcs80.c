@@ -1,76 +1,258 @@
 /***************************************************************************
 
-        VCS-80
+    VCS-80
 
-        12/05/2009 Skeleton driver.
+    12/05/2009 Skeleton driver.
+
+	http://hc-ddr.hucki.net/entwicklungssysteme.htm#VCS_80_von_Eckhard_Schiller
 
 ****************************************************************************/
 
 #include "driver.h"
+#include "includes/vcs80.h"
 #include "cpu/z80/z80.h"
+#include "cpu/z80/z80daisy.h"
+#include "machine/z80pio.h"
+#include "vcs80.lh"
 
-static ADDRESS_MAP_START(vcs80_mem, ADDRESS_SPACE_PROGRAM, 8)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x01ff ) AM_ROM
-	AM_RANGE( 0x0200, 0xffff ) AM_RAM
+/* Read/Write Handlers */
+
+static READ8_DEVICE_HANDLER( vcs80_z80pio_r )
+{
+	switch (offset)
+	{
+	case 0: return z80pio_c_r(device, 1);
+	case 1: return z80pio_c_r(device, 0);
+	case 2: return z80pio_d_r(device, 1);
+	case 3: return z80pio_d_r(device, 0);
+	}
+
+	return 0;
+}
+
+static WRITE8_DEVICE_HANDLER( vcs80_z80pio_w )
+{
+	switch (offset)
+	{
+	case 0: z80pio_c_w(device, 1, data); break;
+	case 1: z80pio_c_w(device, 0, data); break;
+	case 2: z80pio_d_w(device, 1, data); break;
+	case 3: z80pio_d_w(device, 0, data); break;
+	}
+}
+
+/* Memory Maps */
+
+static ADDRESS_MAP_START( vcs80_mem, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x01ff) AM_ROM
+	AM_RANGE(0x0400, 0x07ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vcs80_io , ADDRESS_SPACE_IO, 8)
-	ADDRESS_MAP_UNMAP_HIGH
+static ADDRESS_MAP_START( vcs80_io, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE(Z80PIO_TAG, vcs80_z80pio_r, vcs80_z80pio_w)
 ADDRESS_MAP_END
 
-/* Input ports */
+/* Input Ports */
+
 static INPUT_PORTS_START( vcs80 )
+	PORT_START("ROW0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CHAR('0')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CHAR('5')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CHAR('6')
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7')
+
+	PORT_START("ROW1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CHAR('9')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('A')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('B')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('C')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('D')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('E')
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F')
+
+	PORT_START("ROW2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("A+") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("A-") PORT_CODE(KEYCODE_F2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("MA") PORT_CODE(KEYCODE_F3)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RE") PORT_CODE(KEYCODE_F4)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("GO") PORT_CODE(KEYCODE_F5)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("TR") PORT_CODE(KEYCODE_F6)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("ST") PORT_CODE(KEYCODE_F7)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("PE") PORT_CODE(KEYCODE_F8)
 INPUT_PORTS_END
 
+/* Keyboard HACK */
 
-static MACHINE_RESET(vcs80)
+static TIMER_DEVICE_CALLBACK( vcs80_keyboard_tick )
 {
+	vcs80_state *state = timer->machine->driver_data;
+
+	UINT8 data = 0xf7;
+
+	if (!BIT(input_port_read(timer->machine, "ROW0"), state->keylatch)) data &= ~0x10;
+	if (!BIT(input_port_read(timer->machine, "ROW1"), state->keylatch)) data &= ~0x20;
+	if (!BIT(input_port_read(timer->machine, "ROW2"), state->keylatch)) data &= ~0x40;
+
+	z80pio_p_w(state->z80pio, 0, data);
+
+	z80pio_p_w(state->z80pio, 1, 0x80);
+	z80pio_p_w(state->z80pio, 1, 0x00);
 }
 
-static VIDEO_START( vcs80 )
+/* Z80-PIO Interface */
+
+static READ8_DEVICE_HANDLER( pio_port_a_r )
 {
+	/*
+		
+		bit		description
+
+		0		keyboard and led latch bit 0
+		1		keyboard and led latch bit 1
+		2		keyboard and led latch bit 2
+		3		GND
+		4		keyboard row input 0
+		5		keyboard row input 1
+		6		keyboard row input 2
+		7		demultiplexer clock output
+
+	*/
+
+	vcs80_state *state = device->machine->driver_data;
+
+	UINT8 data = 0xf7;
+
+	if (!BIT(input_port_read(device->machine, "ROW0"), state->keylatch)) data &= ~0x10;
+	if (!BIT(input_port_read(device->machine, "ROW1"), state->keylatch)) data &= ~0x20;
+	if (!BIT(input_port_read(device->machine, "ROW2"), state->keylatch)) data &= ~0x40;
+
+	return data;
 }
 
-static VIDEO_UPDATE( vcs80 )
+static WRITE8_DEVICE_HANDLER( pio_port_a_w )
 {
-    return 0;
+	/*
+		
+		bit		description
+
+		0		keyboard and led latch bit 0
+		1		keyboard and led latch bit 1
+		2		keyboard and led latch bit 2
+		3		GND
+		4		keyboard row input 0
+		5		keyboard row input 1
+		6		keyboard row input 2
+		7		demultiplexer clock output
+
+	*/
+
+	vcs80_state *state = device->machine->driver_data;
+
+	state->keylatch = data & 0x07;
 }
+
+static WRITE8_DEVICE_HANDLER( pio_port_b_w )
+{
+	/*
+		
+		bit		description
+
+		0		VQD30 segment A
+		1		VQD30 segment B
+		2		VQD30 segment C
+		3		VQD30 segment D
+		4		VQD30 segment E
+		5		VQD30 segment F
+		6		VQD30 segment G
+		7		PIO B/_A
+
+	*/
+
+	vcs80_state *state = device->machine->driver_data;
+
+	int digit = state->keylatch;
+
+	/* skip middle digit */
+	if (digit > 3) digit++;
+
+	output_set_digit_value(digit, data & 0x7f);
+}
+
+static const z80pio_interface pio_intf =
+{
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* callback when change interrupt status */
+	DEVCB_HANDLER(pio_port_a_r),	/* port A read callback */
+	DEVCB_NULL,						/* port B read callback */
+	DEVCB_HANDLER(pio_port_a_w),	/* port A write callback */
+	DEVCB_HANDLER(pio_port_b_w),	/* port B write callback */
+	DEVCB_NULL,						/* portA ready active callback */
+	DEVCB_NULL						/* portB ready active callback */
+};
+
+/* Z80 Daisy Chain */
+
+static const z80_daisy_chain vcs80_daisy_chain[] =
+{
+	{ Z80PIO_TAG },
+	{ NULL }
+};
+
+/* Machine Initialization */
+
+static MACHINE_START(vcs80)
+{
+	vcs80_state *state = machine->driver_data;
+
+	/* find devices */
+	state->z80pio = devtag_get_device(machine, Z80PIO_TAG);
+
+	/* register for state saving */
+	state_save_register_global(machine, state->keylatch);
+}
+
+/* Machine Driver */
 
 static MACHINE_DRIVER_START( vcs80 )
-    /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
+	MDRV_DRIVER_DATA(vcs80_state)
+
+	/* basic machine hardware */
+    MDRV_CPU_ADD(Z80_TAG, Z80, XTAL_5MHz/2) /* U880D */
     MDRV_CPU_PROGRAM_MAP(vcs80_mem)
     MDRV_CPU_IO_MAP(vcs80_io)
+	MDRV_CPU_CONFIG(vcs80_daisy_chain)
 
-    MDRV_MACHINE_RESET(vcs80)
+    MDRV_MACHINE_START(vcs80)
+
+	/* keyboard HACK */
+	MDRV_TIMER_ADD_PERIODIC("keyboard", vcs80_keyboard_tick, HZ(1000))
 
     /* video hardware */
-    MDRV_SCREEN_ADD("screen", RASTER)
-    MDRV_SCREEN_REFRESH_RATE(50)
-    MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MDRV_SCREEN_SIZE(640, 480)
-    MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-    MDRV_PALETTE_LENGTH(2)
-    MDRV_PALETTE_INIT(black_and_white)
+	MDRV_DEFAULT_LAYOUT( layout_vcs80 )
 
-    MDRV_VIDEO_START(vcs80)
-    MDRV_VIDEO_UPDATE(vcs80)
+	/* devices */
+	MDRV_Z80PIO_ADD(Z80PIO_TAG, pio_intf)
 MACHINE_DRIVER_END
 
-static SYSTEM_CONFIG_START(vcs80)
-SYSTEM_CONFIG_END
+/* ROMs */
 
-/* ROM definition */
 ROM_START( vcs80 )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-  ROM_LOAD( "monitor.rom", 0x0000, 0x0200, CRC(44aff4e9) SHA1(3472e5a9357eaba3ed6de65dee2b1c6b29349dd2))
-
+	ROM_REGION( 0x10000, Z80_TAG, 0 )
+	ROM_LOAD( "monitor.rom", 0x0000, 0x0200, CRC(44aff4e9) SHA1(3472e5a9357eaba3ed6de65dee2b1c6b29349dd2) )
 ROM_END
 
-/* Driver */
+/* System Configuration */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( ????, vcs80,  0,       0, 	vcs80, 	vcs80, 	 0,  	  vcs80,  	 "Eckhard Schiller",   "VCS-80",		GAME_NOT_WORKING)
+static SYSTEM_CONFIG_START(vcs80)
+	CONFIG_RAM_DEFAULT( 1 * 1024 )
+SYSTEM_CONFIG_END
 
+/* System Drivers */
+
+/*    YEAR	NAME	PARENT	COMPAT	MACHINE	INPUT	INIT	CONFIG	COMPANY				FULLNAME	FLAGS */
+COMP( 1983, vcs80,  0,		0,		vcs80,	vcs80,	0,		vcs80,	"Eckhard Schiller",	"VCS-80",	GAME_NOT_WORKING)
