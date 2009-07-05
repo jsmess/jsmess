@@ -27,6 +27,7 @@ struct fm7_alu_flags
 	UINT16 x1;
 	UINT16 y0;
 	UINT16 y1;
+	UINT8 busy;
 } fm7_alu;
 
 extern UINT8* fm7_video_ram;
@@ -335,6 +336,33 @@ static void fm7_alu_function_not(UINT32 offset)
 	}
 }
 
+static void fm7_alu_function_invalid(UINT32 offset)
+{
+	// Invalid function, still does something though (used by Laydock)
+	int x;
+	UINT8 dat;
+	int page = 0;
+	UINT8 mask;
+	
+	if(fm7_alu.command & 0x40)
+		fm7_alu_function_compare(offset);
+	
+	if(offset >= 0xc000)
+		page = 1;
+	
+	for(x=0;x<3;x++) // cycle through banks
+	{
+		if(!(fm7_alu.bank_disable & (1 << x)))
+		{
+			mask = (fm7_video_ram[(offset & 0x3fff) + (x * 0x4000) + (page * 0xc000)]);
+			
+			dat = mask & fm7_alu.mask;
+				
+			fm7_video_ram[(offset & 0x3fff) + (x * 0x4000) + (page * 0xc000)] = dat;
+		}
+	}
+}
+
 static void fm7_alu_function_tilepaint(UINT32 offset)
 {
 	// TILEPAINT - writes to VRAM based on the tilepaint colour registers
@@ -401,7 +429,7 @@ static void fm7_alu_function(UINT32 offset)
 			break;
 		case 0x01:
 		default:
-			popmessage("ALU: Invalid draw mode %i used\n",fm7_alu.command & 0x07);
+			fm7_alu_function_invalid(offset);
 	}
 }
 
