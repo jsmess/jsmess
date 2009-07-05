@@ -201,11 +201,22 @@ static void abc80_keyboard_scan(running_machine *machine)
 		{
 			if (BIT(data, col))
 			{
-				/* latch key data */
-				state->key_data = abc80_keycodes[row + (table * 7)][col];
+				UINT8 keydata = abc80_keycodes[row + (table * 7)][col];
 
-				/* set key strobe */
-				state->key_strobe = 1;
+				if (state->key_data != keydata)
+				{
+					UINT8 pio_data = 0x80 | keydata;
+
+					/* latch key data */
+					state->key_data = keydata;
+
+					/* set key strobe */
+					state->key_strobe = 1;
+
+					z80pio_p_w(state->z80pio, 0, pio_data);
+
+					return;
+				}
 			}
 		}
 	}
