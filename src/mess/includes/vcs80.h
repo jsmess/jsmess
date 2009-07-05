@@ -10,6 +10,7 @@ struct _vcs80_state
 {
 	/* keyboard state */
 	int keylatch;
+	int keyclk;
 
 	/* devices */
 	const device_config *z80pio;

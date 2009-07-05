@@ -47,6 +47,8 @@ System Driver Changes:
   
 - [TIKI100] System is now working, except for double sided disks. [Curt Coder]
 
+- [VCS80] System is now fully working. [Curt Coder]
+
 
 
 User Interface Changes:

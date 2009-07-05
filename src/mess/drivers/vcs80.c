@@ -77,23 +77,46 @@ static INPUT_PORTS_START( vcs80 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F')
 
 	PORT_START("ROW2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("A+") PORT_CODE(KEYCODE_F1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("A-") PORT_CODE(KEYCODE_F2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("MA") PORT_CODE(KEYCODE_F3)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RE") PORT_CODE(KEYCODE_F4)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("GO") PORT_CODE(KEYCODE_F5)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("TR") PORT_CODE(KEYCODE_F6)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("ST") PORT_CODE(KEYCODE_F7)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("PE") PORT_CODE(KEYCODE_F8)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("A+") PORT_CODE(KEYCODE_UP)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("A-") PORT_CODE(KEYCODE_DOWN)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("MA") PORT_CODE(KEYCODE_M)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RE") PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("GO") PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("TR") PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("ST") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("PE") PORT_CODE(KEYCODE_P)
 INPUT_PORTS_END
 
-/* Keyboard HACK */
+/* Z80-PIO Interface */
 
 static TIMER_DEVICE_CALLBACK( vcs80_keyboard_tick )
 {
+	/*
+		
+		bit		description
+
+		PA0		keyboard and led latch bit 0
+		PA1		keyboard and led latch bit 1
+		PA2		keyboard and led latch bit 2
+		PA3		GND
+		PA4		keyboard row input 0
+		PA5		keyboard row input 1
+		PA6		keyboard row input 2
+		PA7		demultiplexer clock input
+
+	*/
+
 	vcs80_state *state = timer->machine->driver_data;
 
-	UINT8 data = 0xf7;
+	UINT8 data = 0;
+
+	if (state->keyclk)
+	{
+		state->keylatch++;
+		state->keylatch &= 0x07;
+	}
+
+	data = (state->keyclk << 7) | 0x70 | state->keylatch;
 
 	if (!BIT(input_port_read(timer->machine, "ROW0"), state->keylatch)) data &= ~0x10;
 	if (!BIT(input_port_read(timer->machine, "ROW1"), state->keylatch)) data &= ~0x20;
@@ -101,60 +124,7 @@ static TIMER_DEVICE_CALLBACK( vcs80_keyboard_tick )
 
 	z80pio_p_w(state->z80pio, 0, data);
 
-	z80pio_p_w(state->z80pio, 1, 0x80);
-	z80pio_p_w(state->z80pio, 1, 0x00);
-}
-
-/* Z80-PIO Interface */
-
-static READ8_DEVICE_HANDLER( pio_port_a_r )
-{
-	/*
-		
-		bit		description
-
-		0		keyboard and led latch bit 0
-		1		keyboard and led latch bit 1
-		2		keyboard and led latch bit 2
-		3		GND
-		4		keyboard row input 0
-		5		keyboard row input 1
-		6		keyboard row input 2
-		7		demultiplexer clock output
-
-	*/
-
-	vcs80_state *state = device->machine->driver_data;
-
-	UINT8 data = 0xf7;
-
-	if (!BIT(input_port_read(device->machine, "ROW0"), state->keylatch)) data &= ~0x10;
-	if (!BIT(input_port_read(device->machine, "ROW1"), state->keylatch)) data &= ~0x20;
-	if (!BIT(input_port_read(device->machine, "ROW2"), state->keylatch)) data &= ~0x40;
-
-	return data;
-}
-
-static WRITE8_DEVICE_HANDLER( pio_port_a_w )
-{
-	/*
-		
-		bit		description
-
-		0		keyboard and led latch bit 0
-		1		keyboard and led latch bit 1
-		2		keyboard and led latch bit 2
-		3		GND
-		4		keyboard row input 0
-		5		keyboard row input 1
-		6		keyboard row input 2
-		7		demultiplexer clock output
-
-	*/
-
-	vcs80_state *state = device->machine->driver_data;
-
-	state->keylatch = data & 0x07;
+	state->keyclk = !state->keyclk;
 }
 
 static WRITE8_DEVICE_HANDLER( pio_port_b_w )
@@ -163,33 +133,34 @@ static WRITE8_DEVICE_HANDLER( pio_port_b_w )
 		
 		bit		description
 
-		0		VQD30 segment A
-		1		VQD30 segment B
-		2		VQD30 segment C
-		3		VQD30 segment D
-		4		VQD30 segment E
-		5		VQD30 segment F
-		6		VQD30 segment G
-		7		PIO B/_A
+		PB0		VQD30 segment A
+		PB1		VQD30 segment B
+		PB2		VQD30 segment C
+		PB3		VQD30 segment D
+		PB4		VQD30 segment E
+		PB5		VQD30 segment G
+		PB6		VQD30 segment F
+		PB7		_A0
 
 	*/
 
 	vcs80_state *state = device->machine->driver_data;
 
+	UINT8 led_data = BITSWAP8(data & 0x7f, 7, 5, 6, 4, 3, 2, 1, 0);
 	int digit = state->keylatch;
 
 	/* skip middle digit */
 	if (digit > 3) digit++;
 
-	output_set_digit_value(digit, data & 0x7f);
+	output_set_digit_value(8 - digit, led_data);
 }
 
 static const z80pio_interface pio_intf =
 {
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* callback when change interrupt status */
-	DEVCB_HANDLER(pio_port_a_r),	/* port A read callback */
+	DEVCB_NULL,						/* port A read callback */
 	DEVCB_NULL,						/* port B read callback */
-	DEVCB_HANDLER(pio_port_a_w),	/* port A write callback */
+	DEVCB_NULL,						/* port A write callback */
 	DEVCB_HANDLER(pio_port_b_w),	/* port B write callback */
 	DEVCB_NULL,						/* portA ready active callback */
 	DEVCB_NULL						/* portB ready active callback */
@@ -214,6 +185,7 @@ static MACHINE_START(vcs80)
 
 	/* register for state saving */
 	state_save_register_global(machine, state->keylatch);
+	state_save_register_global(machine, state->keyclk);
 }
 
 /* Machine Driver */
@@ -229,7 +201,7 @@ static MACHINE_DRIVER_START( vcs80 )
 
     MDRV_MACHINE_START(vcs80)
 
-	/* keyboard HACK */
+	/* keyboard timer */
 	MDRV_TIMER_ADD_PERIODIC("keyboard", vcs80_keyboard_tick, HZ(1000))
 
     /* video hardware */
@@ -248,11 +220,29 @@ ROM_END
 
 /* System Configuration */
 
-static SYSTEM_CONFIG_START(vcs80)
+static SYSTEM_CONFIG_START( vcs80 )
 	CONFIG_RAM_DEFAULT( 1 * 1024 )
 SYSTEM_CONFIG_END
+
+/* Driver Initialization */
+
+static DIRECT_UPDATE_HANDLER( vcs80_direct_update_handler )
+{
+	vcs80_state *state = space->machine->driver_data;
+
+	/* _A0 is connected to PIO PB7 */
+	z80pio_p_w(state->z80pio, 1, (!BIT(address, 0)) << 7);
+
+	return address;
+}
+
+static DRIVER_INIT( vcs80 )
+{
+	memory_set_direct_update_handler(cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM), vcs80_direct_update_handler);
+	memory_set_direct_update_handler(cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_IO), vcs80_direct_update_handler);
+}
 
 /* System Drivers */
 
 /*    YEAR	NAME	PARENT	COMPAT	MACHINE	INPUT	INIT	CONFIG	COMPANY				FULLNAME	FLAGS */
-COMP( 1983, vcs80,  0,		0,		vcs80,	vcs80,	0,		vcs80,	"Eckhard Schiller",	"VCS-80",	GAME_NOT_WORKING)
+COMP( 1983, vcs80,  0,		0,		vcs80,	vcs80,	vcs80,	vcs80,	"Eckhard Schiller",	"VCS-80",	GAME_SUPPORTS_SAVE )
