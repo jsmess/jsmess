@@ -13,6 +13,7 @@ Systems Promoted from GAME_NOT_WORKING:
 - Bondwell 12 [Curt Coder, Tomas Karlsson]
 - Bondwell 14 [Curt Coder, Tomas Karlsson]
 - CCE MC-1000 [Curt Coder]
+- C-80 [Curt Coder]
 - TI-83 [Xander]
 - KONTIKI 100 [Curt Coder]
 - TIKI 100 [Curt Coder]
@@ -40,6 +41,8 @@ System Driver Changes:
 ----------------------
 - [BW12] System is now fully working. Disk operations are very slow, so set
   maximum speed to unlimited while loading. [Curt Coder, Tomas Karlsson]
+
+- [C80] System is now fully working. [Curt Coder]
 
 - [EINSTEIN] Largely rewritten and lots of cleanups.  [Dirk Best]
 
