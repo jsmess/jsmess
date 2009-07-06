@@ -159,7 +159,7 @@ static const z80pio_interface pio2_intf =
 	DEVCB_NULL						/* portB ready active callback */
 };
 
-/* Z80-PIO Interface */
+/* Z80-SIO Interface */
 
 static const z80sio_interface sio_intf =
 {

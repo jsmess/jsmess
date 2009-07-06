@@ -294,7 +294,7 @@ static const z80_daisy_chain lc80_daisy_chain[] =
 
 /* Machine Initialization */
 
-static MACHINE_START(lc80)
+static MACHINE_START( lc80 )
 {
 	lc80_state *state = machine->driver_data;
 	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
