@@ -12,7 +12,7 @@
 #include "cpu/z80/z80daisy.h"
 #include "machine/z80pio.h"
 #include "devices/cassette.h"
-#include "vcs80.lh"
+#include "c80.lh"
 
 static const device_config *cassette_device_image(running_machine *machine)
 {
@@ -260,7 +260,7 @@ static MACHINE_DRIVER_START( c80 )
     MDRV_MACHINE_START(c80)
 
     /* video hardware */
-	MDRV_DEFAULT_LAYOUT( layout_vcs80 )
+	MDRV_DEFAULT_LAYOUT( layout_c80 )
 
 	/* devices */
 	MDRV_Z80PIO_ADD(Z80PIO1_TAG, pio1_intf)
