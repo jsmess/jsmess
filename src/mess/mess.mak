@@ -1483,6 +1483,7 @@ $(MESS_DRIVERS)/mk2.o:		$(MESS_LAYOUT)/mk2.lh
 $(MESS_DRIVERS)/mpf1.o:		$(MESS_LAYOUT)/mpf1.lh
 $(MESS_DRIVERS)/mmd1.o:		$(MESS_LAYOUT)/mmd1.lh \
 							$(MESS_LAYOUT)/mmd2.lh
+$(MESS_DRIVERS)/poly880.o:	$(MESS_LAYOUT)/poly880.lh
 $(MESS_VIDEO)/pc8401a.o:	$(MESS_LAYOUT)/pc8500.lh
 $(MESS_DRIVERS)/px4.o:		$(MESS_LAYOUT)/px4.lh
 $(MESS_DRIVERS)/socrates.o:	$(MESS_LAYOUT)/socrates.lh
