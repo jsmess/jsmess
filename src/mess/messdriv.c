@@ -716,7 +716,9 @@ const game_driver * const drivers[] =
     DRIVER( kc85_5 )    /* VEB KC 85/5                                      */
     DRIVER( mc8020 )    /* MC 80.2x                                         */
     DRIVER( mc8030 )    /* MC 80.3x                                         */
-
+    DRIVER( lc80 )
+    DRIVER( lc80_2 )
+    DRIVER( sc80 )
 
     /* MICROBEE SYSTEMS */
     DRIVER( mbee )      /* Microbee 16 Standard or Plus                     */
@@ -1366,8 +1368,6 @@ const game_driver * const drivers[] =
     DRIVER( et3400 )
     DRIVER( huebler )
     DRIVER( interact )
-    DRIVER( sc80 )
-    DRIVER( lc80 )
     DRIVER( jr200 )
     DRIVER( h8 )
     DRIVER( h19 )

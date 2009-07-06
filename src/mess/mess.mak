@@ -809,6 +809,8 @@ $(MESSOBJ)/veb.a:      \
 	$(MESS_DRIVERS)/mc80.o     \
 	$(MESS_VIDEO)/mc80.o       \
 	$(MESS_MACHINE)/mc80.o     \
+	$(MESS_DRIVERS)/lc80.o \
+	$(MESS_DRIVERS)/poly880.o \
 
 $(MESSOBJ)/nec.a:	   \
 	$(MAME_VIDEO)/vdc.o	 \
@@ -1424,11 +1426,8 @@ $(MESSOBJ)/skeleton.a: \
 	$(MESS_DRIVERS)/fmtowns.o \
 	$(MESS_DRIVERS)/huebler.o \
 	$(MESS_DRIVERS)/interact.o \
-	$(MESS_DRIVERS)/sc80.o \
-	$(MESS_DRIVERS)/lc80.o \
 	$(MESS_DRIVERS)/jr200.o \
 	$(MESS_DRIVERS)/hec2hrp.o \
-	$(MESS_DRIVERS)/poly880.o \
 	$(MESS_DRIVERS)/sc1.o \
 	$(MESS_DRIVERS)/sc2.o \
 	$(MESS_DRIVERS)/chessmst.o \
@@ -1477,6 +1476,7 @@ $(MESS_DRIVERS)/c80.o:		$(MESS_LAYOUT)/c80.lh
 $(MESS_DRIVERS)/ex800.o:	$(MESS_LAYOUT)/ex800.lh
 $(MESS_DRIVERS)/glasgow.o:	$(MESS_LAYOUT)/glasgow.lh
 $(MESS_DRIVERS)/kim1.o:		$(MESS_LAYOUT)/kim1.lh
+$(MESS_DRIVERS)/lc80.o:		$(MESS_LAYOUT)/lc80.lh
 $(MESS_DRIVERS)/mephisto.o:	$(MESS_LAYOUT)/mephisto.lh
 $(MESS_DRIVERS)/mk1.o:		$(MESS_LAYOUT)/mk1.lh
 $(MESS_DRIVERS)/mk2.o:		$(MESS_LAYOUT)/mk2.lh
