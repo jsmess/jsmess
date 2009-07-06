@@ -472,11 +472,12 @@ ROM_START(laser350)
 ROM_END
 
 
-ROM_START(laser500)
+ROM_START(laser500) // based on the picture at http://www.8bit-museum.de/hardware/laser500pcb-h.jpg
+// There should be two roms, one 0x2000 long for the font at u10, and one longer one for the os rom at u6.
 	ROM_REGION(0x40000,"maincpu",0)
-	ROM_LOAD("laserv3.rom", 0x00000, 0x08000, CRC(9bed01f7) SHA1(3210fddfab2f4c7855fa902fb8e2fc18d10d48f1))
+	ROM_LOAD("27-0401-00-00.u6", 0x00000, 0x08000, CRC(9bed01f7) SHA1(3210fddfab2f4c7855fa902fb8e2fc18d10d48f1)) // may be dumped at wrong size; label is: "VTL 27-0401-00-00 // 6133-7081 // 8611MAK"
 	ROM_REGION(0x00800,"gfx1",0)
-	ROM_LOAD("laser.fnt",   0x00000, 0x00800, CRC(ed6bfb2a) SHA1(95e247021a10167b9de1d6ffc91ec4ba83b0ec87))
+	ROM_LOAD("27-393-00.u10",   0x00000, 0x00800, BAD_DUMP CRC(ed6bfb2a) SHA1(95e247021a10167b9de1d6ffc91ec4ba83b0ec87)) // dumped at wrong size; correct size is 0x2000; label is "TMS 2364-25NL // D8614L // ZA234015 // 27-393-00/VT 85 // SINGAPORE"
 	ROM_REGION(0x00100,"gfx2",ROMREGION_ERASEFF)
 	/* initialized in init_laser */
 ROM_END
