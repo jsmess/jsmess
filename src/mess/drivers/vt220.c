@@ -70,5 +70,7 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( ????, vt220,  0,       0, 	vt220, 	vt220, 	 0,  	  vt220,  	 "DEC",   "VT220",		GAME_NOT_WORKING)
+COMP( 1983, vt220,  0,       0, 	vt220, 	vt220, 	 0,  	  vt220,  	 "DEC",   "VT220",		GAME_NOT_WORKING)
+//COMP( 1983, vt240,  0,       0, 	vt220, 	vt220, 	 0,  	  vt220,  	 "DEC",   "VT240",		GAME_NOT_WORKING)
+//COMP( 1983, vt241,  0,       0, 	vt220, 	vt220, 	 0,  	  vt220,  	 "DEC",   "VT241",		GAME_NOT_WORKING)
 
