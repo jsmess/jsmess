@@ -253,8 +253,12 @@ static READ8_HANDLER( fm7_irq_cause_r )
 static READ8_HANDLER( vector_r )
 {
 	UINT8* RAM = memory_region(space->machine,"maincpu");
+	UINT8* ROM = memory_region(space->machine,"init");
 
-	return RAM[0xfff0+offset];
+	if(init_rom_en)
+		return ROM[0x1ff0+offset];
+	else
+		return RAM[0xfff0+offset];
 }
 
 static WRITE8_HANDLER( vector_w )
@@ -1094,7 +1098,7 @@ static TIMER_CALLBACK( fm7_subtimer_irq )
 }
 
 // When a key is pressed or released, an IRQ is generated on the main CPU,
-// and an FIRQ on the sub CPU.  Both CPUs have ports to read keyboard data.
+// or an FIRQ on the sub CPU, if masked.  Both CPUs have ports to read keyboard data.
 // Scancodes are 9 bits.
 static void key_press(running_machine* machine, UINT16 scancode)
 {
@@ -1597,7 +1601,7 @@ static MACHINE_RESET(fm7)
 	if(fm7_type != SYS_FM7)
 		timer_adjust_oneshot(fm77av_vsync_timer,video_screen_get_time_until_vblank_end(machine->primary_screen),0);
 		
-	irq_mask = 0xff;
+	irq_mask = 0x00;
 	irq_flags = 0x00;
 	fm7_video.attn_irq = 0;
 	fm7_video.sub_busy = 0x80;  // busy at reset

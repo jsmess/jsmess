@@ -1146,11 +1146,10 @@ WRITE8_HANDLER( fm77av_alu_w )
 	{
 		case 0x00:
 			fm7_alu.command = data;
-			// TODO: if bit 7 is active, then start operation
 			logerror("ALU: write to command register - %02x\n",data);
 			break;
 		case 0x01:
-			fm7_alu.lcolour = data & 0x03;
+			fm7_alu.lcolour = data & 0x07;
 			logerror("ALU: write to logical colour - %02x\n",data);
 			break;
 		case 0x02:
@@ -1455,7 +1454,7 @@ VIDEO_UPDATE( fm7 )
 	            {
 	            	col = (((code_b >> b) & 0x01) ? 8 : 0) | (((code_b2 >> b) & 0x01) ? 4 : 0) | (((code_b3 >> b) & 0x01) ? 2 : 0) | (((code_b4 >> b) & 0x01) ? 1 : 0); 
 	            	col |= (((code_g >> b) & 0x01) ? 128 : 0) | (((code_g2 >> b) & 0x01) ? 64 : 0) | (((code_g3 >> b) & 0x01) ? 32 : 0) | (((code_g4 >> b) & 0x01) ? 16 : 0);
-	            	col |= (((code_r >> b) & 0x01) ? 2048 : 0) | (((code_r2 >> b) & 0x01) ? 1024 : 0) | (((code_r3 >> b) & 0x01) ? 512 : 0) | (((code_r4 >> b) & 0x01) ? 256 : 0); 
+	            	col |= (((code_r >> b) & 0x01) ? 2048 : 0) | (((code_r2 >> b) & 0x01) ? 1024 : 0) | (((code_r3 >> b) & 0x01) ? 512 : 0) | (((code_r4 >> b) & 0x01) ? 256 : 0);
 					col += 8;  // use analog palette
 	                *BITMAP_ADDR16(bitmap, y,  x*8+(7-b)) =  col;
 	            }
