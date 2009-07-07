@@ -121,6 +121,11 @@ WRITE8_HANDLER( fm7_vram_access_w )
 	fm7_video.vram_access = 0;
 }
 
+static TIMER_CALLBACK( fm77av_alu_task_end )
+{
+	fm7_alu.busy = 0;
+}
+
 static void fm7_alu_function_compare(UINT32 offset)
 {
 	// COMPARE - compares which colors match those in the compare registers
@@ -431,6 +436,152 @@ static void fm7_alu_function(UINT32 offset)
 		default:
 			fm7_alu_function_invalid(offset);
 	}
+}
+
+static UINT32 fm7_line_set_pixel(int x, int y)
+{
+	UINT32 addr;
+	UINT8 pixel_mask[8] = {0x7f, 0xbf, 0xdf, 0xef, 0xf7, 0xfb, 0xfd, 0xfe };
+	
+	
+	if(fm7_video.modestatus & 0x40) // 320 pixels wide
+	{
+		addr = (x >> 3) + (y * 40);
+	}
+	else  // 640 pixels wide
+	{
+		addr = (x >> 3) + (y * 80);
+	}
+	addr += (fm7_alu.addr_offset << 1);
+	addr &= 0x3fff;
+	if(fm7_video.active_video_page != 0)
+		addr += 0xc000;
+	
+	if(fm7_alu.command & 0x80)  // ALU must be active
+	{
+		fm7_alu.mask = pixel_mask[x & 0x07];
+		fm7_alu_function(addr);
+	}
+	
+	return addr;
+}
+
+static void fm77av_line_draw(running_machine* machine)
+{
+	int x1 = fm7_alu.x0;
+	int x2 = fm7_alu.x1;
+	int y1 = fm7_alu.y0;
+	int y2 = fm7_alu.y1;
+	int horiz,vert;
+	int dirx,diry;
+	int rep;
+	int byte_count = 0;
+	UINT16 old_addr = 0xffff;
+	UINT16 addr;
+	
+	fm7_alu.busy = 1;
+	
+	horiz = x2 - x1;
+	vert = y2 - y1;
+	
+	if(horiz < 0)
+	{
+		dirx = -1;
+		horiz = -horiz;
+	}
+	else
+		dirx = 1;
+	if(vert < 0)
+	{
+		diry = -1;
+		vert = -vert;
+	}
+	else
+		diry = 1;
+		
+	if(horiz == 0 && vert == 0)
+	{
+		fm7_line_set_pixel(x1,y1);
+		byte_count = 1;
+	}
+	else if(horiz == 0)
+	{
+		for(;;)
+		{
+			addr = fm7_line_set_pixel(x1,y1);
+			if(addr != old_addr)
+			{
+				byte_count++;
+				old_addr = addr;
+			}
+			if(y1 == y2)
+				break;
+			y1 += diry;
+		}
+	}
+	else if(vert == 0)
+	{
+		for(;;)
+		{
+			addr = fm7_line_set_pixel(x1,y1);
+			if(addr != old_addr)
+			{
+				byte_count++;
+				old_addr = addr;
+			}
+			if(x1 == x2)
+				break;
+			x1 += dirx;
+		}
+	}
+	else if(horiz >= vert)
+	{
+		rep = horiz >> 1;
+		for(;;)
+		{
+			addr = fm7_line_set_pixel(x1,y1);
+			if(addr != old_addr)
+			{
+				byte_count++;
+				old_addr = addr;
+			}
+			if(x1 == x2)
+				break;
+			x1 += dirx;
+			rep -= vert;
+			if(rep < 0)
+			{
+				rep += horiz;
+				y1 += diry; 
+			}
+		}
+	}
+	else
+	{
+		rep = vert >> 1;
+		for(;;)
+		{
+			addr = fm7_line_set_pixel(x1,y1);
+			if(addr != old_addr)
+			{
+				byte_count++;
+				old_addr = addr;
+			}
+			if(y1 == y2)
+				break;
+			y1 += diry;
+			rep -= horiz;
+			if(rep < 0)
+			{
+				rep += vert;
+				x1 += dirx; 
+			}
+		}
+	}
+	
+	// set timer to disable busy flag
+	// 1/16 us for each byte changed
+	timer_set(machine,ATTOTIME_IN_USEC(byte_count/16),NULL,0,fm77av_alu_task_end);
 }
 
 READ8_HANDLER( fm7_vram_r )
@@ -798,7 +949,7 @@ WRITE8_HANDLER( fm77av_analog_palette_w )
  *   Sub CPU: 0xd430 - BUSY/NMI/Bank register (FM77AV series only)
  * 
  *   On read:  bit 7 - 0 if in VBlank
- *             bit 4 - busy(0)/ready(1)
+ *             bit 4 - ALU busy(0)/ready(1)
  *             bit 2 - VSync status (1 if active?)
  *             bit 0 - RESET
  * 
@@ -814,6 +965,9 @@ READ8_HANDLER( fm77av_video_flags_r )
 	
 	if(video_screen_get_vblank(space->machine->primary_screen))
 		ret &= ~0x80;
+	
+	if(fm7_alu.busy != 0)
+		ret &= ~0x10;
 	
 	if(fm7_video.vsync_flag == 0)
 		ret &= ~0x04;
@@ -1088,6 +1242,8 @@ WRITE8_HANDLER( fm77av_alu_w )
 		case 0x1b:
 			dat = (fm7_alu.y1 & 0xff00) | data;
 			fm7_alu.y1 = dat;
+			// draw line
+			fm77av_line_draw(space->machine);
 			logerror("ALU: write to Y1 (low) register - %02x (%04x)\n",data,fm7_alu.y1);
 			break;
 		default:

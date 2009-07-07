@@ -1238,7 +1238,7 @@ void fm77av_fmirq(const device_config* device,int irq)
 	}
 	else
 	{
-//		cputag_set_input_line(device->machine,"maincpu",M6809_IRQ_LINE,CLEAR_LINE);
+		cputag_set_input_line(device->machine,"maincpu",M6809_IRQ_LINE,CLEAR_LINE);
 		fm77av_ym_irq = 0;
 	}
 }
