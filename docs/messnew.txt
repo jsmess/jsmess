@@ -14,6 +14,9 @@ Systems Promoted from GAME_NOT_WORKING:
 - Bondwell 14 [Curt Coder, Tomas Karlsson]
 - CCE MC-1000 [Curt Coder]
 - C-80 [Curt Coder]
+- Lerncomputer LC-80 [Curt Coder]
+- Lerncomputer LC-80.2 [Curt Coder]
+- Poly-Computer 880 [Curt Coder]
 - TI-83 [Xander]
 - KONTIKI 100 [Curt Coder]
 - TIKI 100 [Curt Coder]
@@ -48,12 +51,18 @@ System Driver Changes:
 
 - [GENESIS] Save RAM emulation improved for several games (bugs #1691, #1696,
   #1823, #1824) [Enik]
+  
+- [LC80] System is now fully working. [Curt Coder]
 
 - [MC1000] System is now basically working. [Curt Coder]
 
 - [NES] Fixed mappers #88, #193, added mappers #107, #154.  [Heretical One]
 
 - [PC] Renamed bondwell to bw230. [Curt Coder]
+
+- [POLY880] System is now working, except single stepping. [Curt Coder]
+
+- [SC80] Merged with lc80.c. [Curt Coder]
 
 - [SEGA CD] Split up sets and added new dumps. [Justin Kerk, TmEE]
 
