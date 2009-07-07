@@ -37,6 +37,7 @@ Skeleton drivers :
 - DEC VT220
 - DEC VT320
 - DEC VT520
+- PROF-180X
 
 
 

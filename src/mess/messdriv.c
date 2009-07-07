@@ -1320,6 +1320,10 @@ const game_driver * const drivers[] =
     DRIVER( votrtnt ) /* 1980 Votrax Type-'N-Talk */
     DRIVER( votrpss ) /* 1982 Votrax Personal Speech System */
 
+	/* Conitec Datensysteme */
+    DRIVER( prof80 )
+    DRIVER( prof180x )
+
 /****************Games*******************************************************/
     /* Computer Electronic */
     DRIVER( mk1 )       /* Chess Champion MK I                              */
@@ -1405,7 +1409,6 @@ const game_driver * const drivers[] =
     DRIVER( unior)
     DRIVER( vec1200)
     DRIVER( pk6128c)
-    DRIVER( prof80 )
     DRIVER( tvc64 )
     DRIVER( tvc64p )
     DRIVER( tvc64pru )

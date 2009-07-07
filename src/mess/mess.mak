@@ -1402,6 +1402,7 @@ $(MESSOBJ)/xerox.a: \
 
 $(MESSOBJ)/conitec.a: \
 	$(MESS_DRIVERS)/prof80.o \
+	$(MESS_DRIVERS)/prof180x.o \
 	$(MESS_MACHINE)/z80sti.o
 
 $(MESSOBJ)/skeleton.a: \
