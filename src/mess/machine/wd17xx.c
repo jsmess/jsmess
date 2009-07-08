@@ -60,7 +60,7 @@
 	  Setting it to 12usec.
 	  Really, this whole thing needs a complete rewrite.
 
-    2009-July-25 Roberto Lavarone:
+    2009-July-08 Roberto Lavarone:
 	- Fixed a bug in head load flag handling: einstein and samcoupe now working again
 
     TODO:
