@@ -804,6 +804,7 @@ $(MESSOBJ)/epoch.a:				\
 
 $(MESSOBJ)/epson.a:				\
 	$(MESS_DRIVERS)/ex800.o		\
+	$(MESS_DRIVERS)/lx800.o		\
 	$(MESS_DRIVERS)/px4.o		\
 	$(MESS_DRIVERS)/px8.o		\
 	$(MESS_DRIVERS)/qx10.o		\
@@ -1459,6 +1460,7 @@ $(MESS_DRIVERS)/ex800.o:	$(MESS_LAYOUT)/ex800.lh
 $(MESS_DRIVERS)/glasgow.o:	$(MESS_LAYOUT)/glasgow.lh
 $(MESS_DRIVERS)/kim1.o:		$(MESS_LAYOUT)/kim1.lh
 $(MESS_DRIVERS)/lc80.o:		$(MESS_LAYOUT)/lc80.lh
+$(MESS_DRIVERS)/lx800.o:	$(MESS_LAYOUT)/lx800.lh
 $(MESS_DRIVERS)/mephisto.o:	$(MESS_LAYOUT)/mephisto.lh
 $(MESS_DRIVERS)/mk1.o:		$(MESS_LAYOUT)/mk1.lh
 $(MESS_DRIVERS)/mk2.o:		$(MESS_LAYOUT)/mk2.lh

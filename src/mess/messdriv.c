@@ -1349,7 +1349,8 @@ const game_driver * const drivers[] =
 
 /*********** Misc ***********************************************************/
 
-    DRIVER( ex800 )
+    DRIVER( ex800 ) /* Epson EX-800 printer */
+    DRIVER( lx800 ) /* Epson LX-800 printer */
     DRIVER( ssem ) /* Manchester Small-Scale Experimental Machine, "Baby" */
     DRIVER( craft ) /* Craft, by [lft] */
 
@@ -1432,4 +1433,3 @@ const game_driver * const drivers[] =
 	DRIVER( stopthie )
 
 #endif /* DRIVER_RECURSIVE */
-
