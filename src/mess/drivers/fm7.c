@@ -527,7 +527,7 @@ READ8_HANDLER( fm77av_key_encoder_r )
 			break;
 		case 0x01:  // status register
 			if(fm7_encoder.latch != 0)
-				ret &= ~0x7f;
+				ret &= ~0x80;
 			if(fm7_encoder.ack == 0)
 				ret &= ~0x01;
 			break;
@@ -849,7 +849,7 @@ static WRITE8_HANDLER( fm77av_ym_select_w )
 
 static READ8_HANDLER( fm7_psg_data_r )
 {
-	fm7_update_psg(space->machine);
+//	fm7_update_psg(space->machine);
 	return psg_data;
 }
 
@@ -1093,7 +1093,7 @@ static TIMER_CALLBACK( fm7_timer_irq )
 
 static TIMER_CALLBACK( fm7_subtimer_irq )
 {
-//	if(fm7_video.nmi_mask == 0)
+	if(fm7_video.nmi_mask == 0)
 		cputag_set_input_line(machine,"sub",INPUT_LINE_NMI,PULSE_LINE);
 }
 
@@ -1628,6 +1628,8 @@ static MACHINE_RESET(fm7)
 	fm7_mmr.segment = 0;
 	fm7_mmr.enabled = 0;
 	fm77av_ym_irq = 0;
+	fm7_encoder.latch = 0;
+	fm7_encoder.ack = 1;
 	// set boot mode (FM-7 only, AV and later has boot RAM instead)
 	if(fm7_type == SYS_FM7)
 	{
