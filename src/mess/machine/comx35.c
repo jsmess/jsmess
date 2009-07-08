@@ -47,7 +47,7 @@ COMX-35 Disk Controller Card
 PCB Layout
 ----------
 
-???-REV?
+F-001-FD-REV0
 
 	|---------------|
 	|      CN1      |

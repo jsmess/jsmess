@@ -93,5 +93,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT      MACHINE         INPUT            INIT     CONFIG          COMPANY            FULLNAME       FLAGS */
-COMP( ????, xor100,  0,       0, 	xor100, 	xor100, 	 0,  	  xor100,  	 "Xor Data Science", "XOR-100-12", GAME_NOT_WORKING)
+COMP( 1982, xor100,  0,       0, 	xor100, 	xor100, 	 0,  	  xor100,  	 "Xor Data Science", "XOR-100-12", GAME_NOT_WORKING)
 

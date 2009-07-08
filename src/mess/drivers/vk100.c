@@ -77,5 +77,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( ????, vk100,  0,       0, 	vk100, 	vk100, 	 0,  	  vk100,  	 "DEC",   "VK 100",		GAME_NOT_WORKING)
+COMP( 198?, vk100,  0,       0, 	vk100, 	vk100, 	 0,  	  vk100,  	 "DEC",   "VK 100",		GAME_NOT_WORKING)
 
