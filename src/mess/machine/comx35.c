@@ -1,11 +1,53 @@
 /*
 
-COMX-35 Disk Controller Card
+COMX-35E Expansion Box
+(c) 1984 Comx World Operations
 
 PCB Layout
 ----------
 
-xxx-REVx
+F-001-EB-REV0
+
+	 |--------------------------------------|
+	 |	40174		4073	4049	4075	|
+	 |										|
+	 |	ROM			40175	4073	4075	|
+	 |										|
+|----|		-		-		-		-		|
+|			|		|		|		| 7805	|
+|			|		|		|		|		|
+|			|		|		|		|		|
+|C			C		C		C		C		|
+|N			N		N		N		N		|
+|5			1		2		3		4		|
+|			|		|		|		|		|
+|			|		|		|		|		|
+|			|		|		|		|		|
+|			-		-		- LD1	-		|
+|-------------------------------------------|
+
+Notes:
+    All IC's shown.
+
+    ROM     - NEC D2732D-4 4Kx8 EPROM, unlabeled
+    CN1		- COMX-35 bus connector slot 1
+    CN2		- COMX-35 bus connector slot 2
+    CN3		- COMX-35 bus connector slot 3
+    CN4		- COMX-35 bus connector slot 4
+    CN5		- COMX-35 bus PCB edge connector
+    LD1		- LED
+
+*/
+
+/*
+
+COMX-35 Disk Controller Card
+(c) 1984 Comx World Operations
+
+PCB Layout
+----------
+
+???-REV?
 
 	|---------------|
 	|      CN1      |
@@ -36,6 +78,7 @@ Notes:
 /*
 
 COMX-35 80-Column Card
+(c) 1985 Comx World Operations
 
 PCB Layout
 ----------
