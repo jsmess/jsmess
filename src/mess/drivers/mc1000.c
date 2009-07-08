@@ -4,12 +4,6 @@
 
     12/05/2009 Skeleton driver.
 
-	This is running - look at memory at 8000. There's even a flashing cursor.
-
-	The display looks like 32x16 although memory from 8000-97FE is filled with
-	spaces. The character generator rom is missing - unless it uses a 6847.
-	This is a color computer.
-
 	http://ensjo.wikispaces.com/MC-1000+on+JEMU
 
 ****************************************************************************/
