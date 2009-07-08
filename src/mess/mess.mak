@@ -272,6 +272,7 @@ DRVLIBS = \
 	$(MESSOBJ)/dec.a \
 	$(MESSOBJ)/dicksmth.a \
 	$(MESSOBJ)/dragon.a \
+	$(MESSOBJ)/drc.a \
 	$(MESSOBJ)/eaca.a \
 	$(MESSOBJ)/einis.a \
 	$(MESSOBJ)/elektrka.a \
@@ -364,6 +365,7 @@ DRVLIBS = \
 	$(MESSOBJ)/trs.a \
 	$(MESSOBJ)/unisys.a \
 	$(MESSOBJ)/veb.a \
+	$(MESSOBJ)/visual.a \
 	$(MESSOBJ)/votrax.a \
 	$(MESSOBJ)/vtech.a \
 	$(MESSOBJ)/xerox.a \
@@ -758,7 +760,6 @@ $(MESSOBJ)/dec.a:				\
 	$(MESS_DRIVERS)/vt320.o		\
 	$(MESS_DRIVERS)/vt520.o		\
 	$(MESS_VIDEO)/vtvideo.o		\
-	$(MESS_DRIVERS)/zrt80.o		\
 
 $(MESSOBJ)/dicksmth.a:			\
 	$(MESS_DRIVERS)/super80.o	\
@@ -769,6 +770,9 @@ $(MESSOBJ)/dragon.a:			\
 	$(MESS_MACHINE)/dgn_beta.o	\
 	$(MESS_VIDEO)/dgn_beta.o	\
 	$(MESS_DRIVERS)/dgn_beta.o	\
+
+$(MESSOBJ)/drc.a:				\
+	$(MESS_DRIVERS)/zrt80.o		\
 
 $(MESSOBJ)/eaca.a:				\
 	$(MESS_DRIVERS)/cgenie.o	\
@@ -1395,6 +1399,10 @@ $(MESSOBJ)/veb.a:				\
 	$(MESS_DRIVERS)/sc1.o		\
 	$(MESS_DRIVERS)/sc2.o		\
 
+$(MESSOBJ)/visual.a:			\
+	$(MESS_DRIVERS)/v1050.o		\
+	$(MESS_VIDEO)/v1050.o		\
+
 $(MESSOBJ)/votrax.a:			\
 	$(MESS_DRIVERS)/votrpss.o	\
 	$(MESS_DRIVERS)/votrtnt.o	\
@@ -1427,7 +1435,6 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/interact.o	\
 	$(MESS_DRIVERS)/hec2hrp.o	\
 	$(MESS_DRIVERS)/sys2900.o	\
-	$(MESS_DRIVERS)/v1050.o		\
 	$(MESS_DRIVERS)/xor100.o	\
 	$(MESS_DRIVERS)/iq151.o		\
 	$(MESS_DRIVERS)/ply601.o	\
