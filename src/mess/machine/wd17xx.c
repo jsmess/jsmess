@@ -60,6 +60,9 @@
 	  Setting it to 12usec.
 	  Really, this whole thing needs a complete rewrite.
 
+    2009-July-25 Roberto Lavarone:
+	- Fixed a bug in head load flag handling: einstein and samcoupe now working again
+
     TODO:
         - Multiple record write
         - What happens if a track is read that doesn't have any id's on it?
@@ -1571,7 +1574,7 @@ WRITE8_DEVICE_HANDLER ( wd17xx_command_w )
 	if (w->command_type == TYPE_I)
 	{
 		/* 0 is enable spin up sequence, 1 is disable spin up sequence */
-		if (data & FDC_STEP_HDLOAD)
+		if ((data & FDC_STEP_HDLOAD)==0)
 		{
 			w->status |= STA_1_HD_LOADED;
 			w->hld_count = 2;
