@@ -8,9 +8,45 @@
 
 	- row update
 	- vsync interrupt
-	- attribute RAM
 
 */
+
+/* Video RAM Access */
+
+READ8_HANDLER( v1050_attr_r )
+{
+	v1050_state *state = space->machine->driver_data;
+
+	return state->attr;
+}
+
+WRITE8_HANDLER( v1050_attr_w )
+{
+	v1050_state *state = space->machine->driver_data;
+
+	state->attr = data;
+}
+
+READ8_HANDLER( v1050_videoram_r )
+{
+	v1050_state *state = space->machine->driver_data;
+
+	state->attr = (state->attr & 0xfc) | (state->attr_ram[offset] & 0x03);
+
+	return state->video_ram[offset];
+}
+
+WRITE8_HANDLER( v1050_videoram_w )
+{
+	v1050_state *state = space->machine->driver_data;
+
+	state->video_ram[offset] = data;
+
+	if (BIT(state->attr, 2))
+	{
+		state->attr_ram[offset] = state->attr & 0x03;
+	}
+}
 
 /* MC6845 Interface */
 
@@ -22,8 +58,8 @@ static MC6845_UPDATE_ROW( v1050_update_row )
 
 	for (column = 0; column < x_count; column++)
 	{
-		UINT16 address = ((ma + column) << 5) | ra;
-		UINT8 data = state->video_ram[address & 0x5fff];
+		UINT16 address = ((ra & 0x03) << 13) | (ma + column);
+		UINT8 data = state->video_ram[address & V1050_VIDEORAM_MASK];
 
 		for (bit = 0; bit < 8; bit++)
 		{
@@ -34,6 +70,8 @@ static MC6845_UPDATE_ROW( v1050_update_row )
 
 			data <<= 1;
 		}
+
+		//logerror("MA %04x RA %01x addr %04x y %u\n", ma, ra, address, y);
 	}
 }
 
@@ -72,8 +110,12 @@ static VIDEO_START( v1050 )
 	/* find devices */
 	state->mc6845 = devtag_get_device(machine, HD6845_TAG);
 
+	/* allocate memory */
+	state->attr_ram = auto_alloc_array(machine, UINT8, V1050_VIDEORAM_SIZE);
+
 	/* register for state saving */
 //	state_save_register_global(machine, state->);
+	state_save_register_global_pointer(machine, state->attr_ram, V1050_VIDEORAM_SIZE);
 }
 
 /* Video Update */
