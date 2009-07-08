@@ -185,7 +185,12 @@ static void fm7_alu_function_pset(UINT32 offset)
 		fm7_alu_function_compare(offset);
 	
 	if(offset >= 0xc000)
+	{
 		page = 1;
+		offset += fm7_video.vram_offset2;
+	}
+	else
+		offset += fm7_video.vram_offset;
 	
 	for(x=0;x<3;x++) // cycle through banks
 	{
@@ -604,7 +609,10 @@ READ8_HANDLER( fm7_vram_r )
 		fm7_alu_function(offset+page);
 	}
 	
-	offs = (offset & 0xc000) | ((offset + fm7_video.vram_offset) & 0x3fff);
+	if(fm7_video.active_video_page != 0)
+		offs = (offset & 0xc000) | ((offset + fm7_video.vram_offset2) & 0x3fff);
+	else
+		offs = (offset & 0xc000) | ((offset + fm7_video.vram_offset) & 0x3fff);
 	return fm7_video_ram[offs + page];
 }
 
@@ -629,7 +637,10 @@ WRITE8_HANDLER( fm7_vram_w )
 		return;
 	}
 		
-	offs = (offset & 0xc000) | ((offset + fm7_video.vram_offset) & 0x3fff);
+	if(fm7_video.active_video_page != 0)
+		offs = (offset & 0xc000) | ((offset + fm7_video.vram_offset2) & 0x3fff);
+	else
+		offs = (offset & 0xc000) | ((offset + fm7_video.vram_offset) & 0x3fff);
 	if(fm7_video.vram_access != 0)
 		fm7_video_ram[offs+page] = data;
 }
@@ -659,7 +670,10 @@ WRITE8_HANDLER( fm7_vram_banked_w )
 		return;
 	}
 	
-	offs = (offset & 0xc000) | ((offset + fm7_video.vram_offset) & 0x3fff);
+	if(fm7_video.active_video_page != 0)
+		offs = (offset & 0xc000) | ((offset + fm7_video.vram_offset2) & 0x3fff);
+	else
+		offs = (offset & 0xc000) | ((offset + fm7_video.vram_offset) & 0x3fff);
 	fm7_video_ram[offs+page] = data;
 }
 
@@ -837,21 +851,37 @@ WRITE8_HANDLER( fm7_vram_offset_w )
 	switch(offset)
 	{
 		case 0:
-			new_offset = ((data & 0x3f) << 8) | (fm7_video.vram_offset & 0x00ff); 
+			if(fm7_video.active_video_page != 0)
+				new_offset = ((data & 0x3f) << 8) | (fm7_video.vram_offset2 & 0x00ff);
+			else
+				new_offset = ((data & 0x3f) << 8) | (fm7_video.vram_offset & 0x00ff); 
 			break;
 		case 1:  // low 5 bits are used on FM-77AV and later only
 			if(fm7_type == SYS_FM7)
 				new_offset = (fm7_video.vram_offset & 0xff00) | (data & 0xe0);
 			else
 			{
-				if(fm7_video.fine_offset != 0)
-					new_offset = (fm7_video.vram_offset & 0xff00) | (data & 0xff);
+				if(fm7_video.active_video_page != 0)
+				{
+					if(fm7_video.fine_offset != 0)
+						new_offset = (fm7_video.vram_offset2 & 0xff00) | (data & 0xff);
+					else
+						new_offset = (fm7_video.vram_offset2 & 0xff00) | (data & 0xe0);
+				}
 				else
-					new_offset = (fm7_video.vram_offset & 0xff00) | (data & 0xe0);
+				{
+					if(fm7_video.fine_offset != 0)
+						new_offset = (fm7_video.vram_offset & 0xff00) | (data & 0xff);
+					else
+						new_offset = (fm7_video.vram_offset & 0xff00) | (data & 0xe0);
+				}
 			}
 			break;
 	}	
-	fm7_video.vram_offset = new_offset;
+	if(fm7_video.active_video_page != 0)
+		fm7_video.vram_offset2 = new_offset;
+	else
+		fm7_video.vram_offset = new_offset;
 }
 
 /*
@@ -1396,6 +1426,7 @@ VIDEO_START( fm7 )
 	fm7_video.vram_access = 0;
 	fm7_video.crt_enable = 0;
 	fm7_video.vram_offset = 0x0000;
+	fm7_video.vram_offset2 = 0x0000;
 	fm7_video.sub_reset = 0;
 	fm7_video.multi_page = 0;
 	fm7_video.subrom = 0;
@@ -1433,22 +1464,22 @@ VIDEO_UPDATE( fm7 )
 		    	{
 	            	code_r = fm7_video_ram[0x8000 + ((y*40 + x + fm7_video.vram_offset) & 0x1fff)];
 	            	code_r2 = fm7_video_ram[0xa000 + ((y*40 + x + fm7_video.vram_offset) & 0x1fff)];
-	            	code_r3 = fm7_video_ram[0x14000 + ((y*40 + x + fm7_video.vram_offset) & 0x1fff)];
-	            	code_r4 = fm7_video_ram[0x16000 + ((y*40 + x + fm7_video.vram_offset) & 0x1fff)];
+	            	code_r3 = fm7_video_ram[0x14000 + ((y*40 + x + fm7_video.vram_offset2) & 0x1fff)];
+	            	code_r4 = fm7_video_ram[0x16000 + ((y*40 + x + fm7_video.vram_offset2) & 0x1fff)];
 		    	}
 		    	if(!(fm7_video.multi_page & 0x20))
 		    	{
 	    	        code_g = fm7_video_ram[0x4000 + ((y*40 + x + fm7_video.vram_offset) & 0x1fff)];
 	    	        code_g2 = fm7_video_ram[0x6000 + ((y*40 + x + fm7_video.vram_offset) & 0x1fff)];
-	            	code_g3 = fm7_video_ram[0x10000 + ((y*40 + x + fm7_video.vram_offset) & 0x1fff)];
-	            	code_g4 = fm7_video_ram[0x12000 + ((y*40 + x + fm7_video.vram_offset) & 0x1fff)];
+	            	code_g3 = fm7_video_ram[0x10000 + ((y*40 + x + fm7_video.vram_offset2) & 0x1fff)];
+	            	code_g4 = fm7_video_ram[0x12000 + ((y*40 + x + fm7_video.vram_offset2) & 0x1fff)];
 		    	}
 		    	if(!(fm7_video.multi_page & 0x10))
 		    	{
 		            code_b = fm7_video_ram[0x0000 + ((y*40 + x + fm7_video.vram_offset) & 0x1fff)];
 		            code_b2 = fm7_video_ram[0x2000 + ((y*40 + x + fm7_video.vram_offset) & 0x1fff)];
-	            	code_b3 = fm7_video_ram[0xc000 + ((y*40 + x + fm7_video.vram_offset) & 0x1fff)];
-	            	code_b4 = fm7_video_ram[0xe000 + ((y*40 + x + fm7_video.vram_offset) & 0x1fff)];
+	            	code_b3 = fm7_video_ram[0xc000 + ((y*40 + x + fm7_video.vram_offset2) & 0x1fff)];
+	            	code_b4 = fm7_video_ram[0xe000 + ((y*40 + x + fm7_video.vram_offset2) & 0x1fff)];
 		    	}
 	            for (b = 0; b < 8; b++)
 	            {

@@ -37,6 +37,7 @@ struct fm7_video_flags
 	UINT8 vram_access;  // VRAM access flag
 	UINT8 crt_enable;
 	UINT16 vram_offset;
+	UINT16 vram_offset2;
 	UINT8 fm7_pal[8];
 	UINT16 fm77av_pal_selected;
 	UINT8 fm77av_pal_r[4096];
