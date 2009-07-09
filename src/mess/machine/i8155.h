@@ -1,6 +1,6 @@
 /**********************************************************************
 
-    8155 - 2048-Bit Static MOS RAM with I/O Ports and Timer emulation
+    Intel 8155 - 2048-Bit Static MOS RAM with I/O Ports and Timer emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -30,8 +30,8 @@
 
 **********************************************************************/
 
-#ifndef __PIO8155__
-#define __PIO8155__
+#ifndef __I8155__
+#define __I8155__
 
 #include "driver.h"
 #include "devcb.h"
@@ -40,21 +40,21 @@
     MACROS / CONSTANTS
 ***************************************************************************/
 
-#define PIO8155 DEVICE_GET_INFO_NAME( pio8155 )
+#define I8155 DEVICE_GET_INFO_NAME( i8155 )
 
-#define MDRV_PIO8155_ADD(_tag, _clock, _config) \
-	MDRV_DEVICE_ADD((_tag), PIO8155, _clock)	\
+#define MDRV_I8155_ADD(_tag, _clock, _config) \
+	MDRV_DEVICE_ADD((_tag), I8155, _clock)	\
 	MDRV_DEVICE_CONFIG(_config)
 
-#define PIO8155_INTERFACE(name) \
-	const pio8155_interface (name) =
+#define I8155_INTERFACE(name) \
+	const i8155_interface (name) =
 
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _pio8155_interface pio8155_interface;
-struct _pio8155_interface
+typedef struct _i8155_interface i8155_interface;
+struct _i8155_interface
 {
 	devcb_read8				in_pa_func;
 	devcb_read8				in_pb_func;
@@ -73,14 +73,14 @@ struct _pio8155_interface
 ***************************************************************************/
 
 /* device interface */
-DEVICE_GET_INFO( pio8155 );
+DEVICE_GET_INFO( i8155 );
 
 /* register access */
-READ8_DEVICE_HANDLER( pio8155_r );
-WRITE8_DEVICE_HANDLER( pio8155_w );
+READ8_DEVICE_HANDLER( i8155_r );
+WRITE8_DEVICE_HANDLER( i8155_w );
 
 /* memory access */
-READ8_DEVICE_HANDLER( pio8155_ram_r );
-WRITE8_DEVICE_HANDLER( pio8155_ram_w );
+READ8_DEVICE_HANDLER( i8155_ram_r );
+WRITE8_DEVICE_HANDLER( i8155_ram_w );
 
 #endif

@@ -4,13 +4,13 @@
 #define SCREEN_TAG		"screen"
 
 #define I8085_TAG		"m19"
-#define PIO8155_TAG		"m25"
+#define I8155_TAG		"m25"
 #define UPD1990A_TAG	"m18"
 #define IM6402_TAG		"m22"
 #define MC14412_TAG		"m31"
 
 //#define I8085_TAG		"m19"
-//#define PIO8155_TAG	"m12"
+//#define I8155_TAG	"m12"
 //#define MC14412_TAG	"m8"
 #define RP5C01A_TAG		"m301"
 #define TCM5089_TAG		"m11"

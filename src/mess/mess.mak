@@ -413,7 +413,6 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/6551.o		\
 	$(MESS_MACHINE)/68901mfp.o	\
 	$(MESS_MACHINE)/74145.o		\
-	$(MESS_MACHINE)/8155pio.o	\
 	$(MESS_MACHINE)/8530scc.o	\
 	$(MESS_MACHINE)/adc080x.o	\
 	$(MESS_MACHINE)/at29040.o	\
@@ -425,6 +424,7 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/d88.o		\
 	$(MESS_MACHINE)/e0516.o		\
 	$(MESS_MACHINE)/hd63450.o   \
+	$(MESS_MACHINE)/i8155.o		\
 	$(MESS_MACHINE)/i82439tx.o	\
 	$(MESS_MACHINE)/i8271.o		\
 	$(MESS_MACHINE)/ins8154.o	\
