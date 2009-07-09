@@ -13,9 +13,7 @@
 	- video
 	- µPB8214 chip
 	- RTC58321 chip
-	- floppy
 	- keyboard
-	- centronics
 	- winchester
 
 */
@@ -27,7 +25,7 @@
 #include "cpu/mcs48/mcs48.h"
 #include "devices/basicdsk.h"
 #include "machine/ctronics.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255a.h"
 #include "machine/msm8251.h"
 #include "machine/wd17xx.h"
 #include "video/mc6845.h"
@@ -101,14 +99,15 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( v1050_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
-//	AM_RANGE(0x84, 0x87) AM_DEVREADWRITE(CRT_Z80_PPI8255_TAG, ppi8255_r, ppi8255_w)
-//	AM_RANGE(0x88, 0x88) AM_DEVREADWRITE(KB_MSM8251_TAG, msm8251_data_r, msm8251_data_w)
-//	AM_RANGE(0x89, 0x89) AM_DEVREADWRITE(KB_MSM8251_TAG, msm8251_status_r, msm8251_control_w)
-//	AM_RANGE(0x8c, 0x8c) AM_DEVREADWRITE(SIO_MSM8251_TAG, msm8251_data_r, msm8251_data_w)
-//	AM_RANGE(0x8d, 0x8d) AM_DEVREADWRITE(SIO_MSM8251_TAG, msm8251_status_r, msm8251_control_w)
-//	AM_RANGE(0x90, 0x93) AM_DEVREADWRITE(FDC_PPI8255_TAG, ppi8255_r, ppi8255_w)
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x84, 0x87) AM_DEVREADWRITE(I8255_DISP_TAG, i8255a_r, i8255a_w)
+//	AM_RANGE(0x88, 0x88) AM_DEVREADWRITE(I8251_KB_TAG, msm8251_data_r, msm8251_data_w)
+//	AM_RANGE(0x89, 0x89) AM_DEVREADWRITE(I8251_KB_TAG, msm8251_status_r, msm8251_control_w)
+//	AM_RANGE(0x8c, 0x8c) AM_DEVREADWRITE(I8251_SIO_TAG, msm8251_data_r, msm8251_data_w)
+//	AM_RANGE(0x8d, 0x8d) AM_DEVREADWRITE(I8251_SIO_TAG, msm8251_status_r, msm8251_control_w)
+	AM_RANGE(0x90, 0x93) AM_DEVREADWRITE(I8255_MISC_TAG, i8255a_r, i8255a_w)
 	AM_RANGE(0x94, 0x97) AM_DEVREADWRITE(MB8877_TAG, wd17xx_r, wd17xx_w)
-//	AM_RANGE(0x9c, 0x9f) AM_DEVREADWRITE(RTC_PPI8255_TAG, ppi8255_r, ppi8255_w)
+	AM_RANGE(0x9c, 0x9f) AM_DEVREADWRITE(I8255_RTC_TAG, i8255a_r, i8255a_w)
 //	AM_RANGE(0xa0, 0xa0) AM_READWRITE(vint_clr_r, vint_clr_w)
 //	AM_RANGE(0xb0, 0xb0) AM_READWRITE(dint_clr_r, dint_clr_w)
 //	AM_RANGE(0xc0, 0xc0) AM_DEVREADWRITE(UPB8214_TAG, pic8214_r, pic8214_w) 
@@ -121,7 +120,7 @@ static ADDRESS_MAP_START( v1050_crt_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x7fff) AM_RAM AM_READWRITE(v1050_videoram_r, v1050_videoram_w) AM_BASE_MEMBER(v1050_state, video_ram)
 	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE(HD6845_TAG, mc6845_address_w)
 	AM_RANGE(0x8001, 0x8001) AM_DEVREADWRITE(HD6845_TAG, mc6845_register_r, mc6845_register_w)
-//	AM_RANGE(0x9000, 0x9003) AM_DEVREADWRITE(CRT_M6502_PPI8255_TAG, ppi8255_r, ppi8255_w)
+	AM_RANGE(0x9000, 0x9003) AM_DEVREADWRITE(I8255_M6502_TAG, i8255a_r, i8255a_w)
 	AM_RANGE(0xa000, 0xa000) AM_READWRITE(v1050_attr_r, v1050_attr_w)
 //	AM_RANGE(0xb000, 0xb000) AM_WRITE(z80int_w)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(dvint_clr_w)
@@ -258,9 +257,47 @@ static INPUT_PORTS_START( v1050 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
 INPUT_PORTS_END
 
+/* Display 8255A Interface */
+
+static WRITE8_DEVICE_HANDLER( crt_z80_ppi8255_c_w )
+{
+	v1050_state *state = device->machine->driver_data;
+
+	i8255a_pc2_w(state->i8255a_crt_m6502, BIT(data, 6));
+	i8255a_pc4_w(state->i8255a_crt_m6502, BIT(data, 7));
+}
+
+static I8255A_INTERFACE( disp_8255_intf )
+{
+	DEVCB_DEVICE_HANDLER(I8255_M6502_TAG, i8255a_pb_r),	// Port A read
+	DEVCB_NULL,								// Port B read
+	DEVCB_NULL,								// Port C read
+	DEVCB_NULL,								// Port A write
+	DEVCB_NULL,								// Port B write
+	DEVCB_HANDLER(crt_z80_ppi8255_c_w)		// Port C write
+};
+
+static WRITE8_DEVICE_HANDLER( crt_m6502_ppi8255_c_w )
+{
+	v1050_state *state = device->machine->driver_data;
+
+	i8255a_pc2_w(state->i8255a_crt_z80, BIT(data, 7));
+	i8255a_pc4_w(state->i8255a_crt_z80, BIT(data, 6));
+}
+
+static I8255A_INTERFACE( m6502_8255_intf )
+{
+	DEVCB_DEVICE_HANDLER(I8255_DISP_TAG, i8255a_pb_r),	// Port A read
+	DEVCB_NULL,								// Port B read
+	DEVCB_NULL,								// Port C read
+	DEVCB_NULL,								// Port A write
+	DEVCB_NULL,								// Port B write
+	DEVCB_HANDLER(crt_m6502_ppi8255_c_w)	// Port C write
+};
+
 /* Miscellanous 8255A Interface */
 
-static WRITE8_DEVICE_HANDLER( misc_ppi8255_a_w )
+static WRITE8_DEVICE_HANDLER( misc_8255_a_w )
 {
 	/*
 
@@ -284,8 +321,8 @@ static WRITE8_DEVICE_HANDLER( misc_ppi8255_a_w )
 	/* floppy drive select */
 	if (BIT(data, 0)) wd17xx_set_drive(state->mb8877, 0);
 	if (BIT(data, 1)) wd17xx_set_drive(state->mb8877, 1);
-	if (BIT(data, 2)) wd17xx_set_drive(state->mb8877, 2);
-	if (BIT(data, 3)) wd17xx_set_drive(state->mb8877, 3);
+//	if (BIT(data, 2)) wd17xx_set_drive(state->mb8877, 2);
+//	if (BIT(data, 3)) wd17xx_set_drive(state->mb8877, 3);
 
 	/* floppy side select */
 	wd17xx_set_side(state->mb8877, BIT(data, 4));
@@ -300,7 +337,7 @@ static WRITE8_DEVICE_HANDLER( misc_ppi8255_a_w )
 	wd17xx_set_density(state->mb8877, BIT(data, 7) ? DEN_FM_LO : DEN_FM_HI);
 }
 
-static READ8_DEVICE_HANDLER( misc_ppi8255_c_r )
+static READ8_DEVICE_HANDLER( misc_8255_c_r )
 {
 	/*
 
@@ -327,7 +364,7 @@ static READ8_DEVICE_HANDLER( misc_ppi8255_c_r )
 	return data;
 }
 
-static WRITE8_DEVICE_HANDLER( misc_ppi8255_c_w )
+static WRITE8_DEVICE_HANDLER( misc_8255_c_w )
 {
 	/*
 
@@ -353,14 +390,86 @@ static WRITE8_DEVICE_HANDLER( misc_ppi8255_c_w )
 	state->f_int_enb = BIT(data, 1);
 }
 
-static const ppi8255_interface misc_ppi8255_intf =
+static I8255A_INTERFACE( misc_8255_intf )
 {
 	DEVCB_NULL,							// Port A read
 	DEVCB_NULL,							// Port B read
-	DEVCB_HANDLER(misc_ppi8255_c_r),	// Port C read
-	DEVCB_HANDLER(misc_ppi8255_a_w),	// Port A write
+	DEVCB_HANDLER(misc_8255_c_r),		// Port C read
+	DEVCB_HANDLER(misc_8255_a_w),		// Port A write
 	DEVCB_DEVICE_HANDLER(CENTRONICS_TAG, centronics_data_w),// Port B write
-	DEVCB_HANDLER(misc_ppi8255_c_w)		// Port C write
+	DEVCB_HANDLER(misc_8255_c_w)		// Port C write
+};
+
+/* Real Time Clock 8255A Interface */
+
+static WRITE8_DEVICE_HANDLER( rtc_8255_b_w )
+{
+	/*
+
+        bit		signal		description
+
+		PB0					RS-232
+        PB1					Winchester
+        PB2					keyboard
+        PB3					floppy disk interrupt
+        PB4					vertical interrupt
+        PB5					display interrupt
+        PB6					expansion B
+        PB7					expansion A
+    
+	*/
+
+	v1050_state *state = device->machine->driver_data;
+
+	state->int_mask = data;
+}
+
+static READ8_DEVICE_HANDLER( rtc_8255_c_r )
+{
+	/*
+
+        bit		signal		description
+
+		PC0     
+        PC1     
+        PC2     
+        PC3					clock busy
+        PC4					clock address write
+        PC5					clock data write
+        PC6					clock data read
+        PC7					clock device select
+    
+	*/
+
+	return 0xff;
+}
+
+static WRITE8_DEVICE_HANDLER( rtc_8255_c_w )
+{
+	/*
+
+        bit		signal		description
+
+		PC0     
+        PC1     
+        PC2     
+        PC3					clock busy
+        PC4					clock address write
+        PC5					clock data write
+        PC6					clock data read
+        PC7					clock device select
+    
+	*/
+}
+
+static I8255A_INTERFACE( rtc_8255_intf )
+{
+	DEVCB_NULL,							// Port A read (RTC data)
+	DEVCB_NULL,							// Port B read
+	DEVCB_HANDLER(rtc_8255_c_r),		// Port C read
+	DEVCB_NULL,							// Port A write (RTC data)
+	DEVCB_HANDLER(rtc_8255_b_w),		// Port B write
+	DEVCB_HANDLER(rtc_8255_c_w)			// Port C write
 };
 
 /* MB8877 Interface */
@@ -403,6 +512,8 @@ static MACHINE_START( v1050 )
 
 	/* find devices */
 	state->upb8214 = devtag_get_device(machine, UPB8214_TAG);
+	state->i8255a_crt_z80 = devtag_get_device(machine, I8255_DISP_TAG);
+	state->i8255a_crt_m6502 = devtag_get_device(machine, I8255_M6502_TAG);
 	state->mb8877 = devtag_get_device(machine, MB8877_TAG);
 	state->centronics = devtag_get_device(machine, CENTRONICS_TAG);
 
@@ -452,8 +563,12 @@ static MACHINE_DRIVER_START( v1050 )
 	MDRV_IMPORT_FROM(v1050_video)
 
 	/* devices */
-	MDRV_PPI8255_ADD(FDC_PPI8255_TAG, misc_ppi8255_intf)
+	MDRV_I8255A_ADD(I8255_DISP_TAG, disp_8255_intf)
+	MDRV_I8255A_ADD(I8255_MISC_TAG, misc_8255_intf)
+	MDRV_I8255A_ADD(I8255_RTC_TAG, rtc_8255_intf)
 	MDRV_WD1793_ADD(MB8877_TAG, v1050_wd17xx_intf )
+
+	MDRV_I8255A_ADD(I8255_M6502_TAG, m6502_8255_intf)
 
 	/* printer */
 	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
@@ -463,10 +578,10 @@ MACHINE_DRIVER_END
 
 ROM_START( v1050 )
 	ROM_REGION( 0x10000, Z80_TAG, 0 )
-	ROM_LOAD( "244-032.u86", 0x0000, 0x2000, CRC(46f847a7) SHA1(374db7a38a9e9230834ce015006e2f1996b9609a) )
+	ROM_LOAD( "e244-032 rev 1.2.u86", 0x0000, 0x2000, CRC(46f847a7) SHA1(374db7a38a9e9230834ce015006e2f1996b9609a) )
 
 	ROM_REGION( 0x10000, M6502_TAG, 0 )
-	ROM_LOAD( "244-033.u77", 0xe000, 0x2000, CRC(c0502b66) SHA1(bc0015f5b14f98110e652eef9f7c57c614683be5) )
+	ROM_LOAD( "e244-033 rev 1.1.u77", 0xe000, 0x2000, CRC(c0502b66) SHA1(bc0015f5b14f98110e652eef9f7c57c614683be5) )
 
 	ROM_REGION( 0x800, I8049_TAG, 0 )
 	ROM_LOAD( "20-08049-410.z5", 0x0000, 0x0800, NO_DUMP )
@@ -478,7 +593,24 @@ ROM_END
 static DEVICE_IMAGE_LOAD( v1050_floppy )
 {
 	if (image_has_been_created(image))
+	{
 		return INIT_FAIL;
+	}
+
+	if (DEVICE_IMAGE_LOAD_NAME(basicdsk_floppy)(image) == INIT_PASS)
+	{
+		switch (image_length(image))
+		{
+		case 80*1*10*512: /* 400KB DSDD */
+			basicdsk_set_geometry(image, 80, 1, 10, 512, 1, 0, FALSE);
+			break;
+
+		default:
+			return INIT_FAIL;
+		}
+
+		return INIT_PASS;
+	}
 
 	return INIT_FAIL;
 }

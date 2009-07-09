@@ -1403,6 +1403,7 @@ $(MESSOBJ)/veb.a:				\
 $(MESSOBJ)/visual.a:			\
 	$(MESS_DRIVERS)/v1050.o		\
 	$(MESS_VIDEO)/v1050.o		\
+	$(MESS_MACHINE)/i8255a.o	\
 
 $(MESSOBJ)/votrax.a:			\
 	$(MESS_DRIVERS)/votrpss.o	\

@@ -7,7 +7,7 @@
 	TODO:
 
 	- row update
-	- vsync interrupt
+	- vsync interrupt to Z80
 
 */
 
