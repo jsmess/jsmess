@@ -641,7 +641,7 @@ WRITE8_HANDLER( fm7_vram_w )
 		offs = (offset & 0xc000) | ((offset + fm7_video.vram_offset2) & 0x3fff);
 	else
 		offs = (offset & 0xc000) | ((offset + fm7_video.vram_offset) & 0x3fff);
-	if(fm7_video.vram_access != 0)
+//	if(fm7_video.vram_access != 0)
 		fm7_video_ram[offs+page] = data;
 }
 
@@ -1110,6 +1110,7 @@ WRITE8_HANDLER( fm77av_sub_bank_w )
 	// reset sub CPU, set busy flag, set reset flag
 	cputag_set_input_line(space->machine,"sub",INPUT_LINE_RESET,PULSE_LINE);
 	fm7_video.sub_busy = 0x80;
+	fm7_video.sub_halt = 0;
 	fm7_video.sub_reset = 1;
 	prev = data;
 }

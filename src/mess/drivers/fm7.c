@@ -1002,7 +1002,7 @@ static void fm7_update_bank(const address_space* space, int bank, UINT8 physical
 		if(init_rom_en)
 		{
 			RAM = memory_region(space->machine,"init");
-			memory_install_readwrite8_handler(space,bank*0x1000,(bank*0x1000)+size,0,0,SMH_BANK(bank+1),SMH_BANK(bank+1));
+			memory_install_readwrite8_handler(space,bank*0x1000,(bank*0x1000)+size,0,0,SMH_BANK(bank+1),SMH_NOP);
 			memory_set_bankptr(space->machine,bank+1,RAM+(physical<<12)-0x36000);
 			return;
 		}
@@ -1012,7 +1012,7 @@ static void fm7_update_bank(const address_space* space, int bank, UINT8 physical
 		if(basic_rom_en)
 		{
 			RAM = memory_region(space->machine,"fbasic");
-			memory_install_readwrite8_handler(space,bank*0x1000,(bank*0x1000)+size,0,0,SMH_BANK(bank+1),SMH_BANK(bank+1));
+			memory_install_readwrite8_handler(space,bank*0x1000,(bank*0x1000)+size,0,0,SMH_BANK(bank+1),SMH_NOP);
 			memory_set_bankptr(space->machine,bank+1,RAM+(physical<<12)-0x38000);
 			return;
 		}
@@ -1026,6 +1026,7 @@ void fm7_mmr_refresh(const address_space* space)
 	int x;
 	UINT16 window_addr;
 	UINT8* RAM = memory_region(space->machine,"maincpu");
+	UINT16 size = 0x3ff;
 	
 	if(fm7_mmr.enabled)
 	{
@@ -1045,8 +1046,10 @@ void fm7_mmr_refresh(const address_space* space)
 		window_addr = ((fm7_mmr.window_offset << 8) + 0x7c00) & 0xffff;
 		if(window_addr < 0xfc00)
 		{
-			memory_install_readwrite8_handler(space,window_addr,window_addr+0x3ff,0,0,SMH_BANK(24),SMH_BANK(24));
-			memory_set_bankptr(space->machine,24,RAM+window_addr);
+			if(window_addr > 0xf800)
+				size = 0xfc00 - window_addr - 1;
+			memory_install_readwrite8_handler(space,window_addr,window_addr+size,0,0,SMH_BANK(24),SMH_BANK(24));
+			memory_set_bankptr(space->machine,24,RAM+window_addr+0x30000);
 		}
 	}
 }
@@ -1093,7 +1096,7 @@ static TIMER_CALLBACK( fm7_timer_irq )
 
 static TIMER_CALLBACK( fm7_subtimer_irq )
 {
-	if(fm7_video.nmi_mask == 0)
+	if(fm7_video.nmi_mask == 0 && fm7_video.sub_halt == 0)
 		cputag_set_input_line(machine,"sub",INPUT_LINE_NMI,PULSE_LINE);
 }
 
@@ -1351,7 +1354,7 @@ static ADDRESS_MAP_START( fm77av_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfd16,0xfd16) AM_READWRITE(fm7_psg_data_r,fm7_psg_data_w)
 	AM_RANGE(0xfd17,0xfd17) AM_READ(fm7_fmirq_r)
 	AM_RANGE(0xfd18,0xfd1f) AM_READWRITE(fm7_fdc_r,fm7_fdc_w)
-	AM_RANGE(0xfd24,0xfd2f) AM_READ(fm7_unknown_r)
+	AM_RANGE(0xfd24,0xfd2b) AM_READ(fm7_unknown_r)
 	AM_RANGE(0xfd30,0xfd34) AM_WRITE(fm77av_analog_palette_w)
 	AM_RANGE(0xfd35,0xfd36) AM_READ(fm7_unknown_r)
 	AM_RANGE(0xfd37,0xfd37) AM_WRITE(fm7_multipage_w)
@@ -1628,7 +1631,7 @@ static MACHINE_RESET(fm7)
 	fm7_mmr.segment = 0;
 	fm7_mmr.enabled = 0;
 	fm77av_ym_irq = 0;
-	fm7_encoder.latch = 0;
+	fm7_encoder.latch = 1;
 	fm7_encoder.ack = 1;
 	// set boot mode (FM-7 only, AV and later has boot RAM instead)
 	if(fm7_type == SYS_FM7)
