@@ -66,7 +66,8 @@ System Driver Changes:
 
 - [SC80] Merged with lc80.c. [Curt Coder]
 
-- [SEGA CD] Split up sets and added new dumps. [Justin Kerk, TmEE]
+- [SEGA CD] Rearranged sets and added new and better dumps. [Justin Kerk, TmEE,
+  segaloco]
 
 - [TI85] TI-83 now works [Xander]
 
