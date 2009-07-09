@@ -13,6 +13,7 @@
 
 	TODO:
 
+	- PROF<>GRIP interface fails if IBFA is cleared after reading PA
 	- keyboard
 	- NE555 timeout is 10x too high
 	- GRIP does not send keys back to PROF-80
@@ -33,7 +34,7 @@
 #include "cpu/z80/z80daisy.h"
 #include "devices/basicdsk.h"
 #include "video/mc6845.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255a.h"
 #include "machine/nec765.h"
 #include "machine/upd1990a.h"
 #include "machine/z80sti.h"
@@ -126,9 +127,8 @@ static void prof80_keyboard_scan(running_machine *machine)
 					state->keydata = keydata;
 
 					/* trigger GRIP 8255 port C bit 2 (_STBB) */
-					ppi8255_set_port_c(state->ppi8255, 0x54);
-					ppi8255_set_port_c(state->ppi8255, 0x50);
-					ppi8255_set_port_c(state->ppi8255, 0x54);
+					i8255a_pc2_w(state->ppi8255, 0);
+					i8255a_pc2_w(state->ppi8255, 1);
 					return;
 				}
 			}
@@ -387,9 +387,8 @@ static READ8_HANDLER( gripd_r )
 	prof80_state *state = space->machine->driver_data;
 
 	/* trigger GRIP 8255 port C bit 6 (_ACKA) */
-	ppi8255_set_port_c(state->ppi8255, 0x54);
-	ppi8255_set_port_c(state->ppi8255, 0x14);
-	ppi8255_set_port_c(state->ppi8255, 0x54);
+	i8255a_pc6_w(state->ppi8255, 0);
+	i8255a_pc6_w(state->ppi8255, 1);
 
 	return state->gripd;
 }
@@ -401,9 +400,8 @@ static WRITE8_HANDLER( gripd_w )
 	state->gripd = data;
 
 	/* trigger GRIP 8255 port C bit 4 (_STBA) */
-	ppi8255_set_port_c(state->ppi8255, 0x54);
-	ppi8255_set_port_c(state->ppi8255, 0x44);
-	ppi8255_set_port_c(state->ppi8255, 0x54);
+	i8255a_pc4_w(state->ppi8255, 0);
+	i8255a_pc4_w(state->ppi8255, 1);
 }
 
 /* GRIP */
@@ -565,7 +563,7 @@ static ADDRESS_MAP_START( grip_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x52, 0x52) AM_DEVWRITE(MC6845_TAG, mc6845_register_w)
 	AM_RANGE(0x53, 0x53) AM_DEVREAD(MC6845_TAG, mc6845_register_r)
 	AM_RANGE(0x60, 0x60) AM_DEVWRITE("centronics", centronics_data_w)
-	AM_RANGE(0x70, 0x73) AM_DEVREADWRITE(PPI8255_TAG, ppi8255_r, ppi8255_w)
+	AM_RANGE(0x70, 0x73) AM_DEVREADWRITE(PPI8255_TAG, i8255a_r, i8255a_w)
 //	AM_RANGE(0x80, 0x80) AM_WRITE(bl2out_w)
 //	AM_RANGE(0x90, 0x90) AM_WRITE(gr2out_w)
 //	AM_RANGE(0xa0, 0xa0) AM_WRITE(rd2out_w)
@@ -600,7 +598,7 @@ static ADDRESS_MAP_START( grip5_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x52, 0x52) AM_DEVWRITE(MC6845_TAG, mc6845_register_w)
 	AM_RANGE(0x53, 0x53) AM_DEVREAD(MC6845_TAG, mc6845_register_r)
 	AM_RANGE(0x60, 0x60) AM_DEVWRITE("centronics", centronics_data_w)
-	AM_RANGE(0x70, 0x73) AM_DEVREADWRITE(PPI8255_TAG, ppi8255_r, ppi8255_w)
+	AM_RANGE(0x70, 0x73) AM_DEVREADWRITE(PPI8255_TAG, i8255a_r, i8255a_w)
 
 //	AM_RANGE(0x80, 0x80) AM_WRITE(xrflgs_w)
 //	AM_RANGE(0xc0, 0xc0) AM_WRITE(xrclrg_w)
@@ -1037,10 +1035,10 @@ static WRITE8_DEVICE_HANDLER( grip_ppi8255_c_w )
 	z80sti_i7_w(state->z80sti, BIT(data, 3));
 
 	/* PROF-80 handshaking */
-	state->gripc = (!BIT(data, 7) << 7) | (!BIT(data, 5) << 6) | (ppi8255_get_port_a(state->ppi8255) & 0x3f);
+	state->gripc = (!BIT(data, 7) << 7) | (!BIT(data, 5) << 6) | (i8255a_pa_r(state->ppi8255, 0) & 0x3f);
 }
 
-static const ppi8255_interface grip_ppi8255_interface =
+static I8255A_INTERFACE( grip_ppi8255_interface )
 {
 	DEVCB_HANDLER(grip_ppi8255_a_r),	// Port A read
 	DEVCB_HANDLER(grip_ppi8255_b_r),	// Port B read
@@ -1217,7 +1215,7 @@ static MACHINE_DRIVER_START( prof80 )
 	/* devices */
 	MDRV_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, prof80_upd1990a_intf)
 	MDRV_NEC765A_ADD(NEC765_TAG, prof80_nec765_interface)
-	MDRV_PPI8255_ADD(PPI8255_TAG, grip_ppi8255_interface)
+	MDRV_I8255A_ADD(PPI8255_TAG, grip_ppi8255_interface)
 	MDRV_Z80STI_ADD(Z80STI_TAG, XTAL_16MHz/4, grip_z80sti_interface)
 
 	/* printer */

@@ -353,6 +353,9 @@ static UINT8 read_mode2(i8255a_t *i8255a)
 	/* clear input buffer full flag */
 	set_ibf(i8255a, PORT_A, 0);
 
+	/* clear interrupt */
+	set_intr(i8255a, PORT_A, 0);
+
 	return data;
 }
 
