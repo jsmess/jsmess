@@ -8,53 +8,126 @@
 
 #include "driver.h"
 #include "cpu/upd7810/upd7810.h"
+#include "machine/e05a03.h"
 #include "sound/beep.h"
 #include "lx800.lh"
 
 
 /***************************************************************************
-    GATE ARRAY
+    TYPE DEFINITIONS
 ***************************************************************************/
 
-static READ8_HANDLER( lx800_ga_r )
+typedef struct _lx800_state lx800_state;
+struct _lx800_state
 {
-	logerror("%s: lx800_ga_r(%02x)\n", cpuexec_describe_context(space->machine), offset);
-
-	return 0xff;
-}
-
-static WRITE8_HANDLER( lx800_ga_w )
-{
-	logerror("%s: lx800_ga_w(%02x): %02x\n", cpuexec_describe_context(space->machine), offset, data);
-}
+	const device_config *speaker;
+};
 
 
 /***************************************************************************
     I/O PORTS
 ***************************************************************************/
 
+/* PA0   W  CRCOM  carriage motor, 0 = holding voltage, 1 = drive voltage
+ * PA1             not used
+ * PA2   W  PFCOM  paper feed motor, 0 = holding voltage, 1 = drive voltage
+ * PA3  R   LF SW  line feed switch
+ * PA4  R   FF SW  form feed switch
+ * PA5  R   PE SW  paper end sensor, 0 = no paper, 1 = paper
+ * PA6             not used
+ * PA7  R   P/S    P/S signal from the optional interface
+ */
 static READ8_HANDLER( lx800_porta_r )
 {
+	UINT8 result = 0;
+
 	logerror("%s: lx800_porta_r(%02x)\n", cpuexec_describe_context(space->machine), offset);
 
-	return 0xff;
+	result |= input_port_read(space->machine, "LINEFEED") << 3;
+	result |= input_port_read(space->machine, "FORMFEED") << 4;
+	result |= 1 << 5;
+
+	result |= 1 << 7;
+
+	return result;
 }
 
 static WRITE8_HANDLER( lx800_porta_w )
 {
 	logerror("%s: lx800_porta_w(%02x): %02x\n", cpuexec_describe_context(space->machine), offset, data);
+	logerror("--> carriage: %d, paper feed: %d\n", BIT(data, 0), BIT(data, 2));
 }
 
+/* PC0   W  TXD        serial i/o txd
+ * PC1  R   RXD        serial i/o rxd
+ * PC2   W  ONLINE LP  online led
+ * PC3  R   ONLINE SW  online switch
+ * PC4   W  ERR        centronics error
+ * PC5   W  ACK        centronics acknowledge
+ * PC6   W  FIRE       drive pulse width signal
+ * PC7   W  BUZZER     buzzer signal
+ */
 static READ8_HANDLER( lx800_portc_r )
 {
+	UINT8 result = 0;
+
 	logerror("%s: lx800_portc_r(%02x)\n", cpuexec_describe_context(space->machine), offset);
 
-	return 0xff;
+	result |= input_port_read(space->machine, "ONLINE") << 3;
+
+	return result;
 }
 
 static WRITE8_HANDLER( lx800_portc_w )
 {
+	lx800_state *lx800 = space->machine->driver_data;
+
 	logerror("%s: lx800_portc_w(%02x): %02x\n", cpuexec_describe_context(space->machine), offset, data);
+	logerror("--> err: %d, ack: %d, fire: %d, buzzer: %d\n", BIT(data, 4), BIT(data, 5), BIT(data, 6), BIT(data, 7));
+
+	output_set_value("online_led", !BIT(data, 2));
+	beep_set_state(lx800->speaker, !BIT(data, 7));
+}
+
+
+/***************************************************************************
+    GATE ARRAY
+***************************************************************************/
+
+static READ8_DEVICE_HANDLER( lx800_centronics_data_r )
+{
+	logerror("centronics: data read\n");
+	return 0x55;
+}
+
+static WRITE_LINE_DEVICE_HANDLER( lx800_centronics_pe_w )
+{
+	logerror("centronics: pe = %d\n", state);
+}
+
+static WRITE_LINE_DEVICE_HANDLER( lx800_paperempty_led_w )
+{
+	output_set_value("paperout_led", state);
+}
+
+static WRITE_LINE_DEVICE_HANDLER( lx800_reset_w )
+{
+	cputag_reset(device->machine, "maincpu");
+}
+
+
+/***************************************************************************
+    MACHINE EMULATION
+***************************************************************************/
+
+static MACHINE_START( lx800 )
+{
+	lx800_state *lx800 = machine->driver_data;
+
+	lx800->speaker = devtag_get_device(machine, "beep");
+
+	beep_set_state(lx800->speaker, 0);
+	beep_set_frequency(lx800->speaker, 4000); /* ? */
 }
 
 
@@ -66,7 +139,7 @@ static ADDRESS_MAP_START( lx800_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM /* 32k firmware */
 	AM_RANGE(0x8000, 0x9fff) AM_RAM /* 8k external RAM */
 	AM_RANGE(0xa000, 0xbfff) AM_NOP /* not used */
-	AM_RANGE(0xc000, 0xdfff) AM_MIRROR(0x1ff8) AM_READWRITE(lx800_ga_r, lx800_ga_w)
+	AM_RANGE(0xc000, 0xdfff) AM_MIRROR(0x1ff8) AM_DEVREADWRITE("ic3b", e05a03_r, e05a03_w)
 	AM_RANGE(0xe000, 0xfeff) AM_NOP /* not used */
 	AM_RANGE(0xff00, 0xffff) AM_RAM /* internal CPU RAM */
 ADDRESS_MAP_END
@@ -83,6 +156,15 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 static INPUT_PORTS_START( lx800 )
+	PORT_START("ONLINE")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("On Line") PORT_CODE(KEYCODE_O)
+
+	PORT_START("FORMFEED")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Form Feed") PORT_CODE(KEYCODE_F)
+
+	PORT_START("LINEFEED")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Line Feed") PORT_CODE(KEYCODE_L)
+
 	PORT_START("DIPSW1")
 	PORT_DIPNAME(0x01, 0x00, "Typeface")
 	PORT_DIPLOCATION("DIP:8")
@@ -145,6 +227,15 @@ static const UPD7810_CONFIG lx800_cpu_config =
     0
 };
 
+static const e05a03_interface lx800_e05a03_intf =
+{
+	DEVCB_HANDLER(lx800_centronics_data_r),
+	DEVCB_NULL,
+	DEVCB_LINE(lx800_paperempty_led_w),
+	DEVCB_LINE(lx800_centronics_pe_w),
+	DEVCB_LINE(lx800_reset_w)
+};
+
 static MACHINE_DRIVER_START( lx800 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", UPD7810, XTAL_14_7456MHz)
@@ -152,12 +243,19 @@ static MACHINE_DRIVER_START( lx800 )
 	MDRV_CPU_PROGRAM_MAP(lx800_mem)
 	MDRV_CPU_IO_MAP(lx800_io)
 
+	MDRV_MACHINE_START(lx800)
+
+	MDRV_DRIVER_DATA(lx800_state)
+
 	MDRV_DEFAULT_LAYOUT(layout_lx800)
 
 	/* audio hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("beep", BEEP, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	/* gate array */
+	MDRV_E05A03_ADD("ic3b", lx800_e05a03_intf)
 MACHINE_DRIVER_END
 
 
@@ -167,7 +265,7 @@ MACHINE_DRIVER_END
 
 ROM_START( lx800 )
     ROM_REGION(0x8000, "maincpu", 0)
-    ROM_LOAD("lx800.bin", 0x0000, 0x8000, CRC(da06c45b) SHA1(9618c940dd10d5b43cd1edd5763b90e6447de667))
+    ROM_LOAD("lx800.ic3c", 0x0000, 0x8000, CRC(da06c45b) SHA1(9618c940dd10d5b43cd1edd5763b90e6447de667))
 ROM_END
 
 
