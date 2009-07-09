@@ -5,7 +5,7 @@
 #define CRT_SCREEN_TAG	"screen2"
 
 #define Z80_TAG			"z80"
-#define PPI8255_TAG		"ppi8255"
+#define I8255A_TAG		"i8255a"
 #define UPD1990A_TAG	"upd1990a"
 #define AY8910_TAG		"ay8910"
 #define SED1330_TAG		"sed1330"

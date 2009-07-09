@@ -2,7 +2,7 @@
 #include "includes/pc8401a.h"
 #include "cpu/z80/z80.h"
 #include "devices/cartslot.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255a.h"
 #include "machine/msm8251.h"
 #include "machine/upd1990a.h"
 #include "video/sed1330.h"
@@ -400,7 +400,7 @@ static ADDRESS_MAP_START( pc8500_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xb0, 0xb3) AM_WRITE(io_rom_addr_w)
 	AM_RANGE(0xb3, 0xb3) AM_READ(io_rom_data_r)
 //	AM_RANGE(0xc8, 0xc8) 
-	AM_RANGE(0xfc, 0xff) AM_DEVREADWRITE(PPI8255_TAG, ppi8255_r, ppi8255_w)
+	AM_RANGE(0xfc, 0xff) AM_DEVREADWRITE(I8255A_TAG, i8255a_r, i8255a_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -551,7 +551,7 @@ static MACHINE_START( pc8401a )
 	state_save_register_global(machine, state->io_addr);
 }
 
-static READ8_DEVICE_HANDLER( pc8401a_ppi8255_c_r )
+static READ8_DEVICE_HANDLER( pc8401a_8255_c_r )
 {
 	/*
 
@@ -571,7 +571,7 @@ static READ8_DEVICE_HANDLER( pc8401a_ppi8255_c_r )
 	return 0;
 }
 
-static WRITE8_DEVICE_HANDLER( pc8401a_ppi8255_c_w )
+static WRITE8_DEVICE_HANDLER( pc8401a_8255_c_w )
 {
 	/*
 
@@ -589,14 +589,14 @@ static WRITE8_DEVICE_HANDLER( pc8401a_ppi8255_c_w )
 	*/
 }
 
-static const ppi8255_interface pc8401a_ppi8255_interface =
+static I8255A_INTERFACE( pc8401a_8255_interface )
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(pc8401a_ppi8255_c_r),
+	DEVCB_HANDLER(pc8401a_8255_c_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(pc8401a_ppi8255_c_w),
+	DEVCB_HANDLER(pc8401a_8255_c_w),
 };
 
 /* uPD1990A Interface */
@@ -646,7 +646,7 @@ static MACHINE_DRIVER_START( common )
 
 	/* devices */
 	MDRV_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, pc8401a_upd1990a_intf)
-	MDRV_PPI8255_ADD(PPI8255_TAG, pc8401a_ppi8255_interface)
+	MDRV_I8255A_ADD(I8255A_TAG, pc8401a_8255_interface)
 	MDRV_MSM8251_ADD(MSM8251_TAG, pc8401a_msm8251_interface)
 
 	/* option ROM cartridge */

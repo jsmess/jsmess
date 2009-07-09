@@ -7,7 +7,7 @@
 #define NEC765_TAG				"z38"
 #define UPD1990A_TAG			"z43"
 #define MC6845_TAG				"z30"
-#define PPI8255_TAG				"z6"
+#define I8255A_TAG				"z6"
 #define Z80STI_TAG				"z9"
 
 #define GRIP_Z80_TAG			"grip_z1"

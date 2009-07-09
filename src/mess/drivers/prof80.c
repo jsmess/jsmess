@@ -563,7 +563,7 @@ static ADDRESS_MAP_START( grip_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x52, 0x52) AM_DEVWRITE(MC6845_TAG, mc6845_register_w)
 	AM_RANGE(0x53, 0x53) AM_DEVREAD(MC6845_TAG, mc6845_register_r)
 	AM_RANGE(0x60, 0x60) AM_DEVWRITE("centronics", centronics_data_w)
-	AM_RANGE(0x70, 0x73) AM_DEVREADWRITE(PPI8255_TAG, i8255a_r, i8255a_w)
+	AM_RANGE(0x70, 0x73) AM_DEVREADWRITE(I8255A_TAG, i8255a_r, i8255a_w)
 //	AM_RANGE(0x80, 0x80) AM_WRITE(bl2out_w)
 //	AM_RANGE(0x90, 0x90) AM_WRITE(gr2out_w)
 //	AM_RANGE(0xa0, 0xa0) AM_WRITE(rd2out_w)
@@ -598,7 +598,7 @@ static ADDRESS_MAP_START( grip5_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x52, 0x52) AM_DEVWRITE(MC6845_TAG, mc6845_register_w)
 	AM_RANGE(0x53, 0x53) AM_DEVREAD(MC6845_TAG, mc6845_register_r)
 	AM_RANGE(0x60, 0x60) AM_DEVWRITE("centronics", centronics_data_w)
-	AM_RANGE(0x70, 0x73) AM_DEVREADWRITE(PPI8255_TAG, i8255a_r, i8255a_w)
+	AM_RANGE(0x70, 0x73) AM_DEVREADWRITE(I8255A_TAG, i8255a_r, i8255a_w)
 
 //	AM_RANGE(0x80, 0x80) AM_WRITE(xrflgs_w)
 //	AM_RANGE(0xc0, 0xc0) AM_WRITE(xrclrg_w)
@@ -1116,7 +1116,7 @@ static MACHINE_START( prof80 )
 	state->nec765 = devtag_get_device(machine, NEC765_TAG);
 	state->upd1990a = devtag_get_device(machine, UPD1990A_TAG);
 	state->mc6845 = devtag_get_device(machine, MC6845_TAG);
-	state->ppi8255 = devtag_get_device(machine, PPI8255_TAG);
+	state->ppi8255 = devtag_get_device(machine, I8255A_TAG);
 	state->z80sti = devtag_get_device(machine, Z80STI_TAG);
 	state->centronics = devtag_get_device(machine, "centronics");
 
@@ -1215,7 +1215,7 @@ static MACHINE_DRIVER_START( prof80 )
 	/* devices */
 	MDRV_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, prof80_upd1990a_intf)
 	MDRV_NEC765A_ADD(NEC765_TAG, prof80_nec765_interface)
-	MDRV_I8255A_ADD(PPI8255_TAG, grip_ppi8255_interface)
+	MDRV_I8255A_ADD(I8255A_TAG, grip_ppi8255_interface)
 	MDRV_Z80STI_ADD(Z80STI_TAG, XTAL_16MHz/4, grip_z80sti_interface)
 
 	/* printer */
