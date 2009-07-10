@@ -26,7 +26,7 @@
 */
 
 #include "driver.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255a.h"
 #include "cpu/z80/z80.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
@@ -112,7 +112,7 @@ static ADDRESS_MAP_START( mpf1_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
 	// The 16 I/O port combinations for the 8255 (P8255A-5, 8628LLP, (c) 1981 AMD)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255", ppi8255_r, ppi8255_w) AM_MIRROR(0x3C)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255", i8255a_r, i8255a_w) AM_MIRROR(0x3C)
 
 //  TODO: create drivers to emulate the following two chips
 //  The 16 I/O port combinations for the CTC (Zilog, Z0843004PSC, Z80 CTC, 8644)
@@ -426,7 +426,7 @@ static WRITE8_DEVICE_HANDLER( mpf1_portc_w )
 
 
 
-static const ppi8255_interface ppi8255_intf =
+static I8255A_INTERFACE( ppi8255_intf )
 {
 	DEVCB_HANDLER(mpf1_porta_r),	/* Port A read */
 	DEVCB_HANDLER(mpf1_portb_r),	/* Port B read */
@@ -463,7 +463,7 @@ static MACHINE_DRIVER_START( mpf1 )
 
 	MDRV_Z80PIO_ADD( "z80pio", mpf1_pio_intf )
 
-	MDRV_PPI8255_ADD( "ppi8255", ppi8255_intf )
+	MDRV_I8255A_ADD( "ppi8255", ppi8255_intf )
 
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -483,7 +483,7 @@ static MACHINE_DRIVER_START( mpf1p )
 
 	MDRV_Z80PIO_ADD( "z80pio", mpf1_pio_intf )
 
-	MDRV_PPI8255_ADD( "ppi8255", ppi8255_intf )
+	MDRV_I8255A_ADD( "ppi8255", ppi8255_intf )
 
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")
