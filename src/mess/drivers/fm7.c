@@ -245,7 +245,7 @@ static READ8_HANDLER( fm7_irq_cause_r )
 {
 	UINT8 ret = ~irq_flags;
 	
-	irq_flags = 0;  // clear flags
+	irq_flags &= ~0x07;  // clear flags
 	logerror("IRQ flags read: 0x%02x\n",ret);
 	return ret;
 }
@@ -885,7 +885,7 @@ static READ8_HANDLER( fm7_fmirq_r )
 {
 	UINT8 ret = 0xff;
 	
-	if(fm77av_ym_irq == 0)
+	if(fm77av_ym_irq != 0)
 		ret &= ~0x08;
 		
 	return ret;
@@ -1236,17 +1236,18 @@ void fm77av_fmirq(const device_config* device,int irq)
 {
 	if(irq == 1)
 	{
-		if(irq_mask & IRQ_FLAG_OTHER)
-		{		
-			irq_flags |= IRQ_FLAG_OTHER;
-			cputag_set_input_line(device->machine,"maincpu",M6809_IRQ_LINE,ASSERT_LINE);
-		}
+		// cannot be masked
+		irq_flags |= IRQ_FLAG_OTHER;
+		cputag_set_input_line(device->machine,"maincpu",M6809_IRQ_LINE,ASSERT_LINE);
 		fm77av_ym_irq = 1;
+		logerror("YM: IRQ on\n");
 	}
 	else
 	{
+		irq_flags &= ~IRQ_FLAG_OTHER;
 		cputag_set_input_line(device->machine,"maincpu",M6809_IRQ_LINE,CLEAR_LINE);
 		fm77av_ym_irq = 0;
+		logerror("YM: IRQ off\n");
 	}
 }
 
