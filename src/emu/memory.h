@@ -2,7 +2,7 @@
 
     memory.h
 
-    Functions which handle the CPU memory accesses.
+    Functions which handle device memory accesses.
 
     Copyright Nicola Salmoria and the MAME Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -15,8 +15,9 @@
 #define __MEMORY_H__
 
 #include "mamecore.h"
-#include "devintrf.h"
 #include "tokenize.h"
+#include "astring.h"
+
 
 
 /***************************************************************************
@@ -26,9 +27,10 @@
 /* address spaces */
 enum
 {
-	ADDRESS_SPACE_PROGRAM = 0,		/* program address space */
-	ADDRESS_SPACE_DATA,				/* data address space */
-	ADDRESS_SPACE_IO,				/* I/O address space */
+	ADDRESS_SPACE_0,				/* first address space */
+	ADDRESS_SPACE_1,				/* second address space */
+	ADDRESS_SPACE_2,				/* third address space */
+	ADDRESS_SPACE_3,				/* fourth address space */
 	ADDRESS_SPACES					/* maximum number of address spaces */
 };
 
@@ -273,7 +275,7 @@ struct _address_space
 {
 	address_space *			next;				/* next address space in the global list */
 	running_machine *		machine;			/* reference to the owning machine */
-	const device_config *	cpu;				/* reference to the owning CPU */
+	const device_config *	cpu;				/* reference to the owning device */
 	address_map *			map;				/* original memory map */
 	const char *			name;				/* friendly name of the address space */
 	UINT8 *					readlookup;			/* live lookup table for reads */
@@ -289,7 +291,6 @@ struct _address_space
 	UINT8					spacenum;			/* address space index */
 	UINT8					endianness;			/* endianness of this space */
 	INT8					ashift;				/* address shift */
-	UINT8					pageshift;			/* page shift */
 	UINT8					abits;				/* address bits */
 	UINT8 					dbits;				/* data bits */
 	UINT8					addrchars;			/* number of characters to use for physical addresses */
@@ -803,14 +804,14 @@ extern const char *const address_space_names[ADDRESS_SPACES];
 /* initialize the memory system */
 void memory_init(running_machine *machine);
 
-/* find an address space in our internal list; for faster access use cpu_get_address_space() */
-const address_space *memory_find_address_space(const device_config *cpu, int spacenum);
+/* find an address space in our internal list; for faster access use device->space[] after device is started */
+const address_space *memory_find_address_space(const device_config *device, int spacenum);
 
 
 
 /* ----- address maps ----- */
 
-/* build and allocate an address map for a CPU's address space */
+/* build and allocate an address map for a device's address space */
 address_map *address_map_alloc(const device_config *device, const game_driver *driver, int spacenum);
 
 /* release allocated memory for an address map */
@@ -823,10 +824,10 @@ void address_map_free(address_map *map);
 /* registers an address range as having a decrypted data pointer */
 void memory_set_decrypted_region(const address_space *space, offs_t addrstart, offs_t addrend, void *base) ATTR_NONNULL(1, 4);
 
-/* register a handler for opcode base changes on a given CPU */
+/* register a handler for opcode base changes on a given device */
 direct_update_func memory_set_direct_update_handler(const address_space *space, direct_update_func function) ATTR_NONNULL(1);
 
-/* called by CPU cores to update the opcode base for the given address */
+/* called by device cores to update the opcode base for the given address */
 int memory_set_direct_region(const address_space *space, offs_t *byteaddress) ATTR_NONNULL(1, 2);
 
 /* return a pointer the memory byte provided in the given address space, or NULL if it is not mapped to a bank */
@@ -853,6 +854,9 @@ int memory_get_bank(running_machine *machine, int banknum) ATTR_NONNULL(1);
 
 /* set the absolute address of a bank base */
 void memory_set_bankptr(running_machine *machine, int banknum, void *base) ATTR_NONNULL(1, 3);
+
+/* return the index of an unused bank */
+int memory_find_unused_bank(running_machine *machine) ATTR_NONNULL(1);
 
 
 

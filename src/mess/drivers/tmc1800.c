@@ -1014,7 +1014,7 @@ ROM_START( osc1000b )
 	ROM_REGION( 0x10000, CDP1802_TAG, 0 )
 	ROM_LOAD( "mmi6341-1.ic2", 0x8000, 0x0200, NO_DUMP ) // equivalent to 82S141
 
-	ROM_REGION( 0x400, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x400, "gfx1", 0 )
 	ROM_LOAD( "mmi6349.5d",	0x0000, 0x0200, NO_DUMP ) // equivalent to 82S147
 	ROM_LOAD( "mmi6349.5c",	0x0200, 0x0200, NO_DUMP ) // equivalent to 82S147
 ROM_END

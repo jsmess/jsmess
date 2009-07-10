@@ -569,7 +569,7 @@ ROM_START( abc80 )
 	ROM_REGION( 0x10000, "keyboard", 0 )
 	ROM_LOAD( "keyboard.rom", 0x0000, 0x1000, NO_DUMP )
 
-	ROM_REGION( 0xa00, "chargen", ROMREGION_DISPOSE )
+	ROM_REGION( 0xa00, "chargen", 0 )
 	ROM_LOAD( "sn74s263.h2", 0x0000, 0x0a00, BAD_DUMP CRC(9e064e91) SHA1(354783c8f2865f73dc55918c9810c66f3aca751f) ) // created by hand
 
 	ROM_REGION( 0x80, "hsync", 0 )
@@ -607,7 +607,7 @@ ROM_START( abc80h )
 	ROM_REGION( 0x10000, "keyboard", 0 )
 	ROM_LOAD( "keyboard.rom", 0x0000, 0x1000, NO_DUMP )
 
-	ROM_REGION( 0xa00, "chargen", ROMREGION_DISPOSE )
+	ROM_REGION( 0xa00, "chargen", 0 )
 	ROM_LOAD( "sn74s262.h2", 0x0000, 0x0a00, NO_DUMP ) // UK charset
 
 	ROM_REGION( 0x80, "hsync", 0 )

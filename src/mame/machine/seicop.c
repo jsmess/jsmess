@@ -148,7 +148,7 @@ static UINT8 dma_status;
 static UINT32 dma_src;
 static UINT16 prot_data[2],dma_size;
 /*Number protection*//*Heated Barrel,SD Gundam,Godzilla,Denjin Makai*/
-static UINT32 prot_bcd[4];
+//static UINT32 prot_bcd[4];
 /*Hit check protection*//*Legionnaire,Heated Barrel,SD Gundam*/
 static UINT8 xy_check;
 
@@ -165,40 +165,6 @@ static UINT8 xy_check;
 	video_screen_configure(space->machine->primary_screen, _x_, _y_, &visarea, video_screen_get_frame_period(space->machine->primary_screen).attoseconds ); \
 	flip_screen_set(space->machine, _flip_); \
 	} \
-
-/*TODO: numbers over 65535?*/
-static UINT32 protection_bcd_jsr(UINT16 prot_data)
-{
-	UINT32 res,bcd_data;
-
-	res = 0;
-	bcd_data = prot_data;
-	while(bcd_data > 0)
-	{
-		if(bcd_data > 999)
-		{
-			res+=0x01000000;
-			bcd_data-=1000;
-		}
-		else if(bcd_data > 99)
-		{
-			res+=0x00010000;
-			bcd_data-=100;
-		}
-		else if(bcd_data > 9)
-		{
-			res+=0x00000100;
-			bcd_data-=10;
-		}
-		else
-		{
-			res++;
-			bcd_data--;
-		}
-	}
-
-	return res & 0x0f0f0f0f;
-}
 
 /*TODO: -move x-axis limits,to calculate basing on the screen xy-axis values*/
 /*      -the second value should be end of calculation (in other words,check everything between the two values) */
@@ -868,10 +834,9 @@ WRITE16_HANDLER( copdxbl_0_w )
 		case (0x66c/2): { legionna_scrollram16[6] = cop_mcu_ram[offset] - 0x1f0; break; }
 		case (0x66e/2): { legionna_scrollram16[7] = cop_mcu_ram[offset]; break; }
 
-		/*WRONG*/
-		case (0x65c/2):
+		case (0x740/2):
 		{
-			soundlatch_w(space, 1, data & 0xff);
+			soundlatch_w(space, 0, data & 0xff);
 			cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE );
 			break;
 		}
@@ -1125,22 +1090,13 @@ static READ16_HANDLER( generic_cop_r )
 		default:
 			seibu_cop_log("%06x: COPX unhandled read returning %04x from offset %04x\n", cpu_get_pc(space->cpu), retvalue, offset*2);
 			return retvalue;
-
-		/* BCD protection reads */
-		case (0x190/2): { return ((prot_bcd[0] & 0x0000ffff) >> 0 ) + 0x3030; }
-		case (0x192/2): { return ((prot_bcd[0] & 0xffff0000) >> 16) + 0x3030; }
-		case (0x194/2): { return ((prot_bcd[1] & 0x0000ffff) >> 0 ) + 0x3030; }
-		case (0x196/2): { return ((prot_bcd[1] & 0xffff0000) >> 16) + 0x3030; }
-		case (0x198/2):	{ return ((prot_bcd[2] & 0x0000ffff) >> 0 ) + 0x3030; }
-		case (0x19a/2): { return ((prot_bcd[2] & 0xffff0000) >> 16) + 0x3030; }
-		case (0x19c/2): { return 0x3030; }
-
-
 	}
 }
 
 static WRITE16_HANDLER( generic_cop_w )
 {
+	static UINT32 temp32;
+
 	switch (offset)
 	{
 		default:
@@ -1148,9 +1104,23 @@ static WRITE16_HANDLER( generic_cop_w )
 			break;
 
 		/* BCD Protection */
-		case (0x020/2):	{ prot_bcd[0] = protection_bcd_jsr(cop_mcu_ram[offset]); break; }
-		case (0x022/2): { prot_bcd[1] = protection_bcd_jsr(cop_mcu_ram[offset]); break; }
-		case (0x024/2): { prot_bcd[2] = protection_bcd_jsr(cop_mcu_ram[offset]); break; }
+		case (0x020/2):
+		case (0x022/2):
+			temp32 = (cop_mcu_ram[0x020/2]) | (cop_mcu_ram[0x022/2] << 16);
+			cop_mcu_ram[0x190/2] = (((temp32 / 1) % 10) + (((temp32 / 10) % 10) << 8) + 0x3030);
+			cop_mcu_ram[0x192/2] = (((temp32 / 100) % 10) + (((temp32 / 1000) % 10) << 8) + 0x3030);
+			cop_mcu_ram[0x194/2] = (((temp32 / 10000) % 10) + (((temp32 / 100000) % 10) << 8) + 0x3030);
+			cop_mcu_ram[0x196/2] = (((temp32 / 1000000) % 10) + (((temp32 / 10000000) % 10) << 8) + 0x3030);
+			cop_mcu_ram[0x198/2] = (((temp32 / 100000000) % 10) + (((temp32 / 1000000000) % 10) << 8) + 0x3030);
+			break;
+		case (0x024/2):
+			/*
+            This looks like a register for the BCD...
+            Godzilla and Heated Barrel sets 3
+            Denjin Makai sets 3 at start-up and toggles between 2 and 3 during gameplay on the BCD subroutine
+            SD Gundam sets 0 (maybe there's a mirror somewhere else? 0x01e for example is setted with an 8)
+            */
+			break;
 
 		/* Command tables for 0x500 / 0x502 commands */
 		case (0x032/2): { copd2_set_tabledata(space->machine, data); break; }

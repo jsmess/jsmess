@@ -10,7 +10,6 @@ TODO:
 - Find what the remaining video C.R.T. registers does;
 - Fix sprites bugs at a start of a play;
 - Check NVRAM boudaries;
-- Why we need to write "something" to the comms to let the coins to work? Bug with the Seibu custom z80?
 - How the "SW Service Mode" (press F2 during gameplay) really works (inputs etc)? Nothing mapped works with it...
 
 Notes:
@@ -98,11 +97,6 @@ static WRITE16_HANDLER( sengokmj_out_w )
 //  popmessage("%02x",hopper_io);
 }
 
-static WRITE16_HANDLER( seibu_z80_com_6_mirror_w )
-{
-	seibu_main_word_w(space,6,data,0xffff);
-}
-
 static READ16_HANDLER( sengokmj_system_r )
 {
 	return (input_port_read(space->machine, "SYSTEM") & 0xffbf) | hopper_io;
@@ -125,8 +119,8 @@ static ADDRESS_MAP_START( sengokmj_io_map, ADDRESS_SPACE_IO, 16 )
 	/*Areas from 8000-804f are for the custom Seibu CRTC.*/
 	AM_RANGE(0x8000, 0x804f) AM_RAM_WRITE(seibucrtc_vregs_w) AM_BASE(&seibucrtc_vregs)
 
-	AM_RANGE(0x8080, 0x8081) AM_WRITE(seibu_z80_com_6_mirror_w)
-//  AM_RANGE(0x80c0, 0x80c1) AM_WRITE(seibu_z80_com_unk_mirror_w)
+//  AM_RANGE(0x8080, 0x8081) CRTC extra register?
+//  AM_RANGE(0x80c0, 0x80c1) CRTC extra register?
 //  AM_RANGE(0x8100, 0x8101) AM_WRITENOP // always 0
 	AM_RANGE(0x8180, 0x8181) AM_WRITE(sengokmj_out_w)
 	AM_RANGE(0x8140, 0x8141) AM_WRITE(mahjong_panel_w)
@@ -326,29 +320,29 @@ ROM_START( sengokmj )
 	ROM_CONTINUE(             0x010000, 0x08000 )
 	ROM_COPY( "audiocpu", 0,     0x018000, 0x08000 )
 
-	ROM_REGION( 0x100000, "spr_gfx", ROMREGION_DISPOSE ) /*Sprites gfx rom*/
+	ROM_REGION( 0x100000, "spr_gfx", 0 ) /*Sprites gfx rom*/
 	ROM_LOAD( "rssengo2.72", 0x00000, 0x100000, CRC(fb215ff8) SHA1(f98c0a53ad9b97d209dd1f85c994fc17ec585bd7) )
 
 	ROM_REGION( 0x200000, "gfx_tiles", 0 ) /*Tiles data,to be reloaded*/
 	ROM_LOAD( "rssengo0.64", 0x000000, 0x100000, CRC(36924b71) SHA1(814b2c69ab9876ccc57774e5718c05059ea23150) )
 	ROM_LOAD( "rssengo1.68", 0x100000, 0x100000, CRC(1bbd00e5) SHA1(86391323b8e0d3b7e09a5914d87fb2adc48e5af4) )
 
-	ROM_REGION( 0x080000, "bg_gfx", ROMREGION_DISPOSE )
+	ROM_REGION( 0x080000, "bg_gfx", 0 )
 	ROM_COPY( "gfx_tiles" , 0x000000, 0x00000, 0x080000)
 
-	ROM_REGION( 0x080000, "md_gfx", ROMREGION_DISPOSE )
+	ROM_REGION( 0x080000, "md_gfx", 0 )
 	ROM_COPY( "gfx_tiles" , 0x080000, 0x00000, 0x080000)
 
-	ROM_REGION( 0x080000, "fg_gfx", ROMREGION_DISPOSE )
+	ROM_REGION( 0x080000, "fg_gfx", 0 )
 	ROM_COPY( "gfx_tiles" , 0x100000, 0x00000, 0x080000)
 
-	ROM_REGION( 0x080000, "tx_gfx", ROMREGION_DISPOSE )
+	ROM_REGION( 0x080000, "tx_gfx", 0 )
 	ROM_COPY( "gfx_tiles" , 0x180000, 0x00000, 0x080000)
 
-	ROM_REGION( 0x20000, "oki", 0 )	 /* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )	 /* ADPCM samples */
 	ROM_LOAD( "mah1-1-1.915", 0x00000, 0x20000, CRC(d4612e95) SHA1(937c5dbd25c89d4f4178b0bed510307020c5f40e) )
 
-	ROM_REGION( 0x200, "user1", ROMREGION_DISPOSE ) /* not used */
+	ROM_REGION( 0x200, "user1", 0 ) /* not used */
 	ROM_LOAD( "rs006.89", 0x000, 0x200, CRC(96f7646e) SHA1(400a831b83d6ac4d2a46ef95b97b1ee237099e44) ) /* Priority */
 ROM_END
 

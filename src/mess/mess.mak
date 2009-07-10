@@ -343,6 +343,7 @@ DRVLIBS = \
 	$(MESSOBJ)/sgi.a \
 	$(MESSOBJ)/sharp.a \
 	$(MESSOBJ)/sinclair.a \
+	$(MESSOBJ)/skeleton.a \
 	$(MESSOBJ)/snk.a \
 	$(MESSOBJ)/sony.a \
 	$(MESSOBJ)/sord.a \
@@ -370,7 +371,6 @@ DRVLIBS = \
 	$(MESSOBJ)/vtech.a \
 	$(MESSOBJ)/xerox.a \
 	$(MESSOBJ)/zvt.a \
-	$(MESSOBJ)/skeleton.a \
 	$(MESSOBJ)/shared.a \
 
 

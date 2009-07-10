@@ -318,6 +318,7 @@
 #include "machine/timekpr.h"
 #include "sound/rf5c400.h"
 #include "rendlay.h"
+#include "machine/adc1213x.h"
 
 static UINT8 led_reg0, led_reg1;
 static UINT32 *workram;
@@ -631,6 +632,7 @@ static READ8_HANDLER( sysreg_r )
 {
 	UINT8 r = 0;
 	static const char *const portnames[] = { "IN0", "IN1", "IN2" };
+	const device_config *adc12138 = devtag_get_device(space->machine, "adc12138");
 
 	switch (offset)
 	{
@@ -650,7 +652,8 @@ static READ8_HANDLER( sysreg_r )
                 0x02 = ADDOR (ADC DOR)
                 0x01 = ADDO (ADC DO)
             */
-			r = 0xf7 | (eeprom_read_bit() << 3);
+			r = 0xf0 | (eeprom_read_bit() << 3);
+			r |= adc1213x_do_r(adc12138, 0) | (adc1213x_eoc_r(adc12138, 0) << 2);
 			break;
 
 		case 4:	/* I/O port 4 - DIP switches */
@@ -662,6 +665,8 @@ static READ8_HANDLER( sysreg_r )
 
 static WRITE8_HANDLER( sysreg_w )
 {
+	const device_config *adc12138 = devtag_get_device(space->machine, "adc12138");
+
 	switch (offset)
 	{
 		case 0:	/* LED Register 0 */
@@ -704,6 +709,11 @@ static WRITE8_HANDLER( sysreg_w )
                 0x02 = ADDI (ADC DI)
                 0x01 = ADDSCLK (ADC SCLK)
             */
+			adc1213x_cs_w(adc12138, 0, (data >> 3) & 0x1);
+			adc1213x_conv_w(adc12138, 0, (data >> 2) & 0x1);
+			adc1213x_di_w(adc12138, 0, (data >> 1) & 0x1);
+			adc1213x_sclk_w(adc12138, 0, data & 0x1);
+
 			cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 			mame_printf_debug("System register 1 = %02X\n", data);
 			break;
@@ -768,6 +778,22 @@ static READ32_HANDLER( comm0_unk_r )
 	return 0xffffffff;
 }
 
+static UINT16 gn680_latch, gn680_ret0, gn680_ret1;
+
+static READ32_HANDLER(gun_r)
+{
+	return gn680_ret0<<16 | gn680_ret1;
+}
+
+static WRITE32_HANDLER(gun_w)
+{
+	if (mem_mask == 0xffff0000)
+	{
+		gn680_latch = data>>16;
+		cputag_set_input_line(space->machine, "gn680", M68K_IRQ_6, HOLD_LINE);
+	}
+}
+
 /*****************************************************************************/
 
 static ADDRESS_MAP_START( hornet_map, ADDRESS_SPACE_PROGRAM, 32 )
@@ -775,6 +801,7 @@ static ADDRESS_MAP_START( hornet_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x74000000, 0x740000ff) AM_READWRITE(K037122_reg_r, K037122_reg_w)
 	AM_RANGE(0x74020000, 0x7403ffff) AM_READWRITE(K037122_sram_r, K037122_sram_w)
 	AM_RANGE(0x74040000, 0x7407ffff) AM_READWRITE(K037122_char_r, K037122_char_w)
+	AM_RANGE(0x74080000, 0x7408000f) AM_READWRITE(gun_r, gun_w)
 	AM_RANGE(0x78000000, 0x7800ffff) AM_READWRITE(cgboard_dsp_shared_r_ppc, cgboard_dsp_shared_w_ppc)
 	AM_RANGE(0x780c0000, 0x780c0003) AM_READWRITE(cgboard_dsp_comm_r_ppc, cgboard_dsp_comm_w_ppc)
 	AM_RANGE(0x7d000000, 0x7d00ffff) AM_READ8(sysreg_r, 0xffffffff)
@@ -798,7 +825,46 @@ static ADDRESS_MAP_START( sound_memmap, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM		/* Work RAM */
 	AM_RANGE(0x200000, 0x200fff) AM_DEVREADWRITE("rf", rf5c400_r, rf5c400_w)		/* Ricoh RF5C400 */
 	AM_RANGE(0x300000, 0x30000f) AM_READWRITE(K056800_sound_r, K056800_sound_w)
+	AM_RANGE(0x480000, 0x480001) AM_WRITENOP
+	AM_RANGE(0x4c0000, 0x4c0001) AM_WRITENOP
+	AM_RANGE(0x500000, 0x500001) AM_WRITENOP
 	AM_RANGE(0x600000, 0x600001) AM_NOP
+ADDRESS_MAP_END
+
+/*****************************************************************************/
+
+static WRITE16_HANDLER(gn680_sysctrl)
+{
+	// bit 15 = watchdog toggle
+	// lower 4 bits = LEDs?
+}
+
+static READ16_HANDLER(gn680_latch_r)
+{
+	cputag_set_input_line(space->machine, "gn680", M68K_IRQ_6, CLEAR_LINE);
+
+	return gn680_latch;
+}
+
+static WRITE16_HANDLER(gn680_latch_w)
+{
+	if (offset)
+	{
+		gn680_ret1 = data;
+	}
+	else
+	{
+		gn680_ret0 = data;
+	}
+}
+
+static ADDRESS_MAP_START( gn680_memmap, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x01ffff) AM_ROM
+	AM_RANGE(0x200000, 0x203fff) AM_RAM
+	AM_RANGE(0x300000, 0x300001) AM_WRITE(gn680_sysctrl)
+	AM_RANGE(0x314000, 0x317fff) AM_RAM
+	AM_RANGE(0x400000, 0x400003) AM_READWRITE(gn680_latch_r, gn680_latch_w)
+	AM_RANGE(0x400008, 0x400009) AM_WRITENOP	// writes 0001 00fe each time IRQ 6 triggers
 ADDRESS_MAP_END
 
 /*****************************************************************************/
@@ -1000,6 +1066,15 @@ static NVRAM_HANDLER( hornet )
 	NVRAM_HANDLER_CALL(93C46);
 }
 
+static double adc12138_input_callback( const device_config *device, UINT8 input )
+{
+	return (double)0.0;
+}
+
+static const adc12138_interface hornet_adc_interface = {
+	adc12138_input_callback
+};
+
 static MACHINE_DRIVER_START( hornet )
 
 	/* basic machine hardware */
@@ -1044,6 +1119,8 @@ static MACHINE_DRIVER_START( hornet )
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	MDRV_M48T58_ADD( "m48t58" )
+
+	MDRV_ADC12138_ADD( "adc12138", hornet_adc_interface )
 MACHINE_DRIVER_END
 
 static MACHINE_RESET( hornet_2board )
@@ -1103,6 +1180,13 @@ static MACHINE_DRIVER_START( hornet_2board )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_SIZE(512, 384)
 	MDRV_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( terabrst )
+	MDRV_IMPORT_FROM(hornet_2board)
+
+	MDRV_CPU_ADD("gn680", M68000, 32000000/2)	/* 16MHz */
+	MDRV_CPU_PROGRAM_MAP(gn680_memmap)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( hornet_2board_v2 )
@@ -1350,6 +1434,28 @@ ROM_START(sscopea)
 	ROM_LOAD( "m48t58y-70pc1", 0x000000, 0x002000, CRC(ee815325) SHA1(91b10802791b68a8360c0cd6c376c0c4bbbc6fa0) )
 ROM_END
 
+ROM_START(sscopeb)
+	ROM_REGION32_BE(0x400000, "user1", 0)	/* PowerPC program */
+	ROM_LOAD16_WORD_SWAP("830_a01.bin", 0x200000, 0x200000, CRC(39e353f1) SHA1(569b06969ae7a690f6d6e63cc3b5336061663a37) )
+	ROM_RELOAD(0x000000, 0x200000)
+
+	ROM_REGION32_BE(0x800000, "user2", ROMREGION_ERASE00)	/* Data roms */
+
+	ROM_REGION(0x80000, "audiocpu", 0)		/* 68K Program */
+	ROM_LOAD16_WORD_SWAP("ss1-1.7s", 0x000000, 0x80000, CRC(2805ea1d) SHA1(2556a51ee98cb8f59bf081e916c69a24532196f1) )
+
+	ROM_REGION(0x1000000, "user5", 0)		/* CG Board texture roms */
+	ROM_LOAD32_WORD( "ss1-3.u32",    0x000000, 0x400000, CRC(335793e1) SHA1(d582b53c3853abd59bc728f619a30c27cfc9497c) )
+	ROM_LOAD32_WORD( "ss1-3.u24",    0x000002, 0x400000, CRC(d6e7877e) SHA1(b4d0e17ada7dd126ec564a20e7140775b4b3fdb7) )
+
+	ROM_REGION(0x1000000, "rf", 0)		/* PCM sample roms */
+	ROM_LOAD( "830a09.16p",    0x000000, 0x400000, CRC(e4b9f305) SHA1(ce2c6f63bdc9374dde48d8359102b57e48b4fdeb) )
+	ROM_LOAD( "830a10.14p",    0x400000, 0x400000, CRC(8b8aaf7e) SHA1(49b694dc171c149056b87c15410a6bf37ff2987f) )
+
+	ROM_REGION(0x2000, "m48t58",0)
+	ROM_LOAD( "m48t58y-70pc1", 0x000000, 0x002000, CRC(ee815325) SHA1(91b10802791b68a8360c0cd6c376c0c4bbbc6fa0) )
+ROM_END
+
 ROM_START(sscope2)
 	ROM_REGION32_BE(0x400000, "user1", 0)	/* PowerPC program */
 	ROM_LOAD16_WORD_SWAP("931d01.bin", 0x200000, 0x200000, CRC(4065fde6) SHA1(84f2dedc3e8f61651b22c0a21433a64993e1b9e2) )
@@ -1432,6 +1538,33 @@ ROM_END
 
 ROM_START(terabrst)
 	ROM_REGION32_BE(0x400000, "user1", 0)	/* PowerPC program */
+        ROM_LOAD32_WORD_SWAP( "715l02.25p",   0x000000, 0x200000, CRC(79586f19) SHA1(8dcfed5d101ebe49d958a7a38d5472323f75dd1d) )
+	ROM_LOAD32_WORD_SWAP( "715l03.22p",   0x000002, 0x200000, CRC(c193021e) SHA1(c934b7c4bdab0ceff0f1699fcf2fb7d90e2e8962) )
+
+	ROM_REGION32_BE(0x800000, "user2", 0)	/* Data roms */
+	ROM_LOAD32_WORD_SWAP( "715a04.16t",   0x000000, 0x200000, CRC(00d9567e) SHA1(fe372399ad0ae89d557c93c3145b38e3ed0f714d) )
+	ROM_LOAD32_WORD_SWAP( "715a05.14t",   0x000002, 0x200000, CRC(462d53bf) SHA1(0216a84358571de6791365c69a1fa8fe2784148d) )
+
+	ROM_REGION32_BE(0x1000000, "user5", 0)	/* CG Board texture roms */
+	ROM_LOAD32_WORD_SWAP( "715a14.32u",   0x000002, 0x400000, CRC(bbb36be3) SHA1(c828d0af0546db02e87afe68423b9447db7c7e51) )
+	ROM_LOAD32_WORD_SWAP( "715a13.24u",   0x000000, 0x400000, CRC(dbff58a1) SHA1(f0c60bb2cbf268cfcbdd65606ebb18f1b4839c0e) )
+
+	ROM_REGION(0x80000, "audiocpu", 0)		/* 68K Program */
+	ROM_LOAD16_WORD_SWAP( "715a08.7s",    0x000000, 0x080000, CRC(3aa2f4a5) SHA1(bb43e5f5ef4ac51f228d4d825be66d3c720d51ea) )
+
+	ROM_REGION(0x1000000, "rf", 0)		/* PCM sample roms */
+	ROM_LOAD( "715a09.16p",   0x000000, 0x400000, CRC(65845866) SHA1(d2a63d0deef1901e6fa21b55c5f96e1f781dceda) )
+	ROM_LOAD( "715a10.14p",   0x400000, 0x400000, CRC(294fe71b) SHA1(ac5fff5627df1cee4f1e1867377f208b34334899) )
+
+	ROM_REGION(0x20000, "gn680", 0)		/* 68K Program */
+	ROM_LOAD16_WORD_SWAP( "715a17.20k",    0x000000, 0x020000, CRC(f0b7ba0c) SHA1(863b260824b0ae2f890ba84d1c9a8f436891b1ff) )
+
+	ROM_REGION(0x2000, "m48t58",0)
+	ROM_LOAD( "715uel_m48t58y.35d", 0x000000, 0x002000, CRC(57322db4) SHA1(59cb8cd6ab446bf8781e3dddf902a4ff2484068e) )
+ROM_END
+
+ROM_START(terabrsta)
+	ROM_REGION32_BE(0x400000, "user1", 0)	/* PowerPC program */
 	ROM_LOAD32_WORD_SWAP( "715a02.25p",   0x000000, 0x200000, CRC(070c48b3) SHA1(066cefbd34d8f6476083417471114f782bef97fb) )
 	ROM_LOAD32_WORD_SWAP( "715a03.22p",   0x000002, 0x200000, CRC(f77d242f) SHA1(7680e4abcccd549b3f6d1d245f64631fab57e80d) )
 
@@ -1450,7 +1583,7 @@ ROM_START(terabrst)
 	ROM_LOAD( "715a09.16p",   0x000000, 0x400000, CRC(65845866) SHA1(d2a63d0deef1901e6fa21b55c5f96e1f781dceda) )
 	ROM_LOAD( "715a10.14p",   0x400000, 0x400000, CRC(294fe71b) SHA1(ac5fff5627df1cee4f1e1867377f208b34334899) )
 
-	ROM_REGION(0x20000, "dsp", 0)		/* 68K Program */
+	ROM_REGION(0x20000, "gn680", 0)		/* 68K Program */
 	ROM_LOAD16_WORD_SWAP( "715a17.20k",    0x000000, 0x020000, CRC(f0b7ba0c) SHA1(863b260824b0ae2f890ba84d1c9a8f436891b1ff) )
 
 	ROM_REGION(0x2000, "m48t58",0)
@@ -1461,7 +1594,8 @@ ROM_END
 
 GAME(  1998, gradius4, 0,      hornet,           hornet, hornet,        ROT0, "Konami", "Gradius 4: Fukkatsu", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME(  1998, nbapbp,   0,      hornet,           hornet, hornet,        ROT0, "Konami", "NBA Play By Play", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAMEL( 1998, terabrst, 0,      hornet_2board,    hornet, hornet_2board, ROT0, "Konami", "Teraburst", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_dualhsxs )
+GAMEL( 1998, terabrst, 0,      terabrst,    	 hornet, hornet_2board, ROT0, "Konami", "Teraburst (1998/07/17 ver UEL)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_dualhsxs )
+GAMEL( 1998, terabrsta,terabrst,terabrst,   	 hornet, hornet_2board, ROT0, "Konami", "Teraburst (1998/02/25 ver AAA)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_dualhsxs )
 GAMEL( 2000, sscope,   0,      hornet_2board,    sscope, hornet_2board, ROT0, "Konami", "Silent Scope (ver UAB)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE, layout_dualhsxs )
 GAMEL( 2000, sscopea,  sscope, hornet_2board,    sscope, hornet_2board, ROT0, "Konami", "Silent Scope (ver UAA)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE, layout_dualhsxs )
 GAMEL( 2000, sscope2,  0,      hornet_2board_v2, sscope, hornet_2board, ROT0, "Konami", "Silent Scope 2", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE, layout_dualhsxs )

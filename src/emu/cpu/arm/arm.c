@@ -333,7 +333,7 @@ static CPU_EXECUTE( arm )
 	cpustate->icount = cycles;
 	do
 	{
-		debugger_instruction_hook(device, R15);
+		debugger_instruction_hook(device, R15 & ADDRESS_MASK);
 
 		/* load instruction */
 		pc = R15;
@@ -805,7 +805,6 @@ static void HandleALU( ARM_REGS* cpustate, UINT32 insn )
 		rd = (rn + op2);
 		HandleALUAddFlags(rd, rn, op2);
 		break;
-
 	/* Logical operations */
 	case OPCODE_AND:
 	case OPCODE_TST:
@@ -866,36 +865,25 @@ static void HandleALU( ARM_REGS* cpustate, UINT32 insn )
 			}
 		}
 	/* TST & TEQ can affect R15 (the condition code register) with the S bit set */
-	} else if (rdn==eR15) {
-		if (insn & INSN_S) {
-			if (ARM_DEBUG_CORE)
-				logerror("%08x: TST class on R15 s bit set\n",R15);
-
-			/* Dubious hack for 'TEQS R15, #$3', the docs suggest execution
-                should continue two instructions later (because pipelined R15
-                is read back as already being incremented), but it seems the
-                hardware should execute the instruction in the delay slot.
-                Simulate it by just setting the PC back to the previously
-                skipped instruction.
-
-                See Heavy Smash (Data East) at 0x1c4
-            */
-			if (insn==0xe33ff003)
-				rd-=4;
-
-			cpustate->icount -= S_CYCLE + N_CYCLE;
-			if ((R15&MODE_MASK)!=0)
-			{
-				SetRegister(cpustate, 15, rd);
-			}
-			else
-			{
-				SetRegister(cpustate, 15, (rd&ADDRESS_MASK) | (rd&PSR_MASK) | (R15&IRQ_MASK) | (R15&MODE_MASK));
-			}
-		} else {
-			if (ARM_DEBUG_CORE)
-				logerror("%08x: TST class on R15 no s bit set\n",R15);
+	}
+	else if ((rdn==eR15) && (insn & INSN_S))
+	{
+		// update only the flags
+		if ((R15&MODE_MASK)!=0)
+		{
+			// combine the flags from rd with the address from R15
+			rd &= ~ADDRESS_MASK;
+			rd |= (R15 & ADDRESS_MASK);
+			SetRegister(cpustate,rdn,rd);
 		}
+		else
+		{
+			// combine the flags from rd with the address from R15
+			rd &= ~ADDRESS_MASK;	// clear address part of RD
+			rd |= (R15 & ADDRESS_MASK);	// RD = address part of R15
+			SetRegister(cpustate, rdn,(rd&ADDRESS_MASK) | (rd&PSR_MASK) | (R15&IRQ_MASK) | (R15&MODE_MASK));
+		}
+		cpustate->icount -= S_CYCLE + N_CYCLE;
 	}
 }
 
@@ -1459,7 +1447,7 @@ CPU_GET_INFO( arm )
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(ARM_REGS);				break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 2;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;			break;
+		case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;			break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 4;							break;
@@ -1525,11 +1513,11 @@ CPU_GET_INFO( arm )
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "ARM");					break;
-		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "Acorn Risc Machine");	break;
-		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.3");					break;
-		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Bryan McPhail, bmcphail@tendril.co.uk"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "ARM");					break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Acorn Risc Machine");	break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.3");					break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Bryan McPhail, bmcphail@tendril.co.uk"); break;
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "%c%c%c%c%c%c",

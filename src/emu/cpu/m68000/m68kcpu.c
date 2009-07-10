@@ -484,7 +484,8 @@ INLINE m68ki_cpu_core *get_safe_token(const device_config *device)
 		   cpu_get_type(device) == CPU_M68010 ||
 		   cpu_get_type(device) == CPU_M68EC020 ||
 		   cpu_get_type(device) == CPU_M68020 ||
-		   cpu_get_type(device) == CPU_M68040);
+		   cpu_get_type(device) == CPU_M68040 ||
+		   cpu_get_type(device) == CPU_SCC68070);
 	return (m68ki_cpu_core *)device->token;
 }
 
@@ -779,7 +780,7 @@ static CPU_GET_INFO( m68k )
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(m68ki_cpu_core);		break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 8;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = -1;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;				break;
+		case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;				break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 2;							break;
@@ -814,11 +815,11 @@ static CPU_GET_INFO( m68k )
 		case CPUINFO_PTR_STATE_TABLE:					info->state_table = &m68k->state;		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							/* set per-core */						break;
-		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "Motorola 68K");		break;
-		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "4.00");				break;
-		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Karl Stenerud. All rights reserved. (2.1 fixes HJB)"); break;
+		case DEVINFO_STR_NAME:							/* set per-core */						break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Motorola 68K");		break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "4.00");				break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Karl Stenerud. All rights reserved. (2.1 fixes HJB)"); break;
 
 		case CPUINFO_STR_FLAGS:
 			sr = m68ki_get_sr(m68k);
@@ -1044,7 +1045,7 @@ CPU_GET_INFO( m68000 )
 		case CPUINFO_FCT_INIT:						info->init = CPU_INIT_NAME(m68000);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:						strcpy(info->s, "68000");						break;
+		case DEVINFO_STR_NAME:						strcpy(info->s, "68000");						break;
 
 		default: 									CPU_GET_INFO_CALL(m68k);						break;
 	}
@@ -1091,7 +1092,7 @@ CPU_GET_INFO( m68008 )
 		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(m68008);						break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "68008");				break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "68008");				break;
 
 		default: 										CPU_GET_INFO_CALL(m68k);				break;
 	}
@@ -1134,7 +1135,7 @@ CPU_GET_INFO( m68010 )
 		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(m68010);						break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "68010");				break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "68010");				break;
 
 		default:										CPU_GET_INFO_CALL(m68k);				break;
 	}
@@ -1188,7 +1189,7 @@ CPU_GET_INFO( m68020 )
 		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(m68020);						break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "68020");				break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "68020");				break;
 
 		case CPUINFO_STR_FLAGS:
 			sr = m68ki_get_sr(m68k);
@@ -1255,7 +1256,7 @@ CPU_GET_INFO( m68ec020 )
 		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(m68ec020);					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "68EC020");				break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "68EC020");				break;
 
 		default:										CPU_GET_INFO_CALL(m68020);				break;
 	}
@@ -1308,7 +1309,7 @@ CPU_GET_INFO( m68040 )
 		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(m68040);						break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "68040");				break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "68040");				break;
 
 		case CPUINFO_STR_FLAGS:
 			sr = m68ki_get_sr(m68k);
@@ -1332,5 +1333,27 @@ CPU_GET_INFO( m68040 )
 			break;
 
 		default:										CPU_GET_INFO_CALL(m68k);				break;
+	}
+}
+
+
+/****************************************************************************
+ * SCC-68070 section
+ ****************************************************************************/
+
+CPU_GET_INFO( scc68070 )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: 		info->i = 32;							break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(m68000);		break; //todo
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "SCC68070");			break;
+
+		default: 										CPU_GET_INFO_CALL(m68k);				break;
 	}
 }

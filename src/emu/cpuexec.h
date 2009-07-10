@@ -63,7 +63,6 @@ struct _cpu_config
 {
 	cpu_type			type;						/* index for the CPU type */
 	UINT32				flags;						/* flags; see #defines below */
-	const addrmap_token *address_map[ADDRESS_SPACES]; /* 1 memory map per address space */
 	cpu_interrupt_func 	vblank_interrupt;			/* for interrupts tied to VBLANK */
 	int 				vblank_interrupts_per_frame;/* usually 1 */
 	const char *		vblank_interrupt_screen;	/* the screen that causes the VBLANK interrupt */
@@ -77,7 +76,6 @@ typedef struct _cpu_class_header cpu_class_header;
 struct _cpu_class_header
 {
 	cpu_debug_data *		debug;					/* debugging data */
-	const address_space *	space[ADDRESS_SPACES];	/* address spaces */
 	cpu_set_info_func		set_info;				/* this CPU's set_info function */
 };
 
@@ -111,14 +109,14 @@ struct _cpu_class_header
 #define MDRV_CPU_CONFIG(_config) \
 	MDRV_DEVICE_CONFIG(_config)
 
-#define MDRV_CPU_PROGRAM_MAP(_map1) \
-	MDRV_DEVICE_CONFIG_DATAPTR_ARRAY(cpu_config, address_map, ADDRESS_SPACE_PROGRAM, ADDRESS_MAP_NAME(_map1)) \
+#define MDRV_CPU_PROGRAM_MAP(_map) \
+	MDRV_DEVICE_PROGRAM_MAP(_map)
 
-#define MDRV_CPU_DATA_MAP(_map1) \
-	MDRV_DEVICE_CONFIG_DATAPTR_ARRAY(cpu_config, address_map, ADDRESS_SPACE_DATA, ADDRESS_MAP_NAME(_map1)) \
+#define MDRV_CPU_DATA_MAP(_map) \
+	MDRV_DEVICE_DATA_MAP(_map)
 
-#define MDRV_CPU_IO_MAP(_map1) \
-	MDRV_DEVICE_CONFIG_DATAPTR_ARRAY(cpu_config, address_map, ADDRESS_SPACE_IO, ADDRESS_MAP_NAME(_map1)) \
+#define MDRV_CPU_IO_MAP(_map) \
+	MDRV_DEVICE_IO_MAP(_map)
 
 #define MDRV_CPU_VBLANK_INT(_tag, _func) \
 	MDRV_DEVICE_CONFIG_DATAPTR(cpu_config, vblank_interrupt, _func) \
@@ -347,12 +345,9 @@ INLINE cpu_debug_data *cpu_get_debug_data(const device_config *device)
 
 INLINE const address_space *cpu_get_address_space(const device_config *device, int spacenum)
 {
-	/* it is faster to pull this from the class header, but only after we've started */
+	/* it is faster to pull this from the pre-fetched data, but only after we've started */
 	if (device->token != NULL)
-	{
-		cpu_class_header *classheader = cpu_get_class_header(device);
-		return classheader->space[spacenum];
-	}
+		return device->space[spacenum];
 	return memory_find_address_space(device, spacenum);
 }
 

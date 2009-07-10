@@ -274,7 +274,7 @@ ROM_START( microtan )
     ROM_LOAD( "tanbug_2.rom", 0xf800, 0x0400, CRC(7e215313) SHA1(c8fb3d33ce2beaf624dc75ec57d34c216b086274) )
     ROM_LOAD( "tanbug.rom",   0xfc00, 0x0400, CRC(c8221d9e) SHA1(c7fe4c174523aaaab30be7a8c9baf2bc08b33968) )
 
-	ROM_REGION( 0x00800, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x00800, "gfx1", 0 )
     ROM_LOAD( "charset.rom",  0x0000, 0x0800, CRC(3b3c5360) SHA1(a3a2f74149107f8b8f35b15069c71f3aa843d12f) )
 
 	ROM_REGION( 0x01000, "gfx2", ROMREGION_ERASEFF )

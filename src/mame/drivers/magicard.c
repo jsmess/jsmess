@@ -130,6 +130,7 @@ TODO: check this register,doesn't seem to be 100% correct.
 
 #define SCC_DCR_VREG    (pcab_vregs[0x02/2] & 0xffff)
 #define SCC_DE_VREG		((SCC_DCR_VREG & 0x8000)>>15)
+#define SCC_FG_VREG		((SCC_DCR_VREG & 0x0080)>>7)
 #define SCC_VSR_VREG_H  ((SCC_DCR_VREG & 0xf)>>0)
 
 /*
@@ -275,23 +276,58 @@ static VIDEO_UPDATE(magicard)
 
 	count = ((SCC_VSR_VREG)/2);
 
-	for(y=0;y<300;y++)
+	if(SCC_FG_VREG) //4bpp gfx
 	{
-		for(x=0;x<168;x++)
+		for(y=0;y<300;y++)
 		{
-			UINT32 color;
+			for(x=0;x<84;x++)
+			{
+				UINT32 color;
 
-			color = ((magicram[count]) & 0x00ff)>>0;
+				color = ((magicram[count]) & 0x000f)>>0;
 
-			if((x*2)<video_screen_get_visible_area(screen)->max_x && ((y)+0)<video_screen_get_visible_area(screen)->max_y)
-				*BITMAP_ADDR32(bitmap, y, (x*2)+1) = screen->machine->pens[color];
+				if(((x*4)+3)<video_screen_get_visible_area(screen)->max_x && ((y)+0)<video_screen_get_visible_area(screen)->max_y)
+					*BITMAP_ADDR32(bitmap, y, (x*4)+3) = screen->machine->pens[color];
 
-			color = ((magicram[count]) & 0xff00)>>8;
+				color = ((magicram[count]) & 0x00f0)>>4;
 
-			if(((x*2)+1)<video_screen_get_visible_area(screen)->max_x && ((y)+0)<video_screen_get_visible_area(screen)->max_y)
-				*BITMAP_ADDR32(bitmap, y, (x*2)+0) = screen->machine->pens[color];
+				if(((x*4)+2)<video_screen_get_visible_area(screen)->max_x && ((y)+0)<video_screen_get_visible_area(screen)->max_y)
+					*BITMAP_ADDR32(bitmap, y, (x*4)+2) = screen->machine->pens[color];
 
-			count++;
+				color = ((magicram[count]) & 0x0f00)>>8;
+
+				if(((x*4)+1)<video_screen_get_visible_area(screen)->max_x && ((y)+0)<video_screen_get_visible_area(screen)->max_y)
+					*BITMAP_ADDR32(bitmap, y, (x*4)+1) = screen->machine->pens[color];
+
+				color = ((magicram[count]) & 0xf000)>>12;
+
+				if(((x*4)+0)<video_screen_get_visible_area(screen)->max_x && ((y)+0)<video_screen_get_visible_area(screen)->max_y)
+					*BITMAP_ADDR32(bitmap, y, (x*4)+0) = screen->machine->pens[color];
+
+				count++;
+			}
+		}
+	}
+	else //8bpp gfx
+	{
+		for(y=0;y<300;y++)
+		{
+			for(x=0;x<168;x++)
+			{
+				UINT32 color;
+
+				color = ((magicram[count]) & 0x00ff)>>0;
+
+				if(((x*2)+1)<video_screen_get_visible_area(screen)->max_x && ((y)+0)<video_screen_get_visible_area(screen)->max_y)
+					*BITMAP_ADDR32(bitmap, y, (x*2)+1) = screen->machine->pens[color];
+
+				color = ((magicram[count]) & 0xff00)>>8;
+
+				if(((x*2)+0)<video_screen_get_visible_area(screen)->max_x && ((y)+0)<video_screen_get_visible_area(screen)->max_y)
+					*BITMAP_ADDR32(bitmap, y, (x*2)+0) = screen->machine->pens[color];
+
+				count++;
+			}
 		}
 	}
 
@@ -316,9 +352,9 @@ static WRITE16_HANDLER( paletteram_io_w )
 	{
 		case 0:
 			pal_offs = data;
+			internal_pal_offs = 0;
 			break;
 		case 4:
-			internal_pal_offs = 0;
 			break;
 		case 2:
 			switch(internal_pal_offs)
@@ -351,7 +387,7 @@ static READ16_HANDLER( philips_66470_r )
 //          return mame_rand(space->machine); //TODO
 	}
 
-	printf("[%04x]\n",offset*2);
+	//printf("[%04x]\n",offset*2);
 
 
 	return pcab_vregs[offset];
@@ -368,22 +404,93 @@ static WRITE16_HANDLER( philips_66470_w )
 //  }
 }
 
+/* scc68070 specific stuff (to be moved) */
+static UINT16 *scc68070_ext_irqc_regs;
+static UINT16 *scc68070_iic_regs;
+static UINT16 *scc68070_uart_regs;
+static UINT16 *scc68070_timer_regs;
+static UINT16 *scc68070_int_irqc_regs;
+static UINT16 *scc68070_dma_ch1_regs;
+static UINT16 *scc68070_dma_ch2_regs;
+static UINT16 *scc68070_mmu_regs;
+
+//#define ENABLE_CDI_BIOS
+
+static READ16_HANDLER( scc68070_ext_irqc_r ) { return scc68070_ext_irqc_regs[offset]; }
+static WRITE16_HANDLER( scc68070_ext_irqc_w ){ scc68070_ext_irqc_regs[offset] = data; }
+static READ16_HANDLER( scc68070_iic_r )
+{
+	//printf("%04x\n",offset*2);
+
+	switch(offset)
+	{
+		case 0x04/2: return scc68070_iic_regs[offset] & 0xef; //iic status register, bit 4 = pending irq
+	}
+
+	return scc68070_iic_regs[offset];
+}
+
+static WRITE16_HANDLER( scc68070_iic_w ){ scc68070_iic_regs[offset] = data; }
+
+static READ16_HANDLER( scc68070_uart_r )
+{
+	//printf("%02x\n",offset*2);
+
+	switch(offset)
+	{
+		case 0x02/2: return mame_rand(space->machine); //uart mode register
+	}
+
+	return scc68070_uart_regs[offset];
+}
+
+static WRITE16_HANDLER( scc68070_uart_w ) {	scc68070_uart_regs[offset] = data; }
+
+static READ16_HANDLER( scc68070_timer_r ) { return scc68070_timer_regs[offset]; }
+static WRITE16_HANDLER( scc68070_timer_w ){ scc68070_timer_regs[offset] = data; }
+static READ16_HANDLER( scc68070_int_irqc_r ) { return scc68070_int_irqc_regs[offset]; }
+static WRITE16_HANDLER( scc68070_int_irqc_w ){ scc68070_int_irqc_regs[offset] = data; }
+static READ16_HANDLER( scc68070_dma_ch1_r ) { return scc68070_dma_ch1_regs[offset]; }
+static WRITE16_HANDLER( scc68070_dma_ch1_w ){ scc68070_dma_ch1_regs[offset] = data; }
+static READ16_HANDLER( scc68070_dma_ch2_r ) { return scc68070_dma_ch2_regs[offset]; }
+static WRITE16_HANDLER( scc68070_dma_ch2_w ){ scc68070_dma_ch2_regs[offset] = data; }
+static READ16_HANDLER( scc68070_mmu_r ) { return scc68070_mmu_regs[offset]; }
+static WRITE16_HANDLER( scc68070_mmu_w )
+{
+	scc68070_mmu_regs[offset] = data;
+
+	switch(offset)
+	{
+		case 0x0000/2:
+			if(data & 0x80) //throw an error if the (unemulated) MMU is enabled
+				fatalerror("SCC68070: MMU enable bit active");
+			break;
+	}
+}
+
+
 static ADDRESS_MAP_START( magicard_mem, ADDRESS_SPACE_PROGRAM, 16 )
 //  ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
-	AM_RANGE(0x000000, 0x0fffff) AM_RAM AM_BASE(&magicram) /*only 0-7ffff accessed in Magic Card*/
-//  AM_RANGE(0x100000, 0x17ffff) AM_RAM AM_REGION("maincpu", 0)
-	AM_RANGE(0x180000, 0x1ffbff) AM_ROM AM_REGION("maincpu", 0)
-	/* 1ffc00-1ffdff System I/O */
-	AM_RANGE(0x1ffc00, 0x1ffc01) AM_READ(test_r)
-	AM_RANGE(0x1ffc40, 0x1ffc41) AM_READ(test_r)
-	AM_RANGE(0x1ffd00, 0x1ffd05) AM_WRITE(paletteram_io_w) //RAMDAC
+	AM_RANGE(0x00000000, 0x0017ffff) AM_MIRROR(0x7fe00000) AM_RAM AM_BASE(&magicram) /*only 0-7ffff accessed in Magic Card*/
+	AM_RANGE(0x00180000, 0x001ffbff) AM_MIRROR(0x7fe00000) AM_RAM AM_REGION("maincpu", 0)
+	/* 001ffc00-001ffdff System I/O */
+	AM_RANGE(0x001ffc00, 0x001ffc01) AM_MIRROR(0x7fe00000) AM_READ(test_r)
+	AM_RANGE(0x001ffc40, 0x001ffc41) AM_MIRROR(0x7fe00000) AM_READ(test_r)
+	AM_RANGE(0x001ffd00, 0x001ffd05) AM_MIRROR(0x7fe00000) AM_WRITE(paletteram_io_w) //RAMDAC
 	/*not the right sound chip,unknown type,it should be an ADPCM with 8 channels.*/
-	AM_RANGE(0x1ffd40, 0x1ffd43) AM_DEVWRITE8("ym", ym2413_w, 0x00ff)
-	AM_RANGE(0x1ffd80, 0x1ffd81) AM_READ(test_r)
-	AM_RANGE(0x1ffd80, 0x1ffd81) AM_WRITENOP //?
-	AM_RANGE(0x1fff80, 0x1fffbf) AM_RAM //DRAM I/O, not accessed by this game, CD buffer?
-	AM_RANGE(0x1fffe0, 0x1fffff) AM_READWRITE(philips_66470_r,philips_66470_w) AM_BASE(&pcab_vregs) //video registers
-	AM_RANGE(0x200000, 0x2fffff) AM_RAM
+	AM_RANGE(0x001ffd40, 0x001ffd43) AM_MIRROR(0x7fe00000) AM_DEVWRITE8("ym", ym2413_w, 0x00ff)
+	AM_RANGE(0x001ffd80, 0x001ffd81) AM_MIRROR(0x7fe00000) AM_READ(test_r)
+	AM_RANGE(0x001ffd80, 0x001ffd81) AM_MIRROR(0x7fe00000) AM_WRITENOP //?
+	AM_RANGE(0x001fff80, 0x001fffbf) AM_MIRROR(0x7fe00000) AM_RAM //DRAM I/O, not accessed by this game, CD buffer?
+	AM_RANGE(0x001fffe0, 0x001fffff) AM_MIRROR(0x7fe00000) AM_READWRITE(philips_66470_r,philips_66470_w) AM_BASE(&pcab_vregs) //video registers
+	AM_RANGE(0x80001000, 0x8000100f) AM_READWRITE(scc68070_ext_irqc_r,scc68070_ext_irqc_w) AM_BASE(&scc68070_ext_irqc_regs) //lir
+	AM_RANGE(0x80002000, 0x8000200f) AM_READWRITE(scc68070_iic_r,scc68070_iic_w) AM_BASE(&scc68070_iic_regs) //i2c
+	AM_RANGE(0x80002010, 0x8000201f) AM_READWRITE(scc68070_uart_r,scc68070_uart_w) AM_BASE(&scc68070_uart_regs)
+	AM_RANGE(0x80002020, 0x8000202f) AM_READWRITE(scc68070_timer_r,scc68070_timer_w) AM_BASE(&scc68070_timer_regs)
+	AM_RANGE(0x80002040, 0x8000204f) AM_READWRITE(scc68070_int_irqc_r,scc68070_int_irqc_w) AM_BASE(&scc68070_int_irqc_regs)
+	AM_RANGE(0x80004000, 0x8000403f) AM_READWRITE(scc68070_dma_ch1_r,scc68070_dma_ch1_w) AM_BASE(&scc68070_dma_ch1_regs)
+	AM_RANGE(0x80004040, 0x8000407f) AM_READWRITE(scc68070_dma_ch2_r,scc68070_dma_ch2_w) AM_BASE(&scc68070_dma_ch2_regs)
+	AM_RANGE(0x80008000, 0x8000807f) AM_READWRITE(scc68070_mmu_r,scc68070_mmu_w) AM_BASE(&scc68070_mmu_regs)
 ADDRESS_MAP_END
 
 
@@ -410,13 +517,14 @@ static MACHINE_RESET( magicard )
 /*Probably there's a mask somewhere if it REALLY uses irqs at all...irq vectors dynamically changes after some time.*/
 static INTERRUPT_GEN( magicard_irq )
 {
-//  if(input_code_pressed(KEYCODE_Z))
-//      cputag_set_input_line(device->machine, "maincpu", 1, HOLD_LINE);
-//  magicram[0x2004/2]^=0xffff;
+	if(input_code_pressed(KEYCODE_Z)) //vblank?
+		cpu_set_input_line_and_vector(device, 1, HOLD_LINE,0xe4/4);
+	if(input_code_pressed(KEYCODE_X)) //uart irq
+		cpu_set_input_line_and_vector(device, 1, HOLD_LINE,0xf0/4);
 }
 
 static MACHINE_DRIVER_START( magicard )
-	MDRV_CPU_ADD("maincpu", M68000, CLOCK_A/2)	/* SCC-68070 CCA84 datasheet */
+	MDRV_CPU_ADD("maincpu", SCC68070, CLOCK_A/2)	/* SCC-68070 CCA84 datasheet */
 	MDRV_CPU_PROGRAM_MAP(magicard_mem)
  	MDRV_CPU_VBLANK_INT("screen", magicard_irq) /* no interrupts? (it erases the vectors..) */
 
@@ -487,7 +595,6 @@ GAME( 199?, magicrda, 0,     magicard, 0,     magicard,    ROT0, "Impera", "Magi
 GAME( 199?, magicrdb, 0,     magicard, 0,     magicard,    ROT0, "Impera", "Magic Card (set 3)", GAME_NO_SOUND | GAME_NOT_WORKING )
 
 /*Below here there are CD-I bios defines,to be removed in the end*/
-/*
 ROM_START( mcdi200 )
     ROM_REGION( 0x80000, "maincpu", 0 )
     ROM_LOAD16_WORD( "mgvx200.rom", 0x000000, 0x80000, CRC(40c4e6b9) SHA1(d961de803c89b3d1902d656ceb9ce7c02dccb40a) )
@@ -503,7 +610,8 @@ ROM_START( pcdi910m )
     ROM_LOAD16_WORD( "cdi910.rom", 0x000000, 0x80000,  CRC(8ee44ed6) SHA1(3fcdfa96f862b0cb7603fb6c2af84cac59527b05) )
 ROM_END
 
-//GAME( 199?, mcdi200, 0,     magicard, 0,     magicard,    ROT0, "Philips", "Magnavox CD-I 200 BIOS", GAME_NO_SOUND | GAME_NOT_WORKING )
-//GAME( 199?, pcdi490, 0,     magicard, 0,     magicard,    ROT0, "Philips", "Philips CD-I 490 BIOS", GAME_NO_SOUND | GAME_NOT_WORKING )
-//GAME( 199?, pcdi910m,0,     magicard, 0,     magicard,    ROT0, "Philips", "Philips CD-I 910 (Memorex-Tandy) BIOS", GAME_NO_SOUND | GAME_NOT_WORKING )
-*/
+#ifdef ENABLE_CDI_BIOS
+GAME( 199?, mcdi200, 0,     magicard, 0,     magicard,    ROT0, "Philips", "Magnavox CD-I 200 BIOS", GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 199?, pcdi490, 0,     magicard, 0,     magicard,    ROT0, "Philips", "Philips CD-I 490 BIOS", GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 199?, pcdi910m,0,     magicard, 0,     magicard,    ROT0, "Philips", "Philips CD-I 910 (Memorex-Tandy) BIOS", GAME_NO_SOUND | GAME_NOT_WORKING )
+#endif

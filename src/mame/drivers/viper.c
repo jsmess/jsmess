@@ -25,6 +25,10 @@
     G?C00         2003    Pop'n Music 9
     G?C09         2002    Mahjong Fight Club
     G?C22         2002    World Combat (USA/Japan/Korea) / Warzaid (Europe)
+
+Note:
+Everything but p911uc might be a bad dump.
+
 */
 
 #include "driver.h"
@@ -35,7 +39,7 @@
 #include "machine/timekpr.h"
 #include "video/voodoo.h"
 
-
+//#define VIPER_DEBUG_LOG
 
 static VIDEO_UPDATE(viper)
 {
@@ -44,13 +48,14 @@ static VIDEO_UPDATE(viper)
 }
 
 
-
 /*****************************************************************************/
 
 static UINT32 mpc8240_regs[256/4];
 static UINT32 mpc8240_pci_r(const device_config *busdevice, const device_config *device, int function, int reg, UINT32 mem_mask)
 {
-//  printf("MPC8240: PCI read %d, %02X, %08X\n", function, reg, mem_mask);
+	#ifdef VIPER_DEBUG_LOG
+	printf("MPC8240: PCI read %d, %02X, %08X\n", function, reg, mem_mask);
+	#endif
 
 	switch (reg)
 	{
@@ -61,7 +66,10 @@ static UINT32 mpc8240_pci_r(const device_config *busdevice, const device_config 
 
 static void mpc8240_pci_w(const device_config *busdevice, const device_config *device, int function, int reg, UINT32 data, UINT32 mem_mask)
 {
-//  printf("MPC8240: PCI write %d, %02X, %08X, %08X\n", function, reg, data, mem_mask);
+	#ifdef VIPER_DEBUG_LOG
+	printf("MPC8240: PCI write %d, %02X, %08X, %08X\n", function, reg, data, mem_mask);
+	#endif
+
 	COMBINE_DATA(mpc8240_regs + (reg/4));
 }
 
@@ -95,7 +103,9 @@ static READ32_HANDLER( epic_r )
 	int reg;
 	reg = offset * 4;
 
-	//printf("EPIC: read %08X, %08X at %08X\n", reg, mem_mask, cpu_get_pc(space->cpu));
+	#ifdef VIPER_DEBUG_LOG
+	printf("EPIC: read %08X, %08X at %08X\n", reg, mem_mask, cpu_get_pc(space->cpu));
+	#endif
 
 	switch (reg >> 16)
 	{
@@ -120,7 +130,9 @@ static WRITE32_HANDLER( epic_w )
 	int reg;
 	reg = offset * 4;
 
-	//printf("EPIC: write %08X, %08X, %08X at %08X\n", data, reg, mem_mask, cpu_get_pc(space->cpu));
+	#ifdef VIPER_DEBUG_LOG
+	printf("EPIC: write %08X, %08X, %08X at %08X\n", data, reg, mem_mask, cpu_get_pc(space->cpu));
+	#endif
 
 	switch (reg >> 16)
 	{
@@ -271,7 +283,9 @@ static READ64_DEVICE_HANDLER(cf_card_r)
 
 static WRITE64_DEVICE_HANDLER(cf_card_w)
 {
-	//printf("%s:compact_flash_w: %08X%08X, %08X, %08X%08X\n", cpuexec_describe_context(device->machine), (UINT32)(data>>32), (UINT32)(data), offset, (UINT32)(mem_mask >> 32), (UINT32)(mem_mask));
+	#ifdef VIPER_DEBUG_LOG
+	printf("%s:compact_flash_w: %08X%08X, %08X, %08X%08X\n", cpuexec_describe_context(device->machine), (UINT32)(data>>32), (UINT32)(data), offset, (UINT32)(mem_mask >> 32), (UINT32)(mem_mask));
+	#endif
 
 	if (ACCESSING_BITS_16_31)
 	{
@@ -629,6 +643,7 @@ MACHINE_DRIVER_END
 
 static DRIVER_INIT(viper)
 {
+//  memory_install_readwrite64_device_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), ide, 0xff200000, 0xff207fff, 0, 0, hdd_r, hdd_w ); //TODO
 }
 
 static DRIVER_INIT(vipercf)
@@ -764,7 +779,7 @@ ROM_START(p911uc)
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
 
 	DISK_REGION( "ide" )
-	DISK_IMAGE( "a00aac02", 0, SHA1(dc665581d854cb7f69621927beff145676926af7) )
+	DISK_IMAGE( "a00aac02", 0, SHA1(b268789416dbf8886118a634b911f0ee254970de) )
 ROM_END
 
 ROM_START(p911e)
