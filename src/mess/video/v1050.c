@@ -7,7 +7,6 @@
 	TODO:
 
 	- row update
-	- vsync interrupt to Z80
 
 */
 
@@ -77,14 +76,11 @@ static MC6845_UPDATE_ROW( v1050_update_row )
 
 static WRITE_LINE_DEVICE_HANDLER( v1050_vsync_changed )
 {
-	//v1050_state *driver_state = device->machine->driver_data;
-
 	if (state)
 	{
 		cputag_set_input_line(device->machine, M6502_TAG, INPUT_LINE_IRQ0, ASSERT_LINE);
+		v1050_set_int(device->machine, INT_VSYNC, 1);
 	}
-
-	//upb8214_r3_w(driver_state->upb8214, state);
 }
 
 static const mc6845_interface v1050_mc6845_intf = 
