@@ -31,7 +31,7 @@
 #include "includes/bw2.h"
 #include "cpu/z80/z80.h"
 #include "includes/serial.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255a.h"
 #include "machine/ctronics.h"
 #include "machine/msm8251.h"
 #include "machine/wd17xx.h"
@@ -370,7 +370,7 @@ static WRITE8_HANDLER( bw2_wd2797_w )
 
 /* PPI */
 
-static WRITE8_DEVICE_HANDLER( bw2_ppi8255_a_w )
+static WRITE8_DEVICE_HANDLER( bw2_8255_a_w )
 {
 	const device_config *fdc = devtag_get_device(device->machine, "wd179x");
 	/*
@@ -405,7 +405,7 @@ static WRITE8_DEVICE_HANDLER( bw2_ppi8255_a_w )
 	centronics_strobe_w(state->centronics, BIT(data, 7));
 }
 
-static READ8_DEVICE_HANDLER( bw2_ppi8255_b_r )
+static READ8_DEVICE_HANDLER( bw2_8255_b_r )
 {
 	/*
 
@@ -433,7 +433,7 @@ static READ8_DEVICE_HANDLER( bw2_ppi8255_b_r )
 	return 0xff;
 }
 
-static WRITE8_DEVICE_HANDLER( bw2_ppi8255_c_w )
+static WRITE8_DEVICE_HANDLER( bw2_8255_c_w )
 {
 	/*
 
@@ -454,7 +454,7 @@ static WRITE8_DEVICE_HANDLER( bw2_ppi8255_c_w )
 	}
 }
 
-static READ8_DEVICE_HANDLER( bw2_ppi8255_c_r )
+static READ8_DEVICE_HANDLER( bw2_8255_c_r )
 {
 	/*
 
@@ -477,14 +477,14 @@ static READ8_DEVICE_HANDLER( bw2_ppi8255_c_r )
 	return data;
 }
 
-static const ppi8255_interface bw2_ppi8255_interface =
+static I8255A_INTERFACE( bw2_8255_interface )
 {
 	DEVCB_NULL,
-	DEVCB_HANDLER(bw2_ppi8255_b_r),
-	DEVCB_HANDLER(bw2_ppi8255_c_r),
-	DEVCB_HANDLER(bw2_ppi8255_a_w),
+	DEVCB_HANDLER(bw2_8255_b_r),
+	DEVCB_HANDLER(bw2_8255_c_r),
+	DEVCB_HANDLER(bw2_8255_a_w),
 	DEVCB_NULL,
-	DEVCB_HANDLER(bw2_ppi8255_c_w),
+	DEVCB_HANDLER(bw2_8255_c_w),
 };
 
 /* PIT */
@@ -584,6 +584,10 @@ static MACHINE_START( bw2 )
 	state->msm6255 = devtag_get_device(machine, MSM6255_TAG);
 	state->centronics = devtag_get_device(machine, CENTRONICS_TAG);
 
+	/* memory banking */
+	memory_configure_bank(machine, 1, BANK_RAM1, 1, state->work_ram, 0);
+	memory_configure_bank(machine, 1, BANK_VRAM, 1, state->video_ram, 0);
+
 	/* register for state saving */
 	state_save_register_global(machine, state->keyboard_row);
 	state_save_register_global_pointer(machine, state->work_ram, mess_ram_size);
@@ -603,8 +607,6 @@ static MACHINE_RESET( bw2 )
 	{
 		// RAMCARD installed
 
-		memory_configure_bank(machine, 1, BANK_RAM1, 1, state->work_ram, 0);
-		memory_configure_bank(machine, 1, BANK_VRAM, 1, state->video_ram, 0);
 		memory_configure_bank(machine, 1, BANK_RAMCARD_ROM, 1, memory_region(machine, "ramcard"), 0);
 		memory_configure_bank(machine, 1, BANK_RAM3, 2, state->work_ram + 0x8000, 0x8000);
 		memory_configure_bank(machine, 1, BANK_RAMCARD_RAM, 1, state->ramcard_ram, 0);
@@ -617,8 +619,6 @@ static MACHINE_RESET( bw2 )
 	{
 		// no RAMCARD
 
-		memory_configure_bank(machine, 1, BANK_RAM1, 1, state->work_ram, 0);
-		memory_configure_bank(machine, 1, BANK_VRAM, 1, state->video_ram, 0);
 		memory_configure_bank(machine, 1, BANK_RAM2, 5, state->work_ram + 0x8000, 0x8000);
 		memory_configure_bank(machine, 1, BANK_ROM, 1, memory_region(machine, "ic1"), 0);
 
@@ -637,7 +637,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bw2_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x00, 0x03 ) AM_DEVREADWRITE(PPI8255_TAG, ppi8255_r, ppi8255_w )
+	AM_RANGE( 0x00, 0x03 ) AM_DEVREADWRITE(I8255A_TAG, i8255a_r, i8255a_w )
 	AM_RANGE( 0x10, 0x13 ) AM_DEVREADWRITE(PIT8253_TAG, pit8253_r, pit8253_w )
 	AM_RANGE( 0x20, 0x21 ) AM_DEVREADWRITE(MSM6255_TAG, msm6255_register_r, msm6255_register_w )
 //	AM_RANGE( 0x30, 0x3f ) SLOT
@@ -819,7 +819,7 @@ static MACHINE_DRIVER_START( bw2 )
 	MDRV_MACHINE_RESET( bw2 )
 
 	MDRV_PIT8253_ADD( PIT8253_TAG, bw2_pit8253_interface )
-	MDRV_PPI8255_ADD( PPI8255_TAG, bw2_ppi8255_interface )
+	MDRV_I8255A_ADD( I8255A_TAG, bw2_8255_interface )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD( SCREEN_TAG, LCD )

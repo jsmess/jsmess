@@ -3,7 +3,7 @@
 
 #define SCREEN_TAG	"screen"
 #define Z80_TAG		"ic1"
-#define PPI8255_TAG	"ic4"
+#define I8255A_TAG	"ic4"
 #define WD2797_TAG	"ic5"
 #define PIT8253_TAG	"ic6"
 #define MSM8251_TAG	"ic7"
