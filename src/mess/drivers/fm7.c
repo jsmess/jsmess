@@ -207,6 +207,24 @@ static const UINT16 fm7_key_list[0x60][7] =
 	{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
 };
 
+
+static void main_irq_set_flag(running_machine* machine, UINT8 flag)
+{
+	irq_flags |= flag;
+	
+	if(irq_flags != 0)
+		cputag_set_input_line(machine,"maincpu",M6809_IRQ_LINE,ASSERT_LINE);
+}
+
+static void main_irq_clear_flag(running_machine* machine, UINT8 flag)
+{
+	irq_flags &= ~flag;
+
+	if(irq_flags == 0)
+		cputag_set_input_line(machine,"maincpu",M6809_IRQ_LINE,CLEAR_LINE);
+}
+
+
 /*
  * Main CPU: I/O port 0xfd02
  * 
@@ -245,7 +263,14 @@ static READ8_HANDLER( fm7_irq_cause_r )
 {
 	UINT8 ret = ~irq_flags;
 	
-	irq_flags &= ~0x07;  // clear flags
+	// Timer and Printer IRQ flags are cleared when this port is read
+	// Keyboard IRQ flag is cleared when the scancode is read from
+	// either keyboard data port (main CPU 0xfd01 or sub CPU 0xd401) 
+	if(irq_flags & 0x04)
+		main_irq_clear_flag(space->machine,IRQ_FLAG_TIMER);
+	if(irq_flags & 0x02)
+		main_irq_clear_flag(space->machine,IRQ_FLAG_PRINTER);
+		
 	logerror("IRQ flags read: 0x%02x\n",ret);
 	return ret;
 }
@@ -452,6 +477,7 @@ static WRITE8_HANDLER( fm7_fdc_w )
  *  The scancode of the last key pressed is stored in fd/d401, with the 9th
  *  bit (MSB) in bit 7 of fd/d400.  0xfd00 also holds a flag for the main
  *  CPU clock speed in bit 0 (0 = 1.2MHz, 1 = 2MHz)
+ *  Clears keyboard IRQ flag
  */
 static READ8_HANDLER( fm7_keyboard_r)
 {
@@ -463,6 +489,7 @@ static READ8_HANDLER( fm7_keyboard_r)
 			ret |= 0x01; // 1 = 2MHz, 0 = 1.2MHz
 			return ret;
 		case 1:
+			main_irq_clear_flag(space->machine,IRQ_FLAG_KEY);
 			return current_scancode & 0xff;
 		default:
 			return 0x00;
@@ -478,6 +505,7 @@ READ8_HANDLER( fm7_sub_keyboard_r)
 			ret = (current_scancode >> 1) & 0x80;
 			return ret;
 		case 1:
+			main_irq_clear_flag(space->machine,IRQ_FLAG_KEY);
 			return current_scancode & 0xff;
 		default:
 			return 0x00;
@@ -1089,8 +1117,7 @@ static TIMER_CALLBACK( fm7_timer_irq )
 {
 	if(irq_mask & IRQ_FLAG_TIMER)
 	{
-		irq_flags |= IRQ_FLAG_TIMER;
-		cputag_set_input_line(machine,"maincpu",M6809_IRQ_LINE,ASSERT_LINE);
+		main_irq_set_flag(machine,IRQ_FLAG_TIMER);
 	}
 }
 
@@ -1112,8 +1139,7 @@ static void key_press(running_machine* machine, UINT16 scancode)
 	
 	if(irq_mask & IRQ_FLAG_KEY)
 	{
-		irq_flags |= IRQ_FLAG_KEY;
-		cputag_set_input_line(machine,"maincpu",M6809_IRQ_LINE,ASSERT_LINE);
+		main_irq_set_flag(machine,IRQ_FLAG_KEY);
 	}
 	else
 	{
@@ -1222,7 +1248,8 @@ static TIMER_CALLBACK( fm7_keyboard_poll )
 
 static IRQ_CALLBACK(fm7_irq_ack)
 {
-	cputag_set_input_line(device->machine,"maincpu",irqline,CLEAR_LINE);
+	if(irqline == M6809_FIRQ_LINE)
+		cputag_set_input_line(device->machine,"maincpu",irqline,CLEAR_LINE);
 	return -1;
 }
 
@@ -1237,15 +1264,13 @@ void fm77av_fmirq(const device_config* device,int irq)
 	if(irq == 1)
 	{
 		// cannot be masked
-		irq_flags |= IRQ_FLAG_OTHER;
-		cputag_set_input_line(device->machine,"maincpu",M6809_IRQ_LINE,ASSERT_LINE);
+		main_irq_set_flag(device->machine,IRQ_FLAG_OTHER);
 		fm77av_ym_irq = 1;
 		logerror("YM: IRQ on\n");
 	}
 	else
 	{
-		irq_flags &= ~IRQ_FLAG_OTHER;
-		cputag_set_input_line(device->machine,"maincpu",M6809_IRQ_LINE,CLEAR_LINE);
+		main_irq_clear_flag(device->machine,IRQ_FLAG_OTHER);
 		fm77av_ym_irq = 0;
 		logerror("YM: IRQ off\n");
 	}
