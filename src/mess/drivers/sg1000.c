@@ -73,7 +73,7 @@ Notes:
 #include "machine/ctronics.h"
 #include "includes/serial.h"
 #include "machine/msm8251.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255a.h"
 #include "machine/nec765.h"
 #include "sound/sn76496.h"
 #include "video/tms9928a.h"
@@ -168,13 +168,13 @@ static ADDRESS_MAP_START( sc3000_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x7f, 0x7f) AM_DEVWRITE(SN76489A_TAG, sn76496_w)
 	AM_RANGE(0xbe, 0xbe) AM_READWRITE(TMS9928A_vram_r, TMS9928A_vram_w)
 	AM_RANGE(0xbf, 0xbf) AM_READWRITE(TMS9928A_register_r, TMS9928A_register_w)
-	AM_RANGE(0xdc, 0xdf) AM_DEVREADWRITE("ppi8255", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xdc, 0xdf) AM_DEVREADWRITE("ppi8255", i8255a_r, i8255a_w)
 ADDRESS_MAP_END
 
 /* This is how the I/O ports are really mapped, but MAME does not support overlapping ranges
 static ADDRESS_MAP_START( sc3000_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0xdf) AM_DEVREADWRITE("ppi8255", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0xdf) AM_DEVREADWRITE("ppi8255", i8255a_r, i8255a_w)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x7f) AM_WRITE(sn76496_0_w)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0xae) AM_READWRITE(TMS9928A_vram_r, TMS9928A_vram_w)
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0xae) AM_READWRITE(TMS9928A_register_r, TMS9928A_register_w)
@@ -194,10 +194,10 @@ static ADDRESS_MAP_START( sf7000_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x7f, 0x7f) AM_DEVWRITE(SN76489A_TAG, sn76496_w)
 	AM_RANGE(0xbe, 0xbe) AM_READWRITE(TMS9928A_vram_r, TMS9928A_vram_w)
 	AM_RANGE(0xbf, 0xbf) AM_READWRITE(TMS9928A_register_r, TMS9928A_register_w)
-	AM_RANGE(0xdc, 0xdf) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xdc, 0xdf) AM_DEVREADWRITE("ppi8255_0", i8255a_r, i8255a_w)
 	AM_RANGE(0xe0, 0xe0) AM_DEVREAD(NEC765_TAG, nec765_status_r)
 	AM_RANGE(0xe1, 0xe1) AM_DEVREADWRITE(NEC765_TAG, nec765_data_r, nec765_data_w)
-	AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE("ppi8255_1", i8255a_r, i8255a_w)
 	AM_RANGE(0xe8, 0xe8) AM_DEVREADWRITE("uart", msm8251_data_r, msm8251_data_w)
 	AM_RANGE(0xe9, 0xe9) AM_DEVREADWRITE("uart", msm8251_status_r, msm8251_control_w)
 ADDRESS_MAP_END
@@ -567,7 +567,7 @@ static WRITE8_DEVICE_HANDLER( sc3000_ppi8255_c_w )
 	/* printer */
 }
 
-static const ppi8255_interface sc3000_ppi8255_intf =
+static I8255A_INTERFACE( sc3000_ppi8255_intf )
 {
 	DEVCB_HANDLER(sc3000_ppi8255_a_r),	// Port A read
 	DEVCB_HANDLER(sc3000_ppi8255_b_r),	// Port B read
@@ -657,7 +657,7 @@ static WRITE8_DEVICE_HANDLER( sf7000_ppi8255_c_w )
 	centronics_strobe_w(printer, BIT(data, 7));
 }
 
-static const ppi8255_interface sf7000_ppi8255_intf[2] =
+static const i8255a_interface sf7000_ppi8255_intf[2] =
 {
 	{
 		DEVCB_HANDLER(sc3000_ppi8255_a_r),		// Port A read
@@ -880,7 +880,7 @@ static MACHINE_DRIVER_START( sc3000 )
 
 	MDRV_MACHINE_START( sc3000 )
 
-	MDRV_PPI8255_ADD( "ppi8255", sc3000_ppi8255_intf ) // uPD9255AC-2
+	MDRV_I8255A_ADD( "ppi8255", sc3000_ppi8255_intf ) // uPD9255AC-2
 
     /* video hardware */
 	MDRV_IMPORT_FROM(tms9928a)
@@ -918,8 +918,8 @@ static MACHINE_DRIVER_START( sf7000 )
 	MDRV_MACHINE_START( sf7000 )
 	MDRV_MACHINE_RESET( sf7000 )
 
-	MDRV_PPI8255_ADD("ppi8255_0", sf7000_ppi8255_intf[0])
-	MDRV_PPI8255_ADD("ppi8255_1", sf7000_ppi8255_intf[1])
+	MDRV_I8255A_ADD("ppi8255_0", sf7000_ppi8255_intf[0])
+	MDRV_I8255A_ADD("ppi8255_1", sf7000_ppi8255_intf[1])
 
     /* video hardware */
 	MDRV_IMPORT_FROM(tms9928a)
