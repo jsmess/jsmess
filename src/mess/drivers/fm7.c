@@ -327,7 +327,10 @@ static READ8_HANDLER( fm7_rom_en_r )
 	
 	basic_rom_en = 1;
 	if(fm7_type == SYS_FM7)
+	{
+		memory_install_readwrite8_handler(space,0x8000,0xfbff,0,0,SMH_BANK(1),SMH_NOP);
 		memory_set_bankptr(space->machine,1,RAM+0x38000);
+	}
 	else
 		fm7_mmr_refresh(space);
 	logerror("BASIC ROM enabled\n");
@@ -340,7 +343,10 @@ static WRITE8_HANDLER( fm7_rom_en_w )
 	
 	basic_rom_en = 0;
 	if(fm7_type == SYS_FM7)
+	{
+		memory_install_readwrite8_handler(space,0x8000,0xfbff,0,0,SMH_BANK(1),SMH_BANK(1));
 		memory_set_bankptr(space->machine,1,RAM+0x8000);
+	}
 	else
 		fm7_mmr_refresh(space);
 	logerror("BASIC ROM disabled\n");
@@ -1288,7 +1294,7 @@ void fm77av_fmirq(const device_config* device,int irq)
 // The FM-7 has only 64kB RAM, so we'll worry about banking when we do the later models
 static ADDRESS_MAP_START( fm7_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000,0x7fff) AM_RAM 
-	AM_RANGE(0x8000,0xfbff) AM_RAMBANK(1) // also F-BASIC ROM, when enabled
+	AM_RANGE(0x8000,0xfbff) AM_ROMBANK(1) // also F-BASIC ROM, when enabled
 	AM_RANGE(0xfc00,0xfc7f) AM_RAM
 	AM_RANGE(0xfc80,0xfcff) AM_RAM AM_READWRITE(fm7_main_shared_r,fm7_main_shared_w)
 	// I/O space (FD00-FDFF)
