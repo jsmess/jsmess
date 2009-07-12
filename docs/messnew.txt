@@ -62,7 +62,7 @@ System Driver Changes:
 
 - [PC] Renamed bondwell to bw230. [Curt Coder]
 
-- [PC200] Proper ROM labels and PCB locations. [John Elliott]
+- [PC200] Proper ROM labels and PCB locations, added v1.2 dump. [John Elliott]
 
 - [POLY880] System is now working, except single stepping. [Curt Coder]
 
