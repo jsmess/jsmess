@@ -210,7 +210,9 @@ static ADDRESS_MAP_START( lnw80_io, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( model3_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x37ff) AM_ROM
+	AM_RANGE(0x0000, 0x37e7) AM_ROM
+	AM_RANGE(0x37e8, 0x37e9) AM_READWRITE(trs80_printer_r, trs80_printer_w)
+	AM_RANGE(0x37ea, 0x37ff) AM_ROM
 	AM_RANGE(0x3800, 0x38ff) AM_MIRROR(0x300) AM_READ(trs80_keyboard_r)
 	AM_RANGE(0x3c00, 0x3fff) AM_READWRITE(trs80_videoram_r, trs80_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x4000, 0xffff) AM_RAM
@@ -467,8 +469,8 @@ static MACHINE_DRIVER_START( model3 )
 
 	MDRV_VIDEO_UPDATE( trs80m4 )
 	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_SIZE(80*FW, 240)
-	MDRV_SCREEN_VISIBLE_AREA(0,80*FW-1,0,239)
+	MDRV_SCREEN_SIZE(80*8, 240)
+	MDRV_SCREEN_VISIBLE_AREA(0,80*8-1,0,239)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( sys80 )
@@ -616,18 +618,18 @@ ROM_START(trs80m4)
 	ROM_REGION(0x10000, "maincpu",0)
 	ROM_LOAD("trs80m4.rom",  0x0000, 0x3800, CRC(1a92d54d) SHA1(752555fdd0ff23abc9f35c6e03d9d9b4c0e9677b))
 
-	ROM_REGION(0x00400, "gfx1",0)
+	ROM_REGION(0x00800, "gfx1",0)
 	/* this rom unlikely to be the correct one, but it will do for now */
-	ROM_LOAD("trs80m1.chr",  0x0000, 0x0400, NO_DUMP CRC(0033f2b9) SHA1(0d2cd4197d54e2e872b515bbfdaa98efe502eda7))
+	ROM_LOAD("8044316a.u36", 0x0000, 0x0800, CRC(444c8b60) SHA1(c52ee41439bd5e57c3b113ebfd61c951e2af4446))
 ROM_END
 
 ROM_START(trs80m4p)
 	ROM_REGION(0x10000, "maincpu",0)
 	ROM_LOAD("trs80m4p.rom", 0x0000, 0x01f8, CRC(7ff336f4) SHA1(41184f5240b4b54f3804f5a22b4d78bbba52ed1d))
 
-	ROM_REGION(0x00400, "gfx1",0)
+	ROM_REGION(0x00800, "gfx1",0)
 	/* this rom unlikely to be the correct one, but it will do for now */
-	ROM_LOAD("trs80m1.chr",  0x0000, 0x0400, NO_DUMP CRC(0033f2b9) SHA1(0d2cd4197d54e2e872b515bbfdaa98efe502eda7))
+	ROM_LOAD("8044316a.u36", 0x0000, 0x0800, CRC(444c8b60) SHA1(c52ee41439bd5e57c3b113ebfd61c951e2af4446))
 ROM_END
 
 ROM_START(ht1080z)

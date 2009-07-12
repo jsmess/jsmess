@@ -71,7 +71,7 @@ VIDEO_UPDATE( trs80 )
 	{
 		for (ra = 0; ra < FH; ra++)
 		{
-			UINT16  *p = BITMAP_ADDR16(bitmap, sy++, 0);
+			UINT16 *p = BITMAP_ADDR16(bitmap, sy++, 0);
 
 			for (x = ma; x < ma + 64; x+=skip)
 			{
@@ -81,13 +81,13 @@ VIDEO_UPDATE( trs80 )
 				{
 					gfxbit = 1<<((ra & 0x0c)>>1);
 					/* Display one line of a lores character (6 pixels) */
-					*p = ( chr & gfxbit ) ? 1 : 0; p++;
-					*p = ( chr & gfxbit ) ? 1 : 0; p++;
-					*p = ( chr & gfxbit ) ? 1 : 0; p++;
+					*p++ = ( chr & gfxbit ) ? 1 : 0;
+					*p++ = ( chr & gfxbit ) ? 1 : 0;
+					*p++ = ( chr & gfxbit ) ? 1 : 0;
 					gfxbit <<= 1; 
-					*p = ( chr & gfxbit ) ? 1 : 0; p++;
-					*p = ( chr & gfxbit ) ? 1 : 0; p++;
-					*p = ( chr & gfxbit ) ? 1 : 0; p++;
+					*p++ = ( chr & gfxbit ) ? 1 : 0;
+					*p++ = ( chr & gfxbit ) ? 1 : 0;
+					*p++ = ( chr & gfxbit ) ? 1 : 0;
 				}
 				else
 				{
@@ -100,12 +100,12 @@ VIDEO_UPDATE( trs80 )
 						gfx = 0;
 
 					/* Display a scanline of a character (6 pixels) */
-					*p = ( gfx & 0x20 ) ? 1 : 0; p++;
-					*p = ( gfx & 0x10 ) ? 1 : 0; p++;
-					*p = ( gfx & 0x08 ) ? 1 : 0; p++;
-					*p = ( gfx & 0x04 ) ? 1 : 0; p++;
-					*p = ( gfx & 0x02 ) ? 1 : 0; p++;
-					*p = ( gfx & 0x01 ) ? 1 : 0; p++;
+					*p++ = ( gfx & 0x20 ) ? 1 : 0;
+					*p++ = ( gfx & 0x10 ) ? 1 : 0;
+					*p++ = ( gfx & 0x08 ) ? 1 : 0;
+					*p++ = ( gfx & 0x04 ) ? 1 : 0;
+					*p++ = ( gfx & 0x02 ) ? 1 : 0;
+					*p++ = ( gfx & 0x01 ) ? 1 : 0;
 				}
 			}
 		}
@@ -114,8 +114,7 @@ VIDEO_UPDATE( trs80 )
 	return 0;
 }
 
-/* 8-bit video, 32/64/40/80 characters per line = trs80m3, trs80m4.
-	The proper character generator is not dumped, and has extra characters in the 192-255 range. */
+/* 8-bit video, 32/64/40/80 characters per line = trs80m3, trs80m4. */
 VIDEO_UPDATE( trs80m4 )
 {
 	UINT8 y,ra,chr,gfx,gfxbit;
@@ -136,14 +135,14 @@ VIDEO_UPDATE( trs80m4 )
 	if ((trs80_mode & 0x7f) != trs80_size_store)
 	{
 		trs80_size_store = trs80_mode & 5;
-		video_screen_set_visarea(screen, 0, s_cols*FW-1, 0, rows*lines-1);
+		video_screen_set_visarea(screen, 0, s_cols*8-1, 0, rows*lines-1);
 	}
 
 	for (y = 0; y < rows; y++)
 	{
 		for (ra = 0; ra < lines; ra++)
 		{
-			UINT16  *p = BITMAP_ADDR16(bitmap, sy++, 0);
+			UINT16 *p = BITMAP_ADDR16(bitmap, sy++, 0);
 
 			for (x = ma; x < ma + cols; x+=skip)
 			{
@@ -152,14 +151,16 @@ VIDEO_UPDATE( trs80m4 )
 				if ((chr & 0x80) && (~trs80_mode & 8))
 				{
 					gfxbit = 1<<((ra & 0x0c)>>1);
-					/* Display one line of a lores character (6 pixels) */
-					*p = ( chr & gfxbit ) ? 1 : 0; p++;
-					*p = ( chr & gfxbit ) ? 1 : 0; p++;
-					*p = ( chr & gfxbit ) ? 1 : 0; p++;
+					/* Display one line of a lores character */
+					*p++ = ( chr & gfxbit ) ? 1 : 0;
+					*p++ = ( chr & gfxbit ) ? 1 : 0;
+					*p++ = ( chr & gfxbit ) ? 1 : 0;
+					*p++ = ( chr & gfxbit ) ? 1 : 0;
 					gfxbit <<= 1;
-					*p = ( chr & gfxbit ) ? 1 : 0; p++;
-					*p = ( chr & gfxbit ) ? 1 : 0; p++;
-					*p = ( chr & gfxbit ) ? 1 : 0; p++;
+					*p++ = ( chr & gfxbit ) ? 1 : 0;
+					*p++ = ( chr & gfxbit ) ? 1 : 0;
+					*p++ = ( chr & gfxbit ) ? 1 : 0;
+					*p++ = ( chr & gfxbit ) ? 1 : 0;
 				}
 				else
 				{
@@ -173,13 +174,15 @@ VIDEO_UPDATE( trs80m4 )
 					if ((trs80_mode & 8) && (chr & 0x80))
 						gfx ^= 0xff;
 
-					/* Display a scanline of a character (6 pixels) */
-					*p = ( gfx & 0x20 ) ? 1 : 0; p++;
-					*p = ( gfx & 0x10 ) ? 1 : 0; p++;
-					*p = ( gfx & 0x08 ) ? 1 : 0; p++;
-					*p = ( gfx & 0x04 ) ? 1 : 0; p++;
-					*p = ( gfx & 0x02 ) ? 1 : 0; p++;
-					*p = ( gfx & 0x01 ) ? 1 : 0; p++;
+					/* Display a scanline of a character */
+					*p++ = ( gfx & 0x80 ) ? 1 : 0;
+					*p++ = ( gfx & 0x40 ) ? 1 : 0;
+					*p++ = ( gfx & 0x20 ) ? 1 : 0;
+					*p++ = ( gfx & 0x10 ) ? 1 : 0;
+					*p++ = ( gfx & 0x08 ) ? 1 : 0;
+					*p++ = ( gfx & 0x04 ) ? 1 : 0;
+					*p++ = ( gfx & 0x02 ) ? 1 : 0;
+					*p++ = ( gfx & 0x01 ) ? 1 : 0;
 				}
 			}
 		}
@@ -207,7 +210,7 @@ VIDEO_UPDATE( ht1080z )
 	{
 		for (ra = 0; ra < FH; ra++)
 		{
-			UINT16  *p = BITMAP_ADDR16(bitmap, sy++, 0);
+			UINT16 *p = BITMAP_ADDR16(bitmap, sy++, 0);
 
 			for (x = ma; x < ma + 64; x+=skip)
 			{
@@ -217,13 +220,13 @@ VIDEO_UPDATE( ht1080z )
 				{
 					gfxbit = 1<<((ra & 0x0c)>>1);
 					/* Display one line of a lores character (6 pixels) */
-					*p = ( chr & gfxbit ) ? 1 : 0; p++;
-					*p = ( chr & gfxbit ) ? 1 : 0; p++;
-					*p = ( chr & gfxbit ) ? 1 : 0; p++;
+					*p++ = ( chr & gfxbit ) ? 1 : 0;
+					*p++ = ( chr & gfxbit ) ? 1 : 0;
+					*p++ = ( chr & gfxbit ) ? 1 : 0;
 					gfxbit <<= 1; 
-					*p = ( chr & gfxbit ) ? 1 : 0; p++;
-					*p = ( chr & gfxbit ) ? 1 : 0; p++;
-					*p = ( chr & gfxbit ) ? 1 : 0; p++;
+					*p++ = ( chr & gfxbit ) ? 1 : 0;
+					*p++ = ( chr & gfxbit ) ? 1 : 0;
+					*p++ = ( chr & gfxbit ) ? 1 : 0;
 				}
 				else
 				{
@@ -233,12 +236,12 @@ VIDEO_UPDATE( ht1080z )
 					gfx = FNT[(chr<<4) | ra ];
 
 					/* Display a scanline of a character (6 pixels) */
-					*p = ( gfx & 0x80 ) ? 1 : 0; p++;
-					*p = ( gfx & 0x40 ) ? 1 : 0; p++;
-					*p = ( gfx & 0x20 ) ? 1 : 0; p++;
-					*p = ( gfx & 0x10 ) ? 1 : 0; p++;
-					*p = ( gfx & 0x08 ) ? 1 : 0; p++;
-					*p = 0; p++;	/* fix for ht108064 */
+					*p++ = ( gfx & 0x80 ) ? 1 : 0;
+					*p++ = ( gfx & 0x40 ) ? 1 : 0;
+					*p++ = ( gfx & 0x20 ) ? 1 : 0;
+					*p++ = ( gfx & 0x10 ) ? 1 : 0;
+					*p++ = ( gfx & 0x08 ) ? 1 : 0;
+					*p++ = 0;	/* fix for ht108064 */
 				}
 			}
 		}
@@ -276,7 +279,7 @@ VIDEO_UPDATE( lnw80 )
 			{
 				for (ra = 0; ra < FH; ra++)
 				{
-					UINT16  *p = BITMAP_ADDR16(bitmap, sy++, 0);
+					UINT16 *p = BITMAP_ADDR16(bitmap, sy++, 0);
 
 					for (x = ma; x < ma + 64; x++)
 					{
@@ -286,13 +289,13 @@ VIDEO_UPDATE( lnw80 )
 						{
 							gfxbit = 1<<((ra & 0x0c)>>1);
 							/* Display one line of a lores character (6 pixels) */
-							*p = ( chr & gfxbit ) ? fg : bg; p++;
-							*p = ( chr & gfxbit ) ? fg : bg; p++;
-							*p = ( chr & gfxbit ) ? fg : bg; p++;
+							*p++ = ( chr & gfxbit ) ? fg : bg;
+							*p++ = ( chr & gfxbit ) ? fg : bg;
+							*p++ = ( chr & gfxbit ) ? fg : bg;
 							gfxbit <<= 1; 
-							*p = ( chr & gfxbit ) ? fg : bg; p++;
-							*p = ( chr & gfxbit ) ? fg : bg; p++;
-							*p = ( chr & gfxbit ) ? fg : bg; p++;
+							*p++ = ( chr & gfxbit ) ? fg : bg;
+							*p++ = ( chr & gfxbit ) ? fg : bg;
+							*p++ = ( chr & gfxbit ) ? fg : bg;
 						}
 						else
 						{
@@ -303,12 +306,12 @@ VIDEO_UPDATE( lnw80 )
 								gfx = 0;
 
 							/* Display a scanline of a character (6 pixels) */
-							*p = ( gfx & 0x04 ) ? fg : bg; p++;
-							*p = ( gfx & 0x02 ) ? fg : bg; p++;
-							*p = ( gfx & 0x40 ) ? fg : bg; p++;
-							*p = ( gfx & 0x80 ) ? fg : bg; p++;
-							*p = ( gfx & 0x20 ) ? fg : bg; p++;
-							*p = ( gfx & 0x08 ) ? fg : bg; p++;
+							*p++ = ( gfx & 0x04 ) ? fg : bg;
+							*p++ = ( gfx & 0x02 ) ? fg : bg;
+							*p++ = ( gfx & 0x40 ) ? fg : bg;
+							*p++ = ( gfx & 0x80 ) ? fg : bg;
+							*p++ = ( gfx & 0x20 ) ? fg : bg;
+							*p++ = ( gfx & 0x08 ) ? fg : bg;
 						}
 					}
 				}
@@ -321,30 +324,30 @@ VIDEO_UPDATE( lnw80 )
 			{
 				for (ra = 0; ra < 0x3000; ra+=0x400)
 				{
-					UINT16  *p = BITMAP_ADDR16(bitmap, sy++, 0);
+					UINT16 *p = BITMAP_ADDR16(bitmap, sy++, 0);
 
 					for (x = 0; x < 0x40; x++)
 					{
 						gfx = gfxram[ y | x | ra];		
 						/* Display 6 pixels in normal region */
-						*p = ( gfx & 0x01 ) ? fg : bg; p++;
-						*p = ( gfx & 0x02 ) ? fg : bg; p++;
-						*p = ( gfx & 0x04 ) ? fg : bg; p++;
-						*p = ( gfx & 0x08 ) ? fg : bg; p++;
-						*p = ( gfx & 0x10 ) ? fg : bg; p++;
-						*p = ( gfx & 0x20 ) ? fg : bg; p++;
+						*p++ = ( gfx & 0x01 ) ? fg : bg;
+						*p++ = ( gfx & 0x02 ) ? fg : bg;
+						*p++ = ( gfx & 0x04 ) ? fg : bg;
+						*p++ = ( gfx & 0x08 ) ? fg : bg;
+						*p++ = ( gfx & 0x10 ) ? fg : bg;
+						*p++ = ( gfx & 0x20 ) ? fg : bg;
 					}
 
 					for (x = 0; x < 0x10; x++)
 					{
 						gfx = gfxram[ 0x3000 | x | (ra & 0xc00) | ((ra & 0x3000) >> 8)];		
 						/* Display 6 pixels in extended region */
-						*p = ( gfx & 0x01 ) ? fg : bg; p++;
-						*p = ( gfx & 0x02 ) ? fg : bg; p++;
-						*p = ( gfx & 0x04 ) ? fg : bg; p++;
-						*p = ( gfx & 0x08 ) ? fg : bg; p++;
-						*p = ( gfx & 0x10 ) ? fg : bg; p++;
-						*p = ( gfx & 0x20 ) ? fg : bg; p++;
+						*p++ = ( gfx & 0x01 ) ? fg : bg;
+						*p++ = ( gfx & 0x02 ) ? fg : bg;
+						*p++ = ( gfx & 0x04 ) ? fg : bg;
+						*p++ = ( gfx & 0x08 ) ? fg : bg;
+						*p++ = ( gfx & 0x10 ) ? fg : bg;
+						*p++ = ( gfx & 0x20 ) ? fg : bg;
 					}
 				}
 			}
@@ -357,20 +360,20 @@ VIDEO_UPDATE( lnw80 )
 			{
 				for (ra = 0; ra < 0x3000; ra+=0x400)
 				{
-					UINT16  *p = BITMAP_ADDR16(bitmap, sy++, 0);
+					UINT16 *p = BITMAP_ADDR16(bitmap, sy++, 0);
 
 					for (x = 0; x < 0x40; x++)
 					{
 						gfx = gfxram[ y | x | ra];		
 						/* Display 6 pixels in normal region */
 						fg = (gfx & 0x38) >> 3;
-						*p = fg; p++;
-						*p = fg; p++;
-						*p = fg; p++;
+						*p++ = fg;
+						*p++ = fg;
+						*p++ = fg;
 						fg = gfx & 0x07;
-						*p = fg; p++;
-						*p = fg; p++;
-						*p = fg; p++;
+						*p++ = fg;
+						*p++ = fg;
+						*p++ = fg;
 					}
 				}
 			}
@@ -384,20 +387,20 @@ VIDEO_UPDATE( lnw80 )
 			{
 				for (ra = 0; ra < 0x3000; ra+=0x400)
 				{
-					UINT16  *p = BITMAP_ADDR16(bitmap, sy++, 0);
+					UINT16 *p = BITMAP_ADDR16(bitmap, sy++, 0);
 
 					for (x = 0; x < 0x40; x++)
 					{
 						gfx = gfxram[ y | x | ra];
 						fg = (videoram[ 0x3c00 | x | y ] & 0x38) >> 3;		
 						/* Display 6 pixels in normal region */
-						*p = ( gfx & 0x01 ) ? fg : bg; p++;
-						*p = ( gfx & 0x02 ) ? fg : bg; p++;
-						*p = ( gfx & 0x04 ) ? fg : bg; p++;
+						*p++ = ( gfx & 0x01 ) ? fg : bg;
+						*p++ = ( gfx & 0x02 ) ? fg : bg;
+						*p++ = ( gfx & 0x04 ) ? fg : bg;
 						fg = videoram[ 0x3c00 | x | y ] & 0x07;		
-						*p = ( gfx & 0x08 ) ? fg : bg; p++;
-						*p = ( gfx & 0x10 ) ? fg : bg; p++;
-						*p = ( gfx & 0x20 ) ? fg : bg; p++;
+						*p++ = ( gfx & 0x08 ) ? fg : bg;
+						*p++ = ( gfx & 0x10 ) ? fg : bg;
+						*p++ = ( gfx & 0x20 ) ? fg : bg;
 					}
 
 					for (x = 0; x < 0x10; x++)
@@ -405,13 +408,13 @@ VIDEO_UPDATE( lnw80 )
 						gfx = gfxram[ 0x3000 | x | (ra & 0xc00) | ((ra & 0x3000) >> 8)];		
 						fg = (gfxram[ 0x3c00 | x | y ] & 0x38) >> 3;		
 						/* Display 6 pixels in extended region */
-						*p = ( gfx & 0x01 ) ? fg : bg; p++;
-						*p = ( gfx & 0x02 ) ? fg : bg; p++;
-						*p = ( gfx & 0x04 ) ? fg : bg; p++;
+						*p++ = ( gfx & 0x01 ) ? fg : bg;
+						*p++ = ( gfx & 0x02 ) ? fg : bg;
+						*p++ = ( gfx & 0x04 ) ? fg : bg;
 						fg = gfxram[ 0x3c00 | x | y ] & 0x07;		
-						*p = ( gfx & 0x08 ) ? fg : bg; p++;
-						*p = ( gfx & 0x10 ) ? fg : bg; p++;
-						*p = ( gfx & 0x20 ) ? fg : bg; p++;
+						*p++ = ( gfx & 0x08 ) ? fg : bg;
+						*p++ = ( gfx & 0x10 ) ? fg : bg;
+						*p++ = ( gfx & 0x20 ) ? fg : bg;
 					}
 				}
 			}
@@ -439,7 +442,7 @@ VIDEO_UPDATE( radionic )
 	{
 		for (ra = 0; ra < 16; ra++)
 		{
-			UINT16  *p = BITMAP_ADDR16(bitmap, sy++, 0);
+			UINT16 *p = BITMAP_ADDR16(bitmap, sy++, 0);
 
 			for (x = ma; x < ma + 64; x+=skip)
 			{
@@ -449,14 +452,14 @@ VIDEO_UPDATE( radionic )
 				gfx = FNT[(chr<<3) | (ra & 7) | (ra & 8) << 8];
 
 				/* Display a scanline of a character (8 pixels) */
-				*p = ( gfx & 0x01 ) ? 1 : 0; p++;
-				*p = ( gfx & 0x02 ) ? 1 : 0; p++;
-				*p = ( gfx & 0x04 ) ? 1 : 0; p++;
-				*p = ( gfx & 0x08 ) ? 1 : 0; p++;
-				*p = ( gfx & 0x10 ) ? 1 : 0; p++;
-				*p = ( gfx & 0x20 ) ? 1 : 0; p++;
-				*p = ( gfx & 0x40 ) ? 1 : 0; p++;
-				*p = ( gfx & 0x80 ) ? 1 : 0; p++;
+				*p++ = ( gfx & 0x01 ) ? 1 : 0;
+				*p++ = ( gfx & 0x02 ) ? 1 : 0;
+				*p++ = ( gfx & 0x04 ) ? 1 : 0;
+				*p++ = ( gfx & 0x08 ) ? 1 : 0;
+				*p++ = ( gfx & 0x10 ) ? 1 : 0;
+				*p++ = ( gfx & 0x20 ) ? 1 : 0;
+				*p++ = ( gfx & 0x40 ) ? 1 : 0;
+				*p++ = ( gfx & 0x80 ) ? 1 : 0;
 			}
 		}
 		ma+=64;
