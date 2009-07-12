@@ -118,7 +118,8 @@ Not dumped (to our knowledge):
  TRS80 Japanese bios
  TRS80 Katakana Character Generator
  TRS80 Small English Character Generator
- TRS80 Model III/4 Character Generators
+ TRS80 Model III old version Character Generator
+ TRS80 Model 4 Character Generator
  TRS80 Model 4P boot disk
  TRS80 Model II bios and boot disk
 
@@ -577,14 +578,38 @@ ROM_START(lnw80)
 ROM_END
 
 ROM_START(trs80m3)
+/* ROMS we have and are missing:
+HAVE	TRS-80 Model III Level 1 ROM (U104)
+MISSING	TRS-80 Model III Level 2 (ENGLISH) ROM A (U104) ver. CRC BBC4
+MISSING	TRS-80 Model III Level 2 (ENGLISH) ROM A (U104) ver. CRC DA75
+HAVE	TRS-80 Model III Level 2 (ENGLISH) ROM A (U104) ver. CRC 9639
+HAVE	TRS-80 Model III Level 2 (ENGLISH) ROM B (U105) ver. CRC 407C
+MISSING	TRS-80 Model III Level 2 (ENGLISH) ROM C (U106) ver. CRC 2B91 - early mfg. #80040316
+MISSING	TRS-80 Model III Level 2 (ENGLISH) ROM C (U106) ver. CRC 278A - no production REV A
+HAVE	TRS-80 Model III Level 2 (ENGLISH) ROM C (U106) ver. CRC 2EF8 - Manufacturing #80040316 REV B
+MISSING	TRS-80 Model III Level 2 (ENGLISH) ROM C (U106) ver. CRC 2F84 - Manufacturing #80040316 REV C
+MISSING	TRS-80 Model III Level 2 (ENGLISH) ROM C ver. CRC 2764 - Network III v1
+HAVE	TRS-80 Model III Level 2 (ENGLISH) ROM C ver. CRC 276A - Network III v2
+MISSING	TRS-80 Model III Level 2 (BELGIUM) CRC ????
+Note: Be careful when dumping rom C: if dumped on the trs-80 m3 with software, bytes 0x7e8 and 0x7e9 (addresses 0x37e8, 0x0x37e9)
+      will read as 0xFF 0xFF; on the original rom, these bytes are 0x00 0x00, those two bytes are used for printer status on the
+      trs-80 and are mapped on top of the rom; This problem can be avoided by pulling the rom chips and dumping them directly.
+*/
 	ROM_REGION(0x10000, "maincpu",0)
-	ROM_SYSTEM_BIOS(0, "trs80m3", "Standard")
-	ROMX_LOAD("trs80m3.rom", 0x0000, 0x3800, CRC(bddbf843) SHA1(04a1f062cf73c3931c038434e3f299482b6bf613), ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS(1, "trs80m3a", "Level 1 bios")
-	ROMX_LOAD("8040032.rom", 0x0000, 0x1000, CRC(6418d641) SHA1(f823ab6ceb102588d27e5f5c751e31175289291c), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS(0, "trs80m3", "Level 2 bios, RomC Rev B")
+	ROMX_LOAD("8041364.u104", 0x0000, 0x2000, CRC(ec0c6daa) SHA1(257cea6b9b46912d4681251019ec2b84f1b95fc8), ROM_BIOS(1)) // Label: "SCM91248C // Tandy (c) 80 // 8041364 // 8134" (Level 2 bios ROM A '9639')
+	ROMX_LOAD("8040332.u105", 0x2000, 0x1000, CRC(ed4ee921) SHA1(ec0a19d4b72f71e51965de63250009c3c4e4cab3), ROM_BIOS(1)) // Label: "SCM91619P // Tandy (c) 80 // 8040332 // QQ8117", (Level 2 bios ROM B '407c')
+	ROMX_LOAD("8040316b.u106", 0x3000, 0x0800, CRC(d8a225bb) SHA1(100fb585e77e9c4302b7aaae946e98bead206ee7), ROM_BIOS(1)) // 2716 EPROM Label unknown but probably 8040316b, ('standard' system ROM C REV B '2ef8')
+	ROM_SYSTEM_BIOS(1, "trs80m3_n3v2", "Level 2 bios, Network III v2 (student)")
+	ROMX_LOAD("8041364.u104", 0x0000, 0x2000, CRC(ec0c6daa) SHA1(257cea6b9b46912d4681251019ec2b84f1b95fc8), ROM_BIOS(2)) // Label: "SCM91248C // Tandy (c) 80 // 8041364 // 8134" (Level 2 bios ROM A '9639')
+	ROMX_LOAD("8040332.u105", 0x2000, 0x1000, CRC(ed4ee921) SHA1(ec0a19d4b72f71e51965de63250009c3c4e4cab3), ROM_BIOS(2)) // Label: "SCM91619P // Tandy (c) 80 // 8040332 // QQ8117" (Level 2 bios ROM B '407c')
+	ROMX_LOAD("276a.u106", 0x3000, 0x0800, CRC(7d38720a) SHA1(bef621e5ae2a8c1f9e7f6325b7841f5ab8ab7e6a), ROM_BIOS(2)) // 2716 EPROM Label: "MOD.III // ROM C // (276A)" (Network III v2 ROM C '276a')
+	ROM_SYSTEM_BIOS(2, "trs80m3_l1", "Level 1 bios")
+	ROMX_LOAD("8040032.u104", 0x0000, 0x1000, CRC(6418d641) SHA1(f823ab6ceb102588d27e5f5c751e31175289291c), ROM_BIOS(3) ) // Label: "8040032 // (M) QQ8028 // SCM91616P"; Silkscreen: "TANDY // (C) '80"; (Level 1 bios)
 
-	ROM_REGION(0x00400, "gfx1",0)	/* incorrect rom */
-	ROM_LOAD("trs80m1.chr",  0x0000, 0x0400, NO_DUMP CRC(0033f2b9) SHA1(0d2cd4197d54e2e872b515bbfdaa98efe502eda7))
+	ROM_REGION(0x00800, "gfx1",0)	/* correct for later systems; the trs80m3_l1 bios uses the non-a version of this rom, dump is pending */
+	ROM_LOAD("8044316.u36", 0x0000, 0x0800, NO_DUMP) // Label: "(M) // SCM91665P // 8044316 // QQ8029" ('no-letter' revision)
+	ROM_LOAD("8044316a.u36", 0x0000, 0x0800, CRC(444c8b60) SHA1(c52ee41439bd5e57c3b113ebfd61c951e2af4446)) // Label: "Tandy (C) 81 // 8044316A // 8206" (rev A)
 ROM_END
 
 ROM_START(trs80m4)
