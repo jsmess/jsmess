@@ -1,10 +1,95 @@
-/***************************************************************************
+/*
 
-    Visual 1050
+Visual 1050
 
-    12/05/2009 Skeleton driver.
+PCB Layout
+----------
 
-****************************************************************************/
+REV B-1
+
+|---------------------------------------------------------------------------------------------------|
+|																|----------|						|
+|			9216												|	ROM0   |		LS74			|
+|																|----------|						|
+--						LS00	7406			LS255	LS393						4164	4164	|
+||		|-----------|											|----------|						|
+||		|	WD1793	|	LS14	7407	-		LS393	LS74	|  8251A   |		4164	4164	|
+||		|-----------|					|						|----------|						|
+|C										|											4164	4164	|
+|N		7406	LS00	LS74	LS14	|C		LS20	LS08	LS75								|
+|1										|N											4164	4164	|
+||										|5															|
+||		7406	LS195			LS244	|		LS04	LS32	LS08				4164	4164	|
+||										-															|
+||		|------------|  |--------|													4164	4164	|
+-- BAT  |	8255A	 |  |  8214  |				LS139	LS32	LS138	LS17						|
+--		|------------|  |--------|		-											4164	4164	|
+||										|C															|
+||		|--------|		LS00	LS00	|N		LS00	LS32	LS138				4164	4164	|
+|C		| 8251A  |						|6															|
+|N		|--------|		|------------|	-						|------------|						|
+|2						|	8255A	 |							|	 Z80A	 |						|
+||		1488 1489  RTC	|------------|			LS00	LS32	|------------|		LS257	LS257	|
+||																									|
+--																|------------|		|------------|	|
+|														LS04	|	8255A 	 |		|	8255A	 |	|
+|																|------------|		|------------|	|
+|																									|
+|												7404								LS257	LS257	|
+|													16MHz											|
+|		LS04	LS74	LS257														9016	9016	|
+|																									|
+--		LS74	LS04	LS74	LS163												9016	9016	|
+||																									|
+||																					9016	9016	|
+||		LS02	LS163	LS74	7404							7404								|
+||																					9016	9016	|
+||																									|
+|C		LS244	LS10	LS257					LS362			|----------|		9016	9016	|
+|N																|	ROM1   |						|
+|3		LS245	7404	LS273					LS32			|----------|		9016	9016	|
+||																									|
+||		7407			LS174					LS32								9016	9016	|
+||				15.36MHz																			|
+||																|------------|		9016	9016	|
+--						LS09	LS04			LS12			|	 6502 	 |						|
+|																|------------|		9016	9016	|
+--																									|
+|C				LS175	LS86	LS164			LS164								9016	9016	|
+|N																|------------|						|
+|4																|	 6845 	 |		LS253	LS253	|
+--		7426	LS02	LS74	LS00			LS164			|------------|						|
+|																					LS253	LS253	|
+|						REV B-1	W/O 1059			S/N 492											|
+|---------------------------------------------------------------------------------------------------|
+
+Notes:
+    All IC's shown.
+
+    ROM0	- "IC 244-032 V1.0"
+	ROM1	- "IC 244-033 V1.0"
+	Z80A	- Zilog Z8400APS Z80A CPU
+	6502	- Synertek SY6502A CPU
+	4164	- NEC D4164-2 64Kx1 Dynamic RAM
+	9016	- AMD AM9016EPC 16Kx1 Dynamic RAM
+	8214	- NEC µPB8214C Priority Interrupt Control Unit
+	8255A	- NEC D8255AC-5 Programmable Peripheral Interface
+	8251A	- NEC D8251AC Programmable Communication Interface
+	WD1793	- Mitsubishi MB8877 Floppy Disc Controller
+	9216	- SMC FDC9216 Floppy Disk Data Separator
+	1488	- Motorola MC1488 Quad Line EIA-232D Driver
+	1489	- Motorola MC1489 Quad Line Receivers
+	6845	- Hitachi HD46505SP CRT Controller
+	RTC		- OKI MSM58321RS Real Time Clock
+	BAT		- 3.4V battery
+	CN1		- parallel connector
+	CN2		- serial connector
+	CN3		- winchester connector
+	CN4		- monitor connector
+	CN5		- floppy data connector
+	CN6		- floppy power connector
+
+*/
 
 /*
 
