@@ -11,7 +11,8 @@ WRITE8_HANDLER( kb_keytronic_set_data_signal );
  */
 void kb_keytronic_set_host_interface( running_machine *machine, write8_space_func clock_cb, write8_space_func data_cb );
 
-INPUT_PORTS_EXTERN( kb_keytronic );
+INPUT_PORTS_EXTERN( kb_keytronic_pc );
+INPUT_PORTS_EXTERN( kb_keytronic_at );
 MACHINE_DRIVER_EXTERN( kb_keytronic );
 
 #endif  /* __KB_KEYTRO_H_ */

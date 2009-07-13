@@ -90,27 +90,7 @@ static struct {
   Input port declaration
 
 ***************************************************************************/
-INPUT_PORTS_START( kb_keytronic )
-	PORT_START( "kb_keytronic_0b" )
-	PORT_DIPNAME( 0x01, 0x00, "Protocol selection" )
-	PORT_DIPSETTING( 0x00, "Enhanced XT, AT and PS/2 models" )
-	PORT_DIPSETTING( 0x01, "Standard PC and XT" )
-	PORT_DIPNAME( 0x02, 0x02, "IRMA/Native scan code set" )
-	PORT_DIPSETTING( 0x00, "Native scan code set" )
-	PORT_DIPSETTING( 0x02, "IRMA Emulation" )
-	PORT_DIPNAME( 0x04, 0x04, "Enhanced 101/Native scan code set" )
-	PORT_DIPSETTING( 0x00, "Native scan code set" )
-	PORT_DIPSETTING( 0x04, "Enhanced 101 scan code set" )
-	PORT_DIPNAME( 0x08, 0x08, "Enable E0" )
-	PORT_DIPSETTING( 0x00, "Enable E0" )
-	PORT_DIPSETTING( 0x08, "Disable E0" )
-	PORT_DIPNAME( 0x10, 0x10, "Code tables" )
-	PORT_DIPSETTING( 0x00, "U.S. code tables" )
-	PORT_DIPSETTING( 0x10, "International code tables" )
-	PORT_BIT( 0x60, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME( 0x80, 0x80, "Key click" )
-	PORT_DIPSETTING( 0x00, "No key click" )
-	PORT_DIPSETTING( 0x80, "Key click" )
+static INPUT_PORTS_START( kb_keytronic_common )
 
 	PORT_START( "kb_keytronic_0f" )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )	PORT_CODE(KEYCODE_5)			PORT_CHAR('5')						/* 06 */
@@ -287,6 +267,59 @@ INPUT_PORTS_START( kb_keytronic )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )									PORT_NAME("?6d?")					/* 6d */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )	PORT_CODE(KEYCODE_F10)			PORT_CHAR(UCHAR_MAMEKEY(F10))		/* 44 */
 
+INPUT_PORTS_END
+
+
+INPUT_PORTS_START( kb_keytronic_pc )
+	PORT_INCLUDE( kb_keytronic_common )
+
+	PORT_START( "kb_keytronic_0b" )
+	PORT_DIPNAME( 0x01, 0x01, "Protocol selection" )
+	PORT_DIPSETTING( 0x00, "Enhanced XT, AT and PS/2 models" )
+	PORT_DIPSETTING( 0x01, "Standard PC and XT" )
+	PORT_DIPNAME( 0x02, 0x02, "IRMA/Native scan code set" )
+	PORT_DIPSETTING( 0x00, "Native scan code set" )
+	PORT_DIPSETTING( 0x02, "IRMA Emulation" )
+	PORT_DIPNAME( 0x04, 0x04, "Enhanced 101/Native scan code set" )
+	PORT_DIPSETTING( 0x00, "Native scan code set" )
+	PORT_DIPSETTING( 0x04, "Enhanced 101 scan code set" )
+	PORT_DIPNAME( 0x08, 0x08, "Enable E0" )
+	PORT_DIPSETTING( 0x00, "Enable E0" )
+	PORT_DIPSETTING( 0x08, "Disable E0" )
+	PORT_DIPNAME( 0x10, 0x10, "Code tables" )
+	PORT_DIPSETTING( 0x00, "U.S. code tables" )
+	PORT_DIPSETTING( 0x10, "International code tables" )
+	PORT_BIT( 0x60, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x80, 0x80, "Key click" )
+	PORT_DIPSETTING( 0x00, "No key click" )
+	PORT_DIPSETTING( 0x80, "Key click" )
+INPUT_PORTS_END
+
+
+INPUT_PORTS_START( kb_keytronic_at )
+
+	PORT_INCLUDE( kb_keytronic_common )
+
+	PORT_START( "kb_keytronic_0b" )
+	PORT_DIPNAME( 0x01, 0x00, "Protocol selection" )
+	PORT_DIPSETTING( 0x00, "Enhanced XT, AT and PS/2 models" )
+	PORT_DIPSETTING( 0x01, "Standard PC and XT" )
+	PORT_DIPNAME( 0x02, 0x02, "IRMA/Native scan code set" )
+	PORT_DIPSETTING( 0x00, "Native scan code set" )
+	PORT_DIPSETTING( 0x02, "IRMA Emulation" )
+	PORT_DIPNAME( 0x04, 0x04, "Enhanced 101/Native scan code set" )
+	PORT_DIPSETTING( 0x00, "Native scan code set" )
+	PORT_DIPSETTING( 0x04, "Enhanced 101 scan code set" )
+	PORT_DIPNAME( 0x08, 0x00, "Enable E0" )
+	PORT_DIPSETTING( 0x00, "Enable E0" )
+	PORT_DIPSETTING( 0x08, "Disable E0" )
+	PORT_DIPNAME( 0x10, 0x10, "Code tables" )
+	PORT_DIPSETTING( 0x00, "U.S. code tables" )
+	PORT_DIPSETTING( 0x10, "International code tables" )
+	PORT_BIT( 0x60, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x80, 0x80, "Key click" )
+	PORT_DIPSETTING( 0x00, "No key click" )
+	PORT_DIPSETTING( 0x80, "Key click" )
 INPUT_PORTS_END
 
 

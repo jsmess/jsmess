@@ -530,7 +530,7 @@ static INPUT_PORTS_START( pcmda )
 	PORT_BIT( 0x02, 0x02,	IPT_UNUSED ) /* no turbo switch */
 	PORT_BIT( 0x01, 0x01,	IPT_UNUSED )
 
-	PORT_INCLUDE( kb_keytronic )
+	PORT_INCLUDE( kb_keytronic_pc )
 	PORT_INCLUDE( pc_mouse_microsoft )	/* IN12 - IN14 */
 	PORT_INCLUDE( pc_joystick )			/* IN15 - IN19 */
 INPUT_PORTS_END
@@ -606,7 +606,7 @@ static INPUT_PORTS_START( pccga )
 	PORT_BIT( 0x02, 0x02,	IPT_UNUSED ) /* no turbo switch */
 	PORT_BIT( 0x01, 0x01,	IPT_UNUSED )
 
-	PORT_INCLUDE( kb_keytronic )
+	PORT_INCLUDE( kb_keytronic_pc )
 	PORT_INCLUDE( pc_mouse_microsoft )	/* IN12 - IN14 */
 	PORT_INCLUDE( pc_joystick )			/* IN15 - IN19 */
 	PORT_INCLUDE( pcvideo_cga )
@@ -683,7 +683,7 @@ static INPUT_PORTS_START( ibm5150 )
 	PORT_BIT( 0x02, 0x02,	IPT_UNUSED ) /* no turbo switch */
 	PORT_BIT( 0x01, 0x01,	IPT_UNUSED )
 
-	PORT_INCLUDE( kb_keytronic )		/* IN4 - IN11 */
+	PORT_INCLUDE( kb_keytronic_pc )		/* IN4 - IN11 */
 	PORT_INCLUDE( pc_mouse_microsoft )	/* IN12 - IN14 */
 	PORT_INCLUDE( pc_joystick )			/* IN15 - IN19 */
 	PORT_INCLUDE( pcvideo_cga )
@@ -819,7 +819,7 @@ static INPUT_PORTS_START( bondwell )
 	PORT_BIT( 0x01, 0x01,	IPT_UNUSED )
 
 //	PORT_INCLUDE( at_keyboard )		/* IN4 - IN11 */
-    PORT_INCLUDE( kb_keytronic )
+    PORT_INCLUDE( kb_keytronic_pc )
 	PORT_INCLUDE( pc_mouse_microsoft )	/* IN12 - IN14 */
 	PORT_INCLUDE( pc_joystick )			/* IN15 - IN19 */
 	PORT_INCLUDE( pcvideo_cga )
