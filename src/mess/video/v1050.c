@@ -104,13 +104,13 @@ static VIDEO_START( v1050 )
 	v1050_state *state = machine->driver_data;
 	
 	/* find devices */
-	state->mc6845 = devtag_get_device(machine, HD6845_TAG);
+	state->mc6845 = devtag_get_device(machine, H46505_TAG);
 
 	/* allocate memory */
 	state->attr_ram = auto_alloc_array(machine, UINT8, V1050_VIDEORAM_SIZE);
 
 	/* register for state saving */
-//	state_save_register_global(machine, state->);
+	state_save_register_global(machine, state->attr);
 	state_save_register_global_pointer(machine, state->attr_ram, V1050_VIDEORAM_SIZE);
 }
 
@@ -128,7 +128,7 @@ static VIDEO_UPDATE( v1050 )
 /* Machine Drivers */
 
 MACHINE_DRIVER_START( v1050_video )
-	MDRV_MC6845_ADD(HD6845_TAG, HD6845, XTAL_15_36MHz/8, v1050_mc6845_intf) /* HD6845SP */
+	MDRV_MC6845_ADD(H46505_TAG, H46505, XTAL_15_36MHz/8, v1050_mc6845_intf)
 
 	MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

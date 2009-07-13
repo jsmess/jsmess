@@ -108,7 +108,9 @@ Notes:
 #include "cpu/z80/z80.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/mcs48/mcs48.h"
+#include "formats/basicdsk.h"
 #include "devices/basicdsk.h"
+#include "devices/mflopimg.h"
 #include "machine/ctronics.h"
 #include "machine/i8214.h"
 #include "machine/i8255a.h"
@@ -247,14 +249,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( v1050_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x84, 0x87) AM_DEVREADWRITE(I8255_DISP_TAG, i8255a_r, i8255a_w)
-//	AM_RANGE(0x88, 0x88) AM_DEVREADWRITE(I8251_KB_TAG, msm8251_data_r, msm8251_data_w)
-//	AM_RANGE(0x89, 0x89) AM_DEVREADWRITE(I8251_KB_TAG, msm8251_status_r, msm8251_control_w)
-//	AM_RANGE(0x8c, 0x8c) AM_DEVREADWRITE(I8251_SIO_TAG, msm8251_data_r, msm8251_data_w)
-//	AM_RANGE(0x8d, 0x8d) AM_DEVREADWRITE(I8251_SIO_TAG, msm8251_status_r, msm8251_control_w)
-	AM_RANGE(0x90, 0x93) AM_DEVREADWRITE(I8255_MISC_TAG, i8255a_r, i8255a_w)
+	AM_RANGE(0x84, 0x87) AM_DEVREADWRITE(I8255A_DISP_TAG, i8255a_r, i8255a_w)
+	AM_RANGE(0x88, 0x88) AM_DEVREADWRITE(I8251A_KB_TAG, msm8251_data_r, msm8251_data_w)
+	AM_RANGE(0x89, 0x89) AM_DEVREADWRITE(I8251A_KB_TAG, msm8251_status_r, msm8251_control_w)
+	AM_RANGE(0x8c, 0x8c) AM_DEVREADWRITE(I8251A_SIO_TAG, msm8251_data_r, msm8251_data_w)
+	AM_RANGE(0x8d, 0x8d) AM_DEVREADWRITE(I8251A_SIO_TAG, msm8251_status_r, msm8251_control_w)
+	AM_RANGE(0x90, 0x93) AM_DEVREADWRITE(I8255A_MISC_TAG, i8255a_r, i8255a_w)
 	AM_RANGE(0x94, 0x97) AM_DEVREADWRITE(MB8877_TAG, wd17xx_r, wd17xx_w)
-	AM_RANGE(0x9c, 0x9f) AM_DEVREADWRITE(I8255_RTC_TAG, i8255a_r, i8255a_w)
+	AM_RANGE(0x9c, 0x9f) AM_DEVREADWRITE(I8255A_RTC_TAG, i8255a_r, i8255a_w)
 	AM_RANGE(0xa0, 0xa0) AM_READWRITE(vint_clr_r, vint_clr_w)
 	AM_RANGE(0xb0, 0xb0) AM_READWRITE(dint_clr_r, dint_clr_w)
 	AM_RANGE(0xc0, 0xc0) AM_READWRITE(v1050_i8214_r, v1050_i8214_w) 
@@ -265,9 +267,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( v1050_crt_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x7fff) AM_RAM AM_READWRITE(v1050_videoram_r, v1050_videoram_w) AM_BASE_MEMBER(v1050_state, video_ram)
-	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE(HD6845_TAG, mc6845_address_w)
-	AM_RANGE(0x8001, 0x8001) AM_DEVREADWRITE(HD6845_TAG, mc6845_register_r, mc6845_register_w)
-	AM_RANGE(0x9000, 0x9003) AM_DEVREADWRITE(I8255_M6502_TAG, i8255a_r, i8255a_w)
+	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE(H46505_TAG, mc6845_address_w)
+	AM_RANGE(0x8001, 0x8001) AM_DEVREADWRITE(H46505_TAG, mc6845_register_r, mc6845_register_w)
+	AM_RANGE(0x9000, 0x9003) AM_DEVREADWRITE(I8255A_M6502_TAG, i8255a_r, i8255a_w)
 	AM_RANGE(0xa000, 0xa000) AM_READWRITE(v1050_attr_r, v1050_attr_w)
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(dint_w)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(dvint_clr_w)
@@ -436,7 +438,7 @@ static MSM58321_INTERFACE( msm58321_intf )
 
 /* Display 8255A Interface */
 
-static WRITE8_DEVICE_HANDLER( crt_z80_ppi8255_c_w )
+static WRITE8_DEVICE_HANDLER( crt_z80_8255_c_w )
 {
 	v1050_state *state = device->machine->driver_data;
 
@@ -446,15 +448,15 @@ static WRITE8_DEVICE_HANDLER( crt_z80_ppi8255_c_w )
 
 static I8255A_INTERFACE( disp_8255_intf )
 {
-	DEVCB_DEVICE_HANDLER(I8255_M6502_TAG, i8255a_pb_r),	// Port A read
-	DEVCB_NULL,								// Port B read
-	DEVCB_NULL,								// Port C read
-	DEVCB_NULL,								// Port A write
-	DEVCB_NULL,								// Port B write
-	DEVCB_HANDLER(crt_z80_ppi8255_c_w)		// Port C write
+	DEVCB_DEVICE_HANDLER(I8255A_M6502_TAG, i8255a_pb_r),	// Port A read
+	DEVCB_NULL,							// Port B read
+	DEVCB_NULL,							// Port C read
+	DEVCB_NULL,							// Port A write
+	DEVCB_NULL,							// Port B write
+	DEVCB_HANDLER(crt_z80_8255_c_w)		// Port C write
 };
 
-static WRITE8_DEVICE_HANDLER( crt_m6502_ppi8255_c_w )
+static WRITE8_DEVICE_HANDLER( crt_m6502_8255_c_w )
 {
 	v1050_state *state = device->machine->driver_data;
 
@@ -464,12 +466,12 @@ static WRITE8_DEVICE_HANDLER( crt_m6502_ppi8255_c_w )
 
 static I8255A_INTERFACE( m6502_8255_intf )
 {
-	DEVCB_DEVICE_HANDLER(I8255_DISP_TAG, i8255a_pb_r),	// Port A read
-	DEVCB_NULL,								// Port B read
-	DEVCB_NULL,								// Port C read
-	DEVCB_NULL,								// Port A write
-	DEVCB_NULL,								// Port B write
-	DEVCB_HANDLER(crt_m6502_ppi8255_c_w)	// Port C write
+	DEVCB_DEVICE_HANDLER(I8255A_DISP_TAG, i8255a_pb_r),	// Port A read
+	DEVCB_NULL,							// Port B read
+	DEVCB_NULL,							// Port C read
+	DEVCB_NULL,							// Port A write
+	DEVCB_NULL,							// Port B write
+	DEVCB_HANDLER(crt_m6502_8255_c_w)	// Port C write
 };
 
 /* Miscellanous 8255A Interface */
@@ -496,10 +498,10 @@ static WRITE8_DEVICE_HANDLER( misc_8255_a_w )
 	int f_motor_on = !BIT(data, 6);
 
 	/* floppy drive select */
-	if (BIT(data, 0)) wd17xx_set_drive(state->mb8877, 0);
-	if (BIT(data, 1)) wd17xx_set_drive(state->mb8877, 1);
-//	if (BIT(data, 2)) wd17xx_set_drive(state->mb8877, 2);
-//	if (BIT(data, 3)) wd17xx_set_drive(state->mb8877, 3);
+	if (!BIT(data, 0)) wd17xx_set_drive(state->mb8877, 0);
+	if (!BIT(data, 1)) wd17xx_set_drive(state->mb8877, 1);
+	if (!BIT(data, 2)) wd17xx_set_drive(state->mb8877, 2);
+	if (!BIT(data, 3)) wd17xx_set_drive(state->mb8877, 3);
 
 	/* floppy side select */
 	wd17xx_set_side(state->mb8877, BIT(data, 4));
@@ -701,6 +703,47 @@ static I8255A_INTERFACE( rtc_8255_intf )
 	DEVCB_HANDLER(rtc_8255_c_w)			// Port C write
 };
 
+/* Keyboard 8251A Interface */
+
+static WRITE_LINE_DEVICE_HANDLER( kb_8251_rxrdy_w )
+{
+	v1050_set_int(device->machine, INT_KEYBOARD, state);
+}
+
+static msm8251_interface kb_8251_intf =
+{
+	NULL,
+	NULL,
+	kb_8251_rxrdy_w
+};
+
+/* Serial 8251A Interface */
+
+static WRITE_LINE_DEVICE_HANDLER( sio_8251_rxrdy_w )
+{
+	v1050_state *driver_state = device->machine->driver_data;
+
+	driver_state->rxrdy = state;
+
+	v1050_set_int(device->machine, INT_RS_232, driver_state->rxrdy | driver_state->txrdy);
+}
+
+static WRITE_LINE_DEVICE_HANDLER( sio_8251_txrdy_w )
+{
+	v1050_state *driver_state = device->machine->driver_data;
+
+	driver_state->txrdy = state;
+
+	v1050_set_int(device->machine, INT_RS_232, driver_state->rxrdy | driver_state->txrdy);
+}
+
+static msm8251_interface sio_8251_intf =
+{
+	sio_8251_txrdy_w,
+	NULL,
+	sio_8251_rxrdy_w
+};
+
 /* MB8877 Interface */
 
 static WD17XX_CALLBACK( v1050_mb8877_callback )
@@ -739,9 +782,9 @@ static MACHINE_START( v1050 )
 
 	/* find devices */
 	state->i8214 = devtag_get_device(machine, UPB8214_TAG);
-	state->msm58321 = devtag_get_device(machine, MSM58321_TAG);
-	state->i8255a_crt_z80 = devtag_get_device(machine, I8255_DISP_TAG);
-	state->i8255a_crt_m6502 = devtag_get_device(machine, I8255_M6502_TAG);
+	state->msm58321 = devtag_get_device(machine, MSM58321RS_TAG);
+	state->i8255a_crt_z80 = devtag_get_device(machine, I8255A_DISP_TAG);
+	state->i8255a_crt_m6502 = devtag_get_device(machine, I8255A_M6502_TAG);
 	state->mb8877 = devtag_get_device(machine, MB8877_TAG);
 	state->centronics = devtag_get_device(machine, CENTRONICS_TAG);
 
@@ -770,7 +813,13 @@ static MACHINE_START( v1050 )
 	v1050_bankswitch(machine);
 
 	/* register for state saving */
-//	state_save_register_global(machine, state->);
+	state_save_register_global(machine, state->int_mask);
+	state_save_register_global(machine, state->int_state);
+	state_save_register_global(machine, state->f_int_enb);
+	state_save_register_global(machine, state->rxrdy);
+	state_save_register_global(machine, state->txrdy);
+	state_save_register_global(machine, state->bank);
+	state_save_register_global(machine, state->rtc_busy);
 }
 
 /* Machine Driver */
@@ -795,14 +844,16 @@ static MACHINE_DRIVER_START( v1050 )
 	MDRV_IMPORT_FROM(v1050_video)
 
 	/* devices */
-	MDRV_I8214_ADD(UPB8214_TAG, XTAL_16MHz/4, v1050_8214_intf) // NEC µPB8214C
-	MDRV_MSM58321_ADD(MSM58321_TAG, XTAL_32_768kHz, msm58321_intf) // OKI MSM58321RS
-	MDRV_I8255A_ADD(I8255_DISP_TAG, disp_8255_intf) // NEC D8255AC-5
-	MDRV_I8255A_ADD(I8255_MISC_TAG, misc_8255_intf)
-	MDRV_I8255A_ADD(I8255_RTC_TAG, rtc_8255_intf)
-	MDRV_WD1793_ADD(MB8877_TAG, v1050_wd17xx_intf )
+	MDRV_I8214_ADD(UPB8214_TAG, XTAL_16MHz/4, v1050_8214_intf)
+	MDRV_MSM58321_ADD(MSM58321RS_TAG, XTAL_32_768kHz, msm58321_intf)
+	MDRV_I8255A_ADD(I8255A_DISP_TAG, disp_8255_intf)
+	MDRV_I8255A_ADD(I8255A_MISC_TAG, misc_8255_intf)
+	MDRV_I8255A_ADD(I8255A_RTC_TAG, rtc_8255_intf)
+	MDRV_MSM8251_ADD(I8251A_KB_TAG, /*XTAL_16MHz/8,*/ kb_8251_intf)
+	MDRV_MSM8251_ADD(I8251A_SIO_TAG, /*XTAL_16MHz/8,*/ sio_8251_intf)
+	MDRV_WD1793_ADD(MB8877_TAG, /*XTAL_16MHz/16,*/ v1050_wd17xx_intf )
 
-	MDRV_I8255A_ADD(I8255_M6502_TAG, m6502_8255_intf)
+	MDRV_I8255A_ADD(I8255A_M6502_TAG, m6502_8255_intf)
 
 	/* printer */
 	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
@@ -824,45 +875,26 @@ ROM_END
 
 /* System Configuration */
 
-static DEVICE_IMAGE_LOAD( v1050_floppy )
-{
-	if (image_has_been_created(image))
-	{
-		return INIT_FAIL;
-	}
-
-	if (DEVICE_IMAGE_LOAD_NAME(basicdsk_floppy)(image) == INIT_PASS)
-	{
-		switch (image_length(image))
-		{
-		case 80*1*10*512: /* 400KB DSDD */
-			basicdsk_set_geometry(image, 80, 1, 10, 512, 1, 0, FALSE);
-			break;
-
-		default:
-			return INIT_FAIL;
-		}
-
-		return INIT_PASS;
-	}
-
-	return INIT_FAIL;
-}
+static FLOPPY_OPTIONS_START( v1050 )
+	FLOPPY_OPTION( v1050, "dsk", "Visual 1050 disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([1])
+		TRACKS([80])
+		SECTORS([10])
+		SECTOR_LENGTH([512])
+		FIRST_SECTOR_ID([1]))
+FLOPPY_OPTIONS_END
 
 static void v1050_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
-	switch(state)
+	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case MESS_DEVINFO_INT_COUNT:					info->i = 2; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:						info->load = DEVICE_IMAGE_LOAD_NAME(v1050_floppy); break;
+		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:	info->p = (void *) floppyoptions_v1050; break;
 
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:			strcpy(info->s = device_temp_str(), "dsk"); break;
-
-		default:										legacybasicdsk_device_getinfo(devclass, state, info); break;
+		default: floppy_device_getinfo(devclass, state, info); break;
 	}
 }
 

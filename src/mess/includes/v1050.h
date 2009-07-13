@@ -4,18 +4,18 @@
 #define SCREEN_TAG				"screen"
 
 #define Z80_TAG					"u80"
-#define I8255_RTC_TAG			"u36"
 #define UPB8214_TAG				"u38"
-#define I8251_KB_TAG			"u85"
-#define MSM58321_TAG			"u26"
-#define I8251_SIO_TAG			"u8"
-#define I8255_MISC_TAG			"u10"
+#define I8255A_DISP_TAG			"u79"
+#define I8255A_MISC_TAG			"u10"
+#define I8255A_RTC_TAG			"u36"
+#define I8251A_KB_TAG			"u85"
+#define I8251A_SIO_TAG			"u8"
+#define MSM58321RS_TAG			"u26"
 #define MB8877_TAG				"u13"
 #define FDC9216_TAG				"u25"
-#define I8255_DISP_TAG			"u79"
 #define M6502_TAG				"u76"
-#define I8255_M6502_TAG			"u101"
-#define HD6845_TAG				"u75"
+#define I8255A_M6502_TAG		"u101"
+#define H46505_TAG				"u75"
 #define I8049_TAG				"z5"
 #define CENTRONICS_TAG			"centronics"
 
@@ -34,21 +34,25 @@
 typedef struct _v1050_state v1050_state;
 struct _v1050_state
 {
-	/* memory state */
-	UINT8 bank;
-	UINT8 int_mask;
-	UINT8 int_state;
-	int rtc_busy;
+	/* interrupt state */
+	UINT8 int_mask;				/* interrupt mask */
+	UINT8 int_state;			/* interrupt status */
+	int f_int_enb;				/* floppy interrupt enable */
 
-	/* floppy state */
-	int f_int_enb;
+	/* serial state */
+	int rxrdy;					/* receiver ready */
+	int txrdy;					/* transmitter ready */
+
+	/* memory state */
+	UINT8 bank;					/* bank register */
+
+	/* RTC state */
+	int rtc_busy;				/* RTC busy */
 
 	/* video state */
-	UINT8 *video_ram;
-	UINT8 *attr_ram;
-	UINT8 attr;
-	int ppi8255_z80_pc;
-	int ppi8255_m6502_pc;
+	UINT8 *video_ram;			/* video RAM */
+	UINT8 *attr_ram;			/* attribute RAM */
+	UINT8 attr;					/* attribute latch */
 
 	/* devices */
 	const device_config *i8214;
