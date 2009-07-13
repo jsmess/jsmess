@@ -75,7 +75,9 @@ System Driver Changes:
 
 - [TI85] Fixed TI-82/TI-83 on/off and NVRAM, added a DSW to TI-83 for the
   battery status [Xander]
-  
+
+- [TI85] Initial work on TI-83+ emulation.  [Xander]
+
 - [TIKI100] System is now working, except for double sided disks. [Curt Coder]
 
 - [VCS80] System is now fully working. [Curt Coder]

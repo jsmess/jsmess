@@ -21,6 +21,8 @@ enum
 	TI_NOT_INITIALIZED,
 	TI_81,
 	TI_82,
+	TI_83,
+	TI_83p,
 	TI_85,
 	TI_86
 };
@@ -34,8 +36,8 @@ static UINT8 ti85_ON_interrupt_mask;
 static UINT8 ti85_ON_interrupt_status;
 static UINT8 ti85_ON_pressed;
 
-static UINT8 ti85_memory_page_0x4000;
-static UINT8 ti86_memory_page_0x8000;
+static UINT8 ti8x_memory_page_1;
+static UINT8 ti8x_memory_page_2;
 
 UINT8 ti85_LCD_memory_base;
 UINT8 ti85_LCD_contrast;
@@ -51,7 +53,7 @@ static UINT8 ti85_port4_bit0;
 
 static UINT8 ti81_port_7_data;
 
-static UINT8 *ti86_ram = NULL;
+static UINT8 *ti8x_ram = NULL;
 
 static ti85_serial_data ti85_serial_stream;
 
@@ -71,6 +73,7 @@ static UINT8 ti82_video_scroll;
 static UINT8 ti82_video_bit;
 static UINT8 ti82_video_col;
 static UINT8 ti8x_port2;
+static UINT8 ti83p_port4;
 UINT8 ti82_video_buffer[0x300];
 
 enum
@@ -143,7 +146,68 @@ static TIMER_CALLBACK(ti85_timer_callback)
 
 static void update_ti85_memory (running_machine *machine)
 {
-	memory_set_bankptr(machine, 2,memory_region(machine, "maincpu") + 0x010000 + 0x004000*ti85_memory_page_0x4000);
+	memory_set_bankptr(machine, 2,memory_region(machine, "maincpu") + 0x010000 + 0x004000*ti8x_memory_page_1);
+}
+
+static void update_ti83p_memory (running_machine *machine)
+{
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+
+	if (ti8x_memory_page_1 & 0x40)
+	{
+		if (ti83p_port4 & 1)
+		{
+
+			memory_set_bankptr(machine, 3, ti8x_ram + 0x004000*(ti8x_memory_page_1&0x01));
+			memory_install_write8_handler(space, 0x8000, 0xbfff, 0, 0, SMH_BANK(3));
+		}
+		else
+		{
+			memory_set_bankptr(machine, 2, ti8x_ram + 0x004000*(ti8x_memory_page_1&0x01));
+			memory_install_write8_handler(space, 0x4000, 0x7fff, 0, 0, SMH_BANK(2));
+		}
+	}
+	else
+	{
+		if (ti83p_port4 & 1)
+		{
+			memory_set_bankptr(machine, 3, memory_region(machine, "maincpu") + 0x010000 + 0x004000*(ti8x_memory_page_1&0x1f));
+			memory_install_write8_handler(space, 0x8000, 0xbfff, 0, 0, SMH_UNMAP);
+		}
+		else
+		{
+			memory_set_bankptr(machine, 2, memory_region(machine, "maincpu") + 0x010000 + 0x004000*(ti8x_memory_page_1&0x1f));
+			memory_install_write8_handler(space, 0x4000, 0x7fff, 0, 0, SMH_UNMAP);
+		}
+	}
+
+	if (ti8x_memory_page_2 & 0x40)
+	{
+		if (ti83p_port4 & 1)
+		{
+			memory_set_bankptr(machine, 4, ti8x_ram + 0x004000*(ti8x_memory_page_2&0x01));
+			memory_install_write8_handler(space, 0xc000, 0xffff, 0, 0, SMH_BANK(4));
+		}
+		else
+		{
+			memory_set_bankptr(machine, 3, ti8x_ram + 0x004000*(ti8x_memory_page_2&0x01));
+			memory_install_write8_handler(space, 0x8000, 0xbfff, 0, 0, SMH_BANK(3));
+		}
+		
+	}
+	else
+	{
+		if (ti83p_port4 & 1)
+		{
+			memory_set_bankptr(machine, 4, memory_region(machine, "maincpu") + 0x010000 + 0x004000*(ti8x_memory_page_2&0x1f));
+			memory_install_write8_handler(space, 0xc000, 0xffff, 0, 0, SMH_UNMAP);
+		}
+		else
+		{
+			memory_set_bankptr(machine, 3, memory_region(machine, "maincpu") + 0x010000 + 0x004000*(ti8x_memory_page_2&0x1f));
+			memory_install_write8_handler(space, 0x8000, 0xbfff, 0, 0, SMH_UNMAP);
+		}
+	}
 }
 
 static void update_ti86_memory (running_machine *machine)
@@ -151,28 +215,26 @@ static void update_ti86_memory (running_machine *machine)
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	write8_space_func wh;
 
-	if (ti85_memory_page_0x4000 & 0x40)
+	if (ti8x_memory_page_1 & 0x40)
 	{
-		memory_set_bankptr(machine, 2, ti86_ram + 0x004000*(ti85_memory_page_0x4000&0x07));
-		memory_set_bankptr(machine, 6, ti86_ram + 0x004000*(ti85_memory_page_0x4000&0x07));
-		wh = SMH_BANK(6);
+		memory_set_bankptr(machine, 2, ti8x_ram + 0x004000*(ti8x_memory_page_1&0x07));
+		wh = SMH_BANK(2);
 	}
 	else
 	{
-		memory_set_bankptr(machine, 2, memory_region(machine, "maincpu") + 0x010000 + 0x004000*(ti85_memory_page_0x4000&0x0f));
+		memory_set_bankptr(machine, 2, memory_region(machine, "maincpu") + 0x010000 + 0x004000*(ti8x_memory_page_1&0x0f));
 		wh = SMH_UNMAP;
 	}
 	memory_install_write8_handler(space, 0x4000, 0x7fff, 0, 0, wh);
 
-	if (ti86_memory_page_0x8000 & 0x40)
+	if (ti8x_memory_page_2 & 0x40)
 	{
-		memory_set_bankptr(machine, 3, ti86_ram + 0x004000*(ti86_memory_page_0x8000&0x07));
-		memory_set_bankptr(machine, 7, ti86_ram + 0x004000*(ti86_memory_page_0x8000&0x07));
-		wh = SMH_BANK(7);
+		memory_set_bankptr(machine, 3, ti8x_ram + 0x004000*(ti8x_memory_page_2&0x07));
+		wh = SMH_BANK(3);
 	}
 	else
 	{
-		memory_set_bankptr(machine, 3, memory_region(machine, "maincpu") + 0x010000 + 0x004000*(ti86_memory_page_0x8000&0x0f));
+		memory_set_bankptr(machine, 3, memory_region(machine, "maincpu") + 0x010000 + 0x004000*(ti8x_memory_page_2&0x0f));
 		wh = SMH_UNMAP;
 	}
 	memory_install_write8_handler(space, 0x8000, 0xbfff, 0, 0, wh);
@@ -194,7 +256,7 @@ MACHINE_START( ti81 )
 	ti85_ON_pressed = 0;
 	ti85_power_mode = 0;
 	ti85_keypad_mask = 0;
-	ti85_memory_page_0x4000 = 0;
+	ti8x_memory_page_1 = 0;
 	ti85_LCD_memory_base = 0;
 	ti85_LCD_status = 0;
 	ti85_LCD_mask = 0;
@@ -226,7 +288,7 @@ MACHINE_START( ti82 )
 	ti85_ON_interrupt_mask = 0;
 	ti85_ON_interrupt_status = 0;
 	ti85_ON_pressed = 0;
-	ti85_memory_page_0x4000 = 0;
+	ti8x_memory_page_1 = 0;
 	ti85_LCD_status = 0;
 	ti85_LCD_mask = 0;
 	ti85_power_mode = 0;
@@ -269,7 +331,7 @@ MACHINE_START( ti85 )
 	ti85_ON_interrupt_mask = 0;
 	ti85_ON_interrupt_status = 0;
 	ti85_ON_pressed = 0;
-	ti85_memory_page_0x4000 = 0;
+	ti8x_memory_page_1 = 0;
 	ti85_LCD_memory_base = 0;
 	ti85_LCD_status = 0;
 	ti85_LCD_mask = 0;
@@ -295,6 +357,61 @@ MACHINE_START( ti85 )
 	add_exit_callback(machine, ti85_free_serial_data_memory);
 }
 
+MACHINE_START( ti83p )
+{
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	UINT8 *mem = memory_region(machine, "maincpu");
+
+	ti85_timer_interrupt_mask = 0;
+	ti85_timer_interrupt_status = 0;
+	ti85_ON_interrupt_mask = 0;
+	ti85_ON_interrupt_status = 0;
+	ti85_ON_pressed = 0;
+	ti8x_memory_page_1 = 0;
+	ti8x_memory_page_2 = 0;
+	ti85_LCD_memory_base = 0;
+	ti85_LCD_status = 0;
+	ti85_LCD_mask = 0;
+	ti85_power_mode = 0;
+	ti85_keypad_mask = 0;
+	ti85_video_buffer_width = 0;
+	ti85_interrupt_speed = 0;
+	ti85_port4_bit0 = 0;
+	ti82_video_mode = 0;
+	ti82_video_x = 0;
+	ti82_video_y = 0;
+	ti82_video_dir = 0;
+	ti82_video_scroll = 0;
+	ti82_video_bit = 0;
+	ti82_video_col = 0;
+	memset(ti82_video_buffer, 0x00, 0x300);
+
+	ti8x_ram = auto_alloc_array(machine, UINT8, 32*1024);
+	{
+		memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
+		memory_install_write8_handler(space, 0x4000, 0x7fff, 0, 0, SMH_UNMAP);
+		memory_install_write8_handler(space, 0x8000, 0xbfff, 0, 0, SMH_UNMAP);
+
+		memory_set_bankptr(machine, 1, mem + 0x010000);
+		memory_set_bankptr(machine, 2, mem + 0x010000);
+		memory_set_bankptr(machine, 3, mem + 0x010000);
+		memory_set_bankptr(machine, 4, ti8x_ram);
+
+		if (ti_calculator_model == TI_83p)
+			memset(ti8x_ram, 0, sizeof(unsigned char)*32*1024);
+		
+//		memset(mem + 0x83000, 0xff, 0x1000);
+		
+		ti_calculator_model = TI_83p;
+
+		timer_pulse(machine, ATTOTIME_IN_HZ(200), NULL, 0, ti85_timer_callback);
+	}
+
+	add_reset_callback(machine, ti85_reset_serial);
+	add_exit_callback(machine, ti85_free_serial_data_memory);
+}
+
+
 MACHINE_START( ti86 )
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
@@ -305,8 +422,8 @@ MACHINE_START( ti86 )
 	ti85_ON_interrupt_mask = 0;
 	ti85_ON_interrupt_status = 0;
 	ti85_ON_pressed = 0;
-	ti85_memory_page_0x4000 = 0;
-	ti86_memory_page_0x8000 = 0;
+	ti8x_memory_page_1 = 0;
+	ti8x_memory_page_2 = 0;
 	ti85_LCD_memory_base = 0;
 	ti85_LCD_status = 0;
 	ti85_LCD_mask = 0;
@@ -316,18 +433,17 @@ MACHINE_START( ti86 )
 	ti85_interrupt_speed = 0;
 	ti85_port4_bit0 = 0;
 
-	ti86_ram = auto_alloc_array(machine, UINT8, 128*1024);
+	ti8x_ram = auto_alloc_array(machine, UINT8, 128*1024);
 	{
 		memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
 
 		memory_set_bankptr(machine, 1, mem + 0x010000);
 		memory_set_bankptr(machine, 2, mem + 0x014000);
 
-		memory_set_bankptr(machine, 4, ti86_ram);
-		memory_set_bankptr(machine, 8, ti86_ram);
+		memory_set_bankptr(machine, 4, ti8x_ram);
 
 		if (ti_calculator_model == TI_86)
-			memset(ti86_ram, 0, sizeof(unsigned char)*128*1024);
+			memset(ti8x_ram, 0, sizeof(unsigned char)*128*1024);
 
 		ti_calculator_model = TI_86;
 
@@ -396,7 +512,7 @@ READ8_HANDLER ( ti8x_keypad_r )
 
  READ8_HANDLER ( ti85_port_0005_r )
 {
-	return ti85_memory_page_0x4000;
+	return ti8x_memory_page_1;
 }
 
 READ8_HANDLER ( ti85_port_0006_r )
@@ -412,6 +528,11 @@ READ8_HANDLER ( ti85_port_0007_r )
 		| ((ti85_white_in&(1-ti85_white_out))<<1)
 		| (ti85_red_in&(1-ti85_red_out))
 		| ti85_PCR;
+}
+
+READ8_HANDLER ( ti82_port_0000_r )
+{
+	return 0xff; // TODO
 }
 
  READ8_HANDLER ( ti82_port_0002_r )
@@ -465,17 +586,17 @@ READ8_HANDLER ( ti85_port_0007_r )
 
 READ8_HANDLER ( ti86_port_0005_r )
 {
-	return ti85_memory_page_0x4000;
+	return ti8x_memory_page_1;
 }
 
  READ8_HANDLER ( ti86_port_0006_r )
 {
-	return ti86_memory_page_0x8000;
+	return ti8x_memory_page_2;
 }
 
 READ8_HANDLER ( ti83_port_0000_r )
 {
-	return ((ti85_memory_page_0x4000 & 0x08) << 1) | 0x0C;
+	return ((ti8x_memory_page_1 & 0x08) << 1) | 0x0C;
 }
 
  READ8_HANDLER ( ti83_port_0002_r )
@@ -496,6 +617,11 @@ READ8_HANDLER ( ti83_port_0000_r )
 	ti85_ON_interrupt_status = 0;
 	ti85_timer_interrupt_status = 0;
 	return data;
+}
+
+ READ8_HANDLER ( ti83p_port_0002_r )
+{
+	return ti8x_port2|3; 
 }
 
 WRITE8_HANDLER ( ti81_port_0007_w )
@@ -536,7 +662,7 @@ WRITE8_HANDLER ( ti85_port_0004_w )
 
 WRITE8_HANDLER ( ti85_port_0005_w )
 {
-	ti85_memory_page_0x4000 = data;
+	ti8x_memory_page_1 = data;
 	update_ti85_memory(space->machine);
 }
 
@@ -557,19 +683,24 @@ WRITE8_HANDLER ( ti85_port_0007_w )
 
 WRITE8_HANDLER ( ti86_port_0005_w )
 {
-	ti85_memory_page_0x4000 = data&((data&0x40)?0x47:0x4f);
+	ti8x_memory_page_1 = data&((data&0x40)?0x47:0x4f);
 	update_ti86_memory(space->machine);
 }
 
 WRITE8_HANDLER ( ti86_port_0006_w )
 {
-	ti86_memory_page_0x8000 = data&((data&0x40)?0x47:0x4f);
+	ti8x_memory_page_2 = data&((data&0x40)?0x47:0x4f);
 	update_ti86_memory(space->machine);
+}
+
+WRITE8_HANDLER ( ti82_port_0000_w )
+{
+	// TODO
 }
 
 WRITE8_HANDLER ( ti82_port_0002_w )
 {
-	ti85_memory_page_0x4000 = (data & 0x07);
+	ti8x_memory_page_1 = (data & 0x07);
 	update_ti85_memory(space->machine);
 	ti8x_port2 = data;
 }
@@ -622,13 +753,13 @@ WRITE8_HANDLER ( ti82_port_0011_w )
 
 WRITE8_HANDLER ( ti83_port_0000_w )
 {
-	ti85_memory_page_0x4000 = (ti85_memory_page_0x4000 & 7) | ((data & 16) >> 1);
+	ti8x_memory_page_1 = (ti8x_memory_page_1 & 7) | ((data & 16) >> 1);
 	update_ti85_memory(space->machine);	
 }
 
 WRITE8_HANDLER ( ti83_port_0002_w )
 {
-	ti85_memory_page_0x4000 = (ti85_memory_page_0x4000 & 8) | (data & 7);
+	ti8x_memory_page_1 = (ti8x_memory_page_1 & 8) | (data & 7);
 	update_ti85_memory(space->machine);
 	ti8x_port2 = data;
 }
@@ -642,22 +773,98 @@ WRITE8_HANDLER ( ti83_port_0003_w )
 		ti85_LCD_status = data&0x08;
 }
 
+WRITE8_HANDLER ( ti83p_port_0002_w )
+{
+	ti8x_port2 = data;
+}
+
+WRITE8_HANDLER ( ti83p_port_0003_w )
+{
+	ti85_LCD_mask = (data&0x08) >> 2;
+	ti85_ON_interrupt_mask = data & 0x01;
+}
+
+WRITE8_HANDLER ( ti83p_port_0004_w )
+{
+	if ((data & 1) && !(ti83p_port4 & 1))
+	{
+		ti8x_memory_page_1 = 0x1f;
+		ti8x_memory_page_2 = 0x1f;
+	}
+	else if (!(data & 1) && (ti83p_port4 & 1))
+	{
+		ti8x_memory_page_1 = 0x1f;
+		ti8x_memory_page_2 = 0x40;
+	}
+	update_ti83p_memory(space->machine);
+	ti83p_port4 = data;
+}
+
+WRITE8_HANDLER ( ti83p_port_0006_w )
+{
+	ti8x_memory_page_1 = data & ((data&0x40) ? 0x41 : 0x5f);
+	update_ti83p_memory(space->machine);
+}
+
+WRITE8_HANDLER ( ti83p_port_0007_w )
+{
+	ti8x_memory_page_2 = data & ((data&0x40) ? 0x41 : 0x5f);
+	update_ti83p_memory(space->machine);
+}
+
+WRITE8_HANDLER ( ti83p_port_0010_w)
+ {	
+	if (data == 0x00 || data == 0x01)
+		ti82_video_mode = data;
+	if (data == 0x02 || data == 0x03)
+		ti85_LCD_status = data - 0x02;
+	if (data >= 0x04 && data <= 0x07)
+		ti82_video_dir = data;
+	if (data >= 0x20 && data <= 0x30)
+		ti82_video_x = data - 0x20;
+	if (data >= 0x40 && data <= 0x7F)
+		ti82_video_scroll = data - 0x40;
+	if (data >= 0x80 && data <= 0xBF)
+		ti82_video_y = data - 0x80;
+	if (data >= 0xc8)
+		ti85_LCD_contrast = data - 0xc8;
+		
+}
+
 /* NVRAM functions */
-NVRAM_HANDLER( ti86 )
+NVRAM_HANDLER( ti83p )
 {
 	if (read_or_write)
 	{
-		mame_fwrite(file, ti86_ram, sizeof(unsigned char)*128*1024);
+		mame_fwrite(file, ti8x_ram, sizeof(unsigned char)*32*1024);
 	}
 	else
 	{
 			if (file)
 			{
-				mame_fread(file, ti86_ram, sizeof(unsigned char)*128*1024);
+				mame_fread(file, ti8x_ram, sizeof(unsigned char)*32*1024);
 				cpu_set_reg(cputag_get_cpu(machine, "maincpu"), Z80_PC,0x0c59);
 			}
 			else
-				memset(ti86_ram, 0, sizeof(unsigned char)*128*1024);
+				memset(ti8x_ram, 0, sizeof(unsigned char)*32*1024);
+	}
+}
+
+NVRAM_HANDLER( ti86 )
+{
+	if (read_or_write)
+	{
+		mame_fwrite(file, ti8x_ram, sizeof(unsigned char)*128*1024);
+	}
+	else
+	{
+			if (file)
+			{
+				mame_fread(file, ti8x_ram, sizeof(unsigned char)*128*1024);
+				cpu_set_reg(cputag_get_cpu(machine, "maincpu"), Z80_PC,0x0c59);
+			}
+			else
+				memset(ti8x_ram, 0, sizeof(unsigned char)*128*1024);
 	}
 }
 
@@ -735,7 +942,7 @@ static void ti85_setup_snapshot (running_machine *machine, UINT8 * data)
 
 	ti85_keypad_mask = hdw[0x00]&0x7f;
 
-	ti85_memory_page_0x4000 = hdw[0x08]&0xff;
+	ti8x_memory_page_1 = hdw[0x08]&0xff;
 	update_ti85_memory(machine);
 
 	ti85_power_mode = hdw[0x14]&0xff;
@@ -768,15 +975,15 @@ static void ti86_setup_snapshot (running_machine *machine, UINT8 * data)
 	ti8x_snapshot_setup_registers (machine, data);
 
 	/* Memory dump */
-	memcpy(ti86_ram, data+0x94, 0x20000);
+	memcpy(ti8x_ram, data+0x94, 0x20000);
 
 	ti85_keypad_mask = hdw[0x00]&0x7f;
 
-	ti85_memory_page_0x4000 = hdw[0x04]&0xff ? 0x40 : 0x00;
-	ti85_memory_page_0x4000 |= hdw[0x08]&0x0f;
+	ti8x_memory_page_1 = hdw[0x04]&0xff ? 0x40 : 0x00;
+	ti8x_memory_page_1 |= hdw[0x08]&0x0f;
 
-	ti86_memory_page_0x8000 = hdw[0x0c]&0xff ? 0x40 : 0x00;
-	ti86_memory_page_0x8000 |= hdw[0x10]&0x0f;
+	ti8x_memory_page_2 = hdw[0x0c]&0xff ? 0x40 : 0x00;
+	ti8x_memory_page_2 |= hdw[0x10]&0x0f;
 
 	update_ti86_memory(machine);
 
