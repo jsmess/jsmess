@@ -148,6 +148,23 @@ VIDEO_UPDATE( trs80m4 )
 			{
 				chr = videoram[x+start_address];
 
+				if (((chr & 0xc0) == 0xc0) && (~trs80_mode & 8))
+				{
+					if (ra < 8)
+						gfx = FNT[((chr&0xbf)<<3) | ra ];
+					else
+						gfx = 0;
+
+					*p++ = ( gfx & 0x80 ) ? 1 : 0;
+					*p++ = ( gfx & 0x40 ) ? 1 : 0;
+					*p++ = ( gfx & 0x20 ) ? 1 : 0;
+					*p++ = ( gfx & 0x10 ) ? 1 : 0;
+					*p++ = ( gfx & 0x08 ) ? 1 : 0;
+					*p++ = ( gfx & 0x04 ) ? 1 : 0;
+					*p++ = ( gfx & 0x02 ) ? 1 : 0;
+					*p++ = ( gfx & 0x01 ) ? 1 : 0;
+				}
+				else
 				if ((chr & 0x80) && (~trs80_mode & 8))
 				{
 					gfxbit = 1<<((ra & 0x0c)>>1);
