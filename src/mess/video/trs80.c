@@ -125,6 +125,7 @@ VIDEO_UPDATE( trs80m4 )
 	UINT8 rows = (trs80_mode & 4) ? 24 : 16;
 	UINT8 lines = (trs80_mode & 4) ? 10 : 12;
 	UINT8 s_cols = cols;
+	UINT8 mask = (trs80_mode & 0x20) ? 0xff : 0xbf;	/* Select Japanese or extended chars */
 
 	if (trs80_mode & 1)
 	{
@@ -151,7 +152,7 @@ VIDEO_UPDATE( trs80m4 )
 				if (((chr & 0xc0) == 0xc0) && (~trs80_mode & 8))
 				{
 					if (ra < 8)
-						gfx = FNT[((chr&0xbf)<<3) | ra ];
+						gfx = FNT[((chr&mask)<<3) | ra ];
 					else
 						gfx = 0;
 

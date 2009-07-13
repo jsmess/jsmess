@@ -508,7 +508,7 @@ WRITE8_HANDLER( trs80m4_eb_w )
 
 WRITE8_HANDLER( trs80m4_ec_w )
 {
-/* Hardware settings - d5..d3 not emulated
+/* Hardware settings - d5..d4 not emulated
 	d6 CPU fast (1=4MHz, 0=2MHz)
 	d5 1=Enable Video Wait
 	d4 1=Enable External I/O bus
@@ -518,7 +518,7 @@ WRITE8_HANDLER( trs80m4_ec_w )
 
 	cputag_set_clock(space->machine, "maincpu", data & 0x40 ? MODEL4_MASTER_CLOCK/5 : MODEL4_MASTER_CLOCK/10);
 
-	trs80_mode = (trs80_mode & 0xfe) | ((data & 4) ? 1 : 0);
+	trs80_mode = (trs80_mode & 0xde) | ((data & 4) ? 1 : 0) | ((data & 8) ? 0x20 : 0);
 
 	cassette_change_state( trs80_cass, ( data & 2 ) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR );
 

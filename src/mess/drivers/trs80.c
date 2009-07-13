@@ -96,7 +96,7 @@ Expansion interface for more floppy drives. The drives use 8-inch floppies holdi
 It was extremely expensive, non-standard, and not many were sold. A rom dump does not seem to exist.
 
 About the Model 4 - This has 4 memory maps.
-		We emulate Map 1 except for the legacy printer port (see address map for Model 3).
+		We emulate Map 1 (see address map for Model 3).
 		Map 2 - RAM=0..37FF, Keyboard=3800..3Bff, Video=3C00..3FFF, RAM=4000..FFFF
 		Map 3 - RAM=0..F3FF, Keyboard=F400..F7FF, Video=F800..FFFF
 		Map 4 - RAM=0..FFFF
