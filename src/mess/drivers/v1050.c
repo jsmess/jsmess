@@ -95,10 +95,11 @@ Notes:
 
 	TODO:
 
-	- keyboard
+	- keyboard hack
 	- interrupts
 	- RTC58321 chip
-	- winchester
+	- real keyboard w/i8049
+	- Winchester (Xebec S1410 controller)
 
 */
 
@@ -174,13 +175,13 @@ static void v1050_bankswitch(running_machine *machine)
 	memory_set_bank(machine, 5, bank);
 }
 
-/* Read/Write Handlers */
+/* Z80 Read/Write Handlers */
 
 static READ8_HANDLER( v1050_i8214_r )
 {
 	v1050_state *state = space->machine->driver_data;
 
-	return i8214_a_r(state->i8214, 0) << 1;
+	return 0xf0 | (i8214_a_r(state->i8214, 0) << 1);
 }
 
 static WRITE8_HANDLER( v1050_i8214_w )
@@ -215,16 +216,6 @@ static WRITE8_HANDLER( dint_clr_w )
 	v1050_set_int(space->machine, INT_DISPLAY, 0);
 }
 
-static WRITE8_HANDLER( dvint_clr_w )
-{
-	cputag_set_input_line(space->machine, M6502_TAG, INPUT_LINE_IRQ0, CLEAR_LINE);
-}
-
-static WRITE8_HANDLER( dint_w )
-{
-	v1050_set_int(space->machine, INT_DISPLAY, 1);
-}
-
 static WRITE8_HANDLER( bank_w )
 {
 	v1050_state *state = space->machine->driver_data;
@@ -232,6 +223,74 @@ static WRITE8_HANDLER( bank_w )
 	state->bank = data;
 
 	v1050_bankswitch(space->machine);
+}
+
+/* SY6502A Read/Write Handlers */
+
+static WRITE8_HANDLER( dint_w )
+{
+	v1050_set_int(space->machine, INT_DISPLAY, 1);
+}
+
+static WRITE8_HANDLER( dvint_clr_w )
+{
+	cputag_set_input_line(space->machine, M6502_TAG, INPUT_LINE_IRQ0, CLEAR_LINE);
+}
+
+/* i8049 Read/Write Handlers */
+
+static READ8_HANDLER( keyboard_r )
+{
+	v1050_state *state = space->machine->driver_data;
+	
+	static const char *const KEY_ROW[] = { "X0", "X1", "X2", "X3", "X4", "X5", "X6", "X7", "X8", "X9", "XA", "XB" };
+	
+	return input_port_read(space->machine, KEY_ROW[state->keylatch]);
+}
+
+static WRITE8_HANDLER( keyboard_w )
+{
+	v1050_state *state = space->machine->driver_data;
+
+	state->keylatch = data & 0x0f;
+}
+
+static READ8_HANDLER( p2_r )
+{
+	/*
+
+		bit		description
+
+		P20		
+		P21		
+		P22		
+		P23		
+		P24		
+		P25		led output
+		P26		input from NE555
+		P27		serial output
+
+	*/
+
+	return 0;
+}
+
+static WRITE8_HANDLER( p2_w )
+{
+	/*
+
+		bit		description
+
+		P20		
+		P21		
+		P22		
+		P23		
+		P24		
+		P25		led output
+		P26		input from NE555
+		P27		serial output
+
+	*/
 }
 
 /* Memory Maps */
@@ -260,7 +319,7 @@ static ADDRESS_MAP_START( v1050_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xb0, 0xb0) AM_READWRITE(dint_clr_r, dint_clr_w)
 	AM_RANGE(0xc0, 0xc0) AM_READWRITE(v1050_i8214_r, v1050_i8214_w) 
 	AM_RANGE(0xd0, 0xd0) AM_WRITE(bank_w)
-//	AM_RANGE(0xe0, 0xe1) AM_READWRITE(sasi_r, sasi_w)
+//	AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE(S1410_TAG, s1410_r, s1410_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( v1050_crt_mem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -275,9 +334,8 @@ static ADDRESS_MAP_START( v1050_crt_mem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( v1050_kbd_io, ADDRESS_SPACE_IO, 8 )
-//	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) 
-//	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) 
-//	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) 
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(keyboard_r, keyboard_w)
+	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(p2_r, p2_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -560,11 +618,31 @@ static WRITE8_DEVICE_HANDLER( misc_8255_c_w )
 
 	v1050_state *state = device->machine->driver_data;
 
+	int baud_sel = (data >> 2) & 0x03;
+
 	/* printer strobe */
 	centronics_strobe_w(state->centronics, BIT(data, 0));
 
 	/* floppy interrupt enable */
 	state->f_int_enb = BIT(data, 1);
+
+	/* baud select */
+	if (baud_sel != state->baud_sel)
+	{
+		attotime period;
+
+		switch (baud_sel)
+		{
+		case 0:	period = ATTOTIME_IN_HZ(XTAL_16MHz/4/13.0/16); break;
+		case 1:	period = ATTOTIME_IN_HZ(XTAL_16MHz/4/13.0/8); break;
+		case 2:	period = ATTOTIME_IN_HZ(XTAL_16MHz/4/8); break;
+		case 3:	period = ATTOTIME_IN_HZ(XTAL_16MHz/4/13.0/2); break;
+		}
+
+		timer_device_adjust_periodic(state->timer_sio, attotime_zero, 0, period);
+
+		state->baud_sel = baud_sel;
+	}
 }
 
 static I8255A_INTERFACE( misc_8255_intf )
@@ -703,6 +781,14 @@ static I8255A_INTERFACE( rtc_8255_intf )
 
 /* Keyboard 8251A Interface */
 
+static TIMER_DEVICE_CALLBACK( kb_8251_tick )
+{
+	v1050_state *state = timer->machine->driver_data;
+
+	msm8251_transmit_clock(state->i8251_kb);
+	msm8251_receive_clock(state->i8251_kb);
+}
+
 static WRITE_LINE_DEVICE_HANDLER( kb_8251_rxrdy_w )
 {
 	v1050_set_int(device->machine, INT_KEYBOARD, state);
@@ -716,6 +802,14 @@ static msm8251_interface kb_8251_intf =
 };
 
 /* Serial 8251A Interface */
+
+static TIMER_DEVICE_CALLBACK( sio_8251_tick )
+{
+	v1050_state *state = timer->machine->driver_data;
+
+	msm8251_transmit_clock(state->i8251_sio);
+	msm8251_receive_clock(state->i8251_sio);
+}
 
 static WRITE_LINE_DEVICE_HANDLER( sio_8251_rxrdy_w )
 {
@@ -783,6 +877,9 @@ static MACHINE_START( v1050 )
 	state->msm58321 = devtag_get_device(machine, MSM58321RS_TAG);
 	state->i8255a_crt_z80 = devtag_get_device(machine, I8255A_DISP_TAG);
 	state->i8255a_crt_m6502 = devtag_get_device(machine, I8255A_M6502_TAG);
+	state->i8251_kb = devtag_get_device(machine, I8251A_KB_TAG);
+	state->i8251_sio = devtag_get_device(machine, I8251A_SIO_TAG);
+	state->timer_sio = devtag_get_device(machine, TIMER_SIO_TAG);
 	state->mb8877 = devtag_get_device(machine, MB8877_TAG);
 	state->centronics = devtag_get_device(machine, CENTRONICS_TAG);
 
@@ -811,11 +908,13 @@ static MACHINE_START( v1050 )
 	v1050_bankswitch(machine);
 
 	/* register for state saving */
+	state_save_register_global(machine, state->keylatch);
 	state_save_register_global(machine, state->int_mask);
 	state_save_register_global(machine, state->int_state);
 	state_save_register_global(machine, state->f_int_enb);
 	state_save_register_global(machine, state->rxrdy);
 	state_save_register_global(machine, state->txrdy);
+	state_save_register_global(machine, state->baud_sel);
 	state_save_register_global(machine, state->bank);
 	state_save_register_global(machine, state->rtc_busy);
 }
@@ -829,14 +928,16 @@ static MACHINE_DRIVER_START( v1050 )
     MDRV_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
     MDRV_CPU_PROGRAM_MAP(v1050_mem)
     MDRV_CPU_IO_MAP(v1050_io)
+	MDRV_QUANTUM_PERFECT_CPU(Z80_TAG)
 
     MDRV_CPU_ADD(M6502_TAG, M6502, XTAL_15_36MHz/16)
     MDRV_CPU_PROGRAM_MAP(v1050_crt_mem)
-/*
-    MDRV_CPU_ADD(I8049_TAG, I8049, XTAL_4_608MHz)
-	MDRV_CPU_IO_MAP(v1050_kbd_io)
-*/
-    MDRV_MACHINE_START(v1050)
+	MDRV_QUANTUM_PERFECT_CPU(M6502_TAG)
+
+//	MDRV_CPU_ADD(I8049_TAG, I8049, XTAL_4_608MHz)
+//	MDRV_CPU_IO_MAP(v1050_kbd_io)
+
+	MDRV_MACHINE_START(v1050)
 
     /* video hardware */
 	MDRV_IMPORT_FROM(v1050_video)
@@ -847,11 +948,12 @@ static MACHINE_DRIVER_START( v1050 )
 	MDRV_I8255A_ADD(I8255A_DISP_TAG, disp_8255_intf)
 	MDRV_I8255A_ADD(I8255A_MISC_TAG, misc_8255_intf)
 	MDRV_I8255A_ADD(I8255A_RTC_TAG, rtc_8255_intf)
+	MDRV_I8255A_ADD(I8255A_M6502_TAG, m6502_8255_intf)
 	MDRV_MSM8251_ADD(I8251A_KB_TAG, /*XTAL_16MHz/8,*/ kb_8251_intf)
 	MDRV_MSM8251_ADD(I8251A_SIO_TAG, /*XTAL_16MHz/8,*/ sio_8251_intf)
 	MDRV_WD1793_ADD(MB8877_TAG, /*XTAL_16MHz/16,*/ v1050_wd17xx_intf )
-
-	MDRV_I8255A_ADD(I8255A_M6502_TAG, m6502_8255_intf)
+	MDRV_TIMER_ADD_PERIODIC(TIMER_KB_TAG, kb_8251_tick, HZ(XTAL_16MHz/4/13.0/8))
+	MDRV_TIMER_ADD_PERIODIC(TIMER_SIO_TAG, sio_8251_tick, HZ(XTAL_16MHz/4/13.0/16))
 
 	/* printer */
 	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)

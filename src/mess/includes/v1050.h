@@ -18,6 +18,8 @@
 #define H46505_TAG				"u75"
 #define I8049_TAG				"z5"
 #define CENTRONICS_TAG			"centronics"
+#define TIMER_KB_TAG			"timer_kb"
+#define TIMER_SIO_TAG			"timer_sio"
 
 #define V1050_VIDEORAM_SIZE		0x8000
 #define V1050_VIDEORAM_MASK		0x7fff
@@ -39,9 +41,13 @@ struct _v1050_state
 	UINT8 int_state;			/* interrupt status */
 	int f_int_enb;				/* floppy interrupt enable */
 
+	/* keyboard state */
+	UINT8 keylatch;				/* keyboard row select */
+
 	/* serial state */
 	int rxrdy;					/* receiver ready */
 	int txrdy;					/* transmitter ready */
+	int baud_sel;				/* baud select */
 
 	/* memory state */
 	UINT8 bank;					/* bank register */
@@ -59,9 +65,12 @@ struct _v1050_state
 	const device_config *msm58321;
 	const device_config *i8255a_crt_z80;
 	const device_config *i8255a_crt_m6502;
+	const device_config *i8251_kb;
+	const device_config *i8251_sio;
 	const device_config *mb8877;
 	const device_config *mc6845;
 	const device_config *centronics;
+	const device_config *timer_sio;
 };
 
 /*----------- defined in drivers/v1050.c -----------*/
