@@ -2,13 +2,13 @@
 #include "includes/v1050.h"
 #include "video/mc6845.h"
 
-/*
-
-	TODO:
-
-	- row update
-
-*/
+#define V1050_ATTR_BRIGHT	0x01
+#define V1050_ATTR_BLINKING	0x02
+#define V1050_ATTR_ATTEN	0x04
+#define V1050_ATTR_REVERSE	0x10
+#define V1050_ATTR_BLANK	0x20
+#define V1050_ATTR_BOLD		0x40
+#define V1050_ATTR_BLINK	0x80
 
 /* Video RAM Access */
 
@@ -30,7 +30,10 @@ READ8_HANDLER( v1050_videoram_r )
 {
 	v1050_state *state = space->machine->driver_data;
 
-	state->attr = (state->attr & 0xfc) | (state->attr_ram[offset] & 0x03);
+	if (offset >= 0x2000)
+	{
+		state->attr = (state->attr & 0xfc) | (state->attr_ram[offset] & 0x03);
+	}
 
 	return state->video_ram[offset];
 }
@@ -41,7 +44,7 @@ WRITE8_HANDLER( v1050_videoram_w )
 
 	state->video_ram[offset] = data;
 
-	if (BIT(state->attr, 2))
+	if (offset >= 0x2000 && BIT(state->attr, 2))
 	{
 		state->attr_ram[offset] = state->attr & 0x03;
 	}
@@ -54,23 +57,35 @@ static MC6845_UPDATE_ROW( v1050_update_row )
 	v1050_state *state = device->machine->driver_data;
 
 	int column, bit;
+	UINT8 data;
 
 	for (column = 0; column < x_count; column++)
 	{
-		UINT16 address = ((ra & 0x03) << 13) | (ma + column);
-		UINT8 data = state->video_ram[address & V1050_VIDEORAM_MASK];
+		UINT16 address = (((ra & 0x03) + 1) << 13) | ((ma & 0x1fff) + column);
+
+		data = state->video_ram[address & V1050_VIDEORAM_MASK];
 
 		for (bit = 0; bit < 8; bit++)
 		{
 			int x = (column * 8) + bit;
 			int color = BIT(data, 7);
 
+			/* blinking */
+			if ((state->attr_ram[address] & V1050_ATTR_BLINKING) && !(state->attr & V1050_ATTR_BLINK)) color = 0;
+
+			/* reverse video */
+			color ^= BIT(state->attr, 4);
+
+			/* blank video */
+			if (state->attr & V1050_ATTR_BLANK) color = 0;
+
+			/* bright */
+			if (color && ((state->attr & V1050_ATTR_BOLD) ^ (state->attr_ram[address] & V1050_ATTR_BRIGHT))) color = 2;
+
 			*BITMAP_ADDR16(bitmap, y, x) = color;
 
 			data <<= 1;
 		}
-
-		//logerror("MA %04x RA %01x addr %04x y %u\n", ma, ra, address, y);
 	}
 }
 
@@ -96,6 +111,15 @@ static const mc6845_interface v1050_mc6845_intf =
 	DEVCB_LINE(v1050_vsync_changed),
 	NULL
 };
+
+/* Palette */
+
+static PALETTE_INIT( v1050 )
+{
+	palette_set_color(machine, 0, RGB_BLACK); /* black */
+	palette_set_color_rgb(machine, 1, 0x00, 0x80, 0x00); /* green */
+	palette_set_color_rgb(machine, 2, 0x00, 0xff, 0x00); /* bright green */
+}
 
 /* Video Start */
 
@@ -138,8 +162,8 @@ MACHINE_DRIVER_START( v1050_video )
 	MDRV_SCREEN_SIZE(640, 400)
 	MDRV_SCREEN_VISIBLE_AREA(0,640-1, 0, 400-1)
 
-	MDRV_PALETTE_LENGTH(2)
-    MDRV_PALETTE_INIT(monochrome_green)
+	MDRV_PALETTE_LENGTH(3)
+    MDRV_PALETTE_INIT(v1050)
 
 	MDRV_VIDEO_START(v1050)
 	MDRV_VIDEO_UPDATE(v1050)

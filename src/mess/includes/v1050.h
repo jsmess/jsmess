@@ -19,8 +19,8 @@
 #define I8049_TAG				"z5"
 #define CENTRONICS_TAG			"centronics"
 
-#define V1050_VIDEORAM_SIZE		0x6000
-#define V1050_VIDEORAM_MASK		0x5fff
+#define V1050_VIDEORAM_SIZE		0x8000
+#define V1050_VIDEORAM_MASK		0x7fff
 
 #define INT_RS_232			0x01
 #define INT_WINCHESTER		0x02
