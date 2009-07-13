@@ -1433,6 +1433,7 @@ $(MESSOBJ)/zvt.a:				\
 	$(MESS_VIDEO)/pp01.o		\
 
 $(MESSOBJ)/skeleton.a:			\
+	$(MESS_DRIVERS)/act.o		\
 	$(MESS_DRIVERS)/bob85.o		\
 	$(MESS_DRIVERS)/d6809.o		\
 	$(MESS_DRIVERS)/elwro800.o	\

@@ -1431,5 +1431,9 @@ const game_driver * const drivers[] =
     DRIVER( mmd2 )
     DRIVER( mpf1p )
 	DRIVER( stopthie )
+    DRIVER( aprixi )
+    DRIVER( aprif1 )
+    DRIVER( aprif10 )
+    DRIVER( aprifp )
 
 #endif /* DRIVER_RECURSIVE */
