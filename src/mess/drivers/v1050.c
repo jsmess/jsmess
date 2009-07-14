@@ -100,11 +100,9 @@ Notes:
 		Device 'u76': warning - attempt to direct-map address 00001FFE in program space
 		Device 'u76': warning - attempt to direct-map address 00001FFF in program space
 
-	- keyboard hack
 	- rombank1,2 to 0-0x1fff
-	- interrupts
 	- real keyboard w/i8049
-	- Winchester (Xebec S1410 controller)
+	- Winchester (Tandon TM501, CMI 5412 10MB drive on Xebec S1410 controller)
 
 */
 
@@ -284,7 +282,7 @@ static void v1050_keyboard_scan(running_machine *machine)
 				{
 					state->keydata = keydata;
 					state->keyavail = 1;
-					/* logerror("Scanned: 0x%x %d %d %d", keydata, table, row, col); */
+					/* //logerror("Scanned: 0x%x %d %d %d", keydata, table, row, col); */
 					v1050_set_int(machine, INT_KEYBOARD, 1);
 					return;
 				}
@@ -326,7 +324,7 @@ static READ8_HANDLER( v1050_i8214_r )
 {
 	v1050_state *state = space->machine->driver_data;
 
-	return 0xf0 | (i8214_a_r(state->i8214, 0) << 1);
+	return 0xf0 | (i8214_a_r(state->i8214, 0) << 1) | 0x01;
 }
 
 static WRITE8_HANDLER( v1050_i8214_w )
@@ -898,7 +896,7 @@ static WRITE8_DEVICE_HANDLER( misc_8255_c_w )
 	/* baud select */
 	if (baud_sel != state->baud_sel)
 	{
-		attotime period;
+		attotime period = attotime_never;
 
 		switch (baud_sel)
 		{
@@ -946,8 +944,6 @@ static WRITE8_DEVICE_HANDLER( rtc_8255_b_w )
 	v1050_state *state = device->machine->driver_data;
 
 	state->int_mask = data;
-
-	logerror("Interrupt Mask: %02x\n", data);
 }
 
 static READ8_DEVICE_HANDLER( rtc_8255_c_r )
@@ -1068,23 +1064,33 @@ static msm8251_interface sio_8251_intf =
 
 static WD17XX_CALLBACK( v1050_mb8877_callback )
 {
-	switch (state)
+	v1050_state *driver_state = device->machine->driver_data;
+
+	if (driver_state->f_int_enb)
 	{
-	case WD17XX_IRQ_CLR:
+		switch (state)
+		{
+		case WD17XX_IRQ_CLR:
+			v1050_set_int(device->machine, INT_FLOPPY, 0);
+			break;
+
+		case WD17XX_IRQ_SET:
+			v1050_set_int(device->machine, INT_FLOPPY, 1);
+			break;
+
+		case WD17XX_DRQ_CLR:
+			cputag_set_input_line(device->machine, Z80_TAG, INPUT_LINE_NMI, CLEAR_LINE);
+			break;
+
+		case WD17XX_DRQ_SET:
+			cputag_set_input_line(device->machine, Z80_TAG, INPUT_LINE_NMI, ASSERT_LINE);
+			break;
+		}
+	}
+	else
+	{
 		v1050_set_int(device->machine, INT_FLOPPY, 0);
-		break;
-
-	case WD17XX_IRQ_SET:
-		v1050_set_int(device->machine, INT_FLOPPY, 1);
-		break;
-
-	case WD17XX_DRQ_CLR:
 		cputag_set_input_line(device->machine, Z80_TAG, INPUT_LINE_NMI, CLEAR_LINE);
-		break;
-
-	case WD17XX_DRQ_SET:
-		cputag_set_input_line(device->machine, Z80_TAG, INPUT_LINE_NMI, ASSERT_LINE);
-		break;
 	}
 }
 
@@ -1094,6 +1100,19 @@ static const wd17xx_interface v1050_wd17xx_intf =
 };
 
 /* Machine Initialization */
+
+static IRQ_CALLBACK( v1050_int_ack )
+{
+	v1050_state *state = device->machine->driver_data;
+
+	UINT8 vector = 0xf0 | (i8214_a_r(state->i8214, 0) << 1);
+
+	//logerror("Interrupt Acknowledge Vector: %02x\n", vector);
+
+	cputag_set_input_line(device->machine, Z80_TAG, INPUT_LINE_IRQ0, CLEAR_LINE);
+
+	return vector;
+}
 
 static MACHINE_START( v1050 )
 {
@@ -1112,11 +1131,15 @@ static MACHINE_START( v1050 )
 	state->centronics = devtag_get_device(machine, CENTRONICS_TAG);
 
 	/* initialize I8214 */
+	i8214_elr_w(state->i8214, 0);
 	i8214_etlg_w(state->i8214, 1);
 	i8214_inte_w(state->i8214, 1);
 	
 	/* initialize RTC */
 	msm58321_cs1_w(state->msm58321, 1);
+
+	/* set CPU interrupt callback */
+	cpu_set_irq_callback(cputag_get_cpu(machine, Z80_TAG), v1050_int_ack);
 
 	/* setup memory banking */
 	memory_configure_bank(machine, 1, 0, 2, mess_ram, 0x10000);
@@ -1169,7 +1192,7 @@ static MACHINE_DRIVER_START( v1050 )
 
 	MDRV_MACHINE_START(v1050)
 
-	/* keyboard */
+	/* keyboard HACK */
 	MDRV_TIMER_ADD_PERIODIC("keyboard", v1050_keyboard_tick, HZ(60))
 
     /* video hardware */
@@ -1222,7 +1245,7 @@ static void v1050_floppy_getinfo(const mess_device_class *devclass, UINT32 state
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:					info->i = 2; break;
+		case MESS_DEVINFO_INT_COUNT:			info->i = 2; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:	info->p = (void *) floppyoptions_v1050; break;
@@ -1239,4 +1262,4 @@ SYSTEM_CONFIG_END
 /* System Drivers */
 
 /*    YEAR	NAME	PARENT	COMPAT	MACHINE	INPUT	INIT	CONFIG	COMPANY								FULLNAME		FLAGS */
-COMP( 1983, v1050,	0,		0,		v1050,	v1050,	0,		v1050,	"Visual Technology Incorporated",	"Visual 1050",	GAME_NOT_WORKING )
+COMP( 1983, v1050,	0,		0,		v1050,	v1050,	0,		v1050,	"Visual Technology Incorporated",	"Visual 1050",	GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )

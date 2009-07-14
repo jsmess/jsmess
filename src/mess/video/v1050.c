@@ -2,6 +2,14 @@
 #include "includes/v1050.h"
 #include "video/mc6845.h"
 
+/*
+
+	TODO:
+
+	- bright in reverse video
+
+*/
+
 #define V1050_ATTR_BRIGHT	0x01
 #define V1050_ATTR_BLINKING	0x02
 #define V1050_ATTR_ATTEN	0x04
@@ -57,13 +65,12 @@ static MC6845_UPDATE_ROW( v1050_update_row )
 	v1050_state *state = device->machine->driver_data;
 
 	int column, bit;
-	UINT8 data;
 
 	for (column = 0; column < x_count; column++)
 	{
 		UINT16 address = (((ra & 0x03) + 1) << 13) | ((ma & 0x1fff) + column);
-
-		data = state->video_ram[address & V1050_VIDEORAM_MASK];
+		UINT8 data = state->video_ram[address & V1050_VIDEORAM_MASK];
+		UINT8 attr = (state->attr & 0xfc) | (state->attr_ram[address] & 0x03);
 
 		for (bit = 0; bit < 8; bit++)
 		{
@@ -71,16 +78,16 @@ static MC6845_UPDATE_ROW( v1050_update_row )
 			int color = BIT(data, 7);
 
 			/* blinking */
-			if ((state->attr_ram[address] & V1050_ATTR_BLINKING) && !(state->attr & V1050_ATTR_BLINK)) color = 0;
+			if ((attr & V1050_ATTR_BLINKING) && !(attr & V1050_ATTR_BLINK)) color = 0;
 
 			/* reverse video */
-			color ^= BIT(state->attr, 4);
-
-			/* blank video */
-			if (state->attr & V1050_ATTR_BLANK) color = 0;
+			color ^= BIT(attr, 4);
 
 			/* bright */
-			if (color && ((state->attr & V1050_ATTR_BOLD) ^ (state->attr_ram[address] & V1050_ATTR_BRIGHT))) color = 2;
+			if (color && (!(attr & V1050_ATTR_BOLD) ^ (attr & V1050_ATTR_BRIGHT))) color = 2;
+
+			/* display blank */
+			if (attr & V1050_ATTR_BLANK) color = 0;
 
 			*BITMAP_ADDR16(bitmap, y, x) = color;
 
@@ -91,11 +98,8 @@ static MC6845_UPDATE_ROW( v1050_update_row )
 
 static WRITE_LINE_DEVICE_HANDLER( v1050_vsync_changed )
 {
-	if (state)
-	{
-		cputag_set_input_line(device->machine, M6502_TAG, INPUT_LINE_IRQ0, ASSERT_LINE);
-		v1050_set_int(device->machine, INT_VSYNC, 1);
-	}
+	cputag_set_input_line(device->machine, M6502_TAG, INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
+	v1050_set_int(device->machine, INT_VSYNC, state);
 }
 
 static const mc6845_interface v1050_mc6845_intf = 
@@ -117,7 +121,7 @@ static const mc6845_interface v1050_mc6845_intf =
 static PALETTE_INIT( v1050 )
 {
 	palette_set_color(machine, 0, RGB_BLACK); /* black */
-	palette_set_color_rgb(machine, 1, 0x00, 0x80, 0x00); /* green */
+	palette_set_color_rgb(machine, 1, 0x00, 0xc0, 0x00); /* green */
 	palette_set_color_rgb(machine, 2, 0x00, 0xff, 0x00); /* bright green */
 }
 

@@ -36,10 +36,9 @@ struct _i8214_t
 
 	int inte;					/* interrupt enable */
 	int int_dis;				/* interrupt disable flip-flop */
-	int latch;					/* interrupt latch */
 	int a;						/* request level */
 	int b;						/* current status register */
-	UINT8 r;					/* interrupt requests */
+	UINT8 r;					/* interrupt request latch */
 	int sgs;					/* status group select */
 	int etlg;					/* enable this level group */
 };
@@ -78,11 +77,8 @@ INLINE void check_interrupt(const device_config *device)
 
 	for (level = 7; level >= 0; level--)
 	{
-		if (!BIT(i8214->r, level))
+		if (!BIT(i8214->r, 7 - level))
 		{
-			/* latch interrupt level */
-			i8214->latch = level;
-
 			if (i8214->sgs)
 			{
 				if (level > i8214->b)
@@ -110,7 +106,7 @@ READ8_DEVICE_HANDLER( i8214_a_r )
 {
 	i8214_t *i8214 = get_safe_token(device);
 
-	UINT8 a = ~i8214->a & 0x07;
+	UINT8 a = i8214->a & 0x07;
 
 	i8214->int_dis = 0;
 	check_interrupt(device);
@@ -124,7 +120,7 @@ WRITE8_DEVICE_HANDLER( i8214_b_w )
 {
 	i8214_t *i8214 = get_safe_token(device);
 
-	i8214->b = ~data & 0x07;
+	i8214->b = data & 0x07;
 
 	if (LOG) logerror("I8214 '%s' B: %01x\n", device->tag, i8214->b);
 
@@ -136,15 +132,6 @@ WRITE_LINE_DEVICE_HANDLER( i8214_elr_w )
 	i8214_t *i8214 = get_safe_token(device);
 
 	if (LOG) logerror("I8214 '%s' ELR: %u\n", device->tag, state);
-
-	if (state)
-	{
-		i8214->a = 0;
-		i8214->b = 0;
-		i8214->sgs = 0;
-
-		check_interrupt(device);
-	}
 }
 
 WRITE_LINE_DEVICE_HANDLER( i8214_etlg_w )
@@ -203,7 +190,6 @@ static DEVICE_START( i8214 )
 	/* register for state saving */
 	state_save_register_device_item(device, 0, i8214->inte);
 	state_save_register_device_item(device, 0, i8214->int_dis);
-	state_save_register_device_item(device, 0, i8214->latch);
 	state_save_register_device_item(device, 0, i8214->a);
 	state_save_register_device_item(device, 0, i8214->b);
 	state_save_register_device_item(device, 0, i8214->r);
