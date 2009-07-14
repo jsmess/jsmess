@@ -10,7 +10,7 @@
 #include "driver.h"
 #include "cpu/i8085/i8085.h"
 #include "devices/cassette.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255a.h"
 #include "machine/8257dma.h"
 #include "video/i8275.h"
 #include "includes/radio86.h"
@@ -78,7 +78,7 @@ static WRITE8_DEVICE_HANDLER (radio86_8255_portc_w2 )
 }
 
 
-const ppi8255_interface radio86_ppi8255_interface_1 =
+I8255A_INTERFACE( radio86_ppi8255_interface_1 )
 {
 	DEVCB_NULL,
 	DEVCB_HANDLER(radio86_8255_portb_r2),
@@ -88,7 +88,7 @@ const ppi8255_interface radio86_ppi8255_interface_1 =
 	DEVCB_HANDLER(radio86_8255_portc_w2),
 };
 
-const ppi8255_interface mikrosha_ppi8255_interface_1 =
+I8255A_INTERFACE( mikrosha_ppi8255_interface_1 )
 {
 	DEVCB_HANDLER(radio86_8255_portb_r2),
 	DEVCB_NULL,
@@ -119,7 +119,7 @@ static READ8_DEVICE_HANDLER (rk7007_8255_portc_r )
 	return key;	
 }
 
-const ppi8255_interface rk7007_ppi8255_interface =
+I8255A_INTERFACE( rk7007_ppi8255_interface )
 {
 	DEVCB_NULL,
 	DEVCB_HANDLER(radio86_8255_portb_r2),
@@ -219,7 +219,7 @@ static WRITE8_DEVICE_HANDLER (radio86_romdisk_portc_w )
 	romdisk_msb = data;	
 }
 
-const ppi8255_interface radio86_ppi8255_interface_2 =
+I8255A_INTERFACE( radio86_ppi8255_interface_2 )
 {
 	DEVCB_HANDLER(radio86_romdisk_porta_r),
 	DEVCB_NULL,
@@ -234,7 +234,7 @@ static WRITE8_DEVICE_HANDLER (mikrosha_8255_font_page_w )
 	mikrosha_font_page = (data  > 7) & 1;
 }
 
-const ppi8255_interface mikrosha_ppi8255_interface_2 =
+I8255A_INTERFACE( mikrosha_ppi8255_interface_2 )
 {
 	DEVCB_NULL,
 	DEVCB_NULL,

@@ -60,7 +60,7 @@
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255a.h"
 #include "machine/msm8251.h"
 #include "video/m6847.h"
 #include "sound/ay8910.h"
@@ -104,7 +104,7 @@ static READ8_DEVICE_HANDLER(nec_ppi8255_r) {
 	if (offset==2) {
 		return port_c_8255;
 	} else {
-		return ppi8255_r(device,offset);
+		return i8255a_r(device,offset);
 	}
 }
 
@@ -124,7 +124,7 @@ static WRITE8_DEVICE_HANDLER(nec_ppi8255_w) {
 		}
 		port_c_8255 |= 0xa8;
 	}
-	ppi8255_w(device,offset,data);
+	i8255a_w(device,offset,data);
 }
 
 static WRITE8_DEVICE_HANDLER(pc6100_ay8910_address_w) {
@@ -225,7 +225,7 @@ static READ8_DEVICE_HANDLER (pc6001_8255_portc_r )
 
 
 
-static const ppi8255_interface pc6001_ppi8255_interface =
+static I8255A_INTERFACE( pc6001_ppi8255_interface )
 {
 	DEVCB_HANDLER(pc6001_8255_porta_r),
 	DEVCB_HANDLER(pc6001_8255_portb_r),
@@ -275,7 +275,7 @@ static MACHINE_DRIVER_START( pc6001 )
 	MDRV_SOUND_CONFIG(pc6001_ay_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	
-	MDRV_PPI8255_ADD( "ppi8255", pc6001_ppi8255_interface )
+	MDRV_I8255A_ADD( "ppi8255", pc6001_ppi8255_interface )
 	/* uart */
 	MDRV_MSM8251_ADD("uart", pc6001_usart_interface)
 	

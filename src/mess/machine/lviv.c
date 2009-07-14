@@ -13,7 +13,7 @@
 #include "devices/cassette.h"
 #include "devices/snapquik.h"
 #include "cpu/i8085/i8085.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255a.h"
 #include "includes/lviv.h"
 #include "sound/speaker.h"
 
@@ -147,10 +147,10 @@ static WRITE8_DEVICE_HANDLER ( lviv_ppi_1_portc_w )	/* kayboard scaning */
 		switch ((offset >> 4) & 0x3)
 		{
 		case 0:
-			return ppi8255_r(devtag_get_device(space->machine, "ppi8255_0"), offset & 3);
+			return i8255a_r(devtag_get_device(space->machine, "ppi8255_0"), offset & 3);
 
 		case 1:
-			return ppi8255_r(devtag_get_device(space->machine, "ppi8255_1"), offset & 3);
+			return i8255a_r(devtag_get_device(space->machine, "ppi8255_1"), offset & 3);
 
 		case 2:
 		case 3:
@@ -183,11 +183,11 @@ WRITE8_HANDLER ( lviv_io_w )
 		switch ((offset >> 4) & 0x3)
 		{
 		case 0:
-			ppi8255_w(devtag_get_device(space->machine, "ppi8255_0"), offset & 3, data);
+			i8255a_w(devtag_get_device(space->machine, "ppi8255_0"), offset & 3, data);
 			break;
 
 		case 1:
-			ppi8255_w(devtag_get_device(space->machine, "ppi8255_1"), offset & 3, data);
+			i8255a_w(devtag_get_device(space->machine, "ppi8255_1"), offset & 3, data);
 			break;
 
 		case 2:
@@ -199,7 +199,7 @@ WRITE8_HANDLER ( lviv_io_w )
 }
 
 
-const ppi8255_interface lviv_ppi8255_interface_0 =
+I8255A_INTERFACE( lviv_ppi8255_interface_0 )
 {
 	DEVCB_HANDLER(lviv_ppi_0_porta_r),
 	DEVCB_HANDLER(lviv_ppi_0_portb_r),
@@ -209,7 +209,7 @@ const ppi8255_interface lviv_ppi8255_interface_0 =
 	DEVCB_HANDLER(lviv_ppi_0_portc_w)
 };
 
-const ppi8255_interface lviv_ppi8255_interface_1 =
+I8255A_INTERFACE( lviv_ppi8255_interface_1 )
 {
 	DEVCB_HANDLER(lviv_ppi_1_porta_r),
 	DEVCB_HANDLER(lviv_ppi_1_portb_r),

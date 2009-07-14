@@ -13,7 +13,7 @@
 #include "driver.h"
 #include "devices/cassette.h"
 #include "cpu/i8085/i8085.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255a.h"
 #include "includes/dai.h"
 #include "machine/pit8253.h"
 #include "machine/tms5501.h"
@@ -87,7 +87,7 @@ const tms5501_interface dai_tms5501_interface =
 	2000000.
 };
 
-const ppi8255_interface dai_ppi82555_intf =
+I8255A_INTERFACE( dai_ppi82555_intf )
 {
 	DEVCB_NULL,	/* Port A read */
 	DEVCB_NULL,	/* Port B read */

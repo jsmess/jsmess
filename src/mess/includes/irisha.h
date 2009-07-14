@@ -7,13 +7,13 @@
 #ifndef IRISHA_H_
 #define IRISHA_H_
 
-#include "machine/8255ppi.h"
+#include "machine/i8255a.h"
 
 /*----------- defined in machine/irisha.c -----------*/
 
 extern DRIVER_INIT( irisha );
 extern MACHINE_RESET( irisha );
-extern const ppi8255_interface irisha_ppi8255_interface;
+extern const i8255a_interface irisha_ppi8255_interface;
 extern const struct pit8253_config irisha_pit8253_intf;
 extern const struct pic8259_interface irisha_pic8259_config;
 

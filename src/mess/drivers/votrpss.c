@@ -64,7 +64,7 @@
 /* Components */
 //#include "sound/ay8910.h"
 //#include "sound/votrax.h"
-//#include "machine/8255ppi.h"
+//#include "machine/i8255a.h"
 //#include "machine/pit8253.h"
 //#include "machine/msm8251.h"
 

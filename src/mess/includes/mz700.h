@@ -12,7 +12,7 @@
 #ifndef MZ700_H_
 #define MZ700_H_
 
-#include "machine/8255ppi.h"
+#include "machine/i8255a.h"
 #include "machine/pit8253.h"
 #include "machine/z80pio.h"
 
@@ -49,7 +49,7 @@ struct _mz_state
 
 extern const struct pit8253_config mz700_pit8253_config;
 extern const struct pit8253_config mz800_pit8253_config;
-extern const ppi8255_interface mz700_ppi8255_interface;
+extern const i8255a_interface mz700_ppi8255_interface;
 extern const z80pio_interface mz800_z80pio_config;
 
 DRIVER_INIT( mz700 );

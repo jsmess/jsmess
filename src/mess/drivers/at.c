@@ -14,7 +14,7 @@
 #include "cpu/i86/i286.h"
 #include "cpu/i386/i386.h"
 #include "sound/3812intf.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255a.h"
 #include "machine/ins8250.h"
 #include "machine/mc146818.h"
 #include "machine/pic8259.h"

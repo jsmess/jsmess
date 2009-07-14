@@ -11,7 +11,7 @@
 #include "cpu/i8085/i8085.h"
 #include "sound/dac.h"
 #include "devices/cassette.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255a.h"
 #include "includes/ut88.h"
 
 static int ut88_keyboard_mask;
@@ -50,7 +50,7 @@ static WRITE8_DEVICE_HANDLER (ut88_8255_porta_w )
 	ut88_keyboard_mask = data ^ 0xff;	
 }
 
-const ppi8255_interface ut88_ppi8255_interface =
+I8255A_INTERFACE( ut88_ppi8255_interface )
 {
 	DEVCB_NULL,
 	DEVCB_HANDLER(ut88_8255_portb_r),
@@ -75,13 +75,13 @@ MACHINE_RESET( ut88 )
 
 READ8_DEVICE_HANDLER( ut88_keyboard_r )
 {
-	return ppi8255_r(device, offset^0x03);	
+	return i8255a_r(device, offset^0x03);	
 }
 
 
 WRITE8_DEVICE_HANDLER( ut88_keyboard_w )
 {
-	ppi8255_w(device, offset^0x03, data);
+	i8255a_w(device, offset^0x03, data);
 }
 
 WRITE8_HANDLER( ut88_sound_w )

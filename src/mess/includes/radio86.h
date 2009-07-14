@@ -7,7 +7,7 @@
 #ifndef radio86_H_
 #define radio86_H_
 
-#include "machine/8255ppi.h"
+#include "machine/i8255a.h"
 #include "machine/8257dma.h"
 #include "video/i8275.h"
 
@@ -28,12 +28,12 @@ extern READ8_HANDLER (radio_cpu_state_r );
 extern READ8_HANDLER (radio_io_r );
 extern WRITE8_HANDLER(radio_io_w );
 
-extern const ppi8255_interface radio86_ppi8255_interface_1;
-extern const ppi8255_interface radio86_ppi8255_interface_2;
-extern const ppi8255_interface rk7007_ppi8255_interface;
+extern const i8255a_interface radio86_ppi8255_interface_1;
+extern const i8255a_interface radio86_ppi8255_interface_2;
+extern const i8255a_interface rk7007_ppi8255_interface;
 
-extern const ppi8255_interface mikrosha_ppi8255_interface_1;
-extern const ppi8255_interface mikrosha_ppi8255_interface_2;
+extern const i8255a_interface mikrosha_ppi8255_interface_1;
+extern const i8255a_interface mikrosha_ppi8255_interface_2;
 
 extern const i8275_interface radio86_i8275_interface;
 extern const i8275_interface partner_i8275_interface;

@@ -16,7 +16,7 @@
 
 
 #include "driver.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255a.h"
 #include "video/m6847.h"
 #include "machine/ctronics.h"
 #include "machine/i8271.h"
@@ -80,7 +80,7 @@ const via6522_interface atom_6522_interface =
 
 
 
-const ppi8255_interface atom_8255_int =
+I8255A_INTERFACE( atom_8255_int )
 {
 	DEVCB_HANDLER(atom_8255_porta_r),
 	DEVCB_HANDLER(atom_8255_portb_r),

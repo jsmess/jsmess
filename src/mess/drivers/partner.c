@@ -10,7 +10,7 @@
 #include "driver.h"
 #include "cpu/i8085/i8085.h"
 #include "sound/wave.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255a.h"
 #include "machine/8257dma.h"
 #include "machine/wd17xx.h"
 #include "video/i8275.h"
@@ -33,7 +33,7 @@ static ADDRESS_MAP_START(partner_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0xc800, 0xcfff ) AM_RAMBANK(9)
 	AM_RANGE( 0xd000, 0xd7ff ) AM_RAMBANK(10)
 	AM_RANGE( 0xd800, 0xd8ff ) AM_DEVREADWRITE("i8275", i8275_r, i8275_w)  // video
-	AM_RANGE( 0xd900, 0xd9ff ) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE( 0xd900, 0xd9ff ) AM_DEVREADWRITE("ppi8255_1", i8255a_r, i8255a_w)
 	AM_RANGE( 0xda00, 0xdaff ) AM_WRITE(partner_mem_page_w)
 	AM_RANGE( 0xdb00, 0xdbff ) AM_DEVWRITE("dma8257", dma8257_w)	 // DMA
 	AM_RANGE( 0xdc00, 0xddff ) AM_RAMBANK(11)
@@ -152,7 +152,7 @@ static MACHINE_DRIVER_START( partner )
     MDRV_MACHINE_START( partner )
     MDRV_MACHINE_RESET( partner )
 
-	MDRV_PPI8255_ADD( "ppi8255_1", radio86_ppi8255_interface_1 )
+	MDRV_I8255A_ADD( "ppi8255_1", radio86_ppi8255_interface_1 )
 
 	MDRV_I8275_ADD	( "i8275", partner_i8275_interface)
     /* video hardware */

@@ -13,7 +13,7 @@
 #include "includes/mz700.h"
 #include "cpu/z80/z80.h"
 #include "machine/pit8253.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255a.h"
 #include "machine/z80pio.h"
 #include "machine/74145.h"
 #include "machine/ctronics.h"
@@ -41,7 +41,7 @@ static READ8_DEVICE_HANDLER ( pio_port_c_r );
 static WRITE8_DEVICE_HANDLER ( pio_port_a_w );
 static WRITE8_DEVICE_HANDLER ( pio_port_c_w );
 
-const ppi8255_interface mz700_ppi8255_interface =
+I8255A_INTERFACE( mz700_ppi8255_interface )
 {
 	DEVCB_NULL,
 	DEVCB_DEVICE_HANDLER("ls145", pio_port_b_r),
@@ -278,14 +278,14 @@ WRITE8_HANDLER( mz_bank_3_w )
 			/* switch in memory mapped i/o devices */
 			if (mz->mz700)
 			{
-				memory_install_readwrite8_device_handler(spc, mz->ppi, 0xe000, 0xfff3, 0, 0x1ff0, ppi8255_r, ppi8255_w);
+				memory_install_readwrite8_device_handler(spc, mz->ppi, 0xe000, 0xfff3, 0, 0x1ff0, i8255a_r, i8255a_w);
 				memory_install_readwrite8_device_handler(spc, mz->pit, 0xe004, 0xfff7, 0, 0x1ff0, pit8253_r, pit8253_w);
 				memory_install_read8_handler(spc, 0xe008, 0xfff8, 0, 0x1ff0, mz700_e008_r);
 				memory_install_write8_device_handler(spc, mz->pit, 0xe008, 0xfff8, 0, 0x1ff0, pit8253_gate_w);
 			}
 			else
 			{
-				memory_install_readwrite8_device_handler(spc, mz->ppi, 0xe000, 0xe003, 0, 0, ppi8255_r, ppi8255_w);
+				memory_install_readwrite8_device_handler(spc, mz->ppi, 0xe000, 0xe003, 0, 0, i8255a_r, i8255a_w);
 				memory_install_readwrite8_device_handler(spc, mz->pit, 0xe004, 0xe007, 0, 0, pit8253_r, pit8253_w);
 				memory_install_read8_handler(spc, 0xe008, 0xe008, 0, 0, mz700_e008_r);
 				memory_install_write8_device_handler(spc, mz->pit, 0xe008, 0xe008, 0, 0, pit8253_gate_w);

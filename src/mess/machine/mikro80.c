@@ -10,7 +10,7 @@
 #include "driver.h"
 #include "cpu/i8085/i8085.h"
 #include "devices/cassette.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255a.h"
 #include "includes/mikro80.h"
 
 static int mikro80_keyboard_mask;
@@ -64,7 +64,7 @@ static READ8_DEVICE_HANDLER( mikro80_8255_portb_device_r ) { return mikro80_8255
 static READ8_DEVICE_HANDLER( mikro80_8255_portc_device_r ) { return mikro80_8255_portc_r(cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM), offset); }
 static WRITE8_DEVICE_HANDLER( mikro80_8255_porta_device_w ) { mikro80_8255_porta_w(cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM), offset, data); }
 
-const ppi8255_interface mikro80_ppi8255_interface =
+I8255A_INTERFACE( mikro80_ppi8255_interface )
 {
 	DEVCB_NULL,
 	DEVCB_HANDLER(mikro80_8255_portb_device_r),
@@ -90,12 +90,12 @@ MACHINE_RESET( mikro80 )
 
 READ8_DEVICE_HANDLER( mikro80_keyboard_r )
 {
-	return ppi8255_r(device, offset^0x03);
+	return i8255a_r(device, offset^0x03);
 }
 
 WRITE8_DEVICE_HANDLER( mikro80_keyboard_w )
 {
-	ppi8255_w(device, offset^0x03, data);
+	i8255a_w(device, offset^0x03, data);
 }
 
 

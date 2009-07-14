@@ -174,7 +174,7 @@ I/O ports
 #include "sound/wave.h"
 #include "devices/cassette.h"
 #include "includes/pmd85.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255a.h"
 #include "machine/pit8253.h"
 #include "machine/msm8251.h"
 #include "formats/pmd_pmd.h"
@@ -580,13 +580,13 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( pmd851 )
 	MDRV_IMPORT_FROM( pmd85 )
 
-	MDRV_PPI8255_ADD( "ppi8255_0", pmd85_ppi8255_interface[0] )
+	MDRV_I8255A_ADD( "ppi8255_0", pmd85_ppi8255_interface[0] )
 
-	MDRV_PPI8255_ADD( "ppi8255_1", pmd85_ppi8255_interface[1] )
+	MDRV_I8255A_ADD( "ppi8255_1", pmd85_ppi8255_interface[1] )
 
-	MDRV_PPI8255_ADD( "ppi8255_2", pmd85_ppi8255_interface[2] )
+	MDRV_I8255A_ADD( "ppi8255_2", pmd85_ppi8255_interface[2] )
 
-	MDRV_PPI8255_ADD( "ppi8255_3", pmd85_ppi8255_interface[3] )
+	MDRV_I8255A_ADD( "ppi8255_3", pmd85_ppi8255_interface[3] )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( pmd852a )
@@ -606,11 +606,11 @@ static MACHINE_DRIVER_START( alfa )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(alfa_mem)
 
-	MDRV_PPI8255_ADD( "ppi8255_0", alfa_ppi8255_interface[0] )
+	MDRV_I8255A_ADD( "ppi8255_0", alfa_ppi8255_interface[0] )
 
-	MDRV_PPI8255_ADD( "ppi8255_1", alfa_ppi8255_interface[1] )
+	MDRV_I8255A_ADD( "ppi8255_1", alfa_ppi8255_interface[1] )
 
-	MDRV_PPI8255_ADD( "ppi8255_2", alfa_ppi8255_interface[1] )
+	MDRV_I8255A_ADD( "ppi8255_2", alfa_ppi8255_interface[1] )
 
 MACHINE_DRIVER_END
 
@@ -620,7 +620,7 @@ static MACHINE_DRIVER_START( mato )
 	MDRV_CPU_PROGRAM_MAP(mato_mem)
 	MDRV_CPU_IO_MAP(mato_io_map)
 
-	MDRV_PPI8255_ADD( "ppi8255_0", mato_ppi8255_interface )
+	MDRV_I8255A_ADD( "ppi8255_0", mato_ppi8255_interface )
 
 	/* no uart */
 	MDRV_DEVICE_REMOVE( "uart" )

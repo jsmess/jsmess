@@ -8,7 +8,7 @@
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255a.h"
 #include "machine/pit8253.h"
 #include "machine/msm8251.h"
 
@@ -61,7 +61,7 @@ static READ8_DEVICE_HANDLER (fk1_ppi_1_c_r )
 //	logerror("fk1_ppi_1_c_r\n");
 	return 0;
 }
-const ppi8255_interface fk1_ppi8255_interface_1 =
+I8255A_INTERFACE( fk1_ppi8255_interface_1 )
 {
 	DEVCB_HANDLER(fk1_ppi_1_a_r),
 	DEVCB_HANDLER(fk1_ppi_1_b_r),
@@ -111,7 +111,7 @@ static READ8_DEVICE_HANDLER (fk1_ppi_2_c_r )
 //	logerror("fk1_ppi_2_c_r\n");
 	return 0;
 }
-const ppi8255_interface fk1_ppi8255_interface_2 =
+I8255A_INTERFACE( fk1_ppi8255_interface_2 )
 {
 	DEVCB_NULL,
 	DEVCB_HANDLER(fk1_ppi_2_b_r),
@@ -174,7 +174,7 @@ static READ8_DEVICE_HANDLER (fk1_ppi_3_c_r )
 //	logerror("fk1_ppi_3_c_r\n");
 	return 0;
 }
-const ppi8255_interface fk1_ppi8255_interface_3 =
+I8255A_INTERFACE( fk1_ppi8255_interface_3 )
 {
 	DEVCB_HANDLER(fk1_ppi_3_a_r),
 	DEVCB_HANDLER(fk1_ppi_3_b_r),
@@ -296,14 +296,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( fk1_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x00, 0x03 ) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE( 0x00, 0x03 ) AM_DEVREADWRITE("ppi8255_1", i8255a_r, i8255a_w)
 	AM_RANGE( 0x10, 0x13 ) AM_DEVREADWRITE("pit8253", pit8253_r,pit8253_w)
-	AM_RANGE( 0x20, 0x23 ) AM_DEVREADWRITE("ppi8255_2", ppi8255_r, ppi8255_w)
+	AM_RANGE( 0x20, 0x23 ) AM_DEVREADWRITE("ppi8255_2", i8255a_r, i8255a_w)
 	AM_RANGE( 0x30, 0x30 ) AM_READWRITE(fk1_bank_ram_r,fk1_intr_w)
 	AM_RANGE( 0x40, 0x40 ) AM_DEVREADWRITE("uart", msm8251_data_r,msm8251_data_w)
 	AM_RANGE( 0x41, 0x41 ) AM_DEVREADWRITE("uart", msm8251_status_r,msm8251_control_w)
 	AM_RANGE( 0x50, 0x50 ) AM_READWRITE(fk1_bank_rom_r,fk1_disk_w)
-	AM_RANGE( 0x60, 0x63 ) AM_DEVREADWRITE("ppi8255_3", ppi8255_r, ppi8255_w)
+	AM_RANGE( 0x60, 0x63 ) AM_DEVREADWRITE("ppi8255_3", i8255a_r, i8255a_w)
 	AM_RANGE( 0x70, 0x70 ) AM_READWRITE(fk1_mouse_r,fk1_reset_int_w)
 ADDRESS_MAP_END
 
@@ -413,9 +413,9 @@ static MACHINE_DRIVER_START( fk1 )
     MDRV_VIDEO_UPDATE(fk1)
     
 	MDRV_PIT8253_ADD( "pit8253", fk1_pit8253_intf )
-	MDRV_PPI8255_ADD( "ppi8255_1", fk1_ppi8255_interface_1 )
-	MDRV_PPI8255_ADD( "ppi8255_2", fk1_ppi8255_interface_2 )		    
-	MDRV_PPI8255_ADD( "ppi8255_3", fk1_ppi8255_interface_3 )        
+	MDRV_I8255A_ADD( "ppi8255_1", fk1_ppi8255_interface_1 )
+	MDRV_I8255A_ADD( "ppi8255_2", fk1_ppi8255_interface_2 )		    
+	MDRV_I8255A_ADD( "ppi8255_3", fk1_ppi8255_interface_3 )        
 	/* uart */
 	MDRV_MSM8251_ADD("uart", default_msm8251_interface)    
 MACHINE_DRIVER_END

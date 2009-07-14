@@ -18,7 +18,7 @@
  */
 
 #include "driver.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255a.h"
 #include "includes/msx_slot.h"
 #include "includes/msx.h"
 #include "machine/wd17xx.h"

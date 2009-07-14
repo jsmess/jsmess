@@ -121,7 +121,7 @@
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/68901mfp.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255a.h"
 #include "machine/nec765.h"
 #include "sound/2151intf.h"
 #include "sound/okim6258.h"
@@ -1459,12 +1459,12 @@ static WRITE16_HANDLER( x68k_mfp_w )
 
 static WRITE16_DEVICE_HANDLER( x68k_ppi_w )
 {
-	ppi8255_w(device,offset & 0x03,data);
+	i8255a_w(device,offset & 0x03,data);
 }
 
 static READ16_DEVICE_HANDLER( x68k_ppi_r )
 {
-	return ppi8255_r(device,offset & 0x03);
+	return i8255a_r(device,offset & 0x03);
 }
 
 static READ16_DEVICE_HANDLER( x68k_rtc_r )
@@ -1871,7 +1871,7 @@ static MC68901_INTERFACE( mfp_interface )
 	DEVCB_LINE(mfp_irq_callback)						/* interrupt */
 };
 
-static const ppi8255_interface ppi_interface =
+static I8255A_INTERFACE( ppi_interface )
 {
 	DEVCB_HANDLER(ppi_port_a_r),
 	DEVCB_HANDLER(ppi_port_b_r),
@@ -2507,7 +2507,7 @@ static MACHINE_DRIVER_START( x68000 )
 	/* device hardware */
 	MDRV_MC68901_ADD(MC68901_TAG, 2000000, mfp_interface)
 
-	MDRV_PPI8255_ADD( "ppi8255",  ppi_interface )
+	MDRV_I8255A_ADD( "ppi8255",  ppi_interface )
 
 	MDRV_HD63450_ADD( "hd63450", dmac_interface )
 

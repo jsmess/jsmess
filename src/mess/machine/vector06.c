@@ -9,7 +9,7 @@
 
 #include "driver.h"
 #include "cpu/i8085/i8085.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255a.h"
 #include "machine/wd17xx.h"
 #include "devices/cassette.h"
 #include "devices/basicdsk.h"
@@ -102,7 +102,7 @@ static WRITE8_DEVICE_HANDLER (vector06_romdisk_portc_w )
 	romdisk_msb = data;	
 }
 
-const ppi8255_interface vector06_ppi8255_2_interface =
+I8255A_INTERFACE( vector06_ppi8255_2_interface )
 {
 	DEVCB_NULL,
 	DEVCB_HANDLER(vector06_romdisk_portb_r),
@@ -113,7 +113,7 @@ const ppi8255_interface vector06_ppi8255_2_interface =
 };
 
 
-const ppi8255_interface vector06_ppi8255_interface =
+I8255A_INTERFACE( vector06_ppi8255_interface )
 {
 	DEVCB_NULL,
 	DEVCB_HANDLER(vector06_8255_portb_r),
@@ -124,20 +124,20 @@ const ppi8255_interface vector06_ppi8255_interface =
 };
 
 READ8_HANDLER(vector_8255_1_r) {
-	return ppi8255_r(devtag_get_device(space->machine, "ppi8255"), (offset ^ 0x03));
+	return i8255a_r(devtag_get_device(space->machine, "ppi8255"), (offset ^ 0x03));
 }
 
 WRITE8_HANDLER(vector_8255_1_w) {
-	ppi8255_w(devtag_get_device(space->machine, "ppi8255"), (offset ^0x03) , data );
+	i8255a_w(devtag_get_device(space->machine, "ppi8255"), (offset ^0x03) , data );
 
 }
 
 READ8_HANDLER(vector_8255_2_r) {
-	return ppi8255_r(devtag_get_device(space->machine, "ppi8255_2"), (offset ^ 0x03));
+	return i8255a_r(devtag_get_device(space->machine, "ppi8255_2"), (offset ^ 0x03));
 }
 
 WRITE8_HANDLER(vector_8255_2_w) {
-	ppi8255_w(devtag_get_device(space->machine, "ppi8255_2"), (offset ^0x03) , data );
+	i8255a_w(devtag_get_device(space->machine, "ppi8255_2"), (offset ^0x03) , data );
 
 }
 

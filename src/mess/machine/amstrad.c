@@ -37,7 +37,7 @@ This gives a total of 19968 NOPs per frame.
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255a.h"
 #include "machine/mc146818.h"
 #include "machine/nec765.h"
 #include "machine/ctronics.h"
@@ -2354,7 +2354,7 @@ b9 b8 | PPI Function Read/Write status
 	if ((offset & (1<<11)) == 0)
 	{
 		if (r1r0 < 0x03 )
-			data = ppi8255_r(devtag_get_device(space->machine, "ppi8255" ), r1r0);
+			data = i8255a_r(devtag_get_device(space->machine, "ppi8255" ), r1r0);
 	}
 
 /* if b10 = 0 : Expansion Peripherals Read selected
@@ -2519,7 +2519,7 @@ WRITE8_HANDLER ( amstrad_cpc_io_w )
 	{
 		unsigned int Index = ((offset & 0x0300) >> 8);
 
-		ppi8255_w(devtag_get_device(space->machine, "ppi8255" ), Index, data);
+		i8255a_w(devtag_get_device(space->machine, "ppi8255" ), Index, data);
 	}
 
 	/* if b10 = 0 : Expansion Peripherals Write selected */
@@ -2692,11 +2692,11 @@ static void amstrad_handle_snapshot(running_machine *machine, unsigned char *pSn
 	gate_array.upper_bank = pSnapshot[0x055];
 
 	/* PPI */
-	ppi8255_w(devtag_get_device(machine, "ppi8255"),3,pSnapshot[0x059] & 0x0ff);
+	i8255a_w(devtag_get_device(machine, "ppi8255"),3,pSnapshot[0x059] & 0x0ff);
 
-	ppi8255_w(devtag_get_device(machine, "ppi8255"),0,pSnapshot[0x056] & 0x0ff);
-	ppi8255_w(devtag_get_device(machine, "ppi8255"),1,pSnapshot[0x057] & 0x0ff);
-	ppi8255_w(devtag_get_device(machine, "ppi8255"),2,pSnapshot[0x058] & 0x0ff);
+	i8255a_w(devtag_get_device(machine, "ppi8255"),0,pSnapshot[0x056] & 0x0ff);
+	i8255a_w(devtag_get_device(machine, "ppi8255"),1,pSnapshot[0x057] & 0x0ff);
+	i8255a_w(devtag_get_device(machine, "ppi8255"),2,pSnapshot[0x058] & 0x0ff);
 
 	/* PSG */
 	for (i=0; i<16; i++)

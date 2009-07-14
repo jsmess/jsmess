@@ -10,7 +10,7 @@
 
 #include "driver.h"
 #include "machine/pit8253.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255a.h"
 #include "includes/dai.h"
 #include "streams.h"
 

@@ -14,7 +14,7 @@
 #include "sound/dac.h"
 #include "sound/wave.h"
 #include "includes/special.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255a.h"
 #include "machine/pit8253.h"
 #include "devices/cassette.h"
 #include "devices/basicdsk.h"
@@ -403,7 +403,7 @@ static MACHINE_DRIVER_START( special )
 
 	MDRV_PIT8253_ADD( "pit8253", specimx_pit8253_intf )
 
-	MDRV_PPI8255_ADD( "ppi8255", specialist_ppi8255_interface )
+	MDRV_I8255A_ADD( "ppi8255", specialist_ppi8255_interface )
 
     /* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -472,7 +472,7 @@ static MACHINE_DRIVER_START( erik )
 
     MDRV_MACHINE_RESET( erik )
 
-	MDRV_PPI8255_ADD( "ppi8255", specialist_ppi8255_interface )
+	MDRV_I8255A_ADD( "ppi8255", specialist_ppi8255_interface )
 
     /* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

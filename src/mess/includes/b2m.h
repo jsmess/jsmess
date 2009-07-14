@@ -7,7 +7,7 @@
 #ifndef b2m_H_
 #define b2m_H_
 
-#include "machine/8255ppi.h"
+#include "machine/i8255a.h"
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
 
@@ -20,9 +20,9 @@ extern const struct pit8253_config b2m_pit8253_intf;
 
 extern const struct pic8259_interface b2m_pic8259_config;
 
-extern const ppi8255_interface b2m_ppi8255_interface_1;
-extern const ppi8255_interface b2m_ppi8255_interface_2;
-extern const ppi8255_interface b2m_ppi8255_interface_3;
+extern const i8255a_interface b2m_ppi8255_interface_1;
+extern const i8255a_interface b2m_ppi8255_interface_2;
+extern const i8255a_interface b2m_ppi8255_interface_3;
 
 extern DRIVER_INIT( b2m );
 extern MACHINE_START( b2m );

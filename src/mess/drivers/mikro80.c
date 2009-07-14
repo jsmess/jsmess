@@ -10,7 +10,7 @@
 #include "driver.h"
 #include "cpu/i8085/i8085.h"
 #include "sound/wave.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255a.h"
 #include "includes/mikro80.h"
 #include "devices/cassette.h"
 #include "devices/cartslot.h"
@@ -153,7 +153,7 @@ static MACHINE_DRIVER_START( mikro80 )
     MDRV_CPU_IO_MAP(mikro80_io)
     MDRV_MACHINE_RESET( mikro80 )
 
-	MDRV_PPI8255_ADD( "ppi8255", mikro80_ppi8255_interface )
+	MDRV_I8255A_ADD( "ppi8255", mikro80_ppi8255_interface )
 
     /* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

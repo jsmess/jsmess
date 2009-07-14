@@ -66,7 +66,7 @@
 #include "driver.h"
 #include "includes/mz700.h"
 #include "cpu/z80/z80.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255a.h"
 #include "machine/pit8253.h"
 #include "machine/z80pio.h"
 #include "machine/74145.h"
@@ -122,7 +122,7 @@ static ADDRESS_MAP_START( mz800_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xcd, 0xcd) AM_WRITE( mz800_read_format_w )
 	AM_RANGE(0xce, 0xce) AM_READWRITE( mz800_crtc_r, mz800_display_mode_w )
 	AM_RANGE(0xcf, 0xcf) AM_WRITE( mz800_scroll_border_w )
-	AM_RANGE(0xd0, 0xd3) AM_DEVREADWRITE("ppi8255", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xd0, 0xd3) AM_DEVREADWRITE("ppi8255", i8255a_r, i8255a_w)
 	AM_RANGE(0xd4, 0xd7) AM_DEVREADWRITE("pit8253", pit8253_r, pit8253_w)
 	AM_RANGE(0xe0, 0xe0) AM_READWRITE(mz800_bank_0_r, mz800_bank_0_w)
 	AM_RANGE(0xe1, 0xe1) AM_READWRITE(mz800_bank_1_r, mz_bank_1_w)
@@ -369,7 +369,7 @@ static MACHINE_DRIVER_START( mz700 )
 
 	/* devices */
 	MDRV_PIT8253_ADD("pit8253", mz700_pit8253_config)
-	MDRV_PPI8255_ADD("ppi8255", mz700_ppi8255_interface)
+	MDRV_I8255A_ADD("ppi8255", mz700_ppi8255_interface)
 	MDRV_TTL74145_ADD("ls145", default_ttl74145)
 
 	MDRV_CASSETTE_ADD( "cassette", mz700_cassette_config )

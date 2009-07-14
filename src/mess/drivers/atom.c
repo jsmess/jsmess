@@ -64,7 +64,7 @@ Hardware:   PPIA 8255
 /* Components */
 #include "machine/ctronics.h"
 #include "machine/i8271.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255a.h"
 #include "machine/6522via.h"
 #include "video/m6847.h"
 
@@ -91,7 +91,7 @@ static ADDRESS_MAP_START( atom_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0a05, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0x97ff) AM_RAM AM_BASE(&videoram) /* VDG 6847 */
 	AM_RANGE(0x9800, 0x9fff) AM_RAM
-	AM_RANGE(0xb000, 0xb003) AM_DEVREADWRITE("ppi8255", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xb000, 0xb003) AM_DEVREADWRITE("ppi8255", i8255a_r, i8255a_w)
 	AM_RANGE(0xb800, 0xbbff) AM_DEVREADWRITE("via6522_0", via_r, via_w)
 	AM_RANGE(0xc000, 0xcfff) AM_ROM
 	AM_RANGE(0xd000, 0xdfff) AM_ROM
@@ -108,7 +108,7 @@ static ADDRESS_MAP_START( atomeb_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x97ff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size) /* VDG 6847 */
 	AM_RANGE(0x9800, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xafff) AM_READ(SMH_BANK(1))	/* eprom data from eprom box */
-	AM_RANGE(0xb000, 0xb003) AM_DEVREADWRITE("ppi8255", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xb000, 0xb003) AM_DEVREADWRITE("ppi8255", i8255a_r, i8255a_w)
 	AM_RANGE(0xb800, 0xbbff) AM_DEVREADWRITE("via6522_0", via_r, via_w)
 	AM_RANGE(0xbfff, 0xbfff) AM_READWRITE(atom_eprom_box_r, atom_eprom_box_w)
 	AM_RANGE(0xc000, 0xcfff) AM_ROM
@@ -265,7 +265,7 @@ static MACHINE_DRIVER_START( atom )
 
 	MDRV_MACHINE_RESET( atom )
 
-	MDRV_PPI8255_ADD( "ppi8255", atom_8255_int )
+	MDRV_I8255A_ADD( "ppi8255", atom_8255_int )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

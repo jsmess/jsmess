@@ -9,7 +9,7 @@
 
 #include "driver.h"
 #include "cpu/i8085/i8085.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255a.h"
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
 #include "machine/msm8251.h"
@@ -27,7 +27,7 @@ static ADDRESS_MAP_START( irisha_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE( 0x07, 0x07) AM_DEVREADWRITE("uart", msm8251_status_r, msm8251_control_w)
 	AM_RANGE( 0x08, 0x0B) AM_DEVREADWRITE("pit8253", pit8253_r, pit8253_w )
 	AM_RANGE( 0x0C, 0x0F) AM_DEVREADWRITE("pic8259", pic8259_r, pic8259_w ) AM_MASK( 0x01 )
-	AM_RANGE( 0x10, 0x13) AM_DEVREADWRITE("ppi8255", ppi8255_r, ppi8255_w )
+	AM_RANGE( 0x10, 0x13) AM_DEVREADWRITE("ppi8255", i8255a_r, i8255a_w )
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -142,7 +142,7 @@ static MACHINE_DRIVER_START( irisha )
 
    	MDRV_MACHINE_RESET( irisha )
 
-    MDRV_PPI8255_ADD( "ppi8255", irisha_ppi8255_interface )
+    MDRV_I8255A_ADD( "ppi8255", irisha_ppi8255_interface )
 
 	MDRV_PIT8253_ADD( "pit8253", irisha_pit8253_intf )
 

@@ -11,7 +11,7 @@
 #include "cpu/z80/z80.h"
 #include "cpu/i8085/i8085.h"
 #include "sound/wave.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255a.h"
 #include "machine/wd17xx.h"
 #include "devices/cassette.h"
 #include "devices/cartslot.h"
@@ -164,9 +164,9 @@ static MACHINE_DRIVER_START( vector06 )
 	MDRV_MACHINE_START( vector06 )
   	MDRV_MACHINE_RESET( vector06 )
 
-	MDRV_PPI8255_ADD( "ppi8255", vector06_ppi8255_interface )
+	MDRV_I8255A_ADD( "ppi8255", vector06_ppi8255_interface )
 
-	MDRV_PPI8255_ADD( "ppi8255_2", vector06_ppi8255_2_interface )
+	MDRV_I8255A_ADD( "ppi8255_2", vector06_ppi8255_2_interface )
 
     /* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

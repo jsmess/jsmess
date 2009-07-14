@@ -10,7 +10,7 @@
 #include "driver.h"
 #include "cpu/i8085/i8085.h"
 #include "sound/wave.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255a.h"
 #include "machine/8257dma.h"
 #include "machine/pit8253.h"
 #include "video/i8275.h"
@@ -23,8 +23,8 @@ static ADDRESS_MAP_START(mikrosha_mem, ADDRESS_SPACE_PROGRAM, 8)
     AM_RANGE( 0x0000, 0x0fff ) AM_RAMBANK(1) // First bank
     AM_RANGE( 0x1000, 0x7fff ) AM_RAM // RAM
     AM_RANGE( 0x8000, 0xbfff ) AM_READ(radio_cpu_state_r) // Not connected
-    AM_RANGE( 0xc000, 0xc003 ) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w) AM_MIRROR(0x07fc)
-    AM_RANGE( 0xc800, 0xc803 ) AM_DEVREADWRITE("ppi8255_2", ppi8255_r, ppi8255_w) AM_MIRROR(0x07fc)
+    AM_RANGE( 0xc000, 0xc003 ) AM_DEVREADWRITE("ppi8255_1", i8255a_r, i8255a_w) AM_MIRROR(0x07fc)
+    AM_RANGE( 0xc800, 0xc803 ) AM_DEVREADWRITE("ppi8255_2", i8255a_r, i8255a_w) AM_MIRROR(0x07fc)
     AM_RANGE( 0xd000, 0xd001 ) AM_DEVREADWRITE("i8275", i8275_r, i8275_w) AM_MIRROR(0x07fe) // video
     AM_RANGE( 0xd800, 0xd803 ) AM_DEVREADWRITE("pit8253", pit8253_r,pit8253_w) AM_MIRROR(0x07fc) // Timer
     AM_RANGE( 0xe000, 0xf7ff ) AM_READ(radio_cpu_state_r) // Not connected
@@ -170,9 +170,9 @@ static MACHINE_DRIVER_START( mikrosha )
 
 	MDRV_MACHINE_RESET( radio86 )
 
-	MDRV_PPI8255_ADD( "ppi8255_1", mikrosha_ppi8255_interface_1 )
+	MDRV_I8255A_ADD( "ppi8255_1", mikrosha_ppi8255_interface_1 )
 
-	MDRV_PPI8255_ADD( "ppi8255_2", mikrosha_ppi8255_interface_2 )
+	MDRV_I8255A_ADD( "ppi8255_2", mikrosha_ppi8255_interface_2 )
 
 	MDRV_I8275_ADD  ( "i8275", mikrosha_i8275_interface)
 

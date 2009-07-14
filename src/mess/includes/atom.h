@@ -9,7 +9,7 @@
 
 #include "devices/snapquik.h"
 #include "machine/6522via.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255a.h"
 #include "machine/i8271.h"
 
 /* Motherboard crystals
@@ -26,7 +26,7 @@ Source: http://acorn.chriswhy.co.uk/docs/Acorn/Manuals/Acorn_AtomTechnicalManual
 extern UINT8 atom_8255_porta;
 extern UINT8 atom_8255_portc;
 
-extern const ppi8255_interface atom_8255_int;
+extern const i8255a_interface atom_8255_int;
 extern const via6522_interface atom_6522_interface;
 extern const i8271_interface atom_8271_interface;
 

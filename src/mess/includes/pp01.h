@@ -8,11 +8,11 @@
 #define PP01_H_
 
 #include "machine/pit8253.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255a.h"
 
 /*----------- defined in machine/pp01.c -----------*/
 extern const struct pit8253_config pp01_pit8253_intf;
-extern const ppi8255_interface pp01_ppi8255_interface;
+extern const i8255a_interface pp01_ppi8255_interface;
 extern UINT8 pp01_video_scroll;
 extern DRIVER_INIT( pp01 );
 extern MACHINE_START( pp01 );

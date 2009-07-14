@@ -8,7 +8,7 @@
 
 #include "driver.h"
 #include "cpu/i8085/i8085.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255a.h"
 
 static void pk8000_set_bank(running_machine *machine,UINT8 data) 
 { 
@@ -73,7 +73,7 @@ static WRITE8_DEVICE_HANDLER(pk8000_80_porta_w)
 	pk8000_set_bank(device->machine,data);
 }
 
-static const ppi8255_interface pk8000_ppi8255_interface_1 =
+static I8255A_INTERFACE( pk8000_ppi8255_interface_1 )
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -93,10 +93,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pk8000_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
-	//AM_RANGE(0x84, 0x87) AM_DEVREADWRITE("ppi8255_2", ppi8255_r, ppi8255_w)
-	//AM_RANGE(0x88, 0x8b) AM_DEVREADWRITE("ppi8255_3", ppi8255_r, ppi8255_w)
-	//AM_RANGE(0x8c, 0x8f) AM_DEVREADWRITE("ppi8255_4", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("ppi8255_1", i8255a_r, i8255a_w)
+	//AM_RANGE(0x84, 0x87) AM_DEVREADWRITE("ppi8255_2", i8255a_r, i8255a_w)
+	//AM_RANGE(0x88, 0x8b) AM_DEVREADWRITE("ppi8255_3", i8255a_r, i8255a_w)
+	//AM_RANGE(0x8c, 0x8f) AM_DEVREADWRITE("ppi8255_4", i8255a_r, i8255a_w)
 ADDRESS_MAP_END
 
 /*	 Input ports */
@@ -139,7 +139,7 @@ static MACHINE_DRIVER_START( pk8000 )
     MDRV_VIDEO_START(pk8000)
     MDRV_VIDEO_UPDATE(pk8000)
     
-    MDRV_PPI8255_ADD( "ppi8255_1", pk8000_ppi8255_interface_1 )
+    MDRV_I8255A_ADD( "ppi8255_1", pk8000_ppi8255_interface_1 )
 MACHINE_DRIVER_END
 
 static SYSTEM_CONFIG_START(pk8000)

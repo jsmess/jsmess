@@ -7,11 +7,11 @@
 #ifndef UT88_H_
 #define UT88_H_
 
-#include "machine/8255ppi.h"
+#include "machine/i8255a.h"
 
 /*----------- defined in machine/ut88.c -----------*/
 
-extern const ppi8255_interface ut88_ppi8255_interface;
+extern const i8255a_interface ut88_ppi8255_interface;
 
 extern DRIVER_INIT( ut88 );
 extern MACHINE_RESET( ut88 );

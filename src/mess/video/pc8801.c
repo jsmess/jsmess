@@ -8,7 +8,7 @@
 	but the pen colours may be wrong. This needs to be tested. */
 
 #include "driver.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255a.h"
 #include "includes/pc8801.h"
 
 /* NPW 23-Oct-2001 - Adding this so that it compiles */

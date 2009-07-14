@@ -9,7 +9,7 @@
 
 #include "driver.h"
 #include "cpu/i8085/i8085.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255a.h"
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
 #include "machine/msm8251.h"
@@ -88,7 +88,7 @@ static WRITE8_DEVICE_HANDLER (irisha_8255_portc_w )
 	//logerror("irisha_8255_portc_w %02x\n",data);
 }
 
-const ppi8255_interface irisha_ppi8255_interface =
+I8255A_INTERFACE( irisha_ppi8255_interface )
 {
 	DEVCB_NULL,
 	DEVCB_HANDLER(irisha_8255_portb_r),

@@ -88,7 +88,7 @@ Some bugs left :
 #include "includes/amstrad.h"
 
 /* Components */
-#include "machine/8255ppi.h"	/* for 8255 ppi */
+#include "machine/i8255a.h"	/* for 8255 ppi */
 #include "cpu/z80/z80.h"		/* for cycle tables */
 #include "video/mc6845.h"		/* CRTC */
 #include "machine/nec765.h"	/* for floppy disc controller */
@@ -120,7 +120,7 @@ Some bugs left :
 /* -----------------------------
    - amstrad_ppi8255_interface -
    -----------------------------*/
-static const ppi8255_interface amstrad_ppi8255_interface =
+static I8255A_INTERFACE( amstrad_ppi8255_interface )
 {
 	DEVCB_HANDLER(amstrad_ppi_porta_r),	/* port A read */
 	DEVCB_HANDLER(amstrad_ppi_portb_r),	/* port B read */
@@ -851,7 +851,7 @@ static MACHINE_DRIVER_START( amstrad )
 
 	MDRV_MACHINE_RESET( amstrad )
 
-	MDRV_PPI8255_ADD( "ppi8255", amstrad_ppi8255_interface )
+	MDRV_I8255A_ADD( "ppi8255", amstrad_ppi8255_interface )
 
     /* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -907,7 +907,7 @@ static MACHINE_DRIVER_START( cpcplus )
 	MDRV_MACHINE_START( plus )
 	MDRV_MACHINE_RESET( plus )
 
-	MDRV_PPI8255_ADD( "ppi8255", amstrad_ppi8255_interface )
+	MDRV_I8255A_ADD( "ppi8255", amstrad_ppi8255_interface )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -957,7 +957,7 @@ static MACHINE_DRIVER_START( gx4000 )
 	MDRV_MACHINE_START( plus )
 	MDRV_MACHINE_RESET( gx4000 )
 
-	MDRV_PPI8255_ADD( "ppi8255", amstrad_ppi8255_interface )
+	MDRV_I8255A_ADD( "ppi8255", amstrad_ppi8255_interface )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

@@ -8,12 +8,12 @@
 #define LVIV_H_
 
 #include "devices/snapquik.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255a.h"
 
 /*----------- defined in machine/lviv.c -----------*/
 
-extern const ppi8255_interface lviv_ppi8255_interface_0;
-extern const ppi8255_interface lviv_ppi8255_interface_1;
+extern const i8255a_interface lviv_ppi8255_interface_0;
+extern const i8255a_interface lviv_ppi8255_interface_1;
 
 extern unsigned char * lviv_video_ram;
  READ8_HANDLER ( lviv_io_r );

@@ -9,7 +9,7 @@
 
 #include "driver.h"
 #include "devices/cassette.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255a.h"
 #include "includes/bk.h"
 
 static UINT16 kbd_state;

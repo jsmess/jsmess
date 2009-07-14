@@ -10,7 +10,7 @@
 #include "cpu/z80/z80.h"
 #include "sound/speaker.h"
 #include "sound/wave.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255a.h"
 #include "machine/pit8253.h"
 #include "devices/cassette.h"
 #include "includes/mz80.h"
@@ -229,7 +229,7 @@ static ADDRESS_MAP_START( mz80k_mem , ADDRESS_SPACE_PROGRAM, 8)
     AM_RANGE(0x0000, 0x0fff) AM_ROM
     AM_RANGE(0x1000, 0xcfff) AM_RAM // 48 KB of RAM
     AM_RANGE(0xd000, 0xd3ff) AM_RAM // Video RAM
-    AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ppi8255", ppi8255_r, ppi8255_w) /* PPIA 8255 */
+    AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ppi8255", i8255a_r, i8255a_w) /* PPIA 8255 */
     AM_RANGE(0xe004, 0xe007) AM_DEVREADWRITE("pit8253", pit8253_r,pit8253_w)  /* PIT 8253  */
     AM_RANGE(0xe008, 0xe008) AM_READWRITE( mz80k_strobe_r, mz80k_strobe_w)
     AM_RANGE(0xf000, 0xf3ff) AM_ROM
@@ -265,7 +265,7 @@ static MACHINE_DRIVER_START( mz80k )
 
 	MDRV_MACHINE_RESET( mz80k )
 
-	MDRV_PPI8255_ADD( "ppi8255", mz80k_8255_int )
+	MDRV_I8255A_ADD( "ppi8255", mz80k_8255_int )
 
 	MDRV_PIT8253_ADD( "pit8253", mz80k_pit8253_config )
 

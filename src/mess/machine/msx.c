@@ -12,7 +12,7 @@
  */
 
 #include "driver.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255a.h"
 #include "includes/msx_slot.h"
 #include "includes/msx.h"
 #include "machine/tc8521.h"
@@ -346,7 +346,7 @@ static WRITE8_DEVICE_HANDLER ( msx_ppi_port_a_w );
 static WRITE8_DEVICE_HANDLER ( msx_ppi_port_c_w );
 static READ8_DEVICE_HANDLER (msx_ppi_port_b_r );
 
-const ppi8255_interface msx_ppi8255_interface =
+I8255A_INTERFACE( msx_ppi8255_interface )
 {
 	DEVCB_NULL,
 	DEVCB_HANDLER(msx_ppi_port_b_r),
@@ -796,7 +796,7 @@ static READ8_DEVICE_HANDLER( msx_ppi_port_b_r )
 	int row, data;
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5" };
 
-	row = ppi8255_r(device, 2) & 0x0f;
+	row = i8255a_r(device, 2) & 0x0f;
 	if (row <= 10)
 	{
 		data = input_port_read(device->machine, keynames[row / 2]);

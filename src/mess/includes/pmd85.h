@@ -7,14 +7,14 @@
 #ifndef PMD85_H_
 #define PMD85_H_
 
-#include "machine/8255ppi.h"
+#include "machine/i8255a.h"
 
 /*----------- defined in machine/pmd85.c -----------*/
 
 extern const struct pit8253_config pmd85_pit8253_interface;
-extern const ppi8255_interface pmd85_ppi8255_interface[4];
-extern const ppi8255_interface alfa_ppi8255_interface[3];
-extern const ppi8255_interface mato_ppi8255_interface;
+extern const i8255a_interface pmd85_ppi8255_interface[4];
+extern const i8255a_interface alfa_ppi8255_interface[3];
+extern const i8255a_interface mato_ppi8255_interface;
 
  READ8_HANDLER ( pmd85_io_r );
 WRITE8_HANDLER ( pmd85_io_w );

@@ -14,7 +14,7 @@
 #include "driver.h"
 #include "includes/pc.h"
 
-#include "machine/8255ppi.h"
+#include "machine/i8255a.h"
 #include "machine/ins8250.h"
 #include "machine/mc146818.h"
 #include "machine/pic8259.h"
@@ -849,7 +849,7 @@ static void ibm5150_set_keyboard_interface( running_machine *machine, write8_spa
 
 /* IBM PC has a 8255 which is connected to keyboard and other
 status information */
-const ppi8255_interface ibm5150_ppi8255_interface =
+I8255A_INTERFACE( ibm5150_ppi8255_interface )
 {
 	DEVCB_HANDLER(ibm5150_ppi_porta_r),
 	DEVCB_HANDLER(ibm5150_ppi_portb_r),
@@ -944,7 +944,7 @@ static WRITE8_DEVICE_HANDLER( ibm5160_ppi_portb_w )
 }
 
 
-const ppi8255_interface ibm5160_ppi8255_interface =
+I8255A_INTERFACE( ibm5160_ppi8255_interface )
 {
 	DEVCB_HANDLER(ibm5160_ppi_porta_r),
 	DEVCB_HANDLER(ibm5150_ppi_portb_r),
@@ -999,7 +999,7 @@ static WRITE8_DEVICE_HANDLER( pc_ppi_portb_w )
 }
 
 
-const ppi8255_interface pc_ppi8255_interface =
+I8255A_INTERFACE( pc_ppi8255_interface )
 {
 	DEVCB_HANDLER(pc_ppi_porta_r),
 	DEVCB_HANDLER(ibm5150_ppi_portb_r),
@@ -1082,7 +1082,7 @@ static READ8_DEVICE_HANDLER ( pcjr_ppi_portc_r )
 }
 
 
-const ppi8255_interface pcjr_ppi8255_interface =
+I8255A_INTERFACE( pcjr_ppi8255_interface )
 {
 	DEVCB_HANDLER(pcjr_ppi_porta_r),
 	DEVCB_HANDLER(ibm5150_ppi_portb_r),

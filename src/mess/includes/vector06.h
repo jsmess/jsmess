@@ -7,12 +7,12 @@
 #ifndef VECTOR06_H_
 #define VECTOR06_H_
 
-#include "machine/8255ppi.h"
+#include "machine/i8255a.h"
 
 /*----------- defined in machine/vector06.c -----------*/
 
-extern const ppi8255_interface vector06_ppi8255_interface;
-extern const ppi8255_interface vector06_ppi8255_2_interface;
+extern const i8255a_interface vector06_ppi8255_interface;
+extern const i8255a_interface vector06_ppi8255_2_interface;
 
 extern DRIVER_INIT( vector06 );
 extern MACHINE_START( vector06 );

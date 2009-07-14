@@ -33,8 +33,8 @@ static ADDRESS_MAP_START(pp01_mem, ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pp01_io, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0xc0, 0xc3) AM_DEVREADWRITE("ppi8255", ppi8255_r, ppi8255_w)
-	//AM_RANGE(0xc4, 0xc7) AM_DEVREADWRITE("ppi8255", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xc0, 0xc3) AM_DEVREADWRITE("ppi8255", i8255a_r, i8255a_w)
+	//AM_RANGE(0xc4, 0xc7) AM_DEVREADWRITE("ppi8255", i8255a_r, i8255a_w)
 	AM_RANGE(0xcc, 0xcf) AM_WRITE(pp01_video_write_mode_w)
 	AM_RANGE(0xd0, 0xd3) AM_DEVREADWRITE("pit8253", pit8253_r, pit8253_w)
 	AM_RANGE(0xe0, 0xef) AM_READWRITE(pp01_mem_block_r, pp01_mem_block_w)
@@ -218,7 +218,7 @@ static MACHINE_DRIVER_START( pp01 )
 	
 	MDRV_PIT8253_ADD( "pit8253", pp01_pit8253_intf )
 
-	MDRV_PPI8255_ADD( "ppi8255", pp01_ppi8255_interface )	
+	MDRV_I8255A_ADD( "ppi8255", pp01_ppi8255_interface )	
 MACHINE_DRIVER_END
 
 static SYSTEM_CONFIG_START(pp01)

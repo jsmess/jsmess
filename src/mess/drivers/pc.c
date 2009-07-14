@@ -113,7 +113,7 @@ TODO: Which clock signals are available in a PC Jr?
 #include "sound/saa1099.h"
 #include "deprecat.h"
 
-#include "machine/8255ppi.h"
+#include "machine/i8255a.h"
 #include "machine/ins8250.h"
 #include "machine/mc146818.h"
 #include "machine/pic8259.h"
@@ -213,7 +213,7 @@ static ADDRESS_MAP_START(pc8_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE("dma8237", dma8237_r, dma8237_w)
 	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE("pic8259_master", pic8259_r, pic8259_w)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE("pit8253", pit8253_r, pit8253_w)
-	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE("ppi8255", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE("ppi8255", i8255a_r, i8255a_w)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE(pc_page_r,			pc_page_w)
 	AM_RANGE(0x00a0, 0x00a0) AM_WRITE( pc_nmi_enable_w )
 	AM_RANGE(0x0200, 0x0207) AM_READWRITE(pc_JOY_r,				pc_JOY_w)
@@ -270,7 +270,7 @@ static ADDRESS_MAP_START(pc16_io, ADDRESS_SPACE_IO, 16)
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE8("dma8237", dma8237_r, dma8237_w, 0xffff)
 	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE8("pic8259_master", pic8259_r, pic8259_w, 0xffff)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE8("pit8253", pit8253_r, pit8253_w, 0xffff)
-	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE8("ppi8255", ppi8255_r, ppi8255_w, 0xffff)
+	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE8("ppi8255", i8255a_r, i8255a_w, 0xffff)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE8(pc_page_r,				pc_page_w, 0xffff)
 	AM_RANGE(0x00a0, 0x00a1) AM_WRITE8( pc_nmi_enable_w, 0x00ff )
 	AM_RANGE(0x0200, 0x0207) AM_READWRITE(pc16le_JOY_r,				pc16le_JOY_w)
@@ -386,7 +386,7 @@ static ADDRESS_MAP_START(ibmpcjr_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE("dma8237", dma8237_r, dma8237_w)
 	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE("pic8259_master", pic8259_r, pic8259_w)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE("pit8253", pit8253_r, pit8253_w)
-	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE("ppi8255", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE("ppi8255", i8255a_r, i8255a_w)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE(pc_page_r,				pc_page_w)
 	AM_RANGE(0x00a0, 0x00a0) AM_READWRITE( pcjr_nmi_enable_r, pc_nmi_enable_w )
 	AM_RANGE(0x00c0, 0x00c0) AM_DEVWRITE("sn76496", 	sn76496_w)
@@ -1363,7 +1363,7 @@ static MACHINE_DRIVER_START( pcmda )
 
 	MDRV_PIC8259_ADD( "pic8259_slave", ibm5150_pic8259_slave_config )
 
-	MDRV_PPI8255_ADD( "ppi8255", ibm5160_ppi8255_interface )
+	MDRV_I8255A_ADD( "ppi8255", ibm5160_ppi8255_interface )
 
 	MDRV_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
 	MDRV_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
@@ -1422,7 +1422,7 @@ static MACHINE_DRIVER_START( pcherc )
 
 	MDRV_PIC8259_ADD( "pic8259_slave", ibm5150_pic8259_slave_config )
 
-	MDRV_PPI8255_ADD( "ppi8255", ibm5160_ppi8255_interface )
+	MDRV_I8255A_ADD( "ppi8255", ibm5160_ppi8255_interface )
 
 	MDRV_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
 	MDRV_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
@@ -1491,7 +1491,7 @@ static MACHINE_DRIVER_START( ibm5150 )
 
 	MDRV_PIC8259_ADD( "pic8259_slave", ibm5150_pic8259_slave_config )
 
-	MDRV_PPI8255_ADD( "ppi8255", ibm5150_ppi8255_interface )
+	MDRV_I8255A_ADD( "ppi8255", ibm5150_ppi8255_interface )
 
 	MDRV_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
 	MDRV_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
@@ -1551,7 +1551,7 @@ static MACHINE_DRIVER_START( pccga )
 
 	MDRV_PIC8259_ADD( "pic8259_slave", ibm5150_pic8259_slave_config )
 
-	MDRV_PPI8255_ADD( "ppi8255", ibm5160_ppi8255_interface )
+	MDRV_I8255A_ADD( "ppi8255", ibm5160_ppi8255_interface )
 
 	MDRV_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
 	MDRV_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
@@ -1607,7 +1607,7 @@ static MACHINE_DRIVER_START( europc )
 
 	MDRV_PIC8259_ADD( "pic8259_slave", ibm5150_pic8259_slave_config )
 
-	MDRV_PPI8255_ADD( "ppi8255", pc_ppi8255_interface )
+	MDRV_I8255A_ADD( "ppi8255", pc_ppi8255_interface )
 
 	MDRV_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
 	MDRV_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
@@ -1656,7 +1656,7 @@ static MACHINE_DRIVER_START( ibm5160 )
 
 	MDRV_PIC8259_ADD( "pic8259_slave", ibm5150_pic8259_slave_config )
 
-	MDRV_PPI8255_ADD( "ppi8255", ibm5160_ppi8255_interface )
+	MDRV_I8255A_ADD( "ppi8255", ibm5160_ppi8255_interface )
 
 	MDRV_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
 	MDRV_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
@@ -1712,7 +1712,7 @@ static MACHINE_DRIVER_START( pc200 )
 
 	MDRV_PIC8259_ADD( "pic8259_slave", ibm5150_pic8259_slave_config )
 
-	MDRV_PPI8255_ADD( "ppi8255", pc_ppi8255_interface )
+	MDRV_I8255A_ADD( "ppi8255", pc_ppi8255_interface )
 
 	MDRV_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
 	MDRV_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
@@ -1754,7 +1754,7 @@ static MACHINE_DRIVER_START( pc1512 )
 
 	MDRV_PIC8259_ADD( "pic8259_slave", ibm5150_pic8259_slave_config )
 
-	MDRV_PPI8255_ADD( "ppi8255", pc_ppi8255_interface )
+	MDRV_I8255A_ADD( "ppi8255", pc_ppi8255_interface )
 
 	MDRV_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
 	MDRV_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
@@ -1798,7 +1798,7 @@ static MACHINE_DRIVER_START( pc1640 )
 
 	MDRV_PIC8259_ADD( "pic8259_slave", ibm5150_pic8259_slave_config )
 
-	MDRV_PPI8255_ADD( "ppi8255", pc_ppi8255_interface )
+	MDRV_I8255A_ADD( "ppi8255", pc_ppi8255_interface )
 
 	MDRV_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
 	MDRV_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
@@ -1842,7 +1842,7 @@ static MACHINE_DRIVER_START( xtvga )
 
 	MDRV_PIC8259_ADD( "pic8259_slave", ibm5150_pic8259_slave_config )
 
-	MDRV_PPI8255_ADD( "ppi8255", pc_ppi8255_interface )
+	MDRV_I8255A_ADD( "ppi8255", pc_ppi8255_interface )
 
 	MDRV_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
 	MDRV_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
@@ -1898,7 +1898,7 @@ static MACHINE_DRIVER_START( t1000hx )
 
 	MDRV_PIC8259_ADD( "pic8259_slave", ibm5150_pic8259_slave_config )
 
-	MDRV_PPI8255_ADD( "ppi8255", pc_ppi8255_interface )
+	MDRV_I8255A_ADD( "ppi8255", pc_ppi8255_interface )
 
 	MDRV_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
 	MDRV_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
@@ -1942,7 +1942,7 @@ static MACHINE_DRIVER_START( ibmpcjr )
 
 	MDRV_PIC8259_ADD( "pic8259_slave", ibm5150_pic8259_slave_config )
 
-	MDRV_PPI8255_ADD( "ppi8255", pcjr_ppi8255_interface )
+	MDRV_I8255A_ADD( "ppi8255", pcjr_ppi8255_interface )
 
 	MDRV_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
 	MDRV_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */

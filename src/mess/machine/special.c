@@ -13,7 +13,7 @@
 #include "sound/dac.h"
 #include "devices/cassette.h"
 #include "devices/basicdsk.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255a.h"
 #include "machine/pit8253.h"
 #include "machine/wd17xx.h"
 #include "includes/special.h"
@@ -108,7 +108,7 @@ static WRITE8_DEVICE_HANDLER (specialist_8255_portc_w )
 	
 }
 
-const ppi8255_interface specialist_ppi8255_interface =
+I8255A_INTERFACE( specialist_ppi8255_interface )
 {
 	DEVCB_HANDLER(specialist_8255_porta_r),
 	DEVCB_HANDLER(specialist_8255_portb_r),
@@ -132,12 +132,12 @@ MACHINE_RESET( special )
 
 READ8_HANDLER( specialist_keyboard_r )
 {	
-	return ppi8255_r(devtag_get_device(space->machine, "ppi8255"), (offset & 3));
+	return i8255a_r(devtag_get_device(space->machine, "ppi8255"), (offset & 3));
 }
 
 WRITE8_HANDLER( specialist_keyboard_w )
 {	
-	ppi8255_w(devtag_get_device(space->machine, "ppi8255"), (offset & 3) , data );
+	i8255a_w(devtag_get_device(space->machine, "ppi8255"), (offset & 3) , data );
 }
 
 

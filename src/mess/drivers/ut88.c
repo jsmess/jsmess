@@ -181,7 +181,7 @@ static MACHINE_DRIVER_START( ut88 )
     MDRV_CPU_IO_MAP(ut88_io)
     MDRV_MACHINE_RESET( ut88 )
 
-	MDRV_PPI8255_ADD( "ppi8255", ut88_ppi8255_interface )
+	MDRV_I8255A_ADD( "ppi8255", ut88_ppi8255_interface )
 
     /* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

@@ -284,7 +284,7 @@ Timings:
 #include "cpu/i8085/i8085.h"
 #include "sound/speaker.h"
 #include "sound/wave.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255a.h"
 #include "includes/lviv.h"
 #include "devices/snapquik.h"
 #include "devices/cassette.h"
@@ -432,9 +432,9 @@ static MACHINE_DRIVER_START( lviv )
 
 	MDRV_MACHINE_RESET( lviv )
 
-	MDRV_PPI8255_ADD( "ppi8255_0", lviv_ppi8255_interface_0 )
+	MDRV_I8255A_ADD( "ppi8255_0", lviv_ppi8255_interface_0 )
 
-	MDRV_PPI8255_ADD( "ppi8255_1", lviv_ppi8255_interface_1 )
+	MDRV_I8255A_ADD( "ppi8255_1", lviv_ppi8255_interface_1 )
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)

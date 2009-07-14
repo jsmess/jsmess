@@ -7,11 +7,11 @@
 #ifndef MIKRO80_H_
 #define MIKRO80_H_
 
-#include "machine/8255ppi.h"
+#include "machine/i8255a.h"
 
 /*----------- defined in machine/mikro80.c -----------*/
 
-extern const ppi8255_interface mikro80_ppi8255_interface;
+extern const i8255a_interface mikro80_ppi8255_interface;
 
 extern DRIVER_INIT( mikro80 );
 extern DRIVER_INIT( radio99 );

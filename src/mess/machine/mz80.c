@@ -7,7 +7,7 @@
 ****************************************************************************/
 
 #include "driver.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255a.h"
 #include "machine/pit8253.h"
 #include "devices/cassette.h"
 #include "sound/speaker.h"
@@ -87,7 +87,7 @@ static PIT8253_OUTPUT_CHANGED( pit_out2_changed )
 	cputag_set_input_line(device->machine, "maincpu", 0, HOLD_LINE);
 }
 
-const ppi8255_interface mz80k_8255_int =
+I8255A_INTERFACE( mz80k_8255_int )
 {
 	DEVCB_NULL,
 	DEVCB_HANDLER(mz80k_8255_portb_r),
