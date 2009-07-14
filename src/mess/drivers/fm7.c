@@ -40,6 +40,7 @@
 #include "sound/ay8910.h"
 #include "sound/2203intf.h"
 #include "sound/wave.h"
+#include "sound/beep.h"
 
 #include "devices/cassette.h"
 #include "formats/fm7_cas.h"
@@ -76,6 +77,8 @@ static UINT8 fdc_drive;
 static UINT8 fdc_irq_flag;
 static UINT8 fdc_drq_flag;
 static UINT8 fm77av_ym_irq;
+static UINT8 speaker_active;
+
 
 struct key_encoder
 {
@@ -256,8 +259,8 @@ static WRITE8_HANDLER( fm7_irq_mask_w )
  *   bit 3 - ???
  * On write: Buzzer/Speaker On/Off
  *   bit 0 - speaker on/off
- *   bit 6 - ??buzzer on/off
- *   bit 7 - ??buzzer on/off
+ *   bit 6 - buzzer on for 205ms
+ *   bit 7 - buzzer on/off
  */
 static READ8_HANDLER( fm7_irq_cause_r )
 {
@@ -273,6 +276,42 @@ static READ8_HANDLER( fm7_irq_cause_r )
 		
 	logerror("IRQ flags read: 0x%02x\n",ret);
 	return ret;
+}
+
+static TIMER_CALLBACK( fm7_beeper_off )
+{
+	beep_set_state(devtag_get_device(machine,"beeper"),0);
+	logerror("timed beeper off\n");
+}
+
+static WRITE8_HANDLER( fm7_beeper_w )
+{
+	speaker_active = data & 0x01;
+	
+	if(!speaker_active)  // speaker not active, disable all beeper sound
+	{
+		beep_set_state(devtag_get_device(space->machine,"beeper"),0);
+		return;
+	}
+		
+	if(data & 0x80)
+	{
+		if(speaker_active)
+			beep_set_state(devtag_get_device(space->machine,"beeper"),1);
+	}
+	else
+		beep_set_state(devtag_get_device(space->machine,"beeper"),0);
+	
+	if(data & 0x40)
+	{
+		if(speaker_active)
+		{
+			beep_set_state(devtag_get_device(space->machine,"beeper"),1);
+			logerror("timed beeper on\n");
+			timer_set(space->machine,ATTOTIME_IN_MSEC(205),NULL,0,fm7_beeper_off);
+		}
+	}
+	logerror("beeper state: %02x\n",data);
 }
 
 static READ8_HANDLER( vector_r )
@@ -1300,7 +1339,7 @@ static ADDRESS_MAP_START( fm7_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	// I/O space (FD00-FDFF)
 	AM_RANGE(0xfd00,0xfd01) AM_READWRITE(fm7_keyboard_r,fm7_cassette_printer_w)
 	AM_RANGE(0xfd02,0xfd02) AM_READWRITE(fm7_cassette_printer_r,fm7_irq_mask_w)  // IRQ mask
-	AM_RANGE(0xfd03,0xfd03) AM_READ(fm7_irq_cause_r)  // IRQ flags
+	AM_RANGE(0xfd03,0xfd03) AM_READWRITE(fm7_irq_cause_r,fm7_beeper_w)  // IRQ flags
 	AM_RANGE(0xfd04,0xfd04) AM_READ(fm7_fd04_r)
 	AM_RANGE(0xfd05,0xfd05) AM_READWRITE(fm7_subintf_r,fm7_subintf_w)
 	AM_RANGE(0xfd06,0xfd0c) AM_READ(fm7_unknown_r)
@@ -1368,7 +1407,7 @@ static ADDRESS_MAP_START( fm77av_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	// I/O space (FD00-FDFF)
 	AM_RANGE(0xfd00,0xfd01) AM_READWRITE(fm7_keyboard_r,fm7_cassette_printer_w)
 	AM_RANGE(0xfd02,0xfd02) AM_READWRITE(fm7_cassette_printer_r,fm7_irq_mask_w)  // IRQ mask
-	AM_RANGE(0xfd03,0xfd03) AM_READ(fm7_irq_cause_r)  // IRQ flags
+	AM_RANGE(0xfd03,0xfd03) AM_READWRITE(fm7_irq_cause_r,fm7_beeper_w)  // IRQ flags
 	AM_RANGE(0xfd04,0xfd04) AM_READ(fm7_fd04_r)
 	AM_RANGE(0xfd05,0xfd05) AM_READWRITE(fm7_subintf_r,fm7_subintf_w)
 	AM_RANGE(0xfd06,0xfd0a) AM_READ(fm7_unknown_r)
@@ -1604,6 +1643,9 @@ static MACHINE_START(fm7)
 	
 	memset(shared_ram,0xff,0x80);
 	fm7_type = SYS_FM7;
+	
+	beep_set_frequency(devtag_get_device(machine,"beeper"),1200);
+	beep_set_state(devtag_get_device(machine,"beeper"),0);
 }
 
 static MACHINE_START(fm77av)
@@ -1623,6 +1665,8 @@ static MACHINE_START(fm77av)
 	memory_set_bankptr(machine,21,RAM+0x800);
 	
 	fm7_type = SYS_FM77AV;
+	beep_set_frequency(devtag_get_device(machine,"beeper"),1200);
+	beep_set_state(devtag_get_device(machine,"beeper"),0);
 }
 
 static MACHINE_RESET(fm7)
@@ -1758,6 +1802,8 @@ static MACHINE_DRIVER_START( fm7 )
 	MDRV_SOUND_ADD("psg", AY8910, XTAL_4_9152MHz / 4)
 	MDRV_SOUND_CONFIG(fm7_psg_intf)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS,"mono",1.0)
+	MDRV_SOUND_ADD("beeper", BEEP, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS,"mono",1.0)
 	MDRV_SOUND_WAVE_ADD("wave","cass")
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.20)
 
@@ -1798,6 +1844,8 @@ static MACHINE_DRIVER_START( fm77av )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("ym", YM2203, XTAL_4_9152MHz / 4)
 	MDRV_SOUND_CONFIG(fm7_ym_intf)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS,"mono",1.0)
+	MDRV_SOUND_ADD("beeper", BEEP, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS,"mono",1.0)
 	MDRV_SOUND_WAVE_ADD("wave","cass")
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.20)
@@ -1915,6 +1963,6 @@ SYSTEM_CONFIG_END
 /* Driver */
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT   INIT  CONFIG  COMPANY      FULLNAME        FLAGS */
-COMP( 1982, fm7,      0,      0,      fm7,     fm7,    fm7,  fm7,    "Fujitsu",   "FM-7",         GAME_IMPERFECT_SOUND)
+COMP( 1982, fm7,      0,      0,      fm7,     fm7,    fm7,  fm7,    "Fujitsu",   "FM-7",         0)
 COMP( 1985, fm77av,   fm7,    0,      fm77av,  fm7,    fm7,  fm7,    "Fujitsu",   "FM-77AV",      GAME_NOT_WORKING)
 COMP( 1985, fm7740sx, fm7,    0,      fm77av,  fm7,    fm7,  fm7,    "Fujitsu",   "FM-77AV40SX",  GAME_NOT_WORKING)
