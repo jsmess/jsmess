@@ -7,14 +7,6 @@
 
 **********************************************************************/
 
-/*
-
-	TODO:
-
-	- cascading
-
-*/
-
 #include "driver.h"
 #include "i8214.h"
 
@@ -51,7 +43,6 @@ INLINE i8214_t *get_safe_token(const device_config *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
-
 	return (i8214_t *)device->token;
 }
 
@@ -62,8 +53,21 @@ INLINE const i8214_interface *get_interface(const device_config *device)
 	return (const i8214_interface *) device->static_config;
 }
 
-INLINE void trigger_interrupt(i8214_t *i8214)
+INLINE void trigger_interrupt(const device_config *device, int level)
 {
+	i8214_t *i8214 = get_safe_token(device);
+
+	if (LOG) logerror("I8214 '%s' Interrupt Level %u\n", device->tag, level);
+	
+	i8214->a = level;
+
+	/* disable interrupts */
+	i8214->int_dis = 1;
+
+	/* disable next level group */
+	devcb_call_write_line(&i8214->out_enlg_func, 0);
+
+	/* toggle interrupt line */
 	devcb_call_write_line(&i8214->out_int_func, ASSERT_LINE);
 	devcb_call_write_line(&i8214->out_int_func, CLEAR_LINE);
 }
@@ -73,7 +77,7 @@ INLINE void check_interrupt(const device_config *device)
 	i8214_t *i8214 = get_safe_token(device);
 	int level;
 
-	if (i8214->int_dis) return;
+	if (i8214->int_dis || !i8214->etlg) return;
 
 	for (level = 7; level >= 0; level--)
 	{
@@ -83,16 +87,12 @@ INLINE void check_interrupt(const device_config *device)
 			{
 				if (level > i8214->b)
 				{
-					if (LOG) logerror("I8214 '%s' Interrupt Level %u\n", device->tag, level);
-					i8214->a = level;
-					trigger_interrupt(i8214);
+					trigger_interrupt(device, level);
 				}
 			}
 			else
 			{
-				if (LOG) logerror("I8214 '%s' Interrupt Level %u\n", device->tag, level);
-				i8214->a = level;
-				trigger_interrupt(i8214);
+				trigger_interrupt(device, level);
 			}
 		}
 	}
@@ -102,19 +102,24 @@ INLINE void check_interrupt(const device_config *device)
     IMPLEMENTATION
 ***************************************************************************/
 
+/*-------------------------------------------------
+    i8214_a_r - request level read
+-------------------------------------------------*/
+
 READ8_DEVICE_HANDLER( i8214_a_r )
 {
 	i8214_t *i8214 = get_safe_token(device);
 
 	UINT8 a = i8214->a & 0x07;
 
-	i8214->int_dis = 0;
-	check_interrupt(device);
-
 	if (LOG) logerror("I8214 '%s' A: %01x\n", device->tag, a);
 
 	return a;
 }
+
+/*-------------------------------------------------
+    i8214_b_w - current status register write
+-------------------------------------------------*/
 
 WRITE8_DEVICE_HANDLER( i8214_b_w )
 {
@@ -124,15 +129,18 @@ WRITE8_DEVICE_HANDLER( i8214_b_w )
 
 	if (LOG) logerror("I8214 '%s' B: %01x\n", device->tag, i8214->b);
 
+	/* enable interrupts */
+	i8214->int_dis = 0;
+
+	/* enable next level group */
+	devcb_call_write_line(&i8214->out_enlg_func, 1);
+
 	check_interrupt(device);
 }
 
-WRITE_LINE_DEVICE_HANDLER( i8214_elr_w )
-{
-	i8214_t *i8214 = get_safe_token(device);
-
-	if (LOG) logerror("I8214 '%s' ELR: %u\n", device->tag, state);
-}
+/*-------------------------------------------------
+    i8214_etlg_w - enable this level group write
+-------------------------------------------------*/
 
 WRITE_LINE_DEVICE_HANDLER( i8214_etlg_w )
 {
@@ -142,6 +150,10 @@ WRITE_LINE_DEVICE_HANDLER( i8214_etlg_w )
 
 	i8214->etlg = state;
 }
+
+/*-------------------------------------------------
+    i8214_sgs_w - status group select write
+-------------------------------------------------*/
 
 WRITE_LINE_DEVICE_HANDLER( i8214_sgs_w )
 {
@@ -154,6 +166,10 @@ WRITE_LINE_DEVICE_HANDLER( i8214_sgs_w )
 	check_interrupt(device);
 }
 
+/*-------------------------------------------------
+    i8214_inte_w - interrupt enable write
+-------------------------------------------------*/
+
 WRITE_LINE_DEVICE_HANDLER( i8214_inte_w )
 {
 	i8214_t *i8214 = get_safe_token(device);
@@ -162,6 +178,10 @@ WRITE_LINE_DEVICE_HANDLER( i8214_inte_w )
 
 	i8214->inte = state;
 }
+
+/*-------------------------------------------------
+    i8214_r_w - request level write
+-------------------------------------------------*/
 
 WRITE8_DEVICE_HANDLER( i8214_r_w )
 {

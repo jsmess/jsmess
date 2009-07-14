@@ -62,9 +62,6 @@ DEVICE_GET_INFO( i8214 );
 READ8_DEVICE_HANDLER( i8214_a_r );
 WRITE8_DEVICE_HANDLER( i8214_b_w );
 
-/* enable level read */
-WRITE_LINE_DEVICE_HANDLER( i8214_elr_w );
-
 /* enable this level group */
 WRITE_LINE_DEVICE_HANDLER( i8214_etlg_w );
 

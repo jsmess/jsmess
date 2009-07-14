@@ -20,6 +20,7 @@
 #define CENTRONICS_TAG			"centronics"
 #define TIMER_KB_TAG			"timer_kb"
 #define TIMER_SIO_TAG			"timer_sio"
+#define DISCRETE_TAG			"ls1"
 
 #define V1050_VIDEORAM_SIZE		0x8000
 #define V1050_VIDEORAM_MASK		0x7fff
@@ -45,6 +46,7 @@ struct _v1050_state
 	UINT8 keylatch;				/* keyboard row select */
 	UINT8 keydata;
 	int keyavail;
+	int kb_so;					/* keyboard serial output */
 
 	/* serial state */
 	int rxrdy;					/* receiver ready */

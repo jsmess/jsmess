@@ -100,9 +100,10 @@ Notes:
 		Device 'u76': warning - attempt to direct-map address 00001FFE in program space
 		Device 'u76': warning - attempt to direct-map address 00001FFF in program space
 
-	- rombank1,2 to 0-0x1fff
+	- write to banked RAM at 0x0000-0x1fff when ROM is active
 	- real keyboard w/i8049
-	- Winchester (Tandon TM501, CMI 5412 10MB drive on Xebec S1410 controller)
+	- keyboard beeper
+	- Winchester (Tandon TM501/CMI CM-5412 10MB drive on Xebec S1410 controller)
 
 */
 
@@ -121,6 +122,7 @@ Notes:
 #include "machine/msm8251.h"
 #include "machine/wd17xx.h"
 #include "video/mc6845.h"
+#include "sound/discrete.h"
 
 INLINE const device_config *get_floppy_image(running_machine *machine, int drive)
 {
@@ -251,7 +253,6 @@ static void v1050_keyboard_scan(running_machine *machine)
 	int table = 0, row, col;
 	int keydata = 0xff;
 
-	/* RDB TODO - test: have to read this multiple times or is once enough? */
 	UINT8 line_mod = input_port_read(machine, "ROW12");
 
 	if((line_mod & 0x07) && (line_mod & 0x18))
@@ -278,11 +279,12 @@ static void v1050_keyboard_scan(running_machine *machine)
 			{
 				/* latch key data */
 				keydata = v1050_keycodes[table][row][col];
+
 				if (state->keydata != keydata)
 				{
 					state->keydata = keydata;
 					state->keyavail = 1;
-					/* //logerror("Scanned: 0x%x %d %d %d", keydata, table, row, col); */
+
 					v1050_set_int(machine, INT_KEYBOARD, 1);
 					return;
 				}
@@ -324,7 +326,7 @@ static READ8_HANDLER( v1050_i8214_r )
 {
 	v1050_state *state = space->machine->driver_data;
 
-	return 0xf0 | (i8214_a_r(state->i8214, 0) << 1) | 0x01;
+	return 0xf1 | (i8214_a_r(state->i8214, 0) << 1);
 }
 
 static WRITE8_HANDLER( v1050_i8214_w )
@@ -398,26 +400,6 @@ static WRITE8_HANDLER( keyboard_w )
 	state->keylatch = data & 0x0f;
 }
 
-static READ8_HANDLER( p2_r )
-{
-	/*
-
-		bit		description
-
-		P20		
-		P21		
-		P22		
-		P23		
-		P24		
-		P25		led output
-		P26		input from NE555
-		P27		serial output
-
-	*/
-
-	return 0;
-}
-
 static WRITE8_HANDLER( p2_w )
 {
 	/*
@@ -430,10 +412,16 @@ static WRITE8_HANDLER( p2_w )
 		P23		
 		P24		
 		P25		led output
-		P26		input from NE555
+		P26		speaker (NE555) output
 		P27		serial output
 
 	*/
+
+	v1050_state *state = space->machine->driver_data;
+
+	output_set_led_value(0, BIT(data, 5));
+//	discrete_sound_w(discrete, NODE_01, BIT(data, 6));
+	state->kb_so = BIT(data, 7);
 }
 
 /* Memory Maps */
@@ -480,7 +468,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( v1050_kbd_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(keyboard_r, keyboard_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(p2_r, p2_w)
+	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(p2_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -740,7 +728,7 @@ INPUT_PORTS_END
 
 static WRITE_LINE_DEVICE_HANDLER( v1050_8214_int_w )
 {
-	if (state)
+	if (state == ASSERT_LINE)
 	{
 		cputag_set_input_line(device->machine, Z80_TAG, INPUT_LINE_IRQ0, ASSERT_LINE);
 	}
@@ -900,10 +888,10 @@ static WRITE8_DEVICE_HANDLER( misc_8255_c_w )
 
 		switch (baud_sel)
 		{
-		case 0:	period = ATTOTIME_IN_HZ(XTAL_16MHz/4/13.0/16); break;
-		case 1:	period = ATTOTIME_IN_HZ(XTAL_16MHz/4/13.0/8); break;
-		case 2:	period = ATTOTIME_IN_HZ(XTAL_16MHz/4/8); break;
-		case 3:	period = ATTOTIME_IN_HZ(XTAL_16MHz/4/13.0/2); break;
+		case 0:	period = ATTOTIME_IN_HZ((double)XTAL_16MHz/4/13/16); break;
+		case 1:	period = ATTOTIME_IN_HZ((double)XTAL_16MHz/4/13/8); break;
+		case 2:	period = ATTOTIME_IN_HZ((double)XTAL_16MHz/4/8); break;
+		case 3:	period = ATTOTIME_IN_HZ((double)XTAL_16MHz/4/13/2); break;
 		}
 
 		timer_device_adjust_periodic(state->timer_sio, attotime_zero, 0, period);
@@ -1131,7 +1119,6 @@ static MACHINE_START( v1050 )
 	state->centronics = devtag_get_device(machine, CENTRONICS_TAG);
 
 	/* initialize I8214 */
-	i8214_elr_w(state->i8214, 0);
 	i8214_etlg_w(state->i8214, 1);
 	i8214_inte_w(state->i8214, 1);
 	
@@ -1162,14 +1149,26 @@ static MACHINE_START( v1050 )
 	v1050_bankswitch(machine);
 
 	/* register for state saving */
-	state_save_register_global(machine, state->keylatch);
 	state_save_register_global(machine, state->int_mask);
 	state_save_register_global(machine, state->int_state);
 	state_save_register_global(machine, state->f_int_enb);
+	state_save_register_global(machine, state->keylatch);
+	state_save_register_global(machine, state->keydata);
+	state_save_register_global(machine, state->keyavail);
+	state_save_register_global(machine, state->kb_so);
 	state_save_register_global(machine, state->rxrdy);
 	state_save_register_global(machine, state->txrdy);
 	state_save_register_global(machine, state->baud_sel);
 	state_save_register_global(machine, state->bank);
+}
+
+static MACHINE_RESET( v1050 )
+{
+	v1050_state *state = machine->driver_data;
+
+	state->bank = 0;
+
+	v1050_bankswitch(machine);
 }
 
 /* Machine Driver */
@@ -1191,12 +1190,19 @@ static MACHINE_DRIVER_START( v1050 )
 //	MDRV_CPU_IO_MAP(v1050_kbd_io)
 
 	MDRV_MACHINE_START(v1050)
+	MDRV_MACHINE_RESET(v1050)
 
 	/* keyboard HACK */
 	MDRV_TIMER_ADD_PERIODIC("keyboard", v1050_keyboard_tick, HZ(60))
 
     /* video hardware */
 	MDRV_IMPORT_FROM(v1050_video)
+
+	/* sound hardware */
+/*	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD(DISCRETE_TAG, DISCRETE, 0)
+	MDRV_SOUND_CONFIG_DISCRETE(v1050)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)*/
 
 	/* devices */
 	MDRV_I8214_ADD(UPB8214_TAG, XTAL_16MHz/4, v1050_8214_intf)
@@ -1208,8 +1214,8 @@ static MACHINE_DRIVER_START( v1050 )
 	MDRV_MSM8251_ADD(I8251A_KB_TAG, /*XTAL_16MHz/8,*/ kb_8251_intf)
 	MDRV_MSM8251_ADD(I8251A_SIO_TAG, /*XTAL_16MHz/8,*/ sio_8251_intf)
 	MDRV_WD1793_ADD(MB8877_TAG, /*XTAL_16MHz/16,*/ v1050_wd17xx_intf )
-	MDRV_TIMER_ADD_PERIODIC(TIMER_KB_TAG, kb_8251_tick, HZ(XTAL_16MHz/4/13.0/8))
-	MDRV_TIMER_ADD_PERIODIC(TIMER_SIO_TAG, sio_8251_tick, HZ(XTAL_16MHz/4/13.0/16))
+	MDRV_TIMER_ADD_PERIODIC(TIMER_KB_TAG, kb_8251_tick, HZ((double)XTAL_16MHz/4/13/8))
+	MDRV_TIMER_ADD_PERIODIC(TIMER_SIO_TAG, sio_8251_tick, HZ((double)XTAL_16MHz/4/13/16))
 
 	/* printer */
 	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
@@ -1262,4 +1268,4 @@ SYSTEM_CONFIG_END
 /* System Drivers */
 
 /*    YEAR	NAME	PARENT	COMPAT	MACHINE	INPUT	INIT	CONFIG	COMPANY								FULLNAME		FLAGS */
-COMP( 1983, v1050,	0,		0,		v1050,	v1050,	0,		v1050,	"Visual Technology Incorporated",	"Visual 1050",	GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+COMP( 1983, v1050,	0,		0,		v1050,	v1050,	0,		v1050,	"Visual Technology Incorporated",	"Visual 1050",	GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
