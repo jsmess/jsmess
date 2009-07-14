@@ -27,6 +27,7 @@ Systems Promoted from GAME_NOT_WORKING:
 Skeleton drivers: 
 -----------------
 - ACT Apricot Xi / F1 / F10 / Portable
+- A.S.EL. Amico 2000
 - DEC VT220
 - DEC VT320
 - DEC VT520

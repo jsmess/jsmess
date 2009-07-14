@@ -1435,5 +1435,6 @@ const game_driver * const drivers[] =
     DRIVER( aprif1 )
     DRIVER( aprif10 )
     DRIVER( aprifp )
+    DRIVER( amico2k )
 
 #endif /* DRIVER_RECURSIVE */
