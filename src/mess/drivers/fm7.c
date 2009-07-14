@@ -314,6 +314,22 @@ static WRITE8_HANDLER( fm7_beeper_w )
 	logerror("beeper state: %02x\n",data);
 }
 
+
+/*
+ *  Sub CPU: port 0xd403 (read-only)
+ *  On read: timed buzzer sound
+ */
+READ8_HANDLER( fm7_sub_beeper_r )
+{
+	if(speaker_active)
+	{
+		beep_set_state(devtag_get_device(space->machine,"beeper"),1);
+		logerror("timed beeper on\n");
+		timer_set(space->machine,ATTOTIME_IN_MSEC(205),NULL,0,fm7_beeper_off);
+	}
+	return 0xff;
+}
+
 static READ8_HANDLER( vector_r )
 {
 	UINT8* RAM = memory_region(space->machine,"maincpu");
@@ -1377,6 +1393,7 @@ static ADDRESS_MAP_START( fm7_sub_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	// I/O space (D400-D4FF)
 	AM_RANGE(0xd400,0xd401) AM_READ(fm7_sub_keyboard_r)
 	AM_RANGE(0xd402,0xd402) AM_READ(fm7_cancel_ack)
+	AM_RANGE(0xd403,0xd403) AM_READ(fm7_sub_beeper_r)
 	AM_RANGE(0xd404,0xd404) AM_READ(fm7_attn_irq_r)
 	AM_RANGE(0xd408,0xd408) AM_READWRITE(fm7_crt_r,fm7_crt_w)
 	AM_RANGE(0xd409,0xd409) AM_READWRITE(fm7_vram_access_r,fm7_vram_access_w)
@@ -1447,6 +1464,7 @@ static ADDRESS_MAP_START( fm77av_sub_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	// I/O space (D400-D4FF)
 	AM_RANGE(0xd400,0xd401) AM_READ(fm7_sub_keyboard_r)
 	AM_RANGE(0xd402,0xd402) AM_READ(fm7_cancel_ack)
+	AM_RANGE(0xd403,0xd403) AM_READ(fm7_sub_beeper_r)
 	AM_RANGE(0xd404,0xd404) AM_READ(fm7_attn_irq_r)
 	AM_RANGE(0xd408,0xd408) AM_READWRITE(fm7_crt_r,fm7_crt_w)
 	AM_RANGE(0xd409,0xd409) AM_READWRITE(fm7_vram_access_r,fm7_vram_access_w)

@@ -1326,6 +1326,8 @@ READ8_HANDLER( fm7_sub_ram_ports_banked_r )
 			return fm7_sub_keyboard_r(space,offset-0x400);
 		case 0x402:
 			return fm7_cancel_ack(space,0);
+		case 0x403:
+			return fm7_sub_beeper_r(space,0);
 		case 0x404:
 			return fm7_attn_irq_r(space,0);
 		case 0x408:

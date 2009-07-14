@@ -65,6 +65,7 @@ WRITE8_HANDLER( fm7_sub_busyflag_w );
 READ8_HANDLER( fm77av_sub_modestatus_r );
 WRITE8_HANDLER( fm77av_sub_modestatus_w );
 WRITE8_HANDLER( fm77av_sub_bank_w );
+READ8_HANDLER( fm7_sub_beeper_r );
 
 READ8_HANDLER( fm7_cancel_ack );
 READ8_HANDLER( fm7_attn_irq_r );
