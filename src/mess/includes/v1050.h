@@ -43,6 +43,8 @@ struct _v1050_state
 
 	/* keyboard state */
 	UINT8 keylatch;				/* keyboard row select */
+	UINT8 keydata;
+	int keyavail;
 
 	/* serial state */
 	int rxrdy;					/* receiver ready */
