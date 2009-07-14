@@ -21,6 +21,7 @@ Systems Promoted from GAME_NOT_WORKING:
 - TI-83 [Xander]
 - TIKI 100 [Curt Coder]
 - VCS-80 [Curt Coder]
+- Visual 1050 [Curt Coder, rbramante]
 
 
 
@@ -85,6 +86,8 @@ System Driver Changes:
 - [TIKI100] System is now working, except for double sided disks. [Curt Coder]
 
 - [VCS80] System is now fully working. [Curt Coder]
+
+- [V1050] System is now working with some minor issues. [Curt Coder, rbramante]
 
 
 
