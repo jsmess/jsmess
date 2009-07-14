@@ -8,9 +8,13 @@
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
+#include "cpu/z80/z80daisy.h"
 #include "machine/z80pio.h"
+#include "machine/z80sio.h"
+#include "machine/z80ctc.h"
 #include "machine/nec765.h"
 #include "devices/basicdsk.h"
+
 
 static const UINT8 *FNT;
 
@@ -25,13 +29,115 @@ static WRITE8_HANDLER(nanos_tc_w)
 	nec765_set_tc_state(fdc, BIT(data,1));
 }
 
+
+/* Z80-CTC Interface */
+
+static void z80daisy_interrupt(const device_config *device, int state)
+{
+	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_IRQ0, state);
+}
+
+static WRITE8_DEVICE_HANDLER( ctc_z0_w )
+{
+}
+
+static WRITE8_DEVICE_HANDLER( ctc_z1_w )
+{
+}
+
+static WRITE8_DEVICE_HANDLER( ctc_z2_w )
+{
+}
+
+static const z80ctc_interface ctc_intf =
+{
+	0,              	/* timer disables */
+	z80daisy_interrupt,	/* interrupt handler */
+	ctc_z0_w,			/* ZC/TO0 callback */
+	ctc_z1_w,			/* ZC/TO1 callback */
+	ctc_z2_w    		/* ZC/TO2 callback */
+};
+
+/* Z80-PIO Interface */
+
+static const z80pio_interface pio1_intf =
+{
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),	/* callback when change interrupt status */
+	DEVCB_NULL,						/* port A read callback */
+	DEVCB_NULL,						/* port B read callback */
+	DEVCB_NULL,						/* port A write callback */
+	DEVCB_NULL,						/* port B write callback */
+	DEVCB_NULL,						/* portA ready active callback */
+	DEVCB_NULL						/* portB ready active callback */
+};
+
+static const z80pio_interface pio2_intf =
+{
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),	/* callback when change interrupt status */
+	DEVCB_NULL,						/* port A read callback */
+	DEVCB_NULL,						/* port B read callback */
+	DEVCB_NULL,						/* port A write callback */
+	DEVCB_NULL,						/* port B write callback */
+	DEVCB_NULL,						/* portA ready active callback */
+	DEVCB_NULL						/* portB ready active callback */
+};
+
+/* Z80-SIO Interface */
+
+static const z80sio_interface sio_intf =
+{
+	z80daisy_interrupt,	/* interrupt handler */
+	NULL,				/* DTR changed handler */
+	NULL,				/* RTS changed handler */
+	NULL,				/* BREAK changed handler */
+	NULL,				/* transmit handler */
+	NULL				/* receive handler */
+};
+
+/* Z80 Daisy Chain */
+
+static const z80_daisy_chain nanos_daisy_chain[] =
+{
+	{ "z80pio" },
+	{ "z80pio_0" },
+	{ "z80pio_1" },
+	{ "z80sio_0" },
+	{ "z80ctc_0" },
+	{ "z80sio_1" },
+	{ "z80ctc_1" },
+	{ NULL }
+};
 static ADDRESS_MAP_START( nanos_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)	
+	/* CPU card */
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("z80pio", z80pio_r, z80pio_w)
+	
+	/* I/O card */
+	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("z80pio_0", z80pio_r, z80pio_w)
+	AM_RANGE(0x84, 0x84) AM_DEVREADWRITE("z80sio_0", z80sio_d_r, z80sio_d_w)
+	AM_RANGE(0x85, 0x85) AM_DEVREADWRITE("z80sio_0", z80sio_c_r, z80sio_c_w)
+	AM_RANGE(0x86, 0x86) AM_DEVREADWRITE("z80sio_0", z80sio_d_r, z80sio_d_w)
+	AM_RANGE(0x87, 0x87) AM_DEVREADWRITE("z80sio_0", z80sio_c_r, z80sio_c_w)
+	AM_RANGE(0x88, 0x8B) AM_DEVREADWRITE("z80pio_1", z80pio_r, z80pio_w)
+	AM_RANGE(0x8C, 0x8F) AM_DEVREADWRITE("z80ctc_0", z80ctc_r, z80ctc_w)
+	
+	/* FDC card */
 	AM_RANGE(0x92, 0x92) AM_WRITE(nanos_tc_w)
 	AM_RANGE(0x94, 0x94) AM_DEVREAD("nec765", nec765_status_r)
 	AM_RANGE(0x95, 0x95) AM_DEVREADWRITE("nec765", nec765_data_r, nec765_data_w)
+	/* V24+IFSS card */
+	AM_RANGE(0xA0, 0xA0) AM_DEVREADWRITE("z80sio_1", z80sio_d_r, z80sio_d_w)
+	AM_RANGE(0xA1, 0xA1) AM_DEVREADWRITE("z80sio_1", z80sio_c_r, z80sio_c_w)
+	AM_RANGE(0xA2, 0xA2) AM_DEVREADWRITE("z80sio_1", z80sio_d_r, z80sio_d_w)
+	AM_RANGE(0xA3, 0xA3) AM_DEVREADWRITE("z80sio_1", z80sio_c_r, z80sio_c_w)
+	AM_RANGE(0xA4, 0xA7) AM_DEVREADWRITE("z80ctc_1", z80ctc_r, z80ctc_w)
+	
+	/* 256-k RAM card I  - 	64k OS-Memory + 192k-RAM-Floppy */
+	//AM_RANGE(0xC0, 0xC7)
+	
+	/* 256-k RAM card II - 	64k OS-Memory + 192k-RAM-Floppy */
+	//AM_RANGE(0xC8, 0xCF)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -333,6 +439,8 @@ static MACHINE_DRIVER_START( nanos )
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
     MDRV_CPU_PROGRAM_MAP(nanos_mem)
     MDRV_CPU_IO_MAP(nanos_io)	
+    MDRV_CPU_CONFIG(nanos_daisy_chain)
+
 
     MDRV_MACHINE_RESET(nanos)
 	
@@ -349,10 +457,17 @@ static MACHINE_DRIVER_START( nanos )
     MDRV_VIDEO_START(nanos)
     MDRV_VIDEO_UPDATE(nanos)
     
-    MDRV_Z80PIO_ADD( "z80pio", nanos_z80pio_intf )
+    /* devices */
+	MDRV_Z80CTC_ADD( "z80ctc_0", XTAL_4MHz, ctc_intf)
+	MDRV_Z80CTC_ADD( "z80ctc_1", XTAL_4MHz, ctc_intf)
+	MDRV_Z80PIO_ADD( "z80pio_0", pio1_intf)
+	MDRV_Z80PIO_ADD( "z80pio_1", pio2_intf)
+	MDRV_Z80SIO_ADD( "z80sio_0", XTAL_4MHz, sio_intf)
+	MDRV_Z80SIO_ADD( "z80sio_1", XTAL_4MHz, sio_intf)
+	MDRV_Z80PIO_ADD( "z80pio", nanos_z80pio_intf )
 	/* NEC765 */
 	MDRV_NEC765A_ADD("nec765", nanos_nec765_interface)    
-   
+	
 MACHINE_DRIVER_END
 
 static DEVICE_IMAGE_LOAD( nanos_floppy )
