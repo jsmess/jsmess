@@ -322,19 +322,11 @@ static READ8_HANDLER( v1050_get_key_status )
 
 /* Z80 Read/Write Handlers */
 
-static READ8_HANDLER( v1050_i8214_r )
-{
-	v1050_state *state = space->machine->driver_data;
-
-	return 0xf1 | (i8214_a_r(state->i8214, 0) << 1);
-}
-
 static WRITE8_HANDLER( v1050_i8214_w )
 {
 	v1050_state *state = space->machine->driver_data;
 
-	i8214_b_w(state->i8214, 0, (data >> 1) & 0x07);
-	i8214_sgs_w(state->i8214, BIT(data, 4));
+	i8214_b_w(state->i8214, 0, (data >> 1) & 0x0f);
 }
 
 static READ8_HANDLER( vint_clr_r )
@@ -450,7 +442,7 @@ static ADDRESS_MAP_START( v1050_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x9c, 0x9f) AM_DEVREADWRITE(I8255A_RTC_TAG, i8255a_r, i8255a_w)
 	AM_RANGE(0xa0, 0xa0) AM_READWRITE(vint_clr_r, vint_clr_w)
 	AM_RANGE(0xb0, 0xb0) AM_READWRITE(dint_clr_r, dint_clr_w)
-	AM_RANGE(0xc0, 0xc0) AM_READWRITE(v1050_i8214_r, v1050_i8214_w) 
+	AM_RANGE(0xc0, 0xc0) AM_WRITE(v1050_i8214_w) 
 	AM_RANGE(0xd0, 0xd0) AM_WRITE(bank_w)
 //	AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE(S1410_TAG, s1410_r, s1410_w)
 ADDRESS_MAP_END

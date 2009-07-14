@@ -126,8 +126,10 @@ WRITE8_DEVICE_HANDLER( i8214_b_w )
 	i8214_t *i8214 = get_safe_token(device);
 
 	i8214->b = data & 0x07;
+	i8214->sgs = BIT(data, 3);
 
 	if (LOG) logerror("I8214 '%s' B: %01x\n", device->tag, i8214->b);
+	if (LOG) logerror("I8214 '%s' SGS: %u\n", device->tag, i8214->sgs);
 
 	/* enable interrupts */
 	i8214->int_dis = 0;
@@ -149,21 +151,6 @@ WRITE_LINE_DEVICE_HANDLER( i8214_etlg_w )
 	if (LOG) logerror("I8214 '%s' ETLG: %u\n", device->tag, state);
 
 	i8214->etlg = state;
-}
-
-/*-------------------------------------------------
-    i8214_sgs_w - status group select write
--------------------------------------------------*/
-
-WRITE_LINE_DEVICE_HANDLER( i8214_sgs_w )
-{
-	i8214_t *i8214 = get_safe_token(device);
-
-	if (LOG) logerror("I8214 '%s' SGS: %u\n", device->tag, state);
-
-	i8214->sgs = state;
-
-	check_interrupt(device);
 }
 
 /*-------------------------------------------------

@@ -58,15 +58,14 @@ struct _i8214_interface
 /* device interface */
 DEVICE_GET_INFO( i8214 );
 
-/* register access */
+/* request level read */
 READ8_DEVICE_HANDLER( i8214_a_r );
+
+/* current status register write (bit 3 is SGS) */
 WRITE8_DEVICE_HANDLER( i8214_b_w );
 
 /* enable this level group */
 WRITE_LINE_DEVICE_HANDLER( i8214_etlg_w );
-
-/* status group select */
-WRITE_LINE_DEVICE_HANDLER( i8214_sgs_w );
 
 /* interrupt enable */
 WRITE_LINE_DEVICE_HANDLER( i8214_inte_w );
