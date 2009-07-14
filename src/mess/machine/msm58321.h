@@ -1,6 +1,6 @@
 /**********************************************************************
 
-    OKI MSM58321 Real Time Clock/Calendar emulation
+    OKI MSM58321RS Real Time Clock/Calendar emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -10,7 +10,7 @@
 				   CS2	 1 |*    \_/     | 16  Vdd
 				 WRITE	 2 |			 | 15  XT
 				  READ	 3 |			 | 14  _XT
-					D0	 4 |   MSM58321	 | 13  CS1
+					D0	 4 | MSM58321RS	 | 13  CS1
 					D1	 5 |			 | 12  TEST
 					D2	 6 |			 | 11  STOP
 					D3	 7 |			 | 10  _BUSY
@@ -27,14 +27,14 @@
     MACROS / CONSTANTS
 ***************************************************************************/
 
-#define MSM58321		DEVICE_GET_INFO_NAME(msm58321)
+#define MSM58321RS		DEVICE_GET_INFO_NAME(msm58321rs)
 
-#define MDRV_MSM58321_ADD(_tag, _clock, _intrf) \
-	MDRV_DEVICE_ADD(_tag, MSM58321, _clock) \
+#define MDRV_MSM58321RS_ADD(_tag, _clock, _intrf) \
+	MDRV_DEVICE_ADD(_tag, MSM58321RS, _clock) \
 	MDRV_DEVICE_CONFIG(_intrf)
 
 #define MSM58321_INTERFACE(name) \
-	const msm58321_interface (name)=
+	const msm58321_interface (name) =
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -51,11 +51,21 @@ struct _msm58321_interface
 ***************************************************************************/
 
 /* device interface */
-DEVICE_GET_INFO( msm58321 );
+DEVICE_GET_INFO( msm58321rs );
 
 /* register access */
-READ8_DEVICE_HANDLER( msm58321_a_r );
-WRITE8_DEVICE_HANDLER( msm58321_b_w );
+READ8_DEVICE_HANDLER( msm58321_r );
+WRITE8_DEVICE_HANDLER( msm58321_w );
+
+/* chip select */
+WRITE_LINE_DEVICE_HANDLER( msm58321_cs1_w );
+WRITE_LINE_DEVICE_HANDLER( msm58321_cs2_w );
+
+/* handshaking */
+READ_LINE_DEVICE_HANDLER( msm58321_busy_r );
+WRITE_LINE_DEVICE_HANDLER( msm58321_read_w );
+WRITE_LINE_DEVICE_HANDLER( msm58321_write_w );
+WRITE_LINE_DEVICE_HANDLER( msm58321_address_write_w );
 
 /* stop */
 WRITE_LINE_DEVICE_HANDLER( msm58321_stop_w );

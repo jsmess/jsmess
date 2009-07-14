@@ -1,6 +1,6 @@
 /**********************************************************************
 
-    OKI MSM58321 Real Time Clock emulation
+    OKI MSM58321RS Real Time Clock emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -25,12 +25,12 @@
     PARAMETERS
 ***************************************************************************/
 
-#define LOG 1
+#define LOG 0
 
 enum
 {
 	REGISTER_S1 = 0,
-	REGISTER_S0,
+	REGISTER_S10,
 	REGISTER_MI1,
 	REGISTER_MI10,
 	REGISTER_H1,
@@ -56,8 +56,16 @@ struct _msm58321_t
 {
 	devcb_resolved_write_line	out_busy_func;
 
-	UINT8 reg[13];				/* registers */
+	int cs1;					/* chip select 1 */
+	int cs2;					/* chip select 2 */
 	int busy;					/* busy flag */
+	int read;					/* read data */
+	int write;					/* write data */
+	int address_write;			/* write address */
+
+	UINT8 reg[13];				/* registers */
+	UINT8 latch;				/* data latch (not present in real chip) */
+	UINT8 address;				/* address latch */
 
 	/* timers */
 	emu_timer *busy_timer;
@@ -78,7 +86,7 @@ INLINE msm58321_t *get_safe_token(const device_config *device)
 INLINE const msm58321_interface *get_interface(const device_config *device)
 {
 	assert(device != NULL);
-	assert(device->type == MSM58321);
+	assert(device->type == MSM58321RS);
 	return (const msm58321_interface *) device->static_config;
 }
 
@@ -86,50 +94,185 @@ INLINE const msm58321_interface *get_interface(const device_config *device)
     IMPLEMENTATION
 ***************************************************************************/
 
+/*-------------------------------------------------
+    msm58321_r - read data
+-------------------------------------------------*/
+
 READ8_DEVICE_HANDLER( msm58321_r )
 {
 	msm58321_t *msm58321 = get_safe_token(device);
 
 	UINT8 data = 0;
 
-	switch(offset & 0x0f)
+	if (msm58321->cs1 && msm58321->cs2)
 	{
-	case REGISTER_RESET:
-		break;
+		if (msm58321->read)
+		{
+			mame_system_time systime;
 
-	case REGISTER_REF0:
-	case REGISTER_REF1:
-		break;
+			mame_get_current_datetime(device->machine, &systime);
 
-	default:
-		data = msm58321->reg[offset];
-		break;
+			switch (msm58321->latch)
+			{
+			case REGISTER_S1:	data = systime.local_time.second % 10; break;
+			case REGISTER_S10:	data = systime.local_time.second / 10; break;
+			case REGISTER_MI1:	data = systime.local_time.minute % 10; break;
+			case REGISTER_MI10: data = systime.local_time.minute / 10; break;
+			case REGISTER_H1:	data = systime.local_time.hour % 10; break;
+			case REGISTER_H10:	data = (systime.local_time.hour / 10) | 0x08; break;
+			case REGISTER_W:	data = systime.local_time.weekday; break;
+			case REGISTER_D1:	data = systime.local_time.mday % 10; break;
+			case REGISTER_D10:	data = (systime.local_time.mday / 10) | ((systime.local_time.year % 4) ? 0 : 0x04); break;
+			case REGISTER_MO1:	data = (systime.local_time.month + 1) % 10; break;
+			case REGISTER_MO10: data = (systime.local_time.month + 1) / 10; break;
+			case REGISTER_Y1:	data = systime.local_time.year % 10; break;
+			case REGISTER_Y10:	data = (systime.local_time.year / 10) % 10;	break;
+
+			case REGISTER_RESET:
+				break;
+
+			case REGISTER_REF0:
+			case REGISTER_REF1:
+				break;
+
+			default:
+				data = msm58321->reg[offset];
+				break;
+			}
+		}
+
+		if (msm58321->write)
+		{
+			if (msm58321->address >= REGISTER_REF0)
+			{
+				// TODO: output reference values
+			}
+		}
 	}
 
 	return data;
 }
 
+/*-------------------------------------------------
+    msm58321_w - write data
+-------------------------------------------------*/
+
 WRITE8_DEVICE_HANDLER( msm58321_w )
 {
 	msm58321_t *msm58321 = get_safe_token(device);
 
-	switch(offset & 0x0f)
+	/* latch data for future use */
+	msm58321->latch = data & 0x0f;
+
+	if (!msm58321->cs1 || !msm58321->cs2) return;
+
+	if (msm58321->address_write)
 	{
-	case REGISTER_RESET:
-		if (LOG) logerror("MSM58321 '%s' Reset\n", device->tag);
-		break;
+		/* latch address */
+		msm58321->address = msm58321->latch;
+	}
 
-	case REGISTER_REF0:
-	case REGISTER_REF1:
-		if (LOG) logerror("MSM58321 '%s' Reference Signal\n", device->tag);
-		break;
+	if (msm58321->write)
+	{
+		switch(msm58321->latch)
+		{
+		case REGISTER_RESET:
+			if (LOG) logerror("MSM58321 '%s' Reset\n", device->tag);
+			break;
 
-	default:
-		if (LOG) logerror("MSM58321 '%s' Register %01x = %01x\n", device->tag, offset, data & 0x0f);
-		msm58321->reg[offset] = data & 0x0f;
-		break;
+		case REGISTER_REF0:
+		case REGISTER_REF1:
+			if (LOG) logerror("MSM58321 '%s' Reference Signal\n", device->tag);
+			break;
+
+		default:
+			if (LOG) logerror("MSM58321 '%s' Register %01x = %01x\n", device->tag, offset, data & 0x0f);
+			msm58321->reg[offset] = msm58321->latch & 0x0f;
+			break;
+		}
 	}
 }
+
+/*-------------------------------------------------
+    msm58321_cs1_w - chip select 1
+-------------------------------------------------*/
+
+WRITE_LINE_DEVICE_HANDLER( msm58321_cs1_w )
+{
+	msm58321_t *msm58321 = get_safe_token(device);
+
+	if (LOG) logerror("MSM58321 '%s' CS1: %u\n", device->tag, state);
+
+	msm58321->cs1 = state;
+}
+
+/*-------------------------------------------------
+    msm58321_cs2_w - chip select 2
+-------------------------------------------------*/
+
+WRITE_LINE_DEVICE_HANDLER( msm58321_cs2_w )
+{
+	msm58321_t *msm58321 = get_safe_token(device);
+
+	if (LOG) logerror("MSM58321 '%s' CS2: %u\n", device->tag, state);
+
+	msm58321->cs2 = state;
+}
+
+/*-------------------------------------------------
+    msm58321_busy_r - busy flag read
+-------------------------------------------------*/
+
+READ_LINE_DEVICE_HANDLER( msm58321_busy_r )
+{
+	msm58321_t *msm58321 = get_safe_token(device);
+
+	return msm58321->busy;
+}
+
+/*-------------------------------------------------
+    msm58321_read_w - data read handshake
+-------------------------------------------------*/
+
+WRITE_LINE_DEVICE_HANDLER( msm58321_read_w )
+{
+	msm58321_t *msm58321 = get_safe_token(device);
+
+	if (LOG) logerror("MSM58321 '%s' READ: %u\n", device->tag, state);
+
+	msm58321->read = state;
+}
+
+/*-------------------------------------------------
+    msm58321_write_w - data write handshake
+-------------------------------------------------*/
+
+WRITE_LINE_DEVICE_HANDLER( msm58321_write_w )
+{
+	msm58321_t *msm58321 = get_safe_token(device);
+
+	if (LOG) logerror("MSM58321 '%s' WRITE: %u\n", device->tag, state);
+
+	msm58321->write = state;
+}
+
+/*-------------------------------------------------
+    msm58321_address_write_w - adddress write 
+	handshake
+-------------------------------------------------*/
+
+WRITE_LINE_DEVICE_HANDLER( msm58321_address_write_w )
+{
+	msm58321_t *msm58321 = get_safe_token(device);
+
+	if (LOG) logerror("MSM58321 '%s' ADDRESS WRITE: %u\n", device->tag, state);
+
+	msm58321->address_write = state;
+}
+
+/*-------------------------------------------------
+    msm58321_stop_w - stop count
+-------------------------------------------------*/
 
 WRITE_LINE_DEVICE_HANDLER( msm58321_stop_w )
 {
@@ -137,6 +280,10 @@ WRITE_LINE_DEVICE_HANDLER( msm58321_stop_w )
 
 	if (LOG) logerror("MSM58321 '%s' STOP: %u\n", device->tag, state);
 }
+
+/*-------------------------------------------------
+    msm58321_test_w - test
+-------------------------------------------------*/
 
 WRITE_LINE_DEVICE_HANDLER( msm58321_test_w )
 {
@@ -176,14 +323,22 @@ static DEVICE_START( msm58321 )
 	timer_adjust_periodic(msm58321->busy_timer, attotime_zero, 0, ATTOTIME_IN_HZ(2));
 
 	/* register for state saving */
-//	state_save_register_device_item(device, 0, msm58321->);
+	state_save_register_device_item(device, 0, msm58321->cs1);
+	state_save_register_device_item(device, 0, msm58321->cs2);
+	state_save_register_device_item(device, 0, msm58321->busy);
+	state_save_register_device_item(device, 0, msm58321->read);
+	state_save_register_device_item(device, 0, msm58321->write);
+	state_save_register_device_item(device, 0, msm58321->address_write);
+	state_save_register_device_item_array(device, 0, msm58321->reg);
+	state_save_register_device_item(device, 0, msm58321->latch);
+	state_save_register_device_item(device, 0, msm58321->address);
 }
 
 /*-------------------------------------------------
-    DEVICE_GET_INFO( msm58321 )
+    DEVICE_GET_INFO( msm58321rs )
 -------------------------------------------------*/
 
-DEVICE_GET_INFO( msm58321 )
+DEVICE_GET_INFO( msm58321rs )
 {
 	switch (state)
 	{
@@ -198,8 +353,8 @@ DEVICE_GET_INFO( msm58321 )
 		case DEVINFO_FCT_RESET:							/* Nothing */								break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "OKI MSM58321");			break;
-		case DEVINFO_STR_FAMILY:						strcpy(info->s, "OKI MSM58321");			break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "OKI MSM58321RS");			break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "OKI MSM58321RS");			break;
 		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");						break;
 		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);					break;
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright MESS Team");		break;

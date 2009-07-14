@@ -95,10 +95,14 @@ Notes:
 
 	TODO:
 
+	- ?
+		Device 'u76': warning - attempt to direct-map address 00001FFD in program space
+		Device 'u76': warning - attempt to direct-map address 00001FFE in program space
+		Device 'u76': warning - attempt to direct-map address 00001FFF in program space
+
 	- keyboard hack
 	- rombank1,2 to 0-0x1fff
 	- interrupts
-	- RTC58321 chip
 	- real keyboard w/i8049
 	- Winchester (Xebec S1410 controller)
 
@@ -299,16 +303,20 @@ static TIMER_DEVICE_CALLBACK( v1050_keyboard_tick )
 static READ8_HANDLER( v1050_get_key )
 {
 	v1050_state *state = space->machine->driver_data;
+
 	state->keyavail = 0;
+
+	v1050_set_int(space->machine, INT_KEYBOARD, 0);
+
 	return state->keydata;
-	//state->keydata = 0xff;
-	// return val;
 }
 
 static READ8_HANDLER( v1050_get_key_status )
 {
 	v1050_state *state = space->machine->driver_data;
+
 	UINT8 val =	msm8251_status_r(state->i8251_kb, 0);
+
 	return val | (state->keyavail ? 0x02 : 0x00);
 }
 
@@ -748,16 +756,9 @@ static I8214_INTERFACE( v1050_8214_intf )
 
 /* MSM58321 Interface */
 
-static WRITE_LINE_DEVICE_HANDLER( msm58321_busy_w )
-{
-	v1050_state *driver_state = device->machine->driver_data;
-
-	driver_state->rtc_busy = state;
-}
-
 static MSM58321_INTERFACE( msm58321_intf )
 {
-	DEVCB_LINE(msm58321_busy_w)
+	DEVCB_NULL
 };
 
 /* Display 8255A Interface */
@@ -873,12 +874,12 @@ static WRITE8_DEVICE_HANDLER( misc_8255_c_w )
 
         bit		signal		description
 
-		PC0     pr_strobe
-        PC1     f_int_enb
+		PC0     pr_strobe	printer strobe
+        PC1     f_int_enb	floppy interrupt enable
         PC2     baud_sel_a
         PC3     baud_sel_b
-        PC4		pr_busy*
-        PC5     pr_pe*
+        PC4		pr_busy*	printer busy
+        PC5     pr_pe*		printer paper end
         PC6		
         PC7     
     
@@ -925,48 +926,6 @@ static I8255A_INTERFACE( misc_8255_intf )
 
 /* Real Time Clock 8255A Interface */
 
-static READ8_DEVICE_HANDLER( rtc_8255_a_r )
-{
-	/*
-
-        bit		signal		description
-
-		PA0     D0			RTC data bit 0
-        PA1     D1			RTC data bit 1
-        PA2     D2			RTC data bit 2
-        PA3		D3			RTC data bit 3
-        PA4					
-        PA5					
-        PA6					
-        PA7					
-    
-	*/
-
-	logerror("RTC data read\n");
-
-	return 0;
-}
-
-static WRITE8_DEVICE_HANDLER( rtc_8255_a_w )
-{
-	/*
-
-        bit		signal		description
-
-		PA0     D0			RTC data bit 0
-        PA1     D1			RTC data bit 1
-        PA2     D2			RTC data bit 2
-        PA3		D3			RTC data bit 3
-        PA4					
-        PA5					
-        PA6					
-        PA7					
-    
-	*/
-
-	logerror("RTC data write %01x\n", data & 0x0f);
-}
-
 static WRITE8_DEVICE_HANDLER( rtc_8255_b_w )
 {
 	/*
@@ -1010,7 +969,7 @@ static READ8_DEVICE_HANDLER( rtc_8255_c_r )
 
 	v1050_state *state = device->machine->driver_data;
 
-	return state->rtc_busy << 3;
+	return msm58321_busy_r(state->msm58321) << 3;
 }
 
 static WRITE8_DEVICE_HANDLER( rtc_8255_c_w )
@@ -1030,19 +989,20 @@ static WRITE8_DEVICE_HANDLER( rtc_8255_c_w )
     
 	*/
 
-//	v1050_state *state = device->machine->driver_data;
-	logerror("Clock Address Write: %u\n", BIT(data, 4));
-	logerror("Clock Data Write: %u\n", BIT(data, 5));
-	logerror("Clock Data Read: %u\n", BIT(data, 6));
-	logerror("Clock Device Select: %u\n", BIT(data, 7));
+	v1050_state *state = device->machine->driver_data;
+
+	msm58321_address_write_w(state->msm58321, BIT(data, 4));
+	msm58321_write_w(state->msm58321, BIT(data, 5));
+	msm58321_read_w(state->msm58321, BIT(data, 6));
+	msm58321_cs2_w(state->msm58321, BIT(data, 7));
 }
 
 static I8255A_INTERFACE( rtc_8255_intf )
 {
-	DEVCB_HANDLER(rtc_8255_a_r),		// Port A read
+	DEVCB_DEVICE_HANDLER(MSM58321RS_TAG, msm58321_r),	// Port A read
 	DEVCB_NULL,							// Port B read
 	DEVCB_HANDLER(rtc_8255_c_r),		// Port C read
-	DEVCB_HANDLER(rtc_8255_a_w),		// Port A read
+	DEVCB_DEVICE_HANDLER(MSM58321RS_TAG, msm58321_w),	// Port A write
 	DEVCB_HANDLER(rtc_8255_b_w),		// Port B write
 	DEVCB_HANDLER(rtc_8255_c_w)			// Port C write
 };
@@ -1154,6 +1114,9 @@ static MACHINE_START( v1050 )
 	/* initialize I8214 */
 	i8214_etlg_w(state->i8214, 1);
 	i8214_inte_w(state->i8214, 1);
+	
+	/* initialize RTC */
+	msm58321_cs1_w(state->msm58321, 1);
 
 	/* setup memory banking */
 	memory_configure_bank(machine, 1, 0, 2, mess_ram, 0x10000);
@@ -1184,7 +1147,6 @@ static MACHINE_START( v1050 )
 	state_save_register_global(machine, state->txrdy);
 	state_save_register_global(machine, state->baud_sel);
 	state_save_register_global(machine, state->bank);
-	state_save_register_global(machine, state->rtc_busy);
 }
 
 /* Machine Driver */
@@ -1215,7 +1177,7 @@ static MACHINE_DRIVER_START( v1050 )
 
 	/* devices */
 	MDRV_I8214_ADD(UPB8214_TAG, XTAL_16MHz/4, v1050_8214_intf)
-	MDRV_MSM58321_ADD(MSM58321RS_TAG, XTAL_32_768kHz, msm58321_intf)
+	MDRV_MSM58321RS_ADD(MSM58321RS_TAG, XTAL_32_768kHz, msm58321_intf)
 	MDRV_I8255A_ADD(I8255A_DISP_TAG, disp_8255_intf)
 	MDRV_I8255A_ADD(I8255A_MISC_TAG, misc_8255_intf)
 	MDRV_I8255A_ADD(I8255A_RTC_TAG, rtc_8255_intf)

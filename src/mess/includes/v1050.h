@@ -54,9 +54,6 @@ struct _v1050_state
 	/* memory state */
 	UINT8 bank;					/* bank register */
 
-	/* RTC state */
-	int rtc_busy;				/* RTC busy */
-
 	/* video state */
 	UINT8 *video_ram;			/* video RAM */
 	UINT8 *attr_ram;			/* attribute RAM */
