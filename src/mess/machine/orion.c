@@ -13,7 +13,6 @@
 #include "devices/cassette.h"
 #include "devices/basicdsk.h"
 #include "machine/mc146818.h"
-#include "machine/8255ppi.h"
 #include "machine/wd17xx.h"
 #include "sound/speaker.h"
 #include "sound/ay8910.h"
@@ -52,7 +51,7 @@ static WRITE8_DEVICE_HANDLER (orion_romdisk_portc_w )
 	romdisk_msb = data;	
 }
 
-const ppi8255_interface orion128_ppi8255_interface_1 =
+I8255A_INTERFACE( orion128_ppi8255_interface_1)
 {
 	DEVCB_HANDLER(orion_romdisk_porta_r),
 	DEVCB_NULL,
@@ -79,22 +78,22 @@ MACHINE_START( orion128 )
 
 READ8_HANDLER ( orion128_system_r ) 
 {
-	return ppi8255_r(devtag_get_device(space->machine, "ppi8255_2"), offset & 3);
+	return i8255a_r(devtag_get_device(space->machine, "ppi8255_2"), offset & 3);
 }
 
 WRITE8_HANDLER ( orion128_system_w ) 
 {
-	ppi8255_w(devtag_get_device(space->machine, "ppi8255_2"), offset & 3, data);	
+	i8255a_w(devtag_get_device(space->machine, "ppi8255_2"), offset & 3, data);	
 }
 
 READ8_HANDLER ( orion128_romdisk_r ) 
 {
-	return ppi8255_r(devtag_get_device(space->machine, "ppi8255_1"), offset & 3);	
+	return i8255a_r(devtag_get_device(space->machine, "ppi8255_1"), offset & 3);	
 }
 
 WRITE8_HANDLER ( orion128_romdisk_w ) 
 {	
-	ppi8255_w(devtag_get_device(space->machine, "ppi8255_1"), offset & 3, data);	
+	i8255a_w(devtag_get_device(space->machine, "ppi8255_1"), offset & 3, data);	
 }
 
 static void orion_set_video_mode(running_machine *machine, int width) 

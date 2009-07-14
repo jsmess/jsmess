@@ -7,7 +7,7 @@
 #ifndef ORION_H_
 #define ORION_H_
 
-#include "machine/8255ppi.h"
+#include "machine/i8255a.h"
 
 /*----------- defined in machine/orion.c -----------*/
 
@@ -17,7 +17,7 @@ extern UINT8 orion128_video_width;
 extern UINT8 orion_video_mode_mask ;
 extern UINT8 orionpro_pseudo_color;
 
-extern const ppi8255_interface orion128_ppi8255_interface_1;
+extern const i8255a_interface orion128_ppi8255_interface_1;
 
 extern DRIVER_INIT( orion128 );
 extern MACHINE_START( orion128 );

@@ -14,7 +14,6 @@
 #include "sound/ay8910.h"
 #include "sound/speaker.h"
 #include "sound/wave.h"
-#include "machine/8255ppi.h"
 #include "machine/mc146818.h"
 #include "machine/wd17xx.h"
 #include "devices/basicdsk.h"
@@ -95,9 +94,9 @@ static MACHINE_DRIVER_START( orion128 )
     MDRV_MACHINE_START( orion128 )
     MDRV_MACHINE_RESET( orion128 )
 
-	MDRV_PPI8255_ADD( "ppi8255_1", orion128_ppi8255_interface_1 )
+	MDRV_I8255A_ADD( "ppi8255_1", orion128_ppi8255_interface_1 )
 
-	MDRV_PPI8255_ADD( "ppi8255_2", radio86_ppi8255_interface_1 )
+	MDRV_I8255A_ADD( "ppi8255_2", radio86_ppi8255_interface_1 )
 
     /* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -127,8 +126,8 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( orion128ms )
 	MDRV_IMPORT_FROM(orion128)
-
-	MDRV_PPI8255_RECONFIG( "ppi8255_2", rk7007_ppi8255_interface )	
+	MDRV_DEVICE_REMOVE("ppi8255_2")
+	MDRV_I8255A_ADD( "ppi8255_2", rk7007_ppi8255_interface )	
 MACHINE_DRIVER_END	
 
 static const ay8910_interface orionz80_ay_interface =
@@ -147,9 +146,9 @@ static MACHINE_DRIVER_START( orionz80 )
     MDRV_MACHINE_START( orionz80 )
     MDRV_MACHINE_RESET( orionz80 )
 
-	MDRV_PPI8255_ADD( "ppi8255_1", orion128_ppi8255_interface_1 )
+	MDRV_I8255A_ADD( "ppi8255_1", orion128_ppi8255_interface_1 )
 
-	MDRV_PPI8255_ADD( "ppi8255_2", radio86_ppi8255_interface_1 )
+	MDRV_I8255A_ADD( "ppi8255_2", radio86_ppi8255_interface_1 )
 
     /* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -186,7 +185,8 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( orionz80ms )
 	MDRV_IMPORT_FROM(orionz80)
 
-	MDRV_PPI8255_RECONFIG( "ppi8255_2", rk7007_ppi8255_interface )	
+	MDRV_DEVICE_REMOVE("ppi8255_2")
+	MDRV_I8255A_ADD( "ppi8255_2", rk7007_ppi8255_interface )	
 MACHINE_DRIVER_END	
 
 static MACHINE_DRIVER_START( orionpro )
@@ -197,9 +197,9 @@ static MACHINE_DRIVER_START( orionpro )
     MDRV_MACHINE_START( orionpro )
     MDRV_MACHINE_RESET( orionpro )
 
-	MDRV_PPI8255_ADD( "ppi8255_1", orion128_ppi8255_interface_1 )
+	MDRV_I8255A_ADD( "ppi8255_1", orion128_ppi8255_interface_1 )
 
-	MDRV_PPI8255_ADD( "ppi8255_2", radio86_ppi8255_interface_1 )
+	MDRV_I8255A_ADD( "ppi8255_2", radio86_ppi8255_interface_1 )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

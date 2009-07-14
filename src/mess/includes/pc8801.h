@@ -8,7 +8,7 @@
 #define PC8801_H_
 
 #include "machine/nec765.h"
-#include "machine/ppc8255.h"
+#include "machine/8255ppi.h"
 
 /*----------- defined in machine/pc8801.c -----------*/
 
