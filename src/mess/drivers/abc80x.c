@@ -86,7 +86,7 @@
 
 static const device_config *cassette_device_image(running_machine *machine)
 {
-	return devtag_get_device(machine, "cassette");
+	return devtag_get_device(machine, CASSETTE_TAG);
 }
 
 /* Discrete Sound */
@@ -1043,6 +1043,7 @@ static MACHINE_START( abc800 )
 	state->z80dart = devtag_get_device(machine, Z80DART_TAG);
 	state->z80sio = devtag_get_device(machine, Z80SIO_TAG);
 	//state->abc77 = devtag_get_device(machine, ABC77_TAG);
+	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
 
 	/* initialize the ABC BUS */
 
@@ -1078,6 +1079,7 @@ static MACHINE_START( abc802 )
 	state->z80dart = devtag_get_device(machine, Z80DART_TAG);
 	state->z80sio = devtag_get_device(machine, Z80SIO_TAG);
 //	state->abc77 = devtag_get_device(machine, ABC77_TAG);
+	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
 
 	/* initialize the ABC BUS */
 
@@ -1132,6 +1134,7 @@ static MACHINE_START( abc806 )
 	state->z80sio = devtag_get_device(machine, Z80SIO_TAG);
 	state->e0516 = devtag_get_device(machine, E0516_TAG);
 	//state->abc77 = devtag_get_device(machine, ABC77_TAG);
+	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
 
 	/* initialize the ABC BUS */
 

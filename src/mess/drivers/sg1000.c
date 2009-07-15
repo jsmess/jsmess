@@ -78,11 +78,6 @@ Notes:
 #include "sound/sn76496.h"
 #include "video/tms9928a.h"
 
-static const device_config *cassette_device_image(running_machine *machine)
-{
-	return devtag_get_device(machine, "cassette");
-}
-
 /* Terebi Oekaki (TV Draw) */
 
 /*
@@ -536,7 +531,7 @@ static READ8_DEVICE_HANDLER( sc3000_ppi8255_b_r )
 	data |= 0x60;
 
 	/* tape input */
-	if (cassette_input(cassette_device_image(device->machine)) > +0.0) data |= 0x80;
+	if (cassette_input(state->cassette) > +0.0) data |= 0x80;
 
 	return data;
 }
@@ -562,7 +557,7 @@ static WRITE8_DEVICE_HANDLER( sc3000_ppi8255_c_w )
 	state->keylatch = data & 0x07;
 
 	/* cassette */
-	cassette_output(cassette_device_image(device->machine), BIT(data, 4) ? +1.0 : -1.0);
+	cassette_output(state->cassette, BIT(data, 4) ? +1.0 : -1.0);
 
 	/* printer */
 }
@@ -580,6 +575,9 @@ static I8255A_INTERFACE( sc3000_ppi8255_intf )
 static MACHINE_START( sc3000 )
 {
 	sg1000_state *state = machine->driver_data;
+
+	/* find devices */
+	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
 
 	/* configure VDP */
 	TMS9928A_configure(&tms9928a_interface);
@@ -609,7 +607,7 @@ static READ8_DEVICE_HANDLER( sf7000_ppi8255_a_r )
         PA7
     */
 
-	const device_config *printer = devtag_get_device(device->machine, "centronics");
+	const device_config *printer = devtag_get_device(device->machine, CENTRONICS_TAG);
 	sg1000_state *state = device->machine->driver_data;
 	UINT8 result = 0;
 
@@ -623,7 +621,7 @@ static READ8_DEVICE_HANDLER( sf7000_ppi8255_a_r )
 static WRITE8_DEVICE_HANDLER( sf7000_ppi8255_c_w )
 {
 	const device_config *fdc = devtag_get_device(device->machine, NEC765_TAG);
-	const device_config *printer = devtag_get_device(device->machine, "centronics");
+	const device_config *printer = devtag_get_device(device->machine, CENTRONICS_TAG);
 	/*
         Signal  Description
 
@@ -672,15 +670,14 @@ static const i8255a_interface sf7000_ppi8255_intf[2] =
 		DEVCB_NULL,								// Port B read
 		DEVCB_NULL,								// Port C read
 		DEVCB_NULL,								// Port A write
-		DEVCB_DEVICE_HANDLER("centronics", centronics_data_w),	// Port B write
+		DEVCB_DEVICE_HANDLER(CENTRONICS_TAG, centronics_data_w),	// Port B write
 		DEVCB_HANDLER(sf7000_ppi8255_c_w)		// Port C write
 	}
 };
 
-/* callback for /INT output from FDC */
 static NEC765_INTERRUPT( sf7000_fdc_interrupt )
 {
-	sg1000_state *driver_state = device->machine->driver_data; // TODO
+	sg1000_state *driver_state = device->machine->driver_data;
 
 	driver_state->fdc_irq = state;
 }
@@ -704,6 +701,9 @@ static const struct nec765_interface sf7000_nec765_interface =
 static MACHINE_START( sf7000 )
 {
 	sg1000_state *state = machine->driver_data;
+
+	/* find devices */
+	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
 
 	/* configure VDP */
 	TMS9928A_configure(&tms9928a_interface);
@@ -897,7 +897,7 @@ static MACHINE_DRIVER_START( sc3000 )
 	MDRV_PRINTER_ADD("sp400") /* serial printer */
 
 	/* cassette */
-	MDRV_CASSETTE_ADD( "cassette", sc3000_cassette_config )
+	MDRV_CASSETTE_ADD(CASSETTE_TAG, sc3000_cassette_config)
 
 	/* cartridge */
 	MDRV_CARTSLOT_ADD("cart")
@@ -933,11 +933,11 @@ static MACHINE_DRIVER_START( sf7000 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* printer */
-	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
+	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
 	MDRV_PRINTER_ADD("sp400") /* serial printer */
 
 	/* cassette */
-	MDRV_CASSETTE_ADD("cassette", sc3000_cassette_config)
+	MDRV_CASSETTE_ADD(CASSETTE_TAG, sc3000_cassette_config)
 
 	/* uart */
 	MDRV_MSM8251_ADD("uart", default_msm8251_interface)

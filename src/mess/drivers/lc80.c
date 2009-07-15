@@ -28,11 +28,6 @@
 #include "sound/speaker.h"
 #include "lc80.lh"
 
-static const device_config *cassette_device_image(running_machine *machine)
-{
-	return devtag_get_device(machine, CASSETTE_TAG);
-}
-
 /* Memory Maps */
 
 static ADDRESS_MAP_START( lc80_mem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -187,7 +182,9 @@ static READ8_DEVICE_HANDLER( pio1_port_b_r )
 
 	*/
 
-	return (cassette_input(cassette_device_image(device->machine)) < +0.0);
+	lc80_state *state = device->machine->driver_data;
+
+	return (cassette_input(state->cassette) < +0.0);
 }
 
 static WRITE8_DEVICE_HANDLER( pio1_port_b_w )
@@ -210,7 +207,7 @@ static WRITE8_DEVICE_HANDLER( pio1_port_b_w )
 	lc80_state *state = device->machine->driver_data;
 
 	/* tape output */
-	cassette_output(cassette_device_image(device->machine), BIT(data, 1) ? +1.0 : -1.0);
+	cassette_output(state->cassette, BIT(data, 1) ? +1.0 : -1.0);
 
 	/* speaker */
 	speaker_level_w(state->speaker, !BIT(data, 1));
@@ -302,6 +299,7 @@ static MACHINE_START( lc80 )
 	/* find devices */
 	state->z80pio2 = devtag_get_device(machine, Z80PIO2_TAG);
 	state->speaker = devtag_get_device(machine, SPEAKER_TAG);
+	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
 
 	/* setup memory banking */
 	memory_configure_bank(machine, 1, 0, 1, memory_region(machine, Z80_TAG), 0); // TODO

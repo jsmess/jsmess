@@ -32,6 +32,7 @@ struct _mc1000_state
 	const device_config *mc6845;
 	const device_config *mc6847;
 	const device_config *centronics;
+	const device_config *cassette;
 };
 
 #endif

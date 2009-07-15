@@ -1,11 +1,11 @@
 #ifndef __TMC1800__
 #define __TMC1800__
 
-#define SCREEN_TAG	"screen"
-
-#define CDP1802_TAG "cdp1802"
-#define CDP1861_TAG "cdp1861"
-#define CDP1864_TAG "m3"
+#define SCREEN_TAG		"screen"
+#define CDP1802_TAG		"cdp1802"
+#define CDP1861_TAG		"cdp1861"
+#define CDP1864_TAG		"m3"
+#define CASSETTE_TAG	"cassette"
 
 typedef struct _tmc1800_state tmc1800_state;
 struct _tmc1800_state
@@ -21,6 +21,7 @@ struct _tmc1800_state
 
 	/* devices */
 	const device_config *cdp1861;
+	const device_config *cassette;
 };
 
 typedef struct _osc1000b_state osc1000b_state;
@@ -31,6 +32,9 @@ struct _osc1000b_state
 
 	/* keyboard state */
 	int keylatch;			/* key latch */
+
+	/* devices */
+	const device_config *cassette;
 };
 
 typedef struct _tmc2000_state tmc2000_state;
@@ -47,6 +51,7 @@ struct _tmc2000_state
 
 	/* devices */
 	const device_config *cdp1864;
+	const device_config *cassette;
 };
 
 typedef struct _oscnano_state oscnano_state;
@@ -67,6 +72,7 @@ struct _oscnano_state
 
 	/* devices */
 	const device_config *cdp1864;
+	const device_config *cassette;
 };
 
 /* ---------- defined in video/tmc1800.c ---------- */

@@ -31,11 +31,6 @@
 #include "sound/ay8910.h"
 #include "machine/ctronics.h"
 
-static const device_config *cassette_device_image(running_machine *machine)
-{
-	return devtag_get_device(machine, CASSETTE_TAG);
-}
-
 /* Memory Banking */
 
 static void mc1000_bankswitch(running_machine *machine)
@@ -308,7 +303,7 @@ static WRITE8_DEVICE_HANDLER( keylatch_w )
 
 	state->keylatch = data;
 
-	cassette_output(cassette_device_image(device->machine), BIT(data, 7) ? +1.0 : -1.0);
+	cassette_output(state->cassette, BIT(data, 7) ? +1.0 : -1.0);
 }
 
 static READ8_DEVICE_HANDLER( keydata_r )
@@ -328,7 +323,7 @@ static READ8_DEVICE_HANDLER( keydata_r )
 
 	data &= ((input_port_read(device->machine, "MODIFIERS") & 0xc0) | 0x3f);
 
-//	data &= (((cassette_input(cassette_device_image(device->machine)) < +0.0) << 7) | 0x7f);
+//	data &= (((cassette_input(state->cassette) < +0.0) << 7) | 0x7f);
 
 	return data;
 }
@@ -352,6 +347,7 @@ static MACHINE_START( mc1000 )
 	/* find devices */
 	state->mc6845 = devtag_get_device(machine, MC6845_TAG);
 	state->centronics = devtag_get_device(machine, CENTRONICS_TAG);
+	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
 
 	/* allocate video RAM */
 	state->mc6845_video_ram = auto_alloc_array(machine, UINT8, MC1000_MC6845_VIDEORAM_SIZE);

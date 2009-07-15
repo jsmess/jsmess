@@ -1,8 +1,9 @@
 #ifndef __OSI__
 #define __OSI__
 
-#define SCREEN_TAG	"screen"
-#define M6502_TAG	"m6502"
+#define SCREEN_TAG		"screen"
+#define M6502_TAG		"m6502"
+#define CASSETTE_TAG	"cassette"
 
 #define X1			3932160
 #define UK101_X1	XTAL_8MHz
@@ -24,6 +25,9 @@ struct _osi_state
 
 	/* floppy state */
 	int fdc_index;
+
+	/* devices */
+	const device_config *cassette;
 };
 
 /* ---------- defined in video/osi.c ---------- */

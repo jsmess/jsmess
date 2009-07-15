@@ -59,14 +59,6 @@
 
 */
 
-static const device_config *cassette_device_image(running_machine *machine, int index)
-{
-	if ( index )
-		return devtag_get_device(machine, "cassette2");
-	else
-		return devtag_get_device(machine, "cassette1");
-}
-
 static void check_interrupt(running_machine *machine)
 {
 	newbrain_state *state = machine->driver_data;
@@ -471,8 +463,8 @@ static WRITE8_HANDLER( newbrain_cop_g_w )
 
 	/* tape motor enable */
 
-	cassette_change_state(cassette_device_image(space->machine, 0), BIT(data, 1) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
-	cassette_change_state(cassette_device_image(space->machine, 1), BIT(data, 3) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+	cassette_change_state(state->cassette1, BIT(data, 1) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+	cassette_change_state(state->cassette2, BIT(data, 3) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 }
 
 static READ8_HANDLER( newbrain_cop_g_r )
@@ -522,8 +514,8 @@ static WRITE8_HANDLER( newbrain_cop_d_w )
 
 	state->cop_tdo = BIT(data, 1);
 
-	cassette_output(cassette_device_image(space->machine, 0), state->cop_tdo ? -1.0 : +1.0);
-	cassette_output(cassette_device_image(space->machine, 1), state->cop_tdo ? -1.0 : +1.0);
+	cassette_output(state->cassette1, state->cop_tdo ? -1.0 : +1.0);
+	cassette_output(state->cassette2, state->cop_tdo ? -1.0 : +1.0);
 
 	/* keyboard and display clock */
 
@@ -585,7 +577,7 @@ static READ8_HANDLER( newbrain_cop_si_r )
 
 	newbrain_state *state = space->machine->driver_data;
 
-	state->cop_tdi = ((cassette_input(cassette_device_image(space->machine, 0)) > +1.0) || (cassette_input(cassette_device_image(space->machine, 1)) > +1.0)) ^ state->cop_tdo;
+	state->cop_tdi = ((cassette_input(state->cassette1) > +1.0) || (cassette_input(state->cassette2) > +1.0)) ^ state->cop_tdo;
 
 	return state->cop_tdi;
 }
@@ -1381,6 +1373,10 @@ static MACHINE_START( newbrain )
 {
 	newbrain_state *state = machine->driver_data;
 	
+	/* find devices */
+	state->cassette1 = devtag_get_device(machine, CASSETTE1_TAG);
+	state->cassette2 = devtag_get_device(machine, CASSETTE2_TAG);
+
 	/* allocate reset timer */
 	state->reset_timer = timer_alloc(machine, reset_tick, NULL);
 	timer_adjust_oneshot(state->reset_timer, ATTOTIME_IN_USEC(get_reset_t()), 0);

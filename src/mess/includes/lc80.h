@@ -19,6 +19,7 @@ struct _lc80_state
 	/* devices */
 	const device_config *z80pio2;
 	const device_config *speaker;
+	const device_config *cassette;
 };
 
 #endif

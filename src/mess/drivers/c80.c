@@ -14,11 +14,6 @@
 #include "devices/cassette.h"
 #include "c80.lh"
 
-static const device_config *cassette_device_image(running_machine *machine)
-{
-	return devtag_get_device(machine, CASSETTE_TAG);
-}
-
 /* Memory Maps */
 
 static ADDRESS_MAP_START( c80_mem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -116,7 +111,7 @@ static READ8_DEVICE_HANDLER( pio1_port_a_r )
 		}
 	}
 
-	data |= (cassette_input(cassette_device_image(device->machine)) < +0.0) << 7;
+	data |= (cassette_input(state->cassette) < +0.0) << 7;
 
 	return data;
 }
@@ -147,7 +142,7 @@ static WRITE8_DEVICE_HANDLER( pio1_port_a_w )
 		state->digit = 0;
 	}
 
-	cassette_output(cassette_device_image(device->machine), BIT(data, 6) ? +1.0 : -1.0);
+	cassette_output(state->cassette, BIT(data, 6) ? +1.0 : -1.0);
 }
 
 static WRITE8_DEVICE_HANDLER( pio1_port_b_w )
@@ -231,6 +226,9 @@ static const z80_daisy_chain c80_daisy_chain[] =
 static MACHINE_START( c80 )
 {
 	c80_state *state = machine->driver_data;
+
+	/* find devices */
+	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
 
 	/* register for state saving */
 	state_save_register_global(machine, state->keylatch);

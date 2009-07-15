@@ -20,6 +20,7 @@ struct _c80_state
 
 	/* devices */
 	const device_config *z80pio;
+	const device_config *cassette;
 };
 
 #endif

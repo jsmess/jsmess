@@ -1,15 +1,17 @@
 #ifndef __NEWBRAIN__
 #define __NEWBRAIN__
 
-#define SCREEN_TAG			"screen"
-#define Z80_TAG				"409"
-#define COP420_TAG			"419"
-#define MC6850_TAG			"459"
-#define ADC0809_TAG			"427"
-#define DAC0808_TAG			"461"
-#define Z80CTC_TAG			"458"
-#define FDC_Z80_TAG			"416"
-#define NEC765_TAG			"418"
+#define SCREEN_TAG		"screen"
+#define Z80_TAG			"409"
+#define COP420_TAG		"419"
+#define MC6850_TAG		"459"
+#define ADC0809_TAG		"427"
+#define DAC0808_TAG		"461"
+#define Z80CTC_TAG		"458"
+#define FDC_Z80_TAG		"416"
+#define NEC765_TAG		"418"
+#define CASSETTE1_TAG	"cassette1"
+#define CASSETTE2_TAG	"cassette2"
 
 #define NEWBRAIN_EIM_RAM_SIZE			0x10000
 
@@ -95,6 +97,8 @@ struct _newbrain_state
 	const device_config *mc6850;
 	const device_config *z80ctc;
 	const device_config *nec765;
+	const device_config *cassette1;
+	const device_config *cassette2;
 };
 
 /* ---------- defined in video/newbrain.c ---------- */

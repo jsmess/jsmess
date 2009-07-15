@@ -5,6 +5,8 @@
 #define Z80_TAG			"z80"
 #define SN76489A_TAG	"sn76489a"
 #define NEC765_TAG		"nec765"
+#define CASSETTE_TAG	"cassette"
+#define CENTRONICS_TAG	"centronics"
 
 #define IS_CARTRIDGE_TV_DRAW(ptr) \
 	(!strncmp("annakmn", (const char *)&ptr[0x13b3], 7))
@@ -30,6 +32,9 @@ struct _sg1000_state
 	/* floppy state */
 	int fdc_irq;
 	int fdc_index;
+
+	/* devices */
+	const device_config *cassette;
 };
 
 #endif

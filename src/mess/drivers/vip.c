@@ -233,13 +233,6 @@ Notes:
 static QUICKLOAD_LOAD( vip );
 static MACHINE_RESET( vip );
 
-/* Cassette Image */
-
-static const device_config *cassette_device_image(running_machine *machine)
-{
-	return devtag_get_device(machine, "cassette");
-}
-
 /* Sound */
 
 static const discrete_555_desc vip_ca555_a =
@@ -495,8 +488,8 @@ static CDP1802_EF_READ( vip_ef_r )
 	if (state->cdp1861_efx) flags -= EF1;
 
 	/* tape input */
-	if (cassette_input(cassette_device_image(device->machine)) < 0) flags -= EF2;
-	set_led_status(VIP_LED_TAPE, (cassette_input(cassette_device_image(device->machine)) > 0));
+	if (cassette_input(state->cassette) < 0) flags -= EF2;
+	set_led_status(VIP_LED_TAPE, (cassette_input(state->cassette) > 0));
 
 	/* keyboard */
 	if (input_port_read(device->machine, "KEYPAD") & (1 << state->keylatch)) flags -= EF3;
@@ -530,7 +523,7 @@ static CDP1802_Q_WRITE( vip_q_w )
 	set_led_status(VIP_LED_Q, level);
 
 	/* tape output */
-	cassette_output(cassette_device_image(device->machine), level ? 1.0 : -1.0);
+	cassette_output(state->cassette, level ? 1.0 : -1.0);
 }
 
 static CDP1802_DMA_WRITE( vip_dma_w )
@@ -577,38 +570,32 @@ static MACHINE_START( vip )
 	UINT16 addr;
 
 	/* RAM banking */
-
 	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, CDP1802_TAG), 0x8000);
 
 	/* ROM banking */
-
 	memory_install_readwrite8_handler(cputag_get_address_space(machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM), 0x8000, 0x81ff, 0, 0x7e00, SMH_BANK(2), SMH_UNMAP);
 	memory_configure_bank(machine, 2, 0, 1, memory_region(machine, CDP1802_TAG) + 0x8000, 0);
 	memory_set_bank(machine, 2, 0);
 
 	/* randomize RAM contents */
-
 	for (addr = 0; addr < mess_ram_size; addr++)
 	{
 		ram[addr] = mame_rand(machine) & 0xff;
 	}
 
 	/* allocate color RAM */
-	
 	state->colorram = auto_alloc_array(machine, UINT8, VP590_COLOR_RAM_SIZE);
 
 	/* enable power LED */
-
 	set_led_status(VIP_LED_POWER, 1);
 
 	/* look up devices */
-
 	state->cdp1861 = devtag_get_device(machine, CDP1861_TAG);
 	state->cdp1862 = devtag_get_device(machine, CDP1862_TAG);
 	state->cdp1863 = devtag_get_device(machine, CDP1863_TAG);
+	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
 
 	/* register for state saving */
-
 	state_save_register_global_pointer(machine, state->colorram, VP590_COLOR_RAM_SIZE);
 
 	state_save_register_global(machine, state->reset);

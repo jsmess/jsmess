@@ -41,11 +41,6 @@
 #include "sound/wave.h"
 #include "video/tms9928a.h"
 
-static const device_config *cassette_device_image(running_machine *machine)
-{
-	return devtag_get_device(machine, "cassette");
-}
-
 /* Read/Write Handlers */
 
 static READ8_DEVICE_HANDLER( centronics_status_r )
@@ -86,8 +81,8 @@ static ADDRESS_MAP_START( wizzard_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(BANK_ROM2)
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(BANK_ROM1)
 //	AM_RANGE(0xc000, 0xe7ff) AM_RAMBANK(3)
-	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE("centronics", centronics_data_w)
-	AM_RANGE(0xe801, 0xe801) AM_DEVREADWRITE("centronics", centronics_status_r, centronics_ctrl_w)
+	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE(CENTRONICS_TAG, centronics_data_w)
+	AM_RANGE(0xe801, 0xe801) AM_DEVREADWRITE(CENTRONICS_TAG, centronics_status_r, centronics_ctrl_w)
 //	AM_RANGE(0xf000, 0xf7ff) AM_RAMBANK(4)
 	AM_RANGE(0xf800, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -313,10 +308,10 @@ static WRITE8_DEVICE_HANDLER( crvision_pia_porta_w )
 	state->keylatch = ~data & 0x0f;
 
 	/* cassette motor */
-	cassette_change_state(cassette_device_image(device->machine), BIT(data, 6) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+	cassette_change_state(state->cassette, BIT(data, 6) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 
 	/* cassette data output */
-	cassette_output(cassette_device_image(device->machine), BIT(data, 7) ? +1.0 : -1.0);
+	cassette_output(state->cassette, BIT(data, 7) ? +1.0 : -1.0);
 }
 
 static UINT8 read_keyboard(running_machine *machine, int pa)
@@ -360,9 +355,11 @@ static READ8_DEVICE_HANDLER( crvision_pia_porta_r )
         PA7     Cassette data in/out
     */
 
+	crvision_state *state = device->machine->driver_data;
+
 	UINT8 data = 0x7f;
 
-	if (cassette_input(cassette_device_image(device->machine)) > -0.1469) data |= 0x80;
+	if (cassette_input(state->cassette) > -0.1469) data |= 0x80;
 
 	return data;
 }
@@ -452,6 +449,7 @@ static MACHINE_START( creativision )
 
 	/* find devices */
 	state->sn76489 = devtag_get_device(machine, SN76489_TAG);
+	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
 
 	/* register for state saving */
 	state_save_register_global(machine, state->keylatch);
@@ -560,7 +558,7 @@ static MACHINE_DRIVER_START( creativision )
 	MDRV_SOUND_ADD(SN76489_TAG, SN76489, XTAL_2MHz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MDRV_SOUND_WAVE_ADD("wave", "cassette")
+	MDRV_SOUND_WAVE_ADD("wave", CASSETTE_TAG)
 	MDRV_SOUND_ROUTE(1, "mono", 0.25)
 
 	/* peripheral hardware */
@@ -573,7 +571,7 @@ static MACHINE_DRIVER_START( creativision )
 	MDRV_CARTSLOT_LOAD(crvision_cart)
 
 	/* cassette */
-	MDRV_CASSETTE_ADD("cassette", crvision_cassette_config)
+	MDRV_CASSETTE_ADD(CASSETTE_TAG, crvision_cassette_config)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ntsc )
@@ -607,7 +605,7 @@ static MACHINE_DRIVER_START( wizzard )
 	MDRV_CPU_PROGRAM_MAP(wizzard_map)
 
 	/* printer */
-	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
+	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
 MACHINE_DRIVER_END
 
 /* ROMs */

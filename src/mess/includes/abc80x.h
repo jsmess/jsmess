@@ -24,13 +24,14 @@
 #define ABC806_ATTR_RAM_SIZE	0x800
 #define ABC806_VIDEO_RAM_SIZE	0x20000
 
-#define SCREEN_TAG	"screen"
-#define Z80_TAG		"z80"
-#define E0516_TAG	"j13"
-#define MC6845_TAG	"b12"
-#define Z80CTC_TAG	"z80ctc"
-#define Z80SIO_TAG	"z80sio"
-#define Z80DART_TAG	"z80dart"
+#define SCREEN_TAG		"screen"
+#define Z80_TAG			"z80"
+#define E0516_TAG		"j13"
+#define MC6845_TAG		"b12"
+#define Z80CTC_TAG		"z80ctc"
+#define Z80SIO_TAG		"z80sio"
+#define Z80DART_TAG		"z80dart"
+#define CASSETTE_TAG	"cassette"
 
 #define ABC800_CHAR_WIDTH	6
 #define ABC800_CCLK			ABC800_X01/ABC800_CHAR_WIDTH
@@ -47,7 +48,8 @@ struct _abc800_state
 	/* video state */
 	UINT8 *charram;				/* character RAM */
 	UINT8 *videoram;			/* HR video RAM */
-
+	const UINT8 *char_rom;		/* character generator ROM */
+	const UINT8 *fgctl_prom;	/* foreground control PROM */
 	UINT8 hrs;					/* HR picture start scanline */
 	UINT8 fgctl;				/* HR foreground control */
 
@@ -60,10 +62,7 @@ struct _abc800_state
 	const device_config *z80sio;
 	const device_config *abc77;
 	const device_config *mc6845;
-
-	/* memory regions */
-	const UINT8 *char_rom;		/* character generator ROM */
-	const UINT8 *fgctl_prom;	/* foreground control PROM */
+	const device_config *cassette;
 };
 
 typedef struct _abc802_state abc802_state;
@@ -77,6 +76,7 @@ struct _abc802_state
 
 	/* video state */
 	UINT8 *charram;			/* character RAM */
+	const UINT8 *char_rom;	/* character generator ROM */
 
 	int flshclk_ctr;		/* flash clock counter */
 	int flshclk;			/* flash clock */
@@ -91,9 +91,7 @@ struct _abc802_state
 	const device_config *z80sio;
 	const device_config *abc77;
 	const device_config *mc6845;
-
-	/* memory regions */
-	const UINT8 *char_rom;	/* character generator ROM */
+	const device_config *cassette;
 };
 
 typedef struct _abc806_state abc806_state;
@@ -112,6 +110,9 @@ struct _abc806_state
 	UINT8 *charram;			/* character RAM */
 	UINT8 *colorram;		/* attribute RAM */
 	UINT8 *videoram;		/* HR video RAM */
+	const UINT8 *rad_prom;	/* line address PROM */
+	const UINT8 *hru2_prom;	/* HR palette PROM */
+	const UINT8 *char_rom;	/* character generator ROM */
 
 	int txoff;				/* text display enable */
 	int _40;				/* 40/80 column mode */
@@ -134,11 +135,7 @@ struct _abc806_state
 	const device_config *mc6845;
 	const device_config *abc77;
 	const device_config *e0516;
-
-	/* memory regions */
-	const UINT8 *rad_prom;	/* line address PROM */
-	const UINT8 *hru2_prom;	/* HR palette PROM */
-	const UINT8 *char_rom;	/* character generator ROM */
+	const device_config *cassette;
 };
 
 /*----------- defined in video/abc800.c -----------*/

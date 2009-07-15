@@ -2,12 +2,13 @@
 #define __KYOCERA__
 
 #define SCREEN_TAG		"screen"
-
 #define I8085_TAG		"m19"
 #define I8155_TAG		"m25"
 #define UPD1990A_TAG	"m18"
 #define IM6402_TAG		"m22"
 #define MC14412_TAG		"m31"
+#define CASSETTE_TAG	"cassette"
+#define CENTRONICS_TAG	"centronics"
 
 //#define I8085_TAG		"m19"
 //#define I8155_TAG	"m12"
@@ -48,6 +49,7 @@ struct _kc85_state
 	const device_config *mc14412;
 	const device_config *centronics;
 	const device_config *speaker;
+	const device_config *cassette;
 };
 
 typedef struct _tandy200_state tandy200_state;
@@ -73,6 +75,7 @@ struct _tandy200_state
 	const device_config *tcm5089;
 	const device_config *centronics;
 	const device_config *speaker;
+	const device_config *cassette;
 };
 
 /* ---------- defined in video/kyocera.c ---------- */

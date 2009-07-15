@@ -44,9 +44,10 @@
 
 #define ABC80_CHAR_CURSOR		0x80
 
-#define SCREEN_TAG	"screen"
-#define Z80_TAG		"ab67"
-#define Z80PIO_TAG	"cd67"
+#define SCREEN_TAG		"screen"
+#define Z80_TAG			"ab67"
+#define Z80PIO_TAG		"cd67"
+#define CASSETTE_TAG	"cassette"
 
 typedef struct _abc80_state abc80_state;
 struct _abc80_state
@@ -62,15 +63,16 @@ struct _abc80_state
 	int char_bank;
 	int char_row;
 
-	/* devices */
-	const device_config *z80pio;
-
 	/* memory regions */
 	const UINT8 *char_rom;		/* character generator ROM */
 	const UINT8 *hsync_prom;	/* horizontal sync PROM */
 	const UINT8 *vsync_prom;	/* horizontal sync PROM */
 	const UINT8 *line_prom;		/* line address PROM */
 	const UINT8 *attr_prom;		/* character attribute PROM */
+
+	/* devices */
+	const device_config *z80pio;
+	const device_config *cassette;
 };
 
 /*----------- defined in video/abc80.c -----------*/

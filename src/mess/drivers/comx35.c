@@ -23,11 +23,6 @@
 #include "machine/wd17xx.h"
 #include "video/mc6845.h"
 
-static const device_config *cassette_device_image(running_machine *machine)
-{
-	return devtag_get_device(machine, CASSETTE_TAG);
-}
-
 /* Memory Maps */
 
 static ADDRESS_MAP_START( comx35_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -241,7 +236,7 @@ static CDP1802_EF_READ( comx35_ef_r )
 	if (!state->cdp1871_efxa) flags -= EF3;
 
 	// cassette input, expansion device flag
-	if ((cassette_input(cassette_device_image(device->machine)) < +0.0) || !state->cdp1802_ef4) flags -= EF4;
+	if ((cassette_input(state->cassette) < +0.0) || !state->cdp1802_ef4) flags -= EF4;
 
 	return flags;
 }
@@ -298,7 +293,7 @@ static CDP1802_Q_WRITE( comx35_q_w )
 	}
 
 	// cassette output
-	cassette_output(cassette_device_image(device->machine), level ? +1.0 : -1.0);
+	cassette_output(state->cassette, level ? +1.0 : -1.0);
 }
 
 static CDP1802_INTERFACE( comx35_cdp1802_config )

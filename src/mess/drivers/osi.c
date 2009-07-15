@@ -186,11 +186,6 @@ Notes:
 #include "devices/basicdsk.h"
 #include "devices/cassette.h"
 
-static const device_config *cassette_device_image(running_machine *machine)
-{
-	return devtag_get_device(machine, "cassette");
-}
-
 /* Sound */
 
 static const discrete_dac_r1_ladder osi600_dac =
@@ -618,16 +613,16 @@ INPUT_PORTS_END
 
 static READ_LINE_DEVICE_HANDLER( cassette_rx )
 {
-	const device_config *cassette = cassette_device_image(device->machine);
+	osi_state *driver_state = device->machine->driver_data;
 
-	return (cassette_input(cassette) > 0.0) ? 1 : 0;
+	return (cassette_input(driver_state->cassette) > 0.0) ? 1 : 0;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( cassette_tx )
 {
-	const device_config *cassette = cassette_device_image(device->machine);
+	osi_state *driver_state = device->machine->driver_data;
 
-	cassette_output(cassette, state ? +1.0 : -1.0);
+	cassette_output(driver_state->cassette, state ? +1.0 : -1.0);
 }
 
 static ACIA6850_INTERFACE( osi600_acia_intf )
@@ -671,6 +666,9 @@ static MACHINE_START( osi600 )
 	osi_state *state = machine->driver_data;
 
 	const address_space *program = cputag_get_address_space(machine, M6502_TAG, ADDRESS_SPACE_PROGRAM);
+
+	/* find devices */
+	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
 
 	/* configure RAM banking */
 	memory_configure_bank(machine, 1, 0, 1, memory_region(machine, M6502_TAG), 0);

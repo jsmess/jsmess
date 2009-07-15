@@ -1,12 +1,12 @@
 #ifndef __VIP__
 #define __VIP__
 
-#define SCREEN_TAG	"screen"
-
-#define CDP1802_TAG "u1"
-#define CDP1861_TAG "u2"
-#define CDP1862_TAG "cdp1862"
-#define CDP1863_TAG "cdp1863"
+#define SCREEN_TAG		"screen"
+#define CDP1802_TAG		"u1"
+#define CDP1861_TAG		"u2"
+#define CDP1862_TAG		"cdp1862"
+#define CDP1863_TAG		"cdp1863"
+#define CASSETTE_TAG	"cassette"
 
 #define VP590_COLOR_RAM_SIZE	0x100
 
@@ -51,6 +51,7 @@ struct _vip_state
 	const device_config *cdp1861;
 	const device_config *cdp1862;
 	const device_config *cdp1863;
+	const device_config *cassette;
 };
 
 #endif

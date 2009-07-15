@@ -91,11 +91,6 @@ Notes:
 #include "devices/cassette.h"
 #include "devices/printer.h"
 
-static const device_config *cassette_device_image(running_machine *machine)
-{
-	return devtag_get_device(machine, "cassette");
-}
-
 /* Read/Write Handlers */
 
 static WRITE8_HANDLER( abc80_sound_w )
@@ -416,8 +411,10 @@ static READ8_DEVICE_HANDLER( abc80_pio_port_b_r )
 
 	*/
 
+	abc80_state *state = device->machine->driver_data;
+
 	/* cassette data */
-	UINT8 data = (cassette_input(cassette_device_image(device->machine)) > +1.0) ? 0x80 : 0;
+	UINT8 data = (cassette_input(state->cassette) > +1.0) ? 0x80 : 0;
 
 	return data;
 };
@@ -439,11 +436,13 @@ static WRITE8_DEVICE_HANDLER( abc80_pio_port_b_w )
 
 	*/
 
+	abc80_state *state = device->machine->driver_data;
+
 	/* cassette motor */
-	cassette_change_state(cassette_device_image(device->machine), BIT(data, 5) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+	cassette_change_state(state->cassette, BIT(data, 5) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 
 	/* cassette data */
-	cassette_output(cassette_device_image(device->machine), BIT(data, 6) ? -1.0 : +1.0);
+	cassette_output(state->cassette, BIT(data, 6) ? -1.0 : +1.0);
 };
 
 static const z80pio_interface abc80_pio_intf =
@@ -478,7 +477,6 @@ static MACHINE_START( abc80 )
 	abc80_state *state = machine->driver_data;
 
 	/* configure RAM expansion */
-
 	memory_configure_bank(machine, 1, 0, 1, mess_ram, 0);
 	memory_set_bank(machine, 1, 0);
 
@@ -494,15 +492,13 @@ static MACHINE_START( abc80 )
 	}
 
 	/* find devices */
-
 	state->z80pio = devtag_get_device(machine, Z80PIO_TAG);
+	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
 
 	/* initialize the ABC BUS */
-
 	abcbus_init(machine, Z80_TAG, abcbus_config);
 
 	/* register for state saving */
-
 	state_save_register_global(machine, state->key_data);
 	state_save_register_global(machine, state->key_strobe);
 	state_save_register_global(machine, state->z80pio_astb);

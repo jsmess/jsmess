@@ -39,11 +39,6 @@
 #include "sound/beep.h"
 #include "machine/rescap.h"
 
-static const device_config *cassette_device_image(running_machine *machine)
-{
-	return devtag_get_device(machine, "cassette");
-}
-
 /* Read/Write Handlers */
 
 static READ8_HANDLER( vismac_r )
@@ -194,7 +189,7 @@ static CDP1802_EF_READ( tmc2000e_ef_r )
 
 	// tape in
 
-	if (cassette_input(cassette_device_image(device->machine)) > +1.0) flags -= EF2;
+	if (cassette_input(state->cassette) > +1.0) flags -= EF2;
 	
 	// keyboard
 
@@ -217,7 +212,7 @@ static CDP1802_Q_WRITE( tmc2000e_q_w )
 
 	// tape out
 
-	cassette_output(cassette_device_image(device->machine), level ? -1.0 : +1.0);
+	cassette_output(state->cassette, level ? -1.0 : +1.0);
 
 	// floppy control (FDC-6)
 }
@@ -252,15 +247,13 @@ static MACHINE_START( tmc2000e )
 	tmc2000e_state *state = machine->driver_data;
 
 	/* allocate color RAM */
-
 	state->colorram = auto_alloc_array(machine, UINT8, TMC2000E_COLORRAM_SIZE);
 
 	/* find devices */
-
 	state->cdp1864 = devtag_get_device(machine, CDP1864_TAG);
+	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
 
 	/* register for state saving */
-
 	state_save_register_global_pointer(machine, state->colorram, TMC2000E_COLORRAM_SIZE);
 	state_save_register_global(machine, state->cdp1864_efx);
 	state_save_register_global(machine, state->keylatch);

@@ -88,11 +88,6 @@ Notes:
 #include "sound/cdp1869.h"
 #include "includes/tmc600.h"
 
-static const device_config *cassette_device_image(running_machine *machine)
-{
-	return devtag_get_device(machine, "cassette");
-}
-
 /* Read/Write Handlers */
 
 static WRITE8_HANDLER( keyboard_latch_w )
@@ -113,7 +108,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tmc600_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x03, 0x03) AM_WRITE(keyboard_latch_w)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE("centronics", centronics_data_w)
+	AM_RANGE(0x04, 0x04) AM_DEVWRITE(CENTRONICS_TAG, centronics_data_w)
 	AM_RANGE(0x05, 0x05) AM_DEVWRITE(CDP1869_TAG, tmc600_vismac_data_w)
 //  AM_RANGE(0x06, 0x06) AM_WRITE(floppy_w)
 	AM_RANGE(0x07, 0x07) AM_WRITE(tmc600_vismac_register_w)
@@ -242,7 +237,7 @@ static CDP1802_EF_READ( tmc600_ef_r )
 
 	// tape in
 
-	if (cassette_input(cassette_device_image(device->machine)) < +0.0) flags -= EF2;
+	if (cassette_input(state->cassette) < +0.0) flags -= EF2;
 
 	// keyboard
 
@@ -253,7 +248,9 @@ static CDP1802_EF_READ( tmc600_ef_r )
 
 static CDP1802_Q_WRITE( tmc600_q_w )
 {
-	cassette_output(cassette_device_image(device->machine), level ? +1.0 : -1.0);
+	tmc600_state *state = device->machine->driver_data;
+
+	cassette_output(state->cassette, level ? +1.0 : -1.0);
 }
 
 static CDP1802_INTERFACE( tmc600_cdp1802_config )
@@ -273,8 +270,10 @@ static MACHINE_START( tmc600 )
 	tmc600_state *state = machine->driver_data;
 	const address_space *program = cputag_get_address_space(machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM);
 
-	/* configure RAM */
+	/* find devices */
+	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
 
+	/* configure RAM */
 	memory_configure_bank(machine, 1, 0, 1, mess_ram, 0);
 	memory_set_bank(machine, 1, 0);
 
@@ -296,7 +295,6 @@ static MACHINE_START( tmc600 )
 	}
 
 	/* register for state saving */
-
 	state_save_register_global(machine, state->keylatch);
 }
 
@@ -332,10 +330,10 @@ static MACHINE_DRIVER_START( tmc600 )
 	MDRV_IMPORT_FROM(tmc600_video)
 
 	/* printer */
-	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
+	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
 
 	/* cassette */
-	MDRV_CASSETTE_ADD( "cassette", tmc600_cassette_config )
+	MDRV_CASSETTE_ADD(CASSETTE_TAG, tmc600_cassette_config)
 MACHINE_DRIVER_END
 
 /* ROMs */

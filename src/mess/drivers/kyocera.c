@@ -83,7 +83,7 @@
 
 static const device_config *cassette_device_image(running_machine *machine)
 {
-	return devtag_get_device(machine, "cassette");
+	return devtag_get_device(machine, CASSETTE_TAG);
 }
 
 /* Read/Write Handlers */
@@ -210,7 +210,7 @@ static WRITE8_HANDLER( pc8201_ctrl_w )
 	kc85_state *state = space->machine->driver_data;
 	
 	/* cassette motor */
-	cassette_change_state(cassette_device_image(space->machine), BIT(data, 3) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+	cassette_change_state(state->cassette, BIT(data, 3) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 
 	/* RTC strobe */
 	upd1990a_stb_w(state->upd1990a, BIT(data, 4));
@@ -371,7 +371,7 @@ static WRITE8_HANDLER( kc85_ctrl_w )
 	upd1990a_stb_w(state->upd1990a, BIT(data, 2));
 
 	/* cassette motor */
-	cassette_change_state(cassette_device_image(space->machine), BIT(data, 3) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+	cassette_change_state(state->cassette, BIT(data, 3) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 }
 
 static UINT8 read_keyboard(running_machine *machine, UINT16 keylatch)
@@ -469,7 +469,7 @@ static WRITE8_HANDLER( tandy200_stbk_w )
 	centronics_strobe_w(state->centronics, BIT(data, 0));
 
 	/* cassette motor */
-	cassette_change_state(cassette_device_image(space->machine), BIT(data, 1) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+	cassette_change_state(state->cassette, BIT(data, 1) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 }
 
 /* Memory Maps */
@@ -1119,8 +1119,9 @@ static MACHINE_START( kc85 )
 
 	/* find devices */
 	state->upd1990a = devtag_get_device(machine, UPD1990A_TAG);
-	state->centronics = devtag_get_device(machine, "centronics");
+	state->centronics = devtag_get_device(machine, CENTRONICS_TAG);
 	state->speaker = devtag_get_device(machine, "speaker");
+	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
 
 	/* initialize RTC */
 	upd1990a_cs_w(state->upd1990a, 1);
@@ -1162,8 +1163,9 @@ static MACHINE_START( pc8201 )
 
 	/* find devices */
 	state->upd1990a = devtag_get_device(machine, UPD1990A_TAG);
-	state->centronics = devtag_get_device(machine, "centronics");
+	state->centronics = devtag_get_device(machine, CENTRONICS_TAG);
 	state->speaker = devtag_get_device(machine, "speaker");
+	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
 
 	/* initialize RTC */
 	upd1990a_cs_w(state->upd1990a, 1);
@@ -1199,8 +1201,9 @@ static MACHINE_START( trsm100 )
 	
 	/* find devices */
 	state->upd1990a = devtag_get_device(machine, UPD1990A_TAG);
-	state->centronics = devtag_get_device(machine, "centronics");
+	state->centronics = devtag_get_device(machine, CENTRONICS_TAG);
 	state->speaker = devtag_get_device(machine, "speaker");
+	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
 
 	/* initialize RTC */
 	upd1990a_cs_w(state->upd1990a, 1);
@@ -1251,8 +1254,9 @@ static MACHINE_START( tandy200 )
 	tandy200_state *state = machine->driver_data;
 
 	/* find devices */
-	state->centronics = devtag_get_device(machine, "centronics");
+	state->centronics = devtag_get_device(machine, CENTRONICS_TAG);
 	state->speaker = devtag_get_device(machine, "speaker");
+	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
 
 	/* configure ROM banking */
 	memory_configure_bank(machine, 1, 0, 1, memory_region(machine, I8085_TAG), 0);
@@ -1330,7 +1334,7 @@ static MACHINE_DRIVER_START( kc85 )
 	MDRV_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, kc85_upd1990a_intf)
 
 	/* printer */
-	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
+	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
 
 	/* cassette */
 	MDRV_CASSETTE_ADD("cassette", kc85_cassette_config)
@@ -1365,7 +1369,7 @@ static MACHINE_DRIVER_START( pc8201 )
 	MDRV_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, kc85_upd1990a_intf)
 
 	/* printer */
-	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
+	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
 
 	/* cassette */
 	MDRV_CASSETTE_ADD("cassette", kc85_cassette_config)
@@ -1419,7 +1423,7 @@ static MACHINE_DRIVER_START( tandy200 )
 //	MDRV_MC14412_ADD(MC14412_TAG, XTAL_1MHz)
 
 	/* printer */
-	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
+	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
 
 	/* cassette */
 	MDRV_CASSETTE_ADD("cassette", kc85_cassette_config)

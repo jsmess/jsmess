@@ -1,10 +1,11 @@
 #ifndef __TMC600__
 #define __TMC600__
 
-#define SCREEN_TAG	"screen"
-
-#define CDP1802_TAG	"cdp1802"
-#define CDP1869_TAG	"cdp1869"
+#define SCREEN_TAG		"screen"
+#define CDP1802_TAG		"cdp1802"
+#define CDP1869_TAG		"cdp1869"
+#define CASSETTE_TAG	"cassette"
+#define CENTRONICS_TAG	"centronics"
 
 #define TMC600_PAGE_RAM_SIZE	0x400
 #define TMC600_PAGE_RAM_MASK	0x3ff
@@ -22,10 +23,12 @@ struct _tmc600_state
 	UINT8 *color_ram;		/* color memory */
 	UINT8 *char_rom;		/* character generator ROM */
 
-	const device_config *cdp1869;
-
 	/* keyboard state */
 	int keylatch;			/* key latch */
+
+	/* devices */
+	const device_config *cdp1869;
+	const device_config *cassette;
 };
 
 /* ---------- defined in video/tmc600.c ---------- */
