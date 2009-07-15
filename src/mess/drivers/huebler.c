@@ -184,8 +184,12 @@ static const z80_daisy_chain huebler_daisy_chain[] =
 
 /* Machine Initialization */
 
-static MACHINE_START(huebler)
+static MACHINE_START( huebler )
 {
+	huebler_state *state = machine->driver_data;
+
+	/* find devices */
+	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
 }
 
 /* Machine Driver */
@@ -235,7 +239,7 @@ MACHINE_DRIVER_END
 ROM_START( huebler )
 	ROM_REGION( 0x10000, Z80_TAG, 0 )
 	ROM_LOAD( "mon21.bin",    0xf000, 0x0bdf, BAD_DUMP CRC(ba905563) SHA1(1fa0aeab5428731756bdfa74efa3c664898bf083) )
-	ROM_LOAD( "mon30.bin",    0x0000, 0x1000, CRC(033f8112) SHA1(0c6ae7b9d310dec093652db6e8ae84f8ebfdcd29) )
+	ROM_LOAD( "mon30.bin",    0xf000, 0x1000, CRC(033f8112) SHA1(0c6ae7b9d310dec093652db6e8ae84f8ebfdcd29) )
 	ROM_LOAD( "mon30p_hbasic33p.bin", 0x0000, 0x4800, CRC(c927e7be) SHA1(2d1f3ff4d882c40438a1281872c6037b2f07fdf2) )
 
 	ROM_REGION( 0x0400, "chargen", 0 )

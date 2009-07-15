@@ -14,7 +14,10 @@ struct _huebler_state
 {
 	/* video state */
 	UINT8 *video_ram;
-	UINT8 *char_rom;
+	const UINT8 *char_rom;
+
+	/* devices */
+	const device_config *cassette;
 };
 
 #endif
