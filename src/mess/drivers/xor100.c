@@ -34,6 +34,7 @@
 	- floppy
 	- memory expansion
 	- COM5016
+	- CTC
 
 */
 
@@ -59,7 +60,7 @@ static WRITE8_HANDLER( mmu_w )
 		bit		description
 		
 		0		A16
-		1		A7
+		1		A17
 
 	*/
 }
@@ -75,6 +76,12 @@ static READ8_HANDLER( prom_disable_r )
 	memory_set_bank(space->machine, 1, 1);
 
 	return 0xff;
+}
+
+static WRITE8_DEVICE_HANDLER( baud_w )
+{
+	com8116_str_w(device, 0, data & 0x0f);
+	com8116_stt_w(device, 0, data >> 4);
 }
 
 /* Memory Maps */
@@ -96,7 +103,7 @@ static ADDRESS_MAP_START( xor100_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x08, 0x08) AM_WRITE(mmu_w)
 	AM_RANGE(0x09, 0x09) AM_WRITE(prom_toggle_w)
 	AM_RANGE(0x0a, 0x0a) AM_READ(prom_disable_r)
-	AM_RANGE(0x0b, 0x0b) AM_READ_PORT("DSW0") //AM_WRITE(baud_rate_generator_w)
+	AM_RANGE(0x0b, 0x0b) AM_READ_PORT("DSW0") AM_DEVWRITE(COM5016_TAG, baud_w)
 	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_r, z80ctc_w)
 ADDRESS_MAP_END
 
