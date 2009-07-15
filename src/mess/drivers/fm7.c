@@ -1115,7 +1115,6 @@ void fm7_mmr_refresh(const address_space* space)
 	int x;
 	UINT16 window_addr;
 	UINT8* RAM = memory_region(space->machine,"maincpu");
-	UINT16 size = 0x3ff;
 	
 	if(fm7_mmr.enabled)
 	{
@@ -1131,14 +1130,14 @@ void fm7_mmr_refresh(const address_space* space)
 
 	if(fm7_mmr.mode & 0x40)
 	{
-		// Handle window offset (is this even close to right?)
+		// Handle window offset - 0x7c00-0x7fff will show the area of extended
+		// memory (0x00000-0x0ffff) defined by the window address register
+		// 0x00 = 0x07c00, 0x04 = 0x08000 ... 0xff = 0x07400.
 		window_addr = ((fm7_mmr.window_offset << 8) + 0x7c00) & 0xffff;
 		if(window_addr < 0xfc00)
 		{
-			if(window_addr > 0xf800)
-				size = 0xfc00 - window_addr - 1;
-			memory_install_readwrite8_handler(space,window_addr,window_addr+size,0,0,SMH_BANK(24),SMH_BANK(24));
-			memory_set_bankptr(space->machine,24,RAM+window_addr+0x30000);
+			memory_install_readwrite8_handler(space,0x7c00,0x7fff,0,0,SMH_BANK(24),SMH_BANK(24));
+			memory_set_bankptr(space->machine,24,RAM+window_addr);
 		}
 	}
 }
