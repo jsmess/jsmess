@@ -35,6 +35,7 @@ Skeleton drivers:
 - DEC VT520
 - Epson LX-800
 - Intel SDK-86
+- Jugend+Technik CompJU+TEr
 - MMD-2
 - MPF-1 Plus
 - Netronics Explorer 85

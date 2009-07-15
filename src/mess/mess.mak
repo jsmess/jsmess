@@ -747,6 +747,7 @@ $(MESSOBJ)/ddr.a:				\
 	$(MESS_DRIVERS)/bcs3.o		\
 	$(MESS_DRIVERS)/c80.o		\
 	$(MESS_DRIVERS)/huebler.o	\
+	$(MESS_DRIVERS)/jtc.o		\
 	$(MESS_DRIVERS)/kramermc.o	\
 	$(MESS_MACHINE)/kramermc.o	\
 	$(MESS_VIDEO)/kramermc.o	\
