@@ -353,6 +353,7 @@ const game_driver * const drivers[] =
     DRIVER( kim1 )      /* Commodore (MOS) KIM-1 1975                       */
     DRIVER( sym1 )      /* Synertek SYM-1                                   */
     DRIVER( aim65 )     /* Rockwell AIM65                                   */
+    DRIVER( aim65_40 )  /* Rockwell AIM65/40                                */
 
     DRIVER( pet2001 )   /* PET 2001                                         */
     DRIVER( pet2001n )  /* PET 2001-N                                       */
