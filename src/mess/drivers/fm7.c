@@ -78,6 +78,7 @@ static UINT8 fdc_irq_flag;
 static UINT8 fdc_drq_flag;
 static UINT8 fm77av_ym_irq;
 static UINT8 speaker_active;
+static UINT16 fm7_kanji_address;
 
 
 struct key_encoder
@@ -1173,6 +1174,58 @@ static WRITE8_HANDLER( fm7_mmr_w )
 	}
 }
 
+/*
+ *  Main CPU: ports 0xfd20-0xfd23
+ * 	Kanji ROM read ports
+ *  FD20 (W/O): ROM address high
+ *  FD21 (W/O): ROM address low
+ *  FD22 (R/O): Kanji data high
+ *  FD23 (R/O): Kanji data low
+ * 
+ *  Kanji ROM is visible at 0x20000 (first half only?) 
+ */
+static READ8_HANDLER( fm7_kanji_r )
+{
+	UINT8* KROM = memory_region(space->machine,"kanji1");
+	UINT32 addr = fm7_kanji_address << 1;
+	
+	switch(offset)
+	{
+		case 0:
+		case 1:
+			logerror("KANJI: read from invalid register %i\n",offset);
+			return 0xff;  // write-only
+		case 2:
+			return KROM[addr];
+		case 3:
+			return KROM[addr+1];
+		default:
+			logerror("KANJI: read from invalid register %i\n",offset);
+			return 0xff;
+	}
+}
+
+static WRITE8_HANDLER( fm7_kanji_w )
+{
+	UINT16 addr;
+	
+	switch(offset)
+	{
+		case 0:
+			addr = ((data & 0xff) << 8) | (fm7_kanji_address & 0x00ff);
+			fm7_kanji_address = addr;
+			break;
+		case 1:
+			addr = (data & 0xff) | (fm7_kanji_address & 0xff00);
+			fm7_kanji_address = addr;
+			break;
+		case 2:
+		case 3:
+		default:
+			logerror("KANJI: write to invalid register %i\n",offset);
+	}
+}
+
 static TIMER_CALLBACK( fm7_timer_irq )
 {
 	if(irq_mask & IRQ_FLAG_TIMER)
@@ -1363,6 +1416,7 @@ static ADDRESS_MAP_START( fm7_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfd0f,0xfd0f) AM_READWRITE(fm7_rom_en_r,fm7_rom_en_w)
 	AM_RANGE(0xfd10,0xfd17) AM_READ(fm7_unknown_r)
 	AM_RANGE(0xfd18,0xfd1f) AM_READWRITE(fm7_fdc_r,fm7_fdc_w)
+	AM_RANGE(0xfd20,0xfd23) AM_READWRITE(fm7_kanji_r,fm7_kanji_w)
 	AM_RANGE(0xfd24,0xfd36) AM_READ(fm7_unknown_r)
 	AM_RANGE(0xfd37,0xfd37) AM_WRITE(fm7_multipage_w)
 	AM_RANGE(0xfd38,0xfd3f) AM_READWRITE(fm7_palette_r,fm7_palette_w)
@@ -1441,6 +1495,7 @@ static ADDRESS_MAP_START( fm77av_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfd16,0xfd16) AM_READWRITE(fm7_psg_data_r,fm7_psg_data_w)
 	AM_RANGE(0xfd17,0xfd17) AM_READ(fm7_fmirq_r)
 	AM_RANGE(0xfd18,0xfd1f) AM_READWRITE(fm7_fdc_r,fm7_fdc_w)
+	AM_RANGE(0xfd20,0xfd23) AM_READWRITE(fm7_kanji_r,fm7_kanji_w)
 	AM_RANGE(0xfd24,0xfd2b) AM_READ(fm7_unknown_r)
 	AM_RANGE(0xfd30,0xfd34) AM_WRITE(fm77av_analog_palette_w)
 	AM_RANGE(0xfd35,0xfd36) AM_READ(fm7_unknown_r)
@@ -1905,7 +1960,10 @@ ROM_START( fm7 )
 	ROM_REGION( 0x200, "dos", 0 )	
 	ROM_LOAD( "boot_dos.rom", 0x0000,  0x0200, CRC(198614ff) SHA1(037e5881bd3fed472a210ee894a6446965a8d2ef) )
 
-	// optional Kanji rom?
+	// optional Kanji ROM
+	ROM_REGION( 0x20000, "kanji1", 0 )
+	ROM_LOAD_OPTIONAL( "kanji.rom", 0x0000, 0x20000, CRC(62402ac9) SHA1(bf52d22b119d54410dad4949b0687bb0edf3e143) )
+
 ROM_END
 
 ROM_START( fm77av )
