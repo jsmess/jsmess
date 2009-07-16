@@ -30,6 +30,7 @@ Skeleton drivers:
 - ACT Apricot Xi / F1 / F10 / Portable
 - AIM 65/40
 - A.S.EL. Amico 2000
+- Beta Computer
 - DEC VT220
 - DEC VT320
 - DEC VT520
