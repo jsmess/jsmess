@@ -336,7 +336,7 @@ static MACHINE_DRIVER_START( vt100 )
 	MDRV_SCREEN_SIZE(80*10, 30*10)
 	MDRV_SCREEN_VISIBLE_AREA(0, 80*10-1, 0, 30*10-1)
 	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(black_and_white)
+	MDRV_PALETTE_INIT(monochrome_green)
 
 	MDRV_DEFAULT_LAYOUT( layout_vt100 )
 	MDRV_VIDEO_START(generic_bitmapped)
@@ -402,9 +402,9 @@ MACHINE_DRIVER_END
     The DPM01 supposedly has its own processor and roms.
  * vt125 - 1982? base model (stock vt100 firmware plus extra gfx board
    firmware and processor) vt100 with the ReGIS graphical language board
-   installed (very advanced full framebuffer raster graphics, with color,
-   text rotation and scaling, etc. , has backwards compatibility mode for
-   vt105), AVO optional
+   (aka GPO) installed (very advanced full framebuffer raster graphics, with
+   color, text rotation and scaling, etc. , has backwards compatibility mode
+   for vt105), AVO optional
  * vt131 - 1982 cost reduced version of vt132, no longer has the vt100
    expansion backplane; has the AVO advanced video board built in, as well
    as the parallel port interface board, and supports serial block mode.
@@ -418,14 +418,15 @@ MACHINE_DRIVER_END
  * vk100 'gigi'- graphical terminal similar to the vt125, but somewhat more
    primitive; more or less a vt125 without the screen; 
    very little info so far, more research needed
+   see vk100.c for current driver for this
    
  * Upgrade kits for vt1xx:
  * VT1xx-AA : 20ma current loop interface pcb for vt100
  * VT1xx-AB : AVO board (AVO roms could be optionally ordered along with 
               this board if needed)
  * VT1xx-AC : SPT serial printer board (includes a special romset)
- * VT1xx-CA : 20ma current loop interface pcb for vt131 (and maybe vt101/vt102?)
- * VT1xx-CB or CL: ReGIS board vt100->vt125 upgrade kit
+ * VT1xx-CA : later 20ma current loop interface pcb for vt100, vt101/vt102/vt131
+ * VT1xx-CB or CL: GPO "ReGIS" board vt100->vt125 upgrade kit
  
  * Info about mask roms and other nasties:
  * A normal 2716 rom has pin 18: /CE; pin 20: /OE; pin 21: VPP (acts as CE2)
