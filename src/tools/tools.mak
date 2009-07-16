@@ -31,6 +31,7 @@ TOOLS += \
 	regrep$(EXE) \
 	srcclean$(EXE) \
 	src2html$(EXE) \
+	split$(EXE) \
 
 
 
@@ -134,5 +135,18 @@ SRC2HTMLOBJS = \
 	$(TOOLSOBJ)/src2html.o \
 
 src2html$(EXE): $(SRC2HTMLOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(EXPAT)
+	@echo Linking $@...
+	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
+
+
+
+#-------------------------------------------------
+# split
+#-------------------------------------------------
+
+SPLITOBJS = \
+	$(TOOLSOBJ)/split.o \
+
+split$(EXE): $(SPLITOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(EXPAT)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@

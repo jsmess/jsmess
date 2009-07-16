@@ -454,7 +454,7 @@ static WRITE8_HANDLER( laserdisc_command_w )
 
 static TIMER_CALLBACK( laserdisc_philips_callback )
 {
-	int newcode = laserdisc_get_field_code(laserdisc, (param == 17) ? LASERDISC_CODE_LINE17 : LASERDISC_CODE_LINE18);
+	int newcode = laserdisc_get_field_code(laserdisc, (param == 17) ? LASERDISC_CODE_LINE17 : LASERDISC_CODE_LINE18, TRUE);
 
 	/* the PR8210 sends line 17/18 data on each frame; the laserdisc interface
        board receives notification and latches the most recent frame number */
@@ -468,7 +468,7 @@ static TIMER_CALLBACK( laserdisc_philips_callback )
 
 	/* toggle to the next one */
 	param = (param == 17) ? 18 : 17;
-	timer_adjust_oneshot(laserdisc_philips_timer, video_screen_get_time_until_pos(machine->primary_screen, param, 0), param);
+	timer_adjust_oneshot(laserdisc_philips_timer, video_screen_get_time_until_pos(machine->primary_screen, param * 2, 0), param);
 }
 
 
@@ -2426,7 +2426,7 @@ ROM_START( cobram3 )
 	ROM_LOAD( "bh06",   0xc000, 0x2000, CRC(ab6c7cf1) SHA1(3625f2e00a333552036bff99af25edeac5915d78) )
 
 	DISK_REGION( "laserdisc" )
-	DISK_IMAGE_READONLY( "cobracom", 0, NO_DUMP )
+	DISK_IMAGE_READONLY( "cobracom", 0, SHA1(8390498294aca97a5d1769032e7b115d1a42f5d3) )
 ROM_END
 
 
@@ -2605,7 +2605,7 @@ GAME( 1984, curvebal, 0,        gottlieb1, curvebal, romtiles, ROT270, "Mylstar"
 /* games using rev 2 sound board */
 GAME( 1983, screwloo, 0,        screwloo,  screwloo, screwloo, ROT0,   "Mylstar", "Screw Loose (prototype)", 0 )
 GAME( 1983, mach3,    0,        g2laser,   mach3,    romtiles, ROT0,   "Mylstar", "M.A.C.H. 3", 0 )
-GAME( 1984, cobram3,  0,        g2laser,   mach3,    romtiles, ROT0,   "Data East","Cobra Command (M.A.C.H. 3 hardware)", GAME_NOT_WORKING )
+GAME( 1984, cobram3,  0,        g2laser,   mach3,    romtiles, ROT0,   "Data East","Cobra Command (M.A.C.H. 3 hardware)", 0 )
 GAME( 1984, usvsthem, 0,        g2laser,   usvsthem, romtiles, ROT0,   "Mylstar", "Us vs. Them", 0 )
 GAME( 1984, 3stooges, 0,        gottlieb2, 3stooges, stooges,  ROT0,   "Mylstar", "The Three Stooges In Brides Is Brides", 0 )
 GAME( 1984, vidvince, 0,        gottlieb2, vidvince, vidvince, ROT0,   "Mylstar", "Video Vince and the Game Factory (prototype)", GAME_IMPERFECT_GRAPHICS ) // sprite wrapping issues

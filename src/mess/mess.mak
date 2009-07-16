@@ -275,8 +275,8 @@ DRVLIBS = \
 	$(MESSOBJ)/drc.a \
 	$(MESSOBJ)/eaca.a \
 	$(MESSOBJ)/einis.a \
-	$(MESSOBJ)/elektrka.a \
 	$(MESSOBJ)/elektor.a \
+	$(MESSOBJ)/elektrka.a \
 	$(MESSOBJ)/entex.a \
 	$(MESSOBJ)/epoch.a \
 	$(MESSOBJ)/epson.a \

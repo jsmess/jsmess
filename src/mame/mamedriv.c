@@ -274,9 +274,9 @@ const game_driver * const drivers[] =
 	DRIVER( sfx )		/* (c) 1983 Nichibutsu */
 	DRIVER( skelagon )	/* (c) 1983 Nichibutsu USA */
 	DRIVER( monsterz )	/* (c) 1982 Nihon (Arcade TV Game List - P.102, Left, 20 from top) */
-	DRIVER( mimonscr )	/* Universal Video Games */
-	DRIVER( mimonkey )	/* bootleg */
-	DRIVER( mimonsco )	/* bootleg */
+	DRIVER( mimonscr )	/* (c) 1982 Universal Video Games (US Copyright Office info - http://cocatalog.loc.gov)*/
+	DRIVER( mimonkey )	/* (c) 1982 bootleg */
+	DRIVER( mimonsco )	/* (c) 1982 bootleg */
 	DRIVER( scobra )	/* GX316 (c) 1981 Konami */
 	DRIVER( scobras )	/* GX316 (c) 1981 Stern */
 	DRIVER( scobrase )	/* GX316 (c) 1981 Stern */
@@ -2995,6 +2995,7 @@ V-V                           TP-027
 	DRIVER( chaoshej )	/* 1998.10 Chaos Heat (V2.08J) */
 	DRIVER( raycris )	/* 1998.12 Ray Crisis (V2.03J) */
 	DRIVER( otenamih )	/* 1999.02 Otenami Haiken (Success) */
+	DRIVER( otenamhf )	/* 2005.04 Otenami Haiken Final (V2.07JC) */
 	DRIVER( spuzbobj )	/* 1999.03 Super Puzzle Bobble (Japan) */
 	DRIVER( spuzbobl )	/* 1999.?? Super Puzzle Bobble (V2.05O) */
 	DRIVER( gobyrc )	/* 1999.?? Go By RC (V2.03O) */
@@ -3226,34 +3227,37 @@ V-V                           TP-027
 	DRIVER( bmiidx8 )
 
 	/* Konami Viper games */
-	DRIVER( kviper )	/* 1999 */
-	DRIVER( ppp2nd )	/* 2001 */
-	DRIVER( boxingm )	/* 2001 */
-	DRIVER( code1d )	/* 2000 */
-	DRIVER( code1db )	/* 2000 */
-	DRIVER( gticlub2 )	/* 2001 */
-	DRIVER( jpark3 )	/* 2001 */
-	DRIVER( mocapglf )	/* 2001 */
-	DRIVER( mocapb )	/* 2001 */
-	DRIVER( mocapbj )	/* 2001 */
-	DRIVER( p911 )		/* 2001 */
-	DRIVER( p911uc )	/* 2001 */
-	DRIVER( p911e )		/* 2001 */
-	DRIVER( p911j )		/* 2001 */
-	DRIVER( p9112 )		/* 2001 */
-	DRIVER( popn9 )		/* 2003 */
-	DRIVER( sscopex )	/* 2001 */
-	DRIVER( sogeki )	/* 2001 */
-	DRIVER( thrild2 )	/* 2001 */
-	DRIVER( thrild2a )	/* 2001 */
-	DRIVER( tsurugi )	/* 2001 */
-	DRIVER( tsurugij )	/* 2001 */
-	DRIVER( wcombat )	/* 2002 */
-	DRIVER( wcombak )	/* 2002 */
-	DRIVER( wcombaj )	/* 2002 */
-	DRIVER( xtrial )	/* 2002 */
-	DRIVER( mfightc )	/* 2002 */
-	DRIVER( mfightcc )	/* 2002 */
+	DRIVER( kviper )		/* 1999 */
+	DRIVER( ppp2nd )		/* 2001 */
+	DRIVER( boxingm )		/* 2001 */
+	DRIVER( code1d )		/* 2000 */
+	DRIVER( code1db )		/* 2000 */
+	DRIVER( gticlub2 )		/* 2001 */
+	DRIVER( gticlub2ea )	/* 2001 */
+	DRIVER( jpark3 )		/* 2001 */
+	DRIVER( mocapglf )		/* 2001 */
+	DRIVER( mocapb )		/* 2001 */
+	DRIVER( mocapbj )		/* 2001 */
+	DRIVER( p911 )			/* 2001 */
+	DRIVER( p911uc )		/* 2001 */
+	DRIVER( p911kc )		/* 2001 */
+	DRIVER( p911e )			/* 2001 */
+	DRIVER( p911j )			/* 2001 */
+	DRIVER( p9112 )			/* 2001 */
+	DRIVER( popn9 )			/* 2003 */
+	DRIVER( sscopex )		/* 2001 */
+	DRIVER( sogeki )		/* 2001 */
+	DRIVER( thrild2 )		/* 2001 */
+	DRIVER( thrild2a )		/* 2001 */
+	DRIVER( thrild2c )		/* 2001 */
+	DRIVER( tsurugi )		/* 2001 */
+	DRIVER( tsurugij )		/* 2001 */
+	DRIVER( wcombat )		/* 2002 */
+	DRIVER( wcombatk )		/* 2002 */
+	DRIVER( wcombatj )		/* 2002 */
+	DRIVER( xtrial )		/* 2002 */
+	DRIVER( mfightc )		/* 2002 */
+	DRIVER( mfightcc )		/* 2002 */
 
 	/* Mitchell games */
 	DRIVER( mgakuen )	/* (c) 1988 Yuga */
@@ -3514,6 +3518,7 @@ V-V                           TP-027
 	DRIVER( sblazerp )  /* (c) 1983 */
 	DRIVER( cobraseg )  /* (c) ???? */
 	DRIVER( gpworld )	/* (c) 1984 */
+	DRIVER( timetrv )	/* (c) 1991.10 Virtual Image Productions */
 
 	/* Sega SG1000 based games */
 	DRIVER( chboxing )	/* (c) 1984 */
@@ -3918,7 +3923,6 @@ DokiDoki Penguin Land *not confirmed
 	DRIVER( spidman )	/* 1991.?? Spiderman (World) */
 	DRIVER( spidmanu )	/* 1991.09 Spiderman (US) */
 						/* 1991.09 Spiderman (Japan) */
-						/* 1991.10 Hologram Time Traveler (Japan) */
 	DRIVER( f1en )		/* 1991.?? F-1 Exhaust Note (World) */
 						/* 1992.01 F-1 Exhaust Note (US) */
 						/* 1991.11 F-1 Exhaust Note (Japan) */
@@ -4428,6 +4432,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2003.07 Yonin Uchi Mahjong MJ Network Taisen ver. NEW */
 	DRIVER( psyvar2 )	/* 2003.11 Psyvariar 2 */
 	DRIVER( puyofev	)	/* 2003.11 Puyopuyo Fever */
+	DRIVER( shootpl )	/* 2003.xx Shootout Pool / Shootout Pool Prize */
 	DRIVER( tetkiwam )	/* 2004.06 Tetris Kiwamemichi (Arcade TV Game List - P.88, Right, 11 from bottom) */
 	DRIVER( cfield )	/* 2004.06 Chaos Field */
 	DRIVER( trizeal )	/* 2004.09 Trizeal */
@@ -4524,14 +4529,14 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	/* Atomiswave (Dreamcast-based) games */
 	DRIVER( awbios )
 						/* 2002.12 Maximum Speed */
-	DRIVER( sprtshot )			/* 2002.12 Sports Shooting USA */
+	DRIVER( sprtshot )	/* 2002.12 Sports Shooting USA */
 						/* 2003.03 Guilty Gear X ver.1.5 */
 	DRIVER( demofist )	/* 2003.06 Demolish Fist */
 						/* 2003.08 Dolphin Blue */
 						/* 2003.12 Guilty Gear Isuka */
 						/* 2003.12 Sangoku Senki Shichisei Tensei (IGS) */
 						/* 2004.03 The Rumble Fish */
-	DRIVER( rangrmsn )			/* 2004.03 Ranger Mission */
+	DRIVER( rangrmsn )	/* 2004.03 Ranger Mission */
 						/* 2004.06 Salary Man Kintarou Net Select */
 						/* 2004.07 The King of Fighters Neo Wave */
 						/* 2004.09 Extreme Hunting */
@@ -4717,6 +4722,10 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* UX7 1984.12 Tokyo Mie Shinryoujo */
 						/* UX8 1985.01 Tokyo Mie Shinryoujo Part 2 */
 						/* UX9 1985.05 Geinoujin Shikaku Shiken */
+
+	/* Data East LD games */
+	DRIVER( cobra )		/* (c) 1984 */
+	DRIVER( rblaster )	/* (c) 1985 */
 
 	/* other Data East games */
 	DRIVER( madalien )	/* (c) 1980 */
@@ -5698,6 +5707,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( qwak )	 	/* (proto)          (c) 1982 */
 	DRIVER( runaway )	/* (proto)          (c) 1982 */
 	DRIVER( bullsdrt )	/* (c) 1985 Shinkai */
+	DRIVER( cmmb162 )
 
 	/* misc Atari games */
 	DRIVER( tunhunt )	/* 136000           (c) 1979 */
@@ -8897,6 +8907,7 @@ Other Sun games
 	DRIVER( witchcda )	/* 1991, Unknown */
 	DRIVER( witchcdb )	/* 1991, Unknown */
 	DRIVER( witchcdc )	/* 1991, Unknown */
+	DRIVER( witchcdd )	/* 1991, Unknown */
 	DRIVER( sloco93 )	/* 1993, Unknown */
 	DRIVER( sloco93a )	/* 1993, Unknown */
 	DRIVER( maverik )	/* 198?, Unknown */
@@ -9119,6 +9130,8 @@ Other Sun games
 
 	/* Dyna */
 	DRIVER( cb2001 )	/* (c) 2001 Dyna Electronics */
+	DRIVER( scherrym )	/* (c) 2001? Dyna Electronics */
+
 	DRIVER( ncb3 )		/* (c) 199? Dyna Electronics */
 	DRIVER( cb3a )		/* (c) 199? Dyna Electronics */
 	DRIVER( cb3 )		/* (c) 199? Dyna Electronics */

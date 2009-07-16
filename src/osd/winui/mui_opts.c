@@ -1390,12 +1390,12 @@ void SetFontDir(const char* paths)
 
 const char* GetCrosshairDir(void)
 {
-	return options_get_string(global, OPTION_CRSSHAIRPATH);
+	return options_get_string(global, OPTION_CROSSHAIRPATH);
 }
 
 void SetCrosshairDir(const char* paths)
 {
-	options_set_string(global, OPTION_CRSSHAIRPATH, paths, OPTION_PRIORITY_CMDLINE);
+	options_set_string(global, OPTION_CROSSHAIRPATH, paths, OPTION_PRIORITY_CMDLINE);
 }
 
 const char* GetFlyerDir(void)
