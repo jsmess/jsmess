@@ -35,6 +35,7 @@ Skeleton drivers:
 - DEC VT520
 - EC-65
 - EC-65K
+- Elektor Junior
 - Epson LX-800
 - Intel SDK-86
 - Jugend+Technik CompJU+TEr

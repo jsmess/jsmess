@@ -1443,5 +1443,6 @@ const game_driver * const drivers[] =
     DRIVER( jtces40 )
     DRIVER( ec65 )
     DRIVER( ec65k )
+    DRIVER( junior )
 
 #endif /* DRIVER_RECURSIVE */

@@ -276,6 +276,7 @@ DRVLIBS = \
 	$(MESSOBJ)/eaca.a \
 	$(MESSOBJ)/einis.a \
 	$(MESSOBJ)/elektrka.a \
+	$(MESSOBJ)/elektor.a \
 	$(MESSOBJ)/entex.a \
 	$(MESSOBJ)/epoch.a \
 	$(MESSOBJ)/epson.a \
@@ -797,6 +798,10 @@ $(MESSOBJ)/elektrka.a:			\
 	$(MESS_DRIVERS)/mk85.o		\
 	$(MESS_DRIVERS)/mk90.o		\
 
+$(MESSOBJ)/elektor.a:			\
+	$(MESS_DRIVERS)/ec65.o		\
+	$(MESS_DRIVERS)/junior.o	\
+	
 $(MESSOBJ)/entex.a:				\
 	$(MESS_VIDEO)/advision.o	\
 	$(MESS_MACHINE)/advision.o	\
@@ -1452,7 +1457,6 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/unior.o		\
 	$(MESS_DRIVERS)/tvc.o		\
 	$(MESS_DRIVERS)/mmd1.o		\
-	$(MESS_DRIVERS)/ec65.o		\
 
 #-------------------------------------------------
 # layout dependencies
