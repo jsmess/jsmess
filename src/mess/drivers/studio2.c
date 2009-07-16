@@ -372,13 +372,13 @@ static CDP1802_EF_READ( studio2_ef_r )
 	return ef;
 }
 
-static CDP1802_Q_WRITE( studio2_q_w )
+static WRITE_LINE_DEVICE_HANDLER( studio2_q_w )
 {
 	const device_config *speaker = devtag_get_device(device->machine, "beep");
-	beep_set_state(speaker, level);
+	beep_set_state(speaker, state);
 }
 
-static CDP1802_DMA_WRITE( studio2_dma_w )
+static WRITE8_DEVICE_HANDLER( studio2_dma_w )
 {
 	studio2_state *state = device->machine->driver_data;
 
@@ -390,9 +390,9 @@ static CDP1802_INTERFACE( studio2_config )
 	studio2_mode_r,
 	studio2_ef_r,
 	NULL,
-	studio2_q_w,
-	NULL,
-	studio2_dma_w
+	DEVCB_LINE(studio2_q_w),
+	DEVCB_NULL,
+	DEVCB_HANDLER(studio2_dma_w)
 };
 
 static CDP1802_EF_READ( mpt02_ef_r )
@@ -409,11 +409,11 @@ static CDP1802_EF_READ( mpt02_ef_r )
 	return ef;
 }
 
-static CDP1802_DMA_WRITE( mpt02_dma_w )
+static WRITE8_DEVICE_HANDLER( mpt02_dma_w )
 {
 	studio2_state *state = device->machine->driver_data;
 
-	UINT8 color = state->color_ram[ma / 4]; // 0x04 = R, 0x02 = B, 0x01 = G
+	UINT8 color = state->color_ram[offset / 4]; // 0x04 = R, 0x02 = B, 0x01 = G
 
 	int rdata = BIT(color, 2);
 	int gdata = BIT(color, 0);
@@ -427,9 +427,9 @@ static CDP1802_INTERFACE( mpt02_config )
 	studio2_mode_r,
 	mpt02_ef_r,
 	NULL,
-	studio2_q_w,
-	NULL,
-	mpt02_dma_w
+	DEVCB_LINE(studio2_q_w),
+	DEVCB_NULL,
+	DEVCB_HANDLER(mpt02_dma_w)
 };
 
 /* Machine Initialization */

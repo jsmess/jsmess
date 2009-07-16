@@ -236,7 +236,7 @@ static CDP1802_EF_READ( comx35_ef_r )
 	if (!state->cdp1871_efxa) flags -= EF3;
 
 	// cassette input, expansion device flag
-	if ((cassette_input(state->cassette) < +0.0) || !state->cdp1802_ef4) flags -= EF4;
+	if ((state->cassette && (cassette_input(state->cassette) < +0.0)) || !state->cdp1802_ef4) flags -= EF4;
 
 	return flags;
 }
@@ -280,20 +280,20 @@ static CDP1802_SC_WRITE( comx35_sc_w )
 	}
 }
 
-static CDP1802_Q_WRITE( comx35_q_w )
+static WRITE_LINE_DEVICE_HANDLER( comx35_q_w )
 {
-	comx35_state *state = device->machine->driver_data;
+	comx35_state *driver_state = device->machine->driver_data;
 
-	state->cdp1802_q = level;
+	driver_state->cdp1802_q = state;
 
-	if (state->iden && level)
+	if (driver_state->iden && state)
 	{
 		// enable interrupts
-		state->iden = 0;
+		driver_state->iden = 0;
 	}
 
 	// cassette output
-	cassette_output(state->cassette, level ? +1.0 : -1.0);
+	if (driver_state->cassette) cassette_output(driver_state->cassette, state ? +1.0 : -1.0);
 }
 
 static CDP1802_INTERFACE( comx35_cdp1802_config )
@@ -301,9 +301,9 @@ static CDP1802_INTERFACE( comx35_cdp1802_config )
 	comx35_mode_r,
 	comx35_ef_r,
 	comx35_sc_w,
-	comx35_q_w,
-	NULL,
-	NULL
+	DEVCB_LINE(comx35_q_w),
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 /* CDP1871 Interface */

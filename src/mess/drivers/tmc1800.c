@@ -485,15 +485,15 @@ static CDP1802_EF_READ( tmc1800_ef_r )
 	return flags;
 }
 
-static CDP1802_Q_WRITE( tmc1800_q_w )
+static WRITE_LINE_DEVICE_HANDLER( tmc1800_q_w )
 {
-	tmc1800_state *state = device->machine->driver_data;
+	tmc1800_state *driver_state = device->machine->driver_data;
 
 	/* tape output */
-	cassette_output(state->cassette, level ? 1.0 : -1.0);
+	cassette_output(driver_state->cassette, state ? 1.0 : -1.0);
 }
 
-static CDP1802_DMA_WRITE( tmc1800_dma_w )
+static WRITE8_DEVICE_HANDLER( tmc1800_dma_w )
 {
 	tmc1800_state *state = device->machine->driver_data;
 
@@ -505,9 +505,9 @@ static CDP1802_INTERFACE( tmc1800_config )
 	tmc1800_mode_r,
 	tmc1800_ef_r,
 	NULL,
-	tmc1800_q_w,
-	NULL,
-	tmc1800_dma_w
+	DEVCB_LINE(tmc1800_q_w),
+	DEVCB_NULL,
+	DEVCB_HANDLER(tmc1800_dma_w)
 };
 
 static CDP1802_INTERFACE( osc1000b_config )
@@ -515,9 +515,9 @@ static CDP1802_INTERFACE( osc1000b_config )
 	tmc1800_mode_r,
 	tmc1800_ef_r,
 	NULL,
-	tmc1800_q_w,
-	NULL,
-	NULL
+	DEVCB_LINE(tmc1800_q_w),
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 // Telmac 2000
@@ -572,25 +572,25 @@ static CDP1802_EF_READ( tmc2000_ef_r )
 	return flags;
 }
 
-static CDP1802_Q_WRITE( tmc2000_q_w )
+static WRITE_LINE_DEVICE_HANDLER( tmc2000_q_w )
 {
-	tmc2000_state *state = device->machine->driver_data;
+	tmc2000_state *driver_state = device->machine->driver_data;
 
 	/* CDP1864 audio output enable */
-	cdp1864_aoe_w(state->cdp1864, level);
+	cdp1864_aoe_w(driver_state->cdp1864, state);
 
 	/* set Q led status */
-	set_led_status(1, level);
+	set_led_status(1, state);
 
 	/* tape output */
-	cassette_output(state->cassette, level ? 1.0 : -1.0);
+	cassette_output(driver_state->cassette, state ? 1.0 : -1.0);
 }
 
-static CDP1802_DMA_WRITE( tmc2000_dma_w )
+static WRITE8_DEVICE_HANDLER( tmc2000_dma_w )
 {
 	tmc2000_state *state = device->machine->driver_data;
 
-	UINT8 color = ~(state->colorram[ma & 0x1ff]) & 0x07;
+	UINT8 color = ~(state->colorram[offset & 0x1ff]) & 0x07;
 	
 	int rdata = BIT(color, 2);
 	int gdata = BIT(color, 0);
@@ -604,9 +604,9 @@ static CDP1802_INTERFACE( tmc2000_config )
 	tmc2000_mode_r,
 	tmc2000_ef_r,
 	NULL,
-	tmc2000_q_w,
-	NULL,
-	tmc2000_dma_w
+	DEVCB_LINE(tmc2000_q_w),
+	DEVCB_NULL,
+	DEVCB_HANDLER(tmc2000_dma_w)
 };
 
 // OSCOM Nano
@@ -688,21 +688,21 @@ static CDP1802_EF_READ( oscnano_ef_r )
 	return flags;
 }
 
-static CDP1802_Q_WRITE( oscnano_q_w )
+static WRITE_LINE_DEVICE_HANDLER( oscnano_q_w )
 {
-	oscnano_state *state = device->machine->driver_data;
+	oscnano_state *driver_state = device->machine->driver_data;
 
 	/* CDP1864 audio output enable */
-	cdp1864_aoe_w(state->cdp1864, level);
+	cdp1864_aoe_w(driver_state->cdp1864, state);
 
 	/* set Q led status */
-	set_led_status(1, level);
+	set_led_status(1, state);
 
 	/* tape output */
-	cassette_output(state->cassette, level ? 1.0 : -1.0);
+	cassette_output(driver_state->cassette, state ? 1.0 : -1.0);
 }
 
-static CDP1802_DMA_WRITE( oscnano_dma_w )
+static WRITE8_DEVICE_HANDLER( oscnano_dma_w )
 {
 	oscnano_state *state = device->machine->driver_data;
 
@@ -714,9 +714,9 @@ static CDP1802_INTERFACE( oscnano_config )
 	oscnano_mode_r,
 	oscnano_ef_r,
 	NULL,
-	oscnano_q_w,
-	NULL,
-	oscnano_dma_w
+	DEVCB_LINE(oscnano_q_w),
+	DEVCB_NULL,
+	DEVCB_HANDLER(oscnano_dma_w)
 };
 
 /* Machine Initialization */

@@ -505,28 +505,28 @@ static CDP1802_EF_READ( vip_ef_r )
 	return flags;
 }
 
-static CDP1802_Q_WRITE( vip_q_w )
+static WRITE_LINE_DEVICE_HANDLER( vip_q_w )
 {
 	const device_config *discrete = devtag_get_device(device->machine, "discrete");
-	vip_state *state = device->machine->driver_data;
+	vip_state *driver_state = device->machine->driver_data;
 
 	/* sound output */
-	discrete_sound_w(discrete, NODE_01, level);
+	discrete_sound_w(discrete, NODE_01, state);
 
 	if (input_port_read(device->machine, "SOUND") == VIP_SOUND_CDP1863)
 	{
 		/* CDP1863 output enable */
-		cdp1863_oe_w(state->cdp1863, level);
+		cdp1863_oe_w(driver_state->cdp1863, state);
 	}
 
 	/* Q led */
-	set_led_status(VIP_LED_Q, level);
+	set_led_status(VIP_LED_Q, state);
 
 	/* tape output */
-	cassette_output(state->cassette, level ? 1.0 : -1.0);
+	cassette_output(driver_state->cassette, state ? 1.0 : -1.0);
 }
 
-static CDP1802_DMA_WRITE( vip_dma_w )
+static WRITE8_DEVICE_HANDLER( vip_dma_w )
 {
 	vip_state *state = device->machine->driver_data;
 
@@ -538,7 +538,7 @@ static CDP1802_DMA_WRITE( vip_dma_w )
 
 	case VIP_VIDEO_CDP1862:
 		{
-			UINT8 color = state->colorram[ma & 0xff];
+			UINT8 color = state->colorram[offset & 0xff];
 			
 			int rdata = BIT(color, 0);
 			int gdata = BIT(color, 2);
@@ -555,9 +555,9 @@ static CDP1802_INTERFACE( vip_config )
 	vip_mode_r,
 	vip_ef_r,
 	NULL,
-	vip_q_w,
-	NULL,
-	vip_dma_w
+	DEVCB_LINE(vip_q_w),
+	DEVCB_NULL,
+	DEVCB_HANDLER(vip_dma_w)
 };
 
 /* Machine Initialization */

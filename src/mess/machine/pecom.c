@@ -137,9 +137,9 @@ static CDP1802_EF_READ( pecom64_ef_r )
 	return flags;
 }
 
-static CDP1802_Q_WRITE( pecom64_q_w )
+static WRITE_LINE_DEVICE_HANDLER( pecom64_q_w )
 {	
-	cassette_output(cassette_device_image(device->machine), level ? -1.0 : +1.0);
+	cassette_output(cassette_device_image(device->machine), state ? -1.0 : +1.0);
 }
 
 static CDP1802_SC_WRITE( pecom64_sc_w )
@@ -167,7 +167,7 @@ CDP1802_INTERFACE( pecom64_cdp1802_config )
 	pecom64_mode_r,
 	pecom64_ef_r,
 	pecom64_sc_w,
-	pecom64_q_w,
-	NULL,
-	NULL
+	DEVCB_LINE(pecom64_q_w),
+	DEVCB_NULL,
+	DEVCB_NULL
 };

@@ -246,11 +246,11 @@ static CDP1802_EF_READ( tmc600_ef_r )
 	return flags;
 }
 
-static CDP1802_Q_WRITE( tmc600_q_w )
+static WRITE_LINE_DEVICE_HANDLER( tmc600_q_w )
 {
-	tmc600_state *state = device->machine->driver_data;
+	tmc600_state *driver_state = device->machine->driver_data;
 
-	cassette_output(state->cassette, level ? +1.0 : -1.0);
+	cassette_output(driver_state->cassette, state ? +1.0 : -1.0);
 }
 
 static CDP1802_INTERFACE( tmc600_cdp1802_config )
@@ -258,9 +258,9 @@ static CDP1802_INTERFACE( tmc600_cdp1802_config )
 	tmc600_mode_r,
 	tmc600_ef_r,
 	NULL,
-	tmc600_q_w,
-	NULL,
-	NULL
+	DEVCB_LINE(tmc600_q_w),
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 /* Machine Initialization */
