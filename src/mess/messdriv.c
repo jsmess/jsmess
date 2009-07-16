@@ -1445,5 +1445,6 @@ const game_driver * const drivers[] =
     DRIVER( ec65k )
     DRIVER( junior )
     DRIVER( beta )
+    DRIVER( elf2 )
 
 #endif /* DRIVER_RECURSIVE */

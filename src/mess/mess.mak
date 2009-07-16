@@ -463,6 +463,7 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_VIDEO)/cdp1864.o		\
 	$(MESS_VIDEO)/crtc6845.o	\
 	$(MESS_VIDEO)/dl1416.o		\
+	$(MESS_VIDEO)/dm9368.o		\
 	$(MESS_VIDEO)/hd44102.o		\
 	$(MESS_VIDEO)/hd61830.o		\
 	$(MESS_VIDEO)/hd66421.o		\
@@ -1009,6 +1010,7 @@ $(MESSOBJ)/nec.a:				\
 	$(MESS_DRIVERS)/pc98.o		\
 
 $(MESSOBJ)/netronic.a:			\
+	$(MESS_DRIVERS)/elf.o		\
 	$(MESS_DRIVERS)/exp85.o		\
 
 $(MESSOBJ)/nintendo.a:			\
@@ -1471,6 +1473,7 @@ $(MESS_DRIVERS)/amico2k.o:	$(MESS_LAYOUT)/amico2k.lh
 $(MESS_DRIVERS)/bob85.o:	$(MESS_LAYOUT)/bob85.lh
 $(MESS_DRIVERS)/coco.o:		$(MESS_LAYOUT)/coco3.lh
 $(MESS_DRIVERS)/c80.o:		$(MESS_LAYOUT)/c80.lh
+$(MESS_DRIVERS)/elf.o:		$(MESS_LAYOUT)/elf2.lh
 $(MESS_DRIVERS)/ex800.o:	$(MESS_LAYOUT)/ex800.lh
 $(MESS_DRIVERS)/glasgow.o:	$(MESS_LAYOUT)/glasgow.lh
 $(MESS_DRIVERS)/kim1.o:		$(MESS_LAYOUT)/kim1.lh
