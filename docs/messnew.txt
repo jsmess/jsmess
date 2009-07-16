@@ -33,6 +33,8 @@ Skeleton drivers:
 - DEC VT220
 - DEC VT320
 - DEC VT520
+- EC-65
+- EC-65K
 - Epson LX-800
 - Intel SDK-86
 - Jugend+Technik CompJU+TEr

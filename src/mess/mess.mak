@@ -1452,6 +1452,7 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/unior.o		\
 	$(MESS_DRIVERS)/tvc.o		\
 	$(MESS_DRIVERS)/mmd1.o		\
+	$(MESS_DRIVERS)/ec65.o		\
 
 #-------------------------------------------------
 # layout dependencies
