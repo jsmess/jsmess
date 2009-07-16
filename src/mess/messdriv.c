@@ -1446,5 +1446,6 @@ const game_driver * const drivers[] =
     DRIVER( junior )
     DRIVER( beta )
     DRIVER( elf2 )
+    DRIVER( pippin )
 
 #endif /* DRIVER_RECURSIVE */

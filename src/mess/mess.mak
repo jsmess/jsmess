@@ -1460,6 +1460,7 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/tvc.o		\
 	$(MESS_DRIVERS)/mmd1.o		\
 	$(MESS_DRIVERS)/beta.o		\
+	$(MESS_DRIVERS)/pippin.o		\
 
 #-------------------------------------------------
 # layout dependencies
