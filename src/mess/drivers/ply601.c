@@ -12,6 +12,8 @@
 
 static UINT8 rom_page;
 
+static UINT32 vdisk_addr = 0;
+
 static READ8_HANDLER (rom_page_r)
 {
 	return rom_page;
@@ -28,6 +30,37 @@ static WRITE8_HANDLER (rom_page_w)
     	memory_set_bankptr(space->machine, 2, mess_ram + 0xc000);
 	}	
 } 
+
+
+static WRITE8_HANDLER (vdisk_page_w)
+{
+	vdisk_addr = (vdisk_addr & 0x0ffff) | ((data & 0x0f)<<16); 
+}
+
+static WRITE8_HANDLER (vdisk_h_w)
+{
+	vdisk_addr = (vdisk_addr & 0xf00ff) | (data<<8); 
+}
+
+static WRITE8_HANDLER (vdisk_l_w)
+{
+	vdisk_addr = (vdisk_addr & 0xfff00) | data; 
+}
+
+static WRITE8_HANDLER (vdisk_data_w)
+{
+	mess_ram[0x10000 + (vdisk_addr & 0x7ffff)] = data;
+	vdisk_addr++;
+	vdisk_addr&=0x7ffff;
+}
+
+static READ8_HANDLER (vdisk_data_r)
+{
+	UINT8 retVal = mess_ram[0x10000 + (vdisk_addr & 0x7ffff)];
+	vdisk_addr++;
+	vdisk_addr&=0x7ffff;
+	return retVal;
+}
     
 static ADDRESS_MAP_START(ply601_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -38,6 +71,10 @@ static ADDRESS_MAP_START(ply601_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0xe601, 0xe601 ) AM_DEVREADWRITE("crtc", mc6845_register_r , mc6845_register_w)
 	AM_RANGE( 0xe604, 0xe604 ) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE( 0xe605, 0xe605 ) AM_DEVREADWRITE("crtc", mc6845_register_r , mc6845_register_w)
+	AM_RANGE( 0xe680, 0xe680 ) AM_WRITE(vdisk_page_w)
+	AM_RANGE( 0xe681, 0xe681 ) AM_WRITE(vdisk_h_w)
+	AM_RANGE( 0xe682, 0xe682 ) AM_WRITE(vdisk_l_w)
+	AM_RANGE( 0xe683, 0xe683 ) AM_READWRITE(vdisk_data_r,vdisk_data_w)
 	AM_RANGE( 0xe6f0, 0xe6f0 ) AM_READWRITE(rom_page_r, rom_page_w)
 	AM_RANGE( 0xe700, 0xefff ) AM_RAMBANK(4)
 	AM_RANGE( 0xf000, 0xffff ) AM_READWRITE(SMH_BANK(5), SMH_BANK(6))
@@ -138,7 +175,7 @@ static MACHINE_DRIVER_START( ply601 )
 MACHINE_DRIVER_END
 
 static SYSTEM_CONFIG_START(ply601)
-	CONFIG_RAM_DEFAULT(64 * 1024)
+	CONFIG_RAM_DEFAULT((64 +512) * 1024)
 SYSTEM_CONFIG_END
 
 /* ROM definition */
