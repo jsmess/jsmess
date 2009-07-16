@@ -29,7 +29,7 @@
 
 static WRITE8_HANDLER( digit_w )
 {
-	elf_state *state = space->machine->driver_data;
+//	elf_state *state = space->machine->driver_data;
 
 	output_set_digit_value(0, 0xff);
 	output_set_digit_value(1, 0xff);
