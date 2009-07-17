@@ -1454,7 +1454,7 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/sys2900.o	\
 	$(MESS_DRIVERS)/xor100.o	\
 	$(MESS_DRIVERS)/iq151.o		\
-	$(MESS_DRIVERS)/ply601.o	\
+	$(MESS_DRIVERS)/pyl601.o	\
 	$(MESS_DRIVERS)/nanos.o		\
 	$(MESS_DRIVERS)/beehive.o	\
 	$(MESS_DRIVERS)/unior.o		\
