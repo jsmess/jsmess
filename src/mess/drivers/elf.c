@@ -8,7 +8,6 @@
 
 	TODO:
 
-	- TTL74C923
 	- keyboard
 	- Q led
 	- DMAIN
@@ -20,9 +19,11 @@
 #include "driver.h"
 #include "includes/elf.h"
 #include "cpu/cdp1802/cdp1802.h"
+#include "devices/cassette.h"
+#include "machine/mm74c922.h"
 #include "video/cdp1861.h"
 #include "video/dm9368.h"
-#include "devices/cassette.h"
+#include "machine/rescap.h"
 #include "elf2.lh"
 
 /* Read/Write Handlers */
@@ -174,6 +175,24 @@ static CDP1802_INTERFACE( elf2_config )
 	DEVCB_HANDLER(elf2_dma_w)
 };
 
+/* MM74C923 Interface */
+
+static WRITE_LINE_DEVICE_HANDLER( mm74c923_da_w )
+{
+}
+
+static MM74C922_INTERFACE( keyboard_intf )
+{
+	DEVCB_INPUT_PORT("X1"),
+	DEVCB_INPUT_PORT("X2"),
+	DEVCB_INPUT_PORT("X3"),
+	DEVCB_INPUT_PORT("X4"),
+	DEVCB_NULL,
+	DEVCB_LINE(mm74c923_da_w),
+	CAP_U(0.15),
+	CAP_U(1)
+};
+
 /* CDP1861 Interface */
 
 static VIDEO_UPDATE( elf2 )
@@ -209,7 +228,7 @@ static MACHINE_START( elf2 )
 
 	/* find devices */
 	state->cdp1861 = devtag_get_device(machine, CDP1861_TAG);
-	state->_74c923 = devtag_get_device(machine, _74C923_TAG);
+	state->mm74c923 = devtag_get_device(machine, MM74C923_TAG);
 	state->dm9368_l = devtag_get_device(machine, DM9368_L_TAG);
 	state->dm9368_h = devtag_get_device(machine, DM9368_H_TAG);
 	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
@@ -248,6 +267,7 @@ static MACHINE_DRIVER_START( elf2 )
 	MDRV_PALETTE_INIT(black_and_white)
 	MDRV_VIDEO_UPDATE(elf2)
 
+	MDRV_MM74C923_ADD(MM74C923_TAG, keyboard_intf)
 	MDRV_DM9368_ADD(DM9368_H_TAG, 0, NULL)
 	MDRV_DM9368_ADD(DM9368_L_TAG, 1, NULL)
 	MDRV_CDP1861_ADD(CDP1861_TAG, XTAL_3_579545MHz/2, elf2_cdp1861_intf)
