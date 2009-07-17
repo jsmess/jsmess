@@ -1,5 +1,5 @@
-#ifndef __ELF__
-#define __ELF__
+#ifndef __INCLUDES_ELF__
+#define __INCLUDES_ELF__
 
 #define SCREEN_TAG		"screen"
 #define CDP1802_TAG		"a6"
