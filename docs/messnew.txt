@@ -5,6 +5,7 @@ New System Drivers Supported (in no particular order):
 - Canon Cat [Miodrag Milanovic]
 - MMD-1 [Miodrag Milanovic]
 - Nuova Elettronica Z80NE + LX.388 + LX.390  [Roberto Lavarone]
+- Netronics Elf II [Curt Coder]
 
 
 
