@@ -7,6 +7,15 @@
 
 **********************************************************************/
 
+/*
+
+	TODO:
+	
+	- update frequency from interface capacitor value
+	- debounce from interface capacitor value
+
+*/
+
 #include "driver.h"
 #include "mm74c922.h"
 
@@ -14,7 +23,7 @@
     PARAMETERS
 ***************************************************************************/
 
-#define LOG 1
+#define LOG 0
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -26,18 +35,18 @@ struct _mm74c922_t
 	devcb_resolved_read8		in_x_func[5];
 	devcb_resolved_write_line	out_da_func;
 
-	int inhibit;					/* scan counter clock inhibit */
-	int x;							/* currently scanned column */
-	int y;							/* latched row */
-	int max_y;						/* number of rows */
+	int inhibit;				/* scan counter clock inhibit */
+	int x;						/* currently scanned column */
+	int y;						/* latched row */
+	int max_y;					/* number of rows */
 
-	UINT8 data;						/* data latch */
+	UINT8 data;					/* data latch */
 
-	int da;							/* data available flag */
-	int next_da;					/* next value of data available flag */
+	int da;						/* data available flag */
+	int next_da;				/* next value of data available flag */
 
 	/* timers */
-	emu_timer *scan_timer;			/* keyboard scan timer */
+	emu_timer *scan_timer;		/* keyboard scan timer */
 };
 
 /***************************************************************************

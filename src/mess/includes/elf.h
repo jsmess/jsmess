@@ -9,14 +9,12 @@
 #define DM9368_H_TAG	"a8"
 #define CASSETTE_TAG	"cassette"
 
-typedef struct _elf_state elf_state;
-struct _elf_state
+typedef struct _elf2_state elf2_state;
+struct _elf2_state
 {
-	/* keyboard state */
-	int keylatch;
-
 	/* display state */
 	int cdp1861_efx;				/* EFx */
+	UINT8 data;
 
 	/* devices */
 	const device_config *cdp1861;

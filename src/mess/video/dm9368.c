@@ -70,6 +70,8 @@ WRITE8_DEVICE_HANDLER( dm9368_w )
 
 	if (!dm9368->rbi && !a)
 	{
+		if (LOG) logerror("DM9368 '%s' Blanked Rippling Zero\n", device->tag);
+
 		/* blank rippling 0 */
 		output_set_digit_value(dm9368->digit, 0);
 
@@ -80,7 +82,9 @@ WRITE8_DEVICE_HANDLER( dm9368_w )
 	}
 	else
 	{
-		output_set_digit_value(dm9368->digit, ~OUTPUT[a]);
+		if (LOG) logerror("DM9368 '%s' Output Data: %u = %02x\n", device->tag, a, OUTPUT[a]);
+
+		output_set_digit_value(dm9368->digit, OUTPUT[a]);
 
 		if (dm9368->rbo_device)
 		{
@@ -98,6 +102,8 @@ WRITE_LINE_DEVICE_HANDLER( dm9368_rbi_w )
 	dm9368_t *dm9368 = get_safe_token(device);
 
 	dm9368->rbi = state;
+
+	if (LOG) logerror("DM9368 '%s' Ripple Blanking Input: %u\n", device->tag, state);
 }
 
 /*-------------------------------------------------

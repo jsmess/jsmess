@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    Netronics Elf-II
+    Netronics Elf II
 
 ****************************************************************************/
 
@@ -8,11 +8,7 @@
 
 	TODO:
 
-	- keyboard
-	- Q led
-	- DMAIN
-	- memory protect
-	- 7 segment displays
+	- proper layout
 
 */
 
@@ -20,32 +16,80 @@
 #include "includes/elf.h"
 #include "cpu/cdp1802/cdp1802.h"
 #include "devices/cassette.h"
+#include "devices/snapquik.h"
 #include "machine/mm74c922.h"
 #include "video/cdp1861.h"
 #include "video/dm9368.h"
 #include "machine/rescap.h"
 #include "elf2.lh"
 
+#define RUN(_machine)				BIT(input_port_read((_machine), "SPECIAL"), 0)
+#define LOAD(_machine)				BIT(input_port_read((_machine), "SPECIAL"), 1)
+#define MEMORY_PROTECT(_machine)	BIT(input_port_read((_machine), "SPECIAL"), 2)
+#define INPUT(_machine)				BIT(input_port_read((_machine), "SPECIAL"), 3)
+
+static QUICKLOAD_LOAD( elf );
+
 /* Read/Write Handlers */
 
-static WRITE8_HANDLER( digit_w )
+static READ8_DEVICE_HANDLER( dispon_r )
 {
-//	elf_state *state = space->machine->driver_data;
+	cdp1861_dispon_w(device, 1);
+	cdp1861_dispon_w(device, 0);
 
-	output_set_digit_value(0, 0xff);
-	output_set_digit_value(1, 0xff);
+	return 0xff;
+}
+
+static READ8_HANDLER( data_r )
+{
+	elf2_state *state = space->machine->driver_data;
+
+	return state->data;
+}
+
+static WRITE8_HANDLER( data_w )
+{
+	elf2_state *state = space->machine->driver_data;
+
+	dm9368_w(state->dm9368_l, 0, data & 0x0f);
+	dm9368_w(state->dm9368_h, 0, data >> 4);
+}
+
+static WRITE8_HANDLER( memory_w )
+{
+	elf2_state *state = space->machine->driver_data;
+
+	if (LOAD(space->machine))
+	{
+		if (MEMORY_PROTECT(space->machine))
+		{
+			/* latch data from memory */
+			data = mess_ram[offset];
+		}
+		else
+		{
+			/* write latched data to memory */
+			mess_ram[offset] = data;
+		}
+
+		/* write data to 7 segment displays */
+		dm9368_w(state->dm9368_l, 0, data & 0x0f);
+		dm9368_w(state->dm9368_h, 0, data >> 4);
+	}
 }
 
 /* Memory Maps */
 
 static ADDRESS_MAP_START( elf2_mem, ADDRESS_SPACE_PROGRAM, 8 )
+	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x0000, 0x00ff) AM_RAM
+	AM_RANGE(0x0000, 0x00ff) AM_RAMBANK(1)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( elf2_io, ADDRESS_SPACE_IO, 8 )
-//	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(CDP1861_TAG, vip_cdp1861_dispon_r, vip_cdp1861_dispoff_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE(digit_w)
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x01, 0x01) AM_DEVREAD(CDP1861_TAG, dispon_r)
+	AM_RANGE(0x04, 0x04) AM_READWRITE(data_r, data_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -54,6 +98,7 @@ static INPUT_CHANGED( input_w )
 {
 	if (newval)
 	{
+		/* assert DMAIN */
 		cputag_set_input_line(field->port->machine, CDP1802_TAG, CDP1802_INPUT_LINE_DMAIN, ASSERT_LINE);
 	}
 }
@@ -91,26 +136,21 @@ static INPUT_PORTS_START( elf2 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("RUN") PORT_CODE(KEYCODE_R) PORT_TOGGLE
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("LOAD") PORT_CODE(KEYCODE_L) PORT_TOGGLE
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("M/P") PORT_CODE(KEYCODE_M) PORT_TOGGLE
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("INPUT") PORT_CODE(KEYCODE_R) PORT_CHANGED(input_w, 0)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("INPUT") PORT_CODE(KEYCODE_ENTER) PORT_CHANGED(input_w, 0)
 INPUT_PORTS_END
 
 /* CDP1802 Configuration */
 
 static CDP1802_MODE_READ( elf2_mode_r )
 {
-//	elf_state *state = device->machine->driver_data;
-
-	UINT8 special = input_port_read(device->machine, "SPECIAL");
-	int run = BIT(special, 0);
-	int load = !BIT(special, 1);
 	cdp1802_control_mode mode = CDP1802_MODE_RESET;
 
-	switch ((run << 1) | load)
+	switch ((RUN(device->machine) << 1) | !LOAD(device->machine))
 	{
-	case 0: mode = CDP1802_MODE_LOAD; break;
-	case 1: mode = CDP1802_MODE_RESET; break;
-	case 2: mode = CDP1802_MODE_PAUSE; break;
-	case 3: mode = CDP1802_MODE_RUN; break;
+	case 0: mode = CDP1802_MODE_LOAD;	popmessage("LOAD");		break;
+	case 1: mode = CDP1802_MODE_RESET;	popmessage("RESET");	break;
+	case 2: mode = CDP1802_MODE_PAUSE;	popmessage("PAUSE");	break;
+	case 3: mode = CDP1802_MODE_RUN;	popmessage("RUN");		break;
 	}
 
 	return mode;
@@ -122,26 +162,27 @@ static CDP1802_EF_READ( elf2_ef_r )
         EF1     CDP1861
         EF2     
         EF3     
-        EF4     
+        EF4     input switch
     */
 
-	elf_state *state = device->machine->driver_data;
+	elf2_state *state = device->machine->driver_data;
 
 	UINT8 flags = 0x0f;
 
 	/* CDP1861 */
 	if (state->cdp1861_efx) flags -= EF1;
 
+	/* input switch */
+	if (!INPUT(device->machine)) flags -= EF4;
+
 	return flags;
 }
 
 static CDP1802_SC_WRITE( elf2_sc_w )
 {
-//	elf_state *driver_state = device->machine->driver_data;
-
-	if (state == CDP1802_STATE_CODE_S2_DMA)
+	if (sc1)
 	{
-		// DMA acknowledge clears the DMAOUT request
+		/* clear DMAIN */
 		cputag_set_input_line(device->machine, CDP1802_TAG, CDP1802_INPUT_LINE_DMAIN, CLEAR_LINE);
 	}
 }
@@ -153,14 +194,14 @@ static WRITE_LINE_DEVICE_HANDLER( elf2_q_w )
 
 static READ8_DEVICE_HANDLER( elf2_dma_r )
 {
-//	elf_state *state = device->machine->driver_data;
+	elf2_state *state = device->machine->driver_data;
 
-	return 0;
+	return state->data;
 }
 
 static WRITE8_DEVICE_HANDLER( elf2_dma_w )
 {
-	elf_state *state = device->machine->driver_data;
+	elf2_state *state = device->machine->driver_data;
 
 	cdp1861_dma_w(state->cdp1861, data);
 }
@@ -179,6 +220,21 @@ static CDP1802_INTERFACE( elf2_config )
 
 static WRITE_LINE_DEVICE_HANDLER( mm74c923_da_w )
 {
+	elf2_state *driver_state = device->machine->driver_data;
+
+	if (state)
+	{
+		/* shift keyboard data to latch */
+		driver_state->data <<= 4;
+		driver_state->data |= mm74c922_r(device, 0) & 0x0f;
+
+		if (LOAD(device->machine))
+		{
+			/* write data to 7 segment displays */
+			dm9368_w(driver_state->dm9368_l, 0, driver_state->data & 0x0f);
+			dm9368_w(driver_state->dm9368_h, 0, driver_state->data >> 4);
+		}
+	}
 }
 
 static MM74C922_INTERFACE( keyboard_intf )
@@ -197,7 +253,7 @@ static MM74C922_INTERFACE( keyboard_intf )
 
 static VIDEO_UPDATE( elf2 )
 {
-	elf_state *state = screen->machine->driver_data;
+	elf2_state *state = screen->machine->driver_data;
 
 	cdp1861_update(state->cdp1861, bitmap, cliprect);
 
@@ -206,7 +262,7 @@ static VIDEO_UPDATE( elf2 )
 
 static WRITE_LINE_DEVICE_HANDLER( elf2_efx_w )
 {
-	elf_state *driver_state = device->machine->driver_data;
+	elf2_state *driver_state = device->machine->driver_data;
 
 	driver_state->cdp1861_efx = state;
 }
@@ -224,7 +280,8 @@ static CDP1861_INTERFACE( elf2_cdp1861_intf )
 
 static MACHINE_START( elf2 )
 {
-	elf_state *state = machine->driver_data;
+	elf2_state *state = machine->driver_data;
+	const address_space *program = cputag_get_address_space(machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM);
 
 	/* find devices */
 	state->cdp1861 = devtag_get_device(machine, CDP1861_TAG);
@@ -233,8 +290,18 @@ static MACHINE_START( elf2 )
 	state->dm9368_h = devtag_get_device(machine, DM9368_H_TAG);
 	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
 
+	/* initialize LED displays */
+	dm9368_rbi_w(state->dm9368_l, 1);
+	dm9368_rbi_w(state->dm9368_h, 1);
+
+	/* setup memory banking */
+	memory_install_readwrite8_handler(program, 0x0000, 0x00ff, 0, 0, SMH_BANK(1), memory_w);
+	memory_configure_bank(machine, 1, 0, 1, mess_ram, 0);
+	memory_set_bank(machine, 1, 0);
+
 	/* register for state saving */
-//	state_save_register_global(machine, state->);
+	state_save_register_global(machine, state->cdp1861_efx);
+	state_save_register_global(machine, state->data);
 }
 
 /* Machine Driver */
@@ -247,7 +314,7 @@ static const cassette_config elf_cassette_config =
 };
 
 static MACHINE_DRIVER_START( elf2 )
-	MDRV_DRIVER_DATA(elf_state)
+	MDRV_DRIVER_DATA(elf2_state)
 
 	/* basic machine hardware */
     MDRV_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_3_579545MHz/2)
@@ -274,6 +341,7 @@ static MACHINE_DRIVER_START( elf2 )
 
 	/* devices */
 	MDRV_CASSETTE_ADD(CASSETTE_TAG, elf_cassette_config)
+	MDRV_QUICKLOAD_ADD("quickload", elf, "bin", 0)
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -284,11 +352,25 @@ ROM_END
 
 /* System Configuration */
 
+static QUICKLOAD_LOAD( elf )
+{
+	int size = image_length(image);
+
+	if (size > mess_ram_size)
+	{
+		return INIT_FAIL;
+	}
+
+	image_fread(image, mess_ram, size);
+
+	return INIT_PASS;
+}
+
 static SYSTEM_CONFIG_START( elf2 )
-	CONFIG_RAM_DEFAULT( 1 * 1024 )
+	CONFIG_RAM_DEFAULT( 256 )
 SYSTEM_CONFIG_END
 
 /* System Drivers */
 
 /*    YEAR	NAME	PARENT	COMPAT	MACHINE	INPUT	INIT	CONFIG	COMPANY			FULLNAME	FLAGS */
-COMP( 1978, elf2,	0,		0,		elf2,	elf2,	0,		elf2,	"Netronics",	"Elf-II",	GAME_NOT_WORKING )
+COMP( 1978, elf2,	0,		0,		elf2,	elf2,	0,		elf2,	"Netronics",	"Elf II",	GAME_NOT_WORKING )
