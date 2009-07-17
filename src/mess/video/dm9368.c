@@ -112,7 +112,10 @@ static DEVICE_START( dm9368 )
 	dm9368->digit = config->digit;
 
 	/* get the screen device */
-	dm9368->rbo_device = devtag_get_device(device->machine, config->rbo_tag);
+	if (config->rbo_tag)
+	{
+		dm9368->rbo_device = devtag_get_device(device->machine, config->rbo_tag);
+	}
 
 	/* register for state saving */
 	state_save_register_device_item(device, 0, dm9368->latch);
