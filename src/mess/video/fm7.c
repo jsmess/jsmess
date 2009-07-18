@@ -170,7 +170,12 @@ static void fm7_alu_function_compare(UINT32 offset)
 	UINT8 bit = 0x80;
 	
 	if(offset >= 0xc000)
+	{
 		page = 1;
+		offset += fm7_video.vram_offset2;
+	}
+	else
+		offset += fm7_video.vram_offset;
 	
 	blue = fm7_video_ram[(offset & 0x3fff) + (page * 0xc000)];
 	red = fm7_video_ram[(offset & 0x3fff) + 0x4000 + (page * 0xc000)];
@@ -253,7 +258,12 @@ static void fm7_alu_function_or(UINT32 offset)
 		fm7_alu_function_compare(offset);
 	
 	if(offset >= 0xc000)
+	{
 		page = 1;
+		offset += fm7_video.vram_offset2;
+	}
+	else
+		offset += fm7_video.vram_offset;
 	
 	for(x=0;x<3;x++) // cycle through banks
 	{
@@ -287,7 +297,12 @@ static void fm7_alu_function_and(UINT32 offset)
 		fm7_alu_function_compare(offset);
 	
 	if(offset >= 0xc000)
+	{
 		page = 1;
+		offset += fm7_video.vram_offset2;
+	}
+	else
+		offset += fm7_video.vram_offset;
 	
 	for(x=0;x<3;x++) // cycle through banks
 	{
@@ -321,7 +336,12 @@ static void fm7_alu_function_xor(UINT32 offset)
 		fm7_alu_function_compare(offset);
 	
 	if(offset >= 0xc000)
+	{
 		page = 1;
+		offset += fm7_video.vram_offset2;
+	}
+	else
+		offset += fm7_video.vram_offset;
 	
 	for(x=0;x<3;x++) // cycle through banks
 	{
@@ -355,7 +375,12 @@ static void fm7_alu_function_not(UINT32 offset)
 		fm7_alu_function_compare(offset);
 	
 	if(offset >= 0xc000)
+	{
 		page = 1;
+		offset += fm7_video.vram_offset2;
+	}
+	else
+		offset += fm7_video.vram_offset;
 	
 	for(x=0;x<3;x++) // cycle through banks
 	{
@@ -390,7 +415,12 @@ static void fm7_alu_function_invalid(UINT32 offset)
 		fm7_alu_function_compare(offset);
 	
 	if(offset >= 0xc000)
+	{
 		page = 1;
+		offset += fm7_video.vram_offset2;
+	}
+	else
+		offset += fm7_video.vram_offset;
 	
 	for(x=0;x<3;x++) // cycle through banks
 	{
@@ -417,7 +447,12 @@ static void fm7_alu_function_tilepaint(UINT32 offset)
 		fm7_alu_function_compare(offset);
 	
 	if(offset >= 0xc000)
+	{
 		page = 1;
+		offset += fm7_video.vram_offset2;
+	}
+	else
+		offset += fm7_video.vram_offset;
 	
 	for(x=0;x<3;x++) // cycle through banks
 	{

@@ -2047,5 +2047,5 @@ SYSTEM_CONFIG_END
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT   INIT  CONFIG  COMPANY      FULLNAME        FLAGS */
 COMP( 1982, fm7,      0,      0,      fm7,     fm7,    fm7,  fm7,    "Fujitsu",   "FM-7",         0)
-COMP( 1985, fm77av,   fm7,    0,      fm77av,  fm7,    fm7,  fm7,    "Fujitsu",   "FM-77AV",      GAME_NOT_WORKING)
+COMP( 1985, fm77av,   fm7,    0,      fm77av,  fm7,    fm7,  fm7,    "Fujitsu",   "FM-77AV",      GAME_IMPERFECT_GRAPHICS)
 COMP( 1985, fm7740sx, fm7,    0,      fm77av,  fm7,    fm7,  fm7,    "Fujitsu",   "FM-77AV40SX",  GAME_NOT_WORKING)
