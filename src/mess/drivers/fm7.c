@@ -1135,7 +1135,7 @@ void fm7_mmr_refresh(const address_space* space)
 		// memory (0x00000-0x0ffff) defined by the window address register
 		// 0x00 = 0x07c00, 0x04 = 0x08000 ... 0xff = 0x07400.
 		window_addr = ((fm7_mmr.window_offset << 8) + 0x7c00) & 0xffff;
-		if(window_addr < 0xfc00)
+//		if(window_addr < 0xfc00)
 		{
 			memory_install_readwrite8_handler(space,0x7c00,0x7fff,0,0,SMH_BANK(24),SMH_BANK(24));
 			memory_set_bankptr(space->machine,24,RAM+window_addr);
@@ -1240,9 +1240,9 @@ static TIMER_CALLBACK( fm7_subtimer_irq )
 		cputag_set_input_line(machine,"sub",INPUT_LINE_NMI,PULSE_LINE);
 }
 
-// When a key is pressed or released, an IRQ is generated on the main CPU,
+// When a key is pressed or released (in scan mode only), an IRQ is generated on the main CPU,
 // or an FIRQ on the sub CPU, if masked.  Both CPUs have ports to read keyboard data.
-// Scancodes are 9 bits.
+// Scancodes are 9 bits in FM-7 mode, 8 bits in scan mode.
 static void key_press(running_machine* machine, UINT16 scancode)
 {
 	current_scancode = scancode;

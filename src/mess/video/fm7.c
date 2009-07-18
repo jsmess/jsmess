@@ -126,6 +126,35 @@ static TIMER_CALLBACK( fm77av_alu_task_end )
 	fm7_alu.busy = 0;
 }
 
+static void fm7_alu_mask_write(UINT32 offset, int bank, UINT8 dat)
+{
+	UINT8 temp;
+	int page = 0;
+	
+	if(offset >= 0xc000)
+		page = 1;
+
+	if((fm7_alu.command & 0x40) == 0)
+	{  // "always" write mode
+		fm7_video_ram[(offset & 0x3fff) + (bank * 0x4000) + (page * 0xc000)] = dat;
+		return;
+	}
+	
+	temp = fm7_video_ram[(offset & 0x3fff) + (bank * 0x4000) + (page * 0xc000)];
+	if(fm7_alu.command & 0x20)
+	{  // "not equal" write mode
+		temp &= fm7_alu.compare_data;
+		dat &= ~fm7_alu.compare_data;
+	}
+	else
+	{  // "equal" write mode
+		temp &= ~fm7_alu.compare_data;
+		dat &= fm7_alu.compare_data;
+	}
+	
+	fm7_video_ram[(offset & 0x3fff) + (bank * 0x4000) + (page * 0xc000)] = temp | dat;
+}
+
 static void fm7_alu_function_compare(UINT32 offset)
 {
 	// COMPARE - compares which colors match those in the compare registers
@@ -138,6 +167,7 @@ static void fm7_alu_function_compare(UINT32 offset)
 	int x,y;
 	int match;
 	int page = 0;
+	UINT8 bit = 0x80;
 	
 	if(offset >= 0xc000)
 		page = 1;
@@ -151,11 +181,11 @@ static void fm7_alu_function_compare(UINT32 offset)
 	for(x=0;x<8;x++) // loop through each pixel
 	{
 		colour = 0;
-		if(blue & (1 << x))
+		if(blue & bit)
 			colour |= 1;
-		if(red & (1 << x))
+		if(red & bit)
 			colour |= 2;
-		if(green & (1 << x))
+		if(green & bit)
 			colour |= 4;
 			
 		match = 0;
@@ -168,7 +198,9 @@ static void fm7_alu_function_compare(UINT32 offset)
 			}
 		}
 		if(match != 0)
-			dat |= (1 << x);
+			dat |= bit;
+		
+		bit >>= 1;
 	}
 	fm7_alu.compare_data = dat;
 }
@@ -205,7 +237,7 @@ static void fm7_alu_function_pset(UINT32 offset)
 			dat &= ~fm7_alu.mask;
 			dat |= mask;
 			
-			fm7_video_ram[(offset & 0x3fff) + (x * 0x4000) + (page * 0xc000)] = dat;
+			fm7_alu_mask_write(offset,x,dat);
 		}
 	}
 }
@@ -239,7 +271,7 @@ static void fm7_alu_function_or(UINT32 offset)
 			dat &= ~fm7_alu.mask;
 			dat |= mask;
 				
-			fm7_video_ram[(offset & 0x3fff) + (x * 0x4000) + (page * 0xc000)] = dat;
+			fm7_alu_mask_write(offset,x,dat);
 		}
 	}
 }
@@ -273,7 +305,7 @@ static void fm7_alu_function_and(UINT32 offset)
 			dat &= ~fm7_alu.mask;
 			dat |= mask;
 				
-			fm7_video_ram[(offset & 0x3fff) + (x * 0x4000) + (page * 0xc000)] = dat;
+			fm7_alu_mask_write(offset,x,dat);
 		}
 	}
 }
@@ -307,7 +339,7 @@ static void fm7_alu_function_xor(UINT32 offset)
 			dat &= ~fm7_alu.mask;
 			dat |= mask;
 				
-			fm7_video_ram[(offset & 0x3fff) + (x * 0x4000) + (page * 0xc000)] = dat;
+			fm7_alu_mask_write(offset,x,dat);
 		}
 	}
 }
@@ -341,7 +373,7 @@ static void fm7_alu_function_not(UINT32 offset)
 			dat &= ~fm7_alu.mask;
 			dat |= mask;
 				
-			fm7_video_ram[(offset & 0x3fff) + (x * 0x4000) + (page * 0xc000)] = dat;
+			fm7_alu_mask_write(offset,x,dat);
 		}
 	}
 }
@@ -368,7 +400,7 @@ static void fm7_alu_function_invalid(UINT32 offset)
 			
 			dat = mask & fm7_alu.mask;
 				
-			fm7_video_ram[(offset & 0x3fff) + (x * 0x4000) + (page * 0xc000)] = dat;
+			fm7_alu_mask_write(offset,x,dat);
 		}
 	}
 }
@@ -407,7 +439,7 @@ static void fm7_alu_function_tilepaint(UINT32 offset)
 			mask = (fm7_video_ram[(offset & 0x3fff) + (x * 0x4000) + (page * 0xc000)]) & fm7_alu.mask;
 			dat |= mask;
 	
-			fm7_video_ram[(offset & 0x3fff) + (x * 0x4000) + (page * 0xc000)] = dat;
+			fm7_alu_mask_write(offset,x,dat);
 		}
 	}	
 }
@@ -1148,7 +1180,7 @@ READ8_HANDLER( fm77av_alu_r )
 	switch(offset)
 	{
 		case 0x00:
-			logerror("ALU: read from command register\n");
+			logerror("ALU: read from command register (%02x)\n",fm7_alu.command);
 			return fm7_alu.command;
 		case 0x01:
 			logerror("ALU: read from logical colour\n");
@@ -1157,7 +1189,7 @@ READ8_HANDLER( fm77av_alu_r )
 			logerror("ALU: read from mask register\n");
 			return fm7_alu.mask;
 		case 0x03:
-			logerror("ALU: read from compare data register\n");
+			logerror("ALU: read from compare data register (%02x)\n",fm7_alu.compare_data);
 			return fm7_alu.compare_data;
 		case 0x0b:
 			logerror("ALU: read from bank disable register\n");
@@ -1200,81 +1232,81 @@ WRITE8_HANDLER( fm77av_alu_w )
 			break;
 		case 0x0b:
 			fm7_alu.bank_disable = data & 0x03;
-			logerror("ALU: write to bank disable register - %02x\n",data);
+//			logerror("ALU: write to bank disable register - %02x\n",data);
 			break;
 		case 0x0c:
 			fm7_alu.tilepaint_b = data;
-			logerror("ALU: write to tilepaint (blue) register - %02x\n",data);
+//			logerror("ALU: write to tilepaint (blue) register - %02x\n",data);
 			break;
 		case 0x0d:
 			fm7_alu.tilepaint_r = data;
-			logerror("ALU: write to tilepaint (red) register - %02x\n",data);
+//			logerror("ALU: write to tilepaint (red) register - %02x\n",data);
 			break;
 		case 0x0e:
 			fm7_alu.tilepaint_g = data;
-			logerror("ALU: write to tilepaint (green) register - %02x\n",data);
+//			logerror("ALU: write to tilepaint (green) register - %02x\n",data);
 			break;
 		case 0x10:
 			dat = ((data & 0x1f) << 8) | (fm7_alu.addr_offset & 0x00ff);
 			fm7_alu.addr_offset = dat;
-			logerror("ALU: write to address offset (high) register - %02x (%04x)\n",data,fm7_alu.addr_offset);
+//			logerror("ALU: write to address offset (high) register - %02x (%04x)\n",data,fm7_alu.addr_offset);
 			break;
 		case 0x11:
 			dat = (fm7_alu.addr_offset & 0xff00) | data;
 			fm7_alu.addr_offset = dat;
-			logerror("ALU: write to address offset (low) register - %02x (%04x)\n",data,fm7_alu.addr_offset);
+//			logerror("ALU: write to address offset (low) register - %02x (%04x)\n",data,fm7_alu.addr_offset);
 			break;
 		case 0x12:
 			dat = (data << 8) | (fm7_alu.line_style & 0x00ff);
 			fm7_alu.line_style = dat;
-			logerror("ALU: write to line style (high) register - %02x (%04x)\n",data,fm7_alu.line_style);
+//			logerror("ALU: write to line style (high) register - %02x (%04x)\n",data,fm7_alu.line_style);
 			break;
 		case 0x13:
 			dat = (fm7_alu.line_style & 0xff00) | data;
 			fm7_alu.line_style = dat;
-			logerror("ALU: write to line style (low) register - %02x (%04x)\n",data,fm7_alu.line_style);
+//			logerror("ALU: write to line style (low) register - %02x (%04x)\n",data,fm7_alu.line_style);
 			break;
 		case 0x14:
 			dat = ((data & 0x03) << 8) | (fm7_alu.x0 & 0x00ff);
 			fm7_alu.x0 = dat;
-			logerror("ALU: write to X0 (high) register - %02x (%04x)\n",data,fm7_alu.x0);
+//			logerror("ALU: write to X0 (high) register - %02x (%04x)\n",data,fm7_alu.x0);
 			break;
 		case 0x15:
 			dat = (fm7_alu.x0 & 0xff00) | data;
 			fm7_alu.x0 = dat;
-			logerror("ALU: write to X0 (low) register - %02x (%04x)\n",data,fm7_alu.x0);
+//			logerror("ALU: write to X0 (low) register - %02x (%04x)\n",data,fm7_alu.x0);
 			break;
 		case 0x16:
 			dat = ((data & 0x01) << 8) | (fm7_alu.y0 & 0x00ff);
 			fm7_alu.y0 = dat;
-			logerror("ALU: write to Y0 (high) register - %02x (%04x)\n",data,fm7_alu.y0);
+//			logerror("ALU: write to Y0 (high) register - %02x (%04x)\n",data,fm7_alu.y0);
 			break;
 		case 0x17:
 			dat = (fm7_alu.y0 & 0xff00) | data;
 			fm7_alu.y0 = dat;
-			logerror("ALU: write to Y0 (low) register - %02x (%04x)\n",data,fm7_alu.y0);
+//			logerror("ALU: write to Y0 (low) register - %02x (%04x)\n",data,fm7_alu.y0);
 			break;
 		case 0x18:
 			dat = ((data & 0x03) << 8) | (fm7_alu.x1 & 0x00ff);
 			fm7_alu.x1 = dat;
-			logerror("ALU: write to X1 (high) register - %02x (%04x)\n",data,fm7_alu.x1);
+//			logerror("ALU: write to X1 (high) register - %02x (%04x)\n",data,fm7_alu.x1);
 			break;
 		case 0x19:
 			dat = (fm7_alu.x1 & 0xff00) | data;
 			fm7_alu.x1 = dat;
-			logerror("ALU: write to X1 (low) register - %02x (%04x)\n",data,fm7_alu.x1);
+//			logerror("ALU: write to X1 (low) register - %02x (%04x)\n",data,fm7_alu.x1);
 			break;
 		case 0x1a:
 			dat = ((data & 0x01) << 8) | (fm7_alu.y1 & 0x00ff);
 			fm7_alu.y1 = dat;
-			logerror("ALU: write to Y1 (high) register - %02x (%04x)\n",data,fm7_alu.y1);
+//			logerror("ALU: write to Y1 (high) register - %02x (%04x)\n",data,fm7_alu.y1);
 			break;
 		case 0x1b:
 			dat = (fm7_alu.y1 & 0xff00) | data;
 			fm7_alu.y1 = dat;
 			// draw line
 			fm77av_line_draw(space->machine);
-			logerror("ALU: write to Y1 (low) register - %02x (%04x)\n",data,fm7_alu.y1);
+//			logerror("ALU: write to Y1 (low) register - %02x (%04x)\n",data,fm7_alu.y1);
 			break;
 		default:
 			logerror("ALU: write 0x%02x to invalid register 0x%02x\n",data,offset);
