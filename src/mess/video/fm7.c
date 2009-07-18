@@ -1534,11 +1534,11 @@ VIDEO_UPDATE( fm7 )
 		    for (x = 0; x < 80; x++)
 		    {
 		    	if(!(fm7_video.multi_page & 0x40))
-	            	code_r = fm7_video_ram[0x8000 + ((y*80 + x + fm7_video.vram_offset) & 0x3fff)];
+	            	code_r = fm7_video_ram[page + 0x8000 + ((y*80 + x + fm7_video.vram_offset) & 0x3fff)];
 		    	if(!(fm7_video.multi_page & 0x20))
-	    	        code_g = fm7_video_ram[0x4000 + ((y*80 + x + fm7_video.vram_offset) & 0x3fff)];
+	    	        code_g = fm7_video_ram[page + 0x4000 + ((y*80 + x + fm7_video.vram_offset) & 0x3fff)];
 		    	if(!(fm7_video.multi_page & 0x10))
-		            code_b = fm7_video_ram[0x0000 + ((y*80 + x + fm7_video.vram_offset) & 0x3fff)];
+		            code_b = fm7_video_ram[page + 0x0000 + ((y*80 + x + fm7_video.vram_offset) & 0x3fff)];
 	            for (b = 0; b < 8; b++)
 	            {
 	                col = (((code_r >> b) & 0x01) ? 4 : 0) + (((code_g >> b) & 0x01) ? 2 : 0) + (((code_b >> b) & 0x01) ? 1 : 0);
