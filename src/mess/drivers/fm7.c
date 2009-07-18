@@ -339,14 +339,14 @@ static READ8_HANDLER( vector_r )
 	if(init_rom_en)
 		return ROM[0x1ff0+offset];
 	else
-		return RAM[0xfff0+offset];
+		return RAM[0x3fff0+offset];
 }
 
 static WRITE8_HANDLER( vector_w )
 {
 	UINT8* RAM = memory_region(space->machine,"maincpu");
 	
-	RAM[0xfff0+offset] = data;
+	RAM[0x3fff0+offset] = data;
 }
 
 /*
@@ -381,7 +381,7 @@ static READ8_HANDLER( fm7_rom_en_r )
 {
 	UINT8* RAM = memory_region(space->machine,"maincpu");
 	
-	basic_rom_en = 1;
+//	basic_rom_en = 1;
 	if(fm7_type == SYS_FM7)
 	{
 		memory_install_readwrite8_handler(space,0x8000,0xfbff,0,0,SMH_BANK(1),SMH_NOP);
@@ -1728,7 +1728,7 @@ static MACHINE_START(fm77av)
 	memset(shared_ram,0xff,0x80);
 
 	// last part of Initiate ROM is visible at the end of RAM too (interrupt vectors)	
-	memcpy(RAM+0xfff0,ROM+0x1ff0,16);
+	memcpy(RAM+0x3fff0,ROM+0x1ff0,16);
 
 	fm7_video.subrom = 0;  // default sub CPU ROM is type C.
 	RAM = memory_region(machine,"subsyscg");
@@ -1763,7 +1763,7 @@ static MACHINE_RESET(fm7)
 	{
 		init_rom_en = 1;
 		// last part of Initiate ROM is visible at the end of RAM too (interrupt vectors)	
-		memcpy(RAM+0xfff0,ROM+0x1ff0,16);
+		memcpy(RAM+0x3fff0,ROM+0x1ff0,16);
 	}	
 	if(fm7_type == SYS_FM7)
 		memory_set_bankptr(machine,1,RAM+0x38000);
