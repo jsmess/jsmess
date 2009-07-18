@@ -339,14 +339,22 @@ static READ8_HANDLER( vector_r )
 	if(init_rom_en)
 		return ROM[0x1ff0+offset];
 	else
-		return RAM[0x3fff0+offset];
+	{
+		if(fm7_type == SYS_FM7)
+			return RAM[0xfff0+offset];
+		else
+			return RAM[0x3fff0+offset];
+	}
 }
 
 static WRITE8_HANDLER( vector_w )
 {
 	UINT8* RAM = memory_region(space->machine,"maincpu");
 	
-	RAM[0x3fff0+offset] = data;
+	if(fm7_type == SYS_FM7)
+		RAM[0xfff0+offset] = data;
+	else
+		RAM[0x3fff0+offset] = data;
 }
 
 /*
