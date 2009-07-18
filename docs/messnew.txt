@@ -47,6 +47,7 @@ Skeleton drivers:
 - Netronics Explorer 85
 - Nintendo Virtual Boy
 - PROF-180X
+- PTC SOL-20
 - Robotron Z9001 / KC85/1 / KC87
 - Swyft
 - ZRT-80
