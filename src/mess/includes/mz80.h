@@ -19,6 +19,7 @@ extern const struct pit8253_config mz80k_pit8253_config;
 
 extern UINT8 mz80k_vertical;
 extern UINT8 mz80k_cursor_cnt;
+extern UINT8 mz80k_tempo_strobe;
 
 /*----------- defined in video/mz80.c -----------*/
 

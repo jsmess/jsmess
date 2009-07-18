@@ -231,7 +231,7 @@ static ADDRESS_MAP_START( mz80k_mem , ADDRESS_SPACE_PROGRAM, 8)
     AM_RANGE(0xd000, 0xd3ff) AM_RAM // Video RAM
     AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ppi8255", i8255a_r, i8255a_w) /* PPIA 8255 */
     AM_RANGE(0xe004, 0xe007) AM_DEVREADWRITE("pit8253", pit8253_r,pit8253_w)  /* PIT 8253  */
-    AM_RANGE(0xe008, 0xe008) AM_READWRITE( mz80k_strobe_r, mz80k_strobe_w)
+    AM_RANGE(0xe008, 0xe00b) AM_READWRITE( mz80k_strobe_r, mz80k_strobe_w)
     AM_RANGE(0xf000, 0xf3ff) AM_ROM
 ADDRESS_MAP_END
 
@@ -255,11 +255,16 @@ static const cassette_config mz80k_cassette_config =
 	CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED
 };
 
+static TIMER_DEVICE_CALLBACK( ne555_tempo_callback )
+{
+	mz80k_tempo_strobe ^= 1;
+}
+
 static MACHINE_DRIVER_START( mz80k )
 	/* basic machine hardware */
 
 	/* main CPU */
-	MDRV_CPU_ADD("maincpu", Z80, 2000000)        /* 2 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_8MHz / 4)        /* 2 MHz */
 	MDRV_CPU_PROGRAM_MAP(mz80k_mem)
 	MDRV_CPU_IO_MAP(mz80k_io)
 
@@ -288,6 +293,8 @@ static MACHINE_DRIVER_START( mz80k )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	
+	MDRV_TIMER_ADD_PERIODIC("tempo", ne555_tempo_callback, HZ(24)) // 33.5Hz - 34.3Hz 
 	
 	MDRV_CASSETTE_ADD( "cassette", mz80k_cassette_config )		
 MACHINE_DRIVER_END

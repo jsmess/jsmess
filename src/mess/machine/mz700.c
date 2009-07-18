@@ -408,10 +408,17 @@ WRITE8_HANDLER( mz_bank_6_w )
 /************************ PIT ************************************************/
 
 /* Timer 0 is the clock for the speaker output */
+static UINT8 speaker_level = 0;
+static UINT8 prev_state = 0;
+
 static PIT8253_OUTPUT_CHANGED( pit_out0_changed )
 {
 	const device_config *speaker = devtag_get_device(device->machine, "speaker");
-	speaker_level_w(speaker, state ? 1 : 0);
+	if((prev_state==0) && (state==1)) {
+		speaker_level ^= 1;
+	}	
+	prev_state = state;
+	speaker_level_w( speaker, speaker_level);
 }
 
 

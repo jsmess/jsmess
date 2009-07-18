@@ -13,7 +13,7 @@
 #include "sound/speaker.h"
 #include "includes/mz80.h"
  
-static UINT8 mz80k_tempo_strobe = 0;
+UINT8 mz80k_tempo_strobe = 0;
 static UINT8 mz80k_8255_portc = 0;
 UINT8 mz80k_vertical = 0;
 UINT8 mz80k_cursor_cnt = 0;
@@ -24,7 +24,6 @@ static UINT8 mz80k_keyboard_line = 0;
 DRIVER_INIT(mz80k)
 {
 }
-
 
 MACHINE_RESET( mz80k )
 {
@@ -69,10 +68,16 @@ static WRITE8_DEVICE_HANDLER(mz80k_8255_portc_w)
 //	logerror("mz80k_8255_portc_w %02x\n",data);
 }
 
+static UINT8 speaker_level = 0;
+static UINT8 prev_state = 0;
 static PIT8253_OUTPUT_CHANGED( pit_out0_changed )
 {
 	const device_config *speaker = devtag_get_device(device->machine, "speaker");
-	speaker_level_w( speaker, state ? 1 : 0 );
+	if((prev_state==0) && (state==1)) {
+		speaker_level ^= 1;
+	}	
+	prev_state = state;
+	speaker_level_w( speaker, speaker_level);
 }
 
 
@@ -100,19 +105,20 @@ I8255A_INTERFACE( mz80k_8255_int )
 const struct pit8253_config mz80k_pit8253_config =
 {
 	{
-		/* clockin	  irq callback	  */
-		{ 1108800.0,  pit_out0_changed },		
-		{	15611.0,  pit_out1_changed },
-		{		  0,  pit_out2_changed },
+		/* clockin	  irq callback	  */		
+		{ XTAL_8MHz/  4,  pit_out0_changed },		
+		{ XTAL_8MHz/256,  pit_out1_changed },
+		{		      0,  pit_out2_changed },
 	}
 };
 
 READ8_HANDLER(mz80k_strobe_r)
 {
-    mz80k_tempo_strobe^=1;
 	return(0x7e | mz80k_tempo_strobe);
 }
 WRITE8_HANDLER(mz80k_strobe_w)
 {
+	const device_config *pit = devtag_get_device(space->machine, "pit8253");
+	pit8253_gate_w(pit,0,data);
 }
 

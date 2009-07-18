@@ -72,6 +72,8 @@ System Driver Changes:
 
 - [MC1000] System is now basically working. [Curt Coder]
 
+- [MZ80] [MZ700] Sound works now [Miodrag Milanovic]
+
 - [NES] Fixed mappers #88, #193, added mappers #107, #154.  [Heretical One]
 
 - [PC] Renamed bondwell to bw230. [Curt Coder]
