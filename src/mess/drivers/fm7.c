@@ -381,7 +381,7 @@ static READ8_HANDLER( fm7_rom_en_r )
 {
 	UINT8* RAM = memory_region(space->machine,"maincpu");
 	
-//	basic_rom_en = 1;
+	basic_rom_en = 1;
 	if(fm7_type == SYS_FM7)
 	{
 		memory_install_readwrite8_handler(space,0x8000,0xfbff,0,0,SMH_BANK(1),SMH_NOP);
