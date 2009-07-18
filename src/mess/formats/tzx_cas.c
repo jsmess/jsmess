@@ -73,47 +73,55 @@ static int	block_count;
 static UINT8**	blocks;
 static float t_scale = 1;  /* for scaling T-states to the 4MHz CPC */
 
-static void toggle_wave_data(void) {
-	if ( wave_data == WAVE_LOW ) {
+static void toggle_wave_data(void) 
+{
+	if (wave_data == WAVE_LOW) 
+	{
 		wave_data = WAVE_HIGH;
-	} else {
+	} 
+	else 
+	{
 		wave_data = WAVE_LOW;
 	}
 }
 
-static void tzx_cas_get_blocks( const UINT8 *casdata, int caslen ) {
+static void tzx_cas_get_blocks( const UINT8 *casdata, int caslen ) 
+{
 	int pos = sizeof(TZX_HEADER) + 2;
 	int max_block_count = INITIAL_MAX_BLOCK_COUNT;
 
 	blocks = alloc_array_clear_or_die(UINT8*, max_block_count);
 	block_count = 0;
 
-	while( pos < caslen ) {
+	while (pos < caslen) 
+	{
 		UINT32 datasize;
 		UINT8 blocktype = casdata[pos];
 
-		if ( block_count == max_block_count ) {
+		if (block_count == max_block_count) 
+		{
 			void	*old_blocks = blocks;
 			int	old_max_block_count = max_block_count;
 
 			max_block_count = max_block_count + BLOCK_COUNT_INCREMENTS;
 			blocks = auto_alloc_array(NULL /*machine*/, UINT8*, max_block_count);	// SHOULD NOT BE USING auto_alloc_array()
-			memcpy( blocks, old_blocks, old_max_block_count * sizeof(UINT8*) );
+			memcpy(blocks, old_blocks, old_max_block_count * sizeof(UINT8*));
 		}
 
 		blocks[block_count] = (UINT8*)&casdata[pos];
 
 		pos += 1;
 
-		switch( blocktype ) {
+		switch (blocktype) 
+		{
 		case 0x10:
 			pos += 2;
-			datasize = casdata[pos] + ( casdata[pos+1] << 8 );
+			datasize = casdata[pos] + (casdata[pos + 1] << 8);
 			pos += 2 + datasize;
 			break;
 		case 0x11:
 			pos += 0x0f;
-			datasize = casdata[pos] + ( casdata[pos+1] << 8 ) + ( casdata[pos+2] << 16 );
+			datasize = casdata[pos] + (casdata[pos + 1] << 8) + (casdata[pos + 2] << 16);
 			pos += 3 + datasize;
 			break;
 		case 0x12:
@@ -125,12 +133,12 @@ static void tzx_cas_get_blocks( const UINT8 *casdata, int caslen ) {
 			break;
 		case 0x14:
 			pos += 7;
-			datasize = casdata[pos] + ( casdata[pos+1] << 8 ) + ( casdata[pos+2] << 16 );
+			datasize = casdata[pos] + (casdata[pos + 1] << 8) + (casdata[pos + 2] << 16);
 			pos += 3 + datasize;
 			break;
 		case 0x15:
 			pos += 5;
-			datasize = casdata[pos] + ( casdata[pos+1] << 8 ) + ( casdata[pos+2] << 16 );
+			datasize = casdata[pos] + (casdata[pos + 1] << 8) + (casdata[pos + 2] << 16);
 			pos += 3 + datasize;
 			break;
 		case 0x20: case 0x23: case 0x24:
@@ -143,11 +151,11 @@ static void tzx_cas_get_blocks( const UINT8 *casdata, int caslen ) {
 		case 0x22: case 0x25: case 0x27:
 			break;
 		case 0x26:
-			datasize = casdata[pos] + ( casdata[pos+1] << 8 );
+			datasize = casdata[pos] + (casdata[pos + 1] << 8);
 			pos += 2 + 2 * datasize;
 			break;
 		case 0x28: case 0x32:
-			datasize = casdata[pos] + ( casdata[pos+1] << 8 );
+			datasize = casdata[pos] + (casdata[pos + 1] << 8);
 			pos += 2 + datasize;
 			break;
 		case 0x31:
@@ -164,19 +172,19 @@ static void tzx_cas_get_blocks( const UINT8 *casdata, int caslen ) {
 			break;
 		case 0x35:
 			pos += 0x10;
-			datasize = casdata[pos] + ( casdata[pos+1] << 8 ) + ( casdata[pos+2] << 16 ) + ( casdata[pos+3] << 24 );
+			datasize = casdata[pos] + (casdata[pos + 1] << 8) + (casdata[pos + 2] << 16) + (casdata[pos + 3] << 24);
 			pos += 4 + datasize;
 			break;
 		case 0x40:
 			pos += 1;
-			datasize = casdata[pos] + ( casdata[pos+1] << 8 ) + ( casdata[pos+2] << 16 );
+			datasize = casdata[pos] + (casdata[pos + 1] << 8) + (casdata[pos + 2] << 16);
 			pos += 3 + datasize;
 			break;
 		case 0x5A:
 			pos += 9;
 			break;
 		default:
-			datasize = casdata[pos] + ( casdata[pos+1] << 8 ) + ( casdata[pos+2] << 16 ) + ( casdata[pos+3] << 24 );
+			datasize = casdata[pos] + (casdata[pos + 1] << 8) + (casdata[pos + 2] << 16) + (casdata[pos + 3] << 24);
 			pos += 4 + datasize;
 			break;
 		}
@@ -186,160 +194,281 @@ static void tzx_cas_get_blocks( const UINT8 *casdata, int caslen ) {
 	free(blocks);
 }
 
-INLINE int millisec_to_samplecount( int millisec ) {
-	return (int) ( millisec * ( (double)TZX_WAV_FREQUENCY / 1000.0 ) );
+INLINE int millisec_to_samplecount( int millisec ) 
+{
+	return (int) (millisec * ((double)TZX_WAV_FREQUENCY / 1000.0));
 }
 
-INLINE int tcycles_to_samplecount( int tcycles ) {
-	return (int) ( ( 0.5 + ( ( (double)TZX_WAV_FREQUENCY / 3500000 ) * (double)tcycles ) ) * t_scale );
+INLINE int tcycles_to_samplecount( int tcycles ) 
+{
+	return (int) ((0.5 + (((double)TZX_WAV_FREQUENCY / 3500000) * (double)tcycles)) * t_scale);
 }
 
-static void tzx_output_wave( INT16 **buffer, int length ) {
-	if ( buffer == NULL ) {
+static void tzx_output_wave( INT16 **buffer, int length ) 
+{
+	if (buffer == NULL) 
+	{
 		return;
 	}
 
-	for( ; length > 0; length-- ) {
+	for ( ; length > 0; length--)
+	{
 		**buffer = wave_data;
 		*buffer = *buffer + 1;
 	}
 }
 
-static int tzx_cas_handle_block( INT16 **buffer, const UINT8 *bytes, int pause, int data_size, int pilot, int pilot_length, int sync1, int sync2, int bit0, int bit1, int bits_in_last_byte ) {
-	int pilot_samples = tcycles_to_samplecount( pilot );
-	int sync1_samples = tcycles_to_samplecount( sync1 );
-	int sync2_samples = tcycles_to_samplecount( sync2 );
-	int bit0_samples = tcycles_to_samplecount( bit0 );
-	int bit1_samples = tcycles_to_samplecount( bit1 );
+static int tzx_cas_handle_block( INT16 **buffer, const UINT8 *bytes, int pause, int data_size, int pilot, int pilot_length, int sync1, int sync2, int bit0, int bit1, int bits_in_last_byte ) 
+{
+	int pilot_samples = tcycles_to_samplecount(pilot);
+	int sync1_samples = tcycles_to_samplecount(sync1);
+	int sync2_samples = tcycles_to_samplecount(sync2);
+	int bit0_samples = tcycles_to_samplecount(bit0);
+	int bit1_samples = tcycles_to_samplecount(bit1);
 	int data_index;
 	int size = 0;
 
-	logerror( "tzx_cas_block_size: pilot_length = %d, pilot_samples = %d, sync1_samples = %d, sync2_samples = %d, bit0_samples = %d, bit1_samples = %d\n", pilot_length, pilot_samples, sync1_samples, sync2_samples, bit0_samples, bit1_samples );
+	/* Uncomment this to include into error.log a fully detailed analysis of each block */
+//	logerror("tzx_cas_block_size: pilot_length = %d, pilot_samples = %d, sync1_samples = %d, sync2_samples = %d, bit0_samples = %d, bit1_samples = %d\n", pilot_length, pilot_samples, sync1_samples, sync2_samples, bit0_samples, bit1_samples);
 
 	/* PILOT */
-	for( ; pilot_length > 0; pilot_length-- ) {
-		tzx_output_wave( buffer, pilot_samples );
+	for ( ; pilot_length > 0; pilot_length--) 
+	{
+		tzx_output_wave(buffer, pilot_samples);
 		size += pilot_samples;
 		toggle_wave_data();
 	}
 	/* SYNC1 */
-	if ( sync1_samples > 0 ) {
-		tzx_output_wave( buffer, sync1_samples );
+	if (sync1_samples > 0) 
+	{
+		tzx_output_wave(buffer, sync1_samples);
 		size += sync1_samples;
 		toggle_wave_data();
 	}
 	/* SYNC2 */
-	if ( sync2_samples > 0 ) {
-		tzx_output_wave( buffer, sync2_samples );
+	if (sync2_samples > 0) 
+	{
+		tzx_output_wave(buffer, sync2_samples);
 		size += sync2_samples;
 		toggle_wave_data();
 	}
 	/* data */
-	for( data_index = 0; data_index < data_size; data_index++ ) {
-		UINT8	byte = bytes[data_index];
-		int	bits_to_go = ( data_index == ( data_size - 1 ) ) ? bits_in_last_byte : 8;
-		for( ; bits_to_go > 0; byte <<= 1, bits_to_go-- ) {
-			int	bit_samples = ( byte & 0x80 ) ? bit1_samples : bit0_samples;
-			tzx_output_wave( buffer, bit_samples );
+	for (data_index = 0; data_index < data_size; data_index++) 
+	{
+		UINT8 byte = bytes[data_index];
+		int	bits_to_go = (data_index == (data_size - 1)) ? bits_in_last_byte : 8;
+
+		for ( ; bits_to_go > 0; byte <<= 1, bits_to_go--) 
+		{
+			int	bit_samples = (byte & 0x80) ? bit1_samples : bit0_samples;
+			tzx_output_wave(buffer, bit_samples);
 			size += bit_samples;
 			toggle_wave_data();
-			tzx_output_wave( buffer, bit_samples );
+			tzx_output_wave(buffer, bit_samples);
 			size += bit_samples;
 			toggle_wave_data();
 		}
 	}
 	/* pause */
-	if ( pause > 0 ) {
-		int start_pause_samples = millisec_to_samplecount( 1 );
-		int rest_pause_samples = millisec_to_samplecount( pause - 1 );
+	if (pause > 0) 
+	{
+		int start_pause_samples = millisec_to_samplecount(1);
+		int rest_pause_samples = millisec_to_samplecount(pause - 1);
 
-		tzx_output_wave( buffer, start_pause_samples );
+		tzx_output_wave(buffer, start_pause_samples);
 		size += start_pause_samples;
 		wave_data = WAVE_LOW;
-		tzx_output_wave( buffer, rest_pause_samples );
+		tzx_output_wave(buffer, rest_pause_samples);
 		size += rest_pause_samples;
 	}
-    return size;
+	return size;
 }
 
-/*
-  Will go through blocks and calculate number of samples needed.
-  If buffer is not NULL the sample data will also be written.
- */
-static int tzx_cas_do_work( INT16 **buffer ) {
+static void ascii_block_common_log( const char *block_type_string, UINT8 block_type )
+{
+	logerror("%s (type %02x) encountered.\n", block_type_string, block_type);
+	logerror("This block contains info on the .tzx file you are loading.\n");
+	logerror("Please include the following info in your bug reports, if the image has issue in M.E.S.S.\n");
+}
+
+static const char *const archive_ident[] =
+{
+	"Full title",
+	"Software house/publisher",
+	"Author(s)",
+	"Year of publication",
+	"Language",
+	"Game/utility type",
+	"Price",
+	"Protection scheme/loader",
+	"Origin",
+};
+
+static const char *const hw_info[] =
+{
+	"Tape runs on this machine / this hardware",
+	"Tape needs this machine / this hardware",
+	"Tape runs on this machine / this hardware, but does not require its special features",
+	"Tape does not run on this machine / this hardware",
+};
+
+/*  Will go through blocks and calculate number of samples needed.
+If buffer is not NULL the sample data will also be written. */
+static int tzx_cas_do_work( INT16 **buffer ) 
+{
 	int	current_block = 0;
 	int	size = 0;
 
 	wave_data = WAVE_LOW;
 
-	while( current_block < block_count ) {
+	while (current_block < block_count)
+	{
 		int	pause_time;
-		int	data_size;
+		int	data_size, text_size, total_size, i;
 		int	pilot, pilot_length, sync1, sync2;
 		int	bit0, bit1, bits_in_last_byte;
-		UINT8	*cur_block = blocks[current_block];
-		UINT8	block_type =cur_block[0];
-		logerror( "tzx_cas_fill_wave: block %d, block_type %02x\n", current_block, block_type );
-		switch( block_type ) {
+		UINT8 *cur_block = blocks[current_block];
+		UINT8 block_type = cur_block[0];
+
+	/* Uncomment this to include into error.log a list of the types each block */
+//		logerror("tzx_cas_fill_wave: block %d, block_type %02x\n", current_block, block_type);
+
+		switch (block_type)
+		{
 		case 0x10:	/* Standard Speed Data Block (.TAP block) */
-			pause_time = cur_block[1] + ( cur_block[2] << 8 );
-			data_size = cur_block[3] + ( cur_block[4] << 8 );
-			pilot_length = ( cur_block[5] == 0x00 ) ?  8064 : 3220;
-			size += tzx_cas_handle_block( buffer, &cur_block[5], pause_time, data_size, 2168, pilot_length, 667, 735, 855, 1710, 8 );
+			pause_time = cur_block[1] + (cur_block[2] << 8);
+			data_size = cur_block[3] + (cur_block[4] << 8);
+			pilot_length = (cur_block[5] == 0x00) ?  8064 : 3220;
+			size += tzx_cas_handle_block(buffer, &cur_block[5], pause_time, data_size, 2168, pilot_length, 667, 735, 855, 1710, 8);
 			current_block++;
 			break;
 		case 0x11:	/* Turbo Loading Data Block */
-			pilot = cur_block[1] + ( cur_block[2] << 8 );
-			sync1 = cur_block[3] + ( cur_block[4] << 8 );
-			sync2 = cur_block[5] + ( cur_block[6] << 8 );
-			bit0 = cur_block[7] + ( cur_block[8] << 8 );
-			bit1 = cur_block[9] + ( cur_block[10] << 8 );
-			pilot_length = cur_block[11] + ( cur_block[12] << 8 );
+			pilot = cur_block[1] + (cur_block[2] << 8);
+			sync1 = cur_block[3] + (cur_block[4] << 8);
+			sync2 = cur_block[5] + (cur_block[6] << 8);
+			bit0 = cur_block[7] + (cur_block[8] << 8);
+			bit1 = cur_block[9] + (cur_block[10] << 8);
+			pilot_length = cur_block[11] + (cur_block[12] << 8);
 			bits_in_last_byte = cur_block[13];
-			pause_time = cur_block[14] + ( cur_block[15] << 8 );
-			data_size = cur_block[16] + ( cur_block[17] << 8 ) + ( cur_block[18] << 16 );
-			size += tzx_cas_handle_block( buffer, &cur_block[19], pause_time, data_size, pilot, pilot_length, sync1, sync2, bit0, bit1, bits_in_last_byte );
+			pause_time = cur_block[14] + (cur_block[15] << 8);
+			data_size = cur_block[16] + (cur_block[17] << 8) + (cur_block[18] << 16);
+			size += tzx_cas_handle_block(buffer, &cur_block[19], pause_time, data_size, pilot, pilot_length, sync1, sync2, bit0, bit1, bits_in_last_byte);
 			current_block++;
 			break;
 		case 0x12:	/* Pure Tone */
-			pilot = cur_block[1] + ( cur_block[2] << 8 );
-			pilot_length = cur_block[3] + ( cur_block[4] << 8 );
-			size += tzx_cas_handle_block( buffer, cur_block, 0, 0, pilot, pilot_length, 0, 0, 0, 0, 0 );
+			pilot = cur_block[1] + (cur_block[2] << 8);
+			pilot_length = cur_block[3] + (cur_block[4] << 8);
+			size += tzx_cas_handle_block(buffer, cur_block, 0, 0, pilot, pilot_length, 0, 0, 0, 0, 0);
 			current_block++;
 			break;
 		case 0x13:	/* Sequence of Pulses of Different Lengths */
-			for( data_size = 0; data_size < cur_block[1]; data_size++ ) {
-				pilot = cur_block[2 + 2*data_size] + ( cur_block[3 + 2*data_size] << 8 );
-				size += tzx_cas_handle_block( buffer, cur_block, 0, 0, pilot, 1, 0, 0, 0, 0, 0 );
+			for (data_size = 0; data_size < cur_block[1]; data_size++) 
+			{
+				pilot = cur_block[2 + 2 * data_size] + (cur_block[3 + 2 * data_size] << 8);
+				size += tzx_cas_handle_block(buffer, cur_block, 0, 0, pilot, 1, 0, 0, 0, 0, 0);
 			}
 			current_block++;
 			break;
 		case 0x14:	/* Pure Data Block */
-			bit0 = cur_block[1] + ( cur_block[2] << 8 );
-			bit1 = cur_block[3] + ( cur_block[4] << 8 );
+			bit0 = cur_block[1] + (cur_block[2] << 8);
+			bit1 = cur_block[3] + (cur_block[4] << 8);
 			bits_in_last_byte = cur_block[5];
-			pause_time = cur_block[6] + ( cur_block[7] << 8 );
-			data_size = cur_block[8] + ( cur_block[9] << 8 ) + ( cur_block[10] << 16 );
-			size += tzx_cas_handle_block( buffer, &cur_block[11], pause_time, data_size, 0, 0, 0, 0, bit0, bit1, bits_in_last_byte );
-			current_block++;
-			break;
-		case 0x15:	/* Direct Recording */
-		case 0x16:	/* C64 ROM Type Data Block */
-		case 0x17:	/* C64 Turbo Tape Data Block */
-			logerror( "Unsupported block type (%02x) encountered\n", block_type );
+			pause_time = cur_block[6] + (cur_block[7] << 8);
+			data_size = cur_block[8] + (cur_block[9] << 8) + (cur_block[10] << 16);
+			size += tzx_cas_handle_block(buffer, &cur_block[11], pause_time, data_size, 0, 0, 0, 0, bit0, bit1, bits_in_last_byte);
 			current_block++;
 			break;
 		case 0x20:	/* Pause (Silence) or 'Stop the Tape' Command */
-			pause_time = cur_block[1] + ( cur_block[2] << 8 );
-			if ( pause_time == 0 ) {
-				/* pause = 0 is used to let an emulator automagically stop the tape
-				   in MESS we do not do that, so we insert a 5 second pause.
-				 */
+			pause_time = cur_block[1] + (cur_block[2] << 8);
+			if (pause_time == 0) 
+			{
+				/* pause = 0 is used to let an emulator automagically stop the tape 
+				   in MESS we do not do that, so we insert a 5 second pause. */
 				pause_time = 5000;
 			}
-			size += tzx_cas_handle_block( buffer, cur_block, pause_time, 0, 0, 0, 0, 0, 0, 0, 0 );
+			size += tzx_cas_handle_block(buffer, cur_block, pause_time, 0, 0, 0, 0, 0, 0, 0, 0);
 			current_block++;
 			break;
+		case 0x16:	/* C64 ROM Type Data Block */		// Deprecated in TZX 1.20
+		case 0x17:	/* C64 Turbo Tape Data Block */		// Deprecated in TZX 1.20
+		case 0x34:	/* Emulation Info */				// Deprecated in TZX 1.20
+		case 0x40:	/* Snapshot Block */				// Deprecated in TZX 1.20
+			logerror("Deprecated block type (%02x) encountered.\n", block_type);
+			logerror("Please look for an updated .tzx file.\n");
+			current_block++;
+			break;
+		case 0x30:	/* Text Description */
+			ascii_block_common_log("Text Description Block", block_type);
+			for (data_size = 0; data_size < cur_block[1]; data_size++)
+				logerror("%c", cur_block[2 + data_size]);
+			logerror("\n");
+			current_block++;
+			break;
+		case 0x31:	/* Message Block */
+			ascii_block_common_log("Message Block", block_type);
+			logerror("Expected duration of the message display: %02x\n", cur_block[1]);
+			logerror("Message: \n");
+			for (data_size = 0; data_size < cur_block[2]; data_size++)
+			{
+				logerror("%c", cur_block[3 + data_size]);
+				if (cur_block[3 + data_size] == 0x0d)
+					logerror("\n");
+			}
+			logerror("\n");
+			current_block++;
+			break;
+		case 0x32:	/* Archive Info */
+			ascii_block_common_log("Archive Info Block", block_type);
+			total_size = cur_block[1] + (cur_block[2] << 8);
+			text_size = 0;
+			for (data_size = 0; data_size < cur_block[3]; data_size++)	// data_size = number of text blocks, in this case
+			{
+				if (cur_block[4 + text_size] < 0x09)
+					logerror("%s: \n", archive_ident[cur_block[4 + text_size]]);
+				else
+					logerror("Comment(s): \n");
+
+				for (i = 0; i < cur_block[4 + text_size + 1]; i++)
+				{
+					logerror("%c", cur_block[4 + text_size + 2 + i]);
+				}
+				text_size += 2 + i;
+			}
+			logerror("\n");
+			if (text_size != total_size)
+				logerror("Malformed Archive Info Block (Text length different from the declared one).\n Please verify your tape image.\n");
+			current_block++;
+			break;
+		case 0x33:	/* Hardware Type */
+			ascii_block_common_log("Hardware Type Block", block_type);
+			for (data_size = 0; data_size < cur_block[1]; data_size++)	// data_size = number of hardware blocks, in this case
+			{
+				logerror("Hardware Type %02x - Hardware ID %02x - ", cur_block[2 + data_size * 3], cur_block[2 + data_size * 3 + 1]);
+				logerror("%s \n ", hw_info[cur_block[2 + data_size * 3 + 2]]);
+			}
+			current_block++;
+			break;
+		case 0x35:	/* Custom Info Block */
+			ascii_block_common_log("Custom Info Block", block_type);
+			for (data_size = 0; data_size < 10; data_size++)
+			{
+				logerror("%c", cur_block[1 + data_size]);
+			}
+			logerror(":\n");
+			text_size = cur_block[11] + (cur_block[12] << 8) + (cur_block[13] << 16) + (cur_block[14] << 24);
+			for (data_size = 0; data_size < text_size; data_size++)
+				logerror("%c", cur_block[15 + data_size]);
+			logerror("\n");
+			current_block++;
+			break;
+		case 0x5A:	/* "Glue" Block */
+			logerror("Glue Block (type %02x) encountered.\n", block_type);
+			logerror("Please use a .tzx handling utility to split the merged tape files.\n");
+			current_block++;
+			break;
+		case 0x15:	/* Direct Recording */
+		case 0x18:	/* CSW Recording */
+		case 0x19:	/* Generalized Data Block */
 		case 0x21:	/* Group Start */
 		case 0x22:	/* Group End */
 		case 0x23:	/* Jump To Block */
@@ -349,16 +478,9 @@ static int tzx_cas_do_work( INT16 **buffer ) {
 		case 0x27:	/* Return From Sequence */
 		case 0x28:	/* Select Block */
 		case 0x2A:	/* Stop Tape if in 48K Mode */
-		case 0x30:	/* Text Description */
-		case 0x31:	/* Message Block */
-		case 0x32:	/* Archive Info */
-		case 0x33:	/* Hardware Type */
-		case 0x34:	/* Emulation Info */
-		case 0x35:	/* Custom Info Block */
-		case 0x40:	/* Snapshot Block */
-		case 0x5A:	/* Merge Block */
+		case 0x2B:	/* Set signal level */
 		default:
-			logerror( "Unsupported block type (%02x) encountered\n", block_type );
+			logerror("Unsupported block type (%02x) encountered.\n", block_type);
 			current_block++;
 			break;
 		}
@@ -366,37 +488,42 @@ static int tzx_cas_do_work( INT16 **buffer ) {
 	return size;
 }
 
-static int tzx_cas_to_wav_size( const UINT8 *casdata, int caslen ) {
+static int tzx_cas_to_wav_size( const UINT8 *casdata, int caslen ) 
+{
 	int size = 0;
 
 	/* Header size plus major and minor version number */
-	if ( caslen < 10 ) {
-		logerror( "tzx_cas_to_wav_size: cassette image too small\n" );
+	if (caslen < 10) 
+	{
+		logerror("tzx_cas_to_wav_size: cassette image too small\n");
 		goto cleanup;
 	}
 
 	/* Check for correct header */
-	if ( memcmp( casdata, TZX_HEADER, sizeof(TZX_HEADER) ) ) {
-		logerror( "tzx_cas_to_wav_size: cassette image has incompatible header\n" );
+	if (memcmp(casdata, TZX_HEADER, sizeof(TZX_HEADER))) 
+	{
+		logerror("tzx_cas_to_wav_size: cassette image has incompatible header\n");
 		goto cleanup;
 	}
 
 	/* Check major version number in header */
-	if ( casdata[0x08] > SUPPORTED_VERSION_MAJOR ) {
-		logerror( "tzx_cas_to_wav_size: unsupported version\n" );
+	if (casdata[0x08] > SUPPORTED_VERSION_MAJOR) 
+	{
+		logerror("tzx_cas_to_wav_size: unsupported version\n");
 		goto cleanup;
 	}
 
-	tzx_cas_get_blocks( casdata, caslen );
+	tzx_cas_get_blocks(casdata, caslen);
 
-	logerror( "tzx_cas_to_wav_size: %d blocks found\n", block_count );
+	logerror("tzx_cas_to_wav_size: %d blocks found\n", block_count);
 
-	if ( block_count == 0 ) {
-		logerror( "tzx_cas_to_wav_size: no blocks found!\n" );
+	if (block_count == 0) 
+	{
+		logerror("tzx_cas_to_wav_size: no blocks found!\n");
 		goto cleanup;
 	}
 
-	size = tzx_cas_do_work( NULL );
+	size = tzx_cas_do_work(NULL);
 
 	return size;
 
@@ -404,56 +531,63 @@ cleanup:
 	return -1;
 }
 
-static int tzx_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes ) {
-	INT16	*p = buffer;
+static int tzx_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes ) 
+{
+	INT16 *p = buffer;
 	int	size = 0;
 	t_scale = 1.0;
-	size = tzx_cas_do_work( &p );
+	size = tzx_cas_do_work(&p);
 	return size;
 }
 
-static int cdt_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes ) {
-	INT16	*p = buffer;
+static int cdt_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes ) 
+{
+	INT16 *p = buffer;
 	int	size = 0;
 	t_scale = (40 / 35);  /* scale to 4MHz */
-	size = tzx_cas_do_work( &p );
+	size = tzx_cas_do_work(&p);
 	return size;
 }
 
-static int tap_cas_to_wav_size( const UINT8 *casdata, int caslen ) {
+static int tap_cas_to_wav_size( const UINT8 *casdata, int caslen ) 
+{
 	int size = 0;
 	const UINT8 *p = casdata;
 
-	while( p < casdata + caslen ) {
-		int data_size = p[0] + ( p[1] << 8 );
-		int pilot_length = ( p[2] == 0x00 ) ? 8064 : 3220;	/* TZX specification */
-//		int pilot_length = ( p[2] == 0x00 ) ? 8063 : 3223;	/* worldofspectrum */
-		logerror( "tap_cas_to_wav_size: Handling TAP block containing 0x%X bytes", data_size );
+	while (p < casdata + caslen) 
+	{
+		int data_size = p[0] + (p[1] << 8);
+		int pilot_length = (p[2] == 0x00) ? 8064 : 3220;	/* TZX specification */
+//		int pilot_length = (p[2] == 0x00) ? 8063 : 3223;	/* worldofspectrum */
+		logerror("tap_cas_to_wav_size: Handling TAP block containing 0x%X bytes", data_size);
 		p += 2;
-		size += tzx_cas_handle_block( NULL, p, 1000, data_size, 2168, pilot_length, 667, 735, 855, 1710, 8 );
-		logerror( ", total size is now: %d\n", size );
+		size += tzx_cas_handle_block(NULL, p, 1000, data_size, 2168, pilot_length, 667, 735, 855, 1710, 8);
+		logerror(", total size is now: %d\n", size);
 		p += data_size;
 	}
 	return size;
 }
 
-static int tap_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes ) {
+static int tap_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes ) 
+{
 	INT16 *p = buffer;
 	int size = 0;
 
-	while( size < length ) {
-		int data_size = bytes[0] + ( bytes[1] << 8 );
-		int pilot_length = ( bytes[2] == 0x00 ) ? 8064 : 3220;	/* TZX specification */
-//		int pilot_length = ( bytes[2] == 0x00 ) ? 8063 : 3223;	/* worldofspectrum */
-		logerror( "tap_cas_fill_wave: Handling TAP block containing 0x%X bytes\n", data_size );
+	while (size < length) 
+	{
+		int data_size = bytes[0] + (bytes[1] << 8);
+		int pilot_length = (bytes[2] == 0x00) ? 8064 : 3220;	/* TZX specification */
+//		int pilot_length = (bytes[2] == 0x00) ? 8063 : 3223;	/* worldofspectrum */
+		logerror("tap_cas_fill_wave: Handling TAP block containing 0x%X bytes\n", data_size);
 		bytes += 2;
-		size += tzx_cas_handle_block( &p, bytes, 1000, data_size, 2168, pilot_length, 667, 735, 855, 1710, 8 );
+		size += tzx_cas_handle_block(&p, bytes, 1000, data_size, 2168, pilot_length, 667, 735, 855, 1710, 8);
 		bytes += data_size;
 	}
 	return size;
 }
 
-static const struct CassetteLegacyWaveFiller tzx_legacy_fill_wave = {
+static const struct CassetteLegacyWaveFiller tzx_legacy_fill_wave = 
+{
 	tzx_cas_fill_wave,			/* fill_wave */
 	-1,					/* chunk_size */
 	0,					/* chunk_samples */
@@ -463,7 +597,8 @@ static const struct CassetteLegacyWaveFiller tzx_legacy_fill_wave = {
 	0					/* trailer_samples */
 };
 
-static const struct CassetteLegacyWaveFiller tap_legacy_fill_wave = {
+static const struct CassetteLegacyWaveFiller tap_legacy_fill_wave = 
+{
 	tap_cas_fill_wave,			/* fill_wave */
 	-1,					/* chunk_size */
 	0,					/* chunk_samples */
@@ -473,7 +608,8 @@ static const struct CassetteLegacyWaveFiller tap_legacy_fill_wave = {
 	0					/* trailer_samples */
 };
 
-static const struct CassetteLegacyWaveFiller cdt_legacy_fill_wave = {
+static const struct CassetteLegacyWaveFiller cdt_legacy_fill_wave = 
+{
 	cdt_cas_fill_wave,			/* fill_wave */
 	-1,					/* chunk_size */
 	0,					/* chunk_samples */
@@ -483,45 +619,54 @@ static const struct CassetteLegacyWaveFiller cdt_legacy_fill_wave = {
 	0					/* trailer_samples */
 };
 
-static casserr_t tzx_cassette_identify( cassette_image *cassette, struct CassetteOptions *opts ) {
-	return cassette_legacy_identify( cassette, opts, &tzx_legacy_fill_wave );
+static casserr_t tzx_cassette_identify( cassette_image *cassette, struct CassetteOptions *opts ) 
+{
+	return cassette_legacy_identify(cassette, opts, &tzx_legacy_fill_wave);
 }
 
-static casserr_t tap_cassette_identify( cassette_image *cassette, struct CassetteOptions *opts ) {
-	return cassette_legacy_identify( cassette, opts, &tap_legacy_fill_wave );
+static casserr_t tap_cassette_identify( cassette_image *cassette, struct CassetteOptions *opts ) 
+{
+	return cassette_legacy_identify(cassette, opts, &tap_legacy_fill_wave);
 }
 
-static casserr_t cdt_cassette_identify( cassette_image *cassette, struct CassetteOptions *opts ) {
-	return cassette_legacy_identify( cassette, opts, &cdt_legacy_fill_wave );
+static casserr_t cdt_cassette_identify( cassette_image *cassette, struct CassetteOptions *opts ) 
+{
+	return cassette_legacy_identify(cassette, opts, &cdt_legacy_fill_wave);
 }
 
-static casserr_t tzx_cassette_load( cassette_image *cassette ) {
-	return cassette_legacy_construct( cassette, &tzx_legacy_fill_wave );
+static casserr_t tzx_cassette_load( cassette_image *cassette ) 
+{
+	return cassette_legacy_construct(cassette, &tzx_legacy_fill_wave);
 }
 
-static casserr_t tap_cassette_load( cassette_image *cassette ) {
-	return cassette_legacy_construct( cassette, &tap_legacy_fill_wave );
+static casserr_t tap_cassette_load( cassette_image *cassette ) 
+{
+	return cassette_legacy_construct(cassette, &tap_legacy_fill_wave);
 }
 
-static casserr_t cdt_cassette_load( cassette_image *cassette ) {
-	return cassette_legacy_construct( cassette, &cdt_legacy_fill_wave );
+static casserr_t cdt_cassette_load( cassette_image *cassette ) 
+{
+	return cassette_legacy_construct(cassette, &cdt_legacy_fill_wave);
 }
 
-static const struct CassetteFormat tzx_cassette_format = {
+static const struct CassetteFormat tzx_cassette_format = 
+{
 	"tzx",
 	tzx_cassette_identify,
 	tzx_cassette_load,
 	NULL
 };
 
-static const struct CassetteFormat tap_cassette_format = {
+static const struct CassetteFormat tap_cassette_format = 
+{
 	"tap",
 	tap_cassette_identify,
 	tap_cassette_load,
 	NULL
 };
 
-static const struct CassetteFormat cdt_cassette_format = {
+static const struct CassetteFormat cdt_cassette_format = 
+{
 	"cdt",
 	cdt_cassette_identify,
 	cdt_cassette_load,
