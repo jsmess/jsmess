@@ -2,35 +2,27 @@
 
 TZX (currently spectrum only) and spectrum TAP cassette format support by Wilbert Pol
 
-Currently supported block types:
-  0x10, 0x11, 0x12, 0x13, 0x14, 0x20
-
-Tested block types:
-  0x10
-
 TODO:
-  Add support for the remaining block types:
-                case 0x15:	Direct Recording
-                case 0x16:	C64 ROM Type Data Block
-                case 0x17:	C64 Turbo Tape Data Block
-                case 0x21:      Group Start
-                case 0x22:      Group End
-                case 0x23:      Jump To Block
-                case 0x24:      Loop Start
-                case 0x25:      Loop End
-                case 0x26:      Call Sequence
-                case 0x27:      Return From Sequence
-                case 0x28:      Select Block
-                case 0x2A:      Stop Tape if in 48K Mode
-                case 0x30:      Text Description
-                case 0x31:      Message Block
-                case 0x32:      Archive Info
-                case 0x33:      Hardware Type
-                case 0x34:      Emulation Info
-                case 0x35:      Custom Info Block
-                case 0x40:      Snapshot Block
-                case 0x5A:      Merge Block
-
+    Add support for the remaining block types:
+        case 0x15:  Direct Recording
+		case 0x18:  CSW Recording
+		case 0x19:  Generalized Data Block
+        case 0x21:  Group Start
+        case 0x22:  Group End
+        case 0x23:  Jump To Block
+        case 0x24:  Loop Start
+        case 0x25:  Loop End
+        case 0x26:  Call Sequence
+        case 0x27:  Return From Sequence
+        case 0x28:  Select Block
+        case 0x2A:  Stop Tape if in 48K Mode
+		case 0x2B:  Set signal level
+        case 0x5A:  Merge Block
+    Add support for the deprecated block types? Only if there is some image which need them:
+        case 0x16:  C64 ROM type data block
+        case 0x17:  C64 turbo tape data block
+        case 0x34:  Emulation info
+        case 0x40:  Snapshot block
 
 Notes:
 
