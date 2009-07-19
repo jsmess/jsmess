@@ -294,7 +294,7 @@ static MACHINE_DRIVER_START( mz80k )
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	
-	MDRV_TIMER_ADD_PERIODIC("tempo", ne555_tempo_callback, HZ(24)) // 33.5Hz - 34.3Hz 
+	MDRV_TIMER_ADD_PERIODIC("tempo", ne555_tempo_callback, HZ(34)) // 33.5Hz - 34.3Hz 
 	
 	MDRV_CASSETTE_ADD( "cassette", mz80k_cassette_config )		
 MACHINE_DRIVER_END
