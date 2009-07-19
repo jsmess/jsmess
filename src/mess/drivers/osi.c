@@ -697,6 +697,9 @@ static MACHINE_START( c1p )
 
 	const address_space *program = cputag_get_address_space(machine, M6502_TAG, ADDRESS_SPACE_PROGRAM);
 
+	/* find devices */
+	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
+
 	/* configure RAM banking */
 	memory_configure_bank(machine, 1, 0, 1, memory_region(machine, M6502_TAG), 0);
 	memory_set_bank(machine, 1, 0);
