@@ -20,12 +20,13 @@ Systems Promoted from GAME_NOT_WORKING:
 - KONTIKI 100 [Curt Coder]
 - Lerncomputer LC-80 [Curt Coder]
 - Lerncomputer LC-80.2 [Curt Coder]
+- PK8000 Sura/Hobby [Miodrag Milanovic]
+- PK8000 Vesta [Miodrag Milanovic]
 - Poly-Computer 880 [Curt Coder]
 - TI-83 [Xander]
 - TIKI 100 [Curt Coder]
 - VCS-80 [Curt Coder]
 - Visual 1050 [Curt Coder, rbramante]
-
 
 
 Skeleton drivers: 

@@ -10,6 +10,10 @@
 #include "driver.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/i8255a.h"
+#include "devices/cassette.h"
+#include "formats/fmsx_cas.h"
+#include "sound/dac.h"
+#include "sound/wave.h"
 
 static UINT8 pk8000_text_start;
 static UINT8 pk8000_chargen_start;
@@ -19,8 +23,14 @@ static UINT8 pk8000_color_start;
 static UINT8 pk8000_video_mode;
 static UINT8 pk8000_video_color;
 static UINT8 pk8000_color[32];
+static UINT8 pk8000_video_enable;
 
 static UINT8 keyboard_line;
+
+static const device_config *cassette_device_image(running_machine *machine)
+{
+	return devtag_get_device(machine, "cassette");
+}
 
 static void pk8000_set_bank(running_machine *machine,UINT8 data) 
 { 
@@ -96,7 +106,14 @@ static READ8_DEVICE_HANDLER(pk8000_80_portb_r)
 
 static WRITE8_DEVICE_HANDLER(pk8000_80_portc_w)
 {
-	keyboard_line = data & 0x0f;
+	keyboard_line = data & 0x0f;		
+	
+	dac_signed_data_w (devtag_get_device(device->machine, "dac"), (BIT(data,7) ? 0 : 0x7f));
+	
+	cassette_change_state(cassette_device_image(device->machine),
+						(BIT(data,4)) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,
+						CASSETTE_MASK_MOTOR);
+	cassette_output(cassette_device_image(device->machine), (BIT(data,6)) ? +1.0 : 0.0);						
 }
 
 static I8255A_INTERFACE( pk8000_ppi8255_interface_1 )
@@ -118,6 +135,11 @@ static WRITE8_DEVICE_HANDLER(pk8000_84_porta_w)
 {	
 	pk8000_video_mode = data;
 }
+
+static WRITE8_DEVICE_HANDLER(pk8000_84_portc_w)
+{	
+	pk8000_video_enable = BIT(data,4);
+}
 static I8255A_INTERFACE( pk8000_ppi8255_interface_2 )
 {
 	DEVCB_HANDLER(pk8000_84_porta_r),
@@ -125,7 +147,7 @@ static I8255A_INTERFACE( pk8000_ppi8255_interface_2 )
 	DEVCB_NULL,
 	DEVCB_HANDLER(pk8000_84_porta_w),
 	DEVCB_NULL,
-	DEVCB_NULL
+	DEVCB_HANDLER(pk8000_84_portc_w)
 };
 
 static READ8_HANDLER(pk8000_video_color_r)
@@ -179,6 +201,20 @@ static WRITE8_HANDLER(pk8000_color_w)
 {
 	pk8000_color[offset] = data;
 }	
+
+static READ8_HANDLER(pk8000_joy_1_r)
+{
+	UINT8 retVal = (cassette_input(cassette_device_image(space->machine)) > 0.0038 ? 0x80 : 0);
+	retVal |= input_port_read(space->machine, "JOY1") & 0x7f;
+	return retVal;
+}
+static READ8_HANDLER(pk8000_joy_2_r)
+{
+	UINT8 retVal = (cassette_input(cassette_device_image(space->machine)) > 0.0038 ? 0x80 : 0);
+	retVal |= input_port_read(space->machine, "JOY2") & 0x7f;
+	return retVal;
+}
+
 static ADDRESS_MAP_START(pk8000_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x3fff ) AM_READWRITE(SMH_BANK(1), SMH_BANK(5))
@@ -192,8 +228,8 @@ static ADDRESS_MAP_START( pk8000_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("ppi8255_1", i8255a_r, i8255a_w)
 	AM_RANGE(0x84, 0x87) AM_DEVREADWRITE("ppi8255_2", i8255a_r, i8255a_w)
 	AM_RANGE(0x88, 0x88) AM_READWRITE(pk8000_video_color_r,pk8000_video_color_w)	
-	AM_RANGE(0x8c, 0x8c) AM_READ_PORT("JOY1")
-	AM_RANGE(0x8d, 0x8d) AM_READ_PORT("JOY2")
+	AM_RANGE(0x8c, 0x8c) AM_READ(pk8000_joy_1_r)
+	AM_RANGE(0x8d, 0x8d) AM_READ(pk8000_joy_2_r)
 	AM_RANGE(0x90, 0x90) AM_READWRITE(pk8000_text_start_r,pk8000_text_start_w)
 	AM_RANGE(0x91, 0x91) AM_READWRITE(pk8000_chargen_start_r,pk8000_chargen_start_w)
 	AM_RANGE(0x92, 0x92) AM_READWRITE(pk8000_video_start_r,pk8000_video_start_w)
@@ -343,70 +379,74 @@ static VIDEO_UPDATE( pk8000 )
 	my_rect.max_x = 256+32-1;
 	my_rect.min_y = 0;
 	my_rect.max_y = 192+32-1;
-	bitmap_fill(bitmap, &my_rect, 0);
 	
-	bitmap_fill(bitmap, &my_rect, (pk8000_video_color >> 4) & 0x0f);
-	
-	if (BIT(pk8000_video_mode,4)==0){	
-		// Text mode
-		if (BIT(pk8000_video_mode,5)==0){
-			// 32 columns
-			for (y = 0; y < 24; y++)
-			{
-				for (x = 0; x < 32; x++)
+	if (pk8000_video_enable) {
+		bitmap_fill(bitmap, &my_rect, (pk8000_video_color >> 4) & 0x0f);
+		
+		if (BIT(pk8000_video_mode,4)==0){	
+			// Text mode
+			if (BIT(pk8000_video_mode,5)==0){
+				// 32 columns
+				for (y = 0; y < 24; y++)
 				{
-					UINT8 chr  = mess_ram[x +(y*32) + ((pk8000_text_start & 0x0f) << 10)+offset] ;
-					UINT8 color= pk8000_color[chr>>3];
-					for (j = 0; j < 8; j++) {
-						UINT8 code = mess_ram[((chr<<3) + j) + ((pk8000_chargen_start & 0x0e) << 10)+offset];
-						
-						for (b = 0; b < 8; b++)
-						{								
-							UINT8 col = (code >> b) & 0x01 ? (color & 0x0f) : ((color>>4) & 0x0f);
-							*BITMAP_ADDR16(bitmap, (y*8)+j+16, x*8+(7-b)+16) =  col;
+					for (x = 0; x < 32; x++)
+					{
+						UINT8 chr  = mess_ram[x +(y*32) + ((pk8000_text_start & 0x0f) << 10)+offset] ;
+						UINT8 color= pk8000_color[chr>>3];
+						for (j = 0; j < 8; j++) {
+							UINT8 code = mess_ram[((chr<<3) + j) + ((pk8000_chargen_start & 0x0e) << 10)+offset];
+							
+							for (b = 0; b < 8; b++)
+							{								
+								UINT8 col = (code >> b) & 0x01 ? (color & 0x0f) : ((color>>4) & 0x0f);
+								*BITMAP_ADDR16(bitmap, (y*8)+j+16, x*8+(7-b)+16) =  col;
+							}
+						}
+					}
+				}
+			} else {
+				// 40 columns						
+				for (y = 0; y < 24; y++)
+				{
+					for (x = 0; x < 42; x++)
+					{
+						UINT8 chr = mess_ram[x +(y*64) + ((pk8000_text_start & 0x0e) << 10)+offset] ;
+						for (j = 0; j < 8; j++) {
+							UINT8 code = mess_ram[((chr<<3) + j) + ((pk8000_chargen_start  & 0x0e) << 10)+offset];
+							for (b = 2; b < 8; b++)
+							{								
+								UINT8 col = ((code >> b) & 0x01) ? (pk8000_video_color) & 0x0f : (pk8000_video_color>>4) & 0x0f;
+								*BITMAP_ADDR16(bitmap, (y*8)+j+16, x*6+(7-b)+16+8) =  col;
+							}
 						}
 					}
 				}
 			}
 		} else {
-			// 40 columns						
+			//Graphics
 			for (y = 0; y < 24; y++)
 			{
-				for (x = 0; x < 42; x++)
+				UINT16 off_color = (((~pk8000_color_start) & 0x08) << 10)+offset + ((y>>3)<<11);
+				UINT16 off_code  = (((~pk8000_video_start) & 0x08) << 10)+offset + ((y>>3)<<11);
+				for (x = 0; x < 32; x++)
 				{
-					UINT8 chr = mess_ram[x +(y*64) + ((pk8000_text_start & 0x0e) << 10)+offset] ;
+					UINT8 chr  = mess_ram[x +(y*32) + ((pk8000_chargen_start & 0x0e) << 10)+offset] ;
 					for (j = 0; j < 8; j++) {
-						UINT8 code = mess_ram[((chr<<3) + j) + ((pk8000_chargen_start  & 0x0e) << 10)+offset];
-						for (b = 2; b < 8; b++)
+						UINT8 color= mess_ram[((chr<<3) + j)+off_color];
+						UINT8 code = mess_ram[((chr<<3) + j)+off_code];
+						
+						for (b = 0; b < 8; b++)
 						{								
-							UINT8 col = ((code >> b) & 0x01) ? (pk8000_video_color) & 0x0f : (pk8000_video_color>>4) & 0x0f;
-							*BITMAP_ADDR16(bitmap, (y*8)+j+16, x*6+(7-b)+16+8) =  col;
+							UINT8 col = (code >> b) & 0x01 ? (color & 0x0f) : ((color>>4) & 0x0f);						
+							*BITMAP_ADDR16(bitmap, (y*8)+j+16, x*8+(7-b)+16) =  col;
 						}
 					}
 				}
 			}
 		}
 	} else {
-		//Graphics
-		for (y = 0; y < 24; y++)
-		{
-			UINT16 off_color = (((~pk8000_color_start) & 0x08) << 10)+offset + ((y>>3)<<11);
-			UINT16 off_code  = (((~pk8000_video_start) & 0x08) << 10)+offset + ((y>>3)<<11);
-			for (x = 0; x < 32; x++)
-			{
-				UINT8 chr  = mess_ram[x +(y*32) + ((pk8000_chargen_start & 0x0f) << 10)+offset] ;
-				for (j = 0; j < 8; j++) {
-					UINT8 color= mess_ram[((chr<<3) + j)+off_color];
-					UINT8 code = mess_ram[((chr<<3) + j)+off_code];
-					
-					for (b = 0; b < 8; b++)
-					{								
-						UINT8 col = (code >> b) & 0x01 ? (color & 0x0f) : ((color>>4) & 0x0f);						
-						*BITMAP_ADDR16(bitmap, (y*8)+j+16, x*8+(7-b)+16) =  col;
-					}
-				}
-			}
-		}
+		// Disabled video
+		bitmap_fill(bitmap, &my_rect, 0);
 	}
     return 0;
 }
@@ -435,6 +475,13 @@ PALETTE_INIT( pk8000 )
 	palette_set_colors(machine, 0, pk8000_palette, ARRAY_LENGTH(pk8000_palette));
 }
 
+/* Machine driver */
+static const cassette_config pk8000_cassette_config =
+{
+	fmsx_cassette_formats,
+	NULL,
+	CASSETTE_PLAY
+};
 
 static MACHINE_DRIVER_START( pk8000 )
     /* basic machine hardware */
@@ -460,6 +507,15 @@ static MACHINE_DRIVER_START( pk8000 )
     
     MDRV_I8255A_ADD( "ppi8255_1", pk8000_ppi8255_interface_1 )
     MDRV_I8255A_ADD( "ppi8255_2", pk8000_ppi8255_interface_2 )
+    
+    /* audio hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD("dac", DAC, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MDRV_SOUND_WAVE_ADD("wave", "cassette")
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	    
+    MDRV_CASSETTE_ADD( "cassette", pk8000_cassette_config )
 MACHINE_DRIVER_END
 
 static SYSTEM_CONFIG_START(pk8000)
@@ -480,6 +536,6 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( 1987, vesta,  0,       0, 	pk8000, 	pk8000, 	 0,  	  pk8000,  	 "BP EVM",   "PK8000 Vesta",		GAME_NOT_WORKING)
-COMP( 1987, hobby,  vesta,   0, 	pk8000, 	pk8000, 	 0,  	  pk8000,  	 "BP EVM",   "PK8000 Sura/Hobby",		GAME_NOT_WORKING)
+COMP( 1987, vesta,  0,       0, 	pk8000, 	pk8000, 	 0,  	  pk8000,  	 "BP EVM",   "PK8000 Vesta",		0)
+COMP( 1987, hobby,  vesta,   0, 	pk8000, 	pk8000, 	 0,  	  pk8000,  	 "BP EVM",   "PK8000 Sura/Hobby",	0)
 
