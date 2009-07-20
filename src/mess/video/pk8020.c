@@ -15,12 +15,13 @@ VIDEO_START( pk8020 )
 
 VIDEO_UPDATE( pk8020 )
 {
- 	UINT8 code1,code2,code3,code4;
- 	UINT8 col;
-	int y, x, b;
-
+ 	//UINT8 code1,code2,code3,code4;
+ 	//UINT8 col;
+	int y, x, b, j;
+	UINT8 *gfx = memory_region(screen->machine, "gfx1");
+	
 	// draw image
-	for (x = 0; x < 32; x++)
+/*	for (x = 0; x < 32; x++)
 	{
 		for (y = 0; y < 256; y++)
 		{
@@ -35,15 +36,30 @@ VIDEO_UPDATE( pk8020 )
 			}
 		}
 	}
+*/
 
-
+	for (y = 0; y < 16; y++)
+				{
+					for (x = 0; x < 64; x++)
+					{
+						UINT8 chr = mess_ram[x +(y*64) + 0x20000] ;
+						for (j = 0; j < 16; j++) {
+							UINT8 code = gfx[((chr<<4) + j)];
+							for (b = 0; b < 8; b++)
+							{								
+								UINT8 col = ((code >> b) & 0x01) ? 0x0f : 0x00;
+								*BITMAP_ADDR16(bitmap, (y*16)+j, x*8+(7-b)) =  col;
+							}
+						}
+					}
+				}
 	return 0;
 }
 
 PALETTE_INIT( pk8020 )
 {
 	int i;
-	for(i=0;i<16;i++) {
-		palette_set_color( machine, i, MAKE_RGB(0,0,0) );
+	for(i=0;i<16;i++) {		
+		palette_set_color( machine, i, MAKE_RGB(i*0x10,i*0x10,i*0x10) );
 	}
 }
