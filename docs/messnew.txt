@@ -90,6 +90,10 @@ System Driver Changes:
 - [SEGA CD] Rearranged sets and added new and better dumps. [Justin Kerk, TmEE,
   segaloco]
 
+- [SNES] Fixed a blending flag bug (see Micro Machines bg colors), added basic 
+  Horizontal Mosaic effect, fixed 16x16 tiles in 2bpp mode (see e.g. Super 
+  Adventure Island, but also many others). [Angelo Salese]
+
 - [SPECTRUM] Added logging support for Text/Message/Archive/Hardware/Custom 
   Blocks in TZX files. Info are not (and won't be) used directly by the 
   emulator, but can be of use to improve bug reports. Also, updated TZX
