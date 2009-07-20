@@ -39,20 +39,20 @@ VIDEO_UPDATE( pk8020 )
 */
 
 	for (y = 0; y < 16; y++)
-				{
-					for (x = 0; x < 64; x++)
-					{
-						UINT8 chr = mess_ram[x +(y*64) + 0x20000] ;
-						for (j = 0; j < 16; j++) {
-							UINT8 code = gfx[((chr<<4) + j)];
-							for (b = 0; b < 8; b++)
-							{								
-								UINT8 col = ((code >> b) & 0x01) ? 0x0f : 0x00;
-								*BITMAP_ADDR16(bitmap, (y*16)+j, x*8+(7-b)) =  col;
-							}
-						}
-					}
+	{
+		for (x = 0; x < 64; x++)
+		{
+			UINT8 chr = mess_ram[x +(y*64) + 0x20000] ;
+			for (j = 0; j < 16; j++) {
+				UINT8 code = gfx[((chr<<4) + j)];
+				for (b = 0; b < 8; b++)
+				{								
+					UINT8 col = ((code >> b) & 0x01) ? ((pk8020_color >> 4)& 0xf)^ 0x0f : ((pk8020_color >> 1) & 0x07);
+					*BITMAP_ADDR16(bitmap, (y*16)+j, x*8+(7-b)) =  col;
 				}
+			}
+		}
+	}
 	return 0;
 }
 

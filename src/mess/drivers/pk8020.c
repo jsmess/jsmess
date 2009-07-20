@@ -135,42 +135,13 @@ static INPUT_PORTS_START( pk8020 )
 		PORT_BIT(0xFF, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
-static I8255A_INTERFACE( pk8020_ppi8255_interface_1 )
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-static I8255A_INTERFACE( pk8020_ppi8255_interface_2 )
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-static I8255A_INTERFACE( pk8020_ppi8255_interface_3 )
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 /* Machine driver */
 static MACHINE_DRIVER_START( pk8020 )
   /* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", 8080, XTAL_20MHz / 8)
 	MDRV_CPU_PROGRAM_MAP(pk8020_mem)
 	MDRV_CPU_IO_MAP(pk8020_io)
+	MDRV_CPU_VBLANK_INT("screen", pk8020_interrupt)
 
 	MDRV_MACHINE_RESET( pk8020 )
 
@@ -190,7 +161,33 @@ static MACHINE_DRIVER_START( pk8020 )
     MDRV_I8255A_ADD( "ppi8255_1", pk8020_ppi8255_interface_1 )
     MDRV_I8255A_ADD( "ppi8255_2", pk8020_ppi8255_interface_2 )	
     MDRV_I8255A_ADD( "ppi8255_3", pk8020_ppi8255_interface_3 )
+    
+    MDRV_PIT8253_ADD( "pit8253", pk8020_pit8253_intf )
+
+	MDRV_PIC8259_ADD( "pic8259", pk8020_pic8259_config )    
+	MDRV_MSM8251_ADD( "rs232", default_msm8251_interface)
+	MDRV_MSM8251_ADD( "lan", default_msm8251_interface)
+	
+	MDRV_WD1793_ADD( "wd1793", default_wd17xx_interface )	
 MACHINE_DRIVER_END
+
+ static void pk8020_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+{
+	/* floppy */
+	switch(state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case MESS_DEVINFO_INT_COUNT:							info->i = 4; break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_pk8020_floppy; break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "kdi"); break;
+
+		default:										legacybasicdsk_device_getinfo(devclass, state, info); break;
+	}	
+}
 
 /* ROM definition */
 
@@ -202,10 +199,11 @@ ROM_START( korvet )
 ROM_END
 
 static SYSTEM_CONFIG_START(pk8020)
- 	CONFIG_RAM_DEFAULT((128 +2) * 1024)
+ 	CONFIG_RAM_DEFAULT((128 + 1) * 1024)
+ 	CONFIG_DEVICE(pk8020_floppy_getinfo);
 SYSTEM_CONFIG_END
 
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       INIT     CONFIG COMPANY                  FULLNAME   FLAGS */
-COMP( 1987, korvet, 	 0,  	 0,	pk8020, 	pk8020, 	pk8020, pk8020,  "", 					 "PK-8020 Korvet",	 GAME_NOT_WORKING)
+COMP( 1987, korvet, 	 0,  	 0,	pk8020, 	pk8020, 	pk8020, pk8020,  "", 					 "PK8020 Korvet",	 GAME_NOT_WORKING)
