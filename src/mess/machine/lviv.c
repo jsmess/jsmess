@@ -37,7 +37,7 @@ static void lviv_update_memory (running_machine *machine)
 	else
 	{
 		memory_set_bankptr(machine,1, mess_ram + 0x8000);
-		memory_set_bankptr(machine,2, lviv_video_ram);
+		memory_set_bankptr(machine,2, mess_ram + 0xc000);
 	}
 }
 
