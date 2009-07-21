@@ -136,6 +136,14 @@ static INPUT_PORTS_START( pk8020 )
 INPUT_PORTS_END
 
 /* Machine driver */
+static const cassette_config pk8020_cassette_config =
+{
+	cassette_default_formats,
+	NULL,
+	CASSETTE_PLAY
+};
+
+/* Machine driver */
 static MACHINE_DRIVER_START( pk8020 )
   /* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", 8080, XTAL_20MHz / 8)
@@ -169,6 +177,15 @@ static MACHINE_DRIVER_START( pk8020 )
 	MDRV_MSM8251_ADD( "lan", default_msm8251_interface)
 	
 	MDRV_WD1793_ADD( "wd1793", default_wd17xx_interface )	
+    
+    /* audio hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MDRV_SOUND_WAVE_ADD("wave", "cassette")
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	
+	MDRV_CASSETTE_ADD( "cassette", pk8020_cassette_config )	
 MACHINE_DRIVER_END
 
  static void pk8020_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)

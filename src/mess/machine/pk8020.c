@@ -20,8 +20,9 @@ UINT8 pk8020_wide = 0;
 UINT8 pk8020_font = 0;
 static UINT8 pk8020_video_page_access = 0;
 static UINT8 portc_data;
-
 static void pk8020_set_bank(running_machine *machine,UINT8 data);
+static UINT8 sound_gate = 0;
+static UINT8 sound_level = 0;
 
 /* Driver initialization */
 DRIVER_INIT(pk8020)
@@ -897,18 +898,24 @@ I8255A_INTERFACE( pk8020_ppi8255_interface_1 )
 	DEVCB_HANDLER(pk8020_portb_w),
 	DEVCB_HANDLER(pk8020_portc_w)
 };
-static READ8_DEVICE_HANDLER(pk8020_unk_r)
-{	
-	return 0x00;
+
+static WRITE8_DEVICE_HANDLER(pk8020_2_portc_w)
+{      
+	const device_config *speaker = devtag_get_device(device->machine, "speaker");
+	
+	sound_gate = BIT(data,3);
+	
+	speaker_level_w(speaker, sound_gate ? sound_level : 0);
 }
+
 I8255A_INTERFACE( pk8020_ppi8255_interface_2 )
 {
-	DEVCB_HANDLER(pk8020_unk_r),
-	DEVCB_HANDLER(pk8020_unk_r),
-	DEVCB_HANDLER(pk8020_unk_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_NULL
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(pk8020_2_portc_w)
 };
 
 I8255A_INTERFACE( pk8020_ppi8255_interface_3 )
@@ -922,8 +929,12 @@ I8255A_INTERFACE( pk8020_ppi8255_interface_3 )
 };
 
 static PIT8253_OUTPUT_CHANGED(pk8020_pit_out0)
-{
-	// beep	
+{   
+	const device_config *speaker = devtag_get_device(device->machine, "speaker");
+	
+	sound_level = state;
+	
+	speaker_level_w(speaker, sound_gate ? sound_level : 0);
 }
 
 
@@ -976,6 +987,9 @@ MACHINE_RESET( pk8020 )
 	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), pk8020_irq_callback);
 		
 	wd17xx_set_density (fdc,DEN_FM_HI);	
+	
+	sound_gate = 0;
+	sound_level = 0;	
 }
 
 DEVICE_IMAGE_LOAD( pk8020_floppy )

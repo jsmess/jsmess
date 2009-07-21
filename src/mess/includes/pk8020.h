@@ -13,6 +13,9 @@
 #include "machine/msm8251.h"
 #include "machine/wd17xx.h"
 #include "devices/basicdsk.h"
+#include "devices/cassette.h"
+#include "sound/speaker.h"
+#include "sound/wave.h"
 
 /*----------- defined in machine/pk8020.c -----------*/
 extern UINT8 pk8020_color;
