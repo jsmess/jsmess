@@ -199,11 +199,11 @@ ROM_START( korvet )
 ROM_END
 
 static SYSTEM_CONFIG_START(pk8020)
- 	CONFIG_RAM_DEFAULT((128 + 1) * 1024)
+ 	CONFIG_RAM_DEFAULT((64 + 4*48 + 2) * 1024) // Text video ram is 1KB but it is 9bit, so we take 2 KB for that
  	CONFIG_DEVICE(pk8020_floppy_getinfo);
 SYSTEM_CONFIG_END
 
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       INIT     CONFIG COMPANY                  FULLNAME   FLAGS */
-COMP( 1987, korvet, 	 0,  	 0,	pk8020, 	pk8020, 	pk8020, pk8020,  "", 					 "PK8020 Korvet",	 GAME_NOT_WORKING)
+COMP( 1987, korvet, 	 0,  	 0,	pk8020, 	pk8020, 	pk8020, pk8020,  "", 					 "PK8020 Korvet",	 0)

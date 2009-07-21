@@ -16,6 +16,9 @@
 
 /*----------- defined in machine/pk8020.c -----------*/
 extern UINT8 pk8020_color;
+extern UINT8 pk8020_video_page;
+extern UINT8 pk8020_wide;
+extern UINT8 pk8020_font;
 extern DRIVER_INIT( pk8020 );
 extern MACHINE_RESET( pk8020 );
 extern const i8255a_interface pk8020_ppi8255_interface_1;

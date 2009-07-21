@@ -22,6 +22,7 @@ Systems Promoted from GAME_NOT_WORKING:
 - Lerncomputer LC-80.2 [Curt Coder]
 - PK8000 Sura/Hobby [Miodrag Milanovic]
 - PK8000 Vesta [Miodrag Milanovic]
+- PK8020 Korvet [Miodrag Milanovic]
 - Poly-Computer 880 [Curt Coder]
 - TI-83 [Xander]
 - TIKI 100 [Curt Coder]

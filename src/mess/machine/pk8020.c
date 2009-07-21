@@ -11,17 +11,22 @@
 #include "cpu/i8085/i8085.h"
 #include "includes/pk8020.h"
 
-static UINT8 vpage = 0;
 static UINT8 attr = 0;
+static UINT8 text_attr = 0;
 static UINT8 takt = 0;
 UINT8 pk8020_color = 0;
+UINT8 pk8020_video_page = 0;
+UINT8 pk8020_wide = 0;
+UINT8 pk8020_font = 0;
+static UINT8 pk8020_video_page_access = 0;
+static UINT8 portc_data;
 
 static void pk8020_set_bank(running_machine *machine,UINT8 data);
 
 /* Driver initialization */
 DRIVER_INIT(pk8020)
 {
-	memset(mess_ram,0,129*1024);
+	memset(mess_ram,0,(64 + 4*48 + 2)*1024);
 }
 
 static READ8_HANDLER(keyboard_r)
@@ -48,22 +53,21 @@ static READ8_HANDLER(keyboard_r)
 	line++;
 	if (offset & 0x0080) retVal|=input_port_read(space->machine,keynames[line]);
 	line++;
+
 	return retVal;
 }
 
 static READ8_HANDLER(sysreg_r)
 {
-	logerror("sysreg_r %02x\n",offset);
-	return 0xff;
+	return mess_ram[offset];
 }
 static WRITE8_HANDLER(sysreg_w)
 {
-	logerror("sysreg_w %02x %02x\n",offset,data);
 	if (BIT(offset,7)==0) {
 		pk8020_set_bank(space->machine,data >> 2);
 	} else if (BIT(offset,6)==0) {
 		// Color
-		pk8020_color = data;
+		pk8020_color = data;		
 	} else if (BIT(offset,2)==0) {
 		// Palette set
 		UINT8 number = data & 0x0f;
@@ -78,12 +82,81 @@ static WRITE8_HANDLER(sysreg_w)
 
 static READ8_HANDLER(text_r)
 {
-	return mess_ram[0x20000+offset];	
+    if (attr == 3) text_attr=mess_ram[0x40400+offset];
+	return mess_ram[0x40000+offset];	
 }
 
 static WRITE8_HANDLER(text_w)
 {
-	mess_ram[0x20000+offset] = data;
+	mess_ram[0x40000+offset] = data;
+	switch (attr) {
+        case 0: break; 
+        case 1: mess_ram[0x40400+offset]=0x01;break;
+        case 2: mess_ram[0x40400+offset]=0x00;break;
+        case 3: mess_ram[0x40400+offset]=text_attr;break;
+    }	
+}
+
+static READ8_HANDLER(gzu_r)
+{	
+	UINT8 *addr = mess_ram + 0x10000 + (pk8020_video_page_access * 0xC000);
+	UINT8 p0 = addr[offset];
+	UINT8 p1 = addr[offset + 0x4000];
+	UINT8 p2 = addr[offset + 0x8000];
+	UINT8 retVal = 0;
+	if(pk8020_color & 0x80) {
+		// Color mode
+		if (!(pk8020_color & 0x10)) {
+			p0 ^= 0xff;
+		}
+		if (!(pk8020_color & 0x20)) {
+			p1 ^= 0xff;
+		}
+		if (!(pk8020_color & 0x40)) {
+			p2 ^= 0xff;
+		}
+		retVal = (p0 & p1 & p2) ^ 0xff;
+	} else {
+		// Plane mode
+		if (pk8020_color & 0x10) {
+			retVal |= p0;
+		}
+		if (pk8020_color & 0x20) {
+			retVal |= p1;
+		}
+		if (pk8020_color & 0x40) {
+			retVal |= p2;
+		}
+	}
+	return retVal;
+}
+
+static WRITE8_HANDLER(gzu_w)
+{
+	UINT8 *addr = mess_ram + 0x10000 + (pk8020_video_page_access * 0xC000);
+	UINT8 *plane_0 = addr;
+	UINT8 *plane_1 = addr + 0x4000;
+	UINT8 *plane_2 = addr + 0x8000;
+	
+	if(pk8020_color & 0x80) 
+	{
+		// Color mode
+		plane_0[offset] = (plane_0[offset] & ~data) | ((pk8020_color & 2) ? data : 0);
+		plane_1[offset] = (plane_1[offset] & ~data) | ((pk8020_color & 4) ? data : 0);
+		plane_2[offset] = (plane_2[offset] & ~data) | ((pk8020_color & 8) ? data : 0);
+	} else {
+		// Plane mode
+		UINT8 mask = (pk8020_color & 1) ? data : 0;
+   		if (!(pk8020_color & 0x02)) {
+	   		plane_0[offset] = (plane_0[offset] & ~data) | mask;
+   		}
+   		if (!(pk8020_color & 0x04)) {
+	   		plane_1[offset] = (plane_1[offset] & ~data) | mask;
+   		}
+   		if (!(pk8020_color & 0x08)) {
+	   		plane_2[offset] = (plane_2[offset] & ~data) | mask;
+   		}
+	}
 }
 
 static READ8_HANDLER(devices_r)
@@ -96,16 +169,6 @@ static READ8_HANDLER(devices_r)
 	const device_config *rs232 = devtag_get_device(space->machine, "rs232");
 	const device_config *lan = devtag_get_device(space->machine, "lan");
 	const device_config *fdc = devtag_get_device(space->machine, "wd1793");	
-	switch(offset & 0x38)
-	{
-		case 0x00: 
-		case 0x18: 
-		case 0x20: 
-		case 0x28: 
-		case 0x38: 
-			//logerror("devices_r %02x %04x\n",offset,cpu_get_pc(space->cpu));
-			break;
-	}
 	
 	switch(offset & 0x38)
 	{
@@ -145,16 +208,6 @@ static WRITE8_HANDLER(devices_w)
 	const device_config *rs232 = devtag_get_device(space->machine, "rs232");
 	const device_config *lan = devtag_get_device(space->machine, "lan");
 	const device_config *fdc = devtag_get_device(space->machine, "wd1793");
-	switch(offset & 0x38)
-	{
-		case 0x00: 
-		case 0x18: 
-		case 0x20: 
-		case 0x28: 
-		case 0x38: 
-			//logerror("devices_w %02x %02x %04x\n",offset,data,cpu_get_pc(space->cpu));
-			break;
-	}
 	
 	switch(offset & 0x38)
 	{
@@ -166,10 +219,10 @@ static WRITE8_HANDLER(devices_w)
 				   }
 				   break;			
 		case 0x18: switch(offset & 3) {
-						case 0 : wd17xx_command_w(fdc,0,data);
-						case 1 : wd17xx_track_w(fdc,0,data);
-						case 2 : wd17xx_sector_w(fdc,0,data);
-						case 3 : wd17xx_data_w(fdc,0,data);
+						case 0 : wd17xx_command_w(fdc,0,data);break;
+						case 1 : wd17xx_track_w(fdc,0,data);break;
+						case 2 : wd17xx_sector_w(fdc,0,data);break;
+						case 3 : wd17xx_data_w(fdc,0,data);break;
 					} 
 					break;				   	
 		case 0x20: switch(offset & 1) {
@@ -186,7 +239,6 @@ static WRITE8_HANDLER(devices_w)
 static void pk8020_set_bank(running_machine *machine,UINT8 data) 
 { 
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);	
-	
 	switch(data & 0x1F) {
 		case 0x00 : 
 					{
@@ -309,8 +361,8 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						// RAM
 						memory_install_read8_handler (space, 0x0000, 0xf7ff, 0, 0, SMH_BANK(1));
 						memory_install_write8_handler(space, 0x0000, 0xf7ff, 0, 0, SMH_BANK(2));
-						memory_set_bankptr(machine, 1, mess_ram + 0x4000);
-						memory_set_bankptr(machine, 2, mess_ram + 0x4000);
+						memory_set_bankptr(machine, 1, mess_ram);
+						memory_set_bankptr(machine, 2, mess_ram);
 						// Keyboard
 						memory_install_read8_handler (space, 0xf800, 0xf9ff, 0, 0, keyboard_r);
 						memory_install_write8_handler(space, 0xf800, 0xf9ff, 0, 0, SMH_BANK(3));
@@ -352,10 +404,8 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						memory_set_bankptr(machine, 4, mess_ram + 0x4000);
 						memory_set_bankptr(machine, 5, mess_ram + 0x4000);
 						// Video RAM
-						memory_install_read8_handler (space, 0xc000, 0xffff, 0, 0, SMH_BANK(6));
-						memory_install_write8_handler(space, 0xc000, 0xffff, 0, 0, SMH_BANK(7));
-						memory_set_bankptr(machine, 6, mess_ram + 0x10000 + vpage * 0x4000);
-						memory_set_bankptr(machine, 7, mess_ram + 0x10000 + vpage * 0x4000);
+						memory_install_read8_handler (space, 0xc000, 0xffff, 0, 0, gzu_r);
+						memory_install_write8_handler(space, 0xc000, 0xffff, 0, 0, gzu_w);
 						
 					}
 					break;
@@ -372,11 +422,8 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						memory_set_bankptr(machine, 3, mess_ram + 0x2000);
 						memory_set_bankptr(machine, 4, mess_ram + 0x2000);
 						// Video RAM
-						memory_install_read8_handler (space, 0xc000, 0xffff, 0, 0, SMH_BANK(5));
-						memory_install_write8_handler(space, 0xc000, 0xffff, 0, 0, SMH_BANK(6));
-						memory_set_bankptr(machine, 5, mess_ram + 0x10000 + vpage * 0x4000);
-						memory_set_bankptr(machine, 6, mess_ram + 0x10000 + vpage * 0x4000);
-						
+						memory_install_read8_handler (space, 0xc000, 0xffff, 0, 0, gzu_r);
+						memory_install_write8_handler(space, 0xc000, 0xffff, 0, 0, gzu_w);						
 					}
 					break;
 		case 0x0A : 
@@ -392,11 +439,8 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						memory_set_bankptr(machine, 3, mess_ram + 0x4000);
 						memory_set_bankptr(machine, 4, mess_ram + 0x4000);
 						// Video RAM
-						memory_install_read8_handler (space, 0xc000, 0xffff, 0, 0, SMH_BANK(5));
-						memory_install_write8_handler(space, 0xc000, 0xffff, 0, 0, SMH_BANK(6));
-						memory_set_bankptr(machine, 5, mess_ram + 0x10000 + vpage * 0x4000);
-						memory_set_bankptr(machine, 6, mess_ram + 0x10000 + vpage * 0x4000);
-						
+						memory_install_read8_handler (space, 0xc000, 0xffff, 0, 0, gzu_r);
+						memory_install_write8_handler(space, 0xc000, 0xffff, 0, 0, gzu_w);
 					}
 					break;
 		case 0x0B : 
@@ -407,11 +451,8 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						memory_set_bankptr(machine, 1, mess_ram + 0x0000);
 						memory_set_bankptr(machine, 2, mess_ram + 0x0000);
 						// Video RAM
-						memory_install_read8_handler (space, 0xc000, 0xffff, 0, 0, SMH_BANK(3));
-						memory_install_write8_handler(space, 0xc000, 0xffff, 0, 0, SMH_BANK(4));
-						memory_set_bankptr(machine, 3, mess_ram + 0x10000 + vpage * 0x4000);
-						memory_set_bankptr(machine, 4, mess_ram + 0x10000 + vpage * 0x4000);
-						
+						memory_install_read8_handler (space, 0xc000, 0xffff, 0, 0, gzu_r);
+						memory_install_write8_handler(space, 0xc000, 0xffff, 0, 0, gzu_w);
 					}
 					break;
 		case 0x0C : 
@@ -428,15 +469,13 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						memory_set_bankptr(machine, 3, mess_ram + 0x2000);
 						memory_set_bankptr(machine, 4, mess_ram + 0x2000);
 						// Video RAM
-						memory_install_read8_handler (space, 0x4000, 0x7fff, 0, 0, SMH_BANK(5));
-						memory_install_write8_handler(space, 0x4000, 0x7fff, 0, 0, SMH_BANK(6));
-						memory_set_bankptr(machine, 5, mess_ram + 0x10000 + vpage * 0x4000);
-						memory_set_bankptr(machine, 6, mess_ram + 0x10000 + vpage * 0x4000);
+						memory_install_read8_handler (space, 0x4000, 0x7fff, 0, 0, gzu_r);
+						memory_install_write8_handler(space, 0x4000, 0x7fff, 0, 0, gzu_w);
 						// RAM
-						memory_install_read8_handler (space, 0x8000, 0xfdff, 0, 0, SMH_BANK(7));
-						memory_install_write8_handler(space, 0x8000, 0xfdff, 0, 0, SMH_BANK(8));
-						memory_set_bankptr(machine, 7, mess_ram + 0x8000);
-						memory_set_bankptr(machine, 8, mess_ram + 0x8000);
+						memory_install_read8_handler (space, 0x8000, 0xfdff, 0, 0, SMH_BANK(5));
+						memory_install_write8_handler(space, 0x8000, 0xfdff, 0, 0, SMH_BANK(6));
+						memory_set_bankptr(machine, 5, mess_ram + 0x8000);
+						memory_set_bankptr(machine, 6, mess_ram + 0x8000);
 						// Devices
 						memory_install_read8_handler (space, 0xfe00, 0xfeff, 0, 0, devices_r);
 						memory_install_write8_handler(space, 0xfe00, 0xfeff, 0, 0, devices_w);
@@ -453,10 +492,8 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						memory_set_bankptr(machine, 1, memory_region(machine,"maincpu") + 0x10000);
 						memory_set_bankptr(machine, 2, mess_ram + 0x0000);
 						// Video RAM
-						memory_install_read8_handler (space, 0x4000, 0x7fff, 0, 0, SMH_BANK(3));
-						memory_install_write8_handler(space, 0x4000, 0x7fff, 0, 0, SMH_BANK(4));
-						memory_set_bankptr(machine, 3, mess_ram + 0x10000 + vpage * 0x4000);
-						memory_set_bankptr(machine, 4, mess_ram + 0x10000 + vpage * 0x4000);
+						memory_install_read8_handler (space, 0x4000, 0x7fff, 0, 0, gzu_r);
+						memory_install_write8_handler(space, 0x4000, 0x7fff, 0, 0, gzu_w);
 						// RAM
 						memory_install_read8_handler (space, 0x8000, 0xfdff, 0, 0, SMH_BANK(5));
 						memory_install_write8_handler(space, 0x8000, 0xfdff, 0, 0, SMH_BANK(6));
@@ -478,15 +515,13 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						memory_set_bankptr(machine, 1, mess_ram + 0x0000);
 						memory_set_bankptr(machine, 2, mess_ram + 0x0000);
 						// Video RAM
-						memory_install_read8_handler (space, 0x4000, 0x7fff, 0, 0, SMH_BANK(3));
-						memory_install_write8_handler(space, 0x4000, 0x7fff, 0, 0, SMH_BANK(4));
-						memory_set_bankptr(machine, 3, mess_ram + 0x10000 + vpage * 0x4000);
-						memory_set_bankptr(machine, 4, mess_ram + 0x10000 + vpage * 0x4000);
+						memory_install_read8_handler (space, 0x4000, 0x7fff, 0, 0, gzu_r);
+						memory_install_write8_handler(space, 0x4000, 0x7fff, 0, 0, gzu_w);
 						// RAM
-						memory_install_read8_handler (space, 0x8000, 0xfdff, 0, 0, SMH_BANK(5));
-						memory_install_write8_handler(space, 0x8000, 0xfdff, 0, 0, SMH_BANK(6));
-						memory_set_bankptr(machine, 5, mess_ram + 0x8000);
-						memory_set_bankptr(machine, 6, mess_ram + 0x8000);
+						memory_install_read8_handler (space, 0x8000, 0xfdff, 0, 0, SMH_BANK(3));
+						memory_install_write8_handler(space, 0x8000, 0xfdff, 0, 0, SMH_BANK(4));
+						memory_set_bankptr(machine, 3, mess_ram + 0x8000);
+						memory_set_bankptr(machine, 4, mess_ram + 0x8000);
 						// Devices
 						memory_install_read8_handler (space, 0xfe00, 0xfeff, 0, 0, devices_r);
 						memory_install_write8_handler(space, 0xfe00, 0xfeff, 0, 0, devices_w);
@@ -689,10 +724,8 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						memory_install_read8_handler (space, 0xbf00, 0xbfff, 0, 0, sysreg_r);
 						memory_install_write8_handler(space, 0xbf00, 0xbfff, 0, 0, sysreg_w);						
 						// Video RAM
-						memory_install_read8_handler (space, 0xc000, 0xffff, 0, 0, SMH_BANK(5));
-						memory_install_write8_handler(space, 0xc000, 0xffff, 0, 0, SMH_BANK(6));
-						memory_set_bankptr(machine, 5, mess_ram + 0x10000 + vpage * 0x4000);
-						memory_set_bankptr(machine, 6, mess_ram + 0x10000 + vpage * 0x4000);
+						memory_install_read8_handler (space, 0xc000, 0xffff, 0, 0, gzu_r);
+						memory_install_write8_handler(space, 0xc000, 0xffff, 0, 0, gzu_w);
 					}
 					break;
 		case 0x19 : 
@@ -711,10 +744,8 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						memory_install_read8_handler (space, 0xbf00, 0xbfff, 0, 0, sysreg_r);
 						memory_install_write8_handler(space, 0xbf00, 0xbfff, 0, 0, sysreg_w);						
 						// Video RAM
-						memory_install_read8_handler (space, 0xc000, 0xffff, 0, 0, SMH_BANK(5));
-						memory_install_write8_handler(space, 0xc000, 0xffff, 0, 0, SMH_BANK(6));
-						memory_set_bankptr(machine, 5, mess_ram + 0x10000 + vpage * 0x4000);
-						memory_set_bankptr(machine, 6, mess_ram + 0x10000 + vpage * 0x4000);
+						memory_install_read8_handler (space, 0xc000, 0xffff, 0, 0, gzu_r);
+						memory_install_write8_handler(space, 0xc000, 0xffff, 0, 0, gzu_w);
 					}
 					break;
 		case 0x1A : 
@@ -733,10 +764,8 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						memory_install_read8_handler (space, 0xbf00, 0xbfff, 0, 0, sysreg_r);
 						memory_install_write8_handler(space, 0xbf00, 0xbfff, 0, 0, sysreg_w);						
 						// Video RAM
-						memory_install_read8_handler (space, 0xc000, 0xffff, 0, 0, SMH_BANK(5));
-						memory_install_write8_handler(space, 0xc000, 0xffff, 0, 0, SMH_BANK(6));
-						memory_set_bankptr(machine, 5, mess_ram + 0x10000 + vpage * 0x4000);
-						memory_set_bankptr(machine, 6, mess_ram + 0x10000 + vpage * 0x4000);
+						memory_install_read8_handler (space, 0xc000, 0xffff, 0, 0, gzu_r);
+						memory_install_write8_handler(space, 0xc000, 0xffff, 0, 0, gzu_w);
 					}
 					break;
 		case 0x1B : 
@@ -750,10 +779,8 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						memory_install_read8_handler (space, 0xbf00, 0xbfff, 0, 0, sysreg_r);
 						memory_install_write8_handler(space, 0xbf00, 0xbfff, 0, 0, sysreg_w);						
 						// Video RAM
-						memory_install_read8_handler (space, 0xc000, 0xffff, 0, 0, SMH_BANK(3));
-						memory_install_write8_handler(space, 0xc000, 0xffff, 0, 0, SMH_BANK(4));
-						memory_set_bankptr(machine, 3, mess_ram + 0x10000 + vpage * 0x4000);
-						memory_set_bankptr(machine, 4, mess_ram + 0x10000 + vpage * 0x4000);
+						memory_install_read8_handler (space, 0xc000, 0xffff, 0, 0, gzu_r);
+						memory_install_write8_handler(space, 0xc000, 0xffff, 0, 0, gzu_w);
 					}
 					break;
 		case 0x1C : 
@@ -769,10 +796,8 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						memory_set_bankptr(machine, 3, mess_ram + 0x6000);
 						memory_set_bankptr(machine, 4, mess_ram + 0x6000);
 						// Video RAM
-						memory_install_read8_handler (space, 0xc000, 0xffff, 0, 0, SMH_BANK(5));
-						memory_install_write8_handler(space, 0xc000, 0xffff, 0, 0, SMH_BANK(6));
-						memory_set_bankptr(machine, 5, mess_ram + 0x10000 + vpage * 0x4000);
-						memory_set_bankptr(machine, 6, mess_ram + 0x10000 + vpage * 0x4000);
+						memory_install_read8_handler (space, 0xc000, 0xffff, 0, 0, gzu_r);
+						memory_install_write8_handler(space, 0xc000, 0xffff, 0, 0, gzu_w);
 					}
 					break;
 		case 0x1D : 
@@ -788,10 +813,8 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						memory_set_bankptr(machine, 3, mess_ram + 0x2000);
 						memory_set_bankptr(machine, 4, mess_ram + 0x2000);
 						// Video RAM
-						memory_install_read8_handler (space, 0xc000, 0xffff, 0, 0, SMH_BANK(5));
-						memory_install_write8_handler(space, 0xc000, 0xffff, 0, 0, SMH_BANK(6));
-						memory_set_bankptr(machine, 5, mess_ram + 0x10000 + vpage * 0x4000);
-						memory_set_bankptr(machine, 6, mess_ram + 0x10000 + vpage * 0x4000);
+						memory_install_read8_handler (space, 0xc000, 0xffff, 0, 0, gzu_r);
+						memory_install_write8_handler(space, 0xc000, 0xffff, 0, 0, gzu_w);
 					}
 					break;
 		case 0x1E : 
@@ -807,10 +830,8 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						memory_set_bankptr(machine, 3, mess_ram + 0x4000);
 						memory_set_bankptr(machine, 4, mess_ram + 0x4000);
 						// Video RAM
-						memory_install_read8_handler (space, 0xc000, 0xffff, 0, 0, SMH_BANK(5));
-						memory_install_write8_handler(space, 0xc000, 0xffff, 0, 0, SMH_BANK(6));
-						memory_set_bankptr(machine, 5, mess_ram + 0x10000 + vpage * 0x4000);
-						memory_set_bankptr(machine, 6, mess_ram + 0x10000 + vpage * 0x4000);
+						memory_install_read8_handler (space, 0xc000, 0xffff, 0, 0, gzu_r);
+						memory_install_write8_handler(space, 0xc000, 0xffff, 0, 0, gzu_w);
 					}
 					break;
 		case 0x1F : 
@@ -821,10 +842,8 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						memory_set_bankptr(machine, 1, mess_ram);
 						memory_set_bankptr(machine, 2, mess_ram);
 						// Video RAM
-						memory_install_read8_handler (space, 0xc000, 0xffff, 0, 0, SMH_BANK(3));
-						memory_install_write8_handler(space, 0xc000, 0xffff, 0, 0, SMH_BANK(4));
-						memory_set_bankptr(machine, 3, mess_ram + 0x10000 + vpage * 0x4000);
-						memory_set_bankptr(machine, 4, mess_ram + 0x10000 + vpage * 0x4000);
+						memory_install_read8_handler (space, 0xc000, 0xffff, 0, 0, gzu_r);
+						memory_install_write8_handler(space, 0xc000, 0xffff, 0, 0, gzu_w);
 					}
 					break;
 					
@@ -833,23 +852,49 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 
 static READ8_DEVICE_HANDLER(pk8020_porta_r)
 {	
-	return 0xf0 | (takt <<1) | (attr &1)<<3;
+	return 0xf0 | (takt <<1) | (text_attr)<<3;
 }
 
 static WRITE8_DEVICE_HANDLER(pk8020_portc_w)
-{	
-	if (((data & 0x30) >> 4)==3) {
-		attr ^=1; 
+{
+   pk8020_video_page_access =(data>>6) & 3;
+   attr = (data >> 4) & 3;
+   pk8020_wide = (data >> 3) & 1;
+   pk8020_font = (data >> 2) & 1;   
+   pk8020_video_page = (data & 3);   
+   
+   
+   portc_data = data;
+}
+
+static WRITE8_DEVICE_HANDLER(pk8020_portb_w)
+{
+	const device_config *fdc = devtag_get_device(device->machine, "wd1793");
+	wd17xx_set_side(fdc,BIT(data,4));
+	if (BIT(data,0)) {
+ 		wd17xx_set_drive(fdc,0);
+	} else if (BIT(data,1)) {
+ 		wd17xx_set_drive(fdc,1);
+	} else if (BIT(data,2)) {
+ 		wd17xx_set_drive(fdc,2);
+	} else if (BIT(data,3)) {
+ 		wd17xx_set_drive(fdc,3);
 	}
 }
+
+static READ8_DEVICE_HANDLER(pk8020_portc_r)
+{	
+	return portc_data;
+}
+
 
 I8255A_INTERFACE( pk8020_ppi8255_interface_1 )
 {
 	DEVCB_HANDLER(pk8020_porta_r),
 	DEVCB_NULL,
+	DEVCB_HANDLER(pk8020_portc_r),
 	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_HANDLER(pk8020_portb_w),
 	DEVCB_HANDLER(pk8020_portc_w)
 };
 static READ8_DEVICE_HANDLER(pk8020_unk_r)
@@ -926,8 +971,11 @@ static IRQ_CALLBACK(pk8020_irq_callback)
 
 MACHINE_RESET( pk8020 )
 {
+	const device_config *fdc = devtag_get_device(machine, "wd1793");
 	pk8020_set_bank(machine,0);
 	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), pk8020_irq_callback);
+		
+	wd17xx_set_density (fdc,DEN_FM_HI);	
 }
 
 DEVICE_IMAGE_LOAD( pk8020_floppy )
@@ -958,5 +1006,6 @@ DEVICE_IMAGE_LOAD( pk8020_floppy )
 INTERRUPT_GEN( pk8020_interrupt )
 {
 	takt ^= 1;
+	pic8259_set_irq_line(devtag_get_device(device->machine, "pic8259"),4,1);
 }
 
