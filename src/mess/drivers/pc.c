@@ -211,7 +211,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(pc8_io, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE("dma8237", dma8237_r, dma8237_w)
-	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE("pic8259_master", pic8259_r, pic8259_w)
+	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE("pic8259", pic8259_r, pic8259_w)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE("pit8253", pit8253_r, pit8253_w)
 	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE("ppi8255", i8255a_r, i8255a_w)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE(pc_page_r,			pc_page_w)
@@ -268,7 +268,7 @@ static WRITE16_DEVICE_HANDLER( pc16_388_w )
 static ADDRESS_MAP_START(pc16_io, ADDRESS_SPACE_IO, 16)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE8("dma8237", dma8237_r, dma8237_w, 0xffff)
-	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE8("pic8259_master", pic8259_r, pic8259_w, 0xffff)
+	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE8("pic8259", pic8259_r, pic8259_w, 0xffff)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE8("pit8253", pit8253_r, pit8253_w, 0xffff)
 	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE8("ppi8255", i8255a_r, i8255a_w, 0xffff)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE8(pc_page_r,				pc_page_w, 0xffff)
@@ -310,7 +310,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(europc_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE("dma8237", dma8237_r, dma8237_w)
-	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE("pic8259_master", pic8259_r, pic8259_w)
+	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE("pic8259", pic8259_r, pic8259_w)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE("pit8253", pit8253_r, pit8253_w)
 	AM_RANGE(0x0060, 0x0063) AM_READWRITE(europc_pio_r,			europc_pio_w)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE(pc_page_r,			pc_page_w)
@@ -351,7 +351,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(tandy1000_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE("dma8237", dma8237_r, dma8237_w)
-	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE("pic8259_master", pic8259_r, pic8259_w)
+	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE("pic8259", pic8259_r, pic8259_w)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE("pit8253", pit8253_r, pit8253_w)
 	AM_RANGE(0x0060, 0x0063) AM_READWRITE(tandy1000_pio_r,			tandy1000_pio_w)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE(pc_page_r,				pc_page_w)
@@ -383,8 +383,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START(ibmpcjr_io, ADDRESS_SPACE_IO, 8)
-	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE("dma8237", dma8237_r, dma8237_w)
-	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE("pic8259_master", pic8259_r, pic8259_w)
+	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE("pic8259", pic8259_r, pic8259_w)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE("pit8253", pit8253_r, pit8253_w)
 	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE("ppi8255", i8255a_r, i8255a_w)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE(pc_page_r,				pc_page_w)
@@ -405,7 +404,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(pc200_io, ADDRESS_SPACE_IO, 16)
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE8("dma8237", dma8237_r, dma8237_w, 0xffff)
-	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE8("pic8259_master", pic8259_r, pic8259_w, 0xffff)
+	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE8("pic8259", pic8259_r, pic8259_w, 0xffff)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE8("pit8253", pit8253_r, pit8253_w, 0x00ff)
 	AM_RANGE(0x0060, 0x0065) AM_READWRITE(pc1640_16le_port60_r,			pc1640_16le_port60_w)
 	AM_RANGE(0x0078, 0x0079) AM_READWRITE(pc1640_16le_mouse_x_r,			pc1640_16le_mouse_x_w)
@@ -438,7 +437,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(pc1640_io, ADDRESS_SPACE_IO, 16)
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE8("dma8237", dma8237_r, dma8237_w, 0xffff)
-	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE8("pic8259_master", pic8259_r, pic8259_w, 0xffff)
+	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE8("pic8259", pic8259_r, pic8259_w, 0xffff)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE8("pit8253", pit8253_r, pit8253_w, 0x00ff)
 	AM_RANGE(0x0060, 0x0065) AM_READWRITE(pc1640_16le_port60_r,			pc1640_16le_port60_w)
 	AM_RANGE(0x0070, 0x0071) AM_READWRITE(mc146818_port16le_r,		mc146818_port16le_w)
@@ -1359,9 +1358,7 @@ static MACHINE_DRIVER_START( pcmda )
 
 	MDRV_DMA8237_ADD( "dma8237", ibm5150_dma8237_config )
 
-	MDRV_PIC8259_ADD( "pic8259_master", ibm5150_pic8259_master_config )
-
-	MDRV_PIC8259_ADD( "pic8259_slave", ibm5150_pic8259_slave_config )
+	MDRV_PIC8259_ADD( "pic8259", ibm5150_pic8259_config )
 
 	MDRV_I8255A_ADD( "ppi8255", ibm5160_ppi8255_interface )
 
@@ -1418,9 +1415,7 @@ static MACHINE_DRIVER_START( pcherc )
 
 	MDRV_DMA8237_ADD( "dma8237", ibm5150_dma8237_config )
 
-	MDRV_PIC8259_ADD( "pic8259_master", ibm5150_pic8259_master_config )
-
-	MDRV_PIC8259_ADD( "pic8259_slave", ibm5150_pic8259_slave_config )
+	MDRV_PIC8259_ADD( "pic8259", ibm5150_pic8259_config )
 
 	MDRV_I8255A_ADD( "ppi8255", ibm5160_ppi8255_interface )
 
@@ -1487,9 +1482,7 @@ static MACHINE_DRIVER_START( ibm5150 )
 
 	MDRV_DMA8237_ADD( "dma8237", ibm5150_dma8237_config )
 
-	MDRV_PIC8259_ADD( "pic8259_master", ibm5150_pic8259_master_config )
-
-	MDRV_PIC8259_ADD( "pic8259_slave", ibm5150_pic8259_slave_config )
+	MDRV_PIC8259_ADD( "pic8259", ibm5150_pic8259_config )
 
 	MDRV_I8255A_ADD( "ppi8255", ibm5150_ppi8255_interface )
 
@@ -1547,9 +1540,7 @@ static MACHINE_DRIVER_START( pccga )
 
 	MDRV_DMA8237_ADD( "dma8237", ibm5150_dma8237_config )
 
-	MDRV_PIC8259_ADD( "pic8259_master", ibm5150_pic8259_master_config )
-
-	MDRV_PIC8259_ADD( "pic8259_slave", ibm5150_pic8259_slave_config )
+	MDRV_PIC8259_ADD( "pic8259", ibm5150_pic8259_config )
 
 	MDRV_I8255A_ADD( "ppi8255", ibm5160_ppi8255_interface )
 
@@ -1603,9 +1594,7 @@ static MACHINE_DRIVER_START( europc )
 
 	MDRV_DMA8237_ADD( "dma8237", ibm5150_dma8237_config )
 
-	MDRV_PIC8259_ADD( "pic8259_master", ibm5150_pic8259_master_config )
-
-	MDRV_PIC8259_ADD( "pic8259_slave", ibm5150_pic8259_slave_config )
+	MDRV_PIC8259_ADD( "pic8259", ibm5150_pic8259_config )
 
 	MDRV_I8255A_ADD( "ppi8255", pc_ppi8255_interface )
 
@@ -1652,9 +1641,7 @@ static MACHINE_DRIVER_START( ibm5160 )
 
 	MDRV_DMA8237_ADD( "dma8237", ibm5150_dma8237_config )
 
-	MDRV_PIC8259_ADD( "pic8259_master", ibm5150_pic8259_master_config )
-
-	MDRV_PIC8259_ADD( "pic8259_slave", ibm5150_pic8259_slave_config )
+	MDRV_PIC8259_ADD( "pic8259", ibm5150_pic8259_config )
 
 	MDRV_I8255A_ADD( "ppi8255", ibm5160_ppi8255_interface )
 
@@ -1708,9 +1695,7 @@ static MACHINE_DRIVER_START( pc200 )
 
 	MDRV_DMA8237_ADD( "dma8237", ibm5150_dma8237_config )
 
-	MDRV_PIC8259_ADD( "pic8259_master", ibm5150_pic8259_master_config )
-
-	MDRV_PIC8259_ADD( "pic8259_slave", ibm5150_pic8259_slave_config )
+	MDRV_PIC8259_ADD( "pic8259", ibm5150_pic8259_config )
 
 	MDRV_I8255A_ADD( "ppi8255", pc_ppi8255_interface )
 
@@ -1750,9 +1735,7 @@ static MACHINE_DRIVER_START( pc1512 )
 
 	MDRV_DMA8237_ADD( "dma8237", ibm5150_dma8237_config )
 
-	MDRV_PIC8259_ADD( "pic8259_master", ibm5150_pic8259_master_config )
-
-	MDRV_PIC8259_ADD( "pic8259_slave", ibm5150_pic8259_slave_config )
+	MDRV_PIC8259_ADD( "pic8259", ibm5150_pic8259_config )
 
 	MDRV_I8255A_ADD( "ppi8255", pc_ppi8255_interface )
 
@@ -1794,9 +1777,7 @@ static MACHINE_DRIVER_START( pc1640 )
 
 	MDRV_DMA8237_ADD( "dma8237", ibm5150_dma8237_config )
 
-	MDRV_PIC8259_ADD( "pic8259_master", ibm5150_pic8259_master_config )
-
-	MDRV_PIC8259_ADD( "pic8259_slave", ibm5150_pic8259_slave_config )
+	MDRV_PIC8259_ADD( "pic8259", ibm5150_pic8259_config )
 
 	MDRV_I8255A_ADD( "ppi8255", pc_ppi8255_interface )
 
@@ -1838,9 +1819,7 @@ static MACHINE_DRIVER_START( xtvga )
 
 	MDRV_DMA8237_ADD( "dma8237", ibm5150_dma8237_config )
 
-	MDRV_PIC8259_ADD( "pic8259_master", ibm5150_pic8259_master_config )
-
-	MDRV_PIC8259_ADD( "pic8259_slave", ibm5150_pic8259_slave_config )
+	MDRV_PIC8259_ADD( "pic8259", ibm5150_pic8259_config )
 
 	MDRV_I8255A_ADD( "ppi8255", pc_ppi8255_interface )
 
@@ -1894,9 +1873,7 @@ static MACHINE_DRIVER_START( t1000hx )
 
 	MDRV_DMA8237_ADD( "dma8237", ibm5150_dma8237_config )
 
-	MDRV_PIC8259_ADD( "pic8259_master", ibm5150_pic8259_master_config )
-
-	MDRV_PIC8259_ADD( "pic8259_slave", ibm5150_pic8259_slave_config )
+	MDRV_PIC8259_ADD( "pic8259", ibm5150_pic8259_config )
 
 	MDRV_I8255A_ADD( "ppi8255", pc_ppi8255_interface )
 
@@ -1938,9 +1915,7 @@ static MACHINE_DRIVER_START( ibmpcjr )
 
 	MDRV_DMA8237_ADD( "dma8237", ibm5150_dma8237_config )
 
-	MDRV_PIC8259_ADD( "pic8259_master", pcjr_pic8259_master_config )
-
-	MDRV_PIC8259_ADD( "pic8259_slave", ibm5150_pic8259_slave_config )
+	MDRV_PIC8259_ADD( "pic8259", pcjr_pic8259_config )
 
 	MDRV_I8255A_ADD( "ppi8255", pcjr_ppi8255_interface )
 
