@@ -676,10 +676,20 @@ READ8_HANDLER( fm7_vram_r )
 		fm7_alu_function(offset+page);
 	}
 	
-	if(fm7_video.active_video_page != 0)
-		offs = (offset & 0xc000) | ((offset + fm7_video.vram_offset2) & 0x3fff);
+	if(fm7_video.modestatus & 0x40)
+	{
+		if(fm7_video.active_video_page != 0)
+			offs = (offset & 0xe000) | ((offset + fm7_video.vram_offset2) & 0x1fff);
+		else
+			offs = (offset & 0xe000) | ((offset + fm7_video.vram_offset) & 0x1fff);
+	}
 	else
-		offs = (offset & 0xc000) | ((offset + fm7_video.vram_offset) & 0x3fff);
+	{
+		if(fm7_video.active_video_page != 0)
+			offs = (offset & 0xc000) | ((offset + fm7_video.vram_offset2) & 0x3fff);
+		else
+			offs = (offset & 0xc000) | ((offset + fm7_video.vram_offset) & 0x3fff);
+	}
 	return fm7_video_ram[offs + page];
 }
 
@@ -704,10 +714,20 @@ WRITE8_HANDLER( fm7_vram_w )
 		return;
 	}
 		
-	if(fm7_video.active_video_page != 0)
-		offs = (offset & 0xc000) | ((offset + fm7_video.vram_offset2) & 0x3fff);
+	if(fm7_video.modestatus & 0x40)
+	{
+		if(fm7_video.active_video_page != 0)
+			offs = (offset & 0xe000) | ((offset + fm7_video.vram_offset2) & 0x1fff);
+		else
+			offs = (offset & 0xe000) | ((offset + fm7_video.vram_offset) & 0x1fff);
+	}
 	else
-		offs = (offset & 0xc000) | ((offset + fm7_video.vram_offset) & 0x3fff);
+	{
+		if(fm7_video.active_video_page != 0)
+			offs = (offset & 0xc000) | ((offset + fm7_video.vram_offset2) & 0x3fff);
+		else
+			offs = (offset & 0xc000) | ((offset + fm7_video.vram_offset) & 0x3fff);
+	}
 //	if(fm7_video.vram_access != 0)
 		fm7_video_ram[offs+page] = data;
 }
@@ -737,10 +757,20 @@ WRITE8_HANDLER( fm7_vram_banked_w )
 		return;
 	}
 	
-	if(fm7_video.active_video_page != 0)
-		offs = (offset & 0xc000) | ((offset + fm7_video.vram_offset2) & 0x3fff);
+	if(fm7_video.modestatus & 0x40)
+	{
+		if(fm7_video.active_video_page != 0)
+			offs = (offset & 0xe000) | ((offset + fm7_video.vram_offset2) & 0x1fff);
+		else
+			offs = (offset & 0xe000) | ((offset + fm7_video.vram_offset) & 0x1fff);
+	}
 	else
-		offs = (offset & 0xc000) | ((offset + fm7_video.vram_offset) & 0x3fff);
+	{
+		if(fm7_video.active_video_page != 0)
+			offs = (offset & 0xc000) | ((offset + fm7_video.vram_offset2) & 0x3fff);
+		else
+			offs = (offset & 0xc000) | ((offset + fm7_video.vram_offset) & 0x3fff);
+	}
 	fm7_video_ram[offs+page] = data;
 }
 
