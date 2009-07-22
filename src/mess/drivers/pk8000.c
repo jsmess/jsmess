@@ -12,7 +12,7 @@
 #include "machine/i8255a.h"
 #include "devices/cassette.h"
 #include "formats/fmsx_cas.h"
-#include "sound/dac.h"
+#include "sound/speaker.h"
 #include "sound/wave.h"
 
 static UINT8 pk8000_text_start;
@@ -107,9 +107,9 @@ static READ8_DEVICE_HANDLER(pk8000_80_portb_r)
 static WRITE8_DEVICE_HANDLER(pk8000_80_portc_w)
 {
 	keyboard_line = data & 0x0f;		
-	
-	dac_signed_data_w (devtag_get_device(device->machine, "dac"), (BIT(data,7) ? 0 : 0x7f));
-	
+		
+	speaker_level_w(devtag_get_device(device->machine, "speaker"), BIT(data,7));
+		
 	cassette_change_state(cassette_device_image(device->machine),
 						(BIT(data,4)) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,
 						CASSETTE_MASK_MOTOR);
@@ -510,7 +510,7 @@ static MACHINE_DRIVER_START( pk8000 )
     
     /* audio hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("dac", DAC, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MDRV_SOUND_WAVE_ADD("wave", "cassette")
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
