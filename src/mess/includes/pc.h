@@ -49,6 +49,7 @@ DRIVER_INIT( pcjr );
 
 MACHINE_START( pc );
 MACHINE_RESET( pc );
+MACHINE_START( pcjr );
 MACHINE_RESET( pcjr );
 
 DEVICE_IMAGE_LOAD( pcjr_cartridge );

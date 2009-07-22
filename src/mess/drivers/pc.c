@@ -1908,12 +1908,10 @@ static MACHINE_DRIVER_START( ibmpcjr )
 	/* basic machine hardware */
 	MDRV_CPU_PC(ibmpcjr, ibmpcjr, I8088, 4900000, pcjr_frame_interrupt)	/* TODO: Get correct cpu frequency, probably XTAL_14_31818MHz/3 */
 
-	MDRV_MACHINE_START(pc)
+	MDRV_MACHINE_START(pcjr)
 	MDRV_MACHINE_RESET(pcjr)
 
 	MDRV_PIT8253_ADD( "pit8253", pcjr_pit8253_config )
-
-	MDRV_DMA8237_ADD( "dma8237", ibm5150_dma8237_config )
 
 	MDRV_PIC8259_ADD( "pic8259", pcjr_pic8259_config )
 

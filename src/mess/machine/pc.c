@@ -1113,6 +1113,16 @@ static const struct pc_fdc_interface fdc_interface_nc =
 	pc_get_device
 };
 
+
+static const struct pc_fdc_interface pcjr_fdc_interface_nc =
+{
+	pc_fdc_interrupt,
+	NULL,
+	NULL,
+	pc_get_device
+};
+
+
 static void pc_set_irq_line(int irq, int state) {
 	pic8259_set_irq_line(pc_devices.pic8259, irq, state);
 }
@@ -1351,9 +1361,28 @@ MACHINE_RESET( pc )
 }
 
 
+MACHINE_START( pcjr )
+{
+	pc_fdc_init( machine, &pcjr_fdc_interface_nc );
+}
+
+
 MACHINE_RESET( pcjr )
 {
-	MACHINE_RESET_CALL( pc );
+	const device_config *speaker = devtag_get_device(machine, "speaker");
+
+	pc_devices.maincpu = devtag_get_device(machine, "maincpu" );
+	cpu_set_irq_callback(pc_devices.maincpu, pc_irq_callback);
+
+	pc_devices.pic8259 = devtag_get_device(machine, "pic8259");
+	pc_devices.dma8237 = NULL;
+	pc_devices.pit8253 = devtag_get_device(machine, "pit8253");
+	pc_devices.u73_q2 = 0;
+	pc_devices.out1 = 0;
+	pc_mouse_set_serial_port( devtag_get_device(machine, "ins8250_0") );
+	pc_hdc_set_dma8237_device( pc_devices.dma8237 );
+	speaker_level_w( speaker, 0 );
+
 	pcjr_keyb_init(machine);
 	pc_int_delay_timer = timer_alloc(machine,  pcjr_delayed_pic8259_irq, NULL );
 }
