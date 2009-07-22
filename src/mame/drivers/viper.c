@@ -26,6 +26,15 @@
     G?C09         2002    Mahjong Fight Club
     G?C22         2002    World Combat (USA/Japan/Korea) / Warzaid (Europe)
 
+DASM code snippets:
+
+00FE0B8C: addi      r31,r3,0x0000
+00FE0B90: lwz       r3,0x0040(r1)
+00FE0B94: cmpi      r31,0x0000 ;offending check, understand where r3 comes from!
+00FE0B98: lwz       r4,0x0044(r1)
+00FE0B9C: addic     r5,r1,0x0058
+00FE0BA0: bne       0x00FE0C00
+
 */
 
 #include "driver.h"
@@ -782,7 +791,7 @@ ROM_START(p911) //*
 	ROM_LOAD("a00uad_nvram.u39", 0x000000, 0x2000, CRC(cca056ca) SHA1(de1a00d84c1311d48bbe6d24f5b36e22ecf5e85a))
 
 	DISK_REGION( "ide" )
-	DISK_IMAGE( "a00d02", 0, SHA1(6acb8dc41920e7025b87034a3a62b185ef0109d9) )
+	DISK_IMAGE( "a00uad02", 0, SHA1(6acb8dc41920e7025b87034a3a62b185ef0109d9) )
 ROM_END
 
 ROM_START(p911uc) //*
@@ -792,7 +801,7 @@ ROM_START(p911uc) //*
 	ROM_LOAD("a00uac_nvram.u39", 0x000000, 0x2000,  NO_DUMP )
 
 	DISK_REGION( "ide" )
-	DISK_IMAGE( "a00c02", 0, SHA1(b268789416dbf8886118a634b911f0ee254970de) )
+	DISK_IMAGE( "a00uac02", 0, SHA1(b268789416dbf8886118a634b911f0ee254970de) )
 ROM_END
 
 ROM_START(p911kc) //*
@@ -812,7 +821,7 @@ ROM_START(p911e) //*
 	ROM_LOAD("a00eaa_nvram.u39", 0x000000, 0x2000,  NO_DUMP )
 
 	DISK_REGION( "ide" )
-	DISK_IMAGE( "a00a02", 0, SHA1(81565a2dce2e2b0a7927078a784354948af1f87c) )
+	DISK_IMAGE( "a00eaa02", 0, SHA1(81565a2dce2e2b0a7927078a784354948af1f87c) )
 ROM_END
 
 ROM_START(p911j) //*
@@ -822,7 +831,7 @@ ROM_START(p911j) //*
 	ROM_LOAD("a00jaa_nvram.u39", 0x000000, 0x2000, CRC(9ecf70dc) SHA1(4769a99b0cc28563e219860b8d480f32d1e21f60))
 
 	DISK_REGION( "ide" )
-	DISK_IMAGE( "a00c02", 0, SHA1(d962d3a8ea84c380767d0fe336296911c289c224) )
+	DISK_IMAGE( "a00jac02", 0, SHA1(d962d3a8ea84c380767d0fe336296911c289c224) )
 ROM_END
 
 ROM_START(p9112) //*

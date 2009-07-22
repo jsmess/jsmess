@@ -3,6 +3,7 @@
     Naomi plug-in board emulator
 
     emulator by Samuele Zannoli
+    protection chip by R. Belmont, reverse engineering by Deunan Knute
 
 **************************************************************************/
 
@@ -40,6 +41,35 @@
     NAOMI_DIMM_STATUS     = 5f704c  14000024 (16 bit):
         bit 0: when 0 signal interrupt from naomi to dimm board
         bit 8: when 0 signal interrupt from dimm board to naomi
+
+
+    Cartridge protection info from Deunan Knute:
+
+    NAOMI cart can hold up to 256MB of data (well, 512 is possible too I guess), so the highest bits are used for other, dark and scary purposes.
+    I call those bits "mode selector".
+
+    First it's important to note that DMA and PIO seem to have separate address counters, as well as separate mode selector registers.
+
+    * bit 31 (mode bit 3) is auto-advance bit
+    When set to one the address will be automatically incremented when data is read, so you need only set it once and can just keep polling
+    the PIO port. When zero it will stay on current address.  Now this works exactly the same for DMA, and even if DMA engine is 32-byte
+    per block it will repeatedly read only the first 16-bit word.
+
+    * bit 30 (mode bit 2) is most often as special mode switch
+    DMA transfer with this bit set will hang. PIO will return semi-random data (floating bus?). So one function of that bit is "disable".
+    PIO read will return all ones if DMA mode has this bit cleared, so it seems you can do either PIO or DMA but not both at the same time.
+    In other words, disable DMA once before using PIO (most games using both access types do that when the DMA terminates).
+    This bit is also used to reset the chip's internal protection mechanism on "Oh! My Goddess" to a known state.
+
+    * bit 29 (mode bit 1) is address shuffle bit
+    It's actually the opposite, when set the addressing is following the chip layout and when cleared the protection chip will have it's fun
+    with address lines 10 to 23(?). It's not a simple swap function, rather a lookup table and one with repeating results too.
+    The few games I got to work never made any use of that bit, it's always set for all normal reads.
+
+    * bit 28 (mode bit 0) is unused (so far)
+    Or it could really be the last address bit to allow up to 512MB of data on a cart?
+
+    Normal address starts with 0xa0000000 to enable auto-advance and standard addressing mode.
 */
 
 // NOTE: all accesses are 16 or 32 bits wide but only 16 bits are valid
@@ -52,6 +82,9 @@
 #include "cdrom.h"
 #include "naomibd.h"
 
+#define NAOMIBD_FLAG_AUTO_ADVANCE	(8)	// address auto-advances on read
+#define NAOMIBD_FLAG_SPECIAL_MODE	(4)	// used to access protection registers
+#define NAOMIBD_FLAG_ADDRESS_SHUFFLE	(2)	// 0 to let protection chip scramble address lines, 1 for normal
 
 /*************************************
  *
@@ -68,6 +101,15 @@ extern void naomi_game_decrypt(running_machine* machine, UINT64 key, UINT8* regi
  *
  *************************************/
 
+#define MAX_PROT_REGIONS	(32)
+
+typedef struct _naomibd_config_table naomibd_config_table;
+struct _naomibd_config_table
+{
+	const char *name;
+	UINT32	transtbl[MAX_PROT_REGIONS*2];
+};
+
 typedef struct _naomibd_state naomibd_state;
 struct _naomibd_state
 {
@@ -76,13 +118,28 @@ struct _naomibd_state
 	const device_config *device;				/* pointer to our containing device */
 
 	UINT8 *				memory;
+	UINT8 *				protdata;
 	chd_file *			gdromchd;
 	UINT8 *				picdata;
 	UINT32				rom_offset, rom_offset_flags, dma_count;
-	UINT32				dma_offset;
+	UINT32				dma_offset, dma_offset_flags;
+	UINT32				prot_offset, prot_key;
+
+	UINT32				*prot_translate;
 };
 
-
+// maps protection offsets to real addresses
+static naomibd_config_table naomibd_translate_tbl[] =
+{
+	{ "doa2", { 0x500, 0, 0x20504, 0x20000, 0x40508, 0x40000, 0x6050c, 0x60000, 0x80510, 0x80000,
+		    0xa0514, 0xa0000, 0xc0518, 0xc0000, 0xe051c, 0xe0000, 0x100520,0x100000, 0x118a3a, 0x120000,
+		    0x12c0d8, 0x140000, 0x147e22, 0x160000, 0x1645ce, 0x180000, 0x17c6b2, 0x1a0000,
+		    0x19902e, 0x1c0000, 0x1b562a, 0x1e0000, 0xffffffff, 0xffffffff } },
+	{ "doa2m", { 0x500, 0, 0x20504, 0x20000, 0x40508, 0x40000, 0x6050c, 0x60000, 0x80510, 0x80000,
+		    0xa0514, 0xa0000, 0xc0518, 0xc0000, 0xe051c, 0xe0000, 0x100520,0x100000, 0x11a5b4, 0x120000,
+		    0x12e7c4, 0x140000, 0x1471f6, 0x160000, 0x1640c4, 0x180000, 0x1806ca, 0x1a0000,
+		    0x199df4, 0x1c0000, 0x1b5d0a, 0x1e0000, 0xffffffff, 0xffffffff } },
+};
 
 /***************************************************************************
     INLINE FUNCTIONS
@@ -152,6 +209,9 @@ static void init_save_state(const device_config *device)
 	state_save_register_device_item(device, 0, v->rom_offset_flags);
 	state_save_register_device_item(device, 0, v->dma_count);
 	state_save_register_device_item(device, 0, v->dma_offset);
+	state_save_register_device_item(device, 0, v->dma_offset_flags);
+	state_save_register_device_item(device, 0, v->prot_offset);
+	state_save_register_device_item(device, 0, v->prot_key);
 }
 
 
@@ -182,11 +242,39 @@ READ64_DEVICE_HANDLER( naomibd_r )
 	// ROM_DATA
 	if ((offset == 1) && ACCESSING_BITS_0_15)
 	{
-		UINT64 ret;
+		UINT64 ret = 0;
 
-		ret = (UINT64)(ROM[v->rom_offset] | (ROM[v->rom_offset+1]<<8));
+		if (v->rom_offset_flags & NAOMIBD_FLAG_SPECIAL_MODE)
+		{
+			if (v->rom_offset == 0x1fffe)
+			{
+				UINT8 *prot = (UINT8 *)v->protdata;
+				UINT32 byte_offset = v->prot_offset*2;
 
-		v->rom_offset += 2;
+				if (!prot)
+				{
+					logerror("naomibd: reading protection data, but none was supplied\n");
+					return 0;
+				}
+
+				ret = (UINT64)(prot[byte_offset] | (prot[byte_offset+1]<<8));
+
+				v->prot_offset++;
+			}
+			else
+			{
+				mame_printf_verbose("Bad protection offset read %x\n", v->rom_offset);
+			}
+		}
+		else
+		{
+			ret = (UINT64)(ROM[v->rom_offset] | (ROM[v->rom_offset+1]<<8));
+		}
+
+		if (v->rom_offset_flags & NAOMIBD_FLAG_AUTO_ADVANCE)
+		{
+			v->rom_offset += 2;
+		}
 
 		return ret;
 	}
@@ -239,6 +327,7 @@ READ64_DEVICE_HANDLER( naomibd_r )
 WRITE64_DEVICE_HANDLER( naomibd_w )
 {
 	naomibd_state *v = get_safe_token(device);
+	INT32 i;
 
 	switch(offset)
 	{
@@ -249,7 +338,7 @@ WRITE64_DEVICE_HANDLER( naomibd_w )
 				// ROM_OFFSETH
 				v->rom_offset &= 0xffff;
 				v->rom_offset |= (data & 0x1fff)<<16;
-				v->rom_offset_flags = data >> 13;
+				v->rom_offset_flags = data >> 12;
 			}
 			if(ACCESSING_BITS_32_47)
 			{
@@ -266,12 +355,52 @@ WRITE64_DEVICE_HANDLER( naomibd_w )
 				// DMA_OFFSETH
 				v->dma_offset &= 0xffff;
 				v->dma_offset |= (data >> 16) & 0x1fff0000;
+				v->dma_offset_flags = (data>>28);
 			}
 			if(ACCESSING_BITS_0_15)
 			{
-				// ROM_DATA
-				// Doa2 writes here (16 bit decryption key ?)
-				//mame_printf_verbose("%s:ROM: write %llx to 5f7008\n", cpuexec_describe_context(machine), data);
+				// ROM_DATA - used to access registers in the protection chip
+				switch (v->rom_offset)
+				{
+					case 0x1fff8:	// offset low
+						v->prot_offset &= 0xffff0000;
+						v->prot_offset |= (UINT32)data;
+						break;
+
+					case 0x1fffa:	// offset high
+						v->prot_offset &= 0xffff;
+						v->prot_offset |= (UINT32)data<<16;
+						break;
+
+					case 0x1fffc:	// decryption key
+						v->prot_key = data;
+
+						mame_printf_verbose("Protection: set up read @ %x, key %x [%s]\n", v->prot_offset, v->prot_key, cpuexec_describe_context(device->machine));
+
+						// translate address if necessary
+						if (v->prot_translate != NULL)
+						{
+							i = 0;
+							while (v->prot_translate[i] != 0xffffffff)
+							{
+								if (v->prot_translate[i] == (v->prot_offset*2))
+								{
+									mame_printf_verbose("Protection: got offset %x, translated to %x\n", v->prot_offset, v->prot_translate[i+1]);
+									v->prot_offset = v->prot_translate[i+1]/2;
+									break;
+								}
+								else
+								{
+									i += 2;
+								}
+							}
+						}
+						break;
+
+					default:
+						mame_printf_verbose("naomibd: unknown protection write %x @ %x\n", (UINT32)data, offset);
+						break;
+				}
 			}
 		}
 		break;
@@ -327,7 +456,7 @@ WRITE64_DEVICE_HANDLER( naomibd_w )
 		}
 		break;
 		default:
-			//mame_printf_verbose("%s: ROM: write %llx to %x, mask %llx\n", cpuexec_describe_context(machine), data, offset, mem_mask);
+			mame_printf_verbose("%s: ROM: write %llx to %x, mask %llx\n", cpuexec_describe_context(device->machine), data, offset, mem_mask);
 			break;
 	}
 }
@@ -524,6 +653,7 @@ static DEVICE_START( naomibd )
 {
 	const naomibd_config *config = (const naomibd_config *)device->inline_config;
 	naomibd_state *v = get_safe_token(device);
+	int i;
 
 	/* validate some basic stuff */
 	assert(device->static_config == NULL);
@@ -537,11 +667,23 @@ static DEVICE_START( naomibd )
 	/* store a pointer back to the device */
 	v->device = device;
 
+	/* find the protection address translation for this game */
+	v->prot_translate = (UINT32 *)0;
+	for (i=0; i<ARRAY_LENGTH(naomibd_translate_tbl); i++)
+	{
+		if (!strcmp(device->machine->gamedrv->name, naomibd_translate_tbl[i].name))
+		{
+			v->prot_translate = &naomibd_translate_tbl[i].transtbl[0];
+			break;
+		}
+	}
+
 	/* configure type-specific values */
 	switch (config->type)
 	{
 		case ROM_BOARD:
 			v->memory = (UINT8 *)memory_region(device->machine, config->regiontag);
+			v->protdata = (UINT8 *)memory_region(device->machine, "naomibd_prot");
 			break;
 
 		case DIMM_BOARD:
@@ -565,6 +707,8 @@ static DEVICE_START( naomibd )
 	v->rom_offset_flags = 0;
 	v->dma_count = 0;
 	v->dma_offset = 0;
+	v->dma_offset_flags = 0;
+	v->prot_offset = 0;
 
 	/* do a soft reset to reset everything else */
 	soft_reset(v);
@@ -604,6 +748,7 @@ static DEVICE_NVRAM( naomibd )
 {
 	//naomibd_state *v = get_safe_token(device);
 	static UINT8 eeprom_romboard[20+48] = {0x19,0x00,0xaa,0x55,0,0,0,0,0,0,0,0,0x69,0x79,0x68,0x6b,0x74,0x6d,0x68,0x6d};
+	UINT8 *games_contents;
 
 	if (read_or_write)
 		/*eeprom_save(file)*/;
@@ -612,8 +757,18 @@ static DEVICE_NVRAM( naomibd )
 		/*if (file)
             eeprom_load(file);
         else*/
-		x76f100_init( device->machine, 0, eeprom_romboard );
-		memcpy(eeprom_romboard+20,"\241\011                              0000000000000000",48);
+		games_contents = memory_region(device->machine, "naomibd_eeprom");
+
+		if (games_contents)
+		{
+			x76f100_init( device->machine, 0, games_contents );
+		}
+		else
+		{
+			x76f100_init( device->machine, 0, eeprom_romboard );
+			memcpy(eeprom_romboard+20,"\241\011                              0000000000000000",48);
+		}
+
 	}
 }
 
@@ -658,3 +813,4 @@ DEVICE_GET_INFO( naomibd )
 		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
+
