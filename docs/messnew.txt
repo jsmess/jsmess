@@ -2,7 +2,7 @@
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
-(none)
+- Tandy 1000RL  [Wilbert Pol]
 
 
 

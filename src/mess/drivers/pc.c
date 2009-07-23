@@ -76,15 +76,17 @@ Tandy 1000 machines are similar to the IBM 5160s with CGA graphics. Tandy
 added some additional graphic capabilities similar, but not equal, to
 those added for the IBM PC Jr.
 
-Tandy 1000 (8086/8088) variations:
+Tandy 1000 (8088) variations:
 1000				128KB-640KB RAM		4.77 MHz		v01.00.00, v01.01.00
 1000A/1000HD		128KB-640KB RAM		4.77 MHz		v01.01.00
 1000SX/1000AX		384KB-640KB RAM		7.16/4.77 MHz	v01.02.00
 1000EX				256KB-640KB RAM		7.16/4.77 MHz	v01.02.00
 1000HX				256KB-640KB RAM		7.16/4.77 MHz	v02.00.00
-1000SL/1000PC		384KB-640KB RAM		8.0/4.77 MHz	v01.04.00, v01.04.01, v01.04.02, v02.00.01
-1000SL/2			512KB-640KB RAM		8.0/4.77 MHz	v01.04.04
+
+Tandy 1000 (8086) variations:
 1000RL/1000RL-HD	512KB-768KB RAM		9.44/4.77 MHz	v02.00.00, v02.00.01
+1000SL/1000PC       384KB-640KB RAM     8.0/4.77 MHz    v01.04.00, v01.04.01, v01.04.02, v02.00.01
+1000SL/2            512KB-640KB RAM     8.0/4.77 MHz    v01.04.04
 
 Tandy 1000 (80286) variations:
 1000TX				640KB-768KB RAM		8.0/4.77 MHz	v01.03.00
@@ -365,6 +367,40 @@ static ADDRESS_MAP_START(tandy1000_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x03d0, 0x03df) AM_READWRITE(pc_T1T_r,					pc_T1T_w)
 	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE(pc_fdc_r,					pc_fdc_w)
 	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE("ins8250_0", ins8250_r, ins8250_w)
+ADDRESS_MAP_END
+
+
+
+static ADDRESS_MAP_START(tandy1000_16_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x00000, 0x9ffff) AM_RAMBANK(10)
+	AM_RANGE(0xa0000, 0xaffff) AM_RAM
+	AM_RANGE(0xb0000, 0xb7fff) AM_NOP
+	AM_RANGE(0xb8000, 0xbffff) AM_READWRITE8(pc_t1t_videoram_r, pc_video_videoram_w, 0xffff)
+	AM_RANGE(0xc0000, 0xc7fff) AM_NOP
+	AM_RANGE(0xc8000, 0xc9fff) AM_ROM
+	AM_RANGE(0xca000, 0xcffff) AM_NOP
+	AM_RANGE(0xd0000, 0xeffff) AM_ROM AM_REGION("maincpu", 0x60000)	/* This should become AM_ROMBANK(x) */
+	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("maincpu", 0x70000)
+ADDRESS_MAP_END
+
+
+
+static ADDRESS_MAP_START(tandy1000_16_io, ADDRESS_SPACE_IO, 16)
+	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE8("dma8237", dma8237_r, dma8237_w, 0xffff)
+	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE8("pic8259", pic8259_r, pic8259_w, 0xffff)
+	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE8("pit8253", pit8253_r, pit8253_w, 0xffff)
+	AM_RANGE(0x0060, 0x0063) AM_READWRITE8(tandy1000_pio_r,			tandy1000_pio_w, 0xffff)
+	AM_RANGE(0x0080, 0x0087) AM_READWRITE8(pc_page_r,				pc_page_w, 0xffff)
+	AM_RANGE(0x00c0, 0x00c1) AM_DEVWRITE8("sn76496", 	sn76496_w, 0xffff)
+	AM_RANGE(0x0200, 0x0207) AM_READWRITE8(pc_JOY_r,					pc_JOY_w, 0xffff)
+	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8("ins8250_1", ins8250_r, ins8250_w, 0xffff)
+	AM_RANGE(0x0320, 0x0323) AM_READWRITE8(pc_HDC1_r,				pc_HDC1_w, 0xffff)
+	AM_RANGE(0x0324, 0x0327) AM_READWRITE8(pc_HDC2_r,				pc_HDC2_w, 0xffff)
+	AM_RANGE(0x0378, 0x037f) AM_READWRITE8(pc_t1t_p37x_r,			pc_t1t_p37x_w, 0xffff)
+	AM_RANGE(0x03bc, 0x03bf) AM_DEVREADWRITE8("lpt_0", pc_lpt_r, pc_lpt_w, 0xffff)
+	AM_RANGE(0x03d0, 0x03df) AM_READWRITE8(pc_T1T_r,					pc_T1T_w, 0xffff)
+	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE8(pc_fdc_r,					pc_fdc_w, 0xffff)
+	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8("ins8250_0", ins8250_r, ins8250_w, 0xffff)
 ADDRESS_MAP_END
 
 
@@ -1904,6 +1940,48 @@ static MACHINE_DRIVER_START( t1000hx )
 MACHINE_DRIVER_END
 
 
+static MACHINE_DRIVER_START( t1000_16 )
+	/* basic machine hardware */
+	MDRV_CPU_PC(tandy1000_16, tandy1000_16, I8086, XTAL_28_63636MHz / 3, pc_frame_interrupt)
+
+	MDRV_MACHINE_START(pc)
+	MDRV_MACHINE_RESET(pc)
+
+	MDRV_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
+
+	MDRV_DMA8237_ADD( "dma8237", ibm5150_dma8237_config )
+
+	MDRV_PIC8259_ADD( "pic8259", ibm5150_pic8259_config )
+
+	MDRV_I8255A_ADD( "ppi8255", pc_ppi8255_interface )
+
+	MDRV_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
+	MDRV_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
+
+	/* video hardware */
+	MDRV_IMPORT_FROM( pcvideo_t1000 )
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MDRV_SOUND_ADD("sn76496", SN76496, 2386360)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
+	MDRV_NVRAM_HANDLER( tandy1000 )
+
+	/* printer */
+	MDRV_PC_LPT_ADD("lpt_0", pc_lpt_config)
+	MDRV_PC_LPT_ADD("lpt_1", pc_lpt_config)
+	MDRV_PC_LPT_ADD("lpt_2", pc_lpt_config)
+
+	/* harddisk */
+	MDRV_IMPORT_FROM( pc_hdc )
+
+	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
+MACHINE_DRIVER_END
+
+
 static MACHINE_DRIVER_START( ibmpcjr )
 	/* basic machine hardware */
 	MDRV_CPU_PC(ibmpcjr, ibmpcjr, I8088, 4900000, pcjr_frame_interrupt)	/* TODO: Get correct cpu frequency, probably XTAL_14_31818MHz/3 */
@@ -2246,21 +2324,21 @@ ROM_START( t1000sx )
 	ROM_LOAD("50146", 0x00000, 0x02000, BAD_DUMP CRC(1305dcf5) SHA1(aca488a16ae4ff05a1f4d14574379ff49cd48343)) //taken from europc, 9th blank
 ROM_END
 
-#ifdef UNUSED_DEFINITION
+
 ROM_START( t1000rl )
 	ROM_REGION(0x100000,"maincpu", 0)
-	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) /* WDC IDE Superbios 2.0 (06/28/89) Expansion Rom C8000-C9FFF  */	// not sure about this one
-	// partlist says it has 1 128kbyte rom
-	ROM_LOAD("t1000hx.e0", 0xe0000, 0x10000, CRC(61dbf242) SHA1(555b58d8aa8e0b0839259621c44b832d993beaef))	// not sure about this one
-	ROM_SYSTEM_BIOS( 0, "v020000", "v020000" )
-	ROMX_LOAD("v020000.f0", 0xf0000, 0x10000, CRC(d37a1d5f) SHA1(5ec031c31a7967cc3fd53a535d81833e4a1c385e), ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS( 1, "v020001", "v020001" )
-	ROMX_LOAD("v020001.f0", 0xf0000, 0x10000, NO_DUMP, ROM_BIOS(2) )
+//	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) /* WDC IDE Superbios 2.0 (06/28/89) Expansion Rom C8000-C9FFF  */	// not sure about this one
+
+	/* v2.0.0.1 */
+	/* Rom is labeled "(C) TANDY CORP. 1990 // 8079073 // LH534G70 JAPAN // 9034 D" */
+	ROM_LOAD("8079073.u23", 0x00000, 0x80000, CRC(6fab50f7) SHA1(2ccc02bee4c250dc1b7c17faef2590bc158860b0) )
+
 	ROM_REGION(0x08000,"gfx1", 0)
 	// expects 8x9 charset!
+	/* Character rom located at U3 w/label "8079027 // NCR // 609-2495004 // F841030 A9025" */
 	ROM_LOAD("50146", 0x00000, 0x02000, BAD_DUMP CRC(1305dcf5) SHA1(aca488a16ae4ff05a1f4d14574379ff49cd48343)) //taken from europc, 9th blank
 ROM_END
-#endif
+
 
 ROM_START( ibm5160 )
 	ROM_REGION16_LE(0x100000,"maincpu", 0)
@@ -2553,7 +2631,9 @@ SYSTEM_CONFIG_END
 
 
 static SYSTEM_CONFIG_START(pcjr)
+//	CONFIG_RAM( 128 * 1024 )
 	CONFIG_RAM_DEFAULT( 640 * 1024 )
+//	CONFIG_RAM( 768 * 1024 )
 	CONFIG_DEVICE(ibmpc_floppy_getinfo)
 SYSTEM_CONFIG_END
 
@@ -2573,6 +2653,7 @@ COMP(  1988,	europc,		ibm5150,	0,	europc,     europc,		europc,     ibm5160, "Sch
 COMP(  1983,	ibmpcjr,	ibm5150,	0,	ibmpcjr,    tandy1t,	pcjr,       pcjr,    "International Business Machines",  "IBM PC Jr", GAME_NOT_WORKING|GAME_IMPERFECT_COLORS )
 COMP(  1987,	t1000hx,	ibm5150,	0,	t1000hx,    tandy1t,	t1000hx,	ibm5160, "Tandy Radio Shack",  "Tandy 1000HX", 0)
 COMP(  1987,	t1000sx,	ibm5150,	0,	t1000hx,    tandy1t,	t1000hx,	ibm5160, "Tandy Radio Shack",  "Tandy 1000SX", GAME_NOT_WORKING)
+COMP(  1989,    t1000rl,    ibm5150,    0,  t1000_16,   tandy1t,    t1000hx,    ibm5160, "Tandy Radio Shack",  "Tandy 1000RL", GAME_NOT_WORKING )
 
 // xt class (pc but 8086)
 COMP(  1982,	ibm5160,	ibm5150,	0,	ibm5160,    ibm5150,	ibm5150,	ibm5160, "International Business Machines",  "IBM XT 5160" , 0)
