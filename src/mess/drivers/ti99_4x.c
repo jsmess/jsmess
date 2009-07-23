@@ -140,6 +140,9 @@ static INPUT_PORTS_START(ti99_4a)
 		PORT_DIPNAME( config_usbsm_mask << config_usbsm_bit, 1 << config_usbsm_bit, "Nouspickel's USB-SM card")
 			PORT_DIPSETTING( 0x0000, DEF_STR( Off ) )
 			PORT_DIPSETTING( 1 << config_usbsm_bit, DEF_STR( On ) )
+		PORT_DIPNAME( config_pcode_mask << config_pcode_bit, 0, "P-Code card")
+			PORT_DIPSETTING( 0x0000, DEF_STR( Off ) )
+			PORT_DIPSETTING( 1 << config_pcode_bit, DEF_STR( On ) )
 
 		PORT_DIPNAME( config_cartslot_mask << config_cartslot_bit, 0, "Active cartridge slot")                
 			PORT_DIPSETTING( 0, "auto" )
@@ -830,13 +833,17 @@ ROM_START(ti99_4a)
 	ROM_LOAD_OPTIONAL("bwg.bin", offset_bwg_dsr, 0x8000, CRC(06f1ec89) SHA1(6ad77033ed268f986d9a5439e65f7d391c4b7651)) /* BwG disk DSR ROM */
 	ROM_LOAD_OPTIONAL("hfdc.bin", offset_hfdc_dsr, 0x4000, CRC(66fbe0ed) SHA1(11df2ecef51de6f543e4eaf8b2529d3e65d0bd59)) /* HFDC disk DSR ROM */
 	ROM_LOAD_OPTIONAL("rs232.bin", offset_rs232_dsr, 0x1000, CRC(eab382fb) SHA1(ee609a18a21f1a3ddab334e8798d5f2a0fcefa91)) /* TI rs232 DSR ROM */
-
+	ROM_LOAD_OPTIONAL("pcode_r0.bin", offset_pcode_rom, 0x1000, CRC(3881d5b0) SHA1(a60e0468bb15ff72f97cf6e80979ca8c11ed0426)) /* TI P-Code card rom4732 */	
+	ROM_LOAD_OPTIONAL("pcode_r1.bin", offset_pcode_rom + 0x1000, 0x2000, CRC(46a06b8b) SHA1(24e2608179921aef312cdee6f455e3f46deb30d0)) /* TI P-Code card rom4764 */	
+	ROM_LOAD_OPTIONAL("pcode_g0.bin", offset_pcode_grom, 0x10000, CRC(541b3860) SHA1(7be77c216737334ae997753a6a85136f117affb7)) /* TI P-Code card groms */	
+	
 	/* HSGPL memory space */
 	ROM_REGION(region_hsgpl_len, region_hsgpl, ROMREGION_ERASEFF)
 
 	/*TMS5220 ROM space*/
 	ROM_REGION(0x8000, region_speech_rom, 0)
 	ROM_LOAD_OPTIONAL("spchrom.bin", 0x0000, 0x8000, CRC(58b155f7) SHA1(382292295c00dff348d7e17c5ce4da12a1d87763)) /* system speech ROM */
+
 ROM_END
 
 ROM_START(ti99_4ev)

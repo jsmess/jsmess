@@ -50,18 +50,19 @@ enum
 /* offsets for region_dsr */
 enum
 {
-	offset_fdc_dsr   = 0x0000,						/* TI FDC DSR (8kbytes) */
+	offset_fdc_dsr   = 0x0000,			/* TI FDC DSR (8kbytes) */
 	offset_ccfdc_dsr = offset_fdc_dsr   + 0x02000,	/* CorcComp FDC DSR (16kbytes) */
 	offset_bwg_dsr   = offset_ccfdc_dsr + 0x04000,	/* BwG FDC DSR (32kbytes) */
 	offset_bwg_ram   = offset_bwg_dsr   + 0x08000,	/* BwG FDC RAM (2kbytes) */
 	offset_hfdc_dsr  = offset_bwg_ram   + 0x00800,	/* HFDC FDC DSR (16kbytes) */
-	offset_hfdc_ram  = offset_hfdc_dsr  + 0x04000,	/* BwG FDC RAM (32kbytes) */
+	offset_hfdc_ram  = offset_hfdc_dsr  + 0x04000,	/* HFDC FDC RAM (32kbytes) */
 	offset_rs232_dsr = offset_hfdc_ram  + 0x08000,	/* TI RS232 DSR (4kbytes) */
 	offset_evpc_dsr  = offset_rs232_dsr + 0x01000,	/* EVPC DSR (64kbytes) */
 	offset_ide_ram   = offset_evpc_dsr  + 0x10000,	/* IDE card RAM (32 to 2Mbytes, we settled for 512kbytes) */
 	offset_ide_ram2  = offset_ide_ram   + 0x80000,	/* IDE RTC RAM (4kbytes) */
-
-	region_dsr_len   = offset_ide_ram2  + 0x01000
+	offset_pcode_rom = offset_ide_ram2  + 0x01000,  /* P-Code Card ROM (12KiB) */
+	offset_pcode_grom= offset_pcode_rom + 0x03000,  /* P-Code Card GROM (64KiB) */
+	region_dsr_len   = offset_pcode_grom+ 0x10000
 };
 
 /* offsets for region_hsgpl */
@@ -125,13 +126,15 @@ enum
 	config_hsgpl_bit	= 9,
 	config_hsgpl_mask	= 0x1,
 	config_mecmouse_bit	= 10,
-	config_mecmouse_mask= 0x1,
+	config_mecmouse_mask	= 0x1,
 	config_usbsm_bit	= 11,
 	config_usbsm_mask	= 0x1,
 	config_boot_bit		= 13,
 	config_boot_mask	= 0x1,
 	config_cartslot_bit	= 14,
-	config_cartslot_mask	= 0xf  /* need four bits: covers all current and possibly future cartslots, and one auto mode */
+	config_cartslot_mask	= 0xf, /* need four bits: covers all current and possibly future cartslots, and one auto mode */
+	config_pcode_bit	= 18,
+	config_pcode_mask	= 0x1 
 };
 
 enum {

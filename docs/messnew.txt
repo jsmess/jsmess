@@ -107,6 +107,8 @@ System Driver Changes:
 
 - [TI85] Initial work on TI-83+ emulation.  [Xander]
 
+- [TI99] Implemented p-Code peripheral card.  [Michael Zapf]
+
 - [TIKI100] System is now working, except for double sided disks. [Curt Coder]
 
 - [VCS80] System is now fully working. [Curt Coder]

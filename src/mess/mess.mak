@@ -1349,6 +1349,7 @@ $(MESSOBJ)/ti.a:				\
 	$(MESS_MACHINE)/99_peb.o	\
 	$(MESS_MACHINE)/99_hsgpl.o	\
 	$(MESS_MACHINE)/99_usbsm.o	\
+	$(MESS_MACHINE)/ti99pcod.o	\
 	$(MESS_MACHINE)/strata.o	\
 	$(MESS_MACHINE)/geneve.o	\
 	$(MESS_MACHINE)/990_dk.o	\

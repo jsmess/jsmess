@@ -63,6 +63,7 @@ TODO:
 #include "99_ide.h"
 #include "99_hsgpl.h"
 #include "99_usbsm.h"
+#include "ti99pcod.h"
 
 #include "sound/tms5220.h"	/* for tms5220_set_variant() */
 #include "sound/5220intf.h"
@@ -125,6 +126,9 @@ static char has_hsgpl;
 static char has_mecmouse;
 /* TRUE if usb-sm card present */
 static char has_usb_sm;
+
+/* TRUE if p-code card present */
+static char has_pcode;
 
 /* handset interface */
 static int handset_buf;
@@ -507,7 +511,8 @@ MACHINE_RESET( ti99 )
 	has_handset = (ti99_model == model_99_4) && ((input_port_read(machine, "CFG") >> config_handsets_bit) & config_handsets_mask);
 	has_hsgpl = ((ti99_model == model_99_4p) || (input_port_read(machine, "CFG") >> config_hsgpl_bit) & config_hsgpl_mask);
 	has_usb_sm = (input_port_read(machine, "CFG") >> config_usbsm_bit) & config_usbsm_mask;
-
+	has_pcode = (input_port_read(machine, "CFG") >> config_pcode_bit) & config_pcode_mask;
+	
 	/* set up optional expansion hardware */
 	ti99_peb_reset(ti99_model == model_99_4p, tms9901_set_int1, NULL);
 
@@ -606,6 +611,9 @@ MACHINE_RESET( ti99 )
 
 	if (has_evpc)
 		ti99_evpc_reset(machine);
+
+	if (has_pcode)
+		ti99_pcode_reset(machine);
 
 	/* initialize mechatronics mouse */
 	mecmouse_sel = 0;
