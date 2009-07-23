@@ -2113,6 +2113,7 @@ static DEVICE_START(ti99_multicart)
 	for (i=0; i < NUMBER_OF_CARTRIDGE_SLOTS; i++)
 	{
 		cartslots->cartridge[i].pcb = NULL;
+		clear_slot(device, i);
 	}
 	
 	/* Initialize the legacy system. */
@@ -2146,7 +2147,25 @@ static DEVICE_STOP(ti99_multicart)
 READ16_DEVICE_HANDLER( ti99_multicart_r )
 {
 	ti99_multicart_t *cartslots = (ti99_multicart_t *) device->token;
-	cartridge_t *cart = &cartslots->cartridge[cartslots->active_slot];
+	int slot = cartslots->active_slot; 
+	cartridge_t *cart;
+		
+	/* Sanity check. Higher slots are always empty. */
+	if (slot >= NUMBER_OF_CARTRIDGE_SLOTS) 
+		return 0;
+		
+	/* Same as above (GROM read): If there is only one cartridge there
+	   is no use of trying other banks. There is one issue with the 
+	   selection mechanism: When the console probes the GROM banks and
+	   we have a ROM-only cartridge plugged in, it checks bank 0 and bank 1,
+	   finds no GROM, and then fails to dummy-check bank 0 again which would
+	   have set our cartridge expander to slot 0. But in slot 1 there is no
+	   ROM cartridge, so nothing shows up in the selection list. We work 
+	   around this with the following line. */
+	if (cartslots->fixed_slot==AUTO && cartslots->next_free_slot==1)
+		slot=0;
+
+	cart = &cartslots->cartridge[slot];
 
 	/* Idle the CPU */
         cpu_adjust_icount(cputag_get_cpu(device->machine, "maincpu"),-4);
@@ -2162,15 +2181,16 @@ READ16_DEVICE_HANDLER( ti99_multicart_r )
 		return ti99_cart_r_legacy(device, offset, mem_mask);
 	}	
 	
-	if (cart->pcb!=NULL)
+	if (!slot_is_empty(device, slot))
 	{
-//		printf("accessing cartridge in slot %d\n", cartslots->active_slot);
+//		printf("accessing cartridge in slot %d\n", slot);
 		ti99_pcb_t *pcbdef = (ti99_pcb_t *)cart->pcb->token;
+//		printf("address=%lx, offset=%lx\n", pcbdef, offset);
 		return (*pcbdef->read)(cart->pcb, offset, mem_mask);
 	}
 	else 
 	{
-//		printf("No cartridge in slot %d\n", cartslots->active_slot);
+//		printf("No cartridge in slot %d\n", slot);
 		return 0;
 	}
 }
@@ -2188,8 +2208,18 @@ READ16_DEVICE_HANDLER( ti99_multicart_r )
 WRITE16_DEVICE_HANDLER( ti99_multicart_w )
 {
 	ti99_multicart_t *cartslots = (ti99_multicart_t *) device->token;
+	int slot = cartslots->active_slot;
+	cartridge_t *cart;
+		
+	/* Sanity check. Higher slots are always empty. */
+	if (slot >= NUMBER_OF_CARTRIDGE_SLOTS) 
+		return;
+		
+	/* Same as above (READ16). */
+	if (cartslots->fixed_slot==AUTO && cartslots->next_free_slot==1)
+		slot=0;
 
-	cartridge_t *cart = &cartslots->cartridge[cartslots->active_slot];
+	cart = &cartslots->cartridge[slot];
 	
 	/* Idle the CPU */
         cpu_adjust_icount(cputag_get_cpu(device->machine, "maincpu"),-4);
@@ -2202,9 +2232,9 @@ WRITE16_DEVICE_HANDLER( ti99_multicart_w )
 	}	
 	else 
 	{
-		if (cart->pcb!=NULL)
+		if (!slot_is_empty(device, slot))
 		{
-//			printf("writing to cartridge in slot %d\n", cartslots->active_slot);
+//			printf("writing to cartridge in slot %d\n", slot);
 			ti99_pcb_t *pcbdef = (ti99_pcb_t *)cart->pcb->token;
 			(*pcbdef->write)(cart->pcb, offset, data, mem_mask);
 		}
@@ -2219,9 +2249,21 @@ WRITE16_DEVICE_HANDLER( ti99_multicart_w )
 READ8_DEVICE_HANDLER( ti99_multicart_cru_r )
 {
 	ti99_multicart_t *cartslots = (ti99_multicart_t *) device->token;
-	cartridge_t *cart = &cartslots->cartridge[cartslots->active_slot];
+	cartridge_t *cart;
+	
+	int slot = cartslots->active_slot;
+		
+	/* Sanity check. Higher slots are always empty. */
+	if (slot >= NUMBER_OF_CARTRIDGE_SLOTS) 
+		return 0;
+		
+	/* Same as above (READ16). */
+	if (cartslots->fixed_slot==AUTO && cartslots->next_free_slot==1)
+		slot=0;
 
-	if (cart->pcb!=NULL)
+	cart = &cartslots->cartridge[slot];
+	
+	if (!slot_is_empty(device, slot))
 	{
 		ti99_pcb_t *pcbdef = (ti99_pcb_t *)cart->pcb->token;
 		if (pcbdef->cruread != NULL)
@@ -2236,9 +2278,21 @@ READ8_DEVICE_HANDLER( ti99_multicart_cru_r )
 WRITE8_DEVICE_HANDLER( ti99_multicart_cru_w )
 {
 	ti99_multicart_t *cartslots = (ti99_multicart_t *) device->token;
-	cartridge_t *cart = &cartslots->cartridge[cartslots->active_slot];
+	cartridge_t *cart;
+	
+	int slot = cartslots->active_slot;
+		
+	/* Sanity check. Higher slots are always empty. */
+	if (slot >= NUMBER_OF_CARTRIDGE_SLOTS) 
+		return;
+		
+	/* Same as above (READ16). */
+	if (cartslots->fixed_slot==AUTO && cartslots->next_free_slot==1)
+		slot=0;
 
-	if (cart->pcb!=NULL)
+	cart = &cartslots->cartridge[slot];
+
+	if (!slot_is_empty(device, slot))
 	{
 		ti99_pcb_t *pcbdef = (ti99_pcb_t *)cart->pcb->token;
 		if (pcbdef->cruwrite != NULL)
@@ -2253,7 +2307,19 @@ WRITE8_DEVICE_HANDLER( ti99_multicart_cru_w )
 READ8_DEVICE_HANDLER(ti99_multicart8_r)
 {
 	ti99_multicart_t *cartslots = (ti99_multicart_t *) device->token;
-	cartridge_t *cart = &cartslots->cartridge[cartslots->active_slot];
+	cartridge_t *cart;
+	
+	int slot = cartslots->active_slot;
+		
+	/* Sanity check. Higher slots are always empty. */
+	if (slot >= NUMBER_OF_CARTRIDGE_SLOTS) 
+		return 0;
+		
+	/* Same as above (READ16). */
+	if (cartslots->fixed_slot==AUTO && cartslots->next_free_slot==1)
+		slot=0;
+
+	cart = &cartslots->cartridge[slot];
 
 	/* Idle the CPU. TODO: Check whether this is correct for this machine. */
         cpu_adjust_icount(cputag_get_cpu(device->machine, "maincpu"),-4);
@@ -2264,15 +2330,15 @@ READ8_DEVICE_HANDLER(ti99_multicart8_r)
 		return ti99_cart_r_legacy8(device, offset);
 	}	
 	
-	if (cart->pcb!=NULL)
+	if (!slot_is_empty(device, slot))
 	{
-//		printf("accessing cartridge in slot %d\n", cartslots->active_slot);
+//		printf("accessing cartridge in slot %d\n", slot);
 		ti99_pcb_t *pcbdef = (ti99_pcb_t *)cart->pcb->token;
 		return (*pcbdef->read8)(cart->pcb, offset);
 	}
 	else 
 	{
-//		printf("No cartridge in slot %d\n", cartslots->active_slot);
+//		printf("No cartridge in slot %d\n", slot);
 		return 0;
 	}
 }
@@ -2280,8 +2346,19 @@ READ8_DEVICE_HANDLER(ti99_multicart8_r)
 WRITE8_DEVICE_HANDLER(ti99_multicart8_w)
 {
 	ti99_multicart_t *cartslots = (ti99_multicart_t *) device->token;
+	cartridge_t *cart;
+	
+	int slot = cartslots->active_slot;
+		
+	/* Sanity check. Higher slots are always empty. */
+	if (slot >= NUMBER_OF_CARTRIDGE_SLOTS) 
+		return;
+		
+	/* Same as above (READ16). */
+	if (cartslots->fixed_slot==AUTO && cartslots->next_free_slot==1)
+		slot=0;
 
-	cartridge_t *cart = &cartslots->cartridge[cartslots->active_slot];
+	cart = &cartslots->cartridge[slot];
 
 	/* Idle the CPU. TODO: Check whether this is correct for this machine. */
         cpu_adjust_icount(cputag_get_cpu(device->machine, "maincpu"),-4);
@@ -2293,7 +2370,7 @@ WRITE8_DEVICE_HANDLER(ti99_multicart8_w)
 	}	
 	else 
 	{
-		if (cart->pcb!=NULL)
+		if (!slot_is_empty(device, slot))
 		{
 			ti99_pcb_t *pcbdef = (ti99_pcb_t *)cart->pcb->token;
 			(*pcbdef->write8)(cart->pcb, offset, data);
@@ -2310,7 +2387,6 @@ static MACHINE_DRIVER_START(ti99_multicart)
 	MDRV_CARTSLOT_PCBTYPE(3, "minimem", TI99_CARTRIDGE_PCB_MINIMEM)
 	MDRV_CARTSLOT_PCBTYPE(4, "super", TI99_CARTRIDGE_PCB_SUPER)
 	MDRV_CARTSLOT_PCBTYPE(5, "mbx", TI99_CARTRIDGE_PCB_MBX)
-//	MDRV_CARTSLOT_PCBTYPE(6, "gk", TI99_CARTRIDGE_PCB_GK)
 	
 	MDRV_CARTSLOT_START(ti99_cartridge)
 	MDRV_CARTSLOT_LOAD(ti99_cartridge)
@@ -2324,7 +2400,7 @@ static MACHINE_DRIVER_START(ti99_multicart)
 	MDRV_CARTSLOT_PCBTYPE(3, "minimem", TI99_CARTRIDGE_PCB_MINIMEM)
 	MDRV_CARTSLOT_PCBTYPE(4, "super", TI99_CARTRIDGE_PCB_SUPER)
 	MDRV_CARTSLOT_PCBTYPE(5, "mbx", TI99_CARTRIDGE_PCB_MBX)
-//	MDRV_CARTSLOT_PCBTYPE(6, "gk", TI99_CARTRIDGE_PCB_GK)
+
 	MDRV_CARTSLOT_START(ti99_cartridge)
 	MDRV_CARTSLOT_LOAD(ti99_cartridge)
 	MDRV_CARTSLOT_UNLOAD(ti99_cartridge)
@@ -2337,7 +2413,7 @@ static MACHINE_DRIVER_START(ti99_multicart)
 	MDRV_CARTSLOT_PCBTYPE(3, "minimem", TI99_CARTRIDGE_PCB_MINIMEM)
 	MDRV_CARTSLOT_PCBTYPE(4, "super", TI99_CARTRIDGE_PCB_SUPER)
 	MDRV_CARTSLOT_PCBTYPE(5, "mbx", TI99_CARTRIDGE_PCB_MBX)
-//	MDRV_CARTSLOT_PCBTYPE(6, "gk", TI99_CARTRIDGE_PCB_GK)
+
 	MDRV_CARTSLOT_START(ti99_cartridge)
 	MDRV_CARTSLOT_LOAD(ti99_cartridge)
 	MDRV_CARTSLOT_UNLOAD(ti99_cartridge)
@@ -2350,7 +2426,7 @@ static MACHINE_DRIVER_START(ti99_multicart)
 	MDRV_CARTSLOT_PCBTYPE(3, "minimem", TI99_CARTRIDGE_PCB_MINIMEM)
 	MDRV_CARTSLOT_PCBTYPE(4, "super", TI99_CARTRIDGE_PCB_SUPER)
 	MDRV_CARTSLOT_PCBTYPE(5, "mbx", TI99_CARTRIDGE_PCB_MBX)
-//	MDRV_CARTSLOT_PCBTYPE(6, "gk", TI99_CARTRIDGE_PCB_GK)
+
 	MDRV_CARTSLOT_START(ti99_cartridge)
 	MDRV_CARTSLOT_LOAD(ti99_cartridge)
 	MDRV_CARTSLOT_UNLOAD(ti99_cartridge)
