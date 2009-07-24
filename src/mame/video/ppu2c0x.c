@@ -36,7 +36,7 @@ NES-specific:
 /* constant definitions */
 #define VISIBLE_SCREEN_WIDTH	(32*8)	/* Visible screen width */
 #define VISIBLE_SCREEN_HEIGHT	(30*8)	/* Visible screen height */
-#define VIDEOMEM_SIZE			0x4000	/* videomem size */
+#define VIDEOMEM_SIZE			0x1000	/* videomem size */
 #define VIDEOMEM_PAGE_SIZE		0x400	/* videomem page size */
 #define SPRITERAM_SIZE			0x100	/* spriteram size */
 #define SPRITERAM_MASK			(0x100-1)	/* spriteram size */
@@ -113,12 +113,12 @@ typedef struct
 	int						back_color;				/* background color */
 	UINT8					*ppu_page[4];			/* ppu pages */
 	int						nes_vram[8];			/* keep track of 8 .5k vram pages to speed things up */
+	UINT8					palette_ram[0x20];		/* shouldn't be in main memory! */
 	int						scan_scale;				/* scan scale */
 	int						scanlines_per_frame;	/* number of scanlines per frame */
 	int						mirror_state;
 	rgb_t					palette[64*4];			/* palette for this chip */
 } ppu2c0x_chip;
-
 
 
 /***************************************************************************
@@ -132,6 +132,16 @@ static TIMER_CALLBACK( hblank_callback );
 static TIMER_CALLBACK( nmi_callback );
 
 void (*ppu_latch)( const device_config *device, offs_t offset );
+
+/* palette handlers */
+WRITE8_HANDLER(ppu2c0x_palette_write);
+READ8_HANDLER(ppu2c0x_palette_read);
+/* name and attribute table functions */
+WRITE8_HANDLER(ppu2c0x_name_write);
+READ8_HANDLER(ppu2c0x_name_read);
+/* name and attribute table functions */
+WRITE8_HANDLER(ppu2c0x_chr_write);
+READ8_HANDLER(ppu2c0x_chr_read);
 
 
 /***************************************************************************
@@ -167,6 +177,13 @@ INLINE const ppu2c0x_interface *get_interface(const device_config *device)
  *  PPU Palette Initialization
  *
  *************************************/
+
+/* default address map */
+// make this INTERNAL, default should just be enough to avoid compile errors, print error messages!
+static ADDRESS_MAP_START( ppu2c0x, 0, 8 )
+	AM_RANGE(0x3F00, 0x3fff) AM_READWRITE (ppu2c0x_palette_read, ppu2c0x_palette_write)
+ADDRESS_MAP_END
+
 void ppu2c0x_init_palette(running_machine *machine, int first_entry )
 {
 
@@ -302,9 +319,8 @@ static const gfx_layout ppu_charlayout =
 
 static DEVICE_START( ppu2c0x )
 {
-	UINT32 total;
 	ppu2c0x_chip *chip = get_token(device);
-	const ppu2c0x_interface *intf = get_interface(device);
+	//const ppu2c0x_interface *intf = get_interface(device);
 
 	memset(chip, 0, sizeof(*chip));
 	chip->scanlines_per_frame = (int) device_get_info_int(device, PPU2C0XINFO_INT_SCANLINES_PER_FRAME);
@@ -318,58 +334,9 @@ static DEVICE_START( ppu2c0x )
 
 	/* allocate a screen bitmap, videomem and spriteram, a dirtychar array and the monochromatic colortable */
 	chip->bitmap = auto_bitmap_alloc(device->machine, VISIBLE_SCREEN_WIDTH, VISIBLE_SCREEN_HEIGHT, video_screen_get_format(device->machine->primary_screen));
-	chip->videomem = auto_alloc_array_clear(device->machine, UINT8, VIDEOMEM_SIZE );
-	chip->videoram = auto_alloc_array_clear(device->machine, UINT8, VIDEOMEM_SIZE );
 	chip->spriteram = auto_alloc_array_clear(device->machine, UINT8, SPRITERAM_SIZE );
 	chip->colortable = auto_alloc_array(device->machine, pen_t, ARRAY_LENGTH( default_colortable ) );
 	chip->colortable_mono = auto_alloc_array(device->machine, pen_t, ARRAY_LENGTH( default_colortable_mono ) );
-
-	memset( chip->videoram_banks_indices, 0xff, sizeof(chip->videoram_banks_indices) );
-
-	if ( intf->vram_enabled )
-	{
-		chip->has_videoram = 1;
-	}
-
-	/* initialize the video ROM portion, if available */
-	if ( ( intf->vrom_region != NULL ) && ( memory_region( device->machine, intf->vrom_region ) != 0 ) )
-	{
-		/* mark that we have a videorom */
-		chip->has_videorom = 1;
-
-		/* find out how many banks */
-		chip->videorom_banks = memory_region_length( device->machine, intf->vrom_region ) / 0x2000;
-
-		/* tweak the layout accordingly */
-		if ( chip->has_videoram )
-		{
-			total = CHARGEN_NUM_CHARS;
-		}
-		else
-		{
-			total = chip->videorom_banks * CHARGEN_NUM_CHARS;
-		}
-	}
-	else
-	{
-		chip->has_videorom = chip->videorom_banks = 0;
-
-		/* we need to reset this in case of mame running multisession */
-		total = CHARGEN_NUM_CHARS;
-	}
-
-	/* now create the gfx region */
-	{
-		gfx_layout gl;
-		UINT8 *src = (chip->has_videorom && !chip->has_videoram) ? memory_region( device->machine, intf->vrom_region ) : chip->videomem;
-
-		memcpy(&gl, &ppu_charlayout, sizeof(gl));
-		gl.total = total;
-		device->machine->gfx[intf->gfx_layout_number] = gfx_element_alloc( device->machine, &gl, src, 8, 0 );
-	}
-
-	/* setup our videomem handlers based on mirroring */
-	ppu2c0x_set_mirroring( device, intf->mirroring );
 }
 
 static TIMER_CALLBACK( hblank_callback )
@@ -413,22 +380,19 @@ static void draw_background(const device_config *device, UINT8 *line_priority )
 	const int *ppu_regs = &this_ppu->regs[0];
 	const int scanline = this_ppu->scanline;
 	const int refresh_data = this_ppu->refresh_data;
-	const int gfx_bank = intf->gfx_layout_number;
-	const int total_elements = device->machine->gfx[gfx_bank]->total_elements;
 	const int *nes_vram = &this_ppu->nes_vram[0];
 	const int tile_page = this_ppu->tile_page;
-	const int line_modulo = device->machine->gfx[gfx_bank]->line_modulo;
-	UINT8 **ppu_page = this_ppu->ppu_page;
+
 	int	start_x = ( this_ppu->x_fine ^ 0x07 ) - 7;
 	UINT16 back_pen;
 	UINT16 *dest;
 
 	UINT8 scroll_x_coarse, scroll_y_coarse, scroll_y_fine, color_mask;
-	int x, tile_index, start, i;
+	int x, tile_index, i;
 
 	const pen_t *color_table;
 	const pen_t *paldata;
-	const UINT8 *sd;
+	//const UINT8 *sd;
 
 	int tilecount=0;
 
@@ -474,17 +438,20 @@ static void draw_background(const device_config *device, UINT8 *line_priority )
 
 		index1 = tile_index + x;
 
+
+		//this is attribute table stuff! (actually read 2 in PPUspeak)!
 		/* Figure out which byte in the color table to use */
-		pos = ( ( index1 & 0x380 ) >> 4 ) | ( ( index1 & 0x1f ) >> 2 );
+		pos = ( ( index1 & 0x380 ) >> 4 ) | ( ( index1 & 0x1f ) >> 2 ); 
 		page = (index1 & 0x0c00) >> 10;
 		address = 0x3c0 + pos;
-		color_byte = ppu_page[page][address];
+		color_byte = memory_read_byte(device->space[0], (((page*0x400)+address)&0xfff)+0x2000);
 
 		/* figure out which bits in the color table to use */
 		color_bits = ( ( index1 & 0x40 ) >> 4 ) + ( index1 & 0x02 );
 
+		//page2 is the output of the nametable read (this section is the FIRST read per tile!)
 		address = index1 & 0x3ff;
-		page2 = ppu_page[page][address];
+		page2 = memory_read_byte(device->space[0], index1);
 		index2 = nes_vram[ ( page2 >> 6 ) | tile_page ] + ( page2 & 0x3f );
 
 		//27/12/2002
@@ -495,18 +462,35 @@ static void draw_background(const device_config *device, UINT8 *line_priority )
 
 		if(start_x < VISIBLE_SCREEN_WIDTH )
 		{
+			UINT8 plane1, plane2;//use extended size so I can shift!
 			paldata = &color_table[ 4 * ( ( ( color_byte >> color_bits ) & 0x03 ) ) ];
-			start = scroll_y_fine * line_modulo;
-			sd = gfx_element_get_data(device->machine->gfx[gfx_bank], index2 % total_elements) + start;
+			//start = scroll_y_fine * line_modulo;
+
+			//need to read 0x0000 or 0x1000 + 16*nametable data
+			address=((this_ppu->tile_page)?0x1000:0)+(page2*16);
+			//plus something that accounts for y
+			//address-=(scanline%8);
+			address+=scroll_y_fine;
+
+			plane1= memory_read_byte(device->space[0], (address&0x1FFF));
+			plane2= memory_read_byte(device->space[0], (address+8)&0x1FFF);
+			//plane2= plane2<<1;
+
+//			sd = gfx_element_get_data(device->machine->gfx[gfx_bank], index2 % total_elements) + start;
 
 			/* render the pixel */
 			for( i = 0; i < 8; i++ )
 			{
+				UINT8 pix;
+				pix=((plane1>>7)&1)|(((plane2>>7)&1)<<1);
+				plane1=plane1<<1;
+				plane2=plane2<<1;
 				if ( ( start_x+i ) >= 0 && ( start_x+i ) < VISIBLE_SCREEN_WIDTH )
 				{
-					if ( sd[i] )
+					
+					if ( pix )
 					{
-						pen = paldata[sd[i]];
+						pen = paldata[pix];
 						line_priority[ start_x+i ] |= 0x02;
 					}
 					else
@@ -545,16 +529,13 @@ static void draw_background(const device_config *device, UINT8 *line_priority )
 
 static void draw_sprites(const device_config *device, UINT8 *line_priority )
 {
-	const ppu2c0x_interface *intf = get_interface(device);
+	//const ppu2c0x_interface *intf = get_interface(device);
 	ppu2c0x_chip *this_ppu = get_token(device);
 
 	/* cache some values locally */
 	bitmap_t *bitmap = this_ppu->bitmap;
 	const int scanline = this_ppu->scanline;
-	const int gfx_bank = intf->gfx_layout_number;
-	const int total_elements = device->machine->gfx[gfx_bank]->total_elements;
 	const int sprite_page = this_ppu->sprite_page;
-	const int line_modulo = device->machine->gfx[gfx_bank]->line_modulo;
 	const UINT8 *sprite_ram = this_ppu->spriteram;
 	pen_t *color_table = this_ppu->colortable;
 	int *ppu_regs = &this_ppu->regs[0];
@@ -568,12 +549,11 @@ static void draw_sprites(const device_config *device, UINT8 *line_priority )
 	int spriteCount = 0;
 	int sprite_line;
 	int drawn;
-	int start;
 
 	int first_pixel;
 
 	const pen_t *paldata;
-	const UINT8 *sd;
+	//const UINT8 *sd;
 	int pixel;
 
 	/* determine if the sprites are 8x8 or 8x16 */
@@ -583,6 +563,9 @@ static void draw_sprites(const device_config *device, UINT8 *line_priority )
 
 	for( spriteIndex = 0; spriteIndex < SPRITERAM_SIZE; spriteIndex += 4 )
 	{
+		UINT8 plane1;
+		UINT8 plane2;
+
 		spriteYPos = sprite_ram[spriteIndex] + 1;
 		spriteXPos = sprite_ram[spriteIndex+3];
 
@@ -629,7 +612,7 @@ static void draw_sprites(const device_config *device, UINT8 *line_priority )
 			page = ( tile >> 6 ) | sprite_page;
 
 
-		index1 = this_ppu->nes_vram[page] + ( tile & 0x3f );
+		//index1 = this_ppu->nes_vram[page] + ( tile & 0x3f );
 
 		if ( ppu_latch )
 			(*ppu_latch)(device, ( sprite_page << 10 ) | ( (tile & 0xff) << 4 ));
@@ -637,14 +620,29 @@ static void draw_sprites(const device_config *device, UINT8 *line_priority )
 		/* compute the character's line to draw */
 		sprite_line = scanline - spriteYPos;
 
+		
 		if ( flipy )
 			sprite_line = ( size - 1 ) - sprite_line;
 
 		paldata = &color_table[4 * color];
-		start = sprite_line * line_modulo;
-		sd = gfx_element_get_data(device->machine->gfx[gfx_bank], index1 % total_elements) + start;
-		if (size > 8)
-			gfx_element_get_data(device->machine->gfx[gfx_bank], (index1 + 1) % total_elements);
+
+		if(size==16 && sprite_line > 7)
+		{
+			tile++;
+			sprite_line -=8;
+		}
+		
+
+		index1=tile*16;
+		if(size==8)
+			index1+=((sprite_page==0)?0:0x1000);
+
+		plane1=memory_read_byte(device->space[0],(index1+sprite_line)&0x1FFF);
+		plane2=memory_read_byte(device->space[0],(index1+sprite_line+8)&0x1FFF);
+
+//		sd = gfx_element_get_data(device->machine->gfx[gfx_bank], index1 % total_elements) + start;
+//		if (size > 8)
+//			gfx_element_get_data(device->machine->gfx[gfx_bank], (index1 + 1) % total_elements);
 
 		if ( pri )
 		{
@@ -652,7 +650,23 @@ static void draw_sprites(const device_config *device, UINT8 *line_priority )
 
 			for ( pixel = 0; pixel < 8; pixel++ )
 			{
-				UINT8 pixelData = flipx ? sd[7-pixel] : sd[pixel];
+//				UINT8 pixelData = flipx ? sd[7-pixel] : sd[pixel];
+				UINT8 pixelData;
+				if(flipx)
+				{
+					pixelData=(plane1&1)+((plane2&1)<<1);
+					plane1=plane1>>1;
+					plane2=plane2>>1;
+					//sd[7-pixel]
+				}
+				else
+				{
+					pixelData=((plane1>>7)&1)|(((plane2>>7)&1)<<1);
+					plane1=plane1<<1;
+					plane2=plane2<<1;
+
+					//sd[pixel];
+				}
 
 				/* is this pixel non-transparent? */
 				if ( spriteXPos + pixel >= first_pixel)
@@ -684,7 +698,23 @@ static void draw_sprites(const device_config *device, UINT8 *line_priority )
 
 			for ( pixel = 0; pixel < 8; pixel++ )
 			{
-				UINT8 pixelData = flipx ? sd[7-pixel] : sd[pixel];
+				UINT8 pixelData;
+				if(flipx)
+				{
+					pixelData=(plane1&1)+((plane2&1)<<1);
+					plane1=plane1>>1;
+					plane2=plane2>>1;
+					//sd[7-pixel]
+				}
+				else
+				{
+					pixelData=((plane1>>7)&1)|(((plane2>>7)&1)<<1);
+					plane1=plane1<<1;
+					plane2=plane2<<1;
+
+					//sd[pixel];
+				}
+
 
 				/* is this pixel non-transparent? */
 				if ( spriteXPos + pixel >= first_pixel)
@@ -825,9 +855,9 @@ static void update_scanline(const device_config *device)
 				int penNum;
 
 				if (this_ppu->videomem_addr & 0x03)
-					penNum = this_ppu->videomem[this_ppu->videomem_addr & 0x3f1f] & 0x3f;
+					penNum = this_ppu->palette_ram[this_ppu->videomem_addr & 0x1f];
 				else
-					penNum = this_ppu->videomem[this_ppu->videomem_addr & 0x3f00] & 0x3f;
+					penNum = this_ppu->palette_ram[0];
 
 				back_pen = penNum + intf->color_base;
 			}
@@ -995,10 +1025,55 @@ static DEVICE_RESET( ppu2c0x )
 	for( i = 0; i < 8; i++ )
 		this_ppu->nes_vram[i] = i * 64;
 
-	if ( this_ppu->has_videorom )
-		ppu2c0x_set_videorom_bank( device, 0, 8, 0, 512 );
+	//if ( this_ppu->has_videorom )
+	//	ppu2c0x_set_videorom_bank( device, 0, 8, 0, 512 );
 }
 
+/*************************************
+*
+*	PPU Memory functions
+*
+*************************************/
+
+WRITE8_HANDLER (ppu2c0x_palette_write)
+{
+	ppu2c0x_chip *this_ppu = get_token(space->cpu);
+	const ppu2c0x_interface *intf = get_interface(space->cpu);
+	int color_base = intf->color_base;
+
+	int colorEmphasis = (this_ppu->regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) * 2;
+	//it's a palette
+	//transparent pens are mirrored!
+	if(offset&0x3)
+	{
+		this_ppu->palette_ram[offset&0x1F]=data;
+		this_ppu->colortable[ offset & 0x1f ] = color_base + data + colorEmphasis;
+		this_ppu->colortable_mono[offset & 0x1f] = color_base + (data & 0xf0) + colorEmphasis;
+	}
+	else
+	{
+		int i;
+		this_ppu->back_color = data;
+		for( i = 0; i < 32; i += 4 )
+		{
+			this_ppu->colortable[ i ] = color_base + data + colorEmphasis;
+			this_ppu->colortable_mono[i] = color_base + (data & 0xf0) + colorEmphasis;
+		}
+		this_ppu->palette_ram[offset&0xF]=this_ppu->palette_ram[(offset&0xF)+0x10]=data;
+	}
+}
+
+READ8_HANDLER (ppu2c0x_palette_read)
+{
+	ppu2c0x_chip *this_ppu = get_token(space->cpu);
+	{
+		//it's a palette
+		//ERROR: doesn't currently handle monochrome!
+		if (this_ppu->regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO)
+			return (this_ppu->palette_ram[offset&0x1F]&0x30);
+		else return (this_ppu->palette_ram[offset&0x1F]&0x3F);
+	}
+}
 
 /*************************************
  *
@@ -1037,22 +1112,21 @@ READ8_DEVICE_HANDLER( ppu2c0x_r )
 			break;
 
 		case PPU_DATA:
-			if ( this_ppu->videomem_addr >= 0x3f00  )
-			{
-				this_ppu->data_latch = this_ppu->videomem[this_ppu->videomem_addr & 0x3F1F];
-				if (this_ppu->regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO)
-					this_ppu->data_latch &= 0x30;
-			}
-			else
-				this_ppu->data_latch = this_ppu->buffered_data;
-
 			if ( ppu_latch )
 				(*ppu_latch)( device, this_ppu->videomem_addr & 0x3fff );
 
-			if ( ( this_ppu->videomem_addr >= 0x2000 ) && ( this_ppu->videomem_addr <= 0x3fff ) )
-				this_ppu->buffered_data = this_ppu->ppu_page[ ( this_ppu->videomem_addr & 0xc00) >> 10][ this_ppu->videomem_addr & 0x3ff ];
+			if ( this_ppu->videomem_addr >= 0x3f00  )
+			{
+				this_ppu->data_latch = memory_read_byte(device->space[0], this_ppu->videomem_addr);
+				//buffer the mirrored NT data
+				this_ppu->buffered_data =memory_read_byte(device->space[0], this_ppu->videomem_addr&0x2FFF);
+			}
 			else
-				this_ppu->buffered_data = this_ppu->videomem[ this_ppu->videomem_addr & 0x3fff ];
+			{
+				this_ppu->data_latch = this_ppu->buffered_data;
+				this_ppu->buffered_data =memory_read_byte(device->space[0], this_ppu->videomem_addr);
+			}
+
 
 			this_ppu->videomem_addr += this_ppu->add;
 			break;
@@ -1207,60 +1281,17 @@ WRITE8_DEVICE_HANDLER( ppu2c0x_w )
 					else
 					{
 						/* store the data */
-						this_ppu->videomem[tempAddr] = data;
+						memory_write_byte(device->space[0], tempAddr,data);
 
 						/* mark the char dirty */
-						gfx_element_mark_dirty(device->machine->gfx[intf->gfx_layout_number], tempAddr >> 4);
+						//gfx_element_mark_dirty(device->machine->gfx[intf->gfx_layout_number], tempAddr >> 4);
 					}
 				}
 
-				else if ( tempAddr >= 0x3f00 )
-				{
-					int colorEmphasis = (this_ppu->regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) * 2;
-
-					/* store the data */
-					if (tempAddr & 0x03)
-						this_ppu->videomem[tempAddr & 0x3F1F] = data;
-					else
-					{
-						this_ppu->videomem[0x3F10+(tempAddr&0xF)] = data;
-						this_ppu->videomem[0x3F00+(tempAddr&0xF)] = data;
-					}
-
-					/* As usual, some games attempt to write values > the number of colors so we must mask the data. */
-					data &= 0x3f;
-
-					if ( tempAddr & 0x03 )
-					{
-						this_ppu->colortable[ tempAddr & 0x1f ] = color_base + data + colorEmphasis;
-						this_ppu->colortable_mono[tempAddr & 0x1f] = color_base + (data & 0xf0) + colorEmphasis;
-					}
-
-					/* The only valid background colors are writes to 0x3f00 and 0x3f10 */
-					/* and even then, they are mirrors of each other. */
-					if ( ( tempAddr & 0x0f ) == 0 )
-					{
-						int i;
-
-						this_ppu->back_color = data;
-						for( i = 0; i < 32; i += 4 )
-						{
-							this_ppu->colortable[ i ] = color_base + data + colorEmphasis;
-							this_ppu->colortable_mono[i] = color_base + (data & 0xf0) + colorEmphasis;
-						}
-					}
-				}
-
-				/* everything else */
-				/* writes to $3000-$3eff are mirrors of $2000-$2eff */
 				else
 				{
-					int page = ( tempAddr & 0x0c00) >> 10;
-					int address = tempAddr & 0x3ff;
-
-					this_ppu->ppu_page[page][address] = data;
+					memory_write_byte(device->space[0], tempAddr, data);
 				}
-
 				/* increment the address */
 				this_ppu->videomem_addr += this_ppu->add;
 			}
@@ -1286,7 +1317,8 @@ void ppu2c0x_spriteram_dma (const address_space *space, const device_config *dev
 	for (i = 0; i < SPRITERAM_SIZE; i++)
 	{
 		UINT8 spriteData = memory_read_byte(space, address + i);
-		ppu2c0x_w (device, PPU_SPRITE_DATA, spriteData);
+		memory_write_byte(space, 0x2004, spriteData);
+//		ppu2c0x_w (device, PPU_SPRITE_DATA, spriteData);
 	}
 
 	// should last 513 CPU cycles.
@@ -1319,97 +1351,6 @@ void ppu2c0x_render( const device_config *device, bitmap_t *bitmap, int flipx, i
 
 /*************************************
  *
- *  PPU VideoROM banking
- *
- *************************************/
-void ppu2c0x_set_videorom_bank( const device_config *device, int start_page, int num_pages, int bank, int bank_size )
-{
-	ppu2c0x_chip *this_ppu = get_token(device);
-	const ppu2c0x_interface *intf = get_interface(device);
-	int i;
-
-	if ( !this_ppu->has_videorom )
-	{
-		logerror( "PPU(set vrom bank): Attempting to switch videorom banks and no rom is mapped\n" );
-		return;
-	}
-
-	bank &= ( this_ppu->videorom_banks * ( CHARGEN_NUM_CHARS / bank_size ) ) - 1;
-
-	if (this_ppu->has_videoram)
-	{
-		for ( i = start_page; i < start_page + num_pages; i++ )
-		{
-			int elemnum;
-
-			if ( this_ppu->videoram_banks_indices[i] != -1 )
-			{
-				memcpy( &this_ppu->videoram[this_ppu->videoram_banks_indices[i]*0x400], &this_ppu->videomem[i*0x400], 0x400);
-			}
-			this_ppu->videoram_banks_indices[i] = -1;
-			for (elemnum = 0; elemnum < (num_pages*0x400 >> 4); elemnum++)
-				gfx_element_mark_dirty(device->machine->gfx[intf->gfx_layout_number], (start_page*0x400 >> 4) + elemnum);
-		}
-	}
-	else
-	{
-		for( i = start_page; i < ( start_page + num_pages ); i++ )
-			this_ppu->nes_vram[i] = bank * bank_size + 64 * ( i - start_page );
-	}
-
-	{
-		int vram_start = start_page * 0x400;
-		int count = num_pages * 0x400;
-		int rom_start = bank * bank_size * 16;
-
-		memcpy( &this_ppu->videomem[vram_start], &memory_region( device->machine, intf->vrom_region )[rom_start], count );
-	}
-}
-
-/*************************************
- *
- *  PPU VideoRAM banking
- *
- *************************************/
-
-void ppu2c0x_set_videoram_bank( const device_config *device, int start_page, int num_pages, int bank, int bank_size )
-{
-	ppu2c0x_chip *this_ppu = get_token(device);
-	const ppu2c0x_interface *intf = get_interface(device);
-	int i;
-
-	if ( !this_ppu->has_videoram )
-	{
-		logerror( "PPU(set vram bank): Attempting to switch videoram banks and no ram is mapped\n" );
-		return;
-	}
-
-	bank &= ( CHARGEN_NUM_CHARS / bank_size ) - 1;
-
-	for ( i = start_page; i < start_page + num_pages; i++ )
-	{
-		int elemnum;
-		if ( this_ppu->videoram_banks_indices[i] != -1 )
-		{
-			memcpy( &this_ppu->videoram[this_ppu->videoram_banks_indices[i]*0x400], &this_ppu->videomem[i*0x400], 0x400);
-		}
-		this_ppu->videoram_banks_indices[i] = (bank * bank_size * 16)/0x400 + (i - start_page);
-		for (elemnum = 0; elemnum < (num_pages*0x400 >> 4); elemnum++)
-			gfx_element_mark_dirty(device->machine->gfx[intf->gfx_layout_number], (start_page*0x400 >> 4) + elemnum);
-	}
-
-	{
-		int vram_start = start_page * 0x400;
-		int count = num_pages * 0x400;
-		int ram_start = bank * bank_size * 16;
-
-		logerror( "ppu2c0x_set_videoram_bank: vram_start = %04x, count = %04x, ram_start = %04x\n", vram_start, count, ram_start );
-		memcpy( &this_ppu->videomem[vram_start], &this_ppu->videoram[ram_start], count );
-	}
-}
-
-/*************************************
- *
  *  Utility functions
  *
  *************************************/
@@ -1437,60 +1378,6 @@ int ppu2c0x_get_current_scanline( const device_config *device )
 {
 	ppu2c0x_chip *this_ppu = get_token(device);
 	return this_ppu->scanline;
-}
-
-void ppu2c0x_set_mirroring( const device_config *device, int mirroring )
-{
-	ppu2c0x_chip *this_ppu = get_token(device);
-
-	// Once we've set 4-screen mirroring, do not change. Some games
-	// (notably Gauntlet) use mappers that can change the mirroring
-	// state, but are also hard-coded for 4-screen VRAM.
-	if (this_ppu->mirror_state == PPU_MIRROR_4SCREEN)
-		return;
-
-	/* setup our videomem handlers based on mirroring */
-	switch( mirroring )
-	{
-		case PPU_MIRROR_VERT:
-			this_ppu->ppu_page[0] = &(this_ppu->videomem[0x2000]);
-			this_ppu->ppu_page[1] = &(this_ppu->videomem[0x2400]);
-			this_ppu->ppu_page[2] = &(this_ppu->videomem[0x2000]);
-			this_ppu->ppu_page[3] = &(this_ppu->videomem[0x2400]);
-			break;
-
-		case PPU_MIRROR_HORZ:
-			this_ppu->ppu_page[0] = &(this_ppu->videomem[0x2000]);
-			this_ppu->ppu_page[1] = &(this_ppu->videomem[0x2000]);
-			this_ppu->ppu_page[2] = &(this_ppu->videomem[0x2400]);
-			this_ppu->ppu_page[3] = &(this_ppu->videomem[0x2400]);
-			break;
-
-		case PPU_MIRROR_HIGH:
-			this_ppu->ppu_page[0] = &(this_ppu->videomem[0x2400]);
-			this_ppu->ppu_page[1] = &(this_ppu->videomem[0x2400]);
-			this_ppu->ppu_page[2] = &(this_ppu->videomem[0x2400]);
-			this_ppu->ppu_page[3] = &(this_ppu->videomem[0x2400]);
-			break;
-
-		case PPU_MIRROR_LOW:
-			this_ppu->ppu_page[0] = &(this_ppu->videomem[0x2000]);
-			this_ppu->ppu_page[1] = &(this_ppu->videomem[0x2000]);
-			this_ppu->ppu_page[2] = &(this_ppu->videomem[0x2000]);
-			this_ppu->ppu_page[3] = &(this_ppu->videomem[0x2000]);
-			break;
-
-		case PPU_MIRROR_NONE:
-		case PPU_MIRROR_4SCREEN:
-		default:
-			this_ppu->ppu_page[0] = &(this_ppu->videomem[0x2000]);
-			this_ppu->ppu_page[1] = &(this_ppu->videomem[0x2400]);
-			this_ppu->ppu_page[2] = &(this_ppu->videomem[0x2800]);
-			this_ppu->ppu_page[3] = &(this_ppu->videomem[0x2c00]);
-			break;
-	}
-
-	this_ppu->mirror_state = mirroring;
 }
 
 void ppu2c0x_set_scanline_callback( const device_config *device, ppu2c0x_scanline_cb cb )
@@ -1531,6 +1418,14 @@ DEVICE_GET_INFO(ppu2c02)
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
 		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 		case PPU2C0XINFO_INT_SCANLINES_PER_FRAME:		info->i = PPU_NTSC_SCANLINES_PER_FRAME;		break;
+		case DEVINFO_INT_DATABUS_WIDTH_0:				info->i = 8;								break;
+		case DEVINFO_INT_ADDRBUS_WIDTH_0:				info->i = 14;								break;
+		case DEVINFO_INT_ADDRBUS_SHIFT_0:				info->i = 0;								break;
+
+
+		/* --- the following bits of info are returned as pointers to data --- */
+		case DEVINFO_PTR_DEFAULT_MEMORY_MAP_0:		info->default_map8 = ADDRESS_MAP_NAME(ppu2c0x);break;
+
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(ppu2c0x);	break;

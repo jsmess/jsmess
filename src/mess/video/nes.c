@@ -22,20 +22,20 @@ static void nes_vh_reset(running_machine *machine)
 
 	if (nes.four_screen_vram)
 	{
-		ppu2c0x_set_mirroring(devtag_get_device(machine,"ppu"), PPU_MIRROR_4SCREEN);
+		set_nt_mirroring(PPU_MIRROR_4SCREEN);
 	}
 	else
 	{
 		switch(nes.hard_mirroring)
 		{
 			case 0:
-				ppu2c0x_set_mirroring(devtag_get_device(machine,"ppu"), PPU_MIRROR_HORZ);
+				set_nt_mirroring(PPU_MIRROR_HORZ);
 				break;
 			case 1:
-				ppu2c0x_set_mirroring(devtag_get_device(machine,"ppu"), PPU_MIRROR_VERT);
+				set_nt_mirroring(PPU_MIRROR_VERT);
 				break;
 			default:
-				ppu2c0x_set_mirroring(devtag_get_device(machine,"ppu"), PPU_MIRROR_NONE );
+				set_nt_mirroring(PPU_MIRROR_NONE );
 				break;
 		}
 	}

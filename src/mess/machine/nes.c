@@ -78,12 +78,18 @@ static void init_nes_core (running_machine *machine)
 	nes.rom = memory_region(machine, "maincpu");
 	nes.vrom = memory_region(machine, "gfx1");
 	nes.vram = memory_region(machine, "gfx2");
+	nes.ciram = memory_region(machine, "gfx3");
 	nes.wram = memory_region(machine, "user1");
+	nes.exram = auto_alloc_array(machine, UINT8, 0x400);
 
 	/* Brutal hack put in as a consequence of the new memory system; we really
 	 * need to fix the NES code */
 	memory_install_read8_handler(space, 0x0000, 0x07ff, 0, 0x1800, SMH_BANK(10));
 	memory_install_write8_handler(space, 0x0000, 0x07ff, 0, 0x1800, SMH_BANK(10));
+
+	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0, 0x1fff, 0, 0, nes_chr_r, nes_chr_w);
+	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x2000, 0x3eff, 0, 0, nes_nt_r, nes_nt_w);
+
 	memory_set_bankptr(machine, 10, nes.rom);
 
 	nes_battery_ram = nes.wram;
@@ -653,14 +659,4 @@ DEVICE_IMAGE_UNLOAD(nes_disk)
 {
 	/* TODO: should write out changes here as well */
 	nes_fds.data = NULL;
-}
-
-void ppu_mirror_custom (int page, int address)
-{
-	fatalerror("Unimplemented");
-}
-
-void ppu_mirror_custom_vrom (int page, int address)
-{
-	fatalerror("Unimplemented");
 }

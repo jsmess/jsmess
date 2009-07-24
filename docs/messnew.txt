@@ -20,7 +20,8 @@ Skeleton drivers:
 
 System Driver Changes:
 ----------------------
-(none)
+- [NES] Changed the PPU to use a device memory map, enhancements and
+  improvements to mappers 5, 68, 88, 119.  [Robert Bohms]
 
 
 

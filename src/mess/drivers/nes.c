@@ -176,7 +176,7 @@ static void ppu_nmi(const device_config *device, int *ppu_regs)
 
 static const ppu2c0x_interface nes_ppu_interface =
 {
-	NULL,//"gfx1",
+	NULL, //"gfx1",
 	0,
 	0,
 	PPU_MIRROR_NONE,
@@ -284,8 +284,10 @@ ROM_START( nes )
 	ROM_FILL( 0x0000, 0x10000, 0x00 )
 	ROM_REGION( 0x2000,  "gfx1", 0 )  /* VROM */
 	ROM_FILL( 0x0000, 0x2000, 0x00 )
-	ROM_REGION( 0x2000,  "gfx2", 0 )  /* VRAM */
-	ROM_FILL( 0x0000, 0x2000, 0x00 )
+	ROM_REGION( 0x4000,  "gfx2", 0 )  /* VRAM */
+	ROM_FILL( 0x0000, 0x4000, 0x00 )
+	ROM_REGION( 0x800,  "gfx3", 0 )  /* CI RAM */
+	ROM_FILL( 0x0000, 0x800, 0x00 )
 	ROM_REGION( 0x10000, "user1", 0 ) /* WRAM */
 	ROM_FILL( 0x0000, 0x10000, 0x00 )
 ROM_END
@@ -295,8 +297,10 @@ ROM_START( nespal )
 	ROM_FILL( 0x0000, 0x10000, 0x00 )
 	ROM_REGION( 0x2000,  "gfx1", 0 )  /* VROM */
 	ROM_FILL( 0x0000, 0x2000, 0x00 )
-	ROM_REGION( 0x2000,  "gfx2", 0 )  /* VRAM */
-	ROM_FILL( 0x0000, 0x2000, 0x00 )
+	ROM_REGION( 0x4000,  "gfx2", 0 )  /* VRAM */
+	ROM_FILL( 0x0000, 0x4000, 0x00 )
+	ROM_REGION( 0x800,  "gfx3", 0 )  /* CI RAM */
+	ROM_FILL( 0x0000, 0x800, 0x00 )
 	ROM_REGION( 0x10000, "user1", 0 ) /* WRAM */
 	ROM_FILL( 0x0000, 0x10000, 0x00 )
 ROM_END
@@ -307,8 +311,10 @@ ROM_START( famicom )
 
 	ROM_REGION( 0x2000,  "gfx1", 0 )  /* VROM */
 	ROM_FILL( 0x0000, 0x2000, 0x00 )
-	ROM_REGION( 0x2000,  "gfx2", 0 )  /* VRAM */
-	ROM_FILL( 0x0000, 0x2000, 0x00 )
+	ROM_REGION( 0x4000,  "gfx2", 0 )  /* VRAM */
+	ROM_FILL( 0x0000, 0x4000, 0x00 )
+	ROM_REGION( 0x800,  "gfx3", 0 )  /* CI RAM */
+	ROM_FILL( 0x0000, 0x800, 0x00 )
 	ROM_REGION( 0x10000, "user1", 0 ) /* WRAM */
 	ROM_FILL( 0x0000, 0x10000, 0x00 )
 ROM_END
@@ -319,8 +325,10 @@ ROM_START( famitwin )
 
 	ROM_REGION( 0x2000,  "gfx1", 0 )  /* VROM */
 	ROM_FILL( 0x0000, 0x2000, 0x00 )
-	ROM_REGION( 0x2000,  "gfx2", 0 )  /* VRAM */
-	ROM_FILL( 0x0000, 0x2000, 0x00 )
+	ROM_REGION( 0x4000,  "gfx2", 0 )  /* VRAM */
+	ROM_FILL( 0x0000, 0x4000, 0x00 )
+	ROM_REGION( 0x800,  "gfx3", 0 )  /* CI RAM */
+	ROM_FILL( 0x0000, 0x800, 0x00 )
 	ROM_REGION( 0x10000, "user1", 0 ) /* WRAM */
 	ROM_FILL( 0x0000, 0x10000, 0x00 )
 ROM_END
@@ -332,8 +340,10 @@ ROM_START( m82 )
 
 	ROM_REGION( 0x2000,  "gfx1", 0 )  /* VROM */
 	ROM_FILL( 0x0000, 0x2000, 0x00 )
-	ROM_REGION( 0x2000,  "gfx2", 0 )  /* VRAM */
-	ROM_FILL( 0x0000, 0x2000, 0x00 )
+	ROM_REGION( 0x4000,  "gfx2", 0 )  /* VRAM */
+	ROM_FILL( 0x0000, 0x4000, 0x00 )
+	ROM_REGION( 0x800,  "gfx3", 0 )  /* CI RAM */
+	ROM_FILL( 0x0000, 0x800, 0x00 )
 	ROM_REGION( 0x10000, "user1", 0 ) /* WRAM */
 	ROM_FILL( 0x0000, 0x10000, 0x00 )
 ROM_END
@@ -350,8 +360,10 @@ ROM_START( drpcjr )
 
 	ROM_REGION( 0x2000,  "gfx1", 0 )  /* VROM */
 	ROM_FILL( 0x0000, 0x2000, 0x00 )
-	ROM_REGION( 0x2000,  "gfx2", 0 )  /* VRAM */
-	ROM_FILL( 0x0000, 0x2000, 0x00 )
+	ROM_REGION( 0x4000,  "gfx2", 0 )  /* VRAM */
+	ROM_FILL( 0x0000, 0x4000, 0x00 )
+	ROM_REGION( 0x800,  "gfx3", 0 )  /* CI RAM */
+	ROM_FILL( 0x0000, 0x800, 0x00 )
 	ROM_REGION( 0x10000, "user1", 0 ) /* WRAM */
 	ROM_FILL( 0x0000, 0x10000, 0x00 )
 ROM_END
@@ -361,8 +373,10 @@ ROM_START( dendy )
 	ROM_FILL( 0x0000, 0x10000, 0x00 )
 	ROM_REGION( 0x2000,  "gfx1", 0 )  /* VROM */
 	ROM_FILL( 0x0000, 0x2000, 0x00 )
-	ROM_REGION( 0x2000,  "gfx2", 0 )  /* VRAM */
-	ROM_FILL( 0x0000, 0x2000, 0x00 )
+	ROM_REGION( 0x4000,  "gfx2", 0 )  /* VRAM */
+	ROM_FILL( 0x0000, 0x4000, 0x00 )
+	ROM_REGION( 0x800,  "gfx3", 0 )  /* CI RAM */
+	ROM_FILL( 0x0000, 0x800, 0x00 )
 	ROM_REGION( 0x10000, "user1", 0 ) /* WRAM */
 	ROM_FILL( 0x0000, 0x10000, 0x00 )
 ROM_END
@@ -404,10 +418,10 @@ SYSTEM_CONFIG_END
 limitations of the previous implementation. Systems regressed to GAME_NOT_WORKING status until a proper fix is found */
 
 /*     YEAR  NAME      PARENT  COMPAT MACHINE   INPUT    INIT   CONFIG   COMPANY       FULLNAME */
-CONS( 1985, nes,       0,      0,     nes,      nes,     0,     0,       "Nintendo",  "Nintendo Entertainment System / Famicom (NTSC)", GAME_NOT_WORKING )
-CONS( 1987, nespal,    nes,    0,     nespal,   nes,     0,     0,       "Nintendo",  "Nintendo Entertainment System (PAL)", GAME_NOT_WORKING )
-CONS( 1983, famicom,   nes,    0,     famicom,  famicom, 0,     famicom, "Nintendo",  "Famicom Disk System", GAME_NOT_WORKING )
-CONS( 1986, famitwin,  nes,    0,     famicom,  famicom, 0,     famicom, "Sharp",     "Famicom Twin", GAME_NOT_WORKING )
-CONS( 198?, m82,       nes,    0,     nes,      nes,     0,     0,       "Nintendo",  "M82 Display Unit", GAME_NOT_WORKING )
-CONS( 1996, drpcjr,    nes,    0,     famicom,  nes,     0,     0,       "Bung",      "Doctor PC Jr", GAME_NOT_WORKING )
-CONS( 199?, dendy,     nes,    0,     dendy,    nes,     0,     0,       "Steepler",  "Dendy Classic", GAME_NOT_WORKING )
+CONS( 1985, nes,       0,      0,     nes,      nes,     0,     0,       "Nintendo",  "Nintendo Entertainment System / Famicom (NTSC)", GAME_IMPERFECT_GRAPHICS )
+CONS( 1987, nespal,    nes,    0,     nespal,   nes,     0,     0,       "Nintendo",  "Nintendo Entertainment System (PAL)", GAME_IMPERFECT_GRAPHICS )
+CONS( 1983, famicom,   nes,    0,     famicom,  famicom, 0,     famicom, "Nintendo",  "Famicom Disk System", GAME_IMPERFECT_GRAPHICS )
+CONS( 1986, famitwin,  nes,    0,     famicom,  famicom, 0,     famicom, "Sharp",     "Famicom Twin", GAME_IMPERFECT_GRAPHICS )
+CONS( 198?, m82,       nes,    0,     nes,      nes,     0,     0,       "Nintendo",  "M82 Display Unit", GAME_IMPERFECT_GRAPHICS )
+CONS( 1996, drpcjr,    nes,    0,     famicom,  nes,     0,     0,       "Bung",      "Doctor PC Jr", GAME_IMPERFECT_GRAPHICS )
+CONS( 199?, dendy,     nes,    0,     dendy,    nes,     0,     0,       "Steepler",  "Dendy Classic", GAME_IMPERFECT_GRAPHICS )
