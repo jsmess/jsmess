@@ -14,7 +14,8 @@ Systems Promoted from GAME_NOT_WORKING:
 
 Skeleton drivers: 
 -----------------
-(none)
+Kaypro 4/plus88
+Kaypro 4 4-84
 
 
 

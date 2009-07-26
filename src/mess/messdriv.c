@@ -704,8 +704,10 @@ const game_driver * const drivers[] =
 
     /* NON LINEAR SYSTEMS */
     DRIVER( kaypro2x )  /* Kaypro 2 - 2/84 */
+    DRIVER( kaypro4a )  /* Kaypro 4 - 4/84 */
     DRIVER( kayproii )  /* Kaypro II - 2/83 */
     DRIVER( kaypro4 )   /* Kaypro 4 - 4/83 */
+    DRIVER( kaypro4plus88 )   /* Kaypro 4 - 4/83 w/plus88 board installed*/
     DRIVER( kaypro10 )  /* Kaypro 10 */
     DRIVER( omni2 )     /* Omni II */
 
@@ -1240,10 +1242,22 @@ const game_driver * const drivers[] =
     DRIVER( pcm )   /* PC/M Mugler                          */
 
     /* DEC */
-    DRIVER(vt100)
-    DRIVER(vt220)
-    DRIVER(vt320)
-    DRIVER(vt520)
+    DRIVER(vt100) /* 1978 Digital Equipment Corporation */
+    //DRIVER(vt100wp) /* 1978 Digital Equipment Corporation */
+    //DRIVER(vt100stp) /* 1978 Digital Equipment Corporation */
+    //DRIVER(vt101) /* 1981 Digital Equipment Corporation */
+    //DRIVER(vt102) /* 1981 Digital Equipment Corporation */
+    //DRIVER(vt103) /* 1979 Digital Equipment Corporation */
+    DRIVER(vt105) /* 1978 Digital Equipment Corporation */
+    //DRIVER(vt110) /* 1978 Digital Equipment Corporation */
+    //DRIVER(vt125) /* 1981 Digital Equipment Corporation */
+    DRIVER(vt131) /* 1981 Digital Equipment Corporation */
+    //DRIVER(vt132) /* 1978 Digital Equipment Corporation */
+    //DRIVER(vt180) /* 1981 Digital Equipment Corporation */
+    DRIVER(vt220) /* 1983 Digital Equipment Corporation */
+    DRIVER(vt320) /* 1987 Digital Equipment Corporation */
+    DRIVER(vt520) /* 1994 Digital Equipment Corporation */
+    DRIVER(vk100) /* 1980 Digital Equipment Corporation */
 
     /* Ei Nis */
     DRIVER(pecom64)
@@ -1366,7 +1380,6 @@ const game_driver * const drivers[] =
     DRIVER( bob85 )
     DRIVER( c80 )
     DRIVER( mc1000 )
-    DRIVER( vk100 )
     DRIVER( d6809 )
     DRIVER( mk85 )
     DRIVER( mk90 )

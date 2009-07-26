@@ -11,7 +11,7 @@
 
 static ADDRESS_MAP_START(vk100_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-    AM_RANGE( 0x0000, 0x63ff ) AM_ROM
+    AM_RANGE( 0x0000, 0x67ff ) AM_ROM
 	//AM_RANGE( 0x7000, 0x700f) AM_DEVREADWRITE(vk100_keyboard) AM_MIRROR(0x0ff0)
 	AM_RANGE( 0x8000, 0xffff ) AM_RAM
 ADDRESS_MAP_END
@@ -35,7 +35,7 @@ static ADDRESS_MAP_START( vk100_io , ADDRESS_SPACE_IO, 8)
 	//AM_RANGE (0x65, 0x65) AM_WRITE(dot)    //EX DOT
 	//AM_RANGE (0x66, 0x66) AM_WRITE(vec)    //EX VEC
 	//AM_RANGE (0x67, 0x67) AM_WRITE(er)     //EX ER
-	//AM_RANGE (0x68, 0x68) AM_WRITE(unknown_68)
+	//AM_RANGE (0x68, 0x68) AM_WRITE(unknown_68) // lots of writes go here; interrupt related?
 	//AM_RANGE (0x6C, 0x6C) AM_WRITE(baud)   //LD BAUD
 	//AM_RANGE (0x70, 0x70) AM_WRITE(comd)   //LD COMD
 	//AM_RANGE (0x71, 0x71) AM_WRITE(com)    //LD COM
@@ -48,7 +48,7 @@ static ADDRESS_MAP_START( vk100_io , ADDRESS_SPACE_IO, 8)
 	//AM_RANGE (0x51, 0x51) AM_READ(uart_1)   // UAR
 	//AM_RANGE (0x58, 0x58) AM_READ(unknown_58)
 	//AM_RANGE (0x60, 0x60) AM_READ(unknown_60)
-	//AM_RANGE (0x68, 0x68) AM_READ(unknown_68) // NOT USED
+	//AM_RANGE (0x68, 0x68) AM_READ(unknown_68) // NOT USED 
 	//AM_RANGE (0x70, 0x70) AM_READ(unknown_70)
 	//AM_RANGE (0x78, 0x7f) AM_READ(unknown_78)
 ADDRESS_MAP_END
@@ -76,7 +76,7 @@ static MACHINE_DRIVER_START( vk100 )
     MDRV_CPU_ADD("maincpu",8085A, XTAL_4MHz)
     MDRV_CPU_PROGRAM_MAP(vk100_mem)
     MDRV_CPU_IO_MAP(vk100_io)
-    //MDRV_CPU_VBLANK_INT("screen", vk100_vertical_interrupt)
+    //MDRV_CPU_VBLANK_INT("screen", vk100_vertical_interrupt) // hook me up please
 
     MDRV_MACHINE_RESET(vk100)
 
@@ -99,7 +99,7 @@ SYSTEM_CONFIG_END
 
 /* ROM definition */
 /* according to http://www.computer.museum.uq.edu.au/pdf/EK-VK100-TM-001%20VK100%20Technical%20Manual.pdf page 5-10 (pdf pg 114),
-The 4 firmware roms should go from 0x0000-0x1fff, 0x2000-0x3fff, 0x4000-0x5fff and 0x6000-0x63ff
+The 4 firmware roms should go from 0x0000-0x1fff, 0x2000-0x3fff, 0x4000-0x5fff and 0x6000-0x63ff; The last rom is actually a little bit longer and goes to 67ff.
 */
 ROM_START( vk100 )
   ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )

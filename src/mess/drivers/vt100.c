@@ -582,6 +582,7 @@ ROM_START( vt125 ) // This is from bitsavers and vt100.net, as the vt125 schemat
 	ROM_REGION(0x1000, "gfx1",0)
 	ROM_LOAD( "23-018e2-00.e4", 0x0000, 0x0800, BAD_DUMP CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53)) // probably correct but needs redump
 	ROM_LOAD_OPTIONAL ( "23-094e2-00.e9", 0x0800, 0x0800, NO_DUMP) // optional (comes default with some models) alternate character set rom
+//GPO board roms go here!
 ROM_END
 
 ROM_START( vt101 ) // p/n 5414185-01 'unupgradable/low cost' vt101/vt102/vt131 mainboard
@@ -656,9 +657,9 @@ ROM_END
 COMP( 1978, vt100,  0,       0, 	vt100, 		vt100, 	 0,  	  0,  	 "DEC",   "VT100",		GAME_NOT_WORKING)
 COMP( 1978, vt100wp,  vt100,       0, 	vt100, 		vt100, 	 0,  	  0,  	 "DEC",   "VT100-Wx",		GAME_NOT_WORKING)
 //COMP( 1978, vt100stp,  vt100,       0, 	vt100, 		vt100, 	 0,  	  0,  	 "DEC",   "VT100 w/VT1xx-AC STP",		GAME_NOT_WORKING)
-COMP( 1980, vt101,  0,       0, 	vt100, 		vt100, 	 0,  	  0,  	 "DEC",   "VT101",		GAME_NOT_WORKING)
-COMP( 1980, vt102,  vt101,   0, 	vt100, 		vt100, 	 0,  	  0,  	 "DEC",   "VT102",		GAME_NOT_WORKING)
-COMP( 1981, vt103,  vt100,   0, 	vt100, 		vt100, 	 0,  	  0,  	 "DEC",   "VT103",		GAME_NOT_WORKING)
+COMP( 1981, vt101,  0,       0, 	vt100, 		vt100, 	 0,  	  0,  	 "DEC",   "VT101",		GAME_NOT_WORKING)
+COMP( 1981, vt102,  vt101,   0, 	vt100, 		vt100, 	 0,  	  0,  	 "DEC",   "VT102",		GAME_NOT_WORKING)
+COMP( 1979, vt103,  vt100,   0, 	vt100, 		vt100, 	 0,  	  0,  	 "DEC",   "VT103",		GAME_NOT_WORKING)
 COMP( 1978, vt105,  vt100,   0, 	vt100, 		vt100, 	 0,  	  0,  	 "DEC",   "VT105",		GAME_NOT_WORKING)
 COMP( 1978, vt110,  vt100,   0, 	vt100, 		vt100, 	 0,  	  0,  	 "DEC",   "VT110",		GAME_NOT_WORKING)
 COMP( 1981, vt125,  vt100,   0, 	vt100, 		vt100, 	 0,  	  0,  	 "DEC",   "VT125",		GAME_NOT_WORKING)
