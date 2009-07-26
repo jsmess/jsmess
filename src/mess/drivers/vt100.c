@@ -378,15 +378,17 @@ MACHINE_DRIVER_END
         23-094E2 alt charset rom AND the foreign language 23-093E2
         AVO rom are populated.
  *    VT100-NA/NB - ? romset with DECFORM keycaps
- *    VT100 with vt1xx-ac kit - adds serial printer interface (SPI)
-       pcb, replaces roms with the 095e2/096e2/139e2/140e2 SPI set
+ *    VT100 with vt1xx-ac kit - adds serial printer interface (STP)
+       pcb, replaces roms with the 095e2/096e2/139e2/140e2 STP set
  * VT101 - 1981 cost reduced unexpandable vt100; Is the same as a stock
    unexpanded vt100. It has no AVO nor the upgrade connector for it, and no
    video input port.) Has its own firmware.
- * VT102 - 1981 cost reduced unexpandable vt100 with built in AVO and SPI
-   Is the same as a stock vt100 with the AVO and SPI expansions installed,
+   Shares same pcb with vt102 and vt131, but STP/AVO are unpopulated;
+ * VT102 - 1981 cost reduced unexpandable vt100 with built in AVO and STP
+   Is the same as a stock vt100 with the AVO and STP expansions installed,
    but all on one pcb. Does NOT support the AVO extended character roms, nor
    the word processing rom set. Has its own firmware.
+   Shares same pcb with vt101 and vt131, has STP and AVO populated.
  * VT103 - 1980 base model vt100 with an integrated TU58 tape drive, and an
    LSI-11 backplane, which an LSI-11 cpu card is used in, hence the computer
    is effectively a tiny lsi-11 (pdp-11) built in a vt100 case. uses same roms
@@ -404,11 +406,12 @@ MACHINE_DRIVER_END
    firmware and processor) vt100 with the ReGIS graphical language board
    (aka GPO) installed (very advanced full framebuffer raster graphics, with
    color, text rotation and scaling, etc. , has backwards compatibility mode
-   for vt105), AVO optional
+   for vt105), AVO optional; Includes a custom STP board.
  * vt131 - 1982 cost reduced version of vt132, no longer has the vt100
    expansion backplane; has the AVO advanced video board built in, as well
    as the parallel port interface board, and supports serial block mode.
- * vt132 - 1980? base vt100 with AVO, SPI, and its own 23-099e2/23-100e2
+   Shares same pcb with vt101 and vt102, has STP and AVO populated.
+ * vt132 - 1980? base vt100 with AVO, STP, and its own 23-099e2/23-100e2
    AVO character rom set. Has its own base firmware roms which support block
    serial mode.
  * vt180 - 1980 vt10x (w/vt100 expansion backplane) with a z80 daughterboard
@@ -421,12 +424,12 @@ MACHINE_DRIVER_END
    see vk100.c for current driver for this
    
  * Upgrade kits for vt1xx:
- * VT1xx-AA : 20ma current loop interface pcb for vt100
- * VT1xx-AB : AVO board (AVO roms could be optionally ordered along with 
+ * VT1xx-AA : p/n 5413206 20ma current loop interface pcb for vt100
+ * VT1xx-AB : p/n 5413097 AVO board (AVO roms could be optionally ordered along with 
               this board if needed)
- * VT1xx-AC : SPT serial printer board (includes a special romset)
- * VT1xx-CA : later 20ma current loop interface pcb for vt100, vt101/vt102/vt131
- * VT1xx-CB or CL: GPO "ReGIS" board vt100->vt125 upgrade kit
+ * VT1xx-AC : STP serial printer board (includes a special romset)
+ * VT1xx-CA : p/n 5413206 later 20ma current loop interface pcb for vt100, vt101/vt102/vt131
+ * VT1xx-CB or CL: GPO "ReGIS" board vt100->vt125 upgrade kit (p/n 5414275 paddle board and 5414277 gpo board)
  
  * Info about mask roms and other nasties:
  * A normal 2716 rom has pin 18: /CE; pin 20: /OE; pin 21: VPP (acts as CE2)
@@ -463,7 +466,7 @@ MACHINE_DRIVER_END
 /* ROM definition */
 ROM_START( vt100 ) // This is from the schematics at http://www.bitsavers.org/pdf/dec/terminal/vt100/MP00633_VT100_Mar80.pdf
 // This is the standard VT100 cpu board with the 'normal' roms (but later rev of eprom 0) populated
-// This romset is also used for the vt103, vt105, vt125, and ?vt132?
+// This romset is also used for the vt103, vt105, vt110, vt125, and vt180
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	//ROM_LOAD( "23-031e2-00.e56", 0x0000, 0x0800, NO_DUMP) // version 1 1978 'earlier rom', dump needed, correct for earlier vt100s
 	ROM_LOAD( "23-061e2-00.e56", 0x0000, 0x0800, CRC(3dae97ff) SHA1(e3437850c33565751b86af6c2fe270a491246d15)) // version 2 1979 or 1980 'later rom', correct for later vt100s
@@ -471,8 +474,8 @@ ROM_START( vt100 ) // This is from the schematics at http://www.bitsavers.org/pd
 	ROM_LOAD( "23-033e2-00.e45", 0x1000, 0x0800, CRC(384dac0a) SHA1(22aaf5ab5f9555a61ec43f91d4dea3029f613e64))
 	ROM_LOAD( "23-034e2-00.e40", 0x1800, 0x0800, CRC(4643184d) SHA1(27e6c19d9932bf13fdb70305ef4d806e90d60833))
 	ROM_REGION(0x1000, "gfx1",0)
-	ROM_LOAD ( "23-018e2-00.e4", 0x0000, 0x0800, BAD_DUMP CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53)) // probably correct but needs redump
-	ROM_LOAD_OPTIONAL ("23-094e2-00.e9", 0x0800, 0x0800, NO_DUMP) // optional ?word processing? alternate character set rom
+	ROM_LOAD( "23-018e2-00.e4", 0x0000, 0x0800, BAD_DUMP CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53)) // probably correct but needs redump
+	ROM_LOAD_OPTIONAL("23-094e2-00.e9", 0x0800, 0x0800, NO_DUMP) // optional ?word processing? alternate character set rom
 ROM_END
 
 ROM_START( vt100wp ) // This is from the schematics at http://www.bitsavers.org/pdf/dec/terminal/vt100/MP00633_VT100_Mar80.pdf
@@ -485,13 +488,14 @@ ROM_START( vt100wp ) // This is from the schematics at http://www.bitsavers.org/
 	ROM_LOAD( "23-182e2-00.e45", 0x1000, 0x0800, NO_DUMP) 
 	ROM_LOAD( "23-183e2-00.e40", 0x1800, 0x0800, NO_DUMP) 
 	ROM_REGION(0x1000, "gfx1",0)
-	ROM_LOAD ( "23-018e2-00.e4", 0x0000, 0x0800, BAD_DUMP CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53)) // probably correct but needs redump
-	ROM_LOAD_OPTIONAL ( "23-094e2-00.e9", 0x0800, 0x0800, NO_DUMP) // optional ?word processing? alternate character set rom
+	ROM_LOAD( "23-018e2-00.e4", 0x0000, 0x0800, BAD_DUMP CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53)) // probably correct but needs redump
+	ROM_LOAD_OPTIONAL( "23-094e2-00.e9", 0x0800, 0x0800, NO_DUMP) // optional ?word processing? alternate character set rom
 ROM_END
 
-ROM_START( vt100spt ) // This is from the VT180 technical manual at http://www.bitsavers.org/pdf/dec/terminal/vt180/EK-VT18X-TM-001_VT180_Technical_Man_Feb83.pdf
+/*
+ROM_START( vt100stp ) // This is from the VT180 technical manual at http://www.bitsavers.org/pdf/dec/terminal/vt180/EK-VT18X-TM-001_VT180_Technical_Man_Feb83.pdf
 // This is the standard vt100 cpu board, but with the rom set included with the VT1xx-AC kit  
-// which is only used when the STP 'parallel port expansion' card is installed into the terminal board.
+// which is only used when the STP 'printer port expansion' card is installed into the terminal board.
 // This romset adds the Set-up C page to the setup menu (press keypad 5 twice once you hit set-up)
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "23-095e2-00.e56", 0x0000, 0x0800, NO_DUMP) 
@@ -499,32 +503,27 @@ ROM_START( vt100spt ) // This is from the VT180 technical manual at http://www.b
 	ROM_LOAD( "23-139e2-00.e45", 0x1000, 0x0800, NO_DUMP) // revision 2?; revision 1 is 23-097e2
 	ROM_LOAD( "23-140e2-00.e40", 0x1800, 0x0800, NO_DUMP) // revision 2?; revision 1 is 23-098e2
 	ROM_REGION(0x1000, "gfx1",0)
-	ROM_LOAD ( "23-018e2-00.e4", 0x0000, 0x0800, BAD_DUMP CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53)) // probably correct but needs redump
-	ROM_LOAD_OPTIONAL ( "23-094e2-00.e9", 0x0800, 0x0800, NO_DUMP) // optional ?word processing? alternate character set rom
-ROM_END
-
-/*
-ROM_START( vt101 ) // This is from the schematics at http://www.mainecoon.com/classiccmp/VT1XX-EB/
-// It is 8085 based instead of 8080; I don't know exactly what vtxxx model it is from, maybe the 101/102/131
+	ROM_LOAD( "23-018e2-00.e4", 0x0000, 0x0800, BAD_DUMP CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53)) // probably correct but needs redump
+	ROM_LOAD_OPTIONAL( "23-094e2-00.e9", 0x0800, 0x0800, NO_DUMP) // optional ?word processing? alternate character set rom
+	ROM_REGION(0x10000, "stpcpu",ROMREGION_ERASEFF)
+// expansion board for a vt100 with a processor on it and dma, intended to act as a ram/send buffer for the STP printer board.
 // It can be populated with two banks of two eproms each, each bank either contains 2k or 4k eproms depending on the w2/w3 and w4/w5 jumpers.
-// It also has two proms on the cpu board, which the original vt100 does not.
-// I can't tell for sure if its the vt101 or not since the vt101 schematics and tech manual are not scanned yet.
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+// It also has two proms on the cpu board. I don't know if it is technically necessary to have this board installed if an STP module is installed, but due to the alt stp romset, it probably is.
 	ROM_LOAD( "23-003e3-00.e10", 0x0000, 0x1000, NO_DUMP) // "EPROM 0" bank 0
 	ROM_LOAD( "23-004e3-00.e4", 0x1000, 0x1000, NO_DUMP) // "EPROM 1" bank 0
 	ROM_LOAD( "23-005e3-00.e9", 0x2000, 0x1000, NO_DUMP) // "EPROM 2" bank 1
 	ROM_LOAD( "23-006e3-00.e3", 0x3000, 0x1000, NO_DUMP) // "EPROM 3" bank 1
-	ROM_REGION(0x0800, "gfx1",0)
-	ROM_LOAD ("23-???e2-00.e34", 0x0000, 0x0800, NO_DUMP) // ? gfx rom
+	//ROM_REGION(0x0800, "gfx1",0)
+	//ROM_LOAD( "23-???e2-00.e34", 0x0000, 0x0800, NO_DUMP) // ? second gfx rom?
 	ROM_REGION(0x0400, "proms",0)
-	ROM_LOAD ("23-312a1-07.e26", 0x0000, 0x0200, NO_DUMP) // "PROM A"; handles 8085 i/o? mapping (usart, timer, dma, comm, etc)
-	ROM_LOAD ("23-313a1-07.e15", 0x0200, 0x0200, NO_DUMP) // "PROM B"; handles firmware rom mapping and memory size/page select; bit 0 = ram page, bits 1-3 unused, bits 4-7 select one eprom each
+	ROM_LOAD( "23-312a1-07.e26", 0x0000, 0x0200, NO_DUMP) // "PROM A"; handles 8085 i/o? mapping (usart, timer, dma, comm, etc)
+	ROM_LOAD( "23-313a1-07.e15", 0x0200, 0x0200, NO_DUMP) // "PROM B"; handles firmware rom mapping and memory size/page select; bit 0 = ram page, bits 1-3 unused, bits 4-7 select one eprom each
 ROM_END
 */
 
 ROM_START( vt103 ) // This is from the schematics at http://www.bitsavers.org/pdf/dec/terminal/vt103/MP00731_VT103_Aug80.pdf
 // This is the standard VT100 cpu board with the 'normal' roms (but later rev of eprom 0) populated but with an
-// LSI-11 backplane (instead of a normal VT100 one, hence it cannot use the AVO, WG, or VT180 Z80 boards) and 
+// LSI-11 backplane (instead of a normal VT100 one, hence it cannot use the AVO, WG, GPO, or VT180 Z80 boards) and 
 // DEC TU58 dual 256k tape drive integrated; It was intended that you would put an LSI-11 cpu card in there, which
 // Would talk to the terminal as its input/output device. Several LSI-11 cpu cards were available?
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
@@ -533,12 +532,12 @@ ROM_START( vt103 ) // This is from the schematics at http://www.bitsavers.org/pd
 	ROM_LOAD( "23-033e2-00.e45", 0x1000, 0x0800, CRC(384dac0a) SHA1(22aaf5ab5f9555a61ec43f91d4dea3029f613e64))
 	ROM_LOAD( "23-034e2-00.e40", 0x1800, 0x0800, CRC(4643184d) SHA1(27e6c19d9932bf13fdb70305ef4d806e90d60833))
 	ROM_REGION(0x1000, "gfx1",0)
-	ROM_LOAD ( "23-018e2-00.e4", 0x0000, 0x0800, BAD_DUMP CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53)) // probably correct but needs redump
-	ROM_LOAD_OPTIONAL ( "23-094e2-00.e9", 0x0800, 0x0800, NO_DUMP) // optional (comes default with some models) alternate character set rom
+	ROM_LOAD( "23-018e2-00.e4", 0x0000, 0x0800, BAD_DUMP CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53)) // probably correct but needs redump
+	ROM_LOAD_OPTIONAL( "23-094e2-00.e9", 0x0800, 0x0800, NO_DUMP) // optional (comes default with some models) alternate character set rom
 	ROM_REGION(0x0800, "tapecpu",0) // rom for the 8085 cpu in the integrated serial tu58-xa drive
-	ROM_LOAD ( "23-089e2-00.e1", 0x0000, 0x0800, NO_DUMP)
+	ROM_LOAD( "23-089e2-00.e1", 0x0000, 0x0800, NO_DUMP)
 	ROM_REGION(0x80000, "lsi11cpu",0) // rom for the LSI-11 cpu board
-	ROM_LOAD_OPTIONAL ( "unknown.bin", 0x00000, 0x80000, NO_DUMP)
+	ROM_LOAD_OPTIONAL( "unknown.bin", 0x00000, 0x80000, NO_DUMP)
 ROM_END
 
 ROM_START( vt105 ) // This is from anecdotal evidence and vt100.net, as the vt105 schematics are not scanned
@@ -551,8 +550,8 @@ ROM_START( vt105 ) // This is from anecdotal evidence and vt100.net, as the vt10
 	ROM_LOAD( "23-033e2-00.e45", 0x1000, 0x0800, CRC(384dac0a) SHA1(22aaf5ab5f9555a61ec43f91d4dea3029f613e64))
 	ROM_LOAD( "23-034e2-00.e40", 0x1800, 0x0800, CRC(4643184d) SHA1(27e6c19d9932bf13fdb70305ef4d806e90d60833))
 	ROM_REGION(0x1000, "gfx1",0)
-	ROM_LOAD ( "23-018e2-00.e4", 0x0000, 0x0800, BAD_DUMP CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53)) // probably correct but needs redump
-	ROM_LOAD_OPTIONAL ( "23-094e2-00.e9", 0x0800, 0x0800, NO_DUMP) // optional (comes default with some models) alternate character set rom
+	ROM_LOAD( "23-018e2-00.e4", 0x0000, 0x0800, BAD_DUMP CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53)) // probably correct but needs redump
+	ROM_LOAD_OPTIONAL( "23-094e2-00.e9", 0x0800, 0x0800, NO_DUMP) // optional (comes default with some models) alternate character set rom
 ROM_END
 
 ROM_START( vt110 ) 
@@ -565,14 +564,14 @@ ROM_START( vt110 )
 	ROM_LOAD( "23-033e2-00.e45", 0x1000, 0x0800, CRC(384dac0a) SHA1(22aaf5ab5f9555a61ec43f91d4dea3029f613e64))
 	ROM_LOAD( "23-034e2-00.e40", 0x1800, 0x0800, CRC(4643184d) SHA1(27e6c19d9932bf13fdb70305ef4d806e90d60833))
 	ROM_REGION(0x1000, "gfx1",0)
-	ROM_LOAD ( "23-018e2-00.e4", 0x0000, 0x0800, BAD_DUMP CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53)) // probably correct but needs redump
+	ROM_LOAD( "23-018e2-00.e4", 0x0000, 0x0800, BAD_DUMP CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53)) // probably correct but needs redump
 	ROM_LOAD_OPTIONAL ( "23-094e2-00.e9", 0x0800, 0x0800, NO_DUMP) // optional (comes default with some models) alternate character set rom
 //DECDataway board roms go here!
 ROM_END
 
 ROM_START( vt125 ) // This is from bitsavers and vt100.net, as the vt125 schematics are not scanned
 // This is the standard VT100 cpu board with the 'normal' roms (but later rev of eprom 0) populated but with a
-// special ReGIS cpu+ram card installed which provides a framebuffer, text rotation, custom ram fonts, and many other features.
+// special "GPO" ReGIS cpu+ram card installed which provides a framebuffer, text rotation, custom ram fonts, and many other features.
 // Comes with a custom STP card as well.
 // VT125 upgrade kit (upgrade from vt100 or vt105) was called VT1xx-CB or CL
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
@@ -581,24 +580,49 @@ ROM_START( vt125 ) // This is from bitsavers and vt100.net, as the vt125 schemat
 	ROM_LOAD( "23-033e2-00.e45", 0x1000, 0x0800, CRC(384dac0a) SHA1(22aaf5ab5f9555a61ec43f91d4dea3029f613e64))
 	ROM_LOAD( "23-034e2-00.e40", 0x1800, 0x0800, CRC(4643184d) SHA1(27e6c19d9932bf13fdb70305ef4d806e90d60833))
 	ROM_REGION(0x1000, "gfx1",0)
-	ROM_LOAD ( "23-018e2-00.e4", 0x0000, 0x0800, BAD_DUMP CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53)) // probably correct but needs redump
+	ROM_LOAD( "23-018e2-00.e4", 0x0000, 0x0800, BAD_DUMP CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53)) // probably correct but needs redump
 	ROM_LOAD_OPTIONAL ( "23-094e2-00.e9", 0x0800, 0x0800, NO_DUMP) // optional (comes default with some models) alternate character set rom
 ROM_END
 
-ROM_START( vt131 ) // VT101/VT102 'unupgradable/low cost' board with built in AVO and SPI, and vt132-style block serial mode
-// ROMS have the set up page C in them
-// Probably 8085 based instead of 8080
+ROM_START( vt101 ) // p/n 5414185-01 'unupgradable/low cost' vt101/vt102/vt131 mainboard
+// does not have integrated STP or AVO populated
+// 8085 based instead of 8080
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "23-225e4-00.bin", 0x0000, 0x2000, BAD_DUMP CRC(7ddf75cb) SHA1(a3530bb562b5c6ea8ba23f0988b35ef404abcb93)) // A11 stuck high
-	ROM_LOAD( "23-226e4-00.bin", 0x2000, 0x2000, BAD_DUMP CRC(339d4e4e) SHA1(f1b08f2c6bbc2b234f3f43bd800a2615f6dd18d3)) // A11 stuck high
+	ROM_LOAD( "23-???e4-00.e69", 0x0000, 0x2000, NO_DUMP) 
+	ROM_LOAD( "23-???e4-00.e71", 0x2000, 0x2000, NO_DUMP)
 	ROM_REGION(0x0800, "gfx1",0)
-	ROM_LOAD ("23-280e2-00.bin", 0x0000, 0x0800, BAD_DUMP CRC(71b4172e) SHA1(5a82c7dc313bb92b9829eb8350840e072825a797)) // called "VT131 ROM" in the vt101 quick reference guide; CS floating/stuck low (contents are almost total garbage)
-// This board may have proms on it as well
+	ROM_LOAD( "23-018e2-00.e3", 0x0000, 0x0800, BAD_DUMP CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53)) // probably correct but needs redump
+	ROM_LOAD_OPTIONAL( "23-094e2-00.e4", 0x0800, 0x0800, NO_DUMP) // optional (comes default with some models) alternate character set rom
+ROM_END
+
+ROM_START( vt102 ) // p/n 5414185-01 'unupgradable/low cost' vt101/vt102/vt131 mainboard
+// has integrated STP and AVO both populated
+// ROMS have the set up page C in them
+// 8085 based instead of 8080
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "23-225e4-00.e69", 0x0000, 0x2000, BAD_DUMP CRC(7ddf75cb) SHA1(a3530bb562b5c6ea8ba23f0988b35ef404abcb93)) // is this right for vt102? A11 stuck high
+	ROM_LOAD( "23-226e4-00.e71", 0x2000, 0x2000, BAD_DUMP CRC(339d4e4e) SHA1(f1b08f2c6bbc2b234f3f43bd800a2615f6dd18d3)) // is this right for vt102? A11 stuck high
+	ROM_REGION(0x0800, "gfx1",0)
+	ROM_LOAD( "23-018e2-00.e3", 0x0000, 0x0800, BAD_DUMP CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53)) // probably correct but needs redump
+	ROM_LOAD_OPTIONAL( "23-094e2-00.e4", 0x0800, 0x0800, NO_DUMP) // optional (comes default with some models) alternate character set rom
+ROM_END
+
+ROM_START( vt131 ) // p/n 5414185-01 'unupgradable/low cost' vt101/vt131 mainboard with vt132-style block serial mode
+// has integrated STP and AVO both populated
+// ROMS have the set up page C in them
+// 8085 based instead of 8080
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "23-225e4-00.e69", 0x0000, 0x2000, BAD_DUMP CRC(7ddf75cb) SHA1(a3530bb562b5c6ea8ba23f0988b35ef404abcb93)) // A11 stuck high
+	ROM_LOAD( "23-226e4-00.e71", 0x2000, 0x2000, BAD_DUMP CRC(339d4e4e) SHA1(f1b08f2c6bbc2b234f3f43bd800a2615f6dd18d3)) // A11 stuck high
+	ROM_LOAD( "23-280e2-00.e67", 0x4000, 0x0800, BAD_DUMP CRC(71b4172e) SHA1(5a82c7dc313bb92b9829eb8350840e072825a797)) // called "VT131 ROM" in the vt101 quick reference guide; CS floating/stuck low (contents are almost total garbage)
+	ROM_REGION(0x0800, "gfx1",0)
+	ROM_LOAD( "23-018e2-00.e3", 0x0000, 0x0800, BAD_DUMP CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53)) // probably correct but needs redump
+	ROM_LOAD_OPTIONAL( "23-094e2-00.e4", 0x0800, 0x0800, NO_DUMP) // optional (comes default with some models) alternate character set rom
 ROM_END
 
 /*
 ROM_START( vt132 ) // This is from anecdotal evidence and vt100.net, as the vt132 schematics are not scanned
-// VT100 board with ? roms, AVO, SPI, custom firmware with block serial mode; dunnington insists these roms
+// VT100 board with ? roms, AVO, STP, custom firmware with block serial mode; dunnington insists these roms
 // should be the 23-180e2/181e2/182e2/183e2 set, but I'm not convinced.
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "23-???e2-00.e56", 0x0000, 0x0800, NO_DUMP)
@@ -606,24 +630,24 @@ ROM_START( vt132 ) // This is from anecdotal evidence and vt100.net, as the vt13
 	ROM_LOAD( "23-???e2-00.e45", 0x1000, 0x0800, NO_DUMP)
 	ROM_LOAD( "23-???e2-00.e40", 0x1800, 0x0800, NO_DUMP)
 	ROM_REGION(0x1000, "gfx1",0)
-	ROM_LOAD ( "23-018e2-00.e4", 0x0000, 0x0800, BAD_DUMP CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53)) // probably correct but needs redump
-	ROM_LOAD_OPTIONAL ( "23-094e2-00.e9", 0x0800, 0x0800, NO_DUMP) // optional (comes default with some models) alternate character set rom
+	ROM_LOAD( "23-018e2-00.e4", 0x0000, 0x0800, BAD_DUMP CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53)) // probably correct but needs redump
+	ROM_LOAD_OPTIONAL( "23-094e2-00.e9", 0x0800, 0x0800, NO_DUMP) // optional (comes default with some models) alternate character set rom
 ROM_END
 */
 ROM_START( vt180 ) 
 // This is the standard VT100 cpu board with the 'normal' roms (but later rev of eprom 0) populated but with a
-// Z80 daughterboard added to the expansion slot, and replacing the SPT adapter (SPT roms are replaced with the normal set)
+// Z80 daughterboard added to the expansion slot, and replacing the STP adapter (STP roms are replaced with the normal set)
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "23-061e2-00.e56", 0x0000, 0x0800, CRC(3dae97ff) SHA1(e3437850c33565751b86af6c2fe270a491246d15)) // version 2 1980 'later rom'
 	ROM_LOAD( "23-032e2-00.e52", 0x0800, 0x0800, CRC(3d86db99) SHA1(cdd8bdecdc643442f6e7d2c83cf002baf8101867))
 	ROM_LOAD( "23-033e2-00.e45", 0x1000, 0x0800, CRC(384dac0a) SHA1(22aaf5ab5f9555a61ec43f91d4dea3029f613e64))
 	ROM_LOAD( "23-034e2-00.e40", 0x1800, 0x0800, CRC(4643184d) SHA1(27e6c19d9932bf13fdb70305ef4d806e90d60833))
 	ROM_REGION(0x1000, "gfx1",0)
-	ROM_LOAD ( "23-018e2-00.e4", 0x0000, 0x0800, BAD_DUMP CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53)) // probably correct but needs redump
+	ROM_LOAD( "23-018e2-00.e4", 0x0000, 0x0800, BAD_DUMP CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53)) // probably correct but needs redump
 	ROM_LOAD_OPTIONAL ( "23-094e2-00.e9", 0x0800, 0x0800, NO_DUMP) // optional (comes default with some models) alternate character set rom
 	ROM_REGION(0x10000, "z80cpu",0) // z80 daughterboard
-	ROM_LOAD ( "23-017e3-00.bin", 0x0000, 0x1000, NO_DUMP) // fix location once dumped
-	ROM_LOAD ( "23-021e3-00.bin", 0x0000, 0x1000, NO_DUMP) // fix location once dumped
+	ROM_LOAD( "23-017e3-00.bin", 0x0000, 0x1000, NO_DUMP) // fix location once dumped
+	ROM_LOAD( "23-021e3-00.bin", 0x0000, 0x1000, NO_DUMP) // fix location once dumped
 ROM_END
 
 /* Driver */
@@ -631,13 +655,13 @@ ROM_END
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
 COMP( 1978, vt100,  0,       0, 	vt100, 		vt100, 	 0,  	  0,  	 "DEC",   "VT100",		GAME_NOT_WORKING)
 COMP( 1978, vt100wp,  vt100,       0, 	vt100, 		vt100, 	 0,  	  0,  	 "DEC",   "VT100-Wx",		GAME_NOT_WORKING)
-COMP( 1978, vt100spt,  vt100,       0, 	vt100, 		vt100, 	 0,  	  0,  	 "DEC",   "VT100 w/VT1xx-AC SPT",		GAME_NOT_WORKING)
-//COMP( 1980, vt101,  0,       0, 	vt100, 		vt100, 	 0,  	  0,  	 "DEC",   "VT101",		GAME_NOT_WORKING)
-//COMP( 1980, vt102,  0,       0, 	vt100, 		vt100, 	 0,  	  0,  	 "DEC",   "VT102",		GAME_NOT_WORKING)
+//COMP( 1978, vt100stp,  vt100,       0, 	vt100, 		vt100, 	 0,  	  0,  	 "DEC",   "VT100 w/VT1xx-AC STP",		GAME_NOT_WORKING)
+COMP( 1980, vt101,  0,       0, 	vt100, 		vt100, 	 0,  	  0,  	 "DEC",   "VT101",		GAME_NOT_WORKING)
+COMP( 1980, vt102,  vt101,   0, 	vt100, 		vt100, 	 0,  	  0,  	 "DEC",   "VT102",		GAME_NOT_WORKING)
 COMP( 1981, vt103,  vt100,   0, 	vt100, 		vt100, 	 0,  	  0,  	 "DEC",   "VT103",		GAME_NOT_WORKING)
 COMP( 1978, vt105,  vt100,   0, 	vt100, 		vt100, 	 0,  	  0,  	 "DEC",   "VT105",		GAME_NOT_WORKING)
 COMP( 1978, vt110,  vt100,   0, 	vt100, 		vt100, 	 0,  	  0,  	 "DEC",   "VT110",		GAME_NOT_WORKING)
 COMP( 1981, vt125,  vt100,   0, 	vt100, 		vt100, 	 0,  	  0,  	 "DEC",   "VT125",		GAME_NOT_WORKING)
-COMP( 1981, vt131,  0,   0, 	vt100, 		vt100, 	 0,  	  0,  	 "DEC",   "VT131",		GAME_NOT_WORKING)
-//COMP( 1979, vt132,  vt100,   0, 	vt100, 		vt100, 	 0,  	  0,  	 "DEC",   "VT125",		GAME_NOT_WORKING)
+COMP( 1981, vt131,  vt101,   0, 	vt100, 		vt100, 	 0,  	  0,  	 "DEC",   "VT131",		GAME_NOT_WORKING)
+//COMP( 1979, vt132,  vt100,   0, 	vt100, 		vt100, 	 0,  	  0,  	 "DEC",   "VT132",		GAME_NOT_WORKING)
 COMP( 1983, vt180,  vt100,   0, 	vt100, 		vt100, 	 0,  	  0,  	 "DEC",   "VT180",		GAME_NOT_WORKING)
