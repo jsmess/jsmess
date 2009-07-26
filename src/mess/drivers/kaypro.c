@@ -249,6 +249,20 @@ ROM_START(kaypro4)
 	ROM_LOAD("81-146.u43",   0x0000, 0x0800, CRC(4cc7d206) SHA1(5cb880083b94bd8220aac1f87d537db7cfeb9013) )
 ROM_END
 
+ROM_START(kaypro4plus88) // "KAYPRO-88" board has 128k or 256k of its own ram on it
+	ROM_REGION(0x4000, "maincpu",0)
+	ROM_LOAD("81-232.u47",   0x0000, 0x1000, CRC(4918fb91) SHA1(cd9f45cc3546bcaad7254b92c5d501c40e2ef0b2) )
+
+	ROM_REGION(0x10000, "rambank",0)
+	ROM_FILL( 0, 0x10000, 0xff)
+
+	ROM_REGION(0x0800, "gfx1",0)
+	ROM_LOAD("81-146.u43",   0x0000, 0x0800, CRC(4cc7d206) SHA1(5cb880083b94bd8220aac1f87d537db7cfeb9013) )
+
+	ROM_REGION(0x0800, "8088cpu",0)
+	ROM_LOAD("81-356.u29",   0x0000, 0x1000, CRC(948556db) SHA1(6e779866d099cc0dc8c6369bdfb37a923ac448a4) )
+ROM_END
+
 ROM_START(omni2)
 	ROM_REGION(0x4000, "maincpu",0)
 	ROM_LOAD("omni2.u47",    0x0000, 0x1000, CRC(2883f9e0) SHA1(d98c784e62853582d298bf7ca84c75872847ac9b) )
@@ -271,10 +285,21 @@ ROM_START(kaypro2x)
 	ROM_LOAD("81-817.u9",    0x0000, 0x1000, CRC(5f72da5b) SHA1(8a597000cce1a7e184abfb7bebcb564c6bf24fb7) )
 ROM_END
 
+ROM_START(kaypro4a)
+	ROM_REGION(0x4000, "maincpu",0)
+	ROM_LOAD("81-292.u34",   0x0000, 0x2000, CRC(5eb69aec) SHA1(525f955ca002976e2e30ac7ee37e4a54f279fe96) )
+
+	ROM_REGION(0x10000, "rambank",0)
+	ROM_FILL( 0, 0x10000, 0xff)
+
+	ROM_REGION(0x1000, "gfx1",0)
+	ROM_LOAD("81-817.u9",    0x0000, 0x1000, CRC(5f72da5b) SHA1(8a597000cce1a7e184abfb7bebcb564c6bf24fb7) )
+ROM_END
+
 ROM_START(kaypro10)
 	ROM_REGION(0x4000, "maincpu",0)
 	ROM_LOAD("81-302.u42",   0x0000, 0x1000, CRC(3f9bee20) SHA1(b29114a199e70afe46511119b77a662e97b093a0) )
-
+//Note: the older rom 81-187 is also allowed here for kaypro 10, but we don't have a dump of it yet.
 	ROM_REGION(0x10000, "rambank",0)
 	ROM_FILL( 0, 0x10000, 0xff)
 
@@ -292,8 +317,11 @@ static SYSTEM_CONFIG_START(kaypro2x)
 SYSTEM_CONFIG_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE	  INPUT    INIT      CONFIG       COMPANY  FULLNAME */
-COMP( 1983, kayproii, 0,        0,      kayproii, kay_kbd, 0,        kayproii,	  "Non Linear Systems",  "Kaypro II - 2/83" , 0 )
-COMP( 198?, kaypro4,  kayproii, 0,      kayproii, kay_kbd, 0,        kaypro2x,	  "Non Linear Systems",  "Kaypro 4 - 4/83" , GAME_NOT_WORKING )
+COMP( 1982, kayproii, 0,        0,      kayproii, kay_kbd, 0,        kayproii,	  "Non Linear Systems",  "Kaypro II - 2/83" , 0 )
+COMP( 1983, kaypro4,  kayproii, 0,      kayproii, kay_kbd, 0,        kaypro2x,	  "Non Linear Systems",  "Kaypro 4 - 4/83" , GAME_NOT_WORKING ) // model 81-004 
+COMP( 1983, kaypro4plus88, kayproii, 0,      kayproii, kay_kbd, 0,        kaypro2x,	  "Non Linear Systems",  "Kaypro 4 plus88 - 4/83" , GAME_NOT_WORKING ) // model 81-004 with an added 8088 daughterboard and rom
 COMP( 198?, omni2,    kayproii, 0,      omni2,    kay_kbd, 0,        kaypro2x,	  "Non Linear Systems",  "Omni II" , GAME_NOT_WORKING )
-COMP( 1984, kaypro2x, 0,        0,      kaypro2x, kay_kbd, 0,        kaypro2x,	  "Non Linear Systems",  "Kaypro 2x" , GAME_NOT_WORKING )
-COMP( 198?, kaypro10, 0,        0,      kaypro2x, kay_kbd, 0,        kaypro2x,	  "Non Linear Systems",  "Kaypro 10" , GAME_NOT_WORKING )
+COMP( 1984, kaypro2x, 0,        0,      kaypro2x, kay_kbd, 0,        kaypro2x,	  "Non Linear Systems",  "Kaypro 2x" , GAME_NOT_WORKING ) // model 81-025
+COMP( 1984, kaypro4a, 0,        0,      kaypro2x, kay_kbd, 0,        kaypro2x,	  "Non Linear Systems",  "Kaypro 4 - 4/84" , GAME_NOT_WORKING ) // model 81-015
+// Kaypro 4/84 plus 88 goes here, model 81-015 with an added 8088 daughterboard and rom
+COMP( 1983, kaypro10, 0,        0,      kaypro2x, kay_kbd, 0,        kaypro2x,	  "Non Linear Systems",  "Kaypro 10" , GAME_NOT_WORKING ) // model 81-005
