@@ -385,6 +385,8 @@ MACHINE_DRIVER_END
 ROM_START( craft )
 	ROM_REGION( 0x2000, "maincpu", 0 )  /* Main program store */
 	ROM_LOAD( "craft.bin", 0x0000, 0x2000, CRC(2e6f9ad2) SHA1(75e495bf18395d74289ca7ee2649622fc4010457) )
+	ROM_REGION( 0x200, "eeprom", 0 )  /* on-die eeprom */
+	ROM_LOAD( "eeprom.raw", 0x0000, 0x0200, CRC(e18a2af9) SHA1(81fc6f2d391edfd3244870214fac37929af0ac0c) )
 ROM_END
 
 /*   YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     INIT      CONFIG    COMPANY          FULLNAME */
