@@ -16,23 +16,30 @@
   8x read 16 bit word at x
   30 cx 30 4x 16bit 00 write 16bit at x
 */
-static struct {
+static struct
+{
 	int state;
 	int clock;
 	UINT8 oper;
 	UINT16 data;
-	struct {
+	struct
+	{
 		UINT8 low, high;
 	} ee[0x40]; /* only 0 to 4 used in hx, addressing seems to allow this */
 } eeprom={0};
 
 NVRAM_HANDLER( tandy1000 )
 {
-	if (file==NULL) {
+	if (file==NULL)
+	{
 		// init only
-	} else if (read_or_write) {
+	}
+	else if (read_or_write)
+	{
 		mame_fwrite(file, eeprom.ee, sizeof(eeprom.ee));
-	} else {
+	}
+	else
+	{
 		mame_fread(file, eeprom.ee, sizeof(eeprom.ee));
 	}
 }
@@ -46,9 +53,11 @@ static int tandy1000_read_eeprom(void)
 
 static void tandy1000_write_eeprom(UINT8 data)
 {
-	if (!eeprom.clock && (data&4) ) {
+	if (!eeprom.clock && (data&4) )
+	{
 //				logerror("!!!tandy1000 eeprom %.2x %.2x\n",eeprom.state, data);
-		switch (eeprom.state) {
+		switch (eeprom.state)
+		{
 		case 0:
 			if ((data&3)==0) eeprom.state++;
 			break;
@@ -74,14 +83,19 @@ static void tandy1000_write_eeprom(UINT8 data)
 		case 10:
 			eeprom.oper=(eeprom.oper<<1)|(data&1);
 			logerror("!!!tandy1000 eeprom %.2x\n",eeprom.oper);
-			if ((eeprom.oper&0xc0)==0x80) {
+			if ((eeprom.oper&0xc0)==0x80)
+			{
 				eeprom.state=100;
 				eeprom.data=eeprom.ee[eeprom.oper&0x3f].low
 					|(eeprom.ee[eeprom.oper&0x3f].high<<8);
 				logerror("!!!tandy1000 eeprom read %.2x,%.4x\n",eeprom.oper,eeprom.data);
-			} else if ((eeprom.oper&0xc0)==0x40) {
+			}
+			else if ((eeprom.oper&0xc0)==0x40)
+			{
 				eeprom.state=200;
-			} else eeprom.state=0;
+			}
+			else
+				eeprom.state=0;
 			break;
 
 			/* read 16 bit */
@@ -142,8 +156,11 @@ static void tandy1000_write_eeprom(UINT8 data)
 	eeprom.clock=data&4;
 }
 
-static struct {
+static struct
+{
 	UINT8 data[8];
+
+	UINT8 bios_bank;	/* I/O port FFEAh */
 } tandy={ {0}};
 
 WRITE8_HANDLER ( pc_t1t_p37x_w )
@@ -175,19 +192,22 @@ WRITE8_HANDLER ( pc_t1t_p37x_w )
    bit 4 input eeprom data in
    bit 3 output turbo mode
 */
-static struct {
+static struct
+{
 	UINT8 portb, portc;
 } tandy_ppi= { 0 };
 
 WRITE8_HANDLER ( tandy1000_pio_w )
 {
-	switch (offset) {
+	switch (offset)
+	{
 	case 1:
 		tandy_ppi.portb = data;
 		pit8253_gate_w( devtag_get_device(space->machine, "pit8253"), 2, data & 1);
 		pc_speaker_set_spkrdata( space->machine, data & 0x02 );
 		pc_keyb_set_clock(data&0x40);
-		if ( data & 0x80 ) {
+		if ( data & 0x80 )
+		{
 			pc_keyb_clear();
 		}
 		break;
@@ -204,7 +224,8 @@ WRITE8_HANDLER ( tandy1000_pio_w )
  READ8_HANDLER(tandy1000_pio_r)
 {
 	int data=0xff;
-	switch (offset) {
+	switch (offset)
+	{
 	case 0:
 		data = pc_keyb_read();
 		break;
@@ -219,6 +240,51 @@ WRITE8_HANDLER ( tandy1000_pio_w )
 		break;
 	}
 	return data;
+}
+
+
+static void tandy1000_set_bios_bank( running_machine *machine )
+{
+	memory_set_bankptr( machine, 11, memory_region(machine, "maincpu") + ( tandy.bios_bank & 0x07 ) * 0x10000 );
+}
+
+
+MACHINE_RESET( tandy1000rl )
+{
+	MACHINE_RESET_CALL( pc );
+	tandy.bios_bank = 6;
+	tandy1000_set_bios_bank( machine );
+}
+
+
+READ8_HANDLER( tandy1000_bank_r )
+{
+	UINT8 data = 0xFF;
+
+	logerror( "%s: tandy1000_bank_r: offset = %x\n", cpuexec_describe_context(space->machine), offset );
+
+	switch( offset )
+	{
+	case 0x00:	/* FFEA */
+		data = tandy.bios_bank;
+		break;
+	}
+
+	return data;
+}
+
+
+WRITE8_HANDLER( tandy1000_bank_w )
+{
+	logerror( "%s: tandy1000_bank_w: offset = %x, data = %02x\n", cpuexec_describe_context(space->machine), offset, data );
+
+	switch( offset )
+	{
+	case 0x00:	/* FFEA */
+		tandy.bios_bank = data;
+		tandy1000_set_bios_bank( space->machine );
+		break;
+	}
 }
 
 

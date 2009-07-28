@@ -380,6 +380,7 @@ static ADDRESS_MAP_START(tandy1000_16_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc8000, 0xc9fff) AM_ROM
 	AM_RANGE(0xca000, 0xcffff) AM_NOP
 	AM_RANGE(0xd0000, 0xeffff) AM_ROM AM_REGION("maincpu", 0x60000)	/* This should become AM_ROMBANK(x) */
+	AM_RANGE(0xd0000, 0xeffff) AM_ROMBANK(11)						/* Banked part of the BIOS */
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("maincpu", 0x70000)
 ADDRESS_MAP_END
 
@@ -401,6 +402,7 @@ static ADDRESS_MAP_START(tandy1000_16_io, ADDRESS_SPACE_IO, 16)
 	AM_RANGE(0x03d0, 0x03df) AM_READWRITE8(pc_T1T_r,					pc_T1T_w, 0xffff)
 	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE8(pc_fdc_r,					pc_fdc_w, 0xffff)
 	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8("ins8250_0", ins8250_r, ins8250_w, 0xffff)
+	AM_RANGE(0xffea, 0xffeb) AM_READWRITE8(tandy1000_bank_r, tandy1000_bank_w, 0xffff)
 ADDRESS_MAP_END
 
 
@@ -1945,7 +1947,7 @@ static MACHINE_DRIVER_START( t1000_16 )
 	MDRV_CPU_PC(tandy1000_16, tandy1000_16, I8086, XTAL_28_63636MHz / 3, pc_frame_interrupt)
 
 	MDRV_MACHINE_START(pc)
-	MDRV_MACHINE_RESET(pc)
+	MDRV_MACHINE_RESET(tandy1000rl)
 
 	MDRV_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
 
@@ -2651,6 +2653,8 @@ COMP(  1988,	europc,		ibm5150,	0,	europc,     europc,		europc,     ibm5160, "Sch
 
 // pcjr (better graphics, better sound)
 COMP(  1983,	ibmpcjr,	ibm5150,	0,	ibmpcjr,    tandy1t,	pcjr,       pcjr,    "International Business Machines",  "IBM PC Jr", GAME_NOT_WORKING|GAME_IMPERFECT_COLORS )
+
+// tandy 1000
 COMP(  1987,	t1000hx,	ibm5150,	0,	t1000hx,    tandy1t,	t1000hx,	ibm5160, "Tandy Radio Shack",  "Tandy 1000HX", 0)
 COMP(  1987,	t1000sx,	ibm5150,	0,	t1000hx,    tandy1t,	t1000hx,	ibm5160, "Tandy Radio Shack",  "Tandy 1000SX", GAME_NOT_WORKING)
 COMP(  1989,    t1000rl,    ibm5150,    0,  t1000_16,   tandy1t,    t1000hx,    ibm5160, "Tandy Radio Shack",  "Tandy 1000RL", GAME_NOT_WORKING )
