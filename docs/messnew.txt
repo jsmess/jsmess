@@ -24,7 +24,7 @@ System Driver Changes:
 - [NES] Changed the PPU to use a device memory map (bug #1831), enhancements
   and improvements to mappers 5, 68, 88, 119.  [Robert Bohms]
 
-
+- [COCO] Bug #1839 fixed [Miodrag Milanovic]
 
 User Interface Changes:
 -----------------------
