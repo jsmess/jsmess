@@ -51,7 +51,6 @@ static tilemap* x68k_bg1_16;
 
 static int sprite_shift;
 
-static void x68k_render_video_word(int offset);
 static void x68k_crtc_refresh_mode(running_machine *machine);
 
 INLINE void x68k_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
@@ -102,7 +101,6 @@ static void x68k_crtc_text_copy(int src, int dest)
 	// copys one raster in T-VRAM to another raster
 	int src_ram = src * 256;  // 128 bytes per scanline
 	int dest_ram = dest * 256;
-	int x;
 	int line;
 
 	if(dest > 250)
@@ -115,10 +113,6 @@ static void x68k_crtc_text_copy(int src, int dest)
 		memcpy(x68k_tvram+dest_ram+0x10000,x68k_tvram+src_ram+0x10000,128);
 		memcpy(x68k_tvram+dest_ram+0x20000,x68k_tvram+src_ram+0x20000,128);
 		memcpy(x68k_tvram+dest_ram+0x30000,x68k_tvram+src_ram+0x30000,128);
-
-		// redraw scanline
-		for(x=0;x<64;x++)
-			x68k_render_video_word(dest_ram+x);
 
 		src_ram+=64;
 		dest_ram+=64;
@@ -530,47 +524,6 @@ READ16_HANDLER( x68k_crtc_r )
 	return 0xffff;
 }
 
-static int x68k_get_text_pixel(int offset, int bit)
-{
-	int ret = 0;
-
-//	if(offset % 2 == 0)
-//		bit += 8;
-//	offset = offset/2;
-	if(x68k_tvram[offset] & (1 << bit))
-		ret |= 0x01;
-	if(x68k_tvram[offset+0x10000] & (1 << bit))
-		ret |= 0x02;
-	if(x68k_tvram[offset+0x20000] & (1 << bit))
-		ret |= 0x04;
-	if(x68k_tvram[offset+0x30000] & (1 << bit))
-		ret |= 0x08;
-
-	return ret;
-}
-
-static void x68k_render_video_word(int offset)
-{
-	int x,y;
-	int l;
-
-	offset &= 0xffff;
-	y = offset / 64;
-	x = ((offset % 64)) * 16;
-
-	for(l=0;l<16;l++)
-	{
-		// apply text layer access mask
-		if(x68k_sys.crtc.reg[21] & 0x0200)
-		{
-			if((x68k_sys.crtc.reg[23] & (1<<l)) == 0)
-				x68k_plot_pixel(x68k_text_bitmap,x+(15-l),y,0x100+x68k_get_text_pixel(offset,l));
-		}
-		else
-			x68k_plot_pixel(x68k_text_bitmap,x+(15-l),y,0x100+x68k_get_text_pixel(offset,l));
-	}
-}
-
 WRITE16_HANDLER( x68k_gvram_w )
 {
 	int xloc,yloc,pageoffset;
@@ -696,12 +649,10 @@ WRITE16_HANDLER( x68k_tvram_w )
 				COMBINE_DATA(x68k_tvram+offset+(0x10000*plane));
 			}
 		}
-		x68k_render_video_word(offset);
 	}
 	else
 	{
 		COMBINE_DATA(x68k_tvram+offset);
-		x68k_render_video_word(offset);
 	}
 }
 
@@ -821,6 +772,40 @@ WRITE16_HANDLER( x68k_spriteram_w )
 READ16_HANDLER( x68k_spriteram_r )
 {
 	return x68k_spriteram[offset];
+}
+
+static void x68k_draw_text(running_machine* machine,bitmap_t* bitmap, int xscr, int yscr, rectangle rect)
+{
+	unsigned int line,pixel; // location on screen
+	UINT32 loc;  // location in TVRAM
+	UINT32 colour;
+	int bit;
+	
+	for(line=rect.min_y;line<=rect.max_y;line++)  // per scanline
+	{
+		// adjust for scroll registers
+		loc = (((line - x68k_sys.crtc.vbegin) + yscr) & 0x3ff) * 64;
+		loc += (xscr / 16) & 0x7f;
+		loc &= 0xffff;
+		bit = 15 - (xscr & 0x0f);
+		for(pixel=rect.min_x;pixel<=rect.max_x;pixel++)  // per pixel
+		{
+			colour = (((x68k_tvram[loc] >> bit) & 0x01) ? 1 : 0)
+				+ (((x68k_tvram[loc+0x10000] >> bit) & 0x01) ? 2 : 0)
+				+ (((x68k_tvram[loc+0x20000] >> bit) & 0x01) ? 4 : 0)
+				+ (((x68k_tvram[loc+0x30000] >> bit) & 0x01) ? 8 : 0);
+			//if(palette_get_color(machine,0x100 + colour) != 0xff000000)  // any colour but black
+			if(colour != 0)
+				*BITMAP_ADDR16(bitmap,line,pixel) = 512 + (x68k_sys.video.text_pal[colour] >> 1);
+			bit--;
+			if(bit < 0)
+			{
+				bit = 15;
+				loc++;
+				loc &= 0xffff;
+			}
+		}
+	}
 }
 
 static void x68k_draw_gfx(bitmap_t* bitmap,rectangle cliprect)
@@ -1179,10 +1164,10 @@ VIDEO_UPDATE( x68000 )
 		// Text screen
 		if(x68k_sys.video.reg[2] & 0x0020 && priority == x68k_sys.video.text_pri)
 		{
-			xscr = x68k_sys.crtc.hbegin-(x68k_sys.crtc.reg[10] & 0x3ff);
-			yscr = x68k_sys.crtc.vbegin-(x68k_sys.crtc.reg[11] & 0x3ff);
+			xscr = (x68k_sys.crtc.reg[10] & 0x3ff);
+			yscr = (x68k_sys.crtc.reg[11] & 0x3ff);
 			if(!(x68k_sys.crtc.reg[20] & 0x1000))  // if text layer is set to buffer, then it's not visible
-				copyscrollbitmap_trans(bitmap, x68k_text_bitmap, 1, &xscr, 1, &yscr, &rect, 0x100);
+				x68k_draw_text(screen->machine,bitmap,xscr,yscr,rect);
 		}
 	}
 
