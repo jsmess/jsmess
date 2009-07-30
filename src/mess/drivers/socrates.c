@@ -103,6 +103,7 @@ static struct
 {
 UINT8 data[8];
 UINT8 rom_bank;
+UINT8 ram_bank;
 } socrates={ {0}};
 
 static void socrates_set_rom_bank( running_machine *machine )
@@ -110,11 +111,18 @@ static void socrates_set_rom_bank( running_machine *machine )
  memory_set_bankptr( machine, 1, memory_region(machine, "maincpu") + ( socrates.rom_bank * 0x4000 ));
 }
 
+static void socrates_set_ram_bank( running_machine *machine )
+{
+ memory_set_bankptr( machine, 2, memory_region(machine, "vram") + ( (socrates.ram_bank&0x3) * 0x4000 )); // window 0
+ memory_set_bankptr( machine, 3, memory_region(machine, "vram") + ( ((socrates.ram_bank&0xC)>>2) * 0x4000 )); // window 1
+}
+
 MACHINE_RESET( socrates )
 {
  socrates.rom_bank = 0; // actually set semi-randomly on real console but we need to initialize it somewhere...
  socrates_set_rom_bank( machine );
- // ram bank should also be zeroed here; the actual console sets it semi randomly on power up, and the bios cleans it up.
+ socrates.ram_bank = 0;  // the actual console sets it semi randomly on power up, and the bios cleans it up.
+ socrates_set_ram_bank( machine );
 }
 
 READ8_HANDLER( socrates_rom_bank_r )
@@ -130,6 +138,19 @@ WRITE8_HANDLER( socrates_rom_bank_w )
  socrates_set_rom_bank( space->machine );
 }
 
+READ8_HANDLER( socrates_ram_bank_r )
+{
+ UINT8 data = 0xFF;
+ data = socrates.ram_bank | 0xF0;
+ return data;
+}
+
+WRITE8_HANDLER( socrates_ram_bank_w )
+{
+ socrates.ram_bank = data;
+ socrates_set_ram_bank( space->machine );
+}
+
 /******************************************************************************
  Address Maps
 ******************************************************************************/
@@ -138,14 +159,14 @@ static ADDRESS_MAP_START(z80_mem, ADDRESS_SPACE_PROGRAM, 8)
     ADDRESS_MAP_UNMAP_HIGH
     AM_RANGE(0x0000, 0x3fff) AM_ROM /* system rom, bank 0 (fixed) */
     AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1) /* banked rom space; system rom is banks 0 thru F, cartridge rom is banks 10 onward, usually banks 10 thru 17. area past the end of the cartridge, and the whole 10-ff area when no cartridge is inserted, reads as 0xF3 */
-    AM_RANGE(0x8000, 0xbfff) AM_RAM /* banked ram 'window' 0 */
-    AM_RANGE(0xc000, 0xffff) AM_RAM /* banked ram 'window' 1 */
+    AM_RANGE(0x8000, 0xbfff) AM_RAMBANK(2) /* banked ram 'window' 0 */
+    AM_RANGE(0xc000, 0xffff) AM_RAMBANK(3) /* banked ram 'window' 1 */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(z80_io, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(socrates_rom_bank_r, socrates_rom_bank_w) AM_MIRROR(0x7) /* rom bank select - RW - 8 bits */
-	AM_RANGE(0x08, 0x08) AM_RAM AM_MIRROR(0x7) /* ram banks select - RW - 4 low bits; Format: 0b****HHLL where LL controls whether window 0 points at ram area: 0b00: 0x0000-0x3fff; 0b01: 0x4000-0x7fff; 0b10: 0x8000-0xbfff; 0b11: 0xc000-0xffff. HH controls the same thing for window 1 */
+	AM_RANGE(0x08, 0x08) AM_READWRITE(socrates_ram_bank_r, socrates_ram_bank_w) AM_MIRROR(0x7) /* ram banks select - RW - 4 low bits; Format: 0b****HHLL where LL controls whether window 0 points at ram area: 0b00: 0x0000-0x3fff; 0b01: 0x4000-0x7fff; 0b10: 0x8000-0xbfff; 0b11: 0xc000-0xffff. HH controls the same thing for window 1 */
 	AM_RANGE(0x10, 0x17) AM_NOP AM_MIRROR (0x8) /* sound section:
         0x10 - W - frequency control for channel 1 (louder channel) - 01=high pitch, ff=low, write 0 to silence
 	0x11 - W - frequency control for channel 2 (softer channel) - 01=high pitch, ff=low, write 0 to silence
@@ -189,7 +210,7 @@ static MACHINE_DRIVER_START(socrates)
 
     /* sound hardware */
 	//MDRV_SPEAKER_STANDARD_MONO("mono")
-	//MDRV_SOUND_ADD("soc_snd", SOCRATES, XTAL_21_47727MHz/(1024+512)) /* this is correct, as strange as it sounds. */
+	//MDRV_SOUND_ADD("soc_snd", SOCRATES, XTAL_21_4772MHz/(1024+512)) /* this is correct, as strange as it sounds. */
 	//MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 
@@ -205,7 +226,10 @@ ROM_START(socrates)
     ROM_REGION(0x80000, "maincpu", 0)
     /* Socrates US NTSC */
     ROM_LOAD("27-00817-000-000.u1", 0x00000, 0x40000, CRC(80f5aa20) SHA1(4fd1ff7f78b5dd2582d5de6f30633e4e4f34ca8f))
-	ROM_FILL(0x40000, 0x40000, 0xf3) /* fill empty space with 0xf3 */
+    ROM_FILL(0x40000, 0x40000, 0xf3) /* fill empty space with 0xf3 */
+
+    ROM_REGION(0x10000, "vram", 0)
+    ROM_FILL(0x0000, 0xffff, 0xff) /* fill with ff, init should change this to the 'correct' startup pattern */
 ROM_END
     
 ROM_START(socratfc)
