@@ -125,6 +125,15 @@ MACHINE_RESET( socrates )
  socrates_set_ram_bank( machine );
 }
 
+DRIVER_INIT( socrates )
+{
+	UINT8 *gfx = memory_region(machine, "vram");
+	int i;
+    /* fill vram with its init powerup bit pattern, so startup has the checkerboard screen */
+    for (i = 0; i < 0x10000; i++)
+        gfx[i] = (((i&0x1)?0x00:0xFF)^((i&0x100)?0x00:0xff));
+}
+
 READ8_HANDLER( socrates_rom_bank_r )
 {
  UINT8 data = 0xFF;
@@ -150,6 +159,7 @@ WRITE8_HANDLER( socrates_ram_bank_w )
  socrates.ram_bank = data;
  socrates_set_ram_bank( space->machine );
 }
+
 
 /******************************************************************************
  Address Maps
@@ -203,6 +213,7 @@ static MACHINE_DRIVER_START(socrates)
     MDRV_CPU_PROGRAM_MAP(z80_mem)
     MDRV_CPU_IO_MAP(z80_io)
     MDRV_QUANTUM_TIME(HZ(60))
+    //MDRV_MACHINE_START(socrates)
     MDRV_MACHINE_RESET(socrates)
 
     /* video hardware */
@@ -229,13 +240,17 @@ ROM_START(socrates)
     ROM_FILL(0x40000, 0x40000, 0xf3) /* fill empty space with 0xf3 */
 
     ROM_REGION(0x10000, "vram", 0)
-    ROM_FILL(0x0000, 0xffff, 0xff) /* fill with ff, init should change this to the 'correct' startup pattern */
+    ROM_FILL(0x0000, 0xffff, 0xff) /* fill with ff, driver_init changes this to the 'correct' startup pattern */
 ROM_END
     
 ROM_START(socratfc)
     ROM_REGION(0x80000, "maincpu", 0)
     /* Socrates SAITOUT (French Canadian) NTSC */
     ROM_LOAD("socratfc.u1", 0x00000, 0x40000, CRC(042d9d21) SHA1(9ffc67b2721683b2536727d0592798fbc4d061cb)) /* fix label/name */
+    ROM_FILL(0x40000, 0x40000, 0xf3) /* fill empty space with 0xf3 */
+
+    ROM_REGION(0x10000, "vram", 0)
+    ROM_FILL(0x0000, 0xffff, 0xff) /* fill with ff, driver_init changes this to the 'correct' startup pattern */
 ROM_END
 
 
@@ -253,5 +268,5 @@ SYSTEM_CONFIG_END
 ******************************************************************************/
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT CONFIG      COMPANY                     FULLNAME                            FLAGS */
-COMP( 1988, socrates,   0,          0,      socrates,   0, 0,   socrates,   "V-tech",        "Socrates Educational Video System",                        GAME_NOT_WORKING )
-COMP( 1988, socratfc,   socrates,   0,      socrates,   0, 0,   socrates,   "V-tech",        "Socrates SAITOUT",                        GAME_NOT_WORKING )
+COMP( 1988, socrates,   0,          0,      socrates,   0, socrates,   socrates,   "V-tech",        "Socrates Educational Video System",                        GAME_NOT_WORKING )
+COMP( 1988, socratfc,   socrates,   0,      socrates,   0, socrates,   socrates,   "V-tech",        "Socrates SAITOUT",                        GAME_NOT_WORKING )
