@@ -468,8 +468,11 @@ ROM_START( vt100 ) // This is from the schematics at http://www.bitsavers.org/pd
 // This is the standard VT100 cpu board with the 'normal' roms (but later rev of eprom 0) populated
 // This romset is also used for the vt103, vt105, vt110, vt125, and vt180
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	//ROM_LOAD( "23-031e2-00.e56", 0x0000, 0x0800, NO_DUMP) // version 1 1978 'earlier rom', dump needed, correct for earlier vt100s
-	ROM_LOAD( "23-061e2-00.e56", 0x0000, 0x0800, CRC(3dae97ff) SHA1(e3437850c33565751b86af6c2fe270a491246d15)) // version 2 1979 or 1980 'later rom', correct for later vt100s
+	ROM_DEFAULT_BIOS( "vt100" )
+	ROM_SYSTEM_BIOS( 0, "vt100o", "VT100 older roms" )
+	ROMX_LOAD( "23-031e2-00.e56", 0x0000, 0x0800, NO_DUMP, ROM_BIOS(1)) // version 1 1978 'earlier rom', dump needed, correct for earlier vt100s
+	ROM_SYSTEM_BIOS( 1, "vt100", "VT100 newer roms" )
+	ROMX_LOAD( "23-061e2-00.e56", 0x0000, 0x0800, CRC(3dae97ff) SHA1(e3437850c33565751b86af6c2fe270a491246d15), ROM_BIOS(2)) // version 2 1979 or 1980 'later rom', correct for later vt100s
 	ROM_LOAD( "23-032e2-00.e52", 0x0800, 0x0800, CRC(3d86db99) SHA1(cdd8bdecdc643442f6e7d2c83cf002baf8101867))
 	ROM_LOAD( "23-033e2-00.e45", 0x1000, 0x0800, CRC(384dac0a) SHA1(22aaf5ab5f9555a61ec43f91d4dea3029f613e64))
 	ROM_LOAD( "23-034e2-00.e40", 0x1800, 0x0800, CRC(4643184d) SHA1(27e6c19d9932bf13fdb70305ef4d806e90d60833))
@@ -656,11 +659,11 @@ ROM_START( vt180 )
 	ROM_LOAD( "23-033e2-00.e45", 0x1000, 0x0800, CRC(384dac0a) SHA1(22aaf5ab5f9555a61ec43f91d4dea3029f613e64))
 	ROM_LOAD( "23-034e2-00.e40", 0x1800, 0x0800, CRC(4643184d) SHA1(27e6c19d9932bf13fdb70305ef4d806e90d60833))
 
-	ROM_REGION(0x1000, "gfx1",0)
+	ROM_REGION(0x1000, "gfx1", 0)
 	ROM_LOAD( "23-018e2-00.e4", 0x0000, 0x0800, BAD_DUMP CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53)) // probably correct but needs redump
 	ROM_LOAD_OPTIONAL ( "23-094e2-00.e9", 0x0800, 0x0800, NO_DUMP) // optional (comes default with some models) alternate character set rom
 
-	ROM_REGION(0x10000, "z80cpu",0) // z80 daughterboard
+	ROM_REGION(0x10000, "z80cpu", 0) // z80 daughterboard
 	ROM_LOAD( "23-017e3-00.bin", 0x0000, 0x1000, NO_DUMP) // fix location once dumped
 	ROM_LOAD( "23-021e3-00.bin", 0x0000, 0x1000, NO_DUMP) // fix location once dumped
 ROM_END
