@@ -473,7 +473,8 @@ ROM_START( vt100 ) // This is from the schematics at http://www.bitsavers.org/pd
 	ROM_LOAD( "23-032e2-00.e52", 0x0800, 0x0800, CRC(3d86db99) SHA1(cdd8bdecdc643442f6e7d2c83cf002baf8101867))
 	ROM_LOAD( "23-033e2-00.e45", 0x1000, 0x0800, CRC(384dac0a) SHA1(22aaf5ab5f9555a61ec43f91d4dea3029f613e64))
 	ROM_LOAD( "23-034e2-00.e40", 0x1800, 0x0800, CRC(4643184d) SHA1(27e6c19d9932bf13fdb70305ef4d806e90d60833))
-	ROM_REGION(0x1000, "gfx1",0)
+
+	ROM_REGION(0x1000, "gfx1", 0)
 	ROM_LOAD( "23-018e2-00.e4", 0x0000, 0x0800, BAD_DUMP CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53)) // probably correct but needs redump
 	ROM_LOAD_OPTIONAL("23-094e2-00.e9", 0x0800, 0x0800, NO_DUMP) // optional ?word processing? alternate character set rom
 ROM_END
@@ -487,7 +488,8 @@ ROM_START( vt100wp ) // This is from the schematics at http://www.bitsavers.org/
 	ROM_LOAD( "23-181e2-00.e52", 0x0800, 0x0800, NO_DUMP) 
 	ROM_LOAD( "23-182e2-00.e45", 0x1000, 0x0800, NO_DUMP) 
 	ROM_LOAD( "23-183e2-00.e40", 0x1800, 0x0800, NO_DUMP) 
-	ROM_REGION(0x1000, "gfx1",0)
+
+	ROM_REGION(0x1000, "gfx1", 0)
 	ROM_LOAD( "23-018e2-00.e4", 0x0000, 0x0800, BAD_DUMP CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53)) // probably correct but needs redump
 	ROM_LOAD_OPTIONAL( "23-094e2-00.e9", 0x0800, 0x0800, NO_DUMP) // optional ?word processing? alternate character set rom
 ROM_END
@@ -531,12 +533,15 @@ ROM_START( vt103 ) // This is from the schematics at http://www.bitsavers.org/pd
 	ROM_LOAD( "23-032e2-00.e52", 0x0800, 0x0800, CRC(3d86db99) SHA1(cdd8bdecdc643442f6e7d2c83cf002baf8101867))
 	ROM_LOAD( "23-033e2-00.e45", 0x1000, 0x0800, CRC(384dac0a) SHA1(22aaf5ab5f9555a61ec43f91d4dea3029f613e64))
 	ROM_LOAD( "23-034e2-00.e40", 0x1800, 0x0800, CRC(4643184d) SHA1(27e6c19d9932bf13fdb70305ef4d806e90d60833))
-	ROM_REGION(0x1000, "gfx1",0)
+
+	ROM_REGION(0x1000, "gfx1", 0)
 	ROM_LOAD( "23-018e2-00.e4", 0x0000, 0x0800, BAD_DUMP CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53)) // probably correct but needs redump
 	ROM_LOAD_OPTIONAL( "23-094e2-00.e9", 0x0800, 0x0800, NO_DUMP) // optional (comes default with some models) alternate character set rom
-	ROM_REGION(0x0800, "tapecpu",0) // rom for the 8085 cpu in the integrated serial tu58-xa drive
+
+	ROM_REGION(0x0800, "tapecpu", 0) // rom for the 8085 cpu in the integrated serial tu58-xa drive
 	ROM_LOAD( "23-089e2-00.e1", 0x0000, 0x0800, NO_DUMP)
-	ROM_REGION(0x80000, "lsi11cpu",0) // rom for the LSI-11 cpu board
+
+	ROM_REGION(0x80000, "lsi11cpu", 0) // rom for the LSI-11 cpu board
 	ROM_LOAD_OPTIONAL( "unknown.bin", 0x00000, 0x80000, NO_DUMP)
 ROM_END
 
@@ -549,7 +554,8 @@ ROM_START( vt105 ) // This is from anecdotal evidence and vt100.net, as the vt10
 	ROM_LOAD( "23-032e2-00.e52", 0x0800, 0x0800, CRC(3d86db99) SHA1(cdd8bdecdc643442f6e7d2c83cf002baf8101867))
 	ROM_LOAD( "23-033e2-00.e45", 0x1000, 0x0800, CRC(384dac0a) SHA1(22aaf5ab5f9555a61ec43f91d4dea3029f613e64))
 	ROM_LOAD( "23-034e2-00.e40", 0x1800, 0x0800, CRC(4643184d) SHA1(27e6c19d9932bf13fdb70305ef4d806e90d60833))
-	ROM_REGION(0x1000, "gfx1",0)
+
+	ROM_REGION(0x1000, "gfx1", 0)
 	ROM_LOAD( "23-018e2-00.e4", 0x0000, 0x0800, BAD_DUMP CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53)) // probably correct but needs redump
 	ROM_LOAD_OPTIONAL( "23-094e2-00.e9", 0x0800, 0x0800, NO_DUMP) // optional (comes default with some models) alternate character set rom
 ROM_END
@@ -563,7 +569,8 @@ ROM_START( vt110 )
 	ROM_LOAD( "23-032e2-00.e52", 0x0800, 0x0800, CRC(3d86db99) SHA1(cdd8bdecdc643442f6e7d2c83cf002baf8101867))
 	ROM_LOAD( "23-033e2-00.e45", 0x1000, 0x0800, CRC(384dac0a) SHA1(22aaf5ab5f9555a61ec43f91d4dea3029f613e64))
 	ROM_LOAD( "23-034e2-00.e40", 0x1800, 0x0800, CRC(4643184d) SHA1(27e6c19d9932bf13fdb70305ef4d806e90d60833))
-	ROM_REGION(0x1000, "gfx1",0)
+
+	ROM_REGION(0x1000, "gfx1", 0)
 	ROM_LOAD( "23-018e2-00.e4", 0x0000, 0x0800, BAD_DUMP CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53)) // probably correct but needs redump
 	ROM_LOAD_OPTIONAL ( "23-094e2-00.e9", 0x0800, 0x0800, NO_DUMP) // optional (comes default with some models) alternate character set rom
 //DECDataway board roms go here!
@@ -579,7 +586,8 @@ ROM_START( vt125 ) // This is from bitsavers and vt100.net, as the vt125 schemat
 	ROM_LOAD( "23-032e2-00.e52", 0x0800, 0x0800, CRC(3d86db99) SHA1(cdd8bdecdc643442f6e7d2c83cf002baf8101867))
 	ROM_LOAD( "23-033e2-00.e45", 0x1000, 0x0800, CRC(384dac0a) SHA1(22aaf5ab5f9555a61ec43f91d4dea3029f613e64))
 	ROM_LOAD( "23-034e2-00.e40", 0x1800, 0x0800, CRC(4643184d) SHA1(27e6c19d9932bf13fdb70305ef4d806e90d60833))
-	ROM_REGION(0x1000, "gfx1",0)
+
+	ROM_REGION(0x1000, "gfx1", 0)
 	ROM_LOAD( "23-018e2-00.e4", 0x0000, 0x0800, BAD_DUMP CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53)) // probably correct but needs redump
 	ROM_LOAD_OPTIONAL ( "23-094e2-00.e9", 0x0800, 0x0800, NO_DUMP) // optional (comes default with some models) alternate character set rom
 //GPO board roms go here!
@@ -591,7 +599,8 @@ ROM_START( vt101 ) // p/n 5414185-01 'unupgradable/low cost' vt101/vt102/vt131 m
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "23-???e4-00.e69", 0x0000, 0x2000, NO_DUMP) 
 	ROM_LOAD( "23-???e4-00.e71", 0x2000, 0x2000, NO_DUMP)
-	ROM_REGION(0x0800, "gfx1",0)
+
+	ROM_REGION(0x1000, "gfx1", 0)
 	ROM_LOAD( "23-018e2-00.e3", 0x0000, 0x0800, BAD_DUMP CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53)) // probably correct but needs redump
 	ROM_LOAD_OPTIONAL( "23-094e2-00.e4", 0x0800, 0x0800, NO_DUMP) // optional (comes default with some models) alternate character set rom
 ROM_END
@@ -603,7 +612,8 @@ ROM_START( vt102 ) // p/n 5414185-01 'unupgradable/low cost' vt101/vt102/vt131 m
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "23-225e4-00.e69", 0x0000, 0x2000, BAD_DUMP CRC(7ddf75cb) SHA1(a3530bb562b5c6ea8ba23f0988b35ef404abcb93)) // is this right for vt102? A11 stuck high
 	ROM_LOAD( "23-226e4-00.e71", 0x2000, 0x2000, BAD_DUMP CRC(339d4e4e) SHA1(f1b08f2c6bbc2b234f3f43bd800a2615f6dd18d3)) // is this right for vt102? A11 stuck high
-	ROM_REGION(0x0800, "gfx1",0)
+
+	ROM_REGION(0x1000, "gfx1", 0)
 	ROM_LOAD( "23-018e2-00.e3", 0x0000, 0x0800, BAD_DUMP CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53)) // probably correct but needs redump
 	ROM_LOAD_OPTIONAL( "23-094e2-00.e4", 0x0800, 0x0800, NO_DUMP) // optional (comes default with some models) alternate character set rom
 ROM_END
@@ -616,7 +626,8 @@ ROM_START( vt131 ) // p/n 5414185-01 'unupgradable/low cost' vt101/vt131 mainboa
 	ROM_LOAD( "23-225e4-00.e69", 0x0000, 0x2000, BAD_DUMP CRC(7ddf75cb) SHA1(a3530bb562b5c6ea8ba23f0988b35ef404abcb93)) // A11 stuck high
 	ROM_LOAD( "23-226e4-00.e71", 0x2000, 0x2000, BAD_DUMP CRC(339d4e4e) SHA1(f1b08f2c6bbc2b234f3f43bd800a2615f6dd18d3)) // A11 stuck high
 	ROM_LOAD( "23-280e2-00.e67", 0x4000, 0x0800, BAD_DUMP CRC(71b4172e) SHA1(5a82c7dc313bb92b9829eb8350840e072825a797)) // called "VT131 ROM" in the vt101 quick reference guide; CS floating/stuck low (contents are almost total garbage)
-	ROM_REGION(0x0800, "gfx1",0)
+
+	ROM_REGION(0x1000, "gfx1", 0)
 	ROM_LOAD( "23-018e2-00.e3", 0x0000, 0x0800, BAD_DUMP CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53)) // probably correct but needs redump
 	ROM_LOAD_OPTIONAL( "23-094e2-00.e4", 0x0800, 0x0800, NO_DUMP) // optional (comes default with some models) alternate character set rom
 ROM_END
@@ -630,7 +641,8 @@ ROM_START( vt132 ) // This is from anecdotal evidence and vt100.net, as the vt13
 	ROM_LOAD( "23-???e2-00.e52", 0x0800, 0x0800, NO_DUMP)
 	ROM_LOAD( "23-???e2-00.e45", 0x1000, 0x0800, NO_DUMP)
 	ROM_LOAD( "23-???e2-00.e40", 0x1800, 0x0800, NO_DUMP)
-	ROM_REGION(0x1000, "gfx1",0)
+
+	ROM_REGION(0x1000, "gfx1", 0)
 	ROM_LOAD( "23-018e2-00.e4", 0x0000, 0x0800, BAD_DUMP CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53)) // probably correct but needs redump
 	ROM_LOAD_OPTIONAL( "23-094e2-00.e9", 0x0800, 0x0800, NO_DUMP) // optional (comes default with some models) alternate character set rom
 ROM_END
@@ -643,9 +655,11 @@ ROM_START( vt180 )
 	ROM_LOAD( "23-032e2-00.e52", 0x0800, 0x0800, CRC(3d86db99) SHA1(cdd8bdecdc643442f6e7d2c83cf002baf8101867))
 	ROM_LOAD( "23-033e2-00.e45", 0x1000, 0x0800, CRC(384dac0a) SHA1(22aaf5ab5f9555a61ec43f91d4dea3029f613e64))
 	ROM_LOAD( "23-034e2-00.e40", 0x1800, 0x0800, CRC(4643184d) SHA1(27e6c19d9932bf13fdb70305ef4d806e90d60833))
+
 	ROM_REGION(0x1000, "gfx1",0)
 	ROM_LOAD( "23-018e2-00.e4", 0x0000, 0x0800, BAD_DUMP CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53)) // probably correct but needs redump
 	ROM_LOAD_OPTIONAL ( "23-094e2-00.e9", 0x0800, 0x0800, NO_DUMP) // optional (comes default with some models) alternate character set rom
+
 	ROM_REGION(0x10000, "z80cpu",0) // z80 daughterboard
 	ROM_LOAD( "23-017e3-00.bin", 0x0000, 0x1000, NO_DUMP) // fix location once dumped
 	ROM_LOAD( "23-021e3-00.bin", 0x0000, 0x1000, NO_DUMP) // fix location once dumped
@@ -654,15 +668,15 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( 1978, vt100,  0,       0, 	vt100, 		vt100, 	 0,  	  0,  	 "DEC",   "VT100",		GAME_NOT_WORKING)
-COMP( 1978, vt100wp,  vt100,       0, 	vt100, 		vt100, 	 0,  	  0,  	 "DEC",   "VT100-Wx",		GAME_NOT_WORKING)
-//COMP( 1978, vt100stp,  vt100,       0, 	vt100, 		vt100, 	 0,  	  0,  	 "DEC",   "VT100 w/VT1xx-AC STP",		GAME_NOT_WORKING)
-COMP( 1981, vt101,  0,       0, 	vt100, 		vt100, 	 0,  	  0,  	 "DEC",   "VT101",		GAME_NOT_WORKING)
-COMP( 1981, vt102,  vt101,   0, 	vt100, 		vt100, 	 0,  	  0,  	 "DEC",   "VT102",		GAME_NOT_WORKING)
-COMP( 1979, vt103,  vt100,   0, 	vt100, 		vt100, 	 0,  	  0,  	 "DEC",   "VT103",		GAME_NOT_WORKING)
-COMP( 1978, vt105,  vt100,   0, 	vt100, 		vt100, 	 0,  	  0,  	 "DEC",   "VT105",		GAME_NOT_WORKING)
-COMP( 1978, vt110,  vt100,   0, 	vt100, 		vt100, 	 0,  	  0,  	 "DEC",   "VT110",		GAME_NOT_WORKING)
-COMP( 1981, vt125,  vt100,   0, 	vt100, 		vt100, 	 0,  	  0,  	 "DEC",   "VT125",		GAME_NOT_WORKING)
-COMP( 1981, vt131,  vt101,   0, 	vt100, 		vt100, 	 0,  	  0,  	 "DEC",   "VT131",		GAME_NOT_WORKING)
-//COMP( 1979, vt132,  vt100,   0, 	vt100, 		vt100, 	 0,  	  0,  	 "DEC",   "VT132",		GAME_NOT_WORKING)
-COMP( 1983, vt180,  vt100,   0, 	vt100, 		vt100, 	 0,  	  0,  	 "DEC",   "VT180",		GAME_NOT_WORKING)
+COMP( 1978, vt100,  0,       0,     vt100, 	 vt100, 	 0,  	  0,  	 "DEC",   "VT100",		GAME_NOT_WORKING)
+COMP( 1978, vt100wp,  vt100, 0,     vt100, 	 vt100, 	 0,  	  0,  	 "DEC",   "VT100-Wx",		GAME_NOT_WORKING)
+//COMP( 1978, vt100stp,  vt100,       0, 	vt100, 	 vt100, 	 0,  	  0,  	 "DEC",   "VT100 w/VT1xx-AC STP",		GAME_NOT_WORKING)
+COMP( 1981, vt101,  0,       0,     vt100, 	 vt100, 	 0,  	  0,  	 "DEC",   "VT101",		GAME_NOT_WORKING)
+COMP( 1981, vt102,  vt101,   0,     vt100, 	 vt100, 	 0,  	  0,  	 "DEC",   "VT102",		GAME_NOT_WORKING)
+COMP( 1979, vt103,  vt100,   0,     vt100, 	 vt100, 	 0,  	  0,  	 "DEC",   "VT103",		GAME_NOT_WORKING)
+COMP( 1978, vt105,  vt100,   0,     vt100,   vt100, 	 0,  	  0,  	 "DEC",   "VT105",		GAME_NOT_WORKING)
+COMP( 1978, vt110,  vt100,   0,     vt100, 	 vt100, 	 0,  	  0,  	 "DEC",   "VT110",		GAME_NOT_WORKING)
+COMP( 1981, vt125,  vt100,   0,     vt100, 	 vt100, 	 0,  	  0,  	 "DEC",   "VT125",		GAME_NOT_WORKING)
+COMP( 1981, vt131,  /*vt101*/0,       0,     vt100, 		vt100, 	 0,  	  0,  	 "DEC",   "VT131",		GAME_NOT_WORKING)	// this should be a vt101 clone, once the vt101 has been enabled (i.e. its roms dumped)
+//COMP( 1979, vt132,  vt100,   0,    vt100,   vt100, 	 0,  	  0,  	 "DEC",   "VT132",		GAME_NOT_WORKING)
+COMP( 1983, vt180,  vt100,   0,     vt100,   vt100, 	 0,  	  0,  	 "DEC",   "VT180",		GAME_NOT_WORKING)
