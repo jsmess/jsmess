@@ -3,8 +3,50 @@
         DEC VK 100
 
         12/05/2009 Skeleton driver.
+        28/07/2009 added Guru-readme(TM)
 
+        Todo: attach vblank int
+              attach hd46505sp CRTC
+              emulate vector generator hardware
+              attach keyboard
 ****************************************************************************/
+/*
+DEC VK100
+DEC, 1982
+
+This is a VK100 terminal, otherwise known as a DEC Gigi graphics terminal.
+There's a technical manual dated 1982 here:
+http://www.computer.museum.uq.edu.au/./pdf/EK-VK100-TM-001%20VK100%20Technical%20Manual.pdf
+
+PCB Layout
+----------
+
+VK100 LOGICBOARD
+    |-------|    |---------|  |---------|    |-| |-| |-|  |-|
+|---|-POWER-|----|---EIA---|--|HARD-COPY|----|B|-|G|-|R|--|-|----------|
+|                                                         BW   DSW(8)  |
+|                                                             POWER    |
+|                 PR2                                                  |
+|                           HD46505SP              4116 4116 4116 4116 |
+|                                                                      |
+|                                                  4116 4116 4116 4116 |
+|                 INTEL           ROM1                                 |
+|          PR1    P8251A                           4116 4116 4116 4116 |
+|                     45.6192MHz  ROM2                                 |
+|                                                  4116 4116 4116 4116 |
+| 4116 4116 4116  INTEL           ROM3  PR3                            |
+|                 D8202A                                               |
+| 4116 4116 4116       5.0688MHz  ROM4                       PR4       |
+|                                                                      |
+| 4116 4116       INTEL    SMC_5016T                            PIEZO  |
+|                 D8085A                        IDC40   LM556   75452  |
+|----------------------------------------------------------------------|
+Notes:
+      ROM1 - TP-01 (C) DEC 23-031E4-00 (M) SCM91276L 8114
+      ROM2 - TP-01 (C) DEC 1980 23-017E4-00 MOSTEK MK36444N 8116
+      ROM3 - TP-01 (C) MICROSOFT 1979 23-018E4-00 MOSTEK MK36445N 8113
+      ROM4 - TP-01 (C) DEC 1980 23-190E2-00 P8316E AMD 35517 8117DPP
+*/
 
 #include "driver.h"
 #include "cpu/i8085/i8085.h"
@@ -42,8 +84,8 @@ static ADDRESS_MAP_START( vk100_io , ADDRESS_SPACE_IO, 8)
 	//AM_RANGE (0x74, 0x74) AM_WRITE(unknown_74)
 	//AM_RANGE (0x78, 0x78) AM_WRITE(kbdw)   //KBDW
 	//AM_RANGE (0x7C, 0x7C) AM_WRITE(unknown_7C)
-	//AM_RANGE (0x40, 0x40) AM_READ(systat_a) // SYSTAT A
-	//AM_RANGE (0x48, 0x48) AM_READ(systat_b) // SYSTAT B
+	//AM_RANGE (0x40, 0x40) AM_READ(systat_a) // SYSTAT A (dipswitches?)
+	//AM_RANGE (0x48, 0x48) AM_READ(systat_b) // SYSTAT B (dipswitches?)
 	//AM_RANGE (0x50, 0x50) AM_READ(uart_0)   // UART O
 	//AM_RANGE (0x51, 0x51) AM_READ(uart_1)   // UAR
 	//AM_RANGE (0x58, 0x58) AM_READ(unknown_58)
@@ -73,7 +115,7 @@ static VIDEO_UPDATE( vk100 )
 
 static MACHINE_DRIVER_START( vk100 )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu",8085A, XTAL_4MHz)
+    MDRV_CPU_ADD("maincpu",8085A, XTAL_5_0688MHz)
     MDRV_CPU_PROGRAM_MAP(vk100_mem)
     MDRV_CPU_IO_MAP(vk100_io)
     //MDRV_CPU_VBLANK_INT("screen", vk100_vertical_interrupt) // hook me up please
