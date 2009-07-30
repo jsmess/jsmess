@@ -707,7 +707,7 @@ const game_driver * const drivers[] =
     DRIVER( kaypro4a )  /* Kaypro 4 - 4/84 */
     DRIVER( kayproii )  /* Kaypro II - 2/83 */
     DRIVER( kaypro4 )   /* Kaypro 4 - 4/83 */
-    DRIVER( kaypro4plus88 )   /* Kaypro 4 - 4/83 w/plus88 board installed*/
+    DRIVER( kaypro4p88 )   /* Kaypro 4 - 4/83 w/plus88 board installed*/
     DRIVER( kaypro10 )  /* Kaypro 10 */
     DRIVER( omni2 )     /* Omni II */
 
