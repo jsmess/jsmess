@@ -960,6 +960,22 @@ const game_driver * const drivers[] =
 
     /* DEC */
     DRIVER( pdp1 )      /* 1961 DEC PDP1                                    */
+    DRIVER(vt100) /* 1978 Digital Equipment Corporation */
+    //DRIVER(vt100wp) /* 1978 Digital Equipment Corporation */
+    //DRIVER(vt100stp) /* 1978 Digital Equipment Corporation */
+    //DRIVER(vt101) /* 1981 Digital Equipment Corporation */
+    //DRIVER(vt102) /* 1981 Digital Equipment Corporation */
+    //DRIVER(vt103) /* 1979 Digital Equipment Corporation */
+    DRIVER(vt105) /* 1978 Digital Equipment Corporation */
+    //DRIVER(vt110) /* 1978 Digital Equipment Corporation */
+    //DRIVER(vt125) /* 1981 Digital Equipment Corporation */
+    DRIVER(vt131) /* 1981 Digital Equipment Corporation */
+    //DRIVER(vt132) /* 1978 Digital Equipment Corporation */
+    //DRIVER(vt180) /* 1981 Digital Equipment Corporation */
+    DRIVER(vt220) /* 1983 Digital Equipment Corporation */
+    DRIVER(vt320) /* 1987 Digital Equipment Corporation */
+    DRIVER(vt520) /* 1994 Digital Equipment Corporation */
+    DRIVER(vk100) /* 1980 Digital Equipment Corporation */
 
     /* MEMOTECH */
     DRIVER( mtx512 )    /* 1983 Memotech MTX 512                            */
@@ -1240,24 +1256,6 @@ const game_driver * const drivers[] =
     DRIVER(ac1scch) /* 1984 Amateurcomputer AC1 SCCH        */
 
     DRIVER( pcm )   /* PC/M Mugler                          */
-
-    /* DEC */
-    DRIVER(vt100) /* 1978 Digital Equipment Corporation */
-    //DRIVER(vt100wp) /* 1978 Digital Equipment Corporation */
-    //DRIVER(vt100stp) /* 1978 Digital Equipment Corporation */
-    //DRIVER(vt101) /* 1981 Digital Equipment Corporation */
-    //DRIVER(vt102) /* 1981 Digital Equipment Corporation */
-    //DRIVER(vt103) /* 1979 Digital Equipment Corporation */
-    DRIVER(vt105) /* 1978 Digital Equipment Corporation */
-    //DRIVER(vt110) /* 1978 Digital Equipment Corporation */
-    //DRIVER(vt125) /* 1981 Digital Equipment Corporation */
-    DRIVER(vt131) /* 1981 Digital Equipment Corporation */
-    //DRIVER(vt132) /* 1978 Digital Equipment Corporation */
-    //DRIVER(vt180) /* 1981 Digital Equipment Corporation */
-    DRIVER(vt220) /* 1983 Digital Equipment Corporation */
-    DRIVER(vt320) /* 1987 Digital Equipment Corporation */
-    DRIVER(vt520) /* 1994 Digital Equipment Corporation */
-    DRIVER(vk100) /* 1980 Digital Equipment Corporation */
 
     /* Ei Nis */
     DRIVER(pecom64)
