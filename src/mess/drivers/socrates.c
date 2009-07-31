@@ -174,7 +174,7 @@ WRITE8_HANDLER( socrates_scroll_w )
 #define CHROMA_COL_2 0.125125, 0.27525, 0.230225, 0.384875, 0.125125, 0.27525, 0.230225, 0.384875, 0.125125, 0.27525, 0.230225, 0.384875, 0.125125, 0.27525, 0.230225, 0.384875,
 #define CHROMA_COL_5 0.1235, 0.2695, 0.22625, 0.378, 0.1235, 0.2695, 0.22625, 0.378, 0.1235, 0.2695, 0.22625, 0.378, 0.1235, 0.2695, 0.22625, 0.378,
 // gamma: this needs to be messed with... may differ on different systems... attach to slider somehow?
-#define GAMMA 2.2 
+#define GAMMA 2.0 
 
 static rgb_t socrates_create_color(UINT8 color)
 {
@@ -260,8 +260,7 @@ composedcolor = MAKE_RGB((int)finalR,(int)finalG,(int)finalB);
 return composedcolor;
 }
 
-static rgb_t socrates_palette[256] = {
-};
+static rgb_t socrates_palette[256];
 
 PALETTE_INIT( socrates )
 {
@@ -356,9 +355,9 @@ static ADDRESS_MAP_START(z80_io, ADDRESS_SPACE_IO, 8)
 	resulting screen line is one of 512 total offsets on 128-byte boundaries in the whole 64k ram
 	*/
 	AM_RANGE(0x30, 0x30) AM_NOP /* unknown, write only */
-	AM_RANGE(0x40, 0x40) AM_RAM AM_MIRROR(0xF)/* unknown, read and write low 4 bits plus bit 5, bit 7 seems to be fixed at 0, bit 6 and 4 are fixed at 1? is this some sort of control register for timers perhaps? */
-	AM_RANGE(0x50, 0x50) AM_RAM AM_MIRROR(0xE) /* unknown, read and write (bits?) */
-	AM_RANGE(0x51, 0x51) AM_RAM AM_MIRROR(0xE) /* unknown, read and write (bits?) */
+	AM_RANGE(0x40, 0x40) AM_RAM AM_MIRROR(0xF)/* unknown, read and write low 4 bits plus bit 5, bit 7 seems to be fixed at 0, bit 6 and 4 are fixed at 1? is this some sort of control register for timers perhaps? gets a slew of data written to it a few times during startup, may be IR related? */
+	AM_RANGE(0x50, 0x50) AM_RAM AM_MIRROR(0xE) /* unknown, read and write (bits?) reads serially shift 1 bit somewhere? */
+	AM_RANGE(0x51, 0x51) AM_RAM AM_MIRROR(0xE) /* unknown, read and write (bits?) reads serially shift 1 bit somewhere? */
 	AM_RANGE(0x60, 0x60) AM_NOP AM_MIRROR(0xF) /* unknown, write only  */
 ADDRESS_MAP_END
 
