@@ -70,7 +70,7 @@ static const device_config *cartslot_image(running_machine *machine)
 	return state->cart;
 }
 
-static void init_nes_core (running_machine *machine)
+static void init_nes_core(running_machine *machine)
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
@@ -157,7 +157,7 @@ static void init_nes_core (running_machine *machine)
 		}
 		else
 		{
-			logerror ("Mapper %d is not yet supported, defaulting to no mapper.\n",nes.mapper);
+			logerror("Mapper %d is not yet supported, defaulting to no mapper.\n",nes.mapper);
 			mmc_write_low = mmc_write_mid = mmc_write = NULL;
 			mmc_read_low = NULL;
 		}
@@ -171,7 +171,7 @@ static void init_nes_core (running_machine *machine)
 	/* memory subsystem is set up. When this routine is called */
 	/* everything is ready, so we can just copy over the data */
 	/* we loaded before. */
-	memcpy (nes_battery_ram, battery_data, BATTERY_SIZE);
+	memcpy(nes_battery_ram, battery_data, BATTERY_SIZE);
 }
 
 int nes_ppu_vidaccess( const device_config *device, int address, int data )
@@ -199,13 +199,13 @@ MACHINE_RESET( nes )
 	nes.mid_ram_enable = 1;
 
 	/* Reset the mapper variables. Will also mark the char-gen ram as dirty */
-	mapper_reset (machine, nes.mapper);
+	mapper_reset(machine, nes.mapper);
 
 	/* Reset the serial input ports */
 	in_0.shift = 0;
 	in_1.shift = 0;
 
-	cputag_reset( machine, "maincpu" );
+	cputag_reset(machine, "maincpu");
 }
 
 MACHINE_START( nes )
@@ -223,7 +223,7 @@ static void nes_machine_stop(running_machine *machine)
 
 
 
- READ8_HANDLER ( nes_IN0_r )
+READ8_HANDLER( nes_IN0_r )
 {
 	nes_state *state = space->machine->driver_data;
 	int ret;
@@ -242,14 +242,14 @@ static void nes_machine_stop(running_machine *machine)
 		UINT32 pix, color_base;
 
 		/* get the pixel at the gun position */
-		pix = ppu2c0x_get_pixel( state->ppu, x, y );
+		pix = ppu2c0x_get_pixel(state->ppu, x, y);
 
 		/* get the color base from the ppu */
-		color_base = ppu2c0x_get_colorbase( state->ppu );
+		color_base = ppu2c0x_get_colorbase(state->ppu);
 
 		/* look at the screen and see if the cursor is over a bright pixel */
-		if ( ( pix == color_base + 0x20 ) || ( pix == color_base + 0x30 ) ||
-			 ( pix == color_base + 0x33 ) || ( pix == color_base + 0x34 ) )
+		if ((pix == color_base + 0x20) || (pix == color_base + 0x30) ||
+			(pix == color_base + 0x33) || (pix == color_base + 0x34))
 		{
 			ret &= ~0x08; /* sprite hit */
 		}
@@ -261,13 +261,13 @@ static void nes_machine_stop(running_machine *machine)
 	}
 
 	if (LOG_JOY)
-		logerror ("joy 0 read, val: %02x, pc: %04x, bits read: %d, chan0: %08x\n", ret, cpu_get_pc( space->cpu ), in_0.shift, in_0.i0);
+		logerror("joy 0 read, val: %02x, pc: %04x, bits read: %d, chan0: %08x\n", ret, cpu_get_pc(space->cpu), in_0.shift, in_0.i0);
 
 	in_0.shift++;
 	return ret;
 }
 
- READ8_HANDLER ( nes_IN1_r )
+READ8_HANDLER( nes_IN1_r )
 {
 	nes_state *state = space->machine->driver_data;
 	int ret;
@@ -287,14 +287,14 @@ static void nes_machine_stop(running_machine *machine)
 		UINT32 pix, color_base;
 
 		/* get the pixel at the gun position */
-		pix = ppu2c0x_get_pixel( state->ppu, x, y );
+		pix = ppu2c0x_get_pixel(state->ppu, x, y);
 
 		/* get the color base from the ppu */
-		color_base = ppu2c0x_get_colorbase( state->ppu );
+		color_base = ppu2c0x_get_colorbase(state->ppu);
 
 		/* look at the screen and see if the cursor is over a bright pixel */
-		if ( ( pix == color_base + 0x20 ) || ( pix == color_base + 0x30 ) ||
-			 ( pix == color_base + 0x33 ) || ( pix == color_base + 0x34 ) )
+		if ((pix == color_base + 0x20) || (pix == color_base + 0x30) ||
+			(pix == color_base + 0x33) || (pix == color_base + 0x34))
 		{
 			ret &= ~0x08; /* sprite hit */
 		}
@@ -318,7 +318,7 @@ static void nes_machine_stop(running_machine *machine)
 	}
 
 	if (LOG_JOY)
-		logerror ("joy 1 read, val: %02x, pc: %04x, bits read: %d, chan0: %08x\n", ret, cpu_get_pc( space->cpu ), in_1.shift, in_1.i0);
+		logerror("joy 1 read, val: %02x, pc: %04x, bits read: %d, chan0: %08x\n", ret, cpu_get_pc(space->cpu), in_1.shift, in_1.i0);
 
 	in_1.shift++;
 	return ret;
@@ -393,7 +393,7 @@ static TIMER_CALLBACK( lightgun_tick )
 	}
 }
 
-WRITE8_HANDLER ( nes_IN0_w )
+WRITE8_HANDLER( nes_IN0_w )
 {
 	int cfg;
 	nes_input in_2;
@@ -402,7 +402,7 @@ WRITE8_HANDLER ( nes_IN0_w )
 	if (data & 0x01) return;
 
 	if (LOG_JOY)
-		logerror ("joy 0 bits read: %d\n", in_0.shift);
+		logerror("joy 0 bits read: %d\n", in_0.shift);
 
 	/* Toggling bit 0 high then low resets both controllers */
 	in_0.shift = 0;
@@ -428,7 +428,7 @@ WRITE8_HANDLER ( nes_IN0_w )
 
 
 
-WRITE8_HANDLER ( nes_IN1_w )
+WRITE8_HANDLER( nes_IN1_w )
 {
 }
 
@@ -450,7 +450,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 
 	if ((magic[0] != 'N') || (magic[1] != 'E') || (magic[2] != 'S'))
 	{
-		logerror("BAD section hit during LOAD ROM.\n");
+		logerror("%s is NOT a file in iNES format.\n", image_filename(image));
 		return INIT_FAIL;
 	}
 
@@ -458,7 +458,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 
 	if (mapinfo)
 	{
-		if (4 == sscanf(mapinfo,"%d %d %d %d",&mapint1,&mapint2,&mapint3,&mapint4))
+		if (4 == sscanf(mapinfo,"%d %d %d %d", &mapint1, &mapint2, &mapint3, &mapint4))
 		{
 			nes.mapper = mapint1;
 			local_options = mapint2;
@@ -481,12 +481,12 @@ DEVICE_IMAGE_LOAD( nes_cart )
 	{
 		// image_extrainfo() resets the file position back to start.
 		// Let's skip past the magic header once again.
-		image_fseek (image, 4, SEEK_SET);
+		image_fseek(image, 4, SEEK_SET);
 
-		image_fread (image, &nes.prg_chunks, 1);
-		image_fread (image, &nes.chr_chunks, 1);
+		image_fread(image, &nes.prg_chunks, 1);
+		image_fread(image, &nes.chr_chunks, 1);
 		/* Read the first ROM option byte (offset 6) */
-		image_fread (image, &m, 1);
+		image_fread(image, &m, 1);
 
 		/* Interpret the iNES header flags */
 		nes.mapper = (m & 0xf0) >> 4;
@@ -494,10 +494,10 @@ DEVICE_IMAGE_LOAD( nes_cart )
 
 
 		/* Read the second ROM option byte (offset 7) */
-		image_fread (image, &m, 1);
+		image_fread(image, &m, 1);
 
 		/* Check for skanky headers */
-		image_fread (image, &skank, 8);
+		image_fread(image, &skank, 8);
 
 		/* If the header has junk in the unused bytes, assume the extra mapper byte is also invalid */
 		/* We only check the first 4 unused bytes for now */
@@ -525,8 +525,8 @@ DEVICE_IMAGE_LOAD( nes_cart )
 	if (nes.four_screen_vram) logerror("-- 4-screen VRAM\n");
 
 	/* Free the regions that were allocated by the ROM loader */
-	memory_region_free (image->machine, "maincpu");
-	memory_region_free (image->machine, "gfx1");
+	memory_region_free(image->machine, "maincpu");
+	memory_region_free(image->machine, "gfx1");
 
 	/* Allocate them again with the proper size */
 	memory_region_alloc(image->machine, "maincpu", 0x10000 + (nes.prg_chunks + 1) * 0x4000,0);
@@ -539,23 +539,23 @@ DEVICE_IMAGE_LOAD( nes_cart )
 	nes.wram = memory_region(image->machine, "user1");
 
 	/* Position past the header */
-	image_fseek (image, 16, SEEK_SET);
+	image_fseek(image, 16, SEEK_SET);
 
 	/* Load the 0x200 byte trainer at 0x7000 if it exists */
 	if (nes.trainer)
 	{
-		image_fread (image, &nes.wram[0x1000], 0x200);
+		image_fread(image, &nes.wram[0x1000], 0x200);
 	}
 
 	/* Read in the program chunks */
 	if (nes.prg_chunks == 1)
 	{
-		image_fread (image, &nes.rom[0x14000], 0x4000);
+		image_fread(image, &nes.rom[0x14000], 0x4000);
 		/* Mirror this bank into $8000 */
-		memcpy (&nes.rom[0x10000], &nes.rom [0x14000], 0x4000);
+		memcpy(&nes.rom[0x10000], &nes.rom [0x14000], 0x4000);
 	}
 	else
-		image_fread (image, &nes.rom[0x10000], 0x4000 * nes.prg_chunks);
+		image_fread(image, &nes.rom[0x10000], 0x4000 * nes.prg_chunks);
 
 #if SPLIT_PRG
 	{
@@ -564,12 +564,12 @@ DEVICE_IMAGE_LOAD( nes_cart )
 
 		for (i = 0; i < nes.prg_chunks; i ++)
 		{
-			sprintf (outname, "%s.p%d", battery_name, i);
-			prgout = fopen (outname, "wb");
+			sprintf(outname, "%s.p%d", battery_name, i);
+			prgout = fopen(outname, "wb");
 			if (prgout)
 			{
-				fwrite (&nes.rom[0x10000 + 0x4000 * i], 1, 0x4000, prgout);
-				fclose (prgout);
+				fwrite(&nes.rom[0x10000 + 0x4000 * i], 1, 0x4000, prgout);
+				fclose(prgout);
 			}
 		}
 	}
@@ -582,7 +582,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 	/* Read in any chr chunks */
 	if (nes.chr_chunks > 0)
 	{
-		image_fread (image, nes.vrom, nes.chr_chunks * 0x2000);
+		image_fread(image, nes.vrom, nes.chr_chunks * 0x2000);
 		if (nes.mapper == 2)
 			logerror("Warning: VROM has been found in VRAM-based mapper. Either the mapper is set wrong or the ROM image is incorrect.\n");
 	}
@@ -634,20 +634,20 @@ DEVICE_IMAGE_LOAD(nes_disk)
 	if ((magic[0] == 'F') && (magic[1] == 'D') && (magic[2] == 'S'))
 	{
 		/* Skip past the redundant header */
-		image_fseek (image, 0x10, SEEK_SET);
+		image_fseek(image, 0x10, SEEK_SET);
 	}
 	else
 		/* otherwise, point to the start of the image */
-		image_fseek (image, 0, SEEK_SET);
+		image_fseek(image, 0, SEEK_SET);
 
 	/* read in all the sides */
-	while (!image_feof (image))
+	while (!image_feof(image))
 	{
 		nes_fds.sides ++;
 		nes_fds.data = image_realloc(image, nes_fds.data, nes_fds.sides * 65500);
 		if (!nes_fds.data)
 			return INIT_FAIL;
-		image_fread (image, nes_fds.data + ((nes_fds.sides - 1) * 65500), 65500);
+		image_fread(image, nes_fds.data + ((nes_fds.sides - 1) * 65500), 65500);
 	}
 
 	logerror("Number of sides: %d\n", nes_fds.sides);
