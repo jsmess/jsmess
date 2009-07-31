@@ -160,6 +160,121 @@ WRITE8_HANDLER( socrates_ram_bank_w )
  socrates_set_ram_bank( space->machine );
 }
 
+/* NTSC-based Palette stuff */
+// max for I and Q
+#define M_I 0.5957
+#define M_Q 0.5226 
+ /* luma amplitudes, measured on scope */
+#define LUMAMAX 1.420
+#define LUMA_COL_0 0.355, 0.139, 0.205, 0, 0.569, 0.355, 0.419, 0.205, 0.502, 0.288, 0.358, 0.142, 0.720, 0.502, 0.571, 0.358,
+#define LUMA_COL_COMMON 0.52, 0.52, 0.52, 0.52, 0.734, 0.734, 0.734, 0.734, 0.667, 0.667, 0.667, 0.667, 0.885, 0.885, 0.885, 0.885,
+#define LUMA_COL_2 0.574, 0.6565, 0.625, 0.71, 0.792, 0.87, 0.8425, 0.925, 0.724, 0.8055, 0.7825, 0.865, 0.94275, 1.0225, 0.99555, 1.07525,
+#define LUMA_COL_5 0.4585, 0.382, 0.4065, 0.337, 0.6715, 0.5975, 0.6205, 0.5465, 0.6075, 0.531, 0.5555, 0.45, 0.8255, 0.7455, 0.774, 0.6985,
+#define LUMA_COL_F 0.690, 0.904, 0.830, 1.053, 0.910, 1.120, 1.053, 1.270, 0.840, 1.053, 0.990, 1.202, 1.053, 1.270, 1.202, 1.420 
+ /* chroma amplitudes, measured on scope */
+#define CHROMAMAX 0.42075
+#define CHROMA_COL_COMMON 0.148, 0.3125, 0.26475, 0.42075, 0.148, 0.3125, 0.26475, 0.42075, 0.148, 0.3125, 0.26475, 0.42075, 0.148, 0.3125, 0.26475, 0.42075,
+#define CHROMA_COL_2 0.125125, 0.27525, 0.230225, 0.384875, 0.125125, 0.27525, 0.230225, 0.384875, 0.125125, 0.27525, 0.230225, 0.384875, 0.125125, 0.27525, 0.230225, 0.384875,
+#define CHROMA_COL_5 0.1235, 0.2695, 0.22625, 0.378, 0.1235, 0.2695, 0.22625, 0.378, 0.1235, 0.2695, 0.22625, 0.378, 0.1235, 0.2695, 0.22625, 0.378,
+// gamma: this needs to be messed with... may differ on different systems... attach to slider somehow?
+#define GAMMA 2.2 
+
+static rgb_t socrates_create_color(UINT8 color)
+{
+rgb_t composedcolor;
+double lumatable[256] = { 
+    LUMA_COL_0
+    LUMA_COL_COMMON
+    LUMA_COL_2
+    LUMA_COL_COMMON
+    LUMA_COL_COMMON
+    LUMA_COL_5
+    LUMA_COL_COMMON
+    LUMA_COL_COMMON
+    LUMA_COL_COMMON
+    LUMA_COL_COMMON
+    LUMA_COL_COMMON
+    LUMA_COL_COMMON
+    LUMA_COL_COMMON
+    LUMA_COL_COMMON
+    LUMA_COL_COMMON
+    LUMA_COL_F
+  };
+double chromaintensity[256] = { 
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+    CHROMA_COL_COMMON
+    CHROMA_COL_2
+    CHROMA_COL_COMMON
+    CHROMA_COL_COMMON
+    CHROMA_COL_5
+    CHROMA_COL_COMMON
+    CHROMA_COL_COMMON
+    CHROMA_COL_COMMON
+    CHROMA_COL_COMMON
+    CHROMA_COL_COMMON
+    CHROMA_COL_COMMON
+    CHROMA_COL_COMMON
+    CHROMA_COL_COMMON
+    CHROMA_COL_COMMON
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+  };
+  /* chroma colors and phases:
+     0: black-thru-grey (0 assumed chroma)
+     1: purple (90 chroma seems correct)
+     2: light blue/green (210 or 240 chroma, 210 seems slightly closer)
+     3: bright blue (150 seems correct)
+     4: green (270 seems correct)
+     5: red (30 seems correct, does have some blue in it)
+     6: orange (0 seems correct, does have some red in it)
+     7: yellow/gold (330 is closest but conflicts with color C, hence 315 seems close, and must have its own delay line separate from the other phases which use a standard 12 phase scheme)
+     8: blue with a hint of green in it (180 seems correct)
+     9: blue-green (210 seems correct)
+     A: forest green (240 seems correct)
+     B: yellow-green (300 seems correct)
+     C: yellow-orange (330 is close but this conflicts with color 7, and is not quite the same; color 7 has more green in it than color C)
+     D: magenta (60 is closest)
+     E: blue-purple (more blue than color 1, 120 is closest)
+     F: grey-thru-white (0 assumed chroma)
+  */
+  double phaseangle[16] = { 0, 90, 210, 150, 270, 30, 0, 315, 180, 210, 240, 300, 330, 60, 120, 0 }; // note: these are guessed, not measured yet!
+  int chromaindex = color&0x0F;
+  int swappedcolor = ((color&0xf0)>>4)|((color&0x0f)<<4);
+  double finalY, finalI, finalQ, finalR, finalG, finalB;
+  finalY = (1/LUMAMAX) * lumatable[swappedcolor];
+  finalI = (M_I * (cos((phaseangle[chromaindex]/180)*3.141592653589793)))* ((1/CHROMAMAX)*chromaintensity[swappedcolor]);
+  finalQ = (M_Q * (sin((phaseangle[chromaindex]/180)*3.141592653589793)))* ((1/CHROMAMAX)*chromaintensity[swappedcolor]);
+  if (finalY > 1) finalY = 1; // clamp luma
+  /* calculate the R, G and B values here, neato matrix math */
+  finalR = (finalY*1)+(finalI*0.9563)+(finalQ*0.6210);
+  finalG = (finalY*1)+(finalI*-0.2721)+(finalQ*-0.6474);
+  finalB = (finalY*1)+(finalI*-1.1070)+(finalQ*1.7046);
+  /* scale/clamp to 0-255 range */
+  if (finalR<0) finalR = 0;
+  if (finalR>1) finalR = 1;
+  if (finalG<0) finalG = 0;
+  if (finalG>1) finalG = 1;
+  if (finalB<0) finalB = 0;
+  if (finalB>1) finalB = 1;
+  // gamma correction: 1.0 to GAMMA:
+  finalR = pow(finalR, 1/GAMMA)*255;
+  finalG = pow(finalG, 1/GAMMA)*255;
+  finalB = pow(finalB, 1/GAMMA)*255;
+composedcolor = MAKE_RGB((int)finalR,(int)finalG,(int)finalB);
+return composedcolor;
+}
+
+static rgb_t socrates_palette[256] = {
+};
+
+PALETTE_INIT( socrates )
+{
+	int i; // iterator
+	for (i = 0; i < 256; i++)
+	{
+	 socrates_palette[i] = socrates_create_color(i);
+	}
+	palette_set_colors(machine, 0, socrates_palette, ARRAY_LENGTH(socrates_palette));
+}
 
 /******************************************************************************
  Address Maps
@@ -218,6 +333,14 @@ static MACHINE_DRIVER_START(socrates)
 
     /* video hardware */
 	MDRV_DEFAULT_LAYOUT(layout_socrates)
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(256, 228)
+	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 227)
+	MDRV_PALETTE_LENGTH(256)
+	MDRV_PALETTE_INIT(socrates)
 
     /* sound hardware */
 	//MDRV_SPEAKER_STANDARD_MONO("mono")
