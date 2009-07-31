@@ -104,6 +104,8 @@ static struct
 UINT8 data[8];
 UINT8 rom_bank;
 UINT8 ram_bank;
+UINT16 scroll_offset;
+UINT8* videoram;
 } socrates={ {0}};
 
 static void socrates_set_rom_bank( running_machine *machine )
@@ -158,6 +160,16 @@ WRITE8_HANDLER( socrates_ram_bank_w )
 {
  socrates.ram_bank = data;
  socrates_set_ram_bank( space->machine );
+}
+
+/* stuff below belongs in video/socrates.c */
+
+WRITE8_HANDLER( socrates_scroll_w )
+{
+ if (offset == 0)
+ socrates.scroll_offset = (socrates.scroll_offset&0x100) | data;
+ else
+ socrates.scroll_offset = (socrates.scroll_offset&0xFF) | ((data&1)<<8);
 }
 
 /* NTSC-based Palette stuff */
@@ -276,6 +288,37 @@ PALETTE_INIT( socrates )
 	palette_set_colors(machine, 0, socrates_palette, ARRAY_LENGTH(socrates_palette));
 }
 
+static VIDEO_START( socrates )
+{
+// dunno what to do here if anything
+	socrates.videoram = memory_region(machine, "vram");
+	socrates.scroll_offset = 0;
+}
+
+static VIDEO_UPDATE( socrates )
+{
+	UINT8 fixedcolors[8] =
+	{
+	0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0xF7
+	};
+	int x, y, colidx, color;
+	int lineoffset = 0; // if display ever tries to display data at 0xfxxx, offset line displayed by 0x1000
+	for (y = 0; y < 228; y++)
+	{
+		if ((((y+socrates.scroll_offset)*128)&0xffff) >= 0xf000) lineoffset = 0x1000; // see comment above
+		for (x = 0; x < 256; x++)
+		{
+			colidx = socrates.videoram[(((y+socrates.scroll_offset)*128)+(x>>1)+lineoffset)&0xffff];
+			if (x&1) colidx >>=4;
+			colidx &= 0xF;
+			if (colidx > 7) color=socrates.videoram[0xF000+(colidx<<8)+((y+socrates.scroll_offset)&0xFF)];
+			else color=fixedcolors[colidx];
+			*BITMAP_ADDR16(bitmap, y,  x) = color;
+		}
+	}
+	return 0;
+}
+
 /******************************************************************************
  Address Maps
 ******************************************************************************/
@@ -293,13 +336,13 @@ static ADDRESS_MAP_START(z80_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(socrates_rom_bank_r, socrates_rom_bank_w) AM_MIRROR(0x7) /* rom bank select - RW - 8 bits */
 	AM_RANGE(0x08, 0x08) AM_READWRITE(socrates_ram_bank_r, socrates_ram_bank_w) AM_MIRROR(0x7) /* ram banks select - RW - 4 low bits; Format: 0b****HHLL where LL controls whether window 0 points at ram area: 0b00: 0x0000-0x3fff; 0b01: 0x4000-0x7fff; 0b10: 0x8000-0xbfff; 0b11: 0xc000-0xffff. HH controls the same thing for window 1 */
 	AM_RANGE(0x10, 0x17) AM_NOP AM_MIRROR (0x8) /* sound section:
-        0x10 - W - frequency control for channel 1 (louder channel) - 01=high pitch, ff=low, write 0 to silence
-	0x11 - W - frequency control for channel 2 (softer channel) - 01=high pitch, ff=low, write 0 to silence
-	0x12 - volume control for channel 1
-	0x13 - volume control for channel 2
-	0x14-0x17 - ?DAC? related? makes noise when written to...
+        0x10 - W - frequency control for channel 1 (louder channel) - 01=high pitch, ff=low; time between 1->0/0->1 transitions = (XTAL_21_4772MHz/(512+256) / (freq_reg+1)) (note that this is double the actual frequency since each full low and high squarewave pulse is two transitions)
+	0x11 - W - frequency control for channel 2 (softer channel) - 01=high pitch, ff=low; same equation as above
+	0x12 - W - 0b****VVVV volume control for channel 1
+	0x13 - W - 0b****VVVV volume control for channel 2
+	0x14-0x17 - ?DAC? related? makes noise when written to... code implies 0x16 and 0x17 are mirrors of 0x14 and 0x15 respectively.
 	*/
-	AM_RANGE(0x20, 0x21) AM_NOP AM_MIRROR (0xe) /* graphics section:
+	AM_RANGE(0x20, 0x21) AM_WRITE(socrates_scroll_w) AM_MIRROR (0xe) /* graphics section:
 	0x20 - W - lsb offset of screen display
 	0x21 - W - msb offset of screen display
 	resulting screen line is one of 512 total offsets on 128-byte boundaries in the whole 64k ram
@@ -332,7 +375,7 @@ static MACHINE_DRIVER_START(socrates)
     MDRV_MACHINE_RESET(socrates)
 
     /* video hardware */
-	MDRV_DEFAULT_LAYOUT(layout_socrates)
+	//MDRV_DEFAULT_LAYOUT(layout_socrates)
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -341,10 +384,12 @@ static MACHINE_DRIVER_START(socrates)
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 227)
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_PALETTE_INIT(socrates)
+	MDRV_VIDEO_START(socrates)
+	MDRV_VIDEO_UPDATE(socrates)
 
     /* sound hardware */
 	//MDRV_SPEAKER_STANDARD_MONO("mono")
-	//MDRV_SOUND_ADD("soc_snd", SOCRATES, XTAL_21_4772MHz/(1024+512)) /* this is correct, as strange as it sounds. */
+	//MDRV_SOUND_ADD("soc_snd", SOCRATES, XTAL_21_4772MHz/(512+256)) /* this is correct, as strange as it sounds. */
 	//MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 
