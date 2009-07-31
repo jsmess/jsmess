@@ -5,11 +5,8 @@
 *  with dumping help from Kevin 'kevtris' Horton
 *  
 *  (driver structure copied from vtech1.c)
-TODO: (practically everything!)
-	hook up ram banking
-	hook up rom banking
-	fix layout to sane dimensions
-	write renderer (composite ntsc fun!) and hook up scroll regs
+TODO:
+	add waitstates for ram access (lack of this causes the system to run way too fast)
 	hook up cartridges using the bios system
 	hook up sound regs
 	find and hook up keyboard/mouse IR input
@@ -71,28 +68,14 @@ TODO: (practically everything!)
         E        0x8000-0xbfff      0xc000-0xffff
         F        0xc000-0xffff      0xc000-0xffff
 
-video output:
-1. read byte at address in vram
-2. compare the lower nybble >=8 or not
-3. if 2 is false, go to 6; if it is true, go to 4
-4. retrieve the value from ram address 0xFNLL where N is the nybble and LL is the low 8 bits of the current display line offset.
-5. take this newly retrieved byte and shift the bits out to video in the order 4 5 6 7 0 1 2 3 at the 2048-pixels-per-line rate. go to 7.
-6. take the retrieved byte and shift the bits out to video in the order 0 1 2 3 at the 1024-pixels-per-line rate.
-7. compare the upper nybble >= 8 or not
-8. if 7 is false, go to 11; if it is true, go to 9
-9. retrieve the value from ram address 0xFNLL where N is the nybble and LL is the low 8 bits of the current display line offset.
-10. take this newly retrieved byte and shift the bits out to video in the order 4 5 6 7 0 1 2 3 at the 2048-pixels-per-line rate. go to 12.
-11. take the retrieved byte and shift the bits out to video in the order 4 5 6 7 at the 1024-pixels-per-line rate.
-12. are we in hblank? if we are not in hblank or hblank is now over, increment the vram address and go to 1. otherwise, just go to 1.
-
-Yes, the above means that all colors, shades, etc produced by video are entirely composite ntsc artifacts.
-
 ******************************************************************************/
 
 /* Core includes */
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "socrates.lh"
+#include "sound/beep.h"
+
 
 /* Components */
 
@@ -134,6 +117,7 @@ DRIVER_INIT( socrates )
     /* fill vram with its init powerup bit pattern, so startup has the checkerboard screen */
     for (i = 0; i < 0x10000; i++)
         gfx[i] = (((i&0x1)?0x00:0xFF)^((i&0x100)?0x00:0xff));
+// init sound channels to both be on lowest pitch and max volume
 }
 
 READ8_HANDLER( socrates_rom_bank_r )
@@ -290,7 +274,6 @@ PALETTE_INIT( socrates )
 
 static VIDEO_START( socrates )
 {
-// dunno what to do here if anything
 	socrates.videoram = memory_region(machine, "vram");
 	socrates.scroll_offset = 0;
 }
@@ -319,6 +302,29 @@ static VIDEO_UPDATE( socrates )
 	return 0;
 }
 
+/* below belongs in sound/socrates.c */
+
+static WRITE8_HANDLER(socrates_sound_w)
+{
+	switch(offset)
+	{
+		case 0:
+		//beep_set_frequency(channel1, (int)((13982.6)/(data+1)));
+		break;
+		case 1:
+		//beep_set_frequency(channel2, (int)((13982.6)/(data+1)));
+		break;
+		case 2:
+		//beep_set_volume(channel1, data/4);
+		break;
+		case 3:
+		//beep_set_volume(channel2, data/8);
+		break;
+		case 4: case 5: case 6: case 7: default:
+		break;
+	}
+}
+
 /******************************************************************************
  Address Maps
 ******************************************************************************/
@@ -332,10 +338,11 @@ static ADDRESS_MAP_START(z80_mem, ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(z80_io, ADDRESS_SPACE_IO, 8)
+	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(socrates_rom_bank_r, socrates_rom_bank_w) AM_MIRROR(0x7) /* rom bank select - RW - 8 bits */
 	AM_RANGE(0x08, 0x08) AM_READWRITE(socrates_ram_bank_r, socrates_ram_bank_w) AM_MIRROR(0x7) /* ram banks select - RW - 4 low bits; Format: 0b****HHLL where LL controls whether window 0 points at ram area: 0b00: 0x0000-0x3fff; 0b01: 0x4000-0x7fff; 0b10: 0x8000-0xbfff; 0b11: 0xc000-0xffff. HH controls the same thing for window 1 */
-	AM_RANGE(0x10, 0x17) AM_NOP AM_MIRROR (0x8) /* sound section:
+	AM_RANGE(0x10, 0x17) AM_WRITE(socrates_sound_w) AM_MIRROR (0x8) /* sound section:
         0x10 - W - frequency control for channel 1 (louder channel) - 01=high pitch, ff=low; time between 1->0/0->1 transitions = (XTAL_21_4772MHz/(512+256) / (freq_reg+1)) (note that this is double the actual frequency since each full low and high squarewave pulse is two transitions)
 	0x11 - W - frequency control for channel 2 (softer channel) - 01=high pitch, ff=low; same equation as above
 	0x12 - W - 0b****VVVV volume control for channel 1
@@ -364,13 +371,26 @@ ADDRESS_MAP_END
 /******************************************************************************
  Machine Drivers
 ******************************************************************************/
+static TIMER_CALLBACK( clear_irq_cb )
+{
+	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
+}
+
+static INTERRUPT_GEN( assert_irq )
+{
+	cpu_set_input_line(device, 0, ASSERT_LINE);
+	timer_set(device->machine, cpu_clocks_to_attotime(device, 144), NULL, 0, clear_irq_cb);
+// 144 is a complete and total guess, need to properly measure how many clocks/microseconds the int line is high for.
+}
 
 static MACHINE_DRIVER_START(socrates)
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu", Z80, XTAL_21_4772MHz/6)  /* Toshiba TMPZ84C00AP @ 3.579545 MHz, verified, xtal is divided by 6 */
+    //MDRV_CPU_ADD("maincpu", Z80, XTAL_21_4772MHz/6)  /* Toshiba TMPZ84C00AP @ 3.579545 MHz, verified, xtal is divided by 6 */
+    MDRV_CPU_ADD("maincpu", Z80, XTAL_21_4772MHz/12)  /* HACK to make system run at roughly the right speed until waitstates are done */
     MDRV_CPU_PROGRAM_MAP(z80_mem)
     MDRV_CPU_IO_MAP(z80_io)
     MDRV_QUANTUM_TIME(HZ(60))
+    MDRV_CPU_VBLANK_INT("screen", assert_irq)
     //MDRV_MACHINE_START(socrates)
     MDRV_MACHINE_RESET(socrates)
 
@@ -389,8 +409,10 @@ static MACHINE_DRIVER_START(socrates)
 
     /* sound hardware */
 	//MDRV_SPEAKER_STANDARD_MONO("mono")
+	//MDRV_SOUND_ADD("beep", BEEP, 0)
+	//MDRV_SOUND_ADD("beep2", BEEP, 0)
 	//MDRV_SOUND_ADD("soc_snd", SOCRATES, XTAL_21_4772MHz/(512+256)) /* this is correct, as strange as it sounds. */
-	//MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	//MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
 
 MACHINE_DRIVER_END
