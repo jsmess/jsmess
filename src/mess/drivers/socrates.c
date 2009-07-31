@@ -89,6 +89,9 @@ UINT8 rom_bank;
 UINT8 ram_bank;
 UINT16 scroll_offset;
 UINT8* videoram;
+UINT8 kb_latch_low;
+UINT8 kb_latch_high;
+UINT8 kb_latch_mouse;
 } socrates={ {0}};
 
 static void socrates_set_rom_bank( running_machine *machine )
@@ -108,6 +111,9 @@ MACHINE_RESET( socrates )
  socrates_set_rom_bank( machine );
  socrates.ram_bank = 0;  // the actual console sets it semi randomly on power up, and the bios cleans it up.
  socrates_set_ram_bank( machine );
+ socrates.kb_latch_low = 0; // this is really random on startup but its best to set it to the 'sane' 00 01 value
+ socrates.kb_latch_high = 1; // this is really random on startup but its best to set it to the 'sane' 00 01 value
+ socrates.kb_latch_mouse = 0;
 }
 
 DRIVER_INIT( socrates )
@@ -159,17 +165,30 @@ WRITE8_HANDLER( unknownlatch_30 ) // writes to i/o 0x3x do SOMETHING, probably r
 
 READ8_HANDLER( socrates_keyboard_50_r ) // keyboard code low
 {
- return 0x00; // write me!
+ return socrates.kb_latch_low;
 }
 
 READ8_HANDLER( socrates_keyboard_51_r ) // keyboard code high
 {
- return 0x01; // write me!
+ return socrates.kb_latch_high;
 }
 
-WRITE8_HANDLER( socrates_keyboard_reset ) // keyboard latch reset
+WRITE8_HANDLER( socrates_keyboard_clear ) // keyboard latch clear (or show mouse coords next if they have updated)
 {
-//popmessage("kb latch reset!");
+	if ((data&0x2) == 0x2)
+	{
+		if (socrates.kb_latch_mouse == 0)
+		{
+			socrates.kb_latch_low = 0;
+			socrates.kb_latch_high = 1;
+		}
+		else
+		{
+			socrates.kb_latch_low = socrates.kb_latch_mouse&0xFF; // y coord
+			socrates.kb_latch_high = (socrates.kb_latch_mouse&0xFF00)>>8; // x coord
+			socrates.kb_latch_mouse = 0;
+		}
+	}
 }
 
 WRITE8_HANDLER( unknown_6x ) // writes to i/o 0x6x happens on startup once, with 0x01. no idea what it does.
@@ -204,7 +223,7 @@ WRITE8_HANDLER( socrates_scroll_w )
 #define CHROMA_COL_2 0.125125, 0.27525, 0.230225, 0.384875, 0.125125, 0.27525, 0.230225, 0.384875, 0.125125, 0.27525, 0.230225, 0.384875, 0.125125, 0.27525, 0.230225, 0.384875,
 #define CHROMA_COL_5 0.1235, 0.2695, 0.22625, 0.378, 0.1235, 0.2695, 0.22625, 0.378, 0.1235, 0.2695, 0.22625, 0.378, 0.1235, 0.2695, 0.22625, 0.378,
 // gamma: this needs to be messed with... may differ on different systems... attach to slider somehow?
-#define GAMMA 1.3 
+#define GAMMA 1.5 
 
 static rgb_t socrates_create_color(UINT8 color)
 {
@@ -386,8 +405,8 @@ static ADDRESS_MAP_START(z80_io, ADDRESS_SPACE_IO, 8)
 	*/
 	AM_RANGE(0x30, 0x30) AM_READWRITE(read_f3, unknownlatch_30) AM_MIRROR (0xf) /* unknown, write only */
 	//AM_RANGE(0x40, 0x40) AM_RAM AM_MIRROR(0xF)/* unknown, read and write low 4 bits plus bit 5, bit 7 seems to be fixed at 0, bit 6 and 4 are fixed at 1? is this some sort of control register for timers perhaps? gets a slew of data written to it a few times during startup, may be IR or timer related? */
-	AM_RANGE(0x50, 0x50) AM_READWRITE(socrates_keyboard_50_r, socrates_keyboard_reset) AM_MIRROR(0xE) /* Keyboard keycode low, latched on keypress, can only be unlatched by writing 00 here */
-	AM_RANGE(0x51, 0x51) AM_READ(socrates_keyboard_51_r) AM_MIRROR(0xE) /* Keyboard keycode high, latched as above */
+	AM_RANGE(0x50, 0x50) AM_READWRITE(socrates_keyboard_50_r, socrates_keyboard_clear) AM_MIRROR(0xE) /* Keyboard keycode low, latched on keypress, can only be unlatched by writing 0F here */
+	AM_RANGE(0x51, 0x51) AM_READWRITE(socrates_keyboard_51_r, socrates_keyboard_clear) AM_MIRROR(0xE) /* Keyboard keycode high, latched as above */
 	AM_RANGE(0x60, 0x60) AM_READWRITE(read_f3, unknown_6x) AM_MIRROR(0xF) /* unknown, write only  */
 	AM_RANGE(0x70, 0xFF) AM_READ(read_f3) // nothing mapped here afaik
 ADDRESS_MAP_END
@@ -397,7 +416,88 @@ ADDRESS_MAP_END
  Input Ports
 ******************************************************************************/
 
-
+/* socrates keyboard codes:
+keycode low
+|   keycode high
+|   |   key name
+00	01	No key pressed
+// pads on the sides of the kb; this acts like a giant bitfield, both dpads/buttons can send data at once
+00	81	left dpad right
+00	82	left dpad up 
+00	84	left dpad down
+00	88	left dpad left
+01	80	right dpad down
+02	80	right dpad left
+04	80	right dpad up
+08	80	right dpad right
+10	80	left red button
+20	80	right red button
+// top row (right to left)
+44	82	ENTER
+44	83	MENU
+44	84	ANSWER
+44	85	HELP
+44	86	ERASE
+44	87	divide_sign
+44	88	multiply_sign
+44	89	minus_sign
+44	80	plus_sign
+//second row (right to left)
+43	81	0
+43	82	9
+43	83	8
+43	84	7
+43	85	6
+43	86	5
+43	87	4
+43	88	3
+43	89	2
+43	80	1
+// third row (right to left)
+42	82	I/La
+42	83	H/So
+42	84	G/Fa
+42	85	F/Mi
+42	86	E/Re
+42	87	D/Do
+42	88	C/Ti.
+42	89	B/La.
+42	80	A/So.
+42	81	hyphen/period
+// fourth row (right to left)
+41	81	S
+41	82	R
+41	83	Q/NEW
+41	84	P/PLAY
+41	85	O/PAUSE
+41	86	N/Fa`
+41	87	M/Mi`
+41	88	L/Re`
+41	89	K/Do`
+41	80	J/Ti
+// fifth row (right to left)
+40	82	SPACE
+40	83	Z
+40	84	Y
+40	85	X
+40	86	W
+40	87	V
+40	88	U
+40	89	T
+50	80	SHIFT
+// socrates mouse pad (separate from keyboard)
+8x	8y	mouse movement
+x: down = 1 (small) thru 7 (large), up = 8 (small) thru F (large)
+y: right = 1 (small) thru 7 (large), left = 8 (small) thru F (large)
+90	80	right click
+A0	80	left click
+B0	80	both buttons click
+90	81	right click (mouse movement in queue, will be in regs after next latch clear)
+A0	81	left click (mouse movement in queue, will be in regs after next latch clear)
+B0	81	both buttons click (mouse movement in queue, will be in regs after next latch clear)
+// socrates touch pad
+// unknown yet, but probably uses the 60/70/c0/d0/e0/f0 low reg vals
+*/
 
 /******************************************************************************
  Machine Drivers
