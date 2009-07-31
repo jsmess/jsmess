@@ -74,7 +74,7 @@ TODO:
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "socrates.lh"
-#include "sound/beep.h"
+//#include "sound/beep.h"
 
 
 /* Components */
@@ -118,6 +118,7 @@ DRIVER_INIT( socrates )
     for (i = 0; i < 0x10000; i++)
         gfx[i] = (((i&0x1)?0x00:0xFF)^((i&0x100)?0x00:0xff));
 // init sound channels to both be on lowest pitch and max volume
+    cpu_set_clockscale(cputag_get_cpu(machine, "maincpu"), 0.45f); /* RAM access waitstates etc. aren't emulated - slow the CPU to compensate */
 }
 
 READ8_HANDLER( socrates_rom_bank_r )
@@ -385,8 +386,7 @@ static INTERRUPT_GEN( assert_irq )
 
 static MACHINE_DRIVER_START(socrates)
     /* basic machine hardware */
-    //MDRV_CPU_ADD("maincpu", Z80, XTAL_21_4772MHz/6)  /* Toshiba TMPZ84C00AP @ 3.579545 MHz, verified, xtal is divided by 6 */
-    MDRV_CPU_ADD("maincpu", Z80, XTAL_21_4772MHz/12)  /* HACK to make system run at roughly the right speed until waitstates are done */
+    MDRV_CPU_ADD("maincpu", Z80, XTAL_21_4772MHz/6)  /* Toshiba TMPZ84C00AP @ 3.579545 MHz, verified, xtal is divided by 6 */
     MDRV_CPU_PROGRAM_MAP(z80_mem)
     MDRV_CPU_IO_MAP(z80_io)
     MDRV_QUANTUM_TIME(HZ(60))
