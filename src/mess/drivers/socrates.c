@@ -137,14 +137,44 @@ WRITE8_HANDLER( socrates_rom_bank_w )
 READ8_HANDLER( socrates_ram_bank_r )
 {
  UINT8 data = 0xFF;
- data = socrates.ram_bank | 0xF0;
+ data = socrates.ram_bank;
  return data;
 }
 
 WRITE8_HANDLER( socrates_ram_bank_w )
 {
- socrates.ram_bank = data;
+ socrates.ram_bank = data&0xF;
  socrates_set_ram_bank( space->machine );
+}
+
+READ8_HANDLER( read_f3 ) // used for read-only i/o ports as mame/mess doesn't have a way to set the unmapped area to read as 0xF3
+{
+ return 0xF3;
+}
+
+WRITE8_HANDLER( unknownlatch_30 ) // writes to i/o 0x3x do SOMETHING, probably reset a latch, but I don't know yet
+{
+//popmessage("write to i/o 0x30");
+}
+
+READ8_HANDLER( socrates_keyboard_50_r ) // keyboard code low
+{
+ return 0x00; // write me!
+}
+
+READ8_HANDLER( socrates_keyboard_51_r ) // keyboard code high
+{
+ return 0x01; // write me!
+}
+
+WRITE8_HANDLER( socrates_keyboard_reset ) // keyboard latch reset
+{
+//popmessage("kb latch reset!");
+}
+
+WRITE8_HANDLER( unknown_6x ) // writes to i/o 0x6x happens on startup once, with 0x01. no idea what it does.
+{
+//popmessage("write to i/o 0x60");
 }
 
 /* stuff below belongs in video/socrates.c */
@@ -174,7 +204,7 @@ WRITE8_HANDLER( socrates_scroll_w )
 #define CHROMA_COL_2 0.125125, 0.27525, 0.230225, 0.384875, 0.125125, 0.27525, 0.230225, 0.384875, 0.125125, 0.27525, 0.230225, 0.384875, 0.125125, 0.27525, 0.230225, 0.384875,
 #define CHROMA_COL_5 0.1235, 0.2695, 0.22625, 0.378, 0.1235, 0.2695, 0.22625, 0.378, 0.1235, 0.2695, 0.22625, 0.378, 0.1235, 0.2695, 0.22625, 0.378,
 // gamma: this needs to be messed with... may differ on different systems... attach to slider somehow?
-#define GAMMA 2.0 
+#define GAMMA 1.3 
 
 static rgb_t socrates_create_color(UINT8 color)
 {
@@ -342,23 +372,24 @@ static ADDRESS_MAP_START(z80_io, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(socrates_rom_bank_r, socrates_rom_bank_w) AM_MIRROR(0x7) /* rom bank select - RW - 8 bits */
 	AM_RANGE(0x08, 0x08) AM_READWRITE(socrates_ram_bank_r, socrates_ram_bank_w) AM_MIRROR(0x7) /* ram banks select - RW - 4 low bits; Format: 0b****HHLL where LL controls whether window 0 points at ram area: 0b00: 0x0000-0x3fff; 0b01: 0x4000-0x7fff; 0b10: 0x8000-0xbfff; 0b11: 0xc000-0xffff. HH controls the same thing for window 1 */
-	AM_RANGE(0x10, 0x17) AM_WRITE(socrates_sound_w) AM_MIRROR (0x8) /* sound section:
+	AM_RANGE(0x10, 0x17) AM_READWRITE(read_f3, socrates_sound_w) AM_MIRROR (0x8) /* sound section:
         0x10 - W - frequency control for channel 1 (louder channel) - 01=high pitch, ff=low; time between 1->0/0->1 transitions = (XTAL_21_4772MHz/(512+256) / (freq_reg+1)) (note that this is double the actual frequency since each full low and high squarewave pulse is two transitions)
 	0x11 - W - frequency control for channel 2 (softer channel) - 01=high pitch, ff=low; same equation as above
 	0x12 - W - 0b****VVVV volume control for channel 1
 	0x13 - W - 0b****VVVV volume control for channel 2
 	0x14-0x17 - ?DAC? related? makes noise when written to... code implies 0x16 and 0x17 are mirrors of 0x14 and 0x15 respectively.
 	*/
-	AM_RANGE(0x20, 0x21) AM_WRITE(socrates_scroll_w) AM_MIRROR (0xe) /* graphics section:
+	AM_RANGE(0x20, 0x21) AM_READWRITE(read_f3, socrates_scroll_w) AM_MIRROR (0xe) /* graphics section:
 	0x20 - W - lsb offset of screen display
 	0x21 - W - msb offset of screen display
 	resulting screen line is one of 512 total offsets on 128-byte boundaries in the whole 64k ram
 	*/
-	AM_RANGE(0x30, 0x30) AM_NOP /* unknown, write only */
-	AM_RANGE(0x40, 0x40) AM_RAM AM_MIRROR(0xF)/* unknown, read and write low 4 bits plus bit 5, bit 7 seems to be fixed at 0, bit 6 and 4 are fixed at 1? is this some sort of control register for timers perhaps? gets a slew of data written to it a few times during startup, may be IR related? */
-	AM_RANGE(0x50, 0x50) AM_RAM AM_MIRROR(0xE) /* unknown, read and write (bits?) reads serially shift 1 bit somewhere? */
-	AM_RANGE(0x51, 0x51) AM_RAM AM_MIRROR(0xE) /* unknown, read and write (bits?) reads serially shift 1 bit somewhere? */
-	AM_RANGE(0x60, 0x60) AM_NOP AM_MIRROR(0xF) /* unknown, write only  */
+	AM_RANGE(0x30, 0x30) AM_READWRITE(read_f3, unknownlatch_30) AM_MIRROR (0xf) /* unknown, write only */
+	//AM_RANGE(0x40, 0x40) AM_RAM AM_MIRROR(0xF)/* unknown, read and write low 4 bits plus bit 5, bit 7 seems to be fixed at 0, bit 6 and 4 are fixed at 1? is this some sort of control register for timers perhaps? gets a slew of data written to it a few times during startup, may be IR or timer related? */
+	AM_RANGE(0x50, 0x50) AM_READWRITE(socrates_keyboard_50_r, socrates_keyboard_reset) AM_MIRROR(0xE) /* Keyboard keycode low, latched on keypress, can only be unlatched by writing 00 here */
+	AM_RANGE(0x51, 0x51) AM_READ(socrates_keyboard_51_r) AM_MIRROR(0xE) /* Keyboard keycode high, latched as above */
+	AM_RANGE(0x60, 0x60) AM_READWRITE(read_f3, unknown_6x) AM_MIRROR(0xF) /* unknown, write only  */
+	AM_RANGE(0x70, 0xFF) AM_READ(read_f3) // nothing mapped here afaik
 ADDRESS_MAP_END
 
 
