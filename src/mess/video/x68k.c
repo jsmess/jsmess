@@ -794,9 +794,15 @@ static void x68k_draw_text(running_machine* machine,bitmap_t* bitmap, int xscr, 
 				+ (((x68k_tvram[loc+0x10000] >> bit) & 0x01) ? 2 : 0)
 				+ (((x68k_tvram[loc+0x20000] >> bit) & 0x01) ? 4 : 0)
 				+ (((x68k_tvram[loc+0x30000] >> bit) & 0x01) ? 8 : 0);
-			//if(palette_get_color(machine,0x100 + colour) != 0xff000000)  // any colour but black
-			if(colour != 0)
-				*BITMAP_ADDR16(bitmap,line,pixel) = 512 + (x68k_sys.video.text_pal[colour] >> 1);
+			if(x68k_sys.video.text_pal[colour] != 0x0000)  // any colour but black
+			{
+				// Colour 0 is displayable if the text layer is at the priority level 2
+				if(colour == 0 && (x68k_sys.video.reg[1] & 0x0c00) == 0x0800)
+					*BITMAP_ADDR16(bitmap,line,pixel) = 512 + (x68k_sys.video.text_pal[colour] >> 1);
+				else
+					if(colour != 0)
+						*BITMAP_ADDR16(bitmap,line,pixel) = 512 + (x68k_sys.video.text_pal[colour] >> 1);
+			}
 			bit--;
 			if(bit < 0)
 			{
@@ -1089,6 +1095,9 @@ VIDEO_UPDATE( x68000 )
 //	rect.max_y=x68k_sys.crtc.height;
 	bitmap_fill(bitmap,cliprect,0);
 
+	if(x68k_sys.sysport.contrast == 0)  // if monitor contrast is 0, then don't bother displaying anything
+		return 0;
+
 	rect.min_x=x68k_sys.crtc.hbegin;
 	rect.min_y=x68k_sys.crtc.vbegin;
 //	rect.max_x=rect.min_x + x68k_sys.crtc.visible_width-1;
@@ -1211,7 +1220,6 @@ VIDEO_UPDATE( x68000 )
 //	popmessage("Layer enable - 0x%02x",x68k_sys.video.reg[2] & 0xff);
 //	popmessage("Graphic layer scroll - %i, %i - %i, %i - %i, %i - %i, %i",
 //		x68k_sys.crtc.reg[12],x68k_sys.crtc.reg[13],x68k_sys.crtc.reg[14],x68k_sys.crtc.reg[15],x68k_sys.crtc.reg[16],x68k_sys.crtc.reg[17],x68k_sys.crtc.reg[18],x68k_sys.crtc.reg[19]);
-//	popmessage("Video Controller registers - %04x - %04x - %04x",x68k_sys.video.reg[0],x68k_sys.video.reg[1],x68k_sys.video.reg[2]);
 //	popmessage("IOC IRQ status - %02x",x68k_sys.ioc.irqstatus);
 //	popmessage("RAM: mouse data - %02x %02x %02x %02x",mess_ram[0x931],mess_ram[0x930],mess_ram[0x933],mess_ram[0x932]);
 #endif
