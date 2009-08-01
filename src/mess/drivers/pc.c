@@ -379,8 +379,7 @@ static ADDRESS_MAP_START(tandy1000_16_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc0000, 0xc7fff) AM_NOP
 	AM_RANGE(0xc8000, 0xc9fff) AM_ROM
 	AM_RANGE(0xca000, 0xcffff) AM_NOP
-	AM_RANGE(0xd0000, 0xeffff) AM_ROM AM_REGION("maincpu", 0x60000)	/* This should become AM_ROMBANK(x) */
-	AM_RANGE(0xd0000, 0xeffff) AM_ROMBANK(11)						/* Banked part of the BIOS */
+	AM_RANGE(0xe0000, 0xeffff) AM_ROMBANK(11)						/* Banked part of the BIOS */
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("maincpu", 0x70000)
 ADDRESS_MAP_END
 
