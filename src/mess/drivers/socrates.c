@@ -105,6 +105,42 @@ static void socrates_set_ram_bank( running_machine *machine )
  memory_set_bankptr( machine, 3, memory_region(machine, "vram") + ( ((socrates.ram_bank&0xC)>>2) * 0x4000 )); // window 1
 }
 
+static void socrates_update_kb( running_machine *machine )
+{
+	static const char *const rownames[] = { "keyboard_40", "keyboard_41", "keyboard_42", "keyboard_43", "keyboard_44" };
+	int row, keyvalue, powerof2;
+	int shift = 0;
+	// first check that the kb latch is clear; if it isn't, don't touch it!
+	if ((socrates.kb_latch_low != 0) || (socrates.kb_latch_high != 1)) return;
+	// next check for mouse movement.
+	// this isn't written yet, so write me please!
+	// next check if shift is down
+	shift = input_port_read(machine, "keyboard_50");
+	// find key low and high byte
+	for (row = 4; row>=0; row--)
+	{
+		keyvalue = input_port_read(machine, rownames[row]);
+		if (keyvalue != 0)
+		{
+			for (powerof2 = 9; powerof2 >= 0; powerof2--)
+			{
+				if ((keyvalue&(1<<powerof2)) == (1<<powerof2))
+				{
+					socrates.kb_latch_low = (shift?0x50:0x40)+row;
+					socrates.kb_latch_high = (0x80 | powerof2);
+					return; // get out of the for loop. due to the way key priorities work, we're done here.
+				}
+			}
+		}
+	}
+	// no key was pressed... check if shift was hit then?
+	if (shift != 0)
+	{
+		socrates.kb_latch_low = 0x50;
+		socrates.kb_latch_high = 0x80;
+	}
+}
+
 MACHINE_RESET( socrates )
 {
  socrates.rom_bank = 0; // actually set semi-randomly on real console but we need to initialize it somewhere...
@@ -158,42 +194,59 @@ READ8_HANDLER( read_f3 ) // used for read-only i/o ports as mame/mess doesn't ha
  return 0xF3;
 }
 
-WRITE8_HANDLER( unknownlatch_30 ) // writes to i/o 0x3x do SOMETHING, probably reset a latch, but I don't know yet
+WRITE8_HANDLER( unknownlatch_30 ) // writes to i/o 0x3x do SOMETHING, possibly waitstate related (may halt cpu until vblank start?)
 {
-//popmessage("write to i/o 0x30");
+logerror("write to i/o 0x30");
 }
 
-READ8_HANDLER( socrates_keyboard_50_r ) // keyboard code low
+READ8_HANDLER( read_40 ) // read 0x4x, some sort of status reg
 {
+// bit 7 - unknown, never seems to be set
+// bit 6 - unknown, sometimes set sometimes clear
+// bit 5 - timer expired? status, sometimes set sometimes clear
+// bit 4 - vblank? status, sometimes set sometimes clear
+// bit 3 - unknown, sometimes set sometimes clear
+// bit 2 - unknown, sometimes set sometimes clear
+// bit 1 - unknown, sometimes set sometimes clear
+// bit 0 - unknown, sometimes set sometimes clear
+ return mame_rand(space->machine)&0x7f;
+}
+
+WRITE8_HANDLER( write_40 ) // write 0x4x
+{
+logerror("write to i/o 0x4x of %x", data);
+}
+
+READ8_HANDLER( socrates_keyboard_low_r ) // keyboard code low
+{
+ socrates_update_kb( space->machine );
  return socrates.kb_latch_low;
 }
 
-READ8_HANDLER( socrates_keyboard_51_r ) // keyboard code high
+READ8_HANDLER( socrates_keyboard_high_r ) // keyboard code high
 {
+ socrates_update_kb( space->machine );
  return socrates.kb_latch_high;
 }
 
 WRITE8_HANDLER( socrates_keyboard_clear ) // keyboard latch clear (or show mouse coords next if they have updated)
 {
-	if ((data&0x2) == 0x2)
+	if (socrates.kb_latch_mouse == 0)
 	{
-		if (socrates.kb_latch_mouse == 0)
-		{
-			socrates.kb_latch_low = 0;
-			socrates.kb_latch_high = 1;
-		}
-		else
-		{
-			socrates.kb_latch_low = socrates.kb_latch_mouse&0xFF; // y coord
-			socrates.kb_latch_high = (socrates.kb_latch_mouse&0xFF00)>>8; // x coord
-			socrates.kb_latch_mouse = 0;
-		}
+		socrates.kb_latch_low = 0;
+		socrates.kb_latch_high = 1;
+	}
+	else
+	{
+		socrates.kb_latch_low = socrates.kb_latch_mouse&0xFF; // y coord
+		socrates.kb_latch_high = (socrates.kb_latch_mouse&0xFF00)>>8; // x coord
+		socrates.kb_latch_mouse = 0;
 	}
 }
 
 WRITE8_HANDLER( unknown_6x ) // writes to i/o 0x6x happens on startup once, with 0x01. no idea what it does.
 {
-//popmessage("write to i/o 0x60");
+logerror("write to i/o 0x60 of %x",data);
 }
 
 /* stuff below belongs in video/socrates.c */
@@ -223,7 +276,7 @@ WRITE8_HANDLER( socrates_scroll_w )
 #define CHROMA_COL_2 0.125125, 0.27525, 0.230225, 0.384875, 0.125125, 0.27525, 0.230225, 0.384875, 0.125125, 0.27525, 0.230225, 0.384875, 0.125125, 0.27525, 0.230225, 0.384875,
 #define CHROMA_COL_5 0.1235, 0.2695, 0.22625, 0.378, 0.1235, 0.2695, 0.22625, 0.378, 0.1235, 0.2695, 0.22625, 0.378, 0.1235, 0.2695, 0.22625, 0.378,
 // gamma: this needs to be messed with... may differ on different systems... attach to slider somehow?
-#define GAMMA 1.5 
+#define GAMMA 1.5
 
 static rgb_t socrates_create_color(UINT8 color)
 {
@@ -282,7 +335,7 @@ double chromaintensity[256] = {
      E: blue-purple (more blue than color 1, 120 is closest)
      F: grey-thru-white (0 assumed chroma)
   */
-  double phaseangle[16] = { 0, 90, 210, 150, 270, 30, 0, 315, 180, 210, 240, 300, 330, 60, 120, 0 }; // note: these are guessed, not measured yet!
+  double phaseangle[16] = { 0, 90, 220, 150, 270, 40, 0, 315, 180, 210, 240, 300, 330, 60, 120, 0 }; // note: these are guessed, not measured yet!
   int chromaindex = color&0x0F;
   int swappedcolor = ((color&0xf0)>>4)|((color&0x0f)<<4);
   double finalY, finalI, finalQ, finalR, finalG, finalB;
@@ -338,14 +391,26 @@ static VIDEO_UPDATE( socrates )
 	for (y = 0; y < 228; y++)
 	{
 		if ((((y+socrates.scroll_offset)*128)&0xffff) >= 0xf000) lineoffset = 0x1000; // see comment above
-		for (x = 0; x < 256; x++)
+		for (x = 0; x < 264; x++)
 		{
-			colidx = socrates.videoram[(((y+socrates.scroll_offset)*128)+(x>>1)+lineoffset)&0xffff];
-			if (x&1) colidx >>=4;
-			colidx &= 0xF;
-			if (colidx > 7) color=socrates.videoram[0xF000+(colidx<<8)+((y+socrates.scroll_offset)&0xFF)];
-			else color=fixedcolors[colidx];
-			*BITMAP_ADDR16(bitmap, y,  x) = color;
+			if (x < 256)
+			{
+				colidx = socrates.videoram[(((y+socrates.scroll_offset)*128)+(x>>1)+lineoffset)&0xffff];
+				if (x&1) colidx >>=4;
+				colidx &= 0xF;
+				if (colidx > 7) color=socrates.videoram[0xF000+(colidx<<8)+((y+socrates.scroll_offset)&0xFF)];
+				else color=fixedcolors[colidx];
+				*BITMAP_ADDR16(bitmap, y,  x) = color;
+			}
+			else
+			{
+				colidx = socrates.videoram[(((y+socrates.scroll_offset)*128)+(127)+lineoffset)&0xffff];
+				colidx >>=4;
+				colidx &= 0xF;
+				if (colidx > 7) color=socrates.videoram[0xF000+(colidx<<8)+((y+socrates.scroll_offset)&0xFF)];
+				else color=fixedcolors[colidx];
+				*BITMAP_ADDR16(bitmap, y,  x) = color;
+			}
 		}
 	}
 	return 0;
@@ -403,10 +468,10 @@ static ADDRESS_MAP_START(z80_io, ADDRESS_SPACE_IO, 8)
 	0x21 - W - msb offset of screen display
 	resulting screen line is one of 512 total offsets on 128-byte boundaries in the whole 64k ram
 	*/
-	AM_RANGE(0x30, 0x30) AM_READWRITE(read_f3, unknownlatch_30) AM_MIRROR (0xf) /* unknown, write only */
-	//AM_RANGE(0x40, 0x40) AM_RAM AM_MIRROR(0xF)/* unknown, read and write low 4 bits plus bit 5, bit 7 seems to be fixed at 0, bit 6 and 4 are fixed at 1? is this some sort of control register for timers perhaps? gets a slew of data written to it a few times during startup, may be IR or timer related? */
-	AM_RANGE(0x50, 0x50) AM_READWRITE(socrates_keyboard_50_r, socrates_keyboard_clear) AM_MIRROR(0xE) /* Keyboard keycode low, latched on keypress, can only be unlatched by writing 0F here */
-	AM_RANGE(0x51, 0x51) AM_READWRITE(socrates_keyboard_51_r, socrates_keyboard_clear) AM_MIRROR(0xE) /* Keyboard keycode high, latched as above */
+	AM_RANGE(0x30, 0x30) AM_READWRITE(read_f3, unknownlatch_30) AM_MIRROR (0xf) /* unknown, write only. may relate to waitstate timing? */
+	AM_RANGE(0x40, 0x40) AM_READWRITE(read_40, write_40) AM_MIRROR(0xf) /* unknown, some sort of status/control register, speech may work through this. */
+	AM_RANGE(0x50, 0x50) AM_READWRITE(socrates_keyboard_low_r, socrates_keyboard_clear) AM_MIRROR(0xE) /* Keyboard keycode low, latched on keypress, can be unlatched by writing anything here */
+	AM_RANGE(0x51, 0x51) AM_READWRITE(socrates_keyboard_high_r, socrates_keyboard_clear) AM_MIRROR(0xE) /* Keyboard keycode high, latched as above, unlatches same as above */
 	AM_RANGE(0x60, 0x60) AM_READWRITE(read_f3, unknown_6x) AM_MIRROR(0xF) /* unknown, write only  */
 	AM_RANGE(0x70, 0xFF) AM_READ(read_f3) // nothing mapped here afaik
 ADDRESS_MAP_END
@@ -498,6 +563,79 @@ B0	81	both buttons click (mouse movement in queue, will be in regs after next la
 // socrates touch pad
 // unknown yet, but probably uses the 60/70/c0/d0/e0/f0 low reg vals
 */
+static INPUT_PORTS_START( socrates )
+
+	PORT_START("keyboard_50") // lowest 'row' (technically the shift key is on the 5th row but it has its own keycode)
+	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1) PORT_NAME("SHIFT") // 5x xx
+	PORT_BIT(0xfffffffe, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("keyboard_40") // 5th row
+	PORT_BIT(0x00000003, IP_ACTIVE_HIGH, IPT_UNUSED) // 40 80 and 40 81
+	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ') PORT_NAME("SPACE") // 40 82
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z) PORT_CHAR('Z') PORT_NAME("Z") // 40 83
+	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y) PORT_CHAR('Y') PORT_NAME("Y") // 40 84
+	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_X) PORT_CHAR('X') PORT_NAME("X") // 40 85
+	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_W) PORT_CHAR('W') PORT_NAME("W") // 40 86
+	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_V) PORT_CHAR('V') PORT_NAME("V") // 40 87
+	PORT_BIT(0x00000100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_U) PORT_CHAR('U') PORT_NAME("U") // 40 88
+	PORT_BIT(0x00000200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_T) PORT_CHAR('T') PORT_NAME("T") // 40 89
+	PORT_BIT(0xfffffc00, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("keyboard_41") // 4th row
+	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_J) PORT_CHAR('J') PORT_NAME("J/Ti") // 41 80
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_S) PORT_CHAR('S') PORT_NAME("S") // 41 81 
+	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_R) PORT_CHAR('R') PORT_NAME("R") // 41 82
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q) PORT_CHAR('Q') PORT_NAME("Q/NEW") // 41 83
+	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_P) PORT_CHAR('P') PORT_NAME("P/PLAY") // 41 84
+	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_O) PORT_CHAR('O') PORT_NAME("O/PAUSE") // 41 85
+	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_N) PORT_CHAR('N') PORT_NAME("N/Fa'") // 41 86
+	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_M) PORT_CHAR('M') PORT_NAME("M/Mi'") // 41 87
+	PORT_BIT(0x00000100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_L) PORT_CHAR('L') PORT_NAME("L/Re'") // 41 88
+	PORT_BIT(0x00000200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_K) PORT_CHAR('K') PORT_NAME("K/Do'") // 41 89
+	PORT_BIT(0xfffffc00, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("keyboard_42") // 3rd row
+	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_A) PORT_CHAR('A') PORT_NAME("A/So.") // 42 80
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('-') PORT_NAME("-/.") // 42 81 
+	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_I) PORT_CHAR('I') PORT_NAME("I/La") // 42 82
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_H) PORT_CHAR('H') PORT_NAME("H/So") // 42 83
+	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_G) PORT_CHAR('G') PORT_NAME("G/Fa") // 42 84
+	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F) PORT_CHAR('F') PORT_NAME("F/Mi") // 42 85
+	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_E) PORT_CHAR('E') PORT_NAME("E/Re") // 42 86
+	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_D) PORT_CHAR('D') PORT_NAME("D/Do") // 42 87
+	PORT_BIT(0x00000100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_C) PORT_CHAR('C') PORT_NAME("C/Ti.") // 42 88
+	PORT_BIT(0x00000200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_B) PORT_CHAR('B') PORT_NAME("B/La.") // 42 89
+	PORT_BIT(0xfffffc00, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("keyboard_43") // 2nd row
+	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_NAME("1") // 43 80
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_NAME("0") // 43 81 
+	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_NAME("9") // 43 82
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_NAME("8") // 43 83
+	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_NAME("7") // 43 84
+	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_NAME("6") // 43 85
+	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_NAME("5") // 43 86
+	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_NAME("4") // 43 87
+	PORT_BIT(0x00000100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_NAME("3") // 43 88
+	PORT_BIT(0x00000200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_NAME("2") // 43 89
+	PORT_BIT(0xfffffc00, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("keyboard_44") // 1st row
+	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('+') PORT_NAME("+") // 44 80
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_UNUSED) // 44 81 
+	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13) PORT_NAME("ENTER") // 44 82
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_HOME) PORT_CHAR(UCHAR_MAMEKEY(HOME)) PORT_NAME("MENU") // 44 83
+	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_PGUP) PORT_CHAR(UCHAR_MAMEKEY(PGUP)) PORT_NAME("ANSWER") // 44 84
+	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_PGDN) PORT_CHAR(UCHAR_MAMEKEY(PGDN)) PORT_NAME("HELP") // 44 85
+	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8) PORT_NAME("ERASE") // 44 86
+	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_NAME("/") // 44 87
+	PORT_BIT(0x00000100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ASTERISK) PORT_CHAR('*') PORT_NAME("*") // 44 88
+	PORT_BIT(0x00000200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_NAME("-") // 44 89
+	PORT_BIT(0xfffffc00, IP_ACTIVE_HIGH, IPT_UNUSED)
+	
+	// mouse goes here
+INPUT_PORTS_END
+
 
 /******************************************************************************
  Machine Drivers
@@ -530,8 +668,8 @@ static MACHINE_DRIVER_START(socrates)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 228)
-	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 227)
+	MDRV_SCREEN_SIZE(264, 228) // technically the screen size is 256x228 but super painter abuses what I suspect is a hardware bug to display repeated pixels of the very last pixel beyond this horizontal space, well into hblank
+	MDRV_SCREEN_VISIBLE_AREA(0, 263, 0, 219) // the last few rows are usually cut off by the screen bottom but are indeed displayed if you mess with v-hold
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_PALETTE_INIT(socrates)
 	MDRV_VIDEO_START(socrates)
@@ -558,6 +696,7 @@ ROM_START(socrates)
     /* Socrates US NTSC */
     ROM_LOAD("27-00817-000-000.u1", 0x00000, 0x40000, CRC(80f5aa20) SHA1(4fd1ff7f78b5dd2582d5de6f30633e4e4f34ca8f))
     ROM_FILL(0x40000, 0x40000, 0xf3) /* fill empty space with 0xf3 */
+    ROM_LOAD_OPTIONAL("cartridge.bin", 0x40000, 0x20000, NO_DUMP)
 
     ROM_REGION(0x10000, "vram", 0)
     ROM_FILL(0x0000, 0xffff, 0xff) /* fill with ff, driver_init changes this to the 'correct' startup pattern */
@@ -588,5 +727,5 @@ SYSTEM_CONFIG_END
 ******************************************************************************/
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT CONFIG      COMPANY                     FULLNAME                            FLAGS */
-COMP( 1988, socrates,   0,          0,      socrates,   0, socrates,   socrates,   "V-tech",        "Socrates Educational Video System",                        GAME_NOT_WORKING )
-COMP( 1988, socratfc,   socrates,   0,      socrates,   0, socrates,   socrates,   "V-tech",        "Socrates SAITOUT",                        GAME_NOT_WORKING )
+COMP( 1988, socrates,   0,          0,      socrates,   socrates, socrates,   socrates,   "V-tech",        "Socrates Educational Video System",                        GAME_NOT_WORKING )
+COMP( 1988, socratfc,   socrates,   0,      socrates,   socrates, socrates,   socrates,   "V-tech",        "Socrates SAITOUT",                        GAME_NOT_WORKING )
