@@ -122,7 +122,7 @@ static int mapper_warning;
 
 static emu_timer	*nes_irq_timer;
 
-void set_nt_page(int page, int source, int bank, int writable);
+static void set_nt_page(int page, int source, int bank, int writable);
 
 static TIMER_CALLBACK(nes_irq_callback)
 {
@@ -132,29 +132,34 @@ static TIMER_CALLBACK(nes_irq_callback)
 
 WRITE8_HANDLER( nes_chr_w)
 {
-	int bank =offset>>10;
+	int bank = offset >> 10;
 	if(chr_map[bank].source == CHRRAM)
 	{
-		chr_map[bank].access[offset&0x3FF]=data;
+		chr_map[bank].access[offset & 0x3ff] = data;
 	}
 }
+
 READ8_HANDLER( nes_chr_r)
 {
-	int bank =offset>>10;
-	return chr_map[bank].access[offset&0x3FF];
+	int bank = offset >> 10;
+	return chr_map[bank].access[offset & 0x3ff];
 }
 
 WRITE8_HANDLER(nes_nt_w)
 {
-	int page=((offset&0xC00)>>10);
-	if(nt_page[page].writable ==0)
+	int page = ((offset & 0xc00) >> 10);
+
+	if (nt_page[page].writable == 0)
 		return;
-	nt_page[page].access[offset&0x3FF]=data;
+
+	nt_page[page].access[offset & 0x3ff] = data;
 }
+
 READ8_HANDLER(nes_nt_r)
 {
-	int page=((offset&0xC00)>>10);
-	return nt_page[page].access[offset&0x3FF];
+	int page = ((offset & 0xc00) >> 10);
+
+	return nt_page[page].access[offset & 0x3ff];
 }
 
 WRITE8_HANDLER( nes_low_mapper_w )
@@ -164,7 +169,7 @@ WRITE8_HANDLER( nes_low_mapper_w )
 	{
 		logerror("Unimplemented LOW mapper write, offset: %04x, data: %02x\n", offset, data);
 #ifdef MAME_DEBUG
-		if (! mapper_warning)
+		if (!mapper_warning)
 		{
 			logerror ("This game is writing to the low mapper area but no mapper is set. You may get better results by switching to a valid mapper.\n");
 			mapper_warning = 1;
@@ -184,7 +189,7 @@ READ8_HANDLER( nes_low_mapper_r )
 	return 0;
 }
 
-WRITE8_HANDLER ( nes_mid_mapper_w )
+WRITE8_HANDLER( nes_mid_mapper_w )
 {
 	if (mmc_write_mid) (*mmc_write_mid)(space, offset, data);
 	else if (nes.mid_ram_enable)
@@ -202,7 +207,7 @@ WRITE8_HANDLER ( nes_mid_mapper_w )
 	}
 }
 
-READ8_HANDLER ( nes_mid_mapper_r )
+READ8_HANDLER( nes_mid_mapper_r )
 {
 	if ((nes.mid_ram_enable) || (nes.mapper == 5))
 		return nes_battery_ram[offset];
@@ -210,7 +215,7 @@ READ8_HANDLER ( nes_mid_mapper_r )
 		return 0;
 }
 
-WRITE8_HANDLER ( nes_mapper_w )
+WRITE8_HANDLER( nes_mapper_w )
 {
 	if (mmc_write) (*mmc_write)(space, offset, data);
 	else
@@ -241,33 +246,33 @@ WRITE8_HANDLER ( nes_mapper_w )
  * Some helpful routines used by the mappers
  */
 
-void ppu_mirror_custom (int page, int address)
+static void ppu_mirror_custom( int page, int address )
 {
-	fatalerror("Unimplemented: custom NT mirroring");
+	logerror("Unimplemented: custom NT mirroring");
 }
 
-void ppu_mirror_MMC5 (int page, int src)
+static void ppu_mirror_MMC5( int page, int src )
 {
 	switch(src)
 	{
-	case 0://CIRAM0
-		set_nt_page(page, CIRAM, 0,1);
+	case 0:	/* CIRAM0 */
+		set_nt_page(page, CIRAM, 0, 1);
 		break;
-	case 1://CIRAM1
-		set_nt_page(page, CIRAM, 1,1);
+	case 1:	/* CIRAM1 */
+		set_nt_page(page, CIRAM, 1, 1);
 		break;
-	case 2://ExRAM
-		set_nt_page(page, EXRAM,0,1);//actually only works during rendering. 
+	case 2:	/* ExRAM */
+		set_nt_page(page, EXRAM, 0, 1);	// actually only works during rendering. 
 		break;
-	case 3://FillRegisters -useless without dot-based PPU, in general
-		//break;
-	default:	fatalerror("Unimplemented: Fill support");
+	case 3:	/* FillRegisters -useless without dot-based PPU, in general */
+	default:	
+		logerror("Unimplemented: Fill support");
 	}
 }
 
-void ppu_mirror_custom_vrom (int page, int address)
+static void ppu_mirror_custom_vrom( int page, int address )
 {
-	set_nt_page(page, ROM, address,0);
+	set_nt_page(page, ROM, address, 0);
 }
 
 static void prg8_89 (const address_space *space, int bank)
@@ -351,29 +356,32 @@ static void prg32 (const address_space *space, int bank)
 	}
 }
 
-void set_nt_page(int page, int source, int bank, int writable)
+static void set_nt_page( int page, int source, int bank, int writable )
 {
 	UINT8* base_ptr;
 
-	switch(source)
+	switch (source)
 	{
-	case ROM:base_ptr=nes.vrom;
-	case EXRAM:base_ptr=nes.exram;
+		case ROM:
+			base_ptr = nes.vrom;
+		case EXRAM:
+			base_ptr = nes.exram;
 		case CIRAM:
-		default: base_ptr=nes.ciram;
+		default: 
+			base_ptr = nes.ciram;
 	}
 
-	page&=3; //mask down to the 4 logical pages
-	nt_page[page].source=source;
-	nt_page[page].origin=bank*0x400;
-	nt_page[page].access=base_ptr+nt_page[page].origin;
-	nt_page[page].writable=writable;
+	page &= 3; // mask down to the 4 logical pages
+	nt_page[page].source = source;
+	nt_page[page].origin = bank * 0x400;
+	nt_page[page].access = base_ptr + nt_page[page].origin;
+	nt_page[page].writable = writable;
 }
 
-void set_nt_mirroring(int mirroring )
+void set_nt_mirroring( int mirroring )
 {
 	/* setup our videomem handlers based on mirroring */
-	switch( mirroring )
+	switch (mirroring)
 	{
 		case PPU_MIRROR_VERT:
 			set_nt_page(0, CIRAM, 0, 1);
@@ -408,7 +416,6 @@ void set_nt_mirroring(int mirroring )
 		default:
 			/* external RAM needs to be used somehow. */
 			/* but as a default, we'll arbitrarily set vertical so as not to crash*/
-
 			logerror("Mapper set 4-screen mirroring without supplying external nametable memory!\n");
 
 			set_nt_page(0, CIRAM, 0, 1);
@@ -419,117 +426,135 @@ void set_nt_mirroring(int mirroring )
 	}
 }
 
-static void chr8 (running_machine *machine, int bank, int source)
+static void chr8( running_machine *machine, int bank, int source )
 {
 	int i;
-	//nes_state *state = machine->driver_data;
-	bank &= (nes.chr_chunks - 1);
-	
-	for(i=0;i<8;i++)
+
+	bank &= (nes.chr_chunks - 1);	
+	for (i = 0; i < 8; i++)
 	{
-		chr_map[i].source=source;
-		chr_map[i].origin=(bank*0x2000)+(i*0x400); //for save state uses!
-		if(source==CHRRAM)
-			chr_map[i].access=&nes.vram[chr_map[i].origin];
-		else chr_map[i].access=&nes.vrom[chr_map[i].origin];
+		chr_map[i].source = source;
+		chr_map[i].origin = (bank * 0x2000) + (i * 0x400); // for save state uses!
+
+		if (source == CHRRAM)
+			chr_map[i].access = &nes.vram[chr_map[i].origin];
+		else 
+			chr_map[i].access = &nes.vrom[chr_map[i].origin];
 	}
-	//ppu2c0x_set_videorom_bank(state->ppu, 0, 8, bank, 512);
-}
-static void chr4_x (running_machine *machine, int start, int bank, int source)
-{
-	int i;
-	bank &= ((nes.chr_chunks << 1) - 1);
-	for(i=0;i<4;i++)
-	{
-		chr_map[i+start].source=source;
-		chr_map[i+start].origin=(bank*0x1000)+(i*0x400); //for save state uses!
-		if(source==CHRRAM)
-			chr_map[i+start].access=&nes.vram[chr_map[i+start].origin];
-		else chr_map[i+start].access=&nes.vrom[chr_map[i+start].origin];
-	}
-//	ppu2c0x_set_videorom_bank(state->ppu, 0, 4, bank, 256);
 }
 
-static void chr4_0 (running_machine *machine, int bank, int source)
+static void chr4_x( running_machine *machine, int start, int bank, int source )
+{
+	int i;
+
+	bank &= ((nes.chr_chunks << 1) - 1);
+	for (i = 0; i < 4; i++)
+	{
+		chr_map[i + start].source = source;
+		chr_map[i + start].origin = (bank * 0x1000) + (i * 0x400); // for save state uses!
+
+		if (source == CHRRAM)
+			chr_map[i+start].access = &nes.vram[chr_map[i + start].origin];
+		else 
+			chr_map[i+start].access = &nes.vrom[chr_map[i + start].origin];
+	}
+}
+
+static void chr4_0( running_machine *machine, int bank, int source )
 {
 	chr4_x(machine, 0, bank, source);
 }
 
-static void chr4_4 (running_machine *machine, int bank, int source)
+static void chr4_4( running_machine *machine, int bank, int source )
 {
 	chr4_x(machine, 4, bank, source);
 }
-static void chr2_x (running_machine *machine, int start, int bank, int source)
+
+static void chr2_x( running_machine *machine, int start, int bank, int source )
 {
 	int i;
+
 	bank &= ((nes.chr_chunks << 2) - 1);
-	for(i=0;i<2;i++)
+	for (i = 0; i < 2; i++)
 	{
-		chr_map[i+start].source=source;
-		chr_map[i+start].origin=(bank*0x800)+(i*0x400);
-		if(source==CHRRAM)
-			chr_map[i+start].access=&nes.vram[chr_map[i+start].origin];
-		else chr_map[i+start].access=&nes.vrom[chr_map[i+start].origin];
+		chr_map[i + start].source = source;
+		chr_map[i + start].origin = (bank * 0x800) + (i * 0x400);
+
+		if (source == CHRRAM)
+			chr_map[i + start].access = &nes.vram[chr_map[i + start].origin];
+		else
+			chr_map[i + start].access = &nes.vrom[chr_map[i + start].origin];
 	}
 }
 
-static void chr2_0 (running_machine *machine, int bank, int source)
+static void chr2_0( running_machine *machine, int bank, int source )
 {
 	chr2_x(machine, 0, bank, source);
 }
 
-static void chr2_2 (running_machine *machine, int bank, int source)
+static void chr2_2( running_machine *machine, int bank, int source )
 {
 	chr2_x(machine, 2, bank, source);
 }
 
-static void chr2_4 (running_machine *machine, int bank, int source)
+static void chr2_4( running_machine *machine, int bank, int source )
 {
 	chr2_x(machine, 4, bank, source);
 }
 
-static void chr2_6 (running_machine *machine, int bank, int source)
+static void chr2_6( running_machine *machine, int bank, int source )
 {
 	chr2_x(machine, 6, bank, source);
 }
-static void chr1_x (running_machine *machine, int start, int bank, int source)
+
+static void chr1_x( running_machine *machine, int start, int bank, int source )
 {
-	chr_map[start].source=source;
+	chr_map[start].source = source;
 	bank &= ((nes.chr_chunks << 3) - 1);
-	chr_map[start].origin=bank*0x400;
-		if(source==CHRRAM)
-			chr_map[start].access=&nes.vram[chr_map[start].origin];
-		else chr_map[start].access=&nes.vrom[chr_map[start].origin];
+	chr_map[start].origin = bank * 0x400;
+
+	if (source == CHRRAM)
+		chr_map[start].access = &nes.vram[chr_map[start].origin];
+	else 
+		chr_map[start].access = &nes.vrom[chr_map[start].origin];
 }
+
 static void chr1_0 (running_machine *machine, int bank, int source)
 {
 	chr1_x(machine, 0, bank, source);
 }
-static void chr1_1 (running_machine *machine, int bank, int source)
+
+static void chr1_1( running_machine *machine, int bank, int source )
 {
 	chr1_x(machine, 1, bank, source);
 }
-static void chr1_2 (running_machine *machine, int bank, int source)
+
+static void chr1_2( running_machine *machine, int bank, int source )
 {
 	chr1_x(machine, 2, bank, source);
 }
-static void chr1_3 (running_machine *machine, int bank, int source)
+
+static void chr1_3( running_machine *machine, int bank, int source )
 {
 	chr1_x(machine, 3, bank, source);
 }
-static void chr1_4 (running_machine *machine, int bank, int source)
+
+static void chr1_4( running_machine *machine, int bank, int source )
 {
 	chr1_x(machine, 4, bank, source);
 }
-static void chr1_5 (running_machine *machine, int bank, int source)
+
+static void chr1_5( running_machine *machine, int bank, int source )
 {
 	chr1_x(machine, 5, bank, source);
 }
-static void chr1_6 (running_machine *machine, int bank, int source)
+
+static void chr1_6( running_machine *machine, int bank, int source )
 {
 	chr1_x(machine, 6, bank, source);
 }
-static void chr1_7 (running_machine *machine, int bank, int source)
+
+static void chr1_7( running_machine *machine, int bank, int source )
 {
 	chr1_x(machine, 7, bank, source);
 }
@@ -1164,7 +1189,7 @@ static void mapper5_irq ( const device_config *device, int scanline, int vblank,
 	}
 }
 
-static  READ8_HANDLER( mapper5_l_r )
+static READ8_HANDLER( mapper5_l_r )
 {
 	int retVal;
 
@@ -2367,7 +2392,7 @@ static void fds_irq ( const device_config *device, int scanline, int vblank, int
 	}
 }
 
-READ8_HANDLER ( fds_r )
+READ8_HANDLER( fds_r )
 {
 	int ret = 0x00;
 	static int last_side = 0;
@@ -2420,7 +2445,7 @@ READ8_HANDLER ( fds_r )
 	return ret;
 }
 
-WRITE8_HANDLER ( fds_w )
+WRITE8_HANDLER( fds_w )
 {
 	switch (offset)
 	{

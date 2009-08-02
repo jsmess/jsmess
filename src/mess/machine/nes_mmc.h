@@ -32,16 +32,16 @@ extern write8_space_func mmc_write;
 int mapper_reset (running_machine *machine, int mapperNum);
 
 WRITE8_HANDLER( nes_low_mapper_w );
-READ8_HANDLER ( nes_low_mapper_r );
-READ8_HANDLER ( nes_mid_mapper_r );
-WRITE8_HANDLER ( nes_mid_mapper_w );
-WRITE8_HANDLER ( nes_mapper_w );
-WRITE8_HANDLER ( nes_chr_w );
-READ8_HANDLER ( nes_chr_r );
-WRITE8_HANDLER ( nes_nt_w );
-READ8_HANDLER ( nes_nt_r );
+READ8_HANDLER( nes_low_mapper_r );
+READ8_HANDLER( nes_mid_mapper_r );
+WRITE8_HANDLER( nes_mid_mapper_w );
+WRITE8_HANDLER( nes_mapper_w );
+WRITE8_HANDLER( nes_chr_w );
+READ8_HANDLER( nes_chr_r );
+WRITE8_HANDLER( nes_nt_w );
+READ8_HANDLER( nes_nt_r );
 
- READ8_HANDLER ( fds_r );
-WRITE8_HANDLER ( fds_w );
+READ8_HANDLER( fds_r );
+WRITE8_HANDLER( fds_w );
 
 #endif
