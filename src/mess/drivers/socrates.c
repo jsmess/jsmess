@@ -6,10 +6,11 @@
 *  
 *  (driver structure copied from vtech1.c)
 TODO:
+	fix glitches with keyboard input (can't spell "igloo" in scramble due to problem with double keys, letter entry in super painter doesn't work)
+	hook up mouse
 	add waitstates for ram access (lack of this causes the system to run way too fast)
 	hook up cartridges using the bios system
 	hook up sound regs
-	find and hook up keyboard/mouse IR input
 	find and hook up any timers/interrupt controls
 	find and document ports for speech synthesizer
 	
@@ -89,6 +90,8 @@ UINT8 rom_bank;
 UINT8 ram_bank;
 UINT16 scroll_offset;
 UINT8* videoram;
+//UINT8 kb_latch_low_old;
+//UINT8 kb_latch_high_old;
 UINT8 kb_latch_low;
 UINT8 kb_latch_high;
 UINT8 kb_latch_mouse;
@@ -112,11 +115,19 @@ static void socrates_update_kb( running_machine *machine )
 	int shift = 0;
 	// first check that the kb latch is clear; if it isn't, don't touch it!
 	if ((socrates.kb_latch_low != 0) || (socrates.kb_latch_high != 1)) return;
+	// next check for joypad buttons
+	keyvalue = input_port_read(machine, "keyboard_jp");
+	if (keyvalue != 0)
+	{
+		socrates.kb_latch_low = (keyvalue & 0xFF0)>>4;
+		socrates.kb_latch_high = 0x80 | (keyvalue & 0xF);
+		return; // get out of this function; due to the way key priorities work, we're done here.
+	}
 	// next check for mouse movement.
 	// this isn't written yet, so write me please!
 	// next check if shift is down
 	shift = input_port_read(machine, "keyboard_50");
-	// find key low and high byte
+	// find key low and high byte ok keyboard section
 	for (row = 4; row>=0; row--)
 	{
 		keyvalue = input_port_read(machine, rownames[row]);
@@ -128,7 +139,7 @@ static void socrates_update_kb( running_machine *machine )
 				{
 					socrates.kb_latch_low = (shift?0x50:0x40)+row;
 					socrates.kb_latch_high = (0x80 | powerof2);
-					return; // get out of the for loop. due to the way key priorities work, we're done here.
+					return; // get out of the for loop; due to the way key priorities work, we're done here.
 				}
 			}
 		}
@@ -143,12 +154,14 @@ static void socrates_update_kb( running_machine *machine )
 
 MACHINE_RESET( socrates )
 {
- socrates.rom_bank = 0; // actually set semi-randomly on real console but we need to initialize it somewhere...
+ socrates.rom_bank = 0xF3; // actually set semi-randomly on real console but we need to initialize it somewhere...
  socrates_set_rom_bank( machine );
  socrates.ram_bank = 0;  // the actual console sets it semi randomly on power up, and the bios cleans it up.
  socrates_set_ram_bank( machine );
- socrates.kb_latch_low = 0; // this is really random on startup but its best to set it to the 'sane' 00 01 value
- socrates.kb_latch_high = 1; // this is really random on startup but its best to set it to the 'sane' 00 01 value
+ //socrates.kb_latch_low_old = 0xFF;
+ //socrates.kb_latch_high_old = 0x8F;
+ socrates.kb_latch_low = 0xFF;
+ socrates.kb_latch_high = 0x8F; 
  socrates.kb_latch_mouse = 0;
 }
 
@@ -202,9 +215,9 @@ logerror("write to i/o 0x30");
 READ8_HANDLER( read_40 ) // read 0x4x, some sort of status reg
 {
 // bit 7 - unknown, never seems to be set
-// bit 6 - unknown, sometimes set sometimes clear
-// bit 5 - timer expired? status, sometimes set sometimes clear
-// bit 4 - vblank? status, sometimes set sometimes clear
+// bit 6 - unknown, usually set but occasionally clear
+// bit 5 - vblank? status, sometimes set sometimes clear
+// bit 4 - hblank? status, sometimes set sometimes clear
 // bit 3 - unknown, sometimes set sometimes clear
 // bit 2 - unknown, sometimes set sometimes clear
 // bit 1 - unknown, sometimes set sometimes clear
@@ -220,12 +233,14 @@ logerror("write to i/o 0x4x of %x", data);
 READ8_HANDLER( socrates_keyboard_low_r ) // keyboard code low
 {
  socrates_update_kb( space->machine );
+ //return socrates.kb_latch_low_old;
  return socrates.kb_latch_low;
 }
 
 READ8_HANDLER( socrates_keyboard_high_r ) // keyboard code high
 {
  socrates_update_kb( space->machine );
+ //return socrates.kb_latch_high_old;
  return socrates.kb_latch_high;
 }
 
@@ -233,11 +248,17 @@ WRITE8_HANDLER( socrates_keyboard_clear ) // keyboard latch clear (or show mouse
 {
 	if (socrates.kb_latch_mouse == 0)
 	{
+		//socrates.kb_latch_low_old = socrates.kb_latch_low;
+		//socrates.kb_latch_high_old = socrates.kb_latch_high;
 		socrates.kb_latch_low = 0;
 		socrates.kb_latch_high = 1;
 	}
 	else
 	{
+		//socrates.kb_latch_low_old = socrates.kb_latch_mouse&0xFF; // y coord
+		//socrates.kb_latch_high_old = (socrates.kb_latch_mouse&0xFF00)>>8; // x coord
+		//socrates.kb_latch_low = 0;
+		//socrates.kb_latch_high = 1;
 		socrates.kb_latch_low = socrates.kb_latch_mouse&0xFF; // y coord
 		socrates.kb_latch_high = (socrates.kb_latch_mouse&0xFF00)>>8; // x coord
 		socrates.kb_latch_mouse = 0;
@@ -489,8 +510,8 @@ keycode low
 // pads on the sides of the kb; this acts like a giant bitfield, both dpads/buttons can send data at once
 00	81	left dpad right
 00	82	left dpad up 
-00	84	left dpad down
-00	88	left dpad left
+00	84	left dpad left
+00	88	left dpad down
 01	80	right dpad down
 02	80	right dpad left
 04	80	right dpad up
@@ -564,6 +585,32 @@ B0	81	both buttons click (mouse movement in queue, will be in regs after next la
 // unknown yet, but probably uses the 60/70/c0/d0/e0/f0 low reg vals
 */
 static INPUT_PORTS_START( socrates )
+
+	PORT_START("keyboard_jp") // joypad keys
+	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6_PAD) PORT_CHAR(UCHAR_MAMEKEY(6_PAD)) PORT_NAME("Left D-pad Right") // 00 81
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8_PAD) PORT_CHAR(UCHAR_MAMEKEY(8_PAD)) PORT_NAME("Left D-pad Up") // 00 82
+	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4_PAD) PORT_CHAR(UCHAR_MAMEKEY(4_PAD)) PORT_NAME("Left D-pad Left") // 00 84
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2_PAD) PORT_CHAR(UCHAR_MAMEKEY(2_PAD)) PORT_NAME("Left D-pad Down") // 00 88
+	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN)) PORT_NAME("Right D-pad Down") // 01 80
+	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT)) PORT_NAME("Right D-pad Left") // 02 80
+	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP)) PORT_NAME("Right D-pad Up") // 04 80
+	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT)) PORT_NAME("Right D-pad Right") // 08 80
+	PORT_BIT(0x00000100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD)) PORT_NAME("Left D-pad Button") // 10 80
+	PORT_BIT(0x00000200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_RALT) PORT_CHAR(UCHAR_MAMEKEY(RALT)) PORT_NAME("Right D-pad Button") // 20 80
+	PORT_BIT(0xfffffc00, IP_ACTIVE_HIGH, IPT_UNUSED)
+	/* alt w/left and right keypad keys swapped
+	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT)) PORT_NAME("Left D-pad Right") // 00 81
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP)) PORT_NAME("Left D-pad Up") // 00 82
+	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT)) PORT_NAME("Left D-pad Left") // 00 84
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN)) PORT_NAME("Left D-pad Down") // 00 88
+	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2_PAD) PORT_CHAR(UCHAR_MAMEKEY(2_PAD)) PORT_NAME("Right D-pad Down") // 01 80
+	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4_PAD) PORT_CHAR(UCHAR_MAMEKEY(4_PAD)) PORT_NAME("Right D-pad Left") // 02 80
+	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8_PAD) PORT_CHAR(UCHAR_MAMEKEY(8_PAD)) PORT_NAME("Right D-pad Up") // 04 80
+	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6_PAD) PORT_CHAR(UCHAR_MAMEKEY(6_PAD)) PORT_NAME("Right D-pad Right") // 08 80
+	PORT_BIT(0x00000100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_RALT) PORT_CHAR(UCHAR_MAMEKEY(RALT)) PORT_NAME("Left D-pad Button") // 10 80
+	PORT_BIT(0x00000200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD)) PORT_NAME("Right D-pad Button") // 20 80
+	PORT_BIT(0xfffffc00, IP_ACTIVE_HIGH, IPT_UNUSED)
+	*/
 
 	PORT_START("keyboard_50") // lowest 'row' (technically the shift key is on the 5th row but it has its own keycode)
 	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1) PORT_NAME("SHIFT") // 5x xx
@@ -707,6 +754,7 @@ ROM_START(socratfc)
     /* Socrates SAITOUT (French Canadian) NTSC */
     ROM_LOAD("socratfc.u1", 0x00000, 0x40000, CRC(042d9d21) SHA1(9ffc67b2721683b2536727d0592798fbc4d061cb)) /* fix label/name */
     ROM_FILL(0x40000, 0x40000, 0xf3) /* fill empty space with 0xf3 */
+    ROM_LOAD_OPTIONAL("cartridge.bin", 0x40000, 0x20000, NO_DUMP)
 
     ROM_REGION(0x10000, "vram", 0)
     ROM_FILL(0x0000, 0xffff, 0xff) /* fill with ff, driver_init changes this to the 'correct' startup pattern */
