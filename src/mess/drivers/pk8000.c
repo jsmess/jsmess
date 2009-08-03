@@ -311,7 +311,7 @@ static VIDEO_START( pk8000 )
 
 static VIDEO_UPDATE( pk8000 )
 {
-return pk8000_video_update(screen, bitmap, cliprect, memory_region(screen->machine, "maincpu"));
+	return pk8000_video_update(screen, bitmap, cliprect, mess_ram);
 }
 
 /* Machine driver */
