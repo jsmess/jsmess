@@ -6,13 +6,13 @@
 *  
 *  (driver structure copied from vtech1.c)
 TODO:
-	fix glitches with keyboard input (can't spell "igloo" in scramble due to problem with double keys, letter entry in super painter doesn't work)
+	fix glitches with keyboard input (can't spell "igloo" in scramble due to problem with double keys, letter entry in super painter doesn't work) <- is this still true?
+	hook up hblank
 	hook up mouse
 	add waitstates for ram access (lack of this causes the system to run way too fast)
 	hook up cartridges using the bios system
 	hook up sound regs
 	find and hook up any timers/interrupt controls
-	find and document ports for speech synthesizer
 	
 
 
@@ -77,6 +77,8 @@ TODO:
 #include "socrates.lh"
 //#include "sound/beep.h"
 
+/* Defines */
+#undef EMULATE_SPEECH // tries miserably to emulate the speech chip readback. works for the first packet, which causes socrates to crash on the second one.
 
 /* Components */
 
@@ -90,11 +92,15 @@ UINT8 rom_bank;
 UINT8 ram_bank;
 UINT16 scroll_offset;
 UINT8* videoram;
-//UINT8 kb_latch_low_old;
-//UINT8 kb_latch_high_old;
-UINT8 kb_latch_low;
-UINT8 kb_latch_high;
+UINT8 kb_latch_low[2];
+UINT8 kb_latch_high[2];
 UINT8 kb_latch_mouse;
+UINT8 io40_latch;
+UINT8 hblankstate;
+UINT8 vblankstate;
+UINT8 speech_running;
+UINT8 speech_selftest;
+UINT32 speech_regs[8];
 } socrates={ {0}};
 
 static void socrates_set_rom_bank( running_machine *machine )
@@ -113,14 +119,14 @@ static void socrates_update_kb( running_machine *machine )
 	static const char *const rownames[] = { "keyboard_40", "keyboard_41", "keyboard_42", "keyboard_43", "keyboard_44" };
 	int row, keyvalue, powerof2;
 	int shift = 0;
-	// first check that the kb latch is clear; if it isn't, don't touch it!
-	if ((socrates.kb_latch_low != 0) || (socrates.kb_latch_high != 1)) return;
+	// first check that the kb latch[1] is clear; if it isn't, don't touch it!
+	if ((socrates.kb_latch_low[1] != 0) || (socrates.kb_latch_high[1] != 1)) return;
 	// next check for joypad buttons
 	keyvalue = input_port_read(machine, "keyboard_jp");
 	if (keyvalue != 0)
 	{
-		socrates.kb_latch_low = (keyvalue & 0xFF0)>>4;
-		socrates.kb_latch_high = 0x80 | (keyvalue & 0xF);
+		socrates.kb_latch_low[1] = (keyvalue & 0xFF0)>>4;
+		socrates.kb_latch_high[1] = 0x80 | (keyvalue & 0xF);
 		return; // get out of this function; due to the way key priorities work, we're done here.
 	}
 	// next check for mouse movement.
@@ -137,8 +143,8 @@ static void socrates_update_kb( running_machine *machine )
 			{
 				if ((keyvalue&(1<<powerof2)) == (1<<powerof2))
 				{
-					socrates.kb_latch_low = (shift?0x50:0x40)+row;
-					socrates.kb_latch_high = (0x80 | powerof2);
+					socrates.kb_latch_low[1] = (shift?0x50:0x40)+row;
+					socrates.kb_latch_high[1] = (0x80 | powerof2);
 					return; // get out of the for loop; due to the way key priorities work, we're done here.
 				}
 			}
@@ -147,8 +153,20 @@ static void socrates_update_kb( running_machine *machine )
 	// no key was pressed... check if shift was hit then?
 	if (shift != 0)
 	{
-		socrates.kb_latch_low = 0x50;
-		socrates.kb_latch_high = 0x80;
+		socrates.kb_latch_low[1] = 0x50;
+		socrates.kb_latch_high[1] = 0x80;
+	}
+}
+
+static void socrates_check_kb_latch( running_machine *machine ) // if kb[1] is full and kb[0] is not, shift [1] to [0] and clear [1]
+{
+	if (((socrates.kb_latch_low[1] != 0) || (socrates.kb_latch_high[1] != 1)) &&
+	((socrates.kb_latch_low[0] == 0) && (socrates.kb_latch_high[0] == 1)))
+	{
+		socrates.kb_latch_low[0] = socrates.kb_latch_low[1];
+		socrates.kb_latch_low[1] = 0;
+		socrates.kb_latch_high[0] = socrates.kb_latch_high[1];
+		socrates.kb_latch_high[1] = 1;
 	}
 }
 
@@ -158,11 +176,24 @@ MACHINE_RESET( socrates )
  socrates_set_rom_bank( machine );
  socrates.ram_bank = 0;  // the actual console sets it semi randomly on power up, and the bios cleans it up.
  socrates_set_ram_bank( machine );
- //socrates.kb_latch_low_old = 0xFF;
- //socrates.kb_latch_high_old = 0x8F;
- socrates.kb_latch_low = 0xFF;
- socrates.kb_latch_high = 0x8F; 
+ socrates.kb_latch_low[0] = 0xFF;
+ socrates.kb_latch_high[0] = 0x8F;
+ socrates.kb_latch_low[1] = 0x00;
+ socrates.kb_latch_high[1] = 0x01; 
  socrates.kb_latch_mouse = 0;
+ socrates.io40_latch = 0xf;
+ socrates.hblankstate = 0;
+ socrates.vblankstate = 0;
+ socrates.speech_running = 0;
+ socrates.speech_selftest = 0; // should be readback
+ socrates.speech_regs[0] = 0;
+ socrates.speech_regs[1] = 0;
+ socrates.speech_regs[2] = 0;
+ socrates.speech_regs[3] = 0;
+ socrates.speech_regs[4] = 0;
+ socrates.speech_regs[5] = 0;
+ socrates.speech_regs[6] = 0;
+ socrates.speech_regs[7] = 0;
 }
 
 DRIVER_INIT( socrates )
@@ -209,65 +240,141 @@ READ8_HANDLER( read_f3 ) // used for read-only i/o ports as mame/mess doesn't ha
 
 WRITE8_HANDLER( unknownlatch_30 ) // writes to i/o 0x3x do SOMETHING, possibly waitstate related (may halt cpu until vblank start?)
 {
-logerror("write to i/o 0x30");
+logerror("write to i/o 0x30 of %x\n", data);
 }
 
-READ8_HANDLER( read_40 ) // read 0x4x, some sort of status reg
+READ8_HANDLER( status_and_speech ) // read 0x4x, some sort of status reg
 {
-// bit 7 - unknown, never seems to be set
-// bit 6 - unknown, usually set but occasionally clear
-// bit 5 - vblank? status, sometimes set sometimes clear
-// bit 4 - hblank? status, sometimes set sometimes clear
-// bit 3 - unknown, sometimes set sometimes clear
-// bit 2 - unknown, sometimes set sometimes clear
-// bit 1 - unknown, sometimes set sometimes clear
-// bit 0 - unknown, sometimes set sometimes clear
- return mame_rand(space->machine)&0x7f;
+// bit 7 - speech status: high when speech is playing, low when it is not (or when speech cart is not present)
+// bit 6 - unknown, usually set
+// bit 5 - vblank status, high when not in vblank
+// bit 4 - hblank status, high when not in hblank
+// bit 3 - speech chip bit 3
+// bit 2 - speech chip bit 2
+// bit 1 - speech chip bit 1
+// bit 0 - speech chip bit 0
+#ifdef EMULATE_SPEECH
+	UINT8 selftestpattern[14] = { 0x3, 0x5, 0xa, 0x3, 0x5, 0xf, 0x4, 0x3, 0x4, 0x2, 0x5, 0x1, 0x4, 0x4 };
+#endif
+	int temp = 0;
+	temp |= (socrates.speech_running)?0x80:0;
+	temp |= 0x40; // unknown
+	temp |= (socrates.vblankstate)?0:0x20;
+	temp |= (socrates.hblankstate)?0:0x10;
+	switch(socrates.io40_latch&0xF0)
+	{
+#ifdef EMULATE_SPEECH
+		case 0x60: // speech status 'read' register
+			temp |= selftestpattern[socrates.speech_selftest>>1];
+			break;
+		case 0xE0: // speech status 'read' register w/CPE? line active
+			temp |= selftestpattern[socrates.speech_selftest>>1];
+			break;
+#else
+		case 0x60: case 0xE0:
+		break;
+#endif
+		default:
+			temp |= socrates.io40_latch&0xF;
+			break;
+	}
+	logerror("read from i/o 0x4x of %x\n", temp);
+	return temp;
 }
 
-WRITE8_HANDLER( write_40 ) // write 0x4x
+WRITE8_HANDLER( speech_command ) // write 0x4x, some sort of bitfield; speech chip is probably hitachi hd38880 related but not exact, w/4 bit interface
 {
-logerror("write to i/o 0x4x of %x", data);
+/*
+// the high 4 bits of the write control which 'register' is written to, the low 4 bits are data (this is based on a readback test)
+// 00-0f: readback: 70-7f
+// 10-1f: readback: 70-7f
+// 20-2f: readback: 70-7f
+// 30-3f: readback: 70-7f
+// 40-5f: readback: 70-7f
+// 50-5f: readback: 70-7f
+// 60-6f: readback: ALL 7f
+// 70-7f: readback: 50, 71-7f (force vblank?)
+// 80-8f: 80 starts speech reads as f0, rest read as 71-7f
+// 90-9f: all 70-7f
+// a0-af: 70-7f
+// b0-bf: 70-7f
+// c0-cf: 70-7f
+// d0-df: 70-7f
+// e0-ef: readback ALL 76
+// f0-ff: 70-7f
+*/
+/* all this really tells us is: 0x80 is the speech start command;
+   all commands are open bus on readback of 4 bits EXCEPT for 0x60 and 0xE0, which are the CTP active and inactive versions of the same command */
+/*  following is hd38880 info:
+	microcomputer interface of hd38880 is usually 7 wires:
+	FP		frame pulse, involved with READ command somehow
+	SYBS1	data line bit 0, bidirectional
+	SYBS2	data line bit 1, "
+	SYBS3	data line bit 2, " 
+	SYBS4	data line bit 3, "
+	CTP		Command pulse line, sort of a 'write' line
+	CMV		More or less the 'command is being written' line which is active whenenever any command sequence is being written and during readback.
+
+	The instructions which the hd38880 can be sent are: (msb first/to the left), blank instructions are invalid
+	0000	(nop?, used as a dummy read/write during direction change??? invalid when used alone?)
+	0001
+	0010	ADSET (Transfer address to "vsm-alike serial roms") <followed by 5 nybbles>
+	0011	READ (read nybble) <bus changes from cpu->speechchip to speechchip->sys and you get as many nybbles as you pulse the CTP line for, address auto-increments>
+	0100	INT1 (initialize 1) <followed by one nybble>
+	0101
+	0110	INT2 (initialize 2) <followed by one nybble>
+	0111
+	1000	SYSPD (set speed) <followed by one nybble>
+	1001
+	1010	STOP
+	1011	CONDT (Read state P1) <bus changes from cpu->speechchip to speechchip->sys and you get one nybble>
+	1100	START
+	1101
+	1110	SSTART (same as start but syspd speed is ignored and forced to be set to 9 (scale = 1.0))
+	1111
+*/
+/* the socrates speech chip does not QUITE match the hd38880 though, but is very similar */
+
+	if (data==0x60) socrates.speech_selftest++;
+	if (socrates.speech_selftest > 14) socrates.speech_selftest = 0;
+	socrates.io40_latch = data;
+	logerror("write to i/o 0x4x of %x\n", data);
 }
 
 READ8_HANDLER( socrates_keyboard_low_r ) // keyboard code low
 {
  socrates_update_kb( space->machine );
- //return socrates.kb_latch_low_old;
- return socrates.kb_latch_low;
+ socrates_check_kb_latch( space->machine );
+ return socrates.kb_latch_low[0];
 }
 
 READ8_HANDLER( socrates_keyboard_high_r ) // keyboard code high
 {
  socrates_update_kb( space->machine );
- //return socrates.kb_latch_high_old;
- return socrates.kb_latch_high;
+ socrates_check_kb_latch( space->machine );
+ return socrates.kb_latch_high[0];
 }
 
-WRITE8_HANDLER( socrates_keyboard_clear ) // keyboard latch clear (or show mouse coords next if they have updated)
+WRITE8_HANDLER( socrates_keyboard_clear ) // keyboard latch shift/clear
 {
-	if (socrates.kb_latch_mouse == 0)
-	{
-		//socrates.kb_latch_low_old = socrates.kb_latch_low;
-		//socrates.kb_latch_high_old = socrates.kb_latch_high;
-		socrates.kb_latch_low = 0;
-		socrates.kb_latch_high = 1;
-	}
-	else
-	{
-		//socrates.kb_latch_low_old = socrates.kb_latch_mouse&0xFF; // y coord
-		//socrates.kb_latch_high_old = (socrates.kb_latch_mouse&0xFF00)>>8; // x coord
-		//socrates.kb_latch_low = 0;
-		//socrates.kb_latch_high = 1;
-		socrates.kb_latch_low = socrates.kb_latch_mouse&0xFF; // y coord
-		socrates.kb_latch_high = (socrates.kb_latch_mouse&0xFF00)>>8; // x coord
-		socrates.kb_latch_mouse = 0;
-	}
+	socrates.kb_latch_low[0] = socrates.kb_latch_low[1];
+	socrates.kb_latch_high[0] = socrates.kb_latch_high[1];
+	socrates.kb_latch_low[1] = 0;
+	socrates.kb_latch_high[1] = 1;
 }
 
-WRITE8_HANDLER( unknown_6x ) // writes to i/o 0x6x happens on startup once, with 0x01. no idea what it does.
+WRITE8_HANDLER( reset_speech ) // reset speech synth
 {
-logerror("write to i/o 0x60 of %x",data);
+socrates.speech_selftest = 0;
+socrates.speech_regs[0] = 0;
+socrates.speech_regs[1] = 0;
+socrates.speech_regs[2] = 0;
+socrates.speech_regs[3] = 0;
+socrates.speech_regs[4] = 0;
+socrates.speech_regs[5] = 0;
+socrates.speech_regs[6] = 0;
+socrates.speech_regs[7] = 0;
+logerror("write to i/o 0x60 of %x\n",data);
 }
 
 /* stuff below belongs in video/socrates.c */
@@ -490,10 +597,10 @@ static ADDRESS_MAP_START(z80_io, ADDRESS_SPACE_IO, 8)
 	resulting screen line is one of 512 total offsets on 128-byte boundaries in the whole 64k ram
 	*/
 	AM_RANGE(0x30, 0x30) AM_READWRITE(read_f3, unknownlatch_30) AM_MIRROR (0xf) /* unknown, write only. may relate to waitstate timing? */
-	AM_RANGE(0x40, 0x40) AM_READWRITE(read_40, write_40) AM_MIRROR(0xf) /* unknown, some sort of status/control register, speech may work through this. */
+	AM_RANGE(0x40, 0x40) AM_READWRITE(status_and_speech, speech_command ) AM_MIRROR(0xf) /* reads status register for vblank/hblank/speech, also reads and writes speech module */
 	AM_RANGE(0x50, 0x50) AM_READWRITE(socrates_keyboard_low_r, socrates_keyboard_clear) AM_MIRROR(0xE) /* Keyboard keycode low, latched on keypress, can be unlatched by writing anything here */
 	AM_RANGE(0x51, 0x51) AM_READWRITE(socrates_keyboard_high_r, socrates_keyboard_clear) AM_MIRROR(0xE) /* Keyboard keycode high, latched as above, unlatches same as above */
-	AM_RANGE(0x60, 0x60) AM_READWRITE(read_f3, unknown_6x) AM_MIRROR(0xF) /* unknown, write only  */
+	AM_RANGE(0x60, 0x60) AM_READWRITE(read_f3, reset_speech) AM_MIRROR(0xF) /* reset the speech module  */
 	AM_RANGE(0x70, 0xFF) AM_READ(read_f3) // nothing mapped here afaik
 ADDRESS_MAP_END
 
@@ -690,6 +797,7 @@ INPUT_PORTS_END
 static TIMER_CALLBACK( clear_irq_cb )
 {
 	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
+	socrates.vblankstate = 0;
 }
 
 static INTERRUPT_GEN( assert_irq )
@@ -697,6 +805,7 @@ static INTERRUPT_GEN( assert_irq )
 	cpu_set_input_line(device, 0, ASSERT_LINE);
 	timer_set(device->machine, cpu_clocks_to_attotime(device, 144), NULL, 0, clear_irq_cb);
 // 144 is a complete and total guess, need to properly measure how many clocks/microseconds the int line is high for.
+	socrates.vblankstate = 1;
 }
 
 static MACHINE_DRIVER_START(socrates)
