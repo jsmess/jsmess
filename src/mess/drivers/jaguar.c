@@ -5,16 +5,6 @@
     Nathan Woods
     based on MAME cojag driver by Aaron Giles
 
-    Game status:
-	Working: Alien vs Predator, Zool2, Power Drive Rally.
-	Raiden works until the end of the first stage, then hangs.
-	Pinball Fantasies works but no sound.
-	Rayman runs somewhat, with bad graphics and no sound.
-	Brutal Sports and 2 other games get an access violation in the blitter.
-	The rest do little or nothing.
-	None of the homebrew/quickload do anything at all.
-
-    TODO: Lots...
 
 ****************************************************************************
 
@@ -63,6 +53,7 @@
 #define JAGUAR_CLOCK		26.6e6
 
 static QUICKLOAD_LOAD( jaguar );
+static DEVICE_IMAGE_LOAD( jaguar );
 
 /*************************************
  *
@@ -110,12 +101,13 @@ static MACHINE_RESET( jaguar )
 {
 	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), jaguar_irq_callback);
 
-	*((UINT32 *) jaguar_gpu_ram) = 0x3d0dead;
+	/* Break the protection */
+	jaguar_gpu_ram[0] = 0x3d0dead;
+	rom_base[0x4da]=(rom_base[0x4da]&0xffff0000) | 1234;
+	rom_base[0x4db]=(rom_base[0x4db]&0xffff) | 56780000;
 
-	memset(jaguar_shared_ram, 0, 0x200000);
+	/* Set up pointers for Jaguar logo */
 	memcpy(jaguar_shared_ram, rom_base, 0x10);
-	if (cart_base[1] != 0)
-		rom_base[0x53c / 4] = 0x67000002;
 	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), REG_GENPC, rom_base[1]);
 
 #if 0
@@ -203,7 +195,6 @@ static READ32_HANDLER( joystick_r )
 {
 	UINT16 joystick_result = 0xffff;
 	UINT16 joybuts_result = 0xffff;
-	UINT32 result;
 	int i;
 	static const char *const keynames[2][8] =
 			{
@@ -236,10 +227,7 @@ static READ32_HANDLER( joystick_r )
 		}
 	}
 
-	result = joystick_result;
-	result <<= 16;
-	result |= joybuts_result;
-	return result;
+	return (joystick_result << 16) | joybuts_result;
 }
 
 static WRITE32_HANDLER( joystick_w )
@@ -304,12 +292,13 @@ static WRITE32_HANDLER( joystick_w )
 
 
 static ADDRESS_MAP_START( jaguar_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x000000, 0x1fffff) AM_RAM AM_BASE(&jaguar_shared_ram) AM_SHARE(1) AM_MIRROR(0x200000)
-	AM_RANGE(0x800000, 0xdfffff) AM_ROM AM_BASE(&cart_base) AM_SIZE(&cart_size)
-	AM_RANGE(0xe00000, 0xe1ffff) AM_ROM AM_BASE(&rom_base) AM_SIZE(&rom_size)
+	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
+	AM_RANGE(0x000000, 0x1fffff) AM_RAM AM_BASE(&jaguar_shared_ram) AM_MIRROR(0x200000) AM_SHARE(1) AM_REGION("maincpu", 0)
+	AM_RANGE(0x800000, 0xdfffff) AM_ROM AM_BASE(&cart_base) AM_SIZE(&cart_size) AM_REGION("maincpu", 0x800000)
+	AM_RANGE(0xe00000, 0xe1ffff) AM_ROM AM_BASE(&rom_base) AM_SIZE(&rom_size) AM_REGION("maincpu", 0xe00000)
 	AM_RANGE(0xf00000, 0xf003ff) AM_READWRITE(jaguar_tom_regs32_r, jaguar_tom_regs32_w)
 	AM_RANGE(0xf00400, 0xf007ff) AM_RAM AM_BASE(&jaguar_gpu_clut) AM_SHARE(2)
-	AM_RANGE(0xf00800, 0xf01d9f) AM_MIRROR(0x008000) AM_RAM	// Line Buffer Test Areas
+//	AM_RANGE(0xf00800, 0xf01d9f) AM_MIRROR(0x008000) AM_RAM	// Line Buffer Test Areas
 	AM_RANGE(0xf02100, 0xf021ff) AM_MIRROR(0x008000) AM_READWRITE(gpuctrl_r, gpuctrl_w)
 	AM_RANGE(0xf02200, 0xf022ff) AM_MIRROR(0x008000) AM_READWRITE(jaguar_blitter_r, jaguar_blitter_w)
 	AM_RANGE(0xf03000, 0xf03fff) AM_MIRROR(0x008000) AM_RAM AM_BASE(&jaguar_gpu_ram) AM_SHARE(3)
@@ -332,36 +321,22 @@ ADDRESS_MAP_END
 
 /*************************************
  *
- *  GPU memory handlers
+ *  GPU/DSP memory handlers
  *
  *************************************/
 
 static ADDRESS_MAP_START( gpu_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x000000, 0x1fffff) AM_RAM AM_SHARE(1) AM_MIRROR(0x200000)
+	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
+	AM_RANGE(0x000000, 0x1fffff) AM_MIRROR(0x200000) AM_RAM AM_SHARE(1)
 	AM_RANGE(0x800000, 0xdfffff) AM_ROMBANK(15)
 	AM_RANGE(0xe00000, 0xe1ffff) AM_ROMBANK(16)
-
 	AM_RANGE(0xf00000, 0xf003ff) AM_READWRITE(jaguar_tom_regs32_r, jaguar_tom_regs32_w)
 	AM_RANGE(0xf00400, 0xf007ff) AM_RAM AM_SHARE(2)
-	AM_RANGE(0xf02100, 0xf021ff) AM_READWRITE(gpuctrl_r, gpuctrl_w)
-	AM_RANGE(0xf02200, 0xf022ff) AM_READWRITE(jaguar_blitter_r, jaguar_blitter_w)
-	AM_RANGE(0xf03000, 0xf03fff) AM_RAM AM_SHARE(3) AM_MIRROR(0x008000)
+	AM_RANGE(0xf02100, 0xf021ff) AM_MIRROR(0x008000) AM_READWRITE(gpuctrl_r, gpuctrl_w)
+	AM_RANGE(0xf02200, 0xf022ff) AM_MIRROR(0x008000) AM_READWRITE(jaguar_blitter_r, jaguar_blitter_w)
+	AM_RANGE(0xf03000, 0xf03fff) AM_MIRROR(0x008000) AM_RAM AM_SHARE(3)
 	AM_RANGE(0xf10000, 0xf103ff) AM_READWRITE(jaguar_jerry_regs32_r, jaguar_jerry_regs32_w)
-ADDRESS_MAP_END
-
-
-
-/*************************************
- *
- *  DSP memory handlers
- *
- *************************************/
-
-static ADDRESS_MAP_START( dsp_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x000000, 0x1fffff) AM_RAM AM_SHARE(1) AM_MIRROR(0x200000)
-	AM_RANGE(0x800000, 0xdfffff) AM_ROMBANK(15)
-	AM_RANGE(0xe00000, 0xe1ffff) AM_ROMBANK(16)
-	AM_RANGE(0xf10000, 0xf103ff) AM_READWRITE(jaguar_jerry_regs32_r, jaguar_jerry_regs32_w)
+	AM_RANGE(0xf14000, 0xf14003) AM_READWRITE(joystick_r, joystick_w)
 	AM_RANGE(0xf1a100, 0xf1a13f) AM_READWRITE(dspctrl_r, dspctrl_w)
 	AM_RANGE(0xf1a140, 0xf1a17f) AM_READWRITE(jaguar_serial_r, jaguar_serial_w)
 	AM_RANGE(0xf1b000, 0xf1cfff) AM_RAM AM_SHARE(4)
@@ -504,7 +479,7 @@ static MACHINE_DRIVER_START( jaguar )
 
 	MDRV_CPU_ADD("audiocpu", JAGUARDSP, JAGUAR_CLOCK)
 	MDRV_CPU_CONFIG(dsp_config)
-	MDRV_CPU_PROGRAM_MAP(dsp_map)
+	MDRV_CPU_PROGRAM_MAP(gpu_map)
 
 	MDRV_MACHINE_RESET(jaguar)
 
@@ -532,6 +507,7 @@ static MACHINE_DRIVER_START( jaguar )
 	/* cartridge */
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("jag,abs,rom,j64")
+	MDRV_CARTSLOT_LOAD(jaguar)
 MACHINE_DRIVER_END
 
 
@@ -575,13 +551,45 @@ static DRIVER_INIT( jaguar )
 
 static QUICKLOAD_LOAD( jaguar )
 {
+	int i,j;
 	offs_t quickload_begin = 0x4000;
+	memset(jaguar_shared_ram, 0, 0x200000);
 	quickload_size = MIN(quickload_size, 0x200000 - quickload_begin);
 	image_fread(image, &memory_region(image->machine, "maincpu")[quickload_begin], quickload_size);
+
+	/* Fix endian-ness */
+	for (i = quickload_begin / 4; i < quickload_size / 4; i++)
+	{
+		j = jaguar_shared_ram[i];
+		jaguar_shared_ram[i] = ((j & 0xff) << 24) | ((j & 0xff00) << 8) | ((j & 0xff0000) >> 8) | ((j & 0xff000000) >> 24);
+	}
+
+	/* Transfer control to image */
 	cpu_set_reg(cputag_get_cpu(image->machine, "maincpu"), REG_GENPC, quickload_begin);
 	return INIT_PASS;
 }
 
+static DEVICE_IMAGE_LOAD( jaguar )
+{
+	int i,j;
+	image_fread(image, cart_base, image_length(image));
+	memset(jaguar_shared_ram, 0, 0x200000);
+	memcpy(jaguar_shared_ram, rom_base, 0x10);
+
+	/* Fix endian-ness */
+	for (i = 0; i < image_length(image) / 4; i++)
+	{
+		j = cart_base[i];
+		cart_base[i] = ((j & 0xff) << 24) | ((j & 0xff00) << 8) | ((j & 0xff0000) >> 8) | ((j & 0xff000000) >> 24);
+	}
+
+	/* Disable logo - breaks Doom */
+	rom_base[0x53c / 4] = 0x67000002;
+
+	/* Transfer control to the bios */
+	cpu_set_reg(cputag_get_cpu(image->machine, "maincpu"), REG_GENPC, rom_base[1]);
+	return INIT_PASS;
+}
 
 /*************************************
  *
@@ -590,6 +598,5 @@ static QUICKLOAD_LOAD( jaguar )
  *************************************/
 
 /*    YEAR   NAME      PARENT    COMPAT  MACHINE   INPUT     INIT      CONFIG  COMPANY    FULLNAME */
-CONS( 1993,  jaguar,   0,        0,      jaguar,   jaguar,   jaguar,   0,      "Atari",   "Atari Jaguar", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING)
-CONS( 1995,  jaguarcd, jaguar,   0,      jaguar,   jaguar,   jaguar,   0,      "Atari",   "Atari Jaguar CD", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GA\
-ME_NOT_WORKING)
+CONS( 1993,  jaguar,   0,        0,      jaguar,   jaguar,   jaguar,   0,      "Atari",   "Atari Jag", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING)
+CONS( 1995,  jaguarcd, jaguar,   0,      jaguar,   jaguar,   jaguar,   0,      "Atari",   "Atari Jaguar CD", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING)
