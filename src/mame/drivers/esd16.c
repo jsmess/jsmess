@@ -190,7 +190,7 @@ static ADDRESS_MAP_START( mchampdx_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x320000, 0x323fff) AM_WRITE(esd16_vram_1_w) AM_BASE(&esd16_vram_1)							//
 	AM_RANGE(0x324000, 0x327fff) AM_WRITE(esd16_vram_1_w) AM_BASE(&esd16_vram_1)							// mirror?
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)	// Palette
-    AM_RANGE(0x500000, 0x500001) AM_WRITENOP	// IRQ Ack
+	AM_RANGE(0x500000, 0x500001) AM_WRITENOP	// IRQ Ack
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x500004, 0x500005) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x500006, 0x500007) AM_READ(esd_eeprom_r)
@@ -318,50 +318,51 @@ static INPUT_PORTS_START( multchmp )
 	PORT_BIT(  0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW")	// $600006.w
-	PORT_SERVICE( 0x0001, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x0002, 0x0002, "Coinage Type" )	// Not Supported
+	PORT_SERVICE_DIPLOC(  0x0001, IP_ACTIVE_LOW, "SW1:1" )
+	PORT_DIPNAME( 0x0002, 0x0002, "Coinage Type" )			PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(      0x0002, "1" )
-//  PORT_DIPSETTING(      0x0000, "2" )
-	PORT_DIPNAME( 0x0004, 0x0000, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(      0x0000, "2" )
+	PORT_DIPNAME( 0x0004, 0x0000, DEF_STR( Demo_Sounds ) )		PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Flip_Screen ) )		PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0030, 0x0030, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( 2C_1C ) )
+	PORT_DIPNAME( 0x0030, 0x0030, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPSETTING(      0x0000, DEF_STR( 4C_1C ) )	PORT_CONDITION("DSW", 0x0002, PORTCOND_EQUALS, 0x0000)
+	PORT_DIPSETTING(      0x0010, DEF_STR( 3C_1C ) )	PORT_CONDITION("DSW", 0x0002, PORTCOND_EQUALS, 0x0000)
+	PORT_DIPSETTING(      0x0020, DEF_STR( 2C_1C ) )	PORT_CONDITION("DSW", 0x0002, PORTCOND_EQUALS, 0x0000)
+	PORT_DIPSETTING(      0x0010, DEF_STR( 2C_1C ) )	PORT_CONDITION("DSW", 0x0002, PORTCOND_EQUALS, 0x0002)
 	PORT_DIPSETTING(      0x0030, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x00c0, 0x00c0, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( 2C_3C ) )	PORT_CONDITION("DSW", 0x0002, PORTCOND_EQUALS, 0x0002)
+	PORT_DIPSETTING(      0x0020, DEF_STR( 1C_2C ) )	PORT_CONDITION("DSW", 0x0002, PORTCOND_EQUALS, 0x0002)
+	PORT_DIPNAME( 0x00c0, 0x00c0, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPSETTING(      0x0040, DEF_STR( 2C_1C ) )	PORT_CONDITION("DSW", 0x0002, PORTCOND_EQUALS, 0x0002)
 	PORT_DIPSETTING(      0x00c0, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( 2C_3C ) )	PORT_CONDITION("DSW", 0x0002, PORTCOND_EQUALS, 0x0002)
+	PORT_DIPSETTING(      0x0080, DEF_STR( 1C_2C ) )	PORT_CONDITION("DSW", 0x0002, PORTCOND_EQUALS, 0x0002)
+	PORT_DIPSETTING(      0x0080, DEF_STR( 1C_3C ) )	PORT_CONDITION("DSW", 0x0002, PORTCOND_EQUALS, 0x0000)
+	PORT_DIPSETTING(      0x0040, DEF_STR( 1C_4C ) )	PORT_CONDITION("DSW", 0x0002, PORTCOND_EQUALS, 0x0000)
+	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_6C ) )	PORT_CONDITION("DSW", 0x0002, PORTCOND_EQUALS, 0x0000)
 
-//  PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Difficulty" ) )  CRASH CPP??
-	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Difficulty ) )		PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(      0x0200, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x0300, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0100, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0c00, 0x0c00, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x0c00, 0x0c00, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(      0x0000, "2" )
 	PORT_DIPSETTING(      0x0c00, "3" )
 	PORT_DIPSETTING(      0x0800, "4" )
 	PORT_DIPSETTING(      0x0400, "5" )
-	PORT_DIPNAME( 0x1000, 0x1000, "Selectable Games" )
+	PORT_DIPNAME( 0x1000, 0x1000, "Selectable Games" )		PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(      0x1000, "3" )
 	PORT_DIPSETTING(      0x0000, "4" )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Free_Play ) )		PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, "Unknown 2-6" )	// unused
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, "Unknown 2-7" )	// unused
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x4000, 0x4000, "SW2:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x8000, 0x8000, "SW2:8" )
 INPUT_PORTS_END
 
 
@@ -712,7 +713,7 @@ ROM_START( multchmp )
 	ROM_LOAD( "esd4.su10", 0x00000, 0x20000, CRC(6e741fcd) SHA1(742e0952916c00f67dd9f8d01e721a9a538d2fc4) )
 ROM_END
 
-ROM_START( multchmk )
+ROM_START( multchmpk )
 	ROM_REGION( 0x080000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "multchmp.u02", 0x000000, 0x040000, CRC(7da8c0df) SHA1(763a3240554a02d8a9a0b13b6bfcd384825a6c57) )
 	ROM_LOAD16_BYTE( "multchmp.u03", 0x000001, 0x040000, CRC(5dc62799) SHA1(ff7882985efc20309c3f901a622f1beffa0c47be) )
@@ -819,7 +820,7 @@ ROM_START( mchampdx )
 	ROM_LOAD( "ver0106_esd4.su10", 0x00000, 0x40000, CRC(ac8ae009) SHA1(2c1c30cc4b3e34a5f14d7dfb6f6e18ff21f526f5) )
 ROM_END
 
-ROM_START( mchampda )
+ROM_START( mchampdxa )
 	ROM_REGION( 0x080000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "esd2.cu02", 0x000000, 0x040000, CRC(4cca802c) SHA1(5e6e81febbb56b7c4630b530e546e7ab59c6c6c1) )
 	ROM_LOAD16_BYTE( "esd1.cu03", 0x000001, 0x040000, CRC(0af1cd0a) SHA1(d2befcb596d83d523317d17b4c1c71f99de0d33e) )
@@ -913,7 +914,7 @@ ROM_START( hedpanic ) /* Story line & game instructions in English */
 ROM_END
 
 
-ROM_START( hedpanif ) /* Story line in Japanese, game instructions in English */
+ROM_START( hedpanicf ) /* Story line in Japanese, game instructions in English */
 	ROM_REGION( 0x080000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "esd2", 0x000000, 0x040000, CRC(8cccc691) SHA1(d6a5dd6c21a67638b9023182f77780282b9b04e5) )
 	ROM_LOAD16_BYTE( "esd1", 0x000001, 0x040000, CRC(d8574925) SHA1(bd4990778b90a49aa6b10f8cf6709ce2424f546a) )
@@ -938,7 +939,7 @@ ROM_START( hedpanif ) /* Story line in Japanese, game instructions in English */
 ROM_END
 
 
-ROM_START( hedpanio ) /* Story line & game instructions in English, copyright year is 1999 - uses older style sprites */
+ROM_START( hedpanico ) /* Story line & game instructions in English, copyright year is 1999 - uses older style sprites */
 	ROM_REGION( 0x080000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "esd2.rom", 0x000000, 0x040000, CRC(70b08424) SHA1(2ba4fb3b749e31db4239a9173b8509366400152f) )
 	ROM_LOAD16_BYTE( "esd1.rom", 0x000001, 0x040000, CRC(4e0682c5) SHA1(f4117f31b6426d7bf126a6c62c489b9347885b42) )
@@ -951,15 +952,15 @@ ROM_START( hedpanio ) /* Story line & game instructions in English, copyright ye
 	ROM_CONTINUE(          0x10000, 0x34000)
 
 	ROM_REGION( 0x600000, "gfx1", 0 )	/* Sprites, 16x16x5 */
-	ROM_LOAD( "sm1.bin", 0x000000, 0x200000, CRC(8083813f) SHA1(9492e7e844e45d59f0506f69d40c338b27bd3ce3) )
-	ROM_LOAD( "sm2.bin", 0x200000, 0x200000, CRC(7a9610e4) SHA1(21ae3ec3fbddfc66416c109b091bd885d5ba0558) )
+	ROM_LOAD( "sm1.ju01", 0x000000, 0x200000, CRC(8083813f) SHA1(9492e7e844e45d59f0506f69d40c338b27bd3ce3) )
+	ROM_LOAD( "sm2.ju02", 0x200000, 0x200000, CRC(7a9610e4) SHA1(21ae3ec3fbddfc66416c109b091bd885d5ba0558) )
 	/* expand this to take up 0x200000 bytes too so we can decode it */
 	ROM_LOAD16_BYTE( "esd5.rom", 0x400000, 0x080000, CRC(82c5727f) SHA1(017f1d0c94475c51d17f12e24895f47a273a2dbb) )
 	ROM_FILL(                    0x500000, 0x100000, 0 )
 
 	ROM_REGION( 0x400000, "gfx2", 0 )	/* Layers, 16x16x8 */
-	ROM_LOAD16_BYTE( "sm3.bin", 0x000000, 0x200000, CRC(94dd4cfc) SHA1(a3f9c49611f0bc9d26166dafb44e2c5ebbb31127) )
-	ROM_LOAD16_BYTE( "sm4.bin", 0x000001, 0x200000, CRC(6da0fb9e) SHA1(c4e7487953f45c5f6ce2ebe558b4c325f6ec54eb) )
+	ROM_LOAD16_BYTE( "sm3.fu35", 0x000000, 0x200000, CRC(94dd4cfc) SHA1(a3f9c49611f0bc9d26166dafb44e2c5ebbb31127) )
+	ROM_LOAD16_BYTE( "sm4.fu34", 0x000001, 0x200000, CRC(6da0fb9e) SHA1(c4e7487953f45c5f6ce2ebe558b4c325f6ec54eb) )
 
 	ROM_REGION( 0x40000, "oki", 0 )	/* Samples */
 	ROM_LOAD( "esd4.rom", 0x000000, 0x020000, CRC(d7ca6806) SHA1(8ad668bfb5b7561cc0f3e36dfc3c936b136a4274) )
@@ -1128,14 +1129,14 @@ ROM_END
 
 /* ESD 11-09-98 */
 GAME( 1999, multchmp, 0,        multchmp, multchmp, 0, ROT0, "ESD",         "Multi Champ (World)", 0 )
-GAME( 1998, multchmk, multchmp, multchmp, multchmp, 0, ROT0, "ESD",         "Multi Champ (Korea)", 0 )
+GAME( 1998, multchmpk,multchmp, multchmp, multchmp, 0, ROT0, "ESD",         "Multi Champ (Korea)", 0 )
 
 /* ESD 08-26-1999 */
 GAME( 2000, mchampdx, 0,        mchampdx, hedpanic, 0, ROT0, "ESD",         "Multi Champ Deluxe (ver. 0106, 06/01/2000)", 0 ) // 06/01/2000 ?
-GAME( 1999, mchampda, mchampdx, mchampdx, hedpanic, 0, ROT0, "ESD",         "Multi Champ Deluxe (ver. 1126, 26/11/1999)", 0 ) // 26/11/1999 ?
+GAME( 1999, mchampdxa,mchampdx, mchampdx, hedpanic, 0, ROT0, "ESD",         "Multi Champ Deluxe (ver. 1126, 26/11/1999)", 0 ) // 26/11/1999 ?
 GAME( 2000, hedpanic, 0,        hedpanic, hedpanic, 0, ROT0, "ESD",         "Head Panic (ver. 0117, 17/01/2000)", 0 ) // 17/01/2000 ?
-GAME( 2000, hedpanif, hedpanic, hedpanic, hedpanic, 0, ROT0, "ESD / Fuuki", "Head Panic (ver. 0315, 15/03/2000)", 0 ) // 15/03/2000 ?
-GAME( 1999, hedpanio, hedpanic, hedpanio, hedpanic, 0, ROT0, "ESD",         "Head Panic (ver. 0615, 15/06/1999)", 0 ) // 15/06/1999 ?
+GAME( 2000, hedpanicf,hedpanic, hedpanic, hedpanic, 0, ROT0, "ESD / Fuuki", "Head Panic (ver. 0315, 15/03/2000)", 0 ) // 15/03/2000 ?
+GAME( 1999, hedpanico,hedpanic, hedpanio, hedpanic, 0, ROT0, "ESD",         "Head Panic (ver. 0615, 15/06/1999)", 0 ) // 15/06/1999 ?
 
 /* ESD - This PCB looks identical to the ESD 08-26-1999 PCB */
 GAME( 2000, tangtang, 0,        tangtang, hedpanic, 0, ROT0, "ESD",         "Tang Tang (ver. 0526, 26/05/2000)", 0 ) // 26/05/2000 ?

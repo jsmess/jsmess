@@ -160,43 +160,39 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( gbusters )
 	PORT_START("DSW1")
-	KONAMI_COINAGE(DEF_STR( Free_Play ), "No Coin B")
+	KONAMI_COINAGE_LOC(DEF_STR( Free_Play ), "No Coin B", SW1)
 	/* "No Coin B" = coins produce sound, but no effect on coin counter */
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, "2" )
 	PORT_DIPSETTING(    0x02, "3" )
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x00, "7" )
-	PORT_DIPNAME( 0x04, 0x04, "Bullets" )
+	PORT_DIPNAME( 0x04, 0x04, "Bullets" )			PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x04, "50" )
 	PORT_DIPSETTING(    0x00, "60" )
-	PORT_DIPNAME( 0x18, 0x10, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x18, "50k, 200k & 400k" )
-	PORT_DIPSETTING(    0x10, "70k, 250k & 500k" )
-	PORT_DIPSETTING(    0x08, "50k" )
-	PORT_DIPSETTING(    0x00, "70k" )
-	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x18, 0x10, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPSETTING(    0x18, "50k, 200k, Every 400k" )
+	PORT_DIPSETTING(    0x10, "70k, 250k, Every 500k" )
+	PORT_DIPSETTING(    0x08, "50k Only" )
+	PORT_DIPSETTING(    0x00, "70k Only" )
+	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:6,7")
 	PORT_DIPSETTING(    0x60, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Difficult ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Difficult ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW3:2" ) /* Listed as "Unused" */
+	PORT_SERVICE_DIPLOC(  0x04, IP_ACTIVE_LOW, "SW3:3" )
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW3:4" ) /* Listed as "Unused" */
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SYSTEM")
@@ -298,7 +294,7 @@ ROM_START( gbusters )
 	ROM_LOAD( "878c04.d5",  0x00000, 0x40000, CRC(9e982d1c) SHA1(a5b611c67b0f2ac50c679707931ee12ebbf72ebe) )
 ROM_END
 
-ROM_START( gbustera )
+ROM_START( gbustersa )
 	ROM_REGION( 0x30800, "maincpu", 0 ) /* code + banked roms + space for banked RAM */
 	ROM_LOAD( "878_02.k13", 0x10000, 0x08000, CRC(57178414) SHA1(89b1403158f6ce18706c8a941109554d03cf77d9) ) /* unknown region/version leter */
 	ROM_CONTINUE(           0x08000, 0x08000 )
@@ -386,5 +382,5 @@ static DRIVER_INIT( gbusters )
 
 
 GAME( 1988, gbusters, 0,        gbusters, gbusters, gbusters, ROT90, "Konami", "Gang Busters (set 1)", 0 ) /* N02 & J03 program roms */
-GAME( 1988, gbustera, gbusters, gbusters, gbusters, gbusters, ROT90, "Konami", "Gang Busters (set 2)", 0 ) /* unknown region program roms */
+GAME( 1988, gbustersa,gbusters, gbusters, gbusters, gbusters, ROT90, "Konami", "Gang Busters (set 2)", 0 ) /* unknown region program roms */
 GAME( 1988, crazycop, gbusters, gbusters, gbusters, gbusters, ROT90, "Konami", "Crazy Cop (Japan)", 0 )    /* M02 & J03 program roms */

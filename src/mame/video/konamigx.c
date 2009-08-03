@@ -329,7 +329,7 @@ VIDEO_START(konamigx_6bpp_2)
 {
 	K056832_vh_start(machine, "gfx1", K056832_BPP_6, 1, NULL, konamigx_type2_tile_callback, 0);
 
-	if (!strcmp(machine->gamedrv->name,"salmndr2") || !strcmp(machine->gamedrv->name,"salmnd2a"))
+	if (!strcmp(machine->gamedrv->name,"salmndr2") || !strcmp(machine->gamedrv->name,"salmndr2a"))
 	{
 		K055673_vh_start(machine, "gfx2", K055673_LAYOUT_GX6, -48, -23, konamigx_salmndr2_sprite_callback);
 
@@ -378,7 +378,7 @@ VIDEO_START(opengolf)
 
 	// urgh.. the priority bitmap is global, and because our temp bitmaps are bigger than the screen, this causes issues.. so just allocate something huge
 	// until there is a better solution, or priority bitmap can be specified manually.
-	priority_bitmap = auto_bitmap_alloc(machine,2048,2048,BITMAP_FORMAT_INDEXED16);
+	machine->priority_bitmap = auto_bitmap_alloc(machine,2048,2048,BITMAP_FORMAT_INDEXED16);
 
 }
 
@@ -419,7 +419,7 @@ VIDEO_START(racinfrc)
 
 	// urgh.. the priority bitmap is global, and because our temp bitmaps are bigger than the screen, this causes issues.. so just allocate something huge
 	// until there is a better solution, or priority bitmap can be specified manually.
-	priority_bitmap = auto_bitmap_alloc(machine,2048,2048,BITMAP_FORMAT_INDEXED16);
+	machine->priority_bitmap = auto_bitmap_alloc(machine,2048,2048,BITMAP_FORMAT_INDEXED16);
 
 
 }

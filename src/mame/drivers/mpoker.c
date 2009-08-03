@@ -160,7 +160,7 @@
     These writes sounds like a BCD valueset.
     Maybe were intended formerly to send some data to 7seg display unit.
 
-  - Color system (no bipolar PROMs in the system)
+  - Color system (no bipolar PROMs in the system), needs a reference
 
 
 **********************************************************************************/
@@ -194,7 +194,7 @@ static VIDEO_UPDATE(mpoker)
 		for (x=0;x<32;x++)
 		{
 			UINT16 dat = mpoker_video[count];
-			UINT16 col = mpoker_video[count+0x400];
+			UINT16 col = mpoker_video[count+0x400] & 0x7f;
 			drawgfx_opaque(bitmap,cliprect,gfx,dat,col,0,0,x*16,y*16);
 			count++;
 		}
@@ -203,14 +203,20 @@ static VIDEO_UPDATE(mpoker)
 	return 0;
 }
 
-static PALETTE_INIT( mpoker )	// WRONG... FIXME
+static PALETTE_INIT(mpoker)
 {
 	int i;
 
-	for (i = 0; i < 64; i++)
+	for (i = 0; i < 0x100; i++)
 	{
-		palette_set_color_rgb(machine, 2*i+0, pal1bit(i >> 2), pal1bit(i >> 0), pal1bit(i >> 1));
-		palette_set_color_rgb(machine, 2*i+1, pal1bit(i >> 5), pal1bit(i >> 3), pal1bit(i >> 4));
+		rgb_t color;
+
+		if (i & 0x01)
+			color = MAKE_RGB(pal2bit((i & 0x6) >> 1),pal2bit((i & 0x18) >> 3),pal2bit((i & 0x60) >> 5));
+		else
+			color = RGB_BLACK;
+
+		palette_set_color(machine, i, color);
 	}
 }
 
@@ -465,24 +471,23 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( mpoker )
-
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_1) PORT_NAME("Bet")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(KEYCODE_2) PORT_NAME("Deal/Draw")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_N) PORT_NAME("Cancel Discards")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_CODE(KEYCODE_M) PORT_NAME("Stand (Hold all Cards)")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CODE(KEYCODE_Z) PORT_NAME("Discard 1")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_CODE(KEYCODE_X) PORT_NAME("Discard 2")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_CODE(KEYCODE_C) PORT_NAME("Discard 3")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_CODE(KEYCODE_V) PORT_NAME("Discard 4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL ) PORT_NAME("Cancel Discards")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Stand (Hold all Cards)")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("Discard 1")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) PORT_NAME("Discard 2")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_NAME("Discard 3")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) PORT_NAME("Discard 4")
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_CODE(KEYCODE_B) PORT_NAME("Discard 5")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_9) PORT_NAME("Stats")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_Q) PORT_NAME("Payout")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_IMPULSE(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_0) PORT_NAME("Settings")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("Discard 5")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Stats")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Settings")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -520,7 +525,7 @@ static INPUT_PORTS_START( mpoker )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )		/* bit1 connected to a signal heartbeat */
-	PORT_DIPNAME( 0x1c, 0x1c, "Main Percentage" )
+	PORT_DIPNAME( 0x1c, 0x0c, "Main Percentage" )
 	PORT_DIPSETTING(    0x18, "75%" )
 	PORT_DIPSETTING(    0x14, "80%" )
 	PORT_DIPSETTING(    0x00, "85%" )
@@ -551,7 +556,7 @@ static const gfx_layout tiles16x16_layout =
 };
 
 static GFXDECODE_START( mpoker )
-	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16_layout, 0, 0x100 )
 GFXDECODE_END
 
 static MACHINE_DRIVER_START( mpoker )
@@ -571,7 +576,7 @@ static MACHINE_DRIVER_START( mpoker )
 	MDRV_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 
 	MDRV_GFXDECODE(mpoker)
-	MDRV_PALETTE_LENGTH(2*64)
+	MDRV_PALETTE_LENGTH(0x200)
 
 	MDRV_PALETTE_INIT(mpoker)
 	MDRV_VIDEO_START(mpoker)

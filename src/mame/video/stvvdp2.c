@@ -120,8 +120,8 @@ UINT32* stv_vdp2_cram;
 
 static void stv_vdp2_dynamic_res_change(running_machine *machine);
 static UINT8 get_hblank(running_machine *machine);
-static int   get_vblank_duration(running_machine *machine);
-//int get_hblank_duration(running_machine *machine); //<- when we know that...
+static int get_vblank_duration(running_machine *machine);
+static int get_hblank_duration(running_machine *machine);
 static UINT8 get_odd_bit(running_machine *machine);
 
 static void refresh_palette_data(running_machine *machine);
@@ -5277,8 +5277,19 @@ static UINT8 get_hblank(running_machine *machine)
 		return 0;
 }
 
-//int get_hblank_duration(running_machine *machine)
-//...
+/* the following is a complete guess-work */
+static int get_hblank_duration(running_machine *machine)
+{
+	switch( STV_VDP2_HRES & 3 )
+	{
+		case 0: return 80; //400-320
+		case 1: return 104; break; //456-352
+		case 2: return 160; break; //(400-320)*2
+		case 3: return 208; break; //(456-352)*2
+	}
+
+	return 0;
+}
 
 UINT8 stv_get_vblank(running_machine *machine)
 {
@@ -5295,26 +5306,21 @@ UINT8 stv_get_vblank(running_machine *machine)
 /*some vblank lines measurements (according to Charles MacDonald)*/
 static int get_vblank_duration(running_machine *machine)
 {
-	/* TODO: +64 is probably due of missing pixel clock/screen raw params hook-up.
-             Problem is, I don't know if it's possible to handle that in MAME with
-             all this dynamic resolution babblecrap...
-             */
-
 	if(STV_VDP2_HRES & 4)
 	{
 		switch(STV_VDP2_HRES & 1)
 		{
-			case 0: return 45+64; //31kHz Monitor
-			case 1: return 82+64; //Hi-Vision Monitor
+			case 0: return 45; //31kHz Monitor
+			case 1: return 82; //Hi-Vision Monitor
 		}
 	}
 
 	switch(STV_VDP2_VRES & 3)
 	{
-		case 0: return 39+64; //263-224
-		case 1: return 23+64; //263-240
-		case 2: return 7+64; //263-256
-		case 3: return 7+64; //263-256
+		case 0: return 40; //264-224
+		case 1: return 24; //264-240
+		case 2: return 8; //264-256
+		case 3: return 8; //264-256
 	}
 
 	return 0;
@@ -5435,7 +5441,7 @@ VIDEO_START( stv_vdp2 )
 /*    & height / width not yet understood (docs-wise MUST be bigger than normal visible area)*/
 static TIMER_CALLBACK( dyn_res_change )
 {
-	UINT8 vblank_period;
+	int vblank_period,hblank_period;
 	rectangle visarea = *video_screen_get_visible_area(machine->primary_screen);
 	visarea.min_x = 0;
 	visarea.max_x = horz_res-1;
@@ -5443,9 +5449,10 @@ static TIMER_CALLBACK( dyn_res_change )
 	visarea.max_y = vert_res-1;
 
 	vblank_period = get_vblank_duration(machine);
+	hblank_period = get_hblank_duration(machine);
 //  popmessage("%d",vblank_period);
 //  hblank_period = get_hblank_duration(machine->primary_screen);
-	video_screen_configure(machine->primary_screen, horz_res*2, (vert_res+vblank_period), &visarea, video_screen_get_frame_period(machine->primary_screen).attoseconds );
+	video_screen_configure(machine->primary_screen, (horz_res+hblank_period), (vert_res+vblank_period), &visarea, video_screen_get_frame_period(machine->primary_screen).attoseconds );
 }
 
 static void stv_vdp2_dynamic_res_change(running_machine *machine)

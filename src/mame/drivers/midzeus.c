@@ -1164,28 +1164,28 @@ MACHINE_DRIVER_END
 
 ROM_START( mk4 )
 	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )	/* sound data */
-	ROM_LOAD16_BYTE( "mk4_l2.u2", 0x000000, 0x200000, CRC(4c01b493) SHA1(dcd6da9ee30d0f6645bfdb1762d926be0a26090a) ) /* These four sound roms were labeled as v2.0 */
-	ROM_LOAD16_BYTE( "mk4_l2.u3", 0x400000, 0x200000, CRC(8fbcf0ac) SHA1(c53704e72cfcba800c7af3a03267041f1e29a784) )
-	ROM_LOAD16_BYTE( "mk4_l2.u4", 0x800000, 0x200000, CRC(dee91696) SHA1(00a182a36a414744cd014fcfc53c2e1a66ab5189) )
-	ROM_LOAD16_BYTE( "mk4_l2.u5", 0xc00000, 0x200000, CRC(44d072be) SHA1(8a636c2801d799dfb84e69607ade76d2b49cf09f) )
+	ROM_LOAD16_BYTE( "mk4_l2.u2", 0x000000, 0x100000, CRC(f9d410b4) SHA1(49bcacf83430ed26c08789b2f3ed9f946c3a0e5e) ) /* Labeled as v2.0, rom type M27C800 */
+	ROM_LOAD16_BYTE( "mk4_l2.u3", 0x400000, 0x200000, CRC(8fbcf0ac) SHA1(c53704e72cfcba800c7af3a03267041f1e29a784) ) /* Labeled as v2.0, rom type M27C160 */
+	ROM_LOAD16_BYTE( "mk4_l1.u4", 0x800000, 0x200000, CRC(dee91696) SHA1(00a182a36a414744cd014fcfc53c2e1a66ab5189) ) /* Labeled as v1.0, rom type M27C160 */
+	ROM_LOAD16_BYTE( "mk4_l1.u5", 0xc00000, 0x200000, CRC(44d072be) SHA1(8a636c2801d799dfb84e69607ade76d2b49cf09f) ) /* Labeled as v1.0, rom type M27C160 */
 
 	ROM_REGION32_LE( 0x1800000, "user1", 0 )
 	ROM_LOAD32_WORD( "mk4_l3.u10", 0x0000000, 0x200000, CRC(84efe5a9) SHA1(e2a9bf6fab971691017371a87ab87b1bf66f96d0) ) /* Roms U10 & U11 were labeled as v3.0 */
 	ROM_LOAD32_WORD( "mk4_l3.u11", 0x0000002, 0x200000, CRC(0c026ccb) SHA1(7531fe81ff8d8dd9ec3cd915acaf14cbe6bdc90a) )
 	ROM_LOAD32_WORD( "mk4_l2.u12", 0x0400000, 0x200000, CRC(7816c07f) SHA1(da94b4391e671f915c61b5eb9bece4acb3382e31) ) /* Roms U12 through U17 were all labeled as v2.0 */
 	ROM_LOAD32_WORD( "mk4_l2.u13", 0x0400002, 0x200000, CRC(b3c237cd) SHA1(9e71e60cc92c17524f85f36543c174ca138104cd) )
-	ROM_LOAD32_WORD( "mk4_l2.u14", 0x0800000, 0x200000, CRC(fd33eb1a) SHA1(59d9d2e5251679d19cab031f51731c85f429ba18) ) /* It is possible that in late production, these */
-	ROM_LOAD32_WORD( "mk4_l2.u15", 0x0800002, 0x200000, CRC(b907518f) SHA1(cfb56538746895bdca779957fec6a872019b23c3) ) /* rom were also labeled as v3.0, but the labels */
+	ROM_LOAD32_WORD( "mk4_l2.u14", 0x0800000, 0x200000, CRC(fd33eb1a) SHA1(59d9d2e5251679d19cab031f51731c85f429ba18) ) /* It is possible that in late production, these  */
+	ROM_LOAD32_WORD( "mk4_l2.u15", 0x0800002, 0x200000, CRC(b907518f) SHA1(cfb56538746895bdca779957fec6a872019b23c3) ) /* rom were also labeled as v3.0, but the labels  */
 	ROM_LOAD32_WORD( "mk4_l2.u16", 0x0c00000, 0x200000, CRC(24371d57) SHA1(c90134b17c23a182d391d1679bf457d251e641f7) ) /* with v2.0 have been verified on several boards */
-	ROM_LOAD32_WORD( "mk4_l2.u17", 0x0c00002, 0x200000, CRC(3a1a082c) SHA1(5f8e8ce760d8ebadd1240ef08f1382a37cf11d0b) )
+	ROM_LOAD32_WORD( "mk4_l2.u17", 0x0c00002, 0x200000, CRC(3a1a082c) SHA1(5f8e8ce760d8ebadd1240ef08f1382a37cf11d0b) ) /* Some PCBs may have all MASK ROMs instead.      */
 ROM_END
 
 ROM_START( mk4a )
 	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )	/* sound data */
-	ROM_LOAD16_BYTE( "mk4_l2.u2", 0x000000, 0x200000, CRC(4c01b493) SHA1(dcd6da9ee30d0f6645bfdb1762d926be0a26090a) ) /* These four sound roms were labeled as v2.0 */
-	ROM_LOAD16_BYTE( "mk4_l2.u3", 0x400000, 0x200000, CRC(8fbcf0ac) SHA1(c53704e72cfcba800c7af3a03267041f1e29a784) )
-	ROM_LOAD16_BYTE( "mk4_l2.u4", 0x800000, 0x200000, CRC(dee91696) SHA1(00a182a36a414744cd014fcfc53c2e1a66ab5189) )
-	ROM_LOAD16_BYTE( "mk4_l2.u5", 0xc00000, 0x200000, CRC(44d072be) SHA1(8a636c2801d799dfb84e69607ade76d2b49cf09f) )
+	ROM_LOAD16_BYTE( "mk4_l2.u2", 0x000000, 0x100000, CRC(f9d410b4) SHA1(49bcacf83430ed26c08789b2f3ed9f946c3a0e5e) ) /* Labeled as v2.0, rom type M27C800 */
+	ROM_LOAD16_BYTE( "mk4_l2.u3", 0x400000, 0x200000, CRC(8fbcf0ac) SHA1(c53704e72cfcba800c7af3a03267041f1e29a784) ) /* Labeled as v2.0, rom type M27C160 */
+	ROM_LOAD16_BYTE( "mk4_l1.u4", 0x800000, 0x200000, CRC(dee91696) SHA1(00a182a36a414744cd014fcfc53c2e1a66ab5189) ) /* Labeled as v1.0, rom type M27C160 */
+	ROM_LOAD16_BYTE( "mk4_l1.u5", 0xc00000, 0x200000, CRC(44d072be) SHA1(8a636c2801d799dfb84e69607ade76d2b49cf09f) ) /* Labeled as v1.0, rom type M27C160 */
 
 	ROM_REGION32_LE( 0x1800000, "user1", 0 )
 	ROM_LOAD32_WORD( "mk4_l2.1.u10", 0x000000, 0x200000, CRC(42d0f1c9) SHA1(5ac0ded8bf6e756319be2691e3b555eac079ebdc) ) /* Roms U10 & U11 were labeled as v2.1 */
@@ -1266,7 +1266,35 @@ ROM_START( crusnexo )
 	ROM_LOAD32_WORD( "exotica.u21", 0x2400002, 0x200000, CRC(0011b9d6) SHA1(231d768c964a16b905857b0814d758fe93c2eefb) )
 ROM_END
 
-ROM_START( crusnexa )
+ROM_START( crusnexoa )
+	ROM_REGION16_LE( 0xc00000, "dcs", ROMREGION_ERASEFF )	/* sound data */
+	ROM_LOAD( "exotica.u2", 0x000000, 0x200000, CRC(d2d54acf) SHA1(2b4d6fda30af807228bb281335939dfb6df9b530) )
+	ROM_RELOAD(             0x200000, 0x200000 )
+	ROM_LOAD( "exotica.u3", 0x400000, 0x400000, CRC(28a3a13d) SHA1(8d7d641b883df089adefdd144229afef79db9e8a) )
+	ROM_LOAD( "exotica.u4", 0x800000, 0x400000, CRC(213f7fd8) SHA1(8528d524a62bc41a8e3b39f0dbeeba33c862ee27) )
+
+	ROM_REGION32_LE( 0x0800000, "user1", 0 )
+	ROM_LOAD32_WORD( "exotica-20.u10", 0x0000000, 0x200000, CRC(43d80f54) SHA1(25683d835f3ed3dee99da33280ae6e21865801e4) ) /* Version 2.0  Fri Apr 07, 2000  17:55:07 */
+	ROM_LOAD32_WORD( "exotica-20.u11", 0x0000002, 0x200000, CRC(dba26b69) SHA1(4900ac3fe67664a543dcd66e41793874f6cdc07f) )
+	ROM_LOAD32_WORD( "exotica.u12",    0x0400000, 0x200000, CRC(21f122b2) SHA1(5473401ec954bf9ab66a8283bd08d17c7960cd29) )
+	ROM_LOAD32_WORD( "exotica.u13",    0x0400002, 0x200000, CRC(cf9d3609) SHA1(6376891f478185d26370466bef92f0c5304d58d3) )
+
+	ROM_REGION32_LE( 0x3000000, "user2", 0 )
+	ROM_LOAD32_WORD( "exotica.u14", 0x0000000, 0x400000, CRC(84452fc2) SHA1(06d87263f83ef079e6c5fb9de620e0135040c858) )
+	ROM_LOAD32_WORD( "exotica.u15", 0x0000002, 0x400000, CRC(b6aaebdb) SHA1(6ede6ea123be6a88d1ff38e90f059c9d1f822d6d) )
+	ROM_LOAD32_WORD( "exotica.u16", 0x0800000, 0x400000, CRC(aac6d2a5) SHA1(6c336520269d593b46b82414d9352a3f16955cc3) )
+	ROM_LOAD32_WORD( "exotica.u17", 0x0800002, 0x400000, CRC(71cf5404) SHA1(a6eed1a66fb4f4ddd749e4272a2cdb8e3e354029) )
+	ROM_LOAD32_WORD( "exotica.u22", 0x1000000, 0x400000, CRC(ad6dcda7) SHA1(5c9291753e1659f9adbe7e59fa2d0e030efae5bc) )
+	ROM_LOAD32_WORD( "exotica.u23", 0x1000002, 0x400000, CRC(1f103a68) SHA1(3b3acc63a461677cd424e75e7211fa6f063a37ef) )
+	ROM_LOAD32_WORD( "exotica.u24", 0x1800000, 0x400000, CRC(6312feef) SHA1(4113e4e5d39c99e8131d41a57c973df475b67d18) )
+	ROM_LOAD32_WORD( "exotica.u25", 0x1800002, 0x400000, CRC(b8277b16) SHA1(1355e87affd78e195906aedc9aed9e230374e2bf) )
+	ROM_LOAD32_WORD( "exotica.u18", 0x2000000, 0x200000, CRC(60cf5caa) SHA1(629870a305802d632bd2681131d1ffc0086280d2) )
+	ROM_LOAD32_WORD( "exotica.u19", 0x2000002, 0x200000, CRC(6b919a18) SHA1(20e40e195554146ed1d3fad54f7280823ae89d4b) )
+	ROM_LOAD32_WORD( "exotica.u20", 0x2400000, 0x200000, CRC(4855b68b) SHA1(1f6e557590b2621d0d5c782b95577f1be5cbc51d) )
+	ROM_LOAD32_WORD( "exotica.u21", 0x2400002, 0x200000, CRC(0011b9d6) SHA1(231d768c964a16b905857b0814d758fe93c2eefb) )
+ROM_END
+
+ROM_START( crusnexob )
 	ROM_REGION16_LE( 0xc00000, "dcs", ROMREGION_ERASEFF )	/* sound data */
 	ROM_LOAD( "exotica.u2", 0x000000, 0x200000, CRC(d2d54acf) SHA1(2b4d6fda30af807228bb281335939dfb6df9b530) )
 	ROM_RELOAD(             0x200000, 0x200000 )
@@ -1393,6 +1421,7 @@ GAME(  1997, mk4a,     mk4,      midzeus,  mk4,      mk4,      ROT0, "Midway", "
 GAME(  1999, invasnab, 0,        midzeus,  invasn,   invasn,   ROT0, "Midway", "Invasion - The Abductors (version 5.0)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME(  1999, invasnv4, invasnab, midzeus,  invasn,   invasn,   ROT0, "Midway", "Invasion - The Abductors (version 4.0)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAMEL( 1999, crusnexo, 0,        midzeus2, crusnexo, crusnexo, ROT0, "Midway", "Cruis'n Exotica (version 2.4)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE, layout_crusnexo )
-GAMEL( 1999, crusnexa, crusnexo, midzeus2, crusnexo, crusnexo, ROT0, "Midway", "Cruis'n Exotica (version 1.6)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE, layout_crusnexo )
+GAMEL( 1999, crusnexoa,crusnexo, midzeus2, crusnexo, crusnexo, ROT0, "Midway", "Cruis'n Exotica (version 2.0)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE, layout_crusnexo )
+GAMEL( 1999, crusnexob,crusnexo, midzeus2, crusnexo, crusnexo, ROT0, "Midway", "Cruis'n Exotica (version 1.6)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE, layout_crusnexo )
 GAME(  2001, thegrid,  0,        midzeus2, thegrid,  thegrid,  ROT0, "Midway", "The Grid (version 1.2)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME(  2001, thegrida, thegrid,  midzeus2, thegrid,  thegrid,  ROT0, "Midway", "The Grid (version 1.1)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )

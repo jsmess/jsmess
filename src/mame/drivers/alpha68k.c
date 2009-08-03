@@ -56,11 +56,16 @@ Stephh's additional notes (based on the games M68000 code and some tests) :
 
  3)  'paddlema'
 
-  - "Game Time" Dip Switch is the time for match type A. Here is what you
-    have to add for games B to E :
+  - "Game Time" The effects of "Game Time" and "Match Type"
 
-      Match Type       B        C        D        E
-      Time to add    00:10    01:00    01:30    02:00
+      Time Setting
+                       A            B            C            D            E
+       Match Type  1P vs Comp.  2P vs Comp.  1P vs 1P     2P vs 1P     2P vs 2P
+            A        1:00         1:10         2:00         2:30         3:00
+            B        1:10         1:20         2:10         2:40         3:10
+            C        1:20         1:30         2:20         2:50         3:20
+            D        1:30         1:40         2:30         3:00         3:30
+
 
   - When "Game Mode" Dip Switch is set to "Win Match Against CPU", this has
     an effect on matches types A and B : player is awarded 99 points at the
@@ -496,7 +501,7 @@ static READ16_HANDLER( alpha_II_trigger_r )
 
 				if ((coin_id&0xff) == 0x22)
 				{
-					if(!strcmp(space->machine->gamedrv->name, "btlfildb"))
+					if(!strcmp(space->machine->gamedrv->name, "btlfieldb"))
 						coinvalue = (input_port_read(space->machine, "IN4")>>0) & 7;
 					else
 						coinvalue = (~input_port_read(space->machine, "IN4")>>0) & 7;
@@ -519,7 +524,7 @@ static READ16_HANDLER( alpha_II_trigger_r )
 
 				if ((coin_id>>8) == 0x22)
 				{
-					if(!strcmp(space->machine->gamedrv->name, "btlfildb"))
+					if(!strcmp(space->machine->gamedrv->name, "btlfieldb"))
 						coinvalue = (input_port_read(space->machine, "IN4")>>0) & 7;
 					else
 						coinvalue = (~input_port_read(space->machine, "IN4")>>0) & 7;
@@ -1087,47 +1092,41 @@ static INPUT_PORTS_START( paddlema )
 	ALPHA68K_PLAYER_INPUT_MSB( 4, IPT_UNKNOWN, IPT_UNKNOWN, IP_ACTIVE_LOW )
 
 	PORT_START("IN3") //DSW0
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SW1:8,7")
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW1:6,5")
 	PORT_DIPSETTING(    0x0c, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Game_Time ) )				// See notes
-	PORT_DIPSETTING(    0x00, "1:00" )
-	PORT_DIPSETTING(    0x20, "1:10" )
-	PORT_DIPSETTING(    0x10, "1:20" )
-	PORT_DIPSETTING(    0x30, "1:30" )
-	PORT_DIPNAME( 0xc0, 0x40, "Match Type" )
-	PORT_DIPSETTING(    0x80, "A to B" )
-	PORT_DIPSETTING(    0x00, "A to C" )
-	PORT_DIPSETTING(    0x40, "A to E" )
-//  PORT_DIPSETTING(    0xc0, "A to B" )                // Possibility of "A only" in another version ?
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Game_Time ) )	PORT_DIPLOCATION("SW1:4,3") /* See notes for Game Time / Match Type combos */
+	PORT_DIPSETTING(    0x00, "Defualt Time" )
+	PORT_DIPSETTING(    0x20, "+10 Seconds" )
+	PORT_DIPSETTING(    0x10, "+20 Seconds" )
+	PORT_DIPSETTING(    0x30, "+30 Seconds" )
+	PORT_DIPNAME( 0xc0, 0x40, "Match Type" )		PORT_DIPLOCATION("SW1:2,1") /* Styles are for Upright/Table & Single/Dual controls???? */
+	PORT_DIPSETTING(    0x80, "A to B" )	/* Manual shows "Upright Sytle B" */
+	PORT_DIPSETTING(    0x00, "A to C" )	/* Manual shows "Upright Sytle A" */
+	PORT_DIPSETTING(    0x40, "A to E" )	/* Manual shows "Table Sytle C"   */
+//  PORT_DIPSETTING(    0xc0, "A to B" )    /* Manual shows "Table Sytle D"   */
 
 	PORT_START("IN4")	// DSW1
-	PORT_SERVICE( 0x01, IP_ACTIVE_HIGH )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x30, 0x00, "Game Mode" )
+	PORT_SERVICE_DIPLOC(  0x01, IP_ACTIVE_HIGH, "SW2:8" )
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x01, "SW2:7" )		/* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x01, "SW2:6" )		/* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x01, "SW2:5" )		/* Listed as "Unused" */
+	PORT_DIPNAME( 0x30, 0x00, "Game Mode" )			PORT_DIPLOCATION("SW2:4,3")
 	PORT_DIPSETTING(    0x20, "Demo Sounds Off" )
 	PORT_DIPSETTING(    0x00, "Demo Sounds On" )
 	PORT_DIPSETTING(    0x10, "Win Match Against CPU (Cheat)")
 	PORT_DIPSETTING(    0x30, "Freeze" )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Language ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Language ) )		PORT_DIPLOCATION("SW2:2") /* Manual shows "Off" for this dipswitch */
 	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Japanese ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Allow_Continue ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 INPUT_PORTS_END
@@ -1146,28 +1145,28 @@ static INPUT_PORTS_START( timesold )
 	PORT_SERVICE_NO_TOGGLE(0x02, IP_ACTIVE_LOW)
 
 	/* 2 physical sets of _6_ dip switches */
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW1:2,3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x18, DEF_STR( Normal ) )
 //  PORT_DIPSETTING(    0x08, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )					/* "Difficult" */
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Language ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Language ) )		PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Japanese ) )
-	PORT_DIPUNUSED( 0x40, 0x40 )								/* See notes */
-	PORT_DIPNAME( 0x80, 0x80, "Invulnerability (Cheat)")
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW1:5" )		/* Listed as "Unused" - See notes */
+	PORT_DIPNAME( 0x80, 0x80, "Invulnerability (Cheat)")	PORT_DIPLOCATION("SW1:6") /* Listed in the manual as "Free Play" */
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("IN4") /* A 6 way dip switch */
 	ALPHA68K_COINAGE_BITS_0TO2
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:2,1")
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x20, "4" )
 	PORT_DIPSETTING(    0x10, "5" )
@@ -1203,12 +1202,12 @@ static INPUT_PORTS_START( btlfield )
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x18, DEF_STR( Normal ) )
 //  PORT_DIPSETTING(    0x08, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )				/* "Difficult" */
+	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Language ) )			PORT_DIPLOCATION("SW1:4") /* Listed as "Unused". */
 	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Japanese ) )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW1:5" )			/* Listed as "Unused", see notes. */
-	PORT_DIPNAME( 0x80, 0x80, "Invulnerability (Cheat)")	PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x80, 0x80, "Invulnerability (Cheat)")		PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -1217,7 +1216,7 @@ static INPUT_PORTS_START( btlfield )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )		PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )			PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )			PORT_DIPLOCATION("SW2:2,1")
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x20, "4" )
 	PORT_DIPSETTING(    0x10, "5" )
@@ -1271,30 +1270,30 @@ static INPUT_PORTS_START( skysoldr )
 	PORT_SERVICE_NO_TOGGLE(0x02, IP_ACTIVE_LOW)
 
 	/* 2 physical sets of _6_ dip switches */
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Easy ) )					// "1"
-	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )				// "2"
-	PORT_DIPSETTING(    0x18, DEF_STR( Hard ) )					// "3"
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )				// "4"
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Language ) )
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW1:2,3")
+	PORT_DIPSETTING(    0x08, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Language ) )		PORT_DIPLOCATION("SW1:4") /* Manual states "Always On" */
 	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Japanese ) )
-	PORT_DIPNAME( 0x40, 0x40, "Manufacturer" )			// See notes
+	PORT_DIPNAME( 0x40, 0x40, "Manufacturer" )		PORT_DIPLOCATION("SW1:5") /* Manual states "Always Off"  See notes */
 	PORT_DIPSETTING(    0x40, "SNK" )
 	PORT_DIPSETTING(    0x00, "Romstar" )
-	PORT_DIPNAME( 0x80, 0x80, "Invulnerability (Cheat)")
+	PORT_DIPNAME( 0x80, 0x80, "Invulnerability (Cheat)")	PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("IN4") /* A 6 way dip switch */
 	ALPHA68K_COINAGE_BITS_0TO2
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:2,1")
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x20, "4" )
 	PORT_DIPSETTING(    0x10, "5" )
@@ -1336,7 +1335,7 @@ static INPUT_PORTS_START( goldmedl )
 	PORT_SERVICE_NO_TOGGLE(0x02, IP_ACTIVE_LOW)
 
 	/* 2 physical sets of _6_ dip switches */
-	PORT_DIPNAME( 0x04, 0x00, "Event Select" )			PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x04, 0x00, "Event Select" )		PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x88, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW1:2,6")
@@ -1344,11 +1343,11 @@ static INPUT_PORTS_START( goldmedl )
 	PORT_DIPSETTING(    0x80, "Upright 4 Players" )
 	PORT_DIPSETTING(    0x88, DEF_STR( Cocktail ) )
 	//PORT_DIPSETTING(  0x08, DEF_STR( Cocktail ) )     /* Not documented. */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START3 )			PORT_DIPLOCATION("SW1:3") /* Listed as "Always OFF". */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START3 )		PORT_DIPLOCATION("SW1:3") /* Listed as "Always OFF". */
 	PORT_DIPNAME( 0x20, 0x20, "Speed For 100M Dash" )	PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x00, "10 Beats For Max Speed" )
 	PORT_DIPSETTING(    0x20, "14 Beats For Max Speed" )
-	PORT_DIPNAME( 0x40, 0x40, "Computer Demonstration" )PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x40, 0x40, "Computer Demonstration" )	PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
 
@@ -1406,7 +1405,7 @@ static INPUT_PORTS_START( skyadvnt )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Freeze" )				PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x20, 0x20, "Freeze" )			PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1420,7 +1419,7 @@ static INPUT_PORTS_START( skyadvnu )
 	PORT_DIPNAME( 0x01, 0x00, "Price to Continue" )		PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, "Same as Start" )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Allow_Continue ) )PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:3,4")
@@ -1449,8 +1448,8 @@ static INPUT_PORTS_START( gangwars )
 	PORT_DIPSETTING(    0x0c, "3" )
 	PORT_DIPSETTING(    0x04, "4" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x10, 0x00, "Timer Speed" )			PORT_DIPLOCATION("SW2:3") // Check code at 0x01923a
-	PORT_DIPSETTING(    0x00, "Slow" )					// 1 second = 0x01ff
+	PORT_DIPNAME( 0x10, 0x00, "Timer Speed" )		PORT_DIPLOCATION("SW2:3") // Check code at 0x01923a
+	PORT_DIPSETTING(    0x00, "Slow" )			// 1 second = 0x01ff
 	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )		// 1 second = 0x013f
 	PORT_DIPNAME( 0x60, 0x60, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(    0x40, DEF_STR( Easy ) )
@@ -1465,7 +1464,7 @@ static INPUT_PORTS_START( gangwars )
 	PORT_DIPNAME( 0x01, 0x00, "Price to Continue" )		PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, "Same as Start" )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Allow_Continue ) )PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:3,4")
@@ -1476,7 +1475,7 @@ static INPUT_PORTS_START( gangwars )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Freeze" )				PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x20, 0x20, "Freeze" )			PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1493,7 +1492,7 @@ static INPUT_PORTS_START( gangwarb )
 	PORT_DIPSETTING(    0x00, "4" )
 
 	PORT_MODIFY("IN4") /* A 6 way dip switch */
-	PORT_DIPNAME( 0x01, 0x00, "Coin Slots" )			PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x01, 0x00, "Coin Slots" )		PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x01, "2" )
 	PORT_DIPNAME( 0x0e, 0x0e, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:3,4,5")
@@ -1622,10 +1621,10 @@ static INPUT_PORTS_START( tnextspc )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Demo_Sounds ) )		PORT_DIPLOCATION("SW2:3") PORT_CONDITION("DSW2",0x08,PORTCOND_EQUALS,0x08)
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "Game Mode" )					PORT_DIPLOCATION("SW2:3") PORT_CONDITION("DSW2",0x08,PORTCOND_EQUALS,0x00)
+	PORT_DIPNAME( 0x04, 0x04, "Game Mode" )				PORT_DIPLOCATION("SW2:3") PORT_CONDITION("DSW2",0x08,PORTCOND_EQUALS,0x00)
 	PORT_DIPSETTING(    0x00, "Freeze" )
 	PORT_DIPSETTING(    0x04, "Infinite Lives (Cheat)")
-	PORT_DIPNAME( 0x08, 0x08, "SW2:3 Demo Sound/Game Mode" )PORT_DIPLOCATION("SW2:4")
+	PORT_DIPNAME( 0x08, 0x08, "SW2:3 Demo Sound/Game Mode" )	PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, "Game Mode" )
 	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )		PORT_DIPLOCATION("SW2:5,6")
@@ -2542,7 +2541,7 @@ ROM_START( timesold )
 	ROM_LOAD( "bf.21",           0x1c0000, 0x20000, CRC(bc3b3944) SHA1(6c99d2b093e5cb04dc3422c2f0f81a20f5a504b5) )
 ROM_END
 
-ROM_START( timesol1 )
+ROM_START( timesold1 )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "3",          0x00000,  0x10000, CRC(bc069a29) SHA1(891a6809931871a1da0a5a4d313623a8b92326e3) )
 	ROM_LOAD16_BYTE( "4",          0x00001,  0x10000, CRC(ac7dca56) SHA1(4322d601ea5abe222f2d707fbfbfb3b207509760) )
@@ -2606,7 +2605,7 @@ ROM_START( btlfield )
 	ROM_LOAD( "bf.21",           0x1c0000, 0x20000, CRC(bc3b3944) SHA1(6c99d2b093e5cb04dc3422c2f0f81a20f5a504b5) )
 ROM_END
 
-ROM_START( btlfildb )
+ROM_START( btlfieldb )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "3.bin",      0x00000, 0x10000, CRC(141f10ca) SHA1(4f6a59975964c92693476576533aba80c089b5ef) )
 	ROM_LOAD16_BYTE( "1.bin",      0x00001, 0x10000, CRC(caa09adf) SHA1(5df0775119b3e957bbe620142a5454e337bdf4b8) )
@@ -2732,7 +2731,7 @@ ROM_START( goldmedl )
 ROM_END
 
 // it runs in an Alpha-68K96III system board
-ROM_START( goldmeda )
+ROM_START( goldmedla )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "gm3-7.bin", 0x00000, 0x10000, CRC(11a63f4c) SHA1(840a8f1f6d80d0395c65f8ad30cc6bfe5a9693f4) )
 	ROM_LOAD16_BYTE( "gm4-7.bin", 0x00001, 0x10000, CRC(e19966af) SHA1(a2523627fcc9f5e4a82b4ebec937880fc0e0e9f3) )
@@ -2761,7 +2760,7 @@ ROM_START( goldmeda )
 ROM_END
 
 //AT: the bootleg set has strong resemblance of "goldmed7" on an Alpha-68K96III system board
-ROM_START( goldmedb )
+ROM_START( goldmedlb )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "l_3.bin",   0x00000,  0x10000, CRC(5e106bcf) SHA1(421ddfdd5ef1e9b5b7c45617fd690df982d63c4b) )
 	ROM_LOAD16_BYTE( "l_4.bin",   0x00001,  0x10000, CRC(e19966af) SHA1(a2523627fcc9f5e4a82b4ebec937880fc0e0e9f3) )
@@ -2814,7 +2813,7 @@ ROM_START( skyadvnt )
 	ROM_LOAD( "sachr0",         0x1e0000, 0x80000, CRC(e281b204) SHA1(50a041c701970013b84826d67c8002ccd291bfdd) )
 ROM_END
 
-ROM_START( skyadvnu )
+ROM_START( skyadvntu )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "sa_v3.1",   0x00000,  0x20000, CRC(862393b5) SHA1(6c9176a6ae286854f2fa7512c293984a3b952f10) )
 	ROM_LOAD16_BYTE( "sa_v3.2",   0x00001,  0x20000, CRC(fa7a14d1) SHA1(d941042cff726f02e1e645a158b6a2484869464b) )
@@ -2836,7 +2835,7 @@ ROM_START( skyadvnu )
 	ROM_LOAD( "sachr0",         0x1e0000, 0x80000, CRC(e281b204) SHA1(50a041c701970013b84826d67c8002ccd291bfdd) )
 ROM_END
 
-ROM_START( skyadvnj )
+ROM_START( skyadvntj )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "saj1.c19",  0x00000,  0x20000, CRC(662cb4b8) SHA1(853ad557ee7942cef542253f0e643955e27f0ed2) )
 	ROM_LOAD16_BYTE( "saj2.e19",  0x00001,  0x20000, CRC(06d6130a) SHA1(3411ac90e3039e46887451fc97ec2a22ad0f18fe) )
@@ -2933,7 +2932,7 @@ the 128k ones are and match these ones.
 	ROM_LOAD16_BYTE( "u4",        0x00001,  0x20000, CRC(43f7f5d3) SHA1(13ea03cfae97d0067dcfdc6febb53dbe268a91eb) )
 ROM_END
 
-ROM_START( gangwarb )
+ROM_START( gangwarsb )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "gwb_ic.m15", 0x00000, 0x20000, CRC(7752478e) SHA1(7266dd0d2c57433191ae4d1d4e17b32c8c3c8c73) )
 	ROM_LOAD16_BYTE( "gwb_ic.m16", 0x00001, 0x20000, CRC(c2f3b85e) SHA1(79c215d8b43ec7728e3745b359e64f6bb8240881) )
@@ -3313,18 +3312,18 @@ GAME( 1986, kyrosj,   kyros,    kyros,         kyros,    kyros,    ROT90, "Alpha
 GAME( 1987, jongbou,  0,        jongbou,       jongbou,  jongbou,  ROT90, "SNK",                "Mahjong Block Jongbou (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1988, paddlema, 0,        alpha68k_I,    paddlema, paddlema, ROT90, "SNK",                "Paddle Mania", GAME_SUPPORTS_SAVE )
 GAME( 1987, timesold, 0,        alpha68k_II,   timesold, timesold, ROT90, "[Alpha Denshi Co.] (SNK/Romstar license)", "Time Soldiers (US Rev 3)", GAME_SUPPORTS_SAVE )
-GAME( 1987, timesol1, timesold, alpha68k_II,   timesold, timesol1, ROT90, "[Alpha Denshi Co.] (SNK/Romstar license)", "Time Soldiers (US Rev 1)", GAME_SUPPORTS_SAVE )
+GAME( 1987, timesold1,timesold, alpha68k_II,   timesold, timesol1, ROT90, "[Alpha Denshi Co.] (SNK/Romstar license)", "Time Soldiers (US Rev 1)", GAME_SUPPORTS_SAVE )
 GAME( 1987, btlfield, timesold, alpha68k_II,   btlfield, btlfield, ROT90, "[Alpha Denshi Co.] (SNK license)", "Battle Field (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1987, btlfildb, timesold, btlfildb,      btlfildb, btlfildb, ROT90, "bootleg",            "Battle Field (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1987, btlfieldb,timesold, btlfildb,      btlfildb, btlfildb, ROT90, "bootleg",            "Battle Field (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1988, skysoldr, 0,        alpha68k_II,   skysoldr, skysoldr, ROT90, "[Alpha Denshi Co.] (SNK of America/Romstar license)", "Sky Soldiers (US)", GAME_SUPPORTS_SAVE )
 GAME( 1988, goldmedl, 0,        alpha68k_II_gm,goldmedl, goldmedl, ROT0,  "SNK",                "Gold Medalist", GAME_SUPPORTS_SAVE )
-GAME( 1988, goldmeda, goldmedl, alpha68k_II_gm,goldmedl, goldmeda, ROT0,  "SNK",                "Gold Medalist (alt)", GAME_SUPPORTS_SAVE )
-GAME( 1988, goldmedb, goldmedl, alpha68k_II_gm,goldmedl, goldmeda, ROT0,  "bootleg",            "Gold Medalist (bootleg)", GAME_NOT_WORKING )
+GAME( 1988, goldmedla,goldmedl, alpha68k_II_gm,goldmedl, goldmeda, ROT0,  "SNK",                "Gold Medalist (alt)", GAME_SUPPORTS_SAVE )
+GAME( 1988, goldmedlb,goldmedl, alpha68k_II_gm,goldmedl, goldmeda, ROT0,  "bootleg",            "Gold Medalist (bootleg)", GAME_NOT_WORKING )
 GAME( 1989, skyadvnt, 0,        alpha68k_V,    skyadvnt, skyadvnt, ROT90, "Alpha Denshi Co.",   "Sky Adventure (World)", GAME_SUPPORTS_SAVE )
-GAME( 1989, skyadvnu, skyadvnt, alpha68k_V,    skyadvnu, skyadvnu, ROT90, "Alpha Denshi Co. (SNK of America license)", "Sky Adventure (US)", GAME_SUPPORTS_SAVE )
-GAME( 1989, skyadvnj, skyadvnt, alpha68k_V,    skyadvnt, skyadvnt, ROT90, "Alpha Denshi Co.",   "Sky Adventure (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1989, skyadvntu,skyadvnt, alpha68k_V,    skyadvnu, skyadvnu, ROT90, "Alpha Denshi Co. (SNK of America license)", "Sky Adventure (US)", GAME_SUPPORTS_SAVE )
+GAME( 1989, skyadvntj,skyadvnt, alpha68k_V,    skyadvnt, skyadvnt, ROT90, "Alpha Denshi Co.",   "Sky Adventure (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1989, gangwars, 0,        alpha68k_V,    gangwars, gangwars, ROT0,  "Alpha Denshi Co.",   "Gang Wars (US)", GAME_SUPPORTS_SAVE )
-GAME( 1989, gangwarb, gangwars, alpha68k_V,    gangwarb, gangwarb, ROT0,  "bootleg",            "Gang Wars (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1989, gangwarsb,gangwars, alpha68k_V,    gangwarb, gangwarb, ROT0,  "bootleg",            "Gang Wars (bootleg)", GAME_SUPPORTS_SAVE )
 #if SBASEBAL_HACK
 GAME( 1989, sbasebal, 0,        alpha68k_V_sb, sbasebal, sbasebal, ROT0,  "Alpha Denshi Co.",   "Super Champion Baseball (Japan)", GAME_SUPPORTS_SAVE )
 #else

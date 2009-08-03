@@ -1995,7 +1995,7 @@ ROM_START( salmndr2 )
 ROM_END
 
 /* Salamander 2 version AAB (Asia) */
-ROM_START( salmnd2a )
+ROM_START( salmndr2a )
 	/* main program */
 	ROM_REGION( 0x800000, "maincpu", 0 )
 	GX_BIOS
@@ -2379,7 +2379,7 @@ ROMs  :
 */
 
 /* Winning Spike - Version JAA (Japan) */
-ROM_START( winspikj )
+ROM_START( winspikej )
 	/* main program */
 	ROM_REGION( 0x800000, "maincpu", 0 )
 	GX_BIOS
@@ -2557,8 +2557,52 @@ ROM_START( soccerss )
 	ROM_LOAD( "427a16.9r", 0x000000, 2*1024*1024,  CRC(39547265) SHA1(c0efd68c0c1ea59141045150842f36d43e1f01d8) )
 ROM_END
 
+/* Soccer Superstars (Japan ver JAC)*/
+ROM_START( soccerssj )
+	/* main program */
+	ROM_REGION( 0x800000, "maincpu", 0 )
+	GX_BIOS
+	ROM_LOAD32_WORD_SWAP( "427c02.28m", 0x200000, 512*1024, CRC(399fe89d) SHA1(e42cf87cff8cd421afd121621ba1f67c43f728ef) )
+	ROM_LOAD32_WORD_SWAP( "427c03.30m", 0x200002, 512*1024, CRC(f9c6ab08) SHA1(371b05a3990436a16b77b3d58aa235202abe78db) )
+
+	/* data roms */
+	ROM_LOAD32_WORD_SWAP( "427a04.28r",   0x400000, 0x080000, CRC(c7d3e1a2) SHA1(5e1e4f4c97def36902ad853248014a7af62e0c5e) )
+	ROM_LOAD32_WORD_SWAP( "427a05.30r",   0x400002, 0x080000, CRC(5372f0a5) SHA1(36e8d0a73918cbd018c1865d1a05445daba8997c) )
+
+	/* sound program */
+	ROM_REGION( 0x40000, "soundcpu", 0 )
+	ROM_LOAD16_BYTE("427a07.6m", 0x000000, 128*1024, CRC(8dbaf4c7) SHA1(cb69bf94090a4871b35e7ba1f58e3225077b82cd) )
+	ROM_LOAD16_BYTE("427a06.9m", 0x000001, 128*1024, CRC(979df65d) SHA1(7499e9a27aa562692bd3a296789696492a6254bc) )
+
+	/* tiles */
+	ROM_REGION( 0x500000, "gfx1", ROMREGION_ERASE00 )
+	TILE_WORDS2_ROM_LOAD( "427a15.11r", 0x000000, 0x100000, CRC(33ce2b8e) SHA1(b0936386cdc7c41f33b1d7b4f5ce25fe618d1286) )
+	TILE_BYTES2_ROM_LOAD( "427a14.143", 0x000004, 0x080000, CRC(7575a0ed) SHA1(92fda2747ac090f93e60cff8478af6721b949dc2) )
+
+	/* sprites */
+	ROM_REGION( 0xc00000, "gfx2", ROMREGION_ERASE00 )
+	ROM_LOAD32_WORD( "427a08.140", 0x000000, 2*1024*1024, CRC(221250af) SHA1(fd24e7f0e3024df5aa08506523953c5e35d2267b) )
+	ROM_LOAD32_WORD( "427a09.137", 0x000002, 2*1024*1024, CRC(56bdd480) SHA1(01d164aedc77f71f6310cfd739c00b33289a2e7e) )
+	ROM_LOAD32_WORD( "427a10.25r", 0x400000, 2*1024*1024, CRC(6b3ccb41) SHA1(b246ef350a430e60f0afd1b80ff48139c325e926) )
+	ROM_LOAD32_WORD( "427a11.23r", 0x400002, 2*1024*1024, CRC(c1ca74c1) SHA1(b7286df8e59f8f1939ebf17aaf9345a857b0b100) )
+	ROM_LOAD32_WORD( "427a12.21r", 0x800000, 2*1024*1024, CRC(97d6fd38) SHA1(8d2895850cafdea95db08c84e7eeea90a1921515) )
+	ROM_LOAD32_WORD( "427a13.18r", 0x800002, 2*1024*1024, CRC(815a9b87) SHA1(7d9d5932fff7dd7aa4cbccf0c8d3784dc8042e70) )
+
+	/* PSAC2 tiles */
+	ROM_REGION( 0x100000, "gfx3", ROMREGION_ERASE00 )
+	ROM_LOAD( "427a18.145", 0x000000, 0x100000, CRC(bb6e6ec6) SHA1(aa1365a4318866d9e7e74461a6e6c113f83b6771) )
+
+	/* PSAC2 map data */
+	ROM_REGION( 0x080000, "gfx4", ROMREGION_ERASE00 )
+	ROM_LOAD( "427a17.24c", 0x000000, 0x080000, CRC(fb6eb01f) SHA1(28cdb30ff70ee5fc7624e18fe048dd85dfa49ace) )
+
+	/* sound data */
+	ROM_REGION( 0x400000, "shared", 0 )
+	ROM_LOAD( "427a16.9r", 0x000000, 2*1024*1024,  CRC(39547265) SHA1(c0efd68c0c1ea59141045150842f36d43e1f01d8) )
+ROM_END
+
 /* Soccer Superstars (Japan ver JAA)*/
-ROM_START( soccersj )
+ROM_START( soccerssja )
 	/* main program */
 	ROM_REGION( 0x800000, "maincpu", 0 )
 	GX_BIOS
@@ -2602,7 +2646,7 @@ ROM_START( soccersj )
 ROM_END
 
 /* Soccer Superstars (Asian ver AAA) */
-ROM_START( soccersa )
+ROM_START( soccerssa )
 	/* main program */
 	ROM_REGION( 0x800000, "maincpu", 0 )
 	GX_BIOS
@@ -2646,7 +2690,7 @@ ROM_START( soccersa )
 ROM_END
 
 /* Vs. Net Soccer (ver EAD) */
-ROM_START(vsnetscr)
+ROM_START( vsnetscr )
 	/* main program */
 	ROM_REGION( 0x800000, "maincpu", 0 )
 	GX_BIOS
@@ -2686,7 +2730,7 @@ ROM_START(vsnetscr)
 ROM_END
 
 /* Vs. Net Soccer (ver EAB) */
-ROM_START(vsnetseb)
+ROM_START( vsnetscreb )
 	/* main program */
 	ROM_REGION( 0x800000, "maincpu", 0 )
 	GX_BIOS
@@ -2726,7 +2770,7 @@ ROM_START(vsnetseb)
 ROM_END
 
 /* Vs. Net Soccer (ver UAB) */
-ROM_START(vsnetscu)
+ROM_START( vsnetscru )
 	/* main program */
 	ROM_REGION( 0x800000, "maincpu", 0 )
 	GX_BIOS
@@ -2892,7 +2936,7 @@ Notes:
 */
 
 /* Vs. Net Soccer (ver JAB) */
-ROM_START(vsnetscj)
+ROM_START( vsnetscrj )
 	/* main program */
 	ROM_REGION( 0x800000, "maincpu", 0 )
 	GX_BIOS
@@ -2932,7 +2976,7 @@ ROM_START(vsnetscj)
 ROM_END
 
 /* Vs. Net Soccer (ver AAA) */
-ROM_START(vsnetsca)
+ROM_START( vsnetscra )
 	/* main program */
 	ROM_REGION( 0x800000, "maincpu", 0 )
 	GX_BIOS
@@ -3125,7 +3169,7 @@ ROM_END
 
 
 /* Racin' Force */
-ROM_START( racinfru )
+ROM_START( racinfrcu )
 	/* main program */
 	ROM_REGION( 0x800000, "maincpu", 0 )
 	GX_BIOS
@@ -3255,7 +3299,7 @@ ROM_START( opengolf )
 ROM_END
 
 /* Konami's Open Golf Championship - version EAD */
-ROM_START( opengol2 )
+ROM_START( opengolf2 )
 	/* main program */
 	ROM_REGION( 0x800000, "maincpu", 0 )
 	GX_BIOS
@@ -3423,9 +3467,9 @@ typedef struct
 static const GXGameInfoT gameDefs[] =
 {
 	{ "racinfrc", 11, 11, 0, BPP4 },
-	{ "racinfru", 11, 11, 0, BPP4 },
+	{ "racinfrcu",11, 11, 0, BPP4 },
 	{ "opengolf", 11, 12, 0, BPP4 },
-	{ "opengol2", 11, 12, 0, BPP4 },
+	{ "opengolf2",11, 12, 0, BPP4 },
 	{ "ggreats2", 11, 12, 0, BPP4 },
 	{ "le2",      13, 1, 1, BPP4 },
 	{ "le2u",     13, 1, 1, BPP4 },
@@ -3440,17 +3484,17 @@ static const GXGameInfoT gameDefs[] =
 	{ "daiskiss",  7, 0, 5, BPP5 },
 	{ "tokkae",    7, 0, 0, BPP5 },
 	{ "salmndr2",  7, 0, 6, BPP66 },
-	{ "salmnd2a",  7, 0, 6, BPP66 },
+	{ "salmndr2a", 7, 0, 6, BPP66 },
 	{ "winspike",  8, 2, 7, BPP4 },
-	{ "winspikj",  8, 2, 7, BPP4 },
+	{ "winspikej", 8, 2, 7, BPP4 },
 	{ "soccerss",  7, 0, 0, BPP4 },
-	{ "soccersa",  7, 0, 0, BPP4 },
-	{ "soccersj",  7, 0, 0, BPP4 },
+	{ "soccerssa", 7, 0, 0, BPP4 },
+	{ "soccerssj", 7, 0, 0, BPP4 },
 	{ "vsnetscr",  7, 8, 0, BPP4 },
-	{ "vsnetscu",  7, 5, 0, BPP4 },
-	{ "vsnetscj",  7, 10, 0, BPP4 },
-	{ "vsnetsca",  7, 7, 0, BPP4 },
-	{ "vsnetseb",  7, 9, 0, BPP4 },
+	{ "vsnetscru", 7, 5, 0, BPP4 },
+	{ "vsnetscrj", 7, 10, 0, BPP4 },
+	{ "vsnetscra", 7, 7, 0, BPP4 },
+	{ "vsnetscreb",7, 9, 0, BPP4 },
 	{ "rungun2",   7, 3, 0, BPP4 },
 	{ "slamdnk2",  7, 6, 0, BPP4 },
 	{ "rushhero",  7, 4, 0, BPP4 },
@@ -3570,9 +3614,9 @@ GAME( 1994, konamigx, 0, konamigx, konamigx, konamigx, ROT0, "Konami", "System G
 /* and optional LAN capability (only on Racin' Force - chips aren't present on the golf games) */
 /* needs the ROZ layer to be playable */
 GAME( 1994, racinfrc, konamigx, racinfrc,  racinfrc, konamigx, ROT0, "Konami", "Racin' Force (ver EAC)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING  )
-GAME( 1994, racinfru, racinfrc, racinfrc,  racinfrc, konamigx, ROT0, "Konami", "Racin' Force (ver UAB)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING  )
+GAME( 1994, racinfrcu,racinfrc, racinfrc,  racinfrc, konamigx, ROT0, "Konami", "Racin' Force (ver UAB)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING  )
 GAME( 1994, opengolf, konamigx, opengolf,  racinfrc, konamigx, ROT0, "Konami", "Konami's Open Golf Championship (ver EAE)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING  )
-GAME( 1994, opengol2, opengolf, opengolf,  racinfrc, konamigx, ROT0, "Konami", "Konami's Open Golf Championship (ver EAD)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING  )
+GAME( 1994, opengolf2,opengolf, opengolf,  racinfrc, konamigx, ROT0, "Konami", "Konami's Open Golf Championship (ver EAD)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING  )
 GAME( 1994, ggreats2, opengolf, opengolf,  racinfrc, konamigx, ROT0, "Konami", "Golfing Greats 2 (ver JAC)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
 
 
@@ -3593,22 +3637,23 @@ GAME( 1996, daiskiss, konamigx, konamigx, gokuparo, konamigx, ROT0, "Konami", "D
 GAME( 1996, tokkae,   konamigx, konamigx_6bpp, puzldama, konamigx, ROT0, "Konami", "Taisen Tokkae-dama (ver JAA)", GAME_IMPERFECT_GRAPHICS )
 /* protection controls player ship direction in attract mode - doesn't impact playability */
 GAME( 1996, salmndr2, konamigx, konamigx_6bpp_2, gokuparo, konamigx, ROT0, "Konami", "Salamander 2 (ver JAA)", GAME_IMPERFECT_GRAPHICS|GAME_UNEMULATED_PROTECTION )
-GAME( 1996, salmnd2a, salmndr2, konamigx_6bpp_2, gokuparo, konamigx, ROT0, "Konami", "Salamander 2 (ver AAB)", GAME_IMPERFECT_GRAPHICS|GAME_UNEMULATED_PROTECTION )
+GAME( 1996, salmndr2a,salmndr2, konamigx_6bpp_2, gokuparo, konamigx, ROT0, "Konami", "Salamander 2 (ver AAB)", GAME_IMPERFECT_GRAPHICS|GAME_UNEMULATED_PROTECTION )
 /* bad sprite colours, part of tilemap gets blanked out when a game starts (might be more protection) */
 GAME( 1997, winspike, konamigx, winspike, konamigx, konamigx, ROT0, "Konami", "Winning Spike (ver EAA)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS )
-GAME( 1997, winspikj, winspike, winspike, konamigx, konamigx, ROT0, "Konami", "Winning Spike (ver JAA)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS )
+GAME( 1997, winspikej,winspike, winspike, konamigx, konamigx, ROT0, "Konami", "Winning Spike (ver JAA)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS )
 
 /* Type 3: dual monitor output and 53936 on the ROM board, external palette RAM */
 GAME( 1994, soccerss, konamigx, gxtype3,  type3, konamigx, ROT0, "Konami", "Soccer Superstars (ver EAA)", GAME_NOT_WORKING )
-GAME( 1994, soccersj, soccerss, gxtype3,  type3, konamigx, ROT0, "Konami", "Soccer Superstars (ver JAA)", GAME_NOT_WORKING )
-GAME( 1994, soccersa, soccerss, gxtype3,  type3, konamigx, ROT0, "Konami", "Soccer Superstars (ver AAA)", GAME_NOT_WORKING )
+GAME( 1994, soccerssj,soccerss, gxtype3,  type3, konamigx, ROT0, "Konami", "Soccer Superstars (ver JAC)", GAME_NOT_WORKING ) // writes JAB to EEPROM, but should be version JAC according to labels
+GAME( 1994, soccerssja,soccerss, gxtype3,  type3, konamigx, ROT0, "Konami", "Soccer Superstars (ver JAA)", GAME_NOT_WORKING )
+GAME( 1994, soccerssa,soccerss, gxtype3,  type3, konamigx, ROT0, "Konami", "Soccer Superstars (ver AAA)", GAME_NOT_WORKING )
 
 /* Type 4: dual monitor output and 53936 on the ROM board, external palette RAM, DMA protection */
-GAME( 1996, vsnetscr, konamigx, gxtype4, type3, konamigx, ROT0, "Konami", "Versus Net Soccer (ver EAD)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION )
-GAME( 1996, vsnetseb, vsnetscr, gxtype4, type3, konamigx, ROT0, "Konami", "Versus Net Soccer (ver EAB)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION )
-GAME( 1996, vsnetscu, vsnetscr, gxtype4, type3, konamigx, ROT0, "Konami", "Versus Net Soccer (ver UAB)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION )
-GAME( 1996, vsnetsca, vsnetscr, gxtype4, type3, konamigx, ROT0, "Konami", "Versus Net Soccer (ver AAA)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION )
-GAME( 1996, vsnetscj, vsnetscr, gxtype4, type3, konamigx, ROT0, "Konami", "Versus Net Soccer (ver JAB)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION )
-GAME( 1996, rungun2,  konamigx, gxtype4, type3, konamigx, ROT0, "Konami", "Run and Gun 2 (ver UAA)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION )
-GAME( 1996, slamdnk2, rungun2,  gxtype4, type3, konamigx, ROT0, "Konami", "Slam Dunk 2 (ver JAA)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION )
-GAME( 1996, rushhero, konamigx, gxtype4, type3, konamigx, ROT0, "Konami", "Rushing Heroes (ver UAB)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING  )
+GAME( 1996, vsnetscr,  konamigx, gxtype4, type3, konamigx, ROT0, "Konami", "Versus Net Soccer (ver EAD)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION )
+GAME( 1996, vsnetscreb,vsnetscr, gxtype4, type3, konamigx, ROT0, "Konami", "Versus Net Soccer (ver EAB)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION )
+GAME( 1996, vsnetscru, vsnetscr, gxtype4, type3, konamigx, ROT0, "Konami", "Versus Net Soccer (ver UAB)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION )
+GAME( 1996, vsnetscra, vsnetscr, gxtype4, type3, konamigx, ROT0, "Konami", "Versus Net Soccer (ver AAA)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION )
+GAME( 1996, vsnetscrj, vsnetscr, gxtype4, type3, konamigx, ROT0, "Konami", "Versus Net Soccer (ver JAB)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION )
+GAME( 1996, rungun2,   konamigx, gxtype4, type3, konamigx, ROT0, "Konami", "Run and Gun 2 (ver UAA)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION )
+GAME( 1996, slamdnk2,  rungun2,  gxtype4, type3, konamigx, ROT0, "Konami", "Slam Dunk 2 (ver JAA)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION )
+GAME( 1996, rushhero,  konamigx, gxtype4, type3, konamigx, ROT0, "Konami", "Rushing Heroes (ver UAB)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING  )

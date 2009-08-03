@@ -1462,6 +1462,61 @@ static INPUT_PORTS_START( mach3 )
 	PORT_INCLUDE(gottlieb2_sound)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( cobram3 )
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x08, "5" )
+	PORT_DIPNAME( 0x14, 0x00, "1st Bonus / 2nd Bonus" )
+	PORT_DIPSETTING(    0x00, "20000 / None" )
+	PORT_DIPSETTING(    0x10, "15000 / 30000" )
+	PORT_DIPSETTING(    0x04, "20000 / 40000" )
+	PORT_DIPSETTING(    0x14, "30000 / 50000" )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Difficult ) )
+	PORT_DIPNAME( 0x40, 0x00, "Random 1st Level")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, "Self Test")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	PORT_START("IN1")
+	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Select in Service Mode") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_TILT )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START2 )
+
+	PORT_START("IN2")	/* trackball H not used */
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN3")	/* trackball V not used */
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN4")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_INCLUDE(gottlieb2_sound)
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( usvsthem )
 	PORT_START("DSW")
@@ -1950,11 +2005,23 @@ static MACHINE_DRIVER_START( qbert )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
+
 static MACHINE_DRIVER_START( screwloo )
 	MDRV_IMPORT_FROM(gottlieb2)
 
 	MDRV_VIDEO_START(screwloo)
 MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( cobram3 )
+	MDRV_IMPORT_FROM(g2laser)
+
+	/* sound hardware */
+	MDRV_SOUND_MODIFY("dac1")
+	MDRV_SOUND_ROUTES_RESET()
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+MACHINE_DRIVER_END
+
 
 
 /*************************************
@@ -2031,7 +2098,7 @@ ROM_START( qberta )
 	ROM_LOAD( "qb-fg0.bin",   0x6000, 0x2000, CRC(2f695b85) SHA1(807d16459838f129e10b913890bbc95065d5dd40) )
 ROM_END
 
-ROM_START( qbertjp )
+ROM_START( qbertj )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "qbj-rom2.bin", 0xa000, 0x2000, CRC(67bb1cb2) SHA1(23a7f8c86d6db9220a98b3f630c5d000e80f2d53) )
 	ROM_LOAD( "qbj-rom1.bin", 0xc000, 0x2000, CRC(c61216e7) SHA1(e727b85dddc2963e33af6c02b675243f6fbe2710) )
@@ -2211,7 +2278,7 @@ ROM_START( mplanets )
 	ROM_LOAD( "fg0.k4",       0x6000, 0x2000, CRC(a920e325) SHA1(60f15d5014a55d9c18b06c17c7587d45716619e4) )
 ROM_END
 
-ROM_START( mplanuk )
+ROM_START( mplanetsuk )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mpt_rom4.bin", 0x6000, 0x2000, CRC(cd88e23c) SHA1(03222e2600f7fb1c6844340d4a56eedfcdeaa3c8) )
 	ROM_LOAD( "mpt_rom3.bin", 0x8000, 0x2000, CRC(dc355b2d) SHA1(ae3e376afc7a8cb049d0dd28bf3959cb76780999) )
@@ -2412,8 +2479,11 @@ ROM_START( cobram3 )
 	ROM_LOAD( "bh01",   0xc000, 0x2000, CRC(7d86ab08) SHA1(26b7eb089ca3fe3f8b1531316ce8f95e33b380e5) )
 	ROM_LOAD( "bh00",   0xe000, 0x2000, CRC(c19ad038) SHA1(4d20ae70d8ad1eaa61cb91d7a0cff6932fce30d2) )
 
-	ROM_REGION( 0x10000, "audiocpu", ROMREGION_ERASE00 )
-	ROM_REGION( 0x10000, "speech", ROMREGION_ERASE00 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "m3drom1.bin",  0xd000, 0x1000, CRC(a6e29212) SHA1(a73aafc2efa99e9ae0aecbb6075a10f7178ac938) )
+
+	ROM_REGION( 0x10000, "speech", 0 )
+	ROM_LOAD( "bh04",   0xe000, 0x2000, CRC(c3f61bc9) SHA1(d02374e6e29238def0cfb01c96c78b206f24d77e) )
 
 	ROM_REGION( 0x2000, "bgtiles", 0 )
 	ROM_LOAD( "bh09",   0x0000, 0x1000, CRC(8c5dfac0) SHA1(5be28f807c4eb9df76a8f7519086ae57953d8c6f) )
@@ -2565,17 +2635,21 @@ static DRIVER_INIT( stooges )
 	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x05803, 0x05803, 0, 0x07f8, stooges_output_w);
 }
 
+
 static DRIVER_INIT( screwloo )
 {
 	gottlieb_gfxcharlo = 0;
 	gottlieb_gfxcharhi = 1;
 }
 
+
 static DRIVER_INIT( vidvince )
 {
 	gottlieb_gfxcharlo = 1;
 	gottlieb_gfxcharhi = 0;
 }
+
+
 
 /*************************************
  *
@@ -2584,28 +2658,28 @@ static DRIVER_INIT( vidvince )
  *************************************/
 
 /* games using rev 1 sound board */
-GAME( 1982, reactor,  0,        reactor,   reactor,  ramtiles, ROT0,   "Gottlieb", "Reactor", 0 )
-GAME( 1982, qbert,    0,        qbert,     qbert,    romtiles, ROT270, "Gottlieb", "Q*bert (US set 1)", 0 )
-GAME( 1982, qberta,   qbert,    qbert,     qbert,    romtiles, ROT270, "Gottlieb", "Q*bert (US set 2)", 0 )
-GAME( 1982, qbertjp,  qbert,    qbert,     qbert,    romtiles, ROT270, "Gottlieb (Konami license)", "Q*bert (Japan)", 0 )
-GAME( 1982, myqbert,  qbert,    qbert,     qbert,    romtiles, ROT270, "Gottlieb", "Mello Yello Q*bert", 0 )
-GAME( 1982, qberttst, qbert,    qbert,     qbert,    romtiles, ROT270, "Gottlieb", "Q*bert (early test version)", 0 )
-GAME( 1982, qbtrktst, qbert,    qbert,     qbert,    romtiles, ROT270, "Gottlieb", "Q*bert Board Input Test Rom", 0 )
-GAME( 1982, insector, 0,        gottlieb1, insector, romtiles, ROT0,   "Gottlieb", "Insector (prototype)", 0 )
-GAME( 1982, tylz,     0,        qbert,     tylz,     romtiles, ROT0,   "Mylstar",  "Tylz (prototype)", GAME_IMPERFECT_SOUND ) // modified sound hw?
-GAME( 1984, argusg,   0,        gottlieb1, argusg,   ramtiles, ROT0,   "Gottlieb", "Argus (Gottlieb, prototype)" , 0) // aka Guardian / Protector?
-GAME( 1983, mplanets, 0,        gottlieb1, mplanets, romtiles, ROT270, "Gottlieb", "Mad Planets", 0 )
-GAME( 1983, mplanuk,  mplanets, gottlieb1, mplanets, romtiles, ROT270, "Gottlieb (Taitel license)", "Mad Planets (UK)", 0 )
-GAME( 1983, krull,    0,        gottlieb1, krull,    ramtiles, ROT270, "Gottlieb", "Krull", 0 )
-GAME( 1983, kngtmare, 0,        gottlieb1, kngtmare, romtiles, ROT0,   "Gottlieb", "Knightmare (prototype)", GAME_NO_SOUND )
-GAME( 1983, sqbert,   0,        qbert,     qbert,    romtiles, ROT270, "Mylstar", "Faster, Harder, More Challenging Q*bert (prototype)", 0 )
-GAME( 1983, qbertqub, 0,        qbert,     qbertqub, romtiles, ROT270, "Mylstar", "Q*bert's Qubes", 0 )
-GAME( 1984, curvebal, 0,        gottlieb1, curvebal, romtiles, ROT270, "Mylstar", "Curve Ball", 0 )
+GAME( 1982, reactor,   0,        reactor,   reactor,  ramtiles, ROT0,   "Gottlieb", "Reactor", 0 )
+GAME( 1982, qbert,     0,        qbert,     qbert,    romtiles, ROT270, "Gottlieb", "Q*bert (US set 1)", 0 )
+GAME( 1982, qberta,    qbert,    qbert,     qbert,    romtiles, ROT270, "Gottlieb", "Q*bert (US set 2)", 0 )
+GAME( 1982, qbertj,    qbert,    qbert,     qbert,    romtiles, ROT270, "Gottlieb (Konami license)", "Q*bert (Japan)", 0 )
+GAME( 1982, myqbert,   qbert,    qbert,     qbert,    romtiles, ROT270, "Gottlieb", "Mello Yello Q*bert", 0 )
+GAME( 1982, qberttst,  qbert,    qbert,     qbert,    romtiles, ROT270, "Gottlieb", "Q*bert (early test version)", 0 )
+GAME( 1982, qbtrktst,  qbert,    qbert,     qbert,    romtiles, ROT270, "Gottlieb", "Q*bert Board Input Test Rom", 0 )
+GAME( 1982, insector,  0,        gottlieb1, insector, romtiles, ROT0,   "Gottlieb", "Insector (prototype)", 0 )
+GAME( 1982, tylz,      0,        qbert,     tylz,     romtiles, ROT0,   "Mylstar",  "Tylz (prototype)", GAME_IMPERFECT_SOUND ) // modified sound hw?
+GAME( 1984, argusg,    0,        gottlieb1, argusg,   ramtiles, ROT0,   "Gottlieb", "Argus (Gottlieb, prototype)" , 0) // aka Guardian / Protector?
+GAME( 1983, mplanets,  0,        gottlieb1, mplanets, romtiles, ROT270, "Gottlieb", "Mad Planets", 0 )
+GAME( 1983, mplanetsuk,mplanets, gottlieb1, mplanets, romtiles, ROT270, "Gottlieb (Taitel license)", "Mad Planets (UK)", 0 )
+GAME( 1983, krull,     0,        gottlieb1, krull,    ramtiles, ROT270, "Gottlieb", "Krull", 0 )
+GAME( 1983, kngtmare,  0,        gottlieb1, kngtmare, romtiles, ROT0,   "Gottlieb", "Knightmare (prototype)", GAME_NO_SOUND )
+GAME( 1983, sqbert,    0,        qbert,     qbert,    romtiles, ROT270, "Mylstar", "Faster, Harder, More Challenging Q*bert (prototype)", 0 )
+GAME( 1983, qbertqub,  0,        qbert,     qbertqub, romtiles, ROT270, "Mylstar", "Q*bert's Qubes", 0 )
+GAME( 1984, curvebal,  0,        gottlieb1, curvebal, romtiles, ROT270, "Mylstar", "Curve Ball", 0 )
 
 /* games using rev 2 sound board */
 GAME( 1983, screwloo, 0,        screwloo,  screwloo, screwloo, ROT0,   "Mylstar", "Screw Loose (prototype)", 0 )
 GAME( 1983, mach3,    0,        g2laser,   mach3,    romtiles, ROT0,   "Mylstar", "M.A.C.H. 3", 0 )
-GAME( 1984, cobram3,  cobra,    g2laser,   mach3,    romtiles, ROT0,   "Data East","Cobra Command (M.A.C.H. 3 hardware)", 0 )
+GAME( 1984, cobram3,  cobra,    cobram3,   mach3,    romtiles, ROT0,   "Data East","Cobra Command (M.A.C.H. 3 hardware)", 0 )
 GAME( 1984, usvsthem, 0,        g2laser,   usvsthem, romtiles, ROT0,   "Mylstar", "Us vs. Them", 0 )
 GAME( 1984, 3stooges, 0,        gottlieb2, 3stooges, stooges,  ROT0,   "Mylstar", "The Three Stooges In Brides Is Brides", 0 )
 GAME( 1984, vidvince, 0,        gottlieb2, vidvince, vidvince, ROT0,   "Mylstar", "Video Vince and the Game Factory (prototype)", GAME_IMPERFECT_GRAPHICS ) // sprite wrapping issues

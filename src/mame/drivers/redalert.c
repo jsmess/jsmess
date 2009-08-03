@@ -65,6 +65,10 @@
         * Game is NOT_WORKING due to missing graphics layer
         * Everything needs to be verified on real PCB or schematics
 
+    Known issues/to-do's Panther:
+        * Sound comms doesn't work
+        * No title screen?
+
     ********************************************************************
     IREM 'WW III' 1981
 
@@ -122,12 +126,23 @@ static READ8_HANDLER( redalert_interrupt_clear_r )
 }
 
 
+
 static WRITE8_HANDLER( redalert_interrupt_clear_w )
 {
 	redalert_interrupt_clear_r(space, 0);
 }
 
+static READ8_HANDLER( panther_interrupt_clear_r )
+{
+	cputag_set_input_line(space->machine, "maincpu", M6502_IRQ_LINE, CLEAR_LINE);
 
+	return input_port_read(space->machine, "STICK0");
+}
+
+static READ8_HANDLER( panther_unk_r )
+{
+	return ((mame_rand(space->machine) & 0x01) | (input_port_read(space->machine, "C020") & 0xfe));
+}
 
 /*************************************
  *
@@ -166,6 +181,20 @@ static ADDRESS_MAP_START( ww3_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("maincpu", 0x8000)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( panther_main_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_RAM
+	AM_RANGE(0x2000, 0x3fff) AM_RAM_WRITE(redalert_bitmap_videoram_w) AM_BASE(&redalert_bitmap_videoram)
+	AM_RANGE(0x4000, 0x4fff) AM_RAM AM_BASE(&redalert_charmap_videoram)
+	AM_RANGE(0x5000, 0xbfff) AM_ROM
+	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x0f8f) AM_READ_PORT("C000") AM_WRITENOP
+	AM_RANGE(0xc010, 0xc010) AM_MIRROR(0x0f8f) AM_READ_PORT("C010") AM_WRITENOP
+	AM_RANGE(0xc020, 0xc020) AM_MIRROR(0x0f8f) AM_READ(panther_unk_r) /* vblank? */
+	AM_RANGE(0xc030, 0xc030) AM_MIRROR(0x0f8f) AM_READWRITE(SMH_NOP, redalert_audio_command_w)
+	AM_RANGE(0xc040, 0xc040) AM_MIRROR(0x0f8f) AM_READWRITE(SMH_NOP, SMH_RAM) AM_BASE(&redalert_video_control)
+	AM_RANGE(0xc050, 0xc050) AM_MIRROR(0x0f8f) AM_READWRITE(SMH_NOP, SMH_RAM) AM_BASE(&redalert_bitmap_color)
+	AM_RANGE(0xc070, 0xc070) AM_MIRROR(0x0f8f) AM_READWRITE(panther_interrupt_clear_r, redalert_interrupt_clear_w)
+	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("maincpu", 0x8000)
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( demoneye_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
@@ -243,6 +272,58 @@ static INPUT_PORTS_START( redalert )
 	PORT_BIT( 0xf8, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( panther )
+	PORT_START("C000")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW:1,2")
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x01, "4" )
+	PORT_DIPSETTING(    0x02, "5" )
+	PORT_DIPSETTING(    0x03, "6" )
+	PORT_DIPNAME( 0x04, 0x00, "Cabinet in Service Mode" ) PORT_DIPLOCATION("SW:3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW:4")
+	PORT_DIPSETTING(    0x00, "5000" )
+	PORT_DIPSETTING(    0x08, "7000" )
+	PORT_DIPNAME( 0x30, 0x10, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW:5,6")
+	PORT_DIPSETTING(    0x30, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
+	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_HIGH, "SW:8" )
+
+	PORT_START("C010")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) /* pin 35 - N.C. */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON3 ) /* pin 36 - N.C. */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON4 ) /* Meter */
+
+	PORT_START("C020")
+	PORT_BIT ( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT ( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* Meter */
+	PORT_BIT ( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT ( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT ( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT ( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL
+	PORT_BIT ( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
+	PORT_BIT ( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* Meter */
+
+	PORT_START("COIN")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0xf8, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("STICK0")
+	PORT_BIT( 0xff, 0x80, IPT_POSITIONAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(3) PORT_CENTERDELTA(0)
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( demoneye )
 	PORT_START("C000")
@@ -332,6 +413,20 @@ static MACHINE_DRIVER_START( ww3 )
 	MDRV_IMPORT_FROM(ww3_audio)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( panther )
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD("maincpu", M6502, MAIN_CPU_CLOCK)
+	MDRV_CPU_PROGRAM_MAP(panther_main_map)
+	MDRV_CPU_VBLANK_INT("screen", redalert_vblank_interrupt)
+
+	/* video hardware */
+	MDRV_IMPORT_FROM(ww3_video)
+
+	/* audio hardware */
+	MDRV_IMPORT_FROM(ww3_audio)
+MACHINE_DRIVER_END
+
 static MACHINE_DRIVER_START( demoneye )
 
 	/* basic machine hardware */
@@ -353,6 +448,25 @@ MACHINE_DRIVER_END
  *  ROM definitions
  *
  *************************************/
+
+ROM_START( panther )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "qr-1.bin",      0x8000, 0x0800, CRC(406dc606) SHA1(c12b91145aa579813b7b0e8eb7933bf35e4a5b97) )
+	ROM_LOAD( "qr-2.bin",      0x8800, 0x0800, CRC(e7e64b11) SHA1(0fcfbce552b22edce9051b6fad0974f81ab44973) )
+	ROM_LOAD( "qr-3.bin",      0x9000, 0x0800, CRC(dfec33f2) SHA1(4e631a3a8c7873e8f51a81e8b73704729269ee01) )
+	ROM_LOAD( "qr-4.bin",      0x9800, 0x0800, CRC(60571aa0) SHA1(257474383ad7cb90e9e4f9236b3f865a991d688a) )
+	ROM_LOAD( "qr-5.bin",      0xa000, 0x0800, CRC(2ac19b54) SHA1(613a800179f9705df03967889eb23ef71baed493) )
+	ROM_LOAD( "qr-6.bin",      0xa800, 0x0800, CRC(02fbd9d9) SHA1(65b5875c78886b51c9bdfc75e730b9f67ce72cfc) )
+	ROM_LOAD( "qr-7.bin",      0xb000, 0x0800, CRC(b3e2d6cc) SHA1(7bb18f17d635196e617e8f68bf8d866134c362d1) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "q7a.bin",       0x7000, 0x0800, CRC(febd1674) SHA1(e122d0855ab6a352d741f9013c20ec31e0068248) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) /* color PROM */
+	/* taken from ww3, almost surely doesn't match. */
+	ROM_LOAD( "m-27sc.1a",	  0x0000, 0x0200, BAD_DUMP CRC(b1aca792) SHA1(db37f99b9880cc3c434e2a55a0bbb017d9a72aa3) ) /* 512*8 74S472 or compatible BPROM like a 82s147 */
+ROM_END
+
 
 ROM_START( ww3 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -423,6 +537,7 @@ ROM_END
  *
  *************************************/
 
+GAME( 1981, panther,  0, panther,  panther,  0, ROT270, "Irem",       "Panther",    GAME_NO_SOUND | GAME_SUPPORTS_SAVE | GAME_WRONG_COLORS )
 GAME( 1981, redalert, 0, redalert, redalert, 0, ROT270, "Irem + GDI", "Red Alert",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1981, ww3,      0, ww3,      redalert, 0, ROT270, "Irem",       "WW III",     GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1981, demoneye, 0, demoneye, demoneye, 0, ROT270, "Irem",       "Demoneye-X", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

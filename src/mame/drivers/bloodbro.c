@@ -474,8 +474,8 @@ static MACHINE_DRIVER_START( bloodbro )
 	// video hardware
 
 	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MDRV_SCREEN_REFRESH_RATE(59.39)    /* verified on pcb */
+ 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
@@ -540,7 +540,7 @@ ROM_START( bloodbro )
 	ROM_LOAD( "bb_08.bin",    0x00000, 0x20000, CRC(deb1b975) SHA1(08f2e9a0a23171201b71d381d091edcd3787c287) )
 ROM_END
 
-ROM_START( bloodbra )
+ROM_START( bloodbroa )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "2j.21",    0x00001, 0x20000, CRC(e8ca21b8) SHA1(65330368c29ec64ca03124d28a7f8b49d7a15566) )
 	ROM_LOAD16_BYTE( "1j.22",    0x00000, 0x20000, CRC(6b28cfc7) SHA1(dedd06cab61381f3e27dc14315f283d707d06bcb) )
@@ -654,6 +654,6 @@ static DRIVER_INIT( weststry )
 /* Game Drivers */
 
 GAME( 1990, bloodbro, 0,        bloodbro, bloodbro, 0,        ROT0,   "Tad", "Blood Bros. (set 1)", GAME_NO_COCKTAIL )
-GAME( 1990, bloodbra, bloodbro, bloodbro, bloodbro, 0,        ROT0,   "Tad", "Blood Bros. (set 2)", GAME_NO_COCKTAIL )
+GAME( 1990, bloodbroa,bloodbro, bloodbro, bloodbro, 0,        ROT0,   "Tad", "Blood Bros. (set 2)", GAME_NO_COCKTAIL )
 GAME( 1990, weststry, bloodbro, weststry, weststry, weststry, ROT0,   "bootleg", "West Story", GAME_NO_COCKTAIL | GAME_NO_SOUND )
 GAME( 1990, skysmash, 0,        skysmash, skysmash, 0,        ROT270, "Nihon System", "Sky Smasher", 0 )

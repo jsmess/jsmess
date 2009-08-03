@@ -237,7 +237,7 @@ static INPUT_PORTS_START( mainevt )
 	KONAMI8_B21_UNK(4)
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:1,2,3,4")
 	PORT_DIPSETTING(    0x02, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
@@ -254,54 +254,36 @@ static INPUT_PORTS_START( mainevt )
 	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x09, DEF_STR( 1C_7C ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW1:5" )		/* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW1:6" )		/* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW1:7" )		/* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW1:8" )		/* Listed as "Unused" */
 
  	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x18, 0x10, "Bonus Energy" )
+	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW2:1" )		/* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW2:2" )		/* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW2:3" )		/* Listed as "Unused" */
+	PORT_DIPNAME( 0x18, 0x10, "Bonus Energy" )		PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(    0x00, "60" )
 	PORT_DIPSETTING(    0x08, "70" )
 	PORT_DIPSETTING(    0x10, "80" )
 	PORT_DIPSETTING(    0x18, "90" )
-	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:6,7")
 	PORT_DIPSETTING(    0x60, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Hard ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW3:2" )		/* Listed as "Unused" */
+	PORT_SERVICE_DIPLOC(  0x04, IP_ACTIVE_LOW, "SW3:3" )
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW3:4" )		/* Listed as "Unused" */
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -351,19 +333,17 @@ static INPUT_PORTS_START( devstors )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("DSW1")		/* like mainevt, but different 0x00 settings */
-	KONAMI_COINAGE(DEF_STR( Free_Play ), "Invalid")
+	KONAMI_COINAGE_LOC(DEF_STR( Free_Play ), "Invalid", SW1)
 	/* "Invalid" = both coin slots disabled */
 
 	PORT_MODIFY("DSW2")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, "2" )
 	PORT_DIPSETTING(    0x02, "3" )
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x00, "7" )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Bonus_Life ) )
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW2:3" )		/* Listed as "Unused" */
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(    0x18, "150 and every 200" )
 	PORT_DIPSETTING(    0x10, "150 and every 250" )
 	PORT_DIPSETTING(    0x08, "150 Only" )
@@ -375,7 +355,7 @@ static INPUT_PORTS_START( devstor2 )
 	PORT_INCLUDE( devstors )
 
  	PORT_MODIFY("DSW2")
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
 INPUT_PORTS_END
@@ -543,7 +523,7 @@ ROM_END
 
 /* 2 players - English title screen - "Warning" message in the ROM (not displayed) */
 
-ROM_START( mainev2p )
+ROM_START( mainevt2p )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "799x02.k11",   0x10000, 0x08000, CRC(42cfc650) SHA1(2d1918ebc0d93a2356ad995a6854dbde7c3b8daf) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
@@ -627,7 +607,7 @@ ROM_START( devstors )
  	ROM_LOAD( "890f03.d4",  0x00000, 0x80000, CRC(19065031) SHA1(12c47fbe28f85fa2f901fe52601188a5e9633f22) )
 ROM_END
 
-ROM_START( devstor2 )
+ROM_START( devstors2 )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "890x02.k11",  0x10000, 0x08000, CRC(e58ebb35) SHA1(4253b6a7128534cc0866bc910a271d91ac8b40fd) )
 	ROM_CONTINUE(            0x08000, 0x08000 )
@@ -652,7 +632,7 @@ ROM_START( devstor2 )
  	ROM_LOAD( "890f03.d4",  0x00000, 0x80000, CRC(19065031) SHA1(12c47fbe28f85fa2f901fe52601188a5e9633f22) )
 ROM_END
 
-ROM_START( devstor3 )
+ROM_START( devstors3 )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "890k02.k11",   0x10000, 0x08000, CRC(52f4ccdd) SHA1(074e526ed170a5f2083c8c0808734291a2ea7403) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
@@ -714,9 +694,9 @@ static DRIVER_INIT( mainevt )
 
 GAME( 1988, mainevt,  0,        mainevt,  mainevt,  mainevt, ROT0,  "Konami", "The Main Event (4 Players ver. Y)", 0 )
 GAME( 1988, mainevto, mainevt,  mainevt,  mainevt,  mainevt, ROT0,  "Konami", "The Main Event (4 Players ver. F)", 0 )
-GAME( 1988, mainev2p, mainevt,  mainevt,  mainev2p, mainevt, ROT0,  "Konami", "The Main Event (2 Players ver. X)", 0 )
+GAME( 1988, mainevt2p,mainevt,  mainevt,  mainev2p, mainevt, ROT0,  "Konami", "The Main Event (2 Players ver. X)", 0 )
 GAME( 1988, ringohja, mainevt,  mainevt,  mainev2p, mainevt, ROT0,  "Konami", "Ring no Ohja (Japan 2 Players ver. N)", 0 )
 GAME( 1988, devstors, 0,        devstors, devstors, mainevt, ROT90, "Konami", "Devastators (ver. Z)", 0 )
-GAME( 1988, devstor2, devstors, devstors, devstor2, mainevt, ROT90, "Konami", "Devastators (ver. X)", 0 )
-GAME( 1988, devstor3, devstors, devstors, devstors, mainevt, ROT90, "Konami", "Devastators (ver. V)", 0 )
+GAME( 1988, devstors2,devstors, devstors, devstor2, mainevt, ROT90, "Konami", "Devastators (ver. X)", 0 )
+GAME( 1988, devstors3,devstors, devstors, devstors, mainevt, ROT90, "Konami", "Devastators (ver. V)", 0 )
 GAME( 1988, garuka,   devstors, devstors, devstor2, mainevt, ROT90, "Konami", "Garuka (Japan ver. W)", 0 )

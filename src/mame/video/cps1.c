@@ -1234,7 +1234,7 @@ static const struct CPS1config cps1_config_table[]=
 {
 	/* name       CPSB         gfx mapper   in2  in3  out2   kludge */
 	{"forgottn", CPS_B_01,     mapper_LW621 },
-	{"forgottu", CPS_B_01,     mapper_LWCHR },
+	{"forgottnu",CPS_B_01,     mapper_LWCHR },
 	{"lostwrld", CPS_B_01,     mapper_LWCHR },
 	{"lostwrldo",CPS_B_01,     mapper_LWCHR },
 	{"ghouls",   CPS_B_01,     mapper_DM620 },
@@ -1242,7 +1242,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"daimakai", CPS_B_01,     mapper_DM22A },	// equivalent to DM620
 	{"daimakair",CPS_B_21_DEF, mapper_DAM63B },	// equivalent to DM620, also CPS_B_21_DEF is equivalent to CPS_B_01
 	{"strider",  CPS_B_01,     mapper_ST24M1 },
-	{"stridrua", CPS_B_01,     mapper_ST24M1 },
+	{"striderua",CPS_B_01,     mapper_ST24M1 },
 	{"striderj", CPS_B_01,     mapper_ST22B },	// equivalent to ST24M1
 	{"striderjr",CPS_B_01,     mapper_ST24M1 },
 	{"dynwar",   CPS_B_02,     mapper_TK22B },
@@ -1293,17 +1293,17 @@ static const struct CPS1config cps1_config_table[]=
 	{"sf2jc",    CPS_B_12,     mapper_STF29,  0x36 },
 	/* from here onwards the CPS-B board has suicide battery and multiply protection */
 	{"3wonders", CPS_B_21_BT1, mapper_RT24B },
-	{"3wonderu", CPS_B_21_BT1, mapper_RT24B },
+	{"3wondersu",CPS_B_21_BT1, mapper_RT24B },
 	{"wonder3",  CPS_B_21_BT1, mapper_RT22B },	// equivalent to RT24B
-	{"3wonderh", CPS_B_02    , mapper_RT24B },	/* Not 100% sure of the CPS B-ID */
+	{"3wondersh",CPS_B_02    , mapper_RT24B },	/* Not 100% sure of the CPS B-ID */
 	{"kod",      CPS_B_21_BT2, mapper_KD29B,  0x36, 0, 0x34 },
 	{"kodu",     CPS_B_21_BT2, mapper_KD29B,  0x36, 0, 0x34 },
 	{"kodj",     CPS_B_21_BT2, mapper_KD29B,  0x36, 0, 0x34 },
 	{"kodb",     CPS_B_21_BT2, mapper_KD29B,  0x36, 0, 0x34 },	/* bootleg, doesn't use multiply protection */
 	{"captcomm", CPS_B_21_BT3, mapper_CC63B,  0x36, 0x38, 0x34 },
-	{"captcomu", CPS_B_21_BT3, mapper_CC63B,  0x36, 0x38, 0x34 },
-	{"captcomj", CPS_B_21_BT3, mapper_CC63B,  0x36, 0x38, 0x34 },
-	{"captcomb", CPS_B_21_BT3, mapper_CC63B,  0x36, 0x38, 0x34 },
+	{"captcommu",CPS_B_21_BT3, mapper_CC63B,  0x36, 0x38, 0x34 },
+	{"captcommj",CPS_B_21_BT3, mapper_CC63B,  0x36, 0x38, 0x34 },
+	{"captcommb",CPS_B_21_BT3, mapper_CC63B,  0x36, 0x38, 0x34 },
 	{"knights",  CPS_B_21_BT4, mapper_KR63B,  0x36, 0, 0x34 },
 	{"knightsu", CPS_B_21_BT4, mapper_KR63B,  0x36, 0, 0x34 },
 	{"knightsj", CPS_B_21_BT4, mapper_KR63B,  0x36, 0, 0x34 },
@@ -1345,13 +1345,13 @@ static const struct CPS1config cps1_config_table[]=
 	{"dinopic",  CPS_B_21_QS2, mapper_CD63B },	/* layer enable never used */
 	{"dinopic2", CPS_B_21_QS2, mapper_CD63B },	/* layer enable never used */
 	{"punisher", CPS_B_21_QS3, mapper_PS63B },
-	{"punishru", CPS_B_21_QS3, mapper_PS63B },
-	{"punishrj", CPS_B_21_QS3, mapper_PS63B },
+	{"punisheru",CPS_B_21_QS3, mapper_PS63B },
+	{"punisherj",CPS_B_21_QS3, mapper_PS63B },
 	{"punipic",  CPS_B_21_QS3, mapper_PS63B },
 	{"punipic2", CPS_B_21_QS3, mapper_PS63B },
 	{"punipic3", CPS_B_21_QS3, mapper_PS63B },
 	{"slammast", CPS_B_21_QS4, mapper_MB63B },
-	{"slammasu", CPS_B_21_QS4, mapper_MB63B },
+	{"slammastu",CPS_B_21_QS4, mapper_MB63B },
 	{"mbomberj", CPS_B_21_QS4, mapper_MB63B },
 	{"mbombrd",  CPS_B_21_QS5, mapper_MB63B },
 	{"mbombrdj", CPS_B_21_QS5, mapper_MB63B },
@@ -2217,14 +2217,14 @@ static void cps1_render_sprites(running_machine *machine, bitmap_t *bitmap, cons
 				CODE,												\
 				COLOR,												\
 				!(FLIPX),!(FLIPY),									\
-				511-16-(SX),255-16-(SY),							priority_bitmap,0x02,15);					\
+				511-16-(SX),255-16-(SY),							machine->priority_bitmap,0x02,15);					\
 	else															\
 		pdrawgfx_transpen(bitmap,\
 				cliprect,machine->gfx[2],							\
 				CODE,												\
 				COLOR,												\
 				FLIPX,FLIPY,										\
-				SX,SY,												priority_bitmap,0x02,15);					\
+				SX,SY,												machine->priority_bitmap,0x02,15);					\
 }
 
 
@@ -2453,14 +2453,14 @@ static void cps2_render_sprites(running_machine *machine, bitmap_t *bitmap,const
 				CODE,																\
 				COLOR,																\
 				!(FLIPX),!(FLIPY),													\
-				511-16-(SX),255-16-(SY),											priority_bitmap,primasks[priority],15);					\
+				511-16-(SX),255-16-(SY),											machine->priority_bitmap,primasks[priority],15);					\
 	else																			\
 		pdrawgfx_transpen(bitmap,\
 				cliprect,machine->gfx[2],											\
 				CODE,																\
 				COLOR,																\
 				FLIPX,FLIPY,														\
-				SX,SY,																priority_bitmap,primasks[priority],15);					\
+				SX,SY,																machine->priority_bitmap,primasks[priority],15);					\
 }
 
 	int i;
@@ -2765,7 +2765,7 @@ VIDEO_UPDATE( cps1 )
 	l1 = (layercontrol >> 0x08) & 03;
 	l2 = (layercontrol >> 0x0a) & 03;
 	l3 = (layercontrol >> 0x0c) & 03;
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
 	if (cps_version == 1)
 	{

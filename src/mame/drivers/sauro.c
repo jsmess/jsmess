@@ -339,7 +339,7 @@ static MACHINE_DRIVER_START( tecfri )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_REFRESH_RATE(55.72)   /* verified on pcb */
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(5000))  // frames per second, vblank duration (otherwise sprites lag)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32 * 8, 32 * 8)
@@ -452,7 +452,7 @@ ROM_START( trckydoc )
 	ROM_LOAD( "tdprm.prm",    0x0000, 0x0200,  CRC(5261bc11) SHA1(1cc7a9a7376e65f4587b75ef9382049458656372) )
 ROM_END
 
-ROM_START( trckydca )
+ROM_START( trckydoca )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "trckydca.d9",  0x0000,  0x8000, CRC(99c38aa4) SHA1(298a19439cc17743e10d101c50a26b9a7348299e) )
 	ROM_LOAD( "trckydca.b9",  0x8000,  0x8000, CRC(b6048a15) SHA1(d982fafbfa391ef9bab50bfd52607494e2a9eedf) )
@@ -489,5 +489,5 @@ static DRIVER_INIT( tecfri )
 
 GAME( 1987, sauro,    0,        sauro,    tecfri, tecfri, ROT0, "Tecfri", "Sauro", 0 )
 GAME( 1987, trckydoc, 0,        trckydoc, tecfri, tecfri, ROT0, "Tecfri", "Tricky Doc (Set 1)", 0 )
-GAME( 1987, trckydca, trckydoc, trckydoc, tecfri, tecfri, ROT0, "Tecfri", "Tricky Doc (Set 2)", 0 )
+GAME( 1987, trckydoca,trckydoc, trckydoc, tecfri, tecfri, ROT0, "Tecfri", "Tricky Doc (Set 2)", 0 )
 

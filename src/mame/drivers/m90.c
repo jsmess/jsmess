@@ -5,7 +5,7 @@
     Hasamu                                                  1991 M90
     Bomberman / Atomic Punk / Dynablaster                   1992 M90
     Bomberman World / New Atomic Punk / New Dyna Blaster    1992 M99 A
-    Quiz F-1 1,2finish                                      1992 M97
+    Quiz F1 1-2 Finish                                      1992 M97
     Risky Challenge / Gussun Oyoyo                          1993 M97
     Match It II / Shisensho II                              1993 M97-A
 
@@ -1011,7 +1011,7 @@ ROM_START( atompunk )
 	ROM_LOAD( "bbm-v0.20",    0x0000, 0x20000, CRC(0fa803fe) SHA1(d2ac1e624de38bed385442ceae09a76f203fa084) ) /* Labeled as 9132E9001 */
 ROM_END
 
-ROM_START( dynablsb )
+ROM_START( dynablstb )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "db2-26.bin",   0x00001, 0x20000, CRC(a78c72f8) SHA1(e3ed1bce0278bada6357b5d0823511fa0241f3cd) )
 	ROM_LOAD16_BYTE( "db3-25.bin",   0x00000, 0x20000, CRC(bf3137c3) SHA1(64bbca4b3a509b552ee8a19b3b50fe6638fd90e2) )
@@ -1288,12 +1288,12 @@ GAME( 1991, hasamu,   0,        hasamu,   hasamu,   0,        ROT0, "Irem", "Has
 GAME( 1991, dynablst, 0,        bombrman, dynablst, 0,        ROT0, "Irem (licensed from Hudson Soft)", "Dynablaster / Bomber Man", GAME_NO_COCKTAIL )
 GAME( 1991, bombrman, dynablst, bombrman, bombrman, 0,        ROT0, "Irem (licensed from Hudson Soft)", "Bomber Man (Japan)", GAME_NO_COCKTAIL )
 GAME( 1991, atompunk, dynablst, bombrman, atompunk, 0,        ROT0, "Irem America (licensed from Hudson Soft)", "Atomic Punk (US)", GAME_NO_COCKTAIL )
-GAME( 1991, dynablsb, dynablst, dynablsb, dynablsb, 0,        ROT0, "bootleg", "Dynablaster (bootleg)", GAME_NO_COCKTAIL )
+GAME( 1991, dynablstb,dynablst, dynablsb, dynablsb, 0,        ROT0, "bootleg", "Dynablaster (bootleg)", GAME_NO_COCKTAIL )
 GAME( 1992, bbmanw,   0,        bbmanw,   bbmanw,   0,        ROT0, "Irem", "Bomber Man World / New Dyna Blaster - Global Quest", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL )
 GAME( 1992, bbmanwj,  bbmanw,   bbmanwj,  bbmanwj,  0,        ROT0, "Irem", "Bomber Man World (Japan)", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL )
 GAME( 1992, newapunk, bbmanw,   bbmanw,   bbmanwj,  0,        ROT0, "Irem America", "New Atomic Punk - Global Quest (US)", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL )
 GAME( 1992, bomblord, bbmanw,   bomblord, bbmanw,   bomblord, ROT0, "bootleg", "Bomber Lord (bootleg)", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL )
-GAME( 1992, quizf1,   0,        quizf1,   quizf1,   quizf1,   ROT0, "Irem", "Quiz F-1 1,2finish", GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL )
+GAME( 1992, quizf1,   0,        quizf1,   quizf1,   quizf1,   ROT0, "Irem", "Quiz F1 1-2 Finish (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL )
 GAME( 1993, riskchal, 0,        riskchal, riskchal, 0,        ROT0, "Irem", "Risky Challenge", GAME_NO_COCKTAIL )
 GAME( 1993, gussun,   riskchal, riskchal, riskchal, 0,        ROT0, "Irem", "Gussun Oyoyo (Japan)", GAME_NO_COCKTAIL )
 GAME( 1993, matchit2, 0,        matchit2, matchit2, 0,        ROT0, "Tamtex", "Match It II", GAME_NO_COCKTAIL )

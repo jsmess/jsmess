@@ -180,6 +180,7 @@ ToDo / Notes:
 
 #define MASTER_CLOCK_352 57272800
 #define MASTER_CLOCK_320 53748200
+#define PIXEL_CLOCK 50160000/2/4 /*hand-tuned to match fps ~59.82*/
 
 /**************************************************************************************/
 /*to be added into a stv Header file,remember to remove all the static...*/
@@ -2752,11 +2753,8 @@ static MACHINE_DRIVER_START( stv )
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 
 	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(192))	// guess, needed to force video update after V-Blank OUT interrupt
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
-	MDRV_SCREEN_SIZE(704*2, 512*2)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 703, 0*8, 511) // we need to use a resolution as high as the max size it can change to
+	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 400, 0, 320, 262, 0, 224)
 
 	MDRV_PALETTE_LENGTH(2048+(2048*2))//standard palette + extra memory for rgb brightness.
 	MDRV_GFXDECODE(stv)
@@ -2950,7 +2948,7 @@ ROM_START( decathlt )
 	ROM_LOAD16_WORD_SWAP( "mpr18972.6",    0x1400000, 0x0400000, CRC(45c64fca) SHA1(ae2f678b9885426ce99b615b7f62a451f9ef83f9) ) // good (was .5)
 ROM_END
 
-ROM_START( decathlo )
+ROM_START( decathlto )
 	STV_BIOS
 
 	ROM_REGION32_BE( 0x3000000, "user1", ROMREGION_ERASE00 ) /* SH2 code */
@@ -3861,7 +3859,7 @@ GAME( 1997, nclubv3,   stvbios, stv, stv,  		nameclv3,  	ROT0,   "Sega", 	     	
 GAME( 1995, vfremix,   stvbios, stv, stv,  		vfremix,   	ROT0,   "Sega", 	     			  	"Virtua Fighter Remix (JUETBKAL 950428 V1.000)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1997, findlove,  stvbios, stv, stv,  		stv,  		ROT0,   "Daiki / FCF",    	      		"Find Love (J 971212 V1.000)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1996, decathlt,  stvbios, stv, stv,  		decathlt,  	ROT0,   "Sega", 	     			  	"Decathlete (JUET 960709 V1.001)", GAME_NO_SOUND | GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
-GAME( 1996, decathlo,  decathlt,stv, stv,  		decathlt, 	ROT0,  	"Sega", 	     			  	"Decathlete (JUET 960424 V1.000)", GAME_NO_SOUND | GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
+GAME( 1996, decathlto, decathlt,stv, stv,  		decathlt, 	ROT0,  	"Sega", 	     			  	"Decathlete (JUET 960424 V1.000)", GAME_NO_SOUND | GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
 
 /* Gives I/O errors */
 GAME( 1996, magzun,    stvbios, stv, stv,  		stv,      	ROT0,   "Sega", 	     			  	"Magical Zunou Power (J 961031 V1.000)", GAME_NOT_WORKING )

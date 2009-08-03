@@ -187,10 +187,10 @@ const game_driver * const drivers[] =
     DRIVER( advision )  /* Adventurevision                                  */
 
     /* CAPCOM */
-    DRIVER( sfach )     /* CPS Changer (Street Fighter Alpha)               */
-    DRIVER( sfzbch )    /* CPS Changer (Street Fighter ZERO Brazil)         */
-    DRIVER( sfzch )     /* CPS Changer (Street Fighter ZERO)                */
-    DRIVER( wofch )     /* CPS Changer (Tenchi Wo Kurau II)                 */
+//0133u1    DRIVER( sfach )     /* CPS Changer (Street Fighter Alpha)               */
+//0133u1    DRIVER( sfzbch )    /* CPS Changer (Street Fighter ZERO Brazil)         */
+//0133u1    DRIVER( sfzch )     /* CPS Changer (Street Fighter ZERO)                */
+//0133u1    DRIVER( wofch )     /* CPS Changer (Tenchi Wo Kurau II)                 */
 
     /* MAGNAVOX */
     DRIVER( odyssey2 )  /* Magnavox Odyssey 2 - 1978-1983                   */

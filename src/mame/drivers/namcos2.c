@@ -31,10 +31,6 @@ known issues:
     Final Lap 3:
     - uses unaligned 32x32 sprites, which aren't handled correctly in video/namcos2.c yet
 
-    Four Trax
-    - some graphics glitches (POSIRQ-related?)
-    - sprite banking (for rear view mirror) isn't working
-
     Suzuka 8 Hours II
     - some sprite cropping issues
 
@@ -42,6 +38,7 @@ known issues:
     - gives ADSMISS error on startup
 
     Bubble Trouble (Golly Ghost II)
+    - no artwork
     - MCU not dumped
 
 The Namco System II board is a 5 ( only 4 are emulated ) CPU system. The
@@ -395,7 +392,7 @@ C148pin     Master CPU      Slave CPU
 -------------------------------------
 YBNK        VBLANK          VBLANK
 IRQ4        SCIRQ           SCIRQ       (Serial comms IC Interrupt)
-IRQ3        POSIRQ          POSIRQ      (Comes from C116, pixel generator, Position interrup ?? line based ??)
+IRQ3        POSIRQ          POSIRQ      (Comes from C116, pixel generator, line based position interrupt?)
 IRQ2        EXIRQ           EXIRQ       (Goes to video board but does not appear to be connected)
 IRQ1        SCPUIRQ         MCPUIRQ     (Master/Slave interrupts)
 
@@ -456,6 +453,15 @@ $a00000 checks have been seen on the Final Lap boards.
 #include "sound/c140.h"
 
 #include "finallap.lh"
+
+/* Define clocks based on actual OSC on the PCB */
+
+#define MAIN_OSC_CLOCK		XTAL_49_152MHz
+#define M68K_CPU_CLOCK		(MAIN_OSC_CLOCK / 4)		/* 12.288MHz clock for 68000 (Master & Slave) */
+#define M68B09_CPU_CLOCK	(MAIN_OSC_CLOCK / 24)		/* 2.048MHz clock for 68B09 sound CPU */
+#define C65_CPU_CLOCK		(MAIN_OSC_CLOCK / 24)		/* 2.048MHz clock for 63705 (or 63B05) I/O CPU */
+#define YM2151_SOUND_CLOCK	XTAL_3_579545MHz		/* 3.579545MHz FM clock */
+#define C140_SOUND_CLOCK	(MAIN_OSC_CLOCK / 384 / 6)	/* 21.333kHz C140 clock (was 8000000/374 or 21.390kHz) */
 
 
 /*************************************************************/
@@ -1575,24 +1581,24 @@ via software as INT1
 /*************************************************************/
 
 static MACHINE_DRIVER_START( default )
-	MDRV_CPU_ADD("maincpu", M68000, 12288000)
+	MDRV_CPU_ADD("maincpu", M68000, M68K_CPU_CLOCK) /* 12.288MHz (49.152MHz OSC/4) */
 	MDRV_CPU_PROGRAM_MAP(master_default_am)
 	MDRV_CPU_VBLANK_INT("screen", namcos2_68k_master_vblank)
 
-	MDRV_CPU_ADD("slave", M68000, 12288000)
+	MDRV_CPU_ADD("slave", M68000, M68K_CPU_CLOCK) /*  12.288MHz (49.152MHz OSC/4) */
 	MDRV_CPU_PROGRAM_MAP(slave_default_am)
 	MDRV_CPU_VBLANK_INT("screen", namcos2_68k_slave_vblank)
 
-	MDRV_CPU_ADD("audiocpu", M6809,3072000) // Sound handling
+	MDRV_CPU_ADD("audiocpu", M6809, M68B09_CPU_CLOCK) /* 2.048MHz (49.152MHz OSC/24) - Sound handling */
 	MDRV_CPU_PROGRAM_MAP(sound_default_am)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold, 120)
 
-	MDRV_CPU_ADD("mcu", HD63705,2048000) // I/O handling
+	MDRV_CPU_ADD("mcu", HD63705, C65_CPU_CLOCK) /* 2.048MHz (49.152MHz OSC/24) - I/O handling */
 	MDRV_CPU_PROGRAM_MAP(mcu_default_am)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_QUANTUM_TIME(HZ(6000)) /* CPU slices per frame */
+	MDRV_QUANTUM_TIME(HZ(12000)) /* CPU slices per frame */
 
 	MDRV_MACHINE_START(namcos2)
 	MDRV_MACHINE_RESET(namcos2)
@@ -1614,12 +1620,12 @@ static MACHINE_DRIVER_START( default )
 
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("c140", C140, 8000000/374)
+	MDRV_SOUND_ADD("c140", C140, C140_SOUND_CLOCK) /* 21.333kHz */
 	MDRV_SOUND_CONFIG(c140_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.75)
 
-	MDRV_SOUND_ADD("ym", YM2151, 3579580)
+	MDRV_SOUND_ADD("ym", YM2151, YM2151_SOUND_CLOCK) /* 3.579545MHz */
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_DRIVER_END
@@ -1628,7 +1634,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( default2 )
 	MDRV_IMPORT_FROM(default)
 
-	MDRV_SOUND_REPLACE("c140", C140, 8000000/374)
+	MDRV_SOUND_REPLACE("c140", C140, C140_SOUND_CLOCK) /* 21.333kHz */
 	MDRV_SOUND_CONFIG(c140_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -1638,31 +1644,31 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( default3 )
 	MDRV_IMPORT_FROM(default)
 
-	MDRV_SOUND_REPLACE("c140", C140, 8000000/374)
+	MDRV_SOUND_REPLACE("c140", C140, C140_SOUND_CLOCK) /* 21.333kHz */
 	MDRV_SOUND_CONFIG(c140_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.45)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.45)
 
-	MDRV_SOUND_REPLACE("ym", YM2151, 3579580)
+	MDRV_SOUND_REPLACE("ym", YM2151, YM2151_SOUND_CLOCK) /* 3.579545MHz */
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( gollygho )
-	MDRV_CPU_ADD("maincpu", M68000, 12288000)
+	MDRV_CPU_ADD("maincpu", M68000, M68K_CPU_CLOCK) /* 12.288MHz (49.152MHz OSC/4) */
 	MDRV_CPU_PROGRAM_MAP(master_default_am)
 	MDRV_CPU_VBLANK_INT("screen", namcos2_68k_master_vblank)
 
-	MDRV_CPU_ADD("slave", M68000, 12288000)
+	MDRV_CPU_ADD("slave", M68000, M68K_CPU_CLOCK) /* 12.288MHz (49.152MHz OSC/4) */
 	MDRV_CPU_PROGRAM_MAP(slave_default_am)
 	MDRV_CPU_VBLANK_INT("screen", namcos2_68k_slave_vblank)
 
-	MDRV_CPU_ADD("audiocpu", M6809,3072000) // Sound handling
+	MDRV_CPU_ADD("audiocpu", M6809, M68B09_CPU_CLOCK) /* 2.048MHz (49.152MHz OSC/24) - Sound handling */
 	MDRV_CPU_PROGRAM_MAP(sound_default_am)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold, 120)
 
-	MDRV_CPU_ADD("mcu", HD63705,2048000) // I/O handling
+	MDRV_CPU_ADD("mcu", HD63705, C65_CPU_CLOCK) /* 2.048MHz (49.152MHz OSC/24) - I/O handling */
 	MDRV_CPU_PROGRAM_MAP(mcu_default_am)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
@@ -1688,31 +1694,31 @@ static MACHINE_DRIVER_START( gollygho )
 
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("c140", C140, 8000000/374)
+	MDRV_SOUND_ADD("c140", C140, C140_SOUND_CLOCK) /* 21.333kHz */
 	MDRV_SOUND_CONFIG(c140_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.75)
 
-	MDRV_SOUND_ADD("ym", YM2151, 3579580)
+	MDRV_SOUND_ADD("ym", YM2151, YM2151_SOUND_CLOCK) /* 3.579545MHz */
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( finallap )
-	MDRV_CPU_ADD("maincpu", M68000, 12288000)
+	MDRV_CPU_ADD("maincpu", M68000, M68K_CPU_CLOCK) /* 12.288MHz (49.152MHz OSC/4) */
 	MDRV_CPU_PROGRAM_MAP(master_finallap_am)
 	MDRV_CPU_VBLANK_INT("screen", namcos2_68k_master_vblank)
 
-	MDRV_CPU_ADD("slave", M68000, 12288000)
+	MDRV_CPU_ADD("slave", M68000, M68K_CPU_CLOCK) /* 12.288MHz (49.152MHz OSC/4) */
 	MDRV_CPU_PROGRAM_MAP(slave_finallap_am)
 	MDRV_CPU_VBLANK_INT("screen", namcos2_68k_slave_vblank)
 
-	MDRV_CPU_ADD("audiocpu", M6809,3072000) // Sound handling
+	MDRV_CPU_ADD("audiocpu", M6809, M68B09_CPU_CLOCK) /* 2.048MHz (49.152MHz OSC/24) - Sound handling */
 	MDRV_CPU_PROGRAM_MAP(sound_default_am)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold, 120)
 
-	MDRV_CPU_ADD("mcu", HD63705,2048000) // I/O handling
+	MDRV_CPU_ADD("mcu", HD63705, C65_CPU_CLOCK) /* 2.048MHz (49.152MHz OSC/24) - I/O handling */
 	MDRV_CPU_PROGRAM_MAP(mcu_default_am)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
@@ -1738,31 +1744,31 @@ static MACHINE_DRIVER_START( finallap )
 
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("c140", C140, 8000000/374)
+	MDRV_SOUND_ADD("c140", C140, C140_SOUND_CLOCK) /* 21.333kHz */
 	MDRV_SOUND_CONFIG(c140_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.75)
 
-	MDRV_SOUND_ADD("ym", YM2151, 3579580)
+	MDRV_SOUND_ADD("ym", YM2151, YM2151_SOUND_CLOCK) /* 3.579545MHz */
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( sgunner )
-	MDRV_CPU_ADD("maincpu", M68000, 12288000)
+	MDRV_CPU_ADD("maincpu", M68000, M68K_CPU_CLOCK) /* 12.288MHz (49.152MHz OSC/4) */
 	MDRV_CPU_PROGRAM_MAP(master_sgunner_am)
 	MDRV_CPU_VBLANK_INT("screen", namcos2_68k_master_vblank)
 
-	MDRV_CPU_ADD("slave", M68000, 12288000)
+	MDRV_CPU_ADD("slave", M68000, M68K_CPU_CLOCK) /* 12.288MHz (49.152MHz OSC/4) */
 	MDRV_CPU_PROGRAM_MAP(slave_sgunner_am)
 	MDRV_CPU_VBLANK_INT("screen", namcos2_68k_slave_vblank)
 
-	MDRV_CPU_ADD("audiocpu", M6809,3072000) // Sound handling
+	MDRV_CPU_ADD("audiocpu", M6809, M68B09_CPU_CLOCK) /* 2.048MHz (49.152MHz OSC/24) - Sound handling */
 	MDRV_CPU_PROGRAM_MAP(sound_default_am)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold, 120)
 
-	MDRV_CPU_ADD("mcu", HD63705,2048000) // I/O handling
+	MDRV_CPU_ADD("mcu", HD63705, C65_CPU_CLOCK) /* 2.048MHz (49.152MHz OSC/24) - I/O handling */
 	MDRV_CPU_PROGRAM_MAP(mcu_default_am)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
@@ -1788,31 +1794,31 @@ static MACHINE_DRIVER_START( sgunner )
 
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("c140", C140, 8000000/374)
+	MDRV_SOUND_ADD("c140", C140, C140_SOUND_CLOCK) /* 21.333kHz */
 	MDRV_SOUND_CONFIG(c140_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.75)
 
-	MDRV_SOUND_ADD("ym", YM2151, 3579580)
+	MDRV_SOUND_ADD("ym", YM2151, YM2151_SOUND_CLOCK) /* 3.579545MHz */
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( luckywld )
-	MDRV_CPU_ADD("maincpu", M68000, 12288000)
+	MDRV_CPU_ADD("maincpu", M68000, M68K_CPU_CLOCK) /* 12.288MHz (49.152MHz OSC/4) */
 	MDRV_CPU_PROGRAM_MAP(master_luckywld_am)
 	MDRV_CPU_VBLANK_INT("screen", namcos2_68k_master_vblank)
 
-	MDRV_CPU_ADD("slave", M68000, 12288000)
+	MDRV_CPU_ADD("slave", M68000, M68K_CPU_CLOCK) /* 12.288MHz (49.152MHz OSC/4) */
 	MDRV_CPU_PROGRAM_MAP(slave_luckywld_am)
 	MDRV_CPU_VBLANK_INT("screen", namcos2_68k_slave_vblank)
 
-	MDRV_CPU_ADD("audiocpu", M6809,3072000) /* Sound handling */
+	MDRV_CPU_ADD("audiocpu", M6809, M68B09_CPU_CLOCK) /* 2.048MHz (49.152MHz OSC/24) - Sound handling */
 	MDRV_CPU_PROGRAM_MAP(sound_default_am)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,120)
 
-	MDRV_CPU_ADD("mcu", HD63705,2048000) /* I/O handling */
+	MDRV_CPU_ADD("mcu", HD63705, C65_CPU_CLOCK) /* 2.048MHz (49.152MHz OSC/24) - I/O handling */
 	MDRV_CPU_PROGRAM_MAP(mcu_default_am)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
@@ -1838,31 +1844,31 @@ static MACHINE_DRIVER_START( luckywld )
 
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("c140", C140, 8000000/374)
+	MDRV_SOUND_ADD("c140", C140, C140_SOUND_CLOCK) /* 21.333kHz */
 	MDRV_SOUND_CONFIG(c140_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.75)
 
-	MDRV_SOUND_ADD("ym", YM2151, 3579580)
+	MDRV_SOUND_ADD("ym", YM2151, YM2151_SOUND_CLOCK) /* 3.579545MHz */
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( metlhawk )
-	MDRV_CPU_ADD("maincpu", M68000, 12288000)
+	MDRV_CPU_ADD("maincpu", M68000, M68K_CPU_CLOCK) /* 12.288MHz (49.152MHz OSC/4) */
 	MDRV_CPU_PROGRAM_MAP(master_metlhawk_am)
 	MDRV_CPU_VBLANK_INT("screen", namcos2_68k_master_vblank)
 
-	MDRV_CPU_ADD("slave", M68000, 12288000)
+	MDRV_CPU_ADD("slave", M68000, M68K_CPU_CLOCK) /* 12.288MHz (49.152MHz OSC/4) */
 	MDRV_CPU_PROGRAM_MAP(slave_metlhawk_am)
 	MDRV_CPU_VBLANK_INT("screen", namcos2_68k_slave_vblank)
 
-	MDRV_CPU_ADD("audiocpu", M6809,3072000) /* Sound handling */
+	MDRV_CPU_ADD("audiocpu", M6809, M68B09_CPU_CLOCK) /* 2.048MHz (49.152MHz OSC/24) - Sound handling */
 	MDRV_CPU_PROGRAM_MAP(sound_default_am)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,120)
 
-	MDRV_CPU_ADD("mcu", HD63705,2048000) /* I/O handling */
+	MDRV_CPU_ADD("mcu", HD63705, C65_CPU_CLOCK) /* 2.048MHz (49.152MHz OSC/24) - I/O handling */
 	MDRV_CPU_PROGRAM_MAP(mcu_default_am)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
@@ -1880,7 +1886,7 @@ static MACHINE_DRIVER_START( metlhawk )
 	MDRV_SCREEN_SIZE(384, 264)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
 
-    MDRV_GFXDECODE(metlhawk)
+	MDRV_GFXDECODE(metlhawk)
 	MDRV_PALETTE_LENGTH(0x2000)
 
 	MDRV_VIDEO_START(metlhawk)
@@ -1888,12 +1894,12 @@ static MACHINE_DRIVER_START( metlhawk )
 
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("c140", C140, 8000000/374)
+	MDRV_SOUND_ADD("c140", C140, C140_SOUND_CLOCK) /* 21.333kHz */
 	MDRV_SOUND_CONFIG(c140_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MDRV_SOUND_ADD("ym", YM2151, 3579580)
+	MDRV_SOUND_ADD("ym", YM2151, YM2151_SOUND_CLOCK) /* 3.579545MHz */
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_DRIVER_END
@@ -2155,7 +2161,7 @@ ROM_START( burnforc )
 	ROM_LOAD( "bu_voi-1.bin",  0x000000, 0x080000, CRC(99d8a239) SHA1(1ebc586048e757ac0ac68dc9cc171f4849e67cef) )
 ROM_END
 
-ROM_START( burnfrco )
+ROM_START( burnforco )
 	ROM_REGION( 0x040000, "maincpu", 0 ) /* Master CPU */
 	ROM_LOAD16_BYTE( "bu1_mpr0.bin",  0x000000, 0x020000, CRC(096B73E2) SHA1(ED96CA336DD0CE368F6B07CF1A80C55CF16919C9) )
 	ROM_LOAD16_BYTE( "bu1_mpr1.bin",  0x000001, 0x020000, CRC(7EAD4CBF) SHA1(FF8CF722E57FBE9E035CC542180806FE045206F5) )
@@ -2254,7 +2260,7 @@ ROM_START( cosmogng )
 ROM_END
 
 /* COSMO GANG THE VIDEO (JAPAN) */
-ROM_START( cosmognj )
+ROM_START( cosmogngj )
 	ROM_REGION( 0x040000, "maincpu", 0 ) /* Master CPU */
 	ROM_LOAD16_BYTE( "co1mpr0.bin",  0x000000, 0x020000, CRC(d1b4c8db) SHA1(d14974edc458b95cca02defef073804f1af0f5de) )
 	ROM_LOAD16_BYTE( "co1mpr1.bin",  0x000001, 0x020000, CRC(2f391906) SHA1(d97e58eecaca84127caa3bc55d6aa256628e35d7) )
@@ -2502,7 +2508,7 @@ ROM_START( finallap )
 ROM_END
 
 /* FINAL LAP (revision D) */
-ROM_START( finalapd )
+ROM_START( finallapd )
 	ROM_REGION( 0x040000, "maincpu", 0 ) /* Master CPU */
 	ROM_LOAD16_BYTE( "fl2-mp0d",  0x000000, 0x010000, CRC(3576d3aa) SHA1(4928cfc5c929de8cc5ec12ea87c678188d314c39) )
 	ROM_LOAD16_BYTE( "fl2-mp1d",  0x000001, 0x010000, CRC(22d3906d) SHA1(63f3076eeefca57daf427633f82fdea353a52da2) )
@@ -2557,7 +2563,7 @@ ROM_START( finalapd )
 ROM_END
 
 /* FINAL LAP (revision C) */
-ROM_START( finalapc )
+ROM_START( finallapc )
 	ROM_REGION( 0x040000, "maincpu", 0 ) /* Master CPU */
 	ROM_LOAD16_BYTE( "fl2-mp0c",  0x000000, 0x010000, CRC(f667f2c9) SHA1(79096bd600c001b21020ddf468e55c34dad9f1eb) )
 	ROM_LOAD16_BYTE( "fl2-mp1c",  0x000001, 0x010000, CRC(b8615d33) SHA1(f72ce75047cf41d47684d6657aa3bd1b00f68056) )
@@ -2612,7 +2618,7 @@ ROM_START( finalapc )
 ROM_END
 
 /* FINAL LAP (Rev C - Japan) */
-ROM_START( finlapjc )
+ROM_START( finallapjc )
 	ROM_REGION( 0x040000, "maincpu", 0 ) /* Master CPU */
 	ROM_LOAD16_BYTE( "fl1_mp0c.bin",  0x000000, 0x010000, CRC(63cd7304) SHA1(f9342a03b6e3c599946fec1690f34be2d0fe0307) )
 	ROM_LOAD16_BYTE( "fl1_mp1c.bin",  0x000001, 0x010000, CRC(cc9c5fb6) SHA1(7da82f5c8c1574c92432ee003c8433b7dde9d393) )
@@ -2667,7 +2673,7 @@ ROM_START( finlapjc )
 ROM_END
 
 /* FINAL LAP  (REV B - JAPAN) */
-ROM_START( finlapjb )
+ROM_START( finallapjb )
 	ROM_REGION( 0x040000, "maincpu", 0 ) /* Master CPU */
 	ROM_LOAD16_BYTE( "fl1_mp0b.bin",  0x000000, 0x010000, CRC(870a482a) SHA1(776afe0206385732f9bcad4a75399ad7cc8fcda1) )
 	ROM_LOAD16_BYTE( "fl1_mp1b.bin",  0x000001, 0x010000, CRC(af52c991) SHA1(23d440cc0f53872739fce1d0837ef906a5e75f98) )
@@ -2775,7 +2781,7 @@ ROM_START( finalap2 )
 ROM_END
 
 /* FINAL LAP 2 (Japan) */
-ROM_START( finalp2j )
+ROM_START( finalap2j )
 	ROM_REGION( 0x040000, "maincpu", 0 ) /* Master CPU */
 	ROM_LOAD16_BYTE( "fls1_mp0.bin",  0x000000, 0x020000, CRC(05ea8090) SHA1(edd3d8780e9f849f45fff1593821aed6b7711a57) )
 	ROM_LOAD16_BYTE( "fls1_mp1.bin",  0x000001, 0x020000, CRC(fb189f50) SHA1(9436aea727adf9e11e8061d0ded4e4b00df90b70) )
@@ -2886,7 +2892,7 @@ ROM_START( finalap3 )
 ROM_END
 
 /* FINAL LAP 3 JAPAN */
-ROM_START( finalp3j )
+ROM_START( finalap3j )
 	ROM_REGION( 0x040000, "maincpu", 0 ) /* Master CPU */
 	ROM_LOAD16_BYTE( "fltmp0",  0x000000, 0x020000, CRC(2f2a997a) SHA1(02c805b0727d55bd7782d3352d3563c490694fdb) )
 	ROM_LOAD16_BYTE( "fltmp1",  0x000001, 0x020000, CRC(b505ca0b) SHA1(2dd6c264806a32466df78a0bc1f44e2e2796f81e) )
@@ -2996,70 +3002,230 @@ ROM_START( finehour )
 	ROM_LOAD( "fh1_vo1.bin",  0x000000, 0x080000, CRC(07560fc7) SHA1(76f3855f5a4567dc65d513e37072072c2a011e7e) )
 ROM_END
 
-/* FOUR TRAX */
+/*
+
+Four Trax
+Namco 1989
+
+The video board and CPU board are the same type as those used on Final Lap.
+
+PCB Layouts
+-----------
+
+Top Board
+
+8618961200
+(8618963200)
+|--------------------------------------------------------------------|
+| TA7630  C116     M5M5178                                 49.152MHz |
+|  TL084  TL084    M5M5178                                      137  |
+| LC7880 YM3012    M5M5178   FX_CHR-7.9S  FX_CHR-3.11S   FX_DAT0.13S |
+| LA4700     156         123 FX_CHR-6.9R  FX2_CH2.11R    FX_DAT2.13R |
+|                            FX_CHR-5.9P  FX_CHR-1.11P   FX_DAT1.13P |
+|140              FX_SHA.7N  FX_CHR-4.9N  FX_CHR-0.11N   FX_DAT3.13N |
+|      3N*                                                           |
+|  FX_VOI-1.3M        145     84256                                  |
+|J     3L*                    84256       65256          65256       |
+|A                                                                   |
+|M   8464       2018                      FX2_SP0.11K    FX2_SP1.13K |
+|M              2018                                                 |
+|A   YM2151                  FX1_SD0.7J                              |
+|          121  68B09           7G*            68000         148     |
+|          SYS87B-1(PAL)   8464                                      |
+|               SYS87B-2B(PAL)                                       |
+|        SYS2C65C.3F                                                 |
+|N                                                                   |
+|A  DSW(8)    C65                                                    |
+|M 3.579545MHz           MB8422                                      |
+|C   149           LB1760     SYS87B-3(PAL)     65256       65256    |
+|O                 LB1760          139                               |
+|4                                  HN58C65  FX2_MP0.11D  FX2_MP1.13D|
+|8         MB3771 PC900 6N137   M5M5179               68000      148 |
+|--------------------------------------------------------------------|
+Notes:
+      68000 clocks - 12.288MHz [49.152/4]
+      68B09 clock  - 2.048MHz [49.152/24]
+      YM2151 clock - 3.579545MHz
+      C65 clock    - 2.048MHz [49.152/24], 8.192MHz [49.152/6]
+      C140 clocks  - 1.365333334MHz [49.152/36], 42.6667kHz, 85.3334kHz, 128.000kHz [49.152/384],
+                     256.000kHz [49.152/192], 512.000kHz [49.152/96], 4.096MHz [49.152/12],
+                     2.730666667MHz [49.152/18], 2.048MHz [49.152/24], 12.288MHz [49.152/4],
+                     8.192MHz [49.152/6]
+      *            - Unpopulated socket
+
+      Namco customs
+      -------------
+                    C116 (QFP80)
+                    156  (QFP64)
+                    123  (QFP80)
+                    145  (QFP80)
+                    148  (QFP64, x2)
+                    139  (QFP64)
+                    C65  (QFP80). This is a 63B05 MCU
+                    149  (DIP28)
+                    137  (DIP28)
+                    140  (QFP120)
+                    121  (QFP64)
+
+      Measurements
+      ------------
+      HSync - 15.9398kHz
+      VSync - 60.6061Hz
+      OSC1  - 49.15200MHz
+      OSC2  - 3.57962MHz
+
+
+Bottom Board
+
+V56 VIDEO
+2272961200
+(2272963100)
+|--------------------------------------------------------------------|
+|                                                                    |
+|                TMM2063     135                                     |
+|                                              137                   |
+| FL1-1(PAL)     TMM2063                                             |
+|                                     LH5762                         |
+|                TMM2063                                             |
+|                                                                    |
+|                TMM2063                                             |
+|                                          2018             2018     |
+|                134                                                 |
+|                           J203           2018             2018     |
+|                                                                    |
+|                                                                    |
+|   45                                                               |
+|                                                                    |
+|                                                         FL1-2(PAL) |
+|                                                                    |
+|                                                                    |
+|                        4H*      5H*                                |
+|                                                145                 |
+|                        4F*      5F*                                |
+|                                                                    |
+|  MB81464  MB81464                                                  |
+|                                                                    |
+|  MB81464  MB81464                                                  |
+|                    2018    107                                     |
+|                                                                    |
+|                    2018    FX1-1.5B                                |
+|--------------------------------------------------------------------|
+Notes:
+      FX1-1.5B - PROM type MB7118
+      *        - Unpopulated socket
+
+      Namco customs:
+                    45   (QFP80)
+                    107  (SDIP64)
+                    145  (QFP80)
+                    134  (NDIP28)
+                    135  (NDIP28)
+                    137  (NDIP28)
+
+
+ROM Board (mounts onto J203 of VIDEO board)
+
+2294961301
+(2294963201)
+|--------------------------------------|
+|      JP1       J2                    |
+| 74F244  74F139    74F244             |
+|                                      |
+| 74F244  74F244    74F244             |
+|               J1                     |
+|                                      |
+|FX_OBJ-12.8A     FX_OBJ-8.8C          |
+|                                      |
+|FX_OBJ-13.7A     FX_OBJ-9.7C          |
+|                                      |
+|FX_OBJ-14.6A     FX_OBJ10.6C          |
+|                                      |
+|FX_OBJ15.5A      FX_OBJ-11.5C         |
+|                                      |
+|                                      |
+|                                      |
+|FX_OBJ-4.4A      FX_OBJ-0.4C          |
+|                                      |
+|FX_OBJ-5.3A      FX_OBJ-1.3C          |
+|                                      |
+|FX_OBJ6.2A       FX_OBJ2.2C           |
+|                                      |
+|FX_OBJ7.1A       FX_OBJ-3.1C          |
+|                                      |
+|                                      |
+|--------------------------------------|
+Notes: (All ICs shown)
+      JP1 - jumper, set to 2M. Alt setting is 4M
+      J1  - 32 pin connector joining to VIDEO board
+      J2  - 2 pin connector tied with 1 wire to a logic chip on the VIDEO board. If the connector
+            is unplugged, all of the bike sprites are bad. The scenary and spectator objects are not affected.
+      All ROMs are 2MBit. ROMs at 1A, 2A, 5A, 2C and 6C are 27C2001 EPROMs, all others
+      are 2M 32 pin MASK ROMs.
+*/
+
 ROM_START( fourtrax )
 	ROM_REGION( 0x040000, "maincpu", 0 ) /* Master CPU */
-	ROM_LOAD16_BYTE( "fx2mp0",  0x000000, 0x020000, CRC(f147cd6b) SHA1(7cdadd68d55dd8fa9b19cbee1434d9266ae1f4b9) )
-	ROM_LOAD16_BYTE( "fx2mp1",  0x000001, 0x020000, CRC(8af4a309) SHA1(538076359cfd08e99e42c05bcccd95df71856696) )
+	ROM_LOAD16_BYTE( "fx2_mp0.11d",  0x000000, 0x020000, CRC(f147cd6b) SHA1(7cdadd68d55dd8fa9b19cbee1434d9266ae1f4b9) )
+	ROM_LOAD16_BYTE( "fx2_mp1.13d",  0x000001, 0x020000, CRC(8af4a309) SHA1(538076359cfd08e99e42c05bcccd95df71856696) )
 
 	ROM_REGION( 0x040000, "slave", 0 ) /* Slave CPU */
-	ROM_LOAD16_BYTE( "fx2sp0",  0x000000, 0x020000, CRC(48548e78) SHA1(b3a9de8682fe63c1c3ecab3e3f9380a884efd4af) )
-	ROM_LOAD16_BYTE( "fx2sp1",  0x000001, 0x020000, CRC(d2861383) SHA1(36be5a8c8a19f35f9a9bd3ef725a83c5e58ccbe0) )
+	ROM_LOAD16_BYTE( "fx2_sp0.11k", 0x000000, 0x020000, CRC(48548e78) SHA1(b3a9de8682fe63c1c3ecab3e3f9380a884efd4af) )
+	ROM_LOAD16_BYTE( "fx2_sp1.13k", 0x000001, 0x020000, CRC(d2861383) SHA1(36be5a8c8a19f35f9a9bd3ef725a83c5e58ccbe0) )
 
 	ROM_REGION( 0x030000, "audiocpu", 0 ) /* Sound CPU (Banked) */
-	ROM_LOAD( "fx1sd0",  0x00c000, 0x004000, CRC(acccc934) SHA1(98f1a823ba7e3f258a73d5780953f9339d438e1a) )
+	ROM_LOAD( "fx1_sd0.7j", 0x00c000, 0x004000, CRC(acccc934) SHA1(98f1a823ba7e3f258a73d5780953f9339d438e1a) )
 	ROM_CONTINUE( 0x010000, 0x01c000 )
-	ROM_RELOAD(  0x010000, 0x020000 )
+	ROM_RELOAD(   0x010000, 0x020000 )
 
 	ROM_REGION( 0x010000, "mcu", 0 ) /* I/O MCU */
 	ROM_LOAD( "sys2mcpu.bin",  0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
 	ROM_LOAD( "sys2c65c.bin",  0x008000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 ) /* Sprites */
-	ROM_LOAD( "fxobj0",  0x000000, 0x040000, CRC(1aa60ffa) SHA1(1fa625a52c763b8db718af14e9f3cc3e076ff83b) )
-	ROM_LOAD( "fxobj1",  0x040000, 0x040000, CRC(7509bc09) SHA1(823d8d884afc685dda26c1256c2d241c7f626f9e) )
-	ROM_LOAD( "fxobj4",  0x080000, 0x040000, CRC(30add52a) SHA1(ff782d9dca96967233e435c3dd7d69ffde45db43) )
-	ROM_LOAD( "fxobj5",  0x0c0000, 0x040000, CRC(e3cd2776) SHA1(6155e9ad90b8a885125c8a76e9c068247e7693ae) )
-	ROM_LOAD( "fxobj8",  0x100000, 0x040000, CRC(b165acab) SHA1(86bd2cc22e25ddbf73e62426762aa72205868660) )
-	ROM_LOAD( "fxobj9",  0x140000, 0x040000, CRC(90f0735b) SHA1(2adbe72c6547075c0cc0386789cc1b8c1a0bc84f) )
-	ROM_LOAD( "fxobj12", 0x180000, 0x040000, CRC(f5e23b78) SHA1(99896bd7c6663e3f57cb5d206964b81b5d64c8b6) )
-	ROM_LOAD( "fxobj13", 0x1c0000, 0x040000, CRC(04a25007) SHA1(0c33450b0d6907754dbf1914849d1630baa824bd) )
-	ROM_LOAD( "fxobj2",  0x200000, 0x040000, CRC(243affc7) SHA1(738d62960e79b95079b2208ec48fa0f3738c7611) )
-	ROM_LOAD( "fxobj3",  0x240000, 0x040000, CRC(b7e5d17d) SHA1(3d8ea7cbf33b595ddf739024e8d0fccd5f9e073b) )
-	ROM_LOAD( "fxobj6",  0x280000, 0x040000, CRC(a2d5ce4a) SHA1(bbe9df3914632a573a95fcba76442404d149fb9d) )
-	ROM_LOAD( "fxobj7",  0x2c0000, 0x040000, CRC(4d91c929) SHA1(97470a4ad7b28df83c632bfc8c309b24701275fe) )
-	ROM_LOAD( "fxobj10", 0x300000, 0x040000, CRC(7a01e86f) SHA1(5fde10e53cb192df0f3873cd6d59c725430948f5) )
-	ROM_LOAD( "fxobj11", 0x340000, 0x040000, CRC(514b3fe5) SHA1(19562ba2ac04a16d335bdc81b34d929f7ff9161c) )
-	ROM_LOAD( "fxobj14", 0x380000, 0x040000, CRC(c1658c77) SHA1(ec689d0e5cf95085c193aa8949c6ec6e7243338b) )
-	ROM_LOAD( "fxobj15", 0x3c0000, 0x040000, CRC(2bc909b3) SHA1(29c668d6d12ccdee25e97373bc4786894858d463) )
+	ROM_LOAD( "fx_obj-0.4c",  0x000000, 0x040000, CRC(1aa60ffa) SHA1(1fa625a52c763b8db718af14e9f3cc3e076ff83b) )
+	ROM_LOAD( "fx_obj-1.3c",  0x040000, 0x040000, CRC(7509bc09) SHA1(823d8d884afc685dda26c1256c2d241c7f626f9e) )
+	ROM_LOAD( "fx_obj-4.4a",  0x080000, 0x040000, CRC(30add52a) SHA1(ff782d9dca96967233e435c3dd7d69ffde45db43) )
+	ROM_LOAD( "fx_obj-5.3a",  0x0c0000, 0x040000, CRC(e3cd2776) SHA1(6155e9ad90b8a885125c8a76e9c068247e7693ae) )
+	ROM_LOAD( "fx_obj-8.8c",  0x100000, 0x040000, CRC(b165acab) SHA1(86bd2cc22e25ddbf73e62426762aa72205868660) )
+	ROM_LOAD( "fx_obj-9.7c",  0x140000, 0x040000, CRC(90f0735b) SHA1(2adbe72c6547075c0cc0386789cc1b8c1a0bc84f) )
+	ROM_LOAD( "fx_obj-12.8a", 0x180000, 0x040000, CRC(f5e23b78) SHA1(99896bd7c6663e3f57cb5d206964b81b5d64c8b6) )
+	ROM_LOAD( "fx_obj-13.7a", 0x1c0000, 0x040000, CRC(04a25007) SHA1(0c33450b0d6907754dbf1914849d1630baa824bd) )
+	ROM_LOAD( "fx_obj2.2c",   0x200000, 0x040000, CRC(243affc7) SHA1(738d62960e79b95079b2208ec48fa0f3738c7611) )
+	ROM_LOAD( "fx_obj-3.1c",  0x240000, 0x040000, CRC(b7e5d17d) SHA1(3d8ea7cbf33b595ddf739024e8d0fccd5f9e073b) )
+	ROM_LOAD( "fx_obj6.2a",   0x280000, 0x040000, CRC(a2d5ce4a) SHA1(bbe9df3914632a573a95fcba76442404d149fb9d) )
+	ROM_LOAD( "fx_obj7.1a",   0x2c0000, 0x040000, CRC(4d91c929) SHA1(97470a4ad7b28df83c632bfc8c309b24701275fe) )
+	ROM_LOAD( "fx_obj10.6c",  0x300000, 0x040000, CRC(7a01e86f) SHA1(5fde10e53cb192df0f3873cd6d59c725430948f5) )
+	ROM_LOAD( "fx_obj-11.5c", 0x340000, 0x040000, CRC(514b3fe5) SHA1(19562ba2ac04a16d335bdc81b34d929f7ff9161c) )
+	ROM_LOAD( "fx_obj-14.6a", 0x380000, 0x040000, CRC(c1658c77) SHA1(ec689d0e5cf95085c193aa8949c6ec6e7243338b) )
+	ROM_LOAD( "fx_obj15.5a",  0x3c0000, 0x040000, CRC(2bc909b3) SHA1(29c668d6d12ccdee25e97373bc4786894858d463) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 ) /* Tiles */
-	NAMCOS2_GFXROM_LOAD_128K( "fxchr0",  0x000000, CRC(6658c1c3) SHA1(64b5466e0f94cf5f3cb92915a26331748f67041a) )
-	NAMCOS2_GFXROM_LOAD_128K( "fxchr1",  0x080000, CRC(3a888943) SHA1(6540b417003045dfa1401a1ff04ac55b86cc177f) )
-	NAMCOS2_GFXROM_LOAD_128K( "fxch2",	 0x100000, CRC(fdf1e86b) SHA1(91a61c10a9e92f8bbc26ffc9cb72deb31378a843) )
-	NAMCOS2_GFXROM_LOAD_128K( "fxchr3",  0x180000, CRC(47fa7e61) SHA1(cc2eed81ddb4f942dd7a07e474760e4608eb4da0) )
-	NAMCOS2_GFXROM_LOAD_128K( "fxchr4",  0x200000, CRC(c720c5f5) SHA1(f68f369bbefe01c770314ea597dd88587638c62a) )
-	NAMCOS2_GFXROM_LOAD_128K( "fxchr5",  0x280000, CRC(9eacdbc8) SHA1(ca4061afc9e61eeb543f2a3740812abf6a1049bc) )
-	NAMCOS2_GFXROM_LOAD_128K( "fxchr6",  0x300000, CRC(c3dba42e) SHA1(2b5a8fabec11ccd44156ecfccf86fc713845d262) )
-	NAMCOS2_GFXROM_LOAD_128K( "fxchr7",  0x380000, CRC(c009f3ae) SHA1(394beed29bda97f4f5ba532bc0bd22177154746b) )
+	NAMCOS2_GFXROM_LOAD_128K( "fx_chr-0.11n", 0x000000, CRC(6658c1c3) SHA1(64b5466e0f94cf5f3cb92915a26331748f67041a) )
+	NAMCOS2_GFXROM_LOAD_128K( "fx_chr-1.11p", 0x080000, CRC(3a888943) SHA1(6540b417003045dfa1401a1ff04ac55b86cc177f) )
+	NAMCOS2_GFXROM_LOAD_128K( "fx2_ch2.11r",  0x100000, CRC(fdf1e86b) SHA1(91a61c10a9e92f8bbc26ffc9cb72deb31378a843) )
+	NAMCOS2_GFXROM_LOAD_128K( "fx_chr-3.11s", 0x180000, CRC(47fa7e61) SHA1(cc2eed81ddb4f942dd7a07e474760e4608eb4da0) )
+	NAMCOS2_GFXROM_LOAD_128K( "fx_chr-4.9n",  0x200000, CRC(c720c5f5) SHA1(f68f369bbefe01c770314ea597dd88587638c62a) )
+	NAMCOS2_GFXROM_LOAD_128K( "fx_chr-5.9p",  0x280000, CRC(9eacdbc8) SHA1(ca4061afc9e61eeb543f2a3740812abf6a1049bc) )
+	NAMCOS2_GFXROM_LOAD_128K( "fx_chr-6.9r",  0x300000, CRC(c3dba42e) SHA1(2b5a8fabec11ccd44156ecfccf86fc713845d262) )
+	NAMCOS2_GFXROM_LOAD_128K( "fx_chr-7.9s",  0x380000, CRC(c009f3ae) SHA1(394beed29bda97f4f5ba532bc0bd22177154746b) )
 
 	ROM_REGION( 0x400000, "gfx3", ROMREGION_ERASEFF ) /* ROZ Tiles */
 	/* No ROZ files in zip */
 
 	ROM_REGION( 0x080000, "gfx4", 0 ) /* Mask shape */
-	NAMCOS2_GFXROM_LOAD_128K( "fxsha",	0x000000, CRC(f7aa4af7) SHA1(b18ffda9e35beb0f072825e2899691be370f33b1) )
+	NAMCOS2_GFXROM_LOAD_128K( "fx_sha.7n", 0x000000, CRC(f7aa4af7) SHA1(b18ffda9e35beb0f072825e2899691be370f33b1) )
 
 	ROM_REGION16_BE( 0x200000, "user1", 0 ) /* Shared data roms */
-	NAMCOS2_DATA_LOAD_E_256K( "fxdat0",  0x000000, CRC(63abf69b) SHA1(6776991eeff434bf9720f49ad6e62c37fc7ddf40) )
-	NAMCOS2_DATA_LOAD_O_256K( "fxdat1",  0x000000, CRC(725bed14) SHA1(bbf886ac7f8c2c7857bc0b5d7f8fc7e63e8e9559) )
-	NAMCOS2_DATA_LOAD_E_256K( "fxdat2",  0x100000, CRC(71e4a5a0) SHA1(a0188c920a43c5e69e25464627094b6b6ed26a59) )
-	NAMCOS2_DATA_LOAD_O_256K( "fxdat3",  0x100000, CRC(605725f7) SHA1(b94ce0ec37f879a5e46a097058cb2dd57e2281f1) )
+	NAMCOS2_DATA_LOAD_E_256K( "fx_dat0.13s", 0x000000, CRC(63abf69b) SHA1(6776991eeff434bf9720f49ad6e62c37fc7ddf40) )
+	NAMCOS2_DATA_LOAD_O_256K( "fx_dat1.13r", 0x000000, CRC(725bed14) SHA1(bbf886ac7f8c2c7857bc0b5d7f8fc7e63e8e9559) )
+	NAMCOS2_DATA_LOAD_E_256K( "fx_dat2.13p", 0x100000, CRC(71e4a5a0) SHA1(a0188c920a43c5e69e25464627094b6b6ed26a59) )
+	NAMCOS2_DATA_LOAD_O_256K( "fx_dat3.13n", 0x100000, CRC(605725f7) SHA1(b94ce0ec37f879a5e46a097058cb2dd57e2281f1) )
 
 	ROM_REGION( 0x100, "user3", 0 ) /* prom for road colors */
 	ROM_LOAD( "fx1_1.5b", 0, 0x100, CRC(85ffd753) SHA1(7dbc8c295204877f41289141a146aa4f5f9f9c96) )
 
 	ROM_REGION( 0x100000, "c140", 0 ) /* Sound voices */
-	ROM_LOAD( "fxvoi1",  0x000000, 0x080000, CRC(6173364f) SHA1(cc426f49b7e87b11f1f51e8e10db7cad87ffb44d) )
+	ROM_LOAD( "fx_voi-1.3m", 0x000000, 0x080000, CRC(6173364f) SHA1(cc426f49b7e87b11f1f51e8e10db7cad87ffb44d) )
 ROM_END
 
 /* MARVEL LAND (USA) */
@@ -3114,7 +3280,7 @@ ROM_START( marvland )
 ROM_END
 
 /* MARVEL LAND (JAPAN) */
-ROM_START( marvlanj )
+ROM_START( marvlandj )
 	ROM_REGION( 0x040000, "maincpu", 0 ) /* Master CPU */
 	ROM_LOAD16_BYTE( "mv1-mpr0.bin",  0x000000, 0x010000, CRC(8369120f) SHA1(58cf481bf97f74a91ecc5ff77696528441b41b04) )
 	ROM_LOAD16_BYTE( "mv1-mpr1.bin",  0x000001, 0x010000, CRC(6d5442cc) SHA1(8cdaf6e1ec735740ace78393df2d867a213a4725) )
@@ -3231,7 +3397,7 @@ ROM_START( metlhawk )
 ROM_END
 
 /* METAL HAWK (Japan) */
-ROM_START( metlhwkj )
+ROM_START( metlhawkj )
 	ROM_REGION( 0x040000, "maincpu", 0 ) /* Master CPU */
 	ROM_LOAD16_BYTE( "mh1mpr0f.11d",  0x000000, 0x020000, CRC(e22dfb6e) SHA1(41a8d30081bc7206aae655626dcef01e8f744905) )
 	ROM_LOAD16_BYTE( "mh1mpr1f.13d",  0x000001, 0x020000, CRC(d139a7b7) SHA1(ba68221ca6f91ab619e9b2c478d8988abfc86c8c) )
@@ -3713,7 +3879,7 @@ ROM_START( sgunnerj )
 ROM_END
 
 /* STEEL GUNNER 2 */
-ROM_START( sgunner2)
+ROM_START( sgunner2 )
 	ROM_REGION( 0x040000, "maincpu", 0 ) /* Master CPU */
 	ROM_LOAD16_BYTE( "sns2mpr0.bin",  0x000000, 0x020000, CRC(f1a44039) SHA1(c8e73c786a69780d9c66c5d599713976d541e36c) )
 	ROM_LOAD16_BYTE( "sns2mpr1.bin",  0x000001, 0x020000, CRC(9184c4db) SHA1(ef3208157d6e5278a99baca0b31f0d43e5ffd89a) )
@@ -3765,7 +3931,7 @@ ROM_START( sgunner2)
 ROM_END
 
 /* STEEL GUNNER 2 (Japan) */
-ROM_START( sgunnr2j)
+ROM_START( sgunner2j )
 	ROM_REGION( 0x040000, "maincpu", 0 ) /* Master CPU */
 	ROM_LOAD16_BYTE( "sns1mpr0.a",  0x000000, 0x020000, CRC(e7216ad7) SHA1(ebc8e31ee6909d89bc4f40889e80f3c8b46dcd85) )
 	ROM_LOAD16_BYTE( "sns1mpr1.a",  0x000001, 0x020000, CRC(6caef2ee) SHA1(8003517ff8b74480147786af3abdc7a78ba9d379) )
@@ -4053,7 +4219,7 @@ ROM_START( suzuka8h )
 ROM_END /* suzuka8h */
 
 /* SUZUKA 8 HOURS (Japan) */
-ROM_START( suzuk8hj )
+ROM_START( suzuka8hj )
 	ROM_REGION( 0x040000, "maincpu", 0 ) /* Master CPU */
 	ROM_LOAD16_BYTE( "eh1-mp0b.bin",  0x000000, 0x020000, CRC(2850f469) SHA1(65142451db8ddbd1500f4bb5d5a6b2ede5871dd5) )
 	ROM_LOAD16_BYTE( "eh1-mp1b.bin",  0x000001, 0x020000, CRC(be83eb2c) SHA1(f54ca4469050f734e4c2d7d681e3e51cc067f2c2) )
@@ -4274,7 +4440,7 @@ ROM_START( kyukaidk )
 ROM_END
 
 /* KYUUKAI DOUCHUUKI (OLD) */
-ROM_START( kyukaido )
+ROM_START( kyukaidko )
 	ROM_REGION( 0x040000, "maincpu", 0 ) 	 /* Master CPU */
 	ROM_LOAD16_BYTE( "ky1_mp0.bin",  0x000000, 0x010000, CRC(01978a19) SHA1(dac40f6629ee025733ac160d83523488c99794c7) )
 	ROM_LOAD16_BYTE( "ky1_mp1.bin",  0x000001, 0x010000, CRC(b40717a7) SHA1(10a0e4eaa2502f51f34949007e6cc9d3bf031554) )
@@ -4588,7 +4754,7 @@ ROM_START( luckywld )
 ROM_END
 
 /* LUCKY & WILD (Japan) */
-ROM_START( lckywldj )
+ROM_START( luckywldj )
 	ROM_REGION( 0x040000, "maincpu", 0 ) /* Master CPU */
 	ROM_LOAD16_BYTE( "lw1mpr0.11d",	0x000000, 0x020000, CRC(7dce8ba6) SHA1(6cd307e5d88038eda6e061113d7ef2c059da915e) )
 	ROM_LOAD16_BYTE( "lw1mpr1.13d",	0x000001, 0x020000, CRC(ce3b0f37) SHA1(e9edb953eae21465ea231de9d6f2e7f1072c4440) )
@@ -4860,52 +5026,52 @@ static DRIVER_INIT( luckywld ){
 /* and metal hawk have the B version and dragon saber has the C version       */
 
 /*    YEAR, NAME,     PARENT,   MACHINE,  INPUT,    INIT,     MONITOR, COMPANY, FULLNAME */
-GAMEL(1987, finallap, 0,        finallap, finallap, finallap, ROT0,   "Namco", "Final Lap (Rev E)", GAME_IMPERFECT_GRAPHICS, layout_finallap )
-GAMEL(1987, finalapd, finallap, finallap, finallap, finallap, ROT0,   "Namco", "Final Lap (Rev D)", GAME_IMPERFECT_GRAPHICS, layout_finallap )
-GAMEL(1987, finalapc, finallap, finallap, finallap, finallap, ROT0,   "Namco", "Final Lap (Rev C)", GAME_IMPERFECT_GRAPHICS, layout_finallap )
-GAMEL(1987, finlapjc, finallap, finallap, finallap, finallap, ROT0,   "Namco", "Final Lap (Japan - Rev C)", GAME_IMPERFECT_GRAPHICS, layout_finallap )
-GAMEL(1987, finlapjb, finallap, finallap, finallap, finallap, ROT0,   "Namco", "Final Lap (Japan - Rev B)", GAME_IMPERFECT_GRAPHICS, layout_finallap )
-GAME( 1988, assault,  0,        default2, assault,  assault , ROT90,  "Namco", "Assault" , 0)		/* adjusted */
-GAME( 1988, assaultj, assault,  default2, assault,  assaultj, ROT90,  "Namco", "Assault (Japan)" , 0)	/* adjusted */
-GAME( 1988, assaultp, assault,  default2, assault,  assaultp, ROT90,  "Namco", "Assault Plus (Japan)" , 0)	/* adjusted */
-GAME( 1988, metlhawk, 0,        metlhawk, metlhawk, metlhawk, ROT90,  "Namco", "Metal Hawk", 0)
-GAME( 1988, metlhwkj, metlhawk, metlhawk, metlhawk, metlhawk, ROT90,  "Namco", "Metal Hawk (Japan)", 0)
-GAME( 1988, ordyne,   0,        default,  default,  ordyne,   ROT180, "Namco", "Ordyne (Japan, English Version)", 0 )
-GAME( 1988, ordynej,  ordyne,   default,  default,  ordyne,   ROT180, "Namco", "Ordyne (Japan)", 0 )
-GAME( 1988, mirninja, 0,        default,  default,  mirninja, ROT0,   "Namco", "Mirai Ninja (Japan)", 0 )
-GAME( 1988, phelios,  0,        default2, default,  phelios , ROT90,  "Namco", "Phelios (Japan)" , 0)	/* adjusted */
-GAME( 1989, dirtfoxj, 0,        default2, dirtfox,  dirtfoxj, ROT90,  "Namco", "Dirt Fox (Japan)" , 0)	/* adjusted */
-GAME( 1989, fourtrax, 0,        finallap, fourtrax, fourtrax, ROT0,   "Namco", "Four Trax", GAME_IMPERFECT_GRAPHICS )
-GAME( 1989, valkyrie, 0,        default3, default,  valkyrie, ROT90,  "Namco", "Valkyrie No Densetsu (Japan)", 0 )
-GAME( 1989, finehour, 0,        default2, default,  finehour, ROT0,   "Namco", "Finest Hour (Japan)" , 0)		/* adjusted */
-GAME( 1989, burnforc, 0,        default3, default,  burnforc, ROT0,   "Namco", "Burning Force (Japan new version)", 0 )
-GAME( 1989, burnfrco, burnforc, default3, default,  burnforc, ROT0,   "Namco", "Burning Force (Japan old version)", 0 )
-GAME( 1989, marvland, 0,        default,  default,  marvland, ROT0,   "Namco", "Marvel Land (US)", 0 )
-GAME( 1989, marvlanj, marvland, default,  default,  marvlanj, ROT0,   "Namco", "Marvel Land (Japan)", 0 )
-GAME( 1990, kyukaidk, 0,        default,  kyukaidk, kyukaidk, ROT0,   "Namco", "Kyuukai Douchuuki (Japan new version)", 0 )
-GAME( 1990, kyukaido, kyukaidk, default,  kyukaidk, kyukaidk, ROT0,   "Namco", "Kyuukai Douchuuki (Japan old version)", 0 )
-GAME( 1990, dsaber,   0,        default3, default,  dsaber,   ROT90,  "Namco", "Dragon Saber", 0 )
-GAME( 1990, dsaberj,  dsaber,   default3, default,  dsaberj,  ROT90,  "Namco", "Dragon Saber (Japan)", 0 )
-GAMEL(1990, finalap2, 0,        finallap, finallap, finalap2, ROT0,   "Namco", "Final Lap 2", GAME_IMPERFECT_GRAPHICS, layout_finallap  )
-GAMEL(1990, finalp2j, finalap2, finallap, finallap, finalap2, ROT0,   "Namco", "Final Lap 2 (Japan)", GAME_IMPERFECT_GRAPHICS, layout_finallap  )
-GAME( 1990, gollygho, 0,        gollygho, gollygho, gollygho, ROT180, "Namco", "Golly! Ghost!", 0 )
-GAME( 1990, rthun2,   0,        default3, default,  rthun2,   ROT0,   "Namco", "Rolling Thunder 2", 0 )
-GAME( 1990, rthun2j,  rthun2,   default3, default,  rthun2j,  ROT0,   "Namco", "Rolling Thunder 2 (Japan)", 0 )
-GAME( 1990, sgunner,  0,        sgunner,  sgunner,  sgunner2, ROT0,   "Namco", "Steel Gunner", 0 )
-GAME( 1990, sgunnerj, sgunner,  sgunner,  sgunner,  sgunner2, ROT0,   "Namco", "Steel Gunner (Japan)", 0 )
-GAME( 1991, sgunner2, 0,        sgunner,  sgunner,  sgunner2, ROT0,   "Namco", "Steel Gunner 2 (US)", 0 )
-GAME( 1991, sgunnr2j, sgunner2, sgunner,  sgunner,  sgunner2, ROT0,   "Namco", "Steel Gunner 2 (Japan)", 0 )
-GAME( 1991, cosmogng, 0,        default,  default,  cosmogng, ROT90,  "Namco", "Cosmo Gang the Video (US)", 0 )
-GAME( 1991, cosmognj, cosmogng, default,  default,  cosmogng, ROT90,  "Namco", "Cosmo Gang the Video (Japan)", 0 )
-GAME( 1992, bubbletr, 0,        gollygho, bubbletr, bubbletr, ROT180, "Namco", "Bubble Trouble (Japan)", GAME_IMPERFECT_GRAPHICS )	/* missing external artwork */
-GAMEL(1992, finalap3, 0,        finallap, finalap3, finalap3, ROT0,   "Namco", "Final Lap 3 (World)", GAME_IMPERFECT_GRAPHICS, layout_finallap  )
-GAMEL(1992, finalp3j, finalap3, finallap, finalap3, finalap3, ROT0,   "Namco", "Final Lap 3 (Japan)", GAME_IMPERFECT_GRAPHICS, layout_finallap  )
-GAME( 1992, luckywld, 0,        luckywld, luckywld, luckywld, ROT0,   "Namco", "Lucky & Wild", 0 )
-GAME( 1992, lckywldj, luckywld, luckywld, luckywld, luckywld, ROT0,   "Namco", "Lucky & Wild (Japan)", 0 )
-GAME( 1992, suzuka8h, 0,        luckywld, suzuka,   suzuka8h, ROT0,   "Namco", "Suzuka 8 Hours (World)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1992, suzuk8hj, suzuka8h, luckywld, suzuka,   suzuka8h, ROT0,   "Namco", "Suzuka 8 Hours (Japan)", GAME_IMPERFECT_GRAPHICS  )
-GAME( 1992, sws,      0,        default,  default,  sws,      ROT0,   "Namco", "Super World Stadium (Japan)", 0 )
-GAME( 1992, sws92,    0,        default,  default,  sws92,    ROT0,   "Namco", "Super World Stadium '92 (Japan)", 0 )
-GAME( 1992, sws92g,   sws92,    default,  default,  sws92g,   ROT0,   "Namco", "Super World Stadium '92 Gekitouban (Japan)", 0 )
-GAME( 1993, suzuk8h2, 0,        luckywld, suzuka,   suzuk8h2, ROT0,   "Namco", "Suzuka 8 Hours 2 (World)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, sws93,    0,        default,  default,  sws93,    ROT0,   "Namco", "Super World Stadium '93 (Japan)", 0 )
+GAMEL(1987, finallap,  0,        finallap, finallap, finallap, ROT0,   "Namco", "Final Lap (Rev E)", GAME_IMPERFECT_GRAPHICS, layout_finallap )
+GAMEL(1987, finallapd, finallap, finallap, finallap, finallap, ROT0,   "Namco", "Final Lap (Rev D)", GAME_IMPERFECT_GRAPHICS, layout_finallap )
+GAMEL(1987, finallapc, finallap, finallap, finallap, finallap, ROT0,   "Namco", "Final Lap (Rev C)", GAME_IMPERFECT_GRAPHICS, layout_finallap )
+GAMEL(1987, finallapjc,finallap, finallap, finallap, finallap, ROT0,   "Namco", "Final Lap (Japan - Rev C)", GAME_IMPERFECT_GRAPHICS, layout_finallap )
+GAMEL(1987, finallapjb,finallap, finallap, finallap, finallap, ROT0,   "Namco", "Final Lap (Japan - Rev B)", GAME_IMPERFECT_GRAPHICS, layout_finallap )
+GAME( 1988, assault,   0,        default2, assault,  assault , ROT90,  "Namco", "Assault" , 0)		/* adjusted */
+GAME( 1988, assaultj,  assault,  default2, assault,  assaultj, ROT90,  "Namco", "Assault (Japan)" , 0)	/* adjusted */
+GAME( 1988, assaultp,  assault,  default2, assault,  assaultp, ROT90,  "Namco", "Assault Plus (Japan)" , 0)	/* adjusted */
+GAME( 1988, metlhawk,  0,        metlhawk, metlhawk, metlhawk, ROT90,  "Namco", "Metal Hawk", 0)
+GAME( 1988, metlhawkj, metlhawk, metlhawk, metlhawk, metlhawk, ROT90,  "Namco", "Metal Hawk (Japan)", 0)
+GAME( 1988, ordyne,    0,        default,  default,  ordyne,   ROT180, "Namco", "Ordyne (Japan, English Version)", 0 )
+GAME( 1988, ordynej,   ordyne,   default,  default,  ordyne,   ROT180, "Namco", "Ordyne (Japan)", 0 )
+GAME( 1988, mirninja,  0,        default,  default,  mirninja, ROT0,   "Namco", "Mirai Ninja (Japan)", 0 )
+GAME( 1988, phelios,   0,        default2, default,  phelios , ROT90,  "Namco", "Phelios (Japan)" , 0)	/* adjusted */
+GAME( 1989, dirtfoxj,  0,        default2, dirtfox,  dirtfoxj, ROT90,  "Namco", "Dirt Fox (Japan)" , 0)	/* adjusted */
+GAME( 1989, fourtrax,  0,        finallap, fourtrax, fourtrax, ROT0,   "Namco", "Four Trax", GAME_IMPERFECT_GRAPHICS )
+GAME( 1989, valkyrie,  0,        default3, default,  valkyrie, ROT90,  "Namco", "Valkyrie No Densetsu (Japan)", 0 )
+GAME( 1989, finehour,  0,        default2, default,  finehour, ROT0,   "Namco", "Finest Hour (Japan)" , 0)		/* adjusted */
+GAME( 1989, burnforc,  0,        default3, default,  burnforc, ROT0,   "Namco", "Burning Force (Japan new version)", 0 )
+GAME( 1989, burnforco, burnforc, default3, default,  burnforc, ROT0,   "Namco", "Burning Force (Japan old version)", 0 )
+GAME( 1989, marvland,  0,        default,  default,  marvland, ROT0,   "Namco", "Marvel Land (US)", 0 )
+GAME( 1989, marvlandj, marvland, default,  default,  marvlanj, ROT0,   "Namco", "Marvel Land (Japan)", 0 )
+GAME( 1990, kyukaidk,  0,        default,  kyukaidk, kyukaidk, ROT0,   "Namco", "Kyuukai Douchuuki (Japan new version)", 0 )
+GAME( 1990, kyukaidko, kyukaidk, default,  kyukaidk, kyukaidk, ROT0,   "Namco", "Kyuukai Douchuuki (Japan old version)", 0 )
+GAME( 1990, dsaber,    0,        default3, default,  dsaber,   ROT90,  "Namco", "Dragon Saber", 0 )
+GAME( 1990, dsaberj,   dsaber,   default3, default,  dsaberj,  ROT90,  "Namco", "Dragon Saber (Japan)", 0 )
+GAMEL(1990, finalap2,  0,        finallap, finallap, finalap2, ROT0,   "Namco", "Final Lap 2", GAME_IMPERFECT_GRAPHICS, layout_finallap  )
+GAMEL(1990, finalap2j, finalap2, finallap, finallap, finalap2, ROT0,   "Namco", "Final Lap 2 (Japan)", GAME_IMPERFECT_GRAPHICS, layout_finallap  )
+GAME( 1990, gollygho,  0,        gollygho, gollygho, gollygho, ROT180, "Namco", "Golly! Ghost!", 0 )
+GAME( 1990, rthun2,    0,        default3, default,  rthun2,   ROT0,   "Namco", "Rolling Thunder 2", 0 )
+GAME( 1990, rthun2j,   rthun2,   default3, default,  rthun2j,  ROT0,   "Namco", "Rolling Thunder 2 (Japan)", 0 )
+GAME( 1990, sgunner,   0,        sgunner,  sgunner,  sgunner2, ROT0,   "Namco", "Steel Gunner", 0 )
+GAME( 1990, sgunnerj,  sgunner,  sgunner,  sgunner,  sgunner2, ROT0,   "Namco", "Steel Gunner (Japan)", 0 )
+GAME( 1991, sgunner2,  0,        sgunner,  sgunner,  sgunner2, ROT0,   "Namco", "Steel Gunner 2 (US)", 0 )
+GAME( 1991, sgunner2j, sgunner2, sgunner,  sgunner,  sgunner2, ROT0,   "Namco", "Steel Gunner 2 (Japan)", 0 )
+GAME( 1991, cosmogng,  0,        default,  default,  cosmogng, ROT90,  "Namco", "Cosmo Gang the Video (US)", 0 )
+GAME( 1991, cosmogngj, cosmogng, default,  default,  cosmogng, ROT90,  "Namco", "Cosmo Gang the Video (Japan)", 0 )
+GAME( 1992, bubbletr,  0,        gollygho, bubbletr, bubbletr, ROT180, "Namco", "Bubble Trouble (Japan)", GAME_IMPERFECT_GRAPHICS )	/* missing external artwork */
+GAMEL(1992, finalap3,  0,        finallap, finalap3, finalap3, ROT0,   "Namco", "Final Lap 3 (World)", GAME_IMPERFECT_GRAPHICS, layout_finallap  )
+GAMEL(1992, finalap3j, finalap3, finallap, finalap3, finalap3, ROT0,   "Namco", "Final Lap 3 (Japan)", GAME_IMPERFECT_GRAPHICS, layout_finallap  )
+GAME( 1992, luckywld,  0,        luckywld, luckywld, luckywld, ROT0,   "Namco", "Lucky & Wild", 0 )
+GAME( 1992, luckywldj, luckywld, luckywld, luckywld, luckywld, ROT0,   "Namco", "Lucky & Wild (Japan)", 0 )
+GAME( 1992, suzuka8h,  0,        luckywld, suzuka,   suzuka8h, ROT0,   "Namco", "Suzuka 8 Hours (World)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1992, suzuka8hj, suzuka8h, luckywld, suzuka,   suzuka8h, ROT0,   "Namco", "Suzuka 8 Hours (Japan)", GAME_IMPERFECT_GRAPHICS  )
+GAME( 1992, sws,       0,        default,  default,  sws,      ROT0,   "Namco", "Super World Stadium (Japan)", 0 )
+GAME( 1992, sws92,     0,        default,  default,  sws92,    ROT0,   "Namco", "Super World Stadium '92 (Japan)", 0 )
+GAME( 1992, sws92g,    sws92,    default,  default,  sws92g,   ROT0,   "Namco", "Super World Stadium '92 Gekitouban (Japan)", 0 )
+GAME( 1993, suzuk8h2,  0,        luckywld, suzuka,   suzuk8h2, ROT0,   "Namco", "Suzuka 8 Hours 2 (World)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, sws93,     0,        default,  default,  sws93,    ROT0,   "Namco", "Super World Stadium '93 (Japan)", 0 )

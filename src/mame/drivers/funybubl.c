@@ -153,7 +153,7 @@ static INPUT_PORTS_START( funybubl )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* Maybe unused */
 
 	PORT_START("DSW")	/* DSW 1 */
-	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(    0x01, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 3C_2C ) )
@@ -162,7 +162,7 @@ static INPUT_PORTS_START( funybubl )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play) )
-	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW1:4,5,6")
 	PORT_DIPSETTING(    0x30, DEF_STR( Very_Easy) )
 	PORT_DIPSETTING(    0x28, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x38, DEF_STR( Normal ) )
@@ -170,10 +170,10 @@ static INPUT_PORTS_START( funybubl )
 	PORT_DIPSETTING(    0x18, "Hard 2" )
 	PORT_DIPSETTING(    0x10, "Hard 3" )
 	PORT_DIPSETTING(    0x08, "Hard 4" )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "Nudity" )
+	PORT_DIPNAME( 0x80, 0x00, "Nudity" )			PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, "Semi" )
 	PORT_DIPSETTING(    0x00, "Full" )
 INPUT_PORTS_END
@@ -286,7 +286,7 @@ ROM_START( funybubl )
 	ROM_CONTINUE(       0x60000,  0x20000 )
 ROM_END
 
-ROM_START( funybubc )
+ROM_START( funybublc )
 	ROM_REGION( 0x50000, "maincpu", 0 ) /* main z80, lots of banked data */
 	ROM_LOAD( "2.ub16", 0x00000, 0x40000, CRC(d684c13f) SHA1(6a58b44dd775f374d6fd476a8fd175c28a83a495)  )
 	ROM_RELOAD ( 0x10000, 0x40000 )
@@ -319,5 +319,5 @@ ROM_END
 
 
 GAME( 1999, funybubl, 0,        funybubl, funybubl, funybubl, ROT0, "In Chang Electronic Co", "Funny Bubble", 0 )
-GAME( 1999, funybubc, funybubl, funybubl, funybubl, funybubl, ROT0, "Comad Industry Co Ltd", "Funny Bubble (Comad version)", 0 )
+GAME( 1999, funybublc,funybubl, funybubl, funybubl, funybubl, ROT0, "Comad Industry Co Ltd", "Funny Bubble (Comad version)", 0 )
 

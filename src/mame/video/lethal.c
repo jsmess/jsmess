@@ -55,7 +55,7 @@ VIDEO_START(lethalen)
 	K056832_SetExtLinescroll();
 
 	// the US and Japanese cabinets apparently use different mirror setups
-	if (!strcmp(machine->gamedrv->name, "lethalej"))
+	if (!strcmp(machine->gamedrv->name, "lethalenj"))
 	{
 		K056832_set_LayerOffset(0, -196, 0);
 		K056832_set_LayerOffset(1, -194, 0);
@@ -107,7 +107,7 @@ extern UINT16 *K056832_videoram;
 VIDEO_UPDATE(lethalen)
 {
 	bitmap_fill(bitmap, cliprect, 7168);
-	bitmap_fill(priority_bitmap, cliprect, 0);
+	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
 
 	K056832_tilemap_draw(screen->machine, bitmap, cliprect, 3, 0, 1);
 	K056832_tilemap_draw(screen->machine, bitmap, cliprect, 2, 0, 2);
