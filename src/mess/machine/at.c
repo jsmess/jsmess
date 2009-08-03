@@ -622,7 +622,7 @@ WRITE8_HANDLER(at_kbdc8042_w)
 		break;
 
 	case 4:		/* A2 is wired to 8042 A0 */
-printf("8042 command %02x\n", data );
+//printf("8042 command %02x\n", data );
 		upi41_master_w( cputag_get_cpu(space->machine, "kbdc8042"), 1, data );
 		break;
     }
