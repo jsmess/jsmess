@@ -698,6 +698,7 @@ $(MESSOBJ)/cccp.a:				\
 	$(MESS_MACHINE)/mikro80.o	\
 	$(MESS_VIDEO)/mikro80.o		\
 	$(MESS_DRIVERS)/pk8000.o	\
+	$(MAME_VIDEO)/pk8000.o		\
 	$(MESS_DRIVERS)/pk8020.o	\
 	$(MESS_MACHINE)/pk8020.o	\
 	$(MESS_VIDEO)/pk8020.o		\
