@@ -348,9 +348,12 @@ static void pc_fdc_dor_w(running_machine *machine, UINT8 data)
 static TIMER_CALLBACK( watchdog_timeout )
 {
 	/* Trigger a watchdog timeout signal */
-	if ( fdc->fdc_interface.pc_fdc_interrupt )
+	if ( fdc->fdc_interface.pc_fdc_interrupt && ( fdc->digital_output_register & 0x20 )  )
 	{
 		fdc->fdc_interface.pc_fdc_interrupt(machine, 1 );
+	}
+	else
+	{
 		fdc->fdc_interface.pc_fdc_interrupt(machine, 0 );
 	}
 }
@@ -375,6 +378,10 @@ static void pcjr_fdc_dor_w(running_machine *machine, UINT8 data)
 	if ( ! ( data & 0x20 ) )
 	{
 		timer_adjust_oneshot( fdc->watchdog, attotime_never, 0 );
+		if ( fdc->fdc_interface.pc_fdc_interrupt )
+		{
+			fdc->fdc_interface.pc_fdc_interrupt(machine, 0 );
+		}
 	} else {
 		/* Check for 1->0 watchdog trigger */
 		if ( ( fdc->digital_output_register & 0x40 ) && ! ( data & 0x40 ) )
