@@ -177,11 +177,6 @@ static WRITE32_HANDLER( dspctrl_w )
 }
 
 
-static READ32_HANDLER( jaguar_wave_rom_r )
-{
-	return jaguar_wave_rom[offset];
-}
-
 /*************************************
  *
  *  Input ports
@@ -314,7 +309,7 @@ static ADDRESS_MAP_START( jaguar_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xf1a100, 0xf1a13f) AM_READWRITE(dspctrl_r, dspctrl_w)
 	AM_RANGE(0xf1a140, 0xf1a17f) AM_READWRITE(jaguar_serial_r, jaguar_serial_w)
 	AM_RANGE(0xf1b000, 0xf1cfff) AM_RAM AM_BASE(&jaguar_dsp_ram) AM_SHARE(4)
-	AM_RANGE(0xf1d000, 0xf1dfff) AM_READ(jaguar_wave_rom_r)
+	AM_RANGE(0xf1d000, 0xf1dfff) AM_ROM AM_REGION("maincpu", 0xf1d000)
 ADDRESS_MAP_END
 
 
@@ -340,7 +335,7 @@ static ADDRESS_MAP_START( gpu_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xf1a100, 0xf1a13f) AM_READWRITE(dspctrl_r, dspctrl_w)
 	AM_RANGE(0xf1a140, 0xf1a17f) AM_READWRITE(jaguar_serial_r, jaguar_serial_w)
 	AM_RANGE(0xf1b000, 0xf1cfff) AM_RAM AM_SHARE(4)
-	AM_RANGE(0xf1d000, 0xf1dfff) AM_RAM AM_BASE(&jaguar_wave_rom)
+	AM_RANGE(0xf1d000, 0xf1dfff) AM_ROM AM_REGION("maincpu", 0xf1d000)
 ADDRESS_MAP_END
 
 
@@ -519,19 +514,20 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( jaguar )
-	ROM_REGION( 0xe20000, "maincpu", 0 )  /* 4MB for RAM at 0 */
+	ROM_REGION( 0x1000000, "maincpu", 0 )  /* 4MB for RAM at 0 */
 	ROM_LOAD16_WORD( "jagboot.rom", 0xe00000, 0x020000, CRC(fb731aaa) SHA1(f8991b0c385f4e5002fa2a7e2f5e61e8c5213356) )
 	ROM_CART_LOAD("cart", 0x800000, 0x600000, ROM_NOMIRROR)
+	ROM_LOAD16_WORD("jagwave.rom", 0xf1d000, 0x1000, CRC(7a25ee5b) SHA1(58117e11fd6478c521fbd3fdbe157f39567552f0) )
 ROM_END
 
 ROM_START( jaguarcd )
-	ROM_REGION( 0xe40000, "maincpu", 0 )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS( 0, "default", "Jaguar CD" )
 	ROMX_LOAD( "jag_cd.bin", 0xe00000, 0x040000, CRC(687068d5) SHA1(73883e7a6e9b132452436f7ab1aeaeb0776428e5), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "dev", "Jaguar Developer CD" )
 	ROMX_LOAD( "jagdevcd.bin", 0xe00000, 0x040000, CRC(55a0669c) SHA1(d61b7b5912118f114ef00cf44966a5ef62e455a5), ROM_BIOS(2) )
-
 	ROM_CART_LOAD("cart", 0x800000, 0x600000, ROM_NOMIRROR)
+	ROM_LOAD16_WORD("jagwave.rom", 0xf1d000, 0x1000, CRC(7a25ee5b) SHA1(58117e11fd6478c521fbd3fdbe157f39567552f0) )
 ROM_END
 
 /*************************************
@@ -546,7 +542,7 @@ static DRIVER_INIT( jaguar )
 	state_save_register_global(machine, eeprom_enable);
 
 	/* init the sound system and install DSP speedups */
-	cojag_sound_init(machine);
+//	cojag_sound_init(machine);
 }
 
 static QUICKLOAD_LOAD( jaguar )
@@ -598,5 +594,5 @@ static DEVICE_IMAGE_LOAD( jaguar )
  *************************************/
 
 /*    YEAR   NAME      PARENT    COMPAT  MACHINE   INPUT     INIT      CONFIG  COMPANY    FULLNAME */
-CONS( 1993,  jaguar,   0,        0,      jaguar,   jaguar,   jaguar,   0,      "Atari",   "Atari Jag", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING)
+CONS( 1993,  jaguar,   0,        0,      jaguar,   jaguar,   jaguar,   0,      "Atari",   "Atari Jaguar", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING)
 CONS( 1995,  jaguarcd, jaguar,   0,      jaguar,   jaguar,   jaguar,   0,      "Atari",   "Atari Jaguar CD", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING)
