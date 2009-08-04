@@ -267,6 +267,7 @@ static void ppu_mirror_MMC5( int page, int src )
 	case 3:	/* FillRegisters -useless without dot-based PPU, in general */
 	default:	
 		logerror("Unimplemented: Fill support");
+		break;
 	}
 }
 
@@ -364,11 +365,16 @@ static void set_nt_page( int page, int source, int bank, int writable )
 	{
 		case ROM:
 			base_ptr = nes.vrom;
+			break;
+
 		case EXRAM:
 			base_ptr = nes.exram;
+			break;
+
 		case CIRAM:
 		default: 
 			base_ptr = nes.ciram;
+			break;
 	}
 
 	page &= 3; // mask down to the 4 logical pages
