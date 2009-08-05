@@ -8,14 +8,14 @@ New System Drivers Supported (in no particular order):
 
 Systems Promoted from GAME_NOT_WORKING:
 ---------------------------------------
-(none)
+- Elektor Junior [Manfred Schneider]
 
 
 
 Skeleton drivers: 
 -----------------
-Kaypro 4/plus88
-Kaypro 4 4-84
+- Kaypro 4/plus88
+- Kaypro 4 4-84
 
 
 
