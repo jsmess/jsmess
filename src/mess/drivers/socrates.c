@@ -100,8 +100,10 @@ UINT8 hblankstate; // are we in hblank?
 UINT8 vblankstate; // are we in vblank?
 UINT8 speech_running; // is speech synth talking?
 UINT32 speech_address; // address in speech space
+UINT8 speech_settings; // speech settings (nybble 0: ? externrom ? ?; nybble 1: ? ? ? ?)
 UINT8 speech_dummy_read; // have we done a dummy read yet?
 UINT8 speech_load_address_count; // number of times load address has happened
+UINT8 speech_load_settings_count; // number of times load settings has happened
 
 } socrates={ {0}};
 
@@ -188,8 +190,10 @@ MACHINE_RESET( socrates )
  socrates.vblankstate = 0;
  socrates.speech_running = 0;
  socrates.speech_address = 0;
+ socrates.speech_settings = 0;
  socrates.speech_dummy_read = 0;
  socrates.speech_load_address_count = 0;
+ socrates.speech_load_settings_count = 0;
 }
 
 DRIVER_INIT( socrates )
@@ -249,7 +253,8 @@ READ8_HANDLER( status_and_speech ) // read 0x4x, some sort of status reg
 // bit 2 - speech chip bit 2
 // bit 1 - speech chip bit 1
 // bit 0 - speech chip bit 0
-UINT8 *speechrom = memory_region(space->machine, "speech");
+UINT8 *speechromint = memory_region(space->machine, "speechint");
+UINT8 *speechromext = memory_region(space->machine, "speechext");
 	int temp = 0;
 	temp |= (socrates.speech_running)?0x80:0;
 	temp |= 0x40; // unknown
@@ -258,8 +263,16 @@ UINT8 *speechrom = memory_region(space->machine, "speech");
 	switch(socrates.io40_latch&0xF0) // what was last opcode sent?
 	{
 		case 0x60: case 0xE0:// speech status 'read' register
-		logerror("reading speech rom nybble from nybble address %x (byte address %x)\n",socrates.speech_address, socrates.speech_address>>1);
-		temp |= ((speechrom[(socrates.speech_address>>1)&0x1fff]>>((socrates.speech_address&1)*4))&0xF);
+			if(socrates.speech_settings&0x04) // external speech roms (outside of speech ic but still in cart) enabled
+			{
+			logerror("reading external speech rom nybble from nybble address %x (byte address %x)\n",socrates.speech_address, socrates.speech_address>>1);
+			temp |= ((speechromext[((socrates.speech_address>>1)&0xffff)]>>((socrates.speech_address&1)*4))&0xF);
+			}
+			else
+			{
+			logerror("reading internal speech rom nybble from nybble address %x (byte address %x)\n",socrates.speech_address, socrates.speech_address>>1);
+			temp |= ((speechromint[((socrates.speech_address>>1)&0x1fff)]>>((socrates.speech_address&1)*4))&0xF);
+			}
 			if (socrates.speech_dummy_read == 0) // if we havent done the dummy read yet, do so now
 			{
 				socrates.speech_dummy_read++;
@@ -280,6 +293,7 @@ static TIMER_CALLBACK( clear_speech_cb )
 {
 	socrates.speech_running = 0;
 	socrates.speech_load_address_count = 0; // should this be here or in the write functuon subpart which is speak command?
+	socrates.speech_load_settings_count = 0;
 }
 
 WRITE8_HANDLER( speech_command ) // write 0x4x, some sort of bitfield; speech chip is probably hitachi hd38880 related but not exact, w/4 bit interface
@@ -356,8 +370,9 @@ WRITE8_HANDLER( speech_command ) // write 0x4x, some sort of bitfield; speech ch
 			socrates.speech_load_address_count++;
 			logerror("loaded address nybble %X, byte address is currently %5X with %d nybbles loaded\n", data&0xF, socrates.speech_address>>1, socrates.speech_load_address_count);
 			break;
-		case 0xD0: // load bank or maybe init1 and init2?
-			// write code here
+		case 0xD0: // load settings
+			socrates.speech_settings |= ((data&0xF)<<(socrates.speech_load_settings_count*4));
+			socrates.speech_load_settings_count++;
 			break;
 		case 0xE0: // read byte, handled elsewhere
 			break;
@@ -371,8 +386,10 @@ WRITE8_HANDLER( speech_command ) // write 0x4x, some sort of bitfield; speech ch
 			{
 				socrates.speech_running = 0;
 				socrates.speech_address = 0;
+				socrates.speech_settings = 0;
 				socrates.speech_dummy_read = 0;
 				socrates.speech_load_address_count = 0;
+				socrates.speech_load_settings_count = 0;
 				socrates.io40_latch &= 0x0f; // set last command to 0 to prevent problems
 			}
 			else // other
@@ -412,8 +429,10 @@ WRITE8_HANDLER( reset_speech ) // i/o 60: reset speech synth
 {
  socrates.speech_running = 0;
  socrates.speech_address = 0;
+ socrates.speech_settings = 0;
  socrates.speech_dummy_read = 0;
  socrates.speech_load_address_count = 0;
+ socrates.speech_load_settings_count = 0;
  socrates.io40_latch &= 0x0f; // set last command to 0 to prevent problems
 logerror("write to i/o 0x60 of %x\n",data);
 }
@@ -898,9 +917,15 @@ ROM_START(socrates)
     ROM_REGION(0x10000, "vram", 0)
     ROM_FILL(0x0000, 0xffff, 0xff) /* fill with ff, driver_init changes this to the 'correct' startup pattern */
 
-    ROM_REGION(0x10000, "speech", 0)
-    ROM_FILL(0x0000, 0xffff, 0x00) /* fill with 00, if no speech cart is present socrates will see this */
-    ROM_LOAD_OPTIONAL("speech_eng.bin", 0x0000, 0x2000, CRC(edc1fb3f) SHA1(78b4631fc3b1c038e14911047f9edd6c4e8bae58))
+    ROM_REGION(0x2000, "speechint", 0) // speech data inside of the speech chip
+    ROM_FILL(0x0000, 0x1fff, 0x00) /* fill with 00, if no speech cart is present socrates will see this */
+    ROM_LOAD_OPTIONAL("speech_internal.bin", 0x0000, 0x2000, CRC(edc1fb3f) SHA1(78b4631fc3b1c038e14911047f9edd6c4e8bae58)) // 8k on the speech chip itself
+
+	ROM_REGION(0x10000, "speechext", 0) // speech serial modules outside of the speech chip but still on speech cart
+    ROM_LOAD_OPTIONAL("speech_eng_vsm1.bin", 0x0000, 0x4000, CRC(888e3ddd) SHA1(33AF6A21BA6D826071C9D48557B1C9012752570B)) // 16k in serial rom
+    ROM_LOAD_OPTIONAL("speech_eng_vsm2.bin", 0x4000, 0x4000, CRC(de4ac89d) SHA1(3DFA853B02DF756A9B72DEF94A39310992EE11C7)) // 16k in serial rom
+    ROM_LOAD_OPTIONAL("speech_eng_vsm3.bin", 0x8000, 0x4000, CRC(972384aa) SHA1(FFCB1D633CA6BFFC7F481EC505DA447E5B847F16)) // 16k in serial rom
+    ROM_FILL(0xC000, 0x4000, 0xff) // last vsm isn't present, FF fill
 ROM_END
     
 ROM_START(socratfc)
@@ -913,9 +938,15 @@ ROM_START(socratfc)
     ROM_REGION(0x10000, "vram", 0)
     ROM_FILL(0x0000, 0xffff, 0xff) /* fill with ff, driver_init changes this to the 'correct' startup pattern */
 
-    ROM_REGION(0x10000, "speech", 0)
-    ROM_FILL(0x0000, 0xffff, 0x00) /* fill with 00, if no speech cart is present socrates will see this */
-    ROM_LOAD_OPTIONAL("speech_eng.bin", 0x0000, 0x2000, BAD_DUMP CRC(edc1fb3f) SHA1(78b4631fc3b1c038e14911047f9edd6c4e8bae58)) // should be speech_fra.bin, but french speech cart is not dumped
+    ROM_REGION(0x2000, "speechint", 0)
+    ROM_FILL(0x0000, 0x1fff, 0x00) /* fill with 00, if no speech cart is present socrates will see this */
+    ROM_LOAD_OPTIONAL("speech_fra_internal.bin", 0x0000, 0x2000, BAD_DUMP CRC(edc1fb3f) SHA1(78b4631fc3b1c038e14911047f9edd6c4e8bae58)) // probably same on french and english speech carts
+
+    ROM_REGION(0x10000, "speechext", 0) // speech serial modules outside of the speech chip but still on speech cart
+    ROM_LOAD_OPTIONAL("speech_fra_vsm1.bin", 0x0000, 0x4000, NO_DUMP) // 16k in serial rom
+    ROM_LOAD_OPTIONAL("speech_fra_vsm2.bin", 0x4000, 0x4000, NO_DUMP) // 16k in serial rom
+    ROM_LOAD_OPTIONAL("speech_fra_vsm3.bin", 0x8000, 0x4000, NO_DUMP) // 16k in serial rom
+    ROM_FILL(0xC000, 0x4000, 0xff) // last vsm isn't present, FF fill
 ROM_END
 
 
