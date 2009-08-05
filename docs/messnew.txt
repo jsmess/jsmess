@@ -1,4 +1,4 @@
-0.133.1
+﻿0.133.1
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
@@ -22,6 +22,10 @@ Kaypro 4 4-84
 System Driver Changes:
 ----------------------
 - [COCO] Bug #1839 fixed [Miodrag Milanovic]
+
+- [JAGUAR] Replaced wave table code with a ROM. [Zerosquare, Robbbert]
+           Fixed quickload problems.
+           Various miscellaneous improvements. [Robbbert]
 
 - [NES] Changed the PPU to use a device memory map (bug #1831), enhancements
   and improvements to mappers 5, 68, 88, 119.  [Robert Bohms]
