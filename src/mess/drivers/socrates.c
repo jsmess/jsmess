@@ -95,12 +95,14 @@ UINT8* videoram;
 UINT8 kb_latch_low[2];
 UINT8 kb_latch_high[2];
 UINT8 kb_latch_mouse;
-UINT8 io40_latch;
-UINT8 hblankstate;
-UINT8 vblankstate;
-UINT8 speech_running;
-UINT8 speech_selftest;
-UINT32 speech_regs[8];
+UINT8 io40_latch; // what was last written to speech reg (for open bus)?
+UINT8 hblankstate; // are we in hblank?
+UINT8 vblankstate; // are we in vblank?
+UINT8 speech_running; // is speech synth talking?
+UINT32 speech_address; // address in speech space
+UINT8 speech_dummy_read; // have we done a dummy read yet?
+UINT8 speech_load_address_count; // number of times load address has happened
+
 } socrates={ {0}};
 
 static void socrates_set_rom_bank( running_machine *machine )
@@ -181,19 +183,13 @@ MACHINE_RESET( socrates )
  socrates.kb_latch_low[1] = 0x00;
  socrates.kb_latch_high[1] = 0x01; 
  socrates.kb_latch_mouse = 0;
- socrates.io40_latch = 0xf;
+ socrates.io40_latch = 0;
  socrates.hblankstate = 0;
  socrates.vblankstate = 0;
  socrates.speech_running = 0;
- socrates.speech_selftest = 0; // should be readback
- socrates.speech_regs[0] = 0;
- socrates.speech_regs[1] = 0;
- socrates.speech_regs[2] = 0;
- socrates.speech_regs[3] = 0;
- socrates.speech_regs[4] = 0;
- socrates.speech_regs[5] = 0;
- socrates.speech_regs[6] = 0;
- socrates.speech_regs[7] = 0;
+ socrates.speech_address = 0;
+ socrates.speech_dummy_read = 0;
+ socrates.speech_load_address_count = 0;
 }
 
 DRIVER_INIT( socrates )
@@ -240,7 +236,7 @@ READ8_HANDLER( read_f3 ) // used for read-only i/o ports as mame/mess doesn't ha
 
 WRITE8_HANDLER( unknownlatch_30 ) // writes to i/o 0x3x do SOMETHING, possibly waitstate related (may halt cpu until vblank start?)
 {
-logerror("write to i/o 0x30 of %x\n", data);
+//logerror("write to i/o 0x30, data %x\n", data); // too annoying to leave enabled
 }
 
 READ8_HANDLER( status_and_speech ) // read 0x4x, some sort of status reg
@@ -253,37 +249,42 @@ READ8_HANDLER( status_and_speech ) // read 0x4x, some sort of status reg
 // bit 2 - speech chip bit 2
 // bit 1 - speech chip bit 1
 // bit 0 - speech chip bit 0
-#ifdef EMULATE_SPEECH
-	UINT8 selftestpattern[14] = { 0x3, 0x5, 0xa, 0x3, 0x5, 0xf, 0x4, 0x3, 0x4, 0x2, 0x5, 0x1, 0x4, 0x4 };
-#endif
+UINT8 *speechrom = memory_region(space->machine, "speech");
 	int temp = 0;
 	temp |= (socrates.speech_running)?0x80:0;
 	temp |= 0x40; // unknown
 	temp |= (socrates.vblankstate)?0:0x20;
 	temp |= (socrates.hblankstate)?0:0x10;
-	switch(socrates.io40_latch&0xF0)
+	switch(socrates.io40_latch&0xF0) // what was last opcode sent?
 	{
-#ifdef EMULATE_SPEECH
-		case 0x60: // speech status 'read' register
-			temp |= selftestpattern[socrates.speech_selftest>>1];
+		case 0x60: case 0xE0:// speech status 'read' register
+		logerror("reading speech rom nybble from nybble address %x (byte address %x)\n",socrates.speech_address, socrates.speech_address>>1);
+		temp |= ((speechrom[(socrates.speech_address>>1)&0x1fff]>>((socrates.speech_address&1)*4))&0xF);
+			if (socrates.speech_dummy_read == 0) // if we havent done the dummy read yet, do so now
+			{
+				socrates.speech_dummy_read++;
+			}
+			else
+			{
+				socrates.speech_address++;
+			}
 			break;
-		case 0xE0: // speech status 'read' register w/CPE? line active
-			temp |= selftestpattern[socrates.speech_selftest>>1];
-			break;
-#else
-		case 0x60: case 0xE0:
-		break;
-#endif
 		default:
-			temp |= socrates.io40_latch&0xF;
+			temp |= socrates.io40_latch&0xF; // read open bus
 			break;
 	}
 	logerror("read from i/o 0x4x of %x\n", temp);
 	return temp;
 }
+static TIMER_CALLBACK( clear_speech_cb )
+{
+	socrates.speech_running = 0;
+	socrates.speech_load_address_count = 0; // should this be here or in the write functuon subpart which is speak command?
+}
 
 WRITE8_HANDLER( speech_command ) // write 0x4x, some sort of bitfield; speech chip is probably hitachi hd38880 related but not exact, w/4 bit interface
 {
+	logerror("write to i/o 0x4x of %x\n", data);
 /*
 // the high 4 bits of the write control which 'register' is written to, the low 4 bits are data (this is based on a readback test)
 // 00-0f: readback: 70-7f
@@ -334,11 +335,55 @@ WRITE8_HANDLER( speech_command ) // write 0x4x, some sort of bitfield; speech ch
 	1111
 */
 /* the socrates speech chip does not QUITE match the hd38880 though, but is very similar */
-
-	if (data==0x60) socrates.speech_selftest++;
-	if (socrates.speech_selftest > 14) socrates.speech_selftest = 0;
+	switch(data&0xF0)
+	{
+		case 0x80:
+			if (data==0x80)
+			{
+				/* write me: start talking */
+				socrates.speech_running = 1;
+				timer_set(space->machine, ATTOTIME_IN_SEC(4), NULL, 0, clear_speech_cb); // hack
+			}
+			break;
+		case 0x90: // unknown
+			break;
+		case 0xA0: // unknown
+			break;
+		case 0xB0: // unknown
+			break;
+		case 0xC0: // load address to vsm
+			socrates.speech_address |= (((int)data&0xF)<<(socrates.speech_load_address_count*4))<<1;
+			socrates.speech_load_address_count++;
+			logerror("loaded address nybble %X, byte address is currently %5X with %d nybbles loaded\n", data&0xF, socrates.speech_address>>1, socrates.speech_load_address_count);
+			break;
+		case 0xD0: // load bank or maybe init1 and init2?
+			// write code here
+			break;
+		case 0xE0: // read byte, handled elsewhere
+			break;
+		case 0xF0: // command: sub 0 is speak, sub 8 is reset
+			if ((data&0xF) == 0) // speak
+			{
+				socrates.speech_running = 1;
+				timer_set(space->machine, ATTOTIME_IN_SEC(4), NULL, 0, clear_speech_cb); // hack
+			}
+			else if ((data&0xF) == 8) // reset
+			{
+				socrates.speech_running = 0;
+				socrates.speech_address = 0;
+				socrates.speech_dummy_read = 0;
+				socrates.speech_load_address_count = 0;
+				socrates.io40_latch &= 0x0f; // set last command to 0 to prevent problems
+			}
+			else // other
+			{
+			logerror("speech command 0xF%x is unknown!\n",data&0xF);
+			}
+			break;
+		default: // 00 thru 70 are packets without the write bit set, ignore them
+			break;
+	}
 	socrates.io40_latch = data;
-	logerror("write to i/o 0x4x of %x\n", data);
 }
 
 READ8_HANDLER( socrates_keyboard_low_r ) // keyboard code low
@@ -363,17 +408,13 @@ WRITE8_HANDLER( socrates_keyboard_clear ) // keyboard latch shift/clear
 	socrates.kb_latch_high[1] = 1;
 }
 
-WRITE8_HANDLER( reset_speech ) // reset speech synth
+WRITE8_HANDLER( reset_speech ) // i/o 60: reset speech synth
 {
-socrates.speech_selftest = 0;
-socrates.speech_regs[0] = 0;
-socrates.speech_regs[1] = 0;
-socrates.speech_regs[2] = 0;
-socrates.speech_regs[3] = 0;
-socrates.speech_regs[4] = 0;
-socrates.speech_regs[5] = 0;
-socrates.speech_regs[6] = 0;
-socrates.speech_regs[7] = 0;
+ socrates.speech_running = 0;
+ socrates.speech_address = 0;
+ socrates.speech_dummy_read = 0;
+ socrates.speech_load_address_count = 0;
+ socrates.io40_latch &= 0x0f; // set last command to 0 to prevent problems
 logerror("write to i/o 0x60 of %x\n",data);
 }
 
@@ -856,6 +897,10 @@ ROM_START(socrates)
 
     ROM_REGION(0x10000, "vram", 0)
     ROM_FILL(0x0000, 0xffff, 0xff) /* fill with ff, driver_init changes this to the 'correct' startup pattern */
+
+    ROM_REGION(0x10000, "speech", 0)
+    ROM_FILL(0x0000, 0xffff, 0x00) /* fill with 00, if no speech cart is present socrates will see this */
+    ROM_LOAD_OPTIONAL("speech_eng.bin", 0x0000, 0x2000, CRC(edc1fb3f) SHA1(78b4631fc3b1c038e14911047f9edd6c4e8bae58))
 ROM_END
     
 ROM_START(socratfc)
@@ -867,6 +912,10 @@ ROM_START(socratfc)
 
     ROM_REGION(0x10000, "vram", 0)
     ROM_FILL(0x0000, 0xffff, 0xff) /* fill with ff, driver_init changes this to the 'correct' startup pattern */
+
+    ROM_REGION(0x10000, "speech", 0)
+    ROM_FILL(0x0000, 0xffff, 0x00) /* fill with 00, if no speech cart is present socrates will see this */
+    ROM_LOAD_OPTIONAL("speech_eng.bin", 0x0000, 0x2000, BAD_DUMP CRC(edc1fb3f) SHA1(78b4631fc3b1c038e14911047f9edd6c4e8bae58)) // should be speech_fra.bin, but french speech cart is not dumped
 ROM_END
 
 
