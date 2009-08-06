@@ -77,7 +77,6 @@ TODO:
 #include "audio/socrates.h"
 
 /* Defines */
-#undef EMULATE_SPEECH // tries miserably to emulate the speech chip readback. works for the first packet, which causes socrates to crash on the second one.
 
 /* Components */
 
@@ -961,5 +960,5 @@ SYSTEM_CONFIG_END
 ******************************************************************************/
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT CONFIG      COMPANY                     FULLNAME                            FLAGS */
-COMP( 1988, socrates,   0,          0,      socrates,   socrates, socrates,   socrates,   "V-tech",        "Socrates Educational Video System", GAME_IMPERFECT_SOUND )
-COMP( 1988, socratfc,   socrates,   0,      socrates,   socrates, socrates,   socrates,   "V-tech",        "Socrates SAITOUT", GAME_IMPERFECT_SOUND )
+COMP( 1988, socrates,   0,          0,      socrates,   socrates, socrates,   socrates,   "V-tech",        "Socrates Educational Video System", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
+COMP( 1988, socratfc,   socrates,   0,      socrates,   socrates, socrates,   socrates,   "V-tech",        "Socrates SAITOUT", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
