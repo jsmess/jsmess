@@ -80,7 +80,6 @@ static void init_nes_core(running_machine *machine)
 	nes.vram = memory_region(machine, "gfx2");
 	nes.ciram = memory_region(machine, "gfx3");
 	nes.wram = memory_region(machine, "user1");
-	nes.exram = auto_alloc_array(machine, UINT8, 0x400);
 
 	/* Brutal hack put in as a consequence of the new memory system; we really
 	 * need to fix the NES code */

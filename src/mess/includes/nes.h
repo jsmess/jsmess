@@ -57,7 +57,6 @@ struct nes_struct
 	UINT8 *vram;
 	UINT8 *wram;
 	UINT8 *ciram; //PPU nametable RAM - external to PPU!
-	UINT8 *exram; //MMC5 exram. We should move this one day
 
 	/* Variables which can change */
 	UINT8 mid_ram_enable;
