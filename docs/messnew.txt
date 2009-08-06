@@ -23,6 +23,15 @@ System Driver Changes:
 ----------------------
 - [COCO] Bug #1839 fixed [Miodrag Milanovic]
 
+- [IBMPCJR] Fixed the floppy watchdog timer.  [Wilbert Pol]
+
+- [IBMPCJR] Main memory and video ram are now shared.  [Wilbert Pol]
+
+- [IBMPCJR] Added proper support for b/w and color modes.  [Wilbert Pol]
+
+- [IBMPCJR] Added selection of proper mc6845 input clocks for
+            different graphics modes.  [Wilbert Pol]
+
 - [JAGUAR] Replaced wave table code with a ROM. [Zerosquare, Robbbert]
            Fixed quickload problems.
            Various miscellaneous improvements. [Robbbert]
