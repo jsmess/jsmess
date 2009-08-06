@@ -228,6 +228,7 @@ SOUNDS += SID6581
 SOUNDS += SID8580
 SOUNDS += SP0256
 #SOUNDS += DIGITALKER
+SOUNDS += SOCRATES
 
 
 #-------------------------------------------------
@@ -1434,6 +1435,7 @@ $(MESSOBJ)/vtech.a:				\
 	$(MESS_FORMATS)/vt_cas.o	\
 	$(MESS_FORMATS)/vt_dsk.o	\
 	$(MESS_DRIVERS)/crvision.o	\
+	$(MESS_AUDIO)/socrates.o	\
 	$(MESS_DRIVERS)/socrates.o	\
 
 $(MESSOBJ)/xerox.a:				\
@@ -1494,7 +1496,6 @@ $(MESS_DRIVERS)/mmd1.o:		$(MESS_LAYOUT)/mmd1.lh \
 $(MESS_DRIVERS)/poly880.o:	$(MESS_LAYOUT)/poly880.lh
 $(MESS_VIDEO)/pc8401a.o:	$(MESS_LAYOUT)/pc8500.lh
 $(MESS_DRIVERS)/px4.o:		$(MESS_LAYOUT)/px4.lh
-$(MESS_DRIVERS)/socrates.o:	$(MESS_LAYOUT)/socrates.lh
 $(MESS_DRIVERS)/stopthie.o:	$(MESS_LAYOUT)/stopthie.lh
 $(MESS_DRIVERS)/super80.o:	$(MESS_LAYOUT)/super80.lh
 $(MESS_DRIVERS)/svision.o:	$(MESS_LAYOUT)/svision.lh

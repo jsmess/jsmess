@@ -75,7 +75,7 @@ TODO:
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "socrates.lh"
-//#include "sound/beep.h"
+#include "audio/socrates.h"
 
 /* Defines */
 #undef EMULATE_SPEECH // tries miserably to emulate the speech chip readback. works for the first packet, which causes socrates to crash on the second one.
@@ -608,21 +608,23 @@ static VIDEO_UPDATE( socrates )
 
 static WRITE8_HANDLER(socrates_sound_w)
 {
+	const device_config *socr_snd = devtag_get_device(space->machine, "soc_snd");
 	switch(offset)
 	{
 		case 0:
-		//beep_set_frequency(channel1, (int)((13982.6)/(data+1)));
+		socrates_snd_reg0_w(socr_snd, data);
 		break;
 		case 1:
-		//beep_set_frequency(channel2, (int)((13982.6)/(data+1)));
+		socrates_snd_reg1_w(socr_snd, data);
 		break;
 		case 2:
-		//beep_set_volume(channel1, data/4);
+		socrates_snd_reg2_w(socr_snd, data);
 		break;
 		case 3:
-		//beep_set_volume(channel2, data/8);
+		socrates_snd_reg3_w(socr_snd, data);
 		break;
 		case 4: case 5: case 6: case 7: default:
+		socrates_snd_reg4_w(socr_snd, data);
 		break;
 	}
 }
@@ -879,7 +881,6 @@ static MACHINE_DRIVER_START(socrates)
     MDRV_MACHINE_RESET(socrates)
 
     /* video hardware */
-	//MDRV_DEFAULT_LAYOUT(layout_socrates)
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -892,12 +893,9 @@ static MACHINE_DRIVER_START(socrates)
 	MDRV_VIDEO_UPDATE(socrates)
 
     /* sound hardware */
-	//MDRV_SPEAKER_STANDARD_MONO("mono")
-	//MDRV_SOUND_ADD("beep", BEEP, 0)
-	//MDRV_SOUND_ADD("beep2", BEEP, 0)
-	//MDRV_SOUND_ADD("soc_snd", SOCRATES, XTAL_21_4772MHz/(512+256)) /* this is correct, as strange as it sounds. */
-	//MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
-
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD("soc_snd", SOCRATES, XTAL_21_4772MHz/(512+256)) // this is correct, as strange as it sounds.
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 MACHINE_DRIVER_END
 
@@ -964,5 +962,5 @@ SYSTEM_CONFIG_END
 ******************************************************************************/
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT CONFIG      COMPANY                     FULLNAME                            FLAGS */
-COMP( 1988, socrates,   0,          0,      socrates,   socrates, socrates,   socrates,   "V-tech",        "Socrates Educational Video System",                        GAME_NOT_WORKING )
-COMP( 1988, socratfc,   socrates,   0,      socrates,   socrates, socrates,   socrates,   "V-tech",        "Socrates SAITOUT",                        GAME_NOT_WORKING )
+COMP( 1988, socrates,   0,          0,      socrates,   socrates, socrates,   socrates,   "V-tech",        "Socrates Educational Video System", GAME_IMPERFECT_SOUND )
+COMP( 1988, socratfc,   socrates,   0,      socrates,   socrates, socrates,   socrates,   "V-tech",        "Socrates SAITOUT", GAME_IMPERFECT_SOUND )
