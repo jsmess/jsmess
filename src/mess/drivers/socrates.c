@@ -74,7 +74,6 @@ TODO:
 /* Core includes */
 #include "driver.h"
 #include "cpu/z80/z80.h"
-#include "socrates.lh"
 #include "audio/socrates.h"
 
 /* Defines */
