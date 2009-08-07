@@ -102,7 +102,7 @@
 // pcw/pcw16 beeper
 #include "sound/beep.h"
 
-#define VERBOSE 0
+#define VERBOSE 1
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 static NEC765_INTERRUPT( pcw_fdc_interrupt );
@@ -118,7 +118,7 @@ static int fdc_interrupt_code;
 unsigned char pcw_vdu_video_control_register;
 static int pcw_interrupt_counter;
 
-static unsigned long pcw_banks[4];
+static UINT8 pcw_banks[4];
 static unsigned char pcw_bank_force = 0;
 
 
@@ -150,7 +150,8 @@ static void pcw_interrupt_handle(running_machine *machine)
 		((fdc_interrupt_code==1) && ((pcw_system_status & (1<<5))!=0))
 		)
 	{
-		cputag_set_input_line(machine, "maincpu", 0,HOLD_LINE);
+		if(cpu_get_reg(cputag_get_cpu(machine,"maincpu"),Z80_IFF1))
+			cputag_set_input_line(machine, "maincpu", 0,ASSERT_LINE);
 	}
 	else
 	{
@@ -194,7 +195,7 @@ static void	pcw_trigger_fdc_int(running_machine *machine)
 				{
 					/* I'll pulse it because if I used hold-line I'm not sure
                     it would clear - to be checked */
-					cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+					cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
 				}
 			}
 		}
@@ -218,13 +219,11 @@ static void	pcw_trigger_fdc_int(running_machine *machine)
 /* fdc interrupt callback. set/clear fdc int */
 static NEC765_INTERRUPT( pcw_fdc_interrupt )
 {
-	pcw_system_status &= ~(1<<5);
 
-	if (state)
-	{
-		/* fdc interrupt occured */
+	if (state == CLEAR_LINE)
+		pcw_system_status &= ~(1<<5);
+	else
 		pcw_system_status |= (1<<5);
-	}
 
 	pcw_trigger_fdc_int(device->machine);
 }
@@ -263,7 +262,6 @@ static  READ8_HANDLER(pcw_keyboard_r)
 static void pcw_update_read_memory_block(running_machine *machine, int block, int bank)
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	memory_set_bankptr(machine, block + 1, mess_ram + ((bank * 0x4000) % mess_ram_size));
 
 	/* bank 3? */
 	if (bank == 3)
@@ -273,6 +271,7 @@ static void pcw_update_read_memory_block(running_machine *machine, int block, in
 		memory_install_read8_handler(space,
 			block * 0x04000 + 0x3ff0, block * 0x04000 + 0x3fff, 0, 0,
 			pcw_keyboard_r);
+		LOG(("MEM: read block %i -> bank %i\n",block,bank));
 	}
 	else
 	{
@@ -280,7 +279,9 @@ static void pcw_update_read_memory_block(running_machine *machine, int block, in
 		memory_install_read8_handler(space,
 			block * 0x04000 + 0x0000, block * 0x04000 + 0x3fff, 0, 0,
 			(read8_space_func) (STATIC_BANK1 + (FPTR)block));
+		LOG(("MEM: read block %i -> bank %i\n",block,bank));
 	}
+	memory_set_bankptr(machine, block + 1, mess_ram + ((bank * 0x4000) % mess_ram_size));
 }
 
 
@@ -288,6 +289,7 @@ static void pcw_update_read_memory_block(running_machine *machine, int block, in
 static void pcw_update_write_memory_block(running_machine *machine, int block, int bank)
 {
 	memory_set_bankptr(machine, block + 5, mess_ram + ((bank * 0x4000) % mess_ram_size));
+	LOG(("MEM: write block %i -> bank %i\n",block,bank));
 }
 
 
@@ -322,7 +324,7 @@ static void pcw_update_mem(running_machine *machine, int block, int data)
 		{
 			case 0:
 			{
-				mask = (1<<6);
+				mask = (1<<7);
 			}
 			break;
 
@@ -334,13 +336,13 @@ static void pcw_update_mem(running_machine *machine, int block, int data)
 
 			case 2:
 			{
-				mask = (1<<5);
+				mask = (1<<6);
 			}
 			break;
 
 			case 3:
 			{
-				mask = (1<<7);
+				mask = (1<<5);
 			}
 			break;
 		}
@@ -374,7 +376,7 @@ static void pcw_update_mem(running_machine *machine, int block, int data)
 /* from Jacob Nevins docs */
 static int pcw_get_sys_status(running_machine *machine)
 {
-	return pcw_interrupt_counter | (input_port_read(machine, "EXTRA") & (0x040 | 0x010)) | pcw_system_status;
+	return pcw_interrupt_counter | (input_port_read(machine, "EXTRA") & (0x040 | 0x010)) | (pcw_system_status & 0x20);
 }
 
 static READ8_HANDLER(pcw_interrupt_counter_r)
@@ -390,6 +392,7 @@ static READ8_HANDLER(pcw_interrupt_counter_r)
 	/* update interrupt */
 	pcw_interrupt_handle(space->machine);
 	/* return data */
+	LOG(("SYS: IRQ counter read, returning %02x\n",data));
 	return data;
 }
 
@@ -420,16 +423,19 @@ static WRITE8_HANDLER(pcw_roller_ram_addr_w)
 
 	roller_ram_addr = (((data>>5) & 0x07)<<14) |
 							((data & 0x01f)<<9);
+	LOG(("Roller-RAM: Address set to 0x%05x\n",roller_ram_addr));
 }
 
 static WRITE8_HANDLER(pcw_pointer_table_top_scan_w)
 {
 	roller_ram_offset = data;
+	LOG(("Roller-RAM: offset set to 0x%05x\n",roller_ram_offset));
 }
 
 static WRITE8_HANDLER(pcw_vdu_video_control_register_w)
 {
 	pcw_vdu_video_control_register = data;
+	LOG(("Roller-RAM: control reg set to 0x%02x\n",data));
 }
 
 static WRITE8_HANDLER(pcw_system_control_w)
@@ -451,6 +457,7 @@ static WRITE8_HANDLER(pcw_system_control_w)
 		/* reboot */
 		case 1:
 		{
+			popmessage("SYS: Reboot");
 		}
 		break;
 
@@ -505,7 +512,7 @@ static WRITE8_HANDLER(pcw_system_control_w)
 			fdc_interrupt_code = 2;
 
 			/* previously connected to NMI or INT? */
-			if ((fdc_previous_interrupt_code == 0) || (fdc_previous_interrupt_code == 1))
+			if ((fdc_previous_interrupt_code == 0))
 			{
 				/* yes */
 
@@ -513,8 +520,8 @@ static WRITE8_HANDLER(pcw_system_control_w)
 				cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
 
 			}
-
 			pcw_interrupt_handle(space->machine);
+
 		}
 		break;
 
@@ -587,7 +594,10 @@ static WRITE8_HANDLER(pcw_system_control_w)
 static READ8_HANDLER(pcw_system_status_r)
 {
 	/* from Jacob Nevins docs */
-	return pcw_get_sys_status(space->machine);
+	UINT8 ret = pcw_get_sys_status(space->machine);
+	
+	LOG(("SYS: Status port returning %02x\n",ret));
+	return ret;
 }
 
 /* read from expansion hardware - additional hardware not part of
@@ -596,7 +606,7 @@ static  READ8_HANDLER(pcw_expansion_r)
 {
 	logerror("pcw expansion r: %04x\n",offset+0x080);
 
-	switch (offset-0x080)
+	switch (offset+0x080)
 	{
 		case 0x0e0:
 		{
@@ -619,8 +629,9 @@ static  READ8_HANDLER(pcw_expansion_r)
 		}
 
 		case 0x0e1:
+		case 0x0e3:
 		{
-			return 0x07f;
+			return 0x7f;
 		}
 
 		case 0x085:
@@ -691,7 +702,7 @@ static  READ8_HANDLER(pcw_printer_data_r)
 
 static  READ8_HANDLER(pcw_printer_status_r)
 {
-	return 0x0ff;
+	return 0xff;
 }
 
 /* TODO: Implement parallel port! */
@@ -714,7 +725,8 @@ static WRITE8_HANDLER(pcw9512_parallel_w)
 
 
 static ADDRESS_MAP_START(pcw_io, ADDRESS_SPACE_IO, 8)
-	AM_RANGE(0x000, 0x07f) AM_READWRITE(pcw_fdc_r,					pcw_fdc_w)
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x000, 0x07f) AM_READWRITE(pcw_fdc_r,					pcw_fdc_w)  
 	AM_RANGE(0x080, 0x0ef) AM_READWRITE(pcw_expansion_r,			pcw_expansion_w)
 	AM_RANGE(0x0f0, 0x0f3) AM_WRITE(								pcw_bank_select_w)
 	AM_RANGE(0x0f4, 0x0f4) AM_READWRITE(pcw_interrupt_counter_r,	pcw_bank_force_selection_w)
@@ -729,6 +741,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START(pcw9512_io, ADDRESS_SPACE_IO, 8)
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x000, 0x07f) AM_READWRITE(pcw_fdc_r,					pcw_fdc_w)
 	AM_RANGE(0x080, 0x0ef) AM_READWRITE(pcw_expansion_r,			pcw_expansion_w)
 	AM_RANGE(0x0f0, 0x0f3) AM_WRITE(								pcw_bank_select_w)
@@ -752,28 +765,40 @@ static TIMER_CALLBACK(setup_beep)
 
 static MACHINE_START( pcw )
 {
-	fdc_interrupt_code = 0;
+	fdc_interrupt_code = 2;
 	floppy_drive_set_geometry(image_from_devtype_and_index(machine, IO_FLOPPY, 0), FLOPPY_DRIVE_DS_80);
 }
 
-
-static DRIVER_INIT(pcw)
+static MACHINE_RESET( pcw )
 {
-	pcw_boot = 1;
-
-	cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), 0, 0x0ff);
-
-
 	/* ram paging is actually undefined at power-on */
-	pcw_banks[0] = 0;
-	pcw_banks[1] = 1;
-	pcw_banks[2] = 2;
-	pcw_banks[3] = 3;
+	pcw_bank_force = 0x00;
+	
+	pcw_banks[0] = 0x00;
+	pcw_banks[1] = 0x01;
+	pcw_banks[2] = 0x02;
+	pcw_banks[3] = 0x03;
 
 	pcw_update_mem(machine, 0, pcw_banks[0]);
 	pcw_update_mem(machine, 1, pcw_banks[1]);
 	pcw_update_mem(machine, 2, pcw_banks[2]);
 	pcw_update_mem(machine, 3, pcw_banks[3]);
+}
+
+static DRIVER_INIT(pcw)
+{
+	UINT8* code = memory_region(machine,"bootcode");
+	int x;
+	pcw_boot = 0;
+
+	cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), 0, 0x0ff);
+
+	/* copy boot code into RAM - yes, it's skipping a step, 
+	   but there is no verified dump of the boot sequence */
+
+	memset(mess_ram,0x00,mess_ram_size);	
+	for(x=0;x<256;x++)
+		mess_ram[x+2] = code[x];
 
 	/* lower 4 bits are interrupt counter */
 	pcw_system_status = 0x000;
@@ -989,9 +1014,10 @@ static MACHINE_DRIVER_START( pcw )
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)       /* clock supplied to chip, but in reality it is 3.4 MHz */
 	MDRV_CPU_PROGRAM_MAP(pcw_map)
 	MDRV_CPU_IO_MAP(pcw_io)
-	MDRV_QUANTUM_TIME(HZ(60))
+	MDRV_QUANTUM_TIME(HZ(50))
 
 	MDRV_MACHINE_START(pcw)
+	MDRV_MACHINE_RESET(pcw)
 
     /* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1031,12 +1057,18 @@ MACHINE_DRIVER_END
 
 /* I am loading the boot-program outside of the Z80 memory area, because it
 is banked. */
+/* 8256boot.bin is not a real ROM, it is what is loaded into RAM by the boot sequence
+   It was typed in by hand based on the disassembly found at 
+   http://www.chiark.greenend.org.uk/~jacobn/cpm/pcwboot.html  */
 
 // for now all models use the same rom
 #define ROM_PCW(model)												\
 	ROM_START(model)												\
-		ROM_REGION(0x014000, "maincpu",0)							\
-		ROM_LOAD("pcwboot.bin", 0x010000, 608, BAD_DUMP CRC(679b0287) SHA1(5dde974304e3376ace00850d6b4c8ec3b674199e))	\
+		ROM_REGION(0x010000, "maincpu",0)							\
+		ROM_FILL(0x0000,0x10000,0x00)											\
+/*		ROM_LOAD("pcwboot.bin", 0x010000, 608, BAD_DUMP CRC(679b0287) SHA1(5dde974304e3376ace00850d6b4c8ec3b674199e))*/	\
+		ROM_REGION(256,"bootcode",0)								\
+		ROM_LOAD("8256boot.bin", 0, 256, NO_DUMP CRC(d55925bd) SHA1(bca6a47d657557be99cb8580d4bf90968d8dde4a))	\
 	ROM_END															\
 
 ROM_PCW(pcw8256)

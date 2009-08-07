@@ -467,7 +467,7 @@ static void nec765_setup_timed_int(const device_config *device,int signed_tracks
 {
 	nec765_t *fdc = get_safe_token(device);
 	/* setup timer to signal after seek time is complete */
-	timer_adjust_periodic(fdc->seek_timer, attotime_zero, 0, double_to_attotime(fdc->srt_in_ms*abs(signed_tracks)*0.001));
+	timer_adjust_oneshot(fdc->seek_timer, double_to_attotime(fdc->srt_in_ms*abs(signed_tracks)*0.001), 0);
 }
 
 static void nec765_seek_setup(const device_config *device, int is_recalibrate)
