@@ -193,8 +193,7 @@ static void	pcw_trigger_fdc_int(running_machine *machine)
 			{
 				if (state)
 				{
-					/* I'll pulse it because if I used hold-line I'm not sure
-                    it would clear - to be checked */
+					/* Cleared when FDC interrupt mode is set to INT or nothing */
 					cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
 				}
 			}
