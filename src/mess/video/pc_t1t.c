@@ -653,7 +653,6 @@ static void pc_pcjr_vga_data_w(running_machine *machine, int data)
 					/* bit2 - 0 = color, 1 = b/w */
 					/* bit3 - 0 = video disable, 1 = video enable */
 					/* bit4 - 1 = 16 color graphics */
-//printf("pc_pcjr_vga_data_w: mode control 1 write %02x\n", data );
 			pc_pcjr_mode_switch(machine);
 			break;
 		case 0x01:	/* palette mask (bits 3-0) */
@@ -663,7 +662,6 @@ static void pc_pcjr_vga_data_w(running_machine *machine, int data)
 		case 0x03:	/* mode control 2 */
 					/* bit1 - 1 = enable blink */
 					/* bit3 - 1 = 2 color graphics */
-//printf("pc_pcjr_vga_data_w: mode control 2 write %02x\n", data );
 			pc_pcjr_mode_switch(machine);
 			break;
 		case 0x04:	/* reset register */
@@ -748,7 +746,6 @@ static void pc_t1t_bank_w(running_machine *machine, int data)
 
 static void pc_pcjr_bank_w(running_machine *machine, int data)
 {
-//printf("pc_pcjr_bank_w: %02x\n", data);
 	if (pcjr.bank != data)
 	{
 		int dram, vram;
@@ -766,8 +763,8 @@ static void pc_pcjr_bank_w(running_machine *machine, int data)
 		}
 		memory_set_bankptr( machine, 14, mess_ram + vram );
 		pcjr.displayram = mess_ram + dram;
+		pc_pcjr_mode_switch(machine);
 	}
-	pc_pcjr_mode_switch(machine);
 }
 
 
