@@ -280,8 +280,6 @@ static MC6845_UPDATE_ROW( pyl601_update_row )
 
 	int column, bit,i;
 	UINT8 data;
-	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
-
 	if (BIT(video_mode,5)==0) {
 		for (column = 0; column < x_count; column++)
 		{
@@ -304,19 +302,14 @@ static MC6845_UPDATE_ROW( pyl601_update_row )
 		}
 	} else {
 		for ( i = 0; i < x_count; i++ )
-			{		
-				UINT16 offset = i  + (y * 64);
-				UINT8 data = mess_ram[ offset + 0xf000];
-				*p = (data >> 7); p++;
-				*p = (data >> 6); p++;
-				*p = (data >> 5); p++;
-				*p = (data >> 4); p++;
-				*p = (data >> 3); p++;
-				*p = (data >> 2); p++;
-				*p = (data >> 1); p++;
-				*p = (data >> 0); p++;
+		{		
+			UINT8 data = mess_ram[(((ma+i) << 3) | (ra & 0x07)) & 0xffff];
+			for (bit = 0; bit < 8; bit++)
+			{
+				*BITMAP_ADDR16(bitmap, y, (i * 8) + bit) = BIT(data, 7) ? 1 : 0;		
+				data <<= 1;
 			}
-		
+		}		
 	}
 }
 
@@ -324,7 +317,7 @@ static MC6845_UPDATE_ROW( pyl601a_update_row )
 {
 	UINT8 *charrom = memory_region(device->machine, "gfx1");
 
-	int column, bit;
+	int column, bit,i;
 	UINT8 data;
 	if (BIT(video_mode,5)==0) {
 		for (column = 0; column < x_count; column++)
@@ -346,6 +339,16 @@ static MC6845_UPDATE_ROW( pyl601a_update_row )
 				data <<= 1;
 			}
 		}
+	} else {
+		for ( i = 0; i < x_count; i++ )
+		{		
+			UINT8 data = mess_ram[(((ma+i) << 3) | (ra & 0x07)) & 0xffff];
+			for (bit = 0; bit < 8; bit++)
+			{
+				*BITMAP_ADDR16(bitmap, y, (i * 8) + bit) = BIT(data, 7) ? 1 : 0;		
+				data <<= 1;
+			}
+		}		
 	}
 }
 
