@@ -518,7 +518,7 @@ static READ32_HANDLER( gba_io_r )
 			}
 			break;
 		case 0x0004/4:
-			retval = gba_state->DISPSTAT | (video_screen_get_vpos(machine->primary_screen)<<16);
+			retval = (gba_state->DISPSTAT & 0xffff) | (video_screen_get_vpos(machine->primary_screen)<<16);
 			break;
 		case 0x0008/4:
 			if( (mem_mask) & 0x0000ffff )
@@ -1007,11 +1007,8 @@ static WRITE32_HANDLER( gba_io_w )
 			}
 			break;
 		case 0x0004/4:
-			if( (mem_mask) & 0x0000ffff )
-			{
-//				printf("DISPSTAT (%08x) = %04x (%08x)\n", 0x04000000 + ( offset << 2 ), data & 0x0000ffff, ~mem_mask );
-				gba_state->DISPSTAT = ( gba_state->DISPSTAT & ~mem_mask ) | ( data & mem_mask ) ;
-			}
+//			printf("DISPSTAT (%08x) = %04x (%08x)\n", 0x04000000 + ( offset << 2 ), data & 0x0000ffff, mem_mask );
+			COMBINE_DATA(&gba_state->DISPSTAT);
 			break;
 		case 0x0008/4:
 			if( (mem_mask) & 0x0000ffff )
@@ -1827,7 +1824,7 @@ TIMER_CALLBACK( perform_hbl )
 {
 	int ch, ctrl;
 	gba_state *gba_state = machine->driver_data;
-
+	
 	gba_draw_scanline(machine, video_screen_get_vpos(machine->primary_screen));	// we are now in hblank
 	gba_state->DISPSTAT |= DISPSTAT_HBL;
 	if ((gba_state->DISPSTAT & DISPSTAT_HBL_IRQ_EN ) != 0)
@@ -1859,6 +1856,16 @@ TIMER_CALLBACK( perform_scan )
 
 	scanline = video_screen_get_vpos(machine->primary_screen);
 
+	// VBL is set for scanlines 160 through 226 (but not 227, which is the last line)
+	if (scanline >= 160 && scanline < 227)
+	{
+		gba_state->DISPSTAT |= DISPSTAT_VBL;
+	}
+	else
+	{
+		gba_state->DISPSTAT &= ~DISPSTAT_VBL;
+	}
+
 	// handle VCNT match interrupt/flag
 	if (scanline == ((gba_state->DISPSTAT >> 8) & 0xff))
 	{
@@ -1869,18 +1876,12 @@ TIMER_CALLBACK( perform_scan )
 		}
 	}
 
-	// scanline zero means not in VBL anymore
-	if (scanline == 0)
-	{
-		gba_state->DISPSTAT &= ~DISPSTAT_VBL;
-	}
-	else if (scanline == 160)	// scanline 160 means entering VBL
+	// entering VBL, handle interrupts and DMA triggers
+	if (scanline == 160)
 	{
 		int ch, ctrl;
 
-		gba_state->DISPSTAT |= DISPSTAT_VBL;
-//		printf("DISPSTAT %x %x\n", gba_state->DISPSTAT, gba_state->DISPSTAT & DISPSTAT_VBL_IRQ_EN);
-		if ((gba_state->DISPSTAT & DISPSTAT_VBL_IRQ_EN) != 0)
+		if (gba_state->DISPSTAT & DISPSTAT_VBL_IRQ_EN)
 		{
 			gba_request_irq(machine, INT_VBL);
 		}
@@ -1921,7 +1922,7 @@ static MACHINE_RESET( gba )
 	gba_state->RCNT = 0x8000;
 	gba_state->JOYSTAT = 0x0002;
 
-	timer_adjust_oneshot(gba_state->scan_timer, video_screen_get_time_until_pos(machine->primary_screen, 1, 0), 0);
+	timer_adjust_oneshot(gba_state->scan_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 	timer_adjust_oneshot(gba_state->hbl_timer, attotime_never, 0);
 	timer_adjust_oneshot(gba_state->dma_timer[0], attotime_never, 0);
 	timer_adjust_oneshot(gba_state->dma_timer[1], attotime_never, 1);
@@ -1948,7 +1949,7 @@ static MACHINE_START( gba )
 	/* create a timer to fire scanline functions */
 	gba_state->scan_timer = timer_alloc(machine, perform_scan, 0);
 	gba_state->hbl_timer = timer_alloc(machine, perform_hbl, 0);
-	timer_adjust_oneshot(gba_state->scan_timer, video_screen_get_time_until_pos(machine->primary_screen, 1, 0), 0);
+	timer_adjust_oneshot(gba_state->scan_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 
 	/* and one for each DMA channel */
 	gba_state->dma_timer[0] = timer_alloc(machine, dma_complete, 0);
