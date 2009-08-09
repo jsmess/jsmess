@@ -999,7 +999,6 @@ static WRITE32_HANDLER( gba_io_w )
 				verboselog(machine, 2, "GBA IO Register Write: DISPCNT (%08x) = %04x (%08x)\n", 0x04000000 + ( offset << 2 ), data & 0x0000ffff, ~mem_mask );
 				gba_state->DISPCNT = ( gba_state->DISPCNT & ~mem_mask ) | ( data & mem_mask );
 			}
-			break;
 			if( (mem_mask) & 0xffff0000 )
 			{
 				verboselog(machine, 2, "GBA IO Register Write: Green Swap (%08x) = %04x (%08x)\n", 0x04000000 + ( offset << 2 ), ( data & 0xffff0000 ) >> 16, ~mem_mask );
@@ -1980,7 +1979,7 @@ static MACHINE_START( gba )
 
 ROM_START( gba )
 	ROM_REGION( 0x8000, "bios", ROMREGION_ERASE00 )
-	ROM_LOAD( "gba_state->bin", 0x000000, 0x004000, CRC(81977335) )
+	ROM_LOAD( "gba.bin", 0x000000, 0x004000, CRC(81977335) )
 
 	/* cartridge region - 32 MBytes (128 Mbit) */
 	ROM_REGION( 0x2000000, "cartridge", ROMREGION_ERASEFF )
@@ -2261,7 +2260,7 @@ static WRITE32_HANDLER( eeprom_w )
 
 			if (gba_state->eeprom_bits == 0)
 			{
-				printf("%08x: EEPROM: %02x to %x\n", cpu_get_pc(space->	machine->cpu[0]), gba_state->eep_data, gba_state->eeprom_addr );
+				mame_printf_verbose("%08x: EEPROM: %02x to %x\n", cpu_get_pc(space->	machine->cpu[0]), gba_state->eep_data, gba_state->eeprom_addr );
 				gba_state->gba_eeprom[gba_state->eeprom_addr] = gba_state->eep_data;
 				gba_state->eeprom_addr++;
 				gba_state->eep_data = 0;
@@ -2321,7 +2320,7 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 		}
 		else if (!memcmp(&ROM[i], "FLASH1M_", 8))
 		{
-			printf("game has 1M FLASH\n");
+			mame_printf_verbose("game has 1M FLASH\n");
 			break;
 		}
 		else if (!memcmp(&ROM[i], "FLASH", 5))
@@ -2335,7 +2334,7 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 		}
 		else if (!memcmp(&ROM[i], "SIIRTC_V", 8))
 		{
-			printf("game has RTC\n");
+			mame_printf_verbose("game has RTC\n");
 			break;
 		}
 	}
@@ -2431,4 +2430,4 @@ static DRIVER_INIT(gbadv)
 }
 
 /*    YEAR  NAME PARENT COMPAT MACHINE INPUT   INIT   CONFIG COMPANY     FULLNAME */
-CONS( 2001, gba, 0,     0,     gbadv,  gbadv,  gbadv, 0,     "Nintendo", "Game Boy Advance", GAME_SUPPORTS_SAVE)
+CONS( 2001, gba, 0,     0,     gbadv,  gbadv,  gbadv, 0,     "Nintendo", "Game Boy Advance", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND)
