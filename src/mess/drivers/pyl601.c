@@ -9,6 +9,8 @@
 #include "driver.h"
 #include "cpu/m6800/m6800.h"
 #include "video/mc6845.h"
+#include "devices/basicdsk.h"
+#include "machine/nec765.h"
 
 static UINT8 rom_page;
 static UINT32 vdisk_addr = 0;
@@ -66,11 +68,6 @@ static READ8_HANDLER (vdisk_data_r)
 	vdisk_addr++;
 	vdisk_addr &= 0x7ffff;
 	return retVal;
-}
-
-static READ8_HANDLER ( unknown_r )
-{
-	return 0x80;
 }
 
 UINT8 selectedline(UINT16 data) 
@@ -138,6 +135,56 @@ static READ8_HANDLER (timer_r)
 	return retVal;
 }
 
+static WRITE8_HANDLER (speaker_w)
+{
+}
+
+static WRITE8_HANDLER (led_w)
+{
+//	UINT8 caps_led = BIT(data,4);
+}
+
+INLINE const device_config *get_floppy_image(running_machine *machine, int drive)
+{
+	return image_from_devtype_and_index(machine, IO_FLOPPY, drive);
+} 
+
+static NEC765_GET_IMAGE( pyldin_nec765_get_image )
+{
+	return get_floppy_image(device->machine, (floppy_index & 1)^1);
+}
+UINT8 floppy_ctrl = 0;
+static WRITE8_HANDLER (floppy_w) 
+{
+	// bit 0 is reset (if zero)
+	// bit 1 is TC state
+	// bit 2 is drive selected
+	// bit 3 is motor state
+	const device_config *floppy = devtag_get_device(space->machine, "nec765");
+	if (BIT(data,0)==0) {		
+		//reset		
+		nec765_reset(floppy,0);
+	}
+	floppy_drive_set_motor_state(get_floppy_image(space->machine, BIT(data,2)), BIT(data,3));
+	
+	floppy_drive_set_ready_state(get_floppy_image(space->machine, 0), BIT(data,2), 0);
+	
+	nec765_set_tc_state(floppy, BIT(data,1));
+	
+	floppy_ctrl = data;
+}
+static READ8_HANDLER (floppy_r) 
+{
+	return floppy_ctrl;
+}
+
+static const struct nec765_interface pyldin_nec765_interface =
+{
+	NULL,						/* interrupt */
+	NULL,						/* DMA request */
+	pyldin_nec765_get_image,	/* image lookup */
+	NEC765_RDY_PIN_CONNECTED	/* ready pin */
+};
 
 static ADDRESS_MAP_START(pyl601_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -150,15 +197,17 @@ static ADDRESS_MAP_START(pyl601_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0xe605, 0xe605 ) AM_DEVREADWRITE("crtc", mc6845_register_r , mc6845_register_w)
 	AM_RANGE( 0xe628, 0xe628 ) AM_READ(keyboard_r)
 	AM_RANGE( 0xe629, 0xe629 ) AM_READWRITE(video_mode_r,video_mode_w)
-	AM_RANGE( 0xe62a, 0xe62a ) AM_READ(keycheck_r)
-	AM_RANGE( 0xe62b, 0xe62b ) AM_READ(timer_r)
+	AM_RANGE( 0xe62a, 0xe62a ) AM_READWRITE(keycheck_r,led_w)
+	AM_RANGE( 0xe62b, 0xe62b ) AM_READWRITE(timer_r,speaker_w)
 	AM_RANGE( 0xe62d, 0xe62d ) AM_READ(video_mode_r)
-	AM_RANGE( 0xe62e, 0xe62e ) AM_READ(keycheck_r)	
+	AM_RANGE( 0xe62e, 0xe62e ) AM_READWRITE(keycheck_r,led_w)	
 	AM_RANGE( 0xe680, 0xe680 ) AM_WRITE(vdisk_page_w)
 	AM_RANGE( 0xe681, 0xe681 ) AM_WRITE(vdisk_h_w)
 	AM_RANGE( 0xe682, 0xe682 ) AM_WRITE(vdisk_l_w)
 	AM_RANGE( 0xe683, 0xe683 ) AM_READWRITE(vdisk_data_r,vdisk_data_w)
-	AM_RANGE( 0xe6d0, 0xe6d0 ) AM_READ(unknown_r)	
+	AM_RANGE( 0xe6c0, 0xe6c0 ) AM_READWRITE(floppy_r, floppy_w)
+	AM_RANGE( 0xe6d0, 0xe6d0 ) AM_DEVREAD("nec765", nec765_status_r)
+	AM_RANGE( 0xe6d1, 0xe6d1 ) AM_DEVREADWRITE("nec765", nec765_data_r, nec765_data_w)
 	AM_RANGE( 0xe6f0, 0xe6f0 ) AM_READWRITE(rom_page_r, rom_page_w)
 	AM_RANGE( 0xe700, 0xefff ) AM_RAMBANK(4)
 	AM_RANGE( 0xf000, 0xffff ) AM_READWRITE(SMH_BANK(5), SMH_BANK(6))
@@ -433,6 +482,8 @@ static MACHINE_DRIVER_START( pyl601 )
 
 	MDRV_VIDEO_START( pyl601 )
 	MDRV_VIDEO_UPDATE( pyl601 )	
+	
+	MDRV_NEC765A_ADD("nec765", pyldin_nec765_interface)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( pyl601a )
@@ -442,8 +493,49 @@ static MACHINE_DRIVER_START( pyl601a )
 	MDRV_MC6845_ADD("crtc", MC6845, XTAL_2MHz, pyl601a_crtc6845_interface)
 MACHINE_DRIVER_END
 
+static DEVICE_IMAGE_LOAD( pyldin_floppy )
+{
+	if (image_has_been_created(image))
+	{
+		return INIT_FAIL;
+	}
+
+	if (DEVICE_IMAGE_LOAD_NAME(basicdsk_floppy)(image) == INIT_PASS)
+	{
+		switch (image_length(image))
+		{
+		case 720*1024: 
+			basicdsk_set_geometry(image, 80, 2, 9, 512, 1, 0, FALSE);
+			break;
+		default:
+			return INIT_FAIL;
+		}
+
+		return INIT_PASS;
+	}
+
+	return INIT_FAIL;
+}  
+
+static void pyldin_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case MESS_DEVINFO_INT_COUNT:					info->i = 2; break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case MESS_DEVINFO_PTR_LOAD:						info->load = DEVICE_IMAGE_LOAD_NAME(pyldin_floppy); break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:			strcpy(info->s = device_temp_str(), "img"); break;
+
+		default:										legacybasicdsk_device_getinfo(devclass, state, info); break;
+	}
+}
 static SYSTEM_CONFIG_START(pyl601)
 	CONFIG_RAM_DEFAULT((64 +512) * 1024)
+	CONFIG_DEVICE( pyldin_floppy_getinfo )
 SYSTEM_CONFIG_END
 
 /* ROM definition */
@@ -454,7 +546,7 @@ ROM_START( pyl601 )
 	ROM_REGION(0x0800, "gfx1",0)
 	ROM_LOAD( "video.rom",  0x0000, 0x0800, CRC(1c23ba43) SHA1(eb1cfc139858abd0aedbbf3d523f8ba55d27a11d))
 
-	ROM_REGION(0x50000, "romdisk",ROMREGION_ERASEFF)
+	ROM_REGION(0x50000, "romdisk",ROMREGION_ERASEFF)  	
 	ROM_LOAD( "rom0.rom", 0x00000, 0x10000, CRC(60103920) SHA1(ee5b4ee5b513c4a0204da751e53d63b8c6c0aab9))
 	ROM_LOAD( "rom1.rom", 0x10000, 0x10000, CRC(cb4a9b22) SHA1(dd09e4ba35b8d1a6f60e6e262aaf2f156367e385))
 	ROM_LOAD( "rom2.rom", 0x20000, 0x08000, CRC(0b7684bf) SHA1(c02ad1f2a6f484cd9d178d8b060c21c0d4e53442))
