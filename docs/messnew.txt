@@ -3,7 +3,7 @@
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
 - Tandy 1000RL  [Wilbert Pol]
-
+- Nintendo Game Boy Advance [R. Belmont, MooglyGuy]
 
 
 Systems Promoted from GAME_NOT_WORKING:

@@ -69,6 +69,7 @@ const game_driver * const drivers[] =
     DRIVER( sfcbox )    /* Nintendo Super Famicom Box                       */
     DRIVER( n64 )       /* Nintendo N64                                     */
     DRIVER( pokemini )  /* Nintendo Pokemon Mini                            */
+    DRIVER( gba )	/* Nintendo Game Boy Advance Handheld               */
 
     DRIVER( megaduck )  /* Megaduck                                         */
 
