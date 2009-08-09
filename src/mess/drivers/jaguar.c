@@ -44,10 +44,11 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/mips/r3000.h"
 #include "cpu/jaguar/jaguar.h"
-#include "includes/jaguar.h"
 #include "devices/cartslot.h"
 #include "devices/snapquik.h"
 #include "sound/dac.h"
+#include "machine/eeprom.h"
+#include "includes/jaguar.h"
 
 /* 26.6MHz for Tom and Jerry, and half that for the CPU */
 #define JAGUAR_CLOCK		26.6e6
@@ -84,6 +85,8 @@ static size_t rom_size;
 
 static UINT32 *cart_base;
 static size_t cart_size;
+
+static UINT8 eeprom_bit_count;
 
 
 static IRQ_CALLBACK(jaguar_irq_callback)
@@ -137,6 +140,58 @@ static MACHINE_RESET( jaguar )
 	cojag_sound_reset(machine);
 
 	joystick_data = 0xffffffff;
+	eeprom_bit_count = 0;
+}
+
+
+/********************************************************************
+*
+*  EEPROM
+*  ======
+*
+*   The EEPROM is accessed by a serial protocol using the registers
+*   0xF14000 (read data), F14800 (increment clock, write data), F15000 (reset for next word)
+*
+********************************************************************/
+
+
+static NVRAM_HANDLER( jaguar )
+{
+	if (read_or_write)
+		eeprom_save(file);
+	else
+	{
+		eeprom_init(machine, &eeprom_interface_93C46);
+
+		if (file)
+			eeprom_load(file);
+	}
+}
+
+static WRITE32_HANDLER( jaguar_eeprom_w )
+{
+	eeprom_bit_count++;
+	if (eeprom_bit_count != 9)		/* kill extra bit at end of address */
+	{
+		eeprom_write_bit(data >> 31);
+		eeprom_set_clock_line(PULSE_LINE);
+	}
+}
+
+static READ32_HANDLER( jaguar_eeprom_clk )
+{
+	eeprom_set_clock_line(PULSE_LINE);	/* get next bit when reading */
+	return 0;
+}
+
+static READ32_HANDLER( jaguar_eeprom_cs )
+{
+	eeprom_set_cs_line(ASSERT_LINE);	/* must do at end of an operation */
+	eeprom_set_cs_line(CLEAR_LINE);		/* enable chip for next operation */
+	eeprom_write_bit(1);			/* write a start bit */
+	eeprom_set_clock_line(PULSE_LINE);
+	eeprom_bit_count = 0;
+	return 0;
 }
 
 
@@ -188,8 +243,8 @@ static WRITE32_HANDLER( dspctrl_w )
 
 static READ32_HANDLER( joystick_r )
 {
-	UINT16 joystick_result = 0xffff;
-	UINT16 joybuts_result = 0xffff;
+	UINT16 joystick_result = 0xfffe;
+	UINT16 joybuts_result = 0xfffb;
 	int i;
 	static const char *const keynames[2][8] =
 			{
@@ -222,6 +277,9 @@ static READ32_HANDLER( joystick_r )
 		}
 	}
 
+	joystick_result |= eeprom_read_bit();
+	joybuts_result |= (input_port_read(space->machine, "CONFIG") & 4);
+
 	return (joystick_result << 16) | joybuts_result;
 }
 
@@ -243,7 +301,7 @@ static WRITE32_HANDLER( joystick_w )
      *      col_bit|11 10  9  8     1    0
      *      -------+--+--+--+--    ---+------
      *         0   | R  L  D  U     A  PAUSE       (RLDU = Joypad directions)
-     *         1   | *  7  4  1     B
+     *         1   | 1  4  7  *     B
      *         2   | 2  5  8  0     C
      *         3   | 3  6  9  #   OPTION
      *
@@ -261,7 +319,7 @@ static WRITE32_HANDLER( joystick_w )
      *      -------+--+--+--+--    ---+------
      *         4   | 3  6  9  #   OPTION
      *         5   | 2  5  8  0     C
-     *         6   | *  7  4  1     B
+     *         6   | 1  4  7  *     B
      *         7   | R  L  D  U     A  PAUSE     (RLDU = Joypad directions)
      *
      *   mute (mu):   sound control
@@ -299,20 +357,18 @@ static ADDRESS_MAP_START( jaguar_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xf03000, 0xf03fff) AM_MIRROR(0x008000) AM_RAM AM_BASE(&jaguar_gpu_ram) AM_SHARE(3)
 	AM_RANGE(0xf10000, 0xf103ff) AM_READWRITE(jaguar_jerry_regs32_r, jaguar_jerry_regs32_w)
 	AM_RANGE(0xf14000, 0xf14003) AM_READWRITE(joystick_r, joystick_w)
-	AM_RANGE(0xf14800, 0xf14fff) AM_NOP			// GPI00
-	AM_RANGE(0xf15000, 0xf15fff) AM_NOP			// GPI01
-	AM_RANGE(0xf16000, 0xf1600b) AM_READ(cojag_gun_input_r)	// GPI02
-	AM_RANGE(0xf17000, 0xf177ff) AM_NOP			// GPI03
-	//AM_RANGE(0xf17800, 0xf17803) AM_WRITE(latch_w)	// GPI04
-	AM_RANGE(0xf17800, 0xf17bff) AM_NOP			// GPI04
-	AM_RANGE(0xf17c00, 0xf17fff) AM_NOP			// GPI05
+	AM_RANGE(0xf14800, 0xf14803) AM_READWRITE(jaguar_eeprom_clk,jaguar_eeprom_w)	// GPI00
+	AM_RANGE(0xf15000, 0xf15003) AM_READ(jaguar_eeprom_cs)				// GPI01
+///	AM_RANGE(0xf16000, 0xf1600b) AM_READ(cojag_gun_input_r)				// GPI02
+///	AM_RANGE(0xf17000, 0xf177ff) AM_NOP						// GPI03
+	//AM_RANGE(0xf17800, 0xf17803) AM_WRITE(latch_w)				// GPI04
+///	AM_RANGE(0xf17800, 0xf17bff) AM_NOP						// GPI04
+///	AM_RANGE(0xf17c00, 0xf17fff) AM_NOP						// GPI05
 	AM_RANGE(0xf1a100, 0xf1a13f) AM_READWRITE(dspctrl_r, dspctrl_w)
 	AM_RANGE(0xf1a140, 0xf1a17f) AM_READWRITE(jaguar_serial_r, jaguar_serial_w)
 	AM_RANGE(0xf1b000, 0xf1cfff) AM_RAM AM_BASE(&jaguar_dsp_ram) AM_SHARE(4)
 	AM_RANGE(0xf1d000, 0xf1dfff) AM_ROM AM_REGION("maincpu", 0xf1d000)
 ADDRESS_MAP_END
-
-
 
 /*************************************
  *
@@ -441,6 +497,11 @@ static INPUT_PORTS_START( jaguar )
 //	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 //	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 //	PORT_BIT( 0xfff00000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("CONFIG")
+	PORT_CONFNAME( 0x04, 0x04, "TV System")
+	PORT_CONFSETTING(    0x00, "PAL")
+	PORT_CONFSETTING(    0x04, "NTSC")
 INPUT_PORTS_END
 
 
@@ -477,6 +538,7 @@ static MACHINE_DRIVER_START( jaguar )
 	MDRV_CPU_PROGRAM_MAP(gpu_map)
 
 	MDRV_MACHINE_RESET(jaguar)
+	MDRV_NVRAM_HANDLER(jaguar)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -542,7 +604,7 @@ static DRIVER_INIT( jaguar )
 	state_save_register_global(machine, eeprom_enable);
 
 	/* init the sound system and install DSP speedups */
-//	cojag_sound_init(machine);
+//	cojag_sound_init(machine);	// rom makes this redundant
 }
 
 static QUICKLOAD_LOAD( jaguar )
@@ -594,5 +656,5 @@ static DEVICE_IMAGE_LOAD( jaguar )
  *************************************/
 
 /*    YEAR   NAME      PARENT    COMPAT  MACHINE   INPUT     INIT      CONFIG  COMPANY    FULLNAME */
-CONS( 1993,  jaguar,   0,        0,      jaguar,   jaguar,   jaguar,   0,      "Atari",   "Atari Jaguar", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING)
+CONS( 1993,  jaguar,   0,        0,      jaguar,   jaguar,   jaguar,   0,      "Atari",   "Atari Jaguar", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 CONS( 1995,  jaguarcd, jaguar,   0,      jaguar,   jaguar,   jaguar,   0,      "Atari",   "Atari Jaguar CD", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING)
