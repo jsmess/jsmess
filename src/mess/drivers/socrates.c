@@ -907,7 +907,7 @@ MACHINE_DRIVER_END
 ******************************************************************************/
 
 ROM_START(socrates)
-    ROM_REGION(0x80000, "maincpu", 0)
+    ROM_REGION(0x400000, "maincpu", 0) /* can technically address 4mb of rom via bankswitching */
     /* Socrates US NTSC */
 	/* all cart roms are 28 pin 23c1000/tc531000 128Kx8 roms */
 	/* cart port pinout:
@@ -935,18 +935,18 @@ ROM_START(socrates)
     ROM_DEFAULT_BIOS("nocart")
     ROM_LOAD("27-00817-000-000.u1", 0x00000, 0x40000, CRC(80f5aa20) SHA1(4fd1ff7f78b5dd2582d5de6f30633e4e4f34ca8f))
     ROM_SYSTEM_BIOS( 0, "nocart", "Socrates w/o cartridge installed")
-    ROM_FILL(0x40000, 0x40000, 0xf3) /* fill empty space with 0xf3 */
+    ROM_FILL(0x40000, 0x3C0000, 0xf3) /* fill empty space with 0xf3 */
     ROM_SYSTEM_BIOS( 1, "maze", "Socrates w/Amazing Mazes cartridge installed")
     ROMX_LOAD("27-5050-00.u1", 0x40000, 0x20000, CRC(95B84308) SHA1(32E065E8F48BAF0126C1B9AA111C291EC644E387), ROM_BIOS(2)) // Label: "(Vtech) 27-5050-00 // TC531000CP-L332 // (C)1989 VIDEO TECHNOLOGY // 8931EAI   JAPAN"; Alt label: "(Vtech) LH53101Y // (C)1989 VIDEO TECHNOLOGY // 8934 D"
     ROM_SYSTEM_BIOS( 2, "world", "Socrates w/Around the World cartridge installed")
     ROMX_LOAD("27-5013-00-0.u1", 0x40000, 0x20000, BAD_DUMP CRC(DD5C185A) SHA1(F179A28A38588AE8C7044AA8ADAAF9684F01791C), ROM_BIOS(3)) // Label: "(Vtech) 27-5013-00-0 // TC531000CP-L318 // (C)1989 VIDEO TECHNOLOGY // 8918EAI   JAPAN" (may not be a bad dump but crashes very quickly, will redump soon)
     ROM_SYSTEM_BIOS( 3, "fracts", "Socrates w/Facts'N Fractions cartridge installed")
-    ROMX_LOAD("facts'n_fractions.bin", 0x40000, 0x20000, CRC(7118617B) SHA1(52268EF0ADB651AD62773FB2EBCB7506759B2686), ROM_BIOS(4))
+    ROMX_LOAD("27-5001-00-0.u1", 0x40000, 0x20000, CRC(7118617B) SHA1(52268EF0ADB651AD62773FB2EBCB7506759B2686), ROM_BIOS(4)) // Label: "(Vtech) 27-5001-00-0 // TC531000CP-L313 // (C)1988 VIDEO TECHNOLOGY // 8918EAI   JAPAN"
     ROM_SYSTEM_BIOS( 4, "hodge", "Socrates w/Hodge Podge cartridge installed")
     ROMX_LOAD("hodge_podge.bin", 0x40000, 0x20000, CRC(19E1A301) SHA1(649A7791E97BCD0D31AC65A890FACB5753AB04A3), ROM_BIOS(5))
-    ROM_SYSTEM_BIOS( 5, "memory", "Socrates w/Facts'N Fractions cartridge installed")
-    ROMX_LOAD("memory_mania.bin", 0x40000, 0x20000, CRC(3C7FD651) SHA1(3118F53625553010EC95EA91DA8320CCE3DC7FE4), ROM_BIOS(6))
-    ROM_SYSTEM_BIOS( 6, "state", "Socrates w/Facts'N Fractions cartridge installed")
+    ROM_SYSTEM_BIOS( 5, "memoryb", "Socrates w/Memory Mania rev B cartridge installed")
+    ROMX_LOAD("27-5002-00-0.u1", 0x40000, 0x20000, CRC(3C7FD651) SHA1(3118F53625553010EC95EA91DA8320CCE3DC7FE4), ROM_BIOS(6)) // Label: "(Vtech) 27-5002-00-0 // TC531000CP-L314 // (C)1988 VIDEO TECHNOLOGY // 8905EAI   JAPAN" (cart has a small B sticker on it, and rom has a big B sticker; cart pcb shows signs of resoldering, which leads me to believe this is the B revision of the rom code for this game)
+    ROM_SYSTEM_BIOS( 6, "state", "Socrates w/State to State cartridge installed")
     ROMX_LOAD("state_to_state.bin", 0x40000, 0x20000, CRC(5848379F) SHA1(961C9CA4F28A9E02AA1D67583B2D2ADF8EE5F10E), ROM_BIOS(7))
 // a cartridge called 'game master' is supposed to be here
 // an international-only? cartridge called 'puzzles' is supposed to be here
