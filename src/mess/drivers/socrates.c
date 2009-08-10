@@ -6,12 +6,10 @@
 *  
 *  (driver structure copied from vtech1.c)
 TODO:
-	fix glitches with keyboard input (can't spell "igloo" in scramble due to problem with double keys, letter entry in super painter doesn't work) <- is this still true?
+	fix glitches with keyboard input (double keys still don't work, super painter letter entry still doesn't work)
 	hook up hblank
 	hook up mouse
 	add waitstates for ram access (lack of this causes the system to run way too fast)
-	hook up cartridges using the bios system
-	hook up sound regs
 	find and hook up any timers/interrupt controls
 	
 
@@ -236,7 +234,7 @@ READ8_HANDLER( read_f3 ) // used for read-only i/o ports as mame/mess doesn't ha
  return 0xF3;
 }
 
-WRITE8_HANDLER( unknownlatch_30 ) // writes to i/o 0x3x do SOMETHING, possibly waitstate related (may halt cpu until vblank start?)
+WRITE8_HANDLER( unknownlatch_30 ) // writes to i/o 0x3x do SOMETHING, possibly waitstate related (may halt cpu until vblank start?) or involve status reg bit 6
 {
 //logerror("write to i/o 0x30, data %x\n", data); // too annoying to leave enabled
 }
@@ -244,7 +242,7 @@ WRITE8_HANDLER( unknownlatch_30 ) // writes to i/o 0x3x do SOMETHING, possibly w
 READ8_HANDLER( status_and_speech ) // read 0x4x, some sort of status reg
 {
 // bit 7 - speech status: high when speech is playing, low when it is not (or when speech cart is not present)
-// bit 6 - unknown, usually set
+// bit 6 - unknown, usually set, may involve the writes to 0x30, possibly some sort of fixed-length timer?
 // bit 5 - vblank status, high when not in vblank
 // bit 4 - hblank status, high when not in hblank
 // bit 3 - speech chip bit 3
@@ -345,7 +343,7 @@ WRITE8_HANDLER( speech_command ) // write 0x4x, some sort of bitfield; speech ch
 	1101
 	1110	SSTART (same as start but syspd speed is ignored and forced to be set to 9 (scale = 1.0))
 	1111
-*/
+end hd38880 info.*/
 /* the socrates speech chip does not QUITE match the hd38880 though, but is very similar */
 	switch(data&0xF0)
 	{
@@ -647,9 +645,14 @@ static ADDRESS_MAP_START(z80_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x10, 0x17) AM_READWRITE(read_f3, socrates_sound_w) AM_MIRROR (0x8) /* sound section:
         0x10 - W - frequency control for channel 1 (louder channel) - 01=high pitch, ff=low; time between 1->0/0->1 transitions = (XTAL_21_4772MHz/(512+256) / (freq_reg+1)) (note that this is double the actual frequency since each full low and high squarewave pulse is two transitions)
 	0x11 - W - frequency control for channel 2 (softer channel) - 01=high pitch, ff=low; same equation as above
-	0x12 - W - 0b****VVVV volume control for channel 1
-	0x13 - W - 0b****VVVV volume control for channel 2
-	0x14-0x17 - ?DAC? related? makes noise when written to... code implies 0x16 and 0x17 are mirrors of 0x14 and 0x15 respectively.
+	0x12 - W - 0b***EVVVV enable, volume control for channel 1
+	0x13 - W - 0b***EVVVV enable, volume control for channel 2
+	0x14-0x17 - 0bE??????? enable, unknown for channel 3; produces well defined dmc waves when bit 7 is set, and one or two other bits
+	This may be some sort of debug register for serial-dmc banging out some internal rom from the asic, maybe color data?
+	No writes to ram seem to change the waveforms produced, in my limited testing.
+	0x80 produces about a very very quiet 1/8 duty cycle wave at 60hz or so
+	0xC0 produces a DMC wave read from an unknown address at around 342hz
+	0x
 	*/
 	AM_RANGE(0x20, 0x21) AM_READWRITE(read_f3, socrates_scroll_w) AM_MIRROR (0xe) /* graphics section:
 	0x20 - W - lsb offset of screen display
@@ -863,8 +866,8 @@ static TIMER_CALLBACK( clear_irq_cb )
 static INTERRUPT_GEN( assert_irq )
 {
 	cpu_set_input_line(device, 0, ASSERT_LINE);
-	timer_set(device->machine, cpu_clocks_to_attotime(device, 144), NULL, 0, clear_irq_cb);
-// 144 is a complete and total guess, need to properly measure how many clocks/microseconds the int line is high for.
+	timer_set(device->machine, cpu_clocks_to_attotime(device, 44), NULL, 0, clear_irq_cb);
+// 44 is a complete and total guess, need to properly measure how many clocks/microseconds the int line is high for.
 	socrates.vblankstate = 1;
 }
 
@@ -906,9 +909,49 @@ MACHINE_DRIVER_END
 ROM_START(socrates)
     ROM_REGION(0x80000, "maincpu", 0)
     /* Socrates US NTSC */
+	/* all cart roms are 28 pin 23c1000/tc531000 128Kx8 roms */
+	/* cart port pinout:
+	(looking into end of disk-shaped cartridge with label/top side pointing to the right)
+	A15 -> 19  18 -- VCC
+	A14 -> 20  17 <- A16
+	A13 -> 21  16 <- A12
+	 A8 -> 22  15 <- A7
+	 A9 -> 23  14 <- A6
+	A11 -> 24  13 <- A5
+	 A3 -> 25  12 <- A4
+	 A2 -> 26  11 <- A10
+	 D7 <- 27  10 <- A1
+	 D6 <- 28  9 <- A0
+	 D5 <- 29  8 -> D0
+	 D4 <- 30  7 -> D1
+	 D3 <- 31  6 -> D2
+	  ? ?? 32  5 ?? ?
+	A17 -> 33  4 ?? ?
+	  ? ?? 34  3 ?? ?
+	/CE -> 35  2 ?? ?
+	GND -- 36  1 -- GND
+	Note that a17 goes to what would be pin 2 if a 32 pin rom were installed, which is not the case. (pins 1, 31 and 32 would be tied to vcc)
+	*/
+    ROM_DEFAULT_BIOS("nocart")
     ROM_LOAD("27-00817-000-000.u1", 0x00000, 0x40000, CRC(80f5aa20) SHA1(4fd1ff7f78b5dd2582d5de6f30633e4e4f34ca8f))
+    ROM_SYSTEM_BIOS( 0, "nocart", "Socrates w/o cartridge installed")
     ROM_FILL(0x40000, 0x40000, 0xf3) /* fill empty space with 0xf3 */
-    ROM_LOAD_OPTIONAL("cartridge.bin", 0x40000, 0x20000, NO_DUMP)
+    ROM_SYSTEM_BIOS( 1, "maze", "Socrates w/Amazing Mazes cartridge installed")
+    ROMX_LOAD("27-5050-00.u1", 0x40000, 0x20000, CRC(95B84308) SHA1(32E065E8F48BAF0126C1B9AA111C291EC644E387), ROM_BIOS(2)) // Label: "(Vtech) 27-5050-00 // TC531000CP-L332 // (C)1989 VIDEO TECHNOLOGY // 8931EAI   JAPAN"; Alt label: "(Vtech) LH53101Y // (C)1989 VIDEO TECHNOLOGY // 8934 D"
+    ROM_SYSTEM_BIOS( 2, "world", "Socrates w/Around the World cartridge installed")
+    ROMX_LOAD("27-5013-00-0.u1", 0x40000, 0x20000, BAD_DUMP CRC(DD5C185A) SHA1(F179A28A38588AE8C7044AA8ADAAF9684F01791C), ROM_BIOS(3)) // Label: "(Vtech) 27-5013-00-0 // TC531000CP-L318 // (C)1989 VIDEO TECHNOLOGY // 8918EAI   JAPAN" (may not be a bad dump but crashes very quickly, will redump soon)
+    ROM_SYSTEM_BIOS( 3, "fracts", "Socrates w/Facts'N Fractions cartridge installed")
+    ROMX_LOAD("facts'n_fractions.bin", 0x40000, 0x20000, CRC(7118617B) SHA1(52268EF0ADB651AD62773FB2EBCB7506759B2686), ROM_BIOS(4))
+    ROM_SYSTEM_BIOS( 4, "hodge", "Socrates w/Hodge Podge cartridge installed")
+    ROMX_LOAD("hodge_podge.bin", 0x40000, 0x20000, CRC(19E1A301) SHA1(649A7791E97BCD0D31AC65A890FACB5753AB04A3), ROM_BIOS(5))
+    ROM_SYSTEM_BIOS( 5, "memory", "Socrates w/Facts'N Fractions cartridge installed")
+    ROMX_LOAD("memory_mania.bin", 0x40000, 0x20000, CRC(3C7FD651) SHA1(3118F53625553010EC95EA91DA8320CCE3DC7FE4), ROM_BIOS(6))
+    ROM_SYSTEM_BIOS( 6, "state", "Socrates w/Facts'N Fractions cartridge installed")
+    ROMX_LOAD("state_to_state.bin", 0x40000, 0x20000, CRC(5848379F) SHA1(961C9CA4F28A9E02AA1D67583B2D2ADF8EE5F10E), ROM_BIOS(7))
+// a cartridge called 'game master' is supposed to be here
+// an international-only? cartridge called 'puzzles' is supposed to be here
+// Cad professor mouse is supposed to be here
+// the touch pad cartridge is supposed to be here
 
     ROM_REGION(0x10000, "vram", 0)
     ROM_FILL(0x0000, 0xffff, 0xff) /* fill with ff, driver_init changes this to the 'correct' startup pattern */
