@@ -1823,8 +1823,13 @@ TIMER_CALLBACK( perform_hbl )
 {
 	int ch, ctrl;
 	gba_state *gba_state = machine->driver_data;
+	int scanline = video_screen_get_vpos(machine->primary_screen);
 	
-	gba_draw_scanline(machine, video_screen_get_vpos(machine->primary_screen));	// we are now in hblank
+	// draw only visible scanlines
+	if (scanline < 160)
+	{
+		gba_draw_scanline(machine, scanline);
+	}
 	gba_state->DISPSTAT |= DISPSTAT_HBL;
 	if ((gba_state->DISPSTAT & DISPSTAT_HBL_IRQ_EN ) != 0)
 	{
