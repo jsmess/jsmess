@@ -931,6 +931,15 @@ ROM_START(socrates)
 	/CE -> 35  2 ?? ?
 	GND -- 36  1 -- GND
 	Note that a17 goes to what would be pin 2 if a 32 pin rom were installed, which is not the case. (pins 1, 31 and 32 would be tied to vcc)
+	
+	Cartridge check procedure by socrates is, after screen init and check for speech synth,
+	bankswitch to bank 0x10 (i.e. first 0x4000 of cart appears at 4000-7fff in z80 space),
+	do following tests; if any tests fail, jump to 0x0015 (socrates main menu)
+	* read 0x7ff0(0x3ff0 in cart rom) and compare to 0xAA
+	* read 0x7ff1(0x3ff1 in cart rom) and compare to 0x55
+	* read 0x7ff2(0x3ff2 in cart rom) and compare to 0xE7
+	* read 0x7ff3(0x3ff3 in cart rom) and compare to 0x18
+	if all tests passed, jump to 0x4000 (0x0000 in cart rom)
 	*/
     ROM_DEFAULT_BIOS("nocart")
     ROM_LOAD("27-00817-000-000.u1", 0x00000, 0x40000, CRC(80f5aa20) SHA1(4fd1ff7f78b5dd2582d5de6f30633e4e4f34ca8f))
@@ -939,7 +948,7 @@ ROM_START(socrates)
     ROM_SYSTEM_BIOS( 1, "maze", "Socrates w/Amazing Mazes cartridge installed")
     ROMX_LOAD("27-5050-00.u1", 0x40000, 0x20000, CRC(95B84308) SHA1(32E065E8F48BAF0126C1B9AA111C291EC644E387), ROM_BIOS(2)) // Label: "(Vtech) 27-5050-00 // TC531000CP-L332 // (C)1989 VIDEO TECHNOLOGY // 8931EAI   JAPAN"; Alt label: "(Vtech) LH53101Y // (C)1989 VIDEO TECHNOLOGY // 8934 D"
     ROM_SYSTEM_BIOS( 2, "world", "Socrates w/Around the World cartridge installed")
-    ROMX_LOAD("27-5013-00-0.u1", 0x40000, 0x20000, BAD_DUMP CRC(DD5C185A) SHA1(F179A28A38588AE8C7044AA8ADAAF9684F01791C), ROM_BIOS(3)) // Label: "(Vtech) 27-5013-00-0 // TC531000CP-L318 // (C)1989 VIDEO TECHNOLOGY // 8918EAI   JAPAN" (may not be a bad dump but crashes very quickly, will redump soon)
+    ROMX_LOAD("27-5013-00-0.u1", 0x40000, 0x20000, CRC(A1E01C38) SHA1(BEEB2869AE1DDC8BBC9A81749AB9662C14DD47D3), ROM_BIOS(3)) // Label: "(Vtech) 27-5013-00-0 // TC531000CP-L318 // (C)1989 VIDEO TECHNOLOGY // 8918EAI   JAPAN"
     ROM_SYSTEM_BIOS( 3, "fracts", "Socrates w/Facts'N Fractions cartridge installed")
     ROMX_LOAD("27-5001-00-0.u1", 0x40000, 0x20000, CRC(7118617B) SHA1(52268EF0ADB651AD62773FB2EBCB7506759B2686), ROM_BIOS(4)) // Label: "(Vtech) 27-5001-00-0 // TC531000CP-L313 // (C)1988 VIDEO TECHNOLOGY // 8918EAI   JAPAN"
     ROM_SYSTEM_BIOS( 4, "hodge", "Socrates w/Hodge Podge cartridge installed")
