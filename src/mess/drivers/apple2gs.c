@@ -56,7 +56,7 @@
 #include "machine/mockngbd.h"
 #include "machine/8530scc.h"
 #include "sound/ay8910.h"
-#include "sound/dac.h"
+#include "sound/speaker.h"
 
 static const gfx_layout apple2gs_text_layout =
 {
@@ -168,7 +168,7 @@ static MACHINE_DRIVER_START( apple2gs )
 
 	MDRV_NVRAM_HANDLER( apple2gs )
 
-	MDRV_SOUND_REPLACE("a2dac", DAC, 0)
+	MDRV_SOUND_REPLACE("a2speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MDRV_SOUND_ADD("es5503", ES5503, APPLE2GS_7M)

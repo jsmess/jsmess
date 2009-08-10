@@ -20,7 +20,7 @@
 #include "devices/sonydriv.h"
 #include "devices/appldriv.h"
 #include "devices/flopdrv.h"
-#include "sound/dac.h"
+#include "sound/speaker.h"
 #include "profiler.h"
 
 #ifdef MAME_DEBUG
@@ -963,13 +963,13 @@ READ8_HANDLER ( apple2_c03x_r )
 {
 	if (!offset)
 	{
-		const device_config *dac_device = devtag_get_device(space->machine, "a2dac");
+		const device_config *speaker_device = devtag_get_device(space->machine, "a2speaker");
 
-		if (a2_speaker_state == 0xFF)
+		if (a2_speaker_state == 1)
 			a2_speaker_state = 0;
 		else
-			a2_speaker_state = 0xFF;
-		dac_data_w(dac_device, a2_speaker_state);
+			a2_speaker_state = 1;
+		speaker_level_w(speaker_device, a2_speaker_state);
 	}
 	return apple2_getfloatingbusvalue(space->machine);
 }

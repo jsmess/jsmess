@@ -193,7 +193,7 @@ Apple 3.5 and Apple 5.25 drives - up to three devices
 #include "machine/applefdc.h"
 #include "machine/mockngbd.h"
 #include "sound/ay8910.h"
-#include "sound/dac.h"
+#include "sound/speaker.h"
 
 
 
@@ -580,7 +580,7 @@ static MACHINE_DRIVER_START( apple2_common )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("a2dac", DAC, 0)
+	MDRV_SOUND_ADD("a2speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	MDRV_SOUND_ADD("ay8913.1", AY8913, 1022727)
 	MDRV_SOUND_CONFIG(apple2_ay8910_interface)
