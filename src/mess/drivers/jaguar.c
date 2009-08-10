@@ -563,7 +563,7 @@ static MACHINE_DRIVER_START( jaguar )
 
 	/* cartridge */
 	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("jag,abs,rom,j64")
+	MDRV_CARTSLOT_EXTENSION_LIST("jag,abs,rom,j64,j01")
 	MDRV_CARTSLOT_LOAD(jaguar)
 MACHINE_DRIVER_END
 
@@ -635,6 +635,15 @@ static DEVICE_IMAGE_LOAD( jaguar )
 	memcpy(jaguar_shared_ram, rom_base, 0x10);
 
 	/* Fix endian-ness */
+	if (!mame_stricmp(image_filetype(image), "j01"))
+	{
+		for (i = 0; i < image_length(image) / 4; i++)
+		{
+			j = cart_base[i];
+			cart_base[i] = ((j & 0xff) << 16) | ((j & 0xff00) << 16) | ((j & 0xff0000) >> 16) | ((j & 0xff000000) >> 16);
+		}
+	}
+	else
 	for (i = 0; i < image_length(image) / 4; i++)
 	{
 		j = cart_base[i];
@@ -656,5 +665,5 @@ static DEVICE_IMAGE_LOAD( jaguar )
  *************************************/
 
 /*    YEAR   NAME      PARENT    COMPAT  MACHINE   INPUT     INIT      CONFIG  COMPANY    FULLNAME */
-CONS( 1993,  jaguar,   0,        0,      jaguar,   jaguar,   jaguar,   0,      "Atari",   "Atari Jaguar", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+CONS( 1993,  jaguar,   0,        0,      jaguar,   jaguar,   jaguar,   0,      "Atari",   "Atari Jaguar", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND)
 CONS( 1995,  jaguarcd, jaguar,   0,      jaguar,   jaguar,   jaguar,   0,      "Atari",   "Atari Jaguar CD", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING)
