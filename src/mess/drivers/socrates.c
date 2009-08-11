@@ -11,6 +11,7 @@ TODO:
 	hook up mouse
 	add waitstates for ram access (lack of this causes the system to run way too fast)
 	find and hook up any timers/interrupt controls
+	switch cartridges over to a CART system rather than abusing BIOS
 	
 
 
@@ -663,7 +664,7 @@ static ADDRESS_MAP_START(z80_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x40, 0x40) AM_READWRITE(status_and_speech, speech_command ) AM_MIRROR(0xf) /* reads status register for vblank/hblank/speech, also reads and writes speech module */
 	AM_RANGE(0x50, 0x50) AM_READWRITE(socrates_keyboard_low_r, socrates_keyboard_clear) AM_MIRROR(0xE) /* Keyboard keycode low, latched on keypress, can be unlatched by writing anything here */
 	AM_RANGE(0x51, 0x51) AM_READWRITE(socrates_keyboard_high_r, socrates_keyboard_clear) AM_MIRROR(0xE) /* Keyboard keycode high, latched as above, unlatches same as above */
-	AM_RANGE(0x60, 0x60) AM_READWRITE(read_f3, reset_speech) AM_MIRROR(0xF) /* reset the speech module  */
+	AM_RANGE(0x60, 0x60) AM_READWRITE(read_f3, reset_speech) AM_MIRROR(0xF) /* reset the speech module, or perhaps fire an NMI?  */
 	AM_RANGE(0x70, 0xFF) AM_READ(read_f3) // nothing mapped here afaik
 ADDRESS_MAP_END
 
@@ -950,13 +951,13 @@ ROM_START(socrates)
     ROM_SYSTEM_BIOS( 2, "world", "Socrates w/Around the World cartridge installed")
     ROMX_LOAD("27-5013-00-0.u1", 0x40000, 0x20000, CRC(A1E01C38) SHA1(BEEB2869AE1DDC8BBC9A81749AB9662C14DD47D3), ROM_BIOS(3)) // Label: "(Vtech) 27-5013-00-0 // TC531000CP-L318 // (C)1989 VIDEO TECHNOLOGY // 8918EAI   JAPAN"
     ROM_SYSTEM_BIOS( 3, "fracts", "Socrates w/Facts'N Fractions cartridge installed")
-    ROMX_LOAD("27-5001-00-0.u1", 0x40000, 0x20000, CRC(7118617B) SHA1(52268EF0ADB651AD62773FB2EBCB7506759B2686), ROM_BIOS(4)) // Label: "(Vtech) 27-5001-00-0 // TC531000CP-L313 // (C)1988 VIDEO TECHNOLOGY // 8918EAI   JAPAN"
-    ROM_SYSTEM_BIOS( 4, "hodge", "Socrates w/Hodge Podge cartridge installed")
-    ROMX_LOAD("hodge_podge.bin", 0x40000, 0x20000, CRC(19E1A301) SHA1(649A7791E97BCD0D31AC65A890FACB5753AB04A3), ROM_BIOS(5))
+    ROMX_LOAD("27-5001-00-0.u1", 0x40000, 0x20000, CRC(7118617B) SHA1(52268EF0ADB651AD62773FB2EBCB7506759B2686), ROM_BIOS(4)) // Label: "(Vtech) 27-5001-00-0 // TC531000CP-L313 // (C)1988 VIDEO TECHNOLOGY // 8918EAI   JAPAN"; cart has a brown QC sticker
+    ROM_SYSTEM_BIOS( 4, "hodge", "Socrates w/Hodge-Podge cartridge installed")
+    ROMX_LOAD("27-5014-00-0.u1", 0x40000, 0x20000, CRC(19E1A301) SHA1(649A7791E97BCD0D31AC65A890FACB5753AB04A3), ROM_BIOS(5)) // Label: "(Vtech) 27-5014-00-0 // TC531000CP-L316 // (C)1989 VIDEO TECHNOLOGY // 8913EAI   JAPAN"; cart has a green QC sticker
     ROM_SYSTEM_BIOS( 5, "memoryb", "Socrates w/Memory Mania rev B cartridge installed")
     ROMX_LOAD("27-5002-00-0.u1", 0x40000, 0x20000, CRC(3C7FD651) SHA1(3118F53625553010EC95EA91DA8320CCE3DC7FE4), ROM_BIOS(6)) // Label: "(Vtech) 27-5002-00-0 // TC531000CP-L314 // (C)1988 VIDEO TECHNOLOGY // 8905EAI   JAPAN" (cart has a small B sticker on it, and rom has a big B sticker; cart pcb shows signs of resoldering, which leads me to believe this is the B revision of the rom code for this game)
     ROM_SYSTEM_BIOS( 6, "state", "Socrates w/State to State cartridge installed")
-    ROMX_LOAD("state_to_state.bin", 0x40000, 0x20000, CRC(5848379F) SHA1(961C9CA4F28A9E02AA1D67583B2D2ADF8EE5F10E), ROM_BIOS(7))
+    ROMX_LOAD("27-5045-00-0.u1", 0x40000, 0x20000, CRC(5848379F) SHA1(961C9CA4F28A9E02AA1D67583B2D2ADF8EE5F10E), ROM_BIOS(7)) // Label: "(Vtech) 27-5045-00-0 // TC531000CP-L333 // (C)1989 VIDEO TECHNOLOGY // 8931EAI   JAPAN"; cart has a brown QC sticker
 // a cartridge called 'game master' is supposed to be here
 // an international-only? cartridge called 'puzzles' is supposed to be here
 // Cad professor mouse is supposed to be here
@@ -1012,5 +1013,8 @@ SYSTEM_CONFIG_END
 ******************************************************************************/
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT CONFIG      COMPANY                     FULLNAME                            FLAGS */
-COMP( 1988, socrates,   0,          0,      socrates,   socrates, socrates,   socrates,   "V-tech",        "Socrates Educational Video System", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
-COMP( 1988, socratfc,   socrates,   0,      socrates,   socrates, socrates,   socrates,   "V-tech",        "Socrates SAITOUT", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
+COMP( 1988, socrates,   0,          0,      socrates,   socrates, socrates,   socrates,   "V-tech",        "Socrates Educational Video System", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) // English NTSC
+COMP( 1988, socratfc,   socrates,   0,      socrates,   socrates, socrates,   socrates,   "V-tech",        "Socrates SAITOUT", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) // French Canandian NTSC
+// Yeno Professor Weiss-Alles goes here (german PAL)
+// Yeno Professeur Saitout goes here (french SECAM)
+// ? goes here (spanish PAL)
