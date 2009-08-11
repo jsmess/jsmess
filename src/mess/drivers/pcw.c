@@ -402,6 +402,7 @@ static WRITE8_HANDLER(pcw_bank_select_w)
 	pcw_banks[offset] = data;
 
 	pcw_update_mem(space->machine, offset, data);
+	//popmessage("RAM Banks: %02x %02x %02x %02x",pcw_banks[0],pcw_banks[1],pcw_banks[2],pcw_banks[3]); 
 }
 
 static WRITE8_HANDLER(pcw_bank_force_selection_w)
@@ -456,6 +457,7 @@ static WRITE8_HANDLER(pcw_system_control_w)
 		/* reboot */
 		case 1:
 		{
+			cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_RESET, PULSE_LINE);
 			popmessage("SYS: Reboot");
 		}
 		break;
@@ -595,7 +597,7 @@ static READ8_HANDLER(pcw_system_status_r)
 	/* from Jacob Nevins docs */
 	UINT8 ret = pcw_get_sys_status(space->machine);
 	
-	LOG(("SYS: Status port returning %02x\n",ret));
+//	LOG(("SYS: Status port returning %02x\n",ret));
 	return ret;
 }
 
@@ -766,6 +768,7 @@ static MACHINE_START( pcw )
 {
 	fdc_interrupt_code = 2;
 	floppy_drive_set_geometry(image_from_devtype_and_index(machine, IO_FLOPPY, 0), FLOPPY_DRIVE_DS_80);
+	floppy_drive_set_geometry(image_from_devtype_and_index(machine, IO_FLOPPY, 1), FLOPPY_DRIVE_DS_80);
 }
 
 static MACHINE_RESET( pcw )
@@ -773,10 +776,10 @@ static MACHINE_RESET( pcw )
 	/* ram paging is actually undefined at power-on */
 	pcw_bank_force = 0x00;
 	
-	pcw_banks[0] = 0x00;
-	pcw_banks[1] = 0x01;
-	pcw_banks[2] = 0x02;
-	pcw_banks[3] = 0x03;
+	pcw_banks[0] = 0x80;
+	pcw_banks[1] = 0x81;
+	pcw_banks[2] = 0x82;
+	pcw_banks[3] = 0x83;
 
 	pcw_update_mem(machine, 0, pcw_banks[0]);
 	pcw_update_mem(machine, 1, pcw_banks[1]);

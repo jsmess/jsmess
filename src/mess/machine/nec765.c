@@ -504,7 +504,9 @@ static void nec765_seek_setup(const device_config *device, int is_recalibrate)
 			)
 		{
 			/* seek completed */
-			nec765_seek_complete(device);
+//			nec765_seek_complete(device);
+			// delay for the time of 1 step, the PCW does not like immediate recalibrates
+			nec765_setup_timed_int(device,1);
 		}
 		else
 		{
