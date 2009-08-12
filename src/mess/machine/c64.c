@@ -617,7 +617,7 @@ void c64_m6510_port_write(const device_config *device, UINT8 direction, UINT8 da
 		}
 	}
 
-	else if (!ultimax)
+	if (!ultimax)
 		c64_bankswitch(device->machine, 0);
 
 	c64_memory[0x000] = memory_read_byte( cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM), 0 );
