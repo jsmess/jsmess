@@ -1,6 +1,8 @@
 #include "driver.h"
 #include "includes/mikromik.h"
+#include "formats/basicdsk.h"
 #include "devices/basicdsk.h"
+#include "devices/mflopimg.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/8237dma.h"
 #include "machine/nec765.h"
@@ -17,7 +19,7 @@
 	- pixel display
 	- system disks
 	- hook up DMA channels
-	- UPD uPD7220 emulation
+	- NEC uPD7220 emulation (Intel 82720 GDC)
 
 */
 
@@ -249,26 +251,14 @@ ROM_END
 
 /* System Configuration */
 
-static DEVICE_IMAGE_LOAD( mm1_floppy )
-{
-	if (image_has_been_created(image))
-		return INIT_FAIL;
-
-	if (device_load_basicdsk_floppy(image) == INIT_PASS)
-	{
-		int size = image_length(image);
-
-		if (size == 80*2*16*256)  // 640KB
-		{
-			/* image, tracks, heads, sectors per track, sector length, first sector id, offset track zero, track skipping */
-			basicdsk_set_geometry(image, 80, 2, 16, 256, 1, 0, FALSE);
-
-			return INIT_PASS;
-		}
-	}
-
-	return INIT_FAIL;
-}
+static FLOPPY_OPTIONS_START( mm1 )
+	FLOPPY_OPTION( mm1, "dsk", "Nokia MikroMikko 1 disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([80])
+		SECTORS([8])
+		SECTOR_LENGTH([512])
+		FIRST_SECTOR_ID([1]))
+FLOPPY_OPTIONS_END
 
 #ifdef UNUSED_CODE
 static DEVICE_IMAGE_LOAD( mm2_floppy )
@@ -308,15 +298,12 @@ static void dual_640kb_floppy(const mess_device_class *devclass, UINT32 state, u
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:					info->i = 2; break;
+		case MESS_DEVINFO_INT_COUNT:			info->i = 2; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:						info->load = DEVICE_IMAGE_LOAD_NAME(mm1_floppy); break;
+		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:	info->p = (void *) floppyoptions_mm1; break;
 
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:			strcpy(info->s = device_temp_str(), "img"); break;
-
-		default:										legacybasicdsk_device_getinfo(devclass, state, info); break;
+		default:								floppy_device_getinfo(devclass, state, info); break;
 	}
 }
 
