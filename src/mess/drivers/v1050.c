@@ -819,6 +819,13 @@ static WRITE8_DEVICE_HANDLER( misc_8255_a_w )
 	wd17xx_set_density(state->mb8877, BIT(data, 7) ? DEN_FM_LO : DEN_FM_HI);
 }
 
+static WRITE8_DEVICE_HANDLER( misc_8255_b_w )
+{
+	v1050_state *state = device->machine->driver_data;
+
+	centronics_data_w(state->centronics, 0, ~data & 0xff);
+}
+
 static READ8_DEVICE_HANDLER( misc_8255_c_r )
 {
 	/*
@@ -898,7 +905,7 @@ static I8255A_INTERFACE( misc_8255_intf )
 	DEVCB_NULL,							// Port B read
 	DEVCB_HANDLER(misc_8255_c_r),		// Port C read
 	DEVCB_HANDLER(misc_8255_a_w),		// Port A write
-	DEVCB_DEVICE_HANDLER(CENTRONICS_TAG, centronics_data_w),// Port B write
+	DEVCB_HANDLER(misc_8255_b_w),		// Port B write
 	DEVCB_HANDLER(misc_8255_c_w)		// Port C write
 };
 
