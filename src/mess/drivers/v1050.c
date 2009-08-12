@@ -840,7 +840,7 @@ static READ8_DEVICE_HANDLER( misc_8255_c_r )
 
 	UINT8 data = 0;
 
-	data |= centronics_busy_r(state->centronics) << 4;
+	data |= centronics_not_busy_r(state->centronics) << 4;
 	data |= centronics_pe_r(state->centronics) << 5;
 
 	return data;
