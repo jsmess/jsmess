@@ -856,13 +856,16 @@ DRIVER_INIT( sx64 )
 	drive_config(machine, type_1541, 0, 0, "cpu_vc1540", 8);
 }
 
-static void c64_common_init_machine (running_machine *machine)
+MACHINE_START( c64 )
 {
+	c64_port_data = 0x17;
+
+	c64_io_mirror = auto_alloc_array(machine, UINT8, 0x1000);
+
 	if (is_sx64)
 	{
 		drive_reset();
 	}
-
 	else if (c64_cia1_on)
 	{
 		cbm_drive_0_config(SERIAL, 8);
@@ -872,14 +875,6 @@ static void c64_common_init_machine (running_machine *machine)
 
 	c64_vicaddr = c64_memory;
 	vicirq = 0;
-}
-
-MACHINE_START( c64 )
-{
-	c64_port_data = 0x17;
-
-	c64_io_mirror = auto_alloc_array(machine, UINT8, 0x1000);
-	c64_common_init_machine(machine);
 
 	if (!ultimax)
 		c64_bankswitch(machine, 1);
