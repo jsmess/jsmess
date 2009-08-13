@@ -1277,17 +1277,20 @@ static WRITE8_HANDLER( fc3_bank_w )
 static WRITE8_HANDLER( ocean1_bank_w )
 {
 	UINT8 bank = data & 0x3f;
-	UINT8 *mem = memory_region(space->machine, "maincpu");
 	UINT8 *cart = memory_region(space->machine, "cart");
 
-	memcpy(mem + c64_cbm_cart[bank].addr, cart + c64_cbm_cart[bank].start, c64_cbm_cart[bank].size);
-
+	if (bank < 32)
+		memcpy(roml, cart + bank * 0x2000, 0x2000);
+	else
+		memcpy(romh, cart + (bank - 32) * 0x2000, 0x2000);
+/*
 	if (log_cart)
 	{
 		logerror("bank %d of size %d successfully loaded at %d!\n", bank, c64_cbm_cart[bank].size, c64_cbm_cart[bank].addr);
 		if (c64_cbm_cart[bank].index != bank)
 			logerror("Warning: According to the CHIP info this should be bank %d, but we are loading it as bank %d!\n", c64_cbm_cart[bank].index, bank);
 	}
+*/
 }
 
 static WRITE8_HANDLER( funplay_bank_w )
