@@ -363,8 +363,7 @@ INTERRUPT_GEN( vic2_frame_interrupt )
 WRITE8_HANDLER ( vic2_port_w )
 {
 	running_machine *machine = space->machine;
-	int startx, cycles;
-	// printf("vic write %04x %04x %04x\n", offset, data, vic2.rasterline);
+	int cycles, realx;
 	DBG_LOG (2, "vic write", ("%.2x:%.2x\n", offset, data));
 	offset &= 0x3f;
 	switch (offset)
@@ -568,33 +567,20 @@ WRITE8_HANDLER ( vic2_port_w )
 
 	cycles = (int)(cpu_get_total_cycles(space->cpu) - vic2.rasterline_start_cpu_cycles);
 
-	if (cycles > VIC2_CYCLESPERLINE - 1) cycles = VIC2_CYCLESPERLINE;
-	startx = VIC2_FIRSTRASTERCOLUMNS + cycles * 8 * (63 / vic2.totalcycles);
-	if (startx >= VIC2_COLUMNS) startx -= VIC2_COLUMNS;
+	realx = VIC2_FIRST_X + cycles * 8 * (VIC2_CYCLESPERLINE / vic2.totalcycles);
+	if (realx > VIC2_MAX_X) realx -= VIC2_MAX_X;
 
 	// sprites chenges are active only from the next raster line
-	// FIX ME : left border width is 8 pixel wrong ?!
-	// printf("%04x-%04x %04x-%04x %04x-%04x\n",startx, VIC2_STARTVISIBLECOLUMNS + VIC2_VISIBLECOLUMNS - 1, VIC2_STARTVISIBLECOLUMNS, VIC2_FIRSTRASTERCOLUMNS - 1, startx, VIC2_FIRSTRASTERCOLUMNS - 1);
+
 	if (vic2.on)
 		if ((vic2.rasterline >= VIC2_FIRSTRASTERLINE) && (vic2.rasterline < VIC2_FIRSTRASTERLINE + VIC2_VISIBLELINES))
-			// if (!strncmp(machine->gamedrv->name, "c64", 3)) // 
 			{
-				if (startx > VIC2_FIRSTRASTERCOLUMNS)
+				if ((realx >= 0) && (realx <= (VIC2_LAST_VISIBLE_X - VIC2_FIRST_VISIBLE_X)))
 				{
-					if (startx < VIC2_STARTVISIBLECOLUMNS + VIC2_VISIBLECOLUMNS)
-						{
-							vic2_drawlines (machine, vic2.rasterline - 1, vic2.rasterline, startx, VIC2_STARTVISIBLECOLUMNS + VIC2_VISIBLECOLUMNS - 1);
-						}
-					vic2_drawlines (machine, vic2.rasterline - 1, vic2.rasterline, VIC2_STARTVISIBLECOLUMNS, VIC2_FIRSTRASTERCOLUMNS + 8 - 1);
-				}
-				else
-				{
-					if (startx >= VIC2_STARTVISIBLECOLUMNS)
-					{
-						vic2_drawlines (machine, vic2.rasterline - 1, vic2.rasterline, startx, VIC2_FIRSTRASTERCOLUMNS + 8 - 1);
-					}
+					vic2_drawlines (machine, vic2.rasterline - 1, vic2.rasterline, realx, VIC2_LAST_VISIBLE_X - VIC2_FIRST_VISIBLE_X);
 				}
 			}
+
 }
 
 READ8_HANDLER ( vic2_port_r )
@@ -1404,11 +1390,10 @@ static void vic2_drawlines (running_machine *machine, int first, int last, int s
 
 #include "vic4567.c"
 
-// TIMER_CALLBACK( vic2_scanline_interrupt )
 INTERRUPT_GEN( vic2_raster_irq )
 {
 	int i,j;
-//	int scanline = param;
+
 	running_machine *machine = device->machine;	
 
 	vic2.rasterline++;
@@ -1430,15 +1415,6 @@ INTERRUPT_GEN( vic2_raster_irq )
 	for (i=0; i < 4; i++)
 		vic2.spritemulti[i] = vic2.spritemulti_buffer[i];
 /*
-	i=0;
-	if (input_code_pressed(KEYCODE_Q)) i = 1;
-	if (input_code_pressed(KEYCODE_W)) i = 2;
-	if (input_code_pressed(KEYCODE_E)) i = 3;
-	if (input_code_pressed(KEYCODE_R)) i = 4;
-	if (input_code_pressed(KEYCODE_T)) i = 5;
-	if (input_code_pressed(KEYCODE_Y)) i = 6;
-	if (input_code_pressed(KEYCODE_U)) i = 7;
-
 	if ((vic2.rasterline % 8) == 0x02)
 	{
 		vic2.reg[0x11] = vic2.reg_buffer[0x11];
@@ -1479,12 +1455,7 @@ INTERRUPT_GEN( vic2_raster_irq )
 		}
 */
 /*
-	if (input_code_pressed(KEYCODE_Q)) { cpunum_set_clock(machine, 0, 0x93203); }
-	if (input_code_pressed(KEYCODE_W)) { cpunum_set_clock(machine, 0, 0xf08a0); }
-	if (input_code_pressed(KEYCODE_E)) printf("%04x    ",cpunum_get_clock(0));
-	if (input_code_pressed(KEYCODE_R)) printf("%04x    ", (int)(cpunum_get_clock(0)*63/103));
 	vic2.raster_mod += 63 - (activecpu_gettotalcycles() - vic2.rasterline_start_cpu_cycles);
-	if (input_code_pressed(KEYCODE_Q)) printf("%04x-%04x ",vic2.raster_mod, (int)(activecpu_gettotalcycles() - vic2.rasterline_start_cpu_cycles));
 	if (vic2.raster_mod > 63)
 	{
 		vic2.raster_mod -= 63;
@@ -1528,8 +1499,6 @@ INTERRUPT_GEN( vic2_raster_irq )
 	if (vic2.on)
 		if ((vic2.rasterline >= VIC2_FIRSTRASTERLINE) && (vic2.rasterline < VIC2_FIRSTRASTERLINE + VIC2_VISIBLELINES))
 			vic2_drawlines (machine, vic2.rasterline - 1, vic2.rasterline, VIC2_STARTVISIBLECOLUMNS, VIC2_STARTVISIBLECOLUMNS + VIC2_VISIBLECOLUMNS);
-
-//	timer_adjust_oneshot(vicii_scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), scanline);
 }
 
 VIDEO_UPDATE( vic2 )
