@@ -1454,19 +1454,7 @@ INTERRUPT_GEN( vic2_raster_irq )
 			vic2.totalcycles = 63;
 		}
 */
-/*
-	vic2.raster_mod += 63 - (activecpu_gettotalcycles() - vic2.rasterline_start_cpu_cycles);
-	if (vic2.raster_mod > 63)
-	{
-		vic2.raster_mod -= 63;
-		vic2.rasterline--;
-	}
-	if (vic2.raster_mod < -63)
-	{
-		vic2.raster_mod += 63;
-		vic2.rasterline++;
-	}
-*/
+
 	if (vic2.rasterline == vic2.lines)
 	{
 		vic2.rasterline = 0;
@@ -1491,6 +1479,7 @@ INTERRUPT_GEN( vic2_raster_irq )
 	{
 		vic2_set_interrupt(machine, 1);
 	}
+
 	if (!c64_pal)
 		if (vic2.rasterline < VIC2_FIRSTRASTERLINE + VIC2_VISIBLELINES - vic2.lines)
 			vic2_drawlines (machine, vic2.rasterline + vic2.lines - 1, vic2.rasterline + vic2.lines, VIC2_STARTVISIBLECOLUMNS, VIC2_STARTVISIBLECOLUMNS + VIC2_VISIBLECOLUMNS);
