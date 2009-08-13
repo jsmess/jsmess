@@ -1404,7 +1404,7 @@ static void setup_c64_custom_mappers(running_machine *machine)
 			memory_install_read8_handler( space, 0xde00, 0xdeff, 0, 0, dinamic_bank_r );
 			break;
 		case COMAL_80:          /* 4 16k banks, loaded at 0x8000, banks chosen by writing(?) to 0xde00 */
-			memory_install_write8_handler( space, 0xde00, 0xdeff, 0, 0, comal80_bank_w );
+			memory_install_write8_handler( space, 0xde00, 0xde00, 0, 0, comal80_bank_w );
 			break;
 		case GENERIC_CRT:       /* single bank, no bankswitch, loaded at start with correct size and place */
 		default:
