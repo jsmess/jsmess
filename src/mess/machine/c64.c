@@ -1357,8 +1357,7 @@ static READ8_HANDLER( dinamic_bank_r )
 
 static WRITE8_HANDLER( comal80_bank_w )
 {
-	UINT8 bank = offset & 0x83;
-	UINT8 *mem = memory_region(space->machine, "maincpu");
+	UINT8 bank = data & 0x83;
 	UINT8 *cart = memory_region(space->machine, "cart");
 
 	/* only valid values 0x80, 0x81, 0x82, 0x83 */
@@ -1367,15 +1366,16 @@ static WRITE8_HANDLER( comal80_bank_w )
 	else
 	{
 		bank &= 0x03;
-		memcpy(mem + c64_cbm_cart[bank].addr, cart + c64_cbm_cart[bank].start, c64_cbm_cart[bank].size);
 
+		memcpy(roml, cart + bank * 0x4000, 0x4000);
+/*
 		if (log_cart)
 		{
 			logerror("bank %d of size %d successfully loaded at %d!\n", bank, c64_cbm_cart[bank].size, c64_cbm_cart[bank].addr);
 			if (c64_cbm_cart[bank].index != bank)
 				logerror("Warning: According to the CHIP info this should be bank %d, but we are loading it as bank %d!\n", c64_cbm_cart[bank].index, bank);
 		}
-	
+*/	
 	}
 }
 
