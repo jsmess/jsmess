@@ -121,6 +121,10 @@ static int pcw_interrupt_counter;
 static UINT8 pcw_banks[4];
 static unsigned char pcw_bank_force = 0;
 
+static UINT8 pcw_timer_irq_flag;
+static UINT8 pcw_nmi_flag;
+
+
 
 static void pcw_update_interrupt_counter(void)
 {
@@ -142,89 +146,58 @@ static const nec765_interface pcw_nec765_interface =
 	NEC765_RDY_PIN_CONNECTED
 };
 
-/* determines if int line is held or cleared */
-static void pcw_interrupt_handle(running_machine *machine)
+// set/reset INT and NMI lines
+static void pcw_update_irqs(running_machine *machine)
 {
-	if (
-		(pcw_interrupt_counter!=0) ||
-		((fdc_interrupt_code==1) && ((pcw_system_status & (1<<5))!=0))
-		)
-	{
-		if(cpu_get_reg(cputag_get_cpu(machine,"maincpu"),Z80_IFF1))
-			cputag_set_input_line(machine, "maincpu", 0,ASSERT_LINE);
-	}
+	// set NMI line, remains set until FDC interrupt type is changed
+	if(pcw_nmi_flag != 0)
+		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
 	else
+		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
+
+	// set IRQ line, timer pulses IRQ line, all other devices hold it as necessary		
+	if(fdc_interrupt_code == 1 && (pcw_system_status & 0x20))
 	{
-		cputag_set_input_line(machine, "maincpu", 0,CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
+		return;
 	}
+	
+	if(pcw_timer_irq_flag != 0)
+	{
+		cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
+		return;
+	}
+
+	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
 }
 
-
+static TIMER_CALLBACK(pcw_timer_pulse)
+{
+	pcw_timer_irq_flag = 0;
+	pcw_update_irqs(machine);
+}
 
 /* callback for 1/300ths of a second interrupt */
 static TIMER_CALLBACK(pcw_timer_interrupt)
 {
 	pcw_update_interrupt_counter();
 
-	pcw_interrupt_handle(machine);
-}
-
-static int previous_fdc_int_state;
-
-/* set/clear fdc interrupt */
-static void	pcw_trigger_fdc_int(running_machine *machine)
-{
-	int state;
-
-	state = pcw_system_status & (1<<5);
-
-	switch (fdc_interrupt_code)
-	{
-		/* attach fdc to nmi */
-		case 0:
-		{
-			/* I'm assuming that the nmi is edge triggered */
-			/* a interrupt from the fdc will cause a change in line state, and
-            the nmi will be triggered, but when the state changes because the int
-            is cleared this will not cause another nmi */
-			/* I'll emulate it like this to be sure */
-
-			if (state!=previous_fdc_int_state)
-			{
-				if (state)
-				{
-					/* Cleared when FDC interrupt mode is set to INT or nothing */
-					cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
-				}
-			}
-		}
-		break;
-
-		/* attach fdc to int */
-		case 1:
-		{
-			pcw_interrupt_handle(machine);
-		}
-		break;
-
-		/* do not interrupt */
-		default:
-			break;
-	}
-
-	previous_fdc_int_state = state;
+	pcw_timer_irq_flag = 1;
+	pcw_update_irqs(machine);
+	timer_set(machine,ATTOTIME_IN_USEC(2),NULL,0,pcw_timer_pulse);
 }
 
 /* fdc interrupt callback. set/clear fdc int */
 static NEC765_INTERRUPT( pcw_fdc_interrupt )
 {
-
 	if (state == CLEAR_LINE)
 		pcw_system_status &= ~(1<<5);
 	else
+	{
 		pcw_system_status |= (1<<5);
-
-	pcw_trigger_fdc_int(device->machine);
+		if(fdc_interrupt_code == 0)  // NMI is held until interrupt type is changed
+			pcw_nmi_flag = 1;
+	}
 }
 
 
@@ -270,7 +243,7 @@ static void pcw_update_read_memory_block(running_machine *machine, int block, in
 		memory_install_read8_handler(space,
 			block * 0x04000 + 0x3ff0, block * 0x04000 + 0x3fff, 0, 0,
 			pcw_keyboard_r);
-		LOG(("MEM: read block %i -> bank %i\n",block,bank));
+//		LOG(("MEM: read block %i -> bank %i\n",block,bank));
 	}
 	else
 	{
@@ -278,7 +251,7 @@ static void pcw_update_read_memory_block(running_machine *machine, int block, in
 		memory_install_read8_handler(space,
 			block * 0x04000 + 0x0000, block * 0x04000 + 0x3fff, 0, 0,
 			(read8_space_func) (STATIC_BANK1 + (FPTR)block));
-		LOG(("MEM: read block %i -> bank %i\n",block,bank));
+//		LOG(("MEM: read block %i -> bank %i\n",block,bank));
 	}
 	memory_set_bankptr(machine, block + 1, mess_ram + ((bank * 0x4000) % mess_ram_size));
 }
@@ -288,7 +261,7 @@ static void pcw_update_read_memory_block(running_machine *machine, int block, in
 static void pcw_update_write_memory_block(running_machine *machine, int block, int bank)
 {
 	memory_set_bankptr(machine, block + 5, mess_ram + ((bank * 0x4000) % mess_ram_size));
-	LOG(("MEM: write block %i -> bank %i\n",block,bank));
+//	LOG(("MEM: write block %i -> bank %i\n",block,bank));
 }
 
 
@@ -388,8 +361,6 @@ static READ8_HANDLER(pcw_interrupt_counter_r)
 	data = pcw_get_sys_status(space->machine);
 	/* clear int counter */
 	pcw_interrupt_counter = 0;
-	/* update interrupt */
-	pcw_interrupt_handle(space->machine);
 	/* return data */
 	LOG(("SYS: IRQ counter read, returning %02x\n",data));
 	return data;
@@ -474,10 +445,9 @@ static WRITE8_HANDLER(pcw_system_control_w)
 			{
 				/* yes */
 
-				pcw_interrupt_handle(space->machine);
+				pcw_update_irqs(space->machine);
 			}
 
-			pcw_trigger_fdc_int(space->machine);
 		}
 		break;
 
@@ -496,11 +466,11 @@ static WRITE8_HANDLER(pcw_system_control_w)
 				/* yes */
 
 				/* clear nmi interrupt */
-				cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
+				pcw_nmi_flag = 0;
 			}
 
 			/* re-issue interrupt */
-			pcw_interrupt_handle(space->machine);
+			pcw_update_irqs(space->machine);
 		}
 		break;
 
@@ -513,15 +483,14 @@ static WRITE8_HANDLER(pcw_system_control_w)
 			fdc_interrupt_code = 2;
 
 			/* previously connected to NMI or INT? */
-			if ((fdc_previous_interrupt_code == 0))
+			if ((fdc_previous_interrupt_code == 0) || (fdc_previous_interrupt_code == 1))
 			{
 				/* yes */
 
 				/* Clear NMI */
-				cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
-
+				pcw_nmi_flag = 0;
 			}
-			pcw_interrupt_handle(space->machine);
+			pcw_update_irqs(space->machine);
 
 		}
 		break;
@@ -657,12 +626,6 @@ the PCW custom ASIC */
 static WRITE8_HANDLER(pcw_expansion_w)
 {
 	logerror("pcw expansion w: %04x %02x\n",offset+0x080, data);
-
-
-
-
-
-
 }
 
 static READ8_HANDLER(pcw_fdc_r)
