@@ -258,6 +258,7 @@ DRVLIBS = \
 	$(MESSOBJ)/booth.a \
 	$(MESSOBJ)/camputers.a \
 	$(MESSOBJ)/canon.a \
+	$(MESSOBJ)/capcom.a \
 	$(MESSOBJ)/cbm.a \
 	$(MESSOBJ)/cbmshare.a \
 	$(MESSOBJ)/cccp.a \
@@ -374,7 +375,6 @@ DRVLIBS = \
 	$(MESSOBJ)/zvt.a \
 	$(MESSOBJ)/shared.a \
 
-#	$(MESSOBJ)/capcom.a \
 
 
 
