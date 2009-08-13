@@ -426,11 +426,11 @@ READ8_HANDLER( snes_r_io )
 						UINT32 faddr = (addr & ~vram_fgr_mask) + (rem >> vram_fgr_shift) +
 							       ((rem & (vram_fgr_count - 1)) << 3);
 
-						vram_read_buffer = snes_vram[(faddr<<1)&0xffff] | snes_vram[((faddr<<1)+1) & 0xffff]<<8;
+						vram_read_buffer = snes_vram[(faddr<<1)&0x1ffff] | snes_vram[((faddr<<1)+1) & 0x1ffff]<<8;
 					}
 					else
 					{
-						vram_read_buffer = snes_vram[(addr<<1)&0xffff] | snes_vram[((addr<<1)+1) & 0xffff]<<8;
+						vram_read_buffer = snes_vram[(addr<<1)&0x1ffff] | snes_vram[((addr<<1)+1) & 0x1ffff]<<8;
 					}
 
 					addr += vram_fgr_increment;
@@ -453,11 +453,11 @@ READ8_HANDLER( snes_r_io )
 						UINT32 faddr = (addr & ~vram_fgr_mask) + (rem >> vram_fgr_shift) +
 							       ((rem & (vram_fgr_count - 1)) << 3);
 
-						vram_read_buffer = snes_vram[(faddr<<1)&0xffff] | snes_vram[((faddr<<1)+1) & 0xffff]<<8;
+						vram_read_buffer = snes_vram[(faddr<<1)&0x1ffff] | snes_vram[((faddr<<1)+1) & 0x1ffff]<<8;
 					}
 					else
 					{
-						vram_read_buffer = snes_vram[(addr<<1)&0xffff] | snes_vram[((addr<<1)+1) & 0xffff]<<8;
+						vram_read_buffer = snes_vram[(addr<<1)&0x1ffff] | snes_vram[((addr<<1)+1) & 0x1ffff]<<8;
 					}
 
 					addr += vram_fgr_increment;
@@ -882,11 +882,11 @@ WRITE8_HANDLER( snes_w_io )
 					UINT32 faddr = (addr & ~vram_fgr_mask) + (rem >> vram_fgr_shift) +
 						       ((rem & (vram_fgr_count - 1)) << 3);
 
-					vram_read_buffer = snes_vram[(faddr<<1)&0xffff] | snes_vram[((faddr<<1)+1) & 0xffff]<<8;
+					vram_read_buffer = snes_vram[(faddr<<1)&0x1ffff] | snes_vram[((faddr<<1)+1) & 0x1ffff]<<8;
 				}
 				else
 				{
-					vram_read_buffer = snes_vram[(addr<<1)&0xffff] | snes_vram[((addr<<1)+1) & 0xffff]<<8;
+					vram_read_buffer = snes_vram[(addr<<1)&0x1ffff] | snes_vram[((addr<<1)+1) & 0x1ffff]<<8;
 				}
 
 			}
@@ -901,11 +901,11 @@ WRITE8_HANDLER( snes_w_io )
 					UINT32 faddr = (addr & ~vram_fgr_mask) + (rem >> vram_fgr_shift) +
 						       ((rem & (vram_fgr_count - 1)) << 3);
 
-					snes_vram[(faddr<<1)&0xffff] = data;
+					snes_vram[(faddr<<1)&0x1ffff] = data;
 				}
 				else
 				{
-					snes_vram[(addr<<1)&0xffff] = data;
+					snes_vram[(addr<<1)&0x1ffff] = data;
 				}
 
 				if (!vram_fgr_high)
@@ -926,11 +926,11 @@ WRITE8_HANDLER( snes_w_io )
 					UINT32 faddr = (addr & ~vram_fgr_mask) + (rem >> vram_fgr_shift) +
 						       ((rem & (vram_fgr_count - 1)) << 3);
 
-					snes_vram[((faddr<<1)+1)&0xffff] = data;
+					snes_vram[((faddr<<1)+1)&0x1ffff] = data;
 				}
 				else
 				{
-					snes_vram[((addr<<1)+1)&0xffff] = data;
+					snes_vram[((addr<<1)+1)&0x1ffff] = data;
 				}
 
 				if (vram_fgr_high)
