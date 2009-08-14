@@ -325,11 +325,13 @@ static void nec765_seek_complete(const device_config *device)
 
 	/* set drive and side */
 	fdc->nec765_status[0] |= fdc->drive | (fdc->side<<2);
-
+	
 	nec765_set_int(device,0);
 	nec765_set_int(device,1);
 
 	fdc->nec765_flags &= ~NEC765_SEEK_ACTIVE;
+	
+	nec765_idle(device);
 }
 
 static TIMER_CALLBACK(nec765_seek_timer_callback)
@@ -489,6 +491,7 @@ static void nec765_seek_setup(const device_config *device, int is_recalibrate)
 	img = current_image(device);
 
 	fdc->FDC_main |= (1<<fdc->drive);
+	fdc->FDC_main |= 0x20;  // execution phase
 
 	/* recalibrate command? */
 	if (is_recalibrate)
@@ -568,7 +571,7 @@ static void nec765_seek_setup(const device_config *device, int is_recalibrate)
 		}
 	}
 
-    nec765_idle(device);
+//    nec765_idle(device);
 
 }
 
