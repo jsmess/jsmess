@@ -1826,7 +1826,7 @@ static void nec765_setup_command(const device_config *device)
 		"Lock"						/* [14] */
 	};
 
-	const device_config *img = current_image(device);
+	const device_config *img;
 	const char *cmd = NULL;
 	chrn_id id;
 
@@ -1862,7 +1862,8 @@ static void nec765_setup_command(const device_config *device)
 
 		case 0x04:  /* sense drive status */
 			nec765_setup_drive_and_side(device);
-
+			img = current_image(device);
+			
 			fdc->nec765_status[3] = fdc->drive | (fdc->side<<2);
 
 			if (img)
@@ -1900,7 +1901,8 @@ static void nec765_setup_command(const device_config *device)
 
 		case 0x0a:      /* read id */
 			nec765_setup_drive_and_side(device);
-
+			img = current_image(device);
+			
 			fdc->nec765_status[0] = fdc->drive | (fdc->side<<2);
 			fdc->nec765_status[1] = 0;
 			fdc->nec765_status[2] = 0;
@@ -2050,7 +2052,7 @@ static void nec765_setup_command(const device_config *device)
 		case 0x02:
 			/* read a track */
 			nec765_setup_drive_and_side(device);
-
+			img = current_image(device);
 			fdc->nec765_status[0] = fdc->drive | (fdc->side<<2);
 			fdc->nec765_status[1] = 0;
 			fdc->nec765_status[2] = 0;

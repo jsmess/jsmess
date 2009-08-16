@@ -371,7 +371,7 @@ static READ8_HANDLER(pcw_interrupt_counter_r)
 
 static WRITE8_HANDLER(pcw_bank_select_w)
 {
-	LOG(("BANK: %2x %x\n",offset, data));
+	//LOG(("BANK: %2x %x\n",offset, data));
 	pcw_banks[offset] = data;
 
 	pcw_update_mem(space->machine, offset, data);
@@ -531,8 +531,8 @@ static WRITE8_HANDLER(pcw_system_control_w)
 		{
 			floppy_drive_set_motor_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 0), 1);
 			floppy_drive_set_motor_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 1), 1);
-			floppy_drive_set_ready_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 0), 1,0);
-			floppy_drive_set_ready_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 1), 1,0);
+			floppy_drive_set_ready_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 0), 1,1);
+			floppy_drive_set_ready_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 1), 1,1);
 		}
 		break;
 
@@ -541,8 +541,8 @@ static WRITE8_HANDLER(pcw_system_control_w)
 		{
 			floppy_drive_set_motor_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 0), 0);
 			floppy_drive_set_motor_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 1), 0);
-			floppy_drive_set_ready_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 0), 0,0);
-			floppy_drive_set_ready_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 1), 0,0);
+			floppy_drive_set_ready_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 0), 0,1);
+			floppy_drive_set_ready_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 1), 0,1);
 		}
 		break;
 
