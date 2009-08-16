@@ -212,6 +212,7 @@ static struct {
 
 	int lastline, rasterline, raster_mod;
 	UINT64 rasterline_start_cpu_cycles, totalcycles;
+	UINT8 rasterX;
 
 	/* background/foreground for sprite collision */
 	UINT8 *screen[216], shift[216];
@@ -780,6 +781,8 @@ VIDEO_START( vic2 )
 			vic2.multi_collision[i] |= 0xc0;
 	}
 
+	vic2.rasterline = 0;
+	vic2.rasterX = 1; // from 1 to 63 (PAL) or from 1 to 65 (NTSC)
 	timer_set(machine, cputag_clocks_to_attotime(machine, "maincpu", 0), NULL, 0, rz_timer_callback);
 }
 
@@ -1396,95 +1399,80 @@ TIMER_CALLBACK( rz_timer_callback )
 {
 	int i,j;
 
-	vic2.rasterline++;
-	vic2.rasterline_start_cpu_cycles = cpu_get_total_cycles(machine->cpu[0]);
-
-//if (vic2.rasterline == 0x40) cpu_suspend(machine->cpu[0], SUSPEND_REASON_SPIN, 0);
-//if (vic2.rasterline == 0x41) cpu_resume(machine->cpu[0], SUSPEND_REASON_SPIN);
-
-	// update sprites registers
-	for (i=0x00; i <= 0x10; i++)
-		vic2.reg[i] = vic2.reg_buffer[i];
-	vic2.reg[0x17] = vic2.reg_buffer[0x17];
-	for (i=0x1b; i <= 0x1d; i++)
-		vic2.reg[i] = vic2.reg_buffer[i];
-	for (i=0x25; i <= 0x2e; i++)
-		vic2.reg[i] = vic2.reg_buffer[i];	
-	for (i=0; i < 8; i++)
+	switch(vic2.rasterX)
 	{
-		vic2.sprites[i].x = vic2.sprites_buffer[i].x;
-		vic2.sprites[i].y = vic2.sprites_buffer[i].y;
-	}
-	for (i=0; i < 4; i++)
-		vic2.spritemulti[i] = vic2.spritemulti_buffer[i];
-/*
-	if ((vic2.rasterline % 8) == 0x02)
-	{
-		vic2.reg[0x11] = vic2.reg_buffer[0x11];
-		if (LINES25)
+	case 1:
+		timer_set(machine, cputag_clocks_to_attotime(machine, "maincpu", 1), NULL, 0, rz_timer_callback);
+		vic2.rasterline++;
+		vic2.rasterline_start_cpu_cycles = cpu_get_total_cycles(machine->cpu[0]);
+
+		//if (vic2.rasterline == 0x40) cpu_suspend(machine->cpu[0], SUSPEND_REASON_SPIN, 0);
+		//if (vic2.rasterline == 0x41) cpu_resume(machine->cpu[0], SUSPEND_REASON_SPIN);
+
+		// update sprites registers
+		for (i=0x00; i <= 0x10; i++)
+			vic2.reg[i] = vic2.reg_buffer[i];
+		vic2.reg[0x17] = vic2.reg_buffer[0x17];
+		for (i=0x1b; i <= 0x1d; i++)
+			vic2.reg[i] = vic2.reg_buffer[i];
+		for (i=0x25; i <= 0x2e; i++)
+			vic2.reg[i] = vic2.reg_buffer[i];	
+		for (i=0; i < 8; i++)
 		{
-			vic2.y_begin = 0;
-			vic2.y_end = vic2.y_begin + 200;
+			vic2.sprites[i].x = vic2.sprites_buffer[i].x;
+			vic2.sprites[i].y = vic2.sprites_buffer[i].y;
 		}
-		else
+		for (i=0; i < 4; i++)
+			vic2.spritemulti[i] = vic2.spritemulti_buffer[i];
+
+		// check is a bad line
+		if (((vic2.rasterline - 1) >= 0x30) && ((vic2.rasterline - 1) <= 0xf7) && (((vic2.rasterline - 1) & 0x07) == VERTICALPOS))
 		{
-			vic2.y_begin = 4;
-			vic2.y_end = vic2.y_begin + 192;
-		}
-
-		vic2.reg[0x16] = vic2.reg_buffer[0x16];
-		if (COLUMNS40)
-		{
-			vic2.x_begin = 0;
-			vic2.x_end = vic2.x_begin + 320;
-		}
-		else
-		{
-			vic2.x_begin = HORIZONTALPOS;
-			vic2.x_end = vic2.x_begin + 320;
-		}
-	}
-*/
-	// check is a bad line
-	if ((vic2.rasterline >= 0x30) && (vic2.rasterline <= 0xf7) && ((vic2.rasterline & 0x07) == VERTICALPOS))
-	{
-		cpu_eat_cycles(machine->cpu[0], 40);
-	}
-
-	if (vic2.rasterline == vic2.lines)
-	{
-		vic2.rasterline = 0;
-
-
-
-		for (i = 0; i < 8; i++)
-		{
-			vic2.sprites[i].repeat = vic2.sprites[i].line = 0;
-			for (j = 0; j < 256; j++)
-				vic2.sprites[i].paintedline[j] = 0;
+			cpu_eat_cycles(machine->cpu[0], 40);
 		}
 
-		if (LIGHTPEN_BUTTON)
+		if (vic2.rasterline == vic2.lines)
 		{
-			/* lightpen timer starten */
-			timer_set (machine, attotime_make(0, 0), NULL, 1, vic2_timer_timeout);
+			vic2.rasterline = 0;
+
+			for (i = 0; i < 8; i++)
+			{
+				vic2.sprites[i].repeat = vic2.sprites[i].line = 0;
+				for (j = 0; j < 256; j++)
+					vic2.sprites[i].paintedline[j] = 0;
+			}
+
+			if (LIGHTPEN_BUTTON)
+			{
+				/* lightpen timer starten */
+				timer_set (machine, attotime_make(0, 0), NULL, 1, vic2_timer_timeout);
+			}
 		}
+
+		if (vic2.rasterline == C64_2_RASTERLINE(RASTERLINE))
+		{
+			vic2_set_interrupt(machine, 1);
+		}
+
+		if (!c64_pal)
+			if (vic2.rasterline < VIC2_FIRSTRASTERLINE + VIC2_VISIBLELINES - vic2.lines)
+				vic2_drawlines (machine, vic2.rasterline + vic2.lines - 1, vic2.rasterline + vic2.lines, VIC2_STARTVISIBLECOLUMNS, VIC2_STARTVISIBLECOLUMNS + VIC2_VISIBLECOLUMNS);
+
+		if (vic2.on)
+			if ((vic2.rasterline >= VIC2_FIRSTRASTERLINE) && (vic2.rasterline < VIC2_FIRSTRASTERLINE + VIC2_VISIBLELINES))
+				vic2_drawlines (machine, vic2.rasterline - 1, vic2.rasterline, VIC2_STARTVISIBLECOLUMNS, VIC2_STARTVISIBLECOLUMNS + VIC2_VISIBLECOLUMNS);
+
+		vic2.rasterX++;
+		break;
+
+	default:
+		vic2.rasterX++;
+		if (vic2.rasterX == 64) vic2.rasterX = 1;
+		timer_set(machine, cputag_clocks_to_attotime(machine, "maincpu", 1), NULL, 0, rz_timer_callback);
+		break;
 	}
 
-	if (vic2.rasterline == C64_2_RASTERLINE(RASTERLINE))
-	{
-		vic2_set_interrupt(machine, 1);
-	}
 
-	if (!c64_pal)
-		if (vic2.rasterline < VIC2_FIRSTRASTERLINE + VIC2_VISIBLELINES - vic2.lines)
-			vic2_drawlines (machine, vic2.rasterline + vic2.lines - 1, vic2.rasterline + vic2.lines, VIC2_STARTVISIBLECOLUMNS, VIC2_STARTVISIBLECOLUMNS + VIC2_VISIBLECOLUMNS);
-
-	if (vic2.on)
-		if ((vic2.rasterline >= VIC2_FIRSTRASTERLINE) && (vic2.rasterline < VIC2_FIRSTRASTERLINE + VIC2_VISIBLELINES))
-			vic2_drawlines (machine, vic2.rasterline - 1, vic2.rasterline, VIC2_STARTVISIBLECOLUMNS, VIC2_STARTVISIBLECOLUMNS + VIC2_VISIBLECOLUMNS);
-
-	timer_set(machine, cputag_clocks_to_attotime(machine, "maincpu", 63), NULL, 0, rz_timer_callback);
 }
 
 VIDEO_UPDATE( vic2 )
