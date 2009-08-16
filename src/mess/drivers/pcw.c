@@ -361,6 +361,8 @@ static READ8_HANDLER(pcw_interrupt_counter_r)
 	data = pcw_get_sys_status(space->machine);
 	/* clear int counter */
 	pcw_interrupt_counter = 0;
+	/* check interrupts */
+	pcw_update_irqs(space->machine);
 	/* return data */
 	LOG(("SYS: IRQ counter read, returning %02x\n",data));
 	return data;
@@ -529,8 +531,8 @@ static WRITE8_HANDLER(pcw_system_control_w)
 		{
 			floppy_drive_set_motor_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 0), 1);
 			floppy_drive_set_motor_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 1), 1);
-			floppy_drive_set_ready_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 0), 1,1);
-			floppy_drive_set_ready_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 1), 1,1);
+			floppy_drive_set_ready_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 0), 1,0);
+			floppy_drive_set_ready_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 1), 1,0);
 		}
 		break;
 
@@ -539,8 +541,8 @@ static WRITE8_HANDLER(pcw_system_control_w)
 		{
 			floppy_drive_set_motor_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 0), 0);
 			floppy_drive_set_motor_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 1), 0);
-			floppy_drive_set_ready_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 0), 1,1);
-			floppy_drive_set_ready_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 1), 1,1);
+			floppy_drive_set_ready_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 0), 0,0);
+			floppy_drive_set_ready_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 1), 0,0);
 		}
 		break;
 
