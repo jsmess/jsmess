@@ -351,7 +351,6 @@ static ADDRESS_MAP_START( jaguar_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xe00000, 0xe1ffff) AM_ROM AM_BASE(&rom_base) AM_SIZE(&rom_size) AM_REGION("maincpu", 0xe00000)
 	AM_RANGE(0xf00000, 0xf003ff) AM_READWRITE(jaguar_tom_regs32_r, jaguar_tom_regs32_w)
 	AM_RANGE(0xf00400, 0xf007ff) AM_RAM AM_BASE(&jaguar_gpu_clut) AM_SHARE(2)
-//	AM_RANGE(0xf00800, 0xf01d9f) AM_MIRROR(0x008000) AM_RAM	// Line Buffer Test Areas
 	AM_RANGE(0xf02100, 0xf021ff) AM_MIRROR(0x008000) AM_READWRITE(gpuctrl_r, gpuctrl_w)
 	AM_RANGE(0xf02200, 0xf022ff) AM_MIRROR(0x008000) AM_READWRITE(jaguar_blitter_r, jaguar_blitter_w)
 	AM_RANGE(0xf03000, 0xf03fff) AM_MIRROR(0x008000) AM_RAM AM_BASE(&jaguar_gpu_ram) AM_SHARE(3)
@@ -359,11 +358,6 @@ static ADDRESS_MAP_START( jaguar_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xf14000, 0xf14003) AM_READWRITE(joystick_r, joystick_w)
 	AM_RANGE(0xf14800, 0xf14803) AM_READWRITE(jaguar_eeprom_clk,jaguar_eeprom_w)	// GPI00
 	AM_RANGE(0xf15000, 0xf15003) AM_READ(jaguar_eeprom_cs)				// GPI01
-///	AM_RANGE(0xf16000, 0xf1600b) AM_READ(cojag_gun_input_r)				// GPI02
-///	AM_RANGE(0xf17000, 0xf177ff) AM_NOP						// GPI03
-	//AM_RANGE(0xf17800, 0xf17803) AM_WRITE(latch_w)				// GPI04
-///	AM_RANGE(0xf17800, 0xf17bff) AM_NOP						// GPI04
-///	AM_RANGE(0xf17c00, 0xf17fff) AM_NOP						// GPI05
 	AM_RANGE(0xf1a100, 0xf1a13f) AM_READWRITE(dspctrl_r, dspctrl_w)
 	AM_RANGE(0xf1a140, 0xf1a17f) AM_READWRITE(jaguar_serial_r, jaguar_serial_w)
 	AM_RANGE(0xf1b000, 0xf1cfff) AM_RAM AM_BASE(&jaguar_dsp_ram) AM_SHARE(4)
@@ -492,26 +486,6 @@ static INPUT_PORTS_START( jaguar )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("P2 Pause") PORT_PLAYER(2)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P2 A") PORT_PLAYER(2)
 	PORT_BIT( 0xfffc, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	/* The remaining ports are needed by the game "Flip Out" */
-	PORT_START("FAKE1_X")				/* fake analog X */
-//	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 320.0/(320.0 - 7 -7), 0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
-
-	PORT_START("FAKE1_Y")				/* fake analog Y */
-//	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, (240.0 - 1)/240, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10)
-
-	PORT_START("FAKE2_X")				/* fake analog X */
-//	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 320.0/(320.0 - 7 -7), 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2)
-
-	PORT_START("FAKE2_Y")				/* fake analog Y */
-//	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, (240.0 - 1)/240, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_PLAYER(2)
-
-	PORT_START("IN3")			/* gun triggers */
-//	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_SPECIAL )	// gun data valid
-//	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_SPECIAL )	// gun data valid
-//	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-//	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-//	PORT_BIT( 0xfff00000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("CONFIG")
 	PORT_CONFNAME( 0x04, 0x04, "TV System")
