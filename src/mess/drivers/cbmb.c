@@ -430,7 +430,7 @@ static MACHINE_DRIVER_START( p500 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6509, VIC6567_CLOCK)        /* 7.8336 MHz */
 	MDRV_CPU_PROGRAM_MAP(p500_mem)
-	MDRV_CPU_PERIODIC_INT(vic2_raster_irq, VIC6567_HRETRACERATE)
+	//MDRV_CPU_PERIODIC_INT(vic2_raster_irq, VIC6567_HRETRACERATE)
 
 	MDRV_MACHINE_RESET( cbmb )
 

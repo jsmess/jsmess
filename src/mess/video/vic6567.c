@@ -779,6 +779,8 @@ VIDEO_START( vic2 )
 		if (i & 0xc0)
 			vic2.multi_collision[i] |= 0xc0;
 	}
+
+	timer_set(machine, cputag_clocks_to_attotime(machine, "maincpu", 0), NULL, 0, rz_timer_callback);
 }
 
 static void vic2_draw_character (running_machine *machine, int ybegin, int yend, int ch, int yoff, int xoff, UINT16 *color, int start_x, int end_x)
@@ -1390,14 +1392,15 @@ static void vic2_drawlines (running_machine *machine, int first, int last, int s
 
 #include "vic4567.c"
 
-INTERRUPT_GEN( vic2_raster_irq )
+TIMER_CALLBACK( rz_timer_callback )
 {
 	int i,j;
 
-	running_machine *machine = device->machine;	
-
 	vic2.rasterline++;
 	vic2.rasterline_start_cpu_cycles = cpu_get_total_cycles(machine->cpu[0]);
+
+//if (vic2.rasterline == 0x40) cpu_suspend(machine->cpu[0], SUSPEND_REASON_SPIN, 0);
+//if (vic2.rasterline == 0x41) cpu_resume(machine->cpu[0], SUSPEND_REASON_SPIN);
 
 	// update sprites registers
 	for (i=0x00; i <= 0x10; i++)
@@ -1442,18 +1445,11 @@ INTERRUPT_GEN( vic2_raster_irq )
 		}
 	}
 */
-/*
-		if (((vic2.reg[0x11] & 7) == (vic2.reg[0x12] & 7)) && (vic2.rasterline >= 0x30) && (vic2.rasterline <= 0xf7)) // bad lines simulation
-		{
-			cpunum_set_clock(machine, 0, 0x57d0d);
-			vic2.totalcycles = 63 - 40;
-		}
-		else
-		{
-			cpunum_set_clock(machine, 0, 0xf08a0);
-			vic2.totalcycles = 63;
-		}
-*/
+	// check is a bad line
+	if ((vic2.rasterline >= 0x30) && (vic2.rasterline <= 0xf7) && ((vic2.rasterline & 0x07) == VERTICALPOS))
+	{
+		cpu_eat_cycles(machine->cpu[0], 40);
+	}
 
 	if (vic2.rasterline == vic2.lines)
 	{
@@ -1484,15 +1480,16 @@ INTERRUPT_GEN( vic2_raster_irq )
 		if (vic2.rasterline < VIC2_FIRSTRASTERLINE + VIC2_VISIBLELINES - vic2.lines)
 			vic2_drawlines (machine, vic2.rasterline + vic2.lines - 1, vic2.rasterline + vic2.lines, VIC2_STARTVISIBLECOLUMNS, VIC2_STARTVISIBLECOLUMNS + VIC2_VISIBLECOLUMNS);
 
-// if (vic2.rasterline == 0x80)
 	if (vic2.on)
 		if ((vic2.rasterline >= VIC2_FIRSTRASTERLINE) && (vic2.rasterline < VIC2_FIRSTRASTERLINE + VIC2_VISIBLELINES))
 			vic2_drawlines (machine, vic2.rasterline - 1, vic2.rasterline, VIC2_STARTVISIBLECOLUMNS, VIC2_STARTVISIBLECOLUMNS + VIC2_VISIBLECOLUMNS);
+
+	timer_set(machine, cputag_clocks_to_attotime(machine, "maincpu", 63), NULL, 0, rz_timer_callback);
 }
 
 VIDEO_UPDATE( vic2 )
 {
-	vic2.rasterline = 0;
+	//vic2.rasterline = 0;
 	if (vic2.on)
 		copybitmap(bitmap, vic2.bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
