@@ -89,7 +89,7 @@
 #define C64_2_RASTERLINE(a) (a)
 #define XPOS (VIC2_STARTVISIBLECOLUMNS + (VIC2_VISIBLECOLUMNS - VIC2_HSIZE)/2)
 #define YPOS (VIC2_STARTVISIBLELINES /* + (VIC2_VISIBLELINES - VIC2_VSIZE)/2 */)
-#define FIRSTLINE ((VIC2_VISIBLELINES - VIC2_VSIZE)/2)
+#define FIRSTLINE 36 /* ((VIC2_VISIBLELINES - VIC2_VSIZE)/2) */
 
 /* 2008-05 FP: lightpen code needs to read input port from c64.c and cbmb.c */
 #define LIGHTPEN_BUTTON		(input_port_read(machine, "OTHER") & 0x04)
@@ -578,7 +578,7 @@ WRITE8_HANDLER ( vic2_port_w )
 			{
 				if ((realx >= 0) && (realx <= (VIC2_LAST_VISIBLE_X - VIC2_FIRST_VISIBLE_X)))
 				{
-					vic2_drawlines (machine, vic2.rasterline - 1, vic2.rasterline, realx, VIC2_LAST_VISIBLE_X - VIC2_FIRST_VISIBLE_X);
+					vic2_drawlines (machine, vic2.rasterline, vic2.rasterline + 1, realx, VIC2_LAST_VISIBLE_X - VIC2_FIRST_VISIBLE_X);
 				}
 			}
 
@@ -781,8 +781,13 @@ VIDEO_START( vic2 )
 			vic2.multi_collision[i] |= 0xc0;
 	}
 
+	// from 0 to 311 (0 first, PAL) or from 0 to 261 (? first, NTSC 6567R56A) or from 0 to 262 (? first, NTSC 6567R8)
 	vic2.rasterline = 0;
-	vic2.rasterX = 1; // from 1 to 63 (PAL) or from 1 to 65 (NTSC)
+
+	// from 1 to 63 (PAL) or from 1 to 65 (NTSC)
+	vic2.rasterX = 1; 
+
+	// immediately call the timer to handle the first line
 	timer_set(machine, cputag_clocks_to_attotime(machine, "maincpu", 0), NULL, 0, rz_timer_callback);
 }
 
@@ -1403,7 +1408,7 @@ TIMER_CALLBACK( rz_timer_callback )
 	{
 	case 1:
 		timer_set(machine, cputag_clocks_to_attotime(machine, "maincpu", 1), NULL, 0, rz_timer_callback);
-		vic2.rasterline++;
+
 		vic2.rasterline_start_cpu_cycles = cpu_get_total_cycles(machine->cpu[0]);
 
 		//if (vic2.rasterline == 0x40) cpu_suspend(machine->cpu[0], SUSPEND_REASON_SPIN, 0);
@@ -1425,11 +1430,13 @@ TIMER_CALLBACK( rz_timer_callback )
 		for (i=0; i < 4; i++)
 			vic2.spritemulti[i] = vic2.spritemulti_buffer[i];
 
+/*
 		// check is a bad line
-		if (((vic2.rasterline - 1) >= 0x30) && ((vic2.rasterline - 1) <= 0xf7) && (((vic2.rasterline - 1) & 0x07) == VERTICALPOS))
+		if ((vic2.rasterline >= 0x30) && (vic2.rasterline <= 0xf7) && ((vic2.rasterline & 0x07) == VERTICALPOS))
 		{
 			cpu_eat_cycles(machine->cpu[0], 40);
 		}
+*/
 
 		if (vic2.rasterline == vic2.lines)
 		{
@@ -1456,18 +1463,23 @@ TIMER_CALLBACK( rz_timer_callback )
 
 		if (!c64_pal)
 			if (vic2.rasterline < VIC2_FIRSTRASTERLINE + VIC2_VISIBLELINES - vic2.lines)
-				vic2_drawlines (machine, vic2.rasterline + vic2.lines - 1, vic2.rasterline + vic2.lines, VIC2_STARTVISIBLECOLUMNS, VIC2_STARTVISIBLECOLUMNS + VIC2_VISIBLECOLUMNS);
+				vic2_drawlines (machine, vic2.rasterline + vic2.lines, vic2.rasterline + vic2.lines + 1, VIC2_STARTVISIBLECOLUMNS, VIC2_STARTVISIBLECOLUMNS + VIC2_VISIBLECOLUMNS);
 
 		if (vic2.on)
-			if ((vic2.rasterline >= VIC2_FIRSTRASTERLINE) && (vic2.rasterline < VIC2_FIRSTRASTERLINE + VIC2_VISIBLELINES))
-				vic2_drawlines (machine, vic2.rasterline - 1, vic2.rasterline, VIC2_STARTVISIBLECOLUMNS, VIC2_STARTVISIBLECOLUMNS + VIC2_VISIBLECOLUMNS);
+			if ((vic2.rasterline >= VIC6569_STARTVISIBLELINES ) && (vic2.rasterline < VIC6569_STARTVISIBLELINES + VIC2_VISIBLELINES))
+				vic2_drawlines (machine, vic2.rasterline, vic2.rasterline + 1, VIC2_STARTVISIBLECOLUMNS, VIC2_STARTVISIBLECOLUMNS + VIC2_VISIBLECOLUMNS);
 
 		vic2.rasterX++;
 		break;
 
+	case 63:
+		vic2.rasterline++;
+		vic2.rasterX = 1;
+		timer_set(machine, cputag_clocks_to_attotime(machine, "maincpu", 1), NULL, 0, rz_timer_callback);
+		break;
+
 	default:
 		vic2.rasterX++;
-		if (vic2.rasterX == 64) vic2.rasterX = 1;
 		timer_set(machine, cputag_clocks_to_attotime(machine, "maincpu", 1), NULL, 0, rz_timer_callback);
 		break;
 	}
