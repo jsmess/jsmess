@@ -424,6 +424,8 @@ static void jaguar_set_palette(UINT16 vmode)
 	{
 		/* YCC full */
 		case 0x000:
+		/* RGB24 */
+		case 0x002:
 			for (i = 0; i < 65536; i++)
 			{
 				UINT8 r = (red_lookup[i >> 8] * (i & 0xff)) >> 8;
@@ -465,6 +467,7 @@ static void jaguar_set_palette(UINT16 vmode)
 		/* others */
 		default:
 			logerror("Can't handle mode %X\n", vmode);
+			fprintf(stderr, "Can't handle mode %X\n", vmode);
 			break;
 	}
 }
@@ -687,7 +690,7 @@ WRITE16_HANDLER( jaguar_tom_regs_w )
 					int hbend = effective_hvalue(ENABLE_BORDERS ? gpu_regs[HBE] : MIN(gpu_regs[HDB1], gpu_regs[HDB2]));
 					int hbstart = effective_hvalue(gpu_regs[ENABLE_BORDERS ? HBB : HDE]);
 					int vperiod = (gpu_regs[VP] & 0x7ff) + 1;
-					int vbend = gpu_regs[VBE] & 0x7ff;
+					int vbend = MAX(gpu_regs[VBE],gpu_regs[VDB]) & 0x7ff;
 					int vbstart = gpu_regs[VBB] & 0x7ff;
 
 					/* adjust for the half-lines */
@@ -774,9 +777,9 @@ static TIMER_CALLBACK( cojag_scanline_update )
 	/* only run if video is enabled and we are past the "display begin" */
 	if ((gpu_regs[VMODE] & 1) && vc >= (gpu_regs[VDB] & 0x7ff))
 	{
-		UINT32 *dest = BITMAP_ADDR32(screen_bitmap, vc / 2, 0);
+		UINT32 *dest = BITMAP_ADDR32(screen_bitmap, vc >> 1, 0);
 		int maxx = visarea->max_x;
-		int hde = effective_hvalue(gpu_regs[HDE]) / 2;
+		int hde = effective_hvalue(gpu_regs[HDE]) >> 1;
 		UINT16 x,scanline[760];
 		UINT8 y,pixel_width = ((gpu_regs[VMODE]>>10)&3)+1;
 
@@ -792,9 +795,23 @@ static TIMER_CALLBACK( cojag_scanline_update )
 		process_object_list(machine, vc, scanline);
 
 		/* copy the data to the target, clipping */
-		for (x = 0; x < 760 && hdb <= maxx && hdb < hde; x++)
-			for (y = 0; y < pixel_width; y++)
-				dest[hdb++] = pen_table[scanline[x]];
+		if ((gpu_regs[VMODE] & 0x106) == 0x002)	/* RGB24 */
+		{
+			for (x = 0; x < 760 && hdb <= maxx && hdb < hde; x+=2)
+				for (y = 0; y < pixel_width; y++)
+				{
+					UINT8 r = pen_table[(scanline[x]&0xff)|256];
+					UINT8 g = pen_table[(scanline[x]>>8)|512];
+					UINT8 b = pen_table[scanline[x+1]&0xff];					
+					dest[hdb++] = MAKE_RGB(r, g, b);
+				}
+		}
+		else
+		{
+			for (x = 0; x < 760 && hdb <= maxx && hdb < hde; x++)
+				for (y = 0; y < pixel_width; y++)
+					dest[hdb++] = pen_table[scanline[x]];
+		}
 	}
 
 	/* adjust the timer in a loop, to handle missed cases */
