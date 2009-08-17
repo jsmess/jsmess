@@ -12,12 +12,11 @@
 
 	TODO:
 
-	- 60 Hz interrupt from NE555
+	- interrupt from NE555
 	- Z80 _WAIT on 6847 _FS or _HS
 	- joystick
 	- tape
 	- 80-column card (MC6845)
-	- save state
 	- B&W mode color artifacting (mc6847 takes care of this?)
 	- Charlemagne / GEM-1000 / Junior Computer
 
@@ -38,11 +37,7 @@ static void mc1000_bankswitch(running_machine *machine)
 	mc1000_state *state = machine->driver_data;
 	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
 
-	/* ROM/RAM */
-	memory_install_readwrite8_handler(program, 0x0000, 0x1fff, 0, 0, SMH_BANK(1), SMH_BANK(1));
-
 	/* MC6845 video RAM */
-	memory_install_readwrite8_handler(program, 0x2000, 0x27ff, 0, 0, SMH_BANK(2), SMH_BANK(2));
 	memory_set_bank(machine, 2, state->mc6845_bank);
 
 	/* extended RAM */
@@ -321,17 +316,17 @@ static READ8_DEVICE_HANDLER( keydata_r )
 	if (!BIT(state->keylatch, 6)) data &= input_port_read(device->machine, "ROW6");
 	if (!BIT(state->keylatch, 7)) data &= input_port_read(device->machine, "ROW7");
 
-	data &= ((input_port_read(device->machine, "MODIFIERS") & 0xc0) | 0x3f);
+	data = (input_port_read(device->machine, "MODIFIERS") & 0xc0) | (data & 0x3f);
 
-//	data &= (((cassette_input(state->cassette) < +0.0) << 7) | 0x7f);
+	if (cassette_input(state->cassette) < +0.0)	data &= 0x7f;
 
 	return data;
 }
 
 static const ay8910_interface ay8910_intf =
 {
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
+	AY8910_SINGLE_OUTPUT,
+	{2200, 2200, 2200},
 	DEVCB_NULL,
 	DEVCB_HANDLER(keydata_r),
 	DEVCB_HANDLER(keylatch_w),
@@ -343,6 +338,7 @@ static const ay8910_interface ay8910_intf =
 static MACHINE_START( mc1000 )
 {
 	mc1000_state *state = machine->driver_data;
+	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
 
 	/* find devices */
 	state->mc6845 = devtag_get_device(machine, MC6845_TAG);
@@ -354,12 +350,14 @@ static MACHINE_START( mc1000 )
 	state->mc6847_video_ram = auto_alloc_array(machine, UINT8, MC1000_MC6847_VIDEORAM_SIZE);
 
 	/* setup memory banking */
+	memory_install_readwrite8_handler(program, 0x0000, 0x1fff, 0, 0, SMH_BANK(1), SMH_BANK(1));
 	memory_configure_bank(machine, 1, 0, 1, memory_region(machine, Z80_TAG), 0);
 	memory_configure_bank(machine, 1, 1, 1, memory_region(machine, Z80_TAG) + 0xc000, 0);
 	memory_set_bank(machine, 1, 1);
 
 	state->rom0000 = 1;
 
+	memory_install_readwrite8_handler(program, 0x2000, 0x27ff, 0, 0, SMH_BANK(2), SMH_BANK(2));
 	memory_configure_bank(machine, 2, 0, 1, memory_region(machine, Z80_TAG) + 0x2000, 0);
 	memory_configure_bank(machine, 2, 1, 1, state->mc6845_video_ram, 0);
 	memory_set_bank(machine, 2, 0);
@@ -375,6 +373,15 @@ static MACHINE_START( mc1000 )
 	memory_set_bank(machine, 5, 0);
 
 	mc1000_bankswitch(machine);
+
+	/* register for state saving */
+	state_save_register_global(machine, state->rom0000);
+	state_save_register_global(machine, state->mc6845_bank);
+	state_save_register_global(machine, state->mc6847_bank);
+	state_save_register_global(machine, state->keylatch);
+	state_save_register_global_pointer(machine, state->mc6845_video_ram, MC1000_MC6845_VIDEORAM_SIZE);
+	state_save_register_global_pointer(machine, state->mc6847_video_ram, MC1000_MC6847_VIDEORAM_SIZE);
+	state_save_register_global(machine, state->mc6847_attr);
 }
 
 static MACHINE_RESET( mc1000 )
@@ -470,4 +477,4 @@ static DRIVER_INIT( mc1000 )
 /* System Drivers */
 
 /*    YEAR	NAME		PARENT		COMPAT	MACHINE		INPUT		INIT		CONFIG		COMPANY				FULLNAME		FLAGS */
-COMP( 1985,	mc1000,		0,			0,		mc1000,		mc1000,		mc1000,		mc1000,		"CCE",				"MC-1000",		0 )
+COMP( 1985,	mc1000,		0,			0,		mc1000,		mc1000,		mc1000,		mc1000,		"CCE",				"MC-1000",		GAME_SUPPORTS_SAVE )
