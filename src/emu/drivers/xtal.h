@@ -108,6 +108,7 @@ enum
 	XTAL_16_9344MHz  	= 16934400,		/* Usually used to drive 90's Yamaha OPL/FM chips */
 	XTAL_17_73447MHz	= 17734470,		/* 4 times the PAL subcarrier */
 	XTAL_18MHz   		= 18000000,		/* S.A.R, Ikari Warriors 3 */
+	XTAL_18_720MHz   	= 18720000,		/* Nokia MikroMikko 1 */
 	XTAL_18_432MHz  	= 18432000,		/* Extremely common, used on 100's of PCBs */
 	XTAL_19_6608MHz		= 19660800,		/* Euro League (bootleg), labeled as "UKI 19.6608 20PF" */
 	XTAL_19_923MHz		= 19923000,		/* Cinematronics vectors */

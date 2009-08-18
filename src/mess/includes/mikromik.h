@@ -2,11 +2,14 @@
 #define __MIKROMIK__
 
 #define SCREEN_TAG			"screen"
-#define I8085_TAG			"i8085"
-#define I8237_TAG			"i8237"
+#define I8085_TAG			"ic40"
+#define I8212_TAG			"ic12"
+#define I8237_TAG			"ic45"
+#define I8253_TAG			"ic6"
 #define I8272_TAG			"i8272"
-#define I8275_TAG			"i8275"
-#define UPD7220_TAG			"upd7220"
+#define I8275_TAG			"ic59"
+#define UPD7201_TAG			"ic11"
+#define UPD7220_TAG			"ic101"
 
 typedef struct _mm1_state mm1_state;
 struct _mm1_state

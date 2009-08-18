@@ -6,20 +6,41 @@
 #include "cpu/i8085/i8085.h"
 #include "machine/8237dma.h"
 #include "machine/nec765.h"
+#include "machine/pit8253.h"
 #include "video/i8275.h"
 #include "video/upd7220.h"
 
 /*
 
+	Nokia Elektroniikka pj
+	Controller ILC 9534
+
+	Parts:
+
+	18,720 MHz oscillator
+	Intel 8085AP (CPU)
+	Intel 8253-5P (PIT)
+	Intel 8275P (CRTC)
+	Intel 8212P (I/OP)
+	Intel 8237A-5P (DMAC)
+	NEC µPD7220C (GDC)
+	NEC µPD7201P (MPSC=uart)
+	TMS4116-15 (16Kx4 DRAM)*4 = 32KB RAM
+
+*/
+
+/*
+
 	TODO:
 
+	- Intel 8212 emulation
 	- PCB layout
 	- character generator
 	- memory mapped I/O
 	- pixel display
 	- system disks
 	- hook up DMA channels
-	- NEC uPD7220 emulation (Intel 82720 GDC)
+	- NEC µPD7220 emulation (Intel 82720 GDC)
 
 */
 
@@ -146,7 +167,7 @@ static DMA8237_OUT_EOP( dma_eop_w )
 
 static const struct dma8237_interface mm1_dma8237_intf =
 {
-	XTAL_14_31818MHz/3, /* this needs to be verified */
+	XTAL_18_720MHz/3, /* this needs to be verified */
 	dma_hrq_changed,
 	memory_dma_r,
 	memory_dma_w,
@@ -172,6 +193,22 @@ static const nec765_interface mm1_nec765_intf =
 	fdc_drq,
 	NULL,
 	NEC765_RDY_PIN_CONNECTED // ???
+};
+
+static const struct pit8253_config mm1_pit8253_intf =
+{
+	{
+		{
+			XTAL_18_720MHz/12, // ???
+			NULL
+		}, {
+			XTAL_18_720MHz/12, // ???
+			NULL
+		}, {
+			XTAL_18_720MHz/12, // ???
+			NULL
+		}
+	}
 };
 
 /* Memory Maps */
@@ -209,7 +246,7 @@ static MACHINE_DRIVER_START( mm1 )
 	MDRV_DRIVER_DATA(mm1_state)
 
 	/* basic system hardware */
-	MDRV_CPU_ADD(I8085_TAG, 8085A, 2000000)
+	MDRV_CPU_ADD(I8085_TAG, 8085A, XTAL_18_720MHz/8) // ???
 	MDRV_CPU_PROGRAM_MAP(mm1_map)
 
 	MDRV_MACHINE_START(mm1)
@@ -228,6 +265,7 @@ static MACHINE_DRIVER_START( mm1 )
 	/* peripheral hardware */
 	MDRV_I8275_ADD(I8275_TAG, mm1_i8275_intf)
 	MDRV_DMA8237_ADD(I8237_TAG, mm1_dma8237_intf)
+	MDRV_PIT8253_ADD(I8253_TAG, mm1_pit8253_intf)
 	MDRV_NEC765A_ADD(I8272_TAG, mm1_nec765_intf)
 MACHINE_DRIVER_END
 
