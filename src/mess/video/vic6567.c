@@ -1399,6 +1399,7 @@ static void vic2_drawlines (running_machine *machine, int first, int last, int s
 }
 
 #include "vic4567.c"
+static int is_bad_line = 0;
 
 TIMER_CALLBACK( rz_timer_callback )
 {
@@ -1407,12 +1408,9 @@ TIMER_CALLBACK( rz_timer_callback )
 	switch(vic2.rasterX)
 	{
 	case 1:
-		timer_set(machine, cputag_clocks_to_attotime(machine, "maincpu", 1), NULL, 0, rz_timer_callback);
+		is_bad_line = ((vic2.rasterline >= 0x30) && (vic2.rasterline <= 0xf7) && ((vic2.rasterline & 0x07) == VERTICALPOS) && SCREENON);
 
 		vic2.rasterline_start_cpu_cycles = cpu_get_total_cycles(machine->cpu[0]);
-
-		//if (vic2.rasterline == 0x40) cpu_suspend(machine->cpu[0], SUSPEND_REASON_SPIN, 0);
-		//if (vic2.rasterline == 0x41) cpu_resume(machine->cpu[0], SUSPEND_REASON_SPIN);
 
 		// update sprites registers
 		for (i=0x00; i <= 0x10; i++)
@@ -1429,14 +1427,6 @@ TIMER_CALLBACK( rz_timer_callback )
 		}
 		for (i=0; i < 4; i++)
 			vic2.spritemulti[i] = vic2.spritemulti_buffer[i];
-
-/*
-		// check is a bad line
-		if ((vic2.rasterline >= 0x30) && (vic2.rasterline <= 0xf7) && ((vic2.rasterline & 0x07) == VERTICALPOS))
-		{
-			cpu_eat_cycles(machine->cpu[0], 40);
-		}
-*/
 
 		if (vic2.rasterline == vic2.lines)
 		{
@@ -1461,6 +1451,17 @@ TIMER_CALLBACK( rz_timer_callback )
 			vic2_set_interrupt(machine, 1);
 		}
 
+		vic2.rasterX++;
+		break;
+
+	case 15:
+		vic2.rasterX++;
+
+		if (is_bad_line) cpu_suspend(machine->cpu[0], SUSPEND_REASON_SPIN, 0);
+
+		break;
+
+	case 20:
 		if (!c64_pal)
 			if (vic2.rasterline < VIC2_FIRSTRASTERLINE + VIC2_VISIBLELINES - vic2.lines)
 				vic2_drawlines (machine, vic2.rasterline + vic2.lines, vic2.rasterline + vic2.lines + 1, VIC2_STARTVISIBLECOLUMNS, VIC2_STARTVISIBLECOLUMNS + VIC2_VISIBLECOLUMNS);
@@ -1472,19 +1473,27 @@ TIMER_CALLBACK( rz_timer_callback )
 		vic2.rasterX++;
 		break;
 
+	case 55:
+		vic2.rasterX++;
+
+		if (is_bad_line) cpu_resume(machine->cpu[0], SUSPEND_REASON_SPIN);
+
+		break;
+
+
 	case 63:
 		vic2.rasterline++;
 		vic2.rasterX = 1;
-		timer_set(machine, cputag_clocks_to_attotime(machine, "maincpu", 1), NULL, 0, rz_timer_callback);
+
 		break;
 
 	default:
 		vic2.rasterX++;
-		timer_set(machine, cputag_clocks_to_attotime(machine, "maincpu", 1), NULL, 0, rz_timer_callback);
+		
 		break;
 	}
 
-
+	timer_set(machine, cputag_clocks_to_attotime(machine, "maincpu", 1), NULL, 0, rz_timer_callback);
 }
 
 VIDEO_UPDATE( vic2 )
