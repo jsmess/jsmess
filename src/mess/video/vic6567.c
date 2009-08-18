@@ -1407,6 +1407,7 @@ TIMER_CALLBACK( rz_timer_callback )
 
 	switch(vic2.rasterX)
 	{
+
 	case 1:
 		is_bad_line = ((vic2.rasterline >= 0x30) && (vic2.rasterline <= 0xf7) && ((vic2.rasterline & 0x07) == VERTICALPOS) && SCREENON);
 
@@ -1456,12 +1457,8 @@ TIMER_CALLBACK( rz_timer_callback )
 
 	case 15:
 		vic2.rasterX++;
-
 		if (is_bad_line) cpu_suspend(machine->cpu[0], SUSPEND_REASON_SPIN, 0);
 
-		break;
-
-	case 20:
 		if (!c64_pal)
 			if (vic2.rasterline < VIC2_FIRSTRASTERLINE + VIC2_VISIBLELINES - vic2.lines)
 				vic2_drawlines (machine, vic2.rasterline + vic2.lines, vic2.rasterline + vic2.lines + 1, VIC2_STARTVISIBLECOLUMNS, VIC2_STARTVISIBLECOLUMNS + VIC2_VISIBLECOLUMNS);
@@ -1470,7 +1467,6 @@ TIMER_CALLBACK( rz_timer_callback )
 			if ((vic2.rasterline >= VIC6569_STARTVISIBLELINES ) && (vic2.rasterline < VIC6569_STARTVISIBLELINES + VIC2_VISIBLELINES))
 				vic2_drawlines (machine, vic2.rasterline, vic2.rasterline + 1, VIC2_STARTVISIBLECOLUMNS, VIC2_STARTVISIBLECOLUMNS + VIC2_VISIBLECOLUMNS);
 
-		vic2.rasterX++;
 		break;
 
 	case 55:
