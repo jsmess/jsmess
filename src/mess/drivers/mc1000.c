@@ -15,7 +15,8 @@
 
 	- cassette
 	- interrupt from NE555
-	- memory wait state at 0x2000-0xffff when !hsync & !vsync
+	- xtal frequency?
+	- Z80 wait at 0x0000-0x1fff when !hsync & !vsync
 	- MC6847 color artifacting is broken
 	- 80-column card (MC6845)
 	- Charlemagne / GEM-1000 / Junior Computer

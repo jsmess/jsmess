@@ -24,6 +24,8 @@ struct _mc1000_state
 	int keylatch;
 
 	/* video state */
+	int hsync;
+	int vsync;
 	UINT8 *mc6845_video_ram;
 	UINT8 *mc6847_video_ram;
 	UINT8 mc6847_attr;
