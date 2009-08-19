@@ -6,6 +6,8 @@
 
   R. Belmont
   Anthony Kruize
+  Angelo Salese
+  Fabio Priuli
   Based on the original MESS driver by Lee Hammerton (aka Savoury Snax)
 
   Driver is preliminary right now.
@@ -199,7 +201,8 @@ static MACHINE_DRIVER_START( snes )
 	MDRV_CPU_ADD("soundcpu", SPC700, 1024000)	/* 1.024 MHz */
 	MDRV_CPU_PROGRAM_MAP(spc_map)
 
-	MDRV_QUANTUM_TIME(HZ(48000))
+//	MDRV_QUANTUM_TIME(HZ(48000))
+	MDRV_QUANTUM_PERFECT_CPU("maincpu")
 
 	MDRV_MACHINE_START( snes_mess )
 	MDRV_MACHINE_RESET( snes )
@@ -218,7 +221,7 @@ static MACHINE_DRIVER_START( snes )
 	MDRV_SOUND_ADD("custom", SNES, 0)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.00)
-	
+
 	MDRV_IMPORT_FROM(snes_cartslot)
 MACHINE_DRIVER_END
 
