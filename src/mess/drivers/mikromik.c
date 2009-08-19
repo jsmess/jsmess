@@ -17,7 +17,9 @@
 
 	Parts:
 
-	18,720 MHz oscillator
+	6,144 MHz xtal
+	18,720 MHz xtal
+	16 MHz xtal
 	Intel 8085AP (CPU)
 	Intel 8253-5P (PIT)
 	Intel 8275P (CRTC)
@@ -25,7 +27,22 @@
 	Intel 8237A-5P (DMAC)
 	NEC µPD7220C (GDC)
 	NEC µPD7201P (MPSC=uart)
+	NEC µPD765 (FDC)
 	TMS4116-15 (16Kx4 DRAM)*4 = 32KB RAM
+
+	DMA channels:
+	
+	0	CRT
+	1	MPSC transmit
+	2	MPSC receive
+	3	FDC
+
+	Interrupts:
+
+	INTR	MPSC
+	RST5.5	FDC
+	RST6.5	8212
+	RST7.5	TC?
 
 */
 
@@ -199,14 +216,14 @@ static const struct pit8253_config mm1_pit8253_intf =
 {
 	{
 		{
-			XTAL_18_720MHz/12, // ???
-			NULL
+			XTAL_6_144MHz/2/2,
+			NULL /* _ITxC */
 		}, {
-			XTAL_18_720MHz/12, // ???
-			NULL
+			XTAL_6_144MHz/2/2,
+			NULL /* _IRxC */
 		}, {
-			XTAL_18_720MHz/12, // ???
-			NULL
+			XTAL_6_144MHz/2/2,
+			NULL /* _AUXC */
 		}
 	}
 };
@@ -217,7 +234,14 @@ static ADDRESS_MAP_START( mm1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1000, 0xfeff) AM_RAM
 	AM_RANGE(0xff00, 0xff0f) AM_DEVREADWRITE(I8237_TAG, dma8237_r, dma8237_w)
+//	AM_RANGE(0xff10, 0xff1f) µPD7201
     AM_RANGE(0xff20, 0xff21) AM_DEVREADWRITE(I8275_TAG, i8275_r, i8275_w)
+	AM_RANGE(0xff30, 0xff33) AM_DEVREADWRITE(I8253_TAG, pit8253_r, pit8253_w)
+//	AM_RANGE(0xff40, 0xff4f) 8212
+	AM_RANGE(0xff50, 0xff50) AM_DEVREAD(UPD765_TAG, nec765_status_r)
+	AM_RANGE(0xff51, 0xff51) AM_DEVREADWRITE(UPD765_TAG, nec765_data_r, nec765_data_w)
+//	AM_RANGE(0xff60, 0xff6f)
+//	AM_RANGE(0xff70, 0xff7f) µPD7220
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -233,7 +257,7 @@ static MACHINE_START( mm1 )
 
 	/* look up devices */
 	state->i8237 = devtag_get_device(machine, I8237_TAG);
-	state->i8272 = devtag_get_device(machine, I8272_TAG);
+	state->upd765 = devtag_get_device(machine, UPD765_TAG);
 	state->i8275 = devtag_get_device(machine, I8275_TAG);
 
 	/* register for state saving */
@@ -246,7 +270,7 @@ static MACHINE_DRIVER_START( mm1 )
 	MDRV_DRIVER_DATA(mm1_state)
 
 	/* basic system hardware */
-	MDRV_CPU_ADD(I8085_TAG, 8085A, XTAL_18_720MHz/8) // ???
+	MDRV_CPU_ADD(I8085_TAG, 8085A, XTAL_6_144MHz)
 	MDRV_CPU_PROGRAM_MAP(mm1_map)
 
 	MDRV_MACHINE_START(mm1)
@@ -266,7 +290,7 @@ static MACHINE_DRIVER_START( mm1 )
 	MDRV_I8275_ADD(I8275_TAG, mm1_i8275_intf)
 	MDRV_DMA8237_ADD(I8237_TAG, mm1_dma8237_intf)
 	MDRV_PIT8253_ADD(I8253_TAG, mm1_pit8253_intf)
-	MDRV_NEC765A_ADD(I8272_TAG, mm1_nec765_intf)
+	MDRV_NEC765A_ADD(UPD765_TAG, mm1_nec765_intf)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( mm1m6 )

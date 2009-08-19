@@ -6,7 +6,7 @@
 #define I8212_TAG			"ic12"
 #define I8237_TAG			"ic45"
 #define I8253_TAG			"ic6"
-#define I8272_TAG			"i8272"
+#define UPD765_TAG			"ic15"
 #define I8275_TAG			"ic59"
 #define UPD7201_TAG			"ic11"
 #define UPD7220_TAG			"ic101"
@@ -16,7 +16,7 @@ struct _mm1_state
 {
 	/* devices */
 	const device_config		*i8237;
-	const device_config		*i8272;
+	const device_config		*upd765;
 	const device_config		*i8275;
 	const device_config		*upd7220;
 };
