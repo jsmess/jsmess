@@ -1094,13 +1094,13 @@ static void snes_update_windowmasks(void)
 				case 0x0:	/* OR */
 					snes_ppu.clipmasks[5][ii] = w1 | w2 ? 0x00 : 0xff;
 					break;
-				case 0x4:	/* AND */
+				case 0x1:	/* AND */
 					snes_ppu.clipmasks[5][ii] = w1 & w2 ? 0x00 : 0xff;
 					break;
-				case 0x8:	/* XOR */
+				case 0x2:	/* XOR */
 					snes_ppu.clipmasks[5][ii] = w1 ^ w2 ? 0x00 : 0xff;
 					break;
-				case 0xc:	/* XNOR */
+				case 0x3:	/* XNOR */
 					snes_ppu.clipmasks[5][ii] = !(w1 ^ w2) ? 0x00 : 0xff;
 					break;
 			}
