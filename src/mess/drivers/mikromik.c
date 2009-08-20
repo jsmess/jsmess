@@ -14,6 +14,21 @@
 
 /*
 
+	TODO:
+
+	- ROM dumps
+	- pixel display
+	- floppy
+	- keyboard
+	- memory banking
+	- PCB layout
+	- NEC µPD7220 (devicify Intel 82720 GDC)
+	- NEC µPD7201
+
+*/
+
+/*
+
 	Nokia Elektroniikka pj
 	Controller ILC 9534
 
@@ -30,7 +45,8 @@
 	NEC µPD7220C (GDC)
 	NEC µPD7201P (MPSC=uart)
 	NEC µPD765 (FDC)
-	TMS4116-15 (16Kx4 DRAM)*4 = 32KB RAM
+	TMS4116-15 (16Kx4 DRAM)*4 = 32KB Video RAM for 7220
+	2164-6P (64Kx1 DRAM)*8 = 64KB Work RAM
 
 	DMA channels:
 	
@@ -41,25 +57,10 @@
 
 	Interrupts:
 
-	INTR	MPSC
-	RST5.5	FDC
-	RST6.5	8212
-	RST7.5	TC?
-
-*/
-
-/*
-
-	TODO:
-
-	- ROM dumps
-	- pixel display
-	- floppy
-	- keyboard
-	- memory banking
-	- PCB layout
-	- NEC µPD7220 (devicify Intel 82720 GDC)
-	- NEC µPD7201
+	INTR	MPSC INT
+	RST5.5	FDC IRQ
+	RST6.5	8212 INT
+	RST7.5	DMA EOP
 
 */
 
@@ -72,6 +73,7 @@ INLINE const device_config *get_floppy_image(running_machine *machine, int drive
 
 static WRITE8_HANDLER( cs6_w )
 {
+	mm1_state *state = space->machine->driver_data;
 	int d = BIT(data, 0);
 
 	switch (offset)
@@ -80,21 +82,27 @@ static WRITE8_HANDLER( cs6_w )
 		break;
 
 	case 1: /* RECALL */
+		state->recall = d;
 		break;
 
 	case 2: /* _RV28/RX21 */
+		state->rx21 = d;
 		break;
 
 	case 3: /* _TX21 */
+		state->tx21 = d;
 		break;
 
 	case 4: /* _RCL */
+		state->rcl = d;
 		break;
 
 	case 5: /* _INTC */
+		state->intc = d;
 		break;
 
-	case 6: /* C?EN (blurry schematics) */
+	case 6: /* LLEN */
+		state->llen = d;
 		break;
 
 	case 7: /* MOTOR ON */
@@ -268,15 +276,25 @@ static DMA8237_CHANNEL_WRITE( fdc_dack_w )
 	nec765_dack_w(state->upd765, 0, data);
 }
 
+static DMA8237_OUT_EOP( dma_eop_w )
+{
+	mm1_state *driver_state = device->machine->driver_data;
+
+	/* floppy terminal count */
+	nec765_set_tc_state(driver_state->upd765, !state);
+
+	cputag_set_input_line(device->machine, I8085A_TAG, I8085_RST75_LINE, state ? CLEAR_LINE : ASSERT_LINE);
+}
+
 static const struct dma8237_interface mm1_dma8237_intf =
 {
-	XTAL_6_144MHz/2/2, // what is this field for?
+	XTAL_6_144MHz/2/2,
 	dma_hrq_changed,
 	memory_dma_r,
 	memory_dma_w,
 	{ NULL, NULL, mpsc_dack_r, fdc_dack_r },
 	{ crtc_dack_w, mpsc_dack_w, NULL, fdc_dack_w },
-	NULL
+	dma_eop_w
 };
 
 /* µPD765 Interface */
@@ -305,14 +323,30 @@ static const nec765_interface mm1_nec765_intf =
 
 static PIT8253_OUTPUT_CHANGED( itxc_w )
 {
+	mm1_state *driver_state = device->machine->driver_data;
+
+	if (!driver_state->intc)
+	{
+		//upd7201_txca_w(driver_state->upd7201, state);
+	}
 }
 
 static PIT8253_OUTPUT_CHANGED( irxc_w )
 {
+	mm1_state *driver_state = device->machine->driver_data;
+
+	if (!driver_state->intc)
+	{
+		//upd7201_rxca_w(driver_state->upd7201, state);
+	}
 }
 
 static PIT8253_OUTPUT_CHANGED( auxc_w )
 {
+	/*mm1_state *driver_state = device->machine->driver_data;
+
+	upd7201_txcb_w(driver_state->upd7201, state);
+	upd7201_rxcb_w(driver_state->upd7201, state);*/
 }
 
 static const struct pit8253_config mm1_pit8253_intf =
@@ -331,6 +365,27 @@ static const struct pit8253_config mm1_pit8253_intf =
 	}
 };
 
+/* 8085A Interface */
+
+static void mm1_sod_w(const device_config *device, int state)
+{
+	/* _BELL */
+}
+
+static int mm1_sid_r(const device_config *device)
+{
+	/* _DSRA */
+	return 1;
+}
+
+static const i8085_config mm1_i8085_config =
+{
+	NULL,				/* INTE changed callback */
+	NULL,				/* STATUS changed callback */
+	mm1_sod_w,			/* SOD changed callback (8085A only) */
+	mm1_sid_r			/* SID changed callback (8085A only) */
+};
+
 /* Machine Initialization */
 
 static MACHINE_START( mm1 )
@@ -345,7 +400,12 @@ static MACHINE_START( mm1 )
 	state->upd7201 = devtag_get_device(machine, UPD7201_TAG);
 
 	/* register for state saving */
-	//state_save_register_global(machine, state->);
+	state_save_register_global(machine, state->llen);
+	state_save_register_global(machine, state->intc);
+	state_save_register_global(machine, state->rx21);
+	state_save_register_global(machine, state->tx21);
+	state_save_register_global(machine, state->rcl);
+	state_save_register_global(machine, state->recall);
 }
 
 /* Machine Drivers */
@@ -356,6 +416,7 @@ static MACHINE_DRIVER_START( mm1 )
 	/* basic system hardware */
 	MDRV_CPU_ADD(I8085A_TAG, 8085A, XTAL_6_144MHz)
 	MDRV_CPU_PROGRAM_MAP(mm1_map)
+	MDRV_CPU_CONFIG(mm1_i8085_config)
 
 	MDRV_MACHINE_START(mm1)
 
@@ -365,6 +426,7 @@ static MACHINE_DRIVER_START( mm1 )
 	MDRV_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
 	MDRV_SCREEN_SIZE( 800, 327 )
 	MDRV_SCREEN_VISIBLE_AREA( 0, 800-1, 0, 327-1 )
+	//MDRV_SCREEN_RAW_PARAMS(XTAL_18_720MHz, ...)
 
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(black_and_white)
@@ -375,7 +437,7 @@ static MACHINE_DRIVER_START( mm1 )
 	/* peripheral hardware */
 	MDRV_I8212_ADD(I8212_TAG, mm1_i8212_intf)
 	MDRV_I8275_ADD(I8275_TAG, mm1_i8275_intf)
-	MDRV_DMA8237_ADD(I8237_TAG, /* XTAL_6_144MHz/2/2, */ mm1_dma8237_intf)
+	MDRV_DMA8237_ADD(I8237_TAG, /* XTAL_6_144MHz/2, */ mm1_dma8237_intf)
 	MDRV_PIT8253_ADD(I8253_TAG, mm1_pit8253_intf)
 	MDRV_NEC765A_ADD(UPD765_TAG, /* XTAL_16MHz/2/2, */ mm1_nec765_intf)
 MACHINE_DRIVER_END
@@ -395,7 +457,7 @@ ROM_START( mm1m6 )
 	ROM_LOAD( "mm1.bin",  0x0000, 0x1000, BAD_DUMP CRC(07400e72) SHA1(354ff97817a607ca38d296af8b2813878d092a08) )
 
 	ROM_REGION( 0x200, "prom", 0 )
-	ROM_LOAD( "mm6349-1.ic24", 0x0000, 0x0200, NO_DUMP )
+	ROM_LOAD( "mmi6349-1.ic24", 0x0000, 0x0200, NO_DUMP )
 
 	ROM_REGION( 0x800, "chargen", 0 )
 	ROM_LOAD( "chargen.ic51", 0x0000, 0x0800, NO_DUMP )
@@ -462,12 +524,12 @@ static void dual_640kb_floppy(const mess_device_class *devclass, UINT32 state, u
 }
 
 static SYSTEM_CONFIG_START( mm1m6 )
-	CONFIG_RAM_DEFAULT	(32 * 1024)
+	CONFIG_RAM_DEFAULT	(64 * 1024)
 	CONFIG_DEVICE(dual_640kb_floppy)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START( mm1m7 )
-	CONFIG_RAM_DEFAULT	(32 * 1024)
+	CONFIG_RAM_DEFAULT	(64 * 1024)
 	CONFIG_DEVICE(dual_640kb_floppy)
 	// 5MB Winchester
 SYSTEM_CONFIG_END

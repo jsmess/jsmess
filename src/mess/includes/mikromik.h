@@ -21,6 +21,15 @@ struct _mm1_state
 {
 	/* video state */
 	UINT8 *char_rom;
+	int llen;
+
+	/* serial state */
+	int intc;
+	int rx21;
+	int tx21;
+	int rcl;
+
+	int recall;
 
 	/* devices */
 	const device_config		*i8212;
