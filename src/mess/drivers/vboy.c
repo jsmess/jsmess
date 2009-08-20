@@ -13,20 +13,17 @@
 #include "devices/cartslot.h"
 #include "vboy.lh"
 
-UINT16 *vboy_l_frame_0;
-UINT16 *vboy_font0;
-UINT16 *vboy_l_frame_1;
-UINT16 *vboy_font1;
-UINT16 *vboy_r_frame_0;
-UINT16 *vboy_font2;
-UINT16 *vboy_r_frame_1;
-UINT16 *vboy_font3;
-UINT16 *vboy_bg_map;
-UINT16 *vboy_paramtab;
-UINT16 *vboy_world;
-UINT16 *vboy_columntab1;
-UINT16 *vboy_columntab2;
-UINT16 *vboy_objects;
+static UINT16 *vboy_font;
+static UINT16 *vboy_bgmap;
+static UINT16 *vboy_l_frame_0;
+static UINT16 *vboy_l_frame_1;
+static UINT16 *vboy_r_frame_0;
+static UINT16 *vboy_r_frame_1;
+static UINT16 *vboy_paramtab;
+static UINT16 *vboy_world;
+static UINT16 *vboy_columntab1;
+static UINT16 *vboy_columntab2;
+static UINT16 *vboy_objects;
 
 struct VBOY_REGS_STRUCT
 {
@@ -36,13 +33,41 @@ struct VBOY_REGS_STRUCT
 	UINT32 tcr, wcr, kcr;
 };
 
-struct VBOY_REGS_STRUCT vboy_regs;
+static struct VBOY_REGS_STRUCT vboy_regs;
 
-READ32_HANDLER( port_02_read )
+struct VIP_REGS_STRUCT
+{
+
+	UINT16 INTPND;
+	UINT16 INTENB;
+	UINT16 DPSTTS;
+	UINT16 DPCTRL;
+	UINT16 BRTA;
+	UINT16 BRTB;
+	UINT16 BRTC;
+	UINT16 REST;
+	UINT16 FRMCYC;
+	UINT16 CTA;
+	UINT16 XPSTTS;
+	UINT16 XPCTRL;
+	UINT16 VER;
+	UINT16 SPT[4];
+	UINT16 GPLT[4];
+	UINT16 JPLT[4]; 
+	UINT16 BKCOL; 
+};
+
+static struct VIP_REGS_STRUCT vip_regs;
+
+static bitmap_t *bg_map[14];
+
+static bitmap_t *screen_output;
+
+static READ32_HANDLER( port_02_read )
 {
 	UINT32 value = 0x00;
 
-	switch (offset & 0xff)
+	switch ((offset << 2))
 	{
 		case 0x10:	// KLB (Keypad Low Byte)
 			value = vboy_regs.klb | 0x02;	// 0x02 is always 1
@@ -66,20 +91,20 @@ READ32_HANDLER( port_02_read )
 		case 0x18:	// TLB (Timer Low Byte)
 		case 0x1c:	// THB (Timer High Byte)
 		default:
-			logerror("Unemulated read: offset %02x\n", offset);
+			logerror("Unemulated read: offset %08x\n", 0x02000000 + (offset << 2));
 			break;
 	}
 	return value;
 }
 
-WRITE32_HANDLER( port_02_write )
+static WRITE32_HANDLER( port_02_write )
 {
-	switch (offset)
+	switch (offset<<2)
 	{
 		case 0x0c:	// LPR (Link Port Receive)
 		case 0x10:	// KLB (Keypad Low Byte)
 		case 0x14:	// KHB (Keypad High Byte)
-			logerror("Ilegal write: offset %02x should be only read\n", offset);
+			//logerror("Ilegal write: offset %02x should be only read\n", offset);
 			break;
 		case 0x20:	// TCR (Timer Control Reg)
 			vboy_regs.kcr = (data | 0xe0) & 0xfd;	// according to docs: bits 5, 6 & 7 are unused and set to 1, bit 1 is read only.
@@ -91,12 +116,12 @@ WRITE32_HANDLER( port_02_write )
 			if (data & 0x04 )
 			{
 				vboy_regs.klb = (data & 0x01) ? 0 : (input_port_read(space->machine, "INPUT") & 0x00ff);
-				vboy_regs.klb = (data & 0x01) ? 0 : (input_port_read(space->machine, "INPUT") & 0xff00) >> 8;
+				vboy_regs.khb = (data & 0x01) ? 0 : (input_port_read(space->machine, "INPUT") & 0xff00) >> 8;
 			}
 			else if (data & 0x20)
 			{
 				vboy_regs.klb = input_port_read(space->machine, "INPUT") & 0x00ff;
-				vboy_regs.klb = (input_port_read(space->machine, "INPUT") & 0xff00) >> 8;
+				vboy_regs.khb = (input_port_read(space->machine, "INPUT") & 0xff00) >> 8;
 			}
 			vboy_regs.kcr = (data | 0x48) & 0xfd;	// according to docs: bit 6 & bit 3 are unused and set to 1, bit 1 is read only.
 			break;
@@ -106,35 +131,298 @@ WRITE32_HANDLER( port_02_write )
 		case 0x18:	// TLB (Timer Low Byte)
 		case 0x1c:	// THB (Timer High Byte)
 		default:
-			logerror("Unemulated write: offset %02x, data %04x\n", offset, data);
+			logerror("Unemulated write: offset %08x, data %04x\n", 0x02000000 + (offset << 2), data);
 			break;
 	}
+}
+
+static READ16_HANDLER( vip_r )
+{
+	switch(offset << 1) {
+		case 0x00: 	//INTPND
+					return vip_regs.INTPND;
+					break;
+		case 0x02: 	//INTENB
+					return vip_regs.INTENB;
+					break;
+		case 0x04: 	//INTCLR
+					logerror("Error reading INTCLR\n");
+					break;
+		case 0x20: 	//DPSTTS
+					return vip_regs.DPSTTS;
+					break;
+		case 0x22: 	//DPCTRL
+					return vip_regs.DPCTRL;
+					break;
+		case 0x24: 	//BRTA 			
+					return vip_regs.BRTA;
+					break;		
+		case 0x26: 	//BRTB
+					return vip_regs.BRTB;
+					break;
+		case 0x28: 	//BRTC
+					return vip_regs.BRTC;
+					break;
+		case 0x2A: 	//REST
+					return vip_regs.REST;
+					break;
+		case 0x2E: 	//FRMCYC
+					return vip_regs.FRMCYC;
+					break;
+		case 0x30: 	//CTA
+					return vip_regs.CTA;
+					break;
+		case 0x40: 	//XPSTTS
+					return vip_regs.XPSTTS;
+					break;
+		case 0x42: 	//XPCTRL
+					return vip_regs.XPCTRL;
+					break;
+		case 0x44: 	//VER
+					return vip_regs.VER;
+					break;
+		case 0x48: 	//SPT0
+					return vip_regs.SPT[0];
+					break;
+		case 0x4A: 	//SPT1
+					return vip_regs.SPT[1];
+					break;
+		case 0x4C: 	//SPT2
+					return vip_regs.SPT[2];
+					break;
+		case 0x4E: 	//SPT3
+					return vip_regs.SPT[3];
+					break;
+		case 0x60: 	//GPLT0
+					return vip_regs.GPLT[0];
+					break;
+		case 0x62: 	//GPLT1
+					return vip_regs.GPLT[1];
+					break;
+		case 0x64: 	//GPLT2
+					return vip_regs.GPLT[2];
+					break;
+		case 0x66: 	//GPLT3
+					return vip_regs.GPLT[3];
+					break;
+		case 0x68: 	//JPLT0
+					return vip_regs.JPLT[0];
+					break;
+		case 0x6A: 	//JPLT1
+					return vip_regs.JPLT[1];
+					break;
+		case 0x6C: 	//JPLT2
+					return vip_regs.JPLT[2];
+					break;
+		case 0x6E: 	//JPLT3
+					return vip_regs.JPLT[3];
+					break;
+		case 0x70: 	//BKCOL
+					return vip_regs.BKCOL;
+					break;
+		default:
+					logerror("Unemulated read: addr %08x\n", offset * 2 + 0x0005f800);
+					break;			
+	}
+	return 0xffff;
+}
+
+static WRITE16_HANDLER( vip_w )
+{
+	switch(offset << 1) {
+		case 0x00: 	//INTPND
+					logerror("Error writing INTPND\n");
+					break;
+		case 0x02: 	//INTENB
+					vip_regs.INTENB = data;
+					break;
+		case 0x04: 	//INTCLR
+					vip_regs.INTPND &= ~data;
+					break;
+		case 0x20: 	//DPSTTS
+					logerror("Error writing DPSTTS\n");
+					break;
+		case 0x22: 	//DPCTRL
+					vip_regs.DPCTRL = data;
+					break;
+		case 0x24: 	//BRTA
+					vip_regs.BRTA = data;
+					palette_set_color_rgb(space->machine, 1,(vip_regs.BRTA << 1) & 0xff,0,0);
+					break;		
+		case 0x26: 	//BRTB
+					vip_regs.BRTB = data;
+					palette_set_color_rgb(space->machine, 2,((vip_regs.BRTA + vip_regs.BRTB) << 1) & 0xff,0,0);
+					break;
+		case 0x28: 	//BRTC					
+					vip_regs.BRTC = data;
+					palette_set_color_rgb(space->machine, 3,((vip_regs.BRTA + vip_regs.BRTB + vip_regs.BRTC) << 1) & 0xff,0,0);
+					break;
+		case 0x2A: 	//REST
+					vip_regs.REST = data;
+					break;
+		case 0x2E: 	//FRMCYC
+					vip_regs.FRMCYC = data;
+					break;
+		case 0x30: 	//CTA
+					vip_regs.CTA = data;
+					break;
+		case 0x40: 	//XPSTTS
+					logerror("Error writing XPSTTS\n");
+					break;
+		case 0x42: 	//XPCTRL
+					vip_regs.XPCTRL = data;
+					break;
+		case 0x44: 	//VER
+					vip_regs.VER = data;
+					break;
+		case 0x48: 	//SPT0
+					vip_regs.SPT[0] = data;
+					break;
+		case 0x4A: 	//SPT1
+					vip_regs.SPT[1] = data;
+					break;
+		case 0x4C: 	//SPT2
+					vip_regs.SPT[2] = data;
+					break;
+		case 0x4E: 	//SPT3
+					vip_regs.SPT[3] = data;
+					break;
+		case 0x60: 	//GPLT0
+					vip_regs.GPLT[0] = data;
+					break;
+		case 0x62: 	//GPLT1
+					vip_regs.GPLT[1] = data;
+					break;
+		case 0x64: 	//GPLT2
+					vip_regs.GPLT[2] = data;
+					break;
+		case 0x66: 	//GPLT3
+					vip_regs.GPLT[3] = data;
+					break;
+		case 0x68: 	//JPLT0
+					vip_regs.JPLT[0] = data;
+					break;
+		case 0x6A: 	//JPLT1
+					vip_regs.JPLT[1] = data;
+					break;
+		case 0x6C: 	//JPLT2
+					vip_regs.JPLT[2] = data;
+					break;
+		case 0x6E: 	//JPLT3
+					vip_regs.JPLT[3] = data;
+					break;
+		case 0x70: 	//BKCOL
+					vip_regs.BKCOL = data;
+					break;
+		default:
+					logerror("Unemulated write: addr %08x, data %04x\n", offset * 2 + 0x0005f800, data);
+					break;			
+	}
+}
+
+static WRITE16_HANDLER( vboy_font0_w )
+{
+	vboy_font[offset] = data;
+}
+
+static WRITE16_HANDLER( vboy_font1_w )
+{
+	vboy_font[offset + 0x1000] = data;
+}
+
+static WRITE16_HANDLER( vboy_font2_w )
+{
+	vboy_font[offset + 0x2000] = data;
+}
+
+static WRITE16_HANDLER( vboy_font3_w )
+{
+	vboy_font[offset + 0x3000] = data;
+}
+
+static READ16_HANDLER( vboy_font0_r )
+{
+	return vboy_font[offset];
+}
+
+static READ16_HANDLER( vboy_font1_r )
+{
+	return vboy_font[offset + 0x1000];
+}
+
+static READ16_HANDLER( vboy_font2_r )
+{
+	return vboy_font[offset + 0x2000];
+}
+
+static READ16_HANDLER( vboy_font3_r )
+{
+	return vboy_font[offset + 0x3000];
+}
+
+static void put_char(int x, int y, UINT16 ch, bitmap_t *bitmap,int flipx,int flipy,int trans)
+{
+	UINT16 code = ch;
+	int i, b;
+	
+	for(i = 0; i < 8; i++) 
+	{
+		UINT16  data;
+		if(flipy==0) {
+			 data =vboy_font[code * 8 + i]; 
+		} else {
+			 data =vboy_font[code * 8 + (7-i)]; 
+		}
+		for (b = 0; b < 8; b++)
+		{					
+			UINT8 dat;
+			if(flipx==0) {
+				dat = ((data >> (b << 1)) & 0x03);
+			} else {
+				dat = ((data >> ((7-b) << 1)) & 0x03);
+			}
+			if (!trans || ( trans && dat >0)) {
+				*BITMAP_ADDR16(bitmap, y + i, x + b) =  dat;
+			}
+		}		
+	}	
+}
+
+static WRITE16_HANDLER( vboy_bgmap_w )
+{	
+	vboy_bgmap[offset] = data;
+	put_char((offset & 0x3f) << 3, ((offset >> 6) & 0x3f) << 3, data & 0x7ff, bg_map[offset >> 12],BIT(data,13),BIT(data,12),0);
+}
+static READ16_HANDLER( vboy_bgmap_r )
+{
+	return vboy_bgmap[offset];
 }
 
 static ADDRESS_MAP_START( vboy_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	ADDRESS_MAP_GLOBAL_MASK(0x07ffffff)
 	AM_RANGE( 0x00000000, 0x00005fff ) AM_RAM AM_BASE((UINT32**)&vboy_l_frame_0) // L frame buffer 0
-	AM_RANGE( 0x00006000, 0x00007fff ) AM_RAM AM_SHARE(1) AM_BASE((UINT32**)&vboy_font0) // Font 0-511
+	AM_RANGE( 0x00006000, 0x00007fff ) AM_READWRITE16(vboy_font0_r, vboy_font0_w, 0xffffffff) // Font 0-511
 	AM_RANGE( 0x00008000, 0x0000dfff ) AM_RAM AM_BASE((UINT32**)&vboy_l_frame_1) // L frame buffer 1
-	AM_RANGE( 0x0000e000, 0x0000ffff ) AM_RAM AM_SHARE(2) AM_BASE((UINT32**)&vboy_font1) // Font 512-1023
+	AM_RANGE( 0x0000e000, 0x0000ffff ) AM_READWRITE16(vboy_font1_r, vboy_font1_w, 0xffffffff) // Font 512-1023
 	AM_RANGE( 0x00010000, 0x00015fff ) AM_RAM AM_BASE((UINT32**)&vboy_r_frame_0) // R frame buffer 0
-	AM_RANGE( 0x00016000, 0x00017fff ) AM_RAM AM_SHARE(3) AM_BASE((UINT32**)&vboy_font2) // Font 1024-1535
+	AM_RANGE( 0x00016000, 0x00017fff ) AM_READWRITE16(vboy_font2_r, vboy_font2_w, 0xffffffff) // Font 1024-1535
 	AM_RANGE( 0x00018000, 0x0001dfff ) AM_RAM AM_BASE((UINT32**)&vboy_r_frame_1) // R frame buffer 1
-	AM_RANGE( 0x0001e000, 0x0001ffff ) AM_RAM AM_SHARE(4) AM_BASE((UINT32**)&vboy_font3) // Font 1536-2047
+	AM_RANGE( 0x0001e000, 0x0001ffff ) AM_READWRITE16(vboy_font3_r, vboy_font3_w, 0xffffffff) // Font 1536-2047
 	
-	AM_RANGE( 0x00020000, 0x0003bfff ) AM_RAM AM_BASE((UINT32**)&vboy_bg_map) // BG Map
+	AM_RANGE( 0x00020000, 0x0003bfff ) AM_READWRITE16(vboy_bgmap_r,vboy_bgmap_w, 0xffffffff) // BG Map
 	AM_RANGE( 0x0003c000, 0x0003d7ff ) AM_RAM AM_BASE((UINT32**)&vboy_paramtab) // Param Table
 	AM_RANGE( 0x0003d800, 0x0003dbff ) AM_RAM AM_BASE((UINT32**)&vboy_world) // World 
 	AM_RANGE( 0x0003dc00, 0x0003ddff ) AM_RAM AM_BASE((UINT32**)&vboy_columntab1) // Column Table 1
 	AM_RANGE( 0x0003de00, 0x0003dfff ) AM_RAM AM_BASE((UINT32**)&vboy_columntab2) // Column Table 2
 	AM_RANGE( 0x0003e000, 0x0003ffff ) AM_RAM AM_BASE((UINT32**)&vboy_objects) // Objects RAM
 	
-	AM_RANGE( 0x00040000, 0x0005ffff ) AM_RAM // VIPC	
+	//AM_RANGE( 0x00040000, 0x0005ffff ) AM_RAM // VIPC	
+	AM_RANGE( 0x0005f800, 0x0005f87f )	AM_READWRITE16(vip_r, vip_w, 0xffffffff)
 	
-	AM_RANGE( 0x00078000, 0x00079fff ) AM_RAM AM_SHARE(1) // Font 0-511 mirror
-	AM_RANGE( 0x0007a000, 0x0007bfff ) AM_RAM AM_SHARE(2) // Font 512-1023 mirror
-	AM_RANGE( 0x0007c000, 0x0007dfff ) AM_RAM AM_SHARE(3) // Font 1024-1535 mirror
-	AM_RANGE( 0x0007e000, 0x0007ffff ) AM_RAM AM_SHARE(4) // Font 1536-2047 mirror
+	AM_RANGE( 0x00078000, 0x00079fff ) AM_READWRITE16(vboy_font0_r, vboy_font0_w, 0xffffffff) // Font 0-511 mirror
+	AM_RANGE( 0x0007a000, 0x0007bfff ) AM_READWRITE16(vboy_font1_r, vboy_font1_w, 0xffffffff) // Font 512-1023 mirror
+	AM_RANGE( 0x0007c000, 0x0007dfff ) AM_READWRITE16(vboy_font2_r, vboy_font2_w, 0xffffffff) // Font 1024-1535 mirror
+	AM_RANGE( 0x0007e000, 0x0007ffff ) AM_READWRITE16(vboy_font3_r, vboy_font3_w, 0xffffffff) // Font 1536-2047 mirror
 	
 	AM_RANGE( 0x01000000, 0x010005ff ) AM_RAM // Sound RAM 
 	AM_RANGE( 0x02000000, 0x0200002b ) AM_MIRROR(0x0ffff00) AM_READWRITE(port_02_read, port_02_write) // Hardware control registers mask 0xff
@@ -182,7 +470,6 @@ static MACHINE_RESET(vboy)
 	vboy_regs.kcr = 0x4c;
 }
 
-static bitmap_t *bg_map[14];
 
 static VIDEO_START( vboy )
 {
@@ -192,40 +479,10 @@ static VIDEO_START( vboy )
 	{
 		bg_map[i] = auto_bitmap_alloc(machine, 512, 512, BITMAP_FORMAT_INDEXED16);
 	}
-}
-
-static void put_char(int x, int y, UINT16 ch, bitmap_t *bitmap)
-{
-	UINT16 *font = vboy_font0;
-	UINT16 code = ch;
-	int i, b;
-	// determine font buffer from char code used
-	if (ch >= 512)  { font = vboy_font1; code = ch - 512;  }
-	if (ch >= 1024) { font = vboy_font2; code = ch - 1024; }
-	if (ch >= 1536) { font = vboy_font3; code = ch - 1536; }
+	screen_output = auto_bitmap_alloc(machine, 384, 224, BITMAP_FORMAT_INDEXED16);
 	
-	for(i = 0; i < 8; i++) 
-	{
-		UINT16  data = font[code * 8 + i]; 
-		for (b = 0; b < 8; b++)
-		{					
-			*BITMAP_ADDR16(bitmap, y + i, x + b) =  ((data >> (b << 1)) & 0x03);
-		}		
-	}	
-}
-
-static void fill_bg_map(int num, bitmap_t *bitmap)
-{
-	int i, j;	
-	// Fill background map
-	for (i = 0; i < 64; i++) 
-	{
-		for (j = 0; j < 64; j++) 
-		{
-			UINT16 ch = vboy_bg_map[j + 64 * i + (num * 0x1000)];
-			put_char(j * 8, i * 8, ch & 0x7ff, bitmap);
-		}
-	}
+	vboy_font  = auto_alloc_array(machine, UINT16, 2048 * 8);
+	vboy_bgmap = auto_alloc_array(machine, UINT16, 0x1C000 >> 1);;
 }
 
 static UINT8 display_world(int num, bitmap_t *bitmap, UINT8 right)
@@ -237,45 +494,83 @@ static UINT8 display_world(int num, bitmap_t *bitmap, UINT8 right)
 	UINT16 mx  = vboy_world[num*16+4];
 	UINT16 mp  = vboy_world[num*16+5];
 	UINT16 my  = vboy_world[num*16+6];
-	//UINT16 w  = vboy_world[num*16+7];
-	//UINT16 h = vboy_world[num*16+8];
+	UINT16 w  = vboy_world[num*16+7];
+	UINT16 h = vboy_world[num*16+8];
 //	UINT16 param_base  = vboy_world[num*16+9];
 //	UINT16 overplane = vboy_world[num*16+10];
 	UINT8 bg_map_num = def & 0x0f;
+	int x,y,i;	
+	UINT8 mode	= (def >> 12) & 3;
+	
 	
 	if (bg_map_num < 15) {
-		fill_bg_map(bg_map_num,bg_map[bg_map_num]);	
-		if (BIT(def,15) && (right==0)) {
-			// Left screen 
-			copybitmap(bitmap,bg_map[bg_map_num],mx-mp,my,gx-gp,gy,NULL);
+		if(mode==0) {
+			//fill_bg_map(bg_map_num,bg_map[bg_map_num]);			
+			if (BIT(def,15) && (right==0)) {
+				// Left screen 
+				for(y=my;y<my+h;y++) {
+					for(x=mx-mp;x<mx-mp+w;x++) {
+						*BITMAP_ADDR16(bitmap, y+gy-my, x+gx-gp-(mx-mp)) = *BITMAP_ADDR16(bg_map[bg_map_num], y, x);
+					}
+				}
+			}
+			if (BIT(def,14) && (right==1)) {
+				// Right screen 
+				for(y=my;y<my+h;y++) {
+					for(x=mx-mp;x<mx-mp+w;x++) {
+						*BITMAP_ADDR16(bitmap, y+gy-my, x+gx-gp-(mx+mp)) = *BITMAP_ADDR16(bg_map[bg_map_num], y, x);
+					}
+				}
+			}
 		}
-		if (BIT(def,14) && (right==1)) {
-			// Right screen 
-			copybitmap(bitmap,bg_map[bg_map_num],mx+mp,my,gx+gp,gy,NULL);
+		if(mode==3) {
+			// just for test
+			for(i=vip_regs.SPT[3];i>=vip_regs.SPT[2];i--) {
+				UINT16 start_ndx = i * 4;
+				UINT16 jx = vboy_objects[start_ndx+0];
+				UINT16 jp = vboy_objects[start_ndx+1] & 0x3fff;
+				UINT16 jy = vboy_objects[start_ndx+2];
+				UINT16 jca = vboy_objects[start_ndx+3] & 0x7ff;
+				if (!right) {
+					put_char(jx-jp,jy,jca,bitmap,BIT(vboy_objects[start_ndx+3],12),BIT(vboy_objects[start_ndx+3],13),1);
+				} else {
+					put_char(jx+jp,jy,jca,bitmap,BIT(vboy_objects[start_ndx+3],12),BIT(vboy_objects[start_ndx+3],13),1);
+				}
+			}
 		}
 	}
 	// Return END world status
 	return BIT(def,6);
 }
 
+static UINT8 row = 0;
 static VIDEO_UPDATE( vboy )
 {
 	int i;
 	UINT8 right = 0;
 	const device_config *_3d_right_screen = devtag_get_device(screen->machine, "3dright");
+	
+	bitmap_fill(screen_output, cliprect, 0);
+		
 	if (screen == _3d_right_screen) right = 1;
 
 	for(i=31;i>=0;i--) {
-		if (display_world(i,bitmap,right)) break;
+		if (display_world(i,screen_output,right)) break;
 	}
+	copybitmap(bitmap, screen_output, 0, 0, 0, 0, cliprect);
+	
+	vip_regs.XPSTTS = ((row<<8)| 0xff);
+	vip_regs.DPSTTS = ((vip_regs.DPCTRL&0x0302)|0x7c);
+	row++;
+	if (row==0x1c) row=0;
 	return 0;
 }
 
 static const rgb_t vboy_palette[18] = {
 	MAKE_RGB(0x00, 0x00, 0x00), // 0
-	MAKE_RGB(0x55, 0x00, 0x00), // 1
-	MAKE_RGB(0x7f, 0x00, 0x00), // 2 
-	MAKE_RGB(0xff, 0x00, 0x00)  // 3  
+	MAKE_RGB(0x00, 0x00, 0x00), // 1
+	MAKE_RGB(0x00, 0x00, 0x00), // 2 
+	MAKE_RGB(0x00, 0x00, 0x00)  // 3  
 };
 
 PALETTE_INIT( vboy )
