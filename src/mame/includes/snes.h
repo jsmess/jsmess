@@ -508,6 +508,7 @@ struct SNES_PPU_STRUCT	/* once all the regs are saved in this structure, it woul
 	UINT8 update_offsets;
 	UINT8 mode;
 	UINT8 interlace; //doubles the visible resolution
+	UINT8 obj_interlace;
 };
 
 struct snes_cart_info
