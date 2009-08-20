@@ -5,9 +5,11 @@
 #include "devices/mflopimg.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/8237dma.h"
+#include "machine/i8212.h"
 #include "machine/nec765.h"
 #include "machine/pit8253.h"
 #include "video/i8275.h"
+#include "video/i82720.h"
 #include "video/upd7220.h"
 
 /*
@@ -17,9 +19,9 @@
 
 	Parts:
 
-	6,144 MHz xtal
-	18,720 MHz xtal
-	16 MHz xtal
+	6,144 MHz xtal (CPU clock)
+	18,720 MHz xtal (pixel clock)
+	16 MHz xtal (FDC clock)
 	Intel 8085AP (CPU)
 	Intel 8253-5P (PIT)
 	Intel 8275P (CRTC)
@@ -50,20 +52,78 @@
 
 	TODO:
 
-	- Intel 8212 emulation
-	- PCB layout
-	- character generator
-	- memory mapped I/O
+	- ROM dumps
 	- pixel display
-	- system disks
-	- hook up DMA channels
-	- NEC µPD7220 emulation (Intel 82720 GDC)
+	- floppy
+	- keyboard
+	- memory banking
+	- PCB layout
+	- NEC µPD7220 (devicify Intel 82720 GDC)
+	- NEC µPD7201
 
 */
 
-#define MM1_DMA_I8275	0
-#define MM1_DMA_I8272	0
-#define MM1_DMA_UPD7220	0
+INLINE const device_config *get_floppy_image(running_machine *machine, int drive)
+{
+	return image_from_devtype_and_index(machine, IO_FLOPPY, drive);
+}
+
+/* Read/Write Handlers */
+
+static WRITE8_HANDLER( cs6_w )
+{
+	int d = BIT(data, 0);
+
+	switch (offset)
+	{
+	case 0: /* IC24 A8 */
+		break;
+
+	case 1: /* RECALL */
+		break;
+
+	case 2: /* _RV28/RX21 */
+		break;
+
+	case 3: /* _TX21 */
+		break;
+
+	case 4: /* _RCL */
+		break;
+
+	case 5: /* _INTC */
+		break;
+
+	case 6: /* C?EN (blurry schematics) */
+		break;
+
+	case 7: /* MOTOR ON */
+		floppy_drive_set_motor_state(get_floppy_image(space->machine, 0), d);
+		floppy_drive_set_ready_state(get_floppy_image(space->machine, 0), d, 1);
+		break;
+	}
+}
+
+/* Memory Maps */
+
+static ADDRESS_MAP_START( mm1_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x4000, 0xbfff) AM_RAM
+	AM_RANGE(0xff00, 0xff0f) AM_DEVREADWRITE(I8237_TAG, dma8237_r, dma8237_w)
+//	AM_RANGE(0xff10, 0xff13) AM_DEVREADWRITE(UPD7201_TAG, upd7201_r, upd7201_w)
+    AM_RANGE(0xff20, 0xff21) AM_DEVREADWRITE(I8275_TAG, i8275_r, i8275_w)
+	AM_RANGE(0xff30, 0xff33) AM_DEVREADWRITE(I8253_TAG, pit8253_r, pit8253_w)
+	AM_RANGE(0xff40, 0xff40) AM_DEVREADWRITE(I8212_TAG, i8212_r, i8212_w)
+	AM_RANGE(0xff50, 0xff50) AM_DEVREAD(UPD765_TAG, nec765_status_r)
+	AM_RANGE(0xff51, 0xff51) AM_DEVREADWRITE(UPD765_TAG, nec765_data_r, nec765_data_w)
+	AM_RANGE(0xff60, 0xff67) AM_WRITE(cs6_w)
+//	AM_RANGE(0xff70, 0xff7f) AM_DEVREADWRITE(UPD7220_TAG, upd7220_r, upd7220_w)
+ADDRESS_MAP_END
+
+/* Input Ports */
+
+static INPUT_PORTS_START( mm1 )
+INPUT_PORTS_END
 
 /* Video */
 
@@ -71,16 +131,20 @@ static I8275_DMA_REQUEST( crtc_dma_request )
 {
 	mm1_state *driver_state = device->machine->driver_data;
 	//logerror("i8275 DMA\n");
-	dma8237_drq_write(driver_state->i8237, MM1_DMA_I8275, state);
-}
-
-static I8275_INT_REQUEST( crtc_int_request )
-{
-	//logerror("i8275 INT\n");
+	dma8237_drq_write(driver_state->i8237, DMA_CRT, state);
 }
 
 static I8275_DISPLAY_PIXELS( crtc_display_pixels )
 {
+	mm1_state *state = device->machine->driver_data;
+
+	UINT8 data = state->char_rom[((charcode & 0x3f) << 4) | linecount];
+	int i;
+	
+	for (i = 0; i < 6; i++)
+	{
+		*BITMAP_ADDR16(tmpbitmap, y, x + i) = BIT(data, i);
+	}
 }
 
 static const i8275_interface mm1_i8275_intf = 
@@ -89,19 +153,12 @@ static const i8275_interface mm1_i8275_intf =
 	8,
 	0,
 	crtc_dma_request,
-	crtc_int_request,
+	NULL,
 	crtc_display_pixels
 };
 
 static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 {
-}
-
-static WRITE_LINE_DEVICE_HANDLER( hgdc_drq_w )
-{
-	mm1_state *driver_state = device->machine->driver_data;
-
-	dma8237_drq_write(driver_state->i8237, MM1_DMA_UPD7220, state);
 }
 
 static UPD7220_INTERFACE( mm1_upd7220_intf )
@@ -111,24 +168,52 @@ static UPD7220_INTERFACE( mm1_upd7220_intf )
 	hgdc_display_pixels,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_LINE(hgdc_drq_w),
+	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL
 };
+
+static VIDEO_START( mm1 )
+{
+	mm1_state *state = machine->driver_data;
+
+	/* find memory regions */
+	state->char_rom = memory_region(machine, "chargen");
+
+	VIDEO_START_CALL(generic_bitmapped);
+}
 
 static VIDEO_UPDATE( mm1 )
 {
 	mm1_state *state = screen->machine->driver_data;
 
 	i8275_update(state->i8275, bitmap, cliprect);
+	VIDEO_UPDATE_CALL(generic_bitmapped);
 
 	return 0;
 }
 
+/* 8212 Interface */
+
+static READ8_DEVICE_HANDLER( i8212_di_r )
+{
+	/* keyboard data */
+	return 0;
+}
+
+static I8212_INTERFACE( mm1_i8212_intf )
+{
+	DEVCB_CPU_INPUT_LINE(I8085A_TAG, I8085_RST65_LINE),
+	DEVCB_HANDLER(i8212_di_r),
+	DEVCB_NULL
+};
+
+/* 8237 Interface */
+
 static DMA8237_HRQ_CHANGED( dma_hrq_changed )
 {
-	cputag_set_input_line( device->machine, I8085_TAG, INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE );
+	cputag_set_input_line(device->machine, I8085A_TAG, INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* Assert HLDA */
 	dma8237_set_hlda( device, state );
@@ -136,14 +221,14 @@ static DMA8237_HRQ_CHANGED( dma_hrq_changed )
 
 static DMA8237_MEM_READ( memory_dma_r )
 {
-	const address_space *program = cputag_get_address_space(device->machine, I8085_TAG, ADDRESS_SPACE_PROGRAM);
+	const address_space *program = cputag_get_address_space(device->machine, I8085A_TAG, ADDRESS_SPACE_PROGRAM);
 	//logerror("DMA read %04x\n", offset);
 	return memory_read_byte(program, offset);
 }
 
 static DMA8237_MEM_WRITE( memory_dma_w )
 {
-	const address_space *program = cputag_get_address_space(device->machine, I8085_TAG, ADDRESS_SPACE_PROGRAM);
+	const address_space *program = cputag_get_address_space(device->machine, I8085A_TAG, ADDRESS_SPACE_PROGRAM);
 	//logerror("DMA write %04x:%02x\n", offset, data);
 	memory_write_byte(program, offset, data);
 }
@@ -155,53 +240,57 @@ static DMA8237_CHANNEL_WRITE( crtc_dack_w )
 	i8275_dack_set_data(state->i8275, data);
 }
 
-#ifdef UNUSED_CODE
-static DMA8237_CHANNEL_WRITE( hgdc_dack_w )
+static DMA8237_CHANNEL_READ( mpsc_dack_r )
 {
-	mm1_state *state = device->machine->driver_data;
+	//mm1_state *state = device->machine->driver_data;
+	
+	return 0; //upd7201_dack_r(state->upd7201, 0);
+}
 
-	upd7220_dack_w(state->upd7220, 0, data);
+static DMA8237_CHANNEL_WRITE( mpsc_dack_w )
+{
+	//mm1_state *state = device->machine->driver_data;
+
+	//upd7201_dack_w(state->upd7201, 0, data);
 }
 
 static DMA8237_CHANNEL_READ( fdc_dack_r )
 {
 	mm1_state *state = device->machine->driver_data;
 
-	return nec765_dack_r(state->i8272, 0);
+	return nec765_dack_r(state->upd765, 0);
 }
 
 static DMA8237_CHANNEL_WRITE( fdc_dack_w )
 {
 	mm1_state *state = device->machine->driver_data;
 
-	nec765_dack_w(state->i8272, 0, data);
-}
-#endif
-
-static DMA8237_OUT_EOP( dma_eop_w )
-{
+	nec765_dack_w(state->upd765, 0, data);
 }
 
 static const struct dma8237_interface mm1_dma8237_intf =
 {
-	XTAL_18_720MHz/3, /* this needs to be verified */
+	XTAL_6_144MHz/2/2, // what is this field for?
 	dma_hrq_changed,
 	memory_dma_r,
 	memory_dma_w,
-	{ NULL, NULL, NULL, NULL },
-	{ crtc_dack_w, NULL, NULL, NULL },
-	dma_eop_w
+	{ NULL, NULL, mpsc_dack_r, fdc_dack_r },
+	{ crtc_dack_w, mpsc_dack_w, NULL, fdc_dack_w },
+	NULL
 };
+
+/* µPD765 Interface */
 
 static NEC765_INTERRUPT( fdc_irq )
 {
+	cputag_set_input_line(device->machine, I8085A_TAG, I8085_RST55_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static NEC765_DMA_REQUEST( fdc_drq )
 {
 	mm1_state *driver_state = device->machine->driver_data;
 
-	dma8237_drq_write(driver_state->i8237, MM1_DMA_I8272, state);
+	dma8237_drq_write(driver_state->i8237, DMA_FDC, state);
 }
 
 static const nec765_interface mm1_nec765_intf =
@@ -212,42 +301,35 @@ static const nec765_interface mm1_nec765_intf =
 	NEC765_RDY_PIN_CONNECTED // ???
 };
 
+/* 8253 Interface */
+
+static PIT8253_OUTPUT_CHANGED( itxc_w )
+{
+}
+
+static PIT8253_OUTPUT_CHANGED( irxc_w )
+{
+}
+
+static PIT8253_OUTPUT_CHANGED( auxc_w )
+{
+}
+
 static const struct pit8253_config mm1_pit8253_intf =
 {
 	{
 		{
 			XTAL_6_144MHz/2/2,
-			NULL /* _ITxC */
+			itxc_w
 		}, {
 			XTAL_6_144MHz/2/2,
-			NULL /* _IRxC */
+			irxc_w
 		}, {
 			XTAL_6_144MHz/2/2,
-			NULL /* _AUXC */
+			auxc_w
 		}
 	}
 };
-
-/* Memory Maps */
-
-static ADDRESS_MAP_START( mm1_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x1000, 0xfeff) AM_RAM
-	AM_RANGE(0xff00, 0xff0f) AM_DEVREADWRITE(I8237_TAG, dma8237_r, dma8237_w)
-//	AM_RANGE(0xff10, 0xff1f) µPD7201
-    AM_RANGE(0xff20, 0xff21) AM_DEVREADWRITE(I8275_TAG, i8275_r, i8275_w)
-	AM_RANGE(0xff30, 0xff33) AM_DEVREADWRITE(I8253_TAG, pit8253_r, pit8253_w)
-//	AM_RANGE(0xff40, 0xff4f) 8212
-	AM_RANGE(0xff50, 0xff50) AM_DEVREAD(UPD765_TAG, nec765_status_r)
-	AM_RANGE(0xff51, 0xff51) AM_DEVREADWRITE(UPD765_TAG, nec765_data_r, nec765_data_w)
-//	AM_RANGE(0xff60, 0xff6f)
-//	AM_RANGE(0xff70, 0xff7f) µPD7220
-ADDRESS_MAP_END
-
-/* Input Ports */
-
-static INPUT_PORTS_START( mm1 )
-INPUT_PORTS_END
 
 /* Machine Initialization */
 
@@ -256,9 +338,11 @@ static MACHINE_START( mm1 )
 	mm1_state *state = machine->driver_data;
 
 	/* look up devices */
+	state->i8212 = devtag_get_device(machine, I8212_TAG);
 	state->i8237 = devtag_get_device(machine, I8237_TAG);
-	state->upd765 = devtag_get_device(machine, UPD765_TAG);
 	state->i8275 = devtag_get_device(machine, I8275_TAG);
+	state->upd765 = devtag_get_device(machine, UPD765_TAG);
+	state->upd7201 = devtag_get_device(machine, UPD7201_TAG);
 
 	/* register for state saving */
 	//state_save_register_global(machine, state->);
@@ -270,7 +354,7 @@ static MACHINE_DRIVER_START( mm1 )
 	MDRV_DRIVER_DATA(mm1_state)
 
 	/* basic system hardware */
-	MDRV_CPU_ADD(I8085_TAG, 8085A, XTAL_6_144MHz)
+	MDRV_CPU_ADD(I8085A_TAG, 8085A, XTAL_6_144MHz)
 	MDRV_CPU_PROGRAM_MAP(mm1_map)
 
 	MDRV_MACHINE_START(mm1)
@@ -284,13 +368,16 @@ static MACHINE_DRIVER_START( mm1 )
 
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(black_and_white)
+
+	MDRV_VIDEO_START(mm1)
 	MDRV_VIDEO_UPDATE(mm1)
 
 	/* peripheral hardware */
+	MDRV_I8212_ADD(I8212_TAG, mm1_i8212_intf)
 	MDRV_I8275_ADD(I8275_TAG, mm1_i8275_intf)
-	MDRV_DMA8237_ADD(I8237_TAG, mm1_dma8237_intf)
+	MDRV_DMA8237_ADD(I8237_TAG, /* XTAL_6_144MHz/2/2, */ mm1_dma8237_intf)
 	MDRV_PIT8253_ADD(I8253_TAG, mm1_pit8253_intf)
-	MDRV_NEC765A_ADD(UPD765_TAG, mm1_nec765_intf)
+	MDRV_NEC765A_ADD(UPD765_TAG, /* XTAL_16MHz/2/2, */ mm1_nec765_intf)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( mm1m6 )
@@ -302,11 +389,16 @@ MACHINE_DRIVER_END
 /* ROMs */
 
 ROM_START( mm1m6 )
-	ROM_REGION( 0x1000, I8085_TAG, 0 )
-	ROM_LOAD( "mm1.bin", 0x0000, 0x1000, CRC(07400e72) SHA1(354ff97817a607ca38d296af8b2813878d092a08) )
+	ROM_REGION( 0x4000, I8085A_TAG, 0 )
+	ROM_LOAD( "mm1.ic2",  0x0000, 0x2000, NO_DUMP )
+	ROM_LOAD( "mm1.ic10", 0x2000, 0x2000, NO_DUMP )
+	ROM_LOAD( "mm1.bin",  0x0000, 0x1000, BAD_DUMP CRC(07400e72) SHA1(354ff97817a607ca38d296af8b2813878d092a08) )
 
-	ROM_REGION( 0x1000, "chargen", 0 )
-	ROM_LOAD( "chargen", 0x0000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x200, "prom", 0 )
+	ROM_LOAD( "mm6349-1.ic24", 0x0000, 0x0200, NO_DUMP )
+
+	ROM_REGION( 0x800, "chargen", 0 )
+	ROM_LOAD( "chargen.ic51", 0x0000, 0x0800, NO_DUMP )
 ROM_END
 
 #define rom_mm1m7 rom_mm1m6
@@ -370,12 +462,12 @@ static void dual_640kb_floppy(const mess_device_class *devclass, UINT32 state, u
 }
 
 static SYSTEM_CONFIG_START( mm1m6 )
-	CONFIG_RAM_DEFAULT	(64 * 1024)
+	CONFIG_RAM_DEFAULT	(32 * 1024)
 	CONFIG_DEVICE(dual_640kb_floppy)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START( mm1m7 )
-	CONFIG_RAM_DEFAULT	(64 * 1024)
+	CONFIG_RAM_DEFAULT	(32 * 1024)
 	CONFIG_DEVICE(dual_640kb_floppy)
 	// 5MB Winchester
 SYSTEM_CONFIG_END
