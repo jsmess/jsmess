@@ -280,7 +280,7 @@ PALETTE_INIT( amstrad_cpc_green )
 }
 
 
-NEC765_INTERRUPT( aleste_interrupt )
+WRITE_LINE_DEVICE_HANDLER( aleste_interrupt )
 {
 	if(state == CLEAR_LINE)
 		aleste_fdc_int = 0;
