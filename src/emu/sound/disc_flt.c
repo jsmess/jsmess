@@ -72,6 +72,7 @@ struct dst_rcdisc_context
 	double t;           /* time */
 	double exponent0;
 	double exponent1;
+	double v_cap;		/* rcdisc5 */
 };
 
 struct dst_rcdisc_mod_context
@@ -179,15 +180,15 @@ static DISCRETE_RESET(dst_crfilter)
 #define DST_FILTER1__FREQ	(*(node->input[2]))
 #define DST_FILTER1__TYPE	(*(node->input[3]))
 
-static void calculate_filter1_coefficients(double fc, double type,
+static void calculate_filter1_coefficients(const discrete_info *disc_info, double fc, double type,
 										   double *a1, double *b0, double *b1)
 {
 	double den, w, two_over_T;
 
 	/* calculate digital filter coefficents */
 	/*w = 2.0*M_PI*fc; no pre-warping */
-	w = discrete_current_context->sample_rate*2.0*tan(M_PI*fc/discrete_current_context->sample_rate); /* pre-warping */
-	two_over_T = 2.0*discrete_current_context->sample_rate;
+	w = disc_info->sample_rate*2.0*tan(M_PI*fc/disc_info->sample_rate); /* pre-warping */
+	two_over_T = 2.0*disc_info->sample_rate;
 
 	den = w + two_over_T;
 	*a1 = (w - two_over_T)/den;
@@ -202,7 +203,7 @@ static void calculate_filter1_coefficients(double fc, double type,
 	}
 	else
 	{
-		discrete_log("calculate_filter1_coefficients() - Invalid filter type for 1st order filter.");
+		discrete_log(disc_info, "calculate_filter1_coefficients() - Invalid filter type for 1st order filter.");
 	}
 }
 
@@ -227,7 +228,7 @@ static DISCRETE_RESET(dst_filter1)
 {
 	struct dss_filter1_context *context = (struct dss_filter1_context *)node->context;
 
-	calculate_filter1_coefficients(DST_FILTER1__FREQ, DST_FILTER1__TYPE, &context->a1, &context->b0, &context->b1);
+	calculate_filter1_coefficients(disc_info, DST_FILTER1__FREQ, DST_FILTER1__TYPE, &context->a1, &context->b0, &context->b1);
 	node->output[0] = 0;
 }
 
@@ -249,19 +250,20 @@ static DISCRETE_RESET(dst_filter1)
 #define DST_FILTER2__DAMP	(*(node->input[3]))
 #define DST_FILTER2__TYPE	(*(node->input[4]))
 
-static void calculate_filter2_coefficients(double fc, double d, double type,
+static void calculate_filter2_coefficients(const discrete_info *disc_info,
+		                                   double fc, double d, double type,
 										   double *a1, double *a2,
 										   double *b0, double *b1, double *b2)
 {
 	double w;	/* cutoff freq, in radians/sec */
 	double w_squared;
 	double den;	/* temp variable */
-	double two_over_T = 2*discrete_current_context->sample_rate;
+	double two_over_T = 2*disc_info->sample_rate;
 	double two_over_T_squared = two_over_T * two_over_T;
 
 	/* calculate digital filter coefficents */
 	/*w = 2.0*M_PI*fc; no pre-warping */
-	w = discrete_current_context->sample_rate * 2.0 * tan(M_PI * fc / discrete_current_context->sample_rate); /* pre-warping */
+	w = disc_info->sample_rate * 2.0 * tan(M_PI * fc / disc_info->sample_rate); /* pre-warping */
 	w_squared = w * w;
 
 	den = two_over_T_squared + d*w*two_over_T + w_squared;
@@ -287,7 +289,7 @@ static void calculate_filter2_coefficients(double fc, double d, double type,
 	}
 	else
 	{
-		discrete_log("calculate_filter2_coefficients() - Invalid filter type for 2nd order filter.");
+		discrete_log(disc_info, "calculate_filter2_coefficients() - Invalid filter type for 2nd order filter.");
 	}
 }
 
@@ -315,7 +317,7 @@ static DISCRETE_RESET(dst_filter2)
 {
 	struct dss_filter2_context *context = (struct dss_filter2_context *)node->context;
 
-	calculate_filter2_coefficients(DST_FILTER2__FREQ, DST_FILTER2__DAMP, DST_FILTER2__TYPE,
+	calculate_filter2_coefficients(disc_info, DST_FILTER2__FREQ, DST_FILTER2__DAMP, DST_FILTER2__TYPE,
 								   &context->a1, &context->a2,
 								   &context->b0, &context->b1, &context->b2);
 	node->output[0] = 0;
@@ -487,7 +489,7 @@ static DISCRETE_RESET(dst_op_amp_filt)
 			double d  = (info->c1 + info->c2) / sqrt(info->rF / context->rTotal * info->c1 * info->c2);
 			double gain = -info->rF / context->rTotal * info->c2 / (info->c1 + info->c2);
 
-			calculate_filter2_coefficients(fc, d, DISC_FILTER_BANDPASS,
+			calculate_filter2_coefficients(disc_info, fc, d, DISC_FILTER_BANDPASS,
 										   &context->a1, &context->a2,
 										   &context->b0, &context->b1, &context->b2);
 			context->b0 *= gain;
@@ -556,7 +558,7 @@ static DISCRETE_STEP(dst_rcdisc)
 			if (DST_RCDISC__ENABLE)
 			{
 				node->output[0] = DST_RCDISC__IN * exp(context->t / context->exponent0);
-				context->t += discrete_current_context->sample_time;
+				context->t += disc_info->sample_time;
 			} else
 			{
 				context->state = 0;
@@ -740,17 +742,17 @@ static DISCRETE_RESET( dst_rcdisc4)
 	/* some error checking. */
 	if (DST_RCDISC4__R1 <= 0 || DST_RCDISC4__R2 <= 0 || DST_RCDISC4__C1 <= 0 || (DST_RCDISC4__R3 <= 0 &&  context->type == 1))
 	{
-		discrete_log("Invalid component values in NODE_%d.\n", node->node - NODE_00);
+		discrete_log(disc_info, "Invalid component values in NODE_%d.\n", node->node - NODE_00);
 		return;
 	}
 	if (DST_RCDISC4__VP < 3)
 	{
-		discrete_log("vP must be >= 3V in NODE_%d.\n", node->node - NODE_00);
+		discrete_log(disc_info, "vP must be >= 3V in NODE_%d.\n", node->node - NODE_00);
 		return;
 	}
 	if (DST_RCDISC4__TYPE < 1 || DST_RCDISC4__TYPE > 3)
 	{
-		discrete_log("Invalid circuit type in NODE_%d.\n", node->node - NODE_00);
+		discrete_log(disc_info, "Invalid circuit type in NODE_%d.\n", node->node - NODE_00);
 		return;
 	}
 
@@ -824,21 +826,25 @@ static DISCRETE_STEP( dst_rcdisc5)
 
 	/* Exponential based in difference between input/output   */
 
+    u = DST_RCDISC5__IN - 0.7; /* Diode drop */
+	if( u < 0)
+		u = 0;
+
+	diff = u - context->v_cap;
+
 	if(DST_RCDISC5__ENABLE)
 	{
-	    u = DST_RCDISC5__IN - 0.7; /* Diode drop */
-		if( u < 0)
-			u = 0;
-
-		diff = u - node->output[0];
-
 		if(diff < 0)
-			//diff = diff - (diff * exp(discrete_current_context->sample_time / context->exponent0));
-			diff = -node->output[0] + (node->output[0] *  context->exponent0);
-		node->output[0] += diff;
+			diff = diff * context->exponent0;
+
+		context->v_cap += diff;
+		node->output[0] = context->v_cap;
 	}
 	else
 	{
+		if(diff > 0)
+			context->v_cap = u;
+
 		node->output[0] = 0;
 	}
 }
@@ -851,6 +857,7 @@ static DISCRETE_RESET( dst_rcdisc5)
 
 	context->state = 0;
 	context->t = 0;
+	context->v_cap = 0;
 	context->exponent0 = RC_CHARGE_EXP(DST_RCDISC5__R * DST_RCDISC5__C);
 }
 
@@ -1191,7 +1198,7 @@ static DISCRETE_RESET(dst_rcintegrate)
 	struct dst_rcintegrate_context *context = (struct dst_rcintegrate_context *)node->context;
 
 	double r;
-	double dt = discrete_current_context->sample_time;
+	double dt = disc_info->sample_time;
 
 	context->type = DST_RCINTEGRATE__TYPE;
 
@@ -1267,7 +1274,7 @@ static DISCRETE_RESET(dst_sallen_key)
 			fatalerror("Unknown sallen key filter type");
 	}
 
-	calculate_filter2_coefficients(freq, 1.0 / q, DISC_FILTER_LOWPASS,
+	calculate_filter2_coefficients(disc_info, freq, 1.0 / q, DISC_FILTER_LOWPASS,
 								   &context->a1, &context->a2,
 								   &context->b0, &context->b1, &context->b2);
 	node->output[0] = 0;
@@ -1415,8 +1422,8 @@ static DISCRETE_RESET(dst_rcdisc2N)
 	f1 = 1.0 / (2 * M_PI * DST_RCDISC2N__R0 * DST_RCDISC2N__C);
 	f2 = 1.0 / (2 * M_PI * DST_RCDISC2N__R1 * DST_RCDISC2N__C);
 
-	calculate_filter1_coefficients(f1, DISC_FILTER_LOWPASS, &context->a1_0, &context->b0_0, &context->b1_0);
-	calculate_filter1_coefficients(f2, DISC_FILTER_LOWPASS, &context->a1_1, &context->b0_1, &context->b1_1);
+	calculate_filter1_coefficients(disc_info, f1, DISC_FILTER_LOWPASS, &context->a1_0, &context->b0_0, &context->b1_0);
+	calculate_filter1_coefficients(disc_info, f2, DISC_FILTER_LOWPASS, &context->a1_1, &context->b0_1, &context->b1_1);
 
 	/* Initialize the object */
 	node->output[0] = 0;

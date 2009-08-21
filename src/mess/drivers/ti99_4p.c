@@ -44,7 +44,6 @@
 #include "devices/mflopimg.h"
 #include "devices/cassette.h"
 #include "machine/smartmed.h"
-#include "sound/5220intf.h"
 #include "devices/harddriv.h"
 #include "machine/idectrl.h"
 #include "machine/smc92x4.h"

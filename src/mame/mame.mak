@@ -113,6 +113,7 @@ CPUS += MINX
 CPUS += SSEM
 CPUS += AVR8
 CPUS += TMS0980
+CPUS += I4004
 
 
 #-------------------------------------------------
@@ -160,15 +161,7 @@ SOUNDS += C140
 SOUNDS += C352
 SOUNDS += TMS36XX
 SOUNDS += TMS3615
-SOUNDS += TMS5100
 SOUNDS += TMS5110
-SOUNDS += TMS5110A
-SOUNDS += CD2801
-SOUNDS += TMC0281
-SOUNDS += CD2802
-SOUNDS += M58817
-SOUNDS += TMC0285
-SOUNDS += TMS5200
 SOUNDS += TMS5220
 SOUNDS += VLM5030
 SOUNDS += ADPCM
@@ -1492,6 +1485,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/chsuper.o \
 	$(DRIVERS)/cidelsa.o $(VIDEO)/cidelsa.o \
 	$(DRIVERS)/coinmstr.o \
+	$(DRIVERS)/coinmvga.o \
 	$(DRIVERS)/comebaby.o \
 	$(DRIVERS)/coolpool.o \
 	$(DRIVERS)/cowrace.o \
@@ -1739,7 +1733,8 @@ $(DRIVERS)/mw8080bw.o:	$(LAYOUT)/280zzzap.lh \
 						$(LAYOUT)/clowns.lh \
 						$(LAYOUT)/invaders.lh \
 						$(LAYOUT)/invad2ct.lh \
-						$(LAYOUT)/lagunar.lh
+						$(LAYOUT)/lagunar.lh \
+						$(LAYOUT)/spacwalk.lh
 
 $(DRIVERS)/meadows.o:	$(LAYOUT)/deadeye.lh \
 						$(LAYOUT)/gypsyjug.lh
@@ -1767,9 +1762,9 @@ $(DRIVERS)/polepos.o:	$(LAYOUT)/polepos.lh
 
 $(DRIVERS)/qix.o:		$(LAYOUT)/elecyoyo.lh
 
-$(DRIVERS)/re900.o:	$(LAYOUT)/re900.lh
+$(DRIVERS)/re900.o:		$(LAYOUT)/re900.lh
 
-$(DRIVERS)/roul.o:	$(LAYOUT)/roul.lh
+$(DRIVERS)/roul.o:		$(LAYOUT)/roul.lh
 
 $(DRIVERS)/sbrkout.o:	$(LAYOUT)/sbrkout.lh
 
@@ -1819,6 +1814,8 @@ $(DRIVERS)/tx1.o:		$(LAYOUT)/buggybjr.lh \
 						$(LAYOUT)/tx1.lh
 
 $(DRIVERS)/undrfire.o:	$(LAYOUT)/cbombers.lh
+
+$(DRIVERS)/vicdual.o:	$(LAYOUT)/depthch.lh
 
 $(DRIVERS)/videopin.o:	$(LAYOUT)/videopin.lh
 

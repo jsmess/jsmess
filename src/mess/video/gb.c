@@ -349,7 +349,7 @@ static void gb_update_scanline( running_machine *machine )
 {
 	bitmap_t *bitmap = tmpbitmap;
 
-	profiler_mark(PROFILER_VIDEO);
+	profiler_mark_start(PROFILER_VIDEO);
 
 	/* Make sure we're in mode 3 */
 	if ( ( LCDSTAT & 0x03 ) == 0x03 ) 
@@ -492,7 +492,7 @@ static void gb_update_scanline( running_machine *machine )
 		}
 	}
 
-	profiler_mark(PROFILER_END);
+	profiler_mark_end();
 }
 
 /* --- Super Game Boy Specific --- */
@@ -669,7 +669,7 @@ static void sgb_update_scanline( running_machine *machine )
 {
 	bitmap_t *bitmap = tmpbitmap;
 
-	profiler_mark(PROFILER_VIDEO);
+	profiler_mark_start(PROFILER_VIDEO);
 
 	if ( ( LCDSTAT & 0x03 ) == 0x03 ) 
 	{
@@ -858,7 +858,7 @@ static void sgb_update_scanline( running_machine *machine )
 		}
 	}
 
-	profiler_mark(PROFILER_END);
+	profiler_mark_end();
 }
 
 /* --- Game Boy Color Specific --- */
@@ -963,7 +963,7 @@ static void cgb_update_scanline ( running_machine *machine )
 {
 	bitmap_t *bitmap = tmpbitmap;
 
-	profiler_mark(PROFILER_VIDEO);
+	profiler_mark_start(PROFILER_VIDEO);
 
 	if ( ( LCDSTAT & 0x03 ) == 0x03 ) 
 	{
@@ -1147,7 +1147,7 @@ static void cgb_update_scanline ( running_machine *machine )
 		}
 	}
 
-	profiler_mark(PROFILER_END);
+	profiler_mark_end();
 }
 
 /* OAM contents on power up.

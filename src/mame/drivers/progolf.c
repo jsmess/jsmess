@@ -2,17 +2,12 @@
 
 18 Holes Pro Golf (c) 1981 Data East
 
-driver by Angelo Salese, based on early work by Pierpaolo Prazzoli and David Haywood
+driver by Angelo Salese and Roberto Zandona',
+based on early work by Pierpaolo Prazzoli and David Haywood
 
 TODO:
-- We need to patch a rom to get the games to do more, there's also a "rom test error 6"
-  in service mode (that is the g2-m.6a rom), so a rom might be bad or the decryption
-  isn't complete.
-- Hazards doesn't have any effect, might be the same issue as above;
-- There's no "rough" display on the sides on the screen, might be the same issue as above;
-- Map displays are currently wrong, they are drawn with the framebuffer;
+- Map display is (almost) correct but color pens aren't;
 - Flip screen support;
-- progolfa: decryption isn't yet correct;
 
 =========================================================================================
 
@@ -65,15 +60,17 @@ static UINT8 *progolf_fg_fb;
 static UINT8 *progolf_fbram;
 static UINT8 scrollx_hi;
 static UINT8 scrollx_lo;
+static UINT8 progolf_gfx_switch;
 
 static UINT8 sound_cmd;
 
 static VIDEO_START( progolf )
 {
-    scrollx_hi = 0;
-    scrollx_lo = 0;
+	scrollx_hi = 0;
+	scrollx_lo = 0;
 
 	progolf_fg_fb = auto_alloc_array(machine, UINT8, 0x2000*8);
+	videoram = auto_alloc_array(machine, UINT8, 0x1000);
 }
 
 
@@ -153,8 +150,8 @@ static WRITE8_HANDLER( progolf_charram_w )
 static WRITE8_HANDLER( progolf_char_vregs_w )
 {
 	char_pen = data & 0x07;
-	if(data & 0xf0)
-		char_pen_vreg = data & 0xf0;
+	progolf_gfx_switch = data & 0xf0;
+	char_pen_vreg = data & 0x30;
 }
 
 static WRITE8_HANDLER( progolf_scrollx_lo_w )
@@ -186,10 +183,42 @@ static READ8_HANDLER( audio_command_r )
 	return sound_cmd;
 }
 
+static READ8_HANDLER( progolf_videoram_r )
+{
+	UINT8 *gfx_rom = memory_region(space->machine, "gfx1");
+
+	if (offset >= 0x0800)
+	{
+		if      (progolf_gfx_switch == 0x50)
+			return gfx_rom[offset];
+		else if (progolf_gfx_switch == 0x60)
+			return gfx_rom[offset + 0x1000];
+		else if (progolf_gfx_switch == 0x70)
+			return gfx_rom[offset + 0x2000];
+		else
+			return videoram[offset];
+	} else {
+		if      (progolf_gfx_switch == 0x10)
+			return gfx_rom[offset];
+		else if (progolf_gfx_switch == 0x20)
+			return gfx_rom[offset + 0x1000];
+		else if (progolf_gfx_switch == 0x30)
+			return gfx_rom[offset + 0x2000];
+		else
+			return videoram[offset];
+	}
+}
+
+static WRITE8_HANDLER( progolf_videoram_w )
+{
+	//if(progolf_gfx_switch & 0x40)
+	videoram[offset] = data;
+}
+
 static ADDRESS_MAP_START( main_cpu, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_RAM
 	AM_RANGE(0x6000, 0x7fff) AM_RAM_WRITE(progolf_charram_w) AM_BASE(&progolf_fbram)
-	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_BASE(&videoram)
+	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(progolf_videoram_r,progolf_videoram_w)
 	AM_RANGE(0x9000, 0x9000) AM_READ_PORT("IN2") AM_WRITE(progolf_char_vregs_w)
 	AM_RANGE(0x9200, 0x9200) AM_READ_PORT("P1") AM_WRITE(progolf_scrollx_hi_w) //p1 inputs
 	AM_RANGE(0x9400, 0x9400) AM_READ_PORT("P2") AM_WRITE(progolf_scrollx_lo_w) //p2 inputs
@@ -438,7 +467,7 @@ ROM_START( progolf )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "g4-m.2a",      0xb000, 0x1000, CRC(8f06ebc0) SHA1(c012dcaf06cbd9e49f3ae819d9cbed4df8751cec) )
 	ROM_LOAD( "g3-m.4a",      0xc000, 0x1000, CRC(8101b231) SHA1(d933992c93b3cd9a052ac40ec1fa92a181b28691) )
-	ROM_LOAD( "g2-m.6a",      0xd000, 0x1000, BAD_DUMP CRC(a4a0d8dc) SHA1(04db60d5cfca4834ac2cc7661f772704489cb329) ) //bit-rotted?
+	ROM_LOAD( "g2-m.6a",      0xd000, 0x1000, CRC(a4a0d8dc) SHA1(04db60d5cfca4834ac2cc7661f772704489cb329) )
 	ROM_LOAD( "g1-m.8a",      0xe000, 0x1000, CRC(749032eb) SHA1(daa356b2c70bcd8cdd0c4df4268b6158bc8aae8e) )
 	ROM_LOAD( "g0-m.9a",      0xf000, 0x1000, CRC(8f8b1e8e) SHA1(fc877a8f2b26ea48c5ba2324678d6077f3432a79) )
 
@@ -489,30 +518,8 @@ static DRIVER_INIT( progolf )
 	memory_set_decrypted_region(space,0x0000,0xffff, decrypted);
 
 	/* Swap bits 5 & 6 for opcodes */
-	for (A = 0xb000;A < 0x10000;A++)
+	for (A = 0xb000 ; A < 0x10000 ; A++)
 		decrypted[A] = BITSWAP8(rom[A],7,5,6,4,3,2,1,0);
-
-	/*
-    CE12: B1 66         lda  ($66),y
-    CE14: 20 39 A7      jsr  $C759
-        C759: E6 66         inc  $66
-        C75B: D0 02         bne  $C75F
-        C75D: E6 67         inc  $67
-        C75F: 60            rts
-    CE17: C9 FD         cmp  #$FD
-    CE19: F0 44         beq  $CE3F
-    CE1B: C9 FE         cmp  #$FE
-    CE1D: F0 13         beq  $CE32
-    CE1F: C9 FF         cmp  #$FF
-    CE21: F0 4C         beq  $CE4F <- might go out there, this is the only branch in the entire rom that points to the rts
-    ...
-    CE48: 90 A3         bcc  $CE0D
-    CE4A: E6 69         inc  $69
-    CE4C: 4C 0D AE      jmp  $CE0D
-    CE4F: 60            rts
-    */
-
-	decrypted[0xce21] = 0xd0;
 }
 
 static DRIVER_INIT( progolfa )
@@ -526,12 +533,14 @@ static DRIVER_INIT( progolfa )
 
 	/* data is likely to not be encrypted, just the opcodes are. */
 	for (A = 0x0000 ; A < 0x10000 ; A++)
+	{
 		if (A & 1)
 			decrypted[A] = BITSWAP8(rom[A],6,4,7,5,3,2,1,0);
 		else
 			decrypted[A] = rom[A];
+	}
 }
 
 /* Maybe progolf is a bootleg? progolfa uses DECO CPU-6 as custom module CPU (the same as Zoar) */
-GAME( 1981, progolf,  0,       progolf, progolf, progolf,  ROT270, "Data East Corporation", "18 Holes Pro Golf (set 1)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL )
-GAME( 1981, progolfa, progolf, progolf, progolf, progolfa, ROT270, "Data East Corporation", "18 Holes Pro Golf (set 2)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL ) // doesn't display anything
+GAME( 1981, progolf,  0,       progolf, progolf, progolf,  ROT270, "Data East Corporation", "18 Holes Pro Golf (set 1)", GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
+GAME( 1981, progolfa, progolf, progolf, progolf, progolfa, ROT270, "Data East Corporation", "18 Holes Pro Golf (set 2)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL )

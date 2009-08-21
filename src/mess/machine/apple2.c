@@ -774,7 +774,7 @@ INTERRUPT_GEN( apple2_interrupt )
 	int irq_freq = 1;
 	int scanline;
 
-	profiler_mark(PROFILER_A2INT);
+	profiler_mark_start(PROFILER_A2INT);
 
 	scanline = video_screen_get_vpos(device->machine->primary_screen);
 
@@ -790,7 +790,7 @@ INTERRUPT_GEN( apple2_interrupt )
 
 	video_screen_update_partial(device->machine->primary_screen, scanline);
 
-	profiler_mark(PROFILER_END);
+	profiler_mark_end();
 }
 
 
@@ -837,9 +837,9 @@ READ8_HANDLER ( apple2_c00x_r )
 	UINT8 result;
 
 	/* Read the keyboard data and strobe */
-	profiler_mark(PROFILER_C00X);
+	profiler_mark_start(PROFILER_C00X);
 	result = AY3600_keydata_strobe_r();
-	profiler_mark(PROFILER_END);
+	profiler_mark_end();
 
 	return result;
 }
@@ -884,7 +884,7 @@ READ8_HANDLER ( apple2_c01x_r )
 {
 	UINT8 result = apple2_getfloatingbusvalue(space->machine) & 0x7F;
 
-	profiler_mark(PROFILER_C01X);
+	profiler_mark_start(PROFILER_C01X);
 
 	LOG(("a2 softswitch_r: %04x\n", offset + 0xc010));
 	switch (offset)
@@ -907,7 +907,7 @@ READ8_HANDLER ( apple2_c01x_r )
 		case 0x0F:			result |= (a2 & VAR_80COL)		? 0x80 : 0x00;	break;
 	}
 
-	profiler_mark(PROFILER_END);
+	profiler_mark_end();
 	return result;
 }
 
@@ -920,9 +920,9 @@ READ8_HANDLER ( apple2_c01x_r )
 WRITE8_HANDLER( apple2_c01x_w )
 {
 	/* Clear the keyboard strobe - ignore the returned results */
-	profiler_mark(PROFILER_C01X);
+	profiler_mark_start(PROFILER_C01X);
 	AY3600_anykey_clearstrobe_r();
-	profiler_mark(PROFILER_END);
+	profiler_mark_end();
 }
 
 

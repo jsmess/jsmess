@@ -66,7 +66,6 @@ TODO:
 #include "ti99pcod.h"
 
 #include "sound/tms5220.h"	/* for tms5220_set_variant() */
-#include "sound/5220intf.h"
 #include "sound/sn76496.h"
 
 #include "devices/harddriv.h"	/* for device_init_mess_hd() */

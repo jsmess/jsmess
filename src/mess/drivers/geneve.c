@@ -213,7 +213,6 @@
 #include "machine/99_ide.h"
 #include "devices/mflopimg.h"
 #include "machine/smartmed.h"
-#include "sound/5220intf.h"
 #include "devices/harddriv.h"
 #include "machine/idectrl.h"
 #include "machine/smc92x4.h" 

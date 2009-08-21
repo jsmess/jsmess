@@ -421,7 +421,7 @@ static MACHINE_DRIVER_START( panther )
 	MDRV_CPU_VBLANK_INT("screen", redalert_vblank_interrupt)
 
 	/* video hardware */
-	MDRV_IMPORT_FROM(ww3_video)
+	MDRV_IMPORT_FROM(panther_video)
 
 	/* audio hardware */
 	MDRV_IMPORT_FROM(ww3_audio)
@@ -463,8 +463,7 @@ ROM_START( panther )
 	ROM_LOAD( "q7a.bin",       0x7000, 0x0800, CRC(febd1674) SHA1(e122d0855ab6a352d741f9013c20ec31e0068248) )
 
 	ROM_REGION( 0x0200, "proms", 0 ) /* color PROM */
-	/* taken from ww3, almost surely doesn't match. */
-	ROM_LOAD( "m-27sc.1a",	  0x0000, 0x0200, BAD_DUMP CRC(b1aca792) SHA1(db37f99b9880cc3c434e2a55a0bbb017d9a72aa3) ) /* 512*8 74S472 or compatible BPROM like a 82s147 */
+	ROM_LOAD( "6349-1j-8026.1a",	  0x0000, 0x0200, CRC(ea9c2ada) SHA1(cb720c0d77b24f995e0750b3fa42a68962c7a977) ) /* 512*8 74S472 or compatible BPROM like a 82s147 */
 ROM_END
 
 
@@ -537,7 +536,7 @@ ROM_END
  *
  *************************************/
 
-GAME( 1981, panther,  0, panther,  panther,  0, ROT270, "Irem",       "Panther",    GAME_NO_SOUND | GAME_SUPPORTS_SAVE | GAME_WRONG_COLORS )
+GAME( 1981, panther,  0, panther,  panther,  0, ROT270, "Irem",       "Panther",    GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1981, redalert, 0, redalert, redalert, 0, ROT270, "Irem + GDI", "Red Alert",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1981, ww3,      0, ww3,      redalert, 0, ROT270, "Irem",       "WW III",     GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1981, demoneye, 0, demoneye, demoneye, 0, ROT270, "Irem",       "Demoneye-X", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

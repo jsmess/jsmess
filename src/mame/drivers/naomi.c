@@ -3,11 +3,9 @@
   Sega Naomi / Naomi 2 / Atomiswave
 
   Driver by Samuele Zannoli, R. Belmont, ElSemi,
-            David Haywood and Angelo Salese
+            David Haywood, Angelo Salese and Olivier Galibert
 
  Notes:
-  NAMCO Naomi games require a Namco specific BIOS
-
   Several early Naomi games are running on an earlier revision mainboard (HOTD2 etc.) which appears to have an earlier
    revision of the graphic chip.  Attempting to run these games on the later board results in graphical glitches and/or
    other problems.
@@ -1005,14 +1003,13 @@ Notes:
       CN4 - Gun connection for player 1 trigger and optical
       CN5 - Gun connection for player 1 pump switch
 
-
-
 */
 
 #include "driver.h"
 #include "cpu/arm7/arm7.h"
 #include "video/generic.h"
 #include "machine/eeprom.h"
+#include "machine/intelfsh.h"
 #include "naomibd.h"
 #include "naomi.h"
 #include "cpu/sh4/sh4.h"
@@ -1090,6 +1087,13 @@ jvseeprom_default_game[] =
 	{ "keyboard", { 0x32, 0x7E, 0x10, 0x42, 0x45, 0x42, 0x30, 0x09, 0x10, 0x00, 0x01, 0x01,	0x01, 0x00, 0x11, 0x11, 0x11, 0x11, 0x32, 0x7E, 0x10, 0x42, 0x45, 0x42,	0x30, 0x09, 0x10, 0x00, 0x01, 0x01, 0x01, 0x00, 0x11, 0x11, 0x11, 0x11,	0xF0, 0x4A, 0x0C, 0x0C, 0xF0, 0x4A, 0x0C, 0x0C, 0x18, 0x09, 0x01, 0x20,	0x02, 0x00, 0x3C, 0x00, 0x32, 0x00, 0x00, 0x00, 0x18, 0x09, 0x01, 0x20,	0x02, 0x00, 0x3C, 0x00, 0x32, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } }
 };
 
+static NVRAM_HANDLER( aw_nvram )
+{
+	nvram_handler_intelflash(machine, 0, file, read_or_write);
+
+	// TODO: save AW NVRAM at 00200000
+}
+
 static NVRAM_HANDLER( naomi_eeproms )
 {
 	if (read_or_write)
@@ -1097,10 +1101,8 @@ static NVRAM_HANDLER( naomi_eeproms )
 		/* JVS 'eeprom' */
 		mame_fwrite(file,maple0x86data1,0x80);
 
-
 		// mainboard eeprom?
 		eeprom_save(file);
-
 	}
 	else
 	{
@@ -1119,7 +1121,7 @@ static NVRAM_HANDLER( naomi_eeproms )
             eeprom_load(file);
 
 		}
-        else
+        	else
 		{
 		//  int a;
 
@@ -1320,17 +1322,41 @@ static ADDRESS_MAP_START( naomi_port, ADDRESS_SPACE_IO, 64 )
 	AM_RANGE(0x00, 0x0f) AM_READWRITE(eeprom_93c46a_r, eeprom_93c46a_w)
 ADDRESS_MAP_END
 
+static READ64_HANDLER( aw_flash_r )
+{
+	return (UINT64)intelflash_read(0, offset*8) | (UINT64)intelflash_read(0, (offset*8)+1)<<8 | (UINT64)intelflash_read(0, (offset*8)+2)<<16 | (UINT64)intelflash_read(0, (offset*8)+3)<<24 |
+	       (UINT64)intelflash_read(0, (offset*8)+4)<<32 | (UINT64)intelflash_read(0, (offset*8)+5)<<40 | (UINT64)intelflash_read(0, (offset*8)+6)<<48 | (UINT64)intelflash_read(0, (offset*8)+7)<<56;
+}
+
+static WRITE64_HANDLER( aw_flash_w )
+{
+	int i;
+	UINT32 addr = offset * 8;
+
+	for (i = 0; i < 8; i++)
+	{
+		if (mem_mask & ((UINT64)0xff)<< (i*8))
+		{
+			addr += i;
+			break;
+		}
+	}
+
+	data >>= (i*8);
+	intelflash_write(0, addr, data);
+}
+
 
 /*
- * Atomiswave address map, identical to Dreamcast
+ * Atomiswave address map, almost identical to Dreamcast
  */
 
 static ADDRESS_MAP_START( aw_map, ADDRESS_SPACE_PROGRAM, 64 )
 	/* Area 0 */
-	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_SHARE(3) AM_REGION("maincpu", 0) // BIOS
-	AM_RANGE(0xa0000000, 0xa01fffff) AM_ROM AM_SHARE(3)  // non cachable access to  0x00000000 - 0x001fffff
+	AM_RANGE(0x00000000, 0x0001ffff) AM_READWRITE( aw_flash_r, aw_flash_w )
+	AM_RANGE(0xa0000000, 0xa001ffff) AM_READWRITE( aw_flash_r, aw_flash_w )
 
-	AM_RANGE(0x00200000, 0x00207fff) AM_RAM                                             // bios uses it (battery backed ram ?)
+	AM_RANGE(0x00200000, 0x0021ffff) AM_RAM 	// battery backed up RAM
 	AM_RANGE(0x005f6800, 0x005f69ff) AM_READWRITE( dc_sysctrl_r, dc_sysctrl_w )
 	AM_RANGE(0x005f6c00, 0x005f6cff) AM_READWRITE( dc_maple_r, dc_maple_w )
 	AM_RANGE(0x005f7000, 0x005f70ff) AM_DEVREADWRITE("rom_board", naomibd_r, naomibd_w)
@@ -1650,9 +1676,11 @@ MACHINE_DRIVER_END
  */
 
 static MACHINE_DRIVER_START( aw )
-	MDRV_IMPORT_FROM(naomi)
+	MDRV_IMPORT_FROM(naomi_base)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(aw_map)
+	MDRV_NVRAM_HANDLER(aw_nvram)
+	MDRV_AW_ROM_BOARD_ADD("rom_board", "user1")
 MACHINE_DRIVER_END
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
@@ -1842,11 +1870,10 @@ Region byte encoding is as follows:
 	ROM_SYSTEM_BIOS( 7, "bios7", "epr-23607 (USA)"  ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 7, "epr-23607.bin",    0x000000, 0x200000, CRC(2b55add2) SHA1(547de5f97d3183c8cd069c4fa3c09f13d8b637d9) ) \
 
-/* this is one flashrom, however the second half looks like it's used for game settings, may differ between dumps, and may not be needed / could be blanked */
+/* First half is BIOS, second half is game settings and is blanked/reprogrammed by the BIOS as necessary */
 #define AW_BIOS \
 	ROM_SYSTEM_BIOS( 0, "bios0", "Atomiswave BIOS" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 0, "bios.ic23_l",                         0x000000, 0x010000, BAD_DUMP CRC(e5693ce3) SHA1(1bde3ed87af64b0f675ebd47f12a53e1fc5709c1) ) /* Might be bad.. especially. bytes 0x0000, 0x6000, 0x8000 which gave different reads */ \
-	ROM_LOAD16_WORD_SWAP_BIOS( 0, "bios.ic23_h-dolphin_blue_settings",   0x010000, 0x010000, BAD_DUMP CRC(5d5687c7) SHA1(2600ce09c44872d1793f6b55bf44342673da5ad1) ) /* it appears to flash settings game data here */ /* this is one flashrom, however the second half looks like it's used for game settings, may differ between dumps, and may not be needed / could be blanked */
+	ROM_LOAD16_WORD_SWAP_BIOS( 0, "bios.ic23_l",                         0x000000, 0x010000, BAD_DUMP CRC(e5693ce3) SHA1(1bde3ed87af64b0f675ebd47f12a53e1fc5709c1) ) /* Might be bad.. especially. bytes 0x0000, 0x6000, 0x8000 which gave different reads */
 
 
 ROM_START( naomi )
@@ -2883,39 +2910,39 @@ EXP: MARVEL VS. CAPCOM 2
 Note: the following game is one of the few known regular Naomi game to have a rom test item in its specific test mode menu.
 So the Naomi regular board test item is unreliable in this circumstance.
 
-protection notes:
-CPU 'maincpu' (PC=0C001014): unmapped program memory qword write to 0231FCF8 = 00000000E2534910 & 00000000FFFFFFFF
-CPU 'maincpu': warning - attempt to direct-map address 02534910 in program space
-CPU 'maincpu' (PC=02534910): unmapped program memory qword read from 02534910 & 000000000000FFFF
-CPU 'maincpu': warning - attempt to direct-map address 02534912 in program space
-CPU 'maincpu' (PC=02534912): unmapped program memory qword read from 02534910 & 00000000FFFF0000
-CPU 'maincpu': warning - attempt to direct-map address 02534914 in program space
 */
-
 
 ROM_START( mvsc2 )
 	ROM_REGION( 0x200000, "maincpu", 0)
 	NAOMI_BIOS
 
-	ROM_REGION( 0x8800000, "user1", ROMREGION_ERASEFF)
-	ROM_LOAD("epr-23085a.ic11", 0x0000000, 0x0400000, CRC(5d5b7ad1) SHA1(f58c31b245fc33fa541f9f074548402a63f7c3d3) ) //ic 22
+	ROM_REGION( 0x8900000, "user1", ROMREGION_ERASEFF)
+	ROM_LOAD("epr-23085a.ic11", 0x0000000, 0x0400000, CRC(5d5b7ad1) SHA1(f58c31b245fc33fa541f9f074548402a63f7c3d3) )
 	ROM_RELOAD( 0x400000, 0x400000)
-	ROM_LOAD("mpr-23048.ic17",  0x0800000, 0x0800000, CRC(93d7a63a) SHA1(c50d10b4a3f9db51eae5749f5b665d7c8ab6c898) ) //ic 1
-	ROM_LOAD("mpr-23049.ic18",  0x1000000, 0x0800000, CRC(003dcce0) SHA1(fb71c8ca9271d2155878c72d8fe2df3031e6c014) ) //ic 2
-	ROM_LOAD("mpr-23050.ic19",  0x1800000, 0x0800000, CRC(1d6b88a7) SHA1(ba42e9d1d912d88a7ad839b878975ba590634320) ) //ic 3
-	ROM_LOAD("mpr-23051.ic20",  0x2000000, 0x0800000, CRC(01226aaa) SHA1(a4c6a0eda05e53d0e51b92a4317a86a708a7efdb) ) //ic 4
-	ROM_LOAD("mpr-23052.ic21",  0x2800000, 0x0800000, CRC(74bee120) SHA1(5a0fb48fa758a2be2e08e3b1298103c5aa748835) ) //ic 5
-	ROM_LOAD("mpr-23053.ic22",  0x3000000, 0x0800000, CRC(d92d4401) SHA1(a868780f8d2e176ff10781e1c08bf932f34ac504) ) //ic 6
-	ROM_LOAD("mpr-23054.ic23",  0x3800000, 0x0800000, CRC(78ba02e8) SHA1(0f696a33e1e6671001efc309ed62f084a246ad24) ) //ic 7
-	ROM_LOAD("mpr-23055.ic24",  0x4000000, 0x0800000, CRC(84319604) SHA1(c3dde162e043a54e1325202b46191b32e8784a1c) ) //ic 8
-	ROM_LOAD("mpr-23056.ic25",  0x4800000, 0x0800000, CRC(d7386034) SHA1(be1f3ca5f283e428dc59dc072de3e7d36e122d53) ) //ic 9
-	ROM_LOAD("mpr-23057.ic26",  0x5000000, 0x0800000, CRC(a3f087db) SHA1(b52d7c072cb5c2fdd10d0ac0b62cebe48b229ae3) ) //ic 10
-	ROM_LOAD("mpr-23058.ic27",  0x5800000, 0x0800000, CRC(61a6cc5d) SHA1(34e52cb076888313a80f2b87876b8d37b91d85a0) ) //ic 11
-	ROM_LOAD("mpr-23059.ic28",  0x6000000, 0x0800000, CRC(64808024) SHA1(1a6c60c330642b273978d3dd02d95d17d36ee3f2) ) //ic 12
-	ROM_LOAD("mpr-23060.ic29",  0x6800000, 0x0800000, CRC(67519942) SHA1(fc758d9075625f8140d5d828c8f6b7a91bcc9119) ) //ic 13
-	ROM_LOAD("mpr-23061.ic30",  0x7000000, 0x0800000, CRC(fb1844c4) SHA1(1d1571516a6dbed0c4ded3b80efde9cc9281f66f) ) //ic 14
-	ROM_LOAD32_WORD("mpr-23083.ic31",  0x8000000, 0x0400000, CRC(c61d2dfe) SHA1(a05fb979ed7c8040de91716fc8814e6bd995efa2) ) //ic 15
-	ROM_LOAD32_WORD("mpr-23084.ic32",  0x8000002, 0x0400000, CRC(4ebbbdd9) SHA1(9ad8c1a644850de6e35705318cd1991e1d6e60a8) ) //ic 16
+	ROM_LOAD("mpr-23048.ic17",  0x0800000, 0x0800000, CRC(93d7a63a) SHA1(c50d10b4a3f9db51eae5749f5b665d7c8ab6c898) )
+	ROM_LOAD("mpr-23049.ic18",  0x1000000, 0x0800000, CRC(003dcce0) SHA1(fb71c8ca9271d2155878c72d8fe2df3031e6c014) )
+	ROM_LOAD("mpr-23050.ic19",  0x1800000, 0x0800000, CRC(1d6b88a7) SHA1(ba42e9d1d912d88a7ad839b878975ba590634320) )
+	ROM_LOAD("mpr-23051.ic20",  0x2000000, 0x0800000, CRC(01226aaa) SHA1(a4c6a0eda05e53d0e51b92a4317a86a708a7efdb) )
+	ROM_LOAD("mpr-23052.ic21",  0x2800000, 0x0800000, CRC(74bee120) SHA1(5a0fb48fa758a2be2e08e3b1298103c5aa748835) )
+	ROM_LOAD("mpr-23053.ic22",  0x3000000, 0x0800000, CRC(d92d4401) SHA1(a868780f8d2e176ff10781e1c08bf932f34ac504) )
+	ROM_LOAD("mpr-23054.ic23",  0x3800000, 0x0800000, CRC(78ba02e8) SHA1(0f696a33e1e6671001efc309ed62f084a246ad24) )
+	ROM_LOAD("mpr-23055.ic24",  0x4000000, 0x0800000, CRC(84319604) SHA1(c3dde162e043a54e1325202b46191b32e8784a1c) )
+	ROM_LOAD("mpr-23056.ic25",  0x4800000, 0x0800000, CRC(d7386034) SHA1(be1f3ca5f283e428dc59dc072de3e7d36e122d53) )
+	ROM_LOAD("mpr-23057.ic26",  0x5000000, 0x0800000, CRC(a3f087db) SHA1(b52d7c072cb5c2fdd10d0ac0b62cebe48b229ae3) )
+	ROM_LOAD("mpr-23058.ic27",  0x5800000, 0x0800000, CRC(61a6cc5d) SHA1(34e52cb076888313a80f2b87876b8d37b91d85a0) )
+	ROM_LOAD("mpr-23059.ic28",  0x6000000, 0x0800000, CRC(64808024) SHA1(1a6c60c330642b273978d3dd02d95d17d36ee3f2) )
+	ROM_LOAD("mpr-23060.ic29",  0x6800000, 0x0800000, CRC(67519942) SHA1(fc758d9075625f8140d5d828c8f6b7a91bcc9119) )
+	ROM_LOAD("mpr-23061.ic30",  0x7000000, 0x0800000, CRC(fb1844c4) SHA1(1d1571516a6dbed0c4ded3b80efde9cc9281f66f) )
+        ROM_LOAD("mpr-23083.ic31",  0x7800000, 0x0400000, CRC(c61d2dfe) SHA1(a05fb979ed7c8040de91716fc8814e6bd995efa2) )
+        ROM_LOAD("mpr-23084.ic32",  0x8000000, 0x0400000, CRC(e228cdfd) SHA1(d02a2e3557bd24cf34c5ddb42d41ca15e78ae885) )
+
+	// DMA protection data
+        ROM_LOAD("88000000.bin", 0x8800000, 0x025f00, CRC(77d79823) SHA1(2545d28eee47114e8ffb9bc6d7a910e90fc48420) )
+        ROM_LOAD("88026440.bin", 0x8830000, 0x016520, CRC(dad9ebbd) SHA1(39c0697caa2b5ee11d99e75726e92ed86a23f10b) )
+        ROM_LOAD("8803bda0.bin", 0x8850000, 0x01e5e0, CRC(9e0b8202) SHA1(729bed557c1a00da13c990603bbadab38d90285e) )
+        ROM_LOAD("8805a560.bin", 0x8870000, 0x0017a0, CRC(7bc27482) SHA1(6ce6074cf47989f42af02deb7aac52883912784a) )
+        ROM_LOAD("8805b720.bin", 0x8880000, 0x02b5a0, CRC(485d0aef) SHA1(853f4b49b489cc512c906edcaf3cd8b5bf4c64c0) )
+        ROM_LOAD("8808b7e0.bin", 0x88a0000, 0x013ec0, CRC(0fc8f363) SHA1(dad30d43cef89d01ce80301b1d796aabad755de6) )
 ROM_END
 
 /* toy fighter - 1999 sega */
@@ -5213,6 +5240,14 @@ static const atomiswave_key xh_key = {
     {4,0,1,2,5,7,3,6}
 };
 
+static const atomiswave_key xh2_key = {
+    {14,1,11,15,7,3,8,13,0,4,2,12,6,10,5,9},
+    {11,3,7,1,31,17,16,15,24,18,23,26,4,25,20,10,12,27,29,21,5,8,30,14,19,9,0,2,13,6,22,28},
+    {7,11,10,3,15,6,14,4,9,5,8,0,1,12,2,13},
+    {11,1,8,10,9,5,15,14,12,3,0,6,4,7,13,2},
+    {4,0,1,2,5,7,3,6}
+};
+
 static UINT16 atomiswave_decrypt(UINT16 cipherText, int address, const atomiswave_key* key)
 {
     int b0,b1,b2,b3;
@@ -5236,6 +5271,16 @@ static UINT16 atomiswave_decrypt(UINT16 cipherText, int address, const atomiswav
     return (b3<<13)|(b2<<9)|(b1<<5)|b0;
 }
 
+static DRIVER_INIT( atomiswave )
+{
+	UINT64 *ROM = (UINT64 *)memory_region(machine, "maincpu");
+
+	// patch out long startup delay
+	ROM[0x98e/8] = (ROM[0x98e/8] & U64(0xffffffffffff)) | (UINT64)0x0009<<48;
+
+	intelflash_init(machine, 0, FLASH_MACRONIX_29L001MC, memory_region(machine, "maincpu"));
+}
+
 
 static DRIVER_INIT(fotns)
 {
@@ -5249,21 +5294,7 @@ static DRIVER_INIT(fotns)
 		src[i] = atomiswave_decrypt(src[i], i*2, &fotns_key);
 	}
 
-#if 0
-	{
-		FILE *fp;
-		const char *gamename = machine->gamedrv->name;
-		char filename[256];
-		sprintf(filename, "%s.dump", gamename);
-
-		fp=fopen(filename, "w+b");
-		if (fp)
-		{
-			fwrite(src, rom_size, 1, fp);
-			fclose(fp);
-		}
-	}
-#endif
+	DRIVER_INIT_CALL(atomiswave);
 }
 
 
@@ -5280,21 +5311,7 @@ static DRIVER_INIT(demofist)
 		src[i] = atomiswave_decrypt(src[i], i*2, &df_key);
 	}
 
-#if 0
-	{
-		FILE *fp;
-		const char *gamename = machine->gamedrv->name;
-		char filename[256];
-		sprintf(filename, "%s.dump", gamename);
-
-		fp=fopen(filename, "w+b");
-		if (fp)
-		{
-			fwrite(src, rom_size, 1, fp);
-			fclose(fp);
-		}
-	}
-#endif
+	DRIVER_INIT_CALL(atomiswave);
 }
 
 static DRIVER_INIT(sprtshot)
@@ -5308,6 +5325,8 @@ static DRIVER_INIT(sprtshot)
 	{
 		src[i] = atomiswave_decrypt(src[i], i*2, &ssu_key);
 	}
+
+	DRIVER_INIT_CALL(atomiswave);
 }
 
 static DRIVER_INIT(rangrmsn)
@@ -5321,6 +5340,8 @@ static DRIVER_INIT(rangrmsn)
 	{
 		src[i] = atomiswave_decrypt(src[i], i*2, &rm_key);
 	}
+
+	DRIVER_INIT_CALL(atomiswave);
 }
 
 static DRIVER_INIT(xtrmhunt)
@@ -5334,6 +5355,23 @@ static DRIVER_INIT(xtrmhunt)
 	{
 		src[i] = atomiswave_decrypt(src[i], i*2, &xh_key);
 	}
+
+	DRIVER_INIT_CALL(atomiswave);
+}
+
+static DRIVER_INIT(xtrmhnt2)
+{
+  	int i;
+	UINT16 *src = (UINT16 *)(memory_region(machine, "user1"));
+
+	long rom_size = memory_region_length(machine, "user1");
+
+	for(i=0; i<rom_size/2; i++)
+	{
+		src[i] = atomiswave_decrypt(src[i], i*2, &xh2_key);
+	}
+
+	DRIVER_INIT_CALL(atomiswave);
 }
 
 ROM_START( fotns )
@@ -5405,13 +5443,32 @@ ROM_START( xtrmhunt )
 	ROM_LOAD("ax2406m01.ic16", 0x6000000, 0x1000000,  CRC(cbcf2c5d) SHA1(61362fabcbb3bfc01c996748a7ca65f8a0e02f2f) )
 ROM_END
 
+ROM_START( xtrmhnt2 )
+	ROM_REGION( 0x200000, "maincpu", 0)
+	AW_BIOS
+
+	ROM_REGION( 0x8000000, "user1", ROMREGION_ERASE)
+        ROM_LOAD( "610-0752.u3",  0x0000000, 0x1000000, CRC(bab6182e) SHA1(4d25256c81941316887cbb4524a203922f5b7104) )
+        ROM_LOAD( "610-0752.u1",  0x1000000, 0x1000000, CRC(3086bc47) SHA1(eb7b04db90d296985528f0cfdd4545f184c40b64) )
+        ROM_LOAD( "610-0752.u2",  0x2000000, 0x1000000, CRC(d3a88b31) SHA1(ccf14367e4e7efbc2cc835f3b001fd6d64302a5e) )
+        ROM_LOAD( "610-0752.u4",  0x3000000, 0x1000000, CRC(9787f145) SHA1(8445ede0477f70fbdc113810b80356945ce498d2) )
+        ROM_LOAD( "610-0752.u14", 0x4000000, 0x1000000, CRC(ce83bcc7) SHA1(e2d324a5a7eacbec7b0df9a4b9e276521bb9ab80) )
+        ROM_LOAD( "610-0752.u15", 0x5000000, 0x1000000, CRC(864a6342) SHA1(fb97532d5dd00f8520fdaf68dfcd1ea627bdf90a) )
+        ROM_LOAD( "610-0752.u16", 0x6000000, 0x1000000, CRC(8ac71c76) SHA1(080e41e633bf082fc536781541c6031d1ac81939) )
+        ROM_LOAD( "610-0752.u17", 0x7000000, 0x1000000, CRC(a79fb1fa) SHA1(f75c5b574fd79677b926c595b369e95605a3c848) )
+
+	ROM_REGION( 0x1400000, "network", 0)	// network board
+        ROM_LOAD( "fpr-24330a.ic2", 0x000000, 0x400000, CRC(8d89877e) SHA1(6caafc49114eb0358e217bc2d1a3ab58a93c8d19) )
+        ROM_LOAD( "flash128.ic4s", 0x400000, 0x1000000, CRC(866ed675) SHA1(2c4c06935b7ab1876e640cede51713b841833567) )
+ROM_END
 
 /* Atomiswave */
-GAME( 2001, awbios,   0,        naomi,    naomi,    0,        ROT0, "Sammy",                           "Atomiswave Bios", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
+GAME( 2001, awbios,   0,        aw,    naomi,    0,        ROT0, "Sammy",                           "Atomiswave Bios", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
 
-GAME( 2002, sprtshot, awbios,   naomi,    naomi,    sprtshot, ROT0, "Sammy",                           "Sports Shooting USA", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-GAME( 2003, demofist, awbios,   naomi,    naomi,    demofist, ROT0, "Polygon Magic / Dimps",           "Demolish Fist", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-GAME( 2004, rangrmsn, awbios,   naomi,    naomi,    rangrmsn, ROT0, "Sammy",                           "Ranger Mission", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-GAME( 2005, fotns,    awbios,   naomi,    naomi,    fotns,    ROT0, "Arc System Works",                "Fist Of The North Star", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-GAME( 2005, xtrmhunt, awbios,   naomi,    naomi,    xtrmhunt, ROT0, "Sammy",                           "Extreme Hunting", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+GAME( 2002, sprtshot, awbios,   aw,    naomi,    sprtshot, ROT0, "Sammy",                           "Sports Shooting USA", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+GAME( 2003, demofist, awbios,   aw,    naomi,    demofist, ROT0, "Polygon Magic / Dimps",           "Demolish Fist", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+GAME( 2004, rangrmsn, awbios,   aw,    naomi,    rangrmsn, ROT0, "Sammy",                           "Ranger Mission", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+GAME( 2005, fotns,    awbios,   aw,    naomi,    fotns,    ROT0, "Arc System Works",                "Fist Of The North Star", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+GAME( 2005, xtrmhunt, awbios,   aw,    naomi,    xtrmhunt, ROT0, "Sammy",                           "Extreme Hunting", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+GAME( 2006, xtrmhnt2, awbios,   aw,    naomi,    xtrmhnt2, ROT0, "Sammy",                           "Extreme Hunting 2", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 

@@ -544,7 +544,7 @@ $(CPUOBJ)/e132xs/e132xs.o:	$(CPUSRC)/e132xs/e132xs.c \
 							$(CPUSRC)/e132xs/e132xsop.c
 
 
-							
+
 #-------------------------------------------------
 # Intel 4004
 #-------------------------------------------------
@@ -555,7 +555,7 @@ CPUOBJS += $(CPUOBJ)/i4004/i4004.o
 DBGOBJS += $(CPUOBJ)/i4004/4004dasm.o
 endif
 
-$(CPUOBJ)/i4004/i4004.o:	$(CPUSRC)/i4004/i4004.c	\
+$(CPUOBJ)/i4004/i4004.o:	$(CPUSRC)/i4004/i4004.c \
 							$(CPUSRC)/i4004/i4004.h
 
 
@@ -1544,7 +1544,6 @@ endif
 
 $(CPUOBJ)/z180/z180.o:	$(CPUSRC)/z180/z180.c \
 						$(CPUSRC)/z180/z180.h \
-						$(CPUSRC)/z180/z180daa.h \
 						$(CPUSRC)/z180/z180op.c \
 						$(CPUSRC)/z180/z180ops.h \
 						$(CPUSRC)/z180/z180tbl.h \

@@ -726,7 +726,7 @@ static void render_scanline( const device_config *device )
 	int *ppu_regs = &this_ppu->regs[0];
 
 	/* lets see how long it takes */
-	profiler_mark(PROFILER_USER1);
+	profiler_mark_start(PROFILER_USER1);
 
 	/* clear the line priority for this scanline */
 	memset(line_priority, 0, VISIBLE_SCREEN_WIDTH);
@@ -760,7 +760,7 @@ static void render_scanline( const device_config *device )
 	draw_sprites(device, line_priority);
 
  	/* done updating, whew */
-	profiler_mark(PROFILER_END);
+	profiler_mark_end();
 }
 
 static void update_scanline( const device_config *device )
@@ -1018,7 +1018,7 @@ READ8_HANDLER( ppu2c0x_palette_read )
 		if (this_ppu->regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO)
 			return (this_ppu->palette_ram[offset & 0x1f] & 0x30);
 
-		else 
+		else
 			return (this_ppu->palette_ram[offset & 0x1f] & 0x3f);
 	}
 }

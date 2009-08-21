@@ -56,7 +56,7 @@ L056-6    9A          "      "      VLI-8-4 7A         "
 #include "cpu/tms9900/tms9900.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "sound/5220intf.h"
+#include "sound/tms5220.h"
 #include "video/resnet.h"
 #include "cpu/cop400/cop400.h"
 
@@ -87,7 +87,7 @@ L056-6    9A          "      "      VLI-8-4 7A         "
 #define VBEND				(16)
 #define VBSTART				(224+16)
 
-
+UINT8 *cop_io;
 
 /*************************************
  *
@@ -429,29 +429,41 @@ static WRITE8_HANDLER( plr2_w )
  *
  *************************************/
 
-static READ8_HANDLER( protection_r )
+static READ8_HANDLER( cop_io_r )
 {
-	/*
-        The code reads ($7002) ($7004) alternately
-        The result must change at least once every 10 reads
-        A read from ($34b0 + result) must == $01
-
-        Valid values:
-            $61 $67
-            $B7 $BF
-            $DB
-            $E1
-            $F3 $F7 $FD $FF
-
-        Because they read alternately from different locations,
-        it is trivial to bypass the protection.
-    */
-	if (offset == 2)
-		return 0xf3;
-	else
-		return 0xf7;
+	// if (offset == 1) return mame_rand(space->machine) & 0x01;
+	return 1; // cop_io[offset];
 }
 
+static WRITE8_HANDLER( cop_io_w )
+{
+	cop_io[offset] = data;
+if (offset == 0) logerror("%02x  ",data);
+}
+
+static READ8_HANDLER( protection_r )
+{
+//        The code reads ($7002) ($7004) alternately
+//        The result must change at least once every 10 reads
+//        A read from ($34b0 + result) must == $01
+
+//        Valid values:
+//            $61 $67
+//            $B7 $BF
+//            $DB
+//            $E1
+//            $F3 $F7 $FD $FF
+
+//        Because they read alternately from different locations,
+//        it is trivial to bypass the protection.
+
+//        cop write alternately $02 $01 $08 $04 in port $102
+//        cop write randomly fc (unfortunatly) but 61,67,b7,bf,db,e1,f3,fd,ff too and only these values
+
+	// missing something
+	if(cop_io[0] != 0xfc) return cop_io[0];
+	return 0xff;
+}
 
 
 /*************************************
@@ -513,6 +525,7 @@ static ADDRESS_MAP_START( looping_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x008, 0x008) AM_DEVWRITE("ay", ay_enable_w)
 	AM_RANGE(0x009, 0x009) AM_DEVWRITE("tms", speech_enable_w)
 	AM_RANGE(0x00a, 0x00a) AM_WRITE(ballon_enable_w)
+	AM_RANGE(0x00b, 0x00f) AM_NOP
 ADDRESS_MAP_END
 
 
@@ -525,6 +538,9 @@ static ADDRESS_MAP_START( looping_cop_data_map, ADDRESS_SPACE_DATA, 8 )
 	AM_RANGE(0x0000, 0x003f) AM_RAM
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( looping_cop_io_map, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x0100, 0x0107) AM_READWRITE(cop_io_r, cop_io_w)
+ADDRESS_MAP_END
 
 
 /*************************************
@@ -602,6 +618,7 @@ static MACHINE_DRIVER_START( looping )
 	MDRV_CPU_ADD("mcu", COP420, COP_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(looping_cop_map)
 	MDRV_CPU_DATA_MAP(looping_cop_data_map)
+	MDRV_CPU_IO_MAP(looping_cop_io_map)
 	MDRV_CPU_CONFIG(looping_cop_intf)
 
 	MDRV_MACHINE_START(looping)
@@ -718,7 +735,20 @@ ROM_START( looping )
 	ROM_LOAD( "i-o.11a",		0x2800, 0x1000, CRC(61c74c79) SHA1(9f34d18a919446dd76857b851cea23fc1526f3c2) ) /* speech */
 
 	ROM_REGION( 0x1000, "mcu", 0 ) /* COP420 microcontroller code */
-	ROM_LOAD( "cop.bin",		0x0000, 0x1000, BAD_DUMP CRC(bbfd26d5) SHA1(5f78b32b6e7c003841ef5b635084db2cdfebf0e1) ) // overdumped 4 times, and starting PC is not 0
+/*
+    ROM_LOAD( "cop.bin",        0x0000, 0x0400, BAD_DUMP CRC(bbfd26d5) SHA1(5f78b32b6e7c003841ef5b635084db2cdfebf0e1) ) // overdumped 4 times, and starting PC is not 0
+    ROM_CONTINUE(           0x0000, 0x0400)
+    ROM_CONTINUE(           0x0000, 0x0400)
+    ROM_CONTINUE(           0x0000, 0x0400)
+*/
+	ROM_LOAD( "cop.bin",		0x00c2, 0x033e, CRC(bbfd26d5) SHA1(5f78b32b6e7c003841ef5b635084db2cdfebf0e1) ) // overdumped 4 times and shifted
+	ROM_CONTINUE(			0x0000, 0x00c2)
+	ROM_CONTINUE(			0x00c2, 0x033e)
+	ROM_CONTINUE(			0x0000, 0x00c2)
+	ROM_CONTINUE(			0x00c2, 0x033e)
+	ROM_CONTINUE(			0x0000, 0x00c2)
+	ROM_CONTINUE(			0x00c2, 0x033e)
+	ROM_CONTINUE(			0x0000, 0x00c2)
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
 	ROM_LOAD( "log2.8a",		0x0000, 0x800, CRC(ef3284ac) SHA1(8719c9df8c972a56c306b3c707aaa53092ffa2d6) )
@@ -738,11 +768,24 @@ ROM_START( loopinga )
 
 	ROM_REGION( 0x3800, "audiocpu", 0 ) /* TMS9980 code */
 	ROM_LOAD( "i-o-v2.13c",		0x0000, 0x0800, CRC(09765ebe) SHA1(93b035c3a94f2f6d5e463256e26b600a4dd5d3ea) )
-    ROM_LOAD( "i-o.13a",		0x0800, 0x1000, CRC(1de29f25) SHA1(535acb132266d6137b0610ee9a9b946459ae44af) ) /* speech */
+	ROM_LOAD( "i-o.13a",		0x0800, 0x1000, CRC(1de29f25) SHA1(535acb132266d6137b0610ee9a9b946459ae44af) ) /* speech */
 	ROM_LOAD( "i-o.11a",		0x2800, 0x1000, CRC(61c74c79) SHA1(9f34d18a919446dd76857b851cea23fc1526f3c2) )
 
 	ROM_REGION( 0x1000, "mcu", 0 ) /* COP420 microcontroller code */
-	ROM_LOAD( "cop.bin",		0x0000, 0x1000, BAD_DUMP CRC(bbfd26d5) SHA1(5f78b32b6e7c003841ef5b635084db2cdfebf0e1) ) // overdumped 4 times, and starting PC is not 0
+/*
+    ROM_LOAD( "cop.bin",        0x0000, 0x0400, BAD_DUMP CRC(bbfd26d5) SHA1(5f78b32b6e7c003841ef5b635084db2cdfebf0e1) ) // overdumped 4 times, and starting PC is not 0
+    ROM_CONTINUE(           0x0000, 0x0400)
+    ROM_CONTINUE(           0x0000, 0x0400)
+    ROM_CONTINUE(           0x0000, 0x0400)
+*/
+	ROM_LOAD( "cop.bin",		0x00c2, 0x033e, CRC(bbfd26d5) SHA1(5f78b32b6e7c003841ef5b635084db2cdfebf0e1) ) // overdumped 4 times and shifted
+	ROM_CONTINUE(			0x0000, 0x00c2)
+	ROM_CONTINUE(			0x00c2, 0x033e)
+	ROM_CONTINUE(			0x0000, 0x00c2)
+	ROM_CONTINUE(			0x00c2, 0x033e)
+	ROM_CONTINUE(			0x0000, 0x00c2)
+	ROM_CONTINUE(			0x00c2, 0x033e)
+	ROM_CONTINUE(			0x0000, 0x00c2)
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
 	ROM_LOAD( "log2.8a",		0x0000, 0x800, CRC(ef3284ac) SHA1(8719c9df8c972a56c306b3c707aaa53092ffa2d6) )
@@ -759,13 +802,26 @@ ROM_START( skybump )
 	ROM_LOAD( "cpu.9a",			0x4000, 0x2000, CRC(c7a50797) SHA1(60aa0a28ba970f12d0a0e538ae1c6807d105855c) )
 	ROM_LOAD( "cpu.8a",			0x6000, 0x2000, CRC(a718c6f2) SHA1(19afa8c353829232cb96c27b87f13b43166ab6fc) )
 
-    ROM_REGION( 0x3800, "audiocpu", 0 ) /* TMS9980 code */
+	ROM_REGION( 0x3800, "audiocpu", 0 ) /* TMS9980 code */
 	ROM_LOAD( "snd.13c",		0x0000, 0x0800, CRC(21e9350c) SHA1(f30a180309e373a17569351944f5e7982c3b3f9d) )
 	ROM_LOAD( "snd.13a",		0x0800, 0x1000, CRC(1de29f25) SHA1(535acb132266d6137b0610ee9a9b946459ae44af) )
 	ROM_LOAD( "snd.11a",		0x2800, 0x1000, CRC(61c74c79) SHA1(9f34d18a919446dd76857b851cea23fc1526f3c2) )
 
 	ROM_REGION( 0x1000, "mcu", 0 ) /* COP420 microcontroller code */
-	ROM_LOAD( "cop.bin",		0x0000, 0x1000, BAD_DUMP CRC(bbfd26d5) SHA1(5f78b32b6e7c003841ef5b635084db2cdfebf0e1) ) // overdumped 4 times, and starting PC is not 0
+/*
+    ROM_LOAD( "cop.bin",        0x0000, 0x0400, BAD_DUMP CRC(bbfd26d5) SHA1(5f78b32b6e7c003841ef5b635084db2cdfebf0e1) ) // overdumped 4 times, and starting PC is not 0
+    ROM_CONTINUE(           0x0000, 0x0400)
+    ROM_CONTINUE(           0x0000, 0x0400)
+    ROM_CONTINUE(           0x0000, 0x0400)
+*/
+	ROM_LOAD( "cop.bin",		0x00c2, 0x033e, CRC(bbfd26d5) SHA1(5f78b32b6e7c003841ef5b635084db2cdfebf0e1) ) // overdumped 4 times and shifted
+	ROM_CONTINUE(			0x0000, 0x00c2)
+	ROM_CONTINUE(			0x00c2, 0x033e)
+	ROM_CONTINUE(			0x0000, 0x00c2)
+	ROM_CONTINUE(			0x00c2, 0x033e)
+	ROM_CONTINUE(			0x0000, 0x00c2)
+	ROM_CONTINUE(			0x00c2, 0x033e)
+	ROM_CONTINUE(			0x0000, 0x00c2)
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
 	ROM_LOAD( "vid.8a",			0x0000, 0x800, CRC(459ccc55) SHA1(747f6789605b48be9e22f779f9e3f6c98ad4e594) )
@@ -788,6 +844,8 @@ static DRIVER_INIT( looping )
 	int length = memory_region_length(machine, "maincpu");
 	UINT8 *rom = memory_region(machine, "maincpu");
 	int i;
+
+	cop_io = auto_alloc_array(machine, UINT8, 0x08);
 
 	/* bitswap the TMS9995 ROMs */
 	for (i = 0; i < length; i++)

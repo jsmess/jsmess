@@ -418,8 +418,8 @@ INLINE void snes_update_line( UINT8 screen, UINT8 color_depth, UINT8 hires, UINT
 	/* scrolling */
 	UINT32 basevmap;
 	UINT16 vscroll, hscroll, vtilescroll;
-//	UINT16 offset_per_tile_valid;
-//	UINT8 offset_per_tile_mode;
+//  UINT16 offset_per_tile_valid;
+//  UINT8 offset_per_tile_mode;
 	UINT8 vshift, hshift, tile_size;
 	/* variables depending on color_depth */
 	UINT8 color_shift = 0;
@@ -508,7 +508,7 @@ INLINE void snes_update_line( UINT8 screen, UINT8 color_depth, UINT8 hires, UINT
 			wrap_around_x = 0;	/* Make sure we don't do this again */
 		}
 		//if (tmap > 0x10000)
-		//	tmap %= 0x10000;
+		//  tmap %= 0x10000;
 
 		vflip = snes_vram[tmap + ii + 1] & 0x80;
 		hflip = snes_vram[tmap + ii + 1] & 0x40;
@@ -1094,13 +1094,13 @@ static void snes_update_windowmasks(void)
 				case 0x0:	/* OR */
 					snes_ppu.clipmasks[5][ii] = w1 | w2 ? 0x00 : 0xff;
 					break;
-				case 0x1:	/* AND */
+				case 0x4:	/* AND */
 					snes_ppu.clipmasks[5][ii] = w1 & w2 ? 0x00 : 0xff;
 					break;
-				case 0x2:	/* XOR */
+				case 0x8:	/* XOR */
 					snes_ppu.clipmasks[5][ii] = w1 ^ w2 ? 0x00 : 0xff;
 					break;
-				case 0x3:	/* XNOR */
+				case 0xc:	/* XNOR */
 					snes_ppu.clipmasks[5][ii] = !(w1 ^ w2) ? 0x00 : 0xff;
 					break;
 			}
@@ -1154,7 +1154,7 @@ static void snes_refresh_scanline( running_machine *machine, bitmap_t *bitmap, U
 	int fade;
 	struct SCANLINE *scanline;
 
-	profiler_mark(PROFILER_VIDEO);
+	profiler_mark_start(PROFILER_VIDEO);
 
 	if (snes_ram[INIDISP] & 0x80) /* screen is forced blank */
 		for (x = 0; x < SNES_SCR_WIDTH * 2; x++)
@@ -1203,7 +1203,7 @@ static void snes_refresh_scanline( running_machine *machine, bitmap_t *bitmap, U
 #ifdef MAME_DEBUG
 		if (snes_dbg_video(machine, bitmap, curline))
 		{
-			profiler_mark(PROFILER_END);
+			profiler_mark_end();
 			return;
 		}
 
@@ -1233,7 +1233,7 @@ static void snes_refresh_scanline( running_machine *machine, bitmap_t *bitmap, U
 		}
 	}
 
-	profiler_mark(PROFILER_END);
+	profiler_mark_end();
 }
 
 VIDEO_UPDATE( snes )

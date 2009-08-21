@@ -255,6 +255,9 @@
  * DISCRETE_OP_AMP_ONESHOT(NODE,TRIG,INFO)
  * DISCRETE_OP_AMP_TRIG_VCA(NODE,TRG0,TRG1,TRG2,IN0,IN1,INFO)
  *
+ * DISCRETE_BIT_DECODE(NODE,INP,BIT_N,VOUT)
+ * DISCRETE_BITS_DECODE(NODE,INP,BIT_FROM,BIT_TO,VOUT)
+ *
  * DISCRETE_LOGIC_INVERT(NODE,ENAB,INP0)
  * DISCRETE_LOGIC_AND(NODE,ENAB,INP0,INP1)
  * DISCRETE_LOGIC_AND3(NODE,ENAB,INP0,INP1,INP2)
@@ -461,8 +464,7 @@
  *                           DISC_CLK_ON_R_EDGE - toggle on rising edge.
  *                           DISC_CLK_BY_COUNT  - toggle specified number of times.
  *                           DISC_CLK_IS_FREQ   - internally clock at this frequency.
- *                                                Clock node must be static if
- *                                                DISC_CLK_IS_FREQ is used.
+ *
  *               x_time options: you can also | these x_time features to the basic
  *                               types above if needed, or use seperately with 7492.
  *                           DISC_OUT_IS_ENERGY - This will uses the x_time to
@@ -524,6 +526,7 @@
  *            DISC_LFSR_FLAG_RESET_TYPE_L   - reset when LOW (Defalut)
  *            DISC_LFSR_FLAG_RESET_TYPE_H   - reset when HIGH
  *            DISC_LFSR_FLAG_OUTPUT_F0      - output is result of F0
+ *            DISC_LFSR_FLAG_OUTPUT_SR_SN1  - output shift register to sub-node output #1
  *
  *  The diagram below outlines the structure of the LFSR model.
  *
@@ -1244,6 +1247,41 @@
  *
  ***********************************************************************
  *
+ * DISCRETE_BIT_DECODE - Decode a bit from value
+ * DISCRETE_BITS_DECODE - Decode a range of bits from value
+ *
+ *  Declaration syntax
+ *
+ *     DISCRETE_BIT_DECODE(name of node,
+ *                         input0 node or static value,
+ *                         bit number static value,
+ *                         output voltage (logic high) static value)
+ *
+ *  Example config lines
+ *
+ *     DISCRETE_BIT_DECODE(NODE_03,7,0,5)
+ *
+ *  Node output is 5
+ *
+ *     DISCRETE_BIT_DECODE(NODE_03,7,3,5)
+ *
+ *  Node output is 0
+ *
+ *  if the range variant is used, you may access the bits (up to 8)
+ *  by using NODE_SUB, i.e.
+ *
+ *     DISCRETE_BITS_DECODE(NODE_03,5,0,4,5)
+ *
+ * NODE_SUB(NODE_03, 0) = 5
+ * NODE_SUB(NODE_03, 1) = 0
+ * NODE_SUB(NODE_03, 2) = 5
+ * NODE_SUB(NODE_03, 3) = 0
+ * NODE_SUB(NODE_03, 4) = 0
+ *
+ * EXAMPLES: galaxian, dkong, mario
+ *
+# ***********************************************************************
+ *
  * DISCRETE_LOGIC_INVERT - Logic invertor
  * DISCRETE_LOGIC_AND  - Logic AND gate (3 & 4 input also available)
  * DISCRETE_LOGIC_NAND - Logic NAND gate (3 & 4 input also available)
@@ -1650,6 +1688,7 @@
  *   + - Pop two values from stack, add and push result to stack
  *   / - Pop two values from stack, divide and push result to stack
  *   * - Pop two values from stack, multiply and push result to stack
+ *   a - Pop one value from stack, multiply -1 if less than 0 and push result to stack
  *   i - Pop one value from stack, multiply -1 and push result to stack
  *   ! - Pop one value from stack, logical invert, push result to stack
  *   = - Pop two values from stack, logical = and push result to stack
@@ -2437,6 +2476,8 @@
  *
  * DISCRETE_RCDISC3 - RC discharge network
  *
+ * FIXME: Diode direction (for bzone)
+ *
  *                        .-----------------.
  *                        |                 |
  *    ENAB       -0------>|                 |
@@ -2552,18 +2593,18 @@
  *
  * DISCRETE_RCDISC5 - Diode in series with R//C
  *
- *                        .---------------.
- *                        |               |
- *    ENAB       -0------>|               |
- *                        |               |
- *    INPUT1     -1------>| -|>|--+---+-  |
- *                        |       |   |   |---->   Netlist node
- *    RVAL       -2------>|      ---  Z   |
- *                        |     C---  Z R |
- *    CVAL       -3------>|       |   Z   |
- *                        |       --+--   |
- *                        |         |gnd  |
- *                        '---------------'
+ *                        .---------------------.
+ *                        |                     |
+ *    ENAB       -0------>| -----------.        |
+ *                        |           --        |
+ *    INPUT1     -1------>| -|>|--+--|SW|---+-  |---->   Netlist node
+ *                        |       |   --    |   |
+ *    RVAL       -2------>|      ---        Z   |
+ *                        |     C---        Z R |
+ *    CVAL       -3------>|       |         Z   |
+ *                        |       -----+-----   |
+ *                        |            |gnd     |
+ *                        '---------------------'
  *
  *  Declaration syntax
  *
@@ -2578,9 +2619,12 @@
  *     DISCRETE_RCDISC5(NODE_11,NODE_10,10,100,CAP_U(1))
  *
  *  When enabled by NODE_10, C discharges from 10v as indicated by RC
- *  of 100R & 1uF.
+ *  of 100R & 1uF. If not enabled, the capcitors keeps it load and may
+ *  still be charged through input1. The switch is assumed to be a CD4066,
+ *  thus if not enabled the output will be drawn by R to GND since
+ *  the switch is in high impedance mode.
  *
- *  EXAMPLES: see Spiders
+ *  EXAMPLES: see Spiders, Galaxian
  *
  ***********************************************************************
  *
@@ -3260,13 +3304,13 @@
  *************************************/
 
 /* calculate charge exponent using discrete sample time */
-#define RC_CHARGE_EXP(rc)				(1.0 - exp(discrete_current_context->neg_sample_time / (rc)))
+#define RC_CHARGE_EXP(rc)				(1.0 - exp(disc_info->neg_sample_time / (rc)))
 /* calculate charge exponent using given sample time */
 #define RC_CHARGE_EXP_DT(rc, dt)		(1.0 - exp(-(dt) / (rc)))
 #define RC_CHARGE_NEG_EXP_DT(rc, dt)	(1.0 - exp((dt) / (rc)))
 
 /* calculate discharge exponent using discrete sample time */
-#define RC_DISCHARGE_EXP(rc)			(exp(discrete_current_context->neg_sample_time / (rc)))
+#define RC_DISCHARGE_EXP(rc)			(exp(disc_info->neg_sample_time / (rc)))
 /* calculate discharge exponent using given sample time */
 #define RC_DISCHARGE_EXP_DT(rc, dt)		(exp(-(dt) / (rc)))
 #define RC_DISCHARGE_NEG_EXP_DT(rc, dt)	(exp((dt) / (rc)))
@@ -3280,19 +3324,19 @@
 #define DISCRETE_STEP_NAME( _func )  _func ## _step
 #define DISCRETE_RESET_NAME( _func ) _func ## _reset
 
+#define DISCRETE_STEP(_func) void DISCRETE_STEP_NAME(_func) (const discrete_info *disc_info, node_description *node)
+#define DISCRETE_RESET(_func) void DISCRETE_RESET_NAME(_func) (const discrete_info *disc_info, node_description *node)
+
+#define DISCRETE_STEP_CALL(_func) DISCRETE_STEP_NAME(_func) (disc_info, node)
+#define DISCRETE_RESET_CALL(_func) DISCRETE_RESET_NAME(_func) (disc_info, node)
+
+#if 0
 #define DISCRETE_STEP(_func) void DISCRETE_STEP_NAME(_func) (const device_config *device, node_description *node)
 #define DISCRETE_RESET(_func) void DISCRETE_RESET_NAME(_func) (const device_config *device, node_description *node)
 
 #define DISCRETE_STEP_CALL(_func) DISCRETE_STEP_NAME(_func) (device, node)
 #define DISCRETE_RESET_CALL(_func) DISCRETE_RESET_NAME(_func) (device, node)
-
-/*************************************
- *
- *  Profiling Nodes
- *
- *************************************/
-
-#define DISCRETE_PROFILING			(0)
+#endif
 
 /*************************************
  *
@@ -3361,6 +3405,7 @@
 #define DISC_LFSR_FLAG_RESET_TYPE_L		0x00
 #define DISC_LFSR_FLAG_RESET_TYPE_H		0x02
 #define DISC_LFSR_FLAG_OUTPUT_F0		0x04
+#define DISC_LFSR_FLAG_OUTPUT_SR_SN1	0x08
 
 /* Sample & Hold supported clock types */
 #define DISC_SAMPHOLD_REDGE				0
@@ -3531,6 +3576,7 @@ typedef struct _discrete_sound_block discrete_sound_block;
  *************************************/
 
 typedef struct _node_description node_description;
+typedef struct _discrete_info discrete_info;
 
 typedef struct _discrete_module discrete_module;
 struct _discrete_module
@@ -3539,8 +3585,8 @@ struct _discrete_module
 	const char *	name;
 	int				num_output;				/* Total number of output nodes, i.e. Master node + 1 */
 	size_t			contextsize;
-	void (*reset)(const device_config *device, node_description *node);	/* Called to reset a node after creation or system reset */
-	void (*step)(const device_config *device, node_description *node);	/* Called to execute one time delta of output update */
+	void (*reset)(const discrete_info *disc_info, node_description *node);	/* Called to reset a node after creation or system reset */
+	void (*step)(const discrete_info *disc_info, node_description *node);	/* Called to execute one time delta of output update */
 };
 
 
@@ -3564,9 +3610,7 @@ struct _node_description
 	void *			context;							/* Contextual information specific to this node type */
 	const char *	name;								/* Text name string for identification/debug */
 	const void *	custom;								/* Custom function specific initialisation data */
-#if (DISCRETE_PROFILING)
 	osd_ticks_t		run_time;
-#endif
 };
 
 
@@ -3580,7 +3624,6 @@ struct _node_description
  *
  *************************************/
 
-typedef struct _discrete_info discrete_info;
 struct _discrete_info
 {
 	const device_config *device;
@@ -3620,6 +3663,9 @@ struct _discrete_info
 	int num_wavelogs;
 	wav_file *disc_wav_file[DISCRETE_MAX_WAVELOGS];
 	node_description *wavelog_node[DISCRETE_MAX_WAVELOGS];
+
+	/* profiling */
+	int total_samples;
 };
 
 
@@ -3881,8 +3927,8 @@ struct _discrete_adsr
 typedef struct _discrete_custom_info discrete_custom_info;
 struct _discrete_custom_info
 {
-	void (*reset)(const device_config *device, node_description *node);	/* Called to reset a node after creation or system reset */
-	void (*step)(const device_config *device, node_description *node);	/* Called to execute one time delta of output update */
+	void (*reset)(const discrete_info *disc_info, node_description *node);	/* Called to reset a node after creation or system reset */
+	void (*step)(const discrete_info *disc_info, node_description *node);	/* Called to execute one time delta of output update */
 	size_t contextsize;
 	const void *custom;						/* Custom function specific initialisation data */
 };
@@ -3999,6 +4045,7 @@ enum {
 enum
 {
 	DSS_NULL,			/* Nothing, nill, zippo, only to be used as terminating node */
+	DSS_NOP,			/* just do nothing, placeholder for potential DISCRETE_REPLACE in parent block */
 
 	/* from disc_inp.c */
 	DSS_ADJUSTMENT,		/* Adjustment node */
@@ -4036,6 +4083,7 @@ enum
 	DST_CLAMP,			/* Signal Clamp */
 	DST_DIVIDE,			/* Gain Block, C = A/B */
 	DST_GAIN,			/* Gain Block, D = (A*B) + C*/
+	DST_BITS_DECODE,	/* Decode bits from input value */
 	DST_LOGIC_INV,
 	DST_LOGIC_AND,
 	DST_LOGIC_NAND,
@@ -4104,7 +4152,15 @@ enum
 	DSO_WAVELOG,		/* Dump nodes as wav file */
 
 	/* Output Node -- this must be the last entry in this enum! */
-	DSO_OUTPUT			/* The final output node */
+	DSO_OUTPUT,			/* The final output node */
+
+	/* Import another blocklist */
+	DSO_IMPORT,			/* import from another discrete block */
+	DSO_REPLACE,		/* replace next node */
+	DSO_DELETE,			/* delete nodes */
+
+	/* Marks end of this enum -- must be last entry ! */
+	DSO_LAST
 };
 
 
@@ -4169,6 +4225,10 @@ enum
 #define DISCRETE_GAIN(NODE,INP0,GAIN)                                   { NODE, DST_GAIN        , 4, { NODE_NC,INP0,NODE_NC,NODE_NC }, { 1,INP0,GAIN,0 }, NULL, "DISCRETE_GAIN" },
 #define DISCRETE_INVERT(NODE,INP0)                                      { NODE, DST_GAIN        , 4, { NODE_NC,INP0,NODE_NC,NODE_NC }, { 1,INP0,-1,0 }, NULL, "DISCRETE_INVERT" },
 #define DISCRETE_LOGIC_INVERT(NODE,ENAB,INP0)                           { NODE, DST_LOGIC_INV   , 2, { ENAB,INP0 }, { ENAB,INP0 }, NULL, "DISCRETE_LOGIC_INVERT" },
+
+#define DISCRETE_BIT_DECODE(NODE, INP, BIT_N, VOUT)                     { NODE, DST_BITS_DECODE , 3, { INP,NODE_NC,NODE_NC,NODE_NC }, { INP,BIT_N,BIT_N, VOUT }, NULL, "DISCRETE_BIT_DECODE" },
+#define DISCRETE_BITS_DECODE(NODE, INP, BIT_FROM, BIT_TO, VOUT)         { NODE, DST_BITS_DECODE , 4, { INP,NODE_NC,NODE_NC,NODE_NC }, { INP,BIT_FROM,BIT_TO, VOUT }, NULL, "DISCRETE_BITS_DECODE" },
+
 #define DISCRETE_LOGIC_AND(NODE,ENAB,INP0,INP1)                         { NODE, DST_LOGIC_AND   , 5, { ENAB,INP0,INP1,NODE_NC,NODE_NC }, { ENAB,INP0,INP1,1.0,1.0 }, NULL, "DISCRETE_LOGIC_AND" },
 #define DISCRETE_LOGIC_AND3(NODE,ENAB,INP0,INP1,INP2)                   { NODE, DST_LOGIC_AND   , 5, { ENAB,INP0,INP1,INP2,NODE_NC }, { ENAB,INP0,INP1,INP2,1.0 }, NULL, "DISCRETE_LOGIC_AND3" },
 #define DISCRETE_LOGIC_AND4(NODE,ENAB,INP0,INP1,INP2,INP3)              { NODE, DST_LOGIC_AND   , 5, { ENAB,INP0,INP1,INP2,INP3 }, { ENAB,INP0,INP1,INP2,INP3 } ,NULL, "DISCRETE_LOGIC_AND4" },
@@ -4266,6 +4326,9 @@ enum
 #define DISCRETE_566(NODE,ENAB,VMOD,R,C,OPTIONS)                        { NODE, DSD_566         , 4, { ENAB,VMOD,R,C }, { ENAB,VMOD,R,C }, OPTIONS, "DISCRETE_566" },
 #define DISCRETE_74LS624(NODE,ENAB,VMOD,VRNG,C,OUTTYPE)                 { NODE, DSD_LS624       , 5, { ENAB,VMOD,VRNG,C,NODE_NC }, { ENAB,VMOD,VRNG,C, OUTTYPE }, NULL, "DISCRETE_74LS624" },
 
+/* NOP */
+#define DISCRETE_NOP(NODE)                                              { NODE, DSS_NOP         , 0, { 0 }, { 0 }, NULL, "DISCRETE_NOP" },
+
 /* logging */
 #define DISCRETE_CSVLOG1(NODE1)                                    { NODE_SPECIAL, DSO_CSVLOG   , 1, { NODE1 }, { NODE1 }, NULL, "DISCRETE_CSVLOG1" },
 #define DISCRETE_CSVLOG2(NODE1,NODE2)                              { NODE_SPECIAL, DSO_CSVLOG   , 2, { NODE1,NODE2 }, { NODE1,NODE2 }, NULL, "DISCRETE_CSVLOG2" },
@@ -4274,6 +4337,13 @@ enum
 #define DISCRETE_CSVLOG5(NODE1,NODE2,NODE3,NODE4,NODE5)            { NODE_SPECIAL, DSO_CSVLOG   , 5, { NODE1,NODE2,NODE3,NODE4,NODE5 }, { NODE1,NODE2,NODE3,NODE4,NODE5 }, NULL, "DISCRETE_CSVLOG5" },
 #define DISCRETE_WAVELOG1(NODE1,GAIN1)                             { NODE_SPECIAL, DSO_WAVELOG  , 2, { NODE1,NODE_NC }, { NODE1,GAIN1 }, NULL, "DISCRETE_WAVELOG1" },
 #define DISCRETE_WAVELOG2(NODE1,GAIN1,NODE2,GAIN2)                 { NODE_SPECIAL, DSO_WAVELOG  , 4, { NODE1,NODE_NC,NODE2,NODE_NC }, { NODE1,GAIN1,NODE2,GAIN2 }, NULL, "DISCRETE_WAVELOG2" },
+
+/* import */
+#define DISCRETE_IMPORT(INFO)                                      { NODE_SPECIAL, DSO_IMPORT   , 0, { 0 }, { 0 }, &(INFO##_discrete_interface), "DISCRETE_IMPORT" },
+#define DISCRETE_DELETE(NODE_FROM, NODE_TO)                        { NODE_SPECIAL, DSO_DELETE   , 2, { NODE_FROM, NODE_TO }, { NODE_FROM, NODE_TO }, NULL, "DISCRETE_DELETE" },
+#define DISCRETE_REPLACE					                       { NODE_SPECIAL, DSO_REPLACE  , 0, { 0 }, { 0 }, NULL, "DISCRETE_REPLACE" },
+
+
 /* output */
 #define DISCRETE_OUTPUT(OPNODE,GAIN)                               { NODE_SPECIAL, DSO_OUTPUT   , 2, { OPNODE,NODE_NC }, { 0,GAIN }, NULL, "DISCRETE_OUTPUT" },
 
@@ -4286,13 +4356,6 @@ enum
  *  Interface to the external world
  *
  *************************************/
-
-extern discrete_info *discrete_current_context;
-
-node_description *discrete_find_node(void *chip, int node);
-
-void discrete_sound_n_w(void *chip, offs_t offset, UINT8 data);
-UINT8 discrete_sound_n_r(void *chip, offs_t offset);
 
 WRITE8_DEVICE_HANDLER( discrete_sound_w );
 READ8_DEVICE_HANDLER( discrete_sound_r );

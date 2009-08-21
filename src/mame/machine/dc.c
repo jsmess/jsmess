@@ -426,7 +426,7 @@ READ64_HANDLER( dc_sysctrl_r )
 	#if DEBUG_SYSCTRL
 	if ((reg != 0x40) && (reg != 0x41) && (reg != 0x42) && (reg != 0x23) && (reg > 2))	// filter out IRQ status reads
 	{
-		mame_printf_verbose("SYSCTRL: [%08x] read %x @ %x (reg %x: %s), mask %llx (PC=%x)\n", 0x5f6800+reg*4, dc_sysctrl_regs[reg], offset, reg, sysctrl_names[reg], mem_mask, cpu_get_pc(space->cpu));
+		mame_printf_verbose("SYSCTRL: [%08x] read %x @ %x (reg %x: %s), mask %" I64FMT "x (PC=%x)\n", 0x5f6800+reg*4, dc_sysctrl_regs[reg], offset, reg, sysctrl_names[reg], mem_mask, cpu_get_pc(space->cpu));
 	}
 	#endif
 
@@ -512,7 +512,7 @@ WRITE64_HANDLER( dc_sysctrl_w )
 	#if DEBUG_SYSCTRL
 	if ((reg != 0x40) && (reg != 0x42) && (reg > 2))	// filter out IRQ acks and ch2 dma
 	{
-		mame_printf_verbose("SYSCTRL: write %llx to %x (reg %x), mask %llx\n", data>>shift, offset, reg, /*sysctrl_names[reg],*/ mem_mask);
+		mame_printf_verbose("SYSCTRL: write %" I64FMT "x to %x (reg %x), mask %" I64FMT "x\n", data>>shift, offset, reg, /*sysctrl_names[reg],*/ mem_mask);
 	}
 	#endif
 }
@@ -549,7 +549,7 @@ WRITE64_HANDLER( dc_maple_w )
 	old = maple_regs[reg];
 
 	#if DEBUG_MAPLE_REGS
-	mame_printf_verbose("MAPLE: [%08x=%x] write %llx to %x (reg %x: %s), mask %llx\n", 0x5f6c00+reg*4, dat, data >> shift, offset, reg, maple_names[reg], mem_mask);
+	mame_printf_verbose("MAPLE: [%08x=%x] write %" I64FMT "x to %x (reg %x: %s), mask %" I64FMT "x\n", 0x5f6c00+reg*4, dat, data >> shift, offset, reg, maple_names[reg], mem_mask);
 	#endif
 
 	maple_regs[reg] = dat; // 5f6c00+reg*4=dat
@@ -912,7 +912,7 @@ WRITE64_HANDLER( dc_gdrom_w )
 		off=offset << 1;
 	}
 
-	mame_printf_verbose("GDROM: [%08x=%x]write %llx to %x, mask %llx\n", 0x5f7000+off*4, dat, data, offset, mem_mask);
+	mame_printf_verbose("GDROM: [%08x=%x]write %" I64FMT "x to %x, mask %" I64FMT "x\n", 0x5f7000+off*4, dat, data, offset, mem_mask);
 }
 
 READ64_HANDLER( dc_g1_ctrl_r )
@@ -939,7 +939,7 @@ WRITE64_HANDLER( dc_g1_ctrl_w )
 	old = g1bus_regs[reg];
 
 	g1bus_regs[reg] = dat; // 5f7400+reg*4=dat
-	mame_printf_verbose("G1CTRL: [%08x=%x] write %llx to %x, mask %llx\n", 0x5f7400+reg*4, dat, data, offset, mem_mask);
+	mame_printf_verbose("G1CTRL: [%08x=%x] write %" I64FMT "x to %x, mask %" I64FMT "x\n", 0x5f7400+reg*4, dat, data, offset, mem_mask);
 	switch (reg)
 	{
 	case SB_GDST:
@@ -950,6 +950,7 @@ WRITE64_HANDLER( dc_g1_ctrl_w )
 				mame_printf_verbose("G1CTRL: unsupported transfer\n");
 				return;
 			}
+//          printf("ROM board DMA to %x (PC %x)\n", g1bus_regs[SB_GDSTAR], cpu_get_pc(space->cpu));
  			ROM = (UINT8 *)devtag_get_info_ptr(space->machine, "rom_board", DEVINFO_PTR_MEMORY);
  			dmaoffset = (UINT32)devtag_get_info_int(space->machine, "rom_board", DEVINFO_INT_DMAOFFSET);
 			ddtdata.destination=g1bus_regs[SB_GDSTAR];		// destination address
@@ -1089,9 +1090,9 @@ READ64_HANDLER( dc_modem_r )
 
 	// from ElSemi: this makes Atomiswave do it's "verbose boot" with a Sammy logo and diagnostics instead of just running the cart.
 	// our PVR emulation is apparently not good enough for that to work yet though.
-	if ((reg == 0x280/4) && (mem_mask == U64(0x00000000ffffffff)))
+	if (reg == 0x280/4)
 	{
-		return 1;
+		return U64(0xffffffffffffffff);
 	}
 
 	mame_printf_verbose("MODEM:  Unmapped read %08x\n", 0x600000+reg*4);
@@ -1106,7 +1107,7 @@ WRITE64_HANDLER( dc_modem_w )
 
 	reg = decode_reg32_64(space->machine, offset, mem_mask, &shift);
 	dat = (UINT32)(data >> shift);
-	mame_printf_verbose("MODEM: [%08x=%x] write %llx to %x, mask %llx\n", 0x600000+reg*4, dat, data, offset, mem_mask);
+	mame_printf_verbose("MODEM: [%08x=%x] write %" I64FMT "x to %x, mask %" I64FMT "x\n", 0x600000+reg*4, dat, data, offset, mem_mask);
 }
 
 READ64_HANDLER( dc_rtc_r )
@@ -1147,7 +1148,7 @@ WRITE64_HANDLER( dc_rtc_w )
 		dc_rtcregister[RTC3] &= 1;
 		break;
 	}
-	mame_printf_verbose("RTC: [%08x=%x] write %llx to %x, mask %llx\n", 0x710000 + reg*4, dat, data, offset, mem_mask);
+	mame_printf_verbose("RTC: [%08x=%x] write %" I64FMT "x to %x, mask %" I64FMT "x\n", 0x710000 + reg*4, dat, data, offset, mem_mask);
 }
 
 static TIMER_CALLBACK(dc_rtc_increment)
@@ -1184,7 +1185,7 @@ READ64_DEVICE_HANDLER( dc_aica_reg_r )
 
 	/*reg = */decode_reg32_64(device->machine, offset, mem_mask, &shift);
 
-//  mame_printf_verbose("AICA REG: [%08x] read %llx, mask %llx\n", 0x700000+reg*4, (UINT64)offset, mem_mask);
+//  mame_printf_verbose("AICA REG: [%08x] read %" I64FMT "x, mask %" I64FMT "x\n", 0x700000+reg*4, (UINT64)offset, mem_mask);
 
 	return (UINT64) aica_r(device, offset*2, 0xffff)<<shift;
 }
@@ -1214,7 +1215,7 @@ WRITE64_DEVICE_HANDLER( dc_aica_reg_w )
 
 	aica_w(device, offset*2, dat, shift ? ((mem_mask>>32)&0xffff) : (mem_mask & 0xffff));
 
-//  mame_printf_verbose("AICA REG: [%08x=%x] write %llx to %x, mask %llx\n", 0x700000+reg*4, dat, data, offset, mem_mask);
+//  mame_printf_verbose("AICA REG: [%08x=%x] write %" I64FMT "x to %x, mask %" I64FMT "x\n", 0x700000+reg*4, dat, data, offset, mem_mask);
 }
 
 READ32_DEVICE_HANDLER( dc_arm_aica_r )
