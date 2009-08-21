@@ -182,7 +182,7 @@ DEVICE_GET_INFO( i8212 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Intel 8212");				break;
-		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Intel 8080");				break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Intel MCS-80");			break;
 		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");						break;
 		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);					break;
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright MESS Team");		break;
