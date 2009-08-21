@@ -391,11 +391,6 @@ static READ8_DEVICE_HANDLER( crvision_pia_portb_r )
 	return data;
 }
 
-static READ_LINE_DEVICE_HANDLER( crvision_pia_ca_r )
-{
-	return 1;
-}
-
 static READ_LINE_DEVICE_HANDLER( crvision_pia_cb1_r )
 {
 	crvision_state *state = device->machine->driver_data;
@@ -431,10 +426,10 @@ static const pia6821_interface crvision_pia_intf =
 {
 	DEVCB_HANDLER(crvision_pia_porta_r),	// input A
 	DEVCB_HANDLER(crvision_pia_portb_r),	// input B
-	DEVCB_LINE(crvision_pia_ca_r),			// input CA1 (+5V)
+	DEVCB_LINE_VCC,							// input CA1 (+5V)
 	DEVCB_LINE(crvision_pia_cb1_r),			// input CB1 (SN76489 pin READY )
-	DEVCB_LINE(crvision_pia_ca_r),			// input CA2 (+5V)
-	DEVCB_LINE(crvision_pia_ca_r),			// input CB2 (+5V)
+	DEVCB_LINE_VCC,							// input CA2 (+5V)
+	DEVCB_LINE_VCC,							// input CB2 (+5V)
 	DEVCB_HANDLER(crvision_pia_porta_w),	// output A
 	DEVCB_HANDLER(crvision_pia_portb_w),	// output B (SN76489 pins D0-D7)
 	DEVCB_NULL,								// output CA2
