@@ -8,6 +8,7 @@
 #include "machine/i8212.h"
 #include "machine/nec765.h"
 #include "machine/pit8253.h"
+#include "machine/upd7201.h"
 #include "video/i8275.h"
 #include "video/i82720.h"
 #include "video/upd7220.h"
@@ -118,14 +119,14 @@ static ADDRESS_MAP_START( mm1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0xbfff) AM_RAM
 	AM_RANGE(0xff00, 0xff0f) AM_DEVREADWRITE(I8237_TAG, dma8237_r, dma8237_w)
-//	AM_RANGE(0xff10, 0xff13) AM_DEVREADWRITE(UPD7201_TAG, upd7201_r, upd7201_w)
+	AM_RANGE(0xff10, 0xff13) AM_DEVREADWRITE(UPD7201_TAG, upd7201_cd_ba_r, upd7201_cd_ba_w)
     AM_RANGE(0xff20, 0xff21) AM_DEVREADWRITE(I8275_TAG, i8275_r, i8275_w)
 	AM_RANGE(0xff30, 0xff33) AM_DEVREADWRITE(I8253_TAG, pit8253_r, pit8253_w)
 	AM_RANGE(0xff40, 0xff40) AM_DEVREADWRITE(I8212_TAG, i8212_r, i8212_w)
 	AM_RANGE(0xff50, 0xff50) AM_DEVREAD(UPD765_TAG, nec765_status_r)
 	AM_RANGE(0xff51, 0xff51) AM_DEVREADWRITE(UPD765_TAG, nec765_data_r, nec765_data_w)
 	AM_RANGE(0xff60, 0xff67) AM_WRITE(cs6_w)
-//	AM_RANGE(0xff70, 0xff7f) AM_DEVREADWRITE(UPD7220_TAG, upd7220_r, upd7220_w)
+//	AM_RANGE(0xff70, 0xff7f) AM_DEVREADWRITE(UPD7220_TAG, i82720_r, i82720_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -135,7 +136,7 @@ INPUT_PORTS_END
 
 /* Video */
 
-static WRITE_LINE_DEVICE_HANDLER( crtc_dma_request )
+static WRITE_LINE_DEVICE_HANDLER( drqcrt_w )
 {
 	mm1_state *driver_state = device->machine->driver_data;
 	//logerror("i8275 DMA\n");
@@ -160,7 +161,7 @@ static const i8275_interface mm1_i8275_intf =
 	SCREEN_TAG,
 	8,
 	0,
-	DEVCB_LINE(crtc_dma_request),
+	DEVCB_LINE(drqcrt_w),
 	DEVCB_NULL,
 	crtc_display_pixels
 };
@@ -204,7 +205,7 @@ static VIDEO_UPDATE( mm1 )
 
 /* 8212 Interface */
 
-static READ8_DEVICE_HANDLER( i8212_di_r )
+static READ8_DEVICE_HANDLER( kb_r )
 {
 	/* keyboard data */
 	return 0;
@@ -213,7 +214,7 @@ static READ8_DEVICE_HANDLER( i8212_di_r )
 static I8212_INTERFACE( mm1_i8212_intf )
 {
 	DEVCB_CPU_INPUT_LINE(I8085A_TAG, I8085_RST65_LINE),
-	DEVCB_HANDLER(i8212_di_r),
+	DEVCB_HANDLER(kb_r),
 	DEVCB_NULL
 };
 
@@ -250,16 +251,16 @@ static DMA8237_CHANNEL_WRITE( crtc_dack_w )
 
 static DMA8237_CHANNEL_READ( mpsc_dack_r )
 {
-	//mm1_state *state = device->machine->driver_data;
+	mm1_state *state = device->machine->driver_data;
 	
-	return 0; //upd7201_dack_r(state->upd7201, 0);
+	return upd7201_hai_r(state->upd7201, 0);
 }
 
 static DMA8237_CHANNEL_WRITE( mpsc_dack_w )
 {
-	//mm1_state *state = device->machine->driver_data;
+	mm1_state *state = device->machine->driver_data;
 
-	//upd7201_dack_w(state->upd7201, 0, data);
+	upd7201_hai_w(state->upd7201, 0, data);
 }
 
 static DMA8237_CHANNEL_READ( fdc_dack_r )
@@ -276,7 +277,7 @@ static DMA8237_CHANNEL_WRITE( fdc_dack_w )
 	nec765_dack_w(state->upd765, 0, data);
 }
 
-static DMA8237_OUT_EOP( dma_eop_w )
+static DMA8237_OUT_EOP( tc_w )
 {
 	mm1_state *driver_state = device->machine->driver_data;
 
@@ -294,12 +295,12 @@ static const struct dma8237_interface mm1_dma8237_intf =
 	memory_dma_w,
 	{ NULL, NULL, mpsc_dack_r, fdc_dack_r },
 	{ crtc_dack_w, mpsc_dack_w, NULL, fdc_dack_w },
-	dma_eop_w
+	tc_w
 };
 
 /* µPD765 Interface */
 
-static NEC765_DMA_REQUEST( fdc_drq )
+static NEC765_DMA_REQUEST( drq_w )
 {
 	mm1_state *driver_state = device->machine->driver_data;
 
@@ -309,7 +310,7 @@ static NEC765_DMA_REQUEST( fdc_drq )
 static const nec765_interface mm1_nec765_intf =
 {
 	DEVCB_CPU_INPUT_LINE(I8085A_TAG, I8085_RST55_LINE),
-	fdc_drq,
+	drq_w,
 	NULL,
 	NEC765_RDY_PIN_CONNECTED // ???
 };
@@ -322,7 +323,7 @@ static PIT8253_OUTPUT_CHANGED( itxc_w )
 
 	if (!driver_state->intc)
 	{
-		//upd7201_txca_w(driver_state->upd7201, state);
+		upd7201_txca_w(driver_state->upd7201, state);
 	}
 }
 
@@ -332,16 +333,16 @@ static PIT8253_OUTPUT_CHANGED( irxc_w )
 
 	if (!driver_state->intc)
 	{
-		//upd7201_rxca_w(driver_state->upd7201, state);
+		upd7201_rxca_w(driver_state->upd7201, state);
 	}
 }
 
 static PIT8253_OUTPUT_CHANGED( auxc_w )
 {
-	/*mm1_state *driver_state = device->machine->driver_data;
+	mm1_state *driver_state = device->machine->driver_data;
 
 	upd7201_txcb_w(driver_state->upd7201, state);
-	upd7201_rxcb_w(driver_state->upd7201, state);*/
+	upd7201_rxcb_w(driver_state->upd7201, state);
 }
 
 static const struct pit8253_config mm1_pit8253_intf =
@@ -356,6 +357,56 @@ static const struct pit8253_config mm1_pit8253_intf =
 		}, {
 			XTAL_6_144MHz/2/2,
 			auxc_w
+		}
+	}
+};
+
+/* µPD7201 Interface */
+
+static WRITE_LINE_DEVICE_HANDLER( drq2_w )
+{
+	mm1_state *driver_state = device->machine->driver_data;
+
+	dma8237_drq_write(driver_state->i8237, 2, state);
+}
+
+static WRITE_LINE_DEVICE_HANDLER( drq1_w )
+{
+	mm1_state *driver_state = device->machine->driver_data;
+
+	dma8237_drq_write(driver_state->i8237, 1, state);
+}
+
+static UPD7201_INTERFACE( mm1_upd7201_intf )
+{
+	DEVCB_NULL,					/* interrupt */
+	{
+		{
+			0,					/* receive clock */
+			0,					/* transmit clock */
+			DEVCB_LINE(drq2_w),	/* receive DRQ */
+			DEVCB_LINE(drq1_w),	/* transmit DRQ */
+			DEVCB_NULL,			/* receive data */
+			DEVCB_NULL,			/* transmit data */
+			DEVCB_NULL,			/* clear to send */
+			DEVCB_NULL,			/* data carrier detect */
+			DEVCB_NULL,			/* ready to send */
+			DEVCB_NULL,			/* data terminal ready */
+			DEVCB_NULL,			/* wait */
+			DEVCB_NULL			/* sync output */
+		}, {
+			0,					/* receive clock */
+			0,					/* transmit clock */
+			DEVCB_NULL,			/* receive DRQ */
+			DEVCB_NULL,			/* transmit DRQ */
+			DEVCB_NULL,			/* receive data */
+			DEVCB_NULL,			/* transmit data */
+			DEVCB_NULL,			/* clear to send */
+			DEVCB_LINE_GND,		/* data carrier detect */
+			DEVCB_NULL,			/* ready to send */
+			DEVCB_NULL,			/* data terminal ready */
+			DEVCB_NULL,			/* wait */
+			DEVCB_NULL			/* sync output */
 		}
 	}
 };
@@ -433,6 +484,7 @@ static MACHINE_DRIVER_START( mm1 )
 	MDRV_DMA8237_ADD(I8237_TAG, /* XTAL_6_144MHz/2, */ mm1_dma8237_intf)
 	MDRV_PIT8253_ADD(I8253_TAG, mm1_pit8253_intf)
 	MDRV_NEC765A_ADD(UPD765_TAG, /* XTAL_16MHz/2/2, */ mm1_nec765_intf)
+	MDRV_UPD7201_ADD(UPD7201_TAG, XTAL_6_144MHz/2, mm1_upd7201_intf)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( mm1m6 )
@@ -461,7 +513,7 @@ ROM_END
 /* System Configuration */
 
 static FLOPPY_OPTIONS_START( mm1 )
-	FLOPPY_OPTION( mm1, "dsk", "Nokia MikroMikko 1 disk image", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION( mm1_640kb, "dsk", "Nokia MikroMikko 1 640KB disk image", basicdsk_identify_default, basicdsk_construct_default,
 		HEADS([2])
 		TRACKS([80])
 		SECTORS([8])
@@ -469,38 +521,21 @@ static FLOPPY_OPTIONS_START( mm1 )
 		FIRST_SECTOR_ID([1]))
 FLOPPY_OPTIONS_END
 
-#ifdef UNUSED_CODE
-static DEVICE_IMAGE_LOAD( mm2_floppy )
-{
-	if (image_has_been_created(image))
-		return INIT_FAIL;
+static FLOPPY_OPTIONS_START( mm2 )
+	FLOPPY_OPTION( mm2_360kb, "dsk", "Nokia MikroMikko 2 360KB disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([40])
+		SECTORS([9])
+		SECTOR_LENGTH([512])
+		FIRST_SECTOR_ID([1]))
 
-	if (device_load_basicdsk_floppy(image) == INIT_PASS)
-	{
-		int size = image_length(image);
-
-		switch (size)
-		{
-		case 40*2*9*512: // 360KB
-			/* image, tracks, heads, sectors per track, sector length, first sector id, offset track zero, track skipping */
-			basicdsk_set_geometry(image, 40, 2, 9, 512, 1, 0, FALSE);
-			break;
-
-		case 40*2*18*512: // 720KB (number of sectors has been doubled, instead of tracks as in 720KB DOS floppies)
-			/* image, tracks, heads, sectors per track, sector length, first sector id, offset track zero, track skipping */
-			basicdsk_set_geometry(image, 40, 2, 18, 512, 1, 0, FALSE);
-			break;
-
-		default:
-			return INIT_FAIL;
-		}
-
-		return INIT_PASS;
-	}
-
-	return INIT_FAIL;
-}
-#endif
+	FLOPPY_OPTION( mm2_720kb, "dsk", "Nokia MikroMikko 2 720KB disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([40])
+		SECTORS([18])
+		SECTOR_LENGTH([512])
+		FIRST_SECTOR_ID([1]))
+FLOPPY_OPTIONS_END
 
 static void dual_640kb_floppy(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
