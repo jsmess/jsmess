@@ -129,7 +129,7 @@ I8255A_INTERFACE( rk7007_ppi8255_interface )
 	DEVCB_HANDLER(radio86_8255_portc_w2),
 };
 
-static I8275_DMA_REQUEST(radio86_video_dma_request) {
+static WRITE_LINE_DEVICE_HANDLER(radio86_video_dma_request) {
 	const device_config *dma8257 = devtag_get_device(device->machine, "dma8257");
 	dma8257_drq_w(dma8257, 2, state);
 }
@@ -143,7 +143,7 @@ READ8_DEVICE_HANDLER(radio86_dma_read_byte)
 
 WRITE8_DEVICE_HANDLER(radio86_write_video)
 {
-	i8275_dack_set_data(devtag_get_device(device->machine, "i8275"),data);
+	i8275_dack_w(devtag_get_device(device->machine, "i8275"), 0, data);
 }
 
 const dma8257_interface radio86_dma =
@@ -248,8 +248,8 @@ const i8275_interface radio86_i8275_interface = {
 	"screen",
 	6,
 	0,
-	radio86_video_dma_request,
-	NULL,
+	DEVCB_LINE(radio86_video_dma_request),
+	DEVCB_NULL,
 	radio86_display_pixels
 };
 
@@ -257,8 +257,8 @@ const i8275_interface mikrosha_i8275_interface = {
 	"screen",
 	6,
 	0,
-	radio86_video_dma_request,
-	NULL,
+	DEVCB_LINE(radio86_video_dma_request),
+	DEVCB_NULL,
 	mikrosha_display_pixels
 };
 
@@ -266,8 +266,8 @@ const i8275_interface apogee_i8275_interface = {
 	"screen",
 	6,
 	0,
-	radio86_video_dma_request,
-	NULL,
+	DEVCB_LINE(radio86_video_dma_request),
+	DEVCB_NULL,
 	apogee_display_pixels
 };
 
@@ -275,7 +275,7 @@ const i8275_interface partner_i8275_interface = {
 	"screen",
 	6,
 	1,
-	radio86_video_dma_request,
-	NULL,
+	DEVCB_LINE(radio86_video_dma_request),
+	DEVCB_NULL,
 	partner_display_pixels
 };

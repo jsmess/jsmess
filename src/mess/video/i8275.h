@@ -12,6 +12,8 @@
 #ifndef __I8275_VIDEO__
 #define __I8275_VIDEO__
 
+#include "devcb.h"
+
 /***************************************************************************
     MACROS
 ***************************************************************************/
@@ -21,12 +23,6 @@
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
-
-typedef void (*i8275_dma_request_func)(const device_config *device, int state);
-#define I8275_DMA_REQUEST(name)	void name(const device_config *device, int state )
-
-typedef void (*i8275_int_request_func)(const device_config *device, int state);
-#define I8275_INT_REQUEST(name)	void name(const device_config *device, int state)
 
 typedef void (*i8275_display_pixels_func)(const device_config *device, int x, int y, UINT8 linecount, UINT8 charcode, UINT8 lineattr, UINT8 lten, UINT8 rvv, UINT8 vsp, UINT8 gpa, UINT8 hlgt);
 #define I8275_DISPLAY_PIXELS(name)	void name(const device_config *device, int x, int y, UINT8 linecount, UINT8 charcode, UINT8 lineattr, UINT8 lten, UINT8 rvv, UINT8 vsp, UINT8 gpa, UINT8 hlgt)
@@ -38,9 +34,10 @@ struct _i8275_interface
 	const char *screen_tag;		/* screen we are acting on */
 	int width;					/* char width in pixels */
 	int char_delay;				/* delay of display char */
-	i8275_dma_request_func dma_request;
+	
+	devcb_write_line out_drq_func;
 
-	i8275_int_request_func int_request;
+	devcb_write_line out_irq_func;
 
 	i8275_display_pixels_func display_pixels;
 };
@@ -59,7 +56,7 @@ WRITE8_DEVICE_HANDLER ( i8275_w );
 /* updates the screen */
 void i8275_update(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect);
 
-void i8275_dack_set_data(const device_config *device, UINT8 data);
+WRITE8_DEVICE_HANDLER( i8275_dack_w );
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS

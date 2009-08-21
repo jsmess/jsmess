@@ -61,6 +61,9 @@ typedef struct _i8275_t i8275_t;
 
 struct _i8275_t
 {
+	devcb_resolved_write_line	out_drq_func;
+	devcb_resolved_write_line	out_irq_func;
+
 	const device_config *screen;
 
 	const i8275_interface *intf;
@@ -398,7 +401,7 @@ static void i8275_draw_char_line(const device_config *device)
 	i8275->current_row++;
 }
 
-void i8275_dack_set_data(const device_config *device, UINT8 data)
+WRITE8_DEVICE_HANDLER( i8275_dack_w )
 {
 	i8275_t *i8275 = get_safe_token(device);
 
@@ -451,7 +454,8 @@ void i8275_dack_set_data(const device_config *device, UINT8 data)
 	{
 		i8275->ypos = 0;
 		i8275->current_row = 0;
-		i8275->intf->dma_request(device,0);
+
+		devcb_call_write_line(&i8275->out_drq_func, 0);
 	}
 }
 
@@ -478,7 +482,8 @@ void i8275_update(const device_config *device, bitmap_t *bitmap, const rectangle
 		// if value < 32 it is visible otherwise not
 		i8275->char_blink_cnt++;
 		if(i8275->char_blink_cnt==64) i8275->char_blink_cnt = 0;
-		i8275->intf->dma_request(device,1);
+
+		devcb_call_write_line(&i8275->out_drq_func, 1);
 	}
 	if (i8275->status_reg & I8275_STATUS_INTERRUPT_ENABLE) {
 		i8275->status_reg |= I8275_STATUS_INTERRUPT_REQUEST;
@@ -490,47 +495,49 @@ void i8275_update(const device_config *device, bitmap_t *bitmap, const rectangle
 static DEVICE_START( i8275 )
 {
 	i8275_t *i8275 = get_safe_token(device);
-	// validate arguments
-
+	
+	/* validate arguments */
 	assert(device != NULL);
 	assert(device->tag != NULL);
 	assert(device->static_config != NULL);
 
 	i8275->intf = device->static_config;
 
-	assert(i8275->intf->dma_request != NULL);
 	assert(i8275->intf->display_pixels != NULL);
 
-	// get the screen device
-
+	/* get the screen device */
 	i8275->screen = devtag_get_device(device->machine, i8275->intf->screen_tag);
 	assert(i8275->screen != NULL);
 
-	// register for state saving
-	state_save_register_item(device->machine, "I8275", device->tag, 0, i8275->status_reg);
-	state_save_register_item(device->machine, "I8275", device->tag, 0, i8275->num_of_params);
-	state_save_register_item(device->machine, "I8275", device->tag, 0, i8275->current_command);
-	state_save_register_item(device->machine, "I8275", device->tag, 0, i8275->param_type);
+	/* resolve callbacks */
+	devcb_resolve_write_line(&i8275->out_drq_func, &i8275->intf->out_drq_func, device);
+	devcb_resolve_write_line(&i8275->out_irq_func, &i8275->intf->out_irq_func, device);
 
-	state_save_register_item(device->machine, "I8275", device->tag, 0, i8275->cursor_col);
-	state_save_register_item(device->machine, "I8275", device->tag, 0, i8275->cursor_row);
+	/* register for state saving */
+	state_save_register_device_item(device, 0, i8275->status_reg);
+	state_save_register_device_item(device, 0, i8275->num_of_params);
+	state_save_register_device_item(device, 0, i8275->current_command);
+	state_save_register_device_item(device, 0, i8275->param_type);
 
-	state_save_register_item(device->machine, "I8275", device->tag, 0, i8275->light_pen_col);
-	state_save_register_item(device->machine, "I8275", device->tag, 0, i8275->light_pen_row);
+	state_save_register_device_item(device, 0, i8275->cursor_col);
+	state_save_register_device_item(device, 0, i8275->cursor_row);
 
-	state_save_register_item(device->machine, "I8275", device->tag, 0, i8275->rows_type);
-	state_save_register_item(device->machine, "I8275", device->tag, 0, i8275->chars_per_row);
-	state_save_register_item(device->machine, "I8275", device->tag, 0, i8275->vert_retrace_rows);
-	state_save_register_item(device->machine, "I8275", device->tag, 0, i8275->rows_per_frame);
-	state_save_register_item(device->machine, "I8275", device->tag, 0, i8275->undeline_line_num);
-	state_save_register_item(device->machine, "I8275", device->tag, 0, i8275->lines_per_row);
-	state_save_register_item(device->machine, "I8275", device->tag, 0, i8275->line_counter_mode);
-	state_save_register_item(device->machine, "I8275", device->tag, 0, i8275->field_attribute_mode);
-	state_save_register_item(device->machine, "I8275", device->tag, 0, i8275->cursor_format);
-	state_save_register_item(device->machine, "I8275", device->tag, 0, i8275->hor_retrace_count);
+	state_save_register_device_item(device, 0, i8275->light_pen_col);
+	state_save_register_device_item(device, 0, i8275->light_pen_row);
 
-	state_save_register_item(device->machine, "I8275", device->tag, 0, i8275->burst_space_code);
-	state_save_register_item(device->machine, "I8275", device->tag, 0, i8275->burst_count_code);
+	state_save_register_device_item(device, 0, i8275->rows_type);
+	state_save_register_device_item(device, 0, i8275->chars_per_row);
+	state_save_register_device_item(device, 0, i8275->vert_retrace_rows);
+	state_save_register_device_item(device, 0, i8275->rows_per_frame);
+	state_save_register_device_item(device, 0, i8275->undeline_line_num);
+	state_save_register_device_item(device, 0, i8275->lines_per_row);
+	state_save_register_device_item(device, 0, i8275->line_counter_mode);
+	state_save_register_device_item(device, 0, i8275->field_attribute_mode);
+	state_save_register_device_item(device, 0, i8275->cursor_format);
+	state_save_register_device_item(device, 0, i8275->hor_retrace_count);
+
+	state_save_register_device_item(device, 0, i8275->burst_space_code);
+	state_save_register_device_item(device, 0, i8275->burst_count_code);
 }
 
 static DEVICE_RESET( i8275 )

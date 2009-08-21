@@ -135,7 +135,7 @@ INPUT_PORTS_END
 
 /* Video */
 
-static I8275_DMA_REQUEST( crtc_dma_request )
+static WRITE_LINE_DEVICE_HANDLER( crtc_dma_request )
 {
 	mm1_state *driver_state = device->machine->driver_data;
 	//logerror("i8275 DMA\n");
@@ -160,8 +160,8 @@ static const i8275_interface mm1_i8275_intf =
 	SCREEN_TAG,
 	8,
 	0,
-	crtc_dma_request,
-	NULL,
+	DEVCB_LINE(crtc_dma_request),
+	DEVCB_NULL,
 	crtc_display_pixels
 };
 
@@ -245,7 +245,7 @@ static DMA8237_CHANNEL_WRITE( crtc_dack_w )
 {
 	mm1_state *state = device->machine->driver_data;
 
-	i8275_dack_set_data(state->i8275, data);
+	i8275_dack_w(state->i8275, 0, data);
 }
 
 static DMA8237_CHANNEL_READ( mpsc_dack_r )
@@ -362,13 +362,13 @@ static const struct pit8253_config mm1_pit8253_intf =
 
 /* 8085A Interface */
 
-static WRITE_LINE_DEVICE_HANDLER( bell_w )
-{
-}
-
 static READ_LINE_DEVICE_HANDLER( dsra_r )
 {
 	return 1;
+}
+
+static WRITE_LINE_DEVICE_HANDLER( bell_w )
+{
 }
 
 static I8085_CONFIG( mm1_i8085_config )
