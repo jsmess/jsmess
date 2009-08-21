@@ -224,7 +224,7 @@ static DMA8237_HRQ_CHANGED( dma_hrq_changed )
 	cputag_set_input_line(device->machine, I8085A_TAG, INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* Assert HLDA */
-	dma8237_set_hlda( device, state );
+	dma8237_set_hlda(device, state);
 }
 
 static DMA8237_MEM_READ( memory_dma_r )
@@ -367,23 +367,21 @@ static const struct pit8253_config mm1_pit8253_intf =
 
 /* 8085A Interface */
 
-static void mm1_sod_w(const device_config *device, int state)
+static WRITE_LINE_DEVICE_HANDLER( bell_w )
 {
-	/* _BELL */
 }
 
-static int mm1_sid_r(const device_config *device)
+static READ_LINE_DEVICE_HANDLER( dsra_r )
 {
-	/* _DSRA */
 	return 1;
 }
 
-static const i8085_config mm1_i8085_config =
+static I8085_CONFIG( mm1_i8085_config )
 {
-	NULL,				/* INTE changed callback */
-	NULL,				/* STATUS changed callback */
-	mm1_sod_w,			/* SOD changed callback (8085A only) */
-	mm1_sid_r			/* SID changed callback (8085A only) */
+	DEVCB_NULL,			/* STATUS changed callback */
+	DEVCB_NULL,			/* INTE changed callback */
+	DEVCB_LINE(dsra_r),	/* SID changed callback (8085A only) */
+	DEVCB_LINE(bell_w)	/* SOD changed callback (8085A only) */
 };
 
 /* Machine Initialization */

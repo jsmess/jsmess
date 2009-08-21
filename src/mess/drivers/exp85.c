@@ -142,14 +142,14 @@ static I8355_INTERFACE( i8355_intf )
 
 /* I8085A Interface */
 
-static void exp85_sod_w(const device_config *device, int state)
+static WRITE_LINE_DEVICE_HANDLER( exp85_sod_w )
 {
 	exp85_state *driver_state = device->machine->driver_data;
 
 	cassette_output(driver_state->cassette, state ? -1.0 : +1.0);
 }
 
-static int exp85_sid_r(const device_config *device)
+static READ_LINE_DEVICE_HANDLER( exp85_sid_r )
 {
 	exp85_state *driver_state = device->machine->driver_data;
 
@@ -163,12 +163,12 @@ static int exp85_sid_r(const device_config *device)
 	return data;
 }
 
-static const i8085_config exp85_i8085_config =
+static I8085_CONFIG( exp85_i8085_config )
 {
-	NULL,				/* INTE changed callback */
-	NULL,				/* STATUS changed callback */
-	exp85_sod_w,		/* SOD changed callback (8085A only) */
-	exp85_sid_r			/* SID changed callback (8085A only) */
+	DEVCB_NULL,					/* STATUS changed callback */
+	DEVCB_NULL,					/* INTE changed callback */
+	DEVCB_LINE(exp85_sid_r),	/* SID changed callback (8085A only) */
+	DEVCB_LINE(exp85_sod_w)		/* SOD changed callback (8085A only) */
 };
 
 /* Machine Initialization */

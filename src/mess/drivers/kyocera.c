@@ -1283,22 +1283,22 @@ static const cassette_config kc85_cassette_config =
 	CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED
 };
 
-static void kc85_sod_w(const device_config *device, int state)
+static WRITE_LINE_DEVICE_HANDLER( kc85_sod_w )
 {
 	cassette_output(cassette_device_image(device->machine), state ? +1.0 : -1.0);
 }
 
-static int kc85_sid_r(const device_config *device)
+static READ_LINE_DEVICE_HANDLER( kc85_sid_r )
 {
 	return cassette_input(cassette_device_image(device->machine)) > 0.0;
 }
 
-static const i8085_config kc85_i8085_config =
+static I8085_CONFIG( kc85_i8085_config )
 {
-	NULL,				/* INTE changed callback */
-	NULL,				/* STATUS changed callback */
-	kc85_sod_w,			/* SOD changed callback (8085A only) */
-	kc85_sid_r			/* SID changed callback (8085A only) */
+	DEVCB_NULL,				/* STATUS changed callback */
+	DEVCB_NULL,				/* INTE changed callback */
+	DEVCB_LINE(kc85_sid_r),	/* SID changed callback (8085A only) */
+	DEVCB_LINE(kc85_sod_w)	/* SOD changed callback (8085A only) */
 };
 
 static TIMER_DEVICE_CALLBACK( tandy200_tp_tick )
