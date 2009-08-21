@@ -87,10 +87,10 @@ static WRITE8_HANDLER(printer_w)
 }
 static WRITE8_HANDLER(status_w) 
 {
-	UINT8 mem_lamp = BIT(data,0);
+/*	UINT8 mem_lamp = BIT(data,0);
 	UINT8 over_lamp = BIT(data,1);
 	UINT8 minus_lamp = BIT(data,2);
-	
+*/	
 	//logerror("status %c %c %c\n",mem_lamp ? 'M':'x',over_lamp ? 'O':'x',minus_lamp ? '-':'x');
 }
 
