@@ -274,6 +274,11 @@ static ATTR_CONST UINT8 mc1000_get_attributes(running_machine *machine, UINT8 c,
 	return data;
 }
 
+static UINT8 mc1000_get_char_rom(running_machine *machine, UINT8 ch,int line)
+{
+   return ch;
+}
+
 static const UINT8 *mc1000_get_video_ram(running_machine *machine, int scanline)
 {
 	mc1000_state *state = machine->driver_data;
@@ -310,6 +315,7 @@ static VIDEO_START( mc1000 )
 	cfg.field_sync_callback = mc1000_vsync;
 	cfg.get_attributes = mc1000_get_attributes;
 	cfg.get_video_ram = mc1000_get_video_ram;
+	cfg.get_char_rom = mc1000_get_char_rom;
 
 	m6847_init(machine, &cfg);
 }

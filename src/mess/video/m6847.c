@@ -1731,7 +1731,7 @@ static const UINT8 *find_char(const m6847_variant *v,
 		{
 			/* semigraphics 6 */
 			ch = (byte & 0x3F) + 0x60;
-			*fg = ((byte >> 5) & 0x03) + ((attr & M6847_CSS) ? BUFF : GREEN);
+			*fg = ((byte >> 6) & 0x03) + ((attr & M6847_CSS) ? BUFF : GREEN);
 		}
 		else
 		{
