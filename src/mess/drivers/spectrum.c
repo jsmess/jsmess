@@ -621,6 +621,12 @@ ROM_START(hc85)
 	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
+ROM_START( hc88 )
+    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "hc88.bin", 0x0000, 0x0800, CRC(33be5134) SHA1(b15a6e7085710de8b818e42d329707cb737627e3))
+	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
+ROM_END
+
 ROM_START(hc90)
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD("hc90.rom",0x0000,0x4000, CRC(78c14d9a) SHA1(25ef81905bed90497a749770170c24632efb2039))
@@ -648,6 +654,26 @@ ROM_END
 ROM_START(jet)
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD("jet.rom",0x0000,0x4000, CRC(e56a7d11) SHA1(e76be9ee71bae6aa1c2ff969276fb599ed68cb50))
+	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
+ROM_END
+
+ROM_START( cobra )
+    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_SYSTEM_BIOS(0, "v1", "V1")
+	ROMX_LOAD( "boot64k_v1.bin", 0x0000, 0x0800, CRC(a54aae6d) SHA1(8f5134ce24aea59065ed166ad79e864e17ce812f), ROM_BIOS(1))
+    ROM_SYSTEM_BIOS(1, "v2", "V2")
+	ROMX_LOAD( "boot64k_v2.bin", 0x0000, 0x0800, CRC(ee91cc89) SHA1(37dea7fe0734068adf99b91fdcbf3119095c350d), ROM_BIOS(2))
+	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
+ROM_END
+
+ROM_START( cobra80 )
+    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+    ROM_SYSTEM_BIOS(0, "v1", "V1")
+	ROMX_LOAD( "boot80k_v1.bin", 0x0000, 0x0800, CRC(f42d2342) SHA1(8aa1b3b056e311674a051ffc6a49af60cae409f3), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(1, "v2", "V2")
+	ROMX_LOAD( "boot80k_v2.bin", 0x0000, 0x0800, CRC(df6bd954) SHA1(5b858b59e697d0368ea631ead14f5b2aa7954ccd), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(2, "v3", "V3")	
+	ROMX_LOAD( "boot80k_v3.bin", 0x0000, 0x0800, CRC(8580494c) SHA1(91af3f3fa50f2071f8ff081536bdf7e21e9823d9), ROM_BIOS(3))
 	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
@@ -756,8 +782,11 @@ COMP( 1986, inves,    spectrum, 0,		spectrum,		spec_plus,	0,		0,	"Investronica",
 COMP( 1985, tk90x,    spectrum, 0,		spectrum,		spectrum,	0,		0,	"Micro Digital",	"TK 90X Color Computer" , 0)
 COMP( 1986, tk95,     spectrum, 0,		spectrum,		spec_plus,	0,		0,	"Micro Digital",	"TK 95 Color Computer" , 0)
 COMP( 1985, hc85,     spectrum, 0,		spectrum,		spectrum,	0,		0,	"ICE-Felix",	"HC-85" , 0)
+COMP( 1988, hc88,     spectrum, 0,		spectrum,		spectrum,	0,		0,	"ICE-Felix",	"HC-88" , GAME_NOT_WORKING)
 COMP( 1990, hc90,     spectrum, 0,		spectrum,		spectrum,	0,		0,	"ICE-Felix",	"HC-90" , 0)
 COMP( 1991, hc91,     spectrum, 0,		spectrum,		spec_plus,	0,		0,	"ICE-Felix",	"HC-91" , 0)
+COMP( 1988, cobra,    spectrum, 0,		spectrum,		spectrum,	0,		0,	"ITCI",	"Cobra" , GAME_NOT_WORKING)
+COMP( 1988, cobra80,  spectrum, 0,		spectrum,		spectrum,	0,		0,	"ITCI",	"Cobra 80K" , GAME_NOT_WORKING)
 COMP( 1987, cip01,    spectrum, 0,		spectrum,		spectrum,	0,		0,	"Electronica",	"CIP-01" , 0)	// keyboard should be spectrum, but image was not clear
 COMP( 1988, cip03,    spectrum, 0,		spectrum,		spectrum,	0,		0,	"Electronica",	"CIP-03" , 0)	// keyboard should be spectrum, but image was not clear
 COMP( 1990, jet,      spectrum, 0,		spectrum,		spectrum,	0,		0,	"Electromagnetica",	"JET" , 0)	// keyboard should be spectrum, but image was not clear

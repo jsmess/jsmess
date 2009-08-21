@@ -16,7 +16,8 @@ Skeleton drivers:
 -----------------
 - Kaypro 4/plus88
 - Kaypro 4 4-84
-
+- HC-88
+- Cobra / Cobra 80K
 
 
 System Driver Changes:
