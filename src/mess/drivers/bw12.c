@@ -168,7 +168,7 @@ static void ls259_w(running_machine *machine, int address, int data)
 		break;
 
 	case 7: /* FDC TC */
-		nec765_set_tc_state(state->nec765, data);
+		nec765_tc_w(state->nec765, data);
 		break;
 	}
 }
@@ -423,7 +423,7 @@ static VIDEO_UPDATE( bw12 )
 
 /* NEC765 Interface */
 
-static NEC765_INTERRUPT( bw12_nec765_interrupt )
+static WRITE_LINE_DEVICE_HANDLER( bw12_nec765_interrupt )
 {
 	bw12_state *driver_state = device->machine->driver_data;
 
@@ -447,7 +447,7 @@ static NEC765_GET_IMAGE( bw12_nec765_get_image )
 
 static const struct nec765_interface bw12_nec765_interface =
 {
-	bw12_nec765_interrupt,		/* interrupt */
+	DEVCB_LINE(bw12_nec765_interrupt),		/* interrupt */
 	NULL,						/* DMA request */
 	bw12_nec765_get_image,		/* image lookup */
 	NEC765_RDY_PIN_CONNECTED	/* ready pin */

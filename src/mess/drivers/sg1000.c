@@ -640,7 +640,7 @@ static WRITE8_DEVICE_HANDLER( sf7000_ppi8255_c_w )
 	floppy_drive_set_ready_state(image_from_devtype_and_index(device->machine, IO_FLOPPY, 0), 1, 0);
 
 	/* FDC terminal count */
-	nec765_set_tc_state(fdc, data & 0x04);
+	nec765_tc_w(fdc, data & 0x04);
 
 	/* FDC reset */
 	if (data & 0x08)
@@ -675,7 +675,7 @@ static const i8255a_interface sf7000_ppi8255_intf[2] =
 	}
 };
 
-static NEC765_INTERRUPT( sf7000_fdc_interrupt )
+static WRITE_LINE_DEVICE_HANDLER( sf7000_fdc_interrupt )
 {
 	sg1000_state *driver_state = device->machine->driver_data;
 
@@ -691,7 +691,7 @@ static void sf7000_fdc_index_callback(const device_config *controller, const dev
 
 static const struct nec765_interface sf7000_nec765_interface =
 {
-	sf7000_fdc_interrupt,
+	DEVCB_LINE(sf7000_fdc_interrupt),
 	NULL,
 	NULL,
 	NEC765_RDY_PIN_CONNECTED

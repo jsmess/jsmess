@@ -169,7 +169,7 @@ static WRITE8_HANDLER (floppy_w)
 	
 	floppy_drive_set_ready_state(get_floppy_image(space->machine, 0), BIT(data,2), 0);
 	
-	nec765_set_tc_state(floppy, BIT(data,1));
+	nec765_tc_w(floppy, BIT(data,1));
 	
 	floppy_ctrl = data;
 }
@@ -180,7 +180,7 @@ static READ8_HANDLER (floppy_r)
 
 static const struct nec765_interface pyldin_nec765_interface =
 {
-	NULL,						/* interrupt */
+	DEVCB_NULL,						/* interrupt */
 	NULL,						/* DMA request */
 	pyldin_nec765_get_image,	/* image lookup */
 	NEC765_RDY_PIN_CONNECTED	/* ready pin */

@@ -1068,7 +1068,7 @@ static READ16_HANDLER( x68k_fdc_r )
 	}
 }
 
-static NEC765_INTERRUPT( fdc_irq )
+static WRITE_LINE_DEVICE_HANDLER( fdc_irq )
 {
 	if((x68k_sys.ioc.irqstatus & 0x04) && state == ASSERT_LINE)
 	{
@@ -1129,7 +1129,7 @@ static WRITE8_DEVICE_HANDLER( x68k_ct_w )
 	// CT1 and CT2 bits from YM2151 port 0x1b
 	// CT1 - ADPCM clock - 0 = 8MHz, 1 = 4MHz
 	// CT2 - 1 = Set ready state of FDC
-	nec765_set_ready_state(fdc,data & 0x01);
+	nec765_ready_w(fdc,data & 0x01);
 	x68k_sys.adpcm.clock = data & 0x02;
 	x68k_set_adpcm(device->machine);
 	okim6258_set_clock(okim, data & 0x02 ? 4000000 : 8000000);
@@ -1896,7 +1896,7 @@ static const hd63450_intf dmac_interface =
 
 static const nec765_interface fdc_interface =
 {
-	fdc_irq,
+	DEVCB_LINE(fdc_irq),
 	fdc_drq,
 	NULL,
 	NEC765_RDY_PIN_CONNECTED

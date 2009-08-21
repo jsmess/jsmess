@@ -1291,7 +1291,7 @@ static const msm8251_interface nc200_uart_interface=
 };
 
 
-static NEC765_INTERRUPT( nc200_fdc_interrupt )
+static WRITE_LINE_DEVICE_HANDLER( nc200_fdc_interrupt )
 {
 #if 0
     nc_irq_latch &=~(1<<5);
@@ -1313,7 +1313,7 @@ static NEC765_INTERRUPT( nc200_fdc_interrupt )
 
 static const nec765_interface nc200_nec765_interface=
 {
-    nc200_fdc_interrupt,
+    DEVCB_LINE(nc200_fdc_interrupt),
     NULL,
     NULL,
     NEC765_RDY_PIN_CONNECTED
@@ -1477,7 +1477,7 @@ static WRITE8_HANDLER(nc200_memory_card_wait_state_w)
 	floppy_drive_set_motor_state(0, 1);
 	floppy_drive_set_ready_state(0, 1, 1);
 #endif
-	nec765_set_tc_state(fdc, (data & 0x01));
+	nec765_tc_w(fdc, (data & 0x01));
 }
 
 /* bit 2: backlight: 1=off, 0=on */

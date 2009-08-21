@@ -26,7 +26,7 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER(nanos_tc_w)
 {
 	const device_config *fdc = devtag_get_device(space->machine, "nec765");
-	nec765_set_tc_state(fdc, BIT(data,1));
+	nec765_tc_w(fdc, BIT(data,1));
 }
 
 
@@ -427,7 +427,7 @@ static const z80pio_interface nanos_z80pio_intf =
 
 static const nec765_interface nanos_nec765_interface =
 {
-	NULL,
+	DEVCB_NULL,
 	NULL,
 	NULL,
 	NEC765_RDY_PIN_NOT_CONNECTED

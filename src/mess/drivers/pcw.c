@@ -105,7 +105,7 @@
 #define VERBOSE 1
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
-static NEC765_INTERRUPT( pcw_fdc_interrupt );
+static WRITE_LINE_DEVICE_HANDLER( pcw_fdc_interrupt );
 
 // pointer to pcw ram
 unsigned int roller_ram_addr;
@@ -140,7 +140,7 @@ static void pcw_update_interrupt_counter(void)
 /NMI depending on choice (see system control below) */
 static const nec765_interface pcw_nec765_interface =
 {
-	pcw_fdc_interrupt,
+	DEVCB_LINE(pcw_fdc_interrupt),
 	NULL,
 	NULL,
 	NEC765_RDY_PIN_CONNECTED
@@ -188,7 +188,7 @@ static TIMER_CALLBACK(pcw_timer_interrupt)
 }
 
 /* fdc interrupt callback. set/clear fdc int */
-static NEC765_INTERRUPT( pcw_fdc_interrupt )
+static WRITE_LINE_DEVICE_HANDLER( pcw_fdc_interrupt )
 {
 	if (state == CLEAR_LINE)
 		pcw_system_status &= ~(1<<5);
@@ -500,14 +500,14 @@ static WRITE8_HANDLER(pcw_system_control_w)
 		/* set fdc terminal count */
 		case 5:
 		{
-			nec765_set_tc_state(fdc, 1);
+			nec765_tc_w(fdc, 1);
 		}
 		break;
 
 		/* clear fdc terminal count */
 		case 6:
 		{
-			nec765_set_tc_state(fdc, 0);
+			nec765_tc_w(fdc, 0);
 		}
 		break;
 

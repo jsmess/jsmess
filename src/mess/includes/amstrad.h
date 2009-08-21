@@ -28,7 +28,7 @@ WRITE8_DEVICE_HANDLER( amstrad_ppi_portc_w );
 
 READ8_HANDLER ( amstrad_psg_porta_read );
 
-NEC765_INTERRUPT( aleste_interrupt );
+WRITE_LINE_DEVICE_HANDLER( aleste_interrupt );
 
 MACHINE_RESET( amstrad );
 MACHINE_RESET( kccomp );

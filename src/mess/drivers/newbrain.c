@@ -658,9 +658,9 @@ static WRITE8_HANDLER( fdc_auxiliary_w )
 	floppy_drive_set_motor_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 0), BIT(data, 0));
 	floppy_drive_set_ready_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 0), 1, 0);
 
-	nec765_set_reset_state(state->nec765, BIT(data, 1));
+	nec765_reset_w(state->nec765, BIT(data, 1));
 
-	nec765_set_tc_state(state->nec765, BIT(data, 2));
+	nec765_tc_w(state->nec765, BIT(data, 2));
 }
 
 static READ8_HANDLER( fdc_control_r )
@@ -1288,7 +1288,7 @@ static ACIA6850_INTERFACE( newbrain_acia_intf )
 	DEVCB_LINE(acia_interrupt)
 };
 
-static NEC765_INTERRUPT( newbrain_fdc_interrupt )
+static WRITE_LINE_DEVICE_HANDLER( newbrain_fdc_interrupt )
 {
 	newbrain_state *driver_state = device->machine->driver_data;
 
@@ -1297,7 +1297,7 @@ static NEC765_INTERRUPT( newbrain_fdc_interrupt )
 
 static const nec765_interface newbrain_nec765_interface =
 {
-	newbrain_fdc_interrupt,
+	DEVCB_LINE(newbrain_fdc_interrupt),
 	NULL,
 	NULL,
 	NEC765_RDY_PIN_NOT_CONNECTED

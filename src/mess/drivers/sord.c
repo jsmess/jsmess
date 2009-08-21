@@ -139,8 +139,8 @@ static WRITE8_HANDLER(fd5_drive_control_w)
 static WRITE8_HANDLER(fd5_tc_w)
 {
 	const device_config *fdc = devtag_get_device(space->machine, "nec765");
-	nec765_set_tc_state(fdc, 1);
-	nec765_set_tc_state(fdc, 0);
+	nec765_tc_w(fdc, 1);
+	nec765_tc_w(fdc, 0);
 }
 
 /* 0x020 fd5 writes to this port to communicate with m5 */
@@ -159,14 +159,14 @@ static ADDRESS_MAP_START(sord_fd5_io, ADDRESS_SPACE_IO, 8)
 ADDRESS_MAP_END
 
 /* nec765 data request is connected to interrupt of z80 inside fd5 interface */
-static NEC765_INTERRUPT( sord_fd5_fdc_interrupt )
+static WRITE_LINE_DEVICE_HANDLER( sord_fd5_fdc_interrupt )
 {
 	cputag_set_input_line(device->machine, "floppy", 0, state? HOLD_LINE : CLEAR_LINE);
 }
 
 static const struct nec765_interface sord_fd5_nec765_interface=
 {
-	sord_fd5_fdc_interrupt,
+	DEVCB_LINE(sord_fd5_fdc_interrupt),
 	NULL,
 	NULL,
 	NEC765_RDY_PIN_CONNECTED

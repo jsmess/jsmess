@@ -797,13 +797,13 @@ const ppi8255_interface pc8801_8255_config_1 =
 READ8_HANDLER(pc8801fd_nec765_tc)
 {
   const device_config *fdc = devtag_get_device(space->machine, "nec765");
-  nec765_set_tc_state(fdc, 1);
-  nec765_set_tc_state(fdc, 0);
+  nec765_tc_w(fdc, 1);
+  nec765_tc_w(fdc, 0);
   return 0;
 }
 
 /* callback for /INT output from FDC */
-static NEC765_INTERRUPT( pc8801_fdc_interrupt )
+static WRITE_LINE_DEVICE_HANDLER( pc8801_fdc_interrupt )
 {
     cputag_set_input_line(device->machine, "sub", 0, state ? HOLD_LINE : CLEAR_LINE);
 }
@@ -815,7 +815,7 @@ static NEC765_DMA_REQUEST( pc8801_fdc_dma_drq )
 
 const nec765_interface pc8801_fdc_interface=
 {
-	pc8801_fdc_interrupt,
+	DEVCB_LINE(pc8801_fdc_interrupt),
 	pc8801_fdc_dma_drq,
 	NULL,
 	NEC765_RDY_PIN_CONNECTED

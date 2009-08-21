@@ -9,6 +9,7 @@
 #ifndef NEC765_H
 #define NEC765_H
 
+#include "devcb.h"
 #include "devices/flopdrv.h"
 
 /***************************************************************************
@@ -34,9 +35,6 @@ typedef enum
 #define NEC765_DAM_DELETED_DATA 0x0f8
 #define NEC765_DAM_DATA 0x0fb
 
-typedef void (*nec765_interrupt_func)(const device_config *device, int state);
-#define NEC765_INTERRUPT(name)	void name(const device_config *device, int state )
-
 typedef void (*nec765_dma_drq_func)(const device_config *device, int state,int read_write);
 #define NEC765_DMA_REQUEST(name)	void name(const device_config *device, int state,int read_write )
 
@@ -47,7 +45,7 @@ typedef const device_config *(*nec765_get_image_func)(const device_config *devic
 typedef struct nec765_interface
 {
 	/* interrupt issued */
-	nec765_interrupt_func interrupt;
+	devcb_write_line out_int_func;
 
 	/* dma data request */
 	nec765_dma_drq_func dma_drq;
@@ -85,12 +83,13 @@ READ8_DEVICE_HANDLER(nec765_dack_r);
 void nec765_reset(const device_config *device, int);
 
 /* reset pin of nec765 */
-void nec765_set_reset_state(const device_config *device, int);
+WRITE_LINE_DEVICE_HANDLER(nec765_reset_w);
 
 /* set nec765 terminal count input state */
-void nec765_set_tc_state(const device_config *device, int);
+WRITE_LINE_DEVICE_HANDLER(nec765_tc_w);
+
 /* set nec765 ready input*/
-void nec765_set_ready_state(const device_config *device,int);
+WRITE_LINE_DEVICE_HANDLER(nec765_ready_w);
 
 void nec765_idle(const device_config *device);
 

@@ -169,10 +169,10 @@ int spectrum_plus3_port_1ffd_data = -1;
 
 static const nec765_interface spectrum_plus3_nec765_interface =
 {
-		NULL,
-		NULL,
-		NULL,
-		NEC765_RDY_PIN_CONNECTED
+	DEVCB_NULL,
+	NULL,
+	NULL,
+	NEC765_RDY_PIN_CONNECTED
 };
 
 

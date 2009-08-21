@@ -281,7 +281,7 @@ static DMA8237_OUT_EOP( dma_eop_w )
 	mm1_state *driver_state = device->machine->driver_data;
 
 	/* floppy terminal count */
-	nec765_set_tc_state(driver_state->upd765, !state);
+	nec765_tc_w(driver_state->upd765, !state);
 
 	cputag_set_input_line(device->machine, I8085A_TAG, I8085_RST75_LINE, state ? CLEAR_LINE : ASSERT_LINE);
 }
@@ -299,11 +299,6 @@ static const struct dma8237_interface mm1_dma8237_intf =
 
 /* µPD765 Interface */
 
-static NEC765_INTERRUPT( fdc_irq )
-{
-	cputag_set_input_line(device->machine, I8085A_TAG, I8085_RST55_LINE, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
 static NEC765_DMA_REQUEST( fdc_drq )
 {
 	mm1_state *driver_state = device->machine->driver_data;
@@ -313,7 +308,7 @@ static NEC765_DMA_REQUEST( fdc_drq )
 
 static const nec765_interface mm1_nec765_intf =
 {
-	fdc_irq,
+	DEVCB_CPU_INPUT_LINE(I8085A_TAG, I8085_RST55_LINE),
 	fdc_drq,
 	NULL,
 	NEC765_RDY_PIN_CONNECTED // ???

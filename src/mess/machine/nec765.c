@@ -78,6 +78,8 @@ typedef enum
 typedef struct _nec765_t nec765_t;
 struct _nec765_t
 {
+	devcb_resolved_write_line	out_int_func;
+
 	unsigned long	sector_counter;
 	/* version of fdc to emulate */
 	NEC765_VERSION version;
@@ -650,8 +652,8 @@ static void nec765_change_flags(const device_config *device,unsigned int flags, 
 	fdc->nec765_flags = new_flags;
 
 	/* if interrupt changed, call the handler */
-	if ((changed_flags & NEC765_INT) && fdc->intf->interrupt)
-		fdc->intf->interrupt(device,(fdc->nec765_flags & NEC765_INT) ? 1 : 0);
+	if (changed_flags & NEC765_INT)
+		devcb_call_write_line(&fdc->out_int_func, (fdc->nec765_flags & NEC765_INT) ? 1 : 0);
 
 	/* if DRQ changed, call the handler */
 	if ((changed_flags & NEC765_DMA_DRQ) && fdc->intf->dma_drq)
@@ -726,7 +728,7 @@ static void nec765_set_ready_change_callback(const device_config *controller, co
 
 
 /* terminal count input */
-void nec765_set_tc_state(const device_config *device, int state)
+WRITE_LINE_DEVICE_HANDLER( nec765_tc_w )
 {
 	int old_state;
 	nec765_t *fdc = get_safe_token(device);
@@ -2217,7 +2219,7 @@ void nec765_reset(const device_config *device, int offset)
 	}
 }
 
-void nec765_set_reset_state(const device_config *device, int state)
+WRITE_LINE_DEVICE_HANDLER( nec765_reset_w )
 {
 	nec765_t *fdc = get_safe_token(device);
 
@@ -2253,7 +2255,7 @@ void nec765_set_reset_state(const device_config *device, int state)
 }
 
 
-void nec765_set_ready_state(const device_config *device, int state)
+WRITE_LINE_DEVICE_HANDLER( nec765_ready_w )
 {
 	nec765_t *fdc = get_safe_token(device);
 
@@ -2288,6 +2290,7 @@ static void common_start(const device_config *device, int device_type)
 	fdc->nec765_flags &= NEC765_FDD_READY;
 	fdc->data_buffer = auto_alloc_array(device->machine, char, 32*1024);
 
+	devcb_resolve_write_line(&fdc->out_int_func, &fdc->intf->out_int_func, device);
 
 	// register for state saving
 	//state_save_register_item(device->machine, "nec765", device->tag, 0, nec765->number);

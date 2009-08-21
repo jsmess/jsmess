@@ -134,7 +134,7 @@ static I8255A_INTERFACE( amstrad_ppi8255_interface )
 /* Amstrad NEC765 interface doesn't use interrupts or DMA! */
 static const nec765_interface amstrad_nec765_interface =
 {
-	NULL,
+	DEVCB_NULL,
 	NULL,
 	NULL,
 	NEC765_RDY_PIN_CONNECTED
@@ -143,7 +143,7 @@ static const nec765_interface amstrad_nec765_interface =
 /* Aleste uses an 8272A, with the interrupt flag visible on PPI port B */
 static const nec765_interface aleste_8272_interface =
 {
-	aleste_interrupt,
+	DEVCB_LINE(aleste_interrupt),
 	NULL,
 	NULL,
 	NEC765_RDY_PIN_CONNECTED

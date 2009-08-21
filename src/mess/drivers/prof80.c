@@ -932,7 +932,7 @@ static void prof80_fdc_index_callback(const device_config *controller, const dev
 
 static const struct nec765_interface prof80_nec765_interface =
 {
-	NULL,
+	DEVCB_NULL,
 	NULL,
 	NULL,
 	NEC765_RDY_PIN_CONNECTED

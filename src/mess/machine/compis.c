@@ -283,7 +283,7 @@ static void compis_fdc_reset(running_machine *machine)
 	nec765_reset(fdc, 0);
 
 	/* set FDC at reset */
-	nec765_set_reset_state(fdc, 1);
+	nec765_reset_w(fdc, 1);
 }
 
 static void compis_fdc_tc(running_machine *machine, int state)
@@ -292,11 +292,11 @@ static void compis_fdc_tc(running_machine *machine, int state)
 	/* Terminal count if iSBX-218A has DMA enabled */
   	if (input_port_read(machine, "DSW1"))
 	{
-		nec765_set_tc_state(fdc, state);
+		nec765_tc_w(fdc, state);
 	}
 }
 
-static NEC765_INTERRUPT( compis_fdc_int )
+static WRITE_LINE_DEVICE_HANDLER( compis_fdc_int )
 {
 	/* No interrupt requests if iSBX-218A has DMA enabled */
   	if (!input_port_read(device->machine, "DSW1") && state)
@@ -316,7 +316,7 @@ static NEC765_DMA_REQUEST( compis_fdc_dma_drq )
 
 const nec765_interface compis_fdc_interface =
 {
-	compis_fdc_int,
+	DEVCB_LINE(compis_fdc_int),
 	compis_fdc_dma_drq,
 	NULL,
 	NEC765_RDY_PIN_CONNECTED
