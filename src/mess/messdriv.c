@@ -1465,5 +1465,7 @@ const game_driver * const drivers[] =
     DRIVER( elf2 )
     DRIVER( pippin )
     DRIVER( sol20 )
-
+    DRIVER( 4004clk )
+    DRIVER( busicom )
+    
 #endif /* DRIVER_RECURSIVE */

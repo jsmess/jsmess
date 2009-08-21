@@ -544,6 +544,21 @@ $(CPUOBJ)/e132xs/e132xs.o:	$(CPUSRC)/e132xs/e132xs.c \
 							$(CPUSRC)/e132xs/e132xsop.c
 
 
+							
+#-------------------------------------------------
+# Intel 4004
+#-------------------------------------------------
+
+ifneq ($(filter I4004,$(CPUS)),)
+OBJDIRS += $(CPUOBJ)/i4004
+CPUOBJS += $(CPUOBJ)/i4004/i4004.o
+DBGOBJS += $(CPUOBJ)/i4004/4004dasm.o
+endif
+
+$(CPUOBJ)/i4004/i4004.o:	$(CPUSRC)/i4004/i4004.c \
+							$(CPUSRC)/i4004/i4004.h
+
+							
 
 #-------------------------------------------------
 # Intel 8080/8085A

@@ -45,6 +45,7 @@ include $(SRC)/mess/messcore.mak
 
 CPUS += Z80
 #CPUS += Z180
+CPUS += I4004
 CPUS += I8085
 CPUS += M6502
 CPUS += H6280
@@ -1450,9 +1451,12 @@ $(MESSOBJ)/zvt.a:				\
 	$(MESS_VIDEO)/pp01.o		\
 
 $(MESSOBJ)/skeleton.a:			\
+	$(MESS_DRIVERS)/4004clk.o	\
 	$(MESS_DRIVERS)/act.o		\
 	$(MESS_DRIVERS)/amico2k.o	\
 	$(MESS_DRIVERS)/bob85.o		\
+	$(MESS_DRIVERS)/busicom.o	\
+	$(MESS_VIDEO)/busicom.o		\
 	$(MESS_DRIVERS)/d6809.o		\
 	$(MESS_DRIVERS)/elwro800.o	\
 	$(MESS_DRIVERS)/fk1.o		\
