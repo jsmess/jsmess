@@ -277,8 +277,26 @@ static ATTR_CONST UINT8 mc1000_get_attributes(running_machine *machine, UINT8 c,
 static const UINT8 *mc1000_get_video_ram(running_machine *machine, int scanline)
 {
 	mc1000_state *state = machine->driver_data;
+	
+	UINT16 addr = 0;
 
-	return state->mc6847_video_ram + (scanline / 12) * 0x20;
+	if (BIT(state->mc6847_attr, 7))
+	{
+		switch ((state->mc6847_attr >> 2) & 0x07)
+		{
+		case 0:	case 1: addr = (scanline / 3) * 0x10; break;
+		case 2:			addr = (scanline / 3) * 0x20; break;
+		case 3:	case 5: addr = (scanline / 2) * 0x10; break;
+		case 4:			addr = (scanline / 2) * 0x20; break;
+		case 6:	case 7: addr = scanline * 0x20; break;
+		}
+	}
+	else
+	{
+		addr = (scanline / 12) * 0x20;
+	}
+
+	return state->mc6847_video_ram + addr;
 }
 
 static VIDEO_START( mc1000 )
@@ -304,7 +322,7 @@ static WRITE8_DEVICE_HANDLER( keylatch_w )
 
 	state->keylatch = data;
 
-	cassette_output(state->cassette, BIT(data, 7) ? +1.0 : -1.0);
+	cassette_output(state->cassette, BIT(data, 7) ? -1.0 : +1.0);
 }
 
 static READ8_DEVICE_HANDLER( keydata_r )
