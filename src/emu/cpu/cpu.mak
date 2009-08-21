@@ -555,10 +555,10 @@ CPUOBJS += $(CPUOBJ)/i4004/i4004.o
 DBGOBJS += $(CPUOBJ)/i4004/4004dasm.o
 endif
 
-$(CPUOBJ)/i4004/i4004.o:	$(CPUSRC)/i4004/i4004.c \
+$(CPUOBJ)/i4004/i4004.o:	$(CPUSRC)/i4004/i4004.c	\
 							$(CPUSRC)/i4004/i4004.h
 
-							
+
 
 #-------------------------------------------------
 # Intel 8080/8085A
