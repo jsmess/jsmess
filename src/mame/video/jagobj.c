@@ -80,10 +80,10 @@ INLINE void bitmap_4_draw(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos,
 {
 	if (firstpix & 7)
 	{
-		UINT32 pixsrc = src[firstpix / 8];
+		UINT32 pixsrc = src[firstpix >> 3];
 		while (firstpix & 7)
 		{
-			int pix = (pixsrc >> (4 * (~firstpix & 7))) & 0x0f;
+			int pix = (pixsrc >> ((~firstpix & 7) << 2)) & 0x0f;
 			if ((!(flags & 4) || pix) && (UINT32)xpos < 760)
 			{
 				if (!(flags & 2))
@@ -96,8 +96,8 @@ INLINE void bitmap_4_draw(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos,
 		}
 	}
 
-	firstpix /= 8;
-	iwidth /= 8;
+	firstpix >>= 3;
+	iwidth >>= 3;
 	iwidth -= firstpix;
 
 	while (iwidth-- > 0)
@@ -178,7 +178,7 @@ INLINE void bitmap_4_draw(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos,
 			xpos += dxpos;
 		}
 		else
-			xpos += 8 * dxpos;
+			xpos += dxpos << 3;
 	}
 }
 
@@ -246,10 +246,10 @@ INLINE void bitmap_8_draw(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos,
 {
 	if (firstpix & 3)
 	{
-		UINT32 pixsrc = src[firstpix / 4];
+		UINT32 pixsrc = src[firstpix >> 2];
 		while (firstpix & 3)
 		{
-			UINT8 pix = pixsrc >> (8 * (~firstpix & 3));
+			UINT8 pix = pixsrc >> ((~firstpix & 3) << 3);
 			if ((!(flags & 4) || pix) && (UINT32)xpos < 760)
 			{
 				if (!(flags & 2))
@@ -262,8 +262,8 @@ INLINE void bitmap_8_draw(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos,
 		}
 	}
 
-	firstpix /= 4;
-	iwidth /= 4;
+	firstpix >>= 2;
+	iwidth >>= 2;
 	iwidth -= firstpix;
 
 	while (iwidth-- > 0)
@@ -308,7 +308,7 @@ INLINE void bitmap_8_draw(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos,
 			xpos += dxpos;
 		}
 		else
-			xpos += 4 * dxpos;
+			xpos += dxpos << 2;
 	}
 }
 
@@ -376,7 +376,7 @@ INLINE void bitmap_16_draw(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos
 {
 	if (firstpix & 1)
 	{
-		UINT16 pix = src[firstpix / 2];
+		UINT16 pix = src[firstpix >> 1];
 		if ((!(flags & 4) || pix) && (UINT32)xpos < 760)
 		{
 			if (!(flags & 2))
@@ -387,8 +387,8 @@ INLINE void bitmap_16_draw(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos
 		xpos += dxpos;
 	}
 
-	firstpix /= 2;
-	iwidth /= 2;
+	firstpix >>= 1;
+	iwidth >>= 1;
 	iwidth -= firstpix;
 
 	while (iwidth-- > 0)
@@ -415,7 +415,7 @@ INLINE void bitmap_16_draw(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos
 			xpos += dxpos;
 		}
 		else
-			xpos += 2 * dxpos;
+			xpos += dxpos << 1;
 	}
 }
 
@@ -473,10 +473,88 @@ static void (*const bitmap16[8])(INT32, INT32, UINT32 *, INT32) =
 
 
 
+
+
+/*************************************
+ *
+ *  32bpp bitmap renderers - needs to be verified
+ *
+ *************************************/
+
+INLINE void bitmap_32_draw(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos, UINT8 flags, INT32 dxpos)
+{
+	iwidth -= firstpix;
+
+	while (iwidth-- > 0)
+	{
+		UINT32 pix = src[firstpix++];
+
+		if (xpos < 760)
+		{
+			scanline[xpos++] = (pix&0xffff0000)>>16;
+			scanline[xpos++] = pix&0xffff;
+		}
+	}
+}
+
+static void bitmap_32_0(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos)
+{
+	bitmap_32_draw(firstpix, iwidth, src, xpos, 0, 1);
+}
+
+static void bitmap_32_1(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos)
+{
+	bitmap_32_draw(firstpix, iwidth, src, xpos, 1, -1);
+}
+
+static void bitmap_32_2(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos)
+{
+	bitmap_32_draw(firstpix, iwidth, src, xpos, 2, 1);
+}
+
+static void bitmap_32_3(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos)
+{
+	bitmap_32_draw(firstpix, iwidth, src, xpos, 3, -1);
+}
+
+static void bitmap_32_4(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos)
+{
+	bitmap_32_draw(firstpix, iwidth, src, xpos, 4, 1);
+}
+
+static void bitmap_32_5(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos)
+{
+	bitmap_32_draw(firstpix, iwidth, src, xpos, 5, -1);
+}
+
+static void bitmap_32_6(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos)
+{
+	bitmap_32_draw(firstpix, iwidth, src, xpos, 6, 1);
+}
+
+static void bitmap_32_7(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos)
+{
+	bitmap_32_draw(firstpix, iwidth, src, xpos, 7, -1);
+}
+
+static void (*const bitmap32[8])(INT32, INT32, UINT32 *, INT32) =
+{
+	bitmap_32_0,
+	bitmap_32_1,
+	bitmap_32_2,
+	bitmap_32_3,
+	bitmap_32_4,
+	bitmap_32_5,
+	bitmap_32_6,
+	bitmap_32_7
+};
+
+
+
 INLINE UINT8 lookup_pixel(const UINT32 *src, int i, int pitch, int depth)
 {
 	int ppl			= 32 / depth;
-	UINT32 data	= src[((i & ppl) / ppl) + ((i / (ppl*2)) * 2 * pitch)];
+	UINT32 data	= src[((i & ppl) / ppl) + ((i / (ppl<<1)) * (pitch<<1))];
 	UINT8 pix		= (data >> ((~i & (ppl-1)) * depth)) & ((1 << depth) - 1);
 	return pix;
 }
@@ -641,6 +719,15 @@ static UINT32 *process_bitmap(running_machine *machine, UINT32 *objdata, int vc,
 				(*bitmap16[flags & 7])(firstpix, iwidth, src, xpos);
 				break;
 
+			/* 32bpp case */
+			case 5:
+				/* only handle pitch=1 for now */
+				if (pitch != 1)
+					logerror("Unhandled pitch = %d\n", pitch);
+
+				(*bitmap32[flags & 7])(firstpix, iwidth, src, xpos);
+				break;
+
 			default:
 				fprintf(stderr, "Unhandled bitmap source depth = %d\n", depthlog);
 				break;
@@ -724,7 +811,7 @@ static UINT32 *process_scaled_bitmap(running_machine *machine, UINT32 *objdata, 
 		int dxpos = (flags & 1) ? -1 : 1;
 		int xpix = firstpix, yinc;
 
-		/* only handle pitch=0 for now */
+		/* only handle pitch=1 (sequential data) for now */
 		if (pitch != 1)
 			logerror("Unhandled pitch = %d\n", pitch);
 		if (flags & 2)
@@ -742,6 +829,52 @@ static UINT32 *process_scaled_bitmap(running_machine *machine, UINT32 *objdata, 
 			/* switch off the depth */
 			switch (depthlog)
 			{
+				case 0:		/* needs to be verified */
+				{
+					UINT16 *clut = (UINT16 *)jaguar_gpu_clut;
+					clut += _index & 0x03;
+
+					/* render in phrases */
+					while (xpix < iwidth)
+					{
+						UINT16 pix = (src[xpix >> 5] >> (~xpix & 31)) & 0x01;
+
+						while (xleft > 0)
+						{
+							if (xpos >= 0 && xpos < 760 && (pix || !(flags & 4)))
+								scanline[xpos] = clut[BYTE_XOR_BE(pix)];
+							xpos += dxpos;
+							xleft -= 0x20;
+						}
+						while (xleft <= 0)
+							xleft += hscale, xpix++;
+					}
+					break;
+				}
+
+				case 1:		/* needs to be verified */
+				{
+					UINT16 *clut = (UINT16 *)jaguar_gpu_clut;
+					clut += _index & 0x0f;
+
+					/* render in phrases */
+					while (xpix < iwidth)
+					{
+						UINT16 pix = (src[xpix >> 4] >> ((~xpix & 15) << 1)) & 0x03;
+
+						while (xleft > 0)
+						{
+							if (xpos >= 0 && xpos < 760 && (pix || !(flags & 4)))
+								scanline[xpos] = clut[BYTE_XOR_BE(pix)];
+							xpos += dxpos;
+							xleft -= 0x20;
+						}
+						while (xleft <= 0)
+							xleft += hscale, xpix++;
+					}
+					break;
+				}
+
 				case 2:
 				{
 					UINT16 *clut = (UINT16 *)jaguar_gpu_clut;
@@ -750,7 +883,7 @@ static UINT32 *process_scaled_bitmap(running_machine *machine, UINT32 *objdata, 
 					/* render in phrases */
 					while (xpix < iwidth)
 					{
-						UINT16 pix = (src[xpix / 8] >> ((~xpix & 7) * 4)) & 0x0f;
+						UINT16 pix = (src[xpix >> 3] >> ((~xpix & 7) << 2)) & 0x0f;
 
 						while (xleft > 0)
 						{
@@ -772,7 +905,7 @@ static UINT32 *process_scaled_bitmap(running_machine *machine, UINT32 *objdata, 
 					/* render in phrases */
 					while (xpix < iwidth)
 					{
-						UINT16 pix = (src[xpix / 4] >> ((~xpix & 3) * 8)) & 0xff;
+						UINT16 pix = (src[xpix >> 2] >> ((~xpix & 3) << 3)) & 0xff;
 
 						while (xleft > 0)
 						{
@@ -790,7 +923,7 @@ static UINT32 *process_scaled_bitmap(running_machine *machine, UINT32 *objdata, 
 				case 4:
 					while (xpix < iwidth)
 					{
-						UINT16 pix = src[xpix / 2] >> ((~xpix & 1) * 16);
+						UINT16 pix = src[xpix >> 1] >> ((~xpix & 1) << 4);
 
 						while (xleft > 0)
 						{
