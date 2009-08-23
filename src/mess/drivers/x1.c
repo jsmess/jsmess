@@ -5,7 +5,7 @@
 	05/2009 Skeleton driver.
 
 	=============  X1 series  =============
-	
+
 	X1 (CZ-800C) - November, 1982
 	 * CPU: z80A @ 4MHz, 80C49 x 2 (one for key scan, the other for TV & Cas Ctrl)
 	 * ROM: IPL (4KB) + chargen (2KB)
@@ -53,7 +53,7 @@
 	 * It contains a PC-Engine
 
 	=============  X1 Turbo series  =============
-	
+
 	X1turbo Model 30 (CZ-852C) - October, 1984
 	 * CPU: z80A @ 4MHz, 80C49 x 2 (one for key scan, the other for TV & Cas Ctrl)
 	 * ROM: IPL (32KB) + chargen (8KB) + Kanji (128KB)
@@ -98,14 +98,14 @@
 	X1turboZIII (CZ-888C) - December, 1988
 	 * same as turboZII, but no more built-in cassette drive
 
-	Please refer to http://www2s.biglobe.ne.jp/~ITTO/x1/x1menu.html for 
+	Please refer to http://www2s.biglobe.ne.jp/~ITTO/x1/x1menu.html for
 	more info
 
-	BASIC has to be loaded from external media (tape or disk), the 
+	BASIC has to be loaded from external media (tape or disk), the
 	computer only has an Initial Program Loader (IPL)
 
-	TODO: everything, in particular to sort out the BIOS dumps 
-	(especially CGROM dumps). Also, notice this is a color computer, 
+	TODO: everything, in particular to sort out the BIOS dumps
+	(especially CGROM dumps). Also, notice this is a color computer,
 	despite the skeleton code says it's black ad white
 
 ****************************************************************************/
@@ -115,11 +115,33 @@
 
 static ADDRESS_MAP_START( x1_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( x1_io , ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0700, 0x0701) AM_WRITENOP //YM-2151 reg/data
+	AM_RANGE(0x0704, 0x0707) AM_NOP //ctc regs
+	AM_RANGE(0x0e80, 0x0e82) AM_WRITENOP //kanji registers?
+	AM_RANGE(0x0ff8, 0x0fff) AM_WRITENOP //fdc registers
+	AM_RANGE(0x1000, 0x12ff) AM_RAM //paletteram
+	AM_RANGE(0x1300, 0x13ff) AM_WRITENOP //ply port, mirrored
+	AM_RANGE(0x1400, 0x17ff) AM_RAM //pcg?
+	AM_RANGE(0x1800, 0x1801) AM_WRITENOP //crtc reg/data (CGA?)
+	AM_RANGE(0x1900, 0x19ff) AM_WRITENOP //sub port, mirrored
+	AM_RANGE(0x1a00, 0x1aff) AM_NOP //8255, mirrored
+	AM_RANGE(0x1b00, 0x1bff) AM_WRITENOP //PSG / ay-3-8910 data port
+	AM_RANGE(0x1c00, 0x1cff) AM_WRITENOP //PSG / ay-3-8910 reg port
+	AM_RANGE(0x1d00, 0x1dff) AM_WRITENOP //ROM bankswitch = 1
+	AM_RANGE(0x1e00, 0x1eff) AM_WRITENOP //ROM bankswitch = 0
+	AM_RANGE(0x1f80, 0x1f8f) AM_WRITENOP //dma
+	AM_RANGE(0x1f90, 0x1f93) AM_NOP //sio
+	AM_RANGE(0x1fa0, 0x1fa3) AM_NOP //ctc regs
+	AM_RANGE(0x1fa8, 0x1fab) AM_NOP //ctc regs
+	AM_RANGE(0x1fd0, 0x1fdf) AM_RAM //scrn?
+	AM_RANGE(0x2000, 0x3fff) AM_RAM //txt mode RAM
+	AM_RANGE(0x4000, 0x5fff) AM_RAM //gfx mode RAM
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -205,8 +227,8 @@ ROM_START( x1turbo )
 	ROM_LOAD("kanji2.rom", 0x0000, 0x4ac00, BAD_DUMP CRC(33800ef2) SHA1(fc07a31ee30db312c7995e887519a9173cb38c0d) )
 ROM_END
 
-/* X1 Turbo Z: IPL is supposed to be the same as X1 Turbo, but which dumps should be in "cgrom"? 
-Many emulators come with fnt0816.x1 & fnt1616.x1 but I am not sure about what was present on the real 
+/* X1 Turbo Z: IPL is supposed to be the same as X1 Turbo, but which dumps should be in "cgrom"?
+Many emulators come with fnt0816.x1 & fnt1616.x1 but I am not sure about what was present on the real
 X1 Turbo / Turbo Z */
 ROM_START( x1turboz )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
