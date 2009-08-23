@@ -78,14 +78,10 @@ UINT8 cojag_is_r3000 = FALSE;
  *************************************/
 
 static UINT32 joystick_data;
-static UINT8 eeprom_enable;
-
 static UINT32 *rom_base;
 static size_t rom_size;
-
 static UINT32 *cart_base;
 static size_t cart_size;
-
 static UINT8 eeprom_bit_count;
 
 
@@ -123,10 +119,10 @@ static MACHINE_RESET( jaguar )
 	memory_set_bankptr(machine, 12, jaguar_gpu_ram);
 	memory_set_bankptr(machine, 13, jaguar_dsp_ram);
 	memory_set_bankptr(machine, 14, jaguar_shared_ram);
-#endif
 	memory_set_bankptr(machine, 15, cart_base);
 	memory_set_bankptr(machine, 16, rom_base);
-//  memory_set_bankptr(machine, 17, jaguar_gpu_ram);
+	memory_set_bankptr(machine, 17, jaguar_gpu_ram);
+#endif
 
 	/* clear any spinuntil stuff */
 	jaguar_gpu_resume(machine);
@@ -155,16 +151,81 @@ static MACHINE_RESET( jaguar )
 ********************************************************************/
 
 
+static mame_file *jaguar_nvram_fopen( running_machine *machine, UINT32 openflags)
+{
+	const device_config *image = devtag_get_device(machine, "cart");
+	astring *fname;
+	file_error filerr;
+	mame_file *file;
+	fname = astring_assemble_4( astring_alloc(), machine->gamedrv->name, PATH_SEPARATOR, image_basename_noext(image), ".nv");
+	filerr = mame_fopen( SEARCHPATH_NVRAM, astring_c( fname), openflags, &file);
+	astring_free( fname);
+	return (filerr == FILERR_NONE) ? file : NULL;
+}
+
+static void jaguar_nvram_load(running_machine *machine)
+{
+	mame_file *nvram_file = NULL;
+	const device_config *device;
+
+	if (machine->config->nvram_handler != NULL)
+	{
+		nvram_file = jaguar_nvram_fopen(machine, OPEN_FLAG_READ);
+		eeprom_load(nvram_file);
+	}
+
+	for (device = machine->config->devicelist; device != NULL; device = device->next)
+	{
+		device_nvram_func nvram = (device_nvram_func)device_get_info_fct(device, DEVINFO_FCT_NVRAM);
+		if (nvram != NULL)
+		{
+			if (nvram_file == NULL)
+				nvram_file = nvram_fopen(machine, OPEN_FLAG_READ);
+			(*nvram)(device, nvram_file, 0);
+		}
+	}
+
+	if (nvram_file != NULL)
+		mame_fclose(nvram_file);
+}
+
+
+static void jaguar_nvram_save(running_machine *machine)
+{
+	mame_file *nvram_file = NULL;
+	const device_config *device;
+
+	if (machine->config->nvram_handler != NULL)
+	{
+		nvram_file = jaguar_nvram_fopen(machine, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+		eeprom_save(nvram_file);
+	}
+
+	for (device = machine->config->devicelist; device != NULL; device = device->next)
+	{
+		device_nvram_func nvram = (device_nvram_func)device_get_info_fct(device, DEVINFO_FCT_NVRAM);
+		if (nvram != NULL)
+		{
+			if (nvram_file == NULL)
+				nvram_file = nvram_fopen(machine, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+			(*nvram)(device, nvram_file, 1);
+		}
+	}
+
+	if (nvram_file != NULL)
+		mame_fclose(nvram_file);
+}
+
 static NVRAM_HANDLER( jaguar )
 {
 	if (read_or_write)
-		eeprom_save(file);
+		jaguar_nvram_save(machine);
 	else
 	{
 		eeprom_init(machine, &eeprom_interface_93C46);
 
 		if (file)
-			eeprom_load(file);
+			jaguar_nvram_load(machine);
 	}
 }
 
@@ -347,8 +408,8 @@ static WRITE32_HANDLER( joystick_w )
 static ADDRESS_MAP_START( jaguar_map, ADDRESS_SPACE_PROGRAM, 32 )
 	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
 	AM_RANGE(0x000000, 0x1fffff) AM_RAM AM_BASE(&jaguar_shared_ram) AM_MIRROR(0x200000) AM_SHARE(1) AM_REGION("maincpu", 0)
-	AM_RANGE(0x800000, 0xdfffff) AM_ROM AM_BASE(&cart_base) AM_SIZE(&cart_size) AM_REGION("maincpu", 0x800000)
-	AM_RANGE(0xe00000, 0xe1ffff) AM_ROM AM_BASE(&rom_base) AM_SIZE(&rom_size) AM_REGION("maincpu", 0xe00000)
+	AM_RANGE(0x800000, 0xdfffff) AM_ROM AM_BASE(&cart_base) AM_SIZE(&cart_size) AM_SHARE(15) AM_REGION("maincpu", 0x800000)
+	AM_RANGE(0xe00000, 0xe1ffff) AM_ROM AM_BASE(&rom_base) AM_SIZE(&rom_size) AM_SHARE(16) AM_REGION("maincpu", 0xe00000)
 	AM_RANGE(0xf00000, 0xf003ff) AM_READWRITE(jaguar_tom_regs32_r, jaguar_tom_regs32_w)
 	AM_RANGE(0xf00400, 0xf007ff) AM_RAM AM_BASE(&jaguar_gpu_clut) AM_SHARE(2)
 	AM_RANGE(0xf02100, 0xf021ff) AM_MIRROR(0x008000) AM_READWRITE(gpuctrl_r, gpuctrl_w)
@@ -372,9 +433,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gpu_map, ADDRESS_SPACE_PROGRAM, 32 )
 	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
-	AM_RANGE(0x000000, 0x1fffff) AM_MIRROR(0x200000) AM_RAM AM_SHARE(1)
-	AM_RANGE(0x800000, 0xdfffff) AM_ROMBANK(15)
-	AM_RANGE(0xe00000, 0xe1ffff) AM_ROMBANK(16)
+	AM_RANGE(0x000000, 0x1fffff) AM_MIRROR(0x200000) AM_RAM AM_SHARE(1) AM_REGION("maincpu", 0)
+	AM_RANGE(0x800000, 0xdfffff) AM_ROM AM_SHARE(15) AM_REGION("maincpu", 0x800000)
+	AM_RANGE(0xe00000, 0xe1ffff) AM_ROM AM_SHARE(16) AM_REGION("maincpu", 0xe00000)
 	AM_RANGE(0xf00000, 0xf003ff) AM_READWRITE(jaguar_tom_regs32_r, jaguar_tom_regs32_w)
 	AM_RANGE(0xf00400, 0xf007ff) AM_RAM AM_SHARE(2)
 	AM_RANGE(0xf02100, 0xf021ff) AM_MIRROR(0x008000) AM_READWRITE(gpuctrl_r, gpuctrl_w)
@@ -488,6 +549,9 @@ static INPUT_PORTS_START( jaguar )
 	PORT_BIT( 0xfffc, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("CONFIG")
+//	PORT_CONFNAME( 0x02, 0x02, "Show Logo")
+//	PORT_CONFSETTING(    0x00, "Yes")
+//	PORT_CONFSETTING(    0x02, "No")
 	PORT_CONFNAME( 0x04, 0x04, "TV System")
 	PORT_CONFSETTING(    0x00, "PAL")
 	PORT_CONFSETTING(    0x04, "NTSC")
@@ -590,10 +654,6 @@ ROM_END
 static DRIVER_INIT( jaguar )
 {
 	state_save_register_global(machine, joystick_data);
-	state_save_register_global(machine, eeprom_enable);
-
-	/* init the sound system and install DSP speedups */
-//	cojag_sound_init(machine);	// rom makes this redundant
 }
 
 static QUICKLOAD_LOAD( jaguar )
@@ -639,8 +699,9 @@ static DEVICE_IMAGE_LOAD( jaguar )
 		cart_base[i] = ((j & 0xff) << 24) | ((j & 0xff00) << 8) | ((j & 0xff0000) >> 8) | ((j & 0xff000000) >> 24);
 	}
 
-	/* Disable logo - breaks Doom */
-	rom_base[0x53c / 4] = 0x67000002;
+	/* Disable logo? - can't do this because of core fatal warning */
+	//if (input_port_read(image->machine, "CONFIG") & 2)
+		rom_base[0x53c / 4] = 0x67000002;
 
 	/* Transfer control to the bios */
 	cpu_set_reg(cputag_get_cpu(image->machine, "maincpu"), REG_GENPC, rom_base[1]);
