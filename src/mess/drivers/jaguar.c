@@ -157,10 +157,15 @@ static mame_file *jaguar_nvram_fopen( running_machine *machine, UINT32 openflags
 	astring *fname;
 	file_error filerr;
 	mame_file *file;
-	fname = astring_assemble_4( astring_alloc(), machine->gamedrv->name, PATH_SEPARATOR, image_basename_noext(image), ".nv");
-	filerr = mame_fopen( SEARCHPATH_NVRAM, astring_c( fname), openflags, &file);
-	astring_free( fname);
-	return (filerr == FILERR_NONE) ? file : NULL;
+	if (image_exists(image))
+	{
+		fname = astring_assemble_4( astring_alloc(), machine->gamedrv->name, PATH_SEPARATOR, image_basename_noext(image), ".nv");
+		filerr = mame_fopen( SEARCHPATH_NVRAM, astring_c( fname), openflags, &file);
+		astring_free( fname);
+		return (filerr == FILERR_NONE) ? file : NULL;
+	}
+	else
+		return NULL;
 }
 
 static void jaguar_nvram_load(running_machine *machine)
@@ -171,7 +176,7 @@ static void jaguar_nvram_load(running_machine *machine)
 	if (machine->config->nvram_handler != NULL)
 	{
 		nvram_file = jaguar_nvram_fopen(machine, OPEN_FLAG_READ);
-		eeprom_load(nvram_file);
+		if (nvram_file) eeprom_load(nvram_file);
 	}
 
 	for (device = machine->config->devicelist; device != NULL; device = device->next)
@@ -198,7 +203,7 @@ static void jaguar_nvram_save(running_machine *machine)
 	if (machine->config->nvram_handler != NULL)
 	{
 		nvram_file = jaguar_nvram_fopen(machine, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		eeprom_save(nvram_file);
+		if (nvram_file) eeprom_save(nvram_file);
 	}
 
 	for (device = machine->config->devicelist; device != NULL; device = device->next)
