@@ -112,46 +112,10 @@
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
+#include "machine/8255ppi.h"
+#include "sound/ay8910.h"
+#include "video/mc6845.h"
 
-static ADDRESS_MAP_START( x1_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( x1_io , ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0700, 0x0701) AM_WRITENOP //YM-2151 reg/data
-	AM_RANGE(0x0704, 0x0707) AM_NOP //ctc regs
-	AM_RANGE(0x0e80, 0x0e82) AM_WRITENOP //kanji registers?
-	AM_RANGE(0x0ff8, 0x0fff) AM_WRITENOP //fdc registers
-	AM_RANGE(0x1000, 0x12ff) AM_RAM //paletteram
-	AM_RANGE(0x1300, 0x13ff) AM_WRITENOP //ply port, mirrored
-	AM_RANGE(0x1400, 0x17ff) AM_RAM //pcg?
-	AM_RANGE(0x1800, 0x1801) AM_WRITENOP //crtc reg/data (CGA?)
-	AM_RANGE(0x1900, 0x19ff) AM_WRITENOP //sub port, mirrored
-	AM_RANGE(0x1a00, 0x1aff) AM_NOP //8255, mirrored
-	AM_RANGE(0x1b00, 0x1bff) AM_WRITENOP //PSG / ay-3-8910 data port
-	AM_RANGE(0x1c00, 0x1cff) AM_WRITENOP //PSG / ay-3-8910 reg port
-	AM_RANGE(0x1d00, 0x1dff) AM_WRITENOP //ROM bankswitch = 1
-	AM_RANGE(0x1e00, 0x1eff) AM_WRITENOP //ROM bankswitch = 0
-	AM_RANGE(0x1f80, 0x1f8f) AM_WRITENOP //dma
-	AM_RANGE(0x1f90, 0x1f93) AM_NOP //sio
-	AM_RANGE(0x1fa0, 0x1fa3) AM_NOP //ctc regs
-	AM_RANGE(0x1fa8, 0x1fab) AM_NOP //ctc regs
-	AM_RANGE(0x1fd0, 0x1fdf) AM_RAM //scrn?
-	AM_RANGE(0x2000, 0x3fff) AM_RAM //txt mode RAM
-	AM_RANGE(0x4000, 0x5fff) AM_RAM //gfx mode RAM
-ADDRESS_MAP_END
-
-/* Input ports */
-static INPUT_PORTS_START( x1 )
-INPUT_PORTS_END
-
-
-static MACHINE_RESET( x1 )
-{
-}
 
 static VIDEO_START( x1 )
 {
@@ -159,8 +123,245 @@ static VIDEO_START( x1 )
 
 static VIDEO_UPDATE( x1 )
 {
+	const gfx_element *gfx = screen->machine->gfx[0];
+	int count = 0;
+
+	int y,x;
+
+	for (y=0;y<25;y++)
+	{
+		for (x=0;x<40;x++)
+		{
+			int tile = videoram[count];
+			int color = colorram[count];
+
+			//int colour = tile>>12;
+			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,x*8,y*8);
+
+			count++;
+		}
+	}
+
 	return 0;
 }
+
+static ADDRESS_MAP_START( x1_mem, ADDRESS_SPACE_PROGRAM, 8 )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x0fff) AM_ROM
+	AM_RANGE(0x8000, 0xffff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( x1_io , ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_UNMAP_HIGH
+//	AM_RANGE(0x0700, 0x0701) AM_WRITENOP //YM-2151 reg/data
+//	AM_RANGE(0x0704, 0x0707) AM_NOP //ctc regs
+//	AM_RANGE(0x0e80, 0x0e82) AM_WRITENOP //kanji registers?
+//	AM_RANGE(0x0ff8, 0x0fff) AM_WRITENOP //fdc registers
+//	AM_RANGE(0x1000, 0x12ff) AM_RAM //paletteram
+//	AM_RANGE(0x1300, 0x13ff) AM_WRITENOP //ply port, mirrored
+//	AM_RANGE(0x1400, 0x17ff) AM_RAM //pcg?
+	AM_RANGE(0x1800, 0x1800) AM_DEVWRITE("crtc", mc6845_address_w)
+	AM_RANGE(0x1801, 0x1801) AM_DEVWRITE("crtc", mc6845_register_w)
+//	AM_RANGE(0x1900, 0x19ff) AM_NOP //sub port, mirrored
+	AM_RANGE(0x1a00, 0x1a03) AM_MIRROR(0xfc) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w) //8255, mirrored
+	AM_RANGE(0x1b00, 0x1bff) AM_DEVWRITE("ay", ay8910_data_w) //PSG / ay-3-8910 data port
+	AM_RANGE(0x1c00, 0x1cff) AM_DEVWRITE("ay", ay8910_address_w) //PSG / ay-3-8910 reg port
+//	AM_RANGE(0x1d00, 0x1dff) AM_WRITENOP //ROM bankswitch = 1
+//	AM_RANGE(0x1e00, 0x1eff) AM_WRITENOP //ROM bankswitch = 0
+//	AM_RANGE(0x1f80, 0x1f8f) AM_WRITENOP //dma
+//	AM_RANGE(0x1f90, 0x1f93) AM_NOP //sio
+//	AM_RANGE(0x1fa0, 0x1fa3) AM_NOP //ctc regs
+//	AM_RANGE(0x1fa8, 0x1fab) AM_NOP //ctc regs
+//	AM_RANGE(0x1fd0, 0x1fdf) AM_RAM //scrn?
+	AM_RANGE(0x2000, 0x2fff) AM_RAM AM_BASE(&colorram)//txt mode RAM
+	AM_RANGE(0x3000, 0x3fff) AM_RAM AM_BASE(&videoram)//txt mode RAM
+	AM_RANGE(0x4000, 0x5fff) AM_RAM //gfx mode RAM
+ADDRESS_MAP_END
+
+static const gfx_layout x1_chars_8x8 =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	1,
+	{ 0 },
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8
+};
+
+static const gfx_layout x1_chars_16x16 =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	1,
+	{ 0 },
+	{ 0, 1, 2, 3, 4, 5, 6, 7,8,9,10,11,12,13,14,15 },
+	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
+	16*16
+};
+
+/* TODO: separe the different x1 decodings accordingly */
+static GFXDECODE_START( x1 )
+	GFXDECODE_ENTRY( "cgrom", 0x00000, x1_chars_8x8,    0, 0x40 )
+	GFXDECODE_ENTRY( "cgrom", 0x00000, x1_chars_16x16,  0, 0x40 ) //only x1turboz uses this so far
+	GFXDECODE_ENTRY( "kanji", 0x27000, x1_chars_16x16,  0, 0x40 ) //needs to be checked when the ROM will be redumped
+GFXDECODE_END
+
+static PALETTE_INIT(x1)
+{
+	int i;
+
+	for(i=0;i<0x300;i++)
+		palette_set_color(machine, i,MAKE_RGB(0x00,0x00,0x00));
+
+	for (i = 0; i < 64; i++) //text mode colors
+	{
+		palette_set_color_rgb(machine, 2*i+1, pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
+		palette_set_color_rgb(machine, 2*i+0, pal1bit(i >> 5), pal1bit(i >> 4), pal1bit(i >> 3));
+	}
+
+	//bitmap mode,TODO
+	for(i=0;i<8;i++)
+		palette_set_color_rgb(machine, 0x200+i, pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
+}
+
+static MACHINE_RESET( x1 )
+{
+}
+
+
+static UINT8 hres_320, io_switch;
+
+static READ8_DEVICE_HANDLER( x1_porta_r )
+{
+	//printf("PPI Port A read\n");
+	return 0xff;
+}
+
+/* this port is system related */
+static READ8_DEVICE_HANDLER( x1_portb_r )
+{
+	//printf("PPI Port B read\n");
+	/*
+	x--- ---- "v disp"
+	-x-- ---- "sub cpu ibf"
+	--x- ---- "sub cpu obf"
+	---x ---- ROM/RAM flag (0=ROM, 1=RAM)
+	---- x--- "busy"
+	---- -x-- "v sync"
+	---- --x- "cmt read"
+	---- ---x "cmt test" (active low)
+	*/
+	return input_port_read(device->machine, "SYSTEM");
+}
+
+/* I/O system port */
+static READ8_DEVICE_HANDLER( x1_portc_r )
+{
+	//printf("PPI Port C read\n");
+	/*
+	x--x xxxx <unknown>
+	-x-- ---- 320 mode (r/w)
+	--x- ---- i/o mode (r/w)
+	*/
+	return (input_port_read(device->machine, "IOSYS") & 0x9f) | hres_320 | io_switch;
+}
+
+static WRITE8_DEVICE_HANDLER( x1_porta_w )
+{
+	//printf("PPI Port A write %02x\n",data);
+}
+
+static WRITE8_DEVICE_HANDLER( x1_portb_w )
+{
+	//printf("PPI Port B write %02x\n",data);
+}
+
+static WRITE8_DEVICE_HANDLER( x1_portc_w )
+{
+	//printf("PPI Port C write %02x\n",data);
+	hres_320 = data & 0x40;
+	io_switch = ~data & 0x20;
+}
+
+static const ppi8255_interface ppi8255_intf =
+{
+	DEVCB_HANDLER(x1_porta_r),						/* Port A read */
+	DEVCB_HANDLER(x1_portb_r),						/* Port B read */
+	DEVCB_HANDLER(x1_portc_r),						/* Port C read */
+	DEVCB_HANDLER(x1_porta_w),						/* Port A write */
+	DEVCB_HANDLER(x1_portb_w),						/* Port B write */
+	DEVCB_HANDLER(x1_portc_w)						/* Port C write */
+};
+
+static const mc6845_interface mc6845_intf =
+{
+	"screen",	/* screen we are acting on */
+	8,			/* number of pixels per video memory address */
+	NULL,		/* before pixel update callback */
+	NULL,		/* row update callback */
+	NULL,		/* after pixel update callback */
+	DEVCB_NULL,	/* callback for display state changes */
+	DEVCB_NULL,	/* callback for cursor state changes */
+	DEVCB_NULL,	/* HSYNC callback */
+	DEVCB_NULL,	/* VSYNC callback */
+	NULL		/* update address callback */
+};
+
+/* Input ports */
+static INPUT_PORTS_START( x1 )
+	PORT_START("SYSTEM")
+	PORT_DIPNAME( 0x01, 0x01, "SYSTEM" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IOSYS")
+	PORT_DIPNAME( 0x01, 0x01, "IOSYS" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( x1 )
 	/* basic machine hardware */
@@ -170,18 +371,30 @@ static MACHINE_DRIVER_START( x1 )
 
 	MDRV_MACHINE_RESET(x1)
 
+	MDRV_PPI8255_ADD( "ppi8255_0", ppi8255_intf )
+
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
+	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(640, 480)
 	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(black_and_white)
+	MDRV_PALETTE_LENGTH(0x300)
+	MDRV_PALETTE_INIT(x1)
+
+	MDRV_MC6845_ADD("crtc", MC6845, XTAL_4MHz/5, mc6845_intf)	/* unknown type and clock / divider, hand tuned to get ~60 fps */
+
+	MDRV_GFXDECODE(x1)
 
 	MDRV_VIDEO_START(x1)
 	MDRV_VIDEO_UPDATE(x1)
+
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD("ay", AY8910, XTAL_4MHz/8) //unknown clock / divider
+	//MDRV_SOUND_CONFIG(ay8910_config)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
 static SYSTEM_CONFIG_START(x1)
@@ -197,6 +410,8 @@ ROM_START( x1 )
 
 	ROM_REGION(0x0800, "cgrom", 0)
 	ROM_LOAD("fnt0808.x1", 0x0000, 0x0800, CRC(e3995a57) SHA1(1c1a0d8c9f4c446ccd7470516b215ddca5052fb2) )
+
+	ROM_REGION(0x4ac00, "kanji", ROMREGION_ERASEFF)
 ROM_END
 
 ROM_START( x1ck )
