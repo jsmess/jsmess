@@ -553,9 +553,9 @@ static void (*const bitmap32[8])(INT32, INT32, UINT32 *, INT32) =
 
 INLINE UINT8 lookup_pixel(const UINT32 *src, int i, int pitch, int depth)
 {
-	int ppl			= 32 / depth;
+	int ppl		= 32 / depth;
 	UINT32 data	= src[((i & ppl) / ppl) + ((i / (ppl<<1)) * (pitch<<1))];
-	UINT8 pix		= (data >> ((~i & (ppl-1)) * depth)) & ((1 << depth) - 1);
+	UINT8 pix	= (data >> ((~i & (ppl-1)) * depth)) & ((1 << depth) - 1);
 	return pix;
 }
 
@@ -612,8 +612,8 @@ static UINT32 *process_bitmap(running_machine *machine, UINT32 *objdata, int vc,
 		UINT32 dwidth = (lower2 >> 18) & 0x3ff;
 		UINT32 iwidth = ((lower2 >> 28) | ((upper2 & 0x3f) << 4)) << (6 - depthlog);
 		UINT8 _index = (upper2 >> 5) & 0xfe;
-		UINT8 flags = (upper2 >> 13) & 0x0f;
-		UINT8 firstpix = ((upper2 >> 17) & 0x1f) >> depthlog;
+		UINT8 flags = (upper2 >> 13) & 0x07;
+		UINT8 firstpix = ((upper2 >> 17) & 0x3f) >> depthlog;
 		int i, dxpos = (flags & 1) ? -1 : 1;
 
 		/* preadjust for firstpix */
@@ -625,8 +625,7 @@ static UINT32 *process_bitmap(running_machine *machine, UINT32 *objdata, int vc,
 			/* 1bpp case */
 			case 0:
 			{
-				UINT16 *clut = (UINT16 *)jaguar_gpu_clut;
-				clut += _index & 0xfe;
+				UINT16 *clut = (UINT16 *)jaguar_gpu_clut + _index;
 
 				/* non-blending */
 				if (!(flags & 2))
@@ -659,8 +658,7 @@ static UINT32 *process_bitmap(running_machine *machine, UINT32 *objdata, int vc,
 			/* 2bpp case */
 			case 1:
 			{
-				UINT16 *clut = (UINT16 *)jaguar_gpu_clut;
-				clut += _index & 0xfc;
+				UINT16 *clut = (UINT16 *)jaguar_gpu_clut + (_index & 0xfc);
 
 				/* non-blending */
 				if (!(flags & 2))
@@ -696,8 +694,8 @@ static UINT32 *process_bitmap(running_machine *machine, UINT32 *objdata, int vc,
 				if (pitch != 1)
 					logerror("Unhandled pitch = %d\n", pitch);
 
-				clutbase = (UINT16 *)jaguar_gpu_clut + (_index & 0xf0);
-				(*bitmap4[flags & 7])(firstpix, iwidth, src, xpos);
+				clutbase = (UINT16 *)jaguar_gpu_clut + (_index & 0xf8);
+				(*bitmap4[flags])(firstpix, iwidth, src, xpos);
 				break;
 
 			/* 8bpp case */
@@ -707,7 +705,7 @@ static UINT32 *process_bitmap(running_machine *machine, UINT32 *objdata, int vc,
 					logerror("Unhandled pitch = %d\n", pitch);
 
 				clutbase = (UINT16 *)jaguar_gpu_clut;
-				(*bitmap8[flags & 7])(firstpix, iwidth, src, xpos);
+				(*bitmap8[flags])(firstpix, iwidth, src, xpos);
 				break;
 
 			/* 16bpp case */
@@ -716,7 +714,7 @@ static UINT32 *process_bitmap(running_machine *machine, UINT32 *objdata, int vc,
 				if (pitch != 1)
 					logerror("Unhandled pitch = %d\n", pitch);
 
-				(*bitmap16[flags & 7])(firstpix, iwidth, src, xpos);
+				(*bitmap16[flags])(firstpix, iwidth, src, xpos);
 				break;
 
 			/* 32bpp case */
@@ -725,7 +723,7 @@ static UINT32 *process_bitmap(running_machine *machine, UINT32 *objdata, int vc,
 				if (pitch != 1)
 					logerror("Unhandled pitch = %d\n", pitch);
 
-				(*bitmap32[flags & 7])(firstpix, iwidth, src, xpos);
+				(*bitmap32[flags])(firstpix, iwidth, src, xpos);
 				break;
 
 			default:
@@ -802,8 +800,8 @@ static UINT32 *process_scaled_bitmap(running_machine *machine, UINT32 *objdata, 
 		UINT32 dwidth = (lower2 >> 18) & 0x3ff;
 		INT32 iwidth = ((lower2 >> 28) | ((upper2 & 0x3f) << 4)) << (6 - depthlog);
 		UINT8 _index = (upper2 >> 5) & 0xfe;
-		UINT8 flags = (upper2 >> 13) & 0x0f;
-		UINT8 firstpix = ((upper2 >> 17) & 0x1f) >> depthlog;
+		UINT8 flags = (upper2 >> 13) & 0x07;
+		UINT8 firstpix = ((upper2 >> 17) & 0x3f) >> depthlog;
 
 		INT32 hscale = lower3 & 0xff;
 		INT32 vscale = (lower3 >> 8) & 0xff;
@@ -829,10 +827,9 @@ static UINT32 *process_scaled_bitmap(running_machine *machine, UINT32 *objdata, 
 			/* switch off the depth */
 			switch (depthlog)
 			{
-				case 0:		/* needs to be verified */
+				case 0:
 				{
-					UINT16 *clut = (UINT16 *)jaguar_gpu_clut;
-					clut += _index & 0x03;
+					UINT16 *clut = (UINT16 *)jaguar_gpu_clut + _index;
 
 					/* render in phrases */
 					while (xpix < iwidth)
@@ -852,10 +849,9 @@ static UINT32 *process_scaled_bitmap(running_machine *machine, UINT32 *objdata, 
 					break;
 				}
 
-				case 1:		/* needs to be verified */
+				case 1:
 				{
-					UINT16 *clut = (UINT16 *)jaguar_gpu_clut;
-					clut += _index & 0x0f;
+					UINT16 *clut = (UINT16 *)jaguar_gpu_clut + (_index & 0xfc);
 
 					/* render in phrases */
 					while (xpix < iwidth)
@@ -877,8 +873,7 @@ static UINT32 *process_scaled_bitmap(running_machine *machine, UINT32 *objdata, 
 
 				case 2:
 				{
-					UINT16 *clut = (UINT16 *)jaguar_gpu_clut;
-					clut += _index & 0xf0;
+					UINT16 *clut = (UINT16 *)jaguar_gpu_clut + (_index & 0xf8);
 
 					/* render in phrases */
 					while (xpix < iwidth)
@@ -1070,10 +1065,10 @@ static void process_object_list(running_machine *machine, int vc, UINT16 *_scanl
 
 			/* GPU interrupt */
 			case 2:
-				gpu_regs[OB_HH]=objdata[1];
-				gpu_regs[OB_HL]=objdata[2];
-				gpu_regs[OB_LH]=objdata[3];
-				gpu_regs[OB_LL]=objdata[4];
+				gpu_regs[OB_HH]=(objdata[1]&0xffff0000)>>16;
+				gpu_regs[OB_HL]=objdata[1]&0xffff;
+				gpu_regs[OB_LH]=(objdata[0]&0xffff0000)>>16;
+				gpu_regs[OB_LL]=objdata[0]&0xffff;
 				cpu_irq_state |= 2;
 				update_cpu_irq(machine);
 				done=1;

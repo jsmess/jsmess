@@ -646,17 +646,36 @@ READ16_HANDLER( jaguar_tom_regs_r )
 	return gpu_regs[offset];
 }
 
+static TIMER_CALLBACK( jaguar_pit )
+{
+	attotime sample_period;
+	cpu_irq_state |= 8;
+	update_cpu_irq(machine);
 
+	if (gpu_regs[PIT0])
+	{
+		sample_period = ATTOTIME_IN_NSEC(cpu_get_clock(cputag_get_cpu(machine,"gpu")) / (1+gpu_regs[PIT0]) / (1+gpu_regs[PIT1]));
+//		timer_set(machine, sample_period, NULL, 0, jaguar_pit);
+	}
+}
+	
 WRITE16_HANDLER( jaguar_tom_regs_w )
 {
 	UINT32 reg_store = gpu_regs[offset];
-
+	attotime sample_period;
 	if (offset < GPU_REGS)
 	{
 		COMBINE_DATA(&gpu_regs[offset]);
 
 		switch (offset)
 		{
+			case PIT1:
+				if (gpu_regs[PIT0])
+				{
+					sample_period = ATTOTIME_IN_NSEC(cpu_get_clock(cputag_get_cpu(space->machine,"gpu")) / (1+gpu_regs[PIT0]) / (1+gpu_regs[PIT1]));
+					timer_set(space->machine, sample_period, NULL, 0, jaguar_pit);
+				}
+				break;
 			case INT1:
 				cpu_irq_state &= ~(gpu_regs[INT1] >> 8);
 				update_cpu_irq(space->machine);
