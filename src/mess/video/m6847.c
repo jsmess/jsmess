@@ -147,11 +147,11 @@ struct _m6847_vdg
 	/* saved palette; used with CoCo 3 */
 	UINT32 saved_palette[16];
 
-	/* 2^7 modes, 128/16 character groups, background/foreground */
-	UINT8 colordata[128][128/16][2];
+	/* 2^7 modes, 256/16 character groups, background/foreground */
+	UINT8 colordata[128][256/16][2];
 
 	/* 2^7 modes, 128 characters, 12 scanlines */
-	UINT8 fontdata[128][128][12];
+	UINT8 fontdata[128][256][12];
 };
 
 
@@ -1197,8 +1197,8 @@ static void text_mode(running_machine *machine, int scanline, UINT32 *RESTRICT l
 
 		attr_index = attr_index_from_attribute(attr);
 
-		bg_color = color(m6847->colordata[attr_index][(byte & 0x7F) / 16][0]);
-		fg_color = color(m6847->colordata[attr_index][(byte & 0x7F) / 16][1]);
+		bg_color = color(m6847->colordata[attr_index][byte / 16][0]);
+		fg_color = color(m6847->colordata[attr_index][byte / 16][1]);
 		
 		if( (!m6847->has_lowercase) && (attr & M6847_INTEXT) && !(attr & M6847_AS)) {
 			if (m6847->get_char_rom) {
@@ -1207,7 +1207,7 @@ static void text_mode(running_machine *machine, int scanline, UINT32 *RESTRICT l
 				char_data = 0xff;
 			}
 		} else {
-			char_data = m6847->fontdata[attr_index][byte & 0x7F][scanline % 12];
+			char_data = m6847->fontdata[attr_index][byte][scanline % 12];
 		}
 
 		line[x*8+0] = (char_data & 0x80) ? fg_color : bg_color;
@@ -1788,14 +1788,14 @@ static void build_fontdata(const m6847_variant *v)
 {
 	int attr_index, row;
 	int fg, bg;
-	UINT8 byte, attr;
+	int byte;
 	const UINT8 *char_data;
 
 	for (attr_index = 0; attr_index < sizeof(m6847->fontdata) / sizeof(m6847->fontdata[0]); attr_index++)
 	{
-		attr = attribute_from_attr_index(attr_index);
+		UINT8 attr = attribute_from_attr_index(attr_index);
 
-		for (byte = 0; byte < 128; byte++)
+		for (byte = 0; byte < 256; byte++)
 		{
 			char_data = find_char(v, byte, attr, &fg, &bg);
 
