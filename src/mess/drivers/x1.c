@@ -1,10 +1,16 @@
-/***************************************************************************
+/************************************************************************************************
 
-	Sharp X1
+	Sharp X1 (c) 1983 Sharp Corporation
 
-	05/2009 Skeleton driver.
+	preliminary driver by Angelo Salese
 
-	=============  X1 series  =============
+	TODO:
+	- Understand how keyboard works and decap/dump the keyboard MCU if possible;
+	- Hook-up image formats;
+	- Video part is bare minimum, chances are that's probably a tilemap/bitmap nightmare;
+	- Sort out / redump the gfx roms;
+
+=================================================================================================
 
 	X1 (CZ-800C) - November, 1982
 	 * CPU: z80A @ 4MHz, 80C49 x 2 (one for key scan, the other for TV & Cas Ctrl)
@@ -104,11 +110,7 @@
 	BASIC has to be loaded from external media (tape or disk), the
 	computer only has an Initial Program Loader (IPL)
 
-	TODO: everything, in particular to sort out the BIOS dumps
-	(especially CGROM dumps). Also, notice this is a color computer,
-	despite the skeleton code says it's black ad white
-
-****************************************************************************/
+************************************************************************************************/
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
@@ -123,31 +125,108 @@ static VIDEO_START( x1 )
 
 static VIDEO_UPDATE( x1 )
 {
-	const gfx_element *gfx = screen->machine->gfx[0];
-	int count = 0;
-
 	int y,x;
 
 	for (y=0;y<25;y++)
 	{
 		for (x=0;x<40;x++)
 		{
-			int tile = videoram[count];
-			int color = colorram[count];
+			int tile = videoram[x+(y*40)];
+			int color = colorram[x+(y*40)] & 0x3f;
+			int width = (colorram[x+(y*40)] & 0x80)>>7;
 
-			//int colour = tile>>12;
-			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,x*8,y*8);
-
-			count++;
+			drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[width],tile,color,0,0,(x/(width+1))*8*(width+1),y*8);
 		}
 	}
 
 	return 0;
 }
 
+
+
+static UINT8 sub_cmd,sub_val;
+
+/*
+Keyboard MCU simulation
+*/
+
+static READ8_HANDLER( sub_io_r )
+{
+	//printf("R\n");
+	return sub_val;
+}
+
+static WRITE8_HANDLER( sub_io_w )
+{
+	static UINT32 test;
+
+	/* TODO: check sub-routine at $10e */
+	/* $17a -> floppy? */
+	/* $094 -> ROM */
+	/* $0c0 -> timer*/
+	/* $052 -> cmt */
+	/* $0f5 -> reload sub-routine? */
+	test = input_code_pressed(KEYCODE_C) ? 0x02 : 0x00; //temp kludge
+
+	switch(data)
+	{
+		case 0xe6: sub_val = 0; break; //RTC timer?
+		case 0xe8: sub_val = sub_cmd; break;
+		case 0xeb: sub_val = test; break; //used on device select
+		//case 0xed: sub_val = test; break;
+		//case 0xef: sub_val = test; break; //used on timer select?
+		#if 0
+		default:
+		{
+			if(data > 0xe0 && data <= 0xef)
+				printf("%02x CMD\n",data);
+		}
+		#endif
+	}
+	sub_cmd = data;
+}
+
+static UINT8 rom_index[3];
+
+static READ8_HANDLER( x1_rom_r )
+{
+	//UINT8 *ROM = memory_region(space->machine, "rom");
+
+//	popmessage("%06x",rom_index[0]<<16|rom_index[1]<<8|rom_index[2]<<0);
+
+	return 0; //ROM[rom_index[0]<<16|rom_index[1]<<8|rom_index[2]<<0];
+}
+
+static WRITE8_HANDLER( x1_rom_w )
+{
+	rom_index[offset] = data;
+}
+
+static WRITE8_HANDLER( rom_bank_0_w )
+{
+	UINT8 *ROM = memory_region(space->machine, "maincpu");
+
+	memory_set_bankptr(space->machine, 1, &ROM[0x10000]);
+}
+
+static WRITE8_HANDLER( rom_bank_1_w )
+{
+	UINT8 *ROM = memory_region(space->machine, "maincpu");
+
+	memory_set_bankptr(space->machine, 1, &ROM[0x00000]);
+}
+
+static WRITE8_HANDLER( rom_data_w )
+{
+	UINT8 *ROM = memory_region(space->machine, "maincpu");
+
+	ROM[0x10000+offset] = data;
+}
+
+
 static ADDRESS_MAP_START( x1_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
+	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK(1) AM_WRITE(rom_data_w)
 	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -155,6 +234,8 @@ static ADDRESS_MAP_START( x1_io , ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 //	AM_RANGE(0x0700, 0x0701) AM_WRITENOP //YM-2151 reg/data
 //	AM_RANGE(0x0704, 0x0707) AM_NOP //ctc regs
+	AM_RANGE(0x0e00, 0x0e02) AM_WRITE(x1_rom_w)
+	AM_RANGE(0x0e03, 0x0e03) AM_READ(x1_rom_r)
 //	AM_RANGE(0x0e80, 0x0e82) AM_WRITENOP //kanji registers?
 //	AM_RANGE(0x0ff8, 0x0fff) AM_WRITENOP //fdc registers
 //	AM_RANGE(0x1000, 0x12ff) AM_RAM //paletteram
@@ -162,12 +243,12 @@ static ADDRESS_MAP_START( x1_io , ADDRESS_SPACE_IO, 8 )
 //	AM_RANGE(0x1400, 0x17ff) AM_RAM //pcg?
 	AM_RANGE(0x1800, 0x1800) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x1801, 0x1801) AM_DEVWRITE("crtc", mc6845_register_w)
-//	AM_RANGE(0x1900, 0x19ff) AM_NOP //sub port, mirrored
+	AM_RANGE(0x1900, 0x19ff) AM_READWRITE(sub_io_r,sub_io_w) //sub port comms, mirrored
 	AM_RANGE(0x1a00, 0x1a03) AM_MIRROR(0xfc) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w) //8255, mirrored
 	AM_RANGE(0x1b00, 0x1bff) AM_DEVWRITE("ay", ay8910_data_w) //PSG / ay-3-8910 data port
 	AM_RANGE(0x1c00, 0x1cff) AM_DEVWRITE("ay", ay8910_address_w) //PSG / ay-3-8910 reg port
-//	AM_RANGE(0x1d00, 0x1dff) AM_WRITENOP //ROM bankswitch = 1
-//	AM_RANGE(0x1e00, 0x1eff) AM_WRITENOP //ROM bankswitch = 0
+	AM_RANGE(0x1d00, 0x1dff) AM_WRITE(rom_bank_1_w) //ROM bankswitch = 1
+	AM_RANGE(0x1e00, 0x1eff) AM_WRITE(rom_bank_0_w) //ROM bankswitch = 0
 //	AM_RANGE(0x1f80, 0x1f8f) AM_WRITENOP //dma
 //	AM_RANGE(0x1f90, 0x1f93) AM_NOP //sio
 //	AM_RANGE(0x1fa0, 0x1fa3) AM_NOP //ctc regs
@@ -189,6 +270,17 @@ static const gfx_layout x1_chars_8x8 =
 	8*8
 };
 
+static const gfx_layout x1_chars_8wx8 =
+{
+	16,8,
+	RGN_FRAC(1,1),
+	1,
+	{ 0 },
+	{ 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8
+};
+
 static const gfx_layout x1_chars_16x16 =
 {
 	16,16,
@@ -203,7 +295,8 @@ static const gfx_layout x1_chars_16x16 =
 /* TODO: separe the different x1 decodings accordingly */
 static GFXDECODE_START( x1 )
 	GFXDECODE_ENTRY( "cgrom", 0x00000, x1_chars_8x8,    0, 0x40 )
-	GFXDECODE_ENTRY( "cgrom", 0x00000, x1_chars_16x16,  0, 0x40 ) //only x1turboz uses this so far
+	GFXDECODE_ENTRY( "cgrom", 0x00000, x1_chars_8wx8,   0, 0x40 )
+	GFXDECODE_ENTRY( "cgrom", 0x01800, x1_chars_16x16,  0, 0x40 ) //only x1turboz uses this so far
 	GFXDECODE_ENTRY( "kanji", 0x27000, x1_chars_16x16,  0, 0x40 ) //needs to be checked when the ROM will be redumped
 GFXDECODE_END
 
@@ -225,12 +318,7 @@ static PALETTE_INIT(x1)
 		palette_set_color_rgb(machine, 0x200+i, pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
 }
 
-static MACHINE_RESET( x1 )
-{
-}
-
-
-static UINT8 hres_320, io_switch;
+static UINT8 hres_320,io_switch;
 
 static READ8_DEVICE_HANDLER( x1_porta_r )
 {
@@ -241,6 +329,7 @@ static READ8_DEVICE_HANDLER( x1_porta_r )
 /* this port is system related */
 static READ8_DEVICE_HANDLER( x1_portb_r )
 {
+	static UINT8 sub_obf;
 	//printf("PPI Port B read\n");
 	/*
 	x--- ---- "v disp"
@@ -252,7 +341,8 @@ static READ8_DEVICE_HANDLER( x1_portb_r )
 	---- --x- "cmt read"
 	---- ---x "cmt test" (active low)
 	*/
-	return input_port_read(device->machine, "SYSTEM");
+	sub_obf^=0x20;
+	return (input_port_read(device->machine, "SYSTEM") & ~0x60) | sub_obf;
 }
 
 /* I/O system port */
@@ -363,6 +453,14 @@ static INPUT_PORTS_START( x1 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static MACHINE_RESET( x1 )
+{
+	UINT8 *ROM = memory_region(machine, "maincpu");
+
+	memory_set_bankptr(machine, 1, &ROM[0x00000]);
+}
+
+
 static MACHINE_DRIVER_START( x1 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_4MHz)
@@ -402,24 +500,30 @@ SYSTEM_CONFIG_END
 
 /* ROM definition */
 ROM_START( x1 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "default", "X1 IPL" )
 	ROMX_LOAD( "ipl.x1", 0x0000, 0x1000, CRC(7b28d9de) SHA1(c4db9a6e99873808c8022afd1c50fef556a8b44d), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "alt", "X1 IPL (alt)" )
 	ROMX_LOAD( "ipl_alt.x1", 0x0000, 0x1000, CRC(e70011d3) SHA1(d3395e9aeb5b8bbba7654dd471bcd8af228ee69a), ROM_BIOS(2) )
 
-	ROM_REGION(0x0800, "cgrom", 0)
-	ROM_LOAD("fnt0808.x1", 0x0000, 0x0800, CRC(e3995a57) SHA1(1c1a0d8c9f4c446ccd7470516b215ddca5052fb2) )
+	ROM_REGION(0x1000, "mcu", ROMREGION_ERASEFF) //MCU for the Keyboard, "sub cpu"
+	ROM_LOAD( "80c48", 0x0000, 0x1000, NO_DUMP )
+
+	ROM_REGION(0x4c600, "cgrom", 0)
+	ROM_LOAD("fnt0808.x1", 0x00000, 0x00800, CRC(e3995a57) SHA1(1c1a0d8c9f4c446ccd7470516b215ddca5052fb2) )
 
 	ROM_REGION(0x4ac00, "kanji", ROMREGION_ERASEFF)
 ROM_END
 
 ROM_START( x1ck )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "default", "X1 IPL" )
 	ROMX_LOAD( "ipl.x1", 0x0000, 0x1000, CRC(7b28d9de) SHA1(c4db9a6e99873808c8022afd1c50fef556a8b44d), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "alt", "X1 IPL (alt)" )
 	ROMX_LOAD( "ipl_alt.x1", 0x0000, 0x1000, CRC(e70011d3) SHA1(d3395e9aeb5b8bbba7654dd471bcd8af228ee69a), ROM_BIOS(2) )
+
+	ROM_REGION(0x1000, "mcu", ROMREGION_ERASEFF) //MCU for the Keyboard, "sub cpu"
+	ROM_LOAD( "80c48", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION(0x0800, "cgrom", 0)
 	ROM_LOAD("fnt0808.x1", 0x0000, 0x0800, CRC(e3995a57) SHA1(1c1a0d8c9f4c446ccd7470516b215ddca5052fb2) )
@@ -430,8 +534,11 @@ ROM_START( x1ck )
 ROM_END
 
 ROM_START( x1turbo )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "ipl.x1t", 0x0000, 0x8000, CRC(2e8b767c) SHA1(44620f57a25f0bcac2b57ca2b0f1ebad3bf305d3) )
+
+	ROM_REGION(0x1000, "mcu", ROMREGION_ERASEFF) //MCU for the Keyboard, "sub cpu"
+	ROM_LOAD( "80c48", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION(0x0800, "cgrom", 0)
 	/* This should be larger... hence, we are missing something (maybe part of the other fnt roms?) */
@@ -446,8 +553,11 @@ ROM_END
 Many emulators come with fnt0816.x1 & fnt1616.x1 but I am not sure about what was present on the real
 X1 Turbo / Turbo Z */
 ROM_START( x1turboz )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "ipl.x1t", 0x0000, 0x8000, CRC(2e8b767c) SHA1(44620f57a25f0bcac2b57ca2b0f1ebad3bf305d3) )
+
+	ROM_REGION(0x1000, "mcu", ROMREGION_ERASEFF) //MCU for the Keyboard, "sub cpu"
+	ROM_LOAD( "80c48", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION(0x4c600, "cgrom", 0)
 	ROM_LOAD("fnt0808.x1", 0x0000, 0x0800, CRC(84a47530) SHA1(06c0995adc7a6609d4272417fe3570ca43bd0454) )
