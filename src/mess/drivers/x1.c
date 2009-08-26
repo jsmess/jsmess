@@ -117,7 +117,11 @@
 #include "machine/8255ppi.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
+#include "machine/wd17xx.h"
+#include "devices/basicdsk.h"
 
+static UINT8 hres_320,io_switch;
+static UINT8 *bitmapa_ram,*bitmapb_ram;
 
 static VIDEO_START( x1 )
 {
@@ -125,15 +129,17 @@ static VIDEO_START( x1 )
 
 static VIDEO_UPDATE( x1 )
 {
-	int y,x;
+	int y,x,w;
+
+	w = (hres_320 & 0x40) ? 1 : 2;
 
 	for (y=0;y<25;y++)
 	{
-		for (x=0;x<40;x++)
+		for (x=0;x<40*w;x++)
 		{
-			int tile = videoram[x+(y*40)];
-			int color = colorram[x+(y*40)] & 0x3f;
-			int width = (colorram[x+(y*40)] & 0x80)>>7;
+			int tile = videoram[x+(y*40*w)];
+			int color = colorram[x+(y*40*w)] & 0x3f;
+			int width = (colorram[x+(y*40*w)] & 0x80)>>7;
 
 			drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[width],tile,color,0,0,(x/(width+1))*8*(width+1),y*8);
 		}
@@ -223,6 +229,102 @@ static WRITE8_HANDLER( rom_data_w )
 	ROM[0x10000+offset] = data;
 }
 
+/*
+FDC is a MB8877A, wd17XX compatible
+*/
+
+//static UINT8 fdc_irq_flag;
+//static UINT8 fdc_drq_flag;
+//static UINT8 fdc_side;
+//static UINT8 fdc_drive;
+
+static WD17XX_CALLBACK( x1_fdc_irq )
+{
+	#if 0
+	switch(state)
+	{
+		case WD17XX_IRQ_CLR:
+			fdc_irq_flag = 0;
+			break;
+		case WD17XX_IRQ_SET:
+			fdc_irq_flag = 1;
+			break;
+		case WD17XX_DRQ_CLR:
+			fdc_drq_flag = 0;
+			break;
+		case WD17XX_DRQ_SET:
+			fdc_drq_flag = 1;
+			break;
+	}
+	#endif
+}
+
+static READ8_HANDLER( x1_fdc_r )
+{
+	const device_config* dev = devtag_get_device(space->machine,"fdc");
+	//UINT8 ret = 0;
+
+	switch(offset+0xff8)
+	{
+		case 0x0ff8:
+			return wd17xx_status_r(dev,offset);
+		case 0x0ff9:
+			return wd17xx_track_r(dev,offset);
+		case 0x0ffa:
+			return wd17xx_sector_r(dev,offset);
+		case 0x0ffb:
+			return wd17xx_data_r(dev,offset);
+		case 0x0ffc:
+		case 0x0ffd:
+		case 0x0ffe:
+		case 0x0fff:
+			logerror("FDC: read from %04x\n",offset+0xff8);
+			return 0xff;
+	}
+
+	return 0x00;
+}
+
+static WRITE8_HANDLER( x1_fdc_w )
+{
+	const device_config* dev = devtag_get_device(space->machine,"fdc");
+
+	switch(offset+0xff8)
+	{
+		case 0x0ff8:
+			wd17xx_command_w(dev,offset,data);
+			break;
+		case 0x0ff9:
+			wd17xx_track_w(dev,offset,data);
+			break;
+		case 0x0ffa:
+			wd17xx_sector_w(dev,offset,data);
+			break;
+		case 0x0ffb:
+			wd17xx_data_w(dev,offset,data);
+			break;
+		case 0x0ffc:
+			/* data & 3 = disk drive, TODO */
+			if(data & 3)
+				fatalerror("FDC: Using more than 1 floppy disk drive!");
+			wd17xx_set_drive(dev,0);
+			floppy_drive_set_motor_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 0), data & 0x80);
+			floppy_drive_set_ready_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 0), data & 0x80,0);
+			wd17xx_set_side(dev,(data & 0x10)>>4);
+			break;
+		case 0x0ffd:
+		case 0x0ffe:
+		case 0x0fff:
+			logerror("FDC: write to %04x = %02x\n",offset+0xff8,data);
+			break;
+	}
+}
+
+static const wd17xx_interface x1_mb8877a_interface =
+{
+	x1_fdc_irq,
+	NULL
+};
 
 static ADDRESS_MAP_START( x1_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
@@ -237,7 +339,7 @@ static ADDRESS_MAP_START( x1_io , ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0e00, 0x0e02) AM_WRITE(x1_rom_w)
 	AM_RANGE(0x0e03, 0x0e03) AM_READ(x1_rom_r)
 //	AM_RANGE(0x0e80, 0x0e82) AM_WRITENOP //kanji registers?
-//	AM_RANGE(0x0ff8, 0x0fff) AM_WRITENOP //fdc registers
+	AM_RANGE(0x0ff8, 0x0fff) AM_READWRITE(x1_fdc_r,x1_fdc_w) //fdc registers
 //	AM_RANGE(0x1000, 0x12ff) AM_RAM //paletteram
 //	AM_RANGE(0x1300, 0x13ff) AM_WRITENOP //ply port, mirrored
 //	AM_RANGE(0x1400, 0x17ff) AM_RAM //pcg?
@@ -256,7 +358,8 @@ static ADDRESS_MAP_START( x1_io , ADDRESS_SPACE_IO, 8 )
 //	AM_RANGE(0x1fd0, 0x1fdf) AM_RAM //scrn?
 	AM_RANGE(0x2000, 0x2fff) AM_RAM AM_BASE(&colorram)//txt mode RAM
 	AM_RANGE(0x3000, 0x3fff) AM_RAM AM_BASE(&videoram)//txt mode RAM
-	AM_RANGE(0x4000, 0x5fff) AM_RAM //gfx mode RAM
+	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE(&bitmapa_ram)//gfx mode bank 1 RAM
+	AM_RANGE(0x6000, 0x7fff) AM_RAM AM_BASE(&bitmapb_ram)//gfx mode bank 2 RAM
 ADDRESS_MAP_END
 
 static const gfx_layout x1_chars_8x8 =
@@ -317,8 +420,6 @@ static PALETTE_INIT(x1)
 	for(i=0;i<8;i++)
 		palette_set_color_rgb(machine, 0x200+i, pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
 }
-
-static UINT8 hres_320,io_switch;
 
 static READ8_DEVICE_HANDLER( x1_porta_r )
 {
@@ -488,6 +589,8 @@ static MACHINE_DRIVER_START( x1 )
 	MDRV_VIDEO_START(x1)
 	MDRV_VIDEO_UPDATE(x1)
 
+	MDRV_MB8877_ADD("fdc",x1_mb8877a_interface)
+
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ay", AY8910, XTAL_4MHz/8) //unknown clock / divider
@@ -495,7 +598,44 @@ static MACHINE_DRIVER_START( x1 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
+static DEVICE_IMAGE_LOAD( x1_floppy )
+{
+	if (image_has_been_created(image))
+		return INIT_FAIL;
+
+	if (image_length(image) == 80*1*16*256) // 320K
+	{
+		if (DEVICE_IMAGE_LOAD_NAME(basicdsk_floppy)(image) == INIT_PASS)
+		{
+			/* image, tracks, sides, sectors per track, sector length, first sector id, offset of track 0, track skipping */
+			basicdsk_set_geometry(image, 40, 2, 16, 256, 1, 0, FALSE);
+
+			return INIT_PASS;
+		}
+	}
+
+	return INIT_FAIL;
+}
+
+static void x1_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+{
+	switch(state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case MESS_DEVINFO_INT_COUNT:					info->i = 1; break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case MESS_DEVINFO_PTR_LOAD:						info->load = DEVICE_IMAGE_LOAD_NAME(x1_floppy); break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:			strcpy(info->s = device_temp_str(), "2d"); break;
+
+		default:										legacybasicdsk_device_getinfo(devclass, state, info); break;
+	}
+}
+
 static SYSTEM_CONFIG_START(x1)
+	CONFIG_DEVICE(x1_floppy_getinfo)
 SYSTEM_CONFIG_END
 
 /* ROM definition */
