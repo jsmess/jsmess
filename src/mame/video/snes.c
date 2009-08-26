@@ -167,7 +167,7 @@ INLINE void snes_draw_blend(UINT16 offset, UINT16 *colour, UINT8 mode, UINT8 cli
 				b = ((*colour & 0x7c00) >> 10) + ((scanlines[SUBSCREEN].buffer[offset] & 0x7c00) >> 10);
 
 				/* don't halve for the back colour */
-				if( (snes_ram[CGADSUB] & 0x40) && (scanlines[SUBSCREEN].zbuf[offset] || scanlines[SUBSCREEN].buffer[offset] != snes_cgram[FIXED_COLOUR]) )
+				if( (snes_ram[CGADSUB] & 0x40) && (scanlines[SUBSCREEN].zbuf[offset] || scanlines[SUBSCREEN].buffer[offset]) )
 				{
 					r >>= 1;
 					g >>= 1;
@@ -181,7 +181,7 @@ INLINE void snes_draw_blend(UINT16 offset, UINT16 *colour, UINT8 mode, UINT8 cli
 				b = ((*colour & 0x7c00) >> 10) + ((snes_cgram[FIXED_COLOUR] & 0x7c00) >> 10);
 
 				/* don't halve for the back colour */
-				if( (snes_ram[CGADSUB] & 0x40) && (scanlines[SUBSCREEN].zbuf[offset] || scanlines[SUBSCREEN].buffer[offset] != snes_cgram[FIXED_COLOUR]) )
+				if( (snes_ram[CGADSUB] & 0x40) && (scanlines[SUBSCREEN].zbuf[offset] || scanlines[SUBSCREEN].buffer[offset]) )
 				{
 					r >>= 1;
 					g >>= 1;
@@ -205,7 +205,7 @@ INLINE void snes_draw_blend(UINT16 offset, UINT16 *colour, UINT8 mode, UINT8 cli
 				if( b > 0x1f ) b = 0;
 
 				/* don't halve for the back colour */
-				if( (snes_ram[CGADSUB] & 0x40) && (scanlines[SUBSCREEN].zbuf[offset] || scanlines[SUBSCREEN].buffer[offset] != snes_cgram[FIXED_COLOUR]) )
+				if( (snes_ram[CGADSUB] & 0x40) && (scanlines[SUBSCREEN].zbuf[offset] || scanlines[SUBSCREEN].buffer[offset]) )
 				{
 					r >>= 1;
 					g >>= 1;
@@ -222,7 +222,7 @@ INLINE void snes_draw_blend(UINT16 offset, UINT16 *colour, UINT8 mode, UINT8 cli
 				if( b > 0x1f ) b = 0;
 
 				/* don't halve for the back colour */
-				if( (snes_ram[CGADSUB] & 0x40) && (scanlines[SUBSCREEN].zbuf[offset] || scanlines[SUBSCREEN].buffer[offset] != snes_cgram[FIXED_COLOUR]) )
+				if( (snes_ram[CGADSUB] & 0x40) && (scanlines[SUBSCREEN].zbuf[offset] || scanlines[SUBSCREEN].buffer[offset]) )
 				{
 					r >>= 1;
 					g >>= 1;
