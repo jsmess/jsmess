@@ -1238,9 +1238,9 @@ INTERRUPT_GEN( c128_frame_interrupt )
 			vic2_set_rastering(1);
 			vdc8563_set_rastering(0);
 			if (c64_pal)
-				video_screen_set_visarea(device->machine->primary_screen, VIC6569_STARTVISIBLECOLUMNS, VIC6569_STARTVISIBLECOLUMNS + VIC6569_VISIBLECOLUMNS - 1, VIC6569_STARTVISIBLELINES, VIC6569_STARTVISIBLELINES + VIC6569_VISIBLELINES - 1);
+				video_screen_set_visarea(device->machine->primary_screen, 0, VIC6569_VISIBLECOLUMNS - 1, 0, VIC6569_VISIBLELINES - 1);
 			else
-				video_screen_set_visarea(device->machine->primary_screen, VIC6567_STARTVISIBLECOLUMNS, VIC6567_STARTVISIBLECOLUMNS + VIC6567_VISIBLECOLUMNS - 1, VIC6567_STARTVISIBLELINES, VIC6567_STARTVISIBLELINES + VIC6567_VISIBLELINES - 1);
+				video_screen_set_visarea(device->machine->primary_screen, 0, VIC6567_VISIBLECOLUMNS - 1, 0, VIC6567_VISIBLELINES - 1);
 		}
 		monitor = input_port_read(device->machine, "SPECIAL") & 0x08;
 	}
