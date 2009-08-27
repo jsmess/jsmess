@@ -146,10 +146,13 @@ static VIDEO_UPDATE( x1 )
 	{
 		int count,xi,yi;
 		int pen_r,pen_g,pen_b,color;
+		int yi_size;
 
 		count = 0;
 
-		for(yi=0;yi<8;yi++)
+		yi_size = (w == 1) ? 16 : 8;
+
+		for(yi=0;yi<yi_size;yi++)
 		{
 			for(y=0;y<200;y+=8)
 			{
@@ -163,9 +166,19 @@ static VIDEO_UPDATE( x1 )
 
 						color = pen_r<<2 | pen_g<<1 | pen_b<<0;
 
-						if((x+xi)<=video_screen_get_visible_area(screen)->max_x && ((y)+0)<video_screen_get_visible_area(screen)->max_y)
-							*BITMAP_ADDR16(bitmap, y+yi, x+xi) = screen->machine->pens[color+0x100];
+						if(w == 1)
+						{
+							if(yi & 1)
+								continue;
 
+							if((x+xi)<=video_screen_get_visible_area(screen)->max_x && ((y)+0)<video_screen_get_visible_area(screen)->max_y)
+								*BITMAP_ADDR16(bitmap, y+(yi >> 1), x+xi) = screen->machine->pens[color+0x100];
+						}
+						else
+						{
+							if((x+xi)<=video_screen_get_visible_area(screen)->max_x && ((y)+0)<video_screen_get_visible_area(screen)->max_y)
+								*BITMAP_ADDR16(bitmap, y+yi, x+xi) = screen->machine->pens[color+0x100];
+						}
 					}
 					count++;
 				}
@@ -181,14 +194,22 @@ static VIDEO_UPDATE( x1 )
 			int tile = videoram[x+(y*40*w)];
 			int color = colorram[x+(y*40*w)] & 0x1f;
 			int width = (colorram[x+(y*40*w)] & 0x80)>>7;
-			int bank = (colorram[x+(y*40*w)] & 0x20)>>4;
+			int height = (colorram[x+(y*40*w)] & 0x40)>>6;
+			int pcg_bank = (colorram[x+(y*40*w)] & 0x20)>>4;
+			int region = (width+(height<<1)) & 3;
 
-			if(tile == 0) continue; //<- correct?
+			if(pcg_bank)
+			{
+				region = 4;
+				width = 0;
+				height = 0;
+			}
+			else if(tile == 0) continue; //<- correct?
 
 			if(color & 0x38)
-				drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[width+bank],tile,color,0,0,(x/(width+1))*8*(width+1),y*8);
+				drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[region],tile,color,0,0,(x/(width+1))*8*(width+1),(y/(height+1))*8*(height+1));
 			else
-				drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[width+bank],tile,color,0,0,(x/(width+1))*8*(width+1),y*8,0);
+				drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[region],tile,color,0,0,(x/(width+1))*8*(width+1),(y/(height+1))*8*(height+1),0);
 		}
 	}
 
@@ -521,6 +542,28 @@ static const gfx_layout x1_chars_8wx8 =
 	8*8
 };
 
+static const gfx_layout x1_chars_8x8w =
+{
+	8,16,
+	RGN_FRAC(1,1),
+	1,
+	{ 0 },
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 0*8, 0*8, 1*8, 1*8, 2*8, 2*8, 3*8, 3*8, 4*8, 4*8, 5*8, 5*8, 6*8, 6*8, 7*8, 7*8 },
+	8*8
+};
+
+static const gfx_layout x1_chars_8wx8w =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	1,
+	{ 0 },
+	{ 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7 },
+	{ 0*8, 0*8, 1*8, 1*8, 2*8, 2*8, 3*8, 3*8, 4*8, 4*8, 5*8, 5*8, 6*8, 6*8, 7*8, 7*8 },
+	8*8
+};
+
 static const gfx_layout x1_chars_16x16 =
 {
 	16,16,
@@ -547,6 +590,8 @@ static const gfx_layout x1_pcg_8x8 =
 static GFXDECODE_START( x1 )
 	GFXDECODE_ENTRY( "cgrom", 0x00000, x1_chars_8x8,    0, 0x40 )
 	GFXDECODE_ENTRY( "cgrom", 0x00000, x1_chars_8wx8,   0, 0x40 )
+	GFXDECODE_ENTRY( "cgrom", 0x00000, x1_chars_8x8w,   0, 0x40 )
+	GFXDECODE_ENTRY( "cgrom", 0x00000, x1_chars_8wx8w,  0, 0x40 )
 	GFXDECODE_ENTRY( "pcg",   0x00000, x1_pcg_8x8,      0x80, 1 )
 	GFXDECODE_ENTRY( "cgrom", 0x01800, x1_chars_16x16,  0, 0x40 ) //only x1turboz uses this so far
 	GFXDECODE_ENTRY( "kanji", 0x27000, x1_chars_16x16,  0, 0x40 ) //needs to be checked when the ROM will be redumped
