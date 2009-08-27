@@ -12,10 +12,11 @@
 	- Fix the interrupts (uses IM 2)
 
 	per-game specific TODO:
-	- 177 / Dragon Buster: fix the keyboard flags otherwise these doesn't boot
-	- Dragon Buster: uses PCG + sets bitmap in a weird way;
+	- 177 / Dragon Buster: fix the keyboard flags otherwise these doesn't boot;
+	- Dragon Buster: Maybe the pcg tilemap uses scrolling and priorities are wrong;
 	- Shanghai: tests the ay8910 read regs, mouse/joystick perhaps?
-	- Gaia: Hits a FDC drive assert;
+	- Gaia/Space Harrier: Hits the FDC drive assert, the latter boots but has heavy emulation
+	  video/logic problems;
 
 =================================================================================================
 
@@ -198,12 +199,7 @@ static VIDEO_UPDATE( x1 )
 			int pcg_bank = (colorram[x+(y*40*w)] & 0x20)>>4;
 			int region = (width+(height<<1)) & 3;
 
-			if(pcg_bank)
-			{
-				region = 4;
-				width = 0;
-				height = 0;
-			}
+			if(pcg_bank) { region+= 4; }
 			else if(tile == 0) continue; //<- correct?
 
 			if(color & 0x38)
@@ -316,7 +312,8 @@ static WRITE8_HANDLER( rom_bank_1_w )
 {
 	UINT8 *ROM = memory_region(space->machine, "maincpu");
 
-	memory_set_bankptr(space->machine, 1, &ROM[0x00000]);
+	if(data)
+		memory_set_bankptr(space->machine, 1, &ROM[0x00000]);
 }
 
 static WRITE8_HANDLER( rom_data_w )
@@ -402,8 +399,8 @@ static WRITE8_HANDLER( x1_fdc_w )
 			break;
 		case 0x0ffc:
 			/* data & 3 = disk drive, TODO */
-			if(data & 3)
-				fatalerror("FDC: Using more than 1 floppy disk drive!");
+			//if(data & 3)
+			//	fatalerror("FDC: Using more than 1 floppy disk drive!");
 			wd17xx_set_drive(dev,0);
 			floppy_drive_set_motor_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 0), data & 0x80);
 			floppy_drive_set_ready_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 0), data & 0x80,0);
@@ -461,22 +458,24 @@ static WRITE8_HANDLER( x1_pcg_w )
 	if(addr == 0)
 	{
 		/* maybe data actually? */
-		pcg_index[0] = 0;
-		pcg_index[1] = 0;
-		pcg_index[2] = 0;
+		pcg_index[0] = data*8;
+		pcg_index[1] = data*8;
+		pcg_index[2] = data*8;
 	}
 	else
 	{
-		pcg_offset = ((pcg_index[addr-1]*8)+(offset & 7)) & 0x7ff;
+		pcg_offset = (pcg_index[addr-1]) & 0x7ff;
 		pcg_offset+=((addr-1)*0x800);
 		PCG_RAM[pcg_offset] = data;
 
 		pcg_offset &= 0x7ff;
 
-		gfx_element_mark_dirty(space->machine->gfx[2], pcg_offset >> 3);
+    	gfx_element_mark_dirty(space->machine->gfx[4], pcg_offset >> 3);
+    	gfx_element_mark_dirty(space->machine->gfx[5], pcg_offset >> 3);
+    	gfx_element_mark_dirty(space->machine->gfx[6], pcg_offset >> 3);
+    	gfx_element_mark_dirty(space->machine->gfx[7], pcg_offset >> 3);
 
-	  	if((offset & 7) == 7)
-	  		pcg_index[addr-1]++;
+  		pcg_index[addr-1]++;
 	}
 }
 
@@ -506,7 +505,6 @@ static ADDRESS_MAP_START( x1_io , ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x1900, 0x19ff) AM_READWRITE(sub_io_r,sub_io_w) //sub port comms, mirrored
 	AM_RANGE(0x1a00, 0x1a03) AM_MIRROR(0xfc) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w) //8255, mirrored
 	AM_RANGE(0x1b00, 0x1bff) AM_DEVREADWRITE("ay", ay8910_r, ay8910_data_w) //PSG / ay-3-8910 data port
-//	AM_RANGE(0x1b00, 0x1bff) AM_DEVWRITE("ay", ay8910_data_w) //PSG / ay-3-8910 data port
 	AM_RANGE(0x1c00, 0x1cff) AM_DEVWRITE("ay", ay8910_address_w) //PSG / ay-3-8910 reg port
 	AM_RANGE(0x1d00, 0x1dff) AM_READNOP AM_WRITE(rom_bank_1_w) //ROM/RAM bankswitch = ROM
 	AM_RANGE(0x1e00, 0x1eff) AM_WRITE(rom_bank_0_w) //ROM/RAM bankswitch = RAM
@@ -564,6 +562,50 @@ static const gfx_layout x1_chars_8wx8w =
 	8*8
 };
 
+static const gfx_layout x1_pcg_8x8 =
+{
+	8,8,
+	RGN_FRAC(1,3),
+	3,
+	{ RGN_FRAC(1,3),RGN_FRAC(2,3),RGN_FRAC(0,3) },
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8
+};
+
+static const gfx_layout x1_pcg_8wx8 =
+{
+	16,8,
+	RGN_FRAC(1,3),
+	3,
+	{ RGN_FRAC(1,3),RGN_FRAC(2,3),RGN_FRAC(0,3) },
+	{ 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8
+};
+
+static const gfx_layout x1_pcg_8x8w =
+{
+	8,16,
+	RGN_FRAC(1,3),
+	3,
+	{ RGN_FRAC(1,3),RGN_FRAC(2,3),RGN_FRAC(0,3) },
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 0*8, 0*8, 1*8, 1*8, 2*8, 2*8, 3*8, 3*8, 4*8, 4*8, 5*8, 5*8, 6*8, 6*8, 7*8, 7*8 },
+	8*8
+};
+
+static const gfx_layout x1_pcg_8wx8w =
+{
+	16,16,
+	RGN_FRAC(1,3),
+	3,
+	{ RGN_FRAC(1,3),RGN_FRAC(2,3),RGN_FRAC(0,3) },
+	{ 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7 },
+	{ 0*8, 0*8, 1*8, 1*8, 2*8, 2*8, 3*8, 3*8, 4*8, 4*8, 5*8, 5*8, 6*8, 6*8, 7*8, 7*8 },
+	8*8
+};
+
 static const gfx_layout x1_chars_16x16 =
 {
 	16,16,
@@ -575,17 +617,6 @@ static const gfx_layout x1_chars_16x16 =
 	16*16
 };
 
-static const gfx_layout x1_pcg_8x8 =
-{
-	8,8,
-	RGN_FRAC(1,3),
-	3,
-	{ RGN_FRAC(2,3),RGN_FRAC(1,3),RGN_FRAC(0,3) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
-
 /* TODO: separe the different x1 decodings accordingly */
 static GFXDECODE_START( x1 )
 	GFXDECODE_ENTRY( "cgrom", 0x00000, x1_chars_8x8,    0, 0x40 )
@@ -593,6 +624,9 @@ static GFXDECODE_START( x1 )
 	GFXDECODE_ENTRY( "cgrom", 0x00000, x1_chars_8x8w,   0, 0x40 )
 	GFXDECODE_ENTRY( "cgrom", 0x00000, x1_chars_8wx8w,  0, 0x40 )
 	GFXDECODE_ENTRY( "pcg",   0x00000, x1_pcg_8x8,      0x80, 1 )
+	GFXDECODE_ENTRY( "pcg",   0x00000, x1_pcg_8wx8,     0x80, 1 )
+	GFXDECODE_ENTRY( "pcg",   0x00000, x1_pcg_8x8w,     0x80, 1 )
+	GFXDECODE_ENTRY( "pcg",   0x00000, x1_pcg_8wx8w,    0x80, 1 )
 	GFXDECODE_ENTRY( "cgrom", 0x01800, x1_chars_16x16,  0, 0x40 ) //only x1turboz uses this so far
 	GFXDECODE_ENTRY( "kanji", 0x27000, x1_chars_16x16,  0, 0x40 ) //needs to be checked when the ROM will be redumped
 GFXDECODE_END
@@ -939,7 +973,17 @@ static MACHINE_RESET( x1 )
 	memset(gfx_bitmap_ram,0x00,0xc000);
 
 	for(i=0;i<0x1800;i++)
+	{
 		PCG_RAM[i] = 0;
+	}
+
+	for(i=0;i<0x0400;i++)
+	{
+		gfx_element_mark_dirty(machine->gfx[4], i);
+	   	gfx_element_mark_dirty(machine->gfx[5], i);
+	   	gfx_element_mark_dirty(machine->gfx[6], i);
+		gfx_element_mark_dirty(machine->gfx[7], i);
+	}
 }
 
 static void ctc0_interrupt(const device_config *device, int state)
