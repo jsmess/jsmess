@@ -150,7 +150,7 @@ struct _m6847_vdg
 	/* 2^7 modes, 256/16 character groups, background/foreground */
 	UINT8 colordata[128][256/16][2];
 
-	/* 2^7 modes, 128 characters, 12 scanlines */
+	/* 2^7 modes, 256 characters, 12 scanlines */
 	UINT8 fontdata[128][256][12];
 };
 
