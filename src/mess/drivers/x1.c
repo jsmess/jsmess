@@ -10,6 +10,12 @@
 	- Video part is bare minimum, chances are that's probably a tilemap/bitmap nightmare;
 	- Sort out / redump the gfx roms;
 
+	per-game specific TODO:
+	- 177 / Dragon Buster: check why it does a tight loop (patching it makes the game go further)
+	- Dragon Buster: uses PCG + sets bitmap in a weird way;
+	- Shanghai: tests the ay8910 read regs, mouse/joystick perhaps?
+	- Gaia: Hits a FDC drive assert;
+
 =================================================================================================
 
 	X1 (CZ-800C) - November, 1982
@@ -121,7 +127,7 @@
 #include "devices/basicdsk.h"
 
 static UINT8 hres_320,io_switch;
-static UINT8 *bitmapa_ram,*bitmapb_ram;
+static UINT8 *gfx_bitmap_ram;
 
 static VIDEO_START( x1 )
 {
@@ -133,6 +139,38 @@ static VIDEO_UPDATE( x1 )
 
 	w = (hres_320 & 0x40) ? 1 : 2;
 
+	bitmap_fill(bitmap, cliprect, 0);
+
+	{
+		int count,xi,yi;
+		int pen_r,pen_g,pen_b,color;
+
+		count = 0;
+		for(yi=0;yi<8;yi++)
+		{
+			for(y=0;y<200;y+=8)
+			{
+				for(x=0;x<640;x+=8)
+				{
+					for(xi=0;xi<8;xi++)
+					{
+						pen_r = (gfx_bitmap_ram[count+0x4000]>>(7-xi)) & 1;
+						pen_g = (gfx_bitmap_ram[count+0x8000]>>(7-xi)) & 1;
+						pen_b = (gfx_bitmap_ram[count+0x0000]>>(7-xi)) & 1;
+
+						color = pen_r<<2 | pen_g<<1 | pen_b<<0;
+
+						if((x+xi)<=video_screen_get_visible_area(screen)->max_x && ((y)+0)<video_screen_get_visible_area(screen)->max_y)
+							*BITMAP_ADDR16(bitmap, y+yi, x+xi) = screen->machine->pens[color+0x80];
+
+					}
+					count++;
+				}
+			}
+			count+=48;
+		}
+	}
+
 	for (y=0;y<25;y++)
 	{
 		for (x=0;x<40*w;x++)
@@ -141,7 +179,12 @@ static VIDEO_UPDATE( x1 )
 			int color = colorram[x+(y*40*w)] & 0x3f;
 			int width = (colorram[x+(y*40*w)] & 0x80)>>7;
 
-			drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[width],tile,color,0,0,(x/(width+1))*8*(width+1),y*8);
+			if(tile == 0) continue; //<- correct?
+
+			if(color & 0x38)
+				drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[width],tile,color,0,0,(x/(width+1))*8*(width+1),y*8);
+			else
+				drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[width],tile,color,0,0,(x/(width+1))*8*(width+1),y*8,0);
 		}
 	}
 
@@ -326,6 +369,28 @@ static const wd17xx_interface x1_mb8877a_interface =
 	NULL
 };
 
+/* for bitmap mode */
+static UINT8 x_b,x_g,x_r;
+
+static void set_current_palette(running_machine *machine)
+{
+	UINT8 addr,r,g,b;
+
+	for(addr=0;addr<8;addr++)
+	{
+		r = ((x_r)>>(7-addr)) & 1;
+		g = ((x_g)>>(7-addr)) & 1;
+		b = ((x_b)>>(7-addr)) & 1;
+
+		palette_set_color_rgb(machine, addr+0x100, pal1bit(r), pal1bit(g), pal1bit(b));
+	}
+}
+
+static WRITE8_HANDLER( x1_pal_r_w ) { x_r = data; set_current_palette(space->machine); }
+static WRITE8_HANDLER( x1_pal_g_w ) { x_g = data; set_current_palette(space->machine); }
+static WRITE8_HANDLER( x1_pal_b_w ) { x_b = data; set_current_palette(space->machine); }
+
+
 static ADDRESS_MAP_START( x1_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK(1) AM_WRITE(rom_data_w)
@@ -336,17 +401,21 @@ static ADDRESS_MAP_START( x1_io , ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 //	AM_RANGE(0x0700, 0x0701) AM_WRITENOP //YM-2151 reg/data
 //	AM_RANGE(0x0704, 0x0707) AM_NOP //ctc regs
+//	0x0c00 rs232c port
 	AM_RANGE(0x0e00, 0x0e02) AM_WRITE(x1_rom_w)
 	AM_RANGE(0x0e03, 0x0e03) AM_READ(x1_rom_r)
 //	AM_RANGE(0x0e80, 0x0e82) AM_WRITENOP //kanji registers?
 	AM_RANGE(0x0ff8, 0x0fff) AM_READWRITE(x1_fdc_r,x1_fdc_w) //fdc registers
-//	AM_RANGE(0x1000, 0x12ff) AM_RAM //paletteram
+	AM_RANGE(0x1000, 0x10ff) AM_WRITE(x1_pal_b_w) //paletteram
+	AM_RANGE(0x1100, 0x11ff) AM_WRITE(x1_pal_r_w) //paletteram
+	AM_RANGE(0x1200, 0x12ff) AM_WRITE(x1_pal_g_w) //paletteram
 //	AM_RANGE(0x1300, 0x13ff) AM_WRITENOP //ply port, mirrored
-//	AM_RANGE(0x1400, 0x17ff) AM_RAM //pcg?
+//	AM_RANGE(0x1400, 0x17ff) AM_RAM //PCG = Programmable Character Generator
 	AM_RANGE(0x1800, 0x1800) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x1801, 0x1801) AM_DEVWRITE("crtc", mc6845_register_w)
 	AM_RANGE(0x1900, 0x19ff) AM_READWRITE(sub_io_r,sub_io_w) //sub port comms, mirrored
 	AM_RANGE(0x1a00, 0x1a03) AM_MIRROR(0xfc) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w) //8255, mirrored
+//	AM_RANGE(0x1b00, 0x1bff) AM_DEVREADWRITE("ay", ay8910_r, ay8910_data_w) //PSG / ay-3-8910 data port
 	AM_RANGE(0x1b00, 0x1bff) AM_DEVWRITE("ay", ay8910_data_w) //PSG / ay-3-8910 data port
 	AM_RANGE(0x1c00, 0x1cff) AM_DEVWRITE("ay", ay8910_address_w) //PSG / ay-3-8910 reg port
 	AM_RANGE(0x1d00, 0x1dff) AM_WRITE(rom_bank_1_w) //ROM bankswitch = 1
@@ -358,8 +427,7 @@ static ADDRESS_MAP_START( x1_io , ADDRESS_SPACE_IO, 8 )
 //	AM_RANGE(0x1fd0, 0x1fdf) AM_RAM //scrn?
 	AM_RANGE(0x2000, 0x2fff) AM_RAM AM_BASE(&colorram)//txt mode RAM
 	AM_RANGE(0x3000, 0x3fff) AM_RAM AM_BASE(&videoram)//txt mode RAM
-	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE(&bitmapa_ram)//gfx mode bank 1 RAM
-	AM_RANGE(0x6000, 0x7fff) AM_RAM AM_BASE(&bitmapb_ram)//gfx mode bank 2 RAM
+	AM_RANGE(0x4000, 0xffff) AM_RAM AM_BASE(&gfx_bitmap_ram)//gfx mode bank b/r/g RAM
 ADDRESS_MAP_END
 
 static const gfx_layout x1_chars_8x8 =
@@ -418,7 +486,7 @@ static PALETTE_INIT(x1)
 
 	//bitmap mode,TODO
 	for(i=0;i<8;i++)
-		palette_set_color_rgb(machine, 0x200+i, pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
+		palette_set_color_rgb(machine, 0x80+i, pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
 }
 
 static READ8_DEVICE_HANDLER( x1_porta_r )
@@ -523,9 +591,7 @@ static INPUT_PORTS_START( x1 )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
 
 	PORT_START("IOSYS")
 	PORT_DIPNAME( 0x01, 0x01, "IOSYS" )
@@ -559,6 +625,8 @@ static MACHINE_RESET( x1 )
 	UINT8 *ROM = memory_region(machine, "maincpu");
 
 	memory_set_bankptr(machine, 1, &ROM[0x00000]);
+
+	memset(gfx_bitmap_ram,0x00,0xc000);
 }
 
 
