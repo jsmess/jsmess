@@ -9,8 +9,8 @@
 *  which is invaluable for work on this driver.
 *
 *  TODO:
-*  * Attach 2681(M68681 clone?) DUART
-*  * Attach m68k interrupts properly
+*  * Fix hookup of duart, I suspect there's an address line shift problem, either that or modes 0-6 of the duart being unimplemented prevents this from working at all.
+*  * Attach m68k interrupts properly; i suspect the duart int is hooked up wrong
 *  * Figure out why status LEDS are flashing 00 FD 00 FD etc... some sort of 68k selftest DUART error?
 *    * NICETOHAVE: figure out what all the LED error codes actually mean, as DEC didn't document them anywhere.
 *  * Actually store the X2212 nvram's eeprom data to disk rather than throwing it out on exit
@@ -18,7 +18,7 @@
 *      or the shared error/fifo flag regs... How can I actually do this? CPU_BOOST_INTERLEAVE?
 *      otherwise i need to have the two in some mad insane sync...
 *  * Hook the 'output' FIFO up to the 10khz sampling rate generator xtal using SPEAKER
-*  * emulate/simulate the MT8060 dtmf decoder as an input device
+*  * emulate/simulate the MT8060 dtmf decoder as a 16-key input device?
 *  * discuss and figure out how to have an external application send data to the two serial ports to be spoken
 *
 *******************************************************************************/
@@ -65,6 +65,19 @@ DUART is INT D3
 /* Components */
 
 /* Devices */
+static void duart_irq_handler(const device_config *device, UINT8 vector)
+{
+	cputag_set_input_line_and_vector(device->machine, "maincpu", 6, HOLD_LINE, vector);
+};
+
+static const duart68681_config dectalk_duart68681_config =
+{
+	duart_irq_handler,
+	// duart_tx,
+	NULL,
+	NULL
+};
+
 static struct
 {
 UINT8 data[8]; // ? what is this for?
@@ -299,13 +312,11 @@ static ADDRESS_MAP_START(m68k_mem, ADDRESS_SPACE_PROGRAM, 16)
     AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_MIRROR(0x740000) /* ROM */
     AM_RANGE(0x080000, 0x093fff) AM_RAM AM_MIRROR(0x760000) /* RAM */
     AM_RANGE(0x094000, 0x0943ff) AM_READWRITE(led_sw_nvr_read, led_sw_nv_write) AM_MIRROR(0x763C00) /* LED array and Xicor X2212 NVRAM */
-    //AM_RANGE(0x094001, 0x094001) AM_READWRITE(x2212_read, x2212_write) AM_MIRROR(0x763C00) /* Xicor X2212 NVRAM (SRAM) */
-    //AM_RANGE(0x094201, 0x094201) AM_READWRITE(x2212_recall, x2212_store) AM_MIRROR(0x763C00)  /* Xicor X2212 NVRAM (EEPROM commands) */
-    //AM_RANGE(0x098000, 0x09bfff) AM_READWRITE(1) AM_MIRROR(0x760000) /* DUART */
-    AM_RANGE(0x09C000, 0x09C001) AM_READWRITE(m68k_spcflags_r, m68k_spcflags_w) AM_MIRROR(0x761FF8) /* SPC flags reg */
-    AM_RANGE(0x09C002, 0x09C003) AM_WRITE(m68k_infifo_w) AM_MIRROR(0x761FF8) /* SPC fifo reg */
-    AM_RANGE(0x09C004, 0x09C005) AM_READWRITE(m68k_tlcflags_r, m68k_tlcflags_w) AM_MIRROR(0x761FF8) /* telephone status flags */
-    AM_RANGE(0x09C006, 0x09C007) AM_READ(m68k_tlc_dtmf_r) AM_MIRROR(0x761FF8) /* telephone dtmf read */
+    AM_RANGE(0x098000, 0x09801f) AM_DEVREADWRITE8( "duart68681", duart68681_r, duart68681_w, 0xff) AM_MIRROR(0x763FE0) /* DUART */
+    AM_RANGE(0x09C000, 0x09C001) AM_READWRITE(m68k_spcflags_r, m68k_spcflags_w) AM_MIRROR(0x763FF8) /* SPC flags reg */
+    AM_RANGE(0x09C002, 0x09C003) AM_WRITE(m68k_infifo_w) AM_MIRROR(0x763FF8) /* SPC fifo reg */
+    AM_RANGE(0x09C004, 0x09C005) AM_READWRITE(m68k_tlcflags_r, m68k_tlcflags_w) AM_MIRROR(0x763FF8) /* telephone status flags */
+    AM_RANGE(0x09C006, 0x09C007) AM_READ(m68k_tlc_dtmf_r) AM_MIRROR(0x763FF8) /* telephone dtmf read */
 ADDRESS_MAP_END
 
 // do we even need this below?
@@ -335,13 +346,15 @@ ADDRESS_MAP_END
 
 static MACHINE_DRIVER_START(dectalk)
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz/2)
+    MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* Y2 20Mhz (/2) */
     MDRV_CPU_PROGRAM_MAP(m68k_mem)
     MDRV_CPU_IO_MAP(m68k_io)
     MDRV_QUANTUM_TIME(HZ(10000))
     MDRV_MACHINE_RESET(dectalk)
+	MDRV_DUART68681_ADD( "duart68681", XTAL_3_6864MHz, dectalk_duart68681_config ) /* Y3 3.6864Mhz */
 
-    MDRV_CPU_ADD("dsp", TMS32010, XTAL_20MHz)
+
+    MDRV_CPU_ADD("dsp", TMS32010, XTAL_20MHz) /* Y1 20Mhz */
     MDRV_CPU_PROGRAM_MAP(tms32010_mem)
     MDRV_CPU_IO_MAP(tms32010_io)
     MDRV_QUANTUM_TIME(HZ(10000))
