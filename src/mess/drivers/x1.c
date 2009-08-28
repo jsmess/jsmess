@@ -141,6 +141,8 @@
 #include "video/mc6845.h"
 #include "machine/wd17xx.h"
 #include "devices/basicdsk.h"
+#include "includes/d88.h"
+#include <ctype.h>
 
 static UINT8 hres_320,io_switch,io_sys;
 static UINT8 io_bank_mode;
@@ -161,7 +163,7 @@ static VIDEO_UPDATE( x1 )
 
 	w = (video_screen_get_width(screen) < 640) ? 1 : 2;
 
-	bitmap_fill(bitmap, cliprect, 0);
+	bitmap_fill(bitmap, cliprect, screen->machine->pens[0x100]);
 
 	for (y=0;y<25;y++)
 	{
@@ -177,6 +179,7 @@ static VIDEO_UPDATE( x1 )
 			if(pcg_bank) { region+= 4; }
 
 			if(color & 0x8) continue;
+			if(tile == 0) continue;
 
 			drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[region],tile,color,0,0,(x/(width+1))*8*(width+1),(y/(height+1))*8*(height+1));
 		}
@@ -438,9 +441,9 @@ static WRITE8_HANDLER( x1_fdc_w )
 			/* data & 3 = disk drive, TODO */
 			//if(data & 3)
 			//	fatalerror("FDC: Using more than 1 floppy disk drive!");
-			wd17xx_set_drive(dev,0);
-			floppy_drive_set_motor_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 0), data & 0x80);
-			floppy_drive_set_ready_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 0), data & 0x80,0);
+			wd17xx_set_drive(dev,data & 3);
+			floppy_drive_set_motor_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, data & 3), data & 0x80);
+			floppy_drive_set_ready_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, data & 3), data & 0x80,0);
 			wd17xx_set_side(dev,(data & 0x10)>>4);
 			break;
 		case 0x0ffd:
@@ -1144,35 +1147,54 @@ MACHINE_DRIVER_END
 
 static DEVICE_IMAGE_LOAD( x1_floppy )
 {
-	if (image_has_been_created(image))
+	const char *ext;
+
+	ext = image_filetype(image);
+
+	if (image_has_been_created(image)) //FIXME
 		return INIT_FAIL;
 
-	if (image_length(image) == 80*1*16*256) // 320K
-	{
-		if (DEVICE_IMAGE_LOAD_NAME(basicdsk_floppy)(image) == INIT_PASS)
-		{
-			/* image, tracks, sides, sectors per track, sector length, first sector id, offset of track 0, track skipping */
-			basicdsk_set_geometry(image, 40, 2, 16, 256, 1, 0, FALSE);
+    if( toupper(ext[0])=='D' && toupper(ext[1])=='8' && toupper(ext[2])=='8' )
+    {
+		DEVICE_IMAGE_LOAD_NAME(d88image_floppy)(image);
+		return INIT_PASS;
+	}
 
-			return INIT_PASS;
+    if( toupper(ext[0])=='2' && toupper(ext[1])=='D' )
+    {
+		if (image_length(image) == 80*1*16*256) // 320K
+		{
+			if (DEVICE_IMAGE_LOAD_NAME(basicdsk_floppy)(image) == INIT_PASS)
+			{
+				/* image, tracks, sides, sectors per track, sector length, first sector id, offset of track 0, track skipping */
+				basicdsk_set_geometry(image, 40, 2, 16, 256, 1, 0, FALSE);
+
+				return INIT_PASS;
+			}
 		}
 	}
 
 	return INIT_FAIL;
 }
 
+
 static void x1_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:					info->i = 1; break;
+		case MESS_DEVINFO_INT_TYPE:						info->i = IO_FLOPPY; break;
+		case MESS_DEVINFO_INT_READABLE:					info->i = 1; break;
+		case MESS_DEVINFO_INT_WRITEABLE:				info->i = 1; break;
+		case MESS_DEVINFO_INT_CREATABLE:				info->i = 0; break;
+		case MESS_DEVINFO_INT_COUNT:					info->i = 4; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case MESS_DEVINFO_PTR_START:					info->start = DEVICE_START_NAME(d88image_floppy); break;
 		case MESS_DEVINFO_PTR_LOAD:						info->load = DEVICE_IMAGE_LOAD_NAME(x1_floppy); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:			strcpy(info->s = device_temp_str(), "2d"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:			strcpy(info->s = device_temp_str(), "2d,d88"); break;
 
 		default:										legacybasicdsk_device_getinfo(devclass, state, info); break;
 	}
