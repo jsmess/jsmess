@@ -428,7 +428,7 @@ MACHINE_DRIVER_END
  * VT1xx-AB : p/n 5413097 AVO board (AVO roms could be optionally ordered along with 
               this board if needed)
  * VT1xx-AC : STP serial printer board (includes a special romset)
- * VT1xx-CA : p/n 5413206 later 20ma current loop interface pcb for vt100, vt101/vt102/vt131
+ * VT1xx-CA : p/n 5413206? 20ma current loop interface pcb for vt101/vt102/vt131
  * VT1xx-CB or CL: GPO "ReGIS" board vt100->vt125 upgrade kit (p/n 5414275 paddle board and 5414277 gpo board)
  
  * Info about mask roms and other nasties:

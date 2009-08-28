@@ -66,7 +66,7 @@ CPUS += S2650
 #CPUS += TMS340X0
 CPUS += TMS9900
 CPUS += Z8000
-#CPUS += TMS32010
+CPUS += TMS32010
 #CPUS += TMS32025
 #CPUS += TMS32031
 #CPUS += TMS32051
@@ -766,6 +766,7 @@ $(MESSOBJ)/ddr.a:				\
 	$(MESS_DRIVERS)/vcs80.o		\
 
 $(MESSOBJ)/dec.a:				\
+	$(MESS_DRIVERS)/dectalk.o	\
 	$(MESS_DRIVERS)/vk100.o		\
 	$(MESS_DRIVERS)/vt100.o		\
 	$(MESS_DRIVERS)/vt220.o		\
@@ -1487,6 +1488,7 @@ $(MESS_DRIVERS)/amico2k.o:	$(MESS_LAYOUT)/amico2k.lh
 $(MESS_DRIVERS)/bob85.o:	$(MESS_LAYOUT)/bob85.lh
 $(MESS_DRIVERS)/coco.o:		$(MESS_LAYOUT)/coco3.lh
 $(MESS_DRIVERS)/c80.o:		$(MESS_LAYOUT)/c80.lh
+$(MESS_DRIVERS)/dectalk.o:	$(MESS_LAYOUT)/dectalk.lh
 $(MESS_DRIVERS)/elf.o:		$(MESS_LAYOUT)/elf2.lh
 $(MESS_DRIVERS)/ex800.o:	$(MESS_LAYOUT)/ex800.lh
 $(MESS_DRIVERS)/glasgow.o:	$(MESS_LAYOUT)/glasgow.lh

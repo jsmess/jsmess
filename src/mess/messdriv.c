@@ -977,6 +977,7 @@ const game_driver * const drivers[] =
     DRIVER(vt320) /* 1987 Digital Equipment Corporation */
     DRIVER(vt520) /* 1994 Digital Equipment Corporation */
     DRIVER(vk100) /* 1980 Digital Equipment Corporation */
+    DRIVER(dectalk) /* 1982 Digital Equipment Corporation */
 
     /* MEMOTECH */
     DRIVER( mtx512 )    /* 1983 Memotech MTX 512                            */
