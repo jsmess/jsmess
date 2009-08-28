@@ -5,6 +5,8 @@
 *  with major help (dumping, tech questions answered, etc)
 *  from Kevin 'kevtris' Horton, without whom this driver would
 *  have been impossible.
+*  Special thanks to Al Kossow for archiving the DTC-01 schematic at bitsavers,
+*  which is invaluable for work on this driver.
 *
 *  TODO:
 *  * Attach 2681(M68681 clone?) DUART
@@ -12,11 +14,10 @@
 *  * Figure out why status LEDS are flashing 00 FD 00 FD etc... some sort of 68k selftest DUART error?
 *    * NICETOHAVE: figure out what all the LED error codes actually mean, as DEC didn't document them anywhere.
 *  * Actually store the X2212 nvram's eeprom data to disk rather than throwing it out on exit
-*  * Properly attach 'input' FIFO between 68k and TMS32010
-*    * force sync between both processors if either one pushes or pulls the fifo
+*  * force sync between both processors if either one pushes or pulls the fifo
 *      or the shared error/fifo flag regs... How can I actually do this? CPU_BOOST_INTERLEAVE?
+*      otherwise i need to have the two in some mad insane sync...
 *  * Hook the 'output' FIFO up to the 10khz sampling rate generator xtal using SPEAKER
-*  * hook up the SPC(tms32010 interface) status flags properly
 *  * emulate/simulate the MT8060 dtmf decoder as an input device
 *  * discuss and figure out how to have an external application send data to the two serial ports to be spoken
 *
@@ -77,9 +78,14 @@ UINT8 infifo_head_ptr;
 UINT16 outfifo[16]; // technically three 74LS224 4bit*16stage FIFO chips, arranged as a 16 stage, 12-bit wide fifo
 UINT8 outfifo_tail_ptr;
 UINT8 outfifo_head_ptr;
-UINT8 outfifo_status_latch; // latch for status of output fifo, d-latch 74ls74 @ E64 'lower half'
+UINT8 outfifo_writable_latch; // latch for status of output fifo, d-latch 74ls74 @ E64 'lower half'
 UINT8 spc_error_latch; // latch for error status of speech dsp, d-latch 74ls74 @ E64 'upper half'
+UINT8 m68k_spcflags_latch; // latch for initializing the speech dsp, d-latch 74ls74 @ E29 'lower half', AND latch for spc irq enable, d-latch 74ls74 @ E29 'upper half'; these are stored in bits 0 and 6 respectively, the rest of the bits stored here MUST be zeroed!
+UINT8 m68k_tlcflags_latch; // latch for telephone interface stuff, d-latches 74ls74 @ E93 'upper half' and @ 103 'upper and lower halves'
 } dectalk={ {0}};
+
+#define SPC_INITIALIZE dectalk.m68k_spcflags_latch&0x1 // speech initialize flag
+#define SPC_IRQ_ENABLED ((dectalk.m68k_spcflags_latch&0x40)>>6) // irq enable flag
 
 static void dectalk_clear_all_fifos( running_machine *machine )
 {
@@ -113,7 +119,7 @@ static void dectalk_x2212_recall( running_machine *machine )
 DRIVER_INIT( dectalk )
 {
 	dectalk_clear_all_fifos(machine);
-	dectalk.outfifo_status_latch = 0;
+	dectalk.outfifo_writable_latch = 0;
 	dectalk.spc_error_latch = 0;
 }
 
@@ -123,24 +129,13 @@ MACHINE_RESET( dectalk )
 // stuff that is affected by the RESET generator on the pcb: the status LED latch, the novram (forced load from eeprom to tempram)
 	dectalk.statusLED = 0; // clear status led latch
 	dectalk_x2212_recall(machine);
+	dectalk.m68k_spcflags_latch = 1; // initial status is speech reset(d0) active and spc int(d6) disabled
+	dectalk.m68k_tlcflags_latch = 0; // initial status is tone detect int(d6) off, answer phone(d8) off, ring detect int(d14) off
+	dectalk_clear_all_fifos(machine); // which also clears the fifos, though we have to do it explicitly here since we're not actually in the m68k_spcflags_w function.
+	/* write me */ // it also forces the CLR line active on the tms32010, we need to do that here as well
 }
 
-WRITE16_HANDLER( latch_outfifo_error_stats ) // latch 74ls74 @ E64 upper and lower halves with d0 and fifo status respectively
-{
-    dectalk.outfifo_status_latch = (dectalk.outfifo_tail_ptr == ((dectalk.outfifo_head_ptr-1)&0xF)?1:0);
-    dectalk.spc_error_latch = data&1;
-}
-
-WRITE16_HANDLER( outfifo_data_w )
-{
- // for now, do nothing. eventually we'll actually need to write data here.
- //logerror("write to fifo, data %x\n", data)
-}
-
-READ8_HANDLER( outfifo_status_r ) // Return state of d-latch 74ls74 @ E64 'lower half' in d0
-{
- return dectalk.spc_error_latch;
-}
+/* Begin 68k i/o handlers */
 
 /* x2212 nvram/sram chip and led array demunger due to interleaved addresses */
 /* 0x400 long: anything at offset&0x1 = 0 is open bus read, write to leds; everything else is nvram*/
@@ -184,6 +179,97 @@ WRITE16_HANDLER( led_sw_nv_write )
 	}
 }
 
+WRITE16_HANDLER( m68k_infifo_w ) // 68k write to the speech input fifo
+{
+    dectalk.infifo[dectalk.infifo_head_ptr] = data;
+    dectalk.infifo_head_ptr++;
+    dectalk.infifo_head_ptr&=0x1F;
+}
+
+READ16_HANDLER( m68k_spcflags_r ) // 68k read from the speech flags
+{
+	UINT8 data = 0;
+	data |= dectalk.m68k_spcflags_latch; // bits 0 and 6
+	data |= dectalk.spc_error_latch<<5; // bit 5
+	data |= dectalk.outfifo_writable_latch<<7; // bit 7
+	return data;
+}
+
+WRITE16_HANDLER( m68k_spcflags_w ) // 68k write to the speech flags (only 3 bits do anything)
+{
+	dectalk.m68k_spcflags_latch = data&0x41; // ONLY store bits 6 and 0!
+	// d0: initialize speech flag (reset tms32010 and clear infifo and outfifo if high)
+	if ((data&0x1) == 0x1) // bit 0
+	{
+		dectalk_clear_all_fifos(space->machine);
+		/* write me */ // data&1 also forces the CLR line active on the tms32010, we need to do that here as well
+	}
+	if ((data&0x2) == 0x2) // bit 1
+	{
+	// clear the two speech side latches
+	dectalk.spc_error_latch = 0;
+	dectalk.outfifo_writable_latch = 0;
+	}
+	if ((data&0x40) == 0x40) // bit 6
+	{
+		/* write me */ //enable or disable the spc irq, which triggers when fifo writable goes high, if data&40 is set.
+	}
+}
+
+READ16_HANDLER( m68k_tlcflags_r ) // dtmf flags read
+{
+	UINT16 data = 0;
+	data |= dectalk.m68k_tlcflags_latch; // bits 6, 8, 14;
+	//data |= dectalk.tlc_tonedetect<<7; // bit 7 is tone detect
+	//data |= dectalk.tlc_ringdetect<<14; // bit 15 is ring detect
+	return data;
+}
+
+WRITE16_HANDLER( m68k_tlcflags_w ) // dtmf flags write
+{
+	dectalk.m68k_tlcflags_latch = data&0x4140; // ONLY store bits 6 8 and 14!
+	// write me for the ring and tone int enables and answer phone
+}
+
+READ16_HANDLER( m68k_tlc_dtmf_r ) // dtmf chip read
+{
+// write me!
+return 0;
+}
+
+/* End 68k i/o handlers */
+
+/* Begin tms32010 i/o handlers */
+WRITE16_HANDLER( spc_latch_outfifo_error_stats ) // latch 74ls74 @ E64 upper and lower halves with d0 and fifo status respectively
+{
+    dectalk.outfifo_writable_latch = (dectalk.outfifo_tail_ptr == ((dectalk.outfifo_head_ptr-1)&0xF)?0:1); // may have polarity backwards
+    dectalk.spc_error_latch = data&1;
+}
+
+READ16_HANDLER( spc_infifo_data_r )
+{
+ UINT16 data = 0xFFFF;
+ data = dectalk.infifo[dectalk.infifo_tail_ptr];
+ //logerror("dsp read from infifo, data %x\n", data);
+ dectalk.infifo_tail_ptr++;
+ dectalk.infifo_tail_ptr&=0x1F;
+ return data;
+}
+
+WRITE16_HANDLER( spc_outfifo_data_w )
+{
+ // the low 4 data bits are thrown out on the real unit due to use of a 12 bit dac (and to save use of another 16x4 fifo chip), though technically they're probably valid, and with suitable hacking a dtc-01 could probably output full 16 bit samples at 10khz.
+ logerror("dsp write to outfifo, data %x\n", data);
+ dectalk.outfifo[dectalk.outfifo_head_ptr] = data;
+ dectalk.outfifo_head_ptr++;
+ dectalk.outfifo_head_ptr&=0xF;
+}
+
+READ16_HANDLER( spc_outfifo_writable_r ) // Return state of d-latch 74ls74 @ E64 'lower half' in d0 which indicates whether outfifo is writable
+{
+ return dectalk.outfifo_writable_latch;
+}
+/* end tms32010 i/o handlers */
 
 
 /******************************************************************************
@@ -216,23 +302,25 @@ static ADDRESS_MAP_START(m68k_mem, ADDRESS_SPACE_PROGRAM, 16)
     //AM_RANGE(0x094001, 0x094001) AM_READWRITE(x2212_read, x2212_write) AM_MIRROR(0x763C00) /* Xicor X2212 NVRAM (SRAM) */
     //AM_RANGE(0x094201, 0x094201) AM_READWRITE(x2212_recall, x2212_store) AM_MIRROR(0x763C00)  /* Xicor X2212 NVRAM (EEPROM commands) */
     //AM_RANGE(0x098000, 0x09bfff) AM_READWRITE(1) AM_MIRROR(0x760000) /* DUART */
-    //AM_RANGE(0x09C000, 0x09ffff) AM_READWRITE(1) AM_MIRROR(0x760000) /* TMS32010 */
+    AM_RANGE(0x09C000, 0x09C001) AM_READWRITE(m68k_spcflags_r, m68k_spcflags_w) AM_MIRROR(0x761FF8) /* SPC flags reg */
+    AM_RANGE(0x09C002, 0x09C003) AM_WRITE(m68k_infifo_w) AM_MIRROR(0x761FF8) /* SPC fifo reg */
+    AM_RANGE(0x09C004, 0x09C005) AM_READWRITE(m68k_tlcflags_r, m68k_tlcflags_w) AM_MIRROR(0x761FF8) /* telephone status flags */
+    AM_RANGE(0x09C006, 0x09C007) AM_READ(m68k_tlc_dtmf_r) AM_MIRROR(0x761FF8) /* telephone dtmf read */
 ADDRESS_MAP_END
 
+// do we even need this below?
 static ADDRESS_MAP_START(m68k_io, ADDRESS_SPACE_IO, 16)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(tms32010_mem, ADDRESS_SPACE_PROGRAM, 16)
-    ADDRESS_MAP_UNMAP_HIGH
     AM_RANGE(0x000, 0x7ff) AM_ROM /* ROM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(tms32010_io, ADDRESS_SPACE_IO, 16)
-    ADDRESS_MAP_UNMAP_HIGH
-    AM_RANGE(0, 0) AM_WRITE(latch_outfifo_error_stats) // latch fifo status to be read by outfifo_status_r, and also latch the error bit at D0.
-    AM_RANGE(1, 1) AM_WRITE(outfifo_data_w) //write to sound fifo
-    AM_RANGE(TMS32010_BIO, TMS32010_BIO) AM_READ(outfifo_status_r) //read output fifo status
+    AM_RANGE(0, 0) AM_WRITE(spc_latch_outfifo_error_stats) // latch fifo status to be read by outfifo_status_r, and also latch the error bit at D0.
+    AM_RANGE(1, 1) AM_READWRITE(spc_infifo_data_r, spc_outfifo_data_w) //read from input fifo, write to sound fifo
+    AM_RANGE(TMS32010_BIO, TMS32010_BIO) AM_READ(spc_outfifo_writable_r) //read output fifo writable status
 ADDRESS_MAP_END
 
 /******************************************************************************
@@ -250,20 +338,20 @@ static MACHINE_DRIVER_START(dectalk)
     MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz/2)
     MDRV_CPU_PROGRAM_MAP(m68k_mem)
     MDRV_CPU_IO_MAP(m68k_io)
-    MDRV_QUANTUM_TIME(HZ(60))
+    MDRV_QUANTUM_TIME(HZ(10000))
     MDRV_MACHINE_RESET(dectalk)
 
     MDRV_CPU_ADD("dsp", TMS32010, XTAL_20MHz)
     MDRV_CPU_PROGRAM_MAP(tms32010_mem)
     MDRV_CPU_IO_MAP(tms32010_io)
-    MDRV_QUANTUM_TIME(HZ(60))
+    MDRV_QUANTUM_TIME(HZ(10000))
 
     /* video hardware */
 	MDRV_DEFAULT_LAYOUT(layout_dectalk) // hack to avoid screenless system crash
 
     /* sound hardware */
 	//MDRV_SPEAKER_STANDARD_MONO("mono")
-	//MDRV_SOUND_ADD("dectalk_snd", SPEAKER, XTAL_20MHz/2)
+	//MDRV_SOUND_ADD("dectalk_snd", SPEAKER, XTAL_10Khz)
 	//MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 
@@ -318,4 +406,4 @@ SYSTEM_CONFIG_END
 ******************************************************************************/
 
 /*    YEAR	NAME		PARENT	COMPAT	MACHINE		INPUT	INIT		CONFIG		COMPANY		FULLNAME			FLAGS */
-COMP( 1982, dectalk,	0,		0,		dectalk,	0,		dectalk,	dectalk,	"DEC",		"DECTalk DTC-01",	GAME_NOT_WORKING )
+COMP( 1984, dectalk,	0,		0,		dectalk,	0,		dectalk,	dectalk,	"DEC",		"DECTalk DTC-01",	GAME_NOT_WORKING )
