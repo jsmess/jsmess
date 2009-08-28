@@ -322,8 +322,7 @@ static WRITE8_HANDLER( rom_bank_1_w )
 {
 	UINT8 *ROM = memory_region(space->machine, "maincpu");
 
-	if(data)
-		memory_set_bankptr(space->machine, 1, &ROM[0x00000]);
+	memory_set_bankptr(space->machine, 1, &ROM[0x00000]);
 }
 
 static WRITE8_HANDLER( rom_data_w )
@@ -493,7 +492,7 @@ static READ8_HANDLER( x1_io_r )
 {
 	io_bank_mode = 0; //any read disables the extended mode.
 
-	if     (offset >= 0x0704 && offset <= 0x0707)	{ return z80ctc_r(devtag_get_device(space->machine, "ctc"), offset-0x0704); }
+	if(offset >= 0x0704 && offset <= 0x0707)	{ return z80ctc_r(devtag_get_device(space->machine, "ctc"), offset-0x0704); }
 	else if(offset == 0x0e03)                    	{ return x1_rom_r(space, 0); }
 	else if(offset >= 0x0ff8 && offset <= 0x0fff)	{ return x1_fdc_r(space, offset-0xff8); }
 	else if(offset >= 0x1900 && offset <= 0x19ff)	{ return sub_io_r(space, 0); }
@@ -508,15 +507,15 @@ static READ8_HANDLER( x1_io_r )
 	else if(offset >= 0x4000 && offset <= 0xffff)	{ return gfx_bitmap_ram[offset-0x4000]; }
 	else
 	{
-		//...
+		logerror("(PC=%06x) Read i/o address %04x\n",cpu_get_pc(space->cpu),offset);
 	}
 	return 0xff;
 }
 
 static WRITE8_HANDLER( x1_ex_gfxram_w )
 {
-	if(data)
-		fatalerror("Extended GFX RAM write %02x %04x",data,offset);
+//	if(data)
+//		fatalerror("Extended GFX RAM write %02x %04x",data,offset);
 }
 
 static WRITE8_HANDLER( x1_io_w )
@@ -550,7 +549,7 @@ static WRITE8_HANDLER( x1_io_w )
 	else if(offset >= 0x4000 && offset <= 0xffff)	{ gfx_bitmap_ram[offset-0x4000] = data; }
 	else
 	{
-		//...
+		logerror("(PC=%06x) Write %02x at i/o address %04x\n",cpu_get_pc(space->cpu),data,offset);
 	}
 }
 
@@ -836,15 +835,14 @@ static INPUT_PORTS_START( x1 )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	/* TODO: check if the other inputs are actually used (including button 2)... */
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("P2")
@@ -852,9 +850,9 @@ static INPUT_PORTS_START( x1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("key1") //0x00-0x1f
