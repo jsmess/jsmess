@@ -18,6 +18,11 @@
 	- Gaia/Space Harrier: Hits the FDC drive assert, the latter boots but has heavy emulation
 	  video/logic problems;
 
+	Notes:
+	- An interesting feature of the Sharp X-1 is the extended i/o bank. When the ppi port c bit 5
+	  does a 1->0 transition, the HW i/o is banked with an extra bitmap RAM to the entire 0-ffff
+	  space, presumably for 640x200 bitmap gfxs. Any i/o read disables this extended bitmap ram.
+
 =================================================================================================
 
 	X1 (CZ-800C) - November, 1982
@@ -129,11 +134,16 @@
 #include "machine/wd17xx.h"
 #include "devices/basicdsk.h"
 
-static UINT8 hres_320,io_switch;
+static UINT8 hres_320,io_switch,io_sys;
+static UINT8 io_bank_mode;
 static UINT8 *gfx_bitmap_ram;
+
 
 static VIDEO_START( x1 )
 {
+	colorram = auto_alloc_array(machine, UINT8, 0x1000);
+	videoram = auto_alloc_array(machine, UINT8, 0x1000);
+	gfx_bitmap_ram = auto_alloc_array(machine, UINT8, 0xc000);
 }
 
 static VIDEO_UPDATE( x1 )
@@ -479,6 +489,70 @@ static WRITE8_HANDLER( x1_pcg_w )
 	}
 }
 
+static READ8_HANDLER( x1_io_r )
+{
+	io_bank_mode = 0; //any read disables the extended mode.
+
+	if     (offset >= 0x0704 && offset <= 0x0707)	{ return z80ctc_r(devtag_get_device(space->machine, "ctc"), offset-0x0704); }
+	else if(offset == 0x0e03)                    	{ return x1_rom_r(space, 0); }
+	else if(offset >= 0x0ff8 && offset <= 0x0fff)	{ return x1_fdc_r(space, offset-0xff8); }
+	else if(offset >= 0x1900 && offset <= 0x19ff)	{ return sub_io_r(space, 0); }
+	else if(offset >= 0x1a00 && offset <= 0x1aff)	{ return ppi8255_r(devtag_get_device(space->machine, "ppi8255_0"), (offset-0x1a00) & 3); }
+	else if(offset >= 0x1b00 && offset <= 0x1bff)	{ return ay8910_r(devtag_get_device(space->machine, "ay"), 0); }
+//	else if(offset >= 0x1f90 && offset <= 0x1f93)	{ return x1_sio_r(space,(offset-0x1f90) & 3); }
+	else if(offset >= 0x1fa0 && offset <= 0x1fa3)	{ return z80ctc_r(devtag_get_device(space->machine, "ctc"), offset-0x1fa3); }
+	else if(offset >= 0x1fa8 && offset <= 0x1fab)	{ return z80ctc_r(devtag_get_device(space->machine, "ctc"), offset-0x1fa8); }
+//	else if(offset >= 0x1fd0 && offset <= 0x1fdf)	{ return x1_scrn_r(space,offset-0x1fd0); }
+	else if(offset >= 0x2000 && offset <= 0x2fff)	{ return colorram[offset-0x2000]; }
+	else if(offset >= 0x3000 && offset <= 0x3fff)	{ return videoram[offset-0x3000]; }
+	else if(offset >= 0x4000 && offset <= 0xffff)	{ return gfx_bitmap_ram[offset-0x4000]; }
+	else
+	{
+		//...
+	}
+	return 0xff;
+}
+
+static WRITE8_HANDLER( x1_ex_gfxram_w )
+{
+	if(data)
+		fatalerror("Extended GFX RAM write %02x %04x",data,offset);
+}
+
+static WRITE8_HANDLER( x1_io_w )
+{
+	if(io_bank_mode == 1)                        	{ x1_ex_gfxram_w(space, offset, data); }
+	else if(offset >= 0x0704 && offset <= 0x0707)	{ z80ctc_w(devtag_get_device(space->machine, "ctc"), offset-0x0704,data); }
+//	else if(offset >= 0x0c00 && offset <= 0x0cff)	{ x1_rs232c_w(space->machine, 0, data); }
+	else if(offset >= 0x0e00 && offset <= 0x0e02)  	{ x1_rom_w(space, offset-0xe00,data); }
+//	else if(offset >= 0x0e80 && offset <= 0x0e82)	{ x1_kanji_w(space->machine, offset-0xe80,data); }
+	else if(offset >= 0x0ff8 && offset <= 0x0fff)	{ x1_fdc_w(space, offset-0xff8,data); }
+	else if(offset >= 0x1000 && offset <= 0x10ff)	{ x1_pal_b_w(space, 0,data); }
+	else if(offset >= 0x1100 && offset <= 0x11ff)	{ x1_pal_g_w(space, 0,data); }
+	else if(offset >= 0x1200 && offset <= 0x12ff)	{ x1_pal_r_w(space, 0,data); }
+//	else if(offset >= 0x1300 && offset <= 0x13ff)	{ x1_ply_w(space->machine, 0,data; }
+	else if(offset >= 0x1400 && offset <= 0x17ff)	{ x1_pcg_w(space, offset-0x1400,data); }
+	else if(offset == 0x1800                    )	{ mc6845_address_w(devtag_get_device(space->machine, "crtc"), 0,data); }
+	else if(offset == 0x1801                    )	{ mc6845_register_w(devtag_get_device(space->machine, "crtc"), 0,data); }
+	else if(offset >= 0x1900 && offset <= 0x19ff)	{ sub_io_w(space, 0,data); }
+	else if(offset >= 0x1a00 && offset <= 0x1aff)	{ ppi8255_w(devtag_get_device(space->machine, "ppi8255_0"), (offset-0x1a00) & 3,data); }
+	else if(offset >= 0x1b00 && offset <= 0x1bff)	{ ay8910_data_w(devtag_get_device(space->machine, "ay"), 0,data); }
+	else if(offset >= 0x1c00 && offset <= 0x1cff)	{ ay8910_address_w(devtag_get_device(space->machine, "ay"), 0,data); }
+	else if(offset >= 0x1d00 && offset <= 0x1dff)	{ rom_bank_1_w(space,0,data); }
+	else if(offset >= 0x1e00 && offset <= 0x1eff)	{ rom_bank_0_w(space,0,data); }
+	else if(offset >= 0x1f80 && offset <= 0x1f80)	{ x1_dma_w(space,offset-0x1f80,data); }
+//	else if(offset >= 0x1f90 && offset <= 0x1f93)	{ x1_sio_w(space->machine,(offset-0x1f90) & 3),data; }
+	else if(offset >= 0x1fa0 && offset <= 0x1fa3)	{ z80ctc_w(devtag_get_device(space->machine, "ctc"), offset-0x1fa3,data); }
+	else if(offset >= 0x1fa8 && offset <= 0x1fab)	{ z80ctc_w(devtag_get_device(space->machine, "ctc"), offset-0x1fa8,data); }
+//	else if(offset >= 0x1fd0 && offset <= 0x1fdf)	{ x1_scrn_w(space->machine,offset-0x1fd0,data); }
+	else if(offset >= 0x2000 && offset <= 0x2fff)	{ colorram[offset-0x2000] = data; }
+	else if(offset >= 0x3000 && offset <= 0x3fff)	{ videoram[offset-0x3000] = data; }
+	else if(offset >= 0x4000 && offset <= 0xffff)	{ gfx_bitmap_ram[offset-0x4000] = data; }
+	else
+	{
+		//...
+	}
+}
 
 static ADDRESS_MAP_START( x1_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
@@ -488,34 +562,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( x1_io , ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
-//	AM_RANGE(0x0700, 0x0701) AM_WRITENOP //YM-2151 reg/data
-	AM_RANGE(0x0704, 0x0707) AM_DEVREADWRITE("ctc", z80ctc_r, z80ctc_w)
-//	0x0c00 rs232c port
-	AM_RANGE(0x0e00, 0x0e02) AM_WRITE(x1_rom_w)
-	AM_RANGE(0x0e03, 0x0e03) AM_READ(x1_rom_r)
-//	AM_RANGE(0x0e80, 0x0e82) AM_WRITENOP //kanji registers?
-	AM_RANGE(0x0ff8, 0x0fff) AM_READWRITE(x1_fdc_r,x1_fdc_w) //fdc registers
-	AM_RANGE(0x1000, 0x10ff) AM_WRITE(x1_pal_b_w) //paletteram
-	AM_RANGE(0x1100, 0x11ff) AM_WRITE(x1_pal_g_w) //paletteram
-	AM_RANGE(0x1200, 0x12ff) AM_WRITE(x1_pal_r_w) //paletteram
-//	AM_RANGE(0x1300, 0x13ff) AM_WRITENOP //ply port, mirrored
-	AM_RANGE(0x1400, 0x17ff) AM_WRITE(x1_pcg_w) //PCG = Programmable Character Generator
-	AM_RANGE(0x1800, 0x1800) AM_DEVWRITE("crtc", mc6845_address_w)
-	AM_RANGE(0x1801, 0x1801) AM_DEVWRITE("crtc", mc6845_register_w)
-	AM_RANGE(0x1900, 0x19ff) AM_READWRITE(sub_io_r,sub_io_w) //sub port comms, mirrored
-	AM_RANGE(0x1a00, 0x1a03) AM_MIRROR(0xfc) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w) //8255, mirrored
-	AM_RANGE(0x1b00, 0x1bff) AM_DEVREADWRITE("ay", ay8910_r, ay8910_data_w) //PSG / ay-3-8910 data port
-	AM_RANGE(0x1c00, 0x1cff) AM_DEVWRITE("ay", ay8910_address_w) //PSG / ay-3-8910 reg port
-	AM_RANGE(0x1d00, 0x1dff) AM_READNOP AM_WRITE(rom_bank_1_w) //ROM/RAM bankswitch = ROM
-	AM_RANGE(0x1e00, 0x1eff) AM_WRITE(rom_bank_0_w) //ROM/RAM bankswitch = RAM
-	AM_RANGE(0x1f80, 0x1f8f) AM_WRITE(x1_dma_w) //dma
-//	AM_RANGE(0x1f90, 0x1f93) AM_NOP //sio
-	AM_RANGE(0x1fa0, 0x1fa3) AM_DEVREADWRITE("ctc", z80ctc_r, z80ctc_w)
-	AM_RANGE(0x1fa8, 0x1fab) AM_DEVREADWRITE("ctc", z80ctc_r, z80ctc_w)
-//	AM_RANGE(0x1fd0, 0x1fdf) AM_RAM //scrn?
-	AM_RANGE(0x2000, 0x2fff) AM_RAM AM_BASE(&colorram)//txt mode RAM
-	AM_RANGE(0x3000, 0x3fff) AM_RAM AM_BASE(&videoram)//txt mode RAM
-	AM_RANGE(0x4000, 0xffff) AM_RAM AM_BASE(&gfx_bitmap_ram)//gfx mode bank b/g/r RAM
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(x1_io_r, x1_io_w)
 ADDRESS_MAP_END
 
 static const gfx_layout x1_chars_8x8 =
@@ -683,7 +730,7 @@ static READ8_DEVICE_HANDLER( x1_portc_r )
 	-x-- ---- 320 mode (r/w)
 	--x- ---- i/o mode (r/w)
 	*/
-	return (input_port_read(device->machine, "IOSYS") & 0x9f) | hres_320 | io_switch;
+	return (io_sys & 0x9f) | hres_320 | ~io_switch;
 }
 
 static WRITE8_DEVICE_HANDLER( x1_porta_w )
@@ -700,7 +747,17 @@ static WRITE8_DEVICE_HANDLER( x1_portc_w )
 {
 	//printf("PPI Port C write %02x\n",data);
 	hres_320 = data & 0x40;
-	io_switch = ~data & 0x20;
+
+//	if(hres_320 && data & 0x20 && io_switch & 0x20 && (data & 0xa0) != 0)
+
+	if(((data & 0x20) == 0) && (io_switch & 0x20))
+		io_bank_mode = 1;
+
+	io_switch = data & 0x20;
+	io_sys = data & 0xff;
+
+	//if(io_sys_state != io_sys)
+	//	io_sys_state = io_sys;
 }
 
 static const ppi8255_interface ppi8255_intf =
@@ -984,6 +1041,8 @@ static MACHINE_RESET( x1 )
 	   	gfx_element_mark_dirty(machine->gfx[6], i);
 		gfx_element_mark_dirty(machine->gfx[7], i);
 	}
+
+	io_bank_mode = 0;
 }
 
 static void ctc0_interrupt(const device_config *device, int state)
