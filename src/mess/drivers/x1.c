@@ -6,17 +6,25 @@
 
 	TODO:
 	- Understand how keyboard works and decap/dump the keyboard MCU if possible;
-	- Hook-up image formats;
-	- Video part is bare minimum, chances are that's probably a tilemap/bitmap nightmare;
-	- Sort out / redump the gfx roms;
+	- Hook-up .d88 and .tap image formats (.rom too?);
+	- Sort out / redump the BIOS gfx roms;
 	- Fix the interrupts (uses IM 2)
+	- Add multiple FDC drive support;
+	- clean-ups!
+	- There are various unclear video things, these are:
+		- how layer clearance works? Dragon Buster relies on it
+		- fg tilemap colors are wrong, the Shanghai "hit any key" msg must be blue with white
+		  background;
+		- I bet there's a PCG reset address tied to some bit, find it;
+		- Add the extended gfx hookup;
+		- (anything else?)
 
 	per-game specific TODO:
-	- 177 / Dragon Buster: fix the keyboard flags otherwise these doesn't boot;
-	- Dragon Buster: Maybe the pcg tilemap uses scrolling and priorities are wrong;
+	- 177 / Dragon Buster / (many others): fix the keyboard obf flag otherwise these doesn't boot;
 	- Shanghai: tests the ay8910 read regs, mouse/joystick perhaps?
 	- Gaia/Space Harrier: Hits the FDC drive assert, the latter boots but has heavy emulation
 	  video/logic problems;
+	- "alpha": Apparently does use the DMA feature (writes z80 code?), investigate;
 
 	Notes:
 	- An interesting feature of the Sharp X-1 is the extended i/o bank. When the ppi port c bit 5
@@ -137,6 +145,7 @@
 static UINT8 hres_320,io_switch,io_sys;
 static UINT8 io_bank_mode;
 static UINT8 *gfx_bitmap_ram;
+static UINT16 pcg_index[3];
 
 
 static VIDEO_START( x1 )
@@ -153,6 +162,25 @@ static VIDEO_UPDATE( x1 )
 	w = (video_screen_get_width(screen) < 640) ? 1 : 2;
 
 	bitmap_fill(bitmap, cliprect, 0);
+
+	for (y=0;y<25;y++)
+	{
+		for (x=0;x<40*w;x++)
+		{
+			int tile = videoram[x+(y*40*w)];
+			int color = colorram[x+(y*40*w)] & 0x1f;
+			int width = (colorram[x+(y*40*w)] & 0x80)>>7;
+			int height = (colorram[x+(y*40*w)] & 0x40)>>6;
+			int pcg_bank = (colorram[x+(y*40*w)] & 0x20)>>4;
+			int region = (width+(height<<1)) & 3;
+
+			if(pcg_bank) { region+= 4; }
+
+			if(color & 0x8) continue;
+
+			drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[region],tile,color,0,0,(x/(width+1))*8*(width+1),(y/(height+1))*8*(height+1));
+		}
+	}
 
 	{
 		int count,xi,yi;
@@ -175,7 +203,10 @@ static VIDEO_UPDATE( x1 )
 						pen_g = (gfx_bitmap_ram[count+0x8000]>>(7-xi)) & 1;
 						pen_b = (gfx_bitmap_ram[count+0x0000]>>(7-xi)) & 1;
 
-						color = pen_r<<2 | pen_g<<1 | pen_b<<0;
+						color = pen_r<<1 | pen_g<<2 | pen_b<<0;
+
+						if(color == 0)
+							continue;
 
 						if(w == 1)
 						{
@@ -210,15 +241,12 @@ static VIDEO_UPDATE( x1 )
 			int region = (width+(height<<1)) & 3;
 
 			if(pcg_bank) { region+= 4; }
-			else if(tile == 0) continue; //<- correct?
 
-			if(color & 0x38)
-				drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[region],tile,color,0,0,(x/(width+1))*8*(width+1),(y/(height+1))*8*(height+1));
-			else
-				drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[region],tile,color,0,0,(x/(width+1))*8*(width+1),(y/(height+1))*8*(height+1),0);
+			if(!(color & 0x8)) continue;
+
+			drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[region],tile,color,0,0,(x/(width+1))*8*(width+1),(y/(height+1))*8*(height+1));
 		}
 	}
-
 	return 0;
 }
 
@@ -452,14 +480,14 @@ static WRITE8_HANDLER( x1_pal_b_w ) { x_b = data; set_current_palette(space->mac
 
 static WRITE8_HANDLER( x1_dma_w )
 {
-	if(data)
-		fatalerror("Data written to the DMA space");
+	printf("%02x %02x\n",offset,data);
+	//if(data)
+	//	fatalerror("Data written to the DMA space");
 }
 
 static WRITE8_HANDLER( x1_pcg_w )
 {
 	int addr,pcg_offset;
-	static int pcg_index[3];
 	UINT8 *PCG_RAM = memory_region(space->machine, "pcg");
 
 	addr = (offset & 0x300) >> 8;
@@ -527,8 +555,8 @@ static WRITE8_HANDLER( x1_io_w )
 //	else if(offset >= 0x0e80 && offset <= 0x0e82)	{ x1_kanji_w(space->machine, offset-0xe80,data); }
 	else if(offset >= 0x0ff8 && offset <= 0x0fff)	{ x1_fdc_w(space, offset-0xff8,data); }
 	else if(offset >= 0x1000 && offset <= 0x10ff)	{ x1_pal_b_w(space, 0,data); }
-	else if(offset >= 0x1100 && offset <= 0x11ff)	{ x1_pal_g_w(space, 0,data); }
-	else if(offset >= 0x1200 && offset <= 0x12ff)	{ x1_pal_r_w(space, 0,data); }
+	else if(offset >= 0x1100 && offset <= 0x11ff)	{ x1_pal_r_w(space, 0,data); }
+	else if(offset >= 0x1200 && offset <= 0x12ff)	{ x1_pal_g_w(space, 0,data); }
 //	else if(offset >= 0x1300 && offset <= 0x13ff)	{ x1_ply_w(space->machine, 0,data; }
 	else if(offset >= 0x1400 && offset <= 0x17ff)	{ x1_pcg_w(space, offset-0x1400,data); }
 	else if(offset == 0x1800                    )	{ mc6845_address_w(devtag_get_device(space->machine, "crtc"), 0,data); }
@@ -613,7 +641,7 @@ static const gfx_layout x1_pcg_8x8 =
 	8,8,
 	RGN_FRAC(1,3),
 	3,
-	{ RGN_FRAC(1,3),RGN_FRAC(2,3),RGN_FRAC(0,3) },
+	{ RGN_FRAC(2,3),RGN_FRAC(1,3),RGN_FRAC(0,3) },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	8*8
@@ -624,7 +652,7 @@ static const gfx_layout x1_pcg_8wx8 =
 	16,8,
 	RGN_FRAC(1,3),
 	3,
-	{ RGN_FRAC(1,3),RGN_FRAC(2,3),RGN_FRAC(0,3) },
+	{ RGN_FRAC(2,3),RGN_FRAC(1,3),RGN_FRAC(0,3) },
 	{ 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	8*8
@@ -635,7 +663,7 @@ static const gfx_layout x1_pcg_8x8w =
 	8,16,
 	RGN_FRAC(1,3),
 	3,
-	{ RGN_FRAC(1,3),RGN_FRAC(2,3),RGN_FRAC(0,3) },
+	{ RGN_FRAC(2,3),RGN_FRAC(1,3),RGN_FRAC(0,3) },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 0*8, 1*8, 1*8, 2*8, 2*8, 3*8, 3*8, 4*8, 4*8, 5*8, 5*8, 6*8, 6*8, 7*8, 7*8 },
 	8*8
@@ -646,7 +674,7 @@ static const gfx_layout x1_pcg_8wx8w =
 	16,16,
 	RGN_FRAC(1,3),
 	3,
-	{ RGN_FRAC(1,3),RGN_FRAC(2,3),RGN_FRAC(0,3) },
+	{ RGN_FRAC(2,3),RGN_FRAC(1,3),RGN_FRAC(0,3) },
 	{ 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7 },
 	{ 0*8, 0*8, 1*8, 1*8, 2*8, 2*8, 3*8, 3*8, 4*8, 4*8, 5*8, 5*8, 6*8, 6*8, 7*8, 7*8 },
 	8*8
@@ -669,10 +697,10 @@ static GFXDECODE_START( x1 )
 	GFXDECODE_ENTRY( "cgrom", 0x00000, x1_chars_8wx8,   0, 0x40 )
 	GFXDECODE_ENTRY( "cgrom", 0x00000, x1_chars_8x8w,   0, 0x40 )
 	GFXDECODE_ENTRY( "cgrom", 0x00000, x1_chars_8wx8w,  0, 0x40 )
-	GFXDECODE_ENTRY( "pcg",   0x00000, x1_pcg_8x8,      0x80, 1 )
-	GFXDECODE_ENTRY( "pcg",   0x00000, x1_pcg_8wx8,     0x80, 1 )
-	GFXDECODE_ENTRY( "pcg",   0x00000, x1_pcg_8x8w,     0x80, 1 )
-	GFXDECODE_ENTRY( "pcg",   0x00000, x1_pcg_8wx8w,    0x80, 1 )
+	GFXDECODE_ENTRY( "pcg",   0x00000, x1_pcg_8x8,      0x100, 1 )
+	GFXDECODE_ENTRY( "pcg",   0x00000, x1_pcg_8wx8,     0x100, 1 )
+	GFXDECODE_ENTRY( "pcg",   0x00000, x1_pcg_8x8w,     0x100, 1 )
+	GFXDECODE_ENTRY( "pcg",   0x00000, x1_pcg_8wx8w,    0x100, 1 )
 	GFXDECODE_ENTRY( "cgrom", 0x01800, x1_chars_16x16,  0, 0x40 ) //only x1turboz uses this so far
 	GFXDECODE_ENTRY( "kanji", 0x27000, x1_chars_16x16,  0, 0x40 ) //needs to be checked when the ROM will be redumped
 GFXDECODE_END
@@ -684,20 +712,26 @@ static PALETTE_INIT(x1)
 	for(i=0;i<0x300;i++)
 		palette_set_color(machine, i,MAKE_RGB(0x00,0x00,0x00));
 
-	for (i = 0; i < 64; i++) //text mode colors
+	for (i = 0; i < 0x20; i++)
 	{
-		palette_set_color_rgb(machine, 2*i+1, pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
-		palette_set_color_rgb(machine, 2*i+0, pal1bit(i >> 5), pal1bit(i >> 4), pal1bit(i >> 3));
+		rgb_t color;
+
+		if (i & 0x01)
+			color = MAKE_RGB(pal1bit(i >> 3), pal1bit(i >> 2), pal1bit(i >> 1));
+		else
+			color = (i & 0x10) ? RGB_WHITE : RGB_BLACK;
+
+		palette_set_color(machine, i, color);
 	}
 
 	/* TODO: fix this */
 	for(i=0;i<8;i++)
-		palette_set_color_rgb(machine, i+0x80, pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
+		palette_set_color_rgb(machine, i+0x100, pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
 }
 
 static READ8_DEVICE_HANDLER( x1_porta_r )
 {
-	//printf("PPI Port A read\n");
+	printf("PPI Port A read\n");
 	return 0xff;
 }
 
@@ -1041,6 +1075,7 @@ static MACHINE_RESET( x1 )
 	}
 
 	io_bank_mode = 0;
+	pcg_index[0] = pcg_index[1] = pcg_index[2] = 0;
 }
 
 static void ctc0_interrupt(const device_config *device, int state)
