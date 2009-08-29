@@ -13,8 +13,6 @@
 	- clean-ups!
 	- There are various unclear video things, these are:
 		- how layer clearance works? Dragon Buster relies on it
-		- fg tilemap colors are wrong, the Shanghai "hit any key" msg must be blue with white
-		  background;
 		- I bet there's a PCG reset address tied to some bit, find it;
 		- Add the extended gfx hookup;
 		- (anything else?)
@@ -25,6 +23,9 @@
 	- Gaia/Space Harrier: Hits the FDC drive assert, the latter boots but has heavy emulation
 	  video/logic problems;
 	- "alpha": Apparently does use the DMA feature (writes z80 code?), investigate;
+	- Bosconian: title screen background is completely white because it reverts the pen used
+	  (it's gray in the Arcade version),could be either flickering for pseudo-alpha effect or it's
+	  a btanb;
 
 	Notes:
 	- An interesting feature of the Sharp X-1 is the extended i/o bank. When the ppi port c bit 5
@@ -159,7 +160,7 @@ static VIDEO_START( x1 )
 
 static void draw_fgtilemap(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int w,int pri)
 {
-	int y,x;
+	int y,x,res_x,res_y;
 
 	for (y=0;y<25;y++)
 	{
@@ -169,15 +170,54 @@ static void draw_fgtilemap(running_machine *machine, bitmap_t *bitmap,const rect
 			int color = colorram[x+(y*40*w)] & 0x1f;
 			int width = (colorram[x+(y*40*w)] & 0x80)>>7;
 			int height = (colorram[x+(y*40*w)] & 0x40)>>6;
-			int pcg_bank = (colorram[x+(y*40*w)] & 0x20)>>4;
+			int pcg_bank = (colorram[x+(y*40*w)] & 0x20)>>5;
 			int region = (width+(height<<1)) & 3;
-
-			if(pcg_bank) { region+= 4; }
 
 			if(((color & 0x8)>>3) != pri) continue;
 			if(tile == 0) continue; //correct?
 
-			drawgfx_opaque(bitmap,cliprect,machine->gfx[region],tile,color,0,0,(x/(width+1))*8*(width+1),(y/(height+1))*8*(height+1));
+			res_x = (x/(width+1))*8*(width+1);
+			res_y = (y/(height+1))*8*(height+1);
+
+			if(pcg_bank)
+			{
+				UINT8 *PCG_RAM = memory_region(machine, "pcg");
+				int pen[3],pen_mask,pcg_pen,xi,yi;
+
+				pen_mask = color & 7;
+
+				/* We use custom drawing code for the PCG due of the bitplane disable stuff and the color revert stuff. */
+				for(yi=0;yi<8*(height+1);yi+=(height+1))
+				{
+					for(xi=0;xi<8*(width+1);xi+=(width+1))
+					{
+						pen[0] = PCG_RAM[((tile*8)+yi)+0x0000]>>(7-xi) & (pen_mask & 1)>>0;
+						pen[1] = PCG_RAM[((tile*8)+yi)+0x0800]>>(7-xi) & (pen_mask & 2)>>1;
+						pen[2] = PCG_RAM[((tile*8)+yi)+0x1000]>>(7-xi) & (pen_mask & 4)>>2;
+
+						pcg_pen = pen[2]<<2|pen[1]<<1|pen[0]<<0;
+
+						if(pcg_pen == 0 && (!(color & 8)))
+							continue;
+
+						if(color & 8) //revert the used color pen
+							pcg_pen^=7;
+
+						if((res_x+xi)>video_screen_get_visible_area(machine->primary_screen)->max_x && (res_y+yi)>video_screen_get_visible_area(machine->primary_screen)->max_y)
+							continue;
+
+						*BITMAP_ADDR16(bitmap, res_y+yi, res_x+xi) = machine->pens[pcg_pen+0x100];
+						if(width)
+							*BITMAP_ADDR16(bitmap, res_y+yi, res_x+xi+1) = machine->pens[pcg_pen+0x100];
+						if(height)
+							*BITMAP_ADDR16(bitmap, res_y+yi+1, res_x+xi) = machine->pens[pcg_pen+0x100];
+						if(width && height)
+							*BITMAP_ADDR16(bitmap, res_y+yi+1, res_x+xi+1) = machine->pens[pcg_pen+0x100];
+					}
+				}
+			}
+			else
+				drawgfx_opaque(bitmap,cliprect,machine->gfx[region],tile,color,0,0,res_x,res_y);
 		}
 	}
 }
@@ -634,7 +674,7 @@ static const gfx_layout x1_pcg_8x8 =
 {
 	8,8,
 	RGN_FRAC(1,3),
-	3,
+	1,
 	{ RGN_FRAC(2,3),RGN_FRAC(1,3),RGN_FRAC(0,3) },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
@@ -691,6 +731,7 @@ static GFXDECODE_START( x1 )
 	GFXDECODE_ENTRY( "cgrom", 0x00000, x1_chars_8wx8,   0, 0x20 )
 	GFXDECODE_ENTRY( "cgrom", 0x00000, x1_chars_8x8w,   0, 0x20 )
 	GFXDECODE_ENTRY( "cgrom", 0x00000, x1_chars_8wx8w,  0, 0x20 )
+	/* decoded for debugging purpose, they will be nuked in the end */
 	GFXDECODE_ENTRY( "pcg",   0x00000, x1_pcg_8x8,      0x100, 1 )
 	GFXDECODE_ENTRY( "pcg",   0x00000, x1_pcg_8wx8,     0x100, 1 )
 	GFXDECODE_ENTRY( "pcg",   0x00000, x1_pcg_8x8w,     0x100, 1 )
