@@ -1112,7 +1112,18 @@ static DEVICE_IMAGE_LOAD(c64_cart)
 		/* If it is unsupported cart type, warn the user */
 		switch (c64_cart_type)
 		{
-			case GENERIC_CRT:
+			case KCS_PC:		/* Type #  2 */
+			case FINAL_CART_III:    /* Type #  3 */
+			case SIMONS_BASIC:	/* Type #  4 */
+			case OCEAN_1:           /* Type #  5 */
+			case FUN_PLAY:          /* Type #  7 */
+			case EPYX_FASTLOAD:	/* Type # 10 */
+			case WESTERMANN:		/* Type # 11 */
+			case FINAL_CART_I:	/* Type # 13 */
+			case C64GS:             /* Type # 15 */
+			case DINAMIC:           /* Type # 17 */
+			case COMAL_80:          /* Type # 21 */
+			case GENERIC_CRT:       /* Type #  0 */
 				printf("Currently supported cart type (Type %d)\n", c64_cart_type);
 				break;
 
@@ -1270,7 +1281,7 @@ static DEVICE_IMAGE_LOAD(c64_cart)
 	}
 */
 	memcpy(roml, cart + 0 * 0x2000, 0x2000);
-	if (n_banks > 1) memcpy(romh, cart + 1 * 0x2000, 0x2000);
+	memcpy(romh, cart + 1 * 0x2000, 0x2000);
 
 	c64_cart_n_banks = n_banks; // this is needed so that we only set mappers if a cart is present!
 	return INIT_PASS;
