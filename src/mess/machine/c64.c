@@ -1279,20 +1279,29 @@ static DEVICE_IMAGE_LOAD(c64_cart)
 
 static WRITE8_HANDLER( fc3_bank_w )
 {
-	UINT8 bank = data - 0x40;
-	UINT8 *mem = memory_region(space->machine, "maincpu");
+	// Type # 3
+	// working:
+	// not working:
+
+	UINT8 bank = data & 0x3f;
 	UINT8 *cart = memory_region(space->machine, "cart");
 
-	if (bank > 3)
-		logerror("Warning: This cart type should have at most 4 banks and the cart looked for bank %d... Something strange is going on!\n", bank);
-
-	memcpy(mem + c64_cbm_cart[bank].addr, cart + c64_cbm_cart[bank].start, c64_cbm_cart[bank].size);
-
-	if (log_cart)
+	if (data & 0x40)
 	{
-		logerror("bank %d of size %d successfully loaded at %d!\n", bank, c64_cbm_cart[bank].size, c64_cbm_cart[bank].addr);
-		if (c64_cbm_cart[bank].index != bank)
-			logerror("Warning: According to the CHIP info this should be bank %d, but we are loading it as bank %d!\n", c64_cbm_cart[bank].index, bank);
+		if (bank > 3)
+			logerror("Warning: This cart type should have at most 4 banks and the cart looked for bank %d... Something strange is going on!\n", bank);
+		else
+		{
+//			memcpy(mem + c64_cbm_cart[bank].addr, cart + c64_cbm_cart[bank].start, c64_cbm_cart[bank].size);
+			memcpy(roml, cart + bank * 0x4000, 0x2000);
+			memcpy(romh, cart + bank * 0x4000 + 0x2000, 0x2000);
+			if (log_cart)
+			{
+				logerror("bank %d of size %d successfully loaded at %d!\n", bank, c64_cbm_cart[bank].size, c64_cbm_cart[bank].addr);
+				if (c64_cbm_cart[bank].index != bank)
+					logerror("Warning: According to the CHIP info this should be bank %d, but we are loading it as bank %d!\n", c64_cbm_cart[bank].index, bank);
+			}
+		}
 	}
 }
 
@@ -1343,8 +1352,6 @@ static WRITE8_HANDLER( funplay_bank_w )
 		/* bank number is not the value written, but c64_cbm_cart[bank].index IS the value written! */
 		real_bank = ((bank & 0x01) << 3) + ((bank & 0x38) >> 3);
 
-//		memcpy(mem + c64_cbm_cart[bank].addr, cart + c64_cbm_cart[bank].start, c64_cbm_cart[bank].size);
-
 		memcpy(roml, cart + real_bank * 0x2000, 0x2000);
 
 		if (log_cart)
@@ -1367,8 +1374,6 @@ static WRITE8_HANDLER( c64gs_bank_w )
 
 	if (bank > 0x3f)
 		logerror("Warning: This cart type should have at most 64 banks and the cart looked for bank %d... Something strange is going on!\n", bank);
-
-//	memcpy(mem + c64_cbm_cart[bank].addr, cart + c64_cbm_cart[bank].start, c64_cbm_cart[bank].size);
 
 	memcpy(roml, cart + bank * 0x2000, 0x2000);
 
@@ -1393,8 +1398,6 @@ static READ8_HANDLER( dinamic_bank_r )
 		logerror("Warning: This cart type should have 16 banks and the cart looked for bank %d... Something strange is going on!\n", bank);
 
 	memcpy(roml, cart + bank * 0x2000, 0x2000);
-
-//	memcpy(mem + c64_cbm_cart[bank].addr, cart + c64_cbm_cart[bank].start, c64_cbm_cart[bank].size);
 
 	if (log_cart)
 	{
