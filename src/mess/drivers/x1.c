@@ -152,11 +152,12 @@ static UINT8 *gfx_bitmap_ram;
 static UINT16 pcg_index[3];
 static UINT8 pcg_reset;
 static UINT16 crtc_start_addr;
+static UINT8 sub_obf;
 static struct
 {
 	UINT8 gfx_bank;
 	UINT8 pcg_mode;
-}ply_reg;
+}scrn_reg;
 
 static VIDEO_START( x1 )
 {
@@ -326,13 +327,21 @@ static UINT8 check_keyboard_press(running_machine *machine)
 	return 0;
 }
 
+static UINT8 sub_cmd_length;
+
 static READ8_HANDLER( sub_io_r )
 {
+	if(sub_obf)
+		return 0xff;
+
 	if(key_flag == 1)
 	{
 		key_flag = 0;
 		return 0x82;
 	}
+
+	sub_cmd_length--;
+	sub_obf = (sub_cmd_length) ? 0x00 : 0x20;
 
 	return sub_val;
 }
@@ -348,23 +357,44 @@ static WRITE8_HANDLER( sub_io_w )
 
 	switch(data)
 	{
+		case 0xe3:
+			sub_cmd_length = 3;
+			break;
 		case 0xe6:
 			sub_val = check_keyboard_press(space->machine);
+			sub_cmd_length = 2;
 			break;
-		case 0xe8: sub_val = sub_cmd; break;
+		case 0xe8:
+			sub_val = sub_cmd;
+			sub_cmd_length = 1;
+			break;
+		case 0xea:
+			sub_cmd_length = 1;
+			break;
+		case 0xeb:
+			sub_cmd_length = 1;
+			break;
+		case 0xed:
+			sub_cmd_length = 3;
+			break;
+		case 0xef:
+			sub_cmd_length = 3;
+			break;
 		//case 0xeb: sub_val = test; break; //used on device select
 		//case 0xed: sub_val = test; break;
 		//case 0xef: sub_val = test; break; //used on timer select?
 		#if 0
 		default:
 		{
-			if(data > 0xe0 && data <= 0xef)
+			if(data > 0xe3 && data <= 0xef)
 				printf("%02x CMD\n",data);
 		}
 		#endif
 	}
 
 	sub_cmd = data;
+
+	sub_obf = (sub_cmd_length) ? 0x00 : 0x20;
 }
 
 static UINT8 rom_index[3];
@@ -599,7 +629,7 @@ static READ8_HANDLER( x1_io_r )
 //	else if(offset >= 0x1fd0 && offset <= 0x1fdf)	{ return x1_scrn_r(space,offset-0x1fd0); }
 	else if(offset >= 0x2000 && offset <= 0x2fff)	{ return colorram[offset-0x2000]; }
 	else if(offset >= 0x3000 && offset <= 0x3fff)	{ return videoram[offset-0x3000]; }
-	else if(offset >= 0x4000 && offset <= 0xffff)	{ return gfx_bitmap_ram[offset-0x4000+(ply_reg.gfx_bank*0xc000)]; }
+	else if(offset >= 0x4000 && offset <= 0xffff)	{ return gfx_bitmap_ram[offset-0x4000+(scrn_reg.gfx_bank*0xc000)]; }
 	else
 	{
 		logerror("(PC=%06x) Read i/o address %04x\n",cpu_get_pc(space->cpu),offset);
@@ -613,10 +643,14 @@ static WRITE8_HANDLER( x1_ex_gfxram_w )
 //		fatalerror("Extended GFX RAM write %02x %04x",data,offset);
 }
 
+static WRITE8_HANDLER( x1_scrn_w )
+{
+	scrn_reg.pcg_mode = (data & 0x20)>>5;
+	scrn_reg.gfx_bank = (data & 0x10)>>4;
+}
+
 static WRITE8_HANDLER( x1_ply_w )
 {
-	ply_reg.pcg_mode = (data & 0x20)>>5;
-	ply_reg.gfx_bank = (data & 0x10)>>4;
 }
 
 static WRITE8_HANDLER( x1_6845_w )
@@ -664,10 +698,10 @@ static WRITE8_HANDLER( x1_io_w )
 //	else if(offset >= 0x1f90 && offset <= 0x1f93)	{ x1_sio_w(space->machine,(offset-0x1f90) & 3),data; }
 	else if(offset >= 0x1fa0 && offset <= 0x1fa3)	{ z80ctc_w(devtag_get_device(space->machine, "ctc"), offset-0x1fa3,data); }
 	else if(offset >= 0x1fa8 && offset <= 0x1fab)	{ z80ctc_w(devtag_get_device(space->machine, "ctc"), offset-0x1fa8,data); }
-//	else if(offset >= 0x1fd0 && offset <= 0x1fdf)	{ x1_scrn_w(space->machine,offset-0x1fd0,data); }
+	else if(offset >= 0x1fd0 && offset <= 0x1fdf)	{ x1_scrn_w(space,0,data); }
 	else if(offset >= 0x2000 && offset <= 0x2fff)	{ colorram[offset-0x2000] = data; }
 	else if(offset >= 0x3000 && offset <= 0x3fff)	{ videoram[offset-0x3000] = data; }
-	else if(offset >= 0x4000 && offset <= 0xffff)	{ gfx_bitmap_ram[offset-0x4000+(ply_reg.gfx_bank*0xc000)] = data; }
+	else if(offset >= 0x4000 && offset <= 0xffff)	{ gfx_bitmap_ram[offset-0x4000+(scrn_reg.gfx_bank*0xc000)] = data; }
 	else
 	{
 		logerror("(PC=%06x) Write %02x at i/o address %04x\n",cpu_get_pc(space->cpu),data,offset);
@@ -840,7 +874,6 @@ static READ8_DEVICE_HANDLER( x1_porta_r )
 /* this port is system related */
 static READ8_DEVICE_HANDLER( x1_portb_r )
 {
-	static UINT8 sub_obf;
 	//printf("PPI Port B read\n");
 	/*
 	x--- ---- "v disp"
@@ -852,7 +885,6 @@ static READ8_DEVICE_HANDLER( x1_portb_r )
 	---- --x- "cmt read"
 	---- ---x "cmt test" (active low)
 	*/
-	sub_obf^=0x20;
 	return (input_port_read(device->machine, "SYSTEM") & ~0x60) | sub_obf;
 }
 
@@ -1005,7 +1037,7 @@ static INPUT_PORTS_START( x1 )
 	PORT_BIT(0x00000400,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Tab") PORT_CODE(KEYCODE_TAB) PORT_CHAR(9)
 	PORT_BIT(0x00000800,IP_ACTIVE_HIGH,IPT_UNUSED) //0x0b lf
 	PORT_BIT(0x00001000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x0c vt
-	PORT_BIT(0x00002000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x0d ff
+	PORT_BIT(0x00002000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("RETURN") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(27)
 	PORT_BIT(0x00004000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x0e cr
 	PORT_BIT(0x00008000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x0f so
 
@@ -1096,7 +1128,6 @@ static INPUT_PORTS_START( x1 )
 	PORT_BIT(0x80000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("_")
 
 	#if 0
-	PORT_BIT(0x20000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("RETURN") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(27)
 	PORT_BIT(0x00020000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME(",") PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',')
 	PORT_BIT(0x00040000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME(".") PORT_CODE(KEYCODE_STOP) PORT_CHAR('.')
 	PORT_BIT(0x00080000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("/") PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/')
