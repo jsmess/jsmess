@@ -46,7 +46,7 @@
 #define log_cart 0
 
 /* expansion port lines input */
-int c64_pal = 0;
+int c64_pal;
 UINT8 c64_game = 1, c64_exrom = 1;
 
 /* cpu port */
@@ -68,7 +68,7 @@ int c64_tape_on;
 static int c64_cia1_on;
 static int c64_io_enabled = 0;
 static int is_sx64;				// temporary workaround until we implement full vc1541 emulation for every c64 set
-static UINT8 c64_cart_loaded = 0;
+static UINT8 c64_cart_n_banks = 0;
 
 static UINT8 serial_clock, serial_data, serial_atn;
 static UINT8 vicirq = 0;
@@ -1028,38 +1028,38 @@ static DEVICE_START(c64_cart)
 
 /* Hardware Types for C64 carts */
 enum {
-	GENERIC_CRT = 0,	/* 00 - Normal cartridge					*/
+	GENERIC_CRT = 0,		/* 00 - Normal cartridge					*/
 	ACTION_REPLAY,		/* 01 - Action Replay						*/
-	KCS_PC,				/* 02 - KCS Power Cartridge					*/
+	KCS_PC,			/* 02 - KCS Power Cartridge					*/
 	FINAL_CART_III,		/* 03 - Final Cartridge III					*/
 	SIMONS_BASIC,		/* 04 - Simons Basic						*/
 	OCEAN_1,			/* 05 - Ocean type 1 (1)					*/
-	EXPERT,				/* 06 - Expert Cartridge					*/
-	FUN_PLAY,			/* 07 - Fun Play, Power Play				*/
-	SUPER_GAMES,		/* 08 - Super Games							*/
+	EXPERT,			/* 06 - Expert Cartridge					*/
+	FUN_PLAY,			/* 07 - Fun Play, Power Play					*/
+	SUPER_GAMES,		/* 08 - Super Games						*/
 	ATOMIC_POWER,		/* 09 - Atomic Power						*/
 	EPYX_FASTLOAD,		/* 10 - Epyx Fastload						*/
 	WESTERMANN,			/* 11 - Westermann Learning					*/
-	REX,				/* 12 - Rex Utility							*/
+	REX,				/* 12 - Rex Utility						*/
 	FINAL_CART_I,		/* 13 - Final Cartridge I					*/
 	MAGIC_FORMEL,		/* 14 - Magic Formel						*/
-	C64GS,				/* 15 - C64 Game System, System 3			*/
+	C64GS,			/* 15 - C64 Game System, System 3				*/
 	WARPSPEED,			/* 16 - WarpSpeed							*/
-	DINAMIC,			/* 17 - Dinamic (2)							*/
-	ZAXXON,				/* 18 - Zaxxon, Super Zaxxon (SEGA)			*/
-	DOMARK,				/* 19 - Magic Desk, Domark, HES Australia	*/
+	DINAMIC,			/* 17 - Dinamic (2)						*/
+	ZAXXON,			/* 18 - Zaxxon, Super Zaxxon (SEGA)				*/
+	DOMARK,			/* 19 - Magic Desk, Domark, HES Australia			*/
 	SUPER_SNAP_5,		/* 20 - Super Snapshot 5					*/
 	COMAL_80,			/* 21 - Comal-80							*/
 	STRUCT_BASIC,		/* 22 - Structured Basic					*/
-	ROSS,				/* 23 - Ross								*/
+	ROSS,				/* 23 - Ross							*/
 	DELA_EP64,			/* 24 - Dela EP64							*/
-	DELA_EP7X8,			/* 25 - Dela EP7x8							*/
-	DELA_EP256,			/* 26 - Dela EP256							*/
+	DELA_EP7X8,			/* 25 - Dela EP7x8						*/
+	DELA_EP256,			/* 26 - Dela EP256						*/
 	REX_EP256,			/* 27 - Rex EP256							*/
 	MIKRO_ASSMBLR,		/* 28 - Mikro Assembler						*/
-	REAL_FC_I,			/* 29 - (3)									*/
-	ACTION_REPLAY_4,	/* 30 - Action Replay 4						*/
-	STARDOS,			/* 31 - StarDOS								*/
+	REAL_FC_I,			/* 29 - (3)								*/
+	ACTION_REPLAY_4,		/* 30 - Action Replay 4						*/
+	STARDOS,			/* 31 - StarDOS							*/
 	/*
 	(1) Ocean type 1 includes Navy Seals, Robocop 2 & 3,  Shadow  of
 	the Beast, Toki, Terminator 2 and more. Both 256 and 128 Kb images.
@@ -1082,9 +1082,10 @@ static UINT8 c64_mapper = GENERIC_CRT;
 
 static DEVICE_IMAGE_LOAD(c64_cart)
 {
-	int size = image_length(image), test, i = 0;
+	int size = image_length(image), test, i = 0, n_banks;
 	const char *filetype;
-	int address = 0, lbank_end_addr = 0, hbank_end_addr = 0, new_start = 0;
+	int address = 0, new_start = 0;
+	// int lbank_end_addr = 0, hbank_end_addr = 0;
 	UINT8 *cart = memory_region(image->machine, "cart");
 
 	filetype = image_filetype(image);
@@ -1112,10 +1113,11 @@ static DEVICE_IMAGE_LOAD(c64_cart)
 		switch (c64_cart_type)
 		{
 			case GENERIC_CRT:
+				printf("Currently supported cart type (Type %d)\n", c64_cart_type);
 				break;
 
 			default:
-				logerror("Currently unsupported cart type (Type %d)\n", c64_cart_type);
+				printf("Currently unsupported cart type (Type %d)\n", c64_cart_type);
 				break;
 		}
 
@@ -1197,9 +1199,7 @@ static DEVICE_IMAGE_LOAD(c64_cart)
 			j += chip_size;
 		}
 	}
-
-	/* We also support .80 files for c64 & .e0/.f0 for max */
-	else
+	else /* We also support .80 files for c64 & .e0/.f0 for max */
 	{
 		/* Assign loading address according to extension */
 		if (!mame_stricmp (filetype, "80"))
@@ -1232,6 +1232,8 @@ static DEVICE_IMAGE_LOAD(c64_cart)
 			return INIT_FAIL;
 	}
 
+	n_banks = i;
+
 	/* If we load a .crt file, use EXROM & GAME from the header! */
 	if ((cbm_c64_exrom != -1) && (cbm_c64_game != -1))
 	{
@@ -1244,7 +1246,7 @@ static DEVICE_IMAGE_LOAD(c64_cart)
 	roml = c64_roml;
 	romh = c64_romh;
 
-	memset(roml, 0, 0x4000);
+	memset(roml, 0, 0x2000);
 	memset(romh, 0, 0x2000);
 
 	/* a bit hacky, until we have fixed the bankswitch part... it will be improved afterwards! */
@@ -1252,8 +1254,9 @@ static DEVICE_IMAGE_LOAD(c64_cart)
 	/* now we have bankswitch handlers for some cart types, but we keep loading first 1 or 2 banks here, for carts without bankswitch */
 	/* to be sure we only load the first pieces, we check that cart.addr is larger than the previous and that no more than 2 CHIPs are loaded */
 	for (i = 0; (i < sizeof(c64_cbm_cart) / sizeof(c64_cbm_cart[0])) && (c64_cbm_cart[i].size != 0); i++)
+/*
 	{
-		/* load the bank only if the space is free */
+		// load the bank only if the space is free
 		if ((c64_cbm_cart[i].addr < 0xc000) && (c64_cbm_cart[i].addr >= lbank_end_addr + 0x8000) && (i < 2))
 		{
 			memcpy(roml + c64_cbm_cart[i].addr - 0x8000, cart + c64_cbm_cart[i].start, c64_cbm_cart[i].size);
@@ -1265,8 +1268,11 @@ static DEVICE_IMAGE_LOAD(c64_cart)
 			hbank_end_addr += c64_cbm_cart[i].addr - 0xe000 + c64_cbm_cart[i].size;
 		}
 	}
+*/
+	memcpy(roml, cart + 0 * 0x2000, 0x2000);
+	if (n_banks > 1) memcpy(romh, cart + 1 * 0x2000, 0x2000);
 
-	c64_cart_loaded = 1; // this is needed so that we only set mappers if a cart is present!
+	c64_cart_n_banks = n_banks; // this is needed so that we only set mappers if a cart is present!
 	return INIT_PASS;
 }
 
@@ -1292,13 +1298,24 @@ static WRITE8_HANDLER( fc3_bank_w )
 
 static WRITE8_HANDLER( ocean1_bank_w )
 {
+	// Type # 5
+	// working: Ghostbusters, Terminator 2
+	// not working: Pang, Robocop 2, Toki
+
 	UINT8 bank = data & 0x3f;
 	UINT8 *cart = memory_region(space->machine, "cart");
 
-	if (bank < 32)
+	if (c64_cart_n_banks != 64)								// all carts except Terminator II
+	{
+		if (bank < 16)
+			memcpy(roml, cart + bank * 0x2000, 0x2000);
+		else
+			memcpy(romh, cart + (bank - 16) * 0x2000, 0x2000);
+	}
+	else  											// Terminator II
+	{
 		memcpy(roml, cart + bank * 0x2000, 0x2000);
-	else
-		memcpy(romh, cart + (bank - 32) * 0x2000, 0x2000);
+	}
 /*
 	if (log_cart)
 	{
@@ -1311,8 +1328,11 @@ static WRITE8_HANDLER( ocean1_bank_w )
 
 static WRITE8_HANDLER( funplay_bank_w )
 {
+	// Type # 7
+	// working:
+	// not working:
+
 	UINT8 bank = data & 0x39, real_bank = 0;
-	UINT8 *mem = memory_region(space->machine, "maincpu");
 	UINT8 *cart = memory_region(space->machine, "cart");
 
 	/* This should be written after the bankswitch has happened. We log it to see if it is really working */
@@ -1323,7 +1343,9 @@ static WRITE8_HANDLER( funplay_bank_w )
 		/* bank number is not the value written, but c64_cbm_cart[bank].index IS the value written! */
 		real_bank = ((bank & 0x01) << 3) + ((bank & 0x38) >> 3);
 
-		memcpy(mem + c64_cbm_cart[bank].addr, cart + c64_cbm_cart[bank].start, c64_cbm_cart[bank].size);
+//		memcpy(mem + c64_cbm_cart[bank].addr, cart + c64_cbm_cart[bank].start, c64_cbm_cart[bank].size);
+
+		memcpy(roml, cart + real_bank * 0x2000, 0x2000);
 
 		if (log_cart)
 		{
@@ -1336,14 +1358,19 @@ static WRITE8_HANDLER( funplay_bank_w )
 
 static WRITE8_HANDLER( c64gs_bank_w )
 {
+	// Type # 15
+	// working:
+	// not working: The Last Ninja Remix
+
 	UINT8 bank = offset & 0xff;
-	UINT8 *mem = memory_region(space->machine, "maincpu");
 	UINT8 *cart = memory_region(space->machine, "cart");
 
 	if (bank > 0x3f)
 		logerror("Warning: This cart type should have at most 64 banks and the cart looked for bank %d... Something strange is going on!\n", bank);
 
-	memcpy(mem + c64_cbm_cart[bank].addr, cart + c64_cbm_cart[bank].start, c64_cbm_cart[bank].size);
+//	memcpy(mem + c64_cbm_cart[bank].addr, cart + c64_cbm_cart[bank].start, c64_cbm_cart[bank].size);
+
+	memcpy(roml, cart + bank * 0x2000, 0x2000);
 
 	if (log_cart)
 	{
@@ -1355,14 +1382,19 @@ static WRITE8_HANDLER( c64gs_bank_w )
 
 static READ8_HANDLER( dinamic_bank_r )
 {
+	// Type # 17
+	// working: Satan
+	// not working:
+
 	UINT8 bank = offset & 0xff;
-	UINT8 *mem = memory_region(space->machine, "maincpu");
 	UINT8 *cart = memory_region(space->machine, "cart");
 
 	if (bank > 0xf)
 		logerror("Warning: This cart type should have 16 banks and the cart looked for bank %d... Something strange is going on!\n", bank);
 
-	memcpy(mem + c64_cbm_cart[bank].addr, cart + c64_cbm_cart[bank].start, c64_cbm_cart[bank].size);
+	memcpy(roml, cart + bank * 0x2000, 0x2000);
+
+//	memcpy(mem + c64_cbm_cart[bank].addr, cart + c64_cbm_cart[bank].start, c64_cbm_cart[bank].size);
 
 	if (log_cart)
 	{
@@ -1376,6 +1408,10 @@ static READ8_HANDLER( dinamic_bank_r )
 
 static WRITE8_HANDLER( comal80_bank_w )
 {
+	// Type # 21
+	// working: Comal 80
+	// not working:
+
 	UINT8 bank = data & 0x83;
 	UINT8 *cart = memory_region(space->machine, "cart");
 
@@ -1404,25 +1440,35 @@ static void setup_c64_custom_mappers(running_machine *machine)
 
 	switch( c64_mapper )
 	{
-		case FINAL_CART_III:    /* 4 16k banks, loaded at 0x8000, banks chosen by writing to 0xdfff */
+		case KCS_PC:		/* Type #  2 not working*/
+			break;
+		case FINAL_CART_III:    /* Type #  3 - 4 16k banks, loaded at 0x8000, banks chosen by writing to 0xdfff */
 			memory_install_write8_handler( space, 0xdfff, 0xdfff, 0, 0, fc3_bank_w );
 			break;
-		case OCEAN_1:           /* up to 64 8k banks, loaded at 0x8000 or 0xa000, banks chosen by writing to 0xde00 */
+		case SIMONS_BASIC:	/* Type #  4 not working*/
+			break;
+		case OCEAN_1:           /* Type #  5 - up to 64 8k banks, loaded at 0x8000 or 0xa000, banks chosen by writing to 0xde00 */
 			memory_install_write8_handler( space, 0xde00, 0xde00, 0, 0, ocean1_bank_w );
 			break;
-		case FUN_PLAY:          /* 16 8k banks, loaded at 0x8000, banks chosen by writing to 0xde00 */
+		case FUN_PLAY:          /* Type #  7 - 16 8k banks, loaded at 0x8000, banks chosen by writing to 0xde00 */
 			memory_install_write8_handler( space, 0xde00, 0xde00, 0, 0, funplay_bank_w );
 			break;
-		case C64GS:             /* up to 64 8k banks, loaded at 0x8000, banks chosen by writing to 0xde00+bank# */
+		case EPYX_FASTLOAD:	/* Type # 10 not working*/
+			break;
+		case WESTERMANN:		/* Type # 11 not working*/
+			break;
+		case FINAL_CART_I:	/* Type # 13 not working*/
+			break;
+		case C64GS:             /* Type # 15 - up to 64 8k banks, loaded at 0x8000, banks chosen by writing to 0xde00 + bank */
 			memory_install_write8_handler( space, 0xde00, 0xdeff, 0, 0, c64gs_bank_w );
 			break;
-		case DINAMIC:           /* 16 8k banks, loaded at 0x8000, banks chosen by reading to 0xde00+bank# */
+		case DINAMIC:           /* Type # 17 - 16 8k banks, loaded at 0x8000, banks chosen by reading to 0xde00 + bank# */
 			memory_install_read8_handler( space, 0xde00, 0xdeff, 0, 0, dinamic_bank_r );
 			break;
-		case COMAL_80:          /* 4 16k banks, loaded at 0x8000, banks chosen by writing(?) to 0xde00 */
+		case COMAL_80:          /* Type # 21 - 4 16k banks, loaded at 0x8000, banks chosen by writing the value 0x80 + bank to 0xde00 */
 			memory_install_write8_handler( space, 0xde00, 0xde00, 0, 0, comal80_bank_w );
 			break;
-		case GENERIC_CRT:       /* single bank, no bankswitch, loaded at start with correct size and place */
+		case GENERIC_CRT:       /* Type #  0 - single bank, no bankswitch, loaded at start with correct size and place */
 		default:
 			break;
 	}
@@ -1431,7 +1477,7 @@ static void setup_c64_custom_mappers(running_machine *machine)
 
 MACHINE_RESET( c64 )
 {
-	if(c64_cart_loaded)
+	if(c64_cart_n_banks)
 		setup_c64_custom_mappers(machine);
 }
 
