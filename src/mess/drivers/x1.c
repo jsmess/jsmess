@@ -191,9 +191,9 @@ static void draw_fgtilemap(running_machine *machine, bitmap_t *bitmap,const rect
 				{
 					for(xi=0;xi<8*(width+1);xi+=(width+1))
 					{
-						pen[0] = PCG_RAM[((tile*8)+yi)+0x0000]>>(7-xi) & (pen_mask & 1)>>0;
-						pen[1] = PCG_RAM[((tile*8)+yi)+0x0800]>>(7-xi) & (pen_mask & 2)>>1;
-						pen[2] = PCG_RAM[((tile*8)+yi)+0x1000]>>(7-xi) & (pen_mask & 4)>>2;
+						pen[0] = PCG_RAM[((tile*8)+yi/(height+1))+0x0000]>>(7-xi/(width+1)) & (pen_mask & 1)>>0;
+						pen[1] = PCG_RAM[((tile*8)+yi/(height+1))+0x0800]>>(7-xi/(width+1)) & (pen_mask & 2)>>1;
+						pen[2] = PCG_RAM[((tile*8)+yi/(height+1))+0x1000]>>(7-xi/(width+1)) & (pen_mask & 4)>>2;
 
 						pcg_pen = pen[2]<<2|pen[1]<<1|pen[0]<<0;
 
@@ -550,11 +550,19 @@ static WRITE8_HANDLER( x1_pcg_w )
 	}
 }
 
+static READ8_HANDLER( x1_clr_r )
+{
+	//memset(gfx_bitmap_ram,0x00,0xc000);
+
+	return 0xff;
+}
+
 static READ8_HANDLER( x1_io_r )
 {
 	io_bank_mode = 0; //any read disables the extended mode.
 
-	if(offset >= 0x0704 && offset <= 0x0707)	{ return z80ctc_r(devtag_get_device(space->machine, "ctc"), offset-0x0704); }
+	if(offset >= 0x0704 && offset <= 0x0707)    	{ return z80ctc_r(devtag_get_device(space->machine, "ctc"), offset-0x0704); }
+	else if(offset == 0x07d0)                    	{ return x1_clr_r(space, 0); }
 	else if(offset == 0x0e03)                    	{ return x1_rom_r(space, 0); }
 	else if(offset >= 0x0ff8 && offset <= 0x0fff)	{ return x1_fdc_r(space, offset-0xff8); }
 	else if(offset >= 0x1900 && offset <= 0x19ff)	{ return sub_io_r(space, 0); }
@@ -674,7 +682,7 @@ static const gfx_layout x1_pcg_8x8 =
 {
 	8,8,
 	RGN_FRAC(1,3),
-	1,
+	3,
 	{ RGN_FRAC(2,3),RGN_FRAC(1,3),RGN_FRAC(0,3) },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
