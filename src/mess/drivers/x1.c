@@ -157,99 +157,90 @@ static VIDEO_START( x1 )
 	gfx_bitmap_ram = auto_alloc_array(machine, UINT8, 0xc000);
 }
 
+static void draw_fgtilemap(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int w,int pri)
+{
+	int y,x;
+
+	for (y=0;y<25;y++)
+	{
+		for (x=0;x<40*w;x++)
+		{
+			int tile = videoram[x+(y*40*w)];
+			int color = colorram[x+(y*40*w)] & 0x1f;
+			int width = (colorram[x+(y*40*w)] & 0x80)>>7;
+			int height = (colorram[x+(y*40*w)] & 0x40)>>6;
+			int pcg_bank = (colorram[x+(y*40*w)] & 0x20)>>4;
+			int region = (width+(height<<1)) & 3;
+
+			if(pcg_bank) { region+= 4; }
+
+			if(((color & 0x8)>>3) != pri) continue;
+			if(tile == 0) continue; //correct?
+
+			drawgfx_opaque(bitmap,cliprect,machine->gfx[region],tile,color,0,0,(x/(width+1))*8*(width+1),(y/(height+1))*8*(height+1));
+		}
+	}
+}
+
+static void draw_gfxbitmap(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int w)
+{
+	int count,xi,yi,x,y;
+	int pen_r,pen_g,pen_b,color;
+	int yi_size;
+
+	count = 0;
+
+	yi_size = (w == 1) ? 16 : 8;
+
+	for(yi=0;yi<yi_size;yi++)
+	{
+		for(y=0;y<200;y+=8)
+		{
+			for(x=0;x<(320*w);x+=8)
+			{
+				for(xi=0;xi<8;xi++)
+				{
+					pen_b = (gfx_bitmap_ram[count+0x0000]>>(7-xi)) & 1;
+					pen_r = (gfx_bitmap_ram[count+0x4000]>>(7-xi)) & 1;
+					pen_g = (gfx_bitmap_ram[count+0x8000]>>(7-xi)) & 1;
+
+					color =  pen_g<<2 | pen_r<<1 | pen_b<<0;
+
+					if(color == 0)
+						continue;
+
+					if(w == 1)
+					{
+						if(yi & 1)
+							continue;
+						if((x+xi)<=video_screen_get_visible_area(machine->primary_screen)->max_x && (y+(yi >> 1))<video_screen_get_visible_area(machine->primary_screen)->max_y)
+							*BITMAP_ADDR16(bitmap, y+(yi >> 1), x+xi) = machine->pens[color+0x100];
+					}
+					else
+					{
+						if((x+xi)<=video_screen_get_visible_area(machine->primary_screen)->max_x && (y+yi)<video_screen_get_visible_area(machine->primary_screen)->max_y)
+							*BITMAP_ADDR16(bitmap, y+yi, x+xi) = machine->pens[color+0x100];
+					}
+				}
+				count++;
+			}
+		}
+		count+= (w == 2) ? 48 : 24;
+	}
+}
+
 static VIDEO_UPDATE( x1 )
 {
-	int y,x,w;
+	int w;
 
 	w = (video_screen_get_width(screen) < 640) ? 1 : 2;
 
 	bitmap_fill(bitmap, cliprect, screen->machine->pens[0x100]);
 
-	for (y=0;y<25;y++)
-	{
-		for (x=0;x<40*w;x++)
-		{
-			int tile = videoram[x+(y*40*w)];
-			int color = colorram[x+(y*40*w)] & 0x1f;
-			int width = (colorram[x+(y*40*w)] & 0x80)>>7;
-			int height = (colorram[x+(y*40*w)] & 0x40)>>6;
-			int pcg_bank = (colorram[x+(y*40*w)] & 0x20)>>4;
-			int region = (width+(height<<1)) & 3;
+	draw_fgtilemap(screen->machine,bitmap,cliprect,w,0);
+	draw_gfxbitmap(screen->machine,bitmap,cliprect,w);
+	draw_fgtilemap(screen->machine,bitmap,cliprect,w,1);
 
-			if(pcg_bank) { region+= 4; }
-
-			if(color & 0x8) continue;
-			if(tile == 0) continue;
-
-			drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[region],tile,color,0,0,(x/(width+1))*8*(width+1),(y/(height+1))*8*(height+1));
-		}
-	}
-
-	{
-		int count,xi,yi;
-		int pen_r,pen_g,pen_b,color;
-		int yi_size;
-
-		count = 0;
-
-		yi_size = (w == 1) ? 16 : 8;
-
-		for(yi=0;yi<yi_size;yi++)
-		{
-			for(y=0;y<200;y+=8)
-			{
-				for(x=0;x<(320*w);x+=8)
-				{
-					for(xi=0;xi<8;xi++)
-					{
-						pen_r = (gfx_bitmap_ram[count+0x4000]>>(7-xi)) & 1;
-						pen_g = (gfx_bitmap_ram[count+0x8000]>>(7-xi)) & 1;
-						pen_b = (gfx_bitmap_ram[count+0x0000]>>(7-xi)) & 1;
-
-						color = pen_r<<1 | pen_g<<2 | pen_b<<0;
-
-						if(color == 0)
-							continue;
-
-						if(w == 1)
-						{
-							if(yi & 1)
-								continue;
-
-							if((x+xi)<=video_screen_get_visible_area(screen)->max_x && ((y)+0)<video_screen_get_visible_area(screen)->max_y)
-								*BITMAP_ADDR16(bitmap, y+(yi >> 1), x+xi) = screen->machine->pens[color+0x100];
-						}
-						else
-						{
-							if((x+xi)<=video_screen_get_visible_area(screen)->max_x && ((y)+0)<video_screen_get_visible_area(screen)->max_y)
-								*BITMAP_ADDR16(bitmap, y+yi, x+xi) = screen->machine->pens[color+0x100];
-						}
-					}
-					count++;
-				}
-			}
-			count+= (w == 2) ? 48 : 24;
-		}
-	}
-
-	for (y=0;y<25;y++)
-	{
-		for (x=0;x<40*w;x++)
-		{
-			int tile = videoram[x+(y*40*w)];
-			int color = colorram[x+(y*40*w)] & 0x1f;
-			int width = (colorram[x+(y*40*w)] & 0x80)>>7;
-			int height = (colorram[x+(y*40*w)] & 0x40)>>6;
-			int pcg_bank = (colorram[x+(y*40*w)] & 0x20)>>4;
-			int region = (width+(height<<1)) & 3;
-
-			if(pcg_bank) { region+= 4; }
-
-			if(!(color & 0x8)) continue;
-
-			drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[region],tile,color,0,0,(x/(width+1))*8*(width+1),(y/(height+1))*8*(height+1));
-		}
-	}
 	return 0;
 }
 
@@ -717,26 +708,19 @@ static PALETTE_INIT(x1)
 
 	for (i = 0; i < 0x20; i++)
 	{
-		rgb_t color;
+		UINT8 r,g,b;
 
-		if(i >= 0x10)
+		if(i & 0x01)
 		{
-			if (i & 0x01)
-				color = RGB_WHITE;
-			else
-				color = MAKE_RGB(pal1bit(i >> 3), pal1bit(i >> 2), pal1bit(i >> 1));
-
-			palette_set_color(machine, 0x2f-i, color);
+			r = ((i >> 3) & 1) ? 0xff : 0x00;
+			g = ((i >> 2) & 1) ? 0xff : 0x00;
+			b = ((i >> 1) & 1) ? 0xff : 0x00;
 		}
-		else
-		{
-			if (i & 0x01)
-				color = MAKE_RGB(pal1bit(i >> 3), pal1bit(i >> 2), pal1bit(i >> 1));
-			else
-				color = RGB_BLACK;
+		else { r = g = b = 0x00; }
 
-			palette_set_color(machine, i, color);
-		}
+		if(i & 0x10) { r^=0xff; g^=0xff; b^=0xff; }
+
+		palette_set_color_rgb(machine, i, r,g,b);
 	}
 
 	/* TODO: fix this */
@@ -1141,7 +1125,7 @@ static MACHINE_DRIVER_START( x1 )
 	MDRV_PALETTE_LENGTH(0x300)
 	MDRV_PALETTE_INIT(x1)
 
-	MDRV_MC6845_ADD("crtc", MC6845, XTAL_4MHz/5, mc6845_intf)	/* unknown type and clock / divider, hand tuned to get ~60 fps */
+	MDRV_MC6845_ADD("crtc", MC6845, XTAL_3_579545MHz/4, mc6845_intf)	/* unknown type and clock / divider, hand tuned to get ~60 fps */
 
 	MDRV_GFXDECODE(x1)
 
