@@ -1112,18 +1112,22 @@ static DEVICE_IMAGE_LOAD(c64_cart)
 		/* If it is unsupported cart type, warn the user */
 		switch (c64_cart_type)
 		{
+			case ACTION_REPLAY:	/* Type #  1 */
 			case KCS_PC:		/* Type #  2 */
-			case FINAL_CART_III:    /* Type #  3 */
+			case FINAL_CART_III:	/* Type #  3 */
 			case SIMONS_BASIC:	/* Type #  4 */
-			case OCEAN_1:           /* Type #  5 */
+			case OCEAN_1:		/* Type #  5 */
+			case EXPERT:		/* Type #  6 */
 			case FUN_PLAY:          /* Type #  7 */
+			case ATOMIC_POWER:	/* Type #  9 */
 			case EPYX_FASTLOAD:	/* Type # 10 */
 			case WESTERMANN:		/* Type # 11 */
+			case REX:			/* Type # 12 */
 			case FINAL_CART_I:	/* Type # 13 */
-			case C64GS:             /* Type # 15 */
-			case DINAMIC:           /* Type # 17 */
-			case COMAL_80:          /* Type # 21 */
-			case GENERIC_CRT:       /* Type #  0 */
+			case C64GS:			/* Type # 15 */
+			case DINAMIC:		/* Type # 17 */
+			case COMAL_80:		/* Type # 21 */
+			case GENERIC_CRT:		/* Type #  0 */
 				printf("Currently supported cart type (Type %d)\n", c64_cart_type);
 				break;
 
@@ -1454,32 +1458,40 @@ static void setup_c64_custom_mappers(running_machine *machine)
 
 	switch( c64_mapper )
 	{
-		case KCS_PC:		/* Type #  2 not working*/
+		case ACTION_REPLAY:	/* Type #  1 not working */
 			break;
-		case FINAL_CART_III:    /* Type #  3 - 4 16k banks, loaded at 0x8000, banks chosen by writing to 0xdfff */
+		case KCS_PC:		/* Type #  2 not working */
+			break;
+		case FINAL_CART_III:    /* Type #  3 not working - 4 16k banks, loaded at 0x8000, banks chosen by writing to 0xdfff */
 			memory_install_write8_handler( space, 0xdfff, 0xdfff, 0, 0, fc3_bank_w );
 			break;
-		case SIMONS_BASIC:	/* Type #  4 not working*/
+		case SIMONS_BASIC:	/* Type #  4 not working */
 			break;
 		case OCEAN_1:           /* Type #  5 - up to 64 8k banks, loaded at 0x8000 or 0xa000, banks chosen by writing to 0xde00 */
 			memory_install_write8_handler( space, 0xde00, 0xde00, 0, 0, ocean1_bank_w );
 			break;
+		case EXPERT:		/* Type #  6 not working */
+			break;
 		case FUN_PLAY:          /* Type #  7 - 16 8k banks, loaded at 0x8000, banks chosen by writing to 0xde00 */
 			memory_install_write8_handler( space, 0xde00, 0xde00, 0, 0, funplay_bank_w );
 			break;
-		case EPYX_FASTLOAD:	/* Type # 10 not working*/
+		case ATOMIC_POWER:	/* Type #  9 not working */
 			break;
-		case WESTERMANN:		/* Type # 11 not working*/
+		case EPYX_FASTLOAD:	/* Type # 10 not working */
 			break;
-		case FINAL_CART_I:	/* Type # 13 not working*/
+		case WESTERMANN:		/* Type # 11 not working */
+			break;
+		case REX:			/* Type # 12 working */
+			break;
+		case FINAL_CART_I:	/* Type # 13 not working */
 			break;
 		case C64GS:             /* Type # 15 - up to 64 8k banks, loaded at 0x8000, banks chosen by writing to 0xde00 + bank */
 			memory_install_write8_handler( space, 0xde00, 0xdeff, 0, 0, c64gs_bank_w );
 			break;
-		case DINAMIC:           /* Type # 17 - 16 8k banks, loaded at 0x8000, banks chosen by reading to 0xde00 + bank# */
+		case DINAMIC:           /* Type # 17 - 16 8k banks, loaded at 0x8000, banks chosen by reading to 0xde00 + bank */
 			memory_install_read8_handler( space, 0xde00, 0xdeff, 0, 0, dinamic_bank_r );
 			break;
-		case COMAL_80:          /* Type # 21 - 4 16k banks, loaded at 0x8000, banks chosen by writing the value 0x80 + bank to 0xde00 */
+		case COMAL_80:          /* Type # 21 - 4 16k banks, loaded at 0x8000, banks chosen by writing to 0xde00 */
 			memory_install_write8_handler( space, 0xde00, 0xde00, 0, 0, comal80_bank_w );
 			break;
 		case GENERIC_CRT:       /* Type #  0 - single bank, no bankswitch, loaded at start with correct size and place */
