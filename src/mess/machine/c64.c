@@ -823,35 +823,51 @@ static void c64_common_driver_init (running_machine *machine)
 
 DRIVER_INIT( c64 )
 {
+	ultimax = 0;
+	is_sx64 = 0;
+	c64_pal = 0;
+	c64_cia1_on = 1;
+	c64_tape_on = 1;
 	c64_common_driver_init(machine);
 }
 
 DRIVER_INIT( c64pal )
 {
+	ultimax = 0;
+	is_sx64 = 0;
 	c64_pal = 1;
+	c64_cia1_on = 1;
+	c64_tape_on = 1;
 	c64_common_driver_init(machine);
 }
 
 DRIVER_INIT( ultimax )
 {
 	ultimax = 1;
-    c64_cia1_on = 0;
+	is_sx64 = 0;
+	c64_pal = 0;
+	c64_cia1_on = 0;
+	c64_tape_on = 1;
 	c64_common_driver_init(machine);
 }
 
 DRIVER_INIT( c64gs )
 {
+	ultimax = 0;
+	is_sx64 = 0;
 	c64_pal = 1;
+	c64_cia1_on = 1;
 	c64_tape_on = 0;
-    c64_cia1_on = 1;
 	c64_common_driver_init(machine);
 }
 
 DRIVER_INIT( sx64 )
 {
+	ultimax = 0;
 	is_sx64 = 1;
-	c64_tape_on = 0;
 	c64_pal = 1;
+	c64_cia1_on = 1;
+	c64_tape_on = 0;
 	c64_common_driver_init(machine);
 	drive_config(machine, type_1541, 0, 0, "cpu_vc1540", 8);
 }

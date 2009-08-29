@@ -1044,15 +1044,16 @@ static void c65_common_driver_init (running_machine *machine)
 
 DRIVER_INIT( c65 )
 {
-	dma.version=2;
+	c64_pal = 0;
+	dma.version = 2;
 	c65_common_driver_init(machine);
 
 }
 
 DRIVER_INIT( c65pal )
 {
-	dma.version=1;
 	c64_pal = 1;
+	dma.version = 1;
 	c65_common_driver_init(machine);
 }
 
