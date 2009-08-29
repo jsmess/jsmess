@@ -570,7 +570,7 @@ static WRITE8_HANDLER( x1_io_w )
 	else if(offset >= 0x1c00 && offset <= 0x1cff)	{ ay8910_address_w(devtag_get_device(space->machine, "ay"), 0,data); }
 	else if(offset >= 0x1d00 && offset <= 0x1dff)	{ rom_bank_1_w(space,0,data); }
 	else if(offset >= 0x1e00 && offset <= 0x1eff)	{ rom_bank_0_w(space,0,data); }
-	else if(offset >= 0x1f80 && offset <= 0x1f80)	{ x1_dma_w(space,offset-0x1f80,data); }
+	else if(offset >= 0x1f80 && offset <= 0x1f8f)	{ x1_dma_w(space,offset-0x1f80,data); }
 //	else if(offset >= 0x1f90 && offset <= 0x1f93)	{ x1_sio_w(space->machine,(offset-0x1f90) & 3),data; }
 	else if(offset >= 0x1fa0 && offset <= 0x1fa3)	{ z80ctc_w(devtag_get_device(space->machine, "ctc"), offset-0x1fa3,data); }
 	else if(offset >= 0x1fa8 && offset <= 0x1fab)	{ z80ctc_w(devtag_get_device(space->machine, "ctc"), offset-0x1fa8,data); }
@@ -696,16 +696,16 @@ static const gfx_layout x1_chars_16x16 =
 
 /* TODO: separe the different x1 decodings accordingly */
 static GFXDECODE_START( x1 )
-	GFXDECODE_ENTRY( "cgrom", 0x00000, x1_chars_8x8,    0, 0x40 )
-	GFXDECODE_ENTRY( "cgrom", 0x00000, x1_chars_8wx8,   0, 0x40 )
-	GFXDECODE_ENTRY( "cgrom", 0x00000, x1_chars_8x8w,   0, 0x40 )
-	GFXDECODE_ENTRY( "cgrom", 0x00000, x1_chars_8wx8w,  0, 0x40 )
+	GFXDECODE_ENTRY( "cgrom", 0x00000, x1_chars_8x8,    0, 0x20 )
+	GFXDECODE_ENTRY( "cgrom", 0x00000, x1_chars_8wx8,   0, 0x20 )
+	GFXDECODE_ENTRY( "cgrom", 0x00000, x1_chars_8x8w,   0, 0x20 )
+	GFXDECODE_ENTRY( "cgrom", 0x00000, x1_chars_8wx8w,  0, 0x20 )
 	GFXDECODE_ENTRY( "pcg",   0x00000, x1_pcg_8x8,      0x100, 1 )
 	GFXDECODE_ENTRY( "pcg",   0x00000, x1_pcg_8wx8,     0x100, 1 )
 	GFXDECODE_ENTRY( "pcg",   0x00000, x1_pcg_8x8w,     0x100, 1 )
 	GFXDECODE_ENTRY( "pcg",   0x00000, x1_pcg_8wx8w,    0x100, 1 )
-	GFXDECODE_ENTRY( "cgrom", 0x01800, x1_chars_16x16,  0, 0x40 ) //only x1turboz uses this so far
-	GFXDECODE_ENTRY( "kanji", 0x27000, x1_chars_16x16,  0, 0x40 ) //needs to be checked when the ROM will be redumped
+	GFXDECODE_ENTRY( "cgrom", 0x01800, x1_chars_16x16,  0, 0x20 ) //only x1turboz uses this so far
+	GFXDECODE_ENTRY( "kanji", 0x27000, x1_chars_16x16,  0, 0x20 ) //needs to be checked when the ROM will be redumped
 GFXDECODE_END
 
 static PALETTE_INIT(x1)
@@ -719,12 +719,24 @@ static PALETTE_INIT(x1)
 	{
 		rgb_t color;
 
-		if (i & 0x01)
-			color = MAKE_RGB(pal1bit(i >> 3), pal1bit(i >> 2), pal1bit(i >> 1));
-		else
-			color = (i & 0x10) ? RGB_WHITE : RGB_BLACK;
+		if(i >= 0x10)
+		{
+			if (i & 0x01)
+				color = RGB_WHITE;
+			else
+				color = MAKE_RGB(pal1bit(i >> 3), pal1bit(i >> 2), pal1bit(i >> 1));
 
-		palette_set_color(machine, i, color);
+			palette_set_color(machine, 0x2f-i, color);
+		}
+		else
+		{
+			if (i & 0x01)
+				color = MAKE_RGB(pal1bit(i >> 3), pal1bit(i >> 2), pal1bit(i >> 1));
+			else
+				color = RGB_BLACK;
+
+			palette_set_color(machine, i, color);
+		}
 	}
 
 	/* TODO: fix this */
