@@ -63,11 +63,11 @@ static UINT8 *c64_io_mirror = NULL;
 static UINT8 c64_port_data;
 
 static UINT8 *roml = 0, *romh = 0;
-static int ultimax = 0;
-int c64_tape_on = 1;
-static int c64_cia1_on = 1;
+static int ultimax;
+int c64_tape_on;
+static int c64_cia1_on;
 static int c64_io_enabled = 0;
-static int is_sx64 = 0;	// temporary workaround until we implement full vc1541 emulation for every c64 set
+static int is_sx64;				// temporary workaround until we implement full vc1541 emulation for every c64 set
 static UINT8 c64_cart_loaded = 0;
 
 static UINT8 serial_clock, serial_data, serial_atn;
