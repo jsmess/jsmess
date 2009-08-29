@@ -171,7 +171,7 @@ static void draw_fgtilemap(running_machine *machine, bitmap_t *bitmap,const rect
 			int width = (colorram[x+(y*40*w)] & 0x80)>>7;
 			int height = (colorram[x+(y*40*w)] & 0x40)>>6;
 			int pcg_bank = (colorram[x+(y*40*w)] & 0x20)>>5;
-			int region = (width+(height<<1)) & 3;
+			UINT8 *gfx_data = pcg_bank ? memory_region(machine, "pcg") : memory_region(machine, "cgrom");
 
 			if(((color & 0x8)>>3) != pri) continue;
 			if(tile == 0) continue; //correct?
@@ -179,21 +179,19 @@ static void draw_fgtilemap(running_machine *machine, bitmap_t *bitmap,const rect
 			res_x = (x/(width+1))*8*(width+1);
 			res_y = (y/(height+1))*8*(height+1);
 
-			if(pcg_bank)
 			{
-				UINT8 *PCG_RAM = memory_region(machine, "pcg");
 				int pen[3],pen_mask,pcg_pen,xi,yi;
 
 				pen_mask = color & 7;
 
-				/* We use custom drawing code for the PCG due of the bitplane disable stuff and the color revert stuff. */
+				/* We use custom drawing code due of the bitplane disable and the color revert stuff. */
 				for(yi=0;yi<8*(height+1);yi+=(height+1))
 				{
 					for(xi=0;xi<8*(width+1);xi+=(width+1))
 					{
-						pen[0] = PCG_RAM[((tile*8)+yi/(height+1))+0x0000]>>(7-xi/(width+1)) & (pen_mask & 1)>>0;
-						pen[1] = PCG_RAM[((tile*8)+yi/(height+1))+0x0800]>>(7-xi/(width+1)) & (pen_mask & 2)>>1;
-						pen[2] = PCG_RAM[((tile*8)+yi/(height+1))+0x1000]>>(7-xi/(width+1)) & (pen_mask & 4)>>2;
+						pen[0] = gfx_data[((tile*8)+yi/(height+1))+0x0000]>>(7-xi/(width+1)) & (pen_mask & 1)>>0;
+						pen[1] = gfx_data[((tile*8)+yi/(height+1))+0x0800]>>(7-xi/(width+1)) & (pen_mask & 2)>>1;
+						pen[2] = gfx_data[((tile*8)+yi/(height+1))+0x1000]>>(7-xi/(width+1)) & (pen_mask & 4)>>2;
 
 						pcg_pen = pen[2]<<2|pen[1]<<1|pen[0]<<0;
 
@@ -206,18 +204,16 @@ static void draw_fgtilemap(running_machine *machine, bitmap_t *bitmap,const rect
 						if((res_x+xi)>video_screen_get_visible_area(machine->primary_screen)->max_x && (res_y+yi)>video_screen_get_visible_area(machine->primary_screen)->max_y)
 							continue;
 
-						*BITMAP_ADDR16(bitmap, res_y+yi, res_x+xi) = machine->pens[pcg_pen+0x100];
+						*BITMAP_ADDR16(bitmap, res_y+yi, res_x+xi) = machine->pens[pcg_pen+0x100*pcg_bank];
 						if(width)
-							*BITMAP_ADDR16(bitmap, res_y+yi, res_x+xi+1) = machine->pens[pcg_pen+0x100];
+							*BITMAP_ADDR16(bitmap, res_y+yi, res_x+xi+1) = machine->pens[pcg_pen+0x100*pcg_bank];
 						if(height)
-							*BITMAP_ADDR16(bitmap, res_y+yi+1, res_x+xi) = machine->pens[pcg_pen+0x100];
+							*BITMAP_ADDR16(bitmap, res_y+yi+1, res_x+xi) = machine->pens[pcg_pen+0x100*pcg_bank];
 						if(width && height)
-							*BITMAP_ADDR16(bitmap, res_y+yi+1, res_x+xi+1) = machine->pens[pcg_pen+0x100];
+							*BITMAP_ADDR16(bitmap, res_y+yi+1, res_x+xi+1) = machine->pens[pcg_pen+0x100*pcg_bank];
 					}
 				}
 			}
-			else
-				drawgfx_opaque(bitmap,cliprect,machine->gfx[region],tile,color,0,0,res_x,res_y);
 		}
 	}
 }
@@ -735,11 +731,11 @@ static const gfx_layout x1_chars_16x16 =
 
 /* TODO: separe the different x1 decodings accordingly */
 static GFXDECODE_START( x1 )
-	GFXDECODE_ENTRY( "cgrom", 0x00000, x1_chars_8x8,    0, 0x20 )
-	GFXDECODE_ENTRY( "cgrom", 0x00000, x1_chars_8wx8,   0, 0x20 )
-	GFXDECODE_ENTRY( "cgrom", 0x00000, x1_chars_8x8w,   0, 0x20 )
-	GFXDECODE_ENTRY( "cgrom", 0x00000, x1_chars_8wx8w,  0, 0x20 )
 	/* decoded for debugging purpose, they will be nuked in the end */
+	GFXDECODE_ENTRY( "cgrom", 0x00000, x1_chars_8x8,    0x200, 0x20 )
+	GFXDECODE_ENTRY( "cgrom", 0x00000, x1_chars_8wx8,   0x200, 0x20 )
+	GFXDECODE_ENTRY( "cgrom", 0x00000, x1_chars_8x8w,   0x200, 0x20 )
+	GFXDECODE_ENTRY( "cgrom", 0x00000, x1_chars_8wx8w,  0x200, 0x20 )
 	GFXDECODE_ENTRY( "pcg",   0x00000, x1_pcg_8x8,      0x100, 1 )
 	GFXDECODE_ENTRY( "pcg",   0x00000, x1_pcg_8wx8,     0x100, 1 )
 	GFXDECODE_ENTRY( "pcg",   0x00000, x1_pcg_8x8w,     0x100, 1 )
@@ -755,7 +751,7 @@ static PALETTE_INIT(x1)
 	for(i=0;i<0x300;i++)
 		palette_set_color(machine, i,MAKE_RGB(0x00,0x00,0x00));
 
-	for (i = 0; i < 0x20; i++)
+	for (i = 0x200; i < 0x220; i++)
 	{
 		UINT8 r,g,b;
 
@@ -774,7 +770,10 @@ static PALETTE_INIT(x1)
 
 	/* TODO: fix this */
 	for(i=0;i<8;i++)
+	{
+		palette_set_color_rgb(machine, i+0x000, pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
 		palette_set_color_rgb(machine, i+0x100, pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
+	}
 }
 
 static READ8_DEVICE_HANDLER( x1_porta_r )
@@ -1264,6 +1263,8 @@ ROM_START( x1 )
 
 	ROM_REGION(0x4c600, "cgrom", 0)
 	ROM_LOAD("fnt0808.x1", 0x00000, 0x00800, CRC(e3995a57) SHA1(1c1a0d8c9f4c446ccd7470516b215ddca5052fb2) )
+	ROM_RELOAD(            0x00800, 0x00800)
+	ROM_RELOAD(            0x01000, 0x00800)
 
 	ROM_REGION(0x4ac00, "kanji", ROMREGION_ERASEFF)
 ROM_END
@@ -1280,8 +1281,10 @@ ROM_START( x1ck )
 
 	ROM_REGION(0xc00, "pcg", ROMREGION_ERASEFF)
 
-	ROM_REGION(0x0800, "cgrom", 0)
-	ROM_LOAD("fnt0808.x1", 0x0000, 0x0800, CRC(e3995a57) SHA1(1c1a0d8c9f4c446ccd7470516b215ddca5052fb2) )
+	ROM_REGION(0x1800, "cgrom", 0)
+	ROM_LOAD("fnt0808.x1", 0x00000, 0x00800, CRC(e3995a57) SHA1(1c1a0d8c9f4c446ccd7470516b215ddca5052fb2) )
+	ROM_RELOAD(            0x00800, 0x00800)
+	ROM_RELOAD(            0x01000, 0x00800)
 
 	ROM_REGION(0x4ac00, "kanji", 0)
 	/* This is clearly a bad dump: size does not make sense and from 0x28000 on there are only 0xff */
@@ -1297,9 +1300,11 @@ ROM_START( x1turbo )
 
 	ROM_REGION(0xc00, "pcg", ROMREGION_ERASEFF)
 
-	ROM_REGION(0x0800, "cgrom", 0)
+	ROM_REGION(0x1800, "cgrom", 0)
 	/* This should be larger... hence, we are missing something (maybe part of the other fnt roms?) */
-	ROM_LOAD("fnt0808.x1", 0x0000, 0x0800, CRC(84a47530) SHA1(06c0995adc7a6609d4272417fe3570ca43bd0454) )
+	ROM_LOAD("fnt0808.x1", 0x00000, 0x0800, CRC(84a47530) SHA1(06c0995adc7a6609d4272417fe3570ca43bd0454) )
+	ROM_RELOAD(            0x00800, 0x00800)
+	ROM_RELOAD(            0x01000, 0x00800)
 
 	ROM_REGION(0x4ac00, "kanji", 0)
 	/* This is clearly a bad dump: size does not make sense and from 0x28000 on there are only 0xff */
