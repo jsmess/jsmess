@@ -1118,7 +1118,8 @@ static DEVICE_IMAGE_LOAD(c64_cart)
 			case SIMONS_BASIC:	/* Type #  4 */
 			case OCEAN_1:		/* Type #  5 */
 			case EXPERT:		/* Type #  6 */
-			case FUN_PLAY:          /* Type #  7 */
+			case FUN_PLAY:		/* Type #  7 */
+			case SUPER_GAMES:		/* Type #  8 */
 			case ATOMIC_POWER:	/* Type #  9 */
 			case EPYX_FASTLOAD:	/* Type # 10 */
 			case WESTERMANN:		/* Type # 11 */
@@ -1256,7 +1257,6 @@ static DEVICE_IMAGE_LOAD(c64_cart)
 		c64_game  = cbm_c64_game;
 	}
 
-
 	/* Finally load the cart */
 	roml = c64_roml;
 	romh = c64_romh;
@@ -1307,15 +1307,16 @@ static WRITE8_HANDLER( fc3_bank_w )
 			logerror("Warning: This cart type should have at most 4 banks and the cart looked for bank %d... Something strange is going on!\n", bank);
 		else
 		{
-//			memcpy(mem + c64_cbm_cart[bank].addr, cart + c64_cbm_cart[bank].start, c64_cbm_cart[bank].size);
 			memcpy(roml, cart + bank * 0x4000, 0x2000);
 			memcpy(romh, cart + bank * 0x4000 + 0x2000, 0x2000);
+/*
 			if (log_cart)
 			{
 				logerror("bank %d of size %d successfully loaded at %d!\n", bank, c64_cbm_cart[bank].size, c64_cbm_cart[bank].addr);
 				if (c64_cbm_cart[bank].index != bank)
 					logerror("Warning: According to the CHIP info this should be bank %d, but we are loading it as bank %d!\n", c64_cbm_cart[bank].index, bank);
 			}
+*/
 		}
 	}
 }
@@ -1323,7 +1324,7 @@ static WRITE8_HANDLER( fc3_bank_w )
 static WRITE8_HANDLER( ocean1_bank_w )
 {
 	// Type # 5
-	// working: Ghostbusters, Terminator 2
+	// working: Double Dragon, Ghostbusters, Terminator 2
 	// not working: Pang, Robocop 2, Toki
 
 	UINT8 bank = data & 0x3f;
@@ -1368,13 +1369,52 @@ static WRITE8_HANDLER( funplay_bank_w )
 		real_bank = ((bank & 0x01) << 3) + ((bank & 0x38) >> 3);
 
 		memcpy(roml, cart + real_bank * 0x2000, 0x2000);
-
+/*
 		if (log_cart)
 		{
 			logerror("bank %d of size %d successfully loaded at %d!\n", bank, c64_cbm_cart[bank].size, c64_cbm_cart[bank].addr);
 			if (c64_cbm_cart[bank].index != bank)
 				logerror("Warning: According to the CHIP info this should be bank %d, but we are loading it as bank %d!\n", c64_cbm_cart[bank].index, bank);
 		}
+*/
+	}
+}
+
+static WRITE8_HANDLER( supergames_bank_w )
+{
+	// Type # 8
+	// working:
+	// not working:
+
+	UINT8 bank = data & 0x03, bit2 = data & 0x04;
+	UINT8 *cart = memory_region(space->machine, "cart");
+
+	if (data & 0x04)
+	{
+		c64_game = 0;
+		c64_exrom = 0;
+	}
+	else
+	{
+		c64_game = 0;
+		c64_exrom = 0;
+	}
+
+	if (data == 0xc)
+	{
+		c64_game = 1;
+		c64_exrom = 1;
+	}
+
+	if (bit2)
+	{
+		memcpy(roml, cart + bank * 0x4000, 0x2000);
+		memcpy(romh, cart + bank * 0x4000 + 0x2000, 0x2000);
+	}
+	else
+	{
+		memcpy(roml, cart + bank * 0x4000, 0x2000);
+		memcpy(romh, cart + bank * 0x4000 + 0x2000, 0x2000);
 	}
 }
 
@@ -1391,13 +1431,14 @@ static WRITE8_HANDLER( c64gs_bank_w )
 		logerror("Warning: This cart type should have at most 64 banks and the cart looked for bank %d... Something strange is going on!\n", bank);
 
 	memcpy(roml, cart + bank * 0x2000, 0x2000);
-
+/*
 	if (log_cart)
 	{
 		logerror("bank %d of size %d successfully loaded at %d!\n", bank, c64_cbm_cart[bank].size, c64_cbm_cart[bank].addr);
 		if (c64_cbm_cart[bank].index != bank)
 			logerror("Warning: According to the CHIP info this should be bank %d, but we are loading it as bank %d!\n", c64_cbm_cart[bank].index, bank);
 	}
+*/
 }
 
 static READ8_HANDLER( dinamic_bank_r )
@@ -1413,14 +1454,14 @@ static READ8_HANDLER( dinamic_bank_r )
 		logerror("Warning: This cart type should have 16 banks and the cart looked for bank %d... Something strange is going on!\n", bank);
 
 	memcpy(roml, cart + bank * 0x2000, 0x2000);
-
+/*
 	if (log_cart)
 	{
 		logerror("bank %d of size %d successfully loaded at %d!\n", bank, c64_cbm_cart[bank].size, c64_cbm_cart[bank].addr);
 		if (c64_cbm_cart[bank].index != bank)
 			logerror("Warning: According to the CHIP info this should be bank %d, but we are loading it as bank %d!\n", c64_cbm_cart[bank].index, bank);
 	}
-
+*/
 	return 0;
 }
 
@@ -1474,6 +1515,9 @@ static void setup_c64_custom_mappers(running_machine *machine)
 			break;
 		case FUN_PLAY:          /* Type #  7 - 16 8k banks, loaded at 0x8000, banks chosen by writing to 0xde00 */
 			memory_install_write8_handler( space, 0xde00, 0xde00, 0, 0, funplay_bank_w );
+			break;
+		case SUPER_GAMES:		/* Type #  8 not working */
+			memory_install_write8_handler( space, 0xdf00, 0xdf00, 0, 0, supergames_bank_w );
 			break;
 		case ATOMIC_POWER:	/* Type #  9 not working */
 			break;
