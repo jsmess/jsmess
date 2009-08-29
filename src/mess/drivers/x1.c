@@ -13,7 +13,8 @@
 	- clean-ups!
 	- There are various unclear video things, these are:
 		- how layer clearance works? Dragon Buster relies on it
-		- I bet there's a PCG reset address tied to some bit, find it;
+		- PCG reset address is tied to the screen beams in some way;
+		- Support the alternative PCG upload mode;
 		- Add the extended gfx hookup;
 		- (anything else?)
 
@@ -149,28 +150,37 @@ static UINT8 hres_320,io_switch,io_sys;
 static UINT8 io_bank_mode;
 static UINT8 *gfx_bitmap_ram;
 static UINT16 pcg_index[3];
-
+static UINT8 pcg_reset;
+static UINT16 crtc_start_addr;
+static struct
+{
+	UINT8 gfx_bank;
+	UINT8 pcg_mode;
+}ply_reg;
 
 static VIDEO_START( x1 )
 {
 	colorram = auto_alloc_array(machine, UINT8, 0x1000);
 	videoram = auto_alloc_array(machine, UINT8, 0x1000);
-	gfx_bitmap_ram = auto_alloc_array(machine, UINT8, 0xc000);
+	gfx_bitmap_ram = auto_alloc_array(machine, UINT8, 0xc000*2);
 }
 
 static void draw_fgtilemap(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int w,int pri)
 {
 	int y,x,res_x,res_y;
+	int screen_mask;
+
+	screen_mask = (w == 2) ? 0xfff : 0x7ff;
 
 	for (y=0;y<25;y++)
 	{
 		for (x=0;x<40*w;x++)
 		{
-			int tile = videoram[x+(y*40*w)];
-			int color = colorram[x+(y*40*w)] & 0x1f;
-			int width = (colorram[x+(y*40*w)] & 0x80)>>7;
-			int height = (colorram[x+(y*40*w)] & 0x40)>>6;
-			int pcg_bank = (colorram[x+(y*40*w)] & 0x20)>>5;
+			int tile = videoram[(x+(y*40*w)+crtc_start_addr) & screen_mask];
+			int color = colorram[(x+(y*40*w)+crtc_start_addr) & screen_mask] & 0x1f;
+			int width = (colorram[(x+(y*40*w)+crtc_start_addr) & screen_mask] & 0x80)>>7;
+			int height = (colorram[(x+(y*40*w)+crtc_start_addr) & screen_mask] & 0x40)>>6;
+			int pcg_bank = (colorram[(x+(y*40*w)+crtc_start_addr) & screen_mask] & 0x20)>>5;
 			UINT8 *gfx_data = pcg_bank ? memory_region(machine, "pcg") : memory_region(machine, "cgrom");
 
 			if(((color & 0x8)>>3) != pri) continue;
@@ -218,13 +228,13 @@ static void draw_fgtilemap(running_machine *machine, bitmap_t *bitmap,const rect
 	}
 }
 
-static void draw_gfxbitmap(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int w)
+static void draw_gfxbitmap(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int w,int plane)
 {
 	int count,xi,yi,x,y;
 	int pen_r,pen_g,pen_b,color;
 	int yi_size;
 
-	count = 0;
+	count = crtc_start_addr;
 
 	yi_size = (w == 1) ? 16 : 8;
 
@@ -236,9 +246,9 @@ static void draw_gfxbitmap(running_machine *machine, bitmap_t *bitmap,const rect
 			{
 				for(xi=0;xi<8;xi++)
 				{
-					pen_b = (gfx_bitmap_ram[count+0x0000]>>(7-xi)) & 1;
-					pen_r = (gfx_bitmap_ram[count+0x4000]>>(7-xi)) & 1;
-					pen_g = (gfx_bitmap_ram[count+0x8000]>>(7-xi)) & 1;
+					pen_b = (gfx_bitmap_ram[count+0x0000+plane*0xc000]>>(7-xi)) & 1;
+					pen_r = (gfx_bitmap_ram[count+0x4000+plane*0xc000]>>(7-xi)) & 1;
+					pen_g = (gfx_bitmap_ram[count+0x8000+plane*0xc000]>>(7-xi)) & 1;
 
 					color =  pen_g<<2 | pen_r<<1 | pen_b<<0;
 
@@ -262,6 +272,7 @@ static void draw_gfxbitmap(running_machine *machine, bitmap_t *bitmap,const rect
 			}
 		}
 		count+= (w == 2) ? 48 : 24;
+		count&=0x3fff;
 	}
 }
 
@@ -274,13 +285,16 @@ static VIDEO_UPDATE( x1 )
 	bitmap_fill(bitmap, cliprect, screen->machine->pens[0x100]);
 
 	draw_fgtilemap(screen->machine,bitmap,cliprect,w,0);
-	draw_gfxbitmap(screen->machine,bitmap,cliprect,w);
+	draw_gfxbitmap(screen->machine,bitmap,cliprect,w,0);
+	draw_gfxbitmap(screen->machine,bitmap,cliprect,w,1);
 	draw_fgtilemap(screen->machine,bitmap,cliprect,w,1);
 
 	return 0;
 }
 
-
+static VIDEO_EOF( x1 )
+{
+}
 
 static UINT8 sub_cmd,sub_val,key_flag;
 
@@ -522,8 +536,15 @@ static WRITE8_HANDLER( x1_pcg_w )
 
 	addr = (offset & 0x300) >> 8;
 
+	if(pcg_reset)
+	{
+		pcg_index[0] = pcg_index[1] = pcg_index[2] = 0;
+		pcg_reset = 0;
+	}
+
 	if(addr == 0)
 	{
+		/* FIXME: this is wrong (it's for the BIOS GFX ROM, read only)  */
 		/* maybe data actually? */
 		pcg_index[0] = data*8;
 		pcg_index[1] = data*8;
@@ -531,24 +552,32 @@ static WRITE8_HANDLER( x1_pcg_w )
 	}
 	else
 	{
-		pcg_offset = (pcg_index[addr-1]) & 0x7ff;
-		pcg_offset+=((addr-1)*0x800);
-		PCG_RAM[pcg_offset] = data;
+//		if(!ply_reg.pcg_mode)
+//		{
+			//( ((V_CNT-CRT_YL)/FNT_YL) + TXT_YL) * TXT_XL
+//			int v_count = video_screen_get_vpos(space->machine->primary_screen);
+//
+//		}
+//		else
+		{
+			pcg_offset = (pcg_index[addr-1]) & 0x7ff;
+			pcg_offset+=((addr-1)*0x800);
+			PCG_RAM[pcg_offset] = data;
 
-		pcg_offset &= 0x7ff;
+			pcg_offset &= 0x7ff;
 
-    	gfx_element_mark_dirty(space->machine->gfx[4], pcg_offset >> 3);
-    	gfx_element_mark_dirty(space->machine->gfx[5], pcg_offset >> 3);
-    	gfx_element_mark_dirty(space->machine->gfx[6], pcg_offset >> 3);
-    	gfx_element_mark_dirty(space->machine->gfx[7], pcg_offset >> 3);
+    		gfx_element_mark_dirty(space->machine->gfx[4], pcg_offset >> 3);
+    		gfx_element_mark_dirty(space->machine->gfx[5], pcg_offset >> 3);
+    		gfx_element_mark_dirty(space->machine->gfx[6], pcg_offset >> 3);
+    		gfx_element_mark_dirty(space->machine->gfx[7], pcg_offset >> 3);
 
-  		pcg_index[addr-1]++;
+  			pcg_index[addr-1]++;
+		}
 	}
 }
 
 static READ8_HANDLER( x1_clr_r )
 {
-	//memset(gfx_bitmap_ram,0x00,0xc000);
 
 	return 0xff;
 }
@@ -557,8 +586,8 @@ static READ8_HANDLER( x1_io_r )
 {
 	io_bank_mode = 0; //any read disables the extended mode.
 
-	if(offset >= 0x0704 && offset <= 0x0707)    	{ return z80ctc_r(devtag_get_device(space->machine, "ctc"), offset-0x0704); }
-	else if(offset == 0x07d0)                    	{ return x1_clr_r(space, 0); }
+	if(offset == 0x0000)                        	{ return x1_clr_r(space, 0); }
+	else if(offset >= 0x0704 && offset <= 0x0707)   { return z80ctc_r(devtag_get_device(space->machine, "ctc"), offset-0x0704); }
 	else if(offset == 0x0e03)                    	{ return x1_rom_r(space, 0); }
 	else if(offset >= 0x0ff8 && offset <= 0x0fff)	{ return x1_fdc_r(space, offset-0xff8); }
 	else if(offset >= 0x1900 && offset <= 0x19ff)	{ return sub_io_r(space, 0); }
@@ -570,7 +599,7 @@ static READ8_HANDLER( x1_io_r )
 //	else if(offset >= 0x1fd0 && offset <= 0x1fdf)	{ return x1_scrn_r(space,offset-0x1fd0); }
 	else if(offset >= 0x2000 && offset <= 0x2fff)	{ return colorram[offset-0x2000]; }
 	else if(offset >= 0x3000 && offset <= 0x3fff)	{ return videoram[offset-0x3000]; }
-	else if(offset >= 0x4000 && offset <= 0xffff)	{ return gfx_bitmap_ram[offset-0x4000]; }
+	else if(offset >= 0x4000 && offset <= 0xffff)	{ return gfx_bitmap_ram[offset-0x4000+(ply_reg.gfx_bank*0xc000)]; }
 	else
 	{
 		logerror("(PC=%06x) Read i/o address %04x\n",cpu_get_pc(space->cpu),offset);
@@ -584,6 +613,33 @@ static WRITE8_HANDLER( x1_ex_gfxram_w )
 //		fatalerror("Extended GFX RAM write %02x %04x",data,offset);
 }
 
+static WRITE8_HANDLER( x1_ply_w )
+{
+	ply_reg.pcg_mode = (data & 0x20)>>5;
+	ply_reg.gfx_bank = (data & 0x10)>>4;
+}
+
+static WRITE8_HANDLER( x1_6845_w )
+{
+	static int addr_latch;
+
+	if(offset == 0)
+	{
+		addr_latch = data;
+		mc6845_address_w(devtag_get_device(space->machine, "crtc"), 0,data);
+	}
+	else
+	{
+		/* FIXME: this should be inside the MC6845 core! */
+		if(addr_latch == 0x0c)
+			crtc_start_addr = ((data<<8) & 0x3f00) | (crtc_start_addr & 0xff);
+		else if(addr_latch == 0x0d)
+			crtc_start_addr = (crtc_start_addr & 0x3f00) | (data & 0xff);
+
+		mc6845_register_w(devtag_get_device(space->machine, "crtc"), 0,data);
+	}
+}
+
 static WRITE8_HANDLER( x1_io_w )
 {
 	if(io_bank_mode == 1)                        	{ x1_ex_gfxram_w(space, offset, data); }
@@ -595,10 +651,9 @@ static WRITE8_HANDLER( x1_io_w )
 	else if(offset >= 0x1000 && offset <= 0x10ff)	{ x1_pal_b_w(space, 0,data); }
 	else if(offset >= 0x1100 && offset <= 0x11ff)	{ x1_pal_r_w(space, 0,data); }
 	else if(offset >= 0x1200 && offset <= 0x12ff)	{ x1_pal_g_w(space, 0,data); }
-//	else if(offset >= 0x1300 && offset <= 0x13ff)	{ x1_ply_w(space->machine, 0,data; }
+	else if(offset >= 0x1300 && offset <= 0x13ff)	{ x1_ply_w(space, 0,data); }
 	else if(offset >= 0x1400 && offset <= 0x17ff)	{ x1_pcg_w(space, offset-0x1400,data); }
-	else if(offset == 0x1800                    )	{ mc6845_address_w(devtag_get_device(space->machine, "crtc"), 0,data); }
-	else if(offset == 0x1801                    )	{ mc6845_register_w(devtag_get_device(space->machine, "crtc"), 0,data); }
+	else if(offset == 0x1800 || offset == 0x1801)	{ x1_6845_w(space, offset-0x1800, data); }
 	else if(offset >= 0x1900 && offset <= 0x19ff)	{ sub_io_w(space, 0,data); }
 	else if(offset >= 0x1a00 && offset <= 0x1aff)	{ ppi8255_w(devtag_get_device(space->machine, "ppi8255_0"), (offset-0x1a00) & 3,data); }
 	else if(offset >= 0x1b00 && offset <= 0x1bff)	{ ay8910_data_w(devtag_get_device(space->machine, "ay"), 0,data); }
@@ -612,7 +667,7 @@ static WRITE8_HANDLER( x1_io_w )
 //	else if(offset >= 0x1fd0 && offset <= 0x1fdf)	{ x1_scrn_w(space->machine,offset-0x1fd0,data); }
 	else if(offset >= 0x2000 && offset <= 0x2fff)	{ colorram[offset-0x2000] = data; }
 	else if(offset >= 0x3000 && offset <= 0x3fff)	{ videoram[offset-0x3000] = data; }
-	else if(offset >= 0x4000 && offset <= 0xffff)	{ gfx_bitmap_ram[offset-0x4000] = data; }
+	else if(offset >= 0x4000 && offset <= 0xffff)	{ gfx_bitmap_ram[offset-0x4000+(ply_reg.gfx_bank*0xc000)] = data; }
 	else
 	{
 		logerror("(PC=%06x) Write %02x at i/o address %04x\n",cpu_get_pc(space->cpu),data,offset);
@@ -1106,7 +1161,7 @@ static MACHINE_RESET( x1 )
 
 	memory_set_bankptr(machine, 1, &ROM[0x00000]);
 
-	memset(gfx_bitmap_ram,0x00,0xc000);
+	memset(gfx_bitmap_ram,0x00,0xc000*2);
 
 	for(i=0;i<0x1800;i++)
 	{
@@ -1150,12 +1205,17 @@ static const ay8910_interface ay8910_config =
 	DEVCB_NULL
 };
 
+static INTERRUPT_GEN( x1_vbl )
+{
+//	pcg_reset = 1;
+}
 
 static MACHINE_DRIVER_START( x1 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_4MHz)
 	MDRV_CPU_PROGRAM_MAP(x1_mem)
 	MDRV_CPU_IO_MAP(x1_io)
+	MDRV_CPU_VBLANK_INT("screen", x1_vbl)
 
 	MDRV_Z80CTC_ADD( "ctc", XTAL_4MHz , ctc_intf )
 
@@ -1179,6 +1239,7 @@ static MACHINE_DRIVER_START( x1 )
 
 	MDRV_VIDEO_START(x1)
 	MDRV_VIDEO_UPDATE(x1)
+	MDRV_VIDEO_EOF(x1)
 
 	MDRV_MB8877_ADD("fdc",x1_mb8877a_interface)
 
