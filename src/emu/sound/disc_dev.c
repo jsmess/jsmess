@@ -141,11 +141,11 @@ struct dsd_ls624_context
  *
  * Jan 2004, D Renaud.
  ************************************************************************/
-#define DSD_555_ASTBL__RESET	(! *(node->input[0]))
-#define DSD_555_ASTBL__R1		(*(node->input[1]))
-#define DSD_555_ASTBL__R2		(*(node->input[2]))
-#define DSD_555_ASTBL__C		(*(node->input[3]))
-#define DSD_555_ASTBL__CTRLV	(*(node->input[4]))
+#define DSD_555_ASTBL__RESET	(! DISCRETE_INPUT(0))
+#define DSD_555_ASTBL__R1		DISCRETE_INPUT(1)
+#define DSD_555_ASTBL__R2		DISCRETE_INPUT(2)
+#define DSD_555_ASTBL__C		DISCRETE_INPUT(3)
+#define DSD_555_ASTBL__CTRLV	DISCRETE_INPUT(4)
 
 /* bit mask of the above RC inputs */
 #define DSD_555_ASTBL_RC_MASK	0x0e
@@ -234,7 +234,7 @@ static DISCRETE_STEP(dsd_555_astbl)
      * dt = R*C(log(1/(1-(Vc/Vr))))
      */
 
-	dt = disc_info->sample_time;
+	dt = node->info->sample_time;
 
 	/* Sometimes a switching network is used to setup the capacitance.
      * These may select no capacitor, causing oscillation to stop.
@@ -338,7 +338,7 @@ static DISCRETE_STEP(dsd_555_astbl)
 	}
 
 	/* Convert last switch time to a ratio */
-	x_time = x_time / disc_info->sample_time;
+	x_time = x_time / node->info->sample_time;
 
 	switch (context->output_type)
 	{
@@ -387,7 +387,7 @@ static DISCRETE_RESET(dsd_555_astbl)
 	context->v_out_high = (info->v_out_high == DEFAULT_555_HIGH) ? info->v_pos - 1.2 : info->v_out_high;
 
 	/* setup v_charge or node */
-	v_charge_node = discrete_find_node(disc_info, info->v_charge);
+	v_charge_node = discrete_find_node(node->info, info->v_charge);
 	if (v_charge_node)
 		context->v_charge_node = &(v_charge_node->output[NODE_CHILD_NODE_NUM(info->v_charge)]);
 	else
@@ -450,10 +450,10 @@ static DISCRETE_RESET(dsd_555_astbl)
  *
  * Oct 2004, D Renaud.
  ************************************************************************/
-#define DSD_555_MSTBL__RESET	(! *(node->input[0]))
-#define DSD_555_MSTBL__TRIGGER	(*(node->input[1]))
-#define DSD_555_MSTBL__R		(*(node->input[2]))
-#define DSD_555_MSTBL__C		(*(node->input[3]))
+#define DSD_555_MSTBL__RESET	(! DISCRETE_INPUT(0))
+#define DSD_555_MSTBL__TRIGGER	DISCRETE_INPUT(1)
+#define DSD_555_MSTBL__R		DISCRETE_INPUT(2)
+#define DSD_555_MSTBL__C		DISCRETE_INPUT(3)
 
 static DISCRETE_STEP(dsd_555_mstbl)
 {
@@ -548,7 +548,7 @@ static DISCRETE_RESET(dsd_555_mstbl)
 	context->output_type = info->options & DISC_555_OUT_MASK;
 	if ((context->output_type == DISC_555_OUT_COUNT_F) || (context->output_type == DISC_555_OUT_COUNT_R))
 	{
-		discrete_log(disc_info, "Invalid Output type in NODE_%d.\n", node->node - NODE_00);
+		discrete_log(node->info, "Invalid Output type in NODE_%d.\n", node->node - NODE_00);
 		context->output_type = DISC_555_OUT_SQW;
 	}
 
@@ -590,13 +590,13 @@ static DISCRETE_RESET(dsd_555_mstbl)
  *
  * Mar 2004, D Renaud.
  ************************************************************************/
-#define DSD_555_CC__RESET	(! *(node->input[0]))
-#define DSD_555_CC__VIN		(*(node->input[1]))
-#define DSD_555_CC__R		(*(node->input[2]))
-#define DSD_555_CC__C		(*(node->input[3]))
-#define DSD_555_CC__RBIAS	(*(node->input[4]))
-#define DSD_555_CC__RGND	(*(node->input[5]))
-#define DSD_555_CC__RDIS	(*(node->input[6]))
+#define DSD_555_CC__RESET	(! DISCRETE_INPUT(0))
+#define DSD_555_CC__VIN		DISCRETE_INPUT(1)
+#define DSD_555_CC__R		DISCRETE_INPUT(2)
+#define DSD_555_CC__C		DISCRETE_INPUT(3)
+#define DSD_555_CC__RBIAS	DISCRETE_INPUT(4)
+#define DSD_555_CC__RGND	DISCRETE_INPUT(5)
+#define DSD_555_CC__RDIS	DISCRETE_INPUT(6)
 
 /* bit mask of the above RC inputs not including DSD_555_CC__R */
 #define DSD_555_CC_RC_MASK	0x78
@@ -642,7 +642,7 @@ static DISCRETE_STEP(dsd_555_cc)
 		return;
 	}
 
-	dt    = disc_info->sample_time;	/* Change in time */
+	dt    = node->info->sample_time;	/* Change in time */
 	v_cap = context->cap_voltage;	/* Set to voltage before change */
 	v_vcharge_limit = DSD_555_CC__VIN + info->v_cc_junction;	/* the max v_cap can be and still be charged by i */
 	/* Calculate charging current */
@@ -888,7 +888,7 @@ static DISCRETE_STEP(dsd_555_cc)
 	context->cap_voltage = v_cap_next;
 
 	/* Convert last switch time to a ratio */
-	x_time = x_time / disc_info->sample_time;
+	x_time = x_time / node->info->sample_time;
 
 	switch (context->output_type)
 	{
@@ -1155,9 +1155,9 @@ static DISCRETE_RESET(dsd_555_cc)
  *
  * Apr 2006, D Renaud.
  ************************************************************************/
-#define DSD_555_VCO1__RESET	(*(node->input[0]))	/* reset active low */
-#define DSD_555_VCO1__VIN1	(*(node->input[1]))
-#define DSD_555_VCO1__VIN2	(*(node->input[2]))
+#define DSD_555_VCO1__RESET	DISCRETE_INPUT(0)	/* reset active low */
+#define DSD_555_VCO1__VIN1	DISCRETE_INPUT(1)
+#define DSD_555_VCO1__VIN2	DISCRETE_INPUT(2)
 
 static DISCRETE_STEP(dsd_555_vco1)
 {
@@ -1171,7 +1171,7 @@ static DISCRETE_STEP(dsd_555_vco1)
 	double	v_cap;			/* Current voltage on capacitor, before dt */
 	double	v_cap_next = 0;	/* Voltage on capacitor, after dt */
 
-	dt    = disc_info->sample_time;	/* Change in time */
+	dt    = node->info->sample_time;	/* Change in time */
 	v_cap = context->cap_voltage;
 
 	/* Check: if the Control Voltage node is connected. */
@@ -1275,7 +1275,7 @@ static DISCRETE_STEP(dsd_555_vco1)
 	context->cap_voltage = v_cap_next;
 
 	/* Convert last switch time to a ratio.  No x_time in reset. */
-	x_time = x_time / disc_info->sample_time;
+	x_time = x_time / node->info->sample_time;
 	if (!DSD_555_VCO1__RESET) x_time = 0;
 
 	switch (context->output_type)
@@ -1385,10 +1385,10 @@ static DISCRETE_RESET(dsd_555_vco1)
  *
  * Mar 2004, D Renaud.
  ************************************************************************/
-#define DSD_566__ENABLE	(*(node->input[0]))
-#define DSD_566__VMOD	(*(node->input[1]))
-#define DSD_566__R		(*(node->input[2]))
-#define DSD_566__C		(*(node->input[3]))
+#define DSD_566__ENABLE	DISCRETE_INPUT(0)
+#define DSD_566__VMOD	DISCRETE_INPUT(1)
+#define DSD_566__R		DISCRETE_INPUT(2)
+#define DSD_566__C		DISCRETE_INPUT(3)
 
 static DISCRETE_STEP(dsd_566)
 {
@@ -1403,7 +1403,7 @@ static DISCRETE_STEP(dsd_566)
 
 	if (DSD_566__ENABLE && !context->error)
 	{
-		dt    = disc_info->sample_time;	/* Change in time */
+		dt    = node->info->sample_time;	/* Change in time */
 		v_cap = context->cap_voltage;	/* Set to voltage before change */
 
 		/* get the v_charge and update each step if it is a node */
@@ -1528,7 +1528,7 @@ static DISCRETE_RESET(dsd_566)
 	}
 
 	/* setup v_charge or node */
-	v_charge_node = discrete_find_node(disc_info, info->v_charge);
+	v_charge_node = discrete_find_node(node->info, info->v_charge);
 	if (v_charge_node)
 		context->v_charge_node = &(v_charge_node->output[NODE_CHILD_NODE_NUM(info->v_charge)]);
 	else
@@ -1575,11 +1575,11 @@ static DISCRETE_RESET(dsd_566)
  *
  * Dec 2007, Couriersud
  ************************************************************************/
-#define DSD_LS624__ENABLE	(*(node->input[0]))
-#define DSD_LS624__VMOD		(*(node->input[1]))
-#define DSD_LS624__VRNG		(*(node->input[2]))
-#define DSD_LS624__C		(*(node->input[3]))
-#define DSD_LS624__OUTTYPE	(*(node->input[4]))
+#define DSD_LS624__ENABLE	DISCRETE_INPUT(0)
+#define DSD_LS624__VMOD		DISCRETE_INPUT(1)
+#define DSD_LS624__VRNG		DISCRETE_INPUT(2)
+#define DSD_LS624__C		DISCRETE_INPUT(3)
+#define DSD_LS624__OUTTYPE	DISCRETE_INPUT(4)
 
 /*
  * The datasheet mentions a 600 ohm discharge. It also gives
@@ -1608,7 +1608,7 @@ static DISCRETE_STEP(dsd_ls624)
 		double  en = 0.0f;
 		int		cntf = 0, cntr = 0;
 
-		sample_t = disc_info->sample_time;	/* Change in time */
+		sample_t = node->info->sample_time;	/* Change in time */
 		//dt  = LS624_T(DSD_LS624__C, DSD_LS624__VRNG, DSD_LS624__VMOD) / 2.0;
 		dt  = 1.0f / (2.0f * LS624_F(DSD_LS624__C, DSD_LS624__VMOD, DSD_LS624__VRNG));
 		t   = context->remain;

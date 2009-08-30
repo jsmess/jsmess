@@ -3026,7 +3026,8 @@ V-V                           TP-027
 	DRIVER( shangtou )	/* 2002.02 Shanghai Sangokuhaitougi */
 	DRIVER( xiistag )	/* 2002.07 XII Stag (V2.01J) */
 	DRIVER( sianniv )	/* 2003.10 Space Invaders Anniversary (V2.02J) */
-	DRIVER( kollon )	/* 2003.11 Kollon */
+	DRIVER( kollon )	/* 2003.11 Kollon (V2.04J) */
+	DRIVER( kollonc )	/* 2003.11 Kollon (V2.04JC, Compact Flash version) */
 	DRIVER( zooo )		/* 2004.05 Zooo */
 
 	/* Namco System 11 */
@@ -4263,7 +4264,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 16 */
 						/* 17 */
 						/* 18 */
-						/* 19 */
+	DRIVER( mt_gfoot )	/* 19 */
 	DRIVER( mt_lastb )	/* 20 */
 	DRIVER( mt_wcsoc )	/* 21 */
 	DRIVER( mt_tetri )	/* 22 */
@@ -6733,6 +6734,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( strkforc )	/* (c) 1991 Midway */
 	DRIVER( mk )		/* (c) 1992 Midway */
 	DRIVER( mkr4 )		/* (c) 1992 Midway */
+	DRIVER( mkturbo )	/* bootleg */
 	DRIVER( mkprot8 )	/* (c) 1992 Midway */
 	DRIVER( mkprot9 )	/* (c) 1992 Midway */
 	DRIVER( mkla1 )		/* (c) 1992 Midway */
@@ -6849,7 +6851,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( tm7ka )		/* (c) 1999 Midway Games */
 	DRIVER( tm7keval )	/* (c) 1999 Midway Games */
 	DRIVER( tm8k )		/* (c) 2000 Midway Games */
-	DRIVER( galgbios )	/* (c) 1998 Creative Electonics & Software (CES) */
+	DRIVER( galgbios )	/* (c) 1998 Creative Electronics & Software (CES) */
+	DRIVER( galgame2 )	/* (c) 1998 Creative Electronics & Software (CES) / Namco */
 
 	/* Cinematronics raster games */
 	DRIVER( embargo )
@@ -6918,6 +6921,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	/* TIA-MC1 hardware games */
 	DRIVER( konek )		/* (c) 1988 Terminal */
 	DRIVER( sosterm )	/* (c) 1988 Terminal */
+	DRIVER( bilyard )	/* (c) 1988 Terminal */
 
 	/* Photon hardware games */
 	DRIVER( phtetris )
@@ -8737,6 +8741,7 @@ Other Sun games
 	DRIVER( spitboss )	/* (c) 1988 Merit */
 	DRIVER( pitbosss )	/* (c) 1990 Merit */
 	DRIVER( pitbossm )	/* (c) 1994 Merit */
+	DRIVER( pitbossma )	/* (c) 1994 Merit */
 	DRIVER( pbst30 )	/* (c) 1994 Merit */
 	DRIVER( pbst30b )	/* (c) 1993 Merit */
 	DRIVER( megat3 )	/* (c) 1996 Merit */
@@ -9494,8 +9499,11 @@ Other Sun games
 
 	/* Hi-Lo Poker-based */
 	DRIVER( gtipoker )	/* (c) 1983 GTI Inc */
-	DRIVER( norautp )	/* (c) 1988? Noraut */
-	DRIVER( norautjp )	/* (c) 1988? Noraut */
+	DRIVER( norautp )	/* (c) 1988? Noraut Ltd */
+	DRIVER( norautjp )	/* (c) 1988? Noraut Ltd */
+	DRIVER( norautrh )	/* (c) 1988? Noraut Ltd */
+	DRIVER( norautu )	/* (c) 1988? Noraut Ltd */
+	DRIVER( norautv3 )	/* (c) 1988? Noraut Ltd */
 	DRIVER( norautpn )	/* (c) 1990? unknown */
 
 	/* Sanki Denshi Kogyo */

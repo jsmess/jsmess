@@ -169,13 +169,13 @@
  *            -||-
  *             C2
  ************************************************************************/
-#define MARIO_CUSTOM_VOUT		(*(node->input[0]))
-#define MARIO_CUSTOM_IN1		(*(node->input[1]))
-#define MARIO_CUSTOM_IN2		(*(node->input[2]))
-#define MARIO_CUSTOM_C1			(*(node->input[3]))
-#define MARIO_CUSTOM_C2			(*(node->input[4]))
-#define MARIO_CUSTOM_R1			(*(node->input[5]))
-#define MARIO_CUSTOM_C3			(*(node->input[6]))
+#define MARIO_CUSTOM_VOUT		DISCRETE_INPUT(0)
+#define MARIO_CUSTOM_IN1		DISCRETE_INPUT(1)
+#define MARIO_CUSTOM_IN2		DISCRETE_INPUT(2)
+#define MARIO_CUSTOM_C1			DISCRETE_INPUT(3)
+#define MARIO_CUSTOM_C2			DISCRETE_INPUT(4)
+#define MARIO_CUSTOM_R1			DISCRETE_INPUT(5)
+#define MARIO_CUSTOM_C3			DISCRETE_INPUT(6)
 
 struct mario_custom_run_context
 {
@@ -192,7 +192,7 @@ static DISCRETE_STEP( mario_custom_run )
 
 	double	t1	= 0.5 / LS624_F(MARIO_CUSTOM_C1, MARIO_CUSTOM_IN1, RUN_VCO_VOLTAGE);
 	double	t2	= 0.5 / LS624_F(MARIO_CUSTOM_C2, MARIO_CUSTOM_IN2, RUN_VCO_VOLTAGE);
-	double  sample_t = disc_info->sample_time;
+	double  sample_t = node->info->sample_time;
 	double  vn, t;
 
 	//if (MARIO_CUSTOM_VOUT)
@@ -258,9 +258,7 @@ static DISCRETE_RESET( mario_custom_run )
 
 static const discrete_custom_info mario_custom_run_info =
 {
-	DISCRETE_RESET_NAME( mario_custom_run ),
-	DISCRETE_STEP_NAME( mario_custom_run ),
-	sizeof(struct mario_custom_run_context),
+	DISCRETE_CUSTOM_MODULE( mario_custom_run, struct mario_custom_run_context),
 	NULL
 };
 

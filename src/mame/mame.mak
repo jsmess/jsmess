@@ -114,6 +114,7 @@ CPUS += SSEM
 CPUS += AVR8
 CPUS += TMS0980
 CPUS += I4004
+CPUS += SUPERFX
 
 
 #-------------------------------------------------
@@ -1749,6 +1750,9 @@ $(DRIVERS)/namcos2.o:	$(LAYOUT)/finallap.lh
 
 $(DRIVERS)/neogeo.o:	$(LAYOUT)/neogeo.lh
 
+$(DRIVERS)/norautp.o:	$(LAYOUT)/noraut11.lh \
+						$(LAYOUT)/noraut12.lh
+
 $(DRIVERS)/overdriv.o:	$(LAYOUT)/overdriv.lh
 
 $(DRIVERS)/peplus.o:	$(LAYOUT)/peplus.lh \
@@ -1841,3 +1845,6 @@ $(DRIVERS)/zac2650.o:	$(LAYOUT)/tinv2650.lh
 $(DRIVERS)/galaxian.o:	$(MAMESRC)/drivers/galdrvr.c
 $(DRIVERS)/mpu4.o:		$(MAMESRC)/drivers/mpu4drvr.c
 $(DRIVERS)/neogeo.o:	$(MAMESRC)/drivers/neodrvr.c
+$(MACHINE)/snes.o: 		$(MAMESRC)/machine/snesdsp1.c \
+						$(MAMESRC)/machine/snesdsp2.c \
+						$(MAMESRC)/machine/snesobc1.c

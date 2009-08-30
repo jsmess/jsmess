@@ -73,6 +73,7 @@ struct dst_rcdisc_context
 	double exponent0;
 	double exponent1;
 	double v_cap;		/* rcdisc5 */
+	double v_diode;		/* rcdisc3 */
 };
 
 struct dst_rcdisc_mod_context
@@ -134,11 +135,11 @@ struct dst_rcintegrate_context
  * input[4]    - Voltage reference. Usually 0V.
  *
  ************************************************************************/
-#define DST_CRFILTER__ENABLE	(*(node->input[0]))
-#define DST_CRFILTER__IN		(*(node->input[1]))
-#define DST_CRFILTER__R			(*(node->input[2]))
-#define DST_CRFILTER__C			(*(node->input[3]))
-#define DST_CRFILTER__VREF		(*(node->input[4]))
+#define DST_CRFILTER__ENABLE	DISCRETE_INPUT(0)
+#define DST_CRFILTER__IN		DISCRETE_INPUT(1)
+#define DST_CRFILTER__R			DISCRETE_INPUT(2)
+#define DST_CRFILTER__C			DISCRETE_INPUT(3)
+#define DST_CRFILTER__VREF		DISCRETE_INPUT(4)
 
 static DISCRETE_STEP(dst_crfilter)
 {
@@ -175,10 +176,10 @@ static DISCRETE_RESET(dst_crfilter)
  * input[3]    - Filter type (initialization only)
  *
  ************************************************************************/
-#define DST_FILTER1__ENABLE	(*(node->input[0]))
-#define DST_FILTER1__IN		(*(node->input[1]))
-#define DST_FILTER1__FREQ	(*(node->input[2]))
-#define DST_FILTER1__TYPE	(*(node->input[3]))
+#define DST_FILTER1__ENABLE	DISCRETE_INPUT(0)
+#define DST_FILTER1__IN		DISCRETE_INPUT(1)
+#define DST_FILTER1__FREQ	DISCRETE_INPUT(2)
+#define DST_FILTER1__TYPE	DISCRETE_INPUT(3)
 
 static void calculate_filter1_coefficients(const discrete_info *disc_info, double fc, double type,
 										   double *a1, double *b0, double *b1)
@@ -228,7 +229,7 @@ static DISCRETE_RESET(dst_filter1)
 {
 	struct dss_filter1_context *context = (struct dss_filter1_context *)node->context;
 
-	calculate_filter1_coefficients(disc_info, DST_FILTER1__FREQ, DST_FILTER1__TYPE, &context->a1, &context->b0, &context->b1);
+	calculate_filter1_coefficients(node->info, DST_FILTER1__FREQ, DST_FILTER1__TYPE, &context->a1, &context->b0, &context->b1);
 	node->output[0] = 0;
 }
 
@@ -244,11 +245,11 @@ static DISCRETE_RESET(dst_filter1)
  * input[4]    - Filter type (initialization only)
  *
  ************************************************************************/
-#define DST_FILTER2__ENABLE	(*(node->input[0]))
-#define DST_FILTER2__IN		(*(node->input[1]))
-#define DST_FILTER2__FREQ	(*(node->input[2]))
-#define DST_FILTER2__DAMP	(*(node->input[3]))
-#define DST_FILTER2__TYPE	(*(node->input[4]))
+#define DST_FILTER2__ENABLE	DISCRETE_INPUT(0)
+#define DST_FILTER2__IN		DISCRETE_INPUT(1)
+#define DST_FILTER2__FREQ	DISCRETE_INPUT(2)
+#define DST_FILTER2__DAMP	DISCRETE_INPUT(3)
+#define DST_FILTER2__TYPE	DISCRETE_INPUT(4)
 
 static void calculate_filter2_coefficients(const discrete_info *disc_info,
 		                                   double fc, double d, double type,
@@ -258,7 +259,7 @@ static void calculate_filter2_coefficients(const discrete_info *disc_info,
 	double w;	/* cutoff freq, in radians/sec */
 	double w_squared;
 	double den;	/* temp variable */
-	double two_over_T = 2*disc_info->sample_rate;
+	double two_over_T = 2 * disc_info->sample_rate;
 	double two_over_T_squared = two_over_T * two_over_T;
 
 	/* calculate digital filter coefficents */
@@ -317,7 +318,7 @@ static DISCRETE_RESET(dst_filter2)
 {
 	struct dss_filter2_context *context = (struct dss_filter2_context *)node->context;
 
-	calculate_filter2_coefficients(disc_info, DST_FILTER2__FREQ, DST_FILTER2__DAMP, DST_FILTER2__TYPE,
+	calculate_filter2_coefficients(node->info, DST_FILTER2__FREQ, DST_FILTER2__DAMP, DST_FILTER2__TYPE,
 								   &context->a1, &context->a2,
 								   &context->b0, &context->b1, &context->b2);
 	node->output[0] = 0;
@@ -337,10 +338,10 @@ static DISCRETE_RESET(dst_filter2)
  *
  * Mar 2004, D Renaud.
  ************************************************************************/
-#define DST_OP_AMP_FILT__ENABLE	(*(node->input[0]))
-#define DST_OP_AMP_FILT__INP1	(*(node->input[1]))
-#define DST_OP_AMP_FILT__INP2	(*(node->input[2]))
-#define DST_OP_AMP_FILT__TYPE	(*(node->input[3]))
+#define DST_OP_AMP_FILT__ENABLE	DISCRETE_INPUT(0)
+#define DST_OP_AMP_FILT__INP1	DISCRETE_INPUT(1)
+#define DST_OP_AMP_FILT__INP2	DISCRETE_INPUT(2)
+#define DST_OP_AMP_FILT__TYPE	DISCRETE_INPUT(3)
 
 static DISCRETE_STEP(dst_op_amp_filt)
 {
@@ -360,9 +361,21 @@ static DISCRETE_STEP(dst_op_amp_filt)
 		{
 			/* Millman the input voltages. */
 			i  = context->iFixed;
-			i += (DST_OP_AMP_FILT__INP1 - context->vRef) / info->r1;
-			if (info->r2 != 0)
-				i += (DST_OP_AMP_FILT__INP2 - context->vRef) / info->r2;
+			switch (context->type)
+			{
+				case DISC_OP_AMP_FILTER_IS_LOW_PASS_1M:
+					i += (DST_OP_AMP_FILT__INP1 - DST_OP_AMP_FILT__INP2) / info->r1;
+					if (info->r2 != 0)
+						i += (context->vP - DST_OP_AMP_FILT__INP2) / info->r2;
+					if (info->r3 != 0)
+						i += (context->vN - DST_OP_AMP_FILT__INP2) / info->r3;
+					break;
+				default:
+					i += (DST_OP_AMP_FILT__INP1 - context->vRef) / info->r1;
+					if (info->r2 != 0)
+						i += (DST_OP_AMP_FILT__INP2 - context->vRef) / info->r2;
+					break;
+			}
 			v = i * context->rTotal;
 		}
 
@@ -371,6 +384,11 @@ static DISCRETE_STEP(dst_op_amp_filt)
 			case DISC_OP_AMP_FILTER_IS_LOW_PASS_1:
 				context->vC1 += (v - context->vC1) * context->exponentC1;
 				node->output[0] = context->vC1 * context->gain + info->vRef;
+				break;
+
+			case DISC_OP_AMP_FILTER_IS_LOW_PASS_1M:
+				context->vC1 += (v - context->vC1) * context->exponentC1;
+				node->output[0] = context->vC1 * context->gain + DST_OP_AMP_FILT__INP2;
 				break;
 
 			case DISC_OP_AMP_FILTER_IS_HIGH_PASS_1:
@@ -470,6 +488,7 @@ static DISCRETE_RESET(dst_op_amp_filt)
 	switch (context->type)
 	{
 		case DISC_OP_AMP_FILTER_IS_LOW_PASS_1:
+		case DISC_OP_AMP_FILTER_IS_LOW_PASS_1M:
 			context->exponentC1 = RC_CHARGE_EXP(info->rF * info->c1);
 			context->exponentC2 =  0;
 			break;
@@ -489,7 +508,7 @@ static DISCRETE_RESET(dst_op_amp_filt)
 			double d  = (info->c1 + info->c2) / sqrt(info->rF / context->rTotal * info->c1 * info->c2);
 			double gain = -info->rF / context->rTotal * info->c2 / (info->c1 + info->c2);
 
-			calculate_filter2_coefficients(disc_info, fc, d, DISC_FILTER_BANDPASS,
+			calculate_filter2_coefficients(node->info, fc, d, DISC_FILTER_BANDPASS,
 										   &context->a1, &context->a2,
 										   &context->b0, &context->b1, &context->b2);
 			context->b0 *= gain;
@@ -534,10 +553,10 @@ static DISCRETE_RESET(dst_op_amp_filt)
  * input[3]    - Capacitor Value (initialization only)
  *
  ************************************************************************/
-#define DST_RCDISC__ENABLE	(*(node->input[0]))
-#define DST_RCDISC__IN		(*(node->input[1]))
-#define DST_RCDISC__R		(*(node->input[2]))
-#define DST_RCDISC__C		(*(node->input[3]))
+#define DST_RCDISC__ENABLE	DISCRETE_INPUT(0)
+#define DST_RCDISC__IN		DISCRETE_INPUT(1)
+#define DST_RCDISC__R		DISCRETE_INPUT(2)
+#define DST_RCDISC__C		DISCRETE_INPUT(3)
 
 static DISCRETE_STEP(dst_rcdisc)
 {
@@ -558,7 +577,7 @@ static DISCRETE_STEP(dst_rcdisc)
 			if (DST_RCDISC__ENABLE)
 			{
 				node->output[0] = DST_RCDISC__IN * exp(context->t / context->exponent0);
-				context->t += disc_info->sample_time;
+				context->t += node->info->sample_time;
 			} else
 			{
 				context->state = 0;
@@ -591,12 +610,12 @@ static DISCRETE_RESET(dst_rcdisc)
  * input[5]    - Capacitor Value (initialization only)
  *
  ************************************************************************/
-#define DST_RCDISC2__ENABLE	(*(node->input[0]))
-#define DST_RCDISC2__IN0	(*(node->input[1]))
-#define DST_RCDISC2__R0		(*(node->input[2]))
-#define DST_RCDISC2__IN1	(*(node->input[3]))
-#define DST_RCDISC2__R1		(*(node->input[4]))
-#define DST_RCDISC2__C		(*(node->input[5]))
+#define DST_RCDISC2__ENABLE	DISCRETE_INPUT(0)
+#define DST_RCDISC2__IN0	DISCRETE_INPUT(1)
+#define DST_RCDISC2__R0		DISCRETE_INPUT(2)
+#define DST_RCDISC2__IN1	DISCRETE_INPUT(3)
+#define DST_RCDISC2__R1		DISCRETE_INPUT(4)
+#define DST_RCDISC2__C		DISCRETE_INPUT(5)
 
 static DISCRETE_STEP(dst_rcdisc2)
 {
@@ -634,13 +653,15 @@ static DISCRETE_RESET(dst_rcdisc2)
  * input[2]    - Resistor0 value (initialization only)
  * input[4]    - Resistor1 value (initialization only)
  * input[5]    - Capacitor Value (initialization only)
+ * input[6]    - Diode Junction voltage (initialization only)
  *
  ************************************************************************/
-#define DST_RCDISC3__ENABLE	(*(node->input[0]))
-#define DST_RCDISC3__IN		(*(node->input[1]))
-#define DST_RCDISC3__R1		(*(node->input[2]))
-#define DST_RCDISC3__R2		(*(node->input[3]))
-#define DST_RCDISC3__C		(*(node->input[4]))
+#define DST_RCDISC3__ENABLE	DISCRETE_INPUT(0)
+#define DST_RCDISC3__IN		DISCRETE_INPUT(1)
+#define DST_RCDISC3__R1		DISCRETE_INPUT(2)
+#define DST_RCDISC3__R2		DISCRETE_INPUT(3)
+#define DST_RCDISC3__C		DISCRETE_INPUT(4)
+#define DST_RCDISC3__DJV	DISCRETE_INPUT(6)
 
 static DISCRETE_STEP(dst_rcdisc3)
 {
@@ -653,15 +674,31 @@ static DISCRETE_STEP(dst_rcdisc3)
 	if(DST_RCDISC3__ENABLE)
 	{
 		diff = DST_RCDISC3__IN - node->output[0];
-		if( diff > 0 )
+		if (context->v_diode > 0)
 		{
-			diff = diff - (diff * context->exponent0);
-		} else if( diff < 0)
-		{
-			if(diff < -0.5)
-				diff = diff - (diff * context->exponent1);
-			else
+			if( diff > 0 )
+			{
 				diff = diff - (diff * context->exponent0);
+			} else if( diff < 0)
+			{
+				if(diff < -context->v_diode)
+					diff = diff - (diff * context->exponent1);
+				else
+					diff = diff - (diff * context->exponent0);
+			}
+		}
+		else
+		{
+			if( diff < 0 )
+			{
+				diff = diff - (diff * context->exponent0);
+			} else if( diff > 0)
+			{
+				if(diff > -context->v_diode)
+					diff = diff - (diff * context->exponent1);
+				else
+					diff = diff - (diff * context->exponent0);
+			}
 		}
 		node->output[0] += diff;
 	}
@@ -679,6 +716,7 @@ static DISCRETE_RESET(dst_rcdisc3)
 
 	context->state = 0;
 	context->t = 0;
+	context->v_diode = DST_RCDISC3__DJV;
 	context->exponent0 = RC_CHARGE_EXP(DST_RCDISC3__R1 * DST_RCDISC3__C);
 	context->exponent1 = RC_CHARGE_EXP(RES_2_PARALLEL(DST_RCDISC3__R1, DST_RCDISC3__R2) * DST_RCDISC3__C);
 }
@@ -697,14 +735,14 @@ static DISCRETE_RESET(dst_rcdisc3)
  * input[4]    - circuit type (initialization only)
  *
  ************************************************************************/
-#define DST_RCDISC4__ENABLE	(*(node->input[0]))
-#define DST_RCDISC4__IN		(*(node->input[1]))
-#define DST_RCDISC4__R1		(*(node->input[2]))
-#define DST_RCDISC4__R2		(*(node->input[3]))
-#define DST_RCDISC4__R3		(*(node->input[4]))
-#define DST_RCDISC4__C1		(*(node->input[5]))
-#define DST_RCDISC4__VP		(*(node->input[6]))
-#define DST_RCDISC4__TYPE	(*(node->input[7]))
+#define DST_RCDISC4__ENABLE	DISCRETE_INPUT(0)
+#define DST_RCDISC4__IN		DISCRETE_INPUT(1)
+#define DST_RCDISC4__R1		DISCRETE_INPUT(2)
+#define DST_RCDISC4__R2		DISCRETE_INPUT(3)
+#define DST_RCDISC4__R3		DISCRETE_INPUT(4)
+#define DST_RCDISC4__C1		DISCRETE_INPUT(5)
+#define DST_RCDISC4__VP		DISCRETE_INPUT(6)
+#define DST_RCDISC4__TYPE	DISCRETE_INPUT(7)
 
 static DISCRETE_STEP(dst_rcdisc4)
 {
@@ -742,17 +780,17 @@ static DISCRETE_RESET( dst_rcdisc4)
 	/* some error checking. */
 	if (DST_RCDISC4__R1 <= 0 || DST_RCDISC4__R2 <= 0 || DST_RCDISC4__C1 <= 0 || (DST_RCDISC4__R3 <= 0 &&  context->type == 1))
 	{
-		discrete_log(disc_info, "Invalid component values in NODE_%d.\n", node->node - NODE_00);
+		discrete_log(node->info, "Invalid component values in NODE_%d.\n", node->node - NODE_00);
 		return;
 	}
 	if (DST_RCDISC4__VP < 3)
 	{
-		discrete_log(disc_info, "vP must be >= 3V in NODE_%d.\n", node->node - NODE_00);
+		discrete_log(node->info, "vP must be >= 3V in NODE_%d.\n", node->node - NODE_00);
 		return;
 	}
 	if (DST_RCDISC4__TYPE < 1 || DST_RCDISC4__TYPE > 3)
 	{
-		discrete_log(disc_info, "Invalid circuit type in NODE_%d.\n", node->node - NODE_00);
+		discrete_log(node->info, "Invalid circuit type in NODE_%d.\n", node->node - NODE_00);
 		return;
 	}
 
@@ -813,10 +851,10 @@ static DISCRETE_RESET( dst_rcdisc4)
  * input[3]    - Capacitor Value (initialization only)
  *
  ************************************************************************/
-#define DST_RCDISC5__ENABLE	(*(node->input[0]))
-#define DST_RCDISC5__IN		(*(node->input[1]))
-#define DST_RCDISC5__R		(*(node->input[2]))
-#define DST_RCDISC5__C		(*(node->input[3]))
+#define DST_RCDISC5__ENABLE	DISCRETE_INPUT(0)
+#define DST_RCDISC5__IN		DISCRETE_INPUT(1)
+#define DST_RCDISC5__R		DISCRETE_INPUT(2)
+#define DST_RCDISC5__C		DISCRETE_INPUT(3)
 
 static DISCRETE_STEP( dst_rcdisc5)
 {
@@ -877,14 +915,14 @@ static DISCRETE_RESET( dst_rcdisc5)
  * input[8]    - Voltage Value (initialization only)
  *
  ************************************************************************/
-#define DST_RCDISC_MOD__IN1		(*(node->input[0]))
-#define DST_RCDISC_MOD__IN2		(*(node->input[1]))
-#define DST_RCDISC_MOD__R1		(*(node->input[2]))
-#define DST_RCDISC_MOD__R2		(*(node->input[3]))
-#define DST_RCDISC_MOD__R3		(*(node->input[4]))
-#define DST_RCDISC_MOD__R4		(*(node->input[5]))
-#define DST_RCDISC_MOD__C		(*(node->input[6]))
-#define DST_RCDISC_MOD__VP		(*(node->input[7]))
+#define DST_RCDISC_MOD__IN1		DISCRETE_INPUT(0)
+#define DST_RCDISC_MOD__IN2		DISCRETE_INPUT(1)
+#define DST_RCDISC_MOD__R1		DISCRETE_INPUT(2)
+#define DST_RCDISC_MOD__R2		DISCRETE_INPUT(3)
+#define DST_RCDISC_MOD__R3		DISCRETE_INPUT(4)
+#define DST_RCDISC_MOD__R4		DISCRETE_INPUT(5)
+#define DST_RCDISC_MOD__C		DISCRETE_INPUT(6)
+#define DST_RCDISC_MOD__VP		DISCRETE_INPUT(7)
 
 static DISCRETE_STEP(dst_rcdisc_mod)
 {
@@ -970,11 +1008,11 @@ static DISCRETE_RESET(dst_rcdisc_mod)
  * input[4]    - Voltage reference. Usually 0V.
  *
  ************************************************************************/
-#define DST_RCFILTER__ENABLE		(*(node->input[0]))
-#define DST_RCFILTER__VIN		(*(node->input[1]))
-#define DST_RCFILTER__R			(*(node->input[2]))
-#define DST_RCFILTER__C			(*(node->input[3]))
-#define DST_RCFILTER__VREF		(*(node->input[4]))
+#define DST_RCFILTER__ENABLE		DISCRETE_INPUT(0)
+#define DST_RCFILTER__VIN		DISCRETE_INPUT(1)
+#define DST_RCFILTER__R			DISCRETE_INPUT(2)
+#define DST_RCFILTER__C			DISCRETE_INPUT(3)
+#define DST_RCFILTER__VREF		DISCRETE_INPUT(4)
 
 static DISCRETE_STEP(dst_rcfilter)
 {
@@ -1015,11 +1053,11 @@ static DISCRETE_RESET(dst_rcfilter)
  * input[4]    - Voltage reference. Usually 0V.
  *
  ************************************************************************/
-#define DST_RCFILTER_SW__ENABLE		(*(node->input[0]))
-#define DST_RCFILTER_SW__VIN		(*(node->input[1]))
-#define DST_RCFILTER_SW__SWITCH		(*(node->input[2]))
-#define DST_RCFILTER_SW__R			(*(node->input[3]))
-#define DST_RCFILTER_SW__C(x)		(*(node->input[4+x]))
+#define DST_RCFILTER_SW__ENABLE		DISCRETE_INPUT(0)
+#define DST_RCFILTER_SW__VIN		DISCRETE_INPUT(1)
+#define DST_RCFILTER_SW__SWITCH		DISCRETE_INPUT(2)
+#define DST_RCFILTER_SW__R			DISCRETE_INPUT(3)
+#define DST_RCFILTER_SW__C(x)		DISCRETE_INPUT(4+x)
 
 #define CD4066_ON_RES  270
 #define DST_RCFILTER_SW_ITERATIONS	(10)
@@ -1032,6 +1070,8 @@ static DISCRETE_STEP(dst_rcfilter_sw)
 	int i,j ;
 	int bits = (int)DST_RCFILTER_SW__SWITCH;
 	double us = 0, rs = 0;
+	double vd;
+	double rt;
 
 	if (DST_RCFILTER_SW__ENABLE)
 	{
@@ -1048,18 +1088,43 @@ static DISCRETE_STEP(dst_rcfilter_sw)
 			context->vCap[1] += (DST_RCFILTER_SW__VIN - context->vCap[1]) * context->exp1;
 			node->output[0] = context->vCap[1] + (DST_RCFILTER_SW__VIN - context->vCap[1]) * context->factor;
 			break;
-		default:
+		case 3:
+			rs = 2 * DST_RCFILTER_SW__R;
+			vd = RES_VOLTAGE_DIVIDER(rs, CD4066_ON_RES) * DST_RCFILTER_SW__VIN;
+			rt = DST_RCFILTER_SW__R / (CD4066_ON_RES + rs);
+
 			for (j = 0; j < DST_RCFILTER_SW_ITERATIONS; j++)
 			{
+				node->output[0] = vd + rt  * (context->vCap[0] + context->vCap[1]);
+				context->vCap[0] += (node->output[0] - context->vCap[0]) * context->exp[0];
+				context->vCap[1] += (node->output[0] - context->vCap[1]) * context->exp[1];
+			}
+			break;
+		default:
+			rs = 0;
+
+			for (i = 0; i < 4; i++)
+			{
+				if (( bits & (1 << i)) != 0)
+				{
+					rs += DST_RCFILTER_SW__R;
+				}
+			}
+
+			vd = RES_VOLTAGE_DIVIDER(rs, CD4066_ON_RES) * DST_RCFILTER_SW__VIN;
+			rt = DST_RCFILTER_SW__R / (CD4066_ON_RES + rs);
+
+			for (j = 0; j < DST_RCFILTER_SW_ITERATIONS; j++)
+			{
+				us = 0;
 				for (i = 0; i < 4; i++)
 				{
 					if (( bits & (1 << i)) != 0)
 					{
 						us += context->vCap[i];
-						rs += DST_RCFILTER_SW__R;
 					}
 				}
-				node->output[0] = RES_VOLTAGE_DIVIDER(rs, CD4066_ON_RES) * DST_RCFILTER_SW__VIN + DST_RCFILTER_SW__R / (CD4066_ON_RES + rs)  * us;
+				node->output[0] = vd + rt  * us;
 				for (i = 0; i < 4; i++)
 				{
 					if (( bits & (1 << i)) != 0)
@@ -1108,13 +1173,13 @@ static DISCRETE_RESET(dst_rcfilter_sw)
  * input[5]    - Capacitor Value (initialization only)
  *
  ************************************************************************/
-#define DST_RCINTEGRATE__IN1	(*(node->input[0]))
-#define DST_RCINTEGRATE__R1		(*(node->input[1]))
-#define DST_RCINTEGRATE__R2		(*(node->input[2]))
-#define DST_RCINTEGRATE__R3		(*(node->input[3]))
-#define DST_RCINTEGRATE__C		(*(node->input[4]))
-#define DST_RCINTEGRATE__VP		(*(node->input[5]))
-#define DST_RCINTEGRATE__TYPE	(*(node->input[6]))
+#define DST_RCINTEGRATE__IN1	DISCRETE_INPUT(0)
+#define DST_RCINTEGRATE__R1		DISCRETE_INPUT(1)
+#define DST_RCINTEGRATE__R2		DISCRETE_INPUT(2)
+#define DST_RCINTEGRATE__R3		DISCRETE_INPUT(3)
+#define DST_RCINTEGRATE__C		DISCRETE_INPUT(4)
+#define DST_RCINTEGRATE__VP		DISCRETE_INPUT(5)
+#define DST_RCINTEGRATE__TYPE	DISCRETE_INPUT(6)
 
 /* Ebers-Moll large signal model
  * Couriersud:
@@ -1198,7 +1263,7 @@ static DISCRETE_RESET(dst_rcintegrate)
 	struct dst_rcintegrate_context *context = (struct dst_rcintegrate_context *)node->context;
 
 	double r;
-	double dt = disc_info->sample_time;
+	double dt = node->info->sample_time;
 
 	context->type = DST_RCINTEGRATE__TYPE;
 
@@ -1233,9 +1298,9 @@ static DISCRETE_RESET(dst_rcintegrate)
  *
  * 2008, couriersud
  ************************************************************************/
-#define DST_SALLEN_KEY__ENABLE	(*(node->input[0]))
-#define DST_SALLEN_KEY__INP0	(*(node->input[1]))
-#define DST_SALLEN_KEY__TYPE	(*(node->input[2]))
+#define DST_SALLEN_KEY__ENABLE	DISCRETE_INPUT(0)
+#define DST_SALLEN_KEY__INP0	DISCRETE_INPUT(1)
+#define DST_SALLEN_KEY__TYPE	DISCRETE_INPUT(2)
 
 static DISCRETE_STEP(dst_sallen_key)
 {
@@ -1274,7 +1339,7 @@ static DISCRETE_RESET(dst_sallen_key)
 			fatalerror("Unknown sallen key filter type");
 	}
 
-	calculate_filter2_coefficients(disc_info, freq, 1.0 / q, DISC_FILTER_LOWPASS,
+	calculate_filter2_coefficients(node->info, freq, 1.0 / q, DISC_FILTER_LOWPASS,
 								   &context->a1, &context->a2,
 								   &context->b0, &context->b1, &context->b2);
 	node->output[0] = 0;
@@ -1294,10 +1359,10 @@ static DISCRETE_RESET(dst_sallen_key)
  * input[3]    - Capacitor Value (initialization only)
  *
  ************************************************************************/
-#define DST_RCFILTERN__ENABLE		(*(node->input[0]))
-#define DST_RCFILTERN__IN		(*(node->input[1]))
-#define DST_RCFILTERN__R		(*(node->input[2]))
-#define DST_RCFILTERN__C		(*(node->input[3]))
+#define DST_RCFILTERN__ENABLE		DISCRETE_INPUT(0)
+#define DST_RCFILTERN__IN		DISCRETE_INPUT(1)
+#define DST_RCFILTERN__R		DISCRETE_INPUT(2)
+#define DST_RCFILTERN__C		DISCRETE_INPUT(3)
 
 static DISCRETE_RESET(dst_rcfilterN)
 {
@@ -1327,10 +1392,10 @@ static DISCRETE_RESET(dst_rcfilterN)
  * input[3]    - Capacitor Value (initialization only)
  *
  ************************************************************************/
-#define DST_RCDISCN__ENABLE	(*(node->input[0]))
-#define DST_RCDISCN__IN		(*(node->input[1]))
-#define DST_RCDISCN__R		(*(node->input[2]))
-#define DST_RCDISCN__C		(*(node->input[3]))
+#define DST_RCDISCN__ENABLE	DISCRETE_INPUT(0)
+#define DST_RCDISCN__IN		DISCRETE_INPUT(1)
+#define DST_RCDISCN__R		DISCRETE_INPUT(2)
+#define DST_RCDISCN__C		DISCRETE_INPUT(3)
 
 static DISCRETE_RESET(dst_rcdiscN)
 {
@@ -1384,12 +1449,12 @@ static DISCRETE_STEP(dst_rcdiscN)
  * input[5]    - Capacitor Value (initialization only)
  *
  ************************************************************************/
-#define DST_RCDISC2N__ENABLE		(*(node->input[0]))
-#define DST_RCDISC2N__IN0		(*(node->input[1]))
-#define DST_RCDISC2N__R0		(*(node->input[2]))
-#define DST_RCDISC2N__IN1		(*(node->input[3]))
-#define DST_RCDISC2N__R1		(*(node->input[4]))
-#define DST_RCDISC2N__C			(*(node->input[5]))
+#define DST_RCDISC2N__ENABLE		DISCRETE_INPUT(0)
+#define DST_RCDISC2N__IN0		DISCRETE_INPUT(1)
+#define DST_RCDISC2N__R0		DISCRETE_INPUT(2)
+#define DST_RCDISC2N__IN1		DISCRETE_INPUT(3)
+#define DST_RCDISC2N__R1		DISCRETE_INPUT(4)
+#define DST_RCDISC2N__C			DISCRETE_INPUT(5)
 
 struct dss_rcdisc2_context
 {
@@ -1422,8 +1487,8 @@ static DISCRETE_RESET(dst_rcdisc2N)
 	f1 = 1.0 / (2 * M_PI * DST_RCDISC2N__R0 * DST_RCDISC2N__C);
 	f2 = 1.0 / (2 * M_PI * DST_RCDISC2N__R1 * DST_RCDISC2N__C);
 
-	calculate_filter1_coefficients(disc_info, f1, DISC_FILTER_LOWPASS, &context->a1_0, &context->b0_0, &context->b1_0);
-	calculate_filter1_coefficients(disc_info, f2, DISC_FILTER_LOWPASS, &context->a1_1, &context->b0_1, &context->b1_1);
+	calculate_filter1_coefficients(node->info, f1, DISC_FILTER_LOWPASS, &context->a1_0, &context->b0_0, &context->b1_0);
+	calculate_filter1_coefficients(node->info, f2, DISC_FILTER_LOWPASS, &context->a1_1, &context->b0_1, &context->b1_1);
 
 	/* Initialize the object */
 	node->output[0] = 0;

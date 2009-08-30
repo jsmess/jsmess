@@ -436,7 +436,7 @@ INLINE int is_display_enabled(mc6845_t *mc6845)
 
 static void update_upd_adr_timer(mc6845_t *mc6845)
 {
-	if (!is_display_enabled(mc6845))
+	if (!is_display_enabled(mc6845) && supports_transparent[mc6845->device_type])
 		timer_adjust_oneshot(mc6845->upd_adr_timer,  mc6845->upd_time, 0);
 }
 
@@ -466,7 +466,7 @@ static void update_de_changed_timer(mc6845_t *mc6845)
 				if (next_y == mc6845->vert_pix_total)
 					next_y = -1;
 			}
-			timer_adjust_oneshot(mc6845->upd_adr_timer,  attotime_never, 0);
+			if (supports_transparent[mc6845->device_type]) timer_adjust_oneshot(mc6845->upd_adr_timer,  attotime_never, 0);
 		}
 
 		/* we are in a blanking region, get the location of the next display start */

@@ -287,7 +287,7 @@
  * DISCRETE_OP_AMP_FILTER(NODE,ENAB,INP0,INP1,TYPE,INFO)
  * DISCRETE_RCDISC(NODE,ENAB,IN0,RVAL,CVAL)
  * DISCRETE_RCDISC2(NODE,SWITCH,INP0,RVAL0,INP1,RVAL1,CVAL)
- * DISCRETE_RCDISC3(NODE,ENAB,INP0,RVAL0,RVAL1,CVAL)
+ * DISCRETE_RCDISC3(NODE,ENAB,INP0,RVAL0,RVAL1,CVAL, DJV)
  * DISCRETE_RCDISC4(NODE,ENAB,INP0,RVAL0,RVAL1,RVAL2,CVAL,VP,TYPE)
  * DISCRETE_RCDISC5(NODE,ENAB,IN0,RVAL,CVAL)
  * DISCRETE_RCINTEGRATE(NODE,INP0,RVAL0,RVAL1,RVAL2,CVAL,vP,TYPE)
@@ -438,8 +438,12 @@
  * Note: The discrete system is floating point based.  So when routing a stream
  *       set it's gain to 100% and then use DISCRETE_INPUTX_STREAM to adjust
  *       it if needed.
+ *       If you need to access a stream from a discrete task, the stream node
+ *       must be part of that task. If a given stream is used in two tasks or
+ *       a task and the main task, you must declare two stream nodes acccessing the
+ *       same stream input NUM.
  *
- * EXAMPLES: see
+ * EXAMPLES: see scramble, frogger
  *
  ***********************************************************************
  =======================================================================
@@ -2249,6 +2253,25 @@
  *  vRef >-----------------------'  |/
  *
  *          --------------------------------------------------
+  *
+ *     DISC_OP_AMP_FILTER_IS_LOW_PASS_1M
+ *          First Order Low Pass Filter
+ *
+ *                              c1
+ *                      .-------||---------.
+ *                      |                  |
+ *          r1          |       rF         |
+ *  IN0 >--ZZZZ--.      +------ZZZZ--------+
+ *               |      |                  |
+ *          r2   |      |           |\     |
+ *  VP  >--ZZZZ--+------+--------+  | \    |
+ *               |               '--|- \   |
+ *          r3   |                  |   >--+----------> Netlist Node
+ *  VN  >--ZZZZ--'               .--|+ /
+ *                               |  | /
+ *  IN1 >------------------------'  |/
+ *
+ *          --------------------------------------------------
  *
  *     DISC_OP_AMP_FILTER_IS_HIGH_PASS_1
  *          First Order High Pass Filter
@@ -2482,7 +2505,10 @@
  *                        |                 |
  *    ENAB       -0------>|                 |
  *                        |    diode  R2    |
- *    INPUT1     -1------>| -+-|<|--ZZZZ-+- |---->   Netlist node
+ *    JV         -5------>| -+-|>|--ZZZZ-+- |---->   Netlist node (JV < 0)
+ *                        |                 |
+ *                        |    diode  R2    |
+ *    INPUT1     -1------>| -+-|<|--ZZZZ-+- |---->   Netlist node (JV > 0)
  *                        |  |           |  |
  *    RVAL1      -2------>|  '-ZZZZ-+----'  |
  *                        |     R1  |       |
@@ -2499,16 +2525,19 @@
  *                      input node (or value),
  *                      R1 resistor value in OHMS,
  *                      R2 resistor value in OHMS,
- *                      capacitor value in FARADS)
+ *                      capacitor value in FARADS,
+ *                      diode junction voltage)
+ *
+ * The polarity of the diode junction voltage determines the polarity of the diode.
  *
  *  Example config line
  *
- *     DISCRETE_RCDISC3(NODE_11,NODE_10,10,100,220,CAP_U(1))
+ *     DISCRETE_RCDISC3(NODE_11,NODE_10,10,100,220,CAP_U(1), 0.5)
  *
  *  When enabled by NODE_10, C charges from 10v as indicated by RC
  *  of 100R & 1uF.
  *
- * EXAMPLES: see Tank8
+ * EXAMPLES: see Tank8, bzone
  *
  ***********************************************************************
  *
@@ -3203,13 +3232,18 @@
  *     DISCRETE_CUSTOMx(name of node,
  *                      input 0 node or static value, ...)
  *
- *     discrete_custom_info = {reset, step, contextsize, custom}
- *                             reset  = address called to reset a node after creation or system reset
- *                             step   = address called to execute one time delta of output update
- *                             contextsize = size of context to create
+ *     discrete_custom_info = {discrete_module, custom}
+ *                             discrete_module  = discrete module definition
  *                             custom = address of specific initialization data
  *
- * EXAMPLES: see Donkey Kong
+ * In most case, you should be able to use
+ *
+ *     discrete_custom_info = {DISCRETE_CUSTOM_MODULE(basename, context type), custom}
+ *
+ * if you have used DISCRETE_STEP(basename) and DISCRETE_RESET(basename) to define
+ * the step/reset procedures.
+ *
+ * EXAMPLES: see Donkey Kong, Mario Bros.
  *
  ***********************************************************************
  =======================================================================
@@ -3304,13 +3338,13 @@
  *************************************/
 
 /* calculate charge exponent using discrete sample time */
-#define RC_CHARGE_EXP(rc)				(1.0 - exp(disc_info->neg_sample_time / (rc)))
+#define RC_CHARGE_EXP(rc)				(1.0 - exp(node->info->neg_sample_time / (rc)))
 /* calculate charge exponent using given sample time */
 #define RC_CHARGE_EXP_DT(rc, dt)		(1.0 - exp(-(dt) / (rc)))
 #define RC_CHARGE_NEG_EXP_DT(rc, dt)	(1.0 - exp((dt) / (rc)))
 
 /* calculate discharge exponent using discrete sample time */
-#define RC_DISCHARGE_EXP(rc)			(exp(disc_info->neg_sample_time / (rc)))
+#define RC_DISCHARGE_EXP(rc)			(exp(node->info->neg_sample_time / (rc)))
 /* calculate discharge exponent using given sample time */
 #define RC_DISCHARGE_EXP_DT(rc, dt)		(exp(-(dt) / (rc)))
 #define RC_DISCHARGE_NEG_EXP_DT(rc, dt)	(exp((dt) / (rc)))
@@ -3324,19 +3358,16 @@
 #define DISCRETE_STEP_NAME( _func )  _func ## _step
 #define DISCRETE_RESET_NAME( _func ) _func ## _reset
 
-#define DISCRETE_STEP(_func) void DISCRETE_STEP_NAME(_func) (const discrete_info *disc_info, node_description *node)
-#define DISCRETE_RESET(_func) void DISCRETE_RESET_NAME(_func) (const discrete_info *disc_info, node_description *node)
+#define DISCRETE_STEP(_func) void DISCRETE_STEP_NAME(_func) (node_description *node)
+#define DISCRETE_RESET(_func) void DISCRETE_RESET_NAME(_func) (node_description *node)
 
-#define DISCRETE_STEP_CALL(_func) DISCRETE_STEP_NAME(_func) (disc_info, node)
-#define DISCRETE_RESET_CALL(_func) DISCRETE_RESET_NAME(_func) (disc_info, node)
+#define DISCRETE_STEP_CALL(_func) DISCRETE_STEP_NAME(_func) (node)
+#define DISCRETE_RESET_CALL(_func) DISCRETE_RESET_NAME(_func) (node)
 
-#if 0
-#define DISCRETE_STEP(_func) void DISCRETE_STEP_NAME(_func) (const device_config *device, node_description *node)
-#define DISCRETE_RESET(_func) void DISCRETE_RESET_NAME(_func) (const device_config *device, node_description *node)
+#define DISCRETE_CUSTOM_MODULE(_basename, _context_type) \
+	{ DST_CUSTOM, "CUSTOM", 1, sizeof(_context_type), DISCRETE_RESET_NAME(_basename), DISCRETE_STEP_NAME(_basename) }
 
-#define DISCRETE_STEP_CALL(_func) DISCRETE_STEP_NAME(_func) (device, node)
-#define DISCRETE_RESET_CALL(_func) DISCRETE_RESET_NAME(_func) (device, node)
-#endif
+#define DISCRETE_INPUT(_num)	(*(node->input[_num]))
 
 /*************************************
  *
@@ -3346,10 +3377,9 @@
 
 #define DISCRETE_MAX_NODES				300
 #define DISCRETE_MAX_INPUTS				10
-#define DISCRETE_MAX_OUTPUTS			16
 #define DISCRETE_MAX_WAVELOGS			10
 #define DISCRETE_MAX_CSVLOGS			10
-#define DISCRETE_MAX_NODE_OUTPUTS		 8
+#define DISCRETE_MAX_OUTPUTS			 8
 
 
 /*************************************
@@ -3460,6 +3490,7 @@ enum
 #define DISC_OP_AMP_FILTER_IS_BAND_PASS_1M	0x30
 #define DISC_OP_AMP_FILTER_IS_HIGH_PASS_0	0x40
 #define DISC_OP_AMP_FILTER_IS_BAND_PASS_0	0x50
+#define DISC_OP_AMP_FILTER_IS_LOW_PASS_1M	0x60
 
 #define DISC_OP_AMP_FILTER_TYPE_MASK		(0xf0 | DISC_OP_AMP_IS_NORTON)	// Used only internally.
 
@@ -3585,8 +3616,8 @@ struct _discrete_module
 	const char *	name;
 	int				num_output;				/* Total number of output nodes, i.e. Master node + 1 */
 	size_t			contextsize;
-	void (*reset)(const discrete_info *disc_info, node_description *node);	/* Called to reset a node after creation or system reset */
-	void (*step)(const discrete_info *disc_info, node_description *node);	/* Called to execute one time delta of output update */
+	void (*reset)(node_description *node);	/* Called to reset a node after creation or system reset */
+	void (*step)(node_description *node);	/* Called to execute one time delta of output update */
 };
 
 
@@ -3599,17 +3630,19 @@ struct _discrete_module
 struct _node_description
 {
 	int				node;								/* The node's index number in the node list */
-	double			output[DISCRETE_MAX_NODE_OUTPUTS];	/* The node's last output value */
+	double			output[DISCRETE_MAX_OUTPUTS];		/* The node's last output value */
 
 	int				active_inputs;						/* Number of active inputs on this node type */
 	int				input_is_node;						/* Bit Flags.  1 in bit location means input_is_node */
 	const double *	input[DISCRETE_MAX_INPUTS];			/* Addresses of Input values */
 
-	discrete_module module;								/* Copy of the node's module info */
-	const discrete_sound_block *block;					/* Points to the node's setup block. */
 	void *			context;							/* Contextual information specific to this node type */
-	const char *	name;								/* Text name string for identification/debug */
 	const void *	custom;								/* Custom function specific initialisation data */
+
+	const discrete_module *module;						/* Node's module info */
+	const discrete_sound_block *block;					/* Points to the node's setup block. */
+	const discrete_info *info;							/* Points to the parent */
+
 	osd_ticks_t		run_time;
 };
 
@@ -3624,6 +3657,24 @@ struct _node_description
  *
  *************************************/
 
+typedef struct _linked_list_entry	linked_list_entry;
+struct _linked_list_entry
+{
+	void *ptr;
+	linked_list_entry *next;
+};
+
+typedef struct _discrete_task_context discrete_task_context;
+struct _discrete_task_context
+{
+	linked_list_entry *list;
+
+	int numbuffered;
+	double *ptr[5];
+	double node_buf[5][2048];
+	double **dest[5];
+};
+
 struct _discrete_info
 {
 	const device_config *device;
@@ -3634,18 +3685,25 @@ struct _discrete_info
 	double	neg_sample_time;
 
 	/* internal node tracking */
-	int node_count;
-	node_description **running_order;
 	node_description **indexed_node;
-	node_description *node_list;
+
+	/* list of all nodes */
+	linked_list_entry	 *node_list;		/* node_description * */
+
+	/* list of nodes which step */
+	linked_list_entry	 *step_list;		/* node_description * */
+
+	/* list of discrete blocks after prescan (IMPORT, DELETE, REPLACE) */
+	linked_list_entry	 *block_list;		/* discrete_sound_block * */
+
+	/* tasks */
+	linked_list_entry	 *task_list;		/* discrete_task_context * */
 
 	/* the input streams */
-	int discrete_input_streams;
-	stream_sample_t *input_stream_data[DISCRETE_MAX_OUTPUTS];
+	linked_list_entry 	 *input_list;
 
 	/* output node tracking */
-	int discrete_outputs;
-	node_description *output_node[DISCRETE_MAX_OUTPUTS];
+	linked_list_entry 	 *output_list;
 
 	/* the output stream */
 	sound_stream *discrete_stream;
@@ -3663,6 +3721,10 @@ struct _discrete_info
 	int num_wavelogs;
 	wav_file *disc_wav_file[DISCRETE_MAX_WAVELOGS];
 	node_description *wavelog_node[DISCRETE_MAX_WAVELOGS];
+
+	/* parallel tasks */
+
+	osd_work_queue *queue;
 
 	/* profiling */
 	int total_samples;
@@ -3927,9 +3989,7 @@ struct _discrete_adsr
 typedef struct _discrete_custom_info discrete_custom_info;
 struct _discrete_custom_info
 {
-	void (*reset)(const discrete_info *disc_info, node_description *node);	/* Called to reset a node after creation or system reset */
-	void (*step)(const discrete_info *disc_info, node_description *node);	/* Called to execute one time delta of output update */
-	size_t contextsize;
+	const discrete_module module;
 	const void *custom;						/* Custom function specific initialisation data */
 };
 
@@ -3967,10 +4027,10 @@ struct _discrete_inverter_osc_desc
  *
  *************************************/
 
-#define NODE0_DEF(_x) NODE_ ## 0 ## _x = (0x40000000 + (_x) * DISCRETE_MAX_NODE_OUTPUTS), \
+#define NODE0_DEF(_x) NODE_ ## 0 ## _x = (0x40000000 + (_x) * DISCRETE_MAX_OUTPUTS), \
 	NODE_ ## 0 ## _x ## _01, NODE_ ## 0 ## _x ## _02, NODE_ ## 0 ## _x ## _03, NODE_ ## 0 ## _x ## _04, \
 	NODE_ ## 0 ## _x ## _05, NODE_ ## 0 ## _x ## _06, NODE_ ## 0 ## _x ## _07
-#define NODE_DEF(_x) NODE_ ## _x = (0x40000000 + (_x) * DISCRETE_MAX_NODE_OUTPUTS), \
+#define NODE_DEF(_x) NODE_ ## _x = (0x40000000 + (_x) * DISCRETE_MAX_OUTPUTS), \
 	NODE_ ## _x ## _01, NODE_ ## _x ## _02, NODE_ ## _x ## _03, NODE_ ## _x ## _04, \
 	NODE_ ## _x ## _05, NODE_ ## _x ## _06, NODE_ ## _x ## _07
 
@@ -4009,15 +4069,15 @@ enum {
 
 /* Some Pre-defined nodes for convenience */
 
-#define NODE(_x)	(NODE_00 + (_x) * DISCRETE_MAX_NODE_OUTPUTS)
+#define NODE(_x)	(NODE_00 + (_x) * DISCRETE_MAX_OUTPUTS)
 #define NODE_SUB(_x, _y) (NODE(_x) + (_y))
 
-#if DISCRETE_MAX_NODE_OUTPUTS == 8
+#if DISCRETE_MAX_OUTPUTS == 8
 #define NODE_CHILD_NODE_NUM(_x)		((int)(_x) & 7)
 #define NODE_DEFAULT_NODE(_x)		((int)(_x) & ~7)
 #define NODE_INDEX(_x)				(((int)(_x) - NODE_START)>>3)
 #else
-#error "DISCRETE_MAX_NODE_OUTPUTS != 8"
+#error "DISCRETE_MAX_OUTPUTS != 8"
 #endif
 
 #define NODE_RELATIVE(_x, _y) (NODE(NODE_INDEX(_x) + (_y)))
@@ -4028,6 +4088,7 @@ enum {
 #define NODE_START	NODE_00
 #define NODE_END	NODE_SPECIAL
 
+#define IS_VALUE_A_NODE(val)	(((val) > NODE_START) && ((val) <= NODE_END))
 
 
 /*************************************
@@ -4150,6 +4211,11 @@ enum
 	/* Debugging */
 	DSO_CSVLOG,			/* Dump nodes as csv file */
 	DSO_WAVELOG,		/* Dump nodes as wav file */
+
+	/* Parallel execution */
+	DSO_TASK_START,	/* start of parallel task */
+	DSO_TASK_END,	/* end of parallel task */
+	DSO_TASK_SYNC,	/* wait for all parallel tasks to finish */
 
 	/* Output Node -- this must be the last entry in this enum! */
 	DSO_OUTPUT,			/* The final output node */
@@ -4292,7 +4358,7 @@ enum
 #define DISCRETE_OP_AMP_FILTER(NODE,ENAB,INP0,INP1,TYPE,INFO)           { NODE, DST_OP_AMP_FILT , 4, { ENAB,INP0,INP1,NODE_NC }, { ENAB,INP0,INP1,TYPE }, INFO, "DISCRETE_OP_AMP_FILTER" },
 #define DISCRETE_RCDISC(NODE,ENAB,INP0,RVAL,CVAL)                       { NODE, DST_RCDISC      , 4, { ENAB,INP0,NODE_NC,NODE_NC }, { ENAB,INP0,RVAL,CVAL }, NULL, "DISCRETE_RCDISC" },
 #define DISCRETE_RCDISC2(NODE,SWITCH,INP0,RVAL0,INP1,RVAL1,CVAL)        { NODE, DST_RCDISC2     , 6, { SWITCH,INP0,NODE_NC,INP1,NODE_NC,NODE_NC }, { SWITCH,INP0,RVAL0,INP1,RVAL1,CVAL }, NULL, "DISCRETE_RCDISC2" },
-#define DISCRETE_RCDISC3(NODE,ENAB,INP0,RVAL0,RVAL1,CVAL)               { NODE, DST_RCDISC3     , 5, { ENAB,INP0,NODE_NC,NODE_NC,NODE_NC }, { ENAB,INP0,RVAL0,RVAL1,CVAL }, NULL, "DISCRETE_RCDISC3" },
+#define DISCRETE_RCDISC3(NODE,ENAB,INP0,RVAL0,RVAL1,CVAL,DJV)           { NODE, DST_RCDISC3     , 6, { ENAB,INP0,NODE_NC,NODE_NC,NODE_NC,NODE_NC }, { ENAB,INP0,RVAL0,RVAL1,CVAL,DJV }, NULL, "DISCRETE_RCDISC3" },
 #define DISCRETE_RCDISC4(NODE,ENAB,INP0,RVAL0,RVAL1,RVAL2,CVAL,VP,TYPE) { NODE, DST_RCDISC4     , 8, { ENAB,INP0,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC }, { ENAB,INP0,RVAL0,RVAL1,RVAL2,CVAL,VP,TYPE }, NULL, "DISCRETE_RCDISC4" },
 #define DISCRETE_RCDISC5(NODE,ENAB,INP0,RVAL,CVAL)                      { NODE, DST_RCDISC5     , 4, { ENAB,INP0,NODE_NC,NODE_NC }, { ENAB,INP0,RVAL,CVAL }, NULL, "DISCRETE_RCDISC5" },
 #define DISCRETE_RCDISC_MODULATED(NODE,INP0,INP1,RVAL0,RVAL1,RVAL2,RVAL3,CVAL,VP)	{ NODE, DST_RCDISC_MOD, 8, { INP0,INP1,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC }, { INP0,INP1,RVAL0,RVAL1,RVAL2,RVAL3,CVAL,VP }, NULL, "DISCRETE_RCDISC_MODULATED" },
@@ -4330,26 +4396,32 @@ enum
 #define DISCRETE_NOP(NODE)                                              { NODE, DSS_NOP         , 0, { 0 }, { 0 }, NULL, "DISCRETE_NOP" },
 
 /* logging */
-#define DISCRETE_CSVLOG1(NODE1)                                    { NODE_SPECIAL, DSO_CSVLOG   , 1, { NODE1 }, { NODE1 }, NULL, "DISCRETE_CSVLOG1" },
-#define DISCRETE_CSVLOG2(NODE1,NODE2)                              { NODE_SPECIAL, DSO_CSVLOG   , 2, { NODE1,NODE2 }, { NODE1,NODE2 }, NULL, "DISCRETE_CSVLOG2" },
-#define DISCRETE_CSVLOG3(NODE1,NODE2,NODE3)                        { NODE_SPECIAL, DSO_CSVLOG   , 3, { NODE1,NODE2,NODE3 }, { NODE1,NODE2,NODE3 }, NULL, "DISCRETE_CSVLOG3" },
-#define DISCRETE_CSVLOG4(NODE1,NODE2,NODE3,NODE4)                  { NODE_SPECIAL, DSO_CSVLOG   , 4, { NODE1,NODE2,NODE3,NODE4 }, { NODE1,NODE2,NODE3,NODE4 }, NULL, "DISCRETE_CSVLOG4" },
-#define DISCRETE_CSVLOG5(NODE1,NODE2,NODE3,NODE4,NODE5)            { NODE_SPECIAL, DSO_CSVLOG   , 5, { NODE1,NODE2,NODE3,NODE4,NODE5 }, { NODE1,NODE2,NODE3,NODE4,NODE5 }, NULL, "DISCRETE_CSVLOG5" },
-#define DISCRETE_WAVELOG1(NODE1,GAIN1)                             { NODE_SPECIAL, DSO_WAVELOG  , 2, { NODE1,NODE_NC }, { NODE1,GAIN1 }, NULL, "DISCRETE_WAVELOG1" },
-#define DISCRETE_WAVELOG2(NODE1,GAIN1,NODE2,GAIN2)                 { NODE_SPECIAL, DSO_WAVELOG  , 4, { NODE1,NODE_NC,NODE2,NODE_NC }, { NODE1,GAIN1,NODE2,GAIN2 }, NULL, "DISCRETE_WAVELOG2" },
+#define DISCRETE_CSVLOG1(NODE1)                                         { NODE_SPECIAL, DSO_CSVLOG   , 1, { NODE1 }, { NODE1 }, NULL, "DISCRETE_CSVLOG1" },
+#define DISCRETE_CSVLOG2(NODE1,NODE2)                                   { NODE_SPECIAL, DSO_CSVLOG   , 2, { NODE1,NODE2 }, { NODE1,NODE2 }, NULL, "DISCRETE_CSVLOG2" },
+#define DISCRETE_CSVLOG3(NODE1,NODE2,NODE3)                             { NODE_SPECIAL, DSO_CSVLOG   , 3, { NODE1,NODE2,NODE3 }, { NODE1,NODE2,NODE3 }, NULL, "DISCRETE_CSVLOG3" },
+#define DISCRETE_CSVLOG4(NODE1,NODE2,NODE3,NODE4)                       { NODE_SPECIAL, DSO_CSVLOG   , 4, { NODE1,NODE2,NODE3,NODE4 }, { NODE1,NODE2,NODE3,NODE4 }, NULL, "DISCRETE_CSVLOG4" },
+#define DISCRETE_CSVLOG5(NODE1,NODE2,NODE3,NODE4,NODE5)                 { NODE_SPECIAL, DSO_CSVLOG   , 5, { NODE1,NODE2,NODE3,NODE4,NODE5 }, { NODE1,NODE2,NODE3,NODE4,NODE5 }, NULL, "DISCRETE_CSVLOG5" },
+#define DISCRETE_WAVELOG1(NODE1,GAIN1)                                  { NODE_SPECIAL, DSO_WAVELOG  , 2, { NODE1,NODE_NC }, { NODE1,GAIN1 }, NULL, "DISCRETE_WAVELOG1" },
+#define DISCRETE_WAVELOG2(NODE1,GAIN1,NODE2,GAIN2)                      { NODE_SPECIAL, DSO_WAVELOG  , 4, { NODE1,NODE_NC,NODE2,NODE_NC }, { NODE1,GAIN1,NODE2,GAIN2 }, NULL, "DISCRETE_WAVELOG2" },
 
 /* import */
-#define DISCRETE_IMPORT(INFO)                                      { NODE_SPECIAL, DSO_IMPORT   , 0, { 0 }, { 0 }, &(INFO##_discrete_interface), "DISCRETE_IMPORT" },
-#define DISCRETE_DELETE(NODE_FROM, NODE_TO)                        { NODE_SPECIAL, DSO_DELETE   , 2, { NODE_FROM, NODE_TO }, { NODE_FROM, NODE_TO }, NULL, "DISCRETE_DELETE" },
-#define DISCRETE_REPLACE					                       { NODE_SPECIAL, DSO_REPLACE  , 0, { 0 }, { 0 }, NULL, "DISCRETE_REPLACE" },
+#define DISCRETE_IMPORT(INFO)                                           { NODE_SPECIAL, DSO_IMPORT   , 0, { 0 }, { 0 }, &(INFO##_discrete_interface), "DISCRETE_IMPORT" },
+#define DISCRETE_DELETE(NODE_FROM, NODE_TO)                             { NODE_SPECIAL, DSO_DELETE   , 2, { NODE_FROM, NODE_TO }, { NODE_FROM, NODE_TO }, NULL, "DISCRETE_DELETE" },
+#define DISCRETE_REPLACE					                            { NODE_SPECIAL, DSO_REPLACE  , 0, { 0 }, { 0 }, NULL, "DISCRETE_REPLACE" },
 
+/* parallel tasks */
+
+#define DISCRETE_TASK_START()                                           { NODE_SPECIAL, DSO_TASK_START, 0, { 0 }, { 0 }, NULL, "DISCRETE_TASK_START" },
+#define DISCRETE_TASK_END(BNODE1)                                       { NODE_SPECIAL, DSO_TASK_END , 1, { BNODE1 }, { BNODE1 }, NULL, "DISCRETE_TASK_END" },
+#define DISCRETE_TASK_END2(BNODE1,BNODE2)                               { NODE_SPECIAL, DSO_TASK_END , 2, { BNODE1,BNODE2 }, { BNODE1,BNODE2 }, NULL, "DISCRETE_TASK_END2" },
+#define DISCRETE_TASK_END3(BNODE1,BNODE2,BNODE3)                        { NODE_SPECIAL, DSO_TASK_END , 3, { BNODE1,BNODE2,BNODE3 }, { BNODE1,BNODE2,BNODE3 }, NULL, "DISCRETE_TASK_END3" },
+#define DISCRETE_TASK_END4(BNODE1,BNODE2,BNODE3,BNODE4)                 { NODE_SPECIAL, DSO_TASK_END , 4, { BNODE1,BNODE2,BNODE3,BNODE4 }, { BNODE1,BNODE2,BNODE3,BNODE4 }, NULL, "DISCRETE_TASK_END4" },
+#define DISCRETE_TASK_END5(BNODE1,BNODE2,BNODE3,BNODE4,BNODE5)          { NODE_SPECIAL, DSO_TASK_END , 5, { BNODE1,BNODE2,BNODE3,BNODE4,BNODE5 }, { BNODE1,BNODE2,BNODE3,BNODE4,BNODE5 }, NULL, "DISCRETE_TASK_END5" },
+//#define DISCRETE_TASK_SYNC()                                          { NODE_SPECIAL, DSO_TASK_SYNC, 0, { 0 }, { 0 }, NULL, "DISCRETE_TASK_SYNC" },
 
 /* output */
 #define DISCRETE_OUTPUT(OPNODE,GAIN)                               { NODE_SPECIAL, DSO_OUTPUT   , 2, { OPNODE,NODE_NC }, { 0,GAIN }, NULL, "DISCRETE_OUTPUT" },
 
-
-
-#define IS_VALUE_A_NODE(val)	(((val) > NODE_START) && ((val) <= NODE_END))
 
 /*************************************
  *
