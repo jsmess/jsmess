@@ -12,14 +12,12 @@
 	- Add multiple FDC drive support;
 	- clean-ups!
 	- There are various unclear video things, these are:
-		- how layer clearance works? Dragon Buster relies on it
 		- PCG reset address is tied to the screen beams in some way;
 		- Support the alternative PCG upload mode;
 		- Add the extended gfx hookup;
 		- (anything else?)
 
 	per-game specific TODO:
-	- 177 / Dragon Buster / (many others): fix the keyboard obf flag otherwise these doesn't boot;
 	- Shanghai: tests the ay8910 read regs, mouse/joystick perhaps?
 	- Gaia/Space Harrier: Hits the FDC drive assert, the latter boots but has heavy emulation
 	  video/logic problems;
@@ -27,11 +25,15 @@
 	- Bosconian: title screen background is completely white because it reverts the pen used
 	  (it's gray in the Arcade version),could be either flickering for pseudo-alpha effect or it's
 	  a btanb;
+	- Dragon Slayer: colors aren't 100% and for whatever reason it doesn't clear the screen on the
+	  gameplay.
+	- Super Mario Bros. SP: background color is black, should be blue.
 
 	Notes:
 	- An interesting feature of the Sharp X-1 is the extended i/o bank. When the ppi port c bit 5
-	  does a 1->0 transition, the HW i/o is banked with an extra bitmap RAM to the entire 0-ffff
-	  space, presumably for 640x200 bitmap gfxs. Any i/o read disables this extended bitmap ram.
+	  does a 1->0 transition, any write to the i/o space accesses 2 or 3 banks gradients of the bitmap RAM
+	  with a single write (generally used for layer clearances and bitmap-style sprites).
+	  Any i/o read disables this extended bitmap ram.
 
 =================================================================================================
 
@@ -639,14 +641,22 @@ static READ8_HANDLER( x1_io_r )
 
 static WRITE8_HANDLER( x1_ex_gfxram_w )
 {
-//	if(data)
-//		fatalerror("Extended GFX RAM write %02x %04x",data,offset);
+	static UINT8 ex_mask;
+
+	if     (offset >= 0x0000 && offset <= 0x3fff)	{ ex_mask = 7; }
+	else if(offset >= 0x4000 && offset <= 0x7fff)	{ ex_mask = 6; }
+	else if(offset >= 0x8000 && offset <= 0xbfff)	{ ex_mask = 5; }
+	else                                        	{ ex_mask = 3; }
+
+	if(ex_mask & 1) { gfx_bitmap_ram[offset+0x0000] = data; }
+	if(ex_mask & 2) { gfx_bitmap_ram[offset+0x4000] = data; }
+	if(ex_mask & 4) { gfx_bitmap_ram[offset+0x8000] = data; }
 }
 
 static WRITE8_HANDLER( x1_scrn_w )
 {
 	scrn_reg.pcg_mode = (data & 0x20)>>5;
-	scrn_reg.gfx_bank = (data & 0x10)>>4;
+	scrn_reg.gfx_bank = 0;//(data & 0x10)>>4;
 }
 
 static WRITE8_HANDLER( x1_ply_w )
