@@ -10,8 +10,8 @@
 *  Special thanks to leeeeee for helping figure out what the led selftest codes actually mean
 *
 *  TODO:
-*  * DUART: I suspect there's an address line shift problem, either that or modes 0-6 of the duart being unimplemented prevents this from working at all.
-*    * seems more likely to be the mode problem?
+*  * DUART: I suspect the duart test fails because modes 0-6 of the duart are currently unimplemented in 68681.c
+*    * DUART needs its i/o pins connected as well:    
 *    * pins IP0, IP2, and IP3 are connected to the primary serial port:
 *      * IP0 is CTS
 *      * IP2 is DSR
@@ -24,8 +24,6 @@
 *      * OP0 is RTS
 *      * OP2 is DTR
 *  * Attach m68k interrupts properly; I suspect the DUART INT and SPC INTs are both hooked up wrong
-*  * Figure out why status LEDS are flashing 00 FD 00 FD etc... some sort of 68k selftest DUART error?
-*    * NICETOHAVE: figure out what all the LED error codes actually mean, as DEC didn't document them anywhere.
 *  * Actually store the X2212 nvram's eeprom data to disk rather than throwing it out on exit
 *  * force sync between both processors if either one pushes or pulls the fifo
 *      or the shared error/fifo flag regs... How can I actually do this? CPU_BOOST_INTERLEAVE?
@@ -35,6 +33,7 @@
 *  * discuss and figure out how to have an external application send data to the two serial ports to be spoken
 *
 * LED error code list (found by experimentation and help from leeeeee):
+*    Startup Self tests:
 *    FF 00 - M68k address register check fail or data register check fail (test code at $21E)
 *     (for some data register failures the processor just spins forever and no led code is generated)
 *    FF 01 - ROM check fail @ 0x00000, rom at E8 or E22 (test code at $278)
@@ -52,9 +51,13 @@
 *    FE 04 - RAM check fail @ 0x8c000-0x8ffff, ram at E33 or E46
 *    FE 05 - RAM check fail @ 0x90000-0x93fff, ram at E32 or E44
 *    FD 00 - DUART test (test code at $046C) [fails in mess]
-*    FC 00 - TMS32010 'SPC' and DTMF 'TLC' status register test (test code at $051E) [passes in mess]
+*    FC 00 - TMS32010 'SPC' and DTMF-decoder 'TLC' status register test (test code at $051E) [passes in mess]
 *    FB 00 - DUART interrupt tests [fails in mess]
 *    Jump to $102C to skip the self tests
+*    During normal operation:
+*    D3 - ? some sort of failure
+*    FF - normal, status OK
+*    * figure out what all the other LED error codes actually mean, as DEC didn't document them anywhere.
 *******************************************************************************/
 /*the 68k memory map is such:
 0x000000-0x007fff: E22 low, E8 high
@@ -338,7 +341,6 @@ a23	a22	a21	a20	a19	a18	a17	a16	a15	a14	a13	a12	a11	a10	a9	a8	a7	a6	a5	a4	a3	a2	
 0	x	x	x	1	x	x	1	1	0	x	x	x	x	x	x	x	x	x	*	*	*	*	x		RW	DUART (keep in mind that a0 is not connected)
 0	x	x	x	1	x	x	1	1	1	x	x	x	x	x	x	x	x	x	x	x	0	0	*		RW	SPC flags: fifo writable (readonly, d7), spc irq suppress (readwrite, d6), fifo error status (readonly, d5), 'fifo release'/clear-tms-fifo-error-status-bits (writeonly, d1), speech initialize/clear (readwrite, d0) [see schematic sheet 4]
 0	x	x	x	1	x	x	1	1	1	x	x	x	x	x	x	x	x	x	x	x	0	1	0?		W	SPC fifo write (clocks fifo)
-
 0	x	x	x	1	x	x	1	1	1	x	x	x	x	x	x	x	x	x	x	x	1	0	*		RW	TLC flags: ring detect (readonly, d15), ring detected irq enable (readwrite, d14), answer phone (readwrite, d8), tone detected (readonly, d7), tone detected irq enable (readwrite, d6) [see schematic sheet 6]
 0	x	x	x	1	x	x	1	1	1	x	x	x	x	x	x	x	x	x	x	x	1	1	*		R	TLC tone chip read, reads on bits d0-d7 only, d4-d7 are tied low; d15-d8 are probably open bus
 			  |				  |				  |				  |				  |
@@ -383,26 +385,28 @@ ADDRESS_MAP_END
 
 static MACHINE_DRIVER_START(dectalk)
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* Y2 20Mhz (/2) */
+    MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* E74 20MHz OSC (/2) */
     MDRV_CPU_PROGRAM_MAP(m68k_mem)
     MDRV_CPU_IO_MAP(m68k_io)
     MDRV_QUANTUM_TIME(HZ(10000))
     MDRV_MACHINE_RESET(dectalk)
-	MDRV_DUART68681_ADD( "duart68681", XTAL_3_6864MHz, dectalk_duart68681_config ) /* Y3 3.6864Mhz */
+    MDRV_DUART68681_ADD( "duart68681", XTAL_3_6864MHz, dectalk_duart68681_config ) /* Y3 3.6864MHz Xtal */
 
 
-    MDRV_CPU_ADD("dsp", TMS32010, XTAL_20MHz) /* Y1 20Mhz */
+    MDRV_CPU_ADD("dsp", TMS32010, XTAL_20MHz) /* Y1 20MHz xtal */
     MDRV_CPU_PROGRAM_MAP(tms32010_mem)
     MDRV_CPU_IO_MAP(tms32010_io)
     MDRV_QUANTUM_TIME(HZ(10000))
 
     /* video hardware */
-	MDRV_DEFAULT_LAYOUT(layout_dectalk) // hack to avoid screenless system crash
+    MDRV_DEFAULT_LAYOUT(layout_dectalk) // hack to avoid screenless system crash
 
     /* sound hardware */
-	//MDRV_SPEAKER_STANDARD_MONO("mono")
-	//MDRV_SOUND_ADD("dectalk_snd", SPEAKER, XTAL_10Khz)
-	//MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+    //MDRV_SPEAKER_STANDARD_MONO("mono")
+    //MDRV_SOUND_ADD("dectalk_snd", SPEAKER, XTAL_10KHz) /* E88 10KHz OSC */
+    //MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+    /* Y2 is a 3.579545 MHz xtal for the dtmf decoder chip */
 
 
 MACHINE_DRIVER_END
