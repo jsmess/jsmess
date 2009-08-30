@@ -1125,10 +1125,12 @@ static DEVICE_IMAGE_LOAD(c64_cart)
 			case WESTERMANN:		/* Type # 11 */
 			case REX:			/* Type # 12 */
 			case FINAL_CART_I:	/* Type # 13 */
+			case MAGIC_FORMEL:	/* Type # 14 */
 			case C64GS:			/* Type # 15 */
 			case DINAMIC:		/* Type # 17 */
 			case ZAXXON:		/* Type # 18 */
 			case DOMARK:		/* Type # 19 */
+			case SUPER_SNAP_5:	/* Type # 20 */
 			case COMAL_80:		/* Type # 21 */
 			case GENERIC_CRT:		/* Type #  0 */
 				printf("Currently supported cart type (Type %d)\n", c64_cart_type);
@@ -1585,6 +1587,8 @@ static void setup_c64_custom_mappers(running_machine *machine)
 			break;
 		case FINAL_CART_I:	/* Type # 13 not working */
 			break;
+		case MAGIC_FORMEL:	/* Type # 14 not working */
+			break;
 		case C64GS:             /* Type # 15 - up to 64 8k banks, loaded at 0x8000, banks chosen by writing to 0xde00 + bank */
 			memory_install_write8_handler( space, 0xde00, 0xdeff, 0, 0, c64gs_bank_w );
 			break;
@@ -1596,6 +1600,8 @@ static void setup_c64_custom_mappers(running_machine *machine)
 			break;
 		case DOMARK:		/* Type # 19 */
 			memory_install_write8_handler( space, 0xde00, 0xde00, 0, 0, domark_bank_w );
+			break;
+		case SUPER_SNAP_5:	/* Type # 20 not working */
 			break;
 		case COMAL_80:          /* Type # 21 - 4 16k banks, loaded at 0x8000, banks chosen by writing to 0xde00 */
 			memory_install_write8_handler( space, 0xde00, 0xde00, 0, 0, comal80_bank_w );
