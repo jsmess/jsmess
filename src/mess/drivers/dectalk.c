@@ -7,10 +7,23 @@
 *  have been impossible.
 *  Special thanks to Al Kossow for archiving the DTC-01 schematic at bitsavers,
 *  which is invaluable for work on this driver.
+*  Special thanks to leeeeee for helping figure out what the led selftest codes actually mean
 *
 *  TODO:
-*  * Fix hookup of duart, I suspect there's an address line shift problem, either that or modes 0-6 of the duart being unimplemented prevents this from working at all.
-*  * Attach m68k interrupts properly; i suspect the duart int is hooked up wrong
+*  * DUART: I suspect there's an address line shift problem, either that or modes 0-6 of the duart being unimplemented prevents this from working at all.
+*    * seems more likely to be the mode problem?
+*    * pins IP0, IP2, and IP3 are connected to the primary serial port:
+*      * IP0 is CTS
+*      * IP2 is DSR
+*      * IP3 is RLS (recieved line signal, this pin is rarely used on rs232)
+*    * pins IP4, IP5 and IP6 are on jumpers on the DUART, tied high normally but jumperable low, should be handled as dipswitches:
+*      * IP4 low: skip hardware self tests
+*      * IP5 low: unknown
+*      * IP6 low: unknown
+*    * pins OP0 and OP2 are connected to the primary serial port:
+*      * OP0 is RTS
+*      * OP2 is DTR
+*  * Attach m68k interrupts properly; I suspect the DUART INT and SPC INTs are both hooked up wrong
 *  * Figure out why status LEDS are flashing 00 FD 00 FD etc... some sort of 68k selftest DUART error?
 *    * NICETOHAVE: figure out what all the LED error codes actually mean, as DEC didn't document them anywhere.
 *  * Actually store the X2212 nvram's eeprom data to disk rather than throwing it out on exit
@@ -21,24 +34,27 @@
 *  * emulate/simulate the MT8060 dtmf decoder as a 16-key input device?
 *  * discuss and figure out how to have an external application send data to the two serial ports to be spoken
 *
-* LED error code list (found by experimentation):
-*    FF 00 - M68k address register check fail (if data registers fail the processor just spins forever and no led code is generated)
-*    FF 01 - ROM check fail @ 0x00000, rom at E8 or E22
-*    FF 02 - ROM check fail @ 0x08000, rom at E7 or E21
-*    FF 03 - ROM check fail @ 0x10000, rom at E6 or E20
-*    FF 04 - ROM check fail @ 0x18000, rom at E5 or E19
-*    FF 05 - ROM check fail @ 0x20000, rom at E4 or E18
-*    FF 06 - ROM check fail @ 0x28000, rom at E3 or E17
-*    FF 07 - ROM check fail @ 0x30000, rom at E2 or E16
-*    FF 08 - ROM check fail @ 0x38000, rom at E1 or E15
+* LED error code list (found by experimentation and help from leeeeee):
+*    FF 00 - M68k address register check fail or data register check fail (test code at $21E)
+*     (for some data register failures the processor just spins forever and no led code is generated)
+*    FF 01 - ROM check fail @ 0x00000, rom at E8 or E22 (test code at $278)
+*    FF 02 - ROM check fail @ 0x08000, rom at E7 or E21 "
+*    FF 03 - ROM check fail @ 0x10000, rom at E6 or E20 "
+*    FF 04 - ROM check fail @ 0x18000, rom at E5 or E19 "
+*    FF 05 - ROM check fail @ 0x20000, rom at E4 or E18 "
+*    FF 06 - ROM check fail @ 0x28000, rom at E3 or E17 "
+*    FF 07 - ROM check fail @ 0x30000, rom at E2 or E16 "
+*    FF 08 - ROM check fail @ 0x38000, rom at E1 or E15 "
 *    FF 0F - ROM check fail at multiple addresses
 *    FE 01 - RAM check fail @ 0x80000-0x83fff, ram at E36 or E49
 *    FE 02 - RAM check fail @ 0x84000-0x87fff, ram at E35 or E48
 *    FE 03 - RAM check fail @ 0x88000-0x8bfff, ram at E34 or E47
 *    FE 04 - RAM check fail @ 0x8c000-0x8ffff, ram at E33 or E46
 *    FE 05 - RAM check fail @ 0x90000-0x93fff, ram at E32 or E44
-*    FD 00 - unknown, probably either duart interface failure, interrupt failure, or duart timer failure
-
+*    FD 00 - DUART test fail (test code at $046C) [fails in mess]
+*    FC 00 - TMS32010 i/o register test? (test code at $051E) [?passes? in mess]
+*    FB 00 - DUART interrupt tests fail [fails in mess]
+*    Jump to $102C to skip the self tests
 *******************************************************************************/
 /*the 68k memory map is such:
 0x000000-0x007fff: E22 low, E8 high
