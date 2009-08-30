@@ -1127,6 +1127,7 @@ static DEVICE_IMAGE_LOAD(c64_cart)
 			case FINAL_CART_I:	/* Type # 13 */
 			case C64GS:			/* Type # 15 */
 			case DINAMIC:		/* Type # 17 */
+			case ZAXXON:		/* Type # 18 */
 			case COMAL_80:		/* Type # 21 */
 			case GENERIC_CRT:		/* Type #  0 */
 				printf("Currently supported cart type (Type %d)\n", c64_cart_type);
@@ -1284,10 +1285,20 @@ static DEVICE_IMAGE_LOAD(c64_cart)
 		}
 	}
 */
-	memcpy(roml, cart + 0 * 0x2000, 0x2000);
-	memcpy(romh, cart + 1 * 0x2000, 0x2000);
+	switch( c64_mapper )
+	{
+	case ZAXXON:
+		// c64_game = 0;
+		// c64_exrom = 0;
+		memcpy(romh, cart + 0x1000, 0x2000);
+		break;
+	default:
+		memcpy(roml, cart + 0 * 0x2000, 0x2000);
+		memcpy(romh, cart + 1 * 0x2000, 0x2000);
+	}
 
 	c64_cart_n_banks = n_banks; // this is needed so that we only set mappers if a cart is present!
+
 	return INIT_PASS;
 }
 
@@ -1465,6 +1476,28 @@ static READ8_HANDLER( dinamic_bank_r )
 	return 0;
 }
 
+static READ8_HANDLER( zaxxon_bank_r )
+{
+	// Type # 18
+	// working:
+	// not working:
+
+	UINT8 bank;
+	UINT8 *cart = memory_region(space->machine, "cart");
+
+	if (offset < 0x1000)
+		bank = 0;
+	else
+		bank = 1;
+
+	// c64_game = 0;
+	// c64_exrom = 0;
+
+	memcpy(romh, cart + bank * 0x2000 + 0x1000, 0x2000);
+
+	return cart[offset & 0x0fff];
+}
+
 static WRITE8_HANDLER( comal80_bank_w )
 {
 	// Type # 21
@@ -1534,6 +1567,9 @@ static void setup_c64_custom_mappers(running_machine *machine)
 			break;
 		case DINAMIC:           /* Type # 17 - 16 8k banks, loaded at 0x8000, banks chosen by reading to 0xde00 + bank */
 			memory_install_read8_handler( space, 0xde00, 0xdeff, 0, 0, dinamic_bank_r );
+			break;
+		case ZAXXON:		/* Type # 18 */
+			memory_install_read8_handler( space, 0x8000, 0x9fff, 0, 0, zaxxon_bank_r );
 			break;
 		case COMAL_80:          /* Type # 21 - 4 16k banks, loaded at 0x8000, banks chosen by writing to 0xde00 */
 			memory_install_write8_handler( space, 0xde00, 0xde00, 0, 0, comal80_bank_w );
