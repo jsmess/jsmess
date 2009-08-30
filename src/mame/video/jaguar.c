@@ -664,15 +664,15 @@ static TIMER_CALLBACK( jaguar_pit )
 WRITE16_HANDLER( jaguar_tom_regs_w )
 {
 	UINT32 reg_store = gpu_regs[offset];
-	attotime sample_period;
+//	attotime sample_period;
 	if (offset < GPU_REGS)
 	{
 		COMBINE_DATA(&gpu_regs[offset]);
 
 		switch (offset)
 		{
-
-#if 0			case PIT1:
+#if 0
+			case PIT1:
 				if (gpu_regs[PIT0])
 				{
 					sample_period = ATTOTIME_IN_NSEC(cpu_get_clock(cputag_get_cpu(space->machine,"gpu")) / (1+gpu_regs[PIT0]) / (1+gpu_regs[PIT1]));
