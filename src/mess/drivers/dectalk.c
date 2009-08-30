@@ -51,9 +51,9 @@
 *    FE 03 - RAM check fail @ 0x88000-0x8bfff, ram at E34 or E47
 *    FE 04 - RAM check fail @ 0x8c000-0x8ffff, ram at E33 or E46
 *    FE 05 - RAM check fail @ 0x90000-0x93fff, ram at E32 or E44
-*    FD 00 - DUART test fail (test code at $046C) [fails in mess]
-*    FC 00 - TMS32010 i/o register test? (test code at $051E) [?passes? in mess]
-*    FB 00 - DUART interrupt tests fail [fails in mess]
+*    FD 00 - DUART test (test code at $046C) [fails in mess]
+*    FC 00 - TMS32010 'SPC' and DTMF 'TLC' status register test (test code at $051E) [passes in mess]
+*    FB 00 - DUART interrupt tests [fails in mess]
 *    Jump to $102C to skip the self tests
 *******************************************************************************/
 /*the 68k memory map is such:
