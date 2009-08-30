@@ -200,6 +200,7 @@
 #include "driver.h"
 #include "cpu/tms9900/tms9900.h"
 #include "sound/sn76496.h"
+#include "sound/tms5220.h"
 #include "deprecat.h"
 #include "video/v9938.h"
 #include "includes/geneve.h"

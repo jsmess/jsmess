@@ -363,6 +363,7 @@ DRVLIBS = \
 	$(MESSOBJ)/tem.a \
 	$(MESSOBJ)/tesla.a \
 	$(MESSOBJ)/thomson.a \
+	$(MESSOBJ)/ti.a \
 	$(MESSOBJ)/tiger.a \
 	$(MESSOBJ)/tiki.a \
 	$(MESSOBJ)/tomy.a \
@@ -375,8 +376,6 @@ DRVLIBS = \
 	$(MESSOBJ)/xerox.a \
 	$(MESSOBJ)/zvt.a \
 	$(MESSOBJ)/shared.a \
-
-#	$(MESSOBJ)/ti.a \
 
 
 

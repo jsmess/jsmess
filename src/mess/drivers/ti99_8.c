@@ -174,6 +174,7 @@ Known Issues (MZ, 2009-04-26)
 #include "devices/cartslot.h"
 #include "machine/smartmed.h"
 #include "sound/sn76496.h"
+#include "sound/tms5220.h"
 #include "sound/wave.h"
 #include "devices/harddriv.h"
 #include "machine/idectrl.h"
