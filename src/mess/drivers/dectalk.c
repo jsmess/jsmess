@@ -21,6 +21,24 @@
 *  * emulate/simulate the MT8060 dtmf decoder as a 16-key input device?
 *  * discuss and figure out how to have an external application send data to the two serial ports to be spoken
 *
+* LED error code list (found by experimentation):
+*    FF 00 - M68k address register check fail (if data registers fail the processor just spins forever and no led code is generated)
+*    FF 01 - ROM check fail @ 0x00000, rom at E8 or E22
+*    FF 02 - ROM check fail @ 0x08000, rom at E7 or E21
+*    FF 03 - ROM check fail @ 0x10000, rom at E6 or E20
+*    FF 04 - ROM check fail @ 0x18000, rom at E5 or E19
+*    FF 05 - ROM check fail @ 0x20000, rom at E4 or E18
+*    FF 06 - ROM check fail @ 0x28000, rom at E3 or E17
+*    FF 07 - ROM check fail @ 0x30000, rom at E2 or E16
+*    FF 08 - ROM check fail @ 0x38000, rom at E1 or E15
+*    FF 0F - ROM check fail at multiple addresses
+*    FE 01 - RAM check fail @ 0x80000-0x83fff, ram at E36 or E49
+*    FE 02 - RAM check fail @ 0x84000-0x87fff, ram at E35 or E48
+*    FE 03 - RAM check fail @ 0x88000-0x8bfff, ram at E34 or E47
+*    FE 04 - RAM check fail @ 0x8c000-0x8ffff, ram at E33 or E46
+*    FE 05 - RAM check fail @ 0x90000-0x93fff, ram at E32 or E44
+*    FD 00 - unknown, probably either duart interface failure, interrupt failure, or duart timer failure
+
 *******************************************************************************/
 /*the 68k memory map is such:
 0x000000-0x007fff: E22 low, E8 high
@@ -132,8 +150,8 @@ static void dectalk_x2212_recall( running_machine *machine )
 DRIVER_INIT( dectalk )
 {
 	dectalk_clear_all_fifos(machine);
-	dectalk.outfifo_writable_latch = 0;
-	dectalk.spc_error_latch = 0;
+	dectalk.outfifo_writable_latch = 0; // on the original dectalk pcb revision, this is a semaphore for the INPUT fifo, later dec hacked on a check for the 3 output fifo chips to see if they're in sync, and set both of these latches if true.
+	dectalk.spc_error_latch = 1; // normally would be 0, but if set to 1 on startup the dectalk should recover as well 
 }
 
 /* Machine reset: stuff that needs setting up which IS directly affected by reset */
@@ -216,12 +234,15 @@ WRITE16_HANDLER( m68k_spcflags_w ) // 68k write to the speech flags (only 3 bits
 	{
 		dectalk_clear_all_fifos(space->machine);
 		/* write me */ // data&1 also forces the CLR line active on the tms32010, we need to do that here as well
+		// clear the two speech side latches
+		dectalk.spc_error_latch = 0;
+		dectalk.outfifo_writable_latch = 0;
 	}
 	if ((data&0x2) == 0x2) // bit 1
 	{
-	// clear the two speech side latches
-	dectalk.spc_error_latch = 0;
-	dectalk.outfifo_writable_latch = 0;
+		// clear the two speech side latches
+		dectalk.spc_error_latch = 0;
+		dectalk.outfifo_writable_latch = 0;
 	}
 	if ((data&0x40) == 0x40) // bit 6
 	{
@@ -253,9 +274,9 @@ return 0;
 /* End 68k i/o handlers */
 
 /* Begin tms32010 i/o handlers */
-WRITE16_HANDLER( spc_latch_outfifo_error_stats ) // latch 74ls74 @ E64 upper and lower halves with d0 and fifo status respectively
+WRITE16_HANDLER( spc_latch_outfifo_error_stats ) // latch 74ls74 @ E64 upper and lower halves with d0 and 1 respectively
 {
-    dectalk.outfifo_writable_latch = (dectalk.outfifo_tail_ptr == ((dectalk.outfifo_head_ptr-1)&0xF)?0:1); // may have polarity backwards
+    dectalk.outfifo_writable_latch = 1; // always set to 1 here.
     dectalk.spc_error_latch = data&1;
 }
 
@@ -329,7 +350,7 @@ static ADDRESS_MAP_START(tms32010_mem, ADDRESS_SPACE_PROGRAM, 16)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(tms32010_io, ADDRESS_SPACE_IO, 16)
-    AM_RANGE(0, 0) AM_WRITE(spc_latch_outfifo_error_stats) // latch fifo status to be read by outfifo_status_r, and also latch the error bit at D0.
+    AM_RANGE(0, 0) AM_WRITE(spc_latch_outfifo_error_stats) // *set* the outfifo_status_r semaphore, and also latch the error bit at D0.
     AM_RANGE(1, 1) AM_READWRITE(spc_infifo_data_r, spc_outfifo_data_w) //read from input fifo, write to sound fifo
     AM_RANGE(TMS32010_BIO, TMS32010_BIO) AM_READ(spc_outfifo_writable_r) //read output fifo writable status
 ADDRESS_MAP_END
@@ -378,7 +399,7 @@ MACHINE_DRIVER_END
 
 ROM_START( dectalk )
 	ROM_REGION16_BE(0x40000,"maincpu", 0)
-	// dectalk dtc-01 firmware v1.2? (first half: 23Jul84 tag; second half: 02Jul84 tag), all roms are 27128 eproms
+	// dectalk dtc-01 firmware v?.? (probably 1.4 or 2.1) (first half: 23Jul84 tag; second half: 02Jul84 tag), all roms are 27128 eproms
 	ROM_LOAD16_BYTE("dtc01_e5.123", 0x00000, 0x4000, CRC(03e1eefa) SHA1(e586de03e113683c2534fca1f3f40ba391193044)) // Label: "SP8510123E5" @ E8
 	ROM_LOAD16_BYTE("dtc01_e5.119", 0x00001, 0x4000, CRC(af20411f) SHA1(7954bb56b7591f8954403a22d34de31c7d5441ac)) // Label: "SP8510119E5" @ E22
 	ROM_LOAD16_BYTE("dtc01_e5.124", 0x08000, 0x4000, CRC(9edeafcb) SHA1(7724babf4ae5d77c0b4200f608d599058d04b25c)) // Label: "SP8510124E5" @ E7
