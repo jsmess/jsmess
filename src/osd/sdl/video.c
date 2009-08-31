@@ -339,10 +339,10 @@ void osd_update(running_machine *machine, int skip_redraw)
 	// if we're not skipping this redraw, update all windows
 	if (!skip_redraw)
 	{
-		profiler_mark(PROFILER_BLIT);
+//		profiler_mark(PROFILER_BLIT);
 		for (window = sdl_window_list; window != NULL; window = window->next)
 			sdlwindow_video_window_update(machine, window);
-		profiler_mark(PROFILER_END);
+//		profiler_mark(PROFILER_END);
 	}
 
 	// poll the joystick values here
@@ -404,7 +404,7 @@ static BOOL CALLBACK monitor_enum_callback(HMONITOR handle, HDC dc, LPRECT rect,
 	assert(result);
 
 	// allocate a new monitor info
-	monitor = alloc_or_die(sdl_monitor_info);
+	monitor = alloc_or_die(sizeof(*monitor));
 	memset(monitor, 0, sizeof(*monitor));
 
 	// copy in the data

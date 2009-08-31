@@ -4,7 +4,7 @@
 #
 #   SDL-specific makefile
 #
-#   Copyright (c) 1996-2008, Nicola Salmoria and the MAME Team.
+#   Copyright (c) 1996-2009, Nicola Salmoria and the MAME Team.
 #   Visit http://mamedev.org for licensing and usage restrictions.
 #
 #   SDLMAME by Olivier Galibert and R. Belmont 
@@ -59,6 +59,10 @@ USE_DISPATCH_GL = 1
 ##################   END USER-CONFIGURABLE OPTIONS   ######################
 ###########################################################################
 
+ifdef IA64
+DEFS += -DSDLMAME_NOASM
+endif
+
 # bring in external flags for RPM build
 CFLAGS += $(OPT_FLAGS)
 
@@ -89,6 +93,12 @@ DEFS += -DDISTRO=$(DISTRO)
 #-------------------------------------------------
 
 ifdef BIGENDIAN
+X86_MIPS3_DRC =
+X86_PPC_DRC =
+FORCE_DRC_C_BACKEND = 1
+endif
+
+ifdef IA64
 X86_MIPS3_DRC =
 X86_PPC_DRC =
 FORCE_DRC_C_BACKEND = 1

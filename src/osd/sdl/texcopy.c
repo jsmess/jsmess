@@ -43,18 +43,42 @@ INLINE UINT32 ycc_to_rgb(unsigned y, unsigned cb, unsigned cr)
 	return MAKE_RGB(r >> 8, g >> 8, b >> 8);
 }
 #else
-#define CLUL(x) ((int) x < 0 ? 0 : (x > 65535 ? 255 : x>>8))
+
+
+static int clamp[256+128+128] = { 255 };
+static int coff_cr[256][2] = {  {0, 0} };
+static int coff_cb[256][2] = { {0, 0} };
+
+static void init_clamp(void)
+{
+	int i;
+	for (i=0;i<128;i++)
+	{
+		clamp[i] = 0;
+		clamp[i + 256 + 128] = 255;
+	}
+	for (i=0;i<256;i++)
+	{
+		clamp[i + 128] = i;
+		
+		coff_cr[i][0] =              + 409 * i     - 56992;
+		coff_cr[i][1] =              - 208 * i;
+		coff_cb[i][0] = - 100 * i /* - 208 * cr */ + 34784;
+		coff_cb[i][1] = + 516 * i                  - 70688;
+	}
+}
+
+INLINE int CLSH(int x)	{	return (const int) clamp[(x >> 8) + 128] ; }
 
 INLINE UINT32 ycc_to_rgb(unsigned y, unsigned cb, unsigned cr)
 {
-	unsigned int r, g, b, common;
+	int r, g, b, common;
+	common = y * 298;
 
-	common = 298 * y - 56992;
-	r = (common +            409 * cr);
-	g = (common - 100 * cb - 208 * cr + 91776);
-	b = (common + 516 * cb - 13696);
-
-	return 0xff000000 | (CLUL(r)<<16) | (CLUL(g)<<8) | (CLUL(b));
+	r = (const int) coff_cr[cr][0]; //             409 * cr - 56992;
+	g = (const int) coff_cb[cb][0] + (const int) coff_cr[cr][1]; //- 100 * cb - 208 * cr + 34784;
+	b = (const int) coff_cb[cb][1]; //+ 516 * cb - 70688;
+	return 0xff000000 | (CLSH(r + common)<<16) | (CLSH(g + common)<<8) | (CLSH(b + common));
 }
 
 #endif
@@ -111,6 +135,9 @@ static void texcopy_yuv16(texture_info *texture, const render_texinfo *texsource
 	UINT32 *dst;
 	UINT16 *src;
 
+	if (clamp[0]>0)
+		init_clamp();
+
 	// loop over Y
 	for (y = 0; y < texsource->height; y++)
 	{
@@ -122,7 +149,7 @@ static void texcopy_yuv16(texture_info *texture, const render_texinfo *texsource
 			*dst++ = 0;
 
 		// we don't support prescale for YUV textures
-		for (x = 0; x < texsource->width/2; x++)
+		for (x = texsource->width/2; x > 0 ; x--)
 		{
 			UINT16 srcpix0 = *src++;
 			UINT16 srcpix1 = *src++;
@@ -141,14 +168,21 @@ static void texcopy_yuv16(texture_info *texture, const render_texinfo *texsource
 	}
 }
 
-#define CLSH(x)		(((int) (x) < 0) ? 0 : ( (x) > 65535 ? 255 : (x) >> 8))
 
 static void texcopy_yuv16_paletted(texture_info *texture, const render_texinfo *texsource)
 {
 	int x, y;
 	UINT32 *dst;
 	UINT16 *src;
+	int lookup[256];
+	
+	if (clamp[0]>0)
+		init_clamp();
 
+	/* preprocess lookup */
+	for (x=0; x<256; x++)
+		lookup[x] = texsource->palette[x] * 298;
+	
 	// loop over Y
 	for (y = 0; y < texsource->height; y++)
 	{
@@ -160,7 +194,7 @@ static void texcopy_yuv16_paletted(texture_info *texture, const render_texinfo *
 			*dst++ = 0;
 
 		// we don't support prescale for YUV textures
-		for (x = 0; x < texsource->width/2; x++)
+		for (x = texsource->width/2; x > 0 ; x--)
 		{
 			UINT16 srcpix0 = *src++;
 			UINT16 srcpix1 = *src++;
@@ -171,17 +205,15 @@ static void texcopy_yuv16_paletted(texture_info *texture, const render_texinfo *
 			*dst++ = ycc_to_rgb(texsource->palette[0x000 + (srcpix0 >> 8)], cb, cr);
 			*dst++ = ycc_to_rgb(texsource->palette[0x000 + (srcpix1 >> 8)], cb, cr);
 #else
-			unsigned int r1, r2, g1, g2, b1, b2;
-			unsigned int y1 = texsource->palette[(srcpix0 >> 8)] * 298;
-			unsigned int y2 = texsource->palette[(srcpix1 >> 8)] * 298;
+			int r  = (const int) coff_cr[cr][0]; 
+			int g  = (const int) coff_cb[cb][0] + (const int) coff_cr[cr][1]; 
+			int b  = (const int) coff_cb[cb][1];
+			int y1 = (const int) lookup[(srcpix0 >> 8)];
+			int y2 = (const int) lookup[(srcpix1 >> 8)];
 
-			r1 = r2 =               409 * cr - 56992;
-			g1 = g2 =  - 100 * cb - 208 * cr + 34784;
-			b1 = b2 =  + 516 * cb - 70688;
-			r1 += y1; g1 += y1; b1 += y1;
-			r2 += y2; g2 += y2; b2 += y2;
-			*dst++ = 0xff000000 | (CLSH(r1)<<16) | (CLSH(g1)<<8) | (CLSH(b1));
-			*dst++ = 0xff000000 | (CLSH(r2)<<16) | (CLSH(g2)<<8) | (CLSH(b2));
+			
+			*dst++ = 0xff000000 | (CLSH(r + y1)<<16) | (CLSH(g + y1)<<8) | (CLSH(b + y1));
+			*dst++ = 0xff000000 | (CLSH(r + y2)<<16) | (CLSH(g + y2)<<8) | (CLSH(b + y2));
 #endif
 		}
 		

@@ -2,7 +2,7 @@
 #
 #   makefile
 #
-#   Core makefile for building SDLMAME and derivatives
+#   Core makefile for building MAME and derivatives
 #
 #   Copyright (c) Nicola Salmoria and the MAME Team.
 #   Visit http://mamedev.org for licensing and usage restrictions.
@@ -337,7 +337,10 @@ CCOMFLAGS += -O$(OPTIMIZE)
 # and make all errors into warnings
 ifneq ($(OPTIMIZE),0)
 ifneq ($(TARGETOS),os2)
+ifndef IA64
 CCOMFLAGS += -Werror -fno-strict-aliasing $(ARCHOPTS)
+else
+endif
 else
 CCOMFLAGS += -fno-strict-aliasing $(ARCHOPTS)
 endif
@@ -435,6 +438,7 @@ OBJDIRS = $(OBJ)
 
 LIBEMU = $(OBJ)/libemu.a
 LIBCPU = $(OBJ)/libcpu.a
+LIBDASM = $(OBJ)/libdasm.a
 LIBSOUND = $(OBJ)/libsound.a
 LIBUTIL = $(OBJ)/libutil.a
 LIBOCORE = $(OBJ)/libocore.a
@@ -507,7 +511,7 @@ include $(SRC)/build/build.mak
 include $(SRC)/tools/tools.mak
 
 # combine the various definitions to one
-CDEFS = $(DEFS) $(COREDEFS) $(CPUDEFS) $(SOUNDDEFS)
+CDEFS = $(DEFS) $(COREDEFS) $(SOUNDDEFS)
 
 
 
@@ -555,7 +559,7 @@ ifndef EXECUTABLE_DEFINED
 # always recompile the version string
 $(VERSIONOBJ): $(DRVLIBS) $(LIBOSD) $(LIBEMU) $(LIBCPU) $(LIBSOUND) $(LIBUTIL) $(EXPAT) $(ZLIB) $(LIBOCORE) $(RESFILE)
 
-$(EMULATOR): $(VERSIONOBJ) $(DRVLIBS) $(LIBOSD) $(LIBEMU) $(LIBCPU) $(LIBSOUND) $(LIBUTIL) $(EXPAT) $(ZLIB) $(LIBOCORE) $(RESFILE)
+$(EMULATOR): $(VERSIONOBJ) $(DRVLIBS) $(LIBOSD) $(LIBEMU) $(LIBCPU) $(LIBDASM) $(LIBSOUND) $(LIBUTIL) $(EXPAT) $(ZLIB) $(LIBOCORE) $(RESFILE)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $(LDFLAGSEMULATOR) $^ $(LIBS) -o $@
 

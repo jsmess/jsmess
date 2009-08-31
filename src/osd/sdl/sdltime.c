@@ -372,20 +372,44 @@ osd_ticks_t osd_ticks_per_second(void)
 //  osd_profiling_ticks
 //============================================================
 
+#if defined(__i386__) || defined(__x86_64__)
+static UINT64 last_result = 0;
+static UINT64 current = 0;
+
+static UINT64 rdtsc(void)
+{
+    UINT64 result;
+
+    // use RDTSC
+    __asm__ __volatile__ (
+        "rdtsc"
+        : "=A" (result)
+    );
+    return result;
+}
+#endif
+
 osd_ticks_t osd_profiling_ticks(void)
 {
 #if defined(__i386__) || defined(__x86_64__)
-	UINT64 result;
+    UINT64 result;
+    UINT64 diff;
 
-	// use RDTSC
-	__asm__ __volatile__ (
-		"rdtsc"
-		: "=A" (result)
-	);
+    result = rdtsc();
+    if (result > last_result)
+    {
+        diff = result - last_result;
+        current += diff;
+    } else
+        printf("less @ %lld\n", current);
+    last_result = result;
 
-	return result;
+    /* osd_ticks_t is defined as INT64 */
+    current &= U64(0x7FFFFFFFFFFFFFFF);
+
+    return current;
 #else
-	return (*ticks_counter)();
+    return (*ticks_counter)();
 #endif
 }
 

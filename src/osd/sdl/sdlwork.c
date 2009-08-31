@@ -2,7 +2,7 @@
 //
 //  sdlwork.c - SDL OSD core work item functions
 //
-//  Copyright (c) 1996-2007, Nicola Salmoria and the MAME Team.
+//  Copyright (c) 1996-2009, Nicola Salmoria and the MAME Team.
 //  Visit http://mamedev.org for licensing and usage restrictions.
 //
 //  SDLMAME by Olivier Galibert and R. Belmont
@@ -12,6 +12,10 @@
 // MinGW does not have pthreads, defer to Aaron's implementation on that platform
 #if defined(SDLMAME_WIN32)
 #include "../windows/winwork.c"
+#else
+
+#if defined(SDLMAME_NOASM)
+#include "../osdmini/miniwork.c"
 #else
 
 #include "osdcore.h"
@@ -894,4 +898,5 @@ static void worker_thread_process(osd_work_queue *queue, work_thread_info *threa
 	end_timing(thread->runtime);
 }
 
+#endif // SDLMAME_NOASM
 #endif	// SDLMAME_WIN32
