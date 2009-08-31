@@ -561,10 +561,22 @@ static WRITE8_HANDLER( x1_dma_w )
 	//	fatalerror("Data written to the DMA space");
 }
 
+/* TODO: still not yet perfect */
+static UINT16 check_pcg_addr(running_machine *machine)
+{
+	if(colorram[0x7ff] & 0x20) return 0x7ff;
+	if(colorram[0x3ff] & 0x20) return 0x3ff;
+	if(colorram[0x5ff] & 0x20) return 0x5ff;
+	if(colorram[0x1ff] & 0x20) return 0x1ff;
+
+	return 0x3ff;
+}
+
 static WRITE8_HANDLER( x1_pcg_w )
 {
 	int addr,pcg_offset;
 	UINT8 *PCG_RAM = memory_region(space->machine, "pcg");
+	static UINT16 used_pcg_addr;
 
 	addr = (offset & 0x300) >> 8;
 
@@ -586,13 +598,12 @@ static WRITE8_HANDLER( x1_pcg_w )
 	{
 //		if(!ply_reg.pcg_mode)
 //		{
-			//( ((V_CNT-CRT_YL)/FNT_YL) + TXT_YL) * TXT_XL
-//			int v_count = video_screen_get_vpos(space->machine->primary_screen);
 //
 //		}
 //		else
 		{
-			pcg_offset = (pcg_index[addr-1]) & 0x7ff;
+			used_pcg_addr = videoram[check_pcg_addr(space->machine)]*8;
+			pcg_offset = (pcg_index[addr-1]+used_pcg_addr) & 0x7ff;
 			pcg_offset+=((addr-1)*0x800);
 			PCG_RAM[pcg_offset] = data;
 
@@ -604,6 +615,7 @@ static WRITE8_HANDLER( x1_pcg_w )
     		gfx_element_mark_dirty(space->machine->gfx[7], pcg_offset >> 3);
 
   			pcg_index[addr-1]++;
+  			pcg_index[addr-1]&=7;
 		}
 	}
 }
