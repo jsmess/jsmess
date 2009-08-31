@@ -6,6 +6,7 @@ New System Drivers Supported (in no particular order):
 - Nintendo Game Boy Advance [R. Belmont, MooglyGuy]
 - 4004 Nixie Tube Clock [Miodrag Milanovic]
 - Busicom 141-PF [Miodrag Milanovic]
+- Mikron-2 [Miodrag Milanovic]
 
 Systems Promoted from GAME_NOT_WORKING:
 ---------------------------------------
