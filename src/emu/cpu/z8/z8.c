@@ -14,7 +14,6 @@
 	- expose register file to disassembler
 	- arithmetic opcodes
 	- interrupts
-	- I/O ports
 	- counter/timer
 	- serial
 	- instruction pipeline
@@ -56,27 +55,38 @@ enum
 #define Z8_P01M_P0L_MODE_MASK		0x03
 #define Z8_P01M_P0L_MODE_OUTPUT		0x00
 #define Z8_P01M_P0L_MODE_INPUT		0x01
-#define Z8_P01M_P0L_MODE_A8_A11		0x02
+#define Z8_P01M_P0L_MODE_A8_A11		0x02	/* not supported */
 #define Z8_P01M_INTERNAL_STACK		0x04
 #define Z8_P01M_P1_MODE_MASK		0x18
 #define Z8_P01M_P1_MODE_OUTPUT		0x00
 #define Z8_P01M_P1_MODE_INPUT		0x08
-#define Z8_P01M_P1_MODE_AD0_AD7		0x10
-#define Z8_P01M_P1_MODE_HI_Z		0x18
-#define Z8_P01M_EXTENDED_TIMING		0x20
-#define Z8_P01M_P1H_MODE_MASK		0xc0
-#define Z8_P01M_P1H_MODE_OUTPUT		0x00
-#define Z8_P01M_P1H_MODE_INPUT		0x40
-#define Z8_P01M_P1H_MODE_A12_A15	0x80
+#define Z8_P01M_P1_MODE_AD0_AD7		0x10	/* not supported */
+#define Z8_P01M_P1_MODE_HI_Z		0x18	/* not supported */
+#define Z8_P01M_EXTENDED_TIMING		0x20	/* not supported */
+#define Z8_P01M_P0H_MODE_MASK		0xc0
+#define Z8_P01M_P0H_MODE_OUTPUT		0x00
+#define Z8_P01M_P0H_MODE_INPUT		0x40
+#define Z8_P01M_P0H_MODE_A12_A15	0x80	/* not supported */
 
-#define Z8_IMR_ENABLE				0x80
+#define Z8_P3M_P2_ACTIVE_PULLUPS	0x01	/* not supported */
+#define Z8_P3M_P0_STROBED			0x04
+#define Z8_P3M_P1_MODE_MASK			0x18
+//#define Z8_P3M_ 0x00
+//#define Z8_P3M_ 0x08
+//#define Z8_P3M_ 0x10
+#define Z8_P3M_P1_STROBED			0x18
+#define Z8_P3M_P2_STROBED			0x20
+#define Z8_P3M_P3_SERIAL			0x40	/* not supported */
+#define Z8_P3M_PARITY				0x80	/* not supported */
+
+#define Z8_IMR_ENABLE				0x80	/* not supported */
 #define Z8_IMR_RAM_PROTECT			0x40	/* not supported */
-#define Z8_IMR_ENABLE_IRQ5			0x20
-#define Z8_IMR_ENABLE_IRQ4			0x10
-#define Z8_IMR_ENABLE_IRQ3			0x08
-#define Z8_IMR_ENABLE_IRQ2			0x04
-#define Z8_IMR_ENABLE_IRQ1			0x02
-#define Z8_IMR_ENABLE_IRQ0			0x01
+#define Z8_IMR_ENABLE_IRQ5			0x20	/* not supported */
+#define Z8_IMR_ENABLE_IRQ4			0x10	/* not supported */
+#define Z8_IMR_ENABLE_IRQ3			0x08	/* not supported */
+#define Z8_IMR_ENABLE_IRQ2			0x04	/* not supported */
+#define Z8_IMR_ENABLE_IRQ1			0x02	/* not supported */
+#define Z8_IMR_ENABLE_IRQ0			0x01	/* not supported */
 
 #define Z8_FLAGS_F1					0x01
 #define Z8_FLAGS_F2					0x02
@@ -110,6 +120,8 @@ struct _z8_state
 	UINT16 fake_sp;			/* fake stack pointer */
 	UINT8 fake_rp;			/* fake register pointer */
 	UINT8 fake_r[16];		/* fake working registers */
+	UINT8 input[4];			/* port input latches */
+	UINT8 output[4];		/* port output latches */
 
 	/* interrupts */
 	int irq[4];				/* external interrupt flip-flops */
@@ -188,15 +200,56 @@ INLINE UINT8 fetch(z8_state *cpustate)
 INLINE UINT8 register_read(z8_state *cpustate, UINT8 offset)
 {
 	UINT8 data = 0xff;
+	UINT8 mask = 0;
 
 	switch (offset)
 	{
 	case Z8_REGISTER_P0:
+		/* TODO: if defined as address outputs, return 1 in each address bit location */
+		if ((cpustate->r[Z8_REGISTER_P01M] & Z8_P01M_P0L_MODE_MASK) == Z8_P01M_P0L_MODE_INPUT) mask |= 0x0f;
+		if ((cpustate->r[Z8_REGISTER_P01M] & Z8_P01M_P0H_MODE_MASK) == Z8_P01M_P0H_MODE_INPUT) mask |= 0xf0;
+
+		if (!(cpustate->r[Z8_REGISTER_P3M] & Z8_P3M_P0_STROBED))
+		{
+			if (mask) cpustate->input[offset] = memory_read_byte_8be(cpustate->io, offset);
+		}
+
+		data = (cpustate->input[offset] & mask) | (cpustate->output[offset] & ~mask);
+		break;
+
 	case Z8_REGISTER_P1:
+		/* TODO: if defined as address outputs, return 1 in each address bit location */
+		if ((cpustate->r[Z8_REGISTER_P01M] & Z8_P01M_P1_MODE_MASK) == Z8_P01M_P1_MODE_INPUT) mask = 0xff;
+
+		if ((cpustate->r[Z8_REGISTER_P3M] & Z8_P3M_P1_MODE_MASK) != Z8_P3M_P1_STROBED)
+		{
+			if (mask) cpustate->input[offset] = memory_read_byte_8be(cpustate->io, offset);
+		}
+
+		data = (cpustate->input[offset] & mask) | (cpustate->output[offset] & ~mask);
+		break;
+
 	case Z8_REGISTER_P2:
+		mask = cpustate->r[Z8_REGISTER_P2M];
+
+		if (!(cpustate->r[Z8_REGISTER_P3M] & Z8_P3M_P2_STROBED))
+		{
+			if (mask) cpustate->input[offset] = memory_read_byte_8be(cpustate->io, offset);
+		}
+
+		data = (cpustate->input[offset] & mask) | (cpustate->output[offset] & ~mask);
+		break;
+
 	case Z8_REGISTER_P3:
-		data = memory_read_byte_8be(cpustate->io, offset);
-		/* if defined as address outputs, return 1 in each address bit location */
+		// TODO: special port 3 modes
+		if (!(cpustate->r[Z8_REGISTER_P3M] & 0x7c))
+		{
+			mask = 0x0f;
+		}
+
+		if (mask) cpustate->input[offset] = memory_read_byte_8be(cpustate->io, offset);
+
+		data = (cpustate->input[offset] & mask) | (cpustate->output[offset] & ~mask);
 		break;
 
 	case Z8_REGISTER_PRE1:
@@ -223,13 +276,39 @@ INLINE UINT16 register_pair_read(z8_state *cpustate, UINT8 offset)
 
 INLINE void register_write(z8_state *cpustate, UINT8 offset, UINT8 data)
 {
+	UINT8 mask = 0;
+
 	switch (offset)
 	{
 	case Z8_REGISTER_P0:
+		cpustate->output[offset] = data;
+		if ((cpustate->r[Z8_REGISTER_P01M] & Z8_P01M_P0L_MODE_MASK) == Z8_P01M_P0L_MODE_OUTPUT) mask |= 0x0f;
+		if ((cpustate->r[Z8_REGISTER_P01M] & Z8_P01M_P0H_MODE_MASK) == Z8_P01M_P0H_MODE_OUTPUT) mask |= 0xf0;
+		if (mask) memory_write_byte_8be(cpustate->io, offset, data & mask);
+		break;
+
 	case Z8_REGISTER_P1:
+		cpustate->output[offset] = data;
+		if ((cpustate->r[Z8_REGISTER_P01M] & Z8_P01M_P1_MODE_MASK) == Z8_P01M_P1_MODE_OUTPUT) mask = 0xff;
+		if (mask) memory_write_byte_8be(cpustate->io, offset, data & mask);
+		break;
+
 	case Z8_REGISTER_P2:
+		cpustate->output[offset] = data;
+		mask = cpustate->r[Z8_REGISTER_P2M] ^ 0xff;
+		if (mask) memory_write_byte_8be(cpustate->io, offset, data & mask);
+		break;
+
 	case Z8_REGISTER_P3:
-		memory_write_byte_8be(cpustate->io, offset, data);
+		cpustate->output[offset] = data;
+		
+		// TODO: special port 3 modes
+		if (!(cpustate->r[Z8_REGISTER_P3M] & 0x7c))
+		{
+			mask = 0xf0;
+		}
+
+		if (mask) memory_write_byte_8be(cpustate->io, offset, data & mask);
 		break;
 
 	case Z8_REGISTER_SIO:

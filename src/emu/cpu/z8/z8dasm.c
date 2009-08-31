@@ -323,8 +323,8 @@ CPU_DISASSEMBLE( z8 )
 			
 			case 0xd0:		mnemonic("SRA"); arg_R(B0); bytes(2);					break;
 			case 0xd1:		mnemonic("SRA"); arg_IR(B0); bytes(2);					break;
-			case 0xd2:		mnemonic("LDC"); arg_Irr(B0H); arg_r(B0L); bytes(2);	break;
-			case 0xd3:		mnemonic("LDCI"); arg_Irr(B0H); arg_Ir(B0L); bytes(2);	break;
+			case 0xd2:		mnemonic("LDC"); arg_Irr(B0L); arg_r(B0H); bytes(2);	break;
+			case 0xd3:		mnemonic("LDCI"); arg_Irr(B0L); arg_Ir(B0H); bytes(2);	break;
 			case 0xd4:		mnemonic("CALL"); arg_IRR(B0); bytes(2); step_over;		break;
 			case 0xd5:		illegal;												break;
 			case 0xd6:		mnemonic("CALL"); arg_DA; bytes(3);	step_over;			break;

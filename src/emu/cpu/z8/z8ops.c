@@ -155,8 +155,8 @@ static void load_from_memory(z8_state *cpustate, const address_space *space)
 static void load_to_memory(z8_state *cpustate, const address_space *space)
 {
 	UINT8 operands = fetch(cpustate);
-	UINT8 dst = get_working_register(cpustate, operands >> 4);
-	UINT8 src = get_working_register(cpustate, operands & 0x0f);
+	UINT8 src = get_working_register(cpustate, operands >> 4);
+	UINT8 dst = get_working_register(cpustate, operands & 0x0f);
 
 	UINT16 address = register_pair_read(cpustate, dst);
 	UINT8 data = register_read(cpustate, src);
@@ -183,8 +183,8 @@ static void load_from_memory_autoinc(z8_state *cpustate, const address_space *sp
 static void load_to_memory_autoinc(z8_state *cpustate, const address_space *space)
 {
 	UINT8 operands = fetch(cpustate);
-	UINT8 dst = get_working_register(cpustate, operands >> 4);
-	UINT8 src = get_working_register(cpustate, operands & 0x0f);
+	UINT8 src = get_working_register(cpustate, operands >> 4);
+	UINT8 dst = get_working_register(cpustate, operands & 0x0f);
 	UINT8 real_src = get_intermediate_register(cpustate, src);
 
 	UINT16 address = register_pair_read(cpustate, dst);
