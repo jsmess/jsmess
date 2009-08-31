@@ -1504,6 +1504,22 @@ $(CPUOBJ)/tlcs900/dasm900.o:	$(CPUSRC)/tlcs900/dasm900.c
 
 
 #-------------------------------------------------
+# Zilog Z8
+#-------------------------------------------------
+
+ifneq ($(filter Z8,$(CPUS)),)
+OBJDIRS += $(CPUOBJ)/z8
+CPUOBJS += $(CPUOBJ)/z8/z8.o
+DASMOBJS += $(CPUOBJ)/z8/z8dasm.o
+endif
+
+$(CPUOBJ)/z8/z8.o:	$(CPUSRC)/z8/z8.c \
+					$(CPUSRC)/z8/z8ops.c \
+					$(CPUSRC)/z8/z8.h
+
+
+
+#-------------------------------------------------
 # Zilog Z80
 #-------------------------------------------------
 
