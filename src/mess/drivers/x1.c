@@ -6,28 +6,30 @@
 
 	TODO:
 	- Understand how keyboard works and decap/dump the keyboard MCU if possible;
-	- Hook-up .d88 and .tap image formats (.rom too?);
+	- Hook-up .tap image formats (.rom too?);
+	- Implement tape commands;
 	- Sort out / redump the BIOS gfx roms;
-	- Fix the interrupts (uses IM 2)
-	- Add multiple FDC drive support;
+	- Implement the interrupts (uses IM 2), basically used by the keyboard.
+	- Implement DMA (X1Turbo only?)
 	- clean-ups!
 	- There are various unclear video things, these are:
-		- PCG reset address is tied to the screen beams in some way;
+		- Understand why some games still doesn't upload the proper PCG index;
 		- Support the alternative PCG upload mode;
-		- Add the extended gfx hookup;
+		- Implement PCG reading, used by Maison Ikkoku, Mule and Gyajiko for kanji reading;
+		- Implement the scrn params;
+		- Interlace mode?
+		- Some colors are still way wrong (check 1942 or Dialide), needs update_partial perhaps?
+		- Maybe the colorram/videoram stuff is actually a converter for the BRG framebuffer in
+		  the end?
 		- (anything else?)
 
 	per-game specific TODO:
-	- Shanghai: tests the ay8910 read regs, mouse/joystick perhaps?
-	- Gaia/Space Harrier: Hits the FDC drive assert, the latter boots but has heavy emulation
-	  video/logic problems;
-	- "alpha": Apparently does use the DMA feature (writes z80 code?), investigate;
 	- Bosconian: title screen background is completely white because it reverts the pen used
 	  (it's gray in the Arcade version),could be either flickering for pseudo-alpha effect or it's
 	  a btanb;
 	- Dragon Slayer: colors aren't 100% and for whatever reason it doesn't clear the screen on the
 	  gameplay.
-	- Super Mario Bros. SP: background color is black, should be blue.
+	- Super Mario Bros. SP: background color is black, should be blue. DMA issue?
 
 	Notes:
 	- An interesting feature of the Sharp X-1 is the extended i/o bank. When the ppi port c bit 5
@@ -188,6 +190,10 @@ static void draw_fgtilemap(running_machine *machine, bitmap_t *bitmap,const rect
 
 			if(((color & 0x8)>>3) != pri) continue;
 			if(tile == 0) continue; //correct?
+			/* skip draw if the x/y values are odd and the width/height is active, */
+			/* behaviour confirmed by Black Onyx title screen and the X1Demo */
+			if((x & 1) == 1 && width) continue;
+			if((y & 1) == 1 && height) continue;
 
 			res_x = (x/(width+1))*8*(width+1);
 			res_y = (y/(height+1))*8*(height+1);
