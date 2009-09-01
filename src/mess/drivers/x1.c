@@ -192,7 +192,6 @@ static void draw_fgtilemap(running_machine *machine, bitmap_t *bitmap,const rect
 			UINT8 *gfx_data = pcg_bank ? memory_region(machine, "pcg") : memory_region(machine, "cgrom");
 
 			if(((color & 0x8)>>3) != pri) continue;
-			if(tile == 0) continue; //correct?
 			/* skip draw if the x/y values are odd and the width/height is active, */
 			/* behaviour confirmed by Black Onyx title screen and the X1Demo */
 			if((x & 1) == 1 && width) continue;
