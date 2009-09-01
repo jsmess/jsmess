@@ -11,10 +11,11 @@
 
 	TODO:
 
+	- strobed I/O
+	- interrupts
 	- expose register file to disassembler
 	- decimal adjust instruction
-	- interrupts
-	- counter/timer
+	- timer Tin/Tout modes
 	- serial
 	- instruction pipeline
 
@@ -52,9 +53,12 @@ enum
 	Z8_REGISTER_SPL
 };
 
-#define Z8_P3_DAV0_RDY0				0x04	/* not supported */
-#define Z8_P3_DAV1_RDY1				0x08	/* not supported */
-#define Z8_P3_DAV2_RDY2				0x02	/* not supported */
+#define Z8_P3_DAV0					0x04	/* not supported */
+#define Z8_P3_DAV1					0x08	/* not supported */
+#define Z8_P3_DAV2					0x02	/* not supported */
+#define Z8_P3_RDY0					0x20	/* not supported */
+#define Z8_P3_RDY1					0x10	/* not supported */
+#define Z8_P3_RDY2					0x40	/* not supported */
 #define Z8_P3_IRQ0					0x04	/* not supported */
 #define Z8_P3_IRQ1					0x08	/* not supported */
 #define Z8_P3_IRQ2					0x02	/* not supported */
@@ -64,6 +68,26 @@ enum
 #define Z8_P3_TIN					0x02	/* not supported */
 #define Z8_P3_TOUT					0x40	/* not supported */
 #define Z8_P3_DM					0x10	/* not supported */
+
+#define Z8_PRE0_COUNT_MODULO_N		0x01
+
+#define Z8_PRE1_COUNT_MODULO_N		0x01
+#define Z8_PRE1_INTERNAL_CLOCK		0x02
+
+#define Z8_TMR_LOAD_T0				0x01
+#define Z8_TMR_ENABLE_T0			0x02
+#define Z8_TMR_LOAD_T1				0x04
+#define Z8_TMR_ENABLE_T1			0x08
+#define Z8_TMR_TIN_MASK				0x30	/* not supported */
+#define Z8_TMR_TIN_EXTERNAL_CLK		0x00	/* not supported */
+#define Z8_TMR_TIN_GATE				0x10	/* not supported */
+#define Z8_TMR_TIN_TRIGGER			0x20	/* not supported */
+#define Z8_TMR_TIN_RETRIGGER		0x30	/* not supported */
+#define Z8_TMR_TOUT_MASK			0xc0	/* not supported */
+#define Z8_TMR_TOUT_OFF				0x00	/* not supported */
+#define Z8_TMR_TOUT_T0				0x40	/* not supported */
+#define Z8_TMR_TOUT_T1				0x80	/* not supported */
+#define Z8_TMR_TOUT_INTERNAL_CLK	0xc0	/* not supported */
 
 #define Z8_P01M_P0L_MODE_MASK		0x03
 #define Z8_P01M_P0L_MODE_OUTPUT		0x00
@@ -117,6 +141,18 @@ enum
 };
 
 /***************************************************************************
+    MACROS
+***************************************************************************/
+
+#define P01M		cpustate->r[Z8_REGISTER_P01M]
+#define P2M			cpustate->r[Z8_REGISTER_P2M]
+#define P3M			cpustate->r[Z8_REGISTER_P3M]
+#define T0			cpustate->r[Z8_REGISTER_T0]
+#define T1			cpustate->r[Z8_REGISTER_T1]
+#define PRE0		cpustate->r[Z8_REGISTER_PRE0]
+#define PRE1		cpustate->r[Z8_REGISTER_PRE1]
+
+/***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
 
@@ -132,18 +168,25 @@ struct _z8_state
 	UINT8 r[256];			/* register file */
 	UINT8 input[4];			/* port input latches */
 	UINT8 output[4];		/* port output latches */
+	UINT8 t0;				/* timer 0 current count */
+	UINT8 t1;				/* timer 1 current count */
 
 	/* fake registers */
 	UINT16 fake_sp;			/* fake stack pointer */
 	UINT8 fake_r[16];		/* fake working registers */
 
 	/* interrupts */
-	int irq[4];				/* external interrupt flip-flops */
+	int irq[6];				/* interrupts */
 
 	/* execution logic */
+	int clock;				/* clock */
 	int icount;				/* instruction counter */
 
 	cpu_state_table state_table;
+
+	/* timers */
+	emu_timer *t0_timer;
+	emu_timer *t1_timer;
 };
 
 /***************************************************************************
@@ -160,6 +203,8 @@ static const cpu_state_entry state_array[] =
 	Z8_STATE_ENTRY(SP, "%04X", fake_sp, 0xffff, CPUSTATE_IMPORT | CPUSTATE_EXPORT)
 	Z8_STATE_ENTRY(GENSP, "%04X", fake_sp, 0xffff, CPUSTATE_NOSHOW | CPUSTATE_IMPORT | CPUSTATE_EXPORT)
 	Z8_STATE_ENTRY(RP, "%02X", r[Z8_REGISTER_RP], 0xff, 0)
+	Z8_STATE_ENTRY(T0, "%02X", t0, 0xff, 0)
+	Z8_STATE_ENTRY(T1, "%02X", t1, 0xff, 0)
 
 	Z8_STATE_ENTRY(R0, "%02X", fake_r[0], 0xff, CPUSTATE_IMPORT | CPUSTATE_EXPORT)
 	Z8_STATE_ENTRY(R1, "%02X", fake_r[1], 0xff, CPUSTATE_IMPORT | CPUSTATE_EXPORT)
@@ -219,34 +264,48 @@ INLINE UINT8 register_read(z8_state *cpustate, UINT8 offset)
 	switch (offset)
 	{
 	case Z8_REGISTER_P0:
-		/* TODO: if defined as address outputs, return 1 in each address bit location */
-		if ((cpustate->r[Z8_REGISTER_P01M] & Z8_P01M_P0L_MODE_MASK) == Z8_P01M_P0L_MODE_INPUT) mask |= 0x0f;
-		if ((cpustate->r[Z8_REGISTER_P01M] & Z8_P01M_P0H_MODE_MASK) == Z8_P01M_P0H_MODE_INPUT) mask |= 0xf0;
+		switch (P01M & Z8_P01M_P0L_MODE_MASK)
+		{
+		case Z8_P01M_P0L_MODE_OUTPUT:	data = cpustate->output[offset] & 0x0f;		break;
+		case Z8_P01M_P0L_MODE_INPUT:	mask = 0x0f;								break;
+		default: /* A8...A11 */			data = 0x0f;								break;
+		}
 
-		if (!(cpustate->r[Z8_REGISTER_P3M] & Z8_P3M_P0_STROBED))
+		switch (P01M & Z8_P01M_P0H_MODE_MASK)
+		{
+		case Z8_P01M_P0H_MODE_OUTPUT:	data |= cpustate->output[offset] & 0xf0;	break;
+		case Z8_P01M_P0H_MODE_INPUT:	mask |= 0xf0;								break;
+		default: /* A12...A15 */		data |= 0xf0;								break;
+		}
+
+		if (!(P3M & Z8_P3M_P0_STROBED))
 		{
 			if (mask) cpustate->input[offset] = memory_read_byte_8be(cpustate->io, offset);
 		}
 
-		data = (cpustate->input[offset] & mask) | (cpustate->output[offset] & ~mask);
+		data |= cpustate->input[offset] & mask;
 		break;
 
 	case Z8_REGISTER_P1:
-		/* TODO: if defined as address outputs, return 1 in each address bit location */
-		if ((cpustate->r[Z8_REGISTER_P01M] & Z8_P01M_P1_MODE_MASK) == Z8_P01M_P1_MODE_INPUT) mask = 0xff;
+		switch (P01M & Z8_P01M_P1_MODE_MASK)
+		{
+		case Z8_P01M_P1_MODE_OUTPUT:	data = cpustate->output[offset];			break;
+		case Z8_P01M_P1_MODE_INPUT:		mask = 0xff;								break;
+		default: /* AD0..AD7 */			data = 0xff;								break;
+		}
 
-		if ((cpustate->r[Z8_REGISTER_P3M] & Z8_P3M_P1_MODE_MASK) != Z8_P3M_P1_STROBED)
+		if ((P3M & Z8_P3M_P1_MODE_MASK) != Z8_P3M_P1_STROBED)
 		{
 			if (mask) cpustate->input[offset] = memory_read_byte_8be(cpustate->io, offset);
 		}
 
-		data = (cpustate->input[offset] & mask) | (cpustate->output[offset] & ~mask);
+		data |= cpustate->input[offset] & mask;
 		break;
 
 	case Z8_REGISTER_P2:
 		mask = cpustate->r[Z8_REGISTER_P2M];
 
-		if (!(cpustate->r[Z8_REGISTER_P3M] & Z8_P3M_P2_STROBED))
+		if (!(P3M & Z8_P3M_P2_STROBED))
 		{
 			if (mask) cpustate->input[offset] = memory_read_byte_8be(cpustate->io, offset);
 		}
@@ -256,7 +315,7 @@ INLINE UINT8 register_read(z8_state *cpustate, UINT8 offset)
 
 	case Z8_REGISTER_P3:
 		// TODO: special port 3 modes
-		if (!(cpustate->r[Z8_REGISTER_P3M] & 0x7c))
+		if (!(P3M & 0x7c))
 		{
 			mask = 0x0f;
 		}
@@ -264,6 +323,14 @@ INLINE UINT8 register_read(z8_state *cpustate, UINT8 offset)
 		if (mask) cpustate->input[offset] = memory_read_byte_8be(cpustate->io, offset);
 
 		data = (cpustate->input[offset] & mask) | (cpustate->output[offset] & ~mask);
+		break;
+
+	case Z8_REGISTER_T0:
+		data = cpustate->t0;
+		break;
+
+	case Z8_REGISTER_T1:
+		data = cpustate->t1;
 		break;
 
 	case Z8_REGISTER_PRE1:
@@ -296,14 +363,14 @@ INLINE void register_write(z8_state *cpustate, UINT8 offset, UINT8 data)
 	{
 	case Z8_REGISTER_P0:
 		cpustate->output[offset] = data;
-		if ((cpustate->r[Z8_REGISTER_P01M] & Z8_P01M_P0L_MODE_MASK) == Z8_P01M_P0L_MODE_OUTPUT) mask |= 0x0f;
-		if ((cpustate->r[Z8_REGISTER_P01M] & Z8_P01M_P0H_MODE_MASK) == Z8_P01M_P0H_MODE_OUTPUT) mask |= 0xf0;
+		if ((P01M & Z8_P01M_P0L_MODE_MASK) == Z8_P01M_P0L_MODE_OUTPUT) mask |= 0x0f;
+		if ((P01M & Z8_P01M_P0H_MODE_MASK) == Z8_P01M_P0H_MODE_OUTPUT) mask |= 0xf0;
 		if (mask) memory_write_byte_8be(cpustate->io, offset, data & mask);
 		break;
 
 	case Z8_REGISTER_P1:
 		cpustate->output[offset] = data;
-		if ((cpustate->r[Z8_REGISTER_P01M] & Z8_P01M_P1_MODE_MASK) == Z8_P01M_P1_MODE_OUTPUT) mask = 0xff;
+		if ((P01M & Z8_P01M_P1_MODE_MASK) == Z8_P01M_P1_MODE_OUTPUT) mask = 0xff;
 		if (mask) memory_write_byte_8be(cpustate->io, offset, data & mask);
 		break;
 
@@ -317,7 +384,7 @@ INLINE void register_write(z8_state *cpustate, UINT8 offset, UINT8 data)
 		cpustate->output[offset] = data;
 		
 		// TODO: special port 3 modes
-		if (!(cpustate->r[Z8_REGISTER_P3M] & 0x7c))
+		if (!(P3M & 0x7c))
 		{
 			mask = 0xf0;
 		}
@@ -327,16 +394,25 @@ INLINE void register_write(z8_state *cpustate, UINT8 offset, UINT8 data)
 
 	case Z8_REGISTER_SIO:
 		break;
+	
 	case Z8_REGISTER_TMR:
+		if (data & Z8_TMR_LOAD_T0)
+		{	
+			cpustate->t0 = T0;
+			timer_adjust_periodic(cpustate->t0_timer, attotime_zero, 0, ATTOTIME_IN_HZ(cpustate->clock / 2 / 4 / ((PRE0 >> 2) + 1)));
+		}
+
+		timer_enable(cpustate->t0_timer, data & Z8_TMR_ENABLE_T0);
+
+		if (data & Z8_TMR_LOAD_T1)
+		{	
+			cpustate->t1 = T1;
+			timer_adjust_periodic(cpustate->t1_timer, attotime_zero, 0, ATTOTIME_IN_HZ(cpustate->clock / 2 / 4 / ((PRE1 >> 2) + 1)));
+		}
+
+		timer_enable(cpustate->t1_timer, data & Z8_TMR_ENABLE_T1);
 		break;
-	case Z8_REGISTER_T1:
-		break;
-	case Z8_REGISTER_PRE1:
-		break;
-	case Z8_REGISTER_T0:
-		break;
-	case Z8_REGISTER_PRE0:
-		break;
+
 	case Z8_REGISTER_P2M:
 		break;
 	case Z8_REGISTER_P3M:
@@ -571,6 +647,40 @@ static const z8_opcode_map Z8601_OPCODE_MAP[] =
 };
 
 /***************************************************************************
+    TIMER CALLBACKS
+***************************************************************************/
+
+static TIMER_CALLBACK( t0_tick )
+{
+	z8_state *cpustate = (z8_state *)ptr;
+
+	cpustate->t0--;
+
+	if (cpustate->t0 == 0)
+	{
+		cpustate->t0 = T0;
+		timer_adjust_periodic(cpustate->t0_timer, attotime_zero, 0, ATTOTIME_IN_HZ(cpustate->clock / 2 / 4 / ((PRE0 >> 2) + 1)));
+		timer_enable(cpustate->t0_timer, PRE0 & Z8_PRE0_COUNT_MODULO_N);
+		cpustate->irq[4] = ASSERT_LINE;
+	}
+}
+
+static TIMER_CALLBACK( t1_tick )
+{
+	z8_state *cpustate = (z8_state *)ptr;
+
+	cpustate->t1--;
+
+	if (cpustate->t1 == 0)
+	{
+		cpustate->t1 = T1;
+		timer_adjust_periodic(cpustate->t1_timer, attotime_zero, 0, ATTOTIME_IN_HZ(cpustate->clock / 2 / 4 / ((PRE1 >> 2) + 1)));
+		timer_enable(cpustate->t1_timer, PRE1 & Z8_PRE0_COUNT_MODULO_N);
+		cpustate->irq[5] = ASSERT_LINE;
+	}
+}
+
+/***************************************************************************
     INITIALIZATION
 ***************************************************************************/
 
@@ -583,10 +693,16 @@ static CPU_INIT( z8 )
 	cpustate->state_table.baseptr = cpustate;
 	cpustate->state_table.subtypemask = 1;
 
+	cpustate->clock = device->clock;
+
 	/* find address spaces */
 	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 	cpustate->data = memory_find_address_space(device, ADDRESS_SPACE_DATA);
 	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
+
+	/* allocate timers */
+	cpustate->t0_timer = timer_alloc(device->machine, t0_tick, cpustate);
+	cpustate->t1_timer = timer_alloc(device->machine, t1_tick, cpustate);
 
 	/* register for state saving */
 	state_save_register_device_item(device, 0, cpustate->pc);
@@ -613,9 +729,13 @@ static CPU_EXECUTE( z8 )
 
 		debugger_instruction_hook(device, cpustate->pc);
 		
+		/* TODO: sample interrupts */
+		
+		/* fetch opcode */
 		opcode = fetch(cpustate);
 		cycles = Z8601_OPCODE_MAP[opcode].execution_cycles;
 
+		/* execute instruction */
 		(*(Z8601_OPCODE_MAP[opcode].function))(cpustate, opcode, &cycles);
 		
 		cpustate->icount -= cycles;
