@@ -45,12 +45,12 @@
 *    FF 07 - ROM check fail @ 0x30000, rom at E2 or E16 "
 *    FF 08 - ROM check fail @ 0x38000, rom at E1 or E15 "
 *    FF 0F - ROM check fail at multiple addresses
-*    FE 01 - RAM check fail @ 0x80000-0x83fff, ram at E36 or E49
-*    FE 02 - RAM check fail @ 0x84000-0x87fff, ram at E35 or E48
-*    FE 03 - RAM check fail @ 0x88000-0x8bfff, ram at E34 or E47
-*    FE 04 - RAM check fail @ 0x8c000-0x8ffff, ram at E33 or E46
-*    FE 05 - RAM check fail @ 0x90000-0x93fff, ram at E32 or E44
-*    FD 00 - DUART test (test code at $046C) [fails in mess]
+*    FE 01 - RAM check fail @ 0x80000-0x83fff, ram at E36 or E49 (test code at $338)
+*    FE 02 - RAM check fail @ 0x84000-0x87fff, ram at E35 or E48 "
+*    FE 03 - RAM check fail @ 0x88000-0x8bfff, ram at E34 or E47 "
+*    FE 04 - RAM check fail @ 0x8c000-0x8ffff, ram at E33 or E46 "
+*    FE 05 - RAM check fail @ 0x90000-0x93fff, ram at E32 or E44 "
+*    FD 00 - DUART test (test code at $046C)
 *    FC 00 - TMS32010 'SPC' and DTMF-decoder 'TLC' status register test (test code at $051E) [passes in mess]
 *    FB 00 - DUART interrupt tests [fails in mess]
 *    Jump to $102C to skip the self tests
@@ -84,9 +84,9 @@ entire space mirrored at 0x100000-0x7fffff
 
 interrupts:
 68k has an interrupt priority decoder attached to it:
-TLC is INT D6
-SPC is INT D4
-DUART is INT D3
+TLC is INT level 4
+SPC is INT level 5
+DUART is INT level 6
 */
 
 
@@ -104,7 +104,9 @@ DUART is INT D3
 /* Devices */
 static void duart_irq_handler(const device_config *device, UINT8 vector)
 {
-	cputag_set_input_line_and_vector(device->machine, "maincpu", 6, HOLD_LINE, vector);
+		cputag_set_input_line_and_vector(device->machine, "maincpu", M68K_IRQ_6, HOLD_LINE, M68K_INT_ACK_AUTOVECTOR);
+		//cputag_set_input_line_and_vector(device->machine, "maincpu", M68K_IRQ_6, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
+	//cputag_set_input_line_and_vector(device->machine, "maincpu", M68K_IRQ_6, HOLD_LINE, vector);
 };
 
 static const duart68681_config dectalk_duart68681_config =
@@ -165,6 +167,16 @@ static void dectalk_x2212_recall( running_machine *machine )
 	logerror("nvram recall done\n");
 }
 
+/*
+static void dectalk_spcflags_write ( running_machine *machine, UINT16 data )
+{
+}
+
+static void dectalk_tlcflags_write ( running_machine *machine, UINT16 data )
+{
+}
+*/
+
 /* Driver init: stuff that needs setting up which isn't directly affected by reset */
 DRIVER_INIT( dectalk )
 {
@@ -173,16 +185,24 @@ DRIVER_INIT( dectalk )
 	dectalk.spc_error_latch = 1; // normally would be 0, but if set to 1 on startup the dectalk should recover as well 
 }
 
-/* Machine reset: stuff that needs setting up which IS directly affected by reset */
-MACHINE_RESET( dectalk )
+/* Machine reset and friends: stuff that needs setting up which IS directly affected by reset */
+static void dectalk_reset(const device_config *device)
 {
-// stuff that is affected by the RESET generator on the pcb: the status LED latch, the novram (forced load from eeprom to tempram)
+	// stuff that is DIRECTLY affected by the RESET line
 	dectalk.statusLED = 0; // clear status led latch
-	dectalk_x2212_recall(machine);
+	dectalk_x2212_recall(device->machine); // nvram recall
 	dectalk.m68k_spcflags_latch = 1; // initial status is speech reset(d0) active and spc int(d6) disabled
 	dectalk.m68k_tlcflags_latch = 0; // initial status is tone detect int(d6) off, answer phone(d8) off, ring detect int(d14) off
-	dectalk_clear_all_fifos(machine); // which also clears the fifos, though we have to do it explicitly here since we're not actually in the m68k_spcflags_w function.
-	/* write me */ // it also forces the CLR line active on the tms32010, we need to do that here as well
+	// DUART is reset, write me "duart68681"
+	// stuff that is INDIRECTLY affected by the RESET line
+	dectalk_clear_all_fifos(device->machine); // speech reset clears the fifos, though we have to do it explicitly here since we're not actually in the m68k_spcflags_w function.
+	cputag_set_input_line(device->machine, "dsp", INPUT_LINE_RESET, ASSERT_LINE); // speech reset forces the CLR line active on the tms32010
+}
+
+MACHINE_RESET( dectalk )
+{
+	/* hook the RESET line, which resets a slew of other components */
+	m68k_set_reset_callback(cputag_get_cpu(machine, "maincpu"), dectalk_reset);
 }
 
 /* Begin 68k i/o handlers */
@@ -252,10 +272,14 @@ WRITE16_HANDLER( m68k_spcflags_w ) // 68k write to the speech flags (only 3 bits
 	if ((data&0x1) == 0x1) // bit 0
 	{
 		dectalk_clear_all_fifos(space->machine);
-		/* write me */ // data&1 also forces the CLR line active on the tms32010, we need to do that here as well
+		cputag_set_input_line(space->machine, "dsp", INPUT_LINE_RESET, ASSERT_LINE); // speech reset forces the CLR line active on the tms32010
 		// clear the two speech side latches
 		dectalk.spc_error_latch = 0;
 		dectalk.outfifo_writable_latch = 0;
+	}
+	else // (data&0x1) == 0
+	{
+	cputag_set_input_line(space->machine, "dsp", INPUT_LINE_RESET, CLEAR_LINE); // speech reset deassert clears the CLR line on the tms32010
 	}
 	if ((data&0x2) == 0x2) // bit 1
 	{
