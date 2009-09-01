@@ -231,6 +231,18 @@ INSTRUCTION( push_IR2 )			{ mode_IR1(push) }
 
 static void add_carry(z8_state *cpustate, UINT8 dst, INT8 src)
 {
+	/* dst <- dst + src + C */
+	UINT8 data = register_read(cpustate, dst);
+	UINT16 new_data = data + src + flag(C);
+
+	set_flag_c(new_data & 0x100);
+	set_flag_z(new_data == 0);
+	set_flag_s(new_data & 0x80);
+	set_flag_v(((data & 0x80) == (src & 0x80)) && ((new_data & 0x80) != (src & 0x80)));
+	set_flag_d(0);
+	set_flag_h(((data & 0x1f) == 0x0f) && ((new_data & 0x1f) == 0x10));
+
+	register_write(cpustate, dst, new_data & 0xff);
 }
 
 INSTRUCTION( adc_r1_r2 )		{ mode_r1_r2(add_carry) }
@@ -243,14 +255,17 @@ INSTRUCTION( adc_IR1_IM )		{ mode_IR1_IM(add_carry) }
 static void add(z8_state *cpustate, UINT8 dst, INT8 src)
 {
 	/* dst <- dst + src */
-	int data = (INT8)read(dst) + src;
+	UINT8 data = register_read(cpustate, dst);
+	UINT16 new_data = data + src;
 
-	set_flag_c(data > 127);
-	set_flag_z(data == 0);
-	set_flag_s(data < 0);
-//	set_flag_v();
+	set_flag_c(new_data & 0x100);
+	set_flag_z(new_data == 0);
+	set_flag_s(new_data & 0x80);
+	set_flag_v(((data & 0x80) == (src & 0x80)) && ((new_data & 0x80) != (src & 0x80)));
 	set_flag_d(0);
-//	set_flag_h();
+	set_flag_h(((data & 0x1f) == 0x0f) && ((new_data & 0x1f) == 0x10));
+
+	register_write(cpustate, dst, new_data & 0xff);
 }
 
 INSTRUCTION( add_r1_r2 )		{ mode_r1_r2(add) }
@@ -262,6 +277,14 @@ INSTRUCTION( add_IR1_IM )		{ mode_IR1_IM(add) }
 
 static void compare(z8_state *cpustate, UINT8 dst, UINT8 src)
 {
+	/* dst - src */
+	UINT8 data = register_read(cpustate, dst);
+	UINT16 new_data = data - src;
+
+	set_flag_c(!(new_data & 0x100));
+	set_flag_z(new_data == 0);
+	set_flag_s(new_data & 0x80);
+	set_flag_v(((data & 0x80) != (src & 0x80)) && ((new_data & 0x80) == (src & 0x80)));
 }
 
 INSTRUCTION( cp_r1_r2 )			{ mode_r1_r2(compare) }
@@ -341,6 +364,18 @@ INSTRUCTION( incw_IR1 )			{ mode_IR1(increment_word) }
 
 static void subtract_carry(z8_state *cpustate, UINT8 dst, UINT8 src)
 {
+	/* dst <- dst - src - C */
+	UINT8 data = register_read(cpustate, dst);
+	UINT16 new_data = data - src;
+
+	set_flag_c(!(new_data & 0x100));
+	set_flag_z(new_data == 0);
+	set_flag_s(new_data & 0x80);
+	set_flag_v(((data & 0x80) != (src & 0x80)) && ((new_data & 0x80) == (src & 0x80)));
+	set_flag_d(1);
+	set_flag_h(!(((data & 0x1f) == 0x0f) && ((new_data & 0x1f) == 0x10)));
+
+	register_write(cpustate, dst, new_data & 0xff);
 }
 
 INSTRUCTION( sbc_r1_r2 )		{ mode_r1_r2(subtract_carry) }
@@ -352,6 +387,18 @@ INSTRUCTION( sbc_IR1_IM )		{ mode_IR1_IM(subtract_carry) }
 
 static void subtract(z8_state *cpustate, UINT8 dst, UINT8 src)
 {
+	/* dst <- dst - src */
+	UINT8 data = register_read(cpustate, dst);
+	UINT16 new_data = data - src;
+
+	set_flag_c(!(new_data & 0x100));
+	set_flag_z(new_data == 0);
+	set_flag_s(new_data & 0x80);
+	set_flag_v(((data & 0x80) != (src & 0x80)) && ((new_data & 0x80) == (src & 0x80)));
+	set_flag_d(1);
+	set_flag_h(!(((data & 0x1f) == 0x0f) && ((new_data & 0x1f) == 0x10)));
+
+	register_write(cpustate, dst, new_data & 0xff);
 }
 
 INSTRUCTION( sub_r1_r2 )		{ mode_r1_r2(subtract) }
