@@ -569,7 +569,8 @@ static WRITE8_HANDLER( x1_dma_w )
 	//	fatalerror("Data written to the DMA space");
 }
 
-/* TODO: still not yet perfect */
+/* TODO: apparently this is for the alternative PCG mode */
+#if 0
 static UINT16 check_pcg_addr(running_machine *machine)
 {
 	if(colorram[0x7ff] & 0x20) return 0x7ff;
@@ -578,6 +579,36 @@ static UINT16 check_pcg_addr(running_machine *machine)
 	if(colorram[0x1ff] & 0x20) return 0x1ff;
 
 	return 0x3ff;
+}
+#endif
+
+static UINT8 pcg_write_addr;
+
+static READ8_HANDLER( x1_pcg_r )
+{
+	#if 0
+	int addr;
+	UINT8 *BIOS_ROM = memory_region(space->machine, "cgrom");
+	static UINT8 bios_offset,res;
+
+	addr = (offset & 0x300) >> 8;
+
+	if(addr == 0)
+	{
+		/* TODO: requires an offset conversion */
+		res = BIOS_ROM[0x1800+bios_offset+(pcg_write_addr*0x10)];
+
+		bios_offset++;
+		bios_offset&=0xf;
+		return res;
+	}
+	else
+	{
+		//...
+	}
+	#endif
+
+	return mame_rand(space->machine);
 }
 
 static WRITE8_HANDLER( x1_pcg_w )
@@ -596,11 +627,8 @@ static WRITE8_HANDLER( x1_pcg_w )
 
 	if(addr == 0)
 	{
-		/* FIXME: this is wrong (it's for the BIOS GFX ROM, read only)  */
-		/* maybe data actually? */
-		pcg_index[0] = data*8;
-		pcg_index[1] = data*8;
-		pcg_index[2] = data*8;
+		/* NOP */
+		logerror("Warning: write to the BIOS PCG area! %04x %02x\n",offset,data);
 	}
 	else
 	{
@@ -610,7 +638,7 @@ static WRITE8_HANDLER( x1_pcg_w )
 //		}
 //		else
 		{
-			used_pcg_addr = videoram[check_pcg_addr(space->machine)]*8;
+			used_pcg_addr = pcg_write_addr*8;
 			pcg_offset = (pcg_index[addr-1]+used_pcg_addr) & 0x7ff;
 			pcg_offset+=((addr-1)*0x800);
 			PCG_RAM[pcg_offset] = data;
@@ -687,6 +715,7 @@ static READ8_HANDLER( x1_io_r )
 	else if(offset >= 0x0704 && offset <= 0x0707)   { return z80ctc_r(devtag_get_device(space->machine, "ctc"), offset-0x0704); }
 	else if(offset == 0x0e03)                    	{ return x1_rom_r(space, 0); }
 	else if(offset >= 0x0ff8 && offset <= 0x0fff)	{ return x1_fdc_r(space, offset-0xff8); }
+	else if(offset >= 0x1400 && offset <= 0x17ff)	{ return x1_pcg_r(space, offset-0x1400); }
 	else if(offset >= 0x1900 && offset <= 0x19ff)	{ return sub_io_r(space, 0); }
 	else if(offset >= 0x1a00 && offset <= 0x1aff)	{ return ppi8255_r(devtag_get_device(space->machine, "ppi8255_0"), (offset-0x1a00) & 3); }
 	else if(offset >= 0x1b00 && offset <= 0x1bff)	{ return ay8910_r(devtag_get_device(space->machine, "ay"), 0); }
@@ -730,7 +759,7 @@ static WRITE8_HANDLER( x1_io_w )
 	else if(offset >= 0x1fa8 && offset <= 0x1fab)	{ z80ctc_w(devtag_get_device(space->machine, "ctc"), offset-0x1fa8,data); }
 	else if(offset >= 0x1fd0 && offset <= 0x1fdf)	{ x1_scrn_w(space,0,data); }
 	else if(offset >= 0x2000 && offset <= 0x2fff)	{ colorram[offset-0x2000] = data; }
-	else if(offset >= 0x3000 && offset <= 0x3fff)	{ videoram[offset-0x3000] = data; }
+	else if(offset >= 0x3000 && offset <= 0x3fff)	{ videoram[offset-0x3000] = pcg_write_addr = data; }
 	else if(offset >= 0x4000 && offset <= 0xffff)	{ gfx_bitmap_ram[offset-0x4000+(scrn_reg.gfx_bank*0xc000)] = data; }
 	else
 	{
@@ -747,6 +776,7 @@ static READ8_HANDLER( x1turbo_io_r )
 	else if(offset >= 0x0704 && offset <= 0x0707)   { return z80ctc_r(devtag_get_device(space->machine, "ctc"), offset-0x0704); }
 	else if(offset == 0x0e03)                    	{ return x1_rom_r(space, 0); }
 	else if(offset >= 0x0ff8 && offset <= 0x0fff)	{ return x1_fdc_r(space, offset-0xff8); }
+	else if(offset >= 0x1400 && offset <= 0x17ff)	{ return x1_pcg_r(space, offset-0x1400); }
 	else if(offset >= 0x1900 && offset <= 0x19ff)	{ return sub_io_r(space, 0); }
 	else if(offset >= 0x1a00 && offset <= 0x1aff)	{ return ppi8255_r(devtag_get_device(space->machine, "ppi8255_0"), (offset-0x1a00) & 3); }
 	else if(offset >= 0x1b00 && offset <= 0x1bff)	{ return ay8910_r(devtag_get_device(space->machine, "ay"), 0); }
@@ -791,7 +821,7 @@ static WRITE8_HANDLER( x1turbo_io_w )
 	else if(offset >= 0x1fa8 && offset <= 0x1fab)	{ z80ctc_w(devtag_get_device(space->machine, "ctc"), offset-0x1fa8,data); }
 	else if(offset >= 0x1fd0 && offset <= 0x1fdf)	{ x1_scrn_w(space,0,data); }
 	else if(offset >= 0x2000 && offset <= 0x2fff)	{ colorram[offset-0x2000] = data; }
-	else if(offset >= 0x3000 && offset <= 0x3fff)	{ videoram[offset-0x3000] = data; }
+	else if(offset >= 0x3000 && offset <= 0x3fff)	{ videoram[offset-0x3000] = pcg_write_addr = data; }
 	else if(offset >= 0x4000 && offset <= 0xffff)	{ gfx_bitmap_ram[offset-0x4000+(scrn_reg.gfx_bank*0xc000)] = data; }
 	else
 	{
