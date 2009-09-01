@@ -495,7 +495,7 @@ INSTRUCTION( call_DA )			{ UINT16 dst = (fetch(cpustate) << 8) | fetch(cpustate)
 
 INSTRUCTION( djnz_r1_RA )
 {
-	INT8 ra = (INT8) fetch(cpustate); 
+	INT8 ra = (INT8)fetch(cpustate); 
 
 	/* r <- r - 1 */
 	int r = get_working_register(cpustate, opcode >> 4);
@@ -580,8 +580,9 @@ INSTRUCTION( jp_cc_DA )
 
 INSTRUCTION( jr_cc_RA )
 {
-	UINT16 dst = cpustate->pc + (INT8)fetch(cpustate) - 1; 
-	
+	INT8 ra = (INT8)fetch(cpustate);
+	UINT16 dst = cpustate->pc + ra; 
+
 	/* if cc is true, then PC <- dst */
 	if (check_condition_code(cpustate, opcode >> 4))
 	{
@@ -597,7 +598,7 @@ INSTRUCTION( jr_cc_RA )
 static void test_complement_under_mask(z8_state *cpustate, UINT8 dst, UINT8 src)
 {
 	/* NOT(dst) AND src */
-	UINT8 data = (dst ^ 0xff) & src;
+	UINT8 data = (register_read(cpustate, dst) ^ 0xff) & src;
 	
 	set_flag_z(data == 0);
 	set_flag_s(data & 0x80);
@@ -614,7 +615,7 @@ INSTRUCTION( tcm_IR1_IM )		{ mode_IR1_IM(test_complement_under_mask) }
 static void test_under_mask(z8_state *cpustate, UINT8 dst, UINT8 src)
 {
 	/* dst AND src */
-	UINT8 data = dst & src;
+	UINT8 data = register_read(cpustate, dst) & src;
 	
 	set_flag_z(data == 0);
 	set_flag_s(data & 0x80);

@@ -12,7 +12,7 @@
 	TODO:
 
 	- expose register file to disassembler
-	- arithmetic opcodes
+	- decimal adjust instruction
 	- interrupts
 	- counter/timer
 	- serial
@@ -52,6 +52,19 @@ enum
 	Z8_REGISTER_SPL
 };
 
+#define Z8_P3_DAV0_RDY0				0x04	/* not supported */
+#define Z8_P3_DAV1_RDY1				0x08	/* not supported */
+#define Z8_P3_DAV2_RDY2				0x02	/* not supported */
+#define Z8_P3_IRQ0					0x04	/* not supported */
+#define Z8_P3_IRQ1					0x08	/* not supported */
+#define Z8_P3_IRQ2					0x02	/* not supported */
+#define Z8_P3_IRQ3					0x01	/* not supported */
+#define Z8_P3_DI					0x01	/* not supported */
+#define Z8_P3_DO					0x80	/* not supported */
+#define Z8_P3_TIN					0x02	/* not supported */
+#define Z8_P3_TOUT					0x40	/* not supported */
+#define Z8_P3_DM					0x10	/* not supported */
+
 #define Z8_P01M_P0L_MODE_MASK		0x03
 #define Z8_P01M_P0L_MODE_OUTPUT		0x00
 #define Z8_P01M_P0L_MODE_INPUT		0x01
@@ -69,13 +82,13 @@ enum
 #define Z8_P01M_P0H_MODE_A12_A15	0x80	/* not supported */
 
 #define Z8_P3M_P2_ACTIVE_PULLUPS	0x01	/* not supported */
-#define Z8_P3M_P0_STROBED			0x04
+#define Z8_P3M_P0_STROBED			0x04	/* not supported */
 #define Z8_P3M_P1_MODE_MASK			0x18
 //#define Z8_P3M_ 0x00
 //#define Z8_P3M_ 0x08
 //#define Z8_P3M_ 0x10
-#define Z8_P3M_P1_STROBED			0x18
-#define Z8_P3M_P2_STROBED			0x20
+#define Z8_P3M_P1_STROBED			0x18	/* not supported */
+#define Z8_P3M_P2_STROBED			0x20	/* not supported */
 #define Z8_P3M_P3_SERIAL			0x40	/* not supported */
 #define Z8_P3M_PARITY				0x80	/* not supported */
 
@@ -117,11 +130,12 @@ struct _z8_state
 	/* registers */
 	UINT16 pc;				/* program counter */
 	UINT8 r[256];			/* register file */
-	UINT16 fake_sp;			/* fake stack pointer */
-	UINT8 fake_rp;			/* fake register pointer */
-	UINT8 fake_r[16];		/* fake working registers */
 	UINT8 input[4];			/* port input latches */
 	UINT8 output[4];		/* port output latches */
+
+	/* fake registers */
+	UINT16 fake_sp;			/* fake stack pointer */
+	UINT8 fake_r[16];		/* fake working registers */
 
 	/* interrupts */
 	int irq[4];				/* external interrupt flip-flops */
@@ -532,19 +546,19 @@ static const z8_opcode_map Z8601_OPCODE_MAP[] =
 	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },	{ jr_cc_RA, 10, 0 },	{ ld_r1_IM, 6, 5 },		{ jp_cc_DA, 10, 0 },	{ inc_r1, 6, 5 },		{ illegal, 0, 0 }, 
 
 	{ decw_RR1, 10, 5 },{ decw_IR1, 10, 5 },{ lde_r1_Irr2, 12, 0 },	{ ldei_Ir1_Irr2, 18, 0 },{ illegal, 0, 0 },		{ illegal, 0, 0 },		{ illegal, 0, 0 },		{ illegal, 0, 0 },		
-	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },	{ jr_cc_RA, 10, 0 },	{ ld_r1_IM, 6, 5 },		{ jp_cc_DA, 10, 0 },	{ inc_r1, 6, 5 },		{ illegal, 0, 0 }, 
-
-	{ rl_R1, 6, 5 },	{ rl_IR1, 6, 5 },	{ lde_r2_Irr1, 12, 0 },	{ ldei_Ir2_Irr1, 18, 0 },{ illegal, 0, 0 },		{ illegal, 0, 0 },		{ illegal, 0, 0 },		{ illegal, 0, 0 },	
 	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },	{ jr_cc_RA, 10, 0 },	{ ld_r1_IM, 6, 5 },		{ jp_cc_DA, 10, 0 },	{ inc_r1, 6, 5 },		{ di, 6, 1 }, 
 
-	{ incw_RR1, 10, 5 },{ incw_IR1, 10, 5 },{ cp_r1_r2, 6, 5 },		{ cp_r1_Ir2, 6, 5 },	{ cp_R2_R1, 10, 5 },	{ cp_IR2_R1, 10, 5 },	{ cp_R1_IM, 10, 5 },	{ cp_IR1_IM, 10, 5 }, 
+	{ rl_R1, 6, 5 },	{ rl_IR1, 6, 5 },	{ lde_r2_Irr1, 12, 0 },	{ ldei_Ir2_Irr1, 18, 0 },{ illegal, 0, 0 },		{ illegal, 0, 0 },		{ illegal, 0, 0 },		{ illegal, 0, 0 },	
 	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },	{ jr_cc_RA, 10, 0 },	{ ld_r1_IM, 6, 5 },		{ jp_cc_DA, 10, 0 },	{ inc_r1, 6, 5 },		{ ei, 6, 1 }, 
 
-	{ clr_R1, 6, 5 },	{ clr_IR1, 6, 5 },	{ xor_r1_r2, 6, 5 },	{ xor_r1_Ir2, 6, 5 },	{ xor_R2_R1, 10, 5 },	{ xor_IR2_R1, 10, 5 },	{ xor_R1_IM, 10, 5 },	{ xor_IR1_IM, 10, 5 }, 
+	{ incw_RR1, 10, 5 },{ incw_IR1, 10, 5 },{ cp_r1_r2, 6, 5 },		{ cp_r1_Ir2, 6, 5 },	{ cp_R2_R1, 10, 5 },	{ cp_IR2_R1, 10, 5 },	{ cp_R1_IM, 10, 5 },	{ cp_IR1_IM, 10, 5 }, 
 	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },	{ jr_cc_RA, 10, 0 },	{ ld_r1_IM, 6, 5 },		{ jp_cc_DA, 10, 0 },	{ inc_r1, 6, 5 },		{ ret, 14, 0 }, 
 
-	{ rrc_R1, 6, 5 },	{ rrc_IR1, 6, 5 },	{ ldc_r1_Irr2, 12, 0 },	{ ldci_Ir1_Irr2, 18, 0 },{ illegal, 0, 0 },		{ illegal, 0, 0 },		{ illegal, 0, 0 },		{ ld_r1_x_R2, 10, 5 }, 
+	{ clr_R1, 6, 5 },	{ clr_IR1, 6, 5 },	{ xor_r1_r2, 6, 5 },	{ xor_r1_Ir2, 6, 5 },	{ xor_R2_R1, 10, 5 },	{ xor_IR2_R1, 10, 5 },	{ xor_R1_IM, 10, 5 },	{ xor_IR1_IM, 10, 5 }, 
 	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },	{ jr_cc_RA, 10, 0 },	{ ld_r1_IM, 6, 5 },		{ jp_cc_DA, 10, 0 },	{ inc_r1, 6, 5 },		{ iret, 16, 0 }, 
+
+	{ rrc_R1, 6, 5 },	{ rrc_IR1, 6, 5 },	{ ldc_r1_Irr2, 12, 0 },	{ ldci_Ir1_Irr2, 18, 0 },{ illegal, 0, 0 },		{ illegal, 0, 0 },		{ illegal, 0, 0 },		{ ld_r1_x_R2, 10, 5 }, 
+	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },	{ jr_cc_RA, 10, 0 },	{ ld_r1_IM, 6, 5 },		{ jp_cc_DA, 10, 0 },	{ inc_r1, 6, 5 },		{ rcf, 6, 5 }, 
 
 	{ sra_R1, 6, 5 },	{ sra_IR1, 6, 5 },	{ ldc_r2_Irr1, 12, 0 },	{ ldci_Ir2_Irr1, 18, 0 },{ call_IRR1, 20, 0 },	{ illegal, 0, 0 },		{ call_DA, 20, 0 },		{ ld_r2_x_R1, 10, 5 }, 
 	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },	{ jr_cc_RA, 10, 0 },	{ ld_r1_IM, 6, 5 },		{ jp_cc_DA, 10, 0 },	{ inc_r1, 6, 5 },		{ scf, 6, 5 }, 
@@ -577,6 +591,9 @@ static CPU_INIT( z8 )
 	/* register for state saving */
 	state_save_register_device_item(device, 0, cpustate->pc);
 	state_save_register_device_item_array(device, 0, cpustate->r);
+	state_save_register_device_item_array(device, 0, cpustate->input);
+	state_save_register_device_item_array(device, 0, cpustate->output);
+	state_save_register_device_item_array(device, 0, cpustate->irq);
 }
 
 /***************************************************************************
@@ -638,11 +655,6 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( program_4kb, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( register_128b, ADDRESS_SPACE_DATA, 8 )
-	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x00f0, 0x00ff) AM_RAM
 ADDRESS_MAP_END
 
 /**************************************************************************
@@ -778,7 +790,6 @@ CPU_GET_INFO( z8601 )
 	{
 		/* --- the following bits of info are returned as pointers --- */
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(program_2kb);	break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_DATA:		info->internal_map8 = ADDRESS_MAP_NAME(register_128b);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Z8601");								break;
@@ -793,7 +804,6 @@ CPU_GET_INFO( ub8830d )
 	{
 		/* --- the following bits of info are returned as pointers --- */
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(program_2kb);	break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_DATA:		info->internal_map8 = ADDRESS_MAP_NAME(register_128b);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "UB8830D");								break;
@@ -808,7 +818,6 @@ CPU_GET_INFO( z8611 )
 	{
 		/* --- the following bits of info are returned as pointers --- */
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(program_4kb);	break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_DATA:		info->internal_map8 = ADDRESS_MAP_NAME(register_128b);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Z8611");								break;

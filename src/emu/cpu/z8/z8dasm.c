@@ -28,8 +28,8 @@ static const char* REGISTER_NAME[256] =
 
 static const char* CONDITION_CODE[16] =
 {
-	"F", "LT", "LE", "ULE", "OV", "MI", "EQ", "ULT", 
-	"", "GE", "GT", "UGT", "NOV", "PL", "NZ", "UGE" 
+	"F", "LT", "LE", "ULE", "OV", "MI", "Z", "C", 
+	"", "GE", "GT", "UGT", "NOV", "PL", "NZ", "NC" 
 };
 
 /***************************************************************************
@@ -66,7 +66,7 @@ static const char* CONDITION_CODE[16] =
 #define arg_IR(_value)				if ((_value & 0xf0) == 0xe0) ARG(Ir, _value & 0x0f) else ARG(IR, _value)
 #define arg_IRR(_value)				if ((_value & 0xf0) == 0xe0) ARG(Irr, _value & 0x0f) else ARG(IRR, _value)
 #define arg_IM(_value)				ARG(IM, _value)
-#define arg_RA						ARG(RA, pc + B0)
+#define arg_RA						ARG(RA, pc + (INT8)B0 + 2)
 #define arg_DA						ARG(DA, B0 << 8 | B1)
 #define arg_X(_value1, _value2)		{ if (argc) dst += sprintf(dst, ", "); dst += sprintf(dst, X, _value1, _value2); argc++; }
 
