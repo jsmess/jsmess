@@ -12,6 +12,7 @@
 	- Implement the interrupts (uses IM 2), basically used by the keyboard.
 	- Implement DMA (X1Turbo only?)
 	- clean-ups!
+	- x1turbo: understand how irq generation works for the ym-2151;
 	- There are various unclear video things, these are:
 		- Understand why some games still doesn't upload the proper PCG index;
 		- Support the alternative PCG upload mode;
@@ -145,6 +146,8 @@
 #include "machine/8255ppi.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
+#include "sound/2151intf.h"
+
 #include "machine/wd17xx.h"
 #include "devices/basicdsk.h"
 #include "includes/d88.h"
@@ -632,31 +635,6 @@ static READ8_HANDLER( x1_clr_r )
 	return 0xff;
 }
 
-static READ8_HANDLER( x1_io_r )
-{
-	io_bank_mode = 0; //any read disables the extended mode.
-
-	if(offset == 0x0000)                        	{ return x1_clr_r(space, 0); }
-	else if(offset >= 0x0704 && offset <= 0x0707)   { return z80ctc_r(devtag_get_device(space->machine, "ctc"), offset-0x0704); }
-	else if(offset == 0x0e03)                    	{ return x1_rom_r(space, 0); }
-	else if(offset >= 0x0ff8 && offset <= 0x0fff)	{ return x1_fdc_r(space, offset-0xff8); }
-	else if(offset >= 0x1900 && offset <= 0x19ff)	{ return sub_io_r(space, 0); }
-	else if(offset >= 0x1a00 && offset <= 0x1aff)	{ return ppi8255_r(devtag_get_device(space->machine, "ppi8255_0"), (offset-0x1a00) & 3); }
-	else if(offset >= 0x1b00 && offset <= 0x1bff)	{ return ay8910_r(devtag_get_device(space->machine, "ay"), 0); }
-//	else if(offset >= 0x1f90 && offset <= 0x1f93)	{ return x1_sio_r(space,(offset-0x1f90) & 3); }
-	else if(offset >= 0x1fa0 && offset <= 0x1fa3)	{ return z80ctc_r(devtag_get_device(space->machine, "ctc"), offset-0x1fa3); }
-	else if(offset >= 0x1fa8 && offset <= 0x1fab)	{ return z80ctc_r(devtag_get_device(space->machine, "ctc"), offset-0x1fa8); }
-//	else if(offset >= 0x1fd0 && offset <= 0x1fdf)	{ return x1_scrn_r(space,offset-0x1fd0); }
-	else if(offset >= 0x2000 && offset <= 0x2fff)	{ return colorram[offset-0x2000]; }
-	else if(offset >= 0x3000 && offset <= 0x3fff)	{ return videoram[offset-0x3000]; }
-	else if(offset >= 0x4000 && offset <= 0xffff)	{ return gfx_bitmap_ram[offset-0x4000+(scrn_reg.gfx_bank*0xc000)]; }
-	else
-	{
-		logerror("(PC=%06x) Read i/o address %04x\n",cpu_get_pc(space->cpu),offset);
-	}
-	return 0xff;
-}
-
 static WRITE8_HANDLER( x1_ex_gfxram_w )
 {
 	static UINT8 ex_mask;
@@ -702,6 +680,31 @@ static WRITE8_HANDLER( x1_6845_w )
 	}
 }
 
+static READ8_HANDLER( x1_io_r )
+{
+	io_bank_mode = 0; //any read disables the extended mode.
+
+	if(offset == 0x0000)                        	{ return x1_clr_r(space, 0); }
+	else if(offset >= 0x0704 && offset <= 0x0707)   { return z80ctc_r(devtag_get_device(space->machine, "ctc"), offset-0x0704); }
+	else if(offset == 0x0e03)                    	{ return x1_rom_r(space, 0); }
+	else if(offset >= 0x0ff8 && offset <= 0x0fff)	{ return x1_fdc_r(space, offset-0xff8); }
+	else if(offset >= 0x1900 && offset <= 0x19ff)	{ return sub_io_r(space, 0); }
+	else if(offset >= 0x1a00 && offset <= 0x1aff)	{ return ppi8255_r(devtag_get_device(space->machine, "ppi8255_0"), (offset-0x1a00) & 3); }
+	else if(offset >= 0x1b00 && offset <= 0x1bff)	{ return ay8910_r(devtag_get_device(space->machine, "ay"), 0); }
+//	else if(offset >= 0x1f90 && offset <= 0x1f93)	{ return x1_sio_r(space,(offset-0x1f90) & 3); }
+	else if(offset >= 0x1fa0 && offset <= 0x1fa3)	{ return z80ctc_r(devtag_get_device(space->machine, "ctc"), offset-0x1fa3); }
+	else if(offset >= 0x1fa8 && offset <= 0x1fab)	{ return z80ctc_r(devtag_get_device(space->machine, "ctc"), offset-0x1fa8); }
+//	else if(offset >= 0x1fd0 && offset <= 0x1fdf)	{ return x1_scrn_r(space,offset-0x1fd0); }
+	else if(offset >= 0x2000 && offset <= 0x2fff)	{ return colorram[offset-0x2000]; }
+	else if(offset >= 0x3000 && offset <= 0x3fff)	{ return videoram[offset-0x3000]; }
+	else if(offset >= 0x4000 && offset <= 0xffff)	{ return gfx_bitmap_ram[offset-0x4000+(scrn_reg.gfx_bank*0xc000)]; }
+	else
+	{
+		logerror("(PC=%06x) Read i/o address %04x\n",cpu_get_pc(space->cpu),offset);
+	}
+	return 0xff;
+}
+
 static WRITE8_HANDLER( x1_io_w )
 {
 	if(io_bank_mode == 1)                        	{ x1_ex_gfxram_w(space, offset, data); }
@@ -736,6 +739,68 @@ static WRITE8_HANDLER( x1_io_w )
 	}
 }
 
+static READ8_HANDLER( x1turbo_io_r )
+{
+	io_bank_mode = 0; //any read disables the extended mode.
+
+	if(offset == 0x0000)                        	{ return x1_clr_r(space, 0); }
+	else if(offset == 0x0700 || offset == 0x0701)	{ return ym2151_r(devtag_get_device(space->machine, "ym"), offset-0x0700); }
+	else if(offset >= 0x0704 && offset <= 0x0707)   { return z80ctc_r(devtag_get_device(space->machine, "ctc"), offset-0x0704); }
+	else if(offset == 0x0e03)                    	{ return x1_rom_r(space, 0); }
+	else if(offset >= 0x0ff8 && offset <= 0x0fff)	{ return x1_fdc_r(space, offset-0xff8); }
+	else if(offset >= 0x1900 && offset <= 0x19ff)	{ return sub_io_r(space, 0); }
+	else if(offset >= 0x1a00 && offset <= 0x1aff)	{ return ppi8255_r(devtag_get_device(space->machine, "ppi8255_0"), (offset-0x1a00) & 3); }
+	else if(offset >= 0x1b00 && offset <= 0x1bff)	{ return ay8910_r(devtag_get_device(space->machine, "ay"), 0); }
+//	else if(offset >= 0x1f90 && offset <= 0x1f93)	{ return x1_sio_r(space,(offset-0x1f90) & 3); }
+	else if(offset >= 0x1fa0 && offset <= 0x1fa3)	{ return z80ctc_r(devtag_get_device(space->machine, "ctc"), offset-0x1fa3); }
+	else if(offset >= 0x1fa8 && offset <= 0x1fab)	{ return z80ctc_r(devtag_get_device(space->machine, "ctc"), offset-0x1fa8); }
+//	else if(offset >= 0x1fd0 && offset <= 0x1fdf)	{ return x1_scrn_r(space,offset-0x1fd0); }
+	else if(offset >= 0x2000 && offset <= 0x2fff)	{ return colorram[offset-0x2000]; }
+	else if(offset >= 0x3000 && offset <= 0x3fff)	{ return videoram[offset-0x3000]; }
+	else if(offset >= 0x4000 && offset <= 0xffff)	{ return gfx_bitmap_ram[offset-0x4000+(scrn_reg.gfx_bank*0xc000)]; }
+	else
+	{
+		logerror("(PC=%06x) Read i/o address %04x\n",cpu_get_pc(space->cpu),offset);
+	}
+	return 0xff;
+}
+
+static WRITE8_HANDLER( x1turbo_io_w )
+{
+	if(io_bank_mode == 1)                        	{ x1_ex_gfxram_w(space, offset, data); }
+	else if(offset == 0x0700 || offset == 0x0701)	{ ym2151_w(devtag_get_device(space->machine, "ym"), offset-0x0700,data); }
+	else if(offset >= 0x0704 && offset <= 0x0707)	{ z80ctc_w(devtag_get_device(space->machine, "ctc"), offset-0x0704,data); }
+//	else if(offset >= 0x0c00 && offset <= 0x0cff)	{ x1_rs232c_w(space->machine, 0, data); }
+	else if(offset >= 0x0e00 && offset <= 0x0e02)  	{ x1_rom_w(space, offset-0xe00,data); }
+//	else if(offset >= 0x0e80 && offset <= 0x0e82)	{ x1_kanji_w(space->machine, offset-0xe80,data); }
+	else if(offset >= 0x0ff8 && offset <= 0x0fff)	{ x1_fdc_w(space, offset-0xff8,data); }
+	else if(offset >= 0x1000 && offset <= 0x10ff)	{ x1_pal_b_w(space, 0,data); }
+	else if(offset >= 0x1100 && offset <= 0x11ff)	{ x1_pal_r_w(space, 0,data); }
+	else if(offset >= 0x1200 && offset <= 0x12ff)	{ x1_pal_g_w(space, 0,data); }
+	else if(offset >= 0x1300 && offset <= 0x13ff)	{ x1_ply_w(space, 0,data); }
+	else if(offset >= 0x1400 && offset <= 0x17ff)	{ x1_pcg_w(space, offset-0x1400,data); }
+	else if(offset == 0x1800 || offset == 0x1801)	{ x1_6845_w(space, offset-0x1800, data); }
+	else if(offset >= 0x1900 && offset <= 0x19ff)	{ sub_io_w(space, 0,data); }
+	else if(offset >= 0x1a00 && offset <= 0x1aff)	{ ppi8255_w(devtag_get_device(space->machine, "ppi8255_0"), (offset-0x1a00) & 3,data); }
+	else if(offset >= 0x1b00 && offset <= 0x1bff)	{ ay8910_data_w(devtag_get_device(space->machine, "ay"), 0,data); }
+	else if(offset >= 0x1c00 && offset <= 0x1cff)	{ ay8910_address_w(devtag_get_device(space->machine, "ay"), 0,data); }
+	else if(offset >= 0x1d00 && offset <= 0x1dff)	{ rom_bank_1_w(space,0,data); }
+	else if(offset >= 0x1e00 && offset <= 0x1eff)	{ rom_bank_0_w(space,0,data); }
+	else if(offset >= 0x1f80 && offset <= 0x1f8f)	{ x1_dma_w(space,offset-0x1f80,data); }
+//	else if(offset >= 0x1f90 && offset <= 0x1f93)	{ x1_sio_w(space->machine,(offset-0x1f90) & 3),data; }
+	else if(offset >= 0x1fa0 && offset <= 0x1fa3)	{ z80ctc_w(devtag_get_device(space->machine, "ctc"), offset-0x1fa3,data); }
+	else if(offset >= 0x1fa8 && offset <= 0x1fab)	{ z80ctc_w(devtag_get_device(space->machine, "ctc"), offset-0x1fa8,data); }
+	else if(offset >= 0x1fd0 && offset <= 0x1fdf)	{ x1_scrn_w(space,0,data); }
+	else if(offset >= 0x2000 && offset <= 0x2fff)	{ colorram[offset-0x2000] = data; }
+	else if(offset >= 0x3000 && offset <= 0x3fff)	{ videoram[offset-0x3000] = data; }
+	else if(offset >= 0x4000 && offset <= 0xffff)	{ gfx_bitmap_ram[offset-0x4000+(scrn_reg.gfx_bank*0xc000)] = data; }
+	else
+	{
+		logerror("(PC=%06x) Write %02x at i/o address %04x\n",cpu_get_pc(space->cpu),data,offset);
+	}
+}
+
+
 static ADDRESS_MAP_START( x1_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK(1) AM_WRITE(rom_data_w)
@@ -745,6 +810,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( x1_io , ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(x1_io_r, x1_io_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( x1turbo_io , ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(x1turbo_io_r, x1turbo_io_w)
 ADDRESS_MAP_END
 
 static const gfx_layout x1_chars_8x8 =
@@ -1309,6 +1379,17 @@ static MACHINE_DRIVER_START( x1 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( x1turbo )
+	MDRV_IMPORT_FROM( x1 )
+
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_IO_MAP(x1turbo_io)
+
+	MDRV_SOUND_ADD("ym", YM2151, XTAL_4MHz/4) //unknown clock / divider
+//	MDRV_SOUND_CONFIG(ay8910_config)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+MACHINE_DRIVER_END
+
 static DEVICE_IMAGE_LOAD( x1_floppy )
 {
 	const char *ext;
@@ -1399,7 +1480,7 @@ ROM_START( x1ck )
 	ROM_REGION(0x1000, "mcu", ROMREGION_ERASEFF) //MCU for the Keyboard, "sub cpu"
 	ROM_LOAD( "80c48", 0x0000, 0x1000, NO_DUMP )
 
-	ROM_REGION(0xc00, "pcg", ROMREGION_ERASEFF)
+	ROM_REGION(0x1800, "pcg", ROMREGION_ERASEFF)
 
 	ROM_REGION(0x1800, "cgrom", 0)
 	ROM_LOAD("fnt0808.x1", 0x00000, 0x00800, CRC(e3995a57) SHA1(1c1a0d8c9f4c446ccd7470516b215ddca5052fb2) )
@@ -1418,11 +1499,11 @@ ROM_START( x1turbo )
 	ROM_REGION(0x1000, "mcu", ROMREGION_ERASEFF) //MCU for the Keyboard, "sub cpu"
 	ROM_LOAD( "80c48", 0x0000, 0x1000, NO_DUMP )
 
-	ROM_REGION(0xc00, "pcg", ROMREGION_ERASEFF)
+	ROM_REGION(0x1800, "pcg", ROMREGION_ERASEFF)
 
 	ROM_REGION(0x1800, "cgrom", 0)
 	/* This should be larger... hence, we are missing something (maybe part of the other fnt roms?) */
-	ROM_LOAD("fnt0808.x1", 0x00000, 0x0800, CRC(84a47530) SHA1(06c0995adc7a6609d4272417fe3570ca43bd0454) )
+	ROM_LOAD("fnt0808.x1", 0x00000, 0x00800, CRC(84a47530) SHA1(06c0995adc7a6609d4272417fe3570ca43bd0454) )
 	ROM_RELOAD(            0x00800, 0x00800)
 	ROM_RELOAD(            0x01000, 0x00800)
 
@@ -1441,18 +1522,20 @@ ROM_START( x1turboz )
 	ROM_REGION(0x1000, "mcu", ROMREGION_ERASEFF) //MCU for the Keyboard, "sub cpu"
 	ROM_LOAD( "80c48", 0x0000, 0x1000, NO_DUMP )
 
-	ROM_REGION(0xc00, "pcg", ROMREGION_ERASEFF)
+	ROM_REGION(0x1800, "pcg", ROMREGION_ERASEFF)
 
-	ROM_REGION(0x4c600, "cgrom", 0)
+	ROM_REGION(0x4d600, "cgrom", 0)
 	ROM_LOAD("fnt0808.x1", 0x0000, 0x0800, CRC(84a47530) SHA1(06c0995adc7a6609d4272417fe3570ca43bd0454) )
+	ROM_RELOAD(            0x00800, 0x00800)
+	ROM_RELOAD(            0x01000, 0x00800)
 	ROM_SYSTEM_BIOS( 0, "font1", "Font set 1" )
-	ROMX_LOAD("fnt0816.x1", 0x0800, 0x1000, BAD_DUMP CRC(34818d54) SHA1(2c5fdd73249421af5509e48a94c52c4e423402bf), ROM_BIOS(1) )
+	ROMX_LOAD("fnt0816.x1", 0x1800, 0x1000, BAD_DUMP CRC(34818d54) SHA1(2c5fdd73249421af5509e48a94c52c4e423402bf), ROM_BIOS(1) )
 	/* I strongly suspect this is not genuine */
-	ROMX_LOAD("fnt1616.x1", 0x01800, 0x4ac00, BAD_DUMP CRC(46826745) SHA1(b9e6c320611f0842df6f45673c47c3e23bc14272), ROM_BIOS(1) )
+	ROMX_LOAD("fnt1616.x1", 0x02800, 0x4ac00, BAD_DUMP CRC(46826745) SHA1(b9e6c320611f0842df6f45673c47c3e23bc14272), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "font2", "Font set 2" )
-	ROMX_LOAD("fnt0816_a.x1", 0x0800, 0x1000, BAD_DUMP CRC(98db5a6b) SHA1(adf1492ef326b0f8820a3caa1915ad5ab8138f49), ROM_BIOS(2) )
+	ROMX_LOAD("fnt0816_a.x1", 0x01800, 0x1000, BAD_DUMP CRC(98db5a6b) SHA1(adf1492ef326b0f8820a3caa1915ad5ab8138f49), ROM_BIOS(2) )
 	/* I strongly suspect this is not genuine */
-	ROMX_LOAD("fnt1616_a.x1", 0x01800, 0x4ac00, BAD_DUMP CRC(bc5689ae) SHA1(a414116e261eb92bbdd407f63c8513257cd5a86f), ROM_BIOS(2) )
+	ROMX_LOAD("fnt1616_a.x1", 0x02800, 0x4ac00, BAD_DUMP CRC(bc5689ae) SHA1(a414116e261eb92bbdd407f63c8513257cd5a86f), ROM_BIOS(2) )
 
 	ROM_REGION(0x4ac00, "kanji", 0)
 	/* This is clearly a bad dump: size does not make sense and from 0x28000 on there are only 0xff */
@@ -1465,5 +1548,5 @@ ROM_END
 /*    YEAR  NAME       PARENT  COMPAT   MACHINE  INPUT  INIT  CONFIG COMPANY   FULLNAME      FLAGS */
 COMP( 1982, x1,        0,      0,       x1,      x1,    0,    x1,    "Sharp",  "X1 (CZ-800C)",         GAME_NOT_WORKING)
 COMP( 1984, x1ck,      x1,     0,       x1,      x1,    0,    x1,    "Sharp",  "X1Ck (CZ-804C)",       GAME_NOT_WORKING)
-COMP( 1984, x1turbo,   x1,     0,       x1,      x1,    0,    x1,    "Sharp",  "X1 Turbo (CZ-850C)",   GAME_NOT_WORKING)
-COMP( 1986, x1turboz,  x1,     0,       x1,      x1,    0,    x1,    "Sharp",  "X1 Turbo Z (CZ-880C)", GAME_NOT_WORKING)
+COMP( 1984, x1turbo,   x1,     0,       x1turbo, x1,    0,    x1,    "Sharp",  "X1 Turbo (CZ-850C)",   GAME_NOT_WORKING)
+COMP( 1986, x1turboz,  x1,     0,       x1turbo, x1,    0,    x1,    "Sharp",  "X1 Turbo Z (CZ-880C)", GAME_NOT_WORKING)
