@@ -245,7 +245,7 @@ static void add(z8_state *cpustate, UINT8 dst, INT8 src)
 	/* dst <- dst + src */
 	int data = (INT8)read(dst) + src;
 
-	set_flag_c(data & 0x100);
+	set_flag_c(data > 127);
 	set_flag_z(data == 0);
 	set_flag_s(data < 0);
 //	set_flag_v();
@@ -280,6 +280,14 @@ INSTRUCTION( da_IR1 )			{ mode_IR1(decimal_adjust) }
 
 static void decrement(z8_state *cpustate, UINT8 dst)
 {
+	/* dst <- dst - 1 */
+	UINT8 data = register_read(cpustate, dst) - 1;
+
+	set_flag_z(data == 0);
+	set_flag_s(data & 0x80);
+	set_flag_v(data == 0x7f);
+
+	register_write(cpustate, dst, data);
 }
 
 INSTRUCTION( dec_R1 )			{ mode_R1(decrement) }
@@ -287,6 +295,14 @@ INSTRUCTION( dec_IR1 )			{ mode_IR1(decrement) }
 
 static void decrement_word(z8_state *cpustate, UINT8 dst)
 {
+	/* dst <- dst - 1 */
+	UINT16 data = register_pair_read(cpustate, dst) - 1;
+
+	set_flag_z(data == 0);
+	set_flag_s(data & 0x8000);
+	set_flag_v(data == 0x7fff);
+
+	register_pair_write(cpustate, dst, data);
 }
 
 INSTRUCTION( decw_RR1 )			{ mode_RR1(decrement_word) }
@@ -294,6 +310,14 @@ INSTRUCTION( decw_IR1 )			{ mode_IR1(decrement_word) }
 
 static void increment(z8_state *cpustate, UINT8 dst)
 {
+	/* dst <- dst + 1 */
+	UINT8 data = register_read(cpustate, dst) + 1;
+
+	set_flag_z(data == 0);
+	set_flag_s(data & 0x80);
+	set_flag_v(data == 0x80);
+
+	register_write(cpustate, dst, data);
 }
 
 INSTRUCTION( inc_r1 )			{ mode_r1(increment) }
@@ -302,6 +326,14 @@ INSTRUCTION( inc_IR1 )			{ mode_IR1(increment) }
 
 static void increment_word(z8_state *cpustate, UINT8 dst)
 {
+	/* dst <- dst + 1 */
+	UINT16 data = register_pair_read(cpustate, dst) + 1;
+
+	set_flag_z(data == 0);
+	set_flag_s(data & 0x8000);
+	set_flag_v(data == 0x8000);
+
+	register_pair_write(cpustate, dst, data);
 }
 
 INSTRUCTION( incw_RR1 )			{ mode_RR1(increment_word) }
@@ -555,6 +587,16 @@ INSTRUCTION( tm_IR1_IM )		{ mode_IR1_IM(test_under_mask) }
 
 static void rotate_left(z8_state *cpustate, UINT8 dst)
 {
+	/* << */
+	UINT8 data = register_read(cpustate, dst);
+	UINT8 new_data = (data << 1) | BIT(data, 7);
+
+	set_flag_c(data & 0x80);
+	set_flag_z(data == 0);
+	set_flag_s(new_data & 0x80);
+	set_flag_v((data & 0x80) != (new_data & 0x80));
+
+	register_write(cpustate, dst, new_data);
 }
 
 INSTRUCTION( rl_R1 )			{ mode_R1(rotate_left) }
@@ -562,6 +604,16 @@ INSTRUCTION( rl_IR1 )			{ mode_IR1(rotate_left) }
 
 static void rotate_left_carry(z8_state *cpustate, UINT8 dst)
 {
+	/* << C */
+	UINT8 data = register_read(cpustate, dst);
+	UINT8 new_data = (data << 1) | flag(C);
+
+	set_flag_c(data & 0x80);
+	set_flag_z(data == 0);
+	set_flag_s(new_data & 0x80);
+	set_flag_v((data & 0x80) != (new_data & 0x80));
+
+	register_write(cpustate, dst, new_data);
 }
 
 INSTRUCTION( rlc_R1 )			{ mode_R1(rotate_left_carry) }
@@ -569,6 +621,16 @@ INSTRUCTION( rlc_IR1 )			{ mode_IR1(rotate_left_carry) }
 
 static void rotate_right(z8_state *cpustate, UINT8 dst)
 {
+	/* >> */
+	UINT8 data = register_read(cpustate, dst);
+	UINT8 new_data = ((data & 0x01) << 7) | (data >> 1);
+
+	set_flag_c(data & 0x01);
+	set_flag_z(data == 0);
+	set_flag_s(new_data & 0x80);
+	set_flag_v((data & 0x80) != (new_data & 0x80));
+
+	register_write(cpustate, dst, new_data);
 }
 
 INSTRUCTION( rr_R1 )			{ mode_R1(rotate_right) }
@@ -576,6 +638,16 @@ INSTRUCTION( rr_IR1 )			{ mode_IR1(rotate_right) }
 
 static void rotate_right_carry(z8_state *cpustate, UINT8 dst)
 {
+	/* >> C */
+	UINT8 data = register_read(cpustate, dst);
+	UINT8 new_data = (flag(C) << 7) | (data >> 1);
+
+	set_flag_c(data & 0x01);
+	set_flag_z(data == 0);
+	set_flag_s(new_data & 0x80);
+	set_flag_v((data & 0x80) != (new_data & 0x80));
+
+	register_write(cpustate, dst, new_data);
 }
 
 INSTRUCTION( rrc_R1 )			{ mode_R1(rotate_right_carry) }
@@ -583,6 +655,16 @@ INSTRUCTION( rrc_IR1 )			{ mode_IR1(rotate_right_carry) }
 
 static void shift_right_arithmetic(z8_state *cpustate, UINT8 dst)
 {
+	/* */
+	UINT8 data = register_read(cpustate, dst);
+	UINT8 new_data = (data & 0x80) | ((data >> 1) & 0x7f);
+
+	set_flag_c(data & 0x01);
+	set_flag_z(data == 0);
+	set_flag_s(new_data & 0x80);
+	set_flag_v(0);
+
+	register_write(cpustate, dst, new_data);
 }
 
 INSTRUCTION( sra_R1 )			{ mode_R1(shift_right_arithmetic) }
