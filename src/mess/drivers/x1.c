@@ -165,6 +165,14 @@ static struct
 	UINT8 gfx_bank;
 	UINT8 pcg_mode;
 }scrn_reg;
+static UINT8 pcg_write_addr;
+
+
+/*************************************
+ *
+ *  Video Functions
+ *
+ *************************************/
 
 static VIDEO_START( x1 )
 {
@@ -307,11 +315,14 @@ static VIDEO_EOF( x1 )
 {
 }
 
-static UINT8 sub_cmd,sub_val,key_flag;
+/*************************************
+ *
+ *  Keyboard MCU simulation
+ *
+ *************************************/
 
-/*
-Keyboard MCU simulation
-*/
+static UINT8 sub_cmd,sub_val,key_flag;
+static UINT8 sub_cmd_length;
 
 static UINT8 check_keyboard_press(running_machine *machine)
 {
@@ -336,8 +347,6 @@ static UINT8 check_keyboard_press(running_machine *machine)
 
 	return 0;
 }
-
-static UINT8 sub_cmd_length;
 
 static READ8_HANDLER( sub_io_r )
 {
@@ -407,6 +416,12 @@ static WRITE8_HANDLER( sub_io_w )
 	sub_obf = (sub_cmd_length) ? 0x00 : 0x20;
 }
 
+/*************************************
+ *
+ *  ROM Image / Banking Handling
+ *
+ *************************************/
+
 static UINT8 rom_index[3];
 
 static READ8_HANDLER( x1_rom_r )
@@ -444,9 +459,12 @@ static WRITE8_HANDLER( rom_data_w )
 	ROM[0x10000+offset] = data;
 }
 
-/*
-FDC is a MB8877A, wd17XX compatible
-*/
+
+/*************************************
+ *
+ *  MB8877A FDC (wd17XX compatible)
+ *
+ *************************************/
 
 //static UINT8 fdc_irq_flag;
 //static UINT8 fdc_drq_flag;
@@ -519,9 +537,6 @@ static WRITE8_HANDLER( x1_fdc_w )
 			wd17xx_data_w(dev,offset,data);
 			break;
 		case 0x0ffc:
-			/* data & 3 = disk drive, TODO */
-			//if(data & 3)
-			//	fatalerror("FDC: Using more than 1 floppy disk drive!");
 			wd17xx_set_drive(dev,data & 3);
 			floppy_drive_set_motor_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, data & 3), data & 0x80);
 			floppy_drive_set_ready_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, data & 3), data & 0x80,0);
@@ -541,33 +556,11 @@ static const wd17xx_interface x1_mb8877a_interface =
 	NULL
 };
 
-/* for bitmap mode */
-static UINT8 x_b,x_g,x_r;
-
-static void set_current_palette(running_machine *machine)
-{
-	UINT8 addr,r,g,b;
-
-	for(addr=0;addr<8;addr++)
-	{
-		r = ((x_r)>>(addr)) & 1;
-		g = ((x_g)>>(addr)) & 1;
-		b = ((x_b)>>(addr)) & 1;
-
-		palette_set_color_rgb(machine, addr+0x100, pal1bit(r), pal1bit(g), pal1bit(b));
-	}
-}
-
-static WRITE8_HANDLER( x1_pal_r_w ) { x_r = data; set_current_palette(space->machine); }
-static WRITE8_HANDLER( x1_pal_g_w ) { x_g = data; set_current_palette(space->machine); }
-static WRITE8_HANDLER( x1_pal_b_w ) { x_b = data; set_current_palette(space->machine); }
-
-static WRITE8_HANDLER( x1_dma_w )
-{
-	printf("%02x %02x\n",offset,data);
-	//if(data)
-	//	fatalerror("Data written to the DMA space");
-}
+/*************************************
+ *
+ *  Programmable Character Generator
+ *
+ *************************************/
 
 /* TODO: apparently this is for the alternative PCG mode */
 #if 0
@@ -581,8 +574,6 @@ static UINT16 check_pcg_addr(running_machine *machine)
 	return 0x3ff;
 }
 #endif
-
-static UINT8 pcg_write_addr;
 
 static READ8_HANDLER( x1_pcg_r )
 {
@@ -656,11 +647,32 @@ static WRITE8_HANDLER( x1_pcg_w )
 	}
 }
 
-static READ8_HANDLER( x1_clr_r )
-{
+/*************************************
+ *
+ *  Other Video-related functions
+ *
+ *************************************/
 
-	return 0xff;
+/* for bitmap mode */
+static UINT8 x_b,x_g,x_r;
+
+static void set_current_palette(running_machine *machine)
+{
+	UINT8 addr,r,g,b;
+
+	for(addr=0;addr<8;addr++)
+	{
+		r = ((x_r)>>(addr)) & 1;
+		g = ((x_g)>>(addr)) & 1;
+		b = ((x_b)>>(addr)) & 1;
+
+		palette_set_color_rgb(machine, addr+0x100, pal1bit(r), pal1bit(g), pal1bit(b));
+	}
 }
+
+static WRITE8_HANDLER( x1_pal_r_w ) { x_r = data; set_current_palette(space->machine); }
+static WRITE8_HANDLER( x1_pal_g_w ) { x_g = data; set_current_palette(space->machine); }
+static WRITE8_HANDLER( x1_pal_b_w ) { x_b = data; set_current_palette(space->machine); }
 
 static WRITE8_HANDLER( x1_ex_gfxram_w )
 {
@@ -707,12 +719,25 @@ static WRITE8_HANDLER( x1_6845_w )
 	}
 }
 
+static WRITE8_HANDLER( x1_dma_w )
+{
+	printf("%02x %02x\n",offset,data);
+	//if(data)
+	//	fatalerror("Data written to the DMA space");
+}
+
+
+/*************************************
+ *
+ *  Memory maps
+ *
+ *************************************/
+
 static READ8_HANDLER( x1_io_r )
 {
 	io_bank_mode = 0; //any read disables the extended mode.
 
-	if(offset == 0x0000)                        	{ return x1_clr_r(space, 0); }
-	else if(offset >= 0x0704 && offset <= 0x0707)   { return z80ctc_r(devtag_get_device(space->machine, "ctc"), offset-0x0704); }
+	if(offset >= 0x0704 && offset <= 0x0707)   		{ return z80ctc_r(devtag_get_device(space->machine, "ctc"), offset-0x0704); }
 	else if(offset == 0x0e03)                    	{ return x1_rom_r(space, 0); }
 	else if(offset >= 0x0ff8 && offset <= 0x0fff)	{ return x1_fdc_r(space, offset-0xff8); }
 	else if(offset >= 0x1400 && offset <= 0x17ff)	{ return x1_pcg_r(space, offset-0x1400); }
@@ -771,8 +796,7 @@ static READ8_HANDLER( x1turbo_io_r )
 {
 	io_bank_mode = 0; //any read disables the extended mode.
 
-	if(offset == 0x0000)                        	{ return x1_clr_r(space, 0); }
-	else if(offset == 0x0700 || offset == 0x0701)	{ return ym2151_r(devtag_get_device(space->machine, "ym"), offset-0x0700); }
+	if(offset == 0x0700 || offset == 0x0701)		{ return ym2151_r(devtag_get_device(space->machine, "ym"), offset-0x0700); }
 	else if(offset >= 0x0704 && offset <= 0x0707)   { return z80ctc_r(devtag_get_device(space->machine, "ctc"), offset-0x0704); }
 	else if(offset == 0x0e03)                    	{ return x1_rom_r(space, 0); }
 	else if(offset >= 0x0ff8 && offset <= 0x0fff)	{ return x1_fdc_r(space, offset-0xff8); }
@@ -846,151 +870,11 @@ static ADDRESS_MAP_START( x1turbo_io , ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(x1turbo_io_r, x1turbo_io_w)
 ADDRESS_MAP_END
 
-static const gfx_layout x1_chars_8x8 =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	1,
-	{ 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
-
-static const gfx_layout x1_chars_8wx8 =
-{
-	16,8,
-	RGN_FRAC(1,1),
-	1,
-	{ 0 },
-	{ 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
-
-static const gfx_layout x1_chars_8x8w =
-{
-	8,16,
-	RGN_FRAC(1,1),
-	1,
-	{ 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 0*8, 1*8, 1*8, 2*8, 2*8, 3*8, 3*8, 4*8, 4*8, 5*8, 5*8, 6*8, 6*8, 7*8, 7*8 },
-	8*8
-};
-
-static const gfx_layout x1_chars_8wx8w =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	1,
-	{ 0 },
-	{ 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7 },
-	{ 0*8, 0*8, 1*8, 1*8, 2*8, 2*8, 3*8, 3*8, 4*8, 4*8, 5*8, 5*8, 6*8, 6*8, 7*8, 7*8 },
-	8*8
-};
-
-static const gfx_layout x1_pcg_8x8 =
-{
-	8,8,
-	RGN_FRAC(1,3),
-	3,
-	{ RGN_FRAC(2,3),RGN_FRAC(1,3),RGN_FRAC(0,3) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
-
-static const gfx_layout x1_pcg_8wx8 =
-{
-	16,8,
-	RGN_FRAC(1,3),
-	3,
-	{ RGN_FRAC(2,3),RGN_FRAC(1,3),RGN_FRAC(0,3) },
-	{ 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
-
-static const gfx_layout x1_pcg_8x8w =
-{
-	8,16,
-	RGN_FRAC(1,3),
-	3,
-	{ RGN_FRAC(2,3),RGN_FRAC(1,3),RGN_FRAC(0,3) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 0*8, 1*8, 1*8, 2*8, 2*8, 3*8, 3*8, 4*8, 4*8, 5*8, 5*8, 6*8, 6*8, 7*8, 7*8 },
-	8*8
-};
-
-static const gfx_layout x1_pcg_8wx8w =
-{
-	16,16,
-	RGN_FRAC(1,3),
-	3,
-	{ RGN_FRAC(2,3),RGN_FRAC(1,3),RGN_FRAC(0,3) },
-	{ 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7 },
-	{ 0*8, 0*8, 1*8, 1*8, 2*8, 2*8, 3*8, 3*8, 4*8, 4*8, 5*8, 5*8, 6*8, 6*8, 7*8, 7*8 },
-	8*8
-};
-
-static const gfx_layout x1_chars_16x16 =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	1,
-	{ 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7,8,9,10,11,12,13,14,15 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
-	16*16
-};
-
-/* TODO: separe the different x1 decodings accordingly */
-static GFXDECODE_START( x1 )
-	/* decoded for debugging purpose, they will be nuked in the end */
-	GFXDECODE_ENTRY( "cgrom", 0x00000, x1_chars_8x8,    0x200, 0x20 )
-	GFXDECODE_ENTRY( "cgrom", 0x00000, x1_chars_8wx8,   0x200, 0x20 )
-	GFXDECODE_ENTRY( "cgrom", 0x00000, x1_chars_8x8w,   0x200, 0x20 )
-	GFXDECODE_ENTRY( "cgrom", 0x00000, x1_chars_8wx8w,  0x200, 0x20 )
-	GFXDECODE_ENTRY( "pcg",   0x00000, x1_pcg_8x8,      0x100, 1 )
-	GFXDECODE_ENTRY( "pcg",   0x00000, x1_pcg_8wx8,     0x100, 1 )
-	GFXDECODE_ENTRY( "pcg",   0x00000, x1_pcg_8x8w,     0x100, 1 )
-	GFXDECODE_ENTRY( "pcg",   0x00000, x1_pcg_8wx8w,    0x100, 1 )
-	GFXDECODE_ENTRY( "cgrom", 0x01800, x1_chars_16x16,  0, 0x20 ) //only x1turboz uses this so far
-	GFXDECODE_ENTRY( "kanji", 0x27000, x1_chars_16x16,  0, 0x20 ) //needs to be checked when the ROM will be redumped
-GFXDECODE_END
-
-static PALETTE_INIT(x1)
-{
-	int i;
-
-	for(i=0;i<0x300;i++)
-		palette_set_color(machine, i,MAKE_RGB(0x00,0x00,0x00));
-
-	for (i = 0x200; i < 0x220; i++)
-	{
-		UINT8 r,g,b;
-
-		if(i & 0x01)
-		{
-			r = ((i >> 3) & 1) ? 0xff : 0x00;
-			g = ((i >> 2) & 1) ? 0xff : 0x00;
-			b = ((i >> 1) & 1) ? 0xff : 0x00;
-		}
-		else { r = g = b = 0x00; }
-
-		if(i & 0x10) { r^=0xff; g^=0xff; b^=0xff; }
-
-		palette_set_color_rgb(machine, i, r,g,b);
-	}
-
-	/* TODO: fix this */
-	for(i=0;i<8;i++)
-	{
-		palette_set_color_rgb(machine, i+0x000, pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
-		palette_set_color_rgb(machine, i+0x100, pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
-	}
-}
+/*************************************
+ *
+ *  PPI8255
+ *
+ *************************************/
 
 static READ8_DEVICE_HANDLER( x1_porta_r )
 {
@@ -1039,19 +923,13 @@ static WRITE8_DEVICE_HANDLER( x1_portb_w )
 
 static WRITE8_DEVICE_HANDLER( x1_portc_w )
 {
-	//printf("PPI Port C write %02x\n",data);
 	hres_320 = data & 0x40;
-
-//	if(hres_320 && data & 0x20 && io_switch & 0x20 && (data & 0xa0) != 0)
 
 	if(((data & 0x20) == 0) && (io_switch & 0x20))
 		io_bank_mode = 1;
 
 	io_switch = data & 0x20;
 	io_sys = data & 0xff;
-
-	//if(io_sys_state != io_sys)
-	//	io_sys_state = io_sys;
 }
 
 static const ppi8255_interface ppi8255_intf =
@@ -1078,7 +956,12 @@ static const mc6845_interface mc6845_intf =
 	NULL		/* update address callback */
 };
 
-/* Input ports */
+/*************************************
+ *
+ *  Inputs
+ *
+ *************************************/
+
 static INPUT_PORTS_START( x1 )
 	PORT_START("SYSTEM")
 	PORT_DIPNAME( 0x01, 0x01, "SYSTEM" )
@@ -1311,6 +1194,175 @@ static INPUT_PORTS_START( x1 )
 	#endif
 INPUT_PORTS_END
 
+/*************************************
+ *
+ *  GFX decoding
+ *
+ *************************************/
+
+static const gfx_layout x1_chars_8x8 =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	1,
+	{ 0 },
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8
+};
+
+static const gfx_layout x1_chars_8wx8 =
+{
+	16,8,
+	RGN_FRAC(1,1),
+	1,
+	{ 0 },
+	{ 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8
+};
+
+static const gfx_layout x1_chars_8x8w =
+{
+	8,16,
+	RGN_FRAC(1,1),
+	1,
+	{ 0 },
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 0*8, 0*8, 1*8, 1*8, 2*8, 2*8, 3*8, 3*8, 4*8, 4*8, 5*8, 5*8, 6*8, 6*8, 7*8, 7*8 },
+	8*8
+};
+
+static const gfx_layout x1_chars_8wx8w =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	1,
+	{ 0 },
+	{ 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7 },
+	{ 0*8, 0*8, 1*8, 1*8, 2*8, 2*8, 3*8, 3*8, 4*8, 4*8, 5*8, 5*8, 6*8, 6*8, 7*8, 7*8 },
+	8*8
+};
+
+static const gfx_layout x1_pcg_8x8 =
+{
+	8,8,
+	RGN_FRAC(1,3),
+	3,
+	{ RGN_FRAC(2,3),RGN_FRAC(1,3),RGN_FRAC(0,3) },
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8
+};
+
+static const gfx_layout x1_pcg_8wx8 =
+{
+	16,8,
+	RGN_FRAC(1,3),
+	3,
+	{ RGN_FRAC(2,3),RGN_FRAC(1,3),RGN_FRAC(0,3) },
+	{ 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8
+};
+
+static const gfx_layout x1_pcg_8x8w =
+{
+	8,16,
+	RGN_FRAC(1,3),
+	3,
+	{ RGN_FRAC(2,3),RGN_FRAC(1,3),RGN_FRAC(0,3) },
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 0*8, 0*8, 1*8, 1*8, 2*8, 2*8, 3*8, 3*8, 4*8, 4*8, 5*8, 5*8, 6*8, 6*8, 7*8, 7*8 },
+	8*8
+};
+
+static const gfx_layout x1_pcg_8wx8w =
+{
+	16,16,
+	RGN_FRAC(1,3),
+	3,
+	{ RGN_FRAC(2,3),RGN_FRAC(1,3),RGN_FRAC(0,3) },
+	{ 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7 },
+	{ 0*8, 0*8, 1*8, 1*8, 2*8, 2*8, 3*8, 3*8, 4*8, 4*8, 5*8, 5*8, 6*8, 6*8, 7*8, 7*8 },
+	8*8
+};
+
+static const gfx_layout x1_chars_16x16 =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	1,
+	{ 0 },
+	{ 0, 1, 2, 3, 4, 5, 6, 7,8,9,10,11,12,13,14,15 },
+	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
+	16*16
+};
+
+/* decoded for debugging purpose, this will be nuked in the end... */
+static GFXDECODE_START( x1 )
+	GFXDECODE_ENTRY( "cgrom", 0x00000, x1_chars_8x8,    0x200, 0x20 )
+	GFXDECODE_ENTRY( "cgrom", 0x00000, x1_chars_8wx8,   0x200, 0x20 )
+	GFXDECODE_ENTRY( "cgrom", 0x00000, x1_chars_8x8w,   0x200, 0x20 )
+	GFXDECODE_ENTRY( "cgrom", 0x00000, x1_chars_8wx8w,  0x200, 0x20 )
+	GFXDECODE_ENTRY( "pcg",   0x00000, x1_pcg_8x8,      0x100, 1 )
+	GFXDECODE_ENTRY( "pcg",   0x00000, x1_pcg_8wx8,     0x100, 1 )
+	GFXDECODE_ENTRY( "pcg",   0x00000, x1_pcg_8x8w,     0x100, 1 )
+	GFXDECODE_ENTRY( "pcg",   0x00000, x1_pcg_8wx8w,    0x100, 1 )
+	GFXDECODE_ENTRY( "cgrom", 0x01800, x1_chars_16x16,  0, 0x20 ) //only x1turboz uses this so far
+	GFXDECODE_ENTRY( "kanji", 0x27000, x1_chars_16x16,  0, 0x20 ) //needs to be checked when the ROM will be redumped
+GFXDECODE_END
+
+/*************************************
+ *
+ *  CTC
+ *
+ *************************************/
+
+static void ctc0_interrupt(const device_config *device, int state)
+{
+	//cputag_set_input_line(device->machine, "maincpu", 0, state);
+}
+
+
+static const z80ctc_interface ctc_intf =
+{
+	0,					// timer disables
+	ctc0_interrupt,		// interrupt handler
+	0,					// ZC/TO0 callback
+	0,					// ZC/TO1 callback
+	0,					// ZC/TO2 callback
+};
+
+/*************************************
+ *
+ *  Sound HW Config
+ *
+ *************************************/
+
+static const ay8910_interface ay8910_config =
+{
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	DEVCB_INPUT_PORT("P1"),
+	DEVCB_INPUT_PORT("P2"),
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+// (ym-2151 handler here)
+
+/*************************************
+ *
+ *  Machine Functions
+ *
+ *************************************/
+
+static INTERRUPT_GEN( x1_vbl )
+{
+//	pcg_reset = 1;
+}
+
 static MACHINE_RESET( x1 )
 {
 	UINT8 *ROM = memory_region(machine, "maincpu");
@@ -1338,34 +1390,36 @@ static MACHINE_RESET( x1 )
 	pcg_index[0] = pcg_index[1] = pcg_index[2] = 0;
 }
 
-static void ctc0_interrupt(const device_config *device, int state)
+static PALETTE_INIT(x1)
 {
-	//cputag_set_input_line(device->machine, "maincpu", 0, state);
-}
+	int i;
 
+	for(i=0;i<0x300;i++)
+		palette_set_color(machine, i,MAKE_RGB(0x00,0x00,0x00));
 
-static const z80ctc_interface ctc_intf =
-{
-	0,					// timer disables
-	ctc0_interrupt,		// interrupt handler
-	0,					// ZC/TO0 callback
-	0,					// ZC/TO1 callback
-	0,					// ZC/TO2 callback
-};
+	for (i = 0x200; i < 0x220; i++)
+	{
+		UINT8 r,g,b;
 
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_INPUT_PORT("P1"),
-	DEVCB_INPUT_PORT("P2"),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
+		if(i & 0x01)
+		{
+			r = ((i >> 3) & 1) ? 0xff : 0x00;
+			g = ((i >> 2) & 1) ? 0xff : 0x00;
+			b = ((i >> 1) & 1) ? 0xff : 0x00;
+		}
+		else { r = g = b = 0x00; }
 
-static INTERRUPT_GEN( x1_vbl )
-{
-//	pcg_reset = 1;
+		if(i & 0x10) { r^=0xff; g^=0xff; b^=0xff; }
+
+		palette_set_color_rgb(machine, i, r,g,b);
+	}
+
+	/* TODO: fix this */
+	for(i=0;i<8;i++)
+	{
+		palette_set_color_rgb(machine, i+0x000, pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
+		palette_set_color_rgb(machine, i+0x100, pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
+	}
 }
 
 static MACHINE_DRIVER_START( x1 )
@@ -1418,6 +1472,12 @@ static MACHINE_DRIVER_START( x1turbo )
 //	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
+
+/*************************************
+ *
+ *  Image Load Functions
+ *
+ *************************************/
 
 static DEVICE_IMAGE_LOAD( x1_floppy )
 {
@@ -1478,8 +1538,13 @@ static SYSTEM_CONFIG_START(x1)
 	CONFIG_DEVICE(x1_floppy_getinfo)
 SYSTEM_CONFIG_END
 
-/* ROM definition */
-ROM_START( x1 )
+/*************************************
+ *
+ * ROM definitions
+ *
+ *************************************/
+
+ ROM_START( x1 )
 	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "default", "X1 IPL" )
 	ROMX_LOAD( "ipl.x1", 0x0000, 0x1000, CRC(7b28d9de) SHA1(c4db9a6e99873808c8022afd1c50fef556a8b44d), ROM_BIOS(1) )
@@ -1572,7 +1637,6 @@ ROM_START( x1turboz )
 ROM_END
 
 
-/* Driver */
 
 /*    YEAR  NAME       PARENT  COMPAT   MACHINE  INPUT  INIT  CONFIG COMPANY   FULLNAME      FLAGS */
 COMP( 1982, x1,        0,      0,       x1,      x1,    0,    x1,    "Sharp",  "X1 (CZ-800C)",         GAME_NOT_WORKING)
