@@ -688,9 +688,9 @@ static WRITE8_HANDLER( x1_ex_gfxram_w )
 	else if(offset >= 0x8000 && offset <= 0xbfff)	{ ex_mask = 5; }
 	else                                        	{ ex_mask = 3; }
 
-	if(ex_mask & 1) { gfx_bitmap_ram[offset+0x0000] = data; }
-	if(ex_mask & 2) { gfx_bitmap_ram[offset+0x4000] = data; }
-	if(ex_mask & 4) { gfx_bitmap_ram[offset+0x8000] = data; }
+	if(ex_mask & 1) { gfx_bitmap_ram[(offset & 0x3fff)+0x0000] = data; }
+	if(ex_mask & 2) { gfx_bitmap_ram[(offset & 0x3fff)+0x4000] = data; }
+	if(ex_mask & 4) { gfx_bitmap_ram[(offset & 0x3fff)+0x8000] = data; }
 }
 
 static WRITE8_HANDLER( x1_scrn_w )
