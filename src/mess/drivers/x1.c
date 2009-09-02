@@ -356,7 +356,7 @@ static READ8_HANDLER( sub_io_r )
 	if(key_flag == 1)
 	{
 		key_flag = 0;
-		return 0x82;
+		return 0x82; //TODO: this is for shift/ctrl/kana lock etc.
 	}
 
 	sub_cmd_length--;
@@ -1377,13 +1377,22 @@ static IRQ_CALLBACK(x1_irq_callback)
 static TIMER_CALLBACK(keyboard_callback)
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	UINT8 key_press;
+	static UINT8 old_key_val;
 
 	if(key_irq_vector)
 	{
-		if(check_keyboard_press(machine))
+		key_press = check_keyboard_press(machine);
+		if(key_press && key_press != old_key_val)
 		{
+			old_key_val = key_press;
 			sub_io_w(space,0,0xe6);
 			cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
+		}
+		else
+		{
+			old_key_val = key_press;
+			key_flag = 0;
 		}
 	}
 }
@@ -1415,7 +1424,7 @@ static MACHINE_RESET( x1 )
 	pcg_index[0] = pcg_index[1] = pcg_index[2] = 0;
 
 	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), x1_irq_callback);
-	timer_pulse(machine, ATTOTIME_IN_HZ(2400), NULL, 0, keyboard_callback);
+	timer_pulse(machine, ATTOTIME_IN_HZ(240), NULL, 0, keyboard_callback);
 }
 
 static PALETTE_INIT(x1)
