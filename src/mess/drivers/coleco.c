@@ -70,6 +70,7 @@
 
 static int joy_mode;
 static int joy_status[2];
+static int last_state=0;
 
 /* Read/Write Handlers */
 
@@ -465,8 +466,6 @@ static INTERRUPT_GEN( coleco_interrupt )
 
 static void coleco_vdp_interrupt(running_machine *machine, int state)
 {
-	static int last_state = 0;
-
     // only if it goes up
 	if (state && !last_state) 
 		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
@@ -538,9 +537,10 @@ static MACHINE_START( coleco )
 
 static MACHINE_RESET( coleco )
 {
-    cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), INPUT_LINE_IRQ0, 0xff);
+	last_state = 0;
+	cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), INPUT_LINE_IRQ0, 0xff);
 	memset(&memory_region(machine, "maincpu")[0x6000], 0xff, 0x400);	// initialize RAM
-    timer_pulse(machine, ATTOTIME_IN_MSEC(20), NULL, 0, paddle_callback);
+	timer_pulse(machine, ATTOTIME_IN_MSEC(20), NULL, 0, paddle_callback);
 }
 
 //static int coleco_cart_verify(const UINT8 *cartdata, size_t size)
@@ -635,28 +635,28 @@ MACHINE_DRIVER_END
 /* ROMs */
 
 ROM_START (coleco)
-    ROM_REGION( 0x10000, "maincpu", 0 )
-    ROM_LOAD( "coleco.rom", 0x0000, 0x2000, CRC(3aa93ef3) SHA1(45bedc4cbdeac66c7df59e9e599195c778d86a92) )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "coleco.rom", 0x0000, 0x2000, CRC(3aa93ef3) SHA1(45bedc4cbdeac66c7df59e9e599195c778d86a92) )
 	ROM_CART_LOAD("cart", 0x8000, 0x8000, ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START (colecoa)
     // differences to 0x3aa93ef3 modified characters, added a pad 2 related fix
-    ROM_REGION( 0x10000, "maincpu", 0 )
-    ROM_LOAD( "colecoa.rom", 0x0000, 0x2000, CRC(39bb16fc) SHA1(99ba9be24ada3e86e5c17aeecb7a2d68c5edfe59) )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "colecoa.rom", 0x0000, 0x2000, CRC(39bb16fc) SHA1(99ba9be24ada3e86e5c17aeecb7a2d68c5edfe59) )
 	ROM_CART_LOAD("cart", 0x8000, 0x8000, ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START (colecob)
-    ROM_REGION( 0x10000, "maincpu", 0 )
-    ROM_LOAD( "svi603.rom", 0x0000, 0x2000, CRC(19e91b82) SHA1(8a30abe5ffef810b0f99b86db38b1b3c9d259b78) )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "svi603.rom", 0x0000, 0x2000, CRC(19e91b82) SHA1(8a30abe5ffef810b0f99b86db38b1b3c9d259b78) )
 	ROM_CART_LOAD("cart", 0x8000, 0x8000, ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START( czz50 )
-    ROM_REGION( 0x10000, "maincpu", 0 )
-    ROM_LOAD( "czz50.rom", 0x0000, 0x2000, CRC(4999abc6) SHA1(96aecec3712c94517103d894405bc98a7dafa440) )
-    ROM_CONTINUE(		  0x8000, 0x2000 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "czz50.rom", 0x0000, 0x2000, CRC(4999abc6) SHA1(96aecec3712c94517103d894405bc98a7dafa440) )
+	ROM_CONTINUE( 0x8000, 0x2000 )
 ROM_END
 
 #define rom_dina rom_czz50
