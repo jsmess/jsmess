@@ -365,6 +365,8 @@ static READ8_HANDLER( sub_io_r )
 	return sub_val;
 }
 
+static UINT8 key_irq_vector;
+
 static WRITE8_HANDLER( sub_io_w )
 {
 	/* TODO: check sub-routine at $10e */
@@ -373,6 +375,9 @@ static WRITE8_HANDLER( sub_io_w )
 	/* $0c0 -> timer*/
 	/* $052 -> cmt */
 	/* $0f5 -> reload sub-routine? */
+
+	if(sub_cmd == 0xe4)
+		key_irq_vector = data;
 
 	switch(data)
 	{
@@ -1363,6 +1368,26 @@ static INTERRUPT_GEN( x1_vbl )
 //	pcg_reset = 1;
 }
 
+static IRQ_CALLBACK(x1_irq_callback)
+{
+	cpu_set_input_line(device, 0, CLEAR_LINE);
+	return key_irq_vector;
+}
+
+static TIMER_CALLBACK(keyboard_callback)
+{
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+
+	if(key_irq_vector)
+	{
+		if(check_keyboard_press(machine))
+		{
+			sub_io_w(space,0,0xe6);
+			cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
+		}
+	}
+}
+
 static MACHINE_RESET( x1 )
 {
 	UINT8 *ROM = memory_region(machine, "maincpu");
@@ -1388,6 +1413,9 @@ static MACHINE_RESET( x1 )
 
 	io_bank_mode = 0;
 	pcg_index[0] = pcg_index[1] = pcg_index[2] = 0;
+
+	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), x1_irq_callback);
+	timer_pulse(machine, ATTOTIME_IN_HZ(2400), NULL, 0, keyboard_callback);
 }
 
 static PALETTE_INIT(x1)
