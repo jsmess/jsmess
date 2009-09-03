@@ -147,9 +147,11 @@
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
 #include "sound/2151intf.h"
+#include "sound/wave.h"
 
 #include "machine/wd17xx.h"
 #include "devices/basicdsk.h"
+#include "devices/cassette.h"
 #include "includes/d88.h"
 #include <ctype.h>
 
@@ -366,6 +368,34 @@ static READ8_HANDLER( sub_io_r )
 }
 
 static UINT8 key_irq_vector;
+static UINT8 cmt_current_cmd;
+
+static void cmt_command( running_machine* machine, UINT8 cmd )
+{
+	// CMT deck control command (E9 xx)
+	// E9 00 - Eject
+	// E9 01 - Stop
+	// E9 02 - Play
+	// E9 03 - Fast Forward
+	// E9 04 - Rewind
+	// E9 05 - APSS(?) Fast Forward
+	// E9 06 - APSS(?) Rewind
+	// E9 0A - Record
+	cmt_current_cmd = cmd;
+	
+	switch(cmd)
+	{
+		case 0x01:  // Stop
+			cassette_change_state(devtag_get_device(machine, "cass" ),CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
+			break;
+		case 0x02:  // Play
+			cassette_change_state(devtag_get_device(machine, "cass" ),CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
+			break;
+		default:
+			logerror("Unimplemented or invalid CMT command (0x%02x)\n",cmd);
+	}
+	logerror("CMT: Command 0xe9-0x%02x received.\n",cmd);
+}
 
 static WRITE8_HANDLER( sub_io_w )
 {
@@ -378,6 +408,9 @@ static WRITE8_HANDLER( sub_io_w )
 
 	if(sub_cmd == 0xe4)
 		key_irq_vector = data;
+
+	if(sub_cmd == 0xe9)
+		cmt_command(space->machine,data);
 
 	switch(data)
 	{
@@ -392,11 +425,18 @@ static WRITE8_HANDLER( sub_io_w )
 			sub_val = sub_cmd;
 			sub_cmd_length = 1;
 			break;
-		case 0xea:
+		case 0xea:  // CMT Control status
+			sub_val = cmt_current_cmd;
 			sub_cmd_length = 1;
+			logerror("CMT: Command 0xEA received, returning 0x%02x.\n",sub_val);
 			break;
-		case 0xeb:
+		case 0xeb:  // CMT Tape status
+		            // bit 0 = tape end
+					// bit 1 = tape inserted
+					// bit 2 = ???
+			sub_val = 0x02;  // assume a tape is inserted for now
 			sub_cmd_length = 1;
+			logerror("CMT: Command 0xEB received, returning 0x%02x.\n",sub_val);
 			break;
 		case 0xed:
 			sub_cmd_length = 3;
@@ -419,6 +459,7 @@ static WRITE8_HANDLER( sub_io_w )
 	sub_cmd = data;
 
 	sub_obf = (sub_cmd_length) ? 0x00 : 0x20;
+	logerror("SUB: Command byte 0x%02x\n",data);
 }
 
 /*************************************
@@ -910,7 +951,19 @@ static READ8_DEVICE_HANDLER( x1_portb_r )
 	---- --x- "cmt read"
 	---- ---x "cmt test" (active low)
 	*/
-	return (input_port_read(device->machine, "SYSTEM") & ~0x60) | sub_obf;
+	UINT8 dat = 0;
+	dat = (input_port_read(device->machine, "SYSTEM") & ~0x68) | sub_obf;
+	
+	if((dat & 0x80) == 0)
+		dat |= 0x04;  // VSync (todo: proper implementation of vsync)
+	
+	if(cassette_input(devtag_get_device(device->machine,"cass")) > 0.03)
+		dat |= 0x02;
+
+	if(cassette_get_state(devtag_get_device(device->machine,"cass")) & CASSETTE_MOTOR_DISABLED)
+		dat |= 0x02;
+		
+	return dat;
 }
 
 /* I/O system port */
@@ -944,6 +997,8 @@ static WRITE8_DEVICE_HANDLER( x1_portc_w )
 
 	io_switch = data & 0x20;
 	io_sys = data & 0xff;
+	
+	cassette_output(devtag_get_device(device->machine,"cass"),(data & 0x01) ? +1.0 : -1.0);
 }
 
 static const ppi8255_interface ppi8255_intf =
@@ -1434,6 +1489,9 @@ static MACHINE_RESET( x1 )
 
 	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), x1_irq_callback);
 	timer_pulse(machine, ATTOTIME_IN_HZ(240), NULL, 0, keyboard_callback);
+	
+	cmt_current_cmd = 0;
+	cassette_change_state(devtag_get_device(machine, "cass" ),CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
 }
 
 static PALETTE_INIT(x1)
@@ -1506,6 +1564,10 @@ static MACHINE_DRIVER_START( x1 )
 	MDRV_SOUND_ADD("ay", AY8910, XTAL_4MHz/4) //unknown clock / divider
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MDRV_SOUND_WAVE_ADD("wave","cass")
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+
+	MDRV_CASSETTE_ADD("cass",default_cassette_config)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( x1turbo )
