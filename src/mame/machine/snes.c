@@ -1596,7 +1596,7 @@ READ8_HANDLER( snes_r_bank5 )
 /* 0x800000 - 0xbfffff */
 READ8_HANDLER( snes_r_bank6 )
 {
-	UINT8 value;
+	UINT8 value = 0;
 	UINT16 address = offset & 0xffff;
 
 	if (address < 0x8000)
