@@ -65,6 +65,7 @@ const game_driver * const drivers[] =
     DRIVER( gblight )   /* Nintendo Game Boy Light Handheld             */
     DRIVER( gbcolor )   /* Nintendo Game Boy Color Handheld                 */
     DRIVER( snes )      /* Nintendo Super Nintendo NTSC                     */
+    DRIVER( snessfx )	/* Nintendo Super Nintendo NTSC, SuperFX			*/
     DRIVER( snespal )   /* Nintendo Super Nintendo PAL                      */
     DRIVER( sfcbox )    /* Nintendo Super Famicom Box                       */
     DRIVER( n64 )       /* Nintendo N64                                     */
@@ -1227,7 +1228,7 @@ const game_driver * const drivers[] =
     DRIVER( hc91 )    /* 1991 HC-91                                       */
     DRIVER( hc128 )   /* 1991 HC-128                                      */
     DRIVER( hc2000 )  /* 1992 HC-2000                                     */
-    
+
     DRIVER( cobra )
     DRIVER( cobra80 )
 
@@ -1469,5 +1470,5 @@ const game_driver * const drivers[] =
     DRIVER( sol20 )
     DRIVER( 4004clk )
     DRIVER( busicom )
-    
+
 #endif /* DRIVER_RECURSIVE */

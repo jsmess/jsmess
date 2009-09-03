@@ -6,6 +6,9 @@
 
 #include "driver.h"
 #include "cpu/avr8/avr8.h"
+#include "sound/dac.h"
+
+#define MASTER_CLOCK 20000000
 
 /****************************************************\
 * I/O devices                                        *
@@ -74,8 +77,7 @@ typedef struct
 
     UINT8 res7[5];
 
-    UINT8 spl;
-    UINT8 sph;
+    UINT16 sp;
     UINT8 sreg;
 
     UINT8 wdtcsr;
@@ -121,14 +123,10 @@ typedef struct
 
     UINT8 res14;
 
-    UINT8 tcnt1l;
-    UINT8 tcnt1h;
-    UINT8 icr1l;
-    UINT8 icr1h;
-    UINT8 ocr1al;
-    UINT8 ocr1ah;
-    UINT8 ocr1bl;
-    UINT8 ocr1bh;
+    UINT16 tcnt1;
+    UINT16 icr1;
+    UINT16 ocr1a;
+    UINT16 ocr1b;
 
     UINT8 res15[36];
 
@@ -164,9 +162,105 @@ typedef struct
     UINT8 udr0;
 
     UINT8 res20[57];
+
+    UINT8 hidden_high;
+
+    INT64 last_tcnt1_cycle;
+
+    emu_timer *ocr1a_timer;
+    emu_timer *ocr1b_timer;
 } avr8_regs;
 
 static avr8_regs regs;
+
+#define AVR8_TIMSK1_OCIE1A  0x02
+#define AVR8_TIMSK1_OCIE1B  0x04
+
+static UINT64 avr8_get_timer_1_frequency(avr8_regs *device)
+{
+    UINT64 frequency = 0;
+    switch(device->tccr1b & 0x07)
+    {
+        case 0: // No clock source (Timer/Counter stopped).
+        case 6: // External clock source on T1 pin.  Clock on falling edge.
+        case 7: // External clock source on T1 pin.  Clock on rising edge.
+            frequency = 0;
+            break;
+
+        case 1: // clk / 1 (No prescaling)
+            frequency = MASTER_CLOCK;
+            break;
+
+        case 2: // clk / 8 (From prescaler)
+            frequency = MASTER_CLOCK / 8;
+            break;
+
+        case 3: // clk / 64 (From prescaler)
+            frequency = MASTER_CLOCK / 64;
+            break;
+
+        case 4: // clk / 256 (From prescaler)
+            frequency = MASTER_CLOCK / 256;
+            break;
+
+        case 5: // clk / 1024 (From prescaler)
+            frequency = MASTER_CLOCK / 1024;
+            break;
+
+        default:
+            frequency = 0;
+            printf( "device->tccr1b & 0x07 returned a value not in the range of 0 to 7.  This is\n" );
+            printf( "impossible.  Please ensure that your walls are not bleeding and your bathroom\n" );
+            printf( "has not turned into a psychokinetic vortex.\n" );
+            break;
+    }
+
+    return frequency;
+}
+
+static void avr8_maybe_start_timer_1(avr8_regs *device)
+{
+    UINT64 frequency = avr8_get_timer_1_frequency(device);
+    if(frequency == 0)
+    {
+        timer_adjust_oneshot(device->ocr1a_timer, attotime_never, 0);
+        timer_adjust_oneshot(device->ocr1b_timer, attotime_never, 0);
+    }
+    else
+    {
+        UINT16 wrap_count_a = (UINT16)(((UINT32)device->ocr1a - (UINT32)device->tcnt1) & 0x0000ffff);
+        UINT16 wrap_count_b = (UINT16)(((UINT32)device->ocr1b - (UINT32)device->tcnt1) & 0x0000ffff);
+        attotime period_a = attotime_mul(ATTOTIME_IN_HZ(frequency), wrap_count_a);
+        attotime period_b = attotime_mul(ATTOTIME_IN_HZ(frequency), wrap_count_b);
+        if(device->timsk1 & AVR8_TIMSK1_OCIE1A)
+        {
+            timer_adjust_oneshot(device->ocr1a_timer, period_a, 0);
+        }
+        if(device->timsk1 & AVR8_TIMSK1_OCIE1B)
+        {
+            timer_adjust_oneshot(device->ocr1b_timer, period_b, 0);
+        }
+    }
+}
+
+static TIMER_CALLBACK( ocr1a_timer_compare )
+{
+    static int blah = 0;
+    printf( "ocr1a_timer_compare %d\n", blah++ );
+    avr8_maybe_start_timer_1(&regs);
+
+    // Inaccurate
+    cpu_set_input_line(cputag_get_cpu(machine, "maincpu"), AVR8_INT_T1COMPA, ASSERT_LINE);
+}
+
+static TIMER_CALLBACK( ocr1b_timer_compare )
+{
+    printf( "ocr1b_timer_compare\n" );
+    avr8_maybe_start_timer_1(&regs);
+
+    // Inaccurate
+    cpu_set_input_line(cputag_get_cpu(machine, "maincpu"), AVR8_INT_T1COMPB, ASSERT_LINE);
+}
 
 static READ8_HANDLER( avr8_read )
 {
@@ -197,10 +291,10 @@ static READ8_HANDLER( avr8_read )
             return regs.spsr;
         case 0x5d:
             //printf( "AVR8: R: regs.spl (%02x)\n", regs.spl );
-            return regs.spl;
+            return regs.sp & 0x00ff;
         case 0x5e:
             //printf( "AVR8: R: regs.sph (%02x)\n", regs.sph );
-            return regs.sph;
+            return (regs.sp >> 8) & 0x00ff;
         case 0x5f:
             return regs.sreg;
         case 0x6f:
@@ -212,18 +306,63 @@ static READ8_HANDLER( avr8_read )
         case 0x81:
             printf( "AVR8: R: regs.tccr1b (%02x)\n", regs.tccr1b );
             return regs.tccr1b;
+        case 0x84:
+        {
+            //INT64 divisor = 1;
+            /*INT64 update = (INT64)(cpu_get_total_cycles(space->cpu)) - last_tcnt1_cycle;
+            switch(device->tccr1b & 0x07)
+            {
+                case 0: // No clock source (Timer/Counter stopped).
+                case 1: // clk / 1 (No prescaling)
+                case 6: // External clock source on T1 pin.  Clock on falling edge.
+                case 7: // External clock source on T1 pin.  Clock on rising edge.
+                    divisor = 1;
+                    break;
+
+                case 2: // clk / 8 (From prescaler)
+                    divisor = 8;
+                    break;
+
+                case 3: // clk / 64 (From prescaler)
+                    divisor = 64;
+                    break;
+
+                case 4: // clk / 256 (From prescaler)
+                    divisor = 256;
+                    break;
+
+                case 5: // clk / 1024 (From prescaler)
+                    divisor = 1024;
+                    break;
+
+                default:
+                    divisor = 1;
+                    printf( "device->tccr1b & 0x07 returned a value not in the range of 0 to 7.  This is\n" );
+                    printf( "impossible.  Please ensure that your walls are not bleeding and your bathroom\n" );
+                    printf( "has not turned into a psychokinetic vortex.\n" );
+                    break;
+            }
+            diff /= divisor;
+            diff %= regs.ocr1a;
+            printf( "AVR8: R: regs.tcnt1l read: %04x\n",  );
+            */break;
+        }
+
+        case 0x85:
+            printf( "AVR8: R: regs.tcnt1h\n" );
+            break;
         case 0x88:
-            printf( "AVR8: R: regs.ocr1al (%02x)\n", regs.ocr1al );
-            return regs.ocr1al;
+            printf( "AVR8: R: regs.ocr1al (%02x)\n", regs.ocr1a & 0x00ff );
+            return regs.ocr1a & 0x00ff;
         case 0x89:
-            printf( "AVR8: R: regs.ocr1ah (%02x)\n", regs.ocr1ah );
-            return regs.ocr1ah;
+            printf( "AVR8: R: regs.ocr1ah (%02x)\n", (regs.ocr1a >> 8) & 0x00ff );
+            return (regs.ocr1a >> 8) & 0x00ff;
         case 0x8a:
-            printf( "AVR8: R: regs.ocr1bl (%02x)\n", regs.ocr1bl );
-            return regs.ocr1bl;
+            printf( "AVR8: R: regs.ocr1bl (%02x)\n", regs.ocr1b & 0x00ff );
+            return regs.ocr1b & 0x00ff;
         case 0x8b:
-            printf( "AVR8: R: regs.ocr1bh (%02x)\n", regs.ocr1bh );
-            return regs.ocr1bh;
+            printf( "AVR8: R: regs.ocr1bh (%02x)\n", (regs.ocr1b >> 8) & 0x00ff );
+            return (regs.ocr1b >> 8) & 0x00ff;
         case 0xb0:
             printf( "AVR8: R: regs.tccr2a (%02x)\n", regs.tccr2a );
             return regs.tccr2a;
@@ -262,6 +401,9 @@ static WRITE8_HANDLER( avr8_write )
             printf( "AVR8: W: regs.ddrd = %02x\n", data );
             regs.ddrd = data;
             break;
+        case 0x2b:
+            dac_data_w(devtag_get_device(space->machine, "dac"), data);
+            break;
         case 0x4c:
             printf( "AVR8: W: regs.spcr = %02x\n", data );
             regs.spcr = data;
@@ -271,12 +413,12 @@ static WRITE8_HANDLER( avr8_write )
             regs.spsr = data;
             break;
         case 0x5d:
-            //printf( "AVR8: W: regs.spl = %02x\n", data );
-            regs.spl = data;
+            //printf( "AVR8: W: regs.sp(L) = %02x\n", data );
+            regs.sp = (regs.hidden_high << 8) | data;
             break;
         case 0x5e:
-            //printf( "AVR8: W: regs.sph = %02x\n", data );
-            regs.sph = data & 0x07;
+            //printf( "AVR8: W: regs.sp(H) = %02x\n", data );
+            regs.hidden_high = data & 0x07;
             break;
         case 0x5f:
             regs.sreg = data;
@@ -284,6 +426,7 @@ static WRITE8_HANDLER( avr8_write )
         case 0x6f:
             printf( "AVR8: W: regs.timsk1 = %02x\n", data );
             regs.timsk1 = data;
+            avr8_maybe_start_timer_1(&regs);
             break;
         case 0x80:
             printf( "AVR8: W: regs.tccr1a = %02x\n", data );
@@ -294,20 +437,22 @@ static WRITE8_HANDLER( avr8_write )
             regs.tccr1b = data;
             break;
         case 0x88:
-            printf( "AVR8: W: regs.ocr1al = %02x\n", data );
-            regs.ocr1al = data;
+            printf( "AVR8: W: regs.ocr1a(L) = %02x\n", data );
+            regs.ocr1a = (regs.hidden_high << 8) | data;
+            avr8_maybe_start_timer_1(&regs);
             break;
         case 0x89:
-            printf( "AVR8: W: regs.ocr1ah = %02x\n", data );
-            regs.ocr1ah = data;
+            printf( "AVR8: W: regs.ocr1a(H) = %02x\n", data );
+            regs.hidden_high = data;
             break;
         case 0x8a:
-            printf( "AVR8: W: regs.ocr1bl = %02x\n", data );
-            regs.ocr1bl = data;
+            printf( "AVR8: W: regs.ocr1b(L) = %02x\n", data );
+            regs.ocr1b = (regs.hidden_high << 8) | data;
+            avr8_maybe_start_timer_1(&regs);
             break;
         case 0x8b:
-            printf( "AVR8: W: regs.ocr1bh = %02x\n", data );
-            regs.ocr1bh = data;
+            printf( "AVR8: W: regs.ocr1b(H) = %02x\n", data );
+            regs.hidden_high = data;
             break;
         case 0xb0:
             printf( "AVR8: W: regs.tccr2a = %02x\n", data );
@@ -357,13 +502,27 @@ static VIDEO_UPDATE( craft )
 * Machine definition                                 *
 \****************************************************/
 
+static DRIVER_INIT( craft )
+{
+    regs.ocr1a_timer = timer_alloc(machine, ocr1a_timer_compare, 0);
+    regs.ocr1b_timer = timer_alloc(machine, ocr1b_timer_compare, 0);
+}
+
 static MACHINE_RESET( craft )
 {
+    regs.timsk1 = 0;
+    regs.tcnt1 = 0;
+    regs.ocr1a = 0;
+    regs.ocr1b = 0;
+    regs.icr1 = 0;
+    regs.last_tcnt1_cycle = 0;
+
+    dac_data_w(devtag_get_device(machine, "dac"), 0x00);
 }
 
 static MACHINE_DRIVER_START( craft )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu", AVR8, 20000000)
+    MDRV_CPU_ADD("maincpu", AVR8, MASTER_CLOCK)
     MDRV_CPU_PROGRAM_MAP(craft_prg_map)
     MDRV_CPU_IO_MAP(craft_io_map)
 
@@ -371,15 +530,21 @@ static MACHINE_DRIVER_START( craft )
 
     /* video hardware */
     MDRV_SCREEN_ADD("screen", RASTER)
-    MDRV_SCREEN_REFRESH_RATE(60)
-    MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+    //MDRV_SCREEN_RAW_PARAMS( MASTER_CLOCK, 634, 0, 633, 525, 0, 481 )
+    MDRV_SCREEN_REFRESH_RATE(60.08)
+    MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1395)) /* accurate */
     MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-    MDRV_SCREEN_SIZE(640, 480)
-    MDRV_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
+    MDRV_SCREEN_SIZE(634, 480)
+    MDRV_SCREEN_VISIBLE_AREA(0, 633, 0, 479)
     MDRV_PALETTE_LENGTH(0x1000)
 
     MDRV_VIDEO_START(generic_bitmapped)
     MDRV_VIDEO_UPDATE(craft)
+
+    /* sound hardware */
+    MDRV_SPEAKER_STANDARD_MONO("avr8")
+    MDRV_SOUND_ADD("dac", DAC, 0)
+    MDRV_SOUND_ROUTE(0, "avr8", 1.00)
 MACHINE_DRIVER_END
 
 ROM_START( craft )
@@ -390,4 +555,4 @@ ROM_START( craft )
 ROM_END
 
 /*   YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     INIT      CONFIG    COMPANY          FULLNAME */
-CONS(2008, craft,    0,        0,        craft,    craft,    0,        0,        "Linus Akesson", "Craft", GAME_NO_SOUND | GAME_NOT_WORKING)
+CONS(2008, craft,    0,        0,        craft,    craft,    craft,    0,        "Linus Akesson", "Craft", GAME_NO_SOUND | GAME_NOT_WORKING)
