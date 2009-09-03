@@ -595,6 +595,8 @@ ROM_START (ti81)
 	ROM_DEFAULT_BIOS("v18")
 	ROM_SYSTEM_BIOS( 0, "v18", "V 1.8K" )
 	ROMX_LOAD( "ti81v18k.bin", 0x10000, 0x8000, CRC(94ac58e2) SHA1(ba915cfe2fe50a452ef8287db8f2244e29056d54), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "v20", "V 2.0V" )
+	ROMX_LOAD( "ti81v20v.bin", 0x10000, 0x8000, CRC(cfbd12da) SHA1(d2a923526d98f1046fcb583e46951939ba66bdb9), ROM_BIOS(2) )
 	//No dumps 1.0, 1.6K (?) and 2.0 from ticalc.org, less sure about 1.6K
 ROM_END
 
@@ -775,7 +777,3 @@ COMP( 1999, ti83p,      0,      0,      ti83p,  ti82,   0,      NULL,   "Texas I
 COMP( 2001, ti83pse,    0,      0,      ti85,   ti85,   0,      NULL,   "Texas Instruments",    "TI-83 Plus Silver Edition",    GAME_NOT_WORKING )
 //COMP( 2004, ti84p,      0,      0,      ti85,   ti85,   0,      NULL,   "Texas Instruments",    "TI-84 Plus",                   GAME_NOT_WORKING )
 COMP( 2004, ti84pse,    0,      0,      ti85,   ti85,   0,      NULL,   "Texas Instruments",    "TI-84 Plus Silver Edition",    GAME_NOT_WORKING )
-
-
-
-
