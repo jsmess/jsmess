@@ -247,15 +247,15 @@ static WRITE16_HANDLER( vip_w )
 					break;
 		case 0x24: 	//BRTA
 					vip_regs.BRTA = data;
-					palette_set_color_rgb(space->machine, 1,(vip_regs.BRTA << 1) & 0xff,0,0);
+					palette_set_color_rgb(space->machine, 1,(vip_regs.BRTA) & 0xff,0,0);
 					break;		
 		case 0x26: 	//BRTB
 					vip_regs.BRTB = data;
-					palette_set_color_rgb(space->machine, 2,((vip_regs.BRTA + vip_regs.BRTB) << 1) & 0xff,0,0);
+					palette_set_color_rgb(space->machine, 2,((vip_regs.BRTA + vip_regs.BRTB)) & 0xff,0,0);
 					break;
 		case 0x28: 	//BRTC					
 					vip_regs.BRTC = data;
-					palette_set_color_rgb(space->machine, 3,((vip_regs.BRTA + vip_regs.BRTB + vip_regs.BRTC) << 1) & 0xff,0,0);
+					palette_set_color_rgb(space->machine, 3,((vip_regs.BRTA + vip_regs.BRTB + vip_regs.BRTC)) & 0xff,0,0);
 					break;
 		case 0x2A: 	//REST
 					vip_regs.REST = data;
@@ -322,22 +322,22 @@ static WRITE16_HANDLER( vip_w )
 
 static WRITE16_HANDLER( vboy_font0_w )
 {
-	vboy_font[offset] = data;
+	vboy_font[offset] = data | (vboy_font[offset] & (mem_mask ^ 0xffff));	
 }
 
 static WRITE16_HANDLER( vboy_font1_w )
 {
-	vboy_font[offset + 0x1000] = data;
+	vboy_font[offset + 0x1000] = data | (vboy_font[offset + 0x1000] & (mem_mask ^ 0xffff));	
 }
 
 static WRITE16_HANDLER( vboy_font2_w )
 {
-	vboy_font[offset + 0x2000] = data;
+	vboy_font[offset + 0x2000] = data | (vboy_font[offset + 0x2000] & (mem_mask ^ 0xffff));	
 }
 
 static WRITE16_HANDLER( vboy_font3_w )
 {
-	vboy_font[offset + 0x3000] = data;
+	vboy_font[offset + 0x3000] = data | (vboy_font[offset + 0x3000] & (mem_mask ^ 0xffff));	
 }
 
 static READ16_HANDLER( vboy_font0_r )
@@ -390,9 +390,12 @@ static void put_char(int x, int y, UINT16 ch, bitmap_t *bitmap,int flipx,int fli
 
 static WRITE16_HANDLER( vboy_bgmap_w )
 {	
-	vboy_bgmap[offset] = data;
-	put_char((offset & 0x3f) << 3, ((offset >> 6) & 0x3f) << 3, data & 0x7ff, bg_map[offset >> 12],BIT(data,13),BIT(data,12),0);
+	UINT16 val;	
+	vboy_bgmap[offset] = data | (vboy_bgmap[offset] & (mem_mask ^ 0xffff));
+	val = vboy_bgmap[offset];
+	put_char((offset & 0x3f) << 3, ((offset >> 6) & 0x3f) << 3, val & 0x7ff, bg_map[offset >> 12],BIT(val,13),BIT(val,12),0);
 }
+
 static READ16_HANDLER( vboy_bgmap_r )
 {
 	return vboy_bgmap[offset];
@@ -543,7 +546,6 @@ static UINT8 display_world(int num, bitmap_t *bitmap, UINT8 right)
 	return BIT(def,6);
 }
 
-static UINT8 row = 0;
 static VIDEO_UPDATE( vboy )
 {
 	int i;
@@ -559,12 +561,15 @@ static VIDEO_UPDATE( vboy )
 	}
 	copybitmap(bitmap, screen_output, 0, 0, 0, 0, cliprect);
 	
-	vip_regs.XPSTTS = ((row<<8)| 0xff);
 	vip_regs.DPSTTS = ((vip_regs.DPCTRL&0x0302)|0x7c);
-	row++;
-	if (row==0x1c) row=0;
 	return 0;
 }
+
+static TIMER_DEVICE_CALLBACK( video_tick )
+{
+	vip_regs.XPSTTS = (vip_regs.XPSTTS==0) ? 0x0c : 0x00;
+}
+
 
 static const rgb_t vboy_palette[18] = {
 	MAKE_RGB(0x00, 0x00, 0x00), // 0
@@ -586,6 +591,8 @@ static MACHINE_DRIVER_START( vboy )
 
 	MDRV_MACHINE_RESET(vboy)
 
+	MDRV_TIMER_ADD_PERIODIC("video", video_tick, HZ(100))
+	
 	/* video hardware */    
 	MDRV_DEFAULT_LAYOUT(layout_vboy)   
 
