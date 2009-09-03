@@ -567,8 +567,6 @@ static const wd17xx_interface x1_mb8877a_interface =
  *
  *************************************/
 
-/* TODO: apparently this is for the alternative PCG mode */
-#if 0
 static UINT16 check_pcg_addr(running_machine *machine)
 {
 	if(colorram[0x7ff] & 0x20) return 0x7ff;
@@ -578,7 +576,6 @@ static UINT16 check_pcg_addr(running_machine *machine)
 
 	return 0x3ff;
 }
-#endif
 
 static READ8_HANDLER( x1_pcg_r )
 {
@@ -628,11 +625,23 @@ static WRITE8_HANDLER( x1_pcg_w )
 	}
 	else
 	{
-//		if(!ply_reg.pcg_mode)
-//		{
-//
-//		}
-//		else
+		if(scrn_reg.pcg_mode)
+		{
+			used_pcg_addr = videoram[check_pcg_addr(space->machine)]*8;
+			pcg_index[addr-1] = (offset & 0xe) >> 1;
+			pcg_offset = (pcg_index[addr-1]+used_pcg_addr) & 0x7ff;
+			pcg_offset+=((addr-1)*0x800);
+			PCG_RAM[pcg_offset] = data;
+
+			pcg_offset &= 0x7ff;
+
+    		gfx_element_mark_dirty(space->machine->gfx[4], pcg_offset >> 3);
+    		gfx_element_mark_dirty(space->machine->gfx[5], pcg_offset >> 3);
+    		gfx_element_mark_dirty(space->machine->gfx[6], pcg_offset >> 3);
+    		gfx_element_mark_dirty(space->machine->gfx[7], pcg_offset >> 3);
+
+		}
+		else
 		{
 			used_pcg_addr = pcg_write_addr*8;
 			pcg_offset = (pcg_index[addr-1]+used_pcg_addr) & 0x7ff;
