@@ -2,7 +2,7 @@
 
 	Sharp X1 (c) 1983 Sharp Corporation
 
-	preliminary driver by Angelo Salese
+	driver by Angelo Salese & Barry Rodewald
 
 	TODO:
 	- Understand how keyboard works and decap/dump the keyboard MCU if possible;
@@ -10,27 +10,29 @@
 	- Implement tape commands;
 	- Sort out / redump the BIOS gfx roms;
 	- Implement the interrupts (uses IM 2), basically used by the keyboard.
-	- Implement DMA (X1Turbo only?)
+	- Implement DMA,CTC and SIO, they are X1Turbo only features.
 	- clean-ups!
 	- x1turbo: understand how irq generation works for the ym-2151;
 	- There are various unclear video things, these are:
 		- Understand why some games still doesn't upload the proper PCG index;
-		- Support the alternative PCG upload mode;
 		- Implement PCG reading, used by Maison Ikkoku, Mule and Gyajiko for kanji reading;
-		- Implement the scrn params;
+		- Implement the scrn regs;
 		- Interlace mode?
 		- Some colors are still way wrong (check 1942 or Dialide), needs update_partial perhaps?
 		- Maybe the colorram/videoram stuff is actually a converter for the BRG framebuffer in
 		  the end?
+		- Implement the new features of the x1turbo, namely the 4096 color feature amongst other
+		  things
 		- (anything else?)
 
 	per-game specific TODO:
 	- Bosconian: title screen background is completely white because it reverts the pen used
 	  (it's gray in the Arcade version),could be either flickering for pseudo-alpha effect or it's
 	  a btanb;
-	- Dragon Slayer: colors aren't 100% and for whatever reason it doesn't clear the screen on the
-	  gameplay.
 	- Super Mario Bros. SP: background color is black, should be blue. DMA issue?
+	- Mappy (New Version): has color issues, should be identical to the Arcade version, sets PLY reg == 0xe;
+	- Gradius: PCG tiles should be 16 colors or use the entire 8 color range, it's sure that the current palette
+	  bank isn't right (it's ok for the bitmaps only)
 
 	Notes:
 	- An interesting feature of the Sharp X-1 is the extended i/o bank. When the ppi port c bit 5
@@ -166,7 +168,9 @@ static struct
 {
 	UINT8 gfx_bank;
 	UINT8 pcg_mode;
+	UINT8 blackclip; // x1 turbo specific
 }scrn_reg;
+
 static UINT8 pcg_write_addr;
 
 
@@ -231,6 +235,9 @@ static void draw_fgtilemap(running_machine *machine, bitmap_t *bitmap,const rect
 
 						if(color & 8) //revert the used color pen
 							pcg_pen^=7;
+
+						if((scrn_reg.blackclip & 8) && (color == (scrn_reg.blackclip & 7)))
+							pcg_pen = 8; // clip the pen to black
 
 						if((res_x+xi)>video_screen_get_visible_area(machine->primary_screen)->max_x && (res_y+yi)>video_screen_get_visible_area(machine->primary_screen)->max_y)
 							continue;
@@ -365,7 +372,7 @@ static UINT8 check_keyboard_shift(running_machine *machine)
 {
 	UINT8 val = 0xe0;
 	val |= input_port_read(machine,"key_modifiers") & 0x1f;
-	
+
 	if(check_keyboard_press(machine) != 0)
 		val &= ~0x40;
 
@@ -376,7 +383,7 @@ static READ8_HANDLER( sub_io_r )
 {
 	static int sub_val_ptr;
 	UINT8 ret;
-	
+
 	if(sub_obf)
 		return 0xff;
 
@@ -413,7 +420,7 @@ static void cmt_command( running_machine* machine, UINT8 cmd )
 	// E9 06 - APSS(?) Rewind
 	// E9 0A - Record
 	cmt_current_cmd = cmd;
-	
+
 	switch(cmd)
 	{
 		case 0x01:  // Stop
@@ -779,10 +786,12 @@ static WRITE8_HANDLER( x1_scrn_w )
 {
 	scrn_reg.pcg_mode = (data & 0x20)>>5;
 	scrn_reg.gfx_bank = 0;//(data & 0x10)>>4;
+	printf("SCRN = %02x\n",data);
 }
 
 static WRITE8_HANDLER( x1_ply_w )
 {
+	printf("PLY = %02x\n",data);
 }
 
 static WRITE8_HANDLER( x1_6845_w )
@@ -808,11 +817,40 @@ static WRITE8_HANDLER( x1_6845_w )
 
 static WRITE8_HANDLER( x1_dma_w )
 {
-	printf("%02x %02x\n",offset,data);
+	//printf("%02x %02x\n",offset,data);
 	//if(data)
 	//	fatalerror("Data written to the DMA space");
 }
 
+static READ8_HANDLER( x1_blackclip_r )
+{
+	return scrn_reg.blackclip;
+}
+
+static WRITE8_HANDLER( x1_blackclip_w )
+{
+	scrn_reg.blackclip = data;
+}
+
+static WRITE8_HANDLER( x1turbo_pal_w )
+{
+	printf("TURBO PAL %02x\n",data);
+}
+
+static WRITE8_HANDLER( x1turbo_txpal_w )
+{
+	printf("TURBO TEXT PAL %02x\n",data);
+}
+
+static WRITE8_HANDLER( x1turbo_txdisp_w )
+{
+	printf("TURBO TEXT DISPLAY %02x\n",data);
+}
+
+static WRITE8_HANDLER( x1turbo_gfxpal_w )
+{
+	printf("TURBO GFX PAL %02x\n",data);
+}
 
 /*************************************
  *
@@ -835,6 +873,7 @@ static READ8_HANDLER( x1_io_r )
 	else if(offset >= 0x1fa0 && offset <= 0x1fa3)	{ return z80ctc_r(devtag_get_device(space->machine, "ctc"), offset-0x1fa3); }
 	else if(offset >= 0x1fa8 && offset <= 0x1fab)	{ return z80ctc_r(devtag_get_device(space->machine, "ctc"), offset-0x1fa8); }
 //	else if(offset >= 0x1fd0 && offset <= 0x1fdf)	{ return x1_scrn_r(space,offset-0x1fd0); }
+	else if(offset == 0x1fe0)						{ return x1_blackclip_r(space,0); }
 	else if(offset >= 0x2000 && offset <= 0x2fff)	{ return colorram[offset-0x2000]; }
 	else if(offset >= 0x3000 && offset <= 0x3fff)	{ return videoram[offset-0x3000]; }
 	else if(offset >= 0x4000 && offset <= 0xffff)	{ return gfx_bitmap_ram[offset-0x4000+(scrn_reg.gfx_bank*0xc000)]; }
@@ -869,7 +908,12 @@ static WRITE8_HANDLER( x1_io_w )
 //	else if(offset >= 0x1f90 && offset <= 0x1f93)	{ x1_sio_w(space->machine,(offset-0x1f90) & 3),data; }
 	else if(offset >= 0x1fa0 && offset <= 0x1fa3)	{ z80ctc_w(devtag_get_device(space->machine, "ctc"), offset-0x1fa3,data); }
 	else if(offset >= 0x1fa8 && offset <= 0x1fab)	{ z80ctc_w(devtag_get_device(space->machine, "ctc"), offset-0x1fa8,data); }
+	else if(offset == 0x1fb0)						{ x1turbo_pal_w(space,0,data); }
+	else if(offset >= 0x1fb9 && offset <= 0x1fbf)	{ x1turbo_txpal_w(space,offset-0x1fb9,data); }
+	else if(offset == 0x1fc0)						{ x1turbo_txdisp_w(space,0,data); }
+	else if(offset == 0x1fc5)						{ x1turbo_gfxpal_w(space,0,data); }
 	else if(offset >= 0x1fd0 && offset <= 0x1fdf)	{ x1_scrn_w(space,0,data); }
+	else if(offset == 0x1fe0)						{ x1_blackclip_w(space,0,data); }
 	else if(offset >= 0x2000 && offset <= 0x2fff)	{ colorram[offset-0x2000] = data; }
 	else if(offset >= 0x3000 && offset <= 0x3fff)	{ videoram[offset-0x3000] = pcg_write_addr = data; }
 	else if(offset >= 0x4000 && offset <= 0xffff)	{ gfx_bitmap_ram[offset-0x4000+(scrn_reg.gfx_bank*0xc000)] = data; }
@@ -895,6 +939,7 @@ static READ8_HANDLER( x1turbo_io_r )
 	else if(offset >= 0x1fa0 && offset <= 0x1fa3)	{ return z80ctc_r(devtag_get_device(space->machine, "ctc"), offset-0x1fa3); }
 	else if(offset >= 0x1fa8 && offset <= 0x1fab)	{ return z80ctc_r(devtag_get_device(space->machine, "ctc"), offset-0x1fa8); }
 //	else if(offset >= 0x1fd0 && offset <= 0x1fdf)	{ return x1_scrn_r(space,offset-0x1fd0); }
+	else if(offset == 0x1fe0)						{ return x1_blackclip_r(space,0); }
 	else if(offset >= 0x2000 && offset <= 0x2fff)	{ return colorram[offset-0x2000]; }
 	else if(offset >= 0x3000 && offset <= 0x3fff)	{ return videoram[offset-0x3000]; }
 	else if(offset >= 0x4000 && offset <= 0xffff)	{ return gfx_bitmap_ram[offset-0x4000+(scrn_reg.gfx_bank*0xc000)]; }
@@ -930,7 +975,12 @@ static WRITE8_HANDLER( x1turbo_io_w )
 //	else if(offset >= 0x1f90 && offset <= 0x1f93)	{ x1_sio_w(space->machine,(offset-0x1f90) & 3),data; }
 	else if(offset >= 0x1fa0 && offset <= 0x1fa3)	{ z80ctc_w(devtag_get_device(space->machine, "ctc"), offset-0x1fa3,data); }
 	else if(offset >= 0x1fa8 && offset <= 0x1fab)	{ z80ctc_w(devtag_get_device(space->machine, "ctc"), offset-0x1fa8,data); }
+	else if(offset == 0x1fb0)						{ x1turbo_pal_w(space,0,data); }
+	else if(offset >= 0x1fb9 && offset <= 0x1fbf)	{ x1turbo_txpal_w(space,offset-0x1fb9,data); }
+	else if(offset == 0x1fc0)						{ x1turbo_txdisp_w(space,0,data); }
+	else if(offset == 0x1fc5)						{ x1turbo_gfxpal_w(space,0,data); }
 	else if(offset >= 0x1fd0 && offset <= 0x1fdf)	{ x1_scrn_w(space,0,data); }
+	else if(offset == 0x1fe0)						{ x1_blackclip_w(space,0,data); }
 	else if(offset >= 0x2000 && offset <= 0x2fff)	{ colorram[offset-0x2000] = data; }
 	else if(offset >= 0x3000 && offset <= 0x3fff)	{ videoram[offset-0x3000] = pcg_write_addr = data; }
 	else if(offset >= 0x4000 && offset <= 0xffff)	{ gfx_bitmap_ram[offset-0x4000+(scrn_reg.gfx_bank*0xc000)] = data; }
@@ -985,16 +1035,16 @@ static READ8_DEVICE_HANDLER( x1_portb_r )
 	*/
 	UINT8 dat = 0;
 	dat = (input_port_read(device->machine, "SYSTEM") & ~0x68) | sub_obf;
-	
+
 	if((dat & 0x80) == 0)
 		dat |= 0x04;  // VSync (todo: proper implementation of vsync)
-	
+
 	if(cassette_input(devtag_get_device(device->machine,"cass")) > 0.03)
 		dat |= 0x02;
 
 	if(cassette_get_state(devtag_get_device(device->machine,"cass")) & CASSETTE_MOTOR_DISABLED)
 		dat |= 0x02;
-		
+
 	return dat;
 }
 
@@ -1029,7 +1079,7 @@ static WRITE8_DEVICE_HANDLER( x1_portc_w )
 
 	io_switch = data & 0x20;
 	io_sys = data & 0xff;
-	
+
 	cassette_output(devtag_get_device(device->machine,"cass"),(data & 0x01) ? +1.0 : -1.0);
 }
 
@@ -1516,12 +1566,15 @@ static MACHINE_RESET( x1 )
 		gfx_element_mark_dirty(machine->gfx[7], i);
 	}
 
+	/* X1 Turbo specific */
+	scrn_reg.blackclip = 0;
+
 	io_bank_mode = 0;
 	pcg_index[0] = pcg_index[1] = pcg_index[2] = 0;
 
 	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), x1_irq_callback);
 	timer_pulse(machine, ATTOTIME_IN_HZ(240), NULL, 0, keyboard_callback);
-	
+
 	cmt_current_cmd = 0;
 	cassette_change_state(devtag_get_device(machine, "cass" ),CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
 }
@@ -1553,8 +1606,8 @@ static PALETTE_INIT(x1)
 	/* TODO: fix this */
 	for(i=0;i<8;i++)
 	{
-		palette_set_color_rgb(machine, i+0x000, pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
-		palette_set_color_rgb(machine, i+0x100, pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
+		palette_set_color_rgb(machine, i+0x000, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
+		palette_set_color_rgb(machine, i+0x100, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
 	}
 }
 
