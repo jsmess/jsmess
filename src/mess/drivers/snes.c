@@ -55,7 +55,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( superfx_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x000000, 0x3fffff) AM_READWRITE(superfx_r_bank1, superfx_w_bank1)
 	AM_RANGE(0x400000, 0x5fffff) AM_READWRITE(superfx_r_bank2, superfx_w_bank2)
-	AM_RANGE(0x600000, 0x7fffff) AM_READWRITE(superfx_r_bank3, superfx_w_bank3)
+	AM_RANGE(0x600000, 0x7dffff) AM_READWRITE(superfx_r_bank3, superfx_w_bank3)
 ADDRESS_MAP_END
 
 static READ8_HANDLER( spc_ram_100_r )

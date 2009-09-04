@@ -552,25 +552,45 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 		/* LoROM carts load data in banks 0x00 to 0x7f at address 0x8000 (actually up to 0x7d, because 0x7e and
 		 * 0x7f are overwritten by WRAM). Each block is also mirrored in banks 0x80 to 0xff (up to 0xff for real)
 		 */
-			while (read_blocks < 128 && read_blocks < total_blocks)
+			if((temp_buffer[0x007fd6] >= 0x13 && temp_buffer[0x007fd6] <= 0x15) || temp_buffer[0x007fd6] == 0xa)
 			{
-				/* Loading data */
-				image_fread(image, &snes_ram[0x8000 + read_blocks * 0x10000], 0x8000);
-				/* Mirroring */
-				memcpy(&snes_ram[0x808000 + (read_blocks * 0x10000)], &snes_ram[0x8000 + (read_blocks * 0x10000)], 0x8000);
-				read_blocks++;
-			}
-			/* Filling banks up to 0x7f and their mirrors */
-			while (read_blocks % 128)
-			{
-				int j = 0, repeat_blocks;
-				while ((read_blocks % (128 >> j)) && j < 7)
-					j++;
-				repeat_blocks = read_blocks % (128 >> (j - 1));
+				while (read_blocks < 64 && read_blocks < total_blocks)
+				{
+					/* Loading data primary: banks 0-3f from 8000-ffff*/
+					image_fread(image, &snes_ram[0x8000 + read_blocks * 0x10000], 0x8000);
+					/* Mirroring at banks 80-bf from 8000-ffff */
+					memcpy(&snes_ram[0x808000 + (read_blocks * 0x10000)], &snes_ram[0x8000 + (read_blocks * 0x10000)], 0x8000);
+					read_blocks++;
+				}
 
-				memcpy( &snes_ram[read_blocks * 0x10000], &snes_ram[(read_blocks - repeat_blocks) * 0x10000], repeat_blocks * 0x10000);
-				memcpy( &snes_ram[0x800000 + read_blocks * 0x10000], &snes_ram[(read_blocks - repeat_blocks) * 0x10000], repeat_blocks * 0x10000);
-				read_blocks += repeat_blocks;
+				image_fseek(image, offset, SEEK_SET);
+				/* Loading data secondary, filling full 64k banks from 0x400000 to 600000 */
+				image_fread(image, &snes_ram[0x400000], total_blocks * 0x8000);
+				/* mirror at c00000-e00000 */
+				memcpy( &snes_ram[0xc00000], &snes_ram[0x400000], total_blocks * 0x8000);
+			}
+			else
+			{
+				while (read_blocks < 128 && read_blocks < total_blocks)
+				{
+					/* Loading data */
+					image_fread(image, &snes_ram[0x8000 + read_blocks * 0x10000], 0x8000);
+					/* Mirroring */
+					memcpy(&snes_ram[0x808000 + (read_blocks * 0x10000)], &snes_ram[0x8000 + (read_blocks * 0x10000)], 0x8000);
+					read_blocks++;
+				}
+				/* Filling banks up to 0x7f and their mirrors */
+				while (read_blocks % 128)
+				{
+					int j = 0, repeat_blocks;
+					while ((read_blocks % (128 >> j)) && j < 7)
+						j++;
+					repeat_blocks = read_blocks % (128 >> (j - 1));
+
+					memcpy( &snes_ram[read_blocks * 0x10000], &snes_ram[(read_blocks - repeat_blocks) * 0x10000], repeat_blocks * 0x10000);
+					memcpy( &snes_ram[0x800000 + read_blocks * 0x10000], &snes_ram[(read_blocks - repeat_blocks) * 0x10000], repeat_blocks * 0x10000);
+					read_blocks += repeat_blocks;
+				}
 			}
 			break;
 	}
@@ -756,6 +776,8 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 		logerror( "\tChecksum:      %X %X\n", snes_r_bank1(space, 0x00ffdf), snes_r_bank1(space, 0x00ffde) );
 		logerror( "\tNMI Address:   %2X%2Xh\n", snes_r_bank1(space, 0x00fffb), snes_r_bank1(space, 0x00fffa) );
 		logerror( "\tStart Address: %2X%2Xh\n\n", snes_r_bank1(space, 0x00fffd), snes_r_bank1(space, 0x00fffc) );
+
+		logerror( "\tMode: %d\n", snes_cart.mode);
 
 		if (!supported_type)
 			logerror("WARNING: This cart type \"%s\" is not supported yet!\n", types[snes_has_addon_chip]);
