@@ -314,7 +314,8 @@ static VIDEO_UPDATE( x1 )
 
 	draw_fgtilemap(screen->machine,bitmap,cliprect,w,0);
 	draw_gfxbitmap(screen->machine,bitmap,cliprect,w,0);
-	draw_gfxbitmap(screen->machine,bitmap,cliprect,w,1);
+	/* Y's uses the following as a normal buffer without anything reasonable to draw */
+//	draw_gfxbitmap(screen->machine,bitmap,cliprect,w,1);
 	draw_fgtilemap(screen->machine,bitmap,cliprect,w,1);
 
 	return 0;
@@ -785,7 +786,7 @@ static WRITE8_HANDLER( x1_ex_gfxram_w )
 static WRITE8_HANDLER( x1_scrn_w )
 {
 	scrn_reg.pcg_mode = (data & 0x20)>>5;
-	scrn_reg.gfx_bank = 0;//(data & 0x10)>>4;
+	scrn_reg.gfx_bank = (data & 0x10)>>4;
 	printf("SCRN = %02x\n",data);
 }
 
