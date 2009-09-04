@@ -56,6 +56,9 @@ static ADDRESS_MAP_START( superfx_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x000000, 0x3fffff) AM_READWRITE(superfx_r_bank1, superfx_w_bank1)
 	AM_RANGE(0x400000, 0x5fffff) AM_READWRITE(superfx_r_bank2, superfx_w_bank2)
 	AM_RANGE(0x600000, 0x7dffff) AM_READWRITE(superfx_r_bank3, superfx_w_bank3)
+	AM_RANGE(0x800000, 0xbfffff) AM_READWRITE(superfx_r_bank1, superfx_w_bank1)
+	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(superfx_r_bank2, superfx_w_bank2)
+	AM_RANGE(0xe00000, 0xffffff) AM_READWRITE(superfx_r_bank3, superfx_w_bank3)
 ADDRESS_MAP_END
 
 static READ8_HANDLER( spc_ram_100_r )
@@ -255,6 +258,13 @@ static MACHINE_DRIVER_START( snespal )
 	MDRV_SCREEN_RAW_PARAMS(DOTCLK_PAL, SNES_HTOTAL, 0, SNES_SCR_WIDTH, SNES_VTOTAL_PAL, 0, SNES_SCR_HEIGHT_PAL)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( snespsfx )
+	MDRV_IMPORT_FROM(snespal)
+
+	MDRV_CPU_ADD("superfx", SUPERFX, 21480000)	/* 21.48MHz */
+	MDRV_CPU_PROGRAM_MAP(superfx_map)
+	MDRV_CPU_CONFIG(snes_superfx_config)
+MACHINE_DRIVER_END
 
 /***************************************************************************
 
@@ -277,6 +287,13 @@ ROM_START(snessfx)
 ROM_END
 
 ROM_START(snespal)
+	ROM_REGION( 0x100, "user5", 0 )		/* IPL ROM */
+	ROM_LOAD( "spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) )	/* boot rom */
+	ROM_REGION( 0x800, "user6", 0 )		/* add-on chip ROMs (DSP, SFX, etc) */
+	ROM_LOAD( "dsp1data.bin", 0x000000, 0x000800, CRC(4b02d66d) SHA1(1534f4403d2a0f68ba6e35186fe7595d33de34b1) )
+ROM_END
+
+ROM_START(snespsfx)
 	ROM_REGION( 0x100, "user5", 0 )		/* IPL ROM */
 	ROM_LOAD( "spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) )	/* boot rom */
 	ROM_REGION( 0x800, "user6", 0 )		/* add-on chip ROMs (DSP, SFX, etc) */
@@ -308,4 +325,5 @@ ROM_END
 CONS( 1989, snes,    0,      0,      snes,    snes,  0,    0,   "Nintendo", "Super Nintendo Entertainment System / Super Famicom (NTSC)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 CONS( 1989, snessfx, snes,   0,      snessfx, snes,  0,    0,   "Nintendo", "Super Nintendo Entertainment System / Super Famicom (NTSC), SuperFX", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 CONS( 1991, snespal, snes,   0,      snespal, snes,  0,    0,   "Nintendo", "Super Nintendo Entertainment System (PAL)",  GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+CONS( 1991, snespsfx,snes,   0,      snespsfx,snes,  0,    0,   "Nintendo", "Super Nintendo Entertainment System (PAL), SuperFX",  GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 CONS( 199?, sfcbox,  snes,   0,      snes,    snes,  0,    0,   "Nintendo", "Super Famicom Box (NTSC)", GAME_NOT_WORKING )
