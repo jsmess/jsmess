@@ -989,6 +989,7 @@ const game_driver * const drivers[] =
     DRIVER( intvkbd )   /* 1981 - Mattel Intellivision Keyboard Component   */
                         /* (Test marketed, later recalled)                  */
     DRIVER( aquarius )  /* 1983 Aquarius                                    */
+    DRIVER( aquarius_qd )  /* 1983 Aquarius w/ Quick Disk                   */
 //  DRIVER( aquariu2 )  /* 1984 Aquarius II                                 */
 
     /*EXIDY INC */
