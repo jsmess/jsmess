@@ -168,6 +168,8 @@ static struct
 {
 	UINT8 gfx_bank;
 	UINT8 pcg_mode;
+
+	UINT8 ply;
 	UINT8 blackclip; // x1 turbo specific
 }scrn_reg;
 
@@ -187,7 +189,7 @@ static VIDEO_START( x1 )
 	gfx_bitmap_ram = auto_alloc_array(machine, UINT8, 0xc000*2);
 }
 
-static void draw_fgtilemap(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int w,int pri)
+static void draw_fgtilemap(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int w)
 {
 	int y,x,res_x,res_y;
 	int screen_mask;
@@ -205,7 +207,6 @@ static void draw_fgtilemap(running_machine *machine, bitmap_t *bitmap,const rect
 			int pcg_bank = (colorram[(x+(y*40*w)+crtc_start_addr) & screen_mask] & 0x20)>>5;
 			UINT8 *gfx_data = pcg_bank ? memory_region(machine, "pcg") : memory_region(machine, "cgrom");
 
-			if(((color & 0x8)>>3) != pri) continue;
 			/* skip draw if the x/y values are odd and the width/height is active, */
 			/* behaviour confirmed by Black Onyx title screen and the X1Demo */
 			if((x & 1) == 1 && width) continue;
@@ -256,11 +257,12 @@ static void draw_fgtilemap(running_machine *machine, bitmap_t *bitmap,const rect
 	}
 }
 
-static void draw_gfxbitmap(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int w,int plane)
+static void draw_gfxbitmap(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int w,int plane,int pri)
 {
 	int count,xi,yi,x,y;
 	int pen_r,pen_g,pen_b,color;
 	int yi_size;
+	int pri_i,pri_mask_val,pri_helper;
 
 	count = crtc_start_addr;
 
@@ -279,6 +281,26 @@ static void draw_gfxbitmap(running_machine *machine, bitmap_t *bitmap,const rect
 					pen_g = (gfx_bitmap_ram[count+0x8000+plane*0xc000]>>(7-xi)) & 1;
 
 					color =  pen_g<<2 | pen_r<<1 | pen_b<<0;
+
+					/* Priority mixer calculation (PLY) */
+					{
+						pri_i = 0;
+						pri_mask_val = 1;
+						pri_helper = 0;
+
+						while(pri_i < 7 && pri_helper == 0)
+						{
+							if((color & 7) == pri_i)
+								pri_helper = 1;
+							else
+							{
+								pri_i++;
+								pri_mask_val<<=1;
+							}
+						}
+					}
+
+					if(pri_mask_val & pri) continue;
 
 					if(color == 0)
 						continue;
@@ -312,11 +334,11 @@ static VIDEO_UPDATE( x1 )
 
 	bitmap_fill(bitmap, cliprect, screen->machine->pens[0x100]);
 
-	draw_fgtilemap(screen->machine,bitmap,cliprect,w,0);
-	draw_gfxbitmap(screen->machine,bitmap,cliprect,w,0);
+	draw_gfxbitmap(screen->machine,bitmap,cliprect,w,0,scrn_reg.ply);
+	draw_fgtilemap(screen->machine,bitmap,cliprect,w);
+	draw_gfxbitmap(screen->machine,bitmap,cliprect,w,0,scrn_reg.ply^0xff);
 	/* Y's uses the following as a normal buffer without anything reasonable to draw */
 //	draw_gfxbitmap(screen->machine,bitmap,cliprect,w,1);
-	draw_fgtilemap(screen->machine,bitmap,cliprect,w,1);
 
 	return 0;
 }
@@ -792,6 +814,7 @@ static WRITE8_HANDLER( x1_scrn_w )
 
 static WRITE8_HANDLER( x1_ply_w )
 {
+	scrn_reg.ply = data;
 	printf("PLY = %02x\n",data);
 }
 
