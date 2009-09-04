@@ -323,8 +323,9 @@ static VIDEO_EOF( x1 )
  *
  *************************************/
 
-static UINT8 sub_cmd,sub_val,key_flag;
+static UINT8 sub_cmd,key_flag;
 static UINT8 sub_cmd_length;
+static UINT8 sub_val[4];
 
 static UINT8 check_keyboard_press(running_machine *machine)
 {
@@ -339,7 +340,7 @@ static UINT8 check_keyboard_press(running_machine *machine)
 		{
 			if((input_port_read(machine,portnames[port_i])>>i) & 1)
 			{
-				key_flag = 1;
+				//key_flag = 1;
 				return scancode;
 			}
 
@@ -350,21 +351,41 @@ static UINT8 check_keyboard_press(running_machine *machine)
 	return 0;
 }
 
+static UINT8 check_keyboard_shift(running_machine *machine)
+{
+	UINT8 val = 0xe0;
+	val |= input_port_read(machine,"key_modifiers") & 0x1f;
+	
+	if(check_keyboard_press(machine) != 0)
+		val &= ~0x40;
+
+	return val;
+}
+
 static READ8_HANDLER( sub_io_r )
 {
+	static int sub_val_ptr;
+	UINT8 ret;
+	
 	if(sub_obf)
 		return 0xff;
 
-	if(key_flag == 1)
+	/*if(key_flag == 1)
 	{
 		key_flag = 0;
 		return 0x82; //TODO: this is for shift/ctrl/kana lock etc.
-	}
+	}*/
 
 	sub_cmd_length--;
 	sub_obf = (sub_cmd_length) ? 0x00 : 0x20;
 
-	return sub_val;
+	ret = sub_val[sub_val_ptr];
+
+	sub_val_ptr++;
+	if(sub_cmd_length <= 0)
+		sub_val_ptr = 0;
+
+	return ret;
 }
 
 static UINT8 key_irq_vector;
@@ -418,25 +439,26 @@ static WRITE8_HANDLER( sub_io_w )
 			sub_cmd_length = 3;
 			break;
 		case 0xe6:
-			sub_val = check_keyboard_press(space->machine);
+			sub_val[0] = check_keyboard_shift(space->machine);
+			sub_val[1] = check_keyboard_press(space->machine);
 			sub_cmd_length = 2;
 			break;
 		case 0xe8:
-			sub_val = sub_cmd;
+			sub_val[0] = sub_cmd;
 			sub_cmd_length = 1;
 			break;
 		case 0xea:  // CMT Control status
-			sub_val = cmt_current_cmd;
+			sub_val[0] = cmt_current_cmd;
 			sub_cmd_length = 1;
-			logerror("CMT: Command 0xEA received, returning 0x%02x.\n",sub_val);
+			logerror("CMT: Command 0xEA received, returning 0x%02x.\n",sub_val[0]);
 			break;
 		case 0xeb:  // CMT Tape status
 		            // bit 0 = tape end
 					// bit 1 = tape inserted
 					// bit 2 = ???
-			sub_val = 0x02;  // assume a tape is inserted for now
+			sub_val[0] = 0x02;  // assume a tape is inserted for now
 			sub_cmd_length = 1;
-			logerror("CMT: Command 0xEB received, returning 0x%02x.\n",sub_val);
+			logerror("CMT: Command 0xEB received, returning 0x%02x.\n",sub_val[0]);
 			break;
 		case 0xed:
 			sub_cmd_length = 3;
@@ -1111,9 +1133,9 @@ static INPUT_PORTS_START( x1 )
 	PORT_BIT(0x00000020,IP_ACTIVE_HIGH,IPT_UNUSED) //0x05 eot
 	PORT_BIT(0x00000040,IP_ACTIVE_HIGH,IPT_UNUSED) //0x06 enq
 	PORT_BIT(0x00000080,IP_ACTIVE_HIGH,IPT_UNUSED) //0x07 ack
-	PORT_BIT(0x00000100,IP_ACTIVE_HIGH,IPT_UNUSED) //0x08 bel
-	PORT_BIT(0x00000200,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Backspace") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
-	PORT_BIT(0x00000400,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Tab") PORT_CODE(KEYCODE_TAB) PORT_CHAR(9)
+	PORT_BIT(0x00000100,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Backspace") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
+	PORT_BIT(0x00000200,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Tab") PORT_CODE(KEYCODE_TAB) PORT_CHAR(9)
+	PORT_BIT(0x00000400,IP_ACTIVE_HIGH,IPT_UNUSED) //0x0a
 	PORT_BIT(0x00000800,IP_ACTIVE_HIGH,IPT_UNUSED) //0x0b lf
 	PORT_BIT(0x00001000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x0c vt
 	PORT_BIT(0x00002000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("RETURN") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(27)
@@ -1206,6 +1228,13 @@ static INPUT_PORTS_START( x1 )
 	PORT_BIT(0x40000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("^") PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('^')
 	PORT_BIT(0x80000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("_")
 
+	PORT_START("key_modifiers")
+	PORT_BIT(0x00000001,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL)
+	PORT_BIT(0x00000002,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT)
+	PORT_BIT(0x00000004,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("KANA") PORT_CODE(KEYCODE_RCONTROL)
+	PORT_BIT(0x00000008,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("CAPS") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
+	PORT_BIT(0x00000010,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("GRPH") PORT_CODE(KEYCODE_LALT)
+
 	#if 0
 	PORT_BIT(0x00020000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME(",") PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',')
 	PORT_BIT(0x00040000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME(".") PORT_CODE(KEYCODE_STOP) PORT_CHAR('.')
@@ -1253,13 +1282,6 @@ static INPUT_PORTS_START( x1 )
 	PORT_BIT(0x08000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("PF9") PORT_CODE(KEYCODE_F9)
 	PORT_BIT(0x10000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("PF10") PORT_CODE(KEYCODE_F10)
 
-	PORT_START("key_modifiers")
-	PORT_BIT(0x00000001,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Ctrl") PORT_CODE(KEYCODE_LCONTROL)
-	PORT_BIT(0x00000002,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Left Shift") PORT_CODE(KEYCODE_LSHIFT)
-	PORT_BIT(0x00000004,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Right Shift") PORT_CODE(KEYCODE_RSHIFT)
-	PORT_BIT(0x00000008,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("CAP") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
-	PORT_BIT(0x00000010,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("GRAPH") PORT_CODE(KEYCODE_RALT)
-	PORT_BIT(0x00000020,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Kana") PORT_CODE(KEYCODE_RCONTROL) PORT_TOGGLE
 	#endif
 INPUT_PORTS_END
 
