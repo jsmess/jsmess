@@ -59,18 +59,17 @@ struct VIP_REGS_STRUCT
 
 static struct VIP_REGS_STRUCT vip_regs;
 
-static bitmap_t *bg_map[14];
+static bitmap_t *bg_map[16];
 
 static bitmap_t *screen_output;
 
 static READ32_HANDLER( port_02_read )
 {
 	UINT32 value = 0x00;
-
 	switch ((offset << 2))
 	{
 		case 0x10:	// KLB (Keypad Low Byte)
-			value = vboy_regs.klb | 0x02;	// 0x02 is always 1
+			value = vboy_regs.klb;	// 0x02 is always 1
 			break;
 		case 0x14:	// KHB (Keypad High Byte)
 			value = vboy_regs.khb;
@@ -93,7 +92,7 @@ static READ32_HANDLER( port_02_read )
 		default:
 			logerror("Unemulated read: offset %08x\n", 0x02000000 + (offset << 2));
 			break;
-	}
+	}	
 	return value;
 }
 
@@ -131,7 +130,7 @@ static WRITE32_HANDLER( port_02_write )
 		case 0x18:	// TLB (Timer Low Byte)
 		case 0x1c:	// THB (Timer High Byte)
 		default:
-			logerror("Unemulated write: offset %08x, data %04x\n", 0x02000000 + (offset << 2), data);
+			logerror("Unemulated write: offset %08x, data %04x\n", 0x02000000 + (offset << 2), data);			
 			break;
 	}
 }
@@ -251,11 +250,11 @@ static WRITE16_HANDLER( vip_w )
 					break;		
 		case 0x26: 	//BRTB
 					vip_regs.BRTB = data;
-					palette_set_color_rgb(space->machine, 2,((vip_regs.BRTA + vip_regs.BRTB)) & 0xff,0,0);
+					palette_set_color_rgb(space->machine, 2,(vip_regs.BRTA + vip_regs.BRTB) & 0xff,0,0);
 					break;
-		case 0x28: 	//BRTC					
+		case 0x28: 	//BRTC				 					
 					vip_regs.BRTC = data;
-					palette_set_color_rgb(space->machine, 3,((vip_regs.BRTA + vip_regs.BRTB + vip_regs.BRTC)) & 0xff,0,0);
+					palette_set_color_rgb(space->machine, 3,(vip_regs.BRTA + vip_regs.BRTB + vip_regs.BRTC) & 0xff,0,0);					
 					break;
 		case 0x2A: 	//REST
 					vip_regs.REST = data;
@@ -360,7 +359,7 @@ static READ16_HANDLER( vboy_font3_r )
 	return vboy_font[offset + 0x3000];
 }
 
-static void put_char(int x, int y, UINT16 ch, bitmap_t *bitmap,int flipx,int flipy,int trans)
+static void put_char(int x, int y, UINT16 ch, bitmap_t *bitmap,int flipx,int flipy,int trans,UINT8 pal)
 {
 	UINT16 code = ch;
 	int i, b;
@@ -375,14 +374,18 @@ static void put_char(int x, int y, UINT16 ch, bitmap_t *bitmap,int flipx,int fli
 		}
 		for (b = 0; b < 8; b++)
 		{					
-			UINT8 dat;
+			UINT8 dat,col;
 			if(flipx==0) {
 				dat = ((data >> (b << 1)) & 0x03);
 			} else {
 				dat = ((data >> ((7-b) << 1)) & 0x03);
 			}
-			if (!trans || ( trans && dat >0)) {
-				*BITMAP_ADDR16(bitmap, y + i, x + b) =  dat;
+			col = (pal >> (dat*2)) & 3;
+			// This is how emulator works, but need to check
+			if (dat==0) col=0;
+			
+			if (!trans || ( trans && col!=0)) {			
+				*BITMAP_ADDR16(bitmap, (y + i) & 0x1ff, (x + b) & 0x1ff) =  col;
 			}
 		}		
 	}	
@@ -390,10 +393,7 @@ static void put_char(int x, int y, UINT16 ch, bitmap_t *bitmap,int flipx,int fli
 
 static WRITE16_HANDLER( vboy_bgmap_w )
 {	
-	UINT16 val;	
 	vboy_bgmap[offset] = data | (vboy_bgmap[offset] & (mem_mask ^ 0xffff));
-	val = vboy_bgmap[offset];
-	put_char((offset & 0x3f) << 3, ((offset >> 6) & 0x3f) << 3, val & 0x7ff, bg_map[offset >> 12],BIT(val,13),BIT(val,12),0);
 }
 
 static READ16_HANDLER( vboy_bgmap_r )
@@ -412,12 +412,7 @@ static ADDRESS_MAP_START( vboy_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE( 0x00018000, 0x0001dfff ) AM_RAM AM_BASE((UINT32**)&vboy_r_frame_1) // R frame buffer 1
 	AM_RANGE( 0x0001e000, 0x0001ffff ) AM_READWRITE16(vboy_font3_r, vboy_font3_w, 0xffffffff) // Font 1536-2047
 	
-	AM_RANGE( 0x00020000, 0x0003bfff ) AM_READWRITE16(vboy_bgmap_r,vboy_bgmap_w, 0xffffffff) // BG Map
-	AM_RANGE( 0x0003c000, 0x0003d7ff ) AM_RAM AM_BASE((UINT32**)&vboy_paramtab) // Param Table
-	AM_RANGE( 0x0003d800, 0x0003dbff ) AM_RAM AM_BASE((UINT32**)&vboy_world) // World 
-	AM_RANGE( 0x0003dc00, 0x0003ddff ) AM_RAM AM_BASE((UINT32**)&vboy_columntab1) // Column Table 1
-	AM_RANGE( 0x0003de00, 0x0003dfff ) AM_RAM AM_BASE((UINT32**)&vboy_columntab2) // Column Table 2
-	AM_RANGE( 0x0003e000, 0x0003ffff ) AM_RAM AM_BASE((UINT32**)&vboy_objects) // Objects RAM
+	AM_RANGE( 0x00020000, 0x0003ffff ) AM_RAM AM_READWRITE16(vboy_bgmap_r,vboy_bgmap_w, 0xffffffff) // VIPC memory
 	
 	//AM_RANGE( 0x00040000, 0x0005ffff ) AM_RAM // VIPC	
 	AM_RANGE( 0x0005f800, 0x0005f87f )	AM_READWRITE16(vip_r, vip_w, 0xffffffff)
@@ -452,8 +447,8 @@ static INPUT_PORTS_START( vboy )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("R") PORT_PLAYER(1) // Right button on back
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("A") PORT_PLAYER(1) // A button (or B?)
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("B") PORT_PLAYER(1) // B button (or A?)
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNUSED ) // Always 1
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_UNUSED ) // Battery low
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW,  IPT_UNUSED ) // Always 1
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNUSED ) // Battery low
 INPUT_PORTS_END
 
 
@@ -478,7 +473,7 @@ static VIDEO_START( vboy )
 {
 	int i;
 	// Allocate memory for temporary screens
-	for(i = 0; i < 14; i++) 
+	for(i = 0; i < 16; i++) 
 	{
 		bg_map[i] = auto_bitmap_alloc(machine, 512, 512, BITMAP_FORMAT_INDEXED16);
 	}
@@ -486,61 +481,105 @@ static VIDEO_START( vboy )
 	
 	vboy_font  = auto_alloc_array(machine, UINT16, 2048 * 8);
 	vboy_bgmap = auto_alloc_array(machine, UINT16, 0x1C000 >> 1);;
+	vboy_objects = vboy_bgmap + (0x1E000 >> 1);	
+	vboy_columntab1 = vboy_bgmap + (0x1dc00 >> 1);
+	vboy_columntab2 = vboy_bgmap + (0x1de00 >> 1);
+	vboy_world = vboy_bgmap + (0x1d800 >> 1);
+}
+
+static void fill_bg_map(int num, bitmap_t *bitmap)
+{
+	int i, j;	
+	// Fill background map
+	for (i = 0; i < 64; i++) 
+	{
+		for (j = 0; j < 64; j++) 
+		{
+			UINT16 val = vboy_bgmap[j + 64 * i + (num * 0x1000)];
+			put_char(j * 8, i * 8, val & 0x7ff, bitmap,BIT(val,13),BIT(val,12),0, vip_regs.GPLT[(val >> 14) & 3]);
+		}
+	}
 }
 
 static UINT8 display_world(int num, bitmap_t *bitmap, UINT8 right)
 {
 	UINT16 def = vboy_world[num*16];
-	UINT16 gx  = vboy_world[num*16+1];
-	UINT16 gp  = vboy_world[num*16+2];
-	UINT16 gy  = vboy_world[num*16+3];
-	UINT16 mx  = vboy_world[num*16+4];
-	UINT16 mp  = vboy_world[num*16+5];
-	UINT16 my  = vboy_world[num*16+6];
+	INT16 gx  = vboy_world[num*16+1];
+	INT16 gp  = vboy_world[num*16+2];
+	INT16 gy  = vboy_world[num*16+3];
+	INT16 mx  = vboy_world[num*16+4];
+	INT16 mp  = vboy_world[num*16+5];
+	INT16 my  = vboy_world[num*16+6];
 	UINT16 w  = vboy_world[num*16+7];
 	UINT16 h = vboy_world[num*16+8];
-//	UINT16 param_base  = vboy_world[num*16+9];
+	UINT16 param_base  = vboy_world[num*16+9] & 0xfff0;
 //	UINT16 overplane = vboy_world[num*16+10];
 	UINT8 bg_map_num = def & 0x0f;
-	int x,y,i;	
+	INT16 x,y,i;	
 	UINT8 mode	= (def >> 12) & 3;
-	
-	
-	if (bg_map_num < 15) {
-		if(mode==0) {
-			//fill_bg_map(bg_map_num,bg_map[bg_map_num]);			
-			if (BIT(def,15) && (right==0)) {
-				// Left screen 
-				for(y=my;y<my+h;y++) {
-					for(x=mx-mp;x<mx-mp+w;x++) {
-						*BITMAP_ADDR16(bitmap, y+gy-my, x+gx-gp-(mx-mp)) = *BITMAP_ADDR16(bg_map[bg_map_num], y, x);
+	vboy_paramtab = vboy_bgmap + param_base;
+	if ((mode==0) || (mode==1)) {					
+		fill_bg_map(bg_map_num,bg_map[bg_map_num]);			
+		if (BIT(def,15) && (right==0)) {
+			// Left screen 
+			for(y=0;y<=h;y++) {
+				for(x=0;x<=w;x++) {
+					INT16 y1 = (y+gy);
+					INT16 x1 = (x+gx-gp);						
+					UINT16 pix = 0;
+					if (mode==1) {
+						x1 += vboy_paramtab[y*2];
 					}
-				}
-			}
-			if (BIT(def,14) && (right==1)) {
-				// Right screen 
-				for(y=my;y<my+h;y++) {
-					for(x=mx-mp;x<mx-mp+w;x++) {
-						*BITMAP_ADDR16(bitmap, y+gy-my, x+gx-gp-(mx+mp)) = *BITMAP_ADDR16(bg_map[bg_map_num], y, x);
+					pix = *BITMAP_ADDR16(bg_map[bg_map_num], (y+my) & 0x1ff, (x+mx-mp) & 0x1ff);						
+					if (pix!=0) {
+						if (y1>=0 && y1<224) {
+							if (x1>=0 && x1<384) {
+								*BITMAP_ADDR16(bitmap, y1, x1) = pix;
+							}
+						}
 					}
 				}
 			}
 		}
-		if(mode==3) {
-			// just for test
-			for(i=vip_regs.SPT[3];i>=vip_regs.SPT[2];i--) {
-				UINT16 start_ndx = i * 4;
-				UINT16 jx = vboy_objects[start_ndx+0];
-				UINT16 jp = vboy_objects[start_ndx+1] & 0x3fff;
-				UINT16 jy = vboy_objects[start_ndx+2];
-				UINT16 jca = vboy_objects[start_ndx+3] & 0x7ff;
-				if (!right) {
-					put_char(jx-jp,jy,jca,bitmap,BIT(vboy_objects[start_ndx+3],12),BIT(vboy_objects[start_ndx+3],13),1);
-				} else {
-					put_char(jx+jp,jy,jca,bitmap,BIT(vboy_objects[start_ndx+3],12),BIT(vboy_objects[start_ndx+3],13),1);
+		if (BIT(def,14) && (right==1)) {
+			// Right screen 
+			for(y=0;y<=h;y++) {
+				for(x=0;x<=w;x++) {
+					INT16 y1 = (y+gy);
+					INT16 x1 = (x+gx+gp);
+					UINT16 pix = 0;
+					if (mode==1) {
+						x1 +=vboy_paramtab[y*2+1];
+					}
+					pix = *BITMAP_ADDR16(bg_map[bg_map_num], (y+my) & 0x1ff, (x+mx+mp) & 0x1ff);
+					if (pix!=0) {
+						if (y1>=0 && y1<224) {
+							if (x1>=0 && x1<384) {
+								*BITMAP_ADDR16(bitmap, y1, x1) = pix;
+							}
+						}
+					}
 				}
 			}
 		}
+	}
+	if(mode==2) {
+		
+	}
+	if(mode==3) {
+		// just for test
+		for(i=vip_regs.SPT[3];i>=vip_regs.SPT[2];i--) {
+			UINT16 start_ndx = i * 4;
+			INT16 jx = vboy_objects[start_ndx+0];
+			INT16 jp = vboy_objects[start_ndx+1] & 0x3fff;
+			INT16 jy = vboy_objects[start_ndx+2] & 0x1ff;
+			UINT16 jca = vboy_objects[start_ndx+3] & 0x7ff;
+			if (!right) {
+				put_char((jx-jp) & 0x1ff,jy,jca,bitmap,BIT(vboy_objects[start_ndx+3],13),BIT(vboy_objects[start_ndx+3],12),1,vip_regs.JPLT[(vboy_objects[start_ndx+3]>>14) & 3]);
+			} else {
+				put_char((jx+jp) & 0x1ff,jy,jca,bitmap,BIT(vboy_objects[start_ndx+3],13),BIT(vboy_objects[start_ndx+3],12),1,vip_regs.JPLT[(vboy_objects[start_ndx+3]>>14) & 3]);
+			}
+		}			
 	}
 	// Return END world status
 	return BIT(def,6);
@@ -552,7 +591,7 @@ static VIDEO_UPDATE( vboy )
 	UINT8 right = 0;
 	const device_config *_3d_right_screen = devtag_get_device(screen->machine, "3dright");
 	
-	bitmap_fill(screen_output, cliprect, 0);
+	bitmap_fill(screen_output, cliprect, vip_regs.BKCOL);
 		
 	if (screen == _3d_right_screen) right = 1;
 
@@ -570,7 +609,6 @@ static TIMER_DEVICE_CALLBACK( video_tick )
 	vip_regs.XPSTTS = (vip_regs.XPSTTS==0) ? 0x0c : 0x00;
 }
 
-
 static const rgb_t vboy_palette[18] = {
 	MAKE_RGB(0x00, 0x00, 0x00), // 0
 	MAKE_RGB(0x00, 0x00, 0x00), // 1
@@ -582,7 +620,6 @@ PALETTE_INIT( vboy )
 {
 	palette_set_colors(machine, 0, vboy_palette, ARRAY_LENGTH(vboy_palette));
 }
-
 
 static MACHINE_DRIVER_START( vboy )
 	/* basic machine hardware */
