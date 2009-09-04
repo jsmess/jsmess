@@ -430,6 +430,35 @@ static ADDRESS_MAP_START( vboy_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE( 0x07000000, 0x071fffff ) AM_MIRROR(0x0e00000) AM_ROM AM_REGION("user1", 0) /* ROM */
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( vboy_io, ADDRESS_SPACE_IO, 32 )
+	ADDRESS_MAP_GLOBAL_MASK(0x07ffffff)
+	AM_RANGE( 0x00000000, 0x00005fff ) AM_RAM AM_BASE((UINT32**)&vboy_l_frame_0) // L frame buffer 0
+	AM_RANGE( 0x00006000, 0x00007fff ) AM_READWRITE16(vboy_font0_r, vboy_font0_w, 0xffffffff) // Font 0-511
+	AM_RANGE( 0x00008000, 0x0000dfff ) AM_RAM AM_BASE((UINT32**)&vboy_l_frame_1) // L frame buffer 1
+	AM_RANGE( 0x0000e000, 0x0000ffff ) AM_READWRITE16(vboy_font1_r, vboy_font1_w, 0xffffffff) // Font 512-1023
+	AM_RANGE( 0x00010000, 0x00015fff ) AM_RAM AM_BASE((UINT32**)&vboy_r_frame_0) // R frame buffer 0
+	AM_RANGE( 0x00016000, 0x00017fff ) AM_READWRITE16(vboy_font2_r, vboy_font2_w, 0xffffffff) // Font 1024-1535
+	AM_RANGE( 0x00018000, 0x0001dfff ) AM_RAM AM_BASE((UINT32**)&vboy_r_frame_1) // R frame buffer 1
+	AM_RANGE( 0x0001e000, 0x0001ffff ) AM_READWRITE16(vboy_font3_r, vboy_font3_w, 0xffffffff) // Font 1536-2047
+	
+	AM_RANGE( 0x00020000, 0x0003ffff ) AM_RAM AM_READWRITE16(vboy_bgmap_r,vboy_bgmap_w, 0xffffffff) // VIPC memory
+	
+	//AM_RANGE( 0x00040000, 0x0005ffff ) AM_RAM // VIPC	
+	AM_RANGE( 0x0005f800, 0x0005f87f )	AM_READWRITE16(vip_r, vip_w, 0xffffffff)
+	
+	AM_RANGE( 0x00078000, 0x00079fff ) AM_READWRITE16(vboy_font0_r, vboy_font0_w, 0xffffffff) // Font 0-511 mirror
+	AM_RANGE( 0x0007a000, 0x0007bfff ) AM_READWRITE16(vboy_font1_r, vboy_font1_w, 0xffffffff) // Font 512-1023 mirror
+	AM_RANGE( 0x0007c000, 0x0007dfff ) AM_READWRITE16(vboy_font2_r, vboy_font2_w, 0xffffffff) // Font 1024-1535 mirror
+	AM_RANGE( 0x0007e000, 0x0007ffff ) AM_READWRITE16(vboy_font3_r, vboy_font3_w, 0xffffffff) // Font 1536-2047 mirror
+	
+	AM_RANGE( 0x01000000, 0x010005ff ) AM_RAM // Sound RAM 
+	AM_RANGE( 0x02000000, 0x0200002b ) AM_MIRROR(0x0ffff00) AM_READWRITE(port_02_read, port_02_write) // Hardware control registers mask 0xff
+	//AM_RANGE( 0x04000000, 0x04ffffff ) // Expansion area
+	AM_RANGE( 0x05000000, 0x0500ffff ) AM_MIRROR(0x0ff0000) AM_RAM // Main RAM - 64K mask 0xffff
+	AM_RANGE( 0x06000000, 0x06003fff ) AM_RAM // Cart RAM - 8K
+	AM_RANGE( 0x07000000, 0x071fffff ) AM_MIRROR(0x0e00000) AM_ROM AM_REGION("user1", 0) /* ROM */
+ADDRESS_MAP_END
+
 /* Input ports */
 static INPUT_PORTS_START( vboy )
 	PORT_START("INPUT")
@@ -480,7 +509,7 @@ static VIDEO_START( vboy )
 	screen_output = auto_bitmap_alloc(machine, 384, 224, BITMAP_FORMAT_INDEXED16);
 	
 	vboy_font  = auto_alloc_array(machine, UINT16, 2048 * 8);
-	vboy_bgmap = auto_alloc_array(machine, UINT16, 0x1C000 >> 1);;
+	vboy_bgmap = auto_alloc_array(machine, UINT16, 0x20000 >> 1);;
 	vboy_objects = vboy_bgmap + (0x1E000 >> 1);	
 	vboy_columntab1 = vboy_bgmap + (0x1dc00 >> 1);
 	vboy_columntab2 = vboy_bgmap + (0x1de00 >> 1);
@@ -625,6 +654,7 @@ static MACHINE_DRIVER_START( vboy )
 	/* basic machine hardware */
 	MDRV_CPU_ADD( "maincpu", V810, XTAL_20MHz )
 	MDRV_CPU_PROGRAM_MAP(vboy_mem)
+	MDRV_CPU_IO_MAP(vboy_io)
 
 	MDRV_MACHINE_RESET(vboy)
 
