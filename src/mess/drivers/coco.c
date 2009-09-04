@@ -488,6 +488,15 @@ static INPUT_PORTS_START( coco )
 	PORT_INCLUDE( coco_joystick_buttons )
 	PORT_INCLUDE( m6847_artifacting )
 
+	PORT_START("joystick_mode")
+	PORT_CONFNAME( 0x70, 0x00, "Joystick Type" )
+	PORT_CHANGED( coco_joystick_mode_changed, 0 )
+	PORT_CONFSETTING(	0x00, DEF_STR( Normal ) )
+	PORT_CONFSETTING(	0x10, "Hi-Res Interface" )
+	PORT_CONFSETTING(	0x30, "Hi-Res Interface (CoCoMax 3 Style)" )
+	PORT_CONFSETTING(	0x20, "The Rat Graphics Mouse" )
+	PORT_CONFSETTING(	0x40, "Diecom Light Gun Adaptor" )
+
 	PORT_START("real_time_clock") /* 13 */
 	PORT_CONFNAME( 0x03, 0x00, "Real Time Clock" )
 	PORT_CONFSETTING(    0x00, "Disto" )

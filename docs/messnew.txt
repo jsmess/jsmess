@@ -8,10 +8,13 @@ New System Drivers Supported (in no particular order):
 - Busicom 141-PF [Miodrag Milanovic]
 - Mikron-2 [Miodrag Milanovic]
 
+
+
 Systems Promoted from GAME_NOT_WORKING:
 ---------------------------------------
 - Elektor Junior [Manfred Schneider]
 - Elwro 800 Junior [Mariusz Wojcieszek]
+
 
 
 Skeleton drivers: 
@@ -22,9 +25,12 @@ Skeleton drivers:
 - Cobra / Cobra 80K
 
 
+
 System Driver Changes:
 ----------------------
 - [COCO] Bug #1839 fixed [Miodrag Milanovic]
+
+- [COCO1/2] Added support for hi-res interface.  [Nathan Woods]
 
 - [IBMPCJR] Fixed the floppy watchdog timer.  [Wilbert Pol]
 
