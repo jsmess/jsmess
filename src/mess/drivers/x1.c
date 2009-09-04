@@ -331,6 +331,7 @@ static UINT8 check_keyboard_press(running_machine *machine)
 {
 	const char* portnames[3] = { "key1","key2","key3" };
 	int i,port_i,scancode;
+	UINT8 keymod = input_port_read(machine,"key_modifiers") & 0x1f;
 
 	scancode = 0;
 
@@ -341,9 +342,18 @@ static UINT8 check_keyboard_press(running_machine *machine)
 			if((input_port_read(machine,portnames[port_i])>>i) & 1)
 			{
 				//key_flag = 1;
+				if(keymod & 0x02)  // shift not pressed
+				{
+					if(scancode >= 0x41 && scancode < 0x5a)
+						scancode += 0x20;  // lowercase
+				}
+				else
+				{
+					if(scancode >= 0x31 && scancode < 0x3a)
+						scancode -= 0x10;
+				}
 				return scancode;
 			}
-
 			scancode++;
 		}
 	}
