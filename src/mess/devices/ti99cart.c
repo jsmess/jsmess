@@ -1766,7 +1766,7 @@ static WRITE8_DEVICE_HANDLER( ti99_cart_w_legacy8 )
 				if (slotebr2 < 0 || slotrom < 0)
 					return; /* just ignore if the cartridge is not paged. */
 				else
-					cartslots->cartridge[slotrom].rom_page = ((data >> 8) & 1);
+					cartslots->cartridge[slotrom].rom_page = ((data >> 7) & 1);
 			}
 		}
 		return;
