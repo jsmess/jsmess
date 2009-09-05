@@ -659,9 +659,9 @@ long myo;
 			const device_config *acia = devtag_get_device(space->machine, "acia6850");
 
 			if ((myo - 0x08) & 1)
-				return acia6850_ctrl_w(acia, 0, data);
+				acia6850_ctrl_w(acia, 0, data);
 			else
-				return acia6850_data_w(acia, 0, data);
+				acia6850_data_w(acia, 0, data);
 		}
 		if ((myo>=0x10) && (myo<=0x17)) BBC_SerialULA_w(space, myo-0x10,data);		/* Serial System Chip */
 		if ((myo>=0x18) && (myo<=0x1f)) uPD7002_w(devtag_get_device(space->machine, "upd7002"),myo-0x18,data);			/* A to D converter */
