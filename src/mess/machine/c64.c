@@ -234,7 +234,7 @@ const cia6526_interface c64_ntsc_cia1 =
 {
 	DEVCB_LINE(c64_cia1_interrupt),
 	DEVCB_NULL,	/* pc_func */
-	60,
+	10, /* 1/10 second */
 
 	{
 		{ DEVCB_HANDLER(c64_cia1_port_a_r), DEVCB_HANDLER(c64_cia1_port_a_w) },
@@ -246,7 +246,7 @@ const cia6526_interface c64_pal_cia1 =
 {
 	DEVCB_LINE(c64_cia1_interrupt),
 	DEVCB_NULL,	/* pc_func */
-	50,
+	10, /* 1/10 second */
 
 	{
 		{ DEVCB_HANDLER(c64_cia1_port_a_r), DEVCB_HANDLER(c64_cia1_port_a_w) },
