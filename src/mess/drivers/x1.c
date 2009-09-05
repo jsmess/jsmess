@@ -257,12 +257,40 @@ static void draw_fgtilemap(running_machine *machine, bitmap_t *bitmap,const rect
 	}
 }
 
+/*
+ * Priority Mixer Calculation (PLY)
+ *
+ * If ply is 0xff then the bitmap entirely covers the tilemap, if it's 0x00 then
+ * the tilemap priority is entirely above the bitmap. Any other value mixes the
+ * bitmap and the tilemap priorities based on the pen value, bit 0 = entry 0 <-> bit 7 = entry 7
+ * of the bitmap.
+ *
+ */
+static int priority_mixer_ply(running_machine *machine,int color)
+{
+	int pri_i,pri_mask_calc;
+
+	pri_i = 0;
+	pri_mask_calc = 1;
+
+	while(pri_i < 7)
+	{
+		if((color & 7) == pri_i)
+			break;
+
+		pri_i++;
+		pri_mask_calc<<=1;
+	}
+
+	return pri_mask_calc;
+}
+
 static void draw_gfxbitmap(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int w,int plane,int pri)
 {
 	int count,xi,yi,x,y;
 	int pen_r,pen_g,pen_b,color;
 	int yi_size;
-	int pri_i,pri_mask_val,pri_helper;
+	int pri_mask_val;
 
 	count = crtc_start_addr;
 
@@ -282,28 +310,8 @@ static void draw_gfxbitmap(running_machine *machine, bitmap_t *bitmap,const rect
 
 					color =  pen_g<<2 | pen_r<<1 | pen_b<<0;
 
-					/* Priority mixer calculation (PLY) */
-					{
-						pri_i = 0;
-						pri_mask_val = 1;
-						pri_helper = 0;
-
-						while(pri_i < 7 && pri_helper == 0)
-						{
-							if((color & 7) == pri_i)
-								pri_helper = 1;
-							else
-							{
-								pri_i++;
-								pri_mask_val<<=1;
-							}
-						}
-					}
-
+					pri_mask_val = priority_mixer_ply(machine,color);
 					if(pri_mask_val & pri) continue;
-
-					if(color == 0)
-						continue;
 
 					if(w == 1)
 					{
@@ -332,12 +340,10 @@ static VIDEO_UPDATE( x1 )
 
 	w = (video_screen_get_width(screen) < 640) ? 1 : 2;
 
-	bitmap_fill(bitmap, cliprect, screen->machine->pens[0x100]);
-
 	draw_gfxbitmap(screen->machine,bitmap,cliprect,w,0,scrn_reg.ply);
 	draw_fgtilemap(screen->machine,bitmap,cliprect,w);
 	draw_gfxbitmap(screen->machine,bitmap,cliprect,w,0,scrn_reg.ply^0xff);
-	/* Y's uses the following as a normal buffer without anything reasonable to draw */
+	/* Y's uses the following as a normal buffer/work ram without anything reasonable to draw */
 //	draw_gfxbitmap(screen->machine,bitmap,cliprect,w,1);
 
 	return 0;
