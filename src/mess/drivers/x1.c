@@ -243,13 +243,13 @@ static void draw_fgtilemap(running_machine *machine, bitmap_t *bitmap,const rect
 						if((res_x+xi)>video_screen_get_visible_area(machine->primary_screen)->max_x && (res_y+yi)>video_screen_get_visible_area(machine->primary_screen)->max_y)
 							continue;
 
-						*BITMAP_ADDR16(bitmap, res_y+yi, res_x+xi) = machine->pens[pcg_pen+0x100*pcg_bank];
+						*BITMAP_ADDR16(bitmap, res_y+yi, res_x+xi) = machine->pens[pcg_pen];
 						if(width)
-							*BITMAP_ADDR16(bitmap, res_y+yi, res_x+xi+1) = machine->pens[pcg_pen+0x100*pcg_bank];
+							*BITMAP_ADDR16(bitmap, res_y+yi, res_x+xi+1) = machine->pens[pcg_pen];
 						if(height)
-							*BITMAP_ADDR16(bitmap, res_y+yi+1, res_x+xi) = machine->pens[pcg_pen+0x100*pcg_bank];
+							*BITMAP_ADDR16(bitmap, res_y+yi+1, res_x+xi) = machine->pens[pcg_pen];
 						if(width && height)
-							*BITMAP_ADDR16(bitmap, res_y+yi+1, res_x+xi+1) = machine->pens[pcg_pen+0x100*pcg_bank];
+							*BITMAP_ADDR16(bitmap, res_y+yi+1, res_x+xi+1) = machine->pens[pcg_pen];
 					}
 				}
 			}
@@ -387,7 +387,7 @@ static UINT8 check_keyboard_press(running_machine *machine)
 			scancode++;
 		}
 	}
-	
+
 	// check numpad
 	scancode = 0x30;
 	for(i=0;i<10;i++)
@@ -426,7 +426,7 @@ static UINT8 get_game_key(running_machine *machine, int port)
 	UINT32 key2 = input_port_read(machine,"key2");
 	UINT32 key3 = input_port_read(machine,"key3");
 	UINT32 pad = input_port_read(machine,"tenkey");
-	
+
 	switch(port)
 	{
 		case 0:
@@ -460,7 +460,7 @@ static UINT8 get_game_key(running_machine *machine, int port)
 			if(key1 & 0x00002000) ret |= 0x01;  // RET
 			break;
 	}
-	
+
 	return ret;
 }
 
@@ -1564,10 +1564,10 @@ static GFXDECODE_START( x1 )
 	GFXDECODE_ENTRY( "cgrom", 0x00000, x1_chars_8wx8,   0x200, 0x20 )
 	GFXDECODE_ENTRY( "cgrom", 0x00000, x1_chars_8x8w,   0x200, 0x20 )
 	GFXDECODE_ENTRY( "cgrom", 0x00000, x1_chars_8wx8w,  0x200, 0x20 )
-	GFXDECODE_ENTRY( "pcg",   0x00000, x1_pcg_8x8,      0x100, 1 )
-	GFXDECODE_ENTRY( "pcg",   0x00000, x1_pcg_8wx8,     0x100, 1 )
-	GFXDECODE_ENTRY( "pcg",   0x00000, x1_pcg_8x8w,     0x100, 1 )
-	GFXDECODE_ENTRY( "pcg",   0x00000, x1_pcg_8wx8w,    0x100, 1 )
+	GFXDECODE_ENTRY( "pcg",   0x00000, x1_pcg_8x8,      0x000, 1 )
+	GFXDECODE_ENTRY( "pcg",   0x00000, x1_pcg_8wx8,     0x000, 1 )
+	GFXDECODE_ENTRY( "pcg",   0x00000, x1_pcg_8x8w,     0x000, 1 )
+	GFXDECODE_ENTRY( "pcg",   0x00000, x1_pcg_8wx8w,    0x000, 1 )
 	GFXDECODE_ENTRY( "cgrom", 0x01800, x1_chars_16x16,  0, 0x20 ) //only x1turboz uses this so far
 	GFXDECODE_ENTRY( "kanji", 0x27000, x1_chars_16x16,  0, 0x20 ) //needs to be checked when the ROM will be redumped
 GFXDECODE_END
@@ -1754,7 +1754,7 @@ static MACHINE_DRIVER_START( x1 )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay", AY8910, XTAL_4MHz/4) //unknown clock / divider
+	MDRV_SOUND_ADD("ay", AY8910, XTAL_4MHz/2) //unknown clock / divider
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MDRV_SOUND_WAVE_ADD("wave","cass")
