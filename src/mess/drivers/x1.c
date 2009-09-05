@@ -317,12 +317,12 @@ static void draw_gfxbitmap(running_machine *machine, bitmap_t *bitmap,const rect
 					{
 						if(yi & 1)
 							continue;
-						if((x+xi)<=video_screen_get_visible_area(machine->primary_screen)->max_x && (y+(yi >> 1))<video_screen_get_visible_area(machine->primary_screen)->max_y)
+						if((x+xi)<=video_screen_get_visible_area(machine->primary_screen)->max_x && (y+(yi >> 1))<=video_screen_get_visible_area(machine->primary_screen)->max_y)
 							*BITMAP_ADDR16(bitmap, y+(yi >> 1), x+xi) = machine->pens[color+0x100];
 					}
 					else
 					{
-						if((x+xi)<=video_screen_get_visible_area(machine->primary_screen)->max_x && (y+yi)<video_screen_get_visible_area(machine->primary_screen)->max_y)
+						if((x+xi)<=video_screen_get_visible_area(machine->primary_screen)->max_x && (y+yi)<=video_screen_get_visible_area(machine->primary_screen)->max_y)
 							*BITMAP_ADDR16(bitmap, y+yi, x+xi) = machine->pens[color+0x100];
 					}
 				}
