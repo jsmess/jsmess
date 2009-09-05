@@ -362,7 +362,7 @@ static UINT8 check_keyboard_press(running_machine *machine)
 	const char* portnames[3] = { "key1","key2","key3" };
 	int i,port_i,scancode;
 	UINT8 keymod = input_port_read(machine,"key_modifiers") & 0x1f;
-
+	UINT32 pad = input_port_read(machine,"tenkey");
 	scancode = 0;
 
 	for(port_i=0;port_i<3;port_i++)
@@ -387,6 +387,17 @@ static UINT8 check_keyboard_press(running_machine *machine)
 			scancode++;
 		}
 	}
+	
+	// check numpad
+	scancode = 0x30;
+	for(i=0;i<10;i++)
+	{
+		if((pad >> i) & 0x01)
+		{
+			return scancode;
+		}
+		scancode++;
+	}
 
 	return 0;
 }
@@ -400,6 +411,57 @@ static UINT8 check_keyboard_shift(running_machine *machine)
 		val &= ~0x40;
 
 	return val;
+}
+
+static UINT8 get_game_key(running_machine *machine, int port)
+{
+	// key status returned by sub CPU function 0xE3.
+	// in order from bit 7 to 0:
+	// port 0: Q,W,E,A,D,Z,X,C
+	// port 1: numpad 7,4,1,8,2,9,6,3
+	// port 2: ESC,1,[-],[+],[*],TAB,SPC,RET ([] = numpad)
+	// bits are active high
+	UINT8 ret = 0;
+	UINT32 key1 = input_port_read(machine,"key1");
+	UINT32 key2 = input_port_read(machine,"key2");
+	UINT32 key3 = input_port_read(machine,"key3");
+	UINT32 pad = input_port_read(machine,"tenkey");
+	
+	switch(port)
+	{
+		case 0:
+			if(key3 & 0x00020000) ret |= 0x80;  // Q
+			if(key3 & 0x00800000) ret |= 0x40;  // W
+			if(key3 & 0x00000020) ret |= 0x20;  // E
+			if(key3 & 0x00000002) ret |= 0x10;  // A
+			if(key3 & 0x00000010) ret |= 0x08;  // D
+			if(key3 & 0x04000000) ret |= 0x04;  // Z
+			if(key3 & 0x01000000) ret |= 0x02;  // X
+			if(key3 & 0x00000008) ret |= 0x01;  // C
+			break;
+		case 1:
+			if(pad & 0x00000040) ret |= 0x80;  // Tenkey 7
+			if(pad & 0x00000008) ret |= 0x40;  // Tenkey 4
+			if(pad & 0x00000001) ret |= 0x20;  // Tenkey 1
+			if(pad & 0x00000080) ret |= 0x10;  // Tenkey 8
+			if(pad & 0x00000002) ret |= 0x08;  // Tenkey 2
+			if(pad & 0x00000100) ret |= 0x04;  // Tenkey 9
+			if(pad & 0x00000020) ret |= 0x02;  // Tenkey 6
+			if(pad & 0x00000004) ret |= 0x01;  // Tenkey 3
+			break;
+		case 2:
+			if(key1 & 0x10000000) ret |= 0x80;  // ESC
+			if(key2 & 0x00020000) ret |= 0x40;  // 1
+			if(pad & 0x00000400) ret |= 0x20;  // Tenkey -
+			if(pad & 0x00000800) ret |= 0x10;  // Tenkey +
+			if(pad & 0x00001000) ret |= 0x08;  // Tenkey *
+			if(key1 & 0x00000200) ret |= 0x04;  // TAB
+			if(key2 & 0x00000001) ret |= 0x02;  // SPC
+			if(key1 & 0x00002000) ret |= 0x01;  // RET
+			break;
+	}
+	
+	return ret;
 }
 
 static READ8_HANDLER( sub_io_r )
@@ -468,7 +530,10 @@ static WRITE8_HANDLER( sub_io_w )
 	/* $0f5 -> reload sub-routine? */
 
 	if(sub_cmd == 0xe4)
+	{
 		key_irq_vector = data;
+		logerror("Key vector set to 0x%02x\n",data);
+	}
 
 	if(sub_cmd == 0xe9)
 		cmt_command(space->machine,data);
@@ -477,6 +542,9 @@ static WRITE8_HANDLER( sub_io_w )
 	{
 		case 0xe3:
 			sub_cmd_length = 3;
+			sub_val[0] = get_game_key(space->machine,0);
+			sub_val[1] = get_game_key(space->machine,1);
+			sub_val[2] = get_game_key(space->machine,2);
 			break;
 		case 0xe6:
 			sub_val[0] = check_keyboard_shift(space->machine);
@@ -1311,6 +1379,22 @@ static INPUT_PORTS_START( x1 )
 	PORT_BIT(0x20000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("]") PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR(']')
 	PORT_BIT(0x40000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("^") PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('^')
 	PORT_BIT(0x80000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("_")
+
+	PORT_START("tenkey")
+	PORT_BIT(0x00000001,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Tenkey 0") PORT_CODE(KEYCODE_0_PAD)
+	PORT_BIT(0x00000002,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Tenkey 1") PORT_CODE(KEYCODE_1_PAD)
+	PORT_BIT(0x00000004,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Tenkey 2") PORT_CODE(KEYCODE_2_PAD)
+	PORT_BIT(0x00000008,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Tenkey 3") PORT_CODE(KEYCODE_3_PAD)
+	PORT_BIT(0x00000010,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Tenkey 4") PORT_CODE(KEYCODE_4_PAD)
+	PORT_BIT(0x00000020,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Tenkey 5") PORT_CODE(KEYCODE_5_PAD)
+	PORT_BIT(0x00000040,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Tenkey 6") PORT_CODE(KEYCODE_6_PAD)
+	PORT_BIT(0x00000080,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Tenkey 7") PORT_CODE(KEYCODE_7_PAD)
+	PORT_BIT(0x00000100,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Tenkey 8") PORT_CODE(KEYCODE_8_PAD)
+	PORT_BIT(0x00000200,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Tenkey 9") PORT_CODE(KEYCODE_9_PAD)
+	PORT_BIT(0x00000400,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Tenkey -") PORT_CODE(KEYCODE_MINUS_PAD)
+	PORT_BIT(0x00000800,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Tenkey +") PORT_CODE(KEYCODE_PLUS_PAD)
+	PORT_BIT(0x00001000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Tenkey *") PORT_CODE(KEYCODE_ASTERISK)
+	// TODO: add other numpad keys
 
 	PORT_START("key_modifiers")
 	PORT_BIT(0x00000001,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL)
