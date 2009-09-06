@@ -38,6 +38,8 @@ System Driver Changes:
 
 - [COCO1/2] Added support for hi-res interface.  [Nathan Woods]
 
+- [COLECO] Bug #1460 fixed [Robbbert]
+
 - [IBMPCJR] Fixed the floppy watchdog timer.  [Wilbert Pol]
 
 - [IBMPCJR] Main memory and video ram are now shared.  [Wilbert Pol]
