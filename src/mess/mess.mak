@@ -1233,6 +1233,7 @@ $(MESSOBJ)/sinclair.a:			\
 	$(MESS_DRIVERS)/atm.o		\
 	$(MESS_DRIVERS)/pentagon.o	\
 	$(MESS_MACHINE)/spectrum.o	\
+	$(MESS_FORMATS)/trd_dsk.o	\
 	$(MESS_MACHINE)/beta.o		\
 	$(MESS_FORMATS)/zx81_p.o	\
 	$(MESS_FORMATS)/tzx_cas.o	\

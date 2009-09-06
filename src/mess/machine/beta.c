@@ -8,11 +8,10 @@
 
 *********************************************************************/
 #include "driver.h"
-#include "devices/basicdsk.h"
+#include "devices/mflopimg.h"
+#include "formats/trd_dsk.h"
 #include "machine/wd17xx.h"
 #include "machine/beta.h"
-
-
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -212,32 +211,6 @@ WRITE8_DEVICE_HANDLER(betadisk_data_w)
 	}	
 }
 
-static DEVICE_IMAGE_LOAD( beta_floppy )
-{
-	UINT8 data[1];
-	int heads;
-	int cylinders;
-	
-	if (device_load_basicdsk_floppy (image) != INIT_PASS)
-		return INIT_FAIL;
-
-	image_fseek( image, 0x8e3 , SEEK_SET );
-	/* Read and verify the header */
-	if ( 1 != image_fread( image, data, 1 ) )
-	{
-		image_seterror( image, IMAGE_ERROR_UNSUPPORTED, "Unable to read header" );
-		return 1;
-	} 
-	
-	image_fseek( image, 0 , SEEK_SET );
-  	/* guess geometry of disk */
-  	heads =  data[0] & 0x08 ? 1 : 2;
-  	cylinders = data[0] & 0x01 ? 40 : 80;
-  
-	basicdsk_set_geometry (image, cylinders, heads, 16, 256, 1, 0, FALSE);
-	return INIT_PASS;
-}
-
 void beta_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
@@ -247,13 +220,10 @@ void beta_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union 
 		case MESS_DEVINFO_INT_COUNT:							info->i = 4; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(beta_floppy); break;
+		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_trd; break;
 
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "trd"); break;
-
-		default:										legacybasicdsk_device_getinfo(devclass, state, info); break;
-	}	
+		default:										floppy_device_getinfo(devclass, state, info); break;
+	}
 }
 
 static MACHINE_DRIVER_START( beta_disk )
