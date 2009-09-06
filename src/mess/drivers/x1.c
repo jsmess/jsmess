@@ -1909,7 +1909,7 @@ ROM_START( x1turbo )
 
 	ROM_REGION(0x1800, "cgrom", 0)
 	/* This should be larger... hence, we are missing something (maybe part of the other fnt roms?) */
-	ROM_LOAD("fnt0808.x1", 0x00000, 0x00800, CRC(84a47530) SHA1(06c0995adc7a6609d4272417fe3570ca43bd0454) )
+	ROM_LOAD("fnt0808_turbo.x1", 0x00000, 0x00800, CRC(84a47530) SHA1(06c0995adc7a6609d4272417fe3570ca43bd0454) )
 	ROM_RELOAD(            0x00800, 0x00800)
 	ROM_RELOAD(            0x01000, 0x00800)
 
@@ -1931,7 +1931,7 @@ ROM_START( x1turboz )
 	ROM_REGION(0x1800, "pcg", ROMREGION_ERASEFF)
 
 	ROM_REGION(0x4d600, "cgrom", 0)
-	ROM_LOAD("fnt0808.x1", 0x0000, 0x0800, CRC(84a47530) SHA1(06c0995adc7a6609d4272417fe3570ca43bd0454) )
+	ROM_LOAD("fnt0808_turbo.x1", 0x0000, 0x0800, CRC(84a47530) SHA1(06c0995adc7a6609d4272417fe3570ca43bd0454) )
 	ROM_RELOAD(            0x00800, 0x00800)
 	ROM_RELOAD(            0x01000, 0x00800)
 	ROM_SYSTEM_BIOS( 0, "font1", "Font set 1" )
