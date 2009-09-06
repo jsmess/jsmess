@@ -2086,15 +2086,9 @@ static HMODULE win_resource_module(void)
 	static HMODULE module;
 	if (module == NULL)
 	{
-#ifdef _MSC_VER
-		// doing this because of lame build problems with EMULATORDLL, and how
-		// vconv is invoked
 		MEMORY_BASIC_INFORMATION info;
 		if ((VirtualQuery(win_resource_module, &info, sizeof(info))) == sizeof(info))
 			module = (HMODULE)info.AllocationBase;
-#else // !_MSC_VER
-		module = LoadLibrary(TEXT(EMULATORDLL));
-#endif // MSC_VER
 	}
 	return module;
 }
