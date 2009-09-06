@@ -359,7 +359,7 @@ static VIDEO_EOF( x1 )
  *
  *************************************/
 
-static UINT8 sub_cmd,key_flag;
+static UINT8 sub_cmd;//,key_flag;
 static UINT8 sub_cmd_length;
 static UINT8 sub_val[4];
 
@@ -446,14 +446,14 @@ static UINT8 get_game_key(running_machine *machine, int port)
 			if(key3 & 0x00000008) ret |= 0x01;  // C
 			break;
 		case 1:
-			if(pad & 0x00000040) ret |= 0x80;  // Tenkey 7
-			if(pad & 0x00000008) ret |= 0x40;  // Tenkey 4
-			if(pad & 0x00000001) ret |= 0x20;  // Tenkey 1
-			if(pad & 0x00000080) ret |= 0x10;  // Tenkey 8
-			if(pad & 0x00000002) ret |= 0x08;  // Tenkey 2
-			if(pad & 0x00000100) ret |= 0x04;  // Tenkey 9
-			if(pad & 0x00000020) ret |= 0x02;  // Tenkey 6
-			if(pad & 0x00000004) ret |= 0x01;  // Tenkey 3
+			if(pad & 0x00000080) ret |= 0x80;  // Tenkey 7
+			if(pad & 0x00000010) ret |= 0x40;  // Tenkey 4
+			if(pad & 0x00000002) ret |= 0x20;  // Tenkey 1
+			if(pad & 0x00000100) ret |= 0x10;  // Tenkey 8
+			if(pad & 0x00000004) ret |= 0x08;  // Tenkey 2
+			if(pad & 0x00000200) ret |= 0x04;  // Tenkey 9
+			if(pad & 0x00000040) ret |= 0x02;  // Tenkey 6
+			if(pad & 0x00000008) ret |= 0x01;  // Tenkey 3
 			break;
 		case 2:
 			if(key1 & 0x10000000) ret |= 0x80;  // ESC
@@ -1637,23 +1637,24 @@ static IRQ_CALLBACK(x1_irq_callback)
 static TIMER_CALLBACK(keyboard_callback)
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	UINT8 key_press;
-	static UINT8 old_key_val;
+	UINT32 key1 = input_port_read(machine,"key1");
+	UINT32 key2 = input_port_read(machine,"key2");
+	UINT32 key3 = input_port_read(machine,"key3");
+	UINT32 key4 = input_port_read(machine,"tenkey");
+	static UINT32 old_key1,old_key2,old_key3,old_key4;
 
 	if(key_irq_vector)
 	{
-		key_press = check_keyboard_press(machine);
-		if(key_press && key_press != old_key_val)
+		if((key1 != old_key1) || (key2 != old_key2) || (key3 != old_key3) || (key4 != old_key4))
 		{
-			old_key_val = key_press;
+			// generate keyboard IRQ
 			sub_io_w(space,0,0xe6);
-			cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
-		}
-		else
-		{
-			old_key_val = key_press;
-			key_flag = 0;
-		}
+			cputag_set_input_line(machine,"maincpu",0,ASSERT_LINE);
+			old_key1 = key1;
+			old_key2 = key2;
+			old_key3 = key3;
+			old_key4 = key4;
+		} 
 	}
 }
 
