@@ -52,7 +52,7 @@
 *    FE 05 - RAM check fail @ 0x90000-0x93fff, ram at E32 or E44 "
 *    FD 00 - DUART test (test code at $046C)
 *    FC 00 - TMS32010 'SPC' and DTMF-decoder 'TLC' status register test (test code at $051E) [passes in mess]
-*    FB 00 - DUART interrupt tests [fails in mess]
+*    FB 00 - TMS32010 extensive tests: make dtmf tone and be sure the decoder detects it and triggers an interrupt [fails in mess]
 *    Jump to $102C to skip the self tests
 *    During normal operation:
 *    D3 - ? some sort of failure
@@ -88,8 +88,7 @@ TLC is INT level 4
 SPC is INT level 5
 DUART is INT level 6
 */
-
-
+#undef VERBOSE
 
 /* Core includes */
 #include "driver.h"
@@ -97,6 +96,7 @@ DUART is INT level 6
 #include "cpu/tms32010/tms32010.h"
 #include "dectalk.lh" // nasty hack to avoid crash on screenless system
 #include "machine/68681.h"
+#include "sound/dac.h"
 
 
 /* Components */
@@ -130,14 +130,26 @@ UINT8 infifo_head_ptr;
 UINT16 outfifo[16]; // technically three 74LS224 4bit*16stage FIFO chips, arranged as a 16 stage, 12-bit wide fifo
 UINT8 outfifo_tail_ptr;
 UINT8 outfifo_head_ptr;
-UINT8 outfifo_writable_latch; // latch for status of output fifo, d-latch 74ls74 @ E64 'lower half'
+UINT8 infifo_semaphore; // latch for status of output fifo, d-latch 74ls74 @ E64 'lower half'
 UINT8 spc_error_latch; // latch for error status of speech dsp, d-latch 74ls74 @ E64 'upper half'
 UINT8 m68k_spcflags_latch; // latch for initializing the speech dsp, d-latch 74ls74 @ E29 'lower half', AND latch for spc irq enable, d-latch 74ls74 @ E29 'upper half'; these are stored in bits 0 and 6 respectively, the rest of the bits stored here MUST be zeroed!
 UINT8 m68k_tlcflags_latch; // latch for telephone interface stuff, d-latches 74ls74 @ E93 'upper half' and @ 103 'upper and lower halves'
+UINT8 simulate_outfifo_error; // simulate an error on the outfifo, which does something unusual to the dsp latches
+UINT8 tlc_tonedetect;
+UINT8 tlc_ringdetect;
 } dectalk={ {0}};
 
 #define SPC_INITIALIZE dectalk.m68k_spcflags_latch&0x1 // speech initialize flag
 #define SPC_IRQ_ENABLED ((dectalk.m68k_spcflags_latch&0x40)>>6) // irq enable flag
+
+static void dectalk_outfifo_check (running_machine *machine)
+{
+	// check if output fifo is full; if it isn't, set the int on the dsp
+	if (((dectalk.outfifo_head_ptr-1)&0xF) != dectalk.outfifo_tail_ptr)
+	cputag_set_input_line(machine, "dsp", 0, ASSERT_LINE); // TMS32010 INT
+	else
+	cputag_set_input_line(machine, "dsp", 0, CLEAR_LINE); // TMS32010 INT
+}
 
 static void dectalk_clear_all_fifos( running_machine *machine )
 {
@@ -147,6 +159,7 @@ static void dectalk_clear_all_fifos( running_machine *machine )
 	for (i=0; i<32; i++) dectalk.infifo[i] = 0;
 	dectalk.outfifo_tail_ptr = dectalk.outfifo_head_ptr = 0;
 	dectalk.infifo_tail_ptr = dectalk.infifo_head_ptr = 0;
+	dectalk_outfifo_check(machine);
 }
 
 static void dectalk_x2212_store( running_machine *machine )
@@ -167,6 +180,35 @@ static void dectalk_x2212_recall( running_machine *machine )
 	logerror("nvram recall done\n");
 }
 
+// helper for dsp infifo_semaphore flag to make dealing with interrupts easier
+static void dectalk_semaphore_w ( running_machine *machine, UINT16 data )
+{
+	dectalk.infifo_semaphore = data&1;
+	if ((dectalk.infifo_semaphore == 1) && (dectalk.m68k_spcflags_latch&0x40))
+	{
+#ifdef VERBOSE
+		logerror("speech int fired!\n");
+#endif
+		cputag_set_input_line_and_vector(machine, "maincpu", M68K_IRQ_5, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+	}
+	else
+	cputag_set_input_line_and_vector(machine, "maincpu", M68K_IRQ_5, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
+}
+
+// read the output fifo and set the interrupt line active on the dsp
+static UINT16 dectalk_outfifo_r ( running_machine *machine )
+{
+	UINT16 data = 0xFFFF;
+	data = dectalk.outfifo[dectalk.outfifo_tail_ptr];
+	// if fifo is empty (tail ptr == head ptr), do not increment the tail ptr, otherwise do.
+	//if (dectalk.outfifo_tail_ptr != dectalk.outfifo_head_ptr) dectalk.outfifo_tail_ptr++; // technically correct but doesn't match sn74ls224 sheet
+	if (((dectalk.outfifo_head_ptr-1)&0xF) != dectalk.outfifo_tail_ptr) dectalk.outfifo_tail_ptr++; // matches sn74ls224 sheet
+	dectalk.outfifo_tail_ptr&=0xF;
+	dectalk_outfifo_check(machine);
+	return ((data&0xfff0)^0x8000); // yes this is right, top bit is inverted and bottom 4 are ignored
+	//return data; // not right but want to get it working first
+}
+
 /*
 static void dectalk_spcflags_write ( running_machine *machine, UINT16 data )
 {
@@ -176,14 +218,6 @@ static void dectalk_tlcflags_write ( running_machine *machine, UINT16 data )
 {
 }
 */
-
-/* Driver init: stuff that needs setting up which isn't directly affected by reset */
-DRIVER_INIT( dectalk )
-{
-	dectalk_clear_all_fifos(machine);
-	dectalk.outfifo_writable_latch = 0; // on the original dectalk pcb revision, this is a semaphore for the INPUT fifo, later dec hacked on a check for the 3 output fifo chips to see if they're in sync, and set both of these latches if true.
-	dectalk.spc_error_latch = 1; // normally would be 0, but if set to 1 on startup the dectalk should recover as well 
-}
 
 /* Machine reset and friends: stuff that needs setting up which IS directly affected by reset */
 static void dectalk_reset(const device_config *device)
@@ -196,7 +230,12 @@ static void dectalk_reset(const device_config *device)
 	// DUART is reset, write me "duart68681"
 	// stuff that is INDIRECTLY affected by the RESET line
 	dectalk_clear_all_fifos(device->machine); // speech reset clears the fifos, though we have to do it explicitly here since we're not actually in the m68k_spcflags_w function.
+	dectalk_semaphore_w(device->machine, 0);
+	//dectalk.infifo_semaphore = 0; // on the original dectalk pcb revision, this is a semaphore for the INPUT fifo, later dec hacked on a check for the 3 output fifo chips to see if they're in sync, and set both of these latches if true.
+	dectalk.spc_error_latch = 0; // spc error latch is cleared on /reset
 	cputag_set_input_line(device->machine, "dsp", INPUT_LINE_RESET, ASSERT_LINE); // speech reset forces the CLR line active on the tms32010
+	dectalk.tlc_tonedetect = 0; // TODO, needed for selftest pass
+	dectalk.tlc_ringdetect = 0; // TODO
 }
 
 MACHINE_RESET( dectalk )
@@ -206,7 +245,6 @@ MACHINE_RESET( dectalk )
 }
 
 /* Begin 68k i/o handlers */
-
 /* x2212 nvram/sram chip and led array demunger due to interleaved addresses */
 /* 0x400 long: anything at offset&0x1 = 0 is open bus read, write to leds; everything else is nvram*/
 READ16_HANDLER( led_sw_nvr_read ) 
@@ -238,7 +276,10 @@ WRITE16_HANDLER( led_sw_nv_write )
 	if (ACCESSING_BITS_0_7) // LEDS
 	{
 		dectalk.statusLED = data&0xFF;
-		popmessage("LED status: %x\n", data&0xFF);
+		popmessage("LED status: %02X\n", data&0xFF);
+#ifdef VERBOSE
+		logerror("m68k: LED status: %02X\n", data&0xFF);
+#endif
 		//popmessage("LED status: %x %x %x %x %x %x %x %x\n", data&0x80, data&0x40, data&0x20, data&0x10, data&0x8, data&0x4, data&0x2, data&0x1);
 	}
 	else if (ACCESSING_BITS_8_15) // X2212 NVRAM chip
@@ -251,9 +292,20 @@ WRITE16_HANDLER( led_sw_nv_write )
 
 WRITE16_HANDLER( m68k_infifo_w ) // 68k write to the speech input fifo
 {
-    dectalk.infifo[dectalk.infifo_head_ptr] = data;
-    dectalk.infifo_head_ptr++;
-    dectalk.infifo_head_ptr&=0x1F;
+#ifdef VERBOSE
+	logerror("m68k: SPC infifo written with data = %04X, fifo head was: %02X; fifo tail: %02X\n",data, dectalk.infifo_head_ptr, dectalk.infifo_tail_ptr);
+#endif
+	// if fifo is full (head ptr = tail ptr-1), do not increment the head ptr and do not store the data
+	if (((dectalk.infifo_tail_ptr-1)&0x1F) == dectalk.infifo_head_ptr)
+	{
+#ifdef VERBOSE
+		logerror("infifo was full, write ignored!\n");
+#endif
+		return;
+	}
+	dectalk.infifo[dectalk.infifo_head_ptr] = data;
+	dectalk.infifo_head_ptr++;
+	dectalk.infifo_head_ptr&=0x1F;
 }
 
 READ16_HANDLER( m68k_spcflags_r ) // 68k read from the speech flags
@@ -261,35 +313,66 @@ READ16_HANDLER( m68k_spcflags_r ) // 68k read from the speech flags
 	UINT8 data = 0;
 	data |= dectalk.m68k_spcflags_latch; // bits 0 and 6
 	data |= dectalk.spc_error_latch<<5; // bit 5
-	data |= dectalk.outfifo_writable_latch<<7; // bit 7
+	data |= dectalk.infifo_semaphore<<7; // bit 7
+#ifdef VERBOSE
+	logerror("m68k: SPC flags read, returning data = %04X\n",data);
+#endif
 	return data;
 }
 
 WRITE16_HANDLER( m68k_spcflags_w ) // 68k write to the speech flags (only 3 bits do anything)
 {
+#ifdef VERBOSE
+	logerror("m68k: SPC flags written with %04X, only storing %04X\n",data, data&0x41);
+#endif
 	dectalk.m68k_spcflags_latch = data&0x41; // ONLY store bits 6 and 0!
 	// d0: initialize speech flag (reset tms32010 and clear infifo and outfifo if high)
 	if ((data&0x1) == 0x1) // bit 0
 	{
+#ifdef VERBOSE
+		logerror(" | 0x01: initialize speech: fifos reset, clear error+semaphore latches and dsp reset\n");
+#endif
 		dectalk_clear_all_fifos(space->machine);
 		cputag_set_input_line(space->machine, "dsp", INPUT_LINE_RESET, ASSERT_LINE); // speech reset forces the CLR line active on the tms32010
 		// clear the two speech side latches
 		dectalk.spc_error_latch = 0;
-		dectalk.outfifo_writable_latch = 0;
+		dectalk_semaphore_w(space->machine, 0);
 	}
 	else // (data&0x1) == 0
 	{
-	cputag_set_input_line(space->machine, "dsp", INPUT_LINE_RESET, CLEAR_LINE); // speech reset deassert clears the CLR line on the tms32010
+#ifdef VERBOSE
+		logerror(" | 0x01 = 0: initialize speech off, dsp running\n");
+#endif
+		cputag_set_input_line(space->machine, "dsp", INPUT_LINE_RESET, CLEAR_LINE); // speech reset deassert clears the CLR line on the tms32010
 	}
-	if ((data&0x2) == 0x2) // bit 1
+	if ((data&0x2) == 0x2) // bit 1 - clear error and semaphore latches
 	{
+#ifdef VERBOSE
+		logerror(" | 0x02: clear error+semaphore latches\n");
+#endif
 		// clear the two speech side latches
 		dectalk.spc_error_latch = 0;
-		dectalk.outfifo_writable_latch = 0;
+		dectalk_semaphore_w(space->machine, 0);
 	}
-	if ((data&0x40) == 0x40) // bit 6
+	if ((data&0x40) == 0x40) // bit 6 - spc irq enable
 	{
-		/* write me */ //enable or disable the spc irq, which triggers when fifo writable goes high, if data&40 is set.
+#ifdef VERBOSE
+		logerror(" | 0x40: speech int enabled\n");
+#endif
+		if ((dectalk.infifo_semaphore == 1))
+		{
+#ifdef VERBOSE
+			logerror("    speech int fired!\n");
+#endif
+			cputag_set_input_line_and_vector(space->machine, "maincpu", M68K_IRQ_5, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR); // set int because semaphore was set
+		}
+	}
+	else
+	{
+#ifdef VERBOSE
+		logerror(" | 0x40 = 0: speech int disabled\n");
+#endif
+		cputag_set_input_line_and_vector(space->machine, "maincpu", M68K_IRQ_5, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR); // clear int because int is now disabled
 	}
 }
 
@@ -297,54 +380,85 @@ READ16_HANDLER( m68k_tlcflags_r ) // dtmf flags read
 {
 	UINT16 data = 0;
 	data |= dectalk.m68k_tlcflags_latch; // bits 6, 8, 14;
-	//data |= dectalk.tlc_tonedetect<<7; // bit 7 is tone detect
-	//data |= dectalk.tlc_ringdetect<<14; // bit 15 is ring detect
+	data |= dectalk.tlc_tonedetect<<7; // bit 7 is tone detect
+	data |= dectalk.tlc_ringdetect<<14; // bit 15 is ring detect
+#ifdef VERBOSE
+	logerror("m68k: TLC flags read, returning data = %04X\n",data);
+#endif
 	return data;
 }
 
 WRITE16_HANDLER( m68k_tlcflags_w ) // dtmf flags write
 {
+#ifdef VERBOSE
+	logerror("m68k: TLC flags written with %04X, only storing %04X\n",data, data&0x4140);
+#endif
 	dectalk.m68k_tlcflags_latch = data&0x4140; // ONLY store bits 6 8 and 14!
 	// write me for the ring and tone int enables and answer phone
 }
 
 READ16_HANDLER( m68k_tlc_dtmf_r ) // dtmf chip read
 {
-// write me!
-return 0;
+	// write me!
+#ifdef VERBOSE
+	logerror("m68k: TLC dtmf read, currently unhandled, returning data = 0");
+#endif
+	return 0;
 }
-
 /* End 68k i/o handlers */
 
 /* Begin tms32010 i/o handlers */
 WRITE16_HANDLER( spc_latch_outfifo_error_stats ) // latch 74ls74 @ E64 upper and lower halves with d0 and 1 respectively
 {
-    dectalk.outfifo_writable_latch = 1; // always set to 1 here.
-    dectalk.spc_error_latch = data&1;
+#ifdef VERBOSE
+	logerror("dsp: set fifo semaphore and set error status = %01X\n",data&1);
+#endif
+	dectalk_semaphore_w(space->machine, (~dectalk.simulate_outfifo_error)&1); // always set to 1 here, unless outfifo error.
+	dectalk.spc_error_latch = (data&1);
 }
 
 READ16_HANDLER( spc_infifo_data_r )
 {
- UINT16 data = 0xFFFF;
- data = dectalk.infifo[dectalk.infifo_tail_ptr];
- //logerror("dsp read from infifo, data %x\n", data);
- dectalk.infifo_tail_ptr++;
- dectalk.infifo_tail_ptr&=0x1F;
- return data;
+	UINT16 data = 0xFFFF;
+	data = dectalk.infifo[dectalk.infifo_tail_ptr];
+#ifdef VERBOSE
+	logerror("dsp: SPC infifo read with data = %04X, fifo head: %02X; fifo tail was: %02X\n",data, dectalk.infifo_head_ptr, dectalk.infifo_tail_ptr);
+#endif
+	// if fifo is empty (tail ptr == head ptr), do not increment the tail ptr, otherwise do.
+	if (dectalk.infifo_tail_ptr != dectalk.infifo_head_ptr) dectalk.infifo_tail_ptr++; // technically correct but doesn't match sn74ls224 sheet
+	//if (((dectalk.infifo_head_ptr-1)&0x1F) != dectalk.infifo_tail_ptr) dectalk.infifo_tail_ptr++; // matches sn74ls224 sheet
+	dectalk.infifo_tail_ptr&=0x1F;
+	return data;
 }
 
 WRITE16_HANDLER( spc_outfifo_data_w )
 {
- // the low 4 data bits are thrown out on the real unit due to use of a 12 bit dac (and to save use of another 16x4 fifo chip), though technically they're probably valid, and with suitable hacking a dtc-01 could probably output full 16 bit samples at 10khz.
- logerror("dsp write to outfifo, data %x\n", data);
- dectalk.outfifo[dectalk.outfifo_head_ptr] = data;
- dectalk.outfifo_head_ptr++;
- dectalk.outfifo_head_ptr&=0xF;
+	// the low 4 data bits are thrown out on the real unit due to use of a 12 bit dac (and to save use of another 16x4 fifo chip), though technically they're probably valid, and with suitable hacking a dtc-01 could probably output full 16 bit samples at 10khz.
+#ifdef VERBOSE
+	logerror("dsp: SPC outfifo write, data = %04X, fifo head was: %02X; fifo tail: %02X\n", data, dectalk.outfifo_head_ptr, dectalk.outfifo_tail_ptr);
+#endif
+	cputag_set_input_line(space->machine, "dsp", 0, CLEAR_LINE); //TMS32010 INT (cleared because LDCK inverts the IR line, clearing int on any outfifo write... for a moment at least.)
+	// if fifo is full (head ptr = tail ptr-1), do not increment the head ptr and do not store the data
+	if (((dectalk.outfifo_tail_ptr-1)&0xF) == dectalk.outfifo_head_ptr)
+	{
+#ifdef VERBOSE
+		logerror("outfifo was full, write ignored!\n");
+#endif
+		return;
+	}
+	dectalk.outfifo[dectalk.outfifo_head_ptr] = data;
+	dectalk.outfifo_head_ptr++;
+	dectalk.outfifo_head_ptr&=0xF;
+	//dectalk_outfifo_check(space->machine); // commented to allow int to clear
 }
 
-READ16_HANDLER( spc_outfifo_writable_r ) // Return state of d-latch 74ls74 @ E64 'lower half' in d0 which indicates whether outfifo is writable
+READ16_HANDLER( spc_semaphore_r ) // Return state of d-latch 74ls74 @ E64 'lower half' in d0 which indicates whether infifo is readable
 {
- return dectalk.outfifo_writable_latch;
+#ifdef VERBOSE
+	//logerror("dsp: read infifo semaphore, returned %d\n", dectalk.infifo_semaphore); // commented due to extreme annoyance factor
+	if (!dectalk.infifo_semaphore) logerror("dsp: read infifo semaphore, returned %d\n", dectalk.infifo_semaphore);
+#endif
+	return dectalk.infifo_semaphore;
 }
 /* end tms32010 i/o handlers */
 
@@ -394,7 +508,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(tms32010_io, ADDRESS_SPACE_IO, 16)
     AM_RANGE(0, 0) AM_WRITE(spc_latch_outfifo_error_stats) // *set* the outfifo_status_r semaphore, and also latch the error bit at D0.
     AM_RANGE(1, 1) AM_READWRITE(spc_infifo_data_r, spc_outfifo_data_w) //read from input fifo, write to sound fifo
-    AM_RANGE(TMS32010_BIO, TMS32010_BIO) AM_READ(spc_outfifo_writable_r) //read output fifo writable status
+    AM_RANGE(TMS32010_BIO, TMS32010_BIO) AM_READ(spc_semaphore_r) //read output fifo writable status
 ADDRESS_MAP_END
 
 /******************************************************************************
@@ -406,13 +520,32 @@ ADDRESS_MAP_END
 /******************************************************************************
  Machine Drivers
 ******************************************************************************/
+static TIMER_CALLBACK( outfifo_read_cb )
+{
+	UINT16 data;
+	const device_config *speaker = devtag_get_device(machine, "dac");
+	data = dectalk_outfifo_r(machine);
+#ifdef VERBOSE
+	if (data!= 0x8000) logerror("sample output: %04X\n", data);
+#endif
+	timer_set(machine, ATTOTIME_IN_HZ(10000), NULL, 0,  outfifo_read_cb);
+	dac_signed_data_16_w( speaker, data );
+}
+
+/* Driver init: stuff that needs setting up which isn't directly affected by reset */
+DRIVER_INIT( dectalk )
+{
+	dectalk_clear_all_fifos(machine);
+	dectalk.simulate_outfifo_error = 0;
+	timer_set(machine, ATTOTIME_IN_HZ(10000), NULL, 0,  outfifo_read_cb);
+}
+
 
 static MACHINE_DRIVER_START(dectalk)
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* E74 20MHz OSC (/2) */
     MDRV_CPU_PROGRAM_MAP(m68k_mem)
     MDRV_CPU_IO_MAP(m68k_io)
-    MDRV_QUANTUM_TIME(HZ(10000))
     MDRV_MACHINE_RESET(dectalk)
     MDRV_DUART68681_ADD( "duart68681", XTAL_3_6864MHz, dectalk_duart68681_config ) /* Y3 3.6864MHz Xtal */
 
@@ -420,15 +553,16 @@ static MACHINE_DRIVER_START(dectalk)
     MDRV_CPU_ADD("dsp", TMS32010, XTAL_20MHz) /* Y1 20MHz xtal */
     MDRV_CPU_PROGRAM_MAP(tms32010_mem)
     MDRV_CPU_IO_MAP(tms32010_io)
-    MDRV_QUANTUM_TIME(HZ(10000))
+    //MDRV_QUANTUM_TIME(HZ(750000))
+	MDRV_QUANTUM_PERFECT_CPU("dsp")
 
     /* video hardware */
     MDRV_DEFAULT_LAYOUT(layout_dectalk) // hack to avoid screenless system crash
 
     /* sound hardware */
-    //MDRV_SPEAKER_STANDARD_MONO("mono")
-    //MDRV_SOUND_ADD("dectalk_snd", SPEAKER, XTAL_10KHz) /* E88 10KHz OSC */
-    //MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+    MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD("dac", DAC, 0) /* E88 10KHz OSC, handled by timer */
+    MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.9)
 
     /* Y2 is a 3.579545 MHz xtal for the dtmf decoder chip */
 
@@ -443,7 +577,7 @@ MACHINE_DRIVER_END
 
 ROM_START( dectalk )
 	ROM_REGION16_BE(0x40000,"maincpu", 0)
-	// dectalk dtc-01 firmware v?.? (probably 1.4 or 2.1) (first half: 23Jul84 tag; second half: 02Jul84 tag), all roms are 27128 eproms
+	// dectalk dtc-01 firmware v2.0 (first half: 23Jul84 tag; second half: 02Jul84 tag), all roms are 27128 eproms
 	ROM_LOAD16_BYTE("dtc01_e5.123", 0x00000, 0x4000, CRC(03e1eefa) SHA1(e586de03e113683c2534fca1f3f40ba391193044)) // Label: "SP8510123E5" @ E8
 	ROM_LOAD16_BYTE("dtc01_e5.119", 0x00001, 0x4000, CRC(af20411f) SHA1(7954bb56b7591f8954403a22d34de31c7d5441ac)) // Label: "SP8510119E5" @ E22
 	ROM_LOAD16_BYTE("dtc01_e5.124", 0x08000, 0x4000, CRC(9edeafcb) SHA1(7724babf4ae5d77c0b4200f608d599058d04b25c)) // Label: "SP8510124E5" @ E7
@@ -462,7 +596,7 @@ ROM_START( dectalk )
 	ROM_LOAD16_BYTE("dtc01_e5.098", 0x38001, 0x4000, CRC(3d8910e7) SHA1(01921e77b46c2d4845023605239c45ffa4a35872)) // Label: "SP8510098E5" @ E15
 
 	ROM_REGION(0x2000,"dsp", 0)
-	// dectalk dtc-01 'klsyn' tms32010 firmware v1.2?, both proms are 82s191 equivalent
+	// dectalk dtc-01 'klsyn' tms32010 firmware v2.0, both proms are 82s191 equivalent
 	ROM_LOAD16_BYTE("dtc01_f4.205", 0x000, 0x800, CRC(ed76a3ad) SHA1(3136bae243ef48721e21c66fde70dab5fc3c21d0)) // Label: "LM8506205F4 // M1-76161-5" @ E70
 	ROM_LOAD16_BYTE("dtc01_f4.204", 0x001, 0x800, CRC(79bb54ff) SHA1(9409f90f7a397b041e4440341f2d7934cb479285)) // Label: "LM8504204F4 // 78S191" @ E69
 
