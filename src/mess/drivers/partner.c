@@ -15,7 +15,8 @@
 #include "machine/wd17xx.h"
 #include "video/i8275.h"
 #include "devices/cassette.h"
-#include "devices/basicdsk.h"
+#include "devices/mflopimg.h"
+#include "formats/basicdsk.h"
 #include "formats/rk_cas.h"
 #include "includes/radio86.h"
 #include "includes/partner.h"
@@ -179,6 +180,14 @@ static MACHINE_DRIVER_START( partner )
 	MDRV_WD1793_ADD("wd1793", partner_wd17xx_interface )
 MACHINE_DRIVER_END
 
+static FLOPPY_OPTIONS_START(partner)
+	FLOPPY_OPTION(partner, "cpm", "Partner disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([80])
+		SECTORS([5])
+		SECTOR_LENGTH([1024])
+		FIRST_SECTOR_ID([1]))
+FLOPPY_OPTIONS_END
 
 static void partner_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
@@ -189,12 +198,9 @@ static void partner_floppy_getinfo(const mess_device_class *devclass, UINT32 sta
 		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(partner_floppy); break;
+		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_partner; break;
 
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "cpm"); break;
-
-		default:										legacybasicdsk_device_getinfo(devclass, state, info); break;
+		default:										floppy_device_getinfo(devclass, state, info); break;
 	}
 }
 

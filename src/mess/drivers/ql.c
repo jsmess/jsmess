@@ -42,7 +42,8 @@
 #include "includes/ql.h"
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/m68000/m68000.h"
-#include "devices/basicdsk.h"
+#include "devices/mflopimg.h"
+#include "formats/basicdsk.h"
 #include "devices/cartslot.h"
 #include "devices/microdrv.h"
 #include "devices/snapquik.h"
@@ -867,54 +868,53 @@ static void ql_serial_getinfo(const mess_device_class *devclass, UINT32 state, u
 	}
 }
 
-static DEVICE_IMAGE_LOAD( ql_floppy )
-{
-	if (image_has_been_created(image))
-		return INIT_FAIL;
-
-	switch (image_length(image))
-	{
-	case 40*1*9*512: // 184320 (SSSD)
-		basicdsk_set_geometry(image, 40, 1, 9, 512, 1, 0, FALSE);
-		return INIT_PASS;
-
-	case 40*2*9*512: // 368640 (DSSD)
-		basicdsk_set_geometry(image, 40, 2, 9, 512, 1, 0, FALSE);
-		return INIT_PASS;
-
-	case 80*2*9*512: // 737280 (DSDD)
-		basicdsk_set_geometry(image, 80, 2, 9, 512, 1, 0, FALSE);
-		return INIT_PASS;
-
-	case 80*2*18*512: // 1474560 (HD)
-		basicdsk_set_geometry(image, 80, 2, 18, 512, 1, 0, FALSE);
-		return INIT_PASS;
-
-	case 80*2*40*512: // 3276800 (ED)
-		basicdsk_set_geometry(image, 80, 2, 40, 512, 1, 0, FALSE);
-		return INIT_PASS;
-	}
-
-	return INIT_FAIL;
-}
+static FLOPPY_OPTIONS_START(ql)
+	FLOPPY_OPTION(ql, "dsk", "SSSD disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([1])
+		TRACKS([40])
+		SECTORS([9])
+		SECTOR_LENGTH([512])
+		FIRST_SECTOR_ID([1]))
+	FLOPPY_OPTION(ql, "dsk", "DSSD disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([40])
+		SECTORS([9])
+		SECTOR_LENGTH([512])
+		FIRST_SECTOR_ID([1]))
+	FLOPPY_OPTION(ql, "dsk", "DSDD disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([80])
+		SECTORS([9])
+		SECTOR_LENGTH([512])
+		FIRST_SECTOR_ID([1]))
+	FLOPPY_OPTION(ql, "dsk", "DSHD disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([80])
+		SECTORS([18])
+		SECTOR_LENGTH([512])
+		FIRST_SECTOR_ID([1]))
+	FLOPPY_OPTION(ql, "dsk", "DSED disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([80])
+		SECTORS([40])
+		SECTOR_LENGTH([512])
+		FIRST_SECTOR_ID([1]))		
+FLOPPY_OPTIONS_END
 
 static void ql_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
+	/* floppy */
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:					info->i = 2; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:						info->load = DEVICE_IMAGE_LOAD_NAME(ql_floppy); break;
+		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_ql; break;
 
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:			strcpy(info->s = device_temp_str(), "dsk"); break;
-
-		default:										legacybasicdsk_device_getinfo(devclass, state, info); break;
+		default:										floppy_device_getinfo(devclass, state, info); break;
 	}
 }
-
 static SYSTEM_CONFIG_START( ql )
 	CONFIG_RAM_DEFAULT	(128 * 1024)
 	CONFIG_RAM			(192 * 1024) // 64K expansion

@@ -25,7 +25,6 @@ extern WRITE8_HANDLER( specialist_keyboard_w );
 extern DRIVER_INIT( specimx );
 extern MACHINE_RESET( specimx );
 extern MACHINE_START ( specimx );
-extern DEVICE_IMAGE_LOAD( specimx_floppy );
 
 extern WRITE8_HANDLER( specimx_select_bank );
 

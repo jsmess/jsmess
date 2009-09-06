@@ -8,29 +8,15 @@
 #include "sound/speaker.h"
 #include "sound/wave.h"
 #include "machine/ctronics.h"
-#include "devices/basicdsk.h"
 #include "devices/cassette.h"
 #include "devices/snapquik.h"
 #include "devices/cartslot.h"
 #include "machine/ay31015.h"
 #include "includes/exidy.h"
+#include "devices/mflopimg.h"
 
 
 static const device_config *exidy_ay31015;
-
-
-static DEVICE_IMAGE_LOAD( exidy_floppy )
-{
-	if (device_load_basicdsk_floppy(image)==INIT_PASS)
-	{
-		/* not correct */
-		basicdsk_set_geometry(image, 80, 2, 9, 512, 1, 0, FALSE);
-		return INIT_PASS;
-	}
-
-	return INIT_FAIL;
-}
-
 
 static UINT8 exidy_fe = 0xff;
 static UINT8 exidy_keyboard_line;
@@ -401,24 +387,6 @@ Z80BIN_EXECUTE( exidy )
 	{
 		if (autorun)
 			cpu_set_reg(cputag_get_cpu(machine, "maincpu"), REG_GENPC, execute_address);
-	}
-}
-
-void exidy_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:			info->i = 4; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:			info->load = DEVICE_IMAGE_LOAD_NAME(exidy_floppy); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:		strcpy(info->s = device_temp_str(), "dsk"); break;
-
-		default:					legacybasicdsk_device_getinfo(devclass, state, info); break;
 	}
 }
 

@@ -11,7 +11,6 @@
 #include "driver.h"
 #include "cpu/i8085/i8085.h"
 #include "devices/cassette.h"
-#include "devices/basicdsk.h"
 #include "machine/mc146818.h"
 #include "machine/wd17xx.h"
 #include "sound/speaker.h"
@@ -183,42 +182,6 @@ MACHINE_RESET ( orion128 )
 	orion128_video_width = SCREEN_WIDTH_384;
 	orion_set_video_mode(machine,384);
 	radio86_init_keyboard();
-}
-
-
-DEVICE_IMAGE_LOAD( orion_floppy )
-{
-	int size;
-
-	if (! image_has_been_created(image))
-		{
-		size = image_length(image);
-
-		switch (size)
-			{
-			case 800*1024:
-				break;
-			case 720*1024:
-				break;
-			default:
-				return INIT_FAIL;
-			}
-		}
-	else
-		return INIT_FAIL;
-
-	if (device_load_basicdsk_floppy (image) != INIT_PASS)
-		return INIT_FAIL;
-
-	if (size==800*1024) 
-	{
-		basicdsk_set_geometry (image, 80, 2, 5, 1024, 1, 0, FALSE);
-	} 
-	else 
-	{
-		basicdsk_set_geometry (image, 80, 2, 9, 512, 1, 0, FALSE);
-	}
-	return INIT_PASS;
 }
 
 static WRITE8_HANDLER ( orion_disk_control_w )

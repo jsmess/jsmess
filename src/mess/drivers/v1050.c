@@ -113,7 +113,6 @@ Notes:
 #include "cpu/m6502/m6502.h"
 #include "cpu/mcs48/mcs48.h"
 #include "formats/basicdsk.h"
-#include "devices/basicdsk.h"
 #include "devices/mflopimg.h"
 #include "machine/ctronics.h"
 #include "machine/i8214.h"

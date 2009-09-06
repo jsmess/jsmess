@@ -32,7 +32,6 @@ extern READ8_HANDLER( b2m_palette_r );
 extern WRITE8_HANDLER( b2m_palette_w );
 extern READ8_HANDLER( b2m_localmachine_r );
 extern WRITE8_HANDLER( b2m_localmachine_w );
-extern DEVICE_IMAGE_LOAD( b2m_floppy );
 
 #define SOUND_B2M		DEVICE_GET_INFO_NAME( b2m_sound )
 

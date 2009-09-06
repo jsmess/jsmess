@@ -21,7 +21,6 @@
 #include "machine/ctronics.h"
 #include "machine/i8271.h"
 #include "machine/6522via.h"
-#include "devices/basicdsk.h"
 #include "devices/flopdrv.h"
 #include "devices/cassette.h"
 #include "devices/snapquik.h"
@@ -267,23 +266,6 @@ QUICKLOAD_LOAD(atom)
 	free(quickload_data);
 	return INIT_PASS;
 }
-
-
-/* load floppy */
-DEVICE_IMAGE_LOAD( atom_floppy )
-{
-	if (device_load_basicdsk_floppy(image)==INIT_PASS)
-	{
-		/* sector id's 0-9 */
-		/* drive, tracks, heads, sectors per track, sector length, dir_sector, dir_length, first sector id */
-		basicdsk_set_geometry(image, 80, 1, 10, 256, 0, 0, FALSE);
-
-		return INIT_PASS;
-	}
-
-	return INIT_PASS;
-}
-
 
 READ8_DEVICE_HANDLER (atom_8255_porta_r )
 {

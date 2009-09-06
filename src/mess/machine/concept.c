@@ -11,7 +11,6 @@
 //#include "machine/6551.h"
 #include "machine/wd17xx.h"
 #include "cpu/m68000/m68000.h"
-#include "devices/basicdsk.h"
 #include "includes/corvushd.h"
 
 #define VERBOSE 1

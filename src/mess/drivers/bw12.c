@@ -26,7 +26,8 @@
 #include "driver.h"
 #include "includes/bw12.h"
 #include "cpu/z80/z80.h"
-#include "devices/basicdsk.h"
+#include "devices/mflopimg.h"
+#include "formats/basicdsk.h"
 #include "machine/6821pia.h"
 #include "machine/ctronics.h"
 #include "machine/nec765.h"
@@ -775,65 +776,53 @@ ROM_END
 #define rom_bw14 rom_bw12
 
 /* System Configurations */
-
-static DEVICE_IMAGE_LOAD( bw12_floppy )
-{
-	if (image_has_been_created(image))
-	{
-		return INIT_FAIL;
-	}
-
-	if (DEVICE_IMAGE_LOAD_NAME(basicdsk_floppy)(image) == INIT_PASS)
-	{
-		switch (image_length(image))
-		{
-		case 40*1*18*256: /* 180KB BW 12 SSDD */
-			basicdsk_set_geometry(image, 40, 1, 18, 256, 0, 0, FALSE);
-			break;
-		
-		case 40*2*18*256: /* 360KB BW 14 DSDD */
-			basicdsk_set_geometry(image, 40, 2, 18, 256, 0, 0, FALSE);
-			break;
-
-		case 40*1*17*256: /* SVI-328 SSDD */
-			basicdsk_set_geometry(image, 40, 1, 17, 256, 0, 0, FALSE);
-			break;
-
-		case 40*2*17*256: /* SVI-328 DSDD */
-			basicdsk_set_geometry(image, 40, 2, 17, 256, 0, 0, FALSE);
-			break;
-
-		case 40*1*10*512: /* Kaypro II SSDD */
-			basicdsk_set_geometry(image, 40, 1, 10, 512, 0, 0, FALSE);
-			break;
-
-		default:
-			return INIT_FAIL;
-		}
-
-		return INIT_PASS;
-	}
-
-	return INIT_FAIL;
-}
+static FLOPPY_OPTIONS_START(bw12)
+	FLOPPY_OPTION(bw12, "dsk", "180KB BW 12 SSDD", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([1])
+		TRACKS([40])
+		SECTORS([18])
+		SECTOR_LENGTH([256])
+		FIRST_SECTOR_ID([0]))
+	FLOPPY_OPTION(bw12, "dsk", "360KB BW 14 DSDD", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([40])
+		SECTORS([18])
+		SECTOR_LENGTH([256])
+		FIRST_SECTOR_ID([0]))
+	FLOPPY_OPTION(bw12, "dsk", "SVI-328 SSDD", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([1])
+		TRACKS([40])
+		SECTORS([17])
+		SECTOR_LENGTH([256])
+		FIRST_SECTOR_ID([0]))
+	FLOPPY_OPTION(bw12, "dsk", "SVI-328 DSDD", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([40])
+		SECTORS([17])
+		SECTOR_LENGTH([256])
+		FIRST_SECTOR_ID([0]))
+	FLOPPY_OPTION(bw12, "dsk", "Kaypro II SSDD", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([1])
+		TRACKS([40])
+		SECTORS([10])
+		SECTOR_LENGTH([512])
+		FIRST_SECTOR_ID([0]))
+FLOPPY_OPTIONS_END
 
 static void bw12_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
-	switch (state)
+	/* floppy */
+	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:					info->i = 2; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:						info->load = DEVICE_IMAGE_LOAD_NAME(bw12_floppy); break;
+		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_bw12; break;
 
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:			strcpy(info->s = device_temp_str(), "dsk"); break;
-
-		default:										legacybasicdsk_device_getinfo(devclass, state, info); break;
+		default:										floppy_device_getinfo(devclass, state, info); break;
 	}
 }
-
 static SYSTEM_CONFIG_START( bw12 )
 	CONFIG_RAM_DEFAULT( 64 * 1024 )
 	CONFIG_DEVICE( bw12_floppy_getinfo )

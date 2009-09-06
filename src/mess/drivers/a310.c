@@ -31,7 +31,6 @@
 
 #include "driver.h"
 #include "machine/wd17xx.h"
-#include "devices/basicdsk.h"
 #include "cpu/arm/arm.h"
 #include "sound/dac.h"
 #include "includes/archimds.h"

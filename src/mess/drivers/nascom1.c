@@ -59,7 +59,8 @@ Nascom Memory map
 #include "machine/z80pio.h"
 
 /* Devices */
-#include "devices/basicdsk.h"
+#include "devices/mflopimg.h"
+#include "formats/basicdsk.h"
 #include "devices/cartslot.h"
 #include "devices/cassette.h"
 
@@ -384,6 +385,20 @@ ROM_END
 //	}
 //}
 
+static FLOPPY_OPTIONS_START(nascom2)
+	FLOPPY_OPTION(nascom2, "dsk", "Nascom 2 SS disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([1])
+		TRACKS([80])
+		SECTORS([16])
+		SECTOR_LENGTH([256])
+		FIRST_SECTOR_ID([1]))
+	FLOPPY_OPTION(nascom2, "dsk", "Nascom 2 DS disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([80])
+		SECTORS([16])
+		SECTOR_LENGTH([256])
+		FIRST_SECTOR_ID([1]))
+FLOPPY_OPTIONS_END
 
 static void nascom2_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
@@ -394,15 +409,11 @@ static void nascom2_floppy_getinfo(const mess_device_class *devclass, UINT32 sta
 		case MESS_DEVINFO_INT_COUNT:							info->i = 4; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(nascom2_floppy); break;
+		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_nascom2; break;
 
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "dsk"); break;
-
-		default:										legacybasicdsk_device_getinfo(devclass, state, info); break;
+		default:										floppy_device_getinfo(devclass, state, info); break;
 	}
 }
-
 
 static SYSTEM_CONFIG_START( nascom1 )
 	CONFIG_RAM(1 * 1024)

@@ -66,7 +66,8 @@ Notes:
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "includes/sg1000.h"
-#include "devices/basicdsk.h"
+#include "devices/mflopimg.h"
+#include "formats/basicdsk.h"
 #include "devices/cartslot.h"
 #include "devices/cassette.h"
 #include "devices/printer.h"
@@ -979,40 +980,27 @@ ROM_START( sf7000 )
 ROM_END
 
 /* System Configuration */
-
-static DEVICE_IMAGE_LOAD( sf7000_floppy )
-{
-	if (image_has_been_created(image))
-		return INIT_FAIL;
-
-	if (image_length(image) == 40*1*16*256) // 160K
-	{
-		if (DEVICE_IMAGE_LOAD_NAME(basicdsk_floppy)(image) == INIT_PASS)
-		{
-			/* image, tracks, sides, sectors per track, sector length, first sector id, offset of track 0, track skipping */
-			basicdsk_set_geometry(image, 40, 1, 16, 256, 1, 0, FALSE);
-
-			return INIT_PASS;
-		}
-	}
-
-	return INIT_FAIL;
-}
+static FLOPPY_OPTIONS_START(sf7000)
+	FLOPPY_OPTION(sf7000, "sf7", "SF7 disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([1])
+		TRACKS([40])
+		SECTORS([16])
+		SECTOR_LENGTH([256])
+		FIRST_SECTOR_ID([1]))
+FLOPPY_OPTIONS_END
 
 static void sf7000_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
+	/* floppy */
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:					info->i = 1; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:						info->load = DEVICE_IMAGE_LOAD_NAME(sf7000_floppy); break;
+		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_sf7000; break;
 
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:			strcpy(info->s = device_temp_str(), "sf7"); break;
-
-		default:										legacybasicdsk_device_getinfo(devclass, state, info); break;
+		default:										floppy_device_getinfo(devclass, state, info); break;
 	}
 }
 

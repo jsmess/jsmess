@@ -17,7 +17,8 @@
 #include "includes/bbc.h"
 #include "machine/upd7002.h"
 #include "machine/ctronics.h"
-#include "devices/basicdsk.h"
+#include "devices/mflopimg.h"
+#include "formats/basicdsk.h"
 #include "devices/cartslot.h"
 #include "devices/cassette.h"
 #include "formats/uef_cas.h"
@@ -915,6 +916,15 @@ static MACHINE_DRIVER_START( bbcm )
 	MDRV_IMPORT_FROM(bbc_cartslot)
 MACHINE_DRIVER_END
 
+static FLOPPY_OPTIONS_START(bbc)
+	FLOPPY_OPTION(bbc, "ssd,bbc,img", "BBC disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([1])
+		TRACKS([80])
+		SECTORS([10])
+		SECTOR_LENGTH([256])
+		FIRST_SECTOR_ID([0]))
+FLOPPY_OPTIONS_END
+
 static void bbc_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
@@ -924,21 +934,15 @@ static void bbc_floppy_getinfo(const mess_device_class *devclass, UINT32 state, 
 		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(bbc_floppy); break;
+		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_bbc; break;
 
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "ssd,bbc,img"); break;
-
-		default:										legacybasicdsk_device_getinfo(devclass, state, info); break;
+		default:										floppy_device_getinfo(devclass, state, info); break;
 	}
 }
-
 
 static SYSTEM_CONFIG_START(bbc)
 	CONFIG_DEVICE(bbc_floppy_getinfo)
 SYSTEM_CONFIG_END
-
-
 
 /*     YEAR  NAME      PARENT    COMPAT MACHINE   INPUT  INIT      CONFIG   COMPANY  FULLNAME */
 COMP ( 1981, bbca,	   0,		 0,		bbca,     bbca,   bbc,     0,		"Acorn","BBC Micro Model A" , 0)

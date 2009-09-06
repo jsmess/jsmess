@@ -33,7 +33,6 @@ coco3h	1.2	2.0		1.1
 #include "machine/ds1315.h"
 #include "machine/6883sam.h"
 #include "includes/coco.h"
-#include "devices/basicdsk.h"
 #include "machine/wd17xx.h"
 #include "machine/6551.h"
 #include "formats/coco_dsk.h"

@@ -10,7 +10,6 @@
 #include "driver.h"
 #include "cpu/i8085/i8085.h"
 #include "devices/cassette.h"
-#include "devices/basicdsk.h"
 #include "machine/i8255a.h"
 #include "machine/pit8253.h"
 #include "machine/wd17xx.h"
@@ -359,33 +358,6 @@ MACHINE_RESET(b2m)
 	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), b2m_irq_callback);
 	b2m_set_bank(machine, 7);
 }
-
-DEVICE_IMAGE_LOAD( b2m_floppy )
-{
-	int size;
-
-	if (! image_has_been_created(image))
-		{
-		size = image_length(image);
-
-		switch (size)
-			{
-			case 800*1024:
-				break;
-			default:
-				return INIT_FAIL;
-			}
-		}
-	else
-		return INIT_FAIL;
-
-	if (device_load_basicdsk_floppy (image) != INIT_PASS)
-		return INIT_FAIL;
-
-	basicdsk_set_geometry (image, 80, 2, 5, 1024, 1, 0, FALSE);	
-	return INIT_PASS;
-}
-
 
 static STREAM_UPDATE( b2m_sh_update )
 {

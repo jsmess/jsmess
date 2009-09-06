@@ -24,7 +24,6 @@ MACHINE_START( exidy );
 MACHINE_RESET( exidyd );
 MACHINE_RESET( exidy );
 Z80BIN_EXECUTE( exidy );
-void exidy_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);
 
 
 /*----------- defined in video/exidy.c -----------*/

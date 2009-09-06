@@ -29,9 +29,6 @@ WRITE8_HANDLER( kayproii_baud_b_w );
 WRITE8_HANDLER( kaypro2x_baud_a_w );
 WRITE8_HANDLER( kaypro2x_system_port_w );
 
-void kayproii_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);
-void kaypro2x_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);
-
 MACHINE_RESET( kayproii );
 MACHINE_RESET( kaypro2x );
 

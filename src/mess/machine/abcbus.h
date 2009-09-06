@@ -80,6 +80,8 @@
 #ifndef __ABCBUS__
 #define __ABCBUS__
 
+#include "formats/flopimg.h"
+
 #define DEVINFO_FCT_ABCBUS_CARD_SELECT	DEVINFO_FCT_DEVICE_SPECIFIC
 
 enum
@@ -116,6 +118,6 @@ void abcbus_init(running_machine *machine, const char *cputag, const abcbus_dais
 WRITE8_HANDLER( abcbus_channel_w );
 READ8_HANDLER( abcbus_reset_r );
 
-DEVICE_IMAGE_LOAD( abc_floppy );
+FLOPPY_OPTIONS_EXTERN(abc80);
 
 #endif

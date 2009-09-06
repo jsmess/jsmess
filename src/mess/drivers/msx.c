@@ -286,7 +286,7 @@ PCB Layouts missing
 #include "machine/ctronics.h"
 #include "includes/msx_slot.h"
 #include "includes/msx.h"
-#include "devices/basicdsk.h"
+#include "devices/mflopimg.h"
 #include "devices/cartslot.h"
 #include "devices/cassette.h"
 #include "formats/fmsx_cas.h"
@@ -3658,15 +3658,11 @@ static void msx_floppy_getinfo(const mess_device_class *devclass, UINT32 state, 
 		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(msx_floppy); break;
+		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_msx; break;
 
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "dsk"); break;
-
-		default:										legacybasicdsk_device_getinfo(devclass, state, info); break;
+		default:										floppy_device_getinfo(devclass, state, info); break;
 	}
 }
-
 
 static SYSTEM_CONFIG_START(msx)
 	CONFIG_DEVICE(msx_floppy_getinfo)

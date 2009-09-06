@@ -32,7 +32,6 @@
 #include "includes/prof80.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
-#include "devices/basicdsk.h"
 #include "video/mc6845.h"
 #include "machine/i8255a.h"
 #include "machine/nec765.h"
@@ -40,6 +39,9 @@
 #include "machine/z80sti.h"
 #include "machine/ctronics.h"
 #include "machine/rescap.h"
+#include "devices/mflopimg.h"
+#include "formats/basicdsk.h"
+
 
 INLINE const device_config *get_floppy_image(running_machine *machine, int drive)
 {
@@ -1253,32 +1255,24 @@ ROM_START( prof80 )
 ROM_END
 
 /* System Configurations */
-
-static DEVICE_IMAGE_LOAD( prof80_floppy )
-{
-	if (image_has_been_created(image))
-		return INIT_FAIL;
-
-	return INIT_FAIL;
-}
+static FLOPPY_OPTIONS_START(prof80)
+	// dsk
+FLOPPY_OPTIONS_END
 
 static void prof80_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
+	/* floppy */
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:					info->i = 2; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 4; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:						info->load = DEVICE_IMAGE_LOAD_NAME(prof80_floppy); break;
+		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_prof80; break;
 
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:			strcpy(info->s = device_temp_str(), "dsk"); break;
-
-		default:										legacybasicdsk_device_getinfo(devclass, state, info); break;
+		default:										floppy_device_getinfo(devclass, state, info); break;
 	}
 }
-
 static SYSTEM_CONFIG_START( prof80 )
 	CONFIG_RAM_DEFAULT	(128 * 1024)
 	CONFIG_DEVICE(prof80_floppy_getinfo)

@@ -36,7 +36,8 @@
 #include "machine/msm8251.h"
 #include "machine/wd17xx.h"
 #include "machine/pit8253.h"
-#include "devices/basicdsk.h"
+#include "devices/mflopimg.h"
+#include "formats/basicdsk.h"
 #include "video/msm6255.h"
 
 
@@ -259,30 +260,6 @@ static DEVICE_IMAGE_LOAD( bw2_serial )
 
 
 /* Floppy */
-
-static DEVICE_IMAGE_LOAD( bw2_floppy )
-{
-	if (image_has_been_created(image)) {
-		return INIT_FAIL;
-	}
-
-	if (device_load_basicdsk_floppy(image) == INIT_PASS)
-	{
-		switch (image_length(image))
-		{
-		case 80*1*17*256: // 340K
-			basicdsk_set_geometry(image, 80, 1, 17, 256, 0, 0, FALSE);
-			return INIT_PASS;
-
-		case 80*1*18*256: // 360K
-			basicdsk_set_geometry(image, 80, 1, 18, 256, 0, 0, FALSE);
-			return INIT_PASS;
-		}
-	}
-
-	return INIT_FAIL;
-}
-
 static WD17XX_CALLBACK( bw2_wd17xx_callback )
 {
 	switch(state)
@@ -862,32 +839,35 @@ ROM_START( bw2 )
 	ROM_LOAD("ramcard-10.bin", 0x0000, 0x4000, CRC(68cde1ba) SHA1(a776a27d64f7b857565594beb63aa2cd692dcf04))
 ROM_END
 
+static FLOPPY_OPTIONS_START(bw2)
+	FLOPPY_OPTION(bw2, "dsk", "BW2 340K disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([1])
+		TRACKS([80])
+		SECTORS([17])
+		SECTOR_LENGTH([256])
+		FIRST_SECTOR_ID([0]))
+	FLOPPY_OPTION(bw2, "dsk", "BW2 360K disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([1])
+		TRACKS([80])
+		SECTORS([18])
+		SECTOR_LENGTH([256])
+		FIRST_SECTOR_ID([0]))		
+FLOPPY_OPTIONS_END
+
 static void bw2_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:
-			info->i = 2;
-			break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:
-			info->load = DEVICE_IMAGE_LOAD_NAME(bw2_floppy);
-			break;
+		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_bw2; break;
 
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:
-			strcpy(info->s = device_temp_str(), "dsk");
-			break;
-
-		default:
-			legacybasicdsk_device_getinfo(devclass, state, info);
-			break;
+		default:										floppy_device_getinfo(devclass, state, info); break;
 	}
 }
-
 static void bw2_serial_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* serial */

@@ -154,67 +154,6 @@ WRITE8_HANDLER ( mbee_fdc_motor_w )
 	wd17xx_set_density(mbee_fdc, (data & 8) ? 1 : 0);
 }
 
-static DEVICE_IMAGE_LOAD( mbee_floppy )
-{
-	if (device_load_basicdsk_floppy(image)==INIT_PASS)
-	{
-		if (!mame_stricmp(image_filetype(image), "ss80"))
-		{
-			basicdsk_set_geometry(image, 80, 1, 10, 512, 1, 0, FALSE);
-			return INIT_PASS;
-		}
-		else
-		if (!mame_stricmp(image_filetype(image), "ds40"))
-		{
-			basicdsk_set_geometry(image, 80, 2, 10, 512, 1, 0, FALSE);
-			return INIT_PASS;
-		}
-		else
-		if (!mame_stricmp(image_filetype(image), "ds80"))
-		{
-			basicdsk_set_geometry(image, 160, 2, 10, 512, 1, 0, FALSE);
-			return INIT_PASS;
-		}
-		else
-		if (!mame_stricmp(image_filetype(image), "ds84"))
-		{
-			basicdsk_set_geometry(image, 168, 2, 10, 512, 1, 0, FALSE);
-			return INIT_PASS;
-		}
-		else
-		if (!mame_stricmp(image_filetype(image), "dsk"))
-		{
-			return INIT_FAIL;	// not handled yet - CPC-EMU formatted image
-		}
-		else
-		if (!mame_stricmp(image_filetype(image), "img"))
-		{
-			return INIT_FAIL;	// not handled - not investigated yet
-		}
-	}
-
-	return INIT_FAIL;
-}
-
-void mbee_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:		info->i = 2; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:		info->load = DEVICE_IMAGE_LOAD_NAME(mbee_floppy); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:	strcpy(info->s = device_temp_str(), "ss80,ds40,ds80,ds84,dsk,img"); break;
-
-		default:				legacybasicdsk_device_getinfo(devclass, state, info); break;
-	}
-}
-
-
 /***********************************************************
 
 	Machine

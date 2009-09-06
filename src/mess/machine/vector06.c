@@ -12,7 +12,6 @@
 #include "machine/i8255a.h"
 #include "machine/wd17xx.h"
 #include "devices/cassette.h"
-#include "devices/basicdsk.h"
 #include "includes/vector06.h"
 
 UINT8 vector06_keyboard_mask;
@@ -175,33 +174,6 @@ WRITE8_HANDLER(vector_disc_w)
 	wd17xx_set_side (fdc,((data & 4) >> 2) ^ 1);
  	wd17xx_set_drive(fdc,data & 1);					
 }
-
-DEVICE_IMAGE_LOAD( vector_floppy )
-{
-	int size;
-
-	if (! image_has_been_created(image))
-		{
-		size = image_length(image);
-
-		switch (size)
-			{
-			case 820*1024:
-				break;
-			default:
-				return INIT_FAIL;
-			}
-		}
-	else
-		return INIT_FAIL;
-
-	if (device_load_basicdsk_floppy (image) != INIT_PASS)
-		return INIT_FAIL;
-
-	basicdsk_set_geometry (image, 82, 2, 5, 1024, 1, 0, FALSE);	
-	return INIT_PASS;
-}
-
 
 MACHINE_START( vector06 )
 {

@@ -66,6 +66,8 @@
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 #include "sound/wave.h"
+#include "devices/mflopimg.h"
+#include "formats/basicdsk.h"
 #include "includes/mbee.h"
 
 size_t mbee_size;
@@ -667,6 +669,47 @@ ROM_END
   Game driver(s)
 
 ***************************************************************************/
+static FLOPPY_OPTIONS_START(mbee)
+	FLOPPY_OPTION(mbee, "ss80", "SS80 disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([1])
+		TRACKS([80])
+		SECTORS([10])
+		SECTOR_LENGTH([512])
+		FIRST_SECTOR_ID([1]))
+	FLOPPY_OPTION(mbee, "ds40", "DS40 disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([80])
+		SECTORS([10])
+		SECTOR_LENGTH([512])
+		FIRST_SECTOR_ID([1]))
+	FLOPPY_OPTION(mbee, "ds80", "DS80 disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([160])
+		SECTORS([10])
+		SECTOR_LENGTH([512])
+		FIRST_SECTOR_ID([1]))
+	FLOPPY_OPTION(mbee, "ds84", "DS84 disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([168])
+		SECTORS([10])
+		SECTOR_LENGTH([512])
+		FIRST_SECTOR_ID([1]))						
+FLOPPY_OPTIONS_END
+
+static void mbee_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+{
+	/* floppy */
+	switch(state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_mbee; break;
+
+		default:										floppy_device_getinfo(devclass, state, info); break;
+	}
+}
 
 static SYSTEM_CONFIG_START(mbeeic)
 	CONFIG_DEVICE(mbee_floppy_getinfo)

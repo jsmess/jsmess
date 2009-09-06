@@ -12,7 +12,6 @@
 #include "cpu/i8085/i8085.h"
 #include "sound/dac.h"
 #include "devices/cassette.h"
-#include "devices/basicdsk.h"
 #include "machine/i8255a.h"
 #include "machine/pit8253.h"
 #include "machine/wd17xx.h"
@@ -293,42 +292,6 @@ WRITE8_HANDLER( specimx_disk_ctrl_w )
 			
   }  
 }
-
-static unsigned long specimx_calcoffset(UINT8 t, UINT8 h, UINT8 s,
-	UINT8 tracks, UINT8 heads, UINT8 sec_per_track, UINT16 sector_length, UINT8 first_sector_id, UINT16 offset_track_zero)
-{
-	unsigned long o;	
-    o = (t * 1024 * 5 * 2) + (h * 1024 * 5) + 1024 * (s-1);
-	return o;
-}
-
-DEVICE_IMAGE_LOAD( specimx_floppy )
-{
-	int size;
-
-	if (! image_has_been_created(image))
-		{
-		size = image_length(image);
-
-		switch (size)
-			{
-			case 800*1024:
-				break;
-			default:
-				return INIT_FAIL;
-			}
-		}
-	else
-		return INIT_FAIL;
-
-	if (device_load_basicdsk_floppy (image) != INIT_PASS)
-		return INIT_FAIL;
-
-	basicdsk_set_geometry (image, 80, 2, 6, 1024, 1, 0, FALSE);
-	basicdsk_set_calcoffset(image, specimx_calcoffset);
-	return INIT_PASS;
-}
-
 
 /*
 	Erik

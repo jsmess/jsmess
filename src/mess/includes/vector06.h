@@ -32,8 +32,6 @@ extern UINT8 vector06_keyboard_mask;
 extern UINT8 vector_color_index;
 extern UINT8 vector_video_mode;
 
-extern DEVICE_IMAGE_LOAD( vector_floppy );
-
 /*----------- defined in video/vector06.c -----------*/
 
 extern PALETTE_INIT( vector06 );

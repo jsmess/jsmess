@@ -89,7 +89,6 @@
 #include "includes/pc8801.h"
 #include "machine/nec765.h"
 #include "includes/d88.h"
-#include "devices/basicdsk.h"
 #include "sound/2203intf.h"
 
 static const gfx_layout char_layout_40L_h =

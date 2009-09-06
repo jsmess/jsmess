@@ -99,7 +99,8 @@ Some bugs left :
 
 /* Devices */
 #include "devices/dsk.h"		/* for CPCEMU style disk images */
-#include "devices/basicdsk.h"   /* for 720k MSX disk images (Aleste supports these) */
+#include "devices/mflopimg.h"
+#include "formats/basicdsk.h"
 #include "includes/msx_slot.h"
 #include "includes/msx.h"  /* MSX floppy device load */
 #include "devices/snapquik.h"
@@ -1137,10 +1138,11 @@ static void aleste_floppy_getinfo(const mess_device_class *devclass, UINT32 stat
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(msx_floppy); break;
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "dsk"); break;
 
-		default:										legacybasicdsk_device_getinfo(devclass, state, info); break;
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_msx; break;
+
+		default:										floppy_device_getinfo(devclass, state, info); break;
 	}
 }
 

@@ -51,8 +51,6 @@ MACHINE_RESET( kc85_4 );
 MACHINE_RESET( kc85_4d );
 
 /* cassette */
-DEVICE_IMAGE_LOAD( kc85_floppy );
-
 READ8_HANDLER(kc85_4_84_r);
 WRITE8_HANDLER(kc85_4_84_w);
 

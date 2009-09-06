@@ -42,7 +42,6 @@
 #include "includes/xor100.h"
 #include "cpu/z80/z80.h"
 #include "formats/basicdsk.h"
-#include "devices/basicdsk.h"
 #include "devices/mflopimg.h"
 #include "devices/cassette.h"
 #include "machine/com8116.h"

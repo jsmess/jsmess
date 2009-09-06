@@ -20,7 +20,6 @@
 #include "machine/i8271.h"
 #include "machine/mc146818.h"
 #include "machine/ctronics.h"
-#include "devices/basicdsk.h"
 #include "devices/cassette.h"
 
 /* BBC Memory Size */
@@ -1458,28 +1457,6 @@ WRITE8_HANDLER ( BBC_SerialULA_w )
 {
 	BBC_Cassette_motor(space->machine, (data & 0x80) >> 7);
 }
-
-
-
-
-/**************************************
-   load floppy disc
-***************************************/
-
-DEVICE_IMAGE_LOAD( bbc_floppy )
-{
-	if (device_load_basicdsk_floppy(image)==INIT_PASS)
-	{
-		/* sector id's 0-9 */
-		/* drive, tracks, heads, sectors per track, sector length, dir_sector, dir_length, first sector id */
-		basicdsk_set_geometry(image, 80, 1, 10, 256, 0, 0, FALSE);
-
-		return INIT_PASS;
-	}
-
-	return INIT_FAIL;
-}
-
 
 /**************************************
    i8271 disc control function

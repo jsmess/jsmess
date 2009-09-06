@@ -41,6 +41,8 @@
 #include "machine/kay_kbd.h"
 #include "sound/beep.h"
 #include "devices/snapquik.h"
+#include "devices/mflopimg.h"
+#include "formats/basicdsk.h"
 #include "includes/kaypro.h"
 
 
@@ -307,6 +309,53 @@ ROM_START(kaypro10)
 	ROM_LOAD("81-817.u31",   0x0000, 0x1000, CRC(5f72da5b) SHA1(8a597000cce1a7e184abfb7bebcb564c6bf24fb7) )
 ROM_END
 
+static FLOPPY_OPTIONS_START(kayproii)
+	FLOPPY_OPTION(kayproii, "img", "Kaypro II disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([1])
+		TRACKS([40])
+		SECTORS([10])
+		SECTOR_LENGTH([512])
+		FIRST_SECTOR_ID([0]))
+FLOPPY_OPTIONS_END
+
+static FLOPPY_OPTIONS_START(kaypro2x)
+	FLOPPY_OPTION(kaypro2x, "img", "Kaypro 2x disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([80])
+		SECTORS([10])
+		SECTOR_LENGTH([512])
+		FIRST_SECTOR_ID([0]))
+FLOPPY_OPTIONS_END
+
+static void kayproii_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+{
+	/* floppy */
+	switch(state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_kayproii; break;
+
+		default:										floppy_device_getinfo(devclass, state, info); break;
+	}
+}
+
+static void kaypro2x_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+{
+	/* floppy */
+	switch(state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_kaypro2x; break;
+
+		default:										floppy_device_getinfo(devclass, state, info); break;
+	}
+}
 
 static SYSTEM_CONFIG_START(kayproii)
 	CONFIG_DEVICE(kayproii_floppy_getinfo)

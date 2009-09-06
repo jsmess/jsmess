@@ -9,7 +9,6 @@
 
 #include "driver.h"
 #include "includes/samcoupe.h"
-#include "devices/basicdsk.h"
 #include "machine/msm6242.h"
 
 

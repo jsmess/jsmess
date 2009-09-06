@@ -14,7 +14,6 @@
 #include "devices/cassette.h"
 #include "machine/ctronics.h"
 #include "sound/speaker.h"
-#include "devices/basicdsk.h"
 
 
 /*----------- defined in drivers/mbee.c -----------*/
@@ -32,7 +31,6 @@ READ8_HANDLER ( mbee_fdc_status_r );
 READ8_DEVICE_HANDLER( mbee_pio_r );
 WRITE8_HANDLER ( mbee_fdc_motor_w );
 WRITE8_DEVICE_HANDLER( mbee_pio_w );
-void mbee_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);
 INTERRUPT_GEN( mbee_interrupt );
 Z80BIN_EXECUTE( mbee );
 QUICKLOAD_LOAD( mbee );

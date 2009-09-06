@@ -6,8 +6,6 @@
 #include "devices/cassette.h"
 #include "sound/ay8910.h"
 #include "sound/speaker.h"
-#include "formats/tzx_cas.h"
-#include "devices/basicdsk.h"
 #include "machine/wd17xx.h"
 #include "machine/beta.h"
 

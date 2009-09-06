@@ -9,7 +9,8 @@
 #include "driver.h"
 #include "cpu/m6800/m6800.h"
 #include "video/mc6845.h"
-#include "devices/basicdsk.h"
+#include "devices/mflopimg.h"
+#include "formats/basicdsk.h"
 #include "machine/nec765.h"
 
 static UINT8 rom_page;
@@ -493,46 +494,30 @@ static MACHINE_DRIVER_START( pyl601a )
 	MDRV_MC6845_ADD("crtc", MC6845, XTAL_2MHz, pyl601a_crtc6845_interface)
 MACHINE_DRIVER_END
 
-static DEVICE_IMAGE_LOAD( pyldin_floppy )
-{
-	if (image_has_been_created(image))
-	{
-		return INIT_FAIL;
-	}
-
-	if (DEVICE_IMAGE_LOAD_NAME(basicdsk_floppy)(image) == INIT_PASS)
-	{
-		switch (image_length(image))
-		{
-		case 720*1024: 
-			basicdsk_set_geometry(image, 80, 2, 9, 512, 1, 0, FALSE);
-			break;
-		default:
-			return INIT_FAIL;
-		}
-
-		return INIT_PASS;
-	}
-
-	return INIT_FAIL;
-}  
+static FLOPPY_OPTIONS_START(pyldin)
+	FLOPPY_OPTION(pyldin, "img", "Pyldin disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([80])
+		SECTORS([9])
+		SECTOR_LENGTH([512])
+		FIRST_SECTOR_ID([1]))
+FLOPPY_OPTIONS_END
 
 static void pyldin_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
-	switch (state)
+	/* floppy */
+	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:					info->i = 2; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:						info->load = DEVICE_IMAGE_LOAD_NAME(pyldin_floppy); break;
+		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_pyldin; break;
 
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:			strcpy(info->s = device_temp_str(), "img"); break;
-
-		default:										legacybasicdsk_device_getinfo(devclass, state, info); break;
+		default:										floppy_device_getinfo(devclass, state, info); break;
 	}
 }
+
 static SYSTEM_CONFIG_START(pyl601)
 	CONFIG_RAM_DEFAULT((64 +512) * 1024)
 	CONFIG_DEVICE( pyldin_floppy_getinfo )

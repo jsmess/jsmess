@@ -1,7 +1,6 @@
 #include "driver.h"
 #include "includes/mikromik.h"
 #include "formats/basicdsk.h"
-#include "devices/basicdsk.h"
 #include "devices/mflopimg.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/8237dma.h"

@@ -17,7 +17,8 @@
 #include "includes/msx.h"
 #include "machine/tc8521.h"
 #include "machine/wd17xx.h"
-#include "devices/basicdsk.h"
+#include "devices/mflopimg.h"
+#include "formats/basicdsk.h"
 #include "video/tms9928a.h"
 #include "cpu/z80/z80.h"
 #include "video/v9938.h"
@@ -722,34 +723,20 @@ static WD17XX_CALLBACK( msx_wd179x_int )
 
 const wd17xx_interface msx_wd17xx_interface = { msx_wd179x_int, NULL };
 
-DEVICE_IMAGE_LOAD( msx_floppy )
-{
-	int size, heads = 2;
-
-	if (! image_has_been_created(image))
-		{
-		size = image_length(image);
-
-		switch (size)
-			{
-			case 360*1024:
-				heads = 1;
-			case 720*1024:
-				break;
-			default:
-				return INIT_FAIL;
-			}
-		}
-	else
-		return INIT_FAIL;
-
-	if (device_load_basicdsk_floppy (image) != INIT_PASS)
-		return INIT_FAIL;
-
-	basicdsk_set_geometry (image, 80, heads, 9, 512, 1, 0, FALSE);
-
-	return INIT_PASS;
-}
+FLOPPY_OPTIONS_START(msx)
+	FLOPPY_OPTION(msx, "dsk", "MSX SS", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([1])
+		TRACKS([80])
+		SECTORS([9])
+		SECTOR_LENGTH([512])
+		FIRST_SECTOR_ID([1]))
+	FLOPPY_OPTION(msx, "dsk", "MSX DS", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([80])
+		SECTORS([9])
+		SECTOR_LENGTH([512])
+		FIRST_SECTOR_ID([1]))
+FLOPPY_OPTIONS_END
 
 /*
 ** The PPI functions

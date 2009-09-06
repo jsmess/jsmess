@@ -40,7 +40,6 @@ extern WRITE8_HANDLER ( orionz80_dispatcher_w );
 extern WRITE8_HANDLER ( orionz80_sound_w );
 extern READ8_HANDLER ( orion128_floppy_r );
 extern WRITE8_HANDLER ( orion128_floppy_w );
-extern DEVICE_IMAGE_LOAD( orion_floppy );
 extern READ8_HANDLER ( orionz80_io_r );
 extern WRITE8_HANDLER ( orionz80_io_w );
 

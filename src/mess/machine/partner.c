@@ -10,7 +10,6 @@
 #include "driver.h"
 #include "cpu/i8085/i8085.h"
 #include "devices/cassette.h"
-#include "devices/basicdsk.h"
 #include "machine/i8255a.h"
 #include "machine/8257dma.h"
 #include "machine/wd17xx.h"
@@ -52,32 +51,6 @@ MACHINE_START(partner)
 	const device_config *fdc = devtag_get_device(machine, "wd1793");
 	wd17xx_set_density (fdc,DEN_MFM_HI);	
 	wd17xx_set_pause_time(fdc,10);
-}
-
-DEVICE_IMAGE_LOAD( partner_floppy )
-{
-	int size;
-
-	if (! image_has_been_created(image))
-		{
-		size = image_length(image);
-
-		switch (size)
-			{
-			case 800*1024:
-				break;
-			default:
-				return INIT_FAIL;
-			}
-		}
-	else
-		return INIT_FAIL;
-
-	if (device_load_basicdsk_floppy (image) != INIT_PASS)
-		return INIT_FAIL;
-
-	basicdsk_set_geometry (image, 80, 2, 5, 1024, 0, 0, FALSE);
-	return INIT_PASS;
 }
 
 static void partner_window_1(running_machine *machine, UINT8 bank, UINT16 offset,UINT8 *rom) 

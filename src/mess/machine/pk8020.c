@@ -992,31 +992,6 @@ MACHINE_RESET( pk8020 )
 	sound_level = 0;	
 }
 
-DEVICE_IMAGE_LOAD( pk8020_floppy )
-{
-	int size;
-
-	if (! image_has_been_created(image))
-		{
-		size = image_length(image);
-
-		switch (size)
-			{
-			case 800*1024:
-				break;
-			default:
-				return INIT_FAIL;
-			}
-		}
-	else
-		return INIT_FAIL;
-
-	if (device_load_basicdsk_floppy (image) != INIT_PASS)
-		return INIT_FAIL;
-
-	basicdsk_set_geometry (image, 80, 2, 5, 1024, 1, 0, FALSE);	
-	return INIT_PASS;
-}
 INTERRUPT_GEN( pk8020_interrupt )
 {
 	takt ^= 1;

@@ -69,8 +69,8 @@ Hardware:   PPIA 8255
 #include "video/m6847.h"
 
 /* Devices */
-#include "devices/basicdsk.h"
-#include "devices/flopdrv.h"
+#include "devices/mflopimg.h"
+#include "formats/basicdsk.h"
 #include "devices/cassette.h"
 #include "devices/snapquik.h"
 #include "sound/speaker.h"
@@ -334,6 +334,14 @@ ROM_START (atomeb)
 	ROM_LOAD ("atomicw.rom",0x018000,0x1000, CRC(a3fd737d) SHA1(d418d9322c69c49106ed2c268ad0864c0f2c4c1b))    // Atomic Windows
 ROM_END
 
+static FLOPPY_OPTIONS_START(atom)
+	FLOPPY_OPTION(atom, "ssd", "Atom disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([1])
+		TRACKS([80])
+		SECTORS([10])
+		SECTOR_LENGTH([256])
+		FIRST_SECTOR_ID([0]))
+FLOPPY_OPTIONS_END
 
 static void atom_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
@@ -344,12 +352,9 @@ static void atom_floppy_getinfo(const mess_device_class *devclass, UINT32 state,
 		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(atom_floppy); break;
+		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_atom; break;
 
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "ssd"); break;
-
-		default:										legacybasicdsk_device_getinfo(devclass, state, info); break;
+		default:										floppy_device_getinfo(devclass, state, info); break;
 	}
 }
 

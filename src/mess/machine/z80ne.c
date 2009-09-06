@@ -18,7 +18,6 @@
 #include "video/m6847.h"
 
 /* Devices */
-#include "devices/basicdsk.h"
 #include "devices/cassette.h"
 #include "devices/flopdrv.h"
 
@@ -72,75 +71,6 @@ static struct _wd17xx_state {
 	UINT8 drive; /* current drive */
 	UINT8 head;  /* current head */
 } wd17xx_state;
-
-
-DEVICE_IMAGE_LOAD( z80ne_floppy )
-{
-	static UINT8 pdrive[4*16];
-	int i;
-	int tracks; 	/* total tracks count per drive */
-	int heads;		/* total heads count per drive */
-	int spt;		/* sector per track count per drive */
-	int dir_sector; /* first directory sector (aka DDSL) */
-	int dir_length; /* length of directory in sectors (aka DDGA) */
-	int id = image_index_in_device(image);
-
-	if (device_load_basicdsk_floppy(image) != INIT_PASS)
-		return INIT_FAIL;
-
-	if (image_index_in_device(image) == 0)        /* first floppy? */
-	{
-		image_fseek(image, 0, SEEK_SET);
-		image_fread(image, pdrive, 2);
-#if 0
-		if (pdrive[0] != 0x00 || pdrive[1] != 0xfe)
-		{
-			basicdsk_read_sectormap(image, &tracks[id], &heads[id], &spt[id]);
-		}
-		else
-#endif
-
-		image_fseek(image, 2 * 256, SEEK_SET);
-		image_fread(image, pdrive, 4*16);
-	}
-
-	tracks = pdrive[id*16+3] + 1;
-	heads = (pdrive[id*16+7] & 0x40) ? 2 : 1;
-	spt = pdrive[id*16+4] / heads;
-	dir_sector = 5 * pdrive[id*16+0] * pdrive[id*16+5];
-	dir_length = 5 * pdrive[id*16+9];
-
-    /* set geometry so disk image can be read */
-	basicdsk_set_geometry(image, tracks, heads, spt, 256, 0, 0, FALSE);
-
-	/* mark directory sectors with deleted data address mark */
-	/* assumption dir_sector is a sector offset */
-	for (i = 0; i < dir_length; i++)
-	{
-		int track, side, sector_id;
-		int track_offset, sector_offset;
-
-		/* calc sector offset */
-		sector_offset = dir_sector + i;
-
-		/* get track offset */
-		track_offset = sector_offset / spt;
-
-		/* calc track */
-		track = track_offset / heads;
-
-		/* calc side */
-		side = track_offset % heads;
-
-		/* calc sector id - first sector id is 0! */
-		sector_id = sector_offset % spt;
-
-		/* set deleted data address mark for sector specified */
-		basicdsk_set_ddam(image, track, side, sector_id, 1);
-	}
-	return INIT_PASS;
-}
-
 
 static const device_config *cassette_device_image(running_machine *machine)
 {

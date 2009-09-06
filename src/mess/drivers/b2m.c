@@ -15,7 +15,8 @@
 #include "machine/pic8259.h"
 #include "machine/msm8251.h"
 #include "machine/wd17xx.h"
-#include "devices/basicdsk.h"
+#include "devices/mflopimg.h"
+#include "formats/basicdsk.h"
 #include "includes/b2m.h"
 
     
@@ -225,7 +226,16 @@ static MACHINE_DRIVER_START( b2mrom )
   	MDRV_CPU_IO_MAP(b2m_rom_io)
 MACHINE_DRIVER_END
  
- static void b2m_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+static FLOPPY_OPTIONS_START(b2m)
+	FLOPPY_OPTION(b2m, "cpm", "Bashkiria-2M disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([80])
+		SECTORS([5])
+		SECTOR_LENGTH([1024])
+		FIRST_SECTOR_ID([1]))
+FLOPPY_OPTIONS_END
+
+static void b2m_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
 	switch(state)
@@ -234,14 +244,12 @@ MACHINE_DRIVER_END
 		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_b2m_floppy; break;
+		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_b2m; break;
 
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "cpm"); break;
-
-		default:										legacybasicdsk_device_getinfo(devclass, state, info); break;
-	}	
+		default:										floppy_device_getinfo(devclass, state, info); break;
+	}
 }
+
 /* ROM definition */
 
 ROM_START( b2m )

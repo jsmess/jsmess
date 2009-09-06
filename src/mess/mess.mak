@@ -542,7 +542,6 @@ $(MESSOBJ)/amstrad.a:			\
 
 $(MESSOBJ)/apf.a:				\
 	$(MESS_DRIVERS)/apf.o		\
-	$(MESS_MACHINE)/apf.o		\
 	$(MESS_VIDEO)/apf.o			\
 	$(MESS_FORMATS)/apf_apt.o	\
 

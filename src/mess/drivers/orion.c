@@ -16,7 +16,8 @@
 #include "sound/wave.h"
 #include "machine/mc146818.h"
 #include "machine/wd17xx.h"
-#include "devices/basicdsk.h"
+#include "devices/mflopimg.h"
+#include "formats/basicdsk.h"
 #include "devices/cassette.h"
 #include "devices/cartslot.h"
 #include "formats/rk_cas.h"
@@ -231,6 +232,20 @@ static MACHINE_DRIVER_START( orionpro )
 	MDRV_CARTSLOT_ADD("cart")
 MACHINE_DRIVER_END
 
+static FLOPPY_OPTIONS_START(orion)
+	FLOPPY_OPTION(orion, "odi,img", "Orion disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([80])
+		SECTORS([5])
+		SECTOR_LENGTH([1024])
+		FIRST_SECTOR_ID([1]))
+	FLOPPY_OPTION(orion, "odi,img", "Lucksian Key Orion disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([80])
+		SECTORS([9])
+		SECTOR_LENGTH([512])
+		FIRST_SECTOR_ID([1]))
+FLOPPY_OPTIONS_END
 
 static void orion_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
@@ -241,12 +256,9 @@ static void orion_floppy_getinfo(const mess_device_class *devclass, UINT32 state
 		case MESS_DEVINFO_INT_COUNT:							info->i = 4; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(orion_floppy); break;
+		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_orion; break;
 
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "odi,img"); break;
-
-		default:										legacybasicdsk_device_getinfo(devclass, state, info); break;
+		default:										floppy_device_getinfo(devclass, state, info); break;
 	}
 }
 

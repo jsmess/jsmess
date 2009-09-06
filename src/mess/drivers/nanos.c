@@ -13,8 +13,8 @@
 #include "machine/z80sio.h"
 #include "machine/z80ctc.h"
 #include "machine/nec765.h"
-#include "devices/basicdsk.h"
-
+#include "devices/mflopimg.h"
+#include "formats/basicdsk.h"
 
 static const UINT8 *FNT;
 
@@ -470,45 +470,27 @@ static MACHINE_DRIVER_START( nanos )
 	
 MACHINE_DRIVER_END
 
-static DEVICE_IMAGE_LOAD( nanos_floppy )
-{
-	int size;
-	if (! image_has_been_created(image))
-		{
-		size = image_length(image);
-
-		switch (size)
-			{
-			case 800*1024:
-				break;
-			default:
-				return INIT_FAIL;
-			}
-		}
-	else
-		return INIT_FAIL;
-
-	if (device_load_basicdsk_floppy (image) != INIT_PASS)
-		return INIT_FAIL;
-			
-	basicdsk_set_geometry (image, 80, 2, 5, 1024, 1, 0, FALSE);
-	return INIT_PASS;
-}
+static FLOPPY_OPTIONS_START(nanos)
+	FLOPPY_OPTION(nanos, "img", "NANOS disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([80])
+		SECTORS([5])
+		SECTOR_LENGTH([1024])
+		FIRST_SECTOR_ID([1]))
+FLOPPY_OPTIONS_END
 
 static void nanos_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
+	/* floppy */
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:					info->i = 4; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 4; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:						info->load = DEVICE_IMAGE_LOAD_NAME(nanos_floppy); break;
+		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_nanos; break;
 
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:			strcpy(info->s = device_temp_str(), "img"); break;
-
-		default:										legacybasicdsk_device_getinfo(devclass, state, info); break;
+		default:										floppy_device_getinfo(devclass, state, info); break;
 	}
 }
 

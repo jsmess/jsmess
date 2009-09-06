@@ -17,8 +17,6 @@ extern DRIVER_INIT( partner );
 extern MACHINE_RESET( partner );
 extern MACHINE_START( partner );
 
-extern DEVICE_IMAGE_LOAD( partner_floppy );
-
 extern const dma8257_interface partner_dma;
 extern const wd17xx_interface partner_wd17xx_interface;
 

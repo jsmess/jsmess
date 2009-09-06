@@ -79,7 +79,7 @@ WRITE8_HANDLER ( msx_rtc_latch_w );
 WRITE8_HANDLER ( msx_90in1_w );
 
 /* disk functions */
-DEVICE_IMAGE_LOAD( msx_floppy );
+FLOPPY_OPTIONS_EXTERN(msx);
 
 /* new memory emulation */
 WRITE8_HANDLER (msx_page0_w);

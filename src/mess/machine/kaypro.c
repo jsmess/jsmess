@@ -3,7 +3,6 @@
 #include "cpu/z80/z80.h"
 #include "machine/ctronics.h"
 #include "machine/kay_kbd.h"
-#include "devices/basicdsk.h"
 #include "devices/snapquik.h"
 #include "includes/kaypro.h"
 
@@ -347,66 +346,6 @@ static WD17XX_CALLBACK( kaypro_fdc_callback )
 }
 
 const wd17xx_interface kaypro_wd1793_interface = { kaypro_fdc_callback, NULL };
-
-static DEVICE_IMAGE_LOAD( kayproii_floppy )
-{
-	if (device_load_basicdsk_floppy(image)==INIT_PASS)
-	{
-		basicdsk_set_geometry(image, 40, 1, 10, 512, 0, 0, FALSE);
-		return INIT_PASS;
-	}
-
-	return INIT_FAIL;
-}
-
-static DEVICE_IMAGE_LOAD( kaypro2x_floppy )
-{
-	if (device_load_basicdsk_floppy(image)==INIT_PASS)
-	{
-		basicdsk_set_geometry(image, 80, 2, 10, 512, 0, 0, FALSE);
-		return INIT_PASS;
-	}
-
-	return INIT_FAIL;
-}
-
-void kayproii_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:			info->i = 2; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:			info->load = DEVICE_IMAGE_LOAD_NAME(kayproii_floppy); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:		strcpy(info->s = device_temp_str(), "dsk"); break;
-
-		default:					legacybasicdsk_device_getinfo(devclass, state, info); break;
-	}
-}
-
-/* all machines have 2 floppies except kaypro 10 has one floppy and one hard drive */
-void kaypro2x_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:			info->i = 2; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:			info->load = DEVICE_IMAGE_LOAD_NAME(kaypro2x_floppy); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:		strcpy(info->s = device_temp_str(), "dsk"); break;
-
-		default:					legacybasicdsk_device_getinfo(devclass, state, info); break;
-	}
-}
-
 
 /***********************************************************
 

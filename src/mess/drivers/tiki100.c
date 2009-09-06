@@ -27,7 +27,8 @@
 #include "includes/tiki100.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
-#include "devices/basicdsk.h"
+#include "devices/mflopimg.h"
+#include "formats/basicdsk.h"
 #include "machine/z80ctc.h"
 #include "machine/z80dart.h"
 #include "machine/z80pio.h"
@@ -678,58 +679,45 @@ ROM_START( tiki100 )
 ROM_END
 
 /* System Configuration */
-
-static DEVICE_IMAGE_LOAD( tiki100_floppy )
-{
-	if (image_has_been_created(image))
-	{
-		return INIT_FAIL;
-	}
-
-	if (DEVICE_IMAGE_LOAD_NAME(basicdsk_floppy)(image) == INIT_PASS)
-	{
-		switch (image_length(image))
-		{
-		case 40*1*18*128: /* 90KB SSSD */
-			basicdsk_set_geometry(image, 40, 1, 18, 128, 1, 0, FALSE);
-			break;
-		
-		case 40*1*10*512: /* 200KB SSDD */
-			basicdsk_set_geometry(image, 40, 1, 10, 512, 1, 0, FALSE);
-			break;
-
-		case 40*2*10*512: /* 400KB DSDD */
-			basicdsk_set_geometry(image, 40, 2, 10, 512, 1, 0, FALSE);
-			break;
-
-		case 80*2*10*512: // 800KB DSHD
-			basicdsk_set_geometry(image, 80, 2, 10, 512, 1, 0, FALSE);
-			break;
-
-		default:
-			return INIT_FAIL;
-		}
-
-		return INIT_PASS;
-	}
-
-	return INIT_FAIL;
-}
+static FLOPPY_OPTIONS_START(tiki100)
+	FLOPPY_OPTION(tiki100, "dsk", "SSSD disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([1])
+		TRACKS([40])
+		SECTORS([18])
+		SECTOR_LENGTH([128])
+		FIRST_SECTOR_ID([1]))
+	FLOPPY_OPTION(tiki100, "dsk", "SSDD disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([1])
+		TRACKS([40])
+		SECTORS([10])
+		SECTOR_LENGTH([512])
+		FIRST_SECTOR_ID([1]))
+	FLOPPY_OPTION(tiki100, "dsk", "DSDD disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([40])
+		SECTORS([10])
+		SECTOR_LENGTH([512])
+		FIRST_SECTOR_ID([1]))
+	FLOPPY_OPTION(tiki100, "dsk", "DSHD disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([80])
+		SECTORS([10])
+		SECTOR_LENGTH([512])
+		FIRST_SECTOR_ID([1]))
+FLOPPY_OPTIONS_END
 
 static void tiki100_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
-	switch (state)
+	/* floppy */
+	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:					info->i = 2; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:						info->load = DEVICE_IMAGE_LOAD_NAME(tiki100_floppy); break;
+		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_tiki100; break;
 
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:			strcpy(info->s = device_temp_str(), "dsk"); break;
-
-		default:										legacybasicdsk_device_getinfo(devclass, state, info); break;
+		default:										floppy_device_getinfo(devclass, state, info); break;
 	}
 }
 

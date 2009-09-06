@@ -12,7 +12,6 @@
 #include "machine/pic8259.h"
 #include "machine/msm8251.h"
 #include "machine/wd17xx.h"
-#include "devices/basicdsk.h"
 #include "devices/cassette.h"
 #include "sound/speaker.h"
 #include "sound/wave.h"
@@ -29,7 +28,6 @@ extern const i8255a_interface pk8020_ppi8255_interface_2;
 extern const i8255a_interface pk8020_ppi8255_interface_3;
 extern const struct pit8253_config pk8020_pit8253_intf;
 extern const struct pic8259_interface pk8020_pic8259_config;
-extern DEVICE_IMAGE_LOAD( pk8020_floppy );
 extern INTERRUPT_GEN( pk8020_interrupt );
 /*----------- defined in video/pk8020.c -----------*/
 

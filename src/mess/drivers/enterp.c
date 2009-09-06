@@ -20,8 +20,8 @@
 #include "audio/dave.h"
 #include "video/epnick.h"
 #include "machine/wd17xx.h"
-#include "devices/basicdsk.h"
-
+#include "devices/mflopimg.h"
+#include "formats/basicdsk.h"
 
 #define ENTERPRISE_XTAL_X1	XTAL_8MHz
 
@@ -173,9 +173,11 @@ static const dave_interface enterprise_dave_interface =
 
 static MACHINE_RESET( enterprise )
 {
+	const device_config *fdc = devtag_get_device(machine, "wd1770");
 	cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), 0, 0xff);
 
 	floppy_drive_set_geometry(image_from_devtype_and_index(machine, IO_FLOPPY, 0), FLOPPY_DRIVE_DS_80);
+	wd17xx_set_density(fdc, DEN_FM_HI);
 }
 
 
@@ -235,21 +237,6 @@ static WRITE8_HANDLER( exdos_card_w )
 	/* side */
 	wd17xx_set_side(fdc, BIT(data, 4));
 }
-
-
-static DEVICE_IMAGE_LOAD( enterprise_floppy )
-{
-	const device_config *fdc = devtag_get_device(image->machine, "wd1770");
-
-	wd17xx_set_density(fdc, DEN_FM_HI);
-
-	if (device_load_basicdsk_floppy(image) != INIT_PASS)
-		return INIT_FAIL;
-
-	basicdsk_set_geometry(image, 80, 2, 9, 512, 1, 0, FALSE);
-	return INIT_PASS;
-}
-
 
 /***************************************************************************
     ADDRESS MAPS
@@ -517,6 +504,14 @@ ROM_END
 /***************************************************************************
     SYSTEM CONFIG
 ***************************************************************************/
+static FLOPPY_OPTIONS_START(enterprise)
+	FLOPPY_OPTION(enterprise, "dsk,img", "Enterprise disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([80])
+		SECTORS([9])
+		SECTOR_LENGTH([512])
+		FIRST_SECTOR_ID([1]))
+FLOPPY_OPTIONS_END
 
 static void enterprise_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
@@ -524,19 +519,14 @@ static void enterprise_floppy_getinfo(const mess_device_class *devclass, UINT32 
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:			info->i = 4; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 4; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:				info->load = DEVICE_IMAGE_LOAD_NAME(enterprise_floppy); break;
+		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_enterprise; break;
 
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:	strcpy(info->s = device_temp_str(), "dsk,img"); break;
-
-		default:								legacybasicdsk_device_getinfo(devclass, state, info); break;
+		default:										floppy_device_getinfo(devclass, state, info); break;
 	}
 }
-
-
 static SYSTEM_CONFIG_START(ep64)
 	CONFIG_RAM_DEFAULT(64*1024)
 	CONFIG_DEVICE(enterprise_floppy_getinfo)

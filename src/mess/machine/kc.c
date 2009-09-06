@@ -12,8 +12,6 @@
 
 /* Devices */
 #include "devices/cassette.h"
-#include "devices/basicdsk.h"
-
 
 #define KC_DEBUG 1
 #define LOG(x) do { if (KC_DEBUG) logerror x; } while (0)
@@ -135,17 +133,6 @@ QUICKLOAD_LOAD(kc)
 /* bit 5: Drive Ready */
 /* bit 4: Index pulse from disc */
 static unsigned char kc85_disc_hw_input_gate;
-
-DEVICE_IMAGE_LOAD( kc85_floppy )
-{
-	if (device_load_basicdsk_floppy(image)==INIT_PASS)
-	{
-		basicdsk_set_geometry(image, 80, 2, 9, 512, 1, 0, FALSE);
-		return INIT_PASS;
-	}
-
-	return INIT_FAIL;
-}
 
 #if 0
 static void kc85_disc_hw_ctc_interrupt(int state)

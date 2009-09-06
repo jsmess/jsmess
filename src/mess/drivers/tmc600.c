@@ -81,7 +81,8 @@ Notes:
 
 #include "driver.h"
 #include "machine/ctronics.h"
-#include "devices/basicdsk.h"
+#include "devices/mflopimg.h"
+#include "formats/basicdsk.h"
 #include "devices/cassette.h"
 #include "devices/snapquik.h"
 #include "cpu/cdp1802/cdp1802.h"
@@ -363,6 +364,9 @@ ROM_START( tmc600s2 )
 ROM_END
 
 /* System Configuration */
+static FLOPPY_OPTIONS_START(tmc600)
+	// dsk
+FLOPPY_OPTIONS_END
 
 static void tmc600_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
@@ -370,15 +374,12 @@ static void tmc600_floppy_getinfo(const mess_device_class *devclass, UINT32 stat
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:					info->i = 4; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 4; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:						info->load = DEVICE_IMAGE_LOAD_NAME(basicdsk_floppy); break;
+		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_tmc600; break;
 
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:			strcpy(info->s = device_temp_str(), "dsk"); break;
-
-		default:										legacybasicdsk_device_getinfo(devclass, state, info); break;
+		default:										floppy_device_getinfo(devclass, state, info); break;
 	}
 }
 

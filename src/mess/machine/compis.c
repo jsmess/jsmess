@@ -22,8 +22,6 @@
 #include "machine/nec765.h"
 #include "machine/msm8251.h"
 #include "machine/ctronics.h"
-#include "devices/basicdsk.h"
-
 
 /*-------------------------------------------------------------------------*/
 /* Defines, constants, and global variables                                */

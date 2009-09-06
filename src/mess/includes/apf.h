@@ -22,9 +22,4 @@ extern unsigned char apf_ints;
 
 void apf_update_ints(running_machine *machine);
 
-/*----------- defined in machine/apf.c -----------*/
-
-DEVICE_IMAGE_LOAD( apfimag_floppy );
-
-
 #endif /* APF_H_ */

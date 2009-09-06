@@ -10,6 +10,8 @@
 #include "driver.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/i8255a.h"
+#include "devices/mflopimg.h"
+#include "formats/basicdsk.h"
 #include "includes/pk8020.h"
 
 /* Address maps */
@@ -188,7 +190,16 @@ static MACHINE_DRIVER_START( pk8020 )
 	MDRV_CASSETTE_ADD( "cassette", pk8020_cassette_config )	
 MACHINE_DRIVER_END
 
- static void pk8020_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+static FLOPPY_OPTIONS_START(pk8020)
+	FLOPPY_OPTION(pk8020, "kdi", "PK8020 disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([80])
+		SECTORS([5])
+		SECTOR_LENGTH([1024])
+		FIRST_SECTOR_ID([1]))
+FLOPPY_OPTIONS_END
+
+static void pk8020_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
 	switch(state)
@@ -197,13 +208,10 @@ MACHINE_DRIVER_END
 		case MESS_DEVINFO_INT_COUNT:							info->i = 4; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:							info->load = device_load_pk8020_floppy; break;
+		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_pk8020; break;
 
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "kdi"); break;
-
-		default:										legacybasicdsk_device_getinfo(devclass, state, info); break;
-	}	
+		default:										floppy_device_getinfo(devclass, state, info); break;
+	}
 }
 
 /* ROM definition */

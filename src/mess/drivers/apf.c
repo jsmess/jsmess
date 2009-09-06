@@ -20,7 +20,8 @@ todo for apf m1000:
 
 #include "machine/6821pia.h"
 #include "machine/wd17xx.h"
-#include "devices/basicdsk.h"
+#include "devices/mflopimg.h"
+#include "formats/basicdsk.h"
 #include "devices/cassette.h"
 #include "devices/cartslot.h"
 #include "formats/apf_apt.h"
@@ -685,6 +686,14 @@ ROM_START(apfm1000)
 	ROM_CART_LOAD("cart", 0x8000, 0x2000, ROM_OPTIONAL)
 ROM_END
 
+static FLOPPY_OPTIONS_START(apfimag)
+	FLOPPY_OPTION(apfimag, "apd", "APF disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([1])
+		TRACKS([40])
+		SECTORS([8])
+		SECTOR_LENGTH([256])
+		FIRST_SECTOR_ID([1]))
+FLOPPY_OPTIONS_END
 
 static void apfimag_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
@@ -695,15 +704,11 @@ static void apfimag_floppy_getinfo(const mess_device_class *devclass, UINT32 sta
 		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(apfimag_floppy); break;
+		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_apfimag; break;
 
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "apd"); break;
-
-		default:										legacybasicdsk_device_getinfo(devclass, state, info); break;
+		default:										floppy_device_getinfo(devclass, state, info); break;
 	}
 }
-
 
 static SYSTEM_CONFIG_START( apfimag )
 	CONFIG_DEVICE(apfimag_floppy_getinfo)

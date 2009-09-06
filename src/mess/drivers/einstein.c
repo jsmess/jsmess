@@ -58,7 +58,6 @@
 #include "machine/ctronics.h"
 #include "machine/msm8251.h"
 #include "devices/dsk.h"
-#include "devices/basicdsk.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
 #include "rendlay.h"

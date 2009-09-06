@@ -92,7 +92,6 @@
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "includes/z80ne.h"
-#include "devices/basicdsk.h"
 #include "devices/mflopimg.h"
 #include "devices/cassette.h"
 #include "formats/z80ne_dsk.h"
@@ -597,8 +596,6 @@ static void z80netf_floppy_getinfo(const mess_device_class *devclass, UINT32 sta
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case MESS_DEVINFO_INT_COUNT:			info->i = 4; break;
 
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-/*      case MESS_DEVINFO_PTR_LOAD:         info->load = DEVICE_IMAGE_LOAD_NAME(z80ne_floppy); break; */
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 
 		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:	info->p = (void *) floppyoptions_z80ne; break;

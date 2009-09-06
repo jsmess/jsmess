@@ -9,8 +9,8 @@
 #include "driver.h"
 #include "video/tms9928a.h"
 #include "includes/adam.h"
+#include "devices/flopdrv.h"
 #include "devices/cartslot.h"
-#include "devices/basicdsk.h"
 
 int adam_lower_memory; /* Lower 32k memory Z80 address configuration */
 int adam_upper_memory; /* Upper 32k memory Z80 address configuration */
@@ -39,29 +39,6 @@ int adam_cart_verify(const UINT8 *cartdata, size_t size)
 
 	return retval;
 }
-
-DEVICE_IMAGE_LOAD( adam_floppy )
-{
-	if (device_load_basicdsk_floppy(image)==INIT_PASS)
-	{
-		/* img, tracks, sides, sectors_per_track, sector_length, first_sector_id, offset_track_zero, track_skipping */
-		basicdsk_set_geometry(image, 40, 1, 8, 512, 0, 0, FALSE);
-		return INIT_PASS;
-	}
-	else
-	{
-		return INIT_FAIL;
-	}
-}
-
-
-
-DEVICE_IMAGE_UNLOAD( adam_floppy )
-{
-    device_unload_basicdsk_floppy(image);
-}
-
-
 
 void adam_clear_keyboard_buffer(void)
 {
