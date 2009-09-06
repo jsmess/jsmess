@@ -162,6 +162,7 @@ static struct
 {
 	UINT8 gfx_bank;
 	UINT8 pcg_mode;
+	UINT8 v400_mode;
 
 	UINT8 ply;
 	UINT8 blackclip; // x1 turbo specific
@@ -232,18 +233,41 @@ static void draw_fgtilemap(running_machine *machine, bitmap_t *bitmap,const rect
 							pcg_pen^=7;
 
 						if((scrn_reg.blackclip & 8) && (color == (scrn_reg.blackclip & 7)))
-							pcg_pen = 8; // clip the pen to black
+							pcg_pen = 0; // clip the pen to black
 
 						if((res_x+xi)>video_screen_get_visible_area(machine->primary_screen)->max_x && (res_y+yi)>video_screen_get_visible_area(machine->primary_screen)->max_y)
 							continue;
 
-						*BITMAP_ADDR16(bitmap, res_y+yi, res_x+xi) = machine->pens[pcg_pen];
-						if(width)
-							*BITMAP_ADDR16(bitmap, res_y+yi, res_x+xi+1) = machine->pens[pcg_pen];
-						if(height)
-							*BITMAP_ADDR16(bitmap, res_y+yi+1, res_x+xi) = machine->pens[pcg_pen];
-						if(width && height)
+						if(scrn_reg.v400_mode)
+						{
+							*BITMAP_ADDR16(bitmap, (res_y+yi)*2+0, res_x+xi) = machine->pens[pcg_pen];
+							*BITMAP_ADDR16(bitmap, (res_y+yi)*2+1, res_x+xi) = machine->pens[pcg_pen];
+							if(width)
+							{
+								*BITMAP_ADDR16(bitmap, (res_y+yi)*2+0, res_x+xi+1) = machine->pens[pcg_pen];
+								*BITMAP_ADDR16(bitmap, (res_y+yi)*2+1, res_x+xi+1) = machine->pens[pcg_pen];
+							}
+							if(height)
+							{
+								*BITMAP_ADDR16(bitmap, (res_y+yi+1)*2+0, res_x+xi) = machine->pens[pcg_pen];
+								*BITMAP_ADDR16(bitmap, (res_y+yi+1)*2+1, res_x+xi) = machine->pens[pcg_pen];
+							}
+							if(width && height)
+							{
+								*BITMAP_ADDR16(bitmap, (res_y+yi+1)*2+0, res_x+xi+1) = machine->pens[pcg_pen];
+								*BITMAP_ADDR16(bitmap, (res_y+yi+1)*2+1, res_x+xi+1) = machine->pens[pcg_pen];
+							}
+						}
+						else
+						{
+							*BITMAP_ADDR16(bitmap, res_y+yi, res_x+xi) = machine->pens[pcg_pen];
+							if(width)
+								*BITMAP_ADDR16(bitmap, res_y+yi, res_x+xi+1) = machine->pens[pcg_pen];
+							if(height)
+								*BITMAP_ADDR16(bitmap, res_y+yi+1, res_x+xi) = machine->pens[pcg_pen];
+							if(width && height)
 							*BITMAP_ADDR16(bitmap, res_y+yi+1, res_x+xi+1) = machine->pens[pcg_pen];
+						}
 					}
 				}
 			}
@@ -311,13 +335,34 @@ static void draw_gfxbitmap(running_machine *machine, bitmap_t *bitmap,const rect
 					{
 						if(yi & 1)
 							continue;
-						if((x+xi)<=video_screen_get_visible_area(machine->primary_screen)->max_x && (y+(yi >> 1))<=video_screen_get_visible_area(machine->primary_screen)->max_y)
-							*BITMAP_ADDR16(bitmap, y+(yi >> 1), x+xi) = machine->pens[color+0x100];
+
+						if(scrn_reg.v400_mode)
+						{
+							if((x+xi)<=video_screen_get_visible_area(machine->primary_screen)->max_x && (y+(yi >> 1)*2+0)<=video_screen_get_visible_area(machine->primary_screen)->max_y)
+								*BITMAP_ADDR16(bitmap, (y+(yi >> 1))*2+0, x+xi) = machine->pens[color+0x100];
+							if((x+xi)<=video_screen_get_visible_area(machine->primary_screen)->max_x && (y+(yi >> 1)*2+1)<=video_screen_get_visible_area(machine->primary_screen)->max_y)
+								*BITMAP_ADDR16(bitmap, (y+(yi >> 1))*2+1, x+xi) = machine->pens[color+0x100];
+						}
+						else
+						{
+							if((x+xi)<=video_screen_get_visible_area(machine->primary_screen)->max_x && (y+(yi >> 1))<=video_screen_get_visible_area(machine->primary_screen)->max_y)
+								*BITMAP_ADDR16(bitmap, y+(yi >> 1), x+xi) = machine->pens[color+0x100];
+						}
 					}
 					else
 					{
-						if((x+xi)<=video_screen_get_visible_area(machine->primary_screen)->max_x && (y+yi)<=video_screen_get_visible_area(machine->primary_screen)->max_y)
-							*BITMAP_ADDR16(bitmap, y+yi, x+xi) = machine->pens[color+0x100];
+						if(scrn_reg.v400_mode)
+						{
+							if((x+xi)<=video_screen_get_visible_area(machine->primary_screen)->max_x && ((y+yi)*2+0)<=video_screen_get_visible_area(machine->primary_screen)->max_y)
+								*BITMAP_ADDR16(bitmap, (y+yi)*2+0, x+xi) = machine->pens[color+0x100];
+							if((x+xi)<=video_screen_get_visible_area(machine->primary_screen)->max_x && ((y+yi)*2+1)<=video_screen_get_visible_area(machine->primary_screen)->max_y)
+								*BITMAP_ADDR16(bitmap, (y+yi)*2+1, x+xi) = machine->pens[color+0x100];
+						}
+						else
+						{
+							if((x+xi)<=video_screen_get_visible_area(machine->primary_screen)->max_x && (y+yi)<=video_screen_get_visible_area(machine->primary_screen)->max_y)
+								*BITMAP_ADDR16(bitmap, y+yi, x+xi) = machine->pens[color+0x100];
+						}
 					}
 				}
 				count++;
@@ -883,10 +928,26 @@ static WRITE8_HANDLER( x1_ex_gfxram_w )
 	if(ex_mask & 4) { gfx_bitmap_ram[(offset & 0x3fff)+0x8000] = data; }
 }
 
+/*
+	SCRN flags
+
+	d0(01) = 0:low res            1:high res
+    d1(02) = 0:1 raster           1:2 raster  <- 0=400-line mode, legal when 'd0=1'
+    d2(04) = 0:25(20) lines       1:12(10) lines
+    d3(08) = 0:bank 0             0:bank 1    <- display
+    d4(10) = 0:bank 0             0:bank 1    <- access
+    d5(20) = 0:compatibility      1:high speed  <- define PCG mode
+    d6(40) = 0:8-raster graphics  1:16-raster graphics
+    d7(80) = 0:don't display      1:display  <- underline (when 1, graphics are not displayed)
+
+    The value output by the X1turbo's IOCS at 0x1fd*
+    is stored in memory at 0xf8d6
+*/
 static WRITE8_HANDLER( x1_scrn_w )
 {
 	scrn_reg.pcg_mode = (data & 0x20)>>5;
 	scrn_reg.gfx_bank = (data & 0x10)>>4;
+	scrn_reg.v400_mode = ((data & 0x03) == 3) ? 1 : 0;
 	printf("SCRN = %02x\n",data);
 }
 
