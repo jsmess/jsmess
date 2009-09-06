@@ -698,6 +698,7 @@ const game_driver * const drivers[] =
     /* Tatung */
     DRIVER( einstein )
     DRIVER( einstei2 )
+    DRIVER( einst256 )
 
     /* INTELLIGENT SOFTWARE */
     DRIVER( ep64 )      /* Enterprise 64                                    */

@@ -23,6 +23,7 @@ Skeleton drivers:
 - Kaypro 4 4-84
 - HC-88
 - Cobra / Cobra 80K
+- Tatung Einstein 256
 
 
 

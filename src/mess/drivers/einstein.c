@@ -964,6 +964,12 @@ ROM_START( einstei2 )
 	ROM_LOAD("charrom.rom", 0, 0x800, NO_DUMP)
 ROM_END
 
+ROM_START( einst256 )
+	ROM_REGION(0x8000, "bios", 0)
+	ROM_LOAD("tc256.rom", 0x0000, 0x4000, CRC(ef8dad88) SHA1(eb2102d3bef572db7161c26a7c68a5fcf457b4d0) )
+ROM_END
+
+
 
 /***************************************************************************
     SYSTEM CONFIG
@@ -995,3 +1001,4 @@ SYSTEM_CONFIG_END
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT           INIT  CONFIG,   COMPANY   FULLNAME                             FLAGS */
 COMP( 1984, einstein, 0,        0,		einstein, einstein,       0,    einstein, "Tatung", "Einstein TC-01",                    0 )
 COMP( 1984, einstei2, einstein, 0,		einstei2, einstein_80col, 0,    einstein, "Tatung", "Einstein TC-01 + 80 column device", 0 )
+COMP( 1984, einst256, 0,        0,		einstein, einstein,       0,    einstein, "Tatung", "Einstein 256",						 GAME_NOT_WORKING )
