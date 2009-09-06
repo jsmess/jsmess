@@ -3,7 +3,7 @@
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
 - Tandy 1000RL  [Wilbert Pol]
-- Nintendo Game Boy Advance [R. Belmont, MooglyGuy]
+- Nintendo Game Boy Advance [R. Belmont, Harmony]
 - 4004 Nixie Tube Clock [Miodrag Milanovic]
 - Busicom 141-PF [Miodrag Milanovic]
 - Mikron-2 [Miodrag Milanovic]
@@ -55,6 +55,8 @@ System Driver Changes:
 
 - [NES] Changed the PPU to use a device memory map (bug #1831), enhancements
   and improvements to mappers 5, 68, 88, 119.  [Robert Bohms]
+
+- [SNES] Added support for SuperFX games. [Harmony]
 
 - [V1050] Fixed centronics output. [Curt Coder]
 
