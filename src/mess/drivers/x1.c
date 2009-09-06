@@ -15,12 +15,10 @@
 	- x1turbo: understand how irq generation works for the ym-2151;
 	- There are various unclear video things, these are:
 		- Understand why some games still doesn't upload the proper PCG index;
-		- Implement PCG reading, used by Maison Ikkoku, Mule and Gyajiko for kanji reading;
+		- Implement PCG reading, used by Maison Ikkoku, Mule and Gyajiko for kanji reading.
+		  Is there a way to select which ROM to use?
 		- Implement the scrn regs;
 		- Interlace mode?
-		- Some colors are still way wrong (check 1942 or Dialide), needs update_partial perhaps?
-		- Maybe the colorram/videoram stuff is actually a converter for the BRG framebuffer in
-		  the end?
 		- Implement the new features of the x1turbo, namely the 4096 color feature amongst other
 		  things
 		- (anything else?)
@@ -29,10 +27,6 @@
 	- Bosconian: title screen background is completely white because it reverts the pen used
 	  (it's gray in the Arcade version),could be either flickering for pseudo-alpha effect or it's
 	  a btanb;
-	- Super Mario Bros. SP: background color is black, should be blue. DMA issue?
-	- Mappy (New Version): has color issues, should be identical to the Arcade version, sets PLY reg == 0xe;
-	- Gradius: PCG tiles should be 16 colors or use the entire 8 color range, it's sure that the current palette
-	  bank isn't right (it's ok for the bitmaps only)
 
 	Notes:
 	- An interesting feature of the Sharp X-1 is the extended i/o bank. When the ppi port c bit 5
@@ -528,6 +522,8 @@ static void cmt_command( running_machine* machine, UINT8 cmd )
 
 static WRITE8_HANDLER( sub_io_w )
 {
+	mame_system_time systime;
+	mame_get_base_datetime(space->machine, &systime);
 	/* TODO: check sub-routine at $10e */
 	/* $17a -> floppy? */
 	/* $094 -> ROM */
@@ -574,15 +570,18 @@ static WRITE8_HANDLER( sub_io_w )
 			sub_cmd_length = 1;
 			logerror("CMT: Command 0xEB received, returning 0x%02x.\n",sub_val[0]);
 			break;
-		case 0xed:
+		case 0xed: //get date
+			sub_val[0] = ((systime.local_time.mday / 10)<<4) | ((systime.local_time.mday % 10) & 0xf);
+			sub_val[1] = ((systime.local_time.month+1)<<4) | ((systime.local_time.weekday % 10) & 0xf);
+			sub_val[2] = (((systime.local_time.year % 100)/10)<<4) | ((systime.local_time.year % 10) & 0xf);
 			sub_cmd_length = 3;
 			break;
-		case 0xef:
+		case 0xef: //get time
+			sub_val[0] = ((systime.local_time.hour / 10)<<4) | ((systime.local_time.hour % 10) & 0xf);
+			sub_val[1] = ((systime.local_time.minute / 10)<<4) | ((systime.local_time.minute % 10) & 0xf);
+			sub_val[2] = ((systime.local_time.second / 10)<<4) | ((systime.local_time.second % 10) & 0xf);
 			sub_cmd_length = 3;
 			break;
-		//case 0xeb: sub_val = test; break; //used on device select
-		//case 0xed: sub_val = test; break;
-		//case 0xef: sub_val = test; break; //used on timer select?
 		#if 0
 		default:
 		{
@@ -756,27 +755,32 @@ static UINT16 check_pcg_addr(running_machine *machine)
 
 static READ8_HANDLER( x1_pcg_r )
 {
-	#if 0
 	int addr;
-	UINT8 *BIOS_ROM = memory_region(space->machine, "cgrom");
-	static UINT8 bios_offset,res;
+	int calc_pcg_offset;
+	static UINT8 bios_offset,pcg_index_r[3],res;
+	UINT8 *gfx_data;
 
 	addr = (offset & 0x300) >> 8;
 
 	if(addr == 0)
 	{
-		/* TODO: requires an offset conversion */
-		res = BIOS_ROM[0x1800+bios_offset+(pcg_write_addr*0x10)];
+		gfx_data = memory_region(space->machine, "cgrom");
+		res = gfx_data[0x0000+bios_offset+(pcg_write_addr*8)];
 
 		bios_offset++;
-		bios_offset&=0xf;
+		bios_offset&=0x7;
 		return res;
 	}
 	else
 	{
-		//...
-	}
-	#endif
+ 		gfx_data = memory_region(space->machine, "pcg");
+ 		calc_pcg_offset = (pcg_index_r[addr-1]) | ((addr-1)*0x800);
+ 		res = gfx_data[0x0000+calc_pcg_offset+(pcg_write_addr*8)];
+
+ 		pcg_index_r[addr-1]++;
+		pcg_index_r[addr-1]&=0x7;
+ 		return res;
+ 	}
 
 	return mame_rand(space->machine);
 }
@@ -1654,7 +1658,7 @@ static TIMER_CALLBACK(keyboard_callback)
 			old_key2 = key2;
 			old_key3 = key3;
 			old_key4 = key4;
-		} 
+		}
 	}
 }
 
