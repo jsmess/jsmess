@@ -286,6 +286,7 @@ const game_driver * const drivers[] =
 	DRIVER( suprheli )	/* bootleg */
 	DRIVER( stratgyx )	/* GX306 (c) 1981 Konami */
 	DRIVER( stratgys )	/* GX306 (c) 1981 Stern */
+	DRIVER( strongx )	/* bootleg */
 	DRIVER( armorcar )	/* (c) 1981 Stern */
 	DRIVER( armorcar2 )	/* (c) 1981 Stern */
 	DRIVER( moonwar )	/* (c) 1981 Stern */
@@ -3107,6 +3108,7 @@ V-V                           TP-027
 
 	/* Namco System 10 */
 	DRIVER( mrdrilr2 )	/* 2000.07 Mr Driller 2 (DR21 Ver.A) */
+	DRIVER( mrdrlr2a )      /* 2000.?? Mr Driller 2 (DR22 Ver.A) */
 						/* 2000.12 Gunbarina */
 						/* 2001.02 Photo Battole */
 						/* 2001.02 Taiko no Tatsujin */
@@ -4337,7 +4339,9 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( naomi2 )
 
 	DRIVER( hod2bios )	/* 1998.11 The House of the Dead 2 */
+	DRIVER( hotd2 )		/* 1998.11 The House of the Dead 2 */
 	DRIVER( dybbnao )	/* 1998.12 Dynamite Baseball NAOMI */
+	DRIVER( smlg99 )        /* 1999.?? Super Major League '99 */
 	DRIVER( pstone )	/* 1999.02 Power Stone */
 						/* 1999.02 Crazy Taxi */
 	DRIVER( zombrvn )	/* 1999.02 Zombie Revenge */
@@ -4414,7 +4418,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2001.06 Crackin' DJ Part2 */
 	DRIVER( wsbbgd )	/* 2001.06 Super Major League */
 	DRIVER( spkrbtl )	/* 2001.07 Spikers Battle */
-						/* 2001.07 Gun Survivor 2: Bio Hazard Code Veronica */
+	DRIVER( gunsur2 )	/* 2001.07 Gun Survivor 2: Bio Hazard Code Veronica */
 						/* 2001.07 Dokidoki Idol Star Seeker */
 	DRIVER( cvs2gd )	/* 2001.08 Capcom vs. SNK 2 */
 	DRIVER( gundmxgd )	/* 2001.09 Kidou Senshi Gundam Renpou vs. Zeon DX */
@@ -4508,12 +4512,14 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2001.06 Club Kart */
 	DRIVER( beachspi )	/* 2001.07 Beach Spikers */
 						/* 2001.08 Wave Runner GP */
-	DRIVER( vf4 )		/* 2001.08.02 Virtua Fighter 4 */
+	DRIVER( vf4cart )     	/* 2001.08.02 Virtua Fighter 4 (cartridge) */
+	DRIVER( vf4 )		/* 2001.08.02 Virtua Fighter 4 (GD-ROM) */
 	DRIVER( vf4b )		/* 2001.08.20 Virtua Fighter 4 ver.B */
 	DRIVER( vf4c )		/* 2002.01.31 Virtua Fighter 4 ver.C */
 						/* 2002.02 The King of Route 66 */
 	DRIVER( initd )		/* 2002.03 Initial D Arcade Stage */
 	DRIVER( initdexp )	/* 200?.?? Initial D Export Version */
+	DRIVER( clubkrte )	/* 2002.?? Club Kart: European Session */
 						/* 2002.06 WCCF SERIE A 2001-2002 */
 						/* 2002.07 Soul Surfer */
 	DRIVER( vf4evoa )	/* 2002.08 Virtua Fighter 4 Evolution */
@@ -4546,19 +4552,20 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( sprtshot )	/* 2002.12 Sports Shooting USA */
 						/* 2003.03 Guilty Gear X ver.1.5 */
 	DRIVER( demofist )	/* 2003.06 Demolish Fist */
-						/* 2003.08 Dolphin Blue */
-						/* 2003.12 Guilty Gear Isuka */
+	DRIVER( dolphin  )	/* 2003.08 Dolphin Blue */
+	DRIVER( ggisuka )	/* 2003.12 Guilty Gear Isuka */
 						/* 2003.12 Sangoku Senki Shichisei Tensei (IGS) */
-						/* 2004.03 The Rumble Fish */
+	DRIVER( rumblef ) 	/* 2004.03 The Rumble Fish */
 	DRIVER( rangrmsn )	/* 2004.03 Ranger Mission */
 						/* 2004.06 Salary Man Kintarou Net Select */
-						/* 2004.07 The King of Fighters Neo Wave */
+	DRIVER( kofnw )		/* 2004.07 The King of Fighters Neo Wave */
 	DRIVER( xtrmhunt )	/* 2004.09 Extreme Hunting */
 						/* 2004.09 Dirty Pig Skin Football */
 						/* 2004.09 Faster than Speed */
+	DRIVER( kov7sprt )	/* 2004.?? Knights of Valour - The Seven Sprits */
 						/* 2005.03 Net Select Keiba Victory Furlong */
 						/* 2005.03 The Rumble Fish 2 */
-						/* 2005.07 NeoGeo Battle Colloseum */
+	DRIVER( ngbc )		/* 2005.07 NeoGeo Battle Colloseum */
 						/* 2005.09 Samurai Spirits Tenkaichi Kenkakuden */
 						/* 2005.10 The King of Fighters XI */
 	DRIVER( fotns )		/* 2005.12 Hokuto no Ken */
@@ -4779,6 +4786,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( kchamp )	/* (c) 1984 Data East USA (US) */
 	DRIVER( karatedo )	/* (c) 1984 Data East Corporation (Japan) */
 	DRIVER( kchampvs )	/* (c) 1984 Data East USA (US) */
+	DRIVER( kchampvs2 ) /* (c) 1984 Data East USA (US) */
 	DRIVER( karatevs )	/* (c) 1984 Data East Corporation (Japan) */
 	DRIVER( compgolf )	/* (c) 1985 Data East Corporation (Japan) */
 	DRIVER( compgolfo )	/* (c) 1985 Data East Corporation (Japan) */
@@ -5078,6 +5086,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( gaiden )	/* 6215 - (c) 1988 Tecmo (US) */
 	DRIVER( ryukendn )	/* 6215 - (c) 1989 Tecmo (Japan) */
 	DRIVER( ryukendna )	/* 6215 - (c) 1989 Tecmo (Japan) */
+	DRIVER( mastninj )	/* bootleg */
 	DRIVER( wildfang )	/* (c) 1989 Tecmo */
 	DRIVER( tknight )	/* (c) 1989 Tecmo */
 	DRIVER( stratof )	/* (c) 1991 Tecmo */
@@ -6713,6 +6722,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	/* Williams/Midway TMS games */
 	DRIVER( narc )		/* (c) 1988 Williams */
 	DRIVER( narc3 )		/* (c) 1988 Williams */
+	DRIVER( narc2 )		/* (c) 1988 Williams */
 	DRIVER( trog )		/* (c) 1990 Midway */
 	DRIVER( trog4 )		/* (c) 1990 Midway */
 	DRIVER( trog3 )		/* (c) 1990 Midway */
@@ -6734,7 +6744,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( strkforc )	/* (c) 1991 Midway */
 	DRIVER( mk )		/* (c) 1992 Midway */
 	DRIVER( mkr4 )		/* (c) 1992 Midway */
-	DRIVER( mkturbo )	/* bootleg */
+	DRIVER( mktturbo )	/* hack */
+	DRIVER( mkyturbo )	/* hack */
 	DRIVER( mkprot8 )	/* (c) 1992 Midway */
 	DRIVER( mkprot9 )	/* (c) 1992 Midway */
 	DRIVER( mkla1 )		/* (c) 1992 Midway */
@@ -7519,6 +7530,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( kiwame )	/* (c) 1994 Athena */
 	DRIVER( krzybowl )	/* (c) 1994 American Sammy */
 	DRIVER( orbs )		/* (c) 1994 American Sammy */
+	DRIVER( keroppi )	/* (c) 1993 Sammy */
 	DRIVER( extdwnhl )	/* (c) 1995 Sammy Japan */
 	DRIVER( gundhara )	/* (c) 1995 Banpresto */
 	DRIVER( sokonuke )	/* (c) 1995 Sammy Industries */
@@ -8950,6 +8962,8 @@ Other Sun games
 	DRIVER( witchcdb )	/* 1991, Unknown */
 	DRIVER( witchcdc )	/* 1991, Unknown */
 	DRIVER( witchcdd )	/* 1991, Unknown */
+	DRIVER( witchcde )	/* 1994, Unknown */
+	DRIVER( witchcdf )	/* (c) 1991 PlayMan */
 	DRIVER( sloco93 )	/* 1993, Unknown */
 	DRIVER( sloco93a )	/* 1993, Unknown */
 	DRIVER( maverik )	/* 198?, Unknown */
@@ -8979,6 +8993,7 @@ Other Sun games
 	DRIVER( bsuerteu )	/* 1991, Unknown */
 
 	/* Cal Omega */
+	DRIVER( comg074 )	/* (c) 1981 Cal Omega Inc. */
 	DRIVER( comg076 )	/* (c) 1981 Cal Omega Inc. */
 	DRIVER( comg079 )	/* (c) 1981 Cal Omega Inc. */
 	DRIVER( comg080 )	/* (c) 1981 Cal Omega Inc. */

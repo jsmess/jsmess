@@ -177,10 +177,10 @@ static TIMER_CALLBACK( scanline_callback )
 		int old = irq2_scanline;
 
 		/* Q = -10 scanlines, W = -1 scanline, E = +1 scanline, R = +10 scanlines */
-		if (input_code_pressed(KEYCODE_Q)) { while (input_code_pressed(KEYCODE_Q)) ; irq2_scanline -= 10; }
-		if (input_code_pressed(KEYCODE_W)) { while (input_code_pressed(KEYCODE_W)) ; irq2_scanline -= 1; }
-		if (input_code_pressed(KEYCODE_E)) { while (input_code_pressed(KEYCODE_E)) ; irq2_scanline += 1; }
-		if (input_code_pressed(KEYCODE_R)) { while (input_code_pressed(KEYCODE_R)) ; irq2_scanline += 10; }
+		if (input_code_pressed(machine, KEYCODE_Q)) { while (input_code_pressed(machine, KEYCODE_Q)) ; irq2_scanline -= 10; }
+		if (input_code_pressed(machine, KEYCODE_W)) { while (input_code_pressed(machine, KEYCODE_W)) ; irq2_scanline -= 1; }
+		if (input_code_pressed(machine, KEYCODE_E)) { while (input_code_pressed(machine, KEYCODE_E)) ; irq2_scanline += 1; }
+		if (input_code_pressed(machine, KEYCODE_R)) { while (input_code_pressed(machine, KEYCODE_R)) ; irq2_scanline += 10; }
 		if (old != irq2_scanline)
 			popmessage("scanline = %d", irq2_scanline);
 	}
@@ -332,7 +332,7 @@ static WRITE16_HANDLER( io_chip_w )
 		case 0x0e/2:
 			/* D7 = /MUTE */
 			/* D6-D0 = FLT31-25 */
-			sound_global_enable(data & 0x80);
+			sound_global_enable(space->machine, data & 0x80);
 			break;
 
 		/* CNT register */

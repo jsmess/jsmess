@@ -130,7 +130,7 @@ static WRITE8_DEVICE_HANDLER(mac_via2_out_a);
 static WRITE8_DEVICE_HANDLER(mac_via2_out_b);
 static void mac_via_irq(const device_config *device, int state);
 static void mac_via2_irq(const device_config *device, int state);
-static offs_t mac_dasm_override(const device_config *device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
+static CPU_DISASSEMBLE(mac_dasm_override);
 
 const via6522_interface mac_via6522_intf =
 {
@@ -1969,7 +1969,7 @@ static void mac_driver_init(running_machine *machine, mac_model_t model)
 
 	inquiry_timeout = timer_alloc(machine, inquiry_timeout_func, NULL);
 
-	debug_cpu_set_dasm_override(cputag_get_cpu(machine, "maincpu"), mac_dasm_override);
+	debug_cpu_set_dasm_override(cputag_get_cpu(machine, "maincpu"), CPU_DISASSEMBLE_NAME(mac_dasm_override));
 
 	/* save state stuff */
 	state_save_register_global(machine, mac_overlay);
@@ -2925,7 +2925,7 @@ static const char *lookup_trap(UINT16 opcode)
 
 
 
-static offs_t mac_dasm_override(const device_config *device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+static CPU_DISASSEMBLE(mac_dasm_override)
 {
 	UINT16 opcode;
 	unsigned result = 0;

@@ -125,10 +125,10 @@ static void process_natural_keyboard(running_machine *machine)
 	{
 		/* identify this keycode */
 		itemid = non_char_keys[i];
-		code = input_code_from_input_item_id(itemid);
+		code = input_code_from_input_item_id(machine, itemid);
 
 		/* ...and determine if it is pressed */
-		pressed = input_code_pressed(code);
+		pressed = input_code_pressed(machine, code);
 
 		/* figure out whey we are in the key_down map */
 		key_down_ptr = &machine->ui_mess_data->non_char_keys_down[i / 8];

@@ -40,7 +40,8 @@ struct dss_input_context
 	UINT8		is_stream;
 	UINT8		is_buffered;
 	UINT32		stream_in_number;
-	UINT32		stream_out_number;
+	/* the buffer stream */
+	sound_stream *buffer_stream;
 };
 
 INLINE discrete_info *get_safe_token(const device_config *device)
@@ -93,6 +94,7 @@ WRITE8_DEVICE_HANDLER(discrete_sound_w)
 		switch (node->module->type)
 		{
 			case DSS_INPUT_DATA:
+			case DSS_INPUT_BUFFER:
 				new_data = data;
 				break;
 			case DSS_INPUT_LOGIC:
@@ -106,13 +108,23 @@ WRITE8_DEVICE_HANDLER(discrete_sound_w)
 
 		if (context->data != new_data)
 		{
-			/* Bring the system up to now */
-			stream_update(info->discrete_stream);
+			if (context->is_buffered)
+			{
+				/* Bring the system up to now */
+				stream_update(context->buffer_stream);
 
-			context->data = new_data;
+				context->data = new_data;
+			}
+			else
+			{
+				/* Bring the system up to now */
+				stream_update(info->discrete_stream);
 
-			/* Update the node output here so we don't have to do it each step */
-			node->output[0] = new_data * context->gain + context->offset;
+				context->data = new_data;
+
+				/* Update the node output here so we don't have to do it each step */
+				node->output[0] = new_data * context->gain + context->offset;
+			}
 		}
 	}
 	else
@@ -171,7 +183,7 @@ static DISCRETE_RESET(dss_adjustment)
 	{
 		context->port = input_port_by_tag(node->info->device->machine->portconfig, (const char *)node->custom);
 		if (context->port == NULL)
-			fatalerror("DISCRETE_ADJUSTMENT_TAG - NODE_%d has invalid tag", node->node-NODE_00);
+			fatalerror("DISCRETE_ADJUSTMENT_TAG - NODE_%d has invalid tag", NODE_BLOCKINDEX(node));
 	}
 	else
 		context->port = input_port_by_index(node->info->device->machine->portconfig, DSS_ADJUSTMENT__PORT);
@@ -294,11 +306,35 @@ static DISCRETE_RESET(dss_input_stream)
 {
 	struct dss_input_context *context = (struct dss_input_context *)node->context;
 
+	context->ptr = NULL;
+	//context->data = 0;
+}
+
+static DISCRETE_START(dss_input_stream)
+{
+	struct dss_input_context *context = (struct dss_input_context *)node->context;
+
 	assert(DSS_INPUT_STREAM__STREAM < linked_list_count(node->info->input_list));
-	context->is_buffered = FALSE;
+
 	context->is_stream = TRUE;
+	/* Stream out number is set during start */
 	context->stream_in_number = DSS_INPUT_STREAM__STREAM;
 	context->gain = DSS_INPUT_STREAM__GAIN;
 	context->offset = DSS_INPUT_STREAM__OFFSET;
 	context->ptr = NULL;
+	//context->data = 0;
+
+	if (node->block->type == DSS_INPUT_BUFFER)
+	{
+		context->is_buffered = TRUE;
+		context->buffer_stream = stream_create(node->info->device, 0, 1, node->info->sample_rate, (void *) node, buffer_stream_update);
+
+		stream_set_input(node->info->discrete_stream, context->stream_in_number,
+			context->buffer_stream, 0, 1.0);
+	}
+	else
+	{
+		context->is_buffered = FALSE;
+		context->buffer_stream = NULL;
+	}
 }

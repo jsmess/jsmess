@@ -298,11 +298,11 @@ static VIDEO_UPDATE( tmaster )
 	int layers_ctrl = -1;
 
 #ifdef MAME_DEBUG
-	if (input_code_pressed(KEYCODE_Z))
+	if (input_code_pressed(screen->machine, KEYCODE_Z))
 	{
 		int mask = 0;
-		if (input_code_pressed(KEYCODE_Q))	mask |= 1;
-		if (input_code_pressed(KEYCODE_W))	mask |= 2;
+		if (input_code_pressed(screen->machine, KEYCODE_Q))	mask |= 1;
+		if (input_code_pressed(screen->machine, KEYCODE_W))	mask |= 2;
 		if (mask != 0) layers_ctrl &= mask;
 	}
 #endif
@@ -541,7 +541,7 @@ static const eeprom_interface galgames_eeprom_interface =
 #define GALGAMES_EEPROM_CART3 "eeprom_cart3"
 #define GALGAMES_EEPROM_CART4 "eeprom_cart4"
 
-const char const *galgames_eeprom_names[5] = { GALGAMES_EEPROM_BIOS, GALGAMES_EEPROM_CART1, GALGAMES_EEPROM_CART2, GALGAMES_EEPROM_CART3, GALGAMES_EEPROM_CART4 };
+const char *galgames_eeprom_names[5] = { GALGAMES_EEPROM_BIOS, GALGAMES_EEPROM_CART1, GALGAMES_EEPROM_CART2, GALGAMES_EEPROM_CART3, GALGAMES_EEPROM_CART4 };
 
 static READ16_HANDLER( galgames_eeprom_r )
 {

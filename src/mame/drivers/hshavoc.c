@@ -300,15 +300,16 @@ static DRIVER_INIT(hshavoc)
 
 	}
 
-	{
-		FILE*FP;
+/* Uncommented until actively worked on
+    {
+        FILE*FP;
 
-		FP=fopen("hshavoc.dump","wb");
+        FP=fopen("hshavoc.dump","wb");
 
-		fwrite(src, rom_size/2, 2, FP);
-		fclose(FP);
-	}
-
+        fwrite(src, rom_size/2, 2, FP);
+        fclose(FP);
+    }
+*/
 
 
 	DRIVER_INIT_CALL(genesis);

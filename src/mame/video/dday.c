@@ -297,9 +297,9 @@ WRITE8_HANDLER( dday_control_w )
 
 	/* bit 4 is sound enable */
 	if (!(data & 0x10) && (control & 0x10))
-		devtag_reset(space->machine, "ay");
+		devtag_reset(space->machine, "ay1");
 
-	sound_global_enable(data & 0x10);
+	sound_global_enable(space->machine, data & 0x10);
 
 	/* bit 6 is search light enable */
 	sl_enable = data & 0x40;

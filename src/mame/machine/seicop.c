@@ -86,39 +86,41 @@ static void copd2_set_tableoffset(running_machine *machine, UINT16 data)
 	copd2_table_3[copd2_offs/8] = cop_43a;
 	copd2_table_4[copd2_offs/8] = cop_43c;
 
-	{
-		FILE *fp;
-		char filename[256];
-		sprintf(filename,"copdat_%s.table2", machine->gamedrv->name);
-		fp=fopen(filename, "w+b");
-		if (fp)
-		{
-			fwrite(copd2_table_2, 0x200/8, 1, fp);
-			fclose(fp);
-		}
-	}
-	{
-		FILE *fp;
-		char filename[256];
-		sprintf(filename,"copdat_%s.table3", machine->gamedrv->name);
-		fp=fopen(filename, "w+b");
-		if (fp)
-		{
-			fwrite(copd2_table_3, 0x200/8, 1, fp);
-			fclose(fp);
-		}
-	}
-	{
-		FILE *fp;
-		char filename[256];
-		sprintf(filename,"copdat_%s.table4", machine->gamedrv->name);
-		fp=fopen(filename, "w+b");
-		if (fp)
-		{
-			fwrite(copd2_table_4, 0x200/8, 1, fp);
-			fclose(fp);
-		}
-	}
+/* Uncommented until actively worked on
+    {
+        FILE *fp;
+        char filename[256];
+        sprintf(filename,"copdat_%s.table2", machine->gamedrv->name);
+        fp=fopen(filename, "w+b");
+        if (fp)
+        {
+            fwrite(copd2_table_2, 0x200/8, 1, fp);
+            fclose(fp);
+        }
+    }
+    {
+        FILE *fp;
+        char filename[256];
+        sprintf(filename,"copdat_%s.table3", machine->gamedrv->name);
+        fp=fopen(filename, "w+b");
+        if (fp)
+        {
+            fwrite(copd2_table_3, 0x200/8, 1, fp);
+            fclose(fp);
+        }
+    }
+    {
+        FILE *fp;
+        char filename[256];
+        sprintf(filename,"copdat_%s.table4", machine->gamedrv->name);
+        fp=fopen(filename, "w+b");
+        if (fp)
+        {
+            fwrite(copd2_table_4, 0x200/8, 1, fp);
+            fclose(fp);
+        }
+    }
+*/
 
 }
 
@@ -127,17 +129,19 @@ static void copd2_set_tabledata(running_machine *machine, UINT16 data)
 	copd2_table[copd2_offs] = data;
 	logerror("mcu_data %04x\n", data);
 
-	{
-		FILE *fp;
-		char filename[256];
-		sprintf(filename,"copdat_%s.data", machine->gamedrv->name);
-		fp=fopen(filename, "w+b");
-		if (fp)
-		{
-			fwrite(copd2_table, 0x200, 1, fp);
-			fclose(fp);
-		}
-	}
+/* Uncommented until actively worked on
+    {
+        FILE *fp;
+        char filename[256];
+        sprintf(filename,"copdat_%s.data", machine->gamedrv->name);
+        fp=fopen(filename, "w+b");
+        if (fp)
+        {
+            fwrite(copd2_table, 0x200, 1, fp);
+            fclose(fp);
+        }
+    }
+*/
 }
 
 
@@ -1267,8 +1271,8 @@ READ16_HANDLER( heatbrl_mcu_r )
         *********************************************************************/
 
 		case (0x180/2):	{ return xy_check; } /*hit protection*/
-		case (0x182/2):	{ if(input_code_pressed(KEYCODE_X)) { return 0; } else { return 3; } } /*---- ---- ---- --xx used bits*/
-		case (0x184/2):	{ if(input_code_pressed(KEYCODE_C)) { return 0; } else { return 3; } } /*---- ---- ---- --xx used bits*/
+		case (0x182/2):	{ if(input_code_pressed(space->machine, KEYCODE_X)) { return 0; } else { return 3; } } /*---- ---- ---- --xx used bits*/
+		case (0x184/2):	{ if(input_code_pressed(space->machine, KEYCODE_C)) { return 0; } else { return 3; } } /*---- ---- ---- --xx used bits*/
 
 	    case (0x1b0/2): return (0xffff); /* bit 15 is branched on a few times in the $1938 area */
 		case (0x1b4/2):	return (0xffff); /* read at $1932 and stored in ram before +0x5b0 bit 15 tested */

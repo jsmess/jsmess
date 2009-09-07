@@ -53,6 +53,7 @@ struct _options
 	UINT8					norawbytes;
 	UINT8					lower;
 	UINT8					upper;
+	int						mode;
 	const dasm_table_entry *dasm;
 };
 
@@ -173,6 +174,7 @@ CPU_DISASSEMBLE( v810 );
 CPU_DISASSEMBLE( z180 );
 CPU_DISASSEMBLE( z8000 );
 CPU_DISASSEMBLE( z80 );
+CPU_DISASSEMBLE( z8 );
 
 
 static const dasm_table_entry dasm_table[] =
@@ -295,6 +297,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "z180",       _8bit,  0, CPU_DISASSEMBLE_NAME(z180) },
 //  { "z8000",      _16be,  0, CPU_DISASSEMBLE_NAME(z8000) },
 	{ "z80",		_8bit,  0, CPU_DISASSEMBLE_NAME(z80) },
+	{ "z8",			_8bit,  0, CPU_DISASSEMBLE_NAME(z8) },
 };
 
 
@@ -327,6 +330,7 @@ int parse_options(int argc, char *argv[], options *opts)
 {
 	int pending_base = FALSE;
 	int pending_arch = FALSE;
+	int pending_mode = FALSE;
 	int curarch;
 	int numrows;
 	int arg;
@@ -341,18 +345,20 @@ int parse_options(int argc, char *argv[], options *opts)
 		// is it a switch?
 		if (curarg[0] == '-')
 		{
-			if (pending_base || pending_arch)
+			if (pending_base || pending_arch || pending_mode)
 				goto usage;
 
-			if (tolower(curarg[1]) == 'a')
+			if (tolower((UINT8)curarg[1]) == 'a')
 				pending_arch = TRUE;
-			else if (tolower(curarg[1]) == 'b')
+			else if (tolower((UINT8)curarg[1]) == 'b')
 				pending_base = TRUE;
-			else if (tolower(curarg[1]) == 'l')
+			else if (tolower((UINT8)curarg[1]) == 'l')
 				opts->lower = TRUE;
-			else if (tolower(curarg[1]) == 'n')
+			else if (tolower((UINT8)curarg[1]) == 'm')
+				pending_mode = TRUE;
+			else if (tolower((UINT8)curarg[1]) == 'n')
 				opts->norawbytes = TRUE;
-			else if (tolower(curarg[1]) == 'u')
+			else if (tolower((UINT8)curarg[1]) == 'u')
 				opts->upper = TRUE;
 			else
 				goto usage;
@@ -361,13 +367,24 @@ int parse_options(int argc, char *argv[], options *opts)
 		// base PC
 		else if (pending_base)
 		{
+			int result;
 			if (curarg[0] == '0' && curarg[1] == 'x')
-				sscanf(&curarg[2], "%x", &opts->basepc);
+				result = sscanf(&curarg[2], "%x", &opts->basepc);
 			else if (curarg[0] == '$')
-				sscanf(&curarg[1], "%x", &opts->basepc);
+				result = sscanf(&curarg[1], "%x", &opts->basepc);
 			else
-				sscanf(&curarg[0], "%x", &opts->basepc);
+				result = sscanf(&curarg[0], "%x", &opts->basepc);
+			if (result != 1)
+				goto usage;
 			pending_base = FALSE;
+		}
+
+		// mode
+		else if (pending_mode)
+		{
+			if (sscanf(curarg, "%d", &opts->mode) != 1)
+				goto usage;
+			pending_mode = FALSE;
 		}
 
 		// architecture
@@ -391,13 +408,17 @@ int parse_options(int argc, char *argv[], options *opts)
 			goto usage;
 	}
 
+	// if we have a dangling option, error
+	if (pending_base || pending_arch || pending_mode)
+		goto usage;
+
 	// if no file or no architecture, fail
 	if (opts->filename == NULL || opts->dasm == NULL)
 		goto usage;
 	return 0;
 
 usage:
-	printf("Usage: %s <filename> -arch <architecture> [-basepc <pc>] [-norawbytes] [-upper] [-lower]\n", argv[0]);
+	printf("Usage: %s <filename> -arch <architecture> [-basepc <pc>] [-mode <n>] [-norawbytes] [-upper] [-lower]\n", argv[0]);
 	printf("\n");
 	printf("Supported architectures:");
 	numrows = (ARRAY_LENGTH(dasm_table) + 6) / 7;
@@ -461,7 +482,7 @@ int main(int argc, char *argv[])
 		int numchunks;
 
 		// disassemble
-		pcdelta = (*opts.dasm->func)(NULL, buffer, curpc, oprom, oprom) & DASMFLAG_LENGTHMASK;
+		pcdelta = (*opts.dasm->func)(NULL, buffer, curpc, oprom, oprom, opts.mode) & DASMFLAG_LENGTHMASK;
 		if (opts.dasm->pcshift < 0)
 			numbytes = pcdelta << -opts.dasm->pcshift;
 		else
@@ -497,11 +518,12 @@ int main(int argc, char *argv[])
 		if (opts.lower)
 		{
 			for (p = buffer; *p != 0; p++)
-				*p = tolower(*p);
-		} else if (opts.upper)
+				*p = tolower((UINT8)*p);
+		}
+		else if (opts.upper)
 		{
 			for (p = buffer; *p != 0; p++)
-				*p = toupper(*p);
+				*p = toupper((UINT8)*p);
 		}
 		printf("%s\n", buffer);
 
@@ -526,7 +548,6 @@ int main(int argc, char *argv[])
 
 		// advance
 		curpc += pcdelta;
-		curbyte += numbytes;
 	}
 
 	return 0;

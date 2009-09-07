@@ -391,11 +391,11 @@ offs_t debug_cpu_disassemble(const device_config *device, char *buffer, offs_t p
 
 	/* check for disassembler override */
 	if (info->dasm_override != NULL)
-		result = (*info->dasm_override)(device, buffer, pc, oprom, opram);
+		result = (*info->dasm_override)(device, buffer, pc, oprom, opram, 0);
 
 	/* if we have a disassembler, run it */
 	if (result == 0 && info->disassemble != NULL)
-		result = (*info->disassemble)(device, buffer, pc, oprom, opram);
+		result = (*info->disassemble)(device, buffer, pc, oprom, opram, 0);
 
 	/* if we still have nothing, output vanilla bytes */
 	if (result == 0)
@@ -669,7 +669,7 @@ void debug_cpu_instruction_hook(const device_config *device, offs_t curpc)
 		debugger_refresh_display(device->machine);
 
 		/* wait for the debugger; during this time, disable sound output */
-		sound_mute(TRUE);
+		sound_mute(device->machine, TRUE);
 		while (global->execution_state == EXECUTION_STATE_STOPPED)
 		{
 			/* flush any pending updates before waiting again */
@@ -694,7 +694,7 @@ void debug_cpu_instruction_hook(const device_config *device, offs_t curpc)
 			if (mame_is_scheduled_event_pending(device->machine))
 				global->execution_state = EXECUTION_STATE_RUNNING;
 		}
-		sound_mute(FALSE);
+		sound_mute(device->machine, FALSE);
 
 		/* remember the last visible CPU in the debugger */
 		global->visiblecpu = device;
@@ -1531,6 +1531,25 @@ UINT64 debug_read_qword(const address_space *space, offs_t address, int apply_tr
 
 
 /*-------------------------------------------------
+    debug_read_memory - return 1,2,4 or 8 bytes
+    from the specified memory space
+-------------------------------------------------*/
+
+UINT64 debug_read_memory(const address_space *space, offs_t address, int size, int apply_translation)
+{
+	UINT64 result = ~(UINT64)0 >> (64 - 8*size);
+	switch (size)
+	{
+		case 1:		result = debug_read_byte(space, address, apply_translation);	break;
+		case 2:		result = debug_read_word(space, address, apply_translation);	break;
+		case 4:		result = debug_read_dword(space, address, apply_translation);	break;
+		case 8:		result = debug_read_qword(space, address, apply_translation);	break;
+	}
+	return result;
+}
+
+
+/*-------------------------------------------------
     debug_write_byte - write a byte to the
     specified memory space
 -------------------------------------------------*/
@@ -1722,6 +1741,23 @@ void debug_write_qword(const address_space *space, offs_t address, UINT64 data, 
 		/* no longer accessing via the debugger */
 		memory_set_debugger_access(space, global->debugger_access = FALSE);
 		global->memory_modified = TRUE;
+	}
+}
+
+
+/*-------------------------------------------------
+    debug_write_memory - write 1,2,4 or 8 bytes
+    to the specified memory space
+-------------------------------------------------*/
+
+void debug_write_memory(const address_space *space, offs_t address, UINT64 data, int size, int apply_translation)
+{
+	switch (size)
+	{
+		case 1:		debug_write_byte(space, address, data, apply_translation);	break;
+		case 2:		debug_write_word(space, address, data, apply_translation);	break;
+		case 4:		debug_write_dword(space, address, data, apply_translation);	break;
+		case 8:		debug_write_qword(space, address, data, apply_translation);	break;
 	}
 }
 
@@ -2471,19 +2507,7 @@ static UINT64 expression_read_address_space(const address_space *space, offs_t a
 	UINT64 result = ~(UINT64)0 >> (64 - 8*size);
 
 	if (space != NULL)
-	{
-		/* adjust the address into a byte address */
-		address = memory_address_to_byte(space, address);
-
-		/* switch contexts and do the read */
-		switch (size)
-		{
-			case 1:		result = debug_read_byte(space, address, TRUE);		break;
-			case 2:		result = debug_read_word(space, address, TRUE);		break;
-			case 4:		result = debug_read_dword(space, address, TRUE);	break;
-			case 8:		result = debug_read_qword(space, address, TRUE);	break;
-		}
-	}
+		result = debug_read_memory(space, memory_address_to_byte(space, address), size, TRUE);
 	return result;
 }
 
@@ -2677,19 +2701,7 @@ static void expression_write_memory(void *param, const char *name, int space, UI
 static void expression_write_address_space(const address_space *space, offs_t address, int size, UINT64 data)
 {
 	if (space != NULL)
-	{
-		/* adjust the address into a byte address */
-		address = memory_address_to_byte(space, address);
-
-		/* switch contexts and do the write */
-		switch (size)
-		{
-			case 1:		debug_write_byte(space, address, data, TRUE);	break;
-			case 2:		debug_write_word(space, address, data, TRUE);	break;
-			case 4:		debug_write_dword(space, address, data, TRUE);	break;
-			case 8:		debug_write_qword(space, address, data, TRUE);	break;
-		}
-	}
+		debug_write_memory(space, memory_address_to_byte(space, address), data, size, TRUE);
 }
 
 

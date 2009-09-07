@@ -745,7 +745,6 @@ READ8_DEVICE_HANDLER( cia_r )
 			data = timer->mode;
 			break;
 	}
-
 	return data;
 }
 
@@ -937,3 +936,4 @@ DEVICE_GET_INFO(cia8520)
 		default:	DEVICE_GET_INFO_CALL(cia6526r1);	break;
 	}
 }
+

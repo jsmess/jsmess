@@ -500,7 +500,7 @@ static DISCRETE_RESET(dss_lfsr)
 	context->out_lfsr_reg = (lfsr_desc->flags & DISC_LFSR_FLAG_OUTPUT_SR_SN1) ? 1 : 0;
 
 	if ((lfsr_desc->clock_type < DISC_CLK_ON_F_EDGE) || (lfsr_desc->clock_type > DISC_CLK_IS_FREQ))
-		discrete_log(node->info, "Invalid clock type passed in NODE_%d\n", NODE_INDEX(node->node));
+		discrete_log(node->info, "Invalid clock type passed in NODE_%d\n", NODE_BLOCKINDEX(node));
 
 	context->last = (DSS_COUNTER__CLOCK != 0);
 	if (lfsr_desc->clock_type == DISC_CLK_IS_FREQ) context->t_clock = 1.0 / DSS_LFSR_NOISE__CLOCK;
@@ -1207,7 +1207,7 @@ static DISCRETE_RESET(dss_schmitt_osc)
      * So use this for the RC charge constant. */
 	rSource     = 1.0 / ((1.0 / info->rIn) + (1.0 / info->rFeedback));
 	context->rc = rSource * info->c;
-	context->exponent = RC_CHARGE_EXP(context->rc);
+	context->exponent = RC_CHARGE_EXP(node, context->rc);
 
 	/* Cap is at 0V on power up.  Causing output to be high. */
 	context->v_cap = 0;
@@ -1508,7 +1508,7 @@ static DISCRETE_RESET(dss_squarewave2)
 #define DSS_INVERTER_OSC__C			DISCRETE_INPUT(4)
 #define DSS_INVERTER_OSC__R2		DISCRETE_INPUT(5)
 
-INLINE double dss_inverter_tftab(node_description *node, double x)
+INLINE double dss_inverter_tftab(const node_description *node, double x)
 {
 	const  discrete_inverter_osc_desc *info    = (const  discrete_inverter_osc_desc *)node->custom;
 	struct dss_inverter_osc_context   *context = (struct dss_inverter_osc_context *)node->context;
@@ -1520,7 +1520,7 @@ INLINE double dss_inverter_tftab(node_description *node, double x)
 		return info->vB;
 }
 
-INLINE double dss_inverter_tf(node_description *node, double x)
+INLINE double dss_inverter_tf(const node_description *node, double x)
 {
 	const  discrete_inverter_osc_desc *info    = (const  discrete_inverter_osc_desc *)node->custom;
 	struct dss_inverter_osc_context   *context = (struct dss_inverter_osc_context *)node->context;
@@ -1569,7 +1569,7 @@ static DISCRETE_STEP(dss_inverter_osc)
 			vG2 = dss_inverter_tf(node,vG3);
 			break;
 		default:
-			fatalerror("DISCRETE_INVERTER_OSC - Wrong type on NODE_%02d", node->node - NODE_00);
+			fatalerror("DISCRETE_INVERTER_OSC - Wrong type on NODE_%02d", NODE_BLOCKINDEX(node));
 	}
 	switch (info->options & DISC_OSC_INVERTER_TYPE_MASK)
 	{
@@ -1628,7 +1628,7 @@ static DISCRETE_STEP(dss_inverter_osc)
 			diff = diff - diff * exp(-node->info->sample_time/(context->c * rMix));
 			break;
 		default:
-			fatalerror("DISCRETE_INVERTER_OSC - Wrong type on NODE_%02d", node->node - NODE_00);
+			fatalerror("DISCRETE_INVERTER_OSC - Wrong type on NODE_%02d", NODE_BLOCKINDEX(node));
 	}
 	context->v_cap   += diff;
 	context->v_g2_old = vG2;

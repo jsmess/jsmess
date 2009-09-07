@@ -88,7 +88,7 @@ static UINT8 *system_rom;
 
 
 /* Debugging commands and handlers. */
-static offs_t dgnbeta_dasm_override(const device_config *device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
+static CPU_DISASSEMBLE(dgnbeta_dasm_override);
 static void execute_beta_dat_log(running_machine *machine, int ref, int params, const char *param[]);
 static void execute_beta_key_dump(running_machine *machine, int ref, int params, const char *param[]);
 
@@ -1120,7 +1120,7 @@ MACHINE_START( dgnbeta )
 {
 	dgnbeta_init_video(machine);
 
-	debug_cpu_set_dasm_override(cputag_get_cpu(machine, "maincpu"), dgnbeta_dasm_override);
+	debug_cpu_set_dasm_override(cputag_get_cpu(machine, "maincpu"), CPU_DISASSEMBLE_NAME(dgnbeta_dasm_override));
 
 	add_reset_callback(machine, dgnbeta_reset);
 	dgnbeta_reset(machine);
@@ -1290,7 +1290,7 @@ static const char *const os9syscalls[] =
 };
 
 
-static offs_t dgnbeta_dasm_override(const device_config *device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+static CPU_DISASSEMBLE(dgnbeta_dasm_override)
 {
 	unsigned call;
 	unsigned result = 0;

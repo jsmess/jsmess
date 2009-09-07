@@ -16,7 +16,7 @@
 #include "debugger.h"
 
 
-static offs_t palm_dasm_override(const device_config *device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
+static CPU_DISASSEMBLE(palm_dasm_override);
 
 static UINT8 port_f_latch;
 static UINT16 spim_data;
@@ -137,7 +137,7 @@ static WRITE8_DEVICE_HANDLER( palm_dac_transition )
 
 static DRIVER_INIT( palm )
 {
-    debug_cpu_set_dasm_override(cputag_get_cpu(machine, "maincpu"), palm_dasm_override);
+    debug_cpu_set_dasm_override(cputag_get_cpu(machine, "maincpu"), CPU_DISASSEMBLE_NAME(palm_dasm_override));
 }
 
 static const mc68328_interface palm_dragonball_iface =
@@ -1639,7 +1639,7 @@ static const char *lookup_trap(UINT16 opcode)
     return NULL;
 }
 
-static offs_t palm_dasm_override(const device_config *device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+static CPU_DISASSEMBLE(palm_dasm_override)
 {
     UINT16 opcode;
     unsigned result = 0;

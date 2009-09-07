@@ -406,7 +406,7 @@ static const char_info *find_charinfo(unicode_char target_char)
 	given code; used for logging and debugging
 -------------------------------------------------*/
 
-static const char *code_point_string(unicode_char ch)
+static const char *code_point_string(running_machine *machine, unicode_char ch)
 {
 	static char buf[16];
 	const char *result = buf;
@@ -430,7 +430,7 @@ static const char *code_point_string(unicode_char ch)
 			{
 				/* try to obtain a codename with input_code_name(); this can result in an empty string */
 				astring *astr = astring_alloc();
-				input_code_name(astr, (input_code) ch - UCHAR_MAMEKEY_BEGIN);
+				input_code_name(machine, astr, (input_code) ch - UCHAR_MAMEKEY_BEGIN);
 				snprintf(buf, ARRAY_LENGTH(buf), "%s", astring_c(astr));
 				astring_free(astr);
 			}
@@ -472,7 +472,7 @@ static unicode_char get_keyboard_code(const input_field_config *field, int i)
 	sets up natural keyboard input mapping
 -------------------------------------------------*/
 
-static int scan_keys(const input_port_config *portconfig, mess_input_code *codes, input_port_config_c *ports, input_field_config_c *shift_ports, int keys, int shift)
+static int scan_keys(running_machine *machine, const input_port_config *portconfig, mess_input_code *codes, input_port_config_c *ports, input_field_config_c *shift_ports, int keys, int shift)
 {
 	int code_count = 0;
 	const input_port_config *port;
@@ -494,7 +494,8 @@ static int scan_keys(const input_port_config *portconfig, mess_input_code *codes
 					if ((code >= UCHAR_SHIFT_BEGIN) && (code <= UCHAR_SHIFT_END))
 					{
 						shift_ports[keys] = field;
-						code_count += scan_keys(portconfig,
+						code_count += scan_keys(machine,
+							portconfig,
 							codes ? &codes[code_count] : NULL,
 							ports,
 							shift_ports,
@@ -516,7 +517,7 @@ static int scan_keys(const input_port_config *portconfig, mess_input_code *codes
 						code_count++;
 
 						if (LOG_INPUTX)
-							logerror("inputx: code=%i (%s) port=%p field->name='%s'\n", (int) code, code_point_string(code), port, field->name);
+							logerror("inputx: code=%i (%s) port=%p field->name='%s'\n", (int) code, code_point_string(machine, code), port, field->name);
 					}
 				}
 			}
@@ -541,14 +542,14 @@ static mess_input_code *build_codes(running_machine *machine, const input_port_c
 	int code_count;
 
 	/* first count the number of codes */
-	code_count = scan_keys(portconfig, NULL, ports, fields, 0, 0);
+	code_count = scan_keys(machine, portconfig, NULL, ports, fields, 0, 0);
 	if (code_count > 0)
 	{
 		/* allocate the codes */
 		codes = auto_alloc_array_clear(machine, mess_input_code, code_count + 1);
 	
 		/* and populate them */
-		scan_keys(portconfig, codes, ports, fields, 0, 0);
+		scan_keys(machine, portconfig, codes, ports, fields, 0, 0);
 	}
 	return codes;
 }
@@ -856,7 +857,7 @@ void inputx_postn_rate(running_machine *machine, const unicode_char *text, size_
 				if (LOG_INPUTX)
 				{
 					code = find_code(ch);
-					logerror("inputx_postn(): code=%i (%s) field->name='%s'\n", (int) ch, code_point_string(ch), (code && code->field[0]) ? code->field[0]->name : "<null>");
+					logerror("inputx_postn(): code=%i (%s) field->name='%s'\n", (int) ch, code_point_string(machine, ch), (code && code->field[0]) ? code->field[0]->name : "<null>");
 				}
 
 				if (can_post_key_directly(ch))
@@ -1554,7 +1555,7 @@ static void execute_dumpkbd(running_machine *machine, int ref, int params, const
 			/* describe the character code */
 			pos += snprintf(&buffer[pos], ARRAY_LENGTH(buffer) - pos, "%08X (%s) ",
 				code->ch,
-				code_point_string(code->ch));
+				code_point_string(machine, code->ch));
 
 			/* pad with spaces */
 			while(pos < left_column_width)

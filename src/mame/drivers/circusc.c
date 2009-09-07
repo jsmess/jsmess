@@ -138,8 +138,8 @@ static WRITE8_HANDLER(circusc_sound_w)
 
 		/* CS5 */
 		case 3:
-			device = devtag_get_device(space->machine, "fltdisc");
-			discrete_sound_w(device, NODE_03, data);
+			device = devtag_get_device(space->machine, "dac");
+			dac_w(device, 0, data);
 			break;
 
 		/* CS6 */
@@ -324,7 +324,7 @@ static DISCRETE_SOUND_START( circusc )
 
 	DISCRETE_INPUTX_STREAM(NODE_01, 0, 1.0, 0)
 	DISCRETE_INPUTX_STREAM(NODE_02, 1, 1.0, 0)
-	DISCRETE_INPUTX_DATA(NODE_03, 255, 0, 0) //DAC
+	DISCRETE_INPUTX_STREAM(NODE_03, 1, 2.0, 0) // DAC 0..32767, multiply by 2
 
 	DISCRETE_INPUT_DATA(NODE_05)
 	DISCRETE_INPUT_DATA(NODE_06)
@@ -377,6 +377,9 @@ static MACHINE_DRIVER_START( circusc )
 
 	MDRV_SOUND_ADD("sn2", SN76496, 14318180/8)
 	MDRV_SOUND_ROUTE_EX(0, "fltdisc", 1.0, 1)
+
+	MDRV_SOUND_ADD("dac", DAC, 0)
+	MDRV_SOUND_ROUTE_EX(0, "fltdisc", 1.0, 2)
 
 	MDRV_SOUND_ADD("fltdisc", DISCRETE, 0)
 

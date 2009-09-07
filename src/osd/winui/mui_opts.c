@@ -708,7 +708,7 @@ static input_seq *options_get_input_seq(core_options *opts, const char *name)
 	const char *seq_string;
 
 	seq_string = options_get_string(opts, name);
-	input_seq_from_tokens(seq_string, &seq);
+	input_seq_from_tokens(NULL, seq_string, &seq);	// HACK
 	return &seq;
 }
 

@@ -3338,13 +3338,13 @@
  *************************************/
 
 /* calculate charge exponent using discrete sample time */
-#define RC_CHARGE_EXP(rc)				(1.0 - exp(node->info->neg_sample_time / (rc)))
+#define RC_CHARGE_EXP(_node, rc)				(1.0 - exp((_node)->info->neg_sample_time / (rc)))
 /* calculate charge exponent using given sample time */
 #define RC_CHARGE_EXP_DT(rc, dt)		(1.0 - exp(-(dt) / (rc)))
 #define RC_CHARGE_NEG_EXP_DT(rc, dt)	(1.0 - exp((dt) / (rc)))
 
 /* calculate discharge exponent using discrete sample time */
-#define RC_DISCHARGE_EXP(rc)			(exp(node->info->neg_sample_time / (rc)))
+#define RC_DISCHARGE_EXP(_node, rc)			(exp((_node)->info->neg_sample_time / (rc)))
 /* calculate discharge exponent using given sample time */
 #define RC_DISCHARGE_EXP_DT(rc, dt)		(exp(-(dt) / (rc)))
 #define RC_DISCHARGE_NEG_EXP_DT(rc, dt)	(exp((dt) / (rc)))
@@ -3357,12 +3357,20 @@
 
 #define DISCRETE_STEP_NAME( _func )  _func ## _step
 #define DISCRETE_RESET_NAME( _func ) _func ## _reset
+#define DISCRETE_START_NAME( _func ) _func ## _start
+#define DISCRETE_STOP_NAME( _func )  _func ## _stop
 
-#define DISCRETE_STEP(_func) void DISCRETE_STEP_NAME(_func) (node_description *node)
-#define DISCRETE_RESET(_func) void DISCRETE_RESET_NAME(_func) (node_description *node)
+#define DISCRETE_FUNC(_func) void _func (node_description *node)
+
+#define DISCRETE_STEP(_func) DISCRETE_FUNC(DISCRETE_STEP_NAME(_func))
+#define DISCRETE_RESET(_func) DISCRETE_FUNC(DISCRETE_RESET_NAME(_func))
+#define DISCRETE_START(_func) DISCRETE_FUNC(DISCRETE_START_NAME(_func))
+#define DISCRETE_STOP(_func) DISCRETE_FUNC(DISCRETE_STOP_NAME(_func))
 
 #define DISCRETE_STEP_CALL(_func) DISCRETE_STEP_NAME(_func) (node)
 #define DISCRETE_RESET_CALL(_func) DISCRETE_RESET_NAME(_func) (node)
+#define DISCRETE_START_CALL(_func) DISCRETE_START_NAME(_func) (node)
+#define DISCRETE_STOP_CALL(_func) DISCRETE_STOP_NAME(_func) (node)
 
 #define DISCRETE_CUSTOM_MODULE(_basename, _context_type) \
 	{ DST_CUSTOM, "CUSTOM", 1, sizeof(_context_type), DISCRETE_RESET_NAME(_basename), DISCRETE_STEP_NAME(_basename) }
@@ -3377,9 +3385,8 @@
 
 #define DISCRETE_MAX_NODES				300
 #define DISCRETE_MAX_INPUTS				10
-#define DISCRETE_MAX_WAVELOGS			10
-#define DISCRETE_MAX_CSVLOGS			10
 #define DISCRETE_MAX_OUTPUTS			 8
+#define DISCRETE_MAX_TASK_OUTPUTS		 8
 
 
 /*************************************
@@ -3616,8 +3623,10 @@ struct _discrete_module
 	const char *	name;
 	int				num_output;				/* Total number of output nodes, i.e. Master node + 1 */
 	size_t			contextsize;
-	void (*reset)(node_description *node);	/* Called to reset a node after creation or system reset */
-	void (*step)(node_description *node);	/* Called to execute one time delta of output update */
+	DISCRETE_FUNC((*reset));	            /* Called to reset a node after creation or system reset */
+	DISCRETE_FUNC((*step));					/* Called to execute one time delta of output update */
+	DISCRETE_FUNC((*start));				/* Called to execute at device start */
+	DISCRETE_FUNC((*stop));					/* Called to execute at device stop */
 };
 
 
@@ -3629,7 +3638,6 @@ struct _discrete_module
 
 struct _node_description
 {
-	int				node;								/* The node's index number in the node list */
 	double			output[DISCRETE_MAX_OUTPUTS];		/* The node's last output value */
 
 	int				active_inputs;						/* Number of active inputs on this node type */
@@ -3660,19 +3668,21 @@ struct _node_description
 typedef struct _linked_list_entry	linked_list_entry;
 struct _linked_list_entry
 {
-	void *ptr;
+	const void *ptr;
 	linked_list_entry *next;
 };
 
 typedef struct _discrete_task_context discrete_task_context;
 struct _discrete_task_context
 {
-	linked_list_entry *list;
+	const linked_list_entry *list;
 
-	int numbuffered;
-	double *ptr[5];
-	double node_buf[5][2048];
-	double **dest[5];
+	int 				numbuffered;
+	double 				*ptr[DISCRETE_MAX_TASK_OUTPUTS];
+	double 				*node_buf[DISCRETE_MAX_TASK_OUTPUTS];
+	node_description	*nodes[DISCRETE_MAX_TASK_OUTPUTS];
+	double 				**dest[DISCRETE_MAX_TASK_OUTPUTS];
+
 };
 
 struct _discrete_info
@@ -3708,26 +3718,15 @@ struct _discrete_info
 	/* the output stream */
 	sound_stream *discrete_stream;
 
-	/* debugging statics */
+	/* debugging statistics */
 	FILE *disclogfile;
 
-	/* csvlog tracking */
-	int num_csvlogs;
-	FILE *disc_csv_file[DISCRETE_MAX_CSVLOGS];
-	node_description *csvlog_node[DISCRETE_MAX_CSVLOGS];
-	INT64 sample_num;
-
-	/* wavelog tracking */
-	int num_wavelogs;
-	wav_file *disc_wav_file[DISCRETE_MAX_WAVELOGS];
-	node_description *wavelog_node[DISCRETE_MAX_WAVELOGS];
-
 	/* parallel tasks */
-
 	osd_work_queue *queue;
 
 	/* profiling */
-	int total_samples;
+	UINT64 total_samples;
+	UINT64 total_stream_updates;
 };
 
 
@@ -4080,6 +4079,8 @@ enum {
 #error "DISCRETE_MAX_OUTPUTS != 8"
 #endif
 
+#define NODE_BLOCKINDEX(_node)	NODE_INDEX((_node)->block->node)
+
 #define NODE_RELATIVE(_x, _y) (NODE(NODE_INDEX(_x) + (_y)))
 
 #define NODE_NC  NODE_00
@@ -4117,6 +4118,7 @@ enum
 	DSS_INPUT_NOT,		/* Input node */
 	DSS_INPUT_PULSE,	/* Input node, single pulsed version */
 	DSS_INPUT_STREAM,	/* Stream Input */
+	DSS_INPUT_BUFFER,	/* Buffer Input node, for high freq inputs like DAC */
 
 	/* from disc_wav.c */
 	/* generic modules */
@@ -4256,8 +4258,11 @@ enum
 #define DISCRETE_INPUT_NOT(NODE)                                        { NODE, DSS_INPUT_NOT   , 3, { NODE_NC,NODE_NC,NODE_NC }, { 1,0,0 }, NULL, "DISCRETE_INPUT_NOT" },
 #define DISCRETE_INPUTX_NOT(NODE,GAIN,OFFSET,INIT)                      { NODE, DSS_INPUT_NOT   , 3, { NODE_NC,NODE_NC,NODE_NC }, { GAIN,OFFSET,INIT }, NULL, "DISCRETE_INPUTX_NOT" },
 #define DISCRETE_INPUT_PULSE(NODE,INIT)                                 { NODE, DSS_INPUT_PULSE , 3, { NODE_NC,NODE_NC,NODE_NC }, { 1,0,INIT }, NULL, "DISCRETE_INPUT_PULSE" },
+
 #define DISCRETE_INPUT_STREAM(NODE, NUM)                                { NODE, DSS_INPUT_STREAM, 3, { NUM,NODE_NC,NODE_NC }, { NUM,1,0 }, NULL, "DISCRETE_INPUT_STREAM" },
 #define DISCRETE_INPUTX_STREAM(NODE, NUM, GAIN,OFFSET)                  { NODE, DSS_INPUT_STREAM, 3, { NUM,NODE_NC,NODE_NC }, { NUM,GAIN,OFFSET }, NULL, "DISCRETE_INPUTX_STREAM" },
+
+#define DISCRETE_INPUT_BUFFER(NODE, NUM)	                            { NODE, DSS_INPUT_BUFFER, 3, { NUM,NODE_NC,NODE_NC }, { NUM,1,0 }, NULL, "DISCRETE_INPUT_BUFFER" },
 
 /* from disc_wav.c */
 /* generic modules */
@@ -4411,12 +4416,8 @@ enum
 
 /* parallel tasks */
 
-#define DISCRETE_TASK_START()                                           { NODE_SPECIAL, DSO_TASK_START, 0, { 0 }, { 0 }, NULL, "DISCRETE_TASK_START" },
-#define DISCRETE_TASK_END(BNODE1)                                       { NODE_SPECIAL, DSO_TASK_END , 1, { BNODE1 }, { BNODE1 }, NULL, "DISCRETE_TASK_END" },
-#define DISCRETE_TASK_END2(BNODE1,BNODE2)                               { NODE_SPECIAL, DSO_TASK_END , 2, { BNODE1,BNODE2 }, { BNODE1,BNODE2 }, NULL, "DISCRETE_TASK_END2" },
-#define DISCRETE_TASK_END3(BNODE1,BNODE2,BNODE3)                        { NODE_SPECIAL, DSO_TASK_END , 3, { BNODE1,BNODE2,BNODE3 }, { BNODE1,BNODE2,BNODE3 }, NULL, "DISCRETE_TASK_END3" },
-#define DISCRETE_TASK_END4(BNODE1,BNODE2,BNODE3,BNODE4)                 { NODE_SPECIAL, DSO_TASK_END , 4, { BNODE1,BNODE2,BNODE3,BNODE4 }, { BNODE1,BNODE2,BNODE3,BNODE4 }, NULL, "DISCRETE_TASK_END4" },
-#define DISCRETE_TASK_END5(BNODE1,BNODE2,BNODE3,BNODE4,BNODE5)          { NODE_SPECIAL, DSO_TASK_END , 5, { BNODE1,BNODE2,BNODE3,BNODE4,BNODE5 }, { BNODE1,BNODE2,BNODE3,BNODE4,BNODE5 }, NULL, "DISCRETE_TASK_END5" },
+#define DISCRETE_TASK_START()                                           { NODE_SPECIAL, DSO_TASK_START,0, { 0 }, { 0 }, NULL, "DISCRETE_TASK_START" },
+#define DISCRETE_TASK_END()                                             { NODE_SPECIAL, DSO_TASK_END , 1, { 0 }, { 0 }, NULL, "DISCRETE_TASK_END" },
 //#define DISCRETE_TASK_SYNC()                                          { NODE_SPECIAL, DSO_TASK_SYNC, 0, { 0 }, { 0 }, NULL, "DISCRETE_TASK_SYNC" },
 
 /* output */

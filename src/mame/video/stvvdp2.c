@@ -2163,7 +2163,7 @@ static struct _stv_rbg_cache_data
 
 #define mul_fixed32( a, b ) mul_32x32_shift( a, b, 16 )
 
-static void stv_vdp2_fill_rotation_parameter_table( UINT8 rot_parameter )
+static void stv_vdp2_fill_rotation_parameter_table( running_machine *machine, UINT8 rot_parameter )
 {
 	UINT32 address;
 
@@ -2222,10 +2222,10 @@ static void stv_vdp2_fill_rotation_parameter_table( UINT8 rot_parameter )
 	/*Attempt to show on screen the rotation table*/
 	if(LOG_ROZ == 2)
 	{
-		if(input_code_pressed_once(JOYCODE_Y_UP_SWITCH))
+		if(input_code_pressed_once(machine, JOYCODE_Y_UP_SWITCH))
 			debug.roz++;
 
-		if(input_code_pressed_once(JOYCODE_Y_DOWN_SWITCH))
+		if(input_code_pressed_once(machine, JOYCODE_Y_DOWN_SWITCH))
 			debug.roz--;
 
 		if(debug.roz > 10)
@@ -4752,7 +4752,8 @@ static void stv_vdp2_draw_NBG3(running_machine *machine, bitmap_t *bitmap, const
 static void stv_vdp2_draw_rotation_screen(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int iRP)
 {
 	rectangle roz_clip_rect, mycliprect;
-	int planesizex = 0, planesizey = 0, planerenderedsizex, planerenderedsizey;
+	int planesizex = 0, planesizey = 0;
+	int planerenderedsizex, planerenderedsizey;
 	UINT8 colour_calculation_enabled;
 	UINT8 window_control;
 	UINT8 fade_control;
@@ -4800,7 +4801,7 @@ static void stv_vdp2_draw_rotation_screen(running_machine *machine, bitmap_t *bi
 		stv2_current_tilemap.map_count = 16;
 	}
 
-	stv_vdp2_fill_rotation_parameter_table(iRP);
+	stv_vdp2_fill_rotation_parameter_table(machine, iRP);
 
 	if ( iRP == 1 )
 	{
@@ -6226,32 +6227,32 @@ VIDEO_UPDATE( stv_vdp2 )
 	stv_vdp2_draw_back(screen->machine, bitmap,cliprect);
 
 	#if DEBUG_MODE
-	if(input_code_pressed_once(KEYCODE_T))
+	if(input_code_pressed_once(screen->machine, KEYCODE_T))
 	{
 		debug.l_en^=1;
 		popmessage("NBG3 %sabled",debug.l_en & 1 ? "en" : "dis");
 	}
-	if(input_code_pressed_once(KEYCODE_Y))
+	if(input_code_pressed_once(screen->machine, KEYCODE_Y))
 	{
 		debug.l_en^=2;
 		popmessage("NBG2 %sabled",debug.l_en & 2 ? "en" : "dis");
 	}
-	if(input_code_pressed_once(KEYCODE_U))
+	if(input_code_pressed_once(screen->machine, KEYCODE_U))
 	{
 		debug.l_en^=4;
 		popmessage("NBG1 %sabled",debug.l_en & 4 ? "en" : "dis");
 	}
-	if(input_code_pressed_once(KEYCODE_I))
+	if(input_code_pressed_once(screen->machine, KEYCODE_I))
 	{
 		debug.l_en^=8;
 		popmessage("NBG0 %sabled",debug.l_en & 8 ? "en" : "dis");
 	}
-	if(input_code_pressed_once(KEYCODE_K))
+	if(input_code_pressed_once(screen->machine, KEYCODE_K))
 	{
 		debug.l_en^=0x10;
 		popmessage("RBG0 %sabled",debug.l_en & 0x10 ? "en" : "dis");
 	}
-	if(input_code_pressed_once(KEYCODE_O))
+	if(input_code_pressed_once(screen->machine, KEYCODE_O))
 	{
 		debug.l_en^=0x20;
 		popmessage("SPRITE %sabled",debug.l_en & 0x20 ? "en" : "dis");
@@ -6294,7 +6295,7 @@ VIDEO_UPDATE( stv_vdp2 )
     ,STV_VDP2_N1ZMXI,STV_VDP2_N1ZMXD
     ,STV_VDP2_N1ZMYI,STV_VDP2_N1ZMYD);*/
 
-	if ( input_code_pressed_once(KEYCODE_W) )
+	if ( input_code_pressed_once(screen->machine, KEYCODE_W) )
 	{
 		int tilecode;
 
@@ -6338,7 +6339,7 @@ VIDEO_UPDATE( stv_vdp2 )
 		}
 	}
 
-	if ( input_code_pressed_once(KEYCODE_N) )
+	if ( input_code_pressed_once(screen->machine, KEYCODE_N) )
 	{
 		FILE *fp;
 
@@ -6350,7 +6351,7 @@ VIDEO_UPDATE( stv_vdp2 )
 		}
 	}
 
-	if ( input_code_pressed_once(KEYCODE_M) )
+	if ( input_code_pressed_once(screen->machine, KEYCODE_M) )
 	{
 		FILE *fp;
 
