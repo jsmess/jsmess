@@ -610,6 +610,7 @@ $(MESSOBJ)/atari.a:				\
 	$(MAME_AUDIO)/jaguar.o		\
 	$(MAME_VIDEO)/jaguar.o		\
 	$(MESS_FORMATS)/a26_cas.o	\
+	$(MESS_FORMATS)/atarist_dsk.o	\
 	$(MESS_DRIVERS)/atarist.o 	\
 	$(MESS_VIDEO)/atarist.o 	\
 	$(MESS_DRIVERS)/lynx.o		\
