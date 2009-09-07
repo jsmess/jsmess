@@ -62,6 +62,8 @@ System Driver Changes:
 - [NES] Improved NES APU when reading reading $4015 and sprite overflow 
   emulation, fixed 4-screen mirroring. [Robert Bohms]
 
+- [ORIC] Revert commented floppy code [Miodrag Milanovic]
+
 - [PIPPIN] Added CD-ROM firmware. [incog nito]
 
 - [SNES] Plenty of improvements to SNES emulation (see MAME whatsnew for 
@@ -127,7 +129,7 @@ Source Changes:
 - The core is based on MAME 0.133u5.  This incorporates all features of the
   update to this core.  [MAME team]
 
-
+- Floppy cleanup [Miodrag Milanovic]
 
 0.133
 

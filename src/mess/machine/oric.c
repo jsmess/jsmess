@@ -1178,8 +1178,7 @@ MACHINE_RESET( oric )
 READ8_HANDLER ( oric_IO_r )
 {
 	const device_config *via_0 = devtag_get_device(space->machine, "via6522_0");
-#if 0
-	switch (input_port_read(machine, "FLOPPY") & 0x07)
+	switch (input_port_read(space->machine, "FLOPPY") & 0x07)
 	{
 		default:
 		case ORIC_FLOPPY_INTERFACE_NONE:
@@ -1189,7 +1188,7 @@ READ8_HANDLER ( oric_IO_r )
 		{
 			if ((offset>=0x010) && (offset<=0x01f))
 			{
-				return oric_microdisc_r(offset);
+				return oric_microdisc_r(space, offset);
 			}
 		}
 		break;
@@ -1198,12 +1197,11 @@ READ8_HANDLER ( oric_IO_r )
 		{
 			if ((offset>=0x0f4) && (offset<=0x0ff))
 			{
-				return oric_jasmin_r(offset);
+				return oric_jasmin_r(space, offset);
 			}
 		}
 		break;
 	}
-#endif
 	if (enable_logging)
 	{
 		if ((offset & 0x0f)!=0x0d)
@@ -1218,8 +1216,7 @@ READ8_HANDLER ( oric_IO_r )
 WRITE8_HANDLER ( oric_IO_w )
 {
 	const device_config *via_0 = devtag_get_device(space->machine, "via6522_0");
-#if 0
-	switch (input_port_read(machine, "FLOPPY") & 0x07)
+	switch (input_port_read(space->machine, "FLOPPY") & 0x07)
 	{
 		default:
 		case ORIC_FLOPPY_INTERFACE_NONE:
@@ -1229,7 +1226,7 @@ WRITE8_HANDLER ( oric_IO_w )
 		{
 			if ((offset >= 0x010) && (offset <= 0x01f))
 			{
-				oric_microdisc_w(offset, data);
+				oric_microdisc_w(space, offset, data);
 				return;
 			}
 		}
@@ -1239,14 +1236,13 @@ WRITE8_HANDLER ( oric_IO_w )
 		{
 			if ((offset >= 0x0f4) && (offset <= 0x0ff))
 			{
-				oric_jasmin_w(offset, data);
+				oric_jasmin_w(space, offset, data);
 				return;
 			}
 
 		}
 		break;
 	}
-#endif
 	if (enable_logging)
 	{
 		logerror("via 0 w: %04x %02x %04x\n", offset, data,(unsigned) cpu_get_reg(cputag_get_cpu(space->machine, "maincpu"), REG_GENPC));
