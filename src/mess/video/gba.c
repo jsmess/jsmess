@@ -499,7 +499,7 @@ static void draw_gba_oam(gba_state *gba_state, running_machine *machine, UINT16 
 			attr1 = pgba_oam[(4*gba_oamindex)+1];
 			attr2 = pgba_oam[(4*gba_oamindex)+2];
 
-			if (((attr0 & OBJ_MODE) != OBJ_MODE_WINDOW) && (((attr2 >> 10) & 3) >= priority))
+			if (((attr0 & OBJ_MODE) != OBJ_MODE_WINDOW) && (((attr2 >> 10) & 3) == priority))
 			{
 				width = 0;
 				height = 0;
