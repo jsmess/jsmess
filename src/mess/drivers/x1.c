@@ -537,6 +537,7 @@ static READ8_HANDLER( sub_io_r )
 
 static UINT8 key_irq_vector;
 static UINT8 cmt_current_cmd;
+static UINT8 cmt_test;
 
 static void cmt_command( running_machine* machine, UINT8 cmd )
 {
@@ -555,8 +556,12 @@ static void cmt_command( running_machine* machine, UINT8 cmd )
 	{
 		case 0x01:  // Stop
 			cassette_change_state(devtag_get_device(machine, "cass" ),CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
+			cmt_test = 1;
 			break;
 		case 0x02:  // Play
+			cassette_change_state(devtag_get_device(machine, "cass" ),CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
+			break;
+		case 0x0a:  // Record
 			cassette_change_state(devtag_get_device(machine, "cass" ),CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
 			break;
 		default:
@@ -608,10 +613,10 @@ static WRITE8_HANDLER( sub_io_w )
 			logerror("CMT: Command 0xEA received, returning 0x%02x.\n",sub_val[0]);
 			break;
 		case 0xeb:  // CMT Tape status
-		            // bit 0 = tape end
+		            // bit 0 = tape end (0=end of tape)
 					// bit 1 = tape inserted
-					// bit 2 = ???
-			sub_val[0] = 0x02;  // assume a tape is inserted for now
+					// bit 2 = record status (1=OK, 0=write protect?)
+			sub_val[0] = 0x07;  // assume a tape is inserted for now
 			sub_cmd_length = 1;
 			logerror("CMT: Command 0xEB received, returning 0x%02x.\n",sub_val[0]);
 			break;
@@ -1197,7 +1202,7 @@ static READ8_DEVICE_HANDLER( x1_portb_r )
 	---- ---x "cmt test" (active low)
 	*/
 	UINT8 dat = 0;
-	dat = (input_port_read(device->machine, "SYSTEM") & ~0x68) | sub_obf;
+	dat = (input_port_read(device->machine, "SYSTEM") & ~0x6e) | sub_obf;
 
 	if((dat & 0x80) == 0)
 		dat |= 0x04;  // VSync (todo: proper implementation of vsync)
@@ -1205,8 +1210,14 @@ static READ8_DEVICE_HANDLER( x1_portb_r )
 	if(cassette_input(devtag_get_device(device->machine,"cass")) > 0.03)
 		dat |= 0x02;
 
-	if(cassette_get_state(devtag_get_device(device->machine,"cass")) & CASSETTE_MOTOR_DISABLED)
-		dat |= 0x02;
+//	if(cassette_get_state(devtag_get_device(device->machine,"cass")) & CASSETTE_MOTOR_DISABLED)
+//		dat &= ~0x02;  // is zero if not playing
+		
+	if(cmt_test != 0)
+	{
+		dat |= 0x01;
+		cmt_test = 1;
+	}
 
 	return dat;
 }
@@ -1756,6 +1767,7 @@ static MACHINE_RESET( x1 )
 	timer_pulse(machine, ATTOTIME_IN_HZ(240), NULL, 0, keyboard_callback);
 
 	cmt_current_cmd = 0;
+	cmt_test = 0;
 	cassette_change_state(devtag_get_device(machine, "cass" ),CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
 }
 
