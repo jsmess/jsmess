@@ -21,8 +21,8 @@ static FLOPPY_CONSTRUCT(comx35_dsk_construct)
 {
 	struct basicdsk_geometry geometry;
 	UINT8 header[1];
-	int heads;
-	int cylinders;	
+	int heads =1;
+	int cylinders =35;	
 	
 	switch(floppy_image_size(floppy)) {
 		case 35*1*16*128:
