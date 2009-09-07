@@ -2,11 +2,11 @@
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
-- Tandy 1000RL  [Wilbert Pol]
-- Nintendo Game Boy Advance [R. Belmont, Harmony]
 - 4004 Nixie Tube Clock [Miodrag Milanovic]
 - Busicom 141-PF [Miodrag Milanovic]
 - Mikron-2 [Miodrag Milanovic]
+- Nintendo Game Boy Advance [R. Belmont, Harmony]
+- Tandy 1000RL  [Wilbert Pol]
 
 
 
@@ -14,15 +14,15 @@ Systems Promoted from GAME_NOT_WORKING:
 ---------------------------------------
 - Elektor Junior [Manfred Schneider]
 - Elwro 800 Junior [Mariusz Wojcieszek]
-
+- Sharp X1 / X1 Turbo [Angelo Salese]
 
 
 Skeleton drivers: 
 -----------------
-- Kaypro 4/plus88
-- Kaypro 4 4-84
 - HC-88
 - Cobra / Cobra 80K
+- Kaypro 4/plus88
+- Kaypro 4 4-84
 - Tatung Einstein 256
 
 
@@ -48,19 +48,66 @@ System Driver Changes:
 - [IBMPCJR] Added proper support for b/w and color modes.  [Wilbert Pol]
 
 - [IBMPCJR] Added selection of proper mc6845 input clocks for
-            different graphics modes.  [Wilbert Pol]
+  different graphics modes.  [Wilbert Pol]
 
 - [JAGUAR] Replaced wave table code with a ROM. [Zerosquare, Robbbert]
-           Fixed quickload problems.
-           Various miscellaneous improvements. [Robbbert]
+
+- [JAGUAR] Fixed quickload problems. [Robbbert]
+
+- [JAGUAR] Various miscellaneous improvements. [Robbbert]
 
 - [NES] Changed the PPU to use a device memory map (bug #1831), enhancements
-  and improvements to mappers 5, 68, 88, 119.  [Robert Bohms]
+  and improvements to mappers 5, 68, 88, 119. [Robert Bohms]
+
+- [NES] Improved NES APU when reading reading $4015 and sprite overflow 
+  emulation, fixed 4-screen mirroring. [Robert Bohms]
+
+- [PIPPIN] Added CD-ROM firmware. [incog nito]
+
+- [SNES] Plenty of improvements to SNES emulation (see MAME whatsnew for 
+  more details) [Fabio Priuli, Angelo Salese]: 
+  * fixes to hi-res in Mode 5/6, interlaced graphics, rowscroll, window effect
+  * implemented open bus
+  * added proper priority tables for various bg/obj layers
+  * simplified tile, line and object drawing routines
+  * improved Mode 7 math precision, EXTBG and Mosaic
+  * fixed direct color gfxs in Mode 3/4/7
+  * improved joypad read/write handling and fixed a serial port quirk
+  * added OBJ interlace support
+  * corrected a bunch of SPC and PPU registers behaviour
+  * fixed HDMA mid-frame inits
+  * added clip colors to black window function
+  * fixed main/sub color maths
+  * fixed half colour blending behaviour
 
 - [SNES] Added support for SuperFX games. [Harmony]
 
+- [SNES] Added preliminary support for S-DD1 and S-RTC emulation. [Harmony]
+
+- [TI81] Added v2.0 BIOS (possibly bad dump). [FloppusMaximus]
+
 - [V1050] Fixed centronics output. [Curt Coder]
 
+- [VBOY] Updates to graphics handling and port reading, some demos 
+  work [Miodrag Milanovic]
+
+- [X1] Many improvements to Sharp X1 emulation [Angelo Salese]: 
+  * Fixed memory maps and added basic graphic emulation
+  * Hooked up 320 bitmap mode and added char double height feature
+  * properly emulated PCG in order to support bitplane mask and color 
+    revert features
+  * added .D88 disk image support
+  * allow the X1Turbo versions to boot properly and hooked up YM-2151
+  * added basic keyboard irq
+  * added proper priority mixer emulation (PLY register)
+  * added basic PCG reading and RTC feature
+  * added v400 mode
+
+- [X1] Improved keyboard support and implemented 'game' keys [Barry Rodewald]
+
+- [X1] Added cassette reading / writing (.wav only atm) [Barry Rodewald]
+
+- [Z8] Added preliminary Z8 cpu core for JuTe computer. [Curt Coder]
 
 
 User Interface Changes:
