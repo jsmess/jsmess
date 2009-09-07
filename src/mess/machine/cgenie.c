@@ -11,7 +11,6 @@
 #include "cpu/z80/z80.h"
 #include "includes/cgenie.h"
 #include "machine/wd17xx.h"
-#include "devices/basicdsk.h"
 #include "devices/cartslot.h"
 #include "devices/cassette.h"
 #include "sound/ay8910.h"
@@ -29,47 +28,6 @@ UINT8 *cgenie_fontram;
 
 int cgenie_tv_mode = -1;
 static int port_ff = 0xff;
-
-#define CGENIE_DRIVE_INFO
-
-
-
-/********************************************************
-   abbreviations used:
-   GPL	Granules Per Lump
-   GAT	Granule Allocation Table
-   GATL GAT Length
-   GATM GAT Mask
-   DDGA Disk Directory Granule Allocation
-*********************************************************/
-typedef struct
-{
-	UINT8 DDSL; 	 /* Disk Directory Start Lump (lump number of GAT) */
-	UINT8 GATL; 	 /* # of bytes used in the Granule Allocation Table sector */
-	UINT8 STEPRATE;  /* step rate and somet SD/DD flag ... */
-	UINT8 TRK;		 /* number of tracks */
-	UINT8 SPT;		 /* sectors per track (both heads counted!) */
-	UINT8 GATM; 	 /* number of used bits per byte in the GAT sector (GAT mask) */
-	UINT8 P7;		 /* ???? always zero */
-	UINT8 FLAGS;	 /* ???? some flags (SS/DS bit 6) */
-	UINT8 GPL;		 /* Sectors per granule (always 5 for the Colour Genie) */
-	UINT8 DDGA; 	 /* Disk Directory Granule allocation (number of driectory granules) */
-}	PDRIVE;
-
-static const PDRIVE pd_list[12] = {
-	{0x14, 0x28, 0x07, 0x28, 0x0A, 0x02, 0x00, 0x00, 0x05, 0x02}, /* CMD"<0=A" 40 tracks, SS, SD */
-	{0x14, 0x28, 0x07, 0x28, 0x14, 0x04, 0x00, 0x40, 0x05, 0x04}, /* CMD"<0=B" 40 tracks, DS, SD */
-	{0x18, 0x30, 0x53, 0x28, 0x12, 0x03, 0x00, 0x03, 0x05, 0x03}, /* CMD"<0=C" 40 tracks, SS, DD */
-	{0x18, 0x30, 0x53, 0x28, 0x24, 0x06, 0x00, 0x43, 0x05, 0x06}, /* CMD"<0=D" 40 tracks, DS, DD */
-	{0x14, 0x28, 0x07, 0x28, 0x0A, 0x02, 0x00, 0x04, 0x05, 0x02}, /* CMD"<0=E" 40 tracks, SS, SD */
-	{0x14, 0x28, 0x07, 0x28, 0x14, 0x04, 0x00, 0x44, 0x05, 0x04}, /* CMD"<0=F" 40 tracks, DS, SD */
-	{0x18, 0x30, 0x53, 0x28, 0x12, 0x03, 0x00, 0x07, 0x05, 0x03}, /* CMD"<0=G" 40 tracks, SS, DD */
-	{0x18, 0x30, 0x53, 0x28, 0x24, 0x06, 0x00, 0x47, 0x05, 0x06}, /* CMD"<0=H" 40 tracks, DS, DD */
-	{0x28, 0x50, 0x07, 0x50, 0x0A, 0x02, 0x00, 0x00, 0x05, 0x02}, /* CMD"<0=I" 80 tracks, SS, SD */
-	{0x28, 0x50, 0x07, 0x50, 0x14, 0x04, 0x00, 0x40, 0x05, 0x04}, /* CMD"<0=J" 80 tracks, DS, SD */
-	{0x30, 0x60, 0x53, 0x50, 0x12, 0x03, 0x00, 0x03, 0x05, 0x03}, /* CMD"<0=K" 80 tracks, SS, DD */
-	{0x30, 0x60, 0x53, 0x50, 0x24, 0x06, 0x00, 0x43, 0x05, 0x06}, /* CMD"<0=L" 80 tracks, DS, DD */
-};
 
 #define IRQ_TIMER		0x80
 #define IRQ_FDC 		0x40
@@ -203,103 +161,6 @@ MACHINE_START( cgenie )
 	videoram = mess_ram;
 	memory_set_bankptr(machine, 1, mess_ram);
 }
-
-
-/* basic-dsk is a disk image format which has the tracks and sectors
- * stored in order, no information is stored which details the number
- * of tracks, number of sides, number of sectors etc, so we need to
- * set that up here
- */
-DEVICE_IMAGE_LOAD( cgenie_floppy )
-{
-	int i, j, dir_offset;
-	UINT8 buff[16];
-	UINT8 tracks = 0;
-	UINT8 heads = 0;
-	UINT8 spt = 0;
-	short dir_sector = 0;
-	short dir_length = 0;
-
-	/* A Floppy Isnt manditory, so return if none */
-	if (device_load_basicdsk_floppy(image) != INIT_PASS)
-		return INIT_FAIL;
-
-	/* determine image geometry */
-	image_fseek(image, 0, SEEK_SET);
-
-	/* determine geometry from disk contents */
-	for( i = 0; i < 12; i++ )
-	{
-		image_fseek(image, pd_list[i].SPT * 256, SEEK_SET);
-		image_fread(image, buff, 16);
-		/* find an entry with matching DDSL */
-		if (buff[0] != 0x00 || buff[1] != 0xfe || buff[2] != pd_list[i].DDSL)
-			continue;
-		logerror("cgenie: checking format #%d\n", i);
-
-		dir_sector = pd_list[i].DDSL * pd_list[i].GATM * pd_list[i].GPL + pd_list[i].SPT;
-		dir_length = pd_list[i].DDGA * pd_list[i].GPL;
-
-		/* scan directory for DIR/SYS or NCW1983/JHL files */
-		/* look into sector 2 and 3 first entry relative to DDSL */
-		for( j = 16; j < 32; j += 8 )
-		{
-			dir_offset = dir_sector * 256 + j * 32;
-			if( image_fseek(image, dir_offset, SEEK_SET) < 0 )
-				break;
-			if( image_fread(image, buff, 16) != 16 )
-				break;
-			if( !strncmp((char*)buff + 5, "DIR     SYS", 11) ||
-				!strncmp((char*)buff + 5, "NCW1983 JHL", 11) )
-			{
-				tracks = pd_list[i].TRK;
-				heads = (pd_list[i].SPT > 18) ? 2 : 1;
-				spt = pd_list[i].SPT / heads;
-				dir_sector = pd_list[i].DDSL * pd_list[i].GATM * pd_list[i].GPL + pd_list[i].SPT;
-				dir_length = pd_list[i].DDGA * pd_list[i].GPL;
-				memcpy(memory_region(image->machine, "maincpu") + 0x5A71 + image_index_in_device(image) * sizeof(PDRIVE), &pd_list[i], sizeof(PDRIVE));
-				break;
-			}
-		}
-
-		logerror("cgenie: geometry %d tracks, %d heads, %d sec/track\n", tracks, heads, spt);
-		/* set geometry so disk image can be read */
-		basicdsk_set_geometry(image, tracks, heads, spt, 256, 0, 0, FALSE);
-
-		logerror("cgenie: directory sectors %d - %d (%d sectors)\n", dir_sector, dir_sector + dir_length - 1, dir_length);
-		/* mark directory sectors with deleted data address mark */
-		/* assumption dir_sector is a sector offset */
-		for (j = 0; j < dir_length; j++)
-		{
-			UINT8 track;
-			UINT8 side;
-			UINT8 sector_id;
-			UINT16 track_offset;
-			UINT16 sector_offset;
-
-			/* calc sector offset */
-			sector_offset = dir_sector + j;
-
-			/* get track offset */
-			track_offset = sector_offset / spt;
-
-			/* calc track */
-			track = track_offset / heads;
-
-			/* calc side */
-			side = track_offset % heads;
-
-			/* calc sector id - first sector id is 0! */
-			sector_id = sector_offset % spt;
-
-			/* set deleted data address mark for sector specified */
-			basicdsk_set_ddam(image, track, side, sector_id, 1);
-		}
-
-	}
-	return INIT_PASS;
-}
-
 
 /*************************************
  *
