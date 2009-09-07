@@ -128,7 +128,9 @@
 #include "machine/8530scc.h"
 #include "machine/hd63450.h"
 #include "machine/rp5c15.h"
-#include "devices/basicdsk.h"
+#include "devices/mflopimg.h"
+#include "formats/basicdsk.h"
+#include "formats/dim_dsk.h"
 #include "devices/harddriv.h"
 #include "machine/x68k_hdc.h"
 #include "includes/x68k.h"
@@ -2227,92 +2229,20 @@ static INPUT_PORTS_START( x68000 )
 
 INPUT_PORTS_END
 
-static void dimdsk_set_geometry(const device_config* image)
-{
-	// DIM disk image header, most of this is guesswork
-	int tracks = 77;
-	int heads = 2;
-	int sectors = 8;  // per track
-	int sectorlen = 1024;
-	int firstsector = 0x01;
-	unsigned char format;
-	int x;
-	unsigned short temp;
-
-	/* Offset + 0 : disk format type (1 byte):
-     * 0 = 2HD / 2HDA (8 sector/track, 1024 bytes/sector, GAP#3 = 0x74)
-     * 1 = 2HS        (9 sector/track, 1024 bytes/sector, GAP#3 = 0x39)
-     * 2 = 2HC        (15 sector/track, 512 bytes/sector, GAP#3 = 0x54)
-     * 3 = 2HDE(68)   (9 sector/track, 1024 bytes/sector, GAP#3 = 0x39)
-     * 9 = 2HQ        (18 sector/track, 512 bytes/sector, GAP#3 = 0x54)
-     * 17 = N88-BASIC (26 sector/track, 256 bytes/sector, GAP#3 = 0x33)
-     *             or (26 sector/track, 128 bytes/sector, GAP#3 = 0x1a)
-     */
-	image_fread(image,&format,1);
-
-	switch(format)
+static void x68k_load_proc(const device_config *image)
+{	
+	if(x68k_sys.ioc.irqstatus & 0x02)
 	{
-	case 0x00:
-		sectors = 8;
-		sectorlen = 1024;
-		break;
-	case 0x01:
-	case 0x03:
-		sectors = 9;
-		sectorlen = 1024;
-		break;
-	case 0x02:
-		sectors = 15;
-		sectorlen = 512;
-		break;
-	case 0x09:
-		sectors = 18;
-		sectorlen = 512;
-		break;
-	case 0x11:
-		sectors = 26;
-		sectorlen = 256;
-		break;
+		current_vector[1] = 0x61;
+		x68k_sys.ioc.irqstatus |= 0x40;
+		current_irq_line = 1;
+		cputag_set_input_line_and_vector(image->machine, "maincpu",1,ASSERT_LINE,current_vector[1]);  // Disk insert/eject interrupt
+		logerror("IOC: Disk image inserted\n");
 	}
-	tracks = 0;
-	for (x=0;x<86;x++)
-	{
-		image_fread(image,&temp,2);
-		if(temp == 0x0101)
-			tracks++;
-	}
-	// TODO: expand on this basic implementation
-
-	logerror("FDD: DIM image loaded - type %i, %i tracks, %i sectors per track, %i bytes per sector\n", format,tracks, sectors,sectorlen);
-	basicdsk_set_geometry(image, tracks+1, heads, sectors, sectorlen, firstsector, 0x100, FALSE);
+	x68k_sys.fdc.disk_inserted[image_index_in_device(image)] = 1;
 }
 
-static DEVICE_IMAGE_LOAD( x68k_floppy )
-{
-	if (device_load_basicdsk_floppy(image)==INIT_PASS)
-	{
-		/* sector id's 01-08 */
-		/* drive, tracks, heads, sectors per track, sector length, first sector id */
-		if(strcmp(image_filetype(image),"dim") == 0)
-			dimdsk_set_geometry(image);
-		else
-			basicdsk_set_geometry(image, 77, 2, 8, 1024, 0x01, 0, FALSE);
-		if(x68k_sys.ioc.irqstatus & 0x02)
-		{
-			current_vector[1] = 0x61;
-			x68k_sys.ioc.irqstatus |= 0x40;
-			current_irq_line = 1;
-			cputag_set_input_line_and_vector(image->machine, "maincpu",1,ASSERT_LINE,current_vector[1]);  // Disk insert/eject interrupt
-			logerror("IOC: Disk image inserted\n");
-		}
-		x68k_sys.fdc.disk_inserted[image_index_in_device(image)] = 1;
-		return INIT_PASS;
-	}
-
-	return INIT_FAIL;
-}
-
-static DEVICE_IMAGE_UNLOAD( x68k_floppy )
+static void x68k_unload_proc(const device_config *image)
 {
 	if(x68k_sys.ioc.irqstatus & 0x02)
 	{
@@ -2324,34 +2254,29 @@ static DEVICE_IMAGE_UNLOAD( x68k_floppy )
 	x68k_sys.fdc.disk_inserted[image_index_in_device(image)] = 0;
 }
 
+FLOPPY_OPTIONS_START( x68k )
+	FLOPPY_OPTION( dim, "dim",		"DIM floppy disk image",	dim_dsk_identify, dim_dsk_construct, NULL)
+	FLOPPY_OPTION( img2d, "xdf,hdm,2hd", "XDF disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([77])
+		SECTORS([8])
+		SECTOR_LENGTH([1024])
+		FIRST_SECTOR_ID([1]))
+FLOPPY_OPTIONS_END
+
+
 static void x68k_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
+	/* floppy */
 	switch(state)
 	{
-	case MESS_DEVINFO_INT_READABLE:
-		info->i = 1;
-		break;
-	case MESS_DEVINFO_INT_WRITEABLE:
-		info->i = 1;
-		break;
-	case MESS_DEVINFO_INT_CREATABLE:
-		info->i = 0;
-		break;
-	case MESS_DEVINFO_INT_COUNT:
-		info->i = 4;
-		break;
-	case MESS_DEVINFO_PTR_LOAD:
-		info->load = DEVICE_IMAGE_LOAD_NAME(x68k_floppy);
-		break;
-	case MESS_DEVINFO_PTR_UNLOAD:
-		info->unload = DEVICE_IMAGE_UNLOAD_NAME(x68k_floppy);
-		break;
-	case MESS_DEVINFO_STR_FILE_EXTENSIONS:
-		strcpy(info->s = device_temp_str(), "xdf,hdm,2hd,dim");
-		break;
-	default:
-		legacybasicdsk_device_getinfo(devclass, state, info);
-		break;
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case MESS_DEVINFO_INT_COUNT:							info->i = 4; break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_x68k; break;
+
+		default:										floppy_device_getinfo(devclass, state, info); break;
 	}
 }
 
@@ -2419,6 +2344,8 @@ static MACHINE_RESET( x68000 )
 		output_set_indexed_value("eject_drv",drive,1);
 		output_set_indexed_value("ctrl_drv",drive,1);
 		output_set_indexed_value("access_drv",drive,1);
+		floppy_install_unload_proc(image_from_devtype_and_index(machine, IO_FLOPPY, drive), x68k_unload_proc);
+		floppy_install_load_proc(image_from_devtype_and_index(machine, IO_FLOPPY, drive), x68k_load_proc);
 	}
 	
 	// reset CPU

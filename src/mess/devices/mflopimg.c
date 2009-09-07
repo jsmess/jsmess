@@ -31,6 +31,7 @@ struct _mess_flopimg
 {
 	floppy_image *floppy;
 	int track;
+	void (*load_proc)(const device_config *image);
 	void (*unload_proc)(const device_config *image);
 	int (*tracktranslate_proc)(const device_config *image, floppy_image *floppy, int physical_track);
 };
@@ -334,14 +335,22 @@ error:
 
 static DEVICE_IMAGE_LOAD( floppy )
 {
-	return internal_floppy_device_load(image, -1, NULL);
+	mess_flopimg *flopimg;
+	int retVal = internal_floppy_device_load(image, -1, NULL);
+	flopimg = image_lookuptag(image, FLOPPY_TAG);
+	if (retVal==INIT_PASS) {
+		/* if we have one of our hacky unload procs, call it */
+		if (flopimg->load_proc)
+			flopimg->load_proc(image);
+	}
+	return retVal;
 }
 
 
 
 static DEVICE_IMAGE_CREATE( floppy )
 {
-	return internal_floppy_device_load(image, create_format, create_args);
+	return internal_floppy_device_load(image, create_format, create_args);	
 }
 
 
@@ -366,6 +375,13 @@ static DEVICE_IMAGE_UNLOAD( floppy )
  *	Hacks for specific systems
  *
  *************************************/
+
+void floppy_install_load_proc(const device_config *image, void (*proc)(const device_config *image))
+{
+	mess_flopimg *flopimg;
+	flopimg = image_lookuptag(image, FLOPPY_TAG);
+	flopimg->load_proc = proc;
+}
 
 void floppy_install_unload_proc(const device_config *image, void (*proc)(const device_config *image))
 {

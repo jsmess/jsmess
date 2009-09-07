@@ -1210,6 +1210,7 @@ $(MESSOBJ)/sharp.a:				\
 	$(MESS_MACHINE)/mz700.o		\
 	$(MESS_DRIVERS)/x68k.o		\
 	$(MESS_VIDEO)/x68k.o		\
+	$(MESS_FORMATS)/dim_dsk.o	\
 	$(MESS_MACHINE)/x68k_hdc.o	\
 	$(MESS_DRIVERS)/mz80.o		\
 	$(MESS_VIDEO)/mz80.o		\
