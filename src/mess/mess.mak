@@ -423,7 +423,6 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/cdp1871.o	\
 	$(MESS_MACHINE)/ctronics.o	\
 	$(MESS_MACHINE)/com8116.o	\
-	$(MESS_MACHINE)/d88.o		\
 	$(MESS_MACHINE)/e0516.o		\
 	$(MESS_MACHINE)/hd63450.o   \
 	$(MESS_MACHINE)/i8155.o		\

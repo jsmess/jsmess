@@ -146,9 +146,10 @@
 #include "sound/wave.h"
 
 #include "machine/wd17xx.h"
-#include "devices/basicdsk.h"
 #include "devices/cassette.h"
-#include "includes/d88.h"
+#include "devices/mflopimg.h"
+#include "formats/basicdsk.h"
+#include "formats/fm7_dsk.h"
 #include <ctype.h>
 
 static UINT8 hres_320,io_switch,io_sys;
@@ -1863,59 +1864,29 @@ MACHINE_DRIVER_END
  *  Image Load Functions
  *
  *************************************/
-
-static DEVICE_IMAGE_LOAD( x1_floppy )
-{
-	const char *ext;
-
-	ext = image_filetype(image);
-
-	if (image_has_been_created(image)) //FIXME
-		return INIT_FAIL;
-
-    if( toupper(ext[0])=='D' && toupper(ext[1])=='8' && toupper(ext[2])=='8' )
-    {
-		DEVICE_IMAGE_LOAD_NAME(d88image_floppy)(image);
-		return INIT_PASS;
-	}
-
-    if( toupper(ext[0])=='2' && toupper(ext[1])=='D' )
-    {
-		if (image_length(image) == 80*1*16*256) // 320K
-		{
-			if (DEVICE_IMAGE_LOAD_NAME(basicdsk_floppy)(image) == INIT_PASS)
-			{
-				/* image, tracks, sides, sectors per track, sector length, first sector id, offset of track 0, track skipping */
-				basicdsk_set_geometry(image, 40, 2, 16, 256, 1, 0, FALSE);
-
-				return INIT_PASS;
-			}
-		}
-	}
-
-	return INIT_FAIL;
-}
+FLOPPY_OPTIONS_START( x1 )
+	FLOPPY_OPTION( d88, "d88",	"D88 Floppy Disk image",	fm7_d77_identify,	fm7_d77_construct, NULL)
+	FLOPPY_OPTION( img2d, "2d", "2D disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([40])
+		SECTORS([16])
+		SECTOR_LENGTH([256])
+		FIRST_SECTOR_ID([1]))	
+FLOPPY_OPTIONS_END
 
 
 static void x1_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
+	/* floppy */
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_TYPE:						info->i = IO_FLOPPY; break;
-		case MESS_DEVINFO_INT_READABLE:					info->i = 1; break;
-		case MESS_DEVINFO_INT_WRITEABLE:				info->i = 1; break;
-		case MESS_DEVINFO_INT_CREATABLE:				info->i = 0; break;
-		case MESS_DEVINFO_INT_COUNT:					info->i = 4; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 4; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_START:					info->start = DEVICE_START_NAME(d88image_floppy); break;
-		case MESS_DEVINFO_PTR_LOAD:						info->load = DEVICE_IMAGE_LOAD_NAME(x1_floppy); break;
+		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_x1; break;
 
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:			strcpy(info->s = device_temp_str(), "2d,d88"); break;
-
-		default:										legacybasicdsk_device_getinfo(devclass, state, info); break;
+		default:										floppy_device_getinfo(devclass, state, info); break;
 	}
 }
 

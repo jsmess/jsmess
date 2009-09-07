@@ -88,7 +88,8 @@
 #include "machine/8255ppi.h"
 #include "includes/pc8801.h"
 #include "machine/nec765.h"
-#include "includes/d88.h"
+#include "devices/mflopimg.h"
+#include "formats/fm7_dsk.h"
 #include "sound/2203intf.h"
 
 static const gfx_layout char_layout_40L_h =
@@ -921,6 +922,9 @@ ROM_START( pc88va )
 	ROM_LOAD( "vadic.rom", 0x00000, 0x80000, CRC(a6108f4d) SHA1(3665db538598abb45d9dfe636423e6728a812b12) )
 ROM_END
 
+FLOPPY_OPTIONS_START(pc88 )
+	FLOPPY_OPTION( d88, "d88",	"D88 Floppy Disk image",	fm7_d77_identify,	fm7_d77_construct, NULL)
+FLOPPY_OPTIONS_END
 
 static void pc88_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
@@ -928,18 +932,12 @@ static void pc88_floppy_getinfo(const mess_device_class *devclass, UINT32 state,
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_TYPE:							info->i = IO_FLOPPY; break;
-		case MESS_DEVINFO_INT_READABLE:						info->i = 1; break;
-		case MESS_DEVINFO_INT_WRITEABLE:						info->i = 1; break;
-		case MESS_DEVINFO_INT_CREATABLE:						info->i = 0; break;
 		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_START:							info->start = DEVICE_START_NAME(d88image_floppy); break;
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(d88image_floppy); break;
+		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_pc88; break;
 
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "d88"); break;
+		default:										floppy_device_getinfo(devclass, state, info); break;
 	}
 }
 
