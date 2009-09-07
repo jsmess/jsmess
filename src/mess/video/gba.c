@@ -148,9 +148,9 @@ static void draw_roz_scanline(gba_state *gba_state, UINT16 *scanline, int ypos, 
 		cx = cy = sizes[size] / 2;
 
 //		psx = ((PA * (X - cx)) & ~63) + ((PB * (Y - cy)) & ~63) + ((PB * ypos) & ~63) + (cx << 8); //pixel start x
-//		psy = ((PC * (X - cx)) & ~63) + ((PD * (Y - cy)) & ~63) + ((PD * ypos) & ~63) + (cy << 8); //pixel start y		
+//		psy = ((PC * (X - cx)) & ~63) + ((PD * (Y - cy)) & ~63) + ((PD * ypos) & ~63) + (cy << 8); //pixel start y
 		psx = ((PA * (X - cx))) + ((PB * (Y - cy))) + ((PB * ypos)) + (cx << 8); //pixel start x
-		psy = ((PC * (X - cx))) + ((PD * (Y - cy))) + ((PD * ypos)) + (cy << 8); //pixel start y		
+		psy = ((PC * (X - cx))) + ((PD * (Y - cy))) + ((PD * ypos)) + (cy << 8); //pixel start y
 
 
 		/*
@@ -186,7 +186,7 @@ static void draw_roz_scanline(gba_state *gba_state, UINT16 *scanline, int ypos, 
 			{
 				scanline[x] = pgba_pram[pixel]&0x7fff;
 			}
-		}		
+		}
 	}
 #endif
 }
@@ -406,12 +406,15 @@ static void draw_gba_oam(gba_state *gba_state, running_machine *machine, UINT16 
 		for( gba_oamindex = 127; gba_oamindex >= 0; gba_oamindex-- )
 		{
 			UINT16 attr0, attr1, attr2;
+			INT32 cury, lg;
+			UINT8 *src;
+			UINT16 j;
 
 			attr0 = pgba_oam[(4*gba_oamindex)+0];
 			attr1 = pgba_oam[(4*gba_oamindex)+1];
 			attr2 = pgba_oam[(4*gba_oamindex)+2];
 
-			if (((attr0 & OBJ_MODE) != OBJ_MODE_WINDOW) && (((attr2 >> 10) & 3) == priority))
+			if (((attr0 & OBJ_MODE) != OBJ_MODE_WINDOW) && (((attr2 >> 10) & 3) >= priority))
 			{
 				width = 0;
 				height = 0;
@@ -490,17 +493,181 @@ static void draw_gba_oam(gba_state *gba_state, running_machine *machine, UINT16 
 				tiledrawindex = tileindex = (attr2 & OBJ_TILENUM);
 				tilebytebase = 0x10000;	// the index doesn't change in the higher modes, we just ignore sprites that are out of range
 
- 				if (attr0 & OBJ_USEROZ)
+ 				if (attr0 & OBJ_ROZMODE_ROZ)
 				{
-				 	// don't draw ROZ sprites for now
-//					printf("OAM: ROZ\n");
+					INT16 sx, sy;
+					INT32 fx, fy, ax, ay, rx, ry, offs;
+					UINT8 blockparam;
+					INT16 dx, dy, dmx, dmy;
+					UINT8 color;
+
+					width *= 8;
+					height *= 8;
+
+					if ((attr0 & OBJ_ROZMODE) == OBJ_ROZMODE_DISABLE)
+					{
+						continue;
+					}
+
+					sx = (attr1 & OBJ_X_COORD);
+					sy = (attr0 & OBJ_Y_COORD);
+
+					lg = width;
+
+					if(sx & 0x100)
+					{
+						sx |= 0xffffff00;
+					}
+
+					if(sy >= 160)
+					{
+						sy |= 0xffffff00;
+					}
+
+					fx = width;
+					fy = height;
+
+					if((attr0 & OBJ_ROZMODE) == OBJ_ROZMODE_DBLROZ)
+					{
+						fx *= 2;
+						fy *= 2;
+						lg *= 2;
+					}
+
+					if((y < sy) || (y >= sy + fy) || (sx >= 240) || (sx + fx <= 0))
+					{
+						continue;
+					}
+
+					cury = y - sy;
+
+					blockparam = ((attr1 & OBJ_SCALE_PARAM) >> OBJ_SCALE_PARAM_SHIFT) << 4;
+
+					dx  = (INT16)pgba_oam[blockparam+3];
+					dmx = (INT16)pgba_oam[blockparam+7];
+					dy  = (INT16)pgba_oam[blockparam+11];
+					dmy = (INT16)pgba_oam[blockparam+15];
+
+					rx = (width << 7) - (fx >> 1)*dx - (fy >> 1)*dmx + cury * dmx;
+					ry = (height << 7) - (fx >> 1)*dy - (fy >> 1)*dmy + cury * dmy;
+
+					if (sx < 0)
+					{
+						if(sx + fx <= 0)
+						{
+							continue;
+						}
+
+						lg += sx;
+						rx -= sx*dx;
+						ry -= sx*dy;
+						sx = 0;
+					}
+					else
+					{
+						if(sx + fx > 256)
+						{
+							lg = 256 - sx;
+						}
+					}
+
+					//printf( "Drawing a sprite scanline, y = %d, sx = %d, sy = %d\n", y, sx, sy );
+					if(attr0 & OBJ_PALMODE_256)
+					{
+						UINT16 *pgba_pram = (UINT16*)gba_state->gba_pram;
+
+						src = (UINT8*)&gba_state->gba_vram[tilebytebase >> 2];
+						if(!src)
+						{
+							continue;
+						}
+
+						src += tiledrawindex * 32;
+
+						for(j = 0; j < lg; ++j, ++sx)
+						{
+							ax = (rx >> 8);
+							ay = (ry >> 8);
+
+							if(ax >= 0 && ay >= 0 && ax < width && ay < height)
+							{
+								if((gba_state->DISPCNT & DISPCNT_VRAM_MAP) == DISPCNT_VRAM_MAP_2D)
+								{
+									offs = (ax & 0x7) + ((ax & 0xfff8) << 3) + ((ay >> 3) << 10) + ((ay & 0x7) << 3);
+								}
+								else
+								{
+									offs = (ax & 0x7) + ((ax & 0xfff8) << 3) + (((ay >> 3) * width) << 3) + ((ay & 0x7) << 3);
+								}
+
+								color = src[offs];
+
+								if(color)
+								{
+									scanline[sx] = pgba_pram[256+color] & 0x7fff;
+								}
+							}
+
+							rx += dx;
+							ry += dy;
+						}
+					}
+					else
+					{
+						UINT16 *pgba_pram = (UINT16*)gba_state->gba_pram;
+
+						src = (UINT8*)&gba_state->gba_vram[tilebytebase >> 2];
+						if(!src)
+						{
+							continue;
+						}
+
+						src += tiledrawindex * 32;
+
+						for(j = 0; j < lg; ++j, ++sx)
+						{
+							ax = (rx >> 8);
+							ay = (ry >> 8);
+
+							if(ax >= 0 && ay >= 0 && ax < width && ay < height)
+							{
+								if((gba_state->DISPCNT & DISPCNT_VRAM_MAP) == DISPCNT_VRAM_MAP_2D)
+								{
+									offs = ((ax >> 1) & 0x3) + (((ax >> 1) & 0xfffc) << 3) + ((ay >> 3) << 10) + ((ay & 0x7) << 2);
+								}
+								else
+								{
+									offs = ((ax >> 1) & 0x3) + (((ax >> 1) & 0xfffc) << 3) + (((ay >> 3) * width) << 2) + ((ay & 0x7) << 2);
+								}
+
+								color = src[offs];
+
+								if(ax & 1)
+								{
+									color >>= 4;
+								}
+								else
+								{
+									color &= 0x0f;
+								}
+
+								if(color)
+								{
+									scanline[sx] = pgba_pram[256 + ((attr2 & 0xf000) >> 8) + color] & 0x7fff;
+								}
+							}
+
+							rx += dx;
+							ry += dy;
+						}
+					}
 				}
 				else
 				{
 					INT16 sx, sy;
 					int vflip, hflip;
 
-					if (attr0 & OBJ_DISABLE)
+					if ((attr0 & OBJ_ROZMODE) == OBJ_ROZMODE_DISABLE)
 					{
 						continue;
 					}
@@ -694,7 +861,7 @@ void gba_video_start(running_machine *machine)
 	int level, x;
 
 	/* generate a table to make mosaic fast */
-	for (level = 0; level < 16; level++) 
+	for (level = 0; level < 16; level++)
 	{
 		for (x = 0; x < 4096; x++)
 		{
