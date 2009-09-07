@@ -83,6 +83,17 @@
 #define OBJ_PALNUM			0xf000
 #define OBJ_PALNUM_SHIFT		12
 
+#define BGCNT_SCREENSIZE		0xc000
+#define BGCNT_SCREENSIZE_SHIFT	14
+#define BGCNT_PALETTESET_WRAP	0x2000
+#define BGCNT_SCREENBASE		0x1f00
+#define BGCNT_SCREENBASE_SHIFT	8
+#define BGCNT_PALETTE256		0x0080
+#define BGCNT_MOSAIC			0x0040
+#define BGCNT_CHARBASE			0x003c
+#define BGCNT_CHARBASE_SHIFT	2
+#define BGCNT_PRIORITY			0x0003
+
 // states for carts with flash saves
 enum
 {
