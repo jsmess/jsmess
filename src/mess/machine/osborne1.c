@@ -19,10 +19,10 @@ be written to RAM if RAM was switched in.
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"
 #include "machine/wd17xx.h"
-#include "devices/basicdsk.h"
 #include "cpu/z80/z80daisy.h"
 #include "sound/beep.h"
 #include "includes/osborne1.h"
+#include "devices/mflopimg.h"
 
 #define RAMMODE		(0x01)
 
@@ -413,71 +413,6 @@ static TIMER_CALLBACK(osborne1_video_callback)
 	timer_adjust_oneshot(osborne1.video_timer, video_screen_get_time_until_pos(machine->primary_screen, y + 1, 0 ), 0);
 }
 
-/*
- * The Osborne-1 supports the following disc formats:
- * - Osborne single density: 40 tracks, 10 sectors per track, 256-byte sectors (100 KByte)
- * - Osborne double density: 40 tracks, 5 sectors per track, 1024-byte sectors (200 KByte)
- * - IBM Personal Computer: 40 tracks, 8 sectors per track, 512-byte sectors (160 KByte)
- * - Xerox 820 Computer: 40 tracks, 18 sectors per track, 128-byte sectors (90 KByte)
- * - DEC 1820 double density: 40 tracks, 9 sectors per track, 512-byte sectors (180 KByte)
- *
- */
-DEVICE_IMAGE_LOAD( osborne1_floppy )
-{
-	int size, sectors, sectorsize;
-	const device_config *fdc = devtag_get_device(image->machine, "mb8877");
-
-	if ( ! image_has_been_created( image ) )
-	{
-		size = image_length( image );
-
-		switch( size )
-		{
-		case 40 * 10 * 256:
-			sectors = 10;
-			sectorsize = 256;
-			wd17xx_set_density( fdc, DEN_FM_LO );
-			break;
-		case 40 * 5 * 1024:
-			sectors = 5;
-			sectorsize = 1024;
-			wd17xx_set_density( fdc, DEN_FM_HI );
-			break;
-		case 40 * 8 * 512:
-			sectors = 8;
-			sectorsize = 512;
-			wd17xx_set_density( fdc, DEN_FM_LO );
-			return INIT_FAIL;
-		case 40 * 18 * 128:
-			sectors = 18;
-			sectorsize = 128;
-			wd17xx_set_density( fdc, DEN_FM_LO );
-			return INIT_FAIL;
-		case 40 * 9 * 512:
-			sectors = 9;
-			sectorsize = 512;
-			wd17xx_set_density( fdc, DEN_FM_HI );
-			return INIT_FAIL;
-		default:
-			return INIT_FAIL;
-		}
-	}
-	else
-	{
-		return INIT_FAIL;
-	}
-
-	if ( device_load_basicdsk_floppy( image ) != INIT_PASS )
-	{
-		return INIT_FAIL;
-	}
-
-	basicdsk_set_geometry( image, 40, 1, sectors, sectorsize, 1, 0, FALSE );
-
-	return INIT_PASS;
-}
-
-
 static TIMER_CALLBACK( setup_osborne1 )
 {
 	const device_config *speaker = devtag_get_device(machine, "beep");
@@ -488,9 +423,34 @@ static TIMER_CALLBACK( setup_osborne1 )
 	pia6821_ca1_w( pia_1, 0, 0 );
 }
 
+static void osborne1_load_proc(const device_config *image)
+{
+	int size = image_length( image );
+	const device_config *fdc = devtag_get_device(image->machine, "mb8877");
+
+	switch( size )
+	{
+	case 40 * 10 * 256:
+		wd17xx_set_density( fdc, DEN_FM_LO );
+		break;
+	case 40 * 5 * 1024:
+		wd17xx_set_density( fdc, DEN_FM_HI );
+		break;
+	case 40 * 8 * 512:
+		wd17xx_set_density( fdc, DEN_FM_LO );
+		break;
+	case 40 * 18 * 128:
+		wd17xx_set_density( fdc, DEN_FM_LO );
+		break;
+	case 40 * 9 * 512:
+		wd17xx_set_density( fdc, DEN_FM_HI );
+		break;
+	}
+}
 
 MACHINE_RESET( osborne1 )
 {
+	int drive;
 	const address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	/* Initialize memory configuration */
 	osborne1_bankswitch_w( space, 0x00, 0 );
@@ -510,6 +470,11 @@ MACHINE_RESET( osborne1 )
 
 	timer_set(machine,  attotime_zero, NULL, 0, setup_osborne1 );
 
+	for(drive=0;drive<2;drive++)
+	{
+		floppy_install_load_proc(image_from_devtype_and_index(machine, IO_FLOPPY, drive), osborne1_load_proc);
+	}
+	
 	memory_set_direct_update_handler( space, osborne1_opbase );
 }
 

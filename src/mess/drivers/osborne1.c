@@ -38,7 +38,8 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 #include "sound/beep.h"
-#include "devices/basicdsk.h"
+#include "devices/mflopimg.h"
+#include "formats/basicdsk.h"
 #include "machine/wd17xx.h"
 #include "machine/6821pia.h"
 #include "includes/osborne1.h"
@@ -215,18 +216,63 @@ ROM_START( osborne1 )
 	ROM_LOAD( "osbchr.bin", 0x0000, 0x800, BAD_DUMP CRC(6c1eab0d) SHA1(b04459d377a70abc9155a5486003cb795342c801) )
 ROM_END
 
+/* System Configuration */
+/*
+ * The Osborne-1 supports the following disc formats:
+ * - Osborne single density: 40 tracks, 10 sectors per track, 256-byte sectors (100 KByte)
+ * - Osborne double density: 40 tracks, 5 sectors per track, 1024-byte sectors (200 KByte)
+ * - IBM Personal Computer: 40 tracks, 8 sectors per track, 512-byte sectors (160 KByte)
+ * - Xerox 820 Computer: 40 tracks, 18 sectors per track, 128-byte sectors (90 KByte)
+ * - DEC 1820 double density: 40 tracks, 9 sectors per track, 512-byte sectors (180 KByte)
+ *
+ */
+FLOPPY_OPTIONS_START(osborne1 )
+	FLOPPY_OPTION( osd, "img", "Osborne single density", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([1])
+		TRACKS([40])
+		SECTORS([10])
+		SECTOR_LENGTH([256])
+		FIRST_SECTOR_ID([1]))	
+	FLOPPY_OPTION( odd, "img", "Osborne double density", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([1])
+		TRACKS([40])
+		SECTORS([5])
+		SECTOR_LENGTH([1024])
+		FIRST_SECTOR_ID([1]))
+	FLOPPY_OPTION( ibm, "img", "IBM Personal Computer", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([1])
+		TRACKS([40])
+		SECTORS([8])
+		SECTOR_LENGTH([512])
+		FIRST_SECTOR_ID([1]))					
+	FLOPPY_OPTION( xerox, "img", "Xerox 820 Computer", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([1])
+		TRACKS([40])
+		SECTORS([18])
+		SECTOR_LENGTH([128])
+		FIRST_SECTOR_ID([1]))					
+	FLOPPY_OPTION( dec, "img", "DEC 1820 double density", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([1])
+		TRACKS([40])
+		SECTORS([9])
+		SECTOR_LENGTH([512])
+		FIRST_SECTOR_ID([1]))					
+FLOPPY_OPTIONS_END
 
-static void osborne1_floppy_getinfo( const mess_device_class *devclass, UINT32 state, union devinfo *info )
+static void osborne1_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
-	switch( state )
+	/* floppy */
+	switch(state)
 	{
-	case MESS_DEVINFO_INT_COUNT:				info->i = 2; break;
-	case MESS_DEVINFO_PTR_LOAD:				info->load = DEVICE_IMAGE_LOAD_NAME(osborne1_floppy); break;
-	case MESS_DEVINFO_STR_FILE_EXTENSIONS:	strcpy( info->s = device_temp_str(), "img" ); break;
-	default:							legacybasicdsk_device_getinfo( devclass, state, info ); break;
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_osborne1; break;
+
+		default:										floppy_device_getinfo(devclass, state, info); break;
 	}
 }
-
 
 static SYSTEM_CONFIG_START( osborne1 )
 	CONFIG_DEVICE( osborne1_floppy_getinfo )

@@ -184,46 +184,6 @@ static int dos_card_active(running_machine *machine)
 }
 
 /* Floppy Disc Controller */
-
-DEVICE_IMAGE_LOAD( comx35_floppy )
-{
-	if (image_has_been_created(image))
-		return INIT_FAIL;
-
-	if (device_load_basicdsk_floppy(image) == INIT_PASS)
-	{
-		int size = image_length(image);
-		UINT8 header[0x20] = {0};
-
-		switch (size)
-		{
-		case 35*1*16*128:
-			/* drive, tracks, heads, sectors per track, sector length, first sector id, offset track zero, track skipping */
-			basicdsk_set_geometry(image, 35, 1, 16, 128, 0, 0, FALSE);
-			break;
-
-		case 35*2*16*128:
-			image_fread(image, header, 0x20);
-
-			if (header[0x12] == 0x01)
-			{
-				/* drive, tracks, heads, sectors per track, sector length, first sector id, offset track zero, track skipping */
-				basicdsk_set_geometry(image, 70, 1, 16, 128, 0, 0, FALSE);
-			}
-			else
-			{
-				/* drive, tracks, heads, sectors per track, sector length, first sector id, offset track zero, track skipping */
-				basicdsk_set_geometry(image, 35, 2, 16, 128, 0, 0, FALSE);
-			}
-			break;
-		}
-
-		return INIT_PASS;
-	}
-
-	return INIT_FAIL;
-}
-
 static WD17XX_CALLBACK( comx35_fdc_callback )
 {
 	comx35_state *driver_state = device->machine->driver_data;

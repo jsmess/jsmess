@@ -34,7 +34,8 @@
 #include "machine/z80sio.h"
 #include "machine/wd17xx.h"
 #include "machine/com8116.h"
-#include "devices/basicdsk.h"
+#include "devices/mflopimg.h"
+#include "formats/basicdsk.h"
 
 INLINE const device_config *get_floppy_image(running_machine *machine, int drive)
 {
@@ -590,11 +591,40 @@ static VIDEO_UPDATE( xerox820 )
 	}
 	return 0;
 }
+static void xerox820_load_proc(const device_config *image)
+{	
+	xerox820_state *state = image->machine->driver_data;
+	
+	switch (image_length(image))
+	{
+	case 77*1*26*128: // 250K 8" SSSD
+		state->_8n5 = 1;
+		state->dsdd = 0;
+		return;
+
+	case 77*1*26*256: // 500K 8" SSDD		
+		state->_8n5 = 1;
+		state->dsdd = 0;
+		return;
+
+	case 40*1*18*128: // 90K 5.25" SSSD		
+		state->_8n5 = 0;
+		state->dsdd = 0;
+		return;
+
+	case 40*2*18*128: // 180K 5.25" DSSD		
+		state->_8n5 = 0;
+		state->dsdd = 1;
+		return;
+	}
+
+}
 
 /* Machine Initialization */
 
 static MACHINE_START( xerox820 )
 {
+	int drive;
 	xerox820_state *state = machine->driver_data;
 
 	/* find devices */
@@ -617,6 +647,12 @@ static MACHINE_START( xerox820 )
 
 	/* bank switch */
 	xerox820_bankswitch(machine, 1);
+	
+	for(drive=0;drive<2;drive++)
+	{
+		floppy_install_load_proc(image_from_devtype_and_index(machine, IO_FLOPPY, drive), xerox820_load_proc);
+	}
+
 
 	/* register for state saving */
 	state_save_register_global_pointer(machine, state->video_ram, XEROX820_LCD_VIDEORAM_SIZE);
@@ -710,48 +746,32 @@ ROM_START( xerox820ii )
 ROM_END
 
 /* System Configuration */
-
-static DEVICE_IMAGE_LOAD( xerox820_floppy )
-{
-	xerox820_state *state = image->machine->driver_data;
-
-	if (image_has_been_created(image))
-	{
-		return INIT_FAIL;
-	}
-
-	if (device_load_basicdsk_floppy(image) == INIT_PASS)
-	{
-		switch (image_length(image))
-		{
-		case 77*1*26*128: // 250K 8" SSSD
-			basicdsk_set_geometry(image, 77, 1, 26, 128, 1, 0, FALSE);
-			state->_8n5 = 1;
-			state->dsdd = 0;
-			return INIT_PASS;
-
-		case 77*1*26*256: // 500K 8" SSDD
-			basicdsk_set_geometry(image, 77, 1, 26, 256, 1, 0, FALSE);
-			state->_8n5 = 1;
-			state->dsdd = 0;
-			return INIT_PASS;
-
-		case 40*1*18*128: // 90K 5.25" SSSD
-			basicdsk_set_geometry(image, 40, 1, 18, 128, 1, 0, FALSE);
-			state->_8n5 = 0;
-			state->dsdd = 0;
-			return INIT_PASS;
-
-		case 40*2*18*128: // 180K 5.25" DSSD
-			basicdsk_set_geometry(image, 40, 2, 18, 128, 1, 0, FALSE);
-			state->_8n5 = 0;
-			state->dsdd = 1;
-			return INIT_PASS;
-		}
-	}
-
-	return INIT_FAIL;
-}
+FLOPPY_OPTIONS_START(xerox820 )
+	FLOPPY_OPTION( sssd8, "dsk", "8\" SSSD", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([1])
+		TRACKS([77])
+		SECTORS([26])
+		SECTOR_LENGTH([128])
+		FIRST_SECTOR_ID([1]))	
+	FLOPPY_OPTION( ssdd8, "dsk", "8\" SSDD", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([1])
+		TRACKS([77])
+		SECTORS([26])
+		SECTOR_LENGTH([256])
+		FIRST_SECTOR_ID([1]))
+	FLOPPY_OPTION( sssd5, "dsk", "5.25\" SSSD", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([1])
+		TRACKS([40])
+		SECTORS([18])
+		SECTOR_LENGTH([128])
+		FIRST_SECTOR_ID([1]))					
+	FLOPPY_OPTION( ssdd5, "dsk", "5.25\" SSDD", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([40])
+		SECTORS([18])
+		SECTOR_LENGTH([128])
+		FIRST_SECTOR_ID([1]))					
+FLOPPY_OPTIONS_END
 
 static void xerox820_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
@@ -759,15 +779,12 @@ static void xerox820_floppy_getinfo(const mess_device_class *devclass, UINT32 st
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:						info->i = 2; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(xerox820_floppy); break;
+		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_xerox820; break;
 
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "dsk"); break;
-
-		default:											legacybasicdsk_device_getinfo(devclass, state, info); break;
+		default:										floppy_device_getinfo(devclass, state, info); break;
 	}
 }
 
