@@ -10,10 +10,33 @@
 #include "includes/jtc.h"
 #include "cpu/z8/z8.h"
 #include "devices/cassette.h"
+#include "machine/ctronics.h"
 #include "sound/speaker.h"
 #include "sound/wave.h"
 
 /* Read/Write Handlers */
+
+static WRITE8_HANDLER( p2_w )
+{
+	/*
+
+		bit		description
+
+		P20		
+		P21		
+		P22		
+		P23		
+		P24		
+		P25		centronics strobe output
+		P26		V4093 pins 1,2
+		P27		DL299 pin 18
+
+	*/
+
+	jtc_state *state = space->machine->driver_data;
+
+	centronics_strobe_w(state->centronics, BIT(data, 5));
+}
 
 static READ8_HANDLER( p3_r )
 {
@@ -24,7 +47,7 @@ static READ8_HANDLER( p3_r )
 		P30		tape input
 		P31
 		P32
-		P33
+		P33		centronics busy input
 		P34
 		P35
 		P36		tape output
@@ -34,7 +57,12 @@ static READ8_HANDLER( p3_r )
 
 	jtc_state *state = space->machine->driver_data;
 
-	return (cassette_input(state->cassette) < 0.0) ? 1 : 0;
+	UINT8 data = 0;
+
+	data |= (cassette_input(state->cassette) < 0.0) ? 1 : 0; 
+	data |= centronics_busy_r(state->centronics) << 3;
+
+	return data;
 }
 
 static WRITE8_HANDLER( p3_w )
@@ -46,7 +74,7 @@ static WRITE8_HANDLER( p3_w )
 		P30		tape input
 		P31
 		P32
-		P33
+		P33		centronics busy input
 		P34
 		P35
 		P36		tape output
@@ -61,6 +89,37 @@ static WRITE8_HANDLER( p3_w )
 
 	/* speaker */
 	speaker_level_w(state->speaker, BIT(data, 7));
+}
+
+static READ8_HANDLER( es40_videoram_r )
+{
+	jtc_state *state = space->machine->driver_data;
+
+	UINT8 data = 0;
+
+	if (state->video_bank & 0x80) data |= state->color_ram_r[offset];
+	if (state->video_bank & 0x40) data |= state->color_ram_g[offset];
+	if (state->video_bank & 0x20) data |= state->color_ram_b[offset];
+	if (state->video_bank & 0x10) data |= state->video_ram[offset];
+
+	return data;
+}
+
+static WRITE8_HANDLER( es40_videoram_w )
+{
+	jtc_state *state = space->machine->driver_data;
+
+	if (state->video_bank & 0x80) state->color_ram_r[offset] = data;
+	if (state->video_bank & 0x40) state->color_ram_g[offset] = data;
+	if (state->video_bank & 0x20) state->color_ram_b[offset] = data;
+	if (state->video_bank & 0x10) state->video_ram[offset] = data;
+}
+
+static WRITE8_HANDLER( es40_banksel_w )
+{
+	jtc_state *state = space->machine->driver_data;
+
+	state->video_bank = offset & 0xf0;
 }
 
 /* Memory Maps */
@@ -129,8 +188,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( jtc_es40_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0800, 0x1fff) AM_ROM
-	AM_RANGE(0x4000, 0x5fff) AM_RAM // videoram
-//	AM_RANGE(0x6000, 0x63ff) AM_WRITE(es40_banksel_w)
+	AM_RANGE(0x4000, 0x5fff) AM_READWRITE(es40_videoram_r, es40_videoram_w)
+	AM_RANGE(0x6000, 0x63ff) AM_WRITE(es40_banksel_w)
 	AM_RANGE(0x7001, 0x7001) AM_MIRROR(0x0ff0) AM_READ_PORT("Y1")
 	AM_RANGE(0x7002, 0x7002) AM_MIRROR(0x0ff0) AM_READ_PORT("Y2")
 	AM_RANGE(0x7003, 0x7003) AM_MIRROR(0x0ff0) AM_READ_PORT("Y3")
@@ -142,8 +201,7 @@ static ADDRESS_MAP_START( jtc_es40_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x7009, 0x7009) AM_MIRROR(0x0ff0) AM_READ_PORT("Y9")
 	AM_RANGE(0x700a, 0x700a) AM_MIRROR(0x0ff0) AM_READ_PORT("Y10")
 	AM_RANGE(0x700b, 0x700b) AM_MIRROR(0x0ff0) AM_READ_PORT("Y11")
-	AM_RANGE(0x700c, 0x700c) AM_MIRROR(0x0ff0) AM_READ_PORT("Y11")
-	AM_RANGE(0x700d, 0x700d) AM_MIRROR(0x0ff0) AM_READ_PORT("Y12")
+	AM_RANGE(0x700c, 0x700c) AM_MIRROR(0x0ff0) AM_READ_PORT("Y12")
 	AM_RANGE(0x8000, 0xffff) AM_RAM//BANK(1)
 ADDRESS_MAP_END
 
@@ -151,7 +209,7 @@ static ADDRESS_MAP_START( jtc_io, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x00) AM_NOP // A8-A15
 	AM_RANGE(0x01, 0x01) AM_NOP // AD0-AD7
-//	AM_RANGE(0x02, 0x02) AM_NOP
+	AM_RANGE(0x02, 0x02) AM_WRITE(p2_w)
 	AM_RANGE(0x03, 0x03) AM_READWRITE(p3_r, p3_w)
 ADDRESS_MAP_END
 
@@ -455,7 +513,7 @@ static VIDEO_UPDATE( jtc )
 
 	int x, y, sx;
 
-	for (y = 0; y < 63; y++)
+	for (y = 0; y < 64; y++)
 	{
 		for (sx = 0; sx < 8; sx++)
 		{
@@ -478,7 +536,25 @@ static VIDEO_START( jtc_es23 )
 
 static VIDEO_UPDATE( jtc_es23 )
 {
-	return 0;
+	jtc_state *state = screen->machine->driver_data;
+
+	int x, y, sx;
+
+	for (y = 0; y < 128; y++)
+	{
+		for (sx = 0; sx < 16; sx++)
+		{
+			UINT8 data = state->video_ram[(y * 16) + sx];
+
+			for (x = 0; x < 8; x++)
+			{
+				int color = BIT(data, x);
+				*BITMAP_ADDR16(bitmap, y, (sx * 8) + x) = color;
+			}
+		}
+	}
+
+    return 0;
 }
 
 static PALETTE_INIT( jtc_es40 )
@@ -487,11 +563,47 @@ static PALETTE_INIT( jtc_es40 )
 
 static VIDEO_START( jtc_es40 )
 {
+	jtc_state *state = machine->driver_data;
+
+	/* allocate memory */
+	state->video_ram = auto_alloc_array(machine, UINT8, JTC_ES40_VIDEORAM_SIZE);
+	state->color_ram_r = auto_alloc_array(machine, UINT8, JTC_ES40_VIDEORAM_SIZE);
+	state->color_ram_g = auto_alloc_array(machine, UINT8, JTC_ES40_VIDEORAM_SIZE);
+	state->color_ram_b = auto_alloc_array(machine, UINT8, JTC_ES40_VIDEORAM_SIZE);
+
+	/* register for state saving */
+	state_save_register_global(machine, state->video_bank);
+	state_save_register_global_pointer(machine, state->video_ram, JTC_ES40_VIDEORAM_SIZE);
+	state_save_register_global_pointer(machine, state->color_ram_r, JTC_ES40_VIDEORAM_SIZE);
+	state_save_register_global_pointer(machine, state->color_ram_g, JTC_ES40_VIDEORAM_SIZE);
+	state_save_register_global_pointer(machine, state->color_ram_b, JTC_ES40_VIDEORAM_SIZE);
 }
 
 static VIDEO_UPDATE( jtc_es40 )
 {
-	return 0;
+	jtc_state *state = screen->machine->driver_data;
+
+	int x, y, sx;
+
+	for (y = 0; y < 192; y++)
+	{
+		for (sx = 0; sx < 40; sx++)
+		{
+			UINT8 data = state->video_ram[(y * 40) + sx];
+			UINT8 color_r = state->color_ram_r[(y * 40) + sx];
+			UINT8 color_g = state->color_ram_g[(y * 40) + sx];
+			UINT8 color_b = state->color_ram_b[(y * 40) + sx];
+
+			for (x = 0; x < 8; x++)
+			{
+				int color = (BIT(color_r, x) << 3) | (BIT(color_g, x) << 2) | (BIT(color_b, x) << 1) | BIT(data, x);
+
+				*BITMAP_ADDR16(bitmap, y, (sx * 8) + x) = color;
+			}
+		}
+	}
+
+    return 0;
 }
 
 /* Machine Initialization */
@@ -503,6 +615,7 @@ static MACHINE_START( jtc )
 	/* find devices */
 	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
 	state->speaker = devtag_get_device(machine, SPEAKER_TAG);
+	state->centronics = devtag_get_device(machine, CENTRONICS_TAG);
 
 	/* register for state saving */
 	//state_save_register_global(machine, state->);
@@ -537,6 +650,9 @@ static MACHINE_DRIVER_START( basic )
 
 	/* cassette */
 	MDRV_CASSETTE_ADD(CASSETTE_TAG, jtc_cassette_config)
+
+	/* printer */
+	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( jtc )
@@ -656,8 +772,8 @@ SYSTEM_CONFIG_END
 
 /* System Drivers */
 
-/*    YEAR	NAME		PARENT	COMPAT	MACHINE	INPUT	INIT	CONFIG		COMPANY					FULLNAME				FLAGS */
-COMP( 1987, jtc,		0,       0, 	jtc, 	jtc, 	 0,		jtc,	 	  "Jugend+Technik",   "CompJU+TEr",		GAME_NOT_WORKING)
-COMP( 1988, jtces88,	jtc,     0, 	jtces88,jtc, 	 0,		jtces88,  	  "Jugend+Technik",   "CompJU+TEr (EMR-ES 1988)",	GAME_NOT_WORKING)
-COMP( 1989, jtces23,	jtc,     0, 	jtces23,jtces23, 0,		jtces23,  	  "Jugend+Technik",   "CompJU+TEr (ES 2.3)",	GAME_NOT_WORKING)
-COMP( 1990, jtces40,	jtc,     0, 	jtces40,jtces40, 0,		jtces40,  	  "Jugend+Technik",   "CompJU+TEr (ES 4.0)",	GAME_NOT_WORKING)
+/*    YEAR	NAME		PARENT	COMPAT	MACHINE	INPUT	INIT	CONFIG		COMPANY					FULLNAME					FLAGS */
+COMP( 1987, jtc,		0,       0, 	jtc, 	jtc, 	 0,		jtc,	 	  "Jugend+Technik",   "CompJU+TEr",					GAME_NOT_WORKING )
+COMP( 1988, jtces88,	jtc,     0, 	jtces88,jtc, 	 0,		jtces88,  	  "Jugend+Technik",   "CompJU+TEr (EMR-ES 1988)",	GAME_NOT_WORKING )
+COMP( 1989, jtces23,	jtc,     0, 	jtces23,jtces23, 0,		jtces23,  	  "Jugend+Technik",   "CompJU+TEr (ES 2.3)",		GAME_NOT_WORKING )
+COMP( 1990, jtces40,	jtc,     0, 	jtces40,jtces40, 0,		jtces40,  	  "Jugend+Technik",   "CompJU+TEr (ES 4.0)",		GAME_NOT_WORKING )
