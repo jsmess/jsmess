@@ -6,11 +6,12 @@
 *  from Kevin 'kevtris' Horton, without whom this driver would
 *  have been impossible.
 *  Special thanks to Al Kossow for archiving the DTC-01 schematic at bitsavers,
-*  which is invaluable for work on this driver.
+*  http://bitsavers.org/pdf/dec/dectalk/MP-01820_DTC01_EngrDrws_Nov83.pdf
+*  which has been invaluable for work on this driver.
 *  Special thanks to leeeeee for helping figure out what the led selftest codes actually mean
 *
 *  TODO:
-*  * DUART: I suspect the duart test fails because modes 0-6 of the duart are currently unimplemented in 68681.c
+*  * DUART: 
 *    * DUART needs its i/o pins connected as well:    
 *    * pins IP0, IP2, and IP3 are connected to the primary serial port:
 *      * IP0 is CTS
@@ -25,10 +26,7 @@
 *      * OP2 is DTR
 *  * Attach m68k interrupts properly; I suspect the DUART INT and SPC INTs are both hooked up wrong
 *  * Actually store the X2212 nvram's eeprom data to disk rather than throwing it out on exit
-*  * force sync between both processors if either one pushes or pulls the fifo
-*      or the shared error/fifo flag regs... How can I actually do this? CPU_BOOST_INTERLEAVE?
-*      otherwise i need to have the two in some mad insane sync...
-*  * Hook the 'output' FIFO up to the 10khz sampling rate generator xtal using SPEAKER
+*    * is there some way i can hook this up using &generic_nvram?
 *  * emulate/simulate the MT8060 dtmf decoder as a 16-key input device?
 *  * discuss and figure out how to have an external application send data to the two serial ports to be spoken
 *
@@ -50,14 +48,43 @@
 *    FE 03 - RAM check fail @ 0x88000-0x8bfff, ram at E34 or E47 "
 *    FE 04 - RAM check fail @ 0x8c000-0x8ffff, ram at E33 or E46 "
 *    FE 05 - RAM check fail @ 0x90000-0x93fff, ram at E32 or E44 "
-*    FD 00 - DUART test (test code at $046C)
-*    FC 00 - TMS32010 'SPC' and DTMF-decoder 'TLC' status register test (test code at $051E) [passes in mess]
-*    FB 00 - TMS32010 extensive tests: make dtmf tone and be sure the decoder detects it and triggers an interrupt [fails in mess]
+*    FD 00 - DUART test & DUART interrupt test (test code at $046C)
+*    FC 00 - This test doesn't exist. Some vestiges of it may remain in code for the FD and FB tests.
+*    FB 00 - TMS32010 extensive tests (test code at $051E): test spc interrupt [works] and make dtmf tone to test tlc interrupt [fails in mess, requires dtmf detection on output]
 *    Jump to $102C to skip the self tests
 *    During normal operation:
-*    D3 - ? some sort of failure
-*    FF - normal, status OK
-*    * figure out what all the other LED error codes actually mean, as DEC didn't document them anywhere.
+(table taken from http://www3.sympatico.ca/n.rieck/docs/DECtalk_notes.html )
+DTC-01 LEDs
+
+   76543210         LEDs
+   ||||||||
+   |||||||+-------- set if host asserting CTS
+   ||||||+--------- set if DECtalk asserting RTS
+   |||||+---------- set if host asserting DSR
+   ||||+----------- set if host asserting DCD
+   |||+------------ set if DECtalk asserting DTR
+   +++------------- 3 bit state code
+
+   000              in state 5, first 500 ms; waiting for CD & CTS in first 500 ms when DECtalk is on-line
+   001              timing 2 second CD=0 while in state 6 (moving data)
+   010              waiting for DSR=0 while disconnecting (part of state 7)
+   011              waiting for DSR=1 while connecting (state 3)
+   100              delaying for UK modems during disconnect (part of state 7)
+   101              waiting for CD and CTS (main part of state 5)
+   110              moving data (state 6)
+   111              disconnecting (start of state 7)
+*    Dectalk dtc-01 hardware and rom version history, from dtc-01 schematic at bitsavers and with additional info from
+     http://americanhistory.si.edu/archives/speechsynthesis/ss_dec1.htm
+     August 1983: Hardware version A done
+     unknown date: Version 1.0 roms finalized
+     unknown date: Version 1.1 roms released to fix a bug with insufficient stack space, see ss_dec1 above
+     March 1984: Hardware version B done (integrates the output fifo sync error check onto the pcb; Version A units are retrofitted when sent in for firmware upgrades) (most of the schematics come from this time)
+     <there might be a v1.2 or v1.3 in this period>
+     July 02 1984: Second half of Version 2.0 rom finalized
+     July 23 1984: First half of Version 2.0 rom finalized
+     October 1984 (the rest of the schematics come from this time)
+     unknown date: version 2.1 rom finalized
+
 *******************************************************************************/
 /*the 68k memory map is such:
 0x000000-0x007fff: E22 low, E8 high
@@ -77,7 +104,7 @@ ram/nvram/speech mapping:
 0x090000-0x093fff: e32 low, e45 high
 0x094000-0x097fff: LED/SW/NVR
 0x098000-0x09bfff: DUART
-0x09c000-0x09ffff: TMS32010 speech (TLC, SPC)
+0x09c000-0x09ffff: DTMF and TMS32010 (TLC, SPC)
 mirrored at 0x0a0000-0x0fffff x3
 entire space mirrored at 0x100000-0x7fffff
 0x800000-0xffffff is open bus?
@@ -88,13 +115,16 @@ TLC is INT level 4
 SPC is INT level 5
 DUART is INT level 6
 */
-#undef VERBOSE
+// USE_LOOSE_TIMING makes the cpu interleave much lower and boosts it on fifo and flag writes by the 68k and semaphore sets by the dsp
+#define USE_LOOSE_TIMING 1
+#undef VERBOSE 
+#undef SERIAL_TO_STDERR 
 
 /* Core includes */
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/tms32010/tms32010.h"
-#include "dectalk.lh" // nasty hack to avoid crash on screenless system
+#include "dectalk.lh" //  hack to avoid screenless system crash
 #include "machine/68681.h"
 #include "sound/dac.h"
 
@@ -109,11 +139,31 @@ static void duart_irq_handler(const device_config *device, UINT8 vector)
 	//cputag_set_input_line_and_vector(device->machine, "maincpu", M68K_IRQ_6, HOLD_LINE, vector);
 };
 
+ static UINT8 hack_self_test = 0; // temp variable for hack below
+
+static UINT8 duart_input(const device_config *device)
+{
+	UINT8 data = 0xFF;
+	data &= 0x8F; // write me: handle bits 0, 2, 3 which are port a CTS, DSR and RLS(DCD?) respectively
+	//data |= input_port_read(device->machine, "duart_in");
+	 data |= (input_port_read(device->machine, "duart_in")&0x7f);
+	 if ((hack_self_test == 1) && (input_port_read(device->machine, "duart_in")&0x80)) data |= 0x10; // hack to prevent hang if selftest disable bit is kept low past the first read; i suppose the proper use of this bit was an incremental switch, or perhaps its expecting an interrupt later from serial in or tone in? added a dipswitch to disable the hack for testing
+	 hack_self_test = 1;
+	return data;
+}
+
+static void duart_tx(const device_config *device, int channel, UINT8 data)
+{
+#ifdef SERIAL_TO_STDERR
+	fprintf(stderr, "%02X ",data);
+#endif
+}
+
 static const duart68681_config dectalk_duart68681_config =
 {
 	duart_irq_handler,
-	// duart_tx,
-	NULL,
+	duart_tx,
+	duart_input,
 	NULL
 };
 
@@ -137,6 +187,7 @@ UINT8 m68k_tlcflags_latch; // latch for telephone interface stuff, d-latches 74l
 UINT8 simulate_outfifo_error; // simulate an error on the outfifo, which does something unusual to the dsp latches
 UINT8 tlc_tonedetect;
 UINT8 tlc_ringdetect;
+UINT8 tlc_dtmf; // dtmf holding reg
 } dectalk={ {0}};
 
 #define SPC_INITIALIZE dectalk.m68k_spcflags_latch&0x1 // speech initialize flag
@@ -222,6 +273,7 @@ static void dectalk_tlcflags_write ( running_machine *machine, UINT16 data )
 /* Machine reset and friends: stuff that needs setting up which IS directly affected by reset */
 static void dectalk_reset(const device_config *device)
 {
+	hack_self_test = 0; // hack
 	// stuff that is DIRECTLY affected by the RESET line
 	dectalk.statusLED = 0; // clear status led latch
 	dectalk_x2212_recall(device->machine); // nvram recall
@@ -236,6 +288,7 @@ static void dectalk_reset(const device_config *device)
 	cputag_set_input_line(device->machine, "dsp", INPUT_LINE_RESET, ASSERT_LINE); // speech reset forces the CLR line active on the tms32010
 	dectalk.tlc_tonedetect = 0; // TODO, needed for selftest pass
 	dectalk.tlc_ringdetect = 0; // TODO
+	dectalk.tlc_dtmf = 0; // TODO
 }
 
 MACHINE_RESET( dectalk )
@@ -292,6 +345,10 @@ WRITE16_HANDLER( led_sw_nv_write )
 
 WRITE16_HANDLER( m68k_infifo_w ) // 68k write to the speech input fifo
 {
+#ifdef USE_LOOSE_TIMING
+	cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(50));
+	cpuexec_trigger(space->machine, 100);
+#endif
 #ifdef VERBOSE
 	logerror("m68k: SPC infifo written with data = %04X, fifo head was: %02X; fifo tail: %02X\n",data, dectalk.infifo_head_ptr, dectalk.infifo_tail_ptr);
 #endif
@@ -322,6 +379,10 @@ READ16_HANDLER( m68k_spcflags_r ) // 68k read from the speech flags
 
 WRITE16_HANDLER( m68k_spcflags_w ) // 68k write to the speech flags (only 3 bits do anything)
 {
+#ifdef USE_LOOSE_TIMING
+	cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(50));
+	cpuexec_trigger(space->machine, 100);
+#endif
 #ifdef VERBOSE
 	logerror("m68k: SPC flags written with %04X, only storing %04X\n",data, data&0x41);
 #endif
@@ -367,7 +428,7 @@ WRITE16_HANDLER( m68k_spcflags_w ) // 68k write to the speech flags (only 3 bits
 			cputag_set_input_line_and_vector(space->machine, "maincpu", M68K_IRQ_5, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR); // set int because semaphore was set
 		}
 	}
-	else
+	else // data&0x40 == 0
 	{
 #ifdef VERBOSE
 		logerror(" | 0x40 = 0: speech int disabled\n");
@@ -394,14 +455,68 @@ WRITE16_HANDLER( m68k_tlcflags_w ) // dtmf flags write
 	logerror("m68k: TLC flags written with %04X, only storing %04X\n",data, data&0x4140);
 #endif
 	dectalk.m68k_tlcflags_latch = data&0x4140; // ONLY store bits 6 8 and 14!
-	// write me for the ring and tone int enables and answer phone
+	if ((data&0x40) == 0x40) // bit 6: tone detect interrupt enable
+	{
+#ifdef VERBOSE
+		logerror(" | 0x40: tone detect int enabled\n");
+#endif
+		if ((dectalk.tlc_tonedetect == 1))
+		{
+#ifdef VERBOSE
+			logerror("    TLC int fired!\n");
+#endif
+			cputag_set_input_line_and_vector(space->machine, "maincpu", M68K_IRQ_4, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR); // set int because tone detect was set
+		}
+	}
+	else // data&0x40 == 0
+	{
+#ifdef VERBOSE
+		logerror(" | 0x40 = 0: tone detect int disabled\n");
+#endif
+	if (((data&0x4000)!=0x4000) || (dectalk.tlc_ringdetect == 0)) // check to be sure we don't disable int if both ints fired at once
+		cputag_set_input_line_and_vector(space->machine, "maincpu", M68K_IRQ_4, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR); // clear int because int is now disabled
+	}
+	if ((data&0x100) == 0x100) // bit 8: answer phone relay enable
+	{
+#ifdef VERBOSE
+		logerror(" | 0x100: answer phone relay enabled\n");
+#endif
+	}
+	else // data&0x100 == 0
+	{
+#ifdef VERBOSE
+		logerror(" | 0x100 = 0: answer phone relay disabled\n");
+#endif
+	}
+	if ((data&0x4000) == 0x4000) // bit 14: ring int enable
+	{
+#ifdef VERBOSE
+		logerror(" | 0x4000: ring detect int enabled\n");
+#endif
+		if ((dectalk.tlc_ringdetect == 1))
+		{
+#ifdef VERBOSE
+			logerror("    TLC int fired!\n");
+#endif
+			cputag_set_input_line_and_vector(space->machine, "maincpu", M68K_IRQ_4, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR); // set int because tone detect was set
+		}
+	}
+	else // data&0x4000 == 0
+	{
+#ifdef VERBOSE
+		logerror(" | 0x4000 = 0: ring detect int disabled\n");
+#endif
+	if (((data&0x40)!=0x40) || (dectalk.tlc_tonedetect == 0)) // check to be sure we don't disable int if both ints fired at once
+		cputag_set_input_line_and_vector(space->machine, "maincpu", M68K_IRQ_4, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR); // clear int because int is now disabled
+	}
 }
 
 READ16_HANDLER( m68k_tlc_dtmf_r ) // dtmf chip read
 {
-	// write me!
+	UINT16 data = 0xFFFF;
+	data = dectalk.tlc_dtmf&0xF;
 #ifdef VERBOSE
-	logerror("m68k: TLC dtmf read, currently unhandled, returning data = 0");
+	logerror("m68k: TLC dtmf detector read, returning data = %02X", data);
 #endif
 	return 0;
 }
@@ -410,6 +525,10 @@ READ16_HANDLER( m68k_tlc_dtmf_r ) // dtmf chip read
 /* Begin tms32010 i/o handlers */
 WRITE16_HANDLER( spc_latch_outfifo_error_stats ) // latch 74ls74 @ E64 upper and lower halves with d0 and 1 respectively
 {
+#ifdef USE_LOOSE_TIMING
+	cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(50));
+	cpuexec_trigger(space->machine, 100);
+#endif
 #ifdef VERBOSE
 	logerror("dsp: set fifo semaphore and set error status = %01X\n",data&1);
 #endif
@@ -514,8 +633,23 @@ ADDRESS_MAP_END
 /******************************************************************************
  Input Ports
 ******************************************************************************/
-
-
+static INPUT_PORTS_START( dectalk )
+PORT_START("duart_in") // IP4, IP5, IP6 bits on duart are dipswitches (really unsoldered holes in the pcb where jumper wires can be soldered or shorted over)
+	PORT_BIT(0x0f, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // these bits are dealt with elsewhere
+	PORT_DIPNAME( 0x10, 0x00, "Skip Self Test (IP4)" )
+	PORT_DIPSETTING(    0x10, "Open (VCC)" )
+	PORT_DIPSETTING(    0x00, "Short to GND" )
+	PORT_DIPNAME( 0x20, 0x20, "Unknown (IP5)" )
+	PORT_DIPSETTING(    0x20, "Open (VCC)" )
+	PORT_DIPSETTING(    0x00, "Short to GND" )
+	PORT_DIPNAME( 0x40, 0x40, "Unknown (IP6)" )
+	PORT_DIPSETTING(    0x40, "Open (VCC)" )
+	PORT_DIPSETTING(    0x00, "Short to GND" )
+	//PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // this pin (IP7) doesn't actually exist as a pin at all, reads as 1
+	PORT_DIPNAME( 0x80, 0x80, "Hack to prevent hang when skip self test is shorted" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+INPUT_PORTS_END
 
 /******************************************************************************
  Machine Drivers
@@ -553,15 +687,20 @@ static MACHINE_DRIVER_START(dectalk)
     MDRV_CPU_ADD("dsp", TMS32010, XTAL_20MHz) /* Y1 20MHz xtal */
     MDRV_CPU_PROGRAM_MAP(tms32010_mem)
     MDRV_CPU_IO_MAP(tms32010_io)
-    //MDRV_QUANTUM_TIME(HZ(750000))
-	MDRV_QUANTUM_PERFECT_CPU("dsp")
+#ifdef USE_LOOSE_TIMING
+    MDRV_QUANTUM_TIME(HZ(200))
+#else
+    MDRV_QUANTUM_PERFECT_CPU("dsp")
+#endif
+
+    //MDRV_NVRAM_HANDLER(generic_0fill)
 
     /* video hardware */
     MDRV_DEFAULT_LAYOUT(layout_dectalk) // hack to avoid screenless system crash
 
     /* sound hardware */
     MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("dac", DAC, 0) /* E88 10KHz OSC, handled by timer */
+    MDRV_SOUND_ADD("dac", DAC, 0) /* E88 10KHz OSC, handled by timer */
     MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.9)
 
     /* Y2 is a 3.579545 MHz xtal for the dtmf decoder chip */
@@ -617,5 +756,5 @@ SYSTEM_CONFIG_END
  Drivers
 ******************************************************************************/
 
-/*    YEAR	NAME		PARENT	COMPAT	MACHINE		INPUT	INIT		CONFIG		COMPANY		FULLNAME			FLAGS */
-COMP( 1984, dectalk,	0,		0,		dectalk,	0,		dectalk,	dectalk,	"DEC",		"DECTalk DTC-01",	GAME_NOT_WORKING )
+/*    YEAR	NAME		PARENT	COMPAT	MACHINE		INPUT		INIT		CONFIG		COMPANY		FULLNAME			FLAGS */
+COMP( 1984, dectalk,	0,		0,		dectalk,	dectalk,	dectalk,	dectalk,	"DEC",		"DECTalk DTC-01",	GAME_NOT_WORKING )

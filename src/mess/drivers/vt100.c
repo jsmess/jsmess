@@ -542,7 +542,7 @@ ROM_START( vt103 ) // This is from the schematics at http://www.bitsavers.org/pd
 	ROM_LOAD_OPTIONAL( "23-094e2-00.e9", 0x0800, 0x0800, NO_DUMP) // optional (comes default with some models) alternate character set rom
 
 	ROM_REGION(0x0800, "tapecpu", 0) // rom for the 8085 cpu in the integrated serial tu58-xa drive
-	ROM_LOAD( "23-089e2-00.e1", 0x0000, 0x0800, NO_DUMP)
+	ROM_LOAD( "23-089e2.e1", 0x0000, 0x0800, CRC(8614dd4c) SHA1(1b554e6c98bddfc6bc48d81c990deea43cf9df7f)) // Label: "23-089E2 // P8316E - AMD // 35227 8008NPP"
 
 	ROM_REGION(0x80000, "lsi11cpu", 0) // rom for the LSI-11 cpu board
 	ROM_LOAD_OPTIONAL( "unknown.bin", 0x00000, 0x80000, NO_DUMP)
