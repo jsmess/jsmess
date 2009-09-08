@@ -152,6 +152,14 @@ static UINT8 duart_input(const device_config *device)
 	return data;
 }
 
+static void duart_output(const device_config *device, UINT8 data)
+{
+	// todo: handle the RTS (bit 0) and DTR (bit 2) bits
+#ifdef SERIAL_TO_STDERR
+	fprintf(stderr, "RTS: %01X, DTR: %01X\n", data&1, (data&4)>>2);
+#endif
+}
+
 static void duart_tx(const device_config *device, int channel, UINT8 data)
 {
 #ifdef SERIAL_TO_STDERR
@@ -164,7 +172,7 @@ static const duart68681_config dectalk_duart68681_config =
 	duart_irq_handler,
 	duart_tx,
 	duart_input,
-	NULL
+	duart_output
 };
 
 static struct
