@@ -147,7 +147,7 @@ static UINT8 duart_input(const device_config *device)
 	data &= 0x8F; // write me: handle bits 0, 2, 3 which are port a CTS, DSR and RLS(DCD?) respectively
 	//data |= input_port_read(device->machine, "duart_in");
 	 data |= (input_port_read(device->machine, "duart_in")&0x7f);
-	 if ((hack_self_test == 1) && (input_port_read(device->machine, "duart_in")&0x80)) data |= 0x10; // hack to prevent hang if selftest disable bit is kept low past the first read; i suppose the proper use of this bit was an incremental switch, or perhaps its expecting an interrupt later from serial in or tone in? added a dipswitch to disable the hack for testing
+	 if ((hack_self_test == 1) && (input_port_read(device->machine, "hacks")&0x01)) data |= 0x10; // hack to prevent hang if selftest disable bit is kept low past the first read; i suppose the proper use of this bit was an incremental switch, or perhaps its expecting an interrupt later from serial in or tone in? added a dipswitch to disable the hack for testing
 	 hack_self_test = 1;
 	return data;
 }
@@ -355,7 +355,6 @@ WRITE16_HANDLER( m68k_infifo_w ) // 68k write to the speech input fifo
 {
 #ifdef USE_LOOSE_TIMING
 	cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(25));
-	cpuexec_trigger(space->machine, 1000);
 #endif
 #ifdef VERBOSE
 	logerror("m68k: SPC infifo written with data = %04X, fifo head was: %02X; fifo tail: %02X\n",data, dectalk.infifo_head_ptr, dectalk.infifo_tail_ptr);
@@ -389,7 +388,6 @@ WRITE16_HANDLER( m68k_spcflags_w ) // 68k write to the speech flags (only 3 bits
 {
 #ifdef USE_LOOSE_TIMING
 	cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(25));
-	cpuexec_trigger(space->machine, 1000);
 #endif
 #ifdef VERBOSE
 	logerror("m68k: SPC flags written with %04X, only storing %04X\n",data, data&0x41);
@@ -535,7 +533,6 @@ WRITE16_HANDLER( spc_latch_outfifo_error_stats ) // latch 74ls74 @ E64 upper and
 {
 #ifdef USE_LOOSE_TIMING
 	cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(25));
-	cpuexec_trigger(space->machine, 1000);
 #endif
 #ifdef VERBOSE
 	logerror("dsp: set fifo semaphore and set error status = %01X\n",data&1);
@@ -653,10 +650,12 @@ PORT_START("duart_in") // IP4, IP5, IP6 bits on duart are dipswitches (really un
 	PORT_DIPNAME( 0x40, 0x40, "Unknown (IP6)" )
 	PORT_DIPSETTING(    0x40, "Open (VCC)" )
 	PORT_DIPSETTING(    0x00, "Short to GND" )
-	//PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // this pin (IP7) doesn't actually exist as a pin at all, reads as 1
-	PORT_DIPNAME( 0x80, 0x80, "Hack to prevent hang when skip self test is shorted" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // this pin (IP7) doesn't actually exist as a pin at all, reads as 1
+
+PORT_START("hacks")
+	PORT_CONFNAME( 0x01, 0x01, "Hack to prevent hang when skip self test is shorted" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 INPUT_PORTS_END
 
 /******************************************************************************
@@ -725,27 +724,28 @@ MACHINE_DRIVER_END
 ROM_START( dectalk )
 	ROM_REGION16_BE(0x40000,"maincpu", 0)
 	// dectalk dtc-01 firmware v2.0 (first half: 23Jul84 tag; second half: 02Jul84 tag), all roms are 27128 eproms
-	ROM_LOAD16_BYTE("dtc01_e5.123", 0x00000, 0x4000, CRC(03e1eefa) SHA1(e586de03e113683c2534fca1f3f40ba391193044)) // Label: "SP8510123E5" @ E8
-	ROM_LOAD16_BYTE("dtc01_e5.119", 0x00001, 0x4000, CRC(af20411f) SHA1(7954bb56b7591f8954403a22d34de31c7d5441ac)) // Label: "SP8510119E5" @ E22
-	ROM_LOAD16_BYTE("dtc01_e5.124", 0x08000, 0x4000, CRC(9edeafcb) SHA1(7724babf4ae5d77c0b4200f608d599058d04b25c)) // Label: "SP8510124E5" @ E7
-	ROM_LOAD16_BYTE("dtc01_e5.120", 0x08001, 0x4000, CRC(f2a346a6) SHA1(af5e4ea0b3631f7d6f16c22e86a33fa2cb520ee0)) // Label: "SP8510120E5" @ E21
-	ROM_LOAD16_BYTE("dtc01_e5.125", 0x10000, 0x4000, CRC(1c0100d1) SHA1(1b60cd71dfa83408b17e13f683b6bf3198c905cc)) // Label: "SP8510125E5" @ E6
-	ROM_LOAD16_BYTE("dtc01_e5.121", 0x10001, 0x4000, CRC(4cb081bd) SHA1(4ad0b00628a90085cd7c78a354256c39fd14db6c)) // Label: "SP8510121E5" @ E20
-	ROM_LOAD16_BYTE("dtc01_e5.126", 0x18000, 0x4000, CRC(7823dedb) SHA1(e2b2415eec838ddd46094f2fea93fd289dd0caa2)) // Label: "SP8510126E5" @ E5
-	ROM_LOAD16_BYTE("dtc01_e5.122", 0x18001, 0x4000, CRC(b86370e6) SHA1(92ab22a24484ad0d0f5c8a07347105509999f3ee)) // Label: "SP8510122E5" @ E19
-	ROM_LOAD16_BYTE("dtc01_e5.103", 0x20000, 0x4000, CRC(35aac6b9) SHA1(b5aec0bf37a176ff4d66d6a10357715957662ebd)) // Label: "SP8510103E5" @ E4
-	ROM_LOAD16_BYTE("dtc01_e5.095", 0x20001, 0x4000, CRC(2296fe39) SHA1(891f3a3b4ce75ef14001257bc8f1f60463a9a7cb)) // Label: "SP8510095E5" @ E18
-	ROM_LOAD16_BYTE("dtc01_e5.104", 0x28000, 0x4000, CRC(9658b43c) SHA1(4d6808f67cbdd316df23adc8ddf701df57aa854a)) // Label: "SP8510104E5" @ E3
-	ROM_LOAD16_BYTE("dtc01_e5.096", 0x28001, 0x4000, CRC(cf236077) SHA1(496c69e52cfa013173f7b9c500ce544a03ad01f7)) // Label: "SP8510096E5" @ E17
-	ROM_LOAD16_BYTE("dtc01_e5.105", 0x30000, 0x4000, CRC(09cddd28) SHA1(de0c25687bab3ff0c88c98622092e0b58331aa16)) // Label: "SP8510105E5" @ E2
-	ROM_LOAD16_BYTE("dtc01_e5.097", 0x30001, 0x4000, CRC(49434da1) SHA1(c450abae0ccf372d7eb87370b8a8c97a45e164d3)) // Label: "SP8510097E5" @ E16
-	ROM_LOAD16_BYTE("dtc01_e5.106", 0x38000, 0x4000, CRC(a389ab31) SHA1(355348bfc96a04193136cdde3418366e6476c3ca)) // Label: "SP8510106E5" @ E1
-	ROM_LOAD16_BYTE("dtc01_e5.098", 0x38001, 0x4000, CRC(3d8910e7) SHA1(01921e77b46c2d4845023605239c45ffa4a35872)) // Label: "SP8510098E5" @ E15
+	// technically the correct rom names are probably 23-123e5.e8, etc, but the chips they were dumped from were NOT labeled that way
+	ROM_LOAD16_BYTE("sp8510123e5.e8", 0x00000, 0x4000, CRC(03e1eefa) SHA1(e586de03e113683c2534fca1f3f40ba391193044)) // Label: "SP8510123E5" @ E8
+	ROM_LOAD16_BYTE("sp8510119e5.e22", 0x00001, 0x4000, CRC(af20411f) SHA1(7954bb56b7591f8954403a22d34de31c7d5441ac)) // Label: "SP8510119E5" @ E22
+	ROM_LOAD16_BYTE("sp8510124e5.e7", 0x08000, 0x4000, CRC(9edeafcb) SHA1(7724babf4ae5d77c0b4200f608d599058d04b25c)) // Label: "SP8510124E5" @ E7
+	ROM_LOAD16_BYTE("sp8510120e5.e21", 0x08001, 0x4000, CRC(f2a346a6) SHA1(af5e4ea0b3631f7d6f16c22e86a33fa2cb520ee0)) // Label: "SP8510120E5" @ E21
+	ROM_LOAD16_BYTE("sp8510125e5.e6", 0x10000, 0x4000, CRC(1c0100d1) SHA1(1b60cd71dfa83408b17e13f683b6bf3198c905cc)) // Label: "SP8510125E5" @ E6
+	ROM_LOAD16_BYTE("sp8510121e5.e20", 0x10001, 0x4000, CRC(4cb081bd) SHA1(4ad0b00628a90085cd7c78a354256c39fd14db6c)) // Label: "SP8510121E5" @ E20
+	ROM_LOAD16_BYTE("sp8510126e5.e5", 0x18000, 0x4000, CRC(7823dedb) SHA1(e2b2415eec838ddd46094f2fea93fd289dd0caa2)) // Label: "SP8510126E5" @ E5
+	ROM_LOAD16_BYTE("sp8510122e5.e19", 0x18001, 0x4000, CRC(b86370e6) SHA1(92ab22a24484ad0d0f5c8a07347105509999f3ee)) // Label: "SP8510122E5" @ E19
+	ROM_LOAD16_BYTE("sp8510103e5.e4", 0x20000, 0x4000, CRC(35aac6b9) SHA1(b5aec0bf37a176ff4d66d6a10357715957662ebd)) // Label: "SP8510103E5" @ E4
+	ROM_LOAD16_BYTE("sp8510095e5.e18", 0x20001, 0x4000, CRC(2296fe39) SHA1(891f3a3b4ce75ef14001257bc8f1f60463a9a7cb)) // Label: "SP8510095E5" @ E18
+	ROM_LOAD16_BYTE("sp8510104e5.e3", 0x28000, 0x4000, CRC(9658b43c) SHA1(4d6808f67cbdd316df23adc8ddf701df57aa854a)) // Label: "SP8510104E5" @ E3
+	ROM_LOAD16_BYTE("sp8510096e5.e17", 0x28001, 0x4000, CRC(cf236077) SHA1(496c69e52cfa013173f7b9c500ce544a03ad01f7)) // Label: "SP8510096E5" @ E17
+	ROM_LOAD16_BYTE("sp8510105e5.e2", 0x30000, 0x4000, CRC(09cddd28) SHA1(de0c25687bab3ff0c88c98622092e0b58331aa16)) // Label: "SP8510105E5" @ E2
+	ROM_LOAD16_BYTE("sp8510097e5.e16", 0x30001, 0x4000, CRC(49434da1) SHA1(c450abae0ccf372d7eb87370b8a8c97a45e164d3)) // Label: "SP8510097E5" @ E16
+	ROM_LOAD16_BYTE("sp8510106e5.e1", 0x38000, 0x4000, CRC(a389ab31) SHA1(355348bfc96a04193136cdde3418366e6476c3ca)) // Label: "SP8510106E5" @ E1
+	ROM_LOAD16_BYTE("sp8510098e5.e15", 0x38001, 0x4000, CRC(3d8910e7) SHA1(01921e77b46c2d4845023605239c45ffa4a35872)) // Label: "SP8510098E5" @ E15
 
 	ROM_REGION(0x2000,"dsp", 0)
 	// dectalk dtc-01 'klsyn' tms32010 firmware v2.0, both proms are 82s191 equivalent
-	ROM_LOAD16_BYTE("dtc01_f4.205", 0x000, 0x800, CRC(ed76a3ad) SHA1(3136bae243ef48721e21c66fde70dab5fc3c21d0)) // Label: "LM8506205F4 // M1-76161-5" @ E70
-	ROM_LOAD16_BYTE("dtc01_f4.204", 0x001, 0x800, CRC(79bb54ff) SHA1(9409f90f7a397b041e4440341f2d7934cb479285)) // Label: "LM8504204F4 // 78S191" @ E69
+	ROM_LOAD16_BYTE("lm8506205f4.e70", 0x000, 0x800, CRC(ed76a3ad) SHA1(3136bae243ef48721e21c66fde70dab5fc3c21d0)) // Label: "LM8506205F4 // M1-76161-5" @ E70
+	ROM_LOAD16_BYTE("lm8504204f4.e69", 0x001, 0x800, CRC(79bb54ff) SHA1(9409f90f7a397b041e4440341f2d7934cb479285)) // Label: "LM8504204F4 // 78S191" @ E69
 
 	ROM_REGION(0x100,"nvram", 0)
 	ROM_FILL(0x00, 0x100, 0xa5) /* fill with crap for now */
