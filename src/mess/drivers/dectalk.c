@@ -347,7 +347,7 @@ WRITE16_HANDLER( m68k_infifo_w ) // 68k write to the speech input fifo
 {
 #ifdef USE_LOOSE_TIMING
 	cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(50));
-	cpuexec_trigger(space->machine, 100);
+	cpuexec_trigger(space->machine, 1000);
 #endif
 #ifdef VERBOSE
 	logerror("m68k: SPC infifo written with data = %04X, fifo head was: %02X; fifo tail: %02X\n",data, dectalk.infifo_head_ptr, dectalk.infifo_tail_ptr);
@@ -381,7 +381,7 @@ WRITE16_HANDLER( m68k_spcflags_w ) // 68k write to the speech flags (only 3 bits
 {
 #ifdef USE_LOOSE_TIMING
 	cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(50));
-	cpuexec_trigger(space->machine, 100);
+	cpuexec_trigger(space->machine, 1000);
 #endif
 #ifdef VERBOSE
 	logerror("m68k: SPC flags written with %04X, only storing %04X\n",data, data&0x41);
@@ -527,7 +527,7 @@ WRITE16_HANDLER( spc_latch_outfifo_error_stats ) // latch 74ls74 @ E64 upper and
 {
 #ifdef USE_LOOSE_TIMING
 	cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(50));
-	cpuexec_trigger(space->machine, 100);
+	cpuexec_trigger(space->machine, 1000);
 #endif
 #ifdef VERBOSE
 	logerror("dsp: set fifo semaphore and set error status = %01X\n",data&1);
