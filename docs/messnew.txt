@@ -7,6 +7,7 @@ New System Drivers Supported (in no particular order):
 - Mikron-2 [Miodrag Milanovic]
 - Nintendo Game Boy Advance [R. Belmont, Harmony]
 - Tandy 1000RL  [Wilbert Pol]
+- DECTalk DTC-01 [Lord Nightmare]
 
 
 
