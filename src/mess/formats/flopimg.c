@@ -316,13 +316,14 @@ done:
 static void floppy_close_internal(floppy_image *floppy, int close_file)
 {
 	assert(floppy);
-
-	floppy_track_unload(floppy);
-	if (close_file)
-		io_generic_close(&floppy->io);
-	if (floppy->loaded_track_data)
-		free(floppy->loaded_track_data);
-	tagpool_exit(&floppy->tags);
+	if (floppy) {
+		floppy_track_unload(floppy);
+		if (close_file)
+			io_generic_close(&floppy->io);
+		if (floppy->loaded_track_data)
+			free(floppy->loaded_track_data);		
+		tagpool_exit(&floppy->tags);
+	}
 
 	free(floppy);
 }
@@ -899,7 +900,6 @@ error:
 static floperr_t floppy_track_unload(floppy_image *floppy)
 {
 	int err;
-
 	if (floppy->loaded_track_status & TRACK_DIRTY)
 	{
 		err = floppy_callbacks(floppy)->write_track(floppy, floppy->loaded_track_head, floppy->loaded_track_index, 0, floppy->loaded_track_data, floppy->loaded_track_size);
