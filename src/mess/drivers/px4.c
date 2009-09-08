@@ -62,6 +62,10 @@ struct _px4_state
 
 	UINT8 key_status;
 	UINT8 interrupt_status;
+
+	/* external ramdisk */
+	offs_t ramdisk_address;
+	UINT8 *ramdisk;
 };
 
 
@@ -561,6 +565,71 @@ static INPUT_CHANGED( key_callback )
 
 
 /***************************************************************************
+    EXTERNAL RAM-DISK
+***************************************************************************/
+
+static WRITE8_HANDLER( px4_ramdisk_address_w )
+{
+	px4_state *px4 = space->machine->driver_data;
+
+	switch (offset)
+	{
+	case 0x00: px4->ramdisk_address = (px4->ramdisk_address & 0xffff00) | data; break;
+	case 0x01: px4->ramdisk_address = (px4->ramdisk_address & 0xff00ff) | (data << 8); break;
+	case 0x02: px4->ramdisk_address = (px4->ramdisk_address & 0x00ffff) | ((data & 0x07) << 16); break;
+	}
+}
+
+static READ8_HANDLER( px4_ramdisk_data_r )
+{
+	px4_state *px4 = space->machine->driver_data;
+	UINT8 ret = 0xff;
+
+	if (px4->ramdisk_address < 0x20000)
+	{
+		/* read from ram */
+		ret = px4->ramdisk[px4->ramdisk_address];
+	}
+	else if (px4->ramdisk_address < 0x40000)
+	{
+		/* read from rom */
+		ret = memory_region(space->machine, "ramdisk")[px4->ramdisk_address];
+	}
+
+	px4->ramdisk_address = (px4->ramdisk_address & 0xffff00) | ((px4->ramdisk_address & 0xff) + 1);
+
+	return ret;
+}
+
+static WRITE8_HANDLER( px4_ramdisk_data_w )
+{
+	px4_state *px4 = space->machine->driver_data;
+
+	if (px4->ramdisk_address < 0x20000)
+		px4->ramdisk[px4->ramdisk_address] = data;
+
+	px4->ramdisk_address = (px4->ramdisk_address & 0xffff00) | ((px4->ramdisk_address & 0xff) + 1);
+}
+
+static READ8_HANDLER( px4_ramdisk_control_r )
+{
+	/* bit 7 determines the presence of a ram-disk */
+	return 0x7f;
+}
+
+static NVRAM_HANDLER( px4_ramdisk )
+{
+	px4_state *px4 = machine->driver_data;
+
+	if (read_or_write)
+		mame_fwrite(file, px4->ramdisk, 0x20000);
+	else
+		if (file)
+			mame_fread(file, px4->ramdisk, 0x20000);
+}
+
+
+/***************************************************************************
     VIDEO EMULATION
 ***************************************************************************/
 
@@ -627,6 +696,16 @@ static DRIVER_INIT( px4 )
 	memory_set_bankptr(machine, 2, mess_ram + 0x8000);
 }
 
+static DRIVER_INIT( px4p )
+{
+	px4_state *px4 = machine->driver_data;
+
+	DRIVER_INIT_CALL(px4);
+
+	/* reserve memory for external ram-disk */
+	px4->ramdisk = auto_alloc_array(machine, UINT8, 0x20000);
+}
+
 
 /***************************************************************************
     ADDRESS MAPS
@@ -661,6 +740,13 @@ static ADDRESS_MAP_START( px4_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x18, 0x18) AM_WRITE(px4_swr_w)
 	AM_RANGE(0x19, 0x19) AM_WRITE(px4_ioctlr_w)
 	AM_RANGE(0x1a, 0x1f) AM_NOP
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( px4p_io, ADDRESS_SPACE_IO, 8 )
+	AM_IMPORT_FROM(px4_io)
+	AM_RANGE(0x90, 0x92) AM_WRITE(px4_ramdisk_address_w)
+	AM_RANGE(0x93, 0x93) AM_READWRITE(px4_ramdisk_data_r, px4_ramdisk_data_w)
+	AM_RANGE(0x94, 0x94) AM_READ(px4_ramdisk_control_r)
 ADDRESS_MAP_END
 
 
@@ -826,6 +912,12 @@ static PALETTE_INIT( px4 )
 	palette_set_color(machine, 1, MAKE_RGB(92, 83, 88));
 }
 
+static PALETTE_INIT( px4p )
+{
+	palette_set_color(machine, 0, MAKE_RGB(149, 157, 130));
+	palette_set_color(machine, 1, MAKE_RGB(92, 83, 88));
+}
+
 
 /***************************************************************************
     MACHINE DRIVERS
@@ -866,6 +958,20 @@ static MACHINE_DRIVER_START( px4 )
 	MDRV_CARTSLOT_NOT_MANDATORY
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( px4p )
+	MDRV_IMPORT_FROM(px4)
+
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_IO_MAP(px4p_io)
+
+	MDRV_NVRAM_HANDLER(px4_ramdisk)
+
+	MDRV_PALETTE_INIT(px4p)
+
+	MDRV_CARTSLOT_ADD("ramdisk")
+	MDRV_CARTSLOT_NOT_MANDATORY
+MACHINE_DRIVER_END
+
 
 /***************************************************************************
     ROM DEFINITIONS
@@ -897,6 +1003,9 @@ ROM_START( px4p )
 
     ROM_REGION(0x8000, "capsule2", 0)
     ROM_CART_LOAD("capsule2", 0x0000, 0x8000, ROM_OPTIONAL)
+
+    ROM_REGION(0x20000, "ramdisk", 0)
+    ROM_CART_LOAD("ramdisk", 0x0000, 0x20000, ROM_OPTIONAL | ROM_MIRROR)
 ROM_END
 
 
@@ -915,4 +1024,4 @@ SYSTEM_CONFIG_END
 
 /*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT      INIT  CONFIG  COMPANY  FULLNAME  FLAGS */
 COMP( 1985, px4,  0,      0,      px4,     px4_h450a, px4,  px4,    "Epson", "PX-4",   0 )
-COMP( 1985, px4p, px4,    0,      px4,     px4_h450a, px4,  px4,    "Epson", "PX-4+",  0 )
+COMP( 1985, px4p, px4,    0,      px4p,    px4_h450a, px4p, px4,    "Epson", "PX-4+",  0 )

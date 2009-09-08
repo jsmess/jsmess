@@ -67,6 +67,8 @@ System Driver Changes:
 
 - [PIPPIN] Added CD-ROM firmware. [incog nito]
 
+- [PX4] Added RAM disk support.  [Dirk Best]
+
 - [SNES] Plenty of improvements to SNES emulation (see MAME whatsnew for 
   more details) [Fabio Priuli, Angelo Salese]: 
   * fixes to hi-res in Mode 5/6, interlaced graphics, rowscroll, window effect
@@ -656,9 +658,9 @@ New System Drivers Supported (in no particular order):
 - Amateurcomputer AC1 [Miodrag Milanovic]
 - Pilot 1000, Pilot 5000, PalmPilot Personal, PalmPilot Pro, Palm III
   [MooglyGuy, R. Belmont]
-- Hewlett Packard HP 48 S/SX/G/GX/G+ [Antoine Miné]
+- Hewlett Packard HP 48 S/SX/G/GX/G+ [Antoine Minï¿½]
 - Epson PX-4  [Dirk Best]
-- Various Channel F clones [Fredric QJ Blåholtz]
+- Various Channel F clones [Fredric QJ Blï¿½holtz]
 - Radionic [Incog, Robbbert]
 
 
@@ -683,7 +685,7 @@ System Driver Changes:
 - [BW2] Updated to use the new centronics interface.  [Dirk Best]
 
 - [CHANNELF] Added support for "new" sound, fixed PAL clock.  [Fredric QJ
-  Blåholtz]
+  Blï¿½holtz]
 
 - [COCO] Cleanups  [Nathan Woods]
 
@@ -1024,9 +1026,9 @@ System Driver Changes:
   had plugged your joystick in port 2). This helps with games which expect
   joystick inputs from port 2 of the C64 [Fabio Priuli]
 
-- [C64] Fixed memory leaks with floppies [Oliver Stöneberg]
+- [C64] Fixed memory leaks with floppies [Oliver Stï¿½neberg]
 
-- [C64] Fixed floppy unmounting [Oliver Stöneberg]
+- [C64] Fixed floppy unmounting [Oliver Stï¿½neberg]
 
 - [C65] Added preliminary cartridge support through MESS core functions.
   Currently, .crt emulation uses unmodified C64 cart code and therefore
@@ -1075,7 +1077,7 @@ System Driver Changes:
 
 - [OSCNANO] Implemented RUN/MONITOR keys properly, changed video to
   black and white, and fixed quickloading. System is now fully
-  working, including the "Säkkijärven polkka" program. [Curt Coder]
+  working, including the "Sï¿½kkijï¿½rven polkka" program. [Curt Coder]
 
 - [JUPITER] Fixed regression; driver works again.  [Wilbert Pol]
 
@@ -1136,7 +1138,7 @@ System Driver Changes:
   single VP-580 Auxiliary Keyboard emulation. The VIP Blockout game can
   now be played in color with sound using 2 keypads. [Curt Coder]
 
-- [X68000] Fixed SASI harddisk device info [Oliver Stöneberg]
+- [X68000] Fixed SASI harddisk device info [Oliver Stï¿½neberg]
 
 
 
@@ -1149,10 +1151,10 @@ User Interface Changes:
   Woods]
 
 - Added "Keyboard Mode" menu to switch between emulated and natural keyboard
-  during emulation. [Oliver Stöneberg]
+  during emulation. [Oliver Stï¿½neberg]
 
 - Fixed toggling through multiple cassettes in Tape Control menu [Oliver
-  Stöneberg]
+  Stï¿½neberg]
 
 - MESSUI now shows the actual values of the system configuration
   settings instead of the defaults. (bug #1679) [Curt Coder]
@@ -1178,7 +1180,7 @@ Source Changes:
   Woods]
 
 - Removed MESS_DEBUG and the TESTDRIVER define and enabled a lot of
-  non-working drivers [Oliver Stöneberg]
+  non-working drivers [Oliver Stï¿½neberg]
 
 - Changed the cassette implementation into a regular mame device.  [Wilbert Pol]
 
@@ -1468,13 +1470,13 @@ System Driver Changes:
 
 - [CBM, C16] Simplified keyboard and interrupt handling code.  [Fabio Priuli]
 
-- [C64] Fixed some timings in c64 pal. [Roberto Zandonà]
+- [C64] Fixed some timings in c64 pal. [Roberto Zandonï¿½]
 
 - [C64] Partial input fix, joystick 2 still not working. (bug #1150) [Roberto
-  Zandonà]
+  Zandonï¿½]
 
 - [C64] Implentation of sprite wrapping at the top of the screen. (bug #1599)
-  [Roberto Zandonà]
+  [Roberto Zandonï¿½]
 
 - [COCO/COCO3] Transitioned Bitbanger and VHD support to use MAME's core
   device system.  [Nate Woods]
@@ -1652,7 +1654,7 @@ System Driver Changes:
 
 - [COCO] Added a quickload for .BIN files.  [Nate Woods]
 
-- [COUPE] Added many new BIOS revisions.  [Oliver Stöneberg]
+- [COUPE] Added many new BIOS revisions.  [Oliver Stï¿½neberg]
 
 - [EP128] Fixed 0.119 regression in graphics display. (bug #1478)
   [Wilbert Pol]
@@ -1934,7 +1936,7 @@ System Driver Changes:
   to the data port.  (bug #1378 and bug #1418) [Wilbert Pol]
 
 - [MEPHISTO] Implemented artwork/code for real chess board usage. [Ralf
-  Schäfer, Cowering]
+  Schï¿½fer, Cowering]
 
 - [ORIC] Fixed floppy interface detection.  [Dirk Best]
 
@@ -7570,9 +7572,9 @@ Other Changes:
   *"Engine" is separate from the "shell"; which gives the potential for front ends for
    those who don't like command lines. [Nate Woods]
 
-- Disk write support for AMSTRAD CPC [Oscar Martín González]
+- Disk write support for AMSTRAD CPC [Oscar Martï¿½n Gonzï¿½lez]
 
-- Wave timer fix [Oscar Martín González]
+- Wave timer fix [Oscar Martï¿½n Gonzï¿½lez]
 
 - m6510t/m7501/m8502 CPU cores added [Peter Trauner]
 
