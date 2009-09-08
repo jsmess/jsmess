@@ -663,6 +663,7 @@ READ8_DEVICE_HANDLER( cia_r )
 			port = &cia->port[offset & 1];
 			data = devcb_call_read8(&port->read, 0);
 			data = ((data & ~port->ddr) | (port->latch & port->ddr)) & port->mask_value;
+
 			port->in = data;
 
 			if (offset == CIA_PRB)
@@ -762,6 +763,7 @@ READ8_DEVICE_HANDLER( cia_r )
 			data = timer->mode;
 			break;
 	}
+
 	return data;
 }
 
@@ -891,8 +893,8 @@ WRITE8_DEVICE_HANDLER( cia_w )
 
 
 
-UINT8 cia_get_output_a(const device_config *device)	{ return get_token(device)->port[0].out; }
-UINT8 cia_get_output_b(const device_config *device)	{ return get_token(device)->port[1].out; }
+UINT8 cia_get_output_a(const device_config *device)	{ return (get_token(device)->port[0].latch | ~get_token(device)->port[0].ddr); }
+UINT8 cia_get_output_b(const device_config *device)	{ return (get_token(device)->port[1].latch | ~get_token(device)->port[1].ddr); }
 int cia_get_irq(const device_config *device)		{ return get_token(device)->irq; }
 
 
