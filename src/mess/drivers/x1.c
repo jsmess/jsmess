@@ -536,6 +536,8 @@ static READ8_HANDLER( sub_io_r )
 	return ret;
 }
 
+static UINT8 x1_irq_vector;
+//static UINT8 ctc_irq_vector; //always 0x5e?
 static UINT8 key_irq_vector;
 static UINT8 cmt_current_cmd;
 static UINT8 cmt_test;
@@ -1031,8 +1033,8 @@ static READ8_HANDLER( x1_io_r )
 {
 	io_bank_mode = 0; //any read disables the extended mode.
 
-	if(offset >= 0x0704 && offset <= 0x0707)   		{ return z80ctc_r(devtag_get_device(space->machine, "ctc"), offset-0x0704); }
-	else if(offset == 0x0e03)                    	{ return x1_rom_r(space, 0); }
+	//if(offset >= 0x0704 && offset <= 0x0707)   	{ return z80ctc_r(devtag_get_device(space->machine, "ctc"), offset-0x0704); }
+	if(offset == 0x0e03)                    		{ return x1_rom_r(space, 0); }
 	else if(offset >= 0x0ff8 && offset <= 0x0fff)	{ return x1_fdc_r(space, offset-0xff8); }
 	else if(offset >= 0x1400 && offset <= 0x17ff)	{ return x1_pcg_r(space, offset-0x1400); }
 	else if(offset >= 0x1900 && offset <= 0x19ff)	{ return sub_io_r(space, 0); }
@@ -1056,7 +1058,7 @@ static READ8_HANDLER( x1_io_r )
 static WRITE8_HANDLER( x1_io_w )
 {
 	if(io_bank_mode == 1)                        	{ x1_ex_gfxram_w(space, offset, data); }
-	else if(offset >= 0x0704 && offset <= 0x0707)	{ z80ctc_w(devtag_get_device(space->machine, "ctc"), offset-0x0704,data); }
+//	else if(offset >= 0x0704 && offset <= 0x0707)	{ z80ctc_w(devtag_get_device(space->machine, "ctc"), offset-0x0704,data); }
 //	else if(offset >= 0x0c00 && offset <= 0x0cff)	{ x1_rs232c_w(space->machine, 0, data); }
 	else if(offset >= 0x0e00 && offset <= 0x0e02)  	{ x1_rom_w(space, offset-0xe00,data); }
 //	else if(offset >= 0x0e80 && offset <= 0x0e82)	{ x1_kanji_w(space->machine, offset-0xe80,data); }
@@ -1213,7 +1215,7 @@ static READ8_DEVICE_HANDLER( x1_portb_r )
 
 //	if(cassette_get_state(devtag_get_device(device->machine,"cass")) & CASSETTE_MOTOR_DISABLED)
 //		dat &= ~0x02;  // is zero if not playing
-		
+
 	if(cmt_test != 0)
 	{
 		dat |= 0x01;
@@ -1663,7 +1665,8 @@ GFXDECODE_END
 
 static void ctc0_interrupt(const device_config *device, int state)
 {
-	//cputag_set_input_line(device->machine, "maincpu", 0, state);
+	x1_irq_vector = 0x5e;
+	cputag_set_input_line(device->machine, "maincpu", 0, state);
 }
 
 
@@ -1671,9 +1674,9 @@ static const z80ctc_interface ctc_intf =
 {
 	0,					// timer disables
 	ctc0_interrupt,		// interrupt handler
-	0,					// ZC/TO0 callback
-	0,					// ZC/TO1 callback
-	0,					// ZC/TO2 callback
+	z80ctc_trg0_w,		// ZC/TO0 callback
+	z80ctc_trg1_w,		// ZC/TO1 callback
+	z80ctc_trg2_w,		// ZC/TO2 callback
 };
 
 /*************************************
@@ -1702,13 +1705,13 @@ static const ay8910_interface ay8910_config =
 
 static INTERRUPT_GEN( x1_vbl )
 {
-//	pcg_reset = 1;
+	//...
 }
 
 static IRQ_CALLBACK(x1_irq_callback)
 {
 	cpu_set_input_line(device, 0, CLEAR_LINE);
-	return key_irq_vector;
+	return x1_irq_vector;
 }
 
 static TIMER_CALLBACK(keyboard_callback)
@@ -1726,6 +1729,7 @@ static TIMER_CALLBACK(keyboard_callback)
 		{
 			// generate keyboard IRQ
 			sub_io_w(space,0,0xe6);
+			x1_irq_vector = key_irq_vector;
 			cputag_set_input_line(machine,"maincpu",0,ASSERT_LINE);
 			old_key1 = key1;
 			old_key2 = key2;
@@ -1854,7 +1858,7 @@ static MACHINE_DRIVER_START( x1turbo )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(x1turbo_io)
 
-	MDRV_SOUND_ADD("ym", YM2151, XTAL_4MHz/4) //unknown clock / divider
+	MDRV_SOUND_ADD("ym", YM2151, XTAL_4MHz) //unknown clock / divider
 //	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
@@ -1871,7 +1875,7 @@ FLOPPY_OPTIONS_START( x1 )
 		TRACKS([40])
 		SECTORS([16])
 		SECTOR_LENGTH([256])
-		FIRST_SECTOR_ID([1]))	
+		FIRST_SECTOR_ID([1]))
 FLOPPY_OPTIONS_END
 
 
