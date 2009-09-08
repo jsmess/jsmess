@@ -346,7 +346,7 @@ WRITE16_HANDLER( led_sw_nv_write )
 WRITE16_HANDLER( m68k_infifo_w ) // 68k write to the speech input fifo
 {
 #ifdef USE_LOOSE_TIMING
-	cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(50));
+	cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(25));
 	cpuexec_trigger(space->machine, 1000);
 #endif
 #ifdef VERBOSE
@@ -380,7 +380,7 @@ READ16_HANDLER( m68k_spcflags_r ) // 68k read from the speech flags
 WRITE16_HANDLER( m68k_spcflags_w ) // 68k write to the speech flags (only 3 bits do anything)
 {
 #ifdef USE_LOOSE_TIMING
-	cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(50));
+	cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(25));
 	cpuexec_trigger(space->machine, 1000);
 #endif
 #ifdef VERBOSE
@@ -526,7 +526,7 @@ READ16_HANDLER( m68k_tlc_dtmf_r ) // dtmf chip read
 WRITE16_HANDLER( spc_latch_outfifo_error_stats ) // latch 74ls74 @ E64 upper and lower halves with d0 and 1 respectively
 {
 #ifdef USE_LOOSE_TIMING
-	cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(50));
+	cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(25));
 	cpuexec_trigger(space->machine, 1000);
 #endif
 #ifdef VERBOSE
@@ -688,7 +688,7 @@ static MACHINE_DRIVER_START(dectalk)
     MDRV_CPU_PROGRAM_MAP(tms32010_mem)
     MDRV_CPU_IO_MAP(tms32010_io)
 #ifdef USE_LOOSE_TIMING
-    MDRV_QUANTUM_TIME(HZ(200))
+    MDRV_QUANTUM_TIME(HZ(100))
 #else
     MDRV_QUANTUM_PERFECT_CPU("dsp")
 #endif
