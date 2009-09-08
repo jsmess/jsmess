@@ -388,7 +388,6 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_AUDIO)/cdp1863.o		\
 	$(MESS_AUDIO)/lmc1992.o		\
 	$(MESS_AUDIO)/mea8000.o		\
-	$(MESS_DEVICES)/basicdsk.o	\
 	$(MESS_DEVICES)/bitbngr.o	\
 	$(MESS_DEVICES)/cartslot.o	\
 	$(MESS_DEVICES)/cassette.o	\
@@ -1275,6 +1274,7 @@ $(MESSOBJ)/special.a:			\
 $(MESSOBJ)/svi.a:				\
 	$(MESS_MACHINE)/svi318.o	\
 	$(MESS_DRIVERS)/svi318.o	\
+	$(MESS_FORMATS)/svi_dsk.o	\
 	$(MESS_FORMATS)/svi_cas.o	\
 
 $(MESSOBJ)/svision.a:			\

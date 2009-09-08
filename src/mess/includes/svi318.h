@@ -47,8 +47,6 @@ READ8_HANDLER( svi318_psg_port_a_r );
 
 int svi318_cassette_present(running_machine *machine, int id);
 
-DEVICE_IMAGE_LOAD( svi318_floppy );
-
 MC6845_UPDATE_ROW( svi806_crtc6845_update_row );
 VIDEO_START( svi328_806 );
 VIDEO_UPDATE( svi328_806 );

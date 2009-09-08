@@ -117,7 +117,6 @@ Notes:
 #include "driver.h"
 #include "cpu/cdp1802/cdp1802.h"
 #include "machine/wd17xx.h"
-#include "devices/basicdsk.h"
 #include "devices/printer.h"
 #include "devices/snapquik.h"
 #include "sound/cdp1869.h"

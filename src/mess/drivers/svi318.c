@@ -18,7 +18,8 @@
 #include "machine/i8255a.h"
 #include "machine/wd17xx.h"
 #include "machine/ctronics.h"
-#include "devices/basicdsk.h"
+#include "devices/mflopimg.h"
+#include "formats/svi_dsk.h"
 #include "devices/cartslot.h"
 #include "devices/cassette.h"
 #include "formats/svi_cas.h"
@@ -483,23 +484,12 @@ static void svi318_floppy_getinfo(const mess_device_class *devclass, UINT32 stat
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:
-			info->i = 2;
-			break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:
-			info->load = DEVICE_IMAGE_LOAD_NAME(svi318_floppy);
-			break;
+		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_svi318; break;
 
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:
-			strcpy(info->s = device_temp_str(), "dsk");
-			break;
-
-		default:
-			legacybasicdsk_device_getinfo(devclass, state, info);
-			break;
+		default:										floppy_device_getinfo(devclass, state, info); break;
 	}
 }
 

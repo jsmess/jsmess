@@ -19,10 +19,7 @@
 #include "machine/wd17xx.h"
 
 /* Devices */
-#include "devices/basicdsk.h"
 #include "devices/cassette.h"
-#include "devices/flopdrv.h"
-
 
 #ifdef MAME_DEBUG
 #define VERBOSE 1
@@ -169,22 +166,22 @@ QUICKLOAD_LOAD( trs80_cmd )
 	free(cmd_buff);
 	return INIT_PASS;
 }
-
+/*
 DEVICE_IMAGE_LOAD( trs80_floppy )
 {
 	static UINT8 pdrive[4*16];
 	int i;
-	int tracks; 	/* total tracks count per drive */
-	int heads;		/* total heads count per drive */
-	int spt;		/* sector per track count per drive */
-	int dir_sector; /* first directory sector (aka DDSL) */
-	int dir_length; /* length of directory in sectors (aka DDGA) */
+	int tracks; 	// total tracks count per drive 
+	int heads;		// total heads count per drive 
+	int spt;		// sector per track count per drive 
+	int dir_sector; // first directory sector (aka DDSL) 
+	int dir_length; // length of directory in sectors (aka DDGA) 
 	int id = image_index_in_device(image);
 
 	if (device_load_basicdsk_floppy(image) != INIT_PASS)
 		return INIT_FAIL;
 
-	if (image_index_in_device(image) == 0)        /* first floppy? */
+	if (image_index_in_device(image) == 0)        // first floppy? 
 	{
 		image_fseek(image, 0, SEEK_SET);
 		image_fread(image, pdrive, 2);
@@ -206,37 +203,37 @@ DEVICE_IMAGE_LOAD( trs80_floppy )
 	dir_sector = 5 * pdrive[id*16+0] * pdrive[id*16+5];
 	dir_length = 5 * pdrive[id*16+9];
 
-    /* set geometry so disk image can be read */
+    // set geometry so disk image can be read 
 	basicdsk_set_geometry(image, tracks, heads, spt, 256, 0, 0, FALSE);
 
-	/* mark directory sectors with deleted data address mark */
-	/* assumption dir_sector is a sector offset */
+	// mark directory sectors with deleted data address mark 
+	// assumption dir_sector is a sector offset 
 	for (i = 0; i < dir_length; i++)
 	{
 		int track, side, sector_id;
 		int track_offset, sector_offset;
 
-		/* calc sector offset */
+		// calc sector offset 
 		sector_offset = dir_sector + i;
 
-		/* get track offset */
+		// get track offset 
 		track_offset = sector_offset / spt;
 
-		/* calc track */
+		// calc track 
 		track = track_offset / heads;
 
-		/* calc side */
+		// calc side 
 		side = track_offset % heads;
 
-		/* calc sector id - first sector id is 0! */
+		// calc sector id - first sector id is 0! 
 		sector_id = sector_offset % spt;
 
-		/* set deleted data address mark for sector specified */
+		// set deleted data address mark for sector specified 
 		basicdsk_set_ddam(image, track, side, sector_id, 1);
 	}
 	return INIT_PASS;
 }
-
+*/
 
 
 /*************************************

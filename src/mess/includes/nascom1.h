@@ -23,7 +23,6 @@ SNAPSHOT_LOAD( nascom1 );
 READ8_HANDLER( nascom2_fdc_select_r );
 WRITE8_HANDLER( nascom2_fdc_select_w );
 READ8_HANDLER( nascom2_fdc_status_r );
-DEVICE_IMAGE_LOAD( nascom2_floppy );
 
 READ8_HANDLER( nascom1_port_00_r);
 READ8_HANDLER( nascom1_port_01_r);

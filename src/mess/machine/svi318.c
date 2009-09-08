@@ -14,7 +14,7 @@
 #include "machine/ins8250.h"
 #include "machine/wd17xx.h"
 #include "machine/ctronics.h"
-#include "devices/basicdsk.h"
+#include "devices/mflopimg.h"
 #include "devices/cassette.h"
 #include "formats/svi_cas.h"
 #include "sound/dac.h"
@@ -350,81 +350,17 @@ static WRITE8_HANDLER( svi318_fdc_drive_motor_w )
 
 static WRITE8_HANDLER( svi318_fdc_density_side_w )
 {
-	const device_config *image;
+	//const device_config *image;
 	const device_config *fdc = devtag_get_device(space->machine, "wd179x");
 
 	wd17xx_set_density(fdc, data & 0x01 ? DEN_FM_LO:DEN_MFM_LO);
 
 	wd17xx_set_side(fdc, data & 0x02 ? 1:0);
-
-	image = image_from_devtype_and_index(space->machine, IO_FLOPPY, svi318_fdc.driveselect);
-	if (image_exists(image))
-	{
-		UINT8 sectors;
-		UINT16 sectorSize;
-		sectors =  data & 0x01 ? 18:17;
-		sectorSize = data & 0x01 ? 128:256;
-		basicdsk_set_geometry(image, 40, svi318_fdc.heads[svi318_fdc.driveselect], sectors, sectorSize, 1, 0, FALSE);
-	}
 }
 
 static READ8_HANDLER( svi318_fdc_irqdrq_r )
 {
 	return svi318_fdc.irq_drq;
-}
-
-static unsigned long svi318_calcoffset(UINT8 t, UINT8 h, UINT8 s,
-	UINT8 tracks, UINT8 heads, UINT8 sec_per_track, UINT16 sector_length, UINT8 first_sector_id, UINT16 offset_track_zero)
-{
-	unsigned long o;
-
-	if ((t==0) && (h==0))
-		o = (s-first_sector_id)*128;
-	else
-		o = ((t*heads+h)*17+s-first_sector_id)*256-2048; /* (17*256)-(18*128)=2048 */
-
-	return o;
-}
-
-DEVICE_IMAGE_LOAD( svi318_floppy )
-{
-	int size;
-	int dsktype;
-	int id = image_index_in_device(image);
-
-	if (!image_has_been_created(image))
-	{
-		size = image_length (image);
-
-		switch (size)
-		{
-		case 172032:	/* SVI-328 SSDD */
-			svi318_fdc.heads[id] = 1;
-			dsktype = 0;
-			break;
-		case 346112:	/* SVI-328 DSDD */
-			svi318_fdc.heads[id] = 2;
-			dsktype = 0;
-			break;
-		case 348160:	/* SVI-728 DSDD CP/M */
-			svi318_fdc.heads[id] = 2;
-			dsktype = 1;
-			break;
-		default:
-			return INIT_FAIL;
-		}
-	}
-	else
-		return INIT_FAIL;
-
-	if (device_load_basicdsk_floppy(image) != INIT_PASS)
-		return INIT_FAIL;
-
-	basicdsk_set_geometry(image, 40, svi318_fdc.heads[id], 17, 256, 1, 0, FALSE);
-
-	if (dsktype == 0) basicdsk_set_calcoffset(image, svi318_calcoffset);
-
-	return INIT_PASS;
 }
 
 MC6845_UPDATE_ROW( svi806_crtc6845_update_row )
@@ -669,13 +605,40 @@ MACHINE_START( svi318_pal )
 	TMS9928A_configure(&svi318_tms9929a_interface);
 }
 
+static void svi318_load_proc(const device_config *image)
+{
+	int size;
+	int id = image_index_in_device(image);
+
+	size = image_length (image);
+
+	switch (size)
+	{
+	case 172032:	/* SVI-328 SSDD */
+		svi318_fdc.heads[id] = 1;
+		break;
+	case 346112:	/* SVI-328 DSDD */
+		svi318_fdc.heads[id] = 2;
+		break;
+	case 348160:	/* SVI-728 DSDD CP/M */
+		svi318_fdc.heads[id] = 2;
+		break;
+	}
+}
+
 MACHINE_RESET( svi318 )
 {
+	int drive;
 	/* video stuff */
 	TMS9928A_reset();
 
 	svi.bank_switch = 0xff;
 	svi318_set_banks(machine);
+	
+	for(drive=0;drive<2;drive++)
+	{
+		floppy_install_load_proc(image_from_devtype_and_index(machine, IO_FLOPPY, drive), svi318_load_proc);
+	}
 }
 
 INTERRUPT_GEN( svi318_interrupt )

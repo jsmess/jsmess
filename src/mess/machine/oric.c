@@ -25,7 +25,6 @@
 #include "machine/applefdc.h"
 #include "machine/6551.h"
 #include "machine/ctronics.h"
-#include "devices/basicdsk.h"
 #include "devices/mfmdisk.h"
 #include "devices/cassette.h"
 #include "sound/ay8910.h"
@@ -1084,14 +1083,14 @@ DEVICE_IMAGE_LOAD( oric_floppy )
 		return INIT_PASS;
 	}
 
-	if (device_load_basicdsk_floppy(image) == INIT_PASS)
+/*	if (device_load_basicdsk_floppy(image) == INIT_PASS)
 	{
-		/* I don't know what the geometry of the disc image should be, so the
-		default is 80 tracks, 2 sides, 9 sectors per track */
+		// I don't know what the geometry of the disc image should be, so the
+		//default is 80 tracks, 2 sides, 9 sectors per track 
 		basicdsk_set_geometry(image, 80, 2, 9, 512, 1, 0, FALSE);
 		floppy_drive_set_disk_image_interface(image, &basicdsk_floppy_interface);
 		return INIT_PASS;
-	}
+	}*/
 	return INIT_FAIL;
 }
 

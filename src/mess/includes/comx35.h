@@ -88,7 +88,6 @@ MACHINE_START( comx35n );
 MACHINE_RESET( comx35 );
 INPUT_CHANGED( comx35_reset );
 
-DEVICE_IMAGE_LOAD( comx35_floppy );
 QUICKLOAD_LOAD( comx35 );
 
 /* ---------- defined in video/comx35.c ---------- */

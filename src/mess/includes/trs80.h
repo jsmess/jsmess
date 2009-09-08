@@ -24,7 +24,6 @@ extern UINT8 *gfxram;
 extern const wd17xx_interface trs80_wd17xx_interface;
 extern UINT8 trs80_mode;
 
-DEVICE_IMAGE_LOAD( trs80_floppy );
 QUICKLOAD_LOAD( trs80_cmd );
 
 MACHINE_RESET( trs80 );

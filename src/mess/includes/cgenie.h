@@ -20,8 +20,6 @@ WRITE8_DEVICE_HANDLER( cgenie_sh_control_port_w );
 extern UINT8 *cgenie_fontram;
 extern const wd17xx_interface cgenie_wd17xx_interface;
 
-DEVICE_IMAGE_LOAD( cgenie_floppy );
-
 extern int cgenie_tv_mode;
 
 READ8_HANDLER ( cgenie_psg_port_a_r);
