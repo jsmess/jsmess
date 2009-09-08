@@ -73,7 +73,4 @@ enum
 /* uitext */
 const char * ui_getstring (int string_num);
 
-/* drawgfx */
-#define fillbitmap(dest, pen, clip) bitmap_fill(dest, clip, pen)
-
 #endif /* MSLEGACY_H */
