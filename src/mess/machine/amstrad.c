@@ -41,7 +41,6 @@ This gives a total of 19968 NOPs per frame.
 #include "machine/mc146818.h"
 #include "machine/nec765.h"
 #include "machine/ctronics.h"
-#include "devices/dsk.h"
 #include "devices/cassette.h"
 #include "devices/snapquik.h"
 #include "includes/amstrad.h"
