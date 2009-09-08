@@ -310,7 +310,7 @@ ROM_START(kaypro10)
 ROM_END
 
 static FLOPPY_OPTIONS_START(kayproii)
-	FLOPPY_OPTION(kayproii, "img", "Kaypro II disk image", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION(kayproii, "dsk", "Kaypro II disk image", basicdsk_identify_default, basicdsk_construct_default,
 		HEADS([1])
 		TRACKS([40])
 		SECTORS([10])
@@ -319,7 +319,7 @@ static FLOPPY_OPTIONS_START(kayproii)
 FLOPPY_OPTIONS_END
 
 static FLOPPY_OPTIONS_START(kaypro2x)
-	FLOPPY_OPTION(kaypro2x, "img", "Kaypro 2x disk image", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION(kaypro2x, "dsk", "Kaypro 2x disk image", basicdsk_identify_default, basicdsk_construct_default,
 		HEADS([2])
 		TRACKS([80])
 		SECTORS([10])
