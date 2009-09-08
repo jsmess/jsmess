@@ -139,6 +139,7 @@
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "machine/z80ctc.h"
+#include "machine/z80sio.h"
 #include "machine/8255ppi.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
@@ -1040,8 +1041,9 @@ static READ8_HANDLER( x1_io_r )
 	else if(offset >= 0x1900 && offset <= 0x19ff)	{ return sub_io_r(space, 0); }
 	else if(offset >= 0x1a00 && offset <= 0x1aff)	{ return ppi8255_r(devtag_get_device(space->machine, "ppi8255_0"), (offset-0x1a00) & 3); }
 	else if(offset >= 0x1b00 && offset <= 0x1bff)	{ return ay8910_r(devtag_get_device(space->machine, "ay"), 0); }
-//	else if(offset >= 0x1f90 && offset <= 0x1f93)	{ return x1_sio_r(space,(offset-0x1f90) & 3); }
-	else if(offset >= 0x1fa0 && offset <= 0x1fa3)	{ return z80ctc_r(devtag_get_device(space->machine, "ctc"), offset-0x1fa3); }
+	else if(offset >= 0x1f90 && offset <= 0x1f91)	{ return z80sio_c_r(devtag_get_device(space->machine, "sio"), (offset-0x1f90) & 1); }
+	else if(offset >= 0x1f92 && offset <= 0x1f93)	{ return z80sio_d_r(devtag_get_device(space->machine, "sio"), (offset-0x1f92) & 1); }
+	else if(offset >= 0x1fa0 && offset <= 0x1fa3)	{ return z80ctc_r(devtag_get_device(space->machine, "ctc"), offset-0x1fa0); }
 	else if(offset >= 0x1fa8 && offset <= 0x1fab)	{ return z80ctc_r(devtag_get_device(space->machine, "ctc"), offset-0x1fa8); }
 //	else if(offset >= 0x1fd0 && offset <= 0x1fdf)	{ return x1_scrn_r(space,offset-0x1fd0); }
 	else if(offset == 0x1fe0)						{ return x1_blackclip_r(space,0); }
@@ -1076,8 +1078,9 @@ static WRITE8_HANDLER( x1_io_w )
 	else if(offset >= 0x1d00 && offset <= 0x1dff)	{ rom_bank_1_w(space,0,data); }
 	else if(offset >= 0x1e00 && offset <= 0x1eff)	{ rom_bank_0_w(space,0,data); }
 	else if(offset >= 0x1f80 && offset <= 0x1f8f)	{ x1_dma_w(space,offset-0x1f80,data); }
-//	else if(offset >= 0x1f90 && offset <= 0x1f93)	{ x1_sio_w(space->machine,(offset-0x1f90) & 3),data; }
-	else if(offset >= 0x1fa0 && offset <= 0x1fa3)	{ z80ctc_w(devtag_get_device(space->machine, "ctc"), offset-0x1fa3,data); }
+	else if(offset >= 0x1f90 && offset <= 0x1f91)	{ z80sio_c_w(devtag_get_device(space->machine, "sio"), (offset-0x1f90) & 1,data); }
+	else if(offset >= 0x1f92 && offset <= 0x1f93)	{ z80sio_d_w(devtag_get_device(space->machine, "sio"), (offset-0x1f92) & 1,data); }
+	else if(offset >= 0x1fa0 && offset <= 0x1fa3)	{ z80ctc_w(devtag_get_device(space->machine, "ctc"), offset-0x1fa0,data); }
 	else if(offset >= 0x1fa8 && offset <= 0x1fab)	{ z80ctc_w(devtag_get_device(space->machine, "ctc"), offset-0x1fa8,data); }
 	else if(offset == 0x1fb0)						{ x1turbo_pal_w(space,0,data); }
 	else if(offset >= 0x1fb9 && offset <= 0x1fbf)	{ x1turbo_txpal_w(space,offset-0x1fb9,data); }
@@ -1106,8 +1109,9 @@ static READ8_HANDLER( x1turbo_io_r )
 	else if(offset >= 0x1900 && offset <= 0x19ff)	{ return sub_io_r(space, 0); }
 	else if(offset >= 0x1a00 && offset <= 0x1aff)	{ return ppi8255_r(devtag_get_device(space->machine, "ppi8255_0"), (offset-0x1a00) & 3); }
 	else if(offset >= 0x1b00 && offset <= 0x1bff)	{ return ay8910_r(devtag_get_device(space->machine, "ay"), 0); }
-//	else if(offset >= 0x1f90 && offset <= 0x1f93)	{ return x1_sio_r(space,(offset-0x1f90) & 3); }
-	else if(offset >= 0x1fa0 && offset <= 0x1fa3)	{ return z80ctc_r(devtag_get_device(space->machine, "ctc"), offset-0x1fa3); }
+	else if(offset >= 0x1f90 && offset <= 0x1f91)	{ return z80sio_c_r(devtag_get_device(space->machine, "sio"), (offset-0x1f90) & 1); }
+	else if(offset >= 0x1f92 && offset <= 0x1f93)	{ return z80sio_d_r(devtag_get_device(space->machine, "sio"), (offset-0x1f92) & 1); }
+	else if(offset >= 0x1fa0 && offset <= 0x1fa3)	{ return z80ctc_r(devtag_get_device(space->machine, "ctc"), offset-0x1fa0); }
 	else if(offset >= 0x1fa8 && offset <= 0x1fab)	{ return z80ctc_r(devtag_get_device(space->machine, "ctc"), offset-0x1fa8); }
 //	else if(offset >= 0x1fd0 && offset <= 0x1fdf)	{ return x1_scrn_r(space,offset-0x1fd0); }
 	else if(offset == 0x1fe0)						{ return x1_blackclip_r(space,0); }
@@ -1143,8 +1147,9 @@ static WRITE8_HANDLER( x1turbo_io_w )
 	else if(offset >= 0x1d00 && offset <= 0x1dff)	{ rom_bank_1_w(space,0,data); }
 	else if(offset >= 0x1e00 && offset <= 0x1eff)	{ rom_bank_0_w(space,0,data); }
 	else if(offset >= 0x1f80 && offset <= 0x1f8f)	{ x1_dma_w(space,offset-0x1f80,data); }
-//	else if(offset >= 0x1f90 && offset <= 0x1f93)	{ x1_sio_w(space->machine,(offset-0x1f90) & 3),data; }
-	else if(offset >= 0x1fa0 && offset <= 0x1fa3)	{ z80ctc_w(devtag_get_device(space->machine, "ctc"), offset-0x1fa3,data); }
+	else if(offset >= 0x1f90 && offset <= 0x1f91)	{ z80sio_c_w(devtag_get_device(space->machine, "sio"), (offset-0x1f90) & 1,data); }
+	else if(offset >= 0x1f92 && offset <= 0x1f93)	{ z80sio_d_w(devtag_get_device(space->machine, "sio"), (offset-0x1f92) & 1,data); }
+	else if(offset >= 0x1fa0 && offset <= 0x1fa3)	{ z80ctc_w(devtag_get_device(space->machine, "ctc"), offset-0x1fa0,data); }
 	else if(offset >= 0x1fa8 && offset <= 0x1fab)	{ z80ctc_w(devtag_get_device(space->machine, "ctc"), offset-0x1fa8,data); }
 	else if(offset == 0x1fb0)						{ x1turbo_pal_w(space,0,data); }
 	else if(offset >= 0x1fb9 && offset <= 0x1fbf)	{ x1turbo_txpal_w(space,offset-0x1fb9,data); }
@@ -1665,8 +1670,8 @@ GFXDECODE_END
 
 static void ctc0_interrupt(const device_config *device, int state)
 {
-	x1_irq_vector = 0x5e;
-	cputag_set_input_line(device->machine, "maincpu", 0, state);
+	//x1_irq_vector = 0x5e;
+	//cputag_set_input_line(device->machine, "maincpu", 0, state);
 }
 
 
@@ -1678,6 +1683,17 @@ static const z80ctc_interface ctc_intf =
 	z80ctc_trg1_w,		// ZC/TO1 callback
 	z80ctc_trg2_w,		// ZC/TO2 callback
 };
+
+static const z80sio_interface sio_intf =
+{
+	0,					/* interrupt handler */
+	0,					/* DTR changed handler */
+	0,					/* RTS changed handler */
+	0,					/* BREAK changed handler */
+	0,					/* transmit handler */
+	0					/* receive handler */
+};
+
 
 /*************************************
  *
@@ -1816,10 +1832,11 @@ static MACHINE_DRIVER_START( x1 )
 	MDRV_CPU_VBLANK_INT("screen", x1_vbl)
 
 	MDRV_Z80CTC_ADD( "ctc", XTAL_4MHz , ctc_intf )
-
-	MDRV_MACHINE_RESET(x1)
+	MDRV_Z80SIO_ADD( "sio", XTAL_4MHz , sio_intf )
 
 	MDRV_PPI8255_ADD( "ppi8255_0", ppi8255_intf )
+
+	MDRV_MACHINE_RESET(x1)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
