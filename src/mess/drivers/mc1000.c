@@ -13,7 +13,6 @@
 
 	TODO:
 
-	- interrupt from NE555
 	- xtal frequency?
 	- Z80 wait at 0x0000-0x1fff when !hsync & !vsync
 	- 80-column card (MC6845) character generator ROM
@@ -419,6 +418,22 @@ static MACHINE_RESET( mc1000 )
 
 /* Machine Driver */
 
+static TIMER_DEVICE_CALLBACK( ne555_tick )
+{
+	mc1000_state *state = timer->machine->driver_data;
+
+	if (state->ne555_int == ASSERT_LINE)
+	{
+		state->ne555_int = CLEAR_LINE;
+	}
+	else
+	{
+		state->ne555_int = ASSERT_LINE;
+	}
+
+	cputag_set_input_line(timer->machine, Z80_TAG, INPUT_LINE_IRQ0, state->ne555_int);
+}
+
 static const cassette_config mc1000_cassette_config =
 {
 	cassette_default_formats,
@@ -436,6 +451,8 @@ static MACHINE_DRIVER_START( mc1000 )
 
     MDRV_MACHINE_START(mc1000)
     MDRV_MACHINE_RESET(mc1000)
+
+	MDRV_TIMER_ADD_PERIODIC("ne555", ne555_tick, HZ(60))
 
     /* video hardware */
     MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
