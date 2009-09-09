@@ -16,7 +16,8 @@
 #define mfm_disk_header_size	0x0100
 #define MFM_ID	"MFM_DISK"
 
-static const int TRACK_SIZE_MFM = 0x01900;
+#define TRACK_SIZE_MFM 0x1900
+
 struct mfm_disk_sector_info
 {
 	int id_ptr;
@@ -288,7 +289,7 @@ static FLOPPY_CONSTRUCT(oric_dsk_construct)
 	tag->heads   = pick_integer_le(header, 8, 4);
 	tag->tracks  = pick_integer_le(header, 12, 4);
 	tag->geometry = pick_integer_le(header, 16, 4);
-	tag->tracksize = 0x1900;
+	tag->tracksize = TRACK_SIZE_MFM;
 	memset(tag->sector_data,0,sizeof(tag->sector_data));
 			
 	callbacks = floppy_callbacks(floppy);
