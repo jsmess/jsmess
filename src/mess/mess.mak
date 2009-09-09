@@ -822,6 +822,7 @@ $(MESSOBJ)/epson.a:				\
 	$(MESS_DRIVERS)/ex800.o		\
 	$(MESS_DRIVERS)/lx800.o		\
 	$(MESS_MACHINE)/e05a03.o	\
+	$(MESS_MACHINE)/pf10.o		\
 	$(MESS_DRIVERS)/px4.o		\
 	$(MESS_DRIVERS)/px8.o		\
 	$(MESS_DRIVERS)/qx10.o		\

@@ -11,6 +11,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/ctronics.h"
 #include "devices/cartslot.h"
+#include "machine/pf10.h"
 #include "px4.lh"
 
 
@@ -956,6 +957,9 @@ static MACHINE_DRIVER_START( px4 )
 	MDRV_CARTSLOT_NOT_MANDATORY
 	MDRV_CARTSLOT_ADD("capsule2")
 	MDRV_CARTSLOT_NOT_MANDATORY
+
+	/* pf10 floppy drive */
+	MDRV_PF10_ADD("pf10")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( px4p )
