@@ -1287,10 +1287,10 @@ $(MESSOBJ)/synertec.a:			\
 	$(MESS_DRIVERS)/sym1.o		\
 
 $(MESSOBJ)/tangerin.a:			\
-	$(MESS_DEVICES)/mfmdisk.o	\
 	$(MESS_VIDEO)/microtan.o	\
 	$(MESS_MACHINE)/microtan.o	\
 	$(MESS_DRIVERS)/microtan.o	\
+	$(MESS_FORMATS)/oric_dsk.o	\
 	$(MESS_FORMATS)/oric_tap.o	\
 	$(MESS_DRIVERS)/oric.o		\
 	$(MESS_VIDEO)/oric.o		\

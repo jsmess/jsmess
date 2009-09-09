@@ -25,7 +25,6 @@
 #include "machine/applefdc.h"
 #include "machine/6551.h"
 #include "machine/ctronics.h"
-#include "devices/mfmdisk.h"
 #include "devices/cassette.h"
 #include "sound/ay8910.h"
 
@@ -380,7 +379,7 @@ static void	oric_via_irq_func(const device_config *device, int state)
 	{
 		if (enable_logging)
 		{
-			logerror("oric via1 interrupt\r\n");
+			//logerror("oric via1 interrupt\r\n");
 		}
 
 		oric_irqs |=(1<<0);
@@ -711,7 +710,7 @@ static READ8_HANDLER (oric_jasmin_r)
 			break;
 		default:
 			data = via_r(via_0, offset & 0x0f);
-			logerror("unhandled io read: %04x %02x\n", offset, data);
+			//logerror("unhandled io read: %04x %02x\n", offset, data);
 			break;
 
 	}
@@ -747,12 +746,12 @@ static WRITE8_HANDLER(oric_jasmin_w)
 			wd17xx_reset(fdc);
 			break;
 		case 0x0a:
-			logerror("jasmin overlay ram w: %02x PC: %04x\n", data, cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")));
+			//logerror("jasmin overlay ram w: %02x PC: %04x\n", data, cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")));
 			port_3fa_w = data;
 			oric_jasmin_set_mem_0x0c000(space->machine);
 			break;
 		case 0x0b:
-			logerror("jasmin romdis w: %02x PC: %04x\n", data, cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")));
+			//logerror("jasmin romdis w: %02x PC: %04x\n", data, cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")));
 			port_3fb_w = data;
 			oric_jasmin_set_mem_0x0c000(space->machine);
 			break;
@@ -990,7 +989,7 @@ WRITE8_HANDLER(oric_microdisc_w)
 
 			port_314_w = data;
 
-			logerror("port_314_w: %02x\n",data);
+			//logerror("port_314_w: %02x\n",data);
 
 			/* bit 6,5: drive */
 			/* bit 4: side */
@@ -1065,34 +1064,6 @@ static WD17XX_CALLBACK(oric_wd179x_callback)
 }
 
 const wd17xx_interface oric_wd17xx_interface = { oric_wd179x_callback, NULL };
-
-DEVICE_START( oric_floppy )
-{
-	/* TODO - THIS DOES NOT MULTITASK BETWEEN ORIC BASICDSKs AND MFM DISKS */
-	floppy_drive_init(device, NULL);
-}
-
-
-
-DEVICE_IMAGE_LOAD( oric_floppy )
-{
-	/* attempt to open mfm disk */
-	if (device_load_mfm_disk(image) == INIT_PASS)
-	{
-		floppy_drive_set_disk_image_interface(image, &mfm_disk_floppy_interface);
-		return INIT_PASS;
-	}
-
-/*	if (device_load_basicdsk_floppy(image) == INIT_PASS)
-	{
-		// I don't know what the geometry of the disc image should be, so the
-		//default is 80 tracks, 2 sides, 9 sectors per track 
-		basicdsk_set_geometry(image, 80, 2, 9, 512, 1, 0, FALSE);
-		floppy_drive_set_disk_image_interface(image, &basicdsk_floppy_interface);
-		return INIT_PASS;
-	}*/
-	return INIT_FAIL;
-}
 
 static void oric_common_init_machine(running_machine *machine)
 {
@@ -1205,7 +1176,7 @@ READ8_HANDLER ( oric_IO_r )
 	{
 		if ((offset & 0x0f)!=0x0d)
 		{
-			logerror("via 0 r: %04x %04x\n",offset, (unsigned) cpu_get_reg(cputag_get_cpu(space->machine, "maincpu"), REG_GENPC));
+			//logerror("via 0 r: %04x %04x\n",offset, (unsigned) cpu_get_reg(cputag_get_cpu(space->machine, "maincpu"), REG_GENPC));
 		}
 	}
 	/* it is repeated */
@@ -1244,7 +1215,7 @@ WRITE8_HANDLER ( oric_IO_w )
 	}
 	if (enable_logging)
 	{
-		logerror("via 0 w: %04x %02x %04x\n", offset, data,(unsigned) cpu_get_reg(cputag_get_cpu(space->machine, "maincpu"), REG_GENPC));
+		//logerror("via 0 w: %04x %02x %04x\n", offset, data,(unsigned) cpu_get_reg(cputag_get_cpu(space->machine, "maincpu"), REG_GENPC));
 	}
 
 	via_w(via_0, offset & 0x0f, data);
@@ -1363,14 +1334,14 @@ static void	telestrat_refresh_mem(running_machine *machine)
 
 static READ8_DEVICE_HANDLER(telestrat_via2_in_a_func)
 {
-	logerror("via 2 - port a %02x\n",telestrat_via2_port_a_data);
+	//logerror("via 2 - port a %02x\n",telestrat_via2_port_a_data);
 	return telestrat_via2_port_a_data;
 }
 
 
 static WRITE8_DEVICE_HANDLER(telestrat_via2_out_a_func)
 {
-	logerror("via 2 - port a w: %02x\n",data);
+	//logerror("via 2 - port a w: %02x\n",data);
 
 	telestrat_via2_port_a_data = data;
 
@@ -1415,7 +1386,7 @@ static void	telestrat_via2_irq_func(const device_config *device, int state)
 
 	if (state)
 	{
-        logerror("telestrat via2 interrupt\n");
+        //logerror("telestrat via2 interrupt\n");
 
         oric_irqs |=(1<<2);
 	}

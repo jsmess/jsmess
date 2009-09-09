@@ -23,6 +23,7 @@
 #include "machine/ctronics.h"
 #include "devices/mflopimg.h"
 #include "devices/cassette.h"
+#include "formats/oric_dsk.h"
 #include "formats/ap2_dsk.h"
 #include "formats/oric_tap.h"
 #include "sound/ay8910.h"
@@ -505,25 +506,18 @@ ROM_START(prav8dd)
     ROM_LOAD_OPTIONAL( "8ddoshi.rom", 0x014100, 0x0200, CRC(66309641) SHA1(9c2e82b3c4d385ade6215fcb89f8b92e6fd2bf4b) )
 ROM_END
 
-
 static void oric1_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_TYPE:						info->i = IO_FLOPPY; break;
-		case MESS_DEVINFO_INT_READABLE:					info->i = 1; break;
-		case MESS_DEVINFO_INT_WRITEABLE:				info->i = 1; break;
-		case MESS_DEVINFO_INT_CREATABLE:				info->i = 1; break;
 		case MESS_DEVINFO_INT_COUNT:					info->i = 4; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_START:					info->start = DEVICE_START_NAME(oric_floppy); break;
-		case MESS_DEVINFO_PTR_LOAD:						info->load = DEVICE_IMAGE_LOAD_NAME(oric_floppy); break;
+		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:			info->p = (void *) floppyoptions_oric; break;
 
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:			strcpy(info->s = device_temp_str(), "dsk"); break;
+		default:										floppy_device_getinfo(devclass, state, info); break;
 	}
 }
 

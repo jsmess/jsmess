@@ -26,9 +26,6 @@ extern UINT8 *oric_ram;
 
 WRITE8_HANDLER(oric_psg_porta_write);
 
-DEVICE_START( oric_floppy );
-DEVICE_IMAGE_LOAD( oric_floppy );
-
 /* Telestrat specific */
 MACHINE_START( telestrat );
 
