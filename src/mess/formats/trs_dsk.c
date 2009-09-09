@@ -1,7 +1,9 @@
 #include <string.h>
+#include "driver.h"
 #include "formats/trs_dsk.h"
 #include "formats/basicdsk.h"
 #include "formats/coco_dsk.h"
+#include "devices/flopdrv.h"
 
 /* -----------------------------------------------------------------------
  * JV1 (Jeff Vavasour 1) format
@@ -26,6 +28,14 @@ static FLOPPY_IDENTIFY( trs80_jv1_identify )
 }
 
 
+static UINT64 trs80_jv1_get_ddam(floppy_image *floppy, const struct basicdsk_geometry *geom, int track, int head, int sector)
+{
+	// directory track is protected
+	if ((track==17) && (head==0)) {
+		return ID_FLAG_DELETED_DATA;
+	}
+	return 0;
+}
 
 static FLOPPY_CONSTRUCT( trs80_jv1_construct )
 {
@@ -36,6 +46,7 @@ static FLOPPY_CONSTRUCT( trs80_jv1_construct )
 	geometry.sectors			= TRS80_JV1_SECTORS;
 	geometry.first_sector_id	= TRS80_JV1_FIRSTSECTORID;
 	geometry.sector_length		= TRS80_JV1_SECTORLENGTH;
+	geometry.get_ddam			= trs80_jv1_get_ddam;
 
 	if (params)
 	{

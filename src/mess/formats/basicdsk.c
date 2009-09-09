@@ -246,6 +246,9 @@ static floperr_t basicdsk_get_sector_length(floppy_image *floppy, int head, int 
 
 static floperr_t basicdsk_get_indexed_sector_info(floppy_image *floppy, int head, int track, int sector_index, int *cylinder, int *side, int *sector, UINT32 *sector_length, unsigned long *flags)
 {
+	const struct basicdsk_geometry *geom;
+	geom = get_geometry(floppy);
+	
 	sector_index += get_geometry(floppy)->first_sector_id;
 	if (cylinder)
 		*cylinder = track;
@@ -253,9 +256,12 @@ static floperr_t basicdsk_get_indexed_sector_info(floppy_image *floppy, int head
 		*side = head;
 	if (sector)
 		*sector = sector_index;
-	if (flags)
+	if (flags) {
 		/* TODO: read DAM or DDAM and determine flags */
 		*flags = 0;
+		if (geom->get_ddam)
+			*flags = geom->get_ddam(floppy, geom, track, head, sector_index);		
+	}
 	return basicdsk_get_sector_length(floppy, head, track, sector_index, sector_length);
 }
 
