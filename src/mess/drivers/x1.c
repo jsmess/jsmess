@@ -1298,13 +1298,26 @@ static WRITE8_DEVICE_HANDLER(x1_dma_write_byte)
 	memory_write_byte(space, offset, data);
 }
 
+static READ8_DEVICE_HANDLER(x1_dma_read_io)
+{
+	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_IO);
+	return memory_read_byte(space, offset);
+}
+
+static WRITE8_DEVICE_HANDLER(x1_dma_write_io)
+{
+	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_IO);
+	memory_write_byte(space, offset, data);
+}
+
+
 static const z80dma_interface x1_dma =
 {
 	"maincpu",
 
 	x1_dma_read_byte,
 	x1_dma_write_byte,
-	0, 0, 0, 0,
+	x1_dma_read_io, x1_dma_write_io, x1_dma_read_io, x1_dma_write_io,
 	NULL
 };
 
