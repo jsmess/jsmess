@@ -25,61 +25,59 @@
 #include "includes/genesis.h"
 
 
-static UINT16 squirrel_king_extra = 0;
-static UINT16 lion2_prot1_data, lion2_prot2_data;
-static UINT16 realtek_bank_addr=0, realtek_bank_size=0, realtek_old_bank_addr;
-static UINT16 g_l3alt_pdat;
-static UINT16 g_l3alt_pcmd;
-
-static int genesis_last_loaded_image_length = -1;
-
-
 #define MAX_MD_CART_SIZE 0x500000
 
 /* where a fresh copy of rom is stashed for reset and banking setup */
 #define VIRGIN_COPY_GEN 0xd00000
 
-static UINT16 *genesis_sram, *megadriv_backupram;
-static int genesis_sram_start = 0;
-static int genesis_sram_end = 0;
-static int genesis_sram_active = 0;
-static int genesis_sram_readonly = 0;
-static int has_serial_eeprom = 0;
-static int sram_handlers_installed = 0;
-
-
-enum 
+enum t_cart_type
 {
 	STANDARD = 0,
 	SSF2,					/* Super Street Fighter 2 */
-	LIONK3,					/* Lion King 3 */
+	LIONK3,				/* Lion King 3 */
 	SKINGKONG,				/* Super King Kong 99 */
-	SDK99,					/* Super Donkey Kong 99 */
+	SDK99,				/* Super Donkey Kong 99 */
 	REDCLIFF,				/* Romance of the Three Kingdoms - Battle of Red Cliffs, already decoded from .mdx format */
 	REDCL_EN,				/* The encoded version... */
-	RADICA,					/* Radica TV games.. these probably should be a seperate driver since they are a seperate 'console' */
-	KOF99,					/* King of Fighters '99 */
+	RADICA,				/* Radica TV games.. these probably should be a seperate driver since they are a seperate 'console' */
+	KOF99,				/* King of Fighters '99 */
 	SOULBLAD,				/* Soul Blade */
 	MJLOVER,				/* Mahjong Lover */
 	SQUIRRELK,				/* Squirrel King */
-	SMOUSE,					/* Smart Mouse */
+	SMOUSE,				/* Smart Mouse */
 	SMB,					/* Super Mario Bros. */
 	SMB2,					/* Super Mario Bros. 2 */
-	KAIJU,
+	KAIJU,				/* Pokemon Stadium */
 	CHINFIGHT3,				/* Chinese Fighters 3 */
-	LIONK2,					/* Lion King 2 */
+	LIONK2,				/* Lion King 2 */
 	BUGSLIFE,				/* A Bug's Life */
-	ELFWOR,					/* Elf Wor */
+	ELFWOR,				/* Elf Wor */
 	ROCKMANX3,				/* Rockman X3 */
 	SBUBBOB,				/* Super Bubble Bobble */
-	KOF98,					/* King of Fighters '98 */
+	KOF98,				/* King of Fighters '98 */
 	REALTEC,				/* Whac a Critter/Mallet legend, Defend the Earth, Funnyworld/Ballonboy */
 	SUP19IN1,				/* Super 19 in 1 */
-	SUP15IN1,				/* Super 15 in 1 */
+	SUP15IN1				/* Super 15 in 1 */
 };
 
 
-static int cart_type = STANDARD;
+static enum t_cart_type cart_type;
+
+
+static UINT16 squirrel_king_extra;
+static UINT16 lion2_prot1_data, lion2_prot2_data;
+static UINT16 realtec_bank_addr, realtec_bank_size, realtec_old_bank_addr;
+static UINT16 g_l3alt_pdat;
+static UINT16 g_l3alt_pcmd;
+
+static int genesis_last_loaded_image_length;
+
+static UINT16 *genesis_sram, *megadriv_backupram;
+static int genesis_sram_start, genesis_sram_end;
+static int genesis_sram_active, genesis_sram_readonly;
+static int sram_handlers_installed;
+
+static int has_serial_eeprom;
 
 
 /*************************************
@@ -93,35 +91,37 @@ static WRITE16_HANDLER( genesis_ssf2_bank_w )
 	static int lastoffset = -1,lastdata = -1;
 	UINT8 *ROM = memory_region(space->machine, "maincpu");
 
-	if ((lastoffset != offset) || (lastdata != data)) {
+	if ((lastoffset != offset) || (lastdata != data)) 
+	{
 		lastoffset = offset; lastdata = data;
-		switch (offset<<1)
+		switch (offset << 1)
 		{
 			case 0x00: /* write protect register // this is not a write protect, but seems to do nothing useful but reset bank0 after the checksum test (red screen otherwise) */
-				if (data == 2) {
-					memcpy(ROM + 0x000000, ROM + 0x400000+(((data&0xf)-2)*0x080000), 0x080000);
+				if (data == 2) 
+				{
+					memcpy(ROM + 0x000000, ROM + 0x400000 + (((data & 0xf) - 2) * 0x080000), 0x080000);
 				}
 				break;
 			case 0x02: /* 0x080000 - 0x0FFFFF */
-				memcpy(ROM + 0x080000, ROM + 0x400000+((data&0xf)*0x080000), 0x080000);
+				memcpy(ROM + 0x080000, ROM + 0x400000 + ((data & 0xf) * 0x080000), 0x080000);
 				break;
 			case 0x04: /* 0x100000 - 0x17FFFF */
-				memcpy(ROM + 0x100000, ROM + 0x400000+((data&0xf)*0x080000), 0x080000);
+				memcpy(ROM + 0x100000, ROM + 0x400000 + ((data & 0xf) * 0x080000), 0x080000);
 				break;
 			case 0x06: /* 0x180000 - 0x1FFFFF */
-				memcpy(ROM + 0x180000, ROM + 0x400000+((data&0xf)*0x080000), 0x080000);
+				memcpy(ROM + 0x180000, ROM + 0x400000 + ((data & 0xf) * 0x080000), 0x080000);
 				break;
 			case 0x08: /* 0x200000 - 0x27FFFF */
-				memcpy(ROM + 0x200000, ROM + 0x400000+((data&0xf)*0x080000), 0x080000);
+				memcpy(ROM + 0x200000, ROM + 0x400000 + ((data & 0xf) * 0x080000), 0x080000);
 				break;
 			case 0x0a: /* 0x280000 - 0x2FFFFF */
-				memcpy(ROM + 0x280000, ROM + 0x400000+((data&0xf)*0x080000), 0x080000);
+				memcpy(ROM + 0x280000, ROM + 0x400000 + ((data & 0xf) * 0x080000), 0x080000);
 				break;
 			case 0x0c: /* 0x300000 - 0x37FFFF */
-				memcpy(ROM + 0x300000, ROM + 0x400000+((data&0xf)*0x080000), 0x080000);
+				memcpy(ROM + 0x300000, ROM + 0x400000 + ((data & 0xf) * 0x080000), 0x080000);
 				break;
 			case 0x0e: /* 0x380000 - 0x3FFFFF */
-				memcpy(ROM + 0x380000, ROM + 0x400000+((data&0xf)*0x080000), 0x080000);
+				memcpy(ROM + 0x380000, ROM + 0x400000 + ((data & 0xf) * 0x080000), 0x080000);
 				break;
 		}
 	}
@@ -142,7 +142,7 @@ static READ16_HANDLER( g_l3alt_prot_r )
 {
 	int retdata = 0;
 
-	offset &=0x7;
+	offset &= 0x07;
 
 	switch (offset)
 	{
@@ -152,24 +152,24 @@ static READ16_HANDLER( g_l3alt_prot_r )
 			switch (g_l3alt_pcmd)
 			{
 				case 1:
-					retdata = g_l3alt_pdat>>1;
+					retdata = g_l3alt_pdat >> 1;
 					break;
 
 				case 2:
-					retdata = g_l3alt_pdat>>4;
-					retdata |= (g_l3alt_pdat&0x0f)<<4;
+					retdata = g_l3alt_pdat >> 4;
+					retdata |= (g_l3alt_pdat & 0x0f) << 4;
 					break;
 
 				default:
-					/* printf("unk prot case %d\n",g_l3alt_pcmd); */
-					retdata = (((g_l3alt_pdat>>7)&1)<<0);
-					retdata |=(((g_l3alt_pdat>>6)&1)<<1);
-					retdata |=(((g_l3alt_pdat>>5)&1)<<2);
-					retdata |=(((g_l3alt_pdat>>4)&1)<<3);
-					retdata |=(((g_l3alt_pdat>>3)&1)<<4);
-					retdata |=(((g_l3alt_pdat>>2)&1)<<5);
-					retdata |=(((g_l3alt_pdat>>1)&1)<<6);
-					retdata |=(((g_l3alt_pdat>>0)&1)<<7);
+					/* printf("unk prot case %d\n", g_l3alt_pcmd); */
+					retdata =  (((g_l3alt_pdat >> 7) & 1) << 0);
+					retdata |= (((g_l3alt_pdat >> 6) & 1) << 1);
+					retdata |= (((g_l3alt_pdat >> 5) & 1) << 2);
+					retdata |= (((g_l3alt_pdat >> 4) & 1) << 3);
+					retdata |= (((g_l3alt_pdat >> 3) & 1) << 4);
+					retdata |= (((g_l3alt_pdat >> 2) & 1) << 5);
+					retdata |= (((g_l3alt_pdat >> 1) & 1) << 6);
+					retdata |= (((g_l3alt_pdat >> 0) & 1) << 7);
 					break;
 			}
 			break;
@@ -180,15 +180,14 @@ static READ16_HANDLER( g_l3alt_prot_r )
 			break;
 	}
 
-/*	printf("%06x: g_l3alt_pdat_w %04x g_l3alt_pcmd_w %04x return %04x\n",activecpu_get_pc(), g_l3alt_pdat,g_l3alt_pcmd,retdata); */
+/*	printf("%06x: g_l3alt_pdat_w %04x g_l3alt_pcmd_w %04x return %04x\n", activecpu_get_pc(), g_l3alt_pdat, g_l3alt_pcmd, retdata); */
 
 	return retdata;
-
 }
 
-static WRITE16_HANDLER( g_l3alt_protw )
+static WRITE16_HANDLER( g_l3alt_prot_w )
 {
-	offset &=0x7;
+	offset &= 0x7;
 
 	switch (offset)
 	{
@@ -206,7 +205,7 @@ static WRITE16_HANDLER( g_l3alt_protw )
 
 static WRITE16_HANDLER( g_l3alt_bank_w )
 {
-	offset &=0x7;
+	offset &= 0x7;
 
 	switch (offset)
 	{
@@ -214,7 +213,7 @@ static WRITE16_HANDLER( g_l3alt_bank_w )
 		{
 		UINT8 *ROM = memory_region(space->machine, "maincpu");
 		/* printf("%06x data %04x\n",activecpu_get_pc(), data); */
-		memcpy(&ROM[0x000000], &ROM[VIRGIN_COPY_GEN + (data&0xffff)*0x8000], 0x8000);
+		memcpy(&ROM[0x000000], &ROM[VIRGIN_COPY_GEN + (data & 0xffff) * 0x8000], 0x8000);
 		}
 		break;
 
@@ -229,8 +228,8 @@ static WRITE16_HANDLER( g_l3alt_bank_w )
 
 static WRITE16_HANDLER( realtec_402000_w )
 {
-	realtek_bank_addr = 0;
-	realtek_bank_size = (data>>8)&0x1f;
+	realtec_bank_addr = 0;
+	realtec_bank_size = (data >> 8) & 0x1f;
 }
 
 static WRITE16_HANDLER( realtec_400000_w )
@@ -239,11 +238,11 @@ static WRITE16_HANDLER( realtec_400000_w )
 
 	UINT8 *ROM = memory_region(space->machine, "maincpu");
 
-	realtek_old_bank_addr = realtek_bank_addr;
-	realtek_bank_addr = (realtek_bank_addr & 0x7) | bankdata<<3;
+	realtec_old_bank_addr = realtec_bank_addr;
+	realtec_bank_addr = (realtec_bank_addr & 0x7) | bankdata << 3;
 
-	memcpy(ROM, ROM +  (realtek_bank_addr*0x20000)+0x400000, realtek_bank_size*0x20000);
-	memcpy(ROM+ realtek_bank_size*0x20000, ROM +  (realtek_bank_addr*0x20000)+0x400000, realtek_bank_size*0x20000);
+	memcpy(ROM, ROM + (realtec_bank_addr * 0x20000) + 0x400000, realtec_bank_size * 0x20000);
+	memcpy(ROM + realtec_bank_size * 0x20000, ROM + (realtec_bank_addr * 0x20000) + 0x400000, realtec_bank_size * 0x20000);
 }
 
 static WRITE16_HANDLER( realtec_404000_w )
@@ -251,13 +250,13 @@ static WRITE16_HANDLER( realtec_404000_w )
 	int bankdata = (data >> 8) & 0x3;
 	UINT8 *ROM = memory_region(space->machine, "maincpu");
 
-	realtek_old_bank_addr = realtek_bank_addr;
-	realtek_bank_addr = (realtek_bank_addr & 0xf8)|bankdata;
+	realtec_old_bank_addr = realtec_bank_addr;
+	realtec_bank_addr = (realtec_bank_addr & 0xf8) | bankdata;
 
-	if (realtek_old_bank_addr != realtek_bank_addr)
+	if (realtec_old_bank_addr != realtec_bank_addr)
 	{
-		memcpy(ROM, ROM +  (realtek_bank_addr*0x20000)+0x400000, realtek_bank_size*0x20000);
-		memcpy(ROM+ realtek_bank_size*0x20000, ROM +  (realtek_bank_addr*0x20000)+0x400000, realtek_bank_size*0x20000);
+		memcpy(ROM, ROM + (realtec_bank_addr * 0x20000)+ 0x400000, realtec_bank_size * 0x20000);
+		memcpy(ROM + realtec_bank_size * 0x20000, ROM + (realtec_bank_addr * 0x20000) + 0x400000, realtec_bank_size * 0x20000);
 	}
 }
 
@@ -265,41 +264,41 @@ static WRITE16_HANDLER( g_chifi3_bank_w )
 {
 	UINT8 *ROM = memory_region(space->machine, "maincpu");
 
-	if (data==0xf100) // *hit player
+	if (data == 0xf100) // *hit player
 	{
 		int x;
-		for (x=0;x<0x100000;x+=0x10000)
+		for (x = 0; x < 0x100000; x += 0x10000)
 		{
 			memcpy(ROM + x, ROM + 0x410000, 0x10000);
 		}
 	}
-	else if (data==0xd700) // title screen..
+	else if (data == 0xd700) // title screen..
 	{
 		int x;
-		for (x=0;x<0x100000;x+=0x10000)
+		for (x = 0; x < 0x100000; x += 0x10000)
 		{
 			memcpy(ROM + x, ROM + 0x470000, 0x10000);
 		}
 	}
-	else if (data==0xd300) // character hits floor
+	else if (data == 0xd300) // character hits floor
 	{
 		int x;
-		for (x=0;x<0x100000;x+=0x10000)
+		for (x = 0; x < 0x100000; x += 0x10000)
 		{
 			memcpy(ROM + x, ROM + 0x430000, 0x10000);
 		}
 	}
-	else if (data==0x0000)
+	else if (data == 0x0000)
 	{
 		int x;
-		for (x=0;x<0x100000;x+=0x10000)
+		for (x = 0; x < 0x100000; x += 0x10000)
 		{
-			memcpy(ROM + x, ROM + 0x400000+x, 0x10000);
+			memcpy(ROM + x, ROM + 0x400000 + x, 0x10000);
 		}
 	}
 	else
 	{
-		logerror("%06x chifi3, bankw? %04x %04x\n",cpu_get_pc(space->cpu), offset,data);
+		logerror("%06x chifi3, bankw? %04x %04x\n", cpu_get_pc(space->cpu), offset, data);
 	}
 
 }
@@ -316,47 +315,47 @@ static READ16_HANDLER( g_chifi3_prot_r )
 	04cefa chifi3, prot_r? 65262
 	*/
 
-	if (cpu_get_pc(space->cpu)==0x01782) // makes 'VS' screen appear
+	if (cpu_get_pc(space->cpu) == 0x01782) // makes 'VS' screen appear
 	{
-		retdat = cpu_get_reg(space->cpu, M68K_D3)&0xff;
-		retdat<<=8;
+		retdat = cpu_get_reg(space->cpu, M68K_D3) & 0xff;
+		retdat <<= 8;
 		return retdat;
 	}
-	else if (cpu_get_pc(space->cpu)==0x1c24) // background gfx etc.
+	else if (cpu_get_pc(space->cpu) == 0x1c24) // background gfx etc.
 	{
-		retdat = cpu_get_reg(space->cpu, M68K_D3)&0xff;
-		retdat<<=8;
+		retdat = cpu_get_reg(space->cpu, M68K_D3) & 0xff;
+		retdat <<= 8;
 		return retdat;
 	}
-	else if (cpu_get_pc(space->cpu)==0x10c4a) // unknown
+	else if (cpu_get_pc(space->cpu) == 0x10c4a) // unknown
 	{
 		return mame_rand(space->machine);
 	}
-	else if (cpu_get_pc(space->cpu)==0x10c50) // unknown
+	else if (cpu_get_pc(space->cpu) == 0x10c50) // unknown
 	{
 		return mame_rand(space->machine);
 	}
-	else if (cpu_get_pc(space->cpu)==0x10c52) // relates to the game speed..
+	else if (cpu_get_pc(space->cpu) == 0x10c52) // relates to the game speed..
 	{
-		retdat = cpu_get_reg(space->cpu, M68K_D4)&0xff;
-		retdat<<=8;
+		retdat = cpu_get_reg(space->cpu, M68K_D4) & 0xff;
+		retdat <<= 8;
 		return retdat;
 	}
-	else if (cpu_get_pc(space->cpu)==0x061ae)
+	else if (cpu_get_pc(space->cpu) == 0x061ae)
 	{
-		retdat = cpu_get_reg(space->cpu, M68K_D3)&0xff;
-		retdat<<=8;
+		retdat = cpu_get_reg(space->cpu, M68K_D3) & 0xff;
+		retdat <<= 8;
 		return retdat;
 	}
-	else if (cpu_get_pc(space->cpu)==0x061b0)
+	else if (cpu_get_pc(space->cpu) == 0x061b0)
 	{
-		retdat = cpu_get_reg(space->cpu, M68K_D3)&0xff;
-		retdat<<=8;
+		retdat = cpu_get_reg(space->cpu, M68K_D3) & 0xff;
+		retdat <<= 8;
 		return retdat;
 	}
 	else
 	{
-		logerror("%06x chifi3, prot_r? %04x\n",cpu_get_pc(space->cpu), offset);
+		logerror("%06x chifi3, prot_r? %04x\n", cpu_get_pc(space->cpu), offset);
 	}
 
 	return 0;
@@ -365,14 +364,14 @@ static READ16_HANDLER( g_chifi3_prot_r )
 static WRITE16_HANDLER( s19in1_bank )
 {
 	UINT8 *ROM = memory_region(space->machine, "maincpu");
-	memcpy(ROM + 0x000000, ROM + 0x400000+((offset << 1)*0x10000), 0x80000);
+	memcpy(ROM + 0x000000, ROM + 0x400000 + ((offset << 1) * 0x10000), 0x80000);
 }
 
 // Kaiju? (Pokemon Stadium) handler from HazeMD
 static WRITE16_HANDLER( g_kaiju_bank_w )
 {
 	UINT8 *ROM = memory_region(space->machine, "maincpu");
-	memcpy(ROM + 0x000000, ROM + 0x400000+(data&0x7f)*0x8000, 0x8000);
+	memcpy(ROM + 0x000000, ROM + 0x400000 + (data & 0x7f) * 0x8000, 0x8000);
 }
 
 // Soulblade handler from HazeMD
@@ -459,7 +458,7 @@ static READ16_HANDLER( radica_bank_select )
 {
 	int bank = offset&0x3f;
 	UINT8 *ROM = memory_region(space->machine, "maincpu");
-	memcpy(ROM, ROM +  (bank*0x10000)+0x400000, 0x400000);
+	memcpy(ROM, ROM +  (bank * 0x10000) + 0x400000, 0x400000);
 	return 0;
 }
 
@@ -577,9 +576,9 @@ static WRITE16_HANDLER( genesis_TMSS_bank_w )
 
 static void alloc_sram(running_machine *machine)
 {
-	genesis_sram = alloc_array_or_die(UINT16, (genesis_sram_end - genesis_sram_start) / sizeof(UINT16));
-	image_battery_load(devtag_get_device(machine, "cart"), genesis_sram, genesis_sram_end - genesis_sram_start);
-	memcpy(megadriv_backupram, genesis_sram, genesis_sram_end - genesis_sram_start);
+	genesis_sram = alloc_array_or_die(UINT16, (genesis_sram_end - genesis_sram_start + 1) / sizeof(UINT16));
+	image_battery_load(devtag_get_device(machine, "cart"), genesis_sram, genesis_sram_end - genesis_sram_start + 1);
+	memcpy(megadriv_backupram, genesis_sram, genesis_sram_end - genesis_sram_start + 1);
 }
 
 static READ16_HANDLER( genesis_sram_read )
@@ -596,9 +595,9 @@ static READ16_HANDLER( genesis_sram_read )
 	else
 	{
 		ROM = memory_region(space->machine, "maincpu");
-		rom_offset = genesis_sram_start + (offset<<1);
+		rom_offset = genesis_sram_start + (offset << 1);
 
-		return (UINT16) ROM[rom_offset] | (ROM[rom_offset+1] << 8);
+		return (UINT16) ROM[rom_offset] | (ROM[rom_offset + 1] << 8);
 	}
 }
 
@@ -648,6 +647,11 @@ static void setup_megadriv_custom_mappers(running_machine *machine)
 	unsigned char *ROM;
 	UINT32 mirroraddr;
 
+	/* SRAM data */
+	sram_handlers_installed = 0;
+	genesis_sram_readonly = 0;
+	genesis_sram_active = 0;
+
 	ROM = memory_region(machine, "maincpu");
 
 	if (cart_type == SSF2)
@@ -661,19 +665,22 @@ static void setup_megadriv_custom_mappers(running_machine *machine)
 
 	if (cart_type == LIONK3 || cart_type == SKINGKONG)
 	{
+		g_l3alt_pdat = g_l3alt_pcmd = 0;
 		memcpy(&ROM[0x000000], &ROM[VIRGIN_COPY_GEN], 0x200000); /* default rom */
 		memcpy(&ROM[0x200000], &ROM[VIRGIN_COPY_GEN], 0x200000); /* default rom */
 
-		memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x600000, 0x6fffff, 0, 0, g_l3alt_prot_r, g_l3alt_protw);
+		memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x600000, 0x6fffff, 0, 0, g_l3alt_prot_r, g_l3alt_prot_w);
 		memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x700000, 0x7fffff, 0, 0, g_l3alt_bank_w);
 	}
 
 	if (cart_type == SDK99)
 	{
+		g_l3alt_pdat = g_l3alt_pcmd = 0;
+
 		memcpy(&ROM[0x000000], &ROM[VIRGIN_COPY_GEN], 0x300000); /* default rom */
 		memcpy(&ROM[0x300000], &ROM[VIRGIN_COPY_GEN], 0x100000); /* default rom */
 
-		memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x600000, 0x6fffff, 0, 0, g_l3alt_prot_r, g_l3alt_protw);
+		memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x600000, 0x6fffff, 0, 0, g_l3alt_prot_r, g_l3alt_prot_w);
 		memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x700000, 0x7fffff, 0, 0, g_l3alt_bank_w);
 	}
 
@@ -729,6 +736,7 @@ static void setup_megadriv_custom_mappers(running_machine *machine)
 
 	if (cart_type == SQUIRRELK)
 	{
+		squirrel_king_extra = 0;
 		memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400000, 0x400007, 0, 0, squirrel_king_extra_r);
 		memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400000, 0x400007, 0, 0, squirrel_king_extra_w);
 	}
@@ -769,6 +777,8 @@ static void setup_megadriv_custom_mappers(running_machine *machine)
 
 	if (cart_type == LIONK2)
 	{
+		lion2_prot1_data = lion2_prot2_data = 0;
+
 		memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400002, 0x400003, 0, 0, lion2_prot1_r);
 		memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400006, 0x400007, 0, 0, lion2_prot2_r);
 		memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400000, 0x400001, 0, 0, lion2_prot1_w);
@@ -814,9 +824,10 @@ static void setup_megadriv_custom_mappers(running_machine *machine)
 
 	if (cart_type == REALTEC)
 	{
-		realtek_old_bank_addr = -1;
-		
 		/* Realtec mapper!*/
+		realtec_bank_addr = realtec_bank_size = 0;
+		realtec_old_bank_addr = -1;
+
 		memcpy(&ROM[0x400000], &ROM[relocate], 0x80000);
 
 		for (mirroraddr = 0; mirroraddr < 0x400000; mirroraddr += 0x2000) 
@@ -845,6 +856,11 @@ static void setup_megadriv_custom_mappers(running_machine *machine)
 	progresses. Currently EEPROM is not emulated. */
 	if (!has_serial_eeprom)
 	{
+		/* Info from DGen: If SRAM does not overlap main ROM, set it active by
+		default since a few games can't manage to properly switch it on/off. */
+		if (genesis_last_loaded_image_length <= genesis_sram_start)
+			genesis_sram_active = 1;
+
 		memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa130f0, 0xa130f1, 0, 0, genesis_sram_toggle);
 
 		/* Sonic 1 included in Sonic Classics doesn't have SRAM and
@@ -853,7 +869,6 @@ static void setup_megadriv_custom_mappers(running_machine *machine)
 		if (genesis_sram_active)
 			install_sram_rw_handlers (machine);
 	}
-
 
 	/* install NOP handler for TMSS */
 	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa14000, 0xa14003, 0, 0, genesis_TMSS_bank_w);
@@ -864,27 +879,6 @@ MACHINE_RESET( md_mappers )
 {
 	setup_megadriv_custom_mappers(machine);
 }
-
-
-/*************************************
- *
- *  Driver initialization
- *
- *************************************/
-
-
-static void genesis_machine_stop(running_machine *machine)
-{
-}
-
-DRIVER_INIT( gencommon )
-{
-	if (genesis_sram)
-	{
-		add_exit_callback(machine, genesis_machine_stop);
-	}
-}
-
 
 
 /*************************************
@@ -1003,6 +997,7 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 	rawROM = memory_region(image->machine, "maincpu");
 	ROM = rawROM /*+ 512 */;
 
+	genesis_last_loaded_image_length = -1;
 	length = image_fread(image, rawROM + 0x2000, 0x600000);
 	logerror("image length = 0x%x\n", length);
 
@@ -1095,6 +1090,8 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 		memcpy(&ROM[VIRGIN_COPY_GEN], &ROM[0x000000], MAX_MD_CART_SIZE);  /* store a copy of data for MACHINE_RESET processing */
 	}
 
+	/* Default cartridge type */
+	cart_type = STANDARD;
 
 	/* Detect carts which need additional handlers */
 	{
@@ -1221,9 +1218,12 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 
 	logerror("cart type: %d\n", cart_type);
 
-	/* check if cart has battery save */
 	genesis_sram = NULL;
-	sram_detected = sram_handlers_installed = has_serial_eeprom = 0;
+	sram_detected = 0;
+	genesis_sram_start = genesis_sram_end = 0;
+	has_serial_eeprom = 0;
+
+	/* check if cart has battery save */
 
 	/* For games using SRAM, unfortunately there are ROMs without info
 	about it in header. The solution adopted is do the mapping anyway,
@@ -1236,10 +1236,10 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 		genesis_sram_end = (ROM[0x1b9] << 24 | ROM[0x1b8] << 16 | ROM[0x1bb] << 8 | ROM[0x1ba]);
 
 		if ((genesis_sram_start > genesis_sram_end) || ((genesis_sram_end - genesis_sram_start) >= 0x10000))	// we assume at most 64k of SRAM (HazeMD uses at most 64k). is this correct?
-			genesis_sram_end = genesis_sram_start + 0x10000;
+			genesis_sram_end = genesis_sram_start + 0x0FFFF;
 
-		/* for some games using serial EEPROM, SRAM will be detected
-		as size 0 or 1. Currently EEPROM is not emulated. */
+		/* for some games using serial EEPROM, difference between SRAM
+		end to start is 0 or 1. Currently EEPROM is not emulated. */
 		if ((genesis_sram_end - genesis_sram_start) < 2)
 			has_serial_eeprom = 1;
 		else
@@ -1249,7 +1249,7 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 	{
 		/* set default SRAM positions, with size = 64k */
 		genesis_sram_start = 0x200000;
-		genesis_sram_end = genesis_sram_start + 0x10000;
+		genesis_sram_end = genesis_sram_start + 0xffff;
 	}
 
 	if (genesis_sram_start & 1)
@@ -1265,16 +1265,11 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 	backup RAM, but only if the value is 0xFFFF, to not break MLBPA Sports
 	Talk Baseball. With this hack some games at least run (NBA Jam, Evander
 	Holyfield's Real Deal Boxing, Greatest Heavyweights of the Ring) */
-	if (has_serial_eeprom && megadriv_backupram[0] == 0xFFFF)
-		megadriv_backupram[0] = 0xFF00;
-
-	/* Info from DGen: If SRAM does not overlap main ROM, set it active by
-	default since a few games can't manage to properly switch it on/off. */
-	if (genesis_last_loaded_image_length <= genesis_sram_start)
-		genesis_sram_active = 1;
+	if (has_serial_eeprom && megadriv_backupram[0] == 0xffff)
+		megadriv_backupram[0] = 0xff00;
 
 	if (sram_detected)
-		logerror("SRAM detected from header: starting location %X - SRAM Length %X\n", genesis_sram_start, genesis_sram_end - genesis_sram_start);
+		logerror("SRAM detected from header: starting location %X - SRAM Length %X\n", genesis_sram_start, genesis_sram_end - genesis_sram_start + 1);
 
 	return INIT_PASS;
 }
@@ -1285,9 +1280,10 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 static DEVICE_IMAGE_UNLOAD( genesis_cart )
 {
 	/* Write out the battery file if necessary */
-	if ((genesis_sram != NULL) && (genesis_sram_end - genesis_sram_start > 0))
+	if (genesis_sram != NULL)
 	{
-		image_battery_save(image, genesis_sram, genesis_sram_end - genesis_sram_start);
+		image_battery_save(image, genesis_sram, genesis_sram_end - genesis_sram_start + 1);
+		free(genesis_sram);
 	}
 }
 

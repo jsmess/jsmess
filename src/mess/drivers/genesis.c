@@ -394,8 +394,6 @@ ROM_END
 
 static DRIVER_INIT( mess_md_common )
 {
-	DRIVER_INIT_CALL(gencommon);
-	
 	megadrive_io_read_data_port_ptr	= mess_md_io_read_data_port;
 	megadrive_io_write_data_port_ptr = mess_md_io_write_data_port;
 }

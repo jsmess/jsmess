@@ -12,7 +12,6 @@
 /*----------- defined in machine/genesis.c -----------*/
 
 MACHINE_RESET( md_mappers );
-DRIVER_INIT( gencommon );
 
 MACHINE_DRIVER_EXTERN( genesis_cartslot );
 MACHINE_DRIVER_EXTERN( pico_cartslot );
