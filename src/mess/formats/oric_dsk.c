@@ -51,8 +51,8 @@ static FLOPPY_IDENTIFY(oric_dsk_identify)
 	
 	floppy_image_read(floppy, header, 0, mfm_disk_header_size);
 	if ( memcmp( header, MFM_ID, 8 ) ==0) {		
-		int heads  = header[8]  + (header[9] << 8 ) + (header[10] << 16) + (header[11] << 24);
-		int tracks = header[12] + (header[13] << 8) + (header[14] << 16) + (header[15] << 24);
+		int heads  = pick_integer_le(header, 8, 4);
+		int tracks = pick_integer_le(header, 12, 4);
 				
 		if (floppy_image_size(floppy)==((tracks*heads*TRACK_SIZE_MFM)+mfm_disk_header_size)) {
 			*vote = 100;
@@ -284,9 +284,10 @@ static FLOPPY_CONSTRUCT(oric_dsk_construct)
 	tag = (struct oricdsk_tag *) floppy_create_tag(floppy, ORICDSK_TAG, sizeof(struct oricdsk_tag));
 	if (!tag)
 		return FLOPPY_ERROR_OUTOFMEMORY;
-	tag->heads   = header[8]  + (header[9] << 8 ) + (header[10] << 16) + (header[11] << 24);
-	tag->tracks  = header[12] + (header[13] << 8) + (header[14] << 16) + (header[15] << 24);
-	tag->geometry = header[16] + (header[17] << 8) + (header[18] << 16) + (header[19] << 24);
+		
+	tag->heads   = pick_integer_le(header, 8, 4);
+	tag->tracks  = pick_integer_le(header, 12, 4);
+	tag->geometry = pick_integer_le(header, 16, 4);
 	tag->tracksize = 0x1900;
 	memset(tag->sector_data,0,sizeof(tag->sector_data));
 			
