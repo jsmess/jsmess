@@ -44,7 +44,8 @@ INLINE pf10_state *get_safe_token(const device_config *device)
 *****************************************************************************/
 
 static ADDRESS_MAP_START( pf10_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
+	AM_RANGE(0x0040, 0x013f) AM_RAM /* internal ram */
+	AM_RANGE(0x0800, 0x0fff) AM_RAM /* external 2k ram */
 	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("pf10", 0)
 ADDRESS_MAP_END
 
@@ -67,7 +68,7 @@ static const nec765_interface pf10_nec765a_intf =
 };
 
 static MACHINE_DRIVER_START( pf10 )
-	MDRV_CPU_ADD("pf10", M6803, XTAL_4MHz /* ??? */) /* HD63A03 */
+	MDRV_CPU_ADD("pf10", M6803, XTAL_2_4576MHz / 4 /* ??? */) /* HD63A03 */
 	MDRV_CPU_PROGRAM_MAP(pf10_mem)
 	MDRV_CPU_IO_MAP(pf10_io)
 
