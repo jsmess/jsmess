@@ -12,6 +12,7 @@
 *
 *  TODO:
 *  * DUART: 
+*    * DUART needs to be reset on reset line activation. as is it works ok, but it should be done anyway.
 *    * DUART needs its i/o pins connected as well:    
 *    * pins IP0, IP2, and IP3 are connected to the primary serial port:
 *      * IP0 is CTS
@@ -75,16 +76,22 @@ DTC-01 LEDs
    111              disconnecting (start of state 7)
 *    Dectalk dtc-01 hardware and rom version history, from dtc-01 schematic at bitsavers and with additional info from
      http://americanhistory.si.edu/archives/speechsynthesis/ss_dec1.htm
-     August 1983: Hardware version A done
-     unknown date: Version 1.0 roms finalized
-     unknown date: Version 1.1 roms released to fix a bug with insufficient stack space, see ss_dec1 above
-     March 1984: Hardware version B done (integrates the output fifo sync error check onto the pcb; Version A units are retrofitted when sent in for firmware upgrades) (most of the schematics come from this time)
+*    August 1983: Hardware version A done
+*    unknown date: Version 1.0 roms finalized
+*    unknown date: Version 1.1 roms released to fix a bug with insufficient stack space, see ss_dec1 above
+*    March 1984: Hardware version B done (integrates the output fifo sync error check onto the pcb; Version A units are retrofitted when sent in for firmware upgrades) (most of the schematics come from this time)
      <there might be a v1.2 or v1.3 in this period>
-     July 02 1984: Second half of Version 2.0 rom finalized
-     July 23 1984: First half of Version 2.0 rom finalized
-     October 1984 (the rest of the schematics come from this time)
-     unknown date: version 2.1 rom finalized
-
+*    July 02 1984: Second half of Version 2.0 rom finalized
+*    July 23 1984: First half of Version 2.0 rom finalized
+*    October 1984 (the rest of the schematics come from this time)
+*    unknown date: version 2.1 rom finalized
+*
+* NVRAM related stuff found by leeeeee:
+* $10402 - nvram recall/reset based on byte on stack (0 = recall, 1 = write default to nvram)
+* $10f2E - nvram recall
+* $10f52 - entry point for nvram check routine
+* $11004(entry point)-$11030, $11032-$111B4 - nvram store routine
+* $1a7ae - default nvram image, without checksum (0x80 bytes)
 *******************************************************************************/
 /*the 68k memory map is such:
 0x000000-0x007fff: E22 low, E8 high
@@ -117,7 +124,17 @@ DUART is INT level 6
 */
 // USE_LOOSE_TIMING makes the cpu interleave much lower and boosts it on fifo and flag writes by the 68k and semaphore sets by the dsp
 #define USE_LOOSE_TIMING 1
-#undef VERBOSE 
+// generic logs like nvram store/recall flag messages and led state, and common writes for dsp and spc such as the speech int
+#undef VERBOSE
+// logs reads and writes to nvram
+#undef NVRAM_LOG
+// logs reads and writes to TLC regs
+#undef TLC_LOG
+// logs reads and writes to SPC regs, 68k side only
+#undef SPC_LOG_68K
+// logs reads and writes to SPC regs, dsp side only
+#undef SPC_LOG_DSP
+// logs txd and related serial lines to stderr
 #undef SERIAL_TO_STDERR 
 
 /* Core includes */
@@ -227,7 +244,9 @@ static void dectalk_x2212_store( running_machine *machine )
 	int i;
 	for (i = 0; i < 256; i++)
 	nvram[i] = dectalk.nvram_local[i];
+#ifdef VERBOSE
 	logerror("nvram store done\n");
+#endif
 }
 
 static void dectalk_x2212_recall( running_machine *machine )
@@ -236,7 +255,9 @@ static void dectalk_x2212_recall( running_machine *machine )
 	int i;
 	for (i = 0; i < 256; i++)
 	dectalk.nvram_local[i] = nvram[i];
+#ifdef VERBOSE
 	logerror("nvram recall done\n");
+#endif
 }
 
 // helper for dsp infifo_semaphore flag to make dealing with interrupts easier
@@ -268,16 +289,6 @@ static UINT16 dectalk_outfifo_r ( running_machine *machine )
 	//return data; // not right but want to get it working first
 }
 
-/*
-static void dectalk_spcflags_write ( running_machine *machine, UINT16 data )
-{
-}
-
-static void dectalk_tlcflags_write ( running_machine *machine, UINT16 data )
-{
-}
-*/
-
 /* Machine reset and friends: stuff that needs setting up which IS directly affected by reset */
 static void dectalk_reset(const device_config *device)
 {
@@ -287,11 +298,10 @@ static void dectalk_reset(const device_config *device)
 	dectalk_x2212_recall(device->machine); // nvram recall
 	dectalk.m68k_spcflags_latch = 1; // initial status is speech reset(d0) active and spc int(d6) disabled
 	dectalk.m68k_tlcflags_latch = 0; // initial status is tone detect int(d6) off, answer phone(d8) off, ring detect int(d14) off
-	// DUART is reset, write me "duart68681"
+	// TODO: DUART is reset, "duart68681"
 	// stuff that is INDIRECTLY affected by the RESET line
 	dectalk_clear_all_fifos(device->machine); // speech reset clears the fifos, though we have to do it explicitly here since we're not actually in the m68k_spcflags_w function.
-	dectalk_semaphore_w(device->machine, 0);
-	//dectalk.infifo_semaphore = 0; // on the original dectalk pcb revision, this is a semaphore for the INPUT fifo, later dec hacked on a check for the 3 output fifo chips to see if they're in sync, and set both of these latches if true.
+	dectalk_semaphore_w(device->machine, 0); // on the original dectalk pcb revision, this is a semaphore for the INPUT fifo, later dec hacked on a check for the 3 output fifo chips to see if they're in sync, and set both of these latches if true.
 	dectalk.spc_error_latch = 0; // spc error latch is cleared on /reset
 	cputag_set_input_line(device->machine, "dsp", INPUT_LINE_RESET, ASSERT_LINE); // speech reset forces the CLR line active on the tms32010
 	dectalk.tlc_tonedetect = 0; // TODO, needed for selftest pass
@@ -323,7 +333,10 @@ READ16_HANDLER( led_sw_nvr_read )
 		dectalk_x2212_recall(space->machine);
 	}
 	*/
-	data = dectalk.nvram_local[(offset>>1)&0xff]<<8; // TODO: should this be before or after a possible /RECALL? I'm guessing before.
+	data = dectalk.nvram_local[offset&0xff]<<8; // TODO: should this be before or after a possible /RECALL? I'm guessing before.
+#ifdef NVRAM_LOG
+		logerror("m68k: nvram read at %08X: %02X\n", offset, (data&0xfF00)>>8);
+#endif
 	if (ACCESSING_BITS_8_15) // X2212 NVRAM chip
 	{
 		if (offset&0x200) // if a9 is set, do a /RECALL
@@ -345,7 +358,10 @@ WRITE16_HANDLER( led_sw_nv_write )
 	}
 	else if (ACCESSING_BITS_8_15) // X2212 NVRAM chip
 	{
-		dectalk.nvram_local[(offset>>1)&0xff] = (UINT8)((data&0xF00)>>8); // TODO: should this be before or after a possible /STORE? I'm guessing before.
+#ifdef NVRAM_LOG
+		logerror("m68k: nvram write at %08X: %02X\n", offset, (data&0xFf00)>>8);
+#endif
+		dectalk.nvram_local[offset&0xff] = (UINT8)((data&0xF00)>>8); // TODO: should this be before or after a possible /STORE? I'm guessing before.
 		if (offset&0x200) // if a9 is set, do a /STORE
 		dectalk_x2212_store(space->machine);
 	}
@@ -356,13 +372,13 @@ WRITE16_HANDLER( m68k_infifo_w ) // 68k write to the speech input fifo
 #ifdef USE_LOOSE_TIMING
 	cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(25));
 #endif
-#ifdef VERBOSE
+#ifdef SPC_LOG_68K
 	logerror("m68k: SPC infifo written with data = %04X, fifo head was: %02X; fifo tail: %02X\n",data, dectalk.infifo_head_ptr, dectalk.infifo_tail_ptr);
 #endif
 	// if fifo is full (head ptr = tail ptr-1), do not increment the head ptr and do not store the data
 	if (((dectalk.infifo_tail_ptr-1)&0x1F) == dectalk.infifo_head_ptr)
 	{
-#ifdef VERBOSE
+#ifdef SPC_LOG_68K
 		logerror("infifo was full, write ignored!\n");
 #endif
 		return;
@@ -378,7 +394,7 @@ READ16_HANDLER( m68k_spcflags_r ) // 68k read from the speech flags
 	data |= dectalk.m68k_spcflags_latch; // bits 0 and 6
 	data |= dectalk.spc_error_latch<<5; // bit 5
 	data |= dectalk.infifo_semaphore<<7; // bit 7
-#ifdef VERBOSE
+#ifdef SPC_LOG_68K
 	logerror("m68k: SPC flags read, returning data = %04X\n",data);
 #endif
 	return data;
@@ -389,14 +405,14 @@ WRITE16_HANDLER( m68k_spcflags_w ) // 68k write to the speech flags (only 3 bits
 #ifdef USE_LOOSE_TIMING
 	cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(25));
 #endif
-#ifdef VERBOSE
+#ifdef SPC_LOG_68K
 	logerror("m68k: SPC flags written with %04X, only storing %04X\n",data, data&0x41);
 #endif
 	dectalk.m68k_spcflags_latch = data&0x41; // ONLY store bits 6 and 0!
 	// d0: initialize speech flag (reset tms32010 and clear infifo and outfifo if high)
 	if ((data&0x1) == 0x1) // bit 0
 	{
-#ifdef VERBOSE
+#ifdef SPC_LOG_68K
 		logerror(" | 0x01: initialize speech: fifos reset, clear error+semaphore latches and dsp reset\n");
 #endif
 		dectalk_clear_all_fifos(space->machine);
@@ -407,14 +423,14 @@ WRITE16_HANDLER( m68k_spcflags_w ) // 68k write to the speech flags (only 3 bits
 	}
 	else // (data&0x1) == 0
 	{
-#ifdef VERBOSE
+#ifdef SPC_LOG_68K
 		logerror(" | 0x01 = 0: initialize speech off, dsp running\n");
 #endif
 		cputag_set_input_line(space->machine, "dsp", INPUT_LINE_RESET, CLEAR_LINE); // speech reset deassert clears the CLR line on the tms32010
 	}
 	if ((data&0x2) == 0x2) // bit 1 - clear error and semaphore latches
 	{
-#ifdef VERBOSE
+#ifdef SPC_LOG_68K
 		logerror(" | 0x02: clear error+semaphore latches\n");
 #endif
 		// clear the two speech side latches
@@ -423,12 +439,12 @@ WRITE16_HANDLER( m68k_spcflags_w ) // 68k write to the speech flags (only 3 bits
 	}
 	if ((data&0x40) == 0x40) // bit 6 - spc irq enable
 	{
-#ifdef VERBOSE
+#ifdef SPC_LOG_68K
 		logerror(" | 0x40: speech int enabled\n");
 #endif
 		if ((dectalk.infifo_semaphore == 1))
 		{
-#ifdef VERBOSE
+#ifdef SPC_LOG_68K
 			logerror("    speech int fired!\n");
 #endif
 			cputag_set_input_line_and_vector(space->machine, "maincpu", M68K_IRQ_5, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR); // set int because semaphore was set
@@ -436,7 +452,7 @@ WRITE16_HANDLER( m68k_spcflags_w ) // 68k write to the speech flags (only 3 bits
 	}
 	else // data&0x40 == 0
 	{
-#ifdef VERBOSE
+#ifdef SPC_LOG_68K
 		logerror(" | 0x40 = 0: speech int disabled\n");
 #endif
 		cputag_set_input_line_and_vector(space->machine, "maincpu", M68K_IRQ_5, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR); // clear int because int is now disabled
@@ -449,7 +465,7 @@ READ16_HANDLER( m68k_tlcflags_r ) // dtmf flags read
 	data |= dectalk.m68k_tlcflags_latch; // bits 6, 8, 14;
 	data |= dectalk.tlc_tonedetect<<7; // bit 7 is tone detect
 	data |= dectalk.tlc_ringdetect<<14; // bit 15 is ring detect
-#ifdef VERBOSE
+#ifdef TLC_LOG
 	logerror("m68k: TLC flags read, returning data = %04X\n",data);
 #endif
 	return data;
@@ -457,18 +473,18 @@ READ16_HANDLER( m68k_tlcflags_r ) // dtmf flags read
 
 WRITE16_HANDLER( m68k_tlcflags_w ) // dtmf flags write
 {
-#ifdef VERBOSE
+#ifdef TLC_LOG
 	logerror("m68k: TLC flags written with %04X, only storing %04X\n",data, data&0x4140);
 #endif
 	dectalk.m68k_tlcflags_latch = data&0x4140; // ONLY store bits 6 8 and 14!
 	if ((data&0x40) == 0x40) // bit 6: tone detect interrupt enable
 	{
-#ifdef VERBOSE
+#ifdef TLC_LOG
 		logerror(" | 0x40: tone detect int enabled\n");
 #endif
 		if ((dectalk.tlc_tonedetect == 1))
 		{
-#ifdef VERBOSE
+#ifdef TLC_LOG
 			logerror("    TLC int fired!\n");
 #endif
 			cputag_set_input_line_and_vector(space->machine, "maincpu", M68K_IRQ_4, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR); // set int because tone detect was set
@@ -476,7 +492,7 @@ WRITE16_HANDLER( m68k_tlcflags_w ) // dtmf flags write
 	}
 	else // data&0x40 == 0
 	{
-#ifdef VERBOSE
+#ifdef TLC_LOG
 		logerror(" | 0x40 = 0: tone detect int disabled\n");
 #endif
 	if (((data&0x4000)!=0x4000) || (dectalk.tlc_ringdetect == 0)) // check to be sure we don't disable int if both ints fired at once
@@ -484,24 +500,24 @@ WRITE16_HANDLER( m68k_tlcflags_w ) // dtmf flags write
 	}
 	if ((data&0x100) == 0x100) // bit 8: answer phone relay enable
 	{
-#ifdef VERBOSE
+#ifdef TLC_LOG
 		logerror(" | 0x100: answer phone relay enabled\n");
 #endif
 	}
 	else // data&0x100 == 0
 	{
-#ifdef VERBOSE
+#ifdef TLC_LOG
 		logerror(" | 0x100 = 0: answer phone relay disabled\n");
 #endif
 	}
 	if ((data&0x4000) == 0x4000) // bit 14: ring int enable
 	{
-#ifdef VERBOSE
+#ifdef TLC_LOG
 		logerror(" | 0x4000: ring detect int enabled\n");
 #endif
 		if ((dectalk.tlc_ringdetect == 1))
 		{
-#ifdef VERBOSE
+#ifdef TLC_LOG
 			logerror("    TLC int fired!\n");
 #endif
 			cputag_set_input_line_and_vector(space->machine, "maincpu", M68K_IRQ_4, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR); // set int because tone detect was set
@@ -509,7 +525,7 @@ WRITE16_HANDLER( m68k_tlcflags_w ) // dtmf flags write
 	}
 	else // data&0x4000 == 0
 	{
-#ifdef VERBOSE
+#ifdef TLC_LOG
 		logerror(" | 0x4000 = 0: ring detect int disabled\n");
 #endif
 	if (((data&0x40)!=0x40) || (dectalk.tlc_tonedetect == 0)) // check to be sure we don't disable int if both ints fired at once
@@ -521,7 +537,7 @@ READ16_HANDLER( m68k_tlc_dtmf_r ) // dtmf chip read
 {
 	UINT16 data = 0xFFFF;
 	data = dectalk.tlc_dtmf&0xF;
-#ifdef VERBOSE
+#ifdef TLC_LOG
 	logerror("m68k: TLC dtmf detector read, returning data = %02X", data);
 #endif
 	return 0;
@@ -534,7 +550,7 @@ WRITE16_HANDLER( spc_latch_outfifo_error_stats ) // latch 74ls74 @ E64 upper and
 #ifdef USE_LOOSE_TIMING
 	cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(25));
 #endif
-#ifdef VERBOSE
+#ifdef SPC_LOG_DSP
 	logerror("dsp: set fifo semaphore and set error status = %01X\n",data&1);
 #endif
 	dectalk_semaphore_w(space->machine, (~dectalk.simulate_outfifo_error)&1); // always set to 1 here, unless outfifo error.
@@ -545,7 +561,7 @@ READ16_HANDLER( spc_infifo_data_r )
 {
 	UINT16 data = 0xFFFF;
 	data = dectalk.infifo[dectalk.infifo_tail_ptr];
-#ifdef VERBOSE
+#ifdef SPC_LOG_DSP
 	logerror("dsp: SPC infifo read with data = %04X, fifo head: %02X; fifo tail was: %02X\n",data, dectalk.infifo_head_ptr, dectalk.infifo_tail_ptr);
 #endif
 	// if fifo is empty (tail ptr == head ptr), do not increment the tail ptr, otherwise do.
@@ -558,14 +574,14 @@ READ16_HANDLER( spc_infifo_data_r )
 WRITE16_HANDLER( spc_outfifo_data_w )
 {
 	// the low 4 data bits are thrown out on the real unit due to use of a 12 bit dac (and to save use of another 16x4 fifo chip), though technically they're probably valid, and with suitable hacking a dtc-01 could probably output full 16 bit samples at 10khz.
-#ifdef VERBOSE
+#ifdef SPC_LOG_DSP
 	logerror("dsp: SPC outfifo write, data = %04X, fifo head was: %02X; fifo tail: %02X\n", data, dectalk.outfifo_head_ptr, dectalk.outfifo_tail_ptr);
 #endif
 	cputag_set_input_line(space->machine, "dsp", 0, CLEAR_LINE); //TMS32010 INT (cleared because LDCK inverts the IR line, clearing int on any outfifo write... for a moment at least.)
 	// if fifo is full (head ptr = tail ptr-1), do not increment the head ptr and do not store the data
 	if (((dectalk.outfifo_tail_ptr-1)&0xF) == dectalk.outfifo_head_ptr)
 	{
-#ifdef VERBOSE
+#ifdef SPC_LOG_DSP
 		logerror("outfifo was full, write ignored!\n");
 #endif
 		return;
@@ -578,7 +594,7 @@ WRITE16_HANDLER( spc_outfifo_data_w )
 
 READ16_HANDLER( spc_semaphore_r ) // Return state of d-latch 74ls74 @ E64 'lower half' in d0 which indicates whether infifo is readable
 {
-#ifdef VERBOSE
+#ifdef SPC_LOG_DSP
 	//logerror("dsp: read infifo semaphore, returned %d\n", dectalk.infifo_semaphore); // commented due to extreme annoyance factor
 	if (!dectalk.infifo_semaphore) logerror("dsp: read infifo semaphore, returned %d\n", dectalk.infifo_semaphore);
 #endif
@@ -747,8 +763,34 @@ ROM_START( dectalk )
 	ROM_LOAD16_BYTE("lm8506205f4.e70", 0x000, 0x800, CRC(ed76a3ad) SHA1(3136bae243ef48721e21c66fde70dab5fc3c21d0)) // Label: "LM8506205F4 // M1-76161-5" @ E70
 	ROM_LOAD16_BYTE("lm8504204f4.e69", 0x001, 0x800, CRC(79bb54ff) SHA1(9409f90f7a397b041e4440341f2d7934cb479285)) // Label: "LM8504204F4 // 78S191" @ E69
 
-	ROM_REGION(0x100,"nvram", 0)
-	ROM_FILL(0x00, 0x100, 0xa5) /* fill with crap for now */
+	ROM_REGION(0x100,"nvram", 0) // default nvram image is at 0x1A7AE in main rom, read lsn first so 0x0005 in rom becomes 0x50 0x00, etc for all words of main rom
+	ROM_FILL(0x00, 0x01, 0x50) // 0005
+	ROM_FILL(0x01, 0x01, 0x00)
+	ROM_FILL(0x02, 0x01, 0x00) // 0000
+	ROM_FILL(0x03, 0x01, 0x00)
+	ROM_FILL(0x04, 0x01, 0x60) // 0006
+	ROM_FILL(0x05, 0x01, 0x00)
+	ROM_FILL(0x06, 0x01, 0x10) // 0001
+	ROM_FILL(0x07, 0x01, 0x00)
+	ROM_FILL(0x08, 0x01, 0x60) // 0006
+	ROM_FILL(0x09, 0x01, 0x00)
+	ROM_FILL(0x0A, 0x01, 0xB0) // 000B
+	ROM_FILL(0x0B, 0x01, 0x00)
+	ROM_FILL(0x0C, 0x01, 0x20) // 0002
+	ROM_FILL(0x0D, 0x01, 0x00)
+	ROM_FILL(0x0E, 0x01, 0x20) // 0002
+	ROM_FILL(0x0F, 0x01, 0x00)
+	ROM_FILL(0x10, 0x01, 0x10) // 0001
+	ROM_FILL(0x11, 0x01, 0x00)
+	ROM_FILL(0x12, 0x01, 0x10) // 0001
+	ROM_FILL(0x13, 0x01, 0x00)
+	ROM_FILL(0x14, 0x01, 0x00) // 0000
+	ROM_FILL(0x15, 0x01, 0x00)
+	ROM_FILL(0x16, 0x01, 0x10) // 0001
+	ROM_FILL(0x17, 0x01, 0x00)
+	ROM_FILL(0x18, 0xE4, 0x00) // rest is 0s except for checksum
+	ROM_FILL(0xFE, 0x01, 0x00) // 0000 for now, probably wrong
+	ROM_FILL(0xFF, 0x01, 0x00)
 
 ROM_END
 
