@@ -1,6 +1,8 @@
 #ifndef __E0516__
 #define __E0516__
 
+#include "devcb.h"
+
 /***************************************************************************
     MACROS / CONSTANTS
 ***************************************************************************/
@@ -18,13 +20,13 @@
 DEVICE_GET_INFO( e0516 );
 
 /* serial data input/output */
-int e0516_dio_r(const device_config *device);
-void e0516_dio_w(const device_config *device, int level);
+READ_LINE_DEVICE_HANDLER( e0516_dio_r );
+WRITE_LINE_DEVICE_HANDLER( e0516_dio_w );
 
 /* clock */
-void e0516_clk_w(const device_config *device, int level);
+WRITE_LINE_DEVICE_HANDLER( e0516_clk_w );
 
 /* chip select */
-void e0516_cs_w(const device_config *device, int level);
+WRITE_LINE_DEVICE_HANDLER( e0516_cs_w );
 
 #endif

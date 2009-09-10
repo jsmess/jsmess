@@ -101,7 +101,7 @@ static TIMER_CALLBACK( clock_tick )
     e0516_dio_r - data out
 -------------------------------------------------*/
 
-int e0516_dio_r(const device_config *device)
+READ_LINE_DEVICE_HANDLER( e0516_dio_r )
 {
 	e0516_t *e0516 = get_safe_token(device);
 
@@ -112,24 +112,24 @@ int e0516_dio_r(const device_config *device)
     e0516_dio_w - data in
 -------------------------------------------------*/
 
-void e0516_dio_w(const device_config *device, int level)
+WRITE_LINE_DEVICE_HANDLER( e0516_dio_w )
 {
 	e0516_t *e0516 = get_safe_token(device);
 
-	e0516->dio = level;
+	e0516->dio = state;
 }
 
 /*-------------------------------------------------
     e0516_clk_w - clock in
 -------------------------------------------------*/
 
-void e0516_clk_w(const device_config *device, int level)
+WRITE_LINE_DEVICE_HANDLER( e0516_clk_w )
 {
 	e0516_t *e0516 = get_safe_token(device);
 
 	if (e0516->cs == 1) return;
 
-	if (level == 0)
+	if (state == 0)
 	{
 		e0516->bits++;
 
@@ -190,13 +190,13 @@ void e0516_clk_w(const device_config *device, int level)
     e0516_clk_w - chip select
 -------------------------------------------------*/
 
-void e0516_cs_w(const device_config *device, int level)
+WRITE_LINE_DEVICE_HANDLER( e0516_cs_w )
 {
 	e0516_t *e0516 = get_safe_token(device);
 
-	e0516->cs = level;
+	e0516->cs = state;
 
-	if (level == 1)
+	if (state == 1)
 	{
 		e0516->data_latch = 0;
 		e0516->reg_latch = 0;
