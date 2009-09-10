@@ -5,8 +5,8 @@
 #define CDP1802_TAG		"u1"
 #define CDP1861_TAG		"u2"
 #define CDP1862_TAG		"cdp1862"
-#define CDP1863_TAG		"cdp1863"
 #define CASSETTE_TAG	"cassette"
+#define DISCRETE_TAG	"discrete"
 
 #define VP590_COLOR_RAM_SIZE	0x100
 
@@ -17,7 +17,7 @@
 #define VIP_VIDEO_CDP1862	1
 
 #define VIP_SOUND_SPEAKER	0
-#define VIP_SOUND_CDP1863	1
+#define VIP_SOUND_VP595		1
 #define VIP_SOUND_VP550		2
 #define VIP_SOUND_VP551		3
 
@@ -52,6 +52,9 @@ struct _vip_state
 	const device_config *cdp1862;
 	const device_config *cdp1863;
 	const device_config *cassette;
+	const device_config *beeper;
+	const device_config *vp550;
+	const device_config *vp595;
 };
 
 #endif

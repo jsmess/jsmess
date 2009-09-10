@@ -56,12 +56,11 @@ Notes:
 
     TODO:
 
-	- CDP1863 clocks
 	- second VP580 keypad
 	- colorram bit order
 
 	- VP-585 Expansion Keyboard Interface (2 keypad connectors for VP-580)
-    - VP-550/551 Super Sound Board (VP-550 2 channel, VP-551 4 channel sound)
+    - VP-551 Super Sound Board (4 channel sound)
     - VP-601/611 ASCII Keyboard (VP-601 58 keys, VP611 58 keys + 16 keys numerical keypad)
     - VP-700 Expanded Tiny Basic Board (4 KB ROM expansion)
 
@@ -224,10 +223,12 @@ Notes:
 #include "cpu/cdp1802/cdp1802.h"
 #include "devices/cassette.h"
 #include "devices/snapquik.h"
+#include "audio/vp550.h"
+#include "audio/vp595.h"
+#include "sound/cdp1863.h"
 #include "sound/discrete.h"
 #include "video/cdp1861.h"
 #include "video/cdp1862.h"
-#include "audio/cdp1863.h"
 #include "machine/rescap.h"
 
 static QUICKLOAD_LOAD( vip );
@@ -247,12 +248,6 @@ static DISCRETE_SOUND_START( vip )
 	DISCRETE_555_ASTABLE_CV(NODE_02, NODE_01, 470, RES_M(1), CAP_P(470), NODE_01, &vip_ca555_a)
 	DISCRETE_OUTPUT(NODE_02, 5000)
 DISCRETE_SOUND_END
-
-static CDP1863_INTERFACE( vip_cdp1863_intf )
-{
-	1750000,	// ???
-	0			// ???
-};
 
 /* Read/Write Handlers */
 
@@ -416,7 +411,6 @@ static WRITE8_HANDLER( vip_colorram_w )
 	vip_state *state = space->machine->driver_data;
 
 	state->colorram[offset] = data;
-
 	state->colorram_mwr = ASSERT_LINE;
 }
 
@@ -427,15 +421,11 @@ static VIDEO_UPDATE( vip )
 	switch (input_port_read(screen->machine, "VIDEO"))
 	{
 	case VIP_VIDEO_CDP1861:
-		{
-			cdp1861_update(state->cdp1861, bitmap, cliprect);
-		}
+		cdp1861_update(state->cdp1861, bitmap, cliprect);
 		break;
 
 	case VIP_VIDEO_CDP1862:
-		{
-			cdp1862_update(state->cdp1862, bitmap, cliprect);
-		}
+		cdp1862_update(state->cdp1862, bitmap, cliprect);
 		break;
 	}
 
@@ -507,16 +497,30 @@ static CDP1802_EF_READ( vip_ef_r )
 
 static WRITE_LINE_DEVICE_HANDLER( vip_q_w )
 {
-	const device_config *discrete = devtag_get_device(device->machine, "discrete");
 	vip_state *driver_state = device->machine->driver_data;
 
 	/* sound output */
-	discrete_sound_w(discrete, NODE_01, state);
 
-	if (input_port_read(device->machine, "SOUND") == VIP_SOUND_CDP1863)
+	switch (input_port_read(device->machine, "SOUND"))
 	{
-		/* CDP1863 output enable */
-		cdp1863_oe_w(driver_state->cdp1863, state);
+	case VIP_SOUND_SPEAKER:
+		discrete_sound_w(driver_state->beeper, NODE_01, state);
+		vp595_q_w(driver_state->vp595, 0);
+		vp550_q_w(driver_state->vp550, 0);
+		break;
+
+	case VIP_SOUND_VP595:
+		discrete_sound_w(driver_state->beeper, NODE_01, 0);
+		vp595_q_w(driver_state->vp595, state);
+		vp550_q_w(driver_state->vp550, 0);
+		break;
+
+	case VIP_SOUND_VP550:
+	case VIP_SOUND_VP551:
+		discrete_sound_w(driver_state->beeper, NODE_01, 0);
+		vp595_q_w(driver_state->vp595, 0);
+		vp550_q_w(driver_state->vp550, state);
+		break;
 	}
 
 	/* Q led */
@@ -592,8 +596,15 @@ static MACHINE_START( vip )
 	/* look up devices */
 	state->cdp1861 = devtag_get_device(machine, CDP1861_TAG);
 	state->cdp1862 = devtag_get_device(machine, CDP1862_TAG);
-	state->cdp1863 = devtag_get_device(machine, CDP1863_TAG);
 	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
+	state->beeper = devtag_get_device(machine, DISCRETE_TAG);
+	state->vp550 = devtag_get_device(machine, VP550_TAG);
+	state->vp595 = devtag_get_device(machine, VP595_TAG);
+
+	/* reset sound */
+	discrete_sound_w(state->beeper, NODE_01, 0);
+	vp595_q_w(state->vp595, 0);
+	vp550_q_w(state->vp550, 0);
 
 	/* register for state saving */
 	state_save_register_global_pointer(machine, state->colorram, VP590_COLOR_RAM_SIZE);
@@ -612,15 +623,16 @@ static MACHINE_RESET( vip )
 	const address_space *io = cputag_get_address_space(machine, CDP1802_TAG, ADDRESS_SPACE_IO);
 
 	/* reset auxiliary chips */
-
 	device_reset(state->cdp1861);
 	device_reset(state->cdp1862);
-	device_reset(state->cdp1863);
+
+	/* reset devices */
+	device_reset(state->vp550);
+	device_reset(state->vp595);
 
 	state->colorram_mwr = CLEAR_LINE;
 
 	/* configure video */
-
 	switch (input_port_read(machine, "VIDEO"))
 	{
 	case VIP_VIDEO_CDP1861:
@@ -635,20 +647,34 @@ static MACHINE_RESET( vip )
 	}
 
 	/* configure audio */
-
 	switch (input_port_read(machine, "SOUND"))
 	{
-	case VIP_SOUND_CDP1863:
-		memory_install_write8_device_handler(io, state->cdp1863, 0x03, 0x03, 0, 0, cdp1863_str_w);
+	case VIP_SOUND_SPEAKER:
+		vp595_install_write_handlers(state->vp595, io, 0);
+		vp550_install_write_handlers(state->vp550, program, 0);
+//		vp551_install_write_handlers(state->vp551, program, 0);
 		break;
 
-	default:
-		memory_install_write8_handler(io, 0x03, 0x03, 0, 0, SMH_UNMAP);
+	case VIP_SOUND_VP595:
+		vp595_install_write_handlers(state->vp595, io, 1);
+		vp550_install_write_handlers(state->vp550, program, 0);
+//		vp551_install_write_handlers(state->vp551, program, 0);
+		break;
+
+	case VIP_SOUND_VP550:
+		vp595_install_write_handlers(state->vp595, io, 0);
+		vp550_install_write_handlers(state->vp550, program, 1);
+//		vp551_install_write_handlers(state->vp551, program, 0);
+		break;
+
+	case VIP_SOUND_VP551:
+		vp595_install_write_handlers(state->vp595, io, 0);
+		vp550_install_write_handlers(state->vp550, program, 0);
+//		vp551_install_write_handlers(state->vp551, program, 1);
 		break;
 	}
 
 	/* enable ROM mirror at 0x0000 */
-
 	memory_install_readwrite8_handler(program, 0x0000, 0x01ff, 0, 0x7e00, SMH_BANK(1), SMH_UNMAP);
 	memory_set_bank(machine, 1, VIP_BANK_ROM);
 }
@@ -687,21 +713,18 @@ static MACHINE_DRIVER_START( vip )
 	MDRV_CDP1862_ADD(CDP1862_TAG, CPD1862_CLOCK, vip_cdp1862_intf)
 
 	/* sound hardware */
-	MDRV_DEVICE_ADD(CDP1863_TAG, CDP1863, 0)
-	MDRV_DEVICE_CONFIG(vip_cdp1863_intf)
-
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
+
+	MDRV_SOUND_ADD(DISCRETE_TAG, DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(vip)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MDRV_SOUND_ADD("beep", BEEP, 0) /* CDP1863 */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MDRV_VP550_ADD(XTAL_3_52128MHz/2)
+	MDRV_VP595_ADD(XTAL_3_52128MHz/2)
 
 	/* devices */
 	MDRV_QUICKLOAD_ADD("quickload", vip, "bin,c8,c8x", 0)
-
-	MDRV_CASSETTE_ADD( "cassette", vip_cassette_config )
+	MDRV_CASSETTE_ADD("cassette", vip_cassette_config)
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -709,7 +732,7 @@ MACHINE_DRIVER_END
 ROM_START( vip )
 	ROM_REGION( 0x10000, CDP1802_TAG, 0 )
 	ROM_LOAD( "cdpr566.u10", 0x8000, 0x0200, CRC(5be0a51f) SHA1(40266e6d13e3340607f8b3dcc4e91d7584287c06) )
-	ROM_SYSTEM_BIOS( 0, "vp711", "VP-711" )
+	ROM_SYSTEM_BIOS( 0, "monitor", "Monitor" )
 	ROM_SYSTEM_BIOS( 1, "vp700", "VP-700 Tiny BASIC" )
 	ROMX_LOAD( "vp700.bin",	 0x9000, 0x1000, NO_DUMP, ROM_BIOS(2) )
 
@@ -720,19 +743,7 @@ ROM_START( vip )
 	ROM_LOAD( "chip8x.bin", 0x0000, 0x0300, CRC(79c5f6f8) SHA1(ed438747b577399f6ccbf20fe14156f768842898) )
 ROM_END
 
-ROM_START( vp111 )
-	ROM_REGION( 0x10000, CDP1802_TAG, 0 )
-	ROM_LOAD( "cdpr566.u10", 0x8000, 0x0200, CRC(5be0a51f) SHA1(40266e6d13e3340607f8b3dcc4e91d7584287c06) )
-	ROM_SYSTEM_BIOS( 0, "vp111", "VP-111" )
-	ROM_SYSTEM_BIOS( 1, "vp700", "VP-700 Tiny BASIC" )
-	ROMX_LOAD( "vp700.bin",	 0x9000, 0x1000, NO_DUMP, ROM_BIOS(2) )
-
-	ROM_REGION( 0x200, "chip8", 0 )
-	ROM_LOAD( "chip8.bin", 0x000, 0x0200, CRC(438ec5d5) SHA1(8aa634c239004ff041c9adbf9144bd315ab5fc77) )
-
-	ROM_REGION( 0x300, "chip8x", 0 )
-	ROM_LOAD( "chip8x.bin", 0x0000, 0x0300, CRC(79c5f6f8) SHA1(ed438747b577399f6ccbf20fe14156f768842898) )
-ROM_END
+#define rom_vp111 rom_vip
 
 /* System Configuration */
 
@@ -784,22 +795,8 @@ static SYSTEM_CONFIG_START( vp111 )
 	CONFIG_RAM			( 4 * 1024)
 SYSTEM_CONFIG_END
 
-/* Driver Initialization */
-
-static TIMER_CALLBACK( setup_beep )
-{
-	const device_config *speaker = devtag_get_device(machine, "beep");
-	beep_set_state(speaker, 0);
-	beep_set_frequency( speaker, 0 );
-}
-
-static DRIVER_INIT( vip )
-{
-	timer_set(machine, attotime_zero, NULL, 0, setup_beep);
-}
-
 /* System Drivers */
 
-//	  YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   INIT    CONFIG  COMPANY FULLNAME
-COMP( 1977, vip,	0,		0,		vip,		vip,	vip,	vp711,	"RCA",	"Cosmac VIP (VP-711)", GAME_SUPPORTS_SAVE )
-COMP( 1977, vp111,	vip,	0,		vip,		vip,	vip,	vp111,	"RCA",	"Cosmac VIP (VP-111)", GAME_SUPPORTS_SAVE )
+/*	  YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   INIT    CONFIG  COMPANY FULLNAME				FLAGS */
+COMP( 1977, vip,	0,		0,		vip,		vip,	0,		vp711,	"RCA",	"Cosmac VIP (VP-711)",	GAME_SUPPORTS_SAVE )
+COMP( 1977, vp111,	vip,	0,		vip,		vip,	0,		vp111,	"RCA",	"Cosmac VIP (VP-111)",	GAME_SUPPORTS_SAVE )

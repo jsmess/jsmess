@@ -230,6 +230,7 @@ SOUNDS += TMS5200
 #SOUNDS += TMC0281
 #SOUNDS += TMS5100
 #SOUNDS += TMS5110A
+SOUNDS += CDP1863
 
 
 #-------------------------------------------------
@@ -386,7 +387,6 @@ DRVLIBS = \
 
 $(MESSOBJ)/shared.a: \
 	$(MAME_MACHINE)/pckeybrd.o	\
-	$(MESS_AUDIO)/cdp1863.o		\
 	$(MESS_AUDIO)/lmc1992.o		\
 	$(MESS_AUDIO)/mea8000.o		\
 	$(MESS_DEVICES)/bitbngr.o	\
@@ -1144,6 +1144,8 @@ $(MESSOBJ)/radio.a:				\
 
 $(MESSOBJ)/rca.a:				\
 	$(MESS_DRIVERS)/vip.o		\
+	$(MESS_AUDIO)/vp550.o		\
+	$(MESS_AUDIO)/vp595.o		\
 	$(MESS_DRIVERS)/studio2.o	\
 
 $(MESSOBJ)/robotron.a:			\
