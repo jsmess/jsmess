@@ -106,12 +106,12 @@ WRITE8_DEVICE_HANDLER( zx8302_irq_acknowledge_w );
 WRITE8_DEVICE_HANDLER( zx8302_data_w );
 
 /* vertical sync */
-void zx8302_vsync_w(const device_config *device, int level);
+WRITE_LINE_DEVICE_HANDLER( zx8302_vsync_w );
 
 /* communication control */
-void zx8302_comctl_w(const device_config *device, int level);
+WRITE_LINE_DEVICE_HANDLER( zx8302_comctl_w );
 
 /* communication data */
-void zx8302_comdata_w(const device_config *device, int level);
+WRITE_LINE_DEVICE_HANDLER( zx8302_comdata_w );
 
 #endif

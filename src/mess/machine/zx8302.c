@@ -268,11 +268,11 @@ static void zx8302_ipc_comm_tick(const device_config *device)
     zx8302_comctl_w - IPC COMCTL accessor
 -------------------------------------------------*/
 
-void zx8302_comctl_w(const device_config *device, int level)
+WRITE_LINE_DEVICE_HANDLER( zx8302_comctl_w )
 {
-	if (LOG) logerror("IPC COMCTL W: %x\n", level);
+	if (LOG) logerror("IPC COMCTL W: %x\n", state);
 
-	if (level == 1)
+	if (state == 1)
 	{
 		zx8302_ipc_comm_tick(device);
 	}
@@ -282,11 +282,11 @@ void zx8302_comctl_w(const device_config *device, int level)
     zx8302_comctl_w - IPC COMDATA accessor
 -------------------------------------------------*/
 
-void zx8302_comdata_w(const device_config *device, int level)
+WRITE_LINE_DEVICE_HANDLER( zx8302_comdata_w )
 {
 	zx8302_t *zx8302 = get_safe_token(device);
 
-	if (LOG) logerror("IPC COMDATA W: %x\n", level);
+	if (LOG) logerror("IPC COMDATA W: %x\n", state);
 
 	if (zx8302->ipc_state == ZX8302_IPC_DATA || zx8302->ipc_state == ZX8302_IPC_STOP)
 	{
@@ -299,7 +299,7 @@ void zx8302_comdata_w(const device_config *device, int level)
 		else
 		{
 			zx8302->ipc_rx = 1;
-			zx8302->comdata = level;
+			zx8302->comdata = state;
 		}
 	}
 }
@@ -337,18 +337,18 @@ WRITE8_DEVICE_HANDLER( zx8302_ipc_command_w )
     zx8302_txd - IPC serial transmit
 -------------------------------------------------*/
 
-static void zx8302_txd(const device_config *device, int level)
+static WRITE_LINE_DEVICE_HANDLER( zx8302_txd )
 {
 	zx8302_t *zx8302 = get_safe_token(device);
 
 	switch (zx8302->tcr & ZX8302_MODE_MASK)
 	{
 	case ZX8302_MODE_SER1:
-		zx8302->ser1_rxd = level;
+		zx8302->ser1_rxd = state;
 		break;
 
 	case ZX8302_MODE_SER2:
-		zx8302->ser2_txd = level;
+		zx8302->ser2_txd = state;
 		break;
 
 	case ZX8302_MODE_MDV:
@@ -356,7 +356,7 @@ static void zx8302_txd(const device_config *device, int level)
 		break;
 
 	case ZX8302_MODE_NET:
-		zx8302->netout = level;
+		zx8302->netout = state;
 		break;
 	}
 }
@@ -664,9 +664,9 @@ READ8_DEVICE_HANDLER( zx8302_status_r )
     zx8302_vsync_w - vertical sync accessor
 -------------------------------------------------*/
 
-void zx8302_vsync_w(const device_config *device, int level)
+WRITE_LINE_DEVICE_HANDLER( zx8302_vsync_w )
 {
-	if (level)
+	if (state)
 	{
 		zx8302_interrupt(device, ZX8302_INT_FRAME);
 		if (LOG) logerror("ZX8302 Frame Interrupt\n");
