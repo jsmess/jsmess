@@ -12,6 +12,10 @@
 #define SAMCOUPE_H_
 
 
+#define SAM_LINE_INT	0x01
+#define SAM_FRAME_INT	0x08
+
+
 typedef struct _coupe_asic coupe_asic;
 struct _coupe_asic
 {

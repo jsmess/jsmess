@@ -162,7 +162,7 @@ VIDEO_UPDATE( samcoupe )
 
 	/* line interrupt? */
 	if (asic->line_int == scanline)
-		samcoupe_irq(screen->machine->firstcpu, 0x01);
+		samcoupe_irq(screen->machine->firstcpu, SAM_LINE_INT);
 
 	/* display disabled? (only in mode 3 or 4) */
 	if ((asic->vmpr & 0x40) && (asic->border & 0x80))
