@@ -1,3 +1,12 @@
+/**********************************************************************
+
+    Motorola MC68901 Multi Function Peripheral emulation
+
+    Copyright MESS Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
+
+**********************************************************************/
+
 /*
 
 	TODO:
@@ -1481,25 +1490,25 @@ int mc68901_get_vector(const device_config *device)
     mc68901_tai_w - timer A input
 -------------------------------------------------*/
 
-void mc68901_tai_w(const device_config *device, int value)
+WRITE_LINE_DEVICE_HANDLER( mc68901_tai_w )
 {
-	timer_input(device, MC68901_TIMER_A, value);
+	timer_input(device, MC68901_TIMER_A, state);
 }
 
 /*-------------------------------------------------
     mc68901_tbi_w - timer B input
 -------------------------------------------------*/
 
-void mc68901_tbi_w(const device_config *device, int value)
+WRITE_LINE_DEVICE_HANDLER( mc68901_tbi_w )
 {
-	timer_input(device, MC68901_TIMER_B, value);
+	timer_input(device, MC68901_TIMER_B, state);
 }
 
 /*-------------------------------------------------
     mc68901_rx_clock_w - receiver clock input
 -------------------------------------------------*/
 
-void mc68901_rx_clock_w(const device_config *device, int state)
+WRITE_LINE_DEVICE_HANDLER( mc68901_rx_clock_w )
 {
 	if (state)
 	{
@@ -1511,7 +1520,7 @@ void mc68901_rx_clock_w(const device_config *device, int state)
     mc68901_tx_clock_w - transmitter clock input
 -------------------------------------------------*/
 
-void mc68901_tx_clock_w(const device_config *device, int state)
+WRITE_LINE_DEVICE_HANDLER( mc68901_tx_clock_w )
 {
 	if (state)
 	{

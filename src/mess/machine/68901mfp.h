@@ -111,15 +111,15 @@ WRITE8_DEVICE_HANDLER( mc68901_register_w );
 int mc68901_get_vector(const device_config *device) ATTR_NONNULL(1);
 
 /* write to Timer A input (pin 19) */
-void mc68901_tai_w(const device_config *device, int state) ATTR_NONNULL(1);
+WRITE_LINE_DEVICE_HANDLER( mc68901_tai_w ) ATTR_NONNULL(1);
 
 /* write to Timer B input (pin 20) */
-void mc68901_tbi_w(const device_config *device, int state) ATTR_NONNULL(1);
+WRITE_LINE_DEVICE_HANDLER( mc68901_tbi_w ) ATTR_NONNULL(1);
 
 /* receive clock */
-void mc68901_rx_clock_w(const device_config *device, int state) ATTR_NONNULL(1);
+WRITE_LINE_DEVICE_HANDLER( mc68901_rx_clock_w ) ATTR_NONNULL(1);
 
 /* transmit clock */
-void mc68901_tx_clock_w(const device_config *device, int state) ATTR_NONNULL(1);
+WRITE_LINE_DEVICE_HANDLER( mc68901_tx_clock_w ) ATTR_NONNULL(1);
 
 #endif
