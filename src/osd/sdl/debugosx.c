@@ -2856,7 +2856,7 @@ void console_create_window(running_machine *machine)
 	if (info == NULL)
 		return;
 	main_console = info;
-	console_set_cpu(machine->cpu[0]);
+	console_set_cpu(machine->firstcpu);
 
 	// create the views
 	if (!debugwin_view_create(info, 0, DVT_DISASSEMBLY))
