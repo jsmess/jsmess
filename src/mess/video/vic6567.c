@@ -1766,10 +1766,27 @@ TIMER_CALLBACK( line_timer_callback )
 #define DrawGraphics \
 	if (draw_this_line == 0) \
 	{ \
-		; \
+		UINT16 p = vic2.graphic_x + HORIZONTALPOS; \
+		fore_coll_buf[p + 7] = 0; \
+		fore_coll_buf[p + 6] = 0; \
+		fore_coll_buf[p + 5] = 0; \
+		fore_coll_buf[p + 4] = 0; \
+		fore_coll_buf[p + 3] = 0; \
+		fore_coll_buf[p + 2] = 0; \
+		fore_coll_buf[p + 1] = 0; \
+		fore_coll_buf[p + 0] = 0; \
 	} \
 	else if (ud_border_on) \
 	{ \
+		UINT16 p = vic2.graphic_x + HORIZONTALPOS; \
+		fore_coll_buf[p + 7] = 0; \
+		fore_coll_buf[p + 6] = 0; \
+		fore_coll_buf[p + 5] = 0; \
+		fore_coll_buf[p + 4] = 0; \
+		fore_coll_buf[p + 3] = 0; \
+		fore_coll_buf[p + 2] = 0; \
+		fore_coll_buf[p + 1] = 0; \
+		fore_coll_buf[p + 0] = 0; \
 		DrawBackground; \
 	} \
 	else \
@@ -1922,7 +1939,7 @@ TIMER_CALLBACK( line_timer_callback )
 									gfx_coll |= sbit; \
 								} \
 								if (plane0_l & 0x80000000) \
-									col =  vic2.spritemulti[3]; \
+									col = vic2.spritemulti[3]; \
 								else \
 									col = color; \
 							} \
@@ -1934,7 +1951,7 @@ TIMER_CALLBACK( line_timer_callback )
 									{ \
 										gfx_coll |= sbit; \
 									} \
-									col =  vic2.spritemulti[1]; \
+									col = vic2.spritemulti[1]; \
 								} \
 								else \
 									continue; \
@@ -1966,7 +1983,7 @@ TIMER_CALLBACK( line_timer_callback )
 									gfx_coll |= sbit; \
 								} \
 								if (plane0_r & 0x80000000) \
-									col =  vic2.spritemulti[3]; \
+									col = vic2.spritemulti[3]; \
 								else \
 									col = color; \
 							} \
@@ -2143,15 +2160,15 @@ TIMER_CALLBACK( line_timer_callback )
 			SPRITE_COLL |= spr_coll; \
 		else \
 		{ \
-			SPRITE_COLL |= spr_coll; \
-			vic2_set_interrupt(machine, 4); \
+			SPRITE_COLL = spr_coll; \
+			if (SPRITE_COLL) vic2_set_interrupt(machine, 4); \
 		} \
 		if (SPRITE_BG_COLL) \
 			SPRITE_BG_COLL |= gfx_coll; \
 		else \
 		{ \
-			SPRITE_BG_COLL |= gfx_coll; \
-			vic2_set_interrupt(machine, 2); \
+			SPRITE_BG_COLL = gfx_coll; \
+			if (SPRITE_BG_COLL) vic2_set_interrupt(machine, 2); \
 		} \
 	}
 
