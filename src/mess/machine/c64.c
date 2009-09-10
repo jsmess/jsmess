@@ -533,7 +533,7 @@ static void c64_bankswitch(running_machine *machine, int reset)
 		// IO/RAM
 		else if (loram && !hiram && !c64_game)	// remember we cannot be in ultimax_mode, no need of !c64_exrom
 		{
-			c64_io_enabled = 0;
+			c64_io_enabled = 1;
 			c64_io_ram_r_ptr = (!charen) ? c64_chargen : c64_memory + 0xd000;
 			c64_io_ram_w_ptr = c64_memory + 0xd000;
 		}
