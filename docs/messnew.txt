@@ -90,6 +90,9 @@ System Driver Changes:
 
 - [SNES] Added support for SuperFX games. [Harmony]
 
+- [SNES] Added support for DSP-3 and DSP-4 add-on chips. [ZSNES Team, Fabio 
+  Priuli]
+
 - [SNES] Added preliminary support for S-DD1 and S-RTC emulation. [Harmony]
 
 - [TI81] Added v2.0 BIOS (possibly bad dump). [FloppusMaximus]
