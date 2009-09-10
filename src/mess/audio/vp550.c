@@ -176,7 +176,7 @@ static DEVICE_RESET( vp550 )
 	device_reset(vp550->cdp1863_a);
 	device_reset(vp550->cdp1863_b);
 
-	cpu_set_input_line(device->machine->cpu[0], CDP1802_INPUT_LINE_INT, CLEAR_LINE);
+	cpu_set_input_line(device->machine->firstcpu, CDP1802_INPUT_LINE_INT, CLEAR_LINE);
 }
 
 /*-------------------------------------------------
