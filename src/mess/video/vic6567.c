@@ -1746,21 +1746,21 @@ TIMER_CALLBACK( line_timer_callback )
 #define DrawMulti \
 	data = gfx_data; \
 	*BITMAP_ADDR16(vic2.bitmap, VIC2_RASTER_2_EMU(vic2.rasterline), p + 7) = c[data & 3]; \
-	fore_coll_buf[p + 7] = data & 3; \
+	fore_coll_buf[p + 7] = data & 2; \
 	*BITMAP_ADDR16(vic2.bitmap, VIC2_RASTER_2_EMU(vic2.rasterline), p + 6) = c[data & 3]; \
-	fore_coll_buf[p + 6] = data & 3; data >>= 2; \
+	fore_coll_buf[p + 6] = data & 2; data >>= 2; \
 	*BITMAP_ADDR16(vic2.bitmap, VIC2_RASTER_2_EMU(vic2.rasterline), p + 5) = c[data & 3]; \
-	fore_coll_buf[p + 5] = data & 3; \
+	fore_coll_buf[p + 5] = data & 2; \
 	*BITMAP_ADDR16(vic2.bitmap, VIC2_RASTER_2_EMU(vic2.rasterline), p + 4) = c[data & 3]; \
-	fore_coll_buf[p + 4] = data & 3; data >>= 2; \
+	fore_coll_buf[p + 4] = data & 2; data >>= 2; \
 	*BITMAP_ADDR16(vic2.bitmap, VIC2_RASTER_2_EMU(vic2.rasterline), p + 3) = c[data & 3]; \
-	fore_coll_buf[p + 3] = data & 3; \
+	fore_coll_buf[p + 3] = data & 2; \
 	*BITMAP_ADDR16(vic2.bitmap, VIC2_RASTER_2_EMU(vic2.rasterline), p + 2) = c[data & 3]; \
-	fore_coll_buf[p + 2] = data & 3; data >>= 2; \
+	fore_coll_buf[p + 2] = data & 2; data >>= 2; \
 	*BITMAP_ADDR16(vic2.bitmap, VIC2_RASTER_2_EMU(vic2.rasterline), p + 1) = c[data]; \
-	fore_coll_buf[p + 1] = data & 3; \
+	fore_coll_buf[p + 1] = data & 2; \
 	*BITMAP_ADDR16(vic2.bitmap, VIC2_RASTER_2_EMU(vic2.rasterline), p + 0) = c[data]; \
-	fore_coll_buf[p + 0] = data & 3; \
+	fore_coll_buf[p + 0] = data & 2; \
 
 // Graphics display (8 pixels)
 #define DrawGraphics \
