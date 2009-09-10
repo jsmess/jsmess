@@ -7,6 +7,7 @@
 **********************************************************************/
 
 #include "driver.h"
+#include "mslegacy.h"
 #include "pc_turbo.h"
 
 
@@ -32,7 +33,7 @@ static TIMER_CALLBACK(pc_turbo_callback)
 	if (val != ti->cur_val)
 	{
 		ti->cur_val = val;
-		cpu_set_clockscale(machine->cpu[ti->cpunum], val ? ti->on_speed : ti->off_speed);
+		cpu_set_clockscale(cpu_get_by_index(machine, ti->cpunum), val ? ti->on_speed : ti->off_speed);
 	}
 }
 

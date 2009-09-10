@@ -73,4 +73,7 @@ enum
 /* uitext */
 const char * ui_getstring (int string_num);
 
+/* retrieves a CPU by index */
+const device_config *cpu_get_by_index(running_machine *machine, int index);
+
 #endif /* MSLEGACY_H */

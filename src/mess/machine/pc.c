@@ -116,7 +116,7 @@ static DMA8237_MEM_READ( pc_dma_read_byte )
 	offs_t page_offset = (((offs_t) dma_offset[0][channel]) << 16)
 		& 0x0F0000;
 
-	result = memory_read_byte( cpu_get_address_space( device->machine->cpu[0], ADDRESS_SPACE_PROGRAM ), page_offset + offset);
+	result = memory_read_byte( cpu_get_address_space( device->machine->firstcpu, ADDRESS_SPACE_PROGRAM ), page_offset + offset);
 	return result;
 }
 
@@ -126,7 +126,7 @@ static DMA8237_MEM_WRITE( pc_dma_write_byte )
 	offs_t page_offset = (((offs_t) dma_offset[0][channel]) << 16)
 		& 0x0F0000;
 
-	memory_write_byte( cpu_get_address_space( device->machine->cpu[0], ADDRESS_SPACE_PROGRAM ), page_offset + offset, data);
+	memory_write_byte( cpu_get_address_space( device->machine->firstcpu, ADDRESS_SPACE_PROGRAM ), page_offset + offset, data);
 }
 
 
@@ -189,7 +189,7 @@ const struct dma8237_interface ibm5150_dma8237_config =
 
 static PIC8259_SET_INT_LINE( pc_pic8259_set_int_line )
 {
-	cpu_set_input_line(device->machine->cpu[0], 0, interrupt ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->firstcpu, 0, interrupt ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -219,19 +219,19 @@ static emu_timer	*pc_int_delay_timer;
 
 static TIMER_CALLBACK( pcjr_delayed_pic8259_irq )
 {
-    cpu_set_input_line(machine->cpu[0], 0, param ? ASSERT_LINE : CLEAR_LINE);
+    cpu_set_input_line(machine->firstcpu, 0, param ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 static PIC8259_SET_INT_LINE( pcjr_pic8259_set_int_line )
 {
-	if ( cpu_get_reg( device->machine->cpu[0], REG_GENPC ) == 0xF0454 )
+	if ( cpu_get_reg( device->machine->firstcpu, REG_GENPC ) == 0xF0454 )
 	{
-		timer_adjust_oneshot( pc_int_delay_timer, cpu_clocks_to_attotime(device->machine->cpu[0], 1), interrupt );
+		timer_adjust_oneshot( pc_int_delay_timer, cpu_clocks_to_attotime(device->machine->firstcpu, 1), interrupt );
 	}
 	else
 	{
-		cpu_set_input_line(device->machine->cpu[0], 0, interrupt ? ASSERT_LINE : CLEAR_LINE);
+		cpu_set_input_line(device->machine->firstcpu, 0, interrupt ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -530,7 +530,7 @@ static void pcjr_set_keyb_int(running_machine *machine, int state)
 			pcjr_keyb.latch = 1;
 			if ( nmi_enabled & 0x80 )
 			{
-				cpu_set_input_line( pc_devices.pit8253->machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE );
+				cpu_set_input_line( pc_devices.pit8253->machine->firstcpu, INPUT_LINE_NMI, PULSE_LINE );
 			}
 		}
 	}
@@ -767,7 +767,7 @@ static WRITE8_DEVICE_HANDLER ( ibm5150_ppi_portb_w )
 
 	pc_ppi.clock_signal = ( pc_ppi.keyb_clock ) ? 1 : 0;
 
-	pc_ppi.clock_callback( cpu_get_address_space( device->machine->cpu[0], ADDRESS_SPACE_PROGRAM ), 0, pc_ppi.clock_signal );
+	pc_ppi.clock_callback( cpu_get_address_space( device->machine->firstcpu, ADDRESS_SPACE_PROGRAM ), 0, pc_ppi.clock_signal );
 
 	/* If PB7 is set clear the shift register and reset the IRQ line */
 	if ( pc_ppi.keyboard_clear )
@@ -919,7 +919,7 @@ static WRITE8_DEVICE_HANDLER( ibm5160_ppi_portb_w )
 	pc_speaker_set_spkrdata( device->machine, data & 0x02 );
 
 	pc_ppi.clock_signal = ( pc_ppi.keyb_clock ) ? 1 : 0;
-	pc_ppi.clock_callback( cpu_get_address_space( device->machine->cpu[0], ADDRESS_SPACE_PROGRAM ), 0, pc_ppi.clock_signal );
+	pc_ppi.clock_callback( cpu_get_address_space( device->machine->firstcpu, ADDRESS_SPACE_PROGRAM ), 0, pc_ppi.clock_signal );
 
 	/* If PB7 is set clear the shift register and reset the IRQ line */
 	if ( pc_ppi.keyboard_clear )
@@ -1230,8 +1230,8 @@ DRIVER_INIT( t1000hx )
 
 DRIVER_INIT( pc200 )
 {
-	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
-	const address_space *io_space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_IO );
+	const address_space *space = cpu_get_address_space( machine->firstcpu, ADDRESS_SPACE_PROGRAM );
+	const address_space *io_space = cpu_get_address_space( machine->firstcpu, ADDRESS_SPACE_IO );
 	UINT8 *gfx = &memory_region(machine, "gfx1")[0x8000];
 	int i;
 
@@ -1250,8 +1250,8 @@ DRIVER_INIT( pc200 )
 
 DRIVER_INIT( pc1512 )
 {
-	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
-	const address_space *io_space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_IO );
+	const address_space *space = cpu_get_address_space( machine->firstcpu, ADDRESS_SPACE_PROGRAM );
+	const address_space *io_space = cpu_get_address_space( machine->firstcpu, ADDRESS_SPACE_IO );
 	UINT8 *gfx = &memory_region(machine, "gfx1")[0x8000];
 	int i;
 
@@ -1279,9 +1279,9 @@ DRIVER_INIT( pcjr )
 
 static void pc_map_vga_memory(running_machine *machine, offs_t begin, offs_t end, read8_space_func rh, write8_space_func wh)
 {
-	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+	const address_space *space = cpu_get_address_space( machine->firstcpu, ADDRESS_SPACE_PROGRAM );
 	int buswidth;
-	buswidth = cpu_get_databus_width(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	buswidth = cpu_get_databus_width(machine->firstcpu, ADDRESS_SPACE_PROGRAM);
 	switch(buswidth)
 	{
 		case 8:
@@ -1316,7 +1316,7 @@ static const struct pc_vga_interface vga_interface =
 
 DRIVER_INIT( pc1640 )
 {
-	const address_space *io_space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_IO );
+	const address_space *io_space = cpu_get_address_space( machine->firstcpu, ADDRESS_SPACE_IO );
 
 	memory_install_read16_handler(io_space, 0x278, 0x27b, 0, 0, pc1640_16le_port278_r );
 	memory_install_read16_handler(io_space, 0x4278, 0x427b, 0, 0, pc1640_16le_port4278_r );

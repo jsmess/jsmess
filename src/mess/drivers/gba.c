@@ -36,7 +36,7 @@ INLINE void verboselog(running_machine *machine, int n_level, const char *s_fmt,
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror( "%08x: %s", cpu_get_pc(machine->cpu[0]), buf );
+		logerror( "%08x: %s", cpu_get_pc(machine->firstcpu), buf );
 	}
 }
 
@@ -86,8 +86,8 @@ static void gba_request_irq(running_machine *machine, UINT32 int_type)
 		// master enable?
 		if (gba_state->IME & 1)
 		{
-			cpu_set_input_line(machine->cpu[0], ARM7_IRQ_LINE, ASSERT_LINE);
-			cpu_set_input_line(machine->cpu[0], ARM7_IRQ_LINE, CLEAR_LINE);
+			cpu_set_input_line(machine->firstcpu, ARM7_IRQ_LINE, ASSERT_LINE);
+			cpu_set_input_line(machine->firstcpu, ARM7_IRQ_LINE, CLEAR_LINE);
 		}
 	}
 }
@@ -142,7 +142,7 @@ static void dma_exec(running_machine *machine, FPTR ch)
 	int ctrl;
 	int srcadd, dstadd;
 	UINT32 src, dst;
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cpu_get_address_space(machine->firstcpu, ADDRESS_SPACE_PROGRAM);
 	gba_state *gba_state = machine->driver_data;
 
 	src = gba_state->dma_src[ch];
@@ -1734,7 +1734,7 @@ static WRITE32_HANDLER( gba_io_w )
 				// if we still have interrupts, yank the IRQ line again
 				if (gba_state->IF)
 				{
-					timer_adjust_oneshot(gba_state->irq_timer, cpu_clocks_to_attotime(machine->cpu[0], 120), 0);
+					timer_adjust_oneshot(gba_state->irq_timer, cpu_clocks_to_attotime(machine->firstcpu, 120), 0);
 				}
 			}
 			break;
@@ -1777,7 +1777,7 @@ static WRITE32_HANDLER( gba_io_w )
 					gba_state->HALTCNT = data & 0x000000ff;
 
 					// either way, wait for an IRQ
-					cpu_spinuntil_int(machine->cpu[0]);
+					cpu_spinuntil_int(machine->firstcpu);
 				}
 			}
 			if( (mem_mask) & 0xffff0000 )
@@ -2265,7 +2265,7 @@ static WRITE32_HANDLER( eeprom_w )
 
 			if (gba_state->eeprom_bits == 0)
 			{
-				mame_printf_verbose("%08x: EEPROM: %02x to %x\n", cpu_get_pc(space->	machine->cpu[0]), gba_state->eep_data, gba_state->eeprom_addr );
+				mame_printf_verbose("%08x: EEPROM: %02x to %x\n", cpu_get_pc(space->	machine->firstcpu), gba_state->eep_data, gba_state->eeprom_addr );
 				gba_state->gba_eeprom[gba_state->eeprom_addr] = gba_state->eep_data;
 				gba_state->eeprom_addr++;
 				gba_state->eep_data = 0;
@@ -2304,13 +2304,13 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 
 			if (image_length(image) <= (16*1024*1024))
 			{
-				memory_install_read32_handler(cpu_get_address_space(image->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xd000000, 0xdffffff, 0, 0, eeprom_r);
-				memory_install_write32_handler(cpu_get_address_space(image->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xd000000, 0xdffffff, 0, 0, eeprom_w);
+				memory_install_read32_handler(cpu_get_address_space(image->machine->firstcpu, ADDRESS_SPACE_PROGRAM), 0xd000000, 0xdffffff, 0, 0, eeprom_r);
+				memory_install_write32_handler(cpu_get_address_space(image->machine->firstcpu, ADDRESS_SPACE_PROGRAM), 0xd000000, 0xdffffff, 0, 0, eeprom_w);
 			}
 			else
 			{
-				memory_install_read32_handler(cpu_get_address_space(image->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xdffff00, 0xdffffff, 0, 0, eeprom_r);
-				memory_install_write32_handler(cpu_get_address_space(image->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xdffff00, 0xdffffff, 0, 0, eeprom_w);
+				memory_install_read32_handler(cpu_get_address_space(image->machine->firstcpu, ADDRESS_SPACE_PROGRAM), 0xdffff00, 0xdffffff, 0, 0, eeprom_r);
+				memory_install_write32_handler(cpu_get_address_space(image->machine->firstcpu, ADDRESS_SPACE_PROGRAM), 0xdffff00, 0xdffffff, 0, 0, eeprom_w);
 			}
 			break;
 		}
@@ -2319,8 +2319,8 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 			nvptr = (UINT8 *)&gba_state->gba_sram;
 			nvsize = 0x10000;
 
-			memory_install_read32_handler(cpu_get_address_space(image->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe00ffff, 0, 0, sram_r);
-			memory_install_write32_handler(cpu_get_address_space(image->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe00ffff, 0, 0, sram_w);
+			memory_install_read32_handler(cpu_get_address_space(image->machine->firstcpu, ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe00ffff, 0, 0, sram_r);
+			memory_install_write32_handler(cpu_get_address_space(image->machine->firstcpu, ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe00ffff, 0, 0, sram_w);
 			break;
 		}
 		else if (!memcmp(&ROM[i], "FLASH1M_", 8))
@@ -2333,8 +2333,8 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 			nvptr = (UINT8 *)&gba_state->gba_flash64k;
 			nvsize = 0x10000;
 
-			memory_install_read32_handler(cpu_get_address_space(image->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe007fff, 0, 0, flash64k_r);
-			memory_install_write32_handler(cpu_get_address_space(image->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe007fff, 0, 0, flash64k_w);
+			memory_install_read32_handler(cpu_get_address_space(image->machine->firstcpu, ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe007fff, 0, 0, flash64k_r);
+			memory_install_write32_handler(cpu_get_address_space(image->machine->firstcpu, ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe007fff, 0, 0, flash64k_w);
 			break;
 		}
 		else if (!memcmp(&ROM[i], "SIIRTC_V", 8))
@@ -2431,7 +2431,7 @@ static DIRECT_UPDATE_HANDLER( gba_direct )
 
 static DRIVER_INIT(gbadv)
 {
-	memory_set_direct_update_handler( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), gba_direct );
+	memory_set_direct_update_handler( cpu_get_address_space(machine->firstcpu, ADDRESS_SPACE_PROGRAM), gba_direct );
 }
 
 /*    YEAR  NAME PARENT COMPAT MACHINE INPUT   INIT   CONFIG COMPANY     FULLNAME */

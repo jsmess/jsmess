@@ -71,7 +71,6 @@ enum
 
 /* maxima */
 #define MAX_GFX_ELEMENTS		32
-#define MAX_MEMORY_REGIONS		32
 
 
 /* MESS vs. MAME abstractions */
@@ -152,7 +151,7 @@ struct _running_machine
 	const input_port_config *portconfig;		/* points to a list of input port configurations */
 
 	/* CPU information */
-	const device_config *	cpu[8];				/* array of first 8 CPU devices */
+	const device_config *	firstcpu;			/* first CPU (allows for quick iteration via typenext) */
 
 	/* game-related information */
 	const game_driver *		gamedrv;			/* points to the definition of the game machine */
@@ -167,7 +166,7 @@ struct _running_machine
 	const pen_t *			pens;				/* remapped palette pen numbers */
 	struct _colortable_t *	colortable;			/* global colortable for remapping */
 	pen_t *					shadow_table;		/* table for looking up a shadowed pen */
-	bitmap_t *priority_bitmap;			/* priority bitmap */
+	bitmap_t *				priority_bitmap;	/* priority bitmap */
 
 	/* audio-related information */
 	int						sample_rate;		/* the digital audio sample rate */
@@ -269,6 +268,9 @@ void add_exit_callback(running_machine *machine, void (*callback)(running_machin
 
 /* handle update tasks for a frame boundary */
 void mame_frame_update(running_machine *machine);
+
+/* return true if the given machine is valid */
+int mame_is_valid_machine(running_machine *machine);
 
 
 

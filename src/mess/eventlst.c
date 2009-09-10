@@ -66,7 +66,7 @@ void    EventList_AddItemOffset(running_machine *machine, int ID, int Data, int 
 {
 
         if (!CyclesPerFrame)
-                CyclesPerFrame = (int)(cpu_get_clock(machine->cpu[0]) / video_screen_get_frame_period(machine->primary_screen).attoseconds);	//totalcycles();	//_(int)(cpunum_get_clock(0) / machine->config->frames_per_second);
+                CyclesPerFrame = (int)(cpu_get_clock(machine->firstcpu) / video_screen_get_frame_period(machine->primary_screen).attoseconds);	//totalcycles();	//_(int)(cpunum_get_clock(0) / machine->config->frames_per_second);
 
         if (NumEvents < TotalEvents)
         {

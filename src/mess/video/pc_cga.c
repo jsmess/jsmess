@@ -467,14 +467,14 @@ static int internal_pc_cga_video_start(running_machine *machine, int personality
 static VIDEO_START( pc_cga )
 {
 	int buswidth;
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	const address_space *spaceio = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO);
+	const address_space *space = cpu_get_address_space(machine->firstcpu, ADDRESS_SPACE_PROGRAM);
+	const address_space *spaceio = cpu_get_address_space(machine->firstcpu, ADDRESS_SPACE_IO);
 
 	/* Changed video RAM size to full 32k, for cards which support the
 	 * Plantronics chipset.
 	 * TODO: Cards which don't support Plantronics should repeat at
 	 * BC000h */
-	buswidth = cpu_get_databus_width(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	buswidth = cpu_get_databus_width(machine->firstcpu, ADDRESS_SPACE_PROGRAM);
 	switch(buswidth)
 	{
 		case 8:

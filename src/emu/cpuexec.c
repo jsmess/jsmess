@@ -422,7 +422,10 @@ const char *cpuexec_describe_context(running_machine *machine)
 
 	/* if we have an executing CPU, output data */
 	if (executingcpu != NULL)
-		sprintf(global->statebuf, "'%s' (%08X)", executingcpu->tag, cpu_get_pc(executingcpu));
+	{
+		const address_space *space = cpu_get_address_space(executingcpu, ADDRESS_SPACE_PROGRAM);
+		sprintf(global->statebuf, "'%s' (%s)", executingcpu->tag, core_i64_hex_format(cpu_get_pc(executingcpu), space->logaddrchars));
+	}
 	else
 		strcpy(global->statebuf, "(no context)");
 
@@ -459,10 +462,6 @@ static DEVICE_START( cpu )
 	config = (const cpu_config *)device->inline_config;
 	header = cpu_get_class_header(device);
 	classdata = get_class_data(device);
-
-	/* add ourself to the global array */
-	if (index < ARRAY_LENGTH(device->machine->cpu))
-		device->machine->cpu[index] = device;
 
 	/* build the header */
 	header->debug = NULL;
@@ -1113,7 +1112,7 @@ void cpuexec_trigger(running_machine *machine, int trigger)
 	const device_config *cpu;
 
 	/* look for suspended CPUs waiting for this trigger and unsuspend them */
-	for (cpu = machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
+	for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
 	{
 		cpu_class_data *classdata = get_class_data(cpu);
 
@@ -1306,14 +1305,15 @@ static void update_clock_information(const device_config *device)
 
 static void compute_perfect_interleave(running_machine *machine)
 {
-	if (machine->cpu[0] != NULL)
+	const device_config *firstcpu = machine->firstcpu;
+	if (firstcpu != NULL)
 	{
-		attoseconds_t smallest = get_minimum_quantum(machine->cpu[0]);
+		attoseconds_t smallest = get_minimum_quantum(firstcpu);
 		attoseconds_t perfect = ATTOSECONDS_PER_SECOND - 1;
 		const device_config *cpu;
 
 		/* start with a huge time factor and find the 2nd smallest cycle time */
-		for (cpu = machine->cpu[0]->typenext; cpu != NULL; cpu = cpu->typenext)
+		for (cpu = cpu_next(firstcpu); cpu != NULL; cpu = cpu_next(cpu))
 		{
 			attoseconds_t curquantum = get_minimum_quantum(cpu);
 
@@ -1348,7 +1348,7 @@ static void on_vblank(const device_config *device, void *param, int vblank_state
 		const device_config *cpu;
 
 		/* find any CPUs that have this screen as their VBLANK interrupt source */
-		for (cpu = device->machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
+		for (cpu = device->machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
 		{
 			const cpu_config *config = (const cpu_config *)cpu->inline_config;
 			cpu_class_data *classdata = get_class_data(cpu);
@@ -1616,7 +1616,7 @@ static void rebuild_execute_list(running_machine *machine)
 	*tailptr = NULL;
 
 	/* first iterate over non-suspended CPUs */
-	for (curcpu = machine->cpu[0]; curcpu != NULL; curcpu = curcpu->typenext)
+	for (curcpu = machine->firstcpu; curcpu != NULL; curcpu = cpu_next(curcpu))
 	{
 		cpu_class_data *classdata = get_class_data(curcpu);
 		if (classdata->suspend == 0)
@@ -1628,7 +1628,7 @@ static void rebuild_execute_list(running_machine *machine)
 	}
 
 	/* then add the suspended CPUs */
-	for (curcpu = machine->cpu[0]; curcpu != NULL; curcpu = curcpu->typenext)
+	for (curcpu = machine->firstcpu; curcpu != NULL; curcpu = cpu_next(curcpu))
 	{
 		cpu_class_data *classdata = get_class_data(curcpu);
 		if (classdata->suspend != 0)

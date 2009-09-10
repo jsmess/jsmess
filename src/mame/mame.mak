@@ -1568,7 +1568,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/murogem.o \
 	$(DRIVERS)/murogmbl.o \
 	$(DRIVERS)/news.o $(VIDEO)/news.o \
-	$(DRIVERS)/norautp.o \
+	$(DRIVERS)/norautp.o  $(AUDIO)/norautp.o \
 	$(DRIVERS)/oneshot.o $(VIDEO)/oneshot.o \
 	$(DRIVERS)/onetwo.o \
 	$(DRIVERS)/othldrby.o $(VIDEO)/othldrby.o \
@@ -1580,6 +1580,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/pcxt.o \
 	$(DRIVERS)/peplus.o \
 	$(DRIVERS)/photon.o $(VIDEO)/pk8000.o \
+	$(DRIVERS)/photon2.o \
 	$(DRIVERS)/pipeline.o \
 	$(DRIVERS)/photoply.o \
 	$(DRIVERS)/pkscram.o \

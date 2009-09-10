@@ -393,7 +393,7 @@ static MACHINE_RESET( cdi )
 static INTERRUPT_GEN( cdi_irq )
 {
 //  if(input_code_pressed(KEYCODE_Z))
-//      cpu_set_input_line(device->machine->cpu[0], 1, HOLD_LINE);
+//      cpu_set_input_line(device->machine->firstcpu, 1, HOLD_LINE);
 //  ram[0x2004/2]^=0xffff;
 }
 

@@ -511,7 +511,7 @@ static TIMER_CALLBACK(pc_hdc_command)
 	{
 		command_name = hdc_command_names[cmd] ? hdc_command_names[cmd] : "Unknown";
 		logerror("pc_hdc_command(): Executing command; pc=0x%08x cmd=0x%02x (%s) drv=%d\n",
-			(unsigned) cpu_get_reg(machine->cpu[0], REG_GENPC), cmd, command_name, drv);
+			(unsigned) cpu_get_reg(machine->firstcpu, REG_GENPC), cmd, command_name, drv);
 	}
 
 	switch (cmd)
@@ -549,7 +549,7 @@ static TIMER_CALLBACK(pc_hdc_command)
 			if (LOG_HDC_STATUS)
 			{
 				logerror("hdc read pc=0x%08x INDEX #%d D:%d C:%d H:%d S:%d N:%d CTL:$%02x\n",
-					(unsigned) cpu_get_reg(machine->cpu[0], REG_GENPC), idx, drv, cylinder[idx], head[idx], sector[idx], sector_cnt[idx], control[idx]);
+					(unsigned) cpu_get_reg(machine->firstcpu, REG_GENPC), idx, drv, cylinder[idx], head[idx], sector[idx], sector_cnt[idx], control[idx]);
 			}
 
 			if (test_ready(machine, n))
@@ -564,7 +564,7 @@ static TIMER_CALLBACK(pc_hdc_command)
 			if (LOG_HDC_STATUS)
 			{
 				logerror("hdc write pc=0x%08x INDEX #%d D:%d C:%d H:%d S:%d N:%d CTL:$%02x\n",
-					(unsigned) cpu_get_reg(machine->cpu[0], REG_GENPC), idx, drv, cylinder[idx], head[idx], sector[idx], sector_cnt[idx], control[idx]);
+					(unsigned) cpu_get_reg(machine->firstcpu, REG_GENPC), idx, drv, cylinder[idx], head[idx], sector[idx], sector_cnt[idx], control[idx]);
 			}
 
 			if (test_ready(machine, n))
@@ -673,7 +673,7 @@ static void pc_hdc_data_w(running_machine *machine, int n, int data)
 		if (--data_cnt == 0)
 		{
 			if (LOG_HDC_STATUS)
-				logerror("pc_hdc_data_w(): Launching command; pc=0x%08x\n", (unsigned) cpu_get_reg(machine->cpu[0], REG_GENPC));
+				logerror("pc_hdc_data_w(): Launching command; pc=0x%08x\n", (unsigned) cpu_get_reg(machine->firstcpu, REG_GENPC));
 
             status[n] &= ~STA_COMMAND;
 			status[n] &= ~STA_REQUEST;
@@ -715,7 +715,7 @@ static void pc_hdc_control_w(running_machine *machine, int n, int data)
 	int irq = irq = (dip[n] & 0x40) ? 5 : 2;
 
 	if (LOG_HDC_STATUS)
-		logerror("pc_hdc_control_w(): Control write pc=0x%08x data=%d\n", (unsigned) cpu_get_reg(machine->cpu[0], REG_GENPC), data);
+		logerror("pc_hdc_control_w(): Control write pc=0x%08x data=%d\n", (unsigned) cpu_get_reg(machine->firstcpu, REG_GENPC), data);
 
 	hdc_control = data;
 
@@ -797,7 +797,7 @@ static UINT8 pc_HDC_r(running_machine *machine, int chip, offs_t offs)
 	}
 
 	if (LOG_HDC_CALL)
-		logerror("pc_HDC_r(): pc=%06X chip=%d offs=%d result=0x%02x\n", cpu_get_pc(machine->cpu[0]), chip, offs, data);
+		logerror("pc_HDC_r(): pc=%06X chip=%d offs=%d result=0x%02x\n", cpu_get_pc(machine->firstcpu), chip, offs, data);
 
 	return data;
 }
@@ -807,7 +807,7 @@ static UINT8 pc_HDC_r(running_machine *machine, int chip, offs_t offs)
 static void pc_HDC_w(running_machine *machine, int chip, offs_t offs, UINT8 data)
 {
 	if (LOG_HDC_CALL)
-		logerror("pc_HDC_w(): pc=%06X chip=%d offs=%d data=0x%02x\n", cpu_get_pc(machine->cpu[0]), chip, offs, data);
+		logerror("pc_HDC_w(): pc=%06X chip=%d offs=%d data=0x%02x\n", cpu_get_pc(machine->firstcpu), chip, offs, data);
 
 	switch( offs )
 	{

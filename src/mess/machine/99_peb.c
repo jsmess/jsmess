@@ -379,7 +379,7 @@ READ16_HANDLER ( ti99_4x_peb_r )
 	int reply = 0;
 	read8_space_func handler;
 
-	cpu_adjust_icount(space->machine->cpu[0],-4);
+	cpu_adjust_icount(space->machine->firstcpu,-4);
 
 	if (active_card != -1)
 	{
@@ -401,7 +401,7 @@ WRITE16_HANDLER ( ti99_4x_peb_w )
 {
 	write8_space_func handler;
 
-	cpu_adjust_icount(space->machine->cpu[0],-4);
+	cpu_adjust_icount(space->machine->firstcpu,-4);
 
 	/* simulate byte write */
 	data = (tmp_buffer & ~mem_mask) | (data & mem_mask);
@@ -475,7 +475,7 @@ WRITE8_HANDLER ( geneve_peb_cru_w )
 	int reply = 0;
 	read8_space_func handler;
 
-	cpu_adjust_icount(space->machine->cpu[0],-8);
+	cpu_adjust_icount(space->machine->firstcpu,-8);
 
 	if (active_card != -1)
 	{
@@ -494,7 +494,7 @@ WRITE8_HANDLER ( geneve_peb_w )
 {
 	write8_space_func handler;
 
-	cpu_adjust_icount(space->machine->cpu[0],-8);
+	cpu_adjust_icount(space->machine->firstcpu,-8);
 
 	if (active_card != -1)
 	{
@@ -561,7 +561,7 @@ WRITE8_HANDLER ( ti99_8_peb_cru_w )
 	int reply = 0;
 	read8_space_func handler;
 
-	cpu_adjust_icount(space->machine->cpu[0],-4);
+	cpu_adjust_icount(space->machine->firstcpu,-4);
 
 	if (active_card != -1)
 	{
@@ -580,7 +580,7 @@ WRITE8_HANDLER ( ti99_8_peb_w )
 {
 	write8_space_func handler;
 
-	cpu_adjust_icount(space->machine->cpu[0],-4);
+	cpu_adjust_icount(space->machine->firstcpu,-4);
 
 	if (active_card != -1)
 	{
@@ -668,13 +668,13 @@ READ16_HANDLER ( ti99_4p_peb_r )
 
 
 	if (active_card == -1)
-		cpu_adjust_icount(space->machine->cpu[0],-4);	/* ??? */
+		cpu_adjust_icount(space->machine->firstcpu,-4);	/* ??? */
 	else
 	{
 
 		if (ti99_4p_expansion_ports[active_card].width == width_8bit)
 		{
-			cpu_adjust_icount(space->machine->cpu[0],-4);
+			cpu_adjust_icount(space->machine->firstcpu,-4);
 
 			handler = ti99_4p_expansion_ports[active_card].w.width_8bit.mem_read;
 			if (handler)
@@ -685,7 +685,7 @@ READ16_HANDLER ( ti99_4p_peb_r )
 		}
 		else
 		{
-			cpu_adjust_icount(space->machine->cpu[0],-1);	/* ??? */
+			cpu_adjust_icount(space->machine->firstcpu,-1);	/* ??? */
 
 			handler16 = ti99_4p_expansion_ports[active_card].w.width_16bit.mem_read;
 			if (handler16)
@@ -717,7 +717,7 @@ WRITE16_HANDLER ( ti99_4p_peb_w )
 	write16_space_func handler16;
 
 	if (active_card == -1)
-		cpu_adjust_icount(space->machine->cpu[0],-4);	/* ??? */
+		cpu_adjust_icount(space->machine->firstcpu,-4);	/* ??? */
 	else
 	{
 		/* simulate byte write */
@@ -725,7 +725,7 @@ WRITE16_HANDLER ( ti99_4p_peb_w )
 
 		if (ti99_4p_expansion_ports[active_card].width == width_8bit)
 		{
-			cpu_adjust_icount(space->machine->cpu[0],-4);
+			cpu_adjust_icount(space->machine->firstcpu,-4);
 
 			handler = ti99_4p_expansion_ports[active_card].w.width_8bit.mem_write;
 			if (handler)
@@ -736,7 +736,7 @@ WRITE16_HANDLER ( ti99_4p_peb_w )
 		}
 		else
 		{
-			cpu_adjust_icount(space->machine->cpu[0],-1);	/* ??? */
+			cpu_adjust_icount(space->machine->firstcpu,-1);	/* ??? */
 
 			handler16 = ti99_4p_expansion_ports[active_card].w.width_16bit.mem_write;
 			if (handler16)

@@ -5,6 +5,7 @@
 */
 
 #include "machine/hd63450.h"
+#include "mslegacy.h"
 
 typedef struct _hd63450_regs hd63450_regs;
 struct _hd63450_regs
@@ -231,7 +232,7 @@ void hd63450_write(const device_config* device, int offset, int data, UINT16 mem
 
 static void dma_transfer_start(const device_config* device, int channel, int dir)
 {
-	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cpu_get_address_space(device->machine->firstcpu, ADDRESS_SPACE_PROGRAM);
 	hd63450_t* dmac = device->token;
 	dmac->in_progress[channel] = 1;
 	dmac->reg[channel].csr &= ~0xe0;
@@ -249,7 +250,7 @@ static void dma_transfer_start(const device_config* device, int channel, int dir
 	// Burst transfers will halt the CPU until the transfer is complete
 	if((dmac->reg[channel].dcr & 0xc0) == 0x00)  // Burst transfer
 	{
-		cpu_set_input_line(device->machine->cpu[dmac->intf->cpu],INPUT_LINE_HALT,ASSERT_LINE);
+		cpu_set_input_line(cpu_get_by_index(device->machine, dmac->intf->cpu), INPUT_LINE_HALT,ASSERT_LINE);
 		timer_adjust_periodic(dmac->timer[channel], attotime_zero, channel, dmac->burst_clock[channel]);
 	}
 	else
@@ -307,7 +308,7 @@ static void dma_transfer_continue(const device_config* device, int channel)
 
 void hd63450_single_transfer(const device_config* device, int x)
 {
-	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cpu_get_address_space(device->machine->firstcpu, ADDRESS_SPACE_PROGRAM);
 	int data;
 	int datasize = 1;
 	hd63450_t* dmac = device->token;
@@ -427,7 +428,7 @@ void hd63450_single_transfer(const device_config* device, int x)
 				dmac->reg[x].csr |= 0xe0;  // channel operation complete, block transfer complete
 				dmac->reg[x].csr &= ~0x08;  // channel no longer active
 				if((dmac->reg[x].dcr & 0xc0) == 0x00)  // Burst transfer
-					cpu_set_input_line(device->machine->cpu[dmac->intf->cpu],INPUT_LINE_HALT,CLEAR_LINE);
+					cpu_set_input_line(cpu_get_by_index(device->machine, dmac->intf->cpu), INPUT_LINE_HALT,CLEAR_LINE);
 
 				if(dmac->intf->dma_end)
 					dmac->intf->dma_end(device->machine,x,dmac->reg[x].ccr & 0x08);

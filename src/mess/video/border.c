@@ -341,5 +341,5 @@ void draw_border(running_machine *machine, bitmap_t *bitmap,
 
 	/* Assume all other routines have processed their data from the list */
 	EventList_Reset();
-	EventList_SetOffsetStartTime ( cpu_attotime_to_clocks(machine->cpu[0], attotime_mul(video_screen_get_scan_period(machine->primary_screen), video_screen_get_vpos(machine->primary_screen))) );
+	EventList_SetOffsetStartTime ( cpu_attotime_to_clocks(machine->firstcpu, attotime_mul(video_screen_get_scan_period(machine->primary_screen), video_screen_get_vpos(machine->primary_screen))) );
 }

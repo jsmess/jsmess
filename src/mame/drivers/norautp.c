@@ -17,6 +17,10 @@
    * Noraut Poker (bootleg),       198?,  Unknown.
 
 
+  Special thanks to Alan Griffin, that kindly helped providing good references
+  that allowed me to improve the system emulation.
+
+
 *******************************************************************************
 
 
@@ -250,8 +254,8 @@
   R2 = 2.2 K ; Tolerance +/- 5%
   R3 = 1 K   ; Tolerance +/- 5%
 
-  C1 = 223J = 22000 pF  =  22 nF = 0.022 uF ; Tolerance +/- 5%
-  C2 = 103J = 10000 pF  =  10 nF = 0.01 uF  ; Tolerance +/- 5%
+  C1 = 103J = 10000 pF  =  10 nF = 0.01 uF  ; Tolerance +/- 5%
+  C2 = 223J = 22000 pF  =  22 nF = 0.022 uF ; Tolerance +/- 5%
   C3 = 473J = 47000 pF  =  47 nF = 0.047 uF ; Tolerance +/- 5%
   C4 = 103J = 10000 pF  =  10 nF = 0.01 uF  ; Tolerance +/- 5%
 
@@ -475,7 +479,7 @@
   - Fixed the screen aspect and visible area.
   - Confirmed correct colors. No bipolar PROM involved.
   - Added Noraut Joker Poker hardware and PCB layouts.
-  - Documented the discrete audio circuitery. Added a full diagram.
+  - Documented the discrete audio circuitry. Added a full diagram.
 
 
   [2009-08-29]
@@ -514,11 +518,16 @@
     It has 2 jumpers that cut the a14 and a15 addressing lines.
 
 
+  [2009-09-09]
+
+  - Added accurate discrete sound system emulation.
+  - Fixed the discrete sound system diagram, based on real sound references.
+
+
   TODO:
 
   - Analize PPI-2 at 0xc0-0xc3. OBF handshake line (PC7) doesn't seems to work properly.
   - Find if wide chars are hardcoded or tied to a bit.
-  - Discrete sound.
   - Save support.
 
 
@@ -531,7 +540,7 @@
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "machine/8255ppi.h"
-#include "sound/dac.h"
+#include "norautp.h"
 
 #include "noraut11.lh"
 #include "noraut12.lh"
@@ -646,11 +655,17 @@ static WRITE8_DEVICE_HANDLER( soundlamps_w )
   ---- x---  + PANEL LAMPS CLOCK
   xxxx ----  * Discrete Sound Lines.
 */
+
+	const device_config *discrete = devtag_get_device(device->machine, "discrete");
+
 	output_set_lamp_value(8, (data >> 0) & 1);	/* DEAL / DRAW lamp */
 	output_set_lamp_value(9, (data >> 1) & 1);	/* BET / COLLECT lamp */
 
 	/* the 4 MSB are for discrete sound */
-	dac_data_w(devtag_get_device(device->machine, "dac"), (data & 0xf0));	/* Discrete Sound */
+	discrete_sound_w(discrete, NORAUTP_SND_EN, (data >> 7) & 0x01);
+	discrete_sound_w(discrete, NORAUTP_FREQ_DATA, (data >> 4) & 0x07);
+
+//  popmessage("sound bits 4-5-6-7: %02x, %02x, %02x, %02x", ((data >> 4) & 0x01), ((data >> 5) & 0x01), ((data >> 6) & 0x01), ((data >> 7) & 0x01));
 }
 
 static WRITE8_DEVICE_HANDLER( counterlamps_w )
@@ -1059,8 +1074,9 @@ static MACHINE_DRIVER_START( norautp )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
+	MDRV_SOUND_CONFIG_DISCRETE(norautp)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( norautxp )
@@ -1316,12 +1332,12 @@ static DRIVER_INIT( gtipoker )
 *************************/
 
 /*     YEAR  NAME      PARENT   MACHINE   INPUT     INIT      ROT    COMPANY        FULLNAME                       FLAGS                              LAYOUT */
-GAMEL( 1988, norautp,  0,       norautp,  norautp,  0,        ROT0, "Noraut Ltd.", "Noraut Poker",                 GAME_NO_SOUND,                     layout_noraut11 )
-GAMEL( 1988, norautjp, norautp, norautp,  norautp,  0,        ROT0, "Noraut Ltd.", "Noraut Joker Poker",           GAME_NO_SOUND,                     layout_noraut11 )
-GAMEL( 1988, norautrh, 0,       norautp,  norautrh, norautrh, ROT0, "Noraut Ltd.", "Noraut Red Hot Joker Poker",   GAME_NO_SOUND,                     layout_noraut12 )
-GAME(  1988, norautu,  0,       norautxp, norautp,  0,        ROT0, "Noraut Ltd.", "Noraut Poker (NTX10A)",        GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME(  1988, norautv3, 0,       norautxp, norautp,  0,        ROT0, "Noraut Ltd.", "Noraut Joker Poker (V3.010a)", GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME(  1983, gtipoker, 0,       gtipoker, norautpn, gtipoker, ROT0, "GTI Inc",     "GTI Poker",                    GAME_NO_SOUND | GAME_NOT_WORKING )
+GAMEL( 1988, norautp,  0,       norautp,  norautp,  0,        ROT0, "Noraut Ltd.", "Noraut Poker",                 0,                     layout_noraut11 )
+GAMEL( 1988, norautjp, norautp, norautp,  norautp,  0,        ROT0, "Noraut Ltd.", "Noraut Joker Poker",           0,                     layout_noraut11 )
+GAMEL( 1988, norautrh, 0,       norautp,  norautrh, norautrh, ROT0, "Noraut Ltd.", "Noraut Red Hot Joker Poker",   0,                     layout_noraut12 )
+GAME(  1988, norautu,  0,       norautxp, norautp,  0,        ROT0, "Noraut Ltd.", "Noraut Poker (NTX10A)",        GAME_NOT_WORKING )
+GAME(  1988, norautv3, 0,       norautxp, norautp,  0,        ROT0, "Noraut Ltd.", "Noraut Joker Poker (V3.010a)", GAME_NOT_WORKING )
+GAME(  1983, gtipoker, 0,       gtipoker, norautpn, gtipoker, ROT0, "GTI Inc",     "GTI Poker",                    GAME_NOT_WORKING )
 
 /*The following has everything uncertain, seems a bootleg/hack and doesn't have any identification strings in program rom. */
-GAMEL( 198?, norautpn, norautp, norautp,  norautpn, norautpn, ROT0, "bootleg?",    "Noraut Poker (bootleg)",       GAME_NO_SOUND,                     layout_noraut12 )
+GAMEL( 198?, norautpn, norautp, norautp,  norautpn, norautpn, ROT0, "bootleg?",    "Noraut Poker (bootleg)",       0,                     layout_noraut12 )

@@ -94,7 +94,7 @@ WRITE8_HANDLER(ncr5380_w)
 	int reg = offset & 7;
 
 	if (VERBOSE)
-		logerror("NCR5380: %02x to %s (reg %d) [PC=%x]\n", data, wnames[reg], reg, cpu_get_pc(space->machine->cpu[0]));
+		logerror("NCR5380: %02x to %s (reg %d) [PC=%x]\n", data, wnames[reg], reg, cpu_get_pc(space->machine->firstcpu));
 
 	switch( reg )
 	{
@@ -354,7 +354,7 @@ READ8_HANDLER(ncr5380_r)
 	}
 
 	if (VERBOSE)
-		logerror("NCR5380: read %s (reg %d) = %02x [PC=%x]\n", rnames[reg], reg, rv, cpu_get_pc(space->machine->cpu[0]));
+		logerror("NCR5380: read %s (reg %d) = %02x [PC=%x]\n", rnames[reg], reg, rv, cpu_get_pc(space->machine->firstcpu));
 
 	return rv;
 }

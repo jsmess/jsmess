@@ -264,7 +264,7 @@ int sony_read_status(const device_config *device)
 	if (LOG_SONY_EXTRA)
 	{
 		logerror("sony_status(): action=%d pc=0x%08x%s\n",
-			action, (int) cpu_get_pc(device->machine->cpu[0]), sony_floppy_enable ? "" : " (no drive enabled)");
+			action, (int) cpu_get_pc(device->machine->firstcpu), sony_floppy_enable ? "" : " (no drive enabled)");
 	}
 
 	if ((! sony_enable2()) && sony_floppy_enable)
@@ -319,7 +319,7 @@ int sony_read_status(const device_config *device)
 				result = floppy_get_heads_per_disk(flopimg_get_image(cur_image)) - 1;
 			break;
 		case 0x0a:	/* At track 0: 0=track zero 1=not track zero */
-			logerror("sony_status(): reading Track 0 pc=0x%08x\n", (int) cpu_get_pc(device->machine->cpu[0]));
+			logerror("sony_status(): reading Track 0 pc=0x%08x\n", (int) cpu_get_pc(device->machine->firstcpu));
 			if (cur_image)
 				result = floppy_drive_get_flag_state(cur_image, FLOPPY_DRIVE_HEAD_AT_TRACK_0) ? 0 : 1;
 			else
@@ -375,7 +375,7 @@ static void sony_doaction(const device_config *device)
 	if (LOG_SONY)
 	{
 		logerror("sony_doaction(): action=%d pc=0x%08x%s\n",
-			action, (int) cpu_get_pc(device->machine->cpu[0]), (sony_floppy_enable) ? "" : " (MOTOR OFF)");
+			action, (int) cpu_get_pc(device->machine->firstcpu), (sony_floppy_enable) ? "" : " (MOTOR OFF)");
 	}
 
 	if (sony_floppy_enable)

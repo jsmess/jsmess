@@ -40,7 +40,6 @@ static UINT8 interrupt_enable[8];
 
 
 
-
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
@@ -48,6 +47,23 @@ static UINT8 interrupt_enable[8];
 static void counters_load(running_machine *machine, int config_type, xml_data_node *parentnode);
 static void counters_save(running_machine *machine, int config_type, xml_data_node *parentnode);
 static void interrupt_reset(running_machine *machine);
+
+
+
+/***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
+
+/*-------------------------------------------------
+    interrupt_enabled - return true if interrupts
+    are enabled for the given CPU
+-------------------------------------------------*/
+
+INLINE int interrupt_enabled(const device_config *device)
+{
+	int cpunum = cpu_get_index(device);
+	return (cpunum >= ARRAY_LENGTH(interrupt_enable) || interrupt_enable[cpunum]);
+}
 
 
 
@@ -128,7 +144,7 @@ static void counters_load(running_machine *machine, int config_type, xml_data_no
 		return;
 
 	/* might not have any data */
-	if (!parentnode)
+	if (parentnode == NULL)
 		return;
 
 	/* iterate over coins nodes */
@@ -141,7 +157,7 @@ static void counters_load(running_machine *machine, int config_type, xml_data_no
 
 	/* get the single tickets node */
 	ticketnode = xml_get_sibling(parentnode->child, "tickets");
-	if (ticketnode)
+	if (ticketnode != NULL)
 		dispensed_tickets = xml_get_attribute_int(ticketnode, "number", 0);
 }
 
@@ -164,7 +180,7 @@ static void counters_save(running_machine *machine, int config_type, xml_data_no
 		if (coin_count[i] != 0)
 		{
 			xml_data_node *coinnode = xml_add_child(parentnode, "coins", NULL);
-			if (coinnode)
+			if (coinnode != NULL)
 			{
 				xml_set_attribute_int(coinnode, "index", i);
 				xml_set_attribute_int(coinnode, "number", coin_count[i]);
@@ -175,7 +191,7 @@ static void counters_save(running_machine *machine, int config_type, xml_data_no
 	if (dispensed_tickets != 0)
 	{
 		xml_data_node *tickets = xml_add_child(parentnode, "tickets", NULL);
-		if (tickets)
+		if (tickets != NULL)
 			xml_set_attribute_int(tickets, "number", dispensed_tickets);
 	}
 }
@@ -185,14 +201,14 @@ static void counters_save(running_machine *machine, int config_type, xml_data_no
     coin_counter_w - sets input for coin counter
 -------------------------------------------------*/
 
-void coin_counter_w(int num,int on)
+void coin_counter_w(int num, int on)
 {
-	if (num >= COIN_COUNTERS) return;
+	if (num >= COIN_COUNTERS)
+		return;
+
 	/* Count it only if the data has changed from 0 to non-zero */
 	if (on && (lastcoin[num] == 0))
-	{
 		coin_count[num]++;
-	}
 	lastcoin[num] = on;
 }
 
@@ -203,8 +219,8 @@ void coin_counter_w(int num,int on)
 
 void coin_lockout_w(int num,int on)
 {
-	if (num >= COIN_COUNTERS) return;
-
+	if (num >= COIN_COUNTERS)
+		return;
 	coinlockedout[num] = on;
 }
 
@@ -219,9 +235,7 @@ void coin_lockout_global_w(int on)
 	int i;
 
 	for (i = 0; i < COIN_COUNTERS; i++)
-	{
-		coin_lockout_w(i,on);
-	}
+		coin_lockout_w(i, on);
 }
 
 
@@ -237,13 +251,13 @@ void coin_lockout_global_w(int on)
 
 INLINE void *nvram_select(void)
 {
-	if (generic_nvram)
+	if (generic_nvram != NULL)
 		return generic_nvram;
-	if (generic_nvram16)
+	if (generic_nvram16 != NULL)
 		return generic_nvram16;
-	if (generic_nvram32)
+	if (generic_nvram32 != NULL)
 		return generic_nvram32;
-	if (generic_nvram64)
+	if (generic_nvram64 != NULL)
 		return generic_nvram64;
 	fatalerror("generic nvram handler called without nvram in the memory map");
 	return 0;
@@ -277,12 +291,14 @@ void nvram_load(running_machine *machine)
 	mame_file *nvram_file = NULL;
 	const device_config *device;
 
+	/* read data from general NVRAM handler first */
 	if (machine->config->nvram_handler != NULL)
 	{
 		nvram_file = nvram_fopen(machine, OPEN_FLAG_READ);
 		(*machine->config->nvram_handler)(machine, nvram_file, 0);
 	}
 
+	/* find all devices with NVRAM handlers, and read from them next */
 	for (device = machine->config->devicelist; device != NULL; device = device->next)
 	{
 		device_nvram_func nvram = (device_nvram_func)device_get_info_fct(device, DEVINFO_FCT_NVRAM);
@@ -308,12 +324,14 @@ void nvram_save(running_machine *machine)
 	mame_file *nvram_file = NULL;
 	const device_config *device;
 
+	/* write data from general NVRAM handler first */
 	if (machine->config->nvram_handler != NULL)
 	{
 		nvram_file = nvram_fopen(machine, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 		(*machine->config->nvram_handler)(machine, nvram_file, 1);
 	}
 
+	/* find all devices with NVRAM handlers, and write them next */
 	for (device = machine->config->devicelist; device != NULL; device = device->next)
 	{
 		device_nvram_func nvram = (device_nvram_func)device_get_info_fct(device, DEVINFO_FCT_NVRAM);
@@ -568,7 +586,7 @@ static void interrupt_reset(running_machine *machine)
 	int cpunum;
 
 	/* on a reset, enable all interrupts */
-	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
+	for (cpunum = 0; cpunum < ARRAY_LENGTH(interrupt_enable); cpunum++)
 		interrupt_enable[cpunum] = 1;
 }
 
@@ -645,7 +663,8 @@ void cpu_interrupt_enable(const device_config *device, int enabled)
 	assert_always(device != NULL, "cpu_interrupt_enable() called for invalid cpu!");
 
 	/* set the new state */
-	interrupt_enable[cpunum] = enabled;
+	if (cpunum < ARRAY_LENGTH(interrupt_enable))
+		interrupt_enable[cpunum] = enabled;
 
 	/* make sure there are no queued interrupts */
 	if (enabled == 0)
@@ -671,7 +690,7 @@ WRITE8_HANDLER( interrupt_enable_w )
 
 READ8_HANDLER( interrupt_enable_r )
 {
-	return interrupt_enable[cpu_get_index(space->cpu)];
+	return interrupt_enabled(space->cpu);
 }
 
 
@@ -681,60 +700,48 @@ READ8_HANDLER( interrupt_enable_r )
 ***************************************************************************/
 
 /*-------------------------------------------------
-    irqn_line_set - set the given IRQ line to the
-    specified state on the active CPU
--------------------------------------------------*/
-
-INLINE void irqn_line_set(const device_config *device, int line, int state)
-{
-	if (interrupt_enable[cpu_get_index(device)])
-		cpu_set_input_line(device, line, state);
-}
-
-
-/*-------------------------------------------------
     NMI callbacks
 -------------------------------------------------*/
 
-INTERRUPT_GEN( nmi_line_pulse )		{ irqn_line_set(device, INPUT_LINE_NMI, PULSE_LINE); }
-INTERRUPT_GEN( nmi_line_assert )	{ irqn_line_set(device, INPUT_LINE_NMI, ASSERT_LINE); }
+INTERRUPT_GEN( nmi_line_pulse )		{ if (interrupt_enabled(device)) cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE); }
+INTERRUPT_GEN( nmi_line_assert )	{ if (interrupt_enabled(device)) cpu_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE); }
 
 
 /*-------------------------------------------------
     IRQn callbacks
 -------------------------------------------------*/
 
-INTERRUPT_GEN( irq0_line_hold )		{ irqn_line_set(device, 0, HOLD_LINE); }
-INTERRUPT_GEN( irq0_line_pulse )	{ if (interrupt_enable[cpu_get_index(device)]) generic_pulse_irq_line(device, 0); }
-INTERRUPT_GEN( irq0_line_assert )	{ irqn_line_set(device, 0, ASSERT_LINE); }
+INTERRUPT_GEN( irq0_line_hold )		{ if (interrupt_enabled(device)) cpu_set_input_line(device, 0, HOLD_LINE); }
+INTERRUPT_GEN( irq0_line_pulse )	{ if (interrupt_enabled(device)) generic_pulse_irq_line(device, 0); }
+INTERRUPT_GEN( irq0_line_assert )	{ if (interrupt_enabled(device)) cpu_set_input_line(device, 0, ASSERT_LINE); }
 
-INTERRUPT_GEN( irq1_line_hold )		{ irqn_line_set(device, 1, HOLD_LINE); }
-INTERRUPT_GEN( irq1_line_pulse )	{ if (interrupt_enable[cpu_get_index(device)]) generic_pulse_irq_line(device, 1); }
-INTERRUPT_GEN( irq1_line_assert )	{ irqn_line_set(device, 1, ASSERT_LINE); }
+INTERRUPT_GEN( irq1_line_hold )		{ if (interrupt_enabled(device)) cpu_set_input_line(device, 1, HOLD_LINE); }
+INTERRUPT_GEN( irq1_line_pulse )	{ if (interrupt_enabled(device)) generic_pulse_irq_line(device, 1); }
+INTERRUPT_GEN( irq1_line_assert )	{ if (interrupt_enabled(device)) cpu_set_input_line(device, 1, ASSERT_LINE); }
 
-INTERRUPT_GEN( irq2_line_hold )		{ irqn_line_set(device, 2, HOLD_LINE); }
-INTERRUPT_GEN( irq2_line_pulse )	{ if (interrupt_enable[cpu_get_index(device)]) generic_pulse_irq_line(device, 2); }
-INTERRUPT_GEN( irq2_line_assert )	{ irqn_line_set(device, 2, ASSERT_LINE); }
+INTERRUPT_GEN( irq2_line_hold )		{ if (interrupt_enabled(device)) cpu_set_input_line(device, 2, HOLD_LINE); }
+INTERRUPT_GEN( irq2_line_pulse )	{ if (interrupt_enabled(device)) generic_pulse_irq_line(device, 2); }
+INTERRUPT_GEN( irq2_line_assert )	{ if (interrupt_enabled(device)) cpu_set_input_line(device, 2, ASSERT_LINE); }
 
-INTERRUPT_GEN( irq3_line_hold )		{ irqn_line_set(device, 3, HOLD_LINE); }
-INTERRUPT_GEN( irq3_line_pulse )	{ if (interrupt_enable[cpu_get_index(device)]) generic_pulse_irq_line(device, 3); }
-INTERRUPT_GEN( irq3_line_assert )	{ irqn_line_set(device, 3, ASSERT_LINE); }
+INTERRUPT_GEN( irq3_line_hold )		{ if (interrupt_enabled(device)) cpu_set_input_line(device, 3, HOLD_LINE); }
+INTERRUPT_GEN( irq3_line_pulse )	{ if (interrupt_enabled(device)) generic_pulse_irq_line(device, 3); }
+INTERRUPT_GEN( irq3_line_assert )	{ if (interrupt_enabled(device)) cpu_set_input_line(device, 3, ASSERT_LINE); }
 
-INTERRUPT_GEN( irq4_line_hold )		{ irqn_line_set(device, 4, HOLD_LINE); }
-INTERRUPT_GEN( irq4_line_pulse )	{ if (interrupt_enable[cpu_get_index(device)]) generic_pulse_irq_line(device, 4); }
-INTERRUPT_GEN( irq4_line_assert )	{ irqn_line_set(device, 4, ASSERT_LINE); }
+INTERRUPT_GEN( irq4_line_hold )		{ if (interrupt_enabled(device)) cpu_set_input_line(device, 4, HOLD_LINE); }
+INTERRUPT_GEN( irq4_line_pulse )	{ if (interrupt_enabled(device)) generic_pulse_irq_line(device, 4); }
+INTERRUPT_GEN( irq4_line_assert )	{ if (interrupt_enabled(device)) cpu_set_input_line(device, 4, ASSERT_LINE); }
 
-INTERRUPT_GEN( irq5_line_hold )		{ irqn_line_set(device, 5, HOLD_LINE); }
-INTERRUPT_GEN( irq5_line_pulse )	{ if (interrupt_enable[cpu_get_index(device)]) generic_pulse_irq_line(device, 5); }
-INTERRUPT_GEN( irq5_line_assert )	{ irqn_line_set(device, 5, ASSERT_LINE); }
+INTERRUPT_GEN( irq5_line_hold )		{ if (interrupt_enabled(device)) cpu_set_input_line(device, 5, HOLD_LINE); }
+INTERRUPT_GEN( irq5_line_pulse )	{ if (interrupt_enabled(device)) generic_pulse_irq_line(device, 5); }
+INTERRUPT_GEN( irq5_line_assert )	{ if (interrupt_enabled(device)) cpu_set_input_line(device, 5, ASSERT_LINE); }
 
-INTERRUPT_GEN( irq6_line_hold )		{ irqn_line_set(device, 6, HOLD_LINE); }
-INTERRUPT_GEN( irq6_line_pulse )	{ if (interrupt_enable[cpu_get_index(device)]) generic_pulse_irq_line(device, 6); }
-INTERRUPT_GEN( irq6_line_assert )	{ irqn_line_set(device, 6, ASSERT_LINE); }
+INTERRUPT_GEN( irq6_line_hold )		{ if (interrupt_enabled(device)) cpu_set_input_line(device, 6, HOLD_LINE); }
+INTERRUPT_GEN( irq6_line_pulse )	{ if (interrupt_enabled(device)) generic_pulse_irq_line(device, 6); }
+INTERRUPT_GEN( irq6_line_assert )	{ if (interrupt_enabled(device)) cpu_set_input_line(device, 6, ASSERT_LINE); }
 
-INTERRUPT_GEN( irq7_line_hold )		{ irqn_line_set(device, 7, HOLD_LINE); }
-INTERRUPT_GEN( irq7_line_pulse )	{ if (interrupt_enable[cpu_get_index(device)]) generic_pulse_irq_line(device, 7); }
-INTERRUPT_GEN( irq7_line_assert )	{ irqn_line_set(device, 7, ASSERT_LINE); }
+INTERRUPT_GEN( irq7_line_hold )		{ if (interrupt_enabled(device)) cpu_set_input_line(device, 7, HOLD_LINE); }
+INTERRUPT_GEN( irq7_line_pulse )	{ if (interrupt_enabled(device)) generic_pulse_irq_line(device, 7); }
+INTERRUPT_GEN( irq7_line_assert )	{ if (interrupt_enabled(device)) cpu_set_input_line(device, 7, ASSERT_LINE); }
 
 
 
@@ -747,7 +754,7 @@ INTERRUPT_GEN( irq7_line_assert )	{ irqn_line_set(device, 7, ASSERT_LINE); }
 -------------------------------------------------*/
 
 WRITE8_HANDLER( watchdog_reset_w ) { watchdog_reset(space->machine); }
-READ8_HANDLER( watchdog_reset_r ) { watchdog_reset(space->machine); return 0xff; }
+READ8_HANDLER( watchdog_reset_r ) { watchdog_reset(space->machine); return space->unmap; }
 
 
 /*-------------------------------------------------
@@ -755,7 +762,7 @@ READ8_HANDLER( watchdog_reset_r ) { watchdog_reset(space->machine); return 0xff;
 -------------------------------------------------*/
 
 WRITE16_HANDLER( watchdog_reset16_w ) {	watchdog_reset(space->machine); }
-READ16_HANDLER( watchdog_reset16_r ) { watchdog_reset(space->machine); return 0xffff; }
+READ16_HANDLER( watchdog_reset16_r ) { watchdog_reset(space->machine); return space->unmap; }
 
 
 /*-------------------------------------------------
@@ -763,7 +770,7 @@ READ16_HANDLER( watchdog_reset16_r ) { watchdog_reset(space->machine); return 0x
 -------------------------------------------------*/
 
 WRITE32_HANDLER( watchdog_reset32_w ) {	watchdog_reset(space->machine); }
-READ32_HANDLER( watchdog_reset32_r ) { watchdog_reset(space->machine); return 0xffffffff; }
+READ32_HANDLER( watchdog_reset32_r ) { watchdog_reset(space->machine); return space->unmap; }
 
 
 

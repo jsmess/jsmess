@@ -142,7 +142,7 @@ static READ8_HANDLER ( ti99_pcode_grom_r )
 {
 	UINT8 reply;
 
-	cpu_adjust_icount(space->machine->cpu[0],-4);
+	cpu_adjust_icount(space->machine->firstcpu,-4);
 	
 	if (offset & 2)
 	{	
@@ -171,7 +171,7 @@ static READ8_HANDLER ( ti99_pcode_grom_r )
 */
 static WRITE8_HANDLER ( ti99_pcode_grom_w )
 {
-	cpu_adjust_icount(space->machine->cpu[0],-4);
+	cpu_adjust_icount(space->machine->firstcpu,-4);
 
 	if (offset & 2)
 	{

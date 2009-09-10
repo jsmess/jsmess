@@ -8,6 +8,7 @@
 **********************************************************************/
 
 #include "driver.h"
+#include "mslegacy.h"
 #include "cpu/m68000/m68000.h"
 #include "includes/mc68328.h"
 #include "mc68328.h"
@@ -30,6 +31,7 @@ INLINE void verboselog(running_machine *machine, int n_level, const char *s_fmt,
 static void mc68328_set_interrupt_line(const device_config *device, UINT32 line, UINT32 active)
 {
     mc68328_t* mc68328 = mc68328_get_safe_token( device );
+	const device_config *cpu = cpu_get_by_index(device->machine, mc68328->iface->parent_m68k_cpu_index);
 
     if(active)
     {
@@ -41,31 +43,31 @@ static void mc68328_set_interrupt_line(const device_config *device, UINT32 line,
 
             if(mc68328->regs.isr & INT_M68K_LINE7)
             {
-                cpu_set_input_line_and_vector(device->machine->cpu[mc68328->iface->parent_m68k_cpu_index], M68K_IRQ_7, ASSERT_LINE, mc68328->regs.ivr | 0x07);
+                cpu_set_input_line_and_vector(cpu, M68K_IRQ_7, ASSERT_LINE, mc68328->regs.ivr | 0x07);
             }
             else if(mc68328->regs.isr & INT_M68K_LINE6)
             {
-                cpu_set_input_line_and_vector(device->machine->cpu[mc68328->iface->parent_m68k_cpu_index], M68K_IRQ_6, ASSERT_LINE, mc68328->regs.ivr | 0x06);
+                cpu_set_input_line_and_vector(cpu, M68K_IRQ_6, ASSERT_LINE, mc68328->regs.ivr | 0x06);
             }
             else if(mc68328->regs.isr & INT_M68K_LINE5)
             {
-                cpu_set_input_line_and_vector(device->machine->cpu[mc68328->iface->parent_m68k_cpu_index], M68K_IRQ_5, ASSERT_LINE, mc68328->regs.ivr | 0x05);
+                cpu_set_input_line_and_vector(cpu, M68K_IRQ_5, ASSERT_LINE, mc68328->regs.ivr | 0x05);
             }
             else if(mc68328->regs.isr & INT_M68K_LINE4)
             {
-                cpu_set_input_line_and_vector(device->machine->cpu[mc68328->iface->parent_m68k_cpu_index], M68K_IRQ_4, ASSERT_LINE, mc68328->regs.ivr | 0x04);
+                cpu_set_input_line_and_vector(cpu, M68K_IRQ_4, ASSERT_LINE, mc68328->regs.ivr | 0x04);
             }
             else if(mc68328->regs.isr & INT_M68K_LINE3)
             {
-                cpu_set_input_line_and_vector(device->machine->cpu[mc68328->iface->parent_m68k_cpu_index], M68K_IRQ_3, ASSERT_LINE, mc68328->regs.ivr | 0x03);
+                cpu_set_input_line_and_vector(cpu, M68K_IRQ_3, ASSERT_LINE, mc68328->regs.ivr | 0x03);
             }
             else if(mc68328->regs.isr & INT_M68K_LINE2)
             {
-                cpu_set_input_line_and_vector(device->machine->cpu[mc68328->iface->parent_m68k_cpu_index], M68K_IRQ_2, ASSERT_LINE, mc68328->regs.ivr | 0x02);
+                cpu_set_input_line_and_vector(cpu, M68K_IRQ_2, ASSERT_LINE, mc68328->regs.ivr | 0x02);
             }
             else if(mc68328->regs.isr & INT_M68K_LINE1)
             {
-                cpu_set_input_line_and_vector(device->machine->cpu[mc68328->iface->parent_m68k_cpu_index], M68K_IRQ_1, ASSERT_LINE, mc68328->regs.ivr | 0x01);
+                cpu_set_input_line_and_vector(cpu, M68K_IRQ_1, ASSERT_LINE, mc68328->regs.ivr | 0x01);
             }
         }
     }
@@ -75,31 +77,31 @@ static void mc68328_set_interrupt_line(const device_config *device, UINT32 line,
 
         if((line & INT_M68K_LINE7) && !(mc68328->regs.isr & INT_M68K_LINE7))
         {
-            cpu_set_input_line(device->machine->cpu[mc68328->iface->parent_m68k_cpu_index], M68K_IRQ_7, CLEAR_LINE);
+            cpu_set_input_line(cpu, M68K_IRQ_7, CLEAR_LINE);
         }
         if((line & INT_M68K_LINE6) && !(mc68328->regs.isr & INT_M68K_LINE6))
         {
-            cpu_set_input_line(device->machine->cpu[mc68328->iface->parent_m68k_cpu_index], M68K_IRQ_6, CLEAR_LINE);
+            cpu_set_input_line(cpu, M68K_IRQ_6, CLEAR_LINE);
         }
         if((line & INT_M68K_LINE5) && !(mc68328->regs.isr & INT_M68K_LINE5))
         {
-            cpu_set_input_line(device->machine->cpu[mc68328->iface->parent_m68k_cpu_index], M68K_IRQ_5, CLEAR_LINE);
+            cpu_set_input_line(cpu, M68K_IRQ_5, CLEAR_LINE);
         }
         if((line & INT_M68K_LINE4) && !(mc68328->regs.isr & INT_M68K_LINE4))
         {
-            cpu_set_input_line(device->machine->cpu[mc68328->iface->parent_m68k_cpu_index], M68K_IRQ_4, CLEAR_LINE);
+            cpu_set_input_line(cpu, M68K_IRQ_4, CLEAR_LINE);
         }
         if((line & INT_M68K_LINE3) && !(mc68328->regs.isr & INT_M68K_LINE3))
         {
-            cpu_set_input_line(device->machine->cpu[mc68328->iface->parent_m68k_cpu_index], M68K_IRQ_3, CLEAR_LINE);
+            cpu_set_input_line(cpu, M68K_IRQ_3, CLEAR_LINE);
         }
         if((line & INT_M68K_LINE2) && !(mc68328->regs.isr & INT_M68K_LINE2))
         {
-            cpu_set_input_line(device->machine->cpu[mc68328->iface->parent_m68k_cpu_index], M68K_IRQ_2, CLEAR_LINE);
+            cpu_set_input_line(cpu, M68K_IRQ_2, CLEAR_LINE);
         }
         if((line & INT_M68K_LINE1) && !(mc68328->regs.isr & INT_M68K_LINE1))
         {
-            cpu_set_input_line(device->machine->cpu[mc68328->iface->parent_m68k_cpu_index], M68K_IRQ_1, CLEAR_LINE);
+            cpu_set_input_line(cpu, M68K_IRQ_1, CLEAR_LINE);
         }
     }
 }

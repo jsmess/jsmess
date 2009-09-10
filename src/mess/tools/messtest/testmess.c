@@ -954,13 +954,14 @@ static void command_verify_image(running_machine *machine)
 
 static void command_trace(running_machine *machine)
 {
-	int cpunum;
+	const device_config *cpu;
+	int cpunum = 0;
 	FILE *file;
 	char filename[256];
 
-	for (cpunum = 0; (cpunum < ARRAY_LENGTH(machine->cpu)) && (machine->cpu[cpunum] != NULL); cpunum++)
+	for (cpu = cpu_first(machine->config); cpu != NULL; cpu = cpu_next(cpu))
 	{
-		if (machine->cpu[1] == NULL)
+		if (cpu_next(cpu_first(machine->config)) == NULL)
 			snprintf(filename, sizeof(filename) / sizeof(filename[0]), "_%s.tr", current_testcase.name);
 		else
 			snprintf(filename, sizeof(filename) / sizeof(filename[0]), "_%s.%d.tr", current_testcase.name, cpunum);
@@ -969,9 +970,11 @@ static void command_trace(running_machine *machine)
 		if (file)
 		{
 			report_message(MSG_INFO, "Tracing CPU #%d: %s", cpunum, filename);
-			debug_cpu_trace(machine->cpu[cpunum], file, FALSE, NULL);
+			debug_cpu_trace(cpu, file, FALSE, NULL);
 			fclose(file);
 		}
+
+		cpunum++;
 	}
 }
 
@@ -1033,7 +1036,6 @@ void osd_update(running_machine *machine, int skip_redraw)
 	int i;
 	attotime time_limit;
 	attotime current_time;
-	int cpunum;
 
 	render_target_get_primitives(target);
 
@@ -1062,16 +1064,6 @@ void osd_update(running_machine *machine, int skip_redraw)
 		state = STATE_ABORTED;
 		report_message(MSG_FAILURE, "Time limit of %s attoseconds exceeded", attotime_string(time_limit, 9));
 		return;
-	}
-
-	/* update the runtime hash */
-	if (0)
-	{
-		for (cpunum = 0; (cpunum < ARRAY_LENGTH(machine->cpu)) && (machine->cpu[cpunum] != NULL); cpunum++)
-		{
-			runtime_hash *= 57;
-			runtime_hash ^= cpu_get_reg(machine->cpu[cpunum], REG_GENPC);	/* TODO - Add more registers? */
-		}
 	}
 
 	for (i = 0; i < sizeof(commands) / sizeof(commands[i]); i++)

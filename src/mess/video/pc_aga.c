@@ -680,8 +680,8 @@ void pc_aga_set_mode(running_machine *machine, AGA_MODE mode)
 
 VIDEO_START( pc_aga )
 {
-	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_IO );
-	int buswidth = cpu_get_databus_width(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cpu_get_address_space( machine->firstcpu, ADDRESS_SPACE_IO );
+	int buswidth = cpu_get_databus_width(machine->firstcpu, ADDRESS_SPACE_PROGRAM);
 
 	switch(buswidth)
 	{
@@ -714,12 +714,12 @@ VIDEO_START( pc_aga )
 
 VIDEO_START( pc200 )
 {
-	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_IO );
+	const address_space *space = cpu_get_address_space( machine->firstcpu, ADDRESS_SPACE_IO );
 	int buswidth;
 
 	VIDEO_START_CALL(pc_aga);
 
-	buswidth = cpu_get_databus_width(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	buswidth = cpu_get_databus_width(machine->firstcpu, ADDRESS_SPACE_PROGRAM);
 	switch(buswidth)
 	{
 		case 8:

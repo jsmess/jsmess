@@ -1284,7 +1284,7 @@
  *
  * EXAMPLES: galaxian, dkong, mario
  *
-# ***********************************************************************
+ ***********************************************************************
  *
  * DISCRETE_LOGIC_INVERT - Logic invertor
  * DISCRETE_LOGIC_AND  - Logic AND gate (3 & 4 input also available)
@@ -3153,6 +3153,9 @@
  *                --- C    |
  *                 |       |
  *               v_neg   v_neg
+ *
+ * Note: There is usually a 0.001uF cap between pins 5 & 6.
+ *       This is for circuit stability and can be ignored for simulation purposes.
  *
  *  Declaration syntax
  *

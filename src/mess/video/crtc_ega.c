@@ -161,7 +161,7 @@ WRITE8_DEVICE_HANDLER( crtc_ega_register_w )
 {
 	crtc_ega_t *crtc_ega = get_safe_token(device);
 
-	if (LOG)  logerror("CRTC_EGA PC %04x: reg 0x%02x = 0x%02x\n", cpu_get_pc(device->machine->cpu[0]), crtc_ega->register_address_latch, data);
+	if (LOG)  logerror("CRTC_EGA PC %04x: reg 0x%02x = 0x%02x\n", cpu_get_pc(device->machine->firstcpu), crtc_ega->register_address_latch, data);
 
 	switch (crtc_ega->register_address_latch)
 	{

@@ -1046,7 +1046,7 @@ static const registers_subview_item *registers_view_enumerate_subviews(running_m
 	int curindex = 0;
 
 	/* iterate over CPUs with program address spaces */
-	for (cpu = machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
+	for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
 	{
 		registers_subview_item *subview;
 
@@ -1187,7 +1187,7 @@ static void registers_view_recompute(debug_view *view)
 
 	/* if no CPU, reset to the first one */
 	if (regdata->device == NULL)
-		regdata->device = view->machine->cpu[0];
+		regdata->device = view->machine->firstcpu;
 	table = cpu_get_state_table(regdata->device);
 
 	/* reset the view parameters */
@@ -1512,7 +1512,7 @@ static const disasm_subview_item *disasm_view_enumerate_subviews(running_machine
 	int curindex = 0;
 
 	/* iterate over CPUs with program address spaces */
-	for (cpu = machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
+	for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
 	{
 		const address_space *space = cpu_get_address_space(cpu, ADDRESS_SPACE_PROGRAM);
 		if (space != NULL)
@@ -1569,7 +1569,7 @@ static int disasm_view_alloc(debug_view *view)
 	debug_view_expression_alloc(&dasmdata->expression);
 
 	/* count the number of comments */
-	for (cpu = view->machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
+	for (cpu = view->machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
 		total_comments += debug_comment_get_count(cpu);
 
 	/* initialize */
@@ -1781,48 +1781,14 @@ static offs_t disasm_view_find_pc_backwards(const address_space *space, offs_t t
 static void disasm_view_generate_bytes(const address_space *space, offs_t pcbyte, int numbytes, int minbytes, char *string, int maxchars, int encrypted)
 {
 	int byte, offset = 0;
-	UINT64 val;
 
-	switch (minbytes)
-	{
-		case 1:
-			if (maxchars >= 2)
-				offset = sprintf(string, "%02X", (UINT32)debug_read_opcode(space, pcbyte, 1, FALSE));
-			for (byte = 1; byte < numbytes && offset + 3 < maxchars; byte++)
-				offset += sprintf(&string[offset], " %02X", (UINT32)debug_read_opcode(space, pcbyte + byte, 1, encrypted));
-			break;
+	/* output the first value */
+	if (maxchars >= 2 * minbytes)
+		offset = sprintf(string, "%s", core_i64_hex_format(debug_read_opcode(space, pcbyte, minbytes, FALSE), minbytes * 2));
 
-		case 2:
-			if (maxchars >= 4)
-				offset = sprintf(string, "%04X", (UINT32)debug_read_opcode(space, pcbyte, 2, FALSE));
-			for (byte = 2; byte < numbytes && offset + 5 < maxchars; byte += 2)
-				offset += sprintf(&string[offset], " %04X", (UINT32)debug_read_opcode(space, pcbyte + byte, 2, encrypted));
-			break;
-
-		case 4:
-			if (maxchars >= 8)
-				offset = sprintf(string, "%08X", (UINT32)debug_read_opcode(space, pcbyte, 4, FALSE));
-			for (byte = 4; byte < numbytes && offset + 9 < maxchars; byte += 4)
-				offset += sprintf(&string[offset], " %08X", (UINT32)debug_read_opcode(space, pcbyte + byte, 4, encrypted));
-			break;
-
-		case 8:
-			if (maxchars >= 16)
-			{
-				val = debug_read_opcode(space, pcbyte, 8, FALSE);
-				offset = sprintf(string, "%08X%08X", (UINT32)(val >> 32), (UINT32)val);
-			}
-			for (byte = 8; byte < numbytes && offset + 17 < maxchars; byte += 8)
-			{
-				val = debug_read_opcode(space, pcbyte + byte, 8, encrypted);
-				offset += sprintf(&string[offset], " %08X%08X", (UINT32)(val >> 32), (UINT32)val);
-			}
-			break;
-
-		default:
-			fatalerror("disasm_view_generate_bytes: unknown size = %d", minbytes);
-			break;
-	}
+	/* output subsequent values */
+	for (byte = minbytes; byte < numbytes && offset + 1 + 2 * minbytes < maxchars; byte += minbytes)
+		offset += sprintf(&string[offset], " %s", core_i64_hex_format(debug_read_opcode(space, pcbyte + byte, minbytes, encrypted), minbytes * 2));
 
 	/* if we ran out of room, indicate more */
 	string[maxchars - 1] = 0;
@@ -1904,7 +1870,7 @@ static int disasm_view_recompute(debug_view *view, offs_t pc, int startline, int
 
 		/* convert back and set the address of this instruction */
 		dasmdata->byteaddress[instr] = pcbyte;
-		sprintf(&destbuf[0], " %0*X  ", space->logaddrchars, memory_byte_to_address(space, pcbyte));
+		sprintf(&destbuf[0], " %s  ", core_i64_hex_format(memory_byte_to_address(space, pcbyte), space->logaddrchars));
 
 		/* make sure we can translate the address, and then disassemble the result */
 		physpcbyte = pcbyte;
@@ -2048,7 +2014,7 @@ recompute:
 	if (view->recompute)
 	{
 		/* recompute the view */
-		if (dasmdata->last_change_count != debug_comment_all_change_count(space->machine))
+		if (dasmdata->byteaddress != NULL && dasmdata->last_change_count != debug_comment_all_change_count(space->machine))
 		{
 			/* smoosh us against the left column, but not the top row */
 			view->topleft.x = 0;
@@ -2433,7 +2399,7 @@ static const memory_subview_item *memory_view_enumerate_subviews(running_machine
 	int itemnum;
 
 	/* first add all the CPUs' address spaces */
-	for (cpu = machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
+	for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
 		for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
 		{
 			const address_space *space = cpu_get_address_space(cpu, spacenum);

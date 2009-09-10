@@ -335,7 +335,7 @@ void debug_command_init(running_machine *machine)
 	debug_console_register_command(machine, "hardreset",	CMDFLAG_NONE, 0, 0, 1, execute_hardreset);
 
 	/* ask all the CPUs if they would like to register functions or symbols */
-	for (cpu = machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
+	for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
 	{
 		cpu_debug_init_func debug_init;
 		debug_init = (cpu_debug_init_func)device_get_info_fct(cpu, CPUINFO_FCT_DEBUG_INIT);
@@ -361,7 +361,7 @@ static void debug_command_exit(running_machine *machine)
 	const device_config *cpu;
 
 	/* turn off all traces */
-	for (cpu = machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
+	for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
 		debug_cpu_trace(cpu, NULL, 0, NULL);
 
 	if (cheat.length)
@@ -510,14 +510,14 @@ int debug_command_parameter_cpu(running_machine *machine, const char *param, con
 		return FALSE;
 	}
 
+	/* if we got a valid one, return */
+	*result = device_list_find_by_index(machine->config->devicelist, CPU, cpunum);
+	if (*result != NULL)
+		return TRUE;
+
 	/* if out of range, complain */
-	if (cpunum >= ARRAY_LENGTH(machine->cpu) || machine->cpu[cpunum] == NULL)
-	{
-		debug_console_printf(machine, "Invalid CPU index %d\n", (UINT32)cpunum);
-		return FALSE;
-	}
-	*result = machine->cpu[cpunum];
-	return TRUE;
+	debug_console_printf(machine, "Invalid CPU index %d\n", (UINT32)cpunum);
+	return FALSE;
 }
 
 
@@ -635,12 +635,7 @@ static void execute_print(running_machine *machine, int ref, int params, const c
 
 	/* then print each one */
 	for (i = 0; i < params; i++)
-	{
-		if ((values[i] >> 32) != 0)
-			debug_console_printf(machine, "%X%08X ", (UINT32)(values[i] >> 32), (UINT32)values[i]);
-		else
-			debug_console_printf(machine, "%X ", (UINT32)values[i]);
-	}
+		debug_console_printf(machine, "%s", core_i64_hex_format(values[i], 0));
 	debug_console_printf(machine, "\n");
 }
 
@@ -957,7 +952,7 @@ static void execute_focus(running_machine *machine, int ref, int params, const c
 	debug_cpu_ignore_cpu(cpu, 0);
 
 	/* then loop over CPUs and set the ignore flags on all other CPUs */
-	for (scancpu = machine->cpu[0]; scancpu != NULL; scancpu = scancpu->typenext)
+	for (scancpu = machine->firstcpu; scancpu != NULL; scancpu = cpu_next(scancpu))
 		if (scancpu != cpu)
 			debug_cpu_ignore_cpu(scancpu, 1);
 	debug_console_printf(machine, "Now focused on CPU '%s'\n", cpu->tag);
@@ -980,7 +975,7 @@ static void execute_ignore(running_machine *machine, int ref, int params, const 
 	if (params == 0)
 	{
 		/* loop over all CPUs */
-		for (cpu = machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
+		for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
 		{
 			const cpu_debug_data *cpuinfo = cpu_get_debug_data(cpu);
 
@@ -1012,7 +1007,7 @@ static void execute_ignore(running_machine *machine, int ref, int params, const 
 		for (paramnum = 0; paramnum < params; paramnum++)
 		{
 			/* make sure this isn't the last live CPU */
-			for (cpu = machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
+			for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
 				if (cpu != cpuwhich[paramnum] && (cpu_get_debug_data(cpu)->flags & DEBUG_FLAG_OBSERVING) != 0)
 					break;
 			if (cpu == NULL)
@@ -1044,7 +1039,7 @@ static void execute_observe(running_machine *machine, int ref, int params, const
 	if (params == 0)
 	{
 		/* loop over all CPUs */
-		for (cpu = machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
+		for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
 		{
 			const cpu_debug_data *cpuinfo = cpu_get_debug_data(cpu);
 
@@ -1196,7 +1191,7 @@ static void execute_bpclear(running_machine *machine, int ref, int params, const
 	{
 		const device_config *cpu;
 
-		for (cpu = machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
+		for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
 		{
 			const cpu_debug_data *cpuinfo = cpu_get_debug_data(cpu);
 			debug_cpu_breakpoint *bp;
@@ -1234,7 +1229,7 @@ static void execute_bpdisenable(running_machine *machine, int ref, int params, c
 	{
 		const device_config *cpu;
 
-		for (cpu = machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
+		for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
 		{
 			const cpu_debug_data *cpuinfo = cpu_get_debug_data(cpu);
 			debug_cpu_breakpoint *bp;
@@ -1273,9 +1268,10 @@ static void execute_bplist(running_machine *machine, int ref, int params, const 
 	char buffer[256];
 
 	/* loop over all CPUs */
-	for (cpu = machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
+	for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
 	{
 		const cpu_debug_data *cpuinfo = cpu_get_debug_data(cpu);
+		const address_space *space = cpu_get_address_space(cpu, ADDRESS_SPACE_PROGRAM);
 
 		if (cpuinfo->bplist != NULL)
 		{
@@ -1287,7 +1283,7 @@ static void execute_bplist(running_machine *machine, int ref, int params, const 
 			for (bp = cpuinfo->bplist; bp != NULL; bp = bp->next)
 			{
 				int buflen;
-				buflen = sprintf(buffer, "%c%4X @ %08X", bp->enabled ? ' ' : 'D', bp->index, bp->address);
+				buflen = sprintf(buffer, "%c%4X @ %s", bp->enabled ? ' ' : 'D', bp->index, core_i64_hex_format(bp->address, space->logaddrchars));
 				if (bp->condition)
 					buflen += sprintf(&buffer[buflen], " if %s", expression_original_string(bp->condition));
 				if (bp->action)
@@ -1370,7 +1366,7 @@ static void execute_wpclear(running_machine *machine, int ref, int params, const
 	{
 		const device_config *cpu;
 
-		for (cpu = machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
+		for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
 		{
 			const cpu_debug_data *cpuinfo = cpu_get_debug_data(cpu);
 			int spacenum;
@@ -1413,7 +1409,7 @@ static void execute_wpdisenable(running_machine *machine, int ref, int params, c
 	{
 		const device_config *cpu;
 
-		for (cpu = machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
+		for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
 		{
 			const cpu_debug_data *cpuinfo = cpu_get_debug_data(cpu);
 			int spacenum;
@@ -1457,7 +1453,7 @@ static void execute_wplist(running_machine *machine, int ref, int params, const 
 	char buffer[256];
 
 	/* loop over all CPUs */
-	for (cpu = machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
+	for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
 	{
 		const cpu_debug_data *cpuinfo = cpu_get_debug_data(cpu);
 		int spacenum;
@@ -1475,8 +1471,10 @@ static void execute_wplist(running_machine *machine, int ref, int params, const 
 				for (wp = cpuinfo->wplist[spacenum]; wp != NULL; wp = wp->next)
 				{
 					int buflen;
-					buflen = sprintf(buffer, "%c%4X @ %08X-%08X %s", wp->enabled ? ' ' : 'D',
-							wp->index, memory_byte_to_address(space, wp->address), memory_byte_to_address_end(space, wp->address + wp->length) - 1, types[wp->type & 3]);
+					buflen = sprintf(buffer, "%c%4X @ %s-%s %s", wp->enabled ? ' ' : 'D', wp->index,
+							core_i64_hex_format(memory_byte_to_address(space, wp->address), space->addrchars),
+							core_i64_hex_format(memory_byte_to_address_end(space, wp->address + wp->length) - 1, space->addrchars),
+							types[wp->type & 3]);
 					if (wp->condition)
 						buflen += sprintf(&buffer[buflen], " if %s", expression_original_string(wp->condition));
 					if (wp->action)
@@ -1509,7 +1507,7 @@ static void execute_hotspot(running_machine *machine, int ref, int params, const
 		int cleared = FALSE;
 
 		/* loop over CPUs and find live spots */
-		for (cpu = machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
+		for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
 		{
 			const cpu_debug_data *cpuinfo = cpu_get_debug_data(cpu);
 
@@ -1639,86 +1637,24 @@ static void execute_dump(running_machine *machine, int ref, int params, const ch
 		int outdex = 0;
 
 		/* print the address */
-		outdex += sprintf(&output[outdex], "%0*X: ", space->logaddrchars, (UINT32)memory_byte_to_address(space, i));
+		outdex += sprintf(&output[outdex], "%s: ", core_i64_hex_format((UINT32)memory_byte_to_address(space, i), space->logaddrchars));
 
 		/* print the bytes */
-		switch (width)
+		for (j = 0; j < 16; j += width)
 		{
-			case 1:
-				for (j = 0; j < 16; j++)
+			if (i + j <= endoffset)
+			{
+				offs_t curaddr = i + j;
+				if (debug_cpu_translate(space, TRANSLATE_READ_DEBUG, &curaddr))
 				{
-					if (i + j <= endoffset)
-					{
-						offs_t curaddr = i + j;
-						if (debug_cpu_translate(space, TRANSLATE_READ, &curaddr))
-						{
-							UINT8 byte = debug_read_byte(space, i + j, TRUE);
-							outdex += sprintf(&output[outdex], " %02X", byte);
-						}
-						else
-							outdex += sprintf(&output[outdex], " **");
-					}
-					else
-						outdex += sprintf(&output[outdex], "   ");
+					UINT64 value = debug_read_memory(space, i + j, width, TRUE);
+					outdex += sprintf(&output[outdex], " %s", core_i64_hex_format(value, width * 2));
 				}
-				break;
-
-			case 2:
-				for (j = 0; j < 16; j += 2)
-				{
-					if (i + j <= endoffset)
-					{
-						offs_t curaddr = i + j;
-						if (debug_cpu_translate(space, TRANSLATE_READ_DEBUG, &curaddr))
-						{
-							UINT16 word = debug_read_word(space, i + j, TRUE);
-							outdex += sprintf(&output[outdex], " %04X", word);
-						}
-						else
-							outdex += sprintf(&output[outdex], " ****");
-					}
-					else
-						outdex += sprintf(&output[outdex], "     ");
-				}
-				break;
-
-			case 4:
-				for (j = 0; j < 16; j += 4)
-				{
-					if (i + j <= endoffset)
-					{
-						offs_t curaddr = i + j;
-						if (debug_cpu_translate(space, TRANSLATE_READ_DEBUG, &curaddr))
-						{
-							UINT32 dword = debug_read_dword(space, i + j, TRUE);
-							outdex += sprintf(&output[outdex], " %08X", dword);
-						}
-						else
-							outdex += sprintf(&output[outdex], " ********");
-					}
-					else
-						outdex += sprintf(&output[outdex], "         ");
-				}
-				break;
-
-			case 8:
-				for (j = 0; j < 16; j += 8)
-				{
-					if (i + j <= endoffset)
-					{
-						offs_t curaddr = i + j;
-						if (debug_cpu_translate(space, TRANSLATE_READ_DEBUG, &curaddr))
-						{
-							UINT64 qword = debug_read_qword(space, i + j, TRUE);
-							outdex += sprintf(&output[outdex], " %08X%08X", (UINT32)(qword >> 32), (UINT32)qword);
-						}
-						else
-							outdex += sprintf(&output[outdex], " ****************");
-					}
-					else
-						outdex += sprintf(&output[outdex], "                 ");
-				}
-				break;
+				else
+					outdex += sprintf(&output[outdex], " %.*s", (int)width * 2, "****************");
+			}
+			else
+				outdex += sprintf(&output[outdex], " %*s", (int)width * 2, "");
 		}
 
 		/* print the ASCII */
@@ -1853,7 +1789,7 @@ static void execute_cheatinit(running_machine *machine, int ref, int params, con
 		/* initialize new cheat system */
 		if (cheat.cheatmap != NULL)
 			free(cheat.cheatmap);
-		cheat.cheatmap = malloc(real_length * sizeof(cheat_map));
+		cheat.cheatmap = (cheat_map *)malloc(real_length * sizeof(cheat_map));
 		if (cheat.cheatmap == NULL)
 		{
 			debug_console_printf(machine, "Unable of allocate the necessary memory\n");
@@ -1878,7 +1814,7 @@ static void execute_cheatinit(running_machine *machine, int ref, int params, con
 		if (!debug_command_parameter_cpu_space(machine, &cheat.cpu, ADDRESS_SPACE_PROGRAM, &space))
 			return;
 
-		cheat.cheatmap = realloc(cheat.cheatmap, (cheat.length + real_length) * sizeof(cheat_map));
+		cheat.cheatmap = (cheat_map *)realloc(cheat.cheatmap, (cheat.length + real_length) * sizeof(cheat_map));
 		if (cheat.cheatmap == NULL)
 		{
 			cheat.cheatmap = cheatmap_bak;
@@ -1927,6 +1863,8 @@ static void execute_cheatnext(running_machine *machine, int ref, int params, con
 		CHEAT_NOTEQUALTO,
 		CHEAT_DECREASE,
 		CHEAT_INCREASE,
+		CHEAT_DECREASE_OR_EQUAL,
+		CHEAT_INCREASE_OR_EQUAL,
 		CHEAT_DECREASEOF,
 		CHEAT_INCREASEOF,
 		CHEAT_SMALLEROF,
@@ -1957,6 +1895,10 @@ static void execute_cheatnext(running_machine *machine, int ref, int params, con
 		condition = (params > 1) ? CHEAT_DECREASEOF : CHEAT_DECREASE;
 	else if (!strcmp(param[0], "increase") || !strcmp(param[0], "in") || !strcmp(param[0], "+"))
 		condition = (params > 1) ? CHEAT_INCREASEOF : CHEAT_INCREASE;
+	else if (!strcmp(param[0], "decreaseorequal") || !strcmp(param[0], "deeq"))
+		condition = CHEAT_DECREASE_OR_EQUAL;
+	else if (!strcmp(param[0], "increaseorequal") || !strcmp(param[0], "ineq"))
+		condition = CHEAT_INCREASE_OR_EQUAL;
 	else if (!strcmp(param[0], "smallerof") || !strcmp(param[0], "lt") || !strcmp(param[0], "<"))
 		condition = CHEAT_SMALLEROF;
 	else if (!strcmp(param[0], "greaterof") || !strcmp(param[0], "gt") || !strcmp(param[0], ">"))
@@ -2010,6 +1952,20 @@ static void execute_cheatnext(running_machine *machine, int ref, int params, con
 						disable_byte = ((INT64)cheat_value <= (INT64)comp_byte);
 					else
 						disable_byte = ((UINT64)cheat_value <= (UINT64)comp_byte);
+					break;
+
+				case CHEAT_DECREASE_OR_EQUAL:
+					if (cheat.signed_cheat)
+						disable_byte = ((INT64)cheat_value > (INT64)comp_byte);
+					else
+						disable_byte = ((UINT64)cheat_value > (UINT64)comp_byte);
+					break;
+
+				case CHEAT_INCREASE_OR_EQUAL:
+					if (cheat.signed_cheat)
+						disable_byte = ((INT64)cheat_value < (INT64)comp_byte);
+					else
+						disable_byte = ((UINT64)cheat_value < (UINT64)comp_byte);
 					break;
 
 				case CHEAT_DECREASEOF:
@@ -2101,14 +2057,14 @@ static void execute_cheatlist(running_machine *machine, int ref, int params, con
 			if (params > 0)
 			{
 				active_cheat++;
-				fprintf(f, "  <cheat desc=\"Possibility %d : %0*X (%0*" I64FMT "X)\">\n", active_cheat, space->logaddrchars, address, cheat.width * 2, value);
+				fprintf(f, "  <cheat desc=\"Possibility %d : %s (%s)\">\n", active_cheat, core_i64_hex_format(address, space->logaddrchars), core_i64_hex_format(value, cheat.width * 2));
 				fprintf(f, "    <script state=\"run\">\n");
-				fprintf(f, "      <action>maincpu.%c%c@%0*X=%0*" I64FMT "X</action>\n", spaceletter, sizeletter, space->logaddrchars, address, cheat.width * 2, cheat.cheatmap[cheatindex].first_value & sizemask);
+				fprintf(f, "      <action>maincpu.%c%c@%s=%s</action>\n", spaceletter, sizeletter, core_i64_hex_format(address, space->logaddrchars), core_i64_hex_format(cheat.cheatmap[cheatindex].first_value & sizemask, cheat.width * 2));
 				fprintf(f, "    </script>\n");
 				fprintf(f, "  </cheat>\n\n");
 			}
 			else
-				debug_console_printf(machine, "Address=%0*X Start=%0*" I64FMT "X Current=%0*" I64FMT "X\n", space->logaddrchars, address, cheat.width * 2, cheat.cheatmap[cheatindex].first_value & sizemask, cheat.width * 2, value);
+				debug_console_printf(machine, "Address=%s Start=%s Current=%s\n", core_i64_hex_format(address, space->logaddrchars), core_i64_hex_format(cheat.cheatmap[cheatindex].first_value & sizemask, cheat.width * 2), core_i64_hex_format(value, cheat.width * 2));
 		}
 	}
 	if (params > 0)
@@ -2234,7 +2190,7 @@ static void execute_find(running_machine *machine, int ref, int params, const ch
 		if (match)
 		{
 			found++;
-			debug_console_printf(machine, "Found at %*X\n", space->logaddrchars, (UINT32)memory_byte_to_address(space, i));
+			debug_console_printf(machine, "Found at %s\n", core_i64_hex_format((UINT32)memory_byte_to_address(space, i), space->addrchars));
 		}
 	}
 
@@ -2295,7 +2251,7 @@ static void execute_dasm(running_machine *machine, int ref, int params, const ch
 		int numbytes = 0;
 
 		/* print the address */
-		outdex += sprintf(&output[outdex], "%0*X: ", space->logaddrchars, (UINT32)memory_byte_to_address(space, pcbyte));
+		outdex += sprintf(&output[outdex], "%s: ", core_i64_hex_format((UINT32)memory_byte_to_address(space, pcbyte), space->logaddrchars));
 
 		/* make sure we can translate the address */
 		tempaddr = pcbyte;
@@ -2319,31 +2275,8 @@ static void execute_dasm(running_machine *machine, int ref, int params, const ch
 		{
 			int startdex = outdex;
 			numbytes = memory_address_to_byte(space, numbytes);
-			switch (minbytes)
-			{
-				case 1:
-					for (j = 0; j < numbytes; j++)
-						outdex += sprintf(&output[outdex], "%02X ", (UINT32)debug_read_opcode(space, pcbyte + j, 1, FALSE));
-					break;
-
-				case 2:
-					for (j = 0; j < numbytes; j += 2)
-						outdex += sprintf(&output[outdex], "%04X ", (UINT32)debug_read_opcode(space, pcbyte + j, 2, FALSE));
-					break;
-
-				case 4:
-					for (j = 0; j < numbytes; j += 4)
-						outdex += sprintf(&output[outdex], "%08X ", (UINT32)debug_read_opcode(space, pcbyte + j, 4, FALSE));
-					break;
-
-				case 8:
-					for (j = 0; j < numbytes; j += 8)
-					{
-						UINT64 val = debug_read_opcode(space, pcbyte + j, 8, FALSE);
-						outdex += sprintf(&output[outdex], "%08X%08X ", (UINT32)(val >> 32), (UINT32)val);
-					}
-					break;
-			}
+			for (j = 0; j < numbytes; j += minbytes)
+				outdex += sprintf(&output[outdex], "%s ", core_i64_hex_format(debug_read_opcode(space, pcbyte + j, minbytes, FALSE), minbytes * 2));
 			if (outdex - startdex < byteswidth)
 				outdex += sprintf(&output[outdex], "%*s", byteswidth - (outdex - startdex), "");
 			outdex += sprintf(&output[outdex], "  ");
@@ -2504,7 +2437,7 @@ static void execute_history(running_machine *machine, int ref, int params, const
 
 		debug_cpu_disassemble(space->cpu, buffer, pc, opbuf, argbuf);
 
-		debug_console_printf(machine, "%0*X: %s\n", space->logaddrchars, pc, buffer);
+		debug_console_printf(machine, "%s: %s\n", core_i64_hex_format(pc, space->logaddrchars), buffer);
 	}
 }
 
@@ -2595,10 +2528,10 @@ static void execute_map(running_machine *machine, int ref, int params, const cha
 		if (debug_cpu_translate(space, intention, &taddress))
 		{
 			const char *mapname = memory_get_handler_string(space, intention == TRANSLATE_WRITE_DEBUG, taddress);
-			debug_console_printf(machine, "%7s: %08X logical == %08X physical -> %s\n", intnames[intention & 3], (UINT32)address, memory_byte_to_address(space, taddress), mapname);
+			debug_console_printf(machine, "%7s: %s logical == %s physical -> %s\n", intnames[intention & 3], core_i64_hex_format(address, space->logaddrchars), core_i64_hex_format(memory_byte_to_address(space, taddress), space->addrchars), mapname);
 		}
 		else
-			debug_console_printf(machine, "%7s: %08X logical is unmapped\n", intnames[intention & 3], (UINT32)address);
+			debug_console_printf(machine, "%7s: %s logical is unmapped\n", intnames[intention & 3], core_i64_hex_format(address, space->logaddrchars));
 	}
 }
 
@@ -2689,11 +2622,7 @@ static void execute_symlist(running_machine *machine, int ref, int params, const
 		assert(entry != NULL);
 
 		/* only display "register" type symbols */
-		debug_console_printf(machine, "%s = ", namelist[symnum]);
-		if ((value >> 32) != 0)
-			debug_console_printf(machine, "%X%08X", (UINT32)(value >> 32), (UINT32)value);
-		else
-			debug_console_printf(machine, "%X", (UINT32)value);
+		debug_console_printf(machine, "%s = %s", namelist[symnum], core_i64_hex_format(value, 0));
 		if (entry->info.reg.setter == NULL)
 			debug_console_printf(machine, "  (read-only)");
 		debug_console_printf(machine, "\n");

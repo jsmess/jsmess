@@ -1667,7 +1667,7 @@ void nec765_update_state(const device_config *device)
 		fdc->FDC_main |= 0x10;                      /* set BUSY */
 
 		if (LOG_VERBOSE)
-			logerror("nec765(): pc=0x%08x command=0x%02x\n", cpu_get_pc(device->machine->cpu[0]), fdc->nec765_data_reg);
+			logerror("nec765(): pc=0x%08x command=0x%02x\n", cpu_get_pc(device->machine->firstcpu), fdc->nec765_data_reg);
 
 		/* seek in progress? */
 		if (fdc->nec765_flags & NEC765_SEEK_ACTIVE)
@@ -1698,7 +1698,7 @@ void nec765_update_state(const device_config *device)
 
     case NEC765_COMMAND_PHASE_BYTES:
 		if (LOG_VERBOSE)
-			logerror("nec765(): pc=0x%08x command=0x%02x\n", cpu_get_pc(device->machine->cpu[0]), fdc->nec765_data_reg);
+			logerror("nec765(): pc=0x%08x command=0x%02x\n", cpu_get_pc(device->machine->firstcpu), fdc->nec765_data_reg);
 
 		fdc->nec765_command_bytes[fdc->nec765_transfer_bytes_count] = fdc->nec765_data_reg;
 		fdc->nec765_transfer_bytes_count++;

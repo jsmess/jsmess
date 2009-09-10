@@ -1,4 +1,4 @@
-﻿0.133.1
+﻿0.134
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
@@ -121,6 +121,7 @@ System Driver Changes:
 - [Z8] Added preliminary Z8 cpu core for JuTe computer. [Curt Coder]
 
 
+
 User Interface Changes:
 -----------------------
 (none)
@@ -135,10 +136,12 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
-- The core is based on MAME 0.133u5.  This incorporates all features of the
+- The core is based on MAME 0.134.  This incorporates all features of the
   update to this core.  [MAME team]
 
 - Floppy cleanup [Miodrag Milanovic]
+
+
 
 0.133
 
