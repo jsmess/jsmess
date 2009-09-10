@@ -57,7 +57,6 @@ Notes:
     TODO:
 
 	- second VP580 keypad
-	- colorram bit order
 
 	- VP-585 Expansion Keyboard Interface (2 keypad connectors for VP-580)
     - VP-551 Super Sound Board (4 channel sound)
@@ -400,10 +399,10 @@ static CDP1861_INTERFACE( vip_cdp1861_intf )
 static CDP1862_INTERFACE( vip_cdp1862_intf )
 {
 	SCREEN_TAG,
-	RES_K(1.21), // ???
-	RES_K(2.05), // ???
-	RES_K(2.26), // ???
-	RES_K(3.92)	 // ???
+	510,			/* R3 */
+	RES_K(1),		/* R5 */
+	360,			/* R4 */
+	RES_K(1.5)		/* R6 */
 };
 
 static WRITE8_HANDLER( vip_colorram_w )
@@ -544,9 +543,9 @@ static WRITE8_DEVICE_HANDLER( vip_dma_w )
 		{
 			UINT8 color = state->colorram[offset & 0xff];
 			
-			int rdata = BIT(color, 0);
-			int gdata = BIT(color, 2);
-			int bdata = BIT(color, 1);
+			int rdata = BIT(color, 1);
+			int gdata = BIT(color, 3);
+			int bdata = BIT(color, 2);
 
 			cdp1862_dma_w(state->cdp1862, data, state->colorram_mwr, rdata, gdata, bdata);
 		}
