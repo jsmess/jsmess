@@ -156,7 +156,8 @@ http://www.z88forever.org.uk/zxplus3e/
 
 /* +3 hardware */
 #include "machine/nec765.h"
-#include "devices/dsk.h"
+#include "formats/dsk_dsk.h"
+#include "devices/mflopimg.h"
 
 
 /****************************************************************************************************/
@@ -457,9 +458,13 @@ static void specpls3_floppy_getinfo(const mess_device_class *devclass, UINT32 st
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
 
-		default:										legacydsk_device_getinfo(devclass, state, info); break;
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_dsk; break;
+
+		default:										floppy_device_getinfo(devclass, state, info); break;
 	}
 }
+
 
 static SYSTEM_CONFIG_START(specpls3)
 	CONFIG_DEVICE(specpls3_floppy_getinfo)

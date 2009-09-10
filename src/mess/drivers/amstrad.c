@@ -98,7 +98,7 @@ Some bugs left :
 #include "machine/ctronics.h"
 
 /* Devices */
-#include "devices/dsk.h"		/* for CPCEMU style disk images */
+#include "formats/dsk_dsk.h"		/* for CPCEMU style disk images */
 #include "devices/mflopimg.h"
 #include "formats/basicdsk.h"
 #include "includes/msx_slot.h"
@@ -1127,8 +1127,12 @@ static void cpc6128_floppy_getinfo(const mess_device_class *devclass, UINT32 sta
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
 
-		default:										legacydsk_device_getinfo(devclass, state, info); break;
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_dsk; break;
+
+		default:										floppy_device_getinfo(devclass, state, info); break;
 	}
+
 }
 
 static void aleste_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)

@@ -32,7 +32,8 @@
 #include "machine/msm8251.h"
 
 /* Devices */
-#include "devices/dsk.h"		/* for CPCEMU style disk images */
+#include "formats/dsk_dsk.h"
+#include "devices/mflopimg.h"
 #include "devices/cassette.h"
 #include "formats/tzx_cas.h"
 
@@ -522,9 +523,13 @@ static void elwro800jr_floppy_getinfo(const mess_device_class *devclass, UINT32 
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
 
-		default:										legacydsk_device_getinfo(devclass, state, info); break;
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_dsk; break;
+
+		default:										floppy_device_getinfo(devclass, state, info); break;
 	}
 }
+
 
 static SYSTEM_CONFIG_START(elwro800)
 	CONFIG_RAM_DEFAULT(64 * 1024)

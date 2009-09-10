@@ -393,7 +393,7 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_DEVICES)/cartslot.o	\
 	$(MESS_DEVICES)/cassette.o	\
 	$(MESS_DEVICES)/chd_cd.o	\
-	$(MESS_DEVICES)/dsk.o		\
+	$(MESS_FORMATS)/dsk_dsk.o	\
 	$(MESS_DEVICES)/flopdrv.o	\
 	$(MESS_DEVICES)/harddriv.o	\
 	$(MESS_DEVICES)/mflopimg.o	\

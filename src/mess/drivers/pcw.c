@@ -96,7 +96,8 @@
 #include "cpu/z80/z80.h"
 // nec765 interface
 #include "machine/nec765.h"
-#include "devices/dsk.h"
+#include "formats/dsk_dsk.h"
+#include "devices/mflopimg.h"
 // pcw video hardware
 #include "includes/pcw.h"
 // pcw/pcw16 beeper
@@ -1052,9 +1053,13 @@ static void generic_pcw_floppy_getinfo(const mess_device_class *devclass, UINT32
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
 
-		default:										legacydsk_device_getinfo(devclass, state, info); break;
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_dsk; break;
+
+		default:										floppy_device_getinfo(devclass, state, info); break;
 	}
 }
+
 
 static SYSTEM_CONFIG_START(generic_pcw)
 	CONFIG_DEVICE(generic_pcw_floppy_getinfo)
