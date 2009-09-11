@@ -194,7 +194,6 @@ static floperr_t dsk_get_indexed_sector_info(floppy_image *floppy, int head, int
 	if (sector_length) {
 		*sector_length = 1 << (sector_info[pos + 3] + 7);
 	}		
-	logerror("track : %d C %02x H %02x R %02x N %02x\n",track,sector_info[pos + 0],sector_info[pos + 1],sector_info[pos + 2],sector_info[pos + 3]);
 	if (flags)
 		*flags = (sector_info[pos + 5] & 0x40) ? ID_FLAG_DELETED_DATA : 0;
 	return retVal;
