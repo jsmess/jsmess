@@ -527,7 +527,7 @@ static TIMER_CALLBACK(reader_callback)
 					if (tape_reader.rcp)
 					{
 						cpu_set_reg(cputag_get_cpu(machine, "maincpu"), PDP1_IO, tape_reader.rb);	/* transfer reader buffer to IO */
-						pdp1_pulse_iot_done();
+						pdp1_pulse_iot_done(cputag_get_cpu(machine, "maincpu"));
 					}
 					else
 						io_status |= io_st_ptr;
@@ -552,7 +552,7 @@ static TIMER_CALLBACK(puncher_callback)
 	io_status |= io_st_ptp;
 	if (nac)
 	{
-		pdp1_pulse_iot_done();
+		pdp1_pulse_iot_done(cputag_get_cpu(machine, "maincpu"));
 	}
 }
 
@@ -849,7 +849,7 @@ static TIMER_CALLBACK(tyo_callback)
 	io_status |= io_st_tyo;
 	if (nac)
 	{
-		pdp1_pulse_iot_done();
+		pdp1_pulse_iot_done(cputag_get_cpu(machine, "maincpu"));
 	}
 }
 
@@ -965,7 +965,7 @@ void iot_tyi(const device_config *device, int op2, int nac, int mb, int *io, int
 */
 static TIMER_CALLBACK(dpy_callback)
 {
-	pdp1_pulse_iot_done();
+	pdp1_pulse_iot_done(cputag_get_cpu(machine, "maincpu"));
 }
 
 
@@ -1374,7 +1374,7 @@ INTERRUPT_GEN( pdp1_interrupt )
 		}
 		if (control_transitions & pdp1_start_nobrk)
 		{
-			pdp1_pulse_start_clear();	/* pulse Start Clear line */
+			pdp1_pulse_start_clear(device);	/* pulse Start Clear line */
 			cpu_set_reg(device, PDP1_EXD, cpu_get_reg(device, PDP1_EXTEND_SW));
 			cpu_set_reg(device, PDP1_SBM, 0);
 			cpu_set_reg(device, PDP1_OV, 0);
@@ -1383,7 +1383,7 @@ INTERRUPT_GEN( pdp1_interrupt )
 		}
 		if (control_transitions & pdp1_start_brk)
 		{
-			pdp1_pulse_start_clear();	/* pulse Start Clear line */
+			pdp1_pulse_start_clear(device);	/* pulse Start Clear line */
 			cpu_set_reg(device, PDP1_EXD, cpu_get_reg(device, PDP1_EXTEND_SW));
 			cpu_set_reg(device, PDP1_SBM, 1);
 			cpu_set_reg(device, PDP1_OV, 0);
@@ -1403,7 +1403,7 @@ INTERRUPT_GEN( pdp1_interrupt )
 		}
 		if (control_transitions & pdp1_examine)
 		{
-			pdp1_pulse_start_clear();	/* pulse Start Clear line */
+			pdp1_pulse_start_clear(device);	/* pulse Start Clear line */
 			cpu_set_reg(device, PDP1_PC, cpu_get_reg(device, PDP1_TA));
 			cpu_set_reg(device, PDP1_MA, cpu_get_reg(device, PDP1_PC));
 			cpu_set_reg(device, PDP1_IR, LAC);	/* this instruction is actually executed */
@@ -1413,7 +1413,7 @@ INTERRUPT_GEN( pdp1_interrupt )
 		}
 		if (control_transitions & pdp1_deposit)
 		{
-			pdp1_pulse_start_clear();	/* pulse Start Clear line */
+			pdp1_pulse_start_clear(device);	/* pulse Start Clear line */
 			cpu_set_reg(device, PDP1_PC, cpu_get_reg(device, PDP1_TA));
 			cpu_set_reg(device, PDP1_MA, cpu_get_reg(device, PDP1_PC));
 			cpu_set_reg(device, PDP1_AC, cpu_get_reg(device, PDP1_TW));
@@ -1424,7 +1424,7 @@ INTERRUPT_GEN( pdp1_interrupt )
 		}
 		if (control_transitions & pdp1_read_in)
 		{	/* set cpu to read instructions from perforated tape */
-			pdp1_pulse_start_clear();	/* pulse Start Clear line */
+			pdp1_pulse_start_clear(device);	/* pulse Start Clear line */
 			cpu_set_reg(device, PDP1_PC, (  cpu_get_reg(device, PDP1_TA) & 0170000)
 										|  (cpu_get_reg(device, PDP1_PC) & 0007777));	/* transfer ETA to EPC */
 			/*cpu_set_reg(cputag_get_cpu(machine, "maincpu"), PDP1_MA, cpu_get_reg(cputag_get_cpu(machine, "maincpu"), PDP1_PC));*/

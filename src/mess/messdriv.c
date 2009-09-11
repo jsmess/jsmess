@@ -962,7 +962,7 @@ const game_driver * const drivers[] =
     DRIVER( mekd2 )     /* 1977 Motorola Evaluation Kit                     */
 
     /* DEC */
-//0134    DRIVER( pdp1 )      /* 1961 DEC PDP1                                    */
+    DRIVER( pdp1 )      /* 1961 DEC PDP1                                    */
     DRIVER(vt100) /* 1978 Digital Equipment Corporation */
     //DRIVER(vt100wp) /* 1978 Digital Equipment Corporation */
     //DRIVER(vt100stp) /* 1978 Digital Equipment Corporation */
