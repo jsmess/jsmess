@@ -154,7 +154,7 @@
 #include "formats/fm7_dsk.h"
 #include <ctype.h>
 
-static UINT8 hres_320,io_switch,io_sys;
+static UINT8 hres_320,io_switch,io_sys,vsync,vdisp;
 static UINT8 io_bank_mode;
 static UINT8 *gfx_bitmap_ram;
 static UINT16 pcg_index[3];
@@ -171,6 +171,14 @@ static struct
 	UINT8 ply;
 	UINT8 blackclip; // x1 turbo specific
 }scrn_reg;
+
+static struct
+{
+	UINT8 pal;
+	UINT8 gfx_pal;
+	UINT8 txt_pal;
+	UINT8 txt_disp;
+}turbo_reg;
 
 static UINT8 pcg_write_addr;
 
@@ -886,6 +894,7 @@ static WRITE8_HANDLER( x1_pcg_w )
 			used_pcg_addr = pcg_write_addr*8;
 			pcg_offset = (pcg_index[addr-1]+used_pcg_addr) & 0x7ff;
 			pcg_offset+=((addr-1)*0x800);
+			printf("%04x\n",pcg_offset);
 			PCG_RAM[pcg_offset] = data;
 
 			pcg_offset &= 0x7ff;
@@ -1004,24 +1013,33 @@ static WRITE8_HANDLER( x1_blackclip_w )
 	scrn_reg.blackclip = data;
 }
 
+static READ8_HANDLER( x1turbo_pal_r )    { return turbo_reg.pal; }
+static READ8_HANDLER( x1turbo_txpal_r )  { return turbo_reg.txt_pal; }
+static READ8_HANDLER( x1turbo_txdisp_r ) { return turbo_reg.txt_disp; }
+static READ8_HANDLER( x1turbo_gfxpal_r ) { return turbo_reg.gfx_pal; }
+
 static WRITE8_HANDLER( x1turbo_pal_w )
 {
 	printf("TURBO PAL %02x\n",data);
+	turbo_reg.pal = data;
 }
 
 static WRITE8_HANDLER( x1turbo_txpal_w )
 {
 	printf("TURBO TEXT PAL %02x\n",data);
+	turbo_reg.txt_pal = data;
 }
 
 static WRITE8_HANDLER( x1turbo_txdisp_w )
 {
 	printf("TURBO TEXT DISPLAY %02x\n",data);
+	turbo_reg.txt_disp = data;
 }
 
 static WRITE8_HANDLER( x1turbo_gfxpal_w )
 {
 	printf("TURBO GFX PAL %02x\n",data);
+	turbo_reg.gfx_pal = data;
 }
 
 /*************************************
@@ -1115,6 +1133,10 @@ static READ8_HANDLER( x1turbo_io_r )
 	else if(offset >= 0x1f92 && offset <= 0x1f93)	{ return z80sio_d_r(devtag_get_device(space->machine, "sio"), (offset-0x1f92) & 1); }
 	else if(offset >= 0x1fa0 && offset <= 0x1fa3)	{ return z80ctc_r(devtag_get_device(space->machine, "ctc"), offset-0x1fa0); }
 	else if(offset >= 0x1fa8 && offset <= 0x1fab)	{ return z80ctc_r(devtag_get_device(space->machine, "ctc"), offset-0x1fa8); }
+	else if(offset == 0x1fb0)						{ return x1turbo_pal_r(space,0); }
+	else if(offset >= 0x1fb9 && offset <= 0x1fbf)	{ return x1turbo_txpal_r(space,offset-0x1fb9); }
+	else if(offset == 0x1fc0)						{ return x1turbo_txdisp_r(space,0); }
+	else if(offset == 0x1fc5)						{ return x1turbo_gfxpal_r(space,0); }
 //	else if(offset >= 0x1fd0 && offset <= 0x1fdf)	{ return x1_scrn_r(space,offset-0x1fd0); }
 	else if(offset == 0x1fe0)						{ return x1_blackclip_r(space,0); }
 	else if(offset >= 0x2000 && offset <= 0x2fff)	{ return colorram[offset-0x2000]; }
@@ -1212,10 +1234,8 @@ static READ8_DEVICE_HANDLER( x1_portb_r )
 	---- ---x "cmt test" (active low)
 	*/
 	UINT8 dat = 0;
-	dat = (input_port_read(device->machine, "SYSTEM") & ~0x6e) | sub_obf;
-
-	if((dat & 0x80) == 0)
-		dat |= 0x04;  // VSync (todo: proper implementation of vsync)
+	vdisp = (video_screen_get_vpos(device->machine->primary_screen) < 200) ? 0x80 : 0x00;
+	dat = (input_port_read(device->machine, "SYSTEM") & 0x11) | sub_obf | vsync | vdisp;
 
 	if(cassette_input(devtag_get_device(device->machine,"cass")) > 0.03)
 		dat |= 0x02;
@@ -1277,6 +1297,12 @@ static const ppi8255_interface ppi8255_intf =
 	DEVCB_HANDLER(x1_portc_w)						/* Port C write */
 };
 
+static WRITE_LINE_DEVICE_HANDLER(vsync_changed)
+{
+	vsync = (state & 1) ? 0x04 : 0x00;
+	//printf("%d %02x\n",video_screen_get_vpos(device->machine->primary_screen),vsync);
+}
+
 static const mc6845_interface mc6845_intf =
 {
 	"screen",	/* screen we are acting on */
@@ -1287,7 +1313,7 @@ static const mc6845_interface mc6845_intf =
 	DEVCB_NULL,	/* callback for display state changes */
 	DEVCB_NULL,	/* callback for cursor state changes */
 	DEVCB_NULL,	/* HSYNC callback */
-	DEVCB_NULL,	/* VSYNC callback */
+	DEVCB_LINE(vsync_changed),	/* VSYNC callback */
 	NULL		/* update address callback */
 };
 
