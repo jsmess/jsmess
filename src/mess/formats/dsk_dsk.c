@@ -20,9 +20,10 @@ struct dskdsk_tag
 {
 	int disk_image_type;  /* image type: standard or extended */
 	int heads;
-	int tracks;
-	int tracksize;
+	int tracks;	
 	int sector_size;
+	UINT64 track_offsets[84*2]; /* offset within data for each track */
+	
 };
 
 
@@ -63,7 +64,7 @@ static int dsk_get_tracks_per_disk(floppy_image *floppy)
 
 static UINT64 dsk_get_track_offset(floppy_image *floppy, int head, int track)
 {
-	return 0x100 + get_tag(floppy)->tracksize * ((track * get_tag(floppy)->heads) + head);
+	return get_tag(floppy)->track_offsets[(track<<1) + head];
 }
 
 static floperr_t get_offset(floppy_image *floppy, int head, int track, int sector, int sector_is_index, UINT64 *offset)
@@ -180,7 +181,7 @@ static floperr_t dsk_get_indexed_sector_info(floppy_image *floppy, int head, int
 	UINT8 sector_info[0x100];
 	int pos;
 	
-	retVal = get_offset(floppy, head, track, sector_index+1, TRUE, NULL);
+	retVal = get_offset(floppy, head, track, sector_index+1, FALSE, NULL);
 	offset = dsk_get_track_offset(floppy,head,track);
 	pos = 0x18 + (sector_index << 3);
 	floppy_image_read(floppy, sector_info, offset, 0x100);
@@ -192,7 +193,8 @@ static floperr_t dsk_get_indexed_sector_info(floppy_image *floppy, int head, int
 		*sector = sector_info[pos + 2];			
 	if (sector_length) {
 		*sector_length = 1 << (sector_info[pos + 3] + 7);
-	}			
+	}		
+	logerror("track : %d C %02x H %02x R %02x N %02x\n",track,sector_info[pos + 0],sector_info[pos + 1],sector_info[pos + 2],sector_info[pos + 3]);
 	if (flags)
 		*flags = (sector_info[pos + 5] & 0x40) ? ID_FLAG_DELETED_DATA : 0;
 	return retVal;
@@ -204,6 +206,9 @@ static FLOPPY_CONSTRUCT(dsk_dsk_construct)
 	struct FloppyCallbacks *callbacks;
 	struct dskdsk_tag *tag;
 	UINT8 header[0x100];
+	UINT64 tmp = 0;
+	int i;
+	int skip,cnt;
 	
 	floppy_image_read(floppy, header, 0, 0x100);
 		
@@ -212,14 +217,31 @@ static FLOPPY_CONSTRUCT(dsk_dsk_construct)
 		return FLOPPY_ERROR_OUTOFMEMORY;
 
 	tag->heads   = header[0x31];
+	if (tag->heads==1) {
+		skip = 2;
+	} else {
+		skip = 1;
+	}
 	tag->tracks  = header[0x30];	
-	
+	cnt =0;
 	if ( memcmp( header, MV_CPC, 8 ) ==0) {		
 		tag->disk_image_type = 0;
-		tag->tracksize = pick_integer_le(header, 0x32, 2);
+		tmp = 0x100;
+		for (i=0; i<tag->tracks * tag->heads; i++)
+		{
+			tag->track_offsets[cnt] = tmp;			
+			tmp += pick_integer_le(header, 0x32, 2);
+			cnt += skip;
+		}		
 	} else  {
 		tag->disk_image_type = 1;
-		tag->tracksize = header[0x34] << 8;
+		tmp = 0x100;
+		for (i=0; i<tag->tracks * tag->heads; i++)
+		{			
+			tag->track_offsets[cnt] = tmp;			
+			tmp += header[0x34 + i] << 8;
+			cnt += skip;
+		}		
 	} 
 
 	callbacks = floppy_callbacks(floppy);
