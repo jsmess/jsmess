@@ -11,6 +11,7 @@
 	- Sort out / redump the BIOS gfx roms;
 	- Implement the interrupts (uses IM 2), basically used by the keyboard.
 	- Implement DMA,CTC and SIO, they are X1Turbo only features.
+	- Improve the z80DMA core, it's so incomplete that nothing that uses it works;
 	- clean-ups!
 	- x1turbo: understand how irq generation works for the ym-2151;
 	- There are various unclear video things, these are:
@@ -27,6 +28,9 @@
 	- Bosconian: title screen background is completely white because it reverts the pen used
 	  (it's gray in the Arcade version),could be either flickering for pseudo-alpha effect or it's
 	  a btanb;
+	- Mappy/Gradius: they sets 320x200 with fps = 30 Hz, due of that they are too slow (they must run at 60 Hz),
+	  HW limitation/MC6845 bug?
+	- Exoa II - Warroid: major tile width/height positioning bugs (especially during gameplay);
 
 	Notes:
 	- An interesting feature of the Sharp X-1 is the extended i/o bank. When the ppi port c bit 5
@@ -891,10 +895,10 @@ static WRITE8_HANDLER( x1_pcg_w )
 		}
 		else
 		{
+			/* TODO: understand what 1942, Herzog and friends wants there */
 			used_pcg_addr = pcg_write_addr*8;
 			pcg_offset = (pcg_index[addr-1]+used_pcg_addr) & 0x7ff;
 			pcg_offset+=((addr-1)*0x800);
-			printf("%04x\n",pcg_offset);
 			PCG_RAM[pcg_offset] = data;
 
 			pcg_offset &= 0x7ff;
@@ -1299,7 +1303,11 @@ static const ppi8255_interface ppi8255_intf =
 
 static WRITE_LINE_DEVICE_HANDLER(vsync_changed)
 {
+	static UINT8 pcg_reset_occurred;
+
 	vsync = (state & 1) ? 0x04 : 0x00;
+	if(state & 1 && pcg_reset_occurred == 0) { pcg_reset = pcg_reset_occurred = 1; }
+	if(!(state & 1))                         { pcg_reset_occurred = 0; }
 	//printf("%d %02x\n",video_screen_get_vpos(device->machine->primary_screen),vsync);
 }
 
