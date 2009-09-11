@@ -400,9 +400,13 @@ static CDP1862_INTERFACE( vip_cdp1862_intf )
 {
 	SCREEN_TAG,
 	510,			/* R3 */
-	RES_K(1),		/* R5 */
 	360,			/* R4 */
-	RES_K(1.5)		/* R6 */
+	RES_K(1),		/* R5 */
+	RES_K(1.5),		/* R6 */
+	RES_K(3.9),		/* R7 */
+	RES_K(10),		/* R8 */
+	RES_K(2),		/* R9 */
+	RES_K(3.3)		/* R10 */
 };
 
 static WRITE8_HANDLER( vip_colorram_w )
@@ -418,11 +422,10 @@ static WRITE8_HANDLER( vip_colorram_w )
 		mask = 0xe7;
 	}
 
-//	logerror("COLOR RAM (%04x) %02x = %02x\n", offset, offset & mask, data);
-
 	/* write to CDP1822 */
 	state->colorram[offset & mask] = data << 1;
-	state->colorram_mwr = ASSERT_LINE;
+
+	cdp1862_con_w(state->cdp1862, 0);
 }
 
 static VIDEO_UPDATE( vip )
@@ -569,7 +572,7 @@ static WRITE8_DEVICE_HANDLER( vip_dma_w )
 			bd = BIT(color, 2);
 			gd = BIT(color, 3);
 
-			cdp1862_dma_w(state->cdp1862, data, state->colorram_mwr, rd, gd, bd);
+			cdp1862_dma_w(state->cdp1862, data, rd, bd, gd);
 		}
 		break;
 	}
@@ -632,7 +635,6 @@ static MACHINE_START( vip )
 
 	state_save_register_global(machine, state->reset);
 	state_save_register_global(machine, state->cdp1861_efx);
-	state_save_register_global(machine, state->colorram_mwr);
 	state_save_register_global(machine, state->keylatch);
 }
 
@@ -650,8 +652,6 @@ static MACHINE_RESET( vip )
 	/* reset devices */
 	device_reset(state->vp550);
 	device_reset(state->vp595);
-
-	state->colorram_mwr = CLEAR_LINE;
 
 	/* configure video */
 	switch (input_port_read(machine, "VIDEO"))
@@ -819,5 +819,5 @@ SYSTEM_CONFIG_END
 /* System Drivers */
 
 /*	  YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   INIT    CONFIG  COMPANY FULLNAME				FLAGS */
-COMP( 1977, vip,	0,		0,		vip,		vip,	0,		vp711,	"RCA",	"Cosmac VIP (VP-711)",	GAME_SUPPORTS_SAVE )
-COMP( 1977, vp111,	vip,	0,		vip,		vip,	0,		vp111,	"RCA",	"Cosmac VIP (VP-111)",	GAME_SUPPORTS_SAVE )
+COMP( 1977, vip,	0,		0,		vip,		vip,	0,		vp711,	"RCA",	"Cosmac VIP (VP-711)",	GAME_SUPPORTS_SAVE | GAME_IMPERFECT_COLORS )
+COMP( 1977, vp111,	vip,	0,		vip,		vip,	0,		vp111,	"RCA",	"Cosmac VIP (VP-111)",	GAME_SUPPORTS_SAVE | GAME_IMPERFECT_COLORS )

@@ -1,19 +1,37 @@
+/**********************************************************************
+
+    RCA CDP1862 COS/MOS Color Generator Controller emulation
+
+    Copyright MESS Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
+
+**********************************************************************/
+
 /*
 
     TODO:
 
-	- NTSC output, currently using RGB
+	- calculate colors from luminance/chrominance resistors
+	- refactor DMA write to WRITE8_DEVICE_HANDLER and add callbacks for RD/BD/GD
 
 */
 
 #include "driver.h"
 #include "cdp1862.h"
 
+/***************************************************************************
+    PARAMETERS
+***************************************************************************/
+
+static const int CDP1862_BACKGROUND_COLOR_SEQUENCE[] = { 2, 0, 1, 4 };
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
 typedef struct _cdp1862_t cdp1862_t;
 struct _cdp1862_t
 {
-	const cdp1862_interface *intf;
-
 	const device_config *screen;	/* screen */
 	bitmap_t *bitmap;				/* bitmap */
 
@@ -21,29 +39,37 @@ struct _cdp1862_t
 	int con;						/* color on */
 };
 
-static const int CDP1862_BACKGROUND_COLOR_SEQUENCE[] = { 2, 0, 1, 4 };
+/***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
 
 INLINE cdp1862_t *get_safe_token(const device_config *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
-
+	assert(device->type == CDP1862);
 	return (cdp1862_t *)device->token;
 }
 
-/* Palette Initialization */
+/***************************************************************************
+    IMPLEMENTATION
+***************************************************************************/
 
-static void cdp1862_init_palette(const device_config *device)
+/*-------------------------------------------------
+    initialize_palette - palette initialization
+-------------------------------------------------*/
+
+static void initialize_palette(const device_config *device)
 {
-	cdp1862_t *cdp1862 = get_safe_token(device);
+	const cdp1862_interface *intf = device->static_config;
 	int i;
 
-	double res_total = cdp1862->intf->res_r + cdp1862->intf->res_g + cdp1862->intf->res_b + cdp1862->intf->res_bkg;
+	double res_total = intf->chr_r + intf->chr_g + intf->chr_b + intf->chr_bkg;
 
-	int weight_r = (cdp1862->intf->res_r / res_total) * 100;
-	int weight_g = (cdp1862->intf->res_g / res_total) * 100;
-	int weight_b = (cdp1862->intf->res_b / res_total) * 100;
-	int weight_bkg = (cdp1862->intf->res_bkg / res_total) * 100;
+	int weight_r = (intf->chr_r / res_total) * 100;
+	int weight_g = (intf->chr_g / res_total) * 100;
+	int weight_b = (intf->chr_b / res_total) * 100;
+	int weight_bkg = (intf->chr_bkg / res_total) * 100;
 
 	for (i = 0; i < 16; i++)
 	{
@@ -60,11 +86,13 @@ static void cdp1862_init_palette(const device_config *device)
 		g = (i & 1) ? luma : 0;
 		b = (i & 2) ? luma : 0;
 
-		palette_set_color_rgb( device->machine, i, r, g, b );
+		palette_set_color_rgb(device->machine, i, r, g, b);
 	}
 }
 
-/* Step Background Color */
+/*-------------------------------------------------
+    cdp1862_bkg_w - background step write
+-------------------------------------------------*/
 
 WRITE8_DEVICE_HANDLER( cdp1862_bkg_w )
 {
@@ -73,9 +101,11 @@ WRITE8_DEVICE_HANDLER( cdp1862_bkg_w )
 	if (++cdp1862->bgcolor > 3) cdp1862->bgcolor = 0;
 }
 
-/* DMA write */
+/*-------------------------------------------------
+    cdp1862_dma_w - DMA byte write
+-------------------------------------------------*/
 
-void cdp1862_dma_w(const device_config *device, UINT8 data, int color_on, int rdata, int gdata, int bdata)
+void cdp1862_dma_w(const device_config *device, UINT8 data, int rd, int bd, int gd)
 {
 	cdp1862_t *cdp1862 = get_safe_token(device);
 
@@ -83,18 +113,12 @@ void cdp1862_dma_w(const device_config *device, UINT8 data, int color_on, int rd
 	int y = video_screen_get_vpos(cdp1862->screen);
 	int x;
 
-	if (color_on == ASSERT_LINE)
-	{
-		/* enable color data input latch */
-		cdp1862->con = ASSERT_LINE;
-	}
-
-	if (cdp1862->con == CLEAR_LINE)
+	if (cdp1862->con)
 	{
 		/* latch white dot color */
-		rdata = 1;
-		gdata = 1;
-		bdata = 1;
+		rd = 1;
+		gd = 1;
+		bd = 1;
 	}
 
 	for (x = 0; x < 8; x++)
@@ -103,7 +127,7 @@ void cdp1862_dma_w(const device_config *device, UINT8 data, int color_on, int rd
 
 		if (BIT(data, 7))
 		{
-			color = (gdata << 2) | (bdata << 1) | rdata;
+			color = (gd << 2) | (bd << 1) | rd;
 		}
 
 		*BITMAP_ADDR16(cdp1862->bitmap, y, sx + x) = color;
@@ -112,7 +136,23 @@ void cdp1862_dma_w(const device_config *device, UINT8 data, int color_on, int rd
 	}
 }
 
-/* Screen Update */
+/*-------------------------------------------------
+    cdp1862_con_w - color on write
+-------------------------------------------------*/
+
+WRITE_LINE_DEVICE_HANDLER( cdp1862_con_w )
+{
+	cdp1862_t *cdp1862 = get_safe_token(device);
+
+	if (!state)
+	{
+		cdp1862->con = 0;
+	}
+}
+
+/*-------------------------------------------------
+    cdp1862_update - screen update
+-------------------------------------------------*/
 
 void cdp1862_update(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
@@ -122,30 +162,24 @@ void cdp1862_update(const device_config *device, bitmap_t *bitmap, const rectang
 	bitmap_fill(cdp1862->bitmap, cliprect, CDP1862_BACKGROUND_COLOR_SEQUENCE[cdp1862->bgcolor] + 8);
 }
 
-/* Device Interface */
+/*-------------------------------------------------
+    DEVICE_START( cdp1862 )
+-------------------------------------------------*/
 
 static DEVICE_START( cdp1862 )
 {
 	cdp1862_t *cdp1862 = get_safe_token(device);
-
-	/* validate arguments */
-	assert(device != NULL);
-	assert(device->tag != NULL);
-	assert(device->clock > 0);
-
-	cdp1862->intf = device->static_config;
-
-	assert(cdp1862->intf != NULL);
+	const cdp1862_interface *intf = device->static_config;
 
 	/* get the screen device */
-	cdp1862->screen = devtag_get_device(device->machine, cdp1862->intf->screen_tag);
+	cdp1862->screen = devtag_get_device(device->machine, intf->screen_tag);
 	assert(cdp1862->screen != NULL);
 
 	/* allocate the temporary bitmap */
 	cdp1862->bitmap = auto_bitmap_alloc(device->machine, video_screen_get_width(cdp1862->screen), video_screen_get_height(cdp1862->screen), video_screen_get_format(cdp1862->screen));
 
 	/* initialize the palette */
-	cdp1862_init_palette(device);
+	initialize_palette(device);
 
 	/* register for state saving */
 	state_save_register_device_item(device, 0, cdp1862->bgcolor);
@@ -153,13 +187,21 @@ static DEVICE_START( cdp1862 )
 	state_save_register_device_item_bitmap(device, 0, cdp1862->bitmap);
 }
 
+/*-------------------------------------------------
+    DEVICE_RESET( cdp1862 )
+-------------------------------------------------*/
+
 static DEVICE_RESET( cdp1862 )
 {
 	cdp1862_t *cdp1862 = get_safe_token(device);
 
 	cdp1862->bgcolor = 0;
-	cdp1862->con = CLEAR_LINE;
+	cdp1862->con = 1;
 }
+
+/*-------------------------------------------------
+    DEVICE_GET_INFO( cdp1862 )
+-------------------------------------------------*/
 
 DEVICE_GET_INFO( cdp1862 )
 {
@@ -176,10 +218,10 @@ DEVICE_GET_INFO( cdp1862 )
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(cdp1862);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "RCA CDP1862");					break;
-		case DEVINFO_STR_FAMILY:						strcpy(info->s, "RCA CDP1800");					break;
-		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");							break;
-		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);							break;
-		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright MESS Team");			break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "RCA CDP1862");				break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "RCA CDP1800");				break;
+		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");						break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);					break;
+		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright MESS Team");		break;
 	}
 }
