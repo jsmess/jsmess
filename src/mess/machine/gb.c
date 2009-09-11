@@ -1922,7 +1922,7 @@ static TIMER_CALLBACK(gb_serial_timer_proc)
 	{
 		SIOCONT &= 0x7F;
 		timer_enable( gb_serial_timer, 0 );
-		cputag_set_input_line(machine, "maincpu", SIO_INT, HOLD_LINE);
+		cputag_set_input_line(machine, "maincpu", SIO_INT, ASSERT_LINE);
 	}
 }
 
@@ -1935,7 +1935,7 @@ INLINE void gb_timer_check_irq( running_machine *machine )
 		if ( TIMECNT == 0 ) 
 		{
 			TIMECNT = TIMEMOD;
-			cputag_set_input_line(machine, "maincpu", TIM_INT, HOLD_LINE );
+			cputag_set_input_line(machine, "maincpu", TIM_INT, ASSERT_LINE );
 			gb_timer.reloading = 1;
 		}
 	}
