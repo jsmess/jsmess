@@ -39,6 +39,7 @@ struct _vip_state
 
 	/* video state */
 	int cdp1861_efx;				/* EFx */
+	int a12;						/* latched address line 12 */
 	int colorram_mwr;				/* color RAM write */
 	UINT8 *colorram;				/* CDP1862 color RAM */
 

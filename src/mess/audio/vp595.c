@@ -1,32 +1,22 @@
 /**********************************************************************
 
-	RCA VP595 - VIP Super Sound System emulation
+	RCA VP595 - VIP Simple Sound System emulation
 
 	Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
 
 *********************************************************************/
 
-/*
-
-	TODO:
-
-	- CDP1863 frequency?
-
-*/
-
 #include "driver.h"
 #include "vp595.h"
-#include "cpu/cdp1802/cdp1802.h"
 #include "sound/cdp1863.h"
 
 /***************************************************************************
     PARAMETERS
 ***************************************************************************/
 
-#define LOG 0
-
-#define CDP1863_TAG		"cdp1863"
+#define CDP1863_TAG		"u1"
+#define CDP1863_XTAL	440560
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -67,6 +57,18 @@ WRITE_LINE_DEVICE_HANDLER( vp595_q_w )
 }
 
 /*-------------------------------------------------
+    vp595_cdp1863_w - CDP1863 latch write
+-------------------------------------------------*/
+
+static WRITE8_DEVICE_HANDLER( vp595_cdp1863_w )
+{
+	/* inject 0x80 instead of 0x00 */
+	if (data == 0) data = 0x80;
+
+	cdp1863_str_w(device, 0, data);
+}
+
+/*-------------------------------------------------
     vp595_install_readwrite_handler - install
 	or uninstall write handlers
 -------------------------------------------------*/
@@ -77,7 +79,7 @@ void vp595_install_write_handlers(const device_config *device, const address_spa
 
 	if (enabled)
 	{
-		memory_install_write8_device_handler(io, vp595->cdp1863, 0x03, 0x03, 0, 0, cdp1863_str_w);
+		memory_install_write8_device_handler(io, vp595->cdp1863, 0x03, 0x03, 0, 0, vp595_cdp1863_w);
 	}
 	else
 	{
@@ -90,7 +92,7 @@ void vp595_install_write_handlers(const device_config *device, const address_spa
 -------------------------------------------------*/
 
 static MACHINE_DRIVER_START( vp595 )
-	MDRV_CDP1863_ADD(CDP1863_TAG, XTAL_3_52128MHz/2, 0)
+	MDRV_CDP1863_ADD(CDP1863_TAG, 0, 0) // TODO: clock2 should be CDP1863_XTAL
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END
 
@@ -103,22 +105,11 @@ static DEVICE_START( vp595 )
 	vp595_t *vp595 = get_safe_token(device);
 
 	/* look up devices */
-	vp595->cdp1863 = devtag_get_device(device->machine, "vp595:cdp1863");
+	vp595->cdp1863 = devtag_get_device(device->machine, "vp595:u1");
 	assert(vp595->cdp1863 != NULL);
 
-	/* register for state saving */
-//	state_save_register_global(device->machine, vp595->);
-}
-
-/*-------------------------------------------------
-    DEVICE_RESET( vp595 )
--------------------------------------------------*/
-
-static DEVICE_RESET( vp595 )
-{
-	vp595_t *vp595 = get_safe_token(device);
-
-	device_reset(vp595->cdp1863);
+	/* HACK workaround */
+	cdp1863_set_clk2(vp595->cdp1863, CDP1863_XTAL);
 }
 
 /*-------------------------------------------------
@@ -140,7 +131,7 @@ DEVICE_GET_INFO( vp595 )
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(vp595);		break;
 		case DEVINFO_FCT_STOP:							/* Nothing */								break;
-		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(vp595);		break;
+		case DEVINFO_FCT_RESET:							/* Nothing */								break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "RCA VP595");				break;

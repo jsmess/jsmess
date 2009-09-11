@@ -408,8 +408,20 @@ static CDP1862_INTERFACE( vip_cdp1862_intf )
 static WRITE8_HANDLER( vip_colorram_w )
 {
 	vip_state *state = space->machine->driver_data;
+	UINT8 mask = 0xff;
 
-	state->colorram[offset] = data;
+	state->a12 = (offset & 0x1000) ? 1 : 0;
+
+	if (!state->a12) 
+	{
+		/* mask out A4 and A3 */
+		mask = 0xe7;
+	}
+
+//	logerror("COLOR RAM (%04x) %02x = %02x\n", offset, offset & mask, data);
+
+	/* write to CDP1822 */
+	state->colorram[offset & mask] = data << 1;
 	state->colorram_mwr = ASSERT_LINE;
 }
 
@@ -541,13 +553,23 @@ static WRITE8_DEVICE_HANDLER( vip_dma_w )
 
 	case VIP_VIDEO_CDP1862:
 		{
-			UINT8 color = state->colorram[offset & 0xff];
-			
-			int rdata = BIT(color, 1);
-			int gdata = BIT(color, 3);
-			int bdata = BIT(color, 2);
+			UINT8 mask = 0xff;
+			UINT8 color;
+			int rd, bd, gd;
 
-			cdp1862_dma_w(state->cdp1862, data, state->colorram_mwr, rdata, gdata, bdata);
+			if (!state->a12)
+			{
+				/* mask out A4 and A3 */
+				mask = 0xe7;
+			}
+
+			color = state->colorram[offset & mask];
+			
+			rd = BIT(color, 1);
+			bd = BIT(color, 2);
+			gd = BIT(color, 3);
+
+			cdp1862_dma_w(state->cdp1862, data, state->colorram_mwr, rd, gd, bd);
 		}
 		break;
 	}
@@ -636,12 +658,12 @@ static MACHINE_RESET( vip )
 	{
 	case VIP_VIDEO_CDP1861:
 		memory_install_write8_handler(io, 0x05, 0x05, 0, 0, SMH_UNMAP);
-		memory_install_write8_handler(program, 0xc000, 0xc0ff, 0, 0, SMH_UNMAP);
+		memory_install_write8_handler(program, 0xc000, 0xdfff, 0, 0, SMH_UNMAP);
 		break;
 
 	case VIP_VIDEO_CDP1862:
 		memory_install_write8_device_handler(io, state->cdp1862, 0x05, 0x05, 0, 0, cdp1862_bkg_w);
-		memory_install_write8_handler(program, 0xc000, 0xc0ff, 0, 0, vip_colorram_w);
+		memory_install_write8_handler(program, 0xc000, 0xdfff, 0, 0, vip_colorram_w);
 		break;
 	}
 
@@ -718,8 +740,8 @@ static MACHINE_DRIVER_START( vip )
 	MDRV_SOUND_CONFIG_DISCRETE(vip)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
+	MDRV_VP595_ADD
 	MDRV_VP550_ADD(XTAL_3_52128MHz/2)
-	MDRV_VP595_ADD(XTAL_3_52128MHz/2)
 
 	/* devices */
 	MDRV_QUICKLOAD_ADD("quickload", vip, "bin,c8,c8x", 0)
