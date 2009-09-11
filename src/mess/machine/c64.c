@@ -1268,36 +1268,19 @@ static DEVICE_IMAGE_LOAD(c64_cart)
 	memset(roml, 0, 0x2000);
 	memset(romh, 0, 0x2000);
 
-	/* a bit hacky, until we have fixed the bankswitch part... it will be improved afterwards! */
-	/* previously we only loaded cart here because we had at most two banks to be loaded sequentially and never switched */
-	/* now we have bankswitch handlers for some cart types, but we keep loading first 1 or 2 banks here, for carts without bankswitch */
-	/* to be sure we only load the first pieces, we check that cart.addr is larger than the previous and that no more than 2 CHIPs are loaded */
-	for (i = 0; (i < sizeof(c64_cbm_cart) / sizeof(c64_cbm_cart[0])) && (c64_cbm_cart[i].size != 0); i++)
-/*
-	{
-		// load the bank only if the space is free
-		if ((c64_cbm_cart[i].addr < 0xc000) && (c64_cbm_cart[i].addr >= lbank_end_addr + 0x8000) && (i < 2))
-		{
-			memcpy(roml + c64_cbm_cart[i].addr - 0x8000, cart + c64_cbm_cart[i].start, c64_cbm_cart[i].size);
-			lbank_end_addr += c64_cbm_cart[i].addr - 0x8000 + c64_cbm_cart[i].size;
-		}
-		else if ((c64_cbm_cart[i].addr >= 0xe000) && (c64_cbm_cart[i].addr >= hbank_end_addr + 0xe000))
-		{
-			memcpy(romh + c64_cbm_cart[i].addr - 0xe000, cart + c64_cbm_cart[i].start, c64_cbm_cart[i].size);
-			hbank_end_addr += c64_cbm_cart[i].addr - 0xe000 + c64_cbm_cart[i].size;
-		}
-	}
-*/
 	switch( c64_mapper )
 	{
 	case ZAXXON:
-		// c64_game = 0;
-		// c64_exrom = 0;
 		memcpy(romh, cart + 0x1000, 0x2000);
 		break;
 	default:
-		memcpy(roml, cart + 0 * 0x2000, 0x2000);
-		memcpy(romh, cart + 1 * 0x2000, 0x2000);
+		if (!c64_game && c64_exrom)
+			memcpy(romh, cart, 0x2000);
+		else
+		{
+			memcpy(roml, cart + 0 * 0x2000, 0x2000);
+			memcpy(romh, cart + 1 * 0x2000, 0x2000);
+		}
 	}
 
 	c64_cart_n_banks = n_banks; // this is needed so that we only set mappers if a cart is present!
