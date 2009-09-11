@@ -164,6 +164,7 @@ static UINT8 sub_obf;
 static struct
 {
 	UINT8 gfx_bank;
+	UINT8 disp_bank;
 	UINT8 pcg_mode;
 	UINT8 v400_mode;
 
@@ -385,9 +386,9 @@ static VIDEO_UPDATE( x1 )
 
 	w = (video_screen_get_width(screen) < 640) ? 1 : 2;
 
-	draw_gfxbitmap(screen->machine,bitmap,cliprect,w,0,scrn_reg.ply);
+	draw_gfxbitmap(screen->machine,bitmap,cliprect,w,scrn_reg.disp_bank,scrn_reg.ply);
 	draw_fgtilemap(screen->machine,bitmap,cliprect,w);
-	draw_gfxbitmap(screen->machine,bitmap,cliprect,w,0,scrn_reg.ply^0xff);
+	draw_gfxbitmap(screen->machine,bitmap,cliprect,w,scrn_reg.disp_bank,scrn_reg.ply^0xff);
 	/* Y's uses the following as a normal buffer/work ram without anything reasonable to draw */
 //	draw_gfxbitmap(screen->machine,bitmap,cliprect,w,1);
 
@@ -936,9 +937,9 @@ static WRITE8_HANDLER( x1_ex_gfxram_w )
 	else if(offset >= 0x8000 && offset <= 0xbfff)	{ ex_mask = 5; }
 	else                                        	{ ex_mask = 3; }
 
-	if(ex_mask & 1) { gfx_bitmap_ram[(offset & 0x3fff)+0x0000] = data; }
-	if(ex_mask & 2) { gfx_bitmap_ram[(offset & 0x3fff)+0x4000] = data; }
-	if(ex_mask & 4) { gfx_bitmap_ram[(offset & 0x3fff)+0x8000] = data; }
+	if(ex_mask & 1) { gfx_bitmap_ram[(offset & 0x3fff)+0x0000+(scrn_reg.gfx_bank*0xc000)] = data; }
+	if(ex_mask & 2) { gfx_bitmap_ram[(offset & 0x3fff)+0x4000+(scrn_reg.gfx_bank*0xc000)] = data; }
+	if(ex_mask & 4) { gfx_bitmap_ram[(offset & 0x3fff)+0x8000+(scrn_reg.gfx_bank*0xc000)] = data; }
 }
 
 /*
@@ -960,9 +961,10 @@ static WRITE8_HANDLER( x1_scrn_w )
 {
 	scrn_reg.pcg_mode = (data & 0x20)>>5;
 	scrn_reg.gfx_bank = (data & 0x10)>>4;
+	scrn_reg.disp_bank = (data & 0x08)>>3;
 	scrn_reg.v400_mode = ((data & 0x03) == 3) ? 1 : 0;
-	if(data & 0xcc)
-		printf("SCRN = %02x\n",data & 0xcc);
+	if(data & 0xc4)
+		printf("SCRN = %02x\n",data & 0xc4);
 }
 
 static WRITE8_HANDLER( x1_ply_w )
