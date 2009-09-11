@@ -6,14 +6,18 @@
 
 **************************************************************************/
 
-#ifndef COUPEDSK_H_
-#define COUPEDSK_H_
-
+#ifndef __COUPEDSK_H__
+#define __COUPEDSK_H__
 
 #include "formats/flopimg.h"
 
 
-FLOPPY_OPTIONS_EXTERN(coupe);
+FLOPPY_CONSTRUCT( coupe_mgt_construct );
+FLOPPY_IDENTIFY( coupe_mgt_identify );
+FLOPPY_CONSTRUCT( coupe_sad_construct );
+FLOPPY_IDENTIFY( coupe_sad_identify );
+FLOPPY_CONSTRUCT( coupe_sdf_construct );
+FLOPPY_IDENTIFY( coupe_sdf_identify );
 
 
-#endif /* COUPEDSK_H_ */
+#endif /* __COUPEDSK_H__ */

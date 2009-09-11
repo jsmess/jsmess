@@ -72,6 +72,9 @@ System Driver Changes:
 
 - [PX4] Added RAM disk support.  [Dirk Best]
 
+- [SAMCOUPE] Added support for Extended DiSK/MV - CPC style disk
+  images.  [Dirk Best]
+
 - [SNES] Plenty of improvements to SNES emulation (see MAME whatsnew for 
   more details) [Fabio Priuli, Angelo Salese]: 
   * fixes to hi-res in Mode 5/6, interlaced graphics, rowscroll, window effect

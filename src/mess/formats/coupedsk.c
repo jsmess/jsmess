@@ -33,9 +33,9 @@ struct sdf_tag
 
 /*
     Straight rip without any header
-    
+
     Data:
-    
+
     Side 0 Track 0
     Side 1 Track 0
     Side 0 Track 1
@@ -44,7 +44,7 @@ struct sdf_tag
 */
 
 
-static FLOPPY_CONSTRUCT( coupe_mgt_construct )
+FLOPPY_CONSTRUCT( coupe_mgt_construct )
 {
 	struct basicdsk_geometry geometry;
 
@@ -69,21 +69,21 @@ static FLOPPY_CONSTRUCT( coupe_mgt_construct )
 			return FLOPPY_ERROR_INVALIDIMAGE;
 
 		geometry.sectors = size / 81920;
-		
+
 	}
 
 	return basicdsk_construct(floppy, &geometry);
 }
 
 
-static FLOPPY_IDENTIFY( coupe_mgt_identify )
+FLOPPY_IDENTIFY( coupe_mgt_identify )
 {
 	UINT64 size;
 
 	size = floppy_image_size(floppy);
 
 	*vote = (size == 737280 || size == 819200) ? 100 : 0;
-	return FLOPPY_ERROR_SUCCESS;	
+	return FLOPPY_ERROR_SUCCESS;
 }
 
 
@@ -96,22 +96,22 @@ static FLOPPY_IDENTIFY( coupe_mgt_identify )
 
 /*
     Header (22 bytes):
-    
+
     0-17 "Aley's disk backup"
     18   number of sides
     19   number of tracks
     20   number of sectors per track
     21   sector size divided by 64
-    
+
     Data:
-    
+
     Side 0 Track 0
     Side 0 Track 1
     Side 0 Track 2
     ...
     Side 1 Track 0
     Side 1 Track 1
-    ...  
+    ...
 */
 
 
@@ -128,7 +128,7 @@ static void coupe_sad_interpret_header(floppy_image *floppy,
 	UINT8 header[SAD_HEADER_LEN];
 
 	floppy_image_read(floppy, header, 0, SAD_HEADER_LEN);
-	
+
 	*heads = header[18];
 	*tracks = header[19];
 	*sectors = header[20];
@@ -136,7 +136,7 @@ static void coupe_sad_interpret_header(floppy_image *floppy,
 }
 
 
-static FLOPPY_CONSTRUCT( coupe_sad_construct )
+FLOPPY_CONSTRUCT( coupe_sad_construct )
 {
 	struct basicdsk_geometry geometry;
 	int heads, tracks, sectors, sector_length;
@@ -184,13 +184,13 @@ static FLOPPY_CONSTRUCT( coupe_sad_construct )
 }
 
 
-static FLOPPY_IDENTIFY( coupe_sad_identify )
+FLOPPY_IDENTIFY( coupe_sad_identify )
 {
 	int heads, tracks, sectors, sector_size;
 	UINT64 size, calculated_size;
 
 	size = floppy_image_size(floppy);
-	
+
 	/* read values from SAD header */
 	coupe_sad_interpret_header(floppy, &heads, &tracks, &sectors, &sector_size);
 
@@ -206,7 +206,7 @@ static FLOPPY_IDENTIFY( coupe_sad_identify )
 /*************************************
  *
  *  SDF disk image format
- * 
+ *
  *  TODO: wd17xx status codes are
  *        currently ignored
  *
@@ -222,7 +222,7 @@ static int coupe_sdf_get_heads_per_disk(floppy_image *floppy)
 static int coupe_sdf_get_tracks_per_disk(floppy_image *floppy)
 {
 	struct sdf_tag *tag = floppy_tag(floppy, SDF_TAG);
-	return tag->tracks;	
+	return tag->tracks;
 }
 
 
@@ -328,7 +328,7 @@ static floperr_t coupe_sdf_get_total_sector_offset(floppy_image *floppy,
 	if (err) return err;
 
 	*offset = track_offset + sector_offset;
-	
+
 	return FLOPPY_ERROR_SUCCESS;
 }
 
@@ -391,7 +391,7 @@ static floperr_t coupe_sdf_read_indexed_sector(floppy_image *floppy,
 
 	err = coupe_sdf_get_total_sector_offset(floppy, head, track, sector, &offset);
 	if (err) return err;
-	
+
 	/* read sector data into buffer */
 	floppy_image_read(floppy, buffer, offset + 8, buflen);
 
@@ -432,7 +432,7 @@ static void coupe_sdf_interpret_header(floppy_image *floppy, int *heads, int *tr
 }
 
 
-static FLOPPY_CONSTRUCT( coupe_sdf_construct )
+FLOPPY_CONSTRUCT( coupe_sdf_construct )
 {
 	struct FloppyCallbacks *callbacks;
 	struct sdf_tag *tag;
@@ -472,7 +472,7 @@ static FLOPPY_CONSTRUCT( coupe_sdf_construct )
 }
 
 
-static FLOPPY_IDENTIFY( coupe_sdf_identify )
+FLOPPY_IDENTIFY( coupe_sdf_identify )
 {
 	int heads, tracks;
 
@@ -487,41 +487,3 @@ static FLOPPY_IDENTIFY( coupe_sdf_identify )
 
 	return FLOPPY_ERROR_SUCCESS;
 }
-
-
-
-/*************************************
- *
- *  Floppy options
- *
- *************************************/
-
-FLOPPY_OPTIONS_START(coupe)
-	FLOPPY_OPTION
-	(
-		coupe_mgt, "mgt,dsk,sad", "SAM Coupe MGT disk image", coupe_mgt_identify, coupe_mgt_construct,
-		HEADS([2])
-		TRACKS([80])
-		SECTORS(9-[10])
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([1])
-	)
-	FLOPPY_OPTION
-	(
-		coupe_sad, "sad,dsk", "SAM Coupe SAD disk image", coupe_sad_identify, coupe_sad_construct,
-		HEADS(1-[2]-255)
-		TRACKS(1-[80]-255)
-		SECTORS(1-[10]-255)
-		SECTOR_LENGTH(64/128/256/[512]/1024/2048/4096)
-		FIRST_SECTOR_ID([1])
-	)
-	FLOPPY_OPTION
-	(
-		coupe_sdf, "sdf,dsk,sad", "SAM Coupe SDF disk image", coupe_sdf_identify, coupe_sdf_construct,
-		HEADS(1-[2])
-		TRACKS(1-[80]-83)
-		SECTORS(1-[10]-12)
-		SECTOR_LENGTH(128/256/[512]/1024)
-		FIRST_SECTOR_ID([1])
-	)
-FLOPPY_OPTIONS_END

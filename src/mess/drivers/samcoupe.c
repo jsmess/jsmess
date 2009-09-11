@@ -44,6 +44,7 @@
 /* devices */
 #include "devices/mflopimg.h"
 #include "formats/coupedsk.h"
+#include "formats/dsk_dsk.h"
 
 
 /***************************************************************************
@@ -562,6 +563,37 @@ ROM_END
 /***************************************************************************
     SYSTEM CONFIG
 ***************************************************************************/
+
+FLOPPY_OPTIONS_START( coupe )
+	FLOPPY_OPTION
+	(
+		coupe_mgt, "mgt,dsk,sad", "SAM Coupe MGT disk image", coupe_mgt_identify, coupe_mgt_construct,
+		HEADS([2])
+		TRACKS([80])
+		SECTORS(9-[10])
+		SECTOR_LENGTH([512])
+		FIRST_SECTOR_ID([1])
+	)
+	FLOPPY_OPTION
+	(
+		coupe_sad, "sad,dsk", "SAM Coupe SAD disk image", coupe_sad_identify, coupe_sad_construct,
+		HEADS(1-[2]-255)
+		TRACKS(1-[80]-255)
+		SECTORS(1-[10]-255)
+		SECTOR_LENGTH(64/128/256/[512]/1024/2048/4096)
+		FIRST_SECTOR_ID([1])
+	)
+	FLOPPY_OPTION
+	(
+		coupe_sdf, "sdf,dsk,sad", "SAM Coupe SDF disk image", coupe_sdf_identify, coupe_sdf_construct,
+		HEADS(1-[2])
+		TRACKS(1-[80]-83)
+		SECTORS(1-[10]-12)
+		SECTOR_LENGTH(128/256/[512]/1024)
+		FIRST_SECTOR_ID([1])
+	)
+	FLOPPY_OPTION(dsk, "dsk", "DSK floppy disk image", dsk_dsk_identify, dsk_dsk_construct, NULL)
+FLOPPY_OPTIONS_END
 
 static void samcoupe_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {

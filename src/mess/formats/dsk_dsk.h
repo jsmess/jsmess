@@ -6,13 +6,16 @@
 
 *********************************************************************/
 
-#ifndef DSK_DSK_H
-#define DSK_DSK_H
+#ifndef __DSK_DSK_H__
+#define __DSK_DSK_H__
 
 #include "formats/flopimg.h"
 
-/**************************************************************************/
 
 FLOPPY_OPTIONS_EXTERN(dsk);
 
-#endif /* DSK_DSK_H */
+FLOPPY_IDENTIFY(dsk_dsk_identify);
+FLOPPY_CONSTRUCT(dsk_dsk_construct);
+
+
+#endif /* __DSK_DSK_H__ */
