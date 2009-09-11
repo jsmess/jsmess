@@ -175,6 +175,8 @@ static void gb_rom16_0000( running_machine *machine, UINT8 *addr )
 {
 	memory_set_bankptr( machine, 5, addr );
 	memory_set_bankptr( machine, 10, addr + 0x0100 );
+	memory_set_bankptr( machine, 6, addr + 0x0150 );
+	memory_set_bankptr( machine, 11, addr + 0x0400 );
 }
 
 static void gb_rom16_4000( running_machine *machine, UINT8 *addr ) 
@@ -301,9 +303,10 @@ MACHINE_RESET( gb )
 
 	gb_video_init( machine, GB_VIDEO_DMG );
 
+	gb_rom16_0000( machine, ROMMap[ROMBank00] );
+
 	/* Enable BIOS rom */
 	memory_set_bankptr(machine, 5, memory_region(machine, "maincpu") );
-	memory_set_bankptr(machine, 10, ROMMap[ROMBank00] + 0x0100 );
 
 	gb_timer.divcount = 0x0004;
 }
@@ -316,8 +319,7 @@ MACHINE_RESET( sgb )
 
 	gb_init_regs(machine);
 
-	memory_set_bankptr(machine, 5, ROMMap[ROMBank00] ? ROMMap[ROMBank00] : gb_dummy_rom_bank );
-	memory_set_bankptr(machine, 10, ROMMap[ROMBank00] ? ROMMap[ROMBank00] + 0x0100 : gb_dummy_rom_bank + 0x0100 );
+	gb_rom16_0000( machine, ROMMap[ROMBank00] ? ROMMap[ROMBank00] : gb_dummy_rom_bank );
 
 	sgb_tile_data = auto_alloc_array_clear(machine, UINT8, 0x2000 );
 	memset( sgb_tile_data, 0, 0x2000 );
@@ -360,8 +362,7 @@ MACHINE_RESET( gbpocket )
 	gb_sound_w(devtag_get_device(machine, "custom"), 0x14,0x77);
 
 	/* Enable BIOS rom if we have one */
-	memory_set_bankptr(machine, 5, ROMMap[ROMBank00] ? ROMMap[ROMBank00] : gb_dummy_rom_bank );
-	memory_set_bankptr(machine, 10, ROMMap[ROMBank00] ? ROMMap[ROMBank00] + 0x0100 : gb_dummy_rom_bank + 0x0100);
+	gb_rom16_0000( machine, ROMMap[ROMBank00] ? ROMMap[ROMBank00] : gb_dummy_rom_bank );
 
 	gb_timer.divcount = 0xABC8;
 }
@@ -381,8 +382,11 @@ MACHINE_RESET( gbc )
 	gb_sound_w(devtag_get_device(machine, "custom"), 0x15, 0xF3);
 	gb_sound_w(devtag_get_device(machine, "custom"), 0x14, 0x77);
 
-	memory_set_bankptr(machine, 5, ROMMap[ROMBank00] ? ROMMap[ROMBank00] : gb_dummy_rom_bank );
-	memory_set_bankptr(machine, 10, ROMMap[ROMBank00] ? ROMMap[ROMBank00] + 0x0100 : gb_dummy_rom_bank + 0x0100);
+	gb_rom16_0000( machine, ROMMap[ROMBank00] ? ROMMap[ROMBank00] : gb_dummy_rom_bank );
+
+	/* Enable BIOS rom */
+	memory_set_bankptr(machine, 5, memory_region(machine, "maincpu") );
+	memory_set_bankptr(machine, 6, memory_region(machine, "maincpu") + 0x100 );
 
 	/* Allocate memory for internal ram */
 	for( ii = 0; ii < 8; ii++ ) 
@@ -890,7 +894,7 @@ WRITE8_HANDLER ( gb_io2_w )
 	if ( offset == 0x10 ) 
 	{
 		/* disable BIOS ROM */
-		memory_set_bankptr(space->machine, 5, ROMMap[ROMBank00]);
+		gb_rom16_0000( space->machine, ROMMap[ROMBank00] );
 	} 
 	else 
 	{
@@ -1985,6 +1989,9 @@ WRITE8_HANDLER ( gbc_io2_w )
 	{
 		case 0x0D:	/* KEY1 - Prepare speed switch */
 			cpu_set_reg( cputag_get_cpu(space->machine, "maincpu"), LR35902_SPEED, data );
+			return;
+		case 0x10:	/* BFF - Bios disable */
+			gb_rom16_0000( space->machine, ROMMap[ROMBank00] );
 			return;
 		case 0x16:	/* RP - Infrared port */
 			break;

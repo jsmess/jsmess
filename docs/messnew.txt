@@ -42,6 +42,8 @@ System Driver Changes:
 
 - [COLECO] Bug #1460 fixed [Robbbert]
 
+- [GBCOLOR] Added preliminary support for the bootstrap rom.  [Wilbert Pol]
+
 - [MEGADRIVE]  Fixed multisession issues, fixed SRAM size and SRAM memory 
   leak. [Enik]
 

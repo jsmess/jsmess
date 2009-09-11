@@ -445,19 +445,21 @@ space. This mapper uses 32KB sized banks.
 /* Initial value of the cpu registers (hacks until we get bios dumps) */
 static const UINT16 sgb_cpu_regs[6] = { 0x01B0, 0x0013, 0x00D8, 0x014D, 0xFFFE, 0x0100 };    /* Super Game Boy                    */
 static const UINT16 mgb_cpu_regs[6] = { 0xFFB0, 0x0013, 0x00D8, 0x014D, 0xFFFE, 0x0100 };	/* Game Boy Pocket / Super Game Boy 2 */
-static const UINT16 cgb_cpu_regs[6] = { 0x11B0, 0x0013, 0x00D8, 0x014D, 0xFFFE, 0x0100 };	/* Game Boy Color  / Game Boy Advance */
+//static const UINT16 cgb_cpu_regs[6] = { 0x11B0, 0x0013, 0x00D8, 0x014D, 0xFFFE, 0x0100 };	/* Game Boy Color  / Game Boy Advance */
 static const UINT16 megaduck_cpu_regs[6] = { 0x0000, 0x0000, 0x0000, 0x0000, 0xFFFE, 0x0000 };	/* Megaduck */
 
 static const lr35902_cpu_core dmg_cpu_reset = { NULL, LR35902_FEATURE_HALT_BUG, gb_timer_callback };
 static const lr35902_cpu_core sgb_cpu_reset = { sgb_cpu_regs, LR35902_FEATURE_HALT_BUG, gb_timer_callback };
 static const lr35902_cpu_core mgb_cpu_reset = { mgb_cpu_regs, LR35902_FEATURE_HALT_BUG, gb_timer_callback };
-static const lr35902_cpu_core cgb_cpu_reset = { cgb_cpu_regs, 0, gb_timer_callback };
+static const lr35902_cpu_core cgb_cpu_reset = { NULL, 0, gb_timer_callback };
 static const lr35902_cpu_core megaduck_cpu_reset = { megaduck_cpu_regs, LR35902_FEATURE_HALT_BUG, gb_timer_callback };
 
 static ADDRESS_MAP_START(gb_map, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x00ff) AM_ROMBANK(5)					/* BIOS or ROM */
-	AM_RANGE(0x0100, 0x3fff) AM_ROMBANK(10)					/* ROM bank */
+	AM_RANGE(0x0100, 0x014f) AM_ROMBANK(10)					/* ROM bank */
+	AM_RANGE(0x0150, 0x03ff) AM_ROMBANK(6)
+	AM_RANGE(0x0400, 0x3fff) AM_ROMBANK(11)
 	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK(1)					/* 8KB/16KB switched ROM bank */
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK(4)					/* 8KB/16KB switched ROM bank */
 	AM_RANGE(0x8000, 0x9fff) AM_READWRITE( gb_vram_r, gb_vram_w ) /* 8k VRAM */
@@ -476,7 +478,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(sgb_map, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x00ff) AM_ROMBANK(5)					/* 16k fixed ROM bank */
-	AM_RANGE(0x0100, 0x3fff) AM_ROMBANK(10)					/* ROM bank */
+	AM_RANGE(0x0100, 0x014f) AM_ROMBANK(10)					/* ROM bank */
+	AM_RANGE(0x0150, 0x03ff) AM_ROMBANK(6)
+	AM_RANGE(0x0400, 0x3fff) AM_ROMBANK(11)
 	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK(1)					/* 8KB/16KB switched ROM bank */
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK(4)					/* 8KB/16KB switched ROM bank */
 	AM_RANGE(0x8000, 0x9fff) AM_READWRITE( gb_vram_r, gb_vram_w ) /* 8k VRAM */
@@ -495,7 +499,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(gbc_map, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x00ff) AM_ROMBANK(5)					/* 16k fixed ROM bank */
-	AM_RANGE(0x0100, 0x3fff) AM_ROMBANK(10)					/* ROM bank */
+	AM_RANGE(0x0100, 0x014f) AM_ROMBANK(10)					/* ROM bank */
+	AM_RANGE(0x0150, 0x03ff) AM_ROMBANK(6)
+	AM_RANGE(0x0400, 0x3fff) AM_ROMBANK(11)
 	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK(1)					/* 8KB/16KB switched ROM bank */
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK(4)					/* 8KB/16KB switched ROM bank */
 	AM_RANGE(0x8000, 0x9fff) AM_READWRITE( gb_vram_r, gb_vram_w )		/* 8k switched VRAM bank */
@@ -629,9 +635,6 @@ static MACHINE_DRIVER_START( gbcolor )
 
 	MDRV_PALETTE_LENGTH(32768)
 	MDRV_PALETTE_INIT(gbc)
-
-	MDRV_CARTSLOT_MODIFY("cart")
-	MDRV_CARTSLOT_MANDATORY
 MACHINE_DRIVER_END
 
 static SYSTEM_CONFIG_START(gb_cgb)
@@ -701,8 +704,10 @@ ROM_START( gblight )
 ROM_END
 
 ROM_START( gbcolor )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-/*  ROM_LOAD( "gbc_boot.bin", 0x0000, 0x0100, NO_DUMP ) */
+	ROM_REGION( 0x03B0 + 1792, "maincpu", 0 )
+	ROM_LOAD( "gbc_boot.1", 0x0000, 0x0100, BAD_DUMP CRC(607a2f81) SHA1(6b232a802ca1f4c3c7c29ad10de10737bbc064bc) )	/* Bootstrap code part 1 */
+	ROM_LOAD( "gbc_boot.2", 0x0100, 0x02B0, BAD_DUMP CRC(2a8e6294) SHA1(0b9a3836b524ffbff74729e0a01f33fef45b457b) ) /* Bootstrap code part 2 */
+	ROM_LOAD( "gbc_boot.3", 0x03B0, 1792, NO_DUMP )	/* DMG game - palette lookup table(?) */
 ROM_END
 
 
@@ -715,7 +720,7 @@ CONS( 1990, gameboy,  0,       0,	gameboy,  gameboy, 0,    0,	 "Nintendo", "Game
 CONS( 1994, supergb,  0,       gameboy,	supergb,  gameboy, 0,    0,	 "Nintendo", "Super Game Boy" , 0)
 CONS( 1996, gbpocket, gameboy, 0,	gbpocket, gameboy, 0,    0,	 "Nintendo", "Game Boy Pocket" , 0)
 CONS( 1997, gblight,  gameboy, 0,	gbpocket, gameboy, 0,    0,	 "Nintendo", "Game Boy Light" , 0)
-CONS( 1998, gbcolor,  0,       gameboy,	gbcolor,  gameboy, 0,    gb_cgb, "Nintendo", "Game Boy Color" , GAME_NOT_WORKING)
+CONS( 1998, gbcolor,  gameboy, 0,	gbcolor,  gameboy, 0,    gb_cgb, "Nintendo", "Game Boy Color" , GAME_NOT_WORKING)
 
 /* Sound is not 100% yet, it generates some sounds which could be ok. Since we're lacking a real
    system there's no way to verify. Same goes for the colors of the LCD. We are no using the default
