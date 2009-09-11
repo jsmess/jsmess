@@ -819,7 +819,7 @@ static MACHINE_DRIVER_START( bw2 )
 	/* uart */
 	MDRV_MSM8251_ADD(MSM8251_TAG, default_msm8251_interface)
 
-	MDRV_WD179X_ADD("wd179x", default_wd17xx_interface )
+	MDRV_WD179X_ADD("wd179x", bw2_wd17xx_interface )
 MACHINE_DRIVER_END
 
 /***************************************************************************
