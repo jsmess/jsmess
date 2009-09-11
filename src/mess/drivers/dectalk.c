@@ -90,7 +90,9 @@ DTC-01 LEDs
 * $10402 - nvram recall/reset based on byte on stack (0 = recall, 1 = write default to nvram)
 * $10f2E - nvram recall
 * $10f52 - entry point for nvram check routine
-* $11004(entry point)-$11030, $11032-$111B4 - nvram store routine
+* $11004(entry point)-$11030, $11032-$111B4 - nvram store routine:
+*    pass with a blank word on stack and be sure the test and branch at 11016 & 1101a passes (jumps to 1106a)
+*    It will then write currently loaded settings to nvram and execute a store, so do it after the defaults are loaded
 * $1a7ae - default nvram image, without checksum (0x80 bytes)
 *******************************************************************************/
 /*the 68k memory map is such:
@@ -124,9 +126,9 @@ DUART is INT level 6
 */
 // USE_LOOSE_TIMING makes the cpu interleave much lower and boosts it on fifo and flag writes by the 68k and semaphore sets by the dsp
 #define USE_LOOSE_TIMING 1
-// generic logs like nvram store/recall flag messages and led state, and common writes for dsp and spc such as the speech int
+// generic logs like led state, and common writes for dsp and spc such as the speech int
 #undef VERBOSE
-// logs reads and writes to nvram
+// logs reads and writes to nvram, and nvram store/recall flag messages
 #undef NVRAM_LOG
 // logs reads and writes to TLC regs
 #undef TLC_LOG
@@ -135,7 +137,7 @@ DUART is INT level 6
 // logs reads and writes to SPC regs, dsp side only
 #undef SPC_LOG_DSP
 // logs txd and related serial lines to stderr
-#undef SERIAL_TO_STDERR 
+#undef SERIAL_TO_STDERR
 
 /* Core includes */
 #include "driver.h"
@@ -244,7 +246,7 @@ static void dectalk_x2212_store( running_machine *machine )
 	int i;
 	for (i = 0; i < 256; i++)
 	nvram[i] = dectalk.nvram_local[i];
-#ifdef VERBOSE
+#ifdef NVRAM_LOG
 	logerror("nvram store done\n");
 #endif
 }
@@ -255,7 +257,7 @@ static void dectalk_x2212_recall( running_machine *machine )
 	int i;
 	for (i = 0; i < 256; i++)
 	dectalk.nvram_local[i] = nvram[i];
-#ifdef VERBOSE
+#ifdef NVRAM_LOG
 	logerror("nvram recall done\n");
 #endif
 }
@@ -763,34 +765,24 @@ ROM_START( dectalk )
 	ROM_LOAD16_BYTE("lm8506205f4.e70", 0x000, 0x800, CRC(ed76a3ad) SHA1(3136bae243ef48721e21c66fde70dab5fc3c21d0)) // Label: "LM8506205F4 // M1-76161-5" @ E70
 	ROM_LOAD16_BYTE("lm8504204f4.e69", 0x001, 0x800, CRC(79bb54ff) SHA1(9409f90f7a397b041e4440341f2d7934cb479285)) // Label: "LM8504204F4 // 78S191" @ E69
 
-	ROM_REGION(0x100,"nvram", 0) // default nvram image is at 0x1A7AE in main rom, read lsn first so 0x0005 in rom becomes 0x50 0x00, etc for all words of main rom
-	ROM_FILL(0x00, 0x01, 0x50) // 0005
-	ROM_FILL(0x01, 0x01, 0x00)
-	ROM_FILL(0x02, 0x01, 0x00) // 0000
-	ROM_FILL(0x03, 0x01, 0x00)
-	ROM_FILL(0x04, 0x01, 0x60) // 0006
-	ROM_FILL(0x05, 0x01, 0x00)
-	ROM_FILL(0x06, 0x01, 0x10) // 0001
-	ROM_FILL(0x07, 0x01, 0x00)
-	ROM_FILL(0x08, 0x01, 0x60) // 0006
-	ROM_FILL(0x09, 0x01, 0x00)
-	ROM_FILL(0x0A, 0x01, 0xB0) // 000B
-	ROM_FILL(0x0B, 0x01, 0x00)
-	ROM_FILL(0x0C, 0x01, 0x20) // 0002
-	ROM_FILL(0x0D, 0x01, 0x00)
-	ROM_FILL(0x0E, 0x01, 0x20) // 0002
-	ROM_FILL(0x0F, 0x01, 0x00)
-	ROM_FILL(0x10, 0x01, 0x10) // 0001
-	ROM_FILL(0x11, 0x01, 0x00)
-	ROM_FILL(0x12, 0x01, 0x10) // 0001
-	ROM_FILL(0x13, 0x01, 0x00)
-	ROM_FILL(0x14, 0x01, 0x00) // 0000
-	ROM_FILL(0x15, 0x01, 0x00)
-	ROM_FILL(0x16, 0x01, 0x10) // 0001
-	ROM_FILL(0x17, 0x01, 0x00)
-	ROM_FILL(0x18, 0xE4, 0x00) // rest is 0s except for checksum
-	ROM_FILL(0xFE, 0x01, 0x00) // 0000 for now, probably wrong
-	ROM_FILL(0xFF, 0x01, 0x00)
+	ROM_REGION(0x100,"nvram", 0) // default nvram image is at 0x1A7AE in main rom, read lsn first so 0x0005 in rom becomes 05 00 00 00 etc for all words of main rom
+	ROM_FILL(0x00, 0xff, 0x00) // blank it first;
+	ROM_FILL(0x00, 0x01, 0x05)
+	ROM_FILL(0x04, 0x01, 0x00)
+	ROM_FILL(0x08, 0x01, 0x06)
+	ROM_FILL(0x0C, 0x01, 0x01)
+	ROM_FILL(0x10, 0x01, 0x06)
+	ROM_FILL(0x14, 0x01, 0x0B)
+	ROM_FILL(0x18, 0x01, 0x02)
+	ROM_FILL(0x1C, 0x01, 0x02)
+	ROM_FILL(0x20, 0x01, 0x01)
+	ROM_FILL(0x24, 0x01, 0x01)
+	ROM_FILL(0x28, 0x01, 0x00)
+	ROM_FILL(0x2c, 0x01, 0x01)
+	ROM_FILL(0xFC, 0x01, 0x0D) // checksum, calculated some weird way which I haven't figured out yet
+	ROM_FILL(0xFD, 0x01, 0x02) // "
+	ROM_FILL(0xFE, 0x01, 0x05) // "
+	ROM_FILL(0xFF, 0x01, 0x0B) // "
 
 ROM_END
 
