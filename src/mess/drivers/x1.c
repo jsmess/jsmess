@@ -229,6 +229,9 @@ static void draw_fgtilemap(running_machine *machine, bitmap_t *bitmap,const rect
 
 						pcg_pen = pen[2]<<2|pen[1]<<1|pen[0]<<0;
 
+						if(color & 0x10 && 	video_screen_get_frame_number(machine->primary_screen) & 0x10) //reverse flickering
+							pcg_pen^=7;
+
 						if(pcg_pen == 0 && (!(color & 8)))
 							continue;
 
@@ -269,7 +272,7 @@ static void draw_fgtilemap(running_machine *machine, bitmap_t *bitmap,const rect
 							if(height)
 								*BITMAP_ADDR16(bitmap, res_y+yi+1, res_x+xi) = machine->pens[pcg_pen];
 							if(width && height)
-							*BITMAP_ADDR16(bitmap, res_y+yi+1, res_x+xi+1) = machine->pens[pcg_pen];
+								*BITMAP_ADDR16(bitmap, res_y+yi+1, res_x+xi+1) = machine->pens[pcg_pen];
 						}
 					}
 				}
