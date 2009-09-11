@@ -420,7 +420,7 @@ static INPUT_PORTS_START (vic64s)
 	PORT_MODIFY( "ROW6" )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("\xc3\xa4") PORT_CODE(KEYCODE_BACKSLASH)	PORT_CHAR('\xA4')
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("\xc3\xb6") PORT_CODE(KEYCODE_QUOTE)		PORT_CHAR('\xB6')
-    PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE)						PORT_CHAR('@')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE)						PORT_CHAR('@')
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH2)						PORT_CHAR(':') PORT_CHAR('*')
 INPUT_PORTS_END
 
@@ -436,7 +436,7 @@ static INPUT_PORTS_START (vip64)
 	PORT_MODIFY( "ROW6" )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("\xc3\xa4") PORT_CODE(KEYCODE_BACKSLASH)	PORT_CHAR('\xA4')
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("\xc3\xb6") PORT_CODE(KEYCODE_QUOTE)		PORT_CHAR('\xB6')
-    PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE)						PORT_CHAR('@')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE)						PORT_CHAR('@')
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH2)						PORT_CHAR(':') PORT_CHAR('*')
 INPUT_PORTS_END
 
@@ -501,7 +501,7 @@ static MACHINE_DRIVER_START( c64 )
 	MDRV_IMPORT_FROM( vh_vic2 )
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(VIC6567_VRETRACERATE)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)) /* not accurate */
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -759,7 +759,7 @@ SYSTEM_CONFIG_END
 
 /*   YEAR  NAME   PARENT COMPAT MACHINE  INPUT    INIT    CONFIG    COMPANY                            FULLNAME */
 
-COMP(1982, max,	    0,    0,    ultimax, c64,     ultimax, 0, "Commodore Business Machines Co.", "Commodore Max Machine", 0)
+COMP(1982, max,	  0,    0,    ultimax, c64,     ultimax, 0,       "Commodore Business Machines Co.", "Commodore Max Machine", 0)
 
 COMP(1982, c64,     0,    0,    c64,     c64,     c64,     c64,     "Commodore Business Machines Co.", "Commodore 64 (NTSC)", 0)
 COMP(1982, c64pal,  c64,  0,    c64pal,  c64,     c64pal,  c64,     "Commodore Business Machines Co.", "Commodore 64 (PAL)", 0)
@@ -767,7 +767,7 @@ COMP(1982, c64jpn,  c64,  0,    c64,     c64,     c64,     c64,     "Commodore B
 COMP(1982, vic64s,  c64,  0,    c64pal,  vic64s,  c64pal,  c64,     "Commodore Business Machines Co.", "VIC 64S", 0)
 COMP(1982, c64swe,  c64,  0,    c64pal,  vic64s,  c64pal,  c64,     "Commodore Business Machines Co.", "Commodore 64 (Sweden)", 0)
 
-COMP(1983, pet64,	c64,  0,    pet64,   c64,     c64,     c64,     "Commodore Business Machines Co.", "PET 64 (NTSC)", 0)
+COMP(1983, pet64,	  c64,  0,    pet64,   c64,     c64,     c64,     "Commodore Business Machines Co.", "PET 64 (NTSC)", 0)
 COMP(1983, cbm4064, c64,  0,    pet64,   c64,     c64,     c64,     "Commodore Business Machines Co.", "CBM 4064 (NTSC)", 0)
 COMP(1983, edu64,   c64,  0,    pet64,   c64,     c64,     c64,     "Commodore Business Machines Co.", "Educator 64 (NTSC)", 0) // maybe different palette?
 
@@ -780,4 +780,4 @@ COMP(1986, c64c,    c64,  0,    c64,     c64,     c64,     c64,     "Commodore B
 COMP(1986, c64cpal, c64,  0,    c64pal,  c64,     c64pal,  c64,     "Commodore Business Machines Co.", "Commodore 64C (PAL)", 0)
 COMP(1986, c64g,    c64,  0,    c64pal,  c64,     c64pal,  c64,     "Commodore Business Machines Co.", "Commodore 64G (PAL)", 0)
 
-CONS(1990, c64gs,   c64,  0,    c64gs,   c64gs,   c64gs,   0,   "Commodore Business Machines Co.", "Commodore 64 Games System (PAL)", 0)
+CONS(1990, c64gs,   c64,  0,    c64gs,   c64gs,   c64gs,   0,       "Commodore Business Machines Co.", "Commodore 64 Games System (PAL)", 0)

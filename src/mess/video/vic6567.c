@@ -1593,7 +1593,7 @@ TIMER_CALLBACK( line_timer_callback )
 		if (cpu_suspended == 0) \
 		{ \
 			first_ba_cycle = vic2.cycles_counter; \
-			if (1==0) cpu_suspend(machine->firstcpu, SUSPEND_REASON_SPIN, 0); \
+			if (input_port_read(machine, "CTRLSEL") & 0x08) cpu_suspend(machine->firstcpu, SUSPEND_REASON_SPIN, 0); \
 			cpu_suspended = 1; \
 		} \
 	}
@@ -1603,7 +1603,7 @@ TIMER_CALLBACK( line_timer_callback )
 	{ \
 		if (cpu_suspended == 1) \
 		{ \
-			if (1==0) cpu_resume(machine->firstcpu, SUSPEND_REASON_SPIN); \
+			if (input_port_read(machine, "CTRLSEL") & 0x08) cpu_resume(machine->firstcpu, SUSPEND_REASON_SPIN); \
 			cpu_suspended = 0; \
 		} \
 	}
