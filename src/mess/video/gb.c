@@ -1912,7 +1912,7 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 			if ( CURLINE == 144 ) 
 			{
 				/* Trigger VBlank interrupt */
-				cputag_set_input_line( machine, "maincpu", LCD_INT, ASSERT_LINE );
+				cputag_set_input_line( machine, "maincpu", VBL_INT, ASSERT_LINE );
 				/* Set VBlank lcdstate */
 				gb_lcd.mode = 1;
 				LCDSTAT = (LCDSTAT & 0xFC) | 0x01;
