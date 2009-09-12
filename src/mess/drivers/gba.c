@@ -834,7 +834,37 @@ static READ32_HANDLER( gba_io_r )
 		case 0x0104/4:
 		case 0x0108/4:
 		case 0x010c/4:
-			return gba_state->timer_regs[offset-(0x100/4)];
+			{
+				UINT32 elapsed;
+				double time, ticks;
+				int timer = offset-(0x100/4);
+
+//				printf("Read timer reg %x (PC=%x)\n", timer, cpu_get_pc(space->cpu));
+
+				// update times for 
+				if (gba_state->timer_regs[timer] & 0x800000)
+				{
+					time = attotime_to_double(timer_timeelapsed(gba_state->tmr_timer[timer]));
+
+					ticks = (double)(0x10000 - (gba_state->timer_regs[timer] & 0xffff));
+
+//					printf("time %f ticks %f 1/hz %f\n", time, ticks, 1.0 / gba_state->timer_hz[timer]);
+
+					time *= ticks;
+					time /= (1.0 / gba_state->timer_hz[timer]);
+
+					elapsed = (UINT32)time;
+
+//					printf("elapsed = %x\n", elapsed);
+				}
+				else
+				{
+					printf("Reading inactive timer!\n");
+					elapsed = 0;
+				}
+
+				return (gba_state->timer_regs[timer] & 0xffff0000) | (elapsed & 0xffff);
+			}
 			break;
 		case 0x0120/4:
 			if( (mem_mask) & 0x0000ffff )
@@ -1615,6 +1645,8 @@ static WRITE32_HANDLER( gba_io_w )
 					clocksel = timer_clks[(gba_state->timer_regs[offset] >> 16) & 3];
 
 					final = clocksel / rate;
+
+					gba_state->timer_hz[offset] = final;
 
 //					printf("Enabling timer %d @ %f Hz\n", offset, final);
 

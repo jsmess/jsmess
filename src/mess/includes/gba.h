@@ -203,6 +203,8 @@ typedef struct
 	emu_timer *dma_timer[4], *tmr_timer[4], *irq_timer;
 	emu_timer *scan_timer, *hbl_timer;
 
+	double timer_hz[4];
+
 	int fifo_a_ptr, fifo_b_ptr, fifo_a_in, fifo_b_in;
 	UINT8 fifo_a[20], fifo_b[20];
 } gba_state;
