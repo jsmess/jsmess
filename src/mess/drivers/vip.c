@@ -396,9 +396,33 @@ static CDP1861_INTERFACE( vip_cdp1861_intf )
 	DEVCB_LINE(vip_efx_w)
 };
 
+static READ_LINE_DEVICE_HANDLER( rd_r )
+{
+	vip_state *state = device->machine->driver_data;
+
+	return BIT(state->color, 1);
+}
+
+static READ_LINE_DEVICE_HANDLER( bd_r )
+{
+	vip_state *state = device->machine->driver_data;
+
+	return BIT(state->color, 2);
+}
+
+static READ_LINE_DEVICE_HANDLER( gd_r )
+{
+	vip_state *state = device->machine->driver_data;
+
+	return BIT(state->color, 3);
+}
+
 static CDP1862_INTERFACE( vip_cdp1862_intf )
 {
 	SCREEN_TAG,
+	DEVCB_LINE(rd_r),
+	DEVCB_LINE(bd_r),
+	DEVCB_LINE(gd_r),
 	510,			/* R3 */
 	360,			/* R4 */
 	RES_K(1),		/* R5 */
@@ -551,28 +575,22 @@ static WRITE8_DEVICE_HANDLER( vip_dma_w )
 	switch (input_port_read(device->machine, "VIDEO"))
 	{
 	case VIP_VIDEO_CDP1861:
-		cdp1861_dma_w(state->cdp1861, data);
+		cdp1861_dma_w(state->cdp1861, offset, data);
 		break;
 
 	case VIP_VIDEO_CDP1862:
 		{
 			UINT8 mask = 0xff;
-			UINT8 color;
-			int rd, bd, gd;
 
-			if (!state->a12)
+			if (!state->a12) 
 			{
 				/* mask out A4 and A3 */
 				mask = 0xe7;
 			}
 
-			color = state->colorram[offset & mask];
+			state->color = state->colorram[offset & mask];
 			
-			rd = BIT(color, 1);
-			bd = BIT(color, 2);
-			gd = BIT(color, 3);
-
-			cdp1862_dma_w(state->cdp1862, data, rd, bd, gd);
+			cdp1862_dma_w(state->cdp1862, offset, data);
 		}
 		break;
 	}
@@ -631,10 +649,10 @@ static MACHINE_START( vip )
 	vp550_q_w(state->vp550, 0);
 
 	/* register for state saving */
-	state_save_register_global_pointer(machine, state->colorram, VP590_COLOR_RAM_SIZE);
-
 	state_save_register_global(machine, state->reset);
+	state_save_register_global_pointer(machine, state->colorram, VP590_COLOR_RAM_SIZE);
 	state_save_register_global(machine, state->cdp1861_efx);
+	state_save_register_global(machine, state->color);
 	state_save_register_global(machine, state->keylatch);
 }
 

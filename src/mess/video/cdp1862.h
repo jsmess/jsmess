@@ -43,7 +43,7 @@
 	MDRV_DEVICE_CONFIG(_config)
 
 #define CDP1862_INTERFACE(name) \
-	const cdp1862_interface (name)=
+	const cdp1862_interface (name) =
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -53,6 +53,10 @@ typedef struct _cdp1862_interface cdp1862_interface;
 struct _cdp1862_interface
 {
 	const char *screen_tag;		/* screen we are acting on */
+
+	devcb_read_line				in_rd_func;
+	devcb_read_line				in_bd_func;
+	devcb_read_line				in_gd_func;
 
 	double lum_r;				/* red luminance resistor value */
 	double lum_b;				/* blue luminance resistor value */
@@ -73,13 +77,13 @@ struct _cdp1862_interface
 DEVICE_GET_INFO( cdp1862 );
 
 /* step background color */
-WRITE8_DEVICE_HANDLER( cdp1862_bkg_w );
+WRITE8_DEVICE_HANDLER( cdp1862_bkg_w ) ATTR_NONNULL(1);
 
 /* color on */
-WRITE_LINE_DEVICE_HANDLER( cdp1862_con_w );
+WRITE_LINE_DEVICE_HANDLER( cdp1862_con_w ) ATTR_NONNULL(1);
 
 /* DMA write */
-void cdp1862_dma_w(const device_config *device, UINT8 data, int rd, int bd, int gd) ATTR_NONNULL(1);
+WRITE8_DEVICE_HANDLER( cdp1862_dma_w ) ATTR_NONNULL(1);
 
 /* screen update */
 void cdp1862_update(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect) ATTR_NONNULL(1) ATTR_NONNULL(2) ATTR_NONNULL(3);

@@ -23,6 +23,7 @@ struct _studio2_state
 	int cdp1861_efx;
 	int cdp1864_efx;
 	UINT8 *color_ram;
+	UINT8 color;
 
 	/* devices */
 	const device_config *cdp1861;

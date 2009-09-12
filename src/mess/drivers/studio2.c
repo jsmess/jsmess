@@ -198,7 +198,7 @@ Notes:
 #include "includes/studio2.h"
 #include "cpu/cdp1802/cdp1802.h"
 #include "video/cdp1861.h"
-#include "video/cdp1864.h"
+#include "sound/cdp1864.h"
 #include "devices/cartslot.h"
 #include "sound/beep.h"
 #include "sound/discrete.h"
@@ -331,6 +331,9 @@ static CDP1864_INTERFACE( mpt02_cdp1864_intf )
 	CDP1802_TAG,
 	SCREEN_TAG,
 	CDP1864_INTERLACED,
+	DEVCB_LINE_VCC, // ?
+	DEVCB_LINE_VCC, // ?
+	DEVCB_LINE_VCC, // ?
 	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, CDP1802_INPUT_LINE_INT),
 	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, CDP1802_INPUT_LINE_DMAOUT),
 	DEVCB_LINE(mpt02_efx_w),
@@ -378,13 +381,6 @@ static WRITE_LINE_DEVICE_HANDLER( studio2_q_w )
 	beep_set_state(speaker, state);
 }
 
-static WRITE8_DEVICE_HANDLER( studio2_dma_w )
-{
-	studio2_state *state = device->machine->driver_data;
-
-	cdp1861_dma_w(state->cdp1861, data);
-}
-
 static CDP1802_INTERFACE( studio2_config )
 {
 	studio2_mode_r,
@@ -392,7 +388,7 @@ static CDP1802_INTERFACE( studio2_config )
 	NULL,
 	DEVCB_LINE(studio2_q_w),
 	DEVCB_NULL,
-	DEVCB_HANDLER(studio2_dma_w)
+	DEVCB_DEVICE_HANDLER(CDP1861_TAG, cdp1861_dma_w)
 };
 
 static CDP1802_EF_READ( mpt02_ef_r )
@@ -413,13 +409,10 @@ static WRITE8_DEVICE_HANDLER( mpt02_dma_w )
 {
 	studio2_state *state = device->machine->driver_data;
 
-	UINT8 color = state->color_ram[offset / 4]; // 0x04 = R, 0x02 = B, 0x01 = G
+	state->color = state->color_ram[offset / 4];
 
-	int rdata = BIT(color, 2);
-	int gdata = BIT(color, 0);
-	int bdata = BIT(color, 1);
-
-	cdp1864_dma_w(state->cdp1864, data, ASSERT_LINE, rdata, gdata, bdata);
+	cdp1864_con_w(state->cdp1864, 0); // HACK
+	cdp1864_dma_w(state->cdp1864, offset, data);
 }
 
 static CDP1802_INTERFACE( mpt02_config )
@@ -543,7 +536,6 @@ static MACHINE_DRIVER_START( studio2 )
 	MDRV_DRIVER_DATA(studio2_state)
 
 	// basic machine hardware
-
 	MDRV_CPU_ADD(CDP1802_TAG, CDP1802, 3579545/2) // the real clock is derived from an oscillator circuit
 	MDRV_CPU_PROGRAM_MAP(studio2_map)
 	MDRV_CPU_IO_MAP(studio2_io_map)
@@ -553,7 +545,6 @@ static MACHINE_DRIVER_START( studio2 )
 	MDRV_MACHINE_RESET(studio2)
 
     // video hardware
-
 	MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(3579545/2, CDP1861_SCREEN_WIDTH, CDP1861_HBLANK_END, CDP1861_HBLANK_START, CDP1861_TOTAL_SCANLINES, CDP1861_SCANLINE_VBLANK_END, CDP1861_SCANLINE_VBLANK_START)
@@ -562,10 +553,9 @@ static MACHINE_DRIVER_START( studio2 )
 	MDRV_PALETTE_INIT(black_and_white)
 	MDRV_VIDEO_UPDATE(studio2)
 
-	MDRV_CDP1861_ADD(CDP1861_TAG, XTAL_3_52128MHz, studio2_cdp1861_intf)
+	MDRV_CDP1861_ADD(CDP1861_TAG, 3579545/2, studio2_cdp1861_intf)
 
 	// sound hardware
-
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("beep", BEEP, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
@@ -577,7 +567,6 @@ static MACHINE_DRIVER_START( visicom )
 	MDRV_DRIVER_DATA(studio2_state)
 
 	// basic machine hardware
-
 	MDRV_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_3_579545MHz/2)
 	MDRV_CPU_PROGRAM_MAP(visicom_map)
 	MDRV_CPU_IO_MAP(visicom_io_map)
@@ -587,7 +576,6 @@ static MACHINE_DRIVER_START( visicom )
 	MDRV_MACHINE_RESET(studio2)
 
     // video hardware
-
 	MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(XTAL_3_579545MHz/2, CDP1861_SCREEN_WIDTH, CDP1861_HBLANK_END, CDP1861_HBLANK_START, CDP1861_TOTAL_SCANLINES, CDP1861_SCANLINE_VBLANK_END, CDP1861_SCANLINE_VBLANK_START)
@@ -599,7 +587,6 @@ static MACHINE_DRIVER_START( visicom )
 	MDRV_CDP1861_ADD(CDP1861_TAG, XTAL_3_579545MHz/2/8, studio2_cdp1861_intf)
 
 	// sound hardware
-
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("beep", BEEP, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
@@ -611,7 +598,6 @@ static MACHINE_DRIVER_START( mpt02 )
 	MDRV_DRIVER_DATA(studio2_state)
 
 	// basic machine hardware
-
 	MDRV_CPU_ADD(CDP1802_TAG, CDP1802, CDP1864_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(mpt02_map)
 	MDRV_CPU_IO_MAP(mpt02_io_map)
@@ -621,7 +607,6 @@ static MACHINE_DRIVER_START( mpt02 )
 	MDRV_MACHINE_RESET(mpt02)
 
     // video hardware
-
 	MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(CDP1864_CLOCK, CDP1864_SCREEN_WIDTH, CDP1864_HBLANK_END, CDP1864_HBLANK_START, CDP1864_TOTAL_SCANLINES, CDP1864_SCANLINE_VBLANK_END, CDP1864_SCANLINE_VBLANK_START)
@@ -629,13 +614,10 @@ static MACHINE_DRIVER_START( mpt02 )
 	MDRV_PALETTE_LENGTH(8+8)
 	MDRV_VIDEO_UPDATE(mpt02)
 
-	MDRV_CDP1864_ADD(CDP1864_TAG, CDP1864_CLOCK, mpt02_cdp1864_intf)
-
 	// sound hardware
-
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("beep", BEEP, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MDRV_CDP1864_ADD(CDP1864_TAG, CDP1864_CLOCK, mpt02_cdp1864_intf)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	
 	MDRV_IMPORT_FROM( studio2_cartslot )
 MACHINE_DRIVER_END

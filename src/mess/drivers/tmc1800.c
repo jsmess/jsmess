@@ -115,7 +115,7 @@ Notes:
 #include "includes/tmc1800.h"
 #include "cpu/cdp1802/cdp1802.h"
 #include "video/cdp1861.h"
-#include "video/cdp1864.h"
+#include "sound/cdp1864.h"
 #include "devices/cassette.h"
 #include "devices/snapquik.h"
 #include "machine/rescap.h"
@@ -493,13 +493,6 @@ static WRITE_LINE_DEVICE_HANDLER( tmc1800_q_w )
 	cassette_output(driver_state->cassette, state ? 1.0 : -1.0);
 }
 
-static WRITE8_DEVICE_HANDLER( tmc1800_dma_w )
-{
-	tmc1800_state *state = device->machine->driver_data;
-
-	cdp1861_dma_w(state->cdp1861, data);
-}
-
 static CDP1802_INTERFACE( tmc1800_config )
 {
 	tmc1800_mode_r,
@@ -507,7 +500,7 @@ static CDP1802_INTERFACE( tmc1800_config )
 	NULL,
 	DEVCB_LINE(tmc1800_q_w),
 	DEVCB_NULL,
-	DEVCB_HANDLER(tmc1800_dma_w)
+	DEVCB_DEVICE_HANDLER(CDP1861_TAG, cdp1861_dma_w)
 };
 
 static CDP1802_INTERFACE( osc1000b_config )
@@ -590,13 +583,10 @@ static WRITE8_DEVICE_HANDLER( tmc2000_dma_w )
 {
 	tmc2000_state *state = device->machine->driver_data;
 
-	UINT8 color = ~(state->colorram[offset & 0x1ff]) & 0x07;
-	
-	int rdata = BIT(color, 2);
-	int gdata = BIT(color, 0);
-	int bdata = BIT(color, 1);
+	state->color = ~(state->colorram[offset & 0x1ff]) & 0x07;
 
-	cdp1864_dma_w(state->cdp1864, data, ASSERT_LINE, rdata, gdata, bdata);
+	cdp1864_con_w(state->cdp1864, 0); // HACK
+	cdp1864_dma_w(state->cdp1864, offset, data);
 }
 
 static CDP1802_INTERFACE( tmc2000_config )
@@ -702,13 +692,6 @@ static WRITE_LINE_DEVICE_HANDLER( oscnano_q_w )
 	cassette_output(driver_state->cassette, state ? 1.0 : -1.0);
 }
 
-static WRITE8_DEVICE_HANDLER( oscnano_dma_w )
-{
-	oscnano_state *state = device->machine->driver_data;
-
-	cdp1864_dma_w(state->cdp1864, data, CLEAR_LINE, 1, 1, 1);
-}
-
 static CDP1802_INTERFACE( oscnano_config )
 {
 	oscnano_mode_r,
@@ -716,7 +699,7 @@ static CDP1802_INTERFACE( oscnano_config )
 	NULL,
 	DEVCB_LINE(oscnano_q_w),
 	DEVCB_NULL,
-	DEVCB_HANDLER(oscnano_dma_w)
+	DEVCB_DEVICE_HANDLER(CDP1864_TAG, cdp1864_dma_w)
 };
 
 /* Machine Initialization */
@@ -741,7 +724,7 @@ static MACHINE_RESET( tmc1800 )
 {
 	tmc1800_state *state = machine->driver_data;
 
-	/* reset CDP1864 */
+	/* reset CDP1861 */
 	device_reset(state->cdp1861);
 }
 
@@ -864,7 +847,6 @@ static MACHINE_DRIVER_START( tmc1800 )
 	MDRV_DRIVER_DATA(tmc1800_state)
 
 	// basic system hardware
-
 	MDRV_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_1_75MHz)
 	MDRV_CPU_PROGRAM_MAP(tmc1800_map)
 	MDRV_CPU_IO_MAP(tmc1800_io_map)
@@ -874,20 +856,16 @@ static MACHINE_DRIVER_START( tmc1800 )
 	MDRV_MACHINE_RESET(tmc1800)
 
 	// video hardware
-
 	MDRV_IMPORT_FROM(tmc1800_video)
 
 	// sound hardware
-
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("beep", BEEP, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	// quickload
-
+	// devices
 	MDRV_QUICKLOAD_ADD("quickload", tmc1800, "bin", 0)
-
 	MDRV_CASSETTE_ADD( "cassette", tmc1800_cassette_config )
 MACHINE_DRIVER_END
 
@@ -895,7 +873,6 @@ static MACHINE_DRIVER_START( osc1000b )
 	MDRV_DRIVER_DATA(osc1000b_state)
 
 	// basic system hardware
-
 	MDRV_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_1_75MHz)
 	MDRV_CPU_PROGRAM_MAP(osc1000b_map)
 	MDRV_CPU_IO_MAP(osc1000b_io_map)
@@ -905,20 +882,16 @@ static MACHINE_DRIVER_START( osc1000b )
 	MDRV_MACHINE_RESET(osc1000b)
 
 	// video hardware
-
 	MDRV_IMPORT_FROM(osc1000b_video)
 
 	// sound hardware
-
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("beep", BEEP, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	// quickload
-
+	// devices
 	MDRV_QUICKLOAD_ADD("quickload", tmc1800, "bin", 0)
-
 	MDRV_CASSETTE_ADD( "cassette", tmc1800_cassette_config )
 MACHINE_DRIVER_END
 
@@ -926,7 +899,6 @@ static MACHINE_DRIVER_START( tmc2000 )
 	MDRV_DRIVER_DATA(tmc2000_state)
 
 	// basic system hardware
-
 	MDRV_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_1_75MHz)
 	MDRV_CPU_PROGRAM_MAP(tmc2000_map)
 	MDRV_CPU_IO_MAP(tmc2000_io_map)
@@ -936,20 +908,10 @@ static MACHINE_DRIVER_START( tmc2000 )
 	MDRV_MACHINE_RESET(tmc2000)
 
 	// video hardware
-
 	MDRV_IMPORT_FROM(tmc2000_video)
 
-	// sound hardware
-
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-
-	MDRV_SOUND_ADD("beep", BEEP, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-
-	// quickload
-
+	// devices
 	MDRV_QUICKLOAD_ADD("quickload", tmc1800, "bin", 0)
-
 	MDRV_CASSETTE_ADD( "cassette", tmc1800_cassette_config )
 MACHINE_DRIVER_END
 
@@ -957,7 +919,6 @@ static MACHINE_DRIVER_START( oscnano )
 	MDRV_DRIVER_DATA(oscnano_state)
 
 	// basic system hardware
-
 	MDRV_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_1_75MHz)
 	MDRV_CPU_PROGRAM_MAP(oscnano_map)
 	MDRV_CPU_IO_MAP(oscnano_io_map)
@@ -967,20 +928,10 @@ static MACHINE_DRIVER_START( oscnano )
 	MDRV_MACHINE_RESET(oscnano)
 
 	// video hardware
-
 	MDRV_IMPORT_FROM(oscnano_video)
 
-	// sound hardware
-
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-
-	MDRV_SOUND_ADD("beep", BEEP, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-
-	// quickload
-
+	// devices
 	MDRV_QUICKLOAD_ADD("quickload", tmc1800, "bin", 0)
-
 	MDRV_CASSETTE_ADD( "cassette", tmc1800_cassette_config )
 MACHINE_DRIVER_END
 
@@ -1071,5 +1022,5 @@ static DRIVER_INIT( tmc1800 )
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        CONFIG      COMPANY         FULLNAME        FLAGS */
 COMP( 1977, tmc1800,    0,      0,      tmc1800,    tmc1800,    tmc1800,    tmc1800,    "Telercas Oy",  "Telmac 1800",  GAME_NOT_WORKING )
 COMP( 1977, osc1000b,   tmc1800,0,      osc1000b,   tmc1800,    tmc1800,    osc1000b,   "OSCOM Oy",		"OSCOM 1000B",  GAME_NOT_WORKING )
-COMP( 1980, tmc2000,    0,      0,      tmc2000,    tmc2000,    tmc1800,    tmc2000,    "Telercas Oy",  "Telmac 2000",  GAME_SUPPORTS_SAVE )
-COMP( 1980, oscnano,	tmc2000,0,		oscnano,	oscnano,	tmc1800,	oscnano,	"OSCOM Oy",		"OSCOM Nano",	GAME_SUPPORTS_SAVE )
+COMP( 1980, tmc2000,    0,      0,      tmc2000,    tmc2000,    0,		    tmc2000,    "Telercas Oy",  "Telmac 2000",  GAME_SUPPORTS_SAVE )
+COMP( 1980, oscnano,	tmc2000,0,		oscnano,	oscnano,	0,			oscnano,	"OSCOM Oy",		"OSCOM Nano",	GAME_SUPPORTS_SAVE )

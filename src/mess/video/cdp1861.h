@@ -1,25 +1,29 @@
-/*
+/**********************************************************************
 
-					  RCA CDP1861 Video Display Controller
+    RCA CDP1861 Video Display Controller emulation
 
-								_______  _______
-				  CLK_	 1	---|	   \/		|---  24  Vdd
-			     DMAO_	 2	---|				|---  23  CLEAR_
-			      INT_	 3	---|				|---  22  SC1
-				   TPA	 4	---|				|---  21  SC0
-				   TPB	 5	---|				|---  20  DI7
-			COMP SYNC_	 6	---|	CDP1861C	|---  19  DI6
-				 VIDEO	 7	---|	top view	|---  18  DI5
-				RESET_	 8	---|				|---  17  DI4
-				  EFX_	 9	---|				|---  16  DI3
-			   DISP ON	10	---|			    |---  15  DI2
-			  DISP OFF	11	---|				|---  14  DI1
-				   Vss	12	---|________________|---  13  DI0
+    Copyright MESS Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
+
+**********************************************************************
+							_______  _______
+			  CLK_	 1	---|	   \/		|---  24  Vdd
+		     DMAO_	 2	---|				|---  23  CLEAR_
+		      INT_	 3	---|				|---  22  SC1
+			   TPA	 4	---|				|---  21  SC0
+			   TPB	 5	---|				|---  20  DI7
+		COMP SYNC_	 6	---|	CDP1861C	|---  19  DI6
+			 VIDEO	 7	---|	top view	|---  18  DI5
+			RESET_	 8	---|				|---  17  DI4
+			  EFX_	 9	---|				|---  16  DI3
+		   DISP ON	10	---|			    |---  15  DI2
+		  DISP OFF	11	---|				|---  14  DI1
+			   Vss	12	---|________________|---  13  DI0
 
 
-			   http://homepage.mac.com/ruske/cosmacelf/cdp1861.pdf
+		   http://homepage.mac.com/ruske/cosmacelf/cdp1861.pdf
 
-*/
+**********************************************************************/
 
 #ifndef __CDP1861__
 #define __CDP1861__
@@ -64,7 +68,8 @@
 	MDRV_DEVICE_ADD(_tag, CDP1861, _clock) \
 	MDRV_DEVICE_CONFIG(_config)
 
-#define CDP1861_INTERFACE(name) const cdp1861_interface (name)=
+#define CDP1861_INTERFACE(name) \
+	const cdp1861_interface (name) =
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -94,15 +99,15 @@ struct _cdp1861_interface
 DEVICE_GET_INFO( cdp1861 );
 
 /* display on */
-WRITE_LINE_DEVICE_HANDLER( cdp1861_dispon_w );
+WRITE_LINE_DEVICE_HANDLER( cdp1861_dispon_w ) ATTR_NONNULL(1);
 
 /* display off */
-WRITE_LINE_DEVICE_HANDLER( cdp1861_dispoff_w );
+WRITE_LINE_DEVICE_HANDLER( cdp1861_dispoff_w ) ATTR_NONNULL(1);
 
 /* DMA write */
-void cdp1861_dma_w(const device_config *device, UINT8 data);
+WRITE8_DEVICE_HANDLER( cdp1861_dma_w ) ATTR_NONNULL(1);
 
 /* screen update */
-void cdp1861_update(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect);
+void cdp1861_update(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect) ATTR_NONNULL(1) ATTR_NONNULL(2) ATTR_NONNULL(3);
 
 #endif

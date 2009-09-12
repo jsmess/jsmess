@@ -1,3 +1,12 @@
+/**********************************************************************
+
+    RCA CDP1861 Video Display Controller emulation
+
+    Copyright MESS Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
+
+**********************************************************************/
+
 #include "driver.h"
 #include "cdp1861.h"
 
@@ -44,7 +53,7 @@ INLINE cdp1861_t *get_safe_token(const device_config *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
-
+	assert(device->type == CDP1861);
 	return (cdp1861_t *)device->token;
 }
 
@@ -199,7 +208,7 @@ WRITE_LINE_DEVICE_HANDLER( cdp1861_dispoff_w )
     cdp1861_dma_w - write DMA byte
 -------------------------------------------------*/
 
-void cdp1861_dma_w(const device_config *device, UINT8 data)
+WRITE8_DEVICE_HANDLER( cdp1861_dma_w )
 {
 	cdp1861_t *cdp1861 = get_safe_token(device);
 

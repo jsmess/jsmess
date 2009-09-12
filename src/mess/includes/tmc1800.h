@@ -45,6 +45,7 @@ struct _tmc2000_state
 	int reset;				/* reset activated */
 
 	UINT8 *colorram;		/* color memory */
+	UINT8 color;
 
 	/* keyboard state */
 	int keylatch;			/* key latch */

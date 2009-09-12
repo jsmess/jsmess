@@ -13,8 +13,8 @@ struct _tmc2000e_state
 {
 	/* video state */
 	int cdp1864_efx;		/* EFx */
-
 	UINT8 *colorram;		/* color memory */
+	UINT8 color;
 
 	/* keyboard state */
 	int keylatch;			/* key latch */

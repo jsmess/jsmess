@@ -36,8 +36,7 @@
 #include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
 #include "devices/cassette.h"
-#include "video/cdp1864.h"
-#include "sound/beep.h"
+#include "sound/cdp1864.h"
 #include "machine/rescap.h"
 
 /* Read/Write Handlers */
@@ -126,6 +125,27 @@ INPUT_PORTS_END
 
 /* Video */
 
+static READ_LINE_DEVICE_HANDLER( rdata_r )
+{
+	tmc2000e_state *state = device->machine->driver_data;
+
+	return BIT(state->color, 2);
+}
+
+static READ_LINE_DEVICE_HANDLER( bdata_r )
+{
+	tmc2000e_state *state = device->machine->driver_data;
+
+	return BIT(state->color, 1);
+}
+
+static READ_LINE_DEVICE_HANDLER( gdata_r )
+{
+	tmc2000e_state *state = device->machine->driver_data;
+
+	return BIT(state->color, 0);
+}
+
 static WRITE_LINE_DEVICE_HANDLER( tmc2000e_efx_w )
 {
 	tmc2000e_state *driver_state = device->machine->driver_data;
@@ -138,6 +158,9 @@ static CDP1864_INTERFACE( tmc2000e_cdp1864_intf )
 	CDP1802_TAG,
 	SCREEN_TAG,
 	CDP1864_INTERLACED,
+	DEVCB_LINE(rdata_r),
+	DEVCB_LINE(bdata_r),
+	DEVCB_LINE(gdata_r),
 	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, CDP1802_INPUT_LINE_INT),
 	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, CDP1802_INPUT_LINE_DMAOUT),
 	DEVCB_LINE(tmc2000e_efx_w),
@@ -222,13 +245,10 @@ static WRITE8_DEVICE_HANDLER( tmc2000e_dma_w )
 {
 	tmc2000e_state *state = device->machine->driver_data;
 
-	UINT8 color = (state->colorram[offset & 0x3ff]) & 0x07; // 0x04 = R, 0x02 = B, 0x01 = G
-	
-	int rdata = BIT(color, 2);
-	int gdata = BIT(color, 0);
-	int bdata = BIT(color, 1);
+	state->color = (state->colorram[offset & 0x3ff]) & 0x07; // 0x04 = R, 0x02 = B, 0x01 = G
 
-	cdp1864_dma_w(state->cdp1864, data, ASSERT_LINE, rdata, gdata, bdata);
+	cdp1864_con_w(state->cdp1864, 0); // HACK
+	cdp1864_dma_w(state->cdp1864, offset, data);
 }
 
 static CDP1802_INTERFACE( tmc2000e_config )
@@ -284,7 +304,6 @@ static MACHINE_DRIVER_START( tmc2000e )
 	MDRV_DRIVER_DATA(tmc2000e_state)
 
 	// basic system hardware
-
 	MDRV_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_1_75MHz)
 	MDRV_CPU_PROGRAM_MAP(tmc2000e_map)
 	MDRV_CPU_IO_MAP(tmc2000e_io_map)
@@ -294,7 +313,6 @@ static MACHINE_DRIVER_START( tmc2000e )
 	MDRV_MACHINE_RESET(tmc2000e)
 
 	// video hardware
-
 	MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16) 
 	MDRV_SCREEN_RAW_PARAMS(XTAL_1_75MHz, CDP1864_SCREEN_WIDTH, CDP1864_HBLANK_END, CDP1864_HBLANK_START, CDP1864_TOTAL_SCANLINES, CDP1864_SCANLINE_VBLANK_END, CDP1864_SCANLINE_VBLANK_START)
@@ -302,17 +320,13 @@ static MACHINE_DRIVER_START( tmc2000e )
 	MDRV_PALETTE_LENGTH(8)
 	MDRV_VIDEO_UPDATE(tmc2000e)
 
-	MDRV_CDP1864_ADD(CDP1864_TAG, XTAL_1_75MHz, tmc2000e_cdp1864_intf)
-
 	// sound hardware
-
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("beep", BEEP, 0)
+	MDRV_CDP1864_ADD(CDP1864_TAG, XTAL_1_75MHz, tmc2000e_cdp1864_intf)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	/* printer */
+	/* devices */
 	MDRV_PRINTER_ADD("printer")
-
 	MDRV_CASSETTE_ADD("cassette", tmc2000_cassette_config)
 MACHINE_DRIVER_END
 
@@ -352,22 +366,5 @@ static SYSTEM_CONFIG_START( tmc2000e )
 	CONFIG_DEVICE(tmc2000e_floppy_getinfo)
 SYSTEM_CONFIG_END
 
-/* Driver Initialization */
-
-static TIMER_CALLBACK(setup_beep)
-{
-	const device_config *speaker = devtag_get_device(machine, "beep");
-	beep_set_state(speaker, 0);
-	beep_set_frequency( speaker, 0 );
-}
-
-static DRIVER_INIT( tmc2000e )
-{
-	// enable power led
-	set_led_status(2, 1);
-
-	timer_set(machine, attotime_zero, NULL, 0, setup_beep);
-}
-
-//    YEAR  NAME      PARENT   COMPAT   MACHINE   INPUT     INIT        CONFIG    COMPANY        FULLNAME
-COMP( 1980, tmc2000e, 0,       0,	    tmc2000e, tmc2000e, tmc2000e,	tmc2000e, "Telercas Oy", "Telmac 2000E", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT   COMPAT   MACHINE   INPUT     INIT    CONFIG    COMPANY        FULLNAME
+COMP( 1980, tmc2000e, 0,       0,	    tmc2000e, tmc2000e, 0,		tmc2000e, "Telercas Oy", "Telmac 2000E", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )

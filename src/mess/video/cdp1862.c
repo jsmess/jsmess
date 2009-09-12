@@ -12,7 +12,6 @@
     TODO:
 
 	- calculate colors from luminance/chrominance resistors
-	- refactor DMA write to WRITE8_DEVICE_HANDLER and add callbacks for RD/BD/GD
 
 */
 
@@ -32,6 +31,10 @@ static const int CDP1862_BACKGROUND_COLOR_SEQUENCE[] = { 2, 0, 1, 4 };
 typedef struct _cdp1862_t cdp1862_t;
 struct _cdp1862_t
 {
+	devcb_resolved_read_line		in_rd_func;
+	devcb_resolved_read_line		in_bd_func;
+	devcb_resolved_read_line		in_gd_func;
+
 	const device_config *screen;	/* screen */
 	bitmap_t *bitmap;				/* bitmap */
 
@@ -105,20 +108,20 @@ WRITE8_DEVICE_HANDLER( cdp1862_bkg_w )
     cdp1862_dma_w - DMA byte write
 -------------------------------------------------*/
 
-void cdp1862_dma_w(const device_config *device, UINT8 data, int rd, int bd, int gd)
+WRITE8_DEVICE_HANDLER( cdp1862_dma_w )
 {
 	cdp1862_t *cdp1862 = get_safe_token(device);
 
+	int rd = 1, bd = 1, gd = 1;
 	int sx = video_screen_get_hpos(cdp1862->screen) + 4;
 	int y = video_screen_get_vpos(cdp1862->screen);
 	int x;
 
-	if (cdp1862->con)
+	if (!cdp1862->con)
 	{
-		/* latch white dot color */
-		rd = 1;
-		gd = 1;
-		bd = 1;
+		rd = devcb_call_read_line(&cdp1862->in_rd_func);
+		bd = devcb_call_read_line(&cdp1862->in_bd_func);
+		gd = devcb_call_read_line(&cdp1862->in_gd_func);
 	}
 
 	for (x = 0; x < 8; x++)
@@ -170,6 +173,11 @@ static DEVICE_START( cdp1862 )
 {
 	cdp1862_t *cdp1862 = get_safe_token(device);
 	const cdp1862_interface *intf = device->static_config;
+
+	/* resolve callbacks */
+	devcb_resolve_read_line(&cdp1862->in_rd_func, &intf->in_rd_func, device);
+	devcb_resolve_read_line(&cdp1862->in_bd_func, &intf->in_bd_func, device);
+	devcb_resolve_read_line(&cdp1862->in_gd_func, &intf->in_gd_func, device);
 
 	/* get the screen device */
 	cdp1862->screen = devtag_get_device(device->machine, intf->screen_tag);

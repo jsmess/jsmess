@@ -199,13 +199,6 @@ static READ8_DEVICE_HANDLER( elf2_dma_r )
 	return state->data;
 }
 
-static WRITE8_DEVICE_HANDLER( elf2_dma_w )
-{
-	elf2_state *state = device->machine->driver_data;
-
-	cdp1861_dma_w(state->cdp1861, data);
-}
-
 static CDP1802_INTERFACE( elf2_config )
 {
 	elf2_mode_r,
@@ -213,7 +206,7 @@ static CDP1802_INTERFACE( elf2_config )
 	elf2_sc_w,
 	DEVCB_LINE(elf2_q_w),
 	DEVCB_HANDLER(elf2_dma_r),
-	DEVCB_HANDLER(elf2_dma_w)
+	DEVCB_DEVICE_HANDLER(CDP1861_TAG, cdp1861_dma_w)
 };
 
 /* MM74C923 Interface */

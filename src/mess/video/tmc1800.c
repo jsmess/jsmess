@@ -2,7 +2,7 @@
 #include "includes/tmc1800.h"
 #include "cpu/cdp1802/cdp1802.h"
 #include "video/cdp1861.h"
-#include "video/cdp1864.h"
+#include "sound/cdp1864.h"
 #include "machine/rescap.h"
 
 /* Telmac 1800 */
@@ -34,6 +34,27 @@ static VIDEO_UPDATE( tmc1800 )
 
 /* Telmac 2000 */
 
+static READ_LINE_DEVICE_HANDLER( rdata_r )
+{
+	tmc2000_state *state = device->machine->driver_data;
+
+	return BIT(state->color, 2);
+}
+
+static READ_LINE_DEVICE_HANDLER( bdata_r )
+{
+	tmc2000_state *state = device->machine->driver_data;
+
+	return BIT(state->color, 1);
+}
+
+static READ_LINE_DEVICE_HANDLER( gdata_r )
+{
+	tmc2000_state *state = device->machine->driver_data;
+
+	return BIT(state->color, 0);
+}
+
 static WRITE_LINE_DEVICE_HANDLER( tmc2000_efx_w )
 {
 	tmc2000_state *driver_state = device->machine->driver_data;
@@ -46,6 +67,9 @@ static CDP1864_INTERFACE( tmc2000_cdp1864_intf )
 	CDP1802_TAG,
 	SCREEN_TAG,
 	CDP1864_INTERLACED,
+	DEVCB_LINE(rdata_r),
+	DEVCB_LINE(bdata_r),
+	DEVCB_LINE(gdata_r),
 	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, CDP1802_INPUT_LINE_INT),
 	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, CDP1802_INPUT_LINE_DMAOUT),
 	DEVCB_LINE(tmc2000_efx_w),
@@ -78,6 +102,9 @@ static CDP1864_INTERFACE( oscnano_cdp1864_intf )
 	CDP1802_TAG,
 	SCREEN_TAG,
 	CDP1864_INTERLACED,
+	DEVCB_LINE_VCC,
+	DEVCB_LINE_VCC,
+	DEVCB_LINE_VCC,
 	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, CDP1802_INPUT_LINE_INT),
 	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, CDP1802_INPUT_LINE_DMAOUT),
 	DEVCB_LINE(oscnano_efx_w),
@@ -142,7 +169,9 @@ MACHINE_DRIVER_START( tmc2000_video )
 	MDRV_PALETTE_LENGTH(8+8)
 	MDRV_VIDEO_UPDATE(tmc2000)
 
+	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_CDP1864_ADD(CDP1864_TAG, XTAL_1_75MHz, tmc2000_cdp1864_intf)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END
 
 MACHINE_DRIVER_START( oscnano_video )
@@ -153,5 +182,7 @@ MACHINE_DRIVER_START( oscnano_video )
 	MDRV_PALETTE_LENGTH(8+8)
 	MDRV_VIDEO_UPDATE(oscnano)
 
+	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_CDP1864_ADD(CDP1864_TAG, XTAL_1_75MHz, oscnano_cdp1864_intf)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END
