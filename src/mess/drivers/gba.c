@@ -1946,7 +1946,7 @@ TIMER_CALLBACK( perform_scan )
 	}
 
 	// entering VBL, handle interrupts and DMA triggers
-	if (scanline == 0)
+	if (scanline == 160)
 	{
 		int ch, ctrl;
 
