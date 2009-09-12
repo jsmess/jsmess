@@ -1274,7 +1274,7 @@ static DEVICE_IMAGE_LOAD(c64_cart)
 		memcpy(romh, cart + 0x1000, 0x2000);
 		break;
 	default:
-		if (!c64_game && c64_exrom)
+		if (!c64_game && c64_exrom && (n_banks == 1))
 			memcpy(romh, cart, 0x2000);
 		else
 		{
