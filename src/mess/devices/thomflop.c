@@ -306,7 +306,6 @@ static WRITE8_HANDLER( to7_5p14_w )
 		}
 
 		dens = (data & 0x80) ? DEN_FM_LO : DEN_MFM_LO;
-		thom_floppy_set_density( dens );
 		wd17xx_set_density( fdc, dens );
 
 		to7_5p14_select = data;
@@ -333,7 +332,6 @@ static void to7_5p14_reset( running_machine *machine )
 	int i;
 	const device_config *fdc = devtag_get_device(machine, "wd2793");
 	LOG(( "to7_5p14_reset: CD 90-640 controller\n" ));
-	thom_floppy_set_density( DEN_MFM_LO );
 	wd17xx_reset(fdc);
 	for ( i = 0; i < device_count( machine, IO_FLOPPY ); i++ )
 	{
@@ -436,7 +434,6 @@ static void to7_5p14sd_reset( running_machine *machine )
 {
 	int i;
 	LOG(( "to7_5p14sd_reset: CD 90-015 controller\n" ));
-	thom_floppy_set_density( DEN_FM_LO );
 	for ( i = 0; i < device_count( machine, IO_FLOPPY ); i++ )
 	{
 		const device_config * img = image_from_devtype_and_index( machine, IO_FLOPPY, i );
@@ -842,8 +839,6 @@ static void to7_qdd_reset( running_machine *machine )
 	int i;
 	LOG(( "to7_qdd_reset: CQ 90-028 controller\n" ));
 
-	thom_floppy_set_density( DEN_MFM_LO );
-
 	for ( i = 0; i < device_count( machine, IO_FLOPPY ); i++ )
 	{
 		const device_config * img = image_from_devtype_and_index( machine, IO_FLOPPY, i );
@@ -949,9 +944,11 @@ static const device_config * thmfc_floppy_image ( running_machine *machine )
 
 
 
-static int thmfc_floppy_is_qdd ( void )
+static int thmfc_floppy_is_qdd ( const device_config *image )
 {
-	return thom_floppy_get_type( thmfc1->drive & 2 ) == THOM_FLOPPY_QDD;
+	if (image==NULL) return 0;
+	if (!image_exists(image)) return 0;
+	return image_length(image)==51200; // idf QDD
 }
 
 
@@ -961,7 +958,7 @@ static void thmfc_floppy_index_pulse_cb ( const device_config *controller,const 
 	if ( image != thmfc_floppy_image(image->machine) )
 		return;
 
-	if ( thmfc_floppy_is_qdd() )
+	if ( thmfc_floppy_is_qdd(image) )
 	{
 		/* pulse each time the whole-disk spiraling track ends */
 		floppy_drive_set_rpm( image, 16.92f /* 423/25 */ );
@@ -1082,7 +1079,7 @@ static UINT8 thmfc_floppy_raw_read_byte ( running_machine *machine )
 	/* rebuild track if needed */
 	if ( ! thmfc1->data_raw_size )
 	{
-		if ( thmfc_floppy_is_qdd() )
+		if ( thmfc_floppy_is_qdd(thmfc_floppy_image(machine)) )
 			/* QDD: track = whole disk */
 			thmfc1->data_raw_size = thom_qdd_make_disk ( thmfc_floppy_image(machine), thmfc1->data );
 		else
@@ -1266,7 +1263,7 @@ READ8_HANDLER ( thmfc_floppy_r )
 		UINT8 data = 0;
 		const device_config * img = thmfc_floppy_image(space->machine);
 		int flags = floppy_drive_get_flag_state( img, -1 );
-		if ( thmfc_floppy_is_qdd() )
+		if ( thmfc_floppy_is_qdd(img) )
 		{
 			if ( ! image_exists(img) )
 				data |= 0x40; /* disk present */
@@ -1327,9 +1324,8 @@ WRITE8_HANDLER ( thmfc_floppy_w )
 	{
 		DENSITY dens = (data & 0x20) ? DEN_FM_LO : DEN_MFM_LO;
 		int wsync = (data >> 4) & 1;
-		int qdd = thmfc_floppy_is_qdd();
+		int qdd = thmfc_floppy_is_qdd(thmfc_floppy_image(space->machine));
 		chrn_id id;
-		thom_floppy_set_density( dens );
 		thmfc1->formatting = (data >> 2) & 1;
 		LOG (( "%f $%04x thmfc_floppy_w: CMD0=$%02X dens=%s wsync=%i dsync=%i fmt=%i op=%i\n",
 		       attotime_to_double(timer_get_time(space->machine)), cpu_get_previouspc(cputag_get_cpu(space->machine, "maincpu")), data,
@@ -1433,7 +1429,8 @@ WRITE8_HANDLER ( thmfc_floppy_w )
 		int seek = 0, motor;
 		thmfc1->drive = data & 2;
 
-		if ( thmfc_floppy_is_qdd() )
+		img = thmfc_floppy_image(space->machine);
+		if ( thmfc_floppy_is_qdd(img) )
 		{
 			motor = !(data & 0x40);
 			/* no side select & no seek for QDD */
@@ -1446,7 +1443,6 @@ WRITE8_HANDLER ( thmfc_floppy_w )
 			thmfc1->drive |= 1 ^ ((data >> 6) & 1);
 		}
 
-		img = thmfc_floppy_image(space->machine);
 		thom_floppy_active( space->machine, 0 );
 
 		LOG (( "%f $%04x thmfc_floppy_w: CMD2=$%02X drv=%i step=%i motor=%i\n",
@@ -1470,7 +1466,7 @@ WRITE8_HANDLER ( thmfc_floppy_w )
 
 	case 3: /* WDATA */
 		thmfc1->wsync = data;
-		if ( thmfc_floppy_is_qdd() )
+		if ( thmfc_floppy_is_qdd(thmfc_floppy_image(space->machine)) )
 			thmfc_floppy_qdd_write_byte( space->machine, data );
 		else if ( thmfc1->op==THMFC1_OP_WRITE_SECT )
 			thmfc_floppy_write_byte( space->machine, data );
@@ -1532,7 +1528,6 @@ void thmfc_floppy_reset( running_machine *machine )
 		floppy_drive_seek( img, - floppy_drive_get_current_track( img ) );
 	}
 
-	thom_floppy_set_density( DEN_MFM_LO );
 	thmfc1->op = THMFC1_OP_RESET;
 	thmfc1->track = 0;
 	thmfc1->sector = 0;

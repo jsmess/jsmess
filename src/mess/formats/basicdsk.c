@@ -85,10 +85,11 @@ static floperr_t get_offset(floppy_image *floppy, int head, int track, int secto
 	/* translate the sector to a raw sector */
 	if (!sector_is_index)
 	{
-		if (geom->translate_sector)
-			sector = geom->translate_sector(floppy, sector);
 		sector -= geom->first_sector_id;
 	}
+
+	if (geom->translate_sector)
+		sector = geom->translate_sector(floppy, sector);
 
 	/* check to see if we are out of range */
 	if ((head < 0) || (head >= geom->heads) || (track < 0) || (track >= geom->tracks)
@@ -124,7 +125,6 @@ static floperr_t internal_basicdsk_read_sector(floppy_image *floppy, int head, i
 	err = get_offset(floppy, head, track, sector, sector_is_index, &offset);
 	if (err)
 		return err;
-
 	floppy_image_read(floppy, buffer, offset, buflen);
 	return FLOPPY_ERROR_SUCCESS;
 }

@@ -75,7 +75,8 @@
 #include "includes/thomson.h"
 #include "machine/6821pia.h"
 #include "machine/ctronics.h"
-
+#include "devices/mflopimg.h"
+#include "formats/basicdsk.h"
 
 /**************************** common *******************************/
 
@@ -634,6 +635,20 @@ static INPUT_PORTS_START ( t9000 )
      PORT_INCLUDE ( to7 )
 INPUT_PORTS_END
 
+static void thom_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+{
+	/* floppy */
+	switch(state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case MESS_DEVINFO_INT_COUNT:							info->i = 4; break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_thomson; break;
+
+		default:										floppy_device_getinfo(devclass, state, info); break;
+	}
+}
 
 /* ------------ config ------------ */
 
