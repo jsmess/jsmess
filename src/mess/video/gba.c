@@ -4,7 +4,7 @@
 
   File to handle emulation of the video hardware of the Game Boy Advance
 
-  By R. Belmont & Harmony
+  By R. Belmont, MooglyGuy, Harmony
 
 ***************************************************************************/
 
@@ -13,7 +13,6 @@
 #include "includes/gba.h"
 
 #define VERBOSE_LEVEL	(0)
-#define DISABLE_ROZ	(0)
 
 INLINE void verboselog(running_machine *machine, int n_level, const char *s_fmt, ...)
 {
@@ -28,7 +27,6 @@ INLINE void verboselog(running_machine *machine, int n_level, const char *s_fmt,
 	}
 }
 
-static UINT16 mosaic_offset[16][4096];
 static int coeff[32] = {  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
 						 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16 };
 
@@ -973,7 +971,7 @@ static void draw_gba_oam_window(gba_state *gba_state, running_machine *machine, 
 							else
 							{
 								int inc = 32;
-								int address;
+								UINT32 address;
 								if(attr1 & OBJ_VFLIP)
 								{
 									cury = height - cury - 1;
@@ -1784,20 +1782,20 @@ void gba_draw_scanline(running_machine *machine, int y)
 		return;
 	}
 
-	//printf( "mode = %d\n", gba_state->DISPCNT & 7 );
-
-	if(gba_state->DISPCNT & DISPCNT_OBJWIN_EN)
+	if(!gba_state->fxOn && !gba_state->windowOn && !(gba_state->DISPCNT & DISPCNT_OBJWIN_EN))
 	{
-		submode = 2;
+		submode = 0;
 	}
-	else if(gba_state->fxOn)
+	else if(gba_state->fxOn && !gba_state->windowOn && !(gba_state->DISPCNT & DISPCNT_OBJWIN_EN))
 	{
 		submode = 1;
 	}
 	else
 	{
-		submode = 0;
+		submode = 2;
 	}
+
+	//printf( "mode = %d, %d\n", gba_state->DISPCNT & 7, submode );
 
 	switch(gba_state->DISPCNT & 7)
 	{
@@ -1824,14 +1822,4 @@ void gba_draw_scanline(running_machine *machine, int y)
 
 void gba_video_start(running_machine *machine)
 {
-	int level, x;
-
-	/* generate a table to make mosaic fast */
-	for (level = 0; level < 16; level++)
-	{
-		for (x = 0; x < 4096; x++)
-		{
-			mosaic_offset[level][x] = (x / (level + 1)) * (level + 1);
-		}
-	}
 }

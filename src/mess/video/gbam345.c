@@ -11,11 +11,11 @@
 void draw_roz_bitmap_mode_scanline(running_machine *machine, gba_state *gba_state, int y, UINT32* line0, UINT32* line1, UINT32* line2, UINT32* line3, UINT32* lineOBJ, UINT32* lineOBJWin, UINT32* lineMix, int bpp)
 {
 	int x = 0;
-	UINT32 backdrop = gba_state->gba_pram[0] | 0x30000000;
+	UINT32 backdrop = ((UINT16*)gba_state->gba_pram)[0] | 0x30000000;
 
 	if(bpp == 4)
 	{
-		fatalerror("Screen mode 5 is not fully supported yet, contact MESSdev!\n" );
+		fatalerror( "Screen mode 5 is not fully supported yet, contact MESSdev!\n" );
 	}
 
 	draw_roz_bitmap_scanline(gba_state, line2, y, DISPCNT_BG2_EN, gba_state->BG2CNT, gba_state->BG2X, gba_state->BG2Y, gba_state->BG2PA, gba_state->BG2PB, gba_state->BG2PC, gba_state->BG2PD, &gba_state->gfxBG2X, &gba_state->gfxBG2Y, gba_state->gfxBG2Changed, bpp);
@@ -81,7 +81,7 @@ void draw_roz_bitmap_mode_scanline(running_machine *machine, gba_state *gba_stat
 void draw_roz_bitmap_mode_scanline_nowindow(running_machine *machine, gba_state *gba_state, int y, UINT32* line0, UINT32* line1, UINT32* line2, UINT32* line3, UINT32* lineOBJ, UINT32* lineOBJWin, UINT32* lineMix, int bpp)
 {
 	int x = 0;
-	UINT32 backdrop = gba_state->gba_pram[0] | 0x30000000;
+	UINT32 backdrop = ((UINT16*)gba_state->gba_pram)[0] | 0x30000000;
 	int effect = gba_state->BLDCNT & BLDCNT_SFX;
 
 	if(bpp == 4)
@@ -201,7 +201,7 @@ void draw_roz_bitmap_mode_scanline_nowindow(running_machine *machine, gba_state 
 void draw_roz_bitmap_mode_scanline_all(running_machine *machine, gba_state *gba_state, int y, UINT32* line0, UINT32* line1, UINT32* line2, UINT32* line3, UINT32* lineOBJ, UINT32* lineOBJWin, UINT32* lineMix, int bpp)
 {
 	int x = 0;
-	UINT32 backdrop = gba_state->gba_pram[0] | 0x30000000;
+	UINT32 backdrop = ((UINT16*)gba_state->gba_pram)[0] | 0x30000000;
 	int inWindow0 = 0;
 	int inWindow1 = 0;
 	UINT8 inWin0Mask = gba_state->WININ & 0x00ff;

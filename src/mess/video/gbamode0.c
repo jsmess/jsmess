@@ -11,7 +11,7 @@
 void draw_mode0_scanline(running_machine *machine, gba_state *gba_state, int y, UINT32* line0, UINT32* line1, UINT32* line2, UINT32* line3, UINT32* lineOBJ, UINT32* lineOBJWin, UINT32* lineMix, int bpp)
 {
 	int x = 0;
-	UINT32 backdrop = gba_state->gba_pram[0] | 0x30000000;
+	UINT32 backdrop = ((UINT16*)gba_state->gba_pram)[0] | 0x30000000;
 
 	draw_bg_scanline(gba_state, line0, y, DISPCNT_BG0_EN, gba_state->BG0CNT, gba_state->BG0HOFS, gba_state->BG0VOFS);
 	draw_bg_scanline(gba_state, line1, y, DISPCNT_BG1_EN, gba_state->BG1CNT, gba_state->BG1HOFS, gba_state->BG1VOFS);
@@ -114,7 +114,7 @@ void draw_mode0_scanline(running_machine *machine, gba_state *gba_state, int y, 
 void draw_mode0_scanline_nowindow(running_machine *machine, gba_state *gba_state, int y, UINT32* line0, UINT32* line1, UINT32* line2, UINT32* line3, UINT32* lineOBJ, UINT32* lineOBJWin, UINT32* lineMix, int bpp)
 {
 	int x = 0;
-	UINT32 backdrop = gba_state->gba_pram[0] | 0x30000000;
+	UINT32 backdrop = ((UINT16*)gba_state->gba_pram)[0] | 0x30000000;
 	int effect = gba_state->BLDCNT & BLDCNT_SFX;
 
 	draw_bg_scanline(gba_state, line0, y, DISPCNT_BG0_EN, gba_state->BG0CNT, gba_state->BG0HOFS, gba_state->BG0VOFS);
@@ -264,12 +264,6 @@ void draw_mode0_scanline_nowindow(running_machine *machine, gba_state *gba_state
 				top2 = 0x08;
 			}
 
-			if(lineOBJ[x] < (back & 0xff000000))
-			{
-				back = lineOBJ[x];
-				top2 = 0x10;
-			}
-
 			if(top2 & (gba_state->BLDCNT >> BLDCNT_TP2_SHIFT))
 			{
 				color = alpha_blend_pixel(color, back, coeff[gba_state->BLDALPHA & 0x1f], coeff[(gba_state->BLDALPHA >> 8) & 0x1f]);
@@ -300,7 +294,7 @@ void draw_mode0_scanline_nowindow(running_machine *machine, gba_state *gba_state
 void draw_mode0_scanline_all(running_machine *machine, gba_state *gba_state, int y, UINT32* line0, UINT32* line1, UINT32* line2, UINT32* line3, UINT32* lineOBJ, UINT32* lineOBJWin, UINT32* lineMix, int bpp)
 {
 	int x = 0;
-	UINT32 backdrop = gba_state->gba_pram[0] | 0x30000000;
+	UINT32 backdrop = ((UINT16*)gba_state->gba_pram)[0] | 0x30000000;
 	int inWindow0 = 0;
 	int inWindow1 = 0;
 	UINT8 inWin0Mask = gba_state->WININ & 0x00ff;
