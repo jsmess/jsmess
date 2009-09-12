@@ -97,7 +97,7 @@
 // nec765 interface
 #include "machine/nec765.h"
 #include "formats/dsk_dsk.h"
-#include "devices/mflopimg.h"
+#include "devices/flopdrv.h"
 // pcw video hardware
 #include "includes/pcw.h"
 // pcw/pcw16 beeper

@@ -42,7 +42,7 @@
 #include "machine/994x_ser.h"
 #include "machine/99_dsk.h"
 #include "machine/99_ide.h"
-#include "devices/mflopimg.h"
+#include "devices/flopdrv.h"
 #include "devices/cassette.h"
 #include "machine/smartmed.h"
 #include "devices/harddriv.h"

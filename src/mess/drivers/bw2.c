@@ -36,7 +36,7 @@
 #include "machine/msm8251.h"
 #include "machine/wd17xx.h"
 #include "machine/pit8253.h"
-#include "devices/mflopimg.h"
+#include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
 #include "video/msm6255.h"
 

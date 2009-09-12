@@ -31,7 +31,7 @@
 #include "99_dsk.h"
 #include "mm58274c.h"
 #include "formats/basicdsk.h"
-#include "devices/mflopimg.h"
+#include "devices/flopdrv.h"
 
 
 #define MAX_FLOPPIES 4

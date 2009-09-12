@@ -169,7 +169,7 @@ Known Issues (MZ, 2009-04-26)
 #include "machine/99_dsk.h"
 #include "machine/99_ide.h"
 #include "cpu/tms9900/tms9900.h"
-#include "devices/mflopimg.h"
+#include "devices/flopdrv.h"
 #include "devices/cassette.h"
 #include "devices/cartslot.h"
 #include "machine/smartmed.h"

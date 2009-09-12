@@ -13,7 +13,7 @@
 #include "devices/cartslot.h"
 #include "machine/ay31015.h"
 #include "includes/exidy.h"
-#include "devices/mflopimg.h"
+#include "devices/flopdrv.h"
 
 
 static const device_config *exidy_ay31015;

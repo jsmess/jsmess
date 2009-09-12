@@ -18,7 +18,7 @@
 #include "machine/i8255a.h"
 #include "machine/wd17xx.h"
 #include "machine/ctronics.h"
-#include "devices/mflopimg.h"
+#include "devices/flopdrv.h"
 #include "formats/svi_dsk.h"
 #include "devices/cartslot.h"
 #include "devices/cassette.h"

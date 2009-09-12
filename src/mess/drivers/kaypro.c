@@ -41,7 +41,7 @@
 #include "machine/kay_kbd.h"
 #include "sound/beep.h"
 #include "devices/snapquik.h"
-#include "devices/mflopimg.h"
+#include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
 #include "includes/kaypro.h"
 

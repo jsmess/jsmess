@@ -191,7 +191,7 @@ TO DO:
 #include "includes/adam.h"
 #include "cpu/m6800/m6800.h"
 #include "devices/cartslot.h"
-#include "devices/mflopimg.h"
+#include "devices/flopdrv.h"
 #include "formats/adam_dsk.h"
 
 static ADDRESS_MAP_START( adam_mem, ADDRESS_SPACE_PROGRAM, 8)

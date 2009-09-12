@@ -92,7 +92,7 @@
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "includes/z80ne.h"
-#include "devices/mflopimg.h"
+#include "devices/flopdrv.h"
 #include "devices/cassette.h"
 #include "formats/z80ne_dsk.h"
 

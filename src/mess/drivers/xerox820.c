@@ -34,7 +34,7 @@
 #include "machine/z80sio.h"
 #include "machine/wd17xx.h"
 #include "machine/com8116.h"
-#include "devices/mflopimg.h"
+#include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
 
 INLINE const device_config *get_floppy_image(running_machine *machine, int drive)

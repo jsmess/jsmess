@@ -39,7 +39,7 @@
 #include "machine/z80sti.h"
 #include "machine/ctronics.h"
 #include "machine/rescap.h"
-#include "devices/mflopimg.h"
+#include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
 
 

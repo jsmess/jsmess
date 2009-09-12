@@ -8,7 +8,6 @@
 
 #include "appldriv.h"
 #include "flopdrv.h"
-#include "mflopimg.h"
 #include "formats/ap2_dsk.h"
 
 

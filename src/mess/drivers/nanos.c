@@ -13,7 +13,7 @@
 #include "machine/z80sio.h"
 #include "machine/z80ctc.h"
 #include "machine/nec765.h"
-#include "devices/mflopimg.h"
+#include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
 
 static const UINT8 *FNT;

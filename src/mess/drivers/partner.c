@@ -15,7 +15,7 @@
 #include "machine/wd17xx.h"
 #include "video/i8275.h"
 #include "devices/cassette.h"
-#include "devices/mflopimg.h"
+#include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
 #include "formats/rk_cas.h"
 #include "includes/radio86.h"

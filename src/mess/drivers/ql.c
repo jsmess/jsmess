@@ -42,7 +42,7 @@
 #include "includes/ql.h"
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/m68000/m68000.h"
-#include "devices/mflopimg.h"
+#include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
 #include "devices/cartslot.h"
 #include "devices/microdrv.h"

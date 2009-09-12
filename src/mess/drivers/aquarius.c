@@ -23,7 +23,7 @@
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/speaker.h"
-#include "devices/mflopimg.h"
+#include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
 #include "devices/cartslot.h"
 #include "devices/cassette.h"

@@ -20,7 +20,7 @@
 #include "audio/dave.h"
 #include "video/epnick.h"
 #include "machine/wd17xx.h"
-#include "devices/mflopimg.h"
+#include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
 
 #define ENTERPRISE_XTAL_X1	XTAL_8MHz

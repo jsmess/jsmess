@@ -69,7 +69,7 @@ Hardware:   PPIA 8255
 #include "video/m6847.h"
 
 /* Devices */
-#include "devices/mflopimg.h"
+#include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
 #include "devices/cassette.h"
 #include "devices/snapquik.h"

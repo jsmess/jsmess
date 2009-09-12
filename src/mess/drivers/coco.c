@@ -38,7 +38,7 @@ coco3h	1.2	2.0		1.1
 #include "formats/coco_dsk.h"
 #include "formats/coco_cas.h"
 #include "devices/printer.h"
-#include "devices/mflopimg.h"
+#include "devices/flopdrv.h"
 #include "devices/cassette.h"
 #include "devices/bitbngr.h"
 #include "devices/snapquik.h"

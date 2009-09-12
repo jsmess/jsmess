@@ -17,7 +17,7 @@
 #include "includes/msx.h"
 #include "machine/tc8521.h"
 #include "machine/wd17xx.h"
-#include "devices/mflopimg.h"
+#include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
 #include "video/tms9928a.h"
 #include "cpu/z80/z80.h"

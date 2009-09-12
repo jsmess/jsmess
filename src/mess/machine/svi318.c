@@ -14,7 +14,7 @@
 #include "machine/ins8250.h"
 #include "machine/wd17xx.h"
 #include "machine/ctronics.h"
-#include "devices/mflopimg.h"
+#include "devices/flopdrv.h"
 #include "devices/cassette.h"
 #include "formats/svi_cas.h"
 #include "sound/dac.h"

@@ -20,7 +20,7 @@ todo for apf m1000:
 
 #include "machine/6821pia.h"
 #include "machine/wd17xx.h"
-#include "devices/mflopimg.h"
+#include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
 #include "devices/cassette.h"
 #include "devices/cartslot.h"

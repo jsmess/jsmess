@@ -103,7 +103,7 @@ TODO:
 
 /* Devices */
 #include "formats/pc_dsk.h"		/* pc disk images */
-#include "devices/mflopimg.h"
+#include "devices/flopdrv.h"
 
 
 // interrupt counter

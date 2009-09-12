@@ -15,7 +15,7 @@
 #include "machine/pic8259.h"
 #include "machine/msm8251.h"
 #include "machine/wd17xx.h"
-#include "devices/mflopimg.h"
+#include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
 #include "includes/b2m.h"
 

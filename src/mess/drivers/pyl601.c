@@ -9,7 +9,7 @@
 #include "driver.h"
 #include "cpu/m6800/m6800.h"
 #include "video/mc6845.h"
-#include "devices/mflopimg.h"
+#include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
 #include "machine/nec765.h"
 

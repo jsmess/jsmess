@@ -8,7 +8,7 @@
 
 *********************************************************************/
 #include "driver.h"
-#include "devices/mflopimg.h"
+#include "devices/flopdrv.h"
 #include "formats/trd_dsk.h"
 #include "machine/wd17xx.h"
 #include "machine/beta.h"

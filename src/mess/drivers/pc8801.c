@@ -88,7 +88,7 @@
 #include "machine/8255ppi.h"
 #include "includes/pc8801.h"
 #include "machine/nec765.h"
-#include "devices/mflopimg.h"
+#include "devices/flopdrv.h"
 #include "formats/fm7_dsk.h"
 #include "sound/2203intf.h"
 

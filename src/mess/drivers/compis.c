@@ -37,7 +37,7 @@
 #include "machine/ctronics.h"
 #include "includes/compis.h"
 #include "video/i82720.h"
-#include "devices/mflopimg.h"
+#include "devices/flopdrv.h"
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
 #include "machine/mm58274c.h"

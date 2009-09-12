@@ -45,7 +45,7 @@
 #include "devices/cassette.h"
 #include "formats/fm7_cas.h"
 #include "machine/wd17xx.h"
-#include "devices/mflopimg.h"
+#include "devices/flopdrv.h"
 #include "formats/fm7_dsk.h"
 #include "machine/ctronics.h"
 

@@ -44,7 +44,7 @@ TODO:
 #else
 #include "video/733_asr.h"
 #endif
-#include "devices/mflopimg.h"
+#include "devices/flopdrv.h"
 
 static MACHINE_RESET(ti990_4)
 {

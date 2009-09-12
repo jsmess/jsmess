@@ -29,7 +29,7 @@ NMI
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "includes/cgenie.h"
-#include "devices/mflopimg.h"
+#include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
 #include "devices/cartslot.h"
 #include "devices/cassette.h"

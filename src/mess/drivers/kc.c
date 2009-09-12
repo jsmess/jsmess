@@ -27,7 +27,7 @@
 
 /* Devices */
 #include "devices/cassette.h"
-#include "devices/mflopimg.h"
+#include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
 
 static READ8_HANDLER(kc85_4_port_r)

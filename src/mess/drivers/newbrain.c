@@ -9,7 +9,7 @@
 #include "machine/z80sio.h"
 #include "includes/newbrain.h"
 #include "includes/serial.h"
-#include "devices/mflopimg.h"
+#include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
 #include "devices/cassette.h"
 #include "machine/rescap.h"

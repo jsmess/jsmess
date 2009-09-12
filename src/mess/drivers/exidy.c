@@ -146,7 +146,7 @@ The sorcerer has a UART device used by the serial interface and the cassette sys
 #include "devices/snapquik.h"
 #include "devices/cartslot.h"
 #include "machine/ay31015.h"
-#include "devices/mflopimg.h"
+#include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
 #include "includes/exidy.h"
 

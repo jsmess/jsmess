@@ -17,7 +17,7 @@
 #include "includes/bbc.h"
 #include "machine/upd7002.h"
 #include "machine/ctronics.h"
-#include "devices/mflopimg.h"
+#include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
 #include "devices/cartslot.h"
 #include "devices/cassette.h"

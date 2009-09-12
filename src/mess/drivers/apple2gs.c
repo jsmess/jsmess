@@ -44,7 +44,7 @@
 #include "cpu/g65816/g65816.h"
 #include "includes/apple2.h"
 #include "machine/ay3600.h"
-#include "devices/mflopimg.h"
+#include "devices/flopdrv.h"
 #include "formats/ap2_dsk.h"
 #include "includes/apple2gs.h"
 #include "devices/sonydriv.h"

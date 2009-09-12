@@ -87,7 +87,7 @@ Notes:
 #include "machine/conkort.h"
 
 /* Devices */
-#include "devices/mflopimg.h"
+#include "devices/flopdrv.h"
 #include "devices/cassette.h"
 #include "devices/printer.h"
 

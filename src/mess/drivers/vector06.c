@@ -15,7 +15,7 @@
 #include "machine/wd17xx.h"
 #include "devices/cassette.h"
 #include "devices/cartslot.h"
-#include "devices/mflopimg.h"
+#include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
 #include "includes/vector06.h"
 

@@ -42,7 +42,7 @@
 #include "sound/speaker.h"
 
 /* devices */
-#include "devices/mflopimg.h"
+#include "devices/flopdrv.h"
 #include "formats/coupedsk.h"
 #include "formats/dsk_dsk.h"
 

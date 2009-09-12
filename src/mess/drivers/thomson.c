@@ -75,7 +75,7 @@
 #include "includes/thomson.h"
 #include "machine/6821pia.h"
 #include "machine/ctronics.h"
-#include "devices/mflopimg.h"
+#include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
 
 /**************************** common *******************************/

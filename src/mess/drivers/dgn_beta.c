@@ -45,7 +45,7 @@ documentation still exists.
 #include "includes/dgn_beta.h"
 #include "machine/6551.h"
 #include "formats/coco_dsk.h"
-#include "devices/mflopimg.h"
+#include "devices/flopdrv.h"
 #include "devices/coco_vhd.h"
 
 /*

@@ -26,7 +26,7 @@
 #include "driver.h"
 #include "includes/bw12.h"
 #include "cpu/z80/z80.h"
-#include "devices/mflopimg.h"
+#include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
 #include "machine/6821pia.h"
 #include "machine/ctronics.h"

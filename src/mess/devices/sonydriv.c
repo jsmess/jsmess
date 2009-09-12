@@ -41,7 +41,6 @@
 #include "sonydriv.h"
 #include "formats/ap_dsk35.h"
 #include "flopdrv.h"
-#include "mflopimg.h"
 
 
 #ifdef MAME_DEBUG

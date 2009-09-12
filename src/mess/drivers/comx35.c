@@ -15,7 +15,7 @@
 #include "cpu/cdp1802/cdp1802.h"
 #include "sound/cdp1869.h"
 #include "sound/wave.h"
-#include "devices/mflopimg.h"
+#include "devices/flopdrv.h"
 #include "formats/comx35_dsk.h"
 #include "devices/cassette.h"
 #include "devices/printer.h"

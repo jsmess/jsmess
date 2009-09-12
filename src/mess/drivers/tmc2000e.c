@@ -33,7 +33,7 @@
 #include "includes/tmc2000e.h"
 #include "cpu/cdp1802/cdp1802.h"
 #include "devices/printer.h"
-#include "devices/mflopimg.h"
+#include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
 #include "devices/cassette.h"
 #include "video/cdp1864.h"

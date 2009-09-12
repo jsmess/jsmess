@@ -99,7 +99,7 @@ Some bugs left :
 
 /* Devices */
 #include "formats/dsk_dsk.h"		/* for CPCEMU style disk images */
-#include "devices/mflopimg.h"
+#include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
 #include "includes/msx_slot.h"
 #include "includes/msx.h"  /* MSX floppy device load */

@@ -3,7 +3,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6800/m6800.h"
 #include "formats/atarist_dsk.h"
-#include "devices/mflopimg.h"
+#include "devices/flopdrv.h"
 #include "devices/cartslot.h"
 #include "machine/ctronics.h"
 #include "includes/serial.h"

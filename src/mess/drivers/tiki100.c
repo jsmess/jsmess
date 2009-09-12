@@ -27,7 +27,7 @@
 #include "includes/tiki100.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
-#include "devices/mflopimg.h"
+#include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
 #include "machine/z80ctc.h"
 #include "machine/z80dart.h"

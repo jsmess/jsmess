@@ -30,7 +30,7 @@
 #include "machine/mpc105.h"
 
 /* Devices */
-#include "devices/mflopimg.h"
+#include "devices/flopdrv.h"
 #include "devices/chd_cd.h"
 #include "devices/harddriv.h"
 #include "formats/pc_dsk.h"

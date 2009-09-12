@@ -58,7 +58,7 @@
 #include "machine/ctronics.h"
 #include "machine/msm8251.h"
 #include "formats/dsk_dsk.h"
-#include "devices/mflopimg.h"
+#include "devices/flopdrv.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
 #include "rendlay.h"

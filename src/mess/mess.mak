@@ -395,7 +395,6 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_FORMATS)/dsk_dsk.o	\
 	$(MESS_DEVICES)/flopdrv.o	\
 	$(MESS_DEVICES)/harddriv.o	\
-	$(MESS_DEVICES)/mflopimg.o	\
 	$(MESS_DEVICES)/microdrv.o	\
 	$(MESS_DEVICES)/multcart.o	\
 	$(MESS_DEVICES)/printer.o	\

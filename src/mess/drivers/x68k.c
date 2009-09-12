@@ -128,7 +128,7 @@
 #include "machine/8530scc.h"
 #include "machine/hd63450.h"
 #include "machine/rp5c15.h"
-#include "devices/mflopimg.h"
+#include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
 #include "formats/dim_dsk.h"
 #include "devices/harddriv.h"

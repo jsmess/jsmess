@@ -184,7 +184,7 @@ Apple 3.5 and Apple 5.25 drives - up to three devices
 #include "cpu/m6502/m6502.h"
 #include "deprecat.h"
 #include "devices/appldriv.h"
-#include "devices/mflopimg.h"
+#include "devices/flopdrv.h"
 #include "formats/ap2_dsk.h"
 #include "includes/apple2.h"
 #include "machine/ay3600.h"

@@ -81,7 +81,7 @@ Notes:
 
 #include "driver.h"
 #include "machine/ctronics.h"
-#include "devices/mflopimg.h"
+#include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
 #include "devices/cassette.h"
 #include "devices/snapquik.h"

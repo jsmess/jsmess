@@ -21,7 +21,7 @@
 #include "sound/wave.h"
 #include "includes/oric.h"
 #include "machine/ctronics.h"
-#include "devices/mflopimg.h"
+#include "devices/flopdrv.h"
 #include "devices/cassette.h"
 #include "formats/oric_dsk.h"
 #include "formats/ap2_dsk.h"

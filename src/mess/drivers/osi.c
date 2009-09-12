@@ -183,7 +183,7 @@ Notes:
 #include "machine/6821pia.h"
 #include "sound/discrete.h"
 #include "sound/beep.h"
-#include "devices/mflopimg.h"
+#include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
 #include "devices/cassette.h"
 

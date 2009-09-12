@@ -31,7 +31,7 @@
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
 #include "includes/concept.h"
-#include "devices/mflopimg.h"
+#include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
 #include "devices/harddriv.h"
 #include "machine/mm58274c.h"

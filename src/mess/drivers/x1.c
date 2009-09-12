@@ -153,7 +153,7 @@
 
 #include "machine/wd17xx.h"
 #include "devices/cassette.h"
-#include "devices/mflopimg.h"
+#include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
 #include "formats/fm7_dsk.h"
 #include "formats/x1_tap.h"

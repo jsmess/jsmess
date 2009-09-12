@@ -42,7 +42,7 @@
 #include "includes/xor100.h"
 #include "cpu/z80/z80.h"
 #include "formats/basicdsk.h"
-#include "devices/mflopimg.h"
+#include "devices/flopdrv.h"
 #include "devices/cassette.h"
 #include "machine/com8116.h"
 #include "machine/i8255a.h"

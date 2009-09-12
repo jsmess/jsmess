@@ -14,7 +14,7 @@
 #include "cpu/m6502/m6502.h"
 #include "includes/apple3.h"
 #include "includes/apple2.h"
-#include "devices/mflopimg.h"
+#include "devices/flopdrv.h"
 #include "formats/ap2_dsk.h"
 #include "machine/6551.h"
 #include "machine/6522via.h"

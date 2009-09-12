@@ -286,7 +286,7 @@ PCB Layouts missing
 #include "machine/ctronics.h"
 #include "includes/msx_slot.h"
 #include "includes/msx.h"
-#include "devices/mflopimg.h"
+#include "devices/flopdrv.h"
 #include "devices/cartslot.h"
 #include "devices/cassette.h"
 #include "formats/fmsx_cas.h"
