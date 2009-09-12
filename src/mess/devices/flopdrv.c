@@ -1,15 +1,15 @@
 /*
-	This code handles the floppy drives.
-	All FDD actions should be performed using these functions.
+    This code handles the floppy drives.
+    All FDD actions should be performed using these functions.
 
-	The functions are emulated and a disk image is used.
+    The functions are emulated and a disk image is used.
 
   Real disk operation:
   - set unit id
 
   TODO:
-	- Disk change handling.
-	- Override write protect if disk image has been opened in read mode
+    - Disk change handling.
+    - Override write protect if disk image has been opened in read mode
 */
 
 #include "driver.h"
@@ -17,7 +17,7 @@
 
 #define VERBOSE		0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
-	
+
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
@@ -39,7 +39,7 @@ struct _floppy_drive
 	/* num sides */
 	int num_sides;
 	/* current track - this may or may not relate to the present cylinder number
-	stored by the fdc */
+    stored by the fdc */
 	int current_track;
 
 	/* index pulse timer */
@@ -91,7 +91,6 @@ static const floppy_error_map errmap[] =
 /***************************************************************************
     IMPLEMENTATION
 ***************************************************************************/
-
 static floppy_drive *get_drive(const device_config *img)
 {
 	return image_lookuptag(img, FLOPDRVTAG);
@@ -102,13 +101,9 @@ floppy_image *flopimg_get_image(const device_config *image)
 	return get_drive(image)->floppy;
 }
 
-
-
 static void flopimg_seek_callback(const device_config *image, int physical_track)
 {
-	floppy_drive *flopimg;
-
-	flopimg = get_drive(image);
+	floppy_drive *flopimg = get_drive(image);
 	if (!flopimg || !flopimg->floppy)
 		return;
 
@@ -119,15 +114,12 @@ static void flopimg_seek_callback(const device_config *image, int physical_track
 	flopimg->track = physical_track;
 }
 
-
-
 static int flopimg_get_sectors_per_track(const device_config *image, int side)
 {
-	floppy_drive *flopimg;
 	floperr_t err;
 	int sector_count;
+	floppy_drive *flopimg = get_drive(image);
 
-	flopimg = get_drive(image);
 	if (!flopimg || !flopimg->floppy)
 		return 0;
 
@@ -136,8 +128,6 @@ static int flopimg_get_sectors_per_track(const device_config *image, int side)
 		return 0;
 	return sector_count;
 }
-
-
 
 static void flopimg_get_id_callback(const device_config *image, chrn_id *id, int id_index, int side)
 {
@@ -161,8 +151,6 @@ static void flopimg_get_id_callback(const device_config *image, chrn_id *id, int
 	id->flags = flags;
 	id->N = ((N >= 7) && (N <= 10)) ? N - 7 : 0;
 }
-
-
 
 static void log_readwrite(const char *name, int head, int track, int sector, const char *buf, int length)
 {
@@ -206,31 +194,6 @@ const struct io_procs mess_ioprocs =
 	image_fsize_thunk
 };
 
-/*************************************
- *
- *	Hacks for specific systems
- *
- *************************************/
-
-void floppy_install_load_proc(const device_config *image, void (*proc)(const device_config *image))
-{
-	floppy_drive *flopimg = get_drive(image);
-	flopimg->load_proc = proc;
-}
-
-void floppy_install_unload_proc(const device_config *image, void (*proc)(const device_config *image))
-{
-	floppy_drive *flopimg = get_drive(image);
-	flopimg->unload_proc = proc;
-}
-
-
-
-void floppy_install_tracktranslate_proc(const device_config *image, int (*proc)(const device_config *image, floppy_image *floppy, int physical_track))
-{
-	floppy_drive *flopimg = get_drive(image);
-	flopimg->tracktranslate_proc = proc;
-}
 
 static TIMER_CALLBACK(floppy_drive_index_callback);
 
@@ -264,8 +227,6 @@ void floppy_drive_init(const device_config *img)
 	pDrive->controller = NULL;
 }
 
-
-
 /* index pulses at rpm/60 Hz, and stays high 1/20th of time */
 static void floppy_drive_index_func(const device_config *img)
 {
@@ -288,28 +249,10 @@ static void floppy_drive_index_func(const device_config *img)
 		pDrive->index_pulse_callback(pDrive->controller, img, pDrive->index);
 }
 
-
-
 static TIMER_CALLBACK(floppy_drive_index_callback)
 {
 	const device_config *image = (const device_config *) ptr;
 	floppy_drive_index_func(image);
-}
-
-
-
-/* set the callback for the index pulse */
-void floppy_drive_set_index_pulse_callback(const device_config *img, void (*callback)(const device_config *controller,const device_config *image, int state))
-{
-	floppy_drive *pDrive = get_drive(img);
-	pDrive->index_pulse_callback = callback;
-}
-
-
-void floppy_drive_set_ready_state_change_callback(const device_config *img, void (*callback)(const device_config *controller,const device_config *img, int state))
-{
-	floppy_drive *pDrive = get_drive(img);
-	pDrive->ready_state_change_callback = callback;
 }
 
 /*************************************************************************/
@@ -327,9 +270,9 @@ int	floppy_status(const device_config *img, int new_status)
 	if (new_status!=-1)
 	{
 		/* we don't set the flags directly.
-		The flags are "cooked" when we do a floppy_drive_get_flag_state depending on
-		if drive is connected etc. So if we wrote the flags back it would
-		corrupt this information. Therefore we update the flags depending on new_status */
+        The flags are "cooked" when we do a floppy_drive_get_flag_state depending on
+        if drive is connected etc. So if we wrote the flags back it would
+        corrupt this information. Therefore we update the flags depending on new_status */
 
 		floppy_drive_set_flag_state(img, FLOPPY_DRIVE_DISK_WRITE_PROTECTED, (new_status & FLOPPY_DRIVE_DISK_WRITE_PROTECTED));
 	}
@@ -337,7 +280,6 @@ int	floppy_status(const device_config *img, int new_status)
 	/* return current status */
 	return floppy_drive_get_flag_state(img,0x0ff);
 }
-
 
 /* set flag state */
 void floppy_drive_set_flag_state(const device_config *img, int flag, int state)
@@ -432,7 +374,7 @@ void floppy_drive_set_ready_state(const device_config *img, int state, int flag)
 	if (flag)
 	{
 		/* set ready only if drive is present, disk is in the drive,
-		and disk motor is on - for Amstrad, Spectrum and PCW*/
+        and disk motor is on - for Amstrad, Spectrum and PCW*/
 
 		/* drive present? */
 		if (image_slotexists(img))
@@ -442,14 +384,12 @@ void floppy_drive_set_ready_state(const device_config *img, int state, int flag)
 			{
 				if (floppy_drive_get_flag_state(img, FLOPPY_DRIVE_MOTOR_ON))
 				{
-
 					/* set state */
 					floppy_drive_set_flag_state(img, FLOPPY_DRIVE_READY, state);
                     return;
 				}
 			}
 		}
-
 		floppy_drive_set_flag_state(img, FLOPPY_DRIVE_READY, 0);
 	}
 	else
@@ -457,9 +397,7 @@ void floppy_drive_set_ready_state(const device_config *img, int state, int flag)
 		/* force ready state - for PC driver */
 		floppy_drive_set_flag_state(img, FLOPPY_DRIVE_READY, state);
 	}
-
 }
-
 
 /* get flag state */
 int	floppy_drive_get_flag_state(const device_config *img, int flag)
@@ -522,13 +460,6 @@ void floppy_drive_set_geometry(const device_config *img, floppy_type type)
 		return;
 	}
 	floppy_drive_set_geometry_absolute(img, max_track, num_sides);
-}
-
-void floppy_drive_set_geometry_absolute(const device_config *img, int tracks, int sides)
-{
-	floppy_drive *pDrive = get_drive(img);
-	pDrive->max_track = tracks;
-	pDrive->num_sides = sides;
 }
 
 void floppy_drive_seek(const device_config *img, signed int signed_tracks)
@@ -604,21 +535,15 @@ int	floppy_drive_get_next_id(const device_config *img, int side, chrn_id *id)
 	return (spt == 0) ? 0 : 1;
 }
 
-int	floppy_drive_get_current_track(const device_config *img)
-{
-	floppy_drive *drv = get_drive(img);
-	return drv->current_track;
-}
-
 void floppy_drive_read_track_data_info_buffer(const device_config *img, int side, void *ptr, int *length )
 {
 	floppy_drive *flopimg;
 	if (image_exists(img))
-	{	
+	{
 		flopimg = get_drive(img);
 		if (!flopimg || !flopimg->floppy)
 			return;
-	
+
 		floppy_read_track_data(flopimg->floppy, side, flopimg->track, ptr, *length);
 	}
 }
@@ -631,7 +556,7 @@ void floppy_drive_write_track_data_info_buffer(const device_config *img, int sid
 		flopimg = get_drive(img);
 		if (!flopimg || !flopimg->floppy)
 			return;
-	
+
 		floppy_write_track_data(flopimg->floppy, side, flopimg->track, ptr, *length);
 	}
 }
@@ -640,8 +565,8 @@ void floppy_drive_format_sector(const device_config *img, int side, int sector_i
 {
 	if (image_exists(img))
 	{
-/*		if (drv->interface_.format_sector)
-			drv->interface_.format_sector(img, side, sector_index,c, h, r, n, filler);*/
+/*      if (drv->interface_.format_sector)
+            drv->interface_.format_sector(img, side, sector_index,c, h, r, n, filler);*/
 	}
 }
 
@@ -653,12 +578,12 @@ void floppy_drive_read_sector_data(const device_config *img, int side, int index
 		flopimg = get_drive(img);
 		if (!flopimg || !flopimg->floppy)
 			return;
-		
+
 		floppy_read_indexed_sector(flopimg->floppy, side, flopimg->track, index1, 0, ptr, length);
-		
+
 		if (LOG_FLOPPY)
 			log_readwrite("sector_read", side, flopimg->track, index1, ptr, length);
-		
+
 	}
 }
 
@@ -666,14 +591,14 @@ void floppy_drive_write_sector_data(const device_config *img, int side, int inde
 {
 	floppy_drive *flopimg;
 	if (image_exists(img))
-	{	
+	{
 		flopimg = get_drive(img);
 		if (!flopimg || !flopimg->floppy)
 			return;
-	
+
 		if (LOG_FLOPPY)
 			log_readwrite("sector_write", side, flopimg->track, index1, ptr, length);
-	
+
 		floppy_write_indexed_sector(flopimg->floppy, side, flopimg->track, index1, 0, ptr, length, ddam);
 	}
 }
@@ -713,7 +638,50 @@ int floppy_drive_get_datarate_in_us(DENSITY density)
 	return usecs;
 }
 
+void floppy_install_load_proc(const device_config *image, void (*proc)(const device_config *image))
+{
+	floppy_drive *flopimg = get_drive(image);
+	flopimg->load_proc = proc;
+}
 
+void floppy_install_unload_proc(const device_config *image, void (*proc)(const device_config *image))
+{
+	floppy_drive *flopimg = get_drive(image);
+	flopimg->unload_proc = proc;
+}
+
+void floppy_install_tracktranslate_proc(const device_config *image, int (*proc)(const device_config *image, floppy_image *floppy, int physical_track))
+{
+	floppy_drive *flopimg = get_drive(image);
+	flopimg->tracktranslate_proc = proc;
+}
+
+/* set the callback for the index pulse */
+void floppy_drive_set_index_pulse_callback(const device_config *img, void (*callback)(const device_config *controller,const device_config *image, int state))
+{
+	floppy_drive *pDrive = get_drive(img);
+	pDrive->index_pulse_callback = callback;
+}
+
+
+void floppy_drive_set_ready_state_change_callback(const device_config *img, void (*callback)(const device_config *controller,const device_config *img, int state))
+{
+	floppy_drive *pDrive = get_drive(img);
+	pDrive->ready_state_change_callback = callback;
+}
+
+void floppy_drive_set_geometry_absolute(const device_config *img, int tracks, int sides)
+{
+	floppy_drive *pDrive = get_drive(img);
+	pDrive->max_track = tracks;
+	pDrive->num_sides = sides;
+}
+
+int	floppy_drive_get_current_track(const device_config *img)
+{
+	floppy_drive *drv = get_drive(img);
+	return drv->current_track;
+}
 
 void floppy_drive_set_rpm(const device_config *img, float rpm)
 {
@@ -728,14 +696,10 @@ void floppy_drive_set_controller(const device_config *img, const device_config *
 }
 
 /* ----------------------------------------------------------------------- */
-
-
 static DEVICE_START( floppy )
 {
 	floppy_drive_init(device);
 }
-
-
 
 static int internal_floppy_device_load(const device_config *image, int create_format, option_resolution *create_args)
 {
@@ -771,18 +735,18 @@ static int internal_floppy_device_load(const device_config *image, int create_fo
 		if (err)
 			goto error;
 	}
-        
+
 	/* if we can get head and track counts, then set the geometry accordingly
-	   However, at least the ti99 system family requires that medium track 
-	   count and drive track count be handled separately. 
-	   It is possible to insert a 40 track medium in an 80 track drive; the 
-	   TI controllers read the track count from sector 0 and automatically 
-	   apply double steps. Setting the track count of the drive to the 
-	   medium track count will then lead to unreachable tracks.
-	*/
+       However, at least the ti99 system family requires that medium track
+       count and drive track count be handled separately.
+       It is possible to insert a 40 track medium in an 80 track drive; the
+       TI controllers read the track count from sector 0 and automatically
+       apply double steps. Setting the track count of the drive to the
+       medium track count will then lead to unreachable tracks.
+    */
 	keep_geometry = (int)mess_device_get_info_int(mess_devclass_from_core_device(image), MESS_DEVINFO_INT_KEEP_DRIVE_GEOMETRY);
 
-	if (!keep_geometry 
+	if (!keep_geometry
             && floppy_callbacks(flopimg->floppy)->get_heads_per_disk
 		&& floppy_callbacks(flopimg->floppy)->get_tracks_per_disk)
 	{
@@ -816,14 +780,10 @@ static DEVICE_IMAGE_LOAD( floppy )
 	return retVal;
 }
 
-
-
 static DEVICE_IMAGE_CREATE( floppy )
 {
-	return internal_floppy_device_load(image, create_format, create_args);	
+	return internal_floppy_device_load(image, create_format, create_args);
 }
-
-
 
 static DEVICE_IMAGE_UNLOAD( floppy )
 {
@@ -835,11 +795,9 @@ static DEVICE_IMAGE_UNLOAD( floppy )
 	flopimg->floppy = NULL;
 }
 
-
-
 /*************************************
  *
- *	Device specification function
+ *  Device specification function
  *
  *************************************/
 
