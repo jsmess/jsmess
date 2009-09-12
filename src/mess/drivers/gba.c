@@ -859,7 +859,7 @@ static READ32_HANDLER( gba_io_r )
 				}
 				else
 				{
-					printf("Reading inactive timer!\n");
+//					printf("Reading inactive timer!\n");
 					elapsed = 0;
 				}
 
