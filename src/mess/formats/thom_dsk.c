@@ -168,7 +168,7 @@ static floperr_t sap_get_indexed_sector_info(floppy_image *floppy, int head, int
 {
 	floperr_t err;
 	UINT8 header[4];
-	UINT64 offset;
+	UINT64 offset = 0;
 	sector_index += 1;
 	err = get_offset(floppy, head, track, sector_index, FALSE, &offset);
 	
