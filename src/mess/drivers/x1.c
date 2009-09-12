@@ -156,6 +156,7 @@
 #include "devices/mflopimg.h"
 #include "formats/basicdsk.h"
 #include "formats/fm7_dsk.h"
+#include "formats/x1_tap.h"
 #include <ctype.h>
 
 static UINT8 hres_320,io_switch,io_sys,vsync,vdisp;
@@ -1785,6 +1786,20 @@ static const ay8910_interface ay8910_config =
 // (ym-2151 handler here)
 
 /*************************************
+ * 
+ *  Cassette configuration
+ * 
+ *************************************/
+
+static const cassette_config x1_cassette_config =
+{
+	x1_cassette_formats,
+	NULL,
+	CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED
+};
+
+
+/*************************************
  *
  *  Machine Functions
  *
@@ -1938,7 +1953,7 @@ static MACHINE_DRIVER_START( x1 )
 	MDRV_SOUND_WAVE_ADD("wave","cass")
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MDRV_CASSETTE_ADD("cass",default_cassette_config)
+	MDRV_CASSETTE_ADD("cass",x1_cassette_config)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( x1turbo )

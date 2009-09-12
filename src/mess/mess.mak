@@ -1220,6 +1220,7 @@ $(MESSOBJ)/sharp.a:				\
 	$(MESS_VIDEO)/mz80.o		\
 	$(MESS_MACHINE)/mz80.o		\
 	$(MESS_DRIVERS)/x1.o		\
+	$(MESS_FORMATS)/x1_tap.o	\
 
 $(MESSOBJ)/sinclair.a:			\
 	$(MESS_VIDEO)/border.o		\
