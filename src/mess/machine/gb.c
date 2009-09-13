@@ -1465,7 +1465,7 @@ DEVICE_START(gb_cart)
 	memset( gb_dummy_rom_bank, 0xFF, 0x4000 );
 
 	gb_dummy_ram_bank = auto_alloc_array( device->machine, UINT8, 0x2000 );
-	memset( gb_dummy_ram_bank, 0x00, 0x2000 );
+	memset( gb_dummy_ram_bank, 0xFF, 0x2000 );
 
 	for(I = 0; I < MAX_ROMBANK; I++) 
 	{
@@ -1872,6 +1872,7 @@ DEVICE_IMAGE_LOAD(gb_cart)
 	{
 		/* Claim memory */
 		gb_cart_ram = auto_alloc_array( image->machine, UINT8, RAMBanks * 0x2000 );
+		memset( gb_cart_ram, 0xFF, RAMBank * 0x2000 );
 
 		for (I = 0; I < RAMBanks; I++)
 		{
