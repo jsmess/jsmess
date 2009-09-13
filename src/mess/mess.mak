@@ -281,6 +281,7 @@ DRVLIBS = \
 	$(MESSOBJ)/einis.a \
 	$(MESSOBJ)/elektor.a \
 	$(MESSOBJ)/elektrka.a \
+	$(MESSOBJ)/ensoniq.a \
 	$(MESSOBJ)/entex.a \
 	$(MESSOBJ)/epoch.a \
 	$(MESSOBJ)/epson.a \
@@ -289,6 +290,7 @@ DRVLIBS = \
 	$(MESSOBJ)/fairch.a \
 	$(MESSOBJ)/fujitsu.a \
 	$(MESSOBJ)/galaxy.a \
+	$(MESSOBJ)/gamepark.a \
 	$(MESSOBJ)/gce.a \
 	$(MESSOBJ)/grundy.a \
 	$(MESSOBJ)/hartung.a \
@@ -807,6 +809,9 @@ $(MESSOBJ)/elektrka.a:			\
 $(MESSOBJ)/elektor.a:			\
 	$(MESS_DRIVERS)/ec65.o		\
 	$(MESS_DRIVERS)/junior.o	\
+
+$(MESSOBJ)/ensoniq.a:				\
+	$(MESS_DRIVERS)/esq1.o	\
 	
 $(MESSOBJ)/entex.a:				\
 	$(MESS_VIDEO)/advision.o	\
@@ -851,6 +856,10 @@ $(MESSOBJ)/galaxy.a:			\
 	$(MESS_DRIVERS)/galaxy.o	\
 	$(MESS_MACHINE)/galaxy.o	\
 	$(MESS_FORMATS)/gtp_cas.o	\
+
+$(MESSOBJ)/gamepark.a:			\
+	$(MESS_DRIVERS)/gp32.o		\
+	$(MESS_DRIVERS)/gp2x.o		\
 
 $(MESSOBJ)/gce.a:	           	\
 	$(MESS_DRIVERS)/vectrex.o	\

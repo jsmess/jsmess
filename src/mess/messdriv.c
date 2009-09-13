@@ -149,6 +149,9 @@ const game_driver * const drivers[] =
 //  DRIVER( mtc9016 )   /* 1978 Mustang 9016 Telespiel Computer             */
 //  DRIVER( shmc1200 )
 
+    /* ENSONIQ */
+    DRIVER( esq1 )	/* 1986 ESQ-1 Digital Wave Synthesizer */
+
     /* FAIRCHILD */
     DRIVER( channelf )  /* Fairchild Channel F VES - 1976                   */
     DRIVER( sabavdpl )  /* SABA Videoplay - 1977 (PAL)                      */
@@ -176,6 +179,10 @@ const game_driver * const drivers[] =
 
     DRIVER( arcadia )   /* Emerson Arcadia 2001                             */
     DRIVER( vcg )       /* Palladium Video-Computer-Game                    */
+
+    /* GAME PARK */
+    DRIVER( gp32 )	/* GP32 2001 */
+    DRIVER( gp2x )	/* GP2X 2005 */
 
     /* GCE */
     DRIVER( vectrex )   /* General Consumer Electric Vectrex - 1982-1984    */

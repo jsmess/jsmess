@@ -8,7 +8,9 @@ New System Drivers Supported (in no particular order):
 - Nintendo Game Boy Advance [R. Belmont, Harmony]
 - Tandy 1000RL  [Wilbert Pol]
 - DECTalk DTC-01 [Lord Nightmare]
-
+- Ensoniq ESQ-1 (not working) [R. Belmont]
+- Game Park GP32 (not working) [R. Belmont]
+- Game Park Holdings GP2X (not working) [R. Belmont]
 
 
 Systems Promoted from GAME_NOT_WORKING:
