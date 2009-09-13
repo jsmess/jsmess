@@ -42,6 +42,9 @@ System Driver Changes:
 
 - [COLECO] Bug #1460 fixed [Robbbert]
 
+- [DREAMCAST] Initial support for controllers and GD-ROM drive added.  Discs
+  do not boot yet. [R. Belmont]
+
 - [GBCOLOR] Added preliminary support for the bootstrap rom.  [Wilbert Pol]
 
 - [MEGADRIVE]  Fixed multisession issues, fixed SRAM size and SRAM memory 
