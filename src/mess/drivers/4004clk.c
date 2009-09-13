@@ -9,6 +9,7 @@
 #include "driver.h"
 #include "cpu/i4004/i4004.h"
 #include "sound/dac.h"
+#include "4004clk.lh"
 
 static UINT16 nixie[6];
 static UINT16 nixie_temp[16];
@@ -131,8 +132,6 @@ static MACHINE_RESET(4004clk)
 	timer = 0;
 	timer_pulse(machine, ATTOTIME_IN_HZ(120), NULL, 0, timer_callback);
 }
-
-static const char layout_4004clk [] = "4004clk";
 
 static MACHINE_DRIVER_START( 4004clk )
     /* basic machine hardware */

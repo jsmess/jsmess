@@ -1486,6 +1486,7 @@ $(MESSOBJ)/skeleton.a:			\
 
 $(MESSOBJ)/mess.o:	$(MESS_LAYOUT)/lcd.lh
 
+$(MESS_DRIVERS)/4004clk.o:	$(MESS_LAYOUT)/4004clk.lh
 $(MESS_DRIVERS)/acrnsys1.o:	$(MESS_LAYOUT)/acrnsys1.lh
 $(MESS_DRIVERS)/aim65.o:	$(MESS_LAYOUT)/aim65.lh
 $(MESS_DRIVERS)/amico2k.o:	$(MESS_LAYOUT)/amico2k.lh
