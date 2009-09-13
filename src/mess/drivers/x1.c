@@ -896,11 +896,7 @@ static WRITE8_HANDLER( x1_pcg_w )
 
 			pcg_offset &= 0x7ff;
 
-    		gfx_element_mark_dirty(space->machine->gfx[4], pcg_offset >> 3);
-    		gfx_element_mark_dirty(space->machine->gfx[5], pcg_offset >> 3);
-    		gfx_element_mark_dirty(space->machine->gfx[6], pcg_offset >> 3);
-    		gfx_element_mark_dirty(space->machine->gfx[7], pcg_offset >> 3);
-
+    		gfx_element_mark_dirty(space->machine->gfx[1], pcg_offset >> 3);
 		}
 		else
 		{
@@ -912,10 +908,7 @@ static WRITE8_HANDLER( x1_pcg_w )
 
 			pcg_offset &= 0x7ff;
 
-    		gfx_element_mark_dirty(space->machine->gfx[4], pcg_offset >> 3);
-    		gfx_element_mark_dirty(space->machine->gfx[5], pcg_offset >> 3);
-    		gfx_element_mark_dirty(space->machine->gfx[6], pcg_offset >> 3);
-    		gfx_element_mark_dirty(space->machine->gfx[7], pcg_offset >> 3);
+    		gfx_element_mark_dirty(space->machine->gfx[1], pcg_offset >> 3);
 
   			pcg_index[addr-1]++;
   			pcg_index[addr-1]&=7;
@@ -1640,37 +1633,15 @@ static const gfx_layout x1_chars_8x8 =
 	8*8
 };
 
-static const gfx_layout x1_chars_8wx8 =
-{
-	16,8,
-	RGN_FRAC(1,1),
-	1,
-	{ 0 },
-	{ 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
-
-static const gfx_layout x1_chars_8x8w =
+static const gfx_layout x1_chars_8x16 =
 {
 	8,16,
 	RGN_FRAC(1,1),
 	1,
 	{ 0 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 0*8, 1*8, 1*8, 2*8, 2*8, 3*8, 3*8, 4*8, 4*8, 5*8, 5*8, 6*8, 6*8, 7*8, 7*8 },
-	8*8
-};
-
-static const gfx_layout x1_chars_8wx8w =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	1,
-	{ 0 },
-	{ 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7 },
-	{ 0*8, 0*8, 1*8, 1*8, 2*8, 2*8, 3*8, 3*8, 4*8, 4*8, 5*8, 5*8, 6*8, 6*8, 7*8, 7*8 },
-	8*8
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,8*8,9*8,10*8,11*8,12*8,13*8,14*8,15*8 },
+	8*16
 };
 
 static const gfx_layout x1_pcg_8x8 =
@@ -1681,39 +1652,6 @@ static const gfx_layout x1_pcg_8x8 =
 	{ RGN_FRAC(2,3),RGN_FRAC(1,3),RGN_FRAC(0,3) },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
-
-static const gfx_layout x1_pcg_8wx8 =
-{
-	16,8,
-	RGN_FRAC(1,3),
-	3,
-	{ RGN_FRAC(2,3),RGN_FRAC(1,3),RGN_FRAC(0,3) },
-	{ 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
-
-static const gfx_layout x1_pcg_8x8w =
-{
-	8,16,
-	RGN_FRAC(1,3),
-	3,
-	{ RGN_FRAC(2,3),RGN_FRAC(1,3),RGN_FRAC(0,3) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 0*8, 1*8, 1*8, 2*8, 2*8, 3*8, 3*8, 4*8, 4*8, 5*8, 5*8, 6*8, 6*8, 7*8, 7*8 },
-	8*8
-};
-
-static const gfx_layout x1_pcg_8wx8w =
-{
-	16,16,
-	RGN_FRAC(1,3),
-	3,
-	{ RGN_FRAC(2,3),RGN_FRAC(1,3),RGN_FRAC(0,3) },
-	{ 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7 },
-	{ 0*8, 0*8, 1*8, 1*8, 2*8, 2*8, 3*8, 3*8, 4*8, 4*8, 5*8, 5*8, 6*8, 6*8, 7*8, 7*8 },
 	8*8
 };
 
@@ -1730,16 +1668,10 @@ static const gfx_layout x1_chars_16x16 =
 
 /* decoded for debugging purpose, this will be nuked in the end... */
 static GFXDECODE_START( x1 )
-	GFXDECODE_ENTRY( "cgrom", 0x00000, x1_chars_8x8,    0x200, 0x20 )
-	GFXDECODE_ENTRY( "cgrom", 0x00000, x1_chars_8wx8,   0x200, 0x20 )
-	GFXDECODE_ENTRY( "cgrom", 0x00000, x1_chars_8x8w,   0x200, 0x20 )
-	GFXDECODE_ENTRY( "cgrom", 0x00000, x1_chars_8wx8w,  0x200, 0x20 )
-	GFXDECODE_ENTRY( "pcg",   0x00000, x1_pcg_8x8,      0x000, 1 )
-	GFXDECODE_ENTRY( "pcg",   0x00000, x1_pcg_8wx8,     0x000, 1 )
-	GFXDECODE_ENTRY( "pcg",   0x00000, x1_pcg_8x8w,     0x000, 1 )
-	GFXDECODE_ENTRY( "pcg",   0x00000, x1_pcg_8wx8w,    0x000, 1 )
-	GFXDECODE_ENTRY( "cgrom", 0x01800, x1_chars_16x16,  0, 0x20 ) //only x1turboz uses this so far
-	GFXDECODE_ENTRY( "kanji", 0x27000, x1_chars_16x16,  0, 0x20 ) //needs to be checked when the ROM will be redumped
+	GFXDECODE_ENTRY( "cgrom",   0x00000, x1_chars_8x8,    0x200, 0x20 )
+	GFXDECODE_ENTRY( "pcg",     0x00000, x1_pcg_8x8,      0x000, 1 )
+	GFXDECODE_ENTRY( "cgrom",   0x01800, x1_chars_8x16,   0x200, 0x20 )
+	GFXDECODE_ENTRY( "kanji",   0x27000, x1_chars_16x16,  0, 0x20 ) //needs to be checked when the ROM will be redumped
 GFXDECODE_END
 
 /*************************************
@@ -1866,10 +1798,7 @@ static MACHINE_RESET( x1 )
 
 	for(i=0;i<0x0400;i++)
 	{
-		gfx_element_mark_dirty(machine->gfx[4], i);
-	   	gfx_element_mark_dirty(machine->gfx[5], i);
-	   	gfx_element_mark_dirty(machine->gfx[6], i);
-		gfx_element_mark_dirty(machine->gfx[7], i);
+		gfx_element_mark_dirty(machine->gfx[1], i);
 	}
 
 	/* X1 Turbo specific */
@@ -2032,6 +1961,7 @@ SYSTEM_CONFIG_END
 	ROM_LOAD("fnt0808.x1", 0x00000, 0x00800, CRC(e3995a57) SHA1(1c1a0d8c9f4c446ccd7470516b215ddca5052fb2) )
 	ROM_RELOAD(            0x00800, 0x00800)
 	ROM_RELOAD(            0x01000, 0x00800)
+	ROM_LOAD("fnt0816.x1", 0x01800, 0x1000, BAD_DUMP CRC(34818d54) SHA1(2c5fdd73249421af5509e48a94c52c4e423402bf) )
 
 	ROM_REGION(0x4ac00, "kanji", ROMREGION_ERASEFF)
 ROM_END
@@ -2048,10 +1978,11 @@ ROM_START( x1ck )
 
 	ROM_REGION(0x1800, "pcg", ROMREGION_ERASEFF)
 
-	ROM_REGION(0x1800, "cgrom", 0)
+	ROM_REGION(0x2800, "cgrom", 0)
 	ROM_LOAD("fnt0808.x1", 0x00000, 0x00800, CRC(e3995a57) SHA1(1c1a0d8c9f4c446ccd7470516b215ddca5052fb2) )
 	ROM_RELOAD(            0x00800, 0x00800)
 	ROM_RELOAD(            0x01000, 0x00800)
+	ROM_LOAD("fnt0816.x1", 0x01800, 0x01000, BAD_DUMP CRC(34818d54) SHA1(2c5fdd73249421af5509e48a94c52c4e423402bf) )
 
 	ROM_REGION(0x4ac00, "kanji", 0)
 	/* This is clearly a bad dump: size does not make sense and from 0x28000 on there are only 0xff */
@@ -2067,11 +1998,12 @@ ROM_START( x1turbo )
 
 	ROM_REGION(0x1800, "pcg", ROMREGION_ERASEFF)
 
-	ROM_REGION(0x1800, "cgrom", 0)
+	ROM_REGION(0x2800, "cgrom", 0)
 	/* This should be larger... hence, we are missing something (maybe part of the other fnt roms?) */
 	ROM_LOAD("fnt0808_turbo.x1", 0x00000, 0x00800, CRC(84a47530) SHA1(06c0995adc7a6609d4272417fe3570ca43bd0454) )
 	ROM_RELOAD(            0x00800, 0x00800)
 	ROM_RELOAD(            0x01000, 0x00800)
+	ROM_LOAD("fnt0816.x1", 0x01800, 0x01000, BAD_DUMP CRC(34818d54) SHA1(2c5fdd73249421af5509e48a94c52c4e423402bf) )
 
 	ROM_REGION(0x4ac00, "kanji", 0)
 	/* This is clearly a bad dump: size does not make sense and from 0x28000 on there are only 0xff */
@@ -2095,7 +2027,7 @@ ROM_START( x1turboz )
 	ROM_RELOAD(            0x00800, 0x00800)
 	ROM_RELOAD(            0x01000, 0x00800)
 	ROM_SYSTEM_BIOS( 0, "font1", "Font set 1" )
-	ROMX_LOAD("fnt0816.x1", 0x1800, 0x1000, BAD_DUMP CRC(34818d54) SHA1(2c5fdd73249421af5509e48a94c52c4e423402bf), ROM_BIOS(1) )
+	ROMX_LOAD("fnt0816.x1", 0x1800, 0x1000, CRC(34818d54) SHA1(2c5fdd73249421af5509e48a94c52c4e423402bf), ROM_BIOS(1) )
 	/* I strongly suspect this is not genuine */
 	ROMX_LOAD("fnt1616.x1", 0x02800, 0x4ac00, BAD_DUMP CRC(46826745) SHA1(b9e6c320611f0842df6f45673c47c3e23bc14272), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "font2", "Font set 2" )
