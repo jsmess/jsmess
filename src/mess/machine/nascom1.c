@@ -253,10 +253,6 @@ SNAPSHOT_LOAD( nascom1 )
 
 MACHINE_RESET( nascom1 )
 {
-	const device_config *fdc = devtag_get_device(machine, "wd1793");
-	
-	wd17xx_set_density(fdc,DEN_FM_HI);
-	
 	nascom1_hd6402 = devtag_get_device(machine, "hd6402");
 
 	/* Set up hd6402 pins */
@@ -271,6 +267,14 @@ MACHINE_RESET( nascom1 )
 	ay31015_set_input_pin( nascom1_hd6402, AY31015_CS, 1 );
 }
 
+MACHINE_RESET( nascom2 )
+{
+	const device_config *fdc = devtag_get_device(machine, "wd1793");
+	
+	wd17xx_set_density(fdc,DEN_FM_HI);
+
+	MACHINE_RESET_CALL(nascom1);
+}
 
 DRIVER_INIT( nascom1 )
 {

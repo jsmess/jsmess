@@ -309,8 +309,10 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( nascom2 )
 	MDRV_IMPORT_FROM(nascom1)
-	MDRV_CPU_REPLACE("maincpu", Z80, XTAL_16MHz/8)
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(nascom2_io)
+
+	MDRV_MACHINE_RESET( nascom2 )
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")

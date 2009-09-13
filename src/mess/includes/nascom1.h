@@ -34,6 +34,7 @@ READ8_DEVICE_HANDLER( nascom1_hd6402_si );
 WRITE8_DEVICE_HANDLER( nascom1_hd6402_so );
 
 MACHINE_RESET( nascom1 );
+MACHINE_RESET( nascom2 );
 
 /*----------- defined in video/nascom1.c -----------*/
 
