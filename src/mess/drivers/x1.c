@@ -531,11 +531,19 @@ static UINT8 get_game_key(running_machine *machine, int port)
 
 static READ8_HANDLER( sub_io_r )
 {
-	static int sub_val_ptr;
-	UINT8 ret;
+	static int sub_val_ptr,key_i = 0;
+	UINT8 ret,bus_res;
 
+	/* Looks like that the HW retains the latest data putted on the bus here, behaviour confirmed by Rally-X */
 	if(sub_obf)
-		return 0xff;
+	{
+		bus_res = sub_val[key_i];
+		/* FIXME: likely to be different here. */
+		key_i++;
+		if(key_i >= 2) { key_i = 0; }
+
+		return bus_res;
+	}
 
 	/*if(key_flag == 1)
 	{
@@ -1786,9 +1794,9 @@ static const ay8910_interface ay8910_config =
 // (ym-2151 handler here)
 
 /*************************************
- * 
+ *
  *  Cassette configuration
- * 
+ *
  *************************************/
 
 static const cassette_config x1_cassette_config =
