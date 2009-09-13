@@ -67,6 +67,7 @@ const game_driver * const drivers[] =
     DRIVER( snes )      /* Nintendo Super Nintendo NTSC                     */
     DRIVER( snessfx )	/* Nintendo Super Nintendo NTSC, SuperFX			*/
     DRIVER( snespal )   /* Nintendo Super Nintendo PAL                      */
+    DRIVER( snespsfx )	/* Nintendo Super Nintendo PAL, SuperFX			*/
     DRIVER( sfcbox )    /* Nintendo Super Famicom Box                       */
     DRIVER( n64 )       /* Nintendo N64                                     */
     DRIVER( pokemini )  /* Nintendo Pokemon Mini                            */
