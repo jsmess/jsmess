@@ -1189,6 +1189,8 @@ $(MESSOBJ)/sega.a:				\
 	$(MAME_MACHINE)/naomibd.o	\
 	$(MAME_MACHINE)/gdcrypt.o	\
 	$(MAME_VIDEO)/dc.o			\
+	$(MESS_MACHINE)/dc.o		\
+	$(MESS_MACHINE)/gdrom.o		\
 
 $(MESSOBJ)/sgi.a:				\
 	$(MESS_MACHINE)/sgi.o		\
