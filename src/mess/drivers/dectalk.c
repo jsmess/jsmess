@@ -150,50 +150,6 @@ DUART is INT level 6
 
 /* Components */
 
-/* Devices */
-static void duart_irq_handler(const device_config *device, UINT8 vector)
-{
-		cputag_set_input_line_and_vector(device->machine, "maincpu", M68K_IRQ_6, HOLD_LINE, M68K_INT_ACK_AUTOVECTOR);
-		//cputag_set_input_line_and_vector(device->machine, "maincpu", M68K_IRQ_6, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
-	//cputag_set_input_line_and_vector(device->machine, "maincpu", M68K_IRQ_6, HOLD_LINE, vector);
-};
-
- static UINT8 hack_self_test = 0; // temp variable for hack below
-
-static UINT8 duart_input(const device_config *device)
-{
-	UINT8 data = 0xFF;
-	data &= 0x8F; // write me: handle bits 0, 2, 3 which are port a CTS, DSR and RLS(DCD?) respectively
-	//data |= input_port_read(device->machine, "duart_in");
-	 data |= (input_port_read(device->machine, "duart_in")&0x7f);
-	 if ((hack_self_test == 1) && (input_port_read(device->machine, "hacks")&0x01)) data |= 0x10; // hack to prevent hang if selftest disable bit is kept low past the first read; i suppose the proper use of this bit was an incremental switch, or perhaps its expecting an interrupt later from serial in or tone in? added a dipswitch to disable the hack for testing
-	 hack_self_test = 1;
-	return data;
-}
-
-static void duart_output(const device_config *device, UINT8 data)
-{
-	// todo: handle the RTS (bit 0) and DTR (bit 2) bits
-#ifdef SERIAL_TO_STDERR
-	fprintf(stderr, "RTS: %01X, DTR: %01X\n", data&1, (data&4)>>2);
-#endif
-}
-
-static void duart_tx(const device_config *device, int channel, UINT8 data)
-{
-#ifdef SERIAL_TO_STDERR
-	fprintf(stderr, "%02X ",data);
-#endif
-}
-
-static const duart68681_config dectalk_duart68681_config =
-{
-	duart_irq_handler,
-	duart_tx,
-	duart_input,
-	duart_output
-};
-
 static struct
 {
 UINT8 data[8]; // ? what is this for?
@@ -215,7 +171,52 @@ UINT8 simulate_outfifo_error; // simulate an error on the outfifo, which does so
 UINT8 tlc_tonedetect;
 UINT8 tlc_ringdetect;
 UINT8 tlc_dtmf; // dtmf holding reg
+UINT8 duart_inport; // low 4 bits of duart input
+UINT8 duart_outport; // most recent duart output
 } dectalk={ {0}};
+
+/* Devices */
+static void duart_irq_handler(const device_config *device, UINT8 vector)
+{
+		cputag_set_input_line_and_vector(device->machine, "maincpu", M68K_IRQ_6, HOLD_LINE, M68K_INT_ACK_AUTOVECTOR);
+		//cputag_set_input_line_and_vector(device->machine, "maincpu", M68K_IRQ_6, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
+	//cputag_set_input_line_and_vector(device->machine, "maincpu", M68K_IRQ_6, HOLD_LINE, vector);
+};
+
+ static UINT8 hack_self_test = 0; // temp variable for hack below
+
+static UINT8 duart_input(const device_config *device)
+{
+	UINT8 data = 0;
+	data |= dectalk.duart_inport&0xF;
+	data |= (input_port_read(device->machine, "duart_in")&0xF0);
+	 if ((hack_self_test == 1) && (input_port_read(device->machine, "hacks")&0x01)) data |= 0x10; // hack to prevent hang if selftest disable bit is kept low past the first read; i suppose the proper use of this bit was an incremental switch, or perhaps its expecting an interrupt later from serial in or tone in? added a dipswitch to disable the hack for testing
+	 hack_self_test = 1;
+	return data;
+}
+
+static void duart_output(const device_config *device, UINT8 data)
+{
+	dectalk.duart_outport = data;
+#ifdef SERIAL_TO_STDERR
+	fprintf(stderr, "RTS: %01X, DTR: %01X\n", data&1, (data&4)>>2);
+#endif
+}
+
+static void duart_tx(const device_config *device, int channel, UINT8 data)
+{
+#ifdef SERIAL_TO_STDERR
+	fprintf(stderr, "%02X ",data);
+#endif
+}
+
+static const duart68681_config dectalk_duart68681_config =
+{
+	duart_irq_handler,
+	duart_tx,
+	duart_input,
+	duart_output
+};
 
 #define SPC_INITIALIZE dectalk.m68k_spcflags_latch&0x1 // speech initialize flag
 #define SPC_IRQ_ENABLED ((dectalk.m68k_spcflags_latch&0x40)>>6) // irq enable flag
@@ -309,6 +310,8 @@ static void dectalk_reset(const device_config *device)
 	dectalk.tlc_tonedetect = 0; // TODO, needed for selftest pass
 	dectalk.tlc_ringdetect = 0; // TODO
 	dectalk.tlc_dtmf = 0; // TODO
+	dectalk.duart_inport = 0xF;
+	dectalk.duart_outport = 0;
 }
 
 MACHINE_RESET( dectalk )
@@ -318,55 +321,36 @@ MACHINE_RESET( dectalk )
 }
 
 /* Begin 68k i/o handlers */
-/* x2212 nvram/sram chip and led array demunger due to interleaved addresses */
-/* 0x400 long: anything at offset&0x1 = 0 is open bus read, write to leds; everything else is nvram*/
-READ16_HANDLER( led_sw_nvr_read ) 
+READ8_HANDLER( nvram_read ) // read from x2212 nvram chip and possibly do recall
 {
-	UINT16 data = 0xFFFF;
-	/*
-	if (ACCESSING_BITS_0_7) // LEDS
-	{
-		return data; // should be open bus; reading the LEDs doesn't work so well
-	}
-	else if (ACCESSING_BITS_8_15) // X2212 NVRAM chip
-	{
-		data = dectalk.nvram_local[(offset>>1)&0xff]<<8; // TODO: should this be before or after a possible /RECALL? I'm guessing before.
-		if (offset&0x200) // if a9 is set, do a /RECALL
-		dectalk_x2212_recall(space->machine);
-	}
-	*/
-	data = dectalk.nvram_local[offset&0xff]<<8; // TODO: should this be before or after a possible /RECALL? I'm guessing before.
+	UINT8 data = 0xFF;
+	data = dectalk.nvram_local[offset&0xff]; // TODO: should this be before or after a possible /RECALL? I'm guessing before.
 #ifdef NVRAM_LOG
-		logerror("m68k: nvram read at %08X: %02X\n", offset, (data&0xfF00)>>8);
+		logerror("m68k: nvram read at %08X: %02X\n", offset, data;
 #endif
-	if (ACCESSING_BITS_8_15) // X2212 NVRAM chip
-	{
-		if (offset&0x200) // if a9 is set, do a /RECALL
-		dectalk_x2212_recall(space->machine);
-	}
+	if (offset&0x200) // if a9 is set, do a /RECALL
+	dectalk_x2212_recall(space->machine);
 	return data;
 }
 
-WRITE16_HANDLER( led_sw_nv_write ) 
+WRITE8_HANDLER( led_write )
 {
-	if (ACCESSING_BITS_0_7) // LEDS
-	{
-		dectalk.statusLED = data&0xFF;
-		popmessage("LED status: %02X\n", data&0xFF);
+	dectalk.statusLED = data&0xFF;
+	popmessage("LED status: %02X\n", data&0xFF);
 #ifdef VERBOSE
-		logerror("m68k: LED status: %02X\n", data&0xFF);
+	logerror("m68k: LED status: %02X\n", data&0xFF);
 #endif
-		//popmessage("LED status: %x %x %x %x %x %x %x %x\n", data&0x80, data&0x40, data&0x20, data&0x10, data&0x8, data&0x4, data&0x2, data&0x1);
-	}
-	else if (ACCESSING_BITS_8_15) // X2212 NVRAM chip
-	{
+	//popmessage("LED status: %x %x %x %x %x %x %x %x\n", data&0x80, data&0x40, data&0x20, data&0x10, data&0x8, data&0x4, data&0x2, data&0x1);
+}
+
+WRITE8_HANDLER( nvram_write ) // write to X2212 NVRAM chip and possibly do store
+{
 #ifdef NVRAM_LOG
-		logerror("m68k: nvram write at %08X: %02X\n", offset, (data&0xFf00)>>8);
+	logerror("m68k: nvram write at %08X: %02X\n", offset, data&0x0f);
 #endif
-		dectalk.nvram_local[offset&0xff] = (UINT8)((data&0xF00)>>8); // TODO: should this be before or after a possible /STORE? I'm guessing before.
-		if (offset&0x200) // if a9 is set, do a /STORE
-		dectalk_x2212_store(space->machine);
-	}
+	dectalk.nvram_local[offset&0xff] = (UINT8)data&0x0f; // TODO: should this be before or after a possible /STORE? I'm guessing before.
+	if (offset&0x200) // if a9 is set, do a /STORE
+	dectalk_x2212_store(space->machine);
 }
 
 WRITE16_HANDLER( m68k_infifo_w ) // 68k write to the speech input fifo
@@ -630,7 +614,9 @@ static ADDRESS_MAP_START(m68k_mem, ADDRESS_SPACE_PROGRAM, 16)
     ADDRESS_MAP_UNMAP_HIGH
     AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_MIRROR(0x740000) /* ROM */
     AM_RANGE(0x080000, 0x093fff) AM_RAM AM_MIRROR(0x760000) /* RAM */
-    AM_RANGE(0x094000, 0x0943ff) AM_READWRITE(led_sw_nvr_read, led_sw_nv_write) AM_MIRROR(0x763C00) /* LED array and Xicor X2212 NVRAM */
+    //AM_RANGE(0x094000, 0x0943ff) AM_READWRITE(led_sw_nvr_read, led_sw_nv_write) AM_MIRROR(0x763C00) /* LED array and Xicor X2212 NVRAM */
+    AM_RANGE(0x094000, 0x0943ff) AM_WRITE8(led_write, 0x00FF) AM_MIRROR(0x763C00) /* LED array */
+    AM_RANGE(0x094000, 0x0943ff) AM_READWRITE8(nvram_read, nvram_write, 0xFF00) AM_MIRROR(0x763C00) /* Xicor X2212 NVRAM */
     AM_RANGE(0x098000, 0x09801f) AM_DEVREADWRITE8( "duart68681", duart68681_r, duart68681_w, 0xff) AM_MIRROR(0x763FE0) /* DUART */
     AM_RANGE(0x09C000, 0x09C001) AM_READWRITE(m68k_spcflags_r, m68k_spcflags_w) AM_MIRROR(0x763FF8) /* SPC flags reg */
     AM_RANGE(0x09C002, 0x09C003) AM_WRITE(m68k_infifo_w) AM_MIRROR(0x763FF8) /* SPC fifo reg */
@@ -687,8 +673,17 @@ static TIMER_CALLBACK( outfifo_read_cb )
 #ifdef VERBOSE
 	if (data!= 0x8000) logerror("sample output: %04X\n", data);
 #endif
-	timer_set(machine, ATTOTIME_IN_HZ(10000), NULL, 0,  outfifo_read_cb);
+	timer_set(machine, ATTOTIME_IN_HZ(10000), NULL, 0, outfifo_read_cb);
 	dac_signed_data_16_w( speaker, data );
+}
+
+// the following function reads the keyboard and sends to the duart to allow for user input; it doesn't 'exist' on the real unit
+// it more or less simulates a half duplex input terminal
+static TIMER_CALLBACK( simulate_input_cb )
+{
+	// todo: check RTS line
+
+	timer_set(machine, ATTOTIME_IN_HZ(120), NULL, 0, simulate_input_cb);
 }
 
 /* Driver init: stuff that needs setting up which isn't directly affected by reset */
@@ -697,6 +692,7 @@ DRIVER_INIT( dectalk )
 	dectalk_clear_all_fifos(machine);
 	dectalk.simulate_outfifo_error = 0;
 	timer_set(machine, ATTOTIME_IN_HZ(10000), NULL, 0,  outfifo_read_cb);
+	timer_set(machine, ATTOTIME_IN_HZ(120), NULL, 0, simulate_input_cb);
 }
 
 
