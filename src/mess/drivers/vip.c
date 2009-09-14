@@ -533,6 +533,22 @@ static CDP1802_EF_READ( vip_ef_r )
 	return flags;
 }
 
+static CDP1802_SC_WRITE( vip_sc_w )
+{
+	vip_state *driver_state = device->machine->driver_data;
+
+	switch (input_port_read(device->machine, "SOUND"))
+	{
+	case VIP_SOUND_VP550:
+		vp550_sc1_w(driver_state->vp550, sc1);
+		break;
+
+	case VIP_SOUND_VP551:
+//		vp551_sc1_w(driver_state->vp551, sc1);
+		break;
+	}
+}
+
 static WRITE_LINE_DEVICE_HANDLER( vip_q_w )
 {
 	vip_state *driver_state = device->machine->driver_data;
@@ -600,7 +616,7 @@ static CDP1802_INTERFACE( vip_config )
 {
 	vip_mode_r,
 	vip_ef_r,
-	NULL,
+	vip_sc_w,
 	DEVCB_LINE(vip_q_w),
 	DEVCB_NULL,
 	DEVCB_HANDLER(vip_dma_w)
