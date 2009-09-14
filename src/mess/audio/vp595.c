@@ -105,8 +105,7 @@ static DEVICE_START( vp595 )
 	vp595_t *vp595 = get_safe_token(device);
 
 	/* look up devices */
-	vp595->cdp1863 = devtag_get_device(device->machine, "vp595:u1");
-	assert(vp595->cdp1863 != NULL);
+	vp595->cdp1863 = device_find_child_by_tag(device, CDP1863_TAG);
 
 	/* HACK workaround */
 	cdp1863_set_clk2(vp595->cdp1863, CDP1863_XTAL);
