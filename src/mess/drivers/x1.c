@@ -586,13 +586,16 @@ static void cmt_command( running_machine* machine, UINT8 cmd )
 	{
 		case 0x01:  // Stop
 			cassette_change_state(devtag_get_device(machine, "cass" ),CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
+			cassette_change_state(devtag_get_device(machine, "cass" ),CASSETTE_STOPPED,CASSETTE_MASK_UISTATE);
 			cmt_test = 1;
 			break;
 		case 0x02:  // Play
 			cassette_change_state(devtag_get_device(machine, "cass" ),CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
+			cassette_change_state(devtag_get_device(machine, "cass" ),CASSETTE_PLAY,CASSETTE_MASK_UISTATE);
 			break;
 		case 0x0a:  // Record
 			cassette_change_state(devtag_get_device(machine, "cass" ),CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
+			cassette_change_state(devtag_get_device(machine, "cass" ),CASSETTE_RECORD,CASSETTE_MASK_UISTATE);
 			break;
 		default:
 			logerror("Unimplemented or invalid CMT command (0x%02x)\n",cmd);
@@ -1740,7 +1743,7 @@ static const cassette_config x1_cassette_config =
 {
 	x1_cassette_formats,
 	NULL,
-	CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED
+	CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED
 };
 
 
