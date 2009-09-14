@@ -42,6 +42,7 @@
 #include "sound/speaker.h"
 
 /* devices */
+#include "devices/cassette.h"
 #include "devices/flopdrv.h"
 #include "formats/coupedsk.h"
 #include "formats/dsk_dsk.h"
@@ -126,18 +127,21 @@ static READ8_HANDLER( samcoupe_status_r )
 {
 	coupe_asic *asic = space->machine->driver_data;
 	UINT8 data = 0xe0;
-	UINT8 row = ~(offset >> 8);
 
-	if (row & 0x80) data &= input_port_read(space->machine, "keyboard_row_7f") & 0xe0;
-	if (row & 0x40) data &= input_port_read(space->machine, "keyboard_row_bf") & 0xe0;
-	if (row & 0x20) data &= input_port_read(space->machine, "keyboard_row_df") & 0xe0;
-	if (row & 0x10) data &= input_port_read(space->machine, "keyboard_row_ef") & 0xe0;
-	if (row & 0x08) data &= input_port_read(space->machine, "keyboard_row_f7") & 0xe0;
-	if (row & 0x04) data &= input_port_read(space->machine, "keyboard_row_fb") & 0xe0;
-	if (row & 0x02) data &= input_port_read(space->machine, "keyboard_row_fd") & 0xe0;
-	if (row & 0x01) data &= input_port_read(space->machine, "keyboard_row_fe") & 0xe0;
+	/* bit 5-7, keyboard input */
+	if (!BIT(offset,  8)) data &= input_port_read(space->machine, "keyboard_row_fe") & 0xe0;
+	if (!BIT(offset,  9)) data &= input_port_read(space->machine, "keyboard_row_fd") & 0xe0;
+	if (!BIT(offset, 10)) data &= input_port_read(space->machine, "keyboard_row_fb") & 0xe0;
+	if (!BIT(offset, 11)) data &= input_port_read(space->machine, "keyboard_row_f7") & 0xe0;
+	if (!BIT(offset, 12)) data &= input_port_read(space->machine, "keyboard_row_ef") & 0xe0;
+	if (!BIT(offset, 13)) data &= input_port_read(space->machine, "keyboard_row_df") & 0xe0;
+	if (!BIT(offset, 14)) data &= input_port_read(space->machine, "keyboard_row_bf") & 0xe0;
+	if (!BIT(offset, 15)) data &= input_port_read(space->machine, "keyboard_row_7f") & 0xe0;
 
-	return data | asic->status;
+	/* bit 0-4, interrupt source */
+	data |= asic->status;
+
+	return data;
 }
 
 static WRITE8_HANDLER( samcoupe_line_int_w )
@@ -204,36 +208,47 @@ static WRITE8_HANDLER( samcoupe_midi_w )
 
 static READ8_HANDLER( samcoupe_keyboard_r )
 {
-	UINT8 data = 0xff;
-	UINT8 row = ~(offset >> 8);
+	const device_config *cassette = devtag_get_device(space->machine, "cassette");
+	UINT8 data = 0x1f;
 
-	if (row == 0)
-	{
-		data &= input_port_read(space->machine, "keyboard_row_ff") & 0x1f;
-	}
-	else
-	{
-		if (row & 0x80) data &= input_port_read(space->machine, "keyboard_row_7f") & 0x1f;
-		if (row & 0x40) data &= input_port_read(space->machine, "keyboard_row_bf") & 0x1f;
-		if (row & 0x20) data &= input_port_read(space->machine, "keyboard_row_df") & 0x1f;
-		if (row & 0x10) data &= input_port_read(space->machine, "keyboard_row_ef") & 0x1f;
-		if (row & 0x08) data &= input_port_read(space->machine, "keyboard_row_f7") & 0x1f;
-		if (row & 0x04) data &= input_port_read(space->machine, "keyboard_row_fb") & 0x1f;
-		if (row & 0x02) data &= input_port_read(space->machine, "keyboard_row_fd") & 0x1f;
-		if (row & 0x01) data &= input_port_read(space->machine, "keyboard_row_fe") & 0x1f;
-	}
+	/* bit 0-4, keyboard input */
+	if (!BIT(offset,  8)) data &= input_port_read(space->machine, "keyboard_row_fe") & 0x1f;
+	if (!BIT(offset,  9)) data &= input_port_read(space->machine, "keyboard_row_fd") & 0x1f;
+	if (!BIT(offset, 10)) data &= input_port_read(space->machine, "keyboard_row_fb") & 0x1f;
+	if (!BIT(offset, 11)) data &= input_port_read(space->machine, "keyboard_row_f7") & 0x1f;
+	if (!BIT(offset, 12)) data &= input_port_read(space->machine, "keyboard_row_ef") & 0x1f;
+	if (!BIT(offset, 13)) data &= input_port_read(space->machine, "keyboard_row_df") & 0x1f;
+	if (!BIT(offset, 14)) data &= input_port_read(space->machine, "keyboard_row_bf") & 0x1f;
+	if (!BIT(offset, 15)) data &= input_port_read(space->machine, "keyboard_row_7f") & 0x1f;
+	if (offset == 0xff00) data &= input_port_read(space->machine, "keyboard_row_ff") & 0x1f;
 
-	return data | 0xe0;
+	/* bit 5, lightpen strobe */
+	data |= 1 << 5;
+
+	/* bit 6, cassette input */
+	data |= (cassette_input(cassette) > 0 ? 1 : 0) << 6;
+
+	/* bit 7, external memory */
+	data |= 1 << 7;
+
+	logerror("data = %02x\n", data);
+
+	return data;
 }
 
 static WRITE8_HANDLER( samcoupe_border_w )
 {
+	const device_config *cassette = devtag_get_device(space->machine, "cassette");
 	const device_config *speaker = devtag_get_device(space->machine, "speaker");
 	coupe_asic *asic = space->machine->driver_data;
+
 	asic->border = data;
 
-	/* DAC output state */
-	speaker_level_w(speaker, (data >> 4) & 0x01);
+	/* bit 3, cassette output */
+	cassette_output(cassette, BIT(data, 3) ? -1.0 : +1.0);
+
+	/* bit 4, beep */
+	speaker_level_w(speaker, BIT(data, 4));
 }
 
 static READ8_HANDLER( samcoupe_attributes_r )
@@ -482,14 +497,22 @@ static PALETTE_INIT( samcoupe )
     MACHINE DRIVERS
 ***************************************************************************/
 
+static const cassette_config samcoupe_cassette_config =
+{
+	cassette_default_formats,
+	NULL,
+	CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED
+};
+
 static MACHINE_DRIVER_START( samcoupe )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, SAMCOUPE_XTAL_X1/4) /* 6 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, SAMCOUPE_XTAL_X1 / 4) /* 6 MHz */
 	MDRV_CPU_PROGRAM_MAP(samcoupe_mem)
 	MDRV_CPU_IO_MAP(samcoupe_io)
 	MDRV_CPU_VBLANK_INT("screen", samcoupe_frame_interrupt)
 
 	MDRV_MACHINE_RESET(samcoupe)
+	MDRV_DRIVER_DATA(coupe_asic)
 
     /* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -502,10 +525,11 @@ static MACHINE_DRIVER_START( samcoupe )
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
 
 	/* devices */
-	MDRV_DRIVER_DATA(coupe_asic)
 	MDRV_CENTRONICS_ADD("lpt1", standard_centronics)
 	MDRV_CENTRONICS_ADD("lpt2", standard_centronics)
 	MDRV_MSM6242_ADD("sambus_clock")
+	MDRV_WD1772_ADD("wd1772", default_wd17xx_interface)
+	MDRV_CASSETTE_ADD("cassette", samcoupe_cassette_config)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -513,8 +537,6 @@ static MACHINE_DRIVER_START( samcoupe )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MDRV_SOUND_ADD("saa1099", SAA1099, SAMCOUPE_XTAL_X1/3) /* 8 MHz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MDRV_WD1772_ADD("wd1772", default_wd17xx_interface )
 MACHINE_DRIVER_END
 
 
