@@ -97,7 +97,7 @@ WRITE_LINE_DEVICE_HANDLER( vp550_sc1_w )
 {
 	if (state)
 	{
-		cpu_set_input_line(device->machine->firstcpu, CDP1802_INPUT_LINE_INT, CLEAR_LINE);
+		cpu_set_input_line(device, CDP1802_INPUT_LINE_INT, CLEAR_LINE);
 
 		if (LOG) logerror("VP550 Clear Interrupt\n");
 	}
@@ -131,31 +131,16 @@ static WRITE8_DEVICE_HANDLER( vp550_octave_w )
 }
 
 /*-------------------------------------------------
-    vp550_vlmna_w - amplitude A write
+    vp550_vlmn_w - amplitude write
 -------------------------------------------------*/
 
-static WRITE8_DEVICE_HANDLER( vp550_vlmna_w )
+static WRITE8_DEVICE_HANDLER( vp550_vlmn_w )
 {
-	vp550_t *vp550 = get_safe_token(device);
 	float gain = 0.625f * (data & 0x0f);
 
-	sound_set_output_gain(vp550->cdp1863[CHANNEL_A], 0, gain);
+	sound_set_output_gain(device, 0, gain);
 
-	if (LOG) logerror("VP550 Volume A: %u\n", data & 0x0f);
-}
-
-/*-------------------------------------------------
-    vp550_vlmnb_w - amplitude B write
--------------------------------------------------*/
-
-static WRITE8_DEVICE_HANDLER( vp550_vlmnb_w )
-{
-	vp550_t *vp550 = get_safe_token(device);
-	float gain = 0.625f * (data & 0x0f);
-
-	sound_set_output_gain(vp550->cdp1863[CHANNEL_B], 0, gain);
-
-	if (LOG) logerror("VP550 Volume B: %u\n", data & 0x0f);
+	if (LOG) logerror("VP550 '%s' Volume: %u\n", device->tag, data & 0x0f);
 }
 
 /*-------------------------------------------------
@@ -164,9 +149,7 @@ static WRITE8_DEVICE_HANDLER( vp550_vlmnb_w )
 
 static WRITE8_DEVICE_HANDLER( vp550_sync_w )
 {
-	vp550_t *vp550 = get_safe_token(device);
-
-	timer_device_enable(vp550->sync_timer, BIT(data, 0));
+	timer_device_enable(device, BIT(data, 0));
 	
 	if (LOG) logerror("VP550 Interrupt Enable: %u\n", BIT(data, 0));
 }
@@ -185,9 +168,9 @@ void vp550_install_write_handlers(const device_config *device, const address_spa
 		memory_install_write8_device_handler(program, vp550->cdp1863[CHANNEL_A], 0x8001, 0x8001, 0, 0, cdp1863_str_w);
 		memory_install_write8_device_handler(program, vp550->cdp1863[CHANNEL_B], 0x8002, 0x8002, 0, 0, cdp1863_str_w);
 		memory_install_write8_device_handler(program, device, 0x8003, 0x8003, 0, 0, vp550_octave_w);
-		memory_install_write8_device_handler(program, device, 0x8010, 0x8010, 0, 0, vp550_vlmna_w);
-		memory_install_write8_device_handler(program, device, 0x8020, 0x8020, 0, 0, vp550_vlmnb_w);
-		memory_install_write8_device_handler(program, device, 0x8030, 0x8030, 0, 0, vp550_sync_w);
+		memory_install_write8_device_handler(program, vp550->cdp1863[CHANNEL_A], 0x8010, 0x8010, 0, 0, vp550_vlmn_w);
+		memory_install_write8_device_handler(program, vp550->cdp1863[CHANNEL_B], 0x8020, 0x8020, 0, 0, vp550_vlmn_w);
+		memory_install_write8_device_handler(program, vp550->sync_timer, 0x8030, 0x8030, 0, 0, vp550_sync_w);
 	}
 	else
 	{
@@ -198,6 +181,15 @@ void vp550_install_write_handlers(const device_config *device, const address_spa
 		memory_install_write8_handler(program, 0x8020, 0x8020, 0, 0, SMH_UNMAP);
 		memory_install_write8_handler(program, 0x8030, 0x8030, 0, 0, SMH_UNMAP);
 	}
+}
+
+/*-------------------------------------------------
+    vp551_install_readwrite_handler - install
+	or uninstall write handlers
+-------------------------------------------------*/
+
+void vp551_install_write_handlers(const device_config *device, const address_space *program, int enabled)
+{
 }
 
 /*-------------------------------------------------

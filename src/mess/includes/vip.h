@@ -52,8 +52,9 @@ struct _vip_state
 	const device_config *cdp1863;
 	const device_config *cassette;
 	const device_config *beeper;
-	const device_config *vp550;
 	const device_config *vp595;
+	const device_config *vp550;
+	const device_config *vp551;
 };
 
 #endif

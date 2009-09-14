@@ -540,11 +540,8 @@ static CDP1802_SC_WRITE( vip_sc_w )
 	switch (input_port_read(device->machine, "SOUND"))
 	{
 	case VIP_SOUND_VP550:
-		vp550_sc1_w(driver_state->vp550, sc1);
-		break;
-
 	case VIP_SOUND_VP551:
-//		vp551_sc1_w(driver_state->vp551, sc1);
+		vp550_sc1_w(device, sc1);
 		break;
 	}
 }
@@ -656,13 +653,15 @@ static MACHINE_START( vip )
 	state->cdp1862 = devtag_get_device(machine, CDP1862_TAG);
 	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
 	state->beeper = devtag_get_device(machine, DISCRETE_TAG);
-	state->vp550 = devtag_get_device(machine, VP550_TAG);
 	state->vp595 = devtag_get_device(machine, VP595_TAG);
+	state->vp550 = devtag_get_device(machine, VP550_TAG);
+	state->vp551 = devtag_get_device(machine, VP551_TAG);
 
 	/* reset sound */
 	discrete_sound_w(state->beeper, NODE_01, 0);
 	vp595_q_w(state->vp595, 0);
 	vp550_q_w(state->vp550, 0);
+	vp550_q_w(state->vp551, 0);
 
 	/* register for state saving */
 	state_save_register_global(machine, state->reset);
@@ -684,8 +683,9 @@ static MACHINE_RESET( vip )
 	device_reset(state->cdp1862);
 
 	/* reset devices */
-	device_reset(state->vp550);
 	device_reset(state->vp595);
+	device_reset(state->vp550);
+	device_reset(state->vp551);
 
 	/* configure video */
 	switch (input_port_read(machine, "VIDEO"))
@@ -707,25 +707,25 @@ static MACHINE_RESET( vip )
 	case VIP_SOUND_SPEAKER:
 		vp595_install_write_handlers(state->vp595, io, 0);
 		vp550_install_write_handlers(state->vp550, program, 0);
-//		vp551_install_write_handlers(state->vp551, program, 0);
+		vp551_install_write_handlers(state->vp551, program, 0);
 		break;
 
 	case VIP_SOUND_VP595:
 		vp595_install_write_handlers(state->vp595, io, 1);
 		vp550_install_write_handlers(state->vp550, program, 0);
-//		vp551_install_write_handlers(state->vp551, program, 0);
+		vp551_install_write_handlers(state->vp551, program, 0);
 		break;
 
 	case VIP_SOUND_VP550:
 		vp595_install_write_handlers(state->vp595, io, 0);
 		vp550_install_write_handlers(state->vp550, program, 1);
-//		vp551_install_write_handlers(state->vp551, program, 0);
+		vp551_install_write_handlers(state->vp551, program, 0);
 		break;
 
 	case VIP_SOUND_VP551:
 		vp595_install_write_handlers(state->vp595, io, 0);
 		vp550_install_write_handlers(state->vp550, program, 0);
-//		vp551_install_write_handlers(state->vp551, program, 1);
+		vp551_install_write_handlers(state->vp551, program, 1);
 		break;
 	}
 
@@ -776,6 +776,7 @@ static MACHINE_DRIVER_START( vip )
 
 	MDRV_VP595_ADD
 	MDRV_VP550_ADD(XTAL_3_52128MHz/2)
+	MDRV_VP551_ADD(XTAL_3_52128MHz/2)
 
 	/* devices */
 	MDRV_QUICKLOAD_ADD("quickload", vip, "bin,c8,c8x", 0)
