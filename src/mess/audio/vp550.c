@@ -136,9 +136,9 @@ static WRITE8_DEVICE_HANDLER( vp550_octave_w )
 
 static WRITE8_DEVICE_HANDLER( vp550_vlmn_w )
 {
-	float gain = 0.625f * (data & 0x0f);
+	//float gain = 0.625f * (data & 0x0f);
 
-	sound_set_output_gain(device, 0, gain);
+//	sound_set_output_gain(device, 0, gain);
 
 	if (LOG) logerror("VP550 '%s' Volume: %u\n", device->tag, data & 0x0f);
 }
@@ -257,11 +257,11 @@ static DEVICE_START( vp551 )
 	vp550_t *vp550 = get_safe_token(device);
 
 	/* look up devices */
-	vp550->cdp1863[CHANNEL_A] = devtag_get_device(device->machine, "vp551:u1");
-	vp550->cdp1863[CHANNEL_B] = devtag_get_device(device->machine, "vp551:u2");
-	vp550->cdp1863[CHANNEL_C] = devtag_get_device(device->machine, "vp551:cdp1863c");
-	vp550->cdp1863[CHANNEL_D] = devtag_get_device(device->machine, "vp551:cdp1863d");
-	vp550->sync_timer = devtag_get_device(device->machine, "vp551:sync");
+	vp550->cdp1863[CHANNEL_A] = device_find_child_by_tag(device, CDP1863_A_TAG);
+	vp550->cdp1863[CHANNEL_B] = device_find_child_by_tag(device, CDP1863_B_TAG);
+	vp550->cdp1863[CHANNEL_C] = device_find_child_by_tag(device, CDP1863_C_TAG);
+	vp550->cdp1863[CHANNEL_D] = device_find_child_by_tag(device, CDP1863_D_TAG);
+	vp550->sync_timer = device_find_child_by_tag(device, "sync");
 
 	/* set initial values */
 	vp550->channels = 4;

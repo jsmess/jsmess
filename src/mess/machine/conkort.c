@@ -822,28 +822,19 @@ ROM_END
 static DEVICE_START( luxor_55_10828 )
 {
 	slow_t *conkort = device->token;
-	astring *tempstring = astring_alloc();
-
-	/* validate arguments */
-	assert(device->tag != NULL);
 
 	/* find our CPU */
-	astring_printf(tempstring, "%s:%s", device->tag, Z80_TAG);
-	conkort->cpu = cputag_get_cpu(device->machine, astring_c(tempstring));
+	conkort->cpu = device_find_child_by_tag(device, Z80_TAG);
 
 	/* find devices */
-	astring_printf(tempstring, "%s:%s", device->tag, Z80PIO_TAG);
-	conkort->z80pio = devtag_get_device(device->machine, astring_c(tempstring));
-	astring_printf(tempstring, "%s:%s", device->tag, WD1791_TAG);
-	conkort->wd1791 = devtag_get_device(device->machine, astring_c(tempstring));
+	conkort->z80pio = device_find_child_by_tag(device, Z80PIO_TAG);
+	conkort->wd1791 = device_find_child_by_tag(device, WD1791_TAG);
 
 	/* register for state saving */
 	state_save_register_device_item(device, 0, conkort->status);
 	state_save_register_device_item(device, 0, conkort->data);
 	state_save_register_device_item(device, 0, conkort->pio_ardy);
 	state_save_register_device_item(device, 0, conkort->fdc_irq);
-
-	astring_free(tempstring);
 }
 
 /*-------------------------------------------------
@@ -894,27 +885,18 @@ DEVICE_GET_INFO( luxor_55_10828 )
 static DEVICE_START( luxor_55_21046 )
 {
 	fast_t *conkort = device->token;
-	astring *tempstring = astring_alloc();
-
-	/* validate arguments */
-	assert(device->tag != NULL);
 
 	/* find our CPU */
-	astring_printf(tempstring, "%s:%s", device->tag, Z80_TAG);
-	conkort->cpu = cputag_get_cpu(device->machine, astring_c(tempstring));
+	conkort->cpu = device_find_child_by_tag(device, Z80_TAG);
 
 	/* find devices */
-	astring_printf(tempstring, "%s:%s", device->tag, Z80DMA_TAG);
-	conkort->z80dma = devtag_get_device(device->machine, astring_c(tempstring));
-	astring_printf(tempstring, "%s:%s", device->tag, SAB1793_TAG);
-	conkort->wd1793 = devtag_get_device(device->machine, astring_c(tempstring));
+	conkort->z80dma = device_find_child_by_tag(device, Z80DMA_TAG);
+	conkort->wd1793 = device_find_child_by_tag(device, SAB1793_TAG);
 
 	/* register for state saving */
 	state_save_register_device_item(device, 0, conkort->status);
 	state_save_register_device_item(device, 0, conkort->data);
 	state_save_register_device_item(device, 0, conkort->fdc_irq);
-
-	astring_free(tempstring);
 }
 
 /*-------------------------------------------------
