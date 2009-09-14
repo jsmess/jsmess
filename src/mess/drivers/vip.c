@@ -535,7 +535,7 @@ static CDP1802_EF_READ( vip_ef_r )
 
 static CDP1802_SC_WRITE( vip_sc_w )
 {
-	vip_state *driver_state = device->machine->driver_data;
+//	vip_state *driver_state = device->machine->driver_data;
 
 	switch (input_port_read(device->machine, "SOUND"))
 	{
