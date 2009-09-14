@@ -646,7 +646,9 @@ static WRITE8_HANDLER( sub_io_w )
 		            // bit 0 = tape end (0=end of tape)
 					// bit 1 = tape inserted
 					// bit 2 = record status (1=OK, 0=write protect?)
-			sub_val[0] = 0x07;  // assume a tape is inserted for now
+			sub_val[0] = 0x05;
+			if(cassette_get_image(devtag_get_device(space->machine,"cass")) != NULL)
+				sub_val[0] |= 0x02;
 			sub_cmd_length = 1;
 			logerror("CMT: Command 0xEB received, returning 0x%02x.\n",sub_val[0]);
 			break;
