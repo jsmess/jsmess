@@ -82,7 +82,7 @@ System Driver Changes:
 - [SAMCOUPE] Added support for Extended DiSK/MV - CPC style disk
   images.  [Dirk Best]
 
-- [SAMCOUPE] Added support for tapes (wav only for now).  [Dirk Best]
+- [SAMCOUPE] Added support for tapes.  [Dirk Best]
 
 - [SNES] Plenty of improvements to SNES emulation (see MAME whatsnew for 
   more details) [Fabio Priuli, Angelo Salese]: 

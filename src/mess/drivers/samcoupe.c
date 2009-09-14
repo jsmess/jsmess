@@ -43,6 +43,7 @@
 
 /* devices */
 #include "devices/cassette.h"
+#include "formats/tzx_cas.h"
 #include "devices/flopdrv.h"
 #include "formats/coupedsk.h"
 #include "formats/dsk_dsk.h"
@@ -499,7 +500,7 @@ static PALETTE_INIT( samcoupe )
 
 static const cassette_config samcoupe_cassette_config =
 {
-	cassette_default_formats,
+	tzx_cassette_formats,
 	NULL,
 	CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED
 };
