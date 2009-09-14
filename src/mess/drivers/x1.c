@@ -1241,7 +1241,7 @@ static READ8_DEVICE_HANDLER( x1_portb_r )
 	*/
 	UINT8 dat = 0;
 	vdisp = (video_screen_get_vpos(device->machine->primary_screen) < 200) ? 0x80 : 0x00;
-	dat = (input_port_read(device->machine, "SYSTEM") & 0x11) | sub_obf | vsync | vdisp;
+	dat = (input_port_read(device->machine, "SYSTEM") & 0x10) | sub_obf | vsync | vdisp;
 
 	if(cassette_input(devtag_get_device(device->machine,"cass")) > 0.03)
 		dat |= 0x02;
@@ -1249,10 +1249,13 @@ static READ8_DEVICE_HANDLER( x1_portb_r )
 //	if(cassette_get_state(devtag_get_device(device->machine,"cass")) & CASSETTE_MOTOR_DISABLED)
 //		dat &= ~0x02;  // is zero if not playing
 
+	// CMT test bit is set low when the CMT Stop command is issued, and becomes
+	// high again when this bit is read.
+	dat |= 0x01;
 	if(cmt_test != 0)
 	{
-		dat |= 0x01;
-		cmt_test = 1;
+		cmt_test = 0;
+		dat &= ~0x01;
 	}
 
 	return dat;
