@@ -8,6 +8,8 @@
 
 #include "driver.h"
 #include "cpu/powerpc/ppc.h"
+#include "devices/chd_cd.h"
+#include "sound/cdda.h"
 
 static ADDRESS_MAP_START( pippin_mem, ADDRESS_SPACE_PROGRAM, 64 )
 	ADDRESS_MAP_UNMAP_HIGH	
@@ -54,7 +56,7 @@ static MACHINE_DRIVER_START( pippin )
 	
     /* video hardware */
     MDRV_SCREEN_ADD("screen", RASTER)
-    MDRV_SCREEN_REFRESH_RATE(50)
+    MDRV_SCREEN_REFRESH_RATE(60)
     MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
     MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
     MDRV_SCREEN_SIZE(640, 480)
@@ -64,12 +66,33 @@ static MACHINE_DRIVER_START( pippin )
 
     MDRV_VIDEO_START(pippin)
     MDRV_VIDEO_UPDATE(pippin)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MDRV_SOUND_ADD( "cdda", CDDA, 0 )
+	MDRV_SOUND_ROUTE( 0, "lspeaker", 1.00 )
+	MDRV_SOUND_ROUTE( 1, "rspeaker", 1.00 )
+
+	MDRV_CDROM_ADD("cdrom")
 MACHINE_DRIVER_END
 
 static SYSTEM_CONFIG_START(pippin)
 SYSTEM_CONFIG_END
 
 /* ROM definition */
+/*
+
+	BIOS versions
+
+	dev		
+	monitor	341S0241 - 245,247,248,250
+	1.0		341S0251..254				U1-U4
+	1.2		341S0297..300				U15,U20,U31,U35
+	1.3		341S0328..331				U1/U31, U2/U35, U3/U15 and U4/U20
+
+*/
+
 ROM_START( pippin )
     ROM_REGION( 0x400000, "user1",  ROMREGION_64BIT | ROMREGION_BE )
 	ROM_LOAD64_WORD_SWAP( "341s0251.u1", 0x000006, 0x100000, CRC(aaea2449) SHA1(2f63e215260a42fb7c5f2364682d5e8c0604646f) )
@@ -77,7 +100,7 @@ ROM_START( pippin )
 	ROM_LOAD64_WORD_SWAP( "341s0253.u3", 0x000002, 0x100000, CRC(d8ae5037) SHA1(d46ce4d87ca1120dfe2cf2ba01451f035992b6f6) )
 	ROM_LOAD64_WORD_SWAP( "341s0254.u4", 0x000000, 0x100000, CRC(3e2851ba) SHA1(7cbf5d6999e890f5e9ab2bc4b10ca897c4dc2016) )	
 
-	ROM_REGION( 0x10000, "cdrom", 0 )
+	ROM_REGION( 0x10000, "cdrom", 0 ) /* MATSUSHITA CR504-L OEM */
 	ROM_LOAD( "504par4.0i.ic7", 0x0000, 0x10000, CRC(25f7dd46) SHA1(ec3b3031742807924c6259af865e701827208fec) )
 ROM_END
 
