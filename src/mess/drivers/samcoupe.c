@@ -22,7 +22,6 @@
     Todo:
     -----
 
-    - Tape
     - Attribute read
     - Better timing
     - Harddisk interfaces
@@ -221,7 +220,15 @@ static READ8_HANDLER( samcoupe_keyboard_r )
 	if (!BIT(offset, 13)) data &= input_port_read(space->machine, "keyboard_row_df") & 0x1f;
 	if (!BIT(offset, 14)) data &= input_port_read(space->machine, "keyboard_row_bf") & 0x1f;
 	if (!BIT(offset, 15)) data &= input_port_read(space->machine, "keyboard_row_7f") & 0x1f;
-	if (offset == 0xff00) data &= input_port_read(space->machine, "keyboard_row_ff") & 0x1f;
+
+	if (offset == 0xff00)
+	{
+		data &= input_port_read(space->machine, "keyboard_row_ff") & 0x1f;
+
+		/* if no key has been pressed, return the mouse state */
+		if (data == 0x1f)
+			data = samcoupe_mouse_r(space->machine);
+	}
 
 	/* bit 5, lightpen strobe */
 	data |= 1 << 5;
@@ -444,6 +451,18 @@ static INPUT_PORTS_START( samcoupe )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_DOWN)   PORT_CHAR(UCHAR_MAMEKEY(DOWN))
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT)   PORT_CHAR(UCHAR_MAMEKEY(LEFT))
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RIGHT)  PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
+
+	PORT_START("mouse_buttons")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_CODE(MOUSECODE_BUTTON1) PORT_NAME("Mouse Button 1")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_CODE(MOUSECODE_BUTTON3) PORT_NAME("Mouse Button 3")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_CODE(MOUSECODE_BUTTON2) PORT_NAME("Mouse Button 2")
+	PORT_BIT(0xf8, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("mouse_x")
+	PORT_BIT(0xfff, 0x000, IPT_MOUSE_X) PORT_SENSITIVITY(50) PORT_KEYDELTA(0) PORT_REVERSE
+
+	PORT_START("mouse_y")
+	PORT_BIT(0xfff, 0x000, IPT_MOUSE_Y) PORT_SENSITIVITY(50) PORT_KEYDELTA(0)
 
 	PORT_START("config")
 	PORT_CONFNAME(0x01, 0x00, "Real Time Clock")

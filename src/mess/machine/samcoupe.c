@@ -1,9 +1,6 @@
 /***************************************************************************
 
- SAM Coupe Driver - Written By Lee Hammerton
-
-  Functions to emulate general aspects of the machine (RAM, ROM, interrupts,
-  I/O ports)
+    SAM Coupe Driver - Written By Lee Hammerton, Dirk Best
 
 ***************************************************************************/
 
@@ -12,10 +9,18 @@
 #include "machine/msm6242.h"
 
 
+/***************************************************************************
+    CONSTANTS
+***************************************************************************/
+
 #define LMPR_RAM0    0x20	/* If bit set ram is paged into bank 0, else its rom0 */
 #define LMPR_ROM1    0x40	/* If bit set rom1 is paged into bank 3, else its ram */
 #define HMPR_MCNTRL  0x80	/* If set external RAM is enabled */
 
+
+/***************************************************************************
+    MEMORY BANKING
+***************************************************************************/
 
 static void samcoupe_update_bank(const address_space *space, int bank, UINT8 *memory, int is_readonly)
 {
@@ -147,6 +152,10 @@ WRITE8_HANDLER( samcoupe_ext_mem_w )
 }
 
 
+/***************************************************************************
+    REAL TIME CLOCK
+***************************************************************************/
+
 static READ8_DEVICE_HANDLER( samcoupe_rtc_r )
 {
 	return msm6242_r(device, offset >> 12);
@@ -159,22 +168,89 @@ static WRITE8_DEVICE_HANDLER( samcoupe_rtc_w )
 }
 
 
+/***************************************************************************
+    MOUSE
+***************************************************************************/
+
+TIMER_CALLBACK( samcoupe_mouse_reset )
+{
+	coupe_asic *asic = machine->driver_data;
+	asic->mouse_index = 0;
+}
+
+UINT8 samcoupe_mouse_r(running_machine *machine)
+{
+	coupe_asic *asic = machine->driver_data;
+	UINT8 result;
+
+	/* on a read, reset the timer */
+	timer_adjust_oneshot(asic->mouse_reset, ATTOTIME_IN_USEC(50), 0);
+
+	/* update when we are about to read the first real values */
+	if (asic->mouse_index == 2)
+	{
+		/* update values */
+		int mouse_x = input_port_read(machine, "mouse_x");
+		int mouse_y = input_port_read(machine, "mouse_y");
+
+		int mouse_dx = asic->mouse_x - mouse_x;
+		int mouse_dy = asic->mouse_y - mouse_y;
+
+		asic->mouse_x = mouse_x;
+		asic->mouse_y = mouse_y;
+
+		/* button state */
+		asic->mouse_data[2] = input_port_read(machine, "mouse_buttons");
+
+		/* y-axis */
+		asic->mouse_data[3] = (mouse_dy & 0xf00) >> 8;
+		asic->mouse_data[4] = (mouse_dy & 0x0f0) >> 4;
+		asic->mouse_data[5] = (mouse_dy & 0x00f) >> 0;
+
+		/* x-axis */
+		asic->mouse_data[6] = (mouse_dx & 0xf00) >> 8;
+		asic->mouse_data[7] = (mouse_dx & 0x0f0) >> 4;
+		asic->mouse_data[8] = (mouse_dx & 0x00f) >> 0;
+	}
+
+	/* get current value */
+	result = asic->mouse_data[asic->mouse_index++];
+
+	/* reset if we are at the end */
+	if (asic->mouse_index == sizeof(asic->mouse_data))
+		asic->mouse_index = 1;
+
+	return result;
+}
+
+
+/***************************************************************************
+    RESET
+***************************************************************************/
+
 MACHINE_RESET( samcoupe )
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	const address_space *spaceio = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
 	coupe_asic *asic = machine->driver_data;
 
+	/* initialize asic */
 	asic->lmpr = 0x0f;      /* ROM0 paged in, ROM1 paged out RAM Banks */
 	asic->hmpr = 0x01;
 	asic->vmpr = 0x81;
 	asic->line_int = 0xff;  /* line interrupts disabled */
 	asic->status = 0x1f;    /* no interrupts active */
 
+	/* initialize mouse */
+	asic->mouse_reset = timer_alloc(space->machine, samcoupe_mouse_reset, 0);
+	asic->mouse_index = 0;
+	asic->mouse_data[0] = 0xff;
+	asic->mouse_data[1] = 0xff;
+
 	if (input_port_read(machine, "config") & 0x01)
 	{
 		/* install RTC */
-		const device_config *rtc = devtag_get_device(machine, "rtc");
+		const device_config *rtc = devtag_get_device(machine, "sambus_clock");
 		memory_install_readwrite8_device_handler(spaceio, rtc, 0xef, 0xef, 0xffff, 0xff00, samcoupe_rtc_r, samcoupe_rtc_w);
 	}
 	else
@@ -183,5 +259,6 @@ MACHINE_RESET( samcoupe )
 		memory_install_readwrite8_handler(spaceio, 0xef, 0xef, 0xffff, 0xff00, SMH_UNMAP, SMH_UNMAP);
 	}
 
+	/* initialize memory */
 	samcoupe_update_memory(space);
 }

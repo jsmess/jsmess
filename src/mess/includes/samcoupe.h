@@ -29,6 +29,12 @@ struct _coupe_asic
 	UINT8 clut[16];         /* color lookup table, 16 entries */
 	UINT8 line_int;         /* line interrupt */
 	UINT8 status;           /* status register */
+
+	/* mouse */
+	int mouse_index;
+	emu_timer *mouse_reset;
+	UINT8 mouse_data[9];
+	int mouse_x, mouse_y;
 };
 
 
@@ -40,6 +46,7 @@ void samcoupe_irq(const device_config *device, UINT8 src);
 /*----------- defined in machine/samcoupe.c -----------*/
 
 void samcoupe_update_memory(const address_space *space);
+UINT8 samcoupe_mouse_r(running_machine *machine);
 
 WRITE8_HANDLER( samcoupe_ext_mem_w );
 MACHINE_RESET( samcoupe );

@@ -8,7 +8,7 @@ New System Drivers Supported (in no particular order):
 
 System Driver Changes:
 ----------------------
-(none)
+- [SAMCOUPE] Added mouse support.  [Dirk Best]
 
 
 
