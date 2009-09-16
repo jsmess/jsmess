@@ -122,6 +122,7 @@ void floppy_install_load_proc(const device_config *image, void (*proc)(const dev
 void floppy_install_tracktranslate_proc(const device_config *image, int (*proc)(const device_config *image, floppy_image *floppy, int physical_track));
 
 const device_config *floppy_get_device(running_machine *machine,int drive);
+int floppy_get_count(running_machine *machine);
 
 int floppy_get_drive(const device_config *image);
 

@@ -268,7 +268,7 @@ static void pc_fdc_dor_w(running_machine *machine, UINT8 data)
 	int selected_drive;
 	int floppy_count;
 
-	floppy_count = 4;//device_count(machine, IO_FLOPPY);
+	floppy_count = floppy_get_count(machine);
 
 	if (floppy_count > (fdc->digital_output_register & 0x03))
 		floppy_drive_set_ready_state(floppy_get_device(machine, fdc->digital_output_register & 0x03), 1, 0);
@@ -375,7 +375,7 @@ static void pcjr_fdc_dor_w(running_machine *machine, UINT8 data)
 {
 	int floppy_count;
 
-	floppy_count = 4;//device_count(machine, IO_FLOPPY);
+	floppy_count = floppy_get_count(machine);
 
 	/* set floppy drive motor state */
 	if (floppy_count > 0)

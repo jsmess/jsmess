@@ -822,6 +822,15 @@ int floppy_get_drive(const device_config *image)
 	return drive;
 }
 
+int floppy_get_count(running_machine *machine)
+{
+	int cnt = 0;
+	if (devtag_get_device(machine,FLOPPY_0)) cnt++;
+    if (devtag_get_device(machine,FLOPPY_1)) cnt++;
+    if (devtag_get_device(machine,FLOPPY_2)) cnt++;
+    if (devtag_get_device(machine,FLOPPY_3)) cnt++;	
+	return cnt;
+}
 /*************************************
  *
  *  Device specification function
