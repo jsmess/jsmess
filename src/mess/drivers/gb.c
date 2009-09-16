@@ -705,8 +705,8 @@ ROM_END
 
 ROM_START( gbcolor )
 	ROM_REGION( 0x03B0 + 1792, "maincpu", 0 )
-	ROM_LOAD( "gbc_boot.1", 0x0000, 0x0100, BAD_DUMP CRC(607a2f81) SHA1(6b232a802ca1f4c3c7c29ad10de10737bbc064bc) )	/* Bootstrap code part 1 */
-	ROM_LOAD( "gbc_boot.2", 0x0100, 0x02B0, BAD_DUMP CRC(2a8e6294) SHA1(0b9a3836b524ffbff74729e0a01f33fef45b457b) ) /* Bootstrap code part 2 */
+	ROM_LOAD( "gbc_boot.1", 0x0000, 0x0100, BAD_DUMP CRC(88d4d695) SHA1(81017173358fccf72246150abf914d8cac9a735a) )	/* Bootstrap code part 1 */
+	ROM_LOAD( "gbc_boot.2", 0x0100, 0x02B0, BAD_DUMP CRC(35ced848) SHA1(2730f3eea908ec1208c9fc05b52afeb2011d36fc) ) /* Bootstrap code part 2 */
 	ROM_LOAD( "gbc_boot.3", 0x03B0, 1792, NO_DUMP )	/* DMG game - palette lookup table(?) */
 ROM_END
 
