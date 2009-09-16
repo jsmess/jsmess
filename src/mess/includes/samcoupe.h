@@ -30,6 +30,9 @@ struct _coupe_asic
 	UINT8 line_int;         /* line interrupt */
 	UINT8 status;           /* status register */
 
+	/* attribute */
+	UINT8 attribute;
+
 	/* mouse */
 	int mouse_index;
 	emu_timer *mouse_reset;

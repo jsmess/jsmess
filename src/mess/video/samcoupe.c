@@ -129,29 +129,34 @@ static void draw_mode2_line(const device_config *screen, bitmap_t *bitmap, int y
 static void draw_mode1_line(const device_config *screen, bitmap_t *bitmap, int y)
 {
 	coupe_asic *asic = screen->machine->driver_data;
-	int x, b;
-	UINT16 ink = 127, pap = 0;
-	UINT8 *attr = videoram + 32*192 + (y/8)*32;
+	int block, x = 0;
 
-	int scrx = 0;
-	int scry = ((y & 7) * 8) + ((y & 0x38) >> 3) + (y & 0xc0);
+	/* get base address of attribute and data values */
+	UINT8 *attr = videoram + 32*192 + ((y & 0xf8) << 2);
+	UINT8 *data = videoram + (((y & 0xc0) << 5) | ((y & 0x07) << 8) | ((y & 0x38) << 2));
 
-	for (x = 0; x < 256/8; x++)
+	/* loop over all 32 blocks */
+	for (block = 0; block < 32; block++)
 	{
-		UINT8 tmp = *(videoram + x + (y*32));
+        int bit;
 
-#ifndef MONO
-		ink = asic->clut[(*attr) & 0x07];
-		pap = asic->clut[((*attr)>>3) & 0x07];
-#endif
+        /* get current colors from attribute byte */
+        UINT8 ink = asic->clut[(*attr & 0x07) + ((*attr >> 3) & 0x08)];
+        UINT8 paper = asic->clut[(*attr >> 3) & 0x0f];
 
-		attr++;
-
-		for (b = 0x80; b != 0; b>>= 1)
+        /* draw a block (8 pixels, doubled) */
+		for (bit = 0x80; bit != 0; bit >>= 1)
 		{
-			*BITMAP_ADDR16(bitmap, scry, scrx++) = (tmp & b) ? ink : pap;
-			*BITMAP_ADDR16(bitmap, scry, scrx++) = (tmp & b) ? ink : pap;
+			*BITMAP_ADDR16(bitmap, y, x++) = (*data & bit) ? ink : paper;
+			*BITMAP_ADDR16(bitmap, y, x++) = (*data & bit) ? ink : paper;
 		}
+
+		/* save current attribute */
+		asic->attribute = *attr;
+
+		/* move to the next block of values */
+		attr++;
+		data++;
 	}
 }
 
@@ -181,6 +186,6 @@ VIDEO_UPDATE( samcoupe )
 		case 3:	draw_mode4_line(screen, bitmap, scanline); break;
 		}
 	}
-
+//printf("videomode: %u\n", (asic->vmpr & 0x60) >> 5);
 	return 0;
 }

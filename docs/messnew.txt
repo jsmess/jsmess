@@ -10,6 +10,8 @@ System Driver Changes:
 ----------------------
 - [SAMCOUPE] Added mouse support.  [Dirk Best]
 
+- [SAMCOUPE] Improved Mode 1 graphics.  [Dirk Best]
+
 
 
 User Interface Changes:

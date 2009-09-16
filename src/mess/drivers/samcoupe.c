@@ -261,17 +261,12 @@ static WRITE8_HANDLER( samcoupe_border_w )
 
 static READ8_HANDLER( samcoupe_attributes_r )
 {
+	coupe_asic *asic = space->machine->driver_data;
+
 	if (video_screen_get_vblank(space->machine->primary_screen))
-	{
-		/* Border areas return 0xff */
-		return 0xff;
-	}
+		return 0xff; /* border areas return 0xff */
 	else
-	{
-		/* TODO: This actually needs to return various attributes
-         * of the currently displayed screen data */
-		return 0x00;
-	}
+		return asic->attribute;
 }
 
 static READ8_DEVICE_HANDLER( samcoupe_lpt1_busy_r )
