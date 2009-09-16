@@ -271,6 +271,12 @@ static const cassette_config svi318_cassette_config =
 	CASSETTE_PLAY
 };
 
+static const floppy_config svi318_floppy_config =
+{
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(svi318)
+};
+
 static MACHINE_DRIVER_START( svi318_cartslot )
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("rom")
@@ -318,6 +324,8 @@ static MACHINE_DRIVER_START( svi318 )
 	MDRV_CASSETTE_ADD( "cassette", svi318_cassette_config )
 
 	MDRV_WD179X_ADD("wd179x", svi_wd17xx_interface )
+	
+	MDRV_FLOPPY_2_DRIVES_ADD(svi318_floppy_config)
 
 	MDRV_IMPORT_FROM( svi318_cartslot )
 MACHINE_DRIVER_END
@@ -344,12 +352,6 @@ static const mc6845_interface svi806_crtc6845_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	NULL
-};
-
-static const floppy_config svi318_floppy_config =
-{
-	FLOPPY_DRIVE_DS_80,
-	FLOPPY_OPTIONS_NAME(svi318)
 };
 
 static MACHINE_DRIVER_START( svi328_806 )

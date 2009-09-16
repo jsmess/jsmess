@@ -611,7 +611,6 @@ static void svi318_load_proc(const device_config *image)
 	int id = floppy_get_drive(image);
 
 	size = image_length (image);
-
 	switch (size)
 	{
 	case 172032:	/* SVI-328 SSDD */

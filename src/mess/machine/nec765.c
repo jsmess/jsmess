@@ -2201,10 +2201,10 @@ void nec765_reset(const device_config *device, int offset)
 		are checked or only the drive selected with the drive select bits?? */
 
 		a_drive_is_ready = 0;
-		for (i = 0; i < 2; i++)
+		for (i = 0; i < 4; i++)
 		{
-			if (fdc->intf->floppy_drive_tags[i]!=NULL) {
-				if(devtag_get_device(device->machine,fdc->intf->floppy_drive_tags[i])) {
+			if (fdc->intf->floppy_drive_tags[i]!=NULL) {				
+				if (image_exists(devtag_get_device(device->machine,fdc->intf->floppy_drive_tags[i]))) {
 					a_drive_is_ready = 1;
 					break;
 				}
@@ -2322,7 +2322,7 @@ static DEVICE_RESET( nec765 )
 {
 	int i;
 	nec765_t *fdc = get_safe_token(device);
-	for (i = 0; i < 2; i++) {
+	for (i = 0; i < 4; i++) {
 		if (fdc->intf->floppy_drive_tags[i]!=NULL) {
 			const device_config *img = devtag_get_device(device->machine,fdc->intf->floppy_drive_tags[i]);
 			floppy_drive_set_controller(img, device);

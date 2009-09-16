@@ -397,7 +397,7 @@ static void wd17xx_restore(const device_config *device)
 	UINT8 step_counter;
 	wd17xx_t *w = get_safe_token(device);
 
-	if (w->current_drive >= 1)
+	if (w->current_drive >= floppy_get_count(device->machine))
 		return;
 
 	step_counter = 255;
@@ -1735,11 +1735,13 @@ static DEVICE_RESET( wd17xx )
 
 	for (i = 0; i < 4; i++)
 	{
-		const device_config *img = devtag_get_device(device->machine,w->intf->floppy_drive_tags[w->current_drive]);
-		if (img!=NULL) {
-			floppy_drive_set_controller(img,device);
-			floppy_drive_set_index_pulse_callback(img, wd17xx_index_pulse_callback);
-			floppy_drive_set_rpm( img, 300.);
+		if(w->intf->floppy_drive_tags[i]!=NULL) {
+			const device_config *img = devtag_get_device(device->machine,w->intf->floppy_drive_tags[i]);
+			if (img!=NULL) {
+				floppy_drive_set_controller(img,device);
+				floppy_drive_set_index_pulse_callback(img, wd17xx_index_pulse_callback);
+				floppy_drive_set_rpm( img, 300.);
+			}
 		}
 	}
 
