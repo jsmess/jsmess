@@ -1053,6 +1053,51 @@ static WRITE8_HANDLER( x1turbo_gfxpal_w )
 	turbo_reg.gfx_pal = data;
 }
 
+static UINT8 kanji_addr_l,kanji_addr_h,kanji_count;
+static UINT32 kanji_addr;
+
+/*
+ *	FIXME: recheck this once that the kanji rom is redumped, it's confirmed bad for the following reasons:
+ *	- A game lets you type stuff that's typed with this function, the index doesn't match with the typed char;
+ *	- It search for chars that are out of the rom range;
+ */
+static READ8_HANDLER( x1_kanji_r )
+{
+	UINT8 *kanji_rom = memory_region(space->machine, "cgrom");
+	UINT8 res;
+
+	//res = 0;
+
+	//printf("%08x\n",kanji_addr*0x20);
+
+	res = kanji_rom[(kanji_addr*0x20)+(kanji_count)+0x2800];
+	kanji_count++;
+	kanji_count&=0x1f;
+
+	//printf("%04x R\n",offset);
+
+	return res;
+}
+
+static WRITE8_HANDLER( x1_kanji_w )
+{
+	//printf("%04x %02x W\n",offset,data);
+	switch(offset)
+	{
+		case 0: kanji_addr_l = (data & 0xff); break;
+		case 1: kanji_addr_h = (data & 0xff); kanji_count = 0; break;
+		case 2:
+			if(data)
+			{
+				kanji_addr = (kanji_addr_h<<8) | (kanji_addr_l);
+				kanji_addr &= 0x3fff; //<- temp kludge until the rom is redumped.
+				//printf("%08x\n",kanji_addr);
+				//kanji_addr+= kanji_count;
+			}
+			break;
+	}
+}
+
 /*************************************
  *
  *  Memory maps
@@ -1134,6 +1179,7 @@ static READ8_HANDLER( x1turbo_io_r )
 	if(offset == 0x0700 || offset == 0x0701)		{ return ym2151_r(devtag_get_device(space->machine, "ym"), offset-0x0700); }
 	else if(offset >= 0x0704 && offset <= 0x0707)   { return z80ctc_r(devtag_get_device(space->machine, "ctc"), offset-0x0704); }
 	else if(offset == 0x0e03)                    	{ return x1_rom_r(space, 0); }
+	else if(offset >= 0x0e80 && offset <= 0x0e83)	{ return x1_kanji_r(space, offset-0xe80); }
 	else if(offset >= 0x0ff8 && offset <= 0x0fff)	{ return x1_fdc_r(space, offset-0xff8); }
 	else if(offset >= 0x1400 && offset <= 0x17ff)	{ return x1_pcg_r(space, offset-0x1400); }
 	else if(offset >= 0x1900 && offset <= 0x19ff)	{ return sub_io_r(space, 0); }
@@ -1155,6 +1201,8 @@ static READ8_HANDLER( x1turbo_io_r )
 	else if(offset >= 0x4000 && offset <= 0xffff)	{ return gfx_bitmap_ram[offset-0x4000+(scrn_reg.gfx_bank*0xc000)]; }
 	else
 	{
+		//0xfd0-0xfd7: FDC extended area?
+		//0x1ff0: if 0, game screen is interlaced
 		logerror("(PC=%06x) Read i/o address %04x\n",cpu_get_pc(space->cpu),offset);
 	}
 	return 0xff;
@@ -1167,7 +1215,7 @@ static WRITE8_HANDLER( x1turbo_io_w )
 	else if(offset >= 0x0704 && offset <= 0x0707)	{ z80ctc_w(devtag_get_device(space->machine, "ctc"), offset-0x0704,data); }
 //	else if(offset >= 0x0c00 && offset <= 0x0cff)	{ x1_rs232c_w(space->machine, 0, data); }
 	else if(offset >= 0x0e00 && offset <= 0x0e02)  	{ x1_rom_w(space, offset-0xe00,data); }
-//	else if(offset >= 0x0e80 && offset <= 0x0e82)	{ x1_kanji_w(space->machine, offset-0xe80,data); }
+	else if(offset >= 0x0e80 && offset <= 0x0e83)	{ x1_kanji_w(space, offset-0xe80,data); }
 	else if(offset >= 0x0ff8 && offset <= 0x0fff)	{ x1_fdc_w(space, offset-0xff8,data); }
 	else if(offset >= 0x1000 && offset <= 0x10ff)	{ x1_pal_b_w(space, 0,data); }
 	else if(offset >= 0x1100 && offset <= 0x11ff)	{ x1_pal_r_w(space, 0,data); }
@@ -1679,7 +1727,8 @@ static GFXDECODE_START( x1 )
 	GFXDECODE_ENTRY( "cgrom",   0x00000, x1_chars_8x8,    0x200, 0x20 )
 	GFXDECODE_ENTRY( "pcg",     0x00000, x1_pcg_8x8,      0x000, 1 )
 	GFXDECODE_ENTRY( "cgrom",   0x01800, x1_chars_8x16,   0x200, 0x20 )
-	GFXDECODE_ENTRY( "kanji",   0x27000, x1_chars_16x16,  0, 0x20 ) //needs to be checked when the ROM will be redumped
+//	GFXDECODE_ENTRY( "kanji",   0x27000, x1_chars_16x16,  0, 0x20 ) //needs to be checked when the ROM will be redumped
+	GFXDECODE_ENTRY( "cgrom",   0x02800, x1_chars_16x16,  0, 0x20 ) //needs to be checked when the ROM will be redumped
 GFXDECODE_END
 
 /*************************************
@@ -1965,7 +2014,7 @@ SYSTEM_CONFIG_END
 
 	ROM_REGION(0x1800, "pcg", ROMREGION_ERASEFF)
 
-	ROM_REGION(0x4c600, "cgrom", 0)
+	ROM_REGION(0x4d600, "cgrom", 0)
 	ROM_LOAD("fnt0808.x1", 0x00000, 0x00800, CRC(e3995a57) SHA1(1c1a0d8c9f4c446ccd7470516b215ddca5052fb2) )
 	ROM_RELOAD(            0x00800, 0x00800)
 	ROM_RELOAD(            0x01000, 0x00800)
@@ -1986,7 +2035,7 @@ ROM_START( x1ck )
 
 	ROM_REGION(0x1800, "pcg", ROMREGION_ERASEFF)
 
-	ROM_REGION(0x2800, "cgrom", 0)
+	ROM_REGION(0x4d600, "cgrom", 0)
 	ROM_LOAD("fnt0808.x1", 0x00000, 0x00800, CRC(e3995a57) SHA1(1c1a0d8c9f4c446ccd7470516b215ddca5052fb2) )
 	ROM_RELOAD(            0x00800, 0x00800)
 	ROM_RELOAD(            0x01000, 0x00800)
@@ -2006,12 +2055,13 @@ ROM_START( x1turbo )
 
 	ROM_REGION(0x1800, "pcg", ROMREGION_ERASEFF)
 
-	ROM_REGION(0x2800, "cgrom", 0)
+	ROM_REGION(0x4d600, "cgrom", 0)
 	/* This should be larger... hence, we are missing something (maybe part of the other fnt roms?) */
 	ROM_LOAD("fnt0808_turbo.x1", 0x00000, 0x00800, CRC(84a47530) SHA1(06c0995adc7a6609d4272417fe3570ca43bd0454) )
 	ROM_RELOAD(            0x00800, 0x00800)
 	ROM_RELOAD(            0x01000, 0x00800)
 	ROM_LOAD("fnt0816.x1", 0x01800, 0x01000, BAD_DUMP CRC(34818d54) SHA1(2c5fdd73249421af5509e48a94c52c4e423402bf) )
+	ROM_LOAD("fnt1616.x1", 0x02800, 0x4ac00, BAD_DUMP CRC(46826745) SHA1(b9e6c320611f0842df6f45673c47c3e23bc14272) )
 
 	ROM_REGION(0x4ac00, "kanji", 0)
 	/* This is clearly a bad dump: size does not make sense and from 0x28000 on there are only 0xff */
