@@ -333,12 +333,14 @@ static void to7_5p14_reset( running_machine *machine )
 	const device_config *fdc = devtag_get_device(machine, "wd2793");
 	LOG(( "to7_5p14_reset: CD 90-640 controller\n" ));
 	wd17xx_reset(fdc);
-	for ( i = 0; i < device_count( machine, IO_FLOPPY ); i++ )
+	for ( i = 0; i < floppy_get_count( machine ); i++ )
 	{
-		const device_config * img = image_from_devtype_and_index( machine, IO_FLOPPY, i );
-		floppy_drive_set_ready_state( img, FLOPPY_DRIVE_READY, 0 );
-		floppy_drive_set_rpm( img, 300. );
-		floppy_drive_seek( img, - floppy_drive_get_current_track( img ) );
+		const device_config * img = floppy_get_device( machine, i );
+		if (img) {
+			floppy_drive_set_ready_state( img, FLOPPY_DRIVE_READY, 0 );
+			floppy_drive_set_rpm( img, 300. );
+			floppy_drive_seek( img, - floppy_drive_get_current_track( img ) );
+		}
 	}
 }
 
@@ -434,14 +436,15 @@ static void to7_5p14sd_reset( running_machine *machine )
 {
 	int i;
 	LOG(( "to7_5p14sd_reset: CD 90-015 controller\n" ));
-	for ( i = 0; i < device_count( machine, IO_FLOPPY ); i++ )
+	for ( i = 0; i < floppy_get_count( machine ); i++ )
 	{
-		const device_config * img = image_from_devtype_and_index( machine, IO_FLOPPY, i );
-		floppy_drive_set_ready_state( img, FLOPPY_DRIVE_READY, 0 );
-		floppy_drive_set_rpm( img, 300. );
-		floppy_drive_seek( img, - floppy_drive_get_current_track( img ) );
-		floppy_drive_set_index_pulse_callback( img, to7_5p14_index_pulse_callback );
-
+		const device_config * img = floppy_get_device( machine, i );
+		if (img) {
+			floppy_drive_set_ready_state( img, FLOPPY_DRIVE_READY, 0 );
+			floppy_drive_set_rpm( img, 300. );
+			floppy_drive_seek( img, - floppy_drive_get_current_track( img ) );
+			floppy_drive_set_index_pulse_callback( img, to7_5p14_index_pulse_callback );
+		}
 	}
 }
 
@@ -544,7 +547,7 @@ static void to7_qdd_index_pulse_cb ( const device_config *controller,const devic
 
 static const device_config * to7_qdd_image ( running_machine *machine )
 {
-	return image_from_devtype_and_index( machine, IO_FLOPPY, 0 );
+	return floppy_get_device( machine, 0 );
 }
 
 
@@ -839,15 +842,17 @@ static void to7_qdd_reset( running_machine *machine )
 	int i;
 	LOG(( "to7_qdd_reset: CQ 90-028 controller\n" ));
 
-	for ( i = 0; i < device_count( machine, IO_FLOPPY ); i++ )
+	for ( i = 0; i < floppy_get_count( machine ); i++ )
 	{
-		const device_config * img = image_from_devtype_and_index( machine, IO_FLOPPY, i );
-		floppy_drive_set_index_pulse_callback( img, to7_qdd_index_pulse_cb );
-		floppy_drive_set_ready_state( img, FLOPPY_DRIVE_READY, 0 );
-		floppy_drive_set_motor_state( img, 1 );
-		/* pulse each time the whole-disk spiraling track ends */
-		/* at 90us per byte read, the disk can be read in 6s */
-		floppy_drive_set_rpm( img, 60. / 6. );
+		const device_config * img = floppy_get_device( machine, i );
+		if (img) {
+			floppy_drive_set_index_pulse_callback( img, to7_qdd_index_pulse_cb );
+			floppy_drive_set_ready_state( img, FLOPPY_DRIVE_READY, 0 );
+			floppy_drive_set_motor_state( img, 1 );
+			/* pulse each time the whole-disk spiraling track ends */
+			/* at 90us per byte read, the disk can be read in 6s */
+			floppy_drive_set_rpm( img, 60. / 6. );
+		}
 	}
 
 	to7qdd->ctrl1 |= QDD_C1_TRESET | QDD_C1_RRESET; /* reset */
@@ -939,7 +944,7 @@ static emu_timer* thmfc_floppy_cmd;
 
 static const device_config * thmfc_floppy_image ( running_machine *machine )
 {
-	return image_from_devtype_and_index( machine, IO_FLOPPY, thmfc1->drive );
+	return floppy_get_device( machine, thmfc1->drive );
 }
 
 
@@ -1520,12 +1525,14 @@ void thmfc_floppy_reset( running_machine *machine )
 	int i;
 	LOG(( "thmfc_floppy_reset: THMFC1 controller\n" ));
 
-	for ( i = 0; i < device_count( machine, IO_FLOPPY ); i++ )
+	for ( i = 0; i < floppy_get_count( machine ); i++ )
 	{
-		const device_config * img = image_from_devtype_and_index( machine, IO_FLOPPY, i );
-		floppy_drive_set_index_pulse_callback( img, thmfc_floppy_index_pulse_cb );
-		floppy_drive_set_ready_state( img, FLOPPY_DRIVE_READY, 0 );
-		floppy_drive_seek( img, - floppy_drive_get_current_track( img ) );
+		const device_config * img = floppy_get_device( machine, i );
+		if (img) {
+			floppy_drive_set_index_pulse_callback( img, thmfc_floppy_index_pulse_cb );
+			floppy_drive_set_ready_state( img, FLOPPY_DRIVE_READY, 0 );
+			floppy_drive_seek( img, - floppy_drive_get_current_track( img ) );
+		}
 	}
 
 	thmfc1->op = THMFC1_OP_RESET;
