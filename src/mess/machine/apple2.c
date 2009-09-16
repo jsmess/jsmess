@@ -1110,7 +1110,7 @@ static int apple2_fdc_has_35(running_machine *machine)
 
 static int apple2_fdc_has_525(running_machine *machine)
 {
-	return device_count_tag_from_machine(machine, "apple525driv") > 0;
+	return 1 > 0;//device_count_tag_from_machine(machine, "apple525driv") > 0;
 }
 
 static void apple2_fdc_set_lines(const device_config *device, UINT8 lines)

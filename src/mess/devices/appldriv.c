@@ -262,8 +262,20 @@ int apple525_read_status(const device_config *device)
 
 static DEVICE_START( apple525_floppy )
 {	
+	struct apple525_disk *disk;
+	
 	DEVICE_START_CALL(floppy);
-	flopimg_alloc_custom_data(device,sizeof(struct apple525_disk));
+	flopimg_alloc_custom_data(device,sizeof(struct apple525_disk));	
+	
+	disk = (struct apple525_disk *)  flopimg_get_custom_data(device);
+	
+	disk->state = 0;
+	disk->tween_tracks = 0;
+	disk->track_loaded = 0;
+	disk->track_dirty = 0;
+	disk->position = 0;
+	disk->spin_count = 0;
+
 }
 
 
