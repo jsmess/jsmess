@@ -819,6 +819,13 @@ static void c64_common_driver_init (running_machine *machine)
 		vic6567_init(0, c64_pal, c64_dma_read_ultimax, c64_dma_read_color, c64_vic_interrupt);
 	else
 		vic6567_init(0, c64_pal, c64_dma_read, c64_dma_read_color, c64_vic_interrupt);
+
+	// "cyberload" tape loader check the e000-ffff ram; the init ram need to return different value
+	{
+		int i;
+		for (i = 0; i < 0x2000; i += 0x40)
+			memset(c64_memory + (0xe000 + i), ((i & 0x40) >> 6) * 0xff, 0x40);
+	}
 }
 
 DRIVER_INIT( c64 )
