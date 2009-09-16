@@ -154,7 +154,6 @@ http://www.z88forever.org.uk/zxplus3e/
 #include "sound/ay8910.h"
 #include "sound/speaker.h"
 #include "formats/tzx_cas.h"
-#include "machine/beta.h"
 
 static const ay8910_interface spectrum_ay_interface =
 {
@@ -281,9 +280,7 @@ MACHINE_DRIVER_START( spectrum_128 )
 	/* sound hardware */
 	MDRV_SOUND_ADD("ay8912", AY8912, 1773400)
 	MDRV_SOUND_CONFIG(spectrum_ay_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	
-	MDRV_BETA_DISK_ADD(BETA_DISK_TAG)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)	
 MACHINE_DRIVER_END
 
 

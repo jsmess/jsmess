@@ -94,7 +94,7 @@ static MACHINE_DRIVER_START( apple3 )
 
 	/* fdc */
 	MDRV_APPLEFDC_ADD("fdc", apple3_fdc_interface)
-	MDRV_FLOPPY_APPLE_2_DRIVES_ADD(apple3_floppy_config)
+	MDRV_FLOPPY_APPLE_4_DRIVES_ADD(apple3_floppy_config)
 	/* acia */
 	MDRV_ACIA6551_ADD("acia")
 

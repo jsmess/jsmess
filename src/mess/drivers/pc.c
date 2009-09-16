@@ -1370,6 +1370,12 @@ static const pc_lpt_interface pc_lpt_config =
 	DEVCB_CPU_INPUT_LINE("maincpu", 0)
 };
 
+static const floppy_config ibmpc_floppy_config =
+{
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(pc)
+};
+
 
 #define MDRV_CPU_PC(mem, port, type, clock, vblankfunc)	\
 	MDRV_CPU_ADD("maincpu", type, clock)				\
@@ -1435,6 +1441,8 @@ static MACHINE_DRIVER_START( pcmda )
 	MDRV_IMPORT_FROM( pc_hdc )
 
 	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
+	
+	MDRV_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
 MACHINE_DRIVER_END
 
 
@@ -1492,6 +1500,8 @@ static MACHINE_DRIVER_START( pcherc )
 	MDRV_IMPORT_FROM( pc_hdc )
 
 	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
+	
+	MDRV_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
 MACHINE_DRIVER_END
 
 
@@ -1500,12 +1510,6 @@ static const cassette_config ibm5150_cassette_config =
 	cassette_default_formats,
 	NULL,
 	CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED
-};
-
-static const floppy_config ibmpc_floppy_config =
-{
-	FLOPPY_DRIVE_DS_80,
-	FLOPPY_OPTIONS_NAME(pc)
 };
 
 static MACHINE_DRIVER_START( ibm5150 )

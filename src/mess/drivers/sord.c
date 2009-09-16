@@ -592,7 +592,7 @@ static MACHINE_DRIVER_START( sord_m5_fd5 )
 	MDRV_QUANTUM_TIME(HZ(1200))
 	MDRV_MACHINE_RESET(sord_m5_fd5)
 	
-	MDRV_FLOPPY_2_DRIVES_ADD(sordm5_floppy_config)
+	MDRV_FLOPPY_4_DRIVES_ADD(sordm5_floppy_config)
 MACHINE_DRIVER_END
 
 

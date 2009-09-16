@@ -581,7 +581,7 @@ static MACHINE_DRIVER_START( samcoupe )
 	MDRV_CENTRONICS_ADD("lpt1", standard_centronics)
 	MDRV_CENTRONICS_ADD("lpt2", standard_centronics)
 	MDRV_MSM6242_ADD("sambus_clock")
-	MDRV_WD1772_ADD("wd1772", default_wd17xx_interface)
+	MDRV_WD1772_ADD("wd1772", default_wd17xx_interface_2_drives)
 	MDRV_CASSETTE_ADD("cassette", samcoupe_cassette_config)
 
 	/* sound hardware */
@@ -591,7 +591,7 @@ static MACHINE_DRIVER_START( samcoupe )
 	MDRV_SOUND_ADD("saa1099", SAA1099, SAMCOUPE_XTAL_X1/3) /* 8 MHz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	
-	MDRV_FLOPPY_4_DRIVES_ADD(samcoupe_floppy_config)
+	MDRV_FLOPPY_2_DRIVES_ADD(samcoupe_floppy_config)
 MACHINE_DRIVER_END
 
 
