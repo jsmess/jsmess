@@ -217,7 +217,8 @@ const nec765_interface kc_fdc_interface=
 	DEVCB_LINE(kc85_fdc_interrupt),
 	kc85_fdc_dma_drq,
 	NULL,
-	NEC765_RDY_PIN_CONNECTED	
+	NEC765_RDY_PIN_CONNECTED,
+	{FLOPPY_0, FLOPPY_1, NULL, NULL}
 };
 
 static TIMER_CALLBACK(kc85_disk_reset_timer_callback)

@@ -317,7 +317,8 @@ const nec765_interface compis_fdc_interface =
 	DEVCB_LINE(compis_fdc_int),
 	compis_fdc_dma_drq,
 	NULL,
-	NEC765_RDY_PIN_CONNECTED
+	NEC765_RDY_PIN_CONNECTED,
+	{FLOPPY_0, FLOPPY_1, NULL, NULL}
 };
 
 READ16_HANDLER (compis_fdc_dack_r)

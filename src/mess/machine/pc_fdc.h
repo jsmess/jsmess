@@ -34,6 +34,7 @@ struct pc_fdc_interface
 
 extern const nec765_interface pc_fdc_nec765_connected_interface;
 extern const nec765_interface pc_fdc_nec765_not_connected_interface;
+extern const nec765_interface pc_fdc_nec765_connected_1_drive_interface;
 
 void pc_fdc_init(running_machine *machine, const struct pc_fdc_interface *iface);
 void pc_fdc_set_tc_state(running_machine *machine, int state);

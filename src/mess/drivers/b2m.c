@@ -175,6 +175,21 @@ static INPUT_PORTS_START( b2m )
 	PORT_CONFSETTING(	0x00, "B/W")			
 INPUT_PORTS_END
  
+static FLOPPY_OPTIONS_START(b2m)
+	FLOPPY_OPTION(b2m, "cpm", "Bashkiria-2M disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([80])
+		SECTORS([5])
+		SECTOR_LENGTH([1024])
+		FIRST_SECTOR_ID([1]))
+FLOPPY_OPTIONS_END
+
+static const floppy_config b2m_floppy_config =
+{
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(b2m)
+};
+
 /* Machine driver */
 static MACHINE_DRIVER_START( b2m )
     /* basic machine hardware */
@@ -217,7 +232,9 @@ static MACHINE_DRIVER_START( b2m )
 	/* uart */
 	MDRV_MSM8251_ADD("uart", default_msm8251_interface)
 	
-	MDRV_WD1793_ADD("wd1793", default_wd17xx_interface )
+	MDRV_WD1793_ADD("wd1793", default_wd17xx_interface_2_drives )
+	
+	MDRV_FLOPPY_2_DRIVES_ADD(b2m_floppy_config)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( b2mrom )
@@ -226,30 +243,6 @@ static MACHINE_DRIVER_START( b2mrom )
   	MDRV_CPU_IO_MAP(b2m_rom_io)
 MACHINE_DRIVER_END
  
-static FLOPPY_OPTIONS_START(b2m)
-	FLOPPY_OPTION(b2m, "cpm", "Bashkiria-2M disk image", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([2])
-		TRACKS([80])
-		SECTORS([5])
-		SECTOR_LENGTH([1024])
-		FIRST_SECTOR_ID([1]))
-FLOPPY_OPTIONS_END
-
-static void b2m_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_b2m; break;
-
-		default:										floppy_device_getinfo(devclass, state, info); break;
-	}
-}
-
 /* ROM definition */
 
 ROM_START( b2m )
@@ -264,8 +257,7 @@ ROM_START( b2mrom )
 ROM_END
 
 static SYSTEM_CONFIG_START(b2m)	
- 	CONFIG_RAM_DEFAULT(128 * 1024)
- 	CONFIG_DEVICE(b2m_floppy_getinfo);
+ 	CONFIG_RAM_DEFAULT(128 * 1024) 	
 SYSTEM_CONFIG_END
 
 /* Driver */

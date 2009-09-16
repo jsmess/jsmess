@@ -299,6 +299,15 @@ static const cassette_config tmc2000_cassette_config =
 	NULL,
 	CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED
 };
+static FLOPPY_OPTIONS_START(tmc2000e)
+	// dsk
+FLOPPY_OPTIONS_END
+
+static const floppy_config tmc2000e_floppy_config =
+{
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(tmc2000e)
+};
 
 static MACHINE_DRIVER_START( tmc2000e )
 	MDRV_DRIVER_DATA(tmc2000e_state)
@@ -328,6 +337,8 @@ static MACHINE_DRIVER_START( tmc2000e )
 	/* devices */
 	MDRV_PRINTER_ADD("printer")
 	MDRV_CASSETTE_ADD("cassette", tmc2000_cassette_config)
+	
+	MDRV_FLOPPY_4_DRIVES_ADD(tmc2000e_floppy_config)	
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -341,29 +352,9 @@ ROM_START( tmc2000e )
 ROM_END
 
 /* System Configuration */
-static FLOPPY_OPTIONS_START(tmc2000e)
-	// dsk
-FLOPPY_OPTIONS_END
-
-static void tmc2000e_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 4; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_tmc2000e; break;
-
-		default:										floppy_device_getinfo(devclass, state, info); break;
-	}
-}
-
 static SYSTEM_CONFIG_START( tmc2000e )
 	CONFIG_RAM_DEFAULT	( 8 * 1024)
 	CONFIG_RAM			(40 * 1024)
-	CONFIG_DEVICE(tmc2000e_floppy_getinfo)
 SYSTEM_CONFIG_END
 
 //    YEAR  NAME      PARENT   COMPAT   MACHINE   INPUT     INIT    CONFIG    COMPANY        FULLNAME

@@ -362,6 +362,12 @@ static const cassette_config comx35_cassette_config =
 	CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED
 };
 
+static const floppy_config comx35_floppy_config =
+{
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(comx35)
+};
+
 static MACHINE_DRIVER_START( comx35_pal )
 	MDRV_DRIVER_DATA(comx35_state)
 
@@ -383,6 +389,8 @@ static MACHINE_DRIVER_START( comx35_pal )
 	MDRV_QUICKLOAD_ADD("quickload", comx35, "comx", 0)
 	MDRV_CASSETTE_ADD(CASSETTE_TAG, comx35_cassette_config)
 	MDRV_PRINTER_ADD("printer")
+	
+	MDRV_FLOPPY_2_DRIVES_ADD(comx35_floppy_config)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( comx35_ntsc )
@@ -406,6 +414,8 @@ static MACHINE_DRIVER_START( comx35_ntsc )
 	MDRV_QUICKLOAD_ADD("quickload", comx35, "comx", 0)
 	MDRV_CASSETTE_ADD(CASSETTE_TAG, comx35_cassette_config)
 	MDRV_PRINTER_ADD("printer")
+	
+	MDRV_FLOPPY_2_DRIVES_ADD(comx35_floppy_config)
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -450,23 +460,8 @@ ROM_END
 #define rom_comx35n rom_comx35p
 
 /* System Configuration */
-static void comx35_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_comx35; break;
-
-		default:										floppy_device_getinfo(devclass, state, info); break;
-	}
-}
 static SYSTEM_CONFIG_START( comx35 )
 	CONFIG_RAM_DEFAULT	(32 * 1024)
-	CONFIG_DEVICE(comx35_floppy_getinfo)
 SYSTEM_CONFIG_END
 
 /* System Drivers */

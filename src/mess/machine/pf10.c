@@ -64,7 +64,8 @@ static const nec765_interface pf10_nec765a_intf =
 	DEVCB_NULL, /* interrupt line */
 	NULL,
 	NULL,
-	NEC765_RDY_PIN_NOT_CONNECTED /* ??? */
+	NEC765_RDY_PIN_NOT_CONNECTED, /* ??? */
+	{FLOPPY_0, FLOPPY_1, NULL, NULL}
 };
 
 static MACHINE_DRIVER_START( pf10 )

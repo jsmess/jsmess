@@ -691,6 +691,12 @@ static const cassette_config coco_cassette_config =
 	CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED
 };
 
+static const floppy_config coco_floppy_config =
+{
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(coco)
+};
+
 static MACHINE_DRIVER_START( dragon32 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 MHz */
@@ -728,6 +734,8 @@ static MACHINE_DRIVER_START( dragon32 )
 	MDRV_DRAGON_CARTRIDGE_CART_CALLBACK(coco_cart_w)
 	MDRV_DRAGON_CARTRIDGE_HALT_CALLBACK(coco_halt_w)
 	MDRV_DRAGON_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
+	
+	MDRV_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( dragon64 )
@@ -771,6 +779,8 @@ static MACHINE_DRIVER_START( dragon64 )
 	MDRV_DRAGON_CARTRIDGE_CART_CALLBACK(coco_cart_w)
 	MDRV_DRAGON_CARTRIDGE_HALT_CALLBACK(coco_halt_w)
 	MDRV_DRAGON_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
+	
+	MDRV_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( d64plus )
@@ -814,6 +824,8 @@ static MACHINE_DRIVER_START( d64plus )
 	MDRV_DRAGON_CARTRIDGE_CART_CALLBACK(coco_cart_w)
 	MDRV_DRAGON_CARTRIDGE_HALT_CALLBACK(coco_halt_w)
 	MDRV_DRAGON_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
+	
+	MDRV_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( dgnalpha )
@@ -864,6 +876,8 @@ static MACHINE_DRIVER_START( dgnalpha )
 	MDRV_DRAGON_CARTRIDGE_CART_CALLBACK(coco_cart_w)
 	MDRV_DRAGON_CARTRIDGE_HALT_CALLBACK(coco_halt_w)
 	MDRV_DRAGON_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
+	
+	MDRV_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( tanodr64 )
@@ -907,6 +921,8 @@ static MACHINE_DRIVER_START( tanodr64 )
 	MDRV_DRAGON_CARTRIDGE_CART_CALLBACK(coco_cart_w)
 	MDRV_DRAGON_CARTRIDGE_HALT_CALLBACK(coco_halt_w)
 	MDRV_DRAGON_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
+	
+	MDRV_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco )
@@ -948,6 +964,8 @@ static MACHINE_DRIVER_START( coco )
 	MDRV_COCO_CARTRIDGE_CART_CALLBACK(coco_cart_w)
 	MDRV_COCO_CARTRIDGE_HALT_CALLBACK(coco_halt_w)
 	MDRV_COCO_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
+	
+	MDRV_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco2 )
@@ -989,6 +1007,8 @@ static MACHINE_DRIVER_START( coco2 )
 	MDRV_COCO_CARTRIDGE_CART_CALLBACK(coco_cart_w)
 	MDRV_COCO_CARTRIDGE_HALT_CALLBACK(coco_halt_w)
 	MDRV_COCO_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
+	
+	MDRV_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco2b )
@@ -1030,6 +1050,8 @@ static MACHINE_DRIVER_START( coco2b )
 	MDRV_COCO_CARTRIDGE_CART_CALLBACK(coco_cart_w)
 	MDRV_COCO_CARTRIDGE_HALT_CALLBACK(coco_halt_w)
 	MDRV_COCO_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
+	
+	MDRV_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco3 )
@@ -1083,6 +1105,8 @@ static MACHINE_DRIVER_START( coco3 )
 	MDRV_COCO_CARTRIDGE_CART_CALLBACK(coco3_cart_w)
 	MDRV_COCO_CARTRIDGE_HALT_CALLBACK(coco_halt_w)
 	MDRV_COCO_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
+	
+	MDRV_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco3p )
@@ -1234,61 +1258,9 @@ ROM_END
 
 /*************************************
  *
- *  CoCo device getinfo functions
- *
- *************************************/
-
-static void coco_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 4; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_coco; break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_NAME+0:						strcpy(info->s = device_temp_str(), "floppydisk0"); break;
-		case MESS_DEVINFO_STR_NAME+1:						strcpy(info->s = device_temp_str(), "floppydisk1"); break;
-		case MESS_DEVINFO_STR_NAME+2:						strcpy(info->s = device_temp_str(), "floppydisk2"); break;
-		case MESS_DEVINFO_STR_NAME+3:						strcpy(info->s = device_temp_str(), "floppydisk3"); break;
-		case MESS_DEVINFO_STR_SHORT_NAME+0:					strcpy(info->s = device_temp_str(), "flop0"); break;
-		case MESS_DEVINFO_STR_SHORT_NAME+1:					strcpy(info->s = device_temp_str(), "flop1"); break;
-		case MESS_DEVINFO_STR_SHORT_NAME+2:					strcpy(info->s = device_temp_str(), "flop2"); break;
-		case MESS_DEVINFO_STR_SHORT_NAME+3:					strcpy(info->s = device_temp_str(), "flop3"); break;
-		case MESS_DEVINFO_STR_DESCRIPTION+0:					strcpy(info->s = device_temp_str(), "Floppy #0"); break;
-		case MESS_DEVINFO_STR_DESCRIPTION+1:					strcpy(info->s = device_temp_str(), "Floppy #1"); break;
-		case MESS_DEVINFO_STR_DESCRIPTION+2:					strcpy(info->s = device_temp_str(), "Floppy #2"); break;
-		case MESS_DEVINFO_STR_DESCRIPTION+3:					strcpy(info->s = device_temp_str(), "Floppy #3"); break;
-
-		default:										floppy_device_getinfo(devclass, state, info); break;
-	}
-}
-
-/*************************************
- *
  *  CoCo sysconfig structures
  *
  *************************************/
-
-
-static SYSTEM_CONFIG_START( generic_coco )
-	CONFIG_DEVICE( coco_floppy_getinfo )
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START( generic_coco12 )
-	CONFIG_IMPORT_FROM( generic_coco )
-SYSTEM_CONFIG_END
-
-/* These have to be split up, as the CoCo has a bitbanger */
-/* where the Dragon has a paralell printer port */
-static SYSTEM_CONFIG_START( generic_dragon )
-	CONFIG_DEVICE( coco_floppy_getinfo )
-SYSTEM_CONFIG_END
-
-
 /* ----------------------------------------------------------------------- */
 
 /* I have split up coco and cocoe, as the basic rom in the coco, cannot    */
@@ -1296,7 +1268,6 @@ SYSTEM_CONFIG_END
 /* split these to avoid confusion -- PHS                                   */
 
 static SYSTEM_CONFIG_START( coco )
-	CONFIG_IMPORT_FROM	( generic_coco12 )
 	CONFIG_RAM		(4 * 1024)
 	CONFIG_RAM_DEFAULT	(16 * 1024)
 	CONFIG_RAM		(32 * 1024)
@@ -1304,7 +1275,6 @@ static SYSTEM_CONFIG_START( coco )
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START( cocoe )
-	CONFIG_IMPORT_FROM	( generic_coco12 )
 	CONFIG_RAM		(4 * 1024)
 	CONFIG_RAM		(16 * 1024)
 	CONFIG_RAM		(32 * 1024)
@@ -1312,13 +1282,11 @@ static SYSTEM_CONFIG_START( cocoe )
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(coco2)
-	CONFIG_IMPORT_FROM	( generic_coco12 )
 	CONFIG_RAM			(16 * 1024)
 	CONFIG_RAM_DEFAULT	(64 * 1024)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(coco3)
-	CONFIG_IMPORT_FROM	( generic_coco )
 	CONFIG_RAM			(128 * 1024)
 	CONFIG_RAM_DEFAULT	(512 * 1024)
 	CONFIG_RAM			(2048 * 1024)
@@ -1326,28 +1294,23 @@ static SYSTEM_CONFIG_START(coco3)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(dragon32)
-	CONFIG_IMPORT_FROM	( generic_dragon )
 	CONFIG_RAM_DEFAULT	(32 * 1024)
 	CONFIG_RAM		(64 * 1024)		// Since a fair number of users did this upgrade - phs
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(dragon64)
-	CONFIG_IMPORT_FROM	( generic_dragon )
 	CONFIG_RAM_DEFAULT	(64 * 1024)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(d64plus)
-	CONFIG_IMPORT_FROM	( generic_dragon )
 	CONFIG_RAM_DEFAULT	(128 * 1024)		// 64K normal RAM + 64K on plus board.
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(tanodr64)
-	CONFIG_IMPORT_FROM	( generic_dragon )
 	CONFIG_RAM_DEFAULT	(64 * 1024)
 SYSTEM_CONFIG_END
 
-static SYSTEM_CONFIG_START(dgnalpha)
-	CONFIG_IMPORT_FROM	( generic_dragon )
+static SYSTEM_CONFIG_START(dgnalpha)	
 	CONFIG_RAM_DEFAULT	(64 * 1024)
 SYSTEM_CONFIG_END
 

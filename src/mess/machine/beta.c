@@ -101,7 +101,7 @@ static WD17XX_CALLBACK( betadisk_wd179x_callback )
 	}
 }
 
-static const wd17xx_interface beta_wd17xx_interface = { betadisk_wd179x_callback, NULL };
+static const wd17xx_interface beta_wd17xx_interface = { betadisk_wd179x_callback, NULL, {FLOPPY_0,FLOPPY_1,FLOPPY_2,FLOPPY_3} };
 
 READ8_DEVICE_HANDLER(betadisk_status_r)
 {
@@ -211,23 +211,15 @@ WRITE8_DEVICE_HANDLER(betadisk_data_w)
 	}	
 }
 
-void beta_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+static const floppy_config beta_floppy_config =
 {
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 4; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_trd; break;
-
-		default:										floppy_device_getinfo(devclass, state, info); break;
-	}
-}
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(trd)
+};
 
 static MACHINE_DRIVER_START( beta_disk )
 	MDRV_WD179X_ADD("wd179x", beta_wd17xx_interface )
+	MDRV_FLOPPY_4_DRIVES_ADD(beta_floppy_config)
 MACHINE_DRIVER_END
 
 ROM_START( beta_disk )

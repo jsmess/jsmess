@@ -173,7 +173,8 @@ static const nec765_interface spectrum_plus3_nec765_interface =
 	DEVCB_NULL,
 	NULL,
 	NULL,
-	NEC765_RDY_PIN_CONNECTED
+	NEC765_RDY_PIN_CONNECTED,
+	{FLOPPY_0,FLOPPY_1, NULL, NULL}
 };
 
 
@@ -318,10 +319,10 @@ static WRITE8_HANDLER(spectrum_plus3_port_1ffd_w)
 	/* D3 - Disk motor on/off */
 	/* D4 - parallel port strobe */
 
-	floppy_drive_set_motor_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 0), data & (1<<3));
-	floppy_drive_set_motor_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 1), data & (1<<3));
-	floppy_drive_set_ready_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 0), 1, 1);
-	floppy_drive_set_ready_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 1), 1, 1);
+	floppy_drive_set_motor_state(floppy_get_device(space->machine, 0), data & (1<<3));
+	floppy_drive_set_motor_state(floppy_get_device(space->machine, 1), data & (1<<3));
+	floppy_drive_set_ready_state(floppy_get_device(space->machine, 0), 1, 1);
+	floppy_drive_set_ready_state(floppy_get_device(space->machine, 1), 1, 1);
 
 	spectrum_plus3_port_1ffd_data = data;
 
@@ -351,8 +352,8 @@ static MACHINE_RESET( spectrum_plus3 )
 {
 	memset(mess_ram,0,128*1024);
 	
-	floppy_drive_set_geometry(image_from_devtype_and_index(machine, IO_FLOPPY, 0), FLOPPY_DRIVE_SS_40);
-	floppy_drive_set_geometry(image_from_devtype_and_index(machine, IO_FLOPPY, 1), FLOPPY_DRIVE_SS_40);
+	floppy_drive_set_geometry(floppy_get_device(machine, 0), FLOPPY_DRIVE_SS_40);
+	floppy_drive_set_geometry(floppy_get_device(machine, 1), FLOPPY_DRIVE_SS_40);
 
 	/* Initial configuration */
 	spectrum_128_port_7ffd_data = 0;
@@ -361,6 +362,12 @@ static MACHINE_RESET( spectrum_plus3 )
 
 	MACHINE_RESET_CALL(spectrum);
 }
+
+static const floppy_config specpls3_floppy_config =
+{
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(dsk)
+};
 
 static MACHINE_DRIVER_START( spectrum_plus3 )
 	MDRV_IMPORT_FROM( spectrum_128 )
@@ -372,6 +379,7 @@ static MACHINE_DRIVER_START( spectrum_plus3 )
 	MDRV_MACHINE_RESET( spectrum_plus3 )
 	
 	MDRV_NEC765A_ADD("nec765", spectrum_plus3_nec765_interface)
+	MDRV_FLOPPY_2_DRIVES_ADD(specpls3_floppy_config)
 MACHINE_DRIVER_END
 
 /***************************************************************************
@@ -450,24 +458,7 @@ ROM_START(sp3eata)
 	ROM_CART_LOAD("cart", 0x10000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
-static void specpls3_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_dsk; break;
-
-		default:										floppy_device_getinfo(devclass, state, info); break;
-	}
-}
-
-
 static SYSTEM_CONFIG_START(specpls3)
-	CONFIG_DEVICE(specpls3_floppy_getinfo)
 	CONFIG_RAM_DEFAULT(128 * 1024)
 SYSTEM_CONFIG_END
 

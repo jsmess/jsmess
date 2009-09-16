@@ -346,6 +346,12 @@ static const mc6845_interface svi806_crtc6845_interface =
 	NULL
 };
 
+static const floppy_config svi318_floppy_config =
+{
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(svi318)
+};
+
 static MACHINE_DRIVER_START( svi328_806 )
 	/* Basic machine hardware */
 	MDRV_CPU_ADD( "maincpu", Z80, 3579545 )	/* 3.579545 MHz */
@@ -400,6 +406,8 @@ static MACHINE_DRIVER_START( svi328_806 )
 
 	MDRV_WD179X_ADD("wd179x", svi_wd17xx_interface )
 
+	MDRV_FLOPPY_2_DRIVES_ADD(svi318_floppy_config)
+	
 	MDRV_IMPORT_FROM( svi318_cartslot )
 MACHINE_DRIVER_END
 
@@ -478,27 +486,7 @@ ROM_START( sv328n80 )
 	ROMX_LOAD ("svi806se.rom", 0x0000, 0x1000, CRC(daea8956) SHA1(3f16d5513ad35692488ae7d864f660e76c6e8ed3), ROM_BIOS(2))
 ROM_END
 
-static void svi318_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_svi318; break;
-
-		default:										floppy_device_getinfo(devclass, state, info); break;
-	}
-}
-
-static SYSTEM_CONFIG_START( svi318_common )
-	CONFIG_DEVICE(svi318_floppy_getinfo)
-SYSTEM_CONFIG_END
-
 static SYSTEM_CONFIG_START( svi318 )
-	CONFIG_IMPORT_FROM(svi318_common)
 	CONFIG_RAM_DEFAULT(16 * 1024)
 	CONFIG_RAM( 32 * 1024 )
 	CONFIG_RAM( 96 * 1024 )
@@ -506,7 +494,6 @@ static SYSTEM_CONFIG_START( svi318 )
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START( svi328 )
-	CONFIG_IMPORT_FROM(svi318_common)
 	CONFIG_RAM_DEFAULT(64 * 1024)
 	CONFIG_RAM( 96 * 1024 )
 	CONFIG_RAM( 160 * 1024 )

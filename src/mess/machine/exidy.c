@@ -421,6 +421,6 @@ MACHINE_RESET( exidyd )
 
 MACHINE_RESET( exidy )
 {
-	floppy_drive_set_geometry(image_from_devtype_and_index(machine, IO_FLOPPY, 0), FLOPPY_DRIVE_DS_80);
+	floppy_drive_set_geometry(floppy_get_device(machine, 0), FLOPPY_DRIVE_DS_80);
 	MACHINE_RESET_CALL( exidyd );
 }

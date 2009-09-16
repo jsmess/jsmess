@@ -1316,7 +1316,8 @@ static const nec765_interface nc200_nec765_interface=
     DEVCB_LINE(nc200_fdc_interrupt),
     NULL,
     NULL,
-    NEC765_RDY_PIN_CONNECTED
+    NEC765_RDY_PIN_CONNECTED,
+	{FLOPPY_0, NULL, NULL, NULL }
 };
 
 #ifdef UNUSED_FUNCTION
@@ -1339,10 +1340,6 @@ static MACHINE_RESET( nc200 )
     nc_membank_card_ram_mask = 0x03f;
 
     nc_common_init_machine(machine);
-
-    /* double sided, 80 track drive */
-	floppy_drive_set_geometry(image_from_devtype_and_index(machine, IO_FLOPPY, 0), FLOPPY_DRIVE_DS_80);
-	//floppy_drive_set_index_pulse_callback(image_from_devtype_and_index(machine, IO_FLOPPY, 0), nc200_floppy_drive_index_callback);
 
 	mc146818_init(machine, MC146818_STANDARD);
 
@@ -1673,6 +1670,11 @@ static MACHINE_DRIVER_START( nc100 )
 	MDRV_CARTSLOT_UNLOAD(nc_pcmcia_card)
 MACHINE_DRIVER_END
 
+static const floppy_config nc200_floppy_config =
+{
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(pc)
+};
 
 static MACHINE_DRIVER_START( nc200 )
 	MDRV_IMPORT_FROM( nc100 )
@@ -1701,6 +1703,8 @@ static MACHINE_DRIVER_START( nc200 )
 	MDRV_DEVICE_REMOVE("rtc")
 
 	MDRV_NEC765A_ADD("nec765", nc200_nec765_interface)
+	
+	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, nc200_floppy_config)
 MACHINE_DRIVER_END
 
 
@@ -1761,25 +1765,9 @@ static SYSTEM_CONFIG_START(nc100)
 	CONFIG_RAM_DEFAULT(64 * 1024)
 SYSTEM_CONFIG_END
 
-static void nc200_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_pc; break;
-
-		default:										floppy_device_getinfo(devclass, state, info); break;
-	}
-}
-
 static SYSTEM_CONFIG_START(nc200)
 	CONFIG_IMPORT_FROM(nc_common)
 	CONFIG_RAM_DEFAULT(128 * 1024)
-	CONFIG_DEVICE(nc200_floppy_getinfo)
 SYSTEM_CONFIG_END
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY         FULLNAME    FLAGS */

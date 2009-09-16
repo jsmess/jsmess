@@ -2553,10 +2553,10 @@ The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which
 					/* FDC Motor Control - Bit 0 defines the state of the FDD motor:
 					 * "1" the FDD motor will be active.
 					 * "0" the FDD motor will be in-active.*/
-					floppy_drive_set_motor_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 0), (data & 0x01));
-					floppy_drive_set_motor_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 1), (data & 0x01));
-					floppy_drive_set_ready_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 0), 1,1);
-					floppy_drive_set_ready_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 1), 1,1);
+					floppy_drive_set_motor_state(floppy_get_device(space->machine, 0), (data & 0x01));
+					floppy_drive_set_motor_state(floppy_get_device(space->machine, 1), (data & 0x01));
+					floppy_drive_set_ready_state(floppy_get_device(space->machine, 0), 1,1);
+					floppy_drive_set_ready_state(floppy_get_device(space->machine, 1), 1,1);
 				  break;
 
 				case 0x03: /* Write Data register of FDC */
@@ -3263,8 +3263,8 @@ static void amstrad_common_init(running_machine *machine)
 
 	if(amstrad_system_type != SYSTEM_GX4000)
 	{
-		floppy_drive_set_geometry(image_from_devtype_and_index(machine, IO_FLOPPY, 0),  FLOPPY_DRIVE_SS_40);
-		floppy_drive_set_geometry(image_from_devtype_and_index(machine, IO_FLOPPY, 1),  FLOPPY_DRIVE_SS_40);
+		floppy_drive_set_geometry(floppy_get_device(machine, 0),  FLOPPY_DRIVE_SS_40);
+		floppy_drive_set_geometry(floppy_get_device(machine, 1),  FLOPPY_DRIVE_SS_40);
 	}
 
 	/* The opcode timing in the Amstrad is different to the opcode
@@ -3439,8 +3439,8 @@ MACHINE_RESET( aleste )
 	amstrad_common_init(machine);
 	amstrad_reset_machine(machine);
 
-	floppy_drive_set_geometry(image_from_devtype_and_index(machine, IO_FLOPPY, 0),  FLOPPY_DRIVE_DS_80);
-	floppy_drive_set_geometry(image_from_devtype_and_index(machine, IO_FLOPPY, 1),  FLOPPY_DRIVE_DS_80);
+	floppy_drive_set_geometry(floppy_get_device(machine, 0),  FLOPPY_DRIVE_DS_80);
+	floppy_drive_set_geometry(floppy_get_device(machine, 1),  FLOPPY_DRIVE_DS_80);
 }
 
 

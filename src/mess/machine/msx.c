@@ -721,7 +721,7 @@ static WD17XX_CALLBACK( msx_wd179x_int )
 	}
 }
 
-const wd17xx_interface msx_wd17xx_interface = { msx_wd179x_int, NULL };
+const wd17xx_interface msx_wd17xx_interface = { msx_wd179x_int, NULL, {FLOPPY_0,FLOPPY_1,NULL,NULL} };
 
 FLOPPY_OPTIONS_START(msx)
 	FLOPPY_OPTION(msx, "dsk", "MSX SS", basicdsk_identify_default, basicdsk_construct_default,

@@ -115,7 +115,8 @@ static void atom_8271_interrupt_callback(const device_config *device, int state)
 const i8271_interface atom_8271_interface=
 {
 	atom_8271_interrupt_callback,
-	NULL
+	NULL,
+	{FLOPPY_0, FLOPPY_1}
 };
 
 /*

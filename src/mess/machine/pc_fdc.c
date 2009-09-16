@@ -65,15 +65,27 @@ const nec765_interface pc_fdc_nec765_connected_interface =
 	DEVCB_LINE(pc_fdc_hw_interrupt),
 	pc_fdc_hw_dma_drq,
 	pc_fdc_get_image,
-	NEC765_RDY_PIN_CONNECTED
+	NEC765_RDY_PIN_CONNECTED,
+	{FLOPPY_0, FLOPPY_1, NULL, NULL}
 };
+
+const nec765_interface pc_fdc_nec765_connected_1_drive_interface =
+{
+	DEVCB_LINE(pc_fdc_hw_interrupt),
+	pc_fdc_hw_dma_drq,
+	pc_fdc_get_image,
+	NEC765_RDY_PIN_CONNECTED,
+	{FLOPPY_0, NULL, NULL, NULL}
+};
+
 
 const nec765_interface pc_fdc_nec765_not_connected_interface =
 {
 	DEVCB_LINE(pc_fdc_hw_interrupt),
 	pc_fdc_hw_dma_drq,
 	pc_fdc_get_image,
-	NEC765_RDY_PIN_NOT_CONNECTED
+	NEC765_RDY_PIN_NOT_CONNECTED,
+	{FLOPPY_0, FLOPPY_1, NULL, NULL}
 };
 
 static const device_config* pc_get_device(running_machine *machine)
@@ -117,10 +129,12 @@ void pc_fdc_init(running_machine *machine, const struct pc_fdc_interface *iface)
 
 	pc_fdc_reset(machine);
 
-	for (i = 0; i < device_count(machine, IO_FLOPPY); i++)
+	for (i = 0; i < 4; i++)
 	{
-		img = image_from_devtype_and_index(machine, IO_FLOPPY, i);
-		floppy_drive_set_geometry(img, FLOPPY_DRIVE_DS_80);
+		img = floppy_get_device(machine, i);
+		if (img) {
+			floppy_drive_set_geometry(img, FLOPPY_DRIVE_DS_80);
+		}
 	}
 }
 
@@ -132,8 +146,7 @@ static NEC765_GET_IMAGE ( pc_fdc_get_image )
 
 	if (!fdc->fdc_interface.get_image)
 	{
-		if (floppy_index < device_count(device->machine, IO_FLOPPY))
-			image = image_from_devtype_and_index(device->machine, IO_FLOPPY, floppy_index);
+		image = floppy_get_device(device->machine, floppy_index);
 	}
 	else
 	{
@@ -255,10 +268,10 @@ static void pc_fdc_dor_w(running_machine *machine, UINT8 data)
 	int selected_drive;
 	int floppy_count;
 
-	floppy_count = device_count(machine, IO_FLOPPY);
+	floppy_count = 4;//device_count(machine, IO_FLOPPY);
 
 	if (floppy_count > (fdc->digital_output_register & 0x03))
-		floppy_drive_set_ready_state(image_from_devtype_and_index(machine, IO_FLOPPY, fdc->digital_output_register & 0x03), 1, 0);
+		floppy_drive_set_ready_state(floppy_get_device(machine, fdc->digital_output_register & 0x03), 1, 0);
 
 	fdc->digital_output_register = data;
 
@@ -266,18 +279,18 @@ static void pc_fdc_dor_w(running_machine *machine, UINT8 data)
 
 	/* set floppy drive motor state */
 	if (floppy_count > 0)
-		floppy_drive_set_motor_state(image_from_devtype_and_index(machine, IO_FLOPPY, 0),	(data>>4) & 0x0f);
+		floppy_drive_set_motor_state(floppy_get_device(machine, 0),	(data>>4) & 0x0f);
 	if (floppy_count > 1)
-		floppy_drive_set_motor_state(image_from_devtype_and_index(machine, IO_FLOPPY, 1),	(data>>5) & 0x01);
+		floppy_drive_set_motor_state(floppy_get_device(machine, 1),	(data>>5) & 0x01);
 	if (floppy_count > 2)
-		floppy_drive_set_motor_state(image_from_devtype_and_index(machine, IO_FLOPPY, 2),	(data>>6) & 0x01);
+		floppy_drive_set_motor_state(floppy_get_device(machine, 2),	(data>>6) & 0x01);
 	if (floppy_count > 3)
-		floppy_drive_set_motor_state(image_from_devtype_and_index(machine, IO_FLOPPY, 3),	(data>>7) & 0x01);
+		floppy_drive_set_motor_state(floppy_get_device(machine, 3),	(data>>7) & 0x01);
 
 	if ((data>>4) & (1<<selected_drive))
 	{
 		if (floppy_count > selected_drive)
-			floppy_drive_set_ready_state(image_from_devtype_and_index(machine, IO_FLOPPY, selected_drive), 1, 0);
+			floppy_drive_set_ready_state(floppy_get_device(machine, selected_drive), 1, 0);
 	}
 
 	/* changing the DMA enable bit, will affect the terminal count state
@@ -362,16 +375,16 @@ static void pcjr_fdc_dor_w(running_machine *machine, UINT8 data)
 {
 	int floppy_count;
 
-	floppy_count = device_count(machine, IO_FLOPPY);
+	floppy_count = 4;//device_count(machine, IO_FLOPPY);
 
 	/* set floppy drive motor state */
 	if (floppy_count > 0)
-		floppy_drive_set_motor_state(image_from_devtype_and_index(machine, IO_FLOPPY, 0), data & 0x01);
+		floppy_drive_set_motor_state(floppy_get_device(machine, 0), data & 0x01);
 
 	if ( data & 0x01 )
 	{
 		if ( floppy_count )
-			floppy_drive_set_ready_state(image_from_devtype_and_index(machine, IO_FLOPPY, 0), 1, 0);
+			floppy_drive_set_ready_state(floppy_get_device(machine, 0), 1, 0);
 	}
 
 	/* Is the watchdog timer disabled */

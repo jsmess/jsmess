@@ -524,8 +524,8 @@ static WRITE8_HANDLER( fm7_fdc_w )
 			else
 			{
 				wd17xx_set_drive(dev,data & 0x03);
-				floppy_drive_set_motor_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, data & 0x03), data & 0x80);
-				floppy_drive_set_ready_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, data & 0x03), data & 0x80,0);
+				floppy_drive_set_motor_state(floppy_get_device(space->machine, data & 0x03), data & 0x80);
+				floppy_drive_set_ready_state(floppy_get_device(space->machine, data & 0x03), data & 0x80,0);
 				logerror("FDC: wrote %02x to 0x%04x (drive)\n",data,offset+0xfd18);
 			}
 			break;
@@ -1810,7 +1810,8 @@ static MACHINE_RESET(fm7)
 static const wd17xx_interface fm7_mb8877a_interface =
 {
 	fm7_fdc_irq,
-	NULL
+	NULL,
+	{FLOPPY_0,FLOPPY_1,FLOPPY_2,FLOPPY_3}
 };
 
 static const ay8910_interface fm7_psg_intf =
@@ -1843,30 +1844,11 @@ static const cassette_config fm7_cassette_config =
 	CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED
 };
 
-static void fm7_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+static const floppy_config fm7_floppy_config =
 {
-	switch(state)
-	{
-	case MESS_DEVINFO_INT_READABLE:
-		info->i = 1;
-		break;
-	case MESS_DEVINFO_INT_WRITEABLE:
-		info->i = 0;
-		break;
-	case MESS_DEVINFO_INT_CREATABLE:
-		info->i = 0;
-		break;
-	case MESS_DEVINFO_INT_COUNT:
-		info->i = 2;
-		break;
-	case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				
-		info->p = (void *) floppyoptions_fm7; 
-		break;
-	default:
-		floppy_device_getinfo(devclass, state, info);
-		break;
-	}
-}
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(fm7)
+};
 
 static MACHINE_DRIVER_START( fm7 )
 	/* basic machine hardware */
@@ -1909,6 +1891,8 @@ static MACHINE_DRIVER_START( fm7 )
 	MDRV_MB8877_ADD("fdc",fm7_mb8877a_interface)
 	
 	MDRV_CENTRONICS_ADD("lpt",standard_centronics)
+	
+	MDRV_FLOPPY_2_DRIVES_ADD(fm7_floppy_config)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( fm77av )
@@ -1951,6 +1935,8 @@ static MACHINE_DRIVER_START( fm77av )
 	MDRV_MB8877_ADD("fdc",fm7_mb8877a_interface)
 	
 	MDRV_CENTRONICS_ADD("lpt",standard_centronics)
+	
+	MDRV_FLOPPY_2_DRIVES_ADD(fm7_floppy_config)
 MACHINE_DRIVER_END
 
 /* ROM definition */
@@ -2037,15 +2023,9 @@ ROM_START( fm7740sx )
 
 ROM_END
 
-
-static SYSTEM_CONFIG_START(fm7)
-	CONFIG_DEVICE(fm7_floppy_getinfo)
-SYSTEM_CONFIG_END
-
-
 /* Driver */
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT   INIT  CONFIG  COMPANY      FULLNAME        FLAGS */
-COMP( 1982, fm7,      0,      0,      fm7,     fm7,    fm7,  fm7,    "Fujitsu",   "FM-7",         0)
-COMP( 1985, fm77av,   fm7,    0,      fm77av,  fm7,    fm7,  fm7,    "Fujitsu",   "FM-77AV",      GAME_IMPERFECT_GRAPHICS)
-COMP( 1985, fm7740sx, fm7,    0,      fm77av,  fm7,    fm7,  fm7,    "Fujitsu",   "FM-77AV40SX",  GAME_NOT_WORKING)
+COMP( 1982, fm7,      0,      0,      fm7,     fm7,    fm7,  0,    "Fujitsu",   "FM-7",         0)
+COMP( 1985, fm77av,   fm7,    0,      fm77av,  fm7,    fm7,  0,    "Fujitsu",   "FM-77AV",      GAME_IMPERFECT_GRAPHICS)
+COMP( 1985, fm7740sx, fm7,    0,      fm77av,  fm7,    fm7,  0,    "Fujitsu",   "FM-77AV40SX",  GAME_NOT_WORKING)

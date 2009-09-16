@@ -43,7 +43,7 @@
 
 static const device_config *get_floppy_image(running_machine *machine, int drive)
 {
-	return image_from_devtype_and_index(machine, IO_FLOPPY, drive);
+	return floppy_get_device(machine, drive);
 }
 
 static int get_ramdisk_size(running_machine *machine)
@@ -782,7 +782,27 @@ static MSM6255_INTERFACE( bw2_msm6255_intf )
 	bw2_charram_r,
 };
 
-static const wd17xx_interface bw2_wd17xx_interface = { bw2_wd17xx_callback, NULL };
+static FLOPPY_OPTIONS_START(bw2)
+	FLOPPY_OPTION(bw2, "dsk", "BW2 340K disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([1])
+		TRACKS([80])
+		SECTORS([17])
+		SECTOR_LENGTH([256])
+		FIRST_SECTOR_ID([0]))
+	FLOPPY_OPTION(bw2, "dsk", "BW2 360K disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([1])
+		TRACKS([80])
+		SECTORS([18])
+		SECTOR_LENGTH([256])
+		FIRST_SECTOR_ID([0]))		
+FLOPPY_OPTIONS_END
+
+static const floppy_config bw2_floppy_config =
+{
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(bw2)
+};
+static const wd17xx_interface bw2_wd17xx_interface = { bw2_wd17xx_callback, NULL, {FLOPPY_0, FLOPPY_1}};
 
 static MACHINE_DRIVER_START( bw2 )
 	MDRV_DRIVER_DATA(bw2_state)
@@ -820,6 +840,8 @@ static MACHINE_DRIVER_START( bw2 )
 	MDRV_MSM8251_ADD(MSM8251_TAG, default_msm8251_interface)
 
 	MDRV_WD179X_ADD("wd179x", bw2_wd17xx_interface )
+	
+	MDRV_FLOPPY_2_DRIVES_ADD(bw2_floppy_config)
 MACHINE_DRIVER_END
 
 /***************************************************************************
@@ -839,35 +861,6 @@ ROM_START( bw2 )
 	ROM_LOAD("ramcard-10.bin", 0x0000, 0x4000, CRC(68cde1ba) SHA1(a776a27d64f7b857565594beb63aa2cd692dcf04))
 ROM_END
 
-static FLOPPY_OPTIONS_START(bw2)
-	FLOPPY_OPTION(bw2, "dsk", "BW2 340K disk image", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([1])
-		TRACKS([80])
-		SECTORS([17])
-		SECTOR_LENGTH([256])
-		FIRST_SECTOR_ID([0]))
-	FLOPPY_OPTION(bw2, "dsk", "BW2 360K disk image", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([1])
-		TRACKS([80])
-		SECTORS([18])
-		SECTOR_LENGTH([256])
-		FIRST_SECTOR_ID([0]))		
-FLOPPY_OPTIONS_END
-
-static void bw2_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_bw2; break;
-
-		default:										floppy_device_getinfo(devclass, state, info); break;
-	}
-}
 static void bw2_serial_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* serial */
@@ -908,8 +901,7 @@ static void bw2_serial_getinfo(const mess_device_class *devclass, UINT32 state, 
 	}
 }
 
-static SYSTEM_CONFIG_START( bw2 )
-	CONFIG_DEVICE( bw2_floppy_getinfo )
+static SYSTEM_CONFIG_START( bw2 )	
 	CONFIG_DEVICE( bw2_serial_getinfo )
 	CONFIG_RAM_DEFAULT( 64 * 1024 )
 	CONFIG_RAM( 96 * 1024 )

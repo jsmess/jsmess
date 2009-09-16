@@ -306,6 +306,26 @@ static MACHINE_DRIVER_START( nascom1 )
 	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
 MACHINE_DRIVER_END
 
+static FLOPPY_OPTIONS_START(nascom2)
+	FLOPPY_OPTION(nascom2_ss, "dsk", "Nascom 2 SS disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([1])
+		TRACKS([80])
+		SECTORS([16])
+		SECTOR_LENGTH([256])
+		FIRST_SECTOR_ID([1]))
+	FLOPPY_OPTION(nascom2_ds, "dsk", "Nascom 2 DS disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([80])
+		SECTORS([16])
+		SECTOR_LENGTH([256])
+		FIRST_SECTOR_ID([1]))
+FLOPPY_OPTIONS_END
+
+static const floppy_config nascom2_floppy_config =
+{
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(nascom2)
+};
 
 static MACHINE_DRIVER_START( nascom2 )
 	MDRV_IMPORT_FROM(nascom1)
@@ -322,6 +342,8 @@ static MACHINE_DRIVER_START( nascom2 )
 	MDRV_VIDEO_UPDATE(nascom2)
 	
 	MDRV_WD1793_ADD("wd1793", nascom2_wd17xx_interface )
+	
+	MDRV_FLOPPY_4_DRIVES_ADD(nascom2_floppy_config)
 MACHINE_DRIVER_END
 
 
@@ -387,35 +409,6 @@ ROM_END
 //	}
 //}
 
-static FLOPPY_OPTIONS_START(nascom2)
-	FLOPPY_OPTION(nascom2, "dsk", "Nascom 2 SS disk image", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([1])
-		TRACKS([80])
-		SECTORS([16])
-		SECTOR_LENGTH([256])
-		FIRST_SECTOR_ID([1]))
-	FLOPPY_OPTION(nascom2, "dsk", "Nascom 2 DS disk image", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([2])
-		TRACKS([80])
-		SECTORS([16])
-		SECTOR_LENGTH([256])
-		FIRST_SECTOR_ID([1]))
-FLOPPY_OPTIONS_END
-
-static void nascom2_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 4; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_nascom2; break;
-
-		default:										floppy_device_getinfo(devclass, state, info); break;
-	}
-}
 
 static SYSTEM_CONFIG_START( nascom1 )
 	CONFIG_RAM(1 * 1024)
@@ -427,8 +420,7 @@ SYSTEM_CONFIG_END
 
 
 static SYSTEM_CONFIG_START( nascom2 )
-	CONFIG_IMPORT_FROM(nascom1)
-	CONFIG_DEVICE(nascom2_floppy_getinfo)
+	CONFIG_IMPORT_FROM(nascom1)	
 SYSTEM_CONFIG_END
 
 

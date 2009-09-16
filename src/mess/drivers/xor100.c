@@ -264,7 +264,9 @@ static WD17XX_CALLBACK( wd1795_callback )
 
 static const wd17xx_interface wd1795_intf = 
 { 
-	wd1795_callback
+	wd1795_callback,
+	NULL,
+	{FLOPPY_0,FLOPPY_1,NULL,NULL}
 };
 
 /* Machine Initialization */
@@ -315,6 +317,21 @@ static const cassette_config xor100_cassette_config =
 	CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED
 };
 
+static FLOPPY_OPTIONS_START( xor100 )
+	FLOPPY_OPTION( xor100, "dsk", "XOR-100-12 disk image", basicdsk_identify_default, basicdsk_construct_default, // WRONG
+		HEADS([1])
+		TRACKS([80])
+		SECTORS([10])
+		SECTOR_LENGTH([512])
+		FIRST_SECTOR_ID([1]))
+FLOPPY_OPTIONS_END
+
+static const floppy_config xor100_floppy_config =
+{
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(xor100)
+};
+
 static MACHINE_DRIVER_START( xor100 )
 	MDRV_DRIVER_DATA(xor100_state)
 
@@ -346,6 +363,7 @@ static MACHINE_DRIVER_START( xor100 )
 	MDRV_Z80CTC_ADD(Z80CTC_TAG, XTAL_8MHz/2, ctc_intf)
 	MDRV_COM8116_ADD(COM5016_TAG, 5000000, com5016_intf) // COM5016
 	MDRV_WD179X_ADD(WD1795_TAG, /*XTAL_8MHz/8,*/ wd1795_intf ) // WD1795-02
+	MDRV_FLOPPY_2_DRIVES_ADD(xor100_floppy_config)	
 
 	MDRV_CASSETTE_ADD(CASSETTE_TAG, xor100_cassette_config)
 MACHINE_DRIVER_END
@@ -359,31 +377,8 @@ ROM_END
 
 /* System Configuration */
 
-static FLOPPY_OPTIONS_START( xor100 )
-	FLOPPY_OPTION( xor100, "dsk", "XOR-100-12 disk image", basicdsk_identify_default, basicdsk_construct_default, // WRONG
-		HEADS([1])
-		TRACKS([80])
-		SECTORS([10])
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([1]))
-FLOPPY_OPTIONS_END
-
-static void xor100_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:			info->i = 2; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:	info->p = (void *) floppyoptions_xor100; break;
-
-		default: floppy_device_getinfo(devclass, state, info); break;
-	}
-}
 static SYSTEM_CONFIG_START( xor100 )
-	CONFIG_RAM_DEFAULT( 64 * 1024 )
-	CONFIG_DEVICE(xor100_floppy_getinfo)
+	CONFIG_RAM_DEFAULT( 64 * 1024 )	
 SYSTEM_CONFIG_END
 
 /* System Drivers */

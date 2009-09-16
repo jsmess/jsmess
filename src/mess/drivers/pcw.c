@@ -144,7 +144,8 @@ static const nec765_interface pcw_nec765_interface =
 	DEVCB_LINE(pcw_fdc_interrupt),
 	NULL,
 	NULL,
-	NEC765_RDY_PIN_CONNECTED
+	NEC765_RDY_PIN_CONNECTED,
+	{FLOPPY_0,FLOPPY_1, NULL, NULL}
 };
 
 // set/reset INT and NMI lines
@@ -530,20 +531,20 @@ static WRITE8_HANDLER(pcw_system_control_w)
 		/* disc motor on */
 		case 9:
 		{
-			floppy_drive_set_motor_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 0), 1);
-			floppy_drive_set_motor_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 1), 1);
-			floppy_drive_set_ready_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 0), 1,1);
-			floppy_drive_set_ready_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 1), 1,1);
+			floppy_drive_set_motor_state(floppy_get_device(space->machine, 0), 1);
+			floppy_drive_set_motor_state(floppy_get_device(space->machine, 1), 1);
+			floppy_drive_set_ready_state(floppy_get_device(space->machine, 0), 1,1);
+			floppy_drive_set_ready_state(floppy_get_device(space->machine, 1), 1,1);
 		}
 		break;
 
 		/* disc motor off */
 		case 10:
 		{
-			floppy_drive_set_motor_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 0), 0);
-			floppy_drive_set_motor_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 1), 0);
-			floppy_drive_set_ready_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 0), 0,1);
-			floppy_drive_set_ready_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 1), 0,1);
+			floppy_drive_set_motor_state(floppy_get_device(space->machine, 0), 0);
+			floppy_drive_set_motor_state(floppy_get_device(space->machine, 1), 0);
+			floppy_drive_set_ready_state(floppy_get_device(space->machine, 0), 0,1);
+			floppy_drive_set_ready_state(floppy_get_device(space->machine, 1), 0,1);
 		}
 		break;
 
@@ -733,8 +734,8 @@ static TIMER_CALLBACK(setup_beep)
 static MACHINE_START( pcw )
 {
 	fdc_interrupt_code = 2;
-	floppy_drive_set_geometry(image_from_devtype_and_index(machine, IO_FLOPPY, 0), FLOPPY_DRIVE_DS_80);
-	floppy_drive_set_geometry(image_from_devtype_and_index(machine, IO_FLOPPY, 1), FLOPPY_DRIVE_DS_80);
+	floppy_drive_set_geometry(floppy_get_device(machine, 0), FLOPPY_DRIVE_DS_80);
+	floppy_drive_set_geometry(floppy_get_device(machine, 1), FLOPPY_DRIVE_DS_80);
 }
 
 static MACHINE_RESET( pcw )
@@ -975,6 +976,11 @@ static INPUT_PORTS_START(pcw)
 	PORT_BIT( 0xff, 0x00,	 IPT_UNUSED)
 INPUT_PORTS_END
 
+static const floppy_config pcw_floppy_config =
+{
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(dsk)
+};
 
 /* PCW8256, PCW8512, PCW9256 */
 static MACHINE_DRIVER_START( pcw )
@@ -1006,6 +1012,8 @@ static MACHINE_DRIVER_START( pcw )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	
 	MDRV_NEC765A_ADD("nec765", pcw_nec765_interface)
+	
+	MDRV_FLOPPY_2_DRIVES_ADD(pcw_floppy_config)
 MACHINE_DRIVER_END
 
 
@@ -1045,33 +1053,11 @@ ROM_PCW(pcw9256)
 ROM_PCW(pcw9512)
 ROM_PCW(pcw10)
 
-static void generic_pcw_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_dsk; break;
-
-		default:										floppy_device_getinfo(devclass, state, info); break;
-	}
-}
-
-
-static SYSTEM_CONFIG_START(generic_pcw)
-	CONFIG_DEVICE(generic_pcw_floppy_getinfo)
-SYSTEM_CONFIG_END
-
 static SYSTEM_CONFIG_START(pcw_256k)
-	CONFIG_IMPORT_FROM(generic_pcw)
 	CONFIG_RAM_DEFAULT(256 * 1024)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(pcw_512k)
-	CONFIG_IMPORT_FROM(generic_pcw)
 	CONFIG_RAM_DEFAULT(512 * 1024)
 SYSTEM_CONFIG_END
 

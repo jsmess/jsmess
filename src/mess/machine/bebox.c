@@ -428,7 +428,7 @@ static const device_config *bebox_fdc_get_image(running_machine *machine, int fl
 {
 	/* the BeBox boot ROM seems to query for floppy #1 when it should be
 	 * querying for floppy #0 */
-	return image_from_devtype_and_index(machine, IO_FLOPPY, 0);
+	return floppy_get_device(machine, 0);
 }
 
 static const device_config * bebox_get_device(running_machine *machine )

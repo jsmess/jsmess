@@ -167,8 +167,9 @@ static const device_config *current_image(const device_config *device)
 
 	if (!fdc->intf->get_image)
 	{
-		if (fdc->drive < device_count(device->machine, IO_FLOPPY))
-			image = image_from_devtype_and_index(device->machine, IO_FLOPPY, fdc->drive);
+		if (fdc->intf->floppy_drive_tags[fdc->drive]!=NULL) {
+			image = devtag_get_device(device->machine,fdc->intf->floppy_drive_tags[fdc->drive]);			
+		}
 	}
 	else
 	{
@@ -710,8 +711,8 @@ is not ready.
 with error */
 static void nec765_set_ready_change_callback(const device_config *controller, const device_config *img, int state)
 {
-	nec765_t *fdc = get_safe_token(controller);
-	int drive = image_index_in_device(img);
+	nec765_t *fdc = get_safe_token(controller);	
+	int drive = floppy_get_drive(img);
 
 	logerror("nec765: ready state change\n");
 
@@ -2200,12 +2201,13 @@ void nec765_reset(const device_config *device, int offset)
 		are checked or only the drive selected with the drive select bits?? */
 
 		a_drive_is_ready = 0;
-		for (i = 0; i < device_count(device->machine, IO_FLOPPY); i++)
+		for (i = 0; i < 2; i++)
 		{
-			if (image_exists(image_from_devtype_and_index(device->machine, IO_FLOPPY, i)))
-			{
-				a_drive_is_ready = 1;
-				break;
+			if (fdc->intf->floppy_drive_tags[i]!=NULL) {
+				if(devtag_get_device(device->machine,fdc->intf->floppy_drive_tags[i])) {
+					a_drive_is_ready = 1;
+					break;
+				}
 			}
 
 		}
@@ -2319,11 +2321,13 @@ static DEVICE_START( nec72065 )
 static DEVICE_RESET( nec765 )
 {
 	int i;
-
-	for (i = 0; i < device_count(device->machine, IO_FLOPPY); i++) {
-		const device_config *img = image_from_devtype_and_index(device->machine, IO_FLOPPY, i);
-		floppy_drive_set_controller(img, device);
-		floppy_drive_set_ready_state_change_callback(img, nec765_set_ready_change_callback);
+	nec765_t *fdc = get_safe_token(device);
+	for (i = 0; i < 2; i++) {
+		if (fdc->intf->floppy_drive_tags[i]!=NULL) {
+			const device_config *img = devtag_get_device(device->machine,fdc->intf->floppy_drive_tags[i]);
+			floppy_drive_set_controller(img, device);
+			floppy_drive_set_ready_state_change_callback(img, nec765_set_ready_change_callback);
+		}
 	}
 
 	nec765_reset(device,0);

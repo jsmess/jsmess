@@ -1013,7 +1013,7 @@ static int thmfc_floppy_find_sector ( running_machine *machine,chrn_id* dst )
 	}
 
 	thmfc1->stat0 = THMFC1_STAT0_CRC_ERROR | THMFC1_STAT0_FINISHED;
-	LOG (( "thmfc_floppy_find_sector: sector not found drive=%i track=%i sector=%i\n", image_index_in_device( img ), thmfc1->track, thmfc1->sector ));
+	LOG (( "thmfc_floppy_find_sector: sector not found drive=%i track=%i sector=%i\n", floppy_get_drive( img ), thmfc1->track, thmfc1->sector ));
 	return 0;
 }
 

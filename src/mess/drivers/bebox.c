@@ -103,6 +103,11 @@ static ADDRESS_MAP_START( bebox_slave_mem, ADDRESS_SPACE_PROGRAM, 64 )
 	AM_IMPORT_FROM(bebox_mem)
 ADDRESS_MAP_END
 
+static const floppy_config bebox_floppy_config =
+{
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(pc)
+};
 
 static MACHINE_DRIVER_START( bebox )
 	/* basic machine hardware */
@@ -155,7 +160,9 @@ static MACHINE_DRIVER_START( bebox )
 	MDRV_PCI_BUS_DEVICE(1, NULL, cirrus5430_pci_read, cirrus5430_pci_write)
 	/*MDRV_PCI_BUS_DEVICE(12, NULL, scsi53c810_pci_read, scsi53c810_pci_write)*/
 
-	MDRV_SMC37C78_ADD("smc37c78", pc_fdc_nec765_connected_interface)
+	MDRV_SMC37C78_ADD("smc37c78", pc_fdc_nec765_connected_1_drive_interface)
+	
+	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, bebox_floppy_config)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( bebox2 )
@@ -182,27 +189,10 @@ ROM_START(bebox2)
 	ROM_LOAD( "bootnub.rom", 0x000000, 0x4000, CRC(5348d09a) SHA1(1b637a3d7a2b072aa128dd5c037bbb440d525c1a) )
 ROM_END
 
-static void bebox_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_pc; break;
-
-		default:			floppy_device_getinfo(devclass, state, info); break;
-	}
-}
-
-
 static SYSTEM_CONFIG_START(bebox)
 	CONFIG_RAM(8 * 1024 * 1024)
 	CONFIG_RAM(16 * 1024 * 1024)
 	CONFIG_RAM_DEFAULT(32 * 1024 * 1024)
-	CONFIG_DEVICE(bebox_floppy_getinfo)
 SYSTEM_CONFIG_END
 
 

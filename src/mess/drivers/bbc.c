@@ -750,6 +750,20 @@ static ACIA6850_INTERFACE( bbc_acia6850_interface )
 	DEVCB_CPU_INPUT_LINE("maincpu", M6502_IRQ_LINE)
 };
 
+static FLOPPY_OPTIONS_START(bbc)
+	FLOPPY_OPTION(bbc, "ssd,bbc,img", "BBC disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([1])
+		TRACKS([80])
+		SECTORS([10])
+		SECTOR_LENGTH([256])
+		FIRST_SECTOR_ID([0]))
+FLOPPY_OPTIONS_END
+
+static const floppy_config bbc_floppy_config =
+{
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(bbc)
+};
 
 static MACHINE_DRIVER_START( bbc_cartslot )
 	MDRV_CARTSLOT_ADD("cart1")
@@ -812,9 +826,9 @@ static MACHINE_DRIVER_START( bbca )
 	/* devices */
 	MDRV_UPD7002_ADD("upd7002",BBC_uPD7002)
 	MDRV_VIA6522_ADD("via6522_0", 1000000, bbcb_system_via)
+	MDRV_FLOPPY_2_DRIVES_ADD(bbc_floppy_config)
 	MDRV_I8271_ADD("i8271", bbc_i8271_interface)
 MACHINE_DRIVER_END
-
 
 static MACHINE_DRIVER_START( bbcb )
 	MDRV_IMPORT_FROM( bbca )
@@ -827,8 +841,7 @@ static MACHINE_DRIVER_START( bbcb )
 	MDRV_VIA6522_ADD("via6522_1", 1000000, bbcb_user_via)
 	MDRV_CENTRONICS_ADD("centronics", bbcb_centronics_config)
 
-	MDRV_WD177X_ADD("wd177x", bbc_wd17xx_interface )
-
+	MDRV_WD177X_ADD("wd177x", bbc_wd17xx_interface )	
 	MDRV_IMPORT_FROM(bbc_cartslot)
 MACHINE_DRIVER_END
 
@@ -911,42 +924,16 @@ static MACHINE_DRIVER_START( bbcm )
 	MDRV_UPD7002_ADD("upd7002",BBC_uPD7002)
 	MDRV_VIA6522_ADD("via6522_0", 1000000, bbcb_system_via)
 	MDRV_VIA6522_ADD("via6522_1", 1000000, bbcb_user_via)
+	
+	MDRV_FLOPPY_2_DRIVES_ADD(bbc_floppy_config)
 	MDRV_WD177X_ADD("wd177x", bbc_wd17xx_interface )
 
 	MDRV_IMPORT_FROM(bbc_cartslot)
 MACHINE_DRIVER_END
 
-static FLOPPY_OPTIONS_START(bbc)
-	FLOPPY_OPTION(bbc, "ssd,bbc,img", "BBC disk image", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([1])
-		TRACKS([80])
-		SECTORS([10])
-		SECTOR_LENGTH([256])
-		FIRST_SECTOR_ID([0]))
-FLOPPY_OPTIONS_END
-
-static void bbc_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_bbc; break;
-
-		default:										floppy_device_getinfo(devclass, state, info); break;
-	}
-}
-
-static SYSTEM_CONFIG_START(bbc)
-	CONFIG_DEVICE(bbc_floppy_getinfo)
-SYSTEM_CONFIG_END
-
 /*     YEAR  NAME      PARENT    COMPAT MACHINE   INPUT  INIT      CONFIG   COMPANY  FULLNAME */
 COMP ( 1981, bbca,	   0,		 0,		bbca,     bbca,   bbc,     0,		"Acorn","BBC Micro Model A" , 0)
-COMP ( 1981, bbcb,     bbca,	 0,		bbcb,     bbca,   bbc,	   bbc,		"Acorn","BBC Micro Model B" , 0)
-COMP ( 1985, bbcbp,    bbca,	 0,		bbcbp,    bbca,   bbc,     bbc,		"Acorn","BBC Micro Model B+ 64K" , 0)
-COMP ( 1985, bbcbp128, bbca,     0,		bbcbp128, bbca,   bbc,     bbc,		"Acorn","BBC Micro Model B+ 128k" , 0)
-COMP ( 198?, bbcm,     bbca,     0,		bbcm,     bbca,   bbcm,    bbc,		"Acorn","BBC Master" , 0)
+COMP ( 1981, bbcb,     bbca,	 0,		bbcb,     bbca,   bbc,	   0,		"Acorn","BBC Micro Model B" , 0)
+COMP ( 1985, bbcbp,    bbca,	 0,		bbcbp,    bbca,   bbc,     0,		"Acorn","BBC Micro Model B+ 64K" , 0)
+COMP ( 1985, bbcbp128, bbca,     0,		bbcbp128, bbca,   bbc,     0,		"Acorn","BBC Micro Model B+ 128k" , 0)
+COMP ( 198?, bbcm,     bbca,     0,		bbcm,     bbca,   bbcm,    0,		"Acorn","BBC Master" , 0)

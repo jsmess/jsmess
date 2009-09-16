@@ -125,7 +125,7 @@ Notes:
 
 INLINE const device_config *get_floppy_image(running_machine *machine, int drive)
 {
-	return image_from_devtype_and_index(machine, IO_FLOPPY, drive);
+	return floppy_get_device(machine, drive);
 }
 
 void v1050_set_int(running_machine *machine, UINT8 mask, int state)
@@ -1082,7 +1082,9 @@ static WD17XX_CALLBACK( v1050_mb8877_callback )
 
 static const wd17xx_interface v1050_wd17xx_intf = 
 { 
-	v1050_mb8877_callback
+	v1050_mb8877_callback,
+	NULL,
+	{FLOPPY_0,FLOPPY_1,NULL,NULL}
 };
 
 /* Machine Initialization */
@@ -1169,8 +1171,23 @@ static MACHINE_RESET( v1050 )
 	v1050_bankswitch(machine);
 }
 
-/* Machine Driver */
 
+static FLOPPY_OPTIONS_START( v1050 )
+	FLOPPY_OPTION( v1050, "dsk", "Visual 1050 disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([1])
+		TRACKS([80])
+		SECTORS([10])
+		SECTOR_LENGTH([512])
+		FIRST_SECTOR_ID([1]))
+FLOPPY_OPTIONS_END
+
+static const floppy_config v1050_floppy_config =
+{
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(v1050)
+};
+
+/* Machine Driver */
 static MACHINE_DRIVER_START( v1050 )
 	MDRV_DRIVER_DATA(v1050_state)
 
@@ -1212,6 +1229,7 @@ static MACHINE_DRIVER_START( v1050 )
 	MDRV_MSM8251_ADD(I8251A_KB_TAG, /*XTAL_16MHz/8,*/ kb_8251_intf)
 	MDRV_MSM8251_ADD(I8251A_SIO_TAG, /*XTAL_16MHz/8,*/ sio_8251_intf)
 	MDRV_WD1793_ADD(MB8877_TAG, /*XTAL_16MHz/16,*/ v1050_wd17xx_intf )
+	MDRV_FLOPPY_2_DRIVES_ADD(v1050_floppy_config)	
 	MDRV_TIMER_ADD_PERIODIC(TIMER_KB_TAG, kb_8251_tick, HZ((double)XTAL_16MHz/4/13/8))
 	MDRV_TIMER_ADD_PERIODIC(TIMER_SIO_TAG, sio_8251_tick, HZ((double)XTAL_16MHz/4/13/16))
 
@@ -1234,33 +1252,8 @@ ROM_START( v1050 )
 ROM_END
 
 /* System Configuration */
-
-static FLOPPY_OPTIONS_START( v1050 )
-	FLOPPY_OPTION( v1050, "dsk", "Visual 1050 disk image", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([1])
-		TRACKS([80])
-		SECTORS([10])
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([1]))
-FLOPPY_OPTIONS_END
-
-static void v1050_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:			info->i = 2; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:	info->p = (void *) floppyoptions_v1050; break;
-
-		default: floppy_device_getinfo(devclass, state, info); break;
-	}
-}
-
 static SYSTEM_CONFIG_START( v1050 )
 	CONFIG_RAM_DEFAULT( 128 * 1024 )
-	CONFIG_DEVICE(v1050_floppy_getinfo)
 SYSTEM_CONFIG_END
 
 /* System Drivers */

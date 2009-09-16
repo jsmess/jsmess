@@ -202,6 +202,12 @@ ADDRESS_MAP_END
     idle_callback
 };*/
 
+static const floppy_config ti990_4_floppy_config =
+{
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(fd800)
+};
+
 static MACHINE_DRIVER_START(ti990_4)
 	/* basic machine hardware */
 	/* TMS9900 CPU @ 3.0(???) MHz */
@@ -248,6 +254,7 @@ static MACHINE_DRIVER_START(ti990_4)
 	MDRV_SOUND_ADD("beep", BEEP, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 #endif
+	MDRV_FLOPPY_4_DRIVES_ADD(ti990_4_floppy_config)	
 
 MACHINE_DRIVER_END
 
@@ -309,24 +316,6 @@ static INPUT_PORTS_START(ti990_4)
 #endif
 INPUT_PORTS_END
 
-static void ti990_4_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 4; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_fd800; break;
-
-		default:										floppy_device_getinfo(devclass, state, info); break;
-	}
-}
-
-static SYSTEM_CONFIG_START(ti990_4)
-	CONFIG_DEVICE(ti990_4_floppy_getinfo)
-SYSTEM_CONFIG_END
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        CONFIG      COMPANY                 FULLNAME */
-COMP( 1976,	ti990_4,	0,		0,		ti990_4,	ti990_4,	ti990_4,	ti990_4,	"Texas Instruments",	"TI Model 990/4 Microcomputer System" , GAME_NOT_WORKING )
+COMP( 1976,	ti990_4,	0,		0,		ti990_4,	ti990_4,	ti990_4,	0,	"Texas Instruments",	"TI Model 990/4 Microcomputer System" , GAME_NOT_WORKING )

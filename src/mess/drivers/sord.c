@@ -130,10 +130,10 @@ static WRITE8_HANDLER(fd5_drive_control_w)
 
 	LOG(("fd5 drive state w: %02x\n",state));
 
-	floppy_drive_set_motor_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 0), state);
-	floppy_drive_set_motor_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 0), state);
-	floppy_drive_set_ready_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 1), 1,1);
-	floppy_drive_set_ready_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 1), 1,1);
+	floppy_drive_set_motor_state(floppy_get_device(space->machine, 0), state);
+	floppy_drive_set_motor_state(floppy_get_device(space->machine, 0), state);
+	floppy_drive_set_ready_state(floppy_get_device(space->machine, 1), 1,1);
+	floppy_drive_set_ready_state(floppy_get_device(space->machine, 1), 1,1);
 }
 
 static WRITE8_HANDLER(fd5_tc_w)
@@ -169,13 +169,14 @@ static const struct nec765_interface sord_fd5_nec765_interface=
 	DEVCB_LINE(sord_fd5_fdc_interrupt),
 	NULL,
 	NULL,
-	NEC765_RDY_PIN_CONNECTED
+	NEC765_RDY_PIN_CONNECTED,
+	{FLOPPY_0, FLOPPY_1, NULL, NULL}
 };
 
 static MACHINE_RESET( sord_m5_fd5 )
 {
-	floppy_drive_set_geometry(image_from_devtype_and_index(machine, IO_FLOPPY, 0), FLOPPY_DRIVE_SS_40);
-	floppy_drive_set_geometry(image_from_devtype_and_index(machine, IO_FLOPPY, 1), FLOPPY_DRIVE_SS_40);
+	floppy_drive_set_geometry(floppy_get_device(machine,0), FLOPPY_DRIVE_SS_40);
+	floppy_drive_set_geometry(floppy_get_device(machine,1), FLOPPY_DRIVE_SS_40);
 	MACHINE_RESET_CALL(sord_m5);
 	ppi8255_set_port_c(devtag_get_device(machine, "ppi8255"), 0x50);
 }
@@ -559,6 +560,21 @@ static MACHINE_DRIVER_START( sord_m5 )
 MACHINE_DRIVER_END
 
 
+static FLOPPY_OPTIONS_START( sordm5 )
+	FLOPPY_OPTION( sordm5, "dsk", "Sord M5 disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([1])
+		TRACKS([40])
+		SECTORS([18])
+		SECTOR_LENGTH([256])
+		FIRST_SECTOR_ID([1]))
+FLOPPY_OPTIONS_END
+
+static const floppy_config sordm5_floppy_config =
+{
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(sordm5)
+};
+
 static MACHINE_DRIVER_START( sord_m5_fd5 )
 	MDRV_IMPORT_FROM( sord_m5 )
 
@@ -575,6 +591,8 @@ static MACHINE_DRIVER_START( sord_m5_fd5 )
 
 	MDRV_QUANTUM_TIME(HZ(1200))
 	MDRV_MACHINE_RESET(sord_m5_fd5)
+	
+	MDRV_FLOPPY_2_DRIVES_ADD(sordm5_floppy_config)
 MACHINE_DRIVER_END
 
 
@@ -601,16 +619,6 @@ ROM_END
 /***************************************************************************
     SYSTEM CONFIG
 ***************************************************************************/
-
-static FLOPPY_OPTIONS_START( sordm5 )
-	FLOPPY_OPTION( sordm5, "dsk", "Sord M5 disk image", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([1])
-		TRACKS([40])
-		SECTORS([18])
-		SECTOR_LENGTH([256])
-		FIRST_SECTOR_ID([1]))
-FLOPPY_OPTIONS_END
-
 /* different ram sizes need to be emulated */
 #ifdef UNUSED_FUNCTION
 static SYSTEM_CONFIG_START( sordm5 )
@@ -619,32 +627,10 @@ static SYSTEM_CONFIG_START( sordm5 )
 SYSTEM_CONFIG_END
 #endif
 
-static void srdm5fd5_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:			info->i = 4; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:	info->p = (void *) floppyoptions_sordm5; break;
-
-		default: floppy_device_getinfo(devclass, state, info); break;
-	}
-}
-
-
-static SYSTEM_CONFIG_START(srdm5fd5)
-/*	CONFIG_IMPORT_FROM(sordm5) */
-	CONFIG_DEVICE(srdm5fd5_floppy_getinfo)
-SYSTEM_CONFIG_END
-
-
 /***************************************************************************
     GAME DRIVERS
 ***************************************************************************/
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE      INPUT    INIT  CONFIG    COMPANY  FULLNAME               FLAGS */
 COMP( 1983, sordm5,	  0,      0,      sord_m5,	   sord_m5, 0,    0,        "Sord",  "Sord M5",             0 )
-COMP( 1983, srdm5fd5, sordm5, 0,      sord_m5_fd5, sord_m5, 0,    srdm5fd5, "Sord",  "Sord M5 + PI5 + FD5", 0 )
+COMP( 1983, srdm5fd5, sordm5, 0,      sord_m5_fd5, sord_m5, 0,    0, "Sord",  "Sord M5 + PI5 + FD5", 0 )

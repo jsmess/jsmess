@@ -2966,7 +2966,8 @@ MACHINE_START( dgnalpha )
 
 const wd17xx_interface dgnalpha_wd17xx_interface = {
 	dgnalpha_fdc_callback,
-	NULL
+	NULL,
+	{FLOPPY_0,FLOPPY_1,FLOPPY_2,FLOPPY_3}
 };
 /******* Machine Setups CoCos **********/
 

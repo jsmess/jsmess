@@ -144,20 +144,11 @@ static FLOPPY_OPTIONS_START(vector)
 		FIRST_SECTOR_ID([1]))
 FLOPPY_OPTIONS_END
 
-static void vector_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+static const floppy_config vector_floppy_config =
 {
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_vector; break;
-
-		default:										floppy_device_getinfo(devclass, state, info); break;
-	}
-}
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(vector)
+};
 
 /* Machine driver */
 static MACHINE_DRIVER_START( vector06 )
@@ -194,7 +185,8 @@ static MACHINE_DRIVER_START( vector06 )
 
 	MDRV_CASSETTE_ADD( "cassette", vector_cassette_config )
 	
-	MDRV_WD1793_ADD("wd1793", default_wd17xx_interface )	
+	MDRV_WD1793_ADD("wd1793", default_wd17xx_interface_2_drives )	
+	MDRV_FLOPPY_2_DRIVES_ADD(vector_floppy_config)	
 
 	/* cartridge */
 	MDRV_CARTSLOT_ADD("cart")
@@ -236,7 +228,6 @@ ROM_END
 
 static SYSTEM_CONFIG_START(vector06)
  	CONFIG_RAM_DEFAULT(64 * 1024)
- 	CONFIG_DEVICE(vector_floppy_getinfo);
 SYSTEM_CONFIG_END
 
 /* Driver */

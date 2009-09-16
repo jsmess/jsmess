@@ -1502,6 +1502,11 @@ static const cassette_config ibm5150_cassette_config =
 	CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED
 };
 
+static const floppy_config ibmpc_floppy_config =
+{
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(pc)
+};
 
 static MACHINE_DRIVER_START( ibm5150 )
 	/* basic machine hardware */
@@ -1561,6 +1566,8 @@ static MACHINE_DRIVER_START( ibm5150 )
 	MDRV_CASSETTE_ADD( "cassette", ibm5150_cassette_config )
 
 	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
+	
+	MDRV_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
 MACHINE_DRIVER_END
 
 
@@ -1617,6 +1624,8 @@ static MACHINE_DRIVER_START( pccga )
 	MDRV_IMPORT_FROM( pc_hdc )
 
 	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
+	
+	MDRV_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
 MACHINE_DRIVER_END
 
 
@@ -1664,6 +1673,8 @@ static MACHINE_DRIVER_START( europc )
 	MDRV_IMPORT_FROM( pc_hdc )
 
 	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
+	
+	MDRV_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
 MACHINE_DRIVER_END
 
 
@@ -1718,6 +1729,8 @@ static MACHINE_DRIVER_START( ibm5160 )
 	MDRV_IMPORT_FROM( pc_hdc )
 
 	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
+	
+	MDRV_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
 MACHINE_DRIVER_END
 
 
@@ -1758,6 +1771,8 @@ static MACHINE_DRIVER_START( pc200 )
 	MDRV_IMPORT_FROM( pc_hdc )
 
 	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
+	
+	MDRV_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
 MACHINE_DRIVER_END
 
 
@@ -1800,6 +1815,8 @@ static MACHINE_DRIVER_START( pc1512 )
 	MDRV_IMPORT_FROM( pc_hdc )
 
 	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
+	
+	MDRV_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
 MACHINE_DRIVER_END
 
 
@@ -1842,6 +1859,8 @@ static MACHINE_DRIVER_START( pc1640 )
 	MDRV_IMPORT_FROM( pc_hdc )
 
 	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
+	
+	MDRV_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
 MACHINE_DRIVER_END
 
 
@@ -1896,6 +1915,8 @@ static MACHINE_DRIVER_START( xtvga )
 	MDRV_IMPORT_FROM( pc_hdc )
 
 	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
+	
+	MDRV_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
 MACHINE_DRIVER_END
 
 
@@ -1938,6 +1959,8 @@ static MACHINE_DRIVER_START( t1000hx )
 	MDRV_IMPORT_FROM( pc_hdc )
 
 	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
+	
+	MDRV_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
 MACHINE_DRIVER_END
 
 
@@ -1980,6 +2003,8 @@ static MACHINE_DRIVER_START( t1000_16 )
 	MDRV_IMPORT_FROM( pc_hdc )
 
 	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
+	
+	MDRV_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
 MACHINE_DRIVER_END
 
 
@@ -2021,6 +2046,8 @@ static MACHINE_DRIVER_START( ibmpcjr )
 
 	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
 
+	MDRV_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
+	
 	/* cartridge */
 	MDRV_CARTSLOT_ADD("cart1")
 	MDRV_CARTSLOT_EXTENSION_LIST("jrc")
@@ -2603,39 +2630,18 @@ ROM_START( dgone )
 	ROM_LOAD("14166.bin", 0x0000, 0x2000, CRC(1aea1b53) SHA1(b75b6d4509036406052157bc34159f7039cdc72e))
 ROM_END
 
-
-static void ibmpc_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_pc; break;
-
-		default:										floppy_device_getinfo(devclass, state, info); break;
-	}
-}
-
 static SYSTEM_CONFIG_START(ibm5150)
 	CONFIG_RAM_DEFAULT( 640 * 1024 )
-	CONFIG_DEVICE(ibmpc_floppy_getinfo)
 SYSTEM_CONFIG_END
-
 
 static SYSTEM_CONFIG_START(ibm5160)
 	CONFIG_RAM_DEFAULT( 640 * 1024 )
-	CONFIG_DEVICE(ibmpc_floppy_getinfo)
 SYSTEM_CONFIG_END
-
 
 static SYSTEM_CONFIG_START(pcjr)
 //	CONFIG_RAM( 128 * 1024 )
 	CONFIG_RAM_DEFAULT( 640 * 1024 )
 //	CONFIG_RAM( 768 * 1024 )
-	CONFIG_DEVICE(ibmpc_floppy_getinfo)
 SYSTEM_CONFIG_END
 
 /***************************************************************************

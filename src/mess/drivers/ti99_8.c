@@ -426,6 +426,12 @@ static const mm58274c_interface floppy_mm58274c_interface =
 	0   /*  first day of week */
 };
 
+static const floppy_config ti99_8_floppy_config =
+{
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(ti99)
+};
+
 static MACHINE_DRIVER_START(ti99_8_60hz)
 	/* basic machine hardware */
 	/* TMS9995-MP9537 CPU @ 10.7 MHz */
@@ -470,6 +476,8 @@ static MACHINE_DRIVER_START(ti99_8_60hz)
 	MDRV_TMS9901_ADD("tms9901", tms9901reset_param_ti99_8)	
 
 	MDRV_WD179X_ADD("wd179x", ti99_wd17xx_interface )
+	
+	MDRV_FLOPPY_4_DRIVES_ADD(ti99_8_floppy_config)	
 	
 	MDRV_TI99_CARTRIDGE_ADD("ti99_multicart")
 MACHINE_DRIVER_END
@@ -519,6 +527,7 @@ static MACHINE_DRIVER_START(ti99_8_50hz)
 	MDRV_TMS9901_ADD("tms9901", tms9901reset_param_ti99_8)	
 
 	MDRV_WD179X_ADD("wd179x", ti99_wd17xx_interface )
+	MDRV_FLOPPY_4_DRIVES_ADD(ti99_8_floppy_config)	
 
 	MDRV_TI99_CARTRIDGE_ADD("ti99_multicart")
 MACHINE_DRIVER_END
@@ -555,21 +564,6 @@ ROM_START(ti99_8)
 ROM_END
 
 #define rom_ti99_8e rom_ti99_8
-
-static void ti99_8_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 4; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_ti99; break;
-
-		default:										floppy_device_getinfo(devclass, state, info); break;
-	}
-}
 
 static void ti99_8_parallel_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
@@ -640,7 +634,6 @@ static SYSTEM_CONFIG_START(ti99_8)
 	/* one cassette unit port */
 	/* Hex-bus disk controller: supports up to 4 floppy disk drives */
 	/* expansion port (similar to 99/4(a) - yet slightly different) */
-	CONFIG_DEVICE(ti99_8_floppy_getinfo)
 	CONFIG_DEVICE(ti99_8_parallel_getinfo)
 	CONFIG_DEVICE(ti99_8_serial_getinfo)
 	/*CONFIG_DEVICE(ti99_8_quickload_getinfo)*/

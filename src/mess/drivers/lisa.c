@@ -14,6 +14,7 @@
 #include "includes/lisa.h"
 #include "devices/sonydriv.h"
 #include "machine/applefdc.h"
+#include "formats/ap_dsk35.h"
 #include "machine/6522via.h"
 #include "sound/speaker.h"
 
@@ -82,7 +83,23 @@ static const applefdc_interface lisa210_fdc_interface =
 	sony_read_status
 };
 
+/*
+static void lisa_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+{
+	switch(state)
+	{
+		case MESS_DEVINFO_INT_SONYDRIV_ALLOWABLE_SIZES:		info->i = SONY_FLOPPY_ALLOW400K | SONY_FLOPPY_ALLOW800K; break;
 
+		default:										sonydriv_device_getinfo(devclass, state, info); break;
+	}
+}
+*/
+
+static const floppy_config lisa_floppy_config =
+{
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(apple35_mac)
+};
 
 /***************************************************************************
     MACHINE DRIVER
@@ -124,7 +141,8 @@ static MACHINE_DRIVER_START( lisa )
 
 	/* devices */
 	MDRV_IWM_ADD("fdc", lisa2_fdc_interface)
-
+	MDRV_FLOPPY_SONY_2_DRIVES_ADD(lisa_floppy_config)
+	
 	/* via */
 	MDRV_VIA6522_ADD("via6522_0", 500000, lisa_via6522_0_intf)
 	MDRV_VIA6522_ADD("via6522_1", 500000, lisa_via6522_1_intf)
@@ -431,35 +449,12 @@ ROM_START( macxl )
 	ROM_LOAD( "vidstatem.rom", 0x00, 0x100, BAD_DUMP CRC(75904783) SHA1(3b0023bd90f2ca1be0b099160a566b044856885d))
 ROM_END
 
-
-static void lisa_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_SONYDRIV_ALLOWABLE_SIZES:		info->i = SONY_FLOPPY_ALLOW400K | SONY_FLOPPY_ALLOW800K; break;
-
-		default:										sonydriv_device_getinfo(devclass, state, info); break;
-	}
-}
-
-static SYSTEM_CONFIG_START(lisa)
-	/* Lisa should eventually support floppies, hard disks, etc. */
-	CONFIG_DEVICE(lisa_floppy_getinfo)
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START(lisa210)
-	CONFIG_IMPORT_FROM(lisa)
-	/* actually, there is an additionnal 10 meg HD, but it is not implemented, though the roms for it are loaded... */
-SYSTEM_CONFIG_END
-
 /*
     Lisa drivers boot MacWorks, but do not boot the Lisa OS, which is why we set
     the GAME_NOT_WORKING flag...
 */
 /*     YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT  INIT      CONFIG   COMPANY  FULLNAME */
-COMP( 1983, lisa,     0,	0,	lisa,     lisa,	 lisa2,    lisa,	"Apple Computer",  "Lisa", GAME_NOT_WORKING )
-COMP( 1984, lisa2,    0,	0,	lisa,     lisa,	 lisa2,    lisa,	"Apple Computer",  "Lisa2", GAME_NOT_WORKING )
-COMP( 1984, lisa210,  lisa2,	0,	lisa210,  lisa,	 lisa210,  lisa210,	"Apple Computer",  "Lisa2/10", GAME_NOT_WORKING )
-COMP( 1985, macxl,    lisa2,	0,	macxl,    lisa,	 mac_xl,   lisa210,	"Apple Computer",  "Macintosh XL", /*GAME_NOT_WORKING*/0 )
+COMP( 1983, lisa,     0,	0,	lisa,     lisa,	 lisa2,    0,	"Apple Computer",  "Lisa", GAME_NOT_WORKING )
+COMP( 1984, lisa2,    0,	0,	lisa,     lisa,	 lisa2,    0,	"Apple Computer",  "Lisa2", GAME_NOT_WORKING )
+COMP( 1984, lisa210,  lisa2,	0,	lisa210,  lisa,	 lisa210,  0,	"Apple Computer",  "Lisa2/10", GAME_NOT_WORKING )
+COMP( 1985, macxl,    lisa2,	0,	macxl,    lisa,	 mac_xl,   0,	"Apple Computer",  "Macintosh XL", /*GAME_NOT_WORKING*/0 )

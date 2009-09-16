@@ -66,7 +66,7 @@
 
 INLINE const device_config *get_floppy_image(running_machine *machine, int drive)
 {
-	return image_from_devtype_and_index(machine, IO_FLOPPY, drive);
+	return floppy_get_device(machine, drive);
 }
 
 /* Read/Write Handlers */
@@ -311,7 +311,8 @@ static const nec765_interface mm1_nec765_intf =
 	DEVCB_CPU_INPUT_LINE(I8085A_TAG, I8085_RST55_LINE),
 	drq_w,
 	NULL,
-	NEC765_RDY_PIN_CONNECTED // ???
+	NEC765_RDY_PIN_CONNECTED, // ???
+	{FLOPPY_0,FLOPPY_1, NULL, NULL}
 };
 
 /* 8253 Interface */
@@ -451,8 +452,38 @@ static MACHINE_START( mm1 )
 	state_save_register_global(machine, state->recall);
 }
 
-/* Machine Drivers */
+static FLOPPY_OPTIONS_START( mm1 )
+	FLOPPY_OPTION( mm1_640kb, "dsk", "Nokia MikroMikko 1 640KB disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([80])
+		SECTORS([8])
+		SECTOR_LENGTH([512])
+		FIRST_SECTOR_ID([1]))
+FLOPPY_OPTIONS_END
 
+static FLOPPY_OPTIONS_START( mm2 )
+	FLOPPY_OPTION( mm2_360kb, "dsk", "Nokia MikroMikko 2 360KB disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([40])
+		SECTORS([9])
+		SECTOR_LENGTH([512])
+		FIRST_SECTOR_ID([1]))
+
+	FLOPPY_OPTION( mm2_720kb, "dsk", "Nokia MikroMikko 2 720KB disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([40])
+		SECTORS([18])
+		SECTOR_LENGTH([512])
+		FIRST_SECTOR_ID([1]))
+FLOPPY_OPTIONS_END
+
+static const floppy_config mm1_floppy_config =
+{
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(mm1)
+};
+
+/* Machine Drivers */
 static MACHINE_DRIVER_START( mm1 )
 	MDRV_DRIVER_DATA(mm1_state)
 
@@ -484,6 +515,8 @@ static MACHINE_DRIVER_START( mm1 )
 	MDRV_PIT8253_ADD(I8253_TAG, mm1_pit8253_intf)
 	MDRV_NEC765A_ADD(UPD765_TAG, /* XTAL_16MHz/2/2, */ mm1_nec765_intf)
 	MDRV_UPD7201_ADD(UPD7201_TAG, XTAL_6_144MHz/2, mm1_upd7201_intf)
+	
+	MDRV_FLOPPY_2_DRIVES_ADD(mm1_floppy_config)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( mm1m6 )
@@ -510,54 +543,12 @@ ROM_END
 #define rom_mm1m7 rom_mm1m6
 
 /* System Configuration */
-
-static FLOPPY_OPTIONS_START( mm1 )
-	FLOPPY_OPTION( mm1_640kb, "dsk", "Nokia MikroMikko 1 640KB disk image", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([2])
-		TRACKS([80])
-		SECTORS([8])
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([1]))
-FLOPPY_OPTIONS_END
-
-static FLOPPY_OPTIONS_START( mm2 )
-	FLOPPY_OPTION( mm2_360kb, "dsk", "Nokia MikroMikko 2 360KB disk image", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([2])
-		TRACKS([40])
-		SECTORS([9])
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([1]))
-
-	FLOPPY_OPTION( mm2_720kb, "dsk", "Nokia MikroMikko 2 720KB disk image", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([2])
-		TRACKS([40])
-		SECTORS([18])
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([1]))
-FLOPPY_OPTIONS_END
-
-static void dual_640kb_floppy(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:			info->i = 2; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:	info->p = (void *) floppyoptions_mm1; break;
-
-		default:								floppy_device_getinfo(devclass, state, info); break;
-	}
-}
-
 static SYSTEM_CONFIG_START( mm1m6 )
 	CONFIG_RAM_DEFAULT	(64 * 1024)
-	CONFIG_DEVICE(dual_640kb_floppy)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START( mm1m7 )
 	CONFIG_RAM_DEFAULT	(64 * 1024)
-	CONFIG_DEVICE(dual_640kb_floppy)
 	// 5MB Winchester
 SYSTEM_CONFIG_END
 

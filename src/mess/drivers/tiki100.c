@@ -37,7 +37,7 @@
 
 INLINE const device_config *get_floppy_image(running_machine *machine, int drive)
 {
-	return image_from_devtype_and_index(machine, IO_FLOPPY, drive);
+	return floppy_get_device(machine, drive);
 }
 
 /* Memory Banking */
@@ -554,7 +554,8 @@ static const z80ctc_interface ctc_intf =
 static const wd17xx_interface tiki100_wd17xx_interface =
 { 
 	NULL,
-	NULL
+	NULL,
+	{FLOPPY_0,FLOPPY_1,NULL,NULL}
 };
 
 /* AY-3-8912 Interface */
@@ -622,8 +623,40 @@ static MACHINE_START( tiki100 )
 	state_save_register_global(machine, state->keylatch);
 }
 
-/* Machine Driver */
+static FLOPPY_OPTIONS_START(tiki100)
+	FLOPPY_OPTION(tiki100, "dsk", "SSSD disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([1])
+		TRACKS([40])
+		SECTORS([18])
+		SECTOR_LENGTH([128])
+		FIRST_SECTOR_ID([1]))
+	FLOPPY_OPTION(tiki100, "dsk", "SSDD disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([1])
+		TRACKS([40])
+		SECTORS([10])
+		SECTOR_LENGTH([512])
+		FIRST_SECTOR_ID([1]))
+	FLOPPY_OPTION(tiki100, "dsk", "DSDD disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([40])
+		SECTORS([10])
+		SECTOR_LENGTH([512])
+		FIRST_SECTOR_ID([1]))
+	FLOPPY_OPTION(tiki100, "dsk", "DSHD disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([80])
+		SECTORS([10])
+		SECTOR_LENGTH([512])
+		FIRST_SECTOR_ID([1]))
+FLOPPY_OPTIONS_END
 
+static const floppy_config tiki100_floppy_config =
+{
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(tiki100)
+};
+
+/* Machine Driver */
 static MACHINE_DRIVER_START( tiki100 )
 	MDRV_DRIVER_DATA(tiki100_state)
 
@@ -653,7 +686,7 @@ static MACHINE_DRIVER_START( tiki100 )
 	MDRV_Z80CTC_ADD(Z80CTC_TAG, 2000000, ctc_intf)
 	MDRV_TIMER_ADD_PERIODIC("ctc", ctc_tick, HZ(2000000))
 	MDRV_WD179X_ADD(FD1797_TAG, tiki100_wd17xx_interface) // FD1767PL-02 or FD1797-PL
-	
+	MDRV_FLOPPY_2_DRIVES_ADD(tiki100_floppy_config)	
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(AY8912_TAG, AY8912, 2000000)
@@ -679,51 +712,8 @@ ROM_START( tiki100 )
 ROM_END
 
 /* System Configuration */
-static FLOPPY_OPTIONS_START(tiki100)
-	FLOPPY_OPTION(tiki100, "dsk", "SSSD disk image", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([1])
-		TRACKS([40])
-		SECTORS([18])
-		SECTOR_LENGTH([128])
-		FIRST_SECTOR_ID([1]))
-	FLOPPY_OPTION(tiki100, "dsk", "SSDD disk image", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([1])
-		TRACKS([40])
-		SECTORS([10])
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([1]))
-	FLOPPY_OPTION(tiki100, "dsk", "DSDD disk image", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([2])
-		TRACKS([40])
-		SECTORS([10])
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([1]))
-	FLOPPY_OPTION(tiki100, "dsk", "DSHD disk image", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([2])
-		TRACKS([80])
-		SECTORS([10])
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([1]))
-FLOPPY_OPTIONS_END
-
-static void tiki100_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_tiki100; break;
-
-		default:										floppy_device_getinfo(devclass, state, info); break;
-	}
-}
-
 static SYSTEM_CONFIG_START( tiki100 )
 	CONFIG_RAM_DEFAULT( 64 * 1024 )
-	CONFIG_DEVICE( tiki100_floppy_getinfo )
 SYSTEM_CONFIG_END
 
 /* System Drivers */

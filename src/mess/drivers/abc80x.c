@@ -1163,6 +1163,11 @@ static MACHINE_RESET( abc806 )
 }
 
 /* Machine Drivers */
+static const floppy_config abc800_floppy_config =
+{
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(abc80)
+};
 
 static MACHINE_DRIVER_START( abc800m )
 	MDRV_DRIVER_DATA(abc800_state)
@@ -1197,6 +1202,8 @@ static MACHINE_DRIVER_START( abc800m )
 
 	/* fake keyboard */
 	MDRV_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, USEC(2500))
+	
+	MDRV_FLOPPY_2_DRIVES_ADD(abc800_floppy_config)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( abc800c )
@@ -1232,6 +1239,8 @@ static MACHINE_DRIVER_START( abc800c )
 
 	/* fake keyboard */
 	MDRV_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, USEC(2500))
+	
+	MDRV_FLOPPY_2_DRIVES_ADD(abc800_floppy_config)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( abc802 )
@@ -1267,6 +1276,8 @@ static MACHINE_DRIVER_START( abc802 )
 
 	/* fake keyboard */
 	MDRV_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, USEC(2500))
+	
+	MDRV_FLOPPY_2_DRIVES_ADD(abc800_floppy_config)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( abc806 )
@@ -1300,6 +1311,8 @@ static MACHINE_DRIVER_START( abc806 )
 
 	/* fake keyboard */
 	MDRV_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, USEC(2500))
+	
+	MDRV_FLOPPY_2_DRIVES_ADD(abc800_floppy_config)
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -1428,21 +1441,6 @@ ROM_START( abc806 )
 ROM_END
 
 /* System Configuration */
-static void abc800_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_abc80; break;
-
-		default:										floppy_device_getinfo(devclass, state, info); break;
-	}
-}
-
 static DEVICE_IMAGE_LOAD( abc800_serial )
 {
 	/* filename specified */
@@ -1484,20 +1482,17 @@ static void abc800_serial_getinfo(const mess_device_class *devclass, UINT32 stat
 static SYSTEM_CONFIG_START( abc800 )
 	CONFIG_RAM_DEFAULT(16 * 1024)
 	CONFIG_RAM		  (32 * 1024)
-	CONFIG_DEVICE(abc800_floppy_getinfo)
 	CONFIG_DEVICE(abc800_serial_getinfo)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START( abc802 )
 	CONFIG_RAM_DEFAULT(64 * 1024)
-	CONFIG_DEVICE(abc800_floppy_getinfo)
 	CONFIG_DEVICE(abc800_serial_getinfo)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START( abc806 )
 	CONFIG_RAM_DEFAULT(160 * 1024) // 32KB + 128KB
 	CONFIG_RAM		  (544 * 1024) // 32KB + 512KB
-	CONFIG_DEVICE(abc800_floppy_getinfo)
 	CONFIG_DEVICE(abc800_serial_getinfo)
 SYSTEM_CONFIG_END
 

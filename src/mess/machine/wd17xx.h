@@ -45,13 +45,13 @@ typedef void (*wd17xx_callback_func)(const device_config *device, wd17xx_state_t
 typedef void* (*wd17xx_param_callback_func)(const device_config *device);
 #define WD17XX_PARAM_CALLBACK(name)	void* name(const device_config *device)
 
-
 /* Interface */
 typedef struct _wd17xx_interface wd17xx_interface;
 struct _wd17xx_interface
 {
 	wd17xx_callback_func callback;
 	wd17xx_param_callback_func callback_param;
+	const char *floppy_drive_tags[4];
 };
 
 /***************************************************************************
@@ -93,6 +93,7 @@ WRITE8_DEVICE_HANDLER( wd17xx_w );
 void wd17xx_set_pause_time(const device_config *device, int usec); /* default is 40 usec if not set */
 
 extern const wd17xx_interface default_wd17xx_interface;
+extern const wd17xx_interface default_wd17xx_interface_2_drives;
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/

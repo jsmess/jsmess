@@ -556,6 +556,30 @@ static const ay8910_interface apple2_ay8910_interface =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL
 };
+/*
+static void apple2_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+{
+	switch(state)
+	{
+		case MESS_DEVINFO_INT_APPLE525_SPINFRACT_DIVIDEND:	info->i = 15; break;
+		case MESS_DEVINFO_INT_APPLE525_SPINFRACT_DIVISOR:	info->i = 16; break;
+
+		case MESS_DEVINFO_STR_NAME+0:						strcpy(info->s = device_temp_str(), "slot6disk1"); break;
+		case MESS_DEVINFO_STR_NAME+1:						strcpy(info->s = device_temp_str(), "slot6disk2"); break;
+		case MESS_DEVINFO_STR_SHORT_NAME+0:					strcpy(info->s = device_temp_str(), "s6d1"); break;
+		case MESS_DEVINFO_STR_SHORT_NAME+1:					strcpy(info->s = device_temp_str(), "s6d2"); break;
+		case MESS_DEVINFO_STR_DESCRIPTION+0:					strcpy(info->s = device_temp_str(), "Slot 6 Disk #1"); break;
+		case MESS_DEVINFO_STR_DESCRIPTION+1:					strcpy(info->s = device_temp_str(), "Slot 6 Disk #2"); break;
+
+		default:										apple525_device_getinfo(devclass, state, info); break;
+	}
+}
+*/
+static const floppy_config apple2_floppy_config =
+{
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(apple2)
+};
 
 static MACHINE_DRIVER_START( apple2_common )
 	/* basic machine hardware */
@@ -598,6 +622,8 @@ static MACHINE_DRIVER_START( apple2_common )
 	MDRV_APPLE2_SLOT_ADD(0, "langcard", apple2_langcard_r, apple2_langcard_w)
 	MDRV_APPLE2_SLOT_ADD(4, "mockingboard", mockingboard_r, mockingboard_w)
 	MDRV_APPLE2_SLOT_ADD(6, "fdc", applefdc_r, applefdc_w)
+	
+	MDRV_FLOPPY_APPLE_2_DRIVES_ADD(apple2_floppy_config)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( apple2 )
@@ -895,33 +921,7 @@ ROM_START(ivelultr)
 	ROM_LOAD ( "341-0027-a.rom", 0x4500, 0x0100, CRC(ce7144f6) SHA1(d4181c9f046aafc3fb326b381baac809d9e38d16)) /* Disk II ROM - DOS 3.3 version */
 ROM_END
 
-static void apple2_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_APPLE525_SPINFRACT_DIVIDEND:	info->i = 15; break;
-		case MESS_DEVINFO_INT_APPLE525_SPINFRACT_DIVISOR:	info->i = 16; break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_NAME+0:						strcpy(info->s = device_temp_str(), "slot6disk1"); break;
-		case MESS_DEVINFO_STR_NAME+1:						strcpy(info->s = device_temp_str(), "slot6disk2"); break;
-		case MESS_DEVINFO_STR_SHORT_NAME+0:					strcpy(info->s = device_temp_str(), "s6d1"); break;
-		case MESS_DEVINFO_STR_SHORT_NAME+1:					strcpy(info->s = device_temp_str(), "s6d2"); break;
-		case MESS_DEVINFO_STR_DESCRIPTION+0:					strcpy(info->s = device_temp_str(), "Slot 6 Disk #1"); break;
-		case MESS_DEVINFO_STR_DESCRIPTION+1:					strcpy(info->s = device_temp_str(), "Slot 6 Disk #2"); break;
-
-		default:										apple525_device_getinfo(devclass, state, info); break;
-	}
-}
-
-static SYSTEM_CONFIG_START(apple2_common)
-	CONFIG_DEVICE(apple2_floppy_getinfo)
-SYSTEM_CONFIG_END
-
 static SYSTEM_CONFIG_START(apple2)
-	CONFIG_IMPORT_FROM( apple2_common )
 	CONFIG_RAM				(4  * 1024)
 	CONFIG_RAM				(8  * 1024)
 	CONFIG_RAM				(12 * 1024)
@@ -937,7 +937,6 @@ static SYSTEM_CONFIG_START(apple2)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(apple2p)
-	CONFIG_IMPORT_FROM( apple2_common )
 	CONFIG_RAM				(16 * 1024)
 	CONFIG_RAM				(32 * 1024)
 	CONFIG_RAM				(48 * 1024)
@@ -947,13 +946,11 @@ static SYSTEM_CONFIG_START(apple2p)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(apple2e)
-	CONFIG_IMPORT_FROM( apple2_common )
 	CONFIG_RAM				(64  * 1024)
 	CONFIG_RAM_DEFAULT		(128 * 1024)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(mprof3)
-	CONFIG_IMPORT_FROM( apple2_common )
 	CONFIG_RAM_DEFAULT		(128 * 1024)
 SYSTEM_CONFIG_END
 

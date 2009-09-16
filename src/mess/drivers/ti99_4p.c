@@ -231,8 +231,11 @@ static const tms5220_interface ti99_4p_tms5220interface =
     b) this is a 2-level output (whereas a DAC provides a 256-level output...)
 */
 
-
-
+static const floppy_config ti99_4p_floppy_config =
+{
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(ti99)
+};
 /*
     machine description.
 */
@@ -285,7 +288,9 @@ static MACHINE_DRIVER_START(ti99_4p_60hz)
 	MDRV_TMS9901_ADD("tms9901", tms9901reset_param_ti99_4x)	
 	/* tms9902 */
 	MDRV_TMS9902_ADD("tms9902_0", tms9902_params_0)
-	MDRV_TMS9902_ADD("tms9902_1", tms9902_params_1)	
+	MDRV_TMS9902_ADD("tms9902_1", tms9902_params_1)
+
+	MDRV_FLOPPY_4_DRIVES_ADD(ti99_4p_floppy_config)	
 MACHINE_DRIVER_END
 
 
@@ -313,21 +318,6 @@ ROM_START(ti99_4p)
 	ROM_REGION(0x8000, region_speech_rom, 0)
 	ROM_LOAD_OPTIONAL("spchrom.bin", 0x0000, 0x8000, CRC(58b155f7) SHA1(382292295c00dff348d7e17c5ce4da12a1d87763)) /* system speech ROM */
 ROM_END
-
-static void ti99_4p_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 4; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_ti99; break;
-
-		default:										floppy_device_getinfo(devclass, state, info); break;
-	}
-}
 
 static void ti99_4p_parallel_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
@@ -415,8 +405,6 @@ static void ti99_4p_memcard_getinfo(const mess_device_class *devclass, UINT32 st
 }
 
 static SYSTEM_CONFIG_START(ti99_4p)
-	CONFIG_DEVICE(ti99_4p_floppy_getinfo)
-	CONFIG_DEVICE(ti99_4p_floppy_getinfo)
 	CONFIG_DEVICE(ti99_4p_parallel_getinfo)
 	CONFIG_DEVICE(ti99_4p_serial_getinfo)
 	/*CONFIG_DEVICE(ti99_4p_quickload_getinfo)*/

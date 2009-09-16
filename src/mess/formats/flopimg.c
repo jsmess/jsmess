@@ -315,7 +315,6 @@ done:
 
 static void floppy_close_internal(floppy_image *floppy, int close_file)
 {
-	assert(floppy);
 	if (floppy) {
 		floppy_track_unload(floppy);
 		if (close_file)

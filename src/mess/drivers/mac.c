@@ -45,6 +45,7 @@
 #include "machine/applefdc.h"
 #include "devices/sonydriv.h"
 #include "devices/harddriv.h"
+#include "formats/ap_dsk35.h"
 
 // LC: boot needs 50f04000 bit 0 to go "1" at a49f00.  SCC.
 
@@ -134,6 +135,18 @@ static const applefdc_interface mac_iwm_interface =
 /***************************************************************************
     MACHINE DRIVERS
 ***************************************************************************/
+static const floppy_config mac128512_floppy_config = //SONY_FLOPPY_ALLOW400K
+{
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(apple35_mac)
+};
+
+
+static const floppy_config mac_floppy_config = //SONY_FLOPPY_ALLOW400K | SONY_FLOPPY_ALLOW800K
+{
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(apple35_mac)
+};
 
 static MACHINE_DRIVER_START( mac512ke )
 	/* basic machine hardware */
@@ -167,6 +180,8 @@ static MACHINE_DRIVER_START( mac512ke )
 
 	/* devices */
 	MDRV_IWM_ADD("fdc", mac_iwm_interface)
+	MDRV_FLOPPY_SONY_2_DRIVES_ADD(mac128512_floppy_config)
+	
 	MDRV_SCC8530_ADD("scc")
 	MDRV_SCC8530_ACK(mac_scc_ack)
 	MDRV_VIA6522_ADD("via6522_0", 1000000, mac_via6522_intf)
@@ -181,6 +196,8 @@ static MACHINE_DRIVER_START( macplus )
 
 	MDRV_HARDDISK_ADD( "harddisk1" )
 	MDRV_HARDDISK_ADD( "harddisk2" )
+	
+	MDRV_FLOPPY_SONY_2_DRIVES_MODIFY(mac_floppy_config)
 MACHINE_DRIVER_END
 
 
@@ -379,42 +396,15 @@ ROM_START( maclc )
         ROM_LOAD("350eacf0.rom", 0x000000, 0x080000, CRC(71681726) SHA1(6bef5853ae736f3f06c2b4e79772f65910c3b7d4))
 ROM_END
 
-static void mac128512_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_SONYDRIV_ALLOWABLE_SIZES:		info->i = SONY_FLOPPY_ALLOW400K; break;
-
-		default:										sonydriv_device_getinfo(devclass, state, info); break;
-	}
-}
-
-static void mac_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_SONYDRIV_ALLOWABLE_SIZES:		info->i = SONY_FLOPPY_ALLOW400K | SONY_FLOPPY_ALLOW800K; break;
-
-		default:										sonydriv_device_getinfo(devclass, state, info); break;
-	}
-}
-
 static SYSTEM_CONFIG_START(mac128k)
-	CONFIG_DEVICE(mac128512_floppy_getinfo)
 	CONFIG_RAM_DEFAULT(0x020000)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(mac512k)
-	CONFIG_DEVICE(mac128512_floppy_getinfo)
 	CONFIG_RAM_DEFAULT(0x080000)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(macplus)
-	CONFIG_DEVICE(mac_floppy_getinfo)
 	CONFIG_RAM			(0x080000)
 	CONFIG_RAM_DEFAULT	(0x100000)
 	CONFIG_RAM			(0x200000)
@@ -423,7 +413,6 @@ static SYSTEM_CONFIG_START(macplus)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(macse)
-	CONFIG_DEVICE(mac_floppy_getinfo)
 	CONFIG_RAM_DEFAULT	(0x100000)
 	CONFIG_RAM			(0x200000)
 	CONFIG_RAM			(0x280000)
@@ -431,7 +420,6 @@ static SYSTEM_CONFIG_START(macse)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(maclc)
-	CONFIG_DEVICE(mac_floppy_getinfo)
 	CONFIG_RAM_DEFAULT	(0x200000)	// 2 MB RAM default
 	CONFIG_RAM			(0x400000)
 	CONFIG_RAM			(0x600000)

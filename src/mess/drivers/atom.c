@@ -256,6 +256,20 @@ static const centronics_interface atom_centronics_config =
 	DEVCB_NULL
 };
 
+static FLOPPY_OPTIONS_START(atom)
+	FLOPPY_OPTION(atom, "ssd", "Atom disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([1])
+		TRACKS([80])
+		SECTORS([10])
+		SECTOR_LENGTH([256])
+		FIRST_SECTOR_ID([0]))
+FLOPPY_OPTIONS_END
+
+static const floppy_config atom_floppy_config =
+{
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(atom)
+};
 
 /* machine definition */
 static MACHINE_DRIVER_START( atom )
@@ -296,6 +310,8 @@ static MACHINE_DRIVER_START( atom )
 
 	/* i8271 */
 	MDRV_I8271_ADD("i8271", atom_8271_interface)
+	
+	MDRV_FLOPPY_2_DRIVES_ADD(atom_floppy_config)
 MACHINE_DRIVER_END
 
 
@@ -334,34 +350,6 @@ ROM_START (atomeb)
 	ROM_LOAD ("atomicw.rom",0x018000,0x1000, CRC(a3fd737d) SHA1(d418d9322c69c49106ed2c268ad0864c0f2c4c1b))    // Atomic Windows
 ROM_END
 
-static FLOPPY_OPTIONS_START(atom)
-	FLOPPY_OPTION(atom, "ssd", "Atom disk image", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([1])
-		TRACKS([80])
-		SECTORS([10])
-		SECTOR_LENGTH([256])
-		FIRST_SECTOR_ID([0]))
-FLOPPY_OPTIONS_END
-
-static void atom_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_atom; break;
-
-		default:										floppy_device_getinfo(devclass, state, info); break;
-	}
-}
-
-static SYSTEM_CONFIG_START(atom)
-	CONFIG_DEVICE(atom_floppy_getinfo)
-SYSTEM_CONFIG_END
-
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT      CONFIG   COMPANY   FULLNAME */
-COMP( 1979, atom,     0,        0,		atom,     atom,     0,        atom,    "Acorn",  "Atom" , 0)
-COMP( 1979, atomeb,   atom,     0,		atomeb,   atom,     0,        atom,    "Acorn",  "Atom with Eprom Box" , 0)
+COMP( 1979, atom,     0,        0,		atom,     atom,     0,        0,    "Acorn",  "Atom" , 0)
+COMP( 1979, atomeb,   atom,     0,		atomeb,   atom,     0,        0,    "Acorn",  "Atom with Eprom Box" , 0)

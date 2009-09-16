@@ -123,7 +123,7 @@ INLINE mc6843_t* get_safe_token( const device_config *device )
 static const device_config* mc6843_floppy_image ( const device_config *device )
 {
 	mc6843_t* mc6843 = get_safe_token( device );
-	return image_from_devtype_and_index( device->machine, IO_FLOPPY, mc6843->drive );
+	return floppy_get_device( device->machine, mc6843->drive );
 }
 
 
@@ -781,9 +781,9 @@ static DEVICE_RESET( mc6843 )
 	LOG (( "mc6843 reset\n" ));
 
 	/* setup/reset floppy drive */
-	for ( i = 0; i < device_count( device->machine, IO_FLOPPY ); i++ )
+	for ( i = 0; i < 4; i++ )
 	{
-		const device_config * img = image_from_devtype_and_index( device->machine, IO_FLOPPY, i );
+		const device_config * img = floppy_get_device( device->machine, i );
 		floppy_drive_set_motor_state( img, 1 );
 		floppy_drive_set_ready_state( img, FLOPPY_DRIVE_READY, 0 );
 		floppy_drive_set_rpm( img, 300. );

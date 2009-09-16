@@ -61,6 +61,57 @@ static const mm58274c_interface concept_mm58274c_interface =
 	1   /*  first day of week */
 };
 
+
+
+static FLOPPY_OPTIONS_START(concept)
+#if 1
+	/* SSSD 8" */
+	FLOPPY_OPTION(concept, "img", "Corvus Concept 8\" SSSD disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([1])
+		TRACKS([77])
+		SECTORS([26])
+		SECTOR_LENGTH([128])
+		FIRST_SECTOR_ID([1]))
+#elif 0
+	/* SSDD 8" (according to ROMs) */
+	FLOPPY_OPTION(concept, "img", "Corvus Concept 8\" SSDD disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([1])
+		TRACKS([77])
+		SECTORS([26])
+		SECTOR_LENGTH([256])
+		FIRST_SECTOR_ID([1]))
+#elif 0
+	/* Apple II DSDD 5"1/4 (according to ROMs) */
+	FLOPPY_OPTION(concept, "img", "Corvus Concept Apple II 5\"1/4 DSDD disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([35])
+		SECTORS([16])
+		SECTOR_LENGTH([256])
+		FIRST_SECTOR_ID([1]))
+#elif 0
+	/* actual formats found */
+	FLOPPY_OPTION(concept, "img", "Corvus Concept 5\"1/4 DSDD disk image (256-byte sectors)", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([80])
+		SECTORS([16])
+		SECTOR_LENGTH([256])
+		FIRST_SECTOR_ID([1]))
+#else
+	FLOPPY_OPTION(concept, "img", "Corvus Concept 5\"1/4 DSDD disk image (512-byte sectors)", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([80])
+		SECTORS([9])
+		SECTOR_LENGTH([512])
+		FIRST_SECTOR_ID([1]))
+#endif
+FLOPPY_OPTIONS_END
+
+static const floppy_config concept_floppy_config =
+{
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(concept)
+};
+
 /* concept machine */
 static MACHINE_DRIVER_START( concept )
 	/* basic machine hardware */
@@ -96,6 +147,8 @@ static MACHINE_DRIVER_START( concept )
 	MDRV_VIA6522_ADD("via6522_0", 1022750, concept_via6522_intf)
 	
 	MDRV_WD179X_ADD("wd179x", concept_wd17xx_interface )
+	
+	MDRV_FLOPPY_4_DRIVES_ADD(concept_floppy_config)
 MACHINE_DRIVER_END
 
 
@@ -274,71 +327,5 @@ ROM_START( concept )
 
 ROM_END
 
-
-static FLOPPY_OPTIONS_START(concept)
-#if 1
-	/* SSSD 8" */
-	FLOPPY_OPTION(concept, "img", "Corvus Concept 8\" SSSD disk image", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([1])
-		TRACKS([77])
-		SECTORS([26])
-		SECTOR_LENGTH([128])
-		FIRST_SECTOR_ID([1]))
-#elif 0
-	/* SSDD 8" (according to ROMs) */
-	FLOPPY_OPTION(concept, "img", "Corvus Concept 8\" SSDD disk image", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([1])
-		TRACKS([77])
-		SECTORS([26])
-		SECTOR_LENGTH([256])
-		FIRST_SECTOR_ID([1]))
-#elif 0
-	/* Apple II DSDD 5"1/4 (according to ROMs) */
-	FLOPPY_OPTION(concept, "img", "Corvus Concept Apple II 5\"1/4 DSDD disk image", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([2])
-		TRACKS([35])
-		SECTORS([16])
-		SECTOR_LENGTH([256])
-		FIRST_SECTOR_ID([1]))
-#elif 0
-	/* actual formats found */
-	FLOPPY_OPTION(concept, "img", "Corvus Concept 5\"1/4 DSDD disk image (256-byte sectors)", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([2])
-		TRACKS([80])
-		SECTORS([16])
-		SECTOR_LENGTH([256])
-		FIRST_SECTOR_ID([1]))
-#else
-	FLOPPY_OPTION(concept, "img", "Corvus Concept 5\"1/4 DSDD disk image (512-byte sectors)", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([2])
-		TRACKS([80])
-		SECTORS([9])
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([1]))
-#endif
-FLOPPY_OPTIONS_END
-
-static void concept_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 4; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_concept; break;
-
-		default:										floppy_device_getinfo(devclass, state, info); break;
-	}
-}
-
-
-static SYSTEM_CONFIG_START(concept)
-	/* The concept should eventually support floppies, hard disks, etc. */
-	CONFIG_DEVICE(concept_floppy_getinfo)
-SYSTEM_CONFIG_END
-
-
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT    INIT  CONFIG   COMPANY           FULLNAME */
-COMP( 1982, concept,  0,		0,		concept,  concept, 0,    concept, "Corvus Systems", "Concept" , 0)
+COMP( 1982, concept,  0,		0,		concept,  concept, 0,    0, "Corvus Systems", "Concept" , 0)

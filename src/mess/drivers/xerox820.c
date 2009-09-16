@@ -39,7 +39,7 @@
 
 INLINE const device_config *get_floppy_image(running_machine *machine, int drive)
 {
-	return image_from_devtype_and_index(machine, IO_FLOPPY, drive);
+	return floppy_get_device(machine, drive);
 }
 
 /* Keyboard HACK */
@@ -519,7 +519,8 @@ static WD17XX_CALLBACK( wd1771_callback )
 static const wd17xx_interface wd1771_intf =
 {
 	wd1771_callback, 
-	NULL
+	NULL,
+	{FLOPPY_0,FLOPPY_1,NULL,NULL}
 };
 
 /* COM8116 Interface */
@@ -650,7 +651,7 @@ static MACHINE_START( xerox820 )
 	
 	for(drive=0;drive<2;drive++)
 	{
-		floppy_install_load_proc(image_from_devtype_and_index(machine, IO_FLOPPY, drive), xerox820_load_proc);
+		floppy_install_load_proc(floppy_get_device(machine, drive), xerox820_load_proc);
 	}
 
 
@@ -666,6 +667,39 @@ static MACHINE_START( xerox820 )
 	state_save_register_global(machine, state->_8n5);
 	state_save_register_global(machine, state->dsdd);
 }
+
+FLOPPY_OPTIONS_START(xerox820 )
+	FLOPPY_OPTION( sssd8, "dsk", "8\" SSSD", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([1])
+		TRACKS([77])
+		SECTORS([26])
+		SECTOR_LENGTH([128])
+		FIRST_SECTOR_ID([1]))	
+	FLOPPY_OPTION( ssdd8, "dsk", "8\" SSDD", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([1])
+		TRACKS([77])
+		SECTORS([26])
+		SECTOR_LENGTH([256])
+		FIRST_SECTOR_ID([1]))
+	FLOPPY_OPTION( sssd5, "dsk", "5.25\" SSSD", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([1])
+		TRACKS([40])
+		SECTORS([18])
+		SECTOR_LENGTH([128])
+		FIRST_SECTOR_ID([1]))					
+	FLOPPY_OPTION( ssdd5, "dsk", "5.25\" SSDD", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([40])
+		SECTORS([18])
+		SECTOR_LENGTH([128])
+		FIRST_SECTOR_ID([1]))					
+FLOPPY_OPTIONS_END
+
+static const floppy_config xerox820_floppy_config =
+{
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(xerox820)
+};
 
 /* Machine Drivers */
 
@@ -701,6 +735,7 @@ static MACHINE_DRIVER_START( xerox820 )
 	MDRV_Z80PIO_ADD(Z80GPPIO_TAG, gppio_intf)
 	MDRV_Z80CTC_ADD(Z80CTC_TAG, XTAL_20MHz/8, ctc_intf)
 	MDRV_WD1771_ADD(WD1771_TAG, wd1771_intf)
+	MDRV_FLOPPY_2_DRIVES_ADD(xerox820_floppy_config)	
 	MDRV_COM8116_ADD(COM8116_TAG, XTAL_5_0688MHz, com8116_intf)
 MACHINE_DRIVER_END
 
@@ -746,51 +781,8 @@ ROM_START( xerox820ii )
 ROM_END
 
 /* System Configuration */
-FLOPPY_OPTIONS_START(xerox820 )
-	FLOPPY_OPTION( sssd8, "dsk", "8\" SSSD", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([1])
-		TRACKS([77])
-		SECTORS([26])
-		SECTOR_LENGTH([128])
-		FIRST_SECTOR_ID([1]))	
-	FLOPPY_OPTION( ssdd8, "dsk", "8\" SSDD", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([1])
-		TRACKS([77])
-		SECTORS([26])
-		SECTOR_LENGTH([256])
-		FIRST_SECTOR_ID([1]))
-	FLOPPY_OPTION( sssd5, "dsk", "5.25\" SSSD", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([1])
-		TRACKS([40])
-		SECTORS([18])
-		SECTOR_LENGTH([128])
-		FIRST_SECTOR_ID([1]))					
-	FLOPPY_OPTION( ssdd5, "dsk", "5.25\" SSDD", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([2])
-		TRACKS([40])
-		SECTORS([18])
-		SECTOR_LENGTH([128])
-		FIRST_SECTOR_ID([1]))					
-FLOPPY_OPTIONS_END
-
-static void xerox820_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_xerox820; break;
-
-		default:										floppy_device_getinfo(devclass, state, info); break;
-	}
-}
-
 static SYSTEM_CONFIG_START( xerox820 )
-	CONFIG_RAM_DEFAULT	(64 * 1024)
-	CONFIG_DEVICE(xerox820_floppy_getinfo)
+	CONFIG_RAM_DEFAULT	(64 * 1024)	
 SYSTEM_CONFIG_END
 /*
 static SYSTEM_CONFIG_START( xerox820ii )

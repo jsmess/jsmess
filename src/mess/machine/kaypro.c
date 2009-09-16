@@ -345,7 +345,7 @@ static WD17XX_CALLBACK( kaypro_fdc_callback )
 	}
 }
 
-const wd17xx_interface kaypro_wd1793_interface = { kaypro_fdc_callback, NULL };
+const wd17xx_interface kaypro_wd1793_interface = { kaypro_fdc_callback, NULL, {FLOPPY_0,FLOPPY_1,NULL,NULL} };
 
 /***********************************************************
 

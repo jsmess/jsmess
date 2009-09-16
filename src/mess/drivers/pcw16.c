@@ -1382,6 +1382,11 @@ static const pc_lpt_interface pcw16_lpt_config =
 	DEVCB_CPU_INPUT_LINE("maincpu", 0)
 };
 
+static const floppy_config pcw16_floppy_config =
+{
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(pc)
+};
 
 static MACHINE_DRIVER_START( pcw16 )
 	/* basic machine hardware */
@@ -1418,6 +1423,7 @@ static MACHINE_DRIVER_START( pcw16 )
 	/* printer */
 	MDRV_PC_LPT_ADD("lpt", pcw16_lpt_config)
 	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_connected_interface)
+	MDRV_FLOPPY_2_DRIVES_ADD(pcw16_floppy_config)
 MACHINE_DRIVER_END
 
 
@@ -1441,24 +1447,8 @@ ROM_START(pcw16)
 	ROM_LOAD("pcw045.sys",0x10000, 524288, CRC(c642f498) SHA1(8a5c05de92e7b2c5acdfb038217503ad363285b5))
 ROM_END
 
-static void pcw16_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_pc; break;
-
-		default:										floppy_device_getinfo(devclass, state, info); break;
-	}
-}
-
 static SYSTEM_CONFIG_START(pcw16)
 	CONFIG_RAM_DEFAULT(2048 * 1024)
-	CONFIG_DEVICE(pcw16_floppy_getinfo)
 SYSTEM_CONFIG_END
 
 /*     YEAR  NAME     PARENT    COMPAT  MACHINE    INPUT     INIT   CONFIG,  COMPANY          FULLNAME */

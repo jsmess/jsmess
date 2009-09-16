@@ -48,17 +48,18 @@ static const struct nec765_interface elwro800jr_nec765_interface =
 	DEVCB_NULL,
 	NULL,
 	NULL,
-	NEC765_RDY_PIN_CONNECTED
+	NEC765_RDY_PIN_CONNECTED,
+	{FLOPPY_0,FLOPPY_1, NULL, NULL}
 };
 
 static WRITE8_HANDLER(elwro800jr_fdc_control_w)
 {
 	const device_config *fdc = devtag_get_device(space->machine, "nec765");
 
-	floppy_drive_set_motor_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 0), (data & 0x01));
-	floppy_drive_set_motor_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 1), (data & 0x02));
-	floppy_drive_set_ready_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 0), 1,1);
-	floppy_drive_set_ready_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 1), 1,1);
+	floppy_drive_set_motor_state(floppy_get_device(space->machine, 0), (data & 0x01));
+	floppy_drive_set_motor_state(floppy_get_device(space->machine, 1), (data & 0x02));
+	floppy_drive_set_ready_state(floppy_get_device(space->machine, 0), 1,1);
+	floppy_drive_set_ready_state(floppy_get_device(space->machine, 1), 1,1);
 
 	nec765_tc_w(fdc, data & 0x04);
 
@@ -473,6 +474,12 @@ static INTERRUPT_GEN( elwro800jr_interrupt )
 	cpu_set_input_line(device, 0, HOLD_LINE);
 }
 
+static const floppy_config elwro800jr_floppy_config =
+{
+	FLOPPY_DRIVE_SS_40,
+	FLOPPY_OPTIONS_NAME(dsk)
+};
+
 static MACHINE_DRIVER_START( elwro800 )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, 3500000)	/* 3.5 MHz */
@@ -512,28 +519,12 @@ static MACHINE_DRIVER_START( elwro800 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MDRV_CASSETTE_ADD( "cassette", elwro800jr_cassette_config )
-
+	
+	MDRV_FLOPPY_2_DRIVES_ADD(elwro800jr_floppy_config)
 MACHINE_DRIVER_END
 
-static void elwro800jr_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_dsk; break;
-
-		default:										floppy_device_getinfo(devclass, state, info); break;
-	}
-}
-
-
 static SYSTEM_CONFIG_START(elwro800)
-	CONFIG_RAM_DEFAULT(64 * 1024)
-	CONFIG_DEVICE(elwro800jr_floppy_getinfo)
+	CONFIG_RAM_DEFAULT(64 * 1024)	
 SYSTEM_CONFIG_END
 
 /*************************************

@@ -656,8 +656,8 @@ static WRITE8_HANDLER( fdc_auxiliary_w )
 
 	newbrain_state *state = space->machine->driver_data;
 
-	floppy_drive_set_motor_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 0), BIT(data, 0));
-	floppy_drive_set_ready_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 0), 1, 0);
+	floppy_drive_set_motor_state(floppy_get_device(space->machine, 0), BIT(data, 0));
+	floppy_drive_set_ready_state(floppy_get_device(space->machine, 0), 1, 0);
 
 	nec765_reset_w(state->nec765, BIT(data, 1));
 
@@ -1301,7 +1301,8 @@ static const nec765_interface newbrain_nec765_interface =
 	DEVCB_LINE(newbrain_fdc_interrupt),
 	NULL,
 	NULL,
-	NEC765_RDY_PIN_NOT_CONNECTED
+	NEC765_RDY_PIN_NOT_CONNECTED,
+	{FLOPPY_0,FLOPPY_1, NULL, NULL}
 };
 
 static WRITE8_DEVICE_HANDLER( ctc_z0_w )
@@ -1509,6 +1510,16 @@ static MACHINE_DRIVER_START( newbrain_a )
 	MDRV_CASSETTE_ADD("cassette2", newbrain_cassette_config)
 MACHINE_DRIVER_END
 
+static FLOPPY_OPTIONS_START(newbrain)
+	// 180K img
+FLOPPY_OPTIONS_END
+
+static const floppy_config newbrain_floppy_config =
+{
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(newbrain)
+};
+
 static MACHINE_DRIVER_START( newbrain_eim )
 	MDRV_IMPORT_FROM(newbrain_a)
 	
@@ -1534,6 +1545,8 @@ static MACHINE_DRIVER_START( newbrain_eim )
 	
 	/* NEC765 */
 	MDRV_NEC765A_ADD(NEC765_TAG, newbrain_nec765_interface)
+	
+	MDRV_FLOPPY_2_DRIVES_ADD(newbrain_floppy_config)
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -1634,25 +1647,6 @@ ROM_START( newbraim )
 ROM_END
 
 /* System Configuration */
-static FLOPPY_OPTIONS_START(newbrain)
-	// 180K img
-FLOPPY_OPTIONS_END
-
-static void newbrain_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_newbrain; break;
-
-		default:										floppy_device_getinfo(devclass, state, info); break;
-	}
-}
-
 static DEVICE_IMAGE_LOAD( newbrain_serial )
 {
 	/* filename specified */
@@ -1697,8 +1691,7 @@ static SYSTEM_CONFIG_START( newbrain_a )
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START( newbrain_eim )
-	CONFIG_RAM_DEFAULT	(96 * 1024)
-	CONFIG_DEVICE(newbrain_floppy_getinfo)
+	CONFIG_RAM_DEFAULT	(96 * 1024)	
 	CONFIG_DEVICE(newbrain_serial_getinfo)
 SYSTEM_CONFIG_END
 

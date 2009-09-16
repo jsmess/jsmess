@@ -79,6 +79,7 @@ struct FloppyFormat
 };
 
 
+#define FLOPPY_OPTIONS_NAME(name)	floppyoptions_##name
 
 #define FLOPPY_OPTIONS_START(name)												\
 	const struct FloppyFormat floppyoptions_##name[] =								\

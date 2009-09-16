@@ -979,8 +979,8 @@ static WRITE16_HANDLER( x68k_fdc_w )
 					output_set_indexed_value("eject_drv",drive,(data & 0x40) ? 1 : 0);
 					if(data & 0x20)  // ejects disk
 					{
-						image_unload(image_from_devtype_and_index(space->machine, IO_FLOPPY, drive));
-						floppy_drive_set_motor_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, drive), 0);  // I'll presume ejecting the disk stops the drive motor :)
+						image_unload(floppy_get_device(space->machine, drive));
+						floppy_drive_set_motor_state(floppy_get_device(space->machine, drive), 0);  // I'll presume ejecting the disk stops the drive motor :)
 					}
 				}
 			}
@@ -991,14 +991,14 @@ static WRITE16_HANDLER( x68k_fdc_w )
 	case 0x03:
 		x68k_sys.fdc.media_density[data & 0x03] = data & 0x10;
 		x68k_sys.fdc.motor[data & 0x03] = data & 0x80;
-		floppy_drive_set_motor_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, data & 0x03), (data & 0x80));
+		floppy_drive_set_motor_state(floppy_get_device(space->machine, data & 0x03), (data & 0x80));
 		if(data & 0x80)
 		{
 			for(drive=0;drive<4;drive++) // enable motor for this drive
 			{
 				if(drive == (data & 0x03))
 				{
-					floppy_drive_set_motor_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, drive), 1);
+					floppy_drive_set_motor_state(floppy_get_device(space->machine, drive), 1);
 					output_set_indexed_value("access_drv",drive,0);
 				}
 				else
@@ -1009,17 +1009,17 @@ static WRITE16_HANDLER( x68k_fdc_w )
 		{
 			for(drive=0;drive<4;drive++)
 			{
-				floppy_drive_set_motor_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, drive), 0);
+				floppy_drive_set_motor_state(floppy_get_device(space->machine, drive), 0);
 				output_set_indexed_value("access_drv",drive,1);
 			}
 		}
-		floppy_drive_set_ready_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 0),1,1);
-		floppy_drive_set_ready_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 1),1,1);
-		floppy_drive_set_ready_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 2),1,1);
-		floppy_drive_set_ready_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 3),1,1);
+		floppy_drive_set_ready_state(floppy_get_device(space->machine, 0),1,1);
+		floppy_drive_set_ready_state(floppy_get_device(space->machine, 1),1,1);
+		floppy_drive_set_ready_state(floppy_get_device(space->machine, 2),1,1);
+		floppy_drive_set_ready_state(floppy_get_device(space->machine, 3),1,1);
 //		for(drive=0;drive<4;drive++)
 //		{
-//			if(floppy_drive_get_flag_state(image_from_devtype_and_index(machine, IO_FLOPPY, drive),FLOPPY_DRIVE_MOTOR_ON))
+//			if(floppy_drive_get_flag_state(floppy_get_device(machine, drive),FLOPPY_DRIVE_MOTOR_ON))
 //				output_set_indexed_value("access_drv",drive,0);
 //			else
 //				output_set_indexed_value("access_drv",drive,1);
@@ -1901,7 +1901,8 @@ static const nec765_interface fdc_interface =
 	DEVCB_LINE(fdc_irq),
 	fdc_drq,
 	NULL,
-	NEC765_RDY_PIN_CONNECTED
+	NEC765_RDY_PIN_CONNECTED,
+	{FLOPPY_0,FLOPPY_1,FLOPPY_2,FLOPPY_3}
 };
 
 static const ym2151_interface x68k_ym2151_interface =
@@ -2239,7 +2240,7 @@ static void x68k_load_proc(const device_config *image)
 		cputag_set_input_line_and_vector(image->machine, "maincpu",1,ASSERT_LINE,current_vector[1]);  // Disk insert/eject interrupt
 		logerror("IOC: Disk image inserted\n");
 	}
-	x68k_sys.fdc.disk_inserted[image_index_in_device(image)] = 1;
+	x68k_sys.fdc.disk_inserted[floppy_get_drive(image)] = 1;
 }
 
 static void x68k_unload_proc(const device_config *image)
@@ -2251,7 +2252,7 @@ static void x68k_unload_proc(const device_config *image)
 		current_irq_line = 1;
 		cputag_set_input_line_and_vector(image->machine, "maincpu",1,ASSERT_LINE,current_vector[1]);  // Disk insert/eject interrupt
 	}
-	x68k_sys.fdc.disk_inserted[image_index_in_device(image)] = 0;
+	x68k_sys.fdc.disk_inserted[floppy_get_drive(image)] = 0;
 }
 
 FLOPPY_OPTIONS_START( x68k )
@@ -2265,20 +2266,11 @@ FLOPPY_OPTIONS_START( x68k )
 FLOPPY_OPTIONS_END
 
 
-static void x68k_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+static const floppy_config x68k_floppy_config =
 {
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 4; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_x68k; break;
-
-		default:										floppy_device_getinfo(devclass, state, info); break;
-	}
-}
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(x68k)
+};
 
 static MACHINE_RESET( x68000 )
 {
@@ -2300,7 +2292,7 @@ static MACHINE_RESET( x68000 )
 	// check for disks
 	for(drive=0;drive<4;drive++)
 	{
-		if(image_exists(image_from_devtype_and_index(machine, IO_FLOPPY,drive)))
+		if(image_exists(floppy_get_device(machine, drive)))
 			x68k_sys.fdc.disk_inserted[drive] = 1;
 		else
 			x68k_sys.fdc.disk_inserted[drive] = 0;
@@ -2344,8 +2336,8 @@ static MACHINE_RESET( x68000 )
 		output_set_indexed_value("eject_drv",drive,1);
 		output_set_indexed_value("ctrl_drv",drive,1);
 		output_set_indexed_value("access_drv",drive,1);
-		floppy_install_unload_proc(image_from_devtype_and_index(machine, IO_FLOPPY, drive), x68k_unload_proc);
-		floppy_install_load_proc(image_from_devtype_and_index(machine, IO_FLOPPY, drive), x68k_load_proc);
+		floppy_install_unload_proc(floppy_get_device(machine, drive), x68k_unload_proc);
+		floppy_install_load_proc(floppy_get_device(machine, drive), x68k_load_proc);
 	}
 	
 	// reset CPU
@@ -2474,10 +2466,10 @@ static MACHINE_DRIVER_START( x68000 )
 	MDRV_NVRAM_HANDLER( generic_0fill )
 
 	MDRV_NEC72065_ADD("nec72065", fdc_interface)	
+	MDRV_FLOPPY_4_DRIVES_ADD(x68k_floppy_config)	
 MACHINE_DRIVER_END
 
 static SYSTEM_CONFIG_START(x68000)
-	CONFIG_DEVICE(x68k_floppy_getinfo)
 	CONFIG_RAM(0x100000)
 	CONFIG_RAM(0x200000)
 	CONFIG_RAM(0x300000)

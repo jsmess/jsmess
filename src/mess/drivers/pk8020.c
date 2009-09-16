@@ -145,6 +145,21 @@ static const cassette_config pk8020_cassette_config =
 	CASSETTE_PLAY
 };
 
+static FLOPPY_OPTIONS_START(pk8020)
+	FLOPPY_OPTION(pk8020, "kdi", "PK8020 disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([80])
+		SECTORS([5])
+		SECTOR_LENGTH([1024])
+		FIRST_SECTOR_ID([1]))
+FLOPPY_OPTIONS_END
+
+static const floppy_config pk8020_floppy_config =
+{
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(pk8020)
+};
+
 /* Machine driver */
 static MACHINE_DRIVER_START( pk8020 )
   /* basic machine hardware */
@@ -188,31 +203,9 @@ static MACHINE_DRIVER_START( pk8020 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	
 	MDRV_CASSETTE_ADD( "cassette", pk8020_cassette_config )	
+	
+	MDRV_FLOPPY_4_DRIVES_ADD(pk8020_floppy_config)
 MACHINE_DRIVER_END
-
-static FLOPPY_OPTIONS_START(pk8020)
-	FLOPPY_OPTION(pk8020, "kdi", "PK8020 disk image", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([2])
-		TRACKS([80])
-		SECTORS([5])
-		SECTOR_LENGTH([1024])
-		FIRST_SECTOR_ID([1]))
-FLOPPY_OPTIONS_END
-
-static void pk8020_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 4; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_pk8020; break;
-
-		default:										floppy_device_getinfo(devclass, state, info); break;
-	}
-}
 
 /* ROM definition */
 
@@ -225,7 +218,6 @@ ROM_END
 
 static SYSTEM_CONFIG_START(pk8020)
  	CONFIG_RAM_DEFAULT((64 + 4*48 + 2) * 1024) // Text video ram is 1KB but it is 9bit, so we take 2 KB for that
- 	CONFIG_DEVICE(pk8020_floppy_getinfo);
 SYSTEM_CONFIG_END
 
 /* Driver */

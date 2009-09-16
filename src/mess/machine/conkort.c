@@ -167,7 +167,7 @@ INLINE fast_t *get_safe_token_machine_fast(running_machine *machine)
 
 INLINE const device_config *get_floppy_image(running_machine *machine, int drive)
 {
-	return image_from_devtype_and_index(machine, IO_FLOPPY, drive);
+	return floppy_get_device(machine, drive);
 }
 
 /***************************************************************************
@@ -717,7 +717,8 @@ static WD17XX_CALLBACK( slow_wd1791_callback )
 static const wd17xx_interface slow_wd17xx_interface =
 {
 	slow_wd1791_callback, 
-	NULL
+	NULL,
+	{FLOPPY_0,FLOPPY_1,FLOPPY_2,FLOPPY_3}
 };
 
 /* FD1793 */
@@ -743,7 +744,9 @@ static WD17XX_CALLBACK( fast_wd1793_callback )
 
 static const wd17xx_interface fast_wd17xx_interface = 
 { 
-	fast_wd1793_callback
+	fast_wd1793_callback,
+	NULL,
+	{FLOPPY_0,FLOPPY_1,FLOPPY_2,FLOPPY_3}
 };
 
 /* Machine Driver */

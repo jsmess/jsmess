@@ -44,7 +44,7 @@ static WD17XX_CALLBACK( partner_wd17xx_callback )
 	}
 }
 
-const wd17xx_interface partner_wd17xx_interface = { partner_wd17xx_callback, NULL };
+const wd17xx_interface partner_wd17xx_interface = { partner_wd17xx_callback, NULL, {FLOPPY_0,FLOPPY_1,NULL,NULL} };
 
 MACHINE_START(partner)
 {

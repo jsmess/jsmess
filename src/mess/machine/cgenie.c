@@ -450,7 +450,7 @@ static  WD17XX_CALLBACK( cgenie_fdc_callback )
 	}
 }
 
-const wd17xx_interface cgenie_wd17xx_interface = { cgenie_fdc_callback, NULL };
+const wd17xx_interface cgenie_wd17xx_interface = { cgenie_fdc_callback, NULL, {FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3} };
 
 WRITE8_HANDLER( cgenie_motor_w )
 {

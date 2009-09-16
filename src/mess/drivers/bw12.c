@@ -49,7 +49,7 @@
 
 INLINE const device_config *get_floppy_image(running_machine *machine, int drive)
 {
-	return image_from_devtype_and_index(machine, IO_FLOPPY, drive);
+	return floppy_get_device(machine, drive);
 }
 
 static void bw12_bankswitch(running_machine *machine)
@@ -451,7 +451,8 @@ static const struct nec765_interface bw12_nec765_interface =
 	DEVCB_LINE(bw12_nec765_interrupt),		/* interrupt */
 	NULL,						/* DMA request */
 	bw12_nec765_get_image,		/* image lookup */
-	NEC765_RDY_PIN_CONNECTED	/* ready pin */
+	NEC765_RDY_PIN_CONNECTED,	/* ready pin */
+	{FLOPPY_0,FLOPPY_1, NULL, NULL}
 };
 
 /* PIA6821 Interface */
@@ -717,8 +718,46 @@ static MACHINE_RESET( bw12 )
 	}
 }
 
-/* Machine Driver */
+static FLOPPY_OPTIONS_START(bw12)
+	FLOPPY_OPTION(bw12, "dsk", "180KB BW 12 SSDD", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([1])
+		TRACKS([40])
+		SECTORS([18])
+		SECTOR_LENGTH([256])
+		FIRST_SECTOR_ID([0]))
+	FLOPPY_OPTION(bw12, "dsk", "360KB BW 14 DSDD", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([40])
+		SECTORS([18])
+		SECTOR_LENGTH([256])
+		FIRST_SECTOR_ID([0]))
+	FLOPPY_OPTION(bw12, "dsk", "SVI-328 SSDD", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([1])
+		TRACKS([40])
+		SECTORS([17])
+		SECTOR_LENGTH([256])
+		FIRST_SECTOR_ID([0]))
+	FLOPPY_OPTION(bw12, "dsk", "SVI-328 DSDD", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([40])
+		SECTORS([17])
+		SECTOR_LENGTH([256])
+		FIRST_SECTOR_ID([0]))
+	FLOPPY_OPTION(bw12, "dsk", "Kaypro II SSDD", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([1])
+		TRACKS([40])
+		SECTORS([10])
+		SECTOR_LENGTH([512])
+		FIRST_SECTOR_ID([0]))
+FLOPPY_OPTIONS_END
 
+static const floppy_config bw12_floppy_config =
+{
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(bw12)
+};
+
+/* Machine Driver */
 static MACHINE_DRIVER_START( bw12 )
 	MDRV_DRIVER_DATA(bw12_state)
 
@@ -761,6 +800,8 @@ static MACHINE_DRIVER_START( bw12 )
 
 	/* printer */
 	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, bw12_centronics_intf)
+	
+	MDRV_FLOPPY_2_DRIVES_ADD(bw12_floppy_config)
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -776,61 +817,12 @@ ROM_END
 #define rom_bw14 rom_bw12
 
 /* System Configurations */
-static FLOPPY_OPTIONS_START(bw12)
-	FLOPPY_OPTION(bw12, "dsk", "180KB BW 12 SSDD", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([1])
-		TRACKS([40])
-		SECTORS([18])
-		SECTOR_LENGTH([256])
-		FIRST_SECTOR_ID([0]))
-	FLOPPY_OPTION(bw12, "dsk", "360KB BW 14 DSDD", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([2])
-		TRACKS([40])
-		SECTORS([18])
-		SECTOR_LENGTH([256])
-		FIRST_SECTOR_ID([0]))
-	FLOPPY_OPTION(bw12, "dsk", "SVI-328 SSDD", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([1])
-		TRACKS([40])
-		SECTORS([17])
-		SECTOR_LENGTH([256])
-		FIRST_SECTOR_ID([0]))
-	FLOPPY_OPTION(bw12, "dsk", "SVI-328 DSDD", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([2])
-		TRACKS([40])
-		SECTORS([17])
-		SECTOR_LENGTH([256])
-		FIRST_SECTOR_ID([0]))
-	FLOPPY_OPTION(bw12, "dsk", "Kaypro II SSDD", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([1])
-		TRACKS([40])
-		SECTORS([10])
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([0]))
-FLOPPY_OPTIONS_END
-
-static void bw12_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_bw12; break;
-
-		default:										floppy_device_getinfo(devclass, state, info); break;
-	}
-}
 static SYSTEM_CONFIG_START( bw12 )
 	CONFIG_RAM_DEFAULT( 64 * 1024 )
-	CONFIG_DEVICE( bw12_floppy_getinfo )
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START( bw14 )
 	CONFIG_RAM_DEFAULT( 128 * 1024 )
-	CONFIG_DEVICE( bw12_floppy_getinfo )
 SYSTEM_CONFIG_END
 
 /* System Drivers */

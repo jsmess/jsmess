@@ -412,6 +412,12 @@ static const ay31015_config trs80_ay31015_config =
 	NULL
 };
 
+static const floppy_config trs80_floppy_config =
+{
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(trs80)
+};
+
 static MACHINE_DRIVER_START( trs80 )		// the original model I, level I, with no extras
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 1796000)        /* 1.796 MHz */
@@ -455,6 +461,7 @@ static MACHINE_DRIVER_START( model1 )		// model I, level II
 	MDRV_CASSETTE_MODIFY( "cassette", trs80l2_cassette_config )
 	MDRV_QUICKLOAD_ADD("quickload", trs80_cmd, "cmd", 0.5)
 	MDRV_WD179X_ADD("wd179x", trs80_wd17xx_interface )
+	MDRV_FLOPPY_4_DRIVES_ADD(trs80_floppy_config)	
 	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
 	MDRV_AY31015_ADD( "tr1602", trs80_ay31015_config )
 MACHINE_DRIVER_END
@@ -692,34 +699,15 @@ static DRIVER_INIT( lnw80 )
 	videoram = memory_region(machine, "gfx2")+0x4000;
 }
 
-static void trs8012_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 4; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_trs80; break;
-
-		default:										floppy_device_getinfo(devclass, state, info); break;
-	}
-}
-
-static SYSTEM_CONFIG_START(trs8012)
-	CONFIG_DEVICE(trs8012_floppy_getinfo)
-SYSTEM_CONFIG_END
-
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE	  INPUT    INIT      CONFIG       COMPANY  FULLNAME */
 COMP( 1977, trs80,    0,	0,	trs80,    trs80,   trs80,    0,		"Tandy Radio Shack",  "TRS-80 Model I (Level I Basic)" , 0 )
-COMP( 1978, trs80l2,  trs80,	0,	model1,   trs80,   trs80l2,  trs8012,	"Tandy Radio Shack",  "TRS-80 Model I (Level II Basic)" , 0 )
-COMP( 1983, radionic, trs80,	0,	radionic, trs80,   trs80,    trs8012,	"Komtek",  "Radionic" , 0 )
-COMP( 1980, sys80,    trs80,	0,	sys80,    trs80,   trs80l2,  trs8012,	"EACA Computers Ltd.","System-80" , 0 )
-COMP( 1981, lnw80,    trs80,	0,	lnw80,    trs80m3, lnw80,    trs8012,	"LNW Research","LNW-80", 0 )
-COMP( 1980, trs80m3,  trs80,	0,	model3,   trs80m3, trs80m4,  trs8012,	"Tandy Radio Shack",  "TRS-80 Model III", 0 )
-COMP( 1980, trs80m4,  trs80,	0,	model3,   trs80m3, trs80m4,  trs8012,	"Tandy Radio Shack",  "TRS-80 Model 4", 0 )
-COMP( 1983, trs80m4p, trs80,	0,	model3,   trs80m3, trs80m4,  trs8012,	"Tandy Radio Shack",  "TRS-80 Model 4P", GAME_NOT_WORKING )
-COMP( 1983, ht1080z,  trs80,	0,	ht1080z,  trs80,   trs80l2,  trs8012,	"Hiradastechnika Szovetkezet",  "HT-1080Z Series I" , 0 )
-COMP( 1984, ht1080z2, trs80,	0,	ht1080z,  trs80,   trs80l2,  trs8012,	"Hiradastechnika Szovetkezet",  "HT-1080Z Series II" , 0 )
-COMP( 1985, ht108064, trs80,	0,	ht1080z,  trs80,   trs80,    trs8012,	"Hiradastechnika Szovetkezet",  "HT-1080Z/64" , 0 )
+COMP( 1978, trs80l2,  trs80,	0,	model1,   trs80,   trs80l2,  0,	"Tandy Radio Shack",  "TRS-80 Model I (Level II Basic)" , 0 )
+COMP( 1983, radionic, trs80,	0,	radionic, trs80,   trs80,    0,	"Komtek",  "Radionic" , 0 )
+COMP( 1980, sys80,    trs80,	0,	sys80,    trs80,   trs80l2,  0,	"EACA Computers Ltd.","System-80" , 0 )
+COMP( 1981, lnw80,    trs80,	0,	lnw80,    trs80m3, lnw80,    0,	"LNW Research","LNW-80", 0 )
+COMP( 1980, trs80m3,  trs80,	0,	model3,   trs80m3, trs80m4,  0,	"Tandy Radio Shack",  "TRS-80 Model III", 0 )
+COMP( 1980, trs80m4,  trs80,	0,	model3,   trs80m3, trs80m4,  0,	"Tandy Radio Shack",  "TRS-80 Model 4", 0 )
+COMP( 1983, trs80m4p, trs80,	0,	model3,   trs80m3, trs80m4,  0,	"Tandy Radio Shack",  "TRS-80 Model 4P", GAME_NOT_WORKING )
+COMP( 1983, ht1080z,  trs80,	0,	ht1080z,  trs80,   trs80l2,  0,	"Hiradastechnika Szovetkezet",  "HT-1080Z Series I" , 0 )
+COMP( 1984, ht1080z2, trs80,	0,	ht1080z,  trs80,   trs80l2,  0,	"Hiradastechnika Szovetkezet",  "HT-1080Z Series II" , 0 )
+COMP( 1985, ht108064, trs80,	0,	ht1080z,  trs80,   trs80,    0,	"Hiradastechnika Szovetkezet",  "HT-1080Z/64" , 0 )

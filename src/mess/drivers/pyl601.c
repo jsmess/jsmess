@@ -147,7 +147,7 @@ static WRITE8_HANDLER (led_w)
 
 INLINE const device_config *get_floppy_image(running_machine *machine, int drive)
 {
-	return image_from_devtype_and_index(machine, IO_FLOPPY, drive);
+	return floppy_get_device(machine, drive);
 } 
 
 static NEC765_GET_IMAGE( pyldin_nec765_get_image )
@@ -184,7 +184,8 @@ static const struct nec765_interface pyldin_nec765_interface =
 	DEVCB_NULL,						/* interrupt */
 	NULL,						/* DMA request */
 	pyldin_nec765_get_image,	/* image lookup */
-	NEC765_RDY_PIN_CONNECTED	/* ready pin */
+	NEC765_RDY_PIN_CONNECTED,	/* ready pin */
+	{FLOPPY_0,FLOPPY_1, NULL, NULL}
 };
 
 static ADDRESS_MAP_START(pyl601_mem, ADDRESS_SPACE_PROGRAM, 8)
@@ -461,6 +462,21 @@ INTERRUPT_GEN( pyl601_interrupt )
 	cpu_set_input_line(device, 0, HOLD_LINE);
 }
 
+static FLOPPY_OPTIONS_START(pyldin)
+	FLOPPY_OPTION(pyldin, "img", "Pyldin disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([80])
+		SECTORS([9])
+		SECTOR_LENGTH([512])
+		FIRST_SECTOR_ID([1]))
+FLOPPY_OPTIONS_END
+
+static const floppy_config pyldin_floppy_config =
+{
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(pyldin)
+};
+
 static MACHINE_DRIVER_START( pyl601 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M6800, XTAL_1MHz)
@@ -485,6 +501,8 @@ static MACHINE_DRIVER_START( pyl601 )
 	MDRV_VIDEO_UPDATE( pyl601 )	
 	
 	MDRV_NEC765A_ADD("nec765", pyldin_nec765_interface)
+	
+	MDRV_FLOPPY_2_DRIVES_ADD(pyldin_floppy_config)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( pyl601a )
@@ -494,33 +512,8 @@ static MACHINE_DRIVER_START( pyl601a )
 	MDRV_MC6845_ADD("crtc", MC6845, XTAL_2MHz, pyl601a_crtc6845_interface)
 MACHINE_DRIVER_END
 
-static FLOPPY_OPTIONS_START(pyldin)
-	FLOPPY_OPTION(pyldin, "img", "Pyldin disk image", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([2])
-		TRACKS([80])
-		SECTORS([9])
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([1]))
-FLOPPY_OPTIONS_END
-
-static void pyldin_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_pyldin; break;
-
-		default:										floppy_device_getinfo(devclass, state, info); break;
-	}
-}
-
 static SYSTEM_CONFIG_START(pyl601)
 	CONFIG_RAM_DEFAULT((64 +512) * 1024)
-	CONFIG_DEVICE( pyldin_floppy_getinfo )
 SYSTEM_CONFIG_END
 
 /* ROM definition */

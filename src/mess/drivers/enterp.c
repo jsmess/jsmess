@@ -176,7 +176,7 @@ static MACHINE_RESET( enterprise )
 	const device_config *fdc = devtag_get_device(machine, "wd1770");
 	cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), 0, 0xff);
 
-	floppy_drive_set_geometry(image_from_devtype_and_index(machine, IO_FLOPPY, 0), FLOPPY_DRIVE_DS_80);
+	floppy_drive_set_geometry(floppy_get_device(machine, 0), FLOPPY_DRIVE_DS_80);
 	wd17xx_set_density(fdc, DEN_FM_HI);
 }
 
@@ -413,7 +413,22 @@ INPUT_PORTS_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-static const wd17xx_interface enterp_wd1770_interface = { enterp_wd1770_callback, NULL };
+static const wd17xx_interface enterp_wd1770_interface = { enterp_wd1770_callback, NULL, {FLOPPY_0,FLOPPY_1,FLOPPY_2,FLOPPY_3} };
+
+static FLOPPY_OPTIONS_START(enterprise)
+	FLOPPY_OPTION(enterprise, "dsk,img", "Enterprise disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([80])
+		SECTORS([9])
+		SECTOR_LENGTH([512])
+		FIRST_SECTOR_ID([1]))
+FLOPPY_OPTIONS_END
+
+static const floppy_config enterprise_floppy_config =
+{
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(enterprise)
+};
 
 static MACHINE_DRIVER_START( ep64 )
 	/* basic machine hardware */
@@ -445,6 +460,8 @@ static MACHINE_DRIVER_START( ep64 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MDRV_WD1770_ADD("wd1770", enterp_wd1770_interface )
+	
+	MDRV_FLOPPY_4_DRIVES_ADD(enterprise_floppy_config)
 MACHINE_DRIVER_END
 
 
@@ -504,37 +521,12 @@ ROM_END
 /***************************************************************************
     SYSTEM CONFIG
 ***************************************************************************/
-static FLOPPY_OPTIONS_START(enterprise)
-	FLOPPY_OPTION(enterprise, "dsk,img", "Enterprise disk image", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([2])
-		TRACKS([80])
-		SECTORS([9])
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([1]))
-FLOPPY_OPTIONS_END
-
-static void enterprise_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 4; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_enterprise; break;
-
-		default:										floppy_device_getinfo(devclass, state, info); break;
-	}
-}
 static SYSTEM_CONFIG_START(ep64)
 	CONFIG_RAM_DEFAULT(64*1024)
-	CONFIG_DEVICE(enterprise_floppy_getinfo)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(ep128)
 	CONFIG_RAM_DEFAULT(128*1024)
-	CONFIG_DEVICE(enterprise_floppy_getinfo)
 SYSTEM_CONFIG_END
 
 

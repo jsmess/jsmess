@@ -248,6 +248,12 @@ static const mm58274c_interface compis_mm58274c_interface =
 	1   /*  first day of week */
 };
 
+static const floppy_config compis_floppy_config =
+{
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(compis)
+};
+
 static MACHINE_DRIVER_START( compis )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I80186, 8000000)	/* 8 MHz */
@@ -294,6 +300,8 @@ static MACHINE_DRIVER_START( compis )
 	MDRV_MM58274C_ADD("mm58274c", compis_mm58274c_interface)
 
 	MDRV_NEC765A_ADD("nec765", compis_fdc_interface)
+	
+	MDRV_FLOPPY_2_DRIVES_ADD(compis_floppy_config)
 MACHINE_DRIVER_END
 
 /***************************************************************************
@@ -307,24 +315,6 @@ ROM_START (compis)
      ROM_LOAD ("compis.rom", 0xf0000, 0x10000, CRC(89877688) SHA1(7daa1762f24e05472eafc025879da90fe61d0225))
 ROM_END
 
-static void compis_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_compis; break;
-
-		default:										floppy_device_getinfo(devclass, state, info); break;
-	}
-}
-
-static SYSTEM_CONFIG_START(compis)
-	CONFIG_DEVICE(compis_floppy_getinfo)
-SYSTEM_CONFIG_END
 
 /*   YEAR   NAME        PARENT  COMPAT MACHINE  INPUT   INIT    CONFIG  COMPANY     FULLNAME */
-COMP(1985,	compis,		0,		0,     compis,	compis,	compis,	compis,	"Telenova", "Compis" , GAME_NOT_WORKING)
+COMP(1985,	compis,		0,		0,     compis,	compis,	compis,	0,	"Telenova", "Compis" , GAME_NOT_WORKING)

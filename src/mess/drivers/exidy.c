@@ -340,6 +340,21 @@ static const cassette_config exidy_cassette_config =
 	CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED
 };
 
+static FLOPPY_OPTIONS_START(exidy)
+	FLOPPY_OPTION(exidy, "dsk", "Exidy disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([80])
+		SECTORS([9])
+		SECTOR_LENGTH([512])
+		FIRST_SECTOR_ID([1]))
+FLOPPY_OPTIONS_END
+
+static const floppy_config exidy_floppy_config =
+{
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(exidy)
+};
+
 static MACHINE_DRIVER_START( exidy )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 12638000/6)
@@ -387,6 +402,8 @@ static MACHINE_DRIVER_START( exidy )
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("rom")
 	MDRV_CARTSLOT_NOT_MANDATORY
+	
+	MDRV_FLOPPY_4_DRIVES_ADD(exidy_floppy_config)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( exidyd )
@@ -397,6 +414,8 @@ static MACHINE_DRIVER_START( exidyd )
 
 	MDRV_MACHINE_START( exidyd )
 	MDRV_MACHINE_RESET( exidyd )
+	
+	MDRV_FLOPPY_4_DRIVES_REMOVE()
 MACHINE_DRIVER_END
 
 static DRIVER_INIT( exidy )
@@ -410,7 +429,6 @@ static DRIVER_INIT( exidy )
   Game driver(s)
 
 ***************************************************************************/
-
 ROM_START(exidy)
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("exmo1-1.dat", 0xe000, 0x0800, CRC(ac924f67) SHA1(72fcad6dd1ed5ec0527f967604401284d0e4b6a1) ) /* monitor roms */
@@ -434,36 +452,7 @@ ROM_START(exidyd)
 	ROM_LOAD_OPTIONAL("bruce.dat",   0x0000, 0x0020, CRC(fae922cb) SHA1(470a86844cfeab0d9282242e03ff1d8a1b2238d1)) /* video prom */
 ROM_END
 
-static FLOPPY_OPTIONS_START(exidy)
-	FLOPPY_OPTION(exidy, "dsk", "Exidy disk image", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([2])
-		TRACKS([80])
-		SECTORS([9])
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([1]))
-FLOPPY_OPTIONS_END
-
-static void exidy_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 4; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_exidy; break;
-
-		default:										floppy_device_getinfo(devclass, state, info); break;
-	}
-}
-
-static SYSTEM_CONFIG_START(exidy)
-	CONFIG_DEVICE(exidy_floppy_getinfo)
-SYSTEM_CONFIG_END
-
-
 /*    YEAR  NAME    PARENT  COMPAT      MACHINE INPUT   INIT    CONFIG  COMPANY        FULLNAME */
-COMP(1979, exidy,   0,		0,	exidy,	exidy,	exidy,	exidy,	"Exidy Inc", "Sorcerer", 0 )
+COMP(1979, exidy,   0,		0,	exidy,	exidy,	exidy,	0,	"Exidy Inc", "Sorcerer", 0 )
 COMP(1979, exidyd,  exidy,	0,	exidyd,	exidy,	exidy,	0,	"Exidy Inc", "Sorcerer (Cassette only)", 0 )
 

@@ -637,8 +637,8 @@ static WRITE8_DEVICE_HANDLER( sf7000_ppi8255_c_w )
     */
 
 	/* floppy motor */
-	floppy_drive_set_motor_state(image_from_devtype_and_index(device->machine, IO_FLOPPY, 0), (data & 0x02) ? 0 : 1);
-	floppy_drive_set_ready_state(image_from_devtype_and_index(device->machine, IO_FLOPPY, 0), 1, 0);
+	floppy_drive_set_motor_state(floppy_get_device(device->machine, 0), (data & 0x02) ? 0 : 1);
+	floppy_drive_set_ready_state(floppy_get_device(device->machine, 0), 1, 0);
 
 	/* FDC terminal count */
 	nec765_tc_w(fdc, data & 0x04);
@@ -695,7 +695,8 @@ static const struct nec765_interface sf7000_nec765_interface =
 	DEVCB_LINE(sf7000_fdc_interrupt),
 	NULL,
 	NULL,
-	NEC765_RDY_PIN_CONNECTED
+	NEC765_RDY_PIN_CONNECTED,
+	{FLOPPY_0, NULL, NULL, NULL }
 };
 
 
@@ -710,7 +711,7 @@ static MACHINE_START( sf7000 )
 	TMS9928A_configure(&tms9928a_interface);
 
 	/* configure FDC */
-	floppy_drive_set_index_pulse_callback(image_from_devtype_and_index(machine, IO_FLOPPY, 0), sf7000_fdc_index_callback);
+	floppy_drive_set_index_pulse_callback(floppy_get_device(machine, 0), sf7000_fdc_index_callback);
 
 	/* configure memory banking */
 	memory_configure_bank(machine, 1, 0, 1, memory_region(machine, Z80_TAG), 0);
@@ -907,6 +908,21 @@ static MACHINE_DRIVER_START( sc3000 )
 	MDRV_CARTSLOT_LOAD(sc3000_cart)
 MACHINE_DRIVER_END
 
+static FLOPPY_OPTIONS_START(sf7000)
+	FLOPPY_OPTION(sf7000, "sf7", "SF7 disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([1])
+		TRACKS([40])
+		SECTORS([16])
+		SECTOR_LENGTH([256])
+		FIRST_SECTOR_ID([1]))
+FLOPPY_OPTIONS_END
+
+static const floppy_config sf7000_floppy_config =
+{
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(sf7000)
+};
+
 static MACHINE_DRIVER_START( sf7000 )
 	MDRV_DRIVER_DATA(sg1000_state)
 
@@ -944,6 +960,8 @@ static MACHINE_DRIVER_START( sf7000 )
 	MDRV_MSM8251_ADD("uart", default_msm8251_interface)
 
 	MDRV_NEC765A_ADD(NEC765_TAG, sf7000_nec765_interface)
+	
+	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, sf7000_floppy_config)
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -980,30 +998,6 @@ ROM_START( sf7000 )
 ROM_END
 
 /* System Configuration */
-static FLOPPY_OPTIONS_START(sf7000)
-	FLOPPY_OPTION(sf7000, "sf7", "SF7 disk image", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([1])
-		TRACKS([40])
-		SECTORS([16])
-		SECTOR_LENGTH([256])
-		FIRST_SECTOR_ID([1]))
-FLOPPY_OPTIONS_END
-
-static void sf7000_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_sf7000; break;
-
-		default:										floppy_device_getinfo(devclass, state, info); break;
-	}
-}
-
 static void sf7000_serial_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* serial */
@@ -1032,8 +1026,7 @@ static SYSTEM_CONFIG_START( sc3000 )
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START( sf7000 )
-	CONFIG_RAM_DEFAULT	(64 * 1024)
-	CONFIG_DEVICE(sf7000_floppy_getinfo)
+	CONFIG_RAM_DEFAULT	(64 * 1024)	
 	CONFIG_DEVICE(sf7000_serial_getinfo)
 SYSTEM_CONFIG_END
 

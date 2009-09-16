@@ -165,58 +165,6 @@ static const z80_daisy_chain osborne1_daisy_chain[] =
 	{ NULL }
 };
 
-
-static MACHINE_DRIVER_START( osborne1 )
-	MDRV_CPU_ADD( "maincpu", Z80, MAIN_CLOCK/4 )
-	MDRV_CPU_PROGRAM_MAP( osborne1_mem)
-	MDRV_CPU_IO_MAP( osborne1_io)
-	MDRV_CPU_CONFIG( osborne1_daisy_chain )
-
-	MDRV_MACHINE_RESET( osborne1 )
-
-	MDRV_DEVICE_ADD( "osborne1_daisy", OSBORNE1_DAISY, 0 )
-
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
-	MDRV_SCREEN_RAW_PARAMS( MAIN_CLOCK/2, 512, 0, 416, 260, 0, 240 )
-	MDRV_VIDEO_START( generic_bitmapped )
-	MDRV_VIDEO_UPDATE( generic_bitmapped )
-	MDRV_PALETTE_LENGTH( 3 )
-	MDRV_PALETTE_INIT( osborne1 )
-
-	MDRV_SPEAKER_STANDARD_MONO( "mono" )
-	MDRV_SOUND_ADD( "beep", BEEP, 0 )
-	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
-	
-	MDRV_PIA6821_ADD( "pia_0", osborne1_ieee_pia_config )
-	MDRV_PIA6821_ADD( "pia_1", osborne1_video_pia_config )
-
-	MDRV_MB8877_ADD("mb8877", default_wd17xx_interface )
-	
-MACHINE_DRIVER_END
-
-
-ROM_START( osborne1 )
-	ROM_REGION(0x1000, "maincpu", 0)
-	ROM_SYSTEM_BIOS( 0, "ver144", "BIOS version 1.44" )
-	ROMX_LOAD( "osb144.bin", 0x0000, 0x1000, CRC(c0596b14) SHA1(ee6a9cc9be3ddc5949d3379351c1d58a175ce9ac), ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS( 1, "verA", "BIOS version A" )
-	ROMX_LOAD( "osba.bin", 0x0000, 0x1000, NO_DUMP, ROM_BIOS(2) )
-	ROM_SYSTEM_BIOS( 2, "ver12", "BIOS version 1.2" )
-	ROMX_LOAD( "osb12.bin", 0x0000, 0x1000, NO_DUMP, ROM_BIOS(3) )
-	ROM_SYSTEM_BIOS( 3, "ver121", "BIOS version 1.2.1" )
-	ROMX_LOAD( "osb121.bin", 0x0000, 0x1000, NO_DUMP, ROM_BIOS(4) )
-	ROM_SYSTEM_BIOS( 4, "ver13", "BIOS version 1.3" )
-	ROMX_LOAD( "osb13.bin", 0x0000, 0x1000, NO_DUMP, ROM_BIOS(5) )
-	ROM_SYSTEM_BIOS( 5, "ver14", "BISO version 1.4" )
-	ROMX_LOAD( "osb14.bin", 0x0000, 0x1000, NO_DUMP, ROM_BIOS(6) )
-	ROM_SYSTEM_BIOS( 6, "ver143", "BIOS version 1.43" )
-	ROMX_LOAD( "osb143.bin", 0x0000, 0x1000, NO_DUMP, ROM_BIOS(7) )
-	ROM_REGION( 0x800, "gfx1", 0 )
-	ROM_LOAD( "osbchr.bin", 0x0000, 0x800, BAD_DUMP CRC(6c1eab0d) SHA1(b04459d377a70abc9155a5486003cb795342c801) )
-ROM_END
-
-/* System Configuration */
 /*
  * The Osborne-1 supports the following disc formats:
  * - Osborne single density: 40 tracks, 10 sectors per track, 256-byte sectors (100 KByte)
@@ -259,23 +207,65 @@ FLOPPY_OPTIONS_START(osborne1 )
 		FIRST_SECTOR_ID([1]))					
 FLOPPY_OPTIONS_END
 
-static void osborne1_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+static const floppy_config osborne1_floppy_config =
 {
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
+	FLOPPY_DRIVE_SS_40,
+	FLOPPY_OPTIONS_NAME(osborne1)
+};
 
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_osborne1; break;
+static MACHINE_DRIVER_START( osborne1 )
+	MDRV_CPU_ADD( "maincpu", Z80, MAIN_CLOCK/4 )
+	MDRV_CPU_PROGRAM_MAP( osborne1_mem)
+	MDRV_CPU_IO_MAP( osborne1_io)
+	MDRV_CPU_CONFIG( osborne1_daisy_chain )
 
-		default:										floppy_device_getinfo(devclass, state, info); break;
-	}
-}
+	MDRV_MACHINE_RESET( osborne1 )
 
+	MDRV_DEVICE_ADD( "osborne1_daisy", OSBORNE1_DAISY, 0 )
+
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
+	MDRV_SCREEN_RAW_PARAMS( MAIN_CLOCK/2, 512, 0, 416, 260, 0, 240 )
+	MDRV_VIDEO_START( generic_bitmapped )
+	MDRV_VIDEO_UPDATE( generic_bitmapped )
+	MDRV_PALETTE_LENGTH( 3 )
+	MDRV_PALETTE_INIT( osborne1 )
+
+	MDRV_SPEAKER_STANDARD_MONO( "mono" )
+	MDRV_SOUND_ADD( "beep", BEEP, 0 )
+	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
+	
+	MDRV_PIA6821_ADD( "pia_0", osborne1_ieee_pia_config )
+	MDRV_PIA6821_ADD( "pia_1", osborne1_video_pia_config )
+
+	MDRV_MB8877_ADD("mb8877", default_wd17xx_interface_2_drives )
+	
+	MDRV_FLOPPY_2_DRIVES_ADD(osborne1_floppy_config)	
+MACHINE_DRIVER_END
+
+
+ROM_START( osborne1 )
+	ROM_REGION(0x1000, "maincpu", 0)
+	ROM_SYSTEM_BIOS( 0, "ver144", "BIOS version 1.44" )
+	ROMX_LOAD( "osb144.bin", 0x0000, 0x1000, CRC(c0596b14) SHA1(ee6a9cc9be3ddc5949d3379351c1d58a175ce9ac), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "verA", "BIOS version A" )
+	ROMX_LOAD( "osba.bin", 0x0000, 0x1000, NO_DUMP, ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS( 2, "ver12", "BIOS version 1.2" )
+	ROMX_LOAD( "osb12.bin", 0x0000, 0x1000, NO_DUMP, ROM_BIOS(3) )
+	ROM_SYSTEM_BIOS( 3, "ver121", "BIOS version 1.2.1" )
+	ROMX_LOAD( "osb121.bin", 0x0000, 0x1000, NO_DUMP, ROM_BIOS(4) )
+	ROM_SYSTEM_BIOS( 4, "ver13", "BIOS version 1.3" )
+	ROMX_LOAD( "osb13.bin", 0x0000, 0x1000, NO_DUMP, ROM_BIOS(5) )
+	ROM_SYSTEM_BIOS( 5, "ver14", "BISO version 1.4" )
+	ROMX_LOAD( "osb14.bin", 0x0000, 0x1000, NO_DUMP, ROM_BIOS(6) )
+	ROM_SYSTEM_BIOS( 6, "ver143", "BIOS version 1.43" )
+	ROMX_LOAD( "osb143.bin", 0x0000, 0x1000, NO_DUMP, ROM_BIOS(7) )
+	ROM_REGION( 0x800, "gfx1", 0 )
+	ROM_LOAD( "osbchr.bin", 0x0000, 0x800, BAD_DUMP CRC(6c1eab0d) SHA1(b04459d377a70abc9155a5486003cb795342c801) )
+ROM_END
+
+/* System Configuration */
 static SYSTEM_CONFIG_START( osborne1 )
-	CONFIG_DEVICE( osborne1_floppy_getinfo )
 	CONFIG_RAM_DEFAULT( 68 * 1024 )		/* 64KB Main RAM and 4Kbit video attribute RAM */
 SYSTEM_CONFIG_END
 

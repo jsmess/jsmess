@@ -459,6 +459,12 @@ static const mm58274c_interface floppy_mm58274c_interface =
 	0   /*  first day of week */
 };
 
+static const floppy_config geneve_floppy_config =
+{
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(ti99)
+};
+
 static MACHINE_DRIVER_START(geneve_60hz)
 	/* basic machine hardware */
 	/* TMS9995 CPU @ 12.0 MHz */
@@ -510,6 +516,8 @@ static MACHINE_DRIVER_START(geneve_60hz)
 	MDRV_TMS9902_ADD("tms9902_1", tms9902_params_1)
 	
 	MDRV_WD179X_ADD("wd179x", ti99_wd17xx_interface )
+	
+	MDRV_FLOPPY_4_DRIVES_ADD(geneve_floppy_config)
 MACHINE_DRIVER_END
 
 
@@ -560,23 +568,6 @@ ROM_START(genmod)
 	ROM_LOAD_OPTIONAL("spchrom.bin", 0x0000, 0x8000, CRC(58b155f7) SHA1(382292295c00dff348d7e17c5ce4da12a1d87763)) /* system speech ROM */
 ROM_END
 
-static void geneve_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 4; break;
-
-		/* Used within mflopimg.c. */
-                case MESS_DEVINFO_INT_KEEP_DRIVE_GEOMETRY:                                  info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_ti99; break;
-
-		default:										floppy_device_getinfo(devclass, state, info); break;
-	}
-}
 
 static void geneve_parallel_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
@@ -642,8 +633,7 @@ static void geneve_memcard_getinfo(const mess_device_class *devclass, UINT32 sta
 	}
 }
 
-static SYSTEM_CONFIG_START(geneve)
-	CONFIG_DEVICE(geneve_floppy_getinfo)
+static SYSTEM_CONFIG_START(geneve)	
 	CONFIG_DEVICE(geneve_parallel_getinfo)
 	CONFIG_DEVICE(geneve_serial_getinfo)
 	CONFIG_DEVICE(geneve_memcard_getinfo)

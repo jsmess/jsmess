@@ -190,7 +190,11 @@ INLINE i8271_t *get_safe_token(const device_config *device)
 static const device_config *current_image(const device_config *device)
 {
 	i8271_t *i8271 = get_safe_token(device);
-	return image_from_devtype_and_index(device->machine, IO_FLOPPY, i8271->drive);
+	if (i8271->intf->floppy_drive_tags[i8271->drive]!=NULL) {
+		return devtag_get_device(device->machine,i8271->intf->floppy_drive_tags[i8271->drive]);
+	} else {
+		return NULL;
+	}	
 }
 
 
@@ -1074,14 +1078,19 @@ static void i8271_command_execute(const device_config *device)
 			status |= (1<<2) | (1<<6);
 
 			/* these two do not appear to be set at all! ?? */
-			if (floppy_drive_get_flag_state(image_from_devtype_and_index(img->machine, IO_FLOPPY, 0), FLOPPY_DRIVE_READY))
-			{
-				status |= (1<<2);
+			
+			if (i8271->intf->floppy_drive_tags[0]!=NULL) {
+				if (floppy_drive_get_flag_state(devtag_get_device(device->machine,i8271->intf->floppy_drive_tags[0]), FLOPPY_DRIVE_READY))
+				{
+					status |= (1<<2);
+				}
 			}
 
-			if (floppy_drive_get_flag_state(image_from_devtype_and_index(img->machine, IO_FLOPPY, 1), FLOPPY_DRIVE_READY))
-			{
-				status |= (1<<6);
+			if (i8271->intf->floppy_drive_tags[1]!=NULL) {
+				if (floppy_drive_get_flag_state(devtag_get_device(device->machine,i8271->intf->floppy_drive_tags[1]), FLOPPY_DRIVE_READY))
+				{
+					status |= (1<<6);
+				}
 			}
 
 			/* bit 3 = 1 if write protected */

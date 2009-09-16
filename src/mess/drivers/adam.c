@@ -625,6 +625,12 @@ static MACHINE_RESET( adam )
 	timer_pulse(machine, ATTOTIME_IN_MSEC(20), NULL, 0, adam_paddle_callback);
 }
 
+static const floppy_config adam_floppy_config =
+{
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(adam)
+};
+
 static MACHINE_DRIVER_START( adam )
 	/* Machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3579545)       /* 3.579545 MHz */
@@ -654,6 +660,8 @@ static MACHINE_DRIVER_START( adam )
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("rom,col,bin")
 	MDRV_CARTSLOT_NOT_MANDATORY
+	
+	MDRV_FLOPPY_4_DRIVES_ADD(adam_floppy_config)	
 MACHINE_DRIVER_END
 
 
@@ -696,24 +704,6 @@ ROM_START (adam)
 	//ROM_LOAD ("master68.rom", 0x0100, 0x0E4, CRC(619a47b8)) /* Replacement 6801 Master ROM */
 ROM_END
 
-static void adam_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 4; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_adam; break;
-
-		default:										floppy_device_getinfo(devclass, state, info); break;
-	}
-}
-
-static SYSTEM_CONFIG_START(adam)
-	CONFIG_DEVICE(adam_floppy_getinfo)
-SYSTEM_CONFIG_END
 
 /***************************************************************************
 
@@ -722,5 +712,5 @@ SYSTEM_CONFIG_END
 ***************************************************************************/
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY FULLNAME */
-COMP( 1982, adam,   0,		coleco,	adam,   adam,   0,		adam,	"Coleco", "Adam" , 0)
+COMP( 1982, adam,   0,		coleco,	adam,   adam,   0,		0,	"Coleco", "Adam" , 0)
 

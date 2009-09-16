@@ -66,7 +66,7 @@ static WD17XX_CALLBACK( nascom2_fdc_callback )
 }
 
 
-const wd17xx_interface nascom2_wd17xx_interface = { nascom2_fdc_callback, NULL };
+const wd17xx_interface nascom2_wd17xx_interface = { nascom2_fdc_callback, NULL, {FLOPPY_0,FLOPPY_1,FLOPPY_2,FLOPPY_3} };
 
 
 READ8_HANDLER( nascom2_fdc_select_r )

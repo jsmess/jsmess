@@ -144,7 +144,9 @@ static WD17XX_CALLBACK( fdc_callback );
 
 static const wd17xx_interface coco_wd17xx_interface =
 {
-	fdc_callback
+	fdc_callback,
+	NULL,
+	{FLOPPY_0,FLOPPY_1,FLOPPY_2,FLOPPY_3}
 };
 
 

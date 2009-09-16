@@ -412,6 +412,12 @@ static const kr2376_interface lx388_kr2376_interface =
 	NULL
 };
 
+static const floppy_config z80netf_floppy_config =
+{
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(z80ne)
+};
+
 static MACHINE_DRIVER_START( z80ne )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("z80ne", Z80, Z80NE_CPU_SPEED_HZ)
@@ -510,6 +516,7 @@ static MACHINE_DRIVER_START( z80netf )
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
 
 	MDRV_WD1771_ADD("wd1771", default_wd17xx_interface)
+	MDRV_FLOPPY_4_DRIVES_ADD(z80netf_floppy_config)	
 
 	MDRV_DEFAULT_LAYOUT(layout_z80netf)
 MACHINE_DRIVER_END
@@ -587,43 +594,8 @@ static SYSTEM_CONFIG_START( z80netb )
 	CONFIG_RAM( 1 * 1024 )
 SYSTEM_CONFIG_END
 
-
-static void z80netf_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:			info->i = 4; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:	info->p = (void *) floppyoptions_z80ne; break;
-
-		case MESS_DEVINFO_STR_NAME+0:						strcpy(info->s = device_temp_str(), "floppydisk0"); break;
-		case MESS_DEVINFO_STR_NAME+1:						strcpy(info->s = device_temp_str(), "floppydisk1"); break;
-		case MESS_DEVINFO_STR_NAME+2:						strcpy(info->s = device_temp_str(), "floppydisk2"); break;
-		case MESS_DEVINFO_STR_NAME+3:						strcpy(info->s = device_temp_str(), "floppydisk3"); break;
-		case MESS_DEVINFO_STR_SHORT_NAME+0:					strcpy(info->s = device_temp_str(), "flop0"); break;
-		case MESS_DEVINFO_STR_SHORT_NAME+1:					strcpy(info->s = device_temp_str(), "flop1"); break;
-		case MESS_DEVINFO_STR_SHORT_NAME+2:					strcpy(info->s = device_temp_str(), "flop2"); break;
-		case MESS_DEVINFO_STR_SHORT_NAME+3:					strcpy(info->s = device_temp_str(), "flop3"); break;
-		case MESS_DEVINFO_STR_DESCRIPTION+0:					strcpy(info->s = device_temp_str(), "Floppy #0"); break;
-		case MESS_DEVINFO_STR_DESCRIPTION+1:					strcpy(info->s = device_temp_str(), "Floppy #1"); break;
-		case MESS_DEVINFO_STR_DESCRIPTION+2:					strcpy(info->s = device_temp_str(), "Floppy #2"); break;
-		case MESS_DEVINFO_STR_DESCRIPTION+3:					strcpy(info->s = device_temp_str(), "Floppy #3"); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:		strcpy(info->s = device_temp_str(), "zmk"); break;
-
-		default:					floppy_device_getinfo(devclass, state, info); break;
-	}
-}
-
-
 static SYSTEM_CONFIG_START( z80netf )
 	CONFIG_RAM_DEFAULT( 56 * 1024 )
-	CONFIG_DEVICE(z80netf_floppy_getinfo)
 SYSTEM_CONFIG_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT     CONFIG   COMPANY               FULLNAME                      FLAGS */

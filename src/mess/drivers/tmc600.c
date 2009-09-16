@@ -312,6 +312,15 @@ static const cassette_config tmc600_cassette_config =
 	NULL,
 	CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED
 };
+static FLOPPY_OPTIONS_START(tmc600)
+	// dsk
+FLOPPY_OPTIONS_END
+
+static const floppy_config tmc600_floppy_config =
+{
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(tmc600)
+};
 
 static MACHINE_DRIVER_START( tmc600 )
 	MDRV_DRIVER_DATA(tmc600_state)
@@ -335,6 +344,8 @@ static MACHINE_DRIVER_START( tmc600 )
 
 	/* cassette */
 	MDRV_CASSETTE_ADD(CASSETTE_TAG, tmc600_cassette_config)
+	
+	MDRV_FLOPPY_4_DRIVES_ADD(tmc600_floppy_config)	
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -364,30 +375,10 @@ ROM_START( tmc600s2 )
 ROM_END
 
 /* System Configuration */
-static FLOPPY_OPTIONS_START(tmc600)
-	// dsk
-FLOPPY_OPTIONS_END
-
-static void tmc600_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 4; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_tmc600; break;
-
-		default:										floppy_device_getinfo(devclass, state, info); break;
-	}
-}
-
 static SYSTEM_CONFIG_START( tmc600 )
 	CONFIG_RAM_DEFAULT	( 8 * 1024)
 	CONFIG_RAM			(16 * 1024)
 	CONFIG_RAM			(24 * 1024)
-	CONFIG_DEVICE(tmc600_floppy_getinfo)
 SYSTEM_CONFIG_END
 
 /* System Drivers */

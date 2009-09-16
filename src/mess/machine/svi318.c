@@ -330,7 +330,7 @@ static WD17XX_CALLBACK( svi_fdc_callback )
 	}
 }
 
-const wd17xx_interface svi_wd17xx_interface = { svi_fdc_callback, NULL };
+const wd17xx_interface svi_wd17xx_interface = { svi_fdc_callback, NULL, {FLOPPY_0,FLOPPY_1,NULL,NULL} };
 
 static WRITE8_HANDLER( svi318_fdc_drive_motor_w )
 {
@@ -608,7 +608,7 @@ MACHINE_START( svi318_pal )
 static void svi318_load_proc(const device_config *image)
 {
 	int size;
-	int id = image_index_in_device(image);
+	int id = floppy_get_drive(image);
 
 	size = image_length (image);
 
@@ -637,7 +637,7 @@ MACHINE_RESET( svi318 )
 	
 	for(drive=0;drive<2;drive++)
 	{
-		floppy_install_load_proc(image_from_devtype_and_index(machine, IO_FLOPPY, drive), svi318_load_proc);
+		floppy_install_load_proc(floppy_get_device(machine, drive), svi318_load_proc);
 	}
 }
 

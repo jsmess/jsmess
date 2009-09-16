@@ -1792,6 +1792,12 @@ static DEVICE_IMAGE_LOAD( atarist_cart )
 	return INIT_FAIL;
 }
 
+static const floppy_config atarist_floppy_config =
+{
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(atarist)
+};
+
 static MACHINE_DRIVER_START( atarist_cartslot )
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("stc")
@@ -1839,6 +1845,8 @@ static MACHINE_DRIVER_START( atarist )
 	MDRV_ACIA6850_ADD("acia_1", acia_midi_intf)
 
 	MDRV_WD1772_ADD(WD1772_TAG, atarist_wd17xx_interface )
+	
+	MDRV_FLOPPY_2_DRIVES_ADD(atarist_floppy_config)
 
 	MDRV_IMPORT_FROM(atarist_cartslot)
 MACHINE_DRIVER_END
@@ -1901,6 +1909,8 @@ static MACHINE_DRIVER_START( atariste )
 	MDRV_ACIA6850_ADD("acia_1", acia_midi_intf)
 
 	MDRV_WD1772_ADD(WD1772_TAG, atarist_wd17xx_interface )
+	
+	MDRV_FLOPPY_2_DRIVES_ADD(atarist_floppy_config)
 
 	MDRV_IMPORT_FROM(atarist_cartslot)
 MACHINE_DRIVER_END
@@ -1957,6 +1967,8 @@ static MACHINE_DRIVER_START( stbook )
 	MDRV_ACIA6850_ADD("acia_1", acia_midi_intf)
 
 	MDRV_WD1772_ADD(WD1772_TAG, atarist_wd17xx_interface )
+	
+	MDRV_FLOPPY_2_DRIVES_ADD(atarist_floppy_config)
 
 	MDRV_IMPORT_FROM(atarist_cartslot)
 MACHINE_DRIVER_END
@@ -2099,20 +2111,6 @@ ROM_START( falcon40 )
 ROM_END
 
 /* System Configuration */
-static void atarist_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_atarist; break;
-
-		default:										floppy_device_getinfo(devclass, state, info); break;
-	}
-}
 static DEVICE_IMAGE_LOAD( atarist_serial )
 {
 	/* filename specified */
@@ -2174,7 +2172,6 @@ static SYSTEM_CONFIG_START( atarist )
 	CONFIG_RAM_DEFAULT(1024 * 1024) // 1040ST
 	CONFIG_RAM		  ( 512 * 1024) //  520ST
 	CONFIG_RAM		  ( 256 * 1024) //  260ST
-	CONFIG_DEVICE(atarist_floppy_getinfo)
 	CONFIG_DEVICE(atarist_serial_getinfo)
 	// MIDI
 SYSTEM_CONFIG_END
@@ -2183,7 +2180,6 @@ static SYSTEM_CONFIG_START( megast )
 	CONFIG_RAM_DEFAULT(4096 * 1024) // Mega ST 4
 	CONFIG_RAM		  (2048 * 1024) // Mega ST 2
 	CONFIG_RAM		  (1024 * 1024) // Mega ST 1
-	CONFIG_DEVICE(atarist_floppy_getinfo)
 	CONFIG_DEVICE(atarist_serial_getinfo)
 	// MIDI
 SYSTEM_CONFIG_END
@@ -2191,7 +2187,6 @@ SYSTEM_CONFIG_END
 static SYSTEM_CONFIG_START( atariste )
 	CONFIG_RAM_DEFAULT(1024 * 1024) // 1040STe
 	CONFIG_RAM		  ( 512 * 1024) //  520STe
-	CONFIG_DEVICE(atarist_floppy_getinfo)
 	CONFIG_DEVICE(atarist_serial_getinfo)
 	// MIDI
 SYSTEM_CONFIG_END
@@ -2200,7 +2195,6 @@ static SYSTEM_CONFIG_START( megaste )
 	CONFIG_RAM_DEFAULT(4096 * 1024) // Mega STe 4
 	CONFIG_RAM		  (2048 * 1024) // Mega STe 2
 	CONFIG_RAM		  (1024 * 1024) // Mega STe 1
-	CONFIG_DEVICE(atarist_floppy_getinfo)
 	CONFIG_DEVICE(megaste_serial_getinfo)
 	// MIDI
 	// LAN
@@ -2209,7 +2203,6 @@ SYSTEM_CONFIG_END
 static SYSTEM_CONFIG_START( stbook )
 	CONFIG_RAM_DEFAULT(4096 * 1024)
 	CONFIG_RAM		  (1024 * 1024)
-	CONFIG_DEVICE(atarist_floppy_getinfo)
 	CONFIG_DEVICE(megaste_serial_getinfo)
 	// MIDI
 	// IDE Hard Disk

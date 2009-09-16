@@ -472,7 +472,7 @@ MACHINE_RESET( osborne1 )
 
 	for(drive=0;drive<2;drive++)
 	{
-		floppy_install_load_proc(image_from_devtype_and_index(machine, IO_FLOPPY, drive), osborne1_load_proc);
+		floppy_install_load_proc(floppy_get_device(machine, drive), osborne1_load_proc);
 	}
 	
 	memory_set_direct_update_handler( space, osborne1_opbase );

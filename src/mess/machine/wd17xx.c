@@ -322,7 +322,11 @@ static void wd17xx_set_irq(const device_config *device);
 static const device_config *wd17xx_current_image(const device_config *device)
 {
 	wd17xx_t *w = get_safe_token(device);
-	return image_from_devtype_and_index(device->machine, IO_FLOPPY, w->current_drive);
+	if (w->intf->floppy_drive_tags[w->current_drive]!=NULL) {
+		return devtag_get_device(device->machine,w->intf->floppy_drive_tags[w->current_drive]);
+	} else {
+		return NULL;
+	}
 }
 
 
@@ -393,7 +397,7 @@ static void wd17xx_restore(const device_config *device)
 	UINT8 step_counter;
 	wd17xx_t *w = get_safe_token(device);
 
-	if (w->current_drive >= device_count(device->machine, IO_FLOPPY))
+	if (w->current_drive >= 1)
 		return;
 
 	step_counter = 255;
@@ -892,7 +896,7 @@ static void wd17xx_complete_command(const device_config *device, int delay)
 
 	usecs = 12;
 
-	/* set new timer */
+	/* set new timer */	
 	timer_adjust_oneshot(w->timer, ATTOTIME_IN_USEC(usecs), MISCCALLBACK_COMMAND);
 }
 
@@ -1700,7 +1704,8 @@ WRITE8_DEVICE_HANDLER( wd17xx_w )
 	}
 }
 
-const wd17xx_interface default_wd17xx_interface = { NULL, NULL };
+const wd17xx_interface default_wd17xx_interface = { NULL, NULL, { FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3} };
+const wd17xx_interface default_wd17xx_interface_2_drives = { NULL, NULL, { FLOPPY_0, FLOPPY_1, NULL, NULL} };
 
 /* device interface */
 static void common_start(const device_config *device, wd17xx_type_t device_type)
@@ -1728,12 +1733,14 @@ static DEVICE_RESET( wd17xx )
 	wd17xx_t *w = get_safe_token(device);
 	int i;
 
-	for (i = 0; i < device_count(device->machine, IO_FLOPPY); i++)
+	for (i = 0; i < 4; i++)
 	{
-		const device_config *img = image_from_devtype_and_index(device->machine, IO_FLOPPY, i);
-		floppy_drive_set_controller(img,device);
-		floppy_drive_set_index_pulse_callback(img, wd17xx_index_pulse_callback);
-		floppy_drive_set_rpm( img, 300.);
+		const device_config *img = devtag_get_device(device->machine,w->intf->floppy_drive_tags[w->current_drive]);
+		if (img!=NULL) {
+			floppy_drive_set_controller(img,device);
+			floppy_drive_set_index_pulse_callback(img, wd17xx_index_pulse_callback);
+			floppy_drive_set_rpm( img, 300.);
+		}
 	}
 
 	w->current_drive = 0;

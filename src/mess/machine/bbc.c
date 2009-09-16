@@ -1489,7 +1489,8 @@ static void	bbc_i8271_interrupt(const device_config *device, int state)
 const i8271_interface bbc_i8271_interface=
 {
 	bbc_i8271_interrupt,
-    NULL
+    NULL,
+	{FLOPPY_0, FLOPPY_1}
 };
 
 
@@ -1655,7 +1656,8 @@ static WD17XX_CALLBACK( bbc_wd177x_callback)
 
 const wd17xx_interface bbc_wd17xx_interface = {
 	bbc_wd177x_callback,
-	NULL
+	NULL,
+	{FLOPPY_0,FLOPPY_1,NULL,NULL}
 };
 
 static WRITE8_HANDLER(bbc_wd177x_status_w)

@@ -131,7 +131,7 @@ static hfdc_t hfdc[MAX_HFDC];
 */
 static int floppy_read_id(running_machine *machine,int which, int disk_unit, int head)
 {
-	const device_config *disk_img = image_from_devtype_and_index(machine, IO_FLOPPY, disk_unit);
+	const device_config *disk_img = floppy_get_device(machine, disk_unit);
 	UINT8 revolution_count;
 	chrn_id id;
 
@@ -163,7 +163,7 @@ static int floppy_read_id(running_machine *machine,int which, int disk_unit, int
 */
 static int floppy_find_sector(running_machine *machine,int which, int disk_unit, int cylinder, int head, int check_secnum, int sector, int *sector_data_id, int *sector_len)
 {
-	const device_config *disk_img = image_from_devtype_and_index(machine, IO_FLOPPY, disk_unit);
+	const device_config *disk_img = floppy_get_device(machine, disk_unit);
 	UINT8 revolution_count;
 	chrn_id id;
 
@@ -207,7 +207,7 @@ static int smc92x4_floppy_read_sector(running_machine *machine,int which, int di
 	int sector_data_id, sector_len;
 	UINT8 buf[MAX_SECTOR_LEN];
 	int i;
-	const device_config *disk_img = image_from_devtype_and_index(machine, IO_FLOPPY, disk_unit);
+	const device_config *disk_img = floppy_get_device(machine, disk_unit);
 
 	if (! floppy_find_sector(machine,which, disk_unit, cylinder, head, check_secnum, sector, & sector_data_id, & sector_len))
 	{
@@ -229,7 +229,7 @@ static int smc92x4_floppy_write_sector(running_machine *machine,int which, int d
 	int sector_data_id, sector_len;
 	UINT8 buf[MAX_SECTOR_LEN];
 	int i;
-	const device_config *disk_img = image_from_devtype_and_index(machine, IO_FLOPPY, disk_unit);
+	const device_config *disk_img = floppy_get_device(machine, disk_unit);
 
 	if (! floppy_find_sector(machine,which, disk_unit, cylinder, head, check_secnum, sector, & sector_data_id, & sector_len))
 	{
@@ -248,13 +248,13 @@ static int smc92x4_floppy_write_sector(running_machine *machine,int which, int d
 
 static void floppy_step(running_machine *machine,int which, int disk_unit, int direction)
 {
-	const device_config *disk_img = image_from_devtype_and_index(machine, IO_FLOPPY, disk_unit);
+	const device_config *disk_img = floppy_get_device(machine, disk_unit);
 	floppy_drive_seek(disk_img, direction);
 }
 
 static UINT8 floppy_get_disk_status(running_machine *machine,int which, int disk_unit)
 {
-	const device_config *disk_img = image_from_devtype_and_index(machine, IO_FLOPPY, disk_unit);
+	const device_config *disk_img = floppy_get_device(machine, disk_unit);
 	int status = floppy_status(disk_img, -1);
 	int reply;
 

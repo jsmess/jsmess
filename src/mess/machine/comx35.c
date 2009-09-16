@@ -213,7 +213,7 @@ static WD17XX_CALLBACK( comx35_fdc_callback )
 	}
 }
 
-const wd17xx_interface comx35_wd17xx_interface = { comx35_fdc_callback, NULL };
+const wd17xx_interface comx35_wd17xx_interface = { comx35_fdc_callback, NULL, {FLOPPY_0,FLOPPY_1,FLOPPY_2,FLOPPY_3} };
 
 static UINT8 fdc_r(const address_space *space)
 {

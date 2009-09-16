@@ -275,35 +275,6 @@ static INPUT_PORTS_START( dgnbeta )
 INPUT_PORTS_END
 
 
-static void dgnbeta_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:			info->i = 4; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:	info->p = (void *) floppyoptions_coco; break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_NAME+0:		strcpy(info->s = device_temp_str(), "floppydisk0"); break;
-		case MESS_DEVINFO_STR_NAME+1:		strcpy(info->s = device_temp_str(), "floppydisk1"); break;
-		case MESS_DEVINFO_STR_NAME+2:		strcpy(info->s = device_temp_str(), "floppydisk2"); break;
-		case MESS_DEVINFO_STR_NAME+3:		strcpy(info->s = device_temp_str(), "floppydisk3"); break;
-		case MESS_DEVINFO_STR_SHORT_NAME+0:		strcpy(info->s = device_temp_str(), "flop0"); break;
-		case MESS_DEVINFO_STR_SHORT_NAME+1:		strcpy(info->s = device_temp_str(), "flop1"); break;
-		case MESS_DEVINFO_STR_SHORT_NAME+2:		strcpy(info->s = device_temp_str(), "flop2"); break;
-		case MESS_DEVINFO_STR_SHORT_NAME+3:		strcpy(info->s = device_temp_str(), "flop3"); break;
-		case MESS_DEVINFO_STR_DESCRIPTION+0:	strcpy(info->s = device_temp_str(), "Floppy #0"); break;
-		case MESS_DEVINFO_STR_DESCRIPTION+1:	strcpy(info->s = device_temp_str(), "Floppy #1"); break;
-		case MESS_DEVINFO_STR_DESCRIPTION+2:	strcpy(info->s = device_temp_str(), "Floppy #2"); break;
-		case MESS_DEVINFO_STR_DESCRIPTION+3:	strcpy(info->s = device_temp_str(), "Floppy #3"); break;
-
-		default:										floppy_device_getinfo(devclass, state, info); break;
-	}
-}
-
 static PALETTE_INIT( dgnbeta )
 {
 	int i;
@@ -312,6 +283,12 @@ static PALETTE_INIT( dgnbeta )
 		palette_set_color_rgb(machine, i, dgnbeta_palette[i*3], dgnbeta_palette[i*3+1], dgnbeta_palette[i*3+2]);
 	}
 }
+
+static const floppy_config dgnbeta_floppy_config =
+{
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(coco)
+};
 
 static MACHINE_DRIVER_START( dgnbeta )
 	/* basic machine hardware */
@@ -344,6 +321,8 @@ static MACHINE_DRIVER_START( dgnbeta )
 	MDRV_PIA6821_ADD( "pia_2", dgnbeta_pia_intf[2] )
 
 	MDRV_WD179X_ADD("wd179x", dgnbeta_wd17xx_interface )	
+	
+	MDRV_FLOPPY_4_DRIVES_ADD(dgnbeta_floppy_config)
 MACHINE_DRIVER_END
 
 ROM_START(dgnbeta)
@@ -373,7 +352,6 @@ static SYSTEM_CONFIG_START(dgnbeta)
 	CONFIG_RAM(512 * 1024)
 	CONFIG_RAM(640 * 1024)
 	CONFIG_RAM(768 * 1024)
-	CONFIG_DEVICE( dgnbeta_floppy_getinfo )
 SYSTEM_CONFIG_END
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    CONFIG      COMPANY             FULLNAME                    FLAGS */

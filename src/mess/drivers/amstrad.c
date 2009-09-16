@@ -138,7 +138,8 @@ static const nec765_interface amstrad_nec765_interface =
 	DEVCB_NULL,
 	NULL,
 	NULL,
-	NEC765_RDY_PIN_CONNECTED
+	NEC765_RDY_PIN_CONNECTED,
+	{FLOPPY_0,FLOPPY_1, NULL, NULL}
 };
 
 /* Aleste uses an 8272A, with the interrupt flag visible on PPI port B */
@@ -147,7 +148,8 @@ static const nec765_interface aleste_8272_interface =
 	DEVCB_LINE(aleste_interrupt),
 	NULL,
 	NULL,
-	NEC765_RDY_PIN_CONNECTED
+	NEC765_RDY_PIN_CONNECTED,
+	{FLOPPY_0,FLOPPY_1, NULL, NULL}
 };
 
 
@@ -835,6 +837,18 @@ static const cassette_config amstrad_cassette_config =
 	CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED
 };
 
+static const floppy_config cpc6128_floppy_config =
+{
+	FLOPPY_DRIVE_SS_40,
+	FLOPPY_OPTIONS_NAME(dsk)
+};
+
+static const floppy_config aleste_floppy_config =
+{
+	FLOPPY_DRIVE_SS_40,
+	FLOPPY_OPTIONS_NAME(msx)
+};
+
 static MACHINE_DRIVER_START( cpcplus_cartslot )
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("cpr,bin")
@@ -886,6 +900,8 @@ static MACHINE_DRIVER_START( amstrad )
 	MDRV_CASSETTE_ADD( "cassette", amstrad_cassette_config )
 
 	MDRV_NEC765A_ADD("nec765", amstrad_nec765_interface)
+	
+	MDRV_FLOPPY_2_DRIVES_ADD(cpc6128_floppy_config)
 MACHINE_DRIVER_END
 
 
@@ -944,6 +960,8 @@ static MACHINE_DRIVER_START( cpcplus )
 	MDRV_NEC765A_ADD("nec765", amstrad_nec765_interface)
 
 	MDRV_IMPORT_FROM(cpcplus_cartslot)
+	
+	MDRV_FLOPPY_2_DRIVES_ADD(cpc6128_floppy_config)
 MACHINE_DRIVER_END
 
 
@@ -996,6 +1014,8 @@ static MACHINE_DRIVER_START( aleste )
 	MDRV_PALETTE_INIT(aleste)
 	MDRV_NVRAM_HANDLER(mc146818)
 	MDRV_NEC765A_MODIFY("nec765", aleste_8272_interface)
+	
+	MDRV_FLOPPY_2_DRIVES_MODIFY(aleste_floppy_config)
 MACHINE_DRIVER_END
 
 
@@ -1118,61 +1138,21 @@ ROM_END
  *  System configs
  *
  *************************************/
-
-static void cpc6128_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_dsk; break;
-
-		default:										floppy_device_getinfo(devclass, state, info); break;
-	}
-
-}
-
-static void aleste_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_msx; break;
-
-		default:										floppy_device_getinfo(devclass, state, info); break;
-	}
-}
-
-
 static SYSTEM_CONFIG_START( cpc6128 )
 	CONFIG_RAM_DEFAULT(128 * 1024)
-	CONFIG_DEVICE(cpc6128_floppy_getinfo)
 SYSTEM_CONFIG_END
-
 
 static SYSTEM_CONFIG_START( cpcplus )
 	CONFIG_IMPORT_FROM(cpc6128)
 SYSTEM_CONFIG_END
 
-
 static SYSTEM_CONFIG_START( gx4000 )
 	CONFIG_RAM_DEFAULT(64 * 1024)  // has 64k RAM
 SYSTEM_CONFIG_END
 
-
 static SYSTEM_CONFIG_START( aleste )
-	CONFIG_DEVICE(aleste_floppy_getinfo)
 	CONFIG_RAM_DEFAULT(2048 * 1024)  // has 2048k RAM
 SYSTEM_CONFIG_END
-
-
 
 /*************************************
  *

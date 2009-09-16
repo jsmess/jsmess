@@ -537,7 +537,7 @@ If you have the source listing or the Rom dump, please send us.
 
 			if (deviceNum>=4 && deviceNum<=7)
 			{
-				image = image_from_devtype_and_index(machine, IO_FLOPPY, deviceNum - 4);
+				image = floppy_get_device(machine, deviceNum - 4);
 				if (image_exists(image))
 					ram[statusDCB+20] = (ram[statusDCB+20]&0xF0); /* Inserted Media */
 				else
@@ -559,7 +559,7 @@ If you have the source listing or the Rom dump, please send us.
 					}
 					else if (deviceNum>=4 && deviceNum<=7)
 					{
-						image = image_from_devtype_and_index(machine, IO_FLOPPY, deviceNum - 4);
+						image = floppy_get_device(machine, deviceNum - 4);
 						if (image_exists(image))
 						{
 							ram[statusDCB] = 0x80;
@@ -620,7 +620,7 @@ If you have the source listing or the Rom dump, please send us.
 					}
 					else if (deviceNum>=4 && deviceNum<=7)
 					{
-						image = image_from_devtype_and_index(machine, IO_FLOPPY, deviceNum - 4);
+						image = floppy_get_device(machine, deviceNum - 4);
 						if (image_exists(image))
 						{
 							sectorNmbr = ((ram[statusDCB+5])+(ram[statusDCB+6]<<8)+(ram[statusDCB+7]<<16)+(ram[statusDCB+8]<<24))<<1;

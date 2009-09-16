@@ -576,8 +576,6 @@ static MACHINE_RESET( einstein )
 	einstein->interrupt = 0;
 	einstein->interrupt_mask = 0;
 
-	floppy_drive_set_geometry(image_from_devtype_and_index(machine, IO_FLOPPY, 0), FLOPPY_DRIVE_SS_40);
-
 	einstein->ctc_trigger = 0;
 }
 
@@ -851,6 +849,11 @@ static const mc6845_interface einstein_crtc6845_interface =
 	NULL
 };
 
+static const floppy_config einstein_floppy_config =
+{
+	FLOPPY_DRIVE_SS_40,
+	FLOPPY_OPTIONS_NAME(dsk)
+};
 
 static MACHINE_DRIVER_START( einstein )
 	/* basic machine hardware */
@@ -896,8 +899,10 @@ static MACHINE_DRIVER_START( einstein )
 
 	/* uart */
 	MDRV_MSM8251_ADD(IC_I060, default_msm8251_interface)
-
+	
 	MDRV_WD1770_ADD(IC_I042, default_wd17xx_interface)
+	
+	MDRV_FLOPPY_4_DRIVES_ADD(einstein_floppy_config)
 MACHINE_DRIVER_END
 
 
@@ -924,6 +929,7 @@ static MACHINE_DRIVER_START( einstei2 )
 	MDRV_MC6845_ADD("crtc", MC6845, XTAL_X002 / 4, einstein_crtc6845_interface)
 
 	MDRV_VIDEO_UPDATE(einstein2)
+
 MACHINE_DRIVER_END
 
 
@@ -974,25 +980,9 @@ ROM_END
 /***************************************************************************
     SYSTEM CONFIG
 ***************************************************************************/
-static void einstein_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 4; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_dsk; break;
-
-		default:										floppy_device_getinfo(devclass, state, info); break;
-	}
-}
-
 static SYSTEM_CONFIG_START( einstein )
 	/* RAM is provided by 8k DRAM ICs i009, i010, i011, i012, i013, i014, i015 and i016 */
-	CONFIG_RAM_DEFAULT(8 * 8 * 1024)
-	CONFIG_DEVICE(einstein_floppy_getinfo)
+	CONFIG_RAM_DEFAULT(8 * 8 * 1024)	
 SYSTEM_CONFIG_END
 
 

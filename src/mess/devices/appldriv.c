@@ -10,9 +10,6 @@
 #include "flopdrv.h"
 #include "formats/ap2_dsk.h"
 
-
-#define APPLE525TAG	"apple525driv"
-
 struct apple525_disk
 {
 	unsigned int state : 4;		/* bits 0-3 are the phase */
@@ -24,10 +21,7 @@ struct apple525_disk
 	UINT8 track_data[APPLE2_NIBBLE_SIZE * APPLE2_SECTOR_COUNT];
 };
 
-static const mess_device_class parent_devclass = { floppy_device_getinfo, NULL };
 static int apple525_enable_mask = 1;
-
-
 
 void apple525_set_enable_lines(const device_config *device,int enable_mask)
 {
@@ -43,7 +37,7 @@ static void apple525_load_current_track(const device_config *image)
 	int len;
 	struct apple525_disk *disk;
 
-	disk = (struct apple525_disk *) image_lookuptag(image, APPLE525TAG);
+	disk = (struct apple525_disk *) flopimg_get_custom_data(image);
 	len = sizeof(disk->track_data);
 
 	floppy_drive_read_track_data_info_buffer(image, 0, disk->track_data, &len);
@@ -58,7 +52,7 @@ static void apple525_save_current_track(const device_config *image, int unload)
 	int len;
 	struct apple525_disk *disk;
 
-	disk = (struct apple525_disk *) image_lookuptag(image, APPLE525TAG);
+	disk = (struct apple525_disk *)  flopimg_get_custom_data(image);
 
 	if (disk->track_dirty)
 	{
@@ -108,7 +102,7 @@ static void apple525_disk_set_lines(const device_config *device,const device_con
 	UINT8 old_state;
 	unsigned int phase;
 
-	cur_disk = (struct apple525_disk *) image_lookuptag(image, APPLE525TAG);
+	cur_disk = (struct apple525_disk *)  flopimg_get_custom_data(image);
 
 	old_state = cur_disk->state;
 	cur_disk->state = new_state;
@@ -145,16 +139,14 @@ static void apple525_disk_set_lines(const device_config *device,const device_con
 
 void apple525_set_lines(const device_config *device,UINT8 lines)
 {
-	int i, count;
+	int i;
 	const device_config *image;
 
-	count = device_count_tag_from_machine(device->machine, APPLE525TAG);
-
-	for (i = 0; i < count; i++)
+	for (i = 0; i < 2; i++)
 	{
 		if (apple525_enable_mask & (1 << i))
 		{
-			image = image_from_devtag_and_index(device->machine, APPLE525TAG, i);
+			image = floppy_get_device(device->machine, i);						
 			if (image)
 				apple525_disk_set_lines(device,image, lines);
 		}
@@ -170,12 +162,12 @@ static UINT8 apple525_process_byte(const device_config *img, int write_value)
 	struct apple525_disk *disk;
 	int spinfract_divisor;
 	int spinfract_dividend;
-	const mess_device_class *devclass;
+	//const mess_device_class *devclass;
 
-	disk = (struct apple525_disk *) image_lookuptag(img, APPLE525TAG);
-	devclass = mess_devclass_from_core_device(img);
-	spinfract_dividend = (int) mess_device_get_info_int(devclass, MESS_DEVINFO_INT_APPLE525_SPINFRACT_DIVIDEND);
-	spinfract_divisor = (int) mess_device_get_info_int(devclass, MESS_DEVINFO_INT_APPLE525_SPINFRACT_DIVISOR);
+	disk = (struct apple525_disk *)  flopimg_get_custom_data(img);
+	//devclass = mess_devclass_from_core_device(img);
+	spinfract_dividend = 15;//(int) mess_device_get_info_int(devclass, MESS_DEVINFO_INT_APPLE525_SPINFRACT_DIVIDEND);
+	spinfract_divisor = 16;//(int) mess_device_get_info_int(devclass, MESS_DEVINFO_INT_APPLE525_SPINFRACT_DIVISOR);
 
 	/* no image initialized for that drive ? */
 	if (!image_exists(img))
@@ -218,14 +210,11 @@ static UINT8 apple525_process_byte(const device_config *img, int write_value)
 
 static const device_config *apple525_selected_image(running_machine *machine)
 {
-	int i, count;
-
-	count = device_count_tag_from_machine(machine, APPLE525TAG);
-
-	for (i = 0; i < count; i++)
+	int i;
+	for (i = 0; i < 2; i++)
 	{
 		if (apple525_enable_mask & (1 << i))
-			return image_from_devtag_and_index(machine, APPLE525TAG, i);
+			return floppy_get_device(machine, i);
 	}
 	return NULL;
 }
@@ -253,16 +242,13 @@ void apple525_write_data(const device_config *device,UINT8 data)
 
 int apple525_read_status(const device_config *device)
 {
-	int i, count, result = 0;
+	int i, result = 0;
 	const device_config *image;
-
-	count = device_count_tag_from_machine(device->machine, APPLE525TAG);
-
-	for (i = 0; i < count; i++)
+	for (i = 0; i < 2; i++)
 	{
 		if (apple525_enable_mask & (1 << i))
 		{
-			image = image_from_devtag_and_index(device->machine, APPLE525TAG, i);
+			image = floppy_get_device(device->machine, i);
 			if (image && !image_is_writable(image))
 				result = 1;
 		}
@@ -275,25 +261,16 @@ int apple525_read_status(const device_config *device)
 /* ----------------------------------------------------------------------- */
 
 static DEVICE_START( apple525_floppy )
-{
-	device_start_func parent_init;
-
-	image_alloctag(device, APPLE525TAG, sizeof(struct apple525_disk));
-
-	parent_init = (device_start_func) mess_device_get_info_fct(&parent_devclass, MESS_DEVINFO_PTR_START);
-	parent_init(device);
+{	
+	DEVICE_START_CALL(floppy);
+	flopimg_alloc_custom_data(device,sizeof(struct apple525_disk));
 }
 
 
 
 static DEVICE_IMAGE_LOAD( apple525_floppy )
 {
-	int result;
-	device_image_load_func parent_load;
-
-	parent_load = (device_image_load_func) mess_device_get_info_fct(&parent_devclass, MESS_DEVINFO_PTR_LOAD);
-	result = parent_load(image);
-
+	int result = DEVICE_IMAGE_LOAD_NAME(floppy)(image);
 	floppy_drive_seek(image, -999);
 	floppy_drive_seek(image, +35/2);
 	return result;
@@ -303,32 +280,39 @@ static DEVICE_IMAGE_LOAD( apple525_floppy )
 
 static DEVICE_IMAGE_UNLOAD( apple525_floppy )
 {
-	device_image_unload_func parent_unload;
-
 	apple525_save_current_track(image, TRUE);
 
-	parent_unload = (device_image_unload_func) mess_device_get_info_fct(&parent_devclass, MESS_DEVINFO_PTR_UNLOAD);
-	parent_unload(image);
+	DEVICE_IMAGE_UNLOAD_NAME(floppy)(image);	
 }
 
 
-
+/*
 void apple525_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	switch(state)
 	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case MESS_DEVINFO_INT_COUNT:				info->i = 2; break;
 
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case MESS_DEVINFO_STR_DEV_TAG:			strcpy(info->s = device_temp_str(), APPLE525TAG); break;
 
-		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case MESS_DEVINFO_PTR_START:				info->start = DEVICE_START_NAME(apple525_floppy); break;
 		case MESS_DEVINFO_PTR_LOAD:				info->load = DEVICE_IMAGE_LOAD_NAME(apple525_floppy); break;
 		case MESS_DEVINFO_PTR_UNLOAD:			info->unload = DEVICE_IMAGE_UNLOAD_NAME(apple525_floppy); break;
 		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:	info->p = (void *) floppyoptions_apple2; break;
 
 		default: floppy_device_getinfo(devclass, state, info); break;
+	}
+}
+
+*/
+DEVICE_GET_INFO( apple525 )
+{
+	switch (state)
+	{
+		case DEVINFO_FCT_START:						info->start = DEVICE_START_NAME(apple525_floppy); break;
+		case DEVINFO_FCT_IMAGE_LOAD:				info->f = (genf *) DEVICE_IMAGE_LOAD_NAME(apple525_floppy); break;
+		case DEVINFO_FCT_IMAGE_UNLOAD:				info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME(apple525_floppy); break;
+
+		default: 									DEVICE_GET_INFO_CALL(floppy);				break;
 	}
 }

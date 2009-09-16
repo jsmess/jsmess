@@ -407,9 +407,9 @@ static MACHINE_RESET(nanos)
 	memory_set_bankptr(machine, 2, mess_ram + 0x1000);
 	memory_set_bankptr(machine, 3, mess_ram);
 	
-	floppy_drive_set_motor_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 0), 1);
+	floppy_drive_set_motor_state(floppy_get_device(space->machine, 0), 1);
 	
-	floppy_drive_set_ready_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 0), 1,1);
+	floppy_drive_set_ready_state(floppy_get_device(space->machine, 0), 1,1);
 	timer_pulse(machine, ATTOTIME_IN_HZ(24000), NULL, 0, keyboard_callback);
 }
 
@@ -430,9 +430,24 @@ static const nec765_interface nanos_nec765_interface =
 	DEVCB_NULL,
 	NULL,
 	NULL,
-	NEC765_RDY_PIN_NOT_CONNECTED
+	NEC765_RDY_PIN_NOT_CONNECTED,
+	{FLOPPY_0,FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 
+static FLOPPY_OPTIONS_START(nanos)
+	FLOPPY_OPTION(nanos, "img", "NANOS disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([80])
+		SECTORS([5])
+		SECTOR_LENGTH([1024])
+		FIRST_SECTOR_ID([1]))
+FLOPPY_OPTIONS_END
+
+static const floppy_config nanos_floppy_config =
+{
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(nanos)
+};
 
 static MACHINE_DRIVER_START( nanos )
     /* basic machine hardware */
@@ -468,35 +483,11 @@ static MACHINE_DRIVER_START( nanos )
 	/* NEC765 */
 	MDRV_NEC765A_ADD("nec765", nanos_nec765_interface)    
 	
+	MDRV_FLOPPY_4_DRIVES_ADD(nanos_floppy_config)
 MACHINE_DRIVER_END
-
-static FLOPPY_OPTIONS_START(nanos)
-	FLOPPY_OPTION(nanos, "img", "NANOS disk image", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([2])
-		TRACKS([80])
-		SECTORS([5])
-		SECTOR_LENGTH([1024])
-		FIRST_SECTOR_ID([1]))
-FLOPPY_OPTIONS_END
-
-static void nanos_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 4; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_nanos; break;
-
-		default:										floppy_device_getinfo(devclass, state, info); break;
-	}
-}
 
 static SYSTEM_CONFIG_START(nanos)
 	CONFIG_RAM_DEFAULT(64 * 1024)
-	CONFIG_DEVICE(nanos_floppy_getinfo)
 SYSTEM_CONFIG_END
 
 /* ROM definition */

@@ -504,6 +504,12 @@ static MACHINE_START( abc80 )
 	state_save_register_global(machine, state->z80pio_astb);
 }
 
+static const floppy_config abc80_floppy_config =
+{
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(abc80)
+};
+
 /* Machine Drivers */
 
 static MACHINE_DRIVER_START( abc80 )
@@ -542,6 +548,8 @@ static MACHINE_DRIVER_START( abc80 )
 
 	/* cassette */
 	MDRV_CASSETTE_ADD("cassette", default_cassette_config)
+	
+	MDRV_FLOPPY_2_DRIVES_ADD(abc80_floppy_config)
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -623,25 +631,10 @@ ROM_START( abc80h )
 ROM_END
 
 /* System Configuration */
-static void abc80_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_abc80; break;
-
-		default:										floppy_device_getinfo(devclass, state, info); break;
-	}
-}
 
 static SYSTEM_CONFIG_START( abc80 )
 	CONFIG_RAM_DEFAULT(16 * 1024)
 	CONFIG_RAM		  (32 * 1024)
-	CONFIG_DEVICE(abc80_floppy_getinfo)
 SYSTEM_CONFIG_END
 
 /* Drivers */

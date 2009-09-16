@@ -622,6 +622,20 @@ static const cassette_config apf_cassette_config =
 	CASSETTE_PLAY
 };
 
+static FLOPPY_OPTIONS_START(apfimag)
+	FLOPPY_OPTION(apfimag, "apd", "APF disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([1])
+		TRACKS([40])
+		SECTORS([8])
+		SECTOR_LENGTH([256])
+		FIRST_SECTOR_ID([1]))
+FLOPPY_OPTIONS_END
+
+static const floppy_config apfimag_floppy_config =
+{
+	FLOPPY_DRIVE_SS_40,
+	FLOPPY_OPTIONS_NAME(apfimag)
+};
 
 static MACHINE_DRIVER_START( apf_imagination )
 	/* basic machine hardware */
@@ -652,6 +666,8 @@ static MACHINE_DRIVER_START( apf_imagination )
 	MDRV_CASSETTE_ADD( "cassette", apf_cassette_config )
 	
 	MDRV_WD179X_ADD("wd179x", default_wd17xx_interface )	
+	
+	MDRV_FLOPPY_2_DRIVES_ADD(apfimag_floppy_config)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( apf_m1000 )
@@ -663,6 +679,7 @@ static MACHINE_DRIVER_START( apf_m1000 )
 
 	MDRV_DEVICE_REMOVE( "cassette" )
 	MDRV_CARTSLOT_ADD("cart")
+	MDRV_FLOPPY_2_DRIVES_REMOVE()
 MACHINE_DRIVER_END
 
 
@@ -686,35 +703,6 @@ ROM_START(apfm1000)
 	ROM_CART_LOAD("cart", 0x8000, 0x2000, ROM_OPTIONAL)
 ROM_END
 
-static FLOPPY_OPTIONS_START(apfimag)
-	FLOPPY_OPTION(apfimag, "apd", "APF disk image", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([1])
-		TRACKS([40])
-		SECTORS([8])
-		SECTOR_LENGTH([256])
-		FIRST_SECTOR_ID([1]))
-FLOPPY_OPTIONS_END
-
-static void apfimag_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_apfimag; break;
-
-		default:										floppy_device_getinfo(devclass, state, info); break;
-	}
-}
-
-static SYSTEM_CONFIG_START( apfimag )
-	CONFIG_DEVICE(apfimag_floppy_getinfo)
-SYSTEM_CONFIG_END
-
-
 /***************************************************************************
 
   Game driver(s)
@@ -722,5 +710,5 @@ SYSTEM_CONFIG_END
 ***************************************************************************/
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE             INPUT               INIT    CONFIG      COMPANY               FULLNAME */
-COMP(1977, apfimag,	0,	0,	apf_imagination,	apf_imagination,	0,	apfimag,	"APF Electronics Inc",  "APF Imagination Machine" , 0 )
+COMP(1977, apfimag,	0,	0,	apf_imagination,	apf_imagination,	0,	0,	"APF Electronics Inc",  "APF Imagination Machine" , 0 )
 CONS(1978, apfm1000,	0,	0,	apf_m1000,		apf_m1000,		0,	0,		"APF Electronics Inc",  "APF M-1000" ,GAME_NOT_WORKING)

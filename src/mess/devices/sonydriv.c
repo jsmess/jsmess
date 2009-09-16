@@ -45,13 +45,13 @@
 
 #ifdef MAME_DEBUG
 #define LOG_SONY		1
-#define LOG_SONY_EXTRA	0
+#define LOG_SONY_EXTRA	1
 #else
-#define LOG_SONY		0
-#define LOG_SONY_EXTRA	0
+#define LOG_SONY		1
+#define LOG_SONY_EXTRA	1
 #endif
 
-static const mess_device_class parent_devclass = { floppy_device_getinfo, NULL };
+//static const mess_device_class parent_devclass = { floppy_device_getinfo, NULL };
 
 /*
 	These lines are normally connected to the PHI0-PHI3 lines of the IWM
@@ -107,7 +107,7 @@ static int sony_enable2(void)
 #ifdef UNUSED_FUNCTION
 static floppy *get_sony_floppy(const device_config *img)
 {
-	int id = image_index_in_device(img);
+	int id = floppy_get_drive(img);
 	return &sony_floppy[id];
 }
 #endif
@@ -121,7 +121,7 @@ static void load_track_data(const device_config *device,int floppy_select)
 	floppy *f;
 
 	f = &sony_floppy[floppy_select];
-	cur_image = image_from_devtag_and_index(device->machine, "sonydriv", floppy_select);
+	cur_image = floppy_get_device(device->machine, floppy_select);
 
 	track_size = floppy_get_track_size(flopimg_get_image(cur_image), f->head, floppy_drive_get_current_track(cur_image));
 	new_data = image_realloc(cur_image, f->loadedtrack_data, track_size);
@@ -145,7 +145,7 @@ static void save_track_data(const device_config *device, int floppy_select)
 	int len;
 
 	f = &sony_floppy[floppy_select];
-	cur_image = image_from_devtag_and_index(device->machine, "sonydriv", floppy_select);
+	cur_image = floppy_get_device(device->machine, floppy_select);
 
 	if (f->loadedtrack_dirty)
 	{
@@ -167,7 +167,7 @@ UINT8 sony_read_data(const device_config *device)
 		return 0xFF;			/* right ??? */
 
 	f = &sony_floppy[sony_floppy_select];
-	cur_image = image_from_devtag_and_index(device->machine, "sonydriv", sony_floppy_select);
+	cur_image = floppy_get_device(device->machine, sony_floppy_select);
 	if (!image_exists(cur_image))
 		return 0xFF;
 
@@ -186,7 +186,7 @@ void sony_write_data(const device_config *device,UINT8 data)
 	floppy *f;
 
 	f = &sony_floppy[sony_floppy_select];
-	cur_image = image_from_devtag_and_index(device->machine, "sonydriv", sony_floppy_select);
+	cur_image = floppy_get_device(device->machine, sony_floppy_select);
 	if (!image_exists(cur_image))
 		return;
 
@@ -269,7 +269,7 @@ int sony_read_status(const device_config *device)
 	if ((! sony_enable2()) && sony_floppy_enable)
 	{
 		f = &sony_floppy[sony_floppy_select];
-		cur_image = image_from_devtag_and_index(device->machine, "sonydriv", sony_floppy_select);
+		cur_image = floppy_get_device(device->machine, sony_floppy_select);
 		if (!image_exists(cur_image))
 			cur_image = NULL;
 
@@ -380,7 +380,7 @@ static void sony_doaction(const device_config *device)
 	if (sony_floppy_enable)
 	{
 		f = &sony_floppy[sony_floppy_select];
-		cur_image = image_from_devtag_and_index(device->machine, "sonydriv", sony_floppy_select);
+		cur_image = floppy_get_device(device->machine, sony_floppy_select);
 		if (!image_exists(cur_image))
 			cur_image = NULL;
 
@@ -491,33 +491,29 @@ void sony_set_speed(int speed)
 static DEVICE_IMAGE_UNLOAD( sonydriv_floppy )
 {
 	int id;
-	device_image_unload_func parent_unload;
+	//device_image_unload_func parent_unload;
 	const device_config *fdc;
 
 	/* locate the FDC */
 	fdc = devtag_get_device(image->machine, "fdc");
 
-	id = image_index_in_device(image);
+	id = floppy_get_drive(image);
 	save_track_data(fdc, id);
 	memset(&sony_floppy[id], 0, sizeof(sony_floppy[id]));
 
-	parent_unload = (device_image_unload_func) mess_device_get_info_fct(&parent_devclass, MESS_DEVINFO_PTR_UNLOAD);
-	parent_unload(image);
+	DEVICE_IMAGE_UNLOAD_NAME(floppy)(image);	
 }
 
 
-
+/*
 void sonydriv_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	switch(state)
 	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case MESS_DEVINFO_INT_COUNT:				info->i = 2; break;
 
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case MESS_DEVINFO_STR_DEV_TAG:			strcpy(info->s = device_temp_str(), "sonydriv"); break;
 
-		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case MESS_DEVINFO_PTR_UNLOAD:			info->unload = DEVICE_IMAGE_UNLOAD_NAME(sonydriv_floppy); break;
 		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:
 			if (mess_device_get_info_int(devclass, MESS_DEVINFO_INT_SONYDRIV_ALLOWABLE_SIZES) & SONY_FLOPPY_SUPPORT2IMG)
@@ -529,4 +525,13 @@ void sonydriv_device_getinfo(const mess_device_class *devclass, UINT32 state, un
 		default: floppy_device_getinfo(devclass, state, info); break;
 	}
 }
+*/
+DEVICE_GET_INFO( sonydriv )
+{
+	switch (state)
+	{
+		case DEVINFO_FCT_IMAGE_UNLOAD:				info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME(sonydriv_floppy); break;
 
+		default: 									DEVICE_GET_INFO_CALL(floppy);				break;
+	}
+}

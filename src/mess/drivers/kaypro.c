@@ -139,6 +139,34 @@ static const mc6845_interface kaypro2x_crtc = {
 	Machine Driver
 
 ************************************************************/
+static FLOPPY_OPTIONS_START(kayproii)
+	FLOPPY_OPTION(kayproii, "dsk", "Kaypro II disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([1])
+		TRACKS([40])
+		SECTORS([10])
+		SECTOR_LENGTH([512])
+		FIRST_SECTOR_ID([0]))
+FLOPPY_OPTIONS_END
+
+static FLOPPY_OPTIONS_START(kaypro2x)
+	FLOPPY_OPTION(kaypro2x, "dsk", "Kaypro 2x disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([80])
+		SECTORS([10])
+		SECTOR_LENGTH([512])
+		FIRST_SECTOR_ID([0]))
+FLOPPY_OPTIONS_END
+
+static const floppy_config kayproii_floppy_config =
+{
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(kayproii)
+};
+static const floppy_config kaypro2x_floppy_config =
+{
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(kaypro2x)
+};
 
 static MACHINE_DRIVER_START( kayproii )
 	/* basic machine hardware */
@@ -175,6 +203,8 @@ static MACHINE_DRIVER_START( kayproii )
 	MDRV_Z80PIO_ADD( "z80pio_g", kayproii_pio_g_intf )
 	MDRV_Z80PIO_ADD( "z80pio_s", kayproii_pio_s_intf )
 	MDRV_Z80SIO_ADD( "z80sio", 4800, kaypro_sio_intf )	/* start at 300 baud */
+	
+	MDRV_FLOPPY_2_DRIVES_ADD(kayproii_floppy_config)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( kaypro2x )
@@ -213,6 +243,8 @@ static MACHINE_DRIVER_START( kaypro2x )
 	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
 	MDRV_Z80SIO_ADD( "z80sio", 4800, kaypro_sio_intf )
 	MDRV_Z80SIO_ADD( "z80sio_2x", 4800, kaypro_sio_intf )	/* extra sio for modem and printer */
+	
+	MDRV_FLOPPY_2_DRIVES_ADD(kaypro2x_floppy_config)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( omni2 )
@@ -309,68 +341,12 @@ ROM_START(kaypro10)
 	ROM_LOAD("81-817.u31",   0x0000, 0x1000, CRC(5f72da5b) SHA1(8a597000cce1a7e184abfb7bebcb564c6bf24fb7) )
 ROM_END
 
-static FLOPPY_OPTIONS_START(kayproii)
-	FLOPPY_OPTION(kayproii, "dsk", "Kaypro II disk image", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([1])
-		TRACKS([40])
-		SECTORS([10])
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([0]))
-FLOPPY_OPTIONS_END
-
-static FLOPPY_OPTIONS_START(kaypro2x)
-	FLOPPY_OPTION(kaypro2x, "dsk", "Kaypro 2x disk image", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([2])
-		TRACKS([80])
-		SECTORS([10])
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([0]))
-FLOPPY_OPTIONS_END
-
-static void kayproii_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_kayproii; break;
-
-		default:										floppy_device_getinfo(devclass, state, info); break;
-	}
-}
-
-static void kaypro2x_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_kaypro2x; break;
-
-		default:										floppy_device_getinfo(devclass, state, info); break;
-	}
-}
-
-static SYSTEM_CONFIG_START(kayproii)
-	CONFIG_DEVICE(kayproii_floppy_getinfo)
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START(kaypro2x)
-	CONFIG_DEVICE(kaypro2x_floppy_getinfo)
-SYSTEM_CONFIG_END
-
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE	  INPUT    INIT    CONFIG       COMPANY  FULLNAME */
-COMP( 1982, kayproii,   0,        0,    kayproii, kay_kbd, 0,      kayproii,	"Non Linear Systems",  "Kaypro II - 2/83" , 0 )
-COMP( 1983, kaypro4,    kayproii, 0,    kayproii, kay_kbd, 0,      kaypro2x,    "Non Linear Systems",  "Kaypro 4 - 4/83" , GAME_NOT_WORKING ) // model 81-004 
-COMP( 1983, kaypro4p88, kayproii, 0,    kayproii, kay_kbd, 0,      kaypro2x,    "Non Linear Systems",  "Kaypro 4 plus88 - 4/83" , GAME_NOT_WORKING ) // model 81-004 with an added 8088 daughterboard and rom
-COMP( 198?, omni2,      kayproii, 0,    omni2,    kay_kbd, 0,      kaypro2x,    "Non Linear Systems",  "Omni II" , GAME_NOT_WORKING )
-COMP( 1984, kaypro2x,   0,        0,    kaypro2x, kay_kbd, 0,      kaypro2x,    "Non Linear Systems",  "Kaypro 2x" , GAME_NOT_WORKING ) // model 81-025
-COMP( 1984, kaypro4a,   0,        0,    kaypro2x, kay_kbd, 0,      kaypro2x,    "Non Linear Systems",  "Kaypro 4 - 4/84" , GAME_NOT_WORKING ) // model 81-015
+COMP( 1982, kayproii,   0,        0,    kayproii, kay_kbd, 0,      0,	"Non Linear Systems",  "Kaypro II - 2/83" , 0 )
+COMP( 1983, kaypro4,    kayproii, 0,    kayproii, kay_kbd, 0,      0,    "Non Linear Systems",  "Kaypro 4 - 4/83" , GAME_NOT_WORKING ) // model 81-004 
+COMP( 1983, kaypro4p88, kayproii, 0,    kayproii, kay_kbd, 0,      0,    "Non Linear Systems",  "Kaypro 4 plus88 - 4/83" , GAME_NOT_WORKING ) // model 81-004 with an added 8088 daughterboard and rom
+COMP( 198?, omni2,      kayproii, 0,    omni2,    kay_kbd, 0,      0,    "Non Linear Systems",  "Omni II" , GAME_NOT_WORKING )
+COMP( 1984, kaypro2x,   0,        0,    kaypro2x, kay_kbd, 0,      0,    "Non Linear Systems",  "Kaypro 2x" , GAME_NOT_WORKING ) // model 81-025
+COMP( 1984, kaypro4a,   0,        0,    kaypro2x, kay_kbd, 0,      0,    "Non Linear Systems",  "Kaypro 4 - 4/84" , GAME_NOT_WORKING ) // model 81-015
 // Kaypro 4/84 plus 88 goes here, model 81-015 with an added 8088 daughterboard and rom
-COMP( 1983, kaypro10,   0,        0,    kaypro2x, kay_kbd, 0,      kaypro2x,    "Non Linear Systems",  "Kaypro 10" , GAME_NOT_WORKING ) // model 81-005
+COMP( 1983, kaypro10,   0,        0,    kaypro2x, kay_kbd, 0,      0,    "Non Linear Systems",  "Kaypro 10" , GAME_NOT_WORKING ) // model 81-005

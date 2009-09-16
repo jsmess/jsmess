@@ -331,6 +331,39 @@ static const z80_daisy_chain mbee_daisy_chain[] =
 	{ NULL }
 };
 
+static FLOPPY_OPTIONS_START(mbee)
+	FLOPPY_OPTION(ss80, "ss80", "SS80 disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([1])
+		TRACKS([80])
+		SECTORS([10])
+		SECTOR_LENGTH([512])
+		FIRST_SECTOR_ID([1]))
+	FLOPPY_OPTION(ds40, "ds40", "DS40 disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([80])
+		SECTORS([10])
+		SECTOR_LENGTH([512])
+		FIRST_SECTOR_ID([1]))
+	FLOPPY_OPTION(ds80, "ds80", "DS80 disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([160])
+		SECTORS([10])
+		SECTOR_LENGTH([512])
+		FIRST_SECTOR_ID([1]))
+	FLOPPY_OPTION(ds84, "ds84", "DS84 disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([168])
+		SECTORS([10])
+		SECTOR_LENGTH([512])
+		FIRST_SECTOR_ID([1]))						
+FLOPPY_OPTIONS_END
+
+static const floppy_config mbee_floppy_config =
+{
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(mbee)
+};
+
 static MACHINE_DRIVER_START( mbee )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz / 6)         /* 2 MHz */
@@ -421,6 +454,7 @@ static MACHINE_DRIVER_START( mbeepc85 )
 	MDRV_CPU_PROGRAM_MAP(mbeepc85_mem)
 	MDRV_CPU_IO_MAP(mbeepc85_io)
 	MDRV_WD179X_ADD("wd179x", mbee_wd17xx_interface )
+	MDRV_FLOPPY_2_DRIVES_ADD(mbee_floppy_config)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( mbeeppc )
@@ -669,59 +703,13 @@ ROM_END
   Game driver(s)
 
 ***************************************************************************/
-static FLOPPY_OPTIONS_START(mbee)
-	FLOPPY_OPTION(mbee, "ss80", "SS80 disk image", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([1])
-		TRACKS([80])
-		SECTORS([10])
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([1]))
-	FLOPPY_OPTION(mbee, "ds40", "DS40 disk image", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([2])
-		TRACKS([80])
-		SECTORS([10])
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([1]))
-	FLOPPY_OPTION(mbee, "ds80", "DS80 disk image", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([2])
-		TRACKS([160])
-		SECTORS([10])
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([1]))
-	FLOPPY_OPTION(mbee, "ds84", "DS84 disk image", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([2])
-		TRACKS([168])
-		SECTORS([10])
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([1]))						
-FLOPPY_OPTIONS_END
-
-static void mbee_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_mbee; break;
-
-		default:										floppy_device_getinfo(devclass, state, info); break;
-	}
-}
-
-static SYSTEM_CONFIG_START(mbeeic)
-	CONFIG_DEVICE(mbee_floppy_getinfo)
-SYSTEM_CONFIG_END
-
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT      CONFIG    COMPANY			FULLNAME */
 COMP( 1982, mbee,     0,	0,	mbee,     mbee,     mbee,     0,	"Applied Technology",  "Microbee 16 Standard" , 0)
-COMP( 1982, mbeeic,   mbee,	0,	mbeeic,   mbee,     mbeeic,   mbeeic,	"Applied Technology",  "Microbee 32 IC" , 0)
-COMP( 1982, mbeepc,   mbee,	0,	mbeepc,   mbee,     mbeepc,   mbeeic,	"Applied Technology",  "Microbee 32 Personal Communicator" , 0)
-COMP( 1985, mbeepc85, mbee,	0,	mbeepc85, mbee,     mbeepc85, mbeeic,	"Applied Technology",  "Microbee 32 PC85" , 0)
-COMP( 1985, mbeeppc,  mbee,	0,	mbeeppc,  mbee,     mbeeppc,  mbeeic,	"Applied Technology",  "Microbee 32 Premium PC85" , GAME_NOT_WORKING)
-COMP( 1986, mbee56,   mbee,	0,	mbee56,   mbee,     mbee56,   mbeeic,	"Applied Technology",  "Microbee 56k" , GAME_NOT_WORKING)
-COMP( 1986, mbee64,   mbee,	0,	mbee64,   mbee,     mbee64,   mbeeic,	"Applied Technology",  "Microbee 64k" , GAME_NOT_WORKING)
+COMP( 1982, mbeeic,   mbee,	0,	mbeeic,   mbee,     mbeeic,   0,	"Applied Technology",  "Microbee 32 IC" , 0)
+COMP( 1982, mbeepc,   mbee,	0,	mbeepc,   mbee,     mbeepc,   0,	"Applied Technology",  "Microbee 32 Personal Communicator" , 0)
+COMP( 1985, mbeepc85, mbee,	0,	mbeepc85, mbee,     mbeepc85, 0,	"Applied Technology",  "Microbee 32 PC85" , 0)
+COMP( 1985, mbeeppc,  mbee,	0,	mbeeppc,  mbee,     mbeeppc,  0,	"Applied Technology",  "Microbee 32 Premium PC85" , GAME_NOT_WORKING)
+COMP( 1986, mbee56,   mbee,	0,	mbee56,   mbee,     mbee56,   0,	"Applied Technology",  "Microbee 56k" , GAME_NOT_WORKING)
+COMP( 1986, mbee64,   mbee,	0,	mbee64,   mbee,     mbee64,   0,	"Applied Technology",  "Microbee 64k" , GAME_NOT_WORKING)
 

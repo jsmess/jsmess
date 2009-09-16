@@ -433,6 +433,16 @@ static MACHINE_DRIVER_START( aquarius )
 	MDRV_CARTSLOT_NOT_MANDATORY
 MACHINE_DRIVER_END
 
+static FLOPPY_OPTIONS_START(aquarius)
+	/* 128K images, 64K/side */
+FLOPPY_OPTIONS_END
+
+static const floppy_config aquarius_floppy_config =
+{
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(aquarius)
+};
+
 static MACHINE_DRIVER_START( aquarius_qd )
 	MDRV_IMPORT_FROM( aquarius )
 
@@ -440,6 +450,8 @@ static MACHINE_DRIVER_START( aquarius_qd )
 	MDRV_CPU_IO_MAP(aquarius_qd_io)
 
 	MDRV_DEVICE_REMOVE("cart")
+	
+	MDRV_FLOPPY_2_DRIVES_ADD(aquarius_floppy_config)
 MACHINE_DRIVER_END
 
 
@@ -487,25 +499,6 @@ ROM_END
 /***************************************************************************
     SYSTEM CONFIG
 ***************************************************************************/
-static FLOPPY_OPTIONS_START(aquarius)
-	/* 128K images, 64K/side */
-FLOPPY_OPTIONS_END
-
-static void aquarius_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_aquarius; break;
-
-		default:										floppy_device_getinfo(devclass, state, info); break;
-	}
-}
-
 static SYSTEM_CONFIG_START( aquarius )
 	CONFIG_RAM_DEFAULT( 4 * 1024)
 	CONFIG_RAM		  ( 8 * 1024)
@@ -513,17 +506,11 @@ static SYSTEM_CONFIG_START( aquarius )
 	CONFIG_RAM		  (36 * 1024)
 SYSTEM_CONFIG_END
 
-static SYSTEM_CONFIG_START( aquarius_qd )
-	CONFIG_IMPORT_FROM(aquarius)
-	CONFIG_DEVICE(aquarius_floppy_getinfo)
-SYSTEM_CONFIG_END
-
-
 /***************************************************************************
     GAME DRIVERS
 ***************************************************************************/
 
 /*    YEAR  NAME         PARENT    COMPAT  MACHINE      INPUT     INIT      CONFIG       COMPANY   FULLNAME                         FLAGS */
 COMP( 1983, aquarius,    0,        0,      aquarius,    aquarius, aquarius, aquarius,    "Mattel", "Aquarius (NTSC)",               0 )
-COMP( 1983, aquarius_qd, aquarius, 0,      aquarius_qd, aquarius, aquarius, aquarius_qd, "Mattel", "Aquarius w/ Quick Disk (NTSC)", 0 )
+COMP( 1983, aquarius_qd, aquarius, 0,      aquarius_qd, aquarius, aquarius, aquarius, "Mattel", "Aquarius w/ Quick Disk (NTSC)", 0 )
 //COMP(	1984,	aquariu2,	aquarius,	0,		aquarius,	aquarius,	0,		aquarius,	"Mattel",	"Aquarius II",	GAME_NOT_WORKING )

@@ -399,6 +399,22 @@ static const cassette_config cgenie_cassette_config =
 	CASSETTE_STOPPED
 };
 
+// This is currently broken
+FLOPPY_OPTIONS_START(cgenie )
+	FLOPPY_OPTION( cgd, "cgd", "Colour Genie disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([40])
+		SECTORS([10])
+		SECTOR_LENGTH([256])
+		FIRST_SECTOR_ID([1]))	
+FLOPPY_OPTIONS_END
+
+static const floppy_config cgenie_floppy_config =
+{
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(cgenie)
+};
+
 static MACHINE_DRIVER_START( cgenie )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 2216800)        /* 2,2168 MHz */
@@ -437,6 +453,7 @@ static MACHINE_DRIVER_START( cgenie )
 
 	MDRV_WD179X_ADD("wd179x", cgenie_wd17xx_interface )
 
+	MDRV_FLOPPY_4_DRIVES_ADD(cgenie_floppy_config)
 	/* cartridge */
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("rom")
@@ -558,7 +575,7 @@ DEVICE_IMAGE_LOAD( cgenie_floppy )
 				spt = pd_list[i].SPT / heads;
 				dir_sector = pd_list[i].DDSL * pd_list[i].GATM * pd_list[i].GPL + pd_list[i].SPT;
 				dir_length = pd_list[i].DDGA * pd_list[i].GPL;
-				memcpy(memory_region(image->machine, "maincpu") + 0x5A71 + image_index_in_device(image) * sizeof(PDRIVE), &pd_list[i], sizeof(PDRIVE));
+				memcpy(memory_region(image->machine, "maincpu") + 0x5A71 + floppy_get_drive(image) * sizeof(PDRIVE), &pd_list[i], sizeof(PDRIVE));
 				break;
 			}
 		}
@@ -601,33 +618,7 @@ DEVICE_IMAGE_LOAD( cgenie_floppy )
 	return INIT_PASS;
 }
 */
-// This is currently broken
-FLOPPY_OPTIONS_START(cgenie )
-	FLOPPY_OPTION( cgd, "cgd", "Colour Genie disk image", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([2])
-		TRACKS([40])
-		SECTORS([10])
-		SECTOR_LENGTH([256])
-		FIRST_SECTOR_ID([1]))	
-FLOPPY_OPTIONS_END
-
-static void cgenie_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 4; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_cgenie; break;
-
-		default:										floppy_device_getinfo(devclass, state, info); break;
-	}
-}
-
 static SYSTEM_CONFIG_START(cgenie)
-	CONFIG_DEVICE(cgenie_floppy_getinfo)
 	CONFIG_RAM_DEFAULT	(16 * 1024)
 	CONFIG_RAM			(32 * 1024)
 SYSTEM_CONFIG_END

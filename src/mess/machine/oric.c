@@ -1063,7 +1063,7 @@ static WD17XX_CALLBACK(oric_wd179x_callback)
 	}
 }
 
-const wd17xx_interface oric_wd17xx_interface = { oric_wd179x_callback, NULL };
+const wd17xx_interface oric_wd17xx_interface = { oric_wd179x_callback, NULL, {FLOPPY_0,FLOPPY_1,FLOPPY_2,FLOPPY_3} };
 
 static void oric_common_init_machine(running_machine *machine)
 {

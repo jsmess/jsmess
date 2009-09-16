@@ -359,7 +359,7 @@ static void ti99_install_tracktranslate_procs(running_machine *machine)
 
 	for (id=0; id<MAX_FLOPPIES; id++)
 	{
-		image = image_from_devtype_and_index(machine, IO_FLOPPY, id);
+		image = floppy_get_device(machine, id);
 		floppy_install_tracktranslate_proc(image, ti99_tracktranslate);
 	}
 }
@@ -390,7 +390,7 @@ static WD17XX_CALLBACK( fdc_callback )
 	fdc_handle_hold(device->machine);
 }
 
-const wd17xx_interface ti99_wd17xx_interface = { fdc_callback, NULL };
+const wd17xx_interface ti99_wd17xx_interface = { fdc_callback, NULL, {FLOPPY_0,FLOPPY_1,FLOPPY_2,FLOPPY_3} };
 
 
 /*

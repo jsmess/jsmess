@@ -638,7 +638,7 @@ static WD17XX_CALLBACK( trs80_fdc_callback )
 	}
 }
 
-const wd17xx_interface trs80_wd17xx_interface = { trs80_fdc_callback, NULL };
+const wd17xx_interface trs80_wd17xx_interface = { trs80_fdc_callback, NULL, {FLOPPY_0,FLOPPY_1,FLOPPY_2,FLOPPY_3} };
 
 
 /*************************************

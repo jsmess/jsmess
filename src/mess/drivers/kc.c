@@ -342,6 +342,23 @@ static ADDRESS_MAP_START(kc85_disc_hw_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0fc, 0x0ff) AM_DEVREADWRITE("z80ctc_1", kc85_disk_hw_ctc_r, kc85_disk_hw_ctc_w)
 ADDRESS_MAP_END
 
+
+static FLOPPY_OPTIONS_START(kc85)
+	FLOPPY_OPTION(kc85, "img", "KC85 disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([80])
+		SECTORS([9])
+		SECTOR_LENGTH([512])
+		FIRST_SECTOR_ID([1]))
+FLOPPY_OPTIONS_END
+
+static const floppy_config kc85_floppy_config =
+{
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(kc85)
+};
+
+
 static MACHINE_DRIVER_START( cpu_kc_disc )
 	MDRV_CPU_ADD("disc", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(kc85_disc_hw_mem)
@@ -407,12 +424,13 @@ static MACHINE_DRIVER_START( kc85_4 )
 	MDRV_VIDEO_UPDATE( kc85_4 )
 MACHINE_DRIVER_END
 
-
 static MACHINE_DRIVER_START( kc85_4d )
 	MDRV_IMPORT_FROM( kc85_4 )
 	MDRV_IMPORT_FROM( cpu_kc_disc )
 	MDRV_QUANTUM_TIME(HZ(120))
 	MDRV_MACHINE_RESET( kc85_4d )
+	
+	MDRV_FLOPPY_2_DRIVES_ADD(kc85_floppy_config)
 MACHINE_DRIVER_END
 
 
@@ -483,38 +501,9 @@ static SYSTEM_CONFIG_START(kc85)
 	CONFIG_RAM_DEFAULT		(64 * 1024)
 SYSTEM_CONFIG_END
 
-static FLOPPY_OPTIONS_START(kc85)
-	FLOPPY_OPTION(kc85, "img", "KC85 disk image", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([2])
-		TRACKS([80])
-		SECTORS([9])
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([1]))
-FLOPPY_OPTIONS_END
-
-static void kc85d_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 4; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_kc85; break;
-
-		default:										floppy_device_getinfo(devclass, state, info); break;
-	}
-}
-
-static SYSTEM_CONFIG_START(kc85d)
-	CONFIG_IMPORT_FROM(kc85)
-	CONFIG_DEVICE(kc85d_floppy_getinfo)
-SYSTEM_CONFIG_END
-
 /*     YEAR  NAME      PARENT   COMPAT  MACHINE  INPUT     INIT  CONFIG  COMPANY   FULLNAME */
 COMP( 1987, kc85_2,   0,	   0,		kc85_3,  kc85,     0,    kc85,   "VEB Mikroelektronik", "HC900 / KC 85/2", GAME_NOT_WORKING)
 COMP( 1987, kc85_3,   kc85_2,  0,		kc85_3,  kc85,     0,    kc85,   "VEB Mikroelektronik", "KC 85/3", GAME_NOT_WORKING)
 COMP( 1989, kc85_4,   kc85_2,  0,		kc85_4,  kc85,     0,    kc85,   "VEB Mikroelektronik", "KC 85/4", GAME_NOT_WORKING)
-COMP( 1989, kc85_4d,  kc85_2,  0,		kc85_4d, kc85,     0,    kc85d,  "VEB Mikroelektronik", "KC 85/4 + Disk Interface Module (D004)", GAME_NOT_WORKING)
+COMP( 1989, kc85_4d,  kc85_2,  0,		kc85_4d, kc85,     0,    kc85,  "VEB Mikroelektronik", "KC 85/4 + Disk Interface Module (D004)", GAME_NOT_WORKING)
 COMP( 1989, kc85_5,   kc85_2,  0,		kc85_4,  kc85,     0,    kc85,   "VEB Mikroelektronik", "KC 85/5", GAME_NOT_WORKING)

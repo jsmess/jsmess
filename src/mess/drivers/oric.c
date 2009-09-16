@@ -360,6 +360,18 @@ static const centronics_interface oric_centronics_config =
 	DEVCB_NULL
 };
 
+static const floppy_config oric1_floppy_config =
+{
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(oric)
+};
+
+static const floppy_config prav8d_floppy_config =
+{
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(apple2)
+};
+
 static MACHINE_DRIVER_START( oric )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 1000000)
@@ -400,8 +412,15 @@ static MACHINE_DRIVER_START( oric )
 	MDRV_VIA6522_ADD( "via6522_0", 1000000, oric_6522_interface )
 
 	MDRV_WD179X_ADD("wd179x", oric_wd17xx_interface )
+	
+	MDRV_FLOPPY_4_DRIVES_ADD(oric1_floppy_config)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( prav8d)
+	MDRV_IMPORT_FROM( oric )
+	MDRV_FLOPPY_4_DRIVES_REMOVE()
+	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, prav8d_floppy_config)
+MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( telstrat)
 	MDRV_IMPORT_FROM( oric )
@@ -506,48 +525,10 @@ ROM_START(prav8dd)
     ROM_LOAD_OPTIONAL( "8ddoshi.rom", 0x014100, 0x0200, CRC(66309641) SHA1(9c2e82b3c4d385ade6215fcb89f8b92e6fd2bf4b) )
 ROM_END
 
-static void oric1_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:					info->i = 4; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:			info->p = (void *) floppyoptions_oric; break;
-
-		default:										floppy_device_getinfo(devclass, state, info); break;
-	}
-}
-
-static SYSTEM_CONFIG_START(oric1)
-	CONFIG_DEVICE(oric1_floppy_getinfo)
-SYSTEM_CONFIG_END
-
-static void prav8_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:					info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:			info->p = (void *) floppyoptions_apple2; break;
-
-		default:										floppy_device_getinfo(devclass, state, info); break;
-	}
-}
-
-static SYSTEM_CONFIG_START(prav8)
-	CONFIG_DEVICE(prav8_floppy_getinfo)
-SYSTEM_CONFIG_END
-
 
 /*    YEAR   NAME       PARENT  COMPAT  MACHINE     INPUT       INIT    CONFIG    COMPANY         FULLNAME */
-COMP( 1983, oric1,     0,		0,		oric,       oric,	    0,	    oric1,    "Tangerine",    "Oric 1" , 0)
-COMP( 1984, orica,     oric1,	0,		oric,	    orica,	    0,	    oric1,    "Tangerine",    "Oric Atmos" , 0)
-COMP( 1985, prav8d,    oric1,	0,		oric,       prav8d,     0,      prav8,    "Pravetz",      "Pravetz 8D", 0)
-COMP( 1989, prav8dd,   oric1,	0,		oric,       prav8d,     0,      prav8,    "Pravetz",      "Pravetz 8D (Disk ROM)", GAME_COMPUTER_MODIFIED)
-COMP( 1986, telstrat,  oric1,	0,		telstrat,   telstrat,   0,      oric1,    "Tangerine",    "Oric Telestrat", GAME_NOT_WORKING )
+COMP( 1983, oric1,     0,		0,		oric,       oric,	    0,	    0,    "Tangerine",    "Oric 1" , 0)
+COMP( 1984, orica,     oric1,	0,		oric,	    orica,	    0,	    0,    "Tangerine",    "Oric Atmos" , 0)
+COMP( 1985, prav8d,    oric1,	0,		prav8d,     prav8d,     0,      0,    "Pravetz",      "Pravetz 8D", 0)
+COMP( 1989, prav8dd,   oric1,	0,		prav8d,     prav8d,     0,      0,    "Pravetz",      "Pravetz 8D (Disk ROM)", GAME_COMPUTER_MODIFIED)
+COMP( 1986, telstrat,  oric1,	0,		telstrat,   telstrat,   0,      0,    "Tangerine",    "Oric Telestrat", GAME_NOT_WORKING )

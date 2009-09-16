@@ -514,6 +514,13 @@ static const mm58274c_interface floppy_mm58274c_interface =
 	0   /*  first day of week */
 };
 
+
+static const floppy_config ti99_4_floppy_config =
+{
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(ti99)
+};
+
 static MACHINE_DRIVER_START(ti99_4_60hz)
 	/* basic machine hardware */
 	/* TMS9900 CPU @ 3.0 MHz */
@@ -562,6 +569,8 @@ static MACHINE_DRIVER_START(ti99_4_60hz)
 	MDRV_TMS9902_ADD("tms9902_1", tms9902_params_1)		
 	
 	MDRV_WD179X_ADD("wd179x", ti99_wd17xx_interface )
+	
+	MDRV_FLOPPY_4_DRIVES_ADD(ti99_4_floppy_config)	
 	
 	MDRV_TI99_CARTRIDGE_ADD("ti99_multicart")
 	
@@ -613,6 +622,8 @@ static MACHINE_DRIVER_START(ti99_4_50hz)
 	MDRV_TMS9902_ADD("tms9902_1", tms9902_params_1)		
 	
 	MDRV_WD179X_ADD("wd179x", ti99_wd17xx_interface )
+	MDRV_FLOPPY_4_DRIVES_ADD(ti99_4_floppy_config)	
+	
 	MDRV_TI99_CARTRIDGE_ADD("ti99_multicart")
 	
 MACHINE_DRIVER_END
@@ -664,6 +675,7 @@ static MACHINE_DRIVER_START(ti99_4a_60hz)
 	MDRV_TMS9902_ADD("tms9902_1", tms9902_params_1)		
 	
 	MDRV_WD179X_ADD("wd179x", ti99_wd17xx_interface )	
+	MDRV_FLOPPY_4_DRIVES_ADD(ti99_4_floppy_config)	
 	
 	MDRV_TI99_CARTRIDGE_ADD("ti99_multicart")
 MACHINE_DRIVER_END
@@ -715,6 +727,7 @@ static MACHINE_DRIVER_START(ti99_4a_50hz)
 	MDRV_TMS9902_ADD("tms9902_1", tms9902_params_1)	
 	
 	MDRV_WD179X_ADD("wd179x", ti99_wd17xx_interface )
+	MDRV_FLOPPY_4_DRIVES_ADD(ti99_4_floppy_config)	
 	
 	MDRV_TI99_CARTRIDGE_ADD("ti99_multicart")
 MACHINE_DRIVER_END
@@ -774,6 +787,7 @@ static MACHINE_DRIVER_START(ti99_4ev_60hz)
 	MDRV_TMS9902_ADD("tms9902_1", tms9902_params_1)
 	
 	MDRV_WD179X_ADD("wd179x", ti99_wd17xx_interface )	
+	MDRV_FLOPPY_4_DRIVES_ADD(ti99_4_floppy_config)	
 	MDRV_TI99_CARTRIDGE_ADD("ti99_multicart")
 	
 MACHINE_DRIVER_END
@@ -877,22 +891,6 @@ ROM_END
 #define rom_ti99_4e rom_ti99_4
 #define rom_ti99_4ae rom_ti99_4a
 
-static void ti99_4_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 4; break;
-
-        case MESS_DEVINFO_INT_KEEP_DRIVE_GEOMETRY:                                  info->i = 1; break;
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_ti99; break;
-
-		default:										floppy_device_getinfo(devclass, state, info); break;
-	}
-}
-
 static void ti99_4_parallel_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* parallel */
@@ -979,7 +977,6 @@ static void ti99_4_memcard_getinfo(const mess_device_class *devclass, UINT32 sta
 }		
 	
 static SYSTEM_CONFIG_START(ti99_4)	
-	CONFIG_DEVICE(ti99_4_floppy_getinfo)
 	CONFIG_DEVICE(ti99_4_parallel_getinfo)
 	CONFIG_DEVICE(ti99_4_serial_getinfo)
 	/*CONFIG_DEVICE(ti99_4_quickload_getinfo)*/

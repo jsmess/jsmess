@@ -804,8 +804,8 @@ static WRITE8_HANDLER( x1_fdc_w )
 			break;
 		case 0x0ffc:
 			wd17xx_set_drive(dev,data & 3);
-			floppy_drive_set_motor_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, data & 3), data & 0x80);
-			floppy_drive_set_ready_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, data & 3), data & 0x80,0);
+			floppy_drive_set_motor_state(floppy_get_device(space->machine, data & 3), data & 0x80);
+			floppy_drive_set_ready_state(floppy_get_device(space->machine, data & 3), data & 0x80,0);
 			wd17xx_set_side(dev,(data & 0x10)>>4);
 			break;
 		case 0x0ffd:
@@ -819,7 +819,8 @@ static WRITE8_HANDLER( x1_fdc_w )
 static const wd17xx_interface x1_mb8877a_interface =
 {
 	x1_fdc_irq,
-	NULL
+	NULL,
+	{FLOPPY_0,FLOPPY_1,FLOPPY_2,FLOPPY_3}
 };
 
 /*************************************
@@ -1904,6 +1905,22 @@ static PALETTE_INIT(x1)
 	}
 }
 
+FLOPPY_OPTIONS_START( x1 )
+	FLOPPY_OPTION( d88, "d88",	"D88 Floppy Disk image",	fm7_d77_identify,	fm7_d77_construct, NULL)
+	FLOPPY_OPTION( img2d, "2d", "2D disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([40])
+		SECTORS([16])
+		SECTOR_LENGTH([256])
+		FIRST_SECTOR_ID([1]))
+FLOPPY_OPTIONS_END
+
+static const floppy_config x1_floppy_config =
+{
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(x1)
+};
+
 static MACHINE_DRIVER_START( x1 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_4MHz)
@@ -1948,6 +1965,8 @@ static MACHINE_DRIVER_START( x1 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	MDRV_CASSETTE_ADD("cass",x1_cassette_config)
+	
+	MDRV_FLOPPY_4_DRIVES_ADD(x1_floppy_config)	
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( x1turbo )
@@ -1960,41 +1979,6 @@ static MACHINE_DRIVER_START( x1turbo )
 //	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
-
-/*************************************
- *
- *  Image Load Functions
- *
- *************************************/
-FLOPPY_OPTIONS_START( x1 )
-	FLOPPY_OPTION( d88, "d88",	"D88 Floppy Disk image",	fm7_d77_identify,	fm7_d77_construct, NULL)
-	FLOPPY_OPTION( img2d, "2d", "2D disk image", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([2])
-		TRACKS([40])
-		SECTORS([16])
-		SECTOR_LENGTH([256])
-		FIRST_SECTOR_ID([1]))
-FLOPPY_OPTIONS_END
-
-
-static void x1_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 4; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_x1; break;
-
-		default:										floppy_device_getinfo(devclass, state, info); break;
-	}
-}
-
-static SYSTEM_CONFIG_START(x1)
-	CONFIG_DEVICE(x1_floppy_getinfo)
-SYSTEM_CONFIG_END
 
 /*************************************
  *
@@ -2101,7 +2085,7 @@ ROM_END
 
 
 /*    YEAR  NAME       PARENT  COMPAT   MACHINE  INPUT  INIT  CONFIG COMPANY   FULLNAME      FLAGS */
-COMP( 1982, x1,        0,      0,       x1,      x1,    0,    x1,    "Sharp",  "X1 (CZ-800C)",         GAME_NOT_WORKING)
-COMP( 1984, x1ck,      x1,     0,       x1,      x1,    0,    x1,    "Sharp",  "X1Ck (CZ-804C)",       GAME_NOT_WORKING)
-COMP( 1984, x1turbo,   x1,     0,       x1turbo, x1,    0,    x1,    "Sharp",  "X1 Turbo (CZ-850C)",   GAME_NOT_WORKING)
-COMP( 1986, x1turboz,  x1,     0,       x1turbo, x1,    0,    x1,    "Sharp",  "X1 Turbo Z (CZ-880C)", GAME_NOT_WORKING)
+COMP( 1982, x1,        0,      0,       x1,      x1,    0,    0,    "Sharp",  "X1 (CZ-800C)",         GAME_NOT_WORKING)
+COMP( 1984, x1ck,      x1,     0,       x1,      x1,    0,    0,    "Sharp",  "X1Ck (CZ-804C)",       GAME_NOT_WORKING)
+COMP( 1984, x1turbo,   x1,     0,       x1turbo, x1,    0,    0,    "Sharp",  "X1 Turbo (CZ-850C)",   GAME_NOT_WORKING)
+COMP( 1986, x1turboz,  x1,     0,       x1turbo, x1,    0,    0,    "Sharp",  "X1 Turbo Z (CZ-880C)", GAME_NOT_WORKING)

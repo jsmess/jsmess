@@ -53,7 +53,9 @@ typedef struct nec765_interface
 	/* image lookup */
 	nec765_get_image_func get_image;
 	
-	NEC765_RDY_PIN rdy_pin;	
+	NEC765_RDY_PIN rdy_pin;
+	
+	const char *floppy_drive_tags[4];
 } nec765_interface;
 
 

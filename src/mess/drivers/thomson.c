@@ -635,25 +635,15 @@ static INPUT_PORTS_START ( t9000 )
      PORT_INCLUDE ( to7 )
 INPUT_PORTS_END
 
-static void thom_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+static const floppy_config thomson_floppy_config =
 {
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 4; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_thomson; break;
-
-		default:										floppy_device_getinfo(devclass, state, info); break;
-	}
-}
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(thomson)
+};
 
 /* ------------ config ------------ */
 
-static SYSTEM_CONFIG_START ( to )
-     CONFIG_DEVICE ( thom_floppy_getinfo )
+static SYSTEM_CONFIG_START ( to )     
      CONFIG_DEVICE ( thom_serial_getinfo )
 SYSTEM_CONFIG_END
 
@@ -728,12 +718,14 @@ static MACHINE_DRIVER_START ( to7 )
 	MDRV_PIA6821_ADD( THOM_PIA_MODEM, to7_pia6821_modem )
 
 /* acia */
-     MDRV_ACIA6551_ADD("acia")
+    MDRV_ACIA6551_ADD("acia")
 
 /* modem */
-     MDRV_ACIA6850_ADD( "acia6850", to7_modem )
+    MDRV_ACIA6850_ADD( "acia6850", to7_modem )
 
-     MDRV_WD2793_ADD("wd2793", default_wd17xx_interface )
+    MDRV_WD2793_ADD("wd2793", default_wd17xx_interface )
+	 
+	MDRV_FLOPPY_4_DRIVES_ADD(thomson_floppy_config)
 
 	/* cartridge */
 	MDRV_CARTSLOT_ADD("cart")
@@ -1098,8 +1090,7 @@ INPUT_PORTS_END
 
 /* ------------ config ------------ */
 
-static SYSTEM_CONFIG_START ( mo )
-     CONFIG_DEVICE ( thom_floppy_getinfo )
+static SYSTEM_CONFIG_START ( mo )     
      CONFIG_DEVICE ( thom_serial_getinfo )
 SYSTEM_CONFIG_END
 

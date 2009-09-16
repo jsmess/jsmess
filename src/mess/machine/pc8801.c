@@ -818,7 +818,8 @@ const nec765_interface pc8801_fdc_interface=
 	DEVCB_LINE(pc8801_fdc_interrupt),
 	pc8801_fdc_dma_drq,
 	NULL,
-	NEC765_RDY_PIN_CONNECTED
+	NEC765_RDY_PIN_CONNECTED,
+	{FLOPPY_0, FLOPPY_1, NULL, NULL}
 };
 
 static void pc8801_init_5fd(running_machine *machine)
@@ -829,10 +830,10 @@ static void pc8801_init_5fd(running_machine *machine)
 	else
 		cputag_resume(machine, "sub", SUSPEND_REASON_DISABLE);
 	cpu_set_input_line_vector(cputag_get_cpu(machine, "sub"), 0, 0);
-	floppy_drive_set_motor_state(image_from_devtype_and_index(machine, IO_FLOPPY, 0), 1);
-	floppy_drive_set_motor_state(image_from_devtype_and_index(machine, IO_FLOPPY, 1), 1);
-	floppy_drive_set_ready_state(image_from_devtype_and_index(machine, IO_FLOPPY, 0), 1,0);
-	floppy_drive_set_ready_state(image_from_devtype_and_index(machine, IO_FLOPPY, 1), 1,0);
+	floppy_drive_set_motor_state(floppy_get_device(machine, 0), 1);
+	floppy_drive_set_motor_state(floppy_get_device(machine, 1), 1);
+	floppy_drive_set_ready_state(floppy_get_device(machine, 0), 1,0);
+	floppy_drive_set_ready_state(floppy_get_device(machine, 1), 1,0);
 }
 
 /*

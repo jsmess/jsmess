@@ -429,6 +429,11 @@ static const pc_lpt_interface at_lpt_config =
 	DEVCB_CPU_INPUT_LINE("maincpu", 0)
 };
 
+static const floppy_config ibmat_floppy_config =
+{
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(pc)
+};
 
 static MACHINE_DRIVER_START( ibm5170 )
 	/* basic machine hardware */
@@ -488,6 +493,8 @@ static MACHINE_DRIVER_START( ibm5170 )
 	MDRV_IMPORT_FROM( pc_hdc )
 
 	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
+	
+	MDRV_FLOPPY_2_DRIVES_ADD(ibmat_floppy_config)
 MACHINE_DRIVER_END
 
 
@@ -551,6 +558,8 @@ static MACHINE_DRIVER_START( ibm5162 )
 	MDRV_IMPORT_FROM( pc_hdc )
 
 	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
+	
+	MDRV_FLOPPY_2_DRIVES_ADD(ibmat_floppy_config)
 MACHINE_DRIVER_END
 
 
@@ -616,6 +625,8 @@ static MACHINE_DRIVER_START( ps2m30286 )
 	MDRV_IMPORT_FROM( pc_hdc )
 
 	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
+	
+	MDRV_FLOPPY_2_DRIVES_ADD(ibmat_floppy_config)
 MACHINE_DRIVER_END
 
 
@@ -683,6 +694,8 @@ static MACHINE_DRIVER_START( atvga )
 	MDRV_IMPORT_FROM( pc_hdc )
 
 	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
+	
+	MDRV_FLOPPY_2_DRIVES_ADD(ibmat_floppy_config)
 MACHINE_DRIVER_END
 
 
@@ -747,6 +760,8 @@ static MACHINE_DRIVER_START( at386 )
 	MDRV_IMPORT_FROM( pc_hdc )
 
 	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
+	
+	MDRV_FLOPPY_2_DRIVES_ADD(ibmat_floppy_config)
 MACHINE_DRIVER_END
 
 
@@ -1061,26 +1076,8 @@ ROM_START( at586 )
 	ROM_LOAD("14166.bin", 0x0000, 0x2000, CRC(1aea1b53) SHA1(b75b6d4509036406052157bc34159f7039cdc72e))
 ROM_END
 
-
-static void ibmat_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_pc; break;
-
-		default:										floppy_device_getinfo(devclass, state, info); break;
-	}
-}
-
-
 static SYSTEM_CONFIG_START(ibmat)
-	CONFIG_RAM_DEFAULT( (640+1024) * 1024 )
-	CONFIG_DEVICE(ibmat_floppy_getinfo)
+	CONFIG_RAM_DEFAULT( (640+1024) * 1024 )	
 SYSTEM_CONFIG_END
 
 /***************************************************************************

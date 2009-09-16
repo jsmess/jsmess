@@ -11,7 +11,7 @@
 
 #include "device.h"
 #include "image.h"
-
+#include "flopdrv.h"
 
 enum
 {
@@ -39,6 +39,28 @@ void sony_set_speed(int speed);
 UINT8 sony_read_data(const device_config *device);
 void sony_write_data(const device_config *device,UINT8 data);
 int sony_read_status(const device_config *device);
+
+#define FLOPPY_SONY	DEVICE_GET_INFO_NAME(sonydriv)
+DEVICE_GET_INFO(sonydriv);
+
+#define MDRV_FLOPPY_SONY_2_DRIVES_ADD(_config) 	\
+	MDRV_DEVICE_ADD(FLOPPY_0, FLOPPY_SONY, 0)		\
+	MDRV_DEVICE_CONFIG(_config)	\
+	MDRV_DEVICE_ADD(FLOPPY_1, FLOPPY_SONY, 0)		\
+	MDRV_DEVICE_CONFIG(_config)	
+
+#define MDRV_FLOPPY_SONY_2_DRIVES_ADDITIONAL_ADD(_config) 	\
+	MDRV_DEVICE_ADD(FLOPPY_2, FLOPPY_SONY, 0)		\
+	MDRV_DEVICE_CONFIG(_config)	\
+	MDRV_DEVICE_ADD(FLOPPY_3, FLOPPY_SONY, 0)		\
+	MDRV_DEVICE_CONFIG(_config)	
+
+#define MDRV_FLOPPY_SONY_2_DRIVES_MODIFY(_config) 	\
+	MDRV_DEVICE_MODIFY(FLOPPY_0)		\
+	MDRV_DEVICE_CONFIG(_config)	\
+	MDRV_DEVICE_MODIFY(FLOPPY_1)		\
+	MDRV_DEVICE_CONFIG(_config)	
+
 
 
 #endif /* SONYDRIV_H */

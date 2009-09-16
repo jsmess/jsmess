@@ -45,7 +45,7 @@
 
 INLINE const device_config *get_floppy_image(running_machine *machine, int drive)
 {
-	return image_from_devtype_and_index(machine, IO_FLOPPY, drive);
+	return floppy_get_device(machine, drive);
 }
 
 /* Keyboard HACK */
@@ -937,7 +937,8 @@ static const struct nec765_interface prof80_nec765_interface =
 	DEVCB_NULL,
 	NULL,
 	NULL,
-	NEC765_RDY_PIN_CONNECTED
+	NEC765_RDY_PIN_CONNECTED,
+	{FLOPPY_0,FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 
 /* PPI8255 Interface */
@@ -1127,7 +1128,7 @@ static MACHINE_START( prof80 )
 	upd1990a_oe_w(state->upd1990a, 1);
 
 	/* configure FDC */
-	floppy_drive_set_index_pulse_callback(image_from_devtype_and_index(machine, IO_FLOPPY, 0), prof80_fdc_index_callback);
+	floppy_drive_set_index_pulse_callback(floppy_get_device(machine, 0), prof80_fdc_index_callback);
 
 	/* allocate floppy motor off timer */
 	state->floppy_motor_off_timer = timer_alloc(machine, floppy_motor_off_tick, NULL);
@@ -1178,8 +1179,17 @@ static MACHINE_RESET( prof80 )
 	state->gripc = 0x40;
 }
 
-/* Machine Drivers */
+static FLOPPY_OPTIONS_START(prof80)
+	// dsk
+FLOPPY_OPTIONS_END
 
+static const floppy_config prof80_floppy_config =
+{
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(prof80)
+};
+
+/* Machine Drivers */
 static MACHINE_DRIVER_START( prof80 )
 	MDRV_DRIVER_DATA(prof80_state)
 
@@ -1222,6 +1232,8 @@ static MACHINE_DRIVER_START( prof80 )
 
 	/* printer */
 	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
+	
+	MDRV_FLOPPY_4_DRIVES_ADD(prof80_floppy_config)
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -1255,27 +1267,8 @@ ROM_START( prof80 )
 ROM_END
 
 /* System Configurations */
-static FLOPPY_OPTIONS_START(prof80)
-	// dsk
-FLOPPY_OPTIONS_END
-
-static void prof80_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 4; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_prof80; break;
-
-		default:										floppy_device_getinfo(devclass, state, info); break;
-	}
-}
 static SYSTEM_CONFIG_START( prof80 )
 	CONFIG_RAM_DEFAULT	(128 * 1024)
-	CONFIG_DEVICE(prof80_floppy_getinfo)
 SYSTEM_CONFIG_END
 
 /* System Drivers */
