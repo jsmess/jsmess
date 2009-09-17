@@ -71,9 +71,6 @@ static MACHINE_DRIVER_START( uknc )
     MDRV_VIDEO_UPDATE(uknc)
 MACHINE_DRIVER_END
 
-static SYSTEM_CONFIG_START(uknc)
-SYSTEM_CONFIG_END
-
 /* ROM definition */
 ROM_START( uknc )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
@@ -84,5 +81,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( 1987, uknc,  0,       0, 	uknc, 	uknc, 	 0,  	  uknc,  	 "????",   "UKNC",		GAME_NOT_WORKING)
+COMP( 1987, uknc,  0,       0, 	uknc, 	uknc, 	 0,  	  0,  	 "????",   "UKNC",		GAME_NOT_WORKING)
 

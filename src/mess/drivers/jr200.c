@@ -201,9 +201,6 @@ MDRV_CPU_VBLANK_INT("screen", jr200_irq)
 	MDRV_VIDEO_UPDATE(jr200)
 MACHINE_DRIVER_END
 
-static SYSTEM_CONFIG_START(jr200)
-SYSTEM_CONFIG_END
-
 /* ROM definition */
 ROM_START( jr200 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
@@ -220,4 +217,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( 1982, jr200,  0,       0, 	jr200, 	jr200, 	 0,  	  jr200,  	 "National",   "JR-200",		GAME_NOT_WORKING )
+COMP( 1982, jr200,  0,       0, 	jr200, 	jr200, 	 0,  	  0,  	 "National",   "JR-200",		GAME_NOT_WORKING )

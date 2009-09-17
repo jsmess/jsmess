@@ -59,9 +59,6 @@ static MACHINE_DRIVER_START( pmi80 )
     MDRV_VIDEO_UPDATE(pmi80)
 MACHINE_DRIVER_END
 
-static SYSTEM_CONFIG_START(pmi80)
-SYSTEM_CONFIG_END
-
 /* ROM definition */
 ROM_START( pmi80 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
@@ -72,5 +69,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( ????, pmi80,  0,       0, 	pmi80, 	pmi80, 	 0,  	  pmi80,  	 "Tesla",   "PMI-80",		GAME_NOT_WORKING)
+COMP( ????, pmi80,  0,       0, 	pmi80, 	pmi80, 	 0,  	  0,  	 "Tesla",   "PMI-80",		GAME_NOT_WORKING)
 

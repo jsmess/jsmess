@@ -59,9 +59,6 @@ static MACHINE_DRIVER_START( unior )
     MDRV_VIDEO_UPDATE(unior)
 MACHINE_DRIVER_END
 
-static SYSTEM_CONFIG_START(unior)
-SYSTEM_CONFIG_END
-
 /* ROM definition */
 ROM_START( unior )
     ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
@@ -74,5 +71,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( ????, unior,  radio86,       0, 	unior, 	unior, 	 0,  	  unior,  	 "",   "Unior",		GAME_NOT_WORKING)
+COMP( ????, unior,  radio86,       0, 	unior, 	unior, 	 0,  	  0,  	 "",   "Unior",		GAME_NOT_WORKING)
 

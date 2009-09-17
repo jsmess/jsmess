@@ -59,9 +59,6 @@ static MACHINE_DRIVER_START( iq151 )
     MDRV_VIDEO_UPDATE(iq151)
 MACHINE_DRIVER_END
 
-static SYSTEM_CONFIG_START(iq151)
-SYSTEM_CONFIG_END
-
 /* ROM definition */
 ROM_START( iq151 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
@@ -80,5 +77,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( ????, iq151,  0,       0, 	iq151, 	iq151, 	 0,  	  iq151,  	 "ZPA Novy Bor",   "IQ-151",		GAME_NOT_WORKING)
+COMP( ????, iq151,  0,       0, 	iq151, 	iq151, 	 0,  	  0,  	 "ZPA Novy Bor",   "IQ-151",		GAME_NOT_WORKING)
 

@@ -94,9 +94,6 @@ static MACHINE_DRIVER_START( hec2hrp )
 	MDRV_VIDEO_UPDATE(hec2hrp)
 MACHINE_DRIVER_END
 
-static SYSTEM_CONFIG_START(hec2hrp)
-SYSTEM_CONFIG_END
-
 /* ROM definition */
 ROM_START( hec2hrp )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
@@ -111,6 +108,6 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP(1983, hec2hrp,  0,       0,     hec2hrp, 	hec2hrp, 0,  	  hec2hrp,  	 "Micronique",   "Hector 2HR+",	GAME_NOT_WORKING)
-COMP(????, hec2hrx,  hec2hrp, 0,     hec2hrp, 	hec2hrp, 0,  	  hec2hrp,  	 "Micronique",   "Hector 2HRX",	GAME_NOT_WORKING)
+COMP(1983, hec2hrp,  0,       0,     hec2hrp, 	hec2hrp, 0,  	  0,  	 "Micronique",   "Hector 2HR+",	GAME_NOT_WORKING)
+COMP(????, hec2hrx,  hec2hrp, 0,     hec2hrp, 	hec2hrp, 0,  	  0,  	 "Micronique",   "Hector 2HRX",	GAME_NOT_WORKING)
 

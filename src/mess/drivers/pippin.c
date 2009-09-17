@@ -77,9 +77,6 @@ static MACHINE_DRIVER_START( pippin )
 	MDRV_CDROM_ADD("cdrom")
 MACHINE_DRIVER_END
 
-static SYSTEM_CONFIG_START(pippin)
-SYSTEM_CONFIG_END
-
 /* ROM definition */
 /*
 
@@ -107,4 +104,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( 1996, pippin,  0,       0, 	pippin, 	pippin, 	 0,  	  pippin,  	 "Apple/Bandai",   "Pippin @mark",		GAME_NOT_WORKING)
+COMP( 1996, pippin,  0,       0, 	pippin, 	pippin, 	 0,  	  0,  	 "Apple/Bandai",   "Pippin @mark",		GAME_NOT_WORKING)

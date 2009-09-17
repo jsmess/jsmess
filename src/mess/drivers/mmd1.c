@@ -185,9 +185,6 @@ static MACHINE_DRIVER_START( mmd2 )
 	MDRV_DEFAULT_LAYOUT(layout_mmd2)
 MACHINE_DRIVER_END
 
-static SYSTEM_CONFIG_START(mmd2)
-SYSTEM_CONFIG_END
-
 /* ROM definition */
 ROM_START( mmd1 )
     ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
@@ -206,5 +203,5 @@ ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
 COMP( 1976, mmd1,  0,       0, 	mmd1, 	mmd1, 	 0,  	  0,  	 	"E&L Instruments, Inc.",   "MMD-1",		0)
-COMP( 1976, mmd2,  mmd1,    0, 	mmd2, 	mmd2, 	 0,  	  mmd2,  	 "E&L Instruments, Inc.",   "MMD-2",		GAME_NOT_WORKING)
+COMP( 1976, mmd2,  mmd1,    0, 	mmd2, 	mmd2, 	 0,  	  0,  	 "E&L Instruments, Inc.",   "MMD-2",		GAME_NOT_WORKING)
 

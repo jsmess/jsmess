@@ -254,9 +254,6 @@ ROM_START( dcdev )
         ROM_LOAD( "hkt-0120-flash.bin", 0x200000, 0x020000, CRC(7784C304) SHA1(31EF57F550D8CD13E40263CBC657253089E53034) )	// Flash
 ROM_END
 
-static SYSTEM_CONFIG_START(dc)
-SYSTEM_CONFIG_END
-
 static INPUT_PORTS_START( dc )
 	PORT_START("P1L")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
@@ -342,8 +339,8 @@ INPUT_PORTS_END
 
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY FULLNAME */
-CONS( 1999, dc,		dcjp,	0,	dc,	dc,	dc,	dc, 	"Sega", "Dreamcast (US NTSC)", GAME_NOT_WORKING )
-CONS( 1998, dcjp,	0,	0,	dc,	dc,	dc,	dc, 	"Sega", "Dreamcast (Japan NTSC)", GAME_NOT_WORKING )
-CONS( 1999, dceu,	dcjp,	0,	dc,	dc,	dc,	dc, 	"Sega", "Dreamcast (European PAL)", GAME_NOT_WORKING )
-CONS( 1998, dcdev,	dcjp,	0,	dc,	dc,	dc,	dc, 	"Sega", "HKT-0120 Sega Dreamcast Development Box", GAME_NOT_WORKING )
+CONS( 1999, dc,		dcjp,	0,	dc,	dc,	dc,	0, 	"Sega", "Dreamcast (US NTSC)", GAME_NOT_WORKING )
+CONS( 1998, dcjp,	0,	0,	dc,	dc,	dc,	0, 	"Sega", "Dreamcast (Japan NTSC)", GAME_NOT_WORKING )
+CONS( 1999, dceu,	dcjp,	0,	dc,	dc,	dc,	0, 	"Sega", "Dreamcast (European PAL)", GAME_NOT_WORKING )
+CONS( 1998, dcdev,	dcjp,	0,	dc,	dc,	dc,	0, 	"Sega", "HKT-0120 Sega Dreamcast Development Box", GAME_NOT_WORKING )
 

@@ -242,9 +242,6 @@ static MACHINE_DRIVER_START( ec65k )
     MDRV_VIDEO_UPDATE(ec65)
 MACHINE_DRIVER_END
 
-static SYSTEM_CONFIG_START(ec65)
-SYSTEM_CONFIG_END
-
 /* ROM definition */
 ROM_START( ec65 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
@@ -262,6 +259,6 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( 1985, ec65,  0,       0, 		ec65, 	ec65, 	 0,  	  ec65,  	 "Elektor Electronics",   "EC-65",		GAME_NOT_WORKING)
-COMP( 1985, ec65k, ec65,    0, 		ec65k, 	ec65, 	 0,  	  ec65,  	 "Elektor Electronics",   "EC-65K",		GAME_NOT_WORKING)
+COMP( 1985, ec65,  0,       0, 		ec65, 	ec65, 	 0,  	  0,  	 "Elektor Electronics",   "EC-65",		GAME_NOT_WORKING)
+COMP( 1985, ec65k, ec65,    0, 		ec65k, 	ec65, 	 0,  	  0,  	 "Elektor Electronics",   "EC-65K",		GAME_NOT_WORKING)
 

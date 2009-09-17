@@ -59,9 +59,6 @@ static MACHINE_DRIVER_START( chessmst )
     MDRV_VIDEO_UPDATE(chessmst)
 MACHINE_DRIVER_END
 
-static SYSTEM_CONFIG_START(chessmst)
-SYSTEM_CONFIG_END
-
 /* ROM definition */
 ROM_START( chessmst )
     ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
@@ -81,5 +78,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( 1984, chessmst,  0,       0, 	chessmst, 	chessmst, 	 0,  	  chessmst,  	 "VEB Mikroelektronik Erfurt",   "Chess-Master",		GAME_NOT_WORKING)
+COMP( 1984, chessmst,  0,       0, 	chessmst, 	chessmst, 	 0,  	  0,  	 "VEB Mikroelektronik Erfurt",   "Chess-Master",		GAME_NOT_WORKING)
 

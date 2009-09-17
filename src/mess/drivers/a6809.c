@@ -60,9 +60,6 @@ static MACHINE_DRIVER_START( a6809 )
     MDRV_VIDEO_UPDATE(a6809)
 MACHINE_DRIVER_END
 
-static SYSTEM_CONFIG_START(a6809)
-SYSTEM_CONFIG_END
-
 /* ROM definition */
 ROM_START( a6809 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -76,5 +73,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( ????, a6809,  0,       0, 	a6809, 	a6809, 	 0,  	  a6809,  	 "Acorn",   "6809",		GAME_NOT_WORKING)
+COMP( ????, a6809,  0,       0, 	a6809, 	a6809, 	 0,  	  0,  	 "Acorn",   "6809",		GAME_NOT_WORKING)
 

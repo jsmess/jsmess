@@ -59,9 +59,6 @@ static MACHINE_DRIVER_START( prof180x )
     MDRV_VIDEO_UPDATE(prof180x)
 MACHINE_DRIVER_END
 
-static SYSTEM_CONFIG_START(prof180x)
-SYSTEM_CONFIG_END
-
 /* ROM definition */
 ROM_START( prof180x )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -79,4 +76,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( 1986, prof180x,  0,       0, 	prof180x, 	prof180x, 	 0,  	  prof180x,  	 "Conitec Datensysteme",   "PROF-180X",		GAME_NOT_WORKING )
+COMP( 1986, prof180x,  0,       0, 	prof180x, 	prof180x, 	 0,  	  0,  	 "Conitec Datensysteme",   "PROF-180X",		GAME_NOT_WORKING )

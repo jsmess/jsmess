@@ -188,9 +188,6 @@ static MACHINE_DRIVER_START( poly8813 )
 	MDRV_CPU_IO_MAP(poly8813_io)
 MACHINE_DRIVER_END
 
-static SYSTEM_CONFIG_START(poly88)
-SYSTEM_CONFIG_END
-
 /* ROM definition */
 ROM_START( poly88 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
@@ -208,6 +205,6 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   				  FULLNAME       FLAGS */
-COMP( 1976, poly88,  0,     0, 		 poly88, 	poly88,  poly88, poly88,"PolyMorphic Systems",   "Poly-88",	 0)
-COMP( 1977, poly8813,poly88,0, 		 poly8813, 	poly88,  poly88, poly88,"PolyMorphic Systems",   "Poly-8813",GAME_NOT_WORKING)
+COMP( 1976, poly88,  0,     0, 		 poly88, 	poly88,  poly88, 0,"PolyMorphic Systems",   "Poly-88",	 0)
+COMP( 1977, poly8813,poly88,0, 		 poly8813, 	poly88,  poly88, 0,"PolyMorphic Systems",   "Poly-8813",GAME_NOT_WORKING)
 

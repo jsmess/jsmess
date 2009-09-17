@@ -61,9 +61,6 @@ static MACHINE_DRIVER_START( x07 )
 	MDRV_VIDEO_UPDATE(x07)
 MACHINE_DRIVER_END
 
-static SYSTEM_CONFIG_START(x07)
-SYSTEM_CONFIG_END
-
 /* ROM definition */
 ROM_START( x07 )
 	/* very strange size... */
@@ -74,4 +71,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME    FLAGS */
-COMP( 1983, x07,    0,      0,       x07,       x07,     0,      x07,   "Canon",  "X-07",     GAME_NOT_WORKING)
+COMP( 1983, x07,    0,      0,       x07,       x07,     0,      0,   "Canon",  "X-07",     GAME_NOT_WORKING)

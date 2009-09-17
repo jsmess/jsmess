@@ -108,9 +108,6 @@ static MACHINE_DRIVER_START( mc8030 )
     MDRV_Z80SIO_ADD( "asp_sio", 4800, asp_z80sio_intf )    
 MACHINE_DRIVER_END
 
-static SYSTEM_CONFIG_START(mc80)
-SYSTEM_CONFIG_END
-
 /* ROM definition */
 ROM_START( mc8020 )
    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
@@ -162,6 +159,6 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( ????, mc8020, 0,       0, 		mc8020, mc80, 	 0,  	  mc80,  	 "VEB Elektronik Gera",   "MC-80.21/22",		GAME_NOT_WORKING)
-COMP( ????, mc8030, mc8020,  0, 		mc8030,	mc80, 	 0,  	  mc80,  	 "VEB Elektronik Gera",   "MC-80.30/31",		GAME_NOT_WORKING)
+COMP( ????, mc8020, 0,       0, 		mc8020, mc80, 	 0,  	  0,  	 "VEB Elektronik Gera",   "MC-80.21/22",		GAME_NOT_WORKING)
+COMP( ????, mc8030, mc8020,  0, 		mc8030,	mc80, 	 0,  	  0,  	 "VEB Elektronik Gera",   "MC-80.30/31",		GAME_NOT_WORKING)
 

@@ -691,9 +691,6 @@ static MACHINE_DRIVER_START( vboy )
 	MDRV_CARTSLOT_MANDATORY
 MACHINE_DRIVER_END
 
-static SYSTEM_CONFIG_START(vboy)
-SYSTEM_CONFIG_END
-
 /* ROM definition */
 ROM_START( vboy )
 	ROM_REGION( 0x200000, "user1", 0 )
@@ -703,4 +700,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   	FULLNAME       FLAGS */
-CONS( 1995, vboy,   0,      0, 		 vboy, 		vboy, 	 0,  	 vboy, 	"Nintendo", "Virtual Boy", GAME_NOT_WORKING )
+CONS( 1995, vboy,   0,      0, 		 vboy, 		vboy, 	 0,  	 0, 	"Nintendo", "Virtual Boy", GAME_NOT_WORKING )

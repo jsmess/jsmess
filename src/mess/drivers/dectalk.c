@@ -783,16 +783,8 @@ ROM_START( dectalk )
 ROM_END
 
 /******************************************************************************
- System Config
-******************************************************************************/
-static SYSTEM_CONFIG_START(dectalk)
-// write me!
-SYSTEM_CONFIG_END
-
-
-/******************************************************************************
  Drivers
 ******************************************************************************/
 
 /*    YEAR	NAME		PARENT	COMPAT	MACHINE		INPUT		INIT		CONFIG		COMPANY		FULLNAME			FLAGS */
-COMP( 1984, dectalk,	0,		0,		dectalk,	dectalk,	dectalk,	dectalk,	"DEC",		"DECTalk DTC-01",	GAME_NOT_WORKING )
+COMP( 1984, dectalk,	0,		0,		dectalk,	dectalk,	dectalk,	0,	"DEC",		"DECTalk DTC-01",	GAME_NOT_WORKING )

@@ -96,9 +96,6 @@ static MACHINE_DRIVER_START( pockstat )
 	MDRV_VIDEO_UPDATE(pockstat)
 MACHINE_DRIVER_END
 
-static SYSTEM_CONFIG_START(pockstat)
-SYSTEM_CONFIG_END
-
 /* ROM definition */
 ROM_START( pockstat )
 	ROM_REGION( 0x4000, "maincpu", 0 )
@@ -108,4 +105,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE    INPUT     INIT  CONFIG     COMPANY                             FULLNAME       FLAGS */
-CONS( 1999, pockstat, 0,      0,      pockstat,  pockstat, 0,    pockstat,  "Sony Computer Entertainment Inc.", "Sony PocketStation", GAME_NOT_WORKING)
+CONS( 1999, pockstat, 0,      0,      pockstat,  pockstat, 0,    0,  "Sony Computer Entertainment Inc.", "Sony PocketStation", GAME_NOT_WORKING)

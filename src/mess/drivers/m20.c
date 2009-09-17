@@ -58,9 +58,6 @@ static MACHINE_DRIVER_START( m20 )
     MDRV_VIDEO_UPDATE(m20)
 MACHINE_DRIVER_END
  
-static SYSTEM_CONFIG_START(m20)
-SYSTEM_CONFIG_END
- 
 ROM_START(m20)
 	ROM_REGION(0x12000,"maincpu",0)
 	ROM_SYSTEM_BIOS( 0, "m20", "M20 1.0" )
@@ -86,5 +83,5 @@ ROM_START(m40)
 ROM_END
  
 /*    YEAR  NAME   PARENT  COMPAT  MACHINE INPUT   INIT CONFIG 	COMPANY     FULLNAME        FLAGS */
-COMP( 1981, m20,   0,      0,      m20,    m20,    m20, 	m20,  	"Olivetti", "Olivetti L1 M20", GAME_NOT_WORKING)
-COMP( 1981, m40,   m20,    0,      m20,    m20,    m20, 	m20,  	"Olivetti", "Olivetti L1 M40", GAME_NOT_WORKING)
+COMP( 1981, m20,   0,      0,      m20,    m20,    m20, 	0,  	"Olivetti", "Olivetti L1 M20", GAME_NOT_WORKING)
+COMP( 1981, m40,   m20,    0,      m20,    m20,    m20, 	0,  	"Olivetti", "Olivetti L1 M40", GAME_NOT_WORKING)

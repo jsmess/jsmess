@@ -61,9 +61,6 @@ static MACHINE_DRIVER_START( sc2 )
     MDRV_VIDEO_UPDATE(sc2)
 MACHINE_DRIVER_END
 
-static SYSTEM_CONFIG_START(sc2)
-SYSTEM_CONFIG_END
-
 /* ROM definition */
 ROM_START( sc2 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
@@ -81,5 +78,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( ????, sc2,  0,       0, 	sc2, 	sc2, 	 0,  	  sc2,  	 "VEB Mikroelektronik Erfurt",   "Schachcomputer SC2",		GAME_NOT_WORKING)
+COMP( ????, sc2,  0,       0, 	sc2, 	sc2, 	 0,  	  0,  	 "VEB Mikroelektronik Erfurt",   "Schachcomputer SC2",		GAME_NOT_WORKING)
 

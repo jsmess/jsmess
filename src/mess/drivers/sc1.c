@@ -59,9 +59,6 @@ static MACHINE_DRIVER_START( sc1 )
     MDRV_VIDEO_UPDATE(sc1)
 MACHINE_DRIVER_END
 
-static SYSTEM_CONFIG_START(sc1)
-SYSTEM_CONFIG_END
-
 /* ROM definition */
 ROM_START( sc1 )			/* These are different bios versions */
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
@@ -73,5 +70,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( ????, sc1,  0,       0, 	sc1, 	sc1, 	 0,  	  sc1,  	 "VEB Mikroelektronik Erfurt",   "Schachcomputer SC1",		GAME_NOT_WORKING)
+COMP( ????, sc1,  0,       0, 	sc1, 	sc1, 	 0,  	  0,  	 "VEB Mikroelektronik Erfurt",   "Schachcomputer SC1",		GAME_NOT_WORKING)
 

@@ -332,10 +332,7 @@ ROM_START( pc9821 )
 	ROM_LOAD( "font.rom", 0x00000, 0x46800, CRC(a61c0649) SHA1(554b87377d176830d21bd03964dc71f8e98676b1) )
 ROM_END
 
-static SYSTEM_CONFIG_START(pc9801)
-SYSTEM_CONFIG_END
-
 
 /*    YEAR  NAME      PARENT   COMPAT MACHINE   INPUT     INIT    CONFIG     COMPANY                        FULLNAME    FLAGS */
-COMP( 1981, pc9801,   0,       0,     pc9801,   pc9801,   0,      pc9801,    "Nippon Electronic Company",   "PC-9801",  GAME_NOT_WORKING )
-COMP( 1993, pc9821,   0,       0,     pc9821,   pc9801,   0,      pc9801,    "Nippon Electronic Company",   "PC-9821 (98MATE)",  GAME_NOT_WORKING )
+COMP( 1981, pc9801,   0,       0,     pc9801,   pc9801,   0,      0,    "Nippon Electronic Company",   "PC-9801",  GAME_NOT_WORKING )
+COMP( 1993, pc9821,   0,       0,     pc9821,   pc9801,   0,      0,    "Nippon Electronic Company",   "PC-9821 (98MATE)",  GAME_NOT_WORKING )

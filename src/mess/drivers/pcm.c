@@ -81,9 +81,6 @@ static MACHINE_DRIVER_START( pcm )
     MDRV_VIDEO_START(pcm)
     MDRV_VIDEO_UPDATE(pcm)
 MACHINE_DRIVER_END
-
-static SYSTEM_CONFIG_START(pcm)
-SYSTEM_CONFIG_END
  
 /* ROM definition */
 ROM_START( pcm )
@@ -112,5 +109,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( 1988, pcm, 	 0,       0, 	 pcm, 		k7659, 	 0,  	  pcm,  "Mugler/Mathes",   "PC/M",		GAME_NOT_WORKING)
+COMP( 1988, pcm, 	 0,       0, 	 pcm, 		k7659, 	 0,  	  0,  "Mugler/Mathes",   "PC/M",		GAME_NOT_WORKING)
 

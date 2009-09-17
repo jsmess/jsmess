@@ -231,9 +231,6 @@ static MACHINE_DRIVER_START( busicom )
 	MDRV_VIDEO_UPDATE(busicom)	    
 MACHINE_DRIVER_END
 
-static SYSTEM_CONFIG_START(busicom)
-SYSTEM_CONFIG_END
-
 /* ROM definition */
 ROM_START( busicom )
 	ROM_REGION( 0x1000, "maincpu", ROMREGION_ERASEFF )
@@ -247,5 +244,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( 1974, busicom,  0,       0, 	busicom, 	busicom, 	 0,  	  busicom,    "Business Computer Corporation",   "Busicom 141-PF",		GAME_NOT_WORKING)
+COMP( 1974, busicom,  0,       0, 	busicom, 	busicom, 	 0,  	  0,    "Business Computer Corporation",   "Busicom 141-PF",		GAME_NOT_WORKING)
 

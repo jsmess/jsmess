@@ -113,12 +113,6 @@ static MACHINE_DRIVER_START( a5130 )
     MDRV_VIDEO_UPDATE(a5130)
 MACHINE_DRIVER_END
 
-static SYSTEM_CONFIG_START(a5120)
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START(a5130)
-SYSTEM_CONFIG_END
-
 /* ROM definition */
 ROM_START( a5120 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
@@ -140,5 +134,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( ????, a5120,  0,       0, 	a5120, 	a5120, 	 0,  	  a5120,  	 "Robotron",   "A5120",		GAME_NOT_WORKING)
-COMP( ????, a5130,  a5120,   0, 	a5130, 	a5130, 	 0,  	  a5130,  	 "Robotron",   "A5130",		GAME_NOT_WORKING)
+COMP( ????, a5120,  0,       0, 	a5120, 	a5120, 	 0,  	  0,  	 "Robotron",   "A5120",		GAME_NOT_WORKING)
+COMP( ????, a5130,  a5120,   0, 	a5130, 	a5130, 	 0,  	  0,  	 "Robotron",   "A5130",		GAME_NOT_WORKING)

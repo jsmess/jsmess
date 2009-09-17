@@ -58,9 +58,6 @@ static MACHINE_DRIVER_START( sdk86 )
     MDRV_VIDEO_UPDATE(sdk86)
 MACHINE_DRIVER_END
 
-static SYSTEM_CONFIG_START(sdk86)
-SYSTEM_CONFIG_END
-
 /* ROM definition */
 ROM_START( sdk86 )
 	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
@@ -74,5 +71,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( 1979, sdk86,  0,       0, 	sdk86, 	sdk86, 	 0,  	  sdk86,  	 "Intel",   "SDK-86",		GAME_NOT_WORKING)
+COMP( 1979, sdk86,  0,       0, 	sdk86, 	sdk86, 	 0,  	  0,  	 "Intel",   "SDK-86",		GAME_NOT_WORKING)
 

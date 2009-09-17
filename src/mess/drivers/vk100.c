@@ -136,9 +136,6 @@ static MACHINE_DRIVER_START( vk100 )
     MDRV_VIDEO_UPDATE(vk100)
 MACHINE_DRIVER_END
 
-static SYSTEM_CONFIG_START(vk100)
-SYSTEM_CONFIG_END
-
 /* ROM definition */
 /* according to http://www.computer.museum.uq.edu.au/pdf/EK-VK100-TM-001%20VK100%20Technical%20Manual.pdf page 5-10 (pdf pg 114),
 The 4 firmware roms should go from 0x0000-0x1fff, 0x2000-0x3fff, 0x4000-0x5fff and 0x6000-0x63ff; The last rom is actually a little bit longer and goes to 67ff.
@@ -160,5 +157,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( 1980, vk100,  0,       0, 	vk100, 	vk100, 	 0,  	  vk100,  	 "DEC",   "VK 100",		GAME_NOT_WORKING)
+COMP( 1980, vk100,  0,       0, 	vk100, 	vk100, 	 0,  	  0,  	 "DEC",   "VK 100",		GAME_NOT_WORKING)
 

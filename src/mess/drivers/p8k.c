@@ -550,10 +550,6 @@ static MACHINE_DRIVER_START( p8k_16 )
 	MDRV_VIDEO_UPDATE(p8k)
 MACHINE_DRIVER_END
 
-
-static SYSTEM_CONFIG_START( p8k )
-SYSTEM_CONFIG_END
-
 /* ROM definition */
 ROM_START( p8000 )
 	ROM_REGION( 0x2000, "maincpu", 0 )
@@ -580,5 +576,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME        PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY                   FULLNAME       FLAGS */
-COMP( 1989, p8000,      0,      0,       p8k,       p8k,     0,      p8k,   "EAW electronic Treptow", "P8000 (8bit Board)",  GAME_NOT_WORKING)
-COMP( 1989, p8000_16,   p8000,  0,       p8k_16,    p8k,     0,      p8k,   "EAW electronic Treptow", "P8000 (16bit Board)",  GAME_NOT_WORKING)
+COMP( 1989, p8000,      0,      0,       p8k,       p8k,     0,      0,   "EAW electronic Treptow", "P8000 (8bit Board)",  GAME_NOT_WORKING)
+COMP( 1989, p8000_16,   p8000,  0,       p8k_16,    p8k,     0,      0,   "EAW electronic Treptow", "P8000 (16bit Board)",  GAME_NOT_WORKING)

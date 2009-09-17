@@ -288,9 +288,6 @@ static MACHINE_DRIVER_START( pc6001sr )
 	MDRV_CPU_REPLACE("maincpu", Z80, XTAL_3_579545MHz)
 MACHINE_DRIVER_END
 
-static SYSTEM_CONFIG_START(pc6001)
-SYSTEM_CONFIG_END
-
 /* ROM definition */
 ROM_START( pc6001 )	/* screen = 8000-83FF */
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
@@ -356,9 +353,9 @@ ROM_START( pc6600sr )	/* Variant of pc6001sr */
 ROM_END
 
 /*    YEAR  NAME      PARENT   COMPAT MACHINE   INPUT     INIT    CONFIG     COMPANY  FULLNAME          FLAGS */
-COMP( 1981, pc6001,   0,       0,     pc6001,   pc6001,   0,      pc6001,    "Nippon Electronic Company",   "PC-6001",       GAME_NOT_WORKING )
-COMP( 1981, pc6001a,  pc6001,  0,     pc6001,   pc6001,   0,      pc6001,    "Nippon Electronic Company",   "PC-6001A",      GAME_NOT_WORKING )	// US version of PC-6001
-COMP( 1983, pc6001m2, pc6001,  0,     pc6001,   pc6001,   0,      pc6001,    "Nippon Electronic Company",   "PC-6001mkII",   GAME_NOT_WORKING )
-COMP( 1983, pc6600,   pc6001,  0,     pc6001,   pc6001,   0,      pc6001,    "Nippon Electronic Company",   "PC-6600",       GAME_NOT_WORKING )	// high-end version of PC-6001mkII
-COMP( 1984, pc6001sr, pc6001,  0,     pc6001sr, pc6001,   0,      pc6001,    "Nippon Electronic Company",   "PC-6001mkIISR", GAME_NOT_WORKING )
-COMP( 1984, pc6600sr, pc6001,  0,     pc6001sr, pc6001,   0,      pc6001,    "Nippon Electronic Company",   "PC-6600SR",     GAME_NOT_WORKING )	// high-end version of PC-6001mkIISR
+COMP( 1981, pc6001,   0,       0,     pc6001,   pc6001,   0,      0,    "Nippon Electronic Company",   "PC-6001",       GAME_NOT_WORKING )
+COMP( 1981, pc6001a,  pc6001,  0,     pc6001,   pc6001,   0,      0,    "Nippon Electronic Company",   "PC-6001A",      GAME_NOT_WORKING )	// US version of PC-6001
+COMP( 1983, pc6001m2, pc6001,  0,     pc6001,   pc6001,   0,      0,    "Nippon Electronic Company",   "PC-6001mkII",   GAME_NOT_WORKING )
+COMP( 1983, pc6600,   pc6001,  0,     pc6001,   pc6001,   0,      0,    "Nippon Electronic Company",   "PC-6600",       GAME_NOT_WORKING )	// high-end version of PC-6001mkII
+COMP( 1984, pc6001sr, pc6001,  0,     pc6001sr, pc6001,   0,      0,    "Nippon Electronic Company",   "PC-6001mkIISR", GAME_NOT_WORKING )
+COMP( 1984, pc6600sr, pc6001,  0,     pc6001sr, pc6001,   0,      0,    "Nippon Electronic Company",   "PC-6600SR",     GAME_NOT_WORKING )	// high-end version of PC-6001mkIISR

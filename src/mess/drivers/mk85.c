@@ -60,9 +60,6 @@ static MACHINE_DRIVER_START( mk85 )
     MDRV_VIDEO_UPDATE(mk85)
 MACHINE_DRIVER_END
 
-static SYSTEM_CONFIG_START(mk85)
-SYSTEM_CONFIG_END
-
 /* ROM definition */
 ROM_START( mk85 )
     ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
@@ -73,5 +70,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( ????, mk85,  0,       0, 	mk85, 	mk85, 	 0,  	  mk85,  	 "Elektronika",   "MK-85",		GAME_NOT_WORKING)
+COMP( ????, mk85,  0,       0, 	mk85, 	mk85, 	 0,  	  0,  	 "Elektronika",   "MK-85",		GAME_NOT_WORKING)
 

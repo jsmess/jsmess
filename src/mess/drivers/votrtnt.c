@@ -95,13 +95,6 @@ ROM_END
 
 
 /******************************************************************************
- System Config
-******************************************************************************/
-static SYSTEM_CONFIG_START(votrtnt)
-// write me!
-SYSTEM_CONFIG_END
-
-/******************************************************************************
  Stuff that belongs in machine/votrtnt.c
 ******************************************************************************/
 /*
@@ -122,5 +115,5 @@ static ACIA6850_INTERFACE( acia_intf )
 ******************************************************************************/
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT CONFIG      COMPANY                     FULLNAME                            FLAGS */
-COMP( 1980, votrtnt,   0,          0,      votrtnt,   votrtnt, 0,   votrtnt,   "Votrax",        "Type 'N Talk",                        GAME_NOT_WORKING )
+COMP( 1980, votrtnt,   0,          0,      votrtnt,   votrtnt, 0,   0,   "Votrax",        "Type 'N Talk",                        GAME_NOT_WORKING )
 

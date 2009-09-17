@@ -142,9 +142,6 @@ static MACHINE_DRIVER_START( bob85 )
 	MDRV_DEFAULT_LAYOUT(layout_bob85)
 MACHINE_DRIVER_END
 
-static SYSTEM_CONFIG_START(bob85)
-SYSTEM_CONFIG_END
-
 /* ROM definition */
 ROM_START( bob85 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
@@ -154,4 +151,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( ????, bob85,  0,       0, 	bob85, 	bob85, 	 0,  	  bob85,  	 "Unknown",   "BOB85",		GAME_NOT_WORKING)
+COMP( ????, bob85,  0,       0, 	bob85, 	bob85, 	 0,  	  0,  	 "Unknown",   "BOB85",		GAME_NOT_WORKING)

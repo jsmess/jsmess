@@ -60,9 +60,6 @@ static MACHINE_DRIVER_START( h89 )
     MDRV_VIDEO_UPDATE(h89)
 MACHINE_DRIVER_END
 
-static SYSTEM_CONFIG_START(h89)
-SYSTEM_CONFIG_END
-
 /* ROM definition */
 ROM_START( h89 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
@@ -76,4 +73,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( 1979, h89,  0,       0, 	h89, 	h89, 	 0,  	  h89,  	 "Heath, Inc.",   "Heathkit H89",		GAME_NOT_WORKING)
+COMP( 1979, h89,  0,       0, 	h89, 	h89, 	 0,  	  0,  	 "Heath, Inc.",   "Heathkit H89",		GAME_NOT_WORKING)

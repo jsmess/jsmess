@@ -60,9 +60,6 @@ static MACHINE_DRIVER_START( sys2900 )
     MDRV_VIDEO_UPDATE(sys2900)
 MACHINE_DRIVER_END
 
-static SYSTEM_CONFIG_START(sys2900)
-SYSTEM_CONFIG_END
-
 /* ROM definition */
 ROM_START( sys2900 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
@@ -73,5 +70,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( ????, sys2900,  0,       0, 	sys2900, 	sys2900, 	 0,  	  sys2900,  	 "Systems Group",   "System 2900",		GAME_NOT_WORKING)
+COMP( ????, sys2900,  0,       0, 	sys2900, 	sys2900, 	 0,  	  0,  	 "Systems Group",   "System 2900",		GAME_NOT_WORKING)
 

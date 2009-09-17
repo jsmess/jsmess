@@ -57,9 +57,6 @@ static MACHINE_DRIVER_START( a5105 )
     MDRV_VIDEO_UPDATE(a5105)
 MACHINE_DRIVER_END
 
-static SYSTEM_CONFIG_START(a5105)
-SYSTEM_CONFIG_END
-
 /* ROM definition */
 ROM_START( a5105 )
     ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
@@ -73,5 +70,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( ????, a5105,  0,       0, 	a5105, 	a5105, 	 0,  	  a5105,  	 "BIC",   "A5105",		GAME_NOT_WORKING)
+COMP( ????, a5105,  0,       0, 	a5105, 	a5105, 	 0,  	  0,  	 "BIC",   "A5105",		GAME_NOT_WORKING)
 

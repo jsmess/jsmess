@@ -1002,20 +1002,12 @@ ROM_END
 
 
 /******************************************************************************
- System Config
-******************************************************************************/
-static SYSTEM_CONFIG_START(socrates)
-// write me!
-SYSTEM_CONFIG_END
-
-
-/******************************************************************************
  Drivers
 ******************************************************************************/
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT CONFIG      COMPANY                     FULLNAME                            FLAGS */
-COMP( 1988, socrates,   0,          0,      socrates,   socrates, socrates,   socrates,   "V-tech",        "Socrates Educational Video System", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) // English NTSC
-COMP( 1988, socratfc,   socrates,   0,      socrates,   socrates, socrates,   socrates,   "V-tech",        "Socrates SAITOUT", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) // French Canandian NTSC
+COMP( 1988, socrates,   0,          0,      socrates,   socrates, socrates,   0,   "V-tech",        "Socrates Educational Video System", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) // English NTSC
+COMP( 1988, socratfc,   socrates,   0,      socrates,   socrates, socrates,   0,   "V-tech",        "Socrates SAITOUT", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) // French Canandian NTSC
 // Yeno Professor Weiss-Alles goes here (german PAL)
 // Yeno Professeur Saitout goes here (french SECAM)
 // ? goes here (spanish PAL)
