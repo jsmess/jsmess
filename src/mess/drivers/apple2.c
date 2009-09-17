@@ -623,7 +623,7 @@ static MACHINE_DRIVER_START( apple2_common )
 	MDRV_APPLE2_SLOT_ADD(4, "mockingboard", mockingboard_r, mockingboard_w)
 	MDRV_APPLE2_SLOT_ADD(6, "fdc", applefdc_r, applefdc_w)
 	
-	MDRV_FLOPPY_APPLE_2_DRIVES_ADD(apple2_floppy_config)
+	MDRV_FLOPPY_APPLE_2_DRIVES_ADD(apple2_floppy_config,15,16)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( apple2 )

@@ -45,13 +45,11 @@
 
 #ifdef MAME_DEBUG
 #define LOG_SONY		1
-#define LOG_SONY_EXTRA	1
+#define LOG_SONY_EXTRA	0
 #else
-#define LOG_SONY		1
-#define LOG_SONY_EXTRA	1
+#define LOG_SONY		0
+#define LOG_SONY_EXTRA	0
 #endif
-
-//static const mess_device_class parent_devclass = { floppy_device_getinfo, NULL };
 
 /*
 	These lines are normally connected to the PHI0-PHI3 lines of the IWM
@@ -361,8 +359,6 @@ int sony_read_status(const device_config *device)
 	return result;
 }
 
-
-
 static void sony_doaction(const device_config *device)
 {
 	int action;
@@ -426,8 +422,6 @@ static void sony_doaction(const device_config *device)
 	}
 }
 
-
-
 void sony_set_lines(const device_config *device,UINT8 lines)
 {
 	int old_sony_lines = sony_lines;
@@ -444,8 +438,6 @@ void sony_set_lines(const device_config *device,UINT8 lines)
 	if (LOG_SONY_EXTRA)
 		logerror("sony_set_lines(): %d\n", lines);
 }
-
-
 
 void sony_set_enable_lines(const device_config *device,int enable_mask)
 {
@@ -469,8 +461,6 @@ void sony_set_enable_lines(const device_config *device,int enable_mask)
 		logerror("sony_set_enable_lines(): %d\n", enable_mask);
 }
 
-
-
 void sony_set_sel_line(const device_config *device,int sel)
 {
 	sony_sel_line = sel ? 1 : 0;
@@ -479,14 +469,10 @@ void sony_set_sel_line(const device_config *device,int sel)
 		logerror("sony_set_sel_line(): %s line IWM_SEL\n", sony_sel_line ? "setting" : "clearing");
 }
 
-
-
 void sony_set_speed(int speed)
 {
 	rotation_speed = speed;
 }
-
-
 
 static DEVICE_IMAGE_UNLOAD( sonydriv_floppy )
 {
@@ -504,28 +490,6 @@ static DEVICE_IMAGE_UNLOAD( sonydriv_floppy )
 	DEVICE_IMAGE_UNLOAD_NAME(floppy)(image);	
 }
 
-
-/*
-void sonydriv_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	switch(state)
-	{
-		case MESS_DEVINFO_INT_COUNT:				info->i = 2; break;
-
-		case MESS_DEVINFO_STR_DEV_TAG:			strcpy(info->s = device_temp_str(), "sonydriv"); break;
-
-		case MESS_DEVINFO_PTR_UNLOAD:			info->unload = DEVICE_IMAGE_UNLOAD_NAME(sonydriv_floppy); break;
-		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:
-			if (mess_device_get_info_int(devclass, MESS_DEVINFO_INT_SONYDRIV_ALLOWABLE_SIZES) & SONY_FLOPPY_SUPPORT2IMG)
-				info->p = (void *) floppyoptions_apple35_iigs;
-			else
-				info->p = (void *) floppyoptions_apple35_mac;
-			break;
-
-		default: floppy_device_getinfo(devclass, state, info); break;
-	}
-}
-*/
 DEVICE_GET_INFO( sonydriv )
 {
 	switch (state)

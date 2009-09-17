@@ -1105,12 +1105,12 @@ static int apple2_fdc_diskreg;
 
 static int apple2_fdc_has_35(running_machine *machine)
 {
-	return device_count_tag_from_machine(machine, "sonydriv") > 0;
+	return (floppy_get_count(machine) - apple525_get_count(machine)) > 0;
 }
 
 static int apple2_fdc_has_525(running_machine *machine)
 {
-	return 1 > 0;//device_count_tag_from_machine(machine, "apple525driv") > 0;
+	return apple525_get_count(machine) > 0;
 }
 
 static void apple2_fdc_set_lines(const device_config *device, UINT8 lines)

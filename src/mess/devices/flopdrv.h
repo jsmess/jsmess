@@ -127,7 +127,7 @@ int floppy_get_count(running_machine *machine);
 int floppy_get_drive(const device_config *image);
 
 void *flopimg_get_custom_data(const device_config *image);
-void flopimg_alloc_custom_data(const device_config *image,int size);
+void flopimg_alloc_custom_data(const device_config *image,void *custom);
 
 #define FLOPPY	DEVICE_GET_INFO_NAME(floppy)
 DEVICE_GET_INFO(floppy);

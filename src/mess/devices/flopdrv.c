@@ -114,10 +114,10 @@ void *flopimg_get_custom_data(const device_config *image)
 	return flopimg->custom_data;
 }
 
-void flopimg_alloc_custom_data(const device_config *image,int size)
+void flopimg_alloc_custom_data(const device_config *image,void *custom)
 {
 	floppy_drive *flopimg = get_safe_token( image );
-	flopimg->custom_data = malloc(size);
+	flopimg->custom_data = custom;
 }
 
 static void flopimg_seek_callback(const device_config *image, int physical_track)
@@ -243,6 +243,8 @@ void floppy_drive_init(const device_config *img)
 	pDrive->rpm = 300;
 
 	pDrive->controller = NULL;
+	
+	pDrive->custom_data = NULL;
 }
 
 /* index pulses at rpm/60 Hz, and stays high 1/20th of time */
@@ -836,81 +838,6 @@ int floppy_get_count(running_machine *machine)
  *  Device specification function
  *
  *************************************/
-/*
-void floppy_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	char *s;
-	int i, count;
-	const struct FloppyFormat *floppy_options;
-
-	switch(state)
-	{
-		// --- the following bits of info are returned as 64-bit signed integers --- 
-		case MESS_DEVINFO_INT_TYPE:				info->i = IO_FLOPPY; break;
-		case MESS_DEVINFO_INT_READABLE:			info->i = 1; break;
-		case MESS_DEVINFO_INT_WRITEABLE:			info->i = 1; break;
-		case MESS_DEVINFO_INT_CREATABLE:
-			floppy_options = mess_device_get_info_ptr(devclass, MESS_DEVINFO_PTR_FLOPPY_OPTIONS);
-			info->i = floppy_options->param_guidelines ? 1 : 0;
-			break;
-
-		case MESS_DEVINFO_INT_CREATE_OPTCOUNT:
-			// count total floppy options 
-			floppy_options = mess_device_get_info_ptr(devclass, MESS_DEVINFO_PTR_FLOPPY_OPTIONS);
-			for (count = 0; floppy_options[count].construct; count++)
-				;
-			info->i = count;
-			break;
-
-		case MESS_DEVINFO_INT_KEEP_DRIVE_GEOMETRY:
-			info->i = 0;
-			break;
-
-		//--- the following bits of info are returned as NULL-terminated strings --- 
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:
-			// retrieve the floppy options 
-			floppy_options = mess_device_get_info_ptr(devclass, MESS_DEVINFO_PTR_FLOPPY_OPTIONS);
-
-			// set up a temporary string 
-			s = device_temp_str();
-			info->s = s;
-			s[0] = '\0';
-
-			// append each of the extensions 
-			for (i = 0; floppy_options[i].construct; i++)
-				specify_extension(s, 256, floppy_options[i].extensions);
-			break;
-
-		// --- the following bits of info are returned as pointers to data or functions --- 
-		case MESS_DEVINFO_PTR_START:				info->start = DEVICE_START_NAME(floppy); break;
-		case MESS_DEVINFO_PTR_LOAD:				info->load = DEVICE_IMAGE_LOAD_NAME(floppy); break;
-		case MESS_DEVINFO_PTR_CREATE:			info->create = DEVICE_IMAGE_CREATE_NAME(floppy); break;
-		case MESS_DEVINFO_PTR_UNLOAD:			info->unload = DEVICE_IMAGE_UNLOAD_NAME(floppy); break;
-		case MESS_DEVINFO_PTR_CREATE_OPTGUIDE:	info->p = (void *) floppy_option_guide; break;
-
-		default:
-			floppy_options = mess_device_get_info_ptr(devclass, MESS_DEVINFO_PTR_FLOPPY_OPTIONS);
-			if ((state >= MESS_DEVINFO_STR_CREATE_OPTNAME) && (state < MESS_DEVINFO_STR_CREATE_OPTNAME + DEVINFO_CREATE_OPTMAX))
-			{
-				info->s = (void *) floppy_options[state - MESS_DEVINFO_STR_CREATE_OPTNAME].name;
-			}
-			else if ((state >= MESS_DEVINFO_STR_CREATE_OPTDESC) && (state < MESS_DEVINFO_STR_CREATE_OPTDESC + DEVINFO_CREATE_OPTMAX))
-			{
-				info->s = (void *) floppy_options[state - MESS_DEVINFO_STR_CREATE_OPTDESC].description;
-			}
-			else if ((state >= MESS_DEVINFO_STR_CREATE_OPTEXTS) && (state < MESS_DEVINFO_STR_CREATE_OPTEXTS + DEVINFO_CREATE_OPTMAX))
-			{
-				info->s = (void *) floppy_options[state - MESS_DEVINFO_STR_CREATE_OPTEXTS].extensions;
-			}
-			else if ((state >= MESS_DEVINFO_PTR_CREATE_OPTSPEC) && (state < MESS_DEVINFO_PTR_CREATE_OPTSPEC + DEVINFO_CREATE_OPTMAX))
-			{
-				info->p = (void *) floppy_options[state - MESS_DEVINFO_PTR_CREATE_OPTSPEC].param_guidelines;
-			}
-			break;
-	}
-}
-
-*/
 /*-------------------------------------------------
     safe_strcpy - hack
 -------------------------------------------------*/
