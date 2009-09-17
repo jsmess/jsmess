@@ -21,22 +21,37 @@
 
 static UINT8 *textram;
 
-static READ8_HANDLER( test1_r )
+static READ8_HANDLER( test_r )
 {
-	if (debug_global_input_code_pressed(KEYCODE_Q)) return 0x50;
-return 0x50;
+	return 0x00;
 }
 
-static READ8_HANDLER( test2_r )
+static WRITE8_HANDLER( test_w )
 {
-	if (debug_global_input_code_pressed(KEYCODE_Q)) return 0x01;
-return 0x01;
+	;
 }
 
-static READ8_HANDLER( test3_r )
+static READ8_HANDLER( test01_r )
 {
-	if (debug_global_input_code_pressed(KEYCODE_Q)) return 0x10;
-return 0x10;
+	if (debug_global_input_code_pressed(KEYCODE_Q)) return 0x51;
+	if (debug_global_input_code_pressed(KEYCODE_P)) return 0x50;
+	if (debug_global_input_code_pressed(KEYCODE_R)) return 0x52;
+	if (debug_global_input_code_pressed(KEYCODE_S)) return 0x53;
+	if (debug_global_input_code_pressed(KEYCODE_T)) return 0x54;
+	if (debug_global_input_code_pressed(KEYCODE_U)) return 0x55;
+	if (debug_global_input_code_pressed(KEYCODE_V)) return 0x56;
+	if (debug_global_input_code_pressed(KEYCODE_W)) return 0x57;
+	return 0x00;
+}
+
+static READ8_HANDLER( test1c_r )
+{
+	return 0x01;
+}
+
+static READ8_HANDLER( test1d_r )
+{
+	return 0x10;
 }
 
 /*
@@ -55,9 +70,38 @@ static ADDRESS_MAP_START(jr200_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x000e, 0x3fff) AM_RAM
 	AM_RANGE(0xa000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_BASE(&textram)
-	AM_RANGE(0xc801, 0xc801) AM_RAM AM_READ(test1_r)
-	AM_RANGE(0xc81c, 0xc81c) AM_RAM AM_READ(test2_r)
-	AM_RANGE(0xc81d, 0xc81d) AM_RAM AM_READ(test3_r)
+	AM_RANGE(0xc800, 0xc800) AM_RAM AM_READWRITE(test_r, test_w)
+	AM_RANGE(0xc801, 0xc801) AM_RAM AM_READWRITE(test01_r, test_w)
+	AM_RANGE(0xc802, 0xc802) AM_RAM AM_READWRITE(test_r, test_w)
+	AM_RANGE(0xc803, 0xc803) AM_RAM AM_READWRITE(test_r, test_w)
+	AM_RANGE(0xc804, 0xc804) AM_RAM AM_READWRITE(test_r, test_w)
+	AM_RANGE(0xc805, 0xc805) AM_RAM AM_READWRITE(test_r, test_w)
+	AM_RANGE(0xc806, 0xc806) AM_RAM AM_READWRITE(test_r, test_w)
+	AM_RANGE(0xc807, 0xc807) AM_RAM AM_READWRITE(test_r, test_w)
+	AM_RANGE(0xc808, 0xc808) AM_RAM AM_READWRITE(test_r, test_w)
+	AM_RANGE(0xc809, 0xc809) AM_RAM AM_READWRITE(test_r, test_w)
+	AM_RANGE(0xc80a, 0xc80a) AM_RAM AM_READWRITE(test_r, test_w)
+	AM_RANGE(0xc80b, 0xc80b) AM_RAM AM_READWRITE(test_r, test_w)
+	AM_RANGE(0xc80c, 0xc80c) AM_RAM AM_READWRITE(test_r, test_w)
+	AM_RANGE(0xc80d, 0xc80d) AM_RAM AM_READWRITE(test_r, test_w)
+	AM_RANGE(0xc80e, 0xc80e) AM_RAM AM_READWRITE(test_r, test_w)
+	AM_RANGE(0xc80f, 0xc80f) AM_RAM AM_READWRITE(test_r, test_w)
+	AM_RANGE(0xc810, 0xc810) AM_RAM AM_READWRITE(test_r, test_w)
+	AM_RANGE(0xc811, 0xc811) AM_RAM AM_READWRITE(test_r, test_w)
+	AM_RANGE(0xc812, 0xc812) AM_RAM AM_READWRITE(test_r, test_w)
+	AM_RANGE(0xc813, 0xc813) AM_RAM AM_READWRITE(test_r, test_w)
+	AM_RANGE(0xc814, 0xc814) AM_RAM AM_READWRITE(test_r, test_w)
+	AM_RANGE(0xc815, 0xc815) AM_RAM AM_READWRITE(test_r, test_w)
+	AM_RANGE(0xc816, 0xc816) AM_RAM AM_READWRITE(test_r, test_w)
+	AM_RANGE(0xc817, 0xc817) AM_RAM AM_READWRITE(test_r, test_w)
+	AM_RANGE(0xc818, 0xc818) AM_RAM AM_READWRITE(test_r, test_w)
+	AM_RANGE(0xc819, 0xc819) AM_RAM AM_READWRITE(test_r, test_w)
+	AM_RANGE(0xc81a, 0xc81a) AM_RAM AM_READWRITE(test_r, test_w)
+	AM_RANGE(0xc81b, 0xc81b) AM_RAM AM_READWRITE(test_r, test_w)
+	AM_RANGE(0xc81c, 0xc81c) AM_RAM AM_READWRITE(test1c_r, test_w)
+	AM_RANGE(0xc81d, 0xc81d) AM_RAM AM_READWRITE(test1d_r, test_w)
+	AM_RANGE(0xc81e, 0xc81e) AM_RAM AM_READWRITE(test_r, test_w)
+	AM_RANGE(0xc81f, 0xc81f) AM_RAM AM_READWRITE(test_r, test_w)
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -123,18 +167,20 @@ static INTERRUPT_GEN( jr200_irq )
 
 }
 
+/*
 static INTERRUPT_GEN( jr200_nmi )
 {
 	cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
+*/
 
 static MACHINE_DRIVER_START( jr200 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6802, XTAL_4MHz) /* MN1800A */
+	MDRV_CPU_ADD("maincpu", M6802, 890000) /* MN1800A */
 	MDRV_CPU_PROGRAM_MAP(jr200_mem)
 	MDRV_CPU_IO_MAP(jr200_io)
 MDRV_CPU_VBLANK_INT("screen", jr200_irq)
-MDRV_CPU_PERIODIC_INT(jr200_nmi,60)
+// MDRV_CPU_PERIODIC_INT(jr200_nmi,60)
 /*
 	MDRV_CPU_ADD("mn1544", MN1544, ?)
 */
