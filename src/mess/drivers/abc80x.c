@@ -1015,6 +1015,12 @@ static ABCBUS_CONFIG( abcbus_config )
 	{ NULL }
 };
 
+static ABCBUS_CONFIG( abc802_abcbus_config )
+{
+//	{ LUXOR_55_21046, CONKORT_TAG }, won't boot with this enabled
+	{ NULL }
+};
+
 /* Machine Initialization */
 
 static MACHINE_START( abc800 )
@@ -1061,7 +1067,7 @@ static MACHINE_START( abc802 )
 	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
 
 	/* initialize the ABC BUS */
-//	abcbus_init(machine, Z80_TAG, abcbus_config);
+	abcbus_init(machine, Z80_TAG, abc802_abcbus_config); // TODO: enable floppy
 
 	/* configure memory */
 	memory_configure_bank(machine, 1, 0, 1, mess_ram, 0);
@@ -1163,6 +1169,7 @@ static MACHINE_RESET( abc806 )
 }
 
 /* Machine Drivers */
+
 static const floppy_config abc800_floppy_config =
 {
 	FLOPPY_DRIVE_DS_80,
@@ -1233,7 +1240,7 @@ static MACHINE_DRIVER_START( abc800c )
 	MDRV_Z80SIO_ADD(Z80SIO_TAG, ABC800_X01/2/2, sio_intf)
 	MDRV_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, abc800_dart_intf)
 //	MDRV_ABC77_ADD(abc800_abc77_intf)
-//	MDRV_LUXOR_55_21046_ADD
+	MDRV_LUXOR_55_21046_ADD
 	MDRV_PRINTER_ADD("printer")
 	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
 
