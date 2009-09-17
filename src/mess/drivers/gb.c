@@ -443,13 +443,13 @@ space. This mapper uses 32KB sized banks.
 
 
 /* Initial value of the cpu registers (hacks until we get bios dumps) */
-static const UINT16 sgb_cpu_regs[6] = { 0x01B0, 0x0013, 0x00D8, 0x014D, 0xFFFE, 0x0100 };    /* Super Game Boy                    */
+//static const UINT16 sgb_cpu_regs[6] = { 0x01B0, 0x0013, 0x00D8, 0x014D, 0xFFFE, 0x0100 };    /* Super Game Boy                    */
 static const UINT16 mgb_cpu_regs[6] = { 0xFFB0, 0x0013, 0x00D8, 0x014D, 0xFFFE, 0x0100 };	/* Game Boy Pocket / Super Game Boy 2 */
 //static const UINT16 cgb_cpu_regs[6] = { 0x11B0, 0x0013, 0x00D8, 0x014D, 0xFFFE, 0x0100 };	/* Game Boy Color  / Game Boy Advance */
 static const UINT16 megaduck_cpu_regs[6] = { 0x0000, 0x0000, 0x0000, 0x0000, 0xFFFE, 0x0000 };	/* Megaduck */
 
 static const lr35902_cpu_core dmg_cpu_reset = { NULL, LR35902_FEATURE_HALT_BUG, gb_timer_callback };
-static const lr35902_cpu_core sgb_cpu_reset = { sgb_cpu_regs, LR35902_FEATURE_HALT_BUG, gb_timer_callback };
+static const lr35902_cpu_core sgb_cpu_reset = { NULL, LR35902_FEATURE_HALT_BUG, gb_timer_callback };
 static const lr35902_cpu_core mgb_cpu_reset = { mgb_cpu_regs, LR35902_FEATURE_HALT_BUG, gb_timer_callback };
 static const lr35902_cpu_core cgb_cpu_reset = { NULL, 0, gb_timer_callback };
 static const lr35902_cpu_core megaduck_cpu_reset = { megaduck_cpu_regs, LR35902_FEATURE_HALT_BUG, gb_timer_callback };
@@ -477,7 +477,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(sgb_map, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x00ff) AM_ROMBANK(5)					/* 16k fixed ROM bank */
+	AM_RANGE(0x0000, 0x00ff) AM_ROMBANK(5)					/* BIOS or ROM */
 	AM_RANGE(0x0100, 0x014f) AM_ROMBANK(10)					/* ROM bank */
 	AM_RANGE(0x0150, 0x03ff) AM_ROMBANK(6)
 	AM_RANGE(0x0400, 0x3fff) AM_ROMBANK(11)
@@ -689,7 +689,7 @@ ROM_START( gameboy )
 ROM_END
 
 ROM_START( supergb )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x0100, "maincpu", 0 )
 	ROM_LOAD( "sgb_boot.bin", 0x0000, 0x0100, CRC(ec8a83b9) SHA1(aa2f50a77dfb4823da96ba99309085a3c6278515) )
 ROM_END
 
