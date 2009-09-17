@@ -151,8 +151,8 @@ void apple525_set_lines(const device_config *device,UINT8 lines)
 	for (i = 0; i < count; i++)
 	{
 		if (apple525_enable_mask & (1 << i))
-		{
-			image = floppy_get_device(device->machine, i);						
+		{			
+			image = floppy_get_device_by_type(device->machine, FLOPPY_TYPE_APPLE, i);
 			if (image)
 				apple525_disk_set_lines(device,image, lines);
 		}
@@ -215,10 +215,10 @@ static const device_config *apple525_selected_image(running_machine *machine)
 	
 	count = apple525_get_count(machine);
 	
-	for (i = 0; i < 2; i++)
+	for (i = 0; i < count; i++)
 	{
 		if (apple525_enable_mask & (1 << i))
-			return floppy_get_device(machine, i);
+			return floppy_get_device_by_type(machine, FLOPPY_TYPE_APPLE, i);
 	}
 	return NULL;
 }
@@ -249,7 +249,7 @@ int apple525_read_status(const device_config *device)
 	{
 		if (apple525_enable_mask & (1 << i))
 		{
-			image = floppy_get_device(device->machine, i);
+			image = floppy_get_device_by_type(device->machine, FLOPPY_TYPE_APPLE, i);
 			if (image && !image_is_writable(image))
 				result = 1;
 		}
@@ -264,6 +264,7 @@ static DEVICE_START( apple525_floppy )
 
 	DEVICE_START_CALL(floppy);
 	flopimg_alloc_custom_data(device,auto_alloc_clear(device->machine,struct apple525_disk));	
+	floppy_set_type(device,FLOPPY_TYPE_APPLE);
 }
 
 static DEVICE_IMAGE_LOAD( apple525_floppy )
@@ -285,6 +286,7 @@ DEVICE_GET_INFO( apple525 )
 {
 	switch (state)
 	{
+		case DEVINFO_STR_NAME:						strcpy(info->s, "Floppy Disk [Apple]"); break;
 		case DEVINFO_FCT_START:						info->start = DEVICE_START_NAME(apple525_floppy); break;
 		case DEVINFO_FCT_IMAGE_LOAD:				info->f = (genf *) DEVICE_IMAGE_LOAD_NAME(apple525_floppy); break;
 		case DEVINFO_FCT_IMAGE_UNLOAD:				info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME(apple525_floppy); break;

@@ -65,6 +65,7 @@ struct _floppy_drive
 	void (*unload_proc)(const device_config *image);
 	int (*tracktranslate_proc)(const device_config *image, floppy_image *floppy, int physical_track);
 	void *custom_data;
+	int floppy_drive_type;
 };
 
 
@@ -245,6 +246,8 @@ void floppy_drive_init(const device_config *img)
 	pDrive->controller = NULL;
 	
 	pDrive->custom_data = NULL;
+	
+	pDrive->floppy_drive_type = FLOPPY_TYPE_REGULAR;
 }
 
 /* index pulses at rpm/60 Hz, and stays high 1/20th of time */
@@ -814,6 +817,34 @@ const device_config *floppy_get_device(running_machine *machine,int drive)
 	return NULL;
 }
 
+int floppy_get_drive_type(const device_config *image)
+{
+	floppy_drive *flopimg = get_safe_token( image );
+	return flopimg->floppy_drive_type;
+}
+
+void floppy_set_type(const device_config *image,int ftype)
+{
+	floppy_drive *flopimg = get_safe_token( image );
+	flopimg->floppy_drive_type = ftype;
+}
+
+const device_config *floppy_get_device_by_type(running_machine *machine,int ftype,int drive)
+{
+	int i;
+	int cnt = 0;
+	for (i=0;i<4;i++) {
+		const device_config *disk = floppy_get_device(machine,i);
+		if (floppy_get_drive_type(disk)==ftype) {
+			if (cnt==drive) {
+				return disk;
+			}
+			cnt++;
+		}
+	}	
+	return NULL;
+}
+
 int floppy_get_drive(const device_config *image)
 {
 	int drive =0;
@@ -821,6 +852,21 @@ int floppy_get_drive(const device_config *image)
 	if (strcmp(image->tag, FLOPPY_1) == 0) drive = 1;
 	if (strcmp(image->tag, FLOPPY_2) == 0) drive = 2;
 	if (strcmp(image->tag, FLOPPY_3) == 0) drive = 3;
+	return drive;
+}
+
+int floppy_get_drive_by_type(const device_config *image,int ftype)
+{
+	int i,drive =0;
+	for (i=0;i<4;i++) {
+		const device_config *disk = floppy_get_device(image->machine,i);
+		if (floppy_get_drive_type(disk)==ftype) {
+			if (image==disk) {
+				return drive;
+			}
+			drive++;			
+		}
+	}		
 	return drive;
 }
 
@@ -833,6 +879,7 @@ int floppy_get_count(running_machine *machine)
     if (devtag_get_device(machine,FLOPPY_3)) cnt++;	
 	return cnt;
 }
+
 /*************************************
  *
  *  Device specification function

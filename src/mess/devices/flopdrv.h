@@ -8,6 +8,10 @@
 #include "image.h"
 #include "formats/flopimg.h"
 
+#define FLOPPY_TYPE_REGULAR 0
+#define FLOPPY_TYPE_APPLE	1
+#define FLOPPY_TYPE_SONY	2
+
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
@@ -122,9 +126,13 @@ void floppy_install_load_proc(const device_config *image, void (*proc)(const dev
 void floppy_install_tracktranslate_proc(const device_config *image, int (*proc)(const device_config *image, floppy_image *floppy, int physical_track));
 
 const device_config *floppy_get_device(running_machine *machine,int drive);
+const device_config *floppy_get_device_by_type(running_machine *machine,int ftype,int drive);
+int floppy_get_drive_type(const device_config *image);
+void floppy_set_type(const device_config *image,int ftype);
 int floppy_get_count(running_machine *machine);
 
 int floppy_get_drive(const device_config *image);
+int floppy_get_drive_by_type(const device_config *image,int ftype);
 
 void *flopimg_get_custom_data(const device_config *image);
 void flopimg_alloc_custom_data(const device_config *image,void *custom);
