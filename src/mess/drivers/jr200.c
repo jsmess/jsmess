@@ -19,10 +19,18 @@
 #include "driver.h"
 #include "cpu/m6800/m6800.h"
 
+static UINT8 *textram;
+
+static READ8_HANDLER( test_r )
+{
+	return 1;
+}
+
 static ADDRESS_MAP_START(jr200_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x7fff) AM_RAM
+	AM_RANGE(0x000d, 0x000d) AM_RAM AM_READ(test_r)
 	AM_RANGE(0xa000, 0xbfff) AM_ROM // basic?
-	AM_RANGE(0xc000, 0xcfff) AM_RAM // videoram, colorram
+	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_BASE(&textram) // videoram, colorram
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -44,31 +52,61 @@ static VIDEO_START( jr200 )
 
 static VIDEO_UPDATE( jr200 )
 {
-    return 0;
+	int i,j;
+	const gfx_element *gfx = screen->machine->gfx[0];
+
+	for (i = 0; i < 0x02ff; i += 0x20)
+		for (j = 0; j < 0x20; j++)
+		{
+			UINT8 code = textram[0x0100 + i + j];
+			UINT8 col = textram[0x0500 + i + j];
+
+			drawgfx_transpen(bitmap, cliprect, gfx,
+					code,col,
+					0, 0,
+					j * 8, (i >> 5) * 8, 15);
+		}
+	return 0;
 }
 
+static const gfx_layout tiles8x8_layout =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	1,
+	{ 0 },
+	{ 0, 1, 2, 3, 4, 5, 6, 7, 8 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8
+};
+
+static GFXDECODE_START( jr200 )
+	GFXDECODE_ENTRY( "char", 0, tiles8x8_layout, 0, 0x100 )
+GFXDECODE_END
+
 static MACHINE_DRIVER_START( jr200 )
-    /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu", M6802, XTAL_4MHz) /* MN1800A */
-    MDRV_CPU_PROGRAM_MAP(jr200_mem)
-    MDRV_CPU_IO_MAP(jr200_io)
+	/* basic machine hardware */
+	MDRV_CPU_ADD("maincpu", M6802, XTAL_4MHz) /* MN1800A */
+	MDRV_CPU_PROGRAM_MAP(jr200_mem)
+	MDRV_CPU_IO_MAP(jr200_io)
 /*
-    MDRV_CPU_ADD("mn1544", MN1544, ?)
+	MDRV_CPU_ADD("mn1544", MN1544, ?)
 */
-    MDRV_MACHINE_RESET(jr200)
+	MDRV_MACHINE_RESET(jr200)
 
-    /* video hardware */
-    MDRV_SCREEN_ADD("screen", RASTER)
-    MDRV_SCREEN_REFRESH_RATE(50)
-    MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MDRV_SCREEN_SIZE(640, 480)
-    MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-    MDRV_PALETTE_LENGTH(2)
-    MDRV_PALETTE_INIT(black_and_white)
+	/* video hardware */
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(50)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(256, 192)
+	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0, 192-1)
 
-    MDRV_VIDEO_START(jr200)
-    MDRV_VIDEO_UPDATE(jr200)
+	MDRV_GFXDECODE(jr200)
+	MDRV_PALETTE_LENGTH(255)
+
+	MDRV_VIDEO_START(jr200)
+	MDRV_VIDEO_UPDATE(jr200)
 MACHINE_DRIVER_END
 
 static SYSTEM_CONFIG_START(jr200)
