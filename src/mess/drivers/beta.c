@@ -4,13 +4,21 @@
 
 	http://retro.hansotten.nl/index.php?page=beta-computer
 
-    17/07/2009 Skeleton driver.
-
 ****************************************************************************/
+
+/*
+
+	TODO:
+
+	- write EPROM back to file
+	- fix display flickering
+
+*/
 
 #include "driver.h"
 #include "includes/beta.h"
 #include "cpu/m6502/m6502.h"
+#include "devices/cartslot.h"
 #include "machine/6532riot.h"
 #include "sound/speaker.h"
 #include "beta.lh"
@@ -24,6 +32,11 @@ static ADDRESS_MAP_START(beta_mem, ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 /* Input Ports */
+
+static INPUT_CHANGED( trigger_reset )
+{
+	cputag_set_input_line(field->port->machine, M6502_TAG, INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
+}
 
 static INPUT_PORTS_START( beta )
 	PORT_START("Q6")
@@ -57,6 +70,9 @@ static INPUT_PORTS_START( beta )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("AD") PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED ) 
+
+	PORT_START("SPECIAL")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RESET") PORT_CODE(KEYCODE_R) PORT_CHANGED(trigger_reset, 0)
 INPUT_PORTS_END
 
 /* M6532 Interface */
@@ -66,7 +82,7 @@ static void update_display(beta_state *state)
 	if (state->ls145_p < 6)
 	{
 		output_set_digit_value(state->ls145_p, state->segment);
-		logerror("update display %u with %02x\n", state->ls145_p, state->segment);
+		//logerror("update display %u with %02x\n", state->ls145_p, state->segment);
 	}
 }
 
@@ -89,7 +105,7 @@ static UINT8 beta_riot_a_r(const device_config *device, UINT8 olddata)
 
 	beta_state *state = device->machine->driver_data;
 
-	UINT8 data = 0xff; // TODO: read 2716 data
+	UINT8 data = 0xff;
 
 	switch (state->ls145_p)
 	{
@@ -97,6 +113,12 @@ static UINT8 beta_riot_a_r(const device_config *device, UINT8 olddata)
 	case 7: data &= input_port_read(device->machine, "Q7"); break;
 	case 8: data &= input_port_read(device->machine, "Q8"); break;
 	case 9: data &= input_port_read(device->machine, "Q9"); break;
+	default: 
+		if (!state->eprom_oe && !state->eprom_ce) 
+		{
+			data = memory_region(device->machine, EPROM_TAG)[state->eprom_addr & 0x7ff];
+			popmessage("EPROM read %04x = %02x\n", state->eprom_addr & 0x7ff, data);
+		}
 	}
 
 	return data;
@@ -121,10 +143,14 @@ static void beta_riot_a_w(const device_config *device, UINT8 data, UINT8 olddata
 
 	beta_state *state = device->machine->driver_data;
 
-	logerror("PA %02x\n", data);
+//	logerror("PA %02x\n", data);
 
+	/* display */
 	state->segment = BITSWAP8(data, 7, 3, 4, 1, 0, 2, 5, 6) & 0x7f;
 	update_display(state);
+
+	/* EPROM data */
+	state->eprom_data = data;
 }
 
 static UINT8 beta_riot_b_r(const device_config *device, UINT8 olddata)
@@ -151,11 +177,10 @@ static void beta_riot_b_w(const device_config *device, UINT8 data, UINT8 olddata
 
 	beta_state *state = device->machine->driver_data;
 
-	logerror("PB %02x\n", data);
+//	logerror("PB %02x %02x\n", data, olddata);
 
 	/* display */
 	state->ls145_p = data & 0x0f;
-	update_display(state);
 
 	/* speaker */
 	speaker_level_w(state->speaker, !BIT(data, 4));
@@ -166,19 +191,29 @@ static void beta_riot_b_w(const device_config *device, UINT8 data, UINT8 olddata
 	/* data led */
 	output_set_led_value(1, !BIT(data, 5));
 
-	/* EPROM address */
-	if (!state->ls164_cp && BIT(data, 5))
+	/* EPROM address shift */
+	if (!BIT(olddata, 5) && BIT(data, 5))
 	{
 		state->eprom_addr <<= 1;
-		state->eprom_addr |= BIT(data, 3);
-		state->ls164_cp = BIT(data, 5);
-		logerror("EPROM address %04x\n", state->eprom_addr & 0x7ff);
+		state->eprom_addr |= BIT(olddata, 3);
+	}
+
+	/* EPROM output enable */
+	state->eprom_oe = BIT(data, 6);
+
+	/* EPROM chip enable */
+	state->eprom_ce = BIT(data, 7);
+
+	if (BIT(data, 6) && (!BIT(olddata, 7) && BIT(data, 7)))
+	{
+		popmessage("EPROM write %04x = %02x\n", state->eprom_addr & 0x7ff, state->eprom_data);
+		memory_region(device->machine, EPROM_TAG)[state->eprom_addr & 0x7ff] &= state->eprom_data;
 	}
 }
 
 static void beta_riot_irq(const device_config *device, int state)
 {
-	//cputag_set_input_line(device->machine, M6502_TAG, M6502_IRQ_LINE, state ? HOLD_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, M6502_TAG, M6502_IRQ_LINE, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 static const riot6532_interface beta_riot_interface =
@@ -190,6 +225,15 @@ static const riot6532_interface beta_riot_interface =
 	beta_riot_irq
 };
 
+/* Quickload */
+
+static DEVICE_IMAGE_UNLOAD( beta_eprom )
+{
+	UINT8 *ptr = memory_region(image->machine, EPROM_TAG);
+
+	image_fwrite(image, ptr, 0x800);
+}
+
 /* Machine Initialization */
 
 static MACHINE_START( beta ) 
@@ -198,6 +242,14 @@ static MACHINE_START( beta )
 
 	/* find devices */
 	state->speaker = devtag_get_device(machine, SPEAKER_TAG);
+
+	/* register for state saving */
+	state_save_register_global(machine, state->eprom_oe);
+	state_save_register_global(machine, state->eprom_ce);
+	state_save_register_global(machine, state->eprom_addr);
+	state_save_register_global(machine, state->eprom_data);
+	state_save_register_global(machine, state->ls145_p);
+	state_save_register_global(machine, state->segment);
 }
 
 /* Machine Driver */
@@ -206,7 +258,7 @@ static MACHINE_DRIVER_START( beta )
 	MDRV_DRIVER_DATA(beta_state)
 
 	/* basic machine hardware */
-    MDRV_CPU_ADD(M6502_TAG, M6502, XTAL_1MHz)
+    MDRV_CPU_ADD(M6502_TAG, M6502, XTAL_4MHz/4)
     MDRV_CPU_PROGRAM_MAP(beta_mem)
 
     MDRV_MACHINE_START(beta)
@@ -220,7 +272,13 @@ static MACHINE_DRIVER_START( beta )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-	MDRV_RIOT6532_ADD(M6532_TAG, XTAL_1MHz, beta_riot_interface)    
+	MDRV_RIOT6532_ADD(M6532_TAG, XTAL_4MHz/4, beta_riot_interface)    
+
+	/* EPROM socket */
+	MDRV_CARTSLOT_ADD(EPROM_TAG)
+	MDRV_CARTSLOT_EXTENSION_LIST("bin,rom")
+	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_UNLOAD(beta_eprom)
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -229,16 +287,17 @@ ROM_START( beta )
     ROM_REGION( 0x10000, M6502_TAG, 0 )
   	ROM_LOAD( "beta.rom", 0x8000, 0x0800, CRC(d42fdb17) SHA1(595225a0cd43dd76c46b2aff6c0f27d5991cc4f0))
 
-	ROM_REGION( 0x800, "2716", ROMREGION_ERASEFF )
+	ROM_REGION( 0x800, EPROM_TAG, ROMREGION_ERASEFF )
+	ROM_CART_LOAD( EPROM_TAG, 0x0000, 0x0800, ROM_FULLSIZE )
 ROM_END
 
 /* System Configuration */
 
 static SYSTEM_CONFIG_START( beta )
-	CONFIG_RAM_DEFAULT( 1 * 1024 )
+	CONFIG_RAM_DEFAULT( 256 )
 SYSTEM_CONFIG_END
 
 /* System Drivers */
 
-/*    YEAR	NAME	PARENT	COMPAT	MACHINE	INPUT	INIT	CONFIG	COMPANY					FULLNAME				FLAGS */
-COMP( 1984, beta,  0,       0, 	beta, 	beta, 	 0,  	  beta,  	 "Pitronics",   "Beta Computer",		GAME_NOT_WORKING)
+/*    YEAR	NAME	PARENT	COMPAT	MACHINE	INPUT	INIT	CONFIG	COMPANY			FULLNAME	FLAGS */
+COMP( 1984, beta,	0,		0,		beta,	beta,	0,		beta,	"Pitronics",	"Beta",		GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )

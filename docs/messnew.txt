@@ -5,9 +5,17 @@ New System Drivers Supported (in no particular order):
 - P8000 (not working) [Matt Knoth, Fabio Priuli]
 
 
+Systems Promoted from GAME_NOT_WORKING:
+---------------------------------------
+- Beta [Curt Coder]
+
 
 System Driver Changes:
 ----------------------
+- [BETA] Added display, keyboard and EPROM read/write. 
+  Screen still flickers, and EPROM cannot be written
+  back to file yet. [Curt Coder]
+
 - [SAMCOUPE] Added mouse support.  [Dirk Best]
 
 - [SAMCOUPE] Improved Mode 1 graphics.  [Dirk Best]

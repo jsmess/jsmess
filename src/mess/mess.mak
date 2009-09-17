@@ -333,6 +333,7 @@ DRVLIBS = \
 	$(MESSOBJ)/osi.a \
 	$(MESSOBJ)/palm.a \
 	$(MESSOBJ)/parker.a \
+	$(MESSOBJ)/pitronic.a \
 	$(MESSOBJ)/pc.a \
 	$(MESSOBJ)/pcm.a \
 	$(MESSOBJ)/pcshare.a \
@@ -1086,6 +1087,9 @@ $(MESSOBJ)/palm.a:				\
 $(MESSOBJ)/parker.a:			\
 	$(MESS_DRIVERS)/stopthie.o	\
 
+$(MESSOBJ)/pitronic.a:			\
+	$(MESS_DRIVERS)/beta.o		\
+
 $(MESSOBJ)/pc.a:				\
 	$(MESS_VIDEO)/pc_aga.o		\
 	$(MESS_MACHINE)/ibmpc.o		\
@@ -1489,7 +1493,6 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/unior.o		\
 	$(MESS_DRIVERS)/tvc.o		\
 	$(MESS_DRIVERS)/mmd1.o		\
-	$(MESS_DRIVERS)/beta.o		\
 	$(MESS_DRIVERS)/ptcsol.o	\
 	$(MESS_DRIVERS)/p8k.o		\
 
