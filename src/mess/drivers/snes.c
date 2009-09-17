@@ -275,28 +275,30 @@ MACHINE_DRIVER_END
 ROM_START(snes)
 	ROM_REGION( 0x100, "user5", 0 )		/* IPL ROM */
 	ROM_LOAD( "spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) )	/* boot rom */
-	ROM_REGION( 0x800, "user6", 0 )		/* add-on chip ROMs (DSP, SFX, etc) */
+	ROM_REGION( 0x1000, "addons", 0 )		/* add-on chip ROMs (DSP, SFX, etc) */
 	ROM_LOAD( "dsp1data.bin", 0x000000, 0x000800, CRC(4b02d66d) SHA1(1534f4403d2a0f68ba6e35186fe7595d33de34b1) )
+	ROM_LOAD( "dsp3data.bin", 0x000800, 0x000800, CRC(4a1c5453) SHA1(2f69c652109938cde21df5eb89890bf090256dbb) )
 ROM_END
 
 ROM_START(snessfx)
 	ROM_REGION( 0x100, "user5", 0 )		/* IPL ROM */
 	ROM_LOAD( "spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) )	/* boot rom */
-	ROM_REGION( 0x800, "user6", 0 )		/* add-on chip ROMs (DSP, SFX, etc) */
+	ROM_REGION( 0x1000, "addons", 0 )		/* add-on chip ROMs (DSP, SFX, etc) */
 	ROM_LOAD( "dsp1data.bin", 0x000000, 0x000800, CRC(4b02d66d) SHA1(1534f4403d2a0f68ba6e35186fe7595d33de34b1) )
 ROM_END
 
 ROM_START(snespal)
 	ROM_REGION( 0x100, "user5", 0 )		/* IPL ROM */
 	ROM_LOAD( "spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) )	/* boot rom */
-	ROM_REGION( 0x800, "user6", 0 )		/* add-on chip ROMs (DSP, SFX, etc) */
+	ROM_REGION( 0x1000, "addons", 0 )		/* add-on chip ROMs (DSP, SFX, etc) */
 	ROM_LOAD( "dsp1data.bin", 0x000000, 0x000800, CRC(4b02d66d) SHA1(1534f4403d2a0f68ba6e35186fe7595d33de34b1) )
+	ROM_LOAD( "dsp3data.bin", 0x000800, 0x000800, CRC(4a1c5453) SHA1(2f69c652109938cde21df5eb89890bf090256dbb) )
 ROM_END
 
 ROM_START(snespsfx)
 	ROM_REGION( 0x100, "user5", 0 )		/* IPL ROM */
 	ROM_LOAD( "spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) )	/* boot rom */
-	ROM_REGION( 0x800, "user6", 0 )		/* add-on chip ROMs (DSP, SFX, etc) */
+	ROM_REGION( 0x1000, "addons", 0 )		/* add-on chip ROMs (DSP, SFX, etc) */
 	ROM_LOAD( "dsp1data.bin", 0x000000, 0x000800, CRC(4b02d66d) SHA1(1534f4403d2a0f68ba6e35186fe7595d33de34b1) )
 ROM_END
 
@@ -312,7 +314,7 @@ ROM_START(sfcbox)
 	ROM_REGION( 0x100, "user5", 0 )		/* IPL ROM */
 	ROM_LOAD( "spc700.rom", 0x00, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) )	/* boot rom */
 
-	ROM_REGION( 0x800, "user6", ROMREGION_ERASE00 )		/* add-on chip ROMs (DSP, SFX, etc) */
+	ROM_REGION( 0x1000, "addons", ROMREGION_ERASE00 )		/* add-on chip ROMs (DSP, SFX, etc) */
 ROM_END
 
 /***************************************************************************

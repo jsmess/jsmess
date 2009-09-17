@@ -335,7 +335,7 @@ static int snes_validate_infoblock( UINT8 *infoblock, UINT32 offset )
 
 static DEVICE_IMAGE_LOAD( snes_cart )
 {
-	int i, supported_type = 0;
+	int i, supported_type = 1;
 	running_machine *machine = image->machine;
 	const address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
 	int total_blocks, read_blocks;
@@ -612,38 +612,27 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 			case 0x01:
 			case 0x02:
 				snes_has_addon_chip = HAS_NONE;
-				supported_type = 1;
 				break;
 
 			case 0x03:
 				if (snes_r_bank1(space, 0x00ffd5) == 0x30)
 					snes_has_addon_chip = HAS_DSP4;
 				else
-				{
 					snes_has_addon_chip = HAS_DSP1;
-					supported_type = 1;
-				}
 				break;
 
 			case 0x04:
 				snes_has_addon_chip = HAS_DSP1;
-				supported_type = 1;
 				break;
 
 			case 0x05:
 				if (snes_r_bank1(space, 0x00ffd5) == 0x20)
-				{
 					snes_has_addon_chip = HAS_DSP2;
-					supported_type = 1;
-				}
 				/* DSP-3 is hard to detect. We exploit the fact that the only game has been manufactured by Bandai */
 				else if ((snes_r_bank1(space, 0x00ffd5) == 0x30) && (snes_r_bank1(space, 0x00ffda) == 0xb2))
 					snes_has_addon_chip = HAS_DSP3;
 				else
-				{
 					snes_has_addon_chip = HAS_DSP1;
-					supported_type = 1;
-				}
 				break;
 
 			case 0x13:	// Mario Chip 1
@@ -652,34 +641,42 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 			case 0x1a:	// GSU-1 (21 MHz at start)
 				if (snes_r_bank1(space, 0x00ffd5) == 0x20)
 					snes_has_addon_chip = HAS_SUPERFX;
-					supported_type = 1;
 				break;
 
 			case 0x25:
 				snes_has_addon_chip = HAS_OBC1;
-				supported_type = 1;
 				break;
 
 			case 0x32:	// needed by a Sample game (according to ZSNES)
 			case 0x34:
 			case 0x35:
 				if (snes_r_bank1(space, 0x00ffd5) == 0x23)
+				{	
 					snes_has_addon_chip = HAS_SA1;
+					supported_type = 0;
+				}
 				break;
 
 			case 0x43:
 			case 0x45:
 				if (snes_r_bank1(space, 0x00ffd5) == 0x32)
+				{	
 					snes_has_addon_chip = HAS_SDD1;
+					supported_type = 0;
+				}
 				break;
 
 			case 0x55:
 				if (snes_r_bank1(space, 0x00ffd5) == 0x35)
+				{	
 					snes_has_addon_chip = HAS_RTC;
+					supported_type = 0;
+				}
 				break;
 
 			case 0xe3:
 				snes_has_addon_chip = HAS_Z80GB;
+				supported_type = 0;
 				break;
 
 			case 0xf3:
@@ -688,27 +685,43 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 
 			case 0xf5:
 				if (snes_r_bank1(space, 0x00ffd5) == 0x30)
+				{
 					snes_has_addon_chip = HAS_ST018;
+					supported_type = 0;
+				}
 				else if (snes_r_bank1(space, 0x00ffd5) == 0x3a)
+				{
 					snes_has_addon_chip = HAS_SPC7110;
+					supported_type = 0;
+				}
 				break;
 
 			case 0xf6:
 				/* These Seta ST-01X chips have both 0x30 at 0x00ffd5,
 				they only differ for the 'size' at 0x00ffd7 */
 				if (snes_r_bank1(space, 0x00ffd7) < 0x0a)
+				{
 					snes_has_addon_chip = HAS_ST011;
+					supported_type = 0;
+				}
 				else
+				{
 					snes_has_addon_chip = HAS_ST010;
+					supported_type = 0;
+				}
 				break;
 
 			case 0xf9:
 				if (snes_r_bank1(space, 0x00ffd5) == 0x3a)
+				{
 					snes_has_addon_chip = HAS_SPC7110_RTC;
+					supported_type = 0;
+				}
 				break;
 
 			default:
 				snes_has_addon_chip = HAS_UNK;
+				supported_type = 0;
 				break;
 	}
 

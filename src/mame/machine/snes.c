@@ -1917,9 +1917,6 @@ static void snes_init_ram(running_machine *machine)
 	const address_space *cpu0space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int i, j;
 
-	/* Init DSP1 */
-	DSP1_reset(machine);
-
 	/* Init VRAM */
 	memset( snes_vram, 0, SNES_VRAM_SIZE );
 
@@ -1980,12 +1977,16 @@ static void snes_init_ram(running_machine *machine)
 
 	switch (snes_has_addon_chip)
 	{
+		case HAS_DSP1:
+			DSP1_reset(machine);
+			break;
+
 		case HAS_DSP2:
 			DSP2_reset();
 			break;
 
 		case HAS_DSP3:
-			InitDSP3();
+			InitDSP3(machine);
 			break;
 
 		case HAS_DSP4:
