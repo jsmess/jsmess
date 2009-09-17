@@ -20,7 +20,7 @@
 #include "cpu/m6800/m6800.h"
 
 static UINT8 *textram;
-static UINT64 timer = 0;
+static UINT16 timer = 0;
 
 static READ8_HANDLER( test_r )
 {
@@ -30,15 +30,25 @@ static READ8_HANDLER( test_r )
 		timer = 0;
 		return 1;
 	}
-	return 0;
+	return 0x20;
 }
+
+/*
+	0000-3fff RAM
+	4000-4fff RAM ( 4k expansion)
+	4000-7fff RAM (16k expansion)
+	4000-bfff RAM (32k expansion)
+	c100-c3FF text code
+	c500-c7ff text color
+	ca00      border color
+*/ 
 
 static ADDRESS_MAP_START(jr200_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x000c) AM_RAM
 	AM_RANGE(0x000d, 0x000d) AM_RAM AM_READ(test_r)
-	AM_RANGE(0x000e, 0x7fff) AM_RAM
-	AM_RANGE(0xa000, 0xbfff) AM_ROM // basic?
-	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_BASE(&textram) // videoram, colorram
+	AM_RANGE(0x000e, 0x3fff) AM_RAM
+	AM_RANGE(0xa000, 0xbfff) AM_ROM
+	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_BASE(&textram)
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
