@@ -1490,6 +1490,7 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/mmd1.o		\
 	$(MESS_DRIVERS)/beta.o		\
 	$(MESS_DRIVERS)/ptcsol.o	\
+	$(MESS_DRIVERS)/p8k.o		\
 
 #-------------------------------------------------
 # layout dependencies

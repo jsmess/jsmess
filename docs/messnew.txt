@@ -2,7 +2,7 @@
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
-(none)
+- P8000 (not working) [Matt Knoth, Fabio Priuli]
 
 
 

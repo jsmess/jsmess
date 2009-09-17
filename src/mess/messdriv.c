@@ -1461,7 +1461,7 @@ const game_driver * const drivers[] =
     DRIVER( mmd1 )
     DRIVER( mmd2 )
     DRIVER( mpf1p )
-	DRIVER( stopthie )
+    DRIVER( stopthie )
     DRIVER( aprixi )
     DRIVER( aprif1 )
     DRIVER( aprif10 )
@@ -1480,5 +1480,7 @@ const game_driver * const drivers[] =
     DRIVER( sol20 )
     DRIVER( 4004clk )
     DRIVER( busicom )
+    DRIVER( p8000 )
+    DRIVER( p8000_16 )
 
 #endif /* DRIVER_RECURSIVE */
