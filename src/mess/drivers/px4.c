@@ -9,6 +9,7 @@
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
+#include "devices/messram.h"
 #include "machine/ctronics.h"
 #include "devices/cartslot.h"
 #include "machine/pf10.h"
@@ -41,6 +42,9 @@
 typedef struct _px4_state px4_state;
 struct _px4_state
 {
+	/* internal ram */
+	const device_config *ram;
+
 	/* gapnit register */
 	UINT8 bankr;
 	UINT8 isr;
@@ -213,9 +217,11 @@ static READ8_HANDLER( px4_str_r )
 /* helper function to map rom capsules */
 static void install_rom_capsule(const address_space *space, int size, const char *region)
 {
+	px4_state *px4 = space->machine->driver_data;
+
 	/* ram, part 1 */
 	memory_install_readwrite8_handler(space, 0x0000, 0xdfff - size, 0, 0, SMH_BANK(1), SMH_BANK(1));
-	memory_set_bankptr(space->machine, 1, mess_ram);
+	memory_set_bankptr(space->machine, 1, messram_get_ptr(px4->ram));
 
 	/* actual rom data, part 1 */
 	memory_install_readwrite8_handler(space, 0xe000 - size, 0xffff - size, 0, 0, SMH_BANK(2), SMH_NOP);
@@ -230,7 +236,7 @@ static void install_rom_capsule(const address_space *space, int size, const char
 
 	/* ram, continued */
 	memory_install_readwrite8_handler(space, 0xe000, 0xffff, 0, 0, SMH_BANK(4), SMH_BANK(4));
-	memory_set_bankptr(space->machine, 4, mess_ram + 0xe000);
+	memory_set_bankptr(space->machine, 4, messram_get_ptr(px4->ram) + 0xe000);
 }
 
 /* bank register */
@@ -251,13 +257,13 @@ static WRITE8_HANDLER( px4_bankr_w )
 		memory_install_readwrite8_handler(space_program, 0x0000, 0x7fff, 0, 0, SMH_BANK(1), SMH_NOP);
 		memory_set_bankptr(space->machine, 1, memory_region(space->machine, "os"));
 		memory_install_readwrite8_handler(space_program, 0x8000, 0xffff, 0, 0, SMH_BANK(2), SMH_BANK(2));
-		memory_set_bankptr(space->machine, 2, mess_ram + 0x8000);
+		memory_set_bankptr(space->machine, 2, messram_get_ptr(px4->ram) + 0x8000);
 		break;
 
 	case 0x04:
 		/* memory */
 		memory_install_readwrite8_handler(space_program, 0x0000, 0xffff, 0, 0, SMH_BANK(1), SMH_BANK(1));
-		memory_set_bankptr(space->machine, 1, mess_ram);
+		memory_set_bankptr(space->machine, 1, messram_get_ptr(px4->ram));
 		break;
 
 	case 0x08: install_rom_capsule(space_program, 0x2000, "capsule1"); break;
@@ -644,7 +650,7 @@ static VIDEO_UPDATE( px4 )
 		int y, x;
 
 		/* get vram start address */
-		UINT8 *vram = &mess_ram[(px4->vadr & 0xf8) << 8];
+		UINT8 *vram = &messram_get_ptr(px4->ram)[(px4->vadr & 0xf8) << 8];
 
 		for (y = 0; y < 64; y++)
 		{
@@ -687,6 +693,9 @@ static DRIVER_INIT( px4 )
 {
 	px4_state *px4 = machine->driver_data;
 
+	/* find devices */
+	px4->ram = devtag_get_device(machine, "messram");
+
 	/* init 7508 */
 	px4->one_sec_int_enabled = TRUE;
 	px4->key_int_enabled = TRUE;
@@ -694,7 +703,7 @@ static DRIVER_INIT( px4 )
 
 	/* map os rom and last half of memory */
 	memory_set_bankptr(machine, 1, memory_region(machine, "os"));
-	memory_set_bankptr(machine, 2, mess_ram + 0x8000);
+	memory_set_bankptr(machine, 2, messram_get_ptr(px4->ram) + 0x8000);
 }
 
 static DRIVER_INIT( px4p )
@@ -949,6 +958,10 @@ static MACHINE_DRIVER_START( px4 )
 	MDRV_TIMER_ADD_PERIODIC("one_sec", upd7508_1sec_callback, SEC(1))
 	MDRV_TIMER_ADD_PERIODIC("frc", frc_tick, NSEC(1600))
 
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("64k")
+
 	/* centronics printer */
 	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
 
@@ -1014,18 +1027,9 @@ ROM_END
 
 
 /***************************************************************************
-    SYSTEM CONFIG
-***************************************************************************/
-
-static SYSTEM_CONFIG_START( px4 )
-	CONFIG_RAM_DEFAULT(64 * 1024) /* 64KB RAM */
-SYSTEM_CONFIG_END
-
-
-/***************************************************************************
     GAME DRIVERS
 ***************************************************************************/
 
 /*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT      INIT  CONFIG  COMPANY  FULLNAME  FLAGS */
-COMP( 1985, px4,  0,      0,      px4,     px4_h450a, px4,  px4,    "Epson", "PX-4",   0 )
-COMP( 1985, px4p, px4,    0,      px4p,    px4_h450a, px4p, px4,    "Epson", "PX-4+",  0 )
+COMP( 1985, px4,  0,      0,      px4,     px4_h450a, px4,  0,      "Epson", "PX-4",   0 )
+COMP( 1985, px4p, px4,    0,      px4p,    px4_h450a, px4p, 0,      "Epson", "PX-4+",  0 )

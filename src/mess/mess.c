@@ -44,10 +44,11 @@ static void ram_init(running_machine *machine, const game_driver *gamedrv)
 	char *s;
 	const char *ramsize_string;
 	UINT32 specified_ram = 0;
+	const device_config *ram_dev = devtag_get_device(machine, "messram");
 
 	/* parse RAM option */
 	ramsize_string = options_get_string(mame_options(), OPTION_RAMSIZE);
-	if ((ramsize_string != NULL) && (ramsize_string[0] != '\0'))
+	if ((ramsize_string != NULL) && (ramsize_string[0] != '\0') && (ram_dev == NULL))
 	{
 		specified_ram = ram_parse_string(ramsize_string);
 		if (specified_ram == 0)
