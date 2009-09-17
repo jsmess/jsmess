@@ -235,7 +235,7 @@ static ABCBUS_CARD_SELECT( luxor_55_10828 )
 
 	if (data == 0x2d) // TODO: bit 0 of this is configurable with S1
 	{
-		const address_space *io = cputag_get_address_space(device->machine, Z80_TAG, ADDRESS_SPACE_IO);
+		const address_space *io = cpu_get_address_space(device->machine->firstcpu, ADDRESS_SPACE_IO);
 
 		memory_install_readwrite8_handler(io, ABCBUS_INP, ABCBUS_OUT, 0x18, 0, slow_bus_data_r, slow_bus_data_w);
 		memory_install_read8_handler(io, ABCBUS_STAT, ABCBUS_STAT, 0x18, 0, slow_bus_stat_r);
@@ -366,7 +366,7 @@ static ABCBUS_CARD_SELECT( luxor_55_21046 )
 
 	if (data == input_port_read(device->machine, "SW3"))
 	{
-		const address_space *io = cputag_get_address_space(device->machine, Z80_TAG, ADDRESS_SPACE_IO);
+		const address_space *io = cpu_get_address_space(device->machine->firstcpu, ADDRESS_SPACE_IO);
 
 		memory_install_readwrite8_handler(io, ABCBUS_INP, ABCBUS_OUT, 0x18, 0, fast_bus_data_r, fast_bus_data_w);
 		memory_install_read8_handler(io, ABCBUS_STAT, ABCBUS_STAT, 0x18, 0, fast_bus_stat_r);
@@ -566,13 +566,13 @@ static void conkort_pio_ardy_w(const device_config *device, int state)
 
 static const z80pio_interface conkort_pio_intf =
 {
-	DEVCB_LINE(conkort_pio_interrupt),				/* interrupt callback */
-	DEVCB_HANDLER(conkort_pio_port_a_r),				/* port A read callback */
-	DEVCB_HANDLER(conkort_pio_port_b_r),				/* port B read callback */
-	DEVCB_HANDLER(conkort_pio_port_a_w),				/* port A write callback */
-	DEVCB_HANDLER(conkort_pio_port_b_w),				/* port B write callback */
-	DEVCB_LINE(conkort_pio_ardy_w),					/* port A ready callback */
-	DEVCB_NULL						/* port B ready callback */
+	DEVCB_LINE(conkort_pio_interrupt),		/* interrupt callback */
+	DEVCB_HANDLER(conkort_pio_port_a_r),	/* port A read callback */
+	DEVCB_HANDLER(conkort_pio_port_b_r),	/* port B read callback */
+	DEVCB_HANDLER(conkort_pio_port_a_w),	/* port A write callback */
+	DEVCB_HANDLER(conkort_pio_port_b_w),	/* port B write callback */
+	DEVCB_LINE(conkort_pio_ardy_w),			/* port A ready callback */
+	DEVCB_NULL								/* port B ready callback */
 };
 
 static const z80_daisy_chain slow_daisy_chain[] =
@@ -775,13 +775,13 @@ MACHINE_DRIVER_END
 
 ROM_START( luxor_55_10828 )
 	ROM_REGION( 0x1000, "abc830", ROMREGION_LOADBYNAME )
-	ROM_LOAD( "mpi02.bin",    0x0000, 0x0800, CRC(2aac9296) SHA1(c01a62e7933186bdf7068d2e9a5bc36590544349) ) // MPI 51
+	ROM_LOAD( "mpi02.bin",    0x0000, 0x0800, CRC(2aac9296) SHA1(c01a62e7933186bdf7068d2e9a5bc36590544349) ) // MPI 51 (5510760-01)
 	ROM_LOAD( "basf6106.bin", 0x0800, 0x0800, NO_DUMP ) // BASF 6106
 
 	ROM_REGION( 0x1800, "abc832", ROMREGION_LOADBYNAME )
 	ROM_LOAD( "micr1015.bin", 0x0000, 0x0800, CRC(a7bc05fa) SHA1(6ac3e202b7ce802c70d89728695f1cb52ac80307) ) // Micropolis 1015
-	ROM_LOAD( "micr1115.bin", 0x0800, 0x0800, CRC(f2fc5ccc) SHA1(86d6baadf6bf1d07d0577dc1e092850b5ff6dd1b) ) // Micropolis 1115
-	ROM_LOAD( "basf6118.bin", 0x1000, 0x0800, CRC(9ca1a1eb) SHA1(04973ad69de8da403739caaebe0b0f6757e4a6b1) ) // BASF 6118
+	ROM_LOAD( "micr1115.bin", 0x0800, 0x0800, CRC(f2fc5ccc) SHA1(86d6baadf6bf1d07d0577dc1e092850b5ff6dd1b) ) // Micropolis 1115 (v2.3)
+	ROM_LOAD( "basf6118.bin", 0x1000, 0x0800, CRC(9ca1a1eb) SHA1(04973ad69de8da403739caaebe0b0f6757e4a6b1) ) // BASF 6118 (v1.2)
 
 	ROM_REGION( 0x1000, "abc838", ROMREGION_LOADBYNAME )
 	ROM_LOAD( "basf6104.bin", 0x0800, 0x0800, NO_DUMP ) // BASF 6104

@@ -466,7 +466,7 @@ static const z80_daisy_chain abc80_daisy_chain[] =
 
 static ABCBUS_CONFIG( abcbus_config )
 {
-//	{ luxor_55_10828, CONKORT_TAG },
+	{ LUXOR_55_10828, CONKORT_TAG },
 	{ NULL }
 };
 
@@ -532,7 +532,7 @@ static MACHINE_DRIVER_START( abc80 )
 	MDRV_Z80PIO_ADD(Z80PIO_TAG, abc80_pio_intf)
 
 	/* Luxor Conkort 55-10828 */
-//	MDRV_DEVICE_ADD(CONKORT_TAG, LUXOR_55_10828)
+	MDRV_LUXOR_55_10828_ADD
 
 	/* video hardware */
 	MDRV_IMPORT_FROM(abc80_video)

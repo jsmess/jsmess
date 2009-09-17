@@ -687,7 +687,7 @@ static INPUT_PORTS_START( abc800 )
 	PORT_CONFSETTING(    0x04, "ABC 852 (640KB/HDD 20MB)" )
 	PORT_CONFSETTING(    0x05, "ABC 856 (640KB/HDD 64MB)" )
 
-//	PORT_INCLUDE(luxor_55_21046)
+	PORT_INCLUDE(luxor_55_21046)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( abc802 )
@@ -1011,7 +1011,7 @@ static const z80_daisy_chain abc800_daisy_chain[] =
 
 static ABCBUS_CONFIG( abcbus_config )
 {
-//	{ LUXOR_55_21046, CONKORT_TAG },
+	{ LUXOR_55_21046, CONKORT_TAG },
 	{ NULL }
 };
 
@@ -1061,7 +1061,7 @@ static MACHINE_START( abc802 )
 	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
 
 	/* initialize the ABC BUS */
-	abcbus_init(machine, Z80_TAG, abcbus_config);
+//	abcbus_init(machine, Z80_TAG, abcbus_config);
 
 	/* configure memory */
 	memory_configure_bank(machine, 1, 0, 1, mess_ram, 0);
@@ -1196,7 +1196,7 @@ static MACHINE_DRIVER_START( abc800m )
 	MDRV_Z80SIO_ADD(Z80SIO_TAG, ABC800_X01/2/2, sio_intf)
 	MDRV_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, abc800_dart_intf)
 //	MDRV_ABC77_ADD(abc800_abc77_intf)
-//	MDRV_LUXOR_55_21046_ADD
+	MDRV_LUXOR_55_21046_ADD
 	MDRV_PRINTER_ADD("printer")
 	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
 
@@ -1270,7 +1270,7 @@ static MACHINE_DRIVER_START( abc802 )
 	MDRV_Z80SIO_ADD(Z80SIO_TAG, ABC800_X01/2/2, sio_intf)
 	MDRV_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, abc802_dart_intf)
 //	MDRV_ABC77_ADD(abc802_abc77_intf)
-//	MDRV_LUXOR_55_21046_ADD
+	MDRV_LUXOR_55_21046_ADD
 	MDRV_PRINTER_ADD("printer")
 	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
 
@@ -1305,7 +1305,7 @@ static MACHINE_DRIVER_START( abc806 )
 	MDRV_Z80SIO_ADD(Z80SIO_TAG, ABC800_X01/2/2, sio_intf)
 	MDRV_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, abc806_dart_intf)
 //	MDRV_ABC77_ADD(abc806_abc77_intf)
-//	MDRV_LUXOR_55_21046_ADD
+	MDRV_LUXOR_55_21046_ADD
 	MDRV_PRINTER_ADD("printer")
 	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
 
