@@ -127,7 +127,7 @@ static DEVICE_RESET( messram )
 static DEVICE_VALIDITY_CHECK( messram )
 {
 	ram_config *config = device->inline_config;
-	const char *ramsize_string;
+	const char *ramsize_string = NULL;
 	int is_valid = FALSE;
 	UINT32 specified_ram = 0;
 	int error = FALSE;
