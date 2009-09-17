@@ -68,6 +68,7 @@
 #include "sound/wave.h"
 #include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
+#include "formats/dsk_dsk.h"
 #include "includes/mbee.h"
 
 size_t mbee_size;
@@ -340,22 +341,23 @@ static FLOPPY_OPTIONS_START(mbee)
 		FIRST_SECTOR_ID([1]))
 	FLOPPY_OPTION(ds40, "ds40", "DS40 disk image", basicdsk_identify_default, basicdsk_construct_default,
 		HEADS([2])
-		TRACKS([80])
+		TRACKS([40])
 		SECTORS([10])
 		SECTOR_LENGTH([512])
 		FIRST_SECTOR_ID([1]))
 	FLOPPY_OPTION(ds80, "ds80", "DS80 disk image", basicdsk_identify_default, basicdsk_construct_default,
 		HEADS([2])
-		TRACKS([160])
+		TRACKS([80])
 		SECTORS([10])
 		SECTOR_LENGTH([512])
 		FIRST_SECTOR_ID([1]))
 	FLOPPY_OPTION(ds84, "ds84", "DS84 disk image", basicdsk_identify_default, basicdsk_construct_default,
 		HEADS([2])
-		TRACKS([168])
+		TRACKS([84])
 		SECTORS([10])
 		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([1]))						
+		FIRST_SECTOR_ID([1]))	
+	FLOPPY_OPTION(dsk, "dsk", "DSK floppy disk image", dsk_dsk_identify, dsk_dsk_construct, NULL)	
 FLOPPY_OPTIONS_END
 
 static const floppy_config mbee_floppy_config =
@@ -453,8 +455,6 @@ static MACHINE_DRIVER_START( mbeepc85 )
 	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_PROGRAM_MAP(mbeepc85_mem)
 	MDRV_CPU_IO_MAP(mbeepc85_io)
-	MDRV_WD179X_ADD("wd179x", mbee_wd17xx_interface )
-	MDRV_FLOPPY_2_DRIVES_ADD(mbee_floppy_config)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( mbeeppc )
@@ -469,6 +469,8 @@ static MACHINE_DRIVER_START( mbee56 )
 	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_PROGRAM_MAP(mbee56_mem)
 	MDRV_CPU_IO_MAP(mbee56_io)
+	MDRV_WD179X_ADD("wd179x", mbee_wd17xx_interface )
+	MDRV_FLOPPY_2_DRIVES_ADD(mbee_floppy_config)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( mbee64 )
@@ -476,6 +478,8 @@ static MACHINE_DRIVER_START( mbee64 )
 	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_PROGRAM_MAP(mbee64_mem)
 	MDRV_CPU_IO_MAP(mbee64_io)
+	MDRV_WD179X_ADD("wd179x", mbee_wd17xx_interface )
+	MDRV_FLOPPY_2_DRIVES_ADD(mbee_floppy_config)
 MACHINE_DRIVER_END
 
 static DRIVER_INIT( mbee )
