@@ -20,15 +20,23 @@
 #include "cpu/m6800/m6800.h"
 
 static UINT8 *textram;
+static UINT64 timer = 0;
 
 static READ8_HANDLER( test_r )
 {
-	return 1;
+	timer++;
+	if (timer == 0x100)
+	{
+		timer = 0;
+		return 1;
+	}
+	return 0;
 }
 
 static ADDRESS_MAP_START(jr200_mem, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x0000, 0x7fff) AM_RAM
+	AM_RANGE(0x0000, 0x000c) AM_RAM
 	AM_RANGE(0x000d, 0x000d) AM_RAM AM_READ(test_r)
+	AM_RANGE(0x000e, 0x7fff) AM_RAM
 	AM_RANGE(0xa000, 0xbfff) AM_ROM // basic?
 	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_BASE(&textram) // videoram, colorram
 	AM_RANGE(0xe000, 0xffff) AM_ROM
@@ -59,10 +67,15 @@ static VIDEO_UPDATE( jr200 )
 		for (j = 0; j < 0x20; j++)
 		{
 			UINT8 code = textram[0x0100 + i + j];
-			UINT8 col = textram[0x0500 + i + j];
+			UINT8 col_bg = (textram[0x0500 + i + j] >> 3) & 0x07;
+			UINT8 col_fg = (textram[0x0500 + i + j] >> 0) & 0x07;
 
+			if (1==0) drawgfx_transpen(bitmap, cliprect, gfx,
+					0, col_bg,
+					0, 0,
+					j * 8, (i >> 5) * 8, 15);
 			drawgfx_transpen(bitmap, cliprect, gfx,
-					code,col,
+					code, col_fg,
 					0, 0,
 					j * 8, (i >> 5) * 8, 15);
 		}
