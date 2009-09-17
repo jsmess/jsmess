@@ -105,7 +105,7 @@ static WD17XX_CALLBACK( atarist_fdc_callback )
 	}
 }
 
-static const wd17xx_interface atarist_wd17xx_interface = { atarist_fdc_callback, NULL };
+static const wd17xx_interface atarist_wd17xx_interface = { atarist_fdc_callback, NULL, {FLOPPY_0,FLOPPY_1, NULL,NULL} };
 
 static READ16_HANDLER( atarist_fdc_data_r )
 {

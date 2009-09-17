@@ -132,7 +132,7 @@ static WD17XX_CALLBACK( mbee_fdc_callback )
 		fdc_status &= 0x7f;
 }
 
-const wd17xx_interface mbee_wd17xx_interface = { mbee_fdc_callback, NULL };
+const wd17xx_interface mbee_wd17xx_interface = { mbee_fdc_callback, NULL, {FLOPPY_0, FLOPPY_1, NULL, NULL }};
 
 READ8_HANDLER ( mbee_fdc_status_r )
 {

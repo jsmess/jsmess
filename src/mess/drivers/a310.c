@@ -207,7 +207,8 @@ INPUT_PORTS_END
 
 static const wd17xx_interface a310_wd17xx_interface = {
 	a310_wd177x_callback,
-	NULL
+	NULL,
+	{FLOPPY_0,FLOPPY_1,FLOPPY_2,FLOPPY_3}
 };
 
 static MACHINE_DRIVER_START( a310 )
@@ -235,6 +236,8 @@ static MACHINE_DRIVER_START( a310 )
 	MDRV_SOUND_ROUTE(0, "a310", 1.00)
 	
 	MDRV_WD1772_ADD("wd1772", a310_wd17xx_interface )
+	
+	//MDRV_FLOPPY_4_DRIVES_ADD(a310_floppy_config)
 MACHINE_DRIVER_END
 
 ROM_START(a310)

@@ -950,7 +950,7 @@ static WD17XX_CALLBACK( dgnbeta_fdc_callback )
 	LOG_DISK(("dgnbeta_fdc_callback(%d)\n",state));
 }
 
-const wd17xx_interface dgnbeta_wd17xx_interface = { dgnbeta_fdc_callback, NULL };
+const wd17xx_interface dgnbeta_wd17xx_interface = { dgnbeta_fdc_callback, NULL, {FLOPPY_0,FLOPPY_1,FLOPPY_2,FLOPPY_3}};
 
  READ8_HANDLER(dgnbeta_wd2797_r)
 {
