@@ -536,6 +536,9 @@ ROM_START( mm1m6 )
 	ROM_REGION( 0x200, "prom", 0 )
 	ROM_LOAD( "mmi6349-1.ic24", 0x0000, 0x0200, NO_DUMP )
 
+	ROM_REGION( 0x200, "keyboard", 0 )
+	ROM_LOAD( "mmi6349-1j.bin", 0x0000, 0x0200, NO_DUMP )
+
 	ROM_REGION( 0x800, "chargen", 0 )
 	ROM_LOAD( "chargen.ic51", 0x0000, 0x0800, NO_DUMP )
 ROM_END
