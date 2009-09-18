@@ -59,7 +59,8 @@ enum
 	header_len = sizeof(disk_image_header)
 };
 
-static struct
+typedef struct _smartmedia_t smartmedia_t;
+struct _smartmedia_t
 {
 	int page_data_size;	// 256 for a 2MB card, 512 otherwise
 	int page_total_size;// 264 for a 2MB card, 528 otherwise
@@ -96,30 +97,40 @@ static struct
 	UINT8 *pagereg;	// page register used by program command
 	UINT8 id[2];		// chip ID
 	UINT8 mp_opcode;	// multi-plane operation code
-} smartmedia[MAX_SMARTMEDIA];
+};
+
+
+INLINE smartmedia_t *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == SMARTMEDIA);
+
+	return (smartmedia_t *)device->token;
+}
+
 
 /*
 	Init a SmartMedia image
 */
 DEVICE_START( smartmedia )
 {
-	int id = image_index_in_device(device);
-	assert((id >= 0) && (id < MAX_SMARTMEDIA));
+	smartmedia_t *sm = get_safe_token(device);
 
-	smartmedia[id].page_data_size = 0;
-	smartmedia[id].page_total_size = 0;
-	smartmedia[id].num_pages = 0;
-	smartmedia[id].log2_pages_per_block = 0;
-	smartmedia[id].data_ptr = NULL;
-	smartmedia[id].mode = SM_M_INIT;
-	smartmedia[id].pointer_mode = SM_PM_A;
-	smartmedia[id].page_addr = 0;
-	smartmedia[id].byte_addr = 0;
-	smartmedia[id].status = 0x40;
-	smartmedia[id].accumulated_status = 0;
-	smartmedia[id].pagereg = NULL;
-	smartmedia[id].id[0] = smartmedia[id].id[1] = 0;
-	smartmedia[id].mp_opcode = 0;
+	sm->page_data_size = 0;
+	sm->page_total_size = 0;
+	sm->num_pages = 0;
+	sm->log2_pages_per_block = 0;
+	sm->data_ptr = NULL;
+	sm->mode = SM_M_INIT;
+	sm->pointer_mode = SM_PM_A;
+	sm->page_addr = 0;
+	sm->byte_addr = 0;
+	sm->status = 0x40;
+	sm->accumulated_status = 0;
+	sm->pagereg = NULL;
+	sm->id[0] = sm->id[1] = 0;
+	sm->mp_opcode = 0;
 }
 
 /*
@@ -127,20 +138,10 @@ DEVICE_START( smartmedia )
 */
 DEVICE_IMAGE_LOAD( smartmedia )
 {
-	int id = image_index_in_device(image);
+	smartmedia_t *sm = get_safe_token(image);
 	disk_image_header custom_header;
 	int bytes_read;
 
-	if (id >= MAX_SMARTMEDIA)
-	{
-		logerror("smartmedia: invalid chip %d\n", id);
-		return INIT_FAIL;
-	}
-
-	/*if (device_load_mess_hd(image, file))
-		return INIT_FAIL;*/
-
-	//mess_hd_get_hard_disk_file(image)
 
 	bytes_read = image_fread(image, &custom_header, sizeof(custom_header));
 	if (bytes_read != sizeof(custom_header))
@@ -153,25 +154,25 @@ DEVICE_IMAGE_LOAD( smartmedia )
 		return INIT_FAIL;
 	}
 
-	smartmedia[id].page_data_size = get_UINT32BE(custom_header.page_data_size);
-	smartmedia[id].page_total_size = get_UINT32BE(custom_header.page_total_size);
-	smartmedia[id].num_pages = get_UINT32BE(custom_header.num_pages);
-	smartmedia[id].log2_pages_per_block = get_UINT32BE(custom_header.log2_pages_per_block);
-	smartmedia[id].data_ptr = auto_alloc_array(image->machine, UINT8, smartmedia[id].page_total_size*smartmedia[id].num_pages);
-	smartmedia[id].mode = SM_M_INIT;
-	smartmedia[id].pointer_mode = SM_PM_A;
-	smartmedia[id].page_addr = 0;
-	smartmedia[id].byte_addr = 0;
-	smartmedia[id].status = 0x40;
+	sm->page_data_size = get_UINT32BE(custom_header.page_data_size);
+	sm->page_total_size = get_UINT32BE(custom_header.page_total_size);
+	sm->num_pages = get_UINT32BE(custom_header.num_pages);
+	sm->log2_pages_per_block = get_UINT32BE(custom_header.log2_pages_per_block);
+	sm->data_ptr = auto_alloc_array(image->machine, UINT8, sm->page_total_size*sm->num_pages);
+	sm->mode = SM_M_INIT;
+	sm->pointer_mode = SM_PM_A;
+	sm->page_addr = 0;
+	sm->byte_addr = 0;
+	sm->status = 0x40;
 	if (!image_is_writable(image))
-		smartmedia[id].status |= 0x80;
-	smartmedia[id].accumulated_status = 0;
-	smartmedia[id].pagereg = auto_alloc_array(image->machine, UINT8, smartmedia[id].page_total_size);
-	smartmedia[id].id[0] = smartmedia[id].id[1] = 0;
+		sm->status |= 0x80;
+	sm->accumulated_status = 0;
+	sm->pagereg = auto_alloc_array(image->machine, UINT8, sm->page_total_size);
+	sm->id[0] = sm->id[1] = 0;
 
-	image_fread(image, smartmedia[id].id, 2);
-	image_fread(image, &smartmedia[id].mp_opcode, 1);
-	image_fread(image, smartmedia[id].data_ptr, smartmedia[id].page_total_size*smartmedia[id].num_pages);
+	image_fread(image, sm->id, 2);
+	image_fread(image, &sm->mp_opcode, 1);
+	image_fread(image, sm->data_ptr, sm->page_total_size*sm->num_pages);
 
 	return INIT_PASS;
 }
@@ -181,175 +182,145 @@ DEVICE_IMAGE_LOAD( smartmedia )
 */
 DEVICE_IMAGE_UNLOAD( smartmedia )
 {
-	int id = image_index_in_device(image);
+	smartmedia_t *sm = get_safe_token(image);
 
-	if (id >= MAX_SMARTMEDIA)
-	{
-		logerror("smartmedia: invalid chip %d\n", id);
-		return;
-	}
-
-	//device_unload_mess_hd(image);
-
-	smartmedia[id].page_data_size = 0;
-	smartmedia[id].page_total_size = 0;
-	smartmedia[id].num_pages = 0;
-	smartmedia[id].log2_pages_per_block = 0;
-	smartmedia[id].data_ptr = NULL;
-	smartmedia[id].mode = SM_M_INIT;
-	smartmedia[id].pointer_mode = SM_PM_A;
-	smartmedia[id].page_addr = 0;
-	smartmedia[id].byte_addr = 0;
-	smartmedia[id].status = 0x40;
-	smartmedia[id].accumulated_status = 0;
-	smartmedia[id].pagereg = auto_alloc_array(image->machine, UINT8, smartmedia[id].page_total_size);
-	smartmedia[id].id[0] = smartmedia[id].id[1] = 0;
-	smartmedia[id].mp_opcode = 0;
+	sm->page_data_size = 0;
+	sm->page_total_size = 0;
+	sm->num_pages = 0;
+	sm->log2_pages_per_block = 0;
+	sm->data_ptr = NULL;
+	sm->mode = SM_M_INIT;
+	sm->pointer_mode = SM_PM_A;
+	sm->page_addr = 0;
+	sm->byte_addr = 0;
+	sm->status = 0x40;
+	sm->accumulated_status = 0;
+	sm->pagereg = auto_alloc_array(image->machine, UINT8, sm->page_total_size);
+	sm->id[0] = sm->id[1] = 0;
+	sm->mp_opcode = 0;
 
 	return;
 }
 
-/*
-	Initialize one SmartMedia chip: may be called at driver init or image load
-	time (or machine init time if you don't use MESS image core)
-*/
-int smartmedia_machine_init(int id)
+int smartmedia_present(const device_config *device)
 {
-	if (id >= MAX_SMARTMEDIA)
-	{
-		logerror("smartmedia: invalid chip %d\n", id);
-		return 1;
-	}
-
-	smartmedia[id].mode = SM_M_INIT;
-	smartmedia[id].pointer_mode = SM_PM_A;
-	smartmedia[id].status = (smartmedia[id].status & 0x80) | 0x40;
-	smartmedia[id].accumulated_status = 0;
-
-	return 0;
+	smartmedia_t *sm = get_safe_token(device);
+	return sm->num_pages != 0;
 }
 
-int smartmedia_present(int id)
+int smartmedia_protected(const device_config *device)
 {
-	return smartmedia[id].num_pages != 0;
-}
-
-int smartmedia_protected(int id)
-{
-	return (smartmedia[id].status & 0x80) != 0;
+	smartmedia_t *sm = get_safe_token(device);
+	return (sm->status & 0x80) != 0;
 }
 
 /*
 	write a byte to SmartMedia command port
 */
-void smartmedia_command_w(int id, UINT8 data)
+void smartmedia_command_w(const device_config *device, UINT8 data)
 {
-	if (id >= MAX_SMARTMEDIA)
-	{
-		logerror("smartmedia: invalid chip %d\n", id);
-		return;
-	}
-
-	if (!smartmedia_present(id))
+	smartmedia_t *sm = get_safe_token(device);
+	
+	if (!smartmedia_present(device))
 		return;
 
 	switch (data)
 	{
 	case 0xff:
-		smartmedia[id].mode = SM_M_INIT;
-		smartmedia[id].pointer_mode = SM_PM_A;
-		smartmedia[id].status = (smartmedia[id].status & 0x80) | 0x40;
-		smartmedia[id].accumulated_status = 0;
+		sm->mode = SM_M_INIT;
+		sm->pointer_mode = SM_PM_A;
+		sm->status = (sm->status & 0x80) | 0x40;
+		sm->accumulated_status = 0;
 		break;
 	case 0x00:
-		smartmedia[id].mode = SM_M_READ;
-		smartmedia[id].pointer_mode = SM_PM_A;
-		smartmedia[id].page_addr = 0;
-		smartmedia[id].addr_load_ptr = 0;
+		sm->mode = SM_M_READ;
+		sm->pointer_mode = SM_PM_A;
+		sm->page_addr = 0;
+		sm->addr_load_ptr = 0;
 		break;
 	case 0x01:
-		if (smartmedia[id].page_data_size <= 256)
+		if (sm->page_data_size <= 256)
 		{
 			logerror("smartmedia: unsupported upper data field select (256-byte pages)\n");
-			smartmedia[id].mode = SM_M_INIT;
+			sm->mode = SM_M_INIT;
 		}
 		else
 		{
-			smartmedia[id].mode = SM_M_READ;
-			smartmedia[id].pointer_mode = SM_PM_B;
-			smartmedia[id].page_addr = 0;
-			smartmedia[id].addr_load_ptr = 0;
+			sm->mode = SM_M_READ;
+			sm->pointer_mode = SM_PM_B;
+			sm->page_addr = 0;
+			sm->addr_load_ptr = 0;
 		}
 		break;
 	case 0x50:
-		smartmedia[id].mode = SM_M_READ;
-		smartmedia[id].pointer_mode = SM_PM_C;
-		smartmedia[id].page_addr = 0;
-		smartmedia[id].addr_load_ptr = 0;
+		sm->mode = SM_M_READ;
+		sm->pointer_mode = SM_PM_C;
+		sm->page_addr = 0;
+		sm->addr_load_ptr = 0;
 		break;
 	case 0x80:
-		smartmedia[id].mode = SM_M_PROGRAM;
-		smartmedia[id].page_addr = 0;
-		smartmedia[id].addr_load_ptr = 0;
-		memset(smartmedia[id].pagereg, 0xff, smartmedia[id].page_total_size);
+		sm->mode = SM_M_PROGRAM;
+		sm->page_addr = 0;
+		sm->addr_load_ptr = 0;
+		memset(sm->pagereg, 0xff, sm->page_total_size);
 		break;
 	case 0x10:
 	case 0x15:
-		if (smartmedia[id].mode != SM_M_PROGRAM)
+		if (sm->mode != SM_M_PROGRAM)
 		{
 			logerror("smartmedia: illegal page program confirm command\n");
-			smartmedia[id].mode = SM_M_INIT;
+			sm->mode = SM_M_INIT;
 		}
 		else
 		{
 			int i;
-			smartmedia[id].status = (smartmedia[id].status & 0x80) | smartmedia[id].accumulated_status;
-			for (i=0; i<smartmedia[id].page_total_size; i++)
-				smartmedia[id].data_ptr[smartmedia[id].page_addr*smartmedia[id].page_total_size + i] &= smartmedia[id].pagereg[i];
-			smartmedia[id].status |= 0x40;
+			sm->status = (sm->status & 0x80) | sm->accumulated_status;
+			for (i=0; i<sm->page_total_size; i++)
+				sm->data_ptr[sm->page_addr*sm->page_total_size + i] &= sm->pagereg[i];
+			sm->status |= 0x40;
 			if (data == 0x15)
-				smartmedia[id].accumulated_status = smartmedia[id].status & 0x1f;
+				sm->accumulated_status = sm->status & 0x1f;
 			else
-				smartmedia[id].accumulated_status = 0;
-			smartmedia[id].mode = SM_M_INIT;
+				sm->accumulated_status = 0;
+			sm->mode = SM_M_INIT;
 		}
 		break;
 	/*case 0x11:
 		break;*/
 	case 0x60:
-		smartmedia[id].mode = SM_M_ERASE;
-		smartmedia[id].page_addr = 0;
-		smartmedia[id].addr_load_ptr = 0;
+		sm->mode = SM_M_ERASE;
+		sm->page_addr = 0;
+		sm->addr_load_ptr = 0;
 		break;
 	case 0xd0:
-		if (smartmedia[id].mode != SM_M_PROGRAM)
+		if (sm->mode != SM_M_PROGRAM)
 		{
 			logerror("smartmedia: illegal block erase confirm command\n");
-			smartmedia[id].mode = SM_M_INIT;
+			sm->mode = SM_M_INIT;
 		}
 		else
 		{
-			smartmedia[id].status &= 0x80;
-			memset(smartmedia[id].data_ptr + (smartmedia[id].page_addr & (-1 << smartmedia[id].log2_pages_per_block)), 0, (size_t)(1 << smartmedia[id].log2_pages_per_block));
-			smartmedia[id].status |= 0x40;
-			smartmedia[id].mode = SM_M_INIT;
-			if (smartmedia[id].pointer_mode == SM_PM_B)
-				smartmedia[id].pointer_mode = SM_PM_A;
+			sm->status &= 0x80;
+			memset(sm->data_ptr + (sm->page_addr & (-1 << sm->log2_pages_per_block)), 0, (size_t)(1 << sm->log2_pages_per_block));
+			sm->status |= 0x40;
+			sm->mode = SM_M_INIT;
+			if (sm->pointer_mode == SM_PM_B)
+				sm->pointer_mode = SM_PM_A;
 		}
 		break;
 	case 0x70:
-		smartmedia[id].mode = SM_M_READSTATUS;
+		sm->mode = SM_M_READSTATUS;
 		break;
 	/*case 0x71:
 		break;*/
 	case 0x90:
-		smartmedia[id].mode = SM_M_READID;
+		sm->mode = SM_M_READID;
 		break;
 	/*case 0x91:
 		break;*/
 	default:
 		logerror("smartmedia: unsupported command 0x%02x\n", data);
-		smartmedia[id].mode = SM_M_INIT;
+		sm->mode = SM_M_INIT;
 		break;
 	}
 }
@@ -357,57 +328,53 @@ void smartmedia_command_w(int id, UINT8 data)
 /*
 	write a byte to SmartMedia address port
 */
-void smartmedia_address_w(int id, UINT8 data)
+void smartmedia_address_w(const device_config *device, UINT8 data)
 {
-	if (id >= MAX_SMARTMEDIA)
-	{
-		logerror("smartmedia: invalid chip %d\n", id);
-		return;
-	}
-
-	if (!smartmedia_present(id))
+	smartmedia_t *sm = get_safe_token(device);
+	
+	if (!smartmedia_present(device))
 		return;
 
-	switch (smartmedia[id].mode)
+	switch (sm->mode)
 	{
 	case SM_M_INIT:
 		logerror("smartmedia: unexpected address port write\n");
 		break;
 	case SM_M_READ:
 	case SM_M_PROGRAM:
-		if (smartmedia[id].addr_load_ptr == 0)
+		if (sm->addr_load_ptr == 0)
 		{
-			switch (smartmedia[id].pointer_mode)
+			switch (sm->pointer_mode)
 			{
 			case SM_PM_A:
-				smartmedia[id].byte_addr = data;
+				sm->byte_addr = data;
 				break;
 			case SM_PM_B:
-				smartmedia[id].byte_addr = data + 256;
-				smartmedia[id].pointer_mode = SM_PM_A;
+				sm->byte_addr = data + 256;
+				sm->pointer_mode = SM_PM_A;
 				break;
 			case SM_PM_C:
-				smartmedia[id].byte_addr = (data & 0x0f) + smartmedia[id].page_data_size;
+				sm->byte_addr = (data & 0x0f) + sm->page_data_size;
 				break;
 			}
 		}
 		else
-			smartmedia[id].page_addr = (smartmedia[id].page_addr & ~(0xff << ((smartmedia[id].addr_load_ptr-1) * 8)))
-										| (data << ((smartmedia[id].addr_load_ptr-1) * 8));
-		smartmedia[id].addr_load_ptr++;
+			sm->page_addr = (sm->page_addr & ~(0xff << ((sm->addr_load_ptr-1) * 8)))
+										| (data << ((sm->addr_load_ptr-1) * 8));
+		sm->addr_load_ptr++;
 		break;
 	case SM_M_ERASE:
-		smartmedia[id].page_addr = (smartmedia[id].page_addr & ~(0xff << (smartmedia[id].addr_load_ptr * 8)))
-									| (data << (smartmedia[id].addr_load_ptr * 8));
-		smartmedia[id].addr_load_ptr++;
+		sm->page_addr = (sm->page_addr & ~(0xff << (sm->addr_load_ptr * 8)))
+									| (data << (sm->addr_load_ptr * 8));
+		sm->addr_load_ptr++;
 		break;
 	case SM_M_READSTATUS:
 		logerror("smartmedia: unexpected address port write\n");
 		break;
 	case SM_M_READID:
-		if (smartmedia[id].addr_load_ptr == 0)
-			smartmedia[id].byte_addr = data;
-		smartmedia[id].addr_load_ptr++;
+		if (sm->addr_load_ptr == 0)
+			sm->byte_addr = data;
+		sm->addr_load_ptr++;
 		break;
 	}
 }
@@ -415,33 +382,28 @@ void smartmedia_address_w(int id, UINT8 data)
 /*
 	read a byte from SmartMedia data port
 */
-UINT8 smartmedia_data_r(int id)
+UINT8 smartmedia_data_r(const device_config *device)
 {
 	UINT8 reply = 0;
+	smartmedia_t *sm = get_safe_token(device);
 
-	if (id >= MAX_SMARTMEDIA)
-	{
-		logerror("smartmedia: invalid chip %d\n", id);
-		return 0;
-	}
-
-	if (!smartmedia_present(id))
+	if (!smartmedia_present(device))
 		return 0;
 
-	switch (smartmedia[id].mode)
+	switch (sm->mode)
 	{
 	case SM_M_INIT:
 		logerror("smartmedia: unexpected data port read\n");
 		break;
 	case SM_M_READ:
-		reply = smartmedia[id].data_ptr[smartmedia[id].page_addr*smartmedia[id].page_total_size + smartmedia[id].byte_addr];
-		smartmedia[id].byte_addr++;
-		if (smartmedia[id].byte_addr == smartmedia[id].page_total_size)
+		reply = sm->data_ptr[sm->page_addr*sm->page_total_size + sm->byte_addr];
+		sm->byte_addr++;
+		if (sm->byte_addr == sm->page_total_size)
 		{
-			smartmedia[id].byte_addr = (smartmedia[id].pointer_mode != SM_PM_C) ? 0 : smartmedia[id].page_data_size;
-			smartmedia[id].page_addr++;
-			if (smartmedia[id].page_addr == smartmedia[id].num_pages)
-				smartmedia[id].page_addr = 0;
+			sm->byte_addr = (sm->pointer_mode != SM_PM_C) ? 0 : sm->page_data_size;
+			sm->page_addr++;
+			if (sm->page_addr == sm->num_pages)
+				sm->page_addr = 0;
 		}
 		break;
 	case SM_M_PROGRAM:
@@ -451,11 +413,11 @@ UINT8 smartmedia_data_r(int id)
 		logerror("smartmedia: unexpected data port read\n");
 		break;
 	case SM_M_READSTATUS:
-		reply = smartmedia[id].status & 0xc1;
+		reply = sm->status & 0xc1;
 		break;
 	case SM_M_READID:
-		if (smartmedia[id].byte_addr < 2)
-			reply = smartmedia[id].id[smartmedia[id].byte_addr];
+		if (sm->byte_addr < 2)
+			reply = sm->id[sm->byte_addr];
 		break;
 	}
 
@@ -465,33 +427,66 @@ UINT8 smartmedia_data_r(int id)
 /*
 	write a byte to SmartMedia data port
 */
-void smartmedia_data_w(int id, UINT8 data)
+void smartmedia_data_w(const device_config *device, UINT8 data)
 {
-	if (id >= MAX_SMARTMEDIA)
-	{
-		logerror("smartmedia: invalid chip %d\n", id);
-		return;
-	}
-
-	if (!smartmedia_present(id))
+	smartmedia_t *sm = get_safe_token(device);
+	
+	if (!smartmedia_present(device))
 		return;
 
-	switch (smartmedia[id].mode)
+	switch (sm->mode)
 	{
 	case SM_M_INIT:
 	case SM_M_READ:
 		logerror("smartmedia: unexpected data port write\n");
 		break;
 	case SM_M_PROGRAM:
-		smartmedia[id].pagereg[smartmedia[id].byte_addr] = data;
-		smartmedia[id].byte_addr++;
-		if (smartmedia[id].byte_addr == smartmedia[id].page_total_size)
-			smartmedia[id].byte_addr = (smartmedia[id].pointer_mode != SM_PM_C) ? 0 : smartmedia[id].page_data_size;
+		sm->pagereg[sm->byte_addr] = data;
+		sm->byte_addr++;
+		if (sm->byte_addr == sm->page_total_size)
+			sm->byte_addr = (sm->pointer_mode != SM_PM_C) ? 0 : sm->page_data_size;
 		break;
 	case SM_M_ERASE:
 	case SM_M_READSTATUS:
 	case SM_M_READID:
 		logerror("smartmedia: unexpected data port write\n");
 		break;
+	}
+}
+
+
+/*
+	Initialize one SmartMedia chip: may be called at driver init or image load
+	time (or machine init time if you don't use MESS image core)
+*/
+static DEVICE_RESET(smartmedia)
+{
+	smartmedia_t *sm = get_safe_token(device);
+	
+	sm->mode = SM_M_INIT;
+	sm->pointer_mode = SM_PM_A;
+	sm->status = (sm->status & 0x80) | 0x40;
+	sm->accumulated_status = 0;
+}
+
+DEVICE_GET_INFO( smartmedia )
+{
+	switch ( state ) 
+	{
+		case DEVINFO_INT_CLASS:	                    info->i = DEVICE_CLASS_PERIPHERAL;                         break;
+		case DEVINFO_INT_TOKEN_BYTES:				info->i = sizeof(smartmedia_t);				break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:		info->i = 0;	
+		case DEVINFO_INT_IMAGE_TYPE:	            info->i = IO_MEMCARD;                                      break;
+		case DEVINFO_INT_IMAGE_READABLE:            info->i = 1;                                               break;
+		case DEVINFO_INT_IMAGE_WRITEABLE:			info->i = 1;                                               break;
+		case DEVINFO_INT_IMAGE_CREATABLE:	     	info->i = 0;                                               break;
+		case DEVINFO_FCT_START:		                info->start = DEVICE_START_NAME( smartmedia );              break;
+		case DEVINFO_FCT_RESET:						info->reset = DEVICE_RESET_NAME( smartmedia );			break;
+		case DEVINFO_FCT_IMAGE_LOAD:		        info->f = (genf *) DEVICE_IMAGE_LOAD_NAME( smartmedia );    break;
+		case DEVINFO_FCT_IMAGE_UNLOAD:		        info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME(smartmedia );  break;
+		case DEVINFO_STR_NAME:		                strcpy( info->s, "SmartMedia Flash ROM");	                         break;
+		case DEVINFO_STR_FAMILY:                    strcpy(info->s, "SmartMedia Flash ROM");	                         break;
+		case DEVINFO_STR_SOURCE_FILE:		        strcpy(info->s, __FILE__);                                        break;
+		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:	    strcpy(info->s, "");                                           break;
 	}
 }

@@ -37,8 +37,8 @@ static int usbsm_cru_r(running_machine *machine, int offset);
 static void usbsm_cru_w(running_machine *machine, int offset, int data);
 static  READ8_HANDLER(usbsm_mem_r);
 static WRITE8_HANDLER(usbsm_mem_w);
-static UINT16 usbsm_mem_16_r(offs_t offset);
-static void usbsm_mem_16_w(offs_t offset, UINT16 data);
+static UINT16 usbsm_mem_16_r(const address_space* space,offs_t offset);
+static void usbsm_mem_16_w(const address_space* space,offs_t offset, UINT16 data);
 
 /* pointer to the SRAM area */
 static UINT16 *ti99_usbsm_RAM;
@@ -84,8 +84,6 @@ int ti99_usbsm_reset(running_machine *machine, int in_tms9995_mode)
 {
 	if (strataflash_init(machine, 0))
 		return 1;
-	if (smartmedia_machine_init(0))
-		return 1;
 
 	ti99_peb_set_card_handlers(0x1600, & usbsm_handlers);
 
@@ -104,7 +102,7 @@ int ti99_usbsm_reset(running_machine *machine, int in_tms9995_mode)
 static int usbsm_cru_r(running_machine *machine, int offset)
 {
 	int reply = 0;
-
+	const device_config *smartmedia =devtag_get_device(machine, "smartmedia");
 	offset &= 3;
 
 	switch (offset)
@@ -126,9 +124,9 @@ static int usbsm_cru_r(running_machine *machine, int offset)
 						1: Card absent or not protected.
 		 */
 		reply = 0x33;
-		if (! smartmedia_present(0))
+		if (! smartmedia_present(smartmedia))
 			reply |= 0xc0;
-		else if (! smartmedia_protected(0))
+		else if (! smartmedia_protected(smartmedia))
 			reply |= 0x80;
 		break;
 	}
@@ -198,7 +196,7 @@ static READ8_HANDLER(usbsm_mem_r)
 {
 	if (tms9995_mode ? (!(offset & 1)) : (offset & 1))
 	{	/* first read triggers 16-bit read cycle */
-		input_latch = usbsm_mem_16_r(offset >> 1);
+		input_latch = usbsm_mem_16_r(space,offset >> 1);
 	}
 
 	/* return latched input */
@@ -218,23 +216,23 @@ static WRITE8_HANDLER(usbsm_mem_w)
 
 	if (tms9995_mode ? (offset & 1) : (!(offset & 1)))
 	{	/* second write triggers 16-bit write cycle */
-		usbsm_mem_16_w(offset >> 1, output_latch);
+		usbsm_mem_16_w(space,offset >> 1, output_latch);
 	}
 }
 
 /*
 	demultiplexed read in USB-SmartMedia DSR space
 */
-static UINT16 usbsm_mem_16_r(offs_t offset)
+static UINT16 usbsm_mem_16_r(const address_space* space,offs_t offset)
 {
 	UINT16 reply = 0;
-
+	const device_config *smartmedia =devtag_get_device(space->machine, "smartmedia");
 	if (offset < 0x800)
 	{	/* 0x4000-0x4fff range */
 		if ((cru_register & cru_reg_io_regs_enable) && (offset >= 0x7f8))
 		{	/* SmartMedia interface */
 			if (offset == 0)
-				reply = smartmedia_data_r(0) << 8;
+				reply = smartmedia_data_r(smartmedia) << 8;
 		}
 		else
 		{	/* FEEPROM */
@@ -259,8 +257,9 @@ static UINT16 usbsm_mem_16_r(offs_t offset)
 /*
 	demultiplexed write in USB-SmartMedia DSR space
 */
-static void usbsm_mem_16_w(offs_t offset, UINT16 data)
+static void usbsm_mem_16_w(const address_space* space,offs_t offset, UINT16 data)
 {
+	const device_config *smartmedia =devtag_get_device(space->machine, "smartmedia");
 	if (offset < 0x800)
 	{	/* 0x4000-0x4fff range */
 		if ((cru_register & cru_reg_io_regs_enable) && (offset >= 0x7f8))
@@ -268,13 +267,13 @@ static void usbsm_mem_16_w(offs_t offset, UINT16 data)
 			switch (offset & 3)
 			{
 			case 0:
-				smartmedia_data_w(0, data >> 8);
+				smartmedia_data_w(smartmedia, data >> 8);
 				break;
 			case 1:
-				smartmedia_address_w(0, data >> 8);
+				smartmedia_address_w(smartmedia, data >> 8);
 				break;
 			case 2:
-				smartmedia_command_w(0, data >> 8);
+				smartmedia_command_w(smartmedia, data >> 8);
 				break;
 			case 3:
 				/* bogus, don't use(?) */

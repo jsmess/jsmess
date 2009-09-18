@@ -530,6 +530,7 @@ static MACHINE_DRIVER_START(ti99_8_50hz)
 	MDRV_FLOPPY_4_DRIVES_ADD(ti99_8_floppy_config)	
 
 	MDRV_TI99_CARTRIDGE_ADD("ti99_multicart")
+	MDRV_SMARTMEDIA_ADD("smartmedia")
 MACHINE_DRIVER_END
 
 /*
@@ -607,27 +608,6 @@ static void ti99_8_serial_getinfo(const mess_device_class *devclass, UINT32 stat
 	}
 }
 
-static void ti99_8_memcard_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* memcard */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_TYPE:							info->i = IO_MEMCARD; break;
-		case MESS_DEVINFO_INT_READABLE:						info->i = 1; break;
-		case MESS_DEVINFO_INT_WRITEABLE:						info->i = 1; break;
-		case MESS_DEVINFO_INT_CREATABLE:						info->i = 0; break;
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_START:							info->start = DEVICE_START_NAME(smartmedia); break;
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(smartmedia); break;
-		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(smartmedia); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), ""); break;
-	}
-}
 
 static SYSTEM_CONFIG_START(ti99_8)
 	/* one cartridge port */
@@ -636,8 +616,7 @@ static SYSTEM_CONFIG_START(ti99_8)
 	/* expansion port (similar to 99/4(a) - yet slightly different) */
 	CONFIG_DEVICE(ti99_8_parallel_getinfo)
 	CONFIG_DEVICE(ti99_8_serial_getinfo)
-	/*CONFIG_DEVICE(ti99_8_quickload_getinfo)*/
-	CONFIG_DEVICE(ti99_8_memcard_getinfo)
+	/*CONFIG_DEVICE(ti99_8_quickload_getinfo)*/	
 SYSTEM_CONFIG_END
 
 /*      YEAR    NAME        PARENT      COMPAT  MACHINE     INPUT   INIT        CONFIG      COMPANY                 FULLNAME */
