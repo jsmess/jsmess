@@ -142,6 +142,7 @@
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
+#include "cpu/z80/z80daisy.h"
 #include "machine/z80ctc.h"
 #include "machine/z80sio.h"
 #include "machine/8255ppi.h"
@@ -166,6 +167,8 @@ static UINT16 pcg_index[3];
 static UINT8 pcg_reset;
 static UINT16 crtc_start_addr;
 static UINT8 sub_obf;
+static UINT8 key_irq_flag;
+static UINT8 ctc_irq_flag;
 static struct
 {
 	UINT8 gfx_bank;
@@ -187,6 +190,7 @@ static struct
 
 static UINT8 pcg_write_addr;
 
+static DEVICE_START(x1_daisy){}
 
 /*************************************
  *
@@ -680,6 +684,44 @@ static WRITE8_HANDLER( sub_io_w )
 
 	sub_obf = (sub_cmd_length) ? 0x00 : 0x20;
 	logerror("SUB: Command byte 0x%02x\n",data);
+}
+
+static int x1_keyboard_irq_state(const device_config* device)
+{
+	if(key_irq_flag != 0)
+		return Z80_DAISY_INT;
+		
+	return 0;
+}
+
+static int x1_keyboard_irq_ack(const device_config* device)
+{
+	key_irq_flag = 0;
+	cputag_set_input_line(device->machine,"maincpu",INPUT_LINE_IRQ0,CLEAR_LINE);
+	return key_irq_vector;
+}
+
+static DEVICE_GET_INFO( x1_keyboard_getinfo )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = 4;											break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;											break;
+		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;						break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(x1_daisy);		break;
+		case DEVINFO_FCT_IRQ_STATE:						info->f = (genf *)x1_keyboard_irq_state;	break;
+		case DEVINFO_FCT_IRQ_ACK:						info->f = (genf *)x1_keyboard_irq_ack;		break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "X1 keyboard");		break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "X1 daisy chain");				break;
+		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");									break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);								break;
+		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright the MESS Team");				break;
+	}
 }
 
 /*************************************
@@ -1740,8 +1782,7 @@ GFXDECODE_END
 
 static void ctc0_interrupt(const device_config *device, int state)
 {
-	//x1_irq_vector = 0x5e;
-	//cputag_set_input_line(device->machine, "maincpu", 0, state);
+	cputag_set_input_line(device->machine,"maincpu",INPUT_LINE_IRQ0,state);
 }
 
 
@@ -1749,7 +1790,7 @@ static const z80ctc_interface ctc_intf =
 {
 	0,					// timer disables
 	ctc0_interrupt,		// interrupt handler
-	z80ctc_trg0_w,		// ZC/TO0 callback
+	z80ctc_trg3_w,		// ZC/TO0 callback
 	z80ctc_trg1_w,		// ZC/TO1 callback
 	z80ctc_trg2_w,		// ZC/TO2 callback
 };
@@ -1764,6 +1805,14 @@ static const z80sio_interface sio_intf =
 	0					/* receive handler */
 };
 
+static const z80_daisy_chain x1_daisy[] =
+{
+	{ "x1kb" },
+	{ "ctc" },
+//	{ "dma" },
+//	{ "sio" },
+	{ NULL }
+};
 
 /*************************************
  *
@@ -1808,12 +1857,25 @@ static INTERRUPT_GEN( x1_vbl )
 	//...
 }
 
-static IRQ_CALLBACK(x1_irq_callback)
+/*static IRQ_CALLBACK(x1_irq_callback)
 {
-	cpu_set_input_line(device, 0, CLEAR_LINE);
+	if(ctc_irq_flag != 0)
+	{
+		ctc_irq_flag = 0;
+		if(key_irq_flag == 0)  // if no other devices are pulling the IRQ line high
+			cpu_set_input_line(device, 0, CLEAR_LINE);
+		return x1_irq_vector;
+	}
+	if(key_irq_flag != 0)
+	{
+		key_irq_flag = 0;
+		if(ctc_irq_flag == 0)  // if no other devices are pulling the IRQ line high
+			cpu_set_input_line(device, 0, CLEAR_LINE);
+		return key_irq_vector;
+	}
 	return x1_irq_vector;
 }
-
+*/
 static TIMER_CALLBACK(keyboard_callback)
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
@@ -1830,6 +1892,7 @@ static TIMER_CALLBACK(keyboard_callback)
 			// generate keyboard IRQ
 			sub_io_w(space,0,0xe6);
 			x1_irq_vector = key_irq_vector;
+			key_irq_flag = 1;
 			cputag_set_input_line(machine,"maincpu",0,ASSERT_LINE);
 			old_key1 = key1;
 			old_key2 = key2;
@@ -1865,12 +1928,14 @@ static MACHINE_RESET( x1 )
 	io_bank_mode = 0;
 	pcg_index[0] = pcg_index[1] = pcg_index[2] = 0;
 
-	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), x1_irq_callback);
+	//cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), x1_irq_callback);
 	timer_pulse(machine, ATTOTIME_IN_HZ(240), NULL, 0, keyboard_callback);
 
 	cmt_current_cmd = 0;
 	cmt_test = 0;
 	cassette_change_state(devtag_get_device(machine, "cass" ),CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
+	
+	key_irq_flag = ctc_irq_flag = 0;
 }
 
 static PALETTE_INIT(x1)
@@ -1927,10 +1992,13 @@ static MACHINE_DRIVER_START( x1 )
 	MDRV_CPU_PROGRAM_MAP(x1_mem)
 	MDRV_CPU_IO_MAP(x1_io)
 	MDRV_CPU_VBLANK_INT("screen", x1_vbl)
+	MDRV_CPU_CONFIG(x1_daisy)
 
 	MDRV_Z80CTC_ADD( "ctc", XTAL_4MHz , ctc_intf )
 	MDRV_Z80SIO_ADD( "sio", XTAL_4MHz , sio_intf )
 	MDRV_Z80DMA_ADD( "dma", XTAL_4MHz , x1_dma )
+
+	MDRV_DEVICE_ADD("x1kb", DEVICE_GET_INFO_NAME(x1_keyboard_getinfo), 0)
 
 	MDRV_PPI8255_ADD( "ppi8255_0", ppi8255_intf )
 
