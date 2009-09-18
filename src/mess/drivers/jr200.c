@@ -308,12 +308,23 @@ static VIDEO_UPDATE( jr200 )
 		for (j = 0; j < 0x20; j++)
 		{
 			UINT8 code = textram[0x0100 + i + j];
-			UINT8 col_fg = (textram[0x0500 + i + j] >> 0) & 0x3f;
+			UINT8 col = textram[0x0500 + i + j];
 
-			drawgfx_transpen(bitmap, cliprect, gfx,
-					code, col_fg,
-					0, 0,
-					j * 8, (i >> 5) * 8, 15);
+			if (col & 0x80)
+			{
+				UINT8 pixel01 = (textram[0x0100 + i + j] >> 3) & 0x07;
+				UINT8 pixel00 = (textram[0x0100 + i + j] >> 0) & 0x07;
+				UINT8 pixel11 = (textram[0x0500 + i + j] >> 3) & 0x07;
+				UINT8 pixel10 = (textram[0x0500 + i + j] >> 0) & 0x07;
+				plot_box(bitmap, j * 8    , (i >> 5) * 8    , 4, 4, pixel00 * 2 + 1);
+				plot_box(bitmap, j * 8 + 4, (i >> 5) * 8    , 4, 4, pixel01 * 2 + 1);
+				plot_box(bitmap, j * 8    , (i >> 5) * 8 + 4, 4, 4, pixel10 * 2 + 1);
+				plot_box(bitmap, j * 8 + 4, (i >> 5) * 8 + 4, 4, 4, pixel11 * 2 + 1);
+			}
+			else
+			{
+				drawgfx_transpen(bitmap, cliprect, gfx, code, col & 0x3f, 0, 0, j * 8, (i >> 5) * 8, 15);
+			}
 		}
 	return 0;
 }
@@ -350,8 +361,9 @@ static MACHINE_DRIVER_START( jr200 )
 	MDRV_CPU_ADD("maincpu", M6802, 890000) /* MN1800A */
 	MDRV_CPU_PROGRAM_MAP(jr200_mem)
 	MDRV_CPU_IO_MAP(jr200_io)
-MDRV_CPU_VBLANK_INT("screen", jr200_irq)
+// MDRV_CPU_VBLANK_INT("screen", jr200_irq)
 // MDRV_CPU_PERIODIC_INT(jr200_nmi,60)
+MDRV_CPU_PERIODIC_INT(jr200_irq,10)
 /*
 	MDRV_CPU_ADD("mn1544", MN1544, ?)
 */
