@@ -611,7 +611,6 @@ static MACHINE_DRIVER_START( supergb )
 	MDRV_PALETTE_INIT(sgb)
 
 	MDRV_CARTSLOT_MODIFY("cart")
-	MDRV_CARTSLOT_MANDATORY
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( gbpocket )
@@ -717,7 +716,7 @@ ROM_END
 
 /*    YEAR  NAME      PARENT   COMPAT   MACHINE   INPUT    INIT  CONFIG		COMPANY     FULLNAME */
 CONS( 1990, gameboy,  0,       0,		gameboy,  gameboy, 0,    0,			"Nintendo", "Game Boy", 0)
-CONS( 1994, supergb,  0,       gameboy,	supergb,  gameboy, 0,    0,			"Nintendo", "Super Game Boy", 0)
+CONS( 1994, supergb,  gameboy, 0,		supergb,  gameboy, 0,    0,			"Nintendo", "Super Game Boy", 0)
 CONS( 1996, gbpocket, gameboy, 0,		gbpocket, gameboy, 0,    0,			"Nintendo", "Game Boy Pocket", 0)
 CONS( 1997, gblight,  gameboy, 0,		gbpocket, gameboy, 0,    0,			"Nintendo", "Game Boy Light", 0)
 CONS( 1998, gbcolor,  gameboy, 0,		gbcolor,  gameboy, 0,    gb_cgb,	"Nintendo", "Game Boy Color", GAME_NOT_WORKING)
