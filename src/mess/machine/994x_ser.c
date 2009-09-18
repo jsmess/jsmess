@@ -502,15 +502,6 @@ DEVICE_GET_INFO( ti99_4_pio )
 	}
 }
 
-/* device interface */
-DEVICE_GET_INFO( ti99_4_pio );
-
-#define TI99_4_PIO	DEVICE_GET_INFO_NAME(ti99_4_pio)
-
-#define MDRV_TI99_4_PIO_ADD(_tag) \
-	MDRV_DEVICE_ADD(_tag, TI99_4_PIO, 0)
-
-
 static MACHINE_DRIVER_START( ti99_4_rs232 )
 	MDRV_TMS9902_ADD("tms9902_0", tms9902_params_0)
 	MDRV_TMS9902_ADD("tms9902_1", tms9902_params_1)
