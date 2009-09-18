@@ -1,19 +1,21 @@
 #ifndef __994X_SER_H__
 #define __994X_SER_H__
 
-#include "machine/tms9902.h"
+/***************************************************************************
+    FUNCTION PROTOTYPES
+***************************************************************************/
 
-extern const tms9902_interface tms9902_params_0;
-extern const tms9902_interface tms9902_params_1;
+/* device interface */
+DEVICE_GET_INFO( ti99_4_rs232_card );
 
-DEVICE_IMAGE_LOAD( ti99_4_pio );
-DEVICE_IMAGE_UNLOAD( ti99_4_pio );
+/***************************************************************************
+    DEVICE CONFIGURATION MACROS
+***************************************************************************/
 
-DEVICE_IMAGE_LOAD( ti99_4_rs232 );
-DEVICE_IMAGE_UNLOAD( ti99_4_rs232 );
+#define TI99_4_RS232_CARD	DEVICE_GET_INFO_NAME(ti99_4_rs232_card)
 
-void ti99_rs232_init(running_machine *machine);
-void ti99_rs232_reset(running_machine *machine);
+#define MDRV_TI99_4_RS232_CARD_ADD(_tag) \
+	MDRV_DEVICE_ADD(_tag, TI99_4_RS232_CARD, 0)
 
 #endif /* __994X_SER_H__ */
 

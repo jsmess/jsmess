@@ -480,6 +480,8 @@ static MACHINE_DRIVER_START(ti99_8_60hz)
 	MDRV_FLOPPY_4_DRIVES_ADD(ti99_8_floppy_config)	
 	
 	MDRV_TI99_CARTRIDGE_ADD("ti99_multicart")
+	MDRV_SMARTMEDIA_ADD("smartmedia")
+	MDRV_TI99_4_RS232_CARD_ADD("rs232")
 MACHINE_DRIVER_END
 
 
@@ -531,6 +533,7 @@ static MACHINE_DRIVER_START(ti99_8_50hz)
 
 	MDRV_TI99_CARTRIDGE_ADD("ti99_multicart")
 	MDRV_SMARTMEDIA_ADD("smartmedia")
+	MDRV_TI99_4_RS232_CARD_ADD("rs232")
 MACHINE_DRIVER_END
 
 /*
@@ -566,59 +569,6 @@ ROM_END
 
 #define rom_ti99_8e rom_ti99_8
 
-static void ti99_8_parallel_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* parallel */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_TYPE:							info->i = IO_PARALLEL; break;
-		case MESS_DEVINFO_INT_READABLE:						info->i = 1; break;
-		case MESS_DEVINFO_INT_WRITEABLE:						info->i = 1; break;
-		case MESS_DEVINFO_INT_CREATABLE:						info->i = 1; break;
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(ti99_4_pio); break;
-		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(ti99_4_pio); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), ""); break;
-	}
-}
-
-static void ti99_8_serial_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* serial */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_TYPE:							info->i = IO_SERIAL; break;
-		case MESS_DEVINFO_INT_READABLE:						info->i = 1; break;
-		case MESS_DEVINFO_INT_WRITEABLE:						info->i = 1; break;
-		case MESS_DEVINFO_INT_CREATABLE:						info->i = 1; break;
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(ti99_4_rs232); break;
-		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(ti99_4_rs232); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), ""); break;
-	}
-}
-
-
-static SYSTEM_CONFIG_START(ti99_8)
-	/* one cartridge port */
-	/* one cassette unit port */
-	/* Hex-bus disk controller: supports up to 4 floppy disk drives */
-	/* expansion port (similar to 99/4(a) - yet slightly different) */
-	CONFIG_DEVICE(ti99_8_parallel_getinfo)
-	CONFIG_DEVICE(ti99_8_serial_getinfo)
-	/*CONFIG_DEVICE(ti99_8_quickload_getinfo)*/	
-SYSTEM_CONFIG_END
-
 /*      YEAR    NAME        PARENT      COMPAT  MACHINE     INPUT   INIT        CONFIG      COMPANY                 FULLNAME */
-COMP(	1983,	ti99_8,		0,	0,	ti99_8_60hz,ti99_8,	ti99_8,	ti99_8,	"Texas Instruments",	"TI-99/8 Computer (US)" , 0)
-COMP(	1983,	ti99_8e,	ti99_8,	0,	ti99_8_50hz,ti99_8,	ti99_8,	ti99_8,	"Texas Instruments",	"TI-99/8 Computer (Europe)" , 0 )
+COMP(	1983,	ti99_8,		0,	0,	ti99_8_60hz,ti99_8,	ti99_8,	0,	"Texas Instruments",	"TI-99/8 Computer (US)" , 0)
+COMP(	1983,	ti99_8e,	ti99_8,	0,	ti99_8_50hz,ti99_8,	ti99_8,	0,	"Texas Instruments",	"TI-99/8 Computer (Europe)" , 0 )

@@ -430,7 +430,6 @@ void ti99_common_init(running_machine *machine, const TMS9928a_interface *gfxpar
 	ti99_peb_init();
 	ti99_floppy_controllers_init_all(machine);
 	ti99_ide_init(machine);
-	ti99_rs232_init(machine);
 	ti99_hsgpl_init(machine);
 	ti99_usbsm_init(machine);
 	
@@ -594,9 +593,6 @@ MACHINE_RESET( ti99 )
 		ti99_ide_reset(machine, ti99_model == model_99_8);
 		ti99_ide_load_memcard(machine);
 	}
-
-	if (has_rs232)
-		ti99_rs232_reset(machine);
 
 	if (has_hsgpl)	{
 		ti99_hsgpl_reset(machine);
