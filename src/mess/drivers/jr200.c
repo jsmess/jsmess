@@ -284,6 +284,17 @@ static MACHINE_RESET(jr200)
 {
 }
 
+static PALETTE_INIT( jr200 )
+{
+	int i;
+
+	for (i = 0; i < 64; i++)
+	{
+		palette_set_color_rgb(machine, 2 * i + 1, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
+		palette_set_color_rgb(machine, 2 * i + 0, pal1bit(i >> 4), pal1bit(i >> 5), pal1bit(i >> 3));
+	}
+}
+
 static VIDEO_START( jr200 )
 {
 }
@@ -298,7 +309,7 @@ static VIDEO_UPDATE( jr200 )
 		{
 			UINT8 code = textram[0x0100 + i + j];
 			UINT8 col_bg = (textram[0x0500 + i + j] >> 3) & 0x07;
-			UINT8 col_fg = (textram[0x0500 + i + j] >> 0) & 0x07;
+			UINT8 col_fg = (textram[0x0500 + i + j] >> 0) & 0x3f;
 
 			if (1==0) drawgfx_transpen(bitmap, cliprect, gfx,
 					0, col_bg,
@@ -360,8 +371,8 @@ MDRV_CPU_VBLANK_INT("screen", jr200_irq)
 	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0, 192-1)
 
 	MDRV_GFXDECODE(jr200)
-	MDRV_PALETTE_LENGTH(255)
-
+	MDRV_PALETTE_LENGTH(128)
+	MDRV_PALETTE_INIT(jr200)
 	MDRV_VIDEO_START(jr200)
 	MDRV_VIDEO_UPDATE(jr200)
 MACHINE_DRIVER_END
