@@ -953,7 +953,7 @@ WRITE8_HANDLER ( sgb_io_w )
 			{
 			case 0x00:				   /* start condition */
 				if (sgb_start)
-					logerror("SGB: Start condition before end of transfer ??");
+					logerror("SGB: Start condition before end of transfer ??\n");
 				sgb_bitcount = 0;
 				sgb_start = 1;
 				sgb_rest = 0;
@@ -1380,8 +1380,12 @@ WRITE8_HANDLER ( sgb_io_w )
 								   But I don't know what it is for. */
 								/* Not Implemented */
 								break;
+							case 0x1E:	/* Used by bootrom to transfer the gb cart header */
+								break;
+							case 0x1F:	/* Used by bootrom to transfer the gb cart header */
+								break;
 							default:
-								logerror( "\tSGB: Unknown Command!\n" );
+								logerror( "SGB: Unknown Command 0x%02x!\n", sgb_data[0] >> 3 );
 						}
 
 						sgb_start = 0;
@@ -1414,6 +1418,10 @@ WRITE8_HANDLER ( sgb_io_w )
 				}
 				else
 					JOYPAD = 0x3F;
+
+				/* Hack to let cartridge know it's running on an SGB */
+				if ( (sgb_data[0] >> 3) == 0x1F )
+					JOYPAD = 0x3E;
 				break;
 			}
 			return;
