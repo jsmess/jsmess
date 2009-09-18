@@ -166,6 +166,7 @@ static UINT8 *gfx_bitmap_ram;
 static UINT16 pcg_index[3];
 static UINT8 pcg_reset;
 static UINT16 crtc_start_addr;
+static UINT8 tile_height;
 static UINT8 sub_obf;
 static UINT8 key_irq_flag;
 static UINT8 ctc_irq_flag;
@@ -212,7 +213,7 @@ static void draw_fgtilemap(running_machine *machine, bitmap_t *bitmap,const rect
 
 	screen_mask = (w == 2) ? 0xfff : 0x7ff;
 
-	for (y=0;y<25;y++)
+	for (y=0;y<50;y++)
 	{
 		for (x=0;x<40*w;x++)
 		{
@@ -229,7 +230,7 @@ static void draw_fgtilemap(running_machine *machine, bitmap_t *bitmap,const rect
 			if((y & 1) == 1 && height) continue;
 
 			res_x = (x/(width+1))*8*(width+1);
-			res_y = (y/(height+1))*8*(height+1);
+			res_y = (y/(height+1))*(tile_height+1)*(height+1);
 
 			{
 				int pen[3],pen_mask,pcg_pen,xi,yi;
@@ -237,7 +238,7 @@ static void draw_fgtilemap(running_machine *machine, bitmap_t *bitmap,const rect
 				pen_mask = color & 7;
 
 				/* We use custom drawing code due of the bitplane disable and the color revert stuff. */
-				for(yi=0;yi<8*(height+1);yi+=(height+1))
+				for(yi=0;yi<(tile_height+1)*(height+1);yi+=(height+1))
 				{
 					for(xi=0;xi<8*(width+1);xi+=(width+1))
 					{
@@ -402,6 +403,8 @@ static VIDEO_UPDATE( x1 )
 	int w;
 
 	w = (video_screen_get_width(screen) < 640) ? 1 : 2;
+
+	bitmap_fill(bitmap, cliprect, MAKE_ARGB(0xff,0x00,0x00,0x00));
 
 	draw_gfxbitmap(screen->machine,bitmap,cliprect,w,scrn_reg.disp_bank,scrn_reg.ply);
 	draw_fgtilemap(screen->machine,bitmap,cliprect,w);
@@ -690,7 +693,7 @@ static int x1_keyboard_irq_state(const device_config* device)
 {
 	if(key_irq_flag != 0)
 		return Z80_DAISY_INT;
-		
+
 	return 0;
 }
 
@@ -1048,6 +1051,8 @@ static WRITE8_HANDLER( x1_6845_w )
 	else
 	{
 		/* FIXME: this should be inside the MC6845 core! */
+		if(addr_latch == 0x09)
+			tile_height = data;
 		if(addr_latch == 0x0c)
 			crtc_start_addr = ((data<<8) & 0x3f00) | (crtc_start_addr & 0xff);
 		else if(addr_latch == 0x0d)
@@ -1934,7 +1939,7 @@ static MACHINE_RESET( x1 )
 	cmt_current_cmd = 0;
 	cmt_test = 0;
 	cassette_change_state(devtag_get_device(machine, "cass" ),CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
-	
+
 	key_irq_flag = ctc_irq_flag = 0;
 }
 
@@ -2033,8 +2038,8 @@ static MACHINE_DRIVER_START( x1 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	MDRV_CASSETTE_ADD("cass",x1_cassette_config)
-	
-	MDRV_FLOPPY_4_DRIVES_ADD(x1_floppy_config)	
+
+	MDRV_FLOPPY_4_DRIVES_ADD(x1_floppy_config)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( x1turbo )
