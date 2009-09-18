@@ -308,13 +308,8 @@ static VIDEO_UPDATE( jr200 )
 		for (j = 0; j < 0x20; j++)
 		{
 			UINT8 code = textram[0x0100 + i + j];
-			UINT8 col_bg = (textram[0x0500 + i + j] >> 3) & 0x07;
 			UINT8 col_fg = (textram[0x0500 + i + j] >> 0) & 0x3f;
 
-			if (1==0) drawgfx_transpen(bitmap, cliprect, gfx,
-					0, col_bg,
-					0, 0,
-					j * 8, (i >> 5) * 8, 15);
 			drawgfx_transpen(bitmap, cliprect, gfx,
 					code, col_fg,
 					0, 0,
