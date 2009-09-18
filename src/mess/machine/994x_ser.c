@@ -132,10 +132,10 @@ static DEVICE_IMAGE_LOAD( ti99_4_rs232 )
 {
 	const device_config *tms9902 = NULL;
 		
-	if (strcmp(image->tag, "port0")) {
+	if (strcmp(image->tag, "rs232:port0")) {
 		tms9902 = devtag_get_device(image->machine, "rs232:tms9902_0");
 	}
-	if (strcmp(image->tag, "port1")) {
+	if (strcmp(image->tag, "rs232:port1")) {
 		tms9902 = devtag_get_device(image->machine, "rs232:tms9902_1");
 	}
 		
@@ -514,8 +514,8 @@ DEVICE_GET_INFO( ti99_4_pio );
 static MACHINE_DRIVER_START( ti99_4_rs232 )
 	MDRV_TMS9902_ADD("tms9902_0", tms9902_params_0)
 	MDRV_TMS9902_ADD("tms9902_1", tms9902_params_1)
+	MDRV_TI99_4_RS232_ADD("port0")
 	MDRV_TI99_4_RS232_ADD("port1")
-	MDRV_TI99_4_RS232_ADD("port2")
 	MDRV_TI99_4_PIO_ADD("pio")
 MACHINE_DRIVER_END
 
