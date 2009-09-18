@@ -537,7 +537,25 @@ static _snes_sdd1_t snes_sdd1;
 
 static void sdd1_init(running_machine* machine)
 {
+	UINT8 i;
+
+	snes_sdd1.sdd1_enable = 0x00;
+	snes_sdd1.xfer_enable = 0x00;
+
+	snes_sdd1.mmc[0] = 0 << 20;
+	snes_sdd1.mmc[1] = 1 << 20;
+	snes_sdd1.mmc[2] = 2 << 20;
+	snes_sdd1.mmc[3] = 3 << 20;
+
+	for(i = 0; i < 8; i++)
+	{
+		snes_sdd1.dma[i].addr = 0;
+		snes_sdd1.dma[i].size = 0;
+	}
+
 	snes_sdd1.sdd1emu = SDD1emu_ctor(machine);
+
+	snes_sdd1.buffer.ready = 0;
 }
 
 static UINT8 sdd1_mmio_read(const address_space *space, UINT32 addr)
@@ -631,6 +649,9 @@ static void sdd1_mmio_write(const address_space *space, UINT32 addr, UINT8 data)
 
 static UINT8 sdd1_read(running_machine* machine, UINT32 addr)
 {
+	unsigned char *ROM;
+	ROM = memory_region(machine, "cart");
+
 	//printf( "sdd1.read(%06x)\n", addr );
 	if(snes_sdd1.sdd1_enable & snes_sdd1.xfer_enable)
 	{
@@ -677,7 +698,7 @@ static UINT8 sdd1_read(running_machine* machine, UINT32 addr)
 	} // S-DD1 decompressor enabled
 
 	//printf( "returning a generic memory read from %06x\n", 0xc00000 + snes_sdd1.mmc[(addr >> 20) & 3] + (addr & 0x0fffff) );
-	return snes_ram[0xc00000 + snes_sdd1.mmc[(addr >> 20) & 3] + (addr & 0x0fffff)];
+	return ROM[snes_sdd1.mmc[(addr >> 20) & 3] + (addr & 0x0fffff)];
 }
 
 static void sdd1_reset(running_machine *machine)
