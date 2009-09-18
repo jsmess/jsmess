@@ -1287,7 +1287,7 @@ void gb_video_init( running_machine *machine, int mode )
 	}
 
 	LCDSTAT = 0x80;
-	LCDCONT = 0x00;
+	LCDCONT = 0x00;		/* Video hardware is turned off at boot time */
 	gb_lcd.current_line = CURLINE = CMPLINE = 0x00;
 	SCROLLX = SCROLLY = 0x00;
 	SPR0PAL = SPR1PAL = 0xFF;
@@ -1348,29 +1348,8 @@ void gb_video_init( running_machine *machine, int mode )
 		/* set the scanline update function */
 		update_scanline = sgb_update_scanline;
 
-		/* Initialize part of VRAM. This code must be deleted when we have added the bios dump */
-		for( i = 1; i < 0x0D; i++ ) 
-		{
-			gb_vram[ 0x1903 + i ] = i;
-			gb_vram[ 0x1923 + i ] = i + 0x0C;
-		}
-		gb_vram[ 0x1910 ] = 0x19;
-
-		/* Make sure the VBlank interrupt is set when the first instruction gets executed */
-		timer_set(machine,  cputag_clocks_to_attotime(machine, "maincpu", 1), NULL, 0, gb_video_init_vbl );
-
-		/* Initialize some video registers */
-		gb_video_w( space, 0x0, 0x91 );    /* LCDCONT */
-		gb_video_w( space, 0x7, 0xFC );    /* BGRDPAL */
-		gb_video_w( space, 0x8, 0xFC );    /* SPR0PAL */
-		gb_video_w( space, 0x9, 0xFC );    /* SPR1PAL */
-
-		CURLINE = gb_lcd.current_line = 0;
-		LCDSTAT = ( LCDSTAT & 0xF8 ) | 0x05;
-		gb_lcd.mode = 1;
-		timer_adjust_oneshot(gb_lcd.lcd_timer, cputag_clocks_to_attotime(machine, "maincpu", 60), GB_LCD_STATE_LY00_M0);
-
 		break;
+
 	case GB_VIDEO_CGB:
 		gb_lcd.lcd_timer = timer_alloc(machine,  gbc_lcd_timer_proc , NULL);
 
