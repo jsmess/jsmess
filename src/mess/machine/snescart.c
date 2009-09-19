@@ -351,6 +351,8 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 	snes_ram = memory_region(machine, "maincpu");
 	memset( snes_ram, 0, 0x1000000 );
 
+	snes_rom_size = image_length(image);
+
 	/* Check for a header (512 bytes) */
 	offset = 512;
 	image_fread(image, header, 512);
@@ -359,13 +361,13 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 		/* Found an SWC identifier */
 		logerror("Found header(SWC) - Skipped\n");
 	}
-	else if ((header[0] | (header[1] << 8)) == (((image_length(image) - 512) / 1024) / 8))
+	else if ((header[0] | (header[1] << 8)) == (((snes_rom_size - 512) / 1024) / 8))
 	{
 		/* Some headers have the rom size at the start, if this matches with the
          * actual rom size, we probably have a header */
 		logerror("Found header(size) - Skipped\n");
 	}
-	else if ((image_length(image) % 0x8000) == 512)
+	else if ((snes_rom_size % 0x8000) == 512)
 	{
 		/* As a last check we'll see if there's exactly 512 bytes extra to this
          * image. */
@@ -378,6 +380,8 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 		offset = 0;
 		image_fseek(image, offset, SEEK_SET);
 	}
+
+	snes_rom_size -= offset;
 
 	/* We need to take a sample to test what mode we need to be in (the
 	sample has to be quite large to cope with large carts in ExHiRom) */
@@ -395,7 +399,7 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 
 	if ((valid_mode20 >= valid_mode21) && (valid_mode20 >= valid_mode25))
 	{
-		if ((temp_buffer[0x007fd5] == 0x32) || ((image_length(image) - offset) > 0x401000))
+		if ((temp_buffer[0x007fd5] == 0x32) || ((snes_rom_size - offset) > 0x401000))
 			snes_cart.mode = SNES_MODE_22;	// ExLoRom
 		else
 			snes_cart.mode = SNES_MODE_20;	// LoRom
@@ -416,12 +420,12 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 
 	/* Loading data */
 	ROM = memory_region(image->machine, "cart");
-	length = image_fread(image, ROM, image_length(image) - offset);
+	length = image_fread(image, ROM, snes_rom_size - offset);
 
 	/* FIXME: Insert crc check here */
 
 	/* How many blocks of data are available to be loaded? */
-	total_blocks = ((image_length(image) - offset) / (snes_cart.mode & 0x05 ? 0x8000 : 0x10000));
+	total_blocks = ((snes_rom_size - offset) / (snes_cart.mode & 0x05 ? 0x8000 : 0x10000));
 	read_blocks = 0;
 
 	/* Loading all the data blocks from cart, we only partially cover banks 0x00 to 0x7f. Therefore, we
@@ -499,6 +503,7 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 			{
 				/* Loading data */
 				memcpy(&snes_ram[0x400000 + read_blocks * 0x10000], &ROM[0x400000 + read_blocks * 0x10000], 0x10000);
+				memcpy(&snes_ram[0x1000000 + read_blocks * 0x10000], &snes_ram[0x400000 + read_blocks * 0x10000], 0x10000);
 				/* Mirroring */
 				memcpy(&snes_ram[0x8000 + read_blocks * 0x10000], &snes_ram[0x408000 + read_blocks * 0x10000], 0x8000);
 				read_blocks++;
@@ -652,7 +657,7 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 			case 0x34:
 			case 0x35:
 				if (snes_r_bank1(space, 0x00ffd5) == 0x23)
-				{	
+				{
 					snes_has_addon_chip = HAS_SA1;
 					supported_type = 0;
 				}
@@ -661,12 +666,14 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 			case 0x43:
 			case 0x45:
 				if (snes_r_bank1(space, 0x00ffd5) == 0x32)
+				{
 					snes_has_addon_chip = HAS_SDD1;
+				}
 				break;
 
 			case 0x55:
 				if (snes_r_bank1(space, 0x00ffd5) == 0x35)
-				{	
+				{
 					snes_has_addon_chip = HAS_RTC;
 					supported_type = 0;
 				}
@@ -690,7 +697,6 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 				else if (snes_r_bank1(space, 0x00ffd5) == 0x3a)
 				{
 					snes_has_addon_chip = HAS_SPC7110;
-					supported_type = 0;
 				}
 				break;
 
@@ -705,7 +711,6 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 				else
 				{
 					snes_has_addon_chip = HAS_ST010;
-					supported_type = 0;
 				}
 				break;
 
@@ -760,7 +765,7 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 		logerror( "===========\n\n" );
 		logerror( "\tTotal blocks:  %d (%dmb)\n", total_blocks, total_blocks / (snes_cart.mode & 5 ? 32 : 16) );
 		logerror( "\tROM bank size: %s (LoROM: %d , HiROM: %d, ExHiROM: %d)\n",
-								(snes_cart.mode == SNES_MODE_20) ? "LoROM" : 
+								(snes_cart.mode == SNES_MODE_20) ? "LoROM" :
 								(snes_cart.mode == SNES_MODE_21) ? "HiROM" :
 								(snes_cart.mode == SNES_MODE_22) ? "ExLoROM" : "ExHiROM",
 										valid_mode20, valid_mode21, valid_mode25);

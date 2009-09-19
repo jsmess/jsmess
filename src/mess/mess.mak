@@ -1498,6 +1498,26 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/ptcsol.o	\
 	$(MESS_DRIVERS)/p8k.o		\
 
+
+
+#-------------------------------------------------
+# miscellaneous dependencies
+#-------------------------------------------------
+
+$(MAME_MACHINE)/snes.o: 	$(MAMESRC)/machine/snesdsp1.c \
+				$(MAMESRC)/machine/snesdsp2.c \
+				$(MAMESRC)/machine/snesobc1.c \
+				$(MAMESRC)/machine/snesrtc.c \
+				$(MAMESRC)/machine/snessdd1.c \
+				$(MAMESRC)/machine/snescx4.c \
+				$(MAMESRC)/machine/snes7110.c \
+				$(MAMESRC)/machine/snesst10.c
+
+$(MESS_VIDEO)/gba.o: 		$(MESSSRC)/video/gbamode0.c \
+				$(MESSSRC)/video/gbamode1.c \
+				$(MESSSRC)/video/gbamode2.c \
+				$(MESSSRC)/video/gbam345.c
+
 #-------------------------------------------------
 # layout dependencies
 #-------------------------------------------------
