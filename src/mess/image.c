@@ -173,7 +173,7 @@ static void memory_error(const char *message)
 
 void image_init(running_machine *machine)
 {
-    int count, indx, format_count, i;
+    int count, indx, format_count, i,cnt;
     const device_config *dev;
     size_t private_size;
     image_slot_data *slot;
@@ -226,21 +226,26 @@ void image_init(running_machine *machine)
         /* creation formats */
         format_count = device_get_info_int(slot->dev, DEVINFO_INT_IMAGE_CREATE_OPTCOUNT);
         formatptr = &slot->formatlist;
+        cnt = 0;
         for (i = 0; i < format_count; i++)
         {
-            /* allocate a new format */
-            format = auto_alloc_clear(machine, image_device_format);
-
-            /* populate it */
-            format->index       = i;
-            format->name        = auto_strdup(machine, device_get_info_string(slot->dev, DEVINFO_STR_IMAGE_CREATE_OPTNAME + i));
-            format->description = auto_strdup(machine, device_get_info_string(slot->dev, DEVINFO_STR_IMAGE_CREATE_OPTDESC + i));
-            format->extensions  = auto_strdup(machine, device_get_info_string(slot->dev, DEVINFO_STR_IMAGE_CREATE_OPTEXTS + i));
-            format->optspec     = device_get_info_ptr(slot->dev, DEVINFO_PTR_IMAGE_CREATE_OPTSPEC + i);
-
-            /* and append it to the list */
-            *formatptr = format;
-            formatptr = &format->next;
+        	// only add if creatable
+        	if (device_get_info_ptr(slot->dev, DEVINFO_PTR_IMAGE_CREATE_OPTSPEC + i)) {
+	            /* allocate a new format */
+	            format = auto_alloc_clear(machine, image_device_format);
+	
+	            /* populate it */
+	            format->index       = cnt;
+	            format->name        = auto_strdup(machine, device_get_info_string(slot->dev, DEVINFO_STR_IMAGE_CREATE_OPTNAME + i));
+	            format->description = auto_strdup(machine, device_get_info_string(slot->dev, DEVINFO_STR_IMAGE_CREATE_OPTDESC + i));
+	            format->extensions  = auto_strdup(machine, device_get_info_string(slot->dev, DEVINFO_STR_IMAGE_CREATE_OPTEXTS + i));
+	            format->optspec     = device_get_info_ptr(slot->dev, DEVINFO_PTR_IMAGE_CREATE_OPTSPEC + i);
+	
+	            /* and append it to the list */
+	            *formatptr = format;
+	            formatptr = &format->next;
+	            cnt++;
+	        }
         }
 
         indx++;
