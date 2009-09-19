@@ -396,8 +396,10 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_DEVICES)/cartslot.o	\
 	$(MESS_DEVICES)/cassette.o	\
 	$(MESS_DEVICES)/chd_cd.o	\
+	$(MESS_FORMATS)/imd_dsk.o	\
 	$(MESS_FORMATS)/td0_dsk.o	\
 	$(MESS_FORMATS)/dsk_dsk.o	\
+	$(MESS_FORMATS)/d88_dsk.o	\
 	$(MESS_DEVICES)/flopdrv.o	\
 	$(MESS_DEVICES)/harddriv.o	\
 	$(MESS_DEVICES)/messram.o	\
@@ -852,7 +854,6 @@ $(MESSOBJ)/fujitsu.a:			\
 	$(MESS_DRIVERS)/fm7.o		\
 	$(MESS_VIDEO)/fm7.o			\
 	$(MESS_FORMATS)/fm7_cas.o	\
-	$(MESS_FORMATS)/fm7_dsk.o	\
 
 $(MESSOBJ)/galaxy.a:			\
 	$(MESS_VIDEO)/galaxy.o		\

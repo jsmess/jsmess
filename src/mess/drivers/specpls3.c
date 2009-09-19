@@ -156,7 +156,6 @@ http://www.z88forever.org.uk/zxplus3e/
 
 /* +3 hardware */
 #include "machine/nec765.h"
-#include "formats/dsk_dsk.h"
 #include "devices/flopdrv.h"
 
 
@@ -366,7 +365,7 @@ static MACHINE_RESET( spectrum_plus3 )
 static const floppy_config specpls3_floppy_config =
 {
 	FLOPPY_DRIVE_DS_80,
-	FLOPPY_OPTIONS_NAME(dsk)
+	FLOPPY_OPTIONS_NAME(default)
 };
 
 static MACHINE_DRIVER_START( spectrum_plus3 )

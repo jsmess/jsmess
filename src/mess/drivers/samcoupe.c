@@ -45,7 +45,6 @@
 #include "formats/tzx_cas.h"
 #include "devices/flopdrv.h"
 #include "formats/coupedsk.h"
-#include "formats/dsk_dsk.h"
 
 
 /***************************************************************************
@@ -547,8 +546,7 @@ FLOPPY_OPTIONS_START( samcoupe )
 		SECTORS(1-[10]-12)
 		SECTOR_LENGTH(128/256/[512]/1024)
 		FIRST_SECTOR_ID([1])
-	)
-	FLOPPY_OPTION(dsk, "dsk", "DSK floppy disk image", dsk_dsk_identify, dsk_dsk_construct, NULL)
+	)	
 FLOPPY_OPTIONS_END
 
 static const floppy_config samcoupe_floppy_config =

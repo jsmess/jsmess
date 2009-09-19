@@ -46,7 +46,6 @@
 #include "formats/fm7_cas.h"
 #include "machine/wd17xx.h"
 #include "devices/flopdrv.h"
-#include "formats/fm7_dsk.h"
 #include "machine/ctronics.h"
 
 #include "includes/fm7.h"
@@ -1847,7 +1846,7 @@ static const cassette_config fm7_cassette_config =
 static const floppy_config fm7_floppy_config =
 {
 	FLOPPY_DRIVE_DS_80,
-	FLOPPY_OPTIONS_NAME(fm7)
+	FLOPPY_OPTIONS_NAME(default)
 };
 
 static MACHINE_DRIVER_START( fm7 )

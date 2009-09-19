@@ -949,4 +949,5 @@ const char *floppy_error(floperr_t err)
 }
 
 
-
+FLOPPY_OPTIONS_START(default)
+FLOPPY_OPTIONS_END

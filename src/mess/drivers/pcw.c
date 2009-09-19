@@ -96,7 +96,6 @@
 #include "cpu/z80/z80.h"
 // nec765 interface
 #include "machine/nec765.h"
-#include "formats/dsk_dsk.h"
 #include "devices/flopdrv.h"
 // pcw video hardware
 #include "includes/pcw.h"
@@ -979,7 +978,7 @@ INPUT_PORTS_END
 static const floppy_config pcw_floppy_config =
 {
 	FLOPPY_DRIVE_DS_80,
-	FLOPPY_OPTIONS_NAME(dsk)
+	FLOPPY_OPTIONS_NAME(default)
 };
 
 /* PCW8256, PCW8512, PCW9256 */

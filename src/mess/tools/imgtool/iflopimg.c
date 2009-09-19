@@ -267,7 +267,7 @@ static void imgtool_floppy_get_info(const imgtool_class *imgclass, UINT32 state,
 				imgtool_get_info_string(&derived_class, IMGTOOLINFO_STR_DESCRIPTION));
 			break;
 		case IMGTOOLINFO_STR_FILE_EXTENSIONS:		strcpy(info->s = imgtool_temp_str(), format->extensions); break;
-		case IMGTOOLINFO_STR_CREATEIMAGE_OPTSPEC:	strcpy(info->s = imgtool_temp_str(), format->param_guidelines); break;
+		case IMGTOOLINFO_STR_CREATEIMAGE_OPTSPEC:	info->p = (void*)format->param_guidelines; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case IMGTOOLINFO_PTR_OPEN:					info->open = imgtool_floppy_open; break;

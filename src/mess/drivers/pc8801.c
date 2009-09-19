@@ -89,7 +89,6 @@
 #include "includes/pc8801.h"
 #include "machine/nec765.h"
 #include "devices/flopdrv.h"
-#include "formats/fm7_dsk.h"
 #include "sound/2203intf.h"
 
 static const gfx_layout char_layout_40L_h =
@@ -571,14 +570,10 @@ static const ym2203_interface pc8801_ym2203_interface =
 	pc88sr_sound_interupt
 };
 
-FLOPPY_OPTIONS_START(pc88 )
-	FLOPPY_OPTION( d88, "d88",	"D88 Floppy Disk image",	fm7_d77_identify,	fm7_d77_construct, NULL)
-FLOPPY_OPTIONS_END
-
 static const floppy_config pc88_floppy_config =
 {
 	FLOPPY_DRIVE_DS_80,
-	FLOPPY_OPTIONS_NAME(pc88)
+	FLOPPY_OPTIONS_NAME(default)
 };
 
 static MACHINE_DRIVER_START( pc88srl )

@@ -57,7 +57,6 @@
 #include "machine/wd17xx.h"
 #include "machine/ctronics.h"
 #include "machine/msm8251.h"
-#include "formats/dsk_dsk.h"
 #include "devices/flopdrv.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
@@ -852,7 +851,7 @@ static const mc6845_interface einstein_crtc6845_interface =
 static const floppy_config einstein_floppy_config =
 {
 	FLOPPY_DRIVE_SS_40,
-	FLOPPY_OPTIONS_NAME(dsk)
+	FLOPPY_OPTIONS_NAME(default)
 };
 
 static MACHINE_DRIVER_START( einstein )

@@ -8,7 +8,7 @@
 
 #include <string.h>
 #include "driver.h"
-#include "formats/dsk_dsk.h"
+#include "formats/flopimg.h"
 #include "devices/flopdrv.h"
 
 #define MV_CPC  	"MV - CPC"
@@ -76,11 +76,6 @@ static floperr_t get_offset(floppy_image *floppy, int head, int track, int secto
 	int i;
 	/* translate the sector to a raw sector */
 
-	if (!sector_is_index)
-	{
-		sector -= 1;
-	}
-
 	/* check to see if we are out of range */
 	if ((head < 0) || (head >= get_tag(floppy)->heads) || (track < 0) || (track >= get_tag(floppy)->tracks)
 			|| (sector < 0) )
@@ -91,8 +86,10 @@ static floperr_t get_offset(floppy_image *floppy, int head, int track, int secto
 	floppy_image_read(floppy, track_info, track_offset, 0x100);
 
 	sectors_per_track = track_info[0x015];
-	if (sector >= sectors_per_track) {
-		return FLOPPY_ERROR_SEEKERROR;
+	if (!sector_is_index) {
+		if (sector >= sectors_per_track) {
+			return FLOPPY_ERROR_SEEKERROR;
+		}
 	}
 
 	if (get_tag(floppy)->disk_image_type==0) {
@@ -181,7 +178,7 @@ static floperr_t dsk_get_indexed_sector_info(floppy_image *floppy, int head, int
 	UINT8 sector_info[0x100];
 	int pos;
 
-	retVal = get_offset(floppy, head, track, sector_index+1, FALSE, NULL);
+	retVal = get_offset(floppy, head, track, sector_index, FALSE, NULL);
 	offset = dsk_get_track_offset(floppy,head,track);
 	pos = 0x18 + (sector_index << 3);
 	floppy_image_read(floppy, sector_info, offset, 0x100);
@@ -208,6 +205,12 @@ FLOPPY_CONSTRUCT( dsk_dsk_construct )
 	UINT64 tmp = 0;
 	int i;
 	int skip,cnt;
+
+	if(params)
+	{
+		// create
+		return FLOPPY_ERROR_UNSUPPORTED;
+	}
 
 	floppy_image_read(floppy, header, 0, 0x100);
 
@@ -254,8 +257,3 @@ FLOPPY_CONSTRUCT( dsk_dsk_construct )
 	callbacks->get_indexed_sector_info = dsk_get_indexed_sector_info;
 	return FLOPPY_ERROR_SUCCESS;
 }
-/* ----------------------------------------------------------------------- */
-
-FLOPPY_OPTIONS_START(dsk )
-	FLOPPY_OPTION( dsk, "dsk", "DSK floppy disk image",	dsk_dsk_identify, dsk_dsk_construct, NULL)
-FLOPPY_OPTIONS_END

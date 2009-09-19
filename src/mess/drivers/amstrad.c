@@ -98,7 +98,6 @@ Some bugs left :
 #include "machine/ctronics.h"
 
 /* Devices */
-#include "formats/dsk_dsk.h"		/* for CPCEMU style disk images */
 #include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
 #include "includes/msx_slot.h"
@@ -840,7 +839,7 @@ static const cassette_config amstrad_cassette_config =
 static const floppy_config cpc6128_floppy_config =
 {
 	FLOPPY_DRIVE_SS_40,
-	FLOPPY_OPTIONS_NAME(dsk)
+	FLOPPY_OPTIONS_NAME(default)
 };
 
 static const floppy_config aleste_floppy_config =

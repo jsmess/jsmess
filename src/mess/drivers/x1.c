@@ -155,8 +155,8 @@
 #include "machine/wd17xx.h"
 #include "devices/cassette.h"
 #include "devices/flopdrv.h"
+#include "formats/flopimg.h"
 #include "formats/basicdsk.h"
-#include "formats/fm7_dsk.h"
 #include "formats/x1_tap.h"
 #include <ctype.h>
 
@@ -2020,7 +2020,6 @@ static PALETTE_INIT(x1)
 }
 
 FLOPPY_OPTIONS_START( x1 )
-	FLOPPY_OPTION( d88, "d88",	"D88 Floppy Disk image",	fm7_d77_identify,	fm7_d77_construct, NULL)
 	FLOPPY_OPTION( img2d, "2d", "2D disk image", basicdsk_identify_default, basicdsk_construct_default,
 		HEADS([2])
 		TRACKS([40])

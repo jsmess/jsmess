@@ -32,7 +32,6 @@
 #include "machine/msm8251.h"
 
 /* Devices */
-#include "formats/dsk_dsk.h"
 #include "devices/flopdrv.h"
 #include "devices/cassette.h"
 #include "formats/tzx_cas.h"
@@ -477,7 +476,7 @@ static INTERRUPT_GEN( elwro800jr_interrupt )
 static const floppy_config elwro800jr_floppy_config =
 {
 	FLOPPY_DRIVE_SS_40,
-	FLOPPY_OPTIONS_NAME(dsk)
+	FLOPPY_OPTIONS_NAME(default)
 };
 
 static MACHINE_DRIVER_START( elwro800 )

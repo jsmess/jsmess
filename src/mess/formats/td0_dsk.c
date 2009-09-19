@@ -8,7 +8,7 @@
 
 #include <string.h>
 #include "driver.h"
-#include "formats/dsk_dsk.h"
+#include "formats/flopimg.h"
 #include "devices/flopdrv.h"
 
 #define TD0_DSK_TAG	"td0tag"
@@ -249,6 +249,12 @@ FLOPPY_CONSTRUCT( td0_dsk_construct )
 	int position;
 	int i;
 	int track;
+
+	if(params)
+	{
+		// create
+		return FLOPPY_ERROR_UNSUPPORTED;
+	}
 
 	floppy_image_read(floppy, header, 0, 16);
 

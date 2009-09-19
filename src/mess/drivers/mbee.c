@@ -68,7 +68,6 @@
 #include "sound/wave.h"
 #include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
-#include "formats/dsk_dsk.h"
 #include "includes/mbee.h"
 
 size_t mbee_size;
@@ -356,8 +355,7 @@ static FLOPPY_OPTIONS_START(mbee)
 		TRACKS([84])
 		SECTORS([10])
 		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([1]))	
-	FLOPPY_OPTION(dsk, "dsk", "DSK floppy disk image", dsk_dsk_identify, dsk_dsk_construct, NULL)	
+		FIRST_SECTOR_ID([1]))		
 FLOPPY_OPTIONS_END
 
 static const floppy_config mbee_floppy_config =
