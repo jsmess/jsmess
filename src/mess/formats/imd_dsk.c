@@ -61,7 +61,7 @@ static int imd_get_tracks_per_disk(floppy_image *floppy)
 */
 static floperr_t get_offset(floppy_image *floppy, int head, int track, int sector, int sector_is_index, UINT64 *offset)
 {
-	UINT64 offs;
+	UINT64 offs = 0;
 	UINT8 sectors_per_track = 0;	
 
 	if ((head < 0) || (head >= get_tag(floppy)->heads) || (track < 0) || (track >= get_tag(floppy)->tracks)
