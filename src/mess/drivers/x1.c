@@ -330,6 +330,49 @@ static int priority_mixer_ply(running_machine *machine,int color)
 
 static void draw_gfxbitmap(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int w,int plane,int pri)
 {
+	int xi,yi,x,y;
+	int pen_r,pen_g,pen_b,color;
+	int pri_mask_val;
+
+	for (y=0;y<50;y++)
+	{
+		for(x=0;x<40*w;x++)
+		{
+			for(yi=0;yi<(tile_height+1);yi++)
+			{
+				for(xi=0;xi<8;xi++)
+				{
+					pen_b = (gfx_bitmap_ram[(((x+(y*40*w)+yi*0x800)+crtc_start_addr) & 0x3fff)+0x0000+plane*0xc000]>>(7-xi)) & 1;
+					pen_r = (gfx_bitmap_ram[(((x+(y*40*w)+yi*0x800)+crtc_start_addr) & 0x3fff)+0x4000+plane*0xc000]>>(7-xi)) & 1;
+					pen_g = (gfx_bitmap_ram[(((x+(y*40*w)+yi*0x800)+crtc_start_addr) & 0x3fff)+0x8000+plane*0xc000]>>(7-xi)) & 1;
+
+					color =  pen_g<<2 | pen_r<<1 | pen_b<<0;
+
+					pri_mask_val = priority_mixer_ply(machine,color);
+					if(pri_mask_val & pri) continue;
+
+					if(scrn_reg.v400_mode)
+					{
+						if((x+xi)<=video_screen_get_visible_area(machine->primary_screen)->max_x && ((y+yi)*2+0)<=video_screen_get_visible_area(machine->primary_screen)->max_y)
+							*BITMAP_ADDR16(bitmap, (y+yi)*2+0, x+xi) = machine->pens[color+0x100];
+						if((x+xi)<=video_screen_get_visible_area(machine->primary_screen)->max_x && ((y+yi)*2+1)<=video_screen_get_visible_area(machine->primary_screen)->max_y)
+							*BITMAP_ADDR16(bitmap, (y+yi)*2+1, x+xi) = machine->pens[color+0x100];
+					}
+					else
+					{
+						if((x+xi)<=video_screen_get_visible_area(machine->primary_screen)->max_x && (y+yi)<=video_screen_get_visible_area(machine->primary_screen)->max_y)
+							*BITMAP_ADDR16(bitmap, y*(tile_height+1)+yi, x*8+xi) = machine->pens[color+0x100];
+					}
+				}
+			}
+		}
+	}
+}
+
+#if 0
+/* Old code for reference, to be removed soon */
+static void draw_gfxbitmap(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int w,int plane,int pri)
+{
 	int count,xi,yi,x,y;
 	int pen_r,pen_g,pen_b,color;
 	int yi_size;
@@ -397,6 +440,7 @@ static void draw_gfxbitmap(running_machine *machine, bitmap_t *bitmap,const rect
 		count&=0x3fff;
 	}
 }
+#endif
 
 static VIDEO_UPDATE( x1 )
 {
