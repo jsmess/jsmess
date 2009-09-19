@@ -36,7 +36,7 @@ FLOPPY_IDENTIFY( imd_dsk_identify )
 	UINT8 header[3];
 
 	floppy_image_read(floppy, header, 0, 3);
-	if (header[0]=='I' && header[1]=='M' && header[1]=='D') {
+	if (header[0]=='I' && header[1]=='M' && header[2]=='D') {
 		*vote = 100;
 	} else {
 		*vote = 0;
