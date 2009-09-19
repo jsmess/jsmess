@@ -43,6 +43,7 @@ IMGTOOL_LIB_OBJS =						\
 	$(MESS_FORMATS)/basicdsk.o			\
 	$(MESS_FORMATS)/coco_dsk.o			\
 	$(MESS_FORMATS)/coco_cas.o			\
+	$(MESS_FORMATS)/td0_dsk.o			\
 	$(MESS_FORMATS)/pc_dsk.o			\
 	$(MESS_FORMATS)/ap2_dsk.o			\
 	$(MESS_FORMATS)/ap_dsk35.o			\

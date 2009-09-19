@@ -78,6 +78,11 @@ struct FloppyFormat
 	const char *param_guidelines;
 };
 
+#define FLOPPY_IDENTIFY(name)	floperr_t name(floppy_image *floppy, const struct FloppyFormat *format, int *vote)
+#define FLOPPY_CONSTRUCT(name)	floperr_t name(floppy_image *floppy, const struct FloppyFormat *format, option_resolution *params)
+
+FLOPPY_IDENTIFY(td0_dsk_identify);
+FLOPPY_CONSTRUCT(td0_dsk_construct);
 
 #define FLOPPY_OPTIONS_NAME(name)	floppyoptions_##name
 
@@ -85,15 +90,17 @@ struct FloppyFormat
 	const struct FloppyFormat floppyoptions_##name[] =								\
 	{																			\
 
-#define FLOPPY_OPTIONS_END														\
-		{ NULL }																\
-	};
 
 #define FLOPPY_OPTIONS_EXTERN(name)												\
 	extern const struct FloppyFormat floppyoptions_##name[]							\
 
 #define FLOPPY_OPTION(name, extensions_, description_, identify_, construct_, ranges_)\
 	{ #name, extensions_, description_, identify_, construct_, ranges_ },				\
+
+#define FLOPPY_OPTIONS_END														\
+		FLOPPY_OPTION( td0, "td0", "TD0 floppy disk image",	td0_dsk_identify, td0_dsk_construct, NULL) \
+		{ NULL }																\
+	};
 
 
 #define PARAM_END				'\0'
@@ -111,8 +118,6 @@ struct FloppyFormat
 #define INTERLEAVE(range)		"I" #range
 #define FIRST_SECTOR_ID(range)	"F" #range
 
-#define FLOPPY_IDENTIFY(name)	floperr_t name(floppy_image *floppy, const struct FloppyFormat *format, int *vote)
-#define FLOPPY_CONSTRUCT(name)	floperr_t name(floppy_image *floppy, const struct FloppyFormat *format, option_resolution *params)
 
 /***************************************************************************
 
