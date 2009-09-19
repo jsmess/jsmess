@@ -415,10 +415,8 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 	}
 
 	/* Loading data */
-	{
 	ROM = memory_region(image->machine, "cart");
 	length = image_fread(image, ROM, image_length(image) - offset);
-	}
 
 	/* FIXME: Insert crc check here */
 
@@ -524,19 +522,15 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 		 * These are then mirrored in banks 0x40 to 0x7f, both at address 0x0000 and at address
 		 * 0x8000, in banks 0x80 to 0xbf at address 0x8000 and in banks 0xc0 to 0xff, both at address
 		 * 0x0000 and at address 0x8000. Notice that SDD-1 games (Star Ocean and Street Fighter Zero 2)
-		 * also use SNES_MODE_22, but we still don't support their bankswitch mechanism: the content
-		 * of banks at 0xc0 to 0xff changes according to MMC registers $4804-$4807
+		 * use SNES_MODE_22
 		 */
 			while (read_blocks < 64 && read_blocks < total_blocks)
 			{
-				/* Loading data */
+				/* Loading and mirroring data */
 				memcpy(&snes_ram[0x008000 + read_blocks * 0x10000], &ROM[0x000000 + read_blocks * 0x8000], 0x8000);
-				/* Mirroring */
-				memcpy(&snes_ram[0x400000 + read_blocks * 0x10000], &snes_ram[0x8000 + read_blocks * 0x10000], 0x8000);
-				memcpy(&snes_ram[0x408000 + read_blocks * 0x10000], &snes_ram[0x8000 + read_blocks * 0x10000], 0x8000);
-				memcpy(&snes_ram[0x808000 + read_blocks * 0x10000], &snes_ram[0x8000 + read_blocks * 0x10000], 0x8000);
-				memcpy(&snes_ram[0xc00000 + read_blocks * 0x10000], &snes_ram[0x8000 + read_blocks * 0x10000], 0x8000);
-				memcpy(&snes_ram[0xc08000 + read_blocks * 0x10000], &snes_ram[0x8000 + read_blocks * 0x10000], 0x8000);
+				memcpy(&snes_ram[0x808000 + read_blocks * 0x10000], &ROM[0x000000 + read_blocks * 0x8000], 0x8000);
+				memcpy(&snes_ram[0x400000 + read_blocks * 0x10000], &ROM[0x000000 + read_blocks * 0x10000], 0x10000);
+				memcpy(&snes_ram[0xc00000 + read_blocks * 0x10000], &ROM[0x000000 + read_blocks * 0x10000], 0x10000);
 				read_blocks++;
 			}
 			/* Filling banks up to 0x3f and their mirrors */
@@ -560,7 +554,7 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 		/* LoROM carts load data in banks 0x00 to 0x7f at address 0x8000 (actually up to 0x7d, because 0x7e and
 		 * 0x7f are overwritten by WRAM). Each block is also mirrored in banks 0x80 to 0xff (up to 0xff for real)
 		 */
-			/* SuperFX games needs a different loading routine */
+			/* SuperFX games needs this different loading routine */
 			if(((temp_buffer[0x007fd6] >= 0x13 && temp_buffer[0x007fd6] <= 0x15) || temp_buffer[0x007fd6] == 0x1a) && (temp_buffer[0x007fd5] == 0x20))
 			{
 				while (read_blocks < 64 && read_blocks < total_blocks)
@@ -667,10 +661,7 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 			case 0x43:
 			case 0x45:
 				if (snes_r_bank1(space, 0x00ffd5) == 0x32)
-				{	
 					snes_has_addon_chip = HAS_SDD1;
-					supported_type = 0;
-				}
 				break;
 
 			case 0x55:
@@ -769,7 +760,9 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 		logerror( "===========\n\n" );
 		logerror( "\tTotal blocks:  %d (%dmb)\n", total_blocks, total_blocks / (snes_cart.mode & 5 ? 32 : 16) );
 		logerror( "\tROM bank size: %s (LoROM: %d , HiROM: %d, ExHiROM: %d)\n",
-								(snes_cart.mode == SNES_MODE_20) ? "LoROM" : ((snes_cart.mode == SNES_MODE_21) ? "HiROM" : "ExHiROM"),
+								(snes_cart.mode == SNES_MODE_20) ? "LoROM" : 
+								(snes_cart.mode == SNES_MODE_21) ? "HiROM" :
+								(snes_cart.mode == SNES_MODE_22) ? "ExLoROM" : "ExHiROM",
 										valid_mode20, valid_mode21, valid_mode25);
 		logerror( "\tCompany:       %s [%.2s]\n", companies[company], company_id );
 		logerror( "\tROM ID:        %.4s\n\n", rom_id );
