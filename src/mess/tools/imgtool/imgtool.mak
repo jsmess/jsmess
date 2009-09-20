@@ -45,6 +45,7 @@ IMGTOOL_LIB_OBJS =						\
 	$(MESS_FORMATS)/coco_cas.o			\
 	$(MESS_FORMATS)/imd_dsk.o			\
 	$(MESS_FORMATS)/td0_dsk.o			\
+	$(MESS_FORMATS)/cqm_dsk.o			\
 	$(MESS_FORMATS)/dsk_dsk.o			\
 	$(MESS_FORMATS)/d88_dsk.o			\
 	$(MESS_FORMATS)/pc_dsk.o			\

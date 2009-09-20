@@ -15,7 +15,6 @@
 
 struct imddsk_tag
 {
-	UINT64 start_offset;
 	int heads;
 	int tracks;
 	int sector_size;
@@ -225,7 +224,6 @@ FLOPPY_CONSTRUCT( imd_dsk_construct )
 		pos++;
 		floppy_image_read(floppy, header, pos, 1);
 	}
-	tag->start_offset = pos + 1;
 	pos++;
 	tag->tracks = 0;
 	tag->heads = 1;

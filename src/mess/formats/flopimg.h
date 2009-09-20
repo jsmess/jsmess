@@ -87,6 +87,9 @@ FLOPPY_CONSTRUCT(td0_dsk_construct);
 FLOPPY_IDENTIFY(imd_dsk_identify);
 FLOPPY_CONSTRUCT(imd_dsk_construct);
 
+FLOPPY_IDENTIFY(cqm_dsk_identify);
+FLOPPY_CONSTRUCT(cqm_dsk_construct);
+
 FLOPPY_IDENTIFY(dsk_dsk_identify);
 FLOPPY_CONSTRUCT(dsk_dsk_construct);
 
@@ -107,8 +110,9 @@ FLOPPY_CONSTRUCT(d88_dsk_construct);
 	{ #name, extensions_, description_, identify_, construct_, ranges_ },				\
 
 #define FLOPPY_OPTIONS_END														\
-		FLOPPY_OPTION( td0, "td0", "TD0 floppy disk image",	td0_dsk_identify, td0_dsk_construct, NULL) \
+		FLOPPY_OPTION( td0, "td0", "Teledisk floppy disk image",	td0_dsk_identify, td0_dsk_construct, NULL) \
 		FLOPPY_OPTION( imd, "imd", "IMD floppy disk image",	imd_dsk_identify, imd_dsk_construct, NULL) \
+		FLOPPY_OPTION( cqm, "cqm,dsk", "CopyQM floppy disk image",	cqm_dsk_identify, cqm_dsk_construct, NULL) \
 		FLOPPY_OPTION( dsk, "dsk", "DSK floppy disk image",	dsk_dsk_identify, dsk_dsk_construct, NULL) \
 		FLOPPY_OPTION( d88, "d77,d88",	"D88 Floppy Disk image", d88_dsk_identify, d88_dsk_construct, NULL)\
 		{ NULL }							\
