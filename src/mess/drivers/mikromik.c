@@ -529,19 +529,18 @@ MACHINE_DRIVER_END
 /* ROMs */
 
 ROM_START( mm1m6 )
-	ROM_REGION( 0x4000, I8085A_TAG, 0 )
-	ROM_LOAD( "mm1.ic2",  0x0000, 0x2000, NO_DUMP )
-	ROM_LOAD( "mm1.ic10", 0x2000, 0x2000, NO_DUMP )
-	ROM_LOAD( "mm1.bin",  0x0000, 0x1000, BAD_DUMP CRC(07400e72) SHA1(354ff97817a607ca38d296af8b2813878d092a08) )
+	ROM_REGION( 0x4000, I8085A_TAG, 0 ) /* BIOS */
+	ROM_LOAD( "9081b.ic2", 0x0000, 0x2000, NO_DUMP )
+	ROM_LOAD( "mm1.bin", 0x0000, 0x1000, BAD_DUMP CRC(07400e72) SHA1(354ff97817a607ca38d296af8b2813878d092a08) )
 
-	ROM_REGION( 0x200, "prom", 0 )
+	ROM_REGION( 0x200, "address", 0 ) /* address decoder */
 	ROM_LOAD( "mmi6349-1.ic24", 0x0000, 0x0200, NO_DUMP )
 
-	ROM_REGION( 0x200, "keyboard", 0 )
+	ROM_REGION( 0x200, "keyboard", 0 ) /* keyboard encoder */
 	ROM_LOAD( "mmi6349-1j.bin", 0x0000, 0x0200, NO_DUMP )
 
-	ROM_REGION( 0x800, "chargen", 0 )
-	ROM_LOAD( "chargen.ic51", 0x0000, 0x0800, NO_DUMP )
+	ROM_REGION( 0x800, "chargen", 0 ) /* character generator */
+	ROM_LOAD( "6807b.ic61", 0x0000, 0x0800, NO_DUMP )
 ROM_END
 
 #define rom_mm1m7 rom_mm1m6
