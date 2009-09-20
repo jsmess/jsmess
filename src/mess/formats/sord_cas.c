@@ -20,7 +20,7 @@ static const struct CassetteModulation sordm5_cas_modulation =
 {
 	CASSETTE_MODULATION_SINEWAVE,
 	1575.0 - 300, 1575.0, 1575.0 + 300,
-	1575.5 + 300, 3150.0, 3150.0 + 600
+	3150.0 - 600, 3150.0, 3150.0 + 600
 };
 
 static UINT8 cassette_image_read_uint8( cassette_image *cassette, UINT64 offset)
