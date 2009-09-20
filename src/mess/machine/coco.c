@@ -1083,103 +1083,6 @@ void coco_set_halt_line(running_machine *machine, int halt_line)
 }
 #endif
 
-/***************************************************************************
-	Input device abstractions
-***************************************************************************/
-
-enum _coco_input_port
-{
-	INPUTPORT_RIGHT_JOYSTICK,
-	INPUTPORT_LEFT_JOYSTICK,
-	INPUTPORT_CASSETTE,
-	INPUTPORT_SERIAL
-};
-typedef enum _coco_input_port coco_input_port;
-
-enum _coco_input_device
-{
-	INPUTDEVICE_NA,
-	INPUTDEVICE_RIGHT_JOYSTICK,
-	INPUTDEVICE_LEFT_JOYSTICK,
-	INPUTDEVICE_HIRES_INTERFACE,
-	INPUTDEVICE_HIRES_CC3MAX_INTERFACE,
-	INPUTDEVICE_RAT,
-	INPUTDEVICE_DIECOM_LIGHTGUN
-};
-typedef enum _coco_input_device coco_input_device;
-
-/*-------------------------------------------------
-    get_input_device - given an input port, determine
-	which input device, if any, it is hooked up to
--------------------------------------------------*/
-
-static coco_input_device get_input_device(running_machine *machine, coco_input_port port)
-{
-	coco_input_device result = INPUTDEVICE_NA;
-
-	switch(input_port_read_safe(machine, "joystick_mode", 0x00))
-	{
-		case 0x00:
-			/* "Normal" */
-			switch(port)
-			{
-				case INPUTPORT_RIGHT_JOYSTICK:	result = INPUTDEVICE_RIGHT_JOYSTICK; break;
-				case INPUTPORT_LEFT_JOYSTICK:	result = INPUTDEVICE_LEFT_JOYSTICK; break;
-				default:						result = INPUTDEVICE_NA; break;
-			}
-			break;
-
-		case 0x10:
-			/* "Hi-Res Interface" */
-			switch(port)
-			{
-				case INPUTPORT_RIGHT_JOYSTICK:	result = INPUTDEVICE_HIRES_INTERFACE; break;
-				case INPUTPORT_LEFT_JOYSTICK:	result = INPUTDEVICE_LEFT_JOYSTICK; break;
-				case INPUTPORT_CASSETTE:		result = INPUTDEVICE_HIRES_INTERFACE; break;
-				default:						result = INPUTDEVICE_NA; break;
-			}
-			break;
-
-		case 0x30:
-			/* "Hi-Res Interface (CoCoMax 3 Style)" */
-			switch(port)
-			{
-				case INPUTPORT_RIGHT_JOYSTICK:	result = INPUTDEVICE_HIRES_CC3MAX_INTERFACE; break;
-				case INPUTPORT_LEFT_JOYSTICK:	result = INPUTDEVICE_LEFT_JOYSTICK; break;
-				case INPUTPORT_CASSETTE:		result = INPUTDEVICE_HIRES_CC3MAX_INTERFACE; break;
-				default:						result = INPUTDEVICE_NA; break;
-			}
-			break;
-
-		case 0x20:
-			/* "The Rat Graphics Mouse" */
-			switch(port)
-			{
-				case INPUTPORT_RIGHT_JOYSTICK:	result = INPUTDEVICE_RAT; break;
-				case INPUTPORT_LEFT_JOYSTICK:	result = INPUTDEVICE_RAT; break;
-				default:						result = INPUTDEVICE_NA; break;
-			}
-			break;
-
-		case 0x40:
-			/* "Diecom Light Gun Adaptor" */
-			switch(port)
-			{
-				case INPUTPORT_RIGHT_JOYSTICK:	result = INPUTDEVICE_DIECOM_LIGHTGUN; break;
-				case INPUTPORT_LEFT_JOYSTICK:	result = INPUTDEVICE_LEFT_JOYSTICK; break;
-				case INPUTPORT_SERIAL:			result = INPUTDEVICE_DIECOM_LIGHTGUN; break;
-				default:						result = INPUTDEVICE_NA; break;
-			}
-			break;
-
-		default:
-			fatalerror("Invalid joystick_mode");
-			break;
-	}
-	return result;
-}
-
-
 
 /***************************************************************************
   Hires Joystick
@@ -1189,13 +1092,23 @@ static int coco_hiresjoy_ca = 1;
 static attotime coco_hiresjoy_xtransitiontime;
 static attotime coco_hiresjoy_ytransitiontime;
 
-static attotime coco_hiresjoy_computetransitiontime(running_machine *machine, const char *inputport)
+static attotime coco_hiresjoy_computetransitiontime(running_machine *machine, UINT8 port, UINT8 axis)
 {
 	double val;
+	UINT8 ctrl = input_port_read_safe(machine, "ctrl_sel", 0x00);
+	/* this function gets only called for hi-res joystick. hence, ctrl can only take values 
+	   0x04, 0x40 (hi-res) or 0x05, 0x50 (hi-res coco3max) */
+	UINT8 coco3max = ((ctrl & 0x0f) == 0x05 || (ctrl & 0xf0) == 0x50) ? 1 : 0;
 
-	val = input_port_read_safe(machine, inputport, 0) / 255.0;
+	static const char *const port_tags[2][4] =
+			{
+				{"joystick_hires_rx", "joystick_hires_ry", "joystick_hires_max_rx", "joystick_hires_max_ry"},	/* right ports */
+				{"joystick_hires_lx", "joystick_hires_ly", "joystick_hires_max_lx", "joystick_hires_max_ly" }	/* left ports */
+			};
 
-	if (get_input_device(machine, INPUTPORT_RIGHT_JOYSTICK) == INPUTDEVICE_HIRES_CC3MAX_INTERFACE)
+	val = input_port_read_safe(machine, port_tags[port][axis + 2 * coco3max], 0) / 255.0;
+
+	if (coco3max)
 	{
 		/* CoCo MAX 3 Interface */
 		val = val * 2500.0 + 400.0;
@@ -1209,18 +1122,18 @@ static attotime coco_hiresjoy_computetransitiontime(running_machine *machine, co
 	return attotime_add(timer_get_time(machine), attotime_mul(COCO_CPU_SPEED, val));
 }
 
-static void coco_hiresjoy_w(running_machine *machine, int data)
+static void coco_hiresjoy_w(running_machine *machine, int data, UINT8 port)
 {
 	if (!data && coco_hiresjoy_ca)
 	{
 		/* Hi to lo */
-		coco_hiresjoy_xtransitiontime = coco_hiresjoy_computetransitiontime(machine, "joystick_right_x");
-		coco_hiresjoy_ytransitiontime = coco_hiresjoy_computetransitiontime(machine, "joystick_right_y");
+		coco_hiresjoy_xtransitiontime = coco_hiresjoy_computetransitiontime(machine, port, 0);
+		coco_hiresjoy_ytransitiontime = coco_hiresjoy_computetransitiontime(machine, port, 1);
 	}
 	else if (data && !coco_hiresjoy_ca)
 	{
 		/* Lo to hi */
-		coco_hiresjoy_ytransitiontime = attotime_zero;
+		coco_hiresjoy_xtransitiontime = attotime_zero;
 		coco_hiresjoy_ytransitiontime = attotime_zero;
 	}
 	coco_hiresjoy_ca = data;
@@ -1446,17 +1359,29 @@ static attotime get_relative_time(running_machine *machine, attotime absolute_ti
 static UINT8 coco_update_keyboard(running_machine *machine)
 {
 	coco_state *state = machine->driver_data;
-	UINT8 porta = 0x7F, port_za = 0x7f;
+	UINT8 porta = 0x7f, port_za = 0x7f;
 	int joyval;
 	static const int joy_rat_table[] = {15, 24, 42, 33 };
 	static const int dclg_table[] = {0, 14, 30, 49 };
 	attotime dclg_time = attotime_zero;
 	UINT8 pia0_pb;
-	UINT8 dac = pia6821_get_output_a(state->pia_1) & 0xFC;
-	int joystick_axis, joystick;
+	UINT8 dac = pia6821_get_output_a(state->pia_1) & 0xfc;
+	int joystick_axis, joystick, joy_mask, joy_shift, ctrl;
+
+	static const char *const portnames[2][6][2] =
+			{
+				{ {0}, {"joystick_rx", "joystick_ry"}, {"rat_mouse_rx", "rat_mouse_ry"}, {"dclg_rx", "dclg_ry"}, 
+					{"joystick_hires_rx", "joystick_hires_ry"}, {"joystick_hires_max_rx", "joystick_hires_max_ry"} },	/* right ports */
+				{ {0}, {"joystick_lx", "joystick_ly"}, {"rat_mouse_lx", "rat_mouse_ly"}, {"dclg_lx", "dclg_ly"}, 
+					{"joystick_hires_lx", "joystick_hires_ly"}, {"joystick_hires_max_lx", "joystick_hires_max_ly"} },	/* left ports */
+			};
+
 	pia0_pb = pia6821_get_output_b(state->pia_0);
 	joystick_axis = mux_sel1;
 	joystick = mux_sel2;
+	joy_mask = joystick ? 0xf0 : 0x0f;
+	joy_shift = joystick ? 4 : 0;
+	ctrl = (input_port_read_safe(machine, "ctrl_sel", 0x00) & joy_mask) >> joy_shift;
 
 	/* poll keyboard keys */
 	if ((input_port_read(machine, "row0") | pia0_pb) != 0xff) porta &= ~0x01;
@@ -1475,53 +1400,46 @@ static UINT8 coco_update_keyboard(running_machine *machine)
 	if ((input_port_read(machine, "row5") | pia6821_get_port_b_z_mask(state->pia_0)) != 0xff) port_za &= ~0x20;
 	if ((input_port_read(machine, "row6") | pia6821_get_port_b_z_mask(state->pia_0)) != 0xff) port_za &= ~0x40;
 
-	switch(get_input_device(machine, joystick ? INPUTPORT_LEFT_JOYSTICK : INPUTPORT_RIGHT_JOYSTICK))
+	switch (ctrl)
 	{
-		case INPUTDEVICE_RIGHT_JOYSTICK:
-			joyval = input_port_read_safe(machine, joystick_axis ? "joystick_right_y" : "joystick_right_x", 0x00);
+		case 0x01: /* Joystick */
+			joyval = input_port_read_safe(machine, portnames[joystick][ctrl][joystick_axis], 0x00);
 			if (dac <= joyval)
 				porta |= 0x80;
 			break;
 
-		case INPUTDEVICE_LEFT_JOYSTICK:
-			joyval = input_port_read_safe(machine, joystick_axis ? "joystick_left_y" : "joystick_left_x", 0x00);
-			if (dac <= joyval)
-				porta |= 0x80;
-			break;
-
-		case INPUTDEVICE_HIRES_INTERFACE:
-		case INPUTDEVICE_HIRES_CC3MAX_INTERFACE:
+		case 0x04: /* Hi-Res Joystick */
+		case 0x05: /* Hi-Res CC3Max Joystick */
 			if (joystick_axis ? coco_hiresjoy_ry(machine) : coco_hiresjoy_rx(machine))
 				porta |= 0x80;
 			break;
 
-		case INPUTDEVICE_RAT:
-			joyval = input_port_read_safe(machine, joystick_axis ? "rat_mouse_y" : "rat_mouse_x", 0x00);
+		case 0x02: /* Rat Mouse */
+			joyval = input_port_read_safe(machine, portnames[joystick][ctrl][joystick_axis], 0x00);
 			if ((dac >> 2) <= joy_rat_table[joyval])
 				porta |= 0x80;
 			break;
 
-		case INPUTDEVICE_DIECOM_LIGHTGUN:
-			if( (video_screen_get_vpos(machine->primary_screen) == input_port_read_safe(machine, "dclg_y", 0)) )
+		case 0x03: /* Diecom Light Gun */
+			if( (video_screen_get_vpos(machine->primary_screen) == input_port_read_safe(machine, portnames[joystick][ctrl][1], 0)) )
 			{
 				/* If gun is pointing at the current scan line, set hit bit and cache horizontal timer value */
 				dclg_output_h |= 0x02;
-				dclg_timer = input_port_read_safe(machine, "dclg_x", 0) << 1;
+				dclg_timer = input_port_read_safe(machine, portnames[joystick][ctrl][0], 0) << 1;
 			}
 
-			if ( (dac >> 2) <= dclg_table[ (joystick_axis ? dclg_output_h : dclg_output_v) & 0x03 ])
+			if ( (dac >> 2) <= dclg_table[(joystick_axis ? dclg_output_h : dclg_output_v) & 0x03])
 				porta |= 0x80;
 
 			if( (dclg_state == 7) )
 			{
 				/* While in state 7, prepare to chech next video frame for a hit */
-				dclg_time = video_screen_get_time_until_pos(machine->primary_screen, input_port_read_safe(machine, "dclg_y", 0), 0);
+				dclg_time = video_screen_get_time_until_pos(machine->primary_screen, input_port_read_safe(machine, portnames[joystick][ctrl][1], 0), 0);
 			}
 
 			break;
 
-		default:
-			fatalerror("Invalid value returned by get_input_device");
+		default: /* No Controller */
 			break;
 	}
 
@@ -1568,8 +1486,11 @@ static TIMER_CALLBACK(coco_update_keyboard_timerproc)	{ (*update_keyboard)(machi
 
 static WRITE8_DEVICE_HANDLER ( d_pia0_pa_w )
 {
-	if (get_input_device(device->machine, INPUTPORT_RIGHT_JOYSTICK) == INPUTDEVICE_HIRES_CC3MAX_INTERFACE)
-		coco_hiresjoy_w(device->machine, data & 0x04);
+	/* Hi-Res CC3Max Joystick (either in Left or in Right Port) writes here */
+	if ((input_port_read_safe(device->machine, "ctrl_sel", 0x00) & 0x0f) == 0x05)
+		coco_hiresjoy_w(device->machine, data & 0x04, 0);
+	else if ((input_port_read_safe(device->machine, "ctrl_sel", 0x00) & 0xf0) == 0x50)
+		coco_hiresjoy_w(device->machine, data & 0x04, 1);
 }
 
 
@@ -1634,7 +1555,9 @@ static WRITE8_DEVICE_HANDLER ( d_pia1_pa_w )
 
 	coco_sound_update(device->machine);
 
-	if (get_input_device(device->machine, INPUTPORT_SERIAL) == INPUTDEVICE_DIECOM_LIGHTGUN)
+	/* Diecom Light Gun (either in Left or in Right Port) writes here */
+	if ((input_port_read_safe(device->machine, "ctrl_sel", 0x00) & 0x0f) == 0x03 || 
+		(input_port_read_safe(device->machine, "ctrl_sel", 0x00) & 0xf0) == 0x30)
 	{
 		int dclg_this_bit = ((data & 2) >> 1);
 
@@ -1682,8 +1605,11 @@ static WRITE8_DEVICE_HANDLER ( d_pia1_pa_w )
 
 	(*update_keyboard)(device->machine);
 
-	if (get_input_device(device->machine, INPUTPORT_RIGHT_JOYSTICK) == INPUTDEVICE_HIRES_INTERFACE)
-		coco_hiresjoy_w(device->machine, dac >= 0x80);
+	/* Hi-Res Joystick (either in Left or in Right Port) writes here */
+	if ((input_port_read_safe(device->machine, "ctrl_sel", 0x00) & 0x0f) == 0x04)
+		coco_hiresjoy_w(device->machine, dac >= 0x80, 0);
+	else if ((input_port_read_safe(device->machine, "ctrl_sel", 0x00) & 0xf0) == 0x40)
+		coco_hiresjoy_w(device->machine, dac >= 0x80, 1);
 
 	/* Handle printer output, serial for CoCos, Paralell for Dragons */
 
@@ -3018,7 +2944,10 @@ static STATE_POSTLOAD( coco3_state_postload )
 
 static void update_lightgun(running_machine *machine)
 {
-	int is_lightgun = input_port_read_safe(machine, "joystick_mode", 0x00) == 0x40;
+	/* is there a Diecom Light Gun either in Left or in Right Port? */
+	int is_lightgun = ((input_port_read_safe(machine, "ctrl_sel", 0x00) & 0x0f) == 0x03 || 
+					(input_port_read_safe(machine, "ctrl_sel", 0x00) & 0xf0) == 0x30) ? 1 :0;
+
 	crosshair_set_screen(machine, 0, is_lightgun ? CROSSHAIR_SCREEN_ALL : CROSSHAIR_SCREEN_NONE);
 }
 
@@ -3040,7 +2969,7 @@ MACHINE_START( coco3 )
 	memset(&init, 0, sizeof(init));
 	init.recalc_interrupts_	= coco3_recalc_interrupts;
 	init.printer_out_		= printer_out_coco;
-	
+		
 	generic_init_machine(machine, &init);
 
 	/* CoCo 3 specific function pointers */
