@@ -185,7 +185,7 @@ static struct
 {
 	UINT8 pal;
 	UINT8 gfx_pal;
-	UINT8 txt_pal;
+	UINT8 txt_pal[8];
 	UINT8 txt_disp;
 }turbo_reg;
 
@@ -1121,7 +1121,7 @@ static WRITE8_HANDLER( x1_blackclip_w )
 }
 
 static READ8_HANDLER( x1turbo_pal_r )    { return turbo_reg.pal; }
-static READ8_HANDLER( x1turbo_txpal_r )  { return turbo_reg.txt_pal; }
+static READ8_HANDLER( x1turbo_txpal_r )  { return turbo_reg.txt_pal[offset]; }
 static READ8_HANDLER( x1turbo_txdisp_r ) { return turbo_reg.txt_disp; }
 static READ8_HANDLER( x1turbo_gfxpal_r ) { return turbo_reg.gfx_pal; }
 
@@ -1133,8 +1133,19 @@ static WRITE8_HANDLER( x1turbo_pal_w )
 
 static WRITE8_HANDLER( x1turbo_txpal_w )
 {
-	printf("TURBO TEXT PAL %02x\n",data);
-	turbo_reg.txt_pal = data;
+	int r,g,b;
+
+	printf("TURBO TEXT PAL %02x %02x\n",data,offset);
+	turbo_reg.txt_pal[offset] = data;
+
+	if(turbo_reg.pal & 0x80)
+	{
+		r = (data & 0x0c) >> 2;
+		g = (data & 0x30) >> 4;
+		b = (data & 0x03) >> 0;
+
+		palette_set_color_rgb(space->machine, offset, pal2bit(r), pal2bit(g), pal2bit(b));
+	}
 }
 
 static WRITE8_HANDLER( x1turbo_txdisp_w )
@@ -1253,10 +1264,10 @@ static WRITE8_HANDLER( x1_io_w )
 	else if(offset >= 0x1f92 && offset <= 0x1f93)	{ z80sio_d_w(devtag_get_device(space->machine, "sio"), (offset-0x1f92) & 1,data); }
 	else if(offset >= 0x1fa0 && offset <= 0x1fa3)	{ z80ctc_w(devtag_get_device(space->machine, "ctc"), offset-0x1fa0,data); }
 	else if(offset >= 0x1fa8 && offset <= 0x1fab)	{ z80ctc_w(devtag_get_device(space->machine, "ctc"), offset-0x1fa8,data); }
-	else if(offset == 0x1fb0)						{ x1turbo_pal_w(space,0,data); }
-	else if(offset >= 0x1fb9 && offset <= 0x1fbf)	{ x1turbo_txpal_w(space,offset-0x1fb9,data); }
-	else if(offset == 0x1fc0)						{ x1turbo_txdisp_w(space,0,data); }
-	else if(offset == 0x1fc5)						{ x1turbo_gfxpal_w(space,0,data); }
+//	else if(offset == 0x1fb0)						{ x1turbo_pal_w(space,0,data); }
+//	else if(offset >= 0x1fb9 && offset <= 0x1fbf)	{ x1turbo_txpal_w(space,offset-0x1fb9,data); }
+//	else if(offset == 0x1fc0)						{ x1turbo_txdisp_w(space,0,data); }
+//	else if(offset == 0x1fc5)						{ x1turbo_gfxpal_w(space,0,data); }
 	else if(offset >= 0x1fd0 && offset <= 0x1fdf)	{ x1_scrn_w(space,0,data); }
 	else if(offset == 0x1fe0)						{ x1_blackclip_w(space,0,data); }
 	else if(offset >= 0x2000 && offset <= 0x2fff)	{ colorram[offset-0x2000] = data; }
@@ -1287,7 +1298,7 @@ static READ8_HANDLER( x1turbo_io_r )
 	else if(offset >= 0x1fa0 && offset <= 0x1fa3)	{ return z80ctc_r(devtag_get_device(space->machine, "ctc"), offset-0x1fa0); }
 	else if(offset >= 0x1fa8 && offset <= 0x1fab)	{ return z80ctc_r(devtag_get_device(space->machine, "ctc"), offset-0x1fa8); }
 	else if(offset == 0x1fb0)						{ return x1turbo_pal_r(space,0); }
-	else if(offset >= 0x1fb9 && offset <= 0x1fbf)	{ return x1turbo_txpal_r(space,offset-0x1fb9); }
+	else if(offset >= 0x1fb8 && offset <= 0x1fbf)	{ return x1turbo_txpal_r(space,offset-0x1fb8); }
 	else if(offset == 0x1fc0)						{ return x1turbo_txdisp_r(space,0); }
 	else if(offset == 0x1fc5)						{ return x1turbo_gfxpal_r(space,0); }
 //	else if(offset >= 0x1fd0 && offset <= 0x1fdf)	{ return x1_scrn_r(space,offset-0x1fd0); }
@@ -1331,7 +1342,7 @@ static WRITE8_HANDLER( x1turbo_io_w )
 	else if(offset >= 0x1fa0 && offset <= 0x1fa3)	{ z80ctc_w(devtag_get_device(space->machine, "ctc"), offset-0x1fa0,data); }
 	else if(offset >= 0x1fa8 && offset <= 0x1fab)	{ z80ctc_w(devtag_get_device(space->machine, "ctc"), offset-0x1fa8,data); }
 	else if(offset == 0x1fb0)						{ x1turbo_pal_w(space,0,data); }
-	else if(offset >= 0x1fb9 && offset <= 0x1fbf)	{ x1turbo_txpal_w(space,offset-0x1fb9,data); }
+	else if(offset >= 0x1fb8 && offset <= 0x1fbf)	{ x1turbo_txpal_w(space,offset-0x1fb8,data); }
 	else if(offset == 0x1fc0)						{ x1turbo_txdisp_w(space,0,data); }
 	else if(offset == 0x1fc5)						{ x1turbo_gfxpal_w(space,0,data); }
 	else if(offset >= 0x1fd0 && offset <= 0x1fdf)	{ x1_scrn_w(space,0,data); }
@@ -1989,6 +2000,13 @@ static MACHINE_RESET( x1 )
 	cassette_change_state(devtag_get_device(machine, "cass" ),CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
 
 	key_irq_flag = ctc_irq_flag = 0;
+
+	/* Reinitialize palette here if there's a soft reset for the Turbo PAL stuff*/
+	for(i=0;i<8;i++)
+	{
+		palette_set_color_rgb(machine, i+0x000, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
+		palette_set_color_rgb(machine, i+0x100, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
+	}
 }
 
 static PALETTE_INIT(x1)
@@ -2013,13 +2031,6 @@ static PALETTE_INIT(x1)
 		if(i & 0x10) { r^=0xff; g^=0xff; b^=0xff; }
 
 		palette_set_color_rgb(machine, i, r,g,b);
-	}
-
-	/* TODO: fix this */
-	for(i=0;i<8;i++)
-	{
-		palette_set_color_rgb(machine, i+0x000, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
-		palette_set_color_rgb(machine, i+0x100, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
 	}
 }
 
