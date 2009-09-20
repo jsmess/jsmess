@@ -187,7 +187,8 @@ FLOPPY_OPTIONS_END
 static const floppy_config b2m_floppy_config =
 {
 	FLOPPY_DRIVE_DS_80,
-	FLOPPY_OPTIONS_NAME(b2m)
+	FLOPPY_OPTIONS_NAME(b2m),
+	DO_NOT_KEEP_GEOMETRY
 };
 
 /* Machine driver */

@@ -573,7 +573,8 @@ static const ym2203_interface pc8801_ym2203_interface =
 static const floppy_config pc88_floppy_config =
 {
 	FLOPPY_DRIVE_DS_80,
-	FLOPPY_OPTIONS_NAME(default)
+	FLOPPY_OPTIONS_NAME(default),
+	DO_NOT_KEEP_GEOMETRY
 };
 
 static MACHINE_DRIVER_START( pc88srl )

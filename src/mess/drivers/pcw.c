@@ -978,7 +978,8 @@ INPUT_PORTS_END
 static const floppy_config pcw_floppy_config =
 {
 	FLOPPY_DRIVE_DS_80,
-	FLOPPY_OPTIONS_NAME(default)
+	FLOPPY_OPTIONS_NAME(default),
+	DO_NOT_KEEP_GEOMETRY
 };
 
 /* PCW8256, PCW8512, PCW9256 */

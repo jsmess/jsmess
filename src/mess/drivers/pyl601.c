@@ -474,7 +474,8 @@ FLOPPY_OPTIONS_END
 static const floppy_config pyldin_floppy_config =
 {
 	FLOPPY_DRIVE_DS_80,
-	FLOPPY_OPTIONS_NAME(pyldin)
+	FLOPPY_OPTIONS_NAME(pyldin),
+	DO_NOT_KEEP_GEOMETRY
 };
 
 static MACHINE_DRIVER_START( pyl601 )

@@ -476,7 +476,8 @@ static INTERRUPT_GEN( elwro800jr_interrupt )
 static const floppy_config elwro800jr_floppy_config =
 {
 	FLOPPY_DRIVE_SS_40,
-	FLOPPY_OPTIONS_NAME(default)
+	FLOPPY_OPTIONS_NAME(default),
+	DO_NOT_KEEP_GEOMETRY
 };
 
 static MACHINE_DRIVER_START( elwro800 )

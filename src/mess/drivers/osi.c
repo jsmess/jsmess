@@ -745,7 +745,8 @@ FLOPPY_OPTIONS_END
 static const floppy_config osi_floppy_config =
 {
 	FLOPPY_DRIVE_SS_40,
-	FLOPPY_OPTIONS_NAME(osi)
+	FLOPPY_OPTIONS_NAME(osi),
+	DO_NOT_KEEP_GEOMETRY
 };
 
 /* Machine Drivers */

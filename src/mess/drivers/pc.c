@@ -1373,7 +1373,8 @@ static const pc_lpt_interface pc_lpt_config =
 static const floppy_config ibmpc_floppy_config =
 {
 	FLOPPY_DRIVE_DS_80,
-	FLOPPY_OPTIONS_NAME(pc)
+	FLOPPY_OPTIONS_NAME(pc),
+	DO_NOT_KEEP_GEOMETRY
 };
 
 

@@ -363,13 +363,15 @@ static const centronics_interface oric_centronics_config =
 static const floppy_config oric1_floppy_config =
 {
 	FLOPPY_DRIVE_DS_80,
-	FLOPPY_OPTIONS_NAME(oric)
+	FLOPPY_OPTIONS_NAME(oric),
+	DO_NOT_KEEP_GEOMETRY
 };
 
 static const floppy_config prav8d_floppy_config =
 {
 	FLOPPY_DRIVE_DS_80,
-	FLOPPY_OPTIONS_NAME(apple2)
+	FLOPPY_OPTIONS_NAME(apple2),
+	DO_NOT_KEEP_GEOMETRY
 };
 
 static MACHINE_DRIVER_START( oric )

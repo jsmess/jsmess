@@ -1173,7 +1173,8 @@ static MACHINE_RESET( abc806 )
 static const floppy_config abc800_floppy_config =
 {
 	FLOPPY_DRIVE_DS_80,
-	FLOPPY_OPTIONS_NAME(abc80)
+	FLOPPY_OPTIONS_NAME(abc80),
+	DO_NOT_KEEP_GEOMETRY
 };
 
 static MACHINE_DRIVER_START( abc800m )

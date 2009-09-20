@@ -157,7 +157,8 @@ FLOPPY_OPTIONS_END
 static const floppy_config pk8020_floppy_config =
 {
 	FLOPPY_DRIVE_DS_80,
-	FLOPPY_OPTIONS_NAME(pk8020)
+	FLOPPY_OPTIONS_NAME(pk8020),
+	DO_NOT_KEEP_GEOMETRY
 };
 
 /* Machine driver */

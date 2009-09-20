@@ -480,7 +480,8 @@ FLOPPY_OPTIONS_END
 static const floppy_config mm1_floppy_config =
 {
 	FLOPPY_DRIVE_DS_80,
-	FLOPPY_OPTIONS_NAME(mm1)
+	FLOPPY_OPTIONS_NAME(mm1),
+	DO_NOT_KEEP_GEOMETRY
 };
 
 /* Machine Drivers */

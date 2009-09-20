@@ -355,7 +355,8 @@ FLOPPY_OPTIONS_END
 static const floppy_config kc85_floppy_config =
 {
 	FLOPPY_DRIVE_DS_80,
-	FLOPPY_OPTIONS_NAME(kc85)
+	FLOPPY_OPTIONS_NAME(kc85),
+	DO_NOT_KEEP_GEOMETRY
 };
 
 

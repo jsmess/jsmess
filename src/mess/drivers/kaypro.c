@@ -160,12 +160,14 @@ FLOPPY_OPTIONS_END
 static const floppy_config kayproii_floppy_config =
 {
 	FLOPPY_DRIVE_DS_80,
-	FLOPPY_OPTIONS_NAME(kayproii)
+	FLOPPY_OPTIONS_NAME(kayproii),
+	DO_NOT_KEEP_GEOMETRY
 };
 static const floppy_config kaypro2x_floppy_config =
 {
 	FLOPPY_DRIVE_DS_80,
-	FLOPPY_OPTIONS_NAME(kaypro2x)
+	FLOPPY_OPTIONS_NAME(kaypro2x),
+	DO_NOT_KEEP_GEOMETRY
 };
 
 static MACHINE_DRIVER_START( kayproii )

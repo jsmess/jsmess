@@ -329,7 +329,8 @@ FLOPPY_OPTIONS_END
 static const floppy_config xor100_floppy_config =
 {
 	FLOPPY_DRIVE_DS_80,
-	FLOPPY_OPTIONS_NAME(xor100)
+	FLOPPY_OPTIONS_NAME(xor100),
+	DO_NOT_KEEP_GEOMETRY
 };
 
 static MACHINE_DRIVER_START( xor100 )

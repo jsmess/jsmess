@@ -429,7 +429,8 @@ static const mm58274c_interface floppy_mm58274c_interface =
 static const floppy_config ti99_8_floppy_config =
 {
 	FLOPPY_DRIVE_DS_80,
-	FLOPPY_OPTIONS_NAME(ti99)
+	FLOPPY_OPTIONS_NAME(ti99),
+	DO_NOT_KEEP_GEOMETRY
 };
 
 static MACHINE_DRIVER_START(ti99_8_60hz)

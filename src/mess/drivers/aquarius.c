@@ -440,7 +440,8 @@ FLOPPY_OPTIONS_END
 static const floppy_config aquarius_floppy_config =
 {
 	FLOPPY_DRIVE_DS_80,
-	FLOPPY_OPTIONS_NAME(aquarius)
+	FLOPPY_OPTIONS_NAME(aquarius),
+	DO_NOT_KEEP_GEOMETRY
 };
 
 static MACHINE_DRIVER_START( aquarius_qd )

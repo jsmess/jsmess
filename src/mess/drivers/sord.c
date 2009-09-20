@@ -572,7 +572,8 @@ FLOPPY_OPTIONS_END
 static const floppy_config sordm5_floppy_config =
 {
 	FLOPPY_DRIVE_DS_80,
-	FLOPPY_OPTIONS_NAME(sordm5)
+	FLOPPY_OPTIONS_NAME(sordm5),
+	DO_NOT_KEEP_GEOMETRY
 };
 
 static MACHINE_DRIVER_START( sord_m5_fd5 )

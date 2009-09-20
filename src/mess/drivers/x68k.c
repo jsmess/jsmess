@@ -2269,7 +2269,8 @@ FLOPPY_OPTIONS_END
 static const floppy_config x68k_floppy_config =
 {
 	FLOPPY_DRIVE_DS_80,
-	FLOPPY_OPTIONS_NAME(x68k)
+	FLOPPY_OPTIONS_NAME(x68k),
+	DO_NOT_KEEP_GEOMETRY
 };
 
 static MACHINE_RESET( x68000 )

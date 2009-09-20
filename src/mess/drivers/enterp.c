@@ -427,7 +427,8 @@ FLOPPY_OPTIONS_END
 static const floppy_config enterprise_floppy_config =
 {
 	FLOPPY_DRIVE_DS_80,
-	FLOPPY_OPTIONS_NAME(enterprise)
+	FLOPPY_OPTIONS_NAME(enterprise),
+	DO_NOT_KEEP_GEOMETRY
 };
 
 static MACHINE_DRIVER_START( ep64 )

@@ -638,7 +638,8 @@ INPUT_PORTS_END
 static const floppy_config thomson_floppy_config =
 {
 	FLOPPY_DRIVE_DS_80,
-	FLOPPY_OPTIONS_NAME(thomson)
+	FLOPPY_OPTIONS_NAME(thomson),
+	DO_NOT_KEEP_GEOMETRY
 };
 
 /* ------------ config ------------ */

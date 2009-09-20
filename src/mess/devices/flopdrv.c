@@ -759,7 +759,7 @@ static int internal_floppy_device_load(const device_config *image, int create_fo
 		if (err)
 			goto error;
 	}
-	if (floppy_callbacks(flopimg->floppy)->get_heads_per_disk && floppy_callbacks(flopimg->floppy)->get_tracks_per_disk)
+	if (((floppy_config*)image->static_config)->keep_drive_geometry==DO_NOT_KEEP_GEOMETRY && floppy_callbacks(flopimg->floppy)->get_heads_per_disk && floppy_callbacks(flopimg->floppy)->get_tracks_per_disk)
 	{
 		floppy_drive_set_geometry_absolute(image,
 			floppy_get_tracks_per_disk(flopimg->floppy),

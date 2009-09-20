@@ -1184,7 +1184,8 @@ FLOPPY_OPTIONS_END
 static const floppy_config v1050_floppy_config =
 {
 	FLOPPY_DRIVE_DS_80,
-	FLOPPY_OPTIONS_NAME(v1050)
+	FLOPPY_OPTIONS_NAME(v1050),
+	DO_NOT_KEEP_GEOMETRY
 };
 
 /* Machine Driver */

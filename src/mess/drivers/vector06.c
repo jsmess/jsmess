@@ -147,7 +147,8 @@ FLOPPY_OPTIONS_END
 static const floppy_config vector_floppy_config =
 {
 	FLOPPY_DRIVE_DS_80,
-	FLOPPY_OPTIONS_NAME(vector)
+	FLOPPY_OPTIONS_NAME(vector),
+	DO_NOT_KEEP_GEOMETRY
 };
 
 /* Machine driver */

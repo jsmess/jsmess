@@ -1017,7 +1017,8 @@ static const cassette_config msx_cassette_config =
 static const floppy_config msx_floppy_config =
 {
 	FLOPPY_DRIVE_DS_80,
-	FLOPPY_OPTIONS_NAME(msx)
+	FLOPPY_OPTIONS_NAME(msx),
+	DO_NOT_KEEP_GEOMETRY
 };
 
 static MACHINE_DRIVER_START( msx_cartslot )

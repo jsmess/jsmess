@@ -2035,7 +2035,8 @@ FLOPPY_OPTIONS_END
 static const floppy_config x1_floppy_config =
 {
 	FLOPPY_DRIVE_DS_80,
-	FLOPPY_OPTIONS_NAME(x1)
+	FLOPPY_OPTIONS_NAME(x1),
+	DO_NOT_KEEP_GEOMETRY
 };
 
 static MACHINE_DRIVER_START( x1 )

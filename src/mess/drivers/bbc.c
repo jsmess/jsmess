@@ -762,7 +762,8 @@ FLOPPY_OPTIONS_END
 static const floppy_config bbc_floppy_config =
 {
 	FLOPPY_DRIVE_DS_80,
-	FLOPPY_OPTIONS_NAME(bbc)
+	FLOPPY_OPTIONS_NAME(bbc),
+	DO_NOT_KEEP_GEOMETRY
 };
 
 static MACHINE_DRIVER_START( bbc_cartslot )

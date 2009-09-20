@@ -352,7 +352,8 @@ FLOPPY_OPTIONS_END
 static const floppy_config exidy_floppy_config =
 {
 	FLOPPY_DRIVE_DS_80,
-	FLOPPY_OPTIONS_NAME(exidy)
+	FLOPPY_OPTIONS_NAME(exidy),
+	DO_NOT_KEEP_GEOMETRY
 };
 
 static MACHINE_DRIVER_START( exidy )

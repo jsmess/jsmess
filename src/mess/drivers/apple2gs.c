@@ -193,13 +193,15 @@ static void apple2gs_floppy525_getinfo(const mess_device_class *devclass, UINT32
 static const floppy_config apple2gs_floppy35_floppy_config =
 {
 	FLOPPY_DRIVE_DS_80,
-	FLOPPY_OPTIONS_NAME(apple35_iigs)
+	FLOPPY_OPTIONS_NAME(apple35_iigs),
+	DO_NOT_KEEP_GEOMETRY
 };
 
 static const floppy_config apple2gs_floppy525_floppy_config =
 {
 	FLOPPY_DRIVE_DS_80,
-	FLOPPY_OPTIONS_NAME(apple2)
+	FLOPPY_OPTIONS_NAME(apple2),
+	DO_NOT_KEEP_GEOMETRY
 };
 
 static MACHINE_DRIVER_START( apple2gs )

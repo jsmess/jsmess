@@ -268,7 +268,8 @@ FLOPPY_OPTIONS_END
 static const floppy_config atom_floppy_config =
 {
 	FLOPPY_DRIVE_DS_80,
-	FLOPPY_OPTIONS_NAME(atom)
+	FLOPPY_OPTIONS_NAME(atom),
+	DO_NOT_KEEP_GEOMETRY
 };
 
 /* machine definition */

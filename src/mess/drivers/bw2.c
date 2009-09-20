@@ -800,7 +800,8 @@ FLOPPY_OPTIONS_END
 static const floppy_config bw2_floppy_config =
 {
 	FLOPPY_DRIVE_DS_80,
-	FLOPPY_OPTIONS_NAME(bw2)
+	FLOPPY_OPTIONS_NAME(bw2),
+	DO_NOT_KEEP_GEOMETRY
 };
 static const wd17xx_interface bw2_wd17xx_interface = { bw2_wd17xx_callback, NULL, {FLOPPY_0, FLOPPY_1, NULL, NULL}};
 

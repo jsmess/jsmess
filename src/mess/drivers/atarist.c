@@ -1795,7 +1795,8 @@ static DEVICE_IMAGE_LOAD( atarist_cart )
 static const floppy_config atarist_floppy_config =
 {
 	FLOPPY_DRIVE_DS_80,
-	FLOPPY_OPTIONS_NAME(atarist)
+	FLOPPY_OPTIONS_NAME(atarist),
+	DO_NOT_KEEP_GEOMETRY
 };
 
 static MACHINE_DRIVER_START( atarist_cartslot )

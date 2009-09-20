@@ -767,7 +767,8 @@ static const cassette_config coco_cassette_config =
 static const floppy_config coco_floppy_config =
 {
 	FLOPPY_DRIVE_DS_80,
-	FLOPPY_OPTIONS_NAME(coco)
+	FLOPPY_OPTIONS_NAME(coco),
+	DO_NOT_KEEP_GEOMETRY
 };
 
 static MACHINE_DRIVER_START( dragon32 )

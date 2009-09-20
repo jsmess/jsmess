@@ -324,7 +324,8 @@ FLOPPY_OPTIONS_END
 static const floppy_config nascom2_floppy_config =
 {
 	FLOPPY_DRIVE_DS_80,
-	FLOPPY_OPTIONS_NAME(nascom2)
+	FLOPPY_OPTIONS_NAME(nascom2),
+	DO_NOT_KEEP_GEOMETRY
 };
 
 static MACHINE_DRIVER_START( nascom2 )

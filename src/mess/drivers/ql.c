@@ -647,7 +647,8 @@ FLOPPY_OPTIONS_END
 static const floppy_config ql_floppy_config =
 {
 	FLOPPY_DRIVE_DS_80,
-	FLOPPY_OPTIONS_NAME(ql)
+	FLOPPY_OPTIONS_NAME(ql),
+	DO_NOT_KEEP_GEOMETRY
 };
 
 static MACHINE_DRIVER_START( ql )

@@ -98,7 +98,8 @@ static void lisa_floppy_getinfo(const mess_device_class *devclass, UINT32 state,
 static const floppy_config lisa_floppy_config =
 {
 	FLOPPY_DRIVE_DS_80,
-	FLOPPY_OPTIONS_NAME(apple35_mac)
+	FLOPPY_OPTIONS_NAME(apple35_mac),
+	DO_NOT_KEEP_GEOMETRY
 };
 
 /***************************************************************************

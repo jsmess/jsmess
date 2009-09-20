@@ -205,7 +205,8 @@ ADDRESS_MAP_END
 static const floppy_config ti990_4_floppy_config =
 {
 	FLOPPY_DRIVE_DS_80,
-	FLOPPY_OPTIONS_NAME(fd800)
+	FLOPPY_OPTIONS_NAME(fd800),
+	DO_NOT_KEEP_GEOMETRY
 };
 
 static MACHINE_DRIVER_START(ti990_4)

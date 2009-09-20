@@ -1673,7 +1673,8 @@ MACHINE_DRIVER_END
 static const floppy_config nc200_floppy_config =
 {
 	FLOPPY_DRIVE_DS_80,
-	FLOPPY_OPTIONS_NAME(pc)
+	FLOPPY_OPTIONS_NAME(pc),
+	DO_NOT_KEEP_GEOMETRY
 };
 
 static MACHINE_DRIVER_START( nc200 )

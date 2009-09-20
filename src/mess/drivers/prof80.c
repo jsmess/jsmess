@@ -1186,7 +1186,8 @@ FLOPPY_OPTIONS_END
 static const floppy_config prof80_floppy_config =
 {
 	FLOPPY_DRIVE_DS_80,
-	FLOPPY_OPTIONS_NAME(prof80)
+	FLOPPY_OPTIONS_NAME(prof80),
+	DO_NOT_KEEP_GEOMETRY
 };
 
 /* Machine Drivers */

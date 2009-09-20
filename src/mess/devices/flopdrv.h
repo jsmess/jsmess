@@ -22,11 +22,18 @@ typedef enum
 	FLOPPY_DRIVE_DS_80
 } floppy_type;
 
+typedef enum
+{
+	DO_NOT_KEEP_GEOMETRY=0,
+	KEEP_GEOMETRY
+} keep_geometry;
+
 typedef struct floppy_config_t	floppy_config;
 struct floppy_config_t
 {
 	floppy_type floppy_type;
 	const struct FloppyFormat *formats;
+	keep_geometry keep_drive_geometry;	
 };
 
 typedef enum
@@ -108,12 +115,6 @@ int	floppy_drive_get_datarate_in_us(DENSITY density);
 void floppy_drive_set_rpm(const device_config *image, float rpm);
 
 void floppy_drive_set_controller(const device_config *img, const device_config *controller);
-
-enum
-{
-	MESS_DEVINFO_PTR_FLOPPY_OPTIONS = MESS_DEVINFO_PTR_DEV_SPECIFIC,
-	MESS_DEVINFO_INT_KEEP_DRIVE_GEOMETRY = MESS_DEVINFO_INT_DEV_SPECIFIC
-};
 
 floppy_image *flopimg_get_image(const device_config *image);
 

@@ -415,7 +415,8 @@ static const ay31015_config trs80_ay31015_config =
 static const floppy_config trs80_floppy_config =
 {
 	FLOPPY_DRIVE_DS_80,
-	FLOPPY_OPTIONS_NAME(trs80)
+	FLOPPY_OPTIONS_NAME(trs80),
+	DO_NOT_KEEP_GEOMETRY
 };
 
 static MACHINE_DRIVER_START( trs80 )		// the original model I, level I, with no extras

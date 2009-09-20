@@ -156,7 +156,8 @@ FLOPPY_OPTIONS_END
 static const floppy_config partner_floppy_config =
 {
 	FLOPPY_DRIVE_DS_80,
-	FLOPPY_OPTIONS_NAME(partner)
+	FLOPPY_OPTIONS_NAME(partner),
+	DO_NOT_KEEP_GEOMETRY
 };
 
 static MACHINE_DRIVER_START( partner )

@@ -462,7 +462,8 @@ static const mm58274c_interface floppy_mm58274c_interface =
 static const floppy_config geneve_floppy_config =
 {
 	FLOPPY_DRIVE_DS_80,
-	FLOPPY_OPTIONS_NAME(ti99)
+	FLOPPY_OPTIONS_NAME(ti99),
+	KEEP_GEOMETRY
 };
 
 static MACHINE_DRIVER_START(geneve_60hz)

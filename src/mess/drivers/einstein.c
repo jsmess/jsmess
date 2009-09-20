@@ -851,7 +851,8 @@ static const mc6845_interface einstein_crtc6845_interface =
 static const floppy_config einstein_floppy_config =
 {
 	FLOPPY_DRIVE_SS_40,
-	FLOPPY_OPTIONS_NAME(default)
+	FLOPPY_OPTIONS_NAME(default),
+	DO_NOT_KEEP_GEOMETRY
 };
 
 static MACHINE_DRIVER_START( einstein )

@@ -109,7 +109,8 @@ FLOPPY_OPTIONS_END
 static const floppy_config concept_floppy_config =
 {
 	FLOPPY_DRIVE_DS_80,
-	FLOPPY_OPTIONS_NAME(concept)
+	FLOPPY_OPTIONS_NAME(concept),
+	DO_NOT_KEEP_GEOMETRY
 };
 
 /* concept machine */

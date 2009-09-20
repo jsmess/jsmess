@@ -287,7 +287,8 @@ static PALETTE_INIT( dgnbeta )
 static const floppy_config dgnbeta_floppy_config =
 {
 	FLOPPY_DRIVE_DS_80,
-	FLOPPY_OPTIONS_NAME(coco)
+	FLOPPY_OPTIONS_NAME(coco),
+	DO_NOT_KEEP_GEOMETRY
 };
 
 static MACHINE_DRIVER_START( dgnbeta )

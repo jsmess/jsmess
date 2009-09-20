@@ -365,7 +365,8 @@ static MACHINE_RESET( spectrum_plus3 )
 static const floppy_config specpls3_floppy_config =
 {
 	FLOPPY_DRIVE_DS_80,
-	FLOPPY_OPTIONS_NAME(default)
+	FLOPPY_OPTIONS_NAME(default),
+	DO_NOT_KEEP_GEOMETRY
 };
 
 static MACHINE_DRIVER_START( spectrum_plus3 )

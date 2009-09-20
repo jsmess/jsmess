@@ -210,7 +210,8 @@ FLOPPY_OPTIONS_END
 static const floppy_config osborne1_floppy_config =
 {
 	FLOPPY_DRIVE_SS_40,
-	FLOPPY_OPTIONS_NAME(osborne1)
+	FLOPPY_OPTIONS_NAME(osborne1),
+	DO_NOT_KEEP_GEOMETRY
 };
 
 static MACHINE_DRIVER_START( osborne1 )

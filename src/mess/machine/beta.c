@@ -214,7 +214,8 @@ WRITE8_DEVICE_HANDLER(betadisk_data_w)
 static const floppy_config beta_floppy_config =
 {
 	FLOPPY_DRIVE_DS_80,
-	FLOPPY_OPTIONS_NAME(trd)
+	FLOPPY_OPTIONS_NAME(trd),
+	DO_NOT_KEEP_GEOMETRY
 };
 
 static MACHINE_DRIVER_START( beta_disk )
