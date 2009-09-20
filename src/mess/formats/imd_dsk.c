@@ -194,8 +194,22 @@ static floperr_t imd_get_indexed_sector_info(floppy_image *floppy, int head, int
 	if (sector_length) {
 		*sector_length = sector_size;
 	}
-	if (flags)
+	if (flags) {
+		UINT8 skip;
+		if (head & 0x40) {			
+			if (head & 0x80) {
+				skip = 3;				
+			} else {
+				skip = 2;
+			}			
+		} else {
+			skip = 1;
+		}		
+		floppy_image_read(floppy, header, offset + 5 + skip * sector_num, 1);
 		*flags = 0;
+		if ((header[0]-1) & 0x02) *flags |= ID_FLAG_DELETED_DATA;
+		if ((header[0]-1) & 0x04) *flags |= ID_FLAG_CRC_ERROR_IN_DATA_FIELD;		
+	}
 	return FLOPPY_ERROR_SUCCESS;
 }
 

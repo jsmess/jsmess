@@ -90,9 +90,11 @@ static floperr_t get_offset(floppy_image *floppy, int head, int track, int secto
 	for(i=0;i < sector-1;i++) {
 		floppy_image_read(floppy, header, offs, 6);
 		offs+= 6;
-		floppy_image_read(floppy, header+6, offs, 2);
-		offs+= 2;		
-		offs+= header[6] + (header[7]<<8);				
+		if ((header[4] & 0x30)==0) {
+			floppy_image_read(floppy, header+6, offs, 2);
+			offs+= 2;		
+			offs+= header[6] + (header[7]<<8);				
+		}
 	}	
 	// read size of sector
 	floppy_image_read(floppy, header, offs, 6);
@@ -125,6 +127,9 @@ static floperr_t internal_td0_read_sector(floppy_image *floppy, int head, int tr
 	// read sector header
 	floppy_image_read(floppy, header, offset, 6);
 	offset+=6;
+	// if there is no date just jump out
+	if ((header[4] & 0x30)!=0) return FLOPPY_ERROR_SUCCESS;
+		
 	floppy_image_read(floppy, header+6, offset, 3);
 	offset+=3;
 	// take data size
@@ -234,8 +239,12 @@ static floperr_t td0_get_indexed_sector_info(floppy_image *floppy, int head, int
 	if (sector_length) {
 		*sector_length = 1 << (sector_info[3] + 7);
 	}
-	if (flags)
+	if (flags) {
 		*flags = 0;
+		if (sector_info[4] & 0x02) *flags |= ID_FLAG_CRC_ERROR_IN_DATA_FIELD;
+		if (sector_info[4] & 0x04) *flags |= ID_FLAG_DELETED_DATA;
+	}
+		
 	return retVal;
 }
 
@@ -284,10 +293,13 @@ FLOPPY_CONSTRUCT( td0_dsk_construct )
 				floppy_image_read(floppy, header, position, 6);
 				position+=6;
 				// read sector size
-				floppy_image_read(floppy, header, position, 2);
-				position+=2;
-				// skip sector data
-				position+= header[0] + (header[1]<<8);
+				if ((header[4] & 0x30)==0) {
+					// if there is sector data
+					floppy_image_read(floppy, header, position, 2);
+					position+=2;
+					// skip sector data
+					position+= header[0] + (header[1]<<8);
+				}
 			}
 			tag->tracks++;
 		}		

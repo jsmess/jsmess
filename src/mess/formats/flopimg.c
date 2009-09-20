@@ -567,38 +567,6 @@ floperr_t floppy_write_indexed_sector(floppy_image *floppy, int head, int track,
 }
 
 
-
-floperr_t floppy_clear_sector(floppy_image *floppy, int head, int track, int sector, UINT8 data)
-{
-	floperr_t err;
-	UINT32 length;
-	UINT8 *buffer = NULL;
-
-	err = floppy_get_sector_length(floppy, head, track, sector, &length);
-	if (err)
-		goto done;
-
-	buffer = malloc(length);
-	if (err)
-	{
-		err = FLOPPY_ERROR_OUTOFMEMORY;
-		goto done;
-	}
-
-	memset(buffer, data, length);
-
-	err = floppy_write_sector(floppy, head, track, sector, 0, buffer, length, 0);
-	if (err)
-		goto done;
-
-done:
-	if (buffer)
-		free(buffer);
-	return err;
-}
-
-
-
 static floperr_t floppy_get_track_data_offset(floppy_image *floppy, int head, int track, UINT64 *offset)
 {
 	floperr_t err;
