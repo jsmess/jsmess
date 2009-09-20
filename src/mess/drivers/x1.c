@@ -353,14 +353,14 @@ static void draw_gfxbitmap(running_machine *machine, bitmap_t *bitmap,const rect
 
 					if(scrn_reg.v400_mode)
 					{
-						if((x+xi)<=video_screen_get_visible_area(machine->primary_screen)->max_x && ((y+yi)*2+0)<=video_screen_get_visible_area(machine->primary_screen)->max_y)
-							*BITMAP_ADDR16(bitmap, (y+yi)*2+0, x+xi) = machine->pens[color+0x100];
-						if((x+xi)<=video_screen_get_visible_area(machine->primary_screen)->max_x && ((y+yi)*2+1)<=video_screen_get_visible_area(machine->primary_screen)->max_y)
-							*BITMAP_ADDR16(bitmap, (y+yi)*2+1, x+xi) = machine->pens[color+0x100];
+						if((x*8+xi)<=video_screen_get_visible_area(machine->primary_screen)->max_x && (( y*(tile_height+1)+yi)*2+0)<=video_screen_get_visible_area(machine->primary_screen)->max_y)
+							*BITMAP_ADDR16(bitmap, ( y*(tile_height+1)+yi)*2+0, x*8+xi) = machine->pens[color+0x100];
+						if((x*8+xi)<=video_screen_get_visible_area(machine->primary_screen)->max_x && (( y*(tile_height+1)+yi)*2+1)<=video_screen_get_visible_area(machine->primary_screen)->max_y)
+							*BITMAP_ADDR16(bitmap, ( y*(tile_height+1)+yi)*2+1, x*8+xi) = machine->pens[color+0x100];
 					}
 					else
 					{
-						if((x+xi)<=video_screen_get_visible_area(machine->primary_screen)->max_x && (y+yi)<=video_screen_get_visible_area(machine->primary_screen)->max_y)
+						if((x*8+xi)<=video_screen_get_visible_area(machine->primary_screen)->max_x && (y*(tile_height+1)+yi)<=video_screen_get_visible_area(machine->primary_screen)->max_y)
 							*BITMAP_ADDR16(bitmap, y*(tile_height+1)+yi, x*8+xi) = machine->pens[color+0x100];
 					}
 				}
@@ -497,6 +497,10 @@ static UINT8 check_keyboard_press(running_machine *machine)
 				{
 					if(scancode >= 0x31 && scancode < 0x3a)
 						scancode -= 0x10;
+					if(scancode == 0x30)
+					{
+						scancode = 0x3d;
+					}
 				}
 				return scancode;
 			}
