@@ -277,7 +277,10 @@ FLOPPY_CONSTRUCT( td0_dsk_construct )
 	} 
 	
 	//  header len + comment header + comment len
-	position = 12 + 10 + header[14] + (header[15]<<8);
+	position = 12;
+	if (header[7] & 0x80) {
+		position += 10 + header[14] + (header[15]<<8);
+	}
 	tag->tracks = 0;
 	
 	do { 
@@ -287,7 +290,7 @@ FLOPPY_CONSTRUCT( td0_dsk_construct )
 		number_of_sectors = header[0];
 		if (number_of_sectors!=0xff){ 
 			position+=4;
-			tag->track_offsets[(track<<1) + header[2]] = position;
+			tag->track_offsets[(track<<1) + (header[2] & 1)] = position;
 			for(i=0;i<number_of_sectors;i++) {
 				// read sector header
 				floppy_image_read(floppy, header, position, 6);
