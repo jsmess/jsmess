@@ -103,6 +103,12 @@ static READ8_HANDLER( io_reg_r )
 			int row, col, keydata = 0, table = 0;
 			static const char *const keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7", "ROW8" };
 
+			if (input_port_read(space->machine, "ROW9") & 0x07)
+			{
+				/* shift, upper case */
+				table = 1;
+			}
+
 			/* scan keyboard */
 			for (row = 0; row < 9; row++)
 			{
