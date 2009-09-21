@@ -64,13 +64,13 @@ static void nes_machine_stop(running_machine *machine);
     FUNCTIONS
 ***************************************************************************/
 
-static const device_config *cartslot_image(running_machine *machine)
+static const device_config *cartslot_image( running_machine *machine )
 {
 	nes_state *state = machine->driver_data;
 	return state->cart;
 }
 
-static void init_nes_core(running_machine *machine)
+static void init_nes_core( running_machine *machine )
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
@@ -82,7 +82,7 @@ static void init_nes_core(running_machine *machine)
 	nes.wram = memory_region(machine, "user1");
 
 	/* Brutal hack put in as a consequence of the new memory system; we really
-	 * need to fix the NES code */
+     * need to fix the NES code */
 	memory_install_read8_handler(space, 0x0000, 0x07ff, 0, 0x1800, SMH_BANK(10));
 	memory_install_write8_handler(space, 0x0000, 0x07ff, 0, 0x1800, SMH_BANK(10));
 
@@ -98,9 +98,9 @@ static void init_nes_core(running_machine *machine)
 	{
 		case 20:
 			nes.slow_banking = 0;
-			/* If we are loading a disk we have already filled nes_fds.data and we don't want to overwrite it, 
-			if we are loading a cart image identified as mapper 20 (probably wrong mapper...) we need to alloc 
-			memory for the bank 2 pointer */
+			/* If we are loading a disk we have already filled nes_fds.data and we don't want to overwrite it,
+            if we are loading a cart image identified as mapper 20 (probably wrong mapper...) we need to alloc
+            memory for the bank 2 pointer */
 			if (nes_fds.data == NULL)
 				nes_fds.data = auto_alloc_array(machine, UINT8, 0x8000 );
 			memory_install_read8_handler(space, 0x4030, 0x403f, 0, 0, fds_r);
@@ -152,7 +152,7 @@ static void init_nes_core(running_machine *machine)
 			mmc_write_mid = mapper->mmc_write_mid;
 			mmc_write = mapper->mmc_write;
 			ppu_latch = mapper->ppu_latch;
-//			mmc_irq = mmc_list[i].mmc_irq;
+//          mmc_irq = mmc_list[i].mmc_irq;
 		}
 		else
 		{
@@ -164,7 +164,8 @@ static void init_nes_core(running_machine *machine)
 
 	/* Load a battery file, but only if there's no trainer since they share */
 	/* overlapping memory. */
-	if (nes.trainer) return;
+	if (nes.trainer)
+		return;
 
 	/* We need this because battery ram is loaded before the */
 	/* memory subsystem is set up. When this routine is called */
@@ -179,9 +180,9 @@ int nes_ppu_vidaccess( const device_config *device, int address, int data )
 	/* but, B-Wings, submath (j) seem to use this location differently... */
 	if (nes.chr_chunks && (address & 0x3fff) < 0x2000)
 	{
-//		int vrom_loc;
-//		vrom_loc = (nes_vram[(address & 0x1fff) >> 10] * 16) + (address & 0x3ff);
-//		data = nes.vrom [vrom_loc];
+//      int vrom_loc;
+//      vrom_loc = (nes_vram[(address & 0x1fff) >> 10] * 16) + (address & 0x3ff);
+//      data = nes.vrom [vrom_loc];
 	}
 	return data;
 }
@@ -213,7 +214,7 @@ MACHINE_START( nes )
 	add_exit_callback(machine, nes_machine_stop);
 }
 
-static void nes_machine_stop(running_machine *machine)
+static void nes_machine_stop( running_machine *machine )
 {
 	/* Write out the battery file if necessary */
 	if (nes.battery)
@@ -325,8 +326,8 @@ READ8_HANDLER( nes_IN1_r )
 
 
 
-static void nes_read_input_device(running_machine *machine, int cfg, nes_input *vals, int pad_port,
-	int supports_zapper, int paddle_port)
+static void nes_read_input_device( running_machine *machine, int cfg, nes_input *vals, int pad_port,
+	int supports_zapper, int paddle_port )
 {
 	static const char *const padnames[] = { "PAD1", "PAD2", "PAD3", "PAD4" };
 
@@ -398,7 +399,8 @@ WRITE8_HANDLER( nes_IN0_w )
 	nes_input in_2;
 	nes_input in_3;
 
-	if (data & 0x01) return;
+	if (data & 0x01)
+		return;
 
 	if (LOG_JOY)
 		logerror("joy 0 bits read: %d\n", in_0.shift);
@@ -465,12 +467,12 @@ DEVICE_IMAGE_LOAD( nes_cart )
 			nes.chr_chunks = mapint4;
 			logerror("NES.CRC info: %d %d %d %d\n",mapint1,mapint2,mapint3,mapint4);
 			goodcrcinfo = 1;
-		} 
+		}
 		else
 		{
 			logerror("NES: [%s], Invalid mapinfo found\n",mapinfo);
 		}
-	} 
+	}
 	else
 	{
 		logerror("NES: No extrainfo found\n");
@@ -506,7 +508,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 			if (skank[i] != 0x00)
 			{
 				logerror("(skank: %d)", i);
-//				m = 0;
+//              m = 0;
 			}
 		}
 		logerror("\n");

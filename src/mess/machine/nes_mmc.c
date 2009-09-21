@@ -1,26 +1,26 @@
 /*
-	TODO:
-	. 5 has some issues, RAM banking needs hardware flags to determine size
-	. 45 mapper is not fully working
-	. 51 only half of the games work
-	. 64 has some IRQ problems - see Skull & Crossbones
-	. 67 display issues, but vrom fixed
-	. 70 (ark2j) starts on round 0 - is this right? Yep!
-	. 82 has chr-rom banking problems. Also mapper is in the middle of sram, which is unemulated.
-	. 95 doesn't match documentation
-	. 96 is preliminary.
-	. 118 mirroring is a guess, chr-rom banking is likely different
-	. 164 preliminary - no sprites?
-	. 228 seems wrong
-	. 229 is preliminary
-	. 230 not working yet
-	. 232 not working yet
-	. 241 preliminary
+    TODO:
+    . 5 has some issues, RAM banking needs hardware flags to determine size
+    . 45 mapper is not fully working
+    . 51 only half of the games work
+    . 64 has some IRQ problems - see Skull & Crossbones
+    . 67 display issues, but vrom fixed
+    . 70 (ark2j) starts on round 0 - is this right? Yep!
+    . 82 has chr-rom banking problems. Also mapper is in the middle of sram, which is unemulated.
+    . 95 doesn't match documentation
+    . 96 is preliminary.
+    . 118 mirroring is a guess, chr-rom banking is likely different
+    . 164 preliminary - no sprites?
+    . 228 seems wrong
+    . 229 is preliminary
+    . 230 not working yet
+    . 232 not working yet
+    . 241 preliminary
 
-	AD&D Hillsfar (mapper 1) seems to be broken. Not sure what's up there
+    AD&D Hillsfar (mapper 1) seems to be broken. Not sure what's up there
 
-	Also, remember that the MMC does not equal the mapper #. In particular, Mapper 4 is
-	really MMC3, Mapper 9 is MMC2 and Mapper 10 is MMC4. Makes perfect sense, right?
+    Also, remember that the MMC does not equal the mapper #. In particular, Mapper 4 is
+    really MMC3, Mapper 9 is MMC2 and Mapper 10 is MMC4. Makes perfect sense, right?
 */
 
 #include "cpu/m6502/m6502.h"
@@ -178,14 +178,15 @@ READ8_HANDLER( nes_nt_r )
 
 WRITE8_HANDLER( nes_low_mapper_w )
 {
-	if (mmc_write_low) (*mmc_write_low)(space, offset, data);
+	if (mmc_write_low)
+		(*mmc_write_low)(space, offset, data);
 	else
 	{
 		logerror("Unimplemented LOW mapper write, offset: %04x, data: %02x\n", offset, data);
 #ifdef MAME_DEBUG
 		if (!mapper_warning)
 		{
-			logerror ("This game is writing to the low mapper area but no mapper is set. You may get better results by switching to a valid mapper.\n");
+			logerror("This game is writing to the low mapper area but no mapper is set. You may get better results by switching to a valid mapper.\n");
 			mapper_warning = 1;
 		}
 #endif
@@ -205,16 +206,17 @@ READ8_HANDLER( nes_low_mapper_r )
 
 WRITE8_HANDLER( nes_mid_mapper_w )
 {
-	if (mmc_write_mid) (*mmc_write_mid)(space, offset, data);
+	if (mmc_write_mid)
+		(*mmc_write_mid)(space, offset, data);
 	else if (nes.mid_ram_enable)
 		nes_battery_ram[offset] = data;
 	else
 	{
 		logerror("Unimplemented MID mapper write, offset: %04x, data: %02x\n", offset, data);
 #ifdef MAME_DEBUG
-		if (! mapper_warning)
+		if (!mapper_warning)
 		{
-			logerror ("This game is writing to the MID mapper area but no mapper is set. You may get better results by switching to a valid mapper or changing the battery flag for this ROM.\n");
+			logerror("This game is writing to the MID mapper area but no mapper is set. You may get better results by switching to a valid mapper or changing the battery flag for this ROM.\n");
 			mapper_warning = 1;
 		}
 #endif
@@ -231,12 +233,13 @@ READ8_HANDLER( nes_mid_mapper_r )
 
 WRITE8_HANDLER( nes_mapper_w )
 {
-	if (mmc_write) (*mmc_write)(space, offset, data);
+	if (mmc_write)
+		(*mmc_write)(space, offset, data);
 	else
 	{
 		logerror("Unimplemented mapper write, offset: %04x, data: %02x\n", offset, data);
 #if 1
-		if (! mapper_warning)
+		if (!mapper_warning)
 		{
 			logerror("This game is writing to the mapper area but no mapper is set. You may get better results by switching to a valid mapper.\n");
 			mapper_warning = 1;
@@ -248,8 +251,8 @@ WRITE8_HANDLER( nes_mapper_w )
 			/* It's really 35-in-1, and it's mostly different versions of Battle City. Unfortunately, the vrom dumps are bad */
 			case 0x7fde:
 				data &= (nes.prg_chunks - 1);
-				memory_set_bankptr (space->machine, 3, &nes.rom[data * 0x4000 + 0x10000]);
-				memory_set_bankptr (space->machine, 4, &nes.rom[data * 0x4000 + 0x12000]);
+				memory_set_bankptr(space->machine, 3, &nes.rom[data * 0x4000 + 0x10000]);
+				memory_set_bankptr(space->machine, 4, &nes.rom[data * 0x4000 + 0x12000]);
 				break;
 		}
 #endif
@@ -262,7 +265,7 @@ WRITE8_HANDLER( nes_mapper_w )
 
 static void ppu_mirror_MMC5( int page, int src )
 {
-	switch(src)
+	switch (src)
 	{
 	case 0:	/* CIRAM0 */
 		set_nt_page(page, CIRAM, 0, 1);
@@ -271,12 +274,12 @@ static void ppu_mirror_MMC5( int page, int src )
 		set_nt_page(page, CIRAM, 1, 1);
 		break;
 	case 2:	/* ExRAM */
-		set_nt_page(page, EXRAM, 0, 1);	// actually only works during rendering. 
+		set_nt_page(page, EXRAM, 0, 1);	// actually only works during rendering.
 		break;
 	case 3: /* Fill Registers */
 		set_nt_page(page, MMC5FILL, 0, 0);
 		break;
-	default:	
+	default:
 		fatalerror("This should never happen");
 		break;
 	}
@@ -294,17 +297,17 @@ static void prg8_89 (const address_space *space, int bank)
 	if (nes.slow_banking)
 		memcpy (&nes.rom[0x8000], &nes.rom[bank * 0x2000 + 0x10000], 0x2000);
 	else
-		memory_set_bankptr (space->machine, 1, &nes.rom[bank * 0x2000 + 0x10000]);
+		memory_set_bankptr(space->machine, 1, &nes.rom[bank * 0x2000 + 0x10000]);
 }
 
-static void prg8_ab (const address_space *space, int bank)
+static void prg8_ab(const address_space *space, int bank)
 {
 	/* assumes that bank references an 8k chunk */
 	bank &= ((nes.prg_chunks << 1) - 1);
 	if (nes.slow_banking)
 		memcpy (&nes.rom[0xa000], &nes.rom[bank * 0x2000 + 0x10000], 0x2000);
 	else
-		memory_set_bankptr (space->machine, 2, &nes.rom[bank * 0x2000 + 0x10000]);
+		memory_set_bankptr(space->machine, 2, &nes.rom[bank * 0x2000 + 0x10000]);
 }
 
 static void prg8_cd (const address_space *space, int bank)
@@ -314,20 +317,20 @@ static void prg8_cd (const address_space *space, int bank)
 	if (nes.slow_banking)
 		memcpy (&nes.rom[0xc000], &nes.rom[bank * 0x2000 + 0x10000], 0x2000);
 	else
-		memory_set_bankptr (space->machine, 3, &nes.rom[bank * 0x2000 + 0x10000]);
+		memory_set_bankptr(space->machine, 3, &nes.rom[bank * 0x2000 + 0x10000]);
 }
 
-static void prg8_ef (const address_space *space, int bank)
+static void prg8_ef(const address_space *space, int bank)
 {
 	/* assumes that bank references an 8k chunk */
 	bank &= ((nes.prg_chunks << 1) - 1);
 	if (nes.slow_banking)
 		memcpy (&nes.rom[0xe000], &nes.rom[bank * 0x2000 + 0x10000], 0x2000);
 	else
-		memory_set_bankptr (space->machine, 4, &nes.rom[bank * 0x2000 + 0x10000]);
+		memory_set_bankptr(space->machine, 4, &nes.rom[bank * 0x2000 + 0x10000]);
 }
 
-static void prg16_89ab (const address_space *space, int bank)
+static void prg16_89ab(const address_space *space, int bank)
 {
 	/* assumes that bank references a 16k chunk */
 	bank &= (nes.prg_chunks - 1);
@@ -335,12 +338,12 @@ static void prg16_89ab (const address_space *space, int bank)
 		memcpy (&nes.rom[0x8000], &nes.rom[bank * 0x4000 + 0x10000], 0x4000);
 	else
 	{
-		memory_set_bankptr (space->machine, 1, &nes.rom[bank * 0x4000 + 0x10000]);
-		memory_set_bankptr (space->machine, 2, &nes.rom[bank * 0x4000 + 0x12000]);
+		memory_set_bankptr(space->machine, 1, &nes.rom[bank * 0x4000 + 0x10000]);
+		memory_set_bankptr(space->machine, 2, &nes.rom[bank * 0x4000 + 0x12000]);
 	}
 }
 
-static void prg16_cdef (const address_space *space, int bank)
+static void prg16_cdef(const address_space *space, int bank)
 {
 	/* assumes that bank references a 16k chunk */
 	bank &= (nes.prg_chunks - 1);
@@ -348,12 +351,12 @@ static void prg16_cdef (const address_space *space, int bank)
 		memcpy (&nes.rom[0xc000], &nes.rom[bank * 0x4000 + 0x10000], 0x4000);
 	else
 	{
-		memory_set_bankptr (space->machine, 3, &nes.rom[bank * 0x4000 + 0x10000]);
-		memory_set_bankptr (space->machine, 4, &nes.rom[bank * 0x4000 + 0x12000]);
+		memory_set_bankptr(space->machine, 3, &nes.rom[bank * 0x4000 + 0x10000]);
+		memory_set_bankptr(space->machine, 4, &nes.rom[bank * 0x4000 + 0x12000]);
 	}
 }
 
-static void prg32 (const address_space *space, int bank)
+static void prg32(const address_space *space, int bank)
 {
 	/* assumes that bank references a 32k chunk */
 	bank &= ((nes.prg_chunks >> 1) - 1);
@@ -361,10 +364,10 @@ static void prg32 (const address_space *space, int bank)
 		memcpy (&nes.rom[0x8000], &nes.rom[bank * 0x8000 + 0x10000], 0x8000);
 	else
 	{
-		memory_set_bankptr (space->machine, 1, &nes.rom[bank * 0x8000 + 0x10000]);
-		memory_set_bankptr (space->machine, 2, &nes.rom[bank * 0x8000 + 0x12000]);
-		memory_set_bankptr (space->machine, 3, &nes.rom[bank * 0x8000 + 0x14000]);
-		memory_set_bankptr (space->machine, 4, &nes.rom[bank * 0x8000 + 0x16000]);
+		memory_set_bankptr(space->machine, 1, &nes.rom[bank * 0x8000 + 0x10000]);
+		memory_set_bankptr(space->machine, 2, &nes.rom[bank * 0x8000 + 0x12000]);
+		memory_set_bankptr(space->machine, 3, &nes.rom[bank * 0x8000 + 0x14000]);
+		memory_set_bankptr(space->machine, 4, &nes.rom[bank * 0x8000 + 0x16000]);
 	}
 }
 
@@ -387,7 +390,7 @@ static void set_nt_page( int page, int source, int bank, int writable )
 			base_ptr = MMC5_vram;
 			break;
 		case CIRAM:
-		default: 
+		default:
 			base_ptr = nes.ciram;
 			break;
 	}
@@ -456,7 +459,7 @@ static void chr8( running_machine *machine, int bank, int source )
 {
 	int i;
 
-	bank &= (nes.chr_chunks - 1);	
+	bank &= (nes.chr_chunks - 1);
 	for (i = 0; i < 8; i++)
 	{
 		chr_map[i].source = source;
@@ -464,7 +467,7 @@ static void chr8( running_machine *machine, int bank, int source )
 
 		if (source == CHRRAM)
 			chr_map[i].access = &nes.vram[chr_map[i].origin];
-		else 
+		else
 			chr_map[i].access = &nes.vrom[chr_map[i].origin];
 	}
 }
@@ -481,7 +484,7 @@ static void chr4_x( running_machine *machine, int start, int bank, int source )
 
 		if (source == CHRRAM)
 			chr_map[i+start].access = &nes.vram[chr_map[i + start].origin];
-		else 
+		else
 			chr_map[i+start].access = &nes.vrom[chr_map[i + start].origin];
 	}
 }
@@ -541,7 +544,7 @@ static void chr1_x( running_machine *machine, int start, int bank, int source )
 
 	if (source == CHRRAM)
 		chr_map[start].access = &nes.vram[chr_map[start].origin];
-	else 
+	else
 		chr_map[start].access = &nes.vrom[chr_map[start].origin];
 }
 
@@ -618,7 +621,7 @@ static WRITE8_HANDLER( mapper1_w )
 
 	if (MMC1_reg_count == 5)
 	{
-//		logerror("   MMC1 reg#%02x val:%02x\n", offset, MMC1_reg);
+//      logerror("   MMC1 reg#%02x val:%02x\n", offset, MMC1_reg);
 		switch (reg)
 		{
 			case 0:
@@ -662,10 +665,10 @@ static WRITE8_HANDLER( mapper1_w )
 				 	{
 						/* Pick 1st or 4th 256k bank */
 						MMC1_extended_base = 0xc0000 * (MMC1_extended_bank & 0x01) + 0x10000;
-						memory_set_bankptr (space->machine, 1, &nes.rom[MMC1_extended_base + MMC1_bank1]);
-						memory_set_bankptr (space->machine, 2, &nes.rom[MMC1_extended_base + MMC1_bank2]);
-						memory_set_bankptr (space->machine, 3, &nes.rom[MMC1_extended_base + MMC1_bank3]);
-						memory_set_bankptr (space->machine, 4, &nes.rom[MMC1_extended_base + MMC1_bank4]);
+						memory_set_bankptr(space->machine, 1, &nes.rom[MMC1_extended_base + MMC1_bank1]);
+						memory_set_bankptr(space->machine, 2, &nes.rom[MMC1_extended_base + MMC1_bank2]);
+						memory_set_bankptr(space->machine, 3, &nes.rom[MMC1_extended_base + MMC1_bank3]);
+						memory_set_bankptr(space->machine, 4, &nes.rom[MMC1_extended_base + MMC1_bank4]);
 						LOG_MMC(("MMC1_extended 1024k bank (no reg) select: %02x\n", MMC1_extended_bank));
 					}
 					else
@@ -674,10 +677,10 @@ static WRITE8_HANDLER( mapper1_w )
 						if (MMC1_extended_swap)
 						{
 							MMC1_extended_base = 0x40000 * MMC1_extended_bank + 0x10000;
-							memory_set_bankptr (space->machine, 1, &nes.rom[MMC1_extended_base + MMC1_bank1]);
-							memory_set_bankptr (space->machine, 2, &nes.rom[MMC1_extended_base + MMC1_bank2]);
-							memory_set_bankptr (space->machine, 3, &nes.rom[MMC1_extended_base + MMC1_bank3]);
-							memory_set_bankptr (space->machine, 4, &nes.rom[MMC1_extended_base + MMC1_bank4]);
+							memory_set_bankptr(space->machine, 1, &nes.rom[MMC1_extended_base + MMC1_bank1]);
+							memory_set_bankptr(space->machine, 2, &nes.rom[MMC1_extended_base + MMC1_bank2]);
+							memory_set_bankptr(space->machine, 3, &nes.rom[MMC1_extended_base + MMC1_bank3]);
+							memory_set_bankptr(space->machine, 4, &nes.rom[MMC1_extended_base + MMC1_bank4]);
 							LOG_MMC(("MMC1_extended 1024k bank (reg 1) select: %02x\n", MMC1_extended_bank));
 							MMC1_extended_swap = 0;
 						}
@@ -688,21 +691,20 @@ static WRITE8_HANDLER( mapper1_w )
 				{
 					/* Pick 1st or 2nd 256k bank */
 					MMC1_extended_base = 0x40000 * (MMC1_extended_bank & 0x01) + 0x10000;
-					memory_set_bankptr (space->machine, 1, &nes.rom[MMC1_extended_base + MMC1_bank1]);
-					memory_set_bankptr (space->machine, 2, &nes.rom[MMC1_extended_base + MMC1_bank2]);
-					memory_set_bankptr (space->machine, 3, &nes.rom[MMC1_extended_base + MMC1_bank3]);
-					memory_set_bankptr (space->machine, 4, &nes.rom[MMC1_extended_base + MMC1_bank4]);
+					memory_set_bankptr(space->machine, 1, &nes.rom[MMC1_extended_base + MMC1_bank1]);
+					memory_set_bankptr(space->machine, 2, &nes.rom[MMC1_extended_base + MMC1_bank2]);
+					memory_set_bankptr(space->machine, 3, &nes.rom[MMC1_extended_base + MMC1_bank3]);
+					memory_set_bankptr(space->machine, 4, &nes.rom[MMC1_extended_base + MMC1_bank4]);
 					LOG_MMC(("MMC1_extended 512k bank select: %02x\n", MMC1_extended_bank & 0x01));
 				}
 				else if (nes.chr_chunks > 0)
 				{
-//					logerror("MMC1_SizeVrom_4k: %02x bank:%02x\n", MMC1_SizeVrom_4k, MMC1_reg);
+//                  logerror("MMC1_SizeVrom_4k: %02x bank:%02x\n", MMC1_SizeVrom_4k, MMC1_reg);
 
 					if (!MMC1_SizeVrom_4k)
 					{
-						/* chr_chunks is the numer of 4k blocks. we take care of the actual bank size 
-						when we divide bank by 2 in the chr8 call */
-						//int bank = MMC1_reg & (nes.chr_chunks - 1);	// this breaks Pinball Quest
+						/* we take care of the actual bank size when we divide bank by 2 in the chr8 call */
+						//int bank = MMC1_reg & (nes.chr_chunks - 1);   // this breaks Pinball Quest
 						int bank = MMC1_reg & ((nes.chr_chunks << 1) - 1);
 						chr8(space->machine, bank >> 1, CHRROM);
 						LOG_MMC(("MMC1 8k VROM switch: %02x\n", MMC1_reg));
@@ -716,7 +718,7 @@ static WRITE8_HANDLER( mapper1_w )
 				}
 				break;
 			case 2:
-//				logerror("MMC1_Reg_2: %02x\n",MMC1_Reg_2);
+//              logerror("MMC1_Reg_2: %02x\n",MMC1_Reg_2);
 				MMC1_extended_bank = (MMC1_extended_bank & ~0x02) | ((MMC1_reg & 0x10) >> 3);
 				if (MMC1_extended == 2 && MMC1_SizeVrom_4k)
 				{
@@ -724,10 +726,10 @@ static WRITE8_HANDLER( mapper1_w )
 					{
 						/* Set 256k bank based on the 256k bank select register */
 						MMC1_extended_base = 0x40000 * MMC1_extended_bank + 0x10000;
-						memory_set_bankptr (space->machine, 1, &nes.rom[MMC1_extended_base + MMC1_bank1]);
-						memory_set_bankptr (space->machine, 2, &nes.rom[MMC1_extended_base + MMC1_bank2]);
-						memory_set_bankptr (space->machine, 3, &nes.rom[MMC1_extended_base + MMC1_bank3]);
-						memory_set_bankptr (space->machine, 4, &nes.rom[MMC1_extended_base + MMC1_bank4]);
+						memory_set_bankptr(space->machine, 1, &nes.rom[MMC1_extended_base + MMC1_bank1]);
+						memory_set_bankptr(space->machine, 2, &nes.rom[MMC1_extended_base + MMC1_bank2]);
+						memory_set_bankptr(space->machine, 3, &nes.rom[MMC1_extended_base + MMC1_bank3]);
+						memory_set_bankptr(space->machine, 4, &nes.rom[MMC1_extended_base + MMC1_bank4]);
 						LOG_MMC(("MMC1_extended 1024k bank (reg 2) select: %02x\n", MMC1_extended_bank));
 						MMC1_extended_swap = 0;
 					}
@@ -750,14 +752,14 @@ static WRITE8_HANDLER( mapper1_w )
 
 					MMC1_bank1 = bank * 0x4000;
 					MMC1_bank2 = bank * 0x4000 + 0x2000;
-					memory_set_bankptr (space->machine, 1, &nes.rom[MMC1_extended_base + MMC1_bank1]);
-					memory_set_bankptr (space->machine, 2, &nes.rom[MMC1_extended_base + MMC1_bank2]);
+					memory_set_bankptr(space->machine, 1, &nes.rom[MMC1_extended_base + MMC1_bank1]);
+					memory_set_bankptr(space->machine, 2, &nes.rom[MMC1_extended_base + MMC1_bank2]);
 					if (!MMC1_extended)
 					{
 						MMC1_bank3 = bank * 0x4000 + 0x4000;
 						MMC1_bank4 = bank * 0x4000 + 0x6000;
-						memory_set_bankptr (space->machine, 3, &nes.rom[MMC1_extended_base + MMC1_bank3]);
-						memory_set_bankptr (space->machine, 4, &nes.rom[MMC1_extended_base + MMC1_bank4]);
+						memory_set_bankptr(space->machine, 3, &nes.rom[MMC1_extended_base + MMC1_bank3]);
+						memory_set_bankptr(space->machine, 4, &nes.rom[MMC1_extended_base + MMC1_bank4]);
 					}
 					LOG_MMC(("MMC1 32k bank select: %02x\n", MMC1_reg));
 				}
@@ -771,14 +773,14 @@ static WRITE8_HANDLER( mapper1_w )
 						MMC1_bank1 = bank * 0x4000;
 						MMC1_bank2 = bank * 0x4000 + 0x2000;
 
-						memory_set_bankptr (space->machine, 1, &nes.rom[MMC1_extended_base + MMC1_bank1]);
-						memory_set_bankptr (space->machine, 2, &nes.rom[MMC1_extended_base + MMC1_bank2]);
+						memory_set_bankptr(space->machine, 1, &nes.rom[MMC1_extended_base + MMC1_bank1]);
+						memory_set_bankptr(space->machine, 2, &nes.rom[MMC1_extended_base + MMC1_bank2]);
 						if (!MMC1_extended)
 						{
 							MMC1_bank3 = MMC1_High;
 							MMC1_bank4 = MMC1_High + 0x2000;
-							memory_set_bankptr (space->machine, 3, &nes.rom[MMC1_extended_base + MMC1_bank3]);
-							memory_set_bankptr (space->machine, 4, &nes.rom[MMC1_extended_base + MMC1_bank4]);
+							memory_set_bankptr(space->machine, 3, &nes.rom[MMC1_extended_base + MMC1_bank3]);
+							memory_set_bankptr(space->machine, 4, &nes.rom[MMC1_extended_base + MMC1_bank4]);
 						}
 						LOG_MMC(("MMC1 16k-low bank select: %02x\n", MMC1_reg));
 					}
@@ -794,10 +796,10 @@ static WRITE8_HANDLER( mapper1_w )
 							MMC1_bank3 = bank * 0x4000;
 							MMC1_bank4 = bank * 0x4000 + 0x2000;
 
-							memory_set_bankptr (space->machine, 1, &nes.rom[MMC1_extended_base + MMC1_bank1]);
-							memory_set_bankptr (space->machine, 2, &nes.rom[MMC1_extended_base + MMC1_bank2]);
-							memory_set_bankptr (space->machine, 3, &nes.rom[MMC1_extended_base + MMC1_bank3]);
-							memory_set_bankptr (space->machine, 4, &nes.rom[MMC1_extended_base + MMC1_bank4]);
+							memory_set_bankptr(space->machine, 1, &nes.rom[MMC1_extended_base + MMC1_bank1]);
+							memory_set_bankptr(space->machine, 2, &nes.rom[MMC1_extended_base + MMC1_bank2]);
+							memory_set_bankptr(space->machine, 3, &nes.rom[MMC1_extended_base + MMC1_bank3]);
+							memory_set_bankptr(space->machine, 4, &nes.rom[MMC1_extended_base + MMC1_bank4]);
 						}
 						LOG_MMC(("MMC1 16k-high bank select: %02x\n", MMC1_reg));
 					}
@@ -815,12 +817,12 @@ static WRITE8_HANDLER( mapper1_w )
 
 static WRITE8_HANDLER( mapper2_w )
 {
-	prg16_89ab (space, data);
+	prg16_89ab(space, data);
 }
 
 static WRITE8_HANDLER( mapper3_w )
 {
-	chr8 (space->machine, data, CHRROM);
+	chr8(space->machine, data, CHRROM);
 }
 
 static void mapper4_set_prg( running_machine *machine )
@@ -872,7 +874,7 @@ static void mapper4_irq( const device_config *device, int scanline, int vblank, 
 		{
 			logerror("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline, video_screen_get_vpos(device->machine->primary_screen), video_screen_get_hpos(device->machine->primary_screen));
 			cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
-//			timer_adjust_oneshot(nes_irq_timer, cputag_clocks_to_attotime(device->machine, "maincpu", 4), 0);
+//          timer_adjust_oneshot(nes_irq_timer, cputag_clocks_to_attotime(device->machine, "maincpu", 4), 0);
 		}
 	}
 }
@@ -881,7 +883,7 @@ static WRITE8_HANDLER( mapper4_w )
 {
 	static UINT8 last_bank = 0xff;
 
-//	logerror("mapper4_w offset: %04x, data: %02x, scanline: %d\n", offset, data, current_scanline);
+//  logerror("mapper4_w offset: %04x, data: %02x, scanline: %d\n", offset, data, current_scanline);
 
 	//only bits 14,13, and 0 matter for offset!
 	switch (offset & 0x6001)
@@ -949,12 +951,12 @@ static WRITE8_HANDLER( mapper4_w )
 
 		case 0x4000: /* $c000 - IRQ scanline counter */
 			IRQ_count_latch = data;
-//			LOG_MMC(("     MMC3 set irq count latch: %02x (scanline %d)\n", data, ppu2c0x_get_current_scanline(0)));
+//          LOG_MMC(("     MMC3 set irq count latch: %02x (scanline %d)\n", data, ppu2c0x_get_current_scanline(0)));
 			break;
 
 		case 0x4001: /* $c001 - IRQ scanline latch */
 			IRQ_reload = 1;
-//			LOG_MMC(("     MMC3 set irq reload (scanline %d)\n", ppu2c0x_get_current_scanline(0)));
+//          LOG_MMC(("     MMC3 set irq reload (scanline %d)\n", ppu2c0x_get_current_scanline(0)));
 			break;
 
 		case 0x6000: /* $e000 - Disable IRQs */
@@ -977,7 +979,7 @@ static WRITE8_HANDLER( mapper118_w )
 {
 	static UINT8 last_bank = 0xff;
 
-//	logerror("mapper4_w offset: %04x, data: %02x, scanline: %d\n", offset, data, current_scanline);
+//  logerror("mapper4_w offset: %04x, data: %02x, scanline: %d\n", offset, data, current_scanline);
 
 	//uses just bits 14, 13, and 0
 	switch (offset & 0x6001)
@@ -1070,7 +1072,7 @@ static void mapper119_set_chr( running_machine *machine )
 	UINT8 chr_page = (MMC3_cmd & 0x80) >> 5;
 	if (MMC3_chr[0] & 0x40)
 		chr2_x(machine, chr_page ^ 0, (MMC3_chr[0] >> 1) & 0x03, CHRRAM);
-	else 
+	else
 		chr2_x(machine, chr_page ^ 0, ((MMC3_chr[0] & 0x3f) >> 1), CHRROM);
 
 	if (MMC3_chr[1] & 0x40)
@@ -1103,7 +1105,7 @@ static WRITE8_HANDLER( mapper119_w )
 {
 	static UINT8 last_bank = 0xff;
 
-//	logerror("mapper4_w offset: %04x, data: %02x, scanline: %d\n", offset, data, current_scanline);
+//  logerror("mapper4_w offset: %04x, data: %02x, scanline: %d\n", offset, data, current_scanline);
 
 	//only bits 14,13, and 0 matter for offset!
 	switch (offset & 0x6001)
@@ -1170,12 +1172,12 @@ static WRITE8_HANDLER( mapper119_w )
 
 		case 0x4000: /* $c000 - IRQ scanline counter */
 			IRQ_count_latch = data;
-//			LOG_MMC(("     MMC3 set irq count latch: %02x (scanline %d)\n", data, ppu2c0x_get_current_scanline(0)));
+//          LOG_MMC(("     MMC3 set irq count latch: %02x (scanline %d)\n", data, ppu2c0x_get_current_scanline(0)));
 			break;
 
 		case 0x4001: /* $c001 - IRQ scanline latch */
 			IRQ_reload = 1;
-//			LOG_MMC(("     MMC3 set irq reload (scanline %d)\n", ppu2c0x_get_current_scanline(0)));
+//          LOG_MMC(("     MMC3 set irq reload (scanline %d)\n", ppu2c0x_get_current_scanline(0)));
 			break;
 
 		case 0x6000: /* $e000 - Disable IRQs */
@@ -1227,9 +1229,9 @@ static READ8_HANDLER( mapper5_l_r )
 	{
 		case 0x1104: /* $5204 */
 #if 0
-			if (current_scanline == MMC5_scanline) 
+			if (current_scanline == MMC5_scanline)
 				return 0x80;
-			else 
+			else
 				return 0x00;
 #else
 			retVal = IRQ_status;
@@ -1250,21 +1252,21 @@ static READ8_HANDLER( mapper5_l_r )
 
 //static void mapper5_sync_vrom (int mode)
 //{
-//	int i;
+//  int i;
 //
-//	for (i = 0; i < 8; i ++)
-//		nes_vram[i] = vrom_bank[0 + (mode * 8)] * 64;
+//  for (i = 0; i < 8; i ++)
+//      nes_vram[i] = vrom_bank[0 + (mode * 8)] * 64;
 //}
 
 static WRITE8_HANDLER( mapper5_l_w )
 {
 	nes_state *state = space->machine->driver_data;
 
-//	static int vrom_next[4];
+//  static int vrom_next[4];
 	static int vrom_page_a;
 	static int vrom_page_b;
 
-//	logerror("Mapper 5 write, offset: %04x, data: %02x\n", offset + 0x4100, data);
+//  logerror("Mapper 5 write, offset: %04x, data: %02x\n", offset + 0x4100, data);
 	/* Send $5000-$5015 to the sound chip */
 	if ((offset >= 0xf00) && (offset <= 0xf15))
 	{
@@ -1329,16 +1331,16 @@ static WRITE8_HANDLER( mapper5_l_w )
 			switch (data & 3)
 			{
 			default:
-			case 0: MMC5_floodattr = 0x00; break; 
-			case 1: MMC5_floodattr = 0x55; break; 
-			case 2: MMC5_floodattr = 0xaa; break; 
-			case 3: MMC5_floodattr = 0xff; break; 
+			case 0: MMC5_floodattr = 0x00; break;
+			case 1: MMC5_floodattr = 0x55; break;
+			case 2: MMC5_floodattr = 0xaa; break;
+			case 3: MMC5_floodattr = 0xff; break;
 			}
 			break;
 
 		case 0x1013: /* $5113 */
 			logerror ("MMC5 mid RAM bank select: %02x\n", data & 0x07);
-			memory_set_bankptr (space->machine, 5, &nes.wram[data * 0x2000]);
+			memory_set_bankptr(space->machine, 5, &nes.wram[data * 0x2000]);
 			/* The & 4 is a hack that'll tide us over for now */
 			nes_battery_ram = &nes.wram[(data & 4) * 0x2000];
 			break;
@@ -1354,14 +1356,14 @@ static WRITE8_HANDLER( mapper5_l_w )
 						/* ROM */
 						logerror ("\tROM bank select (8k, $8000): %02x\n", data);
 						data &= ((nes.prg_chunks << 1) - 1);
-						memory_set_bankptr (space->machine, 1, &nes.rom[data * 0x2000 + 0x10000]);
+						memory_set_bankptr(space->machine, 1, &nes.rom[data * 0x2000 + 0x10000]);
 					}
 					else
 					{
 						/* RAM */
 						logerror ("\tRAM bank select (8k, $8000): %02x\n", data & 0x07);
 						/* The & 4 is a hack that'll tide us over for now */
-						memory_set_bankptr (space->machine, 1, &nes.wram[(data & 4) * 0x2000]);
+						memory_set_bankptr(space->machine, 1, &nes.wram[(data & 4) * 0x2000]);
 					}
 					break;
 			}
@@ -1375,15 +1377,15 @@ static WRITE8_HANDLER( mapper5_l_w )
 					if (data & 0x80)
 					{
 						/* 16k switch - ROM only */
-						prg16_89ab (space, (data & 0x7f) >> 1);
+						prg16_89ab(space, (data & 0x7f) >> 1);
 					}
 					else
 					{
 						/* RAM */
 						logerror ("\tRAM bank select (16k, $8000): %02x\n", data & 0x07);
 						/* The & 4 is a hack that'll tide us over for now */
-						memory_set_bankptr (space->machine, 1, &nes.wram[((data & 4) >> 1) * 0x4000]);
-						memory_set_bankptr (space->machine, 2, &nes.wram[((data & 4) >> 1) * 0x4000 + 0x2000]);
+						memory_set_bankptr(space->machine, 1, &nes.wram[((data & 4) >> 1) * 0x4000]);
+						memory_set_bankptr(space->machine, 2, &nes.wram[((data & 4) >> 1) * 0x4000 + 0x2000]);
 					}
 					break;
 				case 0x03:
@@ -1392,14 +1394,14 @@ static WRITE8_HANDLER( mapper5_l_w )
 					{
 						/* ROM */
 						data &= ((nes.prg_chunks << 1) - 1);
-						memory_set_bankptr (space->machine, 2, &nes.rom[data * 0x2000 + 0x10000]);
+						memory_set_bankptr(space->machine, 2, &nes.rom[data * 0x2000 + 0x10000]);
 					}
 					else
 					{
 						/* RAM */
 						logerror ("\tRAM bank select (8k, $a000): %02x\n", data & 0x07);
 						/* The & 4 is a hack that'll tide us over for now */
-						memory_set_bankptr (space->machine, 2, &nes.wram[(data & 4) * 0x2000]);
+						memory_set_bankptr(space->machine, 2, &nes.wram[(data & 4) * 0x2000]);
 					}
 					break;
 			}
@@ -1415,14 +1417,14 @@ static WRITE8_HANDLER( mapper5_l_w )
 					{
 						/* ROM */
 						data &= ((nes.prg_chunks << 1) - 1);
-						memory_set_bankptr (space->machine, 3, &nes.rom[data * 0x2000 + 0x10000]);
+						memory_set_bankptr(space->machine, 3, &nes.rom[data * 0x2000 + 0x10000]);
 					}
 					else
 					{
 						/* RAM */
 						logerror ("\tRAM bank select (8k, $c000): %02x\n", data & 0x07);
 						/* The & 4 is a hack that'll tide us over for now */
-						memory_set_bankptr (space->machine, 3, &nes.wram[(data & 4)* 0x2000]);
+						memory_set_bankptr(space->machine, 3, &nes.wram[(data & 4)* 0x2000]);
 					}
 					break;
 			}
@@ -1433,17 +1435,17 @@ static WRITE8_HANDLER( mapper5_l_w )
 			{
 				case 0x00:
 					/* 32k switch - ROM only */
-					prg32 (space, data >> 2);
+					prg32(space, data >> 2);
 					break;
 				case 0x01:
 					/* 16k switch - ROM only */
-					prg16_cdef (space, data >> 1);
+					prg16_cdef(space, data >> 1);
 					break;
 				case 0x02:
 				case 0x03:
 					/* 8k switch */
 					data &= ((nes.prg_chunks << 1) - 1);
-					memory_set_bankptr (space->machine, 4, &nes.rom[data * 0x2000 + 0x10000]);
+					memory_set_bankptr(space->machine, 4, &nes.rom[data * 0x2000 + 0x10000]);
 					break;
 			}
 			break;
@@ -1454,13 +1456,13 @@ static WRITE8_HANDLER( mapper5_l_w )
 				case 0x03:
 					/* 1k switch */
 					vrom_bank[0] = data;
-//					mapper5_sync_vrom(0);
+//                  mapper5_sync_vrom(0);
 					chr1_0(space->machine, vrom_bank[0], CHRROM);
-//					ppu2c0x_set_videorom_bank(state->ppu, 0, 1, vrom_bank[0], 64);
-//					nes_vram_sprite[0] = vrom_bank[0] * 64;
-//					vrom_next[0] = 4;
-//					vrom_page_a = 1;
-//					vrom_page_b = 0;
+//                  ppu2c0x_set_videorom_bank(state->ppu, 0, 1, vrom_bank[0], 64);
+//                  nes_vram_sprite[0] = vrom_bank[0] * 64;
+//                  vrom_next[0] = 4;
+//                  vrom_page_a = 1;
+//                  vrom_page_b = 0;
 					break;
 			}
 			break;
@@ -1475,13 +1477,13 @@ static WRITE8_HANDLER( mapper5_l_w )
 				case 0x03:
 					/* 1k switch */
 					vrom_bank[1] = data;
-//					mapper5_sync_vrom(0);
+//                  mapper5_sync_vrom(0);
 					chr1_1(space->machine, vrom_bank[1], CHRROM);
 					//ppu2c0x_set_videorom_bank(state->ppu, 1, 1, vrom_bank[1], 64);
-//					nes_vram_sprite[1] = vrom_bank[0] * 64;
-//					vrom_next[1] = 5;
-//					vrom_page_a = 1;
-//					vrom_page_b = 0;
+//                  nes_vram_sprite[1] = vrom_bank[0] * 64;
+//                  vrom_next[1] = 5;
+//                  vrom_page_a = 1;
+//                  vrom_page_b = 0;
 					break;
 			}
 			break;
@@ -1492,13 +1494,13 @@ static WRITE8_HANDLER( mapper5_l_w )
 				case 0x03:
 					/* 1k switch */
 					vrom_bank[2] = data;
-//					mapper5_sync_vrom(0);
+//                  mapper5_sync_vrom(0);
 					chr1_2(space->machine, vrom_bank[2], CHRROM);
-//					ppu2c0x_set_videorom_bank(state->ppu, 2, 1, vrom_bank[2], 64);
-//					nes_vram_sprite[2] = vrom_bank[0] * 64;
-//					vrom_next[2] = 6;
-//					vrom_page_a = 1;
-//					vrom_page_b = 0;
+//                  ppu2c0x_set_videorom_bank(state->ppu, 2, 1, vrom_bank[2], 64);
+//                  nes_vram_sprite[2] = vrom_bank[0] * 64;
+//                  vrom_next[2] = 6;
+//                  vrom_page_a = 1;
+//                  vrom_page_b = 0;
 					break;
 			}
 			break;
@@ -1516,13 +1518,13 @@ static WRITE8_HANDLER( mapper5_l_w )
 				case 0x03:
 					/* 1k switch */
 					vrom_bank[3] = data;
-//					mapper5_sync_vrom(0);
+//                  mapper5_sync_vrom(0);
 					chr1_3(space->machine, vrom_bank[3], CHRROM);
-//					ppu2c0x_set_videorom_bank(state->ppu, 3, 1, vrom_bank[3], 64);
-//					nes_vram_sprite[3] = vrom_bank[0] * 64;
-//					vrom_next[3] = 7;
-//					vrom_page_a = 1;
-//					vrom_page_b = 0;
+//                  ppu2c0x_set_videorom_bank(state->ppu, 3, 1, vrom_bank[3], 64);
+//                  nes_vram_sprite[3] = vrom_bank[0] * 64;
+//                  vrom_next[3] = 7;
+//                  vrom_page_a = 1;
+//                  vrom_page_b = 0;
 					break;
 			}
 			break;
@@ -1533,13 +1535,13 @@ static WRITE8_HANDLER( mapper5_l_w )
 				case 0x03:
 					/* 1k switch */
 					vrom_bank[4] = data;
-//					mapper5_sync_vrom(0);
+//                  mapper5_sync_vrom(0);
 					chr1_4(space->machine, vrom_bank[4], CHRROM);
-//					ppu2c0x_set_videorom_bank(state->ppu, 4, 1, vrom_bank[4], 64);
-//					nes_vram_sprite[4] = vrom_bank[0] * 64;
-//					vrom_next[0] = 0;
-//					vrom_page_a = 0;
-//					vrom_page_b = 0;
+//                  ppu2c0x_set_videorom_bank(state->ppu, 4, 1, vrom_bank[4], 64);
+//                  nes_vram_sprite[4] = vrom_bank[0] * 64;
+//                  vrom_next[0] = 0;
+//                  vrom_page_a = 0;
+//                  vrom_page_b = 0;
 					break;
 			}
 			break;
@@ -1554,13 +1556,13 @@ static WRITE8_HANDLER( mapper5_l_w )
 				case 0x03:
 					/* 1k switch */
 					vrom_bank[5] = data;
-//					mapper5_sync_vrom(0);
+//                  mapper5_sync_vrom(0);
 					chr1_5(space->machine, vrom_bank[5], CHRROM);
-//					ppu2c0x_set_videorom_bank(state->ppu, 5, 1, vrom_bank[5], 64);
-//					nes_vram_sprite[5] = vrom_bank[0] * 64;
-//					vrom_next[1] = 1;
-//					vrom_page_a = 0;
-//					vrom_page_b = 0;
+//                  ppu2c0x_set_videorom_bank(state->ppu, 5, 1, vrom_bank[5], 64);
+//                  nes_vram_sprite[5] = vrom_bank[0] * 64;
+//                  vrom_next[1] = 1;
+//                  vrom_page_a = 0;
+//                  vrom_page_b = 0;
 					break;
 			}
 			break;
@@ -1571,13 +1573,13 @@ static WRITE8_HANDLER( mapper5_l_w )
 				case 0x03:
 					/* 1k switch */
 					vrom_bank[6] = data;
-//					mapper5_sync_vrom(0);
+//                  mapper5_sync_vrom(0);
 					chr1_6(space->machine, vrom_bank[6], CHRROM);
-//					ppu2c0x_set_videorom_bank(state->ppu, 6, 1, vrom_bank[6], 64);
-//					nes_vram_sprite[6] = vrom_bank[0] * 64;
-//					vrom_next[2] = 2;
-//					vrom_page_a = 0;
-//					vrom_page_b = 0;
+//                  ppu2c0x_set_videorom_bank(state->ppu, 6, 1, vrom_bank[6], 64);
+//                  nes_vram_sprite[6] = vrom_bank[0] * 64;
+//                  vrom_next[2] = 2;
+//                  vrom_page_a = 0;
+//                  vrom_page_b = 0;
 					break;
 			}
 			break;
@@ -1587,7 +1589,7 @@ static WRITE8_HANDLER( mapper5_l_w )
 			{
 				case 0x00:
 					/* 8k switch */
-					chr8 (space->machine, data, CHRROM);
+					chr8(space->machine, data, CHRROM);
 					break;
 				case 0x01:
 					/* 4k switch */
@@ -1600,13 +1602,13 @@ static WRITE8_HANDLER( mapper5_l_w )
 				case 0x03:
 					/* 1k switch */
 					vrom_bank[7] = data;
-//					mapper5_sync_vrom(0);
+//                  mapper5_sync_vrom(0);
 					chr1_7(space->machine, vrom_bank[7], CHRROM);
-//					ppu2c0x_set_videorom_bank(state->ppu, 7, 1, vrom_bank[7], 64);
-//					nes_vram_sprite[7] = vrom_bank[0] * 64;
-//					vrom_next[3] = 3;
-//					vrom_page_a = 0;
-//					vrom_page_b = 0;
+//                  ppu2c0x_set_videorom_bank(state->ppu, 7, 1, vrom_bank[7], 64);
+//                  nes_vram_sprite[7] = vrom_bank[0] * 64;
+//                  vrom_next[3] = 3;
+//                  vrom_page_a = 0;
+//                  vrom_page_b = 0;
 					break;
 			}
 			break;
@@ -1617,12 +1619,12 @@ static WRITE8_HANDLER( mapper5_l_w )
 				case 0x03:
 					/* 1k switch */
 					vrom_bank[8] = vrom_bank[12] = data;
-//					nes_vram[vrom_next[0]] = data * 64;
-//					nes_vram[0 + (vrom_page_a*4)] = data * 64;
-//					nes_vram[0] = data * 64;
+//                  nes_vram[vrom_next[0]] = data * 64;
+//                  nes_vram[0 + (vrom_page_a*4)] = data * 64;
+//                  nes_vram[0] = data * 64;
 					chr1_4(space->machine, data, CHRROM);
-//					ppu2c0x_set_videorom_bank(state->ppu, 4, 1, data, 64);
-//					mapper5_sync_vrom(1);
+//                  ppu2c0x_set_videorom_bank(state->ppu, 4, 1, data, 64);
+//                  mapper5_sync_vrom(1);
 					if (!vrom_page_b)
 					{
 						vrom_page_a ^= 0x01;
@@ -1643,12 +1645,12 @@ static WRITE8_HANDLER( mapper5_l_w )
 				case 0x03:
 					/* 1k switch */
 					vrom_bank[9] = vrom_bank[13] = data;
-//					nes_vram[vrom_next[1]] = data * 64;
-//					nes_vram[1 + (vrom_page_a*4)] = data * 64;
-//					nes_vram[1] = data * 64;
+//                  nes_vram[vrom_next[1]] = data * 64;
+//                  nes_vram[1 + (vrom_page_a*4)] = data * 64;
+//                  nes_vram[1] = data * 64;
 					chr1_5(space->machine, data, CHRROM);
-//					ppu2c0x_set_videorom_bank(state->ppu, 5, 1, data, 64);
-//					mapper5_sync_vrom(1);
+//                  ppu2c0x_set_videorom_bank(state->ppu, 5, 1, data, 64);
+//                  mapper5_sync_vrom(1);
 					if (!vrom_page_b)
 					{
 						vrom_page_a ^= 0x01;
@@ -1664,12 +1666,12 @@ static WRITE8_HANDLER( mapper5_l_w )
 				case 0x03:
 					/* 1k switch */
 					vrom_bank[10] = vrom_bank[14] = data;
-//					nes_vram[vrom_next[2]] = data * 64;
-//					nes_vram[2 + (vrom_page_a*4)] = data * 64;
-//					nes_vram[2] = data * 64;
+//                  nes_vram[vrom_next[2]] = data * 64;
+//                  nes_vram[2 + (vrom_page_a*4)] = data * 64;
+//                  nes_vram[2] = data * 64;
 					chr1_6(space->machine, data, CHRROM);
-//					ppu2c0x_set_videorom_bank(state->ppu, 6, 1, data, 64);
-//					mapper5_sync_vrom(1);
+//                  ppu2c0x_set_videorom_bank(state->ppu, 6, 1, data, 64);
+//                  mapper5_sync_vrom(1);
 					if (!vrom_page_b)
 					{
 						vrom_page_a ^= 0x01;
@@ -1701,12 +1703,12 @@ static WRITE8_HANDLER( mapper5_l_w )
 				case 0x03:
 					/* 1k switch */
 					vrom_bank[11] = vrom_bank[15] = data;
-//					nes_vram[vrom_next[3]] = data * 64;
-//					nes_vram[3 + (vrom_page_a*4)] = data * 64;
-//					nes_vram[3] = data * 64;
+//                  nes_vram[vrom_next[3]] = data * 64;
+//                  nes_vram[3 + (vrom_page_a*4)] = data * 64;
+//                  nes_vram[3] = data * 64;
 					chr1_7(space->machine, data, CHRROM);
-//					ppu2c0x_set_videorom_bank(state->ppu, 7, 1, data, 64);
-//					mapper5_sync_vrom(1);
+//                  ppu2c0x_set_videorom_bank(state->ppu, 7, 1, data, 64);
+//                  mapper5_sync_vrom(1);
 					if (!vrom_page_b)
 					{
 						vrom_page_a ^= 0x01;
@@ -1750,19 +1752,19 @@ static WRITE8_HANDLER( mapper7_w )
 	else
 		set_nt_mirroring(PPU_MIRROR_LOW);
 
-	prg32 (space, data);
+	prg32(space, data);
 }
 
 static WRITE8_HANDLER( mapper8_w )
 {
 	LOG_MMC(("* Mapper 8 switch, vrom: %02x, rom: %02x\n", data & 0x07, (data >> 3)));
 	/* Switch 8k VROM bank */
-	chr8 (space->machine, data & 0x07, CHRROM);
+	chr8(space->machine, data & 0x07, CHRROM);
 
 	/* Switch 16k PRG bank */
 	data = (data >> 3) & (nes.prg_chunks - 1);
-	memory_set_bankptr (space->machine, 1, &nes.rom[data * 0x4000 + 0x10000]);
-	memory_set_bankptr (space->machine, 2, &nes.rom[data * 0x4000 + 0x12000]);
+	memory_set_bankptr(space->machine, 1, &nes.rom[data * 0x4000 + 0x10000]);
+	memory_set_bankptr(space->machine, 2, &nes.rom[data * 0x4000 + 0x12000]);
 }
 
 
@@ -1918,10 +1920,10 @@ static WRITE8_HANDLER( mapper11_w )
 	LOG_MMC(("* Mapper 11 switch, data: %02x\n", data));
 
 	/* Switch 8k VROM bank */
-	chr8 (space->machine, data >> 4, CHRROM);
+	chr8(space->machine, data >> 4, CHRROM);
 
 	/* Switch 32k prg bank */
-	prg32 (space, data & 0x0f);
+	prg32(space, data & 0x0f);
 }
 static WRITE8_HANDLER( mapper13_w )
 {
@@ -1940,22 +1942,22 @@ static WRITE8_HANDLER( mapper15_w )
 				set_nt_mirroring(PPU_MIRROR_HORZ);
 			else
 				set_nt_mirroring(PPU_MIRROR_VERT);
-			memory_set_bankptr (space->machine, 1, &nes.rom[bank + base]);
-			memory_set_bankptr (space->machine, 2, &nes.rom[bank + (base ^ 0x2000)]);
-			memory_set_bankptr (space->machine, 3, &nes.rom[bank + (base ^ 0x4000)]);
-			memory_set_bankptr (space->machine, 4, &nes.rom[bank + (base ^ 0x6000)]);
+			memory_set_bankptr(space->machine, 1, &nes.rom[bank + base]);
+			memory_set_bankptr(space->machine, 2, &nes.rom[bank + (base ^ 0x2000)]);
+			memory_set_bankptr(space->machine, 3, &nes.rom[bank + (base ^ 0x4000)]);
+			memory_set_bankptr(space->machine, 4, &nes.rom[bank + (base ^ 0x6000)]);
 			break;
 
 		case 0x0001:
-			memory_set_bankptr (space->machine, 3, &nes.rom[bank + base]);
-			memory_set_bankptr (space->machine, 4, &nes.rom[bank + (base ^ 0x2000)]);
+			memory_set_bankptr(space->machine, 3, &nes.rom[bank + base]);
+			memory_set_bankptr(space->machine, 4, &nes.rom[bank + (base ^ 0x2000)]);
 			break;
 
 		case 0x0002:
-			memory_set_bankptr (space->machine, 1, &nes.rom[bank + base]);
-			memory_set_bankptr (space->machine, 2, &nes.rom[bank + base]);
-			memory_set_bankptr (space->machine, 3, &nes.rom[bank + base]);
-			memory_set_bankptr (space->machine, 4, &nes.rom[bank + base]);
+			memory_set_bankptr(space->machine, 1, &nes.rom[bank + base]);
+			memory_set_bankptr(space->machine, 2, &nes.rom[bank + base]);
+			memory_set_bankptr(space->machine, 3, &nes.rom[bank + base]);
+			memory_set_bankptr(space->machine, 4, &nes.rom[bank + base]);
         	break;
 
 		case 0x0003:
@@ -1963,8 +1965,8 @@ static WRITE8_HANDLER( mapper15_w )
 				set_nt_mirroring(PPU_MIRROR_HORZ);
 			else
 				set_nt_mirroring(PPU_MIRROR_VERT);
-			memory_set_bankptr (space->machine, 3, &nes.rom[bank + base]);
-			memory_set_bankptr (space->machine, 4, &nes.rom[bank + (base ^ 0x2000)]);
+			memory_set_bankptr(space->machine, 3, &nes.rom[bank + base]);
+			memory_set_bankptr(space->machine, 4, &nes.rom[bank + (base ^ 0x2000)]);
         	break;
 	}
 }
@@ -2002,7 +2004,7 @@ static WRITE8_HANDLER( mapper16_w )
 			break;
 		case 8:
 			/* Switch 16k bank at $8000 */
-			prg16_89ab (space, data);
+			prg16_89ab(space, data);
 			break;
 		case 9:
 			switch (data & 0x03)
@@ -2057,19 +2059,19 @@ static WRITE8_HANDLER( mapper17_l_w )
 				set_nt_mirroring(PPU_MIRROR_VERT);
 			break;
 		/* $4501 - $4503 */
-//		case 0x401:
-//		case 0x402:
-//		case 0x403:
+//      case 0x401:
+//      case 0x402:
+//      case 0x403:
 			/* IRQ control */
-//			break;
+//          break;
 		/* $4504 - $4507 : 8k PRG-Rom switch */
 		case 0x404:
 		case 0x405:
 		case 0x406:
 		case 0x407:
 			data &= ((nes.prg_chunks << 1) - 1);
-//			logerror("Mapper 17 bank switch, bank: %02x, data: %02x\n", offset & 0x03, data);
-			memory_set_bankptr (space->machine, (offset & 0x03) + 1, &nes.rom[0x2000 * (data) + 0x10000]);
+//          logerror("Mapper 17 bank switch, bank: %02x, data: %02x\n", offset & 0x03, data);
+			memory_set_bankptr(space->machine, (offset & 0x03) + 1, &nes.rom[0x2000 * (data) + 0x10000]);
 			break;
 		/* $4510 - $4517 : 1k CHR-Rom switch */
 		case 0x410:
@@ -2081,7 +2083,7 @@ static WRITE8_HANDLER( mapper17_l_w )
 		case 0x416:
 		case 0x417:
 			chr1_x(space->machine, offset&7, data&((nes.chr_chunks << 3) - 1), CHRROM);
-//			ppu2c0x_set_videorom_bank(state->ppu, offset & 0x07, 1, data, 64);
+//          ppu2c0x_set_videorom_bank(state->ppu, offset & 0x07, 1, data, 64);
 			break;
 		default:
 			logerror("** uncaught mapper 17 write, offset: %04x, data: %02x\n", offset, data);
@@ -2131,7 +2133,7 @@ static void jaleco_irq ( const device_config *device, int scanline, int vblank, 
 
 static WRITE8_HANDLER( mapper18_w )
 {
-//	static int irq;
+//  static int irq;
 	static int bank_8000 = 0;
 	static int bank_a000 = 0;
 	static int bank_c000 = 0;
@@ -2142,37 +2144,37 @@ static WRITE8_HANDLER( mapper18_w )
 			/* Switch 8k bank at $8000 - low 4 bits */
 			bank_8000 = (bank_8000 & 0xf0) | (data & 0x0f);
 			bank_8000 &= prg_mask;
-			memory_set_bankptr (space->machine, 1, &nes.rom[0x2000 * (bank_8000) + 0x10000]);
+			memory_set_bankptr(space->machine, 1, &nes.rom[0x2000 * (bank_8000) + 0x10000]);
 			break;
 		case 0x0001:
 			/* Switch 8k bank at $8000 - high 4 bits */
 			bank_8000 = (bank_8000 & 0x0f) | (data << 4);
 			bank_8000 &= prg_mask;
-			memory_set_bankptr (space->machine, 1, &nes.rom[0x2000 * (bank_8000) + 0x10000]);
+			memory_set_bankptr(space->machine, 1, &nes.rom[0x2000 * (bank_8000) + 0x10000]);
 			break;
 		case 0x0002:
 			/* Switch 8k bank at $a000 - low 4 bits */
 			bank_a000 = (bank_a000 & 0xf0) | (data & 0x0f);
 			bank_a000 &= prg_mask;
-			memory_set_bankptr (space->machine, 2, &nes.rom[0x2000 * (bank_a000) + 0x10000]);
+			memory_set_bankptr(space->machine, 2, &nes.rom[0x2000 * (bank_a000) + 0x10000]);
 			break;
 		case 0x0003:
 			/* Switch 8k bank at $a000 - high 4 bits */
 			bank_a000 = (bank_a000 & 0x0f) | (data << 4);
 			bank_a000 &= prg_mask;
-			memory_set_bankptr (space->machine, 2, &nes.rom[0x2000 * (bank_a000) + 0x10000]);
+			memory_set_bankptr(space->machine, 2, &nes.rom[0x2000 * (bank_a000) + 0x10000]);
 			break;
 		case 0x1000:
 			/* Switch 8k bank at $c000 - low 4 bits */
 			bank_c000 = (bank_c000 & 0xf0) | (data & 0x0f);
 			bank_c000 &= prg_mask;
-			memory_set_bankptr (space->machine, 3, &nes.rom[0x2000 * (bank_c000) + 0x10000]);
+			memory_set_bankptr(space->machine, 3, &nes.rom[0x2000 * (bank_c000) + 0x10000]);
 			break;
 		case 0x1001:
 			/* Switch 8k bank at $c000 - high 4 bits */
 			bank_c000 = (bank_c000 & 0x0f) | (data << 4);
 			bank_c000 &= prg_mask;
-			memory_set_bankptr (space->machine, 3, &nes.rom[0x2000 * (bank_c000) + 0x10000]);
+			memory_set_bankptr(space->machine, 3, &nes.rom[0x2000 * (bank_c000) + 0x10000]);
 			break;
 
 		/* $9002, 3 (1002, 3) uncaught = Jaleco Baseball writes 0 */
@@ -2299,7 +2301,7 @@ static WRITE8_HANDLER( mapper18_w )
 		case 0x7000: /* IRQ Control 0 */
 			if (data & 0x01)
 			{
-//				IRQ_enable = 1;
+//              IRQ_enable = 1;
 				IRQ_count = IRQ_count_latch;
 			}
 			logerror("     Mapper 18 IRQ Control 0: %02x\n", data);
@@ -2321,9 +2323,9 @@ static WRITE8_HANDLER( mapper18_w )
 			break;
 
 /* $f003 uncaught, writes 0(start) & various(ingame) */
-//		case 0x7003:
-//			IRQ_count = data;
-//			break;
+//      case 0x7003:
+//          IRQ_count = data;
+//          break;
 
 		default:
 			logerror("Mapper 18 uncaught addr: %04x value: %02x\n", offset + 0x8000, data);
@@ -2371,23 +2373,23 @@ static WRITE8_HANDLER( mapper19_w )
 		case 0x3800:
 			/* Switch 1k VROM at $0000-$1c00 */
 			chr1_x(space->machine, offset /0x800, data, CHRROM);
-//			ppu2c0x_set_videorom_bank(state->ppu, offset / 0x800, 1, data, 64);
+//          ppu2c0x_set_videorom_bank(state->ppu, offset / 0x800, 1, data, 64);
 			break;
 
 		case 0x6000:
 			/* Switch 8k bank at $8000 */
 			data &= prg_mask;
-			memory_set_bankptr (space->machine, 1, &nes.rom[0x2000 * (data) + 0x10000]);
+			memory_set_bankptr(space->machine, 1, &nes.rom[0x2000 * (data) + 0x10000]);
 			break;
 		case 0x6800:
 			/* Switch 8k bank at $a000 */
 			data &= prg_mask;
-			memory_set_bankptr (space->machine, 2, &nes.rom[0x2000 * (data) + 0x10000]);
+			memory_set_bankptr(space->machine, 2, &nes.rom[0x2000 * (data) + 0x10000]);
 			break;
 		case 0x7000:
 			/* Switch 8k bank at $c000 */
 			data &= prg_mask;
-			memory_set_bankptr (space->machine, 3, &nes.rom[0x2000 * (data) + 0x10000]);
+			memory_set_bankptr(space->machine, 3, &nes.rom[0x2000 * (data) + 0x10000]);
 			break;
 	}
 }
@@ -2526,7 +2528,7 @@ static WRITE8_HANDLER( konami_vrc2a_w )
 			case 0:
 				/* Switch 8k bank at $8000 */
 				data &= ((nes.prg_chunks << 1) - 1);
-				memory_set_bankptr (space->machine, 1, &nes.rom[0x2000 * (data) + 0x10000]);
+				memory_set_bankptr(space->machine, 1, &nes.rom[0x2000 * (data) + 0x10000]);
 				break;
 			case 0x1000:
 				switch (data & 0x03)
@@ -2541,7 +2543,7 @@ static WRITE8_HANDLER( konami_vrc2a_w )
 			case 0x2000:
 				/* Switch 8k bank at $a000 */
 				data &= ((nes.prg_chunks << 1) - 1);
-				memory_set_bankptr (space->machine, 2, &nes.rom[0x2000 * (data) + 0x10000]);
+				memory_set_bankptr(space->machine, 2, &nes.rom[0x2000 * (data) + 0x10000]);
 				break;
 			default:
 				logerror("konami_vrc2a_w uncaught offset: %04x value: %02x\n", offset, data);
@@ -2596,7 +2598,7 @@ static WRITE8_HANDLER( konami_vrc2b_w )
 {
 	UINT16 select;
 
-//	logerror("konami_vrc2b_w offset: %04x value: %02x\n", offset, data);
+//  logerror("konami_vrc2b_w offset: %04x value: %02x\n", offset, data);
 
 	if (offset < 0x3000)
 	{
@@ -2605,7 +2607,7 @@ static WRITE8_HANDLER( konami_vrc2b_w )
 			case 0:
 				/* Switch 8k bank at $8000 */
 				data &= ((nes.prg_chunks << 1) - 1);
-				memory_set_bankptr (space->machine, 1, &nes.rom[0x2000 * (data) + 0x10000]);
+				memory_set_bankptr(space->machine, 1, &nes.rom[0x2000 * (data) + 0x10000]);
 				break;
 			case 0x1000:
 				switch (data & 0x03)
@@ -2620,7 +2622,7 @@ static WRITE8_HANDLER( konami_vrc2b_w )
 			case 0x2000:
 				/* Switch 8k bank at $a000 */
 				data &= ((nes.prg_chunks << 1) - 1);
-				memory_set_bankptr (space->machine, 2, &nes.rom[0x2000 * (data) + 0x10000]);
+				memory_set_bankptr(space->machine, 2, &nes.rom[0x2000 * (data) + 0x10000]);
 				break;
 			default:
 				logerror("konami_vrc2b_w offset: %04x value: %02x\n", offset, data);
@@ -2761,7 +2763,7 @@ static WRITE8_HANDLER( konami_vrc4_w )
 		case 0x0000:
 			/* Switch 8k bank at $8000 */
 			data &= ((nes.prg_chunks << 1) - 1);
-			memory_set_bankptr (space->machine, 1, &nes.rom[0x2000 * (data) + 0x10000]);
+			memory_set_bankptr(space->machine, 1, &nes.rom[0x2000 * (data) + 0x10000]);
 			break;
 		case 0x1000:
 			switch (data & 0x03)
@@ -2778,7 +2780,7 @@ static WRITE8_HANDLER( konami_vrc4_w )
 		case 0x2000:
 			/* Switch 8k bank at $a000 */
 			data &= ((nes.prg_chunks << 1) - 1);
-			memory_set_bankptr (space->machine, 2, &nes.rom[0x2000 * (data) + 0x10000]);
+			memory_set_bankptr(space->machine, 2, &nes.rom[0x2000 * (data) + 0x10000]);
 			break;
 		case 0x3000:
 			/* Switch 1k vrom at $0000 - low 4 bits */
@@ -2888,14 +2890,14 @@ static WRITE8_HANDLER( konami_vrc4_w )
 			/* Set low 4 bits of latch */
 			IRQ_count_latch &= ~0x0f;
 			IRQ_count_latch |= data & 0x0f;
-//			logerror("konami_vrc4 irq_latch low: %02x\n", IRQ_count_latch);
+//          logerror("konami_vrc4 irq_latch low: %02x\n", IRQ_count_latch);
 			break;
 		case 0x7002:
 		case 0x7040:
 			/* Set high 4 bits of latch */
 			IRQ_count_latch &= ~0xf0;
 			IRQ_count_latch |= (data << 4) & 0xf0;
-//			logerror("konami_vrc4 irq_latch high: %02x\n", IRQ_count_latch);
+//          logerror("konami_vrc4 irq_latch high: %02x\n", IRQ_count_latch);
 			break;
 		case 0x7004:
 		case 0x7001:
@@ -2903,15 +2905,15 @@ static WRITE8_HANDLER( konami_vrc4_w )
 			IRQ_count = IRQ_count_latch;
 			IRQ_enable = data & 0x02;
 			IRQ_enable_latch = data & 0x01;
-//			logerror("konami_vrc4 irq_count set: %02x\n", IRQ_count);
-//			logerror("konami_vrc4 enable: %02x\n", IRQ_enable);
-//			logerror("konami_vrc4 enable latch: %02x\n", IRQ_enable_latch);
+//          logerror("konami_vrc4 irq_count set: %02x\n", IRQ_count);
+//          logerror("konami_vrc4 enable: %02x\n", IRQ_enable);
+//          logerror("konami_vrc4 enable latch: %02x\n", IRQ_enable_latch);
 			break;
 		case 0x7006:
 		case 0x7003:
 		case 0x70c0:
 			IRQ_enable = IRQ_enable_latch;
-//			logerror("konami_vrc4 enable copy: %02x\n", IRQ_enable);
+//          logerror("konami_vrc4 enable copy: %02x\n", IRQ_enable);
 			break;
 		default:
 			logerror("konami_vrc4_w uncaught offset: %04x value: %02x\n", offset, data);
@@ -2921,13 +2923,13 @@ static WRITE8_HANDLER( konami_vrc4_w )
 
 static WRITE8_HANDLER( konami_vrc6a_w )
 {
-//	logerror("konami_vrc6_w offset: %04x, data: %02x, scanline: %d\n", offset, data, current_scanline);
+//  logerror("konami_vrc6_w offset: %04x, data: %02x, scanline: %d\n", offset, data, current_scanline);
 
 	switch (offset & 0x7003)
 	{
 		case 0: case 1: case 2: case 3:
 			/* Switch 16k bank at $8000 */
-			prg16_89ab (space, data);
+			prg16_89ab(space, data);
 			break;
 
 /* $1000-$1002 = sound regs */
@@ -2945,7 +2947,7 @@ static WRITE8_HANDLER( konami_vrc6a_w )
 			break;
 		case 0x4000: case 0x4001: case 0x4002: case 0x4003:
 			/* Switch 8k bank at $c000 */
-			prg8_cd (space, data);
+			prg8_cd(space, data);
 			break;
 		case 0x5000:
 		case 0x5001:
@@ -2984,13 +2986,13 @@ static WRITE8_HANDLER( konami_vrc6a_w )
 
 static WRITE8_HANDLER( konami_vrc6b_w )
 {
-//	logerror("konami_vrc6_w offset: %04x, data: %02x, scanline: %d\n", offset, data, current_scanline);
+//  logerror("konami_vrc6_w offset: %04x, data: %02x, scanline: %d\n", offset, data, current_scanline);
 
 	switch (offset & 0x7003)
 	{
 		case 0: case 1: case 2: case 3:
 			/* Switch 16k bank at $8000 */
-			prg16_89ab (space, data);
+			prg16_89ab(space, data);
 			break;
 
 /* $1000-$1002 = sound regs */
@@ -3008,7 +3010,7 @@ static WRITE8_HANDLER( konami_vrc6b_w )
 			break;
 		case 0x4000: case 0x4001: case 0x4002: case 0x4003:
 			/* Switch 8k bank at $c000 */
-			prg8_cd (space, data);
+			prg8_cd(space, data);
 			break;
 		case 0x5000:
 			/* Switch 1k VROM at $0000 */
@@ -3064,16 +3066,16 @@ static WRITE8_HANDLER( mapper32_w )
 {
 	static int bankSel;
 
-//	logerror("mapper32_w offset: %04x, data: %02x, scanline: %d\n", offset, data, current_scanline);
+//  logerror("mapper32_w offset: %04x, data: %02x, scanline: %d\n", offset, data, current_scanline);
 
 	switch (offset & 0x7000)
 	{
 		case 0x0000:
 			/* Switch 8k bank at $8000 or $c000 */
 			if (bankSel)
-				prg8_cd (space, data);
+				prg8_cd(space, data);
 			else
-				prg8_89 (space, data);
+				prg8_89(space, data);
 			break;
 		case 0x1000:
 			bankSel = data & 0x02;
@@ -3084,7 +3086,7 @@ static WRITE8_HANDLER( mapper32_w )
 			break;
 		case 0x2000:
 			/* Switch 8k bank at $A000 */
-			prg8_ab (space, data);
+			prg8_ab(space, data);
 			break;
 		case 0x3000:
 			/* Switch 1k VROM at $1000 */
@@ -3098,19 +3100,19 @@ static WRITE8_HANDLER( mapper32_w )
 
 static WRITE8_HANDLER( mapper33_w )
 {
-//	logerror("mapper33_w offset: %04x, data: %02x, scanline: %d\n", offset, data, current_scanline);
+//  logerror("mapper33_w offset: %04x, data: %02x, scanline: %d\n", offset, data, current_scanline);
 
 	switch (offset & 0x7003)
 	{
 		case 0x0000:
 			/* Switch 8k bank at $8000 */
 			data &= ((nes.prg_chunks << 1) - 1);
-			memory_set_bankptr (space->machine, 1, &nes.rom[0x2000 * (data) + 0x10000]);
+			memory_set_bankptr(space->machine, 1, &nes.rom[0x2000 * (data) + 0x10000]);
 			break;
 		case 0x0001:
 			/* Switch 8k bank at $A000 */
 			data &= ((nes.prg_chunks << 1) - 1);
-			memory_set_bankptr (space->machine, 2, &nes.rom[0x2000 * (data) + 0x10000]);
+			memory_set_bankptr(space->machine, 2, &nes.rom[0x2000 * (data) + 0x10000]);
 			break;
 		case 0x0002:
 			/* Switch 2k VROM at $0000 */
@@ -3150,7 +3152,7 @@ static WRITE8_HANDLER( mapper34_m_w )
 	{
 		case 0x1ffd:
 			/* Switch 32k prg banks */
-			prg32 (space, data);
+			prg32(space, data);
 			break;
 		case 0x1ffe:
 			/* Switch 4k VNES_ROM at 0x0000 */
@@ -3170,7 +3172,7 @@ static WRITE8_HANDLER( mapper34_w )
 	/* Deadly Towers is really a Mapper 34 game - the demo screens look wrong using mapper 7. */
 	logerror("Mapper 34 w, offset: %04x, data: %02x\n", offset, data);
 
-	prg32 (space, data);
+	prg32(space, data);
 }
 
 static void mapper40_irq ( const device_config *device, int scanline, int vblank, int blanked )
@@ -3200,7 +3202,7 @@ static WRITE8_HANDLER( mapper40_w )
 			break;
 		case 0x6000:
 			/* Game runs code between banks, use slow but sure method */
-			prg8_cd (space, data);
+			prg8_cd(space, data);
 			break;
 	}
 }
@@ -3217,7 +3219,7 @@ static WRITE8_HANDLER( mapper41_m_w )
 	mapper41_reg2 = offset & 0x04;
 	mapper41_chr &= ~0x0c;
 	mapper41_chr |= (offset & 0x18) >> 1;
-	prg32 (space, offset & 0x07);
+	prg32(space, offset & 0x07);
 }
 
 static WRITE8_HANDLER( mapper41_w )
@@ -3236,23 +3238,25 @@ static WRITE8_HANDLER( mapper42_w )
 {
 	LOG_MMC(("mapper42_w, offset: %04x, data: %02x\n", offset, data));
 
-	if ( offset >= 0x7000 )
+	if (offset >= 0x7000)
 	{
-		switch( offset & 0x03 )
+		switch(offset & 0x03)
 		{
 		case 0x00:
-			memory_set_bankptr (space->machine, 5, &nes.rom[( data & ( ( nes.prg_chunks << 1 ) -1 ) ) * 0x2000 + 0x10000]);
+			memory_set_bankptr(space->machine, 5, &nes.rom[(data & ((nes.prg_chunks << 1) - 1)) * 0x2000 + 0x10000]);
 			break;
 		case 0x01:
-			set_nt_mirroring(( data & 0x08 ) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT );
+			set_nt_mirroring((data & 0x08) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			break;
 		case 0x02:
 			/* Check if IRQ is being enabled */
-			if ( ! IRQ_enable && ( data & 0x02 ) ) {
+			if (!IRQ_enable && (data & 0x02))
+			{
 				IRQ_enable = 1;
 				timer_adjust_oneshot(nes_irq_timer, cputag_clocks_to_attotime(space->machine, "maincpu", 24576), 0);
 			}
-			if ( ! ( data & 0x02 ) ) {
+			if (!(data & 0x02))
+			{
 				IRQ_enable = 0;
 				timer_adjust_oneshot(nes_irq_timer, attotime_never, 0);
 			}
@@ -3263,60 +3267,61 @@ static WRITE8_HANDLER( mapper42_w )
 
 static WRITE8_HANDLER( mapper43_w )
 {
-	int		bank = ( ( ( offset >> 8 ) & 0x03 ) * 0x20 ) + ( offset & 0x1F );
+	int bank = (((offset >> 8) & 0x03) * 0x20) + (offset & 0x1f);
 
 	LOG_MMC(("mapper43_w, offset: %04x, data: %02x\n", offset, data));
 
-	set_nt_mirroring(( offset & 0x2000 ) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT );
+	set_nt_mirroring((offset& 0x2000) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 
-	if ( offset & 0x0800 )
+	if (offset & 0x0800)
 	{
-		if ( offset & 0x1000 )
+		if (offset & 0x1000)
 		{
-			if ( bank * 2 >= nes.prg_chunks )
+			if (bank * 2 >= nes.prg_chunks)
 			{
-				memory_set_bankptr( space->machine, 3, nes.wram );
-				memory_set_bankptr( space->machine, 4, nes.wram );
+				memory_set_bankptr(space->machine, 3, nes.wram);
+				memory_set_bankptr(space->machine, 4, nes.wram);
 			}
 			else
 			{
 				LOG_MMC(("mapper43_w, selecting upper 16KB bank of #%02x\n", bank));
-				prg16_cdef( space, 2 * bank + 1 );
+				prg16_cdef(space, 2 * bank + 1);
 			}
 		}
 		else
 		{
-			if ( bank * 2 >= nes.prg_chunks )
+			if (bank * 2 >= nes.prg_chunks)
 			{
-				memory_set_bankptr( space->machine, 1, nes.wram );
-				memory_set_bankptr( space->machine, 2, nes.wram );
+				memory_set_bankptr(space->machine, 1, nes.wram);
+				memory_set_bankptr(space->machine, 2, nes.wram);
 			}
 			else
 			{
 				LOG_MMC(("mapper43_w, selecting lower 16KB bank of #%02x\n", bank));
-				prg16_89ab( space, 2 * bank );
+				prg16_89ab(space, 2 * bank);
 			}
 		}
 	}
 	else
 	{
-		if ( bank * 2 >= nes.prg_chunks ) {
-			memory_set_bankptr (space->machine, 1, nes.wram );
-			memory_set_bankptr (space->machine, 2, nes.wram );
-			memory_set_bankptr (space->machine, 3, nes.wram );
-			memory_set_bankptr (space->machine, 4, nes.wram );
+		if (bank * 2 >= nes.prg_chunks)
+		{
+			memory_set_bankptr(space->machine, 1, nes.wram);
+			memory_set_bankptr(space->machine, 2, nes.wram);
+			memory_set_bankptr(space->machine, 3, nes.wram);
+			memory_set_bankptr(space->machine, 4, nes.wram);
 		}
-		else 
+		else
 		{
 			LOG_MMC(("mapper43_w, selecting 32KB bank #%02x\n", bank));
-			prg32( space, bank );
+			prg32(space, bank);
 		}
 	}
 }
 
 static WRITE8_HANDLER( mapper44_w )
 {
-//	logerror("mapper44_w offset: %04x, data: %02x, scanline: %d\n", offset, data, current_scanline);
+//  logerror("mapper44_w offset: %04x, data: %02x, scanline: %d\n", offset, data, current_scanline);
 
 	//only bits 14,13, and 0 matter for offset!
 	switch (offset & 0x6001)
@@ -3343,23 +3348,23 @@ static WRITE8_HANDLER( mapper44_w )
 
 static WRITE8_HANDLER( mapper45_m_w )
 {
-	LOG_MMC(("mapper45_m_w, offset: %04x, data: %02x\n", offset, data ));
+	LOG_MMC(("mapper45_m_w, offset: %04x, data: %02x\n", offset, data));
 
-	if (offset == 0) 
+	if (offset == 0)
 	{
 		mapper45_data[mapper45_cmd] = data;
 		mapper45_cmd = (mapper45_cmd + 1) & 0x03;
 
-		if (!mapper45_cmd) 
+		if (!mapper45_cmd)
 		{
 			LOG_MMC(("mapper45_m_w, command completed %02x %02x %02x %02x\n", mapper45_data[3],
-				mapper45_data[2], mapper45_data[1], mapper45_data[0] ));
+				mapper45_data[2], mapper45_data[1], mapper45_data[0]));
 
 			MMC3_prg_base = mapper45_data[1];
 			MMC3_prg_mask = 0x3f ^ (mapper45_data[3] & 0x3f);
 			MMC3_chr_base = ((mapper45_data[2] & 0xf0) << 4) + mapper45_data[0];
 
-			if (mapper45_data[2] & 0x08) 
+			if (mapper45_data[2] & 0x08)
 				MMC3_chr_mask = (1 << ((mapper45_data[2] & 0x07) + 1)) - 1;
 			else
 				MMC3_chr_mask = 0;
@@ -3374,33 +3379,34 @@ static WRITE8_HANDLER( mapper45_m_w )
 
 static WRITE8_HANDLER( mapper46_m_w )
 {
-	LOG_MMC(("mapper46_m_w, offset: %04x, data: %02x\n", offset, data ));
+	LOG_MMC(("mapper46_m_w, offset: %04x, data: %02x\n", offset, data));
 
-	MMC1_bank1 = ( MMC1_bank1 & 0x01 ) | ( ( data & 0x0F ) << 1 );
-	MMC1_bank2 = ( MMC1_bank2 & 0x07 ) | ( ( data & 0xF0 ) >> 1 );
+	MMC1_bank1 = (MMC1_bank1 & 0x01) | ((data & 0x0f) << 1);
+	MMC1_bank2 = (MMC1_bank2 & 0x07) | ((data & 0xf0) >> 1);
 	prg32(space, MMC1_bank1);
 	chr8(space->machine, MMC1_bank2, CHRROM);
 }
 
 static WRITE8_HANDLER( mapper46_w )
 {
-	LOG_MMC(("mapper46_w, offset: %04x, data: %02x\n", offset, data ));
+	LOG_MMC(("mapper46_w, offset: %04x, data: %02x\n", offset, data));
 
-	MMC1_bank1 = ( MMC1_bank1 & ~0x01 ) | ( ( data & 0x02 ) >> 1 );
-	MMC1_bank2 = ( MMC1_bank2 & ~0x07 ) | ( ( data & 0x70 ) >> 4 );
+	MMC1_bank1 = (MMC1_bank1 & ~0x01) | ((data & 0x02) >> 1);
+	MMC1_bank2 = (MMC1_bank2 & ~0x07) | ((data & 0x70) >> 4);
 	prg32(space, MMC1_bank1);
 	chr8(space->machine, MMC1_bank2, CHRROM);
 }
 
 static WRITE8_HANDLER( mapper47_m_w )
 {
-	LOG_MMC(("mapper47_m_w, offset: %04x, data: %02x\n", offset, data ));
+	LOG_MMC(("mapper47_m_w, offset: %04x, data: %02x\n", offset, data));
 
-	if ( offset == 0 ) {
-		MMC3_prg_base = ( data & 0x01 ) << 4;
-		MMC3_prg_mask = 0x0F;
-		MMC3_chr_base = ( data & 0x01 ) << 7;
-		MMC3_chr_mask = 0x7F;
+	if (offset == 0)
+	{
+		MMC3_prg_base = (data & 0x01) << 4;
+		MMC3_prg_mask = 0x0f;
+		MMC3_chr_base = (data & 0x01) << 7;
+		MMC3_chr_mask = 0x7f;
 		mapper4_set_prg(space->machine);
 		mapper4_set_chr(space->machine, MMC3_chr_source);
 	}
@@ -3408,26 +3414,31 @@ static WRITE8_HANDLER( mapper47_m_w )
 
 static WRITE8_HANDLER( mapper49_m_w )
 {
-	LOG_MMC(("mapper49_m_w, offset: %04x, data: %02x\n", offset, data ));
+	LOG_MMC(("mapper49_m_w, offset: %04x, data: %02x\n", offset, data));
 
-	if ( ( offset & 0x1800 ) == 0x0800 && ( offset & 0xFF ) == data ) {
-		MMC3_prg_base = ( data & 0xC0 ) >> 2;
-		MMC3_prg_mask = 0x0F;
-		MMC3_chr_base = ( data & 0xC0 ) << 1;
-		MMC3_chr_mask = 0x7F;
+	if ((offset & 0x1800) == 0x0800 && (offset & 0xff) == data)
+	{
+		MMC3_prg_base = (data & 0xc0) >> 2;
+		MMC3_prg_mask = 0x0f;
+		MMC3_chr_base = (data & 0xc0) << 1;
+		MMC3_chr_mask = 0x7f;
 		mapper4_set_prg(space->machine);
 		mapper4_set_chr(space->machine, MMC3_chr_source);
 	}
 }
 
-static void mapper51_set_banks( const address_space *space ) {
-	set_nt_mirroring(( MMC1_bank1 == 3 ) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT );
+static void mapper51_set_banks( const address_space *space )
+{
+	set_nt_mirroring((MMC1_bank1 == 3) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 
-	if ( MMC1_bank1 & 0x01 ) {
-		prg32( space, MMC1_bank2 );
-	} else {
-		prg16_cdef( space, ( MMC1_bank2 * 2 ) + 1 );
-		prg16_89ab( space, MMC1_bank3 * 2 );
+	if (MMC1_bank1 & 0x01)
+	{
+		prg32(space, MMC1_bank2);
+	}
+	else
+	{
+		prg16_cdef(space, (MMC1_bank2 * 2) + 1);
+		prg16_89ab(space, MMC1_bank3 * 2);
 	}
 }
 
@@ -3435,7 +3446,7 @@ static WRITE8_HANDLER( mapper51_m_w )
 {
 	LOG_MMC(("mapper51_m_w, offset: %04x, data: %02x\n", offset, data));
 
-	MMC1_bank1 = ( ( data >> 1 ) & 0x01 ) | ( ( data >> 3 ) & 0x02 );
+	MMC1_bank1 = ((data >> 1) & 0x01) | ((data >> 3) & 0x02);
 	mapper51_set_banks(space);
 }
 
@@ -3443,9 +3454,12 @@ static WRITE8_HANDLER( mapper51_w )
 {
 	LOG_MMC(("mapper51_w, offset: %04x, data: %02x\n", offset, data));
 
-	if ( offset & 0x4000 ) {
+	if (offset & 0x4000)
+	{
 		MMC1_bank3 = data;
-	} else {
+	}
+	else
+	{
 		MMC1_bank2 = data;
 	}
 	mapper51_set_banks(space);
@@ -3455,98 +3469,115 @@ static WRITE8_HANDLER( mapper57_w )
 {
 	LOG_MMC(("mapper57_w, offset: %04x, data: %02x\n", offset, data));
 
-	if ( offset & 0x0800 ) {
+	if (offset & 0x0800)
+	{
 		MMC1_bank2 = data;
-	} else {
+	}
+	else
+	{
 		MMC1_bank1 = data;
 	}
 
-	if ( MMC1_bank2 & 0x80 ) {
-		prg32( space, 2 | ( MMC1_bank2 >> 6 ) );
-	} else {
-		prg16_89ab( space, ( MMC1_bank2 >> 5 ) & 0x03 );
-		prg16_cdef( space, ( MMC1_bank2 >> 5 ) & 0x03 );
+	if (MMC1_bank2 & 0x80)
+	{
+		prg32(space, 2 | (MMC1_bank2 >> 6));
+	}
+	else
+	{
+		prg16_89ab(space, (MMC1_bank2 >> 5) & 0x03);
+		prg16_cdef(space, (MMC1_bank2 >> 5) & 0x03);
 	}
 
-	set_nt_mirroring(( MMC1_bank2 & 0x08 ) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT );
+	set_nt_mirroring((MMC1_bank2 & 0x08) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 
-	chr8( space->machine, ( MMC1_bank1 & 0x03 ) | ( MMC1_bank2 & 0x07 ) | ( ( MMC1_bank2 & 0x10 ) >> 1 ), CHRROM );
+	chr8(space->machine, (MMC1_bank1 & 0x03) | (MMC1_bank2 & 0x07) | ((MMC1_bank2 & 0x10) >> 1), CHRROM);
 }
 
 static WRITE8_HANDLER( mapper58_w )
 {
 	LOG_MMC(("mapper58_w, offset: %04x, data: %02x\n", offset, data));
 
-	if ( offset & 0x4000 ) {
-		if ( offset & 0x40 ) {
-			prg16_89ab( space, offset & 0x07 );
-			prg16_cdef( space, offset & 0x07 );
-		} else {
-			prg32( space, ( offset & 0x06 ) >> 1 );
+	if (offset & 0x4000)
+	{
+		if (offset & 0x40)
+		{
+			prg16_89ab(space, offset & 0x07);
+			prg16_cdef(space, offset & 0x07);
+		}
+		else
+		{
+			prg32(space, (offset & 0x06) >> 1);
 		}
 
-		chr8( space->machine, ( offset & 0x38 ) >> 3, CHRROM );
+		chr8(space->machine, (offset & 0x38) >> 3, CHRROM);
 
-		set_nt_mirroring(( data & 0x02 ) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT );
+		set_nt_mirroring((data & 0x02) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 	}
 }
 
 static WRITE8_HANDLER( mapper61_w )
 {
-	//nes_state *state = space->machine->driver_data;
-
 	LOG_MMC(("mapper61_w, offset: %04x, data: %02x\n", offset, data));
 
-	switch ( offset & 0x30 ) {
+	switch (offset & 0x30)
+	{
 	case 0x00:
 	case 0x30:
-		prg32( space, offset & 0x0F );
+		prg32(space, offset & 0x0f);
 		break;
 	case 0x10:
 	case 0x20:
-		prg16_89ab( space, ( ( offset & 0x0F ) << 1 ) | ( ( offset & 0x20 ) >> 4 ) );
-		prg16_cdef( space, ( ( offset & 0x0F ) << 1 ) | ( ( offset & 0x20 ) >> 4 ) );
+		prg16_89ab(space, ((offset & 0x0f) << 1) | ((offset & 0x20) >> 4));
+		prg16_cdef(space, ((offset & 0x0f) << 1) | ((offset & 0x20) >> 4));
 		break;
 	}
-	set_nt_mirroring(( offset & 0x80 ) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT );
+	set_nt_mirroring((offset & 0x80) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 }
 
 static WRITE8_HANDLER( mapper62_w )
 {
 	LOG_MMC(("mapper62_w, offset :%04x, data: %02x\n", offset, data));
 
-	chr8( space->machine, ( ( offset & 0x1F ) << 2 ) | ( data & 0x03 ) , CHRROM);
+	chr8(space->machine, ((offset & 0x1f) << 2) | (data & 0x03), CHRROM);
 
-	if ( offset & 0x20 ) {
-		prg16_89ab( space, ( offset & 0x40 ) | ( ( offset >> 8 ) & 0x3F ) );
-		prg16_cdef( space, ( offset & 0x40 ) | ( ( offset >> 8 ) & 0x3F ) );
-	} else {
-		prg32( space, ( ( offset & 0x40 ) | ( ( offset >> 8 ) & 0x3F ) ) >> 1 );
+	if (offset & 0x20)
+	{
+		prg16_89ab(space, (offset & 0x40) | ((offset >> 8) & 0x3f));
+		prg16_cdef(space, (offset & 0x40) | ((offset >> 8) & 0x3f));
+	}
+	else
+	{
+		prg32(space, ((offset & 0x40) | ((offset >> 8) & 0x3f)) >> 1);
 	}
 
-	set_nt_mirroring(( offset & 0x80 ) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT );
+	set_nt_mirroring((offset & 0x80) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 }
 
-static void mapper64_set_banks( const address_space *space ) {
-	if ( mapper64_cmd & 0x20 ) {
-		chr1_0( space->machine, mapper64_data[0], CHRROM );
-		chr1_2( space->machine, mapper64_data[1], CHRROM );
-		chr1_1( space->machine, mapper64_data[8] , CHRROM);
-		chr1_3( space->machine, mapper64_data[9], CHRROM );
-	} else {
-		chr1_0( space->machine, mapper64_data[0] & 0xFE, CHRROM );
-		chr1_1( space->machine, ( mapper64_data[0] & 0xFE ) | 1, CHRROM );
-		chr1_2( space->machine, mapper64_data[1] & 0xFE, CHRROM );
-		chr1_3( space->machine, ( mapper64_data[1] & 0xFE ) | 1, CHRROM );
+static void mapper64_set_banks( const address_space *space )
+{
+	if (mapper64_cmd & 0x20)
+	{
+		chr1_0(space->machine, mapper64_data[0], CHRROM);
+		chr1_2(space->machine, mapper64_data[1], CHRROM);
+		chr1_1(space->machine, mapper64_data[8], CHRROM);
+		chr1_3(space->machine, mapper64_data[9], CHRROM);
 	}
-	chr1_4( space->machine, mapper64_data[2], CHRROM );
-	chr1_5( space->machine, mapper64_data[3], CHRROM );
-	chr1_6( space->machine, mapper64_data[4], CHRROM );
-	chr1_7( space->machine, mapper64_data[5], CHRROM );
+	else
+	{
+		chr1_0( space->machine, mapper64_data[0] & 0xfe, CHRROM);
+		chr1_1( space->machine, (mapper64_data[0] & 0xfe) | 1, CHRROM);
+		chr1_2( space->machine, mapper64_data[1] & 0xfe, CHRROM);
+		chr1_3( space->machine, (mapper64_data[1] & 0xfe) | 1, CHRROM);
+	}
 
-	prg8_89( space, mapper64_data[6] );
-	prg8_ab( space, mapper64_data[7] );
-	prg8_cd( space, mapper64_data[10] );
+	chr1_4(space->machine, mapper64_data[2], CHRROM);
+	chr1_5(space->machine, mapper64_data[3], CHRROM);
+	chr1_6(space->machine, mapper64_data[4], CHRROM);
+	chr1_7(space->machine, mapper64_data[5], CHRROM);
+
+	prg8_89(space, mapper64_data[6]);
+	prg8_ab(space, mapper64_data[7]);
+	prg8_cd(space, mapper64_data[10]);
 }
 
 static WRITE8_HANDLER( mapper64_m_w )
@@ -3559,7 +3590,7 @@ static WRITE8_HANDLER( mapper64_w )
 /* TODO: something in the IRQ handling hoses Skull & Crossbones */
 	//nes_state *state = space->machine->driver_data;
 
-//	logerror("mapper64_w offset: %04x, data: %02x, scanline: %d\n", offset, data, current_scanline);
+//  logerror("mapper64_w offset: %04x, data: %02x, scanline: %d\n", offset, data, current_scanline);
 
 	switch (offset & 0x7001)
 	{
@@ -3567,12 +3598,11 @@ static WRITE8_HANDLER( mapper64_w )
 			mapper64_cmd = data;
 			break;
 		case 0x0001:
-			if ( ( mapper64_cmd & 0x0F ) < 10 ) {
-				mapper64_data[ mapper64_cmd & 0x0F ] = data;
-			}
-			if ( ( mapper64_cmd & 0x0F ) == 0x0F ) {
-				mapper64_data[ 10 ] = data;
-			}
+			if ((mapper64_cmd & 0x0f) < 10)
+				mapper64_data[mapper64_cmd & 0x0f] = data;
+			if ((mapper64_cmd & 0x0f) == 0x0f)
+				mapper64_data[10] = data;
+
 			mapper64_set_banks(space);
 			break;
 		case 0x2000:
@@ -3589,9 +3619,9 @@ static WRITE8_HANDLER( mapper64_w )
 			break;
 		case 0x4000: /* $c000 - IRQ scanline counter */
 			IRQ_count_latch = data;
-			if ( 0 ) {
+			if (0)
 				IRQ_count = IRQ_count_latch;
-			}
+
 			logerror("     MMC3 copy/set irq latch: %02x\n", data);
 			break;
 
@@ -3603,17 +3633,17 @@ static WRITE8_HANDLER( mapper64_w )
 
 		case 0x6000: /* $e000 - Disable IRQs */
 			IRQ_enable = 0;
-			if ( 0 ) {
+			if (0)
 				IRQ_count = IRQ_count_latch;
-			}
+
 			logerror("     MMC3 disable irqs: %02x\n", data);
 			break;
 
 		case 0x6001: /* $e001 - Enable IRQs */
 			IRQ_enable = 1;
-			if ( 0 ) {
+			if (0)
 				IRQ_count = IRQ_count_latch;
-			}
+
 			logerror("     MMC3 enable irqs: %02x\n", data);
 			break;
 
@@ -3642,7 +3672,7 @@ static WRITE8_HANDLER( mapper65_w )
 		case 0x0000:
 			/* Switch 8k bank at $8000 */
 			data &= prg_mask;
-			memory_set_bankptr (space->machine, 1, &nes.rom[0x2000 * (data) + 0x10000]);
+			memory_set_bankptr(space->machine, 1, &nes.rom[0x2000 * (data) + 0x10000]);
 			LOG_MMC(("     Mapper 65 switch ($8000) value: %02x\n", data));
 			break;
 		case 0x1001:
@@ -3661,7 +3691,7 @@ static WRITE8_HANDLER( mapper65_w )
 		case 0x2000:
 			/* Switch 8k bank at $a000 */
 			data &= prg_mask;
-			memory_set_bankptr (space->machine, 2, &nes.rom[0x2000 * (data) + 0x10000]);
+			memory_set_bankptr(space->machine, 2, &nes.rom[0x2000 * (data) + 0x10000]);
 			LOG_MMC(("     Mapper 65 switch ($a000) value: %02x\n", data));
 			break;
 
@@ -3681,7 +3711,7 @@ static WRITE8_HANDLER( mapper65_w )
 		case 0x4000:
 			/* Switch 8k bank at $c000 */
 			data &= prg_mask;
-			memory_set_bankptr (space->machine, 3, &nes.rom[0x2000 * (data) + 0x10000]);
+			memory_set_bankptr(space->machine, 3, &nes.rom[0x2000 * (data) + 0x10000]);
 			LOG_MMC(("     Mapper 65 switch ($c000) value: %02x\n", data));
 			break;
 
@@ -3695,8 +3725,8 @@ static WRITE8_HANDLER( mapper66_w )
 {
 	LOG_MMC(("* Mapper 66 switch, offset %04x, data: %02x\n", offset, data));
 
-	prg32 (space, (data & 0x30) >> 4);
-	chr8 (space->machine, data & 0x03, CHRROM);
+	prg32(space, (data & 0x30) >> 4);
+	chr8(space->machine, data & 0x03, CHRROM);
 }
 
 static void sunsoft_irq ( const device_config *device, int scanline, int vblank, int blanked )
@@ -3717,41 +3747,41 @@ static void sunsoft_irq ( const device_config *device, int scanline, int vblank,
 
 static WRITE8_HANDLER( mapper67_w )
 {
-//	logerror("mapper67_w, offset %04x, data: %02x\n", offset, data);
+//  logerror("mapper67_w, offset %04x, data: %02x\n", offset, data);
 	switch (offset & 0x7801)
 	{
-//		case 0x0000: /* IRQ acknowledge */
-//			IRQ_enable = 0;
-//			break;
+//      case 0x0000: /* IRQ acknowledge */
+//          IRQ_enable = 0;
+//          break;
 		case 0x0800:
-			chr2_0 (space->machine, data, CHRROM);
+			chr2_0(space->machine, data, CHRROM);
 			break;
 		case 0x1800:
-			chr2_2 (space->machine, data, CHRROM);
+			chr2_2(space->machine, data, CHRROM);
 			break;
 		case 0x2800:
-			chr2_4 (space->machine, data, CHRROM);
+			chr2_4(space->machine, data, CHRROM);
 			break;
 		case 0x3800:
-			chr2_6 (space->machine, data, CHRROM);
+			chr2_6(space->machine, data, CHRROM);
 			break;
 		case 0x4800:
-//			nes_vram[5] = data * 64;
-//			break;
+//          nes_vram[5] = data * 64;
+//          break;
 		case 0x4801:
 			/* IRQ count? */
 			IRQ_count = IRQ_count_latch;
 			IRQ_count_latch = data;
 			break;
 		case 0x5800:
-//			chr4_0 (space->machine, data);
-//			break;
+//          chr4_0(space->machine, data);
+//          break;
 		case 0x5801:
 			IRQ_enable = data;
 			break;
 		case 0x6800:
 		case 0x6801:
-			switch(data&3)
+			switch (data & 3)
 			{
 				case 0x00: set_nt_mirroring(PPU_MIRROR_VERT); break;
 				case 0x01: set_nt_mirroring(PPU_MIRROR_HORZ); break;
@@ -3761,7 +3791,7 @@ static WRITE8_HANDLER( mapper67_w )
 			break;
 		case 0x7800:
 		case 0x7801:
-			prg16_89ab (space, data);
+			prg16_89ab(space, data);
 			break;
 		default:
 			logerror("mapper67_w uncaught offset: %04x, data: %02x\n", offset, data);
@@ -3844,7 +3874,7 @@ static WRITE8_HANDLER( mapper68_w )
 			mapper68_mirror (space->machine, m68_mirror, m0, m1);
 			break;
 		case 0x7000:
-			prg16_89ab (space, data);
+			prg16_89ab(space, data);
 			break;
 		default:
 			logerror("mapper68_w uncaught offset: %04x, data: %02x\n", offset, data);
@@ -3857,7 +3887,7 @@ static WRITE8_HANDLER( mapper69_w )
 {
 	static int cmd = 0;
 
-//	logerror("mapper69_w offset: %04x, data: %02x, scanline: %d\n", offset, data, current_scanline);
+//  logerror("mapper69_w offset: %04x, data: %02x, scanline: %d\n", offset, data, current_scanline);
 
 	switch (offset & 0x7000)
 	{
@@ -3878,7 +3908,7 @@ static WRITE8_HANDLER( mapper69_w )
 #if 0
 					if (!(data & 0x40))
 					{
-						memory_set_bankptr (space->machine, 5, &nes.rom[(data & 0x3f) * 0x2000 + 0x10000]);
+						memory_set_bankptr(space->machine, 5, &nes.rom[(data & 0x3f) * 0x2000 + 0x10000]);
 					}
 					else
 #endif
@@ -3886,13 +3916,13 @@ static WRITE8_HANDLER( mapper69_w )
 					break;
 
 				case 9:
-					prg8_89 (space, data);
+					prg8_89(space, data);
 					break;
 				case 10:
-					prg8_ab (space, data);
+					prg8_ab(space, data);
 					break;
 				case 11:
-					prg8_cd (space, data);
+					prg8_cd(space, data);
 					break;
 				case 12:
 					switch (data & 0x03)
@@ -3927,16 +3957,16 @@ static WRITE8_HANDLER( mapper70_w )
 
 	/* TODO: is the data being written irrelevant? */
 
-	prg16_89ab (space, (data & 0xf0) >> 4);
+	prg16_89ab(space, (data & 0xf0) >> 4);
 
-	chr8 (space->machine, data & 0x0f, CHRROM);
+	chr8(space->machine, data & 0x0f, CHRROM);
 
 #if 1
 	if (data & 0x80)
-//		set_nt_mirroring(state->ppu, PPU_MIRROR_HORZ);
+//      set_nt_mirroring(state->ppu, PPU_MIRROR_HORZ);
 		set_nt_mirroring(PPU_MIRROR_HIGH);
 	else
-//		set_nt_mirroring(state->ppu, PPU_MIRROR_VERT);
+//      set_nt_mirroring(state->ppu, PPU_MIRROR_VERT);
 		set_nt_mirroring(PPU_MIRROR_LOW);
 #endif
 }
@@ -3945,7 +3975,7 @@ static WRITE8_HANDLER( mapper71_m_w )
 {
 	logerror("mapper71_m_w offset: %04x, data: %02x\n", offset, data);
 
-	prg16_89ab (space, data);
+	prg16_89ab(space, data);
 }
 
 static WRITE8_HANDLER( mapper71_w )
@@ -3953,7 +3983,7 @@ static WRITE8_HANDLER( mapper71_w )
 	logerror("mapper71_w offset: %04x, data: %02x\n", offset, data);
 
 	if (offset >= 0x4000)
-		prg16_89ab (space, data);
+		prg16_89ab(space, data);
 }
 
 static WRITE8_HANDLER( mapper72_w )
@@ -3961,9 +3991,9 @@ static WRITE8_HANDLER( mapper72_w )
 	logerror("mapper72_w, offset %04x, data: %02x\n", offset, data);
 
 	if(data&0x80)
-		prg16_89ab (space, data & 0x0f);
+		prg16_89ab(space, data & 0x0f);
 	if(data&0x40)
-		chr8 (space->machine, data & 0x0f, CHRROM);
+		chr8(space->machine, data & 0x0f, CHRROM);
 
 }
 
@@ -3989,7 +4019,7 @@ static WRITE8_HANDLER( mapper73_w )
 			IRQ_count |= (data & 0x0f) << 4;
 			break;
 		case 0x7000:
-			prg16_89ab (space, data);
+			prg16_89ab(space, data);
 			break;
 		default:
 			logerror("mapper73_w uncaught, offset %04x, data: %02x\n", offset, data);
@@ -4005,7 +4035,7 @@ static WRITE8_HANDLER( mapper75_w )
 	switch (offset & 0x7000)
 	{
 		case 0x0000:
-			prg8_89 (space, data);
+			prg8_89(space, data);
 			break;
 		case 0x1000: /* TODO: verify */
 			if (data & 0x01)
@@ -4015,44 +4045,52 @@ static WRITE8_HANDLER( mapper75_w )
 			/* vrom banking as well? */
 			break;
 		case 0x2000:
-			prg8_ab (space, data);
+			prg8_ab(space, data);
 			break;
 		case 0x4000:
-			prg8_cd (space, data);
+			prg8_cd(space, data);
 			break;
 		case 0x6000:
-			chr4_0 (space->machine, data, CHRROM);
+			chr4_0(space->machine, data, CHRROM);
 			break;
 		case 0x7000:
-			chr4_4 (space->machine, data, CHRROM);
+			chr4_4(space->machine, data, CHRROM);
 			break;
 	}
 }
 
 static WRITE8_HANDLER( mapper76_w )
 {
-	static int cmd=0;
+	static int cmd = 0;
 
 	logerror("mapper76_w, offset: %04x, data: %02x\n", offset, data);
 
-	switch(offset&0x7001)
+	switch (offset & 0x7001)
 	{
-	case 0: cmd=data;break;
+	case 0:
+		cmd = data;
+		break;
 	case 1:
 		{
-			switch(cmd&7)
+			switch (cmd & 7)
 			{
-			case 2:chr2_0(space->machine, data, CHRROM);break;
-			case 3:chr2_2(space->machine, data, CHRROM);break;
-			case 4:chr2_4(space->machine, data, CHRROM);break;
-			case 5:chr2_6(space->machine, data, CHRROM);break;
-			case 6:(cmd&0x40)?prg8_cd(space, data):prg8_89(space, data);break;
-			case 7:prg8_ab(space, data);break;
-			default:logerror("mapper76 unsupported command: %02x, data: %02x\n", cmd, data);break;
+			case 2: chr2_0(space->machine, data, CHRROM); break;
+			case 3: chr2_2(space->machine, data, CHRROM); break;
+			case 4: chr2_4(space->machine, data, CHRROM); break;
+			case 5: chr2_6(space->machine, data, CHRROM); break;
+			case 6:
+				(cmd & 0x40) ? prg8_cd(space, data) : prg8_89(space, data);
+				break;
+			case 7: prg8_ab(space, data); break;
+			default: logerror("mapper76 unsupported command: %02x, data: %02x\n", cmd, data); break;
 			}
 		}
-	case 0x2000: (data&1)?set_nt_mirroring(PPU_MIRROR_HORZ):set_nt_mirroring(PPU_MIRROR_VERT);break;
-	default: logerror("mapper76 unmapped write, offset: %04x, data: %02x\n", offset, data);break;
+	case 0x2000:
+		(data & 1) ? set_nt_mirroring(PPU_MIRROR_HORZ) : set_nt_mirroring(PPU_MIRROR_VERT);
+		break;
+	default:
+		logerror("mapper76 unmapped write, offset: %04x, data: %02x\n", offset, data);
+		break;
 	}
 }
 static WRITE8_HANDLER( mapper77_w )
@@ -4064,14 +4102,14 @@ static WRITE8_HANDLER( mapper77_w )
 	switch (offset)
 	{
 		case 0x7c84:
-//			prg8_89 (space, data);
+//          prg8_89(space, data);
 			break;
 		case 0x7c86:
-//			prg8_89 (space, data);
-//			prg8_ab (space, data);
-//			prg8_cd (space, data);
-//			prg16_89ab (space, data); /* red screen */
-//			prg16_cdef (space, data);
+//          prg8_89(space, data);
+//          prg8_ab(space, data);
+//          prg8_cd(space, data);
+//          prg16_89ab(space, data); /* red screen */
+//          prg16_cdef(space, data);
 			break;
 	}
 }
@@ -4080,10 +4118,10 @@ static WRITE8_HANDLER( mapper78_w )
 {
 	logerror("mapper78_w, offset: %04x, data: %02x\n", offset, data);
 	/* Switch 8k VROM bank */
-	chr8 (space->machine, (data & 0xf0) >> 4, CHRROM);
+	chr8(space->machine, (data & 0xf0) >> 4, CHRROM);
 
 	/* Switch 16k ROM bank */
-	prg16_89ab (space, data & 0x0f);
+	prg16_89ab(space, data & 0x0f);
 }
 
 static WRITE8_HANDLER( mapper79_l_w )
@@ -4093,10 +4131,10 @@ static WRITE8_HANDLER( mapper79_l_w )
 	if ((offset-0x100) & 0x0100)
 	{
 		/* Select 8k VROM bank */
-		chr8 (space->machine, data & 0x07, CHRROM);
+		chr8(space->machine, data & 0x07, CHRROM);
 
 		/* Select 32k ROM bank? */
-		prg32 (space, (data & 0x08) >> 3);
+		prg32(space, (data & 0x08) >> 3);
 	}
 }
 
@@ -4141,15 +4179,15 @@ static WRITE8_HANDLER( mapper80_m_w )
 			break;
 		case 0x1efa: case 0x1efb:
 			/* Switch 8k ROM at $8000 */
-			prg8_89 (space, data);
+			prg8_89(space, data);
 			break;
 		case 0x1efc: case 0x1efd:
 			/* Switch 8k ROM at $a000 */
-			prg8_ab (space, data);
+			prg8_ab(space, data);
 			break;
 		case 0x1efe: case 0x1eff:
 			/* Switch 8k ROM at $c000 */
-			prg8_cd (space, data);
+			prg8_cd(space, data);
 			break;
 		default:
 			logerror("mapper80_m_w uncaught addr: %04x, value: %02x\n", offset + 0x6000, data);
@@ -4194,34 +4232,34 @@ static WRITE8_HANDLER( mapper207_m_w )
 		case 0x1ef2:
 			/* Switch 1k VROM at $1000 */
 			chr1_4(space->machine, data, CHRROM);
-//			ppu2c0x_set_videorom_bank(state->ppu, 4, 1, data, 64);
+//          ppu2c0x_set_videorom_bank(state->ppu, 4, 1, data, 64);
 			break;
 		case 0x1ef3:
 			/* Switch 1k VROM at $1400 */
 			chr1_5(space->machine, data, CHRROM);
-//			ppu2c0x_set_videorom_bank(state->ppu, 5, 1, data, 64);
+//          ppu2c0x_set_videorom_bank(state->ppu, 5, 1, data, 64);
 			break;
 		case 0x1ef4:
 			/* Switch 1k VROM at $1800 */
 			chr1_6(space->machine, data, CHRROM);
-//			ppu2c0x_set_videorom_bank(state->ppu, 6, 1, data, 64);
+//          ppu2c0x_set_videorom_bank(state->ppu, 6, 1, data, 64);
 			break;
 		case 0x1ef5:
 			/* Switch 1k VROM at $1c00 */
 			chr1_7(space->machine, data, CHRROM);
-//			ppu2c0x_set_videorom_bank(state->ppu, 7, 1, data, 64);
+//          ppu2c0x_set_videorom_bank(state->ppu, 7, 1, data, 64);
 			break;
 		case 0x1efa: case 0x1efb:
 			/* Switch 8k ROM at $8000 */
-			prg8_89 (space, data);
+			prg8_89(space, data);
 			break;
 		case 0x1efc: case 0x1efd:
 			/* Switch 8k ROM at $a000 */
-			prg8_ab (space, data);
+			prg8_ab(space, data);
 			break;
 		case 0x1efe: case 0x1eff:
 			/* Switch 8k ROM at $c000 */
-			prg8_cd (space, data);
+			prg8_cd(space, data);
 			break;
 		default:
 			logerror("mapper80_m_w uncaught addr: %04x, value: %02x\n", offset + 0x6000, data);
@@ -4261,17 +4299,17 @@ static WRITE8_HANDLER( mapper82_m_w )
 		case 0x1ef3:
 			/* Switch 1k VROM at $1400 */
 			chr1_x(space->machine, 5 ^ vrom_switch, data, CHRROM);
-//			ppu2c0x_set_videorom_bank(state->ppu, 5 ^ vrom_switch, 1, data, 64);
+//          ppu2c0x_set_videorom_bank(state->ppu, 5 ^ vrom_switch, 1, data, 64);
 			break;
 		case 0x1ef4:
 			/* Switch 1k VROM at $1800 */
 			chr1_x(space->machine, 6 ^ vrom_switch, data, CHRROM);
-//			ppu2c0x_set_videorom_bank(state->ppu, 6 ^ vrom_switch, 1, data, 64);
+//          ppu2c0x_set_videorom_bank(state->ppu, 6 ^ vrom_switch, 1, data, 64);
 			break;
 		case 0x1ef5:
 			/* Switch 1k VROM at $1c00 */
 			chr1_x(space->machine, 7 ^ vrom_switch, data, CHRROM);
-//			ppu2c0x_set_videorom_bank(state->ppu, 7 ^ vrom_switch, 1, data, 64);
+//          ppu2c0x_set_videorom_bank(state->ppu, 7 ^ vrom_switch, 1, data, 64);
 			break;
 		case 0x1ef6:
 			(data&0x1)?set_nt_mirroring(PPU_MIRROR_VERT):set_nt_mirroring(PPU_MIRROR_HORZ);
@@ -4281,15 +4319,15 @@ static WRITE8_HANDLER( mapper82_m_w )
 
 		case 0x1efa:
 			/* Switch 8k ROM at $8000 */
-			prg8_89 (space, data >> 2);
+			prg8_89(space, data >> 2);
 			break;
 		case 0x1efb:
 			/* Switch 8k ROM at $a000 */
-			prg8_ab (space, data >> 2);
+			prg8_ab(space, data >> 2);
 			break;
 		case 0x1efc:
 			/* Switch 8k ROM at $c000 */
-			prg8_cd (space, data >> 2);
+			prg8_cd(space, data >> 2);
 			break;
 		default:
 			logerror("mapper82_m_w uncaught addr: %04x, value: %02x\n", offset + 0x6000, data);
@@ -4299,50 +4337,54 @@ static WRITE8_HANDLER( mapper82_m_w )
 
 static WRITE8_HANDLER( mapper83_l_w )
 {
-	mapper83_low_data[ offset & 0x03 ] = data;
+	mapper83_low_data[offset & 0x03] = data;
 }
 
 static READ8_HANDLER( mapper83_l_r )
 {
-	return mapper83_low_data[ offset & 0x03 ];
+	return mapper83_low_data[offset & 0x03];
 }
 
-static void mapper83_set_prg( const address_space *space ) {
-	prg16_89ab( space, mapper83_data[8] & 0x3F );
-	prg16_cdef( space, ( mapper83_data[8] & 0x30 ) | 0x0F );
+static void mapper83_set_prg( const address_space *space )
+{
+	prg16_89ab(space, mapper83_data[8] & 0x3f);
+	prg16_cdef(space, (mapper83_data[8] & 0x30) | 0x0f);
 }
 
-static void mapper83_set_chr( running_machine *machine ) {
-	chr1_0( machine, mapper83_data[0] | ( ( mapper83_data[8] & 0x30 ) << 4 ), CHRROM );
-	chr1_1( machine, mapper83_data[1] | ( ( mapper83_data[8] & 0x30 ) << 4 ), CHRROM );
-	chr1_2( machine, mapper83_data[2] | ( ( mapper83_data[8] & 0x30 ) << 4 ), CHRROM );
-	chr1_3( machine, mapper83_data[3] | ( ( mapper83_data[8] & 0x30 ) << 4 ), CHRROM );
-	chr1_4( machine, mapper83_data[4] | ( ( mapper83_data[8] & 0x30 ) << 4 ), CHRROM );
-	chr1_5( machine, mapper83_data[5] | ( ( mapper83_data[8] & 0x30 ) << 4 ), CHRROM );
-	chr1_6( machine, mapper83_data[6] | ( ( mapper83_data[8] & 0x30 ) << 4 ), CHRROM );
-	chr1_7( machine, mapper83_data[7] | ( ( mapper83_data[8] & 0x30 ) << 4 ), CHRROM );
+static void mapper83_set_chr( running_machine *machine )
+{
+	chr1_0(machine, mapper83_data[0] | ((mapper83_data[8] & 0x30) << 4), CHRROM);
+	chr1_1(machine, mapper83_data[1] | ((mapper83_data[8] & 0x30) << 4), CHRROM);
+	chr1_2(machine, mapper83_data[2] | ((mapper83_data[8] & 0x30) << 4), CHRROM);
+	chr1_3(machine, mapper83_data[3] | ((mapper83_data[8] & 0x30) << 4), CHRROM);
+	chr1_4(machine, mapper83_data[4] | ((mapper83_data[8] & 0x30) << 4), CHRROM);
+	chr1_5(machine, mapper83_data[5] | ((mapper83_data[8] & 0x30) << 4), CHRROM);
+	chr1_6(machine, mapper83_data[6] | ((mapper83_data[8] & 0x30) << 4), CHRROM);
+	chr1_7(machine, mapper83_data[7] | ((mapper83_data[8] & 0x30) << 4), CHRROM);
 }
 
 static WRITE8_HANDLER( mapper83_w )
 {
 	LOG_MMC(("mapper83_w, offset: %04x, data: %02x\n", offset, data));
 
-	switch( offset ) {
+	switch (offset)
+	{
 	case 0x0000:
 	case 0x3000:
-	case 0x30FF:
-	case 0x31FF:
+	case 0x30ff:
+	case 0x31ff:
 		mapper83_data[8] = data;
 		mapper83_set_prg(space);
 		mapper83_set_chr(space->machine);
 		break;
 	case 0x0100:
-		switch( data & 0x03 ) {
+		switch (data & 0x03)
+		{
 		case 0:
-			set_nt_mirroring(PPU_MIRROR_VERT );
+			set_nt_mirroring(PPU_MIRROR_VERT);
 			break;
 		case 1:
-			set_nt_mirroring(PPU_MIRROR_HORZ );
+			set_nt_mirroring(PPU_MIRROR_HORZ);
 			break;
 		case 2:
 			set_nt_mirroring(PPU_MIRROR_LOW);
@@ -4353,20 +4395,20 @@ static WRITE8_HANDLER( mapper83_w )
 		}
 		break;
 	case 0x0200:
-		IRQ_count = ( IRQ_count & 0xFF00 ) | data;
+		IRQ_count = (IRQ_count & 0xff00) | data;
 		break;
 	case 0x0201:
 		IRQ_enable = 1;
-		IRQ_count = ( data << 8 ) | ( IRQ_count & 0xFF );
+		IRQ_count = (data << 8) | (IRQ_count & 0xff);
 		break;
 	case 0x0300:
-		prg8_89( space, data );
+		prg8_89(space, data);
 		break;
 	case 0x0301:
-		prg8_ab( space, data );
+		prg8_ab(space, data);
 		break;
 	case 0x0302:
-		prg8_cd( space, data );
+		prg8_cd(space, data);
 		break;
 	case 0x0310:
 	case 0x0311:
@@ -4376,7 +4418,7 @@ static WRITE8_HANDLER( mapper83_w )
 	case 0x0315:
 	case 0x0316:
 	case 0x0317:
-		mapper83_data[ offset - 0x0310 ] = data;
+		mapper83_data[offset - 0x0310] = data;
 		mapper83_set_chr(space->machine);
 		break;
 	case 0x0318:
@@ -4388,22 +4430,22 @@ static WRITE8_HANDLER( mapper83_w )
 
 static WRITE8_HANDLER( konami_vrc7_w )
 {
-//	logerror("konami_vrc7_w offset: %04x, data: %02x, scanline: %d\n", offset, data, current_scanline);
+//  logerror("konami_vrc7_w offset: %04x, data: %02x, scanline: %d\n", offset, data, current_scanline);
 
 	switch (offset & 0x7018)
 	{
 		case 0x0000:
 			/* Switch 8k bank at $8000 */
-			prg8_89 (space, data);
+			prg8_89(space, data);
 			break;
 		case 0x0008: case 0x0010: case 0x0018:
 			/* Switch 8k bank at $a000 */
-			prg8_ab (space, data);
+			prg8_ab(space, data);
 			break;
 
 		case 0x1000:
 			/* Switch 8k bank at $c000 */
-			prg8_cd (space, data);
+			prg8_cd(space, data);
 			break;
 
 /* TODO: there are sound regs in here */
@@ -4411,7 +4453,7 @@ static WRITE8_HANDLER( konami_vrc7_w )
 		case 0x2000:
 			/* Switch 1k VROM at $0000 */
 			chr1_0(space->machine, data, CHRROM);
-//			ppu2c0x_set_videorom_bank(state->ppu, 0, 1, data, 64);
+//          ppu2c0x_set_videorom_bank(state->ppu, 0, 1, data, 64);
 			break;
 		case 0x2008: case 0x2010: case 0x2018:
 			/* Switch 1k VROM at $0400 */
@@ -4475,12 +4517,12 @@ static WRITE8_HANDLER( mapper86_w )
 	switch (offset)
 	{
 		case 0x7541:
-			prg16_89ab (space, data >> 4);
-//			prg16_cdef (space, data >> 4);
+			prg16_89ab(space, data >> 4);
+//          prg16_cdef(space, data >> 4);
 			break;
 		case 0x7d41:
-//			prg16_89ab (space, data >> 4);
-//			prg16_cdef (space, data >> 4);
+//          prg16_89ab(space, data >> 4);
+//          prg16_cdef(space, data >> 4);
 			break;
 	}
 }
@@ -4490,7 +4532,7 @@ static WRITE8_HANDLER( mapper87_m_w )
 	logerror("mapper87_m_w %04x:%02x\n", offset, data);
 
 	/* TODO: verify */
-	chr8 (space->machine, data >> 1, CHRROM);
+	chr8(space->machine, data >> 1, CHRROM);
 }
 static WRITE8_HANDLER( mapper89_w )
 {
@@ -4521,8 +4563,8 @@ static WRITE8_HANDLER( mapper91_m_w )
 		case 0x1000:
 			switch (offset & 0x01)
 			{
-				case 0x00: prg8_89 (space, data); break;
-				case 0x01: prg8_ab (space, data); break;
+				case 0x00: prg8_89(space, data); break;
+				case 0x01: prg8_ab(space, data); break;
 			}
 			break;
 		default:
@@ -4535,9 +4577,9 @@ static WRITE8_HANDLER( mapper92_w )
 	logerror("mapper92_w, offset %04x, data: %02x\n", offset, data);
 
 	if(data&0x80)
-		prg16_cdef (space, data & 0x0f);
+		prg16_cdef(space, data & 0x0f);
 	if(data&0x40)
-		chr8 (space->machine, data & 0x0f, CHRROM);
+		chr8(space->machine, data & 0x0f, CHRROM);
 
 }
 
@@ -4545,7 +4587,7 @@ static WRITE8_HANDLER( mapper93_m_w )
 {
 	LOG_MMC(("mapper93_m_w %04x:%02x\n", offset, data));
 
-	prg16_89ab (space, data);
+	prg16_89ab(space, data);
 }
 
 static WRITE8_HANDLER( mapper93_w )
@@ -4560,7 +4602,7 @@ static WRITE8_HANDLER( mapper94_w )
 {
 	LOG_MMC(("mapper94_w %04x:%02x\n", offset, data));
 
-	prg16_89ab (space, data >> 2);
+	prg16_89ab(space, data >> 2);
 }
 
 static WRITE8_HANDLER( mapper95_w )
@@ -4571,19 +4613,19 @@ static WRITE8_HANDLER( mapper95_w )
 	{
 		case 0x0000:
 			/* Switch 8k bank at $8000 */
-//			prg8_89 (space, data);
-//			prg8_ab (space, data);
-//			prg16_89ab (space, data);
+//          prg8_89(space, data);
+//          prg8_ab(space, data);
+//          prg16_89ab(space, data);
 			break;
 		case 0x0001:
 			/* Switch 8k bank at $a000 */
-			prg8_ab (space, data >> 1);
+			prg8_ab(space, data >> 1);
 			break;
 	}
 }
 static WRITE8_HANDLER( mapper96_w )
 {
-	prg32 (space, data);
+	prg32(space, data);
 }
 
 static WRITE8_HANDLER( mapper97_w )
@@ -4599,7 +4641,7 @@ static WRITE8_HANDLER( mapper101_m_w )
 {
 	LOG_MMC(("mapper101_m_w %04x:%02x\n", offset, data));
 
-	chr8 (space->machine, data, CHRROM);
+	chr8(space->machine, data, CHRROM);
 }
 
 static WRITE8_HANDLER( mapper101_w )
@@ -4610,7 +4652,7 @@ static WRITE8_HANDLER( mapper101_w )
 }
 static WRITE8_HANDLER( mapper107_w )
 {
-	prg32(space, data>>1);
+	prg32(space, data >> 1);
 	chr8(space->machine, data, CHRROM);
 }
 
@@ -4618,44 +4660,46 @@ static WRITE8_HANDLER( mapper112_w )
 {
 	LOG_MMC(("mapper112_w, offset: %04x, data: %02x\n", offset, data));
 
-	switch( offset ) {
+	switch (offset)
+	{
 	case 0x0000:
 		MMC1_bank1 = data;
 		break;
 	case 0x2000:
-		switch ( MMC1_bank1 ) {
+		switch (MMC1_bank1)
+		{
 		case 0:
-			prg8_89( space, data );
+			prg8_89(space, data);
 			break;
 		case 1:
-			prg8_ab( space, data );
+			prg8_ab(space, data);
 			break;
 		case 2:
-			data &= 0xFE;
-			chr1_0( space->machine, data, CHRROM );
-			chr1_1( space->machine, data + 1, CHRROM );
+			data &= 0xfe;
+			chr1_0(space->machine, data, CHRROM);
+			chr1_1(space->machine, data + 1, CHRROM);
 			break;
 		case 3:
-			data &= 0xFE;
-			chr1_2( space->machine, data, CHRROM );
-			chr1_3( space->machine, data + 1, CHRROM );
+			data &= 0xfe;
+			chr1_2(space->machine, data, CHRROM);
+			chr1_3(space->machine, data + 1, CHRROM);
 			break;
 		case 4:
-			chr1_4( space->machine, data, CHRROM );
+			chr1_4(space->machine, data, CHRROM);
 			break;
 		case 5:
-			chr1_5( space->machine, data, CHRROM );
+			chr1_5(space->machine, data, CHRROM);
 			break;
 		case 6:
-			chr1_6( space->machine, data, CHRROM );
+			chr1_6(space->machine, data, CHRROM);
 			break;
 		case 7:
-			chr1_7( space->machine, data, CHRROM );
+			chr1_7(space->machine, data, CHRROM);
 			break;
 		}
 		break;
 	case 0x6000:
-		set_nt_mirroring(( data & 0x01 ) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT );
+		set_nt_mirroring((data & 0x01) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 		break;
 	}
 }
@@ -4677,14 +4721,14 @@ static WRITE8_HANDLER( mapper133_l_w )
 	//I think this is the right value
 	if(offset!=0x20)
 		return;
-	prg32(space, data>>2);
-	chr8(space->machine, data&3, CHRROM);
+	prg32(space, data >> 2);
+	chr8(space->machine, data & 3, CHRROM);
 }
 
 static WRITE8_HANDLER( mapper_140_m_w )
 {
        chr8(space->machine, data&0x0f, CHRROM);
-       prg32(space, (data>>4)&0x03);
+       prg32(space, (data >> 4) & 0x03);
 }
 
 static WRITE8_HANDLER( mapper144_w )
@@ -4694,40 +4738,40 @@ static WRITE8_HANDLER( mapper144_w )
 	//just like mapper 11, except bit 0 taken from ROM
 	//and 0x8000 ignored?
 
-	if(0==(offset&0x7FFF))
+	if ((offset & 0x7fff) == 0)
 		return;
 
-	data = data|(memory_read_byte(space,offset)&1);
+	data = data |(memory_read_byte(space, offset) & 1);
 
 	/* Switch 8k VROM bank */
-	chr8 (space->machine, data >> 4, CHRROM);
+	chr8(space->machine, data >> 4, CHRROM);
 
 	/* Switch 32k prg bank */
-	prg32 (space, data & 0x07);
+	prg32(space, data & 0x07);
 }
+
 static WRITE8_HANDLER( mapper154_w )
 {
-	switch(offset&1)
+	switch (offset & 1)
 	{
 	case 0:
 		{
-			(data&0x40)?set_nt_mirroring(PPU_MIRROR_HIGH):set_nt_mirroring(PPU_MIRROR_LOW);
-			mapper154_reg=data&7;
+			(data & 0x40) ? set_nt_mirroring(PPU_MIRROR_HIGH) : set_nt_mirroring(PPU_MIRROR_LOW);
+			mapper154_reg = data & 7;
 			break;
 		}
 	case 1:
 		{
-			switch(mapper154_reg)
+			switch (mapper154_reg)
 			{
-				case 0:chr2_0(space->machine,(data)>>1, CHRROM);break;
-				case 1:chr2_2(space->machine,(data)>>1, CHRROM);break;
-				case 2:chr1_4(space->machine,(data)|0x40, CHRROM);break;
-				case 3:chr1_5(space->machine,(data)|0x40, CHRROM);break;
-				case 4:chr1_6(space->machine,(data)|0x40, CHRROM);break;
-				case 5:chr1_7(space->machine,(data)|0x40, CHRROM);break;
-				case 6:prg8_89(space,data);break;
-				case 7:prg8_ab(space,data);break;
-
+				case 0: chr2_0(space->machine, data >> 1, CHRROM); break;
+				case 1: chr2_2(space->machine, data >> 1, CHRROM); break;
+				case 2: chr1_4(space->machine, data | 0x40, CHRROM); break;
+				case 3: chr1_5(space->machine, data | 0x40, CHRROM); break;
+				case 4: chr1_6(space->machine, data | 0x40, CHRROM); break;
+				case 5: chr1_7(space->machine, data | 0x40, CHRROM); break;
+				case 6: prg8_89(space, data); break;
+				case 7: prg8_ab(space, data); break;
 			}
 			break;
 		}
@@ -4749,26 +4793,26 @@ static WRITE8_HANDLER( mapper164_w )
 
 static WRITE8_HANDLER( mapper88_w )
 {
-	switch (offset&1)
+	switch (offset & 1)
 	{
 	case 0:
 		{
-			//(data&0x40)?set_nt_mirroring(state->ppu,PPU_MIRROR_HIGH):set_nt_mirroring(state->ppu,PPU_MIRROR_LOW);
-			mapper154_reg=data&7;
+			//(data & 0x40) ? set_nt_mirroring(PPU_MIRROR_HIGH) : set_nt_mirroring(PPU_MIRROR_LOW);
+			mapper154_reg = data & 7;
 			break;
 		}
 	case 1:
 		{
-			switch(mapper154_reg)
+			switch (mapper154_reg)
 			{
-				case 0:chr2_0(space->machine,(data&0x3F)>>1, CHRROM);break;
-				case 1:chr2_2(space->machine,(data&0x3F)>>1, CHRROM);break;
-				case 2:chr1_4(space->machine,(data&0x3F)|0x40, CHRROM);break;
-				case 3:chr1_5(space->machine,(data&0x3F)|0x40, CHRROM);break;
-				case 4:chr1_6(space->machine,(data&0x3F)|0x40, CHRROM);break;
-				case 5:chr1_7(space->machine,(data&0x3F)|0x40, CHRROM);break;
-				case 6:prg8_89(space,data);break;
-				case 7:prg8_ab(space,data);break;
+				case 0: chr2_0(space->machine, (data & 0x3f) >> 1, CHRROM); break;
+				case 1: chr2_2(space->machine, (data & 0x3f) >> 1, CHRROM); break;
+				case 2: chr1_4(space->machine, (data & 0x3f) | 0x40, CHRROM); break;
+				case 3: chr1_5(space->machine, (data & 0x3f) | 0x40, CHRROM); break;
+				case 4: chr1_6(space->machine, (data & 0x3f) | 0x40, CHRROM); break;
+				case 5: chr1_7(space->machine, (data & 0x3f) | 0x40, CHRROM); break;
+				case 6: prg8_89(space,data); break;
+				case 7: prg8_ab(space,data); break;
 
 			}
 			break;
@@ -4786,38 +4830,40 @@ static WRITE8_HANDLER( mapper182_w )
 {
 	LOG_MMC(("mapper182_w, offset: %04x, data: %02x\n", offset, data));
 
-	switch( offset & 0x7003 ) {
+	switch (offset & 0x7003)
+	{
 	case 0x0001:
-		set_nt_mirroring(( data & 0x01 ) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT );
+		set_nt_mirroring((data & 0x01) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 		break;
 	case 0x2000:
 		MMC1_bank1 = data;
 		break;
 	case 0x4000:
-		switch( MMC1_bank1 ) {
+		switch (MMC1_bank1)
+		{
 		case 0:
-			chr2_0( space->machine, data >> 1, CHRROM );
+			chr2_0(space->machine, data >> 1, CHRROM);
 			break;
 		case 1:
-			chr1_5( space->machine, data, CHRROM );
+			chr1_5(space->machine, data, CHRROM);
 			break;
 		case 2:
-			chr2_2( space->machine, data >> 1, CHRROM );
+			chr2_2(space->machine, data >> 1, CHRROM);
 			break;
 		case 3:
-			chr1_7( space->machine, data, CHRROM );
+			chr1_7(space->machine, data, CHRROM);
 			break;
 		case 4:
-			prg8_89( space, data );
+			prg8_89(space, data);
 			break;
 		case 5:
-			prg8_ab( space, data );
+			prg8_ab(space, data);
 			break;
 		case 6:
-			chr1_4( space->machine, data, CHRROM );
+			chr1_4(space->machine, data, CHRROM);
 			break;
 		case 7:
-			chr1_6( space->machine, data, CHRROM );
+			chr1_6(space->machine, data, CHRROM);
 			break;
 		}
 		break;
@@ -4855,31 +4901,32 @@ static WRITE8_HANDLER( mapper184_m_w )
 
 	if(0==offset)
 	{
-		chr4_0(space->machine, data&0x0F, CHRROM);
-		chr4_4(space->machine, (data>>4), CHRROM);
+		chr4_0(space->machine, data & 0x0f, CHRROM);
+		chr4_4(space->machine, data >> 4, CHRROM);
 	}
 }
 
 static WRITE8_HANDLER( mapper188_w )
 {
-	LOG_MMC(("mapper188_w, offset: %04x, data: %02x\n", offset, data ));
+	LOG_MMC(("mapper188_w, offset: %04x, data: %02x\n", offset, data));
 
-	prg16_89ab( space, data ^ 0x08 );
+	prg16_89ab(space, data ^ 0x08);
 }
 
 static WRITE8_HANDLER( mapper193_m_w )
 {
-	LOG_MMC(("mapper193_m_w, offset: %04x, data: %02x\n", offset, data ));
+	LOG_MMC(("mapper193_m_w, offset: %04x, data: %02x\n", offset, data));
 
-	switch( offset & 0x03 ) {
+	switch (offset & 0x03)
+	{
 	case 0:
-		chr4_0( space->machine, data >> 2, CHRROM );
+		chr4_0(space->machine, data >> 2, CHRROM);
 		break;
 	case 1:
-		chr2_4( space->machine, data >> 1, CHRROM );
+		chr2_4(space->machine, data >> 1, CHRROM);
 		break;
 	case 2:
-		chr2_6( space->machine, data >> 1 , CHRROM);
+		chr2_6(space->machine, data >> 1 , CHRROM);
 		break;
 	case 3:
 		prg8_89(space, data);
@@ -4889,56 +4936,59 @@ static WRITE8_HANDLER( mapper193_m_w )
 
 static WRITE8_HANDLER( mapper200_w )
 {
-	LOG_MMC(("mapper200_w, offset: %04x, data: %02x\n", offset, data ));
+	LOG_MMC(("mapper200_w, offset: %04x, data: %02x\n", offset, data));
 
-	prg16_89ab( space, offset & 0x07 );
-	prg16_cdef( space, offset & 0x07 );
-	chr8( space->machine, offset & 0x07 , CHRROM);
-	
-	set_nt_mirroring(( offset & 0x08 ) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT );
+	prg16_89ab(space, offset & 0x07);
+	prg16_cdef(space, offset & 0x07);
+	chr8(space->machine, offset & 0x07, CHRROM);
+
+	set_nt_mirroring((offset & 0x08) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 }
 
 static WRITE8_HANDLER( mapper201_w )
 {
-	LOG_MMC(("mapper201_w, offset: %04x, data: %02x\n", offset, data ));
+	LOG_MMC(("mapper201_w, offset: %04x, data: %02x\n", offset, data));
 
-	if ( offset & 0x08 ) {
-		prg32( space, offset & 0x03 );
-		chr8( space->machine, offset & 0x03, CHRROM );
-	} else {
-		prg32( space, 0 );
-		chr8( space->machine, 0, CHRROM );
+	if (offset & 0x08)
+	{
+		prg32(space, offset & 0x03);
+		chr8(space->machine, offset & 0x03, CHRROM);
+	}
+	else
+	{
+		prg32(space, 0);
+		chr8(space->machine, 0, CHRROM);
 	}
 }
 
 static WRITE8_HANDLER( mapper202_w )
 {
-	int	bank = ( offset >> 1 ) & 0x07;
+	int	bank = (offset >> 1) & 0x07;
 
 	LOG_MMC(("mapper202_w, offset: %04x, data: %02x\n", offset, data));
 
-	prg16_89ab( space, bank );
-	prg16_cdef( space, bank + ( ( ( bank & 0x06 ) == 0x06 ) ? 1 : 0 ) );
-	chr8( space->machine, bank, CHRROM );
+	prg16_89ab(space, bank);
+	prg16_cdef(space, bank + (((bank & 0x06) == 0x06) ? 1 : 0));
+	chr8(space->machine, bank, CHRROM);
 
-	set_nt_mirroring(( offset & 0x01 ) ? PPU_MIRROR_HORZ: PPU_MIRROR_VERT );
+	set_nt_mirroring((offset & 0x01) ? PPU_MIRROR_HORZ: PPU_MIRROR_VERT);
 }
 
 static WRITE8_HANDLER( mapper203_w )
 {
 	LOG_MMC(("mapper203_w, offset: %04x, data: %02x\n", offset, data));
 
-	prg16_89ab( space, ( data >> 2 ) & 0x03 );
-	prg16_cdef( space, ( data >> 2 ) & 0x03 );
-	chr8( space->machine, data & 0x03, CHRROM );
+	prg16_89ab(space, (data >> 2) & 0x03);
+	prg16_cdef(space, (data >> 2) & 0x03);
+	chr8(space->machine, data & 0x03, CHRROM);
 }
 
 static WRITE8_HANDLER( mapper206_w )
 {
-	if ( (offset & 0x6001) == 0x2000 )
+	if ((offset & 0x6001) == 0x2000)
 		return;
 
-	mapper4_w( space, offset, data );
+	mapper4_w(space, offset, data);
 }
 
 static WRITE8_HANDLER( mapper225_w )
@@ -4949,7 +4999,7 @@ static WRITE8_HANDLER( mapper225_w )
 
 	LOG_MMC(("mapper225_w, offset: %04x, data: %02x\n", offset, data));
 
-	chr8 (space->machine, offset & 0x3f, CHRROM);
+	chr8(space->machine, offset & 0x3f, CHRROM);
 	hi_bank = offset & 0x40;
 	size_16 = offset & 0x1000;
 	bank = (offset & 0xf80) >> 7;
@@ -4959,11 +5009,11 @@ static WRITE8_HANDLER( mapper225_w )
 		if (hi_bank)
 			bank ++;
 
-		prg16_89ab (space, bank);
-		prg16_cdef (space, bank);
+		prg16_89ab(space, bank);
+		prg16_cdef(space, bank);
 	}
 	else
-		prg32 (space, bank);
+		prg32(space, bank);
 
 	if (offset & 0x2000)
 		set_nt_mirroring(PPU_MIRROR_HORZ);
@@ -5004,11 +5054,11 @@ static WRITE8_HANDLER( mapper226_w )
 		if (hi_bank)
 			bank ++;
 
-		prg16_89ab (space, bank);
-		prg16_cdef (space, bank);
+		prg16_89ab(space, bank);
+		prg16_cdef(space, bank);
 	}
 	else
-		prg32 (space, bank);
+		prg32(space, bank);
 }
 
 static WRITE8_HANDLER( mapper227_w )
@@ -5028,18 +5078,18 @@ static WRITE8_HANDLER( mapper227_w )
 		if (hi_bank)
 			bank ++;
 
-		prg16_89ab (space, bank);
-		prg16_cdef (space, bank);
+		prg16_89ab(space, bank);
+		prg16_cdef(space, bank);
 	}
 	else
-		prg32 (space, bank);
+		prg32(space, bank);
 
 	if (!(offset & 0x80))
 	{
 		if (offset & 0x200)
-			prg16_cdef (space, (bank >> 2) + 7);
+			prg16_cdef(space, (bank >> 2) + 7);
 		else
-			prg16_cdef (space, bank >> 2);
+			prg16_cdef(space, bank >> 2);
 	}
 
 	if (offset & 0x02)
@@ -5083,12 +5133,12 @@ static WRITE8_HANDLER( mapper228_w )
 		if (offset & 0x40)
 			bank ++;
 
-		prg16_89ab (space, bank);
-		prg16_cdef (space, bank);
+		prg16_89ab(space, bank);
+		prg16_cdef(space, bank);
 	}
 	else
 	{
-		prg32 (space, bank);
+		prg32(space, bank);
 	}
 
 	if (offset & 0x2000)
@@ -5098,7 +5148,7 @@ static WRITE8_HANDLER( mapper228_w )
 
 	/* Now handle vrom banking */
 	chr = (data & 0x03) + ((offset & 0x0f) << 2);
-	chr8 (space->machine, chr, CHRROM);
+	chr8(space->machine, chr, CHRROM);
 }
 
 static WRITE8_HANDLER( mapper229_w )
@@ -5112,14 +5162,14 @@ static WRITE8_HANDLER( mapper229_w )
 
 	if ((offset & 0x1e) == 0)
 	{
-		prg32 (space, 0);
-		chr8 (space->machine, 0, CHRROM);
+		prg32(space, 0);
+		chr8(space->machine, 0, CHRROM);
 	}
 	else
 	{
-		prg16_89ab (space, offset & 0x1f);
-		prg16_89ab (space, offset & 0x1f);
-		chr8 (space->machine, offset, CHRROM);
+		prg16_89ab(space, offset & 0x1f);
+		prg16_89ab(space, offset & 0x1f);
+		chr8(space->machine, offset, CHRROM);
 	}
 }
 
@@ -5127,16 +5177,22 @@ static WRITE8_HANDLER( mapper230_w )
 {
 	LOG_MMC(("mapper230_w, offset: %04x, data: %02x\n", offset, data));
 
-	if ( 1 ) {
-		prg16_89ab( space, 7 );
-	} else {
-		if ( data & 0x20 ) {
-			prg16_89ab( space, ( data & 0x1F ) + 8 );
-			prg16_cdef( space, ( data & 0x1F ) + 8 );
-		} else {
-			prg32( space, ( ( data & 0x1E ) >> 1 ) + 4 );
+	if (1)
+	{
+		prg16_89ab(space, 7);
+	}
+	else
+	{
+		if (data & 0x20)
+		{
+			prg16_89ab(space, (data & 0x1f) + 8);
+			prg16_cdef(space, (data & 0x1f) + 8);
 		}
-		set_nt_mirroring(( data & 0x40 ) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT );
+		else
+		{
+			prg32(space, ((data & 0x1e) >> 1) + 4);
+		}
+		set_nt_mirroring((data & 0x40) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 	}
 }
 
@@ -5147,33 +5203,32 @@ static WRITE8_HANDLER( mapper231_w )
 	LOG_MMC(("mapper231_w, offset: %04x, data: %02x\n", offset, data));
 
 	bank = (data & 0x03) | ((data & 0x80) >> 5);
-	prg32 (space, bank);
-	chr8 (space->machine, (data & 0x70) >> 4, CHRROM);
+	prg32(space, bank);
+	chr8(space->machine, (data & 0x70) >> 4, CHRROM);
 }
 
 static void mapper232_set_prg( const address_space *space )
 {
-	prg16_89ab( space, ( MMC1_bank2 & 0x03 ) | ( ( MMC1_bank1 & 0x18 ) >> 1 ) );
-	prg16_cdef( space, 3 | ( ( MMC1_bank1 & 0x18 ) >> 1 ) );
+	prg16_89ab(space, (MMC1_bank2 & 0x03) | ((MMC1_bank1 & 0x18) >> 1));
+	prg16_cdef(space, 0x03 | ((MMC1_bank1 & 0x18) >> 1));
 }
 
 static WRITE8_HANDLER( mapper232_w )
 {
-	LOG_MMC(("mapper232_w, offset: %04x, data: %02x\n", offset, data ));
+	LOG_MMC(("mapper232_w, offset: %04x, data: %02x\n", offset, data));
 
-	if ( offset < 0x2000 ) {
+	if (offset < 0x2000)
 		MMC1_bank1 = data;
-	} else {
+	else
 		MMC1_bank2 = data;
-	}
 }
 
 static WRITE8_HANDLER( mapper240_l_w )
 {
 	LOG_MMC(("mapper240_l_w, offset: %04x, data: %02x\n", offset, data));
 
-	prg32( space, data >> 4 );
-	chr8( space->machine, data & 0x0F, CHRROM );
+	prg32(space, data >> 4);
+	chr8(space->machine, data & 0x0f, CHRROM);
 }
 
 static READ8_HANDLER( mapper241_l_r )
@@ -5185,21 +5240,22 @@ static WRITE8_HANDLER( mapper241_w )
 {
 	LOG_MMC(("mapper241_w, offset: %04x, data: %02x\n", offset, data));
 
-	prg32( space, data );
+	prg32(space, data);
 }
 
 static WRITE8_HANDLER( mapper242_w )
 {
 	LOG_MMC(("mapper242_w, offset: %04x, data: %02x\n", offset, data));
 
-	prg32( space, ( offset >> 3 ) & 0x0F );
+	prg32(space, (offset >> 3) & 0x0f);
 
-	switch( data & 0x03 ) {
+	switch (data & 0x03)
+	{
 	case 0:
-		set_nt_mirroring(PPU_MIRROR_VERT );
+		set_nt_mirroring(PPU_MIRROR_VERT);
 		break;
 	case 1:
-		set_nt_mirroring(PPU_MIRROR_HORZ );
+		set_nt_mirroring(PPU_MIRROR_HORZ);
 		break;
 	case 2:
 		set_nt_mirroring(PPU_MIRROR_LOW);
@@ -5214,59 +5270,67 @@ static WRITE8_HANDLER( mapper244_w )
 {
 	LOG_MMC(("mapper244_w, offset: %04x, data: %02x\n", offset, data));
 
-	if ( offset < 0x0065 )
+	if (offset < 0x0065)
 		return;
-	if ( offset < 0x00a5 ) {
-		prg32( space, ( offset - 0x0065 ) & 0x03 );
+	if (offset < 0x00a5)
+	{
+		prg32(space, (offset - 0x0065) & 0x03);
 		return;
 	}
-	if ( offset < 0x00e5 ) {
-		chr8( space->machine, ( offset - 0x00a5 ) & 0x07, CHRROM );
+	if (offset < 0x00e5)
+	{
+		chr8(space->machine, (offset - 0x00a5) & 0x07, CHRROM);
 	}
 }
 
 static WRITE8_HANDLER( mapper246_m_w )
 {
-	LOG_MMC(("mapper256_m_w, offset: %04x, data: %02x\n", offset, data ));
+	LOG_MMC(("mapper256_m_w, offset: %04x, data: %02x\n", offset, data));
 
-	if ( offset < 0x0800 ) {
-		switch( offset & 0x0007 ) {
+	if (offset < 0x0800)
+	{
+		switch (offset & 0x0007)
+		{
 		case 0x0000:
-			prg8_89( space, data );
+			prg8_89(space, data);
 			break;
 		case 0x0001:
-			prg8_ab( space, data );
+			prg8_ab(space, data);
 			break;
 		case 0x0002:
-			prg8_cd( space, data );
+			prg8_cd(space, data);
 			break;
 		case 0x0003:
-			prg8_ef( space, data );
+			prg8_ef(space, data);
 			break;
 		case 0x0004:
-			chr2_0( space->machine, data, CHRROM );
+			chr2_0(space->machine, data, CHRROM);
 			break;
 		case 0x0005:
-			chr2_2( space->machine, data, CHRROM );
+			chr2_2(space->machine, data, CHRROM);
 			break;
 		case 0x0006:
-			chr2_4( space->machine, data, CHRROM );
+			chr2_4(space->machine, data, CHRROM);
 			break;
 		case 0x0007:
-			chr2_6( space->machine, data, CHRROM );
+			chr2_6(space->machine, data, CHRROM);
 			break;
 		}
-	} else {
-		nes.wram[offset] = data;
 	}
+	else
+		nes.wram[offset] = data;
 }
 
-static void mapper248_set_prg( const address_space *space ) {
-	if ( MMC1_bank4 & 0x80 ) {
-		prg16_89ab( space, MMC1_bank4 & 0x0F );
-	} else {
-		prg8_89( space, MMC1_bank2 & 0x1F );
-		prg8_ab( space, MMC1_bank3 & 0x1F );
+static void mapper248_set_prg( const address_space *space )
+{
+	if (MMC1_bank4 & 0x80)
+	{
+		prg16_89ab(space, MMC1_bank4 & 0x0f);
+	}
+	else
+	{
+		prg8_89(space, MMC1_bank2 & 0x1f);
+		prg8_ab(space, MMC1_bank3 & 0x1f);
 	}
 }
 
@@ -5282,29 +5346,31 @@ static WRITE8_HANDLER( mapper248_w )
 {
 	LOG_MMC(("mapper248_w, offset: %04x, data: %02x\n", offset, data));
 
-	switch( offset & 0x7001 ) {
+	switch (offset & 0x7001)
+	{
 	case 0x0000:
 		MMC1_bank1 = data;
 		break;
 	case 0x0001:
-		switch( MMC1_bank1 & 0x07 ) {
+		switch (MMC1_bank1 & 0x07)
+		{
 		case 0:
-			chr2_0( space->machine, data >> 1, CHRROM );
+			chr2_0(space->machine, data >> 1, CHRROM);
 			break;
 		case 1:
-			chr2_2( space->machine, data >> 1, CHRROM );
+			chr2_2(space->machine, data >> 1, CHRROM);
 			break;
 		case 2:
-			chr1_4( space->machine, data, CHRROM );
+			chr1_4(space->machine, data, CHRROM);
 			break;
 		case 3:
-			chr1_5( space->machine, data, CHRROM );
+			chr1_5(space->machine, data, CHRROM);
 			break;
 		case 4:
-			chr1_6( space->machine, data, CHRROM );
+			chr1_6(space->machine, data, CHRROM);
 			break;
 		case 5:
-			chr1_7( space->machine, data, CHRROM );
+			chr1_7(space->machine, data, CHRROM);
 			break;
 		case 6:
 			MMC1_bank2 = data;
@@ -5317,7 +5383,7 @@ static WRITE8_HANDLER( mapper248_w )
 		}
 		break;
 	case 0x2000:
-		set_nt_mirroring(( data & 0x01 ) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT );
+		set_nt_mirroring((data & 0x01) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 		break;
 	case 0x4000:
 		IRQ_count_latch = data;
@@ -5365,7 +5431,7 @@ static void mapper248_irq( const device_config *device, int scanline, int vblank
 // 1 = no mapper found
 // 2 = mapper not supported
 */
-int mapper_reset (running_machine *machine, int mapperNum)
+int mapper_reset( running_machine *machine, int mapperNum )
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	nes_state *state = machine->driver_data;
@@ -5382,8 +5448,8 @@ int mapper_reset (running_machine *machine, int mapperNum)
 	if(mapper == NULL)
 		fatalerror("Unimplemented Mapper");
 
-	ppu2c0x_set_scanline_callback (state->ppu, mapper ? mapper->mmc_scanline : NULL);
-	ppu2c0x_set_hblank_callback (state->ppu, mapper ? mapper->mmc_hblank : NULL);
+	ppu2c0x_set_scanline_callback(state->ppu, mapper ? mapper->mmc_scanline : NULL);
+	ppu2c0x_set_hblank_callback(state->ppu, mapper ? mapper->mmc_hblank : NULL);
 
 	if (!nes_irq_timer)
 		nes_irq_timer = timer_alloc(machine, nes_irq_callback, NULL);
@@ -5396,7 +5462,7 @@ int mapper_reset (running_machine *machine, int mapperNum)
 
 	/* Point the WRAM/battery area to the first RAM bank */
 	if (mapperNum != 20 && mapperNum != 40)
-		memory_set_bankptr (space->machine, 5, &nes.wram[0x0000]);
+		memory_set_bankptr(space->machine, 5, &nes.wram[0x0000]);
 
 	switch (mapperNum)
 	{
@@ -5442,7 +5508,7 @@ int mapper_reset (running_machine *machine, int mapperNum)
 			/* These games don't switch VROM, but some ROMs incorrectly have CHR chunks */
 			nes.chr_chunks = 0;
 			prg16_89ab(space, 0);
-			prg16_cdef(space, nes.prg_chunks-1);
+			prg16_cdef(space, nes.prg_chunks - 1);
 			break;
 		case 13:
 			chr4_0(space->machine, 0, CHRRAM);
@@ -5492,14 +5558,14 @@ int mapper_reset (running_machine *machine, int mapperNum)
 			IRQ_enable = 0;
 			IRQ_count = 0;
 			nes.mid_ram_enable = 0;
-			prg16_89ab (space, nes.prg_chunks-2);
-			prg16_cdef (space, nes.prg_chunks-1);
+			prg16_89ab(space, nes.prg_chunks - 2);
+			prg16_cdef(space, nes.prg_chunks - 1);
 			break;
 		case 7:
 			/* Bankswitches 32k at a time */
 			set_nt_mirroring(PPU_MIRROR_LOW);
-			prg16_89ab (space, 0);
-			prg16_cdef (space, nes.prg_chunks-1);
+			prg16_89ab(space, 0);
+			prg16_cdef(space, nes.prg_chunks - 1);
 			break;
 		case 96:
 		case 8:
@@ -5515,17 +5581,17 @@ int mapper_reset (running_machine *machine, int mapperNum)
 			MMC2_bank0_latch = MMC2_bank1_latch = 0xfe;
 			prg8_89(space, 0);
 			//ugly hack to deal with iNES header usage of chunk count.
-			prg8_ab(space, (nes.prg_chunks<<1)-3);
-			prg8_cd(space, (nes.prg_chunks<<1)-2);
-			prg8_ef(space, (nes.prg_chunks<<1)-1);
+			prg8_ab(space, (nes.prg_chunks << 1) - 3);
+			prg8_cd(space, (nes.prg_chunks << 1) - 2);
+			prg8_ef(space, (nes.prg_chunks << 1) - 1);
 			break;
 		case 10:
 			/* Reset VROM latches */
 			MMC2_bank0 = MMC2_bank1 = 0;
 			MMC2_bank0_hi = MMC2_bank1_hi = 0;
 			MMC2_bank0_latch = MMC2_bank1_latch = 0xfe;
-			prg16_89ab (space, 0);
-			prg16_cdef (space, nes.prg_chunks-1);
+			prg16_89ab(space, 0);
+			prg16_cdef(space, nes.prg_chunks - 1);
 			break;
 		case 11:
 			/* Switches 32k banks, 1st 32k bank loaded on reset (?) May be more like mapper 7... */
@@ -5539,8 +5605,8 @@ int mapper_reset (running_machine *machine, int mapperNum)
 		case 17:
 		case 18:
 		case 19:
-			prg16_89ab (space, 0);
-			prg16_cdef (space, nes.prg_chunks-1);
+			prg16_89ab(space, 0);
+			prg16_cdef(space, nes.prg_chunks - 1);
 			break;
 		case 20:
 			IRQ_enable = IRQ_enable_latch = 0;
@@ -5561,8 +5627,8 @@ int mapper_reset (running_machine *machine, int mapperNum)
 		case 23:
 		case 32:
 		case 33:
-			prg16_89ab (space, 0);
-			prg16_cdef (space, nes.prg_chunks-1);
+			prg16_89ab(space, 0);
+			prg16_cdef(space, nes.prg_chunks - 1);
 			break;
 		case 24:
 		case 26:
@@ -5570,8 +5636,8 @@ int mapper_reset (running_machine *machine, int mapperNum)
 		case 75:
 			IRQ_enable = IRQ_enable_latch = 0;
 			IRQ_count = IRQ_count_latch = 0;
-			prg16_89ab (space, 0);
-			prg16_cdef (space, nes.prg_chunks-1);
+			prg16_89ab(space, 0);
+			prg16_cdef(space, nes.prg_chunks - 1);
 			break;
 		case 34:
 			/* Can switch 32k prg banks */
@@ -5581,22 +5647,22 @@ int mapper_reset (running_machine *machine, int mapperNum)
 			IRQ_enable = 0;
 			IRQ_count = 0;
 			/* Who's your daddy? */
-			memcpy (&nes.rom[0x6000], &nes.rom[6 * 0x2000 + 0x10000], 0x2000);
-			prg8_89 (space, 4);
-			prg8_ab (space, 5);
-			prg8_cd (space, 6);
-			prg8_ef (space, 7);
+			memcpy(&nes.rom[0x6000], &nes.rom[6 * 0x2000 + 0x10000], 0x2000);
+			prg8_89(space, 4);
+			prg8_ab(space, 5);
+			prg8_cd(space, 6);
+			prg8_ef(space, 7);
 			break;
 		case 64:
 			/* Can switch 3 8k prg banks */
-			prg16_89ab (space, nes.prg_chunks-1);
-			prg16_cdef (space, nes.prg_chunks-1);
+			prg16_89ab(space, nes.prg_chunks - 1);
+			prg16_cdef(space, nes.prg_chunks - 1);
 			break;
 		case 65:
 			IRQ_enable = 0;
 			IRQ_count = 0;
-			prg16_89ab (space, 0);
-			prg16_cdef (space, nes.prg_chunks-1);
+			prg16_89ab(space, 0);
+			prg16_cdef(space, nes.prg_chunks - 1);
 			break;
 		case 41:
 		case 66:
@@ -5605,11 +5671,11 @@ int mapper_reset (running_machine *machine, int mapperNum)
 			break;
 		case 42:
 			/* Switch in the last 32KB */
-			prg32( space, 0xFF );
+			prg32(space, 0xff);
 			break;
 		case 43:
 			prg32(space, 0);
-			memset( nes.wram, 0x2000, 0xFF );
+			memset(nes.wram, 0x2000, 0xff);
 			break;
 		case 44:
 		case 47:
@@ -5621,9 +5687,9 @@ int mapper_reset (running_machine *machine, int mapperNum)
 			MMC3_prg1 = 0xff;
 			MMC3_cmd = 0;
 			MMC3_prg_base = 0;
-			MMC3_prg_mask = 0x0F;
+			MMC3_prg_mask = 0x0f;
 			MMC3_chr_base = 0;
-			MMC3_chr_mask = 0x7F;
+			MMC3_chr_mask = 0x7f;
 			MMC3_chr_source = nes.chr_chunks ? CHRROM : CHRRAM;
 			mapper4_set_prg(space->machine);
 			mapper4_set_chr(space->machine, MMC3_chr_source);
@@ -5636,15 +5702,15 @@ int mapper_reset (running_machine *machine, int mapperNum)
 			MMC3_prg1 = 0xff;
 			MMC3_cmd = 0;
 			MMC3_prg_base = 0x30;
-			MMC3_prg_mask = 0x0F;
+			MMC3_prg_mask = 0x0f;
 			MMC3_chr_base = 0;
-			MMC3_chr_mask = 0x7F;
+			MMC3_chr_mask = 0x7f;
 			MMC3_chr_source = nes.chr_chunks ? CHRROM : CHRRAM;
 			mapper45_cmd = 0;
 			mapper45_data[0] = mapper45_data[1] = mapper45_data[2] = mapper45_data[3] = 0;
 			mapper4_set_prg(space->machine);
 			mapper4_set_chr(space->machine, MMC3_chr_source);
-			memory_set_bankptr( space->machine, 5, nes.wram );
+			memory_set_bankptr(space->machine, 5, nes.wram);
 			break;
 		case 46:
 			/* Reuseing some MMC1 variables here */
@@ -5662,8 +5728,8 @@ int mapper_reset (running_machine *machine, int mapperNum)
 		case 57:
 			MMC1_bank1 = 0x00;
 			MMC1_bank2 = 0x00;
-			prg16_89ab( space, 0 );
-			prg16_cdef( space, 0 );
+			prg16_89ab(space, 0);
+			prg16_cdef(space, 0);
 			chr8(space->machine, 0, CHRROM);
 			break;
 		case 58:
@@ -5675,9 +5741,9 @@ int mapper_reset (running_machine *machine, int mapperNum)
 			prg32(space, 0);
 			break;
 		case 70:
-//		case 86:
-			prg16_89ab (space, nes.prg_chunks-2);
-			prg16_cdef (space, nes.prg_chunks-1);
+//      case 86:
+			prg16_89ab(space, nes.prg_chunks - 2);
+			prg16_cdef(space, nes.prg_chunks - 1);
 			break;
 		case 67:
 		case 68:
@@ -5689,14 +5755,14 @@ int mapper_reset (running_machine *machine, int mapperNum)
 		case 92:
 			IRQ_enable = IRQ_enable_latch = 0;
 			IRQ_count = IRQ_count_latch = 0;
-			prg16_89ab (space, 0);
-			prg16_cdef (space, nes.prg_chunks-1);
+			prg16_89ab(space, 0);
+			prg16_cdef(space, nes.prg_chunks - 1);
 			break;
 		case 76:
 			prg8_89(space, 0);
 			prg8_ab(space, 1);
 			//cd is bankable, but this should init all banks just fine.
-			prg16_cdef(space, nes.prg_chunks-1);
+			prg16_cdef(space, nes.prg_chunks - 1);
 			chr2_0(space->machine, 0, CHRROM);
 			chr2_2(space->machine, 1, CHRROM);
 			chr2_4(space->machine, 2, CHRROM);
@@ -5704,7 +5770,7 @@ int mapper_reset (running_machine *machine, int mapperNum)
 			break;
 		case 79:
 			/* Mirroring always horizontal...? */
-//			Mirroring = 1;
+//          Mirroring = 1;
 			prg32(space, 0);
 			break;
 		case 80:
@@ -5712,51 +5778,51 @@ int mapper_reset (running_machine *machine, int mapperNum)
 		case 85:
 		case 86:
 		case 207:
-			prg16_89ab (space, 0);
-			prg16_cdef (space, nes.prg_chunks-1);
+			prg16_89ab(space, 0);
+			prg16_cdef(space, nes.prg_chunks - 1);
 			break;
-//		case 70:
+//      case 70:
 		case 87:
 		case 228:
-			prg16_89ab (space, 0);
-			prg16_cdef (space, nes.prg_chunks-1);
+			prg16_89ab(space, 0);
+			prg16_cdef(space, nes.prg_chunks - 1);
 			break;
 		case 83:
-			mapper83_data[9] = 0x0F;
-			prg8_cd( space, 0x1E );
-			prg8_ef( space, 0x1F );
+			mapper83_data[9] = 0x0f;
+			prg8_cd(space, 0x1e);
+			prg8_ef(space, 0x1f);
 			break;
 		case 88:
-			prg8_89(space, 0xC);
-			prg8_ab(space, 0xD);
-			prg8_cd(space, 0xE);
-			prg8_ef(space, 0xF);
+			prg8_89(space, 0xc);
+			prg8_ab(space, 0xd);
+			prg8_cd(space, 0xe);
+			prg8_ef(space, 0xf);
 			break;
 		case 89:
 			prg16_89ab(space, 0);
-			prg16_cdef(space, nes.prg_chunks-1);
+			prg16_cdef(space, nes.prg_chunks - 1);
 			set_nt_mirroring(PPU_MIRROR_LOW);
 			break;
 
 		case 91:
 			set_nt_mirroring(PPU_MIRROR_VERT);
-			prg16_89ab (space, nes.prg_chunks-1);
-			prg16_cdef (space, nes.prg_chunks-1);
+			prg16_89ab(space, nes.prg_chunks - 1);
+			prg16_cdef(space, nes.prg_chunks - 1);
 			break;
 		case 93:
 		case 94:
 		case 95:
 		case 101:
-			prg16_89ab (space, 0);
-			prg16_cdef (space, nes.prg_chunks-1);
+			prg16_89ab(space, 0);
+			prg16_cdef(space, nes.prg_chunks - 1);
 			break;
 		case 97:
-			prg16_89ab (space, nes.prg_chunks-1);
-			prg16_cdef (space, nes.prg_chunks-1);
+			prg16_89ab(space, nes.prg_chunks - 1);
+			prg16_cdef(space, nes.prg_chunks - 1);
 			break;
 		case 112:
-			prg16_89ab( space, nes.prg_chunks-1 );
-			prg16_cdef( space, nes.prg_chunks-1 );
+			prg16_89ab(space, nes.prg_chunks - 1);
+			prg16_cdef(space, nes.prg_chunks - 1);
 			break;
 		case 107:
 		case 113:
@@ -5769,8 +5835,8 @@ int mapper_reset (running_machine *machine, int mapperNum)
 			prg32(space, 0);
 			break;
 		case 154:
-			prg16_89ab (space, nes.prg_chunks-2);
-			prg16_cdef (space, nes.prg_chunks-1);
+			prg16_89ab(space, nes.prg_chunks - 2);
+			prg16_cdef(space, nes.prg_chunks - 1);
 			break;
 		case 164:
 			prg32(space, 0xFF);
@@ -5783,44 +5849,44 @@ int mapper_reset (running_machine *machine, int mapperNum)
 		case 182:
 			IRQ_enable = 0;
 			IRQ_count = 0;
-			prg32( space, ( nes.prg_chunks - 1 ) >> 1 );
+			prg32(space, (nes.prg_chunks - 1) >> 1);
 			break;
 		case 188:
-			prg16_89ab( space, 0 );
-			prg16_cdef( space, ( nes.prg_chunks - 1 ) ^ 0x08 );
+			prg16_89ab(space, 0);
+			prg16_cdef(space, (nes.prg_chunks - 1) ^ 0x08);
 			break;
 		case 193:
-			prg32( space, ( nes.prg_chunks - 1 ) >> 1 );
+			prg32(space, (nes.prg_chunks - 1) >> 1);
 			set_nt_mirroring(PPU_MIRROR_VERT);
 			break;
 		case 200:
-			prg16_89ab( space, nes.prg_chunks - 1 );
-			prg16_cdef( space, nes.prg_chunks - 1 );
+			prg16_89ab(space, nes.prg_chunks - 1);
+			prg16_cdef(space, nes.prg_chunks - 1);
 			break;
 		case 201:
-			prg32( space, 0 );
-			chr8( space->machine, 0, CHRROM );
+			prg32(space, 0);
+			chr8(space->machine, 0, CHRROM);
 			break;
 		case 202:
 		case 203:
-			prg16_89ab( space, 0 );
-			prg16_cdef( space, 0 );
-			chr8( space->machine, 0, CHRROM );
+			prg16_89ab(space, 0);
+			prg16_cdef(space, 0);
+			chr8(space->machine, 0, CHRROM);
 			break;
 		case 225:
 		case 226:
 		case 227:
 		case 229:
-			prg16_89ab (space, 0);
-			prg16_cdef (space, 0);
+			prg16_89ab(space, 0);
+			prg16_cdef(space, 0);
 			break;
 		case 230:
-			prg16_89ab( space, 0 );
-			prg16_cdef( space, 7 );
+			prg16_89ab(space, 0);
+			prg16_cdef(space, 7);
 			break;
 		case 231:
-			prg16_89ab (space, nes.prg_chunks-2);
-			prg16_cdef (space, nes.prg_chunks-1);
+			prg16_89ab(space, nes.prg_chunks - 2);
+			prg16_cdef(space, nes.prg_chunks - 1);
 			break;
 		case 232:
 			MMC1_bank1 = 0x18;
@@ -5834,11 +5900,11 @@ int mapper_reset (running_machine *machine, int mapperNum)
 			prg32(space, 0);
 			break;
 		case 246:
-			prg32( space, 0xFF );
+			prg32(space, 0xff);
 			break;
 		case 248:
 			MMC1_bank1 = MMC1_bank2 = MMC1_bank3 = MMC1_bank4 = 0;
-			prg32( space, 0xFF );
+			prg32(space, 0xff);
 			break;
 		default:
 			/* Mapper not supported */
@@ -5852,7 +5918,7 @@ int mapper_reset (running_machine *machine, int mapperNum)
 
 static const mmc mmc_list[] =
 {
-/*	INES   DESC						LOW_W, LOW_R, MED_W, HIGH_W, PPU_latch, scanline CB, hblank CB */
+/*  INES   DESC                     LOW_W, LOW_R, MED_W, HIGH_W, PPU_latch, scanline CB, hblank CB */
 	{ 0, "No Mapper",				NULL, NULL, NULL, NULL, NULL, NULL, NULL },
 	{ 1, "MMC1",					NULL, NULL, NULL, mapper1_w, NULL, NULL, NULL },
 	{ 2, "74161/32 ROM sw",			NULL, NULL, NULL, mapper2_w, NULL, NULL, NULL },
