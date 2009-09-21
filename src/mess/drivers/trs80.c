@@ -119,7 +119,6 @@ Not dumped (to our knowledge):
  TRS80 Katakana Character Generator
  TRS80 Small English Character Generator
  TRS80 Model III old version Character Generator
- TRS80 Model 4P boot disk (being worked on)
  TRS80 Model II bios and boot disk
 
 Not emulated:
@@ -214,7 +213,7 @@ static ADDRESS_MAP_START( model3_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x37e8, 0x37e9) AM_READWRITE(trs80_printer_r, trs80_printer_w)
 	AM_RANGE(0x37ea, 0x37ff) AM_ROM
 	AM_RANGE(0x3800, 0x38ff) AM_MIRROR(0x300) AM_READ(trs80_keyboard_r)
-	AM_RANGE(0x3c00, 0x3fff) AM_READWRITE(trs80_videoram_r, trs80_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x3c00, 0x3fff) AM_READWRITE(trs80_videoram_r, trs80_videoram_w)
 	AM_RANGE(0x4000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -604,7 +603,7 @@ MISSING	TRS-80 Model III Level 2 (BELGIUM) CRC ????
 Note: Be careful when dumping rom C: if dumped on the trs-80 m3 with software, bytes 0x7e8 and 0x7e9 (addresses 0x37e8, 0x0x37e9)
       will read as 0xFF 0xFF; on the original rom, these bytes are 0x00 0x00 (for eproms) or 0xAA 0xAA (for mask roms), those two bytes are used for printer status on the trs-80 and are mapped on top of the rom; This problem should be avoided by pulling the rom chips and dumping them directly.
 */
-	ROM_REGION(0x10000, "maincpu",0)
+	ROM_REGION(0x10800, "maincpu",0)
 	ROM_SYSTEM_BIOS(0, "trs80m3_revc", "Level 2 bios, RomC Rev C")
 	ROMX_LOAD("8041364.u104", 0x0000, 0x2000, CRC(ec0c6daa) SHA1(257cea6b9b46912d4681251019ec2b84f1b95fc8), ROM_BIOS(1)) // Label: "SCM91248C // Tandy (c) 80 // 8041364 // 8134" (Level 2 bios ROM A '9639')
 	ROMX_LOAD("8040332.u105", 0x2000, 0x1000, CRC(ed4ee921) SHA1(ec0a19d4b72f71e51965de63250009c3c4e4cab3), ROM_BIOS(1)) // Label: "SCM91619P // Tandy (c) 80 // 8040332 // QQ8117", (Level 2 bios ROM B '407c')
@@ -627,7 +626,7 @@ ROM_END
 
 // for model 4 and 4p info, see http://vt100.net/mirror/harte/Radio%20Shack/TRS-80%20Model%204_4P%20Soft%20Tech%20Ref.pdf
 ROM_START(trs80m4)
-	ROM_REGION(0x10000, "maincpu",0)
+	ROM_REGION(0x10800, "maincpu",0)
 	ROM_LOAD("trs80m4.rom",  0x0000, 0x3800, BAD_DUMP CRC(1a92d54d) SHA1(752555fdd0ff23abc9f35c6e03d9d9b4c0e9677b)) // should be split into 3 roms, roms A, B, C, exactly like trs80m3; in fact, roms A and B are shared between both systems.
 
 	ROM_REGION(0x00800, "gfx1",0)
@@ -637,7 +636,7 @@ ROM_END
 ROM_START(trs80m4p) // uses a completely different memory map scheme to the others; the trs-80 model 3 roms are loaded from a boot disk, the only rom on the machine is a bootloader; bootloader can be banked out of 0x0000-0x1000 space which is replaced with ram; see the tech ref pdf, pdf page 62
 // Currently this fails miserably due to lack of ram banking; it does some i/o stuff, copies some of the int vectors to 0x4000, then does some more i/o stuff and fills the entire 0x4000-43ff space with 0x20 (space? is it trying to clear the screen?), then immediately afterward it executes a RET; since the stack pointer is still pointing to 0x40A2, it RETs to 0x2020, which is in unmapped, nop-filled space.
 // Clearly there's some major ram-bank related stuff that isn't working at all here.
-	ROM_REGION(0x10000, "maincpu",0)
+	ROM_REGION(0x10800, "maincpu",0)
 	ROM_SYSTEM_BIOS(0, "trs80m4p", "Level 2 bios, gate array machine")
 	ROMX_LOAD("8075332.u69", 0x0000, 0x1000, CRC(3a738aa9) SHA1(6393396eaa10a84b9e9f0cf5930aba73defc5c52), ROM_BIOS(1)) // Label: "SCM95060P // 8075332 // TANDY (C) 1983 // 8421" at location U69 (may be located at U70 on some pcb revisions)
 	ROM_SYSTEM_BIOS(1, "trs80m4p_hack", "Disk loader hack")
@@ -690,6 +689,7 @@ static DRIVER_INIT( trs80m4 )
 {
 	trs80_mode = 0;
 	trs80_model4 = 1;
+	videoram = memory_region(machine, "maincpu")+0x10000;
 }
 
 static DRIVER_INIT( lnw80 )
