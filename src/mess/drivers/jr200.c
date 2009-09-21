@@ -20,6 +20,7 @@
 #include "cpu/m6800/m6800.h"
 
 static UINT8 *textram;
+static UINT8 *border;
 static UINT8 io_reg[0x20] = { 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 						0, 0, 0, 0, 0, 0, 0, 0, 0, 0	};
 
@@ -151,6 +152,7 @@ static ADDRESS_MAP_START(jr200_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xa000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_BASE(&textram)
 	AM_RANGE(0xc800, 0xc81f) AM_READWRITE(io_reg_r, io_reg_w)
+	AM_RANGE(0xca00, 0xca00) AM_RAM AM_BASE(&border)
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -282,6 +284,8 @@ static VIDEO_UPDATE( jr200 )
 	int i,j;
 	const gfx_element *gfx = screen->machine->gfx[0];
 
+	bitmap_fill(bitmap, cliprect, border[0x0000] * 2 + 1);
+
 	for (i = 0; i < 0x02ff; i += 0x20)
 		for (j = 0; j < 0x20; j++)
 		{
@@ -294,14 +298,14 @@ static VIDEO_UPDATE( jr200 )
 				UINT8 pixel00 = (textram[0x0100 + i + j] >> 0) & 0x07;
 				UINT8 pixel11 = (textram[0x0500 + i + j] >> 3) & 0x07;
 				UINT8 pixel10 = (textram[0x0500 + i + j] >> 0) & 0x07;
-				plot_box(bitmap, j * 8    , (i >> 5) * 8    , 4, 4, pixel00 * 2 + 1);
-				plot_box(bitmap, j * 8 + 4, (i >> 5) * 8    , 4, 4, pixel01 * 2 + 1);
-				plot_box(bitmap, j * 8    , (i >> 5) * 8 + 4, 4, 4, pixel10 * 2 + 1);
-				plot_box(bitmap, j * 8 + 4, (i >> 5) * 8 + 4, 4, 4, pixel11 * 2 + 1);
+				plot_box(bitmap, 16 + j * 8    , 16 + (i >> 5) * 8    , 4, 4, pixel00 * 2 + 1);
+				plot_box(bitmap, 16 + j * 8 + 4, 16 + (i >> 5) * 8    , 4, 4, pixel01 * 2 + 1);
+				plot_box(bitmap, 16 + j * 8    , 16 + (i >> 5) * 8 + 4, 4, 4, pixel10 * 2 + 1);
+				plot_box(bitmap, 16 + j * 8 + 4, 16 + (i >> 5) * 8 + 4, 4, 4, pixel11 * 2 + 1);
 			}
 			else
 			{
-				drawgfx_transpen(bitmap, cliprect, gfx, code, col & 0x3f, 0, 0, j * 8, (i >> 5) * 8, 15);
+				drawgfx_transpen(bitmap, cliprect, gfx, code, col & 0x3f, 0, 0, 16 + j * 8, 16 + (i >> 5) * 8, 15);
 			}
 		}
 	return 0;
@@ -339,7 +343,7 @@ static MACHINE_DRIVER_START( jr200 )
 	MDRV_CPU_PROGRAM_MAP(jr200_mem)
 	MDRV_CPU_IO_MAP(jr200_io)
 // MDRV_CPU_VBLANK_INT("screen", jr200_irq)
-MDRV_CPU_PERIODIC_INT(jr200_nmi,60)
+MDRV_CPU_PERIODIC_INT(jr200_nmi,10)
 MDRV_CPU_PERIODIC_INT(jr200_irq,10)
 /*
 	MDRV_CPU_ADD("mn1544", MN1544, ?)
@@ -351,8 +355,8 @@ MDRV_CPU_PERIODIC_INT(jr200_irq,10)
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 192)
-	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0, 192-1)
+	MDRV_SCREEN_SIZE(16 + 256 + 16, 16 + 192 + 16) /* border size not accurate */
+	MDRV_SCREEN_VISIBLE_AREA(0, 16 + 256 + 16 - 1, 0, 16 + 192 + 16 - 1)
 
 	MDRV_GFXDECODE(jr200)
 	MDRV_PALETTE_LENGTH(128)
