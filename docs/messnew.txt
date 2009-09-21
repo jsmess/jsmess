@@ -16,6 +16,12 @@ System Driver Changes:
   Screen still flickers, and EPROM cannot be written
   back to file yet. [Curt Coder]
 
+- [NES] Fixed crash of MMC3 games with no CHR-ROM (bug
+  #1860) [Fabio Priuli, Rob Bohms]
+
+- [NES] Fixed Pinball Quest graphics problems [Fabio 
+  Priuli]
+
 - [SAMCOUPE] Added mouse support.  [Dirk Best]
 
 - [SAMCOUPE] Improved Mode 1 graphics.  [Dirk Best]

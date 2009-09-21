@@ -103,6 +103,7 @@ static int MMC3_prg0, MMC3_prg1;
 static int MMC3_chr[6];
 static int MMC3_prg_base, MMC3_prg_mask;
 static int MMC3_chr_base, MMC3_chr_mask;
+static int MMC3_chr_source;
 UINT8* extended_ntram;
 
 static int MMC5_rom_bank_mode;
@@ -137,7 +138,7 @@ static TIMER_CALLBACK(nes_irq_callback)
 	timer_adjust_oneshot(nes_irq_timer, attotime_never, 0);
 }
 
-WRITE8_HANDLER( nes_chr_w)
+WRITE8_HANDLER( nes_chr_w )
 {
 	int bank = offset >> 10;
 	if(chr_map[bank].source == CHRRAM)
@@ -146,13 +147,13 @@ WRITE8_HANDLER( nes_chr_w)
 	}
 }
 
-READ8_HANDLER( nes_chr_r)
+READ8_HANDLER( nes_chr_r )
 {
 	int bank = offset >> 10;
 	return chr_map[bank].access[offset & 0x3ff];
 }
 
-WRITE8_HANDLER(nes_nt_w)
+WRITE8_HANDLER( nes_nt_w )
 {
 	int page = ((offset & 0xc00) >> 10);
 
@@ -162,7 +163,7 @@ WRITE8_HANDLER(nes_nt_w)
 	nt_page[page].access[offset & 0x3ff] = data;
 }
 
-READ8_HANDLER(nes_nt_r)
+READ8_HANDLER( nes_nt_r )
 {
 	int page = ((offset & 0xc00) >> 10);
 	if (nt_page[page].source == MMC5FILL)
@@ -699,15 +700,17 @@ static WRITE8_HANDLER( mapper1_w )
 
 					if (!MMC1_SizeVrom_4k)
 					{
-						int bank = MMC1_reg & (nes.chr_chunks - 1);
-						//int bank = MMC1_reg & ((nes.chr_chunks << 1) - 1);
-						chr8(space->machine, bank>>1, CHRROM);
+						/* chr_chunks is the numer of 4k blocks. we take care of the actual bank size 
+						when we divide bank by 2 in the chr8 call */
+						//int bank = MMC1_reg & (nes.chr_chunks - 1);	// this breaks Pinball Quest
+						int bank = MMC1_reg & ((nes.chr_chunks << 1) - 1);
+						chr8(space->machine, bank >> 1, CHRROM);
 						LOG_MMC(("MMC1 8k VROM switch: %02x\n", MMC1_reg));
 					}
 					else
 					{
 						int bank = MMC1_reg & ((nes.chr_chunks << 1) - 1);
-						chr4_0(space->machine,bank, CHRROM);
+						chr4_0(space->machine, bank, CHRROM);
 						LOG_MMC(("MMC1 4k VROM switch (low): %02x\n", MMC1_reg));
 					}
 				}
@@ -820,39 +823,39 @@ static WRITE8_HANDLER( mapper3_w )
 	chr8 (space->machine, data, CHRROM);
 }
 
-static void mapper4_set_prg ( const address_space *space)
+static void mapper4_set_prg( running_machine *machine )
 {
-	int prg0_bank = MMC3_prg_base | ( MMC3_prg0 & MMC3_prg_mask );
-	int prg1_bank = MMC3_prg_base | ( MMC3_prg1 & MMC3_prg_mask );
+	int prg0_bank = MMC3_prg_base | (MMC3_prg0 & MMC3_prg_mask);
+	int prg1_bank = MMC3_prg_base | (MMC3_prg1 & MMC3_prg_mask);
 	int last_bank = MMC3_prg_base | MMC3_prg_mask;
 
 	if (MMC3_cmd & 0x40)
 	{
-		memory_set_bankptr (space->machine, 1, &nes.rom[(last_bank-1) * 0x2000 + 0x10000]);
-		memory_set_bankptr (space->machine, 3, &nes.rom[0x2000 * (prg0_bank) + 0x10000]);
+		memory_set_bankptr(machine, 1, &nes.rom[(last_bank - 1) * 0x2000 + 0x10000]);
+		memory_set_bankptr(machine, 3, &nes.rom[0x2000 * (prg0_bank) + 0x10000]);
 	}
 	else
 	{
-		memory_set_bankptr (space->machine, 1, &nes.rom[0x2000 * (prg0_bank) + 0x10000]);
-		memory_set_bankptr (space->machine, 3, &nes.rom[(last_bank-1) * 0x2000 + 0x10000]);
+		memory_set_bankptr(machine, 1, &nes.rom[0x2000 * (prg0_bank) + 0x10000]);
+		memory_set_bankptr(machine, 3, &nes.rom[(last_bank - 1) * 0x2000 + 0x10000]);
 	}
-	memory_set_bankptr (space->machine, 2, &nes.rom[0x2000 * (prg1_bank) + 0x10000]);
-	memory_set_bankptr (space->machine, 4, &nes.rom[(last_bank) * 0x2000 + 0x10000]);
+	memory_set_bankptr(machine, 2, &nes.rom[0x2000 * (prg1_bank) + 0x10000]);
+	memory_set_bankptr(machine, 4, &nes.rom[(last_bank) * 0x2000 + 0x10000]);
 }
 
-static void mapper4_set_chr (running_machine *machine)
+static void mapper4_set_chr( running_machine *machine, UINT8 chr )
 {
 	UINT8 chr_page = (MMC3_cmd & 0x80) >> 5;
 
-	chr2_x(machine, chr_page ^ 0, MMC3_chr_base | ( (MMC3_chr[0]>>1) & ( MMC3_chr_mask ) ), CHRROM);
-	chr2_x(machine, chr_page ^ 2, MMC3_chr_base | ( (MMC3_chr[1]>>1) & ( MMC3_chr_mask ) ), CHRROM);
-	chr1_x(machine, chr_page ^4, MMC3_chr_base | (MMC3_chr[2]& ( MMC3_chr_mask ) ), CHRROM);
-	chr1_x(machine, chr_page ^5, MMC3_chr_base | (MMC3_chr[3]& ( MMC3_chr_mask ) ), CHRROM);
-	chr1_x(machine, chr_page ^6, MMC3_chr_base | (MMC3_chr[4]& ( MMC3_chr_mask ) ), CHRROM);
-	chr1_x(machine, chr_page ^7, MMC3_chr_base | (MMC3_chr[5]& ( MMC3_chr_mask ) ), CHRROM);
+	chr2_x(machine, chr_page ^ 0, MMC3_chr_base | ((MMC3_chr[0] >> 1) & MMC3_chr_mask), chr);
+	chr2_x(machine, chr_page ^ 2, MMC3_chr_base | ((MMC3_chr[1] >> 1) & MMC3_chr_mask), chr);
+	chr1_x(machine, chr_page ^ 4, MMC3_chr_base | (MMC3_chr[2]& MMC3_chr_mask), chr);
+	chr1_x(machine, chr_page ^ 5, MMC3_chr_base | (MMC3_chr[3]& MMC3_chr_mask), chr);
+	chr1_x(machine, chr_page ^ 6, MMC3_chr_base | (MMC3_chr[4]& MMC3_chr_mask), chr);
+	chr1_x(machine, chr_page ^ 7, MMC3_chr_base | (MMC3_chr[5]& MMC3_chr_mask), chr);
 }
 
-static void mapper4_irq ( const device_config *device, int scanline, int vblank, int blanked )
+static void mapper4_irq( const device_config *device, int scanline, int vblank, int blanked )
 {
 	if ((scanline < PPU_BOTTOM_VISIBLE_SCANLINE) /*|| (scanline == ppu_scanlines_per_frame-1)*/)
 	{
@@ -890,8 +893,8 @@ static WRITE8_HANDLER( mapper4_w )
 			if (last_bank != (data & 0xc0))
 			{
 				/* Reset the banks */
-				mapper4_set_prg (space);
-				mapper4_set_chr (space->machine);
+				mapper4_set_prg(space->machine);
+				mapper4_set_chr(space->machine, MMC3_chr_source);
 				LOG_MMC(("     MMC3 reset banks\n"));
 			}
 			last_bank = data & 0xc0;
@@ -905,24 +908,24 @@ static WRITE8_HANDLER( mapper4_w )
 				case 0: case 1:
 					data &= 0xfe;
 					MMC3_chr[cmd] = data;
-					mapper4_set_chr (space->machine);
+					mapper4_set_chr(space->machine, MMC3_chr_source);
 					LOG_MMC(("     MMC3 set vram %d: %d\n", cmd, data));
 					break;
 
 				case 2: case 3: case 4: case 5:
 					MMC3_chr[cmd] = data;
-					mapper4_set_chr (space->machine);
+					mapper4_set_chr(space->machine, MMC3_chr_source);
 					LOG_MMC(("     MMC3 set vram %d: %d\n", cmd, data));
 					break;
 
 				case 6:
 					MMC3_prg0 = data;
-					mapper4_set_prg (space);
+					mapper4_set_prg(space->machine);
 					break;
 
 				case 7:
 					MMC3_prg1 = data;
-					mapper4_set_prg (space);
+					mapper4_set_prg(space->machine);
 					break;
 			}
 			break;
@@ -986,8 +989,8 @@ static WRITE8_HANDLER( mapper118_w )
 			if (last_bank != (data & 0xc0))
 			{
 				/* Reset the banks */
-				mapper4_set_prg (space);
-				mapper4_set_chr (space->machine);
+				mapper4_set_prg(space->machine);
+				mapper4_set_chr(space->machine, MMC3_chr_source);
 			}
 			last_bank = data & 0xc0;
 			break;
@@ -1000,22 +1003,22 @@ static WRITE8_HANDLER( mapper118_w )
 				case 0: case 1:
 					data &= 0xfe;
 					MMC3_chr[cmd] = data;
-					mapper4_set_chr (space->machine);
+					mapper4_set_chr(space->machine, MMC3_chr_source);
 					break;
 
 				case 2: case 3: case 4: case 5:
 					MMC3_chr[cmd] = data;
-					mapper4_set_chr (space->machine);
+					mapper4_set_chr(space->machine, MMC3_chr_source);
 					break;
 
 				case 6:
 					MMC3_prg0 = data;
-					mapper4_set_prg (space);
+					mapper4_set_prg(space->machine);
 					break;
 
 				case 7:
 					MMC3_prg1 = data;
-					mapper4_set_prg (space);
+					mapper4_set_prg(space->machine);
 					break;
 			}
 			break;
@@ -1062,29 +1065,38 @@ static WRITE8_HANDLER( mapper118_w )
 }
 
 
-static void mapper119_set_chr (running_machine *machine)
+static void mapper119_set_chr( running_machine *machine )
 {
-	//nes_state *state = machine->driver_data;
 	UINT8 chr_page = (MMC3_cmd & 0x80) >> 5;
-	if(MMC3_chr[0]&0x40)
-		chr2_x(machine, chr_page ^ 0, (MMC3_chr[0]>>1)&3, CHRRAM);
-	else chr2_x(machine, chr_page ^ 0, ((MMC3_chr[0]&0x3f)>>1), CHRROM);
-	if(MMC3_chr[1]&0x40)
-		chr2_x(machine, chr_page ^ 2, (MMC3_chr[1]>>1)&3, CHRRAM);
-	else chr2_x(machine, chr_page ^ 2, ((MMC3_chr[1]&0x3f)>>1), CHRROM);
-	if(MMC3_chr[2]&0x40)
-		chr1_x(machine, chr_page ^ 4, MMC3_chr[2]&7, CHRRAM);
-	else chr1_x(machine, chr_page ^ 4, MMC3_chr[2]&0x3f, CHRROM);
+	if (MMC3_chr[0] & 0x40)
+		chr2_x(machine, chr_page ^ 0, (MMC3_chr[0] >> 1) & 0x03, CHRRAM);
+	else 
+		chr2_x(machine, chr_page ^ 0, ((MMC3_chr[0] & 0x3f) >> 1), CHRROM);
 
-	if(MMC3_chr[3]&0x40)
-		chr1_x(machine, chr_page ^ 5, MMC3_chr[3]&7, CHRRAM);
-	else chr1_x(machine, chr_page ^ 5, MMC3_chr[3]&0x3f, CHRROM);
-	if(MMC3_chr[4]&0x40)
-		chr1_x(machine, chr_page ^ 6, MMC3_chr[4]&7, CHRRAM);
-	else chr1_x(machine, chr_page ^ 6, MMC3_chr[4]&0x3f, CHRROM);
-	if(MMC3_chr[5]&0x40)
-		chr1_x(machine, chr_page ^ 7, MMC3_chr[5]&7, CHRRAM);
-	else chr1_x(machine, chr_page ^ 7, MMC3_chr[5]&0x3f, CHRROM);
+	if (MMC3_chr[1] & 0x40)
+		chr2_x(machine, chr_page ^ 2, (MMC3_chr[1] >> 1) & 0x03, CHRRAM);
+	else
+		chr2_x(machine, chr_page ^ 2, ((MMC3_chr[1] & 0x3f) >> 1), CHRROM);
+
+	if (MMC3_chr[2] & 0x40)
+		chr1_x(machine, chr_page ^ 4, MMC3_chr[2] & 0x07, CHRRAM);
+	else
+		chr1_x(machine, chr_page ^ 4, MMC3_chr[2] & 0x3f, CHRROM);
+
+	if (MMC3_chr[3] & 0x40)
+		chr1_x(machine, chr_page ^ 5, MMC3_chr[3] & 0x07, CHRRAM);
+	else
+		chr1_x(machine, chr_page ^ 5, MMC3_chr[3] & 0x3f, CHRROM);
+
+	if (MMC3_chr[4] & 0x40)
+		chr1_x(machine, chr_page ^ 6, MMC3_chr[4] & 0x07, CHRRAM);
+	else
+		chr1_x(machine, chr_page ^ 6, MMC3_chr[4] & 0x3f, CHRROM);
+
+	if (MMC3_chr[5] & 0x40)
+		chr1_x(machine, chr_page ^ 7, MMC3_chr[5] & 0x07, CHRRAM);
+	else
+		chr1_x(machine, chr_page ^ 7, MMC3_chr[5] & 0x3f, CHRROM);
 }
 
 static WRITE8_HANDLER( mapper119_w )
@@ -1103,8 +1115,8 @@ static WRITE8_HANDLER( mapper119_w )
 			if (last_bank != (data & 0xc0))
 			{
 				/* Reset the banks */
-				mapper4_set_prg (space);
-				mapper119_set_chr (space->machine);
+				mapper4_set_prg(space->machine);
+				mapper119_set_chr(space->machine);
 				LOG_MMC(("     MMC3 reset banks\n"));
 			}
 			last_bank = data & 0xc0;
@@ -1117,24 +1129,24 @@ static WRITE8_HANDLER( mapper119_w )
 			{
 				case 0: case 1:
 					MMC3_chr[cmd] = data;
-					mapper119_set_chr (space->machine);
+					mapper119_set_chr(space->machine);
 					LOG_MMC(("     MMC3 set vram %d: %d\n", cmd, data));
 					break;
 
 				case 2: case 3: case 4: case 5:
 					MMC3_chr[cmd] = data;
-					mapper119_set_chr (space->machine);
+					mapper119_set_chr(space->machine);
 					LOG_MMC(("     MMC3 set vram %d: %d\n", cmd, data));
 					break;
 
 				case 6:
 					MMC3_prg0 = data;
-					mapper4_set_prg (space);
+					mapper4_set_prg(space->machine);
 					break;
 
 				case 7:
 					MMC3_prg1 = data;
-					mapper4_set_prg (space);
+					mapper4_set_prg(space->machine);
 					break;
 			}
 			break;
@@ -3311,20 +3323,20 @@ static WRITE8_HANDLER( mapper44_w )
 	{
 	case 0x2001: /* $a001 - Select 128K ROM/VROM base (0..5) or last 256K ROM/VRAM base (6) */
 		{
-			UINT8 page = ( data & 0x07 );
-			if ( page > 6 )
+			UINT8 page = (data & 0x07);
+			if (page > 6)
 				page = 6;
 			MMC3_prg_base = page * 16;
-			MMC3_prg_mask = ( page > 5 ) ? 0x1F : 0x0F;
+			MMC3_prg_mask = (page > 5) ? 0x1f : 0x0f;
 			MMC3_chr_base = page * 128;
-			MMC3_chr_mask = ( page > 5 ) ? 0xFF : 0x7F;
+			MMC3_chr_mask = (page > 5) ? 0xff : 0x7f;
 		}
-		mapper4_set_prg(space);
-		mapper4_set_chr(space->machine);
+		mapper4_set_prg(space->machine);
+		mapper4_set_chr(space->machine, MMC3_chr_source);
 		break;
 
 	default:
-		mapper4_w( space, offset, data );
+		mapper4_w(space, offset, data);
 		break;
 	}
 }
@@ -3333,29 +3345,31 @@ static WRITE8_HANDLER( mapper45_m_w )
 {
 	LOG_MMC(("mapper45_m_w, offset: %04x, data: %02x\n", offset, data ));
 
-	if ( offset == 0 ) {
-		mapper45_data[ mapper45_cmd ] = data;
-		mapper45_cmd = ( mapper45_cmd + 1 ) & 0x03;
+	if (offset == 0) 
+	{
+		mapper45_data[mapper45_cmd] = data;
+		mapper45_cmd = (mapper45_cmd + 1) & 0x03;
 
-		if ( ! mapper45_cmd ) {
+		if (!mapper45_cmd) 
+		{
 			LOG_MMC(("mapper45_m_w, command completed %02x %02x %02x %02x\n", mapper45_data[3],
 				mapper45_data[2], mapper45_data[1], mapper45_data[0] ));
 
 			MMC3_prg_base = mapper45_data[1];
-			MMC3_prg_mask = 0x3F ^ ( mapper45_data[3] & 0x3F );
-			MMC3_chr_base = ( ( mapper45_data[2] & 0xF0 ) << 4 ) + mapper45_data[0];
-			if ( mapper45_data[2] & 0x08 ) {
-				MMC3_chr_mask = ( 1 << ( ( mapper45_data[2] & 0x07 ) + 1 ) ) - 1;
-			} else {
+			MMC3_prg_mask = 0x3f ^ (mapper45_data[3] & 0x3f);
+			MMC3_chr_base = ((mapper45_data[2] & 0xf0) << 4) + mapper45_data[0];
+
+			if (mapper45_data[2] & 0x08) 
+				MMC3_chr_mask = (1 << ((mapper45_data[2] & 0x07) + 1)) - 1;
+			else
 				MMC3_chr_mask = 0;
-			}
-			mapper4_set_prg(space);
-			mapper4_set_chr(space->machine);
+
+			mapper4_set_prg(space->machine);
+			mapper4_set_chr(space->machine, MMC3_chr_source);
 		}
 	}
-	if ( mapper45_data[3] & 0x40 ) {
-		nes.wram[ offset ] = data;
-	}
+	if (mapper45_data[3] & 0x40)
+		nes.wram[offset] = data;
 }
 
 static WRITE8_HANDLER( mapper46_m_w )
@@ -3387,8 +3401,8 @@ static WRITE8_HANDLER( mapper47_m_w )
 		MMC3_prg_mask = 0x0F;
 		MMC3_chr_base = ( data & 0x01 ) << 7;
 		MMC3_chr_mask = 0x7F;
-		mapper4_set_prg(space);
-		mapper4_set_chr(space->machine);
+		mapper4_set_prg(space->machine);
+		mapper4_set_chr(space->machine, MMC3_chr_source);
 	}
 }
 
@@ -3401,8 +3415,8 @@ static WRITE8_HANDLER( mapper49_m_w )
 		MMC3_prg_mask = 0x0F;
 		MMC3_chr_base = ( data & 0xC0 ) << 1;
 		MMC3_chr_mask = 0x7F;
-		mapper4_set_prg(space);
-		mapper4_set_chr(space->machine);
+		mapper4_set_prg(space->machine);
+		mapper4_set_chr(space->machine, MMC3_chr_source);
 	}
 }
 
@@ -5415,10 +5429,10 @@ int mapper_reset (running_machine *machine, int mapperNum)
 			MMC1_bank3 = MMC1_High;
 			MMC1_bank4 = MMC1_High + 0x2000;
 
-			memory_set_bankptr (space->machine, 1, &nes.rom[MMC1_extended_base + MMC1_bank1]);
-			memory_set_bankptr (space->machine, 2, &nes.rom[MMC1_extended_base + MMC1_bank2]);
-			memory_set_bankptr (space->machine, 3, &nes.rom[MMC1_extended_base + MMC1_bank3]);
-			memory_set_bankptr (space->machine, 4, &nes.rom[MMC1_extended_base + MMC1_bank4]);
+			memory_set_bankptr(space->machine, 1, &nes.rom[MMC1_extended_base + MMC1_bank1]);
+			memory_set_bankptr(space->machine, 2, &nes.rom[MMC1_extended_base + MMC1_bank2]);
+			memory_set_bankptr(space->machine, 3, &nes.rom[MMC1_extended_base + MMC1_bank3]);
+			memory_set_bankptr(space->machine, 4, &nes.rom[MMC1_extended_base + MMC1_bank4]);
 			logerror("-- page1: %06x\n", MMC1_bank1);
 			logerror("-- page2: %06x\n", MMC1_bank2);
 			logerror("-- page3: %06x\n", MMC1_bank3);
@@ -5427,8 +5441,8 @@ int mapper_reset (running_machine *machine, int mapperNum)
 		case 2:
 			/* These games don't switch VROM, but some ROMs incorrectly have CHR chunks */
 			nes.chr_chunks = 0;
-			prg16_89ab (space, 0);
-			prg16_cdef (space, nes.prg_chunks-1);
+			prg16_89ab(space, 0);
+			prg16_cdef(space, nes.prg_chunks-1);
 			break;
 		case 13:
 			chr4_0(space->machine, 0, CHRRAM);
@@ -5463,11 +5477,12 @@ int mapper_reset (running_machine *machine, int mapperNum)
 			MMC3_prg1 = 0xff;
 			MMC3_cmd = 0;
 			MMC3_prg_base = 0;
-			MMC3_prg_mask = ( nes.prg_chunks << 1 ) - 1;
+			MMC3_prg_mask = (nes.prg_chunks << 1) - 1;
 			MMC3_chr_base = 0;
-			MMC3_chr_mask = ( nes.chr_chunks << 3 ) - 1;
-			mapper4_set_prg(space);
-			mapper4_set_chr(space->machine);
+			MMC3_chr_mask = (nes.chr_chunks << 3) - 1;
+			MMC3_chr_source = nes.chr_chunks ? CHRROM : CHRRAM;
+			mapper4_set_prg(space->machine);
+			mapper4_set_chr(space->machine, MMC3_chr_source);
 			break;
 		case 5:
 			/* Can switch 8k prg banks, but they are saved as 16k in size */
@@ -5609,8 +5624,9 @@ int mapper_reset (running_machine *machine, int mapperNum)
 			MMC3_prg_mask = 0x0F;
 			MMC3_chr_base = 0;
 			MMC3_chr_mask = 0x7F;
-			mapper4_set_prg(space);
-			mapper4_set_chr(space->machine);
+			MMC3_chr_source = nes.chr_chunks ? CHRROM : CHRRAM;
+			mapper4_set_prg(space->machine);
+			mapper4_set_chr(space->machine, MMC3_chr_source);
 			break;
 		case 45:
 			IRQ_enable = 0;
@@ -5623,10 +5639,11 @@ int mapper_reset (running_machine *machine, int mapperNum)
 			MMC3_prg_mask = 0x0F;
 			MMC3_chr_base = 0;
 			MMC3_chr_mask = 0x7F;
+			MMC3_chr_source = nes.chr_chunks ? CHRROM : CHRRAM;
 			mapper45_cmd = 0;
 			mapper45_data[0] = mapper45_data[1] = mapper45_data[2] = mapper45_data[3] = 0;
-			mapper4_set_prg(space);
-			mapper4_set_chr(space->machine);
+			mapper4_set_prg(space->machine);
+			mapper4_set_chr(space->machine, MMC3_chr_source);
 			memory_set_bankptr( space->machine, 5, nes.wram );
 			break;
 		case 46:
