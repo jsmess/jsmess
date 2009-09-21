@@ -1507,12 +1507,18 @@ $(MESSOBJ)/skeleton.a:			\
 
 $(MAME_MACHINE)/snes.o: 	$(MAMESRC)/machine/snesdsp1.c \
 				$(MAMESRC)/machine/snesdsp2.c \
+				$(MAMESRC)/machine/snesdsp3.c \
+				$(MAMESRC)/machine/snesdsp4.c \
 				$(MAMESRC)/machine/snesobc1.c \
+				$(MAMESRC)/machine/snescx4.c \
+				$(MAMESRC)/machine/cx4ops.c \
+				$(MAMESRC)/machine/cx4oam.c \
+				$(MAMESRC)/machine/cx4fn.c \
+				$(MAMESRC)/machine/cx4data.c \
 				$(MAMESRC)/machine/snesrtc.c \
 				$(MAMESRC)/machine/snessdd1.c \
-				$(MAMESRC)/machine/snescx4.c \
-				$(MAMESRC)/machine/snes7110.c \
-				$(MAMESRC)/machine/snesst10.c
+				$(MAMESRC)/machine/snesst10.c \
+				$(MAMESRC)/machine/snes7110.c
 
 $(MESS_VIDEO)/gba.o: 		$(MESSSRC)/video/gbamode0.c \
 				$(MESSSRC)/video/gbamode1.c \
@@ -1566,19 +1572,6 @@ $(MESS_DRIVERS)/z80ne.o:	$(MESS_LAYOUT)/z80ne.lh   \
 							$(MESS_LAYOUT)/z80net.lh  \
 							$(MESS_LAYOUT)/z80netb.lh \
 							$(MESS_LAYOUT)/z80netf.lh
-
-$(MAME_MACHINE)/snes.o: 	$(MAMESRC)/machine/snesdsp1.c \
-				$(MAMESRC)/machine/snesdsp2.c \
-				$(MAMESRC)/machine/snesdsp3.c \
-				$(MAMESRC)/machine/snesdsp4.c \
-				$(MAMESRC)/machine/snesobc1.c \
-				$(MAMESRC)/machine/snescx4.c \
-				$(MAMESRC)/machine/cx4ops.c \
-				$(MAMESRC)/machine/cx4oam.c \
-				$(MAMESRC)/machine/cx4fn.c \
-				$(MAMESRC)/machine/cx4data.c \
-				$(MAMESRC)/machine/snesrtc.c \
-				$(MAMESRC)/machine/snessdd1.c
 
 #-------------------------------------------------
 # MESS-specific tools
