@@ -381,8 +381,6 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 		image_fseek(image, offset, SEEK_SET);
 	}
 
-	snes_rom_size -= offset;
-
 	/* We need to take a sample to test what mode we need to be in (the
 	sample has to be quite large to cope with large carts in ExHiRom) */
 	image_fread(image, temp_buffer, 0x40ffff);
