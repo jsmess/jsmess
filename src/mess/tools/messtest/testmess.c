@@ -712,11 +712,6 @@ static const device_config *find_device_by_identity(running_machine *machine, co
 		/* no device_type was specified; use the new preferred mechanism */
 		device = devtag_get_device(machine, ident->tag);
 	}
-	else if (ident->tag != NULL)
-	{
-		/* perform a legacy lookup by tag */
-		device = image_from_devtag_and_index(machine, ident->tag, ident->slot);
-	}
 	else
 	{
 		/* perform a legacy lookup by device type */

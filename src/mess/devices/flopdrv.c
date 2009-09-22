@@ -221,9 +221,6 @@ static TIMER_CALLBACK(floppy_drive_index_callback);
 void floppy_drive_init(const device_config *img)
 {	
 	floppy_drive *pDrive = get_safe_token( img );
-//	assert(image_slotexists(img));
-
-//	pDrive = image_alloctag(img, FLOPDRVTAG, sizeof(floppy_drive));
 
 	/* initialise flags */
 	pDrive->flags = 0;
@@ -730,7 +727,6 @@ static int internal_floppy_device_load(const device_config *image, int create_fo
 {
 	floperr_t err;
 	floppy_drive *flopimg;
-	const mess_device_class *devclass;
 	const struct FloppyFormat *floppy_options;
 	int floppy_flags, i;
 	const char *extension;
@@ -739,7 +735,6 @@ static int internal_floppy_device_load(const device_config *image, int create_fo
 	flopimg = get_safe_token( image );
 
 	/* figure out the floppy options */
-	devclass = mess_devclass_from_core_device(image);
 	floppy_options = ((floppy_config*)image->static_config)->formats;
 
 	if (image_has_been_created(image))

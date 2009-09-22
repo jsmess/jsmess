@@ -182,7 +182,6 @@ INLINE char *device_temp_str(void)
 /* interoperability with MAME devices */
 DEVICE_GET_INFO(mess_device);
 struct _machine_config *machine_config_alloc_with_mess_devices(const game_driver *gamedrv);
-const mess_device_class *mess_devclass_from_core_device(const device_config *device);
 
 /* device naming */
 const char *device_typename(iodevice_t type);
@@ -192,23 +191,10 @@ iodevice_t device_typeid(const char *name);
 /* device allocation */
 void mess_devices_setup(running_machine *machine, machine_config *config, const game_driver *gamedrv);
 
-/* device lookup */
-int device_count_tag_from_machine(const running_machine *machine, const char *tag);
-
-/* deprecated: device lookup; both of these function assume only one of each type of device */
-int device_find_from_machine(const running_machine *machine, iodevice_t type);
-int device_count(running_machine *machine, iodevice_t type);
-
-/* deprecated tag management functions; only works on legacy devices */
-void *image_alloctag(const device_config *device, const char *tag, size_t size);
-void *image_lookuptag(const device_config *device, const char *tag);
-
 /* deprecated device access functions */
 int image_index_in_device(const device_config *device);
-const device_config *image_from_devtag_and_index(running_machine *machine, const char *devtag, int id);
 
 /* deprecated device access functions that assume one device of any given type */
-iodevice_t image_devtype(const device_config *device);
 const device_config *image_from_devtype_and_index(running_machine *machine, iodevice_t type, int id);
 
 /* diagnostics */
