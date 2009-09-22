@@ -4,16 +4,16 @@
 
 
 
-    2009-05 FP: Changed the implementation to be a MAME device. However, 
+    2009-05 FP: Changed the implementation to be a MAME device. However,
     the main code has been kept the same as before (to reduce the risk of
     regressions, at this early stage). More work will be eventually done
-    to improve emulation and to allow more devices (possibly of different 
+    to improve emulation and to allow more devices (possibly of different
     kinds) to be connected to the bus like in the real thing.
-    Notice that, imho, the current implementation is not very satisfactory: 
-    it is not really emulating the serial bus, but (in some sense) the plug 
-    of the devices which would be connected to the serial bus. Hence, the 
-    provided handlers pass the serial state of the floppy drives to the CPU 
-    of the main machine. 
+    Notice that, imho, the current implementation is not very satisfactory:
+    it is not really emulating the serial bus, but (in some sense) the plug
+    of the devices which would be connected to the serial bus. Hence, the
+    provided handlers pass the serial state of the floppy drives to the CPU
+    of the main machine.
     As a byproduct of this implementation, the serial_bus device is currently
     tied to the floppy drives (i.e. you will find MDRV_CBM_SERBUS_ADD used
     in the floppy drive MACHINE_DRIVERs, not in the main computer ones)

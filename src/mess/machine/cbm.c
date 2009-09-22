@@ -8,11 +8,11 @@
 
 /***********************************************
 
-	Input Reading - Common Components
+    Input Reading - Common Components
 
 ***********************************************/
 
-/* These are needed by c64, c65 and c128, each machine has also additional specific 
+/* These are needed by c64, c65 and c128, each machine has also additional specific
 components in its INTERRUPT_GEN */
 
 /* keyboard lines */
@@ -84,8 +84,8 @@ void cbm_common_interrupt( const device_config *device )
 
 		case 0x04:
 /* was there any input on the lightpen? where is it mapped? */
-//			if (input_port_read(device->machine, "OTHER") & 0x04)			/* Lightpen Signal */
-//				value &= ?? ;
+//          if (input_port_read(device->machine, "OTHER") & 0x04)           /* Lightpen Signal */
+//              value &= ?? ;
 			break;
 
 		case 0x07:
@@ -126,8 +126,8 @@ void cbm_common_interrupt( const device_config *device )
 
 		case 0x40:
 /* was there any input on the lightpen? where is it mapped? */
-//			if (input_port_read(device->machine, "OTHER") & 0x04)			/* Lightpen Signal */
-//				value &= ?? ;
+//          if (input_port_read(device->machine, "OTHER") & 0x04)           /* Lightpen Signal */
+//              value &= ?? ;
 			break;
 
 		case 0x70:
@@ -140,8 +140,8 @@ void cbm_common_interrupt( const device_config *device )
 
 	c64_keyline[9] = value;
 
-//	vic2_frame_interrupt does nothing so this is not necessary
-//	vic2_frame_interrupt (device);
+//  vic2_frame_interrupt does nothing so this is not necessary
+//  vic2_frame_interrupt (device);
 
 	/* check if lightpen has been chosen as input: if so, enable crosshair */
 	timer_set(device->machine, attotime_zero, NULL, 0, lightpen_tick);
@@ -153,22 +153,22 @@ void cbm_common_interrupt( const device_config *device )
 
 /***********************************************
 
-	CIA Common Handlers
+    CIA Common Handlers
 
 ***********************************************/
 
-/* These are shared by c64, c65 and c128. c65 and c128 also have additional specific 
+/* These are shared by c64, c65 and c128. c65 and c128 also have additional specific
 components (to select/read additional keyboard lines) */
 
 /*
- *	CIA 0 - Port A
+ *  CIA 0 - Port A
  * bits 7-0 keyboard line select
  * bits 7,6: paddle select( 01 port a, 10 port b)
  * bit 4: joystick a fire button
  * bits 3,2: Paddles port a fire button
  * bits 3-0: joystick a direction
  *
- *	CIA 0 - Port B
+ *  CIA 0 - Port B
  * bits 7-0: keyboard raw values
  * bit 4: joystick b fire button, lightpen select
  * bits 3,2: paddle b fire buttons (left,right)
@@ -326,13 +326,13 @@ UINT8 common_cia0_port_b_r( const device_config *device, UINT8 output_a )
 
 /***********************************************
 
-	CBM Quickloads
+    CBM Quickloads
 
 ***********************************************/
 
 
-static int general_cbm_loadsnap(const device_config *image, const char *file_type, int snapshot_size,
-	offs_t offset, void (*cbm_sethiaddress)(running_machine *machine, UINT16 hiaddress))
+static int general_cbm_loadsnap( const device_config *image, const char *file_type, int snapshot_size,
+	offs_t offset, void (*cbm_sethiaddress)(running_machine *machine, UINT16 hiaddress) )
 {
 	char buffer[7];
 	UINT8 *data = NULL;
@@ -400,7 +400,7 @@ error:
 	return INIT_FAIL;
 }
 
-static void cbm_quick_sethiaddress(running_machine *machine, UINT16 hiaddress)
+static void cbm_quick_sethiaddress( running_machine *machine, UINT16 hiaddress )
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
@@ -427,7 +427,7 @@ QUICKLOAD_LOAD( cbm_vc20 )
 	return general_cbm_loadsnap(image, file_type, quickload_size, 0, cbm_quick_sethiaddress);
 }
 
-static void cbm_pet_quick_sethiaddress(running_machine *machine, UINT16 hiaddress)
+static void cbm_pet_quick_sethiaddress( running_machine *machine, UINT16 hiaddress )
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
@@ -479,7 +479,7 @@ QUICKLOAD_LOAD( p500 )
 	return general_cbm_loadsnap(image, file_type, quickload_size, 0, cbmb_quick_sethiaddress);
 }
 
-static void cbm_c65_quick_sethiaddress(running_machine *machine, UINT16 hiaddress)
+static void cbm_c65_quick_sethiaddress( running_machine *machine, UINT16 hiaddress )
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
@@ -495,23 +495,23 @@ QUICKLOAD_LOAD( cbm_c65 )
 
 /***********************************************
 
-	CBM Cartridges
+    CBM Cartridges
 
 ***********************************************/
 
 
-/*	All the cartridge specific code has been moved
-	to machine/ drivers. Once more informations 
-	surface about the cart expansions for systems 
-	in c65.c, c128.c, cbmb.c and pet.c, the shared 
-	code could be refactored to have here the 
-	common functions								*/
+/*  All the cartridge specific code has been moved
+    to machine/ drivers. Once more informations
+    surface about the cart expansions for systems
+    in c65.c, c128.c, cbmb.c and pet.c, the shared
+    code could be refactored to have here the
+    common functions                                */
 
 
 
 /***********************************************
 
-	CBM Datasette Tapes
+    CBM Datasette Tapes
 
 ***********************************************/
 

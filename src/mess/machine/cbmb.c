@@ -36,7 +36,7 @@ drivers 8 & 9 as in pet.c ? */
 		} \
 	} while (0)
 
-static TIMER_CALLBACK(cbmb_frame_interrupt);
+static TIMER_CALLBACK( cbmb_frame_interrupt );
 /* keyboard lines */
 static int cbmb_keyline_a, cbmb_keyline_b, cbmb_keyline_c;
 
@@ -73,23 +73,23 @@ READ8_DEVICE_HANDLER( cbmb_tpi0_port_a_r )
 	const device_config *ieeebus = devtag_get_device(device->machine, "ieee_bus");
 	int data = 0;
 
-	if (cbm_ieee_nrfd_r(ieeebus, 0)) 
+	if (cbm_ieee_nrfd_r(ieeebus, 0))
 		data |= 0x80;
 
-	if (cbm_ieee_ndac_r(ieeebus, 0)) 
+	if (cbm_ieee_ndac_r(ieeebus, 0))
 		data |= 0x40;
 
-	if (cbm_ieee_eoi_r(ieeebus, 0)) 
+	if (cbm_ieee_eoi_r(ieeebus, 0))
 		data |= 0x20;
 
-	if (cbm_ieee_dav_r(ieeebus, 0)) 
+	if (cbm_ieee_dav_r(ieeebus, 0))
 		data |= 0x10;
 
-	if (cbm_ieee_atn_r(ieeebus, 0)) 
+	if (cbm_ieee_atn_r(ieeebus, 0))
 		data |= 0x08;
 
-/*  if (cbm_ieee_ren_r(ieeebus, 0)) 
-		data |= 0x04; */
+/*  if (cbm_ieee_ren_r(ieeebus, 0))
+        data |= 0x04; */
 
 	return data;
 }
@@ -221,7 +221,7 @@ READ8_DEVICE_HANDLER( cbmb_keyboard_line_c )
 	return data ^0xff;
 }
 
-void cbmb_irq(const device_config *device, int level)
+void cbmb_irq( const device_config *device, int level )
 {
 	static int old_level = 0;
 
@@ -266,12 +266,12 @@ const cia6526_interface cbmb_cia =
 	}
 };
 
-WRITE8_HANDLER ( cbmb_colorram_w )
+WRITE8_HANDLER( cbmb_colorram_w )
 {
 	cbmb_colorram[offset] = data | 0xf0;
 }
 
-static int cbmb_dma_read(running_machine *machine, int offset)
+static int cbmb_dma_read( running_machine *machine, int offset )
 {
 	if (offset >= 0x1000)
 		return cbmb_videoram[offset & 0x3ff];
@@ -279,7 +279,7 @@ static int cbmb_dma_read(running_machine *machine, int offset)
 		return cbmb_chargen[offset & 0xfff];
 }
 
-static int cbmb_dma_read_color(running_machine *machine, int offset)
+static int cbmb_dma_read_color( running_machine *machine, int offset )
 {
 	return cbmb_colorram[offset & 0x3ff];
 }
@@ -289,10 +289,10 @@ WRITE8_DEVICE_HANDLER( cbmb_change_font )
 	cbmb_vh_set_font(data);
 }
 
-static void cbmb_common_driver_init(running_machine *machine)
+static void cbmb_common_driver_init( running_machine *machine )
 {
 	cbmb_state *state = machine->driver_data;
-	cbmb_chargen=memory_region(machine, "maincpu") + 0x100000;
+	cbmb_chargen = memory_region(machine, "maincpu") + 0x100000;
 	/*    memset(c64_memory, 0, 0xfd00); */
 
 	timer_pulse(machine, ATTOTIME_IN_MSEC(10), NULL, 0, cbmb_frame_interrupt);
@@ -365,7 +365,7 @@ static TIMER_CALLBACK(cbmb_frame_interrupt)
 
 #if 0
 	value = 0xff;
-	switch(controller1)
+	switch (controller1)
 	{
 		case 0x00:
 			value &= ~input_port_read(machine, "JOY1_1B");			/* Joy1 Directions + Button 1 */
@@ -407,7 +407,7 @@ static TIMER_CALLBACK(cbmb_frame_interrupt)
 
 
 	value = 0xff;
-	switch(controller2)
+	switch (controller2)
 	{
 		case 0x00:
 			value &= ~input_port_read(machine, "JOY2_1B");			/* Joy2 Directions + Button 1 */
@@ -451,7 +451,7 @@ static TIMER_CALLBACK(cbmb_frame_interrupt)
 // 128u4 FIXME
 //  vic2_frame_interrupt (device);
 
-	set_led_status (1, input_port_read(machine, "SPECIAL") & 0x04 ? 1 : 0);		/* Shift Lock */
+	set_led_status(1, input_port_read(machine, "SPECIAL") & 0x04 ? 1 : 0);		/* Shift Lock */
 }
 
 
@@ -472,7 +472,7 @@ static DEVICE_IMAGE_LOAD(cbmb_cart)
 
 	filetype = image_filetype(image);
 
- 	if (!mame_stricmp (filetype, "crt"))
+ 	if (!mame_stricmp(filetype, "crt"))
 	{
 	/* We temporarily remove .crt loading. Previous versions directly used
     the same routines used to load C64 .crt file, but I seriously doubt the
@@ -482,16 +482,16 @@ static DEVICE_IMAGE_LOAD(cbmb_cart)
 	else
 	{
 		/* Assign loading address according to extension */
-		if (!mame_stricmp (filetype, "10"))
+		if (!mame_stricmp(filetype, "10"))
 			address = 0x1000;
 
-		else if (!mame_stricmp (filetype, "20"))
+		else if (!mame_stricmp(filetype, "20"))
 			address = 0x2000;
 
-		else if (!mame_stricmp (filetype, "40"))
+		else if (!mame_stricmp(filetype, "40"))
 			address = 0x4000;
 
-		else if (!mame_stricmp (filetype, "60"))
+		else if (!mame_stricmp(filetype, "60"))
 			address = 0x6000;
 
 		logerror("Loading cart %s at %.4x size:%.4x\n", image_filename(image), address, size);

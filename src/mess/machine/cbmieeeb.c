@@ -4,21 +4,21 @@
 
 
 
-    2009-05 FP: Changed the implementation to be a MAME device. However, 
+    2009-05 FP: Changed the implementation to be a MAME device. However,
     the main code has been kept the same as before (to reduce the risk of
     regressions, at this early stage). More work will be eventually done
-    to improve emulation and to allow more devices (possibly of different 
+    to improve emulation and to allow more devices (possibly of different
     kinds) to be connected to the bus like in the real thing.
-    Notice that write handlers which are passed to the drivers, are always 
-    calling functions with the "device" parameter as 0. In turn, this calls 
-    c2031_state from machine/cbmdrive.c which calls again the functions with 
-    "device" parameter = 1! This forces the current code to export both the 
-    DEVICE_HANDLERs and the functions called by them. 
-    Eventually, proper emulation will remove the need of c2031_state (multiple 
-    devices would be identified by their tags) and it will allow to only export 
+    Notice that write handlers which are passed to the drivers, are always
+    calling functions with the "device" parameter as 0. In turn, this calls
+    c2031_state from machine/cbmdrive.c which calls again the functions with
+    "device" parameter = 1! This forces the current code to export both the
+    DEVICE_HANDLERs and the functions called by them.
+    Eventually, proper emulation will remove the need of c2031_state (multiple
+    devices would be identified by their tags) and it will allow to only export
     the DEVICE_HANDLERs, as it would be preferable.
 
-    As I have written in cbmserb.c, you should not use this driver as an 
+    As I have written in cbmserb.c, you should not use this driver as an
     example of the right way to implement parallel devices in MAME/MESS!
 
 ***************************************************************************/
@@ -334,7 +334,7 @@ struct _cbm_ieee_bus_t
 {
 	struct {
 		UINT8 data;
-/*		int fic; */
+/*      int fic; */
 		int dav, nrfd, ndac, atn, eoi, ren;
 		int srq;
 	} bus[2];
@@ -390,7 +390,7 @@ INLINE cbm_ieee_bus_t *get_safe_token(const device_config *device)
  srq serial request master input, other output
  */
 
-/* TODO - These functions are used in the write handlers but also in c2031_state, hence 
+/* TODO - These functions are used in the write handlers but also in c2031_state, hence
 cannot be static. However, it would be better if only the WRITE8_DEVICE_HANDLER would be
 made available to the rest of the source. */
 
@@ -398,9 +398,9 @@ void cbm_ieee_dav_w( const device_config *ieeedev, int device, int data )
 {
 	cbm_ieee_bus_t *ieeebus = get_safe_token(ieeedev);
 
-//	DBG_LOG(ieeedev->machine, 1, "cbm ieee dav", ("%.4x dev:%d %d\n", activecpu_get_pc(), device, data));
+//  DBG_LOG(ieeedev->machine, 1, "cbm ieee dav", ("%.4x dev:%d %d\n", activecpu_get_pc(), device, data));
 	ieeebus->bus[device].dav = data;
-	if (device == 0) 
+	if (device == 0)
 		c2031_state(ieeedev->machine, cbm_drive);
 }
 
@@ -413,75 +413,75 @@ void cbm_ieee_nrfd_w( const device_config *ieeedev, int device, int data )
 {
 	cbm_ieee_bus_t *ieeebus = get_safe_token(ieeedev);
 
-//	DBG_LOG(ieeedev->machine, 1, "cbm ieee nrfd", ("%.4x dev:%d %d\n", activecpu_get_pc(), device, data));
+//  DBG_LOG(ieeedev->machine, 1, "cbm ieee nrfd", ("%.4x dev:%d %d\n", activecpu_get_pc(), device, data));
 	ieeebus->bus[device].nrfd = data;
-	if (device == 0) 
+	if (device == 0)
 		c2031_state(ieeedev->machine, cbm_drive);
 }
 
 WRITE8_DEVICE_HANDLER( cbm_ieee_nrfd_write )
 {
-	cbm_ieee_nrfd_w(device, 0, data );	
+	cbm_ieee_nrfd_w(device, 0, data );
 }
 
 void cbm_ieee_ndac_w( const device_config *ieeedev, int device, int data )
 {
 	cbm_ieee_bus_t *ieeebus = get_safe_token(ieeedev);
 
-//	DBG_LOG(ieeedev->machine, 1, "cbm ieee ndac",("%.4x dev:%d %d\n", activecpu_get_pc(), device, data));
+//  DBG_LOG(ieeedev->machine, 1, "cbm ieee ndac",("%.4x dev:%d %d\n", activecpu_get_pc(), device, data));
 	ieeebus->bus[device].ndac = data;
-	if (device == 0) 
+	if (device == 0)
 		c2031_state(ieeedev->machine, cbm_drive);
 }
 
 WRITE8_DEVICE_HANDLER( cbm_ieee_ndac_write )
 {
-	cbm_ieee_ndac_w(device, 0, data );	
+	cbm_ieee_ndac_w(device, 0, data );
 }
 
 void cbm_ieee_atn_w( const device_config *ieeedev, int device, int data )
 {
 	cbm_ieee_bus_t *ieeebus = get_safe_token(ieeedev);
 
-//	DBG_LOG(ieeedev->machine, 1, "cbm ieee atn",("%.4x dev:%d %d\n", activecpu_get_pc(), device, data));
+//  DBG_LOG(ieeedev->machine, 1, "cbm ieee atn",("%.4x dev:%d %d\n", activecpu_get_pc(), device, data));
 	ieeebus->bus[device].atn = data;
-	if (device == 0) 
+	if (device == 0)
 		c2031_state(ieeedev->machine, cbm_drive);
 }
 
 WRITE8_DEVICE_HANDLER( cbm_ieee_atn_write )
 {
-	cbm_ieee_atn_w(device, 0, data );	
+	cbm_ieee_atn_w(device, 0, data );
 }
 
 void cbm_ieee_eoi_w( const device_config *ieeedev, int device, int data )
 {
 	cbm_ieee_bus_t *ieeebus = get_safe_token(ieeedev);
 
-//	DBG_LOG(ieeedev->machine, 1, "cbm ieee eoi", ("%.4x dev:%d %d\n", activecpu_get_pc(), device, data));
+//  DBG_LOG(ieeedev->machine, 1, "cbm ieee eoi", ("%.4x dev:%d %d\n", activecpu_get_pc(), device, data));
 	ieeebus->bus[device].eoi = data;
-	if (device == 0) 
+	if (device == 0)
 		c2031_state(ieeedev->machine, cbm_drive);
 }
 
 WRITE8_DEVICE_HANDLER( cbm_ieee_eoi_write )
 {
-	cbm_ieee_eoi_w(device, 0, data );	
+	cbm_ieee_eoi_w(device, 0, data );
 }
 
 void cbm_ieee_data_w( const device_config *ieeedev, int device, int data )
 {
 	cbm_ieee_bus_t *ieeebus = get_safe_token(ieeedev);
 
-//	DBG_LOG(ieeedev->machine, 1, "cbm ieee data", ("%.4x dev:%d %.2x\n", activecpu_get_pc(), device, data));
+//  DBG_LOG(ieeedev->machine, 1, "cbm ieee data", ("%.4x dev:%d %.2x\n", activecpu_get_pc(), device, data));
 	ieeebus->bus[device].data = data;
-	if (device == 0) 
+	if (device == 0)
 		c2031_state(ieeedev->machine, cbm_drive);
 }
 
 WRITE8_DEVICE_HANDLER( cbm_ieee_data_write )
 {
-	cbm_ieee_data_w(device, 0, data );	
+	cbm_ieee_data_w(device, 0, data );
 }
 
 
@@ -535,7 +535,7 @@ READ8_DEVICE_HANDLER( cbm_ieee_eoi_r )
 	cbm_ieee_bus_t *ieeebus = get_safe_token(device);
 	int data = ieeebus->bus[0].eoi && ieeebus->bus[1].eoi;
 
-/*	DBG_LOG(device->machine, 1, "cbm ieee eoi", ("read %d\n", data)); */
+/*  DBG_LOG(device->machine, 1, "cbm ieee eoi", ("read %d\n", data)); */
 	return data;
 }
 
@@ -553,7 +553,7 @@ READ8_DEVICE_HANDLER( cbm_ieee_state )
 {
 	cbm_ieee_bus_t *ieeebus = get_safe_token(device);
 
-	switch (offset) 
+	switch (offset)
 	{
 		case 0: return ieeebus->bus[0].data;
 		case 1: return ieeebus->bus[0].atn;
@@ -600,7 +600,7 @@ static DEVICE_RESET( cbm_ieee_bus )
 	cbm_ieee_bus_t *ieeebus = get_safe_token(device);
 	int i;
 
-	for (i = 0; i < 2; i++) 
+	for (i = 0; i < 2; i++)
 	{
 		ieeebus->bus[i].dav = 1;
 		ieeebus->bus[i].nrfd = 1;

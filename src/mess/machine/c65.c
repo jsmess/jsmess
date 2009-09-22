@@ -1,6 +1,6 @@
 /***************************************************************************
-	commodore c65 home computer
-	peter.trauner@jk.uni-linz.ac.at
+    commodore c65 home computer
+    peter.trauner@jk.uni-linz.ac.at
     documention
      www.funet.fi
  ***************************************************************************/
@@ -30,15 +30,15 @@
 		} \
 	} while (0)
 
-static int c65_charset_select = 0;
+static int c65_charset_select;
 
-static int c64mode = 0;
+static int c64mode;
 
-static UINT8 c65_6511_port = 0xff;
+static UINT8 c65_6511_port;
 static UINT8 c65_keyline = { 0xff };
 
 static UINT8 serial_clock, serial_data, serial_atn;
-static UINT8 vicirq = 0;
+static UINT8 vicirq;
 
 /*UINT8 *c65_basic; */
 /*UINT8 *c65_kernal; */
@@ -49,7 +49,7 @@ UINT8 *c65_interface;
 /*UINT8 *c65_graphics; */
 
 
-static void c65_nmi(running_machine *machine)
+static void c65_nmi( running_machine *machine )
 {
 	static int nmilevel = 0;
 	const device_config *cia_1 = devtag_get_device(machine, "cia_1");
@@ -66,18 +66,18 @@ static void c65_nmi(running_machine *machine)
 
 /***********************************************
 
-	CIA Interfaces
+    CIA Interfaces
 
 ***********************************************/
 
 /*
- *	CIA 0 - Port A keyboard line select
- *	CIA 0 - Port B keyboard line read
+ *  CIA 0 - Port A keyboard line select
+ *  CIA 0 - Port B keyboard line read
  *
- *	flag cassette read input, serial request in
- *	irq to irq connected
+ *  flag cassette read input, serial request in
+ *  irq to irq connected
  *
- *	see machine/cbm.c
+ *  see machine/cbm.c
  */
 
 static READ8_DEVICE_HANDLER( c65_cia0_port_a_r )
@@ -102,11 +102,11 @@ static READ8_DEVICE_HANDLER( c65_cia0_port_b_r )
 
 static WRITE8_DEVICE_HANDLER( c65_cia0_port_b_w )
 {
-//	was there lightpen support in c65 video chip?
-//	vic2_lightpen_write(data & 0x10);
+//  was there lightpen support in c65 video chip?
+//  vic2_lightpen_write(data & 0x10);
 }
 
-static void c65_irq (running_machine *machine, int level)
+static void c65_irq( running_machine *machine, int level )
 {
 	static int old_level = 0;
 
@@ -119,13 +119,13 @@ static void c65_irq (running_machine *machine, int level)
 }
 
 /* is this correct for c65 as well as c64? */
-static void c65_cia0_interrupt (const device_config *device, int level)
+static void c65_cia0_interrupt( const device_config *device, int level )
 {
 	c65_irq (device->machine, level || vicirq);
 }
 
 /* is this correct for c65 as well as c64? */
-static void c65_vic_interrupt (running_machine *machine, int level)
+static void c65_vic_interrupt( running_machine *machine, int level )
 {
 	const device_config *cia_0 = devtag_get_device(machine, "cia_0");
 #if 1
@@ -209,7 +209,7 @@ static WRITE8_DEVICE_HANDLER( c65_cia1_port_a_w )
 	c64_vicaddr = c64_memory + helper[data & 0x03];
 }
 
-static void c65_cia1_interrupt (const device_config *device, int level)
+static void c65_cia1_interrupt( const device_config *device, int level )
 {
 	c65_nmi(device->machine);
 }
@@ -241,26 +241,26 @@ const cia6526_interface c65_pal_cia1 =
 
 /***********************************************
 
-	Memory Handlers
+    Memory Handlers
 
 ***********************************************/
 
 /* processor has only 1 mega address space !? */
 /* and system 8 megabyte */
 /* dma controller and bankswitch hardware ?*/
-static READ8_HANDLER(c65_read_mem)
+static READ8_HANDLER( c65_read_mem )
 {
 	UINT8 result;
-	if (offset <= 0x0FFFF)
+	if (offset <= 0x0ffff)
 		result = c64_memory[offset];
 	else
 		result = memory_read_byte(space, offset);
 	return result;
 }
 
-static WRITE8_HANDLER(c65_write_mem)
+static WRITE8_HANDLER( c65_write_mem )
 {
-	if (offset <= 0x0FFFF)
+	if (offset <= 0x0ffff)
 		c64_memory[offset] = data;
 	else
 		memory_write_byte(space, offset, data);
@@ -275,7 +275,7 @@ static struct {
    writing banknumber to offset 2
    writing hibyte to offset 1
    writing lobyte to offset 0
-    cpu holded, dma transfer (data at address) executed, cpu activated
+    cpu holded, dma transfer(data at address) executed, cpu activated
 
   command data:
    0 command (0 copy, 3 fill)
@@ -295,7 +295,7 @@ static struct {
    version 2:
    cmd 0x30 used for this
 */
-static void c65_dma_port_w(running_machine *machine, int offset, int value)
+static void c65_dma_port_w( running_machine *machine, int offset, int value )
 {
 	static int dump = 0;
 	PAIR pair, src, dst, len;
@@ -303,7 +303,7 @@ static void c65_dma_port_w(running_machine *machine, int offset, int value)
 	int i;
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
-	switch (offset & 3) 
+	switch (offset & 3)
 	{
 	case 2:
 	case 1:
@@ -327,7 +327,7 @@ static void c65_dma_port_w(running_machine *machine, int offset, int value)
 		dst.b.h = c65_read_mem(space, pair.d++);
 		dst.b.h2 = c65_read_mem(space, pair.d++);
 
-		switch (cmd) 
+		switch (cmd)
 		{
 		case 0:
 			if (src.d == 0x3ffff) dump = 1;
@@ -337,29 +337,29 @@ static void c65_dma_port_w(running_machine *machine, int offset, int value)
 						 len.w.l, src.d, dst.d, c65_read_mem(space, pair.d),
 						 c65_read_mem(space, pair.d + 1) ) );
 			if ((dma.version == 1)
-				 && ( (src.d&0x400000) || (dst.d & 0x400000))) 
+				 && ( (src.d&0x400000) || (dst.d & 0x400000)))
 			{
-				if (!(src.d & 0x400000)) 
+				if (!(src.d & 0x400000))
 				{
 					dst.d &= ~0x400000;
 					for (i = 0; i < len.w.l; i++)
 						c65_write_mem(space, dst.d--, c65_read_mem(space, src.d++));
 				}
-				else if (!(dst.d & 0x400000)) 
+				else if (!(dst.d & 0x400000))
 				{
 					src.d &= ~0x400000;
 					for (i = 0; i < len.w.l; i++)
 						c65_write_mem(space, dst.d++, c65_read_mem(space, src.d--));
-				} 
-				else 
+				}
+				else
 				{
 					src.d &= ~0x400000;
 					dst.d &= ~0x400000;
 					for (i = 0; i < len.w.l; i++)
 						c65_write_mem(space, --dst.d, c65_read_mem(space, --src.d));
 				}
-			} 
-			else 
+			}
+			else
 			{
 				for (i = 0; i < len.w.l; i++)
 					c65_write_mem(space, dst.d++, c65_read_mem(space, src.d++));
@@ -394,29 +394,29 @@ static void c65_dma_port_w(running_machine *machine, int offset, int value)
 	}
 }
 
-static int c65_dma_port_r(running_machine *machine, int offset)
+static int c65_dma_port_r( running_machine *machine, int offset )
 {
 	/* offset 3 bit 7 in progress ? */
 	DBG_LOG(machine, 2, "dma chip read", ("%.3x\n", offset));
     return 0x7f;
 }
 
-static void c65_6511_port_w(running_machine *machine, int offset, int value)
+static void c65_6511_port_w( running_machine *machine, int offset, int value )
 {
-	if (offset == 7) 
+	if (offset == 7)
 	{
 		c65_6511_port = value;
 	}
 	DBG_LOG(machine, 2, "r6511 write", ("%.2x %.2x\n", offset, value));
 }
 
-static int c65_6511_port_r(running_machine *machine, int offset)
+static int c65_6511_port_r( running_machine *machine, int offset )
 {
 	int data = 0xff;
 
-	if (offset == 7) 
+	if (offset == 7)
 	{
-		if (input_port_read(machine, "SPECIAL") & 0x20) 
+		if (input_port_read(machine, "SPECIAL") & 0x20)
 			data &= ~1;
 	}
 	DBG_LOG(machine, 2, "r6511 read", ("%.2x\n", offset));
@@ -537,10 +537,10 @@ static struct {
 #if 0
 static void c65_fdc_state(void)
 {
-	switch (c65_fdc.state) 
+	switch (c65_fdc.state)
 	{
 	case FDC_CMD_MOTOR_SPIN_UP:
-		if (timer_get_time(machine) - c65_fdc.time) 
+		if (timer_get_time(machine) - c65_fdc.time)
 		{
 			c65_fdc.state = 0;
 			c65_fdc.status &= ~FDC_BUSY;
@@ -553,14 +553,14 @@ static void c65_fdc_state(void)
 static void c65_fdc_w( running_machine *machine, int offset, int data )
 {
 	DBG_LOG(machine, 1, "fdc write", ("%.5x %.2x %.2x\n", cpu_get_pc(cputag_get_cpu(machine, "maincpu")), offset, data));
-	switch (offset & 0xf) 
+	switch (offset & 0xf)
 	{
 	case 0:
 		c65_fdc.reg[0] = data;
 		break;
 	case 1:
 		c65_fdc.reg[1] = data;
-		switch (data & 0xf9) 
+		switch (data & 0xf9)
 		{
 		case 0x20: // wait for motor spin up
 			c65_fdc.status &= ~(FDC_IRQ|FDC_LOST|FDC_CRC|FDC_RNF);
@@ -606,7 +606,7 @@ static void c65_fdc_w( running_machine *machine, int offset, int data )
 static int c65_fdc_r( running_machine *machine, int offset )
 {
 	UINT8 data = 0;
-	switch (offset & 0xf) 
+	switch (offset & 0xf)
 	{
 	case 0:
 		data = c65_fdc.reg[0];
@@ -659,7 +659,7 @@ static struct {
 	UINT8 reg;
 } expansion_ram = {0};
 
-static READ8_HANDLER(c65_ram_expansion_r)
+static READ8_HANDLER( c65_ram_expansion_r )
 {
 	UINT8 data = 0xff;
 	if (mess_ram_size > (128 * 1024))
@@ -667,7 +667,7 @@ static READ8_HANDLER(c65_ram_expansion_r)
 	return data;
 }
 
-static WRITE8_HANDLER(c65_ram_expansion_w)
+static WRITE8_HANDLER( c65_ram_expansion_w )
 {
 	offs_t expansion_ram_begin;
 	offs_t expansion_ram_end;
@@ -689,23 +689,27 @@ static WRITE8_HANDLER(c65_ram_expansion_w)
 	}
 }
 
-static WRITE8_HANDLER ( c65_write_io )
+static WRITE8_HANDLER( c65_write_io )
 {
 	const device_config *sid_0 = devtag_get_device(space->machine, "sid_r");
 	const device_config *sid_1 = devtag_get_device(space->machine, "sid_l");
 
-	switch(offset&0xf00) {
+	switch (offset & 0xf00)
+	{
 	case 0x000:
 		if (offset < 0x80)
-			vic3_port_w (space, offset & 0x7f, data);
-		else if (offset < 0xa0) {
+			vic3_port_w(space, offset & 0x7f, data);
+		else if (offset < 0xa0)
 			c65_fdc_w(space->machine, offset&0x1f,data);
-		} else {
+		else
+		{
 			c65_ram_expansion_w(space, offset&0x1f, data);
 			/*ram expansion crtl optional */
 		}
 		break;
-	case 0x100:case 0x200: case 0x300:
+	case 0x100:
+	case 0x200:
+	case 0x300:
 		vic3_palette_w(space, offset-0x100,data);
 		break;
 	case 0x400:
@@ -728,12 +732,12 @@ static WRITE8_HANDLER ( c65_write_io )
 	}
 }
 
-static WRITE8_HANDLER ( c65_write_io_dc00 )
+static WRITE8_HANDLER( c65_write_io_dc00 )
 {
 	const device_config *cia_0 = devtag_get_device(space->machine, "cia_0");
 	const device_config *cia_1 = devtag_get_device(space->machine, "cia_1");
 
-	switch(offset & 0xf00) 
+	switch (offset & 0xf00)
 	{
 	case 0x000:
 		cia_w(cia_0, offset, data);
@@ -748,28 +752,26 @@ static WRITE8_HANDLER ( c65_write_io_dc00 )
 	}
 }
 
-static READ8_HANDLER ( c65_read_io )
+static READ8_HANDLER( c65_read_io )
 {
 	const device_config *sid_0 = devtag_get_device(space->machine, "sid_r");
 	const device_config *sid_1 = devtag_get_device(space->machine, "sid_l");
 
-	switch(offset & 0xf00) 
+	switch (offset & 0xf00)
 	{
 	case 0x000:
 		if (offset < 0x80)
-			return vic3_port_r (space, offset & 0x7f);
-		if (offset < 0xa0) 
-		{
+			return vic3_port_r(space, offset & 0x7f);
+		if (offset < 0xa0)
 			return c65_fdc_r(space->machine, offset&0x1f);
-		} 
-		else 
+		else
 		{
 			return c65_ram_expansion_r(space, offset&0x1f);
 			/*return; ram expansion crtl optional */
 		}
 		break;
 	case 0x100:
-	case 0x200: 
+	case 0x200:
 	case 0x300:
 	/* read only !? */
 		DBG_LOG(space->machine, 1, "io read", ("%.3x\n", offset));
@@ -792,12 +794,12 @@ static READ8_HANDLER ( c65_read_io )
 	return 0xff;
 }
 
-static READ8_HANDLER ( c65_read_io_dc00 )
+static READ8_HANDLER( c65_read_io_dc00 )
 {
 	const device_config *cia_0 = devtag_get_device(space->machine, "cia_0");
 	const device_config *cia_1 = devtag_get_device(space->machine, "cia_1");
 
-	switch(offset & 0x300) 
+	switch (offset & 0x300)
 	{
 	case 0x000:
 		return cia_r(cia_0, offset);
@@ -822,7 +824,7 @@ static int c65_io_on=0, c65_io_dc00_on=0;
 /* bit 1 external sync enable (genlock)
    bit 2 palette enable
    bit 6 vic3 c65 character set */
-static void c65_bankswitch_interface(running_machine *machine, int value)
+static void c65_bankswitch_interface( running_machine *machine, int value )
 {
 	static int old = 0;
 	read8_space_func rh;
@@ -848,39 +850,39 @@ static void c65_bankswitch_interface(running_machine *machine, int value)
 		memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0dc00, 0x0dfff, 0, 0, wh);
 	}
 
-	c65_io_dc00_on =! (value & 1);
+	c65_io_dc00_on = !(value & 1);
 #if 0
 	/* cartridge roms !?*/
 	if (value & 0x08)
-		memory_set_bankptr (machine, 1, c64_roml);
+		memory_set_bankptr(machine, 1, c64_roml);
 	else
-		memory_set_bankptr (machine, 1, c64_memory + 0x8000);
+		memory_set_bankptr(machine, 1, c64_memory + 0x8000);
 
 	if (value & 0x10)
-		memory_set_bankptr (machine, 2, c64_basic);
+		memory_set_bankptr(machine, 2, c64_basic);
 	else
-		memory_set_bankptr (machine, 2, c64_memory + 0xa000);
+		memory_set_bankptr(machine, 2, c64_memory + 0xa000);
 #endif
-	if ((old^value) & 0x20) 
-	{ 
+	if ((old^value) & 0x20)
+	{
 	/* bankswitching faulty when doing actual page */
-		if (value & 0x20) 
-			memory_set_bankptr (machine, 3, c65_interface);
+		if (value & 0x20)
+			memory_set_bankptr(machine, 3, c65_interface);
 		else
-			memory_set_bankptr (machine, 3, c64_memory + 0xc000);
+			memory_set_bankptr(machine, 3, c64_memory + 0xc000);
 	}
-	c65_charset_select=value&0x40;
+	c65_charset_select = value & 0x40;
 #if 0
 	/* cartridge roms !?*/
 	if (value & 0x80)
-		memory_set_bankptr (machine, 8, c64_kernal);
+		memory_set_bankptr(machine, 8, c64_kernal);
 	else
-		memory_set_bankptr (machine, 6, c64_memory + 0xe000);
+		memory_set_bankptr(machine, 6, c64_memory + 0xe000);
 #endif
-	old=value;
+	old = value;
 }
 
-void c65_bankswitch (running_machine *machine)
+void c65_bankswitch( running_machine *machine )
 {
 	static int old = -1;
 	int data, loram, hiram, charen;
@@ -896,38 +898,25 @@ void c65_bankswitch (running_machine *machine)
 	hiram = (data & 2) ? 1 : 0;
 	charen = (data & 4) ? 1 : 0;
 
-	if ((!c64_game && c64_exrom)
-		|| (loram && hiram && !c64_exrom))
-	{
-		memory_set_bankptr (machine, 1, c64_roml);
-	}
+	if ((!c64_game && c64_exrom) || (loram && hiram && !c64_exrom))
+		memory_set_bankptr(machine, 1, c64_roml);
 	else
-	{
-		memory_set_bankptr (machine, 1, c64_memory + 0x8000);
-	}
+		memory_set_bankptr(machine, 1, c64_memory + 0x8000);
 
-	if ((!c64_game && c64_exrom && hiram)
-		|| (!c64_exrom))
-	{
-		memory_set_bankptr (machine, 2, c64_romh);
-	}
+	if ((!c64_game && c64_exrom && hiram) || (!c64_exrom))
+		memory_set_bankptr(machine, 2, c64_romh);
 	else if (loram && hiram)
-	{
-		memory_set_bankptr (machine, 2, c64_basic);
-	}
+		memory_set_bankptr(machine, 2, c64_basic);
 	else
-	{
-		memory_set_bankptr (machine, 2, c64_memory + 0xa000);
-	}
+		memory_set_bankptr(machine, 2, c64_memory + 0xa000);
 
-	if ((!c64_game && c64_exrom)
-		|| (charen && (loram || hiram)))
+	if ((!c64_game && c64_exrom) || (charen && (loram || hiram)))
 	{
 		c65_io_on = 1;
 		rh4 = c65_read_io;
 		wh5 = c65_write_io;
-		memory_set_bankptr (machine, 6, c64_colorram);
-		memory_set_bankptr (machine, 7, c64_colorram);
+		memory_set_bankptr(machine, 6, c64_colorram);
+		memory_set_bankptr(machine, 7, c64_colorram);
 
 		if (c65_io_dc00_on)
 		{
@@ -938,8 +927,8 @@ void c65_bankswitch (running_machine *machine)
 		{
 			rh8 = SMH_BANK(8);
 			wh9 = SMH_BANK(9);
-			memory_set_bankptr (machine, 8, c64_colorram+0x400);
-			memory_set_bankptr (machine, 9, c64_colorram+0x400);
+			memory_set_bankptr(machine, 8, c64_colorram + 0x400);
+			memory_set_bankptr(machine, 9, c64_colorram + 0x400);
 		}
 		memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0dc00, 0x0dfff, 0, 0, rh8);
 		memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0dc00, 0x0dfff, 0, 0, wh9);
@@ -949,20 +938,20 @@ void c65_bankswitch (running_machine *machine)
 		c65_io_on = 0;
 		rh4 = SMH_BANK(4);
 		wh5 = SMH_BANK(5);
-		memory_set_bankptr(machine, 5, c64_memory+0xd000);
-		memory_set_bankptr(machine, 7, c64_memory+0xd800);
-		memory_set_bankptr(machine, 9, c64_memory+0xdc00);
+		memory_set_bankptr(machine, 5, c64_memory + 0xd000);
+		memory_set_bankptr(machine, 7, c64_memory + 0xd800);
+		memory_set_bankptr(machine, 9, c64_memory + 0xdc00);
 		if (!charen && (loram || hiram))
 		{
-			memory_set_bankptr (machine, 4, c64_chargen);
-			memory_set_bankptr (machine, 6, c64_chargen+0x800);
-			memory_set_bankptr (machine, 8, c64_chargen+0xc00);
+			memory_set_bankptr(machine, 4, c64_chargen);
+			memory_set_bankptr(machine, 6, c64_chargen + 0x800);
+			memory_set_bankptr(machine, 8, c64_chargen + 0xc00);
 		}
 		else
 		{
-			memory_set_bankptr (machine, 4, c64_memory + 0xd000);
-			memory_set_bankptr (machine, 6, c64_memory + 0xd800);
-			memory_set_bankptr (machine, 8, c64_memory + 0xdc00);
+			memory_set_bankptr(machine, 4, c64_memory + 0xd000);
+			memory_set_bankptr(machine, 6, c64_memory + 0xd800);
+			memory_set_bankptr(machine, 8, c64_memory + 0xdc00);
 		}
 	}
 	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0d000, 0x0d7ff, 0, 0, rh4);
@@ -970,23 +959,23 @@ void c65_bankswitch (running_machine *machine)
 
 	if (!c64_game && c64_exrom)
 	{
-		memory_set_bankptr (machine, 10, c64_romh);
+		memory_set_bankptr(machine, 10, c64_romh);
 	}
 	else
 	{
 		if (hiram)
 		{
-			memory_set_bankptr (machine, 10, c64_kernal);
+			memory_set_bankptr(machine, 10, c64_kernal);
 		}
 		else
 		{
-			memory_set_bankptr (machine, 10, c64_memory + 0xe000);
+			memory_set_bankptr(machine, 10, c64_memory + 0xe000);
 		}
 	}
 	old = data;
 }
 
-void c65_colorram_write (int offset, int value)
+void c65_colorram_write( int offset, int value )
 {
 	c64_colorram[offset & 0x7ff] = value | 0xf0;
 }
@@ -996,7 +985,7 @@ void c65_colorram_write (int offset, int value)
  * a15 and a14 portlines
  * 0x1000-0x1fff, 0x9000-0x9fff char rom
  */
-static int c65_dma_read(running_machine *machine, int offset)
+static int c65_dma_read( running_machine *machine, int offset )
 {
 	if (!c64_game && c64_exrom)
 	{
@@ -1019,13 +1008,14 @@ static int c65_dma_read(running_machine *machine, int offset)
 	return c64_vicaddr[offset & 0x3fff];
 }
 
-static int c65_dma_read_color(running_machine *machine, int offset)
+static int c65_dma_read_color( running_machine *machine, int offset )
 {
-	if (c64mode) return c64_colorram[offset&0x3ff]&0xf;
+	if (c64mode)
+		return c64_colorram[offset & 0x3ff] & 0xf;
 	return c64_colorram[offset & 0x7ff];
 }
 
-static void c65_common_driver_init (running_machine *machine)
+static void c65_common_driver_init( running_machine *machine )
 {
 	c64_memory = auto_alloc_array_clear(machine, UINT8, 0x10000);
 	memory_set_bankptr(machine, 11, c64_memory + 0x00000);
@@ -1034,10 +1024,14 @@ static void c65_common_driver_init (running_machine *machine)
 	memory_set_bankptr(machine, 14, c64_memory + 0x0c000);
 	memory_set_bankptr(machine, 15, c64_memory + 0x0e000);
 
+	c65_charset_select = 0;
+	c65_6511_port = 0xff;
+	vicirq = 0;
+
 	/* C65 had no datasette port */
 	c64_tape_on = 0;
 
-	/*memset(c64_memory+0x40000, 0, 0x800000-0x40000); */
+	/*memset(c64_memory + 0x40000, 0, 0x800000 - 0x40000); */
 
 	vic4567_init(machine, c64_pal, c65_dma_read, c65_dma_read_color, c65_vic_interrupt, c65_bankswitch_interface);
 }
@@ -1047,7 +1041,6 @@ DRIVER_INIT( c65 )
 	c64_pal = 0;
 	dma.version = 2;
 	c65_common_driver_init(machine);
-
 }
 
 DRIVER_INIT( c65pal )

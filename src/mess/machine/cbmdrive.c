@@ -1,7 +1,16 @@
-#include <stdio.h>
-#include <stdlib.h>
+/***************************************************************
+
+    CBM Floppy Drive Simulation
+
+    This code incercepts commands from the CBM machine and
+    send/return the appropriate data to/from the disk image
+
+    This code will be eventually replaced by proper emulation
+    (see vc1541.c)
+
+***************************************************************/
+
 #include <ctype.h>
-#include <string.h>
 #include "driver.h"
 
 #include "includes/cbmserb.h"
@@ -22,7 +31,7 @@
 
 /***********************************************
 
-	D64 images handling
+    D64 images handling
 
 ***********************************************/
 
@@ -342,39 +351,39 @@ static int d64_command( running_machine *machine, CBM_Drive * drive, unsigned ch
 
    CBM Serial Bus Control Codes
 
-	20	Talk
-	3F	Untalk
-	40	Listen
-	5F	Unlisten
-	60	Open Channel
-	70	-
-	80	-
-	90	-
-	A0	-
-	B0	-
-	C0	-
-	D0	-
-	E0	Close
-	F0	Open
+    20  Talk
+    3F  Untalk
+    40  Listen
+    5F  Unlisten
+    60  Open Channel
+    70  -
+    80  -
+    90  -
+    A0  -
+    B0  -
+    C0  -
+    D0  -
+    E0  Close
+    F0  Open
 
 
 
-	 How the C1541 is called by the C64:
+     How the C1541 is called by the C64:
 
-		read (drive 8)
-		/28 /f0 filename /3f
-		/48 /60 read data /5f
-		/28 /e0 /3f
+        read (drive 8)
+        /28 /f0 filename /3f
+        /48 /60 read data /5f
+        /28 /e0 /3f
 
-		write (drive 8)
-		/28 /f0 filename /3f
-		/28 /60 send data /3f
-		/28 /e0 /3f
+        write (drive 8)
+        /28 /f0 filename /3f
+        /28 /60 send data /3f
+        /28 /e0 /3f
 
-	 I used '/' to denote bytes sent under Attention (ATN low).
+     I used '/' to denote bytes sent under Attention (ATN low).
 
-	28 == LISTEN command + device number 8
-	f0 == secondary addres for OPEN file on channel 0
+    28 == LISTEN command + device number 8
+    f0 == secondary addres for OPEN file on channel 0
 
   Note that there's no acknowledge bit, but timeout/EOI handshake for each
   byte. Check the C64 Kernel for exact description...
@@ -504,7 +513,7 @@ static void cbm_command( running_machine *machine, CBM_Drive * drive )
 
 /***********************************************
 
-	Drive state update
+    Drive state update
 
 ***********************************************/
 
@@ -696,7 +705,7 @@ void c1551_state( running_machine *machine, CBM_Drive * drive )
 		if (VERBOSE_LEVEL >= 1) logerror("state %d->%d %d\n", oldstate, drive->i.iec.state, drive->state);
 }
 
-static int vc1541_time_greater(running_machine *machine, CBM_Drive * drive, attotime threshold)
+static int vc1541_time_greater( running_machine *machine, CBM_Drive * drive, attotime threshold )
 {
 	return attotime_compare(
 		attotime_sub(timer_get_time(machine), drive->i.serial.time),
@@ -899,7 +908,7 @@ void vc1541_state( running_machine *machine, CBM_Drive * drive )
 		}
 		break;
 		/* if computer lowers clk not in 200micros (last byte following)
-		 * negativ pulse on data by listener */
+         * negativ pulse on data by listener */
 	case 118:
 		if (!cbm_serial.clock[0])
 		{
@@ -1318,7 +1327,7 @@ void vc1541_state( running_machine *machine, CBM_Drive * drive )
 /* difference between vic20 and pet (first series)
    pet lowers atn and wants a reaction on ndac */
 
-void c2031_state(running_machine *machine, CBM_Drive *drive)
+void c2031_state( running_machine *machine, CBM_Drive *drive )
 {
 	const device_config *ieeebus = devtag_get_device(machine, "ieee_bus");
 	int oldstate = drive->i.ieee.state;
@@ -1327,11 +1336,11 @@ void c2031_state(running_machine *machine, CBM_Drive *drive)
 	switch (drive->i.ieee.state)
 	{
 	case 0:
-		if (!cbm_ieee_dav_r(ieeebus, 0)) 
+		if (!cbm_ieee_dav_r(ieeebus, 0))
 		{
 			drive->i.ieee.state = 10;
-		} 
-		else if (!cbm_ieee_atn_r(ieeebus, 0)) 
+		}
+		else if (!cbm_ieee_atn_r(ieeebus, 0))
 		{
 			drive->i.ieee.state = 11;
 			cbm_ieee_ndac_w(ieeebus, 1, 0);
@@ -1341,7 +1350,7 @@ void c2031_state(running_machine *machine, CBM_Drive *drive)
 	case 1:
 		break;
 	case 10:
-		if (cbm_ieee_dav_r(ieeebus, 0)) 
+		if (cbm_ieee_dav_r(ieeebus, 0))
 		{
 			drive->i.ieee.state++;
 			cbm_ieee_nrfd_w(ieeebus, 1, 1);
@@ -1349,13 +1358,13 @@ void c2031_state(running_machine *machine, CBM_Drive *drive)
 		}
 		break;
 	case 11:
-		if (!cbm_ieee_dav_r(ieeebus, 0)) 
+		if (!cbm_ieee_dav_r(ieeebus, 0))
 		{
 			cbm_ieee_nrfd_w(ieeebus, 1, 0);
 			data = cbm_ieee_data_r(ieeebus, 0) ^ 0xff;
 			cbm_ieee_ndac_w(ieeebus, 1, 1);
 			logerror("byte received %.2x\n",data);
-			if (!cbm_ieee_atn_r(ieeebus, 0) && ((data & 0x0f) == drive->i.ieee.device)) 
+			if (!cbm_ieee_atn_r(ieeebus, 0) && ((data & 0x0f) == drive->i.ieee.device))
 			{
 				if ((data & 0xf0) == 0x40)
 					drive->i.ieee.state = 30;
@@ -1363,12 +1372,12 @@ void c2031_state(running_machine *machine, CBM_Drive *drive)
 					drive->i.ieee.state = 20;
 				if (drive->cmdpos < sizeof (drive->cmdbuffer))
 					drive->cmdbuffer[drive->cmdpos++] = data;
-			} 
-			else if ((data&0xf) == 0xf) 
+			}
+			else if ((data&0xf) == 0xf)
 			{
 				drive->i.ieee.state--;
-			} 
-			else 
+			}
+			else
 			{
 				drive->i.ieee.state++;
 			}
@@ -1376,23 +1385,23 @@ void c2031_state(running_machine *machine, CBM_Drive *drive)
 		break;
 		/* wait until atn is released */
 	case 12:
-		if (cbm_ieee_atn_r(ieeebus, 0)) 
+		if (cbm_ieee_atn_r(ieeebus, 0))
 		{
 			drive->i.ieee.state++;
 			cbm_ieee_nrfd_w(ieeebus, 1, 0);
 		}
 		break;
 	case 13:
-		if (!cbm_ieee_atn_r(ieeebus, 0)) 
+		if (!cbm_ieee_atn_r(ieeebus, 0))
 		{
 			drive->i.ieee.state = 10;
-/*			cbm_ieee_nrfd_w(ieeebus, 1, 0); */
+/*          cbm_ieee_nrfd_w(ieeebus, 1, 0); */
 		}
 		break;
 
 		/* receiving rest of command */
 	case 20:
-		if (cbm_ieee_dav_r(ieeebus, 0)) 
+		if (cbm_ieee_dav_r(ieeebus, 0))
 		{
 			drive->i.ieee.state++;
 			cbm_ieee_nrfd_w(ieeebus, 1, 1);
@@ -1400,18 +1409,18 @@ void c2031_state(running_machine *machine, CBM_Drive *drive)
 		}
 		break;
 	case 21:
-		if (!cbm_ieee_dav_r(ieeebus, 0)) 
+		if (!cbm_ieee_dav_r(ieeebus, 0))
 		{
 			cbm_ieee_nrfd_w(ieeebus, 1, 0);
 			data = cbm_ieee_data_r(ieeebus, 0) ^ 0xff;
 			logerror("byte received %.2x\n",data);
 			if (drive->cmdpos < sizeof (drive->cmdbuffer))
 				drive->cmdbuffer[drive->cmdpos++] = data;
-			if (!cbm_ieee_atn_r(ieeebus, 0) && ((data & 0xf) == 0xf)) 
+			if (!cbm_ieee_atn_r(ieeebus, 0) && ((data & 0xf) == 0xf))
 			{
 				cbm_command(machine, drive);
 				drive->i.ieee.state = 10;
-			} 
+			}
 			else
 				drive->i.ieee.state = 20;
 
@@ -1421,7 +1430,7 @@ void c2031_state(running_machine *machine, CBM_Drive *drive)
 
 		/* read command */
 	case 30:
-		if (cbm_ieee_dav_r(ieeebus, 0)) 
+		if (cbm_ieee_dav_r(ieeebus, 0))
 		{
 			drive->i.ieee.state++;
 			cbm_ieee_nrfd_w(ieeebus, 1, 1);
@@ -1429,7 +1438,7 @@ void c2031_state(running_machine *machine, CBM_Drive *drive)
 		}
 		break;
 	case 31:
-		if (!cbm_ieee_dav_r(ieeebus, 0)) 
+		if (!cbm_ieee_dav_r(ieeebus, 0))
 		{
 			cbm_ieee_nrfd_w(ieeebus, 1, 0);
 			data = cbm_ieee_data_r(ieeebus, 0) ^ 0xff;
@@ -1445,14 +1454,14 @@ void c2031_state(running_machine *machine, CBM_Drive *drive)
 		}
 		break;
 	case 32:
-		if (cbm_ieee_dav_r(ieeebus, 0)) 
+		if (cbm_ieee_dav_r(ieeebus, 0))
 		{
 			cbm_ieee_nrfd_w(ieeebus, 1, 1);
 			drive->i.ieee.state = 40;
 		}
 		break;
 	case 40:
-		if (!cbm_ieee_ndac_r(ieeebus, 0)) 
+		if (!cbm_ieee_ndac_r(ieeebus, 0))
 		{
 			cbm_ieee_data_w(ieeebus, 1, drive->buffer[drive->pos++] ^ 0xff);
 			if (drive->pos >= drive->size)
@@ -1462,18 +1471,18 @@ void c2031_state(running_machine *machine, CBM_Drive *drive)
 		}
 		break;
 	case 41:
-		if (!cbm_ieee_nrfd_r(ieeebus, 0)) 
+		if (!cbm_ieee_nrfd_r(ieeebus, 0))
 		{
 			drive->i.ieee.state++;
 		}
 		break;
 	case 42:
-		if (cbm_ieee_ndac_r(ieeebus, 0)) 
+		if (cbm_ieee_ndac_r(ieeebus, 0))
 		{
 			if (cbm_ieee_eoi_r(ieeebus, 0))
 				drive->i.ieee.state = 40;
 
-			else 
+			else
 			{
 				cbm_ieee_data_w(ieeebus, 1, 0xff);
 				cbm_ieee_ndac_w(ieeebus, 1, 0);
@@ -1497,36 +1506,36 @@ void c2031_state(running_machine *machine, CBM_Drive *drive)
 
 /**************************************
 
-	C1551 handlers
+    C1551 handlers
 
 **************************************/
 
 
-static void c1551_write_data (running_machine *machine, CBM_Drive * drive, int data)
+static void c1551_write_data( running_machine *machine, CBM_Drive * drive, int data )
 {
 	drive->i.iec.datain = data;
 	c1551_state (machine, drive);
 }
 
-static int c1551_read_data (running_machine *machine, CBM_Drive * drive)
+static int c1551_read_data( running_machine *machine, CBM_Drive * drive )
 {
 	c1551_state (machine, drive);
 	return drive->i.iec.dataout;
 }
 
-static void c1551_write_handshake (running_machine *machine, CBM_Drive * drive, int data)
+static void c1551_write_handshake( running_machine *machine, CBM_Drive * drive, int data )
 {
 	drive->i.iec.handshakein = data&0x40?1:0;
 	c1551_state (machine, drive);
 }
 
-static int c1551_read_handshake (running_machine *machine, CBM_Drive * drive)
+static int c1551_read_handshake( running_machine *machine, CBM_Drive * drive )
 {
 	c1551_state (machine, drive);
 	return drive->i.iec.handshakeout?0x80:0;
 }
 
-static int c1551_read_status (running_machine *machine, CBM_Drive * drive)
+static int c1551_read_status( running_machine *machine, CBM_Drive * drive )
 {
 	c1551_state (machine, drive);
 	return drive->i.iec.status;
@@ -1586,7 +1595,7 @@ READ8_DEVICE_HANDLER( c1551_1_read_status )
 
 /**************************************
 
-	VC1541 Serial Bus Device Interface
+    VC1541 Serial Bus Device Interface
 
 **************************************/
 
@@ -1751,7 +1760,7 @@ MACHINE_DRIVER_END
 
 /***********************************************
 
-	Drive handling
+    Drive handling
 
 ***********************************************/
 
@@ -1760,14 +1769,14 @@ CBM_Drive cbm_drive[2];
 CBM_Serial cbm_serial;
 
 /* must be called before other functions */
-static void cbm_drive_open (void)
+static void cbm_drive_open( void )
 {
 	int i;
 
 	memset(cbm_drive, 0, sizeof(cbm_drive));
 	memset(&cbm_serial, 0, sizeof(cbm_serial));
 
-	cbm_drive_open_helper ();
+	cbm_drive_open_helper();
 
 	cbm_serial.count = 0;
 	for (i = 0; i < sizeof(cbm_serial.atn) / sizeof(int); i++)
@@ -1779,7 +1788,7 @@ static void cbm_drive_open (void)
 	}
 }
 
-static void cbm_drive_close (void)
+static void cbm_drive_close( void )
 {
 	int i;
 
@@ -1787,8 +1796,8 @@ static void cbm_drive_close (void)
 	for (i = 0; i < sizeof(cbm_drive) / sizeof(CBM_Drive); i++)
 	{
 		cbm_drive[i].interface = 0;
-		
-		if( cbm_drive[i].buffer ) 
+
+		if( cbm_drive[i].buffer )
 		{
 			free(cbm_drive[i].buffer);
 			cbm_drive[i].buffer = NULL;
@@ -1853,7 +1862,7 @@ void cbm_drive_1_config( int interface, int serialnr )
 
 /**************************************
 
-	Floppy device configurations
+    Floppy device configurations
 
 **************************************/
 

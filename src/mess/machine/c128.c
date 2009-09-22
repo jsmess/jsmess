@@ -1,10 +1,10 @@
 /***************************************************************************
 
-	commodore c128 home computer
+    commodore c128 home computer
 
-	peter.trauner@jk.uni-linz.ac.at
+    peter.trauner@jk.uni-linz.ac.at
     documentation:
- 	 iDOC (http://www.softwolves.pp.se/idoc)
+     iDOC (http://www.softwolves.pp.se/idoc)
            Christian Janoff  mepk@c64.org
 
 ***************************************************************************/
@@ -66,7 +66,7 @@ UINT8 *c128_internal_function;
 UINT8 *c128_external_function;
 UINT8 *c128_vdcram;
 
-static int c64mode = 0, c128_write_io;
+static int c64mode, c128_write_io;
 
 static int c128_ram_bottom, c128_ram_top;
 static UINT8 *c128_ram;
@@ -76,12 +76,12 @@ static UINT8 c64_port_data;
 static UINT8 c128_keyline[3] = {0xff, 0xff, 0xff};
 
 static int c128_va1617;
-static int c128_cia1_on = 1;
+static int c128_cia1_on;
 static UINT8 serial_clock, serial_data, serial_atn;
-static UINT8 vicirq = 0;
-static int emulated_drive = 0;
+static UINT8 vicirq;
+static int emulated_drive;
 
-static void c128_nmi(running_machine *machine)
+static void c128_nmi( running_machine *machine )
 {
 	static int nmilevel = 0;
 	const device_config *cia_1 = devtag_get_device(machine, "cia_1");
@@ -105,18 +105,18 @@ static void c128_nmi(running_machine *machine)
 
 /***********************************************
 
-	CIA Interfaces
+    CIA Interfaces
 
 ***********************************************/
 
 /*
- *	CIA 0 - Port A keyboard line select
- *	CIA 0 - Port B keyboard line read
+ *  CIA 0 - Port A keyboard line select
+ *  CIA 0 - Port B keyboard line read
  *
- *	flag cassette read input, serial request in
- *	irq to irq connected
+ *  flag cassette read input, serial request in
+ *  irq to irq connected
  *
- *	see machine/cbm.c
+ *  see machine/cbm.c
  */
 
 static READ8_DEVICE_HANDLER( c128_cia0_port_a_r )
@@ -128,7 +128,7 @@ static READ8_DEVICE_HANDLER( c128_cia0_port_a_r )
 
 static READ8_DEVICE_HANDLER( c128_cia0_port_b_r )
 {
-    UINT8 value = 0xff;
+	UINT8 value = 0xff;
 	UINT8 cia0porta = cia_get_output_a(devtag_get_device(device->machine, "cia_0"));
 
 	value &= common_cia0_port_b_r(device, cia0porta);
@@ -148,7 +148,7 @@ static WRITE8_DEVICE_HANDLER( c128_cia0_port_b_w )
     vic2_lightpen_write(data & 0x10);
 }
 
-static void c128_irq (running_machine *machine, int level)
+static void c128_irq( running_machine *machine, int level )
 {
 	static int old_level = 0;
 
@@ -169,12 +169,12 @@ static void c128_irq (running_machine *machine, int level)
 	}
 }
 
-static void c128_cia0_interrupt (const device_config *device, int level)
+static void c128_cia0_interrupt( const device_config *device, int level )
 {
 	c128_irq (device->machine, level || vicirq);
 }
 
-static void c128_vic_interrupt (running_machine *machine, int level)
+static void c128_vic_interrupt( running_machine *machine, int level )
 {
 	const device_config *cia_0 = devtag_get_device(machine, "cia_0");
 #if 1
@@ -260,7 +260,7 @@ static WRITE8_DEVICE_HANDLER( c128_cia1_port_a_w )
 	c128_vicaddr = c64_memory + helper[data & 0x03] + c128_va1617;
 }
 
-static void c128_cia1_interrupt (const device_config *device, int level)
+static void c128_cia1_interrupt( const device_config *device, int level )
 {
 	c128_nmi(device->machine);
 }
@@ -291,23 +291,23 @@ const cia6526_interface c128_pal_cia1 =
 
 /***********************************************
 
-	Memory Handlers
+    Memory Handlers
 
 ***********************************************/
 
-static void c128_set_m8502_read_handler(running_machine *machine, UINT16 start, UINT16 end, read8_space_func rh)
+static void c128_set_m8502_read_handler( running_machine *machine, UINT16 start, UINT16 end, read8_space_func rh )
 {
 	const device_config *cpu;
 	cpu = cputag_get_cpu(machine, "m8502");
 	memory_install_read8_handler(cpu_get_address_space(cpu, ADDRESS_SPACE_PROGRAM), start, end, 0, 0, rh);
 }
 
-static WRITE8_HANDLER(c128_dma8726_port_w)
+static WRITE8_HANDLER( c128_dma8726_port_w )
 {
 	DBG_LOG(space->machine, 1, "dma write", ("%.3x %.2x\n",offset,data));
 }
 
-static READ8_HANDLER(c128_dma8726_port_r)
+static READ8_HANDLER( c128_dma8726_port_r )
 {
 	DBG_LOG(space->machine, 1, "dma read", ("%.3x\n",offset));
 	return 0xff;
@@ -404,7 +404,7 @@ static READ8_HANDLER( c128_read_io )
 	return 0xff;
 }
 
-void c128_bankswitch_64(running_machine *machine, int reset)
+void c128_bankswitch_64( running_machine *machine, int reset )
 {
 	static int old, exrom, game;
 	int data, loram, hiram, charen;
@@ -422,32 +422,19 @@ void c128_bankswitch_64(running_machine *machine, int reset)
 	hiram = (data & 2) ? 1 : 0;
 	charen = (data & 4) ? 1 : 0;
 
-	if ((!c64_game && c64_exrom)
-		|| (loram && hiram && !c64_exrom))
-	{
-		memory_set_bankptr (machine, 8, c64_roml);
-	}
+	if ((!c64_game && c64_exrom) || (loram && hiram && !c64_exrom))
+		memory_set_bankptr(machine, 8, c64_roml);
 	else
-	{
-		memory_set_bankptr (machine, 8, c64_memory + 0x8000);
-	}
+		memory_set_bankptr(machine, 8, c64_memory + 0x8000);
 
-	if ((!c64_game && c64_exrom && hiram)
-		|| (!c64_exrom))
-	{
-		memory_set_bankptr (machine, 9, c64_romh);
-	}
+	if ((!c64_game && c64_exrom && hiram) || (!c64_exrom))
+		memory_set_bankptr(machine, 9, c64_romh);
 	else if (loram && hiram)
-	{
-		memory_set_bankptr (machine, 9, c64_basic);
-	}
+		memory_set_bankptr(machine, 9, c64_basic);
 	else
-	{
-		memory_set_bankptr (machine, 9, c64_memory + 0xa000);
-	}
+		memory_set_bankptr(machine, 9, c64_memory + 0xa000);
 
-	if ((!c64_game && c64_exrom)
-		|| (charen && (loram || hiram)))
+	if ((!c64_game && c64_exrom) || (charen && (loram || hiram)))
 	{
 		rh = c128_read_io;
 		c128_write_io = 1;
@@ -457,42 +444,43 @@ void c128_bankswitch_64(running_machine *machine, int reset)
 		rh = SMH_BANK(5);
 		c128_write_io = 0;
 		if ((!charen && (loram || hiram)))
-			memory_set_bankptr (machine, 13, c64_chargen);
+			memory_set_bankptr(machine, 13, c64_chargen);
 		else
-			memory_set_bankptr (machine, 13, c64_memory + 0xd000);
+			memory_set_bankptr(machine, 13, c64_memory + 0xd000);
 	}
+
 	c128_set_m8502_read_handler(machine, 0xd000, 0xdfff, rh);
 
 	if (!c64_game && c64_exrom)
 	{
-		memory_set_bankptr (machine, 14, c64_romh);
-		memory_set_bankptr (machine, 15, c64_romh+0x1f00);
-		memory_set_bankptr (machine, 16, c64_romh+0x1f05);
+		memory_set_bankptr(machine, 14, c64_romh);
+		memory_set_bankptr(machine, 15, c64_romh+0x1f00);
+		memory_set_bankptr(machine, 16, c64_romh+0x1f05);
 	}
 	else
 	{
 		if (hiram)
 		{
-			memory_set_bankptr (machine, 14, c64_kernal);
-			memory_set_bankptr (machine, 15, c64_kernal+0x1f00);
-			memory_set_bankptr (machine, 16, c64_kernal+0x1f05);
+			memory_set_bankptr(machine, 14, c64_kernal);
+			memory_set_bankptr(machine, 15, c64_kernal+0x1f00);
+			memory_set_bankptr(machine, 16, c64_kernal+0x1f05);
 		}
 		else
 		{
-			memory_set_bankptr (machine, 14, c64_memory + 0xe000);
-			memory_set_bankptr (machine, 15, c64_memory + 0xff00);
-			memory_set_bankptr (machine, 16, c64_memory + 0xff05);
+			memory_set_bankptr(machine, 14, c64_memory + 0xe000);
+			memory_set_bankptr(machine, 15, c64_memory + 0xff00);
+			memory_set_bankptr(machine, 16, c64_memory + 0xff05);
 		}
 	}
 	old = data;
-	exrom= c64_exrom;
-	game=c64_game;
+	exrom = c64_exrom;
+	game =c64_game;
 }
 
 static UINT8 c128_mmu[0x0b];
 static const int c128_mmu_helper[4] =
 {0x400, 0x1000, 0x2000, 0x4000};
-static int mmu_cpu=0;
+static int mmu_cpu;
 static int mmu_page0, mmu_page1;
 
 #define MMU_PAGE1 ((((c128_mmu[10]&0xf)<<8)|c128_mmu[9])<<8)
@@ -526,13 +514,13 @@ static int mmu_page0, mmu_page1;
 
 /* typical z80 configuration
    0x3f 0x3f 0x7f 0x3e 0x7e 0xb0 0x0b 0x00 0x00 0x01 0x00 */
-static void c128_bankswitch_z80(running_machine *machine)
+static void c128_bankswitch_z80( running_machine *machine )
 {
 	 c128_ram = c64_memory + MMU_RAM_ADDR;
 	 c128_va1617 = MMU_VIC_ADDR;
 #if 1
-	 memory_set_bankptr (machine, 10, c128_z80);
-	 memory_set_bankptr (machine, 11, c128_ram + 0x1000);
+	 memory_set_bankptr(machine, 10, c128_z80);
+	 memory_set_bankptr(machine, 11, c128_ram + 0x1000);
 	 if ( (( (input_port_read(machine, "SPECIAL") & 0x06) == 0x02 ) && (MMU_RAM_ADDR >= 0x40000))
 		  || (( (input_port_read(machine, "SPECIAL") & 0x06) == 0x00) && (MMU_RAM_ADDR >= 0x20000)) )
 		 c128_ram = NULL;
@@ -543,62 +531,46 @@ static void c128_bankswitch_z80(running_machine *machine)
 		 c128_ram_bottom = 0;
 
 	 if (MMU_RAM_ADDR==0) { /* this is used in z80 mode for rom on/off switching !*/
-		 memory_set_bankptr (machine, 10, c128_z80);
-		 memory_set_bankptr (machine, 11, c128_z80 + 0x400);
-	 } 
-	 else 
-	 {
-		 memory_set_bankptr (machine, 10, (c128_ram_bottom > 0 ? c64_memory : c128_ram));
-		 memory_set_bankptr (machine, 11, (c128_ram_bottom > 0x400 ? c64_memory : c128_ram) + 0x400);
+		 memory_set_bankptr(machine, 10, c128_z80);
+		 memory_set_bankptr(machine, 11, c128_z80 + 0x400);
 	 }
-	 
-	 memory_set_bankptr (machine, 1, (c128_ram_bottom > 0 ? c64_memory : c128_ram));
-	 memory_set_bankptr (machine, 2, (c128_ram_bottom > 0x400 ? c64_memory : c128_ram) + 0x400);
+	 else
+	 {
+		 memory_set_bankptr(machine, 10, (c128_ram_bottom > 0 ? c64_memory : c128_ram));
+		 memory_set_bankptr(machine, 11, (c128_ram_bottom > 0x400 ? c64_memory : c128_ram) + 0x400);
+	 }
 
-	 memory_set_bankptr (machine, 3, (c128_ram_bottom > 0x1000 ? c64_memory : c128_ram) + 0x1000);
-	 memory_set_bankptr (machine, 4, (c128_ram_bottom > 0x2000 ? c64_memory : c128_ram) + 0x2000);
-	 memory_set_bankptr (machine, 5, c128_ram + 0x4000);
+	 memory_set_bankptr(machine, 1, (c128_ram_bottom > 0 ? c64_memory : c128_ram));
+	 memory_set_bankptr(machine, 2, (c128_ram_bottom > 0x400 ? c64_memory : c128_ram) + 0x400);
+
+	 memory_set_bankptr(machine, 3, (c128_ram_bottom > 0x1000 ? c64_memory : c128_ram) + 0x1000);
+	 memory_set_bankptr(machine, 4, (c128_ram_bottom > 0x2000 ? c64_memory : c128_ram) + 0x2000);
+	 memory_set_bankptr(machine, 5, c128_ram + 0x4000);
 
 	 if (MMU_TOP)
 		 c128_ram_top = 0x10000 - MMU_SIZE;
 	 else
 		 c128_ram_top = 0x10000;
 
-	 if (c128_ram_top > 0xc000) 
-	 { 
-		memory_set_bankptr (machine, 6, c128_ram + 0xc000); 
-	 }
-	 else 
-	 { 
-		memory_set_bankptr (machine, 6, c64_memory + 0xc000); 
-	 }
+	 if (c128_ram_top > 0xc000)
+		memory_set_bankptr(machine, 6, c128_ram + 0xc000);
+	 else
+		memory_set_bankptr(machine, 6, c64_memory + 0xc000);
 
-	 if (c128_ram_top > 0xe000) 
-	 { 
-		memory_set_bankptr (machine, 7, c128_ram + 0xe000); 
-	 }
-	 else 
-	 { 
-		memory_set_bankptr (machine, 7, c64_memory + 0xd000); 
-	 }
+	 if (c128_ram_top > 0xe000)
+		memory_set_bankptr(machine, 7, c128_ram + 0xe000);
+	 else
+		memory_set_bankptr(machine, 7, c64_memory + 0xd000);
 
-	 if (c128_ram_top > 0xf000) 
-	 { 
-		memory_set_bankptr (machine, 8, c128_ram + 0xf000); 
-	 }
-	 else 
-	 { 
-		memory_set_bankptr (machine, 8, c64_memory + 0xe000); 
-	 }
+	 if (c128_ram_top > 0xf000)
+		memory_set_bankptr(machine, 8, c128_ram + 0xf000);
+	 else
+		memory_set_bankptr(machine, 8, c64_memory + 0xe000);
 
-	 if (c128_ram_top > 0xff05) 
-	 { 
-		memory_set_bankptr (machine, 9, c128_ram + 0xff05); 
-	 }
-	 else 
-	 { 
-		memory_set_bankptr (machine, 9, c64_memory + 0xff05); 
-	 }
+	 if (c128_ram_top > 0xff05)
+		memory_set_bankptr(machine, 9, c128_ram + 0xff05);
+	 else
+		memory_set_bankptr(machine, 9, c64_memory + 0xff05);
 
 	 if ( (( (input_port_read(machine, "SPECIAL") & 0x06) == 0x02 ) && (MMU_RAM_ADDR >= 0x40000))
 		  || (( (input_port_read(machine, "SPECIAL") & 0x06) == 0x00) && (MMU_RAM_ADDR >= 0x20000)) )
@@ -606,7 +578,7 @@ static void c128_bankswitch_z80(running_machine *machine)
 #endif
 }
 
-static void c128_bankswitch_128 (running_machine *machine, int reset)
+static void c128_bankswitch_128( running_machine *machine, int reset )
 {
 	read8_space_func rh;
 
@@ -619,65 +591,65 @@ static void c128_bankswitch_128 (running_machine *machine, int reset)
 		c128_ram_bottom = 0;
 		c128_ram_top = 0x10000;
 
-		memory_set_bankptr (machine, 1, c64_memory);
-		memory_set_bankptr (machine, 2, c64_memory + 0x100);
+		memory_set_bankptr(machine, 1, c64_memory);
+		memory_set_bankptr(machine, 2, c64_memory + 0x100);
 
-		memory_set_bankptr (machine, 3, c64_memory + 0x200);
-		memory_set_bankptr (machine, 4, c64_memory + 0x400);
-		memory_set_bankptr (machine, 5, c64_memory + 0x1000);
-		memory_set_bankptr (machine, 6, c64_memory + 0x2000);
+		memory_set_bankptr(machine, 3, c64_memory + 0x200);
+		memory_set_bankptr(machine, 4, c64_memory + 0x400);
+		memory_set_bankptr(machine, 5, c64_memory + 0x1000);
+		memory_set_bankptr(machine, 6, c64_memory + 0x2000);
 
-		memory_set_bankptr (machine, 7, c64_memory + 0x4000);
+		memory_set_bankptr(machine, 7, c64_memory + 0x4000);
 
-		memory_set_bankptr (machine, 12, c64_memory + 0xc000);
+		memory_set_bankptr(machine, 12, c64_memory + 0xc000);
 
-		c128_bankswitch_64 (machine, reset);
+		c128_bankswitch_64(machine, reset);
 	}
 	else
 	{
 		c128_ram = c64_memory + MMU_RAM_ADDR;
 		c128_va1617 = MMU_VIC_ADDR;
-		memory_set_bankptr (machine, 1, c64_memory + mmu_page0);
-		memory_set_bankptr (machine, 2, c64_memory + mmu_page1);
+		memory_set_bankptr(machine, 1, c64_memory + mmu_page0);
+		memory_set_bankptr(machine, 2, c64_memory + mmu_page1);
 		if (MMU_BOTTOM)
 			{
 				c128_ram_bottom = MMU_SIZE;
 			}
 		else
 			c128_ram_bottom = 0;
-		memory_set_bankptr (machine, 3, (c128_ram_bottom > 0x200 ? c64_memory : c128_ram) + 0x200);
-		memory_set_bankptr (machine, 4, (c128_ram_bottom > 0x400 ? c64_memory : c128_ram) + 0x400);
-		memory_set_bankptr (machine, 5, (c128_ram_bottom > 0x1000 ? c64_memory : c128_ram) + 0x1000);
-		memory_set_bankptr (machine, 6, (c128_ram_bottom > 0x2000 ? c64_memory : c128_ram) + 0x2000);
+		memory_set_bankptr(machine, 3, (c128_ram_bottom > 0x200 ? c64_memory : c128_ram) + 0x200);
+		memory_set_bankptr(machine, 4, (c128_ram_bottom > 0x400 ? c64_memory : c128_ram) + 0x400);
+		memory_set_bankptr(machine, 5, (c128_ram_bottom > 0x1000 ? c64_memory : c128_ram) + 0x1000);
+		memory_set_bankptr(machine, 6, (c128_ram_bottom > 0x2000 ? c64_memory : c128_ram) + 0x2000);
 
 		if (MMU_RAM_LO)
 		{
-			memory_set_bankptr (machine, 7, c128_ram + 0x4000);
+			memory_set_bankptr(machine, 7, c128_ram + 0x4000);
 		}
 		else
 		{
-			memory_set_bankptr (machine, 7, c128_basic);
+			memory_set_bankptr(machine, 7, c128_basic);
 		}
 
 		if (MMU_RAM_MID)
 		{
-			memory_set_bankptr (machine, 8, c128_ram + 0x8000);
-			memory_set_bankptr (machine, 9, c128_ram + 0xa000);
+			memory_set_bankptr(machine, 8, c128_ram + 0x8000);
+			memory_set_bankptr(machine, 9, c128_ram + 0xa000);
 		}
 		else if (MMU_ROM_MID)
 		{
-			memory_set_bankptr (machine, 8, c128_basic + 0x4000);
-			memory_set_bankptr (machine, 9, c128_basic + 0x6000);
+			memory_set_bankptr(machine, 8, c128_basic + 0x4000);
+			memory_set_bankptr(machine, 9, c128_basic + 0x6000);
 		}
 		else if (MMU_INTERNAL_ROM_MID)
 		{
-			memory_set_bankptr (machine, 8, c128_internal_function);
-			memory_set_bankptr (machine, 9, c128_internal_function + 0x2000);
+			memory_set_bankptr(machine, 8, c128_internal_function);
+			memory_set_bankptr(machine, 9, c128_internal_function + 0x2000);
 		}
 		else
 		{
-			memory_set_bankptr (machine, 8, c128_external_function);
-			memory_set_bankptr (machine, 9, c128_external_function + 0x2000);
+			memory_set_bankptr(machine, 8, c128_external_function);
+			memory_set_bankptr(machine, 9, c128_external_function + 0x2000);
 		}
 
 		if (MMU_TOP)
@@ -705,66 +677,66 @@ static void c128_bankswitch_128 (running_machine *machine, int reset)
 		{
 			if (c128_ram_top > 0xc000)
 			{
-				memory_set_bankptr (machine, 12, c128_ram + 0xc000);
+				memory_set_bankptr(machine, 12, c128_ram + 0xc000);
 			}
 			else
 			{
-				memory_set_bankptr (machine, 12, c64_memory + 0xc000);
+				memory_set_bankptr(machine, 12, c64_memory + 0xc000);
 			}
 			if (!MMU_IO_ON)
 			{
 				if (c128_ram_top > 0xd000)
 				{
-					memory_set_bankptr (machine, 13, c128_ram + 0xd000);
+					memory_set_bankptr(machine, 13, c128_ram + 0xd000);
 				}
 				else
 				{
-					memory_set_bankptr (machine, 13, c64_memory + 0xd000);
+					memory_set_bankptr(machine, 13, c64_memory + 0xd000);
 				}
 			}
 			if (c128_ram_top > 0xe000)
 			{
-				memory_set_bankptr (machine, 14, c128_ram + 0xe000);
+				memory_set_bankptr(machine, 14, c128_ram + 0xe000);
 			}
 			else
 			{
-				memory_set_bankptr (machine, 14, c64_memory + 0xe000);
+				memory_set_bankptr(machine, 14, c64_memory + 0xe000);
 			}
 			if (c128_ram_top > 0xff05)
 			{
-				memory_set_bankptr (machine, 16, c128_ram + 0xff05);
+				memory_set_bankptr(machine, 16, c128_ram + 0xff05);
 			}
 			else
 			{
-				memory_set_bankptr (machine, 16, c64_memory + 0xff05);
+				memory_set_bankptr(machine, 16, c64_memory + 0xff05);
 			}
 		}
 		else if (MMU_ROM_HI)
 		{
-			memory_set_bankptr (machine, 12, c128_editor);
+			memory_set_bankptr(machine, 12, c128_editor);
 			if (!MMU_IO_ON) {
-				memory_set_bankptr (machine, 13, c128_chargen);
+				memory_set_bankptr(machine, 13, c128_chargen);
 			}
-			memory_set_bankptr (machine, 14, c128_kernal);
-			memory_set_bankptr (machine, 16, c128_kernal + 0x1f05);
+			memory_set_bankptr(machine, 14, c128_kernal);
+			memory_set_bankptr(machine, 16, c128_kernal + 0x1f05);
 		}
 		else if (MMU_INTERNAL_ROM_HI)
 		{
-			memory_set_bankptr (machine, 12, c128_internal_function);
+			memory_set_bankptr(machine, 12, c128_internal_function);
 			if (!MMU_IO_ON) {
-				memory_set_bankptr (machine, 13, c128_internal_function + 0x1000);
+				memory_set_bankptr(machine, 13, c128_internal_function + 0x1000);
 			}
-			memory_set_bankptr (machine, 14, c128_internal_function + 0x2000);
-			memory_set_bankptr (machine, 16, c128_internal_function + 0x3f05);
+			memory_set_bankptr(machine, 14, c128_internal_function + 0x2000);
+			memory_set_bankptr(machine, 16, c128_internal_function + 0x3f05);
 		}
 		else					   /*if (MMU_EXTERNAL_ROM_HI) */
 		{
-			memory_set_bankptr (machine, 12, c128_external_function);
+			memory_set_bankptr(machine, 12, c128_external_function);
 			if (!MMU_IO_ON) {
-				memory_set_bankptr (machine, 13, c128_external_function + 0x1000);
+				memory_set_bankptr(machine, 13, c128_external_function + 0x1000);
 			}
-			memory_set_bankptr (machine, 14, c128_external_function + 0x2000);
-			memory_set_bankptr (machine, 16, c128_external_function + 0x3f05);
+			memory_set_bankptr(machine, 14, c128_external_function + 0x2000);
+			memory_set_bankptr(machine, 16, c128_external_function + 0x3f05);
 		}
 
 		if ( (( (input_port_read(machine, "SPECIAL") & 0x06) == 0x02 ) && (MMU_RAM_ADDR >= 0x40000))
@@ -775,40 +747,40 @@ static void c128_bankswitch_128 (running_machine *machine, int reset)
 
 // 128u4
 // FIX-ME: are the bankswitch functions working in the expected way without the memory_set_context?
-static void c128_bankswitch (running_machine *machine, int reset)
+static void c128_bankswitch( running_machine *machine, int reset )
 {
 	if (mmu_cpu != MMU_CPU8502)
 	{
 		if (!MMU_CPU8502)
 		{
-//			DBG_LOG(machine, 1, "switching to z80", ("active %d\n",cpu_getactivecpu()) );
-//			memory_set_context(machine, 0);
+//          DBG_LOG(machine, 1, "switching to z80", ("active %d\n",cpu_getactivecpu()) );
+//          memory_set_context(machine, 0);
 			c128_bankswitch_z80(machine);
-//			memory_set_context(machine, 1);
+//          memory_set_context(machine, 1);
 			cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, CLEAR_LINE);
 			cputag_set_input_line(machine, "m8502", INPUT_LINE_HALT, ASSERT_LINE);
 		}
 		else
 		{
-//			DBG_LOG(machine, 1, "switching to m6502", ("active %d\n",cpu_getactivecpu()) );
-//			memory_set_context(machine, 1);
+//          DBG_LOG(machine, 1, "switching to m6502", ("active %d\n",cpu_getactivecpu()) );
+//          memory_set_context(machine, 1);
 			c128_bankswitch_128(machine, reset);
-//			memory_set_context(machine, 0);
+//          memory_set_context(machine, 0);
 			cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, ASSERT_LINE);
 			cputag_set_input_line(machine, "m8502", INPUT_LINE_HALT, CLEAR_LINE);
 
 			/* NPW 19-Nov-2005 - In the C128, CPU #0 starts out and hands over
-			 * control to CPU #1.  CPU #1 seems to execute garbage from 0x0000
-			 * up to 0x1100, at which point it finally hits some code
-			 * (presumably set up by CPU #1.) This always worked, but when I
-			 * changed the m8502 CPU core to use an internal memory map, it
-			 * started BRK-ing forever when trying to execute 0x0000.
-			 *
-			 * I am not sure whether the C128 actually executes this invalid
-			 * memory or if this is a bug in the C128 driver.  In any case, the
-			 * driver used to work with this behavior, so I am doing this hack
-			 * where I set CPU #1's PC to 0x1100 on reset.
-			 */
+             * control to CPU #1.  CPU #1 seems to execute garbage from 0x0000
+             * up to 0x1100, at which point it finally hits some code
+             * (presumably set up by CPU #1.) This always worked, but when I
+             * changed the m8502 CPU core to use an internal memory map, it
+             * started BRK-ing forever when trying to execute 0x0000.
+             *
+             * I am not sure whether the C128 actually executes this invalid
+             * memory or if this is a bug in the C128 driver.  In any case, the
+             * driver used to work with this behavior, so I am doing this hack
+             * where I set CPU #1's PC to 0x1100 on reset.
+             */
 			if (cpu_get_reg(cputag_get_cpu(machine, "m8502"), REG_GENPC) == 0x0000)
 				cpu_set_reg(cputag_get_cpu(machine, "m8502"), REG_GENPC, 0x1100);
 		}
@@ -821,14 +793,14 @@ static void c128_bankswitch (running_machine *machine, int reset)
 		c128_bankswitch_128(machine, reset);
 }
 
-static void c128_mmu8722_reset (running_machine *machine)
+static void c128_mmu8722_reset( running_machine *machine )
 {
 	memset(c128_mmu, 0, sizeof (c128_mmu));
 	c128_mmu[5] |= 0x38;
 	c128_mmu[10] = 1;
 	mmu_cpu = 0;
-    mmu_page0 = 0;
-    mmu_page1 = 0x0100;
+	mmu_page0 = 0;
+	mmu_page1 = 0x0100;
 	c128_bankswitch (machine, 1);
 }
 
@@ -892,9 +864,9 @@ READ8_HANDLER( c128_mmu8722_port_r )
 		/* hinybble number of 64 kb memory blocks */
 		if ((input_port_read(space->machine, "SPECIAL") & 0x06) == 0x02)		// 256KB RAM
 			data = 0x4f;
-		else if ((input_port_read(space->machine, "SPECIAL") & 0x06) == 0x04)	//	1MB
+		else if ((input_port_read(space->machine, "SPECIAL") & 0x06) == 0x04)	//  1MB
 			data = 0xf;
-		else 
+		else
 			data = 0x2f;
 		break;
 	case 0xc:
@@ -938,37 +910,37 @@ WRITE8_HANDLER( c128_mmu8722_ff00_w )
 
 WRITE8_HANDLER( c128_write_0000 )
 {
-	if (c128_ram!=NULL)
+	if (c128_ram != NULL)
 		c128_ram[0x0000 + offset] = data;
 }
 
 WRITE8_HANDLER( c128_write_1000 )
 {
-	if (c128_ram!=NULL)
+	if (c128_ram != NULL)
 		c128_ram[0x1000 + offset] = data;
 }
 
 WRITE8_HANDLER( c128_write_4000 )
 {
-	if (c128_ram!=NULL)
+	if (c128_ram != NULL)
 		c128_ram[0x4000 + offset] = data;
 }
 
 WRITE8_HANDLER( c128_write_8000 )
 {
-	if (c128_ram!=NULL)
+	if (c128_ram != NULL)
 		c128_ram[0x8000 + offset] = data;
 }
 
 WRITE8_HANDLER( c128_write_a000 )
 {
-	if (c128_ram!=NULL)
+	if (c128_ram != NULL)
 		c128_ram[0xa000 + offset] = data;
 }
 
 WRITE8_HANDLER( c128_write_c000 )
 {
-	if (c128_ram!=NULL)
+	if (c128_ram != NULL)
 		c128_ram[0xc000 + offset] = data;
 }
 
@@ -976,14 +948,14 @@ WRITE8_HANDLER( c128_write_e000 )
 {
 	if (offset + 0xe000 >= c128_ram_top)
 		c64_memory[0xe000 + offset] = data;
-	else if (c128_ram!=NULL)
+	else if (c128_ram != NULL)
 		c128_ram[0xe000 + offset] = data;
 }
 
 WRITE8_HANDLER( c128_write_ff00 )
 {
 	if (!c64mode)
-		c128_mmu8722_ff00_w (space, offset, data);
+		c128_mmu8722_ff00_w(space, offset, data);
 	else if (c128_ram!=NULL)
 		c64_memory[0xff00 + offset] = data;
 }
@@ -1018,8 +990,8 @@ static int c128_dma_read(running_machine *machine, int offset)
 			return c64_chargen[offset & 0xfff];
 		return c64_vicaddr[offset];
 	}
-	if ( !(c64_port6510&4)
-		 && (((c128_vicaddr - c64_memory + offset) & 0x7000) == 0x1000) )
+	if (!(c64_port6510&4)
+		 && (((c128_vicaddr - c64_memory + offset) & 0x7000) == 0x1000))
 		return c128_chargen[offset & 0xfff];
 	return c128_vicaddr[offset];
 }
@@ -1035,20 +1007,20 @@ static int c128_dma_read_color(running_machine *machine, int offset)
 }
 
 /* 2008-09-01
-	We need here the m6510 port handlers from c64, otherwise c128_common_driver_init
-	seems unable to use correctly the timer.
-	This will be probably fixed in a future clean up.
+    We need here the m6510 port handlers from c64, otherwise c128_common_driver_init
+    seems unable to use correctly the timer.
+    This will be probably fixed in a future clean up.
 */
 
 static emu_timer *datasette_timer;
 
-void c128_m6510_port_write(const device_config *device, UINT8 direction, UINT8 data)
+void c128_m6510_port_write( const device_config *device, UINT8 direction, UINT8 data )
 {
 	/* if line is marked as input then keep current value */
 	data = (c64_port_data & ~direction) | (data & direction);
 
 	/* resistors make P0,P1,P2 go high when respective line is changed to input */
-	if (!(direction & 0x04)) 
+	if (!(direction & 0x04))
 		data |= 0x04;
 
 	if (!(direction & 0x02))
@@ -1061,14 +1033,14 @@ void c128_m6510_port_write(const device_config *device, UINT8 direction, UINT8 d
 
 	if (c64_tape_on)
 	{
-		if (direction & 0x08) 
+		if (direction & 0x08)
 		{
 			cassette_output(devtag_get_device(device->machine, "cassette"), (data & 0x08) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
 		}
 
 		if (direction & 0x20)
 		{
-			if(!(data & 0x20))
+			if (!(data & 0x20))
 			{
 				cassette_change_state(devtag_get_device(device->machine, "cassette"),CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
 				timer_adjust_periodic(datasette_timer, attotime_zero, 0, ATTOTIME_IN_HZ(44100));
@@ -1087,7 +1059,7 @@ void c128_m6510_port_write(const device_config *device, UINT8 direction, UINT8 d
 	c64_memory[0x001] = memory_read_byte( cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM), 1 );
 }
 
-UINT8 c128_m6510_port_read(const device_config *device, UINT8 direction)
+UINT8 c128_m6510_port_read( const device_config *device, UINT8 direction )
 {
 	UINT8 data = c64_port_data;
 
@@ -1104,7 +1076,7 @@ UINT8 c128_m6510_port_read(const device_config *device, UINT8 direction)
 	return data;
 }
 
-static void c128_common_driver_init(running_machine *machine)
+static void c128_common_driver_init( running_machine *machine )
 {
 	UINT8 *gfx=memory_region(machine, "gfx1");
 	UINT8 *ram = memory_region(machine, "maincpu");
@@ -1112,21 +1084,25 @@ static void c128_common_driver_init(running_machine *machine)
 
 	c64_memory = ram;
 
-	c128_basic = ram+0x100000;
-	c64_basic = ram+0x108000;
-	c64_kernal = ram+0x10a000;
-	c128_editor = ram+0x10c000;
-	c128_z80 = ram+0x10d000;
-	c128_kernal = ram+0x10e000;
-	c128_internal_function = ram+0x110000;
-	c128_external_function = ram+0x118000;
-	c64_chargen = ram+0x120000;
-	c128_chargen = ram+0x121000;
-	c64_colorram = ram+0x122000;
-	c128_vdcram = ram+0x122800;
+	c128_basic = ram + 0x100000;
+	c64_basic = ram + 0x108000;
+	c64_kernal = ram + 0x10a000;
+	c128_editor = ram + 0x10c000;
+	c128_z80 = ram + 0x10d000;
+	c128_kernal = ram + 0x10e000;
+	c128_internal_function = ram + 0x110000;
+	c128_external_function = ram + 0x118000;
+	c64_chargen = ram + 0x120000;
+	c128_chargen = ram + 0x121000;
+	c64_colorram = ram + 0x122000;
+	c128_vdcram = ram + 0x122800;
 
-	for (i=0; i<0x100; i++)
-		gfx[i]=i;
+	c64mode = 0;
+	c128_cia1_on = 1;
+	vicirq = 0;
+
+	for (i = 0; i < 0x100; i++)
+		gfx[i] = i;
 
 	if (c64_tape_on)
 		datasette_timer = timer_alloc(machine, c64_tape_timer, NULL);
@@ -1135,6 +1111,8 @@ static void c128_common_driver_init(running_machine *machine)
 DRIVER_INIT( c128 )
 {
 	c64_tape_on = 1;
+	c64_pal = 0;
+	emulated_drive = 0;
 	c128_common_driver_init(machine);
 	vic6567_init(1, c64_pal, c128_dma_read, c128_dma_read_color, c128_vic_interrupt);
 	vic2_set_rastering(0);
@@ -1146,6 +1124,7 @@ DRIVER_INIT( c128pal )
 {
 	c64_tape_on = 1;
 	c64_pal = 1;
+	emulated_drive = 0;
 	c128_common_driver_init(machine);
 	vic6567_init(1, c64_pal, c128_dma_read, c128_dma_read_color, c128_vic_interrupt);
 	vic2_set_rastering(1);
@@ -1157,42 +1136,42 @@ DRIVER_INIT( c128d )
 {
 	DRIVER_INIT_CALL( c128 );
 	emulated_drive = 1;
-	drive_config(machine, type_1571, 0, 0, "cpu_vc1571", 8);
+	cbm_drive_config(machine, type_1571, 0, 0, "cpu_vc1571", 8);
 }
 
 DRIVER_INIT( c128dpal )
 {
 	DRIVER_INIT_CALL( c128pal );
 	emulated_drive = 1;
-	drive_config(machine, type_1571, 0, 0, "cpu_vc1571", 8);
+	cbm_drive_config(machine, type_1571, 0, 0, "cpu_vc1571", 8);
 }
 
 DRIVER_INIT( c128dcr )
 {
 	DRIVER_INIT_CALL( c128 );
 	emulated_drive = 1;
-	drive_config(machine, type_1571cr, 0, 0, "cpu_vc1571", 8);
+	cbm_drive_config(machine, type_1571cr, 0, 0, "cpu_vc1571", 8);
 }
 
 DRIVER_INIT( c128dcrp )
 {
 	DRIVER_INIT_CALL( c128pal );
 	emulated_drive = 1;
-	drive_config(machine, type_1571cr, 0, 0, "cpu_vc1571", 8);
+	cbm_drive_config(machine, type_1571cr, 0, 0, "cpu_vc1571", 8);
 }
 
 DRIVER_INIT( c128d81 )
 {
 	DRIVER_INIT_CALL( c128 );
 	emulated_drive = 1;
-	drive_config(machine, type_1581, 0, 0, "cpu_vc1571", 8);
+	cbm_drive_config(machine, type_1581, 0, 0, "cpu_vc1571", 8);
 }
 
 MACHINE_START( c128 )
 {
 	if (emulated_drive)
 	{
-		drive_reset();
+		cbm_drive_reset(machine);
 	}
 	else if (c128_cia1_on)
 	{
@@ -1211,7 +1190,7 @@ MACHINE_RESET( c128 )
 {
 	c128_vicaddr = c64_vicaddr = c64_memory;
 	c64mode = 0;
-	c128_mmu8722_reset (machine);
+	c128_mmu8722_reset(machine);
 	cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, CLEAR_LINE);
 	cputag_set_input_line(machine, "m8502", INPUT_LINE_HALT, ASSERT_LINE);
 }
@@ -1250,8 +1229,8 @@ INTERRUPT_GEN( c128_frame_interrupt )
 	cbm_common_interrupt(device);
 
 	/* Fix Me! Currently, neither left Shift nor Shift Lock work in c128, but reading the correspondent input produces a bug!
-	Hence, we overwrite the actual reading as it never happens */
-	if ((input_port_read(device->machine, "SPECIAL") & 0x40))	// 
+    Hence, we overwrite the actual reading as it never happens */
+	if ((input_port_read(device->machine, "SPECIAL") & 0x40))	//
 		c64_keyline[1] |= 0x80;
 
 	/* c128 specific: keypad input ports */

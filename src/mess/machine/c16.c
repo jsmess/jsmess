@@ -1,10 +1,10 @@
 /***************************************************************************
 
-	commodore c16 home computer
+    commodore c16 home computer
 
-	peter.trauner@jk.uni-linz.ac.at
+    peter.trauner@jk.uni-linz.ac.at
     documentation
- 	 www.funet.fi
+     www.funet.fi
 
 ***************************************************************************/
 
@@ -56,7 +56,7 @@ static UINT8 keyline[10] =
 
 static UINT8 port6529;
 
-static int lowrom = 0, highrom = 0;
+static int lowrom, highrom;
 
 static UINT8 *c16_memory_10000;
 static UINT8 *c16_memory_14000;
@@ -67,12 +67,12 @@ static UINT8 *c16_memory_24000;
 static UINT8 *c16_memory_28000;
 static UINT8 *c16_memory_2c000;
 
-static int has_c1551 = 0, has_vc1541 = 0, has_iec8 = 0, has_iec9 = 0; // Notice that iec8 & iec9 have never been implemented
+static int has_c1551, has_vc1541, has_iec8, has_iec9; // Notice that iec8 & iec9 have never been implemented
 
-static UINT8 read_cfg1(running_machine *machine)
+static UINT8 read_cfg1( running_machine *machine )
 {
 	UINT8 result;
-	switch(mame_get_phase(machine))
+	switch (mame_get_phase(machine))
 	{
 		case MAME_PHASE_RESET:
 		case MAME_PHASE_RUNNING:
@@ -110,7 +110,7 @@ static UINT8 read_cfg1(running_machine *machine)
   p7 serial data in, serial bus 5
 */
 
-void c16_m7501_port_write(const device_config *device, UINT8 direction, UINT8 data)
+void c16_m7501_port_write( const device_config *device, UINT8 direction, UINT8 data )
 {
 	const device_config *serbus = devtag_get_device(device->machine, "serial_bus");
 	int dat, atn, clk;
@@ -121,11 +121,11 @@ void c16_m7501_port_write(const device_config *device, UINT8 direction, UINT8 da
 	cbm_serial_data_write(serbus, 0, dat = !(data & 0x01));
 
 	cassette_output(devtag_get_device(device->machine, "cassette"), !(data & 0x02) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
-	
+
 	cassette_change_state(devtag_get_device(device->machine, "cassette"), (data & 0x08) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 }
 
-UINT8 c16_m7501_port_read(const device_config *device, UINT8 direction)
+UINT8 c16_m7501_port_read( const device_config *device, UINT8 direction )
 {
 	UINT8 data = 0xff;
 	UINT8 c16_port7501 = (UINT8) devtag_get_info_int(device->machine, "maincpu", CPUINFO_INT_M6510_PORT);
@@ -137,7 +137,7 @@ UINT8 c16_m7501_port_read(const device_config *device, UINT8 direction)
 	if ((c16_port7501 & 0x02) || !cbm_serial_clock_read(serbus, 0))
 		data &= ~0x40;
 
-//	data &= ~0x20; // port bit not in pinout
+//  data &= ~0x20; // port bit not in pinout
 
 	if (cassette_input(devtag_get_device(device->machine, "cassette")) > +0.0)
 		data |=  0x10;
@@ -147,50 +147,50 @@ UINT8 c16_m7501_port_read(const device_config *device, UINT8 direction)
 	return data;
 }
 
-static void c16_bankswitch (running_machine *machine)
+static void c16_bankswitch( running_machine *machine )
 {
 	UINT8 *rom = memory_region(machine, "maincpu");
-	memory_set_bankptr (machine, 9, mess_ram);
+	memory_set_bankptr(machine, 9, mess_ram);
 
 	switch (lowrom)
 	{
 	case 0:
-		memory_set_bankptr (machine, 2, rom + 0x10000);
+		memory_set_bankptr(machine, 2, rom + 0x10000);
 		break;
 	case 1:
-		memory_set_bankptr (machine, 2, rom + 0x18000);
+		memory_set_bankptr(machine, 2, rom + 0x18000);
 		break;
 	case 2:
-		memory_set_bankptr (machine, 2, rom + 0x20000);
+		memory_set_bankptr(machine, 2, rom + 0x20000);
 		break;
 	case 3:
-		memory_set_bankptr (machine, 2, rom + 0x28000);
+		memory_set_bankptr(machine, 2, rom + 0x28000);
 		break;
 	}
 
 	switch (highrom)
 	{
 	case 0:
-		memory_set_bankptr (machine, 3, rom + 0x14000);
-		memory_set_bankptr (machine, 8, rom + 0x17f20);
+		memory_set_bankptr(machine, 3, rom + 0x14000);
+		memory_set_bankptr(machine, 8, rom + 0x17f20);
 		break;
 	case 1:
-		memory_set_bankptr (machine, 3, rom + 0x1c000);
-		memory_set_bankptr (machine, 8, rom + 0x1ff20);
+		memory_set_bankptr(machine, 3, rom + 0x1c000);
+		memory_set_bankptr(machine, 8, rom + 0x1ff20);
 		break;
 	case 2:
-		memory_set_bankptr (machine, 3, rom + 0x24000);
-		memory_set_bankptr (machine, 8, rom + 0x27f20);
+		memory_set_bankptr(machine, 3, rom + 0x24000);
+		memory_set_bankptr(machine, 8, rom + 0x27f20);
 		break;
 	case 3:
-		memory_set_bankptr (machine, 3, rom + 0x2c000);
-		memory_set_bankptr (machine, 8, rom + 0x2ff20);
+		memory_set_bankptr(machine, 3, rom + 0x2c000);
+		memory_set_bankptr(machine, 8, rom + 0x2ff20);
 		break;
 	}
-	memory_set_bankptr (machine, 4, rom + 0x17c00);
+	memory_set_bankptr(machine, 4, rom + 0x17c00);
 }
 
-WRITE8_HANDLER(c16_switch_to_rom)
+WRITE8_HANDLER( c16_switch_to_rom )
 {
 	ted7360_rom = 1;
 	c16_bankswitch(space->machine);
@@ -209,7 +209,7 @@ WRITE8_HANDLER(c16_switch_to_rom)
  * 0  1  plus4 hi
  * 1  0  c1 high
  * 1  1  c2 high */
-WRITE8_HANDLER(c16_select_roms)
+WRITE8_HANDLER( c16_select_roms )
 {
 	lowrom = offset & 0x03;
 	highrom = (offset & 0x0c) >> 2;
@@ -217,16 +217,16 @@ WRITE8_HANDLER(c16_select_roms)
 		c16_bankswitch(space->machine);
 }
 
-WRITE8_HANDLER(c16_switch_to_ram)
+WRITE8_HANDLER( c16_switch_to_ram )
 {
 	ted7360_rom = 0;
-	memory_set_bankptr (space->machine, 2, mess_ram + (0x8000 % mess_ram_size));
-	memory_set_bankptr (space->machine, 3, mess_ram + (0xc000 % mess_ram_size));
-	memory_set_bankptr (space->machine, 4, mess_ram + (0xfc00 % mess_ram_size));
-	memory_set_bankptr (space->machine, 8, mess_ram + (0xff20 % mess_ram_size));
+	memory_set_bankptr(space->machine, 2, mess_ram + (0x8000 % mess_ram_size));
+	memory_set_bankptr(space->machine, 3, mess_ram + (0xc000 % mess_ram_size));
+	memory_set_bankptr(space->machine, 4, mess_ram + (0xfc00 % mess_ram_size));
+	memory_set_bankptr(space->machine, 8, mess_ram + (0xff20 % mess_ram_size));
 }
 
-int c16_read_keyboard (int databus)
+int c16_read_keyboard( int databus )
 {
 	int value = 0xff;
 
@@ -255,8 +255,8 @@ int c16_read_keyboard (int databus)
 		value &= keyline[7];
 
 	/* looks like joy 0 needs dataline2 low
-	 * and joy 1 needs dataline1 low
-	 * write to 0xff08 (value on databus) reloads latches */
+     * and joy 1 needs dataline1 low
+     * write to 0xff08 (value on databus) reloads latches */
 	if (!(databus & 0x04))
 		value &= keyline[8];
 
@@ -277,12 +277,12 @@ int c16_read_keyboard (int databus)
  * output low means keyboard line selected
  * keyboard line is then read into the ted7360 latch
  */
-WRITE8_HANDLER(c16_6529_port_w)
+WRITE8_HANDLER( c16_6529_port_w )
 {
 	port6529 = data;
 }
 
- READ8_HANDLER(c16_6529_port_r)
+READ8_HANDLER( c16_6529_port_r )
 {
 	return port6529 & (c16_read_keyboard (0xff /*databus */ ) | (port6529 ^ 0xff));
 }
@@ -297,11 +297,11 @@ WRITE8_HANDLER(c16_6529_port_w)
  * p6 Userport j
  * p7 Userport f
  */
-WRITE8_HANDLER(plus4_6529_port_w)
+WRITE8_HANDLER( plus4_6529_port_w )
 {
 }
 
-READ8_HANDLER(plus4_6529_port_r)
+READ8_HANDLER( plus4_6529_port_r )
 {
 	int data = 0x00;
 
@@ -313,7 +313,7 @@ READ8_HANDLER(plus4_6529_port_r)
 	return data;
 }
 
-READ8_HANDLER(c16_fd1x_r)
+READ8_HANDLER( c16_fd1x_r )
 {
 	int data = 0x00;
 
@@ -362,14 +362,14 @@ READ8_HANDLER(c16_fd1x_r)
    1111 19200
  control register
   */
-WRITE8_HANDLER(c16_6551_port_w)
+WRITE8_HANDLER( c16_6551_port_w )
 {
 	offset &= 0x03;
 	DBG_LOG(space->machine, 3, "6551", ("port write %.2x %.2x\n", offset, data));
 	port6529 = data;
 }
 
-READ8_HANDLER(c16_6551_port_r)
+READ8_HANDLER( c16_6551_port_r )
 {
 	int data = 0x00;
 
@@ -378,12 +378,12 @@ READ8_HANDLER(c16_6551_port_r)
 	return data;
 }
 
-static READ8_HANDLER(ted7360_dma_read)
+static READ8_HANDLER( ted7360_dma_read )
 {
 	return mess_ram[offset % mess_ram_size];
 }
 
-static  READ8_HANDLER(ted7360_dma_read_rom)
+static  READ8_HANDLER( ted7360_dma_read_rom )
 {
 	/* should read real c16 system bus from 0xfd00 -ff1f */
 	if (offset >= 0xc000)
@@ -421,7 +421,7 @@ static  READ8_HANDLER(ted7360_dma_read_rom)
 	return mess_ram[offset % mess_ram_size];
 }
 
-void c16_interrupt (running_machine *machine, int level)
+void c16_interrupt( running_machine *machine, int level )
 {
 	static int old_level;
 
@@ -433,9 +433,12 @@ void c16_interrupt (running_machine *machine, int level)
 	}
 }
 
-static void c16_common_driver_init (running_machine *machine)
+static void c16_common_driver_init( running_machine *machine )
 {
 	UINT8 *rom;
+
+	lowrom = 0;
+	highrom = 0;
 
 	c16_select_roms (cputag_get_address_space(machine,"maincpu",ADDRESS_SPACE_PROGRAM), 0, 0);
 	c16_switch_to_rom (cputag_get_address_space(machine,"maincpu",ADDRESS_SPACE_PROGRAM), 0, 0);
@@ -455,37 +458,55 @@ static void c16_common_driver_init (running_machine *machine)
 	memset(mess_ram + (0xfdc0 % mess_ram_size), 0xff, 0x40);
 
 	memset(mess_ram + (0xfd40 % mess_ram_size), 0xff, 0x20);
-	
+
 	if (has_c1551)		/* C1551 */
 		c1551_config(machine, "cpu_c1551");
 
 	if (has_vc1541)		/* VC1541 */
-		drive_config(machine, type_1541, 0, 0, "cpu_vc1540", 8);
+		cbm_drive_config(machine, type_1541, 0, 0, "cpu_vc1540", 8);
 }
 
-static void c16_driver_init(running_machine *machine)
+static void c16_driver_init( running_machine *machine )
 {
+	int i;
+
 	c16_common_driver_init(machine);
-	ted7360_init(machine, (read_cfg1(machine) & 0x10 ) == 0x00);		/* is it PAL? */
+
+	/* not sure this is the right place for this. ATM ted7360[] is shared by video and audio TED */
+	for(i = 0; i < 0x20; i++)
+		ted7360[i] = 0x00;
+	ted7360_rom = 1;	// FIX-ME: at start should be RAM or ROM?
+
+	ted7360_init(machine, (read_cfg1(machine) & 0x10) == 0x00);		/* is it PAL? */
 	ted7360_set_dma(ted7360_dma_read, ted7360_dma_read_rom);
 }
 
 
 DRIVER_INIT( c16 )
-{ 
-	c16_driver_init(machine); 
+{
+	has_c1551 = 0;
+	has_vc1541 = 0;
+	has_iec8 = 0;
+	has_iec9 = 0;
+	c16_driver_init(machine);
 }
 
 DRIVER_INIT( c16c )
-{ 
+{
 	has_c1551 = 1;
-	c16_driver_init(machine); 
+	has_vc1541 = 0;
+	has_iec8 = 0;
+	has_iec9 = 0;
+	c16_driver_init(machine);
 }
 
 DRIVER_INIT( c16v )
-{ 
+{
+	has_c1551 = 0;
 	has_vc1541 = 1;
-	c16_driver_init(machine); 
+	has_iec8 = 0;
+	has_iec9 = 0;
+	c16_driver_init(machine);
 }
 
 
@@ -493,47 +514,47 @@ MACHINE_RESET( c16 )
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	const device_config *sid = devtag_get_device(space->machine, "sid");
-	
+
 	c364_speech_init(machine);
 
 	if (read_cfg1(machine) & 0x80)  /* SID card present */
 	{
 		memory_install_read8_device_handler(space, sid, 0xfd40, 0xfd5f, 0, 0, sid6581_r);
-		memory_install_write8_device_handler(space,  sid, 0xfd40, 0xfd5f, 0, 0, sid6581_w);
+		memory_install_write8_device_handler(space, sid, 0xfd40, 0xfd5f, 0, 0, sid6581_w);
 		memory_install_read8_device_handler(space, sid, 0xfe80, 0xfe9f, 0, 0, sid6581_r);
-		memory_install_write8_device_handler(space,  sid, 0xfe80, 0xfe9f, 0, 0, sid6581_w);
+		memory_install_write8_device_handler(space, sid, 0xfe80, 0xfe9f, 0, 0, sid6581_w);
 	}
 	else
 	{
 		memory_install_read8_handler(space, 0xfd40, 0xfd5f, 0, 0, SMH_NOP);
-		memory_install_write8_handler(space,  0xfd40, 0xfd5f, 0, 0, SMH_NOP);
+		memory_install_write8_handler(space, 0xfd40, 0xfd5f, 0, 0, SMH_NOP);
 		memory_install_read8_handler(space, 0xfe80, 0xfe9f, 0, 0, SMH_NOP);
-		memory_install_write8_handler(space,  0xfe80, 0xfe9f, 0, 0, SMH_NOP);
+		memory_install_write8_handler(space, 0xfe80, 0xfe9f, 0, 0, SMH_NOP);
 	}
 
 #if 0
 	c16_switch_to_rom (0, 0);
 	c16_select_roms (0, 0);
 #endif
-	if ((read_cfg1(machine) & 0x0c ) == 0x00)		/* is it C16? */
+	if ((read_cfg1(machine) & 0x0c) == 0x00)		/* is it C16? */
 	{
-		memory_set_bankptr (machine, 1, mess_ram + (0x4000 % mess_ram_size));
+		memory_set_bankptr(machine, 1, mess_ram + (0x4000 % mess_ram_size));
 
-		memory_set_bankptr (machine, 5, mess_ram + (0x4000 % mess_ram_size));
-		memory_set_bankptr (machine, 6, mess_ram + (0x8000 % mess_ram_size));
-		memory_set_bankptr (machine, 7, mess_ram + (0xc000 % mess_ram_size));
+		memory_set_bankptr(machine, 5, mess_ram + (0x4000 % mess_ram_size));
+		memory_set_bankptr(machine, 6, mess_ram + (0x8000 % mess_ram_size));
+		memory_set_bankptr(machine, 7, mess_ram + (0xc000 % mess_ram_size));
 
 		memory_install_write8_handler(space, 0xff20, 0xff3d, 0, 0, SMH_BANK(10));
 		memory_install_write8_handler(space, 0xff40, 0xffff, 0, 0, SMH_BANK(11));
-		memory_set_bankptr (machine, 10, mess_ram + (0xff20 % mess_ram_size));
-		memory_set_bankptr (machine, 11, mess_ram + (0xff40 % mess_ram_size));
+		memory_set_bankptr(machine, 10, mess_ram + (0xff20 % mess_ram_size));
+		memory_set_bankptr(machine, 11, mess_ram + (0xff40 % mess_ram_size));
 
 		ted7360_set_dma (ted7360_dma_read, ted7360_dma_read_rom);
 	}
 	else
 	{
 		memory_install_write8_handler(space, 0x4000, 0xfcff, 0, 0, SMH_BANK(10));
-		memory_set_bankptr (machine, 10, mess_ram + (0x4000 % mess_ram_size));
+		memory_set_bankptr(machine, 10, mess_ram + (0x4000 % mess_ram_size));
 
 		ted7360_set_dma (ted7360_dma_read, ted7360_dma_read_rom);
 	}
@@ -566,7 +587,7 @@ MACHINE_RESET( c16 )
 	}
 	if (has_vc1541)		/* vc1541 */
 	{
-		drive_reset();
+		cbm_drive_reset(machine);
 	}
 	else								/* simulated drives */
 	{
@@ -589,12 +610,12 @@ INTERRUPT_GEN( c16_frame_interrupt )
 
 		/* Shift Lock is mapped on Left/Right Shift */
 		if ((i == 1) && (input_port_read(device->machine, "SPECIAL") & 0x80))
-			value &= ~0x80;			
+			value &= ~0x80;
 
 		keyline[i] = value;
 	}
 
-	if (input_port_read(device->machine, "DSW0") & 0x80) 
+	if (input_port_read(device->machine, "DSW0") & 0x80)
 	{
 		value = 0xff;
 		if (input_port_read(device->machine, "JOY0") & 0x10)			/* Joypad1_Button */
@@ -613,7 +634,7 @@ INTERRUPT_GEN( c16_frame_interrupt )
 			keyline[8] = value;
 	}
 
-	if (input_port_read(device->machine, "DSW0") & 0x40) 
+	if (input_port_read(device->machine, "DSW0") & 0x40)
 	{
 		value = 0xff;
 		if (input_port_read(device->machine, "JOY1") & 0x10)			/* Joypad2_Button */
@@ -625,7 +646,7 @@ INTERRUPT_GEN( c16_frame_interrupt )
 			}
 
 		value &= ~(input_port_read(device->machine, "JOY1") & 0x0f);	/* Other Inputs Joypad2 */
-		
+
 		if (input_port_read(device->machine, "SPECIAL") & 0x40)
 			keyline[8] = value;
 		else
@@ -634,52 +655,52 @@ INTERRUPT_GEN( c16_frame_interrupt )
 
 	ted7360_frame_interrupt (device);
 
-	set_led_status (1, input_port_read(device->machine, "SPECIAL") & 0x80 ? 1 : 0);		/* Shift Lock */
-	set_led_status (0, input_port_read(device->machine, "SPECIAL") & 0x40 ? 1 : 0);		/* Joystick Swap */
+	set_led_status(1, input_port_read(device->machine, "SPECIAL") & 0x80 ? 1 : 0);		/* Shift Lock */
+	set_led_status(0, input_port_read(device->machine, "SPECIAL") & 0x40 ? 1 : 0);		/* Joystick Swap */
 }
 
 
 /***********************************************
 
-	C16 Cartridges
+    C16 Cartridges
 
 ***********************************************/
 
-static DEVICE_IMAGE_LOAD(c16_cart)
+static DEVICE_IMAGE_LOAD( c16_cart )
 {
 	UINT8 *mem = memory_region(image->machine, "maincpu");
-	int size = image_length (image), test;
+	int size = image_length(image), test;
 	const char *filetype;
 	int address = 0;
 
     /* magic lowrom at offset 7: $43 $42 $4d */
 	/* if at offset 6 stands 1 it will immediatly jumped to offset 0 (0x8000) */
-	static const unsigned char magic[] = {0x43, 0x42, 0x4d}; 
+	static const unsigned char magic[] = {0x43, 0x42, 0x4d};
 	unsigned char buffer[sizeof (magic)];
 
-	image_fseek (image, 7, SEEK_SET);
-	image_fread (image, buffer, sizeof (magic));
-	image_fseek (image, 0, SEEK_SET);
+	image_fseek(image, 7, SEEK_SET);
+	image_fread(image, buffer, sizeof (magic));
+	image_fseek(image, 0, SEEK_SET);
 
 	/* Check if our cart has the magic string, and set its loading address */
-	if (!memcmp (buffer, magic, sizeof (magic)))
+	if (!memcmp(buffer, magic, sizeof (magic)))
 		address = 0x20000;
-	
+
 	/* Give a loading address to non .bin / non .rom carts as well */
 	filetype = image_filetype(image);
 
-	/* We would support .hi and .lo files, but currently I'm not sure where to load them. 
-	   We simply load them at 0x20000 at this stage, even if it's probably wrong!
-	   It could also well be that they both need to be loaded at the same time, but this 
-	   is now impossible since I reduced to 1 the number of cart slots. 
-	   More investigations are in order if any .hi, .lo dump would surface!				 */
-	if (!mame_stricmp (filetype, "hi"))
+	/* We would support .hi and .lo files, but currently I'm not sure where to load them.
+       We simply load them at 0x20000 at this stage, even if it's probably wrong!
+       It could also well be that they both need to be loaded at the same time, but this
+       is now impossible since I reduced to 1 the number of cart slots.
+       More investigations are in order if any .hi, .lo dump would surface!              */
+	if (!mame_stricmp(filetype, "hi"))
 		address = 0x20000;	/* FIX ME! */
 
-	else if (!mame_stricmp (filetype, "lo"))
+	else if (!mame_stricmp(filetype, "lo"))
 		address = 0x20000;	/* FIX ME! */
 
-	/* As a last try, give a reasonable loading address also to .bin/.rom without the magic string */		
+	/* As a last try, give a reasonable loading address also to .bin/.rom without the magic string */
 	else if (!address)
 	{
 		logerror("Cart %s does not contain the magic string: it may be loaded at the wrong memory address!\n", image_filename(image));
@@ -689,7 +710,7 @@ static DEVICE_IMAGE_LOAD(c16_cart)
 	logerror("Loading cart %s at %.5x size:%.4x\n", image_filename(image), address, size);
 
 	/* Finally load the cart */
-	test = image_fread (image, mem + address, size);
+	test = image_fread(image, mem + address, size);
 
 	if (test != size)
 		return INIT_FAIL;
@@ -697,7 +718,7 @@ static DEVICE_IMAGE_LOAD(c16_cart)
 	return INIT_PASS;
 }
 
-MACHINE_DRIVER_START(c16_cartslot)
+MACHINE_DRIVER_START( c16_cartslot )
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("bin,rom,hi,lo")
 	MDRV_CARTSLOT_NOT_MANDATORY

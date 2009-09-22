@@ -96,44 +96,44 @@ FF00-FFFF       Jump table, vectors
  2 heads
 
  */
-/* 2008-09 FP 
+/* 2008-09 FP
 Started some work on the floppy emulation code:
-	+ made the functions / structs less vc1541-centric & d64-centric
-	+ unified config & reset functions, using type variable
-		to choose the actions to be done
-	+ moved GCR encoding at loading time (wip untested code)
- 
+    + made the functions / structs less vc1541-centric & d64-centric
+    + unified config & reset functions, using type variable
+        to choose the actions to be done
+    + moved GCR encoding at loading time (wip untested code)
+
 A limitation is clear: only a single occurrence of emulated drive
-is expected. 
+is expected.
 At a later stage, at least drive_config & drive_reset will need
 an index to choose between the drives
 In the end, we could also split the floppy drives emulation from the
 disk image handling...
 
 Current status:
-	+ preliminary vc1541 & c1551 implementation (quite slow, especially 
-		if you turn on logging)
-	+ no support for other drive types (even if now I list all
-		the variants supported by Vice in the enum)
-	+ communications between the drive CPU and the computer CPU have 
-		to be checked, debugged and improved: somehow it works, but no
-		sync bit is set (encoding bug? timers-related bug?) and the drive 
-		keeps reading beyond the end of the track (synchronization 
-		problems?)
-	+ all but .g64 images should be correctly encoded at loading time
-		(I actually have doubts about some .d82 details) 
-	+ error maps are not still used, even if their presence is 
-		acknowledged
-	+ floppy drives should become devices and use ROMREGION_LOADBYNAME 
-		for their ROMs (not the current defines)
-	+ all available drive dumps are included for each systems using it
-		(vc1541 = sx64, vip64, c16v, plus4v; vc1571 = c128d; vc1571cr = c128dcr; 
-		vc1581 = c128d81; vc1540 = vc20v, vic20plv; c2031 = vc20i (only dumps added); 
-		c1551 = c16c, plus4c). this is only a temporary workaround to document 
-		available dumps. correct revisions will be used with each systems when 
-		emulation works (or 'default' bios will be used for most common 
-		configurations, when machines were compatible with more than a single 
-		drive model)
+    + preliminary vc1541 & c1551 implementation (quite slow, especially
+        if you turn on logging)
+    + no support for other drive types (even if now I list all
+        the variants supported by Vice in the enum)
+    + communications between the drive CPU and the computer CPU have
+        to be checked, debugged and improved: somehow it works, but no
+        sync bit is set (encoding bug? timers-related bug?) and the drive
+        keeps reading beyond the end of the track (synchronization
+        problems?)
+    + all but .g64 images should be correctly encoded at loading time
+        (I actually have doubts about some .d82 details)
+    + error maps are not still used, even if their presence is
+        acknowledged
+    + floppy drives should become devices and use ROMREGION_LOADBYNAME
+        for their ROMs (not the current defines)
+    + all available drive dumps are included for each systems using it
+        (vc1541 = sx64, vip64, c16v, plus4v; vc1571 = c128d; vc1571cr = c128dcr;
+        vc1581 = c128d81; vc1540 = vc20v, vic20plv; c2031 = vc20i (only dumps added);
+        c1551 = c16c, plus4c). this is only a temporary workaround to document
+        available dumps. correct revisions will be used with each systems when
+        emulation works (or 'default' bios will be used for most common
+        configurations, when machines were compatible with more than a single
+        drive model)
 */
 /*
 Informations on the fileformats (which the code is based on)
@@ -146,7 +146,7 @@ G64 & GCR - http://ist.uwaterloo.ca/~schepers/formats/G64.TXT
 GCR - http://www.baltissen.org/newhtm/1541c.htm
 
 Other info sources:
-	http://sta.c64.org/cbm1541mem.html
+    http://sta.c64.org/cbm1541mem.html
 
 */
 
@@ -184,12 +184,12 @@ Other info sources:
 
 /*******************************************
 
-	Structures
+    Structures
 
 *******************************************/
 
 /* Legacy code. At a later stage, we should convert everything to devices.
-However, fixing the C64 / Floppy drive communications is a priority over 
+However, fixing the C64 / Floppy drive communications is a priority over
 cleaning up of this part */
 
 
@@ -200,12 +200,12 @@ static struct
 }
 serial;
 
-typedef struct 
+typedef struct
 {
 	int sync;				// active after > 9 '1's
 	int ones_count;
 	int ready;				// needed for 1551
-	UINT8 data[0x500000];	// entire d64 image encoded at loading time
+	UINT8 *data;			// entire d64 image encoded at loading time
 } GCR_data;
 
 typedef struct
@@ -232,7 +232,7 @@ typedef struct
 
 	int via0irq, via1irq;
 
-} vc1541_drive_emu;
+} _vc1541_drive_emu_t;
 
 typedef struct
 {
@@ -253,15 +253,15 @@ typedef struct
 	UINT8 cpu_ddr, cpu_port;
 	void *irq_timer;
 
-} c1551_drive_emu;
+} _c1551_drive_emu_t;
 
-static vc1541_drive_emu vc1541_drive_static = { 0 }, *vc1541_drive = &vc1541_drive_static;
-static c1551_drive_emu c1551_drive_static = { 0 }, *c1551_drive = &c1551_drive_static;
+static _vc1541_drive_emu_t vc1541_drive;
+static _c1551_drive_emu_t c1551_drive;
 
 
 /*******************************************
 
-	Format specific code
+    Format specific code
 
 *******************************************/
 
@@ -279,7 +279,7 @@ static const int d64_sectors_per_track[] =
 	18, 18, 18, 18, 18, 18,
 	17, 17, 17, 17, 17,
 	17, 17, 17, 17, 17,		/* only for 40 tracks d64 */
-	17, 17					/* in principle the drive could read 42 tracks */
+	17, 17				/* in principle the drive could read 42 tracks */
 };
 
 #define D71_MAX_TRACKS 70
@@ -305,7 +305,7 @@ static const int d71_sectors_per_track[] =
 static const int d80_sectors_per_track[] =
 {
 	29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29,
-	29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 
+	29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29,
 	27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27,
 	25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25,
 	23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23
@@ -319,12 +319,12 @@ static const int d80_sectors_per_track[] =
 static const int d82_sectors_per_track[] =
 {
 	29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29,
-	29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 
+	29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29,
 	27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27,
 	25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25,
 	23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
 	29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29,
-	29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 
+	29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29,
 	27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27,
 	25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25,
 	23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23
@@ -346,12 +346,12 @@ static const int max_tracks_per_format[] =
 	0		/* Still to add support for .g64 */
 };
 
-static int image_offset[IMAGE_MAX_TRACKS] = { 0 };
-static int gcr_offset[IMAGE_MAX_TRACKS] = { 0 };
+static int image_offset[IMAGE_MAX_TRACKS];
+static int gcr_offset[IMAGE_MAX_TRACKS];
 
 /*******************************************
 
-	Offset initialization
+    Offset initialization
 
 *******************************************/
 
@@ -411,36 +411,36 @@ static void offset_init( int format, int *offset_list, int length )
 
 /*******************************************
 
-	Generic image handling
+    Generic image handling
 
 *******************************************/
 
 
 /* This calculates starting offset (from the beginning of the image file) of a sector */
 /* Since sectors are always 256 bytes large, this works no matter the file format! */
-static int image_tracksector2offset (int track, int sector)
+static int image_tracksector2offset( int track, int sector )
 {
 	return image_offset[track - 1] + sector * 256;
 }
 
 /*
 // WARNING: this would work with a d64 image... it has to be adapted to work with GCR image we store at loading time
-static void image_offset2tracksector (int offset)
+static void image_offset2tracksector( int offset )
 {
-	int track = 0, sector = 0, helper, i = 0;
-	
-	helper = offset;
-	
-	do
-	{
-	helper -= (d64_sectors_per_track[++i] * 256);
-	} while ( helper > 0);
-	
-	track = i;
+    int track = 0, sector = 0, helper, i = 0;
 
-	sector = (offset - image_offset[track]) / 256;
+    helper = offset;
 
-	logerror("We are reading at offset %d, which is in track %d and sector %d \n", offset, track, sector);
+    do
+    {
+    helper -= (d64_sectors_per_track[++i] * 256);
+    } while (helper > 0);
+
+    track = i;
+
+    sector = (offset - image_offset[track]) / 256;
+
+    logerror("We are reading at offset %d, which is in track %d and sector %d \n", offset, track, sector);
 }
 */
 
@@ -450,7 +450,7 @@ static void image_offset2tracksector (int offset)
    indeed, in these cases a g64 image is needed (which stores the
    Disk ID as coded in the GCR data) */
 
-static int disk_id1 (int format)
+static int disk_id1( int format )
 {
 	int id1 = 0;
 
@@ -480,12 +480,12 @@ static int disk_id1 (int format)
 			logerror("Unsupported format\n");
 			break;
 	}
-	
+
 	return id1;
 }
 
 
-static int disk_id2 (int format)
+static int disk_id2( int format )
 {
 	int id2 = 0;
 
@@ -515,14 +515,14 @@ static int disk_id2 (int format)
 			logerror("Unsupported format\n");
 			break;
 	}
-	
+
 	return id2;
 }
 
 
 /* Four different frequencies for the 4 different zones on the disk */
 /* These work for 1541 drives, are the same for other drives? */
-static const double drive_times[4]= 
+static const double drive_times[4]=
 {
 	XTAL_16_MHz / 13, XTAL_16_MHz / 14, XTAL_16_MHz / 15, XTAL_16_MHz / 16
 };
@@ -530,27 +530,27 @@ static const double drive_times[4]=
 
 /* Commodore GCR format */
 /*
-Original	Encoded
-4 bits		5 bits
+Original    Encoded
+4 bits      5 bits
 
-0000	->	01010 = 0x0a
-0001	->	01011 = 0x0b
-0010	->	10010 = 0x12
-0011	->	10011 = 0x13
-0100	->	01110 = 0x0e
-0101	->	01111 = 0x0f
-0110	->	10110 = 0x16
-0111	->	10111 = 0x17
-1000	->	01001 = 0x09
-1001	->	11001 = 0x19
-1010	->	11010 = 0x1a
-1011	->	11011 = 0x1b
-1100	->	01101 = 0x0d
-1101	->	11101 = 0x1d
-1110	->	11110 = 0x1e
-1111	->	10101 = 0x15
+0000    ->  01010 = 0x0a
+0001    ->  01011 = 0x0b
+0010    ->  10010 = 0x12
+0011    ->  10011 = 0x13
+0100    ->  01110 = 0x0e
+0101    ->  01111 = 0x0f
+0110    ->  10110 = 0x16
+0111    ->  10111 = 0x17
+1000    ->  01001 = 0x09
+1001    ->  11001 = 0x19
+1010    ->  11010 = 0x1a
+1011    ->  11011 = 0x1b
+1100    ->  01101 = 0x0d
+1101    ->  11101 = 0x1d
+1110    ->  11110 = 0x1e
+1111    ->  10101 = 0x15
 
-We use the encoded values in bytes because we use them to encode 
+We use the encoded values in bytes because we use them to encode
 groups of 4 bytes into groups of 5 bytes, below.
 */
 
@@ -563,26 +563,26 @@ static const int bin_2_gcr[] =
 
 /* This could be of use if we ever implement saving in .d64 format, to convert back GCR -> d64 */
 /*
-static const int gcr_2_bin[] = 
+static const int gcr_2_bin[] =
 {
-	-1, -1,   -1,   -1,
-	-1, -1,   -1,   -1,
-	-1, 0x08, 0x00, 0x01,
-	-1, 0x0c, 0x04, 0x05,
-	-1, -1,   0x02, 0x03,
-	-1, 0x0f, 0x06, 0x07,
-	-1, 0x09, 0x0a, 0x0b,
-	-1, 0x0d, 0x0e, -1
+    -1, -1,   -1,   -1,
+    -1, -1,   -1,   -1,
+    -1, 0x08, 0x00, 0x01,
+    -1, 0x0c, 0x04, 0x05,
+    -1, -1,   0x02, 0x03,
+    -1, 0x0f, 0x06, 0x07,
+    -1, 0x09, 0x0a, 0x0b,
+    -1, 0x0d, 0x0e, -1
 };
 */
 
 
 /* gcr_double_2_gcr takes 4 bytes (a, b, c, d) and shuffles their nibbles to obtain 5 bytes in dest */
-/* The result is basically res = (enc(a) << 15) | (enc(b) << 10) | (enc(c) << 5) | enc(d) 
+/* The result is basically res = (enc(a) << 15) | (enc(b) << 10) | (enc(c) << 5) | enc(d)
  * with res being 5 bytes long and enc(x) being the GCR encode of x.
  * In fact, we store the result as five separate bytes in the dest argument
  */
-static void gcr_double_2_gcr(UINT8 a, UINT8 b, UINT8 c, UINT8 d, UINT8 *dest)
+static void gcr_double_2_gcr( UINT8 a, UINT8 b, UINT8 c, UINT8 d, UINT8 *dest )
 {
 	UINT8 gcr[8];
 
@@ -604,115 +604,121 @@ static void gcr_double_2_gcr(UINT8 a, UINT8 b, UINT8 c, UINT8 d, UINT8 *dest)
 	dest[4] = (gcr[6] << 5) | gcr[7];
 }
 
+/* FIXME: temp workaround */
+static void filling_byte( UINT8 a, UINT8 *dest )
+{
+	dest[0] = a;
+}
+
 
 /**************************************
 
-	Drive timers (aka floppy reading)
+    Drive timers (aka floppy reading)
 
 **************************************/
 
-static TIMER_CALLBACK(vc1541_drive_timer)
+static TIMER_CALLBACK( vc1541_drive_timer )
 {
 	const device_config *via_1 = devtag_get_device(machine, "_1541_via_1");
 
-	if (vc1541_drive->clock == 0) 
+	if (vc1541_drive.clock == 0)
 	{
-		vc1541_drive->gcr.ready = 0;
+		vc1541_drive.gcr.ready = 0;
 		// why put sync back to 0 here?!? it would break the sync count, isn't it?
 		// or is it the way the serial port reads the sync count?!?
-		vc1541_drive->gcr.sync = 0;
-	
-		cputag_set_input_line(machine, vc1541_drive->cputag, M6502_SET_OVERFLOW, 1);
+		vc1541_drive.gcr.sync = 0;
+
+		cputag_set_input_line(machine, vc1541_drive.cputag, M6502_SET_OVERFLOW, 1);
 		via_ca1_w(via_1, 0, 1);
 
-		vc1541_drive->clock = 1;
+		vc1541_drive.clock = 1;
 		return;
 	}
 
 	// this code has 2 effects: move on the pos on the data and reset it to 0 at the end of the track!
 	// size of the track is: (# sectors in the track) * (size of sector GCR endoded)
-	// Here, size of sector is 368 because of our choices in the loading: 9 bytes of header gap & 14 bytes of sector gap 
+	// Here, size of sector is 368 because of our choices in the loading: 9 bytes of header gap & 14 bytes of sector gap
 	// We will need to set the size at loading time when adding support for G64 images
-	if (++(vc1541_drive->pos) >= (d64_sectors_per_track[(int)vc1541_drive->track - 1] * 368)) 
-		vc1541_drive->pos = 0;
+	if (++(vc1541_drive.pos) >= (d64_sectors_per_track[(int)vc1541_drive.track - 1] * 368))
+		vc1541_drive.pos = 0;
 	// should we check if there is a change of track? to reset the pos in that case as well?
 
-	vc1541_drive->gcr.ready = 1;
+	vc1541_drive.gcr.ready = 1;
 
-	// notice that if there is a sequence of more than 40 1s it correctly does not reset the sync 
+	// notice that if there is a sequence of more than 40 1s it correctly does not reset the sync
 	// counter until a 0 is found
-	if (vc1541_drive->gcr.data[vc1541_drive->pos] == 0xff) 
+	if (vc1541_drive.gcr.data[vc1541_drive.pos] == 0xff)
 	{
-		vc1541_drive->gcr.ones_count++;
+		vc1541_drive.gcr.ones_count++;
 
-//		if (vc1541_drive->gcr.ones_count == 2) // 9 ones should already mark it as a sync, even if CBM chose to use 40 of them
-		if (vc1541_drive->gcr.ones_count == 5)
-			vc1541_drive->gcr.sync = 1;
-	} 
-	else 
+//      if (vc1541_drive.gcr.ones_count == 2) // 9 ones should already mark it as a sync, even if CBM chose to use 40 of them
+		if (vc1541_drive.gcr.ones_count == 5)
+			vc1541_drive.gcr.sync = 1;
+	}
+	else
 	{
-		vc1541_drive->gcr.ones_count = 0;
-		vc1541_drive->gcr.sync = 0;
+		vc1541_drive.gcr.ones_count = 0;
+		vc1541_drive.gcr.sync = 0;
 	}
 
-	cputag_set_input_line(machine, vc1541_drive->cputag, M6502_SET_OVERFLOW, 0);
+	cputag_set_input_line(machine, vc1541_drive.cputag, M6502_SET_OVERFLOW, 0);
 	via_ca1_w(via_1, 0, 0);
 
-	vc1541_drive->clock = 0;
+	vc1541_drive.clock = 0;
 }
 
-static TIMER_CALLBACK(c1551_drive_timer)
+static TIMER_CALLBACK( c1551_drive_timer )
 {
-	if (c1551_drive->clock == 0) 
+	if (c1551_drive.clock == 0)
 	{
-		c1551_drive->gcr.ready = 0;
+		c1551_drive.gcr.ready = 0;
 		// why put sync back to 0 here?!? it would break the sync count, isn't it?
 		// or is it the way the serial port reads the sync count?!?
-		c1551_drive->gcr.sync = 0;
-	
-		c1551_drive->clock = 1;
+		c1551_drive.gcr.sync = 0;
+
+		c1551_drive.clock = 1;
 		return;
 	}
 
 	// this code has 2 effects: move on the pos on the data and reset it to 0 at the end of the track!
 	// size of the track is: (# sectors in the track) * (size of sector GCR endoded)
-	// Here, size of sector is 368 because of our choices in the loading: 9 bytes of header gap & 14 bytes of sector gap 
+	// Here, size of sector is 368 because of our choices in the loading: 9 bytes of header gap & 14 bytes of sector gap
 	// We will need to set the size at loading time when adding support for G64 images
-	if (++(c1551_drive->pos) >= (d64_sectors_per_track[(int)c1551_drive->track - 1] * 368)) 
-		c1551_drive->pos = 0;
+	if (++(c1551_drive.pos) >= (d64_sectors_per_track[(int)c1551_drive.track - 1] * 368))
+		c1551_drive.pos = 0;
 	// should we check if there is a change of track? to reset the pos in that case as well?
 
-	c1551_drive->gcr.ready = 1;
+	c1551_drive.gcr.ready = 1;
 
-	// notice that if there is a sequence of more than 40 1s it correctly does not reset the sync 
+	// notice that if there is a sequence of more than 40 1s it correctly does not reset the sync
 	// counter until a 0 is found
-	if (c1551_drive->gcr.data[c1551_drive->pos] == 0xff) 
+	if (c1551_drive.gcr.data[c1551_drive.pos] == 0xff)
 	{
-		c1551_drive->gcr.ones_count++;
+		c1551_drive.gcr.ones_count++;
 
-//		if (c1551_drive->gcr.ones_count == 2) // 9 ones should already mark it as a sync, even if CBM chose to use 40 of them
-		if (c1551_drive->gcr.ones_count == 5)
-			c1551_drive->gcr.sync = 1;
-	} 
-	else 
+//      if (c1551_drive.gcr.ones_count == 2) // 9 ones should already mark it as a sync, even if CBM chose to use 40 of them
+		if (c1551_drive.gcr.ones_count == 5)
+			c1551_drive.gcr.sync = 1;
+	}
+	else
 	{
-		c1551_drive->gcr.ones_count = 0;
-		c1551_drive->gcr.sync = 0;
+		c1551_drive.gcr.ones_count = 0;
+		c1551_drive.gcr.sync = 0;
 	}
 
-	c1551_drive->clock = 0;
+	c1551_drive.clock = 0;
 }
 
 
 /**************************************
 
-	VC1541 Serial Bus Device Interface
+    VC1541 Serial Bus Device Interface
 
 **************************************/
 
-/* 2009-05 FP - Note: I could use directly these functions as DEVICE_HANDLERs for 
-the serial bus device, but these are also used in the VIA interface above, so I 
-prefer to keep the handlers separated at this stage. Further work on the serial 
+/* 2009-05 FP - Note: I could use directly these functions as DEVICE_HANDLERs for
+the serial bus device, but these are also used in the VIA interface above, so I
+prefer to keep the handlers separated at this stage. Further work on the serial
 bus emulation should allow to remove the duplicated code. */
 
 static void vc1541_serial_reset_write( running_machine *machine, int which, int level )
@@ -754,13 +760,13 @@ static void vc1541_serial_atn_write( running_machine *machine, int which, int le
 			#endif
 				via_ca1_w (via_0, 0, !level);
 #if 0
-				value = vc1541_drive->vc1541_serial.data;
-				if (vc1541_drive->vc1541_serial.acka != !level) 
+				value = vc1541_drive.vc1541_serial.data;
+				if (vc1541_drive.vc1541_serial.acka != !level)
 					value = 0;
-				if (value != serial.data[2]) 
+				if (value != serial.data[2])
 				{
 					serial.data[2] = value;
-					if (serial.data[0] != value) 
+					if (serial.data[0] != value)
 					{
 						serial.data[0] = serial.data[1] && serial.data[2];
 					}
@@ -828,10 +834,10 @@ static void vc1541_serial_clock_write( running_machine *machine, int which, int 
 			serial.clock[0] = serial.clock[1] && serial.clock[2];
 			if (serial.clock[0] == level)
 			{
-/*				DBG_LOG(machine, 1, "vc1541",("%d:%.4x clock %s\n",
-									 cpu_getactivecpu (),
-									 activecpu_get_pc(),
-									 serial.clock[0]?"CLOCK":"clock"));*/
+/*              DBG_LOG(machine, 1, "vc1541",("%d:%.4x clock %s\n",
+                                     cpu_getactivecpu (),
+                                     activecpu_get_pc(),
+                                     serial.clock[0]?"CLOCK":"clock"));*/
 			}
 		}
 	}
@@ -847,7 +853,7 @@ static void vc1541_serial_request_write( running_machine *machine, int which, in
 }
 
 
-/* 2009-05 FP - TODO: better implementation of the DEVICE_HANDLERs below. Right now they are 
+/* 2009-05 FP - TODO: better implementation of the DEVICE_HANDLERs below. Right now they are
 redundant (see also my Note above)  */
 static READ8_DEVICE_HANDLER( emu_drive_atn_read )
 {
@@ -868,7 +874,7 @@ static READ8_DEVICE_HANDLER( emu_drive_request_read )
 {
 	return vc1541_serial_request_read(device->machine, 0);
 }
-	
+
 static WRITE8_DEVICE_HANDLER( emu_drive_atn_write )
 {
 	vc1541_serial_atn_write(device->machine, 0, data);
@@ -912,70 +918,70 @@ static const cbm_serial_bus_interface cbm_emu_drive_interface =
 
 
 /**************************************************************************
- *	VIA 6522 at 0x1800
+ *  VIA 6522 at 0x1800
  *
- *	0x1800  port B
- *		bit 0 : data in (inverted: 0 = Low, 1 = High)
- *		bit 1 : data out (inverted: 0 = Low, 1 = High)
- *		bit 2 : clock in (inverted: 0 = Low, 1 = High)
- *		bit 3 : clock out (inverted: 0 = Low, 1 = High)
- *		bit 4 : atna out (inverted: 0 = Low, 1 = High)
- *		bit 5 : device id 1
- *		bit 6 : device id 2
- *				device ID number is set by a jumper: 
- *				00 = 8 (default), 01 = 9, 10 = 10, 11 = 11
- *		bit 7 : atn in (inverted: 0 = Low, 1 = High)
- *	0x1801	port A - Read to acknowledge interrupt generated by ATN IN going high.
- *	0x1802	port B data direction register. 
- *			if a bit here is 0, then the corresponding bit of portB can only be read
- *			if a bit here is 1, then the corresponding bit of portB can be read and written
- *			default value 0x1a
- *	0x1803	port A data direction register. 
- *			default value 0xff
- *	0x1804	timer 1 counter (low)
- *	0x1805	timer 1 counter (high) / Timer one counter
- *			Read low byte or write high byte to start timer or restart timer upon underflow.
- *	0x1806	timer 1 latch (low)
- *	0x1807	timer 1 latch (high)
- *			read/write starting value of timer from/to here.
- *	0x1808	timer 2 counter (low)
- *	0x1809	timer 2 counter (high)
- *	0x180a	shift register
- *	0x180b	auxiliary control register. bit 6: 0 = Stop timer; 1 = Start timer.
- *	0x180c	peripheral control register
- *	0x180d	interrupt flag register. bit 1: 1 = ATN IN went high, bit 6: 1 = Timer underflow occurred.
- *	0x180e	interrupt enable register.
- *			bit 1: write -  1 = Enable interrupts generated by ATN IN going high
- *			bit 7: read - interrupt has been generated.
- *			bit 7: write - Fill bit: bits 0-6, that are set to 1, get their values from this bit; bits 0-6, that are set to 0, are left unchanged
+ *  0x1800  port B
+ *      bit 0 : data in (inverted: 0 = Low, 1 = High)
+ *      bit 1 : data out (inverted: 0 = Low, 1 = High)
+ *      bit 2 : clock in (inverted: 0 = Low, 1 = High)
+ *      bit 3 : clock out (inverted: 0 = Low, 1 = High)
+ *      bit 4 : atna out (inverted: 0 = Low, 1 = High)
+ *      bit 5 : device id 1
+ *      bit 6 : device id 2
+ *              device ID number is set by a jumper:
+ *              00 = 8 (default), 01 = 9, 10 = 10, 11 = 11
+ *      bit 7 : atn in (inverted: 0 = Low, 1 = High)
+ *  0x1801  port A - Read to acknowledge interrupt generated by ATN IN going high.
+ *  0x1802  port B data direction register.
+ *          if a bit here is 0, then the corresponding bit of portB can only be read
+ *          if a bit here is 1, then the corresponding bit of portB can be read and written
+ *          default value 0x1a
+ *  0x1803  port A data direction register.
+ *          default value 0xff
+ *  0x1804  timer 1 counter (low)
+ *  0x1805  timer 1 counter (high) / Timer one counter
+ *          Read low byte or write high byte to start timer or restart timer upon underflow.
+ *  0x1806  timer 1 latch (low)
+ *  0x1807  timer 1 latch (high)
+ *          read/write starting value of timer from/to here.
+ *  0x1808  timer 2 counter (low)
+ *  0x1809  timer 2 counter (high)
+ *  0x180a  shift register
+ *  0x180b  auxiliary control register. bit 6: 0 = Stop timer; 1 = Start timer.
+ *  0x180c  peripheral control register
+ *  0x180d  interrupt flag register. bit 1: 1 = ATN IN went high, bit 6: 1 = Timer underflow occurred.
+ *  0x180e  interrupt enable register.
+ *          bit 1: write -  1 = Enable interrupts generated by ATN IN going high
+ *          bit 7: read - interrupt has been generated.
+ *          bit 7: write - Fill bit: bits 0-6, that are set to 1, get their values from this bit; bits 0-6, that are set to 0, are left unchanged
  *
  * also ca1 (books says cb2)
  * irq to m6502 irq connected (or with second via irq)
  *
  **************************************************************************/
 
-static void vc1541_via0_irq(const device_config *device, int level)
+static void vc1541_via0_irq( const device_config *device, int level )
 {
-	vc1541_drive->via0irq = level;
-	DBG_LOG(device->machine, 2, "vc1541 via0 irq", ("level %d %d\n", vc1541_drive->via0irq, vc1541_drive->via1irq));
+	vc1541_drive.via0irq = level;
+	DBG_LOG(device->machine, 2, "vc1541 via0 irq", ("level %d %d\n", vc1541_drive.via0irq, vc1541_drive.via1irq));
 
-	cputag_set_input_line(device->machine, vc1541_drive->cputag, M6502_IRQ_LINE, vc1541_drive->via1irq || vc1541_drive->via0irq);
+	cputag_set_input_line(device->machine, vc1541_drive.cputag, M6502_IRQ_LINE, vc1541_drive.via1irq || vc1541_drive.via0irq);
 }
 
 static READ8_DEVICE_HANDLER( vc1541_via0_read_portb )
 {
 	int value = 0x7a;
 
-	if (!vc1541_drive->vc1541_serial.serial_data || !serial.data[0])
+	if (!vc1541_drive.vc1541_serial.serial_data || !serial.data[0])
 		value |= 0x01;
 
-	if (!vc1541_drive->vc1541_serial.serial_clock || !serial.clock[0])
+	if (!vc1541_drive.vc1541_serial.serial_clock || !serial.clock[0])
 		value |= 0x04;
 
-	if (!serial.atn[0]) 
+	if (!serial.atn[0])
 		value |= 0x80;
 
-	switch (vc1541_drive->vc1541_serial.deviceid)
+	switch (vc1541_drive.vc1541_serial.deviceid)
 	{
 		case 8:
 			value &= ~0x60;
@@ -1000,20 +1006,20 @@ static WRITE8_DEVICE_HANDLER( vc1541_via0_write_portb )
 									 data & 0x08 ? "CLOCK" : "clock",
 									 data & 0x02 ? "DATA"  : "data"));
 
-	vc1541_drive->vc1541_serial.data = data & 0x02 ? 0 : 1;
-	vc1541_drive->vc1541_serial.acka = data & 0x10 ? 1 : 0;
+	vc1541_drive.vc1541_serial.data = data & 0x02 ? 0 : 1;
+	vc1541_drive.vc1541_serial.acka = data & 0x10 ? 1 : 0;
 
-	if ((!(data & 0x02)) != vc1541_drive->vc1541_serial.serial_data)
+	if ((!(data & 0x02)) != vc1541_drive.vc1541_serial.serial_data)
 	{
-		vc1541_serial_data_write(device->machine, 1, vc1541_drive->vc1541_serial.serial_data = !(data & 0x02));
+		vc1541_serial_data_write(device->machine, 1, vc1541_drive.vc1541_serial.serial_data = !(data & 0x02));
 	}
 
-	if ((!(data & 0x08)) != vc1541_drive->vc1541_serial.serial_clock)
+	if ((!(data & 0x08)) != vc1541_drive.vc1541_serial.serial_clock)
 	{
-		vc1541_serial_clock_write(device->machine, 1, vc1541_drive->vc1541_serial.serial_clock = !(data & 0x08));
+		vc1541_serial_clock_write(device->machine, 1, vc1541_drive.vc1541_serial.serial_clock = !(data & 0x08));
 	}
 
-	vc1541_serial_atn_write(device->machine, 1, vc1541_drive->vc1541_serial.serial_atn = 1);
+	vc1541_serial_atn_write(device->machine, 1, vc1541_drive.vc1541_serial.serial_atn = 1);
 }
 
 static const via6522_interface vc1541_via0 =
@@ -1035,37 +1041,37 @@ static const via6522_interface vc1541_via0 =
 
 
 /**************************************************************************
- *	VIA 6522 at 0x1c00
+ *  VIA 6522 at 0x1c00
  *
- *	0x1c00  port B - Disk controller i/o control line
- *		bit 0 : step head motor output 1
- *		bit 1 : step head motor output 2
- *		bit 2 : motor on output (0 = Off, 1 = On) - 300 revolutions per minute
- *		bit 3 : LED control output (0 = Off, 1 = On)
- *		bit 4 : write protect sense (0 = protected, 1 = unprotected)
- *		bit 5 : density select 0
- *		bit 6 : density select 1
- *			data density (track dependend): 00 = lowest (faster time), 11 = highest (slower timer)
- *		bit 7 : sync signal (more then nine 1 bits) detect
- *	0x1c01	Port A - byte in gcr format from or to floppy
- *	0x1c02	Port B data direction register + LED output - default 0x6f
- *	0x1c03	Port A data direction register - 0x00 read from disk, 0xff write to disk
- *	0x1c04	Timer 1 counter (low)
- *	0x1c05	Timer 1 counter (high)
- *			Read low byte or write high byte to start timer or restart timer upon underflow.
- *	0x1c06	Timer 1 latch (low)
- *	0x1c07	Timer 1 latch (high)
- *			read/write starting value of timer from/to here.
- *	0x1c08	Timer 2 latch (low)
- *	0x1c09	Timer 2 latch (high)
- *	0x1c0a	Shift register
- *	0x1c0b	Auxiliary control register. bit 6: 0 = Stop timer; 1 = Start timer.
- *	0x1c0c	Peripheral control register
- *	0x1c0d	Interrupt flag register. bit 6: 1 = Timer underflow occurred.
- *	0x1c0e	Interrupt enable register
- *			bit 6: write -  1 = Enable interrupts generated by timer underflow
- *			bit 7: read - interrupt has been generated.
- *			bit 7: write - Fill bit: bits 0-6, that are set to 1, get their values from this bit; bits 0-6, that are set to 0, are left unchanged
+ *  0x1c00  port B - Disk controller i/o control line
+ *      bit 0 : step head motor output 1
+ *      bit 1 : step head motor output 2
+ *      bit 2 : motor on output (0 = Off, 1 = On) - 300 revolutions per minute
+ *      bit 3 : LED control output (0 = Off, 1 = On)
+ *      bit 4 : write protect sense (0 = protected, 1 = unprotected)
+ *      bit 5 : density select 0
+ *      bit 6 : density select 1
+ *          data density (track dependend): 00 = lowest (faster time), 11 = highest (slower timer)
+ *      bit 7 : sync signal (more then nine 1 bits) detect
+ *  0x1c01  Port A - byte in gcr format from or to floppy
+ *  0x1c02  Port B data direction register + LED output - default 0x6f
+ *  0x1c03  Port A data direction register - 0x00 read from disk, 0xff write to disk
+ *  0x1c04  Timer 1 counter (low)
+ *  0x1c05  Timer 1 counter (high)
+ *          Read low byte or write high byte to start timer or restart timer upon underflow.
+ *  0x1c06  Timer 1 latch (low)
+ *  0x1c07  Timer 1 latch (high)
+ *          read/write starting value of timer from/to here.
+ *  0x1c08  Timer 2 latch (low)
+ *  0x1c09  Timer 2 latch (high)
+ *  0x1c0a  Shift register
+ *  0x1c0b  Auxiliary control register. bit 6: 0 = Stop timer; 1 = Start timer.
+ *  0x1c0c  Peripheral control register
+ *  0x1c0d  Interrupt flag register. bit 6: 1 = Timer underflow occurred.
+ *  0x1c0e  Interrupt enable register
+ *          bit 6: write -  1 = Enable interrupts generated by timer underflow
+ *          bit 7: read - interrupt has been generated.
+ *          bit 7: write - Fill bit: bits 0-6, that are set to 1, get their values from this bit; bits 0-6, that are set to 0, are left unchanged
  *
  * ca1 byte ready input (also m6502 set overflow input)
  * ca2 set overflow enable for 6502
@@ -1076,19 +1082,19 @@ static const via6522_interface vc1541_via0 =
  **************************************************************************/
 
 
-static void vc1541_via1_irq (const device_config *device, int level)
+static void vc1541_via1_irq( const device_config *device, int level )
 {
-	vc1541_drive->via1irq = level;
-	DBG_LOG(device->machine, 2, "vc1541 via1 irq", ("level %d %d\n", vc1541_drive->via0irq, vc1541_drive->via1irq));
+	vc1541_drive.via1irq = level;
+	DBG_LOG(device->machine, 2, "vc1541 via1 irq", ("level %d %d\n", vc1541_drive.via0irq, vc1541_drive.via1irq));
 
-	cputag_set_input_line(device->machine, vc1541_drive->cputag, M6502_IRQ_LINE, vc1541_drive->via1irq || vc1541_drive->via0irq);
+	cputag_set_input_line(device->machine, vc1541_drive.cputag, M6502_IRQ_LINE, vc1541_drive.via1irq || vc1541_drive.via0irq);
 }
 
 static READ8_DEVICE_HANDLER( vc1541_via1_read_porta )
 {
-	UINT8 data = vc1541_drive->gcr.data[vc1541_drive->start_pos + vc1541_drive->pos];
+	UINT8 data = vc1541_drive.gcr.data[vc1541_drive.start_pos + vc1541_drive.pos];
 
-//	logerror("Data read: Track %.1f Pos %d\n", vc1541_drive->track, vc1541_drive->pos);
+//  logerror("Data read: Track %.1f Pos %d\n", vc1541_drive.track, vc1541_drive.pos);
 
 	DBG_LOG(device->machine, 2, "vc1541 drive", ("port a read %.2x\n", data));
 	return data;
@@ -1108,7 +1114,7 @@ static  READ8_DEVICE_HANDLER( vc1541_via1_read_portb )
 		value &= ~0x10;
 #endif
 
-	if (vc1541_drive->gcr.sync) 
+	if (vc1541_drive.gcr.sync)
 	{
 		value &= ~0x80;
 	}
@@ -1120,89 +1126,89 @@ static int old = 0;
 
 static WRITE8_DEVICE_HANDLER( vc1541_via1_write_portb )
 {
-	if (data != old) 
+	if (data != old)
 	{
 		DBG_LOG(device->machine, 1, "vc1541 drive",("%.2x\n", data));
 
-	/*	decrease value (%00-%11-%10-%01-%00...) to move head downwards; */
-	/*	increase value (%00-%01-%10-%11-%00...) to move head upwards.	*/
-		if ((old & 0x03) != (data & 0x03)) 
+	/*  decrease value (%00-%11-%10-%01-%00...) to move head downwards; */
+	/*  increase value (%00-%01-%10-%11-%00...) to move head upwards.   */
+		if ((old & 0x03) != (data & 0x03))
 		{
-			switch (old & 0x03) 
+			switch (old & 0x03)
 			{
 			case 0:
-				if ((data & 0x03) == 1) 
-					vc1541_drive->track += 0.5;
-				else if ((data & 0x03) == 3) 
-					vc1541_drive->track -= 0.5;
+				if ((data & 0x03) == 1)
+					vc1541_drive.track += 0.5;
+				else if ((data & 0x03) == 3)
+					vc1541_drive.track -= 0.5;
 				break;
 
 			case 1:
-				if ((data & 0x03) == 2) 
-					vc1541_drive->track += 0.5;
-				else if ((data & 0x03) == 0) 
-					vc1541_drive->track -= 0.5;
+				if ((data & 0x03) == 2)
+					vc1541_drive.track += 0.5;
+				else if ((data & 0x03) == 0)
+					vc1541_drive.track -= 0.5;
 				break;
 
 			case 2:
-				if ((data & 0x03) == 3) 
-					vc1541_drive->track += 0.5;
-				else if ((data & 0x03) == 1) 
-					vc1541_drive->track -= 0.5;
+				if ((data & 0x03) == 3)
+					vc1541_drive.track += 0.5;
+				else if ((data & 0x03) == 1)
+					vc1541_drive.track -= 0.5;
 				break;
 
 			case 3:
-				if ((data & 0x03) == 0) 
-					vc1541_drive->track += 0.5;
-				else if ((data & 0x03) == 2) 
-					vc1541_drive->track -= 0.5;
+				if ((data & 0x03) == 0)
+					vc1541_drive.track += 0.5;
+				else if ((data & 0x03) == 2)
+					vc1541_drive.track -= 0.5;
 				break;
 			}
 
 			/* If we have reached the first or last track, we cannot proceed further! */
-			if (vc1541_drive->track < 1) 
-				vc1541_drive->track = 1.0;
-			if (vc1541_drive->track > 35) 
-				vc1541_drive->track = 35.0;
+			if (vc1541_drive.track < 1)
+				vc1541_drive.track = 1.0;
+			if (vc1541_drive.track > 35)
+				vc1541_drive.track = 35.0;
 
-			logerror("Track #: %.1f\n", vc1541_drive->track);
+			logerror("Track #: %.1f\n", vc1541_drive.track);
 
-			/* We now adjust the vc1541_drive->pos according to the new track */
+			/* We now adjust the vc1541_drive.pos according to the new track */
 			/* This seems a simple way to deal with half tracks */
-			vc1541_drive->pos = 0;
-			vc1541_drive->start_pos = gcr_offset[(int)vc1541_drive->track - 1]				// starting point of Track #
-				+ (int)(2 * (vc1541_drive->track - (int)vc1541_drive->track)) * 184 / 2;	// half track if needed (again, 184 comes from out loading choices)
+			vc1541_drive.pos = 0;
+			vc1541_drive.start_pos = gcr_offset[(int)vc1541_drive.track - 1]				// starting point of Track #
+				+ (int)(2 * (vc1541_drive.track - (int)vc1541_drive.track)) * 184 / 2;	// half track if needed (again, 184 comes from out loading choices)
 		}
 
-		if ((vc1541_drive->motor != (data & 0x04)) || (vc1541_drive->frequency != (data & 0x60)))
+		if ((vc1541_drive.motor != (data & 0x04)) || (vc1541_drive.frequency != (data & 0x60)))
 		{
 			double tme;
-			vc1541_drive->motor = data & 0x04;
-			vc1541_drive->frequency = data & 0x60;
-			tme = drive_times[vc1541_drive->frequency >> 5];
+			vc1541_drive.motor = data & 0x04;
+			vc1541_drive.frequency = data & 0x60;
+			tme = drive_times[vc1541_drive.frequency >> 5];
 
-			if (vc1541_drive->motor)
+			if (vc1541_drive.motor)
 			{
-				if (attotime_to_double(timer_timeelapsed(vc1541_drive->timer)) > 1.0e29)
+				if (attotime_to_double(timer_timeelapsed(vc1541_drive.timer)) > 1.0e29)
 				{
-					timer_reset(vc1541_drive->timer, attotime_never);
+					timer_reset(vc1541_drive.timer, attotime_never);
 				}
 				else
 				{
-					timer_adjust_periodic(vc1541_drive->timer, attotime_zero, 0, ATTOTIME_IN_HZ(tme));
+					timer_adjust_periodic(vc1541_drive.timer, attotime_zero, 0, ATTOTIME_IN_HZ(tme));
 					logerror("Freq changed: %f\n", tme);
 				}
 			}
 			else
 			{
-				timer_reset(vc1541_drive->timer, attotime_never);
+				timer_reset(vc1541_drive.timer, attotime_never);
 				logerror("Motor turned off\n");
 			}
 		}
 		old = data;
 	}
 
-	vc1541_drive->led = data & 0x08;
+	vc1541_drive.led = data & 0x08;
 }
 
 static const via6522_interface vc1541_via1 =
@@ -1225,8 +1231,8 @@ static const via6522_interface vc1541_via1 =
 
 /**************************************
 
-	1541 / 1541B / 1541C / 1541II /
-		2031 (same as 1541 but IEEE)
+    1541 / 1541B / 1541C / 1541II /
+        2031 (same as 1541 but IEEE)
 
 **************************************/
 
@@ -1248,7 +1254,7 @@ ADDRESS_MAP_END
 
 /**************************************
 
-	1570 / 1571 / 1571CR
+    1570 / 1571 / 1571CR
 
 **************************************/
 
@@ -1256,8 +1262,8 @@ static ADDRESS_MAP_START( _1571_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x1800, 0x180f) AM_DEVREADWRITE("_1541_via_0", via_r, via_w)  /* 0 and 1 used in vc20 */
 	AM_RANGE(0x1c00, 0x1c0f) AM_DEVREADWRITE("_1541_via_1", via_r, via_w)
-//	AM_RANGE(0x2000, 0x2003) // WD17xx
-//	AM_RANGE(0x4000, 0x400f) // CIA
+//  AM_RANGE(0x2000, 0x2003) // WD17xx
+//  AM_RANGE(0x4000, 0x400f) // CIA
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -1265,65 +1271,65 @@ ADDRESS_MAP_END
 /*
 David Gahris provided info about differences between 128DCR and stand-alone 1571s
 
-* There is no 6526 or 8521 in the drive section of the 128DCR.  I believe the 
-  5710 handles fast serial because the 5710 is a Commodore custom chip and 
+* There is no 6526 or 8521 in the drive section of the 128DCR.  I believe the
+  5710 handles fast serial because the 5710 is a Commodore custom chip and
   128 fast serial is a Commodore custom protocol.  [Ed's note: Commodore lists
   NTE229, ECG229, SK3246A/229, and 121-Z9021 as substitutes of the 5710.]
 
-* There is no 177x or heat-shrink-wrapped daughterboard in the drive section 
-  of the 128DCR.  I believe the Motorola plastic quad flat-pack chip handles 
-  MFM because I am pretty sure that I have seen this chip in IBM PC drive 
-  mechanisms.  
+* There is no 177x or heat-shrink-wrapped daughterboard in the drive section
+  of the 128DCR.  I believe the Motorola plastic quad flat-pack chip handles
+  MFM because I am pretty sure that I have seen this chip in IBM PC drive
+  mechanisms.
 
-* The 1571cr ROM works great in 1541 mode but not at all in 1571 mode in a 
-  standalone 1571.  
+* The 1571cr ROM works great in 1541 mode but not at all in 1571 mode in a
+  standalone 1571.
 
-* Olaf Seibert informed me that the 1571cr ROM contains a string to the 
+* Olaf Seibert informed me that the 1571cr ROM contains a string to the
   effect of "5710 (c) 1986 by c. hauck"
 */
 static ADDRESS_MAP_START( _1571cr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x1800, 0x180f) AM_DEVREADWRITE("_1541_via_0", via_r, via_w)  /* 0 and 1 used in vc20 */
 	AM_RANGE(0x1c00, 0x1c0f) AM_DEVREADWRITE("_1541_via_1", via_r, via_w)
-//	AM_RANGE(0x2000, 0x2005) // 5710 FDC
-//	AM_RANGE(0x400c, 0x400f) // 5710 CIA Serial Port
-//	AM_RANGE(0x4010, 0x4017) // 5710 FDC2
-//	AM_RANGE(0x6000, 0x7fff) // RAM shadows
+//  AM_RANGE(0x2000, 0x2005) // 5710 FDC
+//  AM_RANGE(0x400c, 0x400f) // 5710 CIA Serial Port
+//  AM_RANGE(0x4010, 0x4017) // 5710 FDC2
+//  AM_RANGE(0x6000, 0x7fff) // RAM shadows
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
 /**************************************
 
-	1581
+    1581
 
 **************************************/
 
 static ADDRESS_MAP_START( _1581_map, ADDRESS_SPACE_PROGRAM, 8 )
-//	AM_RANGE(0x4000, 0x400f) // CIA
-//	AM_RANGE(0x6000, 0x6003) // WD17xx
+//  AM_RANGE(0x4000, 0x400f) // CIA
+//  AM_RANGE(0x6000, 0x6003) // WD17xx
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
 /**************************************
 
-	1001 / 8050 / 8250
+    1001 / 8050 / 8250
 
 http://www.zimmers.net/anonftp/pub/cbm/firmware/drives/old/8050/d/8250.notes
 
 **************************************/
 
 static ADDRESS_MAP_START( sfd1001_map, ADDRESS_SPACE_PROGRAM, 8 )
-//	AM_RANGE(0x0200, 0x021f) // RIOT1
-//	AM_RANGE(0x0280, 0x029f) // RIOT2
+//  AM_RANGE(0x0200, 0x021f) // RIOT1
+//  AM_RANGE(0x0280, 0x029f) // RIOT2
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
 /**************************************
 
-	2040 / 3040 / 4040 
+    2040 / 3040 / 4040
 
 http://www.zimmers.net/anonftp/pub/cbm/schematics/drives/old/4040/memorymap.txt
 
@@ -1335,7 +1341,7 @@ ADDRESS_MAP_END
 
 /**************************************
 
-	1551
+    1551
 
 **************************************/
 
@@ -1345,7 +1351,7 @@ ADDRESS_MAP_END
  */
 static TIMER_CALLBACK(c1551_irq_timer)
 {
-	cputag_set_input_line(machine, c1551_drive->cputag, M6502_IRQ_LINE, ASSERT_LINE);
+	cputag_set_input_line(machine, c1551_drive.cputag, M6502_IRQ_LINE, ASSERT_LINE);
 }
 
 /*
@@ -1360,89 +1366,89 @@ static TIMER_CALLBACK(c1551_irq_timer)
 
 static WRITE8_HANDLER( c1551_port_w )
 {
-	if (offset) 
+	if (offset)
 	{
 		DBG_LOG(space->machine, 1, "c1551 port",("write %.2x\n", data));
-		c1551_drive->cpu_port = data;
+		c1551_drive.cpu_port = data;
 
-		if (data != old) 
+		if (data != old)
 		{
 			DBG_LOG(space->machine, 1, "c1551 drive",("%.2x\n", data));
-		
-			if ((old & 0x03) != (data & 0x03)) 
+
+			if ((old & 0x03) != (data & 0x03))
 			{
-				switch (old & 0x03) 
+				switch (old & 0x03)
 				{
 				case 0:
-					if ((data & 0x03) == 1) 
-						c1551_drive->track += 0.5;
-					else if ((data & 0x03) == 3) 
-						c1551_drive->track -= 0.5;
+					if ((data & 0x03) == 1)
+						c1551_drive.track += 0.5;
+					else if ((data & 0x03) == 3)
+						c1551_drive.track -= 0.5;
 					break;
 
 				case 1:
-					if ((data & 0x03) == 2) 
-						c1551_drive->track += 0.5;
-					else if ((data & 0x03) == 0) 
-						c1551_drive->track -= 0.5;
+					if ((data & 0x03) == 2)
+						c1551_drive.track += 0.5;
+					else if ((data & 0x03) == 0)
+						c1551_drive.track -= 0.5;
 					break;
 
 				case 2:
-					if ((data & 0x03) == 3) 
-						c1551_drive->track += 0.5;
-					else if ((data & 0x03) == 1) 
-						c1551_drive->track -= 0.5;
+					if ((data & 0x03) == 3)
+						c1551_drive.track += 0.5;
+					else if ((data & 0x03) == 1)
+						c1551_drive.track -= 0.5;
 					break;
 
 				case 3:
-					if ((data & 0x03) == 0) 
-						c1551_drive->track += 0.5;
-					else if ((data & 0x03) == 2) 
-						c1551_drive->track -= 0.5;
+					if ((data & 0x03) == 0)
+						c1551_drive.track += 0.5;
+					else if ((data & 0x03) == 2)
+						c1551_drive.track -= 0.5;
 					break;
 				}
 
 				/* If we have reached the first or last track, we cannot proceed further! */
-				if (c1551_drive->track < 1) 
-					c1551_drive->track = 1.0;
-				if (c1551_drive->track > 35) 
-					c1551_drive->track = 35.0;
+				if (c1551_drive.track < 1)
+					c1551_drive.track = 1.0;
+				if (c1551_drive.track > 35)
+					c1551_drive.track = 35.0;
 
-			logerror("Track #: %.1f\n", c1551_drive->track);
+			logerror("Track #: %.1f\n", c1551_drive.track);
 
-			/* We now adjust the c1551_drive->pos according to the new track */
+			/* We now adjust the c1551_drive.pos according to the new track */
 			/* This seems a simple way to deal with half tracks */
-			c1551_drive->pos = 0;
-			c1551_drive->start_pos = gcr_offset[(int)c1551_drive->track - 1]				// starting point of Track #
-				+ (int)(2 * (c1551_drive->track - (int)c1551_drive->track)) * 184 / 2;	// half track if needed (again, 184 comes from out loading choices)
+			c1551_drive.pos = 0;
+			c1551_drive.start_pos = gcr_offset[(int)c1551_drive.track - 1]				// starting point of Track #
+				+ (int)(2 * (c1551_drive.track - (int)c1551_drive.track)) * 184 / 2;	// half track if needed (again, 184 comes from out loading choices)
 			}
 
-			if ((c1551_drive->motor != (data & 0x04)) || (c1551_drive->frequency != (data & 0x60))) 
+			if ((c1551_drive.motor != (data & 0x04)) || (c1551_drive.frequency != (data & 0x60)))
 			{
 				double tme;
-				c1551_drive->motor = data & 0x04;
-				c1551_drive->frequency = data & 0x60;
+				c1551_drive.motor = data & 0x04;
+				c1551_drive.frequency = data & 0x60;
 
-				tme = drive_times[c1551_drive->frequency >> 5];
-				if (c1551_drive->motor)
+				tme = drive_times[c1551_drive.frequency >> 5];
+				if (c1551_drive.motor)
 				{
-					if (attotime_to_double(timer_timeelapsed(c1551_drive->timer)) > 1.0e29)
-						timer_reset(c1551_drive->timer, attotime_never);
+					if (attotime_to_double(timer_timeelapsed(c1551_drive.timer)) > 1.0e29)
+						timer_reset(c1551_drive.timer, attotime_never);
 					else
-						timer_adjust_periodic(c1551_drive->timer, attotime_zero, 0, ATTOTIME_IN_HZ(tme));
+						timer_adjust_periodic(c1551_drive.timer, attotime_zero, 0, ATTOTIME_IN_HZ(tme));
 				}
 				else
 				{
-					timer_reset(c1551_drive->timer, attotime_never);
+					timer_reset(c1551_drive.timer, attotime_never);
 				}
 			}
 			old = data;
 		}
-		c1551_drive->led = data & 0x08;
-	} 
-	else 
+		c1551_drive.led = data & 0x08;
+	}
+	else
 	{
-		c1551_drive->cpu_ddr = data;
+		c1551_drive.cpu_ddr = data;
 		DBG_LOG(space->machine, 1, "c1551 ddr", ("write %.2x\n", data));
 	}
 }
@@ -1451,26 +1457,26 @@ static READ8_HANDLER( c1551_port_r )
 {
 	int data;
 
-	if (offset) 
+	if (offset)
 	{
 		data = 0x7f;
 #if 0
 		if (WRITEPROTECTED)
 			data &= ~0x10;
 #endif
-		if (c1551_drive->gcr.ready) 
+		if (c1551_drive.gcr.ready)
 		{
 			data |= 0x80;
-			c1551_drive->gcr.ready = 0;
+			c1551_drive.gcr.ready = 0;
 		}
 
-		data &= ~c1551_drive->cpu_ddr;
-		data |= c1551_drive->cpu_ddr & c1551_drive->cpu_port;
+		data &= ~c1551_drive.cpu_ddr;
+		data |= c1551_drive.cpu_ddr & c1551_drive.cpu_port;
 		DBG_LOG(space->machine, 3, "c1551 port",("read %.2x\n", data));
-	} 
-	else 
+	}
+	else
 	{
-		data = c1551_drive->cpu_ddr;
+		data = c1551_drive.cpu_ddr;
 		DBG_LOG(space->machine, 3, "c1551 ddr",("read %.2x\n", data));
 	}
 	return data;
@@ -1478,9 +1484,9 @@ static READ8_HANDLER( c1551_port_r )
 
 
 static ADDRESS_MAP_START( _1551_map, ADDRESS_SPACE_PROGRAM, 8 )
-    AM_RANGE(0x0000, 0x0001) AM_READWRITE(c1551_port_r, c1551_port_w)
+	AM_RANGE(0x0000, 0x0001) AM_READWRITE(c1551_port_r, c1551_port_w)
 	AM_RANGE(0x0002, 0x07ff) AM_RAM
-    AM_RANGE(0x4000, 0x4007) AM_DEVREADWRITE("c1551_tpi", tpi6525_r, tpi6525_w)
+	AM_RANGE(0x4000, 0x4007) AM_DEVREADWRITE("c1551_tpi", tpi6525_r, tpi6525_w)
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -1495,21 +1501,21 @@ ADDRESS_MAP_END
     drive data in/out
    port c ddr (0x1f)
     0 output status out
-	1 output status out
-	2 output
-	3 output handshake out
-	4 output
-	5 input drive number 9
-	6 input sync 0 active
-	7 input handshake in
+    1 output status out
+    2 output
+    3 output handshake out
+    4 output
+    5 input drive number 9
+    6 input sync 0 active
+    7 input handshake in
  */
 static READ8_DEVICE_HANDLER( c1551_port_c_r )
 {
 	int data = 0xff;
-	
+
 	data &= ~0x20;
 
-	if (c1551_drive->gcr.sync) 
+	if (c1551_drive.gcr.sync)
 		data &= ~0x40;
 
 	return data;
@@ -1517,7 +1523,7 @@ static READ8_DEVICE_HANDLER( c1551_port_c_r )
 
 static READ8_DEVICE_HANDLER( c1551_port_b_r )
 {
-	UINT8 data = c1551_drive->gcr.data[c1551_drive->start_pos + c1551_drive->pos];
+	UINT8 data = c1551_drive.gcr.data[c1551_drive.start_pos + c1551_drive.pos];
 
 	DBG_LOG(device->machine, 2, "c1551 drive",("port a read %.2x\n", data));
 	return data;
@@ -1541,7 +1547,7 @@ static const tpi6525_interface c1551_tpi_intf =
 
 WRITE8_DEVICE_HANDLER( c1551x_write_data )
 {
-//	DBG_LOG(device->machine, 1, "c1551 cpu", ("%d write data %.2x\n", cpu_getactivecpu (), data));
+//  DBG_LOG(device->machine, 1, "c1551 cpu", ("%d write data %.2x\n", cpu_getactivecpu (), data));
 #ifdef CPU_SYNC
 	cpu_sync();
 #endif
@@ -1560,14 +1566,14 @@ READ8_DEVICE_HANDLER( c1551x_read_data )
 #endif
 
 	data = tpi6525_porta_r(tpi_0, 0);
-//	DBG_LOG(device->machine, 2, "c1551 cpu",("%d read data %.2x\n", cpu_getactivecpu (), data));
+//  DBG_LOG(device->machine, 2, "c1551 cpu",("%d read data %.2x\n", cpu_getactivecpu (), data));
 	return data;
 }
 
 WRITE8_DEVICE_HANDLER( c1551x_write_handshake )
 {
 	const device_config *tpi_0 = devtag_get_device(device->machine, "c1551_tpi");
-//	DBG_LOG(device->machine, 1, "c1551 cpu",("%d write handshake %.2x\n", cpu_getactivecpu (), data));
+//  DBG_LOG(device->machine, 1, "c1551 cpu",("%d write handshake %.2x\n", cpu_getactivecpu (), data));
 #ifdef CPU_SYNC
 	cpu_sync();
 #endif
@@ -1584,7 +1590,7 @@ READ8_DEVICE_HANDLER( c1551x_read_handshake )
 #endif
 
 	data = tpi6525_portc_r(tpi_0, 0) & 0x08 ? 0x80 : 0x00;
-//	DBG_LOG(device->machine, 2, "c1551 cpu",("%d read handshake %.2x\n", cpu_getactivecpu (), data));
+//  DBG_LOG(device->machine, 2, "c1551 cpu",("%d read handshake %.2x\n", cpu_getactivecpu (), data));
 	return data;
 }
 
@@ -1597,7 +1603,7 @@ READ8_DEVICE_HANDLER( c1551x_read_status )
 #endif
 
 	data = tpi6525_portc_r(tpi_0, 0) & 0x03;
-//	DBG_LOG(device->machine, 1, "c1551 cpu",("%d read status %.2x\n", cpu_getactivecpu (), data));
+//  DBG_LOG(device->machine, 1, "c1551 cpu",("%d read status %.2x\n", cpu_getactivecpu (), data));
 
 	return data;
 }
@@ -1606,7 +1612,7 @@ READ8_DEVICE_HANDLER( c1551x_read_status )
 
 /**************************************
 
-	Machine drivers
+    Machine drivers
 
 **************************************/
 
@@ -1673,35 +1679,37 @@ MACHINE_DRIVER_END
 
 /**************************************
 
-	Drive init & reset
+    Drive init & reset
 
 **************************************/
 
-void drive_config( running_machine *machine, int type, int id, int mode, const char *cputag, int devicenr )
+void cbm_drive_config( running_machine *machine, int type, int id, int mode, const char *cputag, int devicenr )
 {
-	vc1541_drive->type = type;
-	vc1541_drive->cputag = cputag;
-	vc1541_drive->vc1541_serial.deviceid = devicenr;
-	vc1541_drive->timer = timer_alloc(machine, vc1541_drive_timer, NULL);
+	vc1541_drive.type = type;
+	vc1541_drive.cputag = cputag;
+	vc1541_drive.vc1541_serial.deviceid = devicenr;
+	vc1541_drive.timer = timer_alloc(machine, vc1541_drive_timer, NULL);
+	vc1541_drive.gcr.data = (UINT8*)auto_alloc_array(machine, UINT8, 0x500000);
 }
 
 void c1551_config( running_machine *machine, const char *cputag )
 {
-	c1551_drive->type = type_1551;
-	c1551_drive->cputag = cputag;
-	c1551_drive->timer = timer_alloc(machine, c1551_drive_timer, NULL);
+	c1551_drive.type = type_1551;
+	c1551_drive.cputag = cputag;
+	c1551_drive.timer = timer_alloc(machine, c1551_drive_timer, NULL);
+	c1551_drive.gcr.data = (UINT8*)auto_alloc_array(machine, UINT8, 0x500000);
 
 	/* time should be small enough to allow quitting of the irq
-	line before the next interrupt is triggered */
-	c1551_drive->irq_timer = timer_alloc(machine, c1551_irq_timer, NULL);
-	timer_adjust_periodic(c1551_drive->irq_timer, attotime_zero, 0, ATTOTIME_IN_HZ(60));
+    line before the next interrupt is triggered */
+	c1551_drive.irq_timer = timer_alloc(machine, c1551_irq_timer, NULL);
+	timer_adjust_periodic(c1551_drive.irq_timer, attotime_zero, 0, ATTOTIME_IN_HZ(60));
 }
 
-void drive_reset (void)
+void cbm_drive_reset( running_machine* machine )
 {
 	int i;
 
-	if (vc1541_drive->type == type_1541) 
+	if (vc1541_drive.type == type_1541)
 	{
 		for (i = 0; i < sizeof (serial.atn) / sizeof (serial.atn[0]); i++)
 		{
@@ -1710,7 +1718,7 @@ void drive_reset (void)
 	}
 
 	/* Create offset map for GCR encoded images: it speeds up finding position where to read data from */
-	switch (vc1541_drive->type)
+	switch (vc1541_drive.type)
 	{
 		case type_1541:
 		case type_1541ii:
@@ -1731,24 +1739,45 @@ void drive_reset (void)
 			logerror("GCR offset map not created\n");
 	}
 
-	vc1541_drive->track = 1.0;
-	vc1541_drive->start_pos = 0;
-	vc1541_drive->pos = 0;
+	vc1541_drive.gcr.sync = 0;
+	vc1541_drive.gcr.ones_count = 0;
+	vc1541_drive.gcr.ready = 0;
+
+	vc1541_drive.track = 1.0;
+	vc1541_drive.start_pos = 0;
+	vc1541_drive.pos = 0;
+	vc1541_drive.led = 0;
+	vc1541_drive.motor = 0;
+	vc1541_drive.frequency = 0;
+	vc1541_drive.clock = 0;
+
+	vc1541_drive.vc1541_serial.acka = 0;
+	vc1541_drive.vc1541_serial.data = 0;
+
 }
 
-void c1551_drive_reset (void)
+void c1551_drive_reset( void )
 {
 	offset_init(format_d64_40t, gcr_offset, 368);	// offset map is the same for both 35 and 40 track discs
-	c1551_drive->track = 1.0;
-	c1551_drive->start_pos = 0;
-	c1551_drive->pos = 0;
+
+	c1551_drive.gcr.sync = 0;
+	c1551_drive.gcr.ones_count = 0;
+	c1551_drive.gcr.ready = 0;
+
+	c1551_drive.track = 1.0;
+	c1551_drive.start_pos = 0;
+	c1551_drive.pos = 0;
+	c1551_drive.led = 0;
+	c1551_drive.motor = 0;
+	c1551_drive.frequency = 0;
+	c1551_drive.clock = 0;
 }
 
 
 
 /**************************************
 
-	Device configurations
+    Device configurations
 
 **************************************/
 
@@ -1762,12 +1791,12 @@ static void cbm_floppy_image_loading( int format, int id1, int id2, UINT8 *copy,
 
 	for (k = 1; k <= max_tracks_per_format[format]; k++)
 	{
-/*		logerror("decoding track %d offset %d %d %d %d %d\n", k,
-						image_tracksector2offset(k, 0) / (16*16*16*16), 
-						(image_tracksector2offset(k, 0) % (16*16*16*16)) / (16*16*16), 
-						(image_tracksector2offset(k, 0) % (16*16*16)) / (16*16), 
-						(image_tracksector2offset(k, 0) % (16*16)) / 16, 
-						image_tracksector2offset(k, 0) % 16); 
+/*      logerror("decoding track %d offset %d %d %d %d %d\n", k,
+                        image_tracksector2offset(k, 0) / (16*16*16*16),
+                        (image_tracksector2offset(k, 0) % (16*16*16*16)) / (16*16*16),
+                        (image_tracksector2offset(k, 0) % (16*16*16)) / (16*16),
+                        (image_tracksector2offset(k, 0) % (16*16)) / 16,
+                        image_tracksector2offset(k, 0) % 16);
 */
 
 		for (l = 0; l < d64_sectors_per_track[k - 1]; l++)
@@ -1780,26 +1809,26 @@ static void cbm_floppy_image_loading( int format, int id1, int id2, UINT8 *copy,
 			pos = image_tracksector2offset(k, l);
 
 			/*
-				1. Header sync       FF FF FF FF FF (40 'on' bits, not GCR encoded)
-				2. Header info       52 54 B5 29 4B 7A 5E 95 55 55 (10 GCR bytes)
-				3. Header gap        55 55 55 55 55 55 55 55 55 (9 bytes, never read)
-				4. Data sync         FF FF FF FF FF (40 'on' bits, not GCR encoded)
-				5. Data block        55...4A (325 GCR bytes)
-				6. Inter-sector gap  55 55 55 55...55 55 (4 to 19 bytes, never read)
-			*/
+                1. Header sync       FF FF FF FF FF (40 'on' bits, not GCR encoded)
+                2. Header info       52 54 B5 29 4B 7A 5E 95 55 55 (10 GCR bytes)
+                3. Header gap        55 55 55 55 55 55 55 55 55 (9 bytes, never read)
+                4. Data sync         FF FF FF FF FF (40 'on' bits, not GCR encoded)
+                5. Data block        55...4A (325 GCR bytes)
+                6. Inter-sector gap  55 55 55 55...55 55 (4 to 19 bytes, never read)
+            */
 
 			/* Header sync */
 			for (j = 0; j < 5; j++)
-				gcr.data[i + j] = 0xff;
+				filling_byte(0xff, gcr.data + i + j);
 			i += 5;
 
 			/* Header info */
 			/* These are 8 bytes unencoded, which become 10 bytes encoded */
-			// $00 - header block ID ($08)						// this byte can be modified by error code 20 -> 0xff
-			// $01 - header block checksum (EOR of $02-$05)		// this byte can be modified by error code 27 -> ^ 0xff
+			// $00 - header block ID ($08)                      // this byte can be modified by error code 20 -> 0xff
+			// $01 - header block checksum (EOR of $02-$05)     // this byte can be modified by error code 27 -> ^ 0xff
 			// $02 - Sector# of data block
 			// $03 - Track# of data block
-			gcr_double_2_gcr(0x08, l ^ k ^ id2 ^ id1, l, k, gcr.data + i); 	
+			gcr_double_2_gcr(0x08, l ^ k ^ id2 ^ id1, l, k, gcr.data + i);
 			i += 5;
 
 			// $04 - Format ID byte #2
@@ -1811,12 +1840,12 @@ static void cbm_floppy_image_loading( int format, int id1, int id2, UINT8 *copy,
 
 			/* Header gap */
 			for (j = 0; j < 9; j++)
-				gcr.data[i + j] = 0x55;
+				filling_byte(0x55, gcr.data + i + j);
 			i += 9;
 
 			/* Data sync */
 			for (j = 0; j < 5; j++)
-				gcr.data[i + j] = 0xff;
+				filling_byte(0xff, gcr.data + i + j);
 			i += 5;
 
 			/* Data block */
@@ -1826,22 +1855,22 @@ static void cbm_floppy_image_loading( int format, int id1, int id2, UINT8 *copy,
 				sector_checksum ^= copy[pos + j];
 
 			/*
-				$00      - data block ID ($07)
-				$01-100  - 256 bytes sector data
-				$101     - data block checksum (EOR of $01-100)
-				$102-103 - $00 ("off" bytes, to make the sector size a multiple of 5) 
-			*/
-			gcr_double_2_gcr(0x07, copy[pos], copy[pos + 1], 
+                $00      - data block ID ($07)
+                $01-100  - 256 bytes sector data
+                $101     - data block checksum (EOR of $01-100)
+                $102-103 - $00 ("off" bytes, to make the sector size a multiple of 5)
+            */
+			gcr_double_2_gcr(0x07, copy[pos], copy[pos + 1],
 								copy[pos + 2], gcr.data + i);
 			i += 5;
 
 			for (j = 1; j < 64; j++)
 			{
-				gcr_double_2_gcr(copy[pos + 4 * j - 1], copy[pos + 4 * j], 
+				gcr_double_2_gcr(copy[pos + 4 * j - 1], copy[pos + 4 * j],
 									copy[pos + 4 * j + 1], copy[pos + 4 * j + 2], gcr.data + i);
 				i += 5;
 			}
-	
+
 			gcr_double_2_gcr(copy[pos + 255], sector_checksum, 0x00, 0x00, gcr.data + i);
 			i += 5;
 
@@ -1849,7 +1878,7 @@ static void cbm_floppy_image_loading( int format, int id1, int id2, UINT8 *copy,
 			// "In tests that the author conducted on a real 1541 disk, gap sizes of 8  to  19 bytes were seen."
 			// Here we put 14 as an average...
 			for (j = 0; j < 14; j++)
-				gcr.data[i + j] = 0x55;
+				filling_byte(0x55, gcr.data + i + j);
 			i += 14;
 		}
 	}
@@ -1884,7 +1913,7 @@ static DEVICE_IMAGE_LOAD( _1541 )
 				format = format_d64_40t_err;
 				break;
 			default:
-				logerror("The image you're trying to load has not the regular size of a .d64 image: \n"); 
+				logerror("The image you're trying to load has not the regular size of a .d64 image: \n");
 				logerror("Image %s size %d\n", image_filename(image), filesize);
 				return INIT_FAIL;
 		}
@@ -1901,7 +1930,7 @@ static DEVICE_IMAGE_LOAD( _1541 )
 				format = format_d71_err;
 				break;
 			default:
-				logerror("The image you're trying to load has not the regular size of a .d71 image: \n"); 
+				logerror("The image you're trying to load has not the regular size of a .d71 image: \n");
 				logerror("Image %s size %d\n", image_filename(image), filesize);
 				return INIT_FAIL;
 		}
@@ -1920,7 +1949,7 @@ static DEVICE_IMAGE_LOAD( _1541 )
 		logerror("Unsupported format\n");
 		return INIT_FAIL;
 	}
-	
+
 	/* Set up track / sector map according to the format of the image */
 	offset_init(format, image_offset, 256);
 
@@ -1934,8 +1963,8 @@ static DEVICE_IMAGE_LOAD( _1541 )
 	format_id_1 = temp_copy[disk_id1(format)];	// can be modified by error code 29 -> ^ 0xff
 	format_id_2 = temp_copy[disk_id2(format)];
 
-	/* Disk is encoded and stored in xxx_drive->gcr.data */
-	cbm_floppy_image_loading( format, format_id_1, format_id_2, temp_copy, vc1541_drive->gcr );
+	/* Disk is encoded and stored in xxx_drive.gcr.data */
+	cbm_floppy_image_loading( format, format_id_1, format_id_2, temp_copy, vc1541_drive.gcr );
 
 	logerror("Floppy image %s successfully loaded\n", image_filename(image));
 	return INIT_PASS;
@@ -1969,7 +1998,7 @@ static DEVICE_IMAGE_LOAD( _1551 )
 				format = format_d64_40t_err;
 				break;
 			default:
-				logerror("The image you're trying to load has not the regular size of a .d64 image: \n"); 
+				logerror("The image you're trying to load has not the regular size of a .d64 image: \n");
 				logerror("Image %s size %d\n", image_filename(image), filesize);
 				return INIT_FAIL;
 		}
@@ -1979,7 +2008,7 @@ static DEVICE_IMAGE_LOAD( _1551 )
 		logerror("Unsupported format\n");
 		return INIT_FAIL;
 	}
-	
+
 	/* Set up track / sector map according to the format of the image */
 	offset_init(format, image_offset, 256);
 
@@ -1993,8 +2022,8 @@ static DEVICE_IMAGE_LOAD( _1551 )
 	format_id_1 = temp_copy[disk_id1(format)];	// can be modified by error code 29 -> ^ 0xff
 	format_id_2 = temp_copy[disk_id2(format)];
 
-	/* Disk is encoded and stored in xxx_drive->gcr.data */
-	cbm_floppy_image_loading( format, format_id_1, format_id_2, temp_copy, c1551_drive->gcr );
+	/* Disk is encoded and stored in xxx_drive.gcr.data */
+	cbm_floppy_image_loading( format, format_id_1, format_id_2, temp_copy, c1551_drive.gcr );
 
 	logerror("Floppy image %s successfully loaded\n", image_filename(image));
 	return INIT_PASS;
@@ -2019,7 +2048,7 @@ void vc1541_device_getinfo(const mess_device_class *devclass, UINT32 state, unio
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case MESS_DEVINFO_PTR_LOAD:					info->load = DEVICE_IMAGE_LOAD_NAME(_1541); break;
 		case MESS_DEVINFO_PTR_UNLOAD:				info->unload = DEVICE_IMAGE_UNLOAD_NAME(_1541); break;
-		case MESS_DEVINFO_PTR_DEV_SPECIFIC:			info->f = (genf *) drive_config; break;
+		case MESS_DEVINFO_PTR_DEV_SPECIFIC:			info->f = (genf *) cbm_drive_config; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case MESS_DEVINFO_STR_FILE_EXTENSIONS:		strcpy(info->s = device_temp_str(), "d64"); break;
@@ -2039,6 +2068,7 @@ void c1551_device_getinfo(const mess_device_class *devclass, UINT32 state, union
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case MESS_DEVINFO_PTR_LOAD:					info->load = DEVICE_IMAGE_LOAD_NAME(_1551); break;
+		case MESS_DEVINFO_PTR_DEV_SPECIFIC:				info->f = (genf *) c1551_config; break;
 
 		default:									vc1541_device_getinfo(devclass, state, info);
 	}

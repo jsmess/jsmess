@@ -352,14 +352,12 @@ Video part
    and reads the rasterline value!
    so i no exact column value reachable!
 */
-#include <math.h>
-#include <stdio.h>
 #include "driver.h"
 #include "utils.h"
 
 #include "includes/c16.h"
 
-#include "ted7360.h"
+#include "video/ted7360.h"
 
 
 #define VERBOSE_LEVEL 0
@@ -487,16 +485,14 @@ const unsigned char ted7360_palette[] =
 	0xd1, 0xff, 0xff, 0xeb, 0xff, 0xff, 0xff, 0xf8, 0xff, 0xed, 0xff, 0xbc
 };
 
-UINT8 ted7360[0x20] =
-{0};
-
+UINT8 ted7360[0x20];
 int ted7360_pal;
 int ted7360_rom;
 
 static int lines;
 static int timer1_active, timer2_active, timer3_active;
 static emu_timer *timer1, *timer2, *timer3;
-static int cursor1 = FALSE;
+static int cursor1;
 static read8_space_func vic_dma_read;
 static read8_space_func vic_dma_read_rom;
 static int chargenaddr, bitmapaddr, videoaddr;
@@ -530,7 +526,7 @@ static gfx_element *cursorelement;
 
 static TIMER_CALLBACK(ted7360_timer_timeout);
 
-void ted7360_init (running_machine *machine, int pal)
+void ted7360_init( running_machine *machine, int pal )
 {
 	ted7360_pal = pal;
 	lines = TED7360_LINES;
@@ -957,6 +953,7 @@ VIDEO_START( ted7360 )
 	/* cursorelement->colortable = cursorcolortable; */
 	cursorcolortable[1] = 1;
 	cursorelement->total_colors = 2;
+	cursor1 = FALSE;
 	ted7360_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
 }
 

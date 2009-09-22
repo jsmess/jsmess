@@ -44,9 +44,9 @@ enum {
 };
 
 
-void drive_config(running_machine *machine, int type, int id, int mode, const char *cputag, int devicenr);
+void cbm_drive_config(running_machine *machine, int type, int id, int mode, const char *cputag, int devicenr);
 void c1551_config(running_machine *machine, const char *cputag);
-void drive_reset(void);
+void cbm_drive_reset(running_machine *machine);
 void c1551_drive_reset(void);
 
 void vc1541_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);
