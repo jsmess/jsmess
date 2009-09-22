@@ -519,6 +519,7 @@ static imgtoolerr_t write_bitmap_block(imgtool_image *img, int block, const bitm
 }
 
 
+#ifdef UNUSED_FUNCTION
 /* Read a bitmap extended block */
 static imgtoolerr_t read_bitmap_ext_block(imgtool_image *img, int block, bitmap_ext_block *bm)
 {
@@ -535,6 +536,7 @@ static imgtoolerr_t read_bitmap_ext_block(imgtool_image *img, int block, bitmap_
 
 	return IMGTOOLERR_SUCCESS;
 }
+#endif
 
 
 /* Read the root block */
@@ -1373,6 +1375,7 @@ static int get_first_bit(UINT32 *array, int size)
 }
 
 
+#ifdef UNUSED_FUNCTION
 static imgtoolerr_t walk_bitmap_ext_blocks(imgtool_image *img, int start, int *block)
 {
 	imgtoolerr_t ret;
@@ -1405,6 +1408,7 @@ static imgtoolerr_t walk_bitmap_ext_blocks(imgtool_image *img, int start, int *b
 	/* else continue walking the list */
 	return walk_bitmap_ext_blocks(img, bm_ext.next, block);
 }
+#endif
 
 
 /* Searches for a block marked as free
