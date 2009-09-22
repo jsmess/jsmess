@@ -165,7 +165,7 @@ FFFF
 #include "devices/cartslot.h"
 #include "devices/cassette.h"
 #include "sound/sn76496.h"
-
+#include "machine/ctronics.h"
 
 /* mapper state */
 static char cartridge_enable;
@@ -224,12 +224,6 @@ static INTERRUPT_GEN( tutor_vblank_interrupt )
 	/* No vblank interrupt? */
 	TMS9928A_interrupt(device->machine);
 }
-
-static const device_config *printer_fp(running_machine *machine)
-{
-	return image_from_devtype_and_index(machine, IO_PARALLEL, 0);
-}
-
 
 /*
     Keyboard:
@@ -410,15 +404,15 @@ static WRITE8_HANDLER(tutor_cassette_w)
 }
 
 /* memory handlers */
-static  READ8_HANDLER(tutor_printer_r)
+static  READ8_DEVICE_HANDLER(tutor_printer_r)
 {
 	int reply;
 
 	switch (offset)
 	{
 	case 0x20:
-		/* busy */
-		reply = printer_fp(space->machine) ? 0xff : 0x00;
+		/* busy */		
+		reply = centronics_busy_r(device) ? 0x00 : 0xff;
 		break;
 
 	default:
@@ -431,24 +425,18 @@ static  READ8_HANDLER(tutor_printer_r)
 	return reply;
 }
 
-static WRITE8_HANDLER(tutor_printer_w)
-{
+static WRITE8_DEVICE_HANDLER(tutor_printer_w)
+{	
 	switch (offset)
 	{
 	case 0x10:
 		/* data */
-		printer_data = data;
+		centronics_data_w(device, 0, data);
 		break;
 
 	case 0x40:
 		/* strobe */
-		if (data && ! printer_strobe)
-		{
-			/* strobe is asserted: output data */
-			if (printer_fp(space->machine))
-				image_fwrite(printer_fp(space->machine), & printer_data, 1);
-		}
-		printer_strobe = data != 0;
+		centronics_strobe_w(device, BIT(data, 7));
 		break;
 
 	default:
@@ -511,7 +499,7 @@ static ADDRESS_MAP_START(tutor_memmap, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xe002, 0xe002) AM_READWRITE(TMS9928A_register_r, TMS9928A_register_w)/*VDP status*/
 	AM_RANGE(0xe100, 0xe1ff) AM_READWRITE(tutor_mapper_r, tutor_mapper_w)	/*cartridge mapper*/
 	AM_RANGE(0xe200, 0xe200) AM_DEVWRITE("sn76489a", sn76496_w)	/*sound chip*/
-	AM_RANGE(0xe800, 0xe8ff) AM_READWRITE(tutor_printer_r, tutor_printer_w)	/*printer*/
+	AM_RANGE(0xe800, 0xe8ff) AM_DEVREADWRITE("printer",tutor_printer_r, tutor_printer_w)	/*printer*/
 	AM_RANGE(0xee00, 0xeeff) AM_READWRITE(SMH_NOP, tutor_cassette_w)		/*cassette interface*/
 
 	AM_RANGE(0xf000, 0xffff) AM_NOP	/*free for expansion (and internal processor RAM)*/
@@ -689,6 +677,8 @@ static MACHINE_DRIVER_START(tutor)
 	MDRV_CARTSLOT_NOT_MANDATORY
 	MDRV_CARTSLOT_LOAD(tutor_cart)
 	MDRV_CARTSLOT_UNLOAD(tutor_cart)
+		
+	MDRV_CENTRONICS_ADD("printer", standard_centronics)
 MACHINE_DRIVER_END
 
 
@@ -702,27 +692,5 @@ ROM_START(tutor)
 	ROM_LOAD("tutor2.bin", 0x8000, 0x4000, CRC(05f228f5) SHA1(46a14a45f6f9e2c30663a2b87ce60c42768a78d0))      /* BASIC ROM */
 ROM_END
 
-static void tutor_parallel_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* parallel */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_TYPE:							info->i = IO_PARALLEL; break;
-		case MESS_DEVINFO_INT_READABLE:						info->i = 0; break;
-		case MESS_DEVINFO_INT_WRITEABLE:						info->i = 1; break;
-		case MESS_DEVINFO_INT_CREATABLE:						info->i = 1; break;
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), ""); break;
-	}
-}
-
-static SYSTEM_CONFIG_START(tutor)
-	/* cartridge port is not emulated */
-	CONFIG_DEVICE(tutor_parallel_getinfo)
-SYSTEM_CONFIG_END
-
 /*      YEAR    NAME    PARENT      COMPAT  MACHINE     INPUT   INIT    CONFIG      COMPANY     FULLNAME */
-COMP(	1983?,	tutor,	0,			0,		tutor,		tutor,	tutor,	tutor,		"Tomy",		"Tomy Tutor" , 0)
+COMP(	1983?,	tutor,	0,			0,		tutor,		tutor,	tutor,	0,		"Tomy",		"Tomy Tutor" , 0)
