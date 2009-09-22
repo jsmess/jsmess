@@ -188,6 +188,7 @@ static int cmd_dir(const struct command *c, int argc, char *argv[])
 	imgtool_directory *imgenum = NULL;
 	imgtool_dirent ent;
 	char buf[512];
+	char last_modified[19];
 	const char *path;
 	int partition_index = 0;
 
@@ -208,15 +209,16 @@ static int cmd_dir(const struct command *c, int argc, char *argv[])
 		goto done;
 
 	memset(&ent, 0, sizeof(ent));
+	last_modified[0] = '\0';
 	total_count = 0;
 	total_size = 0;
 
-	fprintf(stdout, "Contents of %s:\n", argv[1]);
+	fprintf(stdout, "Contents of %s:%s\n", argv[1], path ? path : "");
 
 	imgtool_image_info(image, buf, sizeof(buf));
 	if (buf[0])
 		fprintf(stdout, "%s\n", buf);
-	fprintf(stdout, "------------------------  ------ ---------------\n");
+	fprintf(stdout, "------------------------------  --------  ---------------  ------------------\n");
 
 	while (((err = imgtool_directory_get_next(imgenum, &ent)) == 0) && !ent.eof)
 	{
@@ -225,9 +227,25 @@ static int cmd_dir(const struct command *c, int argc, char *argv[])
 		else
 			snprintf(buf, sizeof(buf), "%u", (unsigned int) ent.filesize);
 
-		fprintf(stdout, "%-20s\t%8s %15s\n", ent.filename, buf, ent.attr);
+		if (ent.lastmodified_time != 0)
+			strftime(last_modified, sizeof(last_modified), "%d-%b-%y %H:%M:%S",
+				localtime(&ent.lastmodified_time));
+
+		if (ent.hardlink)
+			strcat(ent.filename, " <hl>");
+
+		fprintf(stdout, "%-30s  %8s  %15s  %18s\n", ent.filename, buf, ent.attr, last_modified);
+
+		if (ent.softlink && ent.softlink[0] != '\0')
+			fprintf(stdout, "-> %s\n", ent.softlink);
+
+		if (ent.comment && ent.comment[0] != '\0')
+			fprintf(stdout, ": %s\n", ent.comment);
+
 		total_count++;
 		total_size += ent.filesize;
+
+		memset(&ent, 0, sizeof(ent));
 	}
 
 	freespace_err = imgtool_partition_get_free_space(partition, &freespace);

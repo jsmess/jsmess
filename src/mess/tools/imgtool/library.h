@@ -63,11 +63,16 @@ typedef struct
 
 	time_t creation_time;
 	time_t lastmodified_time;
+	time_t lastaccess_time;
+
+	char softlink[1024];
+	char comment[256];
 
 	/* flags */
 	unsigned int eof : 1;
 	unsigned int corrupt : 1;
 	unsigned int directory : 1;
+	unsigned int hardlink : 1;
 } imgtool_dirent;
 
 typedef struct
