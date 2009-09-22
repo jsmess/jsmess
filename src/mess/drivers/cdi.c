@@ -172,38 +172,7 @@ static VIDEO_START(cdi)
 
 static VIDEO_UPDATE(cdi)
 {
-	//int x,y;
-	//UINT32 count;
-
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine)); //TODO
-
-	//if(!(SCC_DE_VREG)) //display enable
-	//	return 0;
-
-	/*
-	count = ((SCC_VSR_VREG)/2);
-
-	for(y=0;y<300;y++)
-	{
-		for(x=0;x<168;x++)
-		{
-			UINT32 color;
-
-			color = ((ram[count]) & 0x00ff)>>0;
-
-			if((x*2)<video_screen_get_visible_area(screen)->max_x && ((y)+0)<video_screen_get_visible_area(screen)->max_y)
-				*BITMAP_ADDR32(bitmap, y, (x*2)+1) = screen->machine->pens[color];
-
-			color = ((ram[count]) & 0xff00)>>8;
-
-			if(((x*2)+1)<video_screen_get_visible_area(screen)->max_x && ((y)+0)<video_screen_get_visible_area(screen)->max_y)
-				*BITMAP_ADDR32(bitmap, y, (x*2)+0) = screen->machine->pens[color];
-
-			count++;
-		}
-	}
-	*/
-
 	return 0;
 }
 
@@ -732,6 +701,10 @@ static WRITE16_HANDLER( scc68070_periphs_w )
 			if(ACCESSING_BITS_0_7)
 			{
 				verboselog(space->machine, 2, "scc68070_periphs_w: UART Transmit Holding Register: %04x & %04x\n", data, mem_mask);
+				if(data >= 0x20 && data < 0x7f)
+				{
+					printf( "%c", data & 0x00ff );
+				}
 				scc68070_regs.uart.transmit_holding_register = data & 0x00ff;
 			}
 			break;
@@ -929,11 +902,24 @@ static WRITE16_HANDLER( scc68070_periphs_w )
 }
 
 static ADDRESS_MAP_START( cdi_mem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_BASE(&ram)
+	AM_RANGE(0x00000000, 0x000fffff) AM_RAM AM_SHARE(1) AM_BASE(&ram)
+	AM_RANGE(0x00100000, 0x001fffff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x00200000, 0x002fffff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x00300000, 0x003fffff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0x00400000, 0x0047ffff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x00480000, 0x004ffbff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x004fffe0, 0x004fffff) AM_READWRITE(mcd212_r, mcd212_w)
-	AM_RANGE(0x00500000, 0x00ffffff) AM_RAM // Wrong... need to find documentation on CDi's RAM mirroring...
+	AM_RANGE(0x00500000, 0x005fffff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x00600000, 0x006fffff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x00700000, 0x007fffff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x00800000, 0x008fffff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x00900000, 0x009fffff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x00a00000, 0x00afffff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x00b00000, 0x00bfffff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x00c00000, 0x00cfffff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x00d00000, 0x00dfffff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x00e00000, 0x00efffff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x00f00000, 0x00ffffff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0x80000000, 0x8000807f) AM_READWRITE(scc68070_periphs_r, scc68070_periphs_w)
 ADDRESS_MAP_END
 
@@ -958,25 +944,24 @@ static MACHINE_RESET( cdi )
 *    Machine Drivers     *
 *************************/
 
-/*Probably there's a mask somewhere if it REALLY uses irqs at all...irq vectors dynamically changes after some time.*/
-static INTERRUPT_GEN( cdi_irq )
-{
+//static INTERRUPT_GEN( cdi_irq )
+//{
 //  if(input_code_pressed(KEYCODE_Z))
 //      cpu_set_input_line(device->machine->firstcpu, 1, HOLD_LINE);
 //  ram[0x2004/2]^=0xffff;
-}
+//}
 
 static MACHINE_DRIVER_START( cdi )
 	MDRV_CPU_ADD("maincpu", SCC68070, CLOCK_A/2)	/* SCC-68070 CCA84 datasheet */
 	MDRV_CPU_PROGRAM_MAP(cdi_mem)
- 	MDRV_CPU_VBLANK_INT("screen", cdi_irq) /* no interrupts? (it erases the vectors..) */
+ 	//MDRV_CPU_VBLANK_INT("screen", cdi_irq) /* no interrupts? (it erases the vectors..) */
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(400, 300)
-	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-1) //dynamic resolution,TODO
+	MDRV_SCREEN_SIZE(768, 560)
+	MDRV_SCREEN_VISIBLE_AREA(0, 760-1, 0, 560-1) //dynamic resolution,TODO
 
 	MDRV_PALETTE_LENGTH(0x100)
 
@@ -985,9 +970,9 @@ static MACHINE_DRIVER_START( cdi )
 
 	MDRV_MACHINE_RESET(cdi)
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("ym", YM2413, CLOCK_A/12)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	//MDRV_SPEAKER_STANDARD_MONO("mono")
+	//MDRV_SOUND_ADD("ym", YM2413, CLOCK_A/12)
+	//MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_CDROM_ADD( "cdrom" )
 MACHINE_DRIVER_END
@@ -1015,5 +1000,5 @@ ROM_END
 *      Game driver(s)    *
 *************************/
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT   INIT    CONFIG  COMPANY    FULLNAME   FLAGS */
-CONS( 1991, cdi,        0,      0,      cdi,        0,      0,      0,      "Philips", "CD-I",    GAME_NO_SOUND | GAME_NOT_WORKING )
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT   INIT    CONFIG  COMPANY     FULLNAME   FLAGS */
+CONS( 1991, cdi,        0,      0,      cdi,        0,      0,      0,      "Philips",  "CD-i",   GAME_NO_SOUND | GAME_NOT_WORKING )
