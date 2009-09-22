@@ -84,7 +84,7 @@ static void mc1000_bankswitch(running_machine *machine)
 static READ8_HANDLER( printer_r )
 {
 	mc1000_state *state = space->machine->driver_data;
-	
+
 	return centronics_busy_r(state->centronics);
 }
 
@@ -148,7 +148,7 @@ static ADDRESS_MAP_START( mc1000_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x05, 0x05) AM_DEVWRITE(CENTRONICS_TAG, centronics_data_w)
 //	AM_RANGE(0x10, 0x10) AM_DEVWRITE(MC6845_TAG, mc6845_address_w)
 //	AM_RANGE(0x11, 0x11) AM_DEVREADWRITE(MC6845_TAG, mc6845_register_r, mc6845_register_w)
-	AM_RANGE(0x12, 0x12) AM_WRITE(mc6845_ctrl_w)	
+	AM_RANGE(0x12, 0x12) AM_WRITE(mc6845_ctrl_w)
 	AM_RANGE(0x20, 0x20) AM_DEVWRITE(AY8910_TAG, ay8910_address_w)
 	AM_RANGE(0x40, 0x40) AM_DEVREAD(AY8910_TAG, ay8910_r)
 	AM_RANGE(0x60, 0x60) AM_DEVWRITE(AY8910_TAG, ay8910_data_w)
@@ -271,15 +271,17 @@ static ATTR_CONST UINT8 mc1000_get_attributes(running_machine *machine, UINT8 c,
 	return data;
 }
 
+#if 0
 static UINT8 mc1000_get_char_rom(running_machine *machine, UINT8 ch,int line)
 {
    return ch;
 }
+#endif
 
 static const UINT8 *mc1000_get_video_ram(running_machine *machine, int scanline)
 {
 	mc1000_state *state = machine->driver_data;
-	
+
 	UINT16 addr = 0;
 
 	if (BIT(state->mc6847_attr, 7))
@@ -312,7 +314,7 @@ static VIDEO_START( mc1000 )
 	cfg.field_sync_callback = mc1000_vsync;
 	cfg.get_attributes = mc1000_get_attributes;
 	cfg.get_video_ram = mc1000_get_video_ram;
-	cfg.get_char_rom = mc1000_get_char_rom;
+//	cfg.get_char_rom = mc1000_get_char_rom;
 
 	m6847_init(machine, &cfg);
 }

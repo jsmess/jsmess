@@ -1199,7 +1199,7 @@ static void text_mode(running_machine *machine, int scanline, UINT32 *RESTRICT l
 
 		bg_color = color(m6847->colordata[attr_index][byte / 16][0]);
 		fg_color = color(m6847->colordata[attr_index][byte / 16][1]);
-		
+
 		if( (!m6847->has_lowercase) && (attr & M6847_INTEXT) && !(attr & M6847_AS)) {
 			if (m6847->get_char_rom) {
 				char_data = m6847->get_char_rom(machine,byte,scanline % 12);
@@ -1207,7 +1207,10 @@ static void text_mode(running_machine *machine, int scanline, UINT32 *RESTRICT l
 				char_data = 0xff;
 			}
 		} else {
-			char_data = m6847->fontdata[attr_index][byte][scanline % 12];
+			if (m6847->get_char_rom)
+				char_data = m6847->get_char_rom(machine,byte,scanline % 12);
+			else
+				char_data = m6847->fontdata[attr_index][byte][scanline % 12];
 		}
 
 		line[x*8+0] = (char_data & 0x80) ? fg_color : bg_color;
@@ -1760,7 +1763,7 @@ static const UINT8 *find_char(const m6847_variant *v,
 
 			if (attr & M6847_GM1)
 				attr ^= M6847_INV;
-			
+
 		}
 
 		if (attr & M6847_INV)
