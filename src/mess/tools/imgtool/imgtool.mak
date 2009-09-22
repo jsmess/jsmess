@@ -64,6 +64,7 @@ IMGTOOL_LIB_OBJS =						\
 	$(IMGTOOLOBJ)/imgterrs.o			\
 	$(IMGTOOLOBJ)/imghd.o				\
 	$(IMGTOOLOBJ)/charconv.o			\
+	$(IMGTOOL_MODULES)/amiga.o			\
 	$(IMGTOOL_MODULES)/macbin.o			\
 	$(IMGTOOL_MODULES)/rsdos.o			\
 	$(IMGTOOL_MODULES)/os9.o			\

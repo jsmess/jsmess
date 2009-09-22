@@ -87,6 +87,7 @@ error:
 
 #else /* MODULES_RECURSIVE */
 
+MODULE(amiga_floppy)
 MODULE(concept)
 MODULE(mac_mfs)
 MODULE(mac_hfs)
