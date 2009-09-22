@@ -38,6 +38,13 @@ typedef enum
 	WD17XX_DRQ_SET
 } wd17xx_state_t;
 
+typedef enum
+{
+	DEN_FM_LO = 0,
+	DEN_FM_HI,
+	DEN_MFM_LO,
+	DEN_MFM_HI
+} DENSITY;
 
 typedef void (*wd17xx_callback_func)(const device_config *device, wd17xx_state_t state, void *param);
 #define WD17XX_CALLBACK(name)	void name(const device_config *device, wd17xx_state_t state, void *param )

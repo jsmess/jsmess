@@ -845,7 +845,7 @@ static const floppy_config cpc6128_floppy_config =
 
 static const floppy_config aleste_floppy_config =
 {
-	FLOPPY_DRIVE_SS_40,
+	FLOPPY_DRIVE_DS_80,
 	FLOPPY_OPTIONS_NAME(msx),
 	DO_NOT_KEEP_GEOMETRY
 };

@@ -733,8 +733,6 @@ static TIMER_CALLBACK(setup_beep)
 static MACHINE_START( pcw )
 {
 	fdc_interrupt_code = 2;
-	floppy_drive_set_geometry(floppy_get_device(machine, 0), FLOPPY_DRIVE_DS_80);
-	floppy_drive_set_geometry(floppy_get_device(machine, 1), FLOPPY_DRIVE_DS_80);
 }
 
 static MACHINE_RESET( pcw )

@@ -390,18 +390,13 @@ Z80BIN_EXECUTE( exidy )
 	}
 }
 
-MACHINE_START( exidyd )
+MACHINE_START( exidy )
 {
 //	serial_timer = timer_alloc(machine, exidy_serial_timer_callback, NULL);
 	cassette_timer = timer_alloc(machine, exidy_cassette_tc, NULL);
 }
 
-MACHINE_START( exidy )
-{
-	MACHINE_START_CALL( exidyd );
-}
-
-MACHINE_RESET( exidyd )
+MACHINE_RESET( exidy )
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
@@ -417,10 +412,4 @@ MACHINE_RESET( exidyd )
 
 	timer_set(machine, ATTOTIME_IN_USEC(10), NULL, 0, exidy_reset);
 	memory_set_bank(machine, 1, 1);
-}
-
-MACHINE_RESET( exidy )
-{
-	floppy_drive_set_geometry(floppy_get_device(machine, 0), FLOPPY_DRIVE_DS_80);
-	MACHINE_RESET_CALL( exidyd );
 }

@@ -866,7 +866,40 @@ static TIMER_CALLBACK(wd17xx_misc_timer_callback)
 	timer_reset(w->timer, attotime_never);
 }
 
+int wd17xx_get_datarate_in_us(DENSITY density)
+{
+	int usecs;
+	/* 64 for single density */
+	switch (density)
+	{
+		case DEN_FM_LO:
+		{
+			usecs = 128;
+		}
+		break;
 
+		case DEN_FM_HI:
+		{
+			usecs = 64;
+		}
+		break;
+
+		default:
+		case DEN_MFM_LO:
+		{
+			usecs = 32;
+		}
+		break;
+
+		case DEN_MFM_HI:
+		{
+			usecs = 16;
+		}
+		break;
+	}
+
+	return usecs;
+}
 
 /* called on error, or when command is actually completed */
 /* KT - I have used a timer for systems that use interrupt driven transfers.
@@ -890,7 +923,7 @@ static void wd17xx_complete_command(const device_config *device, int delay)
 	/* Robbbert - adjusted delay value (see notes above) to fix the osborne1 */
 	w->status &= ~STA_2_BUSY;
 
-	usecs = floppy_drive_get_datarate_in_us(w->density);
+	usecs = wd17xx_get_datarate_in_us(w->density);
 	usecs *= delay;
 #endif
 
@@ -1083,7 +1116,7 @@ static void wd17xx_timed_data_request(const device_config *device)
 	int usecs;
 	wd17xx_t *w = get_safe_token(device);
 
-	usecs = floppy_drive_get_datarate_in_us(w->density);
+	usecs = wd17xx_get_datarate_in_us(w->density);
 
 	/* set new timer */
 	timer_adjust_oneshot(w->timer, ATTOTIME_IN_USEC(usecs), MISCCALLBACK_DATA);

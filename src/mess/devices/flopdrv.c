@@ -214,6 +214,34 @@ const struct io_procs mess_ioprocs =
 	image_fsize_thunk
 };
 
+void floppy_drive_set_geometry_absolute(const device_config *img, int tracks, int sides)
+{
+	floppy_drive *pDrive = get_safe_token( img );
+	pDrive->max_track = tracks;
+	pDrive->num_sides = sides;
+}
+
+void floppy_drive_set_geometry(const device_config *img, floppy_type type)
+{
+	int max_track, num_sides;
+
+	switch (type) {
+	case FLOPPY_DRIVE_SS_40:	/* single sided, 40 track drive e.g. Amstrad CPC internal 3" drive */
+		max_track = 42;
+		num_sides = 1;
+		break;
+
+	case FLOPPY_DRIVE_DS_80:
+		max_track = 83;
+		num_sides = 2;
+		break;
+
+	default:
+		assert(0);
+		return;
+	}
+	floppy_drive_set_geometry_absolute(img, max_track, num_sides);
+}
 
 static TIMER_CALLBACK(floppy_drive_index_callback);
 
@@ -229,8 +257,7 @@ void floppy_drive_init(const device_config *img)
 	pDrive->index_timer = timer_alloc(img->machine, floppy_drive_index_callback, (void *) img);
 	pDrive->index = 0;
 
-	/* all drives are double-sided 80 track - can be overriden in driver! */
-	floppy_drive_set_geometry(img, FLOPPY_DRIVE_DS_80);
+	floppy_drive_set_geometry(img, ((floppy_config*)img->static_config)->floppy_type);
 
 	/* initialise id index - not so important */
 	pDrive->id_index = 0;
@@ -460,28 +487,6 @@ int	floppy_drive_get_flag_state(const device_config *img, int flag)
 }
 
 
-void floppy_drive_set_geometry(const device_config *img, floppy_type type)
-{
-	int max_track, num_sides;
-
-	switch (type) {
-	case FLOPPY_DRIVE_SS_40:	/* single sided, 40 track drive e.g. Amstrad CPC internal 3" drive */
-		max_track = 42;
-		num_sides = 1;
-		break;
-
-	case FLOPPY_DRIVE_DS_80:
-		max_track = 83;
-		num_sides = 2;
-		break;
-
-	default:
-		assert(0);
-		return;
-	}
-	floppy_drive_set_geometry_absolute(img, max_track, num_sides);
-}
-
 void floppy_drive_seek(const device_config *img, signed int signed_tracks)
 {
 	floppy_drive *pDrive;
@@ -623,41 +628,6 @@ void floppy_drive_write_sector_data(const device_config *img, int side, int inde
 	}
 }
 
-int floppy_drive_get_datarate_in_us(DENSITY density)
-{
-	int usecs;
-	/* 64 for single density */
-	switch (density)
-	{
-		case DEN_FM_LO:
-		{
-			usecs = 128;
-		}
-		break;
-
-		case DEN_FM_HI:
-		{
-			usecs = 64;
-		}
-		break;
-
-		default:
-		case DEN_MFM_LO:
-		{
-			usecs = 32;
-		}
-		break;
-
-		case DEN_MFM_HI:
-		{
-			usecs = 16;
-		}
-		break;
-	}
-
-	return usecs;
-}
-
 void floppy_install_load_proc(const device_config *image, void (*proc)(const device_config *image))
 {
 	floppy_drive *flopimg = get_safe_token( image );
@@ -688,13 +658,6 @@ void floppy_drive_set_ready_state_change_callback(const device_config *img, void
 {
 	floppy_drive *pDrive = get_safe_token( img );
 	pDrive->ready_state_change_callback = callback;
-}
-
-void floppy_drive_set_geometry_absolute(const device_config *img, int tracks, int sides)
-{
-	floppy_drive *pDrive = get_safe_token( img );
-	pDrive->max_track = tracks;
-	pDrive->num_sides = sides;
 }
 
 int	floppy_drive_get_current_track(const device_config *img)

@@ -175,8 +175,6 @@ static const struct nec765_interface sord_fd5_nec765_interface=
 
 static MACHINE_RESET( sord_m5_fd5 )
 {
-	floppy_drive_set_geometry(floppy_get_device(machine,0), FLOPPY_DRIVE_SS_40);
-	floppy_drive_set_geometry(floppy_get_device(machine,1), FLOPPY_DRIVE_SS_40);
 	MACHINE_RESET_CALL(sord_m5);
 	ppi8255_set_port_c(devtag_get_device(machine, "ppi8255"), 0x50);
 }
@@ -571,7 +569,7 @@ FLOPPY_OPTIONS_END
 
 static const floppy_config sordm5_floppy_config =
 {
-	FLOPPY_DRIVE_DS_80,
+	FLOPPY_DRIVE_SS_40,
 	FLOPPY_OPTIONS_NAME(sordm5),
 	DO_NOT_KEEP_GEOMETRY
 };

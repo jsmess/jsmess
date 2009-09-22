@@ -19,9 +19,7 @@ WRITE8_HANDLER(exidy_fc_w);
 WRITE8_HANDLER(exidy_fd_w);
 WRITE8_HANDLER(exidy_fe_w);
 WRITE8_HANDLER(exidy_ff_w);
-MACHINE_START( exidyd );
 MACHINE_START( exidy );
-MACHINE_RESET( exidyd );
 MACHINE_RESET( exidy );
 Z80BIN_EXECUTE( exidy );
 

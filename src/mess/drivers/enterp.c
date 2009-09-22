@@ -176,7 +176,6 @@ static MACHINE_RESET( enterprise )
 	const device_config *fdc = devtag_get_device(machine, "wd1770");
 	cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), 0, 0xff);
 
-	floppy_drive_set_geometry(floppy_get_device(machine, 0), FLOPPY_DRIVE_DS_80);
 	wd17xx_set_density(fdc, DEN_FM_HI);
 }
 

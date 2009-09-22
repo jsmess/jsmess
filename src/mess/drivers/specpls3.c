@@ -351,9 +351,6 @@ static MACHINE_RESET( spectrum_plus3 )
 {
 	memset(mess_ram,0,128*1024);
 	
-	floppy_drive_set_geometry(floppy_get_device(machine, 0), FLOPPY_DRIVE_SS_40);
-	floppy_drive_set_geometry(floppy_get_device(machine, 1), FLOPPY_DRIVE_SS_40);
-
 	/* Initial configuration */
 	spectrum_128_port_7ffd_data = 0;
 	spectrum_plus3_port_1ffd_data = 0;
@@ -364,7 +361,7 @@ static MACHINE_RESET( spectrum_plus3 )
 
 static const floppy_config specpls3_floppy_config =
 {
-	FLOPPY_DRIVE_DS_80,
+	FLOPPY_DRIVE_SS_40,
 	FLOPPY_OPTIONS_NAME(default),
 	DO_NOT_KEEP_GEOMETRY
 };

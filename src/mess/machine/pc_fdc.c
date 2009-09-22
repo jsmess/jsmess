@@ -112,9 +112,6 @@ static void pc_fdc_reset(running_machine *machine)
 
 void pc_fdc_init(running_machine *machine, const struct pc_fdc_interface *iface)
 {
-	int i;
-	const device_config *img;
-
 	/* initialize fdc structure */
 	fdc = auto_alloc_clear(machine, struct pc_fdc);
 
@@ -122,20 +119,9 @@ void pc_fdc_init(running_machine *machine, const struct pc_fdc_interface *iface)
 	if (iface)
 		memcpy(&fdc->fdc_interface, iface, sizeof(fdc->fdc_interface));
 
-	/* setup nec765 interface */
-	//nec765_init(machine, &pc_fdc_nec765_interface, iface->nec765_type, iface->nec765_rdy_pin);
-
 	fdc->watchdog = timer_alloc(machine,  watchdog_timeout, NULL );
 
 	pc_fdc_reset(machine);
-
-	for (i = 0; i < 4; i++)
-	{
-		img = floppy_get_device(machine, i);
-		if (img) {
-			floppy_drive_set_geometry(img, FLOPPY_DRIVE_DS_80);
-		}
-	}
 }
 
 

@@ -3261,12 +3261,6 @@ static void amstrad_common_init(running_machine *machine)
 	else
 		cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), 0, 0x00);
 
-	if(amstrad_system_type != SYSTEM_GX4000)
-	{
-		floppy_drive_set_geometry(floppy_get_device(machine, 0),  FLOPPY_DRIVE_SS_40);
-		floppy_drive_set_geometry(floppy_get_device(machine, 1),  FLOPPY_DRIVE_SS_40);
-	}
-
 	/* The opcode timing in the Amstrad is different to the opcode
     timing in the core for the Z80 CPU.
 
@@ -3438,9 +3432,6 @@ MACHINE_RESET( aleste )
 	Amstrad_ROM_Table[7] = &rom[0x018000];  // AMSDOS
 	amstrad_common_init(machine);
 	amstrad_reset_machine(machine);
-
-	floppy_drive_set_geometry(floppy_get_device(machine, 0),  FLOPPY_DRIVE_DS_80);
-	floppy_drive_set_geometry(floppy_get_device(machine, 1),  FLOPPY_DRIVE_DS_80);
 }
 
 

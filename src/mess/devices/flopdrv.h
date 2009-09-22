@@ -36,14 +36,6 @@ struct floppy_config_t
 	keep_geometry keep_drive_geometry;	
 };
 
-typedef enum
-{
-	DEN_FM_LO = 0,
-	DEN_FM_HI,
-	DEN_MFM_LO,
-	DEN_MFM_HI
-} DENSITY;
-
 /* sector has a deleted data address mark */
 #define ID_FLAG_DELETED_DATA	0x0001
 /* CRC error in id field */
@@ -86,9 +78,6 @@ void floppy_drive_set_flag_state(const device_config *img, int flag, int state);
 /* get current physical track drive is on */
 int floppy_drive_get_current_track(const device_config *img);
 
-void floppy_drive_set_geometry(const device_config *img, floppy_type type);
-void floppy_drive_set_geometry_absolute(const device_config *img, int tracks, int sides);
-
 /* get next id from track, 1 if got a id, 0 if no id was got */
 int floppy_drive_get_next_id(const device_config *img, int side, chrn_id *);
 /* set ready state of drive. If flag == 1, set ready state only if drive present,
@@ -105,7 +94,6 @@ void floppy_drive_write_track_data_info_buffer(const device_config *img, int sid
 void floppy_drive_format_sector(const device_config *img, int side, int sector_index, int c, int h, int r, int n, int filler);
 void floppy_drive_read_sector_data(const device_config *img, int side, int index1, void *pBuffer, int length);
 void floppy_drive_write_sector_data(const device_config *img, int side, int index1, const void *pBuffer, int length, int ddam);
-int	floppy_drive_get_datarate_in_us(DENSITY density);
 
 /* set motor speed to get correct index pulses
    standard RPM are 300 RPM (common) and 360 RPM
