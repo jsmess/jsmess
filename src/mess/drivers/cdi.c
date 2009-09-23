@@ -434,7 +434,7 @@ static READ16_HANDLER( scc68070_periphs_r )
 		case 0x2012/2:
 			if(ACCESSING_BITS_0_7)
 			{
-				verboselog(space->machine, 2, "scc68070_periphs_r: UART Status Register: %04x & %04x\n", scc68070_regs.uart.status_register, mem_mask);
+//				verboselog(space->machine, 2, "scc68070_periphs_r: UART Status Register: %04x & %04x\n", scc68070_regs.uart.status_register, mem_mask);
 			}
 			return scc68070_regs.uart.status_register | USR_TXRDY | USR_RXRDY;
 		case 0x2014/2:
@@ -446,7 +446,7 @@ static READ16_HANDLER( scc68070_periphs_r )
 		case 0x2016/2:
 			if(ACCESSING_BITS_0_7)
 			{
-				verboselog(space->machine, 2, "scc68070_periphs_r: UART Command Register: %02x & %04x\n", scc68070_regs.uart.command_register, mem_mask);
+//				verboselog(space->machine, 2, "scc68070_periphs_r: UART Command Register: %02x & %04x\n", scc68070_regs.uart.command_register, mem_mask);
 			}
 			return scc68070_regs.uart.command_register;
 		case 0x2018/2:
@@ -458,7 +458,7 @@ static READ16_HANDLER( scc68070_periphs_r )
 		case 0x201a/2:
 			if(ACCESSING_BITS_0_7)
 			{
-				verboselog(space->machine, 2, "scc68070_periphs_r: UART Receive Holding Register: %02x & %04x\n", scc68070_regs.uart.receive_holding_register, mem_mask);
+//				verboselog(space->machine, 2, "scc68070_periphs_r: UART Receive Holding Register: %02x & %04x\n", scc68070_regs.uart.receive_holding_register, mem_mask);
 			}
 			return scc68070_regs.uart.receive_holding_register;
 
@@ -698,14 +698,14 @@ static WRITE16_HANDLER( scc68070_periphs_w )
 		case 0x2016/2:
 			if(ACCESSING_BITS_0_7)
 			{
-				verboselog(space->machine, 2, "scc68070_periphs_w: UART Command Register: %04x & %04x\n", data, mem_mask);
+//				verboselog(space->machine, 2, "scc68070_periphs_w: UART Command Register: %04x & %04x\n", data, mem_mask);
 				scc68070_regs.uart.command_register = data & 0x00ff;
 			}
 			break;
 		case 0x2018/2:
 			if(ACCESSING_BITS_0_7)
 			{
-				verboselog(space->machine, 2, "scc68070_periphs_w: UART Transmit Holding Register: %04x & %04x\n", data, mem_mask);
+//				verboselog(space->machine, 2, "scc68070_periphs_w: UART Transmit Holding Register: %04x & %04x\n", data, mem_mask);
 				if(data >= 0x20 && data < 0x7f)
 				{
 					printf( "%c", data & 0x00ff );
@@ -906,26 +906,17 @@ static WRITE16_HANDLER( scc68070_periphs_w )
 	}
 }
 
+static READ16_HANDLER( magic_r )
+{
+	return 0x1234;
+}
+
 static ADDRESS_MAP_START( cdi_mem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x00000000, 0x00000007) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x00000008, 0x000fffff) AM_RAM AM_SHARE(1)
-	AM_RANGE(0x00100000, 0x001fffff) AM_RAM AM_SHARE(1) AM_BASE(&ram)
-	AM_RANGE(0x00200000, 0x002fffff) AM_RAM AM_SHARE(1)
-	AM_RANGE(0x00300000, 0x003fffff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x00000000, 0x000fffff) AM_RAM AM_SHARE(1) AM_BASE(&ram)
+	AM_RANGE(0x00301400, 0x00301403) AM_READ( magic_r )
 	AM_RANGE(0x00400000, 0x0047ffff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x00480000, 0x004ffbff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0x004fffe0, 0x004fffff) AM_READWRITE(mcd212_r, mcd212_w)
-	AM_RANGE(0x00500000, 0x005fffff) AM_RAM AM_SHARE(1)
-	AM_RANGE(0x00600000, 0x006fffff) AM_RAM AM_SHARE(1)
-	AM_RANGE(0x00700000, 0x007fffff) AM_RAM AM_SHARE(1)
-	AM_RANGE(0x00800000, 0x008fffff) AM_RAM AM_SHARE(1)
-	AM_RANGE(0x00900000, 0x009fffff) AM_RAM AM_SHARE(1)
-	AM_RANGE(0x00a00000, 0x00afffff) AM_RAM AM_SHARE(1)
-	AM_RANGE(0x00b00000, 0x00bfffff) AM_RAM AM_SHARE(1)
-	AM_RANGE(0x00c00000, 0x00cfffff) AM_RAM AM_SHARE(1)
-	AM_RANGE(0x00d00000, 0x00dfffff) AM_RAM AM_SHARE(1)
-	AM_RANGE(0x00e00000, 0x00efffff) AM_RAM AM_SHARE(1)
-	AM_RANGE(0x00f00000, 0x00ffffff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x00500000, 0x0057ffff) AM_RAM
 	AM_RANGE(0x80000000, 0x8000807f) AM_READWRITE(scc68070_periphs_r, scc68070_periphs_w)
 ADDRESS_MAP_END
 
