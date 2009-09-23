@@ -484,7 +484,7 @@ static MACHINE_START( mm1 )
 	state_save_register_global(machine, state->rcl);
 	state_save_register_global(machine, state->recall);
 }
-
+#if 0
 static MACHINE_RESET( mm1 )
 {
 	const address_space *program = cputag_get_address_space(machine, I8085A_TAG, ADDRESS_SPACE_PROGRAM);
@@ -492,7 +492,7 @@ static MACHINE_RESET( mm1 )
 	memory_install_readwrite8_handler(program, 0x0000, 0x0fff, 0, 0, SMH_BANK(1), SMH_UNMAP);
 	memory_set_bank(machine, 1, 0);
 }
-
+#endif
 static FLOPPY_OPTIONS_START( mm1 )
 	FLOPPY_OPTION( mm1_640kb, "dsk", "Nokia MikroMikko 1 640KB disk image", basicdsk_identify_default, basicdsk_construct_default,
 		HEADS([2])
