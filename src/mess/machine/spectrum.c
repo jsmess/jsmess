@@ -408,18 +408,20 @@ void spectrum_setup_sna(running_machine *machine, unsigned char *pSnapshot, unsi
 	}
 
 	if (SnapshotSize == 49179)
-	{
+	{		
 		/* get pc from stack */
 		addr = cpu_get_reg(cputag_get_cpu(machine, "maincpu"), Z80_SP) & 0xFFFF;
 
-		cpu_set_reg(cputag_get_cpu(machine, "maincpu"), Z80_PC,
-			((UINT16) memory_read_byte(space,addr + 0) ) >> 8 |
-			((UINT16) memory_read_byte(space,addr + 1) ) >> 0);
-
+		lo = memory_read_byte(space,addr + 0);
+		hi = memory_read_byte(space,addr + 1);		
+		cpu_set_reg(cputag_get_cpu(machine, "maincpu"), Z80_PC, (hi << 8) | lo);
+		memory_write_byte(space, addr + 0, 0);
+		memory_write_byte(space, addr + 1, 0);
+		
+		memory_write_byte(space, 0x5CB0, 0xff); // Set NMIADD system variable to make game run
+												//  when directly started with cart mounted
 		addr += 2;
 		cpu_set_reg(cputag_get_cpu(machine, "maincpu"), Z80_SP, (addr & 0x0ffff));
-
-
 	}
 	else
 	{

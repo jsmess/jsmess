@@ -28,7 +28,7 @@ System Driver Changes:
 
 - [SAMCOUPE] Improved Mode 1 graphics.  [Dirk Best]
 
-
+- [SPECTRUM] Fixed bug #803 48K SNA load routine bad PC. [Miodrag Milanovic]
 
 User Interface Changes:
 -----------------------
@@ -44,8 +44,9 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
-(none)
+- Moved implementation to device [Miodrag Milanovic]
 
+- Floppy support for TD0, IMD and CQM [Miodrag Milanovic]
 
 
 0.134
