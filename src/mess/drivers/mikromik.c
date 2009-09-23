@@ -146,10 +146,10 @@ static I8275_DISPLAY_PIXELS( crtc_display_pixels )
 {
 	mm1_state *state = device->machine->driver_data;
 
-	UINT8 data = state->char_rom[((charcode & 0x3f) << 4) | linecount];
+	UINT8 data = state->char_rom[(charcode << 4) | linecount];
 	int i;
 	
-	for (i = 0; i < 6; i++)
+	for (i = 0; i < 8; i++)
 	{
 		*BITMAP_ADDR16(tmpbitmap, y, x + i) = BIT(data, i);
 	}
@@ -196,7 +196,7 @@ static VIDEO_UPDATE( mm1 )
 {
 	mm1_state *state = screen->machine->driver_data;
 
-//	i8275_update(state->i8275, bitmap, cliprect);
+	i8275_update(state->i8275, bitmap, cliprect);
 
 	VIDEO_UPDATE_CALL(generic_bitmapped);
 
@@ -215,7 +215,7 @@ static const gfx_layout tiles8x16_layout =
 };
 
 static GFXDECODE_START( mm1 )
-	GFXDECODE_ENTRY( "chargen", 0, tiles8x8_layout, 0, 0x100 )
+	GFXDECODE_ENTRY( "chargen", 0, tiles8x16_layout, 0, 0x100 )
 GFXDECODE_END
 
 /* 8212 Interface */
@@ -515,8 +515,8 @@ static MACHINE_DRIVER_START( mm1 )
 	MDRV_SCREEN_ADD( SCREEN_TAG, RASTER )
 	MDRV_SCREEN_REFRESH_RATE( 50 )
 	MDRV_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
-	MDRV_SCREEN_SIZE( 800, 327 )
-	MDRV_SCREEN_VISIBLE_AREA( 0, 800-1, 0, 327-1 )
+	MDRV_SCREEN_SIZE( 800, 400 )
+	MDRV_SCREEN_VISIBLE_AREA( 0, 800-1, 0, 400-1 )
 	//MDRV_SCREEN_RAW_PARAMS(XTAL_18_720MHz, ...)
 
 	MDRV_GFXDECODE(mm1)
