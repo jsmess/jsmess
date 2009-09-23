@@ -22,6 +22,8 @@ System Driver Changes:
 - [NES] Fixed Pinball Quest graphics problems [Fabio 
   Priuli]
 
+- [PX4] Added external cassette support.  [Dirk Best]
+
 - [SAMCOUPE] Added mouse support.  [Dirk Best]
 
 - [SAMCOUPE] Improved Mode 1 graphics.  [Dirk Best]

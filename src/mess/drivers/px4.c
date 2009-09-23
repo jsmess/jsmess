@@ -12,6 +12,7 @@
 #include "devices/messram.h"
 #include "machine/ctronics.h"
 #include "devices/cartslot.h"
+#include "devices/cassette.h"
 #include "machine/pf10.h"
 #include "px4.lh"
 
@@ -46,6 +47,8 @@ struct _px4_state
 	const device_config *ram;
 
 	/* gapnit register */
+	UINT8 ctrl1;
+	UINT16 icrb;
 	UINT8 bankr;
 	UINT8 isr;
 	UINT8 ier;
@@ -71,6 +74,11 @@ struct _px4_state
 	/* external ramdisk */
 	offs_t ramdisk_address;
 	UINT8 *ramdisk;
+
+	/* external cassette/barcode reader */
+	const device_config *ext_cas;
+	emu_timer *ext_cas_timer;
+	int ear_last_state;
 };
 
 
@@ -84,26 +92,60 @@ static void gapnit_interrupt(running_machine *machine)
 	px4_state *px4 = machine->driver_data;
 
 	/* any interrupts enabled and pending? */
-	if (px4->ier & px4->isr & 0x1f)
+	if (px4->ier & px4->isr & INT0_7508)
 	{
-		if (px4->isr & INT0_7508)
-		{
-			px4->isr &= ~INT0_7508;
-			cputag_set_input_line_and_vector(machine, "maincpu", 0, ASSERT_LINE, 0xf0);
-		}
-		else if (px4->isr & INT1_ART)
-			cputag_set_input_line_and_vector(machine, "maincpu", 0, ASSERT_LINE, 0xf2);
-		else if (px4->isr & INT2_ICF)
-			cputag_set_input_line_and_vector(machine, "maincpu", 0, ASSERT_LINE, 0xf4);
-		else if (px4->isr & INT3_OVF)
-			cputag_set_input_line_and_vector(machine, "maincpu", 0, ASSERT_LINE, 0xf6);
-		else if (px4->isr & INT4_EXT)
-			cputag_set_input_line_and_vector(machine, "maincpu", 0, ASSERT_LINE, 0xf8);
+		px4->isr &= ~INT0_7508;
+		cputag_set_input_line_and_vector(machine, "maincpu", 0, ASSERT_LINE, 0xf0);
 	}
+	else if (px4->ier & px4->isr & INT1_ART)
+		cputag_set_input_line_and_vector(machine, "maincpu", 0, ASSERT_LINE, 0xf2);
+	else if (px4->ier & px4->isr & INT2_ICF)
+		cputag_set_input_line_and_vector(machine, "maincpu", 0, ASSERT_LINE, 0xf4);
+	else if (px4->ier & px4->isr & INT3_OVF)
+		cputag_set_input_line_and_vector(machine, "maincpu", 0, ASSERT_LINE, 0xf6);
+	else if (px4->ier & px4->isr & INT4_EXT)
+		cputag_set_input_line_and_vector(machine, "maincpu", 0, ASSERT_LINE, 0xf8);
 	else
-	{
 		cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
+}
+
+/* external cassette or barcode reader input */
+static TIMER_CALLBACK( ext_cassette_read )
+{
+	px4_state *px4 = machine->driver_data;
+	UINT8 result;
+	int trigger;
+
+	/* sample input state */
+	result = cassette_input(px4->ext_cas) > 0 ? 1 : 0;
+
+	/* detect transition */
+	switch ((px4->ctrl1 >> 1) & 0x03)
+	{
+	case 0: /* trigger inhibit */
+		trigger = 0;
+		break;
+	case 1: /* falling edge trigger */
+		trigger = px4->ear_last_state == 1 && result == 0;
+		break;
+	case 2: /* rising edge trigger */
+		trigger = px4->ear_last_state == 0 && result == 1;
+		break;
+	case 3: /* rising/falling edge trigger */
+		trigger = px4->ear_last_state != result;
+		break;
 	}
+
+	/* generate an interrupt if we need to trigger */
+	if (trigger)
+	{
+		px4->icrb = px4->frc_value;
+		px4->isr |= INT2_ICF;
+		gapnit_interrupt(machine);
+	}
+
+	/* save last state */
+	px4->ear_last_state = result;
 }
 
 /* free running counter */
@@ -135,13 +177,18 @@ static READ8_HANDLER( px4_icrlc_r )
 /* control register 1 */
 static WRITE8_HANDLER( px4_ctrl1_w )
 {
+	px4_state *px4 = space->machine->driver_data;
+
 	logerror("%s: px4_ctrl1_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
+
+	px4->ctrl1 = data;
 }
 
 /* input capture register high command trigger */
 static READ8_HANDLER( px4_icrhc_r )
 {
 	px4_state *px4 = space->machine->driver_data;
+
 	logerror("%s: px4_icrhc_r\n", cpuexec_describe_context(space->machine));
 
 	return (px4->frc_latch >> 8) & 0xff;
@@ -151,6 +198,7 @@ static READ8_HANDLER( px4_icrhc_r )
 static WRITE8_HANDLER( px4_cmdr_w )
 {
 	px4_state *px4 = space->machine->driver_data;
+
 	logerror("%s: px4_cmdr_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
 
 	/* clear overflow interrupt? */
@@ -161,29 +209,50 @@ static WRITE8_HANDLER( px4_cmdr_w )
 	}
 }
 
-/* barcode trigger */
+/* input capture register low barcode trigger */
 static READ8_HANDLER( px4_icrlb_r )
 {
+	px4_state *px4 = space->machine->driver_data;
+
 	logerror("%s: px4_icrlb_r\n", cpuexec_describe_context(space->machine));
-	return 0xff;
+
+	return px4->icrb & 0xff;
 }
 
 /* control register 2 */
 static WRITE8_HANDLER( px4_ctrl2_w )
 {
+	px4_state *px4 = space->machine->driver_data;
+
 	logerror("%s: px4_ctrl2_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
+
+	/* bit 0, MIC, cassette output */
+	cassette_output(px4->ext_cas, BIT(data, 0) ? -1.0 : +1.0);
+
+	/* bit 1, RMT, cassette motor */
+	if (BIT(data, 1))
+	{
+		cassette_change_state(px4->ext_cas, CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+		timer_adjust_periodic(px4->ext_cas_timer, attotime_zero, 0, ATTOTIME_IN_HZ(44100));
+	}
+	else
+	{
+		cassette_change_state(px4->ext_cas, CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+		timer_adjust_oneshot(px4->ext_cas_timer, attotime_zero, 0);
+	}
 }
 
-/* barcode trigger */
+/* input capture register high barcode trigger */
 static READ8_HANDLER( px4_icrhb_r )
 {
 	px4_state *px4 = space->machine->driver_data;
 	logerror("%s: px4_icrhb_r\n", cpuexec_describe_context(space->machine));
 
+	/* clear icf interrupt */
 	px4->isr &= ~INT2_ICF;
 	gapnit_interrupt(space->machine);
 
-	return 0xff;
+	return (px4->icrb >> 8) & 0xff;
 }
 
 /* interrupt status register */
@@ -209,9 +278,26 @@ static WRITE8_HANDLER( px4_ier_w )
 static READ8_HANDLER( px4_str_r )
 {
 	px4_state *px4 = space->machine->driver_data;
+	UINT8 result = 0;
+
 	logerror("%s: px4_str_r\n", cpuexec_describe_context(space->machine));
 
-	return (px4->bankr & 0xf0) | 0x0f;
+	/* bit 0, EAR, cassette input */
+	result |= cassette_input(px4->ext_cas) > 0 ? 1 : 0;
+
+	/* bit 1, BCRD, barcode reader input */
+	result |= 1 << 1;
+
+	/* bit 2, RDY signal from 7805 */
+	result |= 1 << 2;
+
+	/* bit 3, RDYSIO, enable access to the 7805 */
+	result |= 1 << 3;
+
+	/* bit 4-7, BANK, memory bank */
+	result |= px4->bankr & 0xf0;
+
+	return result;
 }
 
 /* helper function to map rom capsules */
@@ -701,6 +787,11 @@ static DRIVER_INIT( px4 )
 	px4->key_int_enabled = TRUE;
 	px4->alarm_int_enabled = TRUE;
 
+	/* external cassette or barcode reader */
+	px4->ext_cas_timer = timer_alloc(machine, ext_cassette_read, NULL);
+	px4->ext_cas = devtag_get_device(machine, "extcas");
+	px4->ear_last_state = 0;
+
 	/* map os rom and last half of memory */
 	memory_set_bankptr(machine, 1, memory_region(machine, "os"));
 	memory_set_bankptr(machine, 2, messram_get_ptr(px4->ram) + 0x8000);
@@ -933,6 +1024,13 @@ static PALETTE_INIT( px4p )
     MACHINE DRIVERS
 ***************************************************************************/
 
+static const cassette_config px4_cassette_config =
+{
+	cassette_default_formats,
+	NULL,
+	CASSETTE_PLAY | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_DISABLED
+};
+
 static MACHINE_DRIVER_START( px4 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_7_3728MHz/2)	/* uPD70008 */
@@ -956,7 +1054,7 @@ static MACHINE_DRIVER_START( px4 )
 	MDRV_VIDEO_UPDATE(px4)
 
 	MDRV_TIMER_ADD_PERIODIC("one_sec", upd7508_1sec_callback, SEC(1))
-	MDRV_TIMER_ADD_PERIODIC("frc", frc_tick, NSEC(1600))
+	MDRV_TIMER_ADD_PERIODIC("frc", frc_tick, NSEC(1628))
 
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
@@ -964,6 +1062,9 @@ static MACHINE_DRIVER_START( px4 )
 
 	/* centronics printer */
 	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
+
+	/* external cassette */
+	MDRV_CASSETTE_ADD("extcas", px4_cassette_config)
 
 	/* rom capsules */
 	MDRV_CARTSLOT_ADD("capsule1")
