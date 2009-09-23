@@ -196,11 +196,27 @@ static VIDEO_UPDATE( mm1 )
 {
 	mm1_state *state = screen->machine->driver_data;
 
-	i8275_update(state->i8275, bitmap, cliprect);
+//	i8275_update(state->i8275, bitmap, cliprect);
+
 	VIDEO_UPDATE_CALL(generic_bitmapped);
 
 	return 0;
 }
+
+static const gfx_layout tiles8x16_layout =
+{
+	8, 16,
+	RGN_FRAC(1,1),
+	1,
+	{ 0 },
+	{ 7, 6, 5, 4, 3, 2, 1, 0 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	8*16
+};
+
+static GFXDECODE_START( mm1 )
+	GFXDECODE_ENTRY( "chargen", 0, tiles8x8_layout, 0, 0x100 )
+GFXDECODE_END
 
 /* 8212 Interface */
 
@@ -503,6 +519,7 @@ static MACHINE_DRIVER_START( mm1 )
 	MDRV_SCREEN_VISIBLE_AREA( 0, 800-1, 0, 327-1 )
 	//MDRV_SCREEN_RAW_PARAMS(XTAL_18_720MHz, ...)
 
+	MDRV_GFXDECODE(mm1)
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(black_and_white)
 
