@@ -863,8 +863,19 @@ DEVICE_GET_INFO(floppy)
 		case DEVINFO_INT_IMAGE_TYPE:				info->i = IO_FLOPPY; break;
 		case DEVINFO_INT_IMAGE_READABLE:			info->i = 1; break;
 		case DEVINFO_INT_IMAGE_WRITEABLE:			info->i = 1; break;
-		case DEVINFO_INT_IMAGE_CREATABLE:			info->i = ((floppy_config*)device->static_config)->formats->param_guidelines ? 1 : 0; break; // Fix this
-
+		case DEVINFO_INT_IMAGE_CREATABLE:	{		
+												int cnt = 0;
+												if ( device && device->static_config )
+												{
+													const struct FloppyFormat *floppy_options = ((floppy_config*)device->static_config)->formats;
+													int	i;
+													for ( i = 0; floppy_options[i].construct; i++ ) {
+														if(floppy_options[i].param_guidelines) cnt++;
+													}													
+												} 
+												info->i = (cnt>0) ? 1 : 0;
+											}
+											break;
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:						info->start = DEVICE_START_NAME(floppy); break;
 		case DEVINFO_FCT_IMAGE_CREATE:				info->f = (genf *) DEVICE_IMAGE_CREATE_NAME(floppy); break;
