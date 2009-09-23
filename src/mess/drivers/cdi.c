@@ -5,7 +5,7 @@
     -------------------
 
     Preliminary MAME driver by Roberto Fresca, David Haywood & Angelo Salese
-    Borrowed by incog for MESS
+    MESS improvements by Harmony
 
 
 *******************************************************************************
@@ -26,12 +26,17 @@
 
 *******************************************************************************
 
+STATUS:
+
+BIOSes will run until attempting an OS call using the methods described here:
+http://www.icdia.co.uk/microware/tech/tech_2.pdf
+
 TODO:
 
 -Proper handling of the 68070 (68k with 32 address lines instead of 24)
  & handle the extra features properly (UART,DMA,Timers etc.)
 
--Proper emulation of the 66470 Video Chip (still many unhandled features)
+-Proper emulation of the 66470 and/or MCD212 Video Chip (still many unhandled features)
 
 -Inputs;
 
@@ -902,12 +907,13 @@ static WRITE16_HANDLER( scc68070_periphs_w )
 }
 
 static ADDRESS_MAP_START( cdi_mem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x00000000, 0x000fffff) AM_RAM AM_SHARE(1) AM_BASE(&ram)
-	AM_RANGE(0x00100000, 0x001fffff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x00000000, 0x00000007) AM_ROM AM_REGION("maincpu", 0)
+	AM_RANGE(0x00000008, 0x000fffff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x00100000, 0x001fffff) AM_RAM AM_SHARE(1) AM_BASE(&ram)
 	AM_RANGE(0x00200000, 0x002fffff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0x00300000, 0x003fffff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0x00400000, 0x0047ffff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x00480000, 0x004ffbff) AM_ROM AM_REGION("maincpu", 0)
+	AM_RANGE(0x00480000, 0x004ffbff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0x004fffe0, 0x004fffff) AM_READWRITE(mcd212_r, mcd212_w)
 	AM_RANGE(0x00500000, 0x005fffff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0x00600000, 0x006fffff) AM_RAM AM_SHARE(1)
