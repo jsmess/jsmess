@@ -1,6 +1,5 @@
 
 #include "driver.h"
-#include "video/vdc.h"
 #include "cpu/h6280/h6280.h"
 #include "includes/pce.h"
 #include "devices/chd_cd.h"
