@@ -114,7 +114,7 @@ static TIMER_CALLBACK( ext_cassette_read )
 {
 	px4_state *px4 = machine->driver_data;
 	UINT8 result;
-	int trigger;
+	int trigger = 0;
 
 	/* sample input state */
 	result = cassette_input(px4->ext_cas) > 0 ? 1 : 0;
