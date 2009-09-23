@@ -11,12 +11,14 @@
 #include "video/i8275.h"
 #include "video/i82720.h"
 #include "video/upd7220.h"
+#include "sound/speaker.h"
 
 /*
 
 	TODO:
 
 	- ROM dumps
+	- ALL RAM CHIPS FAIL shows a screenful of garbage (DMA error?)
 	- pixel display
 	- floppy
 	- keyboard
@@ -74,11 +76,19 @@ INLINE const device_config *get_floppy_image(running_machine *machine, int drive
 static WRITE8_HANDLER( cs6_w )
 {
 	mm1_state *state = space->machine->driver_data;
+	const address_space *program = cputag_get_address_space(space->machine, I8085A_TAG, ADDRESS_SPACE_PROGRAM);
 	int d = BIT(data, 0);
 
 	switch (offset)
 	{
 	case 0: /* IC24 A8 */
+		//logerror("IC24 A8 %u\n", d);
+		memory_set_bank(space->machine, 1, d);
+
+		if (d)
+			memory_install_readwrite8_handler(program, 0x0000, 0x0fff, 0, 0, SMH_BANK(1), SMH_BANK(1));
+		else
+			memory_install_readwrite8_handler(program, 0x0000, 0x0fff, 0, 0, SMH_BANK(1), SMH_UNMAP);
 		break;
 
 	case 1: /* RECALL */
@@ -106,6 +116,7 @@ static WRITE8_HANDLER( cs6_w )
 		break;
 
 	case 7: /* MOTOR ON */
+		//logerror("MOTOR %u\n", d);
 		floppy_drive_set_motor_state(get_floppy_image(space->machine, 0), d);
 		floppy_drive_set_ready_state(get_floppy_image(space->machine, 0), d, 1);
 		break;
@@ -115,8 +126,8 @@ static WRITE8_HANDLER( cs6_w )
 /* Memory Maps */
 
 static ADDRESS_MAP_START( mm1_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0xbfff) AM_RAM
+	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK(1)
+	AM_RANGE(0x1000, 0xfeff) AM_RAM
 	AM_RANGE(0xff00, 0xff0f) AM_DEVREADWRITE(I8237_TAG, dma8237_r, dma8237_w)
 	AM_RANGE(0xff10, 0xff13) AM_DEVREADWRITE(UPD7201_TAG, upd7201_cd_ba_r, upd7201_cd_ba_w)
     AM_RANGE(0xff20, 0xff21) AM_DEVREADWRITE(I8275_TAG, i8275_r, i8275_w)
@@ -246,7 +257,7 @@ static DMA8237_HRQ_CHANGED( dma_hrq_changed )
 static DMA8237_MEM_READ( memory_dma_r )
 {
 	const address_space *program = cputag_get_address_space(device->machine, I8085A_TAG, ADDRESS_SPACE_PROGRAM);
-	//logerror("DMA read %04x\n", offset);
+//	logerror("DMA read %04x\n", offset);
 	return memory_read_byte(program, offset);
 }
 
@@ -281,13 +292,15 @@ static DMA8237_CHANNEL_WRITE( mpsc_dack_w )
 static DMA8237_CHANNEL_READ( fdc_dack_r )
 {
 	mm1_state *state = device->machine->driver_data;
-
-	return nec765_dack_r(state->upd765, 0);
+	UINT8 data = nec765_dack_r(state->upd765, 0);
+//logerror("FDC DACK read %02x\n", data);
+	return data;
 }
 
 static DMA8237_CHANNEL_WRITE( fdc_dack_w )
 {
 	mm1_state *state = device->machine->driver_data;
+//logerror("FDC DACK write %02x\n", data);
 
 	nec765_dack_w(state->upd765, 0, data);
 }
@@ -299,7 +312,7 @@ static DMA8237_OUT_EOP( tc_w )
 	/* floppy terminal count */
 	nec765_tc_w(driver_state->upd765, !state);
 
-	cputag_set_input_line(device->machine, I8085A_TAG, I8085_RST75_LINE, state ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(device->machine, I8085A_TAG, I8085_RST75_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct dma8237_interface mm1_dma8237_intf =
@@ -327,8 +340,8 @@ static const nec765_interface mm1_nec765_intf =
 	DEVCB_CPU_INPUT_LINE(I8085A_TAG, I8085_RST55_LINE),
 	drq_w,
 	NULL,
-	NEC765_RDY_PIN_CONNECTED, // ???
-	{FLOPPY_0,FLOPPY_1, NULL, NULL}
+	NEC765_RDY_PIN_NOT_CONNECTED,
+	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
 };
 
 /* 8253 Interface */
@@ -434,16 +447,12 @@ static READ_LINE_DEVICE_HANDLER( dsra_r )
 	return 1;
 }
 
-static WRITE_LINE_DEVICE_HANDLER( bell_w )
-{
-}
-
 static I8085_CONFIG( mm1_i8085_config )
 {
 	DEVCB_NULL,			/* STATUS changed callback */
 	DEVCB_NULL,			/* INTE changed callback */
 	DEVCB_LINE(dsra_r),	/* SID changed callback (8085A only) */
-	DEVCB_LINE(bell_w)	/* SOD changed callback (8085A only) */
+	DEVCB_DEVICE_LINE(SPEAKER_TAG, speaker_level_w)	/* SOD changed callback (8085A only) */
 };
 
 /* Machine Initialization */
@@ -451,6 +460,7 @@ static I8085_CONFIG( mm1_i8085_config )
 static MACHINE_START( mm1 )
 {
 	mm1_state *state = machine->driver_data;
+	const address_space *program = cputag_get_address_space(machine, I8085A_TAG, ADDRESS_SPACE_PROGRAM);
 
 	/* look up devices */
 	state->i8212 = devtag_get_device(machine, I8212_TAG);
@@ -458,6 +468,13 @@ static MACHINE_START( mm1 )
 	state->i8275 = devtag_get_device(machine, I8275_TAG);
 	state->upd765 = devtag_get_device(machine, UPD765_TAG);
 	state->upd7201 = devtag_get_device(machine, UPD7201_TAG);
+	state->speaker = devtag_get_device(machine, SPEAKER_TAG);
+
+	/* setup memory banking */
+	memory_install_readwrite8_handler(program, 0x0000, 0x0fff, 0, 0, SMH_BANK(1), SMH_UNMAP);
+	memory_configure_bank(machine, 1, 0, 1, memory_region(machine, "bios"), 0);
+	memory_configure_bank(machine, 1, 1, 1, mess_ram, 0);
+	memory_set_bank(machine, 1, 0);
 
 	/* register for state saving */
 	state_save_register_global(machine, state->llen);
@@ -466,6 +483,14 @@ static MACHINE_START( mm1 )
 	state_save_register_global(machine, state->tx21);
 	state_save_register_global(machine, state->rcl);
 	state_save_register_global(machine, state->recall);
+}
+
+static MACHINE_RESET( mm1 )
+{
+	const address_space *program = cputag_get_address_space(machine, I8085A_TAG, ADDRESS_SPACE_PROGRAM);
+
+	memory_install_readwrite8_handler(program, 0x0000, 0x0fff, 0, 0, SMH_BANK(1), SMH_UNMAP);
+	memory_set_bank(machine, 1, 0);
 }
 
 static FLOPPY_OPTIONS_START( mm1 )
@@ -521,10 +546,15 @@ static MACHINE_DRIVER_START( mm1 )
 
 	MDRV_GFXDECODE(mm1)
 	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(black_and_white)
+	MDRV_PALETTE_INIT(monochrome_green)
 
 	MDRV_VIDEO_START(mm1)
 	MDRV_VIDEO_UPDATE(mm1)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD(SPEAKER_TAG, SPEAKER, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* peripheral hardware */
 	MDRV_I8212_ADD(I8212_TAG, mm1_i8212_intf)
@@ -546,11 +576,11 @@ MACHINE_DRIVER_END
 /* ROMs */
 
 ROM_START( mm1m6 )
-	ROM_REGION( 0x4000, I8085A_TAG, 0 ) /* BIOS */
+	ROM_REGION( 0x4000, "bios", 0 ) /* BIOS */
 	ROM_LOAD( "9081b.ic2", 0x0000, 0x2000, CRC(2955feb3) SHA1(946a6b0b8fb898be3f480c04da33d7aaa781152b) )
 
 	ROM_REGION( 0x200, "address", 0 ) /* address decoder */
-	ROM_LOAD( "mmi6349-1.ic24", 0x0000, 0x0200, NO_DUMP )
+	ROM_LOAD( "720793a.ic24", 0x0000, 0x0200, NO_DUMP )
 
 	ROM_REGION( 0x200, "keyboard", 0 ) /* keyboard encoder */
 	ROM_LOAD( "mmi6349-1j.bin", 0x0000, 0x0200, NO_DUMP )
