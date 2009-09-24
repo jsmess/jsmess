@@ -220,94 +220,94 @@ INLINE void mcd212_set_register(running_machine *machine, int channel, UINT8 reg
 		case 0xa8: case 0xa9: case 0xaa: case 0xab: case 0xac: case 0xad: case 0xae: case 0xaf:
 		case 0xb0: case 0xb1: case 0xb2: case 0xb3: case 0xb4: case 0xb5: case 0xb6: case 0xb7:
 		case 0xb8: case 0xb9: case 0xba: case 0xbb: case 0xbc: case 0xbd: case 0xbe: case 0xbf:
-			verboselog(machine, 2, "          %04xxxxx: CLUT[%d] = %08x\n", channel * 0x20, mcd212.channel[channel].clut_bank * 0x40 + (reg - 0x80), value );
+			verboselog(machine, 6, "          %04xxxxx: CLUT[%d] = %08x\n", channel * 0x20, mcd212.channel[channel].clut_bank * 0x40 + (reg - 0x80), value );
 			mcd212.channel[channel].clut[mcd212.channel[channel].clut_bank * 0x40 + (reg - 0x80)] = value;
 			break;
 		case 0xc0: // Image Coding Method
 			if(channel == 0)
 			{
-				verboselog(machine, 2, "          %04xxxxx: Image Coding Method = %08x\n", channel * 0x20, value );
+				verboselog(machine, 6, "          %04xxxxx: Image Coding Method = %08x\n", channel * 0x20, value );
 				mcd212.channel[channel].image_coding_method = value;
 			}
 			break;
 		case 0xc1: // Transparency Control
 			if(channel == 0)
 			{
-				verboselog(machine, 2, "          %04xxxxx: Transparency Control = %08x\n", channel * 0x20, value );
+				verboselog(machine, 6, "          %04xxxxx: Transparency Control = %08x\n", channel * 0x20, value );
 				mcd212.channel[channel].transparency_control = value;
 			}
 			break;
 		case 0xc2: // Plane Order
 			if(channel == 0)
 			{
-				verboselog(machine, 2, "          %04xxxxx: Plane Order = %08x\n", channel * 0x20, value & 7);
+				verboselog(machine, 6, "          %04xxxxx: Plane Order = %08x\n", channel * 0x20, value & 7);
 				mcd212.channel[channel].plane_order = value & 0x00000007;
 			}
 			break;
 		case 0xc3: // CLUT Bank Register
-			verboselog(machine, 2, "          %04xxxxx: CLUT Bank Register = %08x\n", channel * 0x20, value & 3);
+			verboselog(machine, 6, "          %04xxxxx: CLUT Bank Register = %08x\n", channel * 0x20, value & 3);
 			mcd212.channel[channel].clut_bank = value & 0x00000003;
 			break;
 		case 0xc4: // Transparent Color A
 			if(channel == 0)
 			{
-				verboselog(machine, 2, "          %04xxxxx: Transparent Color A = %08x\n", channel * 0x20, value );
+				verboselog(machine, 6, "          %04xxxxx: Transparent Color A = %08x\n", channel * 0x20, value );
 				mcd212.channel[channel].transparent_color_a = value;
 			}
 			break;
 		case 0xc6: // Transparent Color B
 			if(channel == 1)
 			{
-				verboselog(machine, 2, "          %04xxxxx: Transparent Color B = %08x\n", channel * 0x20, value );
+				verboselog(machine, 6, "          %04xxxxx: Transparent Color B = %08x\n", channel * 0x20, value );
 				mcd212.channel[channel].transparent_color_b = value;
 			}
 			break;
 		case 0xc7: // Mask Color A
 			if(channel == 0)
 			{
-				verboselog(machine, 2, "          %04xxxxx: Mask Color A = %08x\n", channel * 0x20, value );
+				verboselog(machine, 6, "          %04xxxxx: Mask Color A = %08x\n", channel * 0x20, value );
 				mcd212.channel[channel].mask_color_a = value;
 			}
 			break;
 		case 0xc9: // Mask Color B
 			if(channel == 1)
 			{
-				verboselog(machine, 2, "          %04xxxxx: Mask Color B = %08x\n", channel * 0x20, value );
+				verboselog(machine, 6, "          %04xxxxx: Mask Color B = %08x\n", channel * 0x20, value );
 				mcd212.channel[channel].mask_color_b = value;
 			}
 			break;
 		case 0xca: // Delta YUV Absolute Start Value A
 			if(channel == 0)
 			{
-				verboselog(machine, 2, "          %04xxxxx: Delta YUV Absolute Start Value A = %08x\n", channel * 0x20, value );
+				verboselog(machine, 6, "          %04xxxxx: Delta YUV Absolute Start Value A = %08x\n", channel * 0x20, value );
 				mcd212.channel[channel].dyuv_abs_start_a = value;
 			}
 			break;
 		case 0xcb: // Delta YUV Absolute Start Value B
 			if(channel == 1)
 			{
-				verboselog(machine, 2, "          %04xxxxx: Delta YUV Absolute Start Value B = %08x\n", channel * 0x20, value );
+				verboselog(machine, 6, "          %04xxxxx: Delta YUV Absolute Start Value B = %08x\n", channel * 0x20, value );
 				mcd212.channel[channel].dyuv_abs_start_b = value;
 			}
 			break;
 		case 0xcd: // Cursor Position
 			if(channel == 0)
 			{
-				verboselog(machine, 2, "          %04xxxxx: Cursor Position = %08x\n", channel * 0x20, value );
+				verboselog(machine, 6, "          %04xxxxx: Cursor Position = %08x\n", channel * 0x20, value );
 				mcd212.channel[channel].cursor_position = value;
 			}
 			break;
 		case 0xce: // Cursor Control
 			if(channel == 0)
 			{
-				verboselog(machine, 2, "          %04xxxxx: Cursor Control = %08x\n", channel * 0x20, value );
+				verboselog(machine, 6, "          %04xxxxx: Cursor Control = %08x\n", channel * 0x20, value );
 				mcd212.channel[channel].cursor_control = value;
 			}
 			break;
 		case 0xcf: // Cursor Pattern
 			if(channel == 0)
 			{
-				verboselog(machine, 2, "          %04xxxxx: Cursor Pattern[%d] = %04x\n", channel * 0x20, (value >> 16) & 0x000f, value & 0x0000ffff);
+				verboselog(machine, 6, "          %04xxxxx: Cursor Pattern[%d] = %04x\n", channel * 0x20, (value >> 16) & 0x000f, value & 0x0000ffff);
 				mcd212.channel[channel].cursor_pattern[(value >> 16) & 0x000f] = value & 0x0000ffff;
 			}
 			break;
@@ -319,41 +319,41 @@ INLINE void mcd212_set_register(running_machine *machine, int channel, UINT8 reg
 		case 0xd5:
 		case 0xd6:
 		case 0xd7:
-			verboselog(machine, 2, "          %04xxxxx: Region Control %d = %08x\n", channel * 0x20, reg & 7, value );
+			verboselog(machine, 6, "          %04xxxxx: Region Control %d = %08x\n", channel * 0x20, reg & 7, value );
 			mcd212.channel[channel].region_control[reg & 7] = value;
 			break;
 		case 0xd8: // Backdrop Color
 			if(channel == 0)
 			{
-				verboselog(machine, 2, "          %04xxxxx: Backdrop Color = %08x\n", channel * 0x20, value );
+				verboselog(machine, 6, "          %04xxxxx: Backdrop Color = %08x\n", channel * 0x20, value );
 				mcd212.channel[channel].backdrop_color = value;
 			}
 			break;
 		case 0xd9: // Mosaic Pixel Hold Factor A
 			if(channel == 0)
 			{
-				verboselog(machine, 2, "          %04xxxxx: Mosaic Pixel Hold Factor A = %08x\n", channel * 0x20, value );
+				verboselog(machine, 6, "          %04xxxxx: Mosaic Pixel Hold Factor A = %08x\n", channel * 0x20, value );
 				mcd212.channel[channel].mosaic_hold_a = value;
 			}
 			break;
 		case 0xda: // Mosaic Pixel Hold Factor B
 			if(channel == 1)
 			{
-				verboselog(machine, 2, "          %04xxxxx: Mosaic Pixel Hold Factor B = %08x\n", channel * 0x20, value );
+				verboselog(machine, 6, "          %04xxxxx: Mosaic Pixel Hold Factor B = %08x\n", channel * 0x20, value );
 				mcd212.channel[channel].mosaic_hold_b = value;
 			}
 			break;
 		case 0xdb: // Weight Factor A
 			if(channel == 0)
 			{
-				verboselog(machine, 2, "          %04xxxxx: Weight Factor A = %08x\n", channel * 0x20, value );
+				verboselog(machine, 6, "          %04xxxxx: Weight Factor A = %08x\n", channel * 0x20, value );
 				mcd212.channel[channel].weight_factor_a = value;
 			}
 			break;
 		case 0xdc: // Weight Factor B
 			if(channel == 1)
 			{
-				verboselog(machine, 2, "          %04xxxxx: Weight Factor B = %08x\n", channel * 0x20, value );
+				verboselog(machine, 6, "          %04xxxxx: Weight Factor B = %08x\n", channel * 0x20, value );
 				mcd212.channel[channel].weight_factor_b = value;
 			}
 			break;
@@ -406,45 +406,45 @@ static void mcd212_process_ica(running_machine *machine, int channel)
 		{
 			case 0x00: case 0x01: case 0x02: case 0x03: case 0x04: case 0x05: case 0x06: case 0x07:	// STOP
 			case 0x08: case 0x09: case 0x0a: case 0x0b: case 0x0c: case 0x0d: case 0x0e: case 0x0f:
-				verboselog(machine, 2, "%08x: %08x: ICA: STOP\n", addr * 2 + channel * 0x200000, cmd );
+				verboselog(machine, 6, "%08x: %08x: ICA: STOP\n", addr * 2 + channel * 0x200000, cmd );
 				stop = 1;
 				break;
 			case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15: case 0x16: case 0x17: // NOP
 			case 0x18: case 0x19: case 0x1a: case 0x1b: case 0x1c: case 0x1d: case 0x1e: case 0x1f:
-				verboselog(machine, 2, "%08x: %08x: ICA: NOP\n", addr * 2 + channel * 0x200000, cmd );
+				verboselog(machine, 6, "%08x: %08x: ICA: NOP\n", addr * 2 + channel * 0x200000, cmd );
 				break;
 			case 0x20: case 0x21: case 0x22: case 0x23: case 0x24: case 0x25: case 0x26: case 0x27: // RELOAD DCP
 			case 0x28: case 0x29: case 0x2a: case 0x2b: case 0x2c: case 0x2d: case 0x2e: case 0x2f:
-				verboselog(machine, 2, "%08x: %08x: ICA: RELOAD DCP\n", addr * 2 + channel * 0x200000, cmd );
+				verboselog(machine, 6, "%08x: %08x: ICA: RELOAD DCP\n", addr * 2 + channel * 0x200000, cmd );
 				mcd212_set_dcp(channel, cmd & 0x001fffff);
 				break;
 			case 0x30: case 0x31: case 0x32: case 0x33: case 0x34: case 0x35: case 0x36: case 0x37: // RELOAD DCP and STOP
 			case 0x38: case 0x39: case 0x3a: case 0x3b: case 0x3c: case 0x3d: case 0x3e: case 0x3f:
-				verboselog(machine, 2, "%08x: %08x: ICA: RELOAD DCP and STOP\n", addr * 2 + channel * 0x200000, cmd );
+				verboselog(machine, 6, "%08x: %08x: ICA: RELOAD DCP and STOP\n", addr * 2 + channel * 0x200000, cmd );
 				mcd212_set_dcp(channel, cmd & 0x001fffff);
 				stop = 1;
 				break;
 			case 0x40: case 0x41: case 0x42: case 0x43: case 0x44: case 0x45: case 0x46: case 0x47: // RELOAD ICA
 			case 0x48: case 0x49: case 0x4a: case 0x4b: case 0x4c: case 0x4d: case 0x4e: case 0x4f:
-				verboselog(machine, 2, "%08x: %08x: ICA: RELOAD ICA\n", addr * 2 + channel * 0x200000, cmd );
+				verboselog(machine, 6, "%08x: %08x: ICA: RELOAD ICA\n", addr * 2 + channel * 0x200000, cmd );
 				addr = (cmd & 0x001fffff) / 2;
 				break;
 			case 0x50: case 0x51: case 0x52: case 0x53: case 0x54: case 0x55: case 0x56: case 0x57: // RELOAD VSR and STOP
 			case 0x58: case 0x59: case 0x5a: case 0x5b: case 0x5c: case 0x5d: case 0x5e: case 0x5f:
-				verboselog(machine, 2, "%08x: %08x: ICA: RELOAD VSR and STOP\n", addr * 2 + channel * 0x200000, cmd );
+				verboselog(machine, 6, "%08x: %08x: ICA: RELOAD VSR and STOP\n", addr * 2 + channel * 0x200000, cmd );
 				mcd212_set_vsr(channel, cmd & 0x001fffff);
 				stop = 1;
 				break;
 			case 0x60: case 0x61: case 0x62: case 0x63: case 0x64: case 0x65: case 0x66: case 0x67: // INTERRUPT
 			case 0x68: case 0x69: case 0x6a: case 0x6b: case 0x6c: case 0x6d: case 0x6e: case 0x6f:
-				verboselog(machine, 2, "%08x: %08x: ICA: INTERRUPT\n", addr * 2 + channel * 0x200000, cmd );
+				verboselog(machine, 6, "%08x: %08x: ICA: INTERRUPT\n", addr * 2 + channel * 0x200000, cmd );
 				mcd212.channel[1].csrr |= 1 << (2 - channel);
 				// TODO
 				// mcd212_check_interrupts
 				break;
 			case 0x70: case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x77: // RELOAD DISPLAY PARAMETERS
 			case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d: case 0x7e: case 0x7f:
-				verboselog(machine, 2, "%08x: %08x: ICA: RELOAD DISPLAY PARAMETERS\n", addr * 2 + channel * 0x200000, cmd );
+				verboselog(machine, 6, "%08x: %08x: ICA: RELOAD DISPLAY PARAMETERS\n", addr * 2 + channel * 0x200000, cmd );
 				mcd212_set_display_parameters(channel, cmd & 0x1f);
 				break;
 			default:
@@ -472,44 +472,44 @@ static void mcd212_process_dca(running_machine *machine, int channel)
 		{
 			case 0x00: case 0x01: case 0x02: case 0x03: case 0x04: case 0x05: case 0x06: case 0x07:	// STOP
 			case 0x08: case 0x09: case 0x0a: case 0x0b: case 0x0c: case 0x0d: case 0x0e: case 0x0f:
-				verboselog(machine, 2, "%08x: %08x: DCA: STOP\n", addr * 2 + channel * 0x200000, cmd );
+				verboselog(machine, 6, "%08x: %08x: DCA: STOP\n", addr * 2 + channel * 0x200000, cmd );
 				stop = 1;
 				break;
 			case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15: case 0x16: case 0x17: // NOP
 			case 0x18: case 0x19: case 0x1a: case 0x1b: case 0x1c: case 0x1d: case 0x1e: case 0x1f:
-				verboselog(machine, 2, "%08x: %08x: DCA: NOP\n", addr * 2 + channel * 0x200000, cmd );
+				verboselog(machine, 6, "%08x: %08x: DCA: NOP\n", addr * 2 + channel * 0x200000, cmd );
 				break;
 			case 0x20: case 0x21: case 0x22: case 0x23: case 0x24: case 0x25: case 0x26: case 0x27: // RELOAD DCP
 			case 0x28: case 0x29: case 0x2a: case 0x2b: case 0x2c: case 0x2d: case 0x2e: case 0x2f:
-				verboselog(machine, 2, "%08x: %08x: DCA: RELOAD DCP (NOP)\n", addr * 2 + channel * 0x200000, cmd );
+				verboselog(machine, 6, "%08x: %08x: DCA: RELOAD DCP (NOP)\n", addr * 2 + channel * 0x200000, cmd );
 				break;
 			case 0x30: case 0x31: case 0x32: case 0x33: case 0x34: case 0x35: case 0x36: case 0x37: // RELOAD DCP and STOP
 			case 0x38: case 0x39: case 0x3a: case 0x3b: case 0x3c: case 0x3d: case 0x3e: case 0x3f:
-				verboselog(machine, 2, "%08x: %08x: DCA: RELOAD DCP and STOP\n", addr * 2 + channel * 0x200000, cmd );
+				verboselog(machine, 6, "%08x: %08x: DCA: RELOAD DCP and STOP\n", addr * 2 + channel * 0x200000, cmd );
 				mcd212_set_dcp(channel, cmd & 0x001fffff);
 				stop = 1;
 				break;
 			case 0x40: case 0x41: case 0x42: case 0x43: case 0x44: case 0x45: case 0x46: case 0x47: // RELOAD VSR
 			case 0x48: case 0x49: case 0x4a: case 0x4b: case 0x4c: case 0x4d: case 0x4e: case 0x4f:
-				verboselog(machine, 2, "%08x: %08x: DCA: RELOAD VSR\n", addr * 2 + channel * 0x200000, cmd );
+				verboselog(machine, 6, "%08x: %08x: DCA: RELOAD VSR\n", addr * 2 + channel * 0x200000, cmd );
 				mcd212_set_vsr(channel, cmd & 0x001fffff);
 				break;
 			case 0x50: case 0x51: case 0x52: case 0x53: case 0x54: case 0x55: case 0x56: case 0x57: // RELOAD VSR and STOP
 			case 0x58: case 0x59: case 0x5a: case 0x5b: case 0x5c: case 0x5d: case 0x5e: case 0x5f:
-				verboselog(machine, 2, "%08x: %08x: DCA: RELOAD VSR and STOP\n", addr * 2 + channel * 0x200000, cmd );
+				verboselog(machine, 6, "%08x: %08x: DCA: RELOAD VSR and STOP\n", addr * 2 + channel * 0x200000, cmd );
 				mcd212_set_vsr(channel, cmd & 0x001fffff);
 				stop = 1;
 				break;
 			case 0x60: case 0x61: case 0x62: case 0x63: case 0x64: case 0x65: case 0x66: case 0x67: // INTERRUPT
 			case 0x68: case 0x69: case 0x6a: case 0x6b: case 0x6c: case 0x6d: case 0x6e: case 0x6f:
-				verboselog(machine, 2, "%08x: %08x: DCA: INTERRUPT\n", addr * 2 + channel * 0x200000, cmd );
+				verboselog(machine, 6, "%08x: %08x: DCA: INTERRUPT\n", addr * 2 + channel * 0x200000, cmd );
 				mcd212.channel[1].csrr |= 1 << (2 - channel);
 				// TODO
 				// mcd212_check_interrupts
 				break;
 			case 0x70: case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x77: // RELOAD DISPLAY PARAMETERS
 			case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d: case 0x7e: case 0x7f:
-				verboselog(machine, 2, "%08x: %08x: DCA: RELOAD DISPLAY PARAMETERS\n", addr * 2 + channel * 0x200000, cmd );
+				verboselog(machine, 6, "%08x: %08x: DCA: RELOAD DISPLAY PARAMETERS\n", addr * 2 + channel * 0x200000, cmd );
 				mcd212_set_display_parameters(channel, cmd & 0x1f);
 				break;
 			default:
@@ -594,7 +594,7 @@ static void mcd212_draw_scanline(running_machine *machine, int y)
 {
 	bitmap_t *bitmap = tmpbitmap;
 	UINT32 plane_a[768];
-	UINT32 plane_b[768];
+	//UINT32 plane_b[768];
 	UINT32 *scanline = BITMAP_ADDR32(bitmap, y, 0);
 	int x;
 	mcd212_process_vsr(machine, 0, plane_a);
