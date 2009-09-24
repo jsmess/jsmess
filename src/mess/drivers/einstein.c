@@ -390,8 +390,12 @@ static WRITE8_DEVICE_HANDLER( einstein_drsel_w )
 	if (BIT(data, 2)) wd17xx_set_drive(device, 2);
 	if (BIT(data, 3)) wd17xx_set_drive(device, 3);
 
-	/* bit 4 selects the side */
-	wd17xx_set_side(device, BIT(data, 4));
+	/* double sided drive connected? */
+	if (input_port_read(device->machine, "config") & data)
+	{
+		/* bit 4 selects the side then */
+		wd17xx_set_side(device, BIT(data, 4));
+	}
 }
 
 
@@ -557,6 +561,8 @@ static MACHINE_START( einstein )
 static MACHINE_RESET( einstein )
 {
 	einstein_state *einstein = machine->driver_data;
+	const device_config *floppy;
+	UINT8 config = input_port_read(machine, "config");
 
 	/* save pointers to our devices */
 	einstein->color_screen = devtag_get_device(machine, "screen");
@@ -576,6 +582,16 @@ static MACHINE_RESET( einstein )
 	einstein->interrupt_mask = 0;
 
 	einstein->ctc_trigger = 0;
+
+	/* configure floppy drives */
+	floppy = devtag_get_device(machine, "floppy0");
+	floppy_drive_set_geometry(floppy, config & 0x01 ? FLOPPY_DRIVE_DS_80 : FLOPPY_DRIVE_SS_40);
+	floppy = devtag_get_device(machine, "floppy1");
+	floppy_drive_set_geometry(floppy, config & 0x02 ? FLOPPY_DRIVE_DS_80 : FLOPPY_DRIVE_SS_40);
+	floppy = devtag_get_device(machine, "floppy2");
+	floppy_drive_set_geometry(floppy, config & 0x04 ? FLOPPY_DRIVE_DS_80 : FLOPPY_DRIVE_SS_40);
+	floppy = devtag_get_device(machine, "floppy3");
+	floppy_drive_set_geometry(floppy, config & 0x08 ? FLOPPY_DRIVE_DS_80 : FLOPPY_DRIVE_SS_40);
 }
 
 static MACHINE_RESET( einstein2 )
@@ -775,6 +791,20 @@ static INPUT_PORTS_START( einstein )
 	/* analog joystick 2 Y axis */
 	PORT_START("JOY2_Y")
 	PORT_BIT(0xff, 0x80, IPT_AD_STICK_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_MINMAX(1,0xff) PORT_CODE_DEC(JOYCODE_Y_UP_SWITCH) PORT_CODE_INC(JOYCODE_Y_DOWN_SWITCH) PORT_PLAYER(2) PORT_REVERSE
+
+	PORT_START("config")
+	PORT_CONFNAME(0x01, 0x00, "Floppy drive #1")
+	PORT_CONFSETTING(0x00, "Single sided")
+	PORT_CONFSETTING(0x01, "Double sided")
+	PORT_CONFNAME(0x02, 0x00, "Floppy drive #2")
+	PORT_CONFSETTING(0x00, "Single sided")
+	PORT_CONFSETTING(0x02, "Double sided")
+	PORT_CONFNAME(0x04, 0x00, "Floppy drive #3")
+	PORT_CONFSETTING(0x00, "Single sided")
+	PORT_CONFSETTING(0x04, "Double sided")
+	PORT_CONFNAME(0x08, 0x00, "Floppy drive #4")
+	PORT_CONFSETTING(0x00, "Single sided")
+	PORT_CONFSETTING(0x08, "Double sided")
 INPUT_PORTS_END
 
 INPUT_PORTS_START( einstein_80col )
@@ -899,9 +929,9 @@ static MACHINE_DRIVER_START( einstein )
 
 	/* uart */
 	MDRV_MSM8251_ADD(IC_I060, default_msm8251_interface)
-	
+
 	MDRV_WD1770_ADD(IC_I042, default_wd17xx_interface)
-	
+
 	MDRV_FLOPPY_4_DRIVES_ADD(einstein_floppy_config)
 MACHINE_DRIVER_END
 
@@ -982,7 +1012,7 @@ ROM_END
 ***************************************************************************/
 static SYSTEM_CONFIG_START( einstein )
 	/* RAM is provided by 8k DRAM ICs i009, i010, i011, i012, i013, i014, i015 and i016 */
-	CONFIG_RAM_DEFAULT(8 * 8 * 1024)	
+	CONFIG_RAM_DEFAULT(8 * 8 * 1024)
 SYSTEM_CONFIG_END
 
 
