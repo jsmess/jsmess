@@ -574,7 +574,7 @@ static void nec765_seek_setup(const device_config *device, int is_recalibrate)
 		}
 	}
 
-//    nec765_idle(device);
+    nec765_idle(device);
 
 }
 
