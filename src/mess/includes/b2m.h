@@ -10,6 +10,8 @@
 #include "machine/i8255a.h"
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
+#include "sound/speaker.h"
+#include "sound/wave.h"
 
 /*----------- defined in machine/b2m.c -----------*/
 
@@ -32,11 +34,6 @@ extern READ8_HANDLER( b2m_palette_r );
 extern WRITE8_HANDLER( b2m_palette_w );
 extern READ8_HANDLER( b2m_localmachine_r );
 extern WRITE8_HANDLER( b2m_localmachine_w );
-
-#define SOUND_B2M		DEVICE_GET_INFO_NAME( b2m_sound )
-
-DEVICE_GET_INFO( b2m_sound );
-
 
 /*----------- defined in video/b2m.c -----------*/
 

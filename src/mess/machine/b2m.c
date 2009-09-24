@@ -15,7 +15,6 @@
 #include "machine/wd17xx.h"
 #include "machine/pic8259.h"
 #include "machine/msm8251.h"
-#include "streams.h"
 #include "includes/b2m.h"
 
 static int b2m_8255_porta;
@@ -31,9 +30,6 @@ static UINT8 b2m_romdisk_msb;
 
 static UINT8 b2m_color[4];
 static UINT8 b2m_localmachine;
-
-static int	b2m_sound_input;
-static sound_stream *mixer_channel;
 
 
 static READ8_HANDLER (b2m_keyboard_r )
@@ -164,11 +160,11 @@ static PIT8253_OUTPUT_CHANGED(bm2_pit_out0)
 
 
 static PIT8253_OUTPUT_CHANGED(bm2_pit_out1)
-{
-	if (mixer_channel!=NULL) {
-		stream_update( mixer_channel );
-	}
-	b2m_sound_input = state;
+{	
+	const device_config *speaker = devtag_get_device(device->machine, "speaker");
+	
+	speaker_level_w(speaker, state);
+
 }
 
 static PIT8253_OUTPUT_CHANGED(bm2_pit_out2)
@@ -350,46 +346,9 @@ INTERRUPT_GEN (b2m_vblank_interrupt)
 
 MACHINE_RESET(b2m)
 {	
-	b2m_sound_input = 0;
-		
 	b2m_side = 0;
 	b2m_drive = 0;
 
 	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), b2m_irq_callback);
 	b2m_set_bank(machine, 7);
-}
-
-static STREAM_UPDATE( b2m_sh_update )
-{
-	INT16 channel_1_signal;
-
-	stream_sample_t *sample_left = outputs[0];
-
-	channel_1_signal = b2m_sound_input ? 3000 : -3000;
-
-	while (samples--)
-	{
-		*sample_left = channel_1_signal;		
-		sample_left++;
-	}
-}
-
-static DEVICE_START(b2m_sound)
-{
-	b2m_sound_input = 0;
-	mixer_channel = stream_create(device, 0, 1, device->machine->sample_rate, 0, b2m_sh_update);
-}
-
-
-DEVICE_GET_INFO( b2m_sound )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(b2m_sound);	break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "B2M Custom");				break;
-		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);						break;
-	}
 }

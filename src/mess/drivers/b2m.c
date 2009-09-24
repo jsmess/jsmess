@@ -227,7 +227,7 @@ static MACHINE_DRIVER_START( b2m )
     
 	/* sound */
     MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("custom", B2M, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER, 0)	
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)	
 
 	/* uart */
