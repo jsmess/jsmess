@@ -643,19 +643,62 @@ static void cmt_command( running_machine* machine, UINT8 cmd )
 			cassette_change_state(devtag_get_device(machine, "cass" ),CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
 			cassette_change_state(devtag_get_device(machine, "cass" ),CASSETTE_STOPPED,CASSETTE_MASK_UISTATE);
 			cmt_test = 1;
+			popmessage("CMT: Stop");
 			break;
 		case 0x02:  // Play
 			cassette_change_state(devtag_get_device(machine, "cass" ),CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
 			cassette_change_state(devtag_get_device(machine, "cass" ),CASSETTE_PLAY,CASSETTE_MASK_UISTATE);
+			popmessage("CMT: Play");
+			break;
+		case 0x03:  // Fast Forward
+			cassette_change_state(devtag_get_device(machine, "cass" ),CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
+			cassette_change_state(devtag_get_device(machine, "cass" ),CASSETTE_STOPPED,CASSETTE_MASK_UISTATE);
+			popmessage("CMT: Fast Forward");
+			break;
+		case 0x04:  // Rewind
+			cassette_change_state(devtag_get_device(machine, "cass" ),CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
+			cassette_change_state(devtag_get_device(machine, "cass" ),CASSETTE_STOPPED,CASSETTE_MASK_UISTATE);
+			popmessage("CMT: Rewind");
+			break;
+		case 0x05:  // APSS Fast Forward
+			cassette_change_state(devtag_get_device(machine, "cass" ),CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
+			cassette_change_state(devtag_get_device(machine, "cass" ),CASSETTE_STOPPED,CASSETTE_MASK_UISTATE);
+			popmessage("CMT: APSS Fast Forward");
+			break;
+		case 0x06:  // APSS Rewind
+			cassette_change_state(devtag_get_device(machine, "cass" ),CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
+			cassette_change_state(devtag_get_device(machine, "cass" ),CASSETTE_STOPPED,CASSETTE_MASK_UISTATE);
+			popmessage("CMT: APSS Rewind");
 			break;
 		case 0x0a:  // Record
 			cassette_change_state(devtag_get_device(machine, "cass" ),CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
 			cassette_change_state(devtag_get_device(machine, "cass" ),CASSETTE_RECORD,CASSETTE_MASK_UISTATE);
+			popmessage("CMT: Record");
 			break;
 		default:
 			logerror("Unimplemented or invalid CMT command (0x%02x)\n",cmd);
 	}
 	logerror("CMT: Command 0xe9-0x%02x received.\n",cmd);
+}
+
+static TIMER_CALLBACK( cmt_wind_timer )
+{
+	const device_config* cmt = devtag_get_device(machine,"cass");
+	switch(cmt_current_cmd)
+	{
+		case 0x03:
+		case 0x05:  // Fast Forwarding tape
+			cassette_seek(cmt,1,SEEK_CUR);
+			if(cassette_get_position(cmt) >= cassette_get_length(cmt))  // at end?
+				cmt_command(machine,0x01);  // Stop tape
+			break;
+		case 0x04:
+		case 0x06:  // Rewinding tape
+			cassette_seek(cmt,-1,SEEK_CUR);
+			if(cassette_get_position(cmt) <= 0) // at beginning?
+				cmt_command(machine,0x01);  // Stop tape
+			break;
+	}
 }
 
 static WRITE8_HANDLER( sub_io_w )
@@ -1994,7 +2037,8 @@ static MACHINE_RESET( x1 )
 
 	//cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), x1_irq_callback);
 	timer_pulse(machine, ATTOTIME_IN_HZ(240), NULL, 0, keyboard_callback);
-
+	timer_pulse(machine, ATTOTIME_IN_HZ(16), NULL, 0, cmt_wind_timer);
+	
 	cmt_current_cmd = 0;
 	cmt_test = 0;
 	cassette_change_state(devtag_get_device(machine, "cass" ),CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
