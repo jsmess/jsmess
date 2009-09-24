@@ -78,12 +78,6 @@ extern UINT8 sgb_hack;				/* Flag set if we're using a hack       */
 extern MACHINE_RESET( sgb );
 extern WRITE8_HANDLER ( sgb_io_w );
 
-/* -- Game Boy Color specific -- */
-#define GBC_MODE_GBC		1		/* GBC is in colour mode                */
-#define GBC_MODE_MONO		2		/* GBC is in mono mode                  */
-
-extern UINT8 gbc_mode;				/* is the GBC in mono/colour mode?      */
-
 MACHINE_RESET( gbc );
 
 

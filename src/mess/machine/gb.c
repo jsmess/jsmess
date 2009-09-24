@@ -101,7 +101,6 @@ UINT8 sgb_pal_map[20][18];	/* Palette tile map						*/
 UINT8 sgb_tile_map[2048];	/* 32x32 tile map data (0-tile,1-attribute)	*/
 UINT8 sgb_window_mask;		/* Current GB screen mask				*/
 UINT8 sgb_hack;				/* Flag set if we're using a hack		*/
-UINT8 gbc_mode;				/* is the GBC in mono/colour mode?		*/
 
 static UINT8 *gb_cart = NULL;
 static UINT8 *gb_cart_ram = NULL;
@@ -381,11 +380,6 @@ MACHINE_RESET( gbc )
 
 	gb_init_regs(machine);
 
-	/* Initialize the Sound registers */
-	gb_sound_w(devtag_get_device(machine, "custom"), 0x16, 0x80);
-	gb_sound_w(devtag_get_device(machine, "custom"), 0x15, 0xF3);
-	gb_sound_w(devtag_get_device(machine, "custom"), 0x14, 0x77);
-
 	gb_rom16_0000( machine, ROMMap[ROMBank00] ? ROMMap[ROMBank00] : gb_dummy_rom_bank );
 
 	/* Enable BIOS rom */
@@ -398,26 +392,6 @@ MACHINE_RESET( gbc )
 		GBC_RAMMap[ii] = mess_ram + CGB_START_RAM_BANKS + ii * 0x1000;
 		memset (GBC_RAMMap[ii], 0, 0x1000);
 	}
-	gbc_io2_w( cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM ), 0x30, 0x00 );
-
-	/* Initialise registers */
-	gb_io_w( cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM ), 0x6C, 0xFE );
-	gb_io_w( cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM ), 0x72, 0x00 );
-	gb_io_w( cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM ), 0x73, 0x00 );
-	gb_io_w( cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM ), 0x74, 0x8F );
-	gb_io_w( cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM ), 0x75, 0x00 );
-	gb_io_w( cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM ), 0x76, 0x00 );
-	gb_io_w( cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM ), 0x77, 0x00 );
-
-	/* Are we in colour or mono mode? */
-	gbc_mode = GBC_MODE_MONO;
-
-	if (gb_cart)	// make sure cart is in
-	{
-		if( gb_cart[0x143] == 0x80 || gb_cart[0x143] == 0xC0 )
-			gbc_mode = GBC_MODE_GBC;
-	}
-	gb_timer.divcount = 0x1E9C;
 }
 
 static void gb_machine_stop(running_machine *machine)

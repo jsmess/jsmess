@@ -104,6 +104,7 @@ static struct gb_lcd_struct {
 	int hdma_possible;
 	struct layer_struct	layer[2];
 	emu_timer	*lcd_timer;
+	int gbc_mode;
 } gb_lcd;
 
 static void (*update_scanline)( running_machine *machine );
@@ -893,7 +894,7 @@ INLINE void cgb_update_sprites ( running_machine *machine )
 			UINT8 bit, pal;
 
 			/* Handle mono mode for GB games */
-			if( gbc_mode == GBC_MODE_MONO )
+			if( ! gb_lcd.gbc_mode )
 				pal = (oam[3] & 0x10) ? 4 : 0;
 			else
 				pal = ((oam[3] & 0x7) * 4);
@@ -918,7 +919,11 @@ INLINE void cgb_update_sprites ( running_machine *machine )
 				{
 					register int colour = ((data & 0x0100) ? 2 : 0) | ((data & 0x0001) ? 1 : 0);
 					if (colour && !bg_zbuf[xindex] && xindex >= 0 && xindex < 160)
+					{
+						if ( ! gb_lcd.gbc_mode )
+							colour = pal ? gb_spal1[colour] : gb_spal0[colour];
 						gb_plot_pixel(bitmap, xindex, yindex, cgb_spal[pal + colour]);
+					}
 					data >>= 1;
 				}
 				break;
@@ -929,7 +934,11 @@ INLINE void cgb_update_sprites ( running_machine *machine )
 					if((bg_zbuf[xindex] & 0x80) && (bg_zbuf[xindex] & 0x7f) && (LCDCONT & 0x1))
 						colour = 0;
 					if (colour && xindex >= 0 && xindex < 160)
+					{
+						if ( ! gb_lcd.gbc_mode )
+							colour = pal ? gb_spal1[colour] : gb_spal0[colour];
 						gb_plot_pixel(bitmap, xindex, yindex, cgb_spal[pal + colour]);
+					}
 					data >>= 1;
 				}
 				break;
@@ -938,7 +947,11 @@ INLINE void cgb_update_sprites ( running_machine *machine )
 				{
 					register int colour = ((data & 0x8000) ? 2 : 0) | ((data & 0x0080) ? 1 : 0);
 					if (colour && !bg_zbuf[xindex] && xindex >= 0 && xindex < 160)
+					{
+						if ( ! gb_lcd.gbc_mode )
+							colour = pal ? gb_spal1[colour] : gb_spal0[colour];
 						gb_plot_pixel(bitmap, xindex, yindex, cgb_spal[pal + colour]);
+					}
 					data <<= 1;
 				}
 				break;
@@ -949,7 +962,11 @@ INLINE void cgb_update_sprites ( running_machine *machine )
 					if((bg_zbuf[xindex] & 0x80) && (bg_zbuf[xindex] & 0x7f) && (LCDCONT & 0x1))
 						colour = 0;
 					if (colour && xindex >= 0 && xindex < 160)
+					{
+						if ( ! gb_lcd.gbc_mode )
+							colour = pal ? gb_spal1[colour] : gb_spal0[colour];
 						gb_plot_pixel(bitmap, xindex, yindex, cgb_spal[pal + colour]);
+					}
 					data <<= 1;
 				}
 				break;
@@ -1024,7 +1041,7 @@ static void cgb_update_scanline ( running_machine *machine )
 				r.min_y = r.max_y = gb_lcd.current_line;
 				r.min_x = gb_lcd.start_x;
 				r.max_x = gb_lcd.end_x - 1;
-				bitmap_fill( bitmap, &r , ( gbc_mode == GBC_MODE_MONO ) ? 0 : 32767);
+				bitmap_fill( bitmap, &r , ( ! gb_lcd.gbc_mode ) ? 0 : 32767);
 			}
 			while ( l < 2 ) 
 			{
@@ -1086,7 +1103,7 @@ static void cgb_update_scanline ( running_machine *machine )
 							colour = ( ( data & 0x8000 ) ? 2 : 0 ) | ( ( data & 0x0080 ) ? 1 : 0 );
 							data <<= 1;
 						}
-						gb_plot_pixel( bitmap, xindex, gb_lcd.current_line, cgb_bpal[ ( ( gbcmap[ gb_lcd.layer[l].xindex ] & 0x07 ) * 4 ) + colour ] );
+						gb_plot_pixel( bitmap, xindex, gb_lcd.current_line, cgb_bpal[ ( ! gb_lcd.gbc_mode ) ? gb_bpal[colour] : ( ( gbcmap[ gb_lcd.layer[l].xindex ] & 0x07 ) * 4 ) + colour ] );
 						bg_zbuf[ xindex ] = colour + ( gbcmap[ gb_lcd.layer[l].xindex ] & 0x80 );
 						xindex++;
 						gb_lcd.layer[l].xshift++;
@@ -1140,7 +1157,7 @@ static void cgb_update_scanline ( running_machine *machine )
 					const device_config *screen = video_screen_first(machine->config);
 					rectangle r = *video_screen_get_visible_area(screen);
 					r.min_y = r.max_y = gb_lcd.current_line;
-					bitmap_fill( bitmap, &r , ( gbc_mode == GBC_MODE_MONO ) ? 0 : 32767);
+					bitmap_fill( bitmap, &r , ( ! gb_lcd.gbc_mode ) ? 0 : 32767);
 				}
 				gb_lcd.previous_line = gb_lcd.current_line;
 			}
@@ -1367,7 +1384,7 @@ void gb_video_init( running_machine *machine, int mode )
 		gb_lcd.hdma_enabled = 0;
 		gb_lcd.hdma_possible = 0;
 
-		gb_lcd.mode = 1;
+		gb_lcd.gbc_mode = 1;
 		break;
 	}
 }
@@ -2196,7 +2213,6 @@ READ8_HANDLER( gbc_video_r )
 
 WRITE8_HANDLER ( gbc_video_w ) 
 {
-	static const UINT16 gbc_to_gb_pal[4] = {32767, 21140, 10570, 0};
 	static UINT16 BP = 0, OP = 0;
 
 	switch( offset ) 
@@ -2273,33 +2289,26 @@ WRITE8_HANDLER ( gbc_video_w )
 		}
 		break;
 	case 0x07:      /* BGP - GB background palette */
-		/* Some GBC games are lazy and still call this */
-		if( gbc_mode == GBC_MODE_MONO ) 
-		{
-			update_scanline( space->machine );
-			cgb_bpal[0] = gbc_to_gb_pal[(data & 0x03)];
-			cgb_bpal[1] = gbc_to_gb_pal[(data & 0x0C) >> 2];
-			cgb_bpal[2] = gbc_to_gb_pal[(data & 0x30) >> 4];
-			cgb_bpal[3] = gbc_to_gb_pal[(data & 0xC0) >> 6];
-		}
+		update_scanline( space->machine );
+		gb_bpal[0] = data & 0x3;
+		gb_bpal[1] = (data & 0xC) >> 2;
+		gb_bpal[2] = (data & 0x30) >> 4;
+		gb_bpal[3] = (data & 0xC0) >> 6;
 		break;
 	case 0x08:      /* OBP0 - GB Object 0 palette */
-		if( gbc_mode == GBC_MODE_MONO ) /* Some GBC games are lazy and still call this */
-		{
-			cgb_spal[0] = gbc_to_gb_pal[(data & 0x03)];
-			cgb_spal[1] = gbc_to_gb_pal[(data & 0x0C) >> 2];
-			cgb_spal[2] = gbc_to_gb_pal[(data & 0x30) >> 4];
-			cgb_spal[3] = gbc_to_gb_pal[(data & 0xC0) >> 6];
-		}
+		gb_spal0[0] = data & 0x3;
+		gb_spal0[1] = (data & 0xC) >> 2;
+		gb_spal0[2] = (data & 0x30) >> 4;
+		gb_spal0[3] = (data & 0xC0) >> 6;
 		break;
 	case 0x09:      /* OBP1 - GB Object 1 palette */
-		if( gbc_mode == GBC_MODE_MONO ) /* Some GBC games are lazy and still call this */
-		{
-			cgb_spal[4] = gbc_to_gb_pal[(data & 0x03)];
-			cgb_spal[5] = gbc_to_gb_pal[(data & 0x0C) >> 2];
-			cgb_spal[6] = gbc_to_gb_pal[(data & 0x30) >> 4];
-			cgb_spal[7] = gbc_to_gb_pal[(data & 0xC0) >> 6];
-		}
+		gb_spal1[0] = data & 0x3;
+		gb_spal1[1] = (data & 0xC) >> 2;
+		gb_spal1[2] = (data & 0x30) >> 4;
+		gb_spal1[3] = (data & 0xC0) >> 6;
+		break;
+	case 0x0c:		/* Undocumented register involved in selecting gb/gbc mode */
+		logerror( "Write to undocumented register: %X = %X\n", offset, data );
 		break;
 	case 0x0F:		/* VBK - VRAM bank select */
 		gb_vram_ptr = gb_vram + ( data & 0x01 ) * 0x2000;
@@ -2390,6 +2399,10 @@ WRITE8_HANDLER ( gbc_video_w )
 		/* bit 0 can be read/written */
 		logerror( "Write to undocumented register: %X = %X\n", offset, data );
 		data = 0xFE | ( data & 0x01 );
+		if ( data & 0x01 )
+		{
+			gb_lcd.gbc_mode = 0;
+		}
 		break;
 	case 0x32:
 	case 0x33:
