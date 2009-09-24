@@ -126,6 +126,8 @@ int floppy_get_drive_by_type(const device_config *image,int ftype);
 void *flopimg_get_custom_data(const device_config *image);
 void flopimg_alloc_custom_data(const device_config *image,void *custom);
 
+void floppy_drive_set_geometry(const device_config *img, floppy_type type);
+
 #define FLOPPY	DEVICE_GET_INFO_NAME(floppy)
 DEVICE_GET_INFO(floppy);
 
