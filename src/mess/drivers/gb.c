@@ -443,9 +443,7 @@ space. This mapper uses 32KB sized banks.
 
 
 /* Initial value of the cpu registers (hacks until we get bios dumps) */
-//static const UINT16 sgb_cpu_regs[6] = { 0x01B0, 0x0013, 0x00D8, 0x014D, 0xFFFE, 0x0100 };    /* Super Game Boy                    */
 static const UINT16 mgb_cpu_regs[6] = { 0xFFB0, 0x0013, 0x00D8, 0x014D, 0xFFFE, 0x0100 };	/* Game Boy Pocket / Super Game Boy 2 */
-//static const UINT16 cgb_cpu_regs[6] = { 0x11B0, 0x0013, 0x00D8, 0x014D, 0xFFFE, 0x0100 };	/* Game Boy Color  / Game Boy Advance */
 static const UINT16 megaduck_cpu_regs[6] = { 0x0000, 0x0000, 0x0000, 0x0000, 0xFFFE, 0x0000 };	/* Megaduck */
 
 static const lr35902_cpu_core dmg_cpu_reset = { NULL, LR35902_FEATURE_HALT_BUG, gb_timer_callback };
@@ -457,9 +455,9 @@ static const lr35902_cpu_core megaduck_cpu_reset = { megaduck_cpu_regs, LR35902_
 static ADDRESS_MAP_START(gb_map, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x00ff) AM_ROMBANK(5)					/* BIOS or ROM */
-	AM_RANGE(0x0100, 0x014f) AM_ROMBANK(10)					/* ROM bank */
-	AM_RANGE(0x0150, 0x03ff) AM_ROMBANK(6)
-	AM_RANGE(0x0400, 0x3fff) AM_ROMBANK(11)
+	AM_RANGE(0x0100, 0x01ff) AM_ROMBANK(10)					/* ROM bank */
+	AM_RANGE(0x0200, 0x08ff) AM_ROMBANK(6)
+	AM_RANGE(0x0900, 0x3fff) AM_ROMBANK(11)
 	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK(1)					/* 8KB/16KB switched ROM bank */
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK(4)					/* 8KB/16KB switched ROM bank */
 	AM_RANGE(0x8000, 0x9fff) AM_READWRITE( gb_vram_r, gb_vram_w ) /* 8k VRAM */
@@ -478,9 +476,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(sgb_map, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x00ff) AM_ROMBANK(5)					/* BIOS or ROM */
-	AM_RANGE(0x0100, 0x014f) AM_ROMBANK(10)					/* ROM bank */
-	AM_RANGE(0x0150, 0x03ff) AM_ROMBANK(6)
-	AM_RANGE(0x0400, 0x3fff) AM_ROMBANK(11)
+	AM_RANGE(0x0100, 0x01ff) AM_ROMBANK(10)					/* ROM bank */
+	AM_RANGE(0x0200, 0x08ff) AM_ROMBANK(6)
+	AM_RANGE(0x0900, 0x3fff) AM_ROMBANK(11)
 	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK(1)					/* 8KB/16KB switched ROM bank */
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK(4)					/* 8KB/16KB switched ROM bank */
 	AM_RANGE(0x8000, 0x9fff) AM_READWRITE( gb_vram_r, gb_vram_w ) /* 8k VRAM */
@@ -499,9 +497,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(gbc_map, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x00ff) AM_ROMBANK(5)					/* 16k fixed ROM bank */
-	AM_RANGE(0x0100, 0x014f) AM_ROMBANK(10)					/* ROM bank */
-	AM_RANGE(0x0150, 0x03ff) AM_ROMBANK(6)
-	AM_RANGE(0x0400, 0x3fff) AM_ROMBANK(11)
+	AM_RANGE(0x0100, 0x01ff) AM_ROMBANK(10)					/* ROM bank */
+	AM_RANGE(0x0200, 0x08ff) AM_ROMBANK(6)
+	AM_RANGE(0x0900, 0x3fff) AM_ROMBANK(11)
 	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK(1)					/* 8KB/16KB switched ROM bank */
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK(4)					/* 8KB/16KB switched ROM bank */
 	AM_RANGE(0x8000, 0x9fff) AM_READWRITE( gb_vram_r, gb_vram_w )		/* 8k switched VRAM bank */
@@ -704,9 +702,8 @@ ROM_END
 
 ROM_START( gbcolor )
 	ROM_REGION( 0x03B0 + 1792, "maincpu", 0 )
-	ROM_LOAD( "gbc_boot.1", 0x0000, 0x0100, BAD_DUMP CRC(88d4d695) SHA1(81017173358fccf72246150abf914d8cac9a735a) )	/* Bootstrap code part 1 */
-	ROM_LOAD( "gbc_boot.2", 0x0100, 0x02B0, BAD_DUMP CRC(35ced848) SHA1(2730f3eea908ec1208c9fc05b52afeb2011d36fc) ) /* Bootstrap code part 2 */
-	ROM_LOAD( "gbc_boot.3", 0x03B0, 1792, NO_DUMP )	/* DMG game - palette lookup table(?) */
+	ROM_LOAD( "gbc_boot.1", 0x0000, 0x0100, CRC(779ea374) SHA1(e4b40c9fd593a97a1618cfb2696f290cf9596a62) )	/* Bootstrap code part 1 */
+	ROM_LOAD( "gbc_boot.2", 0x0100, 0x0700, CRC(f741807d) SHA1(f943b1e0b640cf1d371e1d8f0ada69af03ebb396) ) /* Bootstrap code part 2 */
 ROM_END
 
 

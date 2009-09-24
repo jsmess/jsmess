@@ -1367,22 +1367,7 @@ void gb_video_init( running_machine *machine, int mode )
 		gb_lcd.hdma_enabled = 0;
 		gb_lcd.hdma_possible = 0;
 
-		/* Make sure the VBlank interrupt is set when the first instruction gets executed */
-		timer_set(machine,  cputag_clocks_to_attotime(machine, "maincpu", 1), NULL, 0, gb_video_init_vbl );
-
-		/* Initialize some video registers */
-		gbc_video_w( space, 0x0, 0x91 );    /* LCDCONT */
-		gbc_video_w( space, 0x7, 0xFC );    /* BGRDPAL */
-		gbc_video_w( space, 0x8, 0xFC );    /* SPR0PAL */
-		gbc_video_w( space, 0x9, 0xFC );    /* SPR1PAL */
-		gbc_video_w( space, 0x0F, 0x00 );
-		CURLINE = gb_lcd.current_line = 0x90;
-		LCDSTAT = ( LCDSTAT & 0xF8 ) | 0x01;
 		gb_lcd.mode = 1;
-		timer_adjust_oneshot(gb_lcd.lcd_timer, cputag_clocks_to_attotime(machine, "maincpu", 292), GB_LCD_STATE_LY9X_M1_INC);
-		gb_lcd.oam_locked = UNLOCKED;
-		gb_lcd.vram_locked = UNLOCKED;
-		gb_lcd.pal_locked = UNLOCKED;
 		break;
 	}
 }

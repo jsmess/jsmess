@@ -175,8 +175,8 @@ static void gb_rom16_0000( running_machine *machine, UINT8 *addr )
 {
 	memory_set_bankptr( machine, 5, addr );
 	memory_set_bankptr( machine, 10, addr + 0x0100 );
-	memory_set_bankptr( machine, 6, addr + 0x0150 );
-	memory_set_bankptr( machine, 11, addr + 0x0400 );
+	memory_set_bankptr( machine, 6, addr + 0x0200 );
+	memory_set_bankptr( machine, 11, addr + 0x0900 );
 }
 
 static void gb_rom16_4000( running_machine *machine, UINT8 *addr ) 

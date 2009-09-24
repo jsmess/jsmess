@@ -19,6 +19,8 @@ System Driver Changes:
 - [EINSTEIN] Made it possible to select single or double sided
   disk drives.  [Dirk Best]
 
+- [GBCOLOR] Added BIOS.  [Wilbert Pol]
+
 - [NES] Fixed crash of MMC3 games with no CHR-ROM (bug
   #1860) [Fabio Priuli, Rob Bohms]
 
