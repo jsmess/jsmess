@@ -11,8 +11,13 @@
 #include "sound/dac.h"
 #include "4004clk.lh"
 
-static UINT16 nixie[6];
-static UINT16 nixie_temp[16];
+typedef struct __4004clk_state _4004clk_state;
+struct __4004clk_state
+{
+	UINT16 nixie[16];
+	UINT8 timer;
+	const device_config *dac;
+};
 
 static READ8_HANDLER(data_r) 
 {
@@ -44,27 +49,23 @@ INLINE void output_set_neon_value(int index, int value)
 	output_set_indexed_value("neon", index, value);
 }
 
-static void update_nixie(void) 
+static void update_nixie(running_machine *machine) 
 {
-	nixie[0] = ((nixie_temp[2] & 3)<<8) | (nixie_temp[1] << 4) | nixie_temp[0];
-	nixie[1] = (nixie_temp[4] << 6) | (nixie_temp[3] << 2) | (nixie_temp[2] >>2);
-	nixie[2] = ((nixie_temp[7] & 3)<<8) | (nixie_temp[6] << 4) | nixie_temp[5];
-	nixie[3] = (nixie_temp[9] << 6) | (nixie_temp[8] << 2) | (nixie_temp[7] >>2);		
-	nixie[4] = ((nixie_temp[12] & 3)<<8) | (nixie_temp[11] << 4) | nixie_temp[10];
-	nixie[5] = (nixie_temp[14] << 6) | (nixie_temp[13] << 2) | (nixie_temp[12] >>2);
-	
-	output_set_nixie_value(0,nixie_to_num(nixie[5]));
-	output_set_nixie_value(1,nixie_to_num(nixie[4]));
-	output_set_nixie_value(2,nixie_to_num(nixie[3]));
-	output_set_nixie_value(3,nixie_to_num(nixie[2]));
-	output_set_nixie_value(4,nixie_to_num(nixie[1]));
-	output_set_nixie_value(5,nixie_to_num(nixie[0]));
+	_4004clk_state *state = machine->driver_data;
+
+	output_set_nixie_value(5,nixie_to_num(((state->nixie[2] & 3)<<8) | (state->nixie[1] << 4) | state->nixie[0]));
+	output_set_nixie_value(4,nixie_to_num((state->nixie[4] << 6) | (state->nixie[3] << 2) | (state->nixie[2] >>2)));
+	output_set_nixie_value(3,nixie_to_num(((state->nixie[7] & 3)<<8) | (state->nixie[6] << 4) | state->nixie[5]));
+	output_set_nixie_value(2,nixie_to_num((state->nixie[9] << 6) | (state->nixie[8] << 2) | (state->nixie[7] >>2)));
+	output_set_nixie_value(1,nixie_to_num(((state->nixie[12] & 3)<<8) | (state->nixie[11] << 4) | state->nixie[10]));
+	output_set_nixie_value(0,nixie_to_num((state->nixie[14] << 6) | (state->nixie[13] << 2) | (state->nixie[12] >>2)));
 }
 
 static WRITE8_HANDLER(nixie_w) 
 {
-	nixie_temp[offset] = data;
-	update_nixie();
+	_4004clk_state *state = space->machine->driver_data;
+	state->nixie[offset] = data;
+	update_nixie(space->machine);
 }
 
 static WRITE8_HANDLER(neon_w) 
@@ -76,9 +77,9 @@ static WRITE8_HANDLER(neon_w)
 }
 
 static WRITE8_HANDLER(relays_w) 
-{
-	const device_config *dac_device = devtag_get_device(space->machine, "dac");
-	dac_data_w(dac_device, (data & 1) ? 0x80 : 0x40); //tick - tock	
+{	
+	_4004clk_state *state = space->machine->driver_data;
+	dac_data_w(state->dac, (data & 1) ? 0x80 : 0x40); //tick - tock	
 }
 
 static ADDRESS_MAP_START(4004clk_rom, ADDRESS_SPACE_PROGRAM, 8)
@@ -111,8 +112,6 @@ INPUT_PORTS_START( 4004clk )
 			PORT_CONFSETTING( 0x08, "60 Hz" )
 INPUT_PORTS_END
 
-static UINT8 timer = 0;
-
 /*
 		16ms Int generator
 		  __  __
@@ -123,24 +122,33 @@ static UINT8 timer = 0;
 
 static TIMER_CALLBACK(timer_callback)
 {
-	i4004_set_test(cputag_get_cpu(machine, "maincpu"),timer);
-	timer^=1;
+	_4004clk_state *state = machine->driver_data;
+	i4004_set_test(cputag_get_cpu(machine, "maincpu"),state->timer);
+	state->timer^=1;
 }
 
-static MACHINE_RESET(4004clk) 
+static MACHINE_START(4004clk) 
 {
-	timer = 0;
+	_4004clk_state *state = machine->driver_data;
+	state->timer = 0;
+	state->dac = devtag_get_device(machine, "dac");
+
 	timer_pulse(machine, ATTOTIME_IN_HZ(120), NULL, 0, timer_callback);
+	
+	/* register for state saving */
+	state_save_register_global(machine, state->timer);
+	state_save_register_global_pointer(machine, state->nixie, 6);
 }
 
 static MACHINE_DRIVER_START( 4004clk )
+	MDRV_DRIVER_DATA(_4004clk_state)
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",I4004, XTAL_5MHz / 8)
     MDRV_CPU_PROGRAM_MAP(4004clk_rom)
     MDRV_CPU_DATA_MAP(4004clk_mem)
     MDRV_CPU_IO_MAP(4004clk_io)	
 
-    MDRV_MACHINE_RESET(4004clk)
+    MDRV_MACHINE_START(4004clk)
 	
 	/* video hardware */
 	MDRV_DEFAULT_LAYOUT(layout_4004clk)	
@@ -175,5 +183,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG  COMPANY   				FULLNAME       		FLAGS */
-COMP( 2008, 4004clk,  0,    0, 		4004clk, 	4004clk,  0,  	 0,  	 "John L. Weinrich",   "4004 Nixie Clock", 0)
+COMP( 2008, 4004clk,  0,    0, 		4004clk, 	4004clk,  0,  	 0,  	 "John L. Weinrich",   "4004 Nixie Clock", GAME_SUPPORTS_SAVE)
 
