@@ -16,6 +16,9 @@ System Driver Changes:
   Screen still flickers, and EPROM cannot be written
   back to file yet. [Curt Coder]
 
+- [EINSTEIN] Made it possible to select single or double sided
+  disk drives.  [Dirk Best]
+
 - [NES] Fixed crash of MMC3 games with no CHR-ROM (bug
   #1860) [Fabio Priuli, Rob Bohms]
 
