@@ -437,7 +437,7 @@ static void mcd212_process_ica(running_machine *machine, int channel)
 				break;
 			case 0x60: case 0x61: case 0x62: case 0x63: case 0x64: case 0x65: case 0x66: case 0x67: // INTERRUPT
 			case 0x68: case 0x69: case 0x6a: case 0x6b: case 0x6c: case 0x6d: case 0x6e: case 0x6f:
-				verboselog(machine, 6, "%08x: %08x: ICA: INTERRUPT\n", addr * 2 + channel * 0x200000, cmd );
+				verboselog(machine, 5, "%08x: %08x: ICA: INTERRUPT\n", addr * 2 + channel * 0x200000, cmd );
 				mcd212.channel[1].csrr |= 1 << (2 - channel);
 				// TODO
 				// mcd212_check_interrupts
@@ -502,7 +502,7 @@ static void mcd212_process_dca(running_machine *machine, int channel)
 				break;
 			case 0x60: case 0x61: case 0x62: case 0x63: case 0x64: case 0x65: case 0x66: case 0x67: // INTERRUPT
 			case 0x68: case 0x69: case 0x6a: case 0x6b: case 0x6c: case 0x6d: case 0x6e: case 0x6f:
-				verboselog(machine, 6, "%08x: %08x: DCA: INTERRUPT\n", addr * 2 + channel * 0x200000, cmd );
+				verboselog(machine, 5, "%08x: %08x: DCA: INTERRUPT\n", addr * 2 + channel * 0x200000, cmd );
 				mcd212.channel[1].csrr |= 1 << (2 - channel);
 				// TODO
 				// mcd212_check_interrupts
@@ -721,6 +721,7 @@ typedef struct
 	UINT16 timer0;
 	UINT16 timer1;
 	UINT16 timer2;
+	emu_timer* timer0_timer;
 } scc68070_timer_regs_t;
 
 #define TSR_OV0			0x80
@@ -852,6 +853,34 @@ typedef struct
 } scc68070_regs_t;
 
 scc68070_regs_t scc68070_regs;
+
+static void scc68070_set_timer_callback(int channel)
+{
+	UINT32 compare = 0;
+	attotime period;
+	switch(channel)
+	{
+		case 0:
+			compare = 0x10000 - scc68070_regs.timers.timer0;
+			period = attotime_mul(ATTOTIME_IN_HZ(1000000), compare);
+            timer_adjust_oneshot(scc68070_regs.timers.timer0_timer, period, 0);
+			break;
+		default:
+			fatalerror( "Unsupported timer channel to scc68070_set_timer_callback!\n" );
+	}
+}
+
+TIMER_CALLBACK( scc68070_timer0_callback )
+{
+	scc68070_regs.timers.timer0 = scc68070_regs.timers.reload_register;
+	if(scc68070_regs.picr1 & 7)
+	{
+		scc68070_regs.timers.timer_status_register |= TSR_OV0;
+		//printf( "Pulling line %d\n", 1 + ((scc68070_regs.picr1 & 7) - 1) );
+		cputag_set_input_line(machine, "maincpu", M68K_IRQ_1 + ((scc68070_regs.picr1 & 7) - 1), ASSERT_LINE);
+	}
+	scc68070_set_timer_callback(0);
+}
 
 static READ16_HANDLER( scc68070_periphs_r )
 {
@@ -1195,7 +1224,11 @@ static WRITE16_HANDLER( scc68070_periphs_w )
 			if(ACCESSING_BITS_0_7)
 			{
 				verboselog(space->machine, 2, "scc68070_periphs_w: Timer Status Register: %04x & %04x\n", data, mem_mask);
-				scc68070_regs.timers.timer_status_register = data & 0x00ff;
+				scc68070_regs.timers.timer_status_register &= ~(data & 0x00ff);
+				if(scc68070_regs.picr1 & 7)
+				{
+					cputag_set_input_line(space->machine, "maincpu", M68K_IRQ_1 + ((scc68070_regs.picr1 & 7) - 1), CLEAR_LINE);
+				}
 			}
 			if(ACCESSING_BITS_8_15)
 			{
@@ -1210,6 +1243,7 @@ static WRITE16_HANDLER( scc68070_periphs_w )
 		case 0x2024/2:
 			verboselog(space->machine, 2, "scc68070_periphs_w: Timer 0: %04x & %04x\n", data, mem_mask);
 			COMBINE_DATA(&scc68070_regs.timers.timer0);
+			scc68070_set_timer_callback(0);
 			break;
 		case 0x2026/2:
 			verboselog(space->machine, 2, "scc68070_periphs_w: Timer 1: %04x & %04x\n", data, mem_mask);
@@ -1390,6 +1424,7 @@ static ADDRESS_MAP_START( cdi_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00200000, 0x002fffff) AM_RAM AM_BASE(&ram2)
 	AM_RANGE(0x00301400, 0x00301403) AM_READ( magic_r )
 	AM_RANGE(0x00310004, 0x00310007) AM_READ( magic_2_r )
+	AM_RANGE(0x00320000, 0x0032ffff) AM_RAM
 	AM_RANGE(0x00400000, 0x0047ffff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x004fffe0, 0x004fffff) AM_READWRITE(mcd212_r, mcd212_w)
 	AM_RANGE(0x00500000, 0x0057ffff) AM_RAM
@@ -1412,6 +1447,8 @@ static MACHINE_RESET( cdi )
 	UINT16 *dst    = ram;
 	memcpy (dst, src, 0x80000);
 	device_reset(cputag_get_cpu(machine, "maincpu"));
+
+	scc68070_regs.timers.timer0_timer = timer_alloc(machine, scc68070_timer0_callback, 0);
 }
 
 /*************************
