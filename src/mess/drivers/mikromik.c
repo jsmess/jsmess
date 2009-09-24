@@ -92,6 +92,7 @@ static WRITE8_HANDLER( cs6_w )
 		break;
 
 	case 1: /* RECALL */
+		logerror("RECALL %u\n", d);
 		state->recall = d;
 		break;
 
@@ -264,7 +265,7 @@ static DMA8237_MEM_READ( memory_dma_r )
 static DMA8237_MEM_WRITE( memory_dma_w )
 {
 	const address_space *program = cputag_get_address_space(device->machine, I8085A_TAG, ADDRESS_SPACE_PROGRAM);
-	//logerror("DMA write %04x:%02x\n", offset, data);
+	logerror("DMA write %04x:%02x\n", offset, data);
 	memory_write_byte(program, offset, data);
 }
 
@@ -293,7 +294,7 @@ static DMA8237_CHANNEL_READ( fdc_dack_r )
 {
 	mm1_state *state = device->machine->driver_data;
 	UINT8 data = nec765_dack_r(state->upd765, 0);
-//logerror("FDC DACK read %02x\n", data);
+logerror("FDC DACK read %02x\n", data);
 	return data;
 }
 
@@ -580,10 +581,10 @@ ROM_START( mm1m6 )
 	ROM_LOAD( "9081b.ic2", 0x0000, 0x2000, CRC(2955feb3) SHA1(946a6b0b8fb898be3f480c04da33d7aaa781152b) )
 
 	ROM_REGION( 0x200, "address", 0 ) /* address decoder */
-	ROM_LOAD( "720793a.ic24", 0x0000, 0x0200, NO_DUMP )
+	ROM_LOAD( "720793a.ic24", 0x0000, 0x0200, CRC(deea87a6) SHA1(8f19e43252c9a0b1befd02fc9d34fe1437477f3a) )
 
 	ROM_REGION( 0x200, "keyboard", 0 ) /* keyboard encoder */
-	ROM_LOAD( "mmi6349-1j.bin", 0x0000, 0x0200, NO_DUMP )
+	ROM_LOAD( "mmi6349-1j.bin", 0x0000, 0x0200, CRC(4ab3bf03) SHA1(925c9ee22db13566416cdbc505c03d4116ff8d5f) )
 
 	ROM_REGION( 0x1000, "chargen", 0 ) /* character generator */
 	ROM_LOAD( "6807b.ic61", 0x0000, 0x1000, CRC(32b36220) SHA1(8fe7a181badea3f7e656dfaea21ee9e4c9baf0f1) )
