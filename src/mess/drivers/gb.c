@@ -701,7 +701,7 @@ ROM_START( gblight )
 ROM_END
 
 ROM_START( gbcolor )
-	ROM_REGION( 0x03B0 + 1792, "maincpu", 0 )
+	ROM_REGION( 0x800, "maincpu", 0 )
 	ROM_LOAD( "gbc_boot.1", 0x0000, 0x0100, CRC(779ea374) SHA1(e4b40c9fd593a97a1618cfb2696f290cf9596a62) )	/* Bootstrap code part 1 */
 	ROM_LOAD( "gbc_boot.2", 0x0100, 0x0700, CRC(f741807d) SHA1(f943b1e0b640cf1d371e1d8f0ada69af03ebb396) ) /* Bootstrap code part 2 */
 ROM_END
