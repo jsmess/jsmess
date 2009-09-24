@@ -326,7 +326,90 @@ WRITE8_HANDLER( trs80m4_84_w )
 	d1 Select bit 1
 	d0 Select bit 0 */
 
+	/* get address space instead of io space */
+	const address_space *mem = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+
 	trs80_mode = (trs80_mode & 0x73) | (data & 0x8c);
+
+	switch (data & 3)
+	{
+		case 0:	/* normal operation */
+			memory_set_bankptr(mem->machine, 1, memory_region(mem->machine, "maincpu"));
+			memory_set_bankptr(mem->machine, 2, memory_region(mem->machine, "maincpu") + 0x01000);
+			memory_set_bankptr(mem->machine, 4, memory_region(mem->machine, "maincpu") + 0x037ea);
+			memory_set_bankptr(mem->machine, 7, memory_region(mem->machine, "maincpu") + 0x14000);
+			memory_set_bankptr(mem->machine, 8, memory_region(mem->machine, "maincpu") + 0x1f400);
+			memory_set_bankptr(mem->machine, 9, memory_region(mem->machine, "maincpu") + 0x1f800);
+			memory_set_bankptr(mem->machine, 11, memory_region(mem->machine, "maincpu") + 0x05000);
+			memory_set_bankptr(mem->machine, 12, memory_region(mem->machine, "maincpu") + 0x06000);
+			memory_set_bankptr(mem->machine, 14, memory_region(mem->machine, "maincpu") + 0x09000);
+			memory_set_bankptr(mem->machine, 15, memory_region(mem->machine, "maincpu") + 0x0a000);
+			memory_set_bankptr(mem->machine, 17, memory_region(mem->machine, "maincpu") + 0x14000);
+			memory_set_bankptr(mem->machine, 18, memory_region(mem->machine, "maincpu") + 0x1f400);
+			memory_set_bankptr(mem->machine, 19, memory_region(mem->machine, "maincpu") + 0x1f800);
+			memory_install_readwrite8_handler (mem, 0x37e8, 0x37e9, 0, 0, trs80_printer_r, trs80_printer_w);
+			memory_install_read8_handler (mem, 0x3800, 0x3bff, 0, 0, trs80_keyboard_r);
+			memory_install_readwrite8_handler (mem, 0x3c00, 0x3fff, 0, 0, trs80_videoram_r, trs80_videoram_w);
+			break;
+		case 1:	/* write-only ram backs up the rom */
+			memory_set_bankptr(mem->machine, 1, memory_region(mem->machine, "maincpu"));
+			memory_set_bankptr(mem->machine, 2, memory_region(mem->machine, "maincpu") + 0x01000);
+			memory_set_bankptr(mem->machine, 3, memory_region(mem->machine, "maincpu") + 0x037e8);
+			memory_set_bankptr(mem->machine, 4, memory_region(mem->machine, "maincpu") + 0x037ea);
+			memory_set_bankptr(mem->machine, 7, memory_region(mem->machine, "maincpu") + 0x14000);
+			memory_set_bankptr(mem->machine, 8, memory_region(mem->machine, "maincpu") + 0x1f400);
+			memory_set_bankptr(mem->machine, 9, memory_region(mem->machine, "maincpu") + 0x1f800);
+			memory_set_bankptr(mem->machine, 11, memory_region(mem->machine, "maincpu") + 0x10000);
+			memory_set_bankptr(mem->machine, 12, memory_region(mem->machine, "maincpu") + 0x11000);
+			memory_set_bankptr(mem->machine, 13, memory_region(mem->machine, "maincpu") + 0x137e8);
+			memory_set_bankptr(mem->machine, 14, memory_region(mem->machine, "maincpu") + 0x137ea);
+			memory_set_bankptr(mem->machine, 15, memory_region(mem->machine, "maincpu") + 0x0a000);
+			memory_set_bankptr(mem->machine, 17, memory_region(mem->machine, "maincpu") + 0x14000);
+			memory_set_bankptr(mem->machine, 18, memory_region(mem->machine, "maincpu") + 0x1f400);
+			memory_set_bankptr(mem->machine, 19, memory_region(mem->machine, "maincpu") + 0x1f800);
+			memory_install_read8_handler (mem, 0x3800, 0x3bff, 0, 0, trs80_keyboard_r);
+			memory_install_readwrite8_handler (mem, 0x3c00, 0x3fff, 0, 0, trs80_videoram_r, trs80_videoram_w);
+			break;
+		case 2:	/* keyboard and video are moved to high memory, and the rest is ram */
+			memory_set_bankptr(mem->machine, 1, memory_region(mem->machine, "maincpu") + 0x10000);
+			memory_set_bankptr(mem->machine, 2, memory_region(mem->machine, "maincpu") + 0x11000);
+			memory_set_bankptr(mem->machine, 3, memory_region(mem->machine, "maincpu") + 0x137e8);
+			memory_set_bankptr(mem->machine, 4, memory_region(mem->machine, "maincpu") + 0x137ea);
+			memory_set_bankptr(mem->machine, 5, memory_region(mem->machine, "maincpu") + 0x13800);
+			memory_set_bankptr(mem->machine, 6, memory_region(mem->machine, "maincpu") + 0x13c00);
+			memory_set_bankptr(mem->machine, 7, memory_region(mem->machine, "maincpu") + 0x14000);
+			memory_set_bankptr(mem->machine, 11, memory_region(mem->machine, "maincpu") + 0x10000);
+			memory_set_bankptr(mem->machine, 12, memory_region(mem->machine, "maincpu") + 0x11000);
+			memory_set_bankptr(mem->machine, 13, memory_region(mem->machine, "maincpu") + 0x137e8);
+			memory_set_bankptr(mem->machine, 14, memory_region(mem->machine, "maincpu") + 0x137ea);
+			memory_set_bankptr(mem->machine, 15, memory_region(mem->machine, "maincpu") + 0x13800);
+			memory_set_bankptr(mem->machine, 16, memory_region(mem->machine, "maincpu") + 0x13c00);
+			memory_set_bankptr(mem->machine, 17, memory_region(mem->machine, "maincpu") + 0x14000);
+			memory_set_bankptr(mem->machine, 18, memory_region(mem->machine, "maincpu") + 0x0a000);
+			memory_install_read8_handler (mem, 0xf400, 0xf7ff, 0, 0, trs80_keyboard_r);
+			memory_install_readwrite8_handler (mem, 0xf800, 0xffff, 0, 0, trs80_videoram_r, trs80_videoram_w);
+			break;
+		case 3:	/* 64k of ram */
+			memory_set_bankptr(mem->machine, 1, memory_region(mem->machine, "maincpu") + 0x10000);
+			memory_set_bankptr(mem->machine, 2, memory_region(mem->machine, "maincpu") + 0x11000);
+			memory_set_bankptr(mem->machine, 3, memory_region(mem->machine, "maincpu") + 0x137e8);
+			memory_set_bankptr(mem->machine, 4, memory_region(mem->machine, "maincpu") + 0x137ea);
+			memory_set_bankptr(mem->machine, 5, memory_region(mem->machine, "maincpu") + 0x13800);
+			memory_set_bankptr(mem->machine, 6, memory_region(mem->machine, "maincpu") + 0x13c00);
+			memory_set_bankptr(mem->machine, 7, memory_region(mem->machine, "maincpu") + 0x14000);
+			memory_set_bankptr(mem->machine, 8, memory_region(mem->machine, "maincpu") + 0x1f400);
+			memory_set_bankptr(mem->machine, 9, memory_region(mem->machine, "maincpu") + 0x1f800);
+			memory_set_bankptr(mem->machine, 11, memory_region(mem->machine, "maincpu") + 0x10000);
+			memory_set_bankptr(mem->machine, 12, memory_region(mem->machine, "maincpu") + 0x11000);
+			memory_set_bankptr(mem->machine, 13, memory_region(mem->machine, "maincpu") + 0x137e8);
+			memory_set_bankptr(mem->machine, 14, memory_region(mem->machine, "maincpu") + 0x137ea);
+			memory_set_bankptr(mem->machine, 15, memory_region(mem->machine, "maincpu") + 0x13800);
+			memory_set_bankptr(mem->machine, 16, memory_region(mem->machine, "maincpu") + 0x13c00);
+			memory_set_bankptr(mem->machine, 17, memory_region(mem->machine, "maincpu") + 0x14000);
+			memory_set_bankptr(mem->machine, 18, memory_region(mem->machine, "maincpu") + 0x1f400);
+			memory_set_bankptr(mem->machine, 19, memory_region(mem->machine, "maincpu") + 0x1f800);
+			break;
+	}
 }
 
 WRITE8_HANDLER( trs80m4_90_w )
@@ -795,6 +878,22 @@ MACHINE_RESET( trs80 )
 	trs80_speaker = devtag_get_device(machine, "speaker");
 	trs80_fdc = devtag_get_device(machine, "wd179x");
 	videoram_size = 0x800;
+}
+
+MACHINE_RESET( trs80m4 )
+{
+	const address_space *mem = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	MACHINE_RESET_CALL(trs80);
+	memory_install_readwrite8_handler (mem, 0x0000, 0x0fff, 0, 0, SMH_BANK(1), SMH_BANK(11));
+	memory_install_readwrite8_handler (mem, 0x1000, 0x37e7, 0, 0, SMH_BANK(2), SMH_BANK(12));
+	memory_install_readwrite8_handler (mem, 0x37e8, 0x37e9, 0, 0, SMH_BANK(3), SMH_BANK(13));
+	memory_install_readwrite8_handler (mem, 0x37ea, 0x37ff, 0, 0, SMH_BANK(4), SMH_BANK(14));
+	memory_install_readwrite8_handler (mem, 0x3800, 0x3bff, 0, 0, SMH_BANK(5), SMH_BANK(15));
+	memory_install_readwrite8_handler (mem, 0x3c00, 0x3fff, 0, 0, SMH_BANK(6), SMH_BANK(16));
+	memory_install_readwrite8_handler (mem, 0x4000, 0xf3ff, 0, 0, SMH_BANK(7), SMH_BANK(17));
+	memory_install_readwrite8_handler (mem, 0xf400, 0xf7ff, 0, 0, SMH_BANK(8), SMH_BANK(18));
+	memory_install_readwrite8_handler (mem, 0xf800, 0xffff, 0, 0, SMH_BANK(9), SMH_BANK(19));
+	trs80m4_84_w(mem, 0, 0);
 }
 
 MACHINE_RESET( lnw80 )

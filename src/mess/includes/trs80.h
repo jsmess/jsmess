@@ -27,6 +27,7 @@ extern UINT8 trs80_mode;
 QUICKLOAD_LOAD( trs80_cmd );
 
 MACHINE_RESET( trs80 );
+MACHINE_RESET( trs80m4 );
 MACHINE_RESET( lnw80 );
 
 WRITE8_HANDLER ( trs80_ff_w );

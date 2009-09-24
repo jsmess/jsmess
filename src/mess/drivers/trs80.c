@@ -95,12 +95,6 @@ out, and RAM takes its place. There is no rom basic, and no cassette support. Di
 Expansion interface for more floppy drives. The drives use 8-inch floppies holding 0.5mb of data.
 It was extremely expensive, non-standard, and not many were sold. A rom dump does not seem to exist.
 
-About the Model 4 - This has 4 memory maps.
-		We emulate Map 1 (see address map for Model 3).
-		Map 2 - RAM=0..37FF, Keyboard=3800..3Bff, Video=3C00..3FFF, RAM=4000..FFFF
-		Map 3 - RAM=0..F3FF, Keyboard=F400..F7FF, Video=F800..FFFF
-		Map 4 - RAM=0..FFFF
-
 About the ht1080z - This was made for schools in Hungary. Each comes with a BASIC extension roms
 		which activated Hungarian features. To activate - start emulation - enter SYSTEM
 		Enter /12288 and the extensions will be installed and you are returned to READY.
@@ -111,6 +105,19 @@ About the RTC - The time is incremented while ever the cursor is flashing. It is
 		of bytes in the computer's work area. The bytes are in a certain order, this is:
 		seconds, minutes, hours, year, day, month. On a model 1, the seconds are stored at
 		0x4041, while on the model 4 it is 0x4217. A reboot always sets the time to zero.
+
+Model 4 memory organisation -
+		Mode 0: ROM=0-37E7 and 37EA-3FFF; Printer=37E8-37E9; Keyboard=3800-3BFF; Video=3C00-3FFF
+		Mode 1: Keyboard and Video as above; 0-3FFF read=ROM and write=RAM
+		Mode 2: Keyboard=F400-F7FF; Video=F800-FFFF; the rest is RAM
+		Mode 3: All RAM
+		In the "maincpu" memory map, the first 64k is given to the ROM, keyboard, printer and video,
+			while the second 64k is RAM that is switched in as needed.
+		The video is organised as 2 banks of 0x400 bytes, except in Mode 2 where it becomes contiguous.
+
+Model 4P - is the same as Model 4 except:
+		- ROM is only 0000-0FFF, while 1000-37FF is given over to RAM
+		- There is no cassette support in hardware.
 
 ***************************************************************************
 
@@ -209,12 +216,6 @@ static ADDRESS_MAP_START( lnw80_io, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( model3_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x37e7) AM_ROM
-	AM_RANGE(0x37e8, 0x37e9) AM_READWRITE(trs80_printer_r, trs80_printer_w)
-	AM_RANGE(0x37ea, 0x37ff) AM_ROM
-	AM_RANGE(0x3800, 0x38ff) AM_MIRROR(0x300) AM_READ(trs80_keyboard_r)
-	AM_RANGE(0x3c00, 0x3fff) AM_READWRITE(trs80_videoram_r, trs80_videoram_w)
-	AM_RANGE(0x4000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( model3_io, ADDRESS_SPACE_IO, 8 )
@@ -474,6 +475,8 @@ static MACHINE_DRIVER_START( model3 )
 	MDRV_CPU_IO_MAP( model3_io)
 	MDRV_CPU_PERIODIC_INT(trs80_rtc_interrupt, 30)
 
+	MDRV_MACHINE_RESET( trs80m4 )
+
 	MDRV_VIDEO_UPDATE( trs80m4 )
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_SIZE(80*8, 240)
@@ -603,7 +606,7 @@ MISSING	TRS-80 Model III Level 2 (BELGIUM) CRC ????
 Note: Be careful when dumping rom C: if dumped on the trs-80 m3 with software, bytes 0x7e8 and 0x7e9 (addresses 0x37e8, 0x0x37e9)
       will read as 0xFF 0xFF; on the original rom, these bytes are 0x00 0x00 (for eproms) or 0xAA 0xAA (for mask roms), those two bytes are used for printer status on the trs-80 and are mapped on top of the rom; This problem should be avoided by pulling the rom chips and dumping them directly.
 */
-	ROM_REGION(0x10800, "maincpu",0)
+	ROM_REGION(0x20000, "maincpu",0)
 	ROM_SYSTEM_BIOS(0, "trs80m3_revc", "Level 2 bios, RomC Rev C")
 	ROMX_LOAD("8041364.u104", 0x0000, 0x2000, CRC(ec0c6daa) SHA1(257cea6b9b46912d4681251019ec2b84f1b95fc8), ROM_BIOS(1)) // Label: "SCM91248C // Tandy (c) 80 // 8041364 // 8134" (Level 2 bios ROM A '9639')
 	ROMX_LOAD("8040332.u105", 0x2000, 0x1000, CRC(ed4ee921) SHA1(ec0a19d4b72f71e51965de63250009c3c4e4cab3), ROM_BIOS(1)) // Label: "SCM91619P // Tandy (c) 80 // 8040332 // QQ8117", (Level 2 bios ROM B '407c')
@@ -626,7 +629,7 @@ ROM_END
 
 // for model 4 and 4p info, see http://vt100.net/mirror/harte/Radio%20Shack/TRS-80%20Model%204_4P%20Soft%20Tech%20Ref.pdf
 ROM_START(trs80m4)
-	ROM_REGION(0x10800, "maincpu",0)
+	ROM_REGION(0x20000, "maincpu",0)
 	ROM_LOAD("trs80m4.rom",  0x0000, 0x3800, BAD_DUMP CRC(1a92d54d) SHA1(752555fdd0ff23abc9f35c6e03d9d9b4c0e9677b)) // should be split into 3 roms, roms A, B, C, exactly like trs80m3; in fact, roms A and B are shared between both systems.
 
 	ROM_REGION(0x00800, "gfx1",0)
@@ -636,7 +639,7 @@ ROM_END
 ROM_START(trs80m4p) // uses a completely different memory map scheme to the others; the trs-80 model 3 roms are loaded from a boot disk, the only rom on the machine is a bootloader; bootloader can be banked out of 0x0000-0x1000 space which is replaced with ram; see the tech ref pdf, pdf page 62
 // Currently this fails miserably due to lack of ram banking; it does some i/o stuff, copies some of the int vectors to 0x4000, then does some more i/o stuff and fills the entire 0x4000-43ff space with 0x20 (space? is it trying to clear the screen?), then immediately afterward it executes a RET; since the stack pointer is still pointing to 0x40A2, it RETs to 0x2020, which is in unmapped, nop-filled space.
 // Clearly there's some major ram-bank related stuff that isn't working at all here.
-	ROM_REGION(0x10800, "maincpu",0)
+	ROM_REGION(0x20000, "maincpu",0)
 	ROM_SYSTEM_BIOS(0, "trs80m4p", "Level 2 bios, gate array machine")
 	ROMX_LOAD("8075332.u69", 0x0000, 0x1000, CRC(3a738aa9) SHA1(6393396eaa10a84b9e9f0cf5930aba73defc5c52), ROM_BIOS(1)) // Label: "SCM95060P // 8075332 // TANDY (C) 1983 // 8421" at location U69 (may be located at U70 on some pcb revisions)
 	ROM_SYSTEM_BIOS(1, "trs80m4p_hack", "Disk loader hack")
@@ -689,7 +692,7 @@ static DRIVER_INIT( trs80m4 )
 {
 	trs80_mode = 0;
 	trs80_model4 = 1;
-	videoram = memory_region(machine, "maincpu")+0x10000;
+	videoram = memory_region(machine, "maincpu")+0x4000;
 }
 
 static DRIVER_INIT( lnw80 )
