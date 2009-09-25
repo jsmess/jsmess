@@ -55,8 +55,8 @@ TODO:
 #include "sound/2413intf.h"
 #include "devices/chd_cd.h"
 
-static UINT16 *ram;
-static UINT16 *ram2;
+static UINT16 *planea;
+static UINT16 *planeb;
 
 #define ENABLE_UART_PRINTING (1)
 
@@ -396,7 +396,7 @@ INLINE void mcd212_set_display_parameters(int channel, UINT8 value)
 
 static void mcd212_process_ica(running_machine *machine, int channel)
 {
-	UINT16 *ica = channel ? ram2 : ram;
+	UINT16 *ica = channel ? planeb : planea;
 	UINT32 addr = 0x000400/2;
 	UINT32 cmd = 0;
 	while(1)
@@ -462,7 +462,7 @@ static void mcd212_process_ica(running_machine *machine, int channel)
 
 static void mcd212_process_dca(running_machine *machine, int channel)
 {
-	UINT16 *dca = channel ? ram2 : ram;
+	UINT16 *dca = channel ? planeb : planea;
 	UINT32 addr = mcd212_get_dcp(channel) / 2;
 	UINT32 cmd = 0;
 	while(1)
@@ -527,7 +527,7 @@ static void mcd212_process_dca(running_machine *machine, int channel)
 
 static void mcd212_process_vsr(running_machine *machine, int channel, UINT32 *pixels)
 {
-	UINT8 *data = channel ? (UINT8*)ram2 : (UINT8*)ram;
+	UINT8 *data = channel ? (UINT8*)planeb : (UINT8*)planea;
 	UINT32 vsr = mcd212_get_vsr(channel);
 	UINT8 done = 0;
 	int x = 0;
@@ -1488,99 +1488,75 @@ m48t08_regs_t m48t08;
 
 static READ16_HANDLER( m48t08_r )
 {
-	return (m48t08.nvram[(offset * 2) + 1] << 8) || m48t08.nvram[offset * 2];
+	verboselog(space->machine, 0, "m48t08_r: %04x = %02x & %04x\n", offset, m48t08.nvram[offset], mem_mask );
+	return m48t08.nvram[offset] << 8;
 }
 
 static WRITE16_HANDLER( m48t08_w )
 {
+	verboselog(space->machine, 0, "m48t08_w: %04x = %02x\n", offset, data >> 8);
 	switch(offset)
 	{
-		case 0x1ff8/2:
-			if(ACCESSING_BITS_0_7)
+		case 0x1ff9:
+			if(m48t08.nvram[0x1ff8] & 0x80)
 			{
-				if(m48t08.nvram[0x1ff8] & 0x80)
-				{
-					m48t08.nvram[0x1ff9] = data & 0x00ff;
-				}
-			}
-			if(ACCESSING_BITS_8_15)
-			{
-				m48t08.nvram[0x1ff8] = data >> 8;
+				m48t08.nvram[0x1ff9] = (data >> 8) & 0x00ff;
 			}
 			break;
-		case 0x1ffa/2:
-			if(ACCESSING_BITS_0_7)
+		case 0x1ffa:
+			if(m48t08.nvram[0x1ff8] & 0x80)
 			{
-				if(m48t08.nvram[0x1ff8] & 0x80)
-				{
-					m48t08.nvram[0x1ffb] = data & 0x003f;
-				}
-			}
-			if(ACCESSING_BITS_8_15)
-			{
-				if(m48t08.nvram[0x1ff8] & 0x80)
-				{
-					m48t08.nvram[0x1ffa] = (data >> 8) & 0x7f;
-				}
+				m48t08.nvram[0x1ffa] = (data >> 8) & 0x7f;
 			}
 			break;
-		case 0x1ffc/2:
-			if(ACCESSING_BITS_0_7)
+		case 0x1ffb:
+			if(m48t08.nvram[0x1ff8] & 0x80)
 			{
-				if(m48t08.nvram[0x1ff8] & 0x80)
-				{
-					m48t08.nvram[0x1ffd] = data & 0x003f;
-				}
-			}
-			if(ACCESSING_BITS_8_15)
-			{
-				if(m48t08.nvram[0x1ff8] & 0x80)
-				{
-					m48t08.nvram[0x1ffc] = (data >> 8) & 0x0047;
-				}
+				m48t08.nvram[0x1ffb] = (data >> 8) & 0x003f;
 			}
 			break;
-		case 0x1ffe/2:
-			if(ACCESSING_BITS_0_7)
+		case 0x1ffc:
+			if(m48t08.nvram[0x1ff8] & 0x80)
 			{
-				if(m48t08.nvram[0x1ff8] & 0x80)
-				{
-					m48t08.nvram[0x1fff] = data & 0x00ff;
-				}
+				m48t08.nvram[0x1ffc] = (data >> 8) & 0x0047;
 			}
-			if(ACCESSING_BITS_8_15)
+			break;
+		case 0x1ffd:
+			if(m48t08.nvram[0x1ff8] & 0x80)
 			{
-				if(m48t08.nvram[0x1ff8] & 0x80)
-				{
-					m48t08.nvram[0x1ffe] = (data >> 8) & 0x001f;
-				}
+				m48t08.nvram[0x1ffd] = (data >> 8) & 0x003f;
+			}
+			break;
+		case 0x1ffe:
+			if(m48t08.nvram[0x1ff8] & 0x80)
+			{
+				m48t08.nvram[0x1ffe] = (data >> 8) & 0x001f;
+			}
+			break;
+		case 0x1fff:
+			if(m48t08.nvram[0x1ff8] & 0x80)
+			{
+				m48t08.nvram[0x1fff] = (data >> 8) & 0x00ff;
 			}
 			break;
 		default:
-			if(ACCESSING_BITS_0_7)
-			{
-				m48t08.nvram[offset*2 + 1] = (data & mem_mask) & 0x00ff;
-			}
-			if(ACCESSING_BITS_8_15)
-			{
-				m48t08.nvram[offset*2 + 1] = (data & mem_mask) >> 8;
-			}
+			m48t08.nvram[offset] = (data & mem_mask) >> 8;
 			break;
 	}
 }
 
 static ADDRESS_MAP_START( cdi_mem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_SHARE(1) AM_BASE(&ram)
-	AM_RANGE(0x00200000, 0x0027ffff) AM_RAM AM_BASE(&ram2)
+	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_BASE(&planea)
+	AM_RANGE(0x00200000, 0x0027ffff) AM_RAM AM_BASE(&planeb)
 	AM_RANGE(0x00300000, 0x003013ff) AM_READWRITE(cdic_r, cdic_w)
 	AM_RANGE(0x00301400, 0x00301403) AM_READ(uart_debug_r)
 	AM_RANGE(0x00310000, 0x00317fff) AM_READWRITE(slave_r, slave_w)
-	AM_RANGE(0x00318000, 0x0031ffff) AM_NOP
-	AM_RANGE(0x00320000, 0x00321fff) AM_READWRITE(m48t08_r, m48t08_w)
+	//AM_RANGE(0x00318000, 0x0031ffff) AM_NOP
+	AM_RANGE(0x00320000, 0x00323fff) AM_READWRITE(m48t08_r, m48t08_w)
 	AM_RANGE(0x00400000, 0x0047ffff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x004fffe0, 0x004fffff) AM_READWRITE(mcd212_r, mcd212_w)
-	//AM_RANGE(0x00500000, 0x0057ffff) AM_RAM
-	AM_RANGE(0x00500000, 0x00ffffff) AM_NOP
+	AM_RANGE(0x00500000, 0x0057ffff) AM_RAM
+	AM_RANGE(0x00580000, 0x00ffffff) AM_NOP
 	AM_RANGE(0x80000000, 0x8000807f) AM_READWRITE(scc68070_periphs_r, scc68070_periphs_w)
 ADDRESS_MAP_END
 
@@ -1597,10 +1573,11 @@ static MACHINE_RESET( cdi )
 {
 	UINT16 *src   = (UINT16*)memory_region( machine, "maincpu" );
 	//UINT8  *srcnv = (UINT8*)memory_region( machine, "nvram" );
-	UINT16 *dst   = ram;
-	memcpy(dst, src, 0x80000);
+	UINT16 *dst   = planea;
+	memcpy(dst, src, 0x8);
 
 	//memcpy(m48t08.nvram, srcnv, 0x2000);
+	m48t08.nvram[0x1ff9] = 0x80;
 
 	scc68070_regs.timers.timer0_timer = timer_alloc(machine, scc68070_timer0_callback, 0);
 
