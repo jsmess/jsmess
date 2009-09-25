@@ -58,6 +58,8 @@ TODO:
 static UINT16 *ram;
 static UINT16 *ram2;
 
+#define ENABLE_UART_PRINTING (1)
+
 #define VERBOSE_LEVEL	(5)
 
 INLINE void verboselog(running_machine *machine, int n_level, const char *s_fmt, ...)
@@ -1120,6 +1122,9 @@ static READ16_HANDLER( scc68070_periphs_r )
 		case 0x807e/2:	// Base Address (SD0-7)
 			verboselog(space->machine, 2, "scc68070_periphs_r: MMU descriptor %d base: %04x & %04x\n", (offset - 0x4020) / 4, scc68070_regs.mmu.desc[(offset - 0x4020) / 4].base, mem_mask);
 			return scc68070_regs.mmu.desc[(offset - 0x4020) / 4].base;
+		default:
+			verboselog(space->machine, 0, "scc68070_periphs_r: Unknown address: %04x & %04x\n", offset * 2, mem_mask);
+			break;
 	}
 
 	return 0;
@@ -1203,7 +1208,7 @@ static WRITE16_HANDLER( scc68070_periphs_w )
 		case 0x2018/2:
 			if(ACCESSING_BITS_0_7)
 			{
-				verboselog(space->machine, 2, "scc68070_periphs_w: UART Transmit Holding Register: %04x & %04x\n", data, mem_mask);
+				//verboselog(space->machine, 2, "scc68070_periphs_w: UART Transmit Holding Register: %04x & %04x\n", data, mem_mask);
 				if(data >= 0x20 && data < 0x7f)
 				{
 					printf( "%c", data & 0x00ff );
@@ -1406,29 +1411,176 @@ static WRITE16_HANDLER( scc68070_periphs_w )
 			verboselog(space->machine, 2, "scc68070_periphs_w: MMU descriptor %d base: %04x & %04x\n", (offset - 0x4020) / 4, data, mem_mask);
 			COMBINE_DATA(&scc68070_regs.mmu.desc[(offset - 0x4020) / 4].base);
 			break;
+		default:
+			verboselog(space->machine, 0, "scc68070_periphs_w: Unknown address: %04x = %04x & %04x\n", offset * 2, data, mem_mask);
+			break;
 	}
 }
 
-static READ16_HANDLER( magic_r )
+static READ16_HANDLER( cdic_r )
 {
-	return 0x1234;
+	verboselog(space->machine, 0, "cdic_r: UNIMPLEMENTED: Unknown address: %04x & %04x\n", offset*2, mem_mask);
+	return 0;
 }
 
-static READ16_HANDLER( magic_2_r )
+static WRITE16_HANDLER( cdic_w )
 {
-	return 0xf6;
+	verboselog(space->machine, 0, "cdic_w: UNIMPLEMENTED: Unknown address: %04x = %04x & %04x\n", offset*2, data, mem_mask);
+}
+
+static READ16_HANDLER( uart_debug_r )
+{
+#if ENABLE_UART_PRINTING
+	return 0x1234;
+#else
+	return 0;
+#endif
+}
+
+UINT8 slave_register;
+UINT8 slave_read_index;
+
+static READ16_HANDLER( slave_r )
+{
+	verboselog(space->machine, 0, "slave_r: UNIMPLEMENTED: Unknown address: %04x & %04x\n", offset*2, mem_mask);
+	if(offset == 0x02)
+	{
+		if(slave_read_index == 0)
+		{
+			return slave_register;
+		}
+		else
+		{
+			switch(slave_register)
+			{
+				case 0xf6: // NTSC/PAL
+					return 0x01; // NTSC
+					break;
+				default:
+					verboselog(space->machine, 0, "slave_r: Unknown register: %02x\n", slave_register);
+					break;
+			}
+		}
+	}
+	return 0;
+}
+
+static WRITE16_HANDLER( slave_w )
+{
+	verboselog(space->machine, 0, "slave_w: UNIMPLEMENTED: Unknown address: %04x = %04x & %04x\n", offset*2, data, mem_mask);
+	if(offset == 0x03)
+	{
+		if(ACCESSING_BITS_0_7)
+		{
+			slave_register = data & 0x00ff;
+			slave_read_index = 0;
+		}
+	}
+}
+
+typedef struct
+{
+	UINT8 nvram[0x2000];
+	emu_timer *clock;
+} m48t08_regs_t;
+
+m48t08_regs_t m48t08;
+
+static READ16_HANDLER( m48t08_r )
+{
+	return (m48t08.nvram[(offset * 2) + 1] << 8) || m48t08.nvram[offset * 2];
+}
+
+static WRITE16_HANDLER( m48t08_w )
+{
+	switch(offset)
+	{
+		case 0x1ff8/2:
+			if(ACCESSING_BITS_0_7)
+			{
+				if(m48t08.nvram[0x1ff8] & 0x80)
+				{
+					m48t08.nvram[0x1ff9] = data & 0x00ff;
+				}
+			}
+			if(ACCESSING_BITS_8_15)
+			{
+				m48t08.nvram[0x1ff8] = data >> 8;
+			}
+			break;
+		case 0x1ffa/2:
+			if(ACCESSING_BITS_0_7)
+			{
+				if(m48t08.nvram[0x1ff8] & 0x80)
+				{
+					m48t08.nvram[0x1ffb] = data & 0x003f;
+				}
+			}
+			if(ACCESSING_BITS_8_15)
+			{
+				if(m48t08.nvram[0x1ff8] & 0x80)
+				{
+					m48t08.nvram[0x1ffa] = (data >> 8) & 0x7f;
+				}
+			}
+			break;
+		case 0x1ffc/2:
+			if(ACCESSING_BITS_0_7)
+			{
+				if(m48t08.nvram[0x1ff8] & 0x80)
+				{
+					m48t08.nvram[0x1ffd] = data & 0x003f;
+				}
+			}
+			if(ACCESSING_BITS_8_15)
+			{
+				if(m48t08.nvram[0x1ff8] & 0x80)
+				{
+					m48t08.nvram[0x1ffc] = (data >> 8) & 0x0047;
+				}
+			}
+			break;
+		case 0x1ffe/2:
+			if(ACCESSING_BITS_0_7)
+			{
+				if(m48t08.nvram[0x1ff8] & 0x80)
+				{
+					m48t08.nvram[0x1fff] = data & 0x00ff;
+				}
+			}
+			if(ACCESSING_BITS_8_15)
+			{
+				if(m48t08.nvram[0x1ff8] & 0x80)
+				{
+					m48t08.nvram[0x1ffe] = (data >> 8) & 0x001f;
+				}
+			}
+			break;
+		default:
+			if(ACCESSING_BITS_0_7)
+			{
+				m48t08.nvram[offset*2 + 1] = (data & mem_mask) & 0x00ff;
+			}
+			if(ACCESSING_BITS_8_15)
+			{
+				m48t08.nvram[offset*2 + 1] = (data & mem_mask) >> 8;
+			}
+			break;
+	}
 }
 
 static ADDRESS_MAP_START( cdi_mem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x00000000, 0x000fffff) AM_RAM AM_SHARE(1) AM_BASE(&ram)
-	AM_RANGE(0x00200000, 0x002fffff) AM_RAM AM_BASE(&ram2)
-	AM_RANGE(0x00301400, 0x00301403) AM_READ( magic_r )
-	AM_RANGE(0x00310004, 0x00310007) AM_READ( magic_2_r )
-	AM_RANGE(0x00320000, 0x0032ffff) AM_RAM
+	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_SHARE(1) AM_BASE(&ram)
+	AM_RANGE(0x00200000, 0x0027ffff) AM_RAM AM_BASE(&ram2)
+	AM_RANGE(0x00300000, 0x003013ff) AM_READWRITE(cdic_r, cdic_w)
+	AM_RANGE(0x00301400, 0x00301403) AM_READ(uart_debug_r)
+	AM_RANGE(0x00310000, 0x00317fff) AM_READWRITE(slave_r, slave_w)
+	AM_RANGE(0x00318000, 0x0031ffff) AM_NOP
+	AM_RANGE(0x00320000, 0x00321fff) AM_READWRITE(m48t08_r, m48t08_w)
 	AM_RANGE(0x00400000, 0x0047ffff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x004fffe0, 0x004fffff) AM_READWRITE(mcd212_r, mcd212_w)
-	AM_RANGE(0x00500000, 0x0057ffff) AM_RAM
-	AM_RANGE(0x00600000, 0x00ffffff) AM_NOP
+	//AM_RANGE(0x00500000, 0x0057ffff) AM_RAM
+	AM_RANGE(0x00500000, 0x00ffffff) AM_NOP
 	AM_RANGE(0x80000000, 0x8000807f) AM_READWRITE(scc68070_periphs_r, scc68070_periphs_w)
 ADDRESS_MAP_END
 
@@ -1443,12 +1595,16 @@ INPUT_PORTS_END
 
 static MACHINE_RESET( cdi )
 {
-	UINT16 *src    = (UINT16*)memory_region( machine, "maincpu" );
-	UINT16 *dst    = ram;
-	memcpy (dst, src, 0x80000);
-	device_reset(cputag_get_cpu(machine, "maincpu"));
+	UINT16 *src   = (UINT16*)memory_region( machine, "maincpu" );
+	//UINT8  *srcnv = (UINT8*)memory_region( machine, "nvram" );
+	UINT16 *dst   = ram;
+	memcpy(dst, src, 0x80000);
+
+	//memcpy(m48t08.nvram, srcnv, 0x2000);
 
 	scc68070_regs.timers.timer0_timer = timer_alloc(machine, scc68070_timer0_callback, 0);
+
+	device_reset(cputag_get_cpu(machine, "maincpu"));
 }
 
 /*************************
@@ -1505,6 +1661,8 @@ ROM_START( cdi )
 	/* Bad dump? */
 	/* ROM_SYSTEM_BIOS( 4, "cdi205", "Philips CD-i 205" ) */
 	/* ROMX_LOAD( "cdi205.rom", 0x000000, 0x7fc00, CRC(79ab41b2) SHA1(656890bbd3115b235bc8c6b1cf29a99e9db37c1b), ROM_BIOS(5) ) */
+	//ROM_REGION(0x2000, "nvram", 0)
+	//ROM_LOAD("initial.nv", 0x0000, 0x2000, CRC(12345678) SHA1(1234567812345678123456781234567812345678))
 ROM_END
 
 /*************************
