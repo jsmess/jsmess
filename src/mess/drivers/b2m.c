@@ -193,6 +193,7 @@ static const floppy_config b2m_floppy_config =
 
 /* Machine driver */
 static MACHINE_DRIVER_START( b2m )
+	MDRV_DRIVER_DATA(b2m_state)
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", 8080, 2000000)
     MDRV_CPU_PROGRAM_MAP(b2m_mem)
@@ -264,5 +265,5 @@ SYSTEM_CONFIG_END
 /* Driver */
  
 /*    YEAR  NAME   	PARENT  COMPAT  MACHINE 	INPUT   	INIT  	 CONFIG COMPANY 				 FULLNAME   FLAGS */
-COMP( 1989, b2m, 	0, 	 	0,		b2m, 		b2m, 		b2m, 	 b2m,  	"BNPO",					 "Bashkiria-2M",	 0)
-COMP( 1989, b2mrom,	b2m, 	0,		b2mrom,		b2m, 		b2m, 	 b2m,  	"BNPO",					 "Bashkiria-2M ROM-disk",	 0)
+COMP( 1989, b2m, 	0, 	 	0,		b2m, 		b2m, 		b2m, 	 b2m,  	"BNPO",					 "Bashkiria-2M",	 GAME_SUPPORTS_SAVE)
+COMP( 1989, b2mrom,	b2m, 	0,		b2mrom,		b2m, 		b2m, 	 b2m,  	"BNPO",					 "Bashkiria-2M ROM-disk",	 GAME_SUPPORTS_SAVE)

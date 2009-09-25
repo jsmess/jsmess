@@ -20,17 +20,18 @@ VIDEO_UPDATE( b2m )
  	UINT8 code2;
  	UINT8 col;
 	int y, x, b;
+	b2m_state *state = screen->machine->driver_data;
 		
 	for (x = 0; x < 48; x++)
 	{			
 		for (y = 0; y < 256; y++)
 		{
-			if (b2m_video_page==0) {
-				code1 = mess_ram[0x11000 + x*256 + ((y + b2m_video_scroll) & 0xff)];
-				code2 = mess_ram[0x15000 + x*256 + ((y + b2m_video_scroll) & 0xff)];
+			if (state->b2m_video_page==0) {
+				code1 = mess_ram[0x11000 + x*256 + ((y + state->b2m_video_scroll) & 0xff)];
+				code2 = mess_ram[0x15000 + x*256 + ((y + state->b2m_video_scroll) & 0xff)];
 			} else {
-				code1 = mess_ram[0x19000 + x*256 + ((y + b2m_video_scroll) & 0xff)];
-				code2 = mess_ram[0x1d000 + x*256 + ((y + b2m_video_scroll) & 0xff)];
+				code1 = mess_ram[0x19000 + x*256 + ((y + state->b2m_video_scroll) & 0xff)];
+				code2 = mess_ram[0x1d000 + x*256 + ((y + state->b2m_video_scroll) & 0xff)];
 			}			
 			for (b = 7; b >= 0; b--)
 			{								

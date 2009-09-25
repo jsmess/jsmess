@@ -4,8 +4,8 @@
  *
  ****************************************************************************/
 
-#ifndef b2m_H_
-#define b2m_H_
+#ifndef B2M_H_
+#define B2M_H_
 
 #include "machine/i8255a.h"
 #include "machine/pit8253.h"
@@ -13,13 +13,33 @@
 #include "sound/speaker.h"
 #include "sound/wave.h"
 
+typedef struct _b2m_state b2m_state;
+struct _b2m_state
+{
+	UINT8 b2m_8255_porta;
+	UINT8 b2m_video_scroll;
+	UINT8 b2m_8255_portc;
+
+	UINT8 b2m_video_page;
+	UINT8 b2m_drive;
+	UINT8 b2m_side;
+
+	UINT8 b2m_romdisk_lsb;
+	UINT8 b2m_romdisk_msb;
+
+	UINT8 b2m_color[4];
+	UINT8 b2m_localmachine;
+	UINT8 vblank_state;
+	
+	/* devices */
+	const device_config *fdc;
+	const device_config *pic;
+	const device_config *speaker;
+};
+
 /*----------- defined in machine/b2m.c -----------*/
 
-extern UINT8 b2m_video_page;
-extern UINT16 b2m_video_scroll;
-
 extern const struct pit8253_config b2m_pit8253_intf;
-
 extern const struct pic8259_interface b2m_pic8259_config;
 
 extern const i8255a_interface b2m_ppi8255_interface_1;
