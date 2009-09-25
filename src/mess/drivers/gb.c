@@ -716,7 +716,7 @@ CONS( 1990, gameboy,  0,       0,		gameboy,  gameboy, 0,    0,			"Nintendo", "Ga
 CONS( 1994, supergb,  gameboy, 0,		supergb,  gameboy, 0,    0,			"Nintendo", "Super Game Boy", 0)
 CONS( 1996, gbpocket, gameboy, 0,		gbpocket, gameboy, 0,    0,			"Nintendo", "Game Boy Pocket", 0)
 CONS( 1997, gblight,  gameboy, 0,		gbpocket, gameboy, 0,    0,			"Nintendo", "Game Boy Light", 0)
-CONS( 1998, gbcolor,  gameboy, 0,		gbcolor,  gameboy, 0,    gb_cgb,	"Nintendo", "Game Boy Color", GAME_NOT_WORKING)
+CONS( 1998, gbcolor,  gameboy, 0,		gbcolor,  gameboy, 0,    gb_cgb,	"Nintendo", "Game Boy Color", GAME_IMPERFECT_GRAPHICS)
 
 /* Sound is not 100% yet, it generates some sounds which could be ok. Since we're lacking a real
    system there's no way to verify. Same goes for the colors of the LCD. We are no using the default
