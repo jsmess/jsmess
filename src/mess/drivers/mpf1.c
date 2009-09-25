@@ -82,45 +82,10 @@ static ADDRESS_MAP_START( mpf1p_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mpf1_io_map, ADDRESS_SPACE_IO, 8 )
-    /* Appendix B.D from the MPF-I user's manual:
-       (contains possible typing/printing errors so I've cited it literally)
-
-    * D. Input/Output port addressing
-    *
-    *    U96 (74LS139) is an I/O port decoder.
-    *
-    *           IORQ    A7  A6   Selected I/O    Port Address
-    *
-    *            0      0   0       8255          00 - 03
-    *
-    *            0      0   1       CTC           40 - 43
-    *
-    *            0      1   0       PIO           80 - 83
-    *
-    *      Note; I/O port is not fully decoded, e.g. the 16 combinations
-    *            00 - 03,  04 - 07, 08 - 0B,.....3C - 3F, all select the s
-    *            8255.  The CTC & PIO are also selected by 16 different
-    *            combinations.
-
-       Where the text states ".... , all select the s ...." it probably means
-       "... ., all select the same ....".
-
-       So to assure that this "incompleteness" of the hardware does also exist in
-       this simulator I've expanded the port assignments accordingly. I've also
-       tested whether this is true for the actual hardware, and it is.
-    */
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-
-	// The 16 I/O port combinations for the 8255 (P8255A-5, 8628LLP, (c) 1981 AMD)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255", i8255a_r, i8255a_w) AM_MIRROR(0x3C)
-
-//  TODO: create drivers to emulate the following two chips
-//  The 16 I/O port combinations for the CTC (Zilog, Z0843004PSC, Z80 CTC, 8644)
-//  AM_RANGE(0x40, 0x43) AM_WRITE(ctc_enable_w) AM_MIRROR(0x7C)
-
-	/* The 16 I/O port combinations for the PIO (Zilog, Z0842004PSC, Z80 PIO, 8735) */
-	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("z80pio", z80pio_r, z80pio_w) AM_MIRROR(0xBF)
-
+	AM_RANGE(0x00, 0x03) AM_MIRROR(0x3c) AM_DEVREADWRITE("ppi8255", i8255a_r, i8255a_w)
+	AM_RANGE(0x40, 0x43) AM_MIRROR(0x3c) AM_DEVREADWRITE("z80ctc", z80ctc_r, z80ctc_w)
+	AM_RANGE(0x80, 0x83) AM_MIRROR(0x3c) AM_DEVREADWRITE("z80pio", z80pio_r, z80pio_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -410,6 +375,15 @@ static MACHINE_RESET( mpf1 )
 
 /* Machine Drivers */
 
+static const z80ctc_interface mpf1_ctc_intf =
+{
+	0,
+	0,
+	0,
+	0,
+	0
+};
+
 static MACHINE_DRIVER_START( mpf1 )
 	// basic machine hardware
 	MDRV_CPU_ADD("maincpu", Z80, 3579500/2)	// 1.79 MHz
@@ -419,9 +393,9 @@ static MACHINE_DRIVER_START( mpf1 )
 	MDRV_MACHINE_START( mpf1 )
 	MDRV_MACHINE_RESET( mpf1 )
 
-	MDRV_Z80PIO_ADD( "z80pio", mpf1_pio_intf )
-
-	MDRV_I8255A_ADD( "ppi8255", ppi8255_intf )
+	MDRV_Z80PIO_ADD("z80pio", mpf1_pio_intf)
+	MDRV_Z80CTC_ADD("z80ctc", 3579500/2, mpf1_ctc_intf)
+	MDRV_I8255A_ADD("ppi8255", ppi8255_intf)
 
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -439,9 +413,9 @@ static MACHINE_DRIVER_START( mpf1p )
 
 	MDRV_MACHINE_RESET( mpf1 )
 
-	MDRV_Z80PIO_ADD( "z80pio", mpf1_pio_intf )
-
-	MDRV_I8255A_ADD( "ppi8255", ppi8255_intf )
+	MDRV_Z80PIO_ADD("z80pio", mpf1_pio_intf)
+	MDRV_Z80CTC_ADD("z80ctc", 3579500/2, mpf1_ctc_intf)
+	MDRV_I8255A_ADD("ppi8255", ppi8255_intf)
 
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")
