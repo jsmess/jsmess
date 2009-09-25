@@ -51,7 +51,7 @@ INLINE void ATTR_PRINTF(2,3) verboselog( int n_level, const char *s_fmt, ... )
 }
 
 
-static UINT32 leddigit[6];
+static emu_timer *led_refresh_timer;
 static INT8 lednum;
 static int led_tone;
 static int led_halt;
@@ -329,67 +329,26 @@ static READ8_DEVICE_HANDLER( mpf1_porta_r )
 }
 
 
-
-static READ8_DEVICE_HANDLER( mpf1_portb_r )
+static TIMER_CALLBACK( led_refresh )
 {
-	verboselog( 0, "PPI port B read\n" );
-	return 0;
+	if (BIT(lednum, 5)) output_set_digit_value(0, param);
+	if (BIT(lednum, 4)) output_set_digit_value(1, param);
+	if (BIT(lednum, 3)) output_set_digit_value(2, param);
+	if (BIT(lednum, 2)) output_set_digit_value(3, param);
+	if (BIT(lednum, 1)) output_set_digit_value(4, param);
+	if (BIT(lednum, 0)) output_set_digit_value(5, param);
 }
-
-
-
-static READ8_DEVICE_HANDLER( mpf1_portc_r )
-{
-	verboselog( 0, "PPI port C read\n" );
-	return 0;
-}
-
-
-
-static WRITE8_DEVICE_HANDLER( mpf1_porta_w )
-{
-	verboselog( 0, "PPI port A write: %02x\n", data );
-}
-
-
 
 static WRITE8_DEVICE_HANDLER( mpf1_portb_w )
 {
-    //int i;
-	/*  A   0x08
-        B   0x10
-        C   0x20
-        D   0x80
-        E   0x01
-        F   0x04
-        G   0x02
-        H   0x40 (represented by P in original schematics) */
+	/* swap bits around for the mame 7-segment emulation */
+	UINT8 led_data = BITSWAP8(data, 6, 1, 2, 0, 7, 5, 4, 3);
 
-	/*  Original bit to leddisplay-segment assignment:
-        (and as such what is written as output to this port)
-        bit      7 6 5 4 3 2 1 0
-        segment  d p c b a f g e
+	/* timer to update segments */
+	timer_adjust_oneshot(led_refresh_timer, ATTOTIME_IN_USEC(70), led_data);
 
-        The next statement converts this to the following assignment: (which is compatible with draw_led())
-        bit      7 6 5 4 3 2 1 0
-        segment  p g f e d c b a */
-	if( data | ( cpu_get_pc(cputag_get_cpu(device->machine, "maincpu")) != 0x63C ) )
-	{
-		data = ( (data & 0x08) >> 3 ) |
-		       ( (data & 0x10) >> 3 ) |
-		       ( (data & 0x20) >> 3 ) |
-		       ( (data & 0x80) >> 4 ) |
-		       ( (data & 0x01) << 4 ) |
-		       ( (data & 0x04) << 3 ) |
-		       ( (data & 0x02) << 5 ) |
-		       ( (data & 0x40) << 1 );
-		leddigit[lednum] = data;
-		output_set_digit_value( lednum, data & 0x7f );
-		set_led_status( lednum + 2, data >> 7 );
-	}
-	verboselog( 1, "PPI port B (LED Data) write: %02x\n", data );
+	verboselog(1, "PPI port B (LED Data) write: %02x\n", data);
 }
-
 
 
 static WRITE8_DEVICE_HANDLER( mpf1_portc_w )
@@ -398,16 +357,9 @@ static WRITE8_DEVICE_HANDLER( mpf1_portc_w )
 
 	kbdlatch = ~data;
 
-	if (data & 0x3f)
-	{
-		for(lednum = 0; lednum < 6; lednum++)
-		{
-			if( data & 0x01 ) break;
-			data >>= 1;
-		}
-		if( lednum == 6 ) lednum = 0;
-		lednum = 5 - lednum;
-	}
+	/* bits 0-5, led select */
+	lednum = data & 0x3f;
+	timer_adjust_oneshot(led_refresh_timer, attotime_never, 0);
 
 	data = ~kbdlatch;
 
@@ -429,9 +381,9 @@ static WRITE8_DEVICE_HANDLER( mpf1_portc_w )
 static I8255A_INTERFACE( ppi8255_intf )
 {
 	DEVCB_HANDLER(mpf1_porta_r),	/* Port A read */
-	DEVCB_HANDLER(mpf1_portb_r),	/* Port B read */
-	DEVCB_HANDLER(mpf1_portc_r),	/* Port C read */
-	DEVCB_HANDLER(mpf1_porta_w),	/* Port A write */
+	DEVCB_NULL,	/* Port B read */
+	DEVCB_NULL,	/* Port C read */
+	DEVCB_NULL,	/* Port A write */
 	DEVCB_HANDLER(mpf1_portb_w),	/* Port B write */
 	DEVCB_HANDLER(mpf1_portc_w),	/* Port C write */
 };
@@ -441,6 +393,11 @@ static I8255A_INTERFACE( ppi8255_intf )
 static TIMER_CALLBACK( irq0_callback )
 {
 	irq0_line_hold( cputag_get_cpu(machine, "maincpu") );
+}
+
+static MACHINE_START( mpf1 )
+{
+	led_refresh_timer = timer_alloc(machine, led_refresh, 0);
 }
 
 static MACHINE_RESET( mpf1 )
@@ -459,6 +416,7 @@ static MACHINE_DRIVER_START( mpf1 )
 	MDRV_CPU_PROGRAM_MAP(mpf1_map)
 	MDRV_CPU_IO_MAP(mpf1_io_map)
 
+	MDRV_MACHINE_START( mpf1 )
 	MDRV_MACHINE_RESET( mpf1 )
 
 	MDRV_Z80PIO_ADD( "z80pio", mpf1_pio_intf )
