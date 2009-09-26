@@ -32,9 +32,9 @@ void aim65_update_ds5(const device_config *device, int digit, int data);
 WRITE8_DEVICE_HANDLER(aim65_pia_a_w);
 WRITE8_DEVICE_HANDLER(aim65_pia_b_w);
 
-UINT8 aim65_riot_b_r(const device_config *device, UINT8 olddata);
-void aim65_riot_a_w(const device_config *device, UINT8 data, UINT8 olddata);
-void aim65_riot_irq(const device_config *device, int state);
+READ8_DEVICE_HANDLER(aim65_riot_b_r);
+WRITE8_DEVICE_HANDLER(aim65_riot_a_w);
+WRITE_LINE_DEVICE_HANDLER(aim65_riot_irq);
 
 MACHINE_START( aim65 );
 

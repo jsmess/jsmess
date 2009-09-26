@@ -1148,7 +1148,7 @@ static ADDRESS_MAP_START(a2600_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x1000, 0x1FFF)                   AM_ROMBANK(1)
 ADDRESS_MAP_END
 
-static void switch_A_w(const device_config *device, UINT8 olddata, UINT8 data)
+static WRITE8_DEVICE_HANDLER(switch_A_w)
 {
 	running_machine *machine = device->machine;
 
@@ -1170,7 +1170,7 @@ static void switch_A_w(const device_config *device, UINT8 olddata, UINT8 data)
 	}
 }
 
-static UINT8 switch_A_r(const device_config *device, UINT8 data)
+static READ8_DEVICE_HANDLER( switch_A_r )
 {
 	static const UINT8 driving_lookup[4] = { 0x00, 0x02, 0x03, 0x01 };
 	running_machine *machine = device->machine;
@@ -1223,26 +1223,26 @@ static UINT8 switch_A_r(const device_config *device, UINT8 data)
 	return val;
 }
 
-static void switch_B_w(const device_config *device, UINT8 newdata, UINT8 olddata)
+static WRITE8_DEVICE_HANDLER(switch_B_w )
 {
 }
 
-static void irq_callback(const device_config *device, int state)
+static WRITE_LINE_DEVICE_HANDLER( irq_callback )
 {
 }
 
-static UINT8 riot_input_port_8_r(const device_config *device, UINT8 olddata)
+static READ8_DEVICE_HANDLER( riot_input_port_8_r )
 {
 	return input_port_read(device->machine, "SWB");
 }
 
 static const riot6532_interface r6532_interface =
 {
-	switch_A_r,
-	riot_input_port_8_r,
-	switch_A_w,
-	switch_B_w,
-	irq_callback
+	DEVCB_HANDLER(switch_A_r),
+	DEVCB_HANDLER(riot_input_port_8_r),
+	DEVCB_HANDLER(switch_A_w),
+	DEVCB_HANDLER(switch_B_w),
+	DEVCB_LINE(irq_callback)
 };
 
 

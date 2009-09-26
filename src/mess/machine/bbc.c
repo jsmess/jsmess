@@ -1211,7 +1211,7 @@ static int TMSrdy=1;
 //void bbc_TMSint(int status)
 //{
 //	TMSint=(!status)&1;
-//	TMSrdy=(!tms5220_ready_r())&1;
+//	TMSrdy=(!tms5220_readyq_r())&1;
 //	via_0_portb_w(0,(0xf | input_port_read(machine, "IN0")|(TMSint<<6)|(TMSrdy<<7)));
 //}
 
@@ -1220,7 +1220,7 @@ static int TMSrdy=1;
 static READ8_DEVICE_HANDLER( bbcb_via_system_read_portb )
 {
 //	TMSint=(!tms5220_int_r())&1;
-//	TMSrdy=(!tms5220_ready_r())&1;
+//	TMSrdy=(!tms5220_readyq_r())&1;
 
 	//logerror("SYSTEM read portb %d\n",0xf | input_port(machine, "IN0")|(TMSint<<6)|(TMSrdy<<7));
 

@@ -40,6 +40,7 @@ Supported games:
     shippumd    RA-MA9402-03  Raizing/8ing  Shippu Mahou Daisakusen
     bgaregga    RA9503        Raizing/8ing  Battle Garegga (World - Sat Feb 3 1996)
     bgareghk    RA9503        Raizing/8ing  Battle Garegga (Hong Kong (and Austria?) - Sat Feb 3 1996)
+    bgaregtw    RA9503        Raizing/8ing  Battle Garegga (Taiwan and Germany - Thu Feb 1 1996)
     bgaregnv    RA9503        Raizing/8ing  Battle Garegga - New Version (Hong Kong (and Austria?) - Sat Mar 2 1996)
     bgaregt2    RA9503        Raizing/8ing  Battle Garegga - Type 2 (World - Sat Mar 2 1996)
     bgaregcn    RA9503        Raizing/8ing  Battle Garegga - Type 2 (China (and Denmark?) - Tue Apr 2 1996)
@@ -2973,6 +2974,19 @@ static INPUT_PORTS_START( bgareghk )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( bgaregtw )
+	PORT_INCLUDE(bgaregga)
+
+	PORT_MODIFY("JMPR")
+	PORT_DIPNAME( 0x0003,	0x0003, "Territory" )
+	PORT_DIPSETTING(		0x0001, "Germany (German Tuning license)" )
+	/* These two settings end up reporting ROM-0 as BAD */
+//  PORT_DIPSETTING(        0x0002, "USA (Fabtek license)" )
+//  PORT_DIPSETTING(        0x0000, DEF_STR( Japan ) )
+	PORT_DIPSETTING(		0x0003, "Taiwan (Liang Hwa license)" )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( bgaregcn )
 	PORT_INCLUDE(bgaregga)
 
@@ -3253,54 +3267,30 @@ static const gfx_layout raizing_textlayout =
 	8*32
 };
 
-#ifdef LSB_FIRST
+#define XOR(a) WORD_XOR_LE(a)
+#define LOC(x) (x+XOR(0))
+
 static const gfx_layout truxton2_tx_tilelayout =
 {
 	8,8,	/* 8x8 characters */
 	1024,	/* 1024 characters */
 	4,		/* 4 bits per pixel */
 	{ 0, 1, 2, 3 },
-	{ 0, 4, 16, 20, 32, 36, 48, 52 },
+	{ LOC(0)*4, LOC(1)*4, LOC(4)*4, LOC(5)*4, LOC(8)*4, LOC(9)*4, LOC(12)*4, LOC(13)*4 },
 	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64 },
 	8*64
 };
-#else
-static const gfx_layout truxton2_tx_tilelayout =
-{
-	8,8,	/* 8x8 characters */
-	1024,	/* 1024 characters */
-	4,		/* 4 bits per pixel */
-	{ 0, 1, 2, 3 },
-	{ 0+8, 4+8, 16+8, 20+8, 32+8, 36+8, 48+8, 52+8 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64 },
-	8*64
-};
-#endif
 
-#ifdef LSB_FIRST
 static const gfx_layout batrider_tx_tilelayout =
 {
 	8,8,	/* 8x8 characters */
 	1024,	/* 1024 characters */
 	4,		/* 4 bits per pixel */
 	{ 0, 1, 2, 3 },
-	{ 0, 4, 8, 12, 16, 20, 24, 28 },
+	{ XOR(0)*4, XOR(1)*4, XOR(2)*4, XOR(3)*4, XOR(4)*4, XOR(5)*4, XOR(6)*4, XOR(7)*4 },
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
 	8*32
 };
-#else
-static const gfx_layout batrider_tx_tilelayout =
-{
-	8,8,	/* 8x8 characters */
-	1024,	/* 1024 characters */
-	4,		/* 4 bits per pixel */
-	{ 0, 1, 2, 3 },
-	{ 8, 12, 0, 4, 24, 28, 16, 20 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	8*32
-};
-#endif
-
 
 static const gfx_layout fixeighblayout =
 {
@@ -3807,12 +3797,12 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( vfive )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, XTAL_10MHz)			/* 10MHz Oscillator */
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz/2)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(vfive_68k_mem)
 	MDRV_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
 
 #if USE_V25
-	MDRV_CPU_ADD("audiocpu", V25, XTAL_32MHz/2)			/* NEC V25+ type Toaplan marked CPU ??? */
+	MDRV_CPU_ADD("audiocpu", V25, XTAL_20MHz/2)	/* Verified on pcb, NEC V25+ type Toaplan mark scratched out */
 	MDRV_CPU_PROGRAM_MAP(V25_rambased_mem)
 	//MDRV_CPU_IO_MAP(V25_port)
 #endif
@@ -3823,7 +3813,7 @@ static MACHINE_DRIVER_START( vfive )
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
 	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE( (XTAL_27MHz / 4) / (432 * 263) )	/* 27MHz Oscillator */
+	MDRV_SCREEN_REFRESH_RATE( (XTAL_27MHz / 4) / (432 * 263) )	/* verified on pcb */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(432, 262)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
@@ -3838,7 +3828,7 @@ static MACHINE_DRIVER_START( vfive )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2151, XTAL_27MHz/8)
+	MDRV_SOUND_ADD("ym", YM2151, XTAL_27MHz/8) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -4804,6 +4794,29 @@ ROM_START( bgareggahk )
 ROM_END
 
 
+ROM_START( bgareggatw )
+	ROM_REGION( 0x100000, "maincpu", 0 )			/* Main 68K code */
+	ROM_LOAD16_BYTE( "garegga_prg0.u123", 0x000000, 0x080000, CRC(235b7405) SHA1(a2434801df4231a6b48f6c63f47c202d25a89e79) )
+	ROM_LOAD16_BYTE( "garegga_prg1.u65",  0x000001, 0x080000, CRC(c29ccf6a) SHA1(38806e0b4ff852f4bfefd80c56ca23f71623e275) )
+
+	ROM_REGION( 0x40000, "audiocpu", 0 )			/* Sound Z80 code + bank */
+	ROM_LOAD( "snd.bin", 0x00000, 0x08000, CRC(68632952) SHA1(fb834db83157948e2b420b6051102a9c6ac3969b) )
+	ROM_CONTINUE(        0x10000, 0x18000 )
+
+	ROM_REGION( 0x800000, "gfx1", 0 )
+	ROM_LOAD( "rom4.bin",  0x000000, 0x200000, CRC(b333d81f) SHA1(5481465f1304334fd55798be2f44324c57c2dbcb) )
+	ROM_LOAD( "rom3.bin",  0x200000, 0x200000, CRC(51b9ebfb) SHA1(30e0c326f5175aa436df8dba08f6f4e08130b92f) )
+	ROM_LOAD( "rom2.bin",  0x400000, 0x200000, CRC(b330e5e2) SHA1(5d48e9d56f99d093b6390e0af1609fd796df2d35) )
+	ROM_LOAD( "rom1.bin",  0x600000, 0x200000, CRC(7eafdd70) SHA1(7c8da8e86c3f9491719b1d7d5d285568d7614f38) )
+
+	ROM_REGION( 0x010000, "gfx2", 0 )
+	ROM_LOAD( "text.u81", 0x00000, 0x08000, CRC(e67fd534) SHA1(987d0edffc2c243a13d4567319ea3d185eaadbf8) )
+
+	ROM_REGION( 0x140000, "oki", 0 )		/* ADPCM Samples */
+	ROM_LOAD( "rom5.bin", 0x040000, 0x100000, CRC(f6d49863) SHA1(3a3c354852adad06e8a051511abfab7606bce382) )
+ROM_END
+
+
 ROM_START( bgaregganv )
 	ROM_REGION( 0x100000, "maincpu", 0 )			/* Main 68K code */
 	ROM_LOAD16_BYTE( "prg_0.bin", 0x000000, 0x080000, CRC(951ecc07) SHA1(a82e4b59e4a974566e59f3ab2fbae1aec7d88a2b) )
@@ -5257,6 +5270,7 @@ GAME( 1994, kingdmgp, shippumd, shippumd, kingdmgp, T2_Z80,   ROT270, "Raizing /
 
 GAME( 1996, bgaregga,   0,        bgaregga, bgaregga, T2_Z80,   ROT270, "Raizing / Eighting", "Battle Garegga (Europe / USA / Japan / Asia) (Sat Feb 3 1996)", GAME_SUPPORTS_SAVE )
 GAME( 1996, bgareggahk, bgaregga, bgaregga, bgareghk, T2_Z80,   ROT270, "Raizing / Eighting", "Battle Garegga (Austria / Hong Kong) (Sat Feb 3 1996)", GAME_SUPPORTS_SAVE )
+GAME( 1996, bgareggatw, bgaregga, bgaregga, bgaregtw, T2_Z80,   ROT270, "Raizing / Eighting", "Battle Garegga (Taiwan / Germany) (Thu Feb 1 1996)", GAME_SUPPORTS_SAVE )
 GAME( 1996, bgaregganv, bgaregga, bgaregga, bgareghk, T2_Z80,   ROT270, "Raizing / Eighting", "Battle Garegga - New Version (Austria / Hong Kong) (Sat Mar 2 1996)" , GAME_SUPPORTS_SAVE ) // displays New Version only when set to HK
 GAME( 1996, bgareggat2, bgaregga, bgaregga, bgaregga, T2_Z80,   ROT270, "Raizing / Eighting", "Battle Garegga - Type 2 (Europe / USA / Japan / Asia) (Sat Mar 2 1996)" , GAME_SUPPORTS_SAVE ) // displays Type 2 only when set to Europe
 GAME( 1996, bgareggacn, bgaregga, bgaregga, bgaregcn, T2_Z80,   ROT270, "Raizing / Eighting", "Battle Garegga - Type 2 (Denmark / China) (Tue Apr 2 1996)", GAME_SUPPORTS_SAVE ) // displays Type 2 only when set to Denmark

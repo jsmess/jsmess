@@ -80,6 +80,14 @@ Driver by
 Hardware Info
  Malcolm & Darren
 
+Additional work
+    2009 Couriersud
+
+Todo & FIXME:
+
+- the board most probably has discrete circuits. The 393Hz tone used
+  for shots (superbike) and collisions (8ball) is just a guess.
+
 ***************************************************************************/
 
 #include "driver.h"
@@ -94,7 +102,7 @@ Hardware Info
 #define CVS_SHOW_ALL_INPUTS	0
 
 
-#define VERBOSE 1
+#define VERBOSE 0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 
@@ -113,15 +121,18 @@ static UINT8 *cvs_character_ram;
 UINT8 *cvs_s2636_0_ram;
 UINT8 *cvs_s2636_1_ram;
 UINT8 *cvs_s2636_2_ram;
+static UINT8 *cvs_fo_state;
 
 static emu_timer *cvs_393hz_timer;
 static UINT8 cvs_393hz_clock;
 static UINT8 *cvs_4_bit_dac_data;
 static UINT8 *cvs_tms5110_ctl_data;
+static UINT8 *dac3_state;
 
 static UINT8 character_banking_mode;
 static UINT16 character_ram_page_start;
 static UINT16 speech_rom_bit_address;
+
 
 
 
@@ -140,7 +151,7 @@ UINT8 cvs_get_character_banking_mode(void)
 
 READ8_HANDLER( cvs_video_or_color_ram_r )
 {
-	if (cpu_get_reg(space->cpu, S2650_FO))
+	if (*cvs_fo_state)
 		return cvs_video_ram[offset];
 	else
 		return cvs_color_ram[offset];
@@ -148,7 +159,7 @@ READ8_HANDLER( cvs_video_or_color_ram_r )
 
 WRITE8_HANDLER( cvs_video_or_color_ram_w )
 {
-	if (cpu_get_reg(space->cpu, S2650_FO))
+	if (*cvs_fo_state)
 		cvs_video_ram[offset] = data;
 	else
 		cvs_color_ram[offset] = data;
@@ -157,7 +168,7 @@ WRITE8_HANDLER( cvs_video_or_color_ram_w )
 
 READ8_HANDLER( cvs_bullet_ram_or_palette_r )
 {
-	if (cpu_get_reg(space->cpu, S2650_FO))
+	if (*cvs_fo_state)
 		return cvs_palette_ram[offset & 0x0f];
 	else
 		return cvs_bullet_ram[offset];
@@ -165,7 +176,7 @@ READ8_HANDLER( cvs_bullet_ram_or_palette_r )
 
 WRITE8_HANDLER( cvs_bullet_ram_or_palette_w )
 {
-	if (cpu_get_reg(space->cpu, S2650_FO))
+	if (*cvs_fo_state)
 		cvs_palette_ram[offset & 0x0f] = data;
 	else
 		cvs_bullet_ram[offset] = data;
@@ -174,7 +185,7 @@ WRITE8_HANDLER( cvs_bullet_ram_or_palette_w )
 
 READ8_HANDLER( cvs_s2636_0_or_character_ram_r )
 {
-	if (cpu_get_reg(space->cpu, S2650_FO))
+	if (*cvs_fo_state)
 		return cvs_character_ram[(0 * 0x800) | 0x400 | character_ram_page_start | offset];
 	else
 		return cvs_s2636_0_ram[offset];
@@ -182,7 +193,7 @@ READ8_HANDLER( cvs_s2636_0_or_character_ram_r )
 
 WRITE8_HANDLER( cvs_s2636_0_or_character_ram_w )
 {
-	if (cpu_get_reg(space->cpu, S2650_FO))
+	if (*cvs_fo_state)
 	{
 		offset |= (0 * 0x800) | 0x400 | character_ram_page_start;
 		cvs_character_ram[offset] = data;
@@ -195,7 +206,7 @@ WRITE8_HANDLER( cvs_s2636_0_or_character_ram_w )
 
 READ8_HANDLER( cvs_s2636_1_or_character_ram_r )
 {
-	if (cpu_get_reg(space->cpu, S2650_FO))
+	if (*cvs_fo_state)
 		return cvs_character_ram[(1 * 0x800) | 0x400 | character_ram_page_start | offset];
 	else
 		return cvs_s2636_1_ram[offset];
@@ -203,7 +214,7 @@ READ8_HANDLER( cvs_s2636_1_or_character_ram_r )
 
 WRITE8_HANDLER( cvs_s2636_1_or_character_ram_w )
 {
-	if (cpu_get_reg(space->cpu, S2650_FO))
+	if (*cvs_fo_state)
 	{
 		offset |= (1 * 0x800) | 0x400 | character_ram_page_start;
 		cvs_character_ram[offset] = data;
@@ -216,7 +227,7 @@ WRITE8_HANDLER( cvs_s2636_1_or_character_ram_w )
 
 READ8_HANDLER( cvs_s2636_2_or_character_ram_r )
 {
-	if (cpu_get_reg(space->cpu, S2650_FO))
+	if (*cvs_fo_state)
 		return cvs_character_ram[(2 * 0x800) | 0x400 | character_ram_page_start | offset];
 	else
 		return cvs_s2636_2_ram[offset];
@@ -224,7 +235,7 @@ READ8_HANDLER( cvs_s2636_2_or_character_ram_r )
 
 WRITE8_HANDLER( cvs_s2636_2_or_character_ram_w )
 {
-	if (cpu_get_reg(space->cpu, S2650_FO))
+	if (*cvs_fo_state)
 	{
 		offset |= (2 * 0x800) | 0x400 | character_ram_page_start;
 		cvs_character_ram[offset] = data;
@@ -251,10 +262,11 @@ static INTERRUPT_GEN( cvs_main_cpu_interrupt )
 }
 
 
-static void cvs_dac_cpu_interrupt(running_machine *machine)
+static void cvs_slave_cpu_interrupt(running_machine *machine, const char *cpu, int state)
 {
-	cpu_set_input_line_vector(cputag_get_cpu(machine, "audiocpu"), 0, 0x03);
-	cputag_set_input_line(machine, "audiocpu", 0, HOLD_LINE);
+	cpu_set_input_line_vector(cputag_get_cpu(machine, cpu), 0, 0x03);
+	//cputag_set_input_line(machine, cpu, 0, state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, cpu, 0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 
@@ -295,23 +307,30 @@ static READ8_HANDLER( cvs_input_r )
  *  Timing
  *
  *************************************/
-
+#if 0
 static READ8_HANDLER( cvs_393hz_clock_r )
 {
   	return cvs_393hz_clock ? 0x80 : 0;
 }
+#endif
 
+static READ8_DEVICE_HANDLER( tms_clock_r )
+{
+  	return tms5110_romclk_r(device, 0) ? 0x80 : 0;
+}
 
 static TIMER_CALLBACK( cvs_393hz_timer_cb )
 {
 	cvs_393hz_clock = !cvs_393hz_clock;
+	if (dac3_state[2])
+		dac_w(devtag_get_device(machine, "dac3"), 0, cvs_393hz_clock * 0xff);
 }
 
 
 static void start_393hz_timer(running_machine *machine)
 {
 	cvs_393hz_timer = timer_alloc(machine, cvs_393hz_timer_cb, NULL);
-	timer_adjust_periodic(cvs_393hz_timer, ATTOTIME_IN_HZ(2*393), 0, ATTOTIME_IN_HZ(2*393));
+	timer_adjust_periodic(cvs_393hz_timer, ATTOTIME_IN_HZ(30*393), 0, ATTOTIME_IN_HZ(30*393));
 }
 
 
@@ -325,7 +344,13 @@ static void start_393hz_timer(running_machine *machine)
 static WRITE8_DEVICE_HANDLER( cvs_4_bit_dac_data_w )
 {
 	UINT8 dac_value;
+	static int old_data[4] = {0,0,0,0};
 
+	if (data != old_data[offset])
+	{
+		LOG(("4BIT: %02x %02x\n", offset, data));
+		old_data[offset] = data;
+	}
 	cvs_4_bit_dac_data[offset] = data >> 7;
 
 	/* merge into D0-D3 */
@@ -338,6 +363,22 @@ static WRITE8_DEVICE_HANDLER( cvs_4_bit_dac_data_w )
 	dac_data_w(device, (dac_value << 4) | dac_value);
 }
 
+static WRITE8_DEVICE_HANDLER( cvs_unknown_w )
+{
+	/* offset 2 is used in 8ball
+     * offset 0 is used in spacefrt
+     * offset 3 is used in darkwar
+     *
+     * offset 1 is not used (no trace in disassembly
+     */
+
+	if (data != dac3_state[offset])
+	{
+		if (offset != 2)
+			popmessage("Unknown: %02x %02x\n", offset, data);
+		dac3_state[offset] = data;
+	}
+}
 
 
 /*************************************
@@ -346,88 +387,53 @@ static WRITE8_DEVICE_HANDLER( cvs_4_bit_dac_data_w )
  *
  *************************************/
 
-/* temporary code begin */
-static void speech_execute_command(const device_config *tms, UINT8 command)
-{
-	/* reset */
-	if (command == 0x3f)
-	{
-		tms5110_ctl_w(tms, 0, TMS5110_CMD_RESET);
-
-		tms5110_pdc_w(tms, 0,0);
-		tms5110_pdc_w(tms, 0,1);
-		tms5110_pdc_w(tms, 0,0);
-
-		tms5110_pdc_w(tms, 0,0);
-		tms5110_pdc_w(tms, 0,1);
-		tms5110_pdc_w(tms, 0,0);
-
-		tms5110_pdc_w(tms, 0,0);
-		tms5110_pdc_w(tms, 0,1);
-		tms5110_pdc_w(tms, 0,0);
-
-		speech_rom_bit_address = 0;
-	}
-	/* start */
-	else
-	{
-		tms5110_ctl_w(tms, 0, TMS5110_CMD_SPEAK);
-
-		tms5110_pdc_w(tms, 0, 0);
-		tms5110_pdc_w(tms, 0, 1);
-		tms5110_pdc_w(tms, 0, 0);
-
-		speech_rom_bit_address = command * 0x80 * 8;
-	}
-}
-/* temporary code end */
-
 
 static WRITE8_HANDLER( cvs_speech_rom_address_lo_w )
 {
 	/* assuming that d0-d2 are cleared here */
 	speech_rom_bit_address = (speech_rom_bit_address & 0xf800) | (data << 3);
-	LOG(("%04x : CVS: Speech Address = %04x\n", cpu_get_pc(space->cpu), speech_rom_bit_address >> 3));
+	LOG(("%04x : CVS: Speech Lo %02x Address = %04x\n", cpu_get_pc(space->cpu), data, speech_rom_bit_address >> 3));
 }
 
 static WRITE8_HANDLER( cvs_speech_rom_address_hi_w )
 {
 	speech_rom_bit_address = (speech_rom_bit_address & 0x07ff) | (data << 11);
-}
-
-
-static void cvs_set_speech_command_w(const address_space *space, UINT8 data)
-{
-	soundlatch2_w(space, 0, data & 0x7f);
-	if (~data & 0x40) LOG(("%04x : CVS: Speech Command W = %04x\n", cpu_get_pc(space->cpu), data & 0x7f));
+	LOG(("%04x : CVS: Speech Hi %02x Address = %04x\n", cpu_get_pc(space->cpu), data, speech_rom_bit_address >> 3));
 }
 
 
 static READ8_HANDLER( cvs_speech_command_r )
 {
-	/* bit 7 is TMS status (active LO) */
-	return (~tms5110_status_r(devtag_get_device(space->machine, "tms"), 0) << 7) | soundlatch2_r(space, 0);
+	/* FIXME: this was by observation on board ???
+     *          -bit 7 is TMS status (active LO) */
+	return ((tms5110_ctl_r(devtag_get_device(space->machine, "tms"), 0) ^ 1) << 7)
+		| (soundlatch_r(space, 0) & 0x7f);
 }
 
 
 static WRITE8_DEVICE_HANDLER( cvs_tms5110_ctl_w )
 {
 	UINT8 ctl;
-
+	/*
+     * offset 0: CS ?
+     */
 	cvs_tms5110_ctl_data[offset] = (~data >> 7) & 0x01;
 
 	ctl = 0 |								/* CTL1 */
 		  (cvs_tms5110_ctl_data[1] << 1) |	/* CTL2 */
-		  0 |								/* CTL4 */
-		  (cvs_tms5110_ctl_data[0] << 3);	/* CTL8 */
+		  (cvs_tms5110_ctl_data[2] << 2) |	/* CTL4 */
+		  (cvs_tms5110_ctl_data[1] << 3);	/* CTL8 */
 
-	//tms5110_ctl_w(device, ctl);
+	LOG(("CVS: Speech CTL = %04x %02x %02x\n",  ctl, offset, data));
+	tms5110_ctl_w(device, 0, ctl);
 }
 
 
 static WRITE8_DEVICE_HANDLER( cvs_tms5110_pdc_w )
 {
-	//tms5110_pdc_w(device, ~data >> 7);
+	UINT8 out = ((~data) >> 7) & 1;
+	LOG(("CVS: Speech PDC = %02x %02x\n", offset, out));
+	tms5110_pdc_w(device, 0, out);
 }
 
 
@@ -464,21 +470,10 @@ static const tms5110_interface tms5100_interface =
 
 static WRITE8_HANDLER( audio_command_w )
 {
+	LOG(("data %02x\n", data));
     /* cause interrupt on audio CPU if bit 7 set */
-	if (data & 0x80)
-	{
-	   	soundlatch_w(space, 0, data);
-		cvs_dac_cpu_interrupt(space->machine);
-
-		LOG(("%04x : CVS: Audio command = %02x\n", cpu_get_pc(space->cpu), data));
-	}
-
-	cvs_set_speech_command_w(space, data);
-
-	/* temporary code begin */
-	if ((data & 0x40) == 0)
-		speech_execute_command(devtag_get_device(space->machine, "tms"), data & 0x03f);
-	/* temporary code end */
+	soundlatch_w(space, 0, data);
+	cvs_slave_cpu_interrupt(space->machine, "audiocpu", data & 0x80 ? 1 : 0);
 }
 
 
@@ -541,6 +536,7 @@ static ADDRESS_MAP_START( cvs_main_cpu_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READWRITE(cvs_collision_clear, cvs_video_fx_w)
 	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_READWRITE(cvs_collision_r, audio_command_w)
     AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
+    AM_RANGE(S2650_FO_PORT, S2650_FO_PORT) AM_RAM AM_BASE(&cvs_fo_state)
 ADDRESS_MAP_END
 
 
@@ -558,12 +554,13 @@ static ADDRESS_MAP_START( cvs_dac_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x1800, 0x1800) AM_READ(soundlatch_r)
     AM_RANGE(0x1840, 0x1840) AM_DEVWRITE("dac1", dac_w)
     AM_RANGE(0x1880, 0x1883) AM_DEVWRITE("dac2", cvs_4_bit_dac_data_w) AM_BASE(&cvs_4_bit_dac_data)
-    AM_RANGE(0x1884, 0x1887) AM_WRITENOP		/* not connected to anything */
+    AM_RANGE(0x1884, 0x1887) AM_DEVWRITE("dac3", cvs_unknown_w)	AM_BASE(&dac3_state)	/* ???? not connected to anything */
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( cvs_dac_cpu_io_map, ADDRESS_SPACE_IO, 8 )
-    AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(cvs_393hz_clock_r)
+	/* doesn't look like it is used at all */
+    //AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(cvs_393hz_clock_r)
 ADDRESS_MAP_END
 
 
@@ -580,15 +577,16 @@ static ADDRESS_MAP_START( cvs_speech_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1d00, 0x1d00) AM_WRITE(cvs_speech_rom_address_lo_w)
 	AM_RANGE(0x1d40, 0x1d40) AM_WRITE(cvs_speech_rom_address_hi_w)
     AM_RANGE(0x1d80, 0x1d80) AM_READ(cvs_speech_command_r)
-	AM_RANGE(0x1ddd, 0x1dde) AM_DEVWRITE("tms", cvs_tms5110_ctl_w) AM_BASE(&cvs_tms5110_ctl_data)
+	AM_RANGE(0x1ddc, 0x1dde) AM_DEVWRITE("tms", cvs_tms5110_ctl_w) AM_BASE(&cvs_tms5110_ctl_data)
 	AM_RANGE(0x1ddf, 0x1ddf) AM_DEVWRITE("tms", cvs_tms5110_pdc_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( cvs_speech_cpu_io_map, ADDRESS_SPACE_IO, 8 )
-    AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(cvs_393hz_clock_r)
+/* romclk is much more probable, 393 Hz results in timing issues */
+//  AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(cvs_393hz_clock_r)
+    AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_DEVREAD("tms", tms_clock_r)
 ADDRESS_MAP_END
-
 
 
 /*************************************
@@ -1051,7 +1049,13 @@ static MACHINE_DRIVER_START( cvs )
 	MDRV_SOUND_ADD("dac1", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
+	//MDRV_SOUND_ADD("dac1a", DAC, 0)
+	//MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
 	MDRV_SOUND_ADD("dac2", DAC, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MDRV_SOUND_ADD("dac3", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("tms", TMS5100, 640000)
@@ -1641,24 +1645,24 @@ static DRIVER_INIT( raiders )
  *
  *************************************/
 
-GAME( 1981, cosmos,   0,        cvs,     cosmos,   0,        ROT90, "Century Electronics", "Cosmos", GAME_NO_COCKTAIL )
-GAME( 1981, darkwar,  0,        cvs,     darkwar,  0,        ROT90, "Century Electronics", "Dark Warrior", GAME_NO_COCKTAIL )
-GAME( 1981, spacefrt, 0,        cvs,     spacefrt, 0,        ROT90, "Century Electronics", "Space Fortress (CVS)", GAME_NO_COCKTAIL )
-GAME( 1982, 8ball,    0,        cvs,     8ball,    0,        ROT90, "Century Electronics", "Video Eight Ball", GAME_NO_COCKTAIL )
-GAME( 1982, 8ball1,   8ball,    cvs,     8ball,    0,        ROT90, "Century Electronics", "Video Eight Ball (Rev.1)", GAME_NO_COCKTAIL )
-GAME( 1982, logger,   0,        cvs,     logger,   0,        ROT90, "Century Electronics", "Logger", GAME_NO_COCKTAIL )
-GAME( 1982, dazzler,  0,        cvs,     dazzler,  0,        ROT90, "Century Electronics", "Dazzler", GAME_NO_COCKTAIL )
-GAME( 1982, wallst,   0,        cvs,     wallst,   0,        ROT90, "Century Electronics", "Wall Street", GAME_NO_COCKTAIL )
-GAME( 1982, radarzon, 0,        cvs,     radarzon, 0,        ROT90, "Century Electronics", "Radar Zone", GAME_NO_COCKTAIL )
-GAME( 1982, radarzon1,radarzon, cvs,     radarzon, 0,        ROT90, "Century Electronics", "Radar Zone (Rev.1)", GAME_NO_COCKTAIL )
-GAME( 1982, radarzont,radarzon, cvs,     radarzon, 0,        ROT90, "Century Electronics (Tuni Electro Service Inc)", "Radar Zone (Tuni)", GAME_NO_COCKTAIL )
-GAME( 1982, outline,  radarzon, cvs,     radarzon, 0,        ROT90, "Century Electronics", "Outline", GAME_NO_COCKTAIL )
-GAME( 1982, goldbug,  0,        cvs,     goldbug,  0,        ROT90, "Century Electronics", "Gold Bug", GAME_NO_COCKTAIL )
-GAME( 1982, diggerc,  0,        cvs,     diggerc,  0,        ROT90, "Century Electronics", "Digger (CVS)", GAME_NO_COCKTAIL )
-GAME( 1983, heartatk, 0,        cvs,     heartatk, 0,        ROT90, "Century Electronics", "Heart Attack", GAME_NO_COCKTAIL )
-GAME( 1983, hunchbak, 0,        cvs,     hunchbak, 0,        ROT90, "Century Electronics", "Hunchback (set 1)", GAME_NO_COCKTAIL )
-GAME( 1983, hunchbaka,hunchbak, cvs,     hunchbak, hunchbka, ROT90, "Century Electronics", "Hunchback (set 2)", GAME_NO_COCKTAIL )
-GAME( 1983, superbik, 0,        cvs,     superbik, superbik, ROT90, "Century Electronics", "Superbike", GAME_NO_COCKTAIL )
-GAME( 1983, raiders,  0,        cvs,     raiders,  raiders,  ROT90, "Century Electronics", "Raiders", GAME_NO_COCKTAIL )
-GAME( 1983, hero,     0,        cvs,     hero,     hero,     ROT90, "Seatongrove Ltd",     "Hero", GAME_NO_COCKTAIL )
-GAME( 1984, huncholy, 0,        cvs,     huncholy, huncholy, ROT90, "Seatongrove Ltd",     "Hunchback Olympic", GAME_NO_COCKTAIL )
+GAME( 1981, cosmos,   0,        cvs,     cosmos,   0,        ROT90, "Century Electronics", "Cosmos", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND )
+GAME( 1981, darkwar,  0,        cvs,     darkwar,  0,        ROT90, "Century Electronics", "Dark Warrior", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND)
+GAME( 1981, spacefrt, 0,        cvs,     spacefrt, 0,        ROT90, "Century Electronics", "Space Fortress (CVS)", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND )
+GAME( 1982, 8ball,    0,        cvs,     8ball,    0,        ROT90, "Century Electronics", "Video Eight Ball", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND)
+GAME( 1982, 8ball1,   8ball,    cvs,     8ball,    0,        ROT90, "Century Electronics", "Video Eight Ball (Rev.1)", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND)
+GAME( 1982, logger,   0,        cvs,     logger,   0,        ROT90, "Century Electronics", "Logger", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND)
+GAME( 1982, dazzler,  0,        cvs,     dazzler,  0,        ROT90, "Century Electronics", "Dazzler", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND)
+GAME( 1982, wallst,   0,        cvs,     wallst,   0,        ROT90, "Century Electronics", "Wall Street", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND)
+GAME( 1982, radarzon, 0,        cvs,     radarzon, 0,        ROT90, "Century Electronics", "Radar Zone", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND)
+GAME( 1982, radarzon1,radarzon, cvs,     radarzon, 0,        ROT90, "Century Electronics", "Radar Zone (Rev.1)", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND)
+GAME( 1982, radarzont,radarzon, cvs,     radarzon, 0,        ROT90, "Century Electronics (Tuni Electro Service Inc)", "Radar Zone (Tuni)", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND)
+GAME( 1982, outline,  radarzon, cvs,     radarzon, 0,        ROT90, "Century Electronics", "Outline", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND)
+GAME( 1982, goldbug,  0,        cvs,     goldbug,  0,        ROT90, "Century Electronics", "Gold Bug", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND)
+GAME( 1982, diggerc,  0,        cvs,     diggerc,  0,        ROT90, "Century Electronics", "Digger (CVS)", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND)
+GAME( 1983, heartatk, 0,        cvs,     heartatk, 0,        ROT90, "Century Electronics", "Heart Attack", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND)
+GAME( 1983, hunchbak, 0,        cvs,     hunchbak, 0,        ROT90, "Century Electronics", "Hunchback (set 1)", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND)
+GAME( 1983, hunchbaka,hunchbak, cvs,     hunchbak, hunchbka, ROT90, "Century Electronics", "Hunchback (set 2)", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND)
+GAME( 1983, superbik, 0,        cvs,     superbik, superbik, ROT90, "Century Electronics", "Superbike", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND)
+GAME( 1983, raiders,  0,        cvs,     raiders,  raiders,  ROT90, "Century Electronics", "Raiders", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND)
+GAME( 1983, hero,     0,        cvs,     hero,     hero,     ROT90, "Seatongrove Ltd",     "Hero", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND)
+GAME( 1984, huncholy, 0,        cvs,     huncholy, huncholy, ROT90, "Seatongrove Ltd",     "Hunchback Olympic", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND)

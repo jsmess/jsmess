@@ -213,6 +213,8 @@ SOUNDS += WAVE
 #SOUNDS += SID8580
 SOUNDS += SP0256
 SOUNDS += DIGITALKER
+SOUNDS += CDP1863
+SOUNDS += CDP1864
 
 
 #-------------------------------------------------
@@ -428,7 +430,7 @@ $(MAMEOBJ)/atari.a: \
 	$(DRIVERS)/shuuz.o $(VIDEO)/shuuz.o \
 	$(DRIVERS)/skullxbo.o $(VIDEO)/skullxbo.o \
 	$(DRIVERS)/skydiver.o $(AUDIO)/skydiver.o $(VIDEO)/skydiver.o \
-	$(DRIVERS)/skyraid.o $(VIDEO)/skyraid.o \
+	$(DRIVERS)/skyraid.o $(AUDIO)/skyraid.o $(VIDEO)/skyraid.o \
 	$(DRIVERS)/sprint2.o $(AUDIO)/sprint2.o $(VIDEO)/sprint2.o \
 	$(DRIVERS)/sprint4.o $(VIDEO)/sprint4.o $(AUDIO)/sprint4.o \
 	$(DRIVERS)/sprint8.o $(VIDEO)/sprint8.o \
@@ -831,6 +833,7 @@ $(MAMEOBJ)/konami.a: \
 	$(DRIVERS)/simpsons.o $(MACHINE)/simpsons.o $(VIDEO)/simpsons.o \
 	$(DRIVERS)/spy.o $(VIDEO)/spy.o \
 	$(DRIVERS)/surpratk.o $(VIDEO)/surpratk.o \
+	$(DRIVERS)/tgtpanic.o \
 	$(DRIVERS)/thunderx.o $(VIDEO)/thunderx.o \
 	$(DRIVERS)/timeplt.o $(AUDIO)/timeplt.o $(VIDEO)/timeplt.o \
 	$(DRIVERS)/tmnt.o $(VIDEO)/tmnt.o \
@@ -1467,6 +1470,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/4roses.o \
 	$(DRIVERS)/acefruit.o \
 	$(DRIVERS)/adp.o \
+	$(DRIVERS)/amaticmg.o \
 	$(DRIVERS)/ambush.o $(VIDEO)/ambush.o \
 	$(DRIVERS)/ampoker2.o $(VIDEO)/ampoker2.o \
 	$(DRIVERS)/amspdwy.o $(VIDEO)/amspdwy.o \
@@ -1852,5 +1856,12 @@ $(MACHINE)/snes.o: 		$(MAMESRC)/machine/snesdsp1.c \
 				$(MAMESRC)/machine/snesdsp3.c \
 				$(MAMESRC)/machine/snesdsp4.c \
 				$(MAMESRC)/machine/snesobc1.c \
+				$(MAMESRC)/machine/snescx4.c \
+				$(MAMESRC)/machine/cx4ops.c \
+				$(MAMESRC)/machine/cx4oam.c \
+				$(MAMESRC)/machine/cx4fn.c \
+				$(MAMESRC)/machine/cx4data.c \
 				$(MAMESRC)/machine/snesrtc.c \
-				$(MAMESRC)/machine/snessdd1.c
+				$(MAMESRC)/machine/snessdd1.c \
+				$(MAMESRC)/machine/snes7110.c \
+				$(MAMESRC)/machine/snesst10.c

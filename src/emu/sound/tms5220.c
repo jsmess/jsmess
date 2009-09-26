@@ -38,6 +38,105 @@
 Note the standard naming for d* data bits with 7 as MSB and 0 as LSB is in lowercase.
 TI's naming has D7 as LSB and D0 as MSB and is in uppercase
 
+TODO:
+    Implement a ready callback for pc interfaces
+    - this will be quite a challenge since for it to be really accurate
+      the whole emulation has to run in sync (lots of timers) with the
+      cpu cores.
+    If a command is still executing, /READY will be kept high until the command has
+    finished if the next command is written.
+    TMS5220C: see below.
+    tomcat has a 5220 which is not hooked up at all
+
+Notes:
+    Looping has the tms5220 hookep up directly to the cpu. However currently the
+    tms9900 cpu core does not support a ready line.
+
+    Email from Lord Nightmare having a lot more detail follows:
+
+    Yes, there is at least two more differences:
+The 5220 is 'noisier' when playing unvoiced frames than the 5220C is; I
+think the 5220C may use a different energy table (or use one value lower
+in the normal energy table) than the 5220 does, possibly only when
+playing unvoiced frames, but I can't prove this without a decap; the
+5220C's PROMOUT pin (for dumping the lpc tables as played) is
+nonfunctional due to changed design or a die bug.
+In addition, the NOP commands on the FIFO interface have been changed
+and data passed in the low bits has a meaning regarding frame length:
+commands :
+(lsb is right, msb is left; x means don't care)
+x0x0xbcc : (5220: NOP) (5220C: select frame length by cc, and b selects
+whether every frame is preceeded by 2 bits to select the frame length
+(instead of using the value set by cc)) (default is 00 for frame length
+(200 samples) and 0 for whether the preceeding 2 bits are enabled (off))
+x001xxxx: sends eight read bit commands (M0 high M1 low) to VSM and
+reads the resulting bits serially into a temporary register, which
+becomes readable as the next byte read from the tms52xx once ready goes
+active.
+
+Note the bit order of the byte read from the TMS52xx is BACKWARDS as
+compared to the actual data order as in the rom on the VSM chips! This
+was IMHO a rather silly design decision of TI. (I asked Larry
+Brantingham about this but he wasn't involved with the TMS52xx chips,
+just the 5100)
+There's ASCII data in the TI 99/4 speech module VSMs which has the bit
+order reversed on purpose because of this!
+
+x011xxxx: sends a read and branch command (M0 high, M1 high) to force
+VSM to set its data pointer to whatever the data is at its current
+pointer location is)
+x100aaaa: send a load address command (M0 low M1 high) to vsm with the 4
+'a' bits
+x101xxxx: 'speak' begins speaking from current address in the data
+pointer of the vsms
+x110xxxx: 'speak external' begins speaking from the 16 byte fifo
+x111xxxx: resets the speech synthesis core immediately; clears the bit
+offset counter in the fifo to the nearest byte 'forward ', but does NOT
+clear the fifo, annoyingly!
+
+Its also possible but inconclusive that the chirp table was changed.
+The LPC tables between the 5220 and 5220C are MOSTLY the same of not
+completely so, but as mentioned above the energy table has some sort of
+difference.
+
+
+As for which games used which chips, from the TMS5220 wikipedia page:
+
+TMS5200 AKA TMC0285: (1981 to 1983ish when supplies ran low)
+    Arcade: Zaccaria's 'money money' and 'jack rabbit'; Bally/Midway's
+'Discs of Tron' (all environmental cabs and a few upright cabs; the code
+exists on all versions for the speech though, and upright cabs can be
+upgraded to add it by hacking on a 'Squawk & Talk' pinball speech board
+(which is also TMS5200 based) with a few modded components)
+    Pinball: All Bally/Midway machines which uses the 'Squawk & Talk' board.
+    Home computer: TI 99/4 PHP1500 Speech module (along with two VSM
+serial chips); Street Electronics Corp.'s Apple II 'Echo 2' Speech
+synthesizer (early cards only)
+
+TMS5220: (mostly on things made between 1982 and 1984-1985 when supplies
+ran low)
+    Arcade: Bally/Midway's 'NFL Football'; Atari's 'Star Wars',
+'Firefox', 'Return of the Jedi', 'Road Runner', 'The Empire Strikes
+Back' (all verified with schematics); Venture Line's 'Looping' and 'Sky
+Bumper' (need verify for both); Olympia's 'Portraits' (need verify);
+Exidy's 'Victory' and 'Victor Banana' (need verify for both)
+    Pinball: Several (don't know names offhand, have not checked schematics)
+    Home computer: Street Electronics Corp.'s Apple II 'Echo 2' Speech
+synthesizer (later cards only); Texas Instruments' 'Speak and Learn'
+scanner wand unit.
+
+TMS5220C AKA TSP5220C: (on stuff made from 1984 to 1992 or so)
+    Arcade: Atari's 'Indiana Jones and the Temple of Doom', '720',
+'Gauntlet', 'Gauntlet II', 'A.P.B.', 'Paperboy', 'RoadBlasters',
+'Vindicators Pt II'(verify?), and 'Escape from the Planet of the Robot
+Monsters' (all verified except for vindicators pt 2)
+    Pinball: Several (less common than the tms5220? (not sure about
+this), mostly on later pinballs with LPC speech)
+    Home computer: Street Electronics Corp.'s 'ECHO' parallel/hobbyist
+module (6511 based), IBM PS/2 Speech adapter (parallel port connection
+device), PES Speech adapter (serial port connection)
+
+
 ***********************************************************************************************/
 
 #include "sndintrf.h"
@@ -45,14 +144,17 @@ TI's naming has D7 as LSB and D0 as MSB and is in uppercase
 #include "tms5220.h"
 
 
-#define DEBUG_5220			0
+#define VERBOSE (0)
+#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 #define MAX_SAMPLE_CHUNK	512
+#define FIFO_SIZE 16
 
 
 enum _tms5220_variant
 {
-	variant_tms5220,	/* TMS5220_IS_TMS5220, TMS5220_IS_TMS5220C,  TMS5220_IS_TSP5220C */
+	variant_tms5220c,	/* TMS5220_IS_TMS5220C  TMS5220_IS_TSP5220C */
+	variant_tms5220,	/* TMS5220_IS_TMS5220 */
 	variant_tmc0285		/* TMS5220_IS_TMS5200, TMS5220_IS_CD2501 */
 };
 typedef enum _tms5220_variant tms5220_variant;
@@ -73,8 +175,10 @@ typedef enum _tms5220_variant tms5220_variant;
 typedef struct _tms5220_state tms5220_state;
 struct _tms5220_state
 {
+	/* callbacks */
+	devcb_resolved_write_line	irq_func;
+
 	/* these contain data that describes the 128-bit data FIFO */
-	#define FIFO_SIZE 16
 	UINT8 fifo[FIFO_SIZE];
 	UINT8 fifo_head;
 	UINT8 fifo_tail;
@@ -98,9 +202,6 @@ struct _tms5220_state
 	UINT8 buffer_low;		/* FIFO has less than 8 bytes in it */
 	UINT8 buffer_empty;		/* FIFO is empty*/
 	UINT8 irq_pin;			/* state of the IRQ pin (output) */
-
-	void (*irq_func)(const device_config *device, int state); /* called when the state of the IRQ pin changes */
-
 
 	/* these contain data describing the current and previous voice frames */
 	UINT16 old_energy;
@@ -139,6 +240,21 @@ struct _tms5220_state
 
 	UINT8 data_register;				/* data register, used by read command */
 	UINT8 RDB_flag;					/* whether we should read data register or status register */
+
+	/* io_ready: page 3 of the datasheet specifies that READY will be asserted until
+     * data is available or processed by the system.
+     */
+
+	UINT8 io_ready;
+
+	/* flag for "true" timing involving rs/ws */
+
+	UINT8 true_timing;
+
+	/* rsws - state, rs bit 1, ws bit 0 */
+	UINT8 rs_ws;
+	UINT8 read_latch;
+	UINT8 write_latch;
 
 	/* flag for variant tmc0285/tms5200 emulation */
 	/* The TMC0285 AKA TMS5200 is an earlier variant of the TMS5220 used in
@@ -243,6 +359,8 @@ static void register_for_save_states(tms5220_state *tms)
 	state_save_register_device_item(tms->device, 0, tms->data_register);
 	state_save_register_device_item(tms->device, 0, tms->RDB_flag);
 	state_save_register_device_item(tms->device, 0, tms->digital_select);
+
+	state_save_register_device_item(tms->device, 0, tms->io_ready);
 }
 
 
@@ -265,11 +383,11 @@ static void tms5220_data_write(tms5220_state *tms, int data)
 		if (tms->speak_external)
 			tms->buffer_empty = 0;
 
-        if (DEBUG_5220) logerror("Added byte to FIFO (size=%2d)\n", tms->fifo_count);
+        LOG(("Added byte to FIFO (size=%2d)\n", tms->fifo_count));
     }
     else
     {
-        if (DEBUG_5220) logerror("Ran out of room in the FIFO!\n");
+        LOG(("Ran out of room in the FIFO!\n"));
     }
 
     /* update the buffer low state */
@@ -317,7 +435,7 @@ static int tms5220_status_read(tms5220_state *tms)
 		/* clear the interrupt pin */
 		set_interrupt_state(tms, 0);
 
-		if (DEBUG_5220) logerror("Status read: TS=%d BL=%d BE=%d\n", tms->talk_status, tms->buffer_low, tms->buffer_empty);
+		LOG(("Status read: TS=%d BL=%d BE=%d\n", tms->talk_status, tms->buffer_low, tms->buffer_empty));
 
 		return (tms->talk_status << 7) | (tms->buffer_low << 6) | (tms->buffer_empty << 5);
 	}
@@ -333,7 +451,8 @@ static int tms5220_status_read(tms5220_state *tms)
 
 static int tms5220_ready_read(tms5220_state *tms)
 {
-    return (tms->fifo_count < FIFO_SIZE-1);
+	LOG(("io_ready %d\n", tms->io_ready));
+    return (tms->fifo_count < FIFO_SIZE-1) && tms->io_ready;
 }
 
 
@@ -762,7 +881,7 @@ static void process_command(tms5220_state *tms)
 			break;
 
 		case 0x30 : /* read and branch */
-			if (DEBUG_5220) logerror("read and branch command received\n");
+			LOG(("read and branch command received\n"));
 			tms->RDB_flag = FALSE;
 			if (tms->intf->read_and_branch)
 				(*tms->intf->read_and_branch)(tms->device);
@@ -893,7 +1012,7 @@ static int parse_frame(tms5220_state *tms, int the_first_frame)
 //  WARNING: This code below breaks Victory's power-on test! If you change it
 //  make sure you test Victory.
 //  {
-//      if (DEBUG_5220) logerror("Buffer Empty set - Last frame stop frame\n");
+//      LOG(("Buffer Empty set - Last frame stop frame\n");
 
 //      tms->buffer_empty = 1;
 //      return 1;
@@ -916,7 +1035,7 @@ static int parse_frame(tms5220_state *tms, int the_first_frame)
 	/* if the index is 0 or 15, we're done */
 	if (indx == 0 || indx == 15)
 	{
-		if (DEBUG_5220) logerror("  (4-bit energy=%d frame)\n",tms->new_energy);
+		LOG(("  (4-bit energy=%d frame)\n",tms->new_energy));
 
 		/* clear tms->fifo if stop frame encountered */
 		if (indx == 15)
@@ -953,7 +1072,7 @@ static int parse_frame(tms5220_state *tms, int the_first_frame)
         for (i = 0; i < 10; i++)
             tms->new_k[i] = tms->old_k[i];
 
-        if (DEBUG_5220) logerror("  (11-bit energy=%d pitch=%d rep=%d frame)\n", tms->new_energy, tms->new_pitch, rep_flag);
+        LOG(("  (11-bit energy=%d pitch=%d rep=%d frame)\n", tms->new_energy, tms->new_pitch, rep_flag));
         goto done;
     }
 
@@ -975,7 +1094,7 @@ static int parse_frame(tms5220_state *tms, int the_first_frame)
 		else
 			tms->new_k[3] = k4table[extract_bits(tms, 4)];
 
-        if (DEBUG_5220) logerror("  (29-bit energy=%d pitch=%d rep=%d 4K frame)\n", tms->new_energy, tms->new_pitch, rep_flag);
+        LOG(("  (29-bit energy=%d pitch=%d rep=%d 4K frame)\n", tms->new_energy, tms->new_pitch, rep_flag));
         goto done;
     }
 
@@ -1001,16 +1120,13 @@ static int parse_frame(tms5220_state *tms, int the_first_frame)
     tms->new_k[8] = k9table[extract_bits(tms, 3)];
     tms->new_k[9] = k10table[extract_bits(tms, 3)];
 
-    if (DEBUG_5220) logerror("  (50-bit energy=%d pitch=%d rep=%d 10K frame)\n", tms->new_energy, tms->new_pitch, rep_flag);
+    LOG(("  (50-bit energy=%d pitch=%d rep=%d 10K frame)\n", tms->new_energy, tms->new_pitch, rep_flag));
 
 done:
-	if (DEBUG_5220)
-	{
-		if (tms->speak_external)
-			logerror("Parsed a frame successfully in FIFO - %d bits remaining\n", bits);
-		else
-			logerror("Parsed a frame successfully in ROM\n");
-	}
+	if (tms->speak_external)
+		LOG(("Parsed a frame successfully in FIFO - %d bits remaining\n", bits));
+	else
+		LOG(("Parsed a frame successfully in ROM\n"));
 
 	if (the_first_frame)
 	{
@@ -1027,7 +1143,7 @@ done:
 
 ranout:
 
-    if (DEBUG_5220) logerror("Ran out of bits on a parse!\n");
+    LOG(("Ran out of bits on a parse!\n"));
 
     /* this is an error condition; mark the buffer empty and turn off speaking */
     tms->buffer_empty = 1;
@@ -1059,7 +1175,7 @@ static void check_buffer_low(tms5220_state *tms)
             set_interrupt_state(tms, 1);
         tms->buffer_low = 1;
 
-        if (DEBUG_5220) logerror("Buffer low set\n");
+        LOG(("Buffer low set\n"));
     }
 
     /* did we just become full? */
@@ -1067,7 +1183,7 @@ static void check_buffer_low(tms5220_state *tms)
     {
         tms->buffer_low = 0;
 
-        if (DEBUG_5220) logerror("Buffer low cleared\n");
+        LOG(("Buffer low cleared\n"));
     }
 }
 
@@ -1081,8 +1197,8 @@ static void check_buffer_low(tms5220_state *tms)
 
 static void set_interrupt_state(tms5220_state *tms, int state)
 {
-    if (tms->intf->irq && state != tms->irq_pin)
-    	tms->intf->irq(tms->device, state);
+    if (tms->irq_func.write && state != tms->irq_pin)
+    	devcb_call_write_line(&tms->irq_func, !state);
     tms->irq_pin = state;
 }
 
@@ -1095,7 +1211,7 @@ static void set_interrupt_state(tms5220_state *tms, int state)
 
 static DEVICE_START( tms5220 )
 {
-	static const tms5220_interface dummy = { 0 };
+	static const tms5220_interface dummy = { DEVCB_NULL };
 	tms5220_state *tms = get_safe_token(device);
 
 	/* set the interface and device */
@@ -1103,12 +1219,27 @@ static DEVICE_START( tms5220 )
 	tms->device = device;
 	tms->clock = device->clock;
 
+	/* resolve */
+
+	devcb_resolve_write_line(&tms->irq_func, &tms->intf->irq_func, device);
+
 	/* initialize a stream */
 	tms->stream = stream_create(device, 0, 1, device->clock / 80, tms, tms5220_update);
 
+	/* not during reset which is called frm within a write! */
+	tms->io_ready = 1;
+	tms->true_timing = 0;
+
+	tms->variant = variant_tms5220;
 	register_for_save_states(tms);
 }
 
+static DEVICE_START( tms5220c )
+{
+	tms5220_state *tms = get_safe_token(device);
+	DEVICE_START_CALL( tms5220 );
+	tms->variant = variant_tms5220c;
+}
 
 static DEVICE_START( tmc0285 )
 {
@@ -1137,7 +1268,7 @@ static DEVICE_RESET( tms5220 )
 	/* initialize the chip state */
 	/* Note that we do not actually clear IRQ on start-up : IRQ is even raised if tms->buffer_empty or tms->buffer_low are 0 */
 	tms->tms5220_speaking = tms->speak_external = tms->talk_status = tms->first_frame = tms->last_frame = tms->irq_pin = 0;
-	if (tms->intf->irq) tms->intf->irq(tms->device, 0);
+	set_interrupt_state(tms, 0);
 	tms->buffer_empty = tms->buffer_low = 1;
 
 	tms->RDB_flag = FALSE;
@@ -1162,7 +1293,125 @@ static DEVICE_RESET( tms5220 )
 	tms->schedule_dummy_read = TRUE;
 }
 
+/**********************************************************************************************
 
+     True timing
+
+***********************************************************************************************/
+
+TIMER_CALLBACK( io_ready_cb )
+{
+	tms5220_state *tms = (tms5220_state *) ptr;
+	if (param)
+	{
+		switch (tms->rs_ws)
+		{
+		case 0x02:
+			/* Write */
+		    /* bring up to date first */
+			LOG(("Service write %02x\n", tms->write_latch));
+		    stream_update(tms->stream);
+		    tms5220_data_write(tms, tms->write_latch);
+		    break;
+		case 0x01:
+			/* Read */
+		    /* bring up to date first */
+		    stream_update(tms->stream);
+		    tms->read_latch = tms5220_status_read(tms);
+			break;
+		case 0x03:
+			/* High Impedance */
+		case 0x00:
+			/* illegal */
+			break;
+		}
+	}
+	tms->io_ready = param;
+}
+
+WRITE_LINE_DEVICE_HANDLER( tms5220_rsq_w )
+{
+	tms5220_state *tms = get_safe_token(device);
+	UINT8 new;
+
+	tms->true_timing = 1;
+	state &= 0x01;
+
+	new = (tms->rs_ws & 0x01) | (state<<1);
+	if (new != tms->rs_ws)
+	{
+		tms->rs_ws = new;
+		if (new == 0)
+		{
+			if (tms->variant == variant_tms5220c)
+				device_reset(device);
+			else
+				/* illegal */
+				LOG(("tms5220_rs_w: illegal\n"));
+			return;
+		}
+		else if ( new == 3)
+		{
+			/* high impedance */
+			tms->read_latch = 0xff;
+			return;
+		}
+		if (state)
+		{
+			/* low to high */
+		}
+		else
+		{
+			/* high to low - schedule ready cycle*/
+			LOG(("Schedule write ready\n"));
+			tms->io_ready = 1;
+			/* 100 nsec from data sheet */
+			timer_set(tms->device->machine, ATTOTIME_IN_NSEC(100), tms, 0, io_ready_cb);
+			/* 25 usec in datasheet, but zaccaria won't work */
+			timer_set(tms->device->machine, ATTOTIME_IN_USEC(100), tms, 1, io_ready_cb);
+		}
+	}
+}
+
+WRITE_LINE_DEVICE_HANDLER( tms5220_wsq_w )
+{
+	tms5220_state *tms = get_safe_token(device);
+	UINT8 new;
+
+	tms->true_timing = 1;
+	state &= 0x01;
+	new = (tms->rs_ws & 0x02) | (state<<0);
+	if (new != tms->rs_ws)
+	{
+		tms->rs_ws = new;
+		if (new == 0)
+		{
+			if (tms->variant == variant_tms5220c)
+				device_reset(device);
+			else
+				/* illegal */
+				LOG(("tms5220_ws_w: illegal\n"));
+			return;
+		}
+		else if ( new == 3)
+		{
+			/* high impedance */
+			tms->read_latch = 0xff;
+			return;
+		}
+		if (state)
+		{
+			/* low to high  */
+		}
+		else
+		{
+			/* high to low - schedule ready cycle*/
+			tms->io_ready = 1;
+			timer_set(tms->device->machine, ATTOTIME_IN_NSEC(100), tms, 0, io_ready_cb);
+			timer_set(tms->device->machine, ATTOTIME_IN_USEC(25), tms, 1, io_ready_cb);
+		}
+	}
+}
 
 /**********************************************************************************************
 
@@ -1173,9 +1422,20 @@ static DEVICE_RESET( tms5220 )
 WRITE8_DEVICE_HANDLER( tms5220_data_w )
 {
 	tms5220_state *tms = get_safe_token(device);
-    /* bring up to date first */
-    stream_update(tms->stream);
-    tms5220_data_write(tms, data);
+
+	if (!tms->true_timing)
+	{
+		/* bring up to date first */
+	    stream_update(tms->stream);
+	    tms5220_data_write(tms, data);
+	}
+	else
+	{
+		/* actually in a write ? */
+		if (!(tms->rs_ws == 0x02))
+			LOG(("tms5220_data_w: data written outside ws, status: %02x!\n", tms->rs_ws));
+		tms->write_latch = data;
+	}
 }
 
 
@@ -1189,9 +1449,21 @@ WRITE8_DEVICE_HANDLER( tms5220_data_w )
 READ8_DEVICE_HANDLER( tms5220_status_r )
 {
 	tms5220_state *tms = get_safe_token(device);
-    /* bring up to date first */
-    stream_update(tms->stream);
-    return tms5220_status_read(tms);
+	if (!tms->true_timing)
+	{
+	   /* bring up to date first */
+	    stream_update(tms->stream);
+	    return tms5220_status_read(tms);
+	}
+	else
+	{
+		/* actually in a read ? */
+		if (tms->rs_ws == 0x01)
+			return tms->read_latch;
+		else
+			LOG(("tms5220_status_r: data read outside rs!\n"));
+		return 0xff;
+	}
 }
 
 
@@ -1202,12 +1474,12 @@ READ8_DEVICE_HANDLER( tms5220_status_r )
 
 ***********************************************************************************************/
 
-int tms5220_ready_r(const device_config *device)
+READ_LINE_DEVICE_HANDLER( tms5220_readyq_r )
 {
 	tms5220_state *tms = get_safe_token(device);
     /* bring up to date first */
     stream_update(tms->stream);
-    return tms5220_ready_read(tms);
+    return !tms5220_ready_read(tms);
 }
 
 
@@ -1237,12 +1509,12 @@ double tms5220_time_to_ready(const device_config *device)
 
 ***********************************************************************************************/
 
-int tms5220_int_r(const device_config *device)
+READ_LINE_DEVICE_HANDLER( tms5220_intq_r )
 {
 	tms5220_state *tms = get_safe_token(device);
     /* bring up to date first */
     stream_update(tms->stream);
-    return tms5220_int_read(tms);
+    return !tms5220_int_read(tms);
 }
 
 
@@ -1302,6 +1574,11 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_FEATURES			DT_HAS_START | DT_HAS_RESET
 #define DEVTEMPLATE_NAME				"TMS5220"
 #define DEVTEMPLATE_FAMILY				"TI Speech"
+#include "devtempl.h"
+
+#define DEVTEMPLATE_DERIVED_ID(p,s)		p##tms5220c##s
+#define DEVTEMPLATE_DERIVED_FEATURES	DT_HAS_START
+#define DEVTEMPLATE_DERIVED_NAME		"TMS5220C"
 #include "devtempl.h"
 
 #define DEVTEMPLATE_DERIVED_ID(p,s)		p##tmc0285##s

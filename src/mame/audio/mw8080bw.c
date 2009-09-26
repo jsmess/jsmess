@@ -289,10 +289,10 @@ static DISCRETE_SOUND_START(tornbase)
 	DISCRETE_SQUAREWFIX(TORNBASE_SQUAREW_120, 1, 120, 1.0, 50.0, 1.0/2, 0)	/* pin V */
 
 	/* 7403 O/C NAND gate at G6.  3 of the 4 gates used with their outputs tied together */
-	DISCRETE_LOGIC_NAND(TORNBASE_TONE_240_SND, 1, TORNBASE_SQUAREW_240, TORNBASE_TONE_240_EN)	/* pins 4,5,6 */
-	DISCRETE_LOGIC_NAND(TORNBASE_TONE_960_SND, 1, TORNBASE_SQUAREW_960, TORNBASE_TONE_960_EN)	/* pins 2,1,3 */
-	DISCRETE_LOGIC_NAND(TORNBASE_TONE_120_SND, 1, TORNBASE_SQUAREW_120, TORNBASE_TONE_120_EN)	/* pins 13,12,11 */
-	DISCRETE_LOGIC_AND3(TORNBASE_TONE_SND,     1, TORNBASE_TONE_240_SND, TORNBASE_TONE_960_SND, TORNBASE_TONE_120_SND)
+	DISCRETE_LOGIC_NAND(TORNBASE_TONE_240_SND, TORNBASE_SQUAREW_240, TORNBASE_TONE_240_EN)	/* pins 4,5,6 */
+	DISCRETE_LOGIC_NAND(TORNBASE_TONE_960_SND, TORNBASE_SQUAREW_960, TORNBASE_TONE_960_EN)	/* pins 2,1,3 */
+	DISCRETE_LOGIC_NAND(TORNBASE_TONE_120_SND, TORNBASE_SQUAREW_120, TORNBASE_TONE_120_EN)	/* pins 13,12,11 */
+	DISCRETE_LOGIC_AND3(TORNBASE_TONE_SND,     TORNBASE_TONE_240_SND, TORNBASE_TONE_960_SND, TORNBASE_TONE_120_SND)
 
 	/* 47K resistor (R601) and 0.047uF capacitor (C601)
        There is also a 50K pot acting as a volume control, but we output at
@@ -477,7 +477,6 @@ static DISCRETE_SOUND_START(maze)
 	/* After the 30s has expired, there is no sound until the next coin is inserted. */
 	/* There is also sound for the first 30s after power up even without a coin. */
 	DISCRETE_LOGIC_INVERT(NODE_20,				/* IC E2, pin 8 */
-					1,							/* ENAB */
 					MAZE_JOYSTICK_IN_USE)		/* IN0 */
 	DISCRETE_555_MSTABLE(MAZE_GAME_OVER,		/* IC F2, pin 3 */
 					1,							/* RESET */
@@ -486,36 +485,30 @@ static DISCRETE_SOUND_START(maze)
 					CAP_U(100),					/* C204 */
 					&maze_555_F2)
 	DISCRETE_LOGIC_JKFLIPFLOP(MAZE_AUDIO_ENABLE,/* IC F1, pin 5 */
-					1,							/* ENAB */
 					MAZE_COIN,					/* RESET */
 					1,							/* SET */
 					MAZE_GAME_OVER,				/* CLK */
 					1,							/* J */
 					0)							/* K */
 	DISCRETE_LOGIC_INVERT(MAZE_TONE_ENABLE,		/* IC F1, pin 6 */
-					1,							/* ENAB */
 					MAZE_AUDIO_ENABLE)			/* IN0 */
 	DISCRETE_LOGIC_AND3(NODE_21,
-					1,							/* ENAB */
 					MAZE_JOYSTICK_IN_USE,		/* INP0 */
 					MAZE_TONE_ENABLE,			/* INP1 */
 					MAZE_TONE_TIMING)			/* INP2 */
 
 	/* The following circuits use the control info to generate a tone. */
 	DISCRETE_LOGIC_JKFLIPFLOP(MAZE_PLAYER_SEL,	/* IC C1, pin 3 */
-					1,							/* ENAB */
 					1,							/* RESET */
 					1,							/* SET */
 					MAZE_TONE_TIMING,			/* CLK */
 					1,							/* J */
 					1)							/* K */
 	DISCRETE_MULTIPLEX2(NODE_31,				/* IC D1 */
-					1,							/* ENAB */
 					MAZE_PLAYER_SEL,			/* ADDR */
 					MAZE_P1_DATA,				/* INP0 */
 					MAZE_P2_DATA)				/* INP1 */
 	DISCRETE_LOOKUP_TABLE(NODE_32,				/* IC E1 */
-					1,							/* ENAB */
 					NODE_31,					/* ADDR */
 					16,							/* SIZE */
 					&maze_74147_table)
@@ -2693,7 +2686,6 @@ static DISCRETE_SOUND_START(spcenctr)
 					CAP_U(1),					/* C713 */
 					&spcenctr_555_bonus)
 	DISCRETE_LOGIC_AND3(NODE_82,				/* IC C-D, pin 6 */
-					1,							/* ENAB */
 					NODE_80,					/* INP0 */
 					NODE_81,					/* INP1 */
 					SPCENCTR_BONUS_EN)			/* INP2 */
@@ -3526,7 +3518,6 @@ static const discrete_mixer_desc invaders_mixer =
 					1.0/2,												/* BIAS */                                  \
 					0)													/* PHASE */                                 \
 	DISCRETE_LOGIC_AND3(INVADERS_NODE(42, _board),						/* IC F3, pin 12 */                         \
-					1,													/* ENAB */                                  \
 					INVADERS_NODE(INVADERS_BONUS_MISSLE_BASE_EN, _board),/* INP0 */                                 \
 					INVADERS_NODE(41, _board),							/* INP1 */                                  \
 					INVADERS_NODE(40, _board) )							/* INP2 */                                  \
@@ -3804,7 +3795,7 @@ static DISCRETE_SOUND_START(blueshrk)
 	/* so we will cheat and add a pulse 1 sample wide to trigger it */
 	DISCRETE_ONESHOT(NODE_30, BLUESHRK_HIT_EN, 1, /* 1 sample wide */ 0, DISC_ONESHOT_REDGE | DISC_ONESHOT_NORETRIG | DISC_OUT_ACTIVE_LOW)
 	DISCRETE_555_MSTABLE(NODE_31, BLUESHRK_HIT_EN, NODE_30, RES_K(47), CAP_U(2.2), &blueshrk_555_H1A)
-	DISCRETE_LOGIC_INVERT(NODE_32, 1, BLUESHRK_HIT_EN)
+	DISCRETE_LOGIC_INVERT(NODE_32, BLUESHRK_HIT_EN)
 	DISCRETE_COUNTER(NODE_33, 1, /*RST*/ NODE_32, /*CLK*/ NODE_31, 1, DISC_COUNT_UP, 0, DISC_CLK_ON_F_EDGE)
 	DISCRETE_SWITCH(NODE_34, 1, NODE_33, CAP_U(0.015) + CAP_U(0.01), CAP_U(0.022))
 	DISCRETE_555_ASTABLE(BLUESHRK_HIT_SND, BLUESHRK_HIT_EN, RES_K(22), RES_K(39), NODE_34, &blueshrk_555_H1B)

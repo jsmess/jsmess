@@ -377,6 +377,7 @@ static ADDRESS_MAP_START( multfish_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xe1, 0xe1)  AM_WRITE(multfish_bank_w)
 	AM_RANGE(0xe5, 0xe5)  AM_WRITE(multfish_bank_w)
 	AM_RANGE(0xe8, 0xe8)  AM_WRITE(multfish_bank_w) // mirror banking for some games
+	AM_RANGE(0xea, 0xea)  AM_WRITE(multfish_bank_w) // mirror banking for some games
 
 	AM_RANGE(0xf1, 0xf1)  AM_WRITE(multfish_rambank_w)
 	AM_RANGE(0xf3, 0xf3)  AM_WRITE(multfish_f3_w) // from 00->01 at startup, irq enable maybe?
@@ -1707,10 +1708,18 @@ ROM_END
 
 Note:
 
-   Only the first set of a given revision is listed in Irgosoft's official hashes list.
+   Only the first set of a given revision is listed in Igrosoft's official hashes list.
 
    It is not known if the alternate sets are hacks or were intended for different regions.
    It looks like the difference are in the payout percentage / odds
+
+Most games had a revision in early 2007 to meet the standards of the "Government gambling control"
+   law of The Russian Federation No 244-03 of Dec 29, 2006
+
+From Igrosoft's web site about version types (IE: some version have "M" in them):
+
+   * Two software versions are shown, one of them corresponds to Russian legislation,
+     the other one (with the letter m) is for the countries without such restrictions.
 
 */
 
@@ -1820,4 +1829,4 @@ GAME( 2006, keks,        0,        multfish, multfish,  0, ROT0, "Igrosoft", "Ke
 GAME( 2006, keksa,       keks,     multfish, multfish,  0, ROT0, "Igrosoft", "Keks (060328, set 2)",  0 )
 GAME( 2006, keksb,       keks,     multfish, multfish,  0, ROT0, "Igrosoft", "Keks (060328, set 3)",  0 )
 GAME( 2006, keks_2,      keks,     multfish, multfish,  0, ROT0, "Igrosoft", "Keks (060403. set 1)",  0 )
-GAME( 2006, keks_2a,     keks,     multfish, multfish,  0, ROT0, "Igrosoft", "Keks (060403, set 3)",  0 )
+GAME( 2006, keks_2a,     keks,     multfish, multfish,  0, ROT0, "Igrosoft", "Keks (060403, set 2)",  0 )

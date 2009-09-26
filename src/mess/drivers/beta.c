@@ -86,7 +86,7 @@ static void update_display(beta_state *state)
 	}
 }
 
-static UINT8 beta_riot_a_r(const device_config *device, UINT8 olddata)
+static READ8_DEVICE_HANDLER(beta_riot_a_r)
 {
 	/*
 
@@ -124,7 +124,7 @@ static UINT8 beta_riot_a_r(const device_config *device, UINT8 olddata)
 	return data;
 }
 
-static void beta_riot_a_w(const device_config *device, UINT8 data, UINT8 olddata)
+static WRITE8_DEVICE_HANDLER(beta_riot_a_w)
 {
 	/*
 
@@ -153,13 +153,14 @@ static void beta_riot_a_w(const device_config *device, UINT8 data, UINT8 olddata
 	state->eprom_data = data;
 }
 
-static UINT8 beta_riot_b_r(const device_config *device, UINT8 olddata)
+static READ8_DEVICE_HANDLER(beta_riot_b_r)
 {
 	return 0;
 }
 
-static void beta_riot_b_w(const device_config *device, UINT8 data, UINT8 olddata)
+static WRITE8_DEVICE_HANDLER(beta_riot_b_w)
 {
+	UINT8 olddata = data; /* HACKHACK - to get 0.134u1 to compile */
 	/*
 
 		bit		description
@@ -211,18 +212,18 @@ static void beta_riot_b_w(const device_config *device, UINT8 data, UINT8 olddata
 	}
 }
 
-static void beta_riot_irq(const device_config *device, int state)
+static WRITE_LINE_DEVICE_HANDLER( beta_riot_irq )
 {
 	cputag_set_input_line(device->machine, M6502_TAG, M6502_IRQ_LINE, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 static const riot6532_interface beta_riot_interface =
 {
-	beta_riot_a_r,
-	beta_riot_b_r,
-	beta_riot_a_w,
-	beta_riot_b_w,
-	beta_riot_irq
+	DEVCB_HANDLER(beta_riot_a_r),
+	DEVCB_HANDLER(beta_riot_b_r),
+	DEVCB_HANDLER(beta_riot_a_w),
+	DEVCB_HANDLER(beta_riot_b_w),
+	DEVCB_LINE(beta_riot_irq)
 };
 
 /* Quickload */

@@ -10,6 +10,7 @@
  ************************************************************************
  *
  * DST_ADDDER            - Multichannel adder
+ * DST_BITS_DECODE       - Decode Bits from input node
  * DST_CLAMP             - Simple signal clamping circuit
  * DST_COMP_ADDER        - Selectable parallel component circuit
  * DST_DAC_R1            - R1 Ladder DAC with cap filtering
@@ -26,6 +27,7 @@
  * DST_LOGIC_NXOR        - Logic NXOR gate 2 input
  * DST_LOGIC_DFF         - Logic D-type flip/flop
  * DST_LOGIC_JKFF        - Logic JK-type flip/flop
+ * DST_LOGIC_SHIFT       - Logic Shift Register
  * DST_LOOKUP_TABLE      - Return value from lookup table
  * DST_MIXER             - Final Mixer Stage
  * DST_MULTIPLEX         - 1 of x Multiplexer/switch
@@ -53,7 +55,6 @@ struct dst_bits_decode_context
 	int from;
 	int count;
 	int last_val;
-	int v_out;
 };
 
 struct dst_dac_r1_context
@@ -121,6 +122,17 @@ struct dst_samphold_context
 {
 	double last_input;
 	int clocktype;
+};
+
+struct dst_shift_context
+{
+	double	t_left;		/* time unused during last sample in seconds */
+	UINT32	shift_data;
+	UINT32	bit_mask;
+	UINT8	clock_type;
+	UINT8	reset_on_high;
+	UINT8	shift_r;
+	UINT8	last;
 };
 
 struct dst_size_context
@@ -292,17 +304,15 @@ static DISCRETE_STEP(dst_clamp)
  *
  * DST_DAC_R1 - R1 Ladder DAC with cap smoothing
  *
- * input[0]    - Enable
- * input[1]    - Binary Data Input
- * input[2]    - Data On Voltage (3.4 for TTL)
+ * input[0]    - Binary Data Input
+ * input[1]    - Data On Voltage (3.4 for TTL)
  *
  * also passed discrete_dac_r1_ladder structure
  *
  * Mar 2004, D Renaud.
  ************************************************************************/
-#define DST_DAC_R1__ENABLE		DISCRETE_INPUT(0)
-#define DST_DAC_R1__DATA		DISCRETE_INPUT(1)
-#define DST_DAC_R1__VON			DISCRETE_INPUT(2)
+#define DST_DAC_R1__DATA		DISCRETE_INPUT(0)
+#define DST_DAC_R1__VON			DISCRETE_INPUT(1)
 
 static DISCRETE_STEP(dst_dac_r1)
 {
@@ -317,50 +327,39 @@ static DISCRETE_STEP(dst_dac_r1)
 	data   = (int)DST_DAC_R1__DATA;
 	x_time = DST_DAC_R1__DATA - data;
 
-	if (DST_DAC_R1__ENABLE)
+	von = DST_DAC_R1__VON;
+	for (bit=0; bit < info->ladderLength; bit++)
 	{
-		von = DST_DAC_R1__VON;
-		for (bit=0; bit < info->ladderLength; bit++)
+		/* Add up currents of ON circuits per Millman. */
+
+		/* ignore if no resistor present */
+		if (info->r[bit] != 0)
 		{
-			/* Add up currents of ON circuits per Millman. */
+			i_bit   = von / info->r[bit];
+			bit_val = (data >> bit) & 0x01;
 
-			/* ignore if no resistor present */
-			if (info->r[bit] != 0)
+			if ((x_time != 0.0) && (bit_val != ((context->last_data >> bit) & 0x01)))
 			{
-				i_bit   = von / info->r[bit];
-				bit_val = (data >> bit) & 0x01;
-
-				if ((x_time != 0.0) && (bit_val != ((context->last_data >> bit) & 0x01)))
-				{
-					/* there is x_time and a change in bit,
-                     * so anti-alias the current */
-					i_bit *= bit_val ? x_time : 1.0 - x_time;
-				}
-				else
-				{
-					/* there is no x_time or a change in bit,
-                     * so 0 the current if the bit value is 0 */
-					 if (bit_val == 0)
-						 i_bit = 0;
-				}
-				i_total += i_bit;
+				/* there is x_time and a change in bit,
+                 * so anti-alias the current */
+				i_bit *= bit_val ? x_time : 1.0 - x_time;
 			}
+			else
+			{
+				/* there is no x_time or a change in bit,
+                 * so 0 the current if the bit value is 0 */
+				 if (bit_val == 0)
+					 i_bit = 0;
+			}
+			i_total += i_bit;
 		}
-
-		v = i_total * context->r_total;
-		context->last_data = data;
-
-		/* Filter if needed, else just output voltage */
-		node->output[0] = info->cFilter ? node->output[0] + ((v - node->output[0]) * context->exponent) : v;
 	}
-	else
-	{
-		/*
-         * If module is disabled we will just leave the voltage where it was.
-         * We may want to set it to 0 in the future, but we will probably never
-         * disable this module.
-         */
-	}
+
+	v = i_total * context->r_total;
+	context->last_data = data;
+
+	/* Filter if needed, else just output voltage */
+	node->output[0] = info->cFilter ? node->output[0] + ((v - node->output[0]) * context->exponent) : v;
 }
 
 static DISCRETE_RESET(dst_dac_r1)
@@ -411,7 +410,7 @@ static DISCRETE_RESET(dst_dac_r1)
 	if (info->cFilter)
 	{
 		/* Setup filter constants */
-		context->exponent = RC_CHARGE_EXP(node, context->r_total * info->cFilter);
+		context->exponent = RC_CHARGE_EXP(context->r_total * info->cFilter);
 	}
 }
 
@@ -509,28 +508,18 @@ static DISCRETE_STEP(dst_divide)
  *
  * DST_GAIN - This is a programmable gain module with enable function
  *
- * input[0]    - Enable input value
- * input[1]    - Channel0 input value
- * input[2]    - Gain value
- * input[3]    - Final addition offset
+ * input[0]    - Channel0 input value
+ * input[1]    - Gain value
+ * input[2]    - Final addition offset
  *
  ************************************************************************/
-#define DST_GAIN__ENABLE	DISCRETE_INPUT(0)
-#define DST_GAIN__IN		DISCRETE_INPUT(1)
-#define DST_GAIN__GAIN		DISCRETE_INPUT(2)
-#define DST_GAIN__OFFSET	DISCRETE_INPUT(3)
+#define DST_GAIN__IN		DISCRETE_INPUT(0)
+#define DST_GAIN__GAIN		DISCRETE_INPUT(1)
+#define DST_GAIN__OFFSET	DISCRETE_INPUT(2)
 
 static DISCRETE_STEP(dst_gain)
 {
-	if(DST_GAIN__ENABLE)
-	{
-		node->output[0]  = DST_GAIN__IN * DST_GAIN__GAIN;
-		node->output[0] += DST_GAIN__OFFSET;
-	}
-	else
-	{
-		node->output[0] = 0;
-	}
+		node->output[0]  = DST_GAIN__IN * DST_GAIN__GAIN + DST_GAIN__OFFSET;
 }
 
 
@@ -660,19 +649,11 @@ static DISCRETE_RESET(dst_integrate)
  * input[1]    - input[0] value
  *
  ************************************************************************/
-#define DST_LOGIC_INV__ENABLE	DISCRETE_INPUT(0)
-#define DST_LOGIC_INV__IN		DISCRETE_INPUT(1)
+#define DST_LOGIC_INV__IN		DISCRETE_INPUT(0)
 
 static DISCRETE_STEP(dst_logic_inv)
 {
-	if(DST_LOGIC_INV__ENABLE)
-	{
-		node->output[0] = DST_LOGIC_INV__IN ? 0.0 : 1.0;
-	}
-	else
-	{
-		node->output[0] = 0.0;
-	}
+	node->output[0] = DST_LOGIC_INV__IN ? 0.0 : 1.0;
 }
 
 /************************************************************************
@@ -699,7 +680,7 @@ static DISCRETE_STEP(dst_bits_decode)
 	{
 		context->last_val = v;
 		for (i = 0; i < context->count; i++ )
-			node->output[i] = ((v >> (i+context->from)) & 1) * context->v_out;
+			node->output[i] = ((v >> (i+context->from)) & 1) * DST_BITS_DECODE__VOUT;
 	}
 }
 
@@ -709,7 +690,6 @@ static DISCRETE_RESET(dst_bits_decode)
 
 	context->from = DST_BITS_DECODE__FROM;
 	context->count = DST_BITS_DECODE__TO - context->from + 1;
-	context->v_out = DST_BITS_DECODE__VOUT;
 
 	DISCRETE_STEP_CALL(dst_bits_decode);
 }
@@ -717,166 +697,112 @@ static DISCRETE_RESET(dst_bits_decode)
  *
  * DST_LOGIC_AND - Logic AND gate implementation
  *
- * input[0]    - Enable
- * input[1]    - input[0] value
- * input[2]    - input[1] value
- * input[3]    - input[2] value
- * input[4]    - input[3] value
+ * input[0]    - input[0] value
+ * input[1]    - input[1] value
+ * input[2]    - input[2] value
+ * input[3]    - input[3] value
  *
  ************************************************************************/
-#define DST_LOGIC_AND__ENABLE	DISCRETE_INPUT(0)
-#define DST_LOGIC_AND__IN0		DISCRETE_INPUT(1)
-#define DST_LOGIC_AND__IN1		DISCRETE_INPUT(2)
-#define DST_LOGIC_AND__IN2		DISCRETE_INPUT(3)
-#define DST_LOGIC_AND__IN3		DISCRETE_INPUT(4)
+#define DST_LOGIC_AND__IN0		DISCRETE_INPUT(0)
+#define DST_LOGIC_AND__IN1		DISCRETE_INPUT(1)
+#define DST_LOGIC_AND__IN2		DISCRETE_INPUT(2)
+#define DST_LOGIC_AND__IN3		DISCRETE_INPUT(3)
 
 static DISCRETE_STEP(dst_logic_and)
 {
-	if(DST_LOGIC_AND__ENABLE)
-	{
-		node->output[0] = (DST_LOGIC_AND__IN0 && DST_LOGIC_AND__IN1 && DST_LOGIC_AND__IN2 && DST_LOGIC_AND__IN3)? 1.0 : 0.0;
-	}
-	else
-	{
-		node->output[0] = 0.0;
-	}
+	node->output[0] = (DST_LOGIC_AND__IN0 && DST_LOGIC_AND__IN1 && DST_LOGIC_AND__IN2 && DST_LOGIC_AND__IN3)? 1.0 : 0.0;
 }
 
 /************************************************************************
  *
  * DST_LOGIC_NAND - Logic NAND gate implementation
  *
- * input[0]    - Enable
- * input[1]    - input[0] value
- * input[2]    - input[1] value
- * input[3]    - input[2] value
- * input[4]    - input[3] value
+ * input[0]    - input[0] value
+ * input[1]    - input[1] value
+ * input[2]    - input[2] value
+ * input[3]    - input[3] value
  *
  ************************************************************************/
-#define DST_LOGIC_NAND__ENABLE	DISCRETE_INPUT(0)
-#define DST_LOGIC_NAND__IN0		DISCRETE_INPUT(1)
-#define DST_LOGIC_NAND__IN1		DISCRETE_INPUT(2)
-#define DST_LOGIC_NAND__IN2		DISCRETE_INPUT(3)
-#define DST_LOGIC_NAND__IN3		DISCRETE_INPUT(4)
+#define DST_LOGIC_NAND__IN0		DISCRETE_INPUT(0)
+#define DST_LOGIC_NAND__IN1		DISCRETE_INPUT(1)
+#define DST_LOGIC_NAND__IN2		DISCRETE_INPUT(2)
+#define DST_LOGIC_NAND__IN3		DISCRETE_INPUT(3)
 
 static DISCRETE_STEP(dst_logic_nand)
 {
-	if(DST_LOGIC_NAND__ENABLE)
-	{
-		node->output[0]= (DST_LOGIC_NAND__IN0 && DST_LOGIC_NAND__IN1 && DST_LOGIC_NAND__IN2 && DST_LOGIC_NAND__IN3)? 0.0 : 1.0;
-	}
-	else
-	{
-		node->output[0] = 0.0;
-	}
+	node->output[0]= (DST_LOGIC_NAND__IN0 && DST_LOGIC_NAND__IN1 && DST_LOGIC_NAND__IN2 && DST_LOGIC_NAND__IN3)? 0.0 : 1.0;
 }
 
 /************************************************************************
  *
  * DST_LOGIC_OR  - Logic OR  gate implementation
  *
- * input[0]    - Enable
- * input[1]    - input[0] value
- * input[2]    - input[1] value
- * input[3]    - input[2] value
- * input[4]    - input[3] value
+ * input[0]    - input[0] value
+ * input[1]    - input[1] value
+ * input[2]    - input[2] value
+ * input[3]    - input[3] value
  *
  ************************************************************************/
-#define DST_LOGIC_OR__ENABLE	DISCRETE_INPUT(0)
-#define DST_LOGIC_OR__IN0		DISCRETE_INPUT(1)
-#define DST_LOGIC_OR__IN1		DISCRETE_INPUT(2)
-#define DST_LOGIC_OR__IN2		DISCRETE_INPUT(3)
-#define DST_LOGIC_OR__IN3		DISCRETE_INPUT(4)
+#define DST_LOGIC_OR__IN0		DISCRETE_INPUT(0)
+#define DST_LOGIC_OR__IN1		DISCRETE_INPUT(1)
+#define DST_LOGIC_OR__IN2		DISCRETE_INPUT(2)
+#define DST_LOGIC_OR__IN3		DISCRETE_INPUT(3)
 
 static DISCRETE_STEP(dst_logic_or)
 {
-	if(DST_LOGIC_OR__ENABLE)
-	{
-		node->output[0] = (DST_LOGIC_OR__IN0 || DST_LOGIC_OR__IN1 || DST_LOGIC_OR__IN2 || DST_LOGIC_OR__IN3) ? 1.0 : 0.0;
-	}
-	else
-	{
-		node->output[0] = 0.0;
-	}
+	node->output[0] = (DST_LOGIC_OR__IN0 || DST_LOGIC_OR__IN1 || DST_LOGIC_OR__IN2 || DST_LOGIC_OR__IN3) ? 1.0 : 0.0;
 }
 
 /************************************************************************
  *
  * DST_LOGIC_NOR - Logic NOR gate implementation
  *
- * input[0]    - Enable
- * input[1]    - input[0] value
- * input[2]    - input[1] value
- * input[3]    - input[2] value
- * input[4]    - input[3] value
+ * input[0]    - input[0] value
+ * input[1]    - input[1] value
+ * input[2]    - input[2] value
+ * input[3]    - input[3] value
  *
  ************************************************************************/
-#define DST_LOGIC_NOR__ENABLE	DISCRETE_INPUT(0)
-#define DST_LOGIC_NOR__IN0		DISCRETE_INPUT(1)
-#define DST_LOGIC_NOR__IN1		DISCRETE_INPUT(2)
-#define DST_LOGIC_NOR__IN2		DISCRETE_INPUT(3)
-#define DST_LOGIC_NOR__IN3		DISCRETE_INPUT(4)
+#define DST_LOGIC_NOR__IN0		DISCRETE_INPUT(0)
+#define DST_LOGIC_NOR__IN1		DISCRETE_INPUT(1)
+#define DST_LOGIC_NOR__IN2		DISCRETE_INPUT(2)
+#define DST_LOGIC_NOR__IN3		DISCRETE_INPUT(3)
 
 static DISCRETE_STEP(dst_logic_nor)
 {
-	if(DST_LOGIC_NOR__ENABLE)
-	{
-		node->output[0] = (DST_LOGIC_NOR__IN0 || DST_LOGIC_NOR__IN1 || DST_LOGIC_NOR__IN2 || DST_LOGIC_NOR__IN3) ? 0.0 : 1.0;
-	}
-	else
-	{
-		node->output[0] = 0.0;
-	}
+	node->output[0] = (DST_LOGIC_NOR__IN0 || DST_LOGIC_NOR__IN1 || DST_LOGIC_NOR__IN2 || DST_LOGIC_NOR__IN3) ? 0.0 : 1.0;
 }
 
 /************************************************************************
  *
  * DST_LOGIC_XOR - Logic XOR gate implementation
  *
- * input[0]    - Enable
- * input[1]    - input[0] value
- * input[2]    - input[1] value
+ * input[0]    - input[0] value
+ * input[1]    - input[1] value
  *
  ************************************************************************/
-#define DST_LOGIC_XOR__ENABLE	DISCRETE_INPUT(0)
-#define DST_LOGIC_XOR__IN0		DISCRETE_INPUT(1)
-#define DST_LOGIC_XOR__IN1		DISCRETE_INPUT(2)
+#define DST_LOGIC_XOR__IN0		DISCRETE_INPUT(0)
+#define DST_LOGIC_XOR__IN1		DISCRETE_INPUT(1)
 
 static DISCRETE_STEP(dst_logic_xor)
 {
-	if(DST_LOGIC_XOR__ENABLE)
-	{
-		node->output[0] = ((DST_LOGIC_XOR__IN0 && !DST_LOGIC_XOR__IN1) || (!DST_LOGIC_XOR__IN0 && DST_LOGIC_XOR__IN1)) ? 1.0 : 0.0;
-	}
-	else
-	{
-		node->output[0] = 0.0;
-	}
+	node->output[0] = ((DST_LOGIC_XOR__IN0 && !DST_LOGIC_XOR__IN1) || (!DST_LOGIC_XOR__IN0 && DST_LOGIC_XOR__IN1)) ? 1.0 : 0.0;
 }
 
 /************************************************************************
  *
  * DST_LOGIC_NXOR - Logic NXOR gate implementation
  *
- * input[0]    - Enable
- * input[1]    - input[0] value
- * input[2]    - input[1] value
+ * input[0]    - input[0] value
+ * input[1]    - input[1] value
  *
  ************************************************************************/
-#define DST_LOGIC_XNOR__ENABLE	DISCRETE_INPUT(0)
-#define DST_LOGIC_XNOR__IN0		DISCRETE_INPUT(1)
-#define DST_LOGIC_XNOR__IN1		DISCRETE_INPUT(2)
+#define DST_LOGIC_XNOR__IN0		DISCRETE_INPUT(0)
+#define DST_LOGIC_XNOR__IN1		DISCRETE_INPUT(1)
 
 static DISCRETE_STEP(dst_logic_nxor)
 {
-	if(DST_LOGIC_XNOR__ENABLE)
-	{
-		node->output[0] = ((DST_LOGIC_XNOR__IN0 && !DST_LOGIC_XNOR__IN1) || (!DST_LOGIC_XNOR__IN0 && DST_LOGIC_XNOR__IN1)) ? 0.0 : 1.0;
-	}
-	else
-	{
-		node->output[0] = 0.0;
-	}
+	node->output[0] = ((DST_LOGIC_XNOR__IN0 && !DST_LOGIC_XNOR__IN1) || (!DST_LOGIC_XNOR__IN0 && DST_LOGIC_XNOR__IN1)) ? 0.0 : 1.0;
 }
 
 
@@ -884,18 +810,16 @@ static DISCRETE_STEP(dst_logic_nxor)
  *
  * DST_LOGIC_DFF - Standard D-type flip-flop implementation
  *
- * input[0]    - enable
- * input[1]    - /Reset
- * input[2]    - /Set
- * input[3]    - clock
- * input[4]    - data
+ * input[0]    - /Reset
+ * input[1]    - /Set
+ * input[2]    - clock
+ * input[3]    - data
  *
  ************************************************************************/
-#define DST_LOGIC_DFF__ENABLE	 DISCRETE_INPUT(0)
-#define DST_LOGIC_DFF__RESET	!DISCRETE_INPUT(1)
-#define DST_LOGIC_DFF__SET		!DISCRETE_INPUT(2)
-#define DST_LOGIC_DFF__CLOCK	 DISCRETE_INPUT(3)
-#define DST_LOGIC_DFF__DATA 	 DISCRETE_INPUT(4)
+#define DST_LOGIC_DFF__RESET	!DISCRETE_INPUT(0)
+#define DST_LOGIC_DFF__SET		!DISCRETE_INPUT(1)
+#define DST_LOGIC_DFF__CLOCK	 DISCRETE_INPUT(2)
+#define DST_LOGIC_DFF__DATA 	 DISCRETE_INPUT(3)
 
 static DISCRETE_STEP(dst_logic_dff)
 {
@@ -903,19 +827,12 @@ static DISCRETE_STEP(dst_logic_dff)
 
 	int clk = (int)DST_LOGIC_DFF__CLOCK;
 
-	if (DST_LOGIC_DFF__ENABLE)
-	{
-		if (DST_LOGIC_DFF__RESET)
-			node->output[0] = 0;
-		else if (DST_LOGIC_DFF__SET)
-			node->output[0] = 1;
-		else if (!context->last_clk && clk)	/* low to high */
-			node->output[0] = DST_LOGIC_DFF__DATA;
-	}
-	else
-	{
+	if (DST_LOGIC_DFF__RESET)
 		node->output[0] = 0;
-	}
+	else if (DST_LOGIC_DFF__SET)
+		node->output[0] = 1;
+	else if (!context->last_clk && clk)	/* low to high */
+		node->output[0] = DST_LOGIC_DFF__DATA;
 	context->last_clk = clk;
 }
 
@@ -932,20 +849,18 @@ static DISCRETE_RESET(dst_logic_ff)
  *
  * DST_LOGIC_JKFF - Standard JK-type flip-flop implementation
  *
- * input[0]    - enable
- * input[1]    - /Reset
- * input[2]    - /Set
- * input[3]    - clock
- * input[4]    - J
- * input[5]    - K
+ * input[0]    - /Reset
+ * input[1]    - /Set
+ * input[2]    - clock
+ * input[3]    - J
+ * input[4]    - K
  *
  ************************************************************************/
-#define DST_LOGIC_JKFF__ENABLE	 DISCRETE_INPUT(0)
-#define DST_LOGIC_JKFF__RESET	!DISCRETE_INPUT(1)
-#define DST_LOGIC_JKFF__SET		!DISCRETE_INPUT(2)
-#define DST_LOGIC_JKFF__CLOCK	 DISCRETE_INPUT(3)
-#define DST_LOGIC_JKFF__J 		 DISCRETE_INPUT(4)
-#define DST_LOGIC_JKFF__K	 	 DISCRETE_INPUT(5)
+#define DST_LOGIC_JKFF__RESET	!DISCRETE_INPUT(0)
+#define DST_LOGIC_JKFF__SET		!DISCRETE_INPUT(1)
+#define DST_LOGIC_JKFF__CLOCK	 DISCRETE_INPUT(2)
+#define DST_LOGIC_JKFF__J 		 DISCRETE_INPUT(3)
+#define DST_LOGIC_JKFF__K	 	 DISCRETE_INPUT(4)
 
 static DISCRETE_STEP(dst_logic_jkff)
 {
@@ -955,35 +870,28 @@ static DISCRETE_STEP(dst_logic_jkff)
 	int j   = (int)DST_LOGIC_JKFF__J;
 	int k   = (int)DST_LOGIC_JKFF__K;
 
-	if (DST_LOGIC_JKFF__ENABLE)
-	{
-		if (DST_LOGIC_JKFF__RESET)
-			node->output[0] = 0;
-		else if (DST_LOGIC_JKFF__SET)
-			node->output[0] = 1;
-		else if (context->last_clk && !clk)	/* high to low */
-		{
-			if (!j)
-			{
-				/* J=0, K=0 - Hold */
-				if (k)
-					/* J=0, K=1 - Reset */
-					node->output[0] = 0;
-			}
-			else
-			{
-				if (!k)
-					/* J=1, K=0 - Set */
-					node->output[0] = 1;
-				else
-					/* J=1, K=1 - Toggle */
-					node->output[0] = !(int)node->output[0];
-			}
-		}
-	}
-	else
-	{
+	if (DST_LOGIC_JKFF__RESET)
 		node->output[0] = 0;
+	else if (DST_LOGIC_JKFF__SET)
+		node->output[0] = 1;
+	else if (context->last_clk && !clk)	/* high to low */
+	{
+		if (!j)
+		{
+			/* J=0, K=0 - Hold */
+			if (k)
+				/* J=0, K=1 - Reset */
+				node->output[0] = 0;
+		}
+		else
+		{
+			if (!k)
+				/* J=1, K=0 - Set */
+				node->output[0] = 1;
+			else
+				/* J=1, K=1 - Toggle */
+				node->output[0] = !(int)node->output[0];
+		}
 	}
 	context->last_clk = clk;
 }
@@ -991,19 +899,119 @@ static DISCRETE_STEP(dst_logic_jkff)
 
 /************************************************************************
  *
+ * DST_LOGIC_SHIFT - Shift Register implementation
+ *
+ ************************************************************************/
+#define DST_LOGIC_SHIFT__IN			DISCRETE_INPUT(0)
+#define DST_LOGIC_SHIFT__RESET		DISCRETE_INPUT(1)
+#define DST_LOGIC_SHIFT__CLK		DISCRETE_INPUT(2)
+#define DST_LOGIC_SHIFT__SIZE		DISCRETE_INPUT(3)
+#define DST_LOGIC_SHIFT__OPTIONS	DISCRETE_INPUT(4)
+
+static DISCRETE_STEP(dst_logic_shift)
+{
+	struct dst_shift_context *context = (struct dst_shift_context *)node->context;
+
+	double	cycles;
+	double	ds_clock;
+	int		clock = 0, inc = 0;
+
+	int input_bit = (DST_LOGIC_SHIFT__IN != 0) ? 1 : 0;
+	ds_clock = DST_LOGIC_SHIFT__CLK;
+	if (context->clock_type == DISC_CLK_IS_FREQ)
+	{
+		/* We need to keep clocking the internal clock even if in reset. */
+		cycles = (context->t_left + node->info->sample_time) * ds_clock;
+		inc    = (int)cycles;
+		context->t_left = (cycles - inc) / ds_clock;
+	}
+	else
+	{
+		clock  = (int)ds_clock;
+	}
+
+	/* If reset enabled then set output to the reset value.  No x_time in reset. */
+	if(((DST_LOGIC_SHIFT__RESET == 0) ? 0 : 1) == context->reset_on_high)
+	{
+		context->shift_data = 0;
+		node->output[0] = 0;
+		return;
+	}
+
+	/* increment clock */
+	switch (context->clock_type)
+	{
+		case DISC_CLK_ON_F_EDGE:
+		case DISC_CLK_ON_R_EDGE:
+			/* See if the clock has toggled to the proper edge */
+			clock = (clock != 0);
+			if (context->last != clock)
+			{
+				context->last = clock;
+				if (context->clock_type == clock)
+				{
+					/* Toggled */
+					inc = 1;
+				}
+			}
+			break;
+
+		case DISC_CLK_BY_COUNT:
+			/* Clock number of times specified. */
+			inc = clock;
+			break;
+	}
+
+	if (inc > 0)
+	{
+		if (context->shift_r)
+		{
+			context->shift_data >>= 1;
+			context->shift_data |= input_bit << ((int)DST_LOGIC_SHIFT__SIZE - 1);
+			inc--;
+			context->shift_data >>= inc;
+		}
+		else
+		{
+			context->shift_data <<= 1;
+			context->shift_data |= input_bit;
+			inc--;
+			context->shift_data <<= inc;
+		}
+		context->shift_data &= context->bit_mask;
+	}
+
+	node->output[0] = context->shift_data;
+}
+
+static DISCRETE_RESET(dst_logic_shift)
+{
+	struct dst_shift_context *context = (struct dst_shift_context *)node->context;
+
+	context->bit_mask = (1 << (int)DST_LOGIC_SHIFT__SIZE) - 1;
+	context->clock_type = (int)DST_LOGIC_SHIFT__OPTIONS & DISC_CLK_MASK;
+	context->reset_on_high = ((int)DST_LOGIC_SHIFT__OPTIONS & DISC_LOGIC_SHIFT__RESET_H) ? 1 : 0;
+	context->shift_r = ((int)DST_LOGIC_SHIFT__OPTIONS & DISC_LOGIC_SHIFT__RIGHT)  ? 1 : 0;
+
+	context->t_left  = 0;
+	context->last = 0;
+	context->shift_data   = 0;
+	node->output[0]  = 0;
+}
+
+/************************************************************************
+ *
  * DST_LOOKUP_TABLE  - Return value from lookup table
  *
- * input[0]    - Enable input value
- * input[1]    - Input 1
- * input[2]    - Table size
+ * input[0]    - Input 1
+ * input[1]    - Table size
  *
  * Also passed address of the lookup table
  *
  * Feb 2007, D Renaud.
  ************************************************************************/
-#define DST_LOOKUP_TABLE__ENABLE	DISCRETE_INPUT(0)
-#define DST_LOOKUP_TABLE__IN		DISCRETE_INPUT(1)
-#define DST_LOOKUP_TABLE__SIZE		DISCRETE_INPUT(2)
+#define DST_LOOKUP_TABLE__IN		DISCRETE_INPUT(0)
+#define DST_LOOKUP_TABLE__SIZE		DISCRETE_INPUT(1)
 
 static DISCRETE_STEP(dst_lookup_table)
 {
@@ -1011,7 +1019,7 @@ static DISCRETE_STEP(dst_lookup_table)
 
 	int	addr = DST_LOOKUP_TABLE__IN;
 
-	if (!DST_LOOKUP_TABLE__ENABLE || addr < 0 || addr >= DST_LOOKUP_TABLE__SIZE)
+	if (addr < 0 || addr >= DST_LOOKUP_TABLE__SIZE)
 		node->output[0] = 0;
 	else
 		node->output[0] = table[addr];
@@ -1138,7 +1146,7 @@ static DISCRETE_STEP(dst_mixer)
 							/* Re-calculate exponent if resistor is a node and has changed value */
 							if (*context->r_node[bit] != context->r_last[bit])
 							{
-								context->exponent_rc[bit] =  RC_CHARGE_EXP(node, rTemp2 * info->c[bit]);
+								context->exponent_rc[bit] =  RC_CHARGE_EXP(rTemp2 * info->c[bit]);
 								context->r_last[bit] = *context->r_node[bit];
 							}
 						}
@@ -1194,7 +1202,7 @@ static DISCRETE_STEP(dst_mixer)
 			if (r_node_bit_flag != 0)
 			{
 				/* Re-calculate exponent if resistor nodes are used */
-				context->exponent_c_f =  RC_CHARGE_EXP(node, r_total * info->cF);
+				context->exponent_c_f =  RC_CHARGE_EXP(r_total * info->cF);
 			}
 			context->v_cap_f += (v - v_ref - context->v_cap_f) * context->exponent_c_f;
 			v = context->v_cap_f;
@@ -1288,7 +1296,7 @@ static DISCRETE_RESET(dst_mixer)
 					break;
 			}
 			/* Setup filter constants */
-			context->exponent_rc[bit] = RC_CHARGE_EXP(node, rTemp * info->c[bit]);
+			context->exponent_rc[bit] = RC_CHARGE_EXP(rTemp * info->c[bit]);
 		}
 	}
 
@@ -1303,7 +1311,7 @@ static DISCRETE_RESET(dst_mixer)
 	if (info->cF != 0)
 	{
 		/* Setup filter constants */
-		context->exponent_c_f = RC_CHARGE_EXP(node, ((info->type == DISC_MIXER_IS_OP_AMP) ? info->rF : (1.0 / context->r_total)) * info->cF);
+		context->exponent_c_f = RC_CHARGE_EXP(((info->type == DISC_MIXER_IS_OP_AMP) ? info->rF : (1.0 / context->r_total)) * info->cF);
 	}
 
 	context->v_cap_amp      = 0;
@@ -1313,7 +1321,7 @@ static DISCRETE_RESET(dst_mixer)
 		/* Setup filter constants */
 		/* We will use 100k ohms as an average final stage impedance. */
 		/* Your amp/speaker system will have more effect on incorrect filtering then any value used here. */
-		context->exponent_c_amp = RC_CHARGE_EXP(node, RES_K(100) * info->cAmp);
+		context->exponent_c_amp = RC_CHARGE_EXP(RES_K(100) * info->cAmp);
 	}
 
 	if (context->type == DISC_MIXER_IS_OP_AMP_WITH_RI) context->gain = info->rF / info->rI;
@@ -1326,17 +1334,15 @@ static DISCRETE_RESET(dst_mixer)
  *
  * DST_MULTIPLEX - 1 of x multiplexer/switch
  *
- * input[0]    - Enable input value
- * input[1]    - switch position
- * input[2]    - input[0]
- * input[3]    - input[1]
+ * input[0]    - switch position
+ * input[1]    - input[0]
+ * input[2]    - input[1]
  * .....
  *
  * Dec 2004, D Renaud.
  ************************************************************************/
-#define DST_MULTIPLEX__ENABLE		DISCRETE_INPUT(0)
-#define DST_MULTIPLEX__ADDR			DISCRETE_INPUT(1)
-#define DST_MULTIPLEX__INP(addr)	DISCRETE_INPUT(2 + addr)
+#define DST_MULTIPLEX__ADDR			DISCRETE_INPUT(0)
+#define DST_MULTIPLEX__INP(addr)	DISCRETE_INPUT(1 + addr)
 
 static DISCRETE_STEP(dst_multiplex)
 {
@@ -1344,22 +1350,15 @@ static DISCRETE_STEP(dst_multiplex)
 
 	int addr;
 
-	if(DST_MULTIPLEX__ENABLE)
+	addr = DST_MULTIPLEX__ADDR;	/* FP to INT */
+	if ((addr >= 0) && (addr < context->size))
 	{
-		addr = DST_MULTIPLEX__ADDR;	/* FP to INT */
-		if ((addr >= 0) && (addr < context->size))
-		{
-			node->output[0] = DST_MULTIPLEX__INP(addr);
-		}
-		else
-		{
-			/* Bad address.  We will leave the output alone. */
-			discrete_log(node->info, "NODE_%02d - Address = %d. Out of bounds\n", NODE_BLOCKINDEX(node), addr);
-		}
+		node->output[0] = DST_MULTIPLEX__INP(addr);
 	}
 	else
 	{
-		node->output[0] = 0;
+		/* Bad address.  We will leave the output alone. */
+		discrete_log(node->info, "NODE_%02d - Address = %d. Out of bounds\n", NODE_BLOCKINDEX(node), addr);
 	}
 }
 
@@ -1524,49 +1523,40 @@ static DISCRETE_RESET(dst_ramp)
  *
  * DST_SAMPHOLD - Sample & Hold Implementation
  *
- * input[0]    - Enable
- * input[1]    - input[0] value
- * input[2]    - clock node
- * input[3]    - clock type
+ * input[0]    - input[0] value
+ * input[1]    - clock node
+ * input[2]    - clock type
  *
  ************************************************************************/
-#define DST_SAMPHOLD__ENABLE	DISCRETE_INPUT(0)
-#define DST_SAMPHOLD__IN0		DISCRETE_INPUT(1)
-#define DST_SAMPHOLD__CLOCK		DISCRETE_INPUT(2)
-#define DST_SAMPHOLD__TYPE		DISCRETE_INPUT(3)
+#define DST_SAMPHOLD__IN0		DISCRETE_INPUT(0)
+#define DST_SAMPHOLD__CLOCK		DISCRETE_INPUT(1)
+#define DST_SAMPHOLD__TYPE		DISCRETE_INPUT(2)
 
 static DISCRETE_STEP(dst_samphold)
 {
 	struct dst_samphold_context *context = (struct dst_samphold_context *)node->context;
 
-	if(DST_SAMPHOLD__ENABLE)
+	switch(context->clocktype)
 	{
-		switch(context->clocktype)
-		{
-			case DISC_SAMPHOLD_REDGE:
-				/* Clock the whole time the input is rising */
-				if (DST_SAMPHOLD__CLOCK > context->last_input) node->output[0] = DST_SAMPHOLD__IN0;
-				break;
-			case DISC_SAMPHOLD_FEDGE:
-				/* Clock the whole time the input is falling */
-				if(DST_SAMPHOLD__CLOCK < context->last_input) node->output[0] = DST_SAMPHOLD__IN0;
-				break;
-			case DISC_SAMPHOLD_HLATCH:
-				/* Output follows input if clock != 0 */
-				if( DST_SAMPHOLD__CLOCK) node->output[0] = DST_SAMPHOLD__IN0;
-				break;
-			case DISC_SAMPHOLD_LLATCH:
-				/* Output follows input if clock == 0 */
-				if (DST_SAMPHOLD__CLOCK == 0) node->output[0] = DST_SAMPHOLD__IN0;
-				break;
-			default:
-				discrete_log(node->info, "dst_samphold_step - Invalid clocktype passed");
-				break;
-		}
-	}
-	else
-	{
-		node->output[0] = 0;
+		case DISC_SAMPHOLD_REDGE:
+			/* Clock the whole time the input is rising */
+			if (DST_SAMPHOLD__CLOCK > context->last_input) node->output[0] = DST_SAMPHOLD__IN0;
+			break;
+		case DISC_SAMPHOLD_FEDGE:
+			/* Clock the whole time the input is falling */
+			if(DST_SAMPHOLD__CLOCK < context->last_input) node->output[0] = DST_SAMPHOLD__IN0;
+			break;
+		case DISC_SAMPHOLD_HLATCH:
+			/* Output follows input if clock != 0 */
+			if( DST_SAMPHOLD__CLOCK) node->output[0] = DST_SAMPHOLD__IN0;
+			break;
+		case DISC_SAMPHOLD_LLATCH:
+			/* Output follows input if clock == 0 */
+			if (DST_SAMPHOLD__CLOCK == 0) node->output[0] = DST_SAMPHOLD__IN0;
+			break;
+		default:
+			discrete_log(node->info, "dst_samphold_step - Invalid clocktype passed");
+			break;
 	}
 	/* Save the last value */
 	context->last_input = DST_SAMPHOLD__CLOCK;
@@ -1586,7 +1576,7 @@ static DISCRETE_RESET(dst_samphold)
 
 /************************************************************************
  *
- * DSS_SWITCH - Programmable 2 pole switch module with enable function
+ * DST_SWITCH - Programmable 2 pole switch module with enable function
  *
  * input[0]    - Enable input value
  * input[1]    - switch position
@@ -1594,16 +1584,16 @@ static DISCRETE_RESET(dst_samphold)
  * input[3]    - input[1]
  *
  ************************************************************************/
-#define DSS_SWITCH__ENABLE	DISCRETE_INPUT(0)
-#define DSS_SWITCH__SWITCH	DISCRETE_INPUT(1)
-#define DSS_SWITCH__IN0		DISCRETE_INPUT(2)
-#define DSS_SWITCH__IN1		DISCRETE_INPUT(3)
+#define DST_SWITCH__ENABLE	DISCRETE_INPUT(0)
+#define DST_SWITCH__SWITCH	DISCRETE_INPUT(1)
+#define DST_SWITCH__IN0		DISCRETE_INPUT(2)
+#define DST_SWITCH__IN1		DISCRETE_INPUT(3)
 
 static DISCRETE_STEP(dst_switch)
 {
-	if(DSS_SWITCH__ENABLE)
+	if(DST_SWITCH__ENABLE)
 	{
-		node->output[0] = DSS_SWITCH__SWITCH ? DSS_SWITCH__IN1 : DSS_SWITCH__IN0;
+		node->output[0] = DST_SWITCH__SWITCH ? DST_SWITCH__IN1 : DST_SWITCH__IN0;
 	}
 	else
 	{
@@ -1613,30 +1603,21 @@ static DISCRETE_STEP(dst_switch)
 
 /************************************************************************
  *
- * DSS_ASWITCH - Analog switch
+ * DST_ASWITCH - Analog switch
  *
- * input[0]    - Enable input value
  * input[1]    - Control
  * input[2]    - Input
  * input[3]    - Threshold for enable
  *
  ************************************************************************/
-#define DSS_ASWITCH__ENABLE		DISCRETE_INPUT(0)
-#define DSS_ASWITCH__CTRL		DISCRETE_INPUT(1)
-#define DSS_ASWITCH__IN			DISCRETE_INPUT(2)
-#define DSS_ASWITCH__THRESHOLD	DISCRETE_INPUT(3)
+#define DST_ASWITCH__CTRL		DISCRETE_INPUT(1)
+#define DST_ASWITCH__IN			DISCRETE_INPUT(2)
+#define DST_ASWITCH__THRESHOLD	DISCRETE_INPUT(3)
 
 
 static DISCRETE_STEP(dst_aswitch)
 {
-	if(DSS_SWITCH__ENABLE)
-	{
-		node->output[0] = DSS_ASWITCH__CTRL > DSS_ASWITCH__THRESHOLD ? DSS_ASWITCH__IN : 0;
-	}
-	else
-	{
-		node->output[0] = 0;
-	}
+	node->output[0] = DST_ASWITCH__CTRL > DST_ASWITCH__THRESHOLD ? DST_ASWITCH__IN : 0;
 }
 
 /************************************************************************
@@ -1864,7 +1845,7 @@ static DISCRETE_RESET(dst_op_amp)
 		if (context->has_r4)
 		{
 			/* exponential charge */
-			context->exponent = RC_CHARGE_EXP(node, info->r4 * info->c);
+			context->exponent = RC_CHARGE_EXP(info->r4 * info->c);
 		}
 		else
 			/* linear charge */
@@ -1935,9 +1916,9 @@ static DISCRETE_RESET(dst_op_amp_1sht)
 	const  discrete_op_amp_1sht_info *info    = (const  discrete_op_amp_1sht_info *)node->custom;
 	struct dst_op_amp_1sht_context   *context = (struct dst_op_amp_1sht_context *)node->context;
 
-	context->exponent1c = RC_CHARGE_EXP(node, RES_2_PARALLEL(info->r3, info->r4) * info->c1);
-	context->exponent1d = RC_CHARGE_EXP(node, info->r4 * info->c1);
-	context->exponent2  = RC_CHARGE_EXP(node, info->r2 * info->c2);
+	context->exponent1c = RC_CHARGE_EXP(RES_2_PARALLEL(info->r3, info->r4) * info->c1);
+	context->exponent1d = RC_CHARGE_EXP(info->r4 * info->c1);
+	context->exponent2  = RC_CHARGE_EXP(info->r2 * info->c2);
 	context->i_fixed  = (info->vP - OP_AMP_NORTON_VBE) / info->r1;
 	context->v_cap1   = context->v_cap2 = 0;
 	context->v_max    = info->vP - OP_AMP_NORTON_VBE;
@@ -2062,23 +2043,23 @@ static DISCRETE_RESET(dst_tvca_op_amp)
 	context->v_cap1 = 0;
 	/* Charge rate thru r5 */
 	/* There can be a different charge rates depending on function F3. */
-	context->exponent_c[0] = RC_CHARGE_EXP(node, RES_2_PARALLEL(info->r5, info->r6) * info->c1);
-	context->exponent_c[1] = RC_CHARGE_EXP(node, RES_2_PARALLEL(info->r5, context->r67) * info->c1);
+	context->exponent_c[0] = RC_CHARGE_EXP(RES_2_PARALLEL(info->r5, info->r6) * info->c1);
+	context->exponent_c[1] = RC_CHARGE_EXP(RES_2_PARALLEL(info->r5, context->r67) * info->c1);
 	/* Discharge rate thru r6 + r7 */
-	context->exponent_d[1] = RC_CHARGE_EXP(node, context->r67 * info->c1);
+	context->exponent_d[1] = RC_CHARGE_EXP(context->r67 * info->c1);
 	/* Discharge rate thru r6 */
 	if (info->r6 != 0)
 	{
-		context->exponent_d[0] = RC_CHARGE_EXP(node, info->r6 * info->c1);
+		context->exponent_d[0] = RC_CHARGE_EXP(info->r6 * info->c1);
 	}
 	context->v_cap2       = 0;
 	context->v_trig2      = (info->v2 - 0.6 - OP_AMP_NORTON_VBE) * RES_VOLTAGE_DIVIDER(info->r8, info->r9);
-	context->exponent2[0] = RC_CHARGE_EXP(node, info->r9 * info->c2);
-	context->exponent2[1] = RC_CHARGE_EXP(node, RES_2_PARALLEL(info->r8, info->r9) * info->c2);
+	context->exponent2[0] = RC_CHARGE_EXP(info->r9 * info->c2);
+	context->exponent2[1] = RC_CHARGE_EXP(RES_2_PARALLEL(info->r8, info->r9) * info->c2);
 	context->v_cap3  = 0;
 	context->v_trig3 = (info->v3 - 0.6 - OP_AMP_NORTON_VBE) * RES_VOLTAGE_DIVIDER(info->r10, info->r11);
-	context->exponent3[0] = RC_CHARGE_EXP(node, info->r11 * info->c3);
-	context->exponent3[1] = RC_CHARGE_EXP(node, RES_2_PARALLEL(info->r10, info->r11) * info->c3);
+	context->exponent3[0] = RC_CHARGE_EXP(info->r11 * info->c3);
+	context->exponent3[1] = RC_CHARGE_EXP(RES_2_PARALLEL(info->r10, info->r11) * info->c3);
 
 	DISCRETE_STEP_CALL(dst_tvca_op_amp);
 }

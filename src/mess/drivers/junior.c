@@ -80,9 +80,9 @@ INPUT_PORTS_END
 
 
 
-static UINT8 junior_riot_a_r(const device_config *device, UINT8 olddata)
+static READ8_DEVICE_HANDLER(junior_riot_a_r)
 {
-		UINT8	data = 0xff;
+	UINT8	data = 0xff;
 
 	switch( ( junior_port_b >> 1 ) & 0x0f )
 	{
@@ -101,7 +101,7 @@ static UINT8 junior_riot_a_r(const device_config *device, UINT8 olddata)
 }
 
 
-static UINT8 junior_riot_b_r(const device_config *device, UINT8 olddata)
+static READ8_DEVICE_HANDLER(junior_riot_b_r)
 {
 	if ( riot6532_portb_out_get(device) & 0x20 )
 		return 0xFF;
@@ -111,11 +111,11 @@ static UINT8 junior_riot_b_r(const device_config *device, UINT8 olddata)
 }
 
 
-void junior_riot_a_w(const device_config *device, UINT8 newdata, UINT8 olddata)
+WRITE8_DEVICE_HANDLER(junior_riot_a_w)
 {
 	UINT8 idx = ( junior_port_b >> 1 ) & 0x0f;
 
-	junior_port_a = newdata;
+	junior_port_a = data;
 
 	if ((idx >= 4 && idx < 10) & ( junior_port_a != 0xff ))
 	{
@@ -125,8 +125,9 @@ void junior_riot_a_w(const device_config *device, UINT8 newdata, UINT8 olddata)
 }
 
 
-void junior_riot_b_w(const device_config *device, UINT8 newdata, UINT8 olddata)
+WRITE8_DEVICE_HANDLER(junior_riot_b_w)
 {
+	UINT8 newdata = data;
 	UINT8 idx = ( newdata >> 1 ) & 0x0f;
 
 	junior_port_b = newdata;
@@ -139,7 +140,7 @@ void junior_riot_b_w(const device_config *device, UINT8 newdata, UINT8 olddata)
 }
 
 
-void junior_riot_irq(const device_config *device, int state)
+static WRITE_LINE_DEVICE_HANDLER( junior_riot_irq )
 {
 	cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, state ? HOLD_LINE : CLEAR_LINE);
 }
@@ -147,11 +148,11 @@ void junior_riot_irq(const device_config *device, int state)
 
 static const riot6532_interface junior_riot_interface =
 {
-	junior_riot_a_r,
-	junior_riot_b_r,
-	junior_riot_a_w,
-	junior_riot_b_w,
-	junior_riot_irq
+	DEVCB_HANDLER(junior_riot_a_r),
+	DEVCB_HANDLER(junior_riot_b_r),
+	DEVCB_HANDLER(junior_riot_a_w),
+	DEVCB_HANDLER(junior_riot_b_w),
+	DEVCB_LINE(junior_riot_irq)
 };
 
 

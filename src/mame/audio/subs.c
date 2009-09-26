@@ -101,7 +101,7 @@ DISCRETE_SOUND_START(subs)
 	/************************************************/
 	/* Launch is just amplitude contolled noise     */
 	/************************************************/
-	DISCRETE_MULTIPLY(SUBS_LAUNCH_SND, 1, SUBS_NOISE, SUBS_LAUNCH_DATA)
+	DISCRETE_MULTIPLY(SUBS_LAUNCH_SND, SUBS_NOISE, SUBS_LAUNCH_DATA)
 
 	/************************************************/
 	/* Crash resamples the noise at 8V and then     */
@@ -109,8 +109,9 @@ DISCRETE_SOUND_START(subs)
 	/* 8V = Hsync/2/8 = 15750/2/8                   */
 	/************************************************/
 	DISCRETE_SQUAREWFIX(NODE_20, 1, 15750.0/2/8, 1.0, 50, 1.0/2, 0)	/* Resample freq. */
-	DISCRETE_SAMPLHOLD(NODE_21, 1, SUBS_NOISE, NODE_20, DISC_SAMPHOLD_REDGE)
-	DISCRETE_MULTIPLY(SUBS_CRASH_SND, SUBS_CRASH_EN, NODE_21, SUBS_CRASH_DATA)
+	DISCRETE_SAMPLHOLD(NODE_21, SUBS_NOISE, NODE_20, DISC_SAMPHOLD_REDGE)
+	DISCRETE_MULTIPLY(NODE_22, NODE_21, SUBS_CRASH_DATA)
+	DISCRETE_ONOFF(SUBS_CRASH_SND, SUBS_CRASH_EN, NODE_22)
 
 	/************************************************/
 	/* Explode filters the crash sound.             */
@@ -124,12 +125,12 @@ DISCRETE_SOUND_START(subs)
 	/************************************************/
 	DISCRETE_RCDISC2(NODE_40, SUBS_SONAR1_EN, SUBS_SONAR1_EN, 680000.0, SUBS_SONAR1_EN, 1000.0, 1e-6)	/* Decay envelope */
 	DISCRETE_ADDER2(NODE_41, 1, NODE_40, 800)
-	DISCRETE_LOGIC_AND(NODE_42, 1, SUBS_SONAR1_EN, SUBS_NOISE)
+	DISCRETE_LOGIC_AND(NODE_42, SUBS_SONAR1_EN, SUBS_NOISE)
 	DISCRETE_TRIANGLEWAVE(SUBS_SONAR1_SND, NODE_42, NODE_41, 320.8, 0.0, 0)
 
 	DISCRETE_RCDISC2(NODE_50, SUBS_SONAR2_EN, SUBS_SONAR2_EN, 18600.0, SUBS_SONAR2_EN, 20.0, 4.7e-6)	/* Decay envelope */
 	DISCRETE_ADDER2(NODE_51, 1, NODE_50, 800)
-	DISCRETE_LOGIC_AND(NODE_52, 1, SUBS_SONAR2_EN, SUBS_NOISE)
+	DISCRETE_LOGIC_AND(NODE_52, SUBS_SONAR2_EN, SUBS_NOISE)
 	DISCRETE_TRIANGLEWAVE(SUBS_SONAR2_SND, NODE_52, NODE_51, 320.8, 0.0, 0)
 
 	/************************************************/

@@ -221,6 +221,8 @@ SOUNDS += SID6581
 SOUNDS += SID8580
 SOUNDS += SP0256
 #SOUNDS += DIGITALKER
+SOUNDS += CDP1863
+SOUNDS += CDP1864
 SOUNDS += SOCRATES
 SOUNDS += TMC0285
 SOUNDS += TMS5200
@@ -230,8 +232,6 @@ SOUNDS += TMS5200
 #SOUNDS += TMC0281
 #SOUNDS += TMS5100
 #SOUNDS += TMS5110A
-SOUNDS += CDP1863
-SOUNDS += CDP1864
 
 
 #-------------------------------------------------
@@ -333,13 +333,13 @@ DRVLIBS = \
 	$(MESSOBJ)/osi.a \
 	$(MESSOBJ)/palm.a \
 	$(MESSOBJ)/parker.a \
-	$(MESSOBJ)/pitronic.a \
 	$(MESSOBJ)/pc.a \
 	$(MESSOBJ)/pcm.a \
 	$(MESSOBJ)/pcshare.a \
 	$(MESSOBJ)/pdp1.a \
 	$(MESSOBJ)/pel.a \
 	$(MESSOBJ)/philips.a \
+	$(MESSOBJ)/pitronic.a \
 	$(MESSOBJ)/poly88.a \
 	$(MESSOBJ)/radio.a \
 	$(MESSOBJ)/rca.a \

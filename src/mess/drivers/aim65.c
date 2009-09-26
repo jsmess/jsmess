@@ -141,11 +141,11 @@ INPUT_PORTS_END
 
 static const riot6532_interface aim65_riot_interface =
 {
-	NULL,
-	aim65_riot_b_r,
-	aim65_riot_a_w,
-	NULL,
-	aim65_riot_irq
+	DEVCB_NULL,
+	DEVCB_HANDLER(aim65_riot_b_r),
+	DEVCB_HANDLER(aim65_riot_a_w),
+	DEVCB_NULL,
+	DEVCB_LINE(aim65_riot_irq)
 };
 
 /* system via interface */

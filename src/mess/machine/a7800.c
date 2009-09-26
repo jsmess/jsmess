@@ -51,22 +51,22 @@ static UINT8 *ROM;
     6532 RIOT
 ***************************************************************************/
 
-static UINT8 riot_joystick_r(const device_config *device, UINT8 olddata)
+static READ8_DEVICE_HANDLER( riot_joystick_r )
 {
 	return input_port_read(device->machine, "joysticks");
 }
 
-static UINT8 riot_console_button_r(const device_config *device, UINT8 olddata)
+static READ8_DEVICE_HANDLER( riot_console_button_r )
 {
 	return input_port_read(device->machine, "console_buttons");
 }
 
 const riot6532_interface a7800_r6532_interface =
 {
-	riot_joystick_r,
-	riot_console_button_r,
-	NULL,
-	NULL
+	DEVCB_HANDLER(riot_joystick_r),
+	DEVCB_HANDLER(riot_console_button_r),
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 

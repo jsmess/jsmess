@@ -75,7 +75,7 @@ static TIMER_CALLBACK( led_refresh )
 }
 
 
-static UINT8 sym1_riot_a_r(const device_config *device, UINT8 olddata)
+static READ8_DEVICE_HANDLER(sym1_riot_a_r)
 {
 	int data = 0x7f;
 
@@ -93,7 +93,7 @@ static UINT8 sym1_riot_a_r(const device_config *device, UINT8 olddata)
 }
 
 
-static UINT8 sym1_riot_b_r(const device_config *device, UINT8 olddata)
+static READ8_DEVICE_HANDLER(sym1_riot_b_r)
 {
 	int data = 0xff;
 
@@ -113,7 +113,7 @@ static UINT8 sym1_riot_b_r(const device_config *device, UINT8 olddata)
 }
 
 
-static void sym1_riot_a_w(const device_config *device, UINT8 newdata, UINT8 data)
+static WRITE8_DEVICE_HANDLER(sym1_riot_a_w)
 {
 	logerror("%x: riot_a_w 0x%02x\n", cpu_get_pc( cputag_get_cpu(device->machine, "maincpu") ), data);
 
@@ -122,7 +122,7 @@ static void sym1_riot_a_w(const device_config *device, UINT8 newdata, UINT8 data
 }
 
 
-static void sym1_riot_b_w(const device_config *device, UINT8 newdata, UINT8 data)
+static WRITE8_DEVICE_HANDLER(sym1_riot_b_w)
 {
 	logerror("%x: riot_b_w 0x%02x\n", cpu_get_pc( cputag_get_cpu(device->machine, "maincpu") ), data);
 
@@ -136,10 +136,10 @@ static void sym1_riot_b_w(const device_config *device, UINT8 newdata, UINT8 data
 
 const riot6532_interface sym1_r6532_interface =
 {
-	sym1_riot_a_r,
-	sym1_riot_b_r,
-	sym1_riot_a_w,
-	sym1_riot_b_w
+	DEVCB_HANDLER(sym1_riot_a_r),
+	DEVCB_HANDLER(sym1_riot_b_r),
+	DEVCB_HANDLER(sym1_riot_a_w),
+	DEVCB_HANDLER(sym1_riot_b_w)
 };
 
 

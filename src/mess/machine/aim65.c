@@ -127,7 +127,7 @@ void aim65_update_ds5(const device_config *device, int digit, int data)
 ******************************************************************************/
 
 
-UINT8 aim65_riot_b_r(const device_config *device, UINT8 olddata)
+READ8_DEVICE_HANDLER(aim65_riot_b_r)
 {
 	static const char *const keynames[] =
 	{
@@ -148,13 +148,13 @@ UINT8 aim65_riot_b_r(const device_config *device, UINT8 olddata)
 }
 
 
-void aim65_riot_a_w(const device_config *device, UINT8 data, UINT8 olddata)
+WRITE8_DEVICE_HANDLER(aim65_riot_a_w)
 {
 	riot_port_a = data;
 }
 
 
-void aim65_riot_irq(const device_config *device, int state)
+WRITE_LINE_DEVICE_HANDLER(aim65_riot_irq)
 {
 	cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, state ? HOLD_LINE : CLEAR_LINE);
 }

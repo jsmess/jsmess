@@ -881,7 +881,7 @@ static READ16_HANDLER ( ti99_rspeech_r )
 
 static void speech_kludge_callback(int dummy)
 {
-	if (! tms5220_ready_r())
+	if (! tms5220_readyq_r())
 	{
 		/* Weirdly enough, we are always seeing some problems even though
 		everything is working fine. */
@@ -905,7 +905,7 @@ static WRITE16_HANDLER ( ti99_wspeech_w )
 	there are 15 bytes in FIFO.  It should be 16.  Of course, if it were the
 	case, we would need to store the value on the bus, which would be more
 	complex. */
-	if (! tms5220_ready_r(devtag_get_device(space->machine, "tms5220")))
+	if (! tms5220_readyq_r(devtag_get_device(space->machine, "tms5220")))
 	{
 		attotime time_to_ready = double_to_attotime(tms5220_time_to_ready(devtag_get_device(space->machine, "tms5220")));
 		int cycles_to_ready = cputag_attotime_to_clocks(space->machine, "maincpu", time_to_ready);
@@ -1409,7 +1409,7 @@ WRITE8_HANDLER ( ti99_8_w )
 					there are 15 bytes in FIFO.  It should be 16.  Of course, if it were the
 					case, we would need to store the value on the bus, which would be more
 					complex. */
-					if (! tms5220_ready_r(devtag_get_device(space->machine, "tms5220")))
+					if (! tms5220_readyq_r(devtag_get_device(space->machine, "tms5220")))
 					{
 						attotime time_to_ready = double_to_attotime(tms5220_time_to_ready(devtag_get_device(space->machine, "tms5220")));
 						double d = ceil(cputag_attotime_to_clocks(space->machine, "maincpu", time_to_ready));
