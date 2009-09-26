@@ -331,6 +331,8 @@ WRITE8_HANDLER( trs80m4_84_w )
 
 	trs80_mode = (trs80_mode & 0x73) | (data & 0x8c);
 
+	trs80_model4 = 1;
+
 	switch (data & 3)
 	{
 		case 0:	/* normal operation */
@@ -388,6 +390,7 @@ WRITE8_HANDLER( trs80m4_84_w )
 			memory_set_bankptr(mem->machine, 18, memory_region(mem->machine, "maincpu") + 0x0a000);
 			memory_install_read8_handler (mem, 0xf400, 0xf7ff, 0, 0, trs80_keyboard_r);
 			memory_install_readwrite8_handler (mem, 0xf800, 0xffff, 0, 0, trs80_videoram_r, trs80_videoram_w);
+			trs80_model4 = 2;
 			break;
 		case 3:	/* 64k of ram */
 			memory_set_bankptr(mem->machine, 1, memory_region(mem->machine, "maincpu") + 0x10000);
