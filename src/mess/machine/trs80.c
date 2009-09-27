@@ -316,7 +316,7 @@ READ8_HANDLER( trs80m4_ff_r )
 
 WRITE8_HANDLER( trs80m4_84_w )
 {
-/* Hi-res graphics control - d6..d4,d1..d0 not emulated
+/* Hi-res graphics control - d6..d4 not emulated
 	d7 Page Control
 	d6 Fix upper memory
 	d5 Memory bit 1
@@ -324,21 +324,33 @@ WRITE8_HANDLER( trs80m4_84_w )
 	d3 Invert Video
 	d2 80/64 width
 	d1 Select bit 1
-	d0 Select bit 0 */
+	d0 Select bit 0
+
+	Note: Area from 0000-0FFF is controlled by tr80m4p_9c_w below */
 
 	/* get address space instead of io space */
 	const address_space *mem = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	trs80_mode = (trs80_mode & 0x73) | (data & 0x8c);
 
-	trs80_model4 = 1;
+	trs80_model4 &= 0xce;
+	trs80_model4 |= (data & 3) << 4;
 
 	switch (data & 3)
 	{
 		case 0:	/* normal operation */
-			memory_set_bankptr(mem->machine, 1, memory_region(mem->machine, "maincpu"));
-			memory_set_bankptr(mem->machine, 2, memory_region(mem->machine, "maincpu") + 0x01000);
-			memory_set_bankptr(mem->machine, 4, memory_region(mem->machine, "maincpu") + 0x037ea);
+
+			if (trs80_model4 & 4)	/* Model 4P gets RAM while Model 4 gets ROM */
+			{
+				memory_set_bankptr(mem->machine, 2, memory_region(mem->machine, "maincpu") + 0x11000);
+				memory_set_bankptr(mem->machine, 4, memory_region(mem->machine, "maincpu") + 0x137ea);
+			}
+			else
+			{
+				memory_set_bankptr(mem->machine, 2, memory_region(mem->machine, "maincpu") + 0x01000);
+				memory_set_bankptr(mem->machine, 4, memory_region(mem->machine, "maincpu") + 0x037ea);
+			}
+
 			memory_set_bankptr(mem->machine, 7, memory_region(mem->machine, "maincpu") + 0x14000);
 			memory_set_bankptr(mem->machine, 8, memory_region(mem->machine, "maincpu") + 0x1f400);
 			memory_set_bankptr(mem->machine, 9, memory_region(mem->machine, "maincpu") + 0x1f800);
@@ -349,15 +361,26 @@ WRITE8_HANDLER( trs80m4_84_w )
 			memory_set_bankptr(mem->machine, 17, memory_region(mem->machine, "maincpu") + 0x14000);
 			memory_set_bankptr(mem->machine, 18, memory_region(mem->machine, "maincpu") + 0x1f400);
 			memory_set_bankptr(mem->machine, 19, memory_region(mem->machine, "maincpu") + 0x1f800);
-			memory_install_readwrite8_handler (mem, 0x37e8, 0x37e9, 0, 0, trs80_printer_r, trs80_printer_w);
-			memory_install_read8_handler (mem, 0x3800, 0x3bff, 0, 0, trs80_keyboard_r);
-			memory_install_readwrite8_handler (mem, 0x3c00, 0x3fff, 0, 0, trs80_videoram_r, trs80_videoram_w);
+			memory_install_readwrite8_handler (mem, 0x37e8, 0x37e9, 0, 0, trs80_printer_r, trs80_printer_w);	/* 3 & 13 */
+			memory_install_read8_handler (mem, 0x3800, 0x3bff, 0, 0, trs80_keyboard_r);	/* 5 */
+			memory_install_readwrite8_handler (mem, 0x3c00, 0x3fff, 0, 0, trs80_videoram_r, trs80_videoram_w);	/* 6 & 16 */
 			break;
+
 		case 1:	/* write-only ram backs up the rom */
-			memory_set_bankptr(mem->machine, 1, memory_region(mem->machine, "maincpu"));
-			memory_set_bankptr(mem->machine, 2, memory_region(mem->machine, "maincpu") + 0x01000);
-			memory_set_bankptr(mem->machine, 3, memory_region(mem->machine, "maincpu") + 0x037e8);
-			memory_set_bankptr(mem->machine, 4, memory_region(mem->machine, "maincpu") + 0x037ea);
+
+			if (trs80_model4 & 4)	/* Model 4P gets RAM while Model 4 gets ROM */
+			{
+				memory_set_bankptr(mem->machine, 2, memory_region(mem->machine, "maincpu") + 0x11000);
+				memory_set_bankptr(mem->machine, 3, memory_region(mem->machine, "maincpu") + 0x137e8);
+				memory_set_bankptr(mem->machine, 4, memory_region(mem->machine, "maincpu") + 0x137ea);
+			}
+			else
+			{
+				memory_set_bankptr(mem->machine, 2, memory_region(mem->machine, "maincpu") + 0x01000);
+				memory_set_bankptr(mem->machine, 3, memory_region(mem->machine, "maincpu") + 0x037e8);
+				memory_set_bankptr(mem->machine, 4, memory_region(mem->machine, "maincpu") + 0x037ea);
+			}
+
 			memory_set_bankptr(mem->machine, 7, memory_region(mem->machine, "maincpu") + 0x14000);
 			memory_set_bankptr(mem->machine, 8, memory_region(mem->machine, "maincpu") + 0x1f400);
 			memory_set_bankptr(mem->machine, 9, memory_region(mem->machine, "maincpu") + 0x1f800);
@@ -369,9 +392,10 @@ WRITE8_HANDLER( trs80m4_84_w )
 			memory_set_bankptr(mem->machine, 17, memory_region(mem->machine, "maincpu") + 0x14000);
 			memory_set_bankptr(mem->machine, 18, memory_region(mem->machine, "maincpu") + 0x1f400);
 			memory_set_bankptr(mem->machine, 19, memory_region(mem->machine, "maincpu") + 0x1f800);
-			memory_install_read8_handler (mem, 0x3800, 0x3bff, 0, 0, trs80_keyboard_r);
-			memory_install_readwrite8_handler (mem, 0x3c00, 0x3fff, 0, 0, trs80_videoram_r, trs80_videoram_w);
+			memory_install_read8_handler (mem, 0x3800, 0x3bff, 0, 0, trs80_keyboard_r);	/* 5 */
+			memory_install_readwrite8_handler (mem, 0x3c00, 0x3fff, 0, 0, trs80_videoram_r, trs80_videoram_w);	/* 6 & 16 */
 			break;
+
 		case 2:	/* keyboard and video are moved to high memory, and the rest is ram */
 			memory_set_bankptr(mem->machine, 1, memory_region(mem->machine, "maincpu") + 0x10000);
 			memory_set_bankptr(mem->machine, 2, memory_region(mem->machine, "maincpu") + 0x11000);
@@ -388,10 +412,11 @@ WRITE8_HANDLER( trs80m4_84_w )
 			memory_set_bankptr(mem->machine, 16, memory_region(mem->machine, "maincpu") + 0x13c00);
 			memory_set_bankptr(mem->machine, 17, memory_region(mem->machine, "maincpu") + 0x14000);
 			memory_set_bankptr(mem->machine, 18, memory_region(mem->machine, "maincpu") + 0x0a000);
-			memory_install_read8_handler (mem, 0xf400, 0xf7ff, 0, 0, trs80_keyboard_r);
-			memory_install_readwrite8_handler (mem, 0xf800, 0xffff, 0, 0, trs80_videoram_r, trs80_videoram_w);
-			trs80_model4 = 2;
+			memory_install_read8_handler (mem, 0xf400, 0xf7ff, 0, 0, trs80_keyboard_r);	/* 8 */
+			memory_install_readwrite8_handler (mem, 0xf800, 0xffff, 0, 0, trs80_videoram_r, trs80_videoram_w);	/* 9 & 19 */
+			trs80_model4++;
 			break;
+
 		case 3:	/* 64k of ram */
 			memory_set_bankptr(mem->machine, 1, memory_region(mem->machine, "maincpu") + 0x10000);
 			memory_set_bankptr(mem->machine, 2, memory_region(mem->machine, "maincpu") + 0x11000);
@@ -418,6 +443,35 @@ WRITE8_HANDLER( trs80m4_84_w )
 WRITE8_HANDLER( trs80m4_90_w )
 {
 	speaker_level_w(trs80_speaker, ~data & 1);
+}
+
+WRITE8_HANDLER( trs80m4p_9c_w )		/* model 4P only - swaps the ROM with read-only RAM */
+{
+	/* Meaning of trs80_model4 variable:
+		d5..d4 memory mode (as described in section above)
+		d3 rom switch (1=enabled) only effective in mode0 and 1
+		d2 this is a Model 4P
+		d1 this is a Model 4
+		d0 Video banking exists yes/no (1=not banked) */
+
+	/* get address space instead of io space */
+	const address_space *mem = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+
+	trs80_model4 &= 0xf7;
+	trs80_model4 |= (data << 3);
+
+	if ((trs80_model4) && (~trs80_model4 & 0x20))
+	{
+		switch (trs80_model4 & 8)
+		{
+			case 0:		/* Read-only RAM replaces rom */
+				memory_set_bankptr(mem->machine, 1, memory_region(mem->machine, "maincpu") + 0x10000);
+				break;
+			case 8:		/* Normal setup - rom enabled */
+				memory_set_bankptr(mem->machine, 1, memory_region(mem->machine, "maincpu"));
+				break;
+		}
+	} 
 }
 
 WRITE8_HANDLER( trs80m4_e0_w )
@@ -896,7 +950,8 @@ MACHINE_RESET( trs80m4 )
 	memory_install_readwrite8_handler (mem, 0x4000, 0xf3ff, 0, 0, SMH_BANK(7), SMH_BANK(17));
 	memory_install_readwrite8_handler (mem, 0xf400, 0xf7ff, 0, 0, SMH_BANK(8), SMH_BANK(18));
 	memory_install_readwrite8_handler (mem, 0xf800, 0xffff, 0, 0, SMH_BANK(9), SMH_BANK(19));
-	trs80m4_84_w(mem, 0, 0);
+	trs80m4_84_w(mem, 0, 0);	/* switch in devices at power-on */
+	trs80m4p_9c_w(mem, 0, 1);	/* Enable the ROM */
 }
 
 MACHINE_RESET( lnw80 )

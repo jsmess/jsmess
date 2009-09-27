@@ -112,7 +112,8 @@ Model 4 memory organisation -
 		Mode 2: Keyboard=F400-F7FF; Video=F800-FFFF; the rest is RAM
 		Mode 3: All RAM
 		In the "maincpu" memory map, the first 64k is given to the ROM, keyboard, printer and video,
-			while the second 64k is RAM that is switched in as needed.
+			while the second 64k is RAM that is switched in as needed. The area from 4800-FFFF
+			is considered a "black hole", any writes to there will disappear.
 		The video is organised as 2 banks of 0x400 bytes, except in Mode 2 where it becomes contiguous.
 
 Model 4P - is the same as Model 4 except:
@@ -220,9 +221,49 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( model3_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0xe0, 0xe3) AM_READWRITE(trs80m4_e0_r, trs80m4_e0_w)
+	AM_RANGE(0xe4, 0xe4) AM_READWRITE(trs80m4_e4_r, trs80m4_e4_w)
+	AM_RANGE(0xe8, 0xe8) AM_READWRITE(trs80m4_e8_r, trs80m4_e8_w)
+	AM_RANGE(0xe9, 0xe9) AM_READ_PORT("E9") AM_WRITE(trs80m4_e9_w)
+	AM_RANGE(0xea, 0xea) AM_READWRITE(trs80m4_ea_r, trs80m4_ea_w)
+	AM_RANGE(0xeb, 0xeb) AM_READWRITE(trs80m4_eb_r, trs80m4_eb_w)
+	AM_RANGE(0xec, 0xef) AM_READWRITE(trs80m4_ec_r, trs80m4_ec_w)
+	AM_RANGE(0xf0, 0xf0) AM_DEVREADWRITE("wd179x", trs80_wd179x_r, wd17xx_command_w)
+	AM_RANGE(0xf1, 0xf1) AM_DEVREADWRITE("wd179x", wd17xx_track_r, wd17xx_track_w)
+	AM_RANGE(0xf2, 0xf2) AM_DEVREADWRITE("wd179x", wd17xx_sector_r, wd17xx_sector_w)
+	AM_RANGE(0xf3, 0xf3) AM_DEVREADWRITE("wd179x", wd17xx_data_r, wd17xx_data_w)
+	AM_RANGE(0xf4, 0xf4) AM_WRITE(trs80m4_f4_w)
+	AM_RANGE(0xf8, 0xfb) AM_READWRITE(trs80_printer_r, trs80_printer_w)
+	AM_RANGE(0xfc, 0xff) AM_READWRITE(trs80m4_ff_r, trs80m4_ff_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( model4_io, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x84, 0x87) AM_WRITE(trs80m4_84_w)
 	AM_RANGE(0x88, 0x89) AM_WRITE(trs80m4_88_w)
 	AM_RANGE(0x90, 0x93) AM_WRITE(trs80m4_90_w)
+	AM_RANGE(0xe0, 0xe3) AM_READWRITE(trs80m4_e0_r, trs80m4_e0_w)
+	AM_RANGE(0xe4, 0xe4) AM_READWRITE(trs80m4_e4_r, trs80m4_e4_w)
+	AM_RANGE(0xe8, 0xe8) AM_READWRITE(trs80m4_e8_r, trs80m4_e8_w)
+	AM_RANGE(0xe9, 0xe9) AM_READ_PORT("E9") AM_WRITE(trs80m4_e9_w)
+	AM_RANGE(0xea, 0xea) AM_READWRITE(trs80m4_ea_r, trs80m4_ea_w)
+	AM_RANGE(0xeb, 0xeb) AM_READWRITE(trs80m4_eb_r, trs80m4_eb_w)
+	AM_RANGE(0xec, 0xef) AM_READWRITE(trs80m4_ec_r, trs80m4_ec_w)
+	AM_RANGE(0xf0, 0xf0) AM_DEVREADWRITE("wd179x", trs80_wd179x_r, wd17xx_command_w)
+	AM_RANGE(0xf1, 0xf1) AM_DEVREADWRITE("wd179x", wd17xx_track_r, wd17xx_track_w)
+	AM_RANGE(0xf2, 0xf2) AM_DEVREADWRITE("wd179x", wd17xx_sector_r, wd17xx_sector_w)
+	AM_RANGE(0xf3, 0xf3) AM_DEVREADWRITE("wd179x", wd17xx_data_r, wd17xx_data_w)
+	AM_RANGE(0xf4, 0xf4) AM_WRITE(trs80m4_f4_w)
+	AM_RANGE(0xf8, 0xfb) AM_READWRITE(trs80_printer_r, trs80_printer_w)
+	AM_RANGE(0xfc, 0xff) AM_READWRITE(trs80m4_ff_r, trs80m4_ff_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( model4p_io, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x84, 0x87) AM_WRITE(trs80m4_84_w)
+	AM_RANGE(0x88, 0x89) AM_WRITE(trs80m4_88_w)
+	AM_RANGE(0x90, 0x93) AM_WRITE(trs80m4_90_w)
+	AM_RANGE(0x9c, 0x9f) AM_WRITE(trs80m4p_9c_w)
 	AM_RANGE(0xe0, 0xe3) AM_READWRITE(trs80m4_e0_r, trs80m4_e0_w)
 	AM_RANGE(0xe4, 0xe4) AM_READWRITE(trs80m4_e4_r, trs80m4_e4_w)
 	AM_RANGE(0xe8, 0xe8) AM_READWRITE(trs80m4_e8_r, trs80m4_e8_w)
@@ -483,6 +524,18 @@ static MACHINE_DRIVER_START( model3 )
 	MDRV_SCREEN_VISIBLE_AREA(0,80*8-1,0,239)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( model4 )
+	MDRV_IMPORT_FROM( model3 )
+	MDRV_CPU_MODIFY( "maincpu" )
+	MDRV_CPU_IO_MAP( model4_io)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( model4p )
+	MDRV_IMPORT_FROM( model3 )
+	MDRV_CPU_MODIFY( "maincpu" )
+	MDRV_CPU_IO_MAP( model4p_io)
+MACHINE_DRIVER_END
+
 static MACHINE_DRIVER_START( sys80 )
 	MDRV_IMPORT_FROM( model1 )
 	MDRV_CPU_MODIFY( "maincpu" )
@@ -637,8 +690,6 @@ ROM_START(trs80m4)
 ROM_END
 
 ROM_START(trs80m4p) // uses a completely different memory map scheme to the others; the trs-80 model 3 roms are loaded from a boot disk, the only rom on the machine is a bootloader; bootloader can be banked out of 0x0000-0x1000 space which is replaced with ram; see the tech ref pdf, pdf page 62
-// Currently this fails miserably due to lack of ram banking; it does some i/o stuff, copies some of the int vectors to 0x4000, then does some more i/o stuff and fills the entire 0x4000-43ff space with 0x20 (space? is it trying to clear the screen?), then immediately afterward it executes a RET; since the stack pointer is still pointing to 0x40A2, it RETs to 0x2020, which is in unmapped, nop-filled space.
-// Clearly there's some major ram-bank related stuff that isn't working at all here.
 	ROM_REGION(0x20000, "maincpu",0)
 	ROM_SYSTEM_BIOS(0, "trs80m4p", "Level 2 bios, gate array machine")
 	ROMX_LOAD("8075332.u69", 0x0000, 0x1000, CRC(3a738aa9) SHA1(6393396eaa10a84b9e9f0cf5930aba73defc5c52), ROM_BIOS(1)) // Label: "SCM95060P // 8075332 // TANDY (C) 1983 // 8421" at location U69 (may be located at U70 on some pcb revisions)
@@ -691,7 +742,14 @@ static DRIVER_INIT( trs80l2 )
 static DRIVER_INIT( trs80m4 )
 {
 	trs80_mode = 0;
-	trs80_model4 = 1;
+	trs80_model4 = 2;
+	videoram = memory_region(machine, "maincpu")+0x4000;
+}
+
+static DRIVER_INIT( trs80m4p )
+{
+	trs80_mode = 0;
+	trs80_model4 = 4;
 	videoram = memory_region(machine, "maincpu")+0x4000;
 }
 
@@ -710,8 +768,8 @@ COMP( 1983, radionic, trs80,	0,	radionic, trs80,   trs80,    0,	"Komtek",  "Radi
 COMP( 1980, sys80,    trs80,	0,	sys80,    trs80,   trs80l2,  0,	"EACA Computers Ltd.","System-80" , 0 )
 COMP( 1981, lnw80,    trs80,	0,	lnw80,    trs80m3, lnw80,    0,	"LNW Research","LNW-80", 0 )
 COMP( 1980, trs80m3,  trs80,	0,	model3,   trs80m3, trs80m4,  0,	"Tandy Radio Shack",  "TRS-80 Model III", 0 )
-COMP( 1980, trs80m4,  trs80,	0,	model3,   trs80m3, trs80m4,  0,	"Tandy Radio Shack",  "TRS-80 Model 4", 0 )
-COMP( 1983, trs80m4p, trs80,	0,	model3,   trs80m3, trs80m4,  0,	"Tandy Radio Shack",  "TRS-80 Model 4P", GAME_NOT_WORKING )
+COMP( 1980, trs80m4,  trs80,	0,	model4,   trs80m3, trs80m4,  0,	"Tandy Radio Shack",  "TRS-80 Model 4", 0 )
+COMP( 1983, trs80m4p, trs80,	0,	model4p,  trs80m3, trs80m4p, 0,	"Tandy Radio Shack",  "TRS-80 Model 4P", 0 )
 COMP( 1983, ht1080z,  trs80,	0,	ht1080z,  trs80,   trs80l2,  0,	"Hiradastechnika Szovetkezet",  "HT-1080Z Series I" , 0 )
 COMP( 1984, ht1080z2, trs80,	0,	ht1080z,  trs80,   trs80l2,  0,	"Hiradastechnika Szovetkezet",  "HT-1080Z Series II" , 0 )
 COMP( 1985, ht108064, trs80,	0,	ht1080z,  trs80,   trs80,    0,	"Hiradastechnika Szovetkezet",  "HT-1080Z/64" , 0 )
