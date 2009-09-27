@@ -4,8 +4,8 @@
         NEC PC-6600 series
 
         12/05/2009 Skeleton driver.
-		
-		PC-6001 (1981-09): 
+
+		PC-6001 (1981-09):
 
 		 * CPU: Z80A @ 4 MHz
 		 * ROM: 16KB + 4KB (chargen) - no kanji
@@ -13,48 +13,64 @@
 		 * Text Mode: 32x16 and 2 colors
 		 * Graphic Modes: 64x48 (9 colors), 128x192 (4 colors), 256x192 (2 colors)
 		 * Sound: BEEP + PSG - Optional Voice Synth Cart
-		 * Keyboard: JIS Keyboard with 5 function keys, control key, TAB key, 
-				HOME/CLR key, INS key, DEL key, GRAPH key, Japanese syllabary 
+		 * Keyboard: JIS Keyboard with 5 function keys, control key, TAB key,
+				HOME/CLR key, INS key, DEL key, GRAPH key, Japanese syllabary
 				key, page key, STOP key, and cursor key (4 directions)
-		 * 1 cartslot, optional floppy drive, optional serial 232 port, 2 
+		 * 1 cartslot, optional floppy drive, optional serial 232 port, 2
 				joystick ports
-	
 
-		PC-6001 mkII (1983-07): 
+
+		PC-6001 mkII (1983-07):
 
 		 * CPU: Z80A @ 4 MHz
 		 * ROM: 32KB + 16KB (chargen) + 32KB (kanji) + 16KB (Voice Synth)
 		 * RAM: 64KB
-		 * Text Mode: same as PC-6001 with N60-BASIC; 40x20 and 15 colors with 
+		 * Text Mode: same as PC-6001 with N60-BASIC; 40x20 and 15 colors with
 				N60M-BASIC
-		 * Graphic Modes: same as PC-6001 with N60-BASIC; 80x40 (15 colors), 
+		 * Graphic Modes: same as PC-6001 with N60-BASIC; 80x40 (15 colors),
 				160x200 (15 colors), 320x200 (4 colors) with N60M-BASIC
 		 * Sound: BEEP + PSG
-		 * Keyboard: JIS Keyboard with 5 function keys, control key, TAB key, 
-				HOME/CLR key, INS key, DEL key, CAPS key, GRAPH key, Japanese 
-				syllabary key, page key, mode key, STOP key, and cursor key (4 
+		 * Keyboard: JIS Keyboard with 5 function keys, control key, TAB key,
+				HOME/CLR key, INS key, DEL key, CAPS key, GRAPH key, Japanese
+				syllabary key, page key, mode key, STOP key, and cursor key (4
 				directions)
 		 * 1 cartslot, floppy drive, optional serial 232 port, 2 joystick ports
-	
 
-		PC-6001 mkIISR (1984-12): 
+
+		PC-6001 mkIISR (1984-12):
 
 		 * CPU: Z80A @ 3.58 MHz
 		 * ROM: 64KB + 16KB (chargen) + 32KB (kanji) + 32KB (Voice Synth)
 		 * RAM: 64KB
-		 * Text Mode: same as PC-6001/PC-6001mkII with N60-BASIC; 40x20, 40x25, 
+		 * Text Mode: same as PC-6001/PC-6001mkII with N60-BASIC; 40x20, 40x25,
 				80x20, 80x25 and 15 colors with N66SR-BASIC
-		 * Graphic Modes: same as PC-6001/PC-6001mkII with N60-BASIC; 80x40 (15 colors), 
+		 * Graphic Modes: same as PC-6001/PC-6001mkII with N60-BASIC; 80x40 (15 colors),
 				320x200 (15 colors), 640x200 (15 colors) with N66SR-BASIC
 		 * Sound: BEEP + PSG + FM
-		 * Keyboard: JIS Keyboard with 5 function keys, control key, TAB key, 
-				HOME/CLR key, INS key, DEL key, CAPS key, GRAPH key, Japanese 
-				syllabary key, page key, mode key, STOP key, and cursor key (4 
+		 * Keyboard: JIS Keyboard with 5 function keys, control key, TAB key,
+				HOME/CLR key, INS key, DEL key, CAPS key, GRAPH key, Japanese
+				syllabary key, page key, mode key, STOP key, and cursor key (4
 				directions)
 		 * 1 cartslot, floppy drive, optional serial 232 port, 2 joystick ports
-	
+
 
 	info from http://www.geocities.jp/retro_zzz/machines/nec/6001/spc60.html
+
+===
+
+irq vector 00: writes 0x00 to [$fa19]
+irq vector 02: (A = 0, B = 0) tests ppi port c, does something with ay ports (plus more?)
+irq vector 04: uart irq
+irq vector 06: operates with $fa28, $fa2e, $fd1b
+irq vector 08: tests ppi port c, puts port A to $fa1d,puts 0x02 to [$fa19]
+irq vector 0A: writes 0x00 to [$fa19]
+irq vector 0C: writes 0x00 to [$fa19]
+irq vector 0E: same as 2, (A = 0x03, B = 0x00)
+irq vector 10: same as 2, (A = 0x03, B = 0x00)
+irq vector 12: writes 0x10 to [$fa19]
+irq vector 14: same as 2, (A = 0x00, B = 0x01)
+irq vector 16: tests ppi port c, writes the result to $feca.
+
 
 ****************************************************************************/
 
@@ -71,7 +87,7 @@ static UINT8 *pc6001_video_ram;
 static WRITE8_HANDLER ( pc6001_system_latch_w )
 {
 	UINT16 startaddr[] = {0xC000, 0xE000, 0x8000, 0xA000 };
-	
+
 	pc6001_video_ram =  pc6001_ram + startaddr[(data >> 1) & 0x03] - 0x8000;
 }
 
@@ -103,7 +119,14 @@ static UINT8 port_c_8255;
 static READ8_DEVICE_HANDLER(nec_ppi8255_r) {
 	if (offset==2) {
 		return port_c_8255;
-	} else {
+	}
+	else if(offset==0)
+	{
+		if(input_code_pressed(device->machine,KEYCODE_Z)) //quick kludge test
+			return 0x30;
+		return i8255a_r(device,offset);
+	}
+	else {
 		return i8255a_r(device,offset);
 	}
 }
@@ -127,10 +150,6 @@ static WRITE8_DEVICE_HANDLER(nec_ppi8255_w) {
 	i8255a_w(device,offset,data);
 }
 
-static WRITE8_DEVICE_HANDLER(pc6100_ay8910_address_w) {
-	ay8910_address_w(device,offset,data & 0x0f);
-}
-
 static ADDRESS_MAP_START(pc6001_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
@@ -143,9 +162,10 @@ static ADDRESS_MAP_START( pc6001_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("uart", msm8251_data_r,msm8251_data_w)
 	AM_RANGE(0x81, 0x81) AM_DEVREADWRITE("uart", msm8251_status_r,msm8251_control_w)
 	AM_RANGE(0x90, 0x93) AM_DEVREADWRITE("ppi8255", nec_ppi8255_r, nec_ppi8255_w)
-	AM_RANGE(0xB0, 0xB0) AM_WRITE(pc6001_system_latch_w)
-	AM_RANGE(0xA0, 0xA0) AM_DEVWRITE("ay8910", pc6100_ay8910_address_w)
-	AM_RANGE(0xA1, 0xA1) AM_DEVWRITE("ay8910", ay8910_data_w)	
+	AM_RANGE(0xa0, 0xa0) AM_DEVWRITE("ay8910", ay8910_address_w)
+	AM_RANGE(0xa1, 0xa1) AM_DEVWRITE("ay8910", ay8910_data_w)
+	AM_RANGE(0xa2, 0xa2) AM_DEVREAD("ay8910", ay8910_r)
+	AM_RANGE(0xb0, 0xb0) AM_WRITE(pc6001_system_latch_w)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -154,11 +174,11 @@ static INPUT_PORTS_START( pc6001 )
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2") PORT_CODE(KEYCODE_2)
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3") PORT_CODE(KEYCODE_3)
-		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4") PORT_CODE(KEYCODE_4)		
+		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4") PORT_CODE(KEYCODE_4)
 		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5") PORT_CODE(KEYCODE_5)
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6") PORT_CODE(KEYCODE_6)
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7") PORT_CODE(KEYCODE_7)
-		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8") PORT_CODE(KEYCODE_8)	
+		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8") PORT_CODE(KEYCODE_8)
 INPUT_PORTS_END
 
 static UINT8 irq_vector = 0x00;
@@ -166,11 +186,18 @@ static UINT8 irq_vector = 0x00;
 static INTERRUPT_GEN( pc6001_interrupt )
 {
 	irq_vector = 0x16;
-	cpu_set_input_line(device, 0, HOLD_LINE);
+	cpu_set_input_line(device, 0, ASSERT_LINE);
+}
+
+static INTERRUPT_GEN( key_irq )
+{
+	irq_vector = 0x14;
+	cpu_set_input_line(device, 0, ASSERT_LINE);
 }
 
 static IRQ_CALLBACK ( pc6001_irq_callback )
 {
+	cpu_set_input_line(device, 0, CLEAR_LINE);
 	return irq_vector;
 }
 
@@ -178,7 +205,7 @@ static MACHINE_RESET(pc6001)
 {
 	port_c_8255=0;
 	pc6001_video_ram =  pc6001_ram;
-	
+
 	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"),pc6001_irq_callback);
 }
 
@@ -200,8 +227,8 @@ static READ8_DEVICE_HANDLER (pc6001_8255_porta_r )
 	return 0;
 }
 static WRITE8_DEVICE_HANDLER (pc6001_8255_porta_w )
-{	
-//	logerror("pc6001_8255_porta_w %02x\n",data);	
+{
+//	logerror("pc6001_8255_porta_w %02x\n",data);
 }
 
 static READ8_DEVICE_HANDLER (pc6001_8255_portb_r )
@@ -209,17 +236,17 @@ static READ8_DEVICE_HANDLER (pc6001_8255_portb_r )
 	return 0;
 }
 static WRITE8_DEVICE_HANDLER (pc6001_8255_portb_w )
-{	
-	//logerror("pc6001_8255_portb_w %02x\n",data);	
+{
+	//logerror("pc6001_8255_portb_w %02x\n",data);
 }
 
 static WRITE8_DEVICE_HANDLER (pc6001_8255_portc_w )
-{		
-	//logerror("pc6001_8255_portc_w %02x\n",data);	
+{
+	//logerror("pc6001_8255_portc_w %02x\n",data);
 }
 
 static READ8_DEVICE_HANDLER (pc6001_8255_portc_r )
-{	
+{
 	return 0x88;
 }
 
@@ -256,12 +283,13 @@ static MACHINE_DRIVER_START( pc6001 )
 	MDRV_CPU_PROGRAM_MAP(pc6001_mem)
 	MDRV_CPU_IO_MAP(pc6001_io)
 	MDRV_CPU_VBLANK_INT("screen", pc6001_interrupt)
+	MDRV_CPU_PERIODIC_INT(key_irq,25)
 
 //	MDRV_CPU_ADD("subcpu", I8049, 7987200)
-	
+
 	MDRV_MACHINE_RESET(pc6001)
 
-	/* video hardware */	
+	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(M6847_NTSC_FRAMES_PER_SECOND)
 	MDRV_VIDEO_START(pc6001)
@@ -270,15 +298,14 @@ static MACHINE_DRIVER_START( pc6001 )
 	MDRV_SCREEN_SIZE(320, 25+192+26)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
 
+	MDRV_I8255A_ADD( "ppi8255", pc6001_ppi8255_interface )
+	/* uart */
+	MDRV_MSM8251_ADD("uart", pc6001_usart_interface)
+
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("ay8910", AY8910, XTAL_4MHz/2)
 	MDRV_SOUND_CONFIG(pc6001_ay_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	
-	MDRV_I8255A_ADD( "ppi8255", pc6001_ppi8255_interface )
-	/* uart */
-	MDRV_MSM8251_ADD("uart", pc6001_usart_interface)
-	
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( pc6001sr )
