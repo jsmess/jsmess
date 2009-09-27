@@ -697,6 +697,7 @@ WRITE8_HANDLER( trs80_ff_w )
 {
 /* Standard output port of Model I
 	d3 ModeSel bit
+	d2 Relay
 	d1, d0 Cassette output */
 
 	static const double levels[4] = { 0.0, -1.0, 0.0, 1.0 };
@@ -706,6 +707,10 @@ WRITE8_HANDLER( trs80_ff_w )
 	cassette_data &= ~0x80;
 
 	trs80_mode = (trs80_mode & 0xfe) | ((data & 8) >> 3);
+
+	/* Speaker for System-80 MK II - only sounds if relay is off */
+	if (~data & 4)
+		speaker_level_w(trs80_speaker, data & 3);
 }
 
 WRITE8_HANDLER( trs80m4_ff_w )
