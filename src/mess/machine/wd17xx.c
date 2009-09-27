@@ -1165,7 +1165,8 @@ void wd17xx_set_pause_time(const device_config *device,int usec)
 	wd17xx_callback(device, WD17XX_IRQ_CLR);
 
 	/* type 1 command or force int command? */
-	if ((w->command_type==TYPE_I) || (w->command_type==TYPE_IV))
+//	if ((w->command_type==TYPE_I) || (w->command_type==TYPE_IV))	/* microbee doesn't like this */
+	if (w->command_type==TYPE_I)
 	{
 		/* toggle index pulse */
 		result &= ~STA_1_IPL;
@@ -1340,6 +1341,7 @@ WRITE8_DEVICE_HANDLER ( wd17xx_command_w )
 		w->data_count = 0;
 		w->data_offset = 0;
 		w->status &= ~STA_2_BUSY;
+		w->status &= ~STA_2_LOST_DAT;
 
 		wd17xx_clear_data_request(device);
 
