@@ -9,6 +9,8 @@ Systems Promoted from GAME_NOT_WORKING:
 ---------------------------------------
 - Beta [Curt Coder]
 
+- TRS-80 Model 4P [Robbbert]
+
 
 System Driver Changes:
 ----------------------
@@ -34,6 +36,8 @@ System Driver Changes:
 - [SAMCOUPE] Improved Mode 1 graphics.  [Dirk Best]
 
 - [SPECTRUM] Fixed bug #803 48K SNA load routine bad PC. [Miodrag Milanovic]
+
+- [TRS80] Model 4 and 4P can boot from floppy disk. [Robbbert]
 
 User Interface Changes:
 -----------------------
