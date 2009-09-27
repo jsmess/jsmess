@@ -492,13 +492,13 @@ VIDEO_UPDATE( radionic )
 
 READ8_HANDLER( trs80_videoram_r )
 {
-	if ((trs80_mode & 0x80) && (trs80_model4 != 2)) offset |= 0x400;
+	if ((trs80_mode & 0x80) && (~trs80_model4 & 1)) offset |= 0x400;
 	return videoram[offset];
 }
 
 WRITE8_HANDLER( trs80_videoram_w )
 {
-	if ((trs80_mode & 0x80) && (trs80_model4 != 2)) offset |= 0x400;
+	if ((trs80_mode & 0x80) && (~trs80_model4 & 1)) offset |= 0x400;
 	videoram[offset] = data;
 }
 
