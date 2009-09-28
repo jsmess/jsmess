@@ -85,7 +85,7 @@ struct _image_device_info
     unsigned int reset_on_load : 1;
     unsigned int has_partial_hash : 1;
     char name[62];
-    char file_extensions[32];
+    char file_extensions[256];
     char instance_name[32];
     char brief_instance_name[16];
 };

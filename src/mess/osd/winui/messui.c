@@ -54,6 +54,7 @@ struct _mess_image_type
 {
 	const device_config *dev;
     const char *ext;
+	const char *dlgname;
 };
 
 
@@ -681,7 +682,7 @@ static BOOL CommonFileImageDialog(LPTSTR the_last_directory, common_file_dialog_
 		if (!imagetypes[i].dev)
 			typname = "Compressed images";
 		else
-			typname = lookupdevice(image_device_getinfo(config, imagetypes[i].dev).type)->dlgname;
+			typname = imagetypes[i].dlgname;
 
         strcpy(s, typname);
         s += strlen(s);
@@ -757,6 +758,7 @@ static void SetupImageTypes(const machine_config *config, mess_image_type *types
 		/* add the ZIP extension */
 		types[num_extensions].ext = "zip";
 		types[num_extensions].dev = NULL;
+		types[num_extensions].dlgname = NULL;
 		num_extensions++;
     }
 
@@ -785,6 +787,7 @@ static void SetupImageTypes(const machine_config *config, mess_image_type *types
 				{
 					types[num_extensions].dev = dev;
 					types[num_extensions].ext = ext;
+					types[num_extensions].dlgname = lookupdevice(info.type)->dlgname;
 					num_extensions++;
 				}
 				ext += strlen(ext) + 1;
