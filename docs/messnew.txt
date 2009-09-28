@@ -23,6 +23,8 @@ System Driver Changes:
 
 - [GBCOLOR] Added BIOS.  [Wilbert Pol]
 
+- [MPF1] Cleaned app, added cassette support.  [Dirk Best]
+
 - [NES] Fixed crash of MMC3 games with no CHR-ROM (bug
   #1860) [Fabio Priuli, Rob Bohms]
 
