@@ -59,17 +59,17 @@
 ===
 
 irq vector 00: writes 0x00 to [$fa19]
-irq vector 02: (A = 0, B = 0) tests ppi port c, does something with ay ports (plus more?)
+irq vector 02: (A = 0, B = 0) tests ppi port c, does something with ay ports (plus more?) ;keyboard data ready, no kanji lock, no caps lock
 irq vector 04: uart irq
 irq vector 06: operates with $fa28, $fa2e, $fd1b
-irq vector 08: tests ppi port c, puts port A to $fa1d,puts 0x02 to [$fa19]
+irq vector 08: tests ppi port c, puts port A to $fa1d,puts 0x02 to [$fa19] ;tape data ready
 irq vector 0A: writes 0x00 to [$fa19]
 irq vector 0C: writes 0x00 to [$fa19]
 irq vector 0E: same as 2, (A = 0x03, B = 0x00)
 irq vector 10: same as 2, (A = 0x03, B = 0x00)
-irq vector 12: writes 0x10 to [$fa19]
+irq vector 12: writes 0x10 to [$fa19] ;end of tape reached
 irq vector 14: same as 2, (A = 0x00, B = 0x01)
-irq vector 16: tests ppi port c, writes the result to $feca.
+irq vector 16: tests ppi port c, writes the result to $feca. ;vblank
 
 
 ****************************************************************************/
@@ -83,12 +83,19 @@ irq vector 16: tests ppi port c, writes the result to $feca.
 
 static UINT8 *pc6001_ram;
 static UINT8 *pc6001_video_ram;
+static UINT8 irq_vector = 0x00;
+static UINT8 cas_switch,sys_latch;
 
 static WRITE8_HANDLER ( pc6001_system_latch_w )
 {
 	UINT16 startaddr[] = {0xC000, 0xE000, 0x8000, 0xA000 };
 
 	pc6001_video_ram =  pc6001_ram + startaddr[(data >> 1) & 0x03] - 0x8000;
+
+	if((!(sys_latch & 8)) && data & 0x8)
+		cas_switch = 1;
+
+	sys_latch = data;
 }
 
 
@@ -96,9 +103,13 @@ static ATTR_CONST UINT8 pc6001_get_attributes(running_machine *machine, UINT8 c,
 {
 	UINT8 result = 0x00;
 	UINT8 val = pc6001_video_ram [(scanline / 12) * 0x20 + pos];
+
 	if (val & 0x01) {
 		result |= M6847_INV;
 	}
+	if (!(val & 0x20))
+		result |= M6847_AG | M6847_GM1; //TODO
+
 	result |= M6847_INTEXT; // always use external ROM
 	return result;
 }
@@ -276,8 +287,6 @@ static INPUT_PORTS_START( pc6001 )
 	PORT_BIT(0x80000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("_")
 INPUT_PORTS_END
 
-static UINT8 irq_vector = 0x00;
-
 static INTERRUPT_GEN( pc6001_interrupt )
 {
 	irq_vector = 0x16;
@@ -307,15 +316,18 @@ static READ8_DEVICE_HANDLER (pc6001_8255_porta_r )
 {
 	return 0;
 }
+
 static WRITE8_DEVICE_HANDLER (pc6001_8255_porta_w )
 {
-//	logerror("pc6001_8255_porta_w %02x\n",data);
+	if(data != 0x06)
+		printf("pc6001_8255_porta_w %02x\n",data);
 }
 
 static READ8_DEVICE_HANDLER (pc6001_8255_portb_r )
 {
 	return 0;
 }
+
 static WRITE8_DEVICE_HANDLER (pc6001_8255_portb_w )
 {
 	//logerror("pc6001_8255_portb_w %02x\n",data);
@@ -379,6 +391,30 @@ static UINT8 check_keyboard_press(running_machine *machine)
 	return 0;
 }
 
+static TIMER_CALLBACK(cassette_callback)
+{
+	UINT8 *gfx_data = memory_region(machine, "cas");
+	static int i;
+
+	if(cas_switch == 1)
+	{
+		cur_keycode = gfx_data[i++];
+		//popmessage("%04x",i);
+		if(i >= 1)
+		{
+			i = 0;
+			cas_switch = 0;
+			irq_vector = 0x12;
+			cputag_set_input_line(machine,"maincpu", 0, ASSERT_LINE);
+		}
+		else
+		{
+			irq_vector = 0x08;
+			cputag_set_input_line(machine,"maincpu", 0, ASSERT_LINE);
+		}
+	}
+}
+
 static TIMER_CALLBACK(keyboard_callback)
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
@@ -387,14 +423,17 @@ static TIMER_CALLBACK(keyboard_callback)
 	UINT32 key3 = input_port_read(machine,"key3");
 	static UINT32 old_key1,old_key2,old_key3;
 
-	if((key1 != old_key1) || (key2 != old_key2) || (key3 != old_key3))
+	if(cas_switch == 0)
 	{
-		cur_keycode = check_keyboard_press(space->machine);
-		irq_vector = 0x02;
-		cputag_set_input_line(machine,"maincpu", 0, ASSERT_LINE);
-		old_key1 = key1;
-		old_key2 = key2;
-		old_key3 = key3;
+		if((key1 != old_key1) || (key2 != old_key2) || (key3 != old_key3))
+		{
+			cur_keycode = check_keyboard_press(space->machine);
+			irq_vector = 0x02;
+			cputag_set_input_line(machine,"maincpu", 0, ASSERT_LINE);
+			old_key1 = key1;
+			old_key2 = key2;
+			old_key3 = key3;
+		}
 	}
 }
 
@@ -405,6 +444,8 @@ static MACHINE_RESET(pc6001)
 
 	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"),pc6001_irq_callback);
 	timer_pulse(machine, ATTOTIME_IN_HZ(240), NULL, 0, keyboard_callback);
+	timer_pulse(machine, ATTOTIME_IN_HZ(100), NULL, 0, cassette_callback);
+	cas_switch = 0;
 }
 
 
@@ -452,6 +493,9 @@ ROM_START( pc6001 )	/* screen = 8000-83FF */
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
 	ROM_LOAD( "cgrom60.60", 0x0000, 0x1000, CRC(b0142d32) SHA1(9570495b10af5b1785802681be94b0ea216a1e26) )
+
+	ROM_REGION( 0x10000, "cas", ROMREGION_ERASEFF )
+//	ROM_LOAD( "ax7 demo.cas", 0x0000, 0x2ef1, CRC(1) SHA1(1) )
 ROM_END
 
 ROM_START( pc6001a )
@@ -460,6 +504,8 @@ ROM_START( pc6001a )
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
 	ROM_LOAD( "cgrom60.60a", 0x0000, 0x1000, CRC(49c21d08) SHA1(9454d6e2066abcbd051bad9a29a5ca27b12ec897) )
+
+	ROM_REGION( 0x10000, "cas", ROMREGION_ERASEFF )
 ROM_END
 
 ROM_START( pc6001m2 )
@@ -472,6 +518,8 @@ ROM_START( pc6001m2 )
 	ROM_LOAD( "cgrom60.62",  0x0000, 0x2000, CRC(81eb5d95) SHA1(53d8ae9599306ff23bf95208d2f6cc8fed3fc39f) )
 	ROM_LOAD( "cgrom60m.62", 0x2000, 0x2000, CRC(3ce48c33) SHA1(f3b6c63e83a17d80dde63c6e4d86adbc26f84f79) )
 	ROM_LOAD( "kanjirom.62", 0x4000, 0x8000, CRC(20c8f3eb) SHA1(4c9f30f0a2ebbe70aa8e697f94eac74d8241cadd) )
+
+	ROM_REGION( 0x10000, "cas", ROMREGION_ERASEFF )
 ROM_END
 
 ROM_START( pc6001sr )
@@ -482,6 +530,8 @@ ROM_START( pc6001sr )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
 	ROM_LOAD( "cgrom68.64", 0x0000, 0x4000, CRC(73bc3256) SHA1(5f80d62a95331dc39b2fb448a380fd10083947eb) )
+
+	ROM_REGION( 0x10000, "cas", ROMREGION_ERASEFF )
 ROM_END
 
 ROM_START( pc6600 )	/* Variant of pc6001m2 */
@@ -493,6 +543,8 @@ ROM_START( pc6600 )	/* Variant of pc6001m2 */
 	ROM_LOAD( "cgrom60.66",  0x0000, 0x2000, CRC(d2434f29) SHA1(a56d76f5cbdbcdb8759abe601eab68f01b0a8fe8) )
 	ROM_LOAD( "cgrom66.66",  0x2000, 0x2000, CRC(3ce48c33) SHA1(f3b6c63e83a17d80dde63c6e4d86adbc26f84f79) )
 	ROM_LOAD( "kanjirom.66", 0x4000, 0x8000, CRC(20c8f3eb) SHA1(4c9f30f0a2ebbe70aa8e697f94eac74d8241cadd) )
+
+	ROM_REGION( 0x10000, "cas", ROMREGION_ERASEFF )
 ROM_END
 
 /* There exists an alternative (incomplete?) dump, consisting of more .68 pieces, but it's been probably created for emulators:
@@ -507,6 +559,8 @@ ROM_START( pc6600sr )	/* Variant of pc6001sr */
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
 	ROM_LOAD( "cgrom68.68", 0x0000, 0x4000, CRC(73bc3256) SHA1(5f80d62a95331dc39b2fb448a380fd10083947eb) )
+
+	ROM_REGION( 0x10000, "cas", ROMREGION_ERASEFF )
 ROM_END
 
 /*    YEAR  NAME      PARENT   COMPAT MACHINE   INPUT     INIT    CONFIG     COMPANY  FULLNAME          FLAGS */
