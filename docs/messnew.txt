@@ -9,6 +9,8 @@ Systems Promoted from GAME_NOT_WORKING:
 ---------------------------------------
 - Beta [Curt Coder]
 
+- Microbee 56k [Robbbert]
+
 - TRS-80 Model 4P [Robbbert]
 
 
