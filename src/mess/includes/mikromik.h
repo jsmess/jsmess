@@ -20,6 +20,12 @@
 typedef struct _mm1_state mm1_state;
 struct _mm1_state
 {
+	/* keyboard state */
+	int sense;
+	int drive;
+	UINT8 keydata;
+	UINT8 *key_rom;
+
 	/* video state */
 	UINT8 *char_rom;
 	int llen;
