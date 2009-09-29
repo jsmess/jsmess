@@ -63,6 +63,10 @@
     2009-July-08 Roberto Lavarone:
 	- Fixed a bug in head load flag handling: einstein and samcoupe now working again
 
+    2009-September-30 Robbbert:
+	- Modified what status flags are returned after a Forced Interrupt,
+	  to allow Microbee to boot CP/M.
+
     TODO:
         - Multiple record write
         - What happens if a track is read that doesn't have any id's on it?
@@ -1165,8 +1169,7 @@ void wd17xx_set_pause_time(const device_config *device,int usec)
 	wd17xx_callback(device, WD17XX_IRQ_CLR);
 
 	/* type 1 command or force int command? */
-//	if ((w->command_type==TYPE_I) || (w->command_type==TYPE_IV))	/* microbee doesn't like this */
-	if (w->command_type==TYPE_I)
+	if ((w->command_type==TYPE_I) || (w->command_type==TYPE_IV))
 	{
 		/* toggle index pulse */
 		result &= ~STA_1_IPL;
@@ -1199,6 +1202,7 @@ void wd17xx_set_pause_time(const device_config *device,int usec)
 			else
 				w->status &= ~ STA_1_HD_LOADED;
 		}
+		if (w->command_type==TYPE_IV) result &= 0x63; /* to allow microbee to boot up */
 	}
 
 	/* eventually set data request bit */
