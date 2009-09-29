@@ -1,62 +1,73 @@
-/***************************************************************************
+/*********************************************************************************
 
-        NEC PC-6001 series
-        NEC PC-6600 series
+	NEC PC-6001 series
+	NEC PC-6600 series
 
-        12/05/2009 Skeleton driver.
+	preliminary driver by Angelo Salese
 
-		PC-6001 (1981-09):
+	TODO:
+	- Hook up tape loading, images that are floating around the net are already
+	  ADC'ed, so they should be easy to implement (but not exactly faithful)
+	- Currently rewriting the video part without the MC6847 for two reasons:
+		A) the later models have a custom video chip in the place of the MC6847,
+		   so this implementation will be used in the end.
+		B) It's easier to me to see what the attribute vram does since I don't
+		   have any docs atm.
 
-		 * CPU: Z80A @ 4 MHz
-		 * ROM: 16KB + 4KB (chargen) - no kanji
-		 * RAM: 16KB, it can be expanded to 32KB
-		 * Text Mode: 32x16 and 2 colors
-		 * Graphic Modes: 64x48 (9 colors), 128x192 (4 colors), 256x192 (2 colors)
-		 * Sound: BEEP + PSG - Optional Voice Synth Cart
-		 * Keyboard: JIS Keyboard with 5 function keys, control key, TAB key,
-				HOME/CLR key, INS key, DEL key, GRAPH key, Japanese syllabary
-				key, page key, STOP key, and cursor key (4 directions)
-		 * 1 cartslot, optional floppy drive, optional serial 232 port, 2
-				joystick ports
+==================================================================================
 
+	PC-6001 (1981-09):
 
-		PC-6001 mkII (1983-07):
-
-		 * CPU: Z80A @ 4 MHz
-		 * ROM: 32KB + 16KB (chargen) + 32KB (kanji) + 16KB (Voice Synth)
-		 * RAM: 64KB
-		 * Text Mode: same as PC-6001 with N60-BASIC; 40x20 and 15 colors with
-				N60M-BASIC
-		 * Graphic Modes: same as PC-6001 with N60-BASIC; 80x40 (15 colors),
-				160x200 (15 colors), 320x200 (4 colors) with N60M-BASIC
-		 * Sound: BEEP + PSG
-		 * Keyboard: JIS Keyboard with 5 function keys, control key, TAB key,
-				HOME/CLR key, INS key, DEL key, CAPS key, GRAPH key, Japanese
-				syllabary key, page key, mode key, STOP key, and cursor key (4
-				directions)
-		 * 1 cartslot, floppy drive, optional serial 232 port, 2 joystick ports
+	 * CPU: Z80A @ 4 MHz
+	 * ROM: 16KB + 4KB (chargen) - no kanji
+	 * RAM: 16KB, it can be expanded to 32KB
+	 * Text Mode: 32x16 and 2 colors
+	 * Graphic Modes: 64x48 (9 colors), 128x192 (4 colors), 256x192 (2 colors)
+	 * Sound: BEEP + PSG - Optional Voice Synth Cart
+	 * Keyboard: JIS Keyboard with 5 function keys, control key, TAB key,
+			HOME/CLR key, INS key, DEL key, GRAPH key, Japanese syllabary
+			key, page key, STOP key, and cursor key (4 directions)
+	 * 1 cartslot, optional floppy drive, optional serial 232 port, 2
+			joystick ports
 
 
-		PC-6001 mkIISR (1984-12):
+	PC-6001 mkII (1983-07):
 
-		 * CPU: Z80A @ 3.58 MHz
-		 * ROM: 64KB + 16KB (chargen) + 32KB (kanji) + 32KB (Voice Synth)
-		 * RAM: 64KB
-		 * Text Mode: same as PC-6001/PC-6001mkII with N60-BASIC; 40x20, 40x25,
-				80x20, 80x25 and 15 colors with N66SR-BASIC
-		 * Graphic Modes: same as PC-6001/PC-6001mkII with N60-BASIC; 80x40 (15 colors),
-				320x200 (15 colors), 640x200 (15 colors) with N66SR-BASIC
-		 * Sound: BEEP + PSG + FM
-		 * Keyboard: JIS Keyboard with 5 function keys, control key, TAB key,
-				HOME/CLR key, INS key, DEL key, CAPS key, GRAPH key, Japanese
-				syllabary key, page key, mode key, STOP key, and cursor key (4
-				directions)
-		 * 1 cartslot, floppy drive, optional serial 232 port, 2 joystick ports
+	 * CPU: Z80A @ 4 MHz
+	 * ROM: 32KB + 16KB (chargen) + 32KB (kanji) + 16KB (Voice Synth)
+	 * RAM: 64KB
+	 * Text Mode: same as PC-6001 with N60-BASIC; 40x20 and 15 colors with
+			N60M-BASIC
+	 * Graphic Modes: same as PC-6001 with N60-BASIC; 80x40 (15 colors),
+			160x200 (15 colors), 320x200 (4 colors) with N60M-BASIC
+	 * Sound: BEEP + PSG
+	 * Keyboard: JIS Keyboard with 5 function keys, control key, TAB key,
+			HOME/CLR key, INS key, DEL key, CAPS key, GRAPH key, Japanese
+			syllabary key, page key, mode key, STOP key, and cursor key (4
+			directions)
+	 * 1 cartslot, floppy drive, optional serial 232 port, 2 joystick ports
+
+
+	PC-6001 mkIISR (1984-12):
+
+	 * CPU: Z80A @ 3.58 MHz
+	 * ROM: 64KB + 16KB (chargen) + 32KB (kanji) + 32KB (Voice Synth)
+	 * RAM: 64KB
+	 * Text Mode: same as PC-6001/PC-6001mkII with N60-BASIC; 40x20, 40x25,
+			80x20, 80x25 and 15 colors with N66SR-BASIC
+	 * Graphic Modes: same as PC-6001/PC-6001mkII with N60-BASIC; 80x40 (15 colors),
+			320x200 (15 colors), 640x200 (15 colors) with N66SR-BASIC
+	 * Sound: BEEP + PSG + FM
+	 * Keyboard: JIS Keyboard with 5 function keys, control key, TAB key,
+			HOME/CLR key, INS key, DEL key, CAPS key, GRAPH key, Japanese
+			syllabary key, page key, mode key, STOP key, and cursor key (4
+			directions)
+	 * 1 cartslot, floppy drive, optional serial 232 port, 2 joystick ports
 
 
 	info from http://www.geocities.jp/retro_zzz/machines/nec/6001/spc60.html
 
-===
+==================================================================================
 
 irq vector 00: writes 0x00 to [$fa19]
 irq vector 02: (A = 0, B = 0) tests ppi port c, does something with ay ports (plus more?) ;keyboard data ready, no kanji lock, no caps lock
@@ -72,7 +83,7 @@ irq vector 14: same as 2, (A = 0x00, B = 0x01)
 irq vector 16: tests ppi port c, writes the result to $feca. ;vblank
 
 
-****************************************************************************/
+*********************************************************************************/
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
@@ -86,6 +97,79 @@ static UINT8 *pc6001_video_ram;
 static UINT8 irq_vector = 0x00;
 static UINT8 cas_switch,sys_latch;
 
+static VIDEO_START( pc6001 )
+{
+	#if 0
+	m6847_config cfg;
+
+	memset(&cfg, 0, sizeof(cfg));
+	cfg.type = M6847_VERSION_M6847T1_NTSC;
+	cfg.get_attributes = pc6001_get_attributes;
+	cfg.get_video_ram = pc6001_get_video_ram;
+	cfg.get_char_rom = pc6001_get_char_rom;
+	m6847_init(machine, &cfg);
+	#endif
+	pc6001_video_ram = auto_alloc_array(machine, UINT8, 0x1000); //0x400? We'll see...
+}
+
+static VIDEO_UPDATE( pc6001 )
+{
+	UINT8 *gfx_data = memory_region(screen->machine, "gfx1");
+	int x,y,xi,yi;
+	int tile,attr,pen,color;
+	int fgcol;
+
+	for(y=0;y<16;y++)
+	{
+		for(x=0;x<32;x++)
+		{
+			tile = pc6001_video_ram[(x+(y*32))+0x200];
+			attr = pc6001_video_ram[(x+(y*32)) & 0x1ff] ;
+
+			if(attr & 0x40)
+			{
+				pen = (tile & 0xc0) >> 6 | (attr & 2)<<1;
+
+				for(yi=0;yi<12;yi++)
+				{
+					for(xi=0;xi<8;xi++)
+					{
+						int i;
+						i = (xi & 4)>>2; //x-axis
+						i+= (yi & 4)>>1; //y-axis 1
+						i+= (yi & 8)>>1; //y-axis 2
+
+						color = ((tile >> i) & 1) ? pen+8 : 0;
+
+						*BITMAP_ADDR16(bitmap, ((y*12+(11-yi))+24), (x*8+(7-xi))+32) = screen->machine->pens[color];
+					}
+				}
+			}
+			else
+			{
+				for(yi=0;yi<12;yi++)
+				{
+					for(xi=0;xi<8;xi++)
+					{
+						pen = gfx_data[(tile*0x10)+yi]>>(7-xi) & 1;
+
+						fgcol = (attr & 2) ? 2 : 7;
+
+						if(attr & 1)
+							color = pen ? 0 : fgcol;
+						else
+							color = pen ? fgcol : 0;
+
+							*BITMAP_ADDR16(bitmap, ((y*12+yi)+24), (x*8+xi)+32) = screen->machine->pens[color];
+					}
+				}
+			}
+		}
+	}
+
+	return 0;
+}
+
 static WRITE8_HANDLER ( pc6001_system_latch_w )
 {
 	UINT16 startaddr[] = {0xC000, 0xE000, 0x8000, 0xA000 };
@@ -98,7 +182,7 @@ static WRITE8_HANDLER ( pc6001_system_latch_w )
 	sys_latch = data;
 }
 
-
+#if 0
 static ATTR_CONST UINT8 pc6001_get_attributes(running_machine *machine, UINT8 c,int scanline, int pos)
 {
 	UINT8 result = 0x00;
@@ -107,7 +191,7 @@ static ATTR_CONST UINT8 pc6001_get_attributes(running_machine *machine, UINT8 c,
 	if (val & 0x01) {
 		result |= M6847_INV;
 	}
-	if (!(val & 0x20))
+	if (val & 0x40)
 		result |= M6847_AG | M6847_GM1; //TODO
 
 	result |= M6847_INTEXT; // always use external ROM
@@ -124,6 +208,7 @@ static UINT8 pc6001_get_char_rom(running_machine *machine, UINT8 ch, int line)
 	UINT8 *gfx = memory_region(machine, "gfx1");
 	return gfx[ch*16+line];
 }
+#endif
 
 static UINT8 port_c_8255,cur_keycode;
 
@@ -299,19 +384,6 @@ static IRQ_CALLBACK ( pc6001_irq_callback )
 	return irq_vector;
 }
 
-static VIDEO_START( pc6001 )
-{
-	m6847_config cfg;
-
-	memset(&cfg, 0, sizeof(cfg));
-	cfg.type = M6847_VERSION_M6847T1_NTSC;
-	cfg.get_attributes = pc6001_get_attributes;
-	cfg.get_video_ram = pc6001_get_video_ram;
-	cfg.get_char_rom = pc6001_get_char_rom;
-	m6847_init(machine, &cfg);
-}
-
-
 static READ8_DEVICE_HANDLER (pc6001_8255_porta_r )
 {
 	return 0;
@@ -400,7 +472,7 @@ static TIMER_CALLBACK(cassette_callback)
 	{
 		cur_keycode = gfx_data[i++];
 		//popmessage("%04x",i);
-		if(i >= 1)
+		if(i >= 0x34c6)
 		{
 			i = 0;
 			cas_switch = 0;
@@ -440,12 +512,32 @@ static TIMER_CALLBACK(keyboard_callback)
 static MACHINE_RESET(pc6001)
 {
 	port_c_8255=0;
-	pc6001_video_ram =  pc6001_ram;
+	//pc6001_video_ram =  pc6001_ram;
 
 	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"),pc6001_irq_callback);
 	timer_pulse(machine, ATTOTIME_IN_HZ(240), NULL, 0, keyboard_callback);
-	timer_pulse(machine, ATTOTIME_IN_HZ(100), NULL, 0, cassette_callback);
+	timer_pulse(machine, ATTOTIME_IN_HZ(160), NULL, 0, cassette_callback);
 	cas_switch = 0;
+}
+
+static const rgb_t defcolors[] =
+{
+	MAKE_RGB(0x00, 0xff, 0x00),	/* GREEN */
+	MAKE_RGB(0xff, 0xff, 0x00),	/* YELLOW */
+	MAKE_RGB(0x00, 0x00, 0xff),	/* BLUE */
+	MAKE_RGB(0xff, 0x00, 0x00),	/* RED */
+	MAKE_RGB(0xff, 0xff, 0xff),	/* BUFF */
+	MAKE_RGB(0x00, 0xff, 0xff),	/* CYAN */
+	MAKE_RGB(0xff, 0x00, 0xff),	/* MAGENTA */
+	MAKE_RGB(0xff, 0x80, 0x00)	/* ORANGE */
+};
+
+static PALETTE_INIT(pc6001)
+{
+	int i;
+
+	for(i=0;i<8;i++)
+		palette_set_color(machine, i+8,defcolors[i]);
 }
 
 
@@ -462,12 +554,17 @@ static MACHINE_DRIVER_START( pc6001 )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(M6847_NTSC_FRAMES_PER_SECOND)
+	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_VIDEO_START(pc6001)
-	MDRV_VIDEO_UPDATE(m6847)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MDRV_VIDEO_UPDATE(pc6001)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+//	MDRV_SCREEN_REFRESH_RATE(M6847_NTSC_FRAMES_PER_SECOND)
+//	MDRV_VIDEO_UPDATE(m6847)
+//	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(320, 25+192+26)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
+	MDRV_PALETTE_LENGTH(16)
+	MDRV_PALETTE_INIT(pc6001)
 
 	MDRV_I8255A_ADD( "ppi8255", pc6001_ppi8255_interface )
 	/* uart */
@@ -495,7 +592,8 @@ ROM_START( pc6001 )	/* screen = 8000-83FF */
 	ROM_LOAD( "cgrom60.60", 0x0000, 0x1000, CRC(b0142d32) SHA1(9570495b10af5b1785802681be94b0ea216a1e26) )
 
 	ROM_REGION( 0x10000, "cas", ROMREGION_ERASEFF )
-//	ROM_LOAD( "ax7 demo.cas", 0x0000, 0x2ef1, CRC(1) SHA1(1) )
+	/* Load here your tape for now (and change line 475 with the length value that MESS returns) */
+	//ROM_LOAD( "demo.cas", 0x0000, 0x34c6, CRC(1) SHA1(1) )
 ROM_END
 
 ROM_START( pc6001a )
