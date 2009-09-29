@@ -1498,6 +1498,7 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/mmd1.o		\
 	$(MESS_DRIVERS)/ptcsol.o	\
 	$(MESS_DRIVERS)/p8k.o		\
+	$(MESS_DRIVERS)/hx20.o		\
 
 
 

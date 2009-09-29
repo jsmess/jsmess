@@ -13,6 +13,9 @@ Systems Promoted from GAME_NOT_WORKING:
 
 - TRS-80 Model 4P [Robbbert]
 
+Skeleton drivers: 
+-----------------
+- Epson HX20
 
 System Driver Changes:
 ----------------------

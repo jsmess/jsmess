@@ -1482,5 +1482,6 @@ const game_driver * const drivers[] =
     DRIVER( busicom )
     DRIVER( p8000 )
     DRIVER( p8000_16 )
+	DRIVER( ehx20 )
 
 #endif /* DRIVER_RECURSIVE */
