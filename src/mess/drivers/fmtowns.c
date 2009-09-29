@@ -82,6 +82,11 @@
 static UINT8 ftimer;
 static UINT8 nmi_mask;
 static UINT8 compat_mode;
+static UINT8 towns_system_port;
+static UINT32* towns_vram;
+static UINT32* towns_cmos;
+static UINT32* towns_gfxvram;
+static UINT32* towns_txtvram;
 
 static READ8_HANDLER(towns_system_r)
 {
@@ -297,25 +302,70 @@ static WRITE32_HANDLER(towns_sys5e8_w)
 	}
 }
 
+static READ32_HANDLER(towns_padport_r)
+{
+	if(ACCESSING_BITS_0_7)
+		return 0x7f;
+
+	return 0x00;
+}
+
+static READ8_HANDLER( towns_cmos8_r )
+{
+	UINT8* cmos = (UINT8*)towns_cmos;
+
+	return cmos[offset];
+}
+
+static WRITE8_HANDLER( towns_cmos8_w )
+{
+	UINT8* cmos = (UINT8*)towns_cmos;
+	
+	cmos[offset] = data;
+}
+
+static READ32_HANDLER( towns_cmos_r )
+{
+	return towns_cmos[offset];
+}
+
+static WRITE32_HANDLER( towns_cmos_w )
+{
+	COMBINE_DATA(towns_cmos+offset);
+}
+
+static READ8_HANDLER( towns_sys480_r )
+{
+	if(towns_system_port & 0x02)
+		return 0x02;
+	else
+		return 0x00;
+}
+
+static WRITE8_HANDLER( towns_sys480_w )
+{
+	towns_system_port = data;
+}
+
 static ADDRESS_MAP_START(towns_mem, ADDRESS_SPACE_PROGRAM, 32)
   // memory map based on FM-Towns/Bochs (Bochs modified to emulate the FM-Towns)
   // may not be (and probably is not) correct
   AM_RANGE(0x00000000, 0x000bffff) AM_RAM 
-  AM_RANGE(0x000c0000, 0x000c7fff) AM_RAM  // GVRAM
-  AM_RANGE(0x000c8000, 0x000cffff) AM_RAM  // TVRAM
-  AM_RANGE(0x000d0000, 0x000d7fff) AM_ROM AM_REGION("user",0x100000)  // DIC ROM
-  AM_RANGE(0x000d8000, 0x000d9fff) AM_RAM  // CMOS? RAM
+  AM_RANGE(0x000c0000, 0x000c7fff) AM_RAM AM_BASE(&towns_gfxvram)  // GVRAM
+  AM_RANGE(0x000c8000, 0x000cffff) AM_RAM AM_BASE(&towns_txtvram) // TVRAM
+//  AM_RANGE(0x000ca000, 0x000cafff) AM_RAM AM_BASE(&towns_txtvram) // TVRAM
+  AM_RANGE(0x000d0000, 0x000d7fff) AM_RAM
+  AM_RANGE(0x000d8000, 0x000d9fff) AM_READWRITE(towns_cmos_r,towns_cmos_w) // CMOS? RAM
   AM_RANGE(0x000da000, 0x000effff) AM_RAM
   AM_RANGE(0x000f0000, 0x000f7fff) AM_RAM
-  AM_RANGE(0x000f8000, 0x000fffff) AM_ROM AM_REGION("user",0x238000)  // BOOT (SYSTEM) ROM
+  AM_RANGE(0x000f8000, 0x000fffff) AM_RAM AM_REGION("user",0x238000)  // BOOT (SYSTEM) ROM
   AM_RANGE(0x00100000, 0x005fffff) AM_RAM  // some extra RAM - seems to be needed to boot
-  AM_RANGE(0x80000000, 0x8007ffff) AM_RAM  // VRAM
-  AM_RANGE(0x80100000, 0x8017ffff) AM_RAM  // VRAM (mirror? second page?)
+  AM_RANGE(0x80000000, 0x8003ffff) AM_RAM AM_MIRROR(0x1c0000) AM_BASE(&towns_vram) // VRAM
   AM_RANGE(0x81000000, 0x8101ffff) AM_RAM  // Sprite RAM
   AM_RANGE(0xc2000000, 0xc207ffff) AM_ROM AM_REGION("user",0x000000)  // OS ROM
   AM_RANGE(0xc2080000, 0xc20fffff) AM_ROM AM_REGION("user",0x100000)  // DIC ROM
   AM_RANGE(0xc2100000, 0xc213ffff) AM_ROM AM_REGION("user",0x180000)  // FONT ROM
-  AM_RANGE(0xc2140000, 0xc2141fff) AM_NOP  // CMOS (mirror?)
+  AM_RANGE(0xc2140000, 0xc2141fff) AM_READWRITE(towns_cmos_r,towns_cmos_w) // CMOS (mirror?)
   AM_RANGE(0xc2200000, 0xc2200fff) AM_NOP  // WAVE RAM
   AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("user",0x200000)  // SYSTEM ROM
 ADDRESS_MAP_END
@@ -340,9 +390,11 @@ static ADDRESS_MAP_START( towns_io , ADDRESS_SPACE_IO, 32)
   AM_RANGE(0x0404,0x0407) AM_NOP  // R/W (0x404)
   AM_RANGE(0x0440,0x045f) AM_READWRITE8(towns_video_440_r, towns_video_440_w, 0xffffffff)
   // System port
-  AM_RANGE(0x0480,0x0483) AM_NOP  // R/W (0x480)
+  AM_RANGE(0x0480,0x0483) AM_READWRITE8(towns_sys480_r,towns_sys480_w,0xff000000)  // R/W (0x480)
   // CD-ROM
   AM_RANGE(0x04c0,0x04cf) AM_NOP
+  // Joystick / Mouse ports(?)
+  AM_RANGE(0x04d0,0x04d3) AM_READ(towns_padport_r)
   // Sound (YM3438 [FM], RF5c68 [PCM])
   AM_RANGE(0x04d4,0x04d7) AM_NOP  // R/W  -- (0x4d5) mute?
   AM_RANGE(0x04d8,0x04df) AM_DEVREADWRITE8("fm",ym3438_r,ym3438_w,0x00ff00ff)
@@ -359,7 +411,7 @@ static ADDRESS_MAP_START( towns_io , ADDRESS_SPACE_IO, 32)
   // Keyboard (8042 MCU)
   AM_RANGE(0x0600,0x0607) AM_READWRITE8(towns_keyboard_r, towns_keyboard_w,0x00ff00ff)
   // CMOS
-  AM_RANGE(0x3000,0x3fff) AM_RAM
+  AM_RANGE(0x3000,0x3fff) AM_READWRITE8(towns_cmos8_r, towns_cmos8_w,0x00ff00ff)
   // CRTC / Video (again)
   AM_RANGE(0xfd90,0xfda3) AM_READWRITE8(towns_video_fd90_r, towns_video_fd90_w, 0xffffffff)
   AM_RANGE(0xff80,0xff83) AM_READWRITE8(towns_video_ff81_r, towns_video_ff81_w, 0x0000ff00)
@@ -370,6 +422,13 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( towns )
 INPUT_PORTS_END
 
+static DRIVER_INIT( towns )
+{
+	towns_vram = auto_alloc_array(machine,UINT32,0x20000);
+	towns_cmos = auto_alloc_array(machine,UINT32,0x2000/(sizeof(UINT32)));
+	towns_gfxvram = auto_alloc_array(machine,UINT32,0x8000/(sizeof(UINT32)));
+	towns_txtvram = auto_alloc_array(machine,UINT32,0x8000/(sizeof(UINT32)));
+}
 
 static MACHINE_RESET( towns )
 {
@@ -384,6 +443,19 @@ static VIDEO_START( towns )
 
 static VIDEO_UPDATE( towns )
 {
+	int x,y;
+	int pixel = 0;
+	
+	for(y=0;y<480;y++)
+	{
+		for(x=0;x<640;x++)
+		{
+			*BITMAP_ADDR32(bitmap,y,x) = towns_vram[pixel++];
+			if(pixel >= 0x20000)
+				pixel = 0;
+		}
+	}
+	
     return 0;
 }
 
@@ -479,7 +551,7 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT    INIT    CONFIG COMPANY      FULLNAME            FLAGS */
-COMP( 1989, fmtowns,  0,    0, 		towns, 		towns, 	 0,  	 0,  	"Fujitsu",   "FM-Towns",		 GAME_NOT_WORKING)
-COMP( 1989, fmtownsa, fmtowns, 0, 	towns, 		towns, 	 0,  	 0,  	"Fujitsu",   "FM-Towns (alternate)", GAME_NOT_WORKING)
-CONS( 1993, fmtmarty, 0,    0, 		towns, 		towns, 	 0,  	 0,  	"Fujitsu",   "FM-Towns Marty",	 GAME_NOT_WORKING)
+COMP( 1989, fmtowns,  0,    0, 		towns, 		towns, 	 towns,  	 0,  	"Fujitsu",   "FM-Towns",		 GAME_NOT_WORKING)
+COMP( 1989, fmtownsa, fmtowns, 0, 	towns, 		towns, 	 towns,  	 0,  	"Fujitsu",   "FM-Towns (alternate)", GAME_NOT_WORKING)
+CONS( 1993, fmtmarty, 0,    0, 		towns, 		towns, 	 towns,  	 0,  	"Fujitsu",   "FM-Towns Marty",	 GAME_NOT_WORKING)
 
