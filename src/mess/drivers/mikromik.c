@@ -324,7 +324,8 @@ static const gfx_layout tiles8x16_layout =
 	1,
 	{ 0 },
 	{ 7, 6, 5, 4, 3, 2, 1, 0 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	{  0*8,  1*8,  2*8,  3*8,  4*8,  5*8,  6*8,  7*8, 
+	   8*8,  9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
 	8*16
 };
 
@@ -382,6 +383,9 @@ static DMA8237_CHANNEL_WRITE( crtc_dack_w )
 static DMA8237_CHANNEL_READ( mpsc_dack_r )
 {
 	mm1_state *state = device->machine->driver_data;
+
+	/* clear data request */
+	dma8237_drq_write(state->i8237, DMA_MPSC_RX, CLEAR_LINE);
 	
 	return upd7201_hai_r(state->upd7201, 0);
 }
@@ -391,6 +395,9 @@ static DMA8237_CHANNEL_WRITE( mpsc_dack_w )
 	mm1_state *state = device->machine->driver_data;
 
 	upd7201_hai_w(state->upd7201, 0, data);
+
+	/* clear data request */
+	dma8237_drq_write(state->i8237, DMA_MPSC_TX, CLEAR_LINE);
 }
 
 static DMA8237_CHANNEL_READ( fdc_dack_r )
@@ -500,14 +507,14 @@ static WRITE_LINE_DEVICE_HANDLER( drq2_w )
 {
 	mm1_state *driver_state = device->machine->driver_data;
 
-	dma8237_drq_write(driver_state->i8237, 2, state);
+	if (state) dma8237_drq_write(driver_state->i8237, DMA_MPSC_RX, ASSERT_LINE);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( drq1_w )
 {
 	mm1_state *driver_state = device->machine->driver_data;
 
-	dma8237_drq_write(driver_state->i8237, 1, state);
+	if (state) dma8237_drq_write(driver_state->i8237, DMA_MPSC_TX, ASSERT_LINE);
 }
 
 static UPD7201_INTERFACE( mm1_upd7201_intf )
