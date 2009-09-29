@@ -160,7 +160,6 @@ static READ8_DEVICE_HANDLER(beta_riot_b_r)
 
 static WRITE8_DEVICE_HANDLER(beta_riot_b_w)
 {
-	UINT8 olddata = data; /* HACKHACK - to get 0.134u1 to compile */
 	/*
 
 		bit		description
@@ -178,7 +177,7 @@ static WRITE8_DEVICE_HANDLER(beta_riot_b_w)
 
 	beta_state *state = device->machine->driver_data;
 
-//	logerror("PB %02x %02x\n", data, olddata);
+	//logerror("PB %02x %02x\n", data, olddata);
 
 	/* display */
 	state->ls145_p = data & 0x0f;
@@ -193,10 +192,10 @@ static WRITE8_DEVICE_HANDLER(beta_riot_b_w)
 	output_set_led_value(1, !BIT(data, 5));
 
 	/* EPROM address shift */
-	if (!BIT(olddata, 5) && BIT(data, 5))
+	if (!BIT(state->old_data, 5) && BIT(data, 5))
 	{
 		state->eprom_addr <<= 1;
-		state->eprom_addr |= BIT(olddata, 3);
+		state->eprom_addr |= BIT(state->old_data, 3);
 	}
 
 	/* EPROM output enable */
@@ -205,11 +204,13 @@ static WRITE8_DEVICE_HANDLER(beta_riot_b_w)
 	/* EPROM chip enable */
 	state->eprom_ce = BIT(data, 7);
 
-	if (BIT(data, 6) && (!BIT(olddata, 7) && BIT(data, 7)))
+	if (BIT(data, 6) && (!BIT(state->old_data, 7) && BIT(data, 7)))
 	{
 		popmessage("EPROM write %04x = %02x\n", state->eprom_addr & 0x7ff, state->eprom_data);
 		memory_region(device->machine, EPROM_TAG)[state->eprom_addr & 0x7ff] &= state->eprom_data;
 	}
+
+	state->old_data = data;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( beta_riot_irq )
@@ -249,6 +250,7 @@ static MACHINE_START( beta )
 	state_save_register_global(machine, state->eprom_ce);
 	state_save_register_global(machine, state->eprom_addr);
 	state_save_register_global(machine, state->eprom_data);
+	state_save_register_global(machine, state->old_data);
 	state_save_register_global(machine, state->ls145_p);
 	state_save_register_global(machine, state->segment);
 }

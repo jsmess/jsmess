@@ -15,6 +15,7 @@ struct _beta_state
 	int eprom_ce;
 	UINT16 eprom_addr;
 	UINT8 eprom_data;
+	UINT8 old_data;
 
 	/* display state */
 	UINT8 ls145_p;
