@@ -57,7 +57,10 @@ TODO:
 
 static UINT16 *planea;
 static UINT16 *planeb;
-static UINT16 *cdic_ram;
+
+emu_timer *test_timer;
+
+emu_timer *mouse_timer;
 
 #define ENABLE_UART_PRINTING (0)
 
@@ -73,31 +76,6 @@ INLINE void verboselog(running_machine *machine, int n_level, const char *s_fmt,
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
 		logerror( "%08x: %s", cpu_get_pc(cputag_get_cpu(machine, "maincpu")), buf );
-	}
-}
-
-/*************************
-* Helpful test functions *
-*************************/
-
-emu_timer *test_timer;
-
-TIMER_CALLBACK( test_timer_callback )
-{
-	// This function manually triggers the SLAVE interrupt request.  Currently, it is the only input trigger that will do anything more than
-	// what the driver does otherwise.
-	static UINT8 stage = 0;
-	if(stage == 0)
-	{
-		stage++;
-		//cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), M68K_IRQ_4, 60);
-		cputag_set_input_line(machine, "maincpu", M68K_IRQ_2, ASSERT_LINE);
-		timer_adjust_oneshot(test_timer, ATTOTIME_IN_HZ(10000), 0);
-	}
-	else
-	{
-		cputag_set_input_line(machine, "maincpu", M68K_IRQ_2, CLEAR_LINE);
-		stage = 0;
 	}
 }
 
@@ -380,25 +358,25 @@ static READ16_HANDLER( scc68070_periphs_r )
 			{
 				verboselog(space->machine, 2, "scc68070_periphs_r: UART Mode Register: %04x & %04x\n", scc68070_regs.uart.mode_register, mem_mask);
 			}
-			return scc68070_regs.uart.mode_register;
+			return scc68070_regs.uart.mode_register | 0x20;
 		case 0x2012/2:
 			if(ACCESSING_BITS_0_7)
 			{
 				verboselog(space->machine, 2, "scc68070_periphs_r: UART Status Register: %04x & %04x\n", scc68070_regs.uart.status_register, mem_mask);
 			}
-			return scc68070_regs.uart.status_register | USR_TXRDY | USR_RXRDY;
+			return scc68070_regs.uart.status_register /*| USR_TXEMT*/ | USR_TXRDY | (1 << 1) | USR_RXRDY;
 		case 0x2014/2:
 			if(ACCESSING_BITS_0_7)
 			{
 				verboselog(space->machine, 2, "scc68070_periphs_r: UART Clock Select: %04x & %04x\n", scc68070_regs.uart.clock_select, mem_mask);
 			}
-			return scc68070_regs.uart.clock_select;
+			return scc68070_regs.uart.clock_select | 0x08;
 		case 0x2016/2:
 			if(ACCESSING_BITS_0_7)
 			{
 				verboselog(space->machine, 2, "scc68070_periphs_r: UART Command Register: %02x & %04x\n", scc68070_regs.uart.command_register, mem_mask);
 			}
-			return scc68070_regs.uart.command_register;
+			return scc68070_regs.uart.command_register | 0x80;
 		case 0x2018/2:
 			if(ACCESSING_BITS_0_7)
 			{
@@ -409,8 +387,9 @@ static READ16_HANDLER( scc68070_periphs_r )
 			if(ACCESSING_BITS_0_7)
 			{
 				verboselog(space->machine, 2, "scc68070_periphs_r: UART Receive Holding Register: %02x & %04x\n", scc68070_regs.uart.receive_holding_register, mem_mask);
+				return scc68070_regs.uart.receive_holding_register;
 			}
-			return scc68070_regs.uart.receive_holding_register;
+			return 0;
 
 		// Timers: 80002020 to 80002029
 		case 0x2020/2:
@@ -659,10 +638,14 @@ static WRITE16_HANDLER( scc68070_periphs_w )
 		case 0x2018/2:
 			if(ACCESSING_BITS_0_7)
 			{
-				verboselog(space->machine, 2, "scc68070_periphs_w: UART Transmit Holding Register: %04x & %04x\n", data, mem_mask);
-				if(data >= 0x20 && data < 0x7f)
+				verboselog(space->machine, 2, "scc68070_periphs_w: UART Transmit Holding Register: %04x & %04x: %c\n", data, mem_mask, (data >= 0x20 && data < 0x7f) ? (data & 0x00ff) : ' ');
+				if((data >= 0x20 && data < 0x7f) || data == 0x08)
 				{
 					printf( "%c", data & 0x00ff );
+				}
+				if(data == 0x0d)
+				{
+					printf( "\n" );
 				}
 				scc68070_regs.uart.transmit_holding_register = data & 0x00ff;
 			}
@@ -869,30 +852,37 @@ static WRITE16_HANDLER( scc68070_periphs_w )
 	}
 }
 
+#if ENABLE_UART_PRINTING
+static READ16_HANDLER( uart_loopback_enable )
+{
+	return 0x1234;
+}
+#endif
+
+typedef struct
+{
+	UINT16 unknown0x3ffa;
+} cdic_regs_t;
+
+cdic_regs_t cdic_regs;
+
 static READ16_HANDLER( cdic_r )
 {
+	offset += 0x3c80/2;
 	verboselog(space->machine, 0, "cdic_r: UNIMPLEMENTED: Unknown address: %04x & %04x\n", offset*2, mem_mask);
-	if(offset == 0x1400/2 || offset == 0x1402/2)
+	switch(offset)
 	{
-	#if ENABLE_UART_PRINTING
-		return 0x1234;
-	#endif
+		case 0x3ffa/2:
+			return 0xd7fe;
+		default:
+			return 0;
 	}
-	if(offset == 0x3ff6/2)
-	{
-		//return 0x8000;
-	}
-	if(offset == 0x3ffe/2)
-	{
-		//return 0x8000;
-	}
-	return cdic_ram[offset];
 }
 
 static WRITE16_HANDLER( cdic_w )
 {
+	offset += 0x3c80/2;
 	verboselog(space->machine, 0, "cdic_w: UNIMPLEMENTED: Unknown address: %04x = %04x & %04x\n", offset*2, data, mem_mask);
-	//COMBINE_DATA(&cdic_ram[offset]);
 }
 
 UINT8 slave_register;
@@ -900,7 +890,6 @@ UINT8 slave_read_index;
 
 static READ16_HANDLER( slave_r )
 {
-	static UINT32 read_count = 0;
 	static UINT32 return_count = 0;
 	verboselog(space->machine, 0, "slave_r: UNIMPLEMENTED: Unknown address: %04x & %04x\n", offset*2, mem_mask);
 	if(offset == 0x00)
@@ -908,53 +897,28 @@ static READ16_HANDLER( slave_r )
 		switch(slave_register)
 		{
 			case 0xf7:
-				switch(read_count)
+			{
+				static UINT16 x = 0;
+				static UINT16 y = 0;
+				static UINT8 bytes[4] = { 0, 0, 0, 0 };
+				return_count %= 4;
+				if(return_count == 0)
 				{
-					case 0:
-						switch(return_count)
-						{
-							case 0:
-							case 1:
-							case 2:
-							case 3:
-								return_count++;
-								if(return_count == 4)
-								{
-									read_count++;
-									return_count = 0;
-								}
-								return 0;
-						}
-						break;
-					case 1:
-						switch(return_count)
-						{
-							case 0:
-								return_count++;
-								return 0x35;
-							case 1:
-								return_count++;
-								return 0x0d;
-							case 2:
-								return_count++;
-								return 0x03;
-							case 3:
-								return_count = 0;
-								read_count = 0;
-								return 0x70;
-						}
-						break;
-					default:
-						return 0;
-						break;
+					x = input_port_read(space->machine, "MOUSEX");
+					y = input_port_read(space->machine, "MOUSEY");
+					bytes[0] = (x & 0x380) >> 7;
+					bytes[1] = x & 0x7f;
+					bytes[2] = (y & 0x380) >> 7;
+					bytes[3] = y & 0x7f;
 				}
-				break;
+				return bytes[return_count++];
+			}
 			default:
 				break;
 		}
 		return 0x0000;
 	}
-	if(offset == 0x02)
+	else if(offset == 0x02)
 	{
 		if(slave_read_index == 0)
 		{
@@ -973,21 +937,65 @@ static READ16_HANDLER( slave_r )
 			}
 		}
 	}
+	else if(offset == 0x03)
+	{
+		switch(slave_register)
+		{
+			case 0xfa:
+				switch(slave_read_index)
+				{
+					case 0:
+						slave_read_index++;
+						return 0xa4;
+					case 1:
+						slave_read_index++;
+						return 0x7a;
+					case 2:
+						slave_read_index++;
+						return 0x3b;
+					case 3:
+						slave_read_index++;
+						if(slave_read_index == 4)
+						{
+							slave_read_index = 0;
+						}
+						return 0x1c;
+					default:
+						return 0;
+				}
+				break;
+			default:
+				break;
+		}
+		return 0x0000;
+	}
 	return 0;
 }
 
 static WRITE16_HANDLER( slave_w )
 {
 	verboselog(space->machine, 0, "slave_w: UNIMPLEMENTED: Unknown address: %04x = %04x & %04x\n", offset*2, data, mem_mask);
+	if(offset == 0x00)
+	{
+		if(ACCESSING_BITS_0_7)
+		{
+			//if((data & 0x00ff) == 0xe3)
+			//{
+				//slave_register = 0xf7;
+				//slave_read_index = 0;
+				//timer_adjust_oneshot(test_timer, ATTOTIME_IN_HZ(1), 0);
+			//}
+		}
+	}
 	if(offset == 0x03)
 	{
 		if(ACCESSING_BITS_0_7)
 		{
 			slave_register = data & 0x00ff;
 			slave_read_index = 0;
-			if(slave_register == 0xf7)
+			if(slave_register == 0xf7)	// Activate input polling?
 			{
-				timer_adjust_oneshot(test_timer, ATTOTIME_IN_HZ(10000), 0);
+				timer_adjust_oneshot(mouse_timer, ATTOTIME_IN_HZ(60), 0);
 			}
 		}
 	}
@@ -1003,13 +1011,13 @@ m48t08_regs_t m48t08;
 
 static READ16_HANDLER( m48t08_r )
 {
-	verboselog(space->machine, 4, "m48t08_r: %04x = %02x & %04x\n", offset, m48t08.nvram[offset], mem_mask );
+	verboselog(space->machine, 11, "m48t08_r: %04x = %02x & %04x\n", offset, m48t08.nvram[offset], mem_mask );
 	return m48t08.nvram[offset] << 8;
 }
 
 static WRITE16_HANDLER( m48t08_w )
 {
-	verboselog(space->machine, 4, "m48t08_w: %04x = %02x\n", offset, data >> 8);
+	verboselog(space->machine, 11, "m48t08_w: %04x = %02x\n", offset, data >> 8);
 	switch(offset)
 	{
 		case 0x1ff9:
@@ -1073,28 +1081,28 @@ typedef struct
 	UINT16 ddr;
 	UINT16 dcp;
 	UINT32 clut[256];
-	UINT8 image_coding_method;
-	UINT8 transparency_control;
-	UINT8 plane_order;
-	UINT8 clut_bank;
-	UINT8 transparent_color_a;
-	UINT8 reserved0;
-	UINT8 transparent_color_b;
-	UINT8 mask_color_a;
-	UINT8 reserved1;
-	UINT8 mask_color_b;
-	UINT8 dyuv_abs_start_a;
-	UINT8 dyuv_abs_start_b;
-	UINT8 reserved2;
-	UINT8 cursor_position;
-	UINT8 cursor_control;
-	UINT8 cursor_pattern[16];
-	UINT8 region_control[8];
-	UINT8 backdrop_color;
-	UINT8 mosaic_hold_a;
-	UINT8 mosaic_hold_b;
-	UINT8 weight_factor_a;
-	UINT8 weight_factor_b;
+	UINT32 image_coding_method;
+	UINT32 transparency_control;
+	UINT32 plane_order;
+	UINT32 clut_bank;
+	UINT32 transparent_color_a;
+	UINT32 reserved0;
+	UINT32 transparent_color_b;
+	UINT32 mask_color_a;
+	UINT32 reserved1;
+	UINT32 mask_color_b;
+	UINT32 dyuv_abs_start_a;
+	UINT32 dyuv_abs_start_b;
+	UINT32 reserved2;
+	UINT32 cursor_position;
+	UINT32 cursor_control;
+	UINT32 cursor_pattern[16];
+	UINT32 region_control[8];
+	UINT32 backdrop_color;
+	UINT32 mosaic_hold_a;
+	UINT32 mosaic_hold_b;
+	UINT32 weight_factor_a;
+	UINT32 weight_factor_b;
 } mcd212_channel_t;
 
 typedef struct
@@ -1104,6 +1112,15 @@ typedef struct
 } mcd212_t;
 
 mcd212_t mcd212;
+
+#define MCD212_CURCNT_COLOR		0x00000f	// Cursor color
+#define MCD212_CURCNT_CUW		0x008000	// Cursor width
+#define MCD212_CURCNT_COF		0x070000	// Cursor off time
+#define MCD212_CURCNT_COF_SHIFT	16
+#define MCD212_CURCNT_CON		0x280000	// Cursor on time
+#define MCD212_CURCNT_CON_SHIFT	19
+#define MCD212_CURCNT_BLKC		0x400000	// Blink type
+#define MCD212_CURCNT_EN		0x800000	// Cursor enable
 
 #define MCD212_CSR2R_IT1		0x0004	// Interrupt 1
 #define MCD212_CSR2R_IT2		0x0002	// Interrupt 2
@@ -1132,7 +1149,7 @@ static READ16_HANDLER(mcd212_r)
 		case 0x10/2:
 			if(ACCESSING_BITS_0_7)
 			{
-				verboselog(space->machine, 2, "mcd212_r: Status Register %d: %02x & %04x\n", channel + 1, mcd212.channel[1 - (offset / 8)].csrr, mem_mask);
+				verboselog(space->machine, 11, "mcd212_r: Status Register %d: %02x & %04x\n", channel + 1, mcd212.channel[1 - (offset / 8)].csrr, mem_mask);
 				if(channel == 0)
 				{
 					return mcd212.channel[0].csrr | 0x20;
@@ -1307,7 +1324,7 @@ INLINE void mcd212_set_register(running_machine *machine, int channel, UINT8 reg
 		case 0xcd: // Cursor Position
 			if(channel == 0)
 			{
-				verboselog(machine, 11, "          %04xxxxx: %d: Cursor Position = %08x\n", channel * 0x20, channel, value );
+				verboselog(machine, 6, "          %04xxxxx: %d: Cursor Position = %08x\n", channel * 0x20, channel, value );
 				mcd212.channel[channel].cursor_position = value;
 			}
 			break;
@@ -1743,6 +1760,77 @@ static void mcd212_process_vsr(running_machine *machine, int channel, UINT32 *pi
 	//mcd212_set_vsr(channel, vsr);
 }
 
+static void mcd212_draw_cursor(running_machine *machine, UINT32 *scanline, int y)
+{
+	if(mcd212.channel[0].cursor_control & MCD212_CURCNT_EN)
+	{
+		UINT16 curx = mcd212.channel[0].cursor_position & 0x3ff;
+		UINT16 cury = (mcd212.channel[0].cursor_position >> 12) & 0x3ff;
+		UINT32 x = 0;
+		cury += 22;
+		if(y >= cury && y < (cury + 16))
+		{
+			UINT32 color = 0;
+			switch(mcd212.channel[0].cursor_control & MCD212_CURCNT_COLOR)
+			{
+				case 0x01:
+					color = 0x0000007f;
+					break;
+				case 0x02:
+					color = 0x00007f00;
+					break;
+				case 0x03:
+					color = 0x00007f7f;
+					break;
+				case 0x04:
+					color = 0x007f0000;
+					break;
+				case 0x05:
+					color = 0x007f007f;
+					break;
+				case 0x06:
+					color = 0x007f7f00;
+					break;
+				case 0x07:
+					color = 0x007f7f7f;
+					break;
+				case 0x09:
+					color = 0x000000ff;
+					break;
+				case 0x0a:
+					color = 0x0000ff00;
+					break;
+				case 0x0b:
+					color = 0x0000ffff;
+					break;
+				case 0x0c:
+					color = 0x00ff0000;
+					break;
+				case 0x0d:
+					color = 0x00ff00ff;
+					break;
+				case 0x0e:
+					color = 0x00ffff00;
+					break;
+				case 0x0f:
+					color = 0x00ffffff;
+					break;
+			}
+			y -= cury;
+			for(x = curx; x < curx + 16; x++)
+			{
+				if(mcd212.channel[0].cursor_pattern[y] & (1 << (15 - (x - curx))))
+				{
+					scanline[x] = color;
+				}
+				else
+				{
+				}
+			}
+		}
+	}
+}
+
 static void mcd212_draw_scanline(running_machine *machine, int y)
 {
 	bitmap_t *bitmap = tmpbitmap;
@@ -1750,13 +1838,13 @@ static void mcd212_draw_scanline(running_machine *machine, int y)
 	UINT32 plane_b[768];
 	UINT32 *scanline = BITMAP_ADDR32(bitmap, y, 0);
 	int x;
-	//prinf( "y=%d, m
 	mcd212_process_vsr(machine, 0, plane_a);
 	mcd212_process_vsr(machine, 1, plane_b);
 	for(x = 0; x < 768; x++)
 	{
 		scanline[x] = plane_a[x];
 	}
+	mcd212_draw_cursor(machine, scanline, y);
 }
 
 TIMER_CALLBACK( mcd212_perform_scan )
@@ -1807,6 +1895,48 @@ static VIDEO_START(cdi)
 	timer_adjust_oneshot(mcd212.scan_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 }
 
+TIMER_CALLBACK( test_timer_callback )
+{
+	// This function manually triggers interrupt requests as a test.
+	static UINT8 set = 0;
+	if(set == 0)
+	{
+		set = 1;
+		cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), M68K_IRQ_2, 26);
+		cputag_set_input_line(machine, "maincpu", M68K_IRQ_2, ASSERT_LINE);
+		timer_adjust_oneshot(test_timer, ATTOTIME_IN_HZ(10000), 0);
+	}
+	else
+	{
+		set = 0;
+		cputag_set_input_line(machine, "maincpu", M68K_IRQ_2, CLEAR_LINE);
+		timer_adjust_oneshot(test_timer, ATTOTIME_IN_HZ(60), 0);
+	}
+}
+
+/*************************
+*    Input functions     *
+*************************/
+
+TIMER_CALLBACK( mouse_callback )
+{
+	static UINT8 set = 0;
+	if(set == 0)
+	{
+		set = 1;
+		cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), M68K_IRQ_2, 26);
+		cputag_set_input_line(machine, "maincpu", M68K_IRQ_2, ASSERT_LINE);
+		timer_adjust_oneshot(mouse_timer, ATTOTIME_IN_HZ(10000), 0);
+		slave_register = 0xf7;
+	}
+	else
+	{
+		set = 0;
+		cputag_set_input_line(machine, "maincpu", M68K_IRQ_2, CLEAR_LINE);
+		timer_adjust_oneshot(mouse_timer, ATTOTIME_IN_HZ(60), 0);
+	}
+}
+
 /*************************
 *      Memory maps       *
 *************************/
@@ -1814,7 +1944,13 @@ static VIDEO_START(cdi)
 static ADDRESS_MAP_START( cdi_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_BASE(&planea)
 	AM_RANGE(0x00200000, 0x0027ffff) AM_RAM AM_BASE(&planeb)
-	AM_RANGE(0x00300000, 0x00303fff) AM_READWRITE(cdic_r, cdic_w) AM_BASE(&cdic_ram)
+#if ENABLE_UART_PRINTING
+	AM_RANGE(0x00301400, 0x00301403) AM_READ(uart_loopback_enable)
+	AM_RANGE(0x00301404, 0x00303c7f) AM_RAM
+#else
+	AM_RANGE(0x00301400, 0x00303c7f) AM_RAM
+#endif
+	AM_RANGE(0x00303c80, 0x00303fff) AM_READWRITE(cdic_r, cdic_w)
 	AM_RANGE(0x00310000, 0x00317fff) AM_READWRITE(slave_r, slave_w)
 	//AM_RANGE(0x00318000, 0x0031ffff) AM_NOP
 	AM_RANGE(0x00320000, 0x00323fff) AM_READWRITE(m48t08_r, m48t08_w)
@@ -1830,6 +1966,11 @@ ADDRESS_MAP_END
 *************************/
 
 static INPUT_PORTS_START( cdi )
+	PORT_START("MOUSEX")
+	PORT_BIT(0x3ff, 0x000, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(0)
+
+	PORT_START("MOUSEY")
+	PORT_BIT(0x3ff, 0x000, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(0)
 INPUT_PORTS_END
 
 static MACHINE_RESET( cdi )
@@ -1847,6 +1988,9 @@ static MACHINE_RESET( cdi )
 
 	test_timer = timer_alloc(machine, test_timer_callback, 0);
 	timer_adjust_oneshot(test_timer, attotime_never, 0);
+
+	mouse_timer = timer_alloc(machine, mouse_callback, 0);
+	timer_adjust_oneshot(mouse_timer, attotime_never, 0);
 
 	device_reset(cputag_get_cpu(machine, "maincpu"));
 }
@@ -1906,4 +2050,4 @@ ROM_END
 *************************/
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT   INIT    CONFIG  COMPANY     FULLNAME   FLAGS */
-CONS( 1991, cdi,        0,      0,      cdi,        0,      0,      0,      "Philips",  "CD-i",   GAME_NO_SOUND | GAME_NOT_WORKING )
+CONS( 1991, cdi,        0,      0,      cdi,        cdi,    0,      0,      "Philips",  "CD-i",   GAME_NO_SOUND | GAME_NOT_WORKING )
