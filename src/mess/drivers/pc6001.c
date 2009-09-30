@@ -99,7 +99,7 @@ static UINT8 *pc6001_video_ram;
 static UINT8 irq_vector = 0x00;
 static UINT8 cas_switch,sys_latch;
 
-#define CAS_LENGTH 0x3d32
+#define CAS_LENGTH 0x2ef1
 
 static VIDEO_START( pc6001 )
 {
@@ -162,7 +162,10 @@ static VIDEO_UPDATE( pc6001 )
 
 				if(attr & 0x40)
 				{
-					pen = (tile & 0xc0) >> 6 | (attr & 2)<<1;
+					if(attr & 0x10) //2x2 squares on a single cell
+						pen = (tile & 0x70)>>4;
+					else //2x3
+						pen = (tile & 0xc0) >> 6 | (attr & 2)<<1;
 
 					for(yi=0;yi<12;yi++)
 					{
@@ -170,8 +173,15 @@ static VIDEO_UPDATE( pc6001 )
 						{
 							int i;
 							i = (xi & 4)>>2; //x-axis
-							i+= (yi & 4)>>1; //y-axis 1
-							i+= (yi & 8)>>1; //y-axis 2
+							if(attr & 0x10) //2x2
+							{
+								i+= (yi >= 6) ? 2 : 0; //y-axis
+							}
+							else //2x3
+							{
+								i+= (yi & 4)>>1; //y-axis 1
+								i+= (yi & 8)>>1; //y-axis 2
+							}
 
 							color = ((tile >> i) & 1) ? pen+8 : 0;
 
@@ -526,7 +536,7 @@ static UINT8 check_keyboard_press(running_machine *machine)
 static TIMER_CALLBACK(cassette_callback)
 {
 	UINT8 *gfx_data = memory_region(machine, "cas");
-	static int i;
+	static UINT32 i;
 
 	if(cas_switch == 1)
 	{
@@ -664,7 +674,7 @@ ROM_START( pc6001 )	/* screen = 8000-83FF */
 
 	ROM_REGION( 0x10000, "cas", ROMREGION_ERASEFF )
 	/* Load here your tape for now (and change the cas length macro according to what MESS returns) */
-//	ROM_LOAD( "magnetic field.cas", 0x0000, CAS_LENGTH, CRC(1) SHA1(1) )
+//	ROM_LOAD( "ax7 demo.cas", 0x0000, CAS_LENGTH, CRC(1) SHA1(1) )
 ROM_END
 
 ROM_START( pc6001a )
