@@ -299,7 +299,7 @@ WRITE_LINE_DEVICE_HANDLER( centronics_prime_w )
 
 	/* reset printer if line is low */
 	if (state == FALSE)
-		device_reset_centronics(device);
+		DEVICE_RESET_CALL( centronics );
 }
 
 
@@ -314,7 +314,7 @@ WRITE_LINE_DEVICE_HANDLER( centronics_init_w )
 
 	/* reset printer if line is low */
 	if (state == FALSE)
-		device_reset_centronics(device);
+		DEVICE_RESET_CALL( centronics );
 }
 
 

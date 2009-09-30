@@ -8,14 +8,16 @@ New System Drivers Supported (in no particular order):
 Systems Promoted from GAME_NOT_WORKING:
 ---------------------------------------
 - Beta [Curt Coder]
-
 - Microbee 56k [Robbbert]
-
 - TRS-80 Model 4P [Robbbert]
+
+
 
 Skeleton drivers: 
 -----------------
 - Epson HX20
+
+
 
 System Driver Changes:
 ----------------------
@@ -46,6 +48,8 @@ System Driver Changes:
 
 - [TRS80] Model 4 and 4P can boot from floppy disk. [Robbbert]
 
+
+
 User Interface Changes:
 -----------------------
 (none)
@@ -63,9 +67,11 @@ Source Changes:
 - The core is based on MAME 0.134u1.  This incorporates all features of the
   update to this core.  [MAME team]
 
-- Moved implementation to device [Miodrag Milanovic]
+- Moved implementation to device.  [Miodrag Milanovic]
 
-- Floppy support for TD0, IMD and CQM [Miodrag Milanovic]
+- Floppy support for TD0, IMD and CQM. [Miodrag Milanovic]
+
+- Cleanups to use more *_NAME and *_CALL macros.  [Atari Ace]
 
 
 

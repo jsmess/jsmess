@@ -263,9 +263,9 @@ static DRIVER_INIT( mephisto )
 ***************************************************************************/
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        CONFIG  COMPANY             FULLNAME                            FLAGS */
-//CONS( 1983, mephisto,   0,      0,      mephisto,   mephisto,   mephisto,   NULL,   "Hegener & Glaser", "Mephisto Schach Computer",         GAME_NOT_WORKING )
-CONS( 1987, mm4,        0,      0,      mephisto,   mephisto,   mephisto,   NULL,   "Hegener & Glaser", "Mephisto 4 Schach Computer",       0 )
-CONS( 1990, mm5,        0,      0,      mephisto,   mephisto,   mephisto,   NULL,   "Hegener & Glaser", "Mephisto 5.1 Schach Computer",     0 )
-CONS( 1990, mm50,       mm5,    0,      mephisto,   mephisto,   mephisto,   NULL,   "Hegener & Glaser", "Mephisto 5.0 Schach Computer",     0 )
-CONS( 1986, rebel5,     0,      0,      rebel5,     mephisto,   mephisto,   NULL,   "Hegener & Glaser", "Mephisto Rebel 5 Schach Computer", 0 )
+//CONS( 1983, mephisto,   0,      0,      mephisto,   mephisto,   mephisto,   0,   "Hegener & Glaser", "Mephisto Schach Computer",         GAME_NOT_WORKING )
+CONS( 1987, mm4,        0,      0,      mephisto,   mephisto,   mephisto,   0,   "Hegener & Glaser", "Mephisto 4 Schach Computer",       0 )
+CONS( 1990, mm5,        0,      0,      mephisto,   mephisto,   mephisto,   0,   "Hegener & Glaser", "Mephisto 5.1 Schach Computer",     0 )
+CONS( 1990, mm50,       mm5,    0,      mephisto,   mephisto,   mephisto,   0,   "Hegener & Glaser", "Mephisto 5.0 Schach Computer",     0 )
+CONS( 1986, rebel5,     0,      0,      rebel5,     mephisto,   mephisto,   0,   "Hegener & Glaser", "Mephisto Rebel 5 Schach Computer", 0 )
 // second design sold (same computer/program?)

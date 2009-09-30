@@ -231,7 +231,7 @@ WRITE_LINE_DEVICE_HANDLER( e05a03_resi_w )
 
 	if (!state)
 	{
-		device_reset_e05a03(device);
+		DEVICE_RESET_CALL( e05a03 );
 		devcb_call_write_line(&e05a03->out_reso_func, 1);
 	}
 }

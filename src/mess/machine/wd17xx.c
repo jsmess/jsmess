@@ -1793,7 +1793,7 @@ static DEVICE_RESET( wd17xx )
 
 void wd17xx_reset(const device_config *device)
 {
-	device_reset_wd17xx(device);
+	DEVICE_RESET_CALL( wd17xx );
 }
 
 static DEVICE_START( wd1770 )

@@ -338,7 +338,7 @@ void at45dbxx_pin_cs(const device_config *device,  int data)
 			memcpy( flash->data + page * flash->page_size, flash->buffer1, flash->page_size);
 		}
 		// reset
-		device_reset_at45dbxx(device);
+		DEVICE_RESET_CALL( at45dbxx );
 	}
 	// save cs
 	flash->pin.cs = data;

@@ -1461,7 +1461,7 @@ WRITE8_DEVICE_HANDLER(i8271_w)
 			{
 				if ((data & 0x01)==0)
 				{
-					device_reset_i8271(device);
+					DEVICE_RESET_CALL( i8271 );
 				}
 			}
 

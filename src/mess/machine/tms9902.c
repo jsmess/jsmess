@@ -565,7 +565,7 @@ WRITE8_DEVICE_HANDLER( tms9902_cru_w )
 		break;
 
 	case 0x1F:	/* RESET */
-		device_reset_tms9902(device);
+		DEVICE_RESET_CALL( tms9902 );
 		break;
 	}
 }

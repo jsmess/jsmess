@@ -174,4 +174,4 @@ ROM_END
 
 /* Driver */
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       INIT     CONFIG COMPANY  FULLNAME   FLAGS */
-COMP( 1983, irisha, 	 0,  	 0,	irisha, 	irisha, 	irisha, NULL,  "MGU",    "Irisha",	 GAME_NOT_WORKING)
+COMP( 1983, irisha, 	 0,  	 0,	irisha, 	irisha, 	irisha, 0,  "MGU",    "Irisha",	 GAME_NOT_WORKING)

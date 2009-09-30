@@ -428,7 +428,7 @@ DEVICE_GET_INFO( abc77 )
 
 		/* --- the following bits of info are returned as pointers --- */
 		case DEVINFO_PTR_ROM_REGION:					info->romregion = rom_abc77;				break;
-		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = machine_config_abc77; break;
+		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_DRIVER_NAME( abc77 ); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(abc77);		break;
