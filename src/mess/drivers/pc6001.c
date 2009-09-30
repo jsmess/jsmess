@@ -99,7 +99,7 @@ static UINT8 *pc6001_video_ram;
 static UINT8 irq_vector = 0x00;
 static UINT8 cas_switch,sys_latch;
 
-#define CAS_LENGTH 0x1655
+#define CAS_LENGTH 0x3d32
 
 static VIDEO_START( pc6001 )
 {
@@ -215,6 +215,7 @@ static WRITE8_HANDLER ( pc6001_system_latch_w )
 		cas_switch = 1;
 
 	sys_latch = data;
+	printf("%02x\n",data);
 }
 
 #if 0
@@ -302,6 +303,27 @@ ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( pc6001 )
+	/* TODO: these two are unchecked */
+	PORT_START("P1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
 	PORT_START("key1") //0x00-0x1f
 	PORT_BIT(0x00000001,IP_ACTIVE_HIGH,IPT_UNUSED) //0x00 null
 	PORT_BIT(0x00000002,IP_ACTIVE_HIGH,IPT_UNUSED) //0x01 soh
@@ -474,6 +496,9 @@ static const ay8910_interface pc6001_ay_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
+	DEVCB_INPUT_PORT("P1"),
+	DEVCB_INPUT_PORT("P2"),
+	DEVCB_NULL,
 	DEVCB_NULL
 };
 
@@ -522,6 +547,15 @@ static TIMER_CALLBACK(cassette_callback)
 	}
 }
 
+static TIMER_CALLBACK(audio_callback)
+{
+	if(cas_switch == 0)
+	{
+		irq_vector = 0x06;
+		cputag_set_input_line(machine,"maincpu", 0, ASSERT_LINE);
+	}
+}
+
 static TIMER_CALLBACK(keyboard_callback)
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
@@ -550,7 +584,9 @@ static MACHINE_RESET(pc6001)
 	//pc6001_video_ram =  pc6001_ram;
 
 	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"),pc6001_irq_callback);
-	timer_pulse(machine, ATTOTIME_IN_HZ(240), NULL, 0, keyboard_callback);
+	/* TODO: accurate timing on these (especially for the first one) */
+	timer_pulse(machine, ATTOTIME_IN_HZ(540), NULL, 0, audio_callback);
+	timer_pulse(machine, ATTOTIME_IN_HZ(250), NULL, 0, keyboard_callback);
 	timer_pulse(machine, ATTOTIME_IN_HZ(160), NULL, 0, cassette_callback);
 	cas_switch = 0;
 }
@@ -578,7 +614,7 @@ static PALETTE_INIT(pc6001)
 
 static MACHINE_DRIVER_START( pc6001 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",Z80, 7987200 /2)
+	MDRV_CPU_ADD("maincpu",Z80, 7987200 / 4)
 	MDRV_CPU_PROGRAM_MAP(pc6001_mem)
 	MDRV_CPU_IO_MAP(pc6001_io)
 	MDRV_CPU_VBLANK_INT("screen", pc6001_interrupt)
@@ -628,7 +664,7 @@ ROM_START( pc6001 )	/* screen = 8000-83FF */
 
 	ROM_REGION( 0x10000, "cas", ROMREGION_ERASEFF )
 	/* Load here your tape for now (and change the cas length macro according to what MESS returns) */
-//	ROM_LOAD( "car.cas", 0x0000, CAS_LENGTH, CRC(1) SHA1(1) )
+//	ROM_LOAD( "magnetic field.cas", 0x0000, CAS_LENGTH, CRC(1) SHA1(1) )
 ROM_END
 
 ROM_START( pc6001a )
