@@ -13,8 +13,6 @@
 		   so this implementation will be used in the end.
 		B) It's easier to me to see what the attribute vram does since I don't
 		   have any docs atm.
-	- IRQ vector 0x06 is clearly used on some games otherwise they locks,
-	  check what is supposed to be.
 
 ==================================================================================
 
@@ -99,7 +97,7 @@ static UINT8 *pc6001_video_ram;
 static UINT8 irq_vector = 0x00;
 static UINT8 cas_switch,sys_latch;
 
-#define CAS_LENGTH 0x2ef1
+#define CAS_LENGTH 0x12e5
 
 static VIDEO_START( pc6001 )
 {
@@ -295,7 +293,8 @@ static WRITE8_DEVICE_HANDLER(nec_ppi8255_w) {
 
 static ADDRESS_MAP_START(pc6001_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x4000, 0x4fff) AM_MIRROR(0x3000) AM_ROM AM_REGION("gfx1",0)
 	AM_RANGE(0x8000, 0xffff) AM_RAM AM_BASE(&pc6001_ram)
 ADDRESS_MAP_END
 
@@ -674,7 +673,7 @@ ROM_START( pc6001 )	/* screen = 8000-83FF */
 
 	ROM_REGION( 0x10000, "cas", ROMREGION_ERASEFF )
 	/* Load here your tape for now (and change the cas length macro according to what MESS returns) */
-//	ROM_LOAD( "ax7 demo.cas", 0x0000, CAS_LENGTH, CRC(1) SHA1(1) )
+//	ROM_LOAD( "block.cas", 0x0000, CAS_LENGTH, CRC(1) SHA1(1) )
 ROM_END
 
 ROM_START( pc6001a )
