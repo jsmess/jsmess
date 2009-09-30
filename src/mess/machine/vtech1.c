@@ -519,12 +519,17 @@ READ8_HANDLER(vtech1_keyboard_r)
  * 1    cassette out (LSB)
  * 0    speaker A
  ************************************************/
-WRITE8_HANDLER(vtech1_latch_w)
+WRITE8_HANDLER( vtech1_latch_w )
 {
 	const device_config *speaker = devtag_get_device(space->machine, "speaker");
+	const device_config *mc6847 = devtag_get_device(space->machine, "mc6847");
 
 	if (LOG_VTECH1_LATCH)
 		logerror("vtech1_latch_w $%02X\n", data);
+
+	/* vdc mode control lines */
+	mc6847_ag_w(mc6847, BIT(data, 3));
+	mc6847_css_w(mc6847, BIT(data, 4));
 
 	/* cassette data bits toggle? */
 	if ((vtech1_latch ^ data ) & 0x06)
@@ -584,4 +589,23 @@ READ8_HANDLER(vtech1_serial_r)
 WRITE8_HANDLER(vtech1_serial_w)
 {
 	logerror("vtech1_serial_w $%02x, offset %02x\n", data, offset);
+}
+
+
+/***************************************************************************
+    MC6847
+***************************************************************************/
+
+READ8_DEVICE_HANDLER( vtech1_mc6847_videoram_r )
+{
+	mc6847_inv_w(device, BIT(videoram[offset], 6));
+	mc6847_as_w(device, BIT(videoram[offset], 7));
+
+	return videoram[offset];
+}
+
+VIDEO_UPDATE( vtech1 )
+{
+	const device_config *mc6847 = devtag_get_device(screen->machine, "mc6847");
+	return mc6847_update(mc6847, bitmap, cliprect);
 }

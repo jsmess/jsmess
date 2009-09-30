@@ -422,7 +422,8 @@ VIDEO_UPDATE( coco3 )
 	if (video->legacy_video)
 	{
 		/* legacy CoCo 1/2 graphics */
-		rc = VIDEO_UPDATE_CALL(m6847);
+		const device_config *mc6847 = devtag_get_device(screen->machine, "mc6847");
+		rc = mc6847_update(mc6847, bitmap, cliprect);
 
 		if ((rc & UPDATE_HAS_NOT_CHANGED) == 0)
 		{
@@ -469,8 +470,9 @@ static void coco3_set_dirty(void)
 
 
 
-static int coco3_new_frame(void)
+int coco3_new_frame(running_machine *machine)
 {
+	const device_config *mc6847 = devtag_get_device(machine, "mc6847");
 	int gime_field_sync = 0;
 
 	/* changing from non-legacy to legacy video? */
@@ -521,7 +523,7 @@ static int coco3_new_frame(void)
 
 	/* set up GIME field sync */
 	timer_adjust_oneshot(video->gime_fs_timer,
-		m6847_scanline_time(gime_field_sync), 0);
+		m6847_scanline_time(mc6847, gime_field_sync), 0);
 
 	return video->legacy_video;
 }
@@ -538,7 +540,7 @@ INLINE void memcpy_dirty(int *dirty, void *RESTRICT dest, const void *RESTRICT s
 
 
 
-static void coco3_prepare_scanline(int scanline)
+void coco3_prepare_scanline(int scanline)
 {
 	static const UINT32 lines_per_row[] = { 1, 1, 2, 8, 9, 10, 11, ~0 };
 	static const UINT32 gfx_bytes_per_row[] = { 16, 20, 32, 40, 64, 80, 128, 160 };
@@ -789,16 +791,35 @@ static STATE_POSTLOAD( coco3_video_postload )
 }
 
 
-static const UINT8 *get_video_ram_coco3(running_machine *machine,int scanline)
+static int last_scanline = -1;
+const UINT8 *coco3_videoram = 0;
+
+READ8_DEVICE_HANDLER( coco3_mc6847_videoram_r )
 {
-	const device_config *sam = devtag_get_device(machine, "sam");
-	return sam_m6847_get_video_ram(sam,scanline);
+	const device_config *sam = devtag_get_device(device->machine, "sam");
+	int scanline;
+
+	scanline = mc6847_get_scanline(device);
+
+	if (last_scanline != scanline)
+	{
+		coco3_videoram = sam_m6847_get_video_ram(sam, scanline);
+		last_scanline = scanline;
+	}
+
+	offset = offset % 32;
+
+	mc6847_inv_w(device, BIT(coco3_videoram[offset], 6));
+	mc6847_as_w(device, BIT(coco3_videoram[offset], 7));
+
+	return coco3_videoram[offset];
 }
 
-static void internal_video_start_coco3(running_machine *machine, m6847_type type)
+
+VIDEO_START( coco3 )
 {
+	const device_config *mc6847 = devtag_get_device(machine, "mc6847");
 	int i;
-	m6847_config cfg;
 	const UINT8 *rom;
 
 	/* allocate video */
@@ -833,17 +854,7 @@ static void internal_video_start_coco3(running_machine *machine, m6847_type type
 	video->gime_fs_timer = timer_alloc(machine, gime_fs, NULL);
 
 	/* initialize the CoCo video code */
-	memset(&cfg, 0, sizeof(cfg));
-	cfg.type = type;
-	cfg.cpu0_timing_factor = 4;
-	cfg.get_attributes = coco_get_attributes;
-	cfg.get_video_ram = get_video_ram_coco3;
-	cfg.horizontal_sync_callback = coco3_horizontal_sync_callback;
-	cfg.field_sync_callback = coco3_field_sync_callback;
-	cfg.custom_palette = video->palette_colors;
-	cfg.new_frame_callback = coco3_new_frame;
-	cfg.custom_prepare_scanline = coco3_prepare_scanline;
-	m6847_init(machine, &cfg);
+	mc6847_set_palette(mc6847, video->palette_colors);
 
 	/* save state stuff */
 	state_save_register_global_array(machine, video->palette_ram);
@@ -852,19 +863,6 @@ static void internal_video_start_coco3(running_machine *machine, m6847_type type
 	state_save_register_global(machine, video->display_scanlines);
 	state_save_register_postload(machine, coco3_video_postload, NULL);
 }
-
-
-
-VIDEO_START( coco3 )
-{
-	internal_video_start_coco3(machine, M6847_VERSION_GIME_NTSC);
-}
-
-VIDEO_START( coco3p )
-{
-	internal_video_start_coco3(machine, M6847_VERSION_GIME_PAL);
-}
-
 
 
 void coco3_vh_blink(void)

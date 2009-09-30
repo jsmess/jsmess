@@ -69,11 +69,24 @@
 #include "debug/debugcpu.h"
 #include "debug/debugcon.h"
 
+enum
+{
+	M6847_AG		= 0x80,
+	M6847_AS		= 0x40,
+	M6847_INTEXT	= 0x20,
+	M6847_INV		= 0x10,
+	M6847_CSS		= 0x08,
+	M6847_GM2		= 0x04,
+	M6847_GM1		= 0x02,
+	M6847_GM0		= 0x01
+};
+
+
 
 #define LOG_FS			0
 #define LOG_HS			0
 #define LOG_STATS		0
-#define LOG_PREPARE		0
+#define LOG_PREPARE		1
 
 typedef struct _m6847_variant m6847_variant;
 struct _m6847_variant
@@ -102,15 +115,41 @@ struct _m6847_pixel
 	UINT8 attr;
 };
 
-typedef struct _m6847_vdg m6847_vdg;
-struct _m6847_vdg
+typedef struct _mc6847_state mc6847_state;
+struct _mc6847_state
 {
 	/* callbacks */
-	void (*horizontal_sync_callback)(running_machine *machine, int line);
-	void (*field_sync_callback)(running_machine *machine, int line);
-	UINT8 (*get_attributes)(running_machine *machine, UINT8 c,int scanline, int pos);
-	const UINT8 *(*get_video_ram)(running_machine *machine, int scanline);
-	int (*new_frame_callback)(void);	/* returns whether the M6847 is in charge of this frame */
+	devcb_resolved_read8 in_dd_func;
+
+	devcb_resolved_read_line in_gm2_func;
+	devcb_resolved_read_line in_gm1_func;
+	devcb_resolved_read_line in_gm0_func;
+	devcb_resolved_read_line in_intext_func;
+	devcb_resolved_read_line in_inv_func;
+	devcb_resolved_read_line in_as_func;
+	devcb_resolved_read_line in_ag_func;
+	devcb_resolved_read_line in_css_func;
+
+	devcb_resolved_write_line out_fs_func;
+	devcb_resolved_write_line out_hs_func;
+	devcb_resolved_write_line out_rs_func;
+
+	/* state of mode control lines */
+	unsigned int gm2 : 1;
+	unsigned int gm1 : 1;
+	unsigned int gm0 : 1;
+	unsigned int intext : 1;
+	unsigned int inv : 1;
+	unsigned int as : 1;
+	unsigned int ag : 1;
+	unsigned int css : 1;
+
+	/* sync control line status */
+	unsigned int fs : 1;
+	unsigned int hs : 1;
+
+	/* to be cleaned up... */
+	int (*new_frame_callback)(running_machine *machine);	/* returns whether the M6847 is in charge of this frame */
 	void (*custom_prepare_scanline)(int scanline);
 	UINT8 (*get_char_rom)(running_machine *machine, UINT8 ch,int line);
 
@@ -157,8 +196,6 @@ struct _m6847_vdg
 
 
 static void apply_artifacts(running_machine *machine, UINT32 *line);
-
-static m6847_vdg *m6847;
 
 
 static const UINT8 pal_round_fontdata8x12[] =
@@ -1031,41 +1068,466 @@ static const m6847_variant variants[] =
 
 
 
+/*****************************************************************************
+    INLINE FUNCTIONS
+*****************************************************************************/
+
+INLINE mc6847_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == MC6847);
+
+	return (mc6847_state *)device->token;
+}
+
+
 /*************************************
  *
  *  Utilities
  *
  *************************************/
 
-static UINT32 color(int c)
+static UINT32 color(const device_config *device, int c)
 {
-	return m6847->palette[c];
+	mc6847_state *mc6847 = get_safe_token(device);
+	return mc6847->palette[c];
 }
 
-
-
-static int attr_index_from_attribute(UINT8 attr)
+static int attr_index_from_attribute(const device_config *device, UINT8 attr)
 {
+	mc6847_state *mc6847 = get_safe_token(device);
 	int result;
 
 	result = ((attr & (M6847_AG | M6847_AS | M6847_INTEXT | M6847_INV | M6847_CSS)) >> 3)
 		| ((attr & (M6847_GM1 | M6847_GM0)) << 5);
 
 	/* sanity check */
-	assert(result < sizeof(m6847->fontdata) / sizeof(m6847->fontdata[0]));
+	assert(result < ARRAY_LENGTH(mc6847->fontdata));
+	return result;
+}
+
+static UINT8 attribute_from_attr_index(const device_config *device, int attr_index)
+{
+	mc6847_state *mc6847 = get_safe_token(device);
+
+	/* sanity check */
+	assert(attr_index >= 0);
+	assert(attr_index < ARRAY_LENGTH(mc6847->fontdata));
+
+	return (UINT8) ((attr_index & 0x1F) << 3)
+		| ((attr_index & 0x60) >> 5);
+}
+
+
+
+/*************************************
+ *
+ *  Scanline operations
+ *
+ *************************************/
+
+static int get_scanline(mc6847_state *mc6847)
+{
+	int result;
+	attotime duration;
+
+	/* get the time since last field sync */
+	duration = attotime_sub(
+		timer_starttime(mc6847->hs_rise_timer),
+		timer_starttime(mc6847->fs_rise_timer));
+	assert_always(duration.seconds == 0, "get_scanline(): duration exceeds one second");
+
+	if (duration.attoseconds < mc6847->vblank_period)
+	{
+		result = -1;	/* vblank */
+	}
+	else
+	{
+		result = (duration.attoseconds - mc6847->vblank_period)
+			/ mc6847->scanline_period;
+	}
 	return result;
 }
 
 
 
-static UINT8 attribute_from_attr_index(int attr_index)
+static offs_t scanline_to_address(mc6847_state *mc6847, int scanline)
 {
-	/* sanity check */
-	assert(attr_index >= 0);
-	assert(attr_index < sizeof(m6847->fontdata) / sizeof(m6847->fontdata[0]));
+	if (mc6847->ag)
+	{
+		/* graphics */
+		int gm = (mc6847->gm0 << 2) | (mc6847->gm1 << 1) | mc6847->gm2;
 
-	return (UINT8) ((attr_index & 0x1F) << 3)
-		| ((attr_index & 0x60) >> 5);
+		switch (gm)
+		{
+		case 0: return (scanline / 3) * 0x10;
+		case 1: return (scanline / 3) * 0x10;
+		case 2: return (scanline / 3) * 0x20;
+		case 3: return (scanline / 2) * 0x20;
+		case 4: return (scanline / 2) * 0x20;
+		case 5: return (scanline / 1) * 0x10;
+		case 6: return (scanline / 1) * 0x20;
+		case 7: return (scanline / 1) * 0x20;
+		}
+	}
+	else
+	{
+		/* text, semi-graphics */
+		return (scanline / 12) * 0x20;
+	}
+
+	/* we never get here */
+	return 0;
+}
+
+
+/* TODO: attributes should be read on demand rather then all at once */
+static UINT8 update_attributes(mc6847_state *mc6847)
+{
+	if (mc6847->in_gm0_func.read != NULL)
+		mc6847->gm0 = devcb_call_read_line(&mc6847->in_gm0_func);
+	if (mc6847->in_gm1_func.read != NULL)
+		mc6847->gm1 = devcb_call_read_line(&mc6847->in_gm1_func);
+	if (mc6847->in_gm2_func.read != NULL)
+		mc6847->gm2 = devcb_call_read_line(&mc6847->in_gm2_func);
+	if (mc6847->in_css_func.read != NULL)
+		mc6847->css = devcb_call_read_line(&mc6847->in_css_func);
+	if (mc6847->in_inv_func.read != NULL)
+		mc6847->inv = devcb_call_read_line(&mc6847->in_inv_func);
+	if (mc6847->in_intext_func.read != NULL)
+		mc6847->intext = devcb_call_read_line(&mc6847->in_intext_func);
+	if (mc6847->in_as_func.read != NULL)
+		mc6847->as = devcb_call_read_line(&mc6847->in_as_func);
+	if (mc6847->in_ag_func.read != NULL)
+		mc6847->ag = devcb_call_read_line(&mc6847->in_ag_func);
+
+	return (mc6847->ag << 7) | (mc6847->as << 6) | (mc6847->intext << 5) | (mc6847->inv << 4) |
+	       (mc6847->css << 3) | (mc6847->gm2 << 2) | (mc6847->gm1 << 1) | mc6847->gm0;
+}
+
+
+INLINE void prepare_scanline(running_machine *machine, mc6847_state *mc6847, int xpos)
+{
+	UINT8 attrs, data, attr;
+	int scanline;
+	int i, border_color;
+	int dirty;
+	m6847_pixel *scanline_data;
+
+	scanline = get_scanline(mc6847);
+
+	if (LOG_PREPARE)
+		logerror("m6847_prepare_scanline(): scanline=%d xpos=%d\n", scanline, xpos);
+
+	if ((scanline >= 0) && (scanline < (mc6847->top_border_scanlines
+		+ mc6847->display_scanlines + mc6847->bottom_border_scanlines)))
+	{
+		if (mc6847->using_custom)
+		{
+			mc6847->custom_prepare_scanline(scanline);
+		}
+		else
+		{
+			/* has the border color changed? */
+			attrs = update_attributes(mc6847);
+
+			if (attrs != mc6847->attrs[scanline])
+			{
+				mc6847->dirty = TRUE;
+				mc6847->attrs[scanline] = attrs;
+
+				/* choose the border color */
+				if (attrs & M6847_AG)
+					border_color = (attrs & M6847_CSS) ? BUFF : GREEN;
+				else if (mc6847->has_lowercase && (attrs & M6847_GM2))
+					border_color = (attrs & M6847_CSS) ? LTORANGE : LTGREEN;
+				else
+					border_color = BLACK;
+
+				/* need to use palette table directly; border colors are constant */
+				mc6847->border[scanline] = mc6847->palette[border_color];
+			}
+
+			/* is this a display scanline? */
+			scanline -= mc6847->top_border_scanlines;
+			if ((scanline >= 0) && (scanline < mc6847->display_scanlines))
+			{
+				offs_t addr = scanline_to_address(mc6847, scanline);
+				dirty = mc6847->dirty;
+				scanline_data = mc6847->screendata[scanline];
+
+				for (i = xpos; i < 32; i++)
+				{
+					data = devcb_call_read8(&mc6847->in_dd_func, addr + i);
+					attr = update_attributes(mc6847);
+
+					if ((data != scanline_data[i].data)	|| (attr != scanline_data[i].attr))
+					{
+						dirty = TRUE;
+						scanline_data[i].data = data;
+						scanline_data[i].attr = attr;
+					}
+				}
+				mc6847->dirty = dirty;
+			}
+		}
+	}
+}
+
+
+
+void m6847_video_changed(void)
+{
+	/* NPW 2-May-2006 - Commenting this out until we properly fix bug #878 */
+	/* prepare_scanline(get_beamx() / 8); */
+}
+
+
+
+/*************************************
+ *
+ *  Field sync/Horizontal sync timers
+ *
+ *************************************/
+
+static TIMER_CALLBACK( hs_fall )
+{
+	mc6847_state *mc6847 = (mc6847_state *) ptr;
+
+	if (LOG_HS)
+		logerror("hs_fall(): time=%s\n", attotime_string(timer_get_time(machine), ATTOTIME_STRING_PRECISION));
+
+	mc6847->hs = CLEAR_LINE;
+	devcb_call_write_line(&mc6847->out_hs_func, CLEAR_LINE);
+}
+
+static TIMER_CALLBACK( hs_rise )
+{
+	mc6847_state *mc6847 = (mc6847_state *) ptr;
+
+	if (LOG_HS)
+		logerror("hs_rise(): time=%s\n", attotime_string(timer_get_time(machine), ATTOTIME_STRING_PRECISION));
+
+	timer_adjust_oneshot(mc6847->hs_rise_timer,
+		attotime_make(0, mc6847->scanline_period), 0);
+	timer_adjust_oneshot(mc6847->hs_fall_timer,
+		attotime_make(0, mc6847->horizontal_sync_period), 0);
+
+	mc6847->hs = ASSERT_LINE;
+	devcb_call_write_line(&mc6847->out_hs_func, ASSERT_LINE);
+
+	prepare_scanline(machine, mc6847, 0);
+}
+
+static TIMER_CALLBACK( fs_fall )
+{
+	mc6847_state *mc6847 = (mc6847_state *) ptr;
+
+	if (LOG_FS)
+		logerror("fs_fall(): time=%s scanline=%d\n", attotime_string(timer_get_time(machine), ATTOTIME_STRING_PRECISION), get_scanline(mc6847));
+
+	mc6847->fs = CLEAR_LINE;
+	devcb_call_write_line(&mc6847->out_fs_func, CLEAR_LINE);
+}
+
+static TIMER_CALLBACK( fs_rise )
+{
+	mc6847_state *mc6847 = (mc6847_state *) ptr;
+
+	if (LOG_FS)
+		logerror("fs_rise(): time=%s scanline=%d\n", attotime_string(timer_get_time(machine), ATTOTIME_STRING_PRECISION), get_scanline(mc6847));
+
+	/* adjust field sync falling edge timer */
+	timer_adjust_oneshot(mc6847->fs_fall_timer,
+		attotime_make(0, mc6847->field_sync_period), 0);
+
+	/* adjust horizontal sync rising timer */
+	timer_adjust_oneshot(mc6847->hs_rise_timer, attotime_zero, 0);
+
+	/* this is a hook for the CoCo 3 code to extend this stuff */
+	if (mc6847->new_frame_callback)
+		mc6847->using_custom = !mc6847->new_frame_callback(machine);
+
+	mc6847->fs = ASSERT_LINE;
+	devcb_call_write_line(&mc6847->out_fs_func, ASSERT_LINE);
+}
+
+
+
+#if 0
+/*************************************
+ *
+ *  Debugging
+ *
+ *************************************/
+
+
+static int get_beamx(mc6847_state *mc6847)
+{
+	attotime scanline_time;
+	int result;
+
+	scanline_time = timer_timeelapsed(mc6847->hs_rise_timer);
+	if (scanline_time.seconds != 0)
+		return 0;
+	assert(attotime_to_attoseconds(scanline_time) < mc6847->scanline_period);
+
+	if (attotime_to_attoseconds(scanline_time) < (mc6847->clock_period * 42))
+	{
+		/* hsync */
+		result = 0;
+	}
+	else if (attotime_to_attoseconds(scanline_time) < (mc6847->clock_period * 95 / 2))
+	{
+		/* left border */
+		result = 0;
+	}
+	else if (attotime_to_attoseconds(scanline_time) < (mc6847->clock_period * 351 / 2))
+	{
+		/* body */
+		result = (attotime_to_attoseconds(scanline_time) - (mc6847->clock_period * 95 / 2))
+			/ mc6847->clock_period * 2;
+	}
+	else
+	{
+		/* right border */
+		result = 256;
+	}
+	return result;
+}
+
+
+static void execute_m6847_dumpscanline(const device_config *device, int ref, int params, const char **param)
+{
+	mc6847_state *mc6847 = get_safe_token(device);
+
+	int i;
+	int beamx = get_beamx(mc6847) / 8;
+	int scanline = get_scanline(mc6847);
+	const m6847_pixel *pixel = mc6847->screendata[scanline];
+
+	for (i = 0; i < beamx; i++)
+	{
+		debug_console_printf(device->machine, "[%02d]: 0x%02X (", i, pixel[i].data);
+
+		if (pixel[i].attr & M6847_AG)		debug_console_printf(device->machine, " AG");
+		if (pixel[i].attr & M6847_AS)		debug_console_printf(device->machine, " AS");
+		if (pixel[i].attr & M6847_INTEXT)	debug_console_printf(device->machine, " INTEXT");
+		if (pixel[i].attr & M6847_INV)		debug_console_printf(device->machine, " INV");
+		if (pixel[i].attr & M6847_CSS)		debug_console_printf(device->machine, " CSS");
+		if (pixel[i].attr & M6847_GM2)		debug_console_printf(device->machine, " GM2");
+		if (pixel[i].attr & M6847_GM1)		debug_console_printf(device->machine, " GM1");
+		if (pixel[i].attr & M6847_GM0)		debug_console_printf(device->machine, " GM0");
+
+		debug_console_printf(device->machine, " )\n");
+	}
+}
+#endif
+
+
+
+/*************************************
+ *
+ *  Initialization
+ *
+ *************************************/
+
+static const UINT8 *find_char(const m6847_variant *v,
+	UINT8 byte, UINT8 attr, int *fg, int *bg)
+{
+	int ch;
+	size_t offset = 0;
+
+	if (attr & M6847_AS)
+	{
+		/* semigraphics */
+		*bg = BLACK;
+
+		if (!v->has_lowercase && (attr & M6847_INTEXT))
+		{
+			/* semigraphics 6 */
+			ch = (byte & 0x3F) + 0x60;
+			*fg = ((byte >> 6) & 0x03) + ((attr & M6847_CSS) ? BUFF : GREEN);
+		}
+		else
+		{
+			/* semigraphics 4 */
+			ch = (byte & 0x0F) + 0xA0;
+			*fg = ((byte >> 4) & 0x07) + GREEN;
+		}
+	}
+	else
+	{
+		/* text */
+		ch = (byte & 0x3F) + 0x00;
+
+		if (v->has_lowercase)
+		{
+			if ((ch < 0x20) && (attr & M6847_GM0) && !(attr & M6847_INV))
+			{
+				/* this is a lowercase character */
+				attr |= M6847_INV;
+				ch += 0x40;
+			}
+
+			if ((ch > 0x20) && (attr & M6847_GM0) && !(attr & M6847_INV)) {
+				ch += 0x20;
+			}
+
+			if (attr & M6847_GM1)
+				attr ^= M6847_INV;
+
+		}
+
+		if (attr & M6847_INV)
+		{
+			/* dark foreground, light background */
+			*fg = (attr & M6847_CSS) ? DKORANGE : DKGREEN;
+			*bg = (attr & M6847_CSS) ? LTORANGE : LTGREEN;
+		}
+		else
+		{
+			/* light foreground, dark background */
+			*fg = (attr & M6847_CSS) ? LTORANGE : LTGREEN;
+			*bg = (attr & M6847_CSS) ? DKORANGE : DKGREEN;
+		}
+
+		offset = v->text_offset;
+	}
+
+	return &v->fontdata[ch * 12] + offset;
+}
+
+
+
+static void build_fontdata(const device_config *device, const m6847_variant *v)
+{
+	mc6847_state *mc6847 = get_safe_token(device);
+
+	int attr_index, row;
+	int fg, bg;
+	int byte;
+	const UINT8 *char_data;
+
+	for (attr_index = 0; attr_index < ARRAY_LENGTH(mc6847->fontdata); attr_index++)
+	{
+		UINT8 attr = attribute_from_attr_index(device, attr_index);
+
+		for (byte = 0; byte < 256; byte++)
+		{
+			char_data = find_char(v, byte, attr, &fg, &bg);
+
+			/* specify colors */
+			mc6847->colordata[attr_index][byte / 16][0] = bg;
+			mc6847->colordata[attr_index][byte / 16][1] = fg;
+
+			for (row = 0; row < 12; row++)
+			{
+				mc6847->fontdata[attr_index][byte][row] = char_data[row];
+			}
+		}
+	}
 }
 
 
@@ -1076,7 +1538,7 @@ static UINT8 attribute_from_attr_index(int attr_index)
  *
  *************************************/
 
-static void graphics_color_64(UINT32 *RESTRICT line, const m6847_pixel *RESTRICT video_data)
+static void graphics_color_64(const device_config *device, UINT32 *RESTRICT line, const m6847_pixel *RESTRICT video_data)
 {
 	int x;
 	UINT8 byte, attr;
@@ -1086,17 +1548,17 @@ static void graphics_color_64(UINT32 *RESTRICT line, const m6847_pixel *RESTRICT
 		byte = video_data[x].data;
 		attr = video_data[x].attr;
 
-		line[ 0] = line[ 1] = line[ 2] = line[ 3] = color(((byte >> 6) & 0x03) + (attr & M6847_CSS ? BUFF : GREEN));
-		line[ 4] = line[ 5] = line[ 6] = line[ 7] = color(((byte >> 4) & 0x03) + (attr & M6847_CSS ? BUFF : GREEN));
-		line[ 8] = line[ 9] = line[10] = line[11] = color(((byte >> 2) & 0x03) + (attr & M6847_CSS ? BUFF : GREEN));
-		line[12] = line[13] = line[14] = line[15] = color(((byte >> 0) & 0x03) + (attr & M6847_CSS ? BUFF : GREEN));
+		line[ 0] = line[ 1] = line[ 2] = line[ 3] = color(device, ((byte >> 6) & 0x03) + (attr & M6847_CSS ? BUFF : GREEN));
+		line[ 4] = line[ 5] = line[ 6] = line[ 7] = color(device, ((byte >> 4) & 0x03) + (attr & M6847_CSS ? BUFF : GREEN));
+		line[ 8] = line[ 9] = line[10] = line[11] = color(device, ((byte >> 2) & 0x03) + (attr & M6847_CSS ? BUFF : GREEN));
+		line[12] = line[13] = line[14] = line[15] = color(device, ((byte >> 0) & 0x03) + (attr & M6847_CSS ? BUFF : GREEN));
 		line += 16;
 	}
 }
 
 
 
-static void graphics_color_128(UINT32 *RESTRICT line, const m6847_pixel *RESTRICT video_data)
+static void graphics_color_128(const device_config *device, UINT32 *RESTRICT line, const m6847_pixel *RESTRICT video_data)
 {
 	int x;
 	UINT8 byte, attr;
@@ -1106,17 +1568,17 @@ static void graphics_color_128(UINT32 *RESTRICT line, const m6847_pixel *RESTRIC
 		byte = video_data[x].data;
 		attr = video_data[x].attr;
 
-		line[ 0] = line[ 1] = color(((byte >> 6) & 0x03) + (attr & M6847_CSS ? BUFF : GREEN));
-		line[ 2] = line[ 3] = color(((byte >> 4) & 0x03) + (attr & M6847_CSS ? BUFF : GREEN));
-		line[ 4] = line[ 5] = color(((byte >> 2) & 0x03) + (attr & M6847_CSS ? BUFF : GREEN));
-		line[ 6] = line[ 7] = color(((byte >> 0) & 0x03) + (attr & M6847_CSS ? BUFF : GREEN));
+		line[ 0] = line[ 1] = color(device, ((byte >> 6) & 0x03) + (attr & M6847_CSS ? BUFF : GREEN));
+		line[ 2] = line[ 3] = color(device, ((byte >> 4) & 0x03) + (attr & M6847_CSS ? BUFF : GREEN));
+		line[ 4] = line[ 5] = color(device, ((byte >> 2) & 0x03) + (attr & M6847_CSS ? BUFF : GREEN));
+		line[ 6] = line[ 7] = color(device, ((byte >> 0) & 0x03) + (attr & M6847_CSS ? BUFF : GREEN));
 		line += 8;
 	}
 }
 
 
 
-static void graphics_bw_128(UINT32 *RESTRICT line, const m6847_pixel *RESTRICT video_data)
+static void graphics_bw_128(const device_config *device, UINT32 *RESTRICT line, const m6847_pixel *RESTRICT video_data)
 {
 	int x;
 	UINT8 byte, attr;
@@ -1127,8 +1589,8 @@ static void graphics_bw_128(UINT32 *RESTRICT line, const m6847_pixel *RESTRICT v
 		byte = video_data[x].data;
 		attr = video_data[x].attr;
 
-		bg = color(attr & M6847_CSS ? 10 :  8);
-		fg = color(attr & M6847_CSS ? 11 :  9);
+		bg = color(device, attr & M6847_CSS ? 10 :  8);
+		fg = color(device, attr & M6847_CSS ? 11 :  9);
 
 		line[ 0] = line[ 1] = ((byte >> 7) & 0x01) ? fg : bg;
 		line[ 2] = line[ 3] = ((byte >> 6) & 0x01) ? fg : bg;
@@ -1144,7 +1606,7 @@ static void graphics_bw_128(UINT32 *RESTRICT line, const m6847_pixel *RESTRICT v
 
 
 
-static void graphics_bw_256(UINT32 *RESTRICT line, const m6847_pixel *RESTRICT video_data)
+static void graphics_bw_256(const device_config *device, UINT32 *RESTRICT line, const m6847_pixel *RESTRICT video_data)
 {
 	int x;
 	UINT8 byte, attr;
@@ -1155,8 +1617,8 @@ static void graphics_bw_256(UINT32 *RESTRICT line, const m6847_pixel *RESTRICT v
 		byte = video_data[x].data;
 		attr = video_data[x].attr;
 
-		bg = color(attr & M6847_CSS ? 10 :  8);
-		fg = color(attr & M6847_CSS ? 11 :  9);
+		bg = color(device, attr & M6847_CSS ? 10 :  8);
+		fg = color(device, attr & M6847_CSS ? 11 :  9);
 
 		line[0] = ((byte >> 7) & 0x01) ? fg : bg;
 		line[1] = ((byte >> 6) & 0x01) ? fg : bg;
@@ -1172,7 +1634,7 @@ static void graphics_bw_256(UINT32 *RESTRICT line, const m6847_pixel *RESTRICT v
 
 
 
-static void (*const graphics_modes[8])(UINT32 *line, const m6847_pixel *video_data) =
+static void (*const graphics_modes[8])(const device_config *device, UINT32 *line, const m6847_pixel *video_data) =
 {
 	graphics_color_64,	graphics_bw_128,
 	graphics_color_128,	graphics_bw_128,
@@ -1182,8 +1644,9 @@ static void (*const graphics_modes[8])(UINT32 *line, const m6847_pixel *video_da
 
 
 
-static void text_mode(running_machine *machine, int scanline, UINT32 *RESTRICT line, const m6847_pixel *RESTRICT video_data)
+static void text_mode(const device_config *device, int scanline, UINT32 *RESTRICT line, const m6847_pixel *RESTRICT video_data)
 {
+	mc6847_state *mc6847 = get_safe_token(device);
 	int x;
 	UINT8 byte, attr;
 	int attr_index;
@@ -1195,22 +1658,22 @@ static void text_mode(running_machine *machine, int scanline, UINT32 *RESTRICT l
 		byte = video_data[x].data;
 		attr = video_data[x].attr;
 
-		attr_index = attr_index_from_attribute(attr);
+		attr_index = attr_index_from_attribute(device, attr);
 
-		bg_color = color(m6847->colordata[attr_index][byte / 16][0]);
-		fg_color = color(m6847->colordata[attr_index][byte / 16][1]);
+		bg_color = color(device, mc6847->colordata[attr_index][byte / 16][0]);
+		fg_color = color(device, mc6847->colordata[attr_index][byte / 16][1]);
 
-		if( (!m6847->has_lowercase) && (attr & M6847_INTEXT) && !(attr & M6847_AS)) {
-			if (m6847->get_char_rom) {
-				char_data = m6847->get_char_rom(machine,byte,scanline % 12);
+		if( (!mc6847->has_lowercase) && (attr & M6847_INTEXT) && !(attr & M6847_AS)) {
+			if (mc6847->get_char_rom) {
+				char_data = mc6847->get_char_rom(device->machine,byte,scanline % 12);
 			} else {
 				char_data = 0xff;
 			}
 		} else {
-			if (m6847->get_char_rom)
-				char_data = m6847->get_char_rom(machine,byte,scanline % 12);
+			if (mc6847->get_char_rom)
+				char_data = mc6847->get_char_rom(device->machine,byte,scanline % 12);
 			else
-				char_data = m6847->fontdata[attr_index][byte][scanline % 12];
+				char_data = mc6847->fontdata[attr_index][byte][scanline % 12];
 		}
 
 		line[x*8+0] = (char_data & 0x80) ? fg_color : bg_color;
@@ -1226,8 +1689,9 @@ static void text_mode(running_machine *machine, int scanline, UINT32 *RESTRICT l
 
 
 
-static void render_scanline(running_machine *machine, bitmap_t *bitmap, int scanline)
+static void render_scanline(const device_config *device, bitmap_t *bitmap, int scanline)
 {
+	mc6847_state *mc6847 = get_safe_token(device);
 	UINT32 border_color;
 	UINT32 *line;
 	UINT8 attrs;
@@ -1238,14 +1702,14 @@ static void render_scanline(running_machine *machine, bitmap_t *bitmap, int scan
 	line = BITMAP_ADDR32(bitmap, scanline, 0);
 
 	/* choose the border color */
-	border_color = m6847->border[scanline];
-	attrs = m6847->attrs[scanline];
+	border_color = mc6847->border[scanline];
+	attrs = mc6847->attrs[scanline];
 
 	/* is this a border scanline? */
-	scanline -= m6847->top_border_scanlines;
-	if ((scanline >= 0) && (scanline < m6847->display_scanlines))
+	scanline -= mc6847->top_border_scanlines;
+	if ((scanline >= 0) && (scanline < mc6847->display_scanlines))
 	{
-		video_data = m6847->screendata[scanline];
+		video_data = mc6847->screendata[scanline];
 
 		/* left border */
 		for (x = 0; x < 32; x++)
@@ -1255,12 +1719,12 @@ static void render_scanline(running_machine *machine, bitmap_t *bitmap, int scan
 		{
 			/* graphics */
 			mode = attrs & (M6847_GM2|M6847_GM1|M6847_GM0);
-			graphics_modes[mode](line + 32, video_data);
+			graphics_modes[mode](device, line + 32, video_data);
 		}
 		else
 		{
 			/* text/semigraphics */
-			text_mode(machine, scanline, line + 32, video_data);
+			text_mode(device, scanline, line + 32, video_data);
 		}
 
 		/* right border */
@@ -1271,7 +1735,7 @@ static void render_scanline(running_machine *machine, bitmap_t *bitmap, int scan
 		if ((attrs & (M6847_AG|M6847_GM2|M6847_GM1|M6847_GM0))
 			== (M6847_AG|M6847_GM2|M6847_GM1|M6847_GM0))
 		{
-			apply_artifacts(machine, line + 32);
+			apply_artifacts(device->machine, line + 32);
 		}
 	}
 	else
@@ -1284,11 +1748,263 @@ static void render_scanline(running_machine *machine, bitmap_t *bitmap, int scan
 
 
 
-static void set_dirty(void)
+static void set_dirty(mc6847_state *mc6847)
 {
-	m6847->dirty = TRUE;
+	mc6847->dirty = TRUE;
 }
 
+
+
+/*****************************************************************************
+    DEVICE INTERFACE
+*****************************************************************************/
+
+static STATE_POSTLOAD( mc6847_postload )
+{
+	set_dirty(param);
+}
+
+static DEVICE_START( mc6847 )
+{
+	mc6847_state *mc6847 = get_safe_token(device);
+	const mc6847_interface *intf = device->static_config;
+	const mc6847_config *cfg = device->inline_config;
+
+	const m6847_variant *v;
+	UINT32 frequency;
+	attoseconds_t period, frame_period, cpu0_clock_period = 0;
+	double total_scanlines;
+
+	/* validate some basic stuff */
+	assert(device->static_config != NULL);
+	assert(device->inline_config != NULL);
+
+
+
+	/* identify proper M6847 variant */
+	assert(cfg->type < ARRAY_LENGTH(variants));
+	v = &variants[cfg->type];
+
+	/* allocate instance */
+	set_dirty(mc6847);
+
+	/* copy configuration */
+	mc6847->new_frame_callback = cfg->new_frame_callback;
+	mc6847->custom_prepare_scanline = cfg->custom_prepare_scanline;
+	mc6847->has_lowercase = v->has_lowercase;
+	mc6847->get_char_rom = cfg->get_char_rom;
+
+	/* assert our assumptions */
+	assert((v->scanlines_per_frame * FACTOR_SCANLINES_PER_FRAME)
+		== (UINT32) (v->scanlines_per_frame * FACTOR_SCANLINES_PER_FRAME));
+	assert((v->clocks_per_scanline * FACTOR_CLOCKS_PER_SCANLINE)
+		== (UINT32) (v->clocks_per_scanline * FACTOR_CLOCKS_PER_SCANLINE));
+	assert((v->scanlines_per_frame * v->clocks_per_scanline * GROSS_FACTOR)
+		== (UINT32) (v->scanlines_per_frame * v->clocks_per_scanline * GROSS_FACTOR));
+
+	/* choose palette */
+	if (cfg->custom_palette)
+	{
+		mc6847->has_custom_palette = 1;
+		mc6847->palette = cfg->custom_palette;
+	}
+	else
+	{
+		mc6847->palette = palette;
+	}
+
+	/* allocate timers */
+	mc6847->fs_rise_timer = timer_alloc(device->machine, fs_rise, mc6847);
+	mc6847->fs_fall_timer = timer_alloc(device->machine, fs_fall, mc6847);
+	mc6847->hs_rise_timer = timer_alloc(device->machine, hs_rise, mc6847);
+	mc6847->hs_fall_timer = timer_alloc(device->machine, hs_fall, mc6847);
+
+	/* setup dimensions */
+	mc6847->top_border_scanlines = v->top_border_scanlines;
+	mc6847->display_scanlines = v->display_scanlines;
+	mc6847->bottom_border_scanlines = v->bottom_border_scanlines;
+
+	/* compute frequency and period */
+	frequency = v->frames_per_second
+		* ((UINT32) (v->scanlines_per_frame * FACTOR_SCANLINES_PER_FRAME))
+		* ((UINT32) (v->clocks_per_scanline * FACTOR_CLOCKS_PER_SCANLINE));
+	period = ATTOSECONDS_PER_SECOND / frequency;
+
+	/* choose CPU clock, if specified */
+	if (cfg->cpu0_timing_factor > 0)
+	{
+		cpu0_clock_period = period * cfg->cpu0_timing_factor * GROSS_FACTOR;
+		cpu_set_clock(device->machine->firstcpu, ATTOSECONDS_PER_SECOND / cpu0_clock_period);
+	}
+
+	/* calculate timing */
+	total_scanlines = v->vblank_scanlines
+		+ v->top_border_scanlines
+		+ v->display_scanlines
+		+ v->bottom_border_scanlines
+		+ v->vretrace_scanlines;
+	mc6847->clock_period = period * GROSS_FACTOR;
+	mc6847->scanline_period = period * (UINT32) (v->clocks_per_scanline * GROSS_FACTOR);
+	mc6847->field_sync_period = period * (UINT32) (v->clocks_per_scanline * v->field_sync_scanlines * GROSS_FACTOR);
+	mc6847->horizontal_sync_period = period * GROSS_FACTOR * 33 / 2;
+	mc6847->vblank_period = period * (UINT32) (v->clocks_per_scanline * v->vblank_scanlines * GROSS_FACTOR);
+
+	/* setup timing */
+	frame_period = period *
+		(UINT32) (v->clocks_per_scanline * total_scanlines * GROSS_FACTOR);
+	timer_adjust_periodic(mc6847->fs_rise_timer, attotime_zero, 0, attotime_make(0, frame_period));
+
+	/* build font */
+	build_fontdata(device, v);
+
+	/* dump stats */
+	if (LOG_STATS)
+	{
+		logerror("m6847_init():\n");
+		logerror("\tclock:      %30s sec\n", attotime_string(attotime_make(0, period * GROSS_FACTOR), ATTOTIME_STRING_PRECISION));
+		if (cpu0_clock_period > 0)
+			logerror("\tCPU0 clock: %30s sec\n", attotime_string(attotime_make(0, cpu0_clock_period), ATTOTIME_STRING_PRECISION));
+		logerror("\tscanline:   %30s sec\n", attotime_string(attotime_make(0, mc6847->scanline_period), ATTOTIME_STRING_PRECISION));
+		logerror("\tfield sync: %30s sec\n", attotime_string(attotime_make(0, mc6847->field_sync_period), ATTOTIME_STRING_PRECISION));
+		logerror("\thorz sync:  %30s sec\n", attotime_string(attotime_make(0, mc6847->horizontal_sync_period), ATTOTIME_STRING_PRECISION));
+		logerror("\tvblank:     %30s sec\n", attotime_string(attotime_make(0, mc6847->vblank_period), ATTOTIME_STRING_PRECISION));
+		logerror("\tframe:      %30s sec\n", attotime_string(attotime_make(0, frame_period), ATTOTIME_STRING_PRECISION));
+		logerror("\n");
+	}
+
+#if 0
+	/* setup debug commands */
+	if (device->machine->debug_flags & DEBUG_FLAG_ENABLED)
+		debug_console_register_command(device->machine, "m6847_dumpscanline", CMDFLAG_NONE, 0, 0, 0, execute_m6847_dumpscanline);
+#endif
+
+
+	/* resolve callbacks */
+	devcb_resolve_read8(&mc6847->in_dd_func, &intf->in_dd_func, device);
+	devcb_resolve_read_line(&mc6847->in_gm2_func, &intf->in_gm2_func, device);
+	devcb_resolve_read_line(&mc6847->in_gm1_func, &intf->in_gm1_func, device);
+	devcb_resolve_read_line(&mc6847->in_gm0_func, &intf->in_gm0_func, device);
+	devcb_resolve_read_line(&mc6847->in_intext_func, &intf->in_intext_func, device);
+	devcb_resolve_read_line(&mc6847->in_inv_func, &intf->in_inv_func, device);
+	devcb_resolve_read_line(&mc6847->in_as_func, &intf->in_as_func, device);
+	devcb_resolve_read_line(&mc6847->in_ag_func, &intf->in_ag_func, device);
+	devcb_resolve_write_line(&mc6847->out_fs_func, &intf->out_fs_func, device);
+	devcb_resolve_write_line(&mc6847->out_hs_func, &intf->out_hs_func, device);
+	devcb_resolve_read_line(&mc6847->in_css_func, &intf->in_css_func, device);
+
+	/* setup save states */
+	state_save_register_postload(device->machine, mc6847_postload, mc6847);
+}
+
+static DEVICE_RESET( mc6847 )
+{
+	mc6847_state *mc6847 = get_safe_token(device);
+
+	mc6847->gm2 = 0;
+	mc6847->gm1 = 0;
+	mc6847->gm0 = 0;
+	mc6847->intext = 0;
+	mc6847->inv = 0;
+	mc6847->as = 0;
+	mc6847->ag = 0;
+	mc6847->css = 0;
+}
+
+DEVICE_GET_INFO( mc6847 )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(mc6847_state);					break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = sizeof(mc6847_config);				break;
+		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_OTHER;					break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(mc6847);		break;
+		case DEVINFO_FCT_STOP:					/* Nothing */									break;
+		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(mc6847);		break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:					strcpy(info->s, "Motorola 6847");				break;
+		case DEVINFO_STR_FAMILY:				strcpy(info->s, "MC6847 VDG");					break;
+		case DEVINFO_STR_VERSION:				strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:			strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright MESS Team");			break;
+	}
+}
+
+
+/***************************************************************************
+    IMPLEMENTATION
+***************************************************************************/
+
+WRITE_LINE_DEVICE_HANDLER( mc6847_gm2_w )
+{
+	mc6847_state *mc6847 = get_safe_token(device);
+	mc6847->gm2 = state;
+}
+
+WRITE_LINE_DEVICE_HANDLER( mc6847_gm1_w )
+{
+	mc6847_state *mc6847 = get_safe_token(device);
+	mc6847->gm1 = state;
+}
+
+WRITE_LINE_DEVICE_HANDLER( mc6847_gm0_w )
+{
+	mc6847_state *mc6847 = get_safe_token(device);
+	mc6847->gm0 = state;
+}
+
+WRITE_LINE_DEVICE_HANDLER( mc6847_intext_w )
+{
+	mc6847_state *mc6847 = get_safe_token(device);
+	mc6847->intext = state;
+}
+
+WRITE_LINE_DEVICE_HANDLER( mc6847_inv_w )
+{
+	mc6847_state *mc6847 = get_safe_token(device);
+	mc6847->inv = state;
+}
+
+WRITE_LINE_DEVICE_HANDLER( mc6847_as_w )
+{
+	mc6847_state *mc6847 = get_safe_token(device);
+	mc6847->as = state;
+}
+
+WRITE_LINE_DEVICE_HANDLER( mc6847_ag_w )
+{
+	mc6847_state *mc6847 = get_safe_token(device);
+	mc6847->ag = state;
+}
+
+WRITE_LINE_DEVICE_HANDLER( mc6847_css_w )
+{
+	mc6847_state *mc6847 = get_safe_token(device);
+	mc6847->css = state;
+}
+
+READ_LINE_DEVICE_HANDLER( mc6847_fs_r )
+{
+	mc6847_state *mc6847 = get_safe_token(device);
+	return mc6847->fs;
+}
+
+READ_LINE_DEVICE_HANDLER( mc6847_hs_r )
+{
+	mc6847_state *mc6847 = get_safe_token(device);
+	return mc6847->hs;
+}
+
+
+void mc6847_set_palette(const device_config *device, UINT32 *palette)
+{
+	mc6847_state *mc6847 = get_safe_token(device);
+	mc6847->has_custom_palette = 1;
+	mc6847->palette = palette;
+}
 
 
 /*************************************
@@ -1422,7 +2138,8 @@ static void apply_artifacts(running_machine *machine, UINT32 *line)
 
 static INPUT_CHANGED( artifacting_changed )
 {
-	set_dirty();
+	/* TODO: not sure how to do this with a device... */
+//	set_dirty();
 }
 
 
@@ -1437,540 +2154,41 @@ INPUT_PORTS_END
 
 
 
-/*************************************
- *
- *  Scanline operations
- *
- *************************************/
 
-static int get_scanline(void)
+UINT32 mc6847_update(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	int result;
-	attotime duration;
-
-	/* get the time since last field sync */
-	duration = attotime_sub(
-		timer_starttime(m6847->hs_rise_timer),
-		timer_starttime(m6847->fs_rise_timer));
-	assert_always(duration.seconds == 0, "get_scanline(): duration exceeds one second");
-
-	if (duration.attoseconds < m6847->vblank_period)
-	{
-		result = -1;	/* vblank */
-	}
-	else
-	{
-		result = (duration.attoseconds - m6847->vblank_period)
-			/ m6847->scanline_period;
-	}
-	return result;
-}
-
-
-static int get_beamx(void)
-{
-	attotime scanline_time;
-	int result;
-
-	scanline_time = timer_timeelapsed(m6847->hs_rise_timer);
-	if (scanline_time.seconds != 0)
-		return 0;
-	assert(attotime_to_attoseconds(scanline_time) < m6847->scanline_period);
-
-	if (attotime_to_attoseconds(scanline_time) < (m6847->clock_period * 42))
-	{
-		/* hsync */
-		result = 0;
-	}
-	else if (attotime_to_attoseconds(scanline_time) < (m6847->clock_period * 95 / 2))
-	{
-		/* left border */
-		result = 0;
-	}
-	else if (attotime_to_attoseconds(scanline_time) < (m6847->clock_period * 351 / 2))
-	{
-		/* body */
-		result = (attotime_to_attoseconds(scanline_time) - (m6847->clock_period * 95 / 2))
-			/ m6847->clock_period * 2;
-	}
-	else
-	{
-		/* right border */
-		result = 256;
-	}
-	return result;
-}
-
-
-INLINE void prepare_scanline(running_machine *machine, int xpos)
-{
-	UINT8 attrs, data, attr;
-	int scanline;
-	int i, border_color;
-	int dirty;
-	const UINT8 *RESTRICT video_ram;
-	m6847_pixel *scanline_data;
-
-	scanline = get_scanline();
-
-	if (LOG_PREPARE)
-		logerror("m6847_prepare_scanline(): scanline=%d xpos=%d\n", scanline, xpos);
-
-	if ((scanline >= 0) && (scanline < (m6847->top_border_scanlines
-		+ m6847->display_scanlines + m6847->bottom_border_scanlines)))
-	{
-		if (m6847->using_custom)
-		{
-			m6847->custom_prepare_scanline(scanline);
-		}
-		else
-		{
-			/* has the border color changed? */
-			attrs = (*m6847->get_attributes)(machine, 0, 0, 0);
-			if (attrs != m6847->attrs[scanline])
-			{
-				m6847->dirty = TRUE;
-				m6847->attrs[scanline] = attrs;
-
-				/* choose the border color */
-				if (attrs & M6847_AG)
-					border_color = (attrs & M6847_CSS) ? BUFF : GREEN;
-				else if (m6847->has_lowercase && (attrs & M6847_GM2))
-					border_color = (attrs & M6847_CSS) ? LTORANGE : LTGREEN;
-				else
-					border_color = BLACK;
-
-				/* need to use palette table directly; border colors are constant */
-				m6847->border[scanline] = m6847->palette[border_color];
-			}
-
-			/* is this a display scanline? */
-			scanline -= m6847->top_border_scanlines;
-			if ((scanline >= 0) && (scanline < m6847->display_scanlines))
-			{
-				video_ram = m6847->get_video_ram(machine,scanline);
-				dirty = m6847->dirty;
-				scanline_data = m6847->screendata[scanline];
-
-				for (i = xpos; i < 32; i++)
-				{
-					data = video_ram[i];
-					attr = (*m6847->get_attributes)(machine, data, scanline, i);
-
-					if ((data != scanline_data[i].data)	|| (attr != scanline_data[i].attr))
-					{
-						dirty = TRUE;
-						scanline_data[i].data = data;
-						scanline_data[i].attr = attr;
-					}
-				}
-				m6847->dirty = dirty;
-			}
-		}
-	}
-}
-
-
-
-void m6847_video_changed(void)
-{
-	/* NPW 2-May-2006 - Commenting this out until we properly fix bug #878 */
-	/* prepare_scanline(get_beamx() / 8); */
-}
-
-
-
-/*************************************
- *
- *  Sync callbacks
- *
- *************************************/
-
-int m6847_get_horizontal_sync(running_machine *machine)
-{
-	attotime fire_time = timer_firetime(m6847->hs_fall_timer);
-	return attotime_compare(fire_time, timer_get_time(machine)) > 0;
-}
-
-
-
-static void set_horizontal_sync(running_machine *machine)
-{
-	attotime fire_time = timer_firetime(m6847->hs_fall_timer);
-	int horizontal_sync = attotime_compare(fire_time, timer_get_time(machine)) > 0;
-	if (m6847->horizontal_sync_callback)
-		m6847->horizontal_sync_callback(machine, !horizontal_sync);
-}
-
-
-
-int m6847_get_field_sync(running_machine *machine)
-{
-	attotime fire_time = timer_firetime(m6847->fs_fall_timer);
-	return attotime_compare(fire_time, timer_get_time(machine)) > 0;
-}
-
-
-
-static void set_field_sync(running_machine *machine)
-{
-	attotime fire_time = timer_firetime(m6847->fs_fall_timer);
-	int field_sync = attotime_compare(fire_time, timer_get_time(machine)) > 0;
-	if (m6847->field_sync_callback)
-		m6847->field_sync_callback(machine,field_sync);
-}
-
-
-
-/*************************************
- *
- *  Field sync/Horizontal sync timers
- *
- *************************************/
-
-static TIMER_CALLBACK(hs_fall)
-{
-	if (LOG_HS)
-		logerror("hs_fall(): time=%s\n", attotime_string(timer_get_time(machine), ATTOTIME_STRING_PRECISION));
-
-	set_horizontal_sync(machine);
-}
-
-static TIMER_CALLBACK(hs_rise)
-{
-	if (LOG_HS)
-		logerror("hs_rise(): time=%s\n", attotime_string(timer_get_time(machine), ATTOTIME_STRING_PRECISION));
-
-	timer_adjust_oneshot(m6847->hs_rise_timer,
-		attotime_make(0, m6847->scanline_period), 0);
-	timer_adjust_oneshot(m6847->hs_fall_timer,
-		attotime_make(0, m6847->horizontal_sync_period), 0);
-
-	set_horizontal_sync(machine);
-	prepare_scanline(machine,0);
-}
-
-static TIMER_CALLBACK(fs_fall)
-{
-	if (LOG_FS)
-		logerror("fs_fall(): time=%s scanline=%d\n", attotime_string(timer_get_time(machine), ATTOTIME_STRING_PRECISION), get_scanline());
-
-	set_field_sync(machine);
-}
-
-static TIMER_CALLBACK(fs_rise)
-{
-	if (LOG_FS)
-		logerror("fs_rise(): time=%s scanline=%d\n", attotime_string(timer_get_time(machine), ATTOTIME_STRING_PRECISION), get_scanline());
-
-	/* adjust field sync falling edge timer */
-	timer_adjust_oneshot(m6847->fs_fall_timer,
-		attotime_make(0, m6847->field_sync_period), 0);
-
-	/* adjust horizontal sync rising timer */
-	timer_adjust_oneshot(m6847->hs_rise_timer, attotime_zero, 0);
-
-	/* this is a hook for the CoCo 3 code to extend this stuff */
-	if (m6847->new_frame_callback)
-		m6847->using_custom = !m6847->new_frame_callback();
-
-	set_field_sync(machine);
-}
-
-
-
-/*************************************
- *
- *  Debugging
- *
- *************************************/
-
-
-static void execute_m6847_dumpscanline(running_machine *machine, int ref, int params, const char **param)
-{
-	int i;
-	int beamx = get_beamx() / 8;
-	int scanline = get_scanline();
-	const m6847_pixel *pixel = m6847->screendata[scanline];
-
-	for (i = 0; i < beamx; i++)
-	{
-		debug_console_printf(machine, "[%02d]: 0x%02X (", i, pixel[i].data);
-
-		if (pixel[i].attr & M6847_AG)		debug_console_printf(machine, " AG");
-		if (pixel[i].attr & M6847_AS)		debug_console_printf(machine, " AS");
-		if (pixel[i].attr & M6847_INTEXT)	debug_console_printf(machine, " INTEXT");
-		if (pixel[i].attr & M6847_INV)		debug_console_printf(machine, " INV");
-		if (pixel[i].attr & M6847_CSS)		debug_console_printf(machine, " CSS");
-		if (pixel[i].attr & M6847_GM2)		debug_console_printf(machine, " GM2");
-		if (pixel[i].attr & M6847_GM1)		debug_console_printf(machine, " GM1");
-		if (pixel[i].attr & M6847_GM0)		debug_console_printf(machine, " GM0");
-
-		debug_console_printf(machine, " )\n");
-	}
-}
-
-
-
-
-/*************************************
- *
- *  Initialization
- *
- *************************************/
-
-static const UINT8 *find_char(const m6847_variant *v,
-	UINT8 byte, UINT8 attr, int *fg, int *bg)
-{
-	int ch;
-	size_t offset = 0;
-
-	if (attr & M6847_AS)
-	{
-		/* semigraphics */
-		*bg = BLACK;
-
-		if (!v->has_lowercase && (attr & M6847_INTEXT))
-		{
-			/* semigraphics 6 */
-			ch = (byte & 0x3F) + 0x60;
-			*fg = ((byte >> 6) & 0x03) + ((attr & M6847_CSS) ? BUFF : GREEN);
-		}
-		else
-		{
-			/* semigraphics 4 */
-			ch = (byte & 0x0F) + 0xA0;
-			*fg = ((byte >> 4) & 0x07) + GREEN;
-		}
-	}
-	else
-	{
-		/* text */
-		ch = (byte & 0x3F) + 0x00;
-
-		if (v->has_lowercase)
-		{
-			if ((ch < 0x20) && (attr & M6847_GM0) && !(attr & M6847_INV))
-			{
-				/* this is a lowercase character */
-				attr |= M6847_INV;
-				ch += 0x40;
-			}
-
-			if ((ch > 0x20) && (attr & M6847_GM0) && !(attr & M6847_INV)) {
-				ch += 0x20;
-			}
-
-			if (attr & M6847_GM1)
-				attr ^= M6847_INV;
-
-		}
-
-		if (attr & M6847_INV)
-		{
-			/* dark foreground, light background */
-			*fg = (attr & M6847_CSS) ? DKORANGE : DKGREEN;
-			*bg = (attr & M6847_CSS) ? LTORANGE : LTGREEN;
-		}
-		else
-		{
-			/* light foreground, dark background */
-			*fg = (attr & M6847_CSS) ? LTORANGE : LTGREEN;
-			*bg = (attr & M6847_CSS) ? DKORANGE : DKGREEN;
-		}
-
-		offset = v->text_offset;
-	}
-
-	return &v->fontdata[ch * 12] + offset;
-}
-
-
-
-static void build_fontdata(const m6847_variant *v)
-{
-	int attr_index, row;
-	int fg, bg;
-	int byte;
-	const UINT8 *char_data;
-
-	for (attr_index = 0; attr_index < sizeof(m6847->fontdata) / sizeof(m6847->fontdata[0]); attr_index++)
-	{
-		UINT8 attr = attribute_from_attr_index(attr_index);
-
-		for (byte = 0; byte < 256; byte++)
-		{
-			char_data = find_char(v, byte, attr, &fg, &bg);
-
-			/* specify colors */
-			m6847->colordata[attr_index][byte / 16][0] = bg;
-			m6847->colordata[attr_index][byte / 16][1] = fg;
-
-			for (row = 0; row < 12; row++)
-			{
-				m6847->fontdata[attr_index][byte][row] = char_data[row];
-			}
-		}
-	}
-}
-
-
-
-static STATE_POSTLOAD( m6847_postload )
-{
-	set_field_sync(machine);
-	set_horizontal_sync(machine);
-	set_dirty();
-}
-
-
-
-void m6847_init(running_machine *machine, const m6847_config *cfg)
-{
-	const m6847_variant *v;
-	UINT32 frequency;
-	attoseconds_t period, frame_period, cpu0_clock_period = 0;
-	double total_scanlines;
-
-	/* identify proper M6847 variant */
-	assert(cfg->type < sizeof(variants) / sizeof(variants[0]));
-	v = &variants[cfg->type];
-
-	/* allocate instance */
-	m6847 = auto_alloc_clear(machine, m6847_vdg);
-	set_dirty();
-
-	/* copy configuration */
-	m6847->get_attributes = cfg->get_attributes;
-	m6847->get_video_ram = cfg->get_video_ram;
-	m6847->horizontal_sync_callback = cfg->horizontal_sync_callback;
-	m6847->field_sync_callback = cfg->field_sync_callback;
-	m6847->new_frame_callback = cfg->new_frame_callback;
-	m6847->custom_prepare_scanline = cfg->custom_prepare_scanline;
-	m6847->has_lowercase = v->has_lowercase;
-	m6847->get_char_rom = cfg->get_char_rom;
-
-	/* assert our assumptions */
-	assert((v->scanlines_per_frame * FACTOR_SCANLINES_PER_FRAME)
-		== (UINT32) (v->scanlines_per_frame * FACTOR_SCANLINES_PER_FRAME));
-	assert((v->clocks_per_scanline * FACTOR_CLOCKS_PER_SCANLINE)
-		== (UINT32) (v->clocks_per_scanline * FACTOR_CLOCKS_PER_SCANLINE));
-	assert((v->scanlines_per_frame * v->clocks_per_scanline * GROSS_FACTOR)
-		== (UINT32) (v->scanlines_per_frame * v->clocks_per_scanline * GROSS_FACTOR));
-
-	/* choose palette */
-	if (cfg->custom_palette)
-	{
-		m6847->has_custom_palette = 1;
-		m6847->palette = cfg->custom_palette;
-	}
-	else
-	{
-		m6847->palette = palette;
-	}
-
-	/* allocate timers */
-	m6847->fs_rise_timer = timer_alloc(machine, fs_rise, NULL);
-	m6847->fs_fall_timer = timer_alloc(machine, fs_fall, NULL);
-	m6847->hs_rise_timer = timer_alloc(machine, hs_rise, NULL);
-	m6847->hs_fall_timer = timer_alloc(machine, hs_fall, NULL);
-
-	/* setup dimensions */
-	m6847->top_border_scanlines = v->top_border_scanlines;
-	m6847->display_scanlines = v->display_scanlines;
-	m6847->bottom_border_scanlines = v->bottom_border_scanlines;
-
-	/* compute frequency and period */
-	frequency = v->frames_per_second
-		* ((UINT32) (v->scanlines_per_frame * FACTOR_SCANLINES_PER_FRAME))
-		* ((UINT32) (v->clocks_per_scanline * FACTOR_CLOCKS_PER_SCANLINE));
-	period = ATTOSECONDS_PER_SECOND / frequency;
-
-	/* choose CPU clock, if specified */
-	if (cfg->cpu0_timing_factor > 0)
-	{
-		cpu0_clock_period = period * cfg->cpu0_timing_factor * GROSS_FACTOR;
-		cpu_set_clock(machine->firstcpu, ATTOSECONDS_PER_SECOND / cpu0_clock_period);
-	}
-
-	/* calculate timing */
-	total_scanlines = v->vblank_scanlines
-		+ v->top_border_scanlines
-		+ v->display_scanlines
-		+ v->bottom_border_scanlines
-		+ v->vretrace_scanlines;
-	m6847->clock_period = period * GROSS_FACTOR;
-	m6847->scanline_period = period * (UINT32) (v->clocks_per_scanline * GROSS_FACTOR);
-	m6847->field_sync_period = period * (UINT32) (v->clocks_per_scanline * v->field_sync_scanlines * GROSS_FACTOR);
-	m6847->horizontal_sync_period = period * GROSS_FACTOR * 33 / 2;
-	m6847->vblank_period = period * (UINT32) (v->clocks_per_scanline * v->vblank_scanlines * GROSS_FACTOR);
-
-	/* setup timing */
-	frame_period = period *
-		(UINT32) (v->clocks_per_scanline * total_scanlines * GROSS_FACTOR);
-	timer_adjust_periodic(m6847->fs_rise_timer, attotime_zero, 0, attotime_make(0, frame_period));
-
-	/* setup save states */
-	state_save_register_postload(machine, m6847_postload, NULL);
-
-	/* build font */
-	build_fontdata(v);
-
-	/* dump stats */
-	if (LOG_STATS)
-	{
-		logerror("m6847_init():\n");
-		logerror("\tclock:      %30s sec\n", attotime_string(attotime_make(0, period * GROSS_FACTOR), ATTOTIME_STRING_PRECISION));
-		if (cpu0_clock_period > 0)
-			logerror("\tCPU0 clock: %30s sec\n", attotime_string(attotime_make(0, cpu0_clock_period), ATTOTIME_STRING_PRECISION));
-		logerror("\tscanline:   %30s sec\n", attotime_string(attotime_make(0, m6847->scanline_period), ATTOTIME_STRING_PRECISION));
-		logerror("\tfield sync: %30s sec\n", attotime_string(attotime_make(0, m6847->field_sync_period), ATTOTIME_STRING_PRECISION));
-		logerror("\thorz sync:  %30s sec\n", attotime_string(attotime_make(0, m6847->horizontal_sync_period), ATTOTIME_STRING_PRECISION));
-		logerror("\tvblank:     %30s sec\n", attotime_string(attotime_make(0, m6847->vblank_period), ATTOTIME_STRING_PRECISION));
-		logerror("\tframe:      %30s sec\n", attotime_string(attotime_make(0, frame_period), ATTOTIME_STRING_PRECISION));
-		logerror("\n");
-	}
-
-	/* setup debug commands */
-	if (machine->debug_flags & DEBUG_FLAG_ENABLED)
-		debug_console_register_command(machine, "m6847_dumpscanline", CMDFLAG_NONE, 0, 0, 0, execute_m6847_dumpscanline);
-}
-
-
-
-VIDEO_UPDATE(m6847)
-{
+	mc6847_state *mc6847 = get_safe_token(device);
 	int row, i;
 	UINT32 rc = 0;
 
 	/* if we have a custom palette, check to see if it has changed */
-	if (!m6847->dirty && m6847->has_custom_palette)
+	if (!mc6847->dirty && mc6847->has_custom_palette)
 	{
 		for (i = 0; i < 16; i++)
 		{
-			if (m6847->palette[i] != m6847->saved_palette[i])
+			if (mc6847->palette[i] != mc6847->saved_palette[i])
 			{
-				m6847->dirty = TRUE;
+				mc6847->dirty = TRUE;
 				break;
 			}
 		}
 	}
 
-	if (m6847->dirty)
+	if (mc6847->dirty)
 	{
 		/* this frame is dirty; render it */
-		m6847->dirty = FALSE;
+		mc6847->dirty = FALSE;
 
 		/* copy palette if we have a custom palete */
-		if (m6847->has_custom_palette)
+		if (mc6847->has_custom_palette)
 		{
 			for (i = 0; i < 16; i++)
-				m6847->saved_palette[i] = m6847->palette[i];
+				mc6847->saved_palette[i] = mc6847->palette[i];
 		}
 
 		/* the video RAM has been dirtied; need to draw */
 		for (row = cliprect->min_y; row <= cliprect->max_y; row++)
-			render_scanline(screen->machine, bitmap, row);
+			render_scanline(device, bitmap, row);
 	}
 	else
 	{
@@ -1998,17 +2216,18 @@ static UINT64 divide_mame_time(attotime dividend, attotime divisor)
 
 
 
-static attotime interval(m6847_timing_type timing)
+static attotime interval(const device_config *device, m6847_timing_type timing)
 {
+	mc6847_state *mc6847 = get_safe_token(device);
 	attotime result;
 
 	switch(timing)
 	{
 		case M6847_CLOCK:
-			result = attotime_make(0, m6847->clock_period);
+			result = attotime_make(0, mc6847->clock_period);
 			break;
 		case M6847_HSYNC:
-			result = attotime_make(0, m6847->scanline_period);
+			result = attotime_make(0, mc6847->scanline_period);
 			break;
 		default:
 			fatalerror("invalid timing type");
@@ -2019,20 +2238,20 @@ static attotime interval(m6847_timing_type timing)
 
 
 
-UINT64 m6847_time(running_machine *machine, m6847_timing_type timing)
+UINT64 m6847_time(const device_config *device, m6847_timing_type timing)
 {
-	attotime current_time = timer_get_time(machine);
-	attotime divisor = interval(timing);
+	attotime current_time = timer_get_time(device->machine);
+	attotime divisor = interval(device, timing);
 	return divide_mame_time(current_time, divisor);
 }
 
 
 
-attotime m6847_time_until(running_machine *machine, m6847_timing_type timing, UINT64 target_time)
+attotime m6847_time_until(const device_config *device, m6847_timing_type timing, UINT64 target_time)
 {
 	attotime target_mame_time, current_time;
-	target_mame_time = attotime_mul(interval(timing), target_time);
-	current_time = timer_get_time(machine);
+	target_mame_time = attotime_mul(interval(device, timing), target_time);
+	current_time = timer_get_time(device->machine);
 
 	if (attotime_compare(target_mame_time, current_time) < 0)
 		fatalerror("m6847_time_until(): cannot target past times");
@@ -2042,9 +2261,11 @@ attotime m6847_time_until(running_machine *machine, m6847_timing_type timing, UI
 
 
 
-attotime m6847_scanline_time(int scanline)
+attotime m6847_scanline_time(const device_config *device, int scanline)
 {
-	return attotime_make(0, m6847->scanline_period *
+	mc6847_state *mc6847 = get_safe_token(device);
+
+	return attotime_make(0, mc6847->scanline_period *
 			(13 /* FIXME */ + scanline));
 }
 
@@ -2060,3 +2281,9 @@ attotime m6847_scanline_time(int scanline)
 void m6847_set_dirty(void) { set_dirty(); }
 int m6847_get_scanline(void) { return get_scanline(); }
 #endif
+
+int mc6847_get_scanline(const device_config *device)
+{
+	mc6847_state *mc6847 = get_safe_token(device);
+	return get_scanline(mc6847) - mc6847->top_border_scanlines;
+}

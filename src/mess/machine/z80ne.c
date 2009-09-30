@@ -646,6 +646,24 @@ WRITE8_HANDLER(lx385_ctrl_w)
 	}
 }
 
+READ8_DEVICE_HANDLER( lx388_mc6847_videoram_r )
+{
+	int d6 = BIT(videoram[offset], 6);
+	int d7 = BIT(videoram[offset], 7);
+
+	mc6847_inv_w(device, d6 && d7);
+	mc6847_as_w(device, !d6 && d7);
+	mc6847_intext_w(device, !d6 && d7);
+
+	return videoram[offset];
+}
+
+VIDEO_UPDATE( lx388 )
+{
+	const device_config *mc6847 = devtag_get_device(screen->machine, "mc6847");
+	return mc6847_update(mc6847, bitmap, cliprect);
+}
+
 READ8_HANDLER(lx388_data_r)
 {
 	UINT8 data;
@@ -655,12 +673,10 @@ READ8_HANDLER(lx388_data_r)
 	return data;
 }
 
-READ8_HANDLER(lx388_read_field_sync)
+READ8_HANDLER( lx388_read_field_sync )
 {
-	UINT8 data;
-
-	data = m6847_get_field_sync(space->machine) ? 0x00 : 0x80;
-	return data;
+	const device_config *mc6847 = devtag_get_device(space->machine, "mc6847");
+	return mc6847_fs_r(mc6847) << 7;
 }
 
 /*

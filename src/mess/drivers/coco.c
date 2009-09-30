@@ -541,7 +541,7 @@ static INPUT_PORTS_START( coco )
 	PORT_CONFSETTING(    0x00, "Disto" )
 	PORT_CONFSETTING(    0x01, "Cloud-9" )
 
-	/* Port Condition is used because you can plug Hi-Res joystick, 
+	/* Port Condition is used because you can plug Hi-Res joystick,
 	Rat Mouse and Lightgun in either ports, but not both */
 	/* Fix me: should Rat Mouse and Diecom Light Gun be available also for coco & coco2? */
 	PORT_START("ctrl_sel")  /* Select Controller Type */
@@ -660,7 +660,7 @@ static INPUT_PORTS_START( coco3 )
 	PORT_CONFSETTING(    0x00, "Disto" )
 	PORT_CONFSETTING(    0x01, "Cloud-9" )
 
-	/* Port Condition is used because you can plug Hi-Res joystick, 
+	/* Port Condition is used because you can plug Hi-Res joystick,
 	Rat Mouse and Lightgun in either ports, but not both */
 	/* Fix me: should Rat Mouse and Diecom Light Gun be available also for coco & coco2? */
 	PORT_START("ctrl_sel")  /* Select Controller Type */
@@ -771,6 +771,38 @@ static const floppy_config coco_floppy_config =
 	DO_NOT_KEEP_GEOMETRY
 };
 
+static const mc6847_interface coco_mc6847_intf =
+{
+	DEVCB_HANDLER(coco_mc6847_videoram_r),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DEVICE_HANDLER("pia_0", pia6821_cb1_w),
+	DEVCB_DEVICE_HANDLER("pia_0", pia6821_ca1_w),
+	DEVCB_NULL
+};
+
+static const mc6847_interface coco3_mc6847_intf =
+{
+	DEVCB_HANDLER(coco3_mc6847_videoram_r),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_LINE(coco3_fs_w),
+	DEVCB_LINE(coco3_hs_w),
+	DEVCB_NULL
+};
+
 static MACHINE_DRIVER_START( dragon32 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 MHz */
@@ -782,11 +814,14 @@ static MACHINE_DRIVER_START( dragon32 )
 	MDRV_DRIVER_DATA( coco_state )
 
 	/* video hardware */
-	MDRV_VIDEO_START(dragon)
-	MDRV_VIDEO_UPDATE(m6847)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(320, 25+192+26)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
+
+	MDRV_VIDEO_UPDATE(coco)
+
+	MDRV_MC6847_ADD("mc6847", coco_mc6847_intf)
+	MDRV_MC6847_TYPE(M6847_VERSION_ORIGINAL_PAL)
 
 	/* sound hardware */
 	MDRV_IMPORT_FROM( coco_sound )
@@ -798,17 +833,17 @@ static MACHINE_DRIVER_START( dragon32 )
 	MDRV_SNAPSHOT_ADD("snapshot", coco_pak, "pak", 0)
 
 	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
-	
+
 	MDRV_PIA6821_ADD( "pia_0", dragon32_pia_intf_0 )
 	MDRV_PIA6821_ADD( "pia_1", dragon32_pia_intf_1 )
 
 	MDRV_SAM6883_ADD("sam", coco_sam_intf)
-	
+
 	MDRV_DRAGON_CARTRIDGE_ADD("coco_cartslot")
 	MDRV_DRAGON_CARTRIDGE_CART_CALLBACK(coco_cart_w)
 	MDRV_DRAGON_CARTRIDGE_HALT_CALLBACK(coco_halt_w)
 	MDRV_DRAGON_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
-	
+
 	MDRV_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
 MACHINE_DRIVER_END
 
@@ -821,13 +856,16 @@ static MACHINE_DRIVER_START( dragon64 )
 	MDRV_DRIVER_DATA( coco_state )
 
 	/* video hardware */
-	MDRV_VIDEO_START(dragon)
-	MDRV_VIDEO_UPDATE(m6847)
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(M6847_PAL_FRAMES_PER_SECOND)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(320, 25+192+26)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
+
+	MDRV_VIDEO_UPDATE(coco)
+
+	MDRV_MC6847_ADD("mc6847", coco_mc6847_intf)
+	MDRV_MC6847_TYPE(M6847_VERSION_ORIGINAL_PAL)
 
 	/* sound hardware */
 	MDRV_IMPORT_FROM( coco_sound )
@@ -843,17 +881,17 @@ static MACHINE_DRIVER_START( dragon64 )
 
 	/* acia */
 	MDRV_ACIA6551_ADD("acia")
-	
+
 	MDRV_PIA6821_ADD( "pia_0", dragon64_pia_intf_0 )
 	MDRV_PIA6821_ADD( "pia_1", dragon64_pia_intf_1 )
 
 	MDRV_SAM6883_ADD("sam", coco_sam_intf)
-	
+
 	MDRV_DRAGON_CARTRIDGE_ADD("coco_cartslot")
 	MDRV_DRAGON_CARTRIDGE_CART_CALLBACK(coco_cart_w)
 	MDRV_DRAGON_CARTRIDGE_HALT_CALLBACK(coco_halt_w)
 	MDRV_DRAGON_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
-	
+
 	MDRV_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
 MACHINE_DRIVER_END
 
@@ -866,13 +904,16 @@ static MACHINE_DRIVER_START( d64plus )
 	MDRV_DRIVER_DATA( coco_state )
 
 	/* video hardware */
-	MDRV_VIDEO_START(dragon)
-	MDRV_VIDEO_UPDATE(m6847)
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(M6847_PAL_FRAMES_PER_SECOND)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(320, 25+192+26)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
+
+	MDRV_VIDEO_UPDATE(coco)
+
+	MDRV_MC6847_ADD("mc6847", coco_mc6847_intf)
+	MDRV_MC6847_TYPE(M6847_VERSION_ORIGINAL_PAL)
 
 	/* sound hardware */
 	MDRV_IMPORT_FROM( coco_sound )
@@ -888,17 +929,17 @@ static MACHINE_DRIVER_START( d64plus )
 
 	/* acia */
 	MDRV_ACIA6551_ADD("acia")
-	
+
 	MDRV_PIA6821_ADD( "pia_0", dragon64_pia_intf_0 )
 	MDRV_PIA6821_ADD( "pia_1", dragon64_pia_intf_1 )
 
 	MDRV_SAM6883_ADD("sam", coco_sam_intf)
-	
+
 	MDRV_DRAGON_CARTRIDGE_ADD("coco_cartslot")
 	MDRV_DRAGON_CARTRIDGE_CART_CALLBACK(coco_cart_w)
 	MDRV_DRAGON_CARTRIDGE_HALT_CALLBACK(coco_halt_w)
 	MDRV_DRAGON_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
-	
+
 	MDRV_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
 MACHINE_DRIVER_END
 
@@ -911,13 +952,16 @@ static MACHINE_DRIVER_START( dgnalpha )
 	MDRV_DRIVER_DATA( coco_state )
 
 	/* video hardware */
-	MDRV_VIDEO_START(dragon)
-	MDRV_VIDEO_UPDATE(m6847)
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(M6847_PAL_FRAMES_PER_SECOND)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(320, 25+192+26)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
+
+	MDRV_VIDEO_UPDATE(coco)
+
+	MDRV_MC6847_ADD("mc6847", coco_mc6847_intf)
+	MDRV_MC6847_TYPE(M6847_VERSION_ORIGINAL_PAL)
 
 	/* sound hardware */
 	MDRV_IMPORT_FROM( coco_sound )
@@ -939,18 +983,18 @@ static MACHINE_DRIVER_START( dgnalpha )
 
 	/* acia */
 	MDRV_ACIA6551_ADD("acia")
-	
+
 	MDRV_PIA6821_ADD( "pia_0", dgnalpha_pia_intf_0 )
 	MDRV_PIA6821_ADD( "pia_1", dgnalpha_pia_intf_1 )
 	MDRV_PIA6821_ADD( "pia_2", dgnalpha_pia_intf_2 )
 
 	MDRV_SAM6883_ADD("sam", coco_sam_intf)
-	
+
 	MDRV_DRAGON_CARTRIDGE_ADD("coco_cartslot")
 	MDRV_DRAGON_CARTRIDGE_CART_CALLBACK(coco_cart_w)
 	MDRV_DRAGON_CARTRIDGE_HALT_CALLBACK(coco_halt_w)
 	MDRV_DRAGON_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
-	
+
 	MDRV_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
 MACHINE_DRIVER_END
 
@@ -963,13 +1007,16 @@ static MACHINE_DRIVER_START( tanodr64 )
 	MDRV_DRIVER_DATA( coco_state )
 
 	/* video hardware */
-	MDRV_VIDEO_START(dragon)
-	MDRV_VIDEO_UPDATE(m6847)
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(COCO_FRAMES_PER_SECOND)			/* Tano Dragon 64 is NTSC */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(320, 25+192+26)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
+
+	MDRV_VIDEO_UPDATE(coco)
+
+	MDRV_MC6847_ADD("mc6847", coco_mc6847_intf)
+	MDRV_MC6847_TYPE(M6847_VERSION_ORIGINAL_PAL)
 
 	/* sound hardware */
 	MDRV_IMPORT_FROM( coco_sound )
@@ -985,17 +1032,17 @@ static MACHINE_DRIVER_START( tanodr64 )
 
 	/* acia */
 	MDRV_ACIA6551_ADD("acia")
-	
+
 	MDRV_PIA6821_ADD( "pia_0", dragon64_pia_intf_0 )
 	MDRV_PIA6821_ADD( "pia_1", dragon64_pia_intf_1 )
 
 	MDRV_SAM6883_ADD("sam", coco_sam_intf)
-	
+
 	MDRV_DRAGON_CARTRIDGE_ADD("coco_cartslot")
 	MDRV_DRAGON_CARTRIDGE_CART_CALLBACK(coco_cart_w)
 	MDRV_DRAGON_CARTRIDGE_HALT_CALLBACK(coco_halt_w)
 	MDRV_DRAGON_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
-	
+
 	MDRV_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
 MACHINE_DRIVER_END
 
@@ -1010,11 +1057,15 @@ static MACHINE_DRIVER_START( coco )
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(M6847_NTSC_FRAMES_PER_SECOND)
-	MDRV_VIDEO_START(coco)
-	MDRV_VIDEO_UPDATE(m6847)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(320, 25+192+26)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
+
+	MDRV_VIDEO_UPDATE(coco)
+
+	MDRV_MC6847_ADD("mc6847", coco_mc6847_intf)
+	MDRV_MC6847_TYPE(M6847_VERSION_ORIGINAL_NTSC)
+	MDRV_MC6847_TIMING_FACTOR(4)
 
 	/* sound hardware */
 	MDRV_IMPORT_FROM( coco_sound )
@@ -1028,17 +1079,17 @@ static MACHINE_DRIVER_START( coco )
 
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
-	
+
 	MDRV_PIA6821_ADD( "pia_0", coco_pia_intf_0 )
 	MDRV_PIA6821_ADD( "pia_1", coco_pia_intf_1 )
 
 	MDRV_SAM6883_ADD("sam", coco_sam_intf)
-	
+
 	MDRV_COCO_CARTRIDGE_ADD("coco_cartslot")
 	MDRV_COCO_CARTRIDGE_CART_CALLBACK(coco_cart_w)
 	MDRV_COCO_CARTRIDGE_HALT_CALLBACK(coco_halt_w)
 	MDRV_COCO_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
-	
+
 	MDRV_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
 MACHINE_DRIVER_END
 
@@ -1056,8 +1107,12 @@ static MACHINE_DRIVER_START( coco2 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(320, 25+192+26)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
-	MDRV_VIDEO_START(coco)
-	MDRV_VIDEO_UPDATE(m6847)
+
+	MDRV_VIDEO_UPDATE(coco)
+
+	MDRV_MC6847_ADD("mc6847", coco_mc6847_intf)
+	MDRV_MC6847_TYPE(M6847_VERSION_ORIGINAL_NTSC)
+	MDRV_MC6847_TIMING_FACTOR(4)
 
 	/* sound hardware */
 	MDRV_IMPORT_FROM( coco_sound )
@@ -1071,17 +1126,17 @@ static MACHINE_DRIVER_START( coco2 )
 
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
-	
+
 	MDRV_PIA6821_ADD( "pia_0", coco2_pia_intf_0 )
 	MDRV_PIA6821_ADD( "pia_1", coco2_pia_intf_1 )
 
 	MDRV_SAM6883_ADD("sam", coco_sam_intf)
-	
+
 	MDRV_COCO_CARTRIDGE_ADD("coco_cartslot")
 	MDRV_COCO_CARTRIDGE_CART_CALLBACK(coco_cart_w)
 	MDRV_COCO_CARTRIDGE_HALT_CALLBACK(coco_halt_w)
 	MDRV_COCO_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
-	
+
 	MDRV_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
 MACHINE_DRIVER_END
 
@@ -1099,8 +1154,12 @@ static MACHINE_DRIVER_START( coco2b )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(320, 25+192+26)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
-	MDRV_VIDEO_START(coco2b)
-	MDRV_VIDEO_UPDATE(m6847)
+
+	MDRV_VIDEO_UPDATE(coco)
+
+	MDRV_MC6847_ADD("mc6847", coco_mc6847_intf)
+	MDRV_MC6847_TYPE(M6847_VERSION_M6847T1_NTSC)
+	MDRV_MC6847_TIMING_FACTOR(4)
 
 	/* sound hardware */
 	MDRV_IMPORT_FROM( coco_sound )
@@ -1114,17 +1173,17 @@ static MACHINE_DRIVER_START( coco2b )
 
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
-	
+
 	MDRV_PIA6821_ADD( "pia_0", coco2_pia_intf_0 )
 	MDRV_PIA6821_ADD( "pia_1", coco2_pia_intf_1 )
 
 	MDRV_SAM6883_ADD("sam", coco_sam_intf)
-	
+
 	MDRV_COCO_CARTRIDGE_ADD("coco_cartslot")
 	MDRV_COCO_CARTRIDGE_CART_CALLBACK(coco_cart_w)
 	MDRV_COCO_CARTRIDGE_HALT_CALLBACK(coco_halt_w)
 	MDRV_COCO_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
-	
+
 	MDRV_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
 MACHINE_DRIVER_END
 
@@ -1154,6 +1213,12 @@ static MACHINE_DRIVER_START( coco3 )
 	MDRV_SCREEN_SIZE(640, 25+192+26)
 	MDRV_SCREEN_VISIBLE_AREA(0, 639, 0, 239)
 
+	MDRV_MC6847_ADD("mc6847", coco3_mc6847_intf)
+	MDRV_MC6847_TYPE(M6847_VERSION_GIME_NTSC)
+	MDRV_MC6847_TIMING_FACTOR(4)
+	MDRV_MC6847_FRAME_CALLBACK(coco3_new_frame)
+	MDRV_MC6847_PREPARE_SCANLINE(coco3_prepare_scanline)
+
 	MDRV_PIA6821_ADD( "pia_0", coco3_pia_intf_0 )
 	MDRV_PIA6821_ADD( "pia_1", coco3_pia_intf_1 )
 
@@ -1172,14 +1237,14 @@ static MACHINE_DRIVER_START( coco3 )
 
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
-	
+
 	MDRV_SAM6883_GIME_ADD("sam", coco3_sam_intf)
-	
+
 	MDRV_COCO_CARTRIDGE_ADD("coco_cartslot")
 	MDRV_COCO_CARTRIDGE_CART_CALLBACK(coco3_cart_w)
 	MDRV_COCO_CARTRIDGE_HALT_CALLBACK(coco_halt_w)
 	MDRV_COCO_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
-	
+
 	MDRV_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
 MACHINE_DRIVER_END
 
@@ -1187,12 +1252,13 @@ static MACHINE_DRIVER_START( coco3p )
 	MDRV_IMPORT_FROM( coco3 )
 
 	/* video hardware */
-	MDRV_VIDEO_START(coco3p)
-	MDRV_VIDEO_UPDATE(coco3)
 	MDRV_SCREEN_MODIFY("composite")
 	MDRV_SCREEN_REFRESH_RATE(M6847_PAL_FRAMES_PER_SECOND)
 	MDRV_SCREEN_MODIFY("rgb")
 	MDRV_SCREEN_REFRESH_RATE(M6847_PAL_FRAMES_PER_SECOND)
+
+	MDRV_DEVICE_MODIFY("mc6847")
+	MDRV_MC6847_TYPE(M6847_VERSION_GIME_PAL)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco3h )
@@ -1384,7 +1450,7 @@ static SYSTEM_CONFIG_START(tanodr64)
 	CONFIG_RAM_DEFAULT	(64 * 1024)
 SYSTEM_CONFIG_END
 
-static SYSTEM_CONFIG_START(dgnalpha)	
+static SYSTEM_CONFIG_START(dgnalpha)
 	CONFIG_RAM_DEFAULT	(64 * 1024)
 SYSTEM_CONFIG_END
 

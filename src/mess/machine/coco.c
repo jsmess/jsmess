@@ -125,6 +125,7 @@ static emu_timer *mux_sel2_timer;
 static UINT8 mux_sel1, mux_sel2;
 
 static WRITE8_DEVICE_HANDLER ( d_pia1_pb_w );
+static WRITE8_DEVICE_HANDLER( d_pia1_pb_w_coco2 );
 static WRITE8_DEVICE_HANDLER ( d_pia1_pa_w );
 static READ8_DEVICE_HANDLER ( d_pia1_pa_r );
 static WRITE8_DEVICE_HANDLER ( d_pia0_pa_w );
@@ -332,7 +333,7 @@ const pia6821_interface coco2_pia_intf_1 =
 	DEVCB_NULL,
 	/*outputs: A/B,CA/B2	   */
 	DEVCB_HANDLER(d_pia1_pa_w),
-	DEVCB_HANDLER(d_pia1_pb_w),
+	DEVCB_HANDLER(d_pia1_pb_w_coco2),
 	DEVCB_HANDLER(d_pia1_ca2_w),
 	DEVCB_HANDLER(d_pia1_cb2_w),
 	/*irqs	 : A/B			   */
@@ -1032,19 +1033,18 @@ static void coco3_raise_interrupt(running_machine *machine, UINT8 mask, int stat
 
 
 
-void coco3_horizontal_sync_callback(running_machine *machine,int data)
+WRITE_LINE_DEVICE_HANDLER( coco3_hs_w )
 {
-	coco_state *state = machine->driver_data;
-	pia6821_ca1_w(state->pia_0, 0, data);
-	coco3_raise_interrupt(machine, COCO3_INT_HBORD, data);
+	coco_state *coco = device->machine->driver_data;
+	pia6821_ca1_w(coco->pia_0, 0, state);
+	coco3_raise_interrupt(device->machine, COCO3_INT_HBORD, state);
 }
 
 
-
-void coco3_field_sync_callback(running_machine *machine,int data)
+WRITE_LINE_DEVICE_HANDLER( coco3_fs_w )
 {
-	coco_state *state = machine->driver_data;
-	pia6821_cb1_w(state->pia_0, 0, data);
+	coco_state *coco = device->machine->driver_data;
+	pia6821_cb1_w(coco->pia_0, 0, state);
 }
 
 void coco3_gime_field_sync_callback(running_machine *machine)
@@ -1096,7 +1096,7 @@ static attotime coco_hiresjoy_computetransitiontime(running_machine *machine, UI
 {
 	double val;
 	UINT8 ctrl = input_port_read_safe(machine, "ctrl_sel", 0x00);
-	/* this function gets only called for hi-res joystick. hence, ctrl can only take values 
+	/* this function gets only called for hi-res joystick. hence, ctrl can only take values
 	   0x04, 0x40 (hi-res) or 0x05, 0x50 (hi-res coco3max) */
 	UINT8 coco3max = ((ctrl & 0x0f) == 0x05 || (ctrl & 0xf0) == 0x50) ? 1 : 0;
 
@@ -1370,9 +1370,9 @@ static UINT8 coco_update_keyboard(running_machine *machine)
 
 	static const char *const portnames[2][6][2] =
 			{
-				{ {0}, {"joystick_rx", "joystick_ry"}, {"rat_mouse_rx", "rat_mouse_ry"}, {"dclg_rx", "dclg_ry"}, 
+				{ {0}, {"joystick_rx", "joystick_ry"}, {"rat_mouse_rx", "rat_mouse_ry"}, {"dclg_rx", "dclg_ry"},
 					{"joystick_hires_rx", "joystick_hires_ry"}, {"joystick_hires_max_rx", "joystick_hires_max_ry"} },	/* right ports */
-				{ {0}, {"joystick_lx", "joystick_ly"}, {"rat_mouse_lx", "rat_mouse_ly"}, {"dclg_lx", "dclg_ly"}, 
+				{ {0}, {"joystick_lx", "joystick_ly"}, {"rat_mouse_lx", "rat_mouse_ly"}, {"dclg_lx", "dclg_ly"},
 					{"joystick_hires_lx", "joystick_hires_ly"}, {"joystick_hires_max_lx", "joystick_hires_max_ly"} },	/* left ports */
 			};
 
@@ -1556,7 +1556,7 @@ static WRITE8_DEVICE_HANDLER ( d_pia1_pa_w )
 	coco_sound_update(device->machine);
 
 	/* Diecom Light Gun (either in Left or in Right Port) writes here */
-	if ((input_port_read_safe(device->machine, "ctrl_sel", 0x00) & 0x0f) == 0x03 || 
+	if ((input_port_read_safe(device->machine, "ctrl_sel", 0x00) & 0x0f) == 0x03 ||
 		(input_port_read_safe(device->machine, "ctrl_sel", 0x00) & 0xf0) == 0x30)
 	{
 		int dclg_this_bit = ((data & 2) >> 1);
@@ -1611,7 +1611,7 @@ static WRITE8_DEVICE_HANDLER ( d_pia1_pa_w )
 	else if ((input_port_read_safe(device->machine, "ctrl_sel", 0x00) & 0xf0) == 0x40)
 		coco_hiresjoy_w(device->machine, dac >= 0x80, 1);
 
-	/* Handle printer output, serial for CoCos, Paralell for Dragons */
+	/* Handle printer output, serial for CoCos, parallel for Dragons */
 
 	printer_out(device->machine, data);
 }
@@ -1626,7 +1626,33 @@ static WRITE8_DEVICE_HANDLER ( d_pia1_pa_w )
 
 static WRITE8_DEVICE_HANDLER( d_pia1_pb_w )
 {
-	m6847_video_changed();
+	coco_state *state = device->machine->driver_data;
+
+	mc6847_css_w(state->mc6847, BIT(data, 3));
+	mc6847_gm0_w(state->mc6847, BIT(data, 4));
+	mc6847_intext_w(state->mc6847, BIT(data, 4));
+	mc6847_gm1_w(state->mc6847, BIT(data, 5));
+	mc6847_gm2_w(state->mc6847, BIT(data, 6));
+	mc6847_ag_w(state->mc6847, BIT(data, 7));
+
+	/* PB1 will drive the sound output.  This is a rarely
+	 * used single bit sound mode. It is always connected thus
+	 * cannot be disabled.
+	 *
+	 * Source:  Page 31 of the Tandy Color Computer Service Manual
+	 */
+	coco_sound_update(device->machine);
+}
+
+static WRITE8_DEVICE_HANDLER( d_pia1_pb_w_coco2 )
+{
+	coco_state *state = device->machine->driver_data;
+
+	mc6847_css_w(state->mc6847, BIT(data, 3));
+	mc6847_gm0_w(state->mc6847, BIT(data, 4));
+	mc6847_gm1_w(state->mc6847, BIT(data, 5));
+	mc6847_gm2_w(state->mc6847, BIT(data, 6));
+	mc6847_ag_w(state->mc6847, BIT(data, 7));
 
 	/* PB1 will drive the sound output.  This is a rarely
 	 * used single bit sound mode. It is always connected thus
@@ -2174,6 +2200,8 @@ static emu_timer *coco3_gime_timer;
 
 static void coco3_timer_reset(running_machine *machine)
 {
+	coco_state *state = machine->driver_data;
+
 	/* reset the timer; take the value stored in $FF94-5 and start the timer ticking */
 	UINT64 current_time;
 	UINT16 timer_value;
@@ -2195,10 +2223,10 @@ static void coco3_timer_reset(running_machine *machine)
 		timing = (coco3_gimereg[1] & 0x20) ? M6847_CLOCK : M6847_HSYNC;
 
 		/* determine the current time */
-		current_time = m6847_time(machine, timing);
+		current_time = m6847_time(state->mc6847, timing);
 
 		/* calculate the time */
-		target_time = m6847_time_until(machine, timing, current_time + timer_value);
+		target_time = m6847_time_until(state->mc6847, timing, current_time + timer_value);
 		if (LOG_TIMER)
 			logerror("coco3_reset_timer(): target_time=%g\n", attotime_to_double(target_time));
 
@@ -2790,6 +2818,7 @@ static void generic_init_machine(running_machine *machine, const machine_init_in
 	state->pia_0			= devtag_get_device(machine, "pia_0");
 	state->pia_1			= devtag_get_device(machine, "pia_1");
 	state->pia_2			= devtag_get_device(machine, "pia_2");
+	state->mc6847			= devtag_get_device(machine, "mc6847");
 
 	/* clear static variables */
 	coco_hiresjoy_ca = 1;
@@ -2945,7 +2974,7 @@ static STATE_POSTLOAD( coco3_state_postload )
 static void update_lightgun(running_machine *machine)
 {
 	/* is there a Diecom Light Gun either in Left or in Right Port? */
-	int is_lightgun = ((input_port_read_safe(machine, "ctrl_sel", 0x00) & 0x0f) == 0x03 || 
+	int is_lightgun = ((input_port_read_safe(machine, "ctrl_sel", 0x00) & 0x0f) == 0x03 ||
 					(input_port_read_safe(machine, "ctrl_sel", 0x00) & 0xf0) == 0x30) ? 1 :0;
 
 	crosshair_set_screen(machine, 0, is_lightgun ? CROSSHAIR_SCREEN_ALL : CROSSHAIR_SCREEN_NONE);
@@ -2969,7 +2998,7 @@ MACHINE_START( coco3 )
 	memset(&init, 0, sizeof(init));
 	init.recalc_interrupts_	= coco3_recalc_interrupts;
 	init.printer_out_		= printer_out_coco;
-		
+
 	generic_init_machine(machine, &init);
 
 	/* CoCo 3 specific function pointers */

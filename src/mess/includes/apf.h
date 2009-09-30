@@ -8,14 +8,6 @@
 #define APF_H_
 
 
-/*----------- defined in video/apf.c -----------*/
-
-extern unsigned char *apf_video_ram;
-
-VIDEO_START(apf);
-extern UINT8 apf_m6847_attr;
-
-
 /*----------- defined in drivers/apf.c -----------*/
 
 extern unsigned char apf_ints;

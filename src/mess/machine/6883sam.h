@@ -18,6 +18,7 @@
 #define __6833SAM_H__
 
 #include "driver.h"
+#include "devcb.h"
 
 
 /***************************************************************************
@@ -79,6 +80,10 @@ const UINT8 *sam_m6847_get_video_ram(const device_config *device,int scanline);
 UINT8 get_sam_memorysize(const device_config *device);
 UINT8 get_sam_pagemode(const device_config *device);
 UINT8 get_sam_maptype(const device_config *device);
+
+#if 0
+WRITE_LINE_DEVICE_HANDLER( sam6883_hs_w );
+#endif
 
 
 /***************************************************************************

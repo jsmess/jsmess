@@ -171,6 +171,18 @@ WRITE8_DEVICE_HANDLER(sam6883_w)
 	}
 }
 
+#if 0
+WRITE_LINE_DEVICE_HANDLER( sam6883_hs_w )
+{
+	sam6883_t *sam = get_safe_token(device);
+}
+
+WRITE8_DEVICE_HANDLER( sam6883_da_w )
+{
+	sam6883_t *sam = get_safe_token(device);
+}
+#endif
+
 const UINT8 *sam_m6847_get_video_ram(const device_config *device,int scanline)
 {
 	sam6883_t *sam = get_safe_token(device);

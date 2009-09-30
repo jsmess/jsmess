@@ -19,7 +19,8 @@ READ8_HANDLER ( mc10_port2_r );
 WRITE8_HANDLER ( mc10_port1_w );
 WRITE8_HANDLER ( mc10_port2_w );
 
-VIDEO_START( mc10 );
+READ8_DEVICE_HANDLER(mc10_mc6847_videoram_r);
+VIDEO_UPDATE(mc10);
 MACHINE_START( mc10 );
 
 

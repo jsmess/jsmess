@@ -288,6 +288,8 @@ READ8_DEVICE_HANDLER ( atom_8255_portb_r )
 
 READ8_DEVICE_HANDLER ( atom_8255_portc_r )
 {
+	const device_config *mc6847 = devtag_get_device(device->machine, "mc6847");
+
 	atom_8255_portc &= 0x0f;
 
 	/* cassette input */
@@ -302,8 +304,8 @@ READ8_DEVICE_HANDLER ( atom_8255_portc_r )
 		atom_8255_portc |= (1<<4);
 	}
 
-	atom_8255_portc |= (m6847_get_field_sync(device->machine) ? 0x00 : 0x80);
 	atom_8255_portc |= (input_port_read(device->machine, "KEY11") & 0x40);
+	atom_8255_portc |= mc6847_fs_r(mc6847) << 7;
 	/* logerror("8255: Read port c (%02X)\n",atom_8255.atom_8255_portc); */
 	return (atom_8255_portc);
 }
@@ -322,8 +324,15 @@ READ8_DEVICE_HANDLER ( atom_8255_portc_r )
 
 */
 
-WRITE8_DEVICE_HANDLER ( atom_8255_porta_w )
+WRITE8_DEVICE_HANDLER( atom_8255_porta_w )
 {
+	const device_config *mc6847 = devtag_get_device(device->machine, "mc6847");
+
+	mc6847_ag_w(mc6847, BIT(data, 4));
+	mc6847_gm0_w(mc6847, BIT(data, 5));
+	mc6847_gm1_w(mc6847, BIT(data, 6));
+	mc6847_gm2_w(mc6847, BIT(data, 7));
+
 	atom_8255_porta = data;
 }
 
@@ -334,8 +343,12 @@ WRITE8_DEVICE_HANDLER ( atom_8255_portb_w )
 
 WRITE8_DEVICE_HANDLER(atom_8255_portc_w)
 {
-	atom_8255_portc = data;
+	const device_config *mc6847 = devtag_get_device(device->machine, "mc6847");
+
 	speaker_level_w(device, BIT(data, 2));
+	mc6847_css_w(mc6847, BIT(data, 3));
+
+	atom_8255_portc = data;
 }
 
 
@@ -382,3 +395,22 @@ MACHINE_RESET( atomeb )
 	atom_eprom_box_init(machine);
 }
 
+
+/***************************************************************************
+    MC6847 VDP
+***************************************************************************/
+
+READ8_DEVICE_HANDLER( atom_mc6847_videoram_r )
+{
+	mc6847_as_w(device, BIT(videoram[offset], 6));
+	mc6847_intext_w(device, BIT(videoram[offset], 6));
+	mc6847_inv_w(device, BIT(videoram[offset], 7));
+
+	return videoram[offset];
+}
+
+VIDEO_UPDATE( atom )
+{
+	const device_config *mc6847 = devtag_get_device(screen->machine, "mc6847");
+	return mc6847_update(mc6847, bitmap, cliprect);
+}

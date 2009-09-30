@@ -40,11 +40,8 @@ READ8_HANDLER ( vtech1_serial_r );
 WRITE8_HANDLER( vtech1_serial_w );
 WRITE8_HANDLER( vtech1_memory_bank_w );
 
-
-/*----------- defined in video/vtech1.c -----------*/
-
-VIDEO_START( vtech1_monochrome );
-VIDEO_START( vtech1 );
+READ8_DEVICE_HANDLER(vtech1_mc6847_videoram_r);
+VIDEO_UPDATE(vtech1);
 
 
 #endif /* VTECH1_H_ */

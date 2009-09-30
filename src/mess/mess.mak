@@ -509,7 +509,6 @@ $(MESSOBJ)/acorn.a:				\
 	$(MAME_MACHINE)/archimds.o	\
 	$(MESS_DRIVERS)/z88.o		\
 	$(MESS_VIDEO)/z88.o			\
-	$(MESS_VIDEO)/atom.o		\
 	$(MESS_DRIVERS)/atom.o		\
 	$(MESS_MACHINE)/atom.o		\
 	$(MESS_FORMATS)/uef_cas.o	\
@@ -545,7 +544,6 @@ $(MESSOBJ)/amstrad.a:			\
 
 $(MESSOBJ)/apf.a:				\
 	$(MESS_DRIVERS)/apf.o		\
-	$(MESS_VIDEO)/apf.o			\
 	$(MESS_FORMATS)/apf_apt.o	\
 
 $(MESSOBJ)/apple.a:				\
@@ -1012,7 +1010,6 @@ $(MESSOBJ)/nascom.a:			\
 
 $(MESSOBJ)/ne.a:				\
 	$(MESS_DRIVERS)/z80ne.o     \
-	$(MESS_VIDEO)/z80ne.o       \
 	$(MESS_FORMATS)/z80ne_dsk.o \
 	$(MESS_MACHINE)/z80ne.o     \
 
@@ -1455,7 +1452,6 @@ $(MESSOBJ)/votrax.a:			\
 	$(MESS_DRIVERS)/votrtnt.o	\
 
 $(MESSOBJ)/vtech.a:				\
-	$(MESS_VIDEO)/vtech1.o		\
 	$(MESS_MACHINE)/vtech1.o	\
 	$(MESS_DRIVERS)/vtech1.o	\
 	$(MESS_VIDEO)/vtech2.o		\

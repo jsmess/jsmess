@@ -272,6 +272,22 @@ static const floppy_config atom_floppy_config =
 	DO_NOT_KEEP_GEOMETRY
 };
 
+static const mc6847_interface atom_mc6847_intf =
+{
+	DEVCB_HANDLER(atom_mc6847_videoram_r),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
 /* machine definition */
 static MACHINE_DRIVER_START( atom )
 	/* basic machine hardware */
@@ -286,11 +302,13 @@ static MACHINE_DRIVER_START( atom )
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(M6847_PAL_FRAMES_PER_SECOND)
 
-	MDRV_VIDEO_START(atom)
-	MDRV_VIDEO_UPDATE(m6847)
+	MDRV_VIDEO_UPDATE(atom)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(320, 25+192+26)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
+
+	MDRV_MC6847_ADD("mc6847", atom_mc6847_intf)
+	MDRV_MC6847_TYPE(M6847_VERSION_ORIGINAL_PAL)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -311,7 +329,7 @@ static MACHINE_DRIVER_START( atom )
 
 	/* i8271 */
 	MDRV_I8271_ADD("i8271", atom_8271_interface)
-	
+
 	MDRV_FLOPPY_2_DRIVES_ADD(atom_floppy_config)
 MACHINE_DRIVER_END
 

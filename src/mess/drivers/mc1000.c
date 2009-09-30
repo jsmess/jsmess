@@ -124,10 +124,15 @@ static WRITE8_HANDLER( mc6847_attr_w )
 	mc1000_state *state = space->machine->driver_data;
 
 	state->mc6847_bank = BIT(data, 0);
+	mc6847_css_w(state->mc6847, BIT(data, 1));
+	mc6847_gm0_w(state->mc6847, BIT(data, 2));
+	mc6847_gm1_w(state->mc6847, BIT(data, 3));
+	mc6847_gm2_w(state->mc6847, BIT(data, 4));
+	mc6847_intext_w(state->mc6847, BIT(data, 5));
+	mc6847_as_w(state->mc6847, BIT(data, 6));
+	mc6847_ag_w(state->mc6847, BIT(data, 7));
 
 	mc1000_bankswitch(space->machine);
-
-	state->mc6847_attr = data;
 }
 
 /* Memory Maps */
@@ -239,84 +244,31 @@ INPUT_PORTS_END
 
 /* Video */
 
-static void mc1000_hsync(running_machine *machine, int data)
+static WRITE_LINE_DEVICE_HANDLER( mc1000_mc6847_fs_w )
 {
-	mc1000_state *state = machine->driver_data;
-
-	state->hsync = data;
+	mc1000_state *mc1000 = device->machine->driver_data;
+	mc1000->vsync = state;
 }
 
-static void mc1000_vsync(running_machine *machine, int data)
+static WRITE_LINE_DEVICE_HANDLER( mc1000_mc6847_hs_w )
 {
-	mc1000_state *state = machine->driver_data;
-
-	state->vsync = data;
+	mc1000_state *mc1000 = device->machine->driver_data;
+	mc1000->hsync = state;
 }
 
-static ATTR_CONST UINT8 mc1000_get_attributes(running_machine *machine, UINT8 c, int scanline, int pos)
+static READ8_DEVICE_HANDLER( mc1000_mc6847_videoram_r )
 {
-	mc1000_state *state = machine->driver_data;
+	mc1000_state *state = device->machine->driver_data;
 
-	UINT8 data = 0;
+	mc6847_inv_w(device, BIT(state->mc6847_video_ram[offset], 7));
 
-	data |= BIT(c, 7) ? M6847_INV : 0;
-	data |= BIT(state->mc6847_attr, 1) ? M6847_CSS : 0;
-	data |= BIT(state->mc6847_attr, 2) ? M6847_GM0 : 0;
-	data |= BIT(state->mc6847_attr, 3) ? M6847_GM1 : 0;
-	data |= BIT(state->mc6847_attr, 4) ? M6847_GM2 : 0;
-	data |= BIT(state->mc6847_attr, 5) ? M6847_INTEXT : 0;
-	data |= BIT(state->mc6847_attr, 6) ? M6847_AS : 0;
-	data |= BIT(state->mc6847_attr, 7) ? M6847_AG : 0;
-
-	return data;
+	return state->mc6847_video_ram[offset];
 }
 
-#if 0
-static UINT8 mc1000_get_char_rom(running_machine *machine, UINT8 ch,int line)
+static VIDEO_UPDATE( mc1000 )
 {
-   return ch;
-}
-#endif
-
-static const UINT8 *mc1000_get_video_ram(running_machine *machine, int scanline)
-{
-	mc1000_state *state = machine->driver_data;
-
-	UINT16 addr = 0;
-
-	if (BIT(state->mc6847_attr, 7))
-	{
-		switch ((state->mc6847_attr >> 2) & 0x07)
-		{
-		case 0:	case 1: addr = (scanline / 3) * 0x10; break;
-		case 2:			addr = (scanline / 3) * 0x20; break;
-		case 3:	case 5: addr = (scanline / 2) * 0x10; break;
-		case 4:			addr = (scanline / 2) * 0x20; break;
-		case 6:	case 7: addr = scanline * 0x20; break;
-		}
-	}
-	else
-	{
-		addr = (scanline / 12) * 0x20;
-	}
-
-	return state->mc6847_video_ram + addr;
-}
-
-static VIDEO_START( mc1000 )
-{
-	m6847_config cfg;
-
-	memset(&cfg, 0, sizeof(cfg));
-
-	cfg.type = M6847_VERSION_ORIGINAL_NTSC;
-	cfg.horizontal_sync_callback = mc1000_hsync;
-	cfg.field_sync_callback = mc1000_vsync;
-	cfg.get_attributes = mc1000_get_attributes;
-	cfg.get_video_ram = mc1000_get_video_ram;
-//	cfg.get_char_rom = mc1000_get_char_rom;
-
-	m6847_init(machine, &cfg);
+	mc1000_state *state = screen->machine->driver_data;
+	return mc6847_update(state->mc6847, bitmap, cliprect);
 }
 
 /* AY-3-8910 Interface */
@@ -371,6 +323,7 @@ static MACHINE_START( mc1000 )
 
 	/* find devices */
 	state->mc6845 = devtag_get_device(machine, MC6845_TAG);
+	state->mc6847 = devtag_get_device(machine, MC6847_TAG);
 	state->centronics = devtag_get_device(machine, CENTRONICS_TAG);
 	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
 
@@ -406,7 +359,6 @@ static MACHINE_START( mc1000 )
 	state_save_register_global(machine, state->keylatch);
 	state_save_register_global(machine, state->hsync);
 	state_save_register_global(machine, state->vsync);
-	state_save_register_global(machine, state->mc6847_attr);
 }
 
 static MACHINE_RESET( mc1000 )
@@ -443,6 +395,22 @@ static const cassette_config mc1000_cassette_config =
 	CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED
 };
 
+static const mc6847_interface mc1000_mc6847_intf =
+{
+	DEVCB_HANDLER(mc1000_mc6847_videoram_r),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_LINE(mc1000_mc6847_fs_w),
+	DEVCB_LINE(mc1000_mc6847_hs_w),
+	DEVCB_NULL
+};
+
 static MACHINE_DRIVER_START( mc1000 )
 	MDRV_DRIVER_DATA(mc1000_state)
 
@@ -465,8 +433,10 @@ static MACHINE_DRIVER_START( mc1000 )
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
     MDRV_PALETTE_LENGTH(16)
 
-    MDRV_VIDEO_START(mc1000)
-    MDRV_VIDEO_UPDATE(m6847)
+    MDRV_VIDEO_UPDATE(mc1000)
+
+    MDRV_MC6847_ADD(MC6847_TAG, mc1000_mc6847_intf)
+    MDRV_MC6847_TYPE(M6847_VERSION_ORIGINAL_NTSC)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

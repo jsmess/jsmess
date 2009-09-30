@@ -17,109 +17,41 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "machine/6821pia.h"
 #include "machine/6883sam.h"
 #include "video/m6847.h"
 #include "includes/coco.h"
 
 
-/*************************************
- *
- *	Code
- *
- *************************************/
+/* TODO: this is really hacky, needs an updated/rewritten sam emulation
+ * to work correctly.
+ */
 
-ATTR_CONST UINT8 coco_get_attributes_2(running_machine *machine, UINT8 c, int scanline, int pos)
+static int last_scanline = -1;
+const UINT8 *coco_videoram = 0;
+
+READ8_DEVICE_HANDLER( coco_mc6847_videoram_r )
 {
-	coco_state *state = machine->driver_data;
-	UINT8 result = 0x00;
-	UINT8 pia1_pb = pia6821_get_output_b(state->pia_1);
+	coco_state *state = device->machine->driver_data;
+	int scanline;
 
-	if (c & 0x40)		result |= M6847_INV;
-	if (c & 0x80)		result |= M6847_AS;
-	if (pia1_pb & 0x08)	result |= M6847_CSS;
-	if (pia1_pb & 0x10)	result |= M6847_GM0;
-	if (pia1_pb & 0x20)	result |= M6847_GM1;
-	if (pia1_pb & 0x40)	result |= M6847_GM2;
-	if (pia1_pb & 0x80)	result |= M6847_AG;
-	return result;
-}
+	scanline = mc6847_get_scanline(device);
 
-ATTR_CONST UINT8 coco_get_attributes(running_machine *machine, UINT8 c, int scanline, int pos)
-{
-	coco_state *state = machine->driver_data;
-	UINT8 result = 0x00;
-	UINT8 pia1_pb = pia6821_get_output_b(state->pia_1);
-
-	if (c & 0x40)		result |= M6847_INV;
-	if (c & 0x80)		result |= M6847_AS;
-	if (pia1_pb & 0x08)	result |= M6847_CSS;
-	if (pia1_pb & 0x10)	result |= M6847_GM0 | M6847_INTEXT;
-	if (pia1_pb & 0x20)	result |= M6847_GM1;
-	if (pia1_pb & 0x40)	result |= M6847_GM2;
-	if (pia1_pb & 0x80)	result |= M6847_AG;
-	return result;
-}
-
-
-static void coco_horizontal_sync_callback(running_machine *machine, int data)
-{
-	coco_state *state = machine->driver_data;
-	pia6821_ca1_w(state->pia_0, 0, data);
-}
-
-
-
-static void coco_field_sync_callback(running_machine *machine, int data)
-{
-	coco_state *state = machine->driver_data;
-	pia6821_cb1_w(state->pia_0, 0, data);
-}
-
-static const UINT8 *get_video_ram_coco(running_machine *machine,int scanline)
-{
-	coco_state *state = machine->driver_data;
-	return sam_m6847_get_video_ram(state->sam, scanline);
-}
-
-static void internal_video_start_coco(running_machine *machine, m6847_type type)
-{
-	m6847_config cfg;
-
-	memset(&cfg, 0, sizeof(cfg));
-	cfg.type = type;
-
-	/* NPW 14-May-2006 - Ugly hack; using CPU timing factor seems to break some
-	 * Dragon games */
-	if (machine->gamedrv->name[0] == 'c')
-		cfg.cpu0_timing_factor = 4;
-
-	if (type==M6847_VERSION_M6847T1_NTSC) {
-		cfg.get_attributes = coco_get_attributes;
-	} else {
-		cfg.get_attributes = coco_get_attributes_2;
+	if (last_scanline != scanline)
+	{
+		coco_videoram = sam_m6847_get_video_ram(state->sam, scanline);
+		last_scanline = scanline;
 	}
-	cfg.get_video_ram = get_video_ram_coco;
-	cfg.horizontal_sync_callback = coco_horizontal_sync_callback;
-	cfg.field_sync_callback = coco_field_sync_callback;
 
-	m6847_init(machine, &cfg);
+	offset = offset % 32;
+
+	mc6847_inv_w(device, BIT(coco_videoram[offset], 6));
+	mc6847_as_w(device, BIT(coco_videoram[offset], 7));
+
+	return coco_videoram[offset];
 }
 
-
-
-VIDEO_START( dragon )
+VIDEO_UPDATE( coco )
 {
-	internal_video_start_coco(machine, M6847_VERSION_ORIGINAL_PAL);
+	const device_config *mc6847 = devtag_get_device(screen->machine, "mc6847");
+	return mc6847_update(mc6847, bitmap, cliprect);
 }
-
-VIDEO_START( coco )
-{
-	internal_video_start_coco(machine, M6847_VERSION_ORIGINAL_NTSC);
-}
-
-VIDEO_START( coco2b )
-{
-	internal_video_start_coco(machine, M6847_VERSION_M6847T1_NTSC);
-}
-

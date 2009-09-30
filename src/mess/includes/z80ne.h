@@ -25,10 +25,6 @@
 #define LX385_TAPE_SAMPLE_FREQ 38400
 
 
-/*----------- defined in video/z80ne.c -----------*/
-
-VIDEO_START(lx388);
-
 /*----------- defined in machine/z80ne.c -----------*/
 
 READ8_HANDLER(lx383_r);
@@ -37,6 +33,8 @@ READ8_HANDLER(lx385_data_r);
 WRITE8_HANDLER(lx385_data_w);
 READ8_HANDLER(lx385_ctrl_r);
 WRITE8_HANDLER(lx385_ctrl_w);
+READ8_DEVICE_HANDLER(lx388_mc6847_videoram_r);
+VIDEO_UPDATE(lx388);
 READ8_HANDLER(lx388_data_r);
 READ8_HANDLER(lx388_read_field_sync);
 READ8_DEVICE_HANDLER(lx390_fdc_r);

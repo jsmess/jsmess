@@ -118,6 +118,7 @@ Notes:
 
 static Z80BIN_EXECUTE(vtech1);
 
+
 /******************************************************************************
  Address Maps
 ******************************************************************************/
@@ -311,24 +312,62 @@ static const cassette_config laser_cassette_config =
 	CASSETTE_PLAY
 };
 
+static const UINT32 vtech1_palette_mono[] =
+{
+	MAKE_RGB(131, 131, 131),
+	MAKE_RGB(211, 211, 211),
+	MAKE_RGB(29, 29, 29),
+	MAKE_RGB(76, 76, 76),
+	MAKE_RGB(213, 213, 213),
+	MAKE_RGB(167, 167, 167),
+	MAKE_RGB(105, 105, 105),
+	MAKE_RGB(136, 136, 136),
+	MAKE_RGB(0, 0, 0),
+	MAKE_RGB(131, 131, 131),
+	MAKE_RGB(0, 0, 0),
+	MAKE_RGB(213, 213, 213),
+	MAKE_RGB(37, 37, 37),
+	MAKE_RGB(133, 133, 133),
+	MAKE_RGB(28, 28, 28),
+	MAKE_RGB(193, 193, 193)
+};
+
+static const mc6847_interface vtech1_mc6847_intf =
+{
+	DEVCB_HANDLER(vtech1_mc6847_videoram_r),
+	DEVCB_LINE_GND,
+	DEVCB_LINE_VCC,
+	DEVCB_LINE_GND,
+	DEVCB_LINE_GND,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_CPU_INPUT_LINE("maincpu", 0),
+	DEVCB_NULL,
+	DEVCB_NULL,
+};
 
 static MACHINE_DRIVER_START(laser110)
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", Z80, VTECH1_CLK)  /* 3.57950 MHz */
     MDRV_CPU_PROGRAM_MAP(laser110_mem)
     MDRV_CPU_IO_MAP(vtech1_io)
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(M6847_PAL_FRAMES_PER_SECOND)
-    MDRV_QUANTUM_TIME(HZ(60))
 
 	MDRV_MACHINE_START(laser110)
 
     /* video hardware */
-	MDRV_VIDEO_START(vtech1_monochrome)
-	MDRV_VIDEO_UPDATE(m6847)
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(M6847_PAL_FRAMES_PER_SECOND)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(320, 25+192+26)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
+
+	MDRV_VIDEO_UPDATE(vtech1)
+
+	MDRV_MC6847_ADD("mc6847", vtech1_mc6847_intf)
+	MDRV_MC6847_TYPE(M6847_VERSION_ORIGINAL_PAL)
+	MDRV_MC6847_PALETTE(vtech1_palette_mono)
 
     /* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -355,7 +394,8 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START(laser200)
     MDRV_IMPORT_FROM(laser110)
 
-	MDRV_VIDEO_START(vtech1)
+    MDRV_DEVICE_MODIFY("mc6847")
+    MDRV_MC6847_PALETTE(NULL)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START(laser210)

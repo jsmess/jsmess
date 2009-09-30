@@ -27,7 +27,6 @@
 *****************************************************************************/
 
 
-static UINT8 mc10_bfff;
 static UINT8 mc10_keyboard_strobe;
 
 
@@ -39,14 +38,12 @@ static UINT8 mc10_keyboard_strobe;
 
 MACHINE_START( mc10 )
 {
-	mc10_bfff = 0x00;
 	mc10_keyboard_strobe = 0x00;
 
 	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),
 			0x4000,	0x4000 + mess_ram_size - 1,	0, 0, SMH_BANK(1), SMH_BANK(1));
 	memory_set_bankptr(machine, 1, mess_ram);
 
-	state_save_register_global(machine, mc10_bfff);
 	state_save_register_global(machine, mc10_keyboard_strobe);
 }
 
@@ -89,6 +86,7 @@ READ8_HANDLER ( mc10_bfff_r )
 WRITE8_HANDLER ( mc10_bfff_w )
 {
 	const device_config *dac_device = devtag_get_device(space->machine, "dac");
+	const device_config *mc6847 = devtag_get_device(space->machine, "mc6847");
 
 	/*   BIT 2 GM2 6847 CONTROL & INT/EXT CONTROL
      *   BIT 3 GM1 6847 CONTROL
@@ -97,8 +95,13 @@ WRITE8_HANDLER ( mc10_bfff_w )
      *   BIT 6 CSS 6847 CONTROL
      *   BIT 7 SOUND OUTPUT BIT
      */
-	mc10_bfff = data;
-	dac_data_w(dac_device, data & 0x80);
+	mc6847_gm2_w(mc6847, BIT(data, 2));
+	mc6847_intext_w(mc6847, BIT(data, 2));
+	mc6847_gm1_w(mc6847, BIT(data, 3));
+	mc6847_gm0_w(mc6847, BIT(data, 4));
+	mc6847_ag_w(mc6847, BIT(data, 5));
+	mc6847_css_w(mc6847, BIT(data, 6));
+	dac_data_w(dac_device, BIT(data, 7));
 }
 
 
@@ -161,58 +164,20 @@ WRITE8_HANDLER ( mc10_port2_w )
 }
 
 
+/***************************************************************************
+    MC6847
+***************************************************************************/
 
-/*****************************************************************************
- Video hardware
-*****************************************************************************/
-
-
-static ATTR_CONST UINT8 mc10_get_attributes(running_machine *machine, UINT8 c, int scanline, int pos)
+READ8_DEVICE_HANDLER( mc10_mc6847_videoram_r )
 {
-	UINT8 result = 0x00;
-	if (c & 0x40)			result |= M6847_INV;
-	if (c & 0x80)			result |= M6847_AS;
-	if (mc10_bfff & 0x04)	result |= M6847_GM2 | M6847_INTEXT;
-	if (mc10_bfff & 0x08)	result |= M6847_GM1;
-	if (mc10_bfff & 0x10)	result |= M6847_GM0;
-	if (mc10_bfff & 0x20)	result |= M6847_AG;
-	if (mc10_bfff & 0x40)	result |= M6847_CSS;
-	return result;
+	mc6847_inv_w(device, BIT(mess_ram[offset], 6));
+	mc6847_as_w(device, BIT(mess_ram[offset], 7));
+
+	return mess_ram[offset];
 }
 
-
-static const UINT8 *mc10_get_video_ram(running_machine *machine, int scanline)
+VIDEO_UPDATE( mc10 )
 {
-	offs_t offset = 0;
-
-	switch(mc10_bfff & 0x3C)
-	{
-		case 0x00: case 0x04: case 0x08: case 0x0C:
-		case 0x10: case 0x14: case 0x18: case 0x1C:
-			offset = (scanline / 12) * 0x20;	/* text/semigraphic */
-			break;
-
-		case 0x20:	offset = (scanline / 3) * 0x10;	break;	/* CG1 */
-		case 0x30:	offset = (scanline / 3) * 0x10;	break;	/* RG1 */
-		case 0x28:	offset = (scanline / 3) * 0x20;	break;	/* CG2 */
-		case 0x38:	offset = (scanline / 2) * 0x20;	break;	/* RG2 */
-		case 0x24:	offset = (scanline / 2) * 0x20;	break;	/* CG3 */
-		case 0x34:	offset = (scanline / 1) * 0x10;	break;	/* RG3 */
-		case 0x2C:	offset = (scanline / 1) * 0x20;	break;	/* CG6 */
-		case 0x3C:	offset = (scanline / 1) * 0x20;	break;	/* RG6 */
-	}
-
-	return mess_ram + offset;
-}
-
-
-VIDEO_START( mc10 )
-{
-	m6847_config cfg;
-
-	memset(&cfg, 0, sizeof(cfg));
-	cfg.type = M6847_VERSION_ORIGINAL_NTSC;
-	cfg.get_attributes = mc10_get_attributes;
-	cfg.get_video_ram = mc10_get_video_ram;
-	m6847_init(machine, &cfg);
+	const device_config *mc6847 = devtag_get_device(screen->machine, "mc6847");
+	return mc6847_update(mc6847, bitmap, cliprect);
 }

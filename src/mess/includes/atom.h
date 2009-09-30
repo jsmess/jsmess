@@ -13,7 +13,7 @@
 #include "machine/i8271.h"
 
 /* Motherboard crystals
-  
+
 Source: http://acorn.chriswhy.co.uk/docs/Acorn/Manuals/Acorn_AtomTechnicalManual.pdf
 
 */
@@ -45,10 +45,8 @@ void atom_eprom_box_init(running_machine *machine);
 
 MACHINE_RESET( atomeb );
 
-
-/*----------- defined in video/atom.c -----------*/
-
-VIDEO_START( atom );
+READ8_DEVICE_HANDLER( atom_mc6847_videoram_r );
+VIDEO_UPDATE( atom );
 
 
 #endif /* ATOM_H_ */

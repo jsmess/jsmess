@@ -49,6 +49,33 @@ text screen in the superior part of the graphical screen.
 /* 6600, 6500-6503 wd179x disc controller? 6400, 6401 */
 static unsigned char keyboard_data;
 static unsigned char pad_data;
+static UINT8 mc6847_css = 0;
+static UINT8 *apf_video_ram;
+
+static READ8_DEVICE_HANDLER( apf_mc6847_videoram_r )
+{
+	mc6847_css_w(device, mc6847_css && BIT(apf_video_ram[offset + 0x200], 6));
+	mc6847_inv_w(device, BIT(apf_video_ram[offset + 0x200], 6));
+	mc6847_as_w(device, BIT(apf_video_ram[offset + 0x200], 7));
+
+	return apf_video_ram[offset + 0x200];
+}
+
+static WRITE_LINE_DEVICE_HANDLER( apf_mc6847_fs_w )
+{
+	if (state)
+	  	apf_ints |= 0x10;
+	else
+		apf_ints &= ~0x10;
+
+	apf_update_ints(device->machine);
+}
+
+static VIDEO_UPDATE( apf )
+{
+	const device_config *mc6847 = devtag_get_device(screen->machine, "mc6847");
+	return mc6847_update(mc6847, bitmap, cliprect);
+}
 
 static  READ8_DEVICE_HANDLER(apf_m1000_pia_in_a_func)
 {
@@ -96,39 +123,23 @@ static WRITE8_DEVICE_HANDLER(apf_m1000_pia_out_a_func)
 {
 }
 
-static unsigned char previous_mode;
+//static unsigned char previous_mode;
 
-static WRITE8_DEVICE_HANDLER(apf_m1000_pia_out_b_func)
+static WRITE8_DEVICE_HANDLER( apf_m1000_pia_out_b_func )
 {
-	pad_data = data;
+	const device_config *mc6847 = devtag_get_device(device->machine, "mc6847");
 
-	/* bit 7..4 video control */
+	/* bit 7..4 video control -- TODO: bit 5 and 4? */
+	mc6847_ag_w(mc6847, BIT(data, 7));
+	mc6847_gm0_w(mc6847, BIT(data, 6));
+
 	/* bit 3..0 keypad line select */
-
-	/* 1b standard, 5b, db */
-	/* 0001 */
-	/* 0101 */
-	/* 1101 */
-
-	/* multi colour graphics mode */
-	/* 158 = 1001 multi-colour graphics */
-	/* 222 = 1101 mono graphics */
-	if (((previous_mode^data) & 0x0f0)!=0)
-	{
-	  //	  logerror("apf vidmode %02x\n", data);
-
-		/* not sure if this is correct - need to check */
-		apf_m6847_attr = 0x00;
-       		if (data & 0x80)	apf_m6847_attr |= M6847_AG;
-		if (data & 0x40)	apf_m6847_attr |= M6847_GM0;
-		//		if (data & 0x20)	apf_m6847_attr |= M6847_GM1; //?
-		//		if (data & 0x10)	apf_m6847_attr |= M6847_GM2; //M6847_GM0; //?
-		previous_mode = data;
-	}
+	pad_data = data;
 }
 
-static WRITE8_DEVICE_HANDLER(apf_m1000_pia_out_ca2_func)
+static WRITE_LINE_DEVICE_HANDLER(apf_m1000_pia_out_ca2_func)
 {
+	mc6847_css = state;
 }
 
 static WRITE8_DEVICE_HANDLER(apf_m1000_pia_out_cb2_func)
@@ -192,7 +203,7 @@ static const pia6821_interface apf_m1000_pia_interface=
 	DEVCB_HANDLER(apf_m1000_pia_in_cb2_func),
 	DEVCB_HANDLER(apf_m1000_pia_out_a_func),
 	DEVCB_HANDLER(apf_m1000_pia_out_b_func),
-	DEVCB_HANDLER(apf_m1000_pia_out_ca2_func),
+	DEVCB_LINE(apf_m1000_pia_out_ca2_func),
 	DEVCB_HANDLER(apf_m1000_pia_out_cb2_func),
 	DEVCB_LINE(apf_m1000_irq_a_func),
 	DEVCB_LINE(apf_m1000_irq_b_func)
@@ -351,7 +362,7 @@ static WRITE8_HANDLER(serial_w)
 }
 
 static WRITE8_HANDLER(apf_wd179x_command_w)
-{	
+{
 	wd17xx_command_w(devtag_get_device(space->machine, "wd179x"), offset,~data);
 }
 
@@ -638,6 +649,22 @@ static const floppy_config apfimag_floppy_config =
 	DO_NOT_KEEP_GEOMETRY
 };
 
+static const mc6847_interface apf_mc6847_intf =
+{
+	DEVCB_HANDLER(apf_mc6847_videoram_r),
+	DEVCB_LINE_VCC,
+	DEVCB_LINE_VCC,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_LINE(apf_mc6847_fs_w),
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
 static MACHINE_DRIVER_START( apf_imagination )
 	/* basic machine hardware */
 	//	MDRV_CPU_ADD("maincpu", M6800, 3750000)        /* 7.8336 MHz, only 6800p type used 1 MHz max*/
@@ -649,12 +676,13 @@ static MACHINE_DRIVER_START( apf_imagination )
 	MDRV_MACHINE_START( apf_imagination )
 
 	/* video hardware */
-	MDRV_VIDEO_START(apf)
-	MDRV_VIDEO_UPDATE(m6847)
+	MDRV_VIDEO_UPDATE(apf)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(320, 25+192+26)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
+
+	MDRV_MC6847_ADD("mc6847", apf_mc6847_intf)
 
 	MDRV_PIA6821_ADD( "pia_0", apf_m1000_pia_interface )
 	MDRV_PIA6821_ADD( "pia_1", apf_imagination_pia_interface )
@@ -665,9 +693,9 @@ static MACHINE_DRIVER_START( apf_imagination )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MDRV_CASSETTE_ADD( "cassette", apf_cassette_config )
-	
-	MDRV_WD179X_ADD("wd179x", default_wd17xx_interface )	
-	
+
+	MDRV_WD179X_ADD("wd179x", default_wd17xx_interface )
+
 	MDRV_FLOPPY_2_DRIVES_ADD(apfimag_floppy_config)
 MACHINE_DRIVER_END
 

@@ -212,6 +212,21 @@ static const cassette_config mc10_cassette_config =
 	CASSETTE_PLAY
 };
 
+static const mc6847_interface mc10_mc6847_intf =
+{
+	DEVCB_HANDLER(mc10_mc6847_videoram_r),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
 
 static MACHINE_DRIVER_START( mc10 )
 	/* basic machine hardware */
@@ -224,11 +239,13 @@ static MACHINE_DRIVER_START( mc10 )
 	MDRV_MACHINE_START(mc10)
 
 	/* video hardware */
-	MDRV_VIDEO_START(mc10)
-	MDRV_VIDEO_UPDATE(m6847)
+	MDRV_VIDEO_UPDATE(mc10)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(320, 25+192+26)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
+
+	MDRV_MC6847_ADD("mc6847", mc10_mc6847_intf)
+	MDRV_MC6847_TYPE(M6847_VERSION_ORIGINAL_NTSC)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
