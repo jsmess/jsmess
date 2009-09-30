@@ -13,6 +13,8 @@
 		   so this implementation will be used in the end.
 		B) It's easier to me to see what the attribute vram does since I don't
 		   have any docs atm.
+	- IRQ vector 0x06 is clearly used on some games otherwise they locks,
+	  check what is supposed to be.
 
 ==================================================================================
 
@@ -72,7 +74,7 @@
 irq vector 00: writes 0x00 to [$fa19]
 irq vector 02: (A = 0, B = 0) tests ppi port c, does something with ay ports (plus more?) ;keyboard data ready, no kanji lock, no caps lock
 irq vector 04: uart irq
-irq vector 06: operates with $fa28, $fa2e, $fd1b
+irq vector 06: operates with $fa28, $fa2e, $fd1b ;hblank? joypad irq?
 irq vector 08: tests ppi port c, puts port A to $fa1d,puts 0x02 to [$fa19] ;tape data ready
 irq vector 0A: writes 0x00 to [$fa19]
 irq vector 0C: writes 0x00 to [$fa19]
@@ -97,6 +99,8 @@ static UINT8 *pc6001_video_ram;
 static UINT8 irq_vector = 0x00;
 static UINT8 cas_switch,sys_latch;
 
+#define CAS_LENGTH 0x1655
+
 static VIDEO_START( pc6001 )
 {
 	#if 0
@@ -109,7 +113,7 @@ static VIDEO_START( pc6001 )
 	cfg.get_char_rom = pc6001_get_char_rom;
 	m6847_init(machine, &cfg);
 	#endif
-	pc6001_video_ram = auto_alloc_array(machine, UINT8, 0x1000); //0x400? We'll see...
+	pc6001_video_ram = auto_alloc_array(machine, UINT8, 0x2000); //0x400? We'll see...
 }
 
 static VIDEO_UPDATE( pc6001 )
@@ -119,48 +123,79 @@ static VIDEO_UPDATE( pc6001 )
 	int tile,attr,pen,color;
 	int fgcol;
 
-	for(y=0;y<16;y++)
+	attr = pc6001_video_ram[0];
+
+	if(attr & 0x80) // 128x192 4 colors mode
 	{
-		for(x=0;x<32;x++)
+		int shrink_x = 2*4;
+		int shrink_y = (attr & 8) ? 1 : 2;
+		int w = (shrink_x == 8) ? 32 : 16;
+
+		for(y=0;y<(192/shrink_y);y++)
 		{
-			tile = pc6001_video_ram[(x+(y*32))+0x200];
-			attr = pc6001_video_ram[(x+(y*32)) & 0x1ff] ;
-
-			if(attr & 0x40)
+			for(x=0;x<w;x++)
 			{
-				pen = (tile & 0xc0) >> 6 | (attr & 2)<<1;
+				tile = pc6001_video_ram[(x+(y*32))+0x200];
 
-				for(yi=0;yi<12;yi++)
+				for(yi=0;yi<shrink_y;yi++)
 				{
-					for(xi=0;xi<8;xi++)
+					for(xi=0;xi<shrink_x;xi++)
 					{
 						int i;
-						i = (xi & 4)>>2; //x-axis
-						i+= (yi & 4)>>1; //y-axis 1
-						i+= (yi & 8)>>1; //y-axis 2
+						i = (shrink_x == 8) ? (xi & 0x06) : (xi & 0x0c)>>1;
+						color = ((tile >> i) & 3)+8;
 
-						color = ((tile >> i) & 1) ? pen+8 : 0;
-
-						*BITMAP_ADDR16(bitmap, ((y*12+(11-yi))+24), (x*8+(7-xi))+32) = screen->machine->pens[color];
+						*BITMAP_ADDR16(bitmap, ((y*shrink_y+yi)+24), (x*shrink_x+((shrink_x-1)-xi))+32) = screen->machine->pens[color];
 					}
 				}
 			}
-			else
+		}
+	}
+	else // text mode
+	{
+		for(y=0;y<16;y++)
+		{
+			for(x=0;x<32;x++)
 			{
-				for(yi=0;yi<12;yi++)
+				tile = pc6001_video_ram[(x+(y*32))+0x200];
+				attr = pc6001_video_ram[(x+(y*32)) & 0x1ff];
+
+				if(attr & 0x40)
 				{
-					for(xi=0;xi<8;xi++)
+					pen = (tile & 0xc0) >> 6 | (attr & 2)<<1;
+
+					for(yi=0;yi<12;yi++)
 					{
-						pen = gfx_data[(tile*0x10)+yi]>>(7-xi) & 1;
+						for(xi=0;xi<8;xi++)
+						{
+							int i;
+							i = (xi & 4)>>2; //x-axis
+							i+= (yi & 4)>>1; //y-axis 1
+							i+= (yi & 8)>>1; //y-axis 2
 
-						fgcol = (attr & 2) ? 2 : 7;
+							color = ((tile >> i) & 1) ? pen+8 : 0;
 
-						if(attr & 1)
-							color = pen ? 0 : fgcol;
-						else
-							color = pen ? fgcol : 0;
+							*BITMAP_ADDR16(bitmap, ((y*12+(11-yi))+24), (x*8+(7-xi))+32) = screen->machine->pens[color];
+						}
+					}
+				}
+				else
+				{
+					for(yi=0;yi<12;yi++)
+					{
+						for(xi=0;xi<8;xi++)
+						{
+							pen = gfx_data[(tile*0x10)+yi]>>(7-xi) & 1;
+
+							fgcol = (attr & 2) ? 2 : 7;
+
+							if(attr & 1)
+								color = pen ? 0 : fgcol;
+							else
+								color = pen ? fgcol : 0;
 
 							*BITMAP_ADDR16(bitmap, ((y*12+yi)+24), (x*8+xi)+32) = screen->machine->pens[color];
+						}
 					}
 				}
 			}
@@ -472,7 +507,7 @@ static TIMER_CALLBACK(cassette_callback)
 	{
 		cur_keycode = gfx_data[i++];
 		//popmessage("%04x",i);
-		if(i >= 0x34c6)
+		if(i >= CAS_LENGTH)
 		{
 			i = 0;
 			cas_switch = 0;
@@ -592,8 +627,8 @@ ROM_START( pc6001 )	/* screen = 8000-83FF */
 	ROM_LOAD( "cgrom60.60", 0x0000, 0x1000, CRC(b0142d32) SHA1(9570495b10af5b1785802681be94b0ea216a1e26) )
 
 	ROM_REGION( 0x10000, "cas", ROMREGION_ERASEFF )
-	/* Load here your tape for now (and change line 475 with the length value that MESS returns) */
-	//ROM_LOAD( "demo.cas", 0x0000, 0x34c6, CRC(1) SHA1(1) )
+	/* Load here your tape for now (and change the cas length macro according to what MESS returns) */
+//	ROM_LOAD( "car.cas", 0x0000, CAS_LENGTH, CRC(1) SHA1(1) )
 ROM_END
 
 ROM_START( pc6001a )
