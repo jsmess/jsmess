@@ -70,7 +70,7 @@ WRITE8_HANDLER(pc8801_dmac_write);
 WRITE8_HANDLER(pc88sr_disp_30);
 WRITE8_HANDLER(pc88sr_disp_31);
 WRITE8_HANDLER(pc88sr_disp_32);
-WRITE8_HANDLER(pc88sr_ALU);
+WRITE8_HANDLER(pc88sr_alu);
 WRITE8_HANDLER(pc8801_palette_out);
 
 
