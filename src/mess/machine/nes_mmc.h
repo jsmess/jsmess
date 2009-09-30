@@ -16,6 +16,20 @@ typedef struct __mmc
 
 const mmc *nes_mapper_lookup(int mapper);
 
+typedef struct __unif
+{
+	const char *board; /* UNIF board */
+	write8_space_func mmc_write_low; /* $4100-$5fff write routine */
+	read8_space_func mmc_read_low; /* $4100-$5fff read routine */
+	write8_space_func mmc_write_mid; /* $6000-$7fff write routine */
+	write8_space_func mmc_write; /* $8000-$ffff write routine */
+	void (*ppu_latch)(const device_config *device, offs_t offset);
+	ppu2c0x_scanline_cb		mmc_scanline;
+	ppu2c0x_hblank_cb		mmc_hblank;
+} unif;
+
+const unif *nes_unif_lookup(const char *board);
+
 extern int MMC1_extended; /* 0 = normal MMC1 cart, 1 = 512k MMC1, 2 = 1024k MMC1 */
 
 #define MMC5_VRAM

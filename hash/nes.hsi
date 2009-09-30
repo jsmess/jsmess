@@ -4508,7 +4508,7 @@
 	</hash>
 	<hash crc32="47918d84" sha1="587e90896e17897682e80b43643a22ec336ed54e" name="Auto-Upturn (Sachen)">
 		<status>GoodNES Verified Image</status>
-		<extrainfo>243 0 2 8</extrainfo>
+		<extrainfo>150 0 2 8</extrainfo>
 
 	</hash>
 	<hash crc32="89e12946" sha1="6e5a4f701c8aaba2c89357a5fbfb11467e1cc61b" name="Auto-Upturn (Sachen) [U]">
@@ -11624,7 +11624,7 @@
 	</hash>
 	<hash crc32="471173e7" sha1="62a6b4db403911f74a0eaa1b726f3d127ea48242" name="Chinese Checkers (Sachen-USA)">
 		<status>GoodNES Verified Image</status>
-		<extrainfo>243 0 2 2</extrainfo>
+		<extrainfo>150 0 2 2</extrainfo>
 
 	</hash>
 	<hash crc32="12a95930" sha1="a58b71b4b9ff14be13f3539405b23bccbca93b69" name="Chinese Checkers (Sachen-USA) [U]">
@@ -26569,7 +26569,7 @@
 	</hash>
 	<hash crc32="2394ae1c" sha1="ca8905c8ab70154e77ca1c93fe014db2de51bf2a" name="Happy Pairs (Sachen)">
 		<status>GoodNES Verified Image</status>
-		<extrainfo>243 0 2 8</extrainfo>
+		<extrainfo>150 0 2 8</extrainfo>
 
 	</hash>
 	<hash crc32="fe361c47" sha1="8579d9b67e9053ed1bd31a5f849a041ec6542064" name="Happy Pairs (Sachen) [U]">
@@ -35756,7 +35756,7 @@
 	</hash>
 	<hash crc32="cab40a6c" sha1="b7a6d5782d0266a7e2f1c1c1c159a41fb122bd08" name="Magic Cubes (Sachen)">
 		<status>GoodNES Verified Image</status>
-		<extrainfo>243 0 2 2</extrainfo>
+		<extrainfo>150 0 2 2</extrainfo>
 
 	</hash>
 	<hash crc32="61625581" sha1="13475548a492e045895006e49eb4c11a1b0bce20" name="Magic Cubes (Sachen) [U]">
@@ -47199,7 +47199,7 @@
 	</hash>
 	<hash crc32="6096f84e" sha1="60fc5fa5b5accaf3aefeba73fc8bffd3c4dae558" name="Pegasus 5-in-1 (Golden Five)">
 		<status>GoodNES Verified Image</status>
-		<extrainfo>71 0 80 0</extrainfo>
+		<extrainfo>104 0 80 0</extrainfo>
 
 	</hash>
 	<hash crc32="9b78dff5" sha1="bad382331c30b22a908da4bff2759c25113cc26a" name="Pegasus 5-in-1 (Golden Five)">
@@ -58056,7 +58056,7 @@
 	</hash>
 	<hash crc32="34ddf806" sha1="cb319ae39b41d8ed695fa40bdd899be4aa839f2d" name="Strategist (Sachen)">
 		<status>GoodNES Verified Image</status>
-		<extrainfo>243 0 2 4</extrainfo>
+		<extrainfo>150 0 2 4</extrainfo>
 
 	</hash>
 	<hash crc32="16caf76b" sha1="347c1eff0165ac7b93fbd64887d348b2f0b46601" name="Strategist (Sachen) [U]">
@@ -58066,7 +58066,7 @@
 	</hash>
 	<hash crc32="c06facfc" sha1="757560b286cb1064cd105acca55e5c2287adc673" name="Strategist (With Intro) (Sachen)">
 		<status>GoodNES Verified Image</status>
-		<extrainfo>243 0 2 4</extrainfo>
+		<extrainfo>150 0 2 4</extrainfo>
 
 	</hash>
 	<hash crc32="7e8fb99a" sha1="afb13f9986e4f8362a5a856504f2ff44afc7065a" name="Strategist (With Intro) (Sachen) [U]">
@@ -72616,7 +72616,7 @@
 
 	</hash>
 	<hash crc32="02c41438" sha1="17473c223453d2d80fcb9dcfa317947287dc5c52" name="Xing He Zhan Shi (Ch)">
-		<extrainfo>177 2 32 0</extrainfo>
+		<extrainfo>179 2 32 0</extrainfo>
 
 	</hash>
 	<hash crc32="e197932b" sha1="705e5a1218f1b22201b357fa5440cac9f3765f66" name="Xing Ji Wu Shi - Super Fighter (Ch)">

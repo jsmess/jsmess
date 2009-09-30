@@ -218,7 +218,7 @@ static MACHINE_DRIVER_START( nes )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 	
 	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("nes")
+	MDRV_CARTSLOT_EXTENSION_LIST("nes,unf")
 	MDRV_CARTSLOT_MANDATORY
 	MDRV_CARTSLOT_LOAD(nes_cart)
 	MDRV_CARTSLOT_PARTIALHASH(nes_partialhash)
@@ -270,7 +270,7 @@ static MACHINE_DRIVER_START( famicom )
 	MDRV_IMPORT_FROM( nes )
 	
 	MDRV_CARTSLOT_MODIFY("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("nes")
+	MDRV_CARTSLOT_EXTENSION_LIST("nes,unf")
 	MDRV_CARTSLOT_NOT_MANDATORY
 	MDRV_CARTSLOT_LOAD(nes_cart)
 	MDRV_CARTSLOT_PARTIALHASH(nes_partialhash)
@@ -411,9 +411,6 @@ SYSTEM_CONFIG_END
   Game driver(s)
 
 ***************************************************************************/
-
-/* Since 0.130u4, most of the games do not show graphics correctly. Conversion of PPU to a device showed some of the 
-limitations of the previous implementation. Systems regressed to GAME_NOT_WORKING status until a proper fix is found */
 
 /*     YEAR  NAME      PARENT  COMPAT MACHINE   INPUT    INIT   CONFIG   COMPANY       FULLNAME */
 CONS( 1985, nes,       0,      0,     nes,      nes,     0,     0,       "Nintendo",  "Nintendo Entertainment System / Famicom (NTSC)", GAME_IMPERFECT_GRAPHICS )
