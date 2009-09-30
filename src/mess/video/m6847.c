@@ -1096,24 +1096,21 @@ static UINT32 color(const device_config *device, int c)
 
 static int attr_index_from_attribute(const device_config *device, UINT8 attr)
 {
-	mc6847_state *mc6847 = get_safe_token(device);
 	int result;
 
 	result = ((attr & (M6847_AG | M6847_AS | M6847_INTEXT | M6847_INV | M6847_CSS)) >> 3)
 		| ((attr & (M6847_GM1 | M6847_GM0)) << 5);
 
 	/* sanity check */
-	assert(result < ARRAY_LENGTH(mc6847->fontdata));
+	assert(result < ARRAY_LENGTH(get_safe_token(device)->fontdata));
 	return result;
 }
 
 static UINT8 attribute_from_attr_index(const device_config *device, int attr_index)
 {
-	mc6847_state *mc6847 = get_safe_token(device);
-
 	/* sanity check */
 	assert(attr_index >= 0);
-	assert(attr_index < ARRAY_LENGTH(mc6847->fontdata));
+	assert(attr_index < ARRAY_LENGTH(get_safe_token(device)->fontdata));
 
 	return (UINT8) ((attr_index & 0x1F) << 3)
 		| ((attr_index & 0x60) >> 5);
