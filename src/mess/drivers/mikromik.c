@@ -92,6 +92,7 @@ static WRITE8_HANDLER( ls259_w )
 	case 1: /* RECALL */
 		//logerror("RECALL %u\n", d);
 		state->recall = d;
+		nec765_reset_w(state->upd765, d);
 		break;
 
 	case 2: /* _RV28/RX21 */
@@ -118,6 +119,8 @@ static WRITE8_HANDLER( ls259_w )
 		//logerror("MOTOR %u\n", d);
 		floppy_drive_set_motor_state(get_floppy_image(space->machine, 0), d);
 		floppy_drive_set_ready_state(get_floppy_image(space->machine, 0), d, 1);
+
+		if (input_port_read(space->machine, "T5")) nec765_ready_w(state->upd765, d);
 		break;
 	}
 }
@@ -245,6 +248,11 @@ static INPUT_PORTS_START( mm1 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Left SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Right SHIFT") PORT_CODE(KEYCODE_RSHIFT)
+
+	PORT_START("T5")
+	PORT_CONFNAME( 0x01, 0x01, "Floppy Drive Type")
+	PORT_CONFSETTING( 0x00, "640 KB" )
+	PORT_CONFSETTING( 0x01, "160/320 KB" )
 INPUT_PORTS_END
 
 /* Video */
@@ -603,10 +611,13 @@ static MACHINE_START( mm1 )
 
 static MACHINE_RESET( mm1 )
 {
+	mm1_state *state = machine->driver_data;
 	const address_space *program = cputag_get_address_space(machine, I8085A_TAG, ADDRESS_SPACE_PROGRAM);
 
 	memory_install_readwrite8_handler(program, 0x0000, 0x0fff, 0, 0, SMH_BANK(1), SMH_UNMAP);
 	memory_set_bank(machine, 1, 0);
+
+	if (!input_port_read(machine, "T5")) nec765_ready_w(state->upd765, 1);
 }
 
 static FLOPPY_OPTIONS_START( mm1 )
