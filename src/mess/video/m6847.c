@@ -86,7 +86,7 @@ enum
 #define LOG_FS			0
 #define LOG_HS			0
 #define LOG_STATS		0
-#define LOG_PREPARE		1
+#define LOG_PREPARE		0
 
 typedef struct _m6847_variant m6847_variant;
 struct _m6847_variant
@@ -1324,8 +1324,8 @@ static TIMER_CALLBACK( fs_fall )
 	if (LOG_FS)
 		logerror("fs_fall(): time=%s scanline=%d\n", attotime_string(timer_get_time(machine), ATTOTIME_STRING_PRECISION), get_scanline(mc6847));
 
-	mc6847->fs = CLEAR_LINE;
-	devcb_call_write_line(&mc6847->out_fs_func, CLEAR_LINE);
+	mc6847->fs = ASSERT_LINE;
+	devcb_call_write_line(&mc6847->out_fs_func, mc6847->fs);
 }
 
 static TIMER_CALLBACK( fs_rise )
@@ -1346,8 +1346,8 @@ static TIMER_CALLBACK( fs_rise )
 	if (mc6847->new_frame_callback)
 		mc6847->using_custom = !mc6847->new_frame_callback(machine);
 
-	mc6847->fs = ASSERT_LINE;
-	devcb_call_write_line(&mc6847->out_fs_func, ASSERT_LINE);
+	mc6847->fs = CLEAR_LINE;
+	devcb_call_write_line(&mc6847->out_fs_func, mc6847->fs);
 }
 
 
