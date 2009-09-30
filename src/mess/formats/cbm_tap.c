@@ -1,28 +1,28 @@
 /*
-	
-	Tape support for C16 / C64 / VIC20 TAP format
+
+    Tape support for C16 / C64 / VIC20 TAP format
 
 
-	Credits to:
-	
-		- Peter Schepers for the informations on C64 formats
-		- Vice Team for the source of their very complete emulator
-		- Attila G. for tap2wav (both the source and the actual tool)
+    Credits to:
 
-	
-	TODO:
-	* to verify and fix (if needed) support for .TAP v2
-	* to implement reading (and logging) the remaining part of the header
-	* to verify if it is more accurate to use a different HIGH_WAVE value
-	  when the pulse corresponds to a 0x00 in the .TAP file
-	(...)
-	* (far away in the future) can this code be merged with TZX code?
+        - Peter Schepers for the informations on C64 formats
+        - Vice Team for the source of their very complete emulator
+        - Attila G. for tap2wav (both the source and the actual tool)
+
+
+    TODO:
+    * to verify and fix (if needed) support for .TAP v2
+    * to implement reading (and logging) the remaining part of the header
+    * to verify if it is more accurate to use a different HIGH_WAVE value
+      when the pulse corresponds to a 0x00 in the .TAP file
+    (...)
+    * (far away in the future) can this code be merged with TZX code?
 
 */
 
-/* Info based on http://ist.uwaterloo.ca/~schepers/formats/TAP.TXT	    */
-/* Please refer to the webpage for the latest version and for a very 
-   complete listing of various cart types and their bankswitch tricks 	*/
+/* Info based on http://ist.uwaterloo.ca/~schepers/formats/TAP.TXT      */
+/* Please refer to the webpage for the latest version and for a very
+   complete listing of various cart types and their bankswitch tricks   */
 /*
 
   Designed by Per Hakan Sundell (author of the CCS64 C64 emulator) in 1997,
@@ -86,7 +86,7 @@ continuously and we decode the entire file.
 [ Additional notes on v.2:
 
   I found no documents about this around, but it seems an expansion of the
-format specifically thought for C16 tapes. In a .TAP version 2, each byte 
+format specifically thought for C16 tapes. In a .TAP version 2, each byte
 only stores informations on half of the wave...
 Unfortunately, I have no such a .tap file to test, so my implementation
 below could be not working.  FP ]
@@ -132,32 +132,32 @@ static int  	len;
 
 
 /* This in fact gives the number of samples for half of the pulse */
-INLINE int tap_data_to_samplecount(int data, int frequency) 
+INLINE int tap_data_to_samplecount(int data, int frequency)
 {
-//	return (int) (0.5 * (0.5 + (((double)CBM_WAV_FREQUENCY / frequency) * (double)data)));		// MESS TZX formula
+//  return (int) (0.5 * (0.5 + (((double)CBM_WAV_FREQUENCY / frequency) * (double)data)));      // MESS TZX formula
 	return (int) (0.5 * (((double)CBM_WAV_FREQUENCY / frequency) * (double)((data) + 0.5)));	// tap2wav formula
 }
 
 /* The version with parameters could be handy if we decide to implement a
 different values for byte == 0x00 below (the WAVE_PAUSE) as tap2wav does. */
 #if 0
-static void toggle_wave_data(int low, int high) 
+static void toggle_wave_data(int low, int high)
 {
 	wave_data = (wave_data == low) ? high : low;
 }
 #endif
 
-static void toggle_wave_data(void ) 
+static void toggle_wave_data(void )
 {
 	wave_data = (wave_data == WAVE_HIGH) ? WAVE_LOW : WAVE_HIGH;
 }
 
-static void cbm_output_wave( INT16 **buffer, int length ) 
+static void cbm_output_wave( INT16 **buffer, int length )
 {
-	if (buffer == NULL) 
+	if (buffer == NULL)
 		return;
-	
-	for( ; length > 0; length-- ) 
+
+	for( ; length > 0; length-- )
 	{
 		**buffer = wave_data;
 		*buffer = *buffer + 1;
@@ -167,7 +167,7 @@ static void cbm_output_wave( INT16 **buffer, int length )
 
 static int cbm_tap_do_work( INT16 **buffer, int length, const UINT8 *data )
 {
-	int i, j = 0; 
+	int i, j = 0;
 	int size = 0;
 
 	int version = data[0x0c];
@@ -178,9 +178,9 @@ static int cbm_tap_do_work( INT16 **buffer, int length, const UINT8 *data )
 	int byte_samples = 0;
 	UINT8 over_pulse_bytes[3] = {0 , 0, 0 };
 	int over_pulse_length = 0;
-	/* These waveamp_* values are currently stored but not used. 
-	  Further investigations are needed to find real pulse amplitude 
-	  in Commodore tapes. Implementation here would follow */
+	/* These waveamp_* values are currently stored but not used.
+      Further investigations are needed to find real pulse amplitude
+      in Commodore tapes. Implementation here would follow */
 	/* int waveamp_high, waveamp_low; */
 
 	/* Log .TAP info but only once */
@@ -188,7 +188,7 @@ static int cbm_tap_do_work( INT16 **buffer, int length, const UINT8 *data )
 	{
 		logerror("TAP version    : %d\n", version);
 		logerror("Machine type   : %d\n", system);
-		logerror("Video standard : %d\n", video_standard);    
+		logerror("Video standard : %d\n", video_standard);
 		logerror("Tape frequency : %d\n", (tap_frequency) << 3);
 	}
 
@@ -223,25 +223,25 @@ static int cbm_tap_do_work( INT16 **buffer, int length, const UINT8 *data )
     }
 
 
-	for (i = CBM_HEADER_SIZE; i < length; i++) 
+	for (i = CBM_HEADER_SIZE; i < length; i++)
 	{
 		UINT8 byte = data[i];
 
 		/* .TAP v0 */
-		/* Here is simple: 
-		  if byte is != 0 -> length = byte
-		  otherwise -> length =  0x100 (i.e. 0xff + 1) */
+		/* Here is simple:
+          if byte is != 0 -> length = byte
+          otherwise -> length =  0x100 (i.e. 0xff + 1) */
 		if (!version)
 		{
-			if (byte != 0x00) 
+			if (byte != 0x00)
 			{
 				byte_samples = tap_data_to_samplecount(byte, tap_frequency);
 				/* waveamp_high = WAVE_HIGH; */
-			} 
-			else 
+			}
+			else
 			{
 				byte_samples = tap_data_to_samplecount(PAUSE, tap_frequency);	// tap2wav value
-//				byte_samples = tap_data_to_samplecount(0x100, tap_frequency);	// vice value			
+//              byte_samples = tap_data_to_samplecount(0x100, tap_frequency);   // vice value
 				/* waveamp_high = WAVE_PAUSE; */
 			}
 			/* waveamp_low = WAVE_LOW; */
@@ -249,27 +249,27 @@ static int cbm_tap_do_work( INT16 **buffer, int length, const UINT8 *data )
 
 		/* .TAP v1 & v2 */
 		/* Here is a bit more complicate:
-		  if byte is != 0 -> length = byte
-		  otherwise -> the length of the pulse is stored as a 24bit value in the 3 bytes after the 0.
-		  See below for comments on the implementation of this mechanism */
+          if byte is != 0 -> length = byte
+          otherwise -> the length of the pulse is stored as a 24bit value in the 3 bytes after the 0.
+          See below for comments on the implementation of this mechanism */
 		if (version)
 		{
 			if ((byte != 0x00) && !j)
 			{
 				byte_samples = tap_data_to_samplecount(byte, tap_frequency);
 				/* waveamp_high = WAVE_HIGH; */
-			} 
-			else 
+			}
+			else
 			{
-				/* If we have a long pulse close to the end of the .TAP, check that bytes still 
-				  to be read are enough to complete it. */
+				/* If we have a long pulse close to the end of the .TAP, check that bytes still
+                  to be read are enough to complete it. */
 				if (length - i + j >= 4)
-				{	
+				{
 					/* Here we read the 3 following bytes, using an index j
-					  j = 0 -> The 0x00 byte: we simply skip everything and go on
-					  j = 1,2 -> The 1st and 2nd bytes after 0x00: we store them and go on
-					  j = 3 -> The final byte of the pulse length: we store it, 
-					  and then we pass to finally output the wave */
+                      j = 0 -> The 0x00 byte: we simply skip everything and go on
+                      j = 1,2 -> The 1st and 2nd bytes after 0x00: we store them and go on
+                      j = 3 -> The final byte of the pulse length: we store it,
+                      and then we pass to finally output the wave */
 					if (j > 0)
 					{
 						over_pulse_bytes[j-1] = byte;
@@ -286,7 +286,7 @@ static int cbm_tap_do_work( INT16 **buffer, int length, const UINT8 *data )
 					else
 					{
 						j += 1;
-						logerror("Found a 00 byte close to the end of the .tap file.\n"); 
+						logerror("Found a 00 byte close to the end of the .tap file.\n");
 						logerror("This is not allowed by the format specs. \n");
 						logerror("Check if your .tap file got corrupted when you created it!\n");
 					}
@@ -300,13 +300,13 @@ static int cbm_tap_do_work( INT16 **buffer, int length, const UINT8 *data )
 		{
 			cbm_output_wave( buffer, byte_samples );
 			size += byte_samples;
-//			toggle_wave_data(waveamp_low, waveamp_high);
+//          toggle_wave_data(waveamp_low, waveamp_high);
 			toggle_wave_data();
 			if (version < 2)
 			{
 				cbm_output_wave( buffer, byte_samples );
 				size += byte_samples;
-//				toggle_wave_data(waveamp_low, waveamp_high);
+//              toggle_wave_data(waveamp_low, waveamp_high);
 				toggle_wave_data();
 			}
 		}
@@ -316,16 +316,16 @@ static int cbm_tap_do_work( INT16 **buffer, int length, const UINT8 *data )
 }
 
 
-static int cbm_tap_to_wav_size( const UINT8 *tapdata, int taplen ) 
+static int cbm_tap_to_wav_size( const UINT8 *tapdata, int taplen )
 {
 	int size = cbm_tap_do_work(NULL, taplen, tapdata);
 	len = taplen;
-	
+
 	return size;
 }
 
-static int cbm_tap_fill_wave( INT16 *buffer, int length, UINT8 *bytes ) 
-{	
+static int cbm_tap_fill_wave( INT16 *buffer, int length, UINT8 *bytes )
+{
 	INT16 *p = buffer;
 
 	return cbm_tap_do_work(&p, len, (const UINT8 *)bytes);
@@ -345,13 +345,13 @@ static const struct CassetteLegacyWaveFiller cbm_legacy_fill_wave = {
 };
 
 
-static casserr_t cbm_cassette_identify( cassette_image *cassette, struct CassetteOptions *opts ) 
+static casserr_t cbm_cassette_identify( cassette_image *cassette, struct CassetteOptions *opts )
 {
 	return cassette_legacy_identify( cassette, opts, &cbm_legacy_fill_wave );
 }
 
 
-static casserr_t cbm_cassette_load( cassette_image *cassette ) 
+static casserr_t cbm_cassette_load( cassette_image *cassette )
 {
 	return cassette_legacy_construct( cassette, &cbm_legacy_fill_wave );
 }

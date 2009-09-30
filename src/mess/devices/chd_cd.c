@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	Code to interface the MESS image code with MAME's CHD-CD core.
+    Code to interface the MESS image code with MAME's CHD-CD core.
 
-	Based on harddriv.c by Raphael Nabet 2003
+    Based on harddriv.c by Raphael Nabet 2003
 
 *********************************************************************/
 

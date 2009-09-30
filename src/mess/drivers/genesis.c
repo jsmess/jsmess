@@ -90,11 +90,11 @@ static void mess_init_6buttons_pad(running_machine *machine)
 /* They're needed to give the users the choice between different controllers */
 static UINT8 mess_md_io_read_data_port(running_machine *machine, int portnum)
 {
-	static const char *const pad6names[2][4] = {{ "PAD1_6B", "PAD2_6B", "UNUSED", "UNUSED" }, 
+	static const char *const pad6names[2][4] = {{ "PAD1_6B", "PAD2_6B", "UNUSED", "UNUSED" },
 												{ "EXTRA1", "EXTRA2", "UNUSED", "UNUSED" }};
 	static const char *const pad3names[4] = { "PAD1_3B", "PAD2_3B", "UNUSED", "UNUSED" };
 
-	UINT8 retdata; 
+	UINT8 retdata;
 	int controller;
 	UINT8 helper_6b = (megadrive_io_ctrl_regs[portnum] & 0x3f) | 0xc0; // bits 6 & 7 always come from megadrive_io_data_regs
 	UINT8 helper_3b = (megadrive_io_ctrl_regs[portnum] & 0x7f) | 0x80; // bit 7 always comes from megadrive_io_data_regs
@@ -122,14 +122,14 @@ static UINT8 mess_md_io_read_data_port(running_machine *machine, int portnum)
 			if (mess_io_stage[portnum] == 2)
 			{
 				/* here we read B, C & the additional buttons */
-				retdata = (megadrive_io_data_regs[portnum] & helper_6b) | 
-							(((input_port_read_safe(machine, pad6names[0][portnum], 0) & 0x30) | 
+				retdata = (megadrive_io_data_regs[portnum] & helper_6b) |
+							(((input_port_read_safe(machine, pad6names[0][portnum], 0) & 0x30) |
 								(input_port_read_safe(machine, pad6names[1][portnum], 0) & 0x0f)) & ~helper_6b);
 			}
 			else
 			{
 				/* here we read B, C & the directional buttons */
-				retdata = (megadrive_io_data_regs[portnum] & helper_6b) | 
+				retdata = (megadrive_io_data_regs[portnum] & helper_6b) |
 							((input_port_read_safe(machine, pad6names[0][portnum], 0) & 0x3f) & ~helper_6b);
 			}
 		}
@@ -138,20 +138,20 @@ static UINT8 mess_md_io_read_data_port(running_machine *machine, int portnum)
 			if (mess_io_stage[portnum] == 1)
 			{
 				/* here we read ((Start & A) >> 2) | 0x00 */
-				retdata = (megadrive_io_data_regs[portnum] & helper_6b) | 
+				retdata = (megadrive_io_data_regs[portnum] & helper_6b) |
 							(((input_port_read_safe(machine, pad6names[0][portnum], 0) & 0xc0) >> 2) & ~helper_6b);
 			}
 			else if (mess_io_stage[portnum]==2)
 			{
 				/* here we read ((Start & A) >> 2) | 0x0f */
-				retdata = (megadrive_io_data_regs[portnum] & helper_6b) | 
+				retdata = (megadrive_io_data_regs[portnum] & helper_6b) |
 							((((input_port_read_safe(machine, pad6names[0][portnum], 0) & 0xc0) >> 2) | 0x0f) & ~helper_6b);
 			}
 			else
 			{
 				/* here we read ((Start & A) >> 2) | Up and Down */
-				retdata = (megadrive_io_data_regs[portnum] & helper_6b) | 
-							((((input_port_read_safe(machine, pad6names[0][portnum], 0) & 0xc0) >> 2) | 
+				retdata = (megadrive_io_data_regs[portnum] & helper_6b) |
+							((((input_port_read_safe(machine, pad6names[0][portnum], 0) & 0xc0) >> 2) |
 								(input_port_read_safe(machine, pad6names[0][portnum], 0) & 0x03)) & ~helper_6b);
 			}
 		}
@@ -166,14 +166,14 @@ static UINT8 mess_md_io_read_data_port(running_machine *machine, int portnum)
 		if (megadrive_io_data_regs[portnum] & 0x40)
 		{
 			/* here we read B, C & the directional buttons */
-			retdata = (megadrive_io_data_regs[portnum] & helper_3b) | 
+			retdata = (megadrive_io_data_regs[portnum] & helper_3b) |
 						(((input_port_read_safe(machine, pad3names[portnum], 0) & 0x3f) | 0x40) & ~helper_3b);
 		}
 		else
 		{
 			/* here we read ((Start & A) >> 2) | Up and Down */
-			retdata = (megadrive_io_data_regs[portnum] & helper_3b) | 
-						((((input_port_read_safe(machine, pad3names[portnum], 0) & 0xc0) >> 2) | 
+			retdata = (megadrive_io_data_regs[portnum] & helper_3b) |
+						((((input_port_read_safe(machine, pad3names[portnum], 0) & 0xc0) >> 2) |
 							(input_port_read_safe(machine, pad3names[portnum], 0) & 0x03) | 0x40) & ~helper_3b);
 		}
 	}
@@ -230,14 +230,14 @@ static INPUT_PORTS_START( md )
 	PORT_CATEGORY_CLASS( 0x0f, 0x00, "Player 1 Controller" )
 	PORT_CATEGORY_ITEM( 0x00, "Joystick 3 Buttons", 10 )
 	PORT_CATEGORY_ITEM( 0x01, "Joystick 6 Buttons", 11 )
-//	PORT_CATEGORY_ITEM( 0x02, "Sega Mouse", 12 )
+//  PORT_CATEGORY_ITEM( 0x02, "Sega Mouse", 12 )
 /* there exists both a 2 buttons version of the Mouse (Jpn ver, to be used with RPGs, it
-	can aslo be used as trackball) and a 3 buttons version (US ver, no trackball feats.) */
-//	PORT_CATEGORY_ITEM( 0x03, "Sega Menacer", 13 )
-//	PORT_CATEGORY_ITEM( 0x04, "Konami Justifier", 14 )
-//	PORT_CATEGORY_ITEM( 0x05, "Team Player (Sega Multitap)", 15 )
-//	PORT_CATEGORY_ITEM( 0x06, "4-Play (EA Multitap)", 16 )
-//	PORT_CATEGORY_ITEM( 0x07, "J-Cart", 17 )
+    can aslo be used as trackball) and a 3 buttons version (US ver, no trackball feats.) */
+//  PORT_CATEGORY_ITEM( 0x03, "Sega Menacer", 13 )
+//  PORT_CATEGORY_ITEM( 0x04, "Konami Justifier", 14 )
+//  PORT_CATEGORY_ITEM( 0x05, "Team Player (Sega Multitap)", 15 )
+//  PORT_CATEGORY_ITEM( 0x06, "4-Play (EA Multitap)", 16 )
+//  PORT_CATEGORY_ITEM( 0x07, "J-Cart", 17 )
 	PORT_CATEGORY_CLASS( 0xf0, 0x00, "Player 2 Controller" )
 	PORT_CATEGORY_ITEM( 0x00, "Joystick 3 Buttons", 20 )
 	PORT_CATEGORY_ITEM( 0x10, "Joystick 6 Buttons", 21 )
@@ -300,8 +300,8 @@ INPUT_PORTS_END
 
 
 /* MegaDrive inputs + Fake Region Selection */
-/* We need this as long as we only have the US version of the SVP add-on, otherwise we could not play 
-   Non-US Virtua Racing versions. It is also handy to develop add-ons emulation without adding each 
+/* We need this as long as we only have the US version of the SVP add-on, otherwise we could not play
+   Non-US Virtua Racing versions. It is also handy to develop add-ons emulation without adding each
    region variants, while they do not even work. Once emulation is working this must disappear.  */
 static INPUT_PORTS_START( md_sel )
 	PORT_INCLUDE( md )
@@ -326,7 +326,7 @@ static MACHINE_RESET( ms_megadriv )
 {
 	MACHINE_RESET_CALL( megadriv );
 	MACHINE_RESET_CALL( md_mappers );
-	
+
 	mess_init_6buttons_pad(machine);
 }
 
@@ -334,7 +334,7 @@ static MACHINE_DRIVER_START( ms_megadriv )
 	MDRV_IMPORT_FROM(megadriv)
 
 	MDRV_MACHINE_RESET( ms_megadriv )
-	
+
 	MDRV_IMPORT_FROM( genesis_cartslot )
 MACHINE_DRIVER_END
 
@@ -342,7 +342,7 @@ static MACHINE_DRIVER_START( ms_megadpal )
 	MDRV_IMPORT_FROM(megadpal)
 
 	MDRV_MACHINE_RESET( ms_megadriv )
-	
+
 	MDRV_IMPORT_FROM( genesis_cartslot )
 MACHINE_DRIVER_END
 
@@ -660,16 +660,16 @@ static READ16_HANDLER( pico_68k_io_read )
 	    break;
 
 	    /*
-	       Still notes from notaz for the pen :
+           Still notes from notaz for the pen :
 
-	       The pen can be used to 'draw' either on the drawing pad or on the storyware
-	       itself. Both storyware and drawing pad are mapped on single virtual plane, where
-	       coordinates range:
+           The pen can be used to 'draw' either on the drawing pad or on the storyware
+           itself. Both storyware and drawing pad are mapped on single virtual plane, where
+           coordinates range:
 
-	       x: 0x03c - 0x17c
-	       y: 0x1fc - 0x2f7 (drawing pad)
-	          0x2f8 - 0x3f3 (storyware)
-	     */
+           x: 0x03c - 0x17c
+           y: 0x1fc - 0x2f7 (drawing pad)
+              0x2f8 - 0x3f3 (storyware)
+         */
 	  case 2:
 	    retdata = pico_read_penpos(space->machine, PICO_PENX) >> 8;
 	    break;
@@ -684,10 +684,10 @@ static READ16_HANDLER( pico_68k_io_read )
 	    break;
 	  case 6:
 	    /* Page register :
-	       00 - storyware closed
-	       01, 03, 07, 0f, 1f, 3f - pages 1-6
-	       either page 5 or page 6 is often unused.
-	    */
+           00 - storyware closed
+           01, 03, 07, 0f, 1f, 3f - pages 1-6
+           either page 5 or page 6 is often unused.
+        */
 	    {
 	      UINT8 tmp;
 
@@ -708,9 +708,9 @@ static READ16_HANDLER( pico_68k_io_read )
 	    break;
 	  case 8:
 	    /*
-	       For reads, if bit 15 is cleared, it means PCM is 'busy' or
-	       something like that, as games sometimes wait for it to become 1.
-	    */
+           For reads, if bit 15 is cleared, it means PCM is 'busy' or
+           something like that, as games sometimes wait for it to become 1.
+        */
 	    retdata = 0x00;
 	  }
 	return retdata | retdata <<8;
@@ -771,7 +771,7 @@ static MACHINE_DRIVER_START( pico )
 	MDRV_DEVICE_REMOVE("genesis_snd_z80")
 
 	MDRV_MACHINE_RESET( ms_megadriv )
-	
+
 	MDRV_IMPORT_FROM( pico_cartslot )
 MACHINE_DRIVER_END
 
@@ -784,7 +784,7 @@ static MACHINE_DRIVER_START( picopal )
 	MDRV_DEVICE_REMOVE("genesis_snd_z80")
 
 	MDRV_MACHINE_RESET( ms_megadriv )
-	
+
 	MDRV_IMPORT_FROM( pico_cartslot )
 MACHINE_DRIVER_END
 

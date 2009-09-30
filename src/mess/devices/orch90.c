@@ -1,12 +1,12 @@
 /***************************************************************************
 
-	orch90.c
+    orch90.c
 
-	Code for emulating the CoCo Orch-90 (Orchestra 90) sound cartridge
+    Code for emulating the CoCo Orch-90 (Orchestra 90) sound cartridge
 
-	The Orch-90 was a simple sound cartridge; it had two 8-bit DACs
-	supporting stereo sound.  The left channel was at $FF7A, and the right
-	channel was at $FF7B
+    The Orch-90 was a simple sound cartridge; it had two 8-bit DACs
+    supporting stereo sound.  The left channel was at $FF7A, and the right
+    channel was at $FF7B
 
 ***************************************************************************/
 
@@ -85,7 +85,7 @@ static WRITE8_DEVICE_HANDLER( orch90_w )
 
 /*-------------------------------------------------
     DEVICE_GET_INFO(coco_cartridge_pcb_orch90) -
-	get info function for the Orch-90
+    get info function for the Orch-90
 -------------------------------------------------*/
 
 DEVICE_GET_INFO(coco_cartridge_pcb_orch90)

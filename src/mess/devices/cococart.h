@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	cococart.h
+    cococart.h
 
-	CoCo/Dragon cartridge management
+    CoCo/Dragon cartridge management
 
 *********************************************************************/
 

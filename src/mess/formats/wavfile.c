@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	wavfile.c
+    wavfile.c
 
-	Format code for wave (*.wav) files
+    Format code for wave (*.wav) files
 
 *********************************************************************/
 
@@ -239,13 +239,13 @@ const struct CassetteFormat wavfile_format =
 
 
 /*********************************************************************
-	wavfile_testload()
+    wavfile_testload()
 
-	This is a hokey function used to test the cassette wave loading
-	system, specifically to test that when one loads a WAV file image
-	that the resulting info queried will be the same data in the WAV.
+    This is a hokey function used to test the cassette wave loading
+    system, specifically to test that when one loads a WAV file image
+    that the resulting info queried will be the same data in the WAV.
 
-	This code has already identified some rounding errors
+    This code has already identified some rounding errors
 *********************************************************************/
 
 #ifdef UNUSED_FUNCTION

@@ -103,9 +103,9 @@ static WRITE8_HANDLER( gmaster_io_w )
    04 b9 1a
    04 b9 22
    02 bb 12
-	4000 e0
-	rr w rr w rr w rr w rr w rr w rr w rr w
-	4000 ee
+    4000 e0
+    rr w rr w rr w rr w rr w rr w rr w rr w
+    4000 ee
 */
 			break;
 		default:
@@ -116,7 +116,7 @@ static WRITE8_HANDLER( gmaster_io_w )
 
 static READ8_HANDLER( gmaster_port_r )
 {
-//	UINT8 data = gmaster.ports[offset];
+//  UINT8 data = gmaster.ports[offset];
     UINT8 data = 0xff;
     switch (offset)
 	{
@@ -189,7 +189,7 @@ static PALETTE_INIT( gmaster )
 static VIDEO_UPDATE( gmaster )
 {
     int x,y;
-//	plot_box(bitmap, 0, 0, 64/*bitmap->width*/, bitmap->height, 0); //xmess rounds up to 64 pixel
+//  plot_box(bitmap, 0, 0, 64/*bitmap->width*/, bitmap->height, 0); //xmess rounds up to 64 pixel
     for (y = 0; y < ARRAY_LENGTH(gmaster_video.pixels); y++)
 	{
 		for (x = 0; x < ARRAY_LENGTH(gmaster_video.pixels[0]); x++)
@@ -224,7 +224,7 @@ static INTERRUPT_GEN( gmaster_interrupt )
 }
 
 static const UPD7810_CONFIG config = {
-//	TYPE_78C10, // 78c11 in handheld
+//  TYPE_78C10, // 78c11 in handheld
 	TYPE_7801, // temporarily until 7810 core fixes synchronized
 	gmaster_io_callback
 };
@@ -257,7 +257,7 @@ MACHINE_DRIVER_END
 ROM_START(gmaster)
 	ROM_REGION(0x10000,"maincpu", 0)
 	ROM_LOAD("gmaster.bin", 0x0000, 0x1000, CRC(05cc45e5) SHA1(05d73638dea9657ccc2791c0202d9074a4782c1e) )
-//	ROM_CART_LOAD(0, "bin", 0x8000, 0x7f00, 0)
+//  ROM_CART_LOAD(0, "bin", 0x8000, 0x7f00, 0)
 	ROM_CART_LOAD("cart", 0x8000, 0x8000, 0)
 ROM_END
 
@@ -297,12 +297,12 @@ static int gmaster_load_rom(running_machine *machine, int id)
 		osd_fclose(cartfile);
 		return 1;
 	}
-//	memcpy(rom+0x0000, rom+0x8000, 0x4000);
+//  memcpy(rom+0x0000, rom+0x8000, 0x4000);
 	osd_fclose(cartfile);
 	return 0;
 }
 #endif
 
 /*    YEAR      NAME            PARENT  MACHINE   INPUT     INIT
-	  COMPANY                 FULLNAME */
+      COMPANY                 FULLNAME */
 CONS( 1990, gmaster,       0,          0, gmaster,  gmaster,    gmaster,   0, "Hartung", "Game Master", GAME_IMPERFECT_SOUND)

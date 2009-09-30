@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	formats/vt_dsk.h
+    formats/vt_dsk.h
 
-	Tandy Color Computer / Dragon disk images
+    Tandy Color Computer / Dragon disk images
 
 *********************************************************************/
 

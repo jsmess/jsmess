@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	ti99cart.h
+    ti99cart.h
 
-	TI99 family cartridge management
+    TI99 family cartridge management
 
 *********************************************************************/
 
@@ -21,7 +21,7 @@
 #define TI99_CARTRIDGE_PCB_SUPER	DEVICE_GET_INFO_NAME(ti99_cartridge_pcb_super)
 #define TI99_CARTRIDGE_PCB_MBX		DEVICE_GET_INFO_NAME(ti99_cartridge_pcb_mbx)
 
-/* We set the number of slots to 8, although we may have up to 16. From a 
+/* We set the number of slots to 8, although we may have up to 16. From a
    logical point of view we could have 256, but the operating system only checks
    the first 16 banks. */
 #define NUMBER_OF_CARTRIDGE_SLOTS 8
@@ -36,8 +36,8 @@ struct _GROM_port_t
 	/* GROM data buffer */
 	UINT8 buf;
 	/* internal flip-flops that are set after the first access to the GROM
-	address so that next access is mapped to the LSB, and cleared after each
-	data access */
+    address so that next access is mapped to the LSB, and cleared after each
+    data access */
 	char raddr_LSB, waddr_LSB;
 };
 typedef struct _GROM_port_t GROM_port_t;
@@ -47,7 +47,7 @@ struct _cartridge_t
 {
 	/* PCB device associated to this cartridge. If NULL, the slot is empty. */
 	const device_config *pcb;
-	
+
         /* GROM buffer size. */
         int grom_size;
 
@@ -67,16 +67,16 @@ struct _cartridge_t
         /* GROM buffered data output. */
         UINT8 grom_buffer;
 
-        /* ROM buffer. We are using this for both 16 bit (99/4a) and 8 bit 
-	   (99/8) access. */
+        /* ROM buffer. We are using this for both 16 bit (99/4a) and 8 bit
+       (99/8) access. */
         void *rom_ptr;
-	
-        /* ROM buffer for the second bank of paged cartridges. Other cartridges 
-	   usually store their ROM in one large file. */
+
+        /* ROM buffer for the second bank of paged cartridges. Other cartridges
+       usually store their ROM in one large file. */
         void *rom2_ptr;
 
         /* RAM buffer. The persistence service is done by the cartridge system.
-	   The RAM space is a consecutive space; all banks are in one buffer. */
+       The RAM space is a consecutive space; all banks are in one buffer. */
         void *ram_ptr;
 };
 typedef struct _cartridge_t cartridge_t;

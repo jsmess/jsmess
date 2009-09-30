@@ -1,8 +1,8 @@
 /***************************************************************************
 
-	coco_vhd.h
+    coco_vhd.h
 
-	Color Computer Virtual Hard Drives
+    Color Computer Virtual Hard Drives
 
 ***************************************************************************/
 
@@ -20,5 +20,5 @@ DEVICE_GET_INFO(coco_vhd);
 
 #define MDRV_COCO_VHD_ADD(_tag) \
 	MDRV_DEVICE_ADD(_tag, COCO_VHD, 0) \
-	
+
 #endif /* COCOVHD_H */

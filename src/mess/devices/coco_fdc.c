@@ -1,68 +1,68 @@
 /*********************************************************************
 
-	coco_fdc.c
+    coco_fdc.c
 
-	CoCo/Dragon FDC
+    CoCo/Dragon FDC
 
-	The CoCo and Dragon both use the Western Digital floppy disk controllers.
-	The CoCo uses either the WD1793 or the WD1773, the Dragon uses the WD2797,
- 	which mostly uses the same command set with some subtle differences, most
- 	notably the 2797 handles disk side select internally. The Dragon Alpha also
- 	uses the WD2797, however as this is a built in interface and not an external
- 	cartrige, it is dealt with in the main coco.c file.
+    The CoCo and Dragon both use the Western Digital floppy disk controllers.
+    The CoCo uses either the WD1793 or the WD1773, the Dragon uses the WD2797,
+    which mostly uses the same command set with some subtle differences, most
+    notably the 2797 handles disk side select internally. The Dragon Alpha also
+    uses the WD2797, however as this is a built in interface and not an external
+    cartrige, it is dealt with in the main coco.c file.
 
-	The wd's variables are mapped to $FF48-$FF4B on the CoCo and on $FF40-$FF43
- 	on the Dragon.  In addition, there is another register
-	called DSKREG that controls the interface with the wd1793.  DSKREG is
-	detailed below:  But they appear to be
+    The wd's variables are mapped to $FF48-$FF4B on the CoCo and on $FF40-$FF43
+    on the Dragon.  In addition, there is another register
+    called DSKREG that controls the interface with the wd1793.  DSKREG is
+    detailed below:  But they appear to be
 
-	References:
-		CoCo:	Disk Basic Unravelled
-		Dragon:	Inferences from the PC-Dragon source code
-	            DragonDos Controller, Disk and File Formats by Graham E Kinns
+    References:
+        CoCo:   Disk Basic Unravelled
+        Dragon: Inferences from the PC-Dragon source code
+                DragonDos Controller, Disk and File Formats by Graham E Kinns
 
-	---------------------------------------------------------------------------
+    ---------------------------------------------------------------------------
 
-	DSKREG - the control register
-	CoCo ($FF40)                                    Dragon ($FF48)
+    DSKREG - the control register
+    CoCo ($FF40)                                    Dragon ($FF48)
 
-	Bit                                              Bit
-	7 halt enable flag                               7 not used
-	6 drive select #3                                6 not used
-	5 density (0=single, 1=double)                   5 NMI enable flag
-		and NMI enable flag
-	4 write precompensation                          4 write precompensation
-	3 drive motor activation                         3 single density enable
-	2 drive select #2                                2 drive motor activation
-	1 drive select #1                                1 drive select high bit
-	0 drive select #0                                0 drive select low bit
+    Bit                                              Bit
+    7 halt enable flag                               7 not used
+    6 drive select #3                                6 not used
+    5 density (0=single, 1=double)                   5 NMI enable flag
+        and NMI enable flag
+    4 write precompensation                          4 write precompensation
+    3 drive motor activation                         3 single density enable
+    2 drive select #2                                2 drive motor activation
+    1 drive select #1                                1 drive select high bit
+    0 drive select #0                                0 drive select low bit
 
-	Reading from $FF48-$FF4F clears bit 7 of DSKREG ($FF40)
+    Reading from $FF48-$FF4F clears bit 7 of DSKREG ($FF40)
 
-	---------------------------------------------------------------------------
+    ---------------------------------------------------------------------------
 
-	2007-02-22, P.Harvey-Smith
+    2007-02-22, P.Harvey-Smith
 
-	Began implementing the Dragon Delta Dos controler, this was actually the first
-	Dragon disk controler to market, beating Dragon Data's by a couple of months,
-	it is based around the WD2791 FDC, which is compatible with the WD1793/WD2797 used
-	by the standard CoCo and Dragon disk controlers except that it used an inverted
-	data bus, which is the reason the read/write handlers invert the data. This
-	controler like, the DragonDos WD2797 is mapped at $FF40-$FF43, in the normal
-	register order.
+    Began implementing the Dragon Delta Dos controler, this was actually the first
+    Dragon disk controler to market, beating Dragon Data's by a couple of months,
+    it is based around the WD2791 FDC, which is compatible with the WD1793/WD2797 used
+    by the standard CoCo and Dragon disk controlers except that it used an inverted
+    data bus, which is the reason the read/write handlers invert the data. This
+    controler like, the DragonDos WD2797 is mapped at $FF40-$FF43, in the normal
+    register order.
 
-	The Delta cart also has a register (74LS174 hex flipflop) at $FF44 encoded as
-	follows :-
+    The Delta cart also has a register (74LS174 hex flipflop) at $FF44 encoded as
+    follows :-
 
-	Bit
-	7 not used
-	6 not used
-	5 not used
-	4 Single (0) / Double (1) density select
-	3 5.25"(0) / 8"(1) Clock select
-	2 Side select
-	1 Drive select ms bit
-	0 Drive select ls bit
+    Bit
+    7 not used
+    6 not used
+    5 not used
+    4 Single (0) / Double (1) density select
+    3 5.25"(0) / 8"(1) Clock select
+    2 Side select
+    1 Drive select ms bit
+    0 Drive select ls bit
 
 *********************************************************************/
 
@@ -178,7 +178,7 @@ INLINE rtc_type_t real_time_clock(const device_config *device)
 {
 	rtc_type_t result;
 	fdc_t *fdc = get_token(device);
-	
+
 	result = (int) input_port_read_safe(device->machine, "real_time_clock", RTC_NONE);
 
 	/* check to make sure we don't have any invalid values */
@@ -291,7 +291,7 @@ static void general_fdc_get_info(const device_config *device, UINT32 state, devi
 
 /*-------------------------------------------------
     fdc_coco_update_lines - CoCo specific disk
-	controller lines
+    controller lines
 -------------------------------------------------*/
 
 static void fdc_coco_update_lines(const device_config *device)
@@ -319,7 +319,7 @@ static void fdc_coco_update_lines(const device_config *device)
 
 /*-------------------------------------------------
     fdc_coco_dskreg_w - function to write to CoCo
-	dskreg
+    dskreg
 -------------------------------------------------*/
 
 static void fdc_coco_dskreg_w(const device_config *device, UINT8 data)
@@ -343,11 +343,11 @@ static void fdc_coco_dskreg_w(const device_config *device, UINT8 data)
 	}
 
 	/* An email from John Kowalski informed me that if the DS3 is
-	 * high, and one of the other drive bits is selected (DS0-DS2), then the
-	 * second side of DS0, DS1, or DS2 is selected.  If multiple bits are
-	 * selected in other situations, then both drives are selected, and any
-	 * read signals get yucky.
-	 */
+     * high, and one of the other drive bits is selected (DS0-DS2), then the
+     * second side of DS0, DS1, or DS2 is selected.  If multiple bits are
+     * selected in other situations, then both drives are selected, and any
+     * read signals get yucky.
+     */
 
 	if (data & 0x04)
 		drive = 2;
@@ -470,7 +470,7 @@ static void fdc_coco_w(const device_config *device, offs_t addr, UINT8 data)
 
 /*-------------------------------------------------
     DEVICE_GET_INFO(coco_cartridge_pcb_fdc_coco) -
-	get info function for the CoCo FDC
+    get info function for the CoCo FDC
 -------------------------------------------------*/
 
 DEVICE_GET_INFO(coco_cartridge_pcb_fdc_coco)
@@ -481,7 +481,7 @@ DEVICE_GET_INFO(coco_cartridge_pcb_fdc_coco)
 		MDRV_DS1315_ADD(CLOUD9_TAG)
 	MACHINE_DRIVER_END
 
-	static const fdc_hardware_type hwtype = 
+	static const fdc_hardware_type hwtype =
 	{
 		"CoCo FDC",
 		fdc_coco_update_lines,
@@ -502,7 +502,7 @@ DEVICE_GET_INFO(coco_cartridge_pcb_fdc_coco)
 
 /*-------------------------------------------------
     fdc_dragon_update_lines - Dragon specific disk
-	controller lines
+    controller lines
 -------------------------------------------------*/
 
 static void fdc_dragon_update_lines(const device_config *device)
@@ -525,7 +525,7 @@ static void fdc_dragon_update_lines(const device_config *device)
 
 /*-------------------------------------------------
     fdc_dragon_dskreg_w - function to write to
-	Dragon dskreg
+    Dragon dskreg
 -------------------------------------------------*/
 
 static void fdc_dragon_dskreg_w(const device_config *device, UINT8 data)
@@ -622,7 +622,7 @@ static void fdc_dragon_w(const device_config *device, offs_t addr, UINT8 data)
 
 /*-------------------------------------------------
     DEVICE_GET_INFO(coco_cartridge_pcb_fdc_dragon) -
-	get info function for the CoCo FDC
+    get info function for the CoCo FDC
 -------------------------------------------------*/
 
 DEVICE_GET_INFO(coco_cartridge_pcb_fdc_dragon)
@@ -631,7 +631,7 @@ DEVICE_GET_INFO(coco_cartridge_pcb_fdc_dragon)
 		MDRV_WD179X_ADD(WD_TAG, coco_wd17xx_interface)
 	MACHINE_DRIVER_END
 
-	static const fdc_hardware_type hwtype = 
+	static const fdc_hardware_type hwtype =
 	{
 		"Dragon FDC",
 		fdc_dragon_update_lines,

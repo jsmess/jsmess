@@ -1,6 +1,6 @@
 /***************************************************************************
 
-	Cartrige loading
+    Cartrige loading
 
 ***************************************************************************/
 
@@ -57,7 +57,7 @@ struct _cartslot_config
 	int								must_be_loaded;
 	device_start_func				device_start;
 	device_image_load_func			device_load;
-	device_image_unload_func		device_unload;	
+	device_image_unload_func		device_unload;
 	device_image_partialhash_func	device_partialhash;
 	cartslot_pcb_type				pcb_types[8];
 };

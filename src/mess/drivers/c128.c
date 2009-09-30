@@ -10,7 +10,7 @@
 
 /*
 
-2008 - Driver Updates 
+2008 - Driver Updates
 ---------------------
 
 (most of the informations are taken from http://www.zimmers.net/cbmpics/ )
@@ -23,15 +23,15 @@
 CPU: CSG 8502 (1 or 2 MHz), Z80 (~3 MHz)
 RAM: 128 kilobytes
 ROM: 72 kilobytes expandable
-Video: MOS 8564 "VIC-IIE", MOS 8563 "VDC" CTRC (40/80 columns text; Palette of 16 
-	colors; Hires modes 320 x 200, 640 x 200, 16k of dedicated VDC RAM)
-Sound: MOS 8580 "SID" (3 voice stereo synthesizer/digital sound 
-	capabilities)
-Ports: MOS 6526 CIA x2 (2 Joystick/Mouse ports; CBM Serial port; CBM 
-	Datasette port; parallel programmable "User" port; CBM Monitor port;
-	C64 expansion port; Warm reset switch; Keyboard port; Power switch)
-Keyboard: Full-sized 93 key QWERTY (14 key numeric keypad; 8 programmable 
-	function keys + HELP; 4 direction 4-key cursor-pad)
+Video: MOS 8564 "VIC-IIE", MOS 8563 "VDC" CTRC (40/80 columns text; Palette of 16
+    colors; Hires modes 320 x 200, 640 x 200, 16k of dedicated VDC RAM)
+Sound: MOS 8580 "SID" (3 voice stereo synthesizer/digital sound
+    capabilities)
+Ports: MOS 6526 CIA x2 (2 Joystick/Mouse ports; CBM Serial port; CBM
+    Datasette port; parallel programmable "User" port; CBM Monitor port;
+    C64 expansion port; Warm reset switch; Keyboard port; Power switch)
+Keyboard: Full-sized 93 key QWERTY (14 key numeric keypad; 8 programmable
+    function keys + HELP; 4 direction 4-key cursor-pad)
 
 Upgrade kits were sold to upgrade the VDC RAM to 64k using a passthrough board
 that the VDC sat in.
@@ -40,7 +40,7 @@ that the VDC sat in.
 * Commodore 128CR (prototype from June, 1986)
 
   Basically, a C128 in a redesigned board to reduce production costs. It's
-not clear when it's been produced, nor if it has ever been produced on 
+not clear when it's been produced, nor if it has ever been produced on
 large scale. Its BIOS is an intermediate revision between rev. 0 and rev. 1
 in the main C128.
 A picture of the PCB can be found here:
@@ -53,31 +53,31 @@ arrays, 8580R5 sid, and 8502R0 processor.
 
 * Commodore 128D (1985)
 
-  Designed in the US, but only sold in Europe, it is a C128 in a desktop 
+  Designed in the US, but only sold in Europe, it is a C128 in a desktop
 case, with built-in 1571 disk drive (upgraded with a special software to
 discourage pirating software). Some NTSC prototypes exist.
 
 CPU: CSG 8502 (1 or 2 MHz), Z80 (~3 MHz), 6502 (co-processor for disk
-	drive)
+    drive)
 RAM: 128 kilobytes
 ROM: 72 kilobytes expandable
-Video: MOS 8564 "VIC-IIE", MOS 8563 "VDC" CTRC (40/80 columns text; Palette of 16 
-	colors; Hires modes 320 x 200, 640 x 200, 64k of dedicated VDC RAM)
-Sound: MOS 8580 "SID" (3 voice stereo synthesizer/digital sound 
-	capabilities)
-Ports: MOS 6526 CIA x2 (2 Joystick/Mouse ports; CBM Serial port; CBM 
-	Datasette port; parallel programmable "User" port; CBM Monitor port;
-	C64 expansion port; Warm reset switch; Keyboard port; Power switch)
-Keyboard: Full-sized 93 key QWERTY (14 key numeric keypad; 8 programmable 
-	function keys + HELP; 4 direction 4-key cursor-pad)
-Additional Hardware: Internal 1571 disk drive (Double sided/Double Density 
-	360k; capable of reading GCR and MFM formats)
+Video: MOS 8564 "VIC-IIE", MOS 8563 "VDC" CTRC (40/80 columns text; Palette of 16
+    colors; Hires modes 320 x 200, 640 x 200, 64k of dedicated VDC RAM)
+Sound: MOS 8580 "SID" (3 voice stereo synthesizer/digital sound
+    capabilities)
+Ports: MOS 6526 CIA x2 (2 Joystick/Mouse ports; CBM Serial port; CBM
+    Datasette port; parallel programmable "User" port; CBM Monitor port;
+    C64 expansion port; Warm reset switch; Keyboard port; Power switch)
+Keyboard: Full-sized 93 key QWERTY (14 key numeric keypad; 8 programmable
+    function keys + HELP; 4 direction 4-key cursor-pad)
+Additional Hardware: Internal 1571 disk drive (Double sided/Double Density
+    360k; capable of reading GCR and MFM formats)
 
 
 * Commodore 128DCR (1986)
 
   Basically, a C128D in a redesigned board to reduce production costs. It's
-the only model sold in the US, but it's quite possible that it came later 
+the only model sold in the US, but it's quite possible that it came later
 in Europe as well (being cheaper to produce).
 
 
@@ -86,7 +86,7 @@ in Europe as well (being cheaper to produce).
   NTSC prototype for an improved version of C128D, featuring a built-in 1581
 disk drive in place of the 1571 used in C128D / C128DCR. The prototype has no
 given name, so C128D/81 is just a reasonable way to indicate it. The case is
-from a PAL C128D and the board is a heavily modified PAL board with hand 
+from a PAL C128D and the board is a heavily modified PAL board with hand
 soldered connections to make it NTSC.
 
 
@@ -104,23 +104,23 @@ disk emulation would be of help, anyway.
 
 * C128 Mode
 
-  Various missing features (e.g. no cpu clock doubling; no internal function 
-rom; serial bus doesn't support printer or other devices; no C128 cart 
+  Various missing features (e.g. no cpu clock doubling; no internal function
+rom; serial bus doesn't support printer or other devices; no C128 cart
 expansions are supported; no userport; no rs232/v.24 interface)
 
 * Informations / BIOS / Supported Sets:
 
 - Was C128D using rev. 1 BIOS in 4 ROMs? I guessed so because the board has the
-same desing as a C128, and later C128DCR still used rev. 1 BIOS (only contained 
+same desing as a C128, and later C128DCR still used rev. 1 BIOS (only contained
 in two ROMs)
 
 - Is it possible to track down and dump properly C128 PAL BIOSes? Current sets
-are mostly tagged as bad dumps because obtained by extracting the content in 
+are mostly tagged as bad dumps because obtained by extracting the content in
 pieces. I'd like to have confirmation that the common parts are really the same
 before removing the flag.
 
-- PAL BIOSes are from C128? C128D? or C128DCR? Were there differences in the 
-contents between them, except for being splitted in 2 or 4 parts? Were all 
+- PAL BIOSes are from C128? C128D? or C128DCR? Were there differences in the
+contents between them, except for being splitted in 2 or 4 parts? Were all
 versions sold in each country? Right now we choose to support the following sets
 (more to be added if BIOS content confirmed):
 
@@ -128,11 +128,11 @@ versions sold in each country? Right now we choose to support the following sets
 we support c128drde, c128drit and c128drsw.
 
 + We also have a dump of the German C128, therefore we support the c128ger, even
-if it's not clear which BASIC version it was shipped with. We assumed the older 
-kernal to be shipped with rev. 0 and the newer with rev. 1. 
+if it's not clear which BASIC version it was shipped with. We assumed the older
+kernal to be shipped with rev. 0 and the newer with rev. 1.
 
-+ The Finnish, French and Norwegian dumps came with no notes (or these have been 
-lost). Therefore we support only the c128 for these, i.e. c128fin, c128fre and 
++ The Finnish, French and Norwegian dumps came with no notes (or these have been
+lost). Therefore we support only the c128 for these, i.e. c128fin, c128fre and
 c128nor.
 
 + Character ROM for Belgium, Italy and French was the same (I/F/B on the label,
@@ -148,24 +148,24 @@ Dumping roms with eeprom reader
 
 c128 / c128d
 
-	U18       (read compatible 2764?) 8kB c64 character rom, c128 character rom
-	U32 23128 (read compatible 27128?) 16kB c64 Basic, c64 Kernel
-	U33 23128 (read compatible 27128?) 16kB c128 Basic at 0x4000
-	U34 23128 (read compatible 27128?) 16kB c128 Basic at 0x8000
-	U35	23128 (read compatible 27128?) 16kB c128 Editor, Z80BIOS, c128 Kernel
+    U18       (read compatible 2764?) 8kB c64 character rom, c128 character rom
+    U32 23128 (read compatible 27128?) 16kB c64 Basic, c64 Kernel
+    U33 23128 (read compatible 27128?) 16kB c128 Basic at 0x4000
+    U34 23128 (read compatible 27128?) 16kB c128 Basic at 0x8000
+    U35 23128 (read compatible 27128?) 16kB c128 Editor, Z80BIOS, c128 Kernel
 
 c128cr / c128dcr
 
-	U18       (read compatible 2764?) 8kB c64 character rom, c128 character rom
-	U32 23256 (read compatible 27256?) 32kB c64 Basic + Kernel, c128 Editor, Z80BIOS, c128 Kernel
-	U34 23256 (read compatible 27256?) 32kB c128 Basic
+    U18       (read compatible 2764?) 8kB c64 character rom, c128 character rom
+    U32 23256 (read compatible 27256?) 32kB c64 Basic + Kernel, c128 Editor, Z80BIOS, c128 Kernel
+    U34 23256 (read compatible 27256?) 32kB c128 Basic
 
 c128d / c128dcr also need:
 
-	U102 23256 (read compatible 27256?) 32kB 1571 system rom
+    U102 23256 (read compatible 27256?) 32kB 1571 system rom
 
 
-It would be also possible to dump the BIOS in monitor, but it would be preferable 
+It would be also possible to dump the BIOS in monitor, but it would be preferable
 to use an EEPROM reader, in order to obtain a dump of the whole content.
 */
 
@@ -321,7 +321,7 @@ static INPUT_PORTS_START( c128 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL_PAD)			PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0_PAD) 			PORT_CHAR(UCHAR_MAMEKEY(0_PAD))
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Alt") PORT_CODE(KEYCODE_F6) PORT_CHAR(UCHAR_MAMEKEY(LALT))
-	
+
 	PORT_INCLUDE( c128_special )			/* SPECIAL */
 
 	PORT_INCLUDE( c64_controls )			/* CTRLSEL, JOY0, JOY1, PADDLE0 -> PADDLE3, TRACKX, TRACKY, LIGHTX, LIGHTY, OTHER */
@@ -634,7 +634,7 @@ static MACHINE_DRIVER_START( c128 )
 	/* cia */
 	MDRV_CIA6526_ADD("cia_0", CIA6526R1, VIC6567_CLOCK, c128_ntsc_cia0)
 	MDRV_CIA6526_ADD("cia_1", CIA6526R1, VIC6567_CLOCK, c128_ntsc_cia1)
-	
+
 	/* floppy from serial bus */
 	MDRV_IMPORT_FROM(simulated_drive)
 
@@ -730,15 +730,15 @@ ROM_END
 
 ROM_START( c128cr )
 	/* C128CR prototype, owned by Bo Zimmers
-	   PCB markings: "COMMODORE 128CR REV.3 // PCB NO.252270" and "PCB ASSY NO.250783"
+       PCB markings: "COMMODORE 128CR REV.3 // PCB NO.252270" and "PCB ASSY NO.250783"
            Sticker on rom cart shield: "C128CR  No.2 // ENG. SAMPLE // Jun/9/'86   KNT"
-	   3 ROMs (combined basic, combined c64/kernal, plain character rom)
-	   6526A-1 CIAs
-	   ?prototype? 2568R1X VDC w/ 1186 datecode
-	*/
+       3 ROMs (combined basic, combined c64/kernal, plain character rom)
+       6526A-1 CIAs
+       ?prototype? 2568R1X VDC w/ 1186 datecode
+    */
 	ROM_REGION( 0x132800, "maincpu", 0 )
-	ROM_LOAD( "252343-03.u34", 0x100000, 0x8000, CRC(bc07ed87) SHA1(0eec437994a3f2212343a712847213a8a39f4a7b) )			// BASIC lo + hi, "252343-03 // U34" 
-	ROM_LOAD( "252343-04.u32", 0x108000, 0x8000, CRC(cc6bdb69) SHA1(36286b2e8bea79f7767639fd85e12c5447c7041b) )			// C64 OS ROM + Kernal, "252343-04 // US // U32" 
+	ROM_LOAD( "252343-03.u34", 0x100000, 0x8000, CRC(bc07ed87) SHA1(0eec437994a3f2212343a712847213a8a39f4a7b) )			// BASIC lo + hi, "252343-03 // U34"
+	ROM_LOAD( "252343-04.u32", 0x108000, 0x8000, CRC(cc6bdb69) SHA1(36286b2e8bea79f7767639fd85e12c5447c7041b) )			// C64 OS ROM + Kernal, "252343-04 // US // U32"
 	ROM_LOAD( "390059-01.u18", 0x120000, 0x2000, CRC(6aaaafe6) SHA1(29ed066d513f2d5c09ff26d9166ba23c2afb2b3f) )			// Character, "MOS // (C)1985 CBM // 390059-01 // M468613 8547H"
 
 	ROM_REGION( 0x10000, "m8502", ROMREGION_ERASEFF )

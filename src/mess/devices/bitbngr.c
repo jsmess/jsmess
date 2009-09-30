@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	bitbngr.c
+    bitbngr.c
 
-	TRS style "bitbanger" serial port
+    TRS style "bitbanger" serial port
 
 *********************************************************************/
 
@@ -186,7 +186,7 @@ static TIMER_CALLBACK(bitbanger_overthreshhold)
 
 /*-------------------------------------------------
     bitbanger_output - outputs data to a bitbanger
-	port
+    port
 -------------------------------------------------*/
 
 void bitbanger_output(const device_config *device, int value)
@@ -225,7 +225,7 @@ void bitbanger_output(const device_config *device, int value)
 
 /*-------------------------------------------------
     DEVICE_GET_INFO(bitbanger) - device getinfo
-	function
+    function
 -------------------------------------------------*/
 
 DEVICE_GET_INFO(bitbanger)

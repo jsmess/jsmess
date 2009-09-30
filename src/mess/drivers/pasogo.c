@@ -46,11 +46,11 @@ static TIMER_CALLBACK( vg230_timer )
 	{
 		vg230.rtc.seconds=00;
 		vg230.rtc.minutes+=1;
-		if (vg230.rtc.minutes>=60) 
+		if (vg230.rtc.minutes>=60)
 		{
 			vg230.rtc.minutes=0;
 			vg230.rtc.hours+=1;
-			if (vg230.rtc.hours>=24) 
+			if (vg230.rtc.hours>=24)
 			{
 				vg230.rtc.hours=0;
 				vg230.rtc.days=(vg230.rtc.days+1)&0xfff;
@@ -61,7 +61,7 @@ static TIMER_CALLBACK( vg230_timer )
 	if (vg230.rtc.seconds==vg230.rtc.alarm_seconds
 		&& vg230.rtc.minutes==vg230.rtc.alarm_minutes
 		&& vg230.rtc.hours==vg230.rtc.alarm_hours
-		&& (vg230.rtc.days&0x1f)==vg230.rtc.alarm_hours) 
+		&& (vg230.rtc.days&0x1f)==vg230.rtc.alarm_hours)
 	{
 		// generate alarm
 	}
@@ -77,7 +77,7 @@ static void vg230_reset(running_machine *machine)
 
 
 	mame_get_base_datetime(machine, &systime);
-  
+
 	vg230.rtc.seconds= systime.local_time.second;
 	vg230.rtc.minutes= systime.local_time.minute;
 	vg230.rtc.hours = systime.local_time.hour;
@@ -97,18 +97,18 @@ static READ8_HANDLER( vg230_io_r )
 	int log=TRUE;
 	UINT8 data=0;
 	vg230.bios_timer.data+=0x100; //HACK
-	if (offset&1) 
+	if (offset&1)
 	{
 		data=vg230.data[vg230.index];
-		switch (vg230.index) 
+		switch (vg230.index)
 		{
 			case 0x09: break;
 			case 0x0a:
-				if (vg230.data[9]&1) 
+				if (vg230.data[9]&1)
 				{
 					data=input_port_read(space->machine, "JOY");
 				}
-				else 
+				else
 				{
 					data=0xff;
 				}
@@ -145,10 +145,10 @@ static READ8_HANDLER( vg230_io_r )
 
 		if (log)
 			logerror("%.5x vg230 %02x read %.2x\n",(int) cpu_get_pc(space->cpu),vg230.index,data);
-      //	data=memory_region(machine, "maincpu")[0x4000+offset];
-	} 
-	else 
-	{      
+      //    data=memory_region(machine, "maincpu")[0x4000+offset];
+	}
+	else
+	{
 		data=vg230.index;
     }
 	return data;
@@ -157,11 +157,11 @@ static READ8_HANDLER( vg230_io_r )
 static WRITE8_HANDLER( vg230_io_w )
 {
 	int log=TRUE;
-	if (offset&1) 
+	if (offset&1)
 	{
-		//	memory_region(machine, "maincpu")[0x4000+offset]=data;
+		//  memory_region(machine, "maincpu")[0x4000+offset]=data;
 		vg230.data[vg230.index]=data;
-		switch (vg230.index) 
+		switch (vg230.index)
 		{
 			case 0x09: break;
 			case 0x70: vg230.rtc.seconds=data&0x3f; break;
@@ -180,17 +180,17 @@ static WRITE8_HANDLER( vg230_io_w )
 				break;
 
 			case 0x7a:
-				if (data&2) 
-				{ 
-					vg230.rtc.alarm_interrupt_request=FALSE; vg230.rtc.onehertz_interrupt_request=FALSE; /* update interrupt */ 
+				if (data&2)
+				{
+					vg230.rtc.alarm_interrupt_request=FALSE; vg230.rtc.onehertz_interrupt_request=FALSE; /* update interrupt */
 				}
 				break;
 		}
-		
+
 		if (log)
 			logerror("%.5x vg230 %02x write %.2x\n",(int)cpu_get_pc(space->cpu),vg230.index,data);
-	} 
-	else 
+	}
+	else
 	{
 		vg230.index=data;
 	}
@@ -210,7 +210,7 @@ static struct {
 static READ8_HANDLER( ems_r )
 {
 	UINT8 data=0;
-	switch (offset) 
+	switch (offset)
 	{
 		case 0: data=ems.data; break;
 		case 2: case 3: data=ems.mapper[ems.index].data[offset&1]; break;
@@ -220,11 +220,11 @@ static READ8_HANDLER( ems_r )
 
 static WRITE8_HANDLER( ems_w )
 {
-	switch (offset) 
+	switch (offset)
 	{
 	case 0:
 		ems.data=data;
-		switch (data&~3) 
+		switch (data&~3)
 		{
 		case 0x80: ems.index=0; break;
 		case 0x84: ems.index=1; break;
@@ -256,7 +256,7 @@ static WRITE8_HANDLER( ems_w )
 		case 0xec: ems.index=25; break;
 		}
 		break;
-	
+
 	case 2:
 	case 3:
 		ems.mapper[ems.index].data[offset&1]=data;
@@ -265,9 +265,9 @@ static WRITE8_HANDLER( ems_w )
 		ems.mapper[ems.index].type=(ems.mapper[ems.index].data[1]&0x70)>>4;
 		logerror("%.5x ems mapper %d(%05x)on:%d type:%d address:%07x\n",(int)cpu_get_pc(space->cpu),ems.index, ems.data<<12,
 			ems.mapper[ems.index].on, ems.mapper[ems.index].type, ems.mapper[ems.index].address );
-		switch (ems.mapper[ems.index].type) 
+		switch (ems.mapper[ems.index].type)
 		{
-		case 0: /*external*/ 
+		case 0: /*external*/
 		case 1: /*ram*/
 		memory_set_bankptr( space->machine, ems.index+1, memory_region(space->machine, "maincpu") + (ems.mapper[ems.index].address&0xfffff) );
 		break;
@@ -285,8 +285,8 @@ static WRITE8_HANDLER( ems_w )
 }
 
 static ADDRESS_MAP_START( pasogo_mem, ADDRESS_SPACE_PROGRAM, 8 )
-//	AM_RANGE(0x00000, 0xfffff) AM_UNMAP AM_MASK(0xfffff)
-//	AM_RANGE( 0x4000, 0x7fff) AM_READWRITE(gmaster_io_r, gmaster_io_w)
+//  AM_RANGE(0x00000, 0xfffff) AM_UNMAP AM_MASK(0xfffff)
+//  AM_RANGE( 0x4000, 0x7fff) AM_READWRITE(gmaster_io_r, gmaster_io_w)
 	ADDRESS_MAP_GLOBAL_MASK(0xffFFF)
 	AM_RANGE(0x00000, 0x7ffff) AM_RAM
 	AM_RANGE(0x80000, 0x83fff) AM_RAMBANK(1)
@@ -303,7 +303,7 @@ static ADDRESS_MAP_START( pasogo_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xac000, 0xaffff) AM_RAMBANK(12)
 	AM_RANGE(0xb0000, 0xb3fff) AM_RAMBANK(13)
 	AM_RANGE(0xb4000, 0xb7fff) AM_RAMBANK(14)
-//	AM_RANGE(0xb8000, 0xbffff) AM_RAM
+//  AM_RANGE(0xb8000, 0xbffff) AM_RAM
 	AM_RANGE(0xb8000, 0xbffff) AM_RAMBANK(28)
 	AM_RANGE(0xc0000, 0xc3fff) AM_RAMBANK(15)
 	AM_RANGE(0xc4000, 0xc7fff) AM_RAMBANK(16)
@@ -322,7 +322,7 @@ static ADDRESS_MAP_START( pasogo_mem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(pasogo_io, ADDRESS_SPACE_IO, 8)
-//	ADDRESS_MAP_GLOBAL_MASK(0xfFFF)
+//  ADDRESS_MAP_GLOBAL_MASK(0xfFFF)
 	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE("pic8259", pic8259_r, pic8259_w)
 	AM_RANGE(0x26, 0x27) AM_READWRITE(vg230_io_r, vg230_io_w )
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE("pit8254", pit8253_r, pit8253_w)
@@ -331,8 +331,8 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( pasogo )
 PORT_START("JOY")
-//	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SELECT)  PORT_NAME("select")
-//	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START) PORT_NAME("start")
+//  PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SELECT)  PORT_NAME("select")
+//  PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START) PORT_NAME("start")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("O") /*?*/
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("X") /*?*/
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP   )
@@ -356,7 +356,7 @@ static PALETTE_INIT( pasogo )
 {
 	int i;
 
-	for ( i = 0; i < ARRAY_LENGTH(pasogo_palette); i++ ) 
+	for ( i = 0; i < ARRAY_LENGTH(pasogo_palette); i++ )
 	{
 		palette_set_color_rgb(machine, i, pasogo_palette[i][0], pasogo_palette[i][1], pasogo_palette[i][2]);
 	}
@@ -368,16 +368,16 @@ static VIDEO_UPDATE( pasogo )
 	UINT8 *rom = memory_region(screen->machine, "maincpu")+0xb8000;
 	UINT16 c[]={ 3, 0 };
 	int x,y;
-//	plot_box(bitmap, 0, 0, 64/*bitmap->width*/, bitmap->height, 0);
+//  plot_box(bitmap, 0, 0, 64/*bitmap->width*/, bitmap->height, 0);
 	int w=640;
 	int h=240;
-	if (0) 
+	if (0)
 	{
 		w=320;
 		h=240;
-		for (y=0;y<h; y++) 
+		for (y=0;y<h; y++)
 		{
-			for (x=0;x<w;x+=4) 
+			for (x=0;x<w;x+=4)
 			{
 				int a=(y&1)*0x2000;
 				UINT8 d=rom[a+(y&~1)*80/2+x/4];
@@ -388,12 +388,12 @@ static VIDEO_UPDATE( pasogo )
 				*line++=(d>>0)&3;
 			}
 		}
-	} 
-	else 
+	}
+	else
 	{
-		for (y=0;y<h; y++) 
+		for (y=0;y<h; y++)
 		{
-			for (x=0;x<w;x+=8) 
+			for (x=0;x<w;x+=8)
 			{
 				int a=(y&3)*0x2000;
 				UINT8 d=rom[a+(y&~3)*80/4+x/8];
@@ -409,10 +409,10 @@ static VIDEO_UPDATE( pasogo )
 			}
 		}
 	}
-	if (w!=width || h!=height) 
+	if (w!=width || h!=height)
 	{
 		width=w; height=h;
-//		video_screen_set_visarea(machine->primary_screen, 0, width-1, 0, height-1);
+//      video_screen_set_visarea(machine->primary_screen, 0, width-1, 0, height-1);
 		video_screen_set_visarea(screen, 0, width-1, 0, height-1);
 	}
 	return 0;
@@ -420,7 +420,7 @@ static VIDEO_UPDATE( pasogo )
 
 static INTERRUPT_GEN( pasogo_interrupt )
 {
-//	cputag_set_input_line(machine, "maincpu", UPD7810_INTFE1, PULSE_LINE);
+//  cputag_set_input_line(machine, "maincpu", UPD7810_INTFE1, PULSE_LINE);
 }
 
 static IRQ_CALLBACK(pasogo_irq_callback)
@@ -457,7 +457,7 @@ static const struct pit8253_config pc_pit8254_config =
 };
 
 
-static PIC8259_SET_INT_LINE( pasogo_pic8259_set_int_line ) 
+static PIC8259_SET_INT_LINE( pasogo_pic8259_set_int_line )
 {
 	cputag_set_input_line(device->machine, "maincpu", 0, interrupt ? HOLD_LINE : CLEAR_LINE);
 }
@@ -487,7 +487,7 @@ static MACHINE_DRIVER_START( pasogo )
 	MDRV_CPU_PROGRAM_MAP(pasogo_mem)
 	MDRV_CPU_IO_MAP( pasogo_io)
 	MDRV_CPU_VBLANK_INT("screen", pasogo_interrupt)
-//	MDRV_CPU_CONFIG(i86_address_mask)
+//  MDRV_CPU_CONFIG(i86_address_mask)
 	MDRV_MACHINE_RESET( pasogo )
 
 	MDRV_PIT8254_ADD( "pit8254", pc_pit8254_config )
@@ -518,8 +518,8 @@ MACHINE_DRIVER_END
 
 ROM_START(pasogo)
 	ROM_REGION(0x100000,"maincpu", ROMREGION_ERASEFF) // 1 megabyte dram?
-//	ROM_LOAD("gmaster.bin", 0x0000, 0x1000, CRC(05cc45e5) SHA1(05d73638dea9657ccc2791c0202d9074a4782c1e) )
-//	ROM_CART_LOAD(0, "bin", 0x8000, 0x8000, 0)
+//  ROM_LOAD("gmaster.bin", 0x0000, 0x1000, CRC(05cc45e5) SHA1(05d73638dea9657ccc2791c0202d9074a4782c1e) )
+//  ROM_CART_LOAD(0, "bin", 0x8000, 0x8000, 0)
 	ROM_REGION(0x100000,"user1", ROMREGION_ERASEFF)
 ROM_END
 
@@ -532,7 +532,7 @@ static DRIVER_INIT( pasogo )
 	memory_set_bankptr( machine, 28, memory_region(machine, "maincpu") + 0xb8000/*?*/ );
 }
 
-/*    YEAR      NAME            PARENT  MACHINE   INPUT     INIT                
-	  COMPANY                 FULLNAME */
+/*    YEAR      NAME            PARENT  MACHINE   INPUT     INIT
+      COMPANY                 FULLNAME */
 CONS( 1996, pasogo,       0,          0, pasogo,  pasogo,    pasogo,   0, "KOEI", "PasoGo", GAME_NO_SOUND|GAME_NOT_WORKING)
 

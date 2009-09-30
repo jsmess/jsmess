@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	formats/ami_dsk.c
+    formats/ami_dsk.c
 
-	Amiga disk images
+    Amiga disk images
 
 *********************************************************************/
 
@@ -23,7 +23,7 @@ static FLOPPY_IDENTIFY( amiga_dsk_identify )
 {
 	UINT64 size;
 	UINT8 header[4];
-	
+
 	*vote = 100;
 
 	/* get first 4 bytes */
@@ -42,7 +42,7 @@ static FLOPPY_IDENTIFY( amiga_dsk_identify )
 	if (header[3] > 5)
 		*vote = 0;
 
-	return FLOPPY_ERROR_SUCCESS;	
+	return FLOPPY_ERROR_SUCCESS;
 }
 
 
@@ -56,7 +56,7 @@ static FLOPPY_CONSTRUCT( amiga_dsk_construct )
 	geometry.tracks = 80;
 	geometry.first_sector_id = 0;
 	geometry.sector_length = 512;
-	
+
 	if (params)
 	{
 		/* create */
@@ -68,9 +68,9 @@ static FLOPPY_CONSTRUCT( amiga_dsk_construct )
 		UINT64 size = floppy_image_size(floppy);
 		geometry.sectors = size/512/80/2;
 		if (geometry.sectors != 11 && geometry.sectors != 22)
-			return FLOPPY_ERROR_INVALIDIMAGE;		
+			return FLOPPY_ERROR_INVALIDIMAGE;
 	}
-	
+
 	return basicdsk_construct(floppy, &geometry);
 }
 

@@ -33,7 +33,7 @@ struct floppy_config_t
 {
 	floppy_type floppy_type;
 	const struct FloppyFormat *formats;
-	keep_geometry keep_drive_geometry;	
+	keep_geometry keep_drive_geometry;
 };
 
 /* sector has a deleted data address mark */
@@ -161,7 +161,7 @@ extern DEVICE_IMAGE_UNLOAD( floppy );
 	MDRV_DEVICE_ADD(FLOPPY_2, FLOPPY, 0)		\
 	MDRV_DEVICE_CONFIG(_config)	\
 	MDRV_DEVICE_ADD(FLOPPY_3, FLOPPY, 0)		\
-	MDRV_DEVICE_CONFIG(_config)	
+	MDRV_DEVICE_CONFIG(_config)
 
 #define MDRV_FLOPPY_4_DRIVES_MODIFY(_config) 	\
 	MDRV_DEVICE_MODIFY(FLOPPY_0)		\
@@ -171,28 +171,28 @@ extern DEVICE_IMAGE_UNLOAD( floppy );
 	MDRV_DEVICE_MODIFY(FLOPPY_2)		\
 	MDRV_DEVICE_CONFIG(_config)	\
 	MDRV_DEVICE_MODIFY(FLOPPY_3)		\
-	MDRV_DEVICE_CONFIG(_config)	
+	MDRV_DEVICE_CONFIG(_config)
 
 #define MDRV_FLOPPY_4_DRIVES_REMOVE() 	\
 	MDRV_DEVICE_REMOVE(FLOPPY_0)		\
 	MDRV_DEVICE_REMOVE(FLOPPY_1)		\
 	MDRV_DEVICE_REMOVE(FLOPPY_2)		\
-	MDRV_DEVICE_REMOVE(FLOPPY_3)		
-	
+	MDRV_DEVICE_REMOVE(FLOPPY_3)
+
 #define MDRV_FLOPPY_2_DRIVES_ADD(_config) 	\
 	MDRV_DEVICE_ADD(FLOPPY_0, FLOPPY, 0)		\
 	MDRV_DEVICE_CONFIG(_config)	\
 	MDRV_DEVICE_ADD(FLOPPY_1, FLOPPY, 0)		\
-	MDRV_DEVICE_CONFIG(_config)	
+	MDRV_DEVICE_CONFIG(_config)
 
 #define MDRV_FLOPPY_2_DRIVES_MODIFY(_config) 	\
 	MDRV_DEVICE_MODIFY(FLOPPY_0)		\
 	MDRV_DEVICE_CONFIG(_config)	\
 	MDRV_DEVICE_MODIFY(FLOPPY_1)		\
-	MDRV_DEVICE_CONFIG(_config)	
+	MDRV_DEVICE_CONFIG(_config)
 
 #define MDRV_FLOPPY_2_DRIVES_REMOVE() 	\
 	MDRV_DEVICE_REMOVE(FLOPPY_0)		\
-	MDRV_DEVICE_REMOVE(FLOPPY_1)		
-			
+	MDRV_DEVICE_REMOVE(FLOPPY_1)
+
 #endif /* FLOPDRV_H */

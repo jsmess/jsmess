@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	multcart.h
+    multcart.h
 
-	Multi-cartridge handling code
+    Multi-cartridge handling code
 
 *********************************************************************/
 

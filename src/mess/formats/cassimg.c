@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	cassimg.c
+    cassimg.c
 
-	Cassette tape image abstraction code
+    Cassette tape image abstraction code
 
 *********************************************************************/
 
@@ -29,7 +29,7 @@ CASSETTE_FORMATLIST_END
 
 
 /*********************************************************************
-	helper code
+    helper code
 *********************************************************************/
 
 static double map_double(double d, UINT64 low, UINT64 high, UINT64 value)
@@ -52,7 +52,7 @@ static size_t waveform_bytes_per_sample(int waveform_flags)
 
 
 /*********************************************************************
-	extrapolation and interpolation
+    extrapolation and interpolation
 *********************************************************************/
 
 static INT32 extrapolate8(INT8 value)
@@ -78,7 +78,7 @@ static INT16 interpolate16(INT32 value)
 
 
 /*********************************************************************
-	initialization and termination
+    initialization and termination
 *********************************************************************/
 
 static cassette_image *cassette_init(running_machine *machine,const struct CassetteFormat *format, void *file, const struct io_procs *procs, int flags)
@@ -301,7 +301,7 @@ void cassette_change(cassette_image *cassette, void *file, const struct io_procs
 
 
 /*********************************************************************
-	calls for accessing the raw cassette image
+    calls for accessing the raw cassette image
 *********************************************************************/
 
 void cassette_image_read(cassette_image *cassette, void *buffer, UINT64 offset, size_t length)
@@ -326,7 +326,7 @@ UINT64 cassette_image_size(cassette_image *cassette)
 
 
 /*********************************************************************
-	waveform accesses
+    waveform accesses
 *********************************************************************/
 
 struct manipulation_ranges
@@ -433,7 +433,7 @@ static casserr_t lookup_sample(cassette_image *cassette, int channel, size_t sam
 
 
 /*********************************************************************
-	waveform accesses
+    waveform accesses
 *********************************************************************/
 
 casserr_t cassette_get_samples(cassette_image *cassette, int channel,
@@ -598,7 +598,7 @@ casserr_t cassette_put_sample(cassette_image *cassette, int channel,
 
 
 /*********************************************************************
-	waveform accesses to/from the raw image
+    waveform accesses to/from the raw image
 *********************************************************************/
 
 casserr_t cassette_read_samples(cassette_image *cassette, int channels, double time_index,
@@ -682,7 +682,7 @@ casserr_t cassette_write_samples(cassette_image *cassette, int channels, double 
 
 
 /*********************************************************************
-	waveform accesses to/from the raw image
+    waveform accesses to/from the raw image
 *********************************************************************/
 
 static const INT8 *choose_wave(const struct CassetteModulation *modulation, size_t *wave_bytes_length)
@@ -868,7 +868,7 @@ done:
 
 
 /*********************************************************************
-	waveform accesses to/from the raw image
+    waveform accesses to/from the raw image
 *********************************************************************/
 
 casserr_t cassette_legacy_identify(cassette_image *cassette, struct CassetteOptions *opts,
@@ -1023,9 +1023,9 @@ done:
 
 
 /*********************************************************************
-	cassette_dump
+    cassette_dump
 
-	A debugging call to dump a casette image to a disk based wave file
+    A debugging call to dump a casette image to a disk based wave file
 *********************************************************************/
 
 void cassette_dump(cassette_image *image, const char *filename)

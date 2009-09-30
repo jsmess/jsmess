@@ -16,8 +16,8 @@
 #define PRIMO_BIT_1_LENGTH		(PRIMO_BIT_1_PERIOD*PRIMO_WAV_FREQUENCY)
 #define PRIMO_BIT_0_LENGTH		(PRIMO_BIT_0_PERIOD*PRIMO_WAV_FREQUENCY)
 /*
-#define PRIMO_BIT_1_LENGTH		6
-#define PRIMO_BIT_0_LENGTH		16
+#define PRIMO_BIT_1_LENGTH      6
+#define PRIMO_BIT_0_LENGTH      16
 */
 #define PRIMO_PAUSE_LENGTH		2000
 #define PRIMO_FILE_PILOT_LENGTH		((4*PRIMO_BIT_1_LENGTH + 4*PRIMO_BIT_0_LENGTH)*512)
@@ -102,7 +102,7 @@ static int primo_cassette_calculate_size_in_samples(const UINT8 *bytes, int leng
 		logerror ("File size (with header): %d\n", file_size);
 
 		/* b is now set on the first data byte of file
-		   it means first byte (type) of block */
+           it means first byte (type) of block */
 
 		j = 0;
 		while (j < file_size-3)
@@ -173,7 +173,7 @@ static int primo_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
 		logerror ("File size: %d\n", file_size);
 
 		/* b is now set on the first data byte of file
-		   it means first byte (block type) of block header */
+           it means first byte (block type) of block header */
 
 		j = 0;
 		while (j < file_size-3)

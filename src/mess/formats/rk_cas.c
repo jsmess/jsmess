@@ -1,7 +1,7 @@
 /*
-	
-	Tape support for RK format
-		
+
+    Tape support for RK format
+
 */
 #include "driver.h"
 #include "formats/rk_cas.h"
@@ -35,13 +35,13 @@ static INT16* rk_output_bit(INT16 *p, UINT8 b,int bitsize)
 	if (b)
 	{
 		p = rk_emit_level (p, bitsize, WAVE_HIGH);
-		p = rk_emit_level (p, bitsize, WAVE_LOW);								
-	}	
+		p = rk_emit_level (p, bitsize, WAVE_LOW);
+	}
 	else
 	{
-		p = rk_emit_level (p, bitsize, WAVE_LOW);	
-		p = rk_emit_level (p, bitsize, WAVE_HIGH);				
-			
+		p = rk_emit_level (p, bitsize, WAVE_LOW);
+		p = rk_emit_level (p, bitsize, WAVE_HIGH);
+
 	}
     return p;
 }
@@ -56,82 +56,82 @@ static INT16* rk_output_byte(INT16 *p, UINT8 byte,int bitsize)
 }
 
 
-static int rk20_cas_to_wav_size( const UINT8 *casdata, int caslen ) {	
+static int rk20_cas_to_wav_size( const UINT8 *casdata, int caslen ) {
 	data_size = caslen;
-	return  (RK_HEADER_LEN  * 8 * 2 +  8*2 + caslen * 8 * 2) * RK_SIZE_20;	
+	return  (RK_HEADER_LEN  * 8 * 2 +  8*2 + caslen * 8 * 2) * RK_SIZE_20;
 }
 
-static int rk22_cas_to_wav_size( const UINT8 *casdata, int caslen ) {	
+static int rk22_cas_to_wav_size( const UINT8 *casdata, int caslen ) {
 	data_size = caslen;
-	return  (RK_HEADER_LEN  * 8 * 2 +  8*2 + caslen * 8 * 2) * RK_SIZE_22;	
+	return  (RK_HEADER_LEN  * 8 * 2 +  8*2 + caslen * 8 * 2) * RK_SIZE_22;
 }
 
-static int rk60_cas_to_wav_size( const UINT8 *casdata, int caslen ) {	
+static int rk60_cas_to_wav_size( const UINT8 *casdata, int caslen ) {
 	data_size = caslen;
-	return  (RK_HEADER_LEN  * 8 * 2 +  8*2 + caslen * 8 * 2) * RK_SIZE_60;	
+	return  (RK_HEADER_LEN  * 8 * 2 +  8*2 + caslen * 8 * 2) * RK_SIZE_60;
 }
 
-static int gam_cas_to_wav_size( const UINT8 *casdata, int caslen ) {	
+static int gam_cas_to_wav_size( const UINT8 *casdata, int caslen ) {
 	data_size = caslen;
-	return  (RK_HEADER_LEN  * 8 * 2 +  caslen * 8 * 2) * RK_SIZE_20;	
+	return  (RK_HEADER_LEN  * 8 * 2 +  caslen * 8 * 2) * RK_SIZE_20;
 }
 
-static int rk20_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes ) {	
+static int rk20_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes ) {
 	int i;
 	INT16 * p = buffer;
-	
+
 	for (i=0; i<RK_HEADER_LEN; i++) {
-		p = rk_output_byte (p, 0x00, RK_SIZE_20 );	
+		p = rk_output_byte (p, 0x00, RK_SIZE_20 );
 	}
 
-	p = rk_output_byte (p, 0xE6, RK_SIZE_20);	
-	
+	p = rk_output_byte (p, 0xE6, RK_SIZE_20);
+
 	for (i=0; i<data_size; i++)
 		p = rk_output_byte (p, bytes[i], RK_SIZE_20);
 
 	return p - buffer;
 }
 
-static int rk22_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes ) {	
+static int rk22_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes ) {
 	int i;
 	INT16 * p = buffer;
-	
+
 	for (i=0; i<RK_HEADER_LEN; i++) {
-		p = rk_output_byte (p, 0x00, RK_SIZE_22 );	
+		p = rk_output_byte (p, 0x00, RK_SIZE_22 );
 	}
 
-	p = rk_output_byte (p, 0xE6, RK_SIZE_22);	
-	
+	p = rk_output_byte (p, 0xE6, RK_SIZE_22);
+
 	for (i=0; i<data_size; i++)
 		p = rk_output_byte (p, bytes[i], RK_SIZE_22);
 
 	return p - buffer;
 }
 
-static int rk60_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes ) {	
+static int rk60_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes ) {
 	int i;
 	INT16 * p = buffer;
-	
+
 	for (i=0; i<RK_HEADER_LEN; i++) {
-		p = rk_output_byte (p, 0x00, RK_SIZE_60 );	
+		p = rk_output_byte (p, 0x00, RK_SIZE_60 );
 	}
 
-	p = rk_output_byte (p, 0xE6, RK_SIZE_60);	
-	
+	p = rk_output_byte (p, 0xE6, RK_SIZE_60);
+
 	for (i=0; i<data_size; i++)
 		p = rk_output_byte (p, bytes[i], RK_SIZE_60);
 
 	return p - buffer;
 }
 
-static int gam_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes ) {	
+static int gam_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes ) {
 	int i;
 	INT16 * p = buffer;
-	
+
 	for (i=0; i<RK_HEADER_LEN; i++) {
-		p = rk_output_byte (p, 0x00, RK_SIZE_20 );	
+		p = rk_output_byte (p, 0x00, RK_SIZE_20 );
 	}
-	
+
 	for (i=0; i<data_size; i++)
 		p = rk_output_byte (p, bytes[i], RK_SIZE_20);
 

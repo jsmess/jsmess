@@ -1,33 +1,33 @@
 /**************************************************************************
 
-	coco_cas.c
+    coco_cas.c
 
-	Format code for CoCo CAS (*.cas) files
+    Format code for CoCo CAS (*.cas) files
 
-	This is the actual code that processes the CAS data.  CAS files are	a
-	problem because they are a legacy of previous CoCo emulators, and most
-	of these emulators patch the system as a shortcut.  Thus, the ones and
-	zeroes in the file do not truly represent modulated pulses in the
-	waveform, but what the BIOS reads and writes.
+    This is the actual code that processes the CAS data.  CAS files are a
+    problem because they are a legacy of previous CoCo emulators, and most
+    of these emulators patch the system as a shortcut.  Thus, the ones and
+    zeroes in the file do not truly represent modulated pulses in the
+    waveform, but what the BIOS reads and writes.
 
-	In doing so, they make the CoCo more tolerant of short headers and lack
-	of delays between blocks.  This legacy is reflected in most CAS files in
+    In doing so, they make the CoCo more tolerant of short headers and lack
+    of delays between blocks.  This legacy is reflected in most CAS files in
     use, and thus presents a problem for a pure hardware emulation like MESS.
 
-	One alternative is to preprocess the data on the CAS, file by file, but
-	this proves to be problematic because in the process, legitimate data
-	that is unrecognized by the preprocessor may get dropped.
+    One alternative is to preprocess the data on the CAS, file by file, but
+    this proves to be problematic because in the process, legitimate data
+    that is unrecognized by the preprocessor may get dropped.
 
-	The approach taken here is a hybrid approach - it retrieves the data
-	block by block until an error occurs; be it the end of the CAS or a
-	corrupt (?!) block.  When "legitimate" blocks are done processing, the
-	remainder of the data is added to the waveform in a traditional manner.
-	The result has proven to work quite well.
+    The approach taken here is a hybrid approach - it retrieves the data
+    block by block until an error occurs; be it the end of the CAS or a
+    corrupt (?!) block.  When "legitimate" blocks are done processing, the
+    remainder of the data is added to the waveform in a traditional manner.
+    The result has proven to work quite well.
 
-	2005-May-04, P.Harvey-Smith, improved handling of some "copy protected"
-	Dragon games that have odd blocks in odd places, this has slightly
-	increased loading time but does mean games like "Rommel's Revenge" will
-	now load.
+    2005-May-04, P.Harvey-Smith, improved handling of some "copy protected"
+    Dragon games that have odd blocks in odd places, this has slightly
+    increased loading time but does mean games like "Rommel's Revenge" will
+    now load.
 
 **************************************************************************/
 

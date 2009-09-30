@@ -98,7 +98,7 @@ static int jupiter_handle_tap(INT16 *buffer, const UINT8 *casdata)
 		/* Handle a block of tape data */
 		block_size = casdata[data_pos] + ( casdata[data_pos + 1] << 8 );
 		data_pos += 2;
-		
+
 		/* Make sure there are enough bytes left */
 		if ( data_pos > cas_size )
 			return -1;

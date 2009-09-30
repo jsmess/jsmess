@@ -6,8 +6,8 @@
 #define VERBOSE 0
 #endif
 
-//#define LOG(N,M,A)	
-//	if(VERBOSE>=N){ if( M )logerror("%11.6f: %-24s",attotime_to_double(timer_get_time(machine)), (const char*)M ); logerror A; }
+//#define LOG(N,M,A)
+//  if(VERBOSE>=N){ if( M )logerror("%11.6f: %-24s",attotime_to_double(timer_get_time(machine)), (const char*)M ); logerror A; }
 
 #define LOG(N,M,A)	\
 	if(VERBOSE>=N){ if( M )logerror("%-24s",(const char*)M ); logerror A; }

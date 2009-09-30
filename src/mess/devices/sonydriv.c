@@ -1,38 +1,38 @@
 /*********************************************************************
 
-	sonydriv.c
+    sonydriv.c
 
-	Apple/Sony 3.5" floppy drive emulation (to be interfaced with iwm.c)
+    Apple/Sony 3.5" floppy drive emulation (to be interfaced with iwm.c)
 
-	Nate Woods, Raphael Nabet
+    Nate Woods, Raphael Nabet
 
-	This floppy drive was present in all variants of Lisa 2 (including Mac XL),
-	and in all Macintosh in production before 1988, when SIWM and superdrive
-	were introduced.
+    This floppy drive was present in all variants of Lisa 2 (including Mac XL),
+    and in all Macintosh in production before 1988, when SIWM and superdrive
+    were introduced.
 
-	There were two variants :
-	- A single-sided 400k unit which was used on Lisa 2/Mac XL, and Macintosh
-	  128k/512k.  This unit needs the computer to send the proper pulses to
-	  control the drive motor rotation.  It can be connected to all early
-	  Macintosh (but not Mac Classic?) as an external unit.
-	- A double-sided 800k unit which was used on Macintosh Plus, 512ke, and
-	  early SE and II*.  This unit generates its own drive motor rotation
-	  control signals.  It can be connected to earlier (and later) Macintosh as
-	  an external or internal unit.  Some Lisa2/10 and Mac XL were upgraded to
-	  use it, too, but a fdc ROM upgrade was required.
+    There were two variants :
+    - A single-sided 400k unit which was used on Lisa 2/Mac XL, and Macintosh
+      128k/512k.  This unit needs the computer to send the proper pulses to
+      control the drive motor rotation.  It can be connected to all early
+      Macintosh (but not Mac Classic?) as an external unit.
+    - A double-sided 800k unit which was used on Macintosh Plus, 512ke, and
+      early SE and II*.  This unit generates its own drive motor rotation
+      control signals.  It can be connected to earlier (and later) Macintosh as
+      an external or internal unit.  Some Lisa2/10 and Mac XL were upgraded to
+      use it, too, but a fdc ROM upgrade was required.
 
-	* Note: I don't know for sure whether some Mac II were actually produced
-	  with a Superdrive unit, though Apple did sell an upgrade kit, made of
-	  a Superdrive unit, a SIWM controller and upgraded systems ROMs, which
-	  added HD and MFM support to existing Macintosh II.
+    * Note: I don't know for sure whether some Mac II were actually produced
+      with a Superdrive unit, though Apple did sell an upgrade kit, made of
+      a Superdrive unit, a SIWM controller and upgraded systems ROMs, which
+      added HD and MFM support to existing Macintosh II.
 
-	TODO :
-	* bare images are supposed to be in Macintosh format (look for formatByte
-	  in sony_floppy_init(), and you will understand).  We need to support
-	  Lisa, Apple II...
-	* support for other image formats?
-	* should we support more than 2 floppy disk units? (Mac SE *MAY* have
-	  supported 3 drives)
+    TODO :
+    * bare images are supposed to be in Macintosh format (look for formatByte
+      in sony_floppy_init(), and you will understand).  We need to support
+      Lisa, Apple II...
+    * support for other image formats?
+    * should we support more than 2 floppy disk units? (Mac SE *MAY* have
+      supported 3 drives)
 
 *********************************************************************/
 
@@ -52,7 +52,7 @@
 #endif
 
 /*
-	These lines are normally connected to the PHI0-PHI3 lines of the IWM
+    These lines are normally connected to the PHI0-PHI3 lines of the IWM
 */
 enum
 {
@@ -71,8 +71,8 @@ static int sony_sel_line;			/* one single line Is 0 or 1 */
 static unsigned int rotation_speed;		/* drive rotation speed - ignored if ext_speed_control == 0 */
 
 /*
-	Structure that describes the state of a floppy drive, and the associated
-	disk image
+    Structure that describes the state of a floppy drive, and the associated
+    disk image
 */
 typedef struct
 {
@@ -192,20 +192,20 @@ static int sony_rpm(floppy *f, const device_config *cur_image)
 	int result = 0;
 
 	/*
-	 * The Mac floppy controller was interesting in that its speed was adjusted
-	 * while the thing was running.  On the tracks closer to the rim, it was
-	 * sped up so that more data could be placed on it.  Hence, this function
-	 * has different results depending on the track number
-	 *
-	 * The Mac Plus (and probably the other Macs that use the IWM) verify that
-	 * the speed of the floppy drive is within a certain range depending on
-	 * what track the floppy is at.  These RPM values are just guesses and are
-	 * probably not fully accurate, but they are within the range that the Mac
-	 * Plus expects and thus are probably in the right ballpark.
-	 *
-	 * Note - the timing values are the values returned by the Mac Plus routine
-	 * that calculates the speed; I'm not sure what units they are in
-	 */
+     * The Mac floppy controller was interesting in that its speed was adjusted
+     * while the thing was running.  On the tracks closer to the rim, it was
+     * sped up so that more data could be placed on it.  Hence, this function
+     * has different results depending on the track number
+     *
+     * The Mac Plus (and probably the other Macs that use the IWM) verify that
+     * the speed of the floppy drive is within a certain range depending on
+     * what track the floppy is at.  These RPM values are just guesses and are
+     * probably not fully accurate, but they are within the range that the Mac
+     * Plus expects and thus are probably in the right ballpark.
+     *
+     * Note - the timing values are the values returned by the Mac Plus routine
+     * that calculates the speed; I'm not sure what units they are in
+     */
 
 	if (f->ext_speed_control)
 	{
@@ -217,21 +217,21 @@ static int sony_rpm(floppy *f, const device_config *cur_image)
 #if 1	/* Mac Plus */
 		static const int speeds[] =
 		{
-			500,	/* 00-15:	timing value 117B (acceptable range {1135-11E9} */
-			550,	/* 16-31:	timing value ???? (acceptable range {12C6-138A} */
-			600,	/* 32-47:	timing value ???? (acceptable range {14A7-157F} */
-			675,	/* 48-63:	timing value ???? (acceptable range {16F2-17E2} */
-			750		/* 64-79:	timing value ???? (acceptable range {19D0-1ADE} */
+			500,	/* 00-15:   timing value 117B (acceptable range {1135-11E9} */
+			550,	/* 16-31:   timing value ???? (acceptable range {12C6-138A} */
+			600,	/* 32-47:   timing value ???? (acceptable range {14A7-157F} */
+			675,	/* 48-63:   timing value ???? (acceptable range {16F2-17E2} */
+			750		/* 64-79:   timing value ???? (acceptable range {19D0-1ADE} */
 		};
 #else	/* Lisa 2 */
 		/* 237 + 1.3*(256-reg) */
 		static const int speeds[] =
 		{
-			293,	/* 00-15:	timing value ???? (acceptable range {0330-0336} */
-			322,	/* 16-31:	timing value ???? (acceptable range {02ED-02F3} */
-			351,	/* 32-47:	timing value ???? (acceptable range {02A7-02AD} */
-			394,	/* 48-63:	timing value ???? (acceptable range {0262-0266} */
-			439		/* 64-79:	timing value ???? (acceptable range {021E-0222} */
+			293,	/* 00-15:   timing value ???? (acceptable range {0330-0336} */
+			322,	/* 16-31:   timing value ???? (acceptable range {02ED-02F3} */
+			351,	/* 32-47:   timing value ???? (acceptable range {02A7-02AD} */
+			394,	/* 48-63:   timing value ???? (acceptable range {0262-0266} */
+			439		/* 64-79:   timing value ???? (acceptable range {021E-0222} */
 		};
 #endif
 		if (cur_image && image_exists(cur_image))
@@ -321,16 +321,16 @@ int sony_read_status(const device_config *device)
 			break;
 		case 0x0d:	/* Unknown */
 			/* I'm not sure what this one does, but the Mac Plus executes the
-			 * following code that uses this status:
-			 *
-			 *	417E52: moveq   #$d, D0		; Status 0x0d
-			 *	417E54: bsr     4185fe		; Query IWM status
-			 *	417E58: bmi     417e82		; If result=1, then skip
-			 *
-			 * This code is called in the Sony driver's open method, and
-			 * _AddDrive does not get called if this status 0x0d returns 1.
-			 * Hence, we are returning 0
-			 */
+             * following code that uses this status:
+             *
+             *  417E52: moveq   #$d, D0     ; Status 0x0d
+             *  417E54: bsr     4185fe      ; Query IWM status
+             *  417E58: bmi     417e82      ; If result=1, then skip
+             *
+             * This code is called in the Sony driver's open method, and
+             * _AddDrive does not get called if this status 0x0d returns 1.
+             * Hence, we are returning 0
+             */
 			result = 0;
 			break;
 		case 0x0e:	/* Tachometer */
@@ -466,7 +466,7 @@ void sony_set_speed(int speed)
 }
 
 static DEVICE_START( sonydriv_floppy )
-{	
+{
 
 	DEVICE_START_CALL(floppy);
 	floppy_set_type(device,FLOPPY_TYPE_SONY);
@@ -480,11 +480,11 @@ static DEVICE_IMAGE_UNLOAD( sonydriv_floppy )
 	/* locate the FDC */
 	fdc = devtag_get_device(image->machine, "fdc");
 
-	id = floppy_get_drive_by_type(image,FLOPPY_TYPE_SONY);	
+	id = floppy_get_drive_by_type(image,FLOPPY_TYPE_SONY);
 	save_track_data(fdc, id);
 	memset(&sony_floppy[id], 0, sizeof(sony_floppy[id]));
 
-	DEVICE_IMAGE_UNLOAD_NAME(floppy)(image);	
+	DEVICE_IMAGE_UNLOAD_NAME(floppy)(image);
 }
 
 DEVICE_GET_INFO( sonydriv )

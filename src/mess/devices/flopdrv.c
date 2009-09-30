@@ -33,7 +33,7 @@ typedef struct _floppy_drive floppy_drive;
 struct _floppy_drive
 {
 	const floppy_config	*config;
-	
+
 	/* flags */
 	int flags;
 	/* maximum track allowed */
@@ -247,7 +247,7 @@ static TIMER_CALLBACK(floppy_drive_index_callback);
 
 /* this is called on device init */
 void floppy_drive_init(const device_config *img)
-{	
+{
 	floppy_drive *pDrive = get_safe_token( img );
 
 	/* initialise flags */
@@ -268,9 +268,9 @@ void floppy_drive_init(const device_config *img)
 	pDrive->rpm = 300;
 
 	pDrive->controller = NULL;
-	
+
 	pDrive->custom_data = NULL;
-	
+
 	pDrive->floppy_drive_type = FLOPPY_TYPE_REGULAR;
 }
 
@@ -770,7 +770,7 @@ const device_config *floppy_get_device(running_machine *machine,int drive)
 		case 0 : return devtag_get_device(machine,FLOPPY_0);
 		case 1 : return devtag_get_device(machine,FLOPPY_1);
 		case 2 : return devtag_get_device(machine,FLOPPY_2);
-		case 3 : return devtag_get_device(machine,FLOPPY_3);		
+		case 3 : return devtag_get_device(machine,FLOPPY_3);
 	}
 	return NULL;
 }
@@ -799,7 +799,7 @@ const device_config *floppy_get_device_by_type(running_machine *machine,int ftyp
 			}
 			cnt++;
 		}
-	}	
+	}
 	return NULL;
 }
 
@@ -822,9 +822,9 @@ int floppy_get_drive_by_type(const device_config *image,int ftype)
 			if (image==disk) {
 				return drive;
 			}
-			drive++;			
+			drive++;
 		}
-	}		
+	}
 	return drive;
 }
 
@@ -834,7 +834,7 @@ int floppy_get_count(running_machine *machine)
 	if (devtag_get_device(machine,FLOPPY_0)) cnt++;
     if (devtag_get_device(machine,FLOPPY_1)) cnt++;
     if (devtag_get_device(machine,FLOPPY_2)) cnt++;
-    if (devtag_get_device(machine,FLOPPY_3)) cnt++;	
+    if (devtag_get_device(machine,FLOPPY_3)) cnt++;
 	return cnt;
 }
 
@@ -863,7 +863,7 @@ DEVICE_GET_INFO(floppy)
 		case DEVINFO_INT_IMAGE_TYPE:				info->i = IO_FLOPPY; break;
 		case DEVINFO_INT_IMAGE_READABLE:			info->i = 1; break;
 		case DEVINFO_INT_IMAGE_WRITEABLE:			info->i = 1; break;
-		case DEVINFO_INT_IMAGE_CREATABLE:	{		
+		case DEVINFO_INT_IMAGE_CREATABLE:	{
 												int cnt = 0;
 												if ( device && device->static_config )
 												{
@@ -871,8 +871,8 @@ DEVICE_GET_INFO(floppy)
 													int	i;
 													for ( i = 0; floppy_options[i].construct; i++ ) {
 														if(floppy_options[i].param_guidelines) cnt++;
-													}													
-												} 
+													}
+												}
 												info->i = (cnt>0) ? 1 : 0;
 											}
 											break;
@@ -884,7 +884,7 @@ DEVICE_GET_INFO(floppy)
 		case DEVINFO_PTR_IMAGE_CREATE_OPTGUIDE:		info->p = (void *)floppy_option_guide; break;
 		case DEVINFO_INT_IMAGE_CREATE_OPTCOUNT:		{
 			const struct FloppyFormat *floppy_options = ((floppy_config*)device->static_config)->formats;
-			int count;			
+			int count;
 			for (count = 0; floppy_options[count].construct; count++)
 				;
 			info->i = count;
@@ -895,7 +895,7 @@ DEVICE_GET_INFO(floppy)
 		case DEVINFO_STR_NAME:						strcpy(info->s, "Floppy Disk"); break;
 		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Floppy Disk"); break;
 		case DEVINFO_STR_SOURCE_FILE:				strcpy(info->s, __FILE__); break;
-		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:			
+		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:
 			if ( device && device->static_config )
 			{
 				const struct FloppyFormat *floppy_options = ((floppy_config*)device->static_config)->formats;
@@ -906,25 +906,25 @@ DEVICE_GET_INFO(floppy)
 					specify_extension( info->s, 256, floppy_options[i].extensions );
 			}
 			break;
-		default: 
-			{		
+		default:
+			{
 				if ( device && device->static_config )
 				{
 					const struct FloppyFormat *floppy_options = ((floppy_config*)device->static_config)->formats;
 					if ((state >= DEVINFO_PTR_IMAGE_CREATE_OPTSPEC) && (state < DEVINFO_PTR_IMAGE_CREATE_OPTSPEC + DEVINFO_CREATE_OPTMAX)) {
-						info->p = (void *) floppy_options[state - DEVINFO_PTR_IMAGE_CREATE_OPTSPEC].param_guidelines; 			
+						info->p = (void *) floppy_options[state - DEVINFO_PTR_IMAGE_CREATE_OPTSPEC].param_guidelines;
 					} else if ((state >= DEVINFO_STR_IMAGE_CREATE_OPTNAME) && (state < DEVINFO_STR_IMAGE_CREATE_OPTNAME + DEVINFO_CREATE_OPTMAX)) {
 						safe_strcpy(info->s,floppy_options[state - DEVINFO_STR_IMAGE_CREATE_OPTNAME].name);
-					} 
+					}
 					else if ((state >= DEVINFO_STR_IMAGE_CREATE_OPTDESC) && (state < DEVINFO_STR_IMAGE_CREATE_OPTDESC + DEVINFO_CREATE_OPTMAX)) {
 						safe_strcpy(info->s,floppy_options[state - DEVINFO_STR_IMAGE_CREATE_OPTDESC].description);
-					} 
+					}
 					else if ((state >= DEVINFO_STR_IMAGE_CREATE_OPTEXTS) && (state < DEVINFO_STR_IMAGE_CREATE_OPTEXTS + DEVINFO_CREATE_OPTMAX)) {
 						safe_strcpy(info->s,floppy_options[state - DEVINFO_STR_IMAGE_CREATE_OPTEXTS].extensions);
 					}
 				}
 			}
-			
-			break;						
+
+			break;
 	}
 }

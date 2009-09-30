@@ -1,17 +1,17 @@
 /*********************************************************************
 
-	Code to interface the MESS image code with MAME's harddisk core.
+    Code to interface the MESS image code with MAME's harddisk core.
 
-	We do not support diff files as it will involve some changes in
-	the MESS image code.  Additionally, the need for diff files comes
-	from MAME's need for "cannonical" hard drive images.
+    We do not support diff files as it will involve some changes in
+    the MESS image code.  Additionally, the need for diff files comes
+    from MAME's need for "cannonical" hard drive images.
 
-	Raphael Nabet 2003
+    Raphael Nabet 2003
 
-	Update: 23-Feb-2004 - Unlike floppy disks, for which we support
-	myriad formats on many systems, it is my intention for MESS to
-	standardize on the CHD file format for hard drives so I made a few
-	changes to support this
+    Update: 23-Feb-2004 - Unlike floppy disks, for which we support
+    myriad formats on many systems, it is my intention for MESS to
+    standardize on the CHD file format for hard drives so I made a few
+    changes to support this
 
 *********************************************************************/
 
@@ -88,10 +88,10 @@ INLINE dev_harddisk_t *get_safe_token(const device_config *device)
 
 /*************************************
  *
- *	DEVICE_IMAGE_LOAD(mess_hd)
+ *  DEVICE_IMAGE_LOAD(mess_hd)
  *  DEVICE_IMAGE_CREATE(mess_hd)
  *
- *	Device load and create
+ *  Device load and create
  *
  *************************************/
 
@@ -109,7 +109,7 @@ static int internal_load_mess_hd(const device_config *image, const char *metadat
 		err = chd_open_file(image_core_file(image), is_writeable ? CHD_OPEN_READWRITE : CHD_OPEN_READ, NULL, &harddisk->chd);
 
 		/* special case; if we get CHDERR_FILE_NOT_WRITEABLE, make the
-		 * image read only and repeat */
+         * image read only and repeat */
 		if (err == CHDERR_FILE_NOT_WRITEABLE)
 			image_make_readonly(image);
 	}
@@ -195,9 +195,9 @@ error:
 
 /*************************************
  *
- *	DEVICE_IMAGE_UNLOAD(mess_hd)
+ *  DEVICE_IMAGE_UNLOAD(mess_hd)
  *
- *	Device unload
+ *  Device unload
  *
  *************************************/
 
@@ -242,7 +242,7 @@ hard_disk_file *mess_hd_get_hard_disk_file(const device_config *device)
 
 /*************************************
  *
- *	Get the MESS/MAME CHD file (from the src/chd.c core)
+ *  Get the MESS/MAME CHD file (from the src/chd.c core)
  *  after an image has been opened with the mess_hd core
  *
  *************************************/
@@ -425,7 +425,7 @@ DEVICE_GET_INFO(mess_ide)
 		case DEVINFO_FCT_START:						info->start = DEVICE_START_NAME(mess_ide); break;
 		case DEVINFO_FCT_IMAGE_LOAD:				info->f = (genf *) DEVICE_IMAGE_LOAD_NAME(mess_ide); break;
 		case DEVINFO_FCT_IMAGE_UNLOAD:				info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME(mess_ide); break;
-//		case DEVINFO_FCT_IMAGE_VERIFY:				info->f = (genf *) ide_hd_validity_check; break;
+//      case DEVINFO_FCT_IMAGE_VERIFY:              info->f = (genf *) ide_hd_validity_check; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:						strcpy(info->s, "IDE harddisk"); break;

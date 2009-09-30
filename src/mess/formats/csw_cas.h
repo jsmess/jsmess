@@ -1,7 +1,7 @@
 /*
-	csw_cas.h
+    csw_cas.h
 
-	Format code for csw cassette files
+    Format code for csw cassette files
 */
 
 #ifndef CSW_CAS_H

@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	formats/pc_dsk.c
+    formats/pc_dsk.c
 
-	PC disk images
+    PC disk images
 
 *********************************************************************/
 
@@ -60,9 +60,9 @@ static floperr_t pc_dsk_compute_geometry(floppy_image *floppy, struct basicdsk_g
 	if (size >= 0x1a)
 	{
 		/*
-		 * get info from boot sector.
-		 * not correct on all disks
-		 */
+         * get info from boot sector.
+         * not correct on all disks
+         */
 		UINT8 scl, spt, heads;
 		floppy_image_read(floppy, &scl, 0x0c, 1);
 		floppy_image_read(floppy, &spt, 0x18, 1);

@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	bitbngr.h
+    bitbngr.h
 
-	TRS style "bitbanger" serial port
+    TRS style "bitbanger" serial port
 
 *********************************************************************/
 

@@ -271,7 +271,7 @@ static UINT8 to7_5p14_select;
 static READ8_HANDLER ( to7_5p14_r )
 {
 	const device_config *fdc = devtag_get_device(space->machine, "wd2793");
-	
+
 	if ( offset < 4 )
 		return wd17xx_r( fdc, offset );
 	else if ( offset == 8 )
@@ -1461,9 +1461,9 @@ WRITE8_HANDLER ( thmfc_floppy_w )
 		}
 
 		/* in real life, to keep the motor running, it is sufficient to
-		   set motor to 1 every few seconds.
-		   instead of counting, we assume the motor is always running...
-		*/
+           set motor to 1 every few seconds.
+           instead of counting, we assume the motor is always running...
+        */
 		floppy_drive_set_motor_state( img, 1 /* motor */ );
 	}
 	break;

@@ -5,46 +5,46 @@
 
 #include "formats/cocopak.h"
 
-/*	PAK files have the following format:
+/*  PAK files have the following format:
  *
- *	length		(two bytes, little endian)
- *	base address (two bytes, little endian, typically 0xc000)
- *	...data... (size is length)
- *	optional trailer
+ *  length      (two bytes, little endian)
+ *  base address (two bytes, little endian, typically 0xc000)
+ *  ...data... (size is length)
+ *  optional trailer
  *
- *	The format for PAK files just plain bites - the extra info is snapshot info
- *	and it is loaded with internal state specific to Jeff's emulator. What ever
- *	happened to desiging clean file formats that don't need to be changed with
- *	every version of ones program?
+ *  The format for PAK files just plain bites - the extra info is snapshot info
+ *  and it is loaded with internal state specific to Jeff's emulator. What ever
+ *  happened to desiging clean file formats that don't need to be changed with
+ *  every version of ones program?
  *
- *	For alignment purposes, some 16 bit values are divided into two UINT8s
+ *  For alignment purposes, some 16 bit values are divided into two UINT8s
  *
- *	The PAK file format's trailer defines the state of the machine other then
- *	the core memory.  This trailer comes in many variations.  I have labeled
- *	them in the following way (trailer sizes are in parentheses):
+ *  The PAK file format's trailer defines the state of the machine other then
+ *  the core memory.  This trailer comes in many variations.  I have labeled
+ *  them in the following way (trailer sizes are in parentheses):
  *
- *		V12		- The version in JeffV's emulator version 1.2
- *		V14		- The version in JeffV's emulator version 1.4	(457)
- *		VOTHER	- From some "other" version of JeffV's emulator
- *		VLITE	- From yet another version of JeffV's emulator	(35)
+ *      V12     - The version in JeffV's emulator version 1.2
+ *      V14     - The version in JeffV's emulator version 1.4   (457)
+ *      VOTHER  - From some "other" version of JeffV's emulator
+ *      VLITE   - From yet another version of JeffV's emulator  (35)
  *
- *	The following table shows what segments appear in each trailer variant:
+ *  The following table shows what segments appear in each trailer variant:
  *
- *	Trailer Segment		V12		V14		VOTHER	VLITE
- *	---------------		---		---		------	-----
- *	pak_trailer1		1		1		1		1
- *	pak_trailer2		2
- *	pak_trailer3		3		2		2		2
- *	pak_trailer4		4		3		3
- *	pak_trailer5		5
- *	pak_trailer6		6		5		4
- *	pak_trailer7		7				5
- *	pak_trailer8				6
- *	pak_trailer9		8		7		6
- *	pak_trailer10		9		4		7
- *	pak_trailer11		10		8		8
- *	pak_trailer12				9
- *	pak_trailer13		11				9
+ *  Trailer Segment     V12     V14     VOTHER  VLITE
+ *  ---------------     ---     ---     ------  -----
+ *  pak_trailer1        1       1       1       1
+ *  pak_trailer2        2
+ *  pak_trailer3        3       2       2       2
+ *  pak_trailer4        4       3       3
+ *  pak_trailer5        5
+ *  pak_trailer6        6       5       4
+ *  pak_trailer7        7               5
+ *  pak_trailer8                6
+ *  pak_trailer9        8       7       6
+ *  pak_trailer10       9       4       7
+ *  pak_trailer11       10      8       8
+ *  pak_trailer12               9
+ *  pak_trailer13       11              9
  */
 
 /* All versions */
@@ -392,9 +392,9 @@ int pak_decode_trailer(UINT8 *rawtrailer, int rawtrailerlen, pak_decodedtrailer 
 
 	case PAK_VLITE_SIZE:
 		/* This is a "lite" format that gives no trailer information except
-		 * for the program counter... I have to set everything up as default
-		 * including the stack pointer... arg this sucks...
-		 */
+         * for the program counter... I have to set everything up as default
+         * including the stack pointer... arg this sucks...
+         */
 		trailer->pia[2] = 0xff;
 		trailer->pia[3] = 0x34;
 		trailer->pia[6] = 0x00;

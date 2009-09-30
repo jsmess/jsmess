@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	multcart.c
+    multcart.c
 
-	Multi-cartridge handling code
+    Multi-cartridge handling code
 
 *********************************************************************/
 
@@ -38,7 +38,7 @@ struct _multicart_load_state
 	multicart_socket *		sockets;
 };
 
-static const char multicart_error_text[14][30] = 
+static const char multicart_error_text[14][30] =
 {
 	"no error",
 	"not a multicart",
@@ -95,7 +95,7 @@ static const zip_file_header *find_file_crc(zip_file *zip, const char *filename,
 		{
 			return header;
 		}
-	}	     
+	}
 	return NULL;
 }
 
@@ -220,22 +220,22 @@ static multicart_open_error load_ram_resource(multicart_load_state *state, xml_d
 	const char *ram_filename;
 
 	astring *ram_pathname;
-	
+
 	/* locate the 'length' attribute */
 	length_string = xml_get_attribute_string(resource_node, "length", NULL);
 	if (length_string == NULL)
 		return MCERR_MISSING_RAM_LENGTH;
-	
+
 	/* ...and parse it */
 	resource->length = ram_parse_string(length_string);
 	if (resource->length <= 0)
 		return MCERR_INVALID_RAM_SPEC;
-	
+
 	/* allocate bytes for this resource */
 	resource->ptr = pool_malloc(state->multicart->data->pool, resource->length);
 	if (resource->ptr == NULL)
 		return MCERR_OUT_OF_MEMORY;
-	
+
 	/* Is this a persistent RAM resource? Then try to load it. */
 	ram_type = xml_get_attribute_string(resource_node, "type", NULL);
 	if (ram_type != NULL)
@@ -246,21 +246,21 @@ static multicart_open_error load_ram_resource(multicart_load_state *state, xml_d
 			ram_filename = xml_get_attribute_string(resource_node, "file", NULL);
 			if (ram_filename==NULL)
 				return MCERR_XML_ERROR;
-			
+
 			ram_pathname = astring_assemble_3(astring_alloc(), state->multicart->gamedrv_name, PATH_SEPARATOR, ram_filename);
-			
-			/* Save the file name so that we can write the contents on unloading. 
-			   If the RAM resource has no filename, we know that it was volatile only. */
+
+			/* Save the file name so that we can write the contents on unloading.
+               If the RAM resource has no filename, we know that it was volatile only. */
 			resource->filename = pool_strdup(state->multicart->data->pool, astring_c(ram_pathname));
 			if (resource->filename == NULL)
 				return MCERR_OUT_OF_MEMORY;
-			
+
 			astring_free(ram_pathname);
-			
+
 			image_battery_load_by_name(resource->filename, resource->ptr, resource->length);
 		}
-		/* else this type is volatile, in which case we just have 
-			a memory expansion */
+		/* else this type is volatile, in which case we just have
+            a memory expansion */
 	}
 	return MCERR_NONE;
 }
@@ -310,7 +310,7 @@ static multicart_open_error load_resource(multicart_load_state *state, xml_data_
 			break;
 
 		default:
-			return MCERR_UNKNOWN_RESOURCE_TYPE; 
+			return MCERR_UNKNOWN_RESOURCE_TYPE;
 	}
 
 	/* append the resource */
@@ -348,7 +348,7 @@ static multicart_open_error load_all_resources(multicart_load_state *state)
 }
 
 /*-------------------------------------------------
-    save_ram_resources. This is important for persistent RAM. All 
+    save_ram_resources. This is important for persistent RAM. All
     resources were allocated within the memory pool of this device and will
     be freed on multicart_close.
 -------------------------------------------------*/
@@ -356,7 +356,7 @@ static multicart_open_error load_all_resources(multicart_load_state *state)
 static multicart_open_error save_ram_resources(multicart *cart)
 {
 	const multicart_resource *resource;
-	
+
 	for (resource = cart->resources; resource != NULL; resource = resource->next)
 	{
 		if ((resource->type == MULTICART_RESOURCE_TYPE_RAM) && (resource->filename != NULL))
@@ -560,7 +560,7 @@ multicart_open_error multicart_open(const char *filename, const char *gamedrv, m
 		err = MCERR_OUT_OF_MEMORY;
 		goto done;
 	}
-	
+
 	/* do we have to load resources? */
 	if (load_flags & MULTICART_FLAGS_LOAD_RESOURCES)
 	{

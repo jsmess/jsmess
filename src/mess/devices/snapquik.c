@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	snapquik.h
+    snapquik.h
 
-	Snapshots and quickloads
+    Snapshots and quickloads
 
 *********************************************************************/
 
@@ -31,7 +31,7 @@ struct _snapquick_token
 
 /*-------------------------------------------------
     assert_is_snapshot_or_quickload - asserts/confirms
-	that a given device is a snapshot or quickload
+    that a given device is a snapshot or quickload
 -------------------------------------------------*/
 
 INLINE void assert_is_snapshot_or_quickload(const device_config *device)
@@ -131,7 +131,7 @@ static DEVICE_IMAGE_LOAD( snapquick )
 
 /*-------------------------------------------------
     DEVICE_GET_INFO(snapquick) - device getinfo
-	function
+    function
 -------------------------------------------------*/
 
 static DEVICE_GET_INFO(snapquick)
@@ -161,7 +161,7 @@ static DEVICE_GET_INFO(snapquick)
 
 /*-------------------------------------------------
     DEVICE_GET_INFO(snapshot) - device getinfo
-	function
+    function
 -------------------------------------------------*/
 
 DEVICE_GET_INFO(snapshot)
@@ -183,7 +183,7 @@ DEVICE_GET_INFO(snapshot)
 
 /*-------------------------------------------------
     DEVICE_GET_INFO(quickload) - device getinfo
-	function
+    function
 -------------------------------------------------*/
 
 DEVICE_GET_INFO(quickload)

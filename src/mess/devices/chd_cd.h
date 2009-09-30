@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	chd_cd.h
+    chd_cd.h
 
-	MESS interface to the MAME CHD CDROM code
+    MESS interface to the MAME CHD CDROM code
 
 *********************************************************************/
 

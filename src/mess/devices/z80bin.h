@@ -1,9 +1,9 @@
 /*********************************************************************
 
-	z80bin.h
+    z80bin.h
 
-	A binary quickload format used by the Microbee, the Exidy Sorcerer
-	VZ200/300 and the Super 80
+    A binary quickload format used by the Microbee, the Exidy Sorcerer
+    VZ200/300 and the Super 80
 
 *********************************************************************/
 
@@ -37,7 +37,7 @@ typedef struct _z80bin_config z80bin_config;
 struct _z80bin_config
 {
 	snapquick_config base;
-	z80bin_execute_func execute; 
+	z80bin_execute_func execute;
 };
 
 

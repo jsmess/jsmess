@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	appldriv.h
+    appldriv.h
 
-	Apple 5.25" floppy drive emulation (to be interfaced with applefdc.c)
+    Apple 5.25" floppy drive emulation (to be interfaced with applefdc.c)
 
 *********************************************************************/
 
@@ -57,10 +57,10 @@ DEVICE_GET_INFO(apple525);
 	MDRV_FLOPPY_APPLE_PARAMS(_dividend,_divisor) \
 	MDRV_DEVICE_ADD(FLOPPY_3, FLOPPY_APPLE, 0)		\
 	MDRV_DEVICE_CONFIG(_config)	\
-	MDRV_FLOPPY_APPLE_PARAMS(_dividend,_divisor) 
+	MDRV_FLOPPY_APPLE_PARAMS(_dividend,_divisor)
 
 #define MDRV_FLOPPY_APPLE_2_DRIVES_REMOVE() 	\
 	MDRV_DEVICE_REMOVE(FLOPPY_0)		\
-	MDRV_DEVICE_REMOVE(FLOPPY_1)		
+	MDRV_DEVICE_REMOVE(FLOPPY_1)
 
 #endif /* APPLDRIV_H */

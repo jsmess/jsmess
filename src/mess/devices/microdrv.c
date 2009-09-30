@@ -1,8 +1,8 @@
 /****************************************************************************
 
-	microdrv.c
+    microdrv.c
 
-	Code for handling Microdrive devices
+    Code for handling Microdrive devices
 
 ****************************************************************************/
 

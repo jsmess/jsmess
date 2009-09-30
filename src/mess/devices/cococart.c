@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	cococart.c
+    cococart.c
 
-	CoCo/Dragon cartridge management
+    CoCo/Dragon cartridge management
 
 *********************************************************************/
 
@@ -83,7 +83,7 @@ static DEVICE_START(coco_cartridge)
 {
 	const device_config *cartslot;
 	coco_cartridge_t *cococart = get_token(device);
-	const cococart_config *config = (const cococart_config *) device->inline_config; 
+	const cococart_config *config = (const cococart_config *) device->inline_config;
 	astring *tempstring = astring_alloc();
 
 	/* initialize */
@@ -187,7 +187,7 @@ static void set_line(const device_config *device, const char *line_name, coco_ca
 
 		if (LOG_LINE)
 			logerror("[%s]: set_line(): %s <= %s", cpuexec_describe_context(device->machine), line_name, line_value_string(value));
-		
+
 		/* engage in a bit of gymnastics for this odious 'Q' value */
 		switch(line->value)
 		{
@@ -249,7 +249,7 @@ static TIMER_CALLBACK( halt_timer_callback )
 
 
 /*-------------------------------------------------
-	set_line_timer()
+    set_line_timer()
 -------------------------------------------------*/
 
 static void set_line_timer(const device_config *device, coco_cartridge_line *line, cococart_line_value value)
@@ -279,7 +279,7 @@ static void twiddle_line_if_q(const device_config *device, coco_cartridge_line *
 
 /*-------------------------------------------------
     coco_cartridge_twiddle_q_lines - hack to
-	support twiddling the Q line
+    support twiddling the Q line
 -------------------------------------------------*/
 
 void coco_cartridge_twiddle_q_lines(const device_config *device)
@@ -357,7 +357,7 @@ static MACHINE_DRIVER_START( coco_cartridge )
 	MDRV_CARTSLOT_PCBTYPE(1, "banked_16k",	COCO_CARTRIDGE_PCB_PAK_BANKED16K)
 	MDRV_CARTSLOT_PCBTYPE(2, "orch90",		COCO_CARTRIDGE_PCB_ORCH90)
 	MDRV_CARTSLOT_PCBTYPE(3, "rs232",		COCO_CARTRIDGE_PCB_RS232)
-	//MDRV_CARTSLOT_PCBTYPE(4, "coco_ssc",	COCO_CARTRIDGE_PCB_SSC)
+	//MDRV_CARTSLOT_PCBTYPE(4, "coco_ssc",  COCO_CARTRIDGE_PCB_SSC)
 	MDRV_CARTSLOT_PCBTYPE(4, "",			COCO_CARTRIDGE_PCB_PAK)
 MACHINE_DRIVER_END
 

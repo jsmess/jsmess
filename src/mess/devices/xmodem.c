@@ -44,11 +44,11 @@
             <--   <ACK>
 
    and packet is:  <SOH> <id> <0xff-id> <data0> ... <data127> <checksum>
-   
+
    <id> is 1 for the first packet, 2 for the 2d, etc...
    <checksum> is the sum of <data0> to <data127> modulo 256
 
-   there are always 128 bytes of data in a packet, so, any file transfered is 
+   there are always 128 bytes of data in a packet, so, any file transfered is
    rounded to a multiple of 128 bytes, using 0-filler
 */
 
@@ -65,7 +65,7 @@ typedef struct {
 	UINT32  id;                  /* block id, starting at 1 */
 	UINT16  pos;                 /* position in block, including header */
 	UINT8   state;               /* one of XMODEM_ */
-	
+
 	const device_config* image;  /* underlying image */
 
 	emu_timer* timer;            /* used to send periodic NAKs */
@@ -88,7 +88,7 @@ static UINT8 xmodem_chksum( xmodem* state )
 }
 
 /* fills state->block with the data for packet number state->id
-   returns != 0 if fail or end of file 
+   returns != 0 if fail or end of file
 */
 static int xmodem_make_send_block( xmodem* state )
 {
@@ -103,7 +103,7 @@ static int xmodem_make_send_block( xmodem* state )
 	return 0;
 }
 
-/* checks the received state->block packet and stores the data in the image 
+/* checks the received state->block packet and stores the data in the image
    returns != 0 if fail (bad packet or bad image)
  */
 static int xmodem_get_receive_block( xmodem* state )
@@ -123,7 +123,7 @@ static int xmodem_get_receive_block( xmodem* state )
 /* the outside (us) sends a byte to the emulated machine */
 static void xmodem_send_byte( xmodem* state, UINT8 data )
 {
-	if ( state->conf && state->conf->send ) 
+	if ( state->conf && state->conf->send )
 	{
 		state->conf->send( state->machine, data );
 	}
@@ -152,10 +152,10 @@ static void xmodem_make_idle( xmodem* state )
 	state->id = 0;
 	state->pos = 0;
         /* When idle, we send NAK periodically to tell the emulated machine that we are
-	   always ready to receive.
-	   The 2 sec start time is here so that the machine does not get NAK instead of
-	   ACK or EOT as the last byte of a transfer.
-	 */
+       always ready to receive.
+       The 2 sec start time is here so that the machine does not get NAK instead of
+       ACK or EOT as the last byte of a transfer.
+     */
 	timer_adjust_periodic( state->timer, ATTOTIME_IN_SEC( 2 ), 0, ATTOTIME_IN_SEC( 2 ) );
 }
 
@@ -277,7 +277,7 @@ void xmodem_receive_byte( const device_config *device, UINT8 data )
 				LOG(( "xmodem: packet is invalid, sending NAK\n" ));
 				xmodem_send_byte( state, XMODEM_NAK );
 			}
-			else 
+			else
 			{
 				/* ok */
 				LOG(( "xmodem: packet is valid, sending ACK\n" ));

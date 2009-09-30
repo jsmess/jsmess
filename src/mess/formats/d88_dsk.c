@@ -1,7 +1,7 @@
 /*
  *   D77 and D88 disk images
- * 
- * 
+ *
+ *
  *   Header (total size = 0x2b0 bytes):
  *     0x00 - Disk label
  *     0x1a - Write protect (bit 3)
@@ -11,20 +11,20 @@
  *
  *   Sectors (0x110 bytes each, typically)
  *     0x00 - Sector info
- * 			byte 0 - track number
- * 			byte 1 - side (0 or 1)
- * 			byte 2 - sector number
+ *          byte 0 - track number
+ *          byte 1 - side (0 or 1)
+ *          byte 2 - sector number
  *     0x10 - sector data
- * 
+ *
  *   Images can be concatenated together.
  *   Sectors can be in any order.
  *   Tracks are in the order:
- * 			Track 0 side 0
- * 			Track 0 side 1
- * 			Track 1 side 0
- * 			...
- * 
- * 
+ *          Track 0 side 0
+ *          Track 0 side 1
+ *          Track 1 side 0
+ *          ...
+ *
+ *
  */
 
 #include "driver.h"
@@ -52,8 +52,8 @@ static int d88_get_sector_id(floppy_image *floppy, int head, int track, int sect
 	UINT32 offset;
 	UINT8 sector_hdr[16];
 	int x;
-	
-	offset = tag->trackoffset[(track*2)+head]; 
+
+	offset = tag->trackoffset[(track*2)+head];
 
 	if(offset == 0)
 		return 0;
@@ -69,7 +69,7 @@ static int d88_get_sector_id(floppy_image *floppy, int head, int track, int sect
 		floppy_image_read(floppy,sector_hdr,offset,16);
 		x++;
 	}
-	
+
 	return sector_hdr[2];
 }
 
@@ -88,14 +88,14 @@ static int d88_get_sectors_per_track(floppy_image *floppy, int head, int track)
 	struct d88_tag* tag = get_d88_tag(floppy);
 	UINT32 offset;
 	UINT8 sector_hdr[16];
-	
+
 	offset = tag->trackoffset[(track*2)+head];
 
 	floppy_image_read(floppy,sector_hdr,offset,16);
-	
+
 	return sector_hdr[4];
 }
-	
+
 static floperr_t d88_get_sector_length(floppy_image *floppy, int head, int track, int sector, UINT32 *sector_length)
 {
 	struct d88_tag* tag = get_d88_tag(floppy);
@@ -103,12 +103,12 @@ static floperr_t d88_get_sector_length(floppy_image *floppy, int head, int track
 	UINT8 sector_hdr[16];
 	UINT32 len;
 	int count,secs;
-	
+
 	offset = tag->trackoffset[(track*2)+head];
-	
+
 	floppy_image_read(floppy,sector_hdr,offset,16);
 	secs = sector_hdr[4];
-	
+
 	for(count=0;count<secs;count++)
 	{
 		floppy_image_read(floppy,sector_hdr,offset,16);
@@ -128,8 +128,8 @@ static floperr_t d88_get_sector_length(floppy_image *floppy, int head, int track
 
 static floperr_t d88_read_track(floppy_image *floppy, int head, int track, UINT64 offset, void *buffer, size_t buflen)
 {
-//	floperr_t err;
-	
+//  floperr_t err;
+
 	return FLOPPY_ERROR_UNSUPPORTED;
 }
 
@@ -141,13 +141,13 @@ static UINT32 d88_get_sector_offset(floppy_image* floppy, int head, int track, i
 	UINT32 len;
 	UINT32 secs;
 	int count;
-	
+
 	// get offset of the beginning of the track
 	offset = tag->trackoffset[(track*2)+head];
 
 	floppy_image_read(floppy,sector_hdr,offset,16);
 	secs = sector_hdr[4];
-	
+
 	for(count=0;count<secs;count++)
 	{
 		floppy_image_read(floppy,sector_hdr,offset,16);
@@ -170,12 +170,12 @@ static floperr_t d88_get_indexed_sector_info(floppy_image *floppy, int head, int
 	UINT32 offset;
 	UINT8 sector_hdr[16];
 	int x;
-	
-	offset = tag->trackoffset[(track*2)+head]; 
+
+	offset = tag->trackoffset[(track*2)+head];
 
 	if(offset == 0)
 		return FLOPPY_ERROR_SEEKERROR;
-	
+
 
 	floppy_image_read(floppy,sector_hdr,offset,16);
 
@@ -191,7 +191,7 @@ static floperr_t d88_get_indexed_sector_info(floppy_image *floppy, int head, int
 		floppy_image_read(floppy,sector_hdr,offset,16);
 		x++;
 	}
-	
+
 	if(offset > tag->image_size || offset == 0)
 		return FLOPPY_ERROR_SEEKERROR;
 
@@ -205,7 +205,7 @@ static floperr_t d88_get_indexed_sector_info(floppy_image *floppy, int head, int
 		*sector = sector_hdr[2];
 	if(flags)
 		*flags = 0;
-	
+
 	return FLOPPY_ERROR_SUCCESS;
 }
 
@@ -213,27 +213,27 @@ static floperr_t d88_read_sector(floppy_image *floppy, int head, int track, int 
 {
 	UINT64 offset;
 	UINT32 sector_length;
-	
+
 	offset = d88_get_sector_offset(floppy,head,track,sector);
-	
+
 	if(d88_get_sector_length(floppy,head,track,sector,&sector_length) != FLOPPY_ERROR_SUCCESS)
 		return FLOPPY_ERROR_SEEKERROR;
-		
+
 	if(offset == 0)
 		return FLOPPY_ERROR_SEEKERROR;
-		
+
 	if(buflen > sector_length)
 		return FLOPPY_ERROR_INTERNAL;
-	
+
 	floppy_image_read(floppy,buffer,offset,sector_length);
-	
+
 	return FLOPPY_ERROR_SUCCESS;
 }
 
 static floperr_t d88_read_indexed_sector(floppy_image *floppy, int head, int track, int sector, void *buffer, size_t buffer_len)
 {
 	int sec;
-	
+
 	sec = d88_get_sector_id(floppy,head,track,sector);
 	return d88_read_sector(floppy,head,track,sec,buffer,buffer_len);
 }
@@ -242,7 +242,7 @@ static void d88_get_header(floppy_image* floppy,UINT32* size, UINT8* prot, UINT8
 {
 	UINT8 header[D88_HEADER_LEN];
 	int x,s;
-	
+
 	floppy_image_read(floppy,header,0,D88_HEADER_LEN);
 
 	if(prot)
@@ -275,9 +275,9 @@ static void d88_get_header(floppy_image* floppy,UINT32* size, UINT8* prot, UINT8
 FLOPPY_IDENTIFY(d88_dsk_identify)
 {
 	UINT32 size;
-	
-	d88_get_header(floppy,&size,NULL,NULL,NULL);	
-	
+
+	d88_get_header(floppy,&size,NULL,NULL,NULL);
+
 	if(floppy_image_size(floppy) == size)
 	{
 		*vote = 100;
@@ -298,7 +298,7 @@ FLOPPY_CONSTRUCT(d88_dsk_construct)
 	UINT8 prot,type = 0;
 	UINT32 offs[164];
 	int x;
-	
+
 	if(params)
 	{
 		// create
@@ -309,17 +309,17 @@ FLOPPY_CONSTRUCT(d88_dsk_construct)
 		// load
 		d88_get_header(floppy,&size,&prot,&type,offs);
 	}
-	
+
 	tag = floppy_create_tag(floppy,"d88tag",sizeof(struct d88_tag));
 	if (!tag)
 		return FLOPPY_ERROR_OUTOFMEMORY;
-	
+
 	tag->write_protect = prot;
 	tag->disk_type = type;
 	tag->image_size = size;
 	for(x=0;x<164;x++)
 		tag->trackoffset[x] = offs[x];
-		
+
 	callbacks = floppy_callbacks(floppy);
 	callbacks->read_track = d88_read_track;
 	callbacks->get_heads_per_disk = d88_get_heads_per_disk;
@@ -329,7 +329,7 @@ FLOPPY_CONSTRUCT(d88_dsk_construct)
 	callbacks->read_indexed_sector = d88_read_indexed_sector;
 	callbacks->get_indexed_sector_info = d88_get_indexed_sector_info;
 	callbacks->get_sectors_per_track = d88_get_sectors_per_track;
-	
-		
+
+
 	return FLOPPY_ERROR_SUCCESS;
 }

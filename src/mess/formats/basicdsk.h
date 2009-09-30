@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	formats/basicdsk.h
+    formats/basicdsk.h
 
-	Floppy format code for basic disks
+    Floppy format code for basic disks
 
 *********************************************************************/
 

@@ -1,7 +1,7 @@
 /*
-	
-	Tape support for Orao  TAP format
-		
+
+    Tape support for Orao  TAP format
+
 */
 #include "driver.h"
 #include "formats/orao_cas.h"
@@ -32,7 +32,7 @@ static void orao_output_wave( INT16 **buffer, int length ) {
 static int orao_cas_to_wav_size( const UINT8 *casdata, int caslen ) {
 	int i,j,size;
 	UINT8 b;
-	
+
 	if (casdata == NULL) return -1;
 	if (caslen <= ORAO_HEADER_SIZE) {
 		return -1;
@@ -45,37 +45,37 @@ static int orao_cas_to_wav_size( const UINT8 *casdata, int caslen ) {
 				size += 2*ORAO_WAVE_ZERO;
 			} else {
 				size += 2*ORAO_WAVE_ONE;
-			}				
+			}
 		}
-	}	
+	}
  	len = caslen;
-	return size;	
+	return size;
 }
 
-static int orao_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes ) {	
+static int orao_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes ) {
 	int i,j,size;
 	UINT8 b;
-	size = 0;	
+	size = 0;
 	if (bytes == NULL) return -1;
 	for (i=ORAO_HEADER_SIZE;i<len-ORAO_HEADER_SIZE;i++) {
 		for (j=0;j<8;j++) {
 			b = (bytes[i] >> j) & 1;
-			if (b==0) {				
+			if (b==0) {
 				wave_data = WAVE_LOW;
 				orao_output_wave(&buffer,ORAO_WAVE_ZERO);
 				wave_data = WAVE_HIGH;
 				orao_output_wave(&buffer,ORAO_WAVE_ZERO);
 				size += 2 *ORAO_WAVE_ZERO;
-			} else {				
+			} else {
 				wave_data = WAVE_LOW;
 				orao_output_wave(&buffer,ORAO_WAVE_ONE);
 				wave_data = WAVE_HIGH;
 				orao_output_wave(&buffer,ORAO_WAVE_ONE);
 				size += 2 * ORAO_WAVE_ONE;
-			}				
+			}
 		}
-	}	
-		
+	}
+
 	return size;
 }
 

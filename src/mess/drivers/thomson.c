@@ -644,7 +644,7 @@ static const floppy_config thomson_floppy_config =
 
 /* ------------ config ------------ */
 
-static SYSTEM_CONFIG_START ( to )     
+static SYSTEM_CONFIG_START ( to )
      CONFIG_DEVICE ( thom_serial_getinfo )
 SYSTEM_CONFIG_END
 
@@ -725,7 +725,7 @@ static MACHINE_DRIVER_START ( to7 )
     MDRV_ACIA6850_ADD( "acia6850", to7_modem )
 
     MDRV_WD2793_ADD("wd2793", default_wd17xx_interface )
-	 
+
 	MDRV_FLOPPY_4_DRIVES_ADD(thomson_floppy_config)
 
 	/* cartridge */
@@ -1091,7 +1091,7 @@ INPUT_PORTS_END
 
 /* ------------ config ------------ */
 
-static SYSTEM_CONFIG_START ( mo )     
+static SYSTEM_CONFIG_START ( mo )
      CONFIG_DEVICE ( thom_serial_getinfo )
 SYSTEM_CONFIG_END
 

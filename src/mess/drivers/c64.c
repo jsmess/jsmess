@@ -9,7 +9,7 @@
 
 /*
 
-2008 - Driver Updates 
+2008 - Driver Updates
 ---------------------
 
 (most of the informations are taken from http://www.zimmers.net/cbmpics/ )
@@ -19,33 +19,33 @@
 
 * Commodore Max Machine (1982, Japan)
 
-  The Max Machine was produced by Commodore Japan and was released along 
-with the C64 in Japan. Also known as "UltiMax" (in North America ads) 
-or "VC-10 / VIC-10" (in some European advertising), it was designed to be a 
-game console. It has no internal kernel and no BASIC, everything must be 
-supplied by the cart. A Mini BASIC and a BASIC carts were produced (the 
-latter with support for LOAD/SAVE commands as well). The character rom 
+  The Max Machine was produced by Commodore Japan and was released along
+with the C64 in Japan. Also known as "UltiMax" (in North America ads)
+or "VC-10 / VIC-10" (in some European advertising), it was designed to be a
+game console. It has no internal kernel and no BASIC, everything must be
+supplied by the cart. A Mini BASIC and a BASIC carts were produced (the
+latter with support for LOAD/SAVE commands as well). The character rom
 is not present either and its content was, again, in the cart. Max Machine
 carts can be run by both C64 and C128.
 
 CPU: MOS Technology 6510 (1 MHz)
 RAM: 4 kilobytes (2 kilobytes?)
 ROM: none
-Video: MOS 6566 "VIC-II" (320 x 200 Hi-Resolution, 40 columns text, 16 
-	colors)
-Sound: MOS 6581 "SID" (3 voice stereo synthesizer/digital sound 
-	capabilities) 
-Ports: 6526 CIA (Power switch; 2 Commodore "Joystick" ports; 'EXPANSION' 
-	port; "TV" port; CBM Datasette port)
+Video: MOS 6566 "VIC-II" (320 x 200 Hi-Resolution, 40 columns text, 16
+    colors)
+Sound: MOS 6581 "SID" (3 voice stereo synthesizer/digital sound
+    capabilities)
+Ports: 6526 CIA (Power switch; 2 Commodore "Joystick" ports; 'EXPANSION'
+    port; "TV" port; CBM Datasette port)
 Keyboard: Full-sized QWERTY "Contact-Pad"
 
 
 * Commodore 64 (1982)
 
-  Released in August 1982 in the US and marketed as a lower end home 
+  Released in August 1982 in the US and marketed as a lower end home
 computer, the C64 dominated the home computer market for a few years,
 outselling competitors like Apple computers, IBM PCs and TRS-80s.
-During the early stages of the project it was called VIC-40, but the 
+During the early stages of the project it was called VIC-40, but the
 named was changed in the end probably to fit the name scheme used at
 time for business product (letter + memory size: P128 & B256).
 It was also advertised as VC 64 in Germany, and as VIC 64S in Sweden
@@ -54,110 +54,110 @@ It was also advertised as VC 64 in Germany, and as VIC 64S in Sweden
 CPU: CSG 6510 (1 MHz)
 RAM: 64 kilobytes
 ROM: 20 kilobytes
-Video: MOS 6569 "VIC-II" (320 x 200 Hi-Resolution, 40 columns text, 16 
-	colors)
-Sound: MOS 6581 "SID" (3 voice stereo synthesizer/digital sound 
-	capabilities) 
-Ports: MOS 6526 CIA x2 (Power switch; 2 Commodore Joystick/Mouse ports; 
-	CBM Serial port; CBM Datasette port; parallel programmable "User" 
-	port; CBM Monitor port; C64 expansion port)
+Video: MOS 6569 "VIC-II" (320 x 200 Hi-Resolution, 40 columns text, 16
+    colors)
+Sound: MOS 6581 "SID" (3 voice stereo synthesizer/digital sound
+    capabilities)
+Ports: MOS 6526 CIA x2 (Power switch; 2 Commodore Joystick/Mouse ports;
+    CBM Serial port; CBM Datasette port; parallel programmable "User"
+    port; CBM Monitor port; C64 expansion port)
 Keyboard: Full-sized 62 key QWERTY (8 programmable function keys; 2
-	cursor keys, 2 directions each)
+    cursor keys, 2 directions each)
 
 BIOS:
-	kernal.901227-02.bin
-	basic.901226-01.bin
-	characters.901225-01.bin
+    kernal.901227-02.bin
+    basic.901226-01.bin
+    characters.901225-01.bin
 
 
 * Commodore 64 (1982, Japan)
 
-  Released in Japan at the same time as Max Machine, in the hope to repeat 
-the success of the VIC-1001, this system was a flop. Technically it is the 
+  Released in Japan at the same time as Max Machine, in the hope to repeat
+the success of the VIC-1001, this system was a flop. Technically it is the
 same as the C64, but it has native support for the Katakana character set.
 
-Video: MOS 6569 "VIC-II" (320 x 200 Hi-Resolution, 40 columns text, 16 
-	colors)
+Video: MOS 6569 "VIC-II" (320 x 200 Hi-Resolution, 40 columns text, 16
+    colors)
 Keyboard: Full-sized 62 key QWERTY (8 programmable function keys; 2
-	cursor keys, 2 directions each; Katakana characters accessible through
-	C= key)
+    cursor keys, 2 directions each; Katakana characters accessible through
+    C= key)
 
 BIOS
-	kernal.906145-02.bin
-	basic.901226-01.bin
-	characters.906143-02.bin
+    kernal.906145-02.bin
+    basic.901226-01.bin
+    characters.906143-02.bin
 
 
 * PET 64 (1983)
 
-  Also known as CBM 4064, it was a C64 fitted in a PET case and with a PET 
+  Also known as CBM 4064, it was a C64 fitted in a PET case and with a PET
 monochrome screen. Exactly like the C64, it features a VIC-II video chip,
-a SID sound chip, 2 x CIA 6526, 64K of memory and BASIC 2.0. Being forced 
-to display on a monochrome screen, color codes were removed from the front 
-of number keys. The kernel itself was modified to output only white 
-characters on a black background. A plate with BASIC commands and other hints 
+a SID sound chip, 2 x CIA 6526, 64K of memory and BASIC 2.0. Being forced
+to display on a monochrome screen, color codes were removed from the front
+of number keys. The kernel itself was modified to output only white
+characters on a black background. A plate with BASIC commands and other hints
 was put above the keyboard.
 
-Video: MOS 6569 "VIC-II" (320 x 200 Hi-Resolution, 40 columns text, 16 
-	colors, monochrome 14" monitor support)
-Sound: MOS 6581 "SID" (3 voice stereo synthesizer/digital sound 
-	capabilities; Internal speaker) 
+Video: MOS 6569 "VIC-II" (320 x 200 Hi-Resolution, 40 columns text, 16
+    colors, monochrome 14" monitor support)
+Sound: MOS 6581 "SID" (3 voice stereo synthesizer/digital sound
+    capabilities; Internal speaker)
 Keyboard: Full-sized 62 key QWERTY (8 programmable function keys; 2
-	cursor keys, 2 directions each; complete BASIC reference on keyboard 
-	panel )
+    cursor keys, 2 directions each; complete BASIC reference on keyboard
+    panel )
 
 BIOS
-	kernal.4064.901246-01.bin
-	basic.901226-01.bin
-	characters.901225-01.bin
+    kernal.4064.901246-01.bin
+    basic.901226-01.bin
+    characters.901225-01.bin
 
 
 * Educator 64 (1983)
 
- Basically the same as the PET 64, but it uses a standard C64 kernel, 
-allowing  to 'explore' all shades of green the monitor was capable of. Also 
-the BASIC plate is slightly different. There could have been an earlier 
-version, already called Educator 64, which came with no monitor and in a 
+ Basically the same as the PET 64, but it uses a standard C64 kernel,
+allowing  to 'explore' all shades of green the monitor was capable of. Also
+the BASIC plate is slightly different. There could have been an earlier
+version, already called Educator 64, which came with no monitor and in a
 C64 case.
 
 Keyboard: Full-sized 62 key QWERTY (8 programmable function keys; 2
-	cursor keys, 2 directions each; complete BASIC reference on keyboard 
-	panel )
+    cursor keys, 2 directions each; complete BASIC reference on keyboard
+    panel )
 
 BIOS
-	kernal.901227-02.bin
-	basic.901226-01.bin
-	characters.901225-01.bin
+    kernal.901227-02.bin
+    basic.901226-01.bin
+    characters.901225-01.bin
 
 
 * SX-64 Executive Computer (1984)
 
-  Portable color computer based on the C64 hardware. The unit is heavy, with 
-its metal case, features a built-in disk driver (mostly 1541 compatible) and 
-has a large handle to carry the computer around. The detachable keyboard can 
+  Portable color computer based on the C64 hardware. The unit is heavy, with
+its metal case, features a built-in disk driver (mostly 1541 compatible) and
+has a large handle to carry the computer around. The detachable keyboard can
 be used as protective front plate. The SX-64 had a 4" full color screen and a
-built-in speaker. The only differences between the C64 and the SX-64 are in 
+built-in speaker. The only differences between the C64 and the SX-64 are in
 the start up colors and in the SX-64 better support for the internal floppy
 drive. The tape drive support was removed in the portable system.
 
 CPU: MOS 6510 (1 MHz)
 RAM: 64 kilobytes (68 with the 1541)
 ROM: 20 kilobytes (36 with the 1541)
-Video: MOS 6569 "VIC-II" (320 x 200 Hi-Resolution, 40 columns text, 16 
-	colors, 4" Full-color screen)
-Sound: MOS 6581 "SID" (3 voice stereo synthesizer/digital sound 
-	capabilities; Internal MONO speaker) 
-Ports: MOS 6526 CIA x2 (Power switch; 2 Commodore Joystick/Mouse ports; 
-	CBM Serial port; CBM Datasette port; parallel programmable "User" 
-	port; CBM Monitor port; C64 expansion port)
+Video: MOS 6569 "VIC-II" (320 x 200 Hi-Resolution, 40 columns text, 16
+    colors, 4" Full-color screen)
+Sound: MOS 6581 "SID" (3 voice stereo synthesizer/digital sound
+    capabilities; Internal MONO speaker)
+Ports: MOS 6526 CIA x2 (Power switch; 2 Commodore Joystick/Mouse ports;
+    CBM Serial port; CBM Datasette port; parallel programmable "User"
+    port; CBM Monitor port; C64 expansion port)
 Keyboard: Full-sized 62 key QWERTY (8 programmable function keys; 2
-	cursor keys, 2 directions each; detachable)
+    cursor keys, 2 directions each; detachable)
 Additional hardware: Commodore 1541 Disk Drive (5.25" 170K SS SD Floppy)
 
 BIOS:
-	kernal.sx.251104-04.bin
-	basic.901226-01.bin
-	characters.901225-01.bin
+    kernal.sx.251104-04.bin
+    basic.901226-01.bin
+    characters.901225-01.bin
 
 
 * DX-64 (198?)
@@ -169,30 +169,30 @@ if it ever reached the prototype stage.
 * Commodore 64C (1986)
 
   Redesigned version of the C64, released with slightly upgraded versions
-of chips and peripherals. It came often bundled with GEOS, GUI based OS 
+of chips and peripherals. It came often bundled with GEOS, GUI based OS
 by Berkeley Softworks (it was stored on floppy disks). It's also known as
 C64-II but the name doesn't seems to have ever been official (only used
-by magazines at early stage of ad & review). Another redesign, in a slightly 
-larger case (closer to the original C64) is known as Commodore 64G, because 
-mainly sold in Germany. Other repackaged versions followed, built around the 
+by magazines at early stage of ad & review). Another redesign, in a slightly
+larger case (closer to the original C64) is known as Commodore 64G, because
+mainly sold in Germany. Other repackaged versions followed, built around the
 same kernel and chips.
 
 CPU: CSG 8500 (1 MHz; 6510 compatible)
 RAM: 64 kilobytes
 ROM: 20 kilobytes
-Video: MOS 8565 "VIC-II" (320 x 200 Hi-Resolution, 40 columns text, 16 
-	colors)
-Sound: CSG 8580 "SID" (3 voice stereo synthesizer/digital sound 
-	capabilities) 
-Ports: MOS 6526 CIA x2 (Power switch; 2 Commodore Joystick/Mouse ports; 
-	CBM Serial port; CBM Datasette port; parallel programmable "User" 
-	port; CBM Monitor port; C64 expansion port)
+Video: MOS 8565 "VIC-II" (320 x 200 Hi-Resolution, 40 columns text, 16
+    colors)
+Sound: CSG 8580 "SID" (3 voice stereo synthesizer/digital sound
+    capabilities)
+Ports: MOS 6526 CIA x2 (Power switch; 2 Commodore Joystick/Mouse ports;
+    CBM Serial port; CBM Datasette port; parallel programmable "User"
+    port; CBM Monitor port; C64 expansion port)
 Keyboard: Full-sized 62 key QWERTY (8 programmable function keys; 2
-	cursor keys, 2 directions each)
+    cursor keys, 2 directions each)
 
 BIOS:
-	64c.251913-01.bin
-	characters.901225-01.bin
+    64c.251913-01.bin
+    characters.901225-01.bin
 
 
 * Commodore 64 Games System (1990)
@@ -203,22 +203,22 @@ system came far too late to enter the console market of the 90s.
 CPU: CSG 6510 (1 MHz)
 RAM: 64 kilobytes
 ROM: 16 kilobytes
-Video: MOS 8565 "VIC-II" (320 x 200 Hi-Resolution, 40 columns text, 16 
-	colors)
-Sound: CSG 8580 "SID" (3 voice stereo synthesizer/digital sound 
-	capabilities) 
-Ports: MOS 6526 CIA (Power switch; 2 Commodore Joystick/Mouse ports; 
-	CBM Monitor port; C64 expansion port)
+Video: MOS 8565 "VIC-II" (320 x 200 Hi-Resolution, 40 columns text, 16
+    colors)
+Sound: CSG 8580 "SID" (3 voice stereo synthesizer/digital sound
+    capabilities)
+Ports: MOS 6526 CIA (Power switch; 2 Commodore Joystick/Mouse ports;
+    CBM Monitor port; C64 expansion port)
 
 BIOS:
-	64gs.390852-01.bin
-	characters.901225-01.bin
+    64gs.390852-01.bin
+    characters.901225-01.bin
 
 * Commodore 64 "Gold" (1984, US - 1986, Germany)
 
-  Commemorative version released to celebrate the one millionth Commodore 64 
-sold in the country. The whole case is golden colored. It is also reasonable 
-to assume that the US version is based on the original C64, while the German 
+  Commemorative version released to celebrate the one millionth Commodore 64
+sold in the country. The whole case is golden colored. It is also reasonable
+to assume that the US version is based on the original C64, while the German
 version is based on the C64C.
 
 
@@ -231,15 +231,15 @@ C64CGS - C64GS in a C64C-like case, sold in Ireland (?), with a keyboard (?)
 
 [Known Fake / Unofficial BIOS]
 
-Max Machine - These are BASIC V2.0 and kernel contained in the MAX BASIC 
-cart, not a real Max BIOS.  
-	basic.901230-01.bin
-	kernal.901231-01.bin
-	
+Max Machine - These are BASIC V2.0 and kernel contained in the MAX BASIC
+cart, not a real Max BIOS.
+    basic.901230-01.bin
+    kernal.901231-01.bin
+
 Character roms
-	c64-german.bin - amateur hack
-	c64-hungarian.bin - amateur hack
-	kauno.bin - calligraphic font for the C64, data saved from a 1985 tape
+    c64-german.bin - amateur hack
+    c64-hungarian.bin - amateur hack
+    kauno.bin - calligraphic font for the C64, data saved from a 1985 tape
 
 [Peripherals]
 
@@ -259,14 +259,14 @@ Character roms
 - Commodore Joysticks
 - Commodore Paddles
 - Commodore 1350 / 1351 Mouse
-- CMD SmartMouse 
+- CMD SmartMouse
 - Inkwell Light Pen
 - Koala Pad
 - Commodore Music Maker overlay
 - External music keyboard (to be plugged into the Sound Expander)
 
 - Commodore REU: REU stands for RAM Expansion Unit for C64 & C128. Three
-models 1700 (128 KB) and 1750 (512 KB), and later the 1764 (256 KB, for the 
+models 1700 (128 KB) and 1750 (512 KB), and later the 1764 (256 KB, for the
 C64)
 - Commodore Sound Expander Cart
 - Commodore Sound Sampler Cart
@@ -274,12 +274,12 @@ C64)
 - Schnedler Systems Turbo Master CPU
 - Creative Micro Designs (CMD) RAMDrive, RAMLink and Super CPU Accelerator
 - CMD SID symphony cartridge
-- Commodore Universal Btx Decoder: Same design of the REU, it's a decoder 
+- Commodore Universal Btx Decoder: Same design of the REU, it's a decoder
 for the Bildschirmtext, a sort of videotext online service similar to the
 French Minitel. It allowed the C64 + Decoder to replace the very expensive
 standalone decoder.
 
-Freezer Carts: Datel "Action Replay", Freeze Frame MK III B, Trilogic 
+Freezer Carts: Datel "Action Replay", Freeze Frame MK III B, Trilogic
 "Expert", "The Final Cartridge III", "Retro Replay"
 Kernal Replacement: SpeedDOS, DolphinDOS, JiffyDOS etc.
 
@@ -292,14 +292,14 @@ needed.
 
 * Cartridges:
 
-- Currently only Type 0 hardware is supported (check cart code in 
+- Currently only Type 0 hardware is supported (check cart code in
 machine/c64.c for more notes). Other Types may load but not work.
 
 * Datasette:
 
-- Currently, .t64 images are supported as Quickload device. This only works 
-if the file contains a single entry with a start address of $0801. This 
-covers most of the existing files, but the format is desinged to be much 
+- Currently, .t64 images are supported as Quickload device. This only works
+if the file contains a single entry with a start address of $0801. This
+covers most of the existing files, but the format is desinged to be much
 more flexible and it could be implemented as a real tape format.
 
 * Other Peripherals:
@@ -312,13 +312,13 @@ dual SID configuration
 
 * Informations / BIOS / Supported Sets:
 
-- Find out if C64 was sold both as VIC 64S and C64 in Sweden, and which 
+- Find out if C64 was sold both as VIC 64S and C64 in Sweden, and which
 were inner/outer differences. For sure advertising was using the VIC 64S
 name.
 - Was it really sold as VC 64 in Germany, or was it just a nickname used
 at launch to indicate standard C64 units?
-- What's the difference between Educator 64-1 and Educator 64-2? My guess 
-is that Edu64-1 was a standard PET64/CBMB4064 with a different name, while 
+- What's the difference between Educator 64-1 and Educator 64-2? My guess
+is that Edu64-1 was a standard PET64/CBMB4064 with a different name, while
 the Edu64-1 used the full C64 BIOS. Confirmations are needed, anyway.
  */
 
@@ -382,7 +382,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START (c64gs)
 	PORT_INCLUDE( c64 )
-	
+
 	/* 2008 FP: This has to be cleaned up later */
 	/* C64gs should simply not scan these inputs */
 	/* as a temporary solution, we keep PeT IPT_UNUSED shortcut */
@@ -561,7 +561,7 @@ static MACHINE_DRIVER_START( c64pal )
 	/* cia */
 	MDRV_CIA6526_ADD("cia_0", CIA6526R1, VIC6569_CLOCK, c64_pal_cia0)
 	MDRV_CIA6526_ADD("cia_1", CIA6526R1, VIC6569_CLOCK, c64_pal_cia1)
-	
+
 	/* floppy from serial bus */
 	MDRV_IMPORT_FROM(simulated_drive)
 
@@ -577,7 +577,7 @@ static MACHINE_DRIVER_START( ultimax )
 	MDRV_SOUND_REPLACE("sid6581", SID6581, VIC6567_CLOCK)
 	MDRV_SOUND_CONFIG(c64_sound_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	
+
 	MDRV_DEVICE_REMOVE("serial_bus")	// in the current code, serial bus device is tied to the floppy drive
 	MDRV_DEVICE_REMOVE("cart1")
 	MDRV_DEVICE_REMOVE("cart2")

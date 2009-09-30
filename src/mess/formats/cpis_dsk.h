@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	formats/cpis_dsk.h
+    formats/cpis_dsk.h
 
-	Telenova Compis disk images
+    Telenova Compis disk images
 
 *********************************************************************/
 

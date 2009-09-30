@@ -1,8 +1,8 @@
 /***************************************************************************
 
-	coco_pak.c
+    coco_pak.c
 
-	Code for emulating standard CoCo cartridges
+    Code for emulating standard CoCo cartridges
 
 ***************************************************************************/
 
@@ -61,7 +61,7 @@ static DEVICE_RESET(coco_pak)
 {
 	coco_pak_pcb_t *pak_pcb = get_token(device);
 	cococart_line_value cart_line;
-	
+
 	cart_line = input_port_read_safe(device->machine, "CARTAUTO", 0x01)
 		? COCOCART_LINE_VALUE_Q
 		: COCOCART_LINE_VALUE_CLEAR;
@@ -76,7 +76,7 @@ static DEVICE_RESET(coco_pak)
 
 /*-------------------------------------------------
     DEVICE_GET_INFO(coco_cartridge_pcb_pak) - get
-	info function for standard CoCo cartridges
+    info function for standard CoCo cartridges
 -------------------------------------------------*/
 
 DEVICE_GET_INFO(coco_cartridge_pcb_pak)
@@ -105,7 +105,7 @@ DEVICE_GET_INFO(coco_cartridge_pcb_pak)
 
 
 /***************************************************************************
-	BANKED CARTRIDGES
+    BANKED CARTRIDGES
 ***************************************************************************/
 
 /*-------------------------------------------------
@@ -119,7 +119,7 @@ static void banked_pak_set_bank(const device_config *device, UINT32 bank)
 	UINT32 i;
 	UINT8 *rom = memory_region(device->machine, "cart");
 	UINT32 rom_length = memory_region_length(device->machine, "cart");
-	
+
 	pos = (bank * 0x4000) % image_length(pak_pcb->cart);
 
 	for (i = 0; i < rom_length / 0x4000; i++)
@@ -164,7 +164,7 @@ static WRITE8_DEVICE_HANDLER( banked_pak_w )
 
 /*-------------------------------------------------
     DEVICE_GET_INFO(coco_cartridge_pcb_pak_banked16k) -
-	get info function for banked CoCo cartridges
+    get info function for banked CoCo cartridges
 -------------------------------------------------*/
 
 DEVICE_GET_INFO(coco_cartridge_pcb_pak_banked16k)

@@ -5,7 +5,7 @@
 
 
 /*********************************************************************
-	ioprocs implementation on stdio
+    ioprocs implementation on stdio
 *********************************************************************/
 
 static void stdio_closeproc(void *file)
@@ -61,7 +61,7 @@ const struct io_procs stdio_ioprocs_noclose =
 
 
 /*********************************************************************
-	calls for accessing generic IO
+    calls for accessing generic IO
 *********************************************************************/
 
 static void io_generic_seek(struct io_generic *generic, UINT64 offset)

@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	svi_cas.h
+    svi_cas.h
 
-	Format code for SVI casette files
+    Format code for SVI casette files
 
 *********************************************************************/
 

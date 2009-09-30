@@ -1,7 +1,7 @@
 /*
- * 
+ *
  *   Sharp X1 TAP image format
- * 
+ *
  */
 
 #ifndef X1_TAP_H_

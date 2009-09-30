@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	appldriv.c
+    appldriv.c
 
-	Apple 5.25" floppy drive emulation (to be interfaced with applefdc.c)
+    Apple 5.25" floppy drive emulation (to be interfaced with applefdc.c)
 
 *********************************************************************/
 #include "driver.h"
@@ -141,7 +141,7 @@ int apple525_get_count(running_machine *machine) {
     if (devtag_get_device(machine,FLOPPY_3)!=NULL && flopimg_get_custom_data(devtag_get_device(machine,FLOPPY_3))!=NULL) cnt++;
 	return cnt;
 }
-	
+
 void apple525_set_lines(const device_config *device,UINT8 lines)
 {
 	int i, count;
@@ -151,7 +151,7 @@ void apple525_set_lines(const device_config *device,UINT8 lines)
 	for (i = 0; i < count; i++)
 	{
 		if (apple525_enable_mask & (1 << i))
-		{			
+		{
 			image = floppy_get_device_by_type(device->machine, FLOPPY_TYPE_APPLE, i);
 			if (image)
 				apple525_disk_set_lines(device,image, lines);
@@ -212,9 +212,9 @@ static UINT8 apple525_process_byte(const device_config *img, int write_value)
 static const device_config *apple525_selected_image(running_machine *machine)
 {
 	int i,count;
-	
+
 	count = apple525_get_count(machine);
-	
+
 	for (i = 0; i < count; i++)
 	{
 		if (apple525_enable_mask & (1 << i))
@@ -242,9 +242,9 @@ int apple525_read_status(const device_config *device)
 {
 	int i, count, result = 0;
 	const device_config *image;
-	
+
 	count = apple525_get_count(device->machine);
-	
+
 	for (i = 0; i < count; i++)
 	{
 		if (apple525_enable_mask & (1 << i))
@@ -260,10 +260,10 @@ int apple525_read_status(const device_config *device)
 /* ----------------------------------------------------------------------- */
 
 static DEVICE_START( apple525_floppy )
-{	
+{
 
 	DEVICE_START_CALL(floppy);
-	flopimg_alloc_custom_data(device,auto_alloc_clear(device->machine,struct apple525_disk));	
+	flopimg_alloc_custom_data(device,auto_alloc_clear(device->machine,struct apple525_disk));
 	floppy_set_type(device,FLOPPY_TYPE_APPLE);
 }
 
@@ -279,7 +279,7 @@ static DEVICE_IMAGE_UNLOAD( apple525_floppy )
 {
 	apple525_save_current_track(image, TRUE);
 
-	DEVICE_IMAGE_UNLOAD_NAME(floppy)(image);	
+	DEVICE_IMAGE_UNLOAD_NAME(floppy)(image);
 }
 
 DEVICE_GET_INFO( apple525 )

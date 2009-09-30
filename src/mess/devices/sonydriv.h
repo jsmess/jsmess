@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	sonydriv.h
+    sonydriv.h
 
-	Apple/Sony 3.5" floppy drive emulation (to be interfaced with applefdc.c)
+    Apple/Sony 3.5" floppy drive emulation (to be interfaced with applefdc.c)
 
 *********************************************************************/
 
@@ -15,11 +15,11 @@
 
 /*enum
 {
-	SONY_FLOPPY_ALLOW400K			= 0x0001,
-	SONY_FLOPPY_ALLOW800K			= 0x0002,
+    SONY_FLOPPY_ALLOW400K           = 0x0001,
+    SONY_FLOPPY_ALLOW800K           = 0x0002,
 
-	SONY_FLOPPY_SUPPORT2IMG			= 0x4000,
-	SONY_FLOPPY_EXT_SPEED_CONTROL	= 0x8000	// means the speed is controlled by computer 
+    SONY_FLOPPY_SUPPORT2IMG         = 0x4000,
+    SONY_FLOPPY_EXT_SPEED_CONTROL   = 0x8000    // means the speed is controlled by computer
 };
 
 */
@@ -42,19 +42,19 @@ DEVICE_GET_INFO(sonydriv);
 	MDRV_DEVICE_ADD(FLOPPY_0, FLOPPY_SONY, 0)		\
 	MDRV_DEVICE_CONFIG(_config)	\
 	MDRV_DEVICE_ADD(FLOPPY_1, FLOPPY_SONY, 0)		\
-	MDRV_DEVICE_CONFIG(_config)	
+	MDRV_DEVICE_CONFIG(_config)
 
 #define MDRV_FLOPPY_SONY_2_DRIVES_ADDITIONAL_ADD(_config) 	\
 	MDRV_DEVICE_ADD(FLOPPY_2, FLOPPY_SONY, 0)		\
 	MDRV_DEVICE_CONFIG(_config)	\
 	MDRV_DEVICE_ADD(FLOPPY_3, FLOPPY_SONY, 0)		\
-	MDRV_DEVICE_CONFIG(_config)	
+	MDRV_DEVICE_CONFIG(_config)
 
 #define MDRV_FLOPPY_SONY_2_DRIVES_MODIFY(_config) 	\
 	MDRV_DEVICE_MODIFY(FLOPPY_0)		\
 	MDRV_DEVICE_CONFIG(_config)	\
 	MDRV_DEVICE_MODIFY(FLOPPY_1)		\
-	MDRV_DEVICE_CONFIG(_config)	
+	MDRV_DEVICE_CONFIG(_config)
 
 
 

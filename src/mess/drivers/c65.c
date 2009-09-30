@@ -10,7 +10,7 @@
 
 /*
 
-2008 - Driver Updates 
+2008 - Driver Updates
 ---------------------
 
 (most of the informations are taken from http://www.zimmers.net/cbmpics/ )
@@ -20,31 +20,31 @@
 
 * Commodore 65 (1989)
 
-Also known as C64 DX at early stages of the project. It was cancelled 
-around 1990-1991. Only few units survive (they were sold after Commodore 
+Also known as C64 DX at early stages of the project. It was cancelled
+around 1990-1991. Only few units survive (they were sold after Commodore
 liquidation in 1994).
 
 CPU: CSG 4510 (3.54 MHz)
 RAM: 128 kilobytes, expandable to 8 megabytes
 ROM: 128 kilobytes
-Video: CSG 4569 "VIC-III" (6 Video modes; Resolutions from 320x200 to 
-	1280x400; 80 columns text; Palette of 4096 colors)
-Sound: CSG 8580 "SID" x2 (6 voice stereo synthesizer/digital sound 
-	capabilities)
-Ports: CSG 4510 (2 Joystick/Mouse ports; CBM Serial port; CBM 'USER' 
-	port; CBM Monitor port; Power and reset switches; C65 bus drive 
-	port; RGBI video port; 2 RCA audio ports; RAM expansion port; C65 
-	expansion port)
+Video: CSG 4569 "VIC-III" (6 Video modes; Resolutions from 320x200 to
+    1280x400; 80 columns text; Palette of 4096 colors)
+Sound: CSG 8580 "SID" x2 (6 voice stereo synthesizer/digital sound
+    capabilities)
+Ports: CSG 4510 (2 Joystick/Mouse ports; CBM Serial port; CBM 'USER'
+    port; CBM Monitor port; Power and reset switches; C65 bus drive
+    port; RGBI video port; 2 RCA audio ports; RAM expansion port; C65
+    expansion port)
 Keyboard: Full-sized 77 key QWERTY (12 programmable function keys;
-	4 direction cursor-pad)
+    4 direction cursor-pad)
 Additional Hardware: Built in 3.5" DD disk drive (1581 compatible)
 Miscellaneous: Partially implemented Commodore 64 emulation
 
 [Notes]
 
-The datasette port was removed here. C65 supports an additional "dumb" 
-drive externally. It also features, in addition to the standard CBM 
-bus serial (available in all modes), a Fast and a Burst serial bus 
+The datasette port was removed here. C65 supports an additional "dumb"
+drive externally. It also features, in addition to the standard CBM
+bus serial (available in all modes), a Fast and a Burst serial bus
 (both available in C65 mode only)
 
 */
@@ -115,11 +115,11 @@ static INPUT_PORTS_START( c65 )
 	PORT_INCLUDE( common_cbm_keyboard )		/* ROW0 -> ROW7 */
 
 	PORT_START("FUNCT")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("ESC") PORT_CODE(KEYCODE_F1)		
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F13 F14") PORT_CODE(KEYCODE_F11)	
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F11 F12") PORT_CODE(KEYCODE_F10)	
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F9 F10") PORT_CODE(KEYCODE_F9)	
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("HELP") PORT_CODE(KEYCODE_F12)		
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("ESC") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F13 F14") PORT_CODE(KEYCODE_F11)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F11 F12") PORT_CODE(KEYCODE_F10)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F9 F10") PORT_CODE(KEYCODE_F9)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("HELP") PORT_CODE(KEYCODE_F12)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("ALT") PORT_CODE(KEYCODE_F2)		/* non blocking */
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("TAB") PORT_CODE(KEYCODE_TAB)
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("NO SCRL") PORT_CODE(KEYCODE_F4)
@@ -132,7 +132,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( c65ger )
 	PORT_INCLUDE( c65 )
-    
+
 	PORT_MODIFY( "ROW1" )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Z  { Y }") PORT_CODE(KEYCODE_Z)					PORT_CHAR('Z')
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("3  #  { 3  Paragraph }") PORT_CODE(KEYCODE_3)		PORT_CHAR('3') PORT_CHAR('#')
@@ -242,7 +242,7 @@ static MACHINE_DRIVER_START( c65 )
 	/* cia */
 	MDRV_CIA6526_ADD("cia_0", CIA6526R1, 3500000, c65_ntsc_cia0)
 	MDRV_CIA6526_ADD("cia_1", CIA6526R1, 3500000, c65_ntsc_cia1)
-	
+
 	/* floppy from serial bus */
 	MDRV_IMPORT_FROM(simulated_drive)
 

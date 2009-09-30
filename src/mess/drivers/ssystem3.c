@@ -99,13 +99,13 @@ static void ssystem3_playfield_write(running_machine *machine, int reset, int si
     playfield.time=t;
 
     //    logerror("%.4x playfield %d lowtime %s hightime %s\n",(int)activecpu_get_pc(), playfield.count,
-    //	     attotime_string(playfield.low_time, 7), attotime_string(playfield.high_time,7) );
+    //       attotime_string(playfield.low_time, 7), attotime_string(playfield.high_time,7) );
 
     if (playfield.started) {
       // 0 twice as long low
       // 1 twice as long high
       if (attotime_compare(playfield.low_time,playfield.high_time)>0) d=TRUE;
-      
+
       playfield.data&=~(1<<(playfield.bit^7));
       if (d) playfield.data|=1<<(playfield.bit^7);
       playfield.bit++;
@@ -199,7 +199,7 @@ static READ8_DEVICE_HANDLER(ssystem3_via_read_a)
     bit 6: input clocks!?
 
   port a:
-   bit 7: input low x/$37 2  
+   bit 7: input low x/$37 2
    bit 6: input low x/$37 3
    bit 5: input low x/$37 4 (else 1)
 
@@ -253,10 +253,10 @@ static ADDRESS_MAP_START( ssystem3_map , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x03ff) AM_RAM
 				  /*
 67-de playfield ($40 means white, $80 black)
-				   */
+                   */
 //  AM_RANGE( 0x4000, 0x40ff) AM_NOP
 /*
-  probably zusatzgerät memory (battery powered ram 256x4? at 0x4000)
+  probably zusatzger??t memory (battery powered ram 256x4? at 0x4000)
   $40ff low nibble ram if playfield module (else init with normal playfield)
  */
 	AM_RANGE( 0x6000, 0x600f) AM_DEVREADWRITE("via6522_0", via_r, via_w)
@@ -278,8 +278,8 @@ static INPUT_PORTS_START( ssystem3 )
 
   PORT_START( "Switches" )
 //PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("NEW GAME") PORT_CODE(KEYCODE_F3) // seems to be direct wired to reset
-//	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("?CLEAR") PORT_CODE(KEYCODE_F1)
-//	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("?ENTER") PORT_CODE(KEYCODE_ENTER)
+//  PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("?CLEAR") PORT_CODE(KEYCODE_F1)
+//  PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("?ENTER") PORT_CODE(KEYCODE_ENTER)
   PORT_START( "matrix1" )
      PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("?1") PORT_CODE(KEYCODE_1_PAD)
      PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9   C SQ     EP") PORT_CODE(KEYCODE_9)
@@ -348,7 +348,7 @@ MACHINE_DRIVER_END
 ROM_START(ssystem3)
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD("ss3lrom", 0xc000, 0x1000, CRC(9ea46ed3) SHA1(34eef85b356efbea6ddac1d1705b104fc8e2731a) )
-//	ROM_RELOAD(0xe000, 0x1000)
+//  ROM_RELOAD(0xe000, 0x1000)
 	ROM_LOAD("ss3hrom", 0xf000, 0x1000, CRC(52741e0b) SHA1(2a7b950f9810c5a14a1b9d5e6b2bd93da621662e) )
 	ROM_RELOAD(0xd000, 0x1000)
 ROM_END

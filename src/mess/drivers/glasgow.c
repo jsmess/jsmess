@@ -93,12 +93,12 @@ static WRITE16_HANDLER( write_lcd_gg )
 {
 	UINT8 lcd_data = data >> 8;
 
-	if (led7 == 0) 
+	if (led7 == 0)
 		output_set_digit_value(lcd_shift_counter, lcd_data);
 
 	lcd_shift_counter--;
 	lcd_shift_counter &= 3;
-//	logerror("LCD Offset = %d Data low = %x \n", offset, lcd_data);
+//  logerror("LCD Offset = %d Data low = %x \n", offset, lcd_data);
 }
 
 static WRITE16_HANDLER( write_beeper )
@@ -107,7 +107,7 @@ static WRITE16_HANDLER( write_beeper )
 
 	lcd_invert = 1;
 	beep_flag = data >> 8;
-//	if ((beep_flag & 02) == 0) key_selector = 0; else key_selector = 1;
+//  if ((beep_flag & 02) == 0) key_selector = 0; else key_selector = 1;
 	logerror("Write Beeper = %x \n", data);
 	beeper = data;
 }
@@ -128,14 +128,14 @@ static WRITE16_HANDLER( write_lcd_flag )
 	lcd_invert = 0;
 	lcd_flag=data >> 8;
 	//beep_set_state(0, lcd_flag & 1 ? 1 : 0);
-	if (lcd_flag == 0) 
+	if (lcd_flag == 0)
 		key_selector = 1;
 
  // The key function in the rom expects after writing to
  // the  a value from the second key row;
-	if (lcd_flag != 0) 
+	if (lcd_flag != 0)
 		led7 = 255;
-	else 
+	else
 		led7 = 0;
 
 	logerror("LCD Flag 16 = %x \n", data);
@@ -148,21 +148,21 @@ static WRITE16_HANDLER( write_lcd_flag_gg )
 
 	beep_set_state(speaker, lcd_flag & 1 ? 1 : 0);
 
-	if (lcd_flag == 0) 
+	if (lcd_flag == 0)
 		key_selector = 1;
 
-	if (lcd_flag != 0) 
+	if (lcd_flag != 0)
 		led7 = 255;
-	else 
+	else
 		led7 = 0;
 
-//	logerror("LCD Flag gg = %x \n", lcd_flag);
+//  logerror("LCD Flag gg = %x \n", lcd_flag);
 }
 
 static WRITE16_HANDLER( write_keys )
 {
 	key_select = data >> 8;
-//	logerror("Write Key = %x \n", data);
+//  logerror("Write Key = %x \n", data);
 }
 
 static READ16_HANDLER( read_board )
@@ -176,10 +176,10 @@ static WRITE16_HANDLER( write_board )
 
 	board_value = board;
 
-	if (board == 0xff) 
+	if (board == 0xff)
 		key_selector = 0;
-//	The key function in the rom expects after writing to
-//	the chess board a value from  the first key row;
+//  The key function in the rom expects after writing to
+//  the chess board a value from  the first key row;
 	logerror("Write Board = %x \n", data >> 8);
 }
 
@@ -241,9 +241,9 @@ static READ16_HANDLER( read_newkeys16 )  //Amsterdam, Roma
 {
 	UINT16 data;
 
-	if (key_selector == 0) 
+	if (key_selector == 0)
 		data = input_port_read(space->machine, "LINE0");
-	else 
+	else
 		data = input_port_read(space->machine, "LINE1");
 
 	logerror("read Keyboard Offset = %x Data = %x Select = %x \n", offset, data, key_selector);
@@ -274,7 +274,7 @@ static READ16_HANDLER( read_board_gg )
 	read_board_flag = TRUE;
 	logerror("read_board_data = %x \n", data);
 
-//	return 0xff00;   // Mephisto need it for working
+//  return 0xff00;   // Mephisto need it for working
 
 	return data;
 }
@@ -286,14 +286,14 @@ static WRITE16_HANDLER( write_beeper_gg )
 	UINT16 LineAH = 0;
 	UINT8 LED;
 
-//	logerror("Write Board   = %x \n  ",data);
+//  logerror("Write Board   = %x \n  ",data);
 
 	LineAH = data >> 8;
 
 	if (LineAH && Line18_LED)
 	{
-//	logerror("Line18_LED   = %x \n  ",Line18_LED);
-//	logerror("LineAH   = %x \n  ",LineAH);
+//  logerror("Line18_LED   = %x \n  ",Line18_LED);
+//  logerror("LineAH   = %x \n  ",LineAH);
 
 		for (i_AH = 0; i_AH < 8; i_AH++)
 		{
@@ -303,9 +303,9 @@ static WRITE16_HANDLER( write_beeper_gg )
 				{
 					if (!(Line18_LED & (1 << i_18)))
 					{
-//						logerror("i_18   = %d \n  ",i_18);
-//						logerror("i_AH   = %d \n  ",i_AH);
-//						logerror("LED an:   = %d \n  ",m_board[i_18][i_AH]);
+//                      logerror("i_18   = %d \n  ",i_18);
+//                      logerror("i_AH   = %d \n  ",i_AH);
+//                      logerror("LED an:   = %d \n  ",m_board[i_18][i_AH]);
 
 						LED = m_board[i_18][i_AH].field;
 						output_set_led_value(LED, 1);
@@ -366,15 +366,15 @@ static WRITE32_HANDLER( write_lcd_flag32 )
 
 	lcd_invert = 0;
 
-	if (lcd_flag == 0) 
+	if (lcd_flag == 0)
 		key_selector = 1;
 
 	logerror("LCD Flag 32 = %x \n", lcd_flag);
 	//beep_set_state(0, lcd_flag & 1 ? 1 : 0);
 
-	if (lcd_flag != 0) 
+	if (lcd_flag != 0)
 		led7 = 255;
-	else 
+	else
 		led7 = 0;
 }
 
@@ -390,9 +390,9 @@ static READ32_HANDLER( read_newkeys32 ) // Dallas 32, Roma 32
 {
 	UINT32 data;
 
-	if (key_selector == 0) 
+	if (key_selector == 0)
 		data = input_port_read(space->machine, "LINE0");
-	else 
+	else
 		data = input_port_read(space->machine, "LINE1");
 	//if (key_selector == 1) data = input_port_read(machine, "LINE0"); else data = 0;
 	logerror("read Keyboard Offset = %x Data = %x\n", offset, data);
@@ -418,7 +418,7 @@ static WRITE32_HANDLER( write_board32 )
 {
 	UINT8 board;
 	board = data >> 24;
-	if (board == 0xff) 
+	if (board == 0xff)
 		key_selector = 0;
 	logerror("Write Board = %x \n", data);
 }
@@ -571,7 +571,7 @@ static MACHINE_DRIVER_START(glasgow )
 
 	/* video hardware */
 	MDRV_DEFAULT_LAYOUT(layout_glasgow)
-	
+
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("beep", BEEP, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

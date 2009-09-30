@@ -1,38 +1,38 @@
 /***************************************************************************
 
-	coco_vhd.c
+    coco_vhd.c
 
-	Color Computer Virtual Hard Drives
+    Color Computer Virtual Hard Drives
 
 ****************************************************************************
 
-	Technical specs on the Virtual Hard Disk interface
+    Technical specs on the Virtual Hard Disk interface
 
-	Address       Description
-	-------       -----------
-	FF80          Logical record number (high byte)
-	FF81          Logical record number (middle byte)
-	FF82          Logical record number (low byte)
-	FF83          Command/status register
-	FF84          Buffer address (high byte)
-	FF85          Buffer address (low byte)
+    Address       Description
+    -------       -----------
+    FF80          Logical record number (high byte)
+    FF81          Logical record number (middle byte)
+    FF82          Logical record number (low byte)
+    FF83          Command/status register
+    FF84          Buffer address (high byte)
+    FF85          Buffer address (low byte)
 
-	Set the other registers, and then issue a command to FF83 as follows:
+    Set the other registers, and then issue a command to FF83 as follows:
 
-	 0 = read 256-byte sector at LRN
-	 1 = write 256-byte sector at LRN
-	 2 = flush write cache (Closes and then opens the image file)
+     0 = read 256-byte sector at LRN
+     1 = write 256-byte sector at LRN
+     2 = flush write cache (Closes and then opens the image file)
 
-	Error values:
+    Error values:
 
-	 0 = no error
-	-1 = power-on state (before the first command is recieved)
-	-2 = invalid command
-	 2 = VHD image does not exist
-	 4 = Unable to open VHD image file
-	 5 = access denied (may not be able to write to VHD image)
+     0 = no error
+    -1 = power-on state (before the first command is recieved)
+    -2 = invalid command
+     2 = VHD image does not exist
+     4 = Unable to open VHD image file
+     5 = access denied (may not be able to write to VHD image)
 
-	IMPORTANT: The I/O buffer must NOT cross an 8K MMU bank boundary.
+    IMPORTANT: The I/O buffer must NOT cross an 8K MMU bank boundary.
 
  ***************************************************************************/
 

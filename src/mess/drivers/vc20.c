@@ -11,7 +11,7 @@
 
 /*
 
-2008 - Driver Updates 
+2008 - Driver Updates
 ---------------------
 
 (most of the informations are taken from http://www.zimmers.net/cbmpics/ )
@@ -28,38 +28,38 @@ Japanese katakana character.
 CPU: MOS Technology 6502 (1.01 MHz)
 RAM: 5 kilobytes (Expanded to 21k though an external 16k unit)
 ROM: 20 kilobytes
-Video: MOS Technology 6560 "VIC"(Text: 22 columns, 23 rows; Hires: 176x184 
+Video: MOS Technology 6560 "VIC"(Text: 22 columns, 23 rows; Hires: 176x184
 pixels bitmapped; 8 text colors, 16 background colors)
 Sound: MOS Technology 6560 "VIC" (3 voices -square wave-, noise and volume)
 Ports: 6522 VIA x2 (1 Joystick/Mouse port; CBM Serial port; 'Cartridge /
-	Game / Expansion' port; CBM Monitor port; CBM 'USER' port; Power and 
-	reset switches; Power connector)
-Keyboard: Full-sized QWERTY 66 key (8 programmable function keys; 2 sets of 
-	Keyboardable graphic characters; 2 key direction cursor-pad)
-  
+    Game / Expansion' port; CBM Monitor port; CBM 'USER' port; Power and
+    reset switches; Power connector)
+Keyboard: Full-sized QWERTY 66 key (8 programmable function keys; 2 sets of
+    Keyboardable graphic characters; 2 key direction cursor-pad)
+
 
 * VIC 20 (1981)
 
-  This system was the first computer to sell more than one million units 
-worldwide. It was sold both in Europe and in the US. In Germany the 
+  This system was the first computer to sell more than one million units
+worldwide. It was sold both in Europe and in the US. In Germany the
 computer was renamed as VC 20 (apparently, it stands for 'VolksComputer'
 
 CPU: MOS Technology 6502A (1.01 MHz)
 RAM: 5 kilobytes (Expanded to 32k)
 ROM: 20 kilobytes
-Video: MOS Technology 6560 "VIC"(Text: 22 columns, 23 rows; Hires: 176x184 
+Video: MOS Technology 6560 "VIC"(Text: 22 columns, 23 rows; Hires: 176x184
 pixels bitmapped; 8 text colors, 16 background colors)
 Sound: MOS Technology 6560 "VIC" (3 voices -square wave-, noise and volume)
 Ports: 6522 VIA x2 (1 Joystick/Mouse port; CBM Serial port; 'Cartridge /
-	Game / Expansion' port; CBM Monitor port; CBM 'USER' port; Power and 
-	reset switches; Power connector)
-Keyboard: Full-sized QWERTY 66 key (8 programmable function keys; 2 sets of 
-	Keyboardable graphic characters; 2 key direction cursor-pad)
+    Game / Expansion' port; CBM Monitor port; CBM 'USER' port; Power and
+    reset switches; Power connector)
+Keyboard: Full-sized QWERTY 66 key (8 programmable function keys; 2 sets of
+    Keyboardable graphic characters; 2 key direction cursor-pad)
 
 
 * VIC 21 (1983)
 
-  It consists of a VIC 20 with built-in RAM expansion, to reach a RAM 
+  It consists of a VIC 20 with built-in RAM expansion, to reach a RAM
   capability of 21 kilobytes.
 
 
@@ -76,9 +76,9 @@ block of RAM instead of 8.
 
 * Timer system only 98% accurate
 
-* No support for printer or other devices; no userport; no rs232/v.24 
+* No support for printer or other devices; no userport; no rs232/v.24
 interface; no special expansion modules like ieee488 interface
- 
+
 */
 
 
@@ -152,8 +152,8 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-/* 2008-05 FP: These lightpen input ports, would better 
-fit machine/cbmipt.c but PORT_MINMAX requires vic6560.c 
+/* 2008-05 FP: These lightpen input ports, would better
+fit machine/cbmipt.c but PORT_MINMAX requires vic6560.c
 constants. Therefore, they will stay here, atm    */
 
 static INPUT_PORTS_START( vic_lightpen_6560 )
@@ -180,7 +180,7 @@ static INPUT_PORTS_START( vic20 )
 	PORT_INCLUDE( vic_special )			/* SPECIAL */
 
 	PORT_INCLUDE( vic_controls )		/* JOY, PADDLE0, PADDLE1 */
-	
+
 	/* Lightpen 6560 */
 	PORT_INCLUDE( vic_lightpen_6560 )	/* LIGHTX, LIGHTY */
 
@@ -202,7 +202,7 @@ static INPUT_PORTS_START( vc20 )
 	PORT_INCLUDE( vic_special )			/* SPECIAL */
 
 	PORT_INCLUDE( vic_controls )		/* JOY, PADDLE0, PADDLE1 */
-		
+
 	/* Lightpen 6561 */
 	PORT_INCLUDE( vic_lightpen_6561 )	/* LIGHTX, LIGHTY */
 
@@ -217,7 +217,7 @@ static INPUT_PORTS_START( vic20swe )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH2)		PORT_CHAR(':') PORT_CHAR('*')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS)			PORT_CHAR('-')
 	PORT_MODIFY( "ROW1" )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE)		PORT_CHAR('@')	
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE)		PORT_CHAR('@')
 	PORT_MODIFY( "ROW2" )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE)			PORT_CHAR(0x00C4)
 	PORT_MODIFY( "ROW5" )
@@ -300,7 +300,7 @@ static MACHINE_DRIVER_START( vic20 )
 	MDRV_VIA6522_ADD("via6522_1", 0, vc20_via1)
 	MDRV_VIA6522_ADD("via6522_2", 0, vc20_via2)
 	MDRV_VIA6522_ADD("via6522_3", 0, vc20_via3)
-	
+
 	MDRV_IMPORT_FROM(vic20_cartslot)
 MACHINE_DRIVER_END
 

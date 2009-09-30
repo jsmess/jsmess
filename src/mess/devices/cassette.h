@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	cassette.h
+    cassette.h
 
-	MESS interface to the cassette image abstraction code
+    MESS interface to the cassette image abstraction code
 
 *********************************************************************/
 

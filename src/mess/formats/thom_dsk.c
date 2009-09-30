@@ -1,10 +1,10 @@
 /*********************************************************************
 
-	formats/thom_dsk.c
+    formats/thom_dsk.c
 
-	Thomson disk images
-	
-	Based on work of  Antoine Mine'
+    Thomson disk images
+
+    Based on work of  Antoine Mine'
 
 *********************************************************************/
 
@@ -50,7 +50,7 @@ static FLOPPY_IDENTIFY(sap_dsk_identify)
 	char header[0x100];
 	floppy_image_read(floppy, header, 1, sizeof(sap_header));
 	if (!memcmp( header, sap_header, sizeof(sap_header) ) )
-	{		
+	{
 		*vote= 100;
 	} else {
 		*vote = 0;
@@ -82,7 +82,7 @@ static floperr_t get_offset(floppy_image *floppy, int head, int track, int secto
 		return FLOPPY_ERROR_SEEKERROR;
 
 	offs = 0x42 + track * ((get_tag(floppy)->sector_size + 6)* 16) + sector * (get_tag(floppy)->sector_size + 6) + 4;
-	if (offset) 
+	if (offset)
 		*offset = offs;
 	return FLOPPY_ERROR_SUCCESS;
 }
@@ -93,7 +93,7 @@ static floperr_t internal_sap_read_sector(floppy_image *floppy, int head, int tr
 {
 	UINT64 offset;
 	floperr_t err;
-	int i;	
+	int i;
 	UINT8 *buf;
 	err = get_offset(floppy, head, track, sector, sector_is_index, &offset);
 	if (err)
@@ -171,7 +171,7 @@ static floperr_t sap_get_indexed_sector_info(floppy_image *floppy, int head, int
 	UINT64 offset = 0;
 	sector_index += 1;
 	err = get_offset(floppy, head, track, sector_index, FALSE, &offset);
-	
+
 	floppy_image_read(floppy, header, offset-4, 4);
 	if (cylinder)
 		*cylinder = header[2];
@@ -214,8 +214,8 @@ static FLOPPY_CONSTRUCT(sap_dsk_construct)
 	callbacks->get_heads_per_disk = sap_get_heads_per_disk;
 	callbacks->get_tracks_per_disk = sap_get_tracks_per_disk;
 	callbacks->get_indexed_sector_info = sap_get_indexed_sector_info;
-	
-	return FLOPPY_ERROR_SUCCESS;	
+
+	return FLOPPY_ERROR_SUCCESS;
 }
 
 static FLOPPY_IDENTIFY(qdd_dsk_identify)
@@ -225,7 +225,7 @@ static FLOPPY_IDENTIFY(qdd_dsk_identify)
 }
 
 /* fixed interlacing map for QDDs */
-static int thom_qdd_map[400]; 
+static int thom_qdd_map[400];
 
 static int qdd_translate_sector(floppy_image *floppy, int sector)
 {
@@ -259,9 +259,9 @@ static void thom_qdd_compute_map ( void )
 static FLOPPY_CONSTRUCT(qdd_dsk_construct)
 {
 	struct basicdsk_geometry geometry;
-	
+
 	thom_qdd_compute_map();
-	
+
 	memset(&geometry, 0, sizeof(geometry));
 	geometry.heads = 1;
 	geometry.first_sector_id = 1;
@@ -269,14 +269,14 @@ static FLOPPY_CONSTRUCT(qdd_dsk_construct)
 	geometry.tracks = 1;
 	geometry.sectors = 400;
 	geometry.translate_sector =  qdd_translate_sector;
-	return basicdsk_construct(floppy, &geometry);	
+	return basicdsk_construct(floppy, &geometry);
 }
 
 
 /* ----------------------------------------------------------------------- */
 
 FLOPPY_OPTIONS_START(thomson)
-	FLOPPY_OPTION(qdd,"qd", "Thomson QDD floppy disk image",	qdd_dsk_identify, qdd_dsk_construct, 
+	FLOPPY_OPTION(qdd,"qd", "Thomson QDD floppy disk image",	qdd_dsk_identify, qdd_dsk_construct,
 		HEADS([1])
 		TRACKS([1])
 		SECTORS([400])

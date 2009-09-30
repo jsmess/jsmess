@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	formats/atarist_dsk.c
+    formats/atarist_dsk.c
 
-	Atari ST disk images
+    Atari ST disk images
 
 *********************************************************************/
 
@@ -21,7 +21,7 @@ static FLOPPY_CONSTRUCT(atarist_dsk_construct)
 {
 	struct basicdsk_geometry geometry;
 	int heads = 0;
-	int tracks = 0;	
+	int tracks = 0;
 	int sectors = 0;
 	UINT8 bootsector[512];
 
@@ -29,14 +29,14 @@ static FLOPPY_CONSTRUCT(atarist_dsk_construct)
 	sectors = bootsector[0x18];
 	heads = bootsector[0x1a];
 	tracks = (bootsector[0x13] | (bootsector[0x14] << 8)) / sectors / heads;
-	
+
 	memset(&geometry, 0, sizeof(geometry));
 	geometry.heads = heads;
 	geometry.first_sector_id = 1;
 	geometry.sector_length = 512;
 	geometry.tracks = tracks;
 	geometry.sectors = sectors;
-	return basicdsk_construct(floppy, &geometry);	
+	return basicdsk_construct(floppy, &geometry);
 }
 
 /* ----------------------------------------------------------------------- */

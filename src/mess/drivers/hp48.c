@@ -25,9 +25,9 @@
    - some bits I/O RAM not implemented
    - printer
    - more accurate timing (accurate SATURN cycles, speedup when screen is off)
-   - save-state: figure what RAM to store & where (currently, when exiting, 
-   base RAM is saved as nvram, RAM in expansion ports is saved as image, 
-   IO RAM is & CPU state are discarded; save-state saves base & IO RAM, 
+   - save-state: figure what RAM to store & where (currently, when exiting,
+   base RAM is saved as nvram, RAM in expansion ports is saved as image,
+   IO RAM is & CPU state are discarded; save-state saves base & IO RAM,
    CPU state, but not expansion port RAM)
    - more accurate IRQ, NMI, sleep and wake-up handling
 */
@@ -69,7 +69,7 @@
   - clock speed: 2 MHz
   - 256 KB ROM (various revisions, identical in S and SX)
 
-  - S model specific: 
+  - S model specific:
     + Codename: Shorty
     + 32 KB RAM base, not expandable (in theory)
     + no expansion port
@@ -92,7 +92,7 @@
 
   - GX model specific:
     + Codename: Hammer
-    + 128 KB base RAM, expandable up to 4 MB (banked) 
+    + 128 KB base RAM, expandable up to 4 MB (banked)
     + 2 expansion ports
       . port 1: up to 128 KB RAM, can be merged with base RAM
       . port 2: up to   4 MB RAM, in 32 banks of 128 KB, cannot be merged
@@ -105,10 +105,10 @@
 */
 
 
-/* 
+/*
    More about memory.
 
-   The base RAM is treated as NVRAM: stored in a .nv file in your nvram 
+   The base RAM is treated as NVRAM: stored in a .nv file in your nvram
    directory.
    When first starting the emulator, or after nvram file has been deleted,
    you'll get a "Try to recover memory?". This is expected.
@@ -116,9 +116,9 @@
    system-reserved RAM part correctly.
    If the emulator is shut down properly (i.e., when the calculator is
    not busy), the message should not appear next time it is run.
-   All the variables and port 0 should be conserved (in the .nv file), 
+   All the variables and port 0 should be conserved (in the .nv file),
    but not the stack.
-   Stopping and restarting the emulator loosely corresponds to hitting the 
+   Stopping and restarting the emulator loosely corresponds to hitting the
    reset button.
 
    Expansion RAMs are treated as images, not NVRAM.
@@ -136,9 +136,9 @@
   kermit communication program (xmodem is also allowed for the G/GX).
   We emulate both the serial link and the communication program.
   Thus, the emulated HP48 can directly upload/download image files.
-  The -k image option corresponds to the kermit protocol (SEND and RECV 
+  The -k image option corresponds to the kermit protocol (SEND and RECV
   commands on the HP48).
-  The -x image option corresponds to the xmodem protocol (XSEND and XRECV 
+  The -x image option corresponds to the xmodem protocol (XSEND and XRECV
   commands on the HP48).
 */
 
@@ -148,8 +148,8 @@
 
   References:
 
-  - Voyage au centre de la HP48 S/SX, by Paul Courbis & Sébastien Lalande
-    (English version: HP48 machine language - a journey to the center 
+  - Voyage au centre de la HP48 S/SX, by Paul Courbis & S?bastien Lalande
+    (English version: HP48 machine language - a journey to the center
      of the HP48 s/sx)
     available at http://www.courbis.com
 
@@ -177,23 +177,23 @@
     keyboard layout (all models)
 
    -------------------------------------------------
-   |   A   |   B   |   C   |   D   |   E   |   F   | 
+   |   A   |   B   |   C   |   D   |   E   |   F   |
    |-------+-------+-------+-------+-------+-------|
-   |  MTH  |  PRG  |  CST  |  VAR  |   up  |  NXT  | 
+   |  MTH  |  PRG  |  CST  |  VAR  |   up  |  NXT  |
    |-------+-------+-------+-------+-------+-------|
-   |   '   |  STO  |  EVAL |  left | down  | right | 
+   |   '   |  STO  |  EVAL |  left | down  | right |
    |-------+-------+-------+-------+-------+-------|
-   |  SIN  |  COS  |  TAN  |  sqrt |  y^x  |  1/x  | 
+   |  SIN  |  COS  |  TAN  |  sqrt |  y^x  |  1/x  |
    |---------------+-------+-------+-------+-------|
-   |     ENTER     |  +/-  |  EEX  |  DEL  |  <=   | 
+   |     ENTER     |  +/-  |  EEX  |  DEL  |  <=   |
    |-----------------------------------------------|
-   |  alpha  |   7    |    8   |    9    |    /    | 
+   |  alpha  |   7    |    8   |    9    |    /    |
    |---------+--------+--------+---------+---------|
-   |   red   |   4    |    5   |    6    |    *    | 
+   |   red   |   4    |    5   |    6    |    *    |
    |---------+--------+--------+---------+---------|
-   |  green  |   1    |    2   |    3    |    -    | 
+   |  green  |   1    |    2   |    3    |    -    |
    |---------+--------+--------+---------+---------|
-   |   ON    |   0    |    .   |   SPC   |    +    | 
+   |   ON    |   0    |    .   |   SPC   |    +    |
    -------------------------------------------------
 
    * 49 keys
@@ -203,7 +203,7 @@
      - a  white alpha key (lower right)
 
    Difference between G and S series: a few red and blue shifted keys.
- 
+
 */
 
 /* S/SX */
@@ -903,16 +903,16 @@ ROM_END
 
 /* In memory, nibbles are unpacked: one nibble at each address.
    This is due to the way the SATURN emulation is done.
-   As a consequence only the 4 lower bits of each byte is used, the 4 higher 
+   As a consequence only the 4 lower bits of each byte is used, the 4 higher
    bits being zeros.
    Another consequence is that ROMs must be unpacked before use.
 
-   Because of the complex memory manager, actual address mapping is done at 
+   Because of the complex memory manager, actual address mapping is done at
    run-time.
  */
 
 static ADDRESS_MAP_START ( hp48, ADDRESS_SPACE_PROGRAM, 8 )
-  
+
 	AM_RANGE( 0x00000, 0xfffff ) AM_NOP /* configured at run-time */
 
 ADDRESS_MAP_END
@@ -925,7 +925,7 @@ static const saturn_cpu_core hp48_config =
 {
 	hp48_reg_out, hp48_reg_in,
 	hp48_mem_reset, hp48_mem_config, hp48_mem_unconfig, hp48_mem_id,
-	hp48_mem_crc, 
+	hp48_mem_crc,
 	hp48_rsi
 };
 
@@ -949,7 +949,7 @@ static MACHINE_DRIVER_START ( hp48_common )
 	MDRV_CPU_ADD ( "maincpu", SATURN, 3937007 ) /* almost 4 MHz */
 	MDRV_CPU_PROGRAM_MAP ( hp48)
 	MDRV_CPU_CONFIG( hp48_config )
- 
+
 	/* memory */
 	MDRV_NVRAM_HANDLER( generic_0fill )
 
@@ -978,7 +978,7 @@ static MACHINE_DRIVER_START ( hp48gx )
 	/* expansion ports */
 	MDRV_HP48_PORT_ADD ( "port1", hp48gx_port1_config )
 	MDRV_HP48_PORT_ADD ( "port2", hp48gx_port2_config )
-		
+
 	/* serial I/O */
 	MDRV_XMODEM_ADD( "rs232_x", hp48_xmodem_rs232_conf )
 	MDRV_KERMIT_ADD( "rs232_k", hp48_kermit_rs232_conf )

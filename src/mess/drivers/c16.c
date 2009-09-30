@@ -10,7 +10,7 @@
 
 /*
 
-2008 - Driver Updates 
+2008 - Driver Updates
 ---------------------
 
 (most of the informations are taken from http://www.zimmers.net/cbmpics/ )
@@ -28,56 +28,56 @@ CPU: MOS Technology 7501 (variable clock rate, with max 1.76 MHz)
 RAM: 16 kilobytes (expandable to 64k internally)
 ROM: 32 kilobytes
 Video: MOS Technology 7360 "TED" (5 Video modes; Max. Resolution 320x200;
-	40 columns text; Palette of 16 colors in 8 shades, for 128 colors) 
-Sound: MOS Technology 7360 "TED" (2 voice tone-generating sound capabilities) 
-Ports: MOS 7360 (2 Joystick/Mouse ports; CBM Serial port; 'TED' port; "TV" 
-	Port and switch; CBM Monitor port; Power and reset switches; Power 
-	connector)
-Keyboard: QWERTY 62 key "membrane" (8 programmable function keys; 4 direction 
-	cursor-pad)
+    40 columns text; Palette of 16 colors in 8 shades, for 128 colors)
+Sound: MOS Technology 7360 "TED" (2 voice tone-generating sound capabilities)
+Ports: MOS 7360 (2 Joystick/Mouse ports; CBM Serial port; 'TED' port; "TV"
+    Port and switch; CBM Monitor port; Power and reset switches; Power
+    connector)
+Keyboard: QWERTY 62 key "membrane" (8 programmable function keys; 4 direction
+    cursor-pad)
 
 
 * Commodore 16 (1984)
 
-  Redesigned version of the C116, with a different case and a different 
+  Redesigned version of the C116, with a different case and a different
 keyboard.
 
 CPU: MOS Technology 7501 (variable clock rate, with max 1.76 MHz)
 RAM: 16 kilobytes (expandable to 64k internally)
 ROM: 32 kilobytes
 Video: MOS Technology 7360 "TED" (5 Video modes; Max. Resolution 320x200;
-	40 columns text; Palette of 16 colors in 8 shades, for 128 colors) 
-Sound: MOS Technology 7360 "TED" (2 voice tone-generating sound capabilities) 
-Ports: MOS 7360 (2 Joystick/Mouse ports; CBM Serial port; 'TED' port; "TV" 
-	Port and switch; CBM Monitor port; Power and reset switches; Power 
-	connector)
+    40 columns text; Palette of 16 colors in 8 shades, for 128 colors)
+Sound: MOS Technology 7360 "TED" (2 voice tone-generating sound capabilities)
+Ports: MOS 7360 (2 Joystick/Mouse ports; CBM Serial port; 'TED' port; "TV"
+    Port and switch; CBM Monitor port; Power and reset switches; Power
+    connector)
 Keyboard: QWERTY 66 key typewriter style (8 programmable function keys;
-	4 direction cursor-pad)
+    4 direction cursor-pad)
 
 
 * Commodore Plus/4 (1984)
 
   This system became the middle tier of the Commodore 264 family, replacing
 the original Commodore 264. The Plus/4 is basically the same as the C264,
-but the name refers to the four built-in programs which came with the 
+but the name refers to the four built-in programs which came with the
 machine: Word Processing, Spreadsheet, Database software, Graphing package.
 
 CPU: MOS Technology 7501 (variable clock rate, with max 1.76 MHz)
 RAM: 64 kilobytes (expandable to 64k internally)
 ROM: 64 kilobytes
 Video: MOS Technology 7360 "TED" (5 Video modes; Max. Resolution 320x200;
-	40 columns text; Palette of 16 colors in 8 shades, for 128 colors) 
-Sound: MOS Technology 7360 "TED" (2 voice tone-generating sound capabilities) 
-Ports: MOS 7360 (2 Joystick/Mouse ports; CBM Serial port; 'TED' port; "TV" 
-	Port and switch; CBM Monitor port; Power and reset switches; Power 
-	connector)
+    40 columns text; Palette of 16 colors in 8 shades, for 128 colors)
+Sound: MOS Technology 7360 "TED" (2 voice tone-generating sound capabilities)
+Ports: MOS 7360 (2 Joystick/Mouse ports; CBM Serial port; 'TED' port; "TV"
+    Port and switch; CBM Monitor port; Power and reset switches; Power
+    connector)
 Keyboard: Full-sized QWERTY 67 key (8 programmable function keys;
-	4 direction cursor-pad)
+    4 direction cursor-pad)
 
 
 * Commodore 232 (1984, Prototype)
 
-  This system never reached the production and only few units exist. It is 
+  This system never reached the production and only few units exist. It is
 in between the C16 and the C264, with its 32 kilobytes of RAM.
 
 
@@ -89,7 +89,7 @@ in between the C16 and the C264, with its 32 kilobytes of RAM.
 * Commodore V364 (1984, Prototype)
 
   This system was supposed to become the high-end system of the family,
-featuring 64 kilobytes of RAM, the same technology of the Plus/4, a 
+featuring 64 kilobytes of RAM, the same technology of the Plus/4, a
 keyboard with numeric keypad and built in voice synthesis capabilities.
 
 [TO DO]
@@ -268,7 +268,7 @@ static INPUT_PORTS_START( c16 )
 
 	PORT_MODIFY("ROW1")
 	/* Both Shift keys were mapped to the same bit */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Shift (Left & Right)") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT)	
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Shift (Left & Right)") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT)
 
 	PORT_MODIFY("ROW4")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("0  \xE2\x86\x91") PORT_CODE(KEYCODE_0)		PORT_CHAR('0') PORT_CHAR(0x2191)
@@ -303,7 +303,7 @@ static INPUT_PORTS_START( plus4 )
 	PORT_INCLUDE( c16 )
 
 	/* no real floppy */
-	
+
 	PORT_MODIFY( "ROW0" )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE)					PORT_CHAR(0xA3)
 	PORT_MODIFY( "ROW5" )
@@ -329,7 +329,7 @@ static INPUT_PORTS_START (c364)
 	PORT_INCLUDE( plus4 )
 
 	/* no real floppy */
-	
+
 	PORT_MODIFY("CFG1")
 	PORT_BIT( 0x10, 0x10, IPT_UNUSED )			/* ntsc */
 	PORT_BIT( 0x0c, 0x08, IPT_UNUSED )			/* 364 */
@@ -374,7 +374,7 @@ static const tpi6525_interface c16_tpi6525_tpi_2_intf =
 	c1551_0_write_handshake,
 	NULL,
 	NULL,
-	NULL	
+	NULL
 };
 
 static const tpi6525_interface c16_tpi6525_tpi_2_c1551_intf =
@@ -400,7 +400,7 @@ static const tpi6525_interface c16_tpi6525_tpi_3_intf =
 	c1551_1_write_handshake,
 	NULL,
 	NULL,
-	NULL	
+	NULL
 };
 
 static const m6502_interface c16_m7501_interface =
@@ -462,8 +462,8 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( c16c )
 	MDRV_IMPORT_FROM( c16 )
 
-	/* c16c uses 'real' floppy drive emulation from machine/vc1541.c... 
-	still in progress, atm */
+	/* c16c uses 'real' floppy drive emulation from machine/vc1541.c...
+    still in progress, atm */
 	MDRV_DEVICE_REMOVE("tpi6535_tpi_2")
 	MDRV_TPI6525_ADD("tpi6535_tpi_2", c16_tpi6525_tpi_2_c1551_intf)
 
@@ -512,8 +512,8 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( plus4c )
 	MDRV_IMPORT_FROM( plus4 )
 
-	/* plus4c uses 'real' floppy drive emulation from machine/vc1541.c... 
-	still in progress, atm */
+	/* plus4c uses 'real' floppy drive emulation from machine/vc1541.c...
+    still in progress, atm */
 	MDRV_DEVICE_REMOVE("tpi6535_tpi_2")
 	MDRV_TPI6525_ADD("tpi6535_tpi_2", c16_tpi6525_tpi_2_c1551_intf)
 

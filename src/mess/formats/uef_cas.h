@@ -1,7 +1,7 @@
 /*
-	uef_cas.h
+    uef_cas.h
 
-	Format code for uef cassette files
+    Format code for uef cassette files
 */
 
 #ifndef UEF_CAS_H

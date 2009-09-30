@@ -211,9 +211,9 @@ static casserr_t zx81_p_identify(cassette_image *cassette, struct CassetteOption
 static casserr_t zx81_p_load(cassette_image *cassette)
 {
 	/* The filename of the file is used to create the wave stream for the emulated machine. Why is this information not
-	   part of the image file itself?
-	   Hardcoding this to "cassette".
-	*/
+       part of the image file itself?
+       Hardcoding this to "cassette".
+    */
 	zx81_fill_file_name ("cassette" /*image_basename_noext(device_list_find_by_tag( Machine->config->devicelist, CASSETTE, "cassette" ))*/ );
 	return cassette_legacy_construct(cassette, &zx81_legacy_fill_wave);
 }

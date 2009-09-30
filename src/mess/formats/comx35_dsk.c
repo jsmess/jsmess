@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	formats/comx35_dsk.c
+    formats/comx35_dsk.c
 
-	COMX35 disk images
+    COMX35 disk images
 
 *********************************************************************/
 
@@ -22,18 +22,18 @@ static FLOPPY_CONSTRUCT(comx35_dsk_construct)
 	struct basicdsk_geometry geometry;
 	UINT8 header[1];
 	int heads =1;
-	int cylinders =35;	
-	
+	int cylinders =35;
+
 	switch(floppy_image_size(floppy)) {
 		case 35*1*16*128:
 			heads = 1;
-			cylinders = 35;			
+			cylinders = 35;
 			break;
 
-		case 35*2*16*128:			
+		case 35*2*16*128:
 			floppy_image_read( floppy, header, 0x12 , 1 );
 			if (header[0] == 0x01)
-			{				
+			{
 				heads = 1;
 				cylinders = 70;
 			}
@@ -42,16 +42,16 @@ static FLOPPY_CONSTRUCT(comx35_dsk_construct)
 				heads = 2;
 				cylinders = 35;
 			}
-			break;		
+			break;
 	}
-	
+
 	memset(&geometry, 0, sizeof(geometry));
 	geometry.heads = heads;
 	geometry.first_sector_id = 0;
 	geometry.sector_length = 128;
 	geometry.tracks = cylinders;
 	geometry.sectors = 16;
-	return basicdsk_construct(floppy, &geometry);	
+	return basicdsk_construct(floppy, &geometry);
 }
 
 /* ----------------------------------------------------------------------- */

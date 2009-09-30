@@ -6,7 +6,7 @@
     MESS source file to handle various Multi-Memory Controllers (aka Mappers) used by NES carts.
 
     Many information about the mappers below come from the wonderful doc written by Disch.
-    Current info (when used) are based on v0.6.1 of his docs. 
+    Current info (when used) are based on v0.6.1 of his docs.
     You can find the latest version of the doc at http://www.romhacking.net/docs/362/
 
 
@@ -19,7 +19,7 @@
     * 016 some graphics problem (e.g. Rokudenashi Blues misses some element of graphics)
     * 018 Pizza Pop and Plasma Ball shows graphics issues for this mapper
     * 024, 026, 085 Registers of the additional sound hardware are not emulated
-    * 032 Major League is not properly working: check missing windows or field graphics in top view screens 
+    * 032 Major League is not properly working: check missing windows or field graphics in top view screens
           (it requires one hack to support both boards using this mapper)
     * 033 has still some graphics problem (e.g. missing text in Akira)
     * 034 Impossible Mission 2 is not working
@@ -37,7 +37,7 @@
     * 072, 086, 092 lack samples support (maybe others as well)
     * 074 is only preliminar (no correct CHR swap)
     * 077 Requires 4-screen mirroring. Currently, it is very glitchy
-    * 078 Cosmo Carrier is not working (it requires one hack to support both boards using this mapper). 
+    * 078 Cosmo Carrier is not working (it requires one hack to support both boards using this mapper).
           also, we lack NT mirroring
     * 082 has chr-rom banking problems. Also mapper is in the middle of sram, which is unemulated.
     * 083 has serious glitches
@@ -153,7 +153,7 @@ static int vrom_bank[16];
 static int mult1, mult2;
 
 /* common local variables */
-static UINT8 mmc_chr_source;				// this is set at init to CHRROM or CHRRAM. a few mappers can swap between 
+static UINT8 mmc_chr_source;				// this is set at init to CHRROM or CHRRAM. a few mappers can swap between
 								// the two (this is done in the specific handlers)
 static UINT8 mmc_cmd1, mmc_cmd2;			// these represent registers where the mapper writes important values
 static UINT8 mmc_bank_latch1, mmc_bank_latch2;	// some mappers change banks by writing subsets of these bits
@@ -659,7 +659,7 @@ void set_nt_mirroring( int mirroring )
 	}
 }
 
-/*  Other custom mirroring helpers are defined below: Waixing games use waixing_set_mirror (which swaps 
+/*  Other custom mirroring helpers are defined below: Waixing games use waixing_set_mirror (which swaps
     MIRROR_HIGH and MIRROR_LOW compared to the above) and Sachen games use sachen_set_mirror (which has
     a slightly different MIRROR_HIGH, with page 0 set to 0) */
 
@@ -672,8 +672,8 @@ void set_nt_mirroring( int mirroring )
     No need of additional MMC
 
     Known Boards: NROM, FB02??, FB04??, Jaleco JF01, JF02, JF03, JF04
-    Games: Mario Bros., Super Mario Bros., Tennis and most of 
-          the first generation games 
+    Games: Mario Bros., Super Mario Bros., Tennis and most of
+          the first generation games
 
     In MESS: Supported, no need of specific handlers or IRQ
 
@@ -683,10 +683,10 @@ void set_nt_mirroring( int mirroring )
 
     Mapper 1
 
-    Known Boards: MMC1 based Boards, i.e. SAROM, SBROM, SCROM, 
+    Known Boards: MMC1 based Boards, i.e. SAROM, SBROM, SCROM,
           SEROM, SFROM, SGROM, SHROM, SJROM, SKROM, SLROM, SNROM,
           SOROM, SUROM, SXROM, WH??
-    Games: Faxanadu, Final Fantasy I & II, Kid Icarus, Legend 
+    Games: Faxanadu, Final Fantasy I & II, Kid Icarus, Legend
           of Zelda, Metroid
 
     In MESS: Supported
@@ -941,8 +941,8 @@ static WRITE8_HANDLER( mapper2_w )
 
     Known Boards: CNROM, CXROM, X79B?, Bandai Aerobics Board,
           Tengen 800008, Bootleg Board by NTDEC (N715062)
-    Games: Adventure Island, Flipull, Friday 13th, GeGeGe no 
-          Kitarou, Ghostbusters, Gradius, Hokuto no Ken, Milon's 
+    Games: Adventure Island, Flipull, Friday 13th, GeGeGe no
+          Kitarou, Ghostbusters, Gradius, Hokuto no Ken, Milon's
           Secret Castle
 
     In MESS: Supported
@@ -958,11 +958,11 @@ static WRITE8_HANDLER( mapper3_w )
 
     Mapper 4
 
-    Known Boards: MMC3 based Boards, i.e. HKROM, TEROM, TBROM, 
-          TFROM, TGROM, TKROM, TLROM, TNROM, TR1ROM, TSROM, 
+    Known Boards: MMC3 based Boards, i.e. HKROM, TEROM, TBROM,
+          TFROM, TGROM, TKROM, TLROM, TNROM, TR1ROM, TSROM,
           TVROM, TRXROM
-    Games: Final Fantasy III, MegaMan 3,4,5 & 6, Startropics, 
-          Super Mario Bros. 2 & 3, 
+    Games: Final Fantasy III, MegaMan 3,4,5 & 6, Startropics,
+          Super Mario Bros. 2 & 3,
 
     In MESS: Supported
 
@@ -1015,7 +1015,7 @@ static void mapper4_irq( const device_config *device, int scanline, int vblank, 
 
 		if (IRQ_enable && !blanked && (IRQ_count == 0) && priorCount)
 		{
-			LOG_MMC(("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline, 
+			LOG_MMC(("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline,
 					video_screen_get_vpos(device->machine->primary_screen), video_screen_get_hpos(device->machine->primary_screen)));
 			cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
 //          timer_adjust_oneshot(nes_irq_timer, cputag_clocks_to_attotime(device->machine, "maincpu", 4), 0);
@@ -1123,7 +1123,7 @@ static WRITE8_HANDLER( mapper4_w )
 
     Mapper 5
 
-    Known Boards:  MMC3 based Boards, i.e. ELROM, EKROM, ETROM, 
+    Known Boards:  MMC3 based Boards, i.e. ELROM, EKROM, ETROM,
           EWROM and EXROM variants
     Games: Castlevania III, Just Breed, many Koei titles
 
@@ -1716,7 +1716,7 @@ static WRITE8_HANDLER( mapper5_w )
 
     Mapper 7
 
-    Known Boards: AMROM, ANROM, AN1ROM, AOROM and unlicensed 
+    Known Boards: AMROM, ANROM, AN1ROM, AOROM and unlicensed
           AxROM
     Games: Arch Rivals, Battletoads, Cabal, Commando, Solstice
 
@@ -1987,7 +1987,7 @@ static WRITE8_HANDLER( mapper15_w )
 
     Known Boards: Bandai LZ93D50 24C02
     Games: Crayon Shin-Chan - Ora to Poi Poi, Dragon Ball Z Gaiden,
-          Dragon Ball Z II & III, Rokudenashi Blues, SD Gundam 
+          Dragon Ball Z II & III, Rokudenashi Blues, SD Gundam
           Gaiden - KGM2
 
     In MESS: Supported
@@ -2140,7 +2140,7 @@ static WRITE8_HANDLER( mapper17_l_w )
 
     Known Boards: Jaleco JF23, JF24, JF25, JF27, JF29, JF30, JF31,
           JF32, JF33, JF34, JF35, JF36, JF37, JF38, JF40, JF41, SS88006
-    Games: Lord of King, Magic John, Moe Pro '90, Ninja Jajamaru, 
+    Games: Lord of King, Magic John, Moe Pro '90, Ninja Jajamaru,
           Pizza Pop, Plasma Ball
 
     In MESS: Supported
@@ -2396,7 +2396,7 @@ static WRITE8_HANDLER( mapper18_w )
     Mapper 19
 
     Known Boards: Namcot 163 & 163S
-    Games: Battle Fleet, Family Circuit '91, Famista '90, '91, 
+    Games: Battle Fleet, Family Circuit '91, Famista '90, '91,
           '92 & '94, Megami Tensei II, Top Striker, Wagyan Land 2 & 3
 
     In MESS: Supported
@@ -2604,7 +2604,7 @@ WRITE8_HANDLER( fds_w )
     Mapper 21 & 25
 
     Known Boards: Konami VRC4A & VRC4C (21), VRC4B & VRC4D (25)
-    Games: Ganbare Goemon Gaiden 2, Wai Wai World 2 (21), Bio 
+    Games: Ganbare Goemon Gaiden 2, Wai Wai World 2 (21), Bio
           Miracle Bokutte Upa, Ganbare Goemon Gaiden, TMNT 1 & 2 Jpn (25)
 
     In MESS: Supported
@@ -2778,7 +2778,7 @@ static WRITE8_HANDLER( konami_vrc4_w )
     Known Boards: Konami VRC2A
     Games: Ganbare Pennant Race, Twin Bee 3
 
-    In MESS: Supported. 
+    In MESS: Supported.
 
 *************************************************************/
 
@@ -2943,9 +2943,9 @@ static WRITE8_HANDLER( konami_vrc6a_w )
 
 	switch (offset & 0x7003)
 	{
-		case 0x0000: 
-		case 0x0001: 
-		case 0x0002: 
+		case 0x0000:
+		case 0x0001:
+		case 0x0002:
 		case 0x0003:
 			/* Switch 16k bank at $8000 */
 			prg16_89ab(space->machine, data);
@@ -2964,9 +2964,9 @@ static WRITE8_HANDLER( konami_vrc6a_w )
 				case 0x0c: set_nt_mirroring(PPU_MIRROR_HIGH); break;
 			}
 			break;
-		case 0x4000: 
-		case 0x4001: 
-		case 0x4002: 
+		case 0x4000:
+		case 0x4001:
+		case 0x4002:
 		case 0x4003:
 			/* Switch 8k bank at $c000 */
 			prg8_cd(space->machine, data);
@@ -3080,7 +3080,7 @@ static WRITE8_HANDLER( konami_vrc6b_w )
     Known Boards: Unknown Bootleg Board
     Games: World Hero
 
-    In MESS: Unsupported. 
+    In MESS: Unsupported.
 
 *************************************************************/
 
@@ -3133,7 +3133,7 @@ static WRITE8_HANDLER( konami_vrc6b_w )
     Mapper 32
 
     Known Boards: Irem G101A & G101B
-    Games: Ai Sensei no Oshiete, Image Fight, Kaiketsu 
+    Games: Ai Sensei no Oshiete, Image Fight, Kaiketsu
           Yanchamaru 2, Maikyuu Shima, Paaman, Paaman 2
 
     In MESS: Supported.
@@ -3172,8 +3172,8 @@ static WRITE8_HANDLER( mapper32_w )
     Mapper 33
 
     Known Boards: Taito TC0190FMC
-    Games: Akira, Bakushou!! Jinsei Gekijou, Don Doko Don, 
-          Insector X, Operation Wolf, Power Blazer, Takeshi no 
+    Games: Akira, Bakushou!! Jinsei Gekijou, Don Doko Don,
+          Insector X, Operation Wolf, Power Blazer, Takeshi no
           Sengoku Fuuunji
 
     In MESS: Supported.
@@ -3219,7 +3219,7 @@ static WRITE8_HANDLER( mapper33_w )
     Mapper 34
 
     Known Boards: BNROM, Unlicensed BxROM, NINA001, NINA002
-    Games: Deadly Tower, Impossible Mission II, Titanic 1912, 
+    Games: Deadly Tower, Impossible Mission II, Titanic 1912,
           Dance Xtreme
 
     In MESS: Supported.
@@ -3274,7 +3274,7 @@ static WRITE8_HANDLER( mapper34_w )
     Known Boards: Bootleg Board by TXC
     Games: Strike Wolf (also Policeman?? according to Nestopia)
 
-    In MESS: Supported. 
+    In MESS: Supported.
 
 *************************************************************/
 
@@ -3298,7 +3298,7 @@ static WRITE8_HANDLER( mapper36_w )
 
     MMC3 clone
 
-    In MESS: Unsupported. 
+    In MESS: Unsupported.
 
 *************************************************************/
 
@@ -3309,7 +3309,7 @@ static WRITE8_HANDLER( mapper36_w )
     Known Boards: Discrete Logic Board
     Games: Crime Busters
 
-    In MESS: Supported. 
+    In MESS: Supported.
 
 *************************************************************/
 
@@ -3328,7 +3328,7 @@ static WRITE8_HANDLER( mapper38_m_w )
     Known Boards: Bootleg Board by Subor
     Games: Study n Game 32 in 1
 
-    In MESS: Partially Supported. 
+    In MESS: Partially Supported.
 
 *************************************************************/
 
@@ -3659,10 +3659,10 @@ static WRITE8_HANDLER( mapper47_m_w )
     Mapper 48
 
     Known Boards: Taito TC0190FMC PAL16R4
-    Games: Bakushou!! Jinsei Gekijou 3, Bubble Bobble 2, 
+    Games: Bakushou!! Jinsei Gekijou 3, Bubble Bobble 2,
           Captain Saver, Don Doko Don 2, Flintstones, Jetsons
 
-    In MESS: Unsupported. 
+    In MESS: Unsupported.
 
 *************************************************************/
 
@@ -3699,7 +3699,7 @@ static WRITE8_HANDLER( mapper49_m_w )
     Known Boards: Unknown Bootleg Board
     Games: Super Mario Bros. Pirate Alt. Levels
 
-    In MESS: Unsupported. 
+    In MESS: Unsupported.
 
 *************************************************************/
 
@@ -3761,7 +3761,7 @@ static WRITE8_HANDLER( mapper51_w )
 
     MMC3 clone
 
-    In MESS: Unsupported. 
+    In MESS: Unsupported.
 
 *************************************************************/
 
@@ -3772,7 +3772,7 @@ static WRITE8_HANDLER( mapper51_w )
     Known Boards: Unknown Multigame Bootleg Board
     Games: Supervision 16 in 1
 
-    In MESS: Unsupported. 
+    In MESS: Unsupported.
 
 *************************************************************/
 
@@ -3783,7 +3783,7 @@ static WRITE8_HANDLER( mapper51_w )
     Known Boards: Unknown Multigame Bootleg Board
     Games: [no games in nes.hsi]
 
-    In MESS: Unsupported. 
+    In MESS: Unsupported.
 
 *************************************************************/
 
@@ -3794,7 +3794,7 @@ static WRITE8_HANDLER( mapper51_w )
     Known Boards: Unknown Bootleg Board
     Games: [no games in nes.hsi]
 
-    In MESS: Unsupported. 
+    In MESS: Unsupported.
 
 *************************************************************/
 
@@ -3805,7 +3805,7 @@ static WRITE8_HANDLER( mapper51_w )
     Known Boards: Bootleg Board by Kaiser (KS202)
     Games: Super Mario Bros. 3 Pirate
 
-    In MESS: Unsupported. 
+    In MESS: Unsupported.
 
 *************************************************************/
 
@@ -3886,9 +3886,9 @@ static WRITE8_HANDLER( mapper58_w )
     Mapper 60
 
     Known Boards: Unknown Multigame Bootleg Board
-    Games: 4 in 1, 35 in 1 
+    Games: 4 in 1, 35 in 1
 
-    In MESS: Unsupported. 
+    In MESS: Unsupported.
 
 *************************************************************/
 
@@ -3901,7 +3901,7 @@ static WRITE8_HANDLER( mapper58_w )
 
     Simple Mapper: prg/chr/nt are swapped depending on the offset
     of writes in 0x8000-0xffff. offset&0x80 set NT mirroring,
-    when (offset&0x30) is 0,3 prg32 is set; when it is 1,2 
+    when (offset&0x30) is 0,3 prg32 is set; when it is 1,2
     two 16k prg banks are set. See below for the values used in
     these banks.
 
@@ -3965,7 +3965,7 @@ static WRITE8_HANDLER( mapper62_w )
     Known Boards: Unknown Multigame Bootleg Board
     Games: [no games in nes.hsi]
 
-    In MESS: Unsupported. 
+    In MESS: Unsupported.
 
 *************************************************************/
 
@@ -3974,7 +3974,7 @@ static WRITE8_HANDLER( mapper62_w )
     Mapper 64
 
     Known Boards: Tengen 800032
-    Games: Klax, Road Runner, Rolling Thunder, Shinobi, Skulls 
+    Games: Klax, Road Runner, Rolling Thunder, Shinobi, Skulls
           & Croosbones, Xybots
 
     In MESS: Supported. It also uses mapper4_irq.
@@ -4085,7 +4085,7 @@ static WRITE8_HANDLER( mapper64_w )
     Mapper 65
 
     Known Boards: Irem H3001
-    Games: Daiku no Gen San 2 - Akage no Dan no Gyakushuu, 
+    Games: Daiku no Gen San 2 - Akage no Dan no Gyakushuu,
           Kaiketsu Yanchamaru 3, Spartan X 2
 
     In MESS: Supported.
@@ -4264,17 +4264,17 @@ static void mapper68_mirror( running_machine *machine, int m68_mirror, int m0, i
 
 	switch (m68_mirror)
 	{
-		case 0x00: 
-			set_nt_mirroring(PPU_MIRROR_HORZ); 
+		case 0x00:
+			set_nt_mirroring(PPU_MIRROR_HORZ);
 			break;
-		case 0x01: 
-			set_nt_mirroring(PPU_MIRROR_VERT); 
+		case 0x01:
+			set_nt_mirroring(PPU_MIRROR_VERT);
 			break;
-		case 0x02: 
-			set_nt_mirroring(PPU_MIRROR_LOW); 
+		case 0x02:
+			set_nt_mirroring(PPU_MIRROR_LOW);
 			break;
-		case 0x03: 
-			set_nt_mirroring(PPU_MIRROR_HIGH); 
+		case 0x03:
+			set_nt_mirroring(PPU_MIRROR_HIGH);
 			break;
 		case 0x10:
 			set_nt_page(0, ROM, m0 | 0x80, 0);	//(m0 << 10) + M68_OFFSET);
@@ -4355,7 +4355,7 @@ static WRITE8_HANDLER( mapper68_w )
 
     Known Boards: JLROM, JSROM, Sunsoft 5B, Sunsoft FME7 and
          Custom
-    Games: Barcode World, Batman - Return of the Joker, Gimmick!, 
+    Games: Barcode World, Batman - Return of the Joker, Gimmick!,
           Splatter House - Wanpaku Graffiti
 
     In MESS: Supported.
@@ -4450,7 +4450,7 @@ static WRITE8_HANDLER( mapper69_w )
     Mapper 70
 
     Known Boards: Discrete Logic Board
-    Games: Space Shadow, Family Trainer Manhattan Police, 
+    Games: Space Shadow, Family Trainer Manhattan Police,
           Kamen Rider Club
 
     Same board as mapper 152, but no NT mirroring
@@ -4474,10 +4474,10 @@ static WRITE8_HANDLER( mapper70_w )
     Mapper 71
 
     Known Boards: Camerica Boards (BF9093, BF9097, BF909X, ALGNV11)
-    Games: Linus Spacehead's Cosmic Crusade, Micro Machines, 
+    Games: Linus Spacehead's Cosmic Crusade, Micro Machines,
           Mig-29, Stunt Kids
 
-    We currently do not emulate NT mirroring for BF9097 board 
+    We currently do not emulate NT mirroring for BF9097 board
     (missing in BF9093). As a result Fire Hawk is broken.
 
     In MESS: Partially Supported.
@@ -4504,7 +4504,7 @@ static WRITE8_HANDLER( mapper71_w )
     Mapper 72
 
     Known Boards: Jaleco JF17, JF26 and JF28
-    Games: Moero!! Juudou Warriors, Moero!! Pro Tennis, Pinball 
+    Games: Moero!! Juudou Warriors, Moero!! Pro Tennis, Pinball
           Quest Jpn
 
     In MESS: Supported.
@@ -4569,11 +4569,11 @@ static WRITE8_HANDLER( mapper73_w )
     Mapper 74
 
     Known Boards: Type A by Waixing
-    Games: Columbus - Ougon no Yoake (C), Ji Jia Zhan Shi, 
+    Games: Columbus - Ougon no Yoake (C), Ji Jia Zhan Shi,
           Jia A Fung Yun, Wei Luo Chuan Qi
 
     In MESS: Partially Supported, but we ignore accesses to 0x5000 / 0x6000 atm
-	(is this the reason for missing graphics?)
+    (is this the reason for missing graphics?)
 
 *************************************************************/
 
@@ -4727,7 +4727,7 @@ static WRITE8_HANDLER( mapper77_w )
     Mapper 78
 
     Known Boards: Jaleco JF16 and Irem
-    Games: Holy Diver, Portopia Renzoku Satsujin Jiken, 
+    Games: Holy Diver, Portopia Renzoku Satsujin Jiken,
           Uchuusen - Cosmo Carrier
 
     In MESS: Partially Supported.
@@ -4749,7 +4749,7 @@ static WRITE8_HANDLER( mapper78_w )
     Mapper 79
 
     Known Boards: NINA03, NINA06 by AVE
-    Games: Krazy Kreatures, Poke Block, Puzzle, Pyramid, 
+    Games: Krazy Kreatures, Poke Block, Puzzle, Pyramid,
           Solitaire, Ultimate League Soccer
 
     In MESS: Supported.
@@ -4772,11 +4772,11 @@ static WRITE8_HANDLER( mapper79_l_w )
     Mapper 80
 
     Known Boards: Taito X1-005 Ver. A
-    Games: Bakushou!! Jinsei Gekijou 2, Kyonshiizu 2, Minelvaton 
+    Games: Bakushou!! Jinsei Gekijou 2, Kyonshiizu 2, Minelvaton
           Saga, Taito Grand Prix
 
-    Registers are at 0x7ef0-0x7eff. first six ones choose chr 
-    (2x2k + 4x1k) banks, the seventh sets NT mirroring, the 
+    Registers are at 0x7ef0-0x7eff. first six ones choose chr
+    (2x2k + 4x1k) banks, the seventh sets NT mirroring, the
     remaining ones chose prg banks.
 
     In MESS: Supported.
@@ -4816,17 +4816,17 @@ static WRITE8_HANDLER( mapper80_m_w )
 		case 0x1ef6:
 			set_nt_mirroring((data & 0x01) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
 			break;
-		case 0x1efa: 
+		case 0x1efa:
 		case 0x1efb:
 			/* Switch 8k ROM at $8000 */
 			prg8_89(space->machine, data);
 			break;
-		case 0x1efc: 
+		case 0x1efc:
 		case 0x1efd:
 			/* Switch 8k ROM at $a000 */
 			prg8_ab(space->machine, data);
 			break;
-		case 0x1efe: 
+		case 0x1efe:
 		case 0x1eff:
 			/* Switch 8k ROM at $c000 */
 			prg8_cd(space->machine, data);
@@ -4853,7 +4853,7 @@ static WRITE8_HANDLER( mapper80_m_w )
     Mapper 82
 
     Known Boards: Taito X1017
-    Games: Kyuukyoku Harikiri Koushien, Kyuukyoku Harikiri 
+    Games: Kyuukyoku Harikiri Koushien, Kyuukyoku Harikiri
           Stadium, SD Keiji - Blader
 
     In MESS: Supported.
@@ -4933,7 +4933,7 @@ static WRITE8_HANDLER( mapper82_m_w )
     Mapper 83
 
     Known Boards: Unknown Multigame Bootleg Board
-    Games: Dragon Ball Party, Fatal Fury 2, Street Blaster II 
+    Games: Dragon Ball Party, Fatal Fury 2, Street Blaster II
           Pro, World Heroes 2
 
     In MESS: Supported.
@@ -5065,8 +5065,8 @@ static WRITE8_HANDLER( konami_vrc7_w )
 			/* Switch 8k bank at $8000 */
 			prg8_89(space->machine, data);
 			break;
-		case 0x0008: 
-		case 0x0010: 
+		case 0x0008:
+		case 0x0010:
 		case 0x0018:
 			/* Switch 8k bank at $a000 */
 			prg8_ab(space->machine, data);
@@ -5165,9 +5165,9 @@ static WRITE8_HANDLER( mapper86_m_w )
 
     Mapper 87
 
-    Known Boards: Jaleco JF05, JF06, JF07, JF08, JF09, JF10 and 
+    Known Boards: Jaleco JF05, JF06, JF07, JF08, JF09, JF10 and
                  Discrete Logic Board
-    Games: The Goonies, Hyper Olympics, Jajamaru no Daibouken, 
+    Games: The Goonies, Hyper Olympics, Jajamaru no Daibouken,
           Legend of Kage, Twin Bee
 
     In MESS: Supported.
@@ -5251,7 +5251,7 @@ static WRITE8_HANDLER( mapper89_w )
     Known Boards: Type A by J.Y. Company
     Games: Aladdin, Final Fight 3, Super Mario World, Tekken 2
 
-    In MESS: Unsupported. 
+    In MESS: Unsupported.
 
 *************************************************************/
 
@@ -5260,7 +5260,7 @@ static WRITE8_HANDLER( mapper89_w )
     Mapper 91
 
     Known Boards: Unknown Bootleg Board
-    Games: Mortal Kombat II, Street Fighter III, Super Mario 
+    Games: Mortal Kombat II, Street Fighter III, Super Mario
           Kart Rider
 
     In MESS: Partially supported.
@@ -5365,7 +5365,7 @@ static WRITE8_HANDLER( mapper94_w )
     Known Boards: Namcot 3425
     Games: Dragon Buster
 
-    Quite similar to other Namco boards, but with a peculiar 
+    Quite similar to other Namco boards, but with a peculiar
     NT mirroring.
 
     In MESS: Supported.
@@ -5389,14 +5389,14 @@ static WRITE8_HANDLER( mapper95_w )
 		{
 			switch (mmc_cmd1 & 0x07)
 			{
-				case 0: 
-				case 1: 
+				case 0:
+				case 1:
 					chr2_x(space->machine, mmc_cmd1 ? 2 : 0, (data >> 1) & 0x1f, CHRROM);
 					break;
-				case 2: 
-				case 3: 
-				case 4: 
-				case 5: 
+				case 2:
+				case 3:
+				case 4:
+				case 5:
 					chr1_x(space->machine, 2 + mmc_cmd1, data & 0x1f, CHRROM);
 					map95_reg[mmc_cmd1 - 2] = data & 0x20;
 					if (!(mmc_cmd1 & 0x80))
@@ -5409,10 +5409,10 @@ static WRITE8_HANDLER( mapper95_w )
 					else
 						set_nt_mirroring(PPU_MIRROR_HORZ);
 					break;
-				case 6: 
-					prg8_89(space->machine,data & 0x1f); 
+				case 6:
+					prg8_89(space->machine,data & 0x1f);
 					break;
-				case 7: 
+				case 7:
 					prg8_ab(space->machine,data & 0x1f);
 					break;
 			}
@@ -5426,7 +5426,7 @@ static WRITE8_HANDLER( mapper95_w )
     Mapper 96
 
     Known Boards: Bandai Oeka Kids Board
-    Games: Oeka Kids - Anpanman no Hiragana Daisuki, Oeka 
+    Games: Oeka Kids - Anpanman no Hiragana Daisuki, Oeka
           Kids - Anpanman to Oekaki Shiyou!!
 
     In MESS: Preliminary Support.
@@ -5549,7 +5549,7 @@ static WRITE8_HANDLER( mapper101_w )
     Known Boards: Camerica Golden Five
     Games: Pegasus 5 in 1
 
-    In MESS: Supported. 
+    In MESS: Supported.
 
 *************************************************************/
 
@@ -5565,7 +5565,7 @@ static WRITE8_HANDLER( mapper104_w )
 			prg16_89ab(space->machine, mmc_bank_latch1);
 			prg16_cdef(space->machine, ((data & 0x07) << 4) | 0x0f);
 		}
-			
+
 	}
 	else
 	{
@@ -5581,7 +5581,7 @@ static WRITE8_HANDLER( mapper104_w )
     Known Boards: Custom Board
     Games: Nintendo World Championships 1990
 
-    In MESS: Unsupported. 
+    In MESS: Unsupported.
 
 *************************************************************/
 
@@ -5592,7 +5592,7 @@ static WRITE8_HANDLER( mapper104_w )
     Known Boards: Unknown Bootleg Board
     Games: Super Mario Bros. 3 Pirate
 
-    In MESS: Unsupported. 
+    In MESS: Unsupported.
 
 *************************************************************/
 
@@ -5663,7 +5663,7 @@ static WRITE8_HANDLER( mapper107_w )
 
     No info avaliable
 
-    In MESS: Unsupported. 
+    In MESS: Unsupported.
 
 *************************************************************/
 
@@ -5672,7 +5672,7 @@ static WRITE8_HANDLER( mapper107_w )
     Mapper 112
 
     Known Boards: Bootleg Board NTDEC ASDER
-    Games: Cobra Mission, Fighting Hero III, Huang Di, Master 
+    Games: Cobra Mission, Fighting Hero III, Huang Di, Master
           Shooter
 
     In MESS: Supported.
@@ -5732,7 +5732,7 @@ static WRITE8_HANDLER( mapper112_w )
     Mapper 113
 
     Known Boards: Bootleg Board by HES (also used by others)
-    Games: AV Hanafuda Club, AV Soccer, Papillon, Sidewinder, 
+    Games: AV Hanafuda Club, AV Soccer, Papillon, Sidewinder,
           Total Funpack
 
     In MESS: Supported.
@@ -5759,7 +5759,7 @@ static WRITE8_HANDLER( mapper113_l_w )
 
     MMC3 clone
 
-    In MESS: Unsupported. 
+    In MESS: Unsupported.
 
 *************************************************************/
 
@@ -5767,8 +5767,8 @@ static WRITE8_HANDLER( mapper113_l_w )
 
     Mapper 115 (formerly 248)
 
-    Known Boards: Unknown Bootleg Board by Kasing 
-    Games: AV Jiu Ji Mahjong, Bao Qing Tian, Thunderbolt 2, 
+    Known Boards: Unknown Bootleg Board by Kasing
+    Games: AV Jiu Ji Mahjong, Bao Qing Tian, Thunderbolt 2,
           Shisen Mahjong 2
 
     MMC3 clone
@@ -5871,7 +5871,7 @@ static void mapper115_irq( const device_config *device, int scanline, int vblank
 
 		if (IRQ_enable && !blanked && (IRQ_count == 0) && priorCount)
 		{
-			LOG_MMC(("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline, 
+			LOG_MMC(("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline,
 					video_screen_get_vpos(device->machine->primary_screen), video_screen_get_hpos(device->machine->primary_screen)));
 			cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
 		}
@@ -5885,7 +5885,7 @@ static void mapper115_irq( const device_config *device, int scanline, int vblank
     Known Boards: Unknown Bootleg Board (Someri?!?)
     Games: AV Mei Shao Nv Zhan Shi, Chuugoku Taitei
 
-    In MESS: Unsupported. 
+    In MESS: Unsupported.
 
 *************************************************************/
 
@@ -5896,7 +5896,7 @@ static void mapper115_irq( const device_config *device, int scanline, int vblank
     Known Boards: Bootleg Board by Future Media
     Games: Crayon Shin-chan (C), San Guo Zhi 4 - Chi Bi Feng Yun
 
-    In MESS: Unsupported. 
+    In MESS: Unsupported.
 
 *************************************************************/
 
@@ -5905,7 +5905,7 @@ static void mapper115_irq( const device_config *device, int scanline, int vblank
     Mapper 118
 
     Known Boards: TKSROM, TLSROM
-    Games: Armadillo, Play Action Football, Pro Hockey, RPG 
+    Games: Armadillo, Play Action Football, Pro Hockey, RPG
           Jinsei Game, Y's 3
 
     In MESS: Supported. It also uses mapper4_irq.
@@ -6149,7 +6149,7 @@ static WRITE8_HANDLER( mapper119_w )
     Known Boards: Unknown Bootleg Board
     Games: Tobidase Daisakusen (FDS Conversion)
 
-    In MESS: Unsupported. 
+    In MESS: Unsupported.
 
 *************************************************************/
 
@@ -6162,7 +6162,7 @@ static WRITE8_HANDLER( mapper119_w )
 
     MMC3 clone
 
-    In MESS: Unsupported. 
+    In MESS: Unsupported.
 
 *************************************************************/
 
@@ -6184,7 +6184,7 @@ static WRITE8_HANDLER( mapper119_w )
     Known Boards: Bootleg Board ???
     Games: [no games in nes.hsi]
 
-    In MESS: Unsupported. 
+    In MESS: Unsupported.
 
 *************************************************************/
 
@@ -6217,7 +6217,7 @@ static WRITE8_HANDLER( mapper119_w )
     Known Boards: Unknown Multigame Bootleg Board
     Games: [no games in nes.hsi]
 
-    In MESS: Unsupported. 
+    In MESS: Unsupported.
 
 *************************************************************/
 
@@ -6283,11 +6283,11 @@ static WRITE8_HANDLER( mapper119_w )
     Known Boards: Bootleg Board by TXC (T22211A)
     Games: Creatom
 
-    Info from NEStopia: this mapper features write to four 
-    registers (0x4100-0x4103). The third one is used to select 
+    Info from NEStopia: this mapper features write to four
+    registers (0x4100-0x4103). The third one is used to select
     PRG and CHR banks.
 
-    In MESS: Supported. 
+    In MESS: Supported.
 
 *************************************************************/
 
@@ -6308,7 +6308,7 @@ static READ8_HANDLER( mapper132_l_r )
 	if (offset == 0x0000)
 		return (txc_reg[1] ^ txc_reg[2]) | 0x40;
 
-	else 
+	else
 		return 0x00;
 }
 
@@ -6348,7 +6348,7 @@ static WRITE8_HANDLER( mapper133_l_w )
 
     MMC3 clone
 
-    In MESS: Unsupported. 
+    In MESS: Unsupported.
 
 *************************************************************/
 
@@ -6435,8 +6435,8 @@ static WRITE8_HANDLER( mapper137_l_w )
 {
 	LOG_MMC(("mapper137_l_w, offset: %04x, data: %02x\n", offset, data));
 
-	/* write happens only if we are at 0x4100 + k * 0x200, 
-	but 0x4100 is offset = 0 */
+	/* write happens only if we are at 0x4100 + k * 0x200,
+    but 0x4100 is offset = 0 */
 	if (!(offset & 0x100))
 	{
 		if (!(offset & 0x01))
@@ -6490,8 +6490,8 @@ static WRITE8_HANDLER( mapper138_l_w )
 	UINT8 bank_helper1 = 0, bank_helper2 = 0;
 	LOG_MMC(("mapper138_l_w, offset: %04x, data: %02x\n", offset, data));
 
-	/* write happens only if we are at 0x4100 + k * 0x200, 
-	but 0x4100 is offset = 0 */
+	/* write happens only if we are at 0x4100 + k * 0x200,
+    but 0x4100 is offset = 0 */
 	if (!(offset & 0x100))
 	{
 		if (!(offset & 0x01))
@@ -6499,7 +6499,7 @@ static WRITE8_HANDLER( mapper138_l_w )
 		else
 		{
 			sachen_regs[mmc_cmd1] = data;
-	
+
 			switch (mmc_cmd1)
 			{
 			case 0x05:
@@ -6547,8 +6547,8 @@ static WRITE8_HANDLER( mapper139_l_w )
 	UINT8 bank_helper1 = 0, bank_helper2 = 0;
 	LOG_MMC(("mapper139_l_w, offset: %04x, data: %02x\n", offset, data));
 
-	/* write happens only if we are at 0x4100 + k * 0x200, 
-	but 0x4100 is offset = 0 */
+	/* write happens only if we are at 0x4100 + k * 0x200,
+    but 0x4100 is offset = 0 */
 	if (!(offset & 0x100))
 	{
 		if (!(offset & 0x01))
@@ -6556,7 +6556,7 @@ static WRITE8_HANDLER( mapper139_l_w )
 		else
 		{
 			sachen_regs[mmc_cmd1] = data;
-	
+
 			switch (mmc_cmd1)
 			{
 			case 0x05:
@@ -6570,7 +6570,7 @@ static WRITE8_HANDLER( mapper139_l_w )
 				{
 					bank_helper1 = sachen_regs[7] & 0x01;
 					bank_helper2 = (sachen_regs[4] & 0x07) << 3;
-					chr2_0(space->machine, ((sachen_regs[bank_helper1 ? 0 : 0] & 0x07) | bank_helper2) << 2, CHRROM);	
+					chr2_0(space->machine, ((sachen_regs[bank_helper1 ? 0 : 0] & 0x07) | bank_helper2) << 2, CHRROM);
 					chr2_2(space->machine, ((sachen_regs[bank_helper1 ? 0 : 1] & 0x07) | bank_helper2) << 2 | 0x01, CHRROM);
 					chr2_4(space->machine, ((sachen_regs[bank_helper1 ? 0 : 2] & 0x07) | bank_helper2) << 2 | 0x02, CHRROM)	;
 					chr2_6(space->machine, ((sachen_regs[bank_helper1 ? 0 : 3] & 0x07) | bank_helper2) << 2 | 0x03, CHRROM);
@@ -6612,7 +6612,7 @@ static WRITE8_HANDLER( mapper_140_m_w )
     Mapper 141
 
     Known Boards: Bootleg Board by Sachen (8259A)
-    Games: Po Po Team, Poker Mahjong, Q Boy, Rockball, 
+    Games: Po Po Team, Poker Mahjong, Q Boy, Rockball,
           Super Cartridge (several versions), Super Pang (1 & 2)
 
     In MESS: Supported.
@@ -6624,8 +6624,8 @@ static WRITE8_HANDLER( mapper141_l_w )
 	UINT8 bank_helper1 = 0, bank_helper2 = 0;
 	LOG_MMC(("mapper141_l_w, offset: %04x, data: %02x\n", offset, data));
 
-	/* write happens only if we are at 0x4100 + k * 0x200, 
-	but 0x4100 is offset = 0 */
+	/* write happens only if we are at 0x4100 + k * 0x200,
+    but 0x4100 is offset = 0 */
 	if (!(offset & 0x100))
 	{
 		if (!(offset & 0x01))
@@ -6691,8 +6691,8 @@ static READ8_HANDLER( mapper143_l_r )
 {
 	LOG_MMC(("mapper143_l_r, offset: %04x\n", offset));
 
-	/* the address is read only if we are at 0x4100 + k * 0x200, 
-	but 0x4100 is offset = 0 */
+	/* the address is read only if we are at 0x4100 + k * 0x200,
+    but 0x4100 is offset = 0 */
 	if (!(offset & 0x100))
 		return (~offset & 0x3f) | 0x40;
 	else
@@ -6706,7 +6706,7 @@ static READ8_HANDLER( mapper143_l_r )
     Known Boards: Bootleg Board by AGCI (50282)
     Games: Death Race
 
-    Just like mapper 11, except bit 0 taken from ROM and 0x8000 
+    Just like mapper 11, except bit 0 taken from ROM and 0x8000
     ignored?
 
     In MESS: Supported.
@@ -6756,7 +6756,7 @@ static WRITE8_HANDLER( mapper145_l_w )
     Mapper 146
 
     Known Boards: Bootleg Board by Sachen (SA0161M)
-    Games: Galactic Crusader, Lucky 777, Metal Fighter, 
+    Games: Galactic Crusader, Lucky 777, Metal Fighter,
           Millionaire, Pyramid II
 
     This is basically the same as Nina-006 (Mapper 79)
@@ -6810,7 +6810,7 @@ static WRITE8_HANDLER( mapper147_w )
     Known Boards: Bootleg Board by Sachen (SA0037)
     Games: Mahjong World, Shisen Mahjong
 
-    Very simple mapper: writes to 0x8000-0xffff set pgr32 and chr8 
+    Very simple mapper: writes to 0x8000-0xffff set pgr32 and chr8
         banks
 
     In MESS: Supported.
@@ -6850,7 +6850,7 @@ static WRITE8_HANDLER( mapper149_w )
     Mapper 150
 
     Known Boards: Bootleg Board by Sachen (74SL374B)
-    Games: Chess Academy, Chinese Checkers Jpn, Mahjong Academy, 
+    Games: Chess Academy, Chinese Checkers Jpn, Mahjong Academy,
           Olympic IQ, Poker II, Tasac
 
     Still investigating this mapper...
@@ -6863,8 +6863,8 @@ static WRITE8_HANDLER( mapper150_l_w )
 {
 	LOG_MMC(("mapper150_l_w, offset: %04x, data: %02x\n", offset, data));
 
-	/* write happens only if we are at 0x4100 + k * 0x200, 
-	but 0x4100 is offset = 0 */
+	/* write happens only if we are at 0x4100 + k * 0x200,
+    but 0x4100 is offset = 0 */
 	if (!(offset & 0x100))
 	{
 		if (!(offset & 0x01))
@@ -6900,11 +6900,11 @@ static READ8_HANDLER( mapper150_l_r )
 {
 	LOG_MMC(("mapper150_l_r, offset: %04x", offset));
 
-	/* read  happens only if we are at 0x4100 + k * 0x200, 
-	but 0x4100 is offset = 0 */
+	/* read  happens only if we are at 0x4100 + k * 0x200,
+    but 0x4100 is offset = 0 */
 	if (!(offset & 0x100))
 		return (~mmc_cmd1 & 0x3f) /* ^ dips*/;	// we would need to check the Dips here
-	else 
+	else
 		return 0;
 }
 
@@ -6952,7 +6952,7 @@ static WRITE8_HANDLER( mapper152_w )
     Mapper 153
 
     Known Boards: Bandai Board
-    Games: Dragon Ball, Dragon Ball 3, Famicom Jump, Famicom 
+    Games: Dragon Ball, Dragon Ball 3, Famicom Jump, Famicom
           Jump II
 
     In MESS: Unsupported.
@@ -7063,7 +7063,7 @@ static WRITE8_HANDLER( mapper156_w )
 
     Mapper 157
 
-    Known Boards: Bandai Datach Board 
+    Known Boards: Bandai Datach Board
     Games: Datach Games
 
     In MESS: Unsupported. Needs reads from 0x6000-0x7fff for the
@@ -7131,7 +7131,7 @@ static WRITE8_HANDLER( mapper156_w )
     Mapper 163
 
     Known Boards: Bootleg Board by Nanjing
-    Games: Diablo, Final Fantasy VII, Harvest Moon, He Xin Wei 
+    Games: Diablo, Final Fantasy VII, Harvest Moon, He Xin Wei
           Ji, Yu-Gi-Oh, Zelda - Shen Qi De Mao Zi and other
 
     In MESS: Unsupported.
@@ -7143,7 +7143,7 @@ static WRITE8_HANDLER( mapper156_w )
     Mapper 164
 
     Known Boards: Bootleg Board by Waixing
-    Games: Darkseed, Digital Dragon, Final Fantasy V, Pocket 
+    Games: Darkseed, Digital Dragon, Final Fantasy V, Pocket
           Monster Red
 
     In MESS: Supported.
@@ -7409,7 +7409,7 @@ static READ8_HANDLER( mapper173_l_r )
     Known Boards: Unknown Bootleg Board
     Games: Shu Qi Yu - Zhi Li Xiao Zhuan Yuan
 
-    Very simple mapper: writes to 0x5ff1 set prg32 (to data>>1), 
+    Very simple mapper: writes to 0x5ff1 set prg32 (to data>>1),
     while writes to 0x5ff2 set chr8
 
     In MESS: Supported.
@@ -7436,7 +7436,7 @@ static WRITE8_HANDLER( mapper176_l_w )
     Mapper 177
 
     Known Boards: Bootleg Board by Henggedianzi
-    Games: Mei Guo Fu Hao, Shang Gu Shen Jian , Wang Zi Fu 
+    Games: Mei Guo Fu Hao, Shang Gu Shen Jian , Wang Zi Fu
           Chou Ji, Xing He Zhan Shi
 
     Writes to 0x8000-0xffff set prg32. Moreover, data&0x20 sets
@@ -7459,7 +7459,7 @@ static WRITE8_HANDLER( mapper177_w )
     Mapper 178
 
     Known Boards: Bootleg Board by Waixing
-    Games: Fan Kong Jing Ying, San Guo Zhong Lie Zhuan, Xing 
+    Games: Fan Kong Jing Ying, San Guo Zhong Lie Zhuan, Xing
           Ji Zheng Ba
 
     In MESS: Supported.
@@ -7621,7 +7621,7 @@ static void mapper182_irq( const device_config *device, int scanline, int vblank
 
 		if (IRQ_enable && !blanked && (IRQ_count == 0) && priorCount)
 		{
-			LOG_MMC(("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline, 
+			LOG_MMC(("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline,
 					video_screen_get_vpos(device->machine->primary_screen), video_screen_get_hpos(device->machine->primary_screen)));
 			cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
 		}
@@ -7644,7 +7644,7 @@ static void mapper182_irq( const device_config *device, int scanline, int vblank
     Mapper 184
 
     Known Boards: Sunsoft 1
-    Games: Atlantis no Nazo, Kanshakudama Nage Kantarou no 
+    Games: Atlantis no Nazo, Kanshakudama Nage Kantarou no
           Toukaidou Gojuusan Tsugi, Wing of Madoola
 
     Very simple mapper: writes to 0x6000-0x7fff set chr banks
@@ -7819,7 +7819,7 @@ static WRITE8_HANDLER( mapper193_m_w )
     Mapper 195
 
     Known Boards: Type E by Waixing
-    Games: Captain Tsubasa Vol. II (C), Chaos World, God 
+    Games: Captain Tsubasa Vol. II (C), Chaos World, God
           Slayer (C), Zu Qiu Xiao Jiang
 
     MMC3 clone
@@ -7835,8 +7835,8 @@ static WRITE8_HANDLER( mapper193_m_w )
     Known Boards: Unknown Bootleg Board
     Games: Super Mario Bros. 11, Super Mario Bros. 17
 
-    This acts basically like a MMC3 with different use of write 
-    address. 
+    This acts basically like a MMC3 with different use of write
+    address.
 
     In MESS: Supported.
 
@@ -7908,7 +7908,7 @@ static WRITE8_HANDLER( mapper196_w )
     Mapper 199
 
     Known Boards: Type G by Waixing
-    Games: San Guo Zhi 2, Dragon Ball Z Gaiden (C), Dragon 
+    Games: San Guo Zhi 2, Dragon Ball Z Gaiden (C), Dragon
           Ball Z II (C)
 
     MMC3 clone
@@ -8043,10 +8043,10 @@ static WRITE8_HANDLER( mapper204_w )
 
     Mapper 206
 
-    Known Boards: Namcot 34x3 boards, DEROM, DE1ROM, DRROM and 
+    Known Boards: Namcot 34x3 boards, DEROM, DE1ROM, DRROM and
           Tengen 800002, 800004, 800030 boards
-    Games: Babel no Tou, Dragon Buster II, Family Circuit, 
-          Family Tennis, Fantasy Zone, Gauntlet, Karnov, 
+    Games: Babel no Tou, Dragon Buster II, Family Circuit,
+          Family Tennis, Fantasy Zone, Gauntlet, Karnov,
           Mappy Land, Pac-Mania, R.B.I. Baseball, Super Sprint
 
     In MESS: Supported.
@@ -8109,17 +8109,17 @@ static WRITE8_HANDLER( mapper207_m_w )
 			/* Switch 1k VROM at $1c00 */
 			chr1_7(space->machine, data, CHRROM);
 			break;
-		case 0x1efa: 
+		case 0x1efa:
 		case 0x1efb:
 			/* Switch 8k ROM at $8000 */
 			prg8_89(space->machine, data);
 			break;
-		case 0x1efc: 
+		case 0x1efc:
 		case 0x1efd:
 			/* Switch 8k ROM at $a000 */
 			prg8_ab(space->machine, data);
 			break;
-		case 0x1efe: 
+		case 0x1efe:
 		case 0x1eff:
 			/* Switch 8k ROM at $c000 */
 			prg8_cd(space->machine, data);
@@ -8148,7 +8148,7 @@ static WRITE8_HANDLER( mapper207_m_w )
     Mapper 209
 
     Known Boards: Type B by J.Y. Company
-    Games: Power Rangers 3, Power Rangers 4, Shin Samurai 
+    Games: Power Rangers 3, Power Rangers 4, Shin Samurai
           Spirits 2
 
     In MESS: Unsupported.
@@ -8398,7 +8398,7 @@ static WRITE8_HANDLER( mapper221_w )
 
     MMC3 clone according to NEStopia
 
-    In MESS: Unsupported. 
+    In MESS: Unsupported.
 
 *************************************************************/
 
@@ -8820,9 +8820,9 @@ static WRITE8_HANDLER( mapper232_w )
     Known Boards: Bootleg Board by C&E
     Games: Jing Ke Xin Zhuan, Sheng Huo Lie Zhuan
 
-    Simple Mapper: writes to 0x4020-0x5fff sets prg32 to 
+    Simple Mapper: writes to 0x4020-0x5fff sets prg32 to
          data>>4 and chr8 to data&f. We currently do not map
-         writes to 0x4020-0x40ff (to do: verify if this produces 
+         writes to 0x4020-0x40ff (to do: verify if this produces
          issues)
 
     In MESS: Supported.
@@ -8842,7 +8842,7 @@ static WRITE8_HANDLER( mapper240_l_w )
     Mapper 241
 
     Known Boards: Bootleg Board by TXC
-    Games: Commandos, Journey to the West, Ma Bu Mi Zhen & 
+    Games: Commandos, Journey to the West, Ma Bu Mi Zhen &
            Qu Wei Cheng Yu Wu, Si Lu Chuan Qi
 
     Simple Mapper: writes to 0x8000-0xffff sets the prg32 bank.
@@ -8872,9 +8872,9 @@ static WRITE8_HANDLER( mapper241_w )
     Games: Wai Xing Zhan Shi, Dragon Quest VIII
 
     Simple mapper: writes to 0x8000-0xffff sets prg32 banks to
-        (offset>>3)&f. written data&3 sets the mirroring (with 
-        switched high/low compared to the standard one). However, 
-        a second variant DQ7 and requires no NT mirroring. 
+        (offset>>3)&f. written data&3 sets the mirroring (with
+        switched high/low compared to the standard one). However,
+        a second variant DQ7 and requires no NT mirroring.
         Currently, we do not support this variant.
 
     In MESS: Partial Support.
@@ -8908,8 +8908,8 @@ static WRITE8_HANDLER( mapper243_l_w )
 {
 	LOG_MMC(("mapper243_l_w, offset: %04x, data: %02x\n", offset, data));
 
-	/* write happens only if we are at 0x4100 + k * 0x200, 
-	but 0x4100 is offset = 0 */
+	/* write happens only if we are at 0x4100 + k * 0x200,
+    but 0x4100 is offset = 0 */
 	if (!(offset & 0x100))
 	{
 		if (!(offset & 0x01))
@@ -8996,7 +8996,7 @@ static WRITE8_HANDLER( mapper244_w )
     Games: Fong Shen Bang - Zhu Lu Zhi Zhan
 
     Simple mapper: writes to 0x6000-0x67ff set PRG and CHR banks.
-    Namely, 0x6000->0x6003 select resp. prg8_89, prg8_ab, prg8_cd 
+    Namely, 0x6000->0x6003 select resp. prg8_89, prg8_ab, prg8_cd
     and prg8_ef. 0x6004->0x6007 select resp. crh2_0, chr2_2,
     chr2_4 and chr2_6. In 0x6800-0x7fff lies WRAM.
 
@@ -9070,7 +9070,7 @@ static WRITE8_HANDLER( mapper246_m_w )
 
     Known Boards: Waixing Security 0 & 1
     Games: Duo Bao Xiao Ying Hao - Guang Ming yu An Hei Chuan Shuo,
-           Myth Struggle, San Shi Liu Ji, Shui Hu Zhuan 
+           Myth Struggle, San Shi Liu Ji, Shui Hu Zhuan
 
     MMC3 clone
 
@@ -9083,9 +9083,9 @@ static WRITE8_HANDLER( mapper246_m_w )
     Mapper 250
 
     Known Boards: Unknown Bootleg Board by Nitra
-    Games: Time Diver Avenger 
+    Games: Time Diver Avenger
 
-    This acts basically like a MMC3 with different use of write 
+    This acts basically like a MMC3 with different use of write
     address. According to NEStopia, there is also a slightly
     different way to set NT mirroring (see below).
 
@@ -9113,7 +9113,7 @@ static WRITE8_HANDLER( mapper250_w )
     Mapper 251
 
     Known Boards: Undocumented
-    Games: Super 8-in-1 99 King Fighter 
+    Games: Super 8-in-1 99 King Fighter
 
     In MESS: Unsupported.
 
@@ -9575,7 +9575,7 @@ int mapper_reset( running_machine *machine, int mmc_num )
 			mmc_cmd1 = 0;
 			prg16_89ab(space->machine, 0);
 			prg16_cdef(space->machine, nes.prg_chunks - 1);
-//			set_nt_mirroring(PPU_MIRROR_HIGH);	// this would be needed for Major League
+//          set_nt_mirroring(PPU_MIRROR_HIGH);  // this would be needed for Major League
 			break;
 		case 24:
 		case 26:

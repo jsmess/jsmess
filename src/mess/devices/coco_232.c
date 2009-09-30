@@ -1,8 +1,8 @@
 /***************************************************************************
 
-	coco_232.c
+    coco_232.c
 
-	Code for emulating the CoCo RS-232 PAK
+    Code for emulating the CoCo RS-232 PAK
 
 ***************************************************************************/
 
@@ -77,7 +77,7 @@ static READ8_DEVICE_HANDLER(coco_rs232_ff40_r)
 
 	if ((offset >= 0x28) && (offset <= 0x2F))
 		result = acia_6551_r(pak_pcb->uart, offset - 0x28);
-	
+
 	return result;
 }
 

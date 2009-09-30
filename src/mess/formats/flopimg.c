@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	flopimg.c
+    flopimg.c
 
-	Floppy disk image abstraction code
+    Floppy disk image abstraction code
 
 *********************************************************************/
 
@@ -66,7 +66,7 @@ OPTION_GUIDE_END
 static void floppy_close_internal(floppy_image *floppy, int close_file);
 
 /*********************************************************************
-	opening, closing and creating of floppy images
+    opening, closing and creating of floppy images
 *********************************************************************/
 
 /* basic floppy_image initialization common to floppy_open() and floppy_create() */
@@ -320,7 +320,7 @@ static void floppy_close_internal(floppy_image *floppy, int close_file)
 		if (close_file)
 			io_generic_close(&floppy->io);
 		if (floppy->loaded_track_data)
-			free(floppy->loaded_track_data);		
+			free(floppy->loaded_track_data);
 		tagpool_exit(&floppy->tags);
 	}
 
@@ -337,7 +337,7 @@ void floppy_close(floppy_image *floppy)
 
 
 /*********************************************************************
-	functions useful in format constructors
+    functions useful in format constructors
 *********************************************************************/
 
 struct FloppyCallbacks *floppy_callbacks(floppy_image *floppy)
@@ -378,7 +378,7 @@ void floppy_set_filler(floppy_image *floppy, UINT8 filler)
 
 
 /*********************************************************************
-	calls for accessing the raw disk image
+    calls for accessing the raw disk image
 *********************************************************************/
 
 void floppy_image_read(floppy_image *floppy, void *buffer, UINT64 offset, size_t length)
@@ -410,7 +410,7 @@ UINT64 floppy_image_size(floppy_image *floppy)
 
 
 /*********************************************************************
-	calls for accessing disk image data
+    calls for accessing disk image data
 *********************************************************************/
 
 static floperr_t floppy_readwrite_sector(floppy_image *floppy, int head, int track, int sector, int offset,
@@ -475,7 +475,7 @@ static floperr_t floppy_readwrite_sector(floppy_image *floppy, int head, int tra
 			if ((offset > 0) || (buffer_len < sector_length))
 			{
 				/* we will be doing an partial read/write; in other words we
-				 * will not be reading/writing a full sector */
+                 * will not be reading/writing a full sector */
 				new_alloc_buf = realloc(alloc_buf, sector_length);
 				if (!new_alloc_buf)
 				{
@@ -809,7 +809,7 @@ UINT8 floppy_random_byte(floppy_image *floppy)
 
 
 /*********************************************************************
-	calls for track based IO
+    calls for track based IO
 *********************************************************************/
 
 floperr_t floppy_load_track(floppy_image *floppy, int head, int track, int dirtify, void **track_data, size_t *track_length)
@@ -881,7 +881,7 @@ static floperr_t floppy_track_unload(floppy_image *floppy)
 
 
 /*********************************************************************
-	accessors for meta information about the image
+    accessors for meta information about the image
 *********************************************************************/
 
 const char *floppy_format_description(floppy_image *floppy)
@@ -892,7 +892,7 @@ const char *floppy_format_description(floppy_image *floppy)
 
 
 /*********************************************************************
-	misc calls
+    misc calls
 *********************************************************************/
 
 const char *floppy_error(floperr_t err)

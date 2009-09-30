@@ -3,18 +3,18 @@ CSW format
 ----------
 Header Description
 
-Offset	Value	Type	Description
-0x00	(note)	ASCII	22 bytes "Compressed Square Wave"  signature
-0x16	0x1A	BYTE	Terminator code
-0x17    0x02	BYTE 	CSW major revision number
-0x18	0x00 	BYTE	CSW minor revision number
-0x19			DWORD	Sample rate
-0x1D			DWORD	Total number of pulses (after decompression)
-0x21			BYTE	Compression type  0x01: RLE    0x02: Z-RLE
-0x22			BYTE	Flags   b0: initial polarity: if set, the signal starts at logical high
-0x23	HDR		BYTE	Header extension length in bytes (0x00)
-0x24			ASCII	16 bytes free use
-0x34			BYTE	Start of Header is HDR>0
+Offset  Value   Type    Description
+0x00    (note)  ASCII   22 bytes "Compressed Square Wave"  signature
+0x16    0x1A    BYTE    Terminator code
+0x17    0x02    BYTE    CSW major revision number
+0x18    0x00    BYTE    CSW minor revision number
+0x19            DWORD   Sample rate
+0x1D            DWORD   Total number of pulses (after decompression)
+0x21            BYTE    Compression type  0x01: RLE    0x02: Z-RLE
+0x22            BYTE    Flags   b0: initial polarity: if set, the signal starts at logical high
+0x23    HDR     BYTE    Header extension length in bytes (0x00)
+0x24            ASCII   16 bytes free use
+0x34            BYTE    Start of Header is HDR>0
 
 
 

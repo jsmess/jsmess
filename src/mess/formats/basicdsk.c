@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	formats/basicdsk.c
+    formats/basicdsk.c
 
-	Floppy format code for basic disks
+    Floppy format code for basic disks
 
 *********************************************************************/
 
@@ -248,7 +248,7 @@ static floperr_t basicdsk_get_indexed_sector_info(floppy_image *floppy, int head
 {
 	const struct basicdsk_geometry *geom;
 	geom = get_geometry(floppy);
-	
+
 	sector_index += get_geometry(floppy)->first_sector_id;
 	if (cylinder)
 		*cylinder = track;
@@ -260,7 +260,7 @@ static floperr_t basicdsk_get_indexed_sector_info(floppy_image *floppy, int head
 		/* TODO: read DAM or DDAM and determine flags */
 		*flags = 0;
 		if (geom->get_ddam)
-			*flags = geom->get_ddam(floppy, geom, track, head, sector_index);		
+			*flags = geom->get_ddam(floppy, geom, track, head, sector_index);
 	}
 	return basicdsk_get_sector_length(floppy, head, track, sector_index, sector_length);
 }

@@ -19,7 +19,7 @@ typedef struct {
 
   /* called by XMODEM when it wants to send a byte to the emulated machine */
   void (*send)( running_machine *machine, UINT8 data );
-  
+
 } xmodem_config;
 
 

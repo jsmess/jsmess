@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	harddriv.h
+    harddriv.h
 
-	MESS interface to the MAME CHD code
+    MESS interface to the MAME CHD code
 
 *********************************************************************/
 

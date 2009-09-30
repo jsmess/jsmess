@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	formats/coco_dsk.h
+    formats/coco_dsk.h
 
-	Tandy Color Computer / Dragon disk images
+    Tandy Color Computer / Dragon disk images
 
 *********************************************************************/
 

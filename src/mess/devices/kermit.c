@@ -89,7 +89,7 @@ typedef struct {
 	UINT16  posin;         /* position in pin */
 	UINT16  posout;        /* position in pout */
 	UINT16  nbout;         /* size of pout */
-	
+
 	UINT8   state;         /* current protocol state */
 	UINT8   retries;       /* packet retries remaining */
 
@@ -156,9 +156,9 @@ static UINT8 kermit_checksum( UINT8* packet )
 static void kermit_start_sending( kermit* state )
 {
 	int i;
-	
-	for (i=1;i<state->nbout;i++) 
-		if (kermit_is_ctl(state->pout[i])) 
+
+	for (i=1;i<state->nbout;i++)
+		if (kermit_is_ctl(state->pout[i]))
 			logerror( "send: not char %i at pos %i\n", state->pout[i], i  );
 
 	if ( state->nbout <= 0 ) return;
@@ -187,7 +187,7 @@ static void kermit_reset( kermit* state );
 
 static void kermit_resend( kermit* state )
 {
-	if ( state->conf && state->conf->send ) 
+	if ( state->conf && state->conf->send )
 	{
 		/* retry */
 		if ( state->nbout == 0 ) return;
@@ -196,7 +196,7 @@ static void kermit_resend( kermit* state )
 			kermit_reset( state );
 			return;
 		}
-	
+
 		state->conf->send( state->machine, state->pout[ 0 ] );
 
 		state->posout = 1;
@@ -229,14 +229,14 @@ static void kermit_send_data_packet( kermit* state )
 		{
 			/* escape control char */
 			state->pout[ 2 + len ] = state->qctl;
-			len++; 
+			len++;
 			state->pout[ 2 + len ] = kermit_ctl( c );
 		}
 		else if ( (c & 0x7f) == state->qctl )
 		{
 			/* escape escape char */
 			state->pout[ 2 + len ] = state->qctl;
-			len++; 
+			len++;
 			state->pout[ 2 + len ] = c;
 		}
 		else
@@ -296,7 +296,7 @@ static int kermit_get_conf( kermit* state )
 	if ( len >= 7 ) state->padc = kermit_ctl( state->pin[ 7 ] );
 	if ( len >= 8 ) state->eol  = kermit_unchar( state->pin[ 8 ] );
 	if ( len >= 9 ) state->qctl = state->pin[ 9 ];
-	
+
 	LOG(( "kermit: get conf: len=%i, maxl=%i, npad=%i, padc=%i, eol=%i, qctl=%i\n",
 	      len, state->maxl, state->npad, state->padc, state->eol, state->qctl ));
 
@@ -389,7 +389,7 @@ static void kermit_reset( kermit* state )
 	state->state   = KERMIT_IDLE;
 	state->seq     = 0;
 
-	if ( state->image ) 
+	if ( state->image )
 	{
 		image_fseek( state->image, SEEK_SET, 0 );
 	}
@@ -402,20 +402,20 @@ static void kermit_reset( kermit* state )
 void kermit_receive_byte( const device_config *device, UINT8 data )
 {
 	kermit* state = (kermit*) device->token;
-	
+
 	LOG(( "get %i %2x %c (%i)\n", data, data, data, state->posin ));
- 
+
 	/* get SOH */
-	if ( (data == KERMIT_SOH) && (state->posin <= 1) ) 
+	if ( (data == KERMIT_SOH) && (state->posin <= 1) )
 	{
 		state->pin[ 0 ] = data;
-		state->posin = 1;	
+		state->posin = 1;
 	}
 
 	/* get packet contents */
 	else if ( state->posin > 0 )
 	{
-		if ( state->posin >= sizeof( state->pout ) ) 
+		if ( state->posin >= sizeof( state->pout ) )
 		{
 			LOG(( "kermit: too many bytes received\n" ));
 			state->posin = 0;
@@ -429,10 +429,10 @@ void kermit_receive_byte( const device_config *device, UINT8 data )
 		state->pin[ state->posin ] = data;
 		state->posin++;
 
-		if ( state->posin > 5 ) 
+		if ( state->posin > 5 )
 		{
 			int len, seq, typ;
-			if ( !kermit_is_char( state->pin[1] ) || 
+			if ( !kermit_is_char( state->pin[1] ) ||
 			     (kermit_unchar( state->pin[1] ) < 3) ||
 			     (kermit_unchar( state->pin[1] ) > state->maxl) )
 			{
@@ -447,7 +447,7 @@ void kermit_receive_byte( const device_config *device, UINT8 data )
 			{
 				/* got packet! */
 				state->posin = 0;
-				if ( kermit_validate_packet( state ) ) 
+				if ( kermit_validate_packet( state ) )
 				{
 					LOG(( "kermit: invalid packet\n" ));
 					kermit_resend( state );
@@ -540,7 +540,7 @@ void kermit_receive_byte( const device_config *device, UINT8 data )
 						/* send next packet */
 
 						state->seq = state->seq + 1;
-						
+
 						switch ( state->state )
 						{
 						case KERMIT_IDLE:
@@ -549,7 +549,7 @@ void kermit_receive_byte( const device_config *device, UINT8 data )
 							kermit_send_string_packet( state, KERMIT_FILE, image_basename( state->image ) );
 							state->state = KERMIT_SEND_DATA;;
 							break;
-							
+
 						case KERMIT_SEND_DATA:
 							/* send next data packet or EOF */
 							if ( image_feof( state->image ) )
@@ -559,22 +559,22 @@ void kermit_receive_byte( const device_config *device, UINT8 data )
 							}
 							else
 							{
-								kermit_send_data_packet( state );	
+								kermit_send_data_packet( state );
 							}
 							break;
-							
+
 						case KERMIT_SEND_EOF:
  						        /* send EOT */
 							kermit_send_simple_packet( state, KERMIT_EOT );
 							state->state = KERMIT_SEND_EOT;
 							break;
-							
+
 						case KERMIT_SEND_EOT:
 							/* reset */
 							kermit_reset( state );
 							state->state = KERMIT_RESET;
 							break;
-							
+
 						}
 					}
 
@@ -590,7 +590,7 @@ void kermit_receive_byte( const device_config *device, UINT8 data )
 						kermit_reset( state );
 					}
 					break;
-					
+
                                 /* errors */
 
 				case KERMIT_ERR:
@@ -599,7 +599,7 @@ void kermit_receive_byte( const device_config *device, UINT8 data )
 					kermit_reset( state );
 					break;
 
-				default: 
+				default:
 					LOG(( "kermit: ignoring packet type %c\n", state->pin[ 3 ] ));
 					/* no abort, just ignoring */
 				}

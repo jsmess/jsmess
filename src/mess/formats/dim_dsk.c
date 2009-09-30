@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	formats/dim_dsk.c
+    formats/dim_dsk.c
 
-	DIM disk images
+    DIM disk images
 
 *********************************************************************/
 
@@ -30,7 +30,7 @@ FLOPPY_CONSTRUCT(dim_dsk_construct)
 	UINT8 format_tmp;
 	int x;
 	UINT16 temp;
-	
+
 	if(params)
 	{
 		// create
@@ -82,7 +82,7 @@ FLOPPY_CONSTRUCT(dim_dsk_construct)
 	// TODO: expand on this basic implementation
 
 	logerror("FDD: DIM image loaded - type %i, %i tracks, %i sectors per track, %i bytes per sector\n", format_tmp,tracks, sectors,sectorlen);
-	
+
 	memset(&geometry, 0, sizeof(geometry));
 	geometry.heads = heads;
 	geometry.first_sector_id = firstsector;
@@ -90,6 +90,6 @@ FLOPPY_CONSTRUCT(dim_dsk_construct)
 	geometry.tracks = tracks+1;
 	geometry.sectors = sectors;
 	geometry.offset = 0x100;
-	return basicdsk_construct(floppy, &geometry);	
+	return basicdsk_construct(floppy, &geometry);
 }
 

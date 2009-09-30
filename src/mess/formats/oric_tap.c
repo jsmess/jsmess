@@ -88,33 +88,33 @@ static int oric_get_bit_size_in_samples(UINT8 b)
 }
 
 
-/*	each byte on cassette is stored as:
+/*  each byte on cassette is stored as:
 
-	start bit		0 * 1
-	data bits		8 * x (x is 0 or 1, and depends on data-bit value)
-	parity bit		1 * x (x is 0 or 1, and depends on the parity of the data bits)
-	stop bits		1 * 3
+    start bit       0 * 1
+    data bits       8 * x (x is 0 or 1, and depends on data-bit value)
+    parity bit      1 * x (x is 0 or 1, and depends on the parity of the data bits)
+    stop bits       1 * 3
 
-	if data has even parity, parity bit will be 1.
-	if data has odd parity, parity bit will be 0.
+    if data has even parity, parity bit will be 1.
+    if data has odd parity, parity bit will be 0.
 */
 
 /*
-	512 * data byte 0x016		-> leader
-	1   * data byte 0x024		-> sync byte
-	9   * data byte 			-> header
-	delay (of last pulse written)
-	x   * data byte			-> length
+    512 * data byte 0x016       -> leader
+    1   * data byte 0x024       -> sync byte
+    9   * data byte             -> header
+    delay (of last pulse written)
+    x   * data byte         -> length
 
 
-	header structure:
-	3	* ?			->		???
-	1	* ?			->		???
-	1	* x			->		end address high byte
-	1	* x			->		end address low byte
-	1	* x			->		start address high byte
-	1	* x			->		start address low byte
-	1	* ?			->		???
+    header structure:
+    3   * ?         ->      ???
+    1   * ?         ->      ???
+    1   * x         ->      end address high byte
+    1   * x         ->      end address low byte
+    1   * x         ->      start address high byte
+    1   * x         ->      start address low byte
+    1   * ?         ->      ???
 */
 
 static int oric_calculate_byte_size_in_samples(UINT8 byte)
@@ -361,7 +361,7 @@ static int oric_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
 
 	/* header and trailer act as pauses */
 	/* the trailer is required so that the via sees the last bit of the last
-		byte */
+        byte */
     if (bytes == CODE_HEADER) {
         for (i = 0; i < ORIC_WAVESAMPLES_HEADER; i++)
             *(p++) = WAVEENTRY_NULL;
@@ -449,7 +449,7 @@ static int oric_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
 					logerror("got end of filename\n");
 
 					/* oric includes a small delay, but I don't see
-					it being 1 bits */
+                    it being 1 bits */
 					for (i=0; i<100; i++)
 					{
                                             p = oric_output_bit(p,1);

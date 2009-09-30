@@ -16,7 +16,7 @@ static int fm7_fill_wave(INT16* buffer, UINT8 high, UINT8 low, int sample_pos)
 	int sample_count = 0;
 	int x = 0;
 	int count = (data & 0x7fff);
-	
+
 	if(data & 0x8000)
 	{
 		for(x=0;x<count;x++)
@@ -34,7 +34,7 @@ static int fm7_fill_wave(INT16* buffer, UINT8 high, UINT8 low, int sample_pos)
 		}
 	}
 
-	sample_count += count;	
+	sample_count += count;
 	return sample_count;
 }
 
@@ -42,16 +42,16 @@ static int fm7_handle_t77(INT16* buffer, const UINT8* casdata)
 {
 	int sample_count = 0;
 	int data_pos = 16;
-	
+
 	if(memcmp(casdata, "XM7 TAPE IMAGE 0",16))  // header check
 		return -1;
-	
+
 	while(data_pos < cas_size)
 	{
 		sample_count += fm7_fill_wave(buffer,casdata[data_pos],casdata[data_pos+1],sample_count);
 		data_pos+=2;
 	}
-	
+
 	return sample_count;
 }
 
@@ -61,7 +61,7 @@ static int fm7_handle_t77(INT16* buffer, const UINT8* casdata)
 static int fm7_cas_to_wav_size (const UINT8 *casdata, int caslen)
 {
 	cas_size = caslen;
-	
+
 	return fm7_handle_t77(NULL,casdata);
 }
 

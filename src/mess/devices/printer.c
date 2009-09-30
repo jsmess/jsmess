@@ -1,8 +1,8 @@
 /****************************************************************************
 
-	printer.c
+    printer.c
 
-	Code for handling printer devices
+    Code for handling printer devices
 
 ****************************************************************************/
 
@@ -16,8 +16,8 @@
 ***************************************************************************/
 
 /*-------------------------------------------------
-	printer_is_ready - checks to see if a printer
-	is ready
+    printer_is_ready - checks to see if a printer
+    is ready
 -------------------------------------------------*/
 
 int printer_is_ready(const device_config *printer)

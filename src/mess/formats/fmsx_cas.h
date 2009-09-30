@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	fmsx_cas.h
+    fmsx_cas.h
 
-	Format code for MSX casette files
+    Format code for MSX casette files
 
 *********************************************************************/
 

@@ -53,7 +53,7 @@ INLINE messram_state *get_safe_token(const device_config *device)
 
 /*-------------------------------------------------
     parse_string - convert a ram string to an
-	integer value
+    integer value
 -------------------------------------------------*/
 
 static UINT32 parse_string(const char *s)

@@ -1093,10 +1093,10 @@ static READ8_DEVICE_HANDLER ( to7_game_porta_in )
 		/* joystick */
 		data = input_port_read(device->machine, "game_port_directions");
 		/* bit 0=0 => P1 up      bit 4=0 => P2 up
-		   bit 1=0 => P1 down    bit 5=0 => P2 down
-		   bit 2=0 => P1 left    bit 6=0 => P2 left
-		   bit 3=0 => P1 right   bit 7=0 => P2 right
-		*/
+           bit 1=0 => P1 down    bit 5=0 => P2 down
+           bit 2=0 => P1 left    bit 6=0 => P2 left
+           bit 3=0 => P1 right   bit 7=0 => P2 right
+        */
 		/* remove impossible combinations: up+down, left+right */
 		if ( ! ( data & 0x03 ) )
 			data |= 0x03;
@@ -1203,14 +1203,14 @@ static TIMER_CALLBACK(to7_game_update_cb)
 		pia6821_cb1_w( game_pia, 0, (in & 0x08) ? 1 : 0 ); /* P2 action B */
 		pia6821_ca1_w( game_pia, 0, (in & 0x04) ? 1 : 0 ); /* P1 action B */
 		/* TODO:
-		   it seems that CM 90-112 behaves differently
-		   - ca1 is P1 action A, i.e., in & 0x40
-		   - ca2 is P2 action A, i.e., in & 0x80
-		   - cb1, cb2 are not connected (should not be a problem)
-		*/
+           it seems that CM 90-112 behaves differently
+           - ca1 is P1 action A, i.e., in & 0x40
+           - ca2 is P2 action A, i.e., in & 0x80
+           - cb1, cb2 are not connected (should not be a problem)
+        */
 		/* Note: the MO6 & MO5NR have slightly different connections
-		   (see mo6_game_update_cb)
-		*/
+           (see mo6_game_update_cb)
+        */
 	}
 }
 
@@ -2823,8 +2823,8 @@ static int to9_kbd_get_key( running_machine *machine )
 			port |= 1; /* shift & control */
 
 		/* TODO: correct handling of simultaneous keystokes:
-		   return the new key preferably & disable repeat
-		*/
+           return the new key preferably & disable repeat
+        */
 		for ( bit = 0; bit < 8; bit++ )
 		{
 			if ( ! (port & (1 << bit)) )
@@ -3255,8 +3255,8 @@ static int to8_kbd_get_key( running_machine *machine )
 			port |= 1; /* shift & control */
 
 		/* TODO: correct handling of simultaneous keystokes:
-		   return the new key preferably & disable repeat
-		*/
+           return the new key preferably & disable repeat
+        */
 		for ( bit = 0; bit < 8; bit++ )
 		{
 			if ( ! (port & (1 << bit)) )
@@ -3319,8 +3319,8 @@ static void to8_kbd_timer_func(running_machine *machine)
 		/* key polling */
 		int k = to8_kbd_get_key(machine);
 		/* if not in transfer, send pulse from time to time
-		   (helps avoiding CPU lock)
-		*/
+           (helps avoiding CPU lock)
+        */
 		if ( ! to8_kbd_ack )
 			mc6846_set_input_cp1( devtag_get_device(machine, "mc6846"), 0 );
 		mc6846_set_input_cp1( devtag_get_device(machine, "mc6846"), 1 );
@@ -3557,12 +3557,12 @@ static void to8_update_ram_bank (running_machine *machine)
 	}
 
 	/*  due to adressing distortion, the 16 KB banked memory space is
-	    split into two 8 KB spaces:
-	    - 0xa000-0xbfff maps to 0x2000-0x3fff in 16 KB bank
-	    - 0xc000-0xdfff maps to 0x0000-0x1fff in 16 KB bank
-	    this is important if we map a bank that is also reachable by another,
-	    undistorted space, such as cartridge, page 0 (video), or page 1
-	*/
+        split into two 8 KB spaces:
+        - 0xa000-0xbfff maps to 0x2000-0x3fff in 16 KB bank
+        - 0xc000-0xdfff maps to 0x0000-0x1fff in 16 KB bank
+        this is important if we map a bank that is also reachable by another,
+        undistorted space, such as cartridge, page 0 (video), or page 1
+    */
 	to8_data_vpage = bank;
 	if ( mess_ram_size == 512*1024 || to8_data_vpage < 16 )
 	{

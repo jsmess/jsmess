@@ -2,7 +2,7 @@
 
     cartslot.c
 
-	Cartridge device
+    Cartridge device
 
 **********************************************************************/
 
@@ -150,9 +150,9 @@ static int process_cartridge(const device_config *image, process_mode mode)
 			while(!ROMENTRY_ISREGIONEND(roment))
 			{
 				if (ROMENTRY_GETTYPE(roment) == ROMENTRYTYPE_CARTRIDGE)
-				{					
+				{
 					if (strcmp(roment->_hashdata,image->tag)==0)
-					{						
+					{
 						result = load_cartridge(image, romrgn, roment, mode);
 						if (!result)
 							return result;
@@ -222,10 +222,10 @@ int cartslot_get_resource_length(const device_config *device, const char *socket
 				break;
 			}
 		}
-		if (socket != NULL) 
+		if (socket != NULL)
 			result = socket->resource->length;
 	}
-	else 
+	else
 		result = 0;
 
 	return result;
@@ -248,7 +248,7 @@ static DEVICE_START( cartslot )
 		(*config->device_start)(device);
 		goto done;
 	}
-	
+
 	/* find the PCB (if there is one) */
 	cart->pcb_device = devtag_get_device(
 		device->machine,
@@ -264,7 +264,7 @@ done:
 -------------------------------------------------*/
 
 static DEVICE_IMAGE_LOAD( cartslot )
-{	
+{
 	int result;
 	cartslot_t *cart = get_token(image);
 	const cartslot_config *config = get_config(image);
@@ -355,7 +355,7 @@ static const cartslot_pcb_type *identify_pcb(const device_config *device)
 				break;
 			}
 		}
-		
+
 		/* check for unknown PCB type */
 		if ((mc != NULL) && (pcb_type == NULL))
 			fatalerror("Unknown PCB type \"%s\"\n", astring_c(pcb_name));
@@ -400,7 +400,7 @@ static DEVICE_GET_IMAGE_DEVICES(cartslot)
 -------------------------------------------------*/
 
 DEVICE_GET_INFO( cartslot )
-{	
+{
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
@@ -413,23 +413,23 @@ DEVICE_GET_INFO( cartslot )
 		case DEVINFO_INT_IMAGE_CREATABLE:			info->i = 0; break;
 		case DEVINFO_INT_IMAGE_RESET_ON_LOAD:		info->i = 1; break;
 		case DEVINFO_INT_IMAGE_MUST_BE_LOADED:		if ( device && device->inline_config) {
-														info->i = get_config(device)->must_be_loaded; 
+														info->i = get_config(device)->must_be_loaded;
 													} else {
-														info->i = 0; 
+														info->i = 0;
 													}
 													break;
 
 		/* --- the following bits of info are returned as pointers to functions --- */
 		case DEVINFO_FCT_START:						info->start = DEVICE_START_NAME(cartslot);					break;
-		case DEVINFO_FCT_IMAGE_LOAD:				info->f = (genf *) DEVICE_IMAGE_LOAD_NAME(cartslot);		break; 
-		case DEVINFO_FCT_IMAGE_UNLOAD:				info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME(cartslot);		break; 
+		case DEVINFO_FCT_IMAGE_LOAD:				info->f = (genf *) DEVICE_IMAGE_LOAD_NAME(cartslot);		break;
+		case DEVINFO_FCT_IMAGE_UNLOAD:				info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME(cartslot);		break;
 		case DEVINFO_FCT_GET_IMAGE_DEVICES:			info->f = (genf *) DEVICE_GET_IMAGE_DEVICES_NAME(cartslot);	break;
 		case DEVINFO_FCT_IMAGE_PARTIAL_HASH:		if ( device && device->inline_config && get_config(device)->device_partialhash) {
-														info->f = (genf *) get_config(device)->device_partialhash; 
+														info->f = (genf *) get_config(device)->device_partialhash;
 													} else {
-														info->f = NULL; 
+														info->f = NULL;
 													}
-													break;			
+													break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:						strcpy(info->s, "Cartslot"); break;

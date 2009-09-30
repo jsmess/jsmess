@@ -243,8 +243,8 @@ static casserr_t to7_k7_load( cassette_image *cass )
 		{
 			cassette_image_read( cass, &in, pos, 1 );
 			/* actually, we are bit laxist and treat as 0xff bytes with at least
-			   5 bits out of 8 set to 1
-			*/
+               5 bits out of 8 set to 1
+            */
 			for ( i = 0; in; in >>= 1 )
 				i += (in & 1);
 			if ( i < 5 )
@@ -313,8 +313,8 @@ static casserr_t to7_k7_load( cassette_image *cass )
 	}
 
 	/* trailing data with invalid block structure
-	   => dump it in a raw form, but stay alert for hidden block starts
-	*/
+       => dump it in a raw form, but stay alert for hidden block starts
+    */
 	if ( pos < size )
 	{
 		invalid++;

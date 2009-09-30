@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	formats/adam_dsk.h
+    formats/adam_dsk.h
 
-	Coleco Adam disk images
+    Coleco Adam disk images
 
 *********************************************************************/
 

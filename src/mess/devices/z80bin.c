@@ -1,9 +1,9 @@
 /*********************************************************************
 
-	z80bin.c
+    z80bin.c
 
-	A binary quickload format used by the Microbee, the Exidy Sorcerer
-	VZ200/300 and the Super 80
+    A binary quickload format used by the Microbee, the Exidy Sorcerer
+    VZ200/300 and the Super 80
 
 *********************************************************************/
 
@@ -23,7 +23,7 @@
 
 /*-------------------------------------------------
     z80bin_load_file - load a z80bin file into
-	memory
+    memory
 -------------------------------------------------*/
 
 static int z80bin_load_file(const device_config *image, const char *file_type, UINT16 *exec_addr, UINT16 *start_addr, UINT16 *end_addr )
@@ -122,7 +122,7 @@ static QUICKLOAD_LOAD( z80bin )
 		else
 		{
 			if (autorun)
-				cpu_set_reg(cputag_get_cpu(image->machine, "maincpu"), REG_GENPC, exec_addr);	
+				cpu_set_reg(cputag_get_cpu(image->machine, "maincpu"), REG_GENPC, exec_addr);
 		}
 	}
 

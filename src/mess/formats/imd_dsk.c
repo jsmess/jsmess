@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	formats/imd_dsk.c
+    formats/imd_dsk.c
 
-	IMD disk images
+    IMD disk images
 
 *********************************************************************/
 
@@ -65,12 +65,12 @@ static floperr_t get_offset(floppy_image *floppy, int head, int track, int secto
 	UINT8 header[5];
 	UINT8 sector_num;
 	int i;
-	
-	
+
+
 	if ((head < 0) || (head >= get_tag(floppy)->heads) || (track < 0) || (track >= get_tag(floppy)->tracks)
 			|| (sector < 0) )
 		return FLOPPY_ERROR_SEEKERROR;
-	
+
 	offs = imd_get_track_offset(floppy,head,track);
 	floppy_image_read(floppy, header, offs, 5);
 
@@ -79,7 +79,7 @@ static floperr_t get_offset(floppy_image *floppy, int head, int track, int secto
 	if(header[2] & 0x80) offs += sector_num; // skip cylinder numbering map
 	if(header[2] & 0x40) offs += sector_num; // skip head numbering map
 	get_tag(floppy)->sector_size = 1 << (header[4] + 7);
-	for(i=0;i<sector;i++) {	
+	for(i=0;i<sector;i++) {
 		floppy_image_read(floppy, header, offs, 1); // take sector data type
 		switch(header[0]) {
 			case 0: offs++; break;
@@ -88,8 +88,8 @@ static floperr_t get_offset(floppy_image *floppy, int head, int track, int secto
 			case 5:
 			case 7: offs += get_tag(floppy)->sector_size + 1; break;
 			default: offs += 2;
-		}			
-	}		
+		}
+	}
 	if (offset)
 		*offset = offs;
 	return FLOPPY_ERROR_SUCCESS;
@@ -100,30 +100,30 @@ static floperr_t get_offset(floppy_image *floppy, int head, int track, int secto
 static floperr_t internal_imd_read_sector(floppy_image *floppy, int head, int track, int sector, int sector_is_index, void *buffer, size_t buflen)
 {
 	UINT64 offset;
-	floperr_t err;	
+	floperr_t err;
 	UINT8 header[1];
-	
+
 	// take sector offset
 	err = get_offset(floppy, head, track, sector, sector_is_index, &offset);
 	if (err)
 		return err;
-	
-	floppy_image_read(floppy, header, offset, 1);	
+
+	floppy_image_read(floppy, header, offset, 1);
 	switch(header[0]) {
 		case 0: break;
 		case 1:
 		case 3:
 		case 5:
-		case 7: 
+		case 7:
 				floppy_image_read(floppy, buffer, offset+1, buflen);
 				break;
-			
+
 		default: // all data same
 				floppy_image_read(floppy, header, offset+1, 1);
 				memset(buffer,header[0],buflen);
 				break;
-	}			
-	
+	}
+
 	return FLOPPY_ERROR_SUCCESS;
 }
 
@@ -145,7 +145,7 @@ static floperr_t imd_get_sector_length(floppy_image *floppy, int head, int track
 	if (err)
 		return err;
 
-	if (sector_length) {		
+	if (sector_length) {
 		*sector_length = get_tag(floppy)->sector_size;
 	}
 	return FLOPPY_ERROR_SUCCESS;
@@ -159,7 +159,7 @@ static floperr_t imd_get_indexed_sector_info(floppy_image *floppy, int head, int
 	UINT8 tr;
 	UINT32 sector_size;
 	UINT8 sector_num;
-	
+
 	offset = imd_get_track_offset(floppy,head,track);
 	floppy_image_read(floppy, header, offset, 5);
 	tr = header[1];
@@ -196,19 +196,19 @@ static floperr_t imd_get_indexed_sector_info(floppy_image *floppy, int head, int
 	}
 	if (flags) {
 		UINT8 skip;
-		if (head & 0x40) {			
+		if (head & 0x40) {
 			if (head & 0x80) {
-				skip = 3;				
+				skip = 3;
 			} else {
 				skip = 2;
-			}			
+			}
 		} else {
 			skip = 1;
-		}		
+		}
 		floppy_image_read(floppy, header, offset + 5 + skip * sector_num, 1);
 		*flags = 0;
 		if ((header[0]-1) & 0x02) *flags |= ID_FLAG_DELETED_DATA;
-		if ((header[0]-1) & 0x04) *flags |= ID_FLAG_CRC_ERROR_IN_DATA_FIELD;		
+		if ((header[0]-1) & 0x04) *flags |= ID_FLAG_CRC_ERROR_IN_DATA_FIELD;
 	}
 	return FLOPPY_ERROR_SUCCESS;
 }
@@ -219,7 +219,7 @@ FLOPPY_CONSTRUCT( imd_dsk_construct )
 	struct FloppyCallbacks *callbacks;
 	struct imddsk_tag *tag;
 	UINT8 header[0x100];
-	UINT64 pos = 0;	
+	UINT64 pos = 0;
 	int sector_size = 0;
 	int sector_num;
 	int i;
@@ -228,7 +228,7 @@ FLOPPY_CONSTRUCT( imd_dsk_construct )
 		// create
 		return FLOPPY_ERROR_UNSUPPORTED;
 	}
-	
+
 	tag = (struct imddsk_tag *) floppy_create_tag(floppy, IMD_DSK_TAG, sizeof(struct imddsk_tag));
 	if (!tag)
 		return FLOPPY_ERROR_OUTOFMEMORY;
@@ -249,7 +249,7 @@ FLOPPY_CONSTRUCT( imd_dsk_construct )
 		if(header[2] & 0x80) pos += sector_num; // skip cylinder numbering map
 		if(header[2] & 0x40) pos += sector_num; // skip head numbering map
 		sector_size = 1 << (header[4] + 7);
-		for(i=0;i<sector_num;i++) {	
+		for(i=0;i<sector_num;i++) {
 			floppy_image_read(floppy, header, pos, 1); // take sector data type
 			switch(header[0]) {
 				case 0: pos++; break;
@@ -258,11 +258,11 @@ FLOPPY_CONSTRUCT( imd_dsk_construct )
 				case 5:
 				case 7: pos += sector_size + 1; break;
 				default: pos += 2;break;
-			}			
-		}	
-		tag->tracks += 1;	
+			}
+		}
+		tag->tracks += 1;
 	} while(pos < floppy_image_size(floppy));
-	
+
 	callbacks = floppy_callbacks(floppy);
 	callbacks->read_sector = imd_read_sector;
 	callbacks->read_indexed_sector = imd_read_indexed_sector;

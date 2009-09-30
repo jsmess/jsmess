@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	formats/trd_dsk.c
+    formats/trd_dsk.c
 
-	TRD disk images
+    TRD disk images
 
 *********************************************************************/
 
@@ -25,7 +25,7 @@ static FLOPPY_CONSTRUCT(trd_dsk_construct)
 	UINT8 data[1];
 	int heads;
 	int cylinders;
-	
+
 	floppy_image_read( floppy, data, 0x8e3 , 1 );
 
   	/* guess geometry of disk */
@@ -38,7 +38,7 @@ static FLOPPY_CONSTRUCT(trd_dsk_construct)
 	geometry.sector_length = 256;
 	geometry.tracks = cylinders;
 	geometry.sectors = 16;
-	return basicdsk_construct(floppy, &geometry);	
+	return basicdsk_construct(floppy, &geometry);
 }
 
 

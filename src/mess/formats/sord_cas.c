@@ -1,8 +1,8 @@
 /**************************************************************************
 
-	sord_cas.c
+    sord_cas.c
 
-	Format code for Sord M5 cassette files
+    Format code for Sord M5 cassette files
 
 **************************************************************************/
 

@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	formats/atarist_dsk.h
+    formats/atarist_dsk.h
 
-	atarist disk images
+    atarist disk images
 
 *********************************************************************/
 

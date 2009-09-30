@@ -450,7 +450,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 	const char *filetype = image_filetype(image);
 
 	if (!mame_stricmp(filetype, "nes"))
-	{	
+	{
 		/* Verify the file is in iNES format */
 		memset(magic, '\0', sizeof(magic));
 		image_fread(image, magic, 4);
@@ -501,7 +501,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 
 			/* Read the second ROM option byte (offset 7) */
 			image_fread(image, &m, 1);
-	
+
 			/* Check for skanky headers */
 			image_fread(image, &skank, 8);
 
@@ -516,7 +516,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 				}
 			}
 			logerror("\n");
-	
+
 			nes.mapper = nes.mapper | (m & 0xf0);
 		}
 
@@ -525,13 +525,13 @@ DEVICE_IMAGE_LOAD( nes_cart )
 		nes.trainer = local_options & 0x04;
 		nes.four_screen_vram = local_options & 0x08;
 
-		if (nes.battery) 
+		if (nes.battery)
 			logerror("-- Battery found\n");
 
-		if (nes.trainer) 
+		if (nes.trainer)
 			logerror("-- Trainer found\n");
 
-		if (nes.four_screen_vram) 
+		if (nes.four_screen_vram)
 			logerror("-- 4-screen VRAM\n");
 
 		/* Free the regions that were allocated by the ROM loader */
@@ -586,8 +586,8 @@ DEVICE_IMAGE_LOAD( nes_cart )
 		logerror("**\n");
 		logerror("Mapper: %d\n", nes.mapper);
 		logerror("PRG chunks: %02x, size: %06x\n", nes.prg_chunks, 0x4000 * nes.prg_chunks);
-//		printf("Mapper: %d\n", nes.mapper);
-//		printf("PRG chunks: %02x, size: %06x\n", nes.prg_chunks, 0x4000 * nes.prg_chunks);
+//      printf("Mapper: %d\n", nes.mapper);
+//      printf("PRG chunks: %02x, size: %06x\n", nes.prg_chunks, 0x4000 * nes.prg_chunks);
 
 		/* Read in any chr chunks */
 		if (nes.chr_chunks > 0)
@@ -617,8 +617,8 @@ DEVICE_IMAGE_LOAD( nes_cart )
 
 		logerror("CHR chunks: %02x, size: %06x\n", nes.chr_chunks, 0x4000 * nes.chr_chunks);
 		logerror("**\n");
-//		printf("CHR chunks: %02x, size: %06x\n", nes.chr_chunks, 0x4000 * nes.chr_chunks);
-//		printf("**\n");
+//      printf("CHR chunks: %02x, size: %06x\n", nes.chr_chunks, 0x4000 * nes.chr_chunks);
+//      printf("**\n");
 
 		/* Attempt to load a battery file for this ROM. If successful, we */
 		/* must wait until later to move it to the system memory. */
@@ -685,7 +685,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 				if (unif_board == NULL)
 				{
 					logerror("Unsupported UNIF board.\n");
-//					return INIT_FAIL;
+//                  return INIT_FAIL;
 				}
 			}
 			else if ((magic2[0] == 'R') && (magic2[1] == 'E') && (magic2[2] == 'A') && (magic2[3] == 'D'))

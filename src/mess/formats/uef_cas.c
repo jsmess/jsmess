@@ -25,10 +25,10 @@ Not nice, but it works...
 static const UINT8 UEF_HEADER[10] = { 0x55, 0x45, 0x46, 0x20, 0x46, 0x69, 0x6c, 0x65, 0x21, 0x00 };
 
 /*
-	bytes are stored as
-	start bit	1 * 0
-	data bits	8 * X
-	stop bit	1 * 1
+    bytes are stored as
+    start bit   1 * 0
+    data bits   8 * X
+    stop bit    1 * 1
 */
 
 /* gzip flag byte */
@@ -81,7 +81,7 @@ static float get_uef_float( const UINT8 *Float)
 		int Exponent;
 
 		/* assume a four byte array named Float exists, where Float[0]
-		was the first byte read from the UEF, Float[1] the second, etc */
+        was the first byte read from the UEF, Float[1] the second, etc */
 
 		/* decode mantissa */
 		Mantissa = Float[0] | (Float[1] << 8) | ((Float[2]&0x7f)|0x80) << 16;

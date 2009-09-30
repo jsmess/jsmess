@@ -1,7 +1,7 @@
 /*
-	a26_cas.h
+    a26_cas.h
 
-	Format code for a2600 SuperCharger cassette files
+    Format code for a2600 SuperCharger cassette files
 */
 
 #ifndef A26_CAS_H
