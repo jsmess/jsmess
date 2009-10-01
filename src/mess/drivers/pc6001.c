@@ -96,8 +96,9 @@ static UINT8 *pc6001_ram;
 static UINT8 *pc6001_video_ram;
 static UINT8 irq_vector = 0x00;
 static UINT8 cas_switch,sys_latch;
+static UINT32 cas_offset;
 
-#define CAS_LENGTH 0x3b9c
+#define CAS_LENGTH 0x64c8
 
 static VIDEO_START( pc6001 )
 {
@@ -127,6 +128,8 @@ static VIDEO_UPDATE( pc6001 )
 	{
 		if(attr & 0x10) // 256x192x1 mode (FIXME: might be a different trigger)
 		{
+			int fgcol = (attr & 2) ? 7 : 2;
+
 			for(y=0;y<192;y++)
 			{
 				for(x=0;x<32;x++)
@@ -135,7 +138,7 @@ static VIDEO_UPDATE( pc6001 )
 
 					for(xi=0;xi<8;xi++)
 					{
-						color = ((tile)>>(7-xi) & 1) ? 7 : 0;
+						color = ((tile)>>(7-xi) & 1) ? fgcol : 0;
 
 						*BITMAP_ADDR16(bitmap, (y+24), (x*8+xi)+32) = screen->machine->pens[color];
 					}
@@ -241,8 +244,14 @@ static WRITE8_HANDLER ( pc6001_system_latch_w )
 
 	pc6001_video_ram =  pc6001_ram + startaddr[(data >> 1) & 0x03] - 0x8000;
 
-	if((!(sys_latch & 8)) && data & 0x8)
+	if((!(sys_latch & 8)) && data & 0x8) //PLAY tape cmd
 		cas_switch = 1;
+	if((sys_latch & 8) && ((data & 0x8) == 0)) //STOP tape cmd
+	{
+		cas_switch = 0;
+		irq_vector = 0x00;
+		cputag_set_input_line(space->machine,"maincpu", 0, ASSERT_LINE);
+	}
 
 	sys_latch = data;
 	printf("%02x\n",data);
@@ -574,15 +583,14 @@ static UINT8 check_keyboard_press(running_machine *machine)
 static TIMER_CALLBACK(cassette_callback)
 {
 	UINT8 *gfx_data = memory_region(machine, "cas");
-	static UINT32 i;
 
 	if(cas_switch == 1)
 	{
-		cur_keycode = gfx_data[i++];
-		//popmessage("%04x",i);
-		if(i >= CAS_LENGTH)
+		cur_keycode = gfx_data[cas_offset++];
+		//popmessage("%04x %02x",cas_offset,cas_switch);
+		if(cas_offset >= CAS_LENGTH)
 		{
-			i = 0;
+			cas_offset = 0;
 			cas_switch = 0;
 			irq_vector = 0x12;
 			cputag_set_input_line(machine,"maincpu", 0, ASSERT_LINE);
@@ -637,6 +645,7 @@ static MACHINE_RESET(pc6001)
 	timer_pulse(machine, ATTOTIME_IN_HZ(250), NULL, 0, keyboard_callback);
 	timer_pulse(machine, ATTOTIME_IN_HZ(160), NULL, 0, cassette_callback);
 	cas_switch = 0;
+	cas_offset = 0;
 }
 
 static const rgb_t defcolors[] =
@@ -712,7 +721,7 @@ ROM_START( pc6001 )	/* screen = 8000-83FF */
 
 	ROM_REGION( 0x10000, "cas", ROMREGION_ERASEFF )
 	/* Load here your tape for now (and change the cas length macro according to what MESS returns) */
-//	ROM_LOAD( "the amazon.cas", 0x0000, CAS_LENGTH, CRC(1) SHA1(1) )
+//	ROM_LOAD( "trick boy.cas", 0x0000, CAS_LENGTH, CRC(1) SHA1(1) )
 ROM_END
 
 ROM_START( pc6001a )
