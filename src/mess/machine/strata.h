@@ -1,5 +1,5 @@
 /*
-	strata.h: header file for strata.c
+    strata.h: header file for strata.c
 */
 
 int strataflash_init(running_machine *machine, int id);

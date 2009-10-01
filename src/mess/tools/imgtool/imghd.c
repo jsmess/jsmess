@@ -1,10 +1,10 @@
 /*
-	Code to interface the MESS image code with MAME's harddisk core.
+    Code to interface the MESS image code with MAME's harddisk core.
 
-	We do not support diff files as it will involve some changes in the MESS
-	image code.
+    We do not support diff files as it will involve some changes in the MESS
+    image code.
 
-	Raphael Nabet 2003
+    Raphael Nabet 2003
 */
 
 /*#include "imgtool.h"*/
@@ -42,9 +42,9 @@ static imgtoolerr_t map_chd_error(chd_error chderr)
 
 
 /*
-	imghd_create()
+    imghd_create()
 
-	Create a MAME HD image
+    Create a MAME HD image
 */
 imgtoolerr_t imghd_create(imgtool_stream *stream, UINT32 hunksize, UINT32 cylinders, UINT32 heads, UINT32 sectors, UINT32 seclen)
 {
@@ -133,9 +133,9 @@ done:
 
 
 /*
-	imghd_open()
+    imghd_open()
 
-	Open stream as a MAME HD image
+    Open stream as a MAME HD image
 */
 imgtoolerr_t imghd_open(imgtool_stream *stream, struct mess_hard_disk_file *hard_disk)
 {
@@ -169,9 +169,9 @@ done:
 
 
 /*
-	imghd_close()
+    imghd_close()
 
-	Close MAME HD image
+    Close MAME HD image
 */
 void imghd_close(struct mess_hard_disk_file *disk)
 {
@@ -192,9 +192,9 @@ void imghd_close(struct mess_hard_disk_file *disk)
 
 
 /*
-	imghd_read()
+    imghd_read()
 
-	Read sector(s) from MAME HD image
+    Read sector(s) from MAME HD image
 */
 imgtoolerr_t imghd_read(struct mess_hard_disk_file *disk, UINT32 lbasector, void *buffer)
 {
@@ -206,9 +206,9 @@ imgtoolerr_t imghd_read(struct mess_hard_disk_file *disk, UINT32 lbasector, void
 
 
 /*
-	imghd_write()
+    imghd_write()
 
-	Write sector(s) from MAME HD image
+    Write sector(s) from MAME HD image
 */
 imgtoolerr_t imghd_write(struct mess_hard_disk_file *disk, UINT32 lbasector, const void *buffer)
 {
@@ -220,9 +220,9 @@ imgtoolerr_t imghd_write(struct mess_hard_disk_file *disk, UINT32 lbasector, con
 
 
 /*
-	imghd_get_header()
+    imghd_get_header()
 
-	Return pointer to the header of MAME HD image
+    Return pointer to the header of MAME HD image
 */
 const hard_disk_info *imghd_get_header(struct mess_hard_disk_file *disk)
 {

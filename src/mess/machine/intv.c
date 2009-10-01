@@ -336,7 +336,7 @@ static int intv_load_rom_file(const device_config *image)
 
 	UINT8 *memory = memory_region(image->machine, "maincpu");
 	const char *filetype = image_filetype(image);
-	
+
 	/* if it is in .rom format, we enter here */
 	if (!mame_stricmp (filetype, "rom"))
 	{
@@ -384,7 +384,7 @@ static int intv_load_rom_file(const device_config *image)
 		return INIT_PASS;
 	}
 	/* otherwise, we load it as a .bin file, using extrainfo from intv.hsi in place of .cfg */
-	else 
+	else
 	{
 		/* This code is a blatant hack, due to impossibility to load a separate .cfg file in MESS. */
 		/* It shall be eventually replaced by the .xml loading */
@@ -392,8 +392,8 @@ static int intv_load_rom_file(const device_config *image)
 		/* extrainfo format */
 		// 1. mapper number (to deal with bankswitch). no bankswitch is mapper 0 (most games).
 		// 2.->5. current images have at most 4 chunks of data. we store here block size and location to load
-		//	(value & 0xf0) >> 4 is the location / 0x1000
-		//	(value & 0x0f) is the size / 0x800
+		//  (value & 0xf0) >> 4 is the location / 0x1000
+		//  (value & 0x0f) is the size / 0x800
 		// 6. some images have a ram chunk. as above we store location and size in 8 bits
 		// 7. extra = 1 ECS, 2 Intellivoice
 		int start, size;
@@ -415,25 +415,25 @@ static int intv_load_rom_file(const device_config *image)
 			sscanf(image_extrainfo(image),"%d %d %d %d %d %d %d", &mapper, &rom[0], &rom[1], &rom[2],
 																&rom[3], &ram, &extra);
 
-//			logerror("extrainfo: %d %d %d %d %d %d %d \n", mapper, rom[0], rom[1], rom[2],
-//																rom[3], ram, extra);
+//          logerror("extrainfo: %d %d %d %d %d %d %d \n", mapper, rom[0], rom[1], rom[2],
+//                                                              rom[3], ram, extra);
 
-			if (mapper) 
+			if (mapper)
 			{
 				logerror("Bankswitch not yet implemented! \n");
 			}
 
-			if (ram) 
+			if (ram)
 			{
 				logerror("RAM banks not yet implemented! \n");
 			}
 
-			if (extra & INTELLIVOICE_MASK) 
+			if (extra & INTELLIVOICE_MASK)
 			{
 				logerror("Intellivoice support not yet implemented! \n");
 			}
 
-			if (extra & ECS_MASK) 
+			if (extra & ECS_MASK)
 			{
 				logerror("ECS support is only partial\n");
 				logerror("(even with the intvkbd driver)! \n");
@@ -443,13 +443,13 @@ static int intv_load_rom_file(const device_config *image)
 			{
 				start = (( rom[j] & 0xf0 ) >> 4) * 0x1000;
 				size = ( rom[j] & 0x0f ) * 0x800;
-				
+
 				/* some cart has to be loaded to 0x4800, but none goes to 0x4000. Hence, we use */
 				/* 0x04 << 4 in extrainfo (to reduce the stored values) and fix the value here. */
 				if (start == 0x4000) start += 0x800;
-				
-//				logerror("step %d: %d %d \n", j, start / 0x1000, size / 0x1000);
-		
+
+//              logerror("step %d: %d %d \n", j, start / 0x1000, size / 0x1000);
+
 				for (i = 0; i < size; i++ )
 				{
 					image_fread(image, &low_byte, 1);
@@ -467,7 +467,7 @@ static int intv_load_rom_file(const device_config *image)
 DEVICE_START( intv_cart )
 {
 	/* First, initialize these as empty so that the intellivision
-	 * will think that the playcable and keyboard are not attached */
+     * will think that the playcable and keyboard are not attached */
 	UINT8 *memory = memory_region(device->machine, "maincpu");
 
 	/* assume playcable is absent */
@@ -482,7 +482,7 @@ DEVICE_START( intv_cart )
 DEVICE_IMAGE_LOAD( intv_cart )
 {
 	/* First, initialize these as empty so that the intellivision
-	 * will think that the playcable and keyboard are not attached */
+     * will think that the playcable and keyboard are not attached */
 	UINT8 *memory = memory_region(image->machine, "maincpu");
 
 	/* assume playcable is absent */
@@ -579,7 +579,7 @@ DEVICE_IMAGE_LOAD( intvkbd_cart )
 	if (strcmp(image->tag,"cart1") == 0) /* Legacy cartridge slot */
 	{
 		/* First, initialize these as empty so that the intellivision
-		 * will think that the playcable is not attached */
+         * will think that the playcable is not attached */
 		UINT8 *memory = memory_region(image->machine, "maincpu");
 
 		/* assume playcable is absent */

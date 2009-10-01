@@ -314,8 +314,8 @@ static void thom_border_changed( running_machine *machine )
 	{
 		/* between left and right border */
 		/* NOTE: this makes the lower right part of the color picker blink
-		   in the TO8/TO9/TO9+, which actually happens on the real computer!
-		*/
+           in the TO8/TO9/TO9+, which actually happens on the real computer!
+        */
 		thom_border_r[ y ] = color;
 		thom_border_l[ y + 1 ] = color;
 	}

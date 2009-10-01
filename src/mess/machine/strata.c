@@ -1,14 +1,14 @@
 /*
-	Intel 28F640J5 Flash ROM emulation (could also handle 28F320J5 with minor
-	changes, and possibly 28F256J3, 28F128J3, 28F640J3 and 28F320J3)
+    Intel 28F640J5 Flash ROM emulation (could also handle 28F320J5 with minor
+    changes, and possibly 28F256J3, 28F128J3, 28F640J3 and 28F320J3)
 
-	The 28F640J5 is a 64Mbit FEEPROM that can be accessed either on an 8-bit or
-	a 16-bit bus.
+    The 28F640J5 is a 64Mbit FEEPROM that can be accessed either on an 8-bit or
+    a 16-bit bus.
 
-	References:
-	Datasheets were found on Intel's site (www.intel.com)
+    References:
+    Datasheets were found on Intel's site (www.intel.com)
 
-	Raphael Nabet 2004, based on MAME's intelfsh.c core
+    Raphael Nabet 2004, based on MAME's intelfsh.c core
 */
 
 #include "driver.h"
@@ -64,8 +64,8 @@ static struct
 #define CLEAR_BLOCKLOCK(id, block) (strata[(id)].blocklock[(block) >> 3] &= ~(1 << ((block) & 7)))
 
 /*
-	Initialize one FEEPROM chip: may be called at driver init or image load
-	time (or machine init time if you don't use MESS image core)
+    Initialize one FEEPROM chip: may be called at driver init or image load
+    time (or machine init time if you don't use MESS image core)
 */
 int strataflash_init(running_machine *machine, int id)
 {
@@ -97,7 +97,7 @@ int strataflash_init(running_machine *machine, int id)
 }
 
 /*
-	load the FEEPROM contents from file
+    load the FEEPROM contents from file
 */
 int strataflash_load(int id, mame_file *file)
 {
@@ -147,7 +147,7 @@ int strataflash_load(int id, mame_file *file)
 }
 
 /*
-	save the FEEPROM contents to file
+    save the FEEPROM contents to file
 */
 int strataflash_save(int id, mame_file *file)
 {
@@ -166,7 +166,7 @@ int strataflash_save(int id, mame_file *file)
 		return 1;
 
 	/* chip state: lower boot block lockout, higher boot block lockout,
-	software data protect */
+    software data protect */
 	buf = strata[id].master_lock;
 	if (mame_fwrite(file, & buf, 1) != 1)
 		return 1;
@@ -214,7 +214,7 @@ typedef enum bus_width_t
 } bus_width_t;
 
 /*
-	read a 8/16-bit word from FEEPROM
+    read a 8/16-bit word from FEEPROM
 */
 static int strataflash_r(int id, offs_t offset, bus_width_t bus_width)
 {
@@ -294,11 +294,11 @@ static int strataflash_r(int id, offs_t offset, bus_width_t bus_width)
 			}
 			return 0;	// default case
 		/*case 0x03: // master lock config
-			if (strata[id].flash_master_lock)
-				return 1;
-			else
-				return 0;
-		*/
+            if (strata[id].flash_master_lock)
+                return 1;
+            else
+                return 0;
+        */
 
 		/* CFI query identification string */
 		case 0x10:
@@ -410,7 +410,7 @@ static int strataflash_r(int id, offs_t offset, bus_width_t bus_width)
 }
 
 /*
-	write a 8/16-bit word to FEEPROM
+    write a 8/16-bit word to FEEPROM
 */
 static void strataflash_w(int id, offs_t offset, int data, bus_width_t bus_width)
 {
@@ -656,7 +656,7 @@ static void strataflash_w(int id, offs_t offset, int data, bus_width_t bus_width
 }
 
 /*
-	read a 8-bit word from FEEPROM
+    read a 8-bit word from FEEPROM
 */
 UINT8 strataflash_8_r(int id, offs_t offset)
 {
@@ -664,7 +664,7 @@ UINT8 strataflash_8_r(int id, offs_t offset)
 }
 
 /*
-	write a 8-bit word to FEEPROM
+    write a 8-bit word to FEEPROM
 */
 void strataflash_8_w(int id, offs_t offset, UINT8 data)
 {
@@ -672,7 +672,7 @@ void strataflash_8_w(int id, offs_t offset, UINT8 data)
 }
 
 /*
-	read a 16-bit word from FEEPROM
+    read a 16-bit word from FEEPROM
 */
 UINT16 strataflash_16_r(int id, offs_t offset)
 {
@@ -680,7 +680,7 @@ UINT16 strataflash_16_r(int id, offs_t offset)
 }
 
 /*
-	write a 16-bit word to FEEPROM
+    write a 16-bit word to FEEPROM
 */
 void strataflash_16_w(int id, offs_t offset, UINT16 data)
 {

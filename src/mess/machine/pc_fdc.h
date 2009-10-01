@@ -1,6 +1,6 @@
 /**********************************************************************
 
-	PC-style floppy disk controller emulation
+    PC-style floppy disk controller emulation
 
 **********************************************************************/
 
@@ -25,9 +25,9 @@
 
 /* main interface */
 struct pc_fdc_interface
-{	
+{
 	void (*pc_fdc_interrupt)(running_machine*,int);
-	void (*pc_fdc_dma_drq)(running_machine*,int,int);	
+	void (*pc_fdc_dma_drq)(running_machine*,int,int);
 	const device_config *(*get_image)(running_machine*, int floppy_index);
 	const device_config *(*get_device)(running_machine*);
 };

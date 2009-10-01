@@ -1,8 +1,8 @@
 /***************************************************************************
 
-	machine/nec765.h
+    machine/nec765.h
 
-	Functions to emulate a NEC765/Intel 8272 compatible floppy disk controller
+    Functions to emulate a NEC765/Intel 8272 compatible floppy disk controller
 
 ***************************************************************************/
 
@@ -52,9 +52,9 @@ typedef struct nec765_interface
 
 	/* image lookup */
 	nec765_get_image_func get_image;
-	
+
 	NEC765_RDY_PIN rdy_pin;
-	
+
 	const char *floppy_drive_tags[4];
 } nec765_interface;
 

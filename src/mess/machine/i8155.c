@@ -9,9 +9,9 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- strobed mode
+    - strobed mode
 
 */
 
@@ -330,7 +330,7 @@ READ8_DEVICE_HANDLER( i8155_r )
 WRITE8_DEVICE_HANDLER( i8155_w )
 {
 	i8155_t *i8155 = get_safe_token(device);
-	
+
 	switch (offset & 0x07)
 	{
 	case I8155_REGISTER_COMMAND:

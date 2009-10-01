@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	ap2_slot.c
+    ap2_slot.c
 
-	Implementation of Apple II device slots
+    Implementation of Apple II device slots
 
 *********************************************************************/
 
@@ -63,7 +63,7 @@ const device_config *apple2_slot(running_machine *machine, int slotnum)
 
 	assert((slotnum >= 0) && (slotnum <= 7));
 	snprintf(buffer, ARRAY_LENGTH(buffer), "slot_%d", slotnum);
-	
+
 	return devtag_get_device(machine, buffer);
 }
 
@@ -71,7 +71,7 @@ const device_config *apple2_slot(running_machine *machine, int slotnum)
 
 /*-------------------------------------------------
     DEVICE_START(apple2_slot) - device start
-	function
+    function
 -------------------------------------------------*/
 
 static DEVICE_START(apple2_slot)
@@ -135,7 +135,7 @@ WRITE8_DEVICE_HANDLER(apple2_slot_w)
 
 /*-------------------------------------------------
     DEVICE_GET_INFO(apple2_slot) - device get info
-	function
+    function
 -------------------------------------------------*/
 
 DEVICE_GET_INFO(apple2_slot)

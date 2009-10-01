@@ -1,77 +1,77 @@
 /*********************************************************************
 
-	tc8521.h
+    tc8521.h
 
-	Toshiba TC8251 Real Time Clock code
+    Toshiba TC8251 Real Time Clock code
 
-	(or RICOH RF5C01A)
+    (or RICOH RF5C01A)
 
-	Registers:
+    Registers:
 
-		Page 0/Mode 0 (timer):
+        Page 0/Mode 0 (timer):
 
-		0x00: 1-second counter
-		0x01: 10-second counter
-		0x02: 1-minute counter
-		0x03: 10-minute counter
-		0x04: 1-hour counter
-		0x05: 10-hour counter
-		0x06: day-of-the-week counter
-		0x07: 1-day counter
-		0x08: 10-day counter
-		0x09: 1-month counter
-		0x0A: 10-month counter
-		0x0b: 1-year counter
-		0x0c: 10-year counter
+        0x00: 1-second counter
+        0x01: 10-second counter
+        0x02: 1-minute counter
+        0x03: 10-minute counter
+        0x04: 1-hour counter
+        0x05: 10-hour counter
+        0x06: day-of-the-week counter
+        0x07: 1-day counter
+        0x08: 10-day counter
+        0x09: 1-month counter
+        0x0A: 10-month counter
+        0x0b: 1-year counter
+        0x0c: 10-year counter
 
-		Page 1/Mode 1 (alarm):
-		0x00: unused
-		0x01: unused
-		0x02: 1-minute alarm
-		0x03: 10-minute alarm
-		0x04: 1-hour alarm
-		0x05: 10-hour alarm
-		0x06: day-of-the-week alarm
-		0x07: 1-day alarm
-		0x08: 10-day alarm
-		0x09: unused
-		0x0a: 12/24 hour select register
-		0x0b: leap year counter
-		0x0c: unused
+        Page 1/Mode 1 (alarm):
+        0x00: unused
+        0x01: unused
+        0x02: 1-minute alarm
+        0x03: 10-minute alarm
+        0x04: 1-hour alarm
+        0x05: 10-hour alarm
+        0x06: day-of-the-week alarm
+        0x07: 1-day alarm
+        0x08: 10-day alarm
+        0x09: unused
+        0x0a: 12/24 hour select register
+        0x0b: leap year counter
+        0x0c: unused
 
-		Page 2/Mode 2 (ram block 1) and
-		Page 3/Mode 3 (ram block 2):
-		0x00: ram
-		0x01: ram
-		0x02: ram
-		0x03: ram
-		0x04: ram
-		0x05: ram
-		0x06: ram
-		0x07: ram
-		0x08: ram
-		0x09: ram
-		0x0a: ram
-		0x0b: ram
-		0x0c: ram
+        Page 2/Mode 2 (ram block 1) and
+        Page 3/Mode 3 (ram block 2):
+        0x00: ram
+        0x01: ram
+        0x02: ram
+        0x03: ram
+        0x04: ram
+        0x05: ram
+        0x06: ram
+        0x07: ram
+        0x08: ram
+        0x09: ram
+        0x0a: ram
+        0x0b: ram
+        0x0c: ram
 
 
-		registers common to all modes:
+        registers common to all modes:
 
-		0x0d: MODE register
-			bit 3: timer enable
-			bit 2: alarm enable
-			bit 1,0: mode/page select
-		0x0e: test register
-			bit 3: test 3
-			bit 2: test 2
-			bit 1: test 1
-			bit 0: test 0
-		0x0f: RESET etc
-			bit 3: 1 Hz enable
-			bit 2: 16 Hz enable
-			bit 1: timer reset
-			bit 0: alarm reset
+        0x0d: MODE register
+            bit 3: timer enable
+            bit 2: alarm enable
+            bit 1,0: mode/page select
+        0x0e: test register
+            bit 3: test 3
+            bit 2: test 2
+            bit 1: test 1
+            bit 0: test 0
+        0x0f: RESET etc
+            bit 3: 1 Hz enable
+            bit 2: 16 Hz enable
+            bit 1: timer reset
+            bit 0: alarm reset
 
 *********************************************************************/
 
@@ -179,7 +179,7 @@ static const UINT8 rtc_write_masks[16*4]=
 
 /*-------------------------------------------------
     tc8521_load_stream - read tc8521 data from
-	supplied file
+    supplied file
 -------------------------------------------------*/
 
 void tc8521_load_stream(const device_config *device, mame_file *file)
@@ -198,7 +198,7 @@ void tc8521_load_stream(const device_config *device, mame_file *file)
 
 /*-------------------------------------------------
     tc8521_save_stream - write tc8521 data to
-	supplied file
+    supplied file
 -------------------------------------------------*/
 
 void tc8521_save_stream(const device_config *device, mame_file *file)

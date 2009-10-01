@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	Philips PCF8593 CMOS clock/calendar circuit
+    Philips PCF8593 CMOS clock/calendar circuit
 
-	(c) 2001-2007 Tim Schuerewegen
+    (c) 2001-2007 Tim Schuerewegen
 
 *********************************************************************/
 

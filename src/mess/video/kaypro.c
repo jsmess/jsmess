@@ -14,26 +14,26 @@ static UINT16 mem,x,cursor,mc6845_video_address;
 
 /***********************************************************
 
-	Video
+    Video
 
 ************************************************************/
 
 PALETTE_INIT( kaypro )
 {
 	palette_set_color(machine, 0, RGB_BLACK); /* black */
-	palette_set_color(machine, 1, MAKE_RGB(0, 220, 0)); /* green */	
-	palette_set_color(machine, 2, MAKE_RGB(0, 110, 0)); /* low intensity green */	
+	palette_set_color(machine, 1, MAKE_RGB(0, 220, 0)); /* green */
+	palette_set_color(machine, 2, MAKE_RGB(0, 110, 0)); /* low intensity green */
 }
 
 VIDEO_UPDATE( kayproii )
 {
 /* The display consists of 80 columns and 24 rows. Each row is allocated 128 bytes of ram,
-	but only the first 80 are used. The total video ram therefore is 0x0c00 bytes.
-	There is one video attribute: bit 7 causes blinking. The first half of the
-	character generator is blank, with the visible characters in the 2nd half.
-	During the "off" period of blanking, the first half is used. Only 5 pixels are
-	connected from the rom to the shift register, the remaining pixels are held high.
-	A high pixel is black and a low pixel is green. */
+    but only the first 80 are used. The total video ram therefore is 0x0c00 bytes.
+    There is one video attribute: bit 7 causes blinking. The first half of the
+    character generator is blank, with the visible characters in the 2nd half.
+    During the "off" period of blanking, the first half is used. Only 5 pixels are
+    connected from the rom to the shift register, the remaining pixels are held high.
+    A high pixel is black and a low pixel is green. */
 
 	static UINT8 framecnt=0;
 	UINT8 y,ra,chr,gfx;
@@ -133,16 +133,16 @@ VIDEO_UPDATE( kaypro2x )
 }
 
 /* bit 6 of kaypro2x_system_port selects alternate characters (A12 on character generator rom).
-	The diagram specifies a 2732 with 28 pins, and more address pins. Possibly a 2764 or 27128.
-	Since our dump only goes up to A11, the alternate character set doesn't exist.
+    The diagram specifies a 2732 with 28 pins, and more address pins. Possibly a 2764 or 27128.
+    Since our dump only goes up to A11, the alternate character set doesn't exist.
 
-	0000-07FF of videoram is memory-mapped characters; 0800-0FFF is equivalent attribute bytes.
-	d3 Underline
-	d2 blinking (at unknown rate)
-	d1 low intensity
-	d0 reverse video
+    0000-07FF of videoram is memory-mapped characters; 0800-0FFF is equivalent attribute bytes.
+    d3 Underline
+    d2 blinking (at unknown rate)
+    d1 low intensity
+    d0 reverse video
 
-	Not sure how the attributes interact, for example does an underline blink? */
+    Not sure how the attributes interact, for example does an underline blink? */
 
 
 MC6845_UPDATE_ROW( kaypro2x_update_row )
@@ -152,7 +152,7 @@ MC6845_UPDATE_ROW( kaypro2x_update_row )
 	for (x = 0; x < x_count; x++)				// for each character
 	{
 		UINT8 inv=0;
-		//		if (x == cursor_x) inv=0xff;	/* uncomment when mame fixed */
+		//      if (x == cursor_x) inv=0xff;    /* uncomment when mame fixed */
 		mem = (ma + x) & 0x7ff;
 		chr = videoram[mem];
 		attr = videoram[mem | 0x800];
@@ -217,10 +217,10 @@ static void mc6845_cursor_configure(void)
 	UINT8 i,curs_type=0,r9,r10,r11;
 
 	/* curs_type holds the general cursor shape to be created
-		0 = no cursor
-		1 = partial cursor (only shows on a block of scan lines)
-		2 = full cursor
-		3 = two-part cursor (has a part at the top and bottom with the middle blank) */
+        0 = no cursor
+        1 = partial cursor (only shows on a block of scan lines)
+        2 = full cursor
+        3 = two-part cursor (has a part at the top and bottom with the middle blank) */
 
 	for ( i = 0; i < ARRAY_LENGTH(mc6845_cursor); i++) mc6845_cursor[i] = 0;		// prepare cursor by erasing old one
 
@@ -247,7 +247,7 @@ static void mc6845_cursor_configure(void)
 }
 
 /* Resize the screen within the limits of the hardware. Expand the image to fill the screen area.
-	Standard screen is 640 x 400 = 0x7d0 bytes. */
+    Standard screen is 640 x 400 = 0x7d0 bytes. */
 
 static void mc6845_screen_configure(running_machine *machine)
 {

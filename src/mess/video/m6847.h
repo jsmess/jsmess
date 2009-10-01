@@ -2,7 +2,7 @@
 
     m6847.h
 
-	Implementation of Motorola 6847 video hardware chip
+    Implementation of Motorola 6847 video hardware chip
 
 **********************************************************************/
 

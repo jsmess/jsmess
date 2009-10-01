@@ -21,9 +21,9 @@ READ8_DEVICE_HANDLER(z1013_z80pio_r)
 
 WRITE8_DEVICE_HANDLER(z1013_z80pio_w)
 {
-	if ((offset & 1) ==0) 
-		z80pio_d_w(device, offset >> 1, data); 
-	else 
+	if ((offset & 1) ==0)
+		z80pio_d_w(device, offset >> 1, data);
+	else
 		z80pio_c_w(device, offset >> 1, data);
 }
 
@@ -44,7 +44,7 @@ WRITE8_HANDLER(z1013_keyboard_w) {
 }
 
 static READ8_DEVICE_HANDLER (z1013_port_b_r)
-{	
+{
 	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3",
 		"LINE4", "LINE5", "LINE6", "LINE7" };
 	UINT8 data = input_port_read(device->machine, keynames[z1013_keyboard_line & 7]);
@@ -71,7 +71,7 @@ const z80pio_interface z1013_z80pio_intf =
 };
 
 static READ8_DEVICE_HANDLER (z1013k7659_port_b_r)
-{	
+{
 	return 0xff;
 }
 
@@ -79,7 +79,7 @@ const z80pio_interface z1013k7659_z80pio_intf =
 {
 	DEVCB_NULL,	/* callback when change interrupt status */
 	DEVCB_NULL,
-	DEVCB_HANDLER(z1013k7659_port_b_r),	
+	DEVCB_HANDLER(z1013k7659_port_b_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -98,7 +98,7 @@ SNAPSHOT_LOAD( z1013 )
 	runaddr   = data[4] + data[5]*256;
 	if (data[12]!='C') return INIT_FAIL;
 	if (data[13]!=0xD3 || data[14]!=0xD3 || data[14]!=0xD3) return INIT_FAIL;
-		
+
 	memcpy (memory_get_read_ptr(cputag_get_address_space(image->machine, "maincpu", ADDRESS_SPACE_PROGRAM),  startaddr ),
 		 data+0x20, endaddr - startaddr + 1);
 

@@ -1,19 +1,19 @@
 /*
-	Handlers for ti99 disk images
+    Handlers for ti99 disk images
 
-	We support the following types of image:
-	* floppy disks ("DSK format") in v9t9, pc99 and old mess image format
-	* hard disks ("WIN format") in MAME harddisk format (256-byte sectors only,
-	  i.e. no SCSI)
-	Files are extracted in TIFILES format.  There is a compile-time option to
-	extract text files in flat format instead, but I need to re-implement it
-	properly (using filters comes to mind).
+    We support the following types of image:
+    * floppy disks ("DSK format") in v9t9, pc99 and old mess image format
+    * hard disks ("WIN format") in MAME harddisk format (256-byte sectors only,
+      i.e. no SCSI)
+    Files are extracted in TIFILES format.  There is a compile-time option to
+    extract text files in flat format instead, but I need to re-implement it
+    properly (using filters comes to mind).
 
-	Raphael Nabet, 2002-2004
+    Raphael Nabet, 2002-2004
 
-	TODO:
-	- finish and test hd support ***test sibling FDR support***
-	- check allocation bitmap against corruption when an image is opened
+    TODO:
+    - finish and test hd support ***test sibling FDR support***
+    - check allocation bitmap against corruption when an image is opened
 */
 
 #include <limits.h>
@@ -28,226 +28,226 @@
 #include "imghd.h"
 
 /*
-	Concepts shared by both disk structures:
-	----------------------------------------
+    Concepts shared by both disk structures:
+    ----------------------------------------
 
-	In both formats, the entire disk surface is split into physical records,
-	each 256-byte-long.  For best efficiency, the sector size is usually 256
-	bytes so that one sector is equivalent to a physical record (this is true
-	with floppies and HFDC hard disks).  If the sector size is not 256 bytes
-	(e.g. 512 bytes with SCSI hard disks, possibly 128 bytes on a TI-99
-	simulator running on TI-990), sectors are grouped or split to form 256-byte
-	physical records.  Physical records are numbered from 0, with the first
-	starting on sector 0 track 0.  To avoid confusion with physical records in
-	files, such physical records will be called "absolute physical records",
-	abbreviated as "absolute physrecs" or "aphysrecs".
+    In both formats, the entire disk surface is split into physical records,
+    each 256-byte-long.  For best efficiency, the sector size is usually 256
+    bytes so that one sector is equivalent to a physical record (this is true
+    with floppies and HFDC hard disks).  If the sector size is not 256 bytes
+    (e.g. 512 bytes with SCSI hard disks, possibly 128 bytes on a TI-99
+    simulator running on TI-990), sectors are grouped or split to form 256-byte
+    physical records.  Physical records are numbered from 0, with the first
+    starting on sector 0 track 0.  To avoid confusion with physical records in
+    files, such physical records will be called "absolute physical records",
+    abbreviated as "absolute physrecs" or "aphysrecs".
 
-	Disk space is allocated in units referred to as AUs.  Each AU represents an
-	integral number of 256-byte physical records.  The number of physrecs per
-	AU varies depending on the disk format and size.  AUs are numbered from 0,
-	with the first starting with absolute physrec 0.
+    Disk space is allocated in units referred to as AUs.  Each AU represents an
+    integral number of 256-byte physical records.  The number of physrecs per
+    AU varies depending on the disk format and size.  AUs are numbered from 0,
+    with the first starting with absolute physrec 0.
 
-	Absolute physrec 0 contains a 256-byte record with volume information,
-	which is called "Volume Information Block", abbreviated as "vib".
+    Absolute physrec 0 contains a 256-byte record with volume information,
+    which is called "Volume Information Block", abbreviated as "vib".
 
-	To keep track of which areas on the disk are allocated and which are free,
-	disk managers maintain a bit map of allocated AUs (called "allocation
-	bitmap", abbreviated as "abm").  Each bit in the allocation bitmap
-	represents an AU: if a bit is 0, the AU is free; if a bit is 1, the AU is
-	allocated (or possibly bad if the disk manager can track bad sectors).
-	Where on the disk the abm is located depends on the disk structure (see
-	structure-specific description for details).
+    To keep track of which areas on the disk are allocated and which are free,
+    disk managers maintain a bit map of allocated AUs (called "allocation
+    bitmap", abbreviated as "abm").  Each bit in the allocation bitmap
+    represents an AU: if a bit is 0, the AU is free; if a bit is 1, the AU is
+    allocated (or possibly bad if the disk manager can track bad sectors).
+    Where on the disk the abm is located depends on the disk structure (see
+    structure-specific description for details).
 
-	Files are implemented as a succession of 256-byte physical records.  To
-	avoid confusion with absolute physical records, these physical records will
-	be called "file physical records", abbreviated as "file physrecs" or
-	"fphysrecs".
+    Files are implemented as a succession of 256-byte physical records.  To
+    avoid confusion with absolute physical records, these physical records will
+    be called "file physical records", abbreviated as "file physrecs" or
+    "fphysrecs".
 
-	Programs do normally not access file physical records directly.  They may
-	call high-level file routines that enable to create either fixed-lenght
-	logical records of any size from 1 through 255, or variable-lenght records
-	of any size from 0 through 254: logical records are grouped by file
-	managers into 256-byte physical records.  Some disk managers (HFDC and
-	SCSI) allow programs to create fixed-lenght records larger than 255 bytes,
-	too, but few programs use this possibility.  Additionally, program files
-	can be created: program files do not implement any logical record, and can
-	be seen as a flat byte stream, not unlike files under MSDOS, UNIX and the C
-	standard library.  (Unfortunately, the API for program files lacks
-	flexibility, and most programs that need to process a flat byte stream
-	will use fixed-size records of 128 bytes.)
+    Programs do normally not access file physical records directly.  They may
+    call high-level file routines that enable to create either fixed-lenght
+    logical records of any size from 1 through 255, or variable-lenght records
+    of any size from 0 through 254: logical records are grouped by file
+    managers into 256-byte physical records.  Some disk managers (HFDC and
+    SCSI) allow programs to create fixed-lenght records larger than 255 bytes,
+    too, but few programs use this possibility.  Additionally, program files
+    can be created: program files do not implement any logical record, and can
+    be seen as a flat byte stream, not unlike files under MSDOS, UNIX and the C
+    standard library.  (Unfortunately, the API for program files lacks
+    flexibility, and most programs that need to process a flat byte stream
+    will use fixed-size records of 128 bytes.)
 
-		Fixed-length records (reclen < 256) are grouped like this:
-			  fphysrec 0        fphysrec 1
-			_______________   _______________
-			|R0 |R1 |R2 |X|   |R3 |R4 |R5 |X|
-			---------------   ---------------
-			            \_/               \_/
-			           unused            unused
-			      (size < reclen)   (size < reclen)
+        Fixed-length records (reclen < 256) are grouped like this:
+              fphysrec 0        fphysrec 1
+            _______________   _______________
+            |R0 |R1 |R2 |X|   |R3 |R4 |R5 |X|
+            ---------------   ---------------
+                        \_/               \_/
+                       unused            unused
+                  (size < reclen)   (size < reclen)
 
-		Fixed-length records (reclen > 256) are grouped like this:
-			  fphysrec 0         fphysrec 1         fphysrec 2          fphysrec 3      ...
-			_________________  _________________  _________________   _________________
-			|  R0 (#0-255)  |  | R0 (#256-511) |  |R0 (#512-end)|X|   |  R1 (#0-255)  |   ...
-			-----------------  -----------------  -----------------   -----------------
-			                                                    \_/
-			                                                   unused
+        Fixed-length records (reclen > 256) are grouped like this:
+              fphysrec 0         fphysrec 1         fphysrec 2          fphysrec 3      ...
+            _________________  _________________  _________________   _________________
+            |  R0 (#0-255)  |  | R0 (#256-511) |  |R0 (#512-end)|X|   |  R1 (#0-255)  |   ...
+            -----------------  -----------------  -----------------   -----------------
+                                                                \_/
+                                                               unused
 
-		Variable lenght records are grouped like this:
-			                 fphysrec 0:
-			byte:
-			        ------------------------------
-			      0 |l0 = lenght of record 0 data|
-			        |----------------------------|
-			      1 |                            |
-			        |                            |
-			      : |       record 0 data        |
-			        |                            |
-			     l0 |                            |
-			        |----------------------------|
-			   l0+1 |l1 = lenght of record 1 data|
-			        |----------------------------|
-			   l0+2 |                            |
-			        |                            |
-			      : |       record 1 data        |
-			        |                            |
-			l0+l1+1 |                            |
-			        |----------------------------|
-			      : :                            :
-			      : :                            :
-			        |----------------------------|
-			      n |lm = lenght of record m data|
-			        |----------------------------|
-			    n+1 |                            |
-			        |                            |
-			      : |       record m data        |
-			        |                            |
-			   n+lm |                            |
-			        |----------------------------|
-			 n+lm+1 |>ff: EOR mark               |
-			        |----------------------------|
-			 n+lm+2 |                            |
-			        |                            |
-			      : |           unused           |
-			      : |(we should have size < lm+1)|
-			        |                            |
-			    255 |                            |
-			        ------------------------------
+        Variable lenght records are grouped like this:
+                             fphysrec 0:
+            byte:
+                    ------------------------------
+                  0 |l0 = lenght of record 0 data|
+                    |----------------------------|
+                  1 |                            |
+                    |                            |
+                  : |       record 0 data        |
+                    |                            |
+                 l0 |                            |
+                    |----------------------------|
+               l0+1 |l1 = lenght of record 1 data|
+                    |----------------------------|
+               l0+2 |                            |
+                    |                            |
+                  : |       record 1 data        |
+                    |                            |
+            l0+l1+1 |                            |
+                    |----------------------------|
+                  : :                            :
+                  : :                            :
+                    |----------------------------|
+                  n |lm = lenght of record m data|
+                    |----------------------------|
+                n+1 |                            |
+                    |                            |
+                  : |       record m data        |
+                    |                            |
+               n+lm |                            |
+                    |----------------------------|
+             n+lm+1 |>ff: EOR mark               |
+                    |----------------------------|
+             n+lm+2 |                            |
+                    |                            |
+                  : |           unused           |
+                  : |(we should have size < lm+1)|
+                    |                            |
+                255 |                            |
+                    ------------------------------
 
-			                 fphysrec 1:
-			byte:
-			        ------------------------------
-			      0 |lm+1=lenght of record 0 data|
-			        |----------------------------|
-			      1 |                            |
-			        |                            |
-			      : |      record m+1 data       |
-			        |                            |
-			   lm+1 |                            |
-			        |----------------------------|
-			      : :                            :
-			      : :                            :
+                             fphysrec 1:
+            byte:
+                    ------------------------------
+                  0 |lm+1=lenght of record 0 data|
+                    |----------------------------|
+                  1 |                            |
+                    |                            |
+                  : |      record m+1 data       |
+                    |                            |
+               lm+1 |                            |
+                    |----------------------------|
+                  : :                            :
+                  : :                            :
 
-			I think the EOR mark is not required if all 256 bytes of a physical
-			record are used by logical records.
-
-
-	All files are associated with a "file descriptor record" ("fdr") that holds
-	file information (name, format, length) and points to the data AUs. The WIN
-	disk structure also supports sibling FDRs, in case a file is so fragmented
-	that all the data pointers cannot fit in one FDR; the DSK disk structure
-	does not implement any such feature, and you may be unable to append data
-	to an existing file if it is too fragmented, even though the disk is not
-	full.
+            I think the EOR mark is not required if all 256 bytes of a physical
+            record are used by logical records.
 
 
-	DSK disk structure:
-	-------------------
-
-	The DSK disk structure is used for floppy disks, and a few RAMDISKs as
-	well.  It supports 1600 AUs and 16 MBytes at most (the 16 MByte value is a
-	theorical maximum, as I doubt anyone has ever created so big a DSK volume).
-
-	The disk sector size is always 256 bytes (the only potential exceptions are
-	the SCSI floppy disk units and the TI-99 simulator on TI-990, but I don't
-	know anything about either).
-
-	For some reason, the number of physrecs per AU is always a power of 2.
-	Originally, AUs always were one physical record each.  However, since the
-	allocation bitmap cannot support more than 1600 AUs, disks larger than
-	400kbytes need to have several physical records per AU.  Note that
-	relatively few disk controllers implement AUs that span multiple physical
-	records (IIRC, these are Myarc's HFDC, SCSI DSR with floppy disk interface,
-	and some upgraded Myarc and Corcomp DD floppy controllers).
-
-	The allocation bitmap is located in the VIB.  It is 200 bytes long, and
-	supports 1600 AUs at most.
-
-	Directories are implemented with a "File Descriptor Index Record" (FDIR)
-	for each directory.  The FDIR is array of 0 through 128 words, containing
-	the aphysrec address of each fdr in the directory, sorted by ascending file
-	name, terminated with a 0.  Note that, while we should be prepared to read
-	images images with 128 entries, I think (not 100% sure) that we should
-	write no more than 127 for compatibility with some existing disk managers.
-
-	Originally, the DSK structure only supported one directory level (i.e. the
-	root directory level).  The FDIR record for the root directory is always
-	located in aphysrec 1.  Moreover, Myarc extended the DSK structure to
-	support up to 3 subdirectories in the root directory (note that there is no
-	support for more subdirs, or for subdirs located in subdirs).  To do so,
-	they used an unused field of the VIB to hold the 10-char name of each
-	directory and the aphysrec address of the associated FDIR record.
-
-	aphysrec 0: Volume Information Block (VIB): see below
-	aphysrec 1: FDIR for root directory
-	Remaining AUs are used for fdr and data (and subdirectory FDIR if
-	applicable).  There is one FDIR record per directory; the FDIR points to
-	the FDR for each file in the directory.  The FDR (File Descriptor Record)
-	contains the file information (name, format, lenght, pointers to data
-	physrecs/AUs, etc).
+    All files are associated with a "file descriptor record" ("fdr") that holds
+    file information (name, format, length) and points to the data AUs. The WIN
+    disk structure also supports sibling FDRs, in case a file is so fragmented
+    that all the data pointers cannot fit in one FDR; the DSK disk structure
+    does not implement any such feature, and you may be unable to append data
+    to an existing file if it is too fragmented, even though the disk is not
+    full.
 
 
-	WIN disk structure:
-	-------------------
+    DSK disk structure:
+    -------------------
 
-	The WIN disk structure is used for hard disks.  It supports 65535 AUs and
-	256 MBytes at most.
+    The DSK disk structure is used for floppy disks, and a few RAMDISKs as
+    well.  It supports 1600 AUs and 16 MBytes at most (the 16 MByte value is a
+    theorical maximum, as I doubt anyone has ever created so big a DSK volume).
 
-	The disk sector size is 256 bytes on HFDC, 512 bytes on SCSI.  512-byte
-	sectors are split into 256-byte physical records.
+    The disk sector size is always 256 bytes (the only potential exceptions are
+    the SCSI floppy disk units and the TI-99 simulator on TI-990, but I don't
+    know anything about either).
 
-	We may have from 1 through 16 physrecs per AUs.  Since we cannot have more
-	than 65535 AUs, we need to have several physical records per AU in disks
-	larger than 16 Mbytes.
+    For some reason, the number of physrecs per AU is always a power of 2.
+    Originally, AUs always were one physical record each.  However, since the
+    allocation bitmap cannot support more than 1600 AUs, disks larger than
+    400kbytes need to have several physical records per AU.  Note that
+    relatively few disk controllers implement AUs that span multiple physical
+    records (IIRC, these are Myarc's HFDC, SCSI DSR with floppy disk interface,
+    and some upgraded Myarc and Corcomp DD floppy controllers).
 
-	Contrary to the DSK disk structure, the WIN disk structure supports
-	hierarchic subdirectories, with a limit of 114 subdirectories and 127 files
-	per directory.  Each directory is associated with both a "Directory
-	Descriptor Record" (DDR) and a "File Descriptor Index Record" (FDIR).  The
-	only exception is the root directory, which uses the VIB instead of a DDR
-	(the VIB includes all the important fields of the DDR).  The DDR contains
-	some directory info (name, number of files and subdirectories directly
-	enclosed in the directory, AU address of the FDIR of the parent directory,
-	etc), the AU address of the associated FDIR, and the AU address of the DDR
-	of up to 114 subdirectories, sorted by ascending directory name.  The WIN
-	FDIR is similar to, yet different from, the DSK FDIR: it contains up to 127
-	(vs. 128) AU address (vs. aphysrec address) of each fdr in the directory,
-	sorted by ascending file name.  Additionally, it includes the AU address of
-	the associated DDR.
+    The allocation bitmap is located in the VIB.  It is 200 bytes long, and
+    supports 1600 AUs at most.
 
-	When a file has more than 54 data fragments, the disk manager creates
-	sibling FDRs that hold additional fragments.  (Sibling FDRs are called
-	offspring FDRs in most existing documentation, but I prefer "sibling FDRs"
-	as "offspring FDRs" wrongly suggests a directory-like hierarchy.
-	Incidentally, I cannot really figure out why they chose to duplicate the
-	FDR rather than create a file extension record, but there must be a
-	reason.)  Note that sibling FDRs usually fill unused physrecs in the AU
-	allocated for the eldest FDR, and a new AU is allocated for new sibling
-	FDRs only when the first AU is full.
+    Directories are implemented with a "File Descriptor Index Record" (FDIR)
+    for each directory.  The FDIR is array of 0 through 128 words, containing
+    the aphysrec address of each fdr in the directory, sorted by ascending file
+    name, terminated with a 0.  Note that, while we should be prepared to read
+    images images with 128 entries, I think (not 100% sure) that we should
+    write no more than 127 for compatibility with some existing disk managers.
 
-	aphysrec 0: Volume Information Block (VIB): see below
-	aphysrec 1-n (where n = 1+SUP(number_of_AUs/2048)): Volume bitmap
-	Remaining AUs are used for ddr, fdir, fdr and data.
+    Originally, the DSK structure only supported one directory level (i.e. the
+    root directory level).  The FDIR record for the root directory is always
+    located in aphysrec 1.  Moreover, Myarc extended the DSK structure to
+    support up to 3 subdirectories in the root directory (note that there is no
+    support for more subdirs, or for subdirs located in subdirs).  To do so,
+    they used an unused field of the VIB to hold the 10-char name of each
+    directory and the aphysrec address of the associated FDIR record.
+
+    aphysrec 0: Volume Information Block (VIB): see below
+    aphysrec 1: FDIR for root directory
+    Remaining AUs are used for fdr and data (and subdirectory FDIR if
+    applicable).  There is one FDIR record per directory; the FDIR points to
+    the FDR for each file in the directory.  The FDR (File Descriptor Record)
+    contains the file information (name, format, lenght, pointers to data
+    physrecs/AUs, etc).
+
+
+    WIN disk structure:
+    -------------------
+
+    The WIN disk structure is used for hard disks.  It supports 65535 AUs and
+    256 MBytes at most.
+
+    The disk sector size is 256 bytes on HFDC, 512 bytes on SCSI.  512-byte
+    sectors are split into 256-byte physical records.
+
+    We may have from 1 through 16 physrecs per AUs.  Since we cannot have more
+    than 65535 AUs, we need to have several physical records per AU in disks
+    larger than 16 Mbytes.
+
+    Contrary to the DSK disk structure, the WIN disk structure supports
+    hierarchic subdirectories, with a limit of 114 subdirectories and 127 files
+    per directory.  Each directory is associated with both a "Directory
+    Descriptor Record" (DDR) and a "File Descriptor Index Record" (FDIR).  The
+    only exception is the root directory, which uses the VIB instead of a DDR
+    (the VIB includes all the important fields of the DDR).  The DDR contains
+    some directory info (name, number of files and subdirectories directly
+    enclosed in the directory, AU address of the FDIR of the parent directory,
+    etc), the AU address of the associated FDIR, and the AU address of the DDR
+    of up to 114 subdirectories, sorted by ascending directory name.  The WIN
+    FDIR is similar to, yet different from, the DSK FDIR: it contains up to 127
+    (vs. 128) AU address (vs. aphysrec address) of each fdr in the directory,
+    sorted by ascending file name.  Additionally, it includes the AU address of
+    the associated DDR.
+
+    When a file has more than 54 data fragments, the disk manager creates
+    sibling FDRs that hold additional fragments.  (Sibling FDRs are called
+    offspring FDRs in most existing documentation, but I prefer "sibling FDRs"
+    as "offspring FDRs" wrongly suggests a directory-like hierarchy.
+    Incidentally, I cannot really figure out why they chose to duplicate the
+    FDR rather than create a file extension record, but there must be a
+    reason.)  Note that sibling FDRs usually fill unused physrecs in the AU
+    allocated for the eldest FDR, and a new AU is allocated for new sibling
+    FDRs only when the first AU is full.
+
+    aphysrec 0: Volume Information Block (VIB): see below
+    aphysrec 1-n (where n = 1+SUP(number_of_AUs/2048)): Volume bitmap
+    Remaining AUs are used for ddr, fdir, fdr and data.
 */
 
 /* Since string length is encoded with a byte, the maximum length of a string
@@ -265,7 +265,7 @@ will accept paths of such lenght). */
 #endif
 
 /*
-	Miscellaneous utilities that are used to handle TI data types
+    Miscellaneous utilities that are used to handle TI data types
 */
 
 typedef struct UINT16BE
@@ -301,10 +301,10 @@ INLINE void set_UINT16LE(UINT16LE *word, UINT16 data)
 }
 
 /*
-	Convert a C string to a 10-character file name (padded with spaces if necessary)
+    Convert a C string to a 10-character file name (padded with spaces if necessary)
 
-	dst (O): destination 10-character array
-	src (I): source C string
+    dst (O): destination 10-character array
+    src (I): source C string
 */
 static void str_to_fname(char dst[10], const char *src)
 {
@@ -330,11 +330,11 @@ static void str_to_fname(char dst[10], const char *src)
 }
 
 /*
-	Convert a 10-character file name to a C string (removing trailing spaces if necessary)
+    Convert a 10-character file name to a C string (removing trailing spaces if necessary)
 
-	dst (O): destination C string
-	src (I): source 10-character array
-	n (I): lenght of dst buffer (string may be truncated if less than 11)
+    dst (O): destination C string
+    src (I): source 10-character array
+    n (I): lenght of dst buffer (string may be truncated if less than 11)
 */
 static void fname_to_str(char *dst, const char src[10], int n)
 {
@@ -363,11 +363,11 @@ static void fname_to_str(char *dst, const char src[10], int n)
 }
 
 /*
-	Check a 10-character file name.
+    Check a 10-character file name.
 
-	filename (I): 10-character array with file name
+    filename (I): 10-character array with file name
 
-	Return non-zero if the file name is invalid.
+    Return non-zero if the file name is invalid.
 */
 static int check_fname(const char filename[10])
 {
@@ -387,13 +387,13 @@ static int check_fname(const char filename[10])
 			return 1;
 		case ' ':
 			/* illegal in a file name, but file names shorter than 10
-			characters are padded with spaces */
+            characters are padded with spaces */
 			space_found_flag = TRUE;
 			break;
 		default:
 			/* all other characters are legal (though non-ASCII characters,
-			control characters and even lower-case characters are not
-			recommended) */
+            control characters and even lower-case characters are not
+            recommended) */
 			if (space_found_flag)
 				return 1;
 			break;
@@ -404,11 +404,11 @@ static int check_fname(const char filename[10])
 }
 
 /*
-	Check a file path.
+    Check a file path.
 
-	fpath (I): C string with file path
+    fpath (I): C string with file path
 
-	Return non-zero if the file path is invalid.
+    Return non-zero if the file path is invalid.
 */
 static int check_fpath(const char *fpath)
 {
@@ -417,7 +417,7 @@ static int check_fpath(const char *fpath)
 
 
 	/* first check that the path is not too long and that there is no space
-	character */
+    character */
 	if ((strlen(fpath) > MAX_PATH_LEN) || strchr(fpath, ' '))
 		return 1;
 
@@ -448,15 +448,15 @@ static int check_fpath(const char *fpath)
 #endif
 
 /*
-	Level 1 deals with accessing the disk hardware (in our case, the raw disk
-	image).
+    Level 1 deals with accessing the disk hardware (in our case, the raw disk
+    image).
 
-	Higher level routines will only know the disk as a succession of
-	256-byte-long physical records addressed by a linear address.
+    Higher level routines will only know the disk as a succession of
+    256-byte-long physical records addressed by a linear address.
 */
 
 /*
-	Disk geometry
+    Disk geometry
 */
 typedef struct ti99_geometry
 {
@@ -466,7 +466,7 @@ typedef struct ti99_geometry
 } ti99_geometry;
 
 /*
-	Physical sector address
+    Physical sector address
 */
 typedef struct ti99_sector_address
 {
@@ -476,7 +476,7 @@ typedef struct ti99_sector_address
 } ti99_sector_address;
 
 /*
-	Time stamp (used in fdr, and WIN VIB/DDR)
+    Time stamp (used in fdr, and WIN VIB/DDR)
 */
 typedef struct ti99_date_time
 {
@@ -485,9 +485,9 @@ typedef struct ti99_date_time
 } ti99_date_time;
 
 /*
-	Subdirectory descriptor (HFDC only)
+    Subdirectory descriptor (HFDC only)
 
-	The HFDC supports up to 3 subdirectories.
+    The HFDC supports up to 3 subdirectories.
 */
 typedef struct dsk_subdir
 {
@@ -496,10 +496,10 @@ typedef struct dsk_subdir
 } dsk_subdir;
 
 /*
-	DSK VIB record
+    DSK VIB record
 
-	Most fields in this record are only revelant to level 2 routines, but level
-	1 routines need the disk geometry information extracted from the VIB.
+    Most fields in this record are only revelant to level 2 routines, but level
+    1 routines need the disk geometry information extracted from the VIB.
 */
 typedef struct dsk_vib
 {
@@ -540,7 +540,7 @@ typedef enum
 } ti99_img_format;
 
 /*
-	level-1 disk image descriptor
+    level-1 disk image descriptor
 */
 typedef struct ti99_lvl1_imgref
 {
@@ -553,11 +553,11 @@ typedef struct ti99_lvl1_imgref
 } ti99_lvl1_imgref;
 
 /*
-	calculate CRC for data address marks or sector data
+    calculate CRC for data address marks or sector data
 
-	crc (I/O): current CRC value to be updated (initialize to 0xffff before
-		calling this function for the first time)
-	value: new byte of data to update the CRC with
+    crc (I/O): current CRC value to be updated (initialize to 0xffff before
+        calling this function for the first time)
+    value: new byte of data to update the CRC with
 */
 static void calc_crc(UINT16 *crc, UINT8 value)
 {
@@ -582,18 +582,18 @@ static void calc_crc(UINT16 *crc, UINT8 value)
 }
 
 /*
-	Parse a PC99 disk image
+    Parse a PC99 disk image
 
-	file_handle (I/O): imgtool file handle
-	fm_format (I): if true, the image is in FM format, otherwise it is in MFM
-		format
-	pass (I): 0 for first pass, 1 for second pass
-	vib (O): buffer where the vib should be stored (first pass)
-	geometry (O): disk image geometry (second pass)
-	data_offset_array (O): array of data offset to generate (second pass)
-	out_track_len (O): track lenght is returned there
+    file_handle (I/O): imgtool file handle
+    fm_format (I): if true, the image is in FM format, otherwise it is in MFM
+        format
+    pass (I): 0 for first pass, 1 for second pass
+    vib (O): buffer where the vib should be stored (first pass)
+    geometry (O): disk image geometry (second pass)
+    data_offset_array (O): array of data offset to generate (second pass)
+    out_track_len (O): track lenght is returned there
 
-	Return imgtool error code
+    Return imgtool error code
 */
 #define MAX_TRACK_LEN 6872
 #define DATA_OFFSET_NONE 0xffffffff
@@ -763,7 +763,7 @@ static int parse_pc99_image(imgtool_stream *file_handle, int fm_format, int pass
 
 			/* CRC seems to be completely hosed */
 			/*if (crc)
-				printf("aargh!");*/
+                printf("aargh!");*/
 			if ((seclen != 256) || (crc1 != 0xf7) || (crc2 != 0xf7)
 					|| (cylinder != expected_cylinder) || (head != expected_head)
 					|| ((pass == 1) && ((cylinder >= geometry->cylinders)
@@ -861,7 +861,7 @@ static int parse_pc99_image(imgtool_stream *file_handle, int fm_format, int pass
 
 			/* CRC seems to be completely hosed */
 			/*if (crc)
-				printf("aargh!");*/
+                printf("aargh!");*/
 			if ((crc1 != 0xf7) || (crc2 != 0xf7))
 				continue;
 
@@ -912,15 +912,15 @@ static int parse_pc99_image(imgtool_stream *file_handle, int fm_format, int pass
 
 
 /*
-	Read the volume information block (aphysrec 0) assuming no geometry
-	information.  (Called when an image is opened to figure out the
-	geometry information.)
+    Read the volume information block (aphysrec 0) assuming no geometry
+    information.  (Called when an image is opened to figure out the
+    geometry information.)
 
-	file_handle (I/O): imgtool file handle
-	img_format (I): image format (MESS, V9T9 or PC99)
-	dest (O): pointer to 256-byte destination buffer
+    file_handle (I/O): imgtool file handle
+    img_format (I): image format (MESS, V9T9 or PC99)
+    dest (O): pointer to 256-byte destination buffer
 
-	Return imgtool error code
+    Return imgtool error code
 */
 static int read_image_vib_no_geometry(imgtool_stream *file_handle, ti99_img_format img_format, dsk_vib *dest)
 {
@@ -953,14 +953,14 @@ static int read_image_vib_no_geometry(imgtool_stream *file_handle, ti99_img_form
 }
 
 /*
-	Open a disk image at level 1
+    Open a disk image at level 1
 
-	file_handle (I/O): imgtool file handle
-	img_format (I): image format (MESS, V9T9, PC99, or MAME harddisk)
-	l1_img (O): level-1 image handle
-	vib (O): buffer where the vib should be stored (floppy images only)
+    file_handle (I/O): imgtool file handle
+    img_format (I): image format (MESS, V9T9, PC99, or MAME harddisk)
+    l1_img (O): level-1 image handle
+    vib (O): buffer where the vib should be stored (floppy images only)
 
-	Return imgtool error code
+    Return imgtool error code
 */
 static imgtoolerr_t open_image_lvl1(imgtool_stream *file_handle, ti99_img_format img_format, ti99_lvl1_imgref *l1_img, dsk_vib *vib)
 {
@@ -992,8 +992,8 @@ static imgtoolerr_t open_image_lvl1(imgtool_stream *file_handle, ti99_img_format
 
 		/* read vib */
 		/*reply = read_absolute_physrec(l1_img, 0, vib);
-		if (reply)
-			return reply;*/
+        if (reply)
+            return reply;*/
 	}
 	else
 	{
@@ -1008,17 +1008,17 @@ static imgtoolerr_t open_image_lvl1(imgtool_stream *file_handle, ti99_img_format
 		l1_img->geometry.secspertrack = vib->secspertrack;
 		if (l1_img->geometry.secspertrack == 0)
 			/* Some images might be like this, because the original SSSD TI
-			controller always assumes 9. */
+            controller always assumes 9. */
 			l1_img->geometry.secspertrack = 9;
 		l1_img->geometry.cylinders = vib->cylinders;
 		if (l1_img->geometry.cylinders == 0)
 			/* Some images are like this, because the original SSSD TI
-			controller always assumes 40. */
+            controller always assumes 40. */
 			l1_img->geometry.cylinders = 40;
 		l1_img->geometry.heads = vib->heads;
 		if (l1_img->geometry.heads == 0)
 			/* Some images are like this, because the original SSSD TI
-			controller always assumes that tracks beyond 40 are on side 2. */
+            controller always assumes that tracks beyond 40 are on side 2. */
 			l1_img->geometry.heads = totphysrecs / (l1_img->geometry.secspertrack * l1_img->geometry.cylinders);
 
 		/* check information */
@@ -1047,11 +1047,11 @@ static imgtoolerr_t open_image_lvl1(imgtool_stream *file_handle, ti99_img_format
 }
 
 /*
-	Close a disk image at level 1
+    Close a disk image at level 1
 
-	l1_img (I/O): level-1 image handle
+    l1_img (I/O): level-1 image handle
 
-	Return imgtool error code
+    Return imgtool error code
 */
 static void close_image_lvl1(ti99_lvl1_imgref *l1_img)
 {
@@ -1067,13 +1067,13 @@ static void close_image_lvl1(ti99_lvl1_imgref *l1_img)
 }
 
 /*
-	Convert physical sector address to offset in disk image (old MESS and V9T9
-	formats only)
+    Convert physical sector address to offset in disk image (old MESS and V9T9
+    formats only)
 
-	l1_img (I/O): level-1 image handle
-	address (I): physical sector address
+    l1_img (I/O): level-1 image handle
+    address (I): physical sector address
 
-	Return offset in image
+    Return offset in image
 */
 INLINE int sector_address_to_image_offset(const ti99_lvl1_imgref *l1_img, const ti99_sector_address *address)
 {
@@ -1108,13 +1108,13 @@ INLINE int sector_address_to_image_offset(const ti99_lvl1_imgref *l1_img, const 
 }
 
 /*
-	Read one 256-byte sector from a disk image
+    Read one 256-byte sector from a disk image
 
-	l1_img (I/O): level-1 image handle
-	address (I): physical sector address
-	dest (O): pointer to 256-byte destination buffer
+    l1_img (I/O): level-1 image handle
+    address (I): physical sector address
+    dest (O): pointer to 256-byte destination buffer
 
-	Return non-zero on error
+    Return non-zero on error
 */
 static int read_sector(ti99_lvl1_imgref *l1_img, const ti99_sector_address *address, void *dest)
 {
@@ -1188,13 +1188,13 @@ static int read_sector(ti99_lvl1_imgref *l1_img, const ti99_sector_address *addr
 }
 
 /*
-	Write one 256-byte sector to a disk image
+    Write one 256-byte sector to a disk image
 
-	l1_img (I/O): level-1 image handle
-	address (I): physical sector address
-	src (I): pointer to 256-byte source buffer
+    l1_img (I/O): level-1 image handle
+    address (I): physical sector address
+    src (I): pointer to 256-byte source buffer
 
-	Return non-zero on error
+    Return non-zero on error
 */
 static int write_sector(ti99_lvl1_imgref *l1_img, const ti99_sector_address *address, const void *src)
 {
@@ -1268,11 +1268,11 @@ static int write_sector(ti99_lvl1_imgref *l1_img, const ti99_sector_address *add
 }
 
 /*
-	Convert physical record address to sector address (DSK format)
+    Convert physical record address to sector address (DSK format)
 
-	aphysrec (I): absolute physrec address
-	geometry (I): disk image geometry
-	address (O): physical sector address
+    aphysrec (I): absolute physrec address
+    geometry (I): disk image geometry
+    address (O): physical sector address
 */
 static void dsk_aphysrec_to_sector_address(int aphysrec, const ti99_geometry *geometry, ti99_sector_address *address)
 {
@@ -1286,30 +1286,30 @@ static void dsk_aphysrec_to_sector_address(int aphysrec, const ti99_geometry *ge
 }
 
 /*
-	Convert physical record address to sector address (WIN format for HFDC)
+    Convert physical record address to sector address (WIN format for HFDC)
 
-	Note that physical address translation makes sense for HFDC, but not SCSI.
+    Note that physical address translation makes sense for HFDC, but not SCSI.
 
-	aphysrec (I): absolute physrec address
-	geometry (I): disk image geometry
-	address (O): physical sector address
+    aphysrec (I): absolute physrec address
+    geometry (I): disk image geometry
+    address (O): physical sector address
 */
 /*static void win_aphysrec_to_sector_address(int aphysrec, const ti99_geometry *geometry, ti99_sector_address *address)
 {
-	address.sector = aphysrec % l1_img->geometry.secspertrack;
-	aphysrec /= l1_img->geometry.secspertrack;
-	address.side = aphysrec % l1_img->geometry.heads;
-	address.cylinder = aphysrec / l1_img->geometry.heads;
+    address.sector = aphysrec % l1_img->geometry.secspertrack;
+    aphysrec /= l1_img->geometry.secspertrack;
+    address.side = aphysrec % l1_img->geometry.heads;
+    address.cylinder = aphysrec / l1_img->geometry.heads;
 }*/
 
 /*
-	Read one 256-byte physical record from a disk image
+    Read one 256-byte physical record from a disk image
 
-	l1_img (I/O): level-1 image handle
-	aphysrec (I): absolute physrec address
-	dest (O): pointer to 256-byte destination buffer
+    l1_img (I/O): level-1 image handle
+    aphysrec (I): absolute physrec address
+    dest (O): pointer to 256-byte destination buffer
 
-	Return non-zero on error
+    Return non-zero on error
 */
 static int read_absolute_physrec(ti99_lvl1_imgref *l1_img, unsigned aphysrec, void *dest)
 {
@@ -1320,7 +1320,7 @@ static int read_absolute_physrec(ti99_lvl1_imgref *l1_img, unsigned aphysrec, vo
 	{
 		/*win_aphysrec_to_sector_address(aphysrec, & l1_img->geometry, & address);
 
-		return read_sector(l1_img, & address, dest);*/
+        return read_sector(l1_img, & address, dest);*/
 
 		return imghd_read(&l1_img->harddisk_handle, aphysrec, dest) != IMGTOOLERR_SUCCESS;
 	}
@@ -1333,13 +1333,13 @@ static int read_absolute_physrec(ti99_lvl1_imgref *l1_img, unsigned aphysrec, vo
 }
 
 /*
-	Write one 256-byte physical record to a disk image
+    Write one 256-byte physical record to a disk image
 
-	l1_img (I/O): level-1 image handle
-	aphysrec (I): absolute physrec address
-	src (I): pointer to 256-byte source buffer
+    l1_img (I/O): level-1 image handle
+    aphysrec (I): absolute physrec address
+    src (I): pointer to 256-byte source buffer
 
-	Return non-zero on error
+    Return non-zero on error
 */
 static int write_absolute_physrec(ti99_lvl1_imgref *l1_img, unsigned aphysrec, const void *src)
 {
@@ -1350,7 +1350,7 @@ static int write_absolute_physrec(ti99_lvl1_imgref *l1_img, unsigned aphysrec, c
 	{
 		/*win_aphysrec_to_sector_address(aphysrec, & l1_img->geometry, & address);
 
-		return write_sector(l1_img, & address, dest);*/
+        return write_sector(l1_img, & address, dest);*/
 
 		return imghd_write(&l1_img->harddisk_handle, aphysrec, src) != IMGTOOLERR_SUCCESS;
 	}
@@ -1368,13 +1368,13 @@ static int write_absolute_physrec(ti99_lvl1_imgref *l1_img, unsigned aphysrec, c
 #endif
 
 /*
-	Level 2 implements files as a succession of 256-byte-long physical records.
+    Level 2 implements files as a succession of 256-byte-long physical records.
 
-	Level 2 implements allocation bitmap (and AU), disk catalog, etc.
+    Level 2 implements allocation bitmap (and AU), disk catalog, etc.
 */
 
 /*
-	WIN VIB/DDR record
+    WIN VIB/DDR record
 */
 typedef struct win_vib_ddr
 {
@@ -1432,7 +1432,7 @@ typedef struct win_vib_ddr
 } win_vib_ddr;
 
 /*
-	AU format
+    AU format
 */
 typedef struct ti99_AUformat
 {
@@ -1441,13 +1441,13 @@ typedef struct ti99_AUformat
 } ti99_AUformat;
 
 /*
-	DSK directory reference: 0 for root, 1 for 1st subdir, 2 for 2nd subdir, 3
-	for 3rd subdir
+    DSK directory reference: 0 for root, 1 for 1st subdir, 2 for 2nd subdir, 3
+    for 3rd subdir
 */
 /*typedef int dir_ref;*/
 
 /*
-	catalog entry (used for in-memory catalog)
+    catalog entry (used for in-memory catalog)
 */
 typedef struct dir_entry
 {
@@ -1472,14 +1472,14 @@ typedef struct ti99_catalog
 } ti99_catalog;
 
 /*
-	level-2 disk image descriptor
+    level-2 disk image descriptor
 */
 typedef struct ti99_lvl2_imgref_dsk
 {
 	UINT16 totphysrecs;				/* total number of aphysrecs (extracted from vib record in aphysrec 0) */
 	ti99_catalog catalogs[4];		/* catalog of root directory and up to 3 subdirectories */
 	UINT16 fdir_aphysrec[4];		/* fdir aphysrec address for root directory
-										and up to 3 subdirectories */
+                                        and up to 3 subdirectories */
 } ti99_lvl2_imgref_dsk;
 
 typedef struct ti99_lvl2_imgref_win
@@ -1496,21 +1496,21 @@ typedef struct ti99_lvl2_imgref
 	ti99_lvl1_imgref l1_img;/* image format, imgtool image handle, image geometry */
 	ti99_AUformat AUformat;	/* AU format */
 	int data_offset;		/* In order to reduce seek times when searching the
-								disk for a given file name, fdr (and ddr, and
-								fdir) records are preferentially allocated in
-								AUs n to data_offset, whereas data records are
-								preferentially allocated in AUs starting at
-								data_offset. */
+                                disk for a given file name, fdr (and ddr, and
+                                fdir) records are preferentially allocated in
+                                AUs n to data_offset, whereas data records are
+                                preferentially allocated in AUs starting at
+                                data_offset. */
 							/* With the DSK disk structure, n is always 2 (if 1
-								physrec per AU) or 1 (if 2 physrecs per AU or
-								more), and data_offset is arbitrarily chosen as
-								34. */
+                                physrec per AU) or 1 (if 2 physrecs per AU or
+                                more), and data_offset is arbitrarily chosen as
+                                34. */
 							/* With the WIN disk structure, n depends on the
-								size of the volume bitmap, which itself depends
-								on the number of AUs on disk (we always have n
-								<= 33), and data_offset is read from the vib
-								record (except with the obsolete v1 VIB, where
-								we use a default value of 64). */
+                                size of the volume bitmap, which itself depends
+                                on the number of AUs on disk (we always have n
+                                <= 33), and data_offset is read from the vib
+                                record (except with the obsolete v1 VIB, where
+                                we use a default value of 64). */
 	char vol_name[10];		/* cached volume name (extracted from vib record in aphysrec 0) */
 
 	UINT8 abm[8192];		/* allocation bitmap */
@@ -1529,20 +1529,20 @@ typedef struct ti99_lvl2_imgref
 } ti99_lvl2_imgref;
 
 /*
-	file flags found in fdr (and tifiles)
+    file flags found in fdr (and tifiles)
 */
 enum
 {
 	fdr99_f_program	= 0x01,	/* set for program files */
 	fdr99_f_int		= 0x02,	/* set for binary files */
 	fdr99_f_wp		= 0x08,	/* set if file is write-protected */
-	/*fdr99_f_backup	= 0x10,*/	/* set if file has been modified since last backup */
-	/*fdr99_f_dskimg	= 0x20,*/	/* set if file is a DSK image (HFDC HD only) */
+	/*fdr99_f_backup    = 0x10,*/	/* set if file has been modified since last backup */
+	/*fdr99_f_dskimg    = 0x20,*/	/* set if file is a DSK image (HFDC HD only) */
 	fdr99_f_var		= 0x80	/* set if file uses variable-length records*/
 };
 
 /*
-	DSK FDR record
+    DSK FDR record
 */
 typedef struct dsk_fdr
 {
@@ -1588,7 +1588,7 @@ typedef struct dsk_fdr
 } dsk_fdr;
 
 /*
-	WIN FDR record
+    WIN FDR record
 */
 typedef struct win_fdr
 {
@@ -1650,7 +1650,7 @@ typedef struct win_fdr
 } win_fdr;
 
 /*
-	tifile header: stand-alone file
+    tifile header: stand-alone file
 */
 typedef struct tifile_header
 {
@@ -1690,7 +1690,7 @@ typedef struct tifile_header
 } tifile_header;
 
 /*
-	level-2 file descriptor
+    level-2 file descriptor
 */
 typedef struct ti99_lvl2_fileref_dsk
 {
@@ -1733,7 +1733,7 @@ typedef struct ti99_lvl2_fileref
 
 
 /*
-	Compare two (possibly empty) catalog entry for qsort
+    Compare two (possibly empty) catalog entry for qsort
 */
 static int cat_file_compare_qsort(const void *p1, const void *p2)
 {
@@ -1766,13 +1766,13 @@ static int cat_dir_compare_qsort(const void *p1, const void *p2)
 }
 
 /*
-	Read a directory catalog from disk image
+    Read a directory catalog from disk image
 
-	l2_img: image reference
-	aphysrec: physical record address of the FDIR
-	dest: pointer to the destination buffer where the catalog should be written
+    l2_img: image reference
+    aphysrec: physical record address of the FDIR
+    dest: pointer to the destination buffer where the catalog should be written
 
-	Return an error code if there was an error, 0 otherwise.
+    Return an error code if there was an error, 0 otherwise.
 */
 static int dsk_read_catalog(ti99_lvl2_imgref *l2_img, int aphysrec, ti99_catalog *dest)
 {
@@ -1837,13 +1837,13 @@ static int dsk_read_catalog(ti99_lvl2_imgref *l2_img, int aphysrec, ti99_catalog
 }
 
 /*
-	Read a directory catalog from disk image
+    Read a directory catalog from disk image
 
-	l2_img: image reference
-	DDR_AU: AU address of the VIB/DDR
-	dest: pointer to the destination buffer where the catalog should be written
+    l2_img: image reference
+    DDR_AU: AU address of the VIB/DDR
+    dest: pointer to the destination buffer where the catalog should be written
 
-	Return an error code if there was an error, 0 otherwise.
+    Return an error code if there was an error, 0 otherwise.
 */
 static int win_read_catalog(ti99_lvl2_imgref *l2_img, int DDR_AU, ti99_catalog *dest)
 {
@@ -1958,15 +1958,15 @@ static int win_read_catalog(ti99_lvl2_imgref *l2_img, int DDR_AU, ti99_catalog *
 }
 
 /*
-	Search for a file path on a floppy image
+    Search for a file path on a floppy image
 
-	l2_img: image reference
-	fpath: path of the file to search
-	parent_ref_valid: set to TRUE if either the file was found or the file was
-		not found but its parent dir was
-	parent_ref: reference to parent dir (0 for root)
-	out_is_dir: TRUE if element is a directory
-	catalog_index: on output, index of file catalog entry (may be NULL)
+    l2_img: image reference
+    fpath: path of the file to search
+    parent_ref_valid: set to TRUE if either the file was found or the file was
+        not found but its parent dir was
+    parent_ref: reference to parent dir (0 for root)
+    out_is_dir: TRUE if element is a directory
+    catalog_index: on output, index of file catalog entry (may be NULL)
 */
 static int dsk_find_catalog_entry(ti99_lvl2_imgref *l2_img, const char *fpath, int *parent_ref_valid, int *parent_ref, int *out_is_dir, int *catalog_index)
 {
@@ -2057,16 +2057,16 @@ static int dsk_find_catalog_entry(ti99_lvl2_imgref *l2_img, const char *fpath, i
 }
 
 /*
-	Search for a file path on a harddisk image
+    Search for a file path on a harddisk image
 
-	l2_img: image reference
-	fpath: path of the file to search
-	parent_ref_valid: set to TRUE if either the file was found or the file was
-		not found but its parent dir was
-	parent_ddr_AU: parent DDR AU address (0 for root)
-	parent_catalog: catalog of parent dir (cannot be NULL)
-	out_is_dir: TRUE if element is a directory
-	catalog_index: on output, index of file catalog entry (may be NULL)
+    l2_img: image reference
+    fpath: path of the file to search
+    parent_ref_valid: set to TRUE if either the file was found or the file was
+        not found but its parent dir was
+    parent_ddr_AU: parent DDR AU address (0 for root)
+    parent_catalog: catalog of parent dir (cannot be NULL)
+    out_is_dir: TRUE if element is a directory
+    catalog_index: on output, index of file catalog entry (may be NULL)
 */
 static int win_find_catalog_entry(ti99_lvl2_imgref *l2_img, const char *fpath,
 									int *parent_ref_valid, int *parent_ddr_AU, ti99_catalog *parent_catalog,
@@ -2163,10 +2163,10 @@ static int win_find_catalog_entry(ti99_lvl2_imgref *l2_img, const char *fpath,
 }
 
 /*
-	Allocate one AU on disk, for use as a fdr record
+    Allocate one AU on disk, for use as a fdr record
 
-	l2_img: image reference
-	fdr_AU: on output, address of allocated AU
+    l2_img: image reference
+    fdr_AU: on output, address of allocated AU
 */
 static int alloc_fdr_AU(ti99_lvl2_imgref *l2_img, unsigned *fdr_AU)
 {
@@ -2282,7 +2282,7 @@ INLINE unsigned get_win_fdr_cursibFDR_basefphysrec(win_fdr *fdr)
 }
 
 /*
-	Advance to next sibling FDR
+    Advance to next sibling FDR
 */
 static int win_goto_next_sibFDR(ti99_lvl2_fileref_win *win_file)
 {
@@ -2297,7 +2297,7 @@ static int win_goto_next_sibFDR(ti99_lvl2_fileref_win *win_file)
 }
 
 /*
-	Back to previous sibling FDR
+    Back to previous sibling FDR
 */
 static int win_goto_prev_sibFDR(ti99_lvl2_fileref_win *win_file)
 {
@@ -2312,9 +2312,9 @@ static int win_goto_prev_sibFDR(ti99_lvl2_fileref_win *win_file)
 }
 
 /*
-	Append a new sibling FDR at the end of the sibling FDR list, and open it.
+    Append a new sibling FDR at the end of the sibling FDR list, and open it.
 
-	You must have gone to the end of the list.
+    You must have gone to the end of the list.
 */
 static int win_alloc_sibFDR(ti99_lvl2_fileref_win *win_file)
 {
@@ -2377,10 +2377,10 @@ static int win_alloc_sibFDR(ti99_lvl2_fileref_win *win_file)
 }
 
 /*
-	Extend a file with nb_alloc_physrecs extra physrecs
+    Extend a file with nb_alloc_physrecs extra physrecs
 
-	dsk_file: file reference
-	nb_alloc_physrecs: number of physical records to allocate
+    dsk_file: file reference
+    nb_alloc_physrecs: number of physical records to allocate
 */
 static int dsk_alloc_file_physrecs(ti99_lvl2_fileref_dsk *dsk_file, int nb_alloc_physrecs)
 {
@@ -2565,10 +2565,10 @@ static int dsk_alloc_file_physrecs(ti99_lvl2_fileref_dsk *dsk_file, int nb_alloc
 }
 
 /*
-	Extend a file with nb_alloc_physrecs extra physrecs
+    Extend a file with nb_alloc_physrecs extra physrecs
 
-	win_file: file reference
-	nb_alloc_physrecs: number of physical records to allocate
+    win_file: file reference
+    nb_alloc_physrecs: number of physical records to allocate
 */
 static int win_alloc_file_physrecs(ti99_lvl2_fileref_win *win_file, int nb_alloc_physrecs)
 {
@@ -2607,7 +2607,7 @@ static int win_alloc_file_physrecs(ti99_lvl2_fileref_win *win_file, int nb_alloc
 	}
 	if ((get_UINT16BE(win_file->curfdr.clusters[0][0]) == 0) && (get_UINT16BE(win_file->curfdr.prevsibFDR_AU) != 0))
 	{	/* this is annoying: we have found a sibling FDR filled with 0s: rewind
-		to last non-empty sibling if applicable */
+        to last non-empty sibling if applicable */
 		errorcode = win_goto_prev_sibFDR(win_file);
 		if (errorcode)
 			return errorcode;
@@ -2782,7 +2782,7 @@ static int win_alloc_file_physrecs(ti99_lvl2_fileref_win *win_file, int nb_alloc
 }
 
 /*
-	Allocate a new (empty) file
+    Allocate a new (empty) file
 */
 static int new_file_lvl2_dsk(ti99_lvl2_imgref *l2_img, int parent_ref, char filename[10], ti99_lvl2_fileref *l2_file)
 {
@@ -2796,9 +2796,9 @@ static int new_file_lvl2_dsk(ti99_lvl2_imgref *l2_img, int parent_ref, char file
 	if (catalog->num_files >= 127)
 		/* if num_files == 128, catalog is full */
 		/* if num_files == 127, catalog is not full, but we don't want to write
-		a 128th entry for compatibility with some existing DSRs that detect the
-		end of the FDIR array with a 0 entry (and do not check that the index
-		has not reached 128) */
+        a 128th entry for compatibility with some existing DSRs that detect the
+        end of the FDIR array with a 0 entry (and do not check that the index
+        has not reached 128) */
 		return IMGTOOLERR_NOSPACE;
 
 	/* find insertion point in catalog */
@@ -2840,7 +2840,7 @@ static int new_file_lvl2_dsk(ti99_lvl2_imgref *l2_img, int parent_ref, char file
 }
 
 /*
-	Allocate a new (empty) file
+    Allocate a new (empty) file
 */
 static int new_file_lvl2_win(ti99_lvl2_imgref *l2_img, ti99_catalog *parent_catalog, char filename[10], ti99_lvl2_fileref *l2_file)
 {
@@ -2894,7 +2894,7 @@ static int new_file_lvl2_win(ti99_lvl2_imgref *l2_img, ti99_catalog *parent_cata
 }
 
 /*
-	Allocate a new (empty) file
+    Allocate a new (empty) file
 */
 static int new_file_lvl2_tifiles(imgtool_stream *file_handle, ti99_lvl2_fileref *l2_file)
 {
@@ -2915,11 +2915,11 @@ static int new_file_lvl2_tifiles(imgtool_stream *file_handle, ti99_lvl2_fileref 
 }
 
 /*
-	Open an existing file on a floppy image
+    Open an existing file on a floppy image
 
-	l2_img: level 2 image the file is located on
-	fpath: access path to the file
-	file: set up if open is successful
+    l2_img: level 2 image the file is located on
+    fpath: access path to the file
+    file: set up if open is successful
 */
 static int open_file_lvl2_dsk(ti99_lvl2_imgref *l2_img, const char *fpath, ti99_lvl2_fileref *l2_file)
 {
@@ -2945,11 +2945,11 @@ static int open_file_lvl2_dsk(ti99_lvl2_imgref *l2_img, const char *fpath, ti99_
 }
 
 /*
-	Open an existing file on a harddisk image
+    Open an existing file on a harddisk image
 
-	l2_img: level 2 image the file is located on
-	fpath: access path to the file
-	file: set up if open is successful
+    l2_img: level 2 image the file is located on
+    fpath: access path to the file
+    file: set up if open is successful
 */
 static int open_file_lvl2_win(ti99_lvl2_imgref *l2_img, const char *fpath, ti99_lvl2_fileref *l2_file)
 {
@@ -2975,8 +2975,8 @@ static int open_file_lvl2_win(ti99_lvl2_imgref *l2_img, const char *fpath, ti99_
 
 	/* check integrity of FDR sibling chain */
 	/* note that as we check that the back chain is consistent with the forward
-	chain, we will also detect any cycle in the sibling chain, so we do not
-	need to check against them explicitely */
+    chain, we will also detect any cycle in the sibling chain, so we do not
+    need to check against them explicitely */
 	if (get_UINT16BE(l2_file->u.win.curfdr.prevsibFDR_AU) != 0)
 		return IMGTOOLERR_CORRUPTIMAGE;
 
@@ -3014,7 +3014,7 @@ static int open_file_lvl2_win(ti99_lvl2_imgref *l2_img, const char *fpath, ti99_
 			for (; i<54; i++)
 			{
 				/*set_UINT16BE(&cur_fdr->clusters[i][0], 0);
-				set_UINT16BE(&cur_fdr->clusters[i][1], 0);*/
+                set_UINT16BE(&cur_fdr->clusters[i][1], 0);*/
 				if ((get_UINT16BE(cur_fdr->clusters[i][0]) != 0) || (get_UINT16BE(cur_fdr->clusters[i][1]) != 0))
 					return IMGTOOLERR_CORRUPTIMAGE;
 			}
@@ -3070,7 +3070,7 @@ static int open_file_lvl2_win(ti99_lvl2_imgref *l2_img, const char *fpath, ti99_
 }
 
 /*
-	Open an existing file in TIFILES format
+    Open an existing file in TIFILES format
 */
 static int open_file_lvl2_tifiles(imgtool_stream *file_handle, ti99_lvl2_fileref *l2_file)
 {
@@ -3089,9 +3089,9 @@ static int open_file_lvl2_tifiles(imgtool_stream *file_handle, ti99_lvl2_fileref
 }
 
 /*
-	compute the aphysrec address for a given file physical record (fphysrec)
+    compute the aphysrec address for a given file physical record (fphysrec)
 
-	l2_img: image where the file is located
+    l2_img: image where the file is located
 */
 static int dsk_fphysrec_to_aphysrec(ti99_lvl2_fileref_dsk *dsk_file, unsigned fphysrec, unsigned *aphysrec)
 {
@@ -3127,9 +3127,9 @@ static int dsk_fphysrec_to_aphysrec(ti99_lvl2_fileref_dsk *dsk_file, unsigned fp
 }
 
 /*
-	compute the aphysrec address for a given file physical record (fphysrec)
+    compute the aphysrec address for a given file physical record (fphysrec)
 
-	l2_img: image where the file is located
+    l2_img: image where the file is located
 */
 static int win_fphysrec_to_aphysrec(ti99_lvl2_fileref_win *win_file, unsigned fphysrec, unsigned *aphysrec)
 {
@@ -3196,7 +3196,7 @@ static int win_fphysrec_to_aphysrec(ti99_lvl2_fileref_win *win_file, unsigned fp
 }
 
 /*
-	read a 256-byte physical record from a file
+    read a 256-byte physical record from a file
 */
 static int read_file_physrec(ti99_lvl2_fileref *l2_file, unsigned fphysrec, void *dest)
 {
@@ -3239,7 +3239,7 @@ static int read_file_physrec(ti99_lvl2_fileref *l2_file, unsigned fphysrec, void
 }
 
 /*
-	read a 256-byte physical record from a file
+    read a 256-byte physical record from a file
 */
 static int write_file_physrec(ti99_lvl2_fileref *l2_file, unsigned fphysrec, const void *src)
 {
@@ -3282,27 +3282,27 @@ static int write_file_physrec(ti99_lvl2_fileref *l2_file, unsigned fphysrec, con
 }
 
 /*
-	Write a field in every fdr record associated to a file
+    Write a field in every fdr record associated to a file
 */
 /*static int set_win_fdr_field(ti99_lvl2_fileref *l2_file, size_t offset, size_t size, void *data)
 {
-	win_fdr fdr_buf;
-	unsigned fdr_aphysrec;
-	int errorcode = 0;
+    win_fdr fdr_buf;
+    unsigned fdr_aphysrec;
+    int errorcode = 0;
 
-	for (fdr_aphysrec = l2_file->u.win.eldestfdr_aphysrec;
-			fdr_aphysrec && ((errorcode = (read_absolute_physrec(&l2_file->u.win.l2_img->l1_img, fdr_aphysrec, &fdr_buf) ? IMGTOOLERR_READERROR : 0)) == 0);
-			fdr_aphysrec = get_win_fdr_nextsibFDR_physrec(l2_file->u.win.l2_img, &fdr_buf))
-	{
-		memcpy(((UINT8 *) &fdr_buf) + offset, data, size);
-		if (write_absolute_physrec(&l2_file->u.win.l2_img->l1_img, fdr_aphysrec, &fdr_buf))
-		{
-			errorcode = IMGTOOLERR_WRITEERROR;
-			break;
-		}
-	}
+    for (fdr_aphysrec = l2_file->u.win.eldestfdr_aphysrec;
+            fdr_aphysrec && ((errorcode = (read_absolute_physrec(&l2_file->u.win.l2_img->l1_img, fdr_aphysrec, &fdr_buf) ? IMGTOOLERR_READERROR : 0)) == 0);
+            fdr_aphysrec = get_win_fdr_nextsibFDR_physrec(l2_file->u.win.l2_img, &fdr_buf))
+    {
+        memcpy(((UINT8 *) &fdr_buf) + offset, data, size);
+        if (write_absolute_physrec(&l2_file->u.win.l2_img->l1_img, fdr_aphysrec, &fdr_buf))
+        {
+            errorcode = IMGTOOLERR_WRITEERROR;
+            break;
+        }
+    }
 
-	return errorcode;
+    return errorcode;
 }*/
 
 static UINT8 get_file_flags(ti99_lvl2_fileref *l2_file)
@@ -3673,12 +3673,12 @@ static void current_date_time(ti99_date_time *reply)
 #endif
 
 /*
-	Level 3 implements files as a succession of logical records.
+    Level 3 implements files as a succession of logical records.
 
-	There are three types of files:
-	* program files that are not implemented at level 3 (no logical record)
-	* files with fixed-size records (random-access files)
-	* files with variable-size records (sequential-access)
+    There are three types of files:
+    * program files that are not implemented at level 3 (no logical record)
+    * files with fixed-size records (random-access files)
+    * files with variable-size records (sequential-access)
 */
 
 typedef struct ti99_lvl3_fileref
@@ -3692,10 +3692,10 @@ typedef struct ti99_lvl3_fileref
 
 #ifdef UNUSED_FUNCTION
 /*
-	Open a file on level 3.
+    Open a file on level 3.
 
-	To open a file on level 3, you must open (or create) the file on level 2,
-	then pass the file reference to open_file_lvl3.
+    To open a file on level 3, you must open (or create) the file on level 2,
+    then pass the file reference to open_file_lvl3.
 */
 static int open_file_lvl3(ti99_lvl3_fileref *l3_file)
 {
@@ -3709,7 +3709,7 @@ static int open_file_lvl3(ti99_lvl3_fileref *l3_file)
 }
 
 /*
-	Test a file for EOF
+    Test a file for EOF
 */
 static int is_eof(ti99_lvl3_fileref *l3_file)
 {
@@ -3730,7 +3730,7 @@ static int is_eof(ti99_lvl3_fileref *l3_file)
 }
 
 /*
-	Read next record from a file
+    Read next record from a file
 */
 static int read_next_record(ti99_lvl3_fileref *l3_file, void *dest, int *out_reclen)
 {
@@ -3810,7 +3810,7 @@ static int read_next_record(ti99_lvl3_fileref *l3_file, void *dest, int *out_rec
 #endif
 
 /*
-	ti99 catalog iterator, used when imgtool reads the catalog
+    ti99 catalog iterator, used when imgtool reads the catalog
 */
 typedef struct dsk_iterator
 {
@@ -3976,7 +3976,7 @@ void ti99_ti99hd_get_info(const imgtool_class *imgclass, UINT32 state, union img
 
 
 /*
-	Open a file as a ti99_image (common code).
+    Open a file as a ti99_image (common code).
 */
 static int dsk_image_init(imgtool_image *img, imgtool_stream *f, ti99_img_format img_format)
 {
@@ -4017,8 +4017,8 @@ static int dsk_image_init(imgtool_image *img, imgtool_stream *f, ti99_img_format
 
 	/* read and check subdirectory catalogs */
 	/* Note that the reserved areas used for HFDC subdirs may be used for other
-	purposes by other FDRs, so, if we get any error, we will assume there is no
-	subdir after all... */
+    purposes by other FDRs, so, if we get any error, we will assume there is no
+    subdir after all... */
 	image->u.dsk.catalogs[0].num_subdirs = 0;
 	for (i=0; i<3; i++)
 	{
@@ -4074,7 +4074,7 @@ static int dsk_image_init(imgtool_image *img, imgtool_stream *f, ti99_img_format
 }
 
 /*
-	Open a file as a ti99_image (MESS format).
+    Open a file as a ti99_image (MESS format).
 */
 static imgtoolerr_t dsk_image_init_mess(imgtool_image *image, imgtool_stream *f)
 {
@@ -4082,7 +4082,7 @@ static imgtoolerr_t dsk_image_init_mess(imgtool_image *image, imgtool_stream *f)
 }
 
 /*
-	Open a file as a ti99_image (V9T9 format).
+    Open a file as a ti99_image (V9T9 format).
 */
 static imgtoolerr_t dsk_image_init_v9t9(imgtool_image *image, imgtool_stream *f)
 {
@@ -4090,7 +4090,7 @@ static imgtoolerr_t dsk_image_init_v9t9(imgtool_image *image, imgtool_stream *f)
 }
 
 /*
-	Open a file as a ti99_image (PC99 FM format).
+    Open a file as a ti99_image (PC99 FM format).
 */
 static imgtoolerr_t dsk_image_init_pc99_fm(imgtool_image *image, imgtool_stream *f)
 {
@@ -4098,7 +4098,7 @@ static imgtoolerr_t dsk_image_init_pc99_fm(imgtool_image *image, imgtool_stream 
 }
 
 /*
-	Open a file as a ti99_image (PC99 MFM format).
+    Open a file as a ti99_image (PC99 MFM format).
 */
 static imgtoolerr_t dsk_image_init_pc99_mfm(imgtool_image *image, imgtool_stream *f)
 {
@@ -4106,7 +4106,7 @@ static imgtoolerr_t dsk_image_init_pc99_mfm(imgtool_image *image, imgtool_stream
 }
 
 /*
-	Open a file as a ti99_image (harddisk format).
+    Open a file as a ti99_image (harddisk format).
 */
 static imgtoolerr_t win_image_init(imgtool_image *img, imgtool_stream *f)
 {
@@ -4162,7 +4162,7 @@ static imgtoolerr_t win_image_init(imgtool_image *img, imgtool_stream *f)
 }
 
 /*
-	close a ti99_image
+    close a ti99_image
 */
 static void ti99_image_exit(imgtool_image *img)
 {
@@ -4172,9 +4172,9 @@ static void ti99_image_exit(imgtool_image *img)
 }
 
 /*
-	get basic information on a ti99_image
+    get basic information on a ti99_image
 
-	Currently returns the volume name
+    Currently returns the volume name
 */
 static void ti99_image_info(imgtool_image *img, char *string, size_t len)
 {
@@ -4187,7 +4187,7 @@ static void ti99_image_info(imgtool_image *img, char *string, size_t len)
 }
 
 /*
-	Open the disk catalog for enumeration
+    Open the disk catalog for enumeration
 */
 static imgtoolerr_t dsk_image_beginenum(imgtool_directory *enumeration, const char *path)
 {
@@ -4204,7 +4204,7 @@ static imgtoolerr_t dsk_image_beginenum(imgtool_directory *enumeration, const ch
 }
 
 /*
-	Enumerate disk catalog next entry
+    Enumerate disk catalog next entry
 */
 static imgtoolerr_t dsk_image_nextenum(imgtool_directory *enumeration, imgtool_dirent *ent)
 {
@@ -4260,7 +4260,7 @@ static imgtoolerr_t dsk_image_nextenum(imgtool_directory *enumeration, imgtool_d
 
 			/* recurse subdirectory */
 			iter->listing_subdirs = 0;	/* no need to list subdirs as only the
-										root dir has subdirs in DSK format */
+                                        root dir has subdirs in DSK format */
 			iter->level = 1;
 			iter->cur_catalog = &iter->image->u.dsk.catalogs[iter->index[0]+1];
 			iter->index[iter->level] = 0;
@@ -4308,7 +4308,7 @@ static imgtoolerr_t dsk_image_nextenum(imgtool_directory *enumeration, imgtool_d
 }
 
 /*
-	Open the disk catalog for enumeration
+    Open the disk catalog for enumeration
 */
 static imgtoolerr_t win_image_beginenum(imgtool_directory *enumeration, const char *path)
 {
@@ -4328,7 +4328,7 @@ static imgtoolerr_t win_image_beginenum(imgtool_directory *enumeration, const ch
 }
 
 /*
-	Enumerate disk catalog next entry
+    Enumerate disk catalog next entry
 */
 static imgtoolerr_t win_image_nextenum(imgtool_directory *enumeration, imgtool_dirent *ent)
 {
@@ -4448,7 +4448,7 @@ static imgtoolerr_t win_image_nextenum(imgtool_directory *enumeration, imgtool_d
 }
 
 /*
-	Compute free space on disk image (in AUs)
+    Compute free space on disk image (in AUs)
 */
 static imgtoolerr_t ti99_image_freespace(imgtool_partition *partition, UINT64 *size)
 {
@@ -4470,7 +4470,7 @@ static imgtoolerr_t ti99_image_freespace(imgtool_partition *partition, UINT64 *s
 }
 
 /*
-	Extract a file from a ti99_image.  The file is saved in tifile format.
+    Extract a file from a ti99_image.  The file is saved in tifile format.
 */
 static imgtoolerr_t ti99_image_readfile(imgtool_partition *partition, const char *fpath, const char *fork, imgtool_stream *destf)
 {
@@ -4530,14 +4530,14 @@ static imgtoolerr_t ti99_image_readfile(imgtool_partition *partition, const char
 
 	get_file_creation_date(&src_file, &date_time);
 	/*if ((date_time.time_MSB == 0) || (date_time.time_LSB == 0)
-			|| (date_time.date_MSB == 0) || (date_time.date_LSB == 0))
-		current_date_time(&date_time);*/
+            || (date_time.date_MSB == 0) || (date_time.date_LSB == 0))
+        current_date_time(&date_time);*/
 	set_file_creation_date(&dst_file, date_time);
 
 	get_file_update_date(&src_file, &date_time);
 	/*if ((date_time.time_MSB == 0) || (date_time.time_LSB == 0)
-			|| (date_time.date_MSB == 0) || (date_time.date_LSB == 0))
-		current_date_time(&date_time);*/
+            || (date_time.date_MSB == 0) || (date_time.date_LSB == 0))
+        current_date_time(&date_time);*/
 	set_file_update_date(&dst_file, date_time);
 
 	if (stream_write(destf, & dst_file.u.tifiles.hdr, 128) != 128)
@@ -4608,7 +4608,7 @@ static imgtoolerr_t ti99_image_readfile(imgtool_partition *partition, const char
 }
 
 /*
-	Add a file to a ti99_image.  The file must be in tifile format.
+    Add a file to a ti99_image.  The file must be in tifile format.
 */
 static imgtoolerr_t ti99_image_writefile(imgtool_partition *partition, const char *fpath, const char *fork, imgtool_stream *sourcef, option_resolution *writeoptions)
 {
@@ -4695,14 +4695,14 @@ static imgtoolerr_t ti99_image_writefile(imgtool_partition *partition, const cha
 
 	get_file_creation_date(&src_file, &date_time);
 	/*if ((date_time.time_MSB == 0) || (date_time.time_LSB == 0)
-			|| (date_time.date_MSB == 0) || (date_time.date_LSB == 0))
-		current_date_time(&date_time);*/
+            || (date_time.date_MSB == 0) || (date_time.date_LSB == 0))
+        current_date_time(&date_time);*/
 	set_file_creation_date(&dst_file, date_time);
 
 	get_file_update_date(&src_file, &date_time);
 	/*if ((date_time.time_MSB == 0) || (date_time.time_LSB == 0)
-			|| (date_time.date_MSB == 0) || (date_time.date_LSB == 0))
-		current_date_time(&date_time);*/
+            || (date_time.date_MSB == 0) || (date_time.date_LSB == 0))
+        current_date_time(&date_time);*/
 	set_file_update_date(&dst_file, date_time);
 
 	/* alloc data physrecs */
@@ -4830,7 +4830,7 @@ static imgtoolerr_t ti99_image_writefile(imgtool_partition *partition, const cha
 }
 
 /*
-	Delete a file from a ti99_image.
+    Delete a file from a ti99_image.
 */
 static imgtoolerr_t dsk_image_deletefile(imgtool_partition *partition, const char *fpath)
 {
@@ -4919,7 +4919,7 @@ static imgtoolerr_t dsk_image_deletefile(imgtool_partition *partition, const cha
 			while (i<=cluster_lastfphysrec)
 			{
 				/* the condition below is an error, but it should not prevent
-				us from deleting the file */
+                us from deleting the file */
 				if (cur_AU >= image->AUformat.totAUs)
 					/*return IMGTOOLERR_CORRUPTIMAGE;*/
 					break;
@@ -4933,9 +4933,9 @@ static imgtoolerr_t dsk_image_deletefile(imgtool_partition *partition, const cha
 			cluster_index++;
 		}
 		/* the condition below is an error, but it should not prevent us from
-		deleting the file */
+        deleting the file */
 		/*if (i<fphysrecs)
-			return IMGTOOLERR_CORRUPTIMAGE;*/
+            return IMGTOOLERR_CORRUPTIMAGE;*/
 
 		/* free fdr AU */
 		cur_AU = catalog->files[catalog_index].fdr_ptr / image->AUformat.physrecsperAU;
@@ -5043,8 +5043,8 @@ static imgtoolerr_t win_image_deletefile(imgtool_partition *partition, const cha
 	{
 		/* check integrity of FDR sibling chain, and go to last sibling */
 		/* note that as we check that the back chain is consistent with the forward
-		chain, we will also detect any cycle in the sibling chain, so we do not
-		need to check against them explicitely */
+        chain, we will also detect any cycle in the sibling chain, so we do not
+        need to check against them explicitely */
 		{
 			int pastendoflist_flag;
 			unsigned prevfdr_aphysrec;
@@ -5114,7 +5114,7 @@ static imgtoolerr_t win_image_deletefile(imgtool_partition *partition, const cha
 					while (cur_AU<=end_AU)
 					{
 						/* the condition below is an error, but it should not prevent
-						us from deleting the file */
+                        us from deleting the file */
 						if (cur_AU >= image->AUformat.totAUs)
 							/*return IMGTOOLERR_CORRUPTIMAGE;*/
 							break;
@@ -5182,9 +5182,9 @@ static imgtoolerr_t win_image_deletefile(imgtool_partition *partition, const cha
 }
 
 /*
-	Create a blank ti99_image (common code).
+    Create a blank ti99_image (common code).
 
-	Supports MESS and V9T9 formats only
+    Supports MESS and V9T9 formats only
 */
 static imgtoolerr_t dsk_image_create(imgtool_image *image, imgtool_stream *f, option_resolution *createoptions, ti99_img_format img_format)
 {
@@ -5304,7 +5304,7 @@ static imgtoolerr_t dsk_image_create(imgtool_image *image, imgtool_stream *f, op
 }
 
 /*
-	Create a blank ti99_image (MESS format).
+    Create a blank ti99_image (MESS format).
 */
 static imgtoolerr_t dsk_image_create_mess(imgtool_image *image, imgtool_stream *f, option_resolution *createoptions)
 {
@@ -5312,7 +5312,7 @@ static imgtoolerr_t dsk_image_create_mess(imgtool_image *image, imgtool_stream *
 }
 
 /*
-	Create a blank ti99_image (V9T9 format).
+    Create a blank ti99_image (V9T9 format).
 */
 static imgtoolerr_t dsk_image_create_v9t9(imgtool_image *image, imgtool_stream *f, option_resolution *createoptions)
 {

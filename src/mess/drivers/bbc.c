@@ -268,14 +268,14 @@ static ADDRESS_MAP_START(bbcm_mem, ADDRESS_SPACE_PROGRAM, 8)
 
 	AM_RANGE(0xfc00, 0xfeff) AM_READWRITE(SMH_BANK(8)			, bbcm_w			)   /*    this is now processed directly because it can be ROM or hardware */
 
-	//AM_RANGE(0xfc00, 0xfeff) AM_READWRITE(bbcm_r			, bbcm_w			)   /*    this is now processed directly because it can be ROM or hardware */
+	//AM_RANGE(0xfc00, 0xfeff) AM_READWRITE(bbcm_r          , bbcm_w            )   /*    this is now processed directly because it can be ROM or hardware */
 	/*
     AM_RANGE(0xfc00, 0xfdff) AM_READWRITE(SMH_BANK(2)        , SMH_ROM          )       fc00-fdff                   FRED & JIM Pages
 
                                                                                           fe00-feff                 Shiela Address Page
     AM_RANGE(0xfe00, 0xfe07) AM_READWRITE(BBC_6845_r        , BBC_6845_w        )         fe00-fe07  6845 CRTC      Video controller
-	AM_RANGE(0xfe08, 0xfe08) AM_MIRROR(0x06) AM_DEVREADWRITE("acia6850", acia6850_stat_r, acia6850_ctrl_w)
-	AM_RANGE(0xfe09, 0xfe09) AM_MIRROR(0x06) AM_DEVREADWRITE("acia6850", acia6850_data_r, acia6850_data_w)
+    AM_RANGE(0xfe08, 0xfe08) AM_MIRROR(0x06) AM_DEVREADWRITE("acia6850", acia6850_stat_r, acia6850_ctrl_w)
+    AM_RANGE(0xfe09, 0xfe09) AM_MIRROR(0x06) AM_DEVREADWRITE("acia6850", acia6850_data_r, acia6850_data_w)
     AM_RANGE(0xfe10, 0xfe17) AM_NOP                                                       fe10-fe17  Serial ULA     Serial system chip
     AM_RANGE(0xfe18, 0xfe1f) M_DEVREADWRITE(UPD7002, "uPD7002",uPD7002_r, uPD7002_w )         fec0-fedf  uPD7002        Analogue to digital converter
     AM_RANGE(0xfe20, 0xfe23) AM_READWRITE(return8_FE        , bbc_videoULA_w        )         fe20-fe23  Video ULA      Video system chip
@@ -827,7 +827,7 @@ static MACHINE_DRIVER_START( bbca )
 	/* devices */
 	MDRV_UPD7002_ADD("upd7002",BBC_uPD7002)
 	MDRV_VIA6522_ADD("via6522_0", 1000000, bbcb_system_via)
-	
+
 	MDRV_I8271_ADD("i8271", bbc_i8271_interface)
 MACHINE_DRIVER_END
 
@@ -842,7 +842,7 @@ static MACHINE_DRIVER_START( bbcb )
 	MDRV_VIA6522_ADD("via6522_1", 1000000, bbcb_user_via)
 	MDRV_CENTRONICS_ADD("centronics", bbcb_centronics_config)
 
-	MDRV_WD177X_ADD("wd177x", bbc_wd17xx_interface )	
+	MDRV_WD177X_ADD("wd177x", bbc_wd17xx_interface )
 	MDRV_FLOPPY_2_DRIVES_ADD(bbc_floppy_config)
 	MDRV_IMPORT_FROM(bbc_cartslot)
 MACHINE_DRIVER_END
@@ -926,7 +926,7 @@ static MACHINE_DRIVER_START( bbcm )
 	MDRV_UPD7002_ADD("upd7002",BBC_uPD7002)
 	MDRV_VIA6522_ADD("via6522_0", 1000000, bbcb_system_via)
 	MDRV_VIA6522_ADD("via6522_1", 1000000, bbcb_user_via)
-		
+
 	MDRV_WD177X_ADD("wd177x", bbc_wd17xx_interface )
 	MDRV_FLOPPY_2_DRIVES_ADD(bbc_floppy_config)
 

@@ -84,7 +84,7 @@ int pc1403_ina(const device_config *device)
     if (outa & 0x01)
 	{
 		data |= input_port_read(device->machine, "KEY7");
-		
+
 		/* At Power Up we fake a 'C-CE' pressure */
 		if (power)
 			data |= 0x02;
@@ -116,7 +116,7 @@ int pc1403_inb(void)
 {
 	int data = outb;
 
-	if (input_port_read(machine, "KEY13")) 
+	if (input_port_read(machine, "KEY13"))
 		data |= 1;
 
 	return data;

@@ -20,7 +20,7 @@ VIDEO_UPDATE( vector06 )
  	UINT8 col;
 	int y, x, b,draw_y;
 
-	int width = (vector_video_mode==0x00) ? 256 : 512;		
+	int width = (vector_video_mode==0x00) ? 256 : 512;
 	rectangle screen_area = {0,width+64-1,0,256+64-1};
 	// fill border color
 	bitmap_fill(bitmap, &screen_area, vector_color_index);

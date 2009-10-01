@@ -1,6 +1,6 @@
 /***************************************************************************
 
-	NOTE: ****** Specbusy: press N, R, or E to boot *************
+    NOTE: ****** Specbusy: press N, R, or E to boot *************
 
 
         Spectrum/Inves/TK90X etc. memory map:
@@ -226,14 +226,14 @@ static  READ8_HANDLER ( spectrum_128_ula_r )
 }
 
 static ADDRESS_MAP_START (spectrum_128_io, ADDRESS_SPACE_IO, 8)
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(spectrum_port_fe_r,spectrum_port_fe_w) AM_MIRROR(0xfffe) AM_MASK(0xffff) 
+	AM_RANGE(0x0000, 0x0000) AM_READWRITE(spectrum_port_fe_r,spectrum_port_fe_w) AM_MIRROR(0xfffe) AM_MASK(0xffff)
 	AM_RANGE(0x001f, 0x001f) AM_READ(spectrum_port_1f_r) AM_MIRROR(0xff00)
 	AM_RANGE(0x007f, 0x007f) AM_READ(spectrum_port_7f_r) AM_MIRROR(0xff00)
 	AM_RANGE(0x00df, 0x00df) AM_READ(spectrum_port_df_r) AM_MIRROR(0xff00)
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(spectrum_128_port_7ffd_w) AM_MIRROR(0x3ffd)
 	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("ay8912", ay8910_data_w) AM_MIRROR(0x3ffd)
 	AM_RANGE(0xc000, 0xc000) AM_DEVREADWRITE("ay8912", ay8910_r, ay8910_address_w) AM_MIRROR(0x3ffd)
-	AM_RANGE(0x0001, 0x0001) AM_READ(spectrum_128_ula_r) AM_MIRROR(0xfffe)	
+	AM_RANGE(0x0001, 0x0001) AM_READ(spectrum_128_ula_r) AM_MIRROR(0xfffe)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START (spectrum_128_mem, ADDRESS_SPACE_PROGRAM, 8)
@@ -280,7 +280,7 @@ MACHINE_DRIVER_START( spectrum_128 )
 	/* sound hardware */
 	MDRV_SOUND_ADD("ay8912", AY8912, 1773400)
 	MDRV_SOUND_CONFIG(spectrum_ay_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)	
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END
 
 
@@ -297,7 +297,7 @@ ROM_START(spec128)
 	ROM_REGION(0x18000,"maincpu",0)
 	ROM_SYSTEM_BIOS( 0, "en", "English" )
 	ROMX_LOAD("zx128_0.rom",0x10000,0x4000, CRC(e76799d2) SHA1(4f4b11ec22326280bdb96e3baf9db4b4cb1d02c5), ROM_BIOS(1))
-	ROMX_LOAD("zx128_1.rom",0x14000,0x4000, CRC(b96a36be) SHA1(80080644289ed93d71a1103992a154cc9802b2fa), ROM_BIOS(1))	
+	ROMX_LOAD("zx128_1.rom",0x14000,0x4000, CRC(b96a36be) SHA1(80080644289ed93d71a1103992a154cc9802b2fa), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 1, "sp", "Spanish" )
 	ROMX_LOAD("zx128s0.rom",0x10000,0x4000, CRC(453d86b2) SHA1(968937b1c750f0ef6205f01c6db4148da4cca4e3), ROM_BIOS(2))
 	ROMX_LOAD("zx128s1.rom",0x14000,0x4000, CRC(6010e796) SHA1(bea3f397cc705eafee995ea629f4a82550562f90), ROM_BIOS(2))
@@ -317,7 +317,7 @@ ROM_START(specpls2)
 	ROMX_LOAD("plus2sp1.rom",0x14000,0x4000, CRC(41981d4b) SHA1(ec0d5a158842d20601b4fbeaefc6668db979d0e1), ROM_BIOS(3))
 	ROM_SYSTEM_BIOS( 3, "ao", "ZX Spectrum +2c (Andrew Owen)" )
 	ROMX_LOAD("plus2c-0.rom",0x10000,0x4000, CRC(bfddf748) SHA1(3eba870bcb2c5efa906f2ca3febe960fc35d66bb), ROM_BIOS(4))
-	ROMX_LOAD("plus2c-1.rom",0x14000,0x4000, CRC(fd8552b6) SHA1(5ffcf79f2154ba2cf42cc1d9cb4be93cb5043e73), ROM_BIOS(4))	
+	ROMX_LOAD("plus2c-1.rom",0x14000,0x4000, CRC(fd8552b6) SHA1(5ffcf79f2154ba2cf42cc1d9cb4be93cb5043e73), ROM_BIOS(4))
 	ROM_SYSTEM_BIOS( 4, "namco", "ZX Spectrum +2c (Namco)" )
 	ROMX_LOAD("pl2namco.rom",0x10000,0x8000, CRC(72a54e75) SHA1(311400157df689450dadc3620f4c4afa960b05ad), ROM_BIOS(5))
 	ROM_CART_LOAD("cart", 0x10000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
@@ -326,7 +326,7 @@ ROM_END
 ROM_START(hc128)
 	ROM_REGION(0x18000,"maincpu",0)
 	ROM_LOAD("zx128_0.rom",0x10000,0x4000, CRC(e76799d2) SHA1(4f4b11ec22326280bdb96e3baf9db4b4cb1d02c5))
-	ROM_LOAD("hc128.rom",  0x14000,0x4000, CRC(0241e960) SHA1(cea0d14391b9e571460a816088a1c00ecb24afa3))	
+	ROM_LOAD("hc128.rom",  0x14000,0x4000, CRC(0241e960) SHA1(cea0d14391b9e571460a816088a1c00ecb24afa3))
 	ROM_CART_LOAD("cart", 0x10000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
@@ -334,7 +334,7 @@ ROM_START(hc2000)
 	ROM_REGION(0x18000,"maincpu",0)
 	ROM_SYSTEM_BIOS( 0, "v1", "Version 1" )
 	ROMX_LOAD("zx128_0.rom",0x10000,0x4000, CRC(e76799d2) SHA1(4f4b11ec22326280bdb96e3baf9db4b4cb1d02c5), ROM_BIOS(1))
-	ROMX_LOAD("hc2000.v1",  0x14000,0x4000, CRC(453c1a5a) SHA1(f8139fc38478691cf44944dc83fd6e70b0f002fb), ROM_BIOS(1))	
+	ROMX_LOAD("hc2000.v1",  0x14000,0x4000, CRC(453c1a5a) SHA1(f8139fc38478691cf44944dc83fd6e70b0f002fb), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 1, "v2", "Version 2" )
 	ROMX_LOAD("zx128_0.rom",0x10000,0x4000, CRC(e76799d2) SHA1(4f4b11ec22326280bdb96e3baf9db4b4cb1d02c5), ROM_BIOS(2))
 	ROMX_LOAD("hc2000.v2",  0x14000,0x4000, CRC(65d90464) SHA1(5e2096e6460ff2120c8ada97579fdf82c1199c09), ROM_BIOS(2))

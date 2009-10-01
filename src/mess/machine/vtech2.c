@@ -1,15 +1,15 @@
 /***************************************************************************
-	vtech2.c
+    vtech2.c
 
     machine driver
-	Juergen Buchmueller <pullmoll@t-online.de> MESS driver, Jan 2000
-	Davide Moretti <dave@rimini.com> ROM dump and hardware description
+    Juergen Buchmueller <pullmoll@t-online.de> MESS driver, Jan 2000
+    Davide Moretti <dave@rimini.com> ROM dump and hardware description
 
     TODO:
-		Add loading images from WAV files.
-		Printer and RS232 support.
-		Check if the FDC is really the same as in the
-		Laser 210/310 (aka VZ200/300) series.
+        Add loading images from WAV files.
+        Printer and RS232 support.
+        Check if the FDC is really the same as in the
+        Laser 210/310 (aka VZ200/300) series.
 
 ****************************************************************************/
 
@@ -204,14 +204,14 @@ static const device_config *vtech2_cassette_image(running_machine *machine)
 /*************************************************
  * memory mapped I/O read
  * bit  function
- * 7	not assigned
- * 6	column 6
- * 5	column 5
- * 4	column 4
- * 3	column 3
- * 2	column 2
- * 1	column 1
- * 0	column 0
+ * 7    not assigned
+ * 6    column 6
+ * 5    column 5
+ * 4    column 4
+ * 3    column 3
+ * 2    column 2
+ * 1    column 1
+ * 0    column 0
  ************************************************/
 static int mra_bank(running_machine *machine, int bank, int offs)
 {

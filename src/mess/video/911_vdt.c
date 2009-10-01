@@ -1,12 +1,12 @@
 /*
-	TI 911 VDT core.  To be operated with the TI 990 line of computers (can be connected to
-	any model, as communication uses the CRU bus).
+    TI 911 VDT core.  To be operated with the TI 990 line of computers (can be connected to
+    any model, as communication uses the CRU bus).
 
-	Raphael Nabet 2002
+    Raphael Nabet 2002
 
 TODO:
-	* add more flexibility, so that we can create multiple-terminal configurations.
-	* support test mode???
+    * add more flexibility, so that we can create multiple-terminal configurations.
+    * support test mode???
 */
 
 
@@ -111,22 +111,22 @@ typedef struct vdt_t
 static vdt_t vdt[MAX_VDT];
 
 /*
-	Macros for model features
+    Macros for model features
 */
 /* TRUE for japanese and arabic terminals, which use 8-bit charcodes and keyboard shift modes */
 #define USES_8BIT_CHARCODES(unit) ((vdt[unit].model == vdt911_model_Japanese) /*|| (vdt[unit].model == vdt911_model_Arabic)*/)
 /* TRUE for keyboards which have this extra key (on the left of TAB/SKIP)
-	(Most localized keyboards have it) */
+    (Most localized keyboards have it) */
 #define HAS_EXTRA_KEY_67(unit) (! ((vdt[unit].model == vdt911_model_US) || (vdt[unit].model == vdt911_model_UK) || (vdt[unit].model == vdt911_model_French)))
 /* TRUE for keyboards which have this extra key (on the right of space),
-	AND do not use it as a modifier */
+    AND do not use it as a modifier */
 #define HAS_EXTRA_KEY_91(unit) ((vdt[unit].model == vdt911_model_German) || (vdt[unit].model == vdt911_model_Swedish) || (vdt[unit].model == vdt911_model_Norwegian))
 
 static TIMER_CALLBACK(blink_callback);
 static TIMER_CALLBACK(beep_callback);
 
 /*
-	Initialize vdt911 palette
+    Initialize vdt911 palette
 */
 PALETTE_INIT( vdt911 )
 {
@@ -145,7 +145,7 @@ PALETTE_INIT( vdt911 )
 }
 
 /*
-	Copy a character bitmap array to another location in memory
+    Copy a character bitmap array to another location in memory
 */
 static void copy_character_matrix_array(const UINT8 char_array[128][10], UINT8 *dest)
 {
@@ -157,7 +157,7 @@ static void copy_character_matrix_array(const UINT8 char_array[128][10], UINT8 *
 }
 
 /*
-	Patch a character bitmap array according to an array of char_override_t
+    Patch a character bitmap array according to an array of char_override_t
 */
 static void apply_char_overrides(int nb_char_overrides, const char_override_t char_overrides[], UINT8 *dest)
 {
@@ -171,7 +171,7 @@ static void apply_char_overrides(int nb_char_overrides, const char_override_t ch
 }
 
 /*
-	Initialize the 911 vdt core
+    Initialize the 911 vdt core
 */
 void vdt911_init(running_machine *machine)
 {
@@ -234,7 +234,7 @@ static TIMER_CALLBACK(setup_beep)
 }
 
 /*
-	Initialize one 911 vdt controller/terminal
+    Initialize one 911 vdt controller/terminal
 */
 void vdt911_init_term(running_machine *machine,int unit, const vdt911_init_params_t *params)
 {
@@ -257,14 +257,14 @@ void vdt911_init_term(running_machine *machine,int unit, const vdt911_init_param
 }
 
 /*
-	Reset the controller board
+    Reset the controller board
 */
 void vdt911_reset(void)
 {
 }
 
 /*
-	timer callback to toggle blink state
+    timer callback to toggle blink state
 */
 static TIMER_CALLBACK(blink_callback)
 {
@@ -273,7 +273,7 @@ static TIMER_CALLBACK(blink_callback)
 }
 
 /*
-	timer callback to stop beep generator
+    timer callback to stop beep generator
 */
 static TIMER_CALLBACK(beep_callback)
 {
@@ -281,7 +281,7 @@ static TIMER_CALLBACK(beep_callback)
 }
 
 /*
-	CRU interface read
+    CRU interface read
 */
 static int vdt911_cru_r(int offset, int unit)
 {
@@ -317,11 +317,11 @@ static int vdt911_cru_r(int offset, int unit)
 			if (vdt[unit].keyboard_data & 0x80)
 				reply |= 0x08;
 			/*if (! vdt[unit].terminal_ready)
-				reply |= 0x10;*/
+                reply |= 0x10;*/
 			if (vdt[unit].previous_word_select)
 				reply |= 0x20;
 			/*if (vdt[unit].keyboard_parity_error)
-				reply |= 0x40;*/
+                reply |= 0x40;*/
 			if (vdt[unit].keyboard_data_ready)
 				reply |= 0x80;
 			break;
@@ -332,7 +332,7 @@ static int vdt911_cru_r(int offset, int unit)
 }
 
 /*
-	CRU interface write
+    CRU interface write
 */
 static void vdt911_cru_w(const address_space *space, int offset, int data, int unit)
 {
@@ -474,7 +474,7 @@ WRITE8_HANDLER(vdt911_0_cru_w)
 }
 
 /*
-	Video refresh
+    Video refresh
 */
 void vdt911_refresh(running_machine *machine, bitmap_t *bitmap, int unit, int x, int y)
 {
@@ -487,7 +487,7 @@ void vdt911_refresh(running_machine *machine, bitmap_t *bitmap, int unit, int x,
 	int color;
 
 	/*if (use_8bit_charcodes)
-		color = vdt[unit].dual_intensity_enable ? 1 : 0;*/
+        color = vdt[unit].dual_intensity_enable ? 1 : 0;*/
 
 	if (! vdt[unit].display_enable)
 	{
@@ -548,8 +548,8 @@ static const unsigned char (*const key_translate[])[91] =
 };
 
 /*
-	keyboard handler: should be called regularly by machine code, for instance
-	every Video Blank Interrupt.
+    keyboard handler: should be called regularly by machine code, for instance
+    every Video Blank Interrupt.
 */
 void vdt911_keyboard(running_machine *machine, int unit)
 {
@@ -595,7 +595,7 @@ void vdt911_keyboard(running_machine *machine, int unit)
 	}
 	else
 	{	/* we are using a western keyboard, or a katakana/arabic keyboard in
-		romaji/latin mode */
+        romaji/latin mode */
 		foreign_mode = FALSE;
 
 		if (key_buf[3] & 0x0040)

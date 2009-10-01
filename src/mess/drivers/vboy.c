@@ -1,10 +1,10 @@
 /***************************************************************************
-   
-	Nintendo Virtual Boy
+
+    Nintendo Virtual Boy
 
     12/05/2009 Skeleton driver.
 
-    Great info at http://www.goliathindustries.com/vb/ and http://www.vr32.de/modules/dokuwiki/doku.php?   
+    Great info at http://www.goliathindustries.com/vb/ and http://www.vr32.de/modules/dokuwiki/doku.php?
 
 ****************************************************************************/
 
@@ -53,8 +53,8 @@ struct VIP_REGS_STRUCT
 	UINT16 VER;
 	UINT16 SPT[4];
 	UINT16 GPLT[4];
-	UINT16 JPLT[4]; 
-	UINT16 BKCOL; 
+	UINT16 JPLT[4];
+	UINT16 BKCOL;
 };
 
 static struct VIP_REGS_STRUCT vip_regs;
@@ -92,7 +92,7 @@ static READ32_HANDLER( port_02_read )
 		default:
 			logerror("Unemulated read: offset %08x\n", 0x02000000 + (offset << 2));
 			break;
-	}	
+	}
 	return value;
 }
 
@@ -130,7 +130,7 @@ static WRITE32_HANDLER( port_02_write )
 		case 0x18:	// TLB (Timer Low Byte)
 		case 0x1c:	// THB (Timer High Byte)
 		default:
-			logerror("Unemulated write: offset %08x, data %04x\n", 0x02000000 + (offset << 2), data);			
+			logerror("Unemulated write: offset %08x, data %04x\n", 0x02000000 + (offset << 2), data);
 			break;
 	}
 }
@@ -153,9 +153,9 @@ static READ16_HANDLER( vip_r )
 		case 0x22: 	//DPCTRL
 					return vip_regs.DPCTRL;
 					break;
-		case 0x24: 	//BRTA 			
+		case 0x24: 	//BRTA
 					return vip_regs.BRTA;
-					break;		
+					break;
 		case 0x26: 	//BRTB
 					return vip_regs.BRTB;
 					break;
@@ -221,7 +221,7 @@ static READ16_HANDLER( vip_r )
 					break;
 		default:
 					logerror("Unemulated read: addr %08x\n", offset * 2 + 0x0005f800);
-					break;			
+					break;
 	}
 	return 0xffff;
 }
@@ -247,14 +247,14 @@ static WRITE16_HANDLER( vip_w )
 		case 0x24: 	//BRTA
 					vip_regs.BRTA = data;
 					palette_set_color_rgb(space->machine, 1,(vip_regs.BRTA) & 0xff,0,0);
-					break;		
+					break;
 		case 0x26: 	//BRTB
 					vip_regs.BRTB = data;
 					palette_set_color_rgb(space->machine, 2,(vip_regs.BRTA + vip_regs.BRTB) & 0xff,0,0);
 					break;
-		case 0x28: 	//BRTC				 					
+		case 0x28: 	//BRTC
 					vip_regs.BRTC = data;
-					palette_set_color_rgb(space->machine, 3,(vip_regs.BRTA + vip_regs.BRTB + vip_regs.BRTC) & 0xff,0,0);					
+					palette_set_color_rgb(space->machine, 3,(vip_regs.BRTA + vip_regs.BRTB + vip_regs.BRTC) & 0xff,0,0);
 					break;
 		case 0x2A: 	//REST
 					vip_regs.REST = data;
@@ -315,28 +315,28 @@ static WRITE16_HANDLER( vip_w )
 					break;
 		default:
 					logerror("Unemulated write: addr %08x, data %04x\n", offset * 2 + 0x0005f800, data);
-					break;			
+					break;
 	}
 }
 
 static WRITE16_HANDLER( vboy_font0_w )
 {
-	vboy_font[offset] = data | (vboy_font[offset] & (mem_mask ^ 0xffff));	
+	vboy_font[offset] = data | (vboy_font[offset] & (mem_mask ^ 0xffff));
 }
 
 static WRITE16_HANDLER( vboy_font1_w )
 {
-	vboy_font[offset + 0x1000] = data | (vboy_font[offset + 0x1000] & (mem_mask ^ 0xffff));	
+	vboy_font[offset + 0x1000] = data | (vboy_font[offset + 0x1000] & (mem_mask ^ 0xffff));
 }
 
 static WRITE16_HANDLER( vboy_font2_w )
 {
-	vboy_font[offset + 0x2000] = data | (vboy_font[offset + 0x2000] & (mem_mask ^ 0xffff));	
+	vboy_font[offset + 0x2000] = data | (vboy_font[offset + 0x2000] & (mem_mask ^ 0xffff));
 }
 
 static WRITE16_HANDLER( vboy_font3_w )
 {
-	vboy_font[offset + 0x3000] = data | (vboy_font[offset + 0x3000] & (mem_mask ^ 0xffff));	
+	vboy_font[offset + 0x3000] = data | (vboy_font[offset + 0x3000] & (mem_mask ^ 0xffff));
 }
 
 static READ16_HANDLER( vboy_font0_r )
@@ -363,17 +363,17 @@ static void put_char(int x, int y, UINT16 ch, bitmap_t *bitmap,int flipx,int fli
 {
 	UINT16 code = ch;
 	int i, b;
-	
-	for(i = 0; i < 8; i++) 
+
+	for(i = 0; i < 8; i++)
 	{
 		UINT16  data;
 		if(flipy==0) {
-			 data =vboy_font[code * 8 + i]; 
+			 data =vboy_font[code * 8 + i];
 		} else {
-			 data =vboy_font[code * 8 + (7-i)]; 
+			 data =vboy_font[code * 8 + (7-i)];
 		}
 		for (b = 0; b < 8; b++)
-		{					
+		{
 			UINT8 dat,col;
 			if(flipx==0) {
 				dat = ((data >> (b << 1)) & 0x03);
@@ -383,16 +383,16 @@ static void put_char(int x, int y, UINT16 ch, bitmap_t *bitmap,int flipx,int fli
 			col = (pal >> (dat*2)) & 3;
 			// This is how emulator works, but need to check
 			if (dat==0) col=0;
-			
-			if (!trans || ( trans && col!=0)) {			
+
+			if (!trans || ( trans && col!=0)) {
 				*BITMAP_ADDR16(bitmap, (y + i) & 0x1ff, (x + b) & 0x1ff) =  col;
 			}
-		}		
-	}	
+		}
+	}
 }
 
 static WRITE16_HANDLER( vboy_bgmap_w )
-{	
+{
 	vboy_bgmap[offset] = data | (vboy_bgmap[offset] & (mem_mask ^ 0xffff));
 }
 
@@ -411,18 +411,18 @@ static ADDRESS_MAP_START( vboy_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE( 0x00016000, 0x00017fff ) AM_READWRITE16(vboy_font2_r, vboy_font2_w, 0xffffffff) // Font 1024-1535
 	AM_RANGE( 0x00018000, 0x0001dfff ) AM_RAM AM_BASE((UINT32**)&vboy_r_frame_1) // R frame buffer 1
 	AM_RANGE( 0x0001e000, 0x0001ffff ) AM_READWRITE16(vboy_font3_r, vboy_font3_w, 0xffffffff) // Font 1536-2047
-	
+
 	AM_RANGE( 0x00020000, 0x0003ffff ) AM_RAM AM_READWRITE16(vboy_bgmap_r,vboy_bgmap_w, 0xffffffff) // VIPC memory
-	
-	//AM_RANGE( 0x00040000, 0x0005ffff ) AM_RAM // VIPC	
+
+	//AM_RANGE( 0x00040000, 0x0005ffff ) AM_RAM // VIPC
 	AM_RANGE( 0x0005f800, 0x0005f87f )	AM_READWRITE16(vip_r, vip_w, 0xffffffff)
-	
+
 	AM_RANGE( 0x00078000, 0x00079fff ) AM_READWRITE16(vboy_font0_r, vboy_font0_w, 0xffffffff) // Font 0-511 mirror
 	AM_RANGE( 0x0007a000, 0x0007bfff ) AM_READWRITE16(vboy_font1_r, vboy_font1_w, 0xffffffff) // Font 512-1023 mirror
 	AM_RANGE( 0x0007c000, 0x0007dfff ) AM_READWRITE16(vboy_font2_r, vboy_font2_w, 0xffffffff) // Font 1024-1535 mirror
 	AM_RANGE( 0x0007e000, 0x0007ffff ) AM_READWRITE16(vboy_font3_r, vboy_font3_w, 0xffffffff) // Font 1536-2047 mirror
-	
-	AM_RANGE( 0x01000000, 0x010005ff ) AM_RAM // Sound RAM 
+
+	AM_RANGE( 0x01000000, 0x010005ff ) AM_RAM // Sound RAM
 	AM_RANGE( 0x02000000, 0x0200002b ) AM_MIRROR(0x0ffff00) AM_READWRITE(port_02_read, port_02_write) // Hardware control registers mask 0xff
 	//AM_RANGE( 0x04000000, 0x04ffffff ) // Expansion area
 	AM_RANGE( 0x05000000, 0x0500ffff ) AM_MIRROR(0x0ff0000) AM_RAM // Main RAM - 64K mask 0xffff
@@ -440,18 +440,18 @@ static ADDRESS_MAP_START( vboy_io, ADDRESS_SPACE_IO, 32 )
 	AM_RANGE( 0x00016000, 0x00017fff ) AM_READWRITE16(vboy_font2_r, vboy_font2_w, 0xffffffff) // Font 1024-1535
 	AM_RANGE( 0x00018000, 0x0001dfff ) AM_RAM AM_BASE((UINT32**)&vboy_r_frame_1) // R frame buffer 1
 	AM_RANGE( 0x0001e000, 0x0001ffff ) AM_READWRITE16(vboy_font3_r, vboy_font3_w, 0xffffffff) // Font 1536-2047
-	
+
 	AM_RANGE( 0x00020000, 0x0003ffff ) AM_RAM AM_READWRITE16(vboy_bgmap_r,vboy_bgmap_w, 0xffffffff) // VIPC memory
-	
-	//AM_RANGE( 0x00040000, 0x0005ffff ) AM_RAM // VIPC	
+
+	//AM_RANGE( 0x00040000, 0x0005ffff ) AM_RAM // VIPC
 	AM_RANGE( 0x0005f800, 0x0005f87f )	AM_READWRITE16(vip_r, vip_w, 0xffffffff)
-	
+
 	AM_RANGE( 0x00078000, 0x00079fff ) AM_READWRITE16(vboy_font0_r, vboy_font0_w, 0xffffffff) // Font 0-511 mirror
 	AM_RANGE( 0x0007a000, 0x0007bfff ) AM_READWRITE16(vboy_font1_r, vboy_font1_w, 0xffffffff) // Font 512-1023 mirror
 	AM_RANGE( 0x0007c000, 0x0007dfff ) AM_READWRITE16(vboy_font2_r, vboy_font2_w, 0xffffffff) // Font 1024-1535 mirror
 	AM_RANGE( 0x0007e000, 0x0007ffff ) AM_READWRITE16(vboy_font3_r, vboy_font3_w, 0xffffffff) // Font 1536-2047 mirror
-	
-	AM_RANGE( 0x01000000, 0x010005ff ) AM_RAM // Sound RAM 
+
+	AM_RANGE( 0x01000000, 0x010005ff ) AM_RAM // Sound RAM
 	AM_RANGE( 0x02000000, 0x0200002b ) AM_MIRROR(0x0ffff00) AM_READWRITE(port_02_read, port_02_write) // Hardware control registers mask 0xff
 	//AM_RANGE( 0x04000000, 0x04ffffff ) // Expansion area
 	AM_RANGE( 0x05000000, 0x0500ffff ) AM_MIRROR(0x0ff0000) AM_RAM // Main RAM - 64K mask 0xffff
@@ -463,14 +463,14 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( vboy )
 	PORT_START("INPUT")
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN ) PORT_PLAYER(1)
-	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_LEFT ) PORT_PLAYER(1)	
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_LEFT ) PORT_PLAYER(1)
 	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_PLAYER(1)
 	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_START ) PORT_PLAYER(1)
 	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_UP ) PORT_PLAYER(1)
 	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN ) PORT_PLAYER(1)
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_LEFT ) PORT_PLAYER(1)
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_RIGHT ) PORT_PLAYER(1)
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_RIGHT ) PORT_PLAYER(1)		
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_RIGHT ) PORT_PLAYER(1)
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_PLAYER(1)
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("L") PORT_PLAYER(1) // Left button on back
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("R") PORT_PLAYER(1) // Right button on back
@@ -481,12 +481,12 @@ static INPUT_PORTS_START( vboy )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(vboy) 
+static MACHINE_RESET(vboy)
 {
 	/* Initial values taken from Reality Boy, to be verified when emulation improves */
 	vboy_regs.lpc = 0x6d;
 	vboy_regs.lpc2 = 0xff;
-	vboy_regs.lpt = 0x00; 
+	vboy_regs.lpt = 0x00;
 	vboy_regs.lpr = 0x00;
 	vboy_regs.klb = 0x00;
 	vboy_regs.khb = 0x00;
@@ -502,15 +502,15 @@ static VIDEO_START( vboy )
 {
 	int i;
 	// Allocate memory for temporary screens
-	for(i = 0; i < 16; i++) 
+	for(i = 0; i < 16; i++)
 	{
 		bg_map[i] = auto_bitmap_alloc(machine, 512, 512, BITMAP_FORMAT_INDEXED16);
 	}
 	screen_output = auto_bitmap_alloc(machine, 384, 224, BITMAP_FORMAT_INDEXED16);
-	
+
 	vboy_font  = auto_alloc_array(machine, UINT16, 2048 * 8);
 	vboy_bgmap = auto_alloc_array(machine, UINT16, 0x20000 >> 1);;
-	vboy_objects = vboy_bgmap + (0x1E000 >> 1);	
+	vboy_objects = vboy_bgmap + (0x1E000 >> 1);
 	vboy_columntab1 = vboy_bgmap + (0x1dc00 >> 1);
 	vboy_columntab2 = vboy_bgmap + (0x1de00 >> 1);
 	vboy_world = vboy_bgmap + (0x1d800 >> 1);
@@ -518,11 +518,11 @@ static VIDEO_START( vboy )
 
 static void fill_bg_map(int num, bitmap_t *bitmap)
 {
-	int i, j;	
+	int i, j;
 	// Fill background map
-	for (i = 0; i < 64; i++) 
+	for (i = 0; i < 64; i++)
 	{
-		for (j = 0; j < 64; j++) 
+		for (j = 0; j < 64; j++)
 		{
 			UINT16 val = vboy_bgmap[j + 64 * i + (num * 0x1000)];
 			put_char(j * 8, i * 8, val & 0x7ff, bitmap,BIT(val,13),BIT(val,12),0, vip_regs.GPLT[(val >> 14) & 3]);
@@ -542,24 +542,24 @@ static UINT8 display_world(int num, bitmap_t *bitmap, UINT8 right)
 	UINT16 w  = vboy_world[num*16+7];
 	UINT16 h = vboy_world[num*16+8];
 	UINT16 param_base  = vboy_world[num*16+9] & 0xfff0;
-//	UINT16 overplane = vboy_world[num*16+10];
+//  UINT16 overplane = vboy_world[num*16+10];
 	UINT8 bg_map_num = def & 0x0f;
-	INT16 x,y,i;	
+	INT16 x,y,i;
 	UINT8 mode	= (def >> 12) & 3;
 	vboy_paramtab = vboy_bgmap + param_base;
-	if ((mode==0) || (mode==1)) {					
-		fill_bg_map(bg_map_num,bg_map[bg_map_num]);			
+	if ((mode==0) || (mode==1)) {
+		fill_bg_map(bg_map_num,bg_map[bg_map_num]);
 		if (BIT(def,15) && (right==0)) {
-			// Left screen 
+			// Left screen
 			for(y=0;y<=h;y++) {
 				for(x=0;x<=w;x++) {
 					INT16 y1 = (y+gy);
-					INT16 x1 = (x+gx-gp);						
+					INT16 x1 = (x+gx-gp);
 					UINT16 pix = 0;
 					if (mode==1) {
 						x1 += vboy_paramtab[y*2];
 					}
-					pix = *BITMAP_ADDR16(bg_map[bg_map_num], (y+my) & 0x1ff, (x+mx-mp) & 0x1ff);						
+					pix = *BITMAP_ADDR16(bg_map[bg_map_num], (y+my) & 0x1ff, (x+mx-mp) & 0x1ff);
 					if (pix!=0) {
 						if (y1>=0 && y1<224) {
 							if (x1>=0 && x1<384) {
@@ -571,7 +571,7 @@ static UINT8 display_world(int num, bitmap_t *bitmap, UINT8 right)
 			}
 		}
 		if (BIT(def,14) && (right==1)) {
-			// Right screen 
+			// Right screen
 			for(y=0;y<=h;y++) {
 				for(x=0;x<=w;x++) {
 					INT16 y1 = (y+gy);
@@ -593,7 +593,7 @@ static UINT8 display_world(int num, bitmap_t *bitmap, UINT8 right)
 		}
 	}
 	if(mode==2) {
-		
+
 	}
 	if(mode==3) {
 		// just for test
@@ -608,7 +608,7 @@ static UINT8 display_world(int num, bitmap_t *bitmap, UINT8 right)
 			} else {
 				put_char((jx+jp) & 0x1ff,jy,jca,bitmap,BIT(vboy_objects[start_ndx+3],13),BIT(vboy_objects[start_ndx+3],12),1,vip_regs.JPLT[(vboy_objects[start_ndx+3]>>14) & 3]);
 			}
-		}			
+		}
 	}
 	// Return END world status
 	return BIT(def,6);
@@ -619,16 +619,16 @@ static VIDEO_UPDATE( vboy )
 	int i;
 	UINT8 right = 0;
 	const device_config *_3d_right_screen = devtag_get_device(screen->machine, "3dright");
-	
+
 	bitmap_fill(screen_output, cliprect, vip_regs.BKCOL);
-		
+
 	if (screen == _3d_right_screen) right = 1;
 
 	for(i=31;i>=0;i--) {
 		if (display_world(i,screen_output,right)) break;
 	}
 	copybitmap(bitmap, screen_output, 0, 0, 0, 0, cliprect);
-	
+
 	vip_regs.DPSTTS = ((vip_regs.DPCTRL&0x0302)|0x7c);
 	return 0;
 }
@@ -641,8 +641,8 @@ static TIMER_DEVICE_CALLBACK( video_tick )
 static const rgb_t vboy_palette[18] = {
 	MAKE_RGB(0x00, 0x00, 0x00), // 0
 	MAKE_RGB(0x00, 0x00, 0x00), // 1
-	MAKE_RGB(0x00, 0x00, 0x00), // 2 
-	MAKE_RGB(0x00, 0x00, 0x00)  // 3  
+	MAKE_RGB(0x00, 0x00, 0x00), // 2
+	MAKE_RGB(0x00, 0x00, 0x00)  // 3
 };
 
 PALETTE_INIT( vboy )
@@ -659,16 +659,16 @@ static MACHINE_DRIVER_START( vboy )
 	MDRV_MACHINE_RESET(vboy)
 
 	MDRV_TIMER_ADD_PERIODIC("video", video_tick, HZ(100))
-	
-	/* video hardware */    
-	MDRV_DEFAULT_LAYOUT(layout_vboy)   
+
+	/* video hardware */
+	MDRV_DEFAULT_LAYOUT(layout_vboy)
 
 	MDRV_PALETTE_LENGTH(4)
 	MDRV_PALETTE_INIT(vboy)
 
 	MDRV_VIDEO_START(vboy)
 	MDRV_VIDEO_UPDATE(vboy)
-     
+
 	/* Left screen */
 	MDRV_SCREEN_ADD("3dleft", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -698,5 +698,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   	FULLNAME       FLAGS */
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY     FULLNAME       FLAGS */
 CONS( 1995, vboy,   0,      0, 		 vboy, 		vboy, 	 0,  	 0, 	"Nintendo", "Virtual Boy", GAME_NOT_WORKING )

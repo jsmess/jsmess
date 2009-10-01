@@ -1,18 +1,18 @@
 /*
-	video/pdp1.c
+    video/pdp1.c
 
-	PDP1 video emulation.
+    PDP1 video emulation.
 
-	We emulate three display devices:
-	* CRT screen
-	* control panel
-	* typewriter output
+    We emulate three display devices:
+    * CRT screen
+    * control panel
+    * typewriter output
 
-	For the actual emulation of these devices look at the machine/pdp1.c.  This
-	file only includes the display routines.
+    For the actual emulation of these devices look at the machine/pdp1.c.  This
+    file only includes the display routines.
 
-	Raphael Nabet 2002-2004
-	Based on earlier work by Chris Salomon
+    Raphael Nabet 2002-2004
+    Based on earlier work by Chris Salomon
 */
 
 #include <math.h>
@@ -51,7 +51,7 @@ INLINE void pdp1_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
 }
 
 /*
-	video init
+    video init
 */
 VIDEO_START( pdp1 )
 {
@@ -70,7 +70,7 @@ VIDEO_START( pdp1 )
 
 
 /*
-	schedule a pixel to be plotted
+    schedule a pixel to be plotted
 */
 void pdp1_plot(int x, int y)
 {
@@ -82,7 +82,7 @@ void pdp1_plot(int x, int y)
 
 
 /*
-	video_update_pdp1: effectively redraw the screen
+    video_update_pdp1: effectively redraw the screen
 */
 VIDEO_UPDATE( pdp1 )
 {
@@ -100,7 +100,7 @@ VIDEO_UPDATE( pdp1 )
 
 
 /*
-	Operator control panel code
+    Operator control panel code
 */
 
 enum
@@ -247,7 +247,7 @@ static void pdp1_draw_string(running_machine *machine, bitmap_t *bitmap, const c
 
 
 /*
-	draw the operator control panel (fixed backdrop)
+    draw the operator control panel (fixed backdrop)
 */
 static void pdp1_draw_panel_backdrop(running_machine *machine, bitmap_t *bitmap)
 {
@@ -298,7 +298,7 @@ static void pdp1_draw_panel_backdrop(running_machine *machine, bitmap_t *bitmap)
 }
 
 /*
-	draw the operator control panel (dynamic elements)
+    draw the operator control panel (dynamic elements)
 */
 static void pdp1_draw_panel(running_machine *machine, bitmap_t *bitmap)
 {
@@ -342,7 +342,7 @@ static void pdp1_draw_panel(running_machine *machine, bitmap_t *bitmap)
 
 
 /*
-	Typewriter code
+    Typewriter code
 */
 
 
@@ -493,7 +493,7 @@ void pdp1_typewriter_drawchar(running_machine *machine, int character)
 
 
 /*
-	lightpen code
+    lightpen code
 */
 
 void pdp1_update_lightpen_state(const lightpen_t *new_state)
@@ -574,13 +574,13 @@ static void pdp1_erase_lightpen(bitmap_t *bitmap)
 	if (previous_lightpen_state.active)
 	{
 		/*if (previous_lightpen_state.x>0)
-			pdp1_plot_pixel(bitmap, previous_lightpen_state.x/2-1, previous_lightpen_state.y/2, pen_black);
-		if (previous_lightpen_state.x<1023)
-			pdp1_plot_pixel(bitmap, previous_lightpen_state.x/2+1, previous_lightpen_state.y/2, pen_black);
-		if (previous_lightpen_state.y>0)
-			pdp1_plot_pixel(bitmap, previous_lightpen_state.x/2, previous_lightpen_state.y/2-1, pen_black);
-		if (previous_lightpen_state.y<1023)
-			pdp1_plot_pixel(bitmap, previous_lightpen_state.x/2, previous_lightpen_state.y/2+1, pen_black);*/
+            pdp1_plot_pixel(bitmap, previous_lightpen_state.x/2-1, previous_lightpen_state.y/2, pen_black);
+        if (previous_lightpen_state.x<1023)
+            pdp1_plot_pixel(bitmap, previous_lightpen_state.x/2+1, previous_lightpen_state.y/2, pen_black);
+        if (previous_lightpen_state.y>0)
+            pdp1_plot_pixel(bitmap, previous_lightpen_state.x/2, previous_lightpen_state.y/2-1, pen_black);
+        if (previous_lightpen_state.y<1023)
+            pdp1_plot_pixel(bitmap, previous_lightpen_state.x/2, previous_lightpen_state.y/2+1, pen_black);*/
 		pdp1_draw_circle(bitmap, previous_lightpen_state.x, previous_lightpen_state.y, previous_lightpen_state.radius, pen_black);
 	}
 }
@@ -591,13 +591,13 @@ static void pdp1_draw_lightpen(bitmap_t *bitmap)
 	{
 		int color_ = lightpen_state.down ? pen_lightpen_pressed : pen_lightpen_nonpressed;
 		/*if (lightpen_state.x>0)
-			pdp1_plot_pixel(bitmap, lightpen_state.x/2-1, lightpen_state.y/2, color);
-		if (lightpen_state.x<1023)
-			pdp1_plot_pixel(bitmap, lightpen_state.x/2+1, lightpen_state.y/2, color);
-		if (lightpen_state.y>0)
-			pdp1_plot_pixel(bitmap, lightpen_state.x/2, lightpen_state.y/2-1, color);
-		if (lightpen_state.y<1023)
-			pdp1_plot_pixel(bitmap, lightpen_state.x/2, lightpen_state.y/2+1, color);*/
+            pdp1_plot_pixel(bitmap, lightpen_state.x/2-1, lightpen_state.y/2, color);
+        if (lightpen_state.x<1023)
+            pdp1_plot_pixel(bitmap, lightpen_state.x/2+1, lightpen_state.y/2, color);
+        if (lightpen_state.y>0)
+            pdp1_plot_pixel(bitmap, lightpen_state.x/2, lightpen_state.y/2-1, color);
+        if (lightpen_state.y<1023)
+            pdp1_plot_pixel(bitmap, lightpen_state.x/2, lightpen_state.y/2+1, color);*/
 		pdp1_draw_circle(bitmap, lightpen_state.x, lightpen_state.y, lightpen_state.radius, color_);
 	}
 	previous_lightpen_state = lightpen_state;

@@ -20,9 +20,9 @@
     MESS cartridge support by R. Belmont based on work by Michael Zapf
 
     Current status:
-    	- Cartridges run.
+        - Cartridges run.
 
-    ToDo : 
+    ToDo :
         - Change input code to allow selection of the mahjong panel in PORT_CATEGORY.
         - Clean up code, to reduce duplication of MAME source
 
@@ -310,8 +310,8 @@ static WRITE16_HANDLER( io_control_w )
 	switch (offset)
 	{
 	case 0x00: select_controller(data & 0x00ff); break;
-//	case 0x18: set_output_latch(space->machine, data & 0x00ff); break;
-//	case 0x20: set_output_data(data & 0x00ff); break;
+//  case 0x18: set_output_latch(space->machine, data & 0x00ff); break;
+//  case 0x20: set_output_data(data & 0x00ff); break;
 	case 0x28: upd4990a_control_16_w(upd4990a, 0, data, mem_mask); break;
 //  case 0x30: break; // coin counters
 //  case 0x31: break; // coin counters
@@ -382,7 +382,7 @@ static void calendar_init(running_machine *machine)
 
 static void calendar_clock(void)
 {
-//	pd4990a_addretrace();
+//  pd4990a_addretrace();
 }
 #endif
 
@@ -807,7 +807,7 @@ static MACHINE_START( neogeo )
 	create_interrupt_timers(machine);
 
 	/* initialize the celander IC to 'right now' */
-//	calendar_init(machine);
+//  calendar_init(machine);
 
 	/* initialize the memcard data structure */
 	memcard_data = auto_alloc_array_clear(machine, UINT8, MEMCARD_SIZE);
@@ -1137,32 +1137,32 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( aes )
 // was there anyting in place of dipswitch in the home console?
-/*	PORT_START("IN0")
-	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
-//	PORT_DIPNAME( 0x0001, 0x0001, "Test Switch" ) PORT_DIPLOCATION("SW:1")
-//	PORT_DIPSETTING(	  0x0001, DEF_STR( Off ) )
-//	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )
-//	PORT_DIPNAME( 0x0002, 0x0002, "Coin Chutes?" ) PORT_DIPLOCATION("SW:2")
-//	PORT_DIPSETTING(	  0x0000, "1?" )
-//	PORT_DIPSETTING(	  0x0002, "2?" )
-//	PORT_DIPNAME( 0x0004, 0x0000, "Mahjong Control Panel (or Auto Fire)" ) PORT_DIPLOCATION("SW:3")
-//	PORT_DIPSETTING(	  0x0004, DEF_STR( Off ) )
-//	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )
-//	PORT_DIPNAME( 0x0018, 0x0018, "COMM Setting (Cabinet No.)" ) PORT_DIPLOCATION("SW:4,5")
-//	PORT_DIPSETTING(	  0x0018, "1" )
-//	PORT_DIPSETTING(	  0x0008, "2" )
-//	PORT_DIPSETTING(	  0x0010, "3" )
-//	PORT_DIPSETTING(	  0x0000, "4" )
-//	PORT_DIPNAME( 0x0020, 0x0020, "COMM Setting (Link Enable)" ) PORT_DIPLOCATION("SW:6")
-//	PORT_DIPSETTING(	  0x0020, DEF_STR( Off ) )
-//	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )
-//	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Free_Play ) ) PORT_DIPLOCATION("SW:7")
-//	PORT_DIPSETTING(	  0x0040, DEF_STR( Off ) )
-//	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )
-//	PORT_DIPNAME( 0x0080, 0x0080, "Freeze" ) PORT_DIPLOCATION("SW:8")
-//	PORT_DIPSETTING(	  0x0080, DEF_STR( Off ) )
-//	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(aes_controller_r, NULL) */
+/*  PORT_START("IN0")
+    PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
+//  PORT_DIPNAME( 0x0001, 0x0001, "Test Switch" ) PORT_DIPLOCATION("SW:1")
+//  PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+//  PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+//  PORT_DIPNAME( 0x0002, 0x0002, "Coin Chutes?" ) PORT_DIPLOCATION("SW:2")
+//  PORT_DIPSETTING(      0x0000, "1?" )
+//  PORT_DIPSETTING(      0x0002, "2?" )
+//  PORT_DIPNAME( 0x0004, 0x0000, "Mahjong Control Panel (or Auto Fire)" ) PORT_DIPLOCATION("SW:3")
+//  PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+//  PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+//  PORT_DIPNAME( 0x0018, 0x0018, "COMM Setting (Cabinet No.)" ) PORT_DIPLOCATION("SW:4,5")
+//  PORT_DIPSETTING(      0x0018, "1" )
+//  PORT_DIPSETTING(      0x0008, "2" )
+//  PORT_DIPSETTING(      0x0010, "3" )
+//  PORT_DIPSETTING(      0x0000, "4" )
+//  PORT_DIPNAME( 0x0020, 0x0020, "COMM Setting (Link Enable)" ) PORT_DIPLOCATION("SW:6")
+//  PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+//  PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+//  PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Free_Play ) ) PORT_DIPLOCATION("SW:7")
+//  PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+//  PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+//  PORT_DIPNAME( 0x0080, 0x0080, "Freeze" ) PORT_DIPLOCATION("SW:8")
+//  PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+//  PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(aes_controller_r, NULL) */
 
 	PORT_START("CTRLSEL")  /* Select Controller Type */
 	PORT_CATEGORY_CLASS( 0x0f, 0x01, "P1 Controller")
@@ -1241,7 +1241,7 @@ MACHINE_DRIVER_END
  *
  *  Driver initalization
  *
- *************************************/
+? *************************************/
 
 static DRIVER_INIT( neogeo )
 {
@@ -1296,7 +1296,7 @@ ROM_START( neocd )
 
 	ROM_REGION( 0x10000, "ym", ROMREGION_ERASEFF )
 
-//	NO_DELTAT_REGION
+//  NO_DELTAT_REGION
 
 	ROM_REGION( 0x100000, "sprites", ROMREGION_ERASEFF )
 ROM_END
@@ -1320,7 +1320,7 @@ ROM_START( neocdz )
 
 	ROM_REGION( 0x10000, "ym", ROMREGION_ERASEFF )
 
-//	NO_DELTAT_REGION
+//  NO_DELTAT_REGION
 
 	ROM_REGION( 0x100000, "sprites", ROMREGION_ERASEFF )
 ROM_END

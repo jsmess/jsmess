@@ -121,7 +121,7 @@ typedef struct
 #define SAMPLING ATTOTIME_IN_HZ((SUPERSAMPLING*F0))
 
 
-INLINE mea8000_t* get_safe_token( const device_config *device ) 
+INLINE mea8000_t* get_safe_token( const device_config *device )
 {
 	assert( device != NULL );
 	assert( device->token != NULL );
@@ -202,10 +202,10 @@ static void mea8000_update_req( const device_config *device )
 {
 	mea8000_t* mea8000 = get_safe_token( device );
 	/* actually, req pulses less than 3us for each new byte,
-	   it goes back up if there space left in the buffer, or stays low if the
-	   buffer contains a complete frame and the CPU nees to wait for the next
-	   frame end to compose a new frame.
-	*/
+       it goes back up if there space left in the buffer, or stays low if the
+       buffer contains a complete frame and the CPU nees to wait for the next
+       frame end to compose a new frame.
+    */
 	if (mea8000->iface->req_out_func)
 		mea8000->iface->req_out_func( device, 0, mea8000_accept_byte( mea8000 ) );
 }

@@ -168,23 +168,23 @@ static void spectrum_page_basicrom(running_machine *machine)
  *      26      2       R,I
  *      28      4       SP,PC
  *      32      2       0 (reserved for future use)
- *      34      1	Border color
+ *      34      1   Border color
  *      35      1       0 (reserved for future use)
  *      36      2       Status word
  *      38      -       RAM dump
  *
- *	Status word:
- *	Bit	Description
- *	15-8	Reserved for future use
- *	7-6	Reserved for internal use (0)
- *	5	Flash: 0=INK/1=PAPER
- *	4	Interrupt pending for execution
- *	3	If 1, IM 0; if 0, bit 1 determines interrupt mode
- *	      	(Spectrum v 0.99e had this behaviour reversed, and this
- *		bit was not used in versions previous to v 0.99e)
- *	2	IFF2 (internal use)
- *	1	Interrupt Mode (if bit 3 reset): 0=>IM1, 1=>IM2
- *	0	IFF1: 0=DI/1=EI
+ *  Status word:
+ *  Bit Description
+ *  15-8    Reserved for future use
+ *  7-6 Reserved for internal use (0)
+ *  5   Flash: 0=INK/1=PAPER
+ *  4   Interrupt pending for execution
+ *  3   If 1, IM 0; if 0, bit 1 determines interrupt mode
+ *          (Spectrum v 0.99e had this behaviour reversed, and this
+ *      bit was not used in versions previous to v 0.99e)
+ *  2   IFF2 (internal use)
+ *  1   Interrupt Mode (if bit 3 reset): 0=>IM1, 1=>IM2
+ *  0   IFF1: 0=DI/1=EI
  *
  *******************************************************************/
 void spectrum_setup_sp(running_machine *machine, unsigned char *pSnapshot, unsigned long SnapshotSize)
@@ -408,16 +408,16 @@ void spectrum_setup_sna(running_machine *machine, unsigned char *pSnapshot, unsi
 	}
 
 	if (SnapshotSize == 49179)
-	{		
+	{
 		/* get pc from stack */
 		addr = cpu_get_reg(cputag_get_cpu(machine, "maincpu"), Z80_SP) & 0xFFFF;
 
 		lo = memory_read_byte(space,addr + 0);
-		hi = memory_read_byte(space,addr + 1);		
+		hi = memory_read_byte(space,addr + 1);
 		cpu_set_reg(cputag_get_cpu(machine, "maincpu"), Z80_PC, (hi << 8) | lo);
 		memory_write_byte(space, addr + 0, 0);
 		memory_write_byte(space, addr + 1, 0);
-		
+
 		memory_write_byte(space, 0x5CB0, 0xff); // Set NMIADD system variable to make game run
 												//  when directly started with cart mounted
 		addr += 2;
@@ -465,14 +465,14 @@ static void spectrum_z80_decompress_block(running_machine *machine,unsigned char
 	unsigned char ch;
 	int i;
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	
+
 	do
 	{
 		/* get byte */
 		ch = pSource[0];
 
 		/* either start 0f 0x0ed, 0x0ed, xx yy or
-		 * single 0x0ed */
+         * single 0x0ed */
 		if (ch == (unsigned char) 0x0ed)
 		{
 			if (pSource[1] == (unsigned char) 0x0ed)

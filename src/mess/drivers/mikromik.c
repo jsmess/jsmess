@@ -15,52 +15,52 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- floppy RECALL
-	- keyboard (arrows, CAPS LOCK, punctuation, keypad stop)
-	- CP/M loading crashes
-	- ALL RAM CHIPS FAIL shows a screenful of garbage (DMA error?)
-	- PCB layout
-	- NEC µPD7220 (devicify Intel 82720 GDC)
-	- NEC µPD7201
+    - floppy RECALL
+    - keyboard (arrows, CAPS LOCK, punctuation, keypad stop)
+    - CP/M loading crashes
+    - ALL RAM CHIPS FAIL shows a screenful of garbage (DMA error?)
+    - PCB layout
+    - NEC ?PD7220 (devicify Intel 82720 GDC)
+    - NEC ?PD7201
 
 */
 
 /*
 
-	Nokia Elektroniikka pj
-	Controller ILC 9534
+    Nokia Elektroniikka pj
+    Controller ILC 9534
 
-	Parts:
+    Parts:
 
-	6,144 MHz xtal (CPU clock)
-	18,720 MHz xtal (pixel clock)
-	16 MHz xtal (FDC clock)
-	Intel 8085AP (CPU)
-	Intel 8253-5P (PIT)
-	Intel 8275P (CRTC)
-	Intel 8212P (I/OP)
-	Intel 8237A-5P (DMAC)
-	NEC µPD7220C (GDC)
-	NEC µPD7201P (MPSC=uart)
-	NEC µPD765 (FDC)
-	TMS4116-15 (16Kx4 DRAM)*4 = 32KB Video RAM for 7220
-	2164-6P (64Kx1 DRAM)*8 = 64KB Work RAM
+    6,144 MHz xtal (CPU clock)
+    18,720 MHz xtal (pixel clock)
+    16 MHz xtal (FDC clock)
+    Intel 8085AP (CPU)
+    Intel 8253-5P (PIT)
+    Intel 8275P (CRTC)
+    Intel 8212P (I/OP)
+    Intel 8237A-5P (DMAC)
+    NEC ?PD7220C (GDC)
+    NEC ?PD7201P (MPSC=uart)
+    NEC ?PD765 (FDC)
+    TMS4116-15 (16Kx4 DRAM)*4 = 32KB Video RAM for 7220
+    2164-6P (64Kx1 DRAM)*8 = 64KB Work RAM
 
-	DMA channels:
-	
-	0	CRT
-	1	MPSC transmit
-	2	MPSC receive
-	3	FDC
+    DMA channels:
 
-	Interrupts:
+    0   CRT
+    1   MPSC transmit
+    2   MPSC receive
+    3   FDC
 
-	INTR	MPSC INT
-	RST5.5	FDC IRQ
-	RST6.5	8212 INT
-	RST7.5	DMA EOP
+    Interrupts:
+
+    INTR    MPSC INT
+    RST5.5  FDC IRQ
+    RST6.5  8212 INT
+    RST7.5  DMA EOP
 
 */
 
@@ -138,7 +138,7 @@ static ADDRESS_MAP_START( mm1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xff50, 0xff50) AM_MIRROR(0x8e) AM_DEVREAD(UPD765_TAG, nec765_status_r)
 	AM_RANGE(0xff51, 0xff51) AM_MIRROR(0x8e) AM_DEVREADWRITE(UPD765_TAG, nec765_data_r, nec765_data_w)
 	AM_RANGE(0xff60, 0xff67) AM_MIRROR(0x88) AM_WRITE(ls259_w)
-//	AM_RANGE(0xff70, 0xff7f) AM_MIRROR(0x80) AM_DEVREADWRITE(UPD7220_TAG, i82720_r, i82720_w)
+//  AM_RANGE(0xff70, 0xff7f) AM_MIRROR(0x80) AM_DEVREADWRITE(UPD7220_TAG, i82720_r, i82720_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -196,7 +196,7 @@ static INPUT_PORTS_START( mm1 )
 
 	PORT_START("ROW5")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('+') PORT_CHAR('?')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('´') PORT_CHAR('`')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('?') PORT_CHAR('`')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("DEL") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR(':')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P')
@@ -270,14 +270,14 @@ static I8275_DISPLAY_PIXELS( crtc_display_pixels )
 
 	UINT8 data = state->char_rom[(charcode << 4) | linecount];
 	int i;
-	
+
 	for (i = 0; i < 8; i++)
 	{
 		*BITMAP_ADDR16(tmpbitmap, y, x + i) = BIT(data, i);
 	}
 }
 
-static const i8275_interface mm1_i8275_intf = 
+static const i8275_interface mm1_i8275_intf =
 {
 	SCREEN_TAG,
 	8,
@@ -332,7 +332,7 @@ static const gfx_layout tiles8x16_layout =
 	1,
 	{ 0 },
 	{ 7, 6, 5, 4, 3, 2, 1, 0 },
-	{  0*8,  1*8,  2*8,  3*8,  4*8,  5*8,  6*8,  7*8, 
+	{  0*8,  1*8,  2*8,  3*8,  4*8,  5*8,  6*8,  7*8,
 	   8*8,  9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
 	8*16
 };
@@ -370,14 +370,14 @@ static DMA8237_HRQ_CHANGED( dma_hrq_changed )
 static DMA8237_MEM_READ( memory_dma_r )
 {
 	const address_space *program = cputag_get_address_space(device->machine, I8085A_TAG, ADDRESS_SPACE_PROGRAM);
-//	logerror("DMA read %04x\n", offset);
+//  logerror("DMA read %04x\n", offset);
 	return memory_read_byte(program, offset);
 }
 
 static DMA8237_MEM_WRITE( memory_dma_w )
 {
 	const address_space *program = cputag_get_address_space(device->machine, I8085A_TAG, ADDRESS_SPACE_PROGRAM);
-//	logerror("DMA write %04x:%02x\n", offset, data);
+//  logerror("DMA write %04x:%02x\n", offset, data);
 	memory_write_byte(program, offset, data);
 }
 
@@ -394,7 +394,7 @@ static DMA8237_CHANNEL_READ( mpsc_dack_r )
 
 	/* clear data request */
 	dma8237_drq_write(state->i8237, DMA_MPSC_RX, CLEAR_LINE);
-	
+
 	return upd7201_hai_r(state->upd7201, 0);
 }
 
@@ -445,7 +445,7 @@ static const struct dma8237_interface mm1_dma8237_intf =
 	tc_w
 };
 
-/* µPD765 Interface */
+/* ?PD765 Interface */
 
 static NEC765_DMA_REQUEST( drq_w )
 {
@@ -509,7 +509,7 @@ static const struct pit8253_config mm1_pit8253_intf =
 	}
 };
 
-/* µPD7201 Interface */
+/* ?PD7201 Interface */
 
 static WRITE_LINE_DEVICE_HANDLER( drq2_w )
 {
@@ -670,7 +670,7 @@ static TIMER_DEVICE_CALLBACK( kbclk_tick )
 		/* get key data from PROM */
 		keydata = state->key_rom[(ctrl << 8) | (shift << 7) | (state->drive << 3) | (state->sense)];
 	}
-	
+
 	if (state->keydata != keydata)
 	{
 		/* latch key data */
@@ -744,7 +744,7 @@ static MACHINE_DRIVER_START( mm1 )
 	MDRV_PIT8253_ADD(I8253_TAG, mm1_pit8253_intf)
 	MDRV_NEC765A_ADD(UPD765_TAG, /* XTAL_16MHz/2/2, */ mm1_nec765_intf)
 	MDRV_UPD7201_ADD(UPD7201_TAG, XTAL_6_144MHz/2, mm1_upd7201_intf)
-	
+
 	MDRV_FLOPPY_2_DRIVES_ADD(mm1_floppy_config)
 MACHINE_DRIVER_END
 
@@ -762,18 +762,18 @@ ROM_START( mm1m6 )
 
 	/*
 
-		Address Decoder PROM outputs
+        Address Decoder PROM outputs
 
-		D0		IOEN/_MEMEN
-		D1		RAMEN
-		D2		not connected
-		D3		_CE4
-		D4		_CE0
-		D5		_CE1
-		D6		_CE2
-		D7		_CE3
+        D0      IOEN/_MEMEN
+        D1      RAMEN
+        D2      not connected
+        D3      _CE4
+        D4      _CE0
+        D5      _CE1
+        D6      _CE2
+        D7      _CE3
 
-	*/
+    */
 	ROM_REGION( 0x200, "address", 0 ) /* address decoder */
 	ROM_LOAD( "720793a.ic24", 0x0000, 0x0200, CRC(deea87a6) SHA1(8f19e43252c9a0b1befd02fc9d34fe1437477f3a) )
 
@@ -798,6 +798,6 @@ SYSTEM_CONFIG_END
 
 /* System Drivers */
 
-//    YEAR  NAME		PARENT  COMPAT	MACHINE		INPUT		INIT	CONFIG    COMPANY			FULLNAME				FLAGS
+//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    CONFIG    COMPANY           FULLNAME                FLAGS
 COMP( 1981, mm1m6,		0,		0,		mm1m6,		mm1,		0, 		mm1m6,	  "Nokia Data",		"MikroMikko 1 M6",		GAME_NOT_WORKING )
 COMP( 1981, mm1m7,		mm1m6,	0,		mm1m6,		mm1,		0, 		mm1m7,	  "Nokia Data",		"MikroMikko 1 M7",		GAME_NOT_WORKING )

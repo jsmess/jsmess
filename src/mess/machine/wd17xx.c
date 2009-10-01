@@ -43,29 +43,29 @@
         - Bugfix: busy flag was cleared too early
 
     2009-June-21 Robbbert:
-	- The Bugfix above, while valid, caused the Osborne1 to fail. This
-	  is because the delay must not exceed 14usec (found by extensive testing).
-	- The minimum delay is 1usec, need by z80netf while formatting a disk.
-	- http://www.bannister.org/forums/ubbthreads.php?ubb=showflat&Number=50889#Post50889
-	  explains the problems, testing done, and the test procedure for the z80netf.
-	- Thus, the delay is set to 10usec, and all the disks I have (not many)
-	  seem to work.
-	- Note to anyone who wants to change something: Make sure that the
-	  Osborne1 boots up! It is extremely sensitive to timing!
-	- For testing only: The osborne1 rom can be patched to make it much
-	  more stable, by changing the byte at 0x0da7 from 0x28 to 0x18.
+    - The Bugfix above, while valid, caused the Osborne1 to fail. This
+      is because the delay must not exceed 14usec (found by extensive testing).
+    - The minimum delay is 1usec, need by z80netf while formatting a disk.
+    - http://www.bannister.org/forums/ubbthreads.php?ubb=showflat&Number=50889#Post50889
+      explains the problems, testing done, and the test procedure for the z80netf.
+    - Thus, the delay is set to 10usec, and all the disks I have (not many)
+      seem to work.
+    - Note to anyone who wants to change something: Make sure that the
+      Osborne1 boots up! It is extremely sensitive to timing!
+    - For testing only: The osborne1 rom can be patched to make it much
+      more stable, by changing the byte at 0x0da7 from 0x28 to 0x18.
 
     2009-June-25 Robbbert:
-	- Turns out kayproii not working, 10usec is too short.. but 11usec is ok.
-	  Setting it to 12usec.
-	  Really, this whole thing needs a complete rewrite.
+    - Turns out kayproii not working, 10usec is too short.. but 11usec is ok.
+      Setting it to 12usec.
+      Really, this whole thing needs a complete rewrite.
 
     2009-July-08 Roberto Lavarone:
-	- Fixed a bug in head load flag handling: einstein and samcoupe now working again
+    - Fixed a bug in head load flag handling: einstein and samcoupe now working again
 
     2009-September-30 Robbbert:
-	- Modified what status flags are returned after a Forced Interrupt,
-	  to allow Microbee to boot CP/M.
+    - Modified what status flags are returned after a Forced Interrupt,
+      to allow Microbee to boot CP/M.
 
     TODO:
         - Multiple record write
@@ -933,7 +933,7 @@ static void wd17xx_complete_command(const device_config *device, int delay)
 
 	usecs = 12;
 
-	/* set new timer */	
+	/* set new timer */
 	timer_adjust_oneshot(w->timer, ATTOTIME_IN_USEC(usecs), MISCCALLBACK_COMMAND);
 }
 

@@ -317,7 +317,7 @@ static WRITE_LINE_DEVICE_HANDLER( mda_vsync_changed )
 
 
 /*
- *	rW	MDA mode control register (see #P138)
+ *  rW  MDA mode control register (see #P138)
  */
 static void mda_mode_control_w(running_machine *machine, int data)
 {
@@ -339,16 +339,16 @@ static void mda_mode_control_w(running_machine *machine, int data)
 }
 
 
-/*	R-	CRT status register (see #P139)
- *		(EGA/VGA) input status 1 register
- *		7	 HGC vertical sync in progress
- *		6-4  adapter 000  hercules
- *					 001  hercules+
- *					 101  hercules InColor
- *					 else unknown
- *		3	 pixel stream (0 black, 1 white)
- *		2-1  reserved
- *		0	 horizontal drive enable
+/*  R-  CRT status register (see #P139)
+ *      (EGA/VGA) input status 1 register
+ *      7    HGC vertical sync in progress
+ *      6-4  adapter 000  hercules
+ *                   001  hercules+
+ *                   101  hercules InColor
+ *                   else unknown
+ *      3    pixel stream (0 black, 1 white)
+ *      2-1  reserved
+ *      0    horizontal drive enable
  */
 static int pc_mda_status_r(void)
 {
@@ -359,8 +359,8 @@ static int pc_mda_status_r(void)
 
 /*************************************************************************
  *
- *		MDA
- *		monochrome display adapter
+ *      MDA
+ *      monochrome display adapter
  *
  *************************************************************************/
 WRITE8_HANDLER ( pc_MDA_w )

@@ -1,5 +1,5 @@
 /*
-	Hitachi HD63450 DMA Controller
+    Hitachi HD63450 DMA Controller
 */
 
 #include "driver.h"

@@ -85,7 +85,7 @@ void svision_soundport_w (running_machine *machine, SVISION_CHANNEL *channel, in
 			size = channel->reg[0] | ((channel->reg[1] & 7) << 8);
 			if (size)
 			{
-				//	channel->size=(int)(machine->sample_rate*(size<<5)/4e6);
+				//  channel->size=(int)(machine->sample_rate*(size<<5)/4e6);
 				channel->size= (int) (machine->sample_rate * (size << 5) / cputag_get_clock(machine, "maincpu"));
 			}
 			else

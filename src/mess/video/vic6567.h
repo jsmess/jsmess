@@ -11,7 +11,7 @@
  *
  ****************************************************************************/
 
-// there're many chips; we use for PAL: 6569 and for NTSC 6567R8 
+// there're many chips; we use for PAL: 6569 and for NTSC 6567R8
 
 #ifndef VIC6567_H_
 #define VIC6567_H_

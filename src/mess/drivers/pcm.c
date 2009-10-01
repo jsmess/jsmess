@@ -14,7 +14,7 @@ static UINT8 *pcm_video_ram;
 static ADDRESS_MAP_START(pcm_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
     AM_RANGE( 0x0000, 0x1fff ) AM_ROM  // ROM
-    AM_RANGE( 0x2000, 0xf7ff ) AM_RAM  // RAM	
+    AM_RANGE( 0x2000, 0xf7ff ) AM_RAM  // RAM
     AM_RANGE( 0xf800, 0xffff ) AM_RAM AM_BASE(&pcm_video_ram) // Video RAM
 ADDRESS_MAP_END
 
@@ -25,8 +25,8 @@ ADDRESS_MAP_END
 /* Input ports */
 INPUT_PORTS_EXTERN( k7659 );
 
-static MACHINE_RESET(pcm) 
-{	
+static MACHINE_RESET(pcm)
+{
 }
 
 static VIDEO_START( pcm )
@@ -38,9 +38,9 @@ static VIDEO_UPDATE( pcm )
  	UINT8 code;
  	UINT8 line;
 	int y, x, j, b;
-	
+
 	UINT8 *gfx = memory_region(screen->machine, "gfx1");
-	
+
 	for (y = 0; y < 32; y++)
 	{
 		for (x = 0; x < 64; x++)
@@ -50,7 +50,7 @@ static VIDEO_UPDATE( pcm )
 			{
 				line = gfx[code*8 + j];
 				for (b = 0; b < 8; b++)
-				{					
+				{
 					*BITMAP_ADDR16(bitmap, y*8+j, x * 8 + (7 - b)) =  ((line >> b) & 0x01);
 				}
 			}
@@ -64,10 +64,10 @@ static MACHINE_DRIVER_START( pcm )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_10MHz /4)
     MDRV_CPU_PROGRAM_MAP(pcm_mem)
-    MDRV_CPU_IO_MAP(pcm_io)	
+    MDRV_CPU_IO_MAP(pcm_io)
 
     MDRV_MACHINE_RESET(pcm)
-	
+
     /* video hardware */
     MDRV_SCREEN_ADD("screen", RASTER)
     MDRV_SCREEN_REFRESH_RATE(50)
@@ -81,7 +81,7 @@ static MACHINE_DRIVER_START( pcm )
     MDRV_VIDEO_START(pcm)
     MDRV_VIDEO_UPDATE(pcm)
 MACHINE_DRIVER_END
- 
+
 /* ROM definition */
 ROM_START( pcm )
     ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
@@ -103,7 +103,7 @@ ROM_START( pcm )
 	ROM_REGION(0x0800, "gfx1",0)
 	ROM_LOAD( "charrom.d113", 0x0000, 0x0800, CRC(5684b3c3) SHA1(418054aa70a0fd120611e32059eb2051d3b82b5a))
 	ROM_REGION(0x0800, "k7659",0)
-	ROM_LOAD ("k7659n.d8", 0x0000, 0x0800, CRC(7454bf0a) SHA1(b97e7df93778fa371b96b6f4fb1a5b1c8b89d7ba) )	
+	ROM_LOAD ("k7659n.d8", 0x0000, 0x0800, CRC(7454bf0a) SHA1(b97e7df93778fa371b96b6f4fb1a5b1c8b89d7ba) )
 ROM_END
 
 /* Driver */

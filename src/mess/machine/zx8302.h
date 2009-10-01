@@ -6,27 +6,27 @@
     Visit http://mamedev.org for licensing and usage restrictions.
 
 **********************************************************************
-							_____   _____
-				 ERASE   1 |*    \_/     | 40  
-			   EXTINTL   2 |			 | 39  DB4
-				MDRDWL   3 |			 | 38  DB5
-				         4 |			 | 37  DB0
-				BAUDX4   5 |			 | 36  DB1
-				NETOUT   6 |			 | 35  COMDATA
-				         7 |			 | 34  MDSELDH
-				 DCSML   8 |			 | 33  MDSELCKH
-					     9 |			 | 32  VSYNCH
-				 PCENL  10 |	ZX8302	 | 31  XTAL2
-				        11 |	 ULA	 | 30  XTAL1
-				   DB2  12 |			 | 29  
-				        13 |			 | 28  RESETOUTL
-				        14 |			 | 27  DB7
-				    A5  15 |			 | 26  IPL1L
-				 NETIN  16 |			 | 25  CLKCPU
-				    A1  17 |			 | 24  DB3
-				    A0  18 |			 | 23  DB6
-				  RAW2  19 |			 | 22  COMCTL
-			 RESETOUTL  20 |_____________| 21  RAW1
+                            _____   _____
+                 ERASE   1 |*    \_/     | 40
+               EXTINTL   2 |             | 39  DB4
+                MDRDWL   3 |             | 38  DB5
+                         4 |             | 37  DB0
+                BAUDX4   5 |             | 36  DB1
+                NETOUT   6 |             | 35  COMDATA
+                         7 |             | 34  MDSELDH
+                 DCSML   8 |             | 33  MDSELCKH
+                         9 |             | 32  VSYNCH
+                 PCENL  10 |    ZX8302   | 31  XTAL2
+                        11 |     ULA     | 30  XTAL1
+                   DB2  12 |             | 29
+                        13 |             | 28  RESETOUTL
+                        14 |             | 27  DB7
+                    A5  15 |             | 26  IPL1L
+                 NETIN  16 |             | 25  CLKCPU
+                    A1  17 |             | 24  DB3
+                    A0  18 |             | 23  DB6
+                  RAW2  19 |             | 22  COMCTL
+             RESETOUTL  20 |_____________| 21  RAW1
 
 **********************************************************************/
 

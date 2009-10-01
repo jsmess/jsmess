@@ -205,7 +205,7 @@ static MACHINE_DRIVER_START( pce )
 	MDRV_SOUND_ROUTE( 1, "rspeaker", 1.00 )
 
 	MDRV_CDROM_ADD( "cdrom" )
-	
+
 	MDRV_IMPORT_FROM( pce_cartslot )
 MACHINE_DRIVER_END
 
@@ -246,7 +246,7 @@ static MACHINE_DRIVER_START( sgx )
 	MDRV_SOUND_ADD( "cdda", CDDA, 0 )
 	MDRV_SOUND_ROUTE( 0, "lspeaker", 1.00 )
 	MDRV_SOUND_ROUTE( 1, "rspeaker", 1.00 )
-	
+
 	MDRV_IMPORT_FROM( pce_cartslot )
 MACHINE_DRIVER_END
 

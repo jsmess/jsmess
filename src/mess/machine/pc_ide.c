@@ -1,9 +1,9 @@
 /***************************************************************************
 
-	machine/pc_ide.c
+    machine/pc_ide.c
 
-	Functions to emulate a IDE hard disk controller
-	Not (currently) used, since an XT does not have IDE support in BIOS :(
+    Functions to emulate a IDE hard disk controller
+    Not (currently) used, since an XT does not have IDE support in BIOS :(
 
 ***************************************************************************/
 
@@ -64,11 +64,11 @@ static void pc_ide_write_precomp_w(DEVICE *This, int data)
  * 7   which drive failed (0 = master, 1 = slave)
  * 6-3 reserved
  * 2-0 error code
- *	   001 no error detected
- *	   010 formatter device error
- *	   011 sector buffer error
- *	   100 ECC circuitry error
- *	   101 controlling microprocessor error
+ *     001 no error detected
+ *     010 formatter device error
+ *     011 sector buffer error
+ *     100 ECC circuitry error
+ *     101 controlling microprocessor error
  * ---operation mode---
  * 7   bad block detected
  * 6   uncorrectable ECC error
@@ -224,14 +224,14 @@ static void pc_ide_command_w(DEVICE *This, int data)
 
 /*
  * Bit(s) Description
- * 7	  controller is executing a command
- * 6	  drive is ready
- * 5	  write fault
- * 4	  seek complete
- * 3	  sector buffer requires servicing
- * 2	  disk data read successfully corrected
- * 1	  index - set to 1 each disk revolution
- * 0	  previous command ended in an error
+ * 7      controller is executing a command
+ * 6      drive is ready
+ * 5      write fault
+ * 4      seek complete
+ * 3      sector buffer requires servicing
+ * 2      disk data read successfully corrected
+ * 1      index - set to 1 each disk revolution
+ * 0      previous command ended in an error
  */
 static int pc_ide_status_r(DEVICE *This)
 {
@@ -242,8 +242,8 @@ static int pc_ide_status_r(DEVICE *This)
 
 /*************************************************************************
  *
- *		ATHD
- *		AT hard disk
+ *      ATHD
+ *      AT hard disk
  *
  *************************************************************************/
 WRITE8_HANDLER(at_mfm_0_w)

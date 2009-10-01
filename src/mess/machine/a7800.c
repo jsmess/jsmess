@@ -1,22 +1,22 @@
 /***************************************************************************
 
-	a7800.c
+    a7800.c
 
-	Machine file to handle emulation of the Atari 7800.
+    Machine file to handle emulation of the Atari 7800.
 
-	 5-Nov-2003 npwoods		Cleanups
+     5-Nov-2003 npwoods     Cleanups
 
-	14-May-2002	kubecj		Fixed Fatal Run - adding simple riot timer helped.
-							maybe someone with knowledge should add full fledged
-							riot emulation?
+    14-May-2002 kubecj      Fixed Fatal Run - adding simple riot timer helped.
+                            maybe someone with knowledge should add full fledged
+                            riot emulation?
 
-	13-May-2002 kubecj		Fixed a7800_cart_type not to be too short ;-D
-							fixed for loading of bank6 cart (uh, I hope)
-							fixed for loading 64k supercarts
-							fixed for using PAL bios
-							cart not needed when in PAL mode
-							added F18 Hornet bank select type
-							added Activision bank select type
+    13-May-2002 kubecj      Fixed a7800_cart_type not to be too short ;-D
+                            fixed for loading of bank6 cart (uh, I hope)
+                            fixed for loading 64k supercarts
+                            fixed for using PAL bios
+                            cart not needed when in PAL mode
+                            added F18 Hornet bank select type
+                            added Activision bank select type
 
 ***************************************************************************/
 
@@ -142,35 +142,35 @@ MACHINE_RESET( a7800 )
 #define MBANK_TYPE_ACTIVISION 0x0100
 #define MBANK_TYPE_ABSOLUTE 0x0200
 
-/*	Header format
-0	  Header version	 - 1 byte
-1..16  "ATARI7800	  "  - 16 bytes
-17..48 Cart title		 - 32 bytes
-49..52 data length		- 4 bytes
-53..54 cart type		  - 2 bytes
-	bit 0 0x01 - pokey cart
-	bit 1 0x02 - supercart bank switched
-	bit 2 0x04 - supercart RAM at $4000
-	bit 3 0x08 - additional ROM at $4000
+/*  Header format
+0     Header version     - 1 byte
+1..16  "ATARI7800     "  - 16 bytes
+17..48 Cart title        - 32 bytes
+49..52 data length      - 4 bytes
+53..54 cart type          - 2 bytes
+    bit 0 0x01 - pokey cart
+    bit 1 0x02 - supercart bank switched
+    bit 2 0x04 - supercart RAM at $4000
+    bit 3 0x08 - additional ROM at $4000
 
-	bit 8-15 - Special
-		0 = Normal cart
-		1 = Absolute (F18 Hornet)
-		2 = Activision
+    bit 8-15 - Special
+        0 = Normal cart
+        1 = Absolute (F18 Hornet)
+        2 = Activision
 
-55	 controller 1 type  - 1 byte
-56	 controller 2 type  - 1 byte
-	0 = None
-	1 = Joystick
-	2 = Light Gun
+55   controller 1 type  - 1 byte
+56   controller 2 type  - 1 byte
+    0 = None
+    1 = Joystick
+    2 = Light Gun
 57  0 = NTSC/1 = PAL
 
 100..127 "ACTUAL CART DATA STARTS HERE" - 28 bytes
 
 Versions:
-	Version 0: Initial release
-	Version 1: Added PAL/NTSC bit. Added Special cart byte.
-			   Changed 53 bit 2, added bit 3
+    Version 0: Initial release
+    Version 1: Added PAL/NTSC bit. Added Special cart byte.
+               Changed 53 bit 2, added bit 3
 
 */
 
@@ -274,11 +274,11 @@ DEVICE_IMAGE_LOAD( a7800_cart )
 		memcpy( memory + 0xC000, memory + 0x10000 + len - 0x4000, 0x4000);
 
 		/* fixed 2002/05/13 kubecj
-			there was 0x08, I added also two other cases.
-			Now, it loads bank n-2 to $4000 if it's empty.
-		*/
+            there was 0x08, I added also two other cases.
+            Now, it loads bank n-2 to $4000 if it's empty.
+        */
 
-		/* bank n-2	*/
+		/* bank n-2 */
 		if( ! ( a7800_cart_type & 0x0D ) )
 		{
 			memcpy( memory + 0x4000, memory + 0x10000 + len - 0x8000, 0x4000);
@@ -372,7 +372,7 @@ WRITE8_HANDLER( a7800_cart_w )
 		}
 		memory_set_bankptr(space->machine, 2,memory + 0x10000 + (data << 14));
 		memory_set_bankptr(space->machine, 3,memory + 0x12000 + (data << 14));
-	/*	logerror("BANK SEL: %d\n",data); */
+	/*  logerror("BANK SEL: %d\n",data); */
 	}
 	else if(( a7800_cart_type == MBANK_TYPE_ABSOLUTE ) &&( offset == 0x4000 ) )
 	{

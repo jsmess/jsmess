@@ -1,63 +1,63 @@
 /***************************************************************************
 
-	video/cirrus.c
+    video/cirrus.c
 
-	Cirrus SVGA card emulation (preliminary)
+    Cirrus SVGA card emulation (preliminary)
 
-	Cirrus has the following additional registers that are not present in
-	conventional VGA:
+    Cirrus has the following additional registers that are not present in
+    conventional VGA:
 
-	SEQ 06h:		Unlock Cirrus registers; write 12h to unlock registers,
-					and	read 12h back to confirm Cirrus presence.
-	SEQ 07h
-		bit 3-1:	Pixel depth
-						0x00	8 bpp
-						0x02	16 bpp (double vert clock)
-						0x04	24 bpp
-						0x06	16 bpp
-						0x08	32 bpp
-		bit 0:		VGA/SVGA (0=VGA, 1=SVGA)
-	SEQ 0Fh
-		bit 7:		Bankswitch enable
-		bits 4-3:	Memory size
-						0x00	256K
-						0x08	512K
-						0x10	1M
-						0x18	2M
-	SEQ 12h:		Hardware Cursor
-
-
+    SEQ 06h:        Unlock Cirrus registers; write 12h to unlock registers,
+                    and read 12h back to confirm Cirrus presence.
+    SEQ 07h
+        bit 3-1:    Pixel depth
+                        0x00    8 bpp
+                        0x02    16 bpp (double vert clock)
+                        0x04    24 bpp
+                        0x06    16 bpp
+                        0x08    32 bpp
+        bit 0:      VGA/SVGA (0=VGA, 1=SVGA)
+    SEQ 0Fh
+        bit 7:      Bankswitch enable
+        bits 4-3:   Memory size
+                        0x00    256K
+                        0x08    512K
+                        0x10    1M
+                        0x18    2M
+    SEQ 12h:        Hardware Cursor
 
 
-	GC 09h:			Set 64k bank (bits 3-0 only)
-	GC 20h:			Blit Width (bits 7-0)
-	GC 21h:			Blit Width (bits 12-8)
-	GC 22h:			Blit Height (bits 7-0)
-	GC 23h:			Blit Height (bits 12-8)
-	GC 24h:			Blit Destination Pitch (bits 7-0)
-	GC 25h:			Blit Destination Pitch (bits 12-8)
-	GC 26h:			Blit Source Pitch (bits 7-0)
-	GC 27h:			Blit Source Pitch (bits 12-8)
-	GC 28h:			Blit Destination Address (bits 7-0)
-	GC 29h:			Blit Destination Address (bits 15-8)
-	GC 2Ah:			Blit Destination Address (bits 21-16)
-	GC 2Ch:			Blit Source Address (bits 7-0)
-	GC 2Dh:			Blit Source Address (bits 15-8)
-	GC 2Eh:			Blit Source Address (bits 21-16)
-	GC 2Fh:			Blit Write Mask
-	GC 30h:			Blit Mode
-	GC 31h:			Blit Status
-						bit 7 - Autostart
-						bit 4 - FIFO Used
-						bit 2 - Blit Reset
-						bit 1 - Blit Started
-						bit 0 - Blit Busy
-	GC 32h:			Raster Operation
-	GC 33h:			Blit Mode Extension
-	GC 34h:			Blit Transparent Color (bits 7-0)
-	GC 35h:			Blit Transparent Color (bits 15-8)
-	GC 38h:			Blit Transparent Color Mask (bits 7-0)
-	GC 39h:			Blit Transparent Color Mask (bits 15-8)
+
+
+    GC 09h:         Set 64k bank (bits 3-0 only)
+    GC 20h:         Blit Width (bits 7-0)
+    GC 21h:         Blit Width (bits 12-8)
+    GC 22h:         Blit Height (bits 7-0)
+    GC 23h:         Blit Height (bits 12-8)
+    GC 24h:         Blit Destination Pitch (bits 7-0)
+    GC 25h:         Blit Destination Pitch (bits 12-8)
+    GC 26h:         Blit Source Pitch (bits 7-0)
+    GC 27h:         Blit Source Pitch (bits 12-8)
+    GC 28h:         Blit Destination Address (bits 7-0)
+    GC 29h:         Blit Destination Address (bits 15-8)
+    GC 2Ah:         Blit Destination Address (bits 21-16)
+    GC 2Ch:         Blit Source Address (bits 7-0)
+    GC 2Dh:         Blit Source Address (bits 15-8)
+    GC 2Eh:         Blit Source Address (bits 21-16)
+    GC 2Fh:         Blit Write Mask
+    GC 30h:         Blit Mode
+    GC 31h:         Blit Status
+                        bit 7 - Autostart
+                        bit 4 - FIFO Used
+                        bit 2 - Blit Reset
+                        bit 1 - Blit Started
+                        bit 0 - Blit Busy
+    GC 32h:         Raster Operation
+    GC 33h:         Blit Mode Extension
+    GC 34h:         Blit Transparent Color (bits 7-0)
+    GC 35h:         Blit Transparent Color (bits 15-8)
+    GC 38h:         Blit Transparent Color Mask (bits 7-0)
+    GC 39h:         Blit Transparent Color Mask (bits 15-8)
 
 ***************************************************************************/
 
@@ -146,7 +146,7 @@ const struct pc_svga_interface cirrus_svga_interface =
 
 /*************************************
  *
- *	PCI card interface
+ *  PCI card interface
  *
  *************************************/
 
@@ -193,7 +193,7 @@ void cirrus5430_pci_write(const device_config *busdevice, const device_config *d
 
 /*************************************
  *
- *	Ports
+ *  Ports
  *
  *************************************/
 

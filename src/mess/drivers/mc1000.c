@@ -4,19 +4,19 @@
 
     12/05/2009 Skeleton driver.
 
-	http://ensjo.wikispaces.com/MC-1000+on+JEMU
-	http://ensjo.blogspot.com/2006/11/color-artifacting-no-mc-1000.html
+    http://ensjo.wikispaces.com/MC-1000+on+JEMU
+    http://ensjo.blogspot.com/2006/11/color-artifacting-no-mc-1000.html
 
 ****************************************************************************/
 
 /*
 
-	TODO:
+    TODO:
 
-	- xtal frequency?
-	- Z80 wait at 0x0000-0x1fff when !hsync & !vsync
-	- 80-column card (MC6845) character generator ROM
-	- Charlemagne / GEM-1000 / Junior Computer ROMs
+    - xtal frequency?
+    - Z80 wait at 0x0000-0x1fff when !hsync & !vsync
+    - 80-column card (MC6845) character generator ROM
+    - Charlemagne / GEM-1000 / Junior Computer ROMs
 
 */
 
@@ -108,18 +108,18 @@ static WRITE8_HANDLER( mc6847_attr_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		enable CPU video RAM access
-		1		CSS
-		2		GM0
-		3		GM1
-		4		GM2
-		5		_INT/EXT
-		6		_A/S
-		7		_A/G
+        0       enable CPU video RAM access
+        1       CSS
+        2       GM0
+        3       GM1
+        4       GM2
+        5       _INT/EXT
+        6       _A/S
+        7       _A/G
 
-	*/
+    */
 
 	mc1000_state *state = space->machine->driver_data;
 
@@ -151,8 +151,8 @@ static ADDRESS_MAP_START( mc1000_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x04, 0x04) AM_READWRITE(printer_r, printer_w)
 	AM_RANGE(0x05, 0x05) AM_DEVWRITE(CENTRONICS_TAG, centronics_data_w)
-//	AM_RANGE(0x10, 0x10) AM_DEVWRITE(MC6845_TAG, mc6845_address_w)
-//	AM_RANGE(0x11, 0x11) AM_DEVREADWRITE(MC6845_TAG, mc6845_register_r, mc6845_register_w)
+//  AM_RANGE(0x10, 0x10) AM_DEVWRITE(MC6845_TAG, mc6845_address_w)
+//  AM_RANGE(0x11, 0x11) AM_DEVREADWRITE(MC6845_TAG, mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0x12, 0x12) AM_WRITE(mc6845_ctrl_w)
 	AM_RANGE(0x20, 0x20) AM_DEVWRITE(AY8910_TAG, ay8910_address_w)
 	AM_RANGE(0x40, 0x40) AM_DEVREAD(AY8910_TAG, ay8910_r)
@@ -489,5 +489,5 @@ static DRIVER_INIT( mc1000 )
 
 /* System Drivers */
 
-/*    YEAR	NAME		PARENT		COMPAT	MACHINE		INPUT		INIT		CONFIG		COMPANY				FULLNAME		FLAGS */
+/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT        CONFIG      COMPANY             FULLNAME        FLAGS */
 COMP( 1985,	mc1000,		0,			0,		mc1000,		mc1000,		mc1000,		mc1000,		"CCE",				"MC-1000",		GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )

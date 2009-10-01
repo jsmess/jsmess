@@ -110,10 +110,10 @@ static void jupiter_machine_stop(running_machine *machine)
 /* Load in .ace files. These are memory images of 0x2000 to 0x7fff
    and compressed as follows:
 
-   ED 00		: End marker
-   ED 01 ED		: 0xED
-   ED <cnt> <byt>	: repeat <byt> count <cnt:3-240> times
-   <byt>		: <byt>
+   ED 00        : End marker
+   ED 01 ED     : 0xED
+   ED <cnt> <byt>   : repeat <byt> count <cnt:3-240> times
+   <byt>        : <byt>
 */
 
 DEVICE_IMAGE_LOAD( jupiter_ace )

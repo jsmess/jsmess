@@ -6,59 +6,59 @@
   I/O ports)
 
   References:
-		There are two main references for the info for this driver
-		- Tandy Color Computer Unravelled Series
-					(http://www.giftmarket.org/unravelled/unravelled.shtml)
-		- Assembly Language Programming For the CoCo 3 by Laurence A. Tepolt
-		- Kevin K. Darlings GIME reference
-					(http://www.cris.com/~Alxevans/gime.txt)
-		- Sock Masters's GIME register reference
-					(http://www.axess.com/twilight/sock/gime.html)
-		- Robert Gault's FAQ
-					(http://home.att.net/~robert.gault/Coco/FAQ/FAQ_main.htm)
-		- Discussions with L. Curtis Boyle (LCB) and John Kowalski (JK)
+        There are two main references for the info for this driver
+        - Tandy Color Computer Unravelled Series
+                    (http://www.giftmarket.org/unravelled/unravelled.shtml)
+        - Assembly Language Programming For the CoCo 3 by Laurence A. Tepolt
+        - Kevin K. Darlings GIME reference
+                    (http://www.cris.com/~Alxevans/gime.txt)
+        - Sock Masters's GIME register reference
+                    (http://www.axess.com/twilight/sock/gime.html)
+        - Robert Gault's FAQ
+                    (http://home.att.net/~robert.gault/Coco/FAQ/FAQ_main.htm)
+        - Discussions with L. Curtis Boyle (LCB) and John Kowalski (JK)
 
   TODO:
-		- Implement unimplemented SAM registers
-		- Implement unimplemented interrupts (serial)
-		- Choose and implement more appropriate ratios for the speed up poke
-		- Handle resets correctly
+        - Implement unimplemented SAM registers
+        - Implement unimplemented interrupts (serial)
+        - Choose and implement more appropriate ratios for the speed up poke
+        - Handle resets correctly
 
   In the CoCo, all timings should be exactly relative to each other.  This
   table shows how all clocks are relative to each other (info: JK):
-		- Main CPU Clock				0.89 MHz
-		- Horizontal Sync Interrupt		15.7 kHz/63.5us	(57 clock cycles)
-		- Vertical Sync Interrupt		60 Hz			(14934 clock cycles)
-		- Composite Video Color Carrier	3.58 MHz/279ns	(1/4 clock cycles)
+        - Main CPU Clock                0.89 MHz
+        - Horizontal Sync Interrupt     15.7 kHz/63.5us (57 clock cycles)
+        - Vertical Sync Interrupt       60 Hz           (14934 clock cycles)
+        - Composite Video Color Carrier 3.58 MHz/279ns  (1/4 clock cycles)
 
   It is also noting that the CoCo 3 had two sets of VSync interrupts.  To quote
   John Kowalski:
 
-	One other thing to mention is that the old vertical interrupt and the new
-	vertical interrupt are not the same..  The old one is triggered by the
-	video's vertical sync pulse, but the new one is triggered on the next scan
-	line *after* the last scan line of the active video display.  That is : new
-	vertical interrupt triggers somewheres around scan line 230 of the 262 line
-	screen (if a 200 line graphics mode is used, a bit earlier if a 192 line
-	mode is used and a bit later if a 225 line mode is used).  The old vsync
-	interrupt triggers on scanline zero.
+    One other thing to mention is that the old vertical interrupt and the new
+    vertical interrupt are not the same..  The old one is triggered by the
+    video's vertical sync pulse, but the new one is triggered on the next scan
+    line *after* the last scan line of the active video display.  That is : new
+    vertical interrupt triggers somewheres around scan line 230 of the 262 line
+    screen (if a 200 line graphics mode is used, a bit earlier if a 192 line
+    mode is used and a bit later if a 225 line mode is used).  The old vsync
+    interrupt triggers on scanline zero.
 
-	230 is just an estimate [(262-200)/2+200].  I don't think the active part
-	of the screen is exactly centered within the 262 line total.  I can
-	research that for you if you want an exact number for scanlines before the
-	screen starts and the scanline that the v-interrupt triggers..etc.
+    230 is just an estimate [(262-200)/2+200].  I don't think the active part
+    of the screen is exactly centered within the 262 line total.  I can
+    research that for you if you want an exact number for scanlines before the
+    screen starts and the scanline that the v-interrupt triggers..etc.
 
 Dragon Alpha code added 21-Oct-2004,
-			Phill Harvey-Smith (afra@aurigae.demon.co.uk)
+            Phill Harvey-Smith (afra@aurigae.demon.co.uk)
 
-			Added AY-8912 and FDC code 30-Oct-2004.
+            Added AY-8912 and FDC code 30-Oct-2004.
 
 Fixed Dragon Alpha NMI enable/disable, following circuit traces on a real machine.
-	P.Harvey-Smith, 11-Aug-2005.
+    P.Harvey-Smith, 11-Aug-2005.
 
 Re-implemented Alpha NMI enable/disable, using direct PIA reads, rather than
 keeping track of it in a variable in the driver.
-	P.Harvey-Smith, 25-Sep-2006.
+    P.Harvey-Smith, 25-Sep-2006.
 
 Radically re-wrote memory emulation code for CoCo 1/2 & Dragon machines, the
 new code emulates the memory mapping of the SAM, dependent on what size of
@@ -75,7 +75,7 @@ the code for individual machine types into seperate files, I have preposed, that
 the CoCo 1/2 should stay in coco.c, and that the coco3 and dragon specifc code
 should go into coco3.c and dragon.c which should (hopefully) make the code
 easier to manage.
-	P.Harvey-Smith, Dec 2006-Feb 2007
+    P.Harvey-Smith, Dec 2006-Feb 2007
 ***************************************************************************/
 
 #include <math.h>
@@ -238,8 +238,8 @@ static CPU_DISASSEMBLE(coco_dasm_override);
  * Notes of interest:  Below are some observations of key programs and what
  * they rely on:
  *
- *		COLOR3:
- *			 (fs_pia_flip ? fall_scanline : rise_scanline) = border_top - 32
+ *      COLOR3:
+ *           (fs_pia_flip ? fall_scanline : rise_scanline) = border_top - 32
  */
 
 const struct coco3_video_vars coco3_vidvars =
@@ -271,12 +271,12 @@ const pia6821_interface coco_pia_intf_0 =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	/*outputs: A/B,CA/B2	   */
+	/*outputs: A/B,CA/B2       */
 	DEVCB_HANDLER(d_pia0_pa_w),
 	DEVCB_HANDLER(d_pia0_pb_w),
 	DEVCB_HANDLER(d_pia0_ca2_w),
 	DEVCB_HANDLER(d_pia0_cb2_w),
-	/*irqs	 : A/B			   */
+	/*irqs   : A/B             */
 	DEVCB_LINE(d_pia0_irq_a),
 	DEVCB_LINE(d_pia0_irq_b)
 };
@@ -291,12 +291,12 @@ const pia6821_interface coco_pia_intf_1 =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	/*outputs: A/B,CA/B2	   */
+	/*outputs: A/B,CA/B2       */
 	DEVCB_HANDLER(d_pia1_pa_w),
 	DEVCB_HANDLER(d_pia1_pb_w),
 	DEVCB_HANDLER(d_pia1_ca2_w),
 	DEVCB_HANDLER(d_pia1_cb2_w),
-	/*irqs	 : A/B			   */
+	/*irqs   : A/B             */
 	DEVCB_LINE(d_pia1_firq_a),
 	DEVCB_LINE(d_pia1_firq_b)
 };
@@ -311,12 +311,12 @@ const pia6821_interface coco2_pia_intf_0 =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	/*outputs: A/B,CA/B2	   */
+	/*outputs: A/B,CA/B2       */
 	DEVCB_HANDLER(d_pia0_pa_w),
 	DEVCB_HANDLER(d_pia0_pb_w),
 	DEVCB_HANDLER(d_pia0_ca2_w),
 	DEVCB_HANDLER(d_pia0_cb2_w),
-	/*irqs	 : A/B			   */
+	/*irqs   : A/B             */
 	DEVCB_LINE(d_pia0_irq_a),
 	DEVCB_LINE(d_pia0_irq_b)
 };
@@ -331,12 +331,12 @@ const pia6821_interface coco2_pia_intf_1 =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	/*outputs: A/B,CA/B2	   */
+	/*outputs: A/B,CA/B2       */
 	DEVCB_HANDLER(d_pia1_pa_w),
 	DEVCB_HANDLER(d_pia1_pb_w_coco2),
 	DEVCB_HANDLER(d_pia1_ca2_w),
 	DEVCB_HANDLER(d_pia1_cb2_w),
-	/*irqs	 : A/B			   */
+	/*irqs   : A/B             */
 	DEVCB_LINE(d_pia1_firq_a),
 	DEVCB_LINE(d_pia1_firq_b)
 };
@@ -351,12 +351,12 @@ const pia6821_interface coco3_pia_intf_0 =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	/*outputs: A/B,CA/B2	   */
+	/*outputs: A/B,CA/B2       */
 	DEVCB_HANDLER(d_pia0_pa_w),
 	DEVCB_HANDLER(d_pia0_pb_w),
 	DEVCB_HANDLER(d_pia0_ca2_w),
 	DEVCB_HANDLER(d_pia0_cb2_w),
-	/*irqs	 : A/B			   */
+	/*irqs   : A/B             */
 	DEVCB_LINE(coco3_pia0_irq_a),
 	DEVCB_LINE(coco3_pia0_irq_b)
 };
@@ -371,12 +371,12 @@ const pia6821_interface coco3_pia_intf_1 =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	/*outputs: A/B,CA/B2	   */
+	/*outputs: A/B,CA/B2       */
 	DEVCB_HANDLER(d_pia1_pa_w),
 	DEVCB_HANDLER(d_pia1_pb_w),
 	DEVCB_HANDLER(d_pia1_ca2_w),
 	DEVCB_HANDLER(d_pia1_cb2_w),
-	/*irqs	 : A/B			   */
+	/*irqs   : A/B             */
 	DEVCB_LINE(coco3_pia1_firq_a),
 	DEVCB_LINE(coco3_pia1_firq_b)
 };
@@ -391,12 +391,12 @@ const pia6821_interface dragon32_pia_intf_0 =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	/*outputs: A/B,CA/B2	   */
+	/*outputs: A/B,CA/B2       */
 	DEVCB_HANDLER(d_pia0_pa_w),
 	DEVCB_HANDLER(d_pia0_pb_w),
 	DEVCB_HANDLER(d_pia0_ca2_w),
 	DEVCB_HANDLER(d_pia0_cb2_w),
-	/*irqs	 : A/B			   */
+	/*irqs   : A/B             */
 	DEVCB_LINE(d_pia0_irq_a),
 	DEVCB_LINE(d_pia0_irq_b)
 };
@@ -411,12 +411,12 @@ const pia6821_interface dragon32_pia_intf_1 =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	/*outputs: A/B,CA/B2	   */
+	/*outputs: A/B,CA/B2       */
 	DEVCB_HANDLER(d_pia1_pa_w),
 	DEVCB_HANDLER(d_pia1_pb_w),
 	DEVCB_HANDLER(d_pia1_ca2_w),
 	DEVCB_HANDLER(d_pia1_cb2_w),
-	/*irqs	 : A/B			   */
+	/*irqs   : A/B             */
 	DEVCB_LINE(d_pia1_firq_a),
 	DEVCB_LINE(d_pia1_firq_b)
 };
@@ -431,12 +431,12 @@ const pia6821_interface dragon64_pia_intf_0 =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	/*outputs: A/B,CA/B2	   */
+	/*outputs: A/B,CA/B2       */
 	DEVCB_HANDLER(d_pia0_pa_w),
 	DEVCB_HANDLER(d_pia0_pb_w),
 	DEVCB_HANDLER(d_pia0_ca2_w),
 	DEVCB_HANDLER(d_pia0_cb2_w),
-	/*irqs	 : A/B			   */
+	/*irqs   : A/B             */
 	DEVCB_LINE(d_pia0_irq_a),
 	DEVCB_LINE(d_pia0_irq_b)
 };
@@ -451,12 +451,12 @@ const pia6821_interface dragon64_pia_intf_1 =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	/*outputs: A/B,CA/B2	   */
+	/*outputs: A/B,CA/B2       */
 	DEVCB_HANDLER(d_pia1_pa_w),
 	DEVCB_HANDLER(dragon64_pia1_pb_w),
 	DEVCB_HANDLER(d_pia1_ca2_w),
 	DEVCB_HANDLER(d_pia1_cb2_w),
-	/*irqs	 : A/B			   */
+	/*irqs   : A/B             */
 	DEVCB_LINE(d_pia1_firq_a),
 	DEVCB_LINE(d_pia1_firq_b)
 };
@@ -472,12 +472,12 @@ const pia6821_interface dgnalpha_pia_intf_0 =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	/*outputs: A/B,CA/B2	   */
+	/*outputs: A/B,CA/B2       */
 	DEVCB_HANDLER(d_pia0_pa_w),
 	DEVCB_HANDLER(d_pia0_pb_w),
 	DEVCB_HANDLER(d_pia0_ca2_w),
 	DEVCB_HANDLER(d_pia0_cb2_w),
-	/*irqs	 : A/B			   */
+	/*irqs   : A/B             */
 	DEVCB_LINE(d_pia0_irq_a),
 	DEVCB_LINE(d_pia0_irq_b)
 };
@@ -492,12 +492,12 @@ const pia6821_interface dgnalpha_pia_intf_1 =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	/*outputs: A/B,CA/B2	   */
+	/*outputs: A/B,CA/B2       */
 	DEVCB_HANDLER(d_pia1_pa_w),
 	DEVCB_HANDLER(d_pia1_pb_w),
 	DEVCB_HANDLER(d_pia1_ca2_w),
 	DEVCB_HANDLER(d_pia1_cb2_w),
-	/*irqs	 : A/B			   */
+	/*irqs   : A/B             */
 	DEVCB_LINE(d_pia1_firq_a),
 	DEVCB_LINE(d_pia1_firq_b)
 };
@@ -512,12 +512,12 @@ const pia6821_interface dgnalpha_pia_intf_2 =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	/*outputs: A/B,CA/B2	   */
+	/*outputs: A/B,CA/B2       */
 	DEVCB_HANDLER(dgnalpha_pia2_pa_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	/*irqs	 : A/B	   		   */
+	/*irqs   : A/B             */
 	DEVCB_LINE(d_pia2_firq_a),
 	DEVCB_LINE(d_pia2_firq_b)
 };
@@ -612,10 +612,10 @@ static void pak_load_trailer(running_machine *machine, const pak_decodedtrailer 
 	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), M6809_CC, trailer->reg_cc);
 
 	/* I seem to only be able to get a small amount of the PIA state from the
-	 * snapshot trailers. Thus I am going to configure the PIA myself. The
-	 * following PIA writes are the same thing that the CoCo ROM does on
-	 * startup. I wish I had a better solution
-	 */
+     * snapshot trailers. Thus I am going to configure the PIA myself. The
+     * following PIA writes are the same thing that the CoCo ROM does on
+     * startup. I wish I had a better solution
+     */
 
 	pia6821_w(state->pia_0, 1, 0x00);
 	pia6821_w(state->pia_0, 3, 0x00);
@@ -637,10 +637,10 @@ static void pak_load_trailer(running_machine *machine, const pak_decodedtrailer 
 	pia6821_w(state->pia_1, 2, trailer->pia[6]);
 
 	/* For some reason, specifying use of high ram seems to screw things up;
-	 * I'm not sure whether it is because I'm using the wrong method to get
-	 * access that bit or or whether it is something else.  So that is why
-	 * I am specifying 0x7fff instead of 0xffff here
-	 */
+     * I'm not sure whether it is because I'm using the wrong method to get
+     * access that bit or or whether it is something else.  So that is why
+     * I am specifying 0x7fff instead of 0xffff here
+     */
 	sam_set_state(state->sam, trailer->sam, 0x7fff);
 }
 
@@ -712,13 +712,13 @@ static int generic_pak_load(const device_config *image, int rambase_index, int r
 		paklength = 0xff00;
 
 	/* PAK files reflect the fact that JeffV's emulator did not appear to
-	 * differentiate between RAM and ROM memory.  So what we do when a PAK
-	 * loads is to copy the ROM into RAM, load the PAK into RAM, and then
-	 * copy the part of RAM corresponding to PAK ROM to the actual PAK ROM
-	 * area.
-	 *
-	 * It is ugly, but it reflects the way that JeffV's emulator works
-	 */
+     * differentiate between RAM and ROM memory.  So what we do when a PAK
+     * loads is to copy the ROM into RAM, load the PAK into RAM, and then
+     * copy the part of RAM corresponding to PAK ROM to the actual PAK ROM
+     * area.
+     *
+     * It is ugly, but it reflects the way that JeffV's emulator works
+     */
 
 	memcpy(rambase + 0x8000, rombase, 0x4000);
 	memcpy(rambase + 0xC000, pakbase, 0x3F00);
@@ -814,11 +814,11 @@ DEVICE_IMAGE_LOAD(coco_rom)
 	romsize = image_length(image);
 
 	/* The following hack is for Arkanoid running on the CoCo2.
-		The issuse is the CoCo2 hardware only allows the cartridge
-		interface to access 0xC000-0xFEFF (16K). The Arkanoid ROM is
-		32K starting at 0x8000. The first 16K is totally inaccessable
-		from a CoCo2. Thus we need to skip ahead in the ROM file. On
-		the CoCo3 the entire 32K ROM is accessable. */
+        The issuse is the CoCo2 hardware only allows the cartridge
+        interface to access 0xC000-0xFEFF (16K). The Arkanoid ROM is
+        32K starting at 0x8000. The first 16K is totally inaccessable
+        from a CoCo2. Thus we need to skip ahead in the ROM file. On
+        the CoCo3 the entire 32K ROM is accessable. */
 
 	if (image_crc(image) == 0x25C3AA70)     /* Test for Arkanoid  */
 	{
@@ -1097,7 +1097,7 @@ static attotime coco_hiresjoy_computetransitiontime(running_machine *machine, UI
 	double val;
 	UINT8 ctrl = input_port_read_safe(machine, "ctrl_sel", 0x00);
 	/* this function gets only called for hi-res joystick. hence, ctrl can only take values
-	   0x04, 0x40 (hi-res) or 0x05, 0x50 (hi-res coco3max) */
+       0x04, 0x40 (hi-res) or 0x05, 0x50 (hi-res coco3max) */
 	UINT8 coco3max = ((ctrl & 0x0f) == 0x05 || (ctrl & 0xf0) == 0x50) ? 1 : 0;
 
 	static const char *const port_tags[2][4] =
@@ -1160,10 +1160,10 @@ static int coco_hiresjoy_ry(running_machine *machine)
 
   The sound MUX has 4 possible settings, depend on SELA and SELB inputs:
 
-  00	- DAC (digital - analog converter)
-  01	- CSN (cassette)
-  10	- SND input from cartridge (NYI because we only support the FDC)
-  11	- Grounded (0)
+  00    - DAC (digital - analog converter)
+  01    - CSN (cassette)
+  10    - SND input from cartridge (NYI because we only support the FDC)
+  11    - Grounded (0)
 
   Note on the Dragon Alpha state 11, selects the AY-3-8912, this is currently
   un-implemented - phs.
@@ -1216,10 +1216,10 @@ static int get_soundmux_status(running_machine *machine)
 static void soundmux_update(running_machine *machine)
 {
 	/* This function is called whenever the MUX (selector switch) is changed
-	 * It mainly turns on and off the cassette audio depending on the switch.
-	 * It also calls a function into the cartridges device to tell it if it is
-	 * switch on or off.
-	 */
+     * It mainly turns on and off the cassette audio depending on the switch.
+     * It also calls a function into the cartridges device to tell it if it is
+     * switch on or off.
+     */
 	cassette_state new_state;
 	int soundmux_status = get_soundmux_status(machine);
 
@@ -1247,8 +1247,8 @@ static void coco_sound_update(running_machine *machine)
 	coco_state *state = machine->driver_data;
 
 	/* Call this function whenever you need to update the sound. It will
-	 * automatically mute any devices that are switched out.
-	 */
+     * automatically mute any devices that are switched out.
+     */
 	UINT8 dac = pia6821_get_output_a(state->pia_1) & 0xFC;
 	UINT8 pia1_pb1 = (pia6821_get_output_b(state->pia_1) & 0x02) ? 0x80 : 0x00;
 	int soundmux_status = get_soundmux_status(machine);
@@ -1275,7 +1275,7 @@ static void coco_sound_update(running_machine *machine)
 }
 
 /*
-	Dragon Alpha AY-3-8912
+    Dragon Alpha AY-3-8912
 */
 
 READ8_HANDLER ( dgnalpha_psg_porta_read )
@@ -1309,12 +1309,12 @@ WRITE8_HANDLER ( dgnalpha_psg_porta_write )
 /***************************************************************************
   PIA0 ($FF00-$FF1F) (Chip U8)
 
-  PIA0 PA0-PA7	- Keyboard/Joystick read
-  PIA0 PB0-PB7	- Keyboard write
-  PIA0 CA1		- M6847 HS (Horizontal Sync)
-  PIA0 CA2		- SEL1 (Used by sound mux and joystick)
-  PIA0 CB1		- M6847 FS (Field Sync)
-  PIA0 CB2		- SEL2 (Used by sound mux and joystick)
+  PIA0 PA0-PA7  - Keyboard/Joystick read
+  PIA0 PB0-PB7  - Keyboard write
+  PIA0 CA1      - M6847 HS (Horizontal Sync)
+  PIA0 CA2      - SEL1 (Used by sound mux and joystick)
+  PIA0 CB1      - M6847 FS (Field Sync)
+  PIA0 CB2      - SEL2 (Used by sound mux and joystick)
 ***************************************************************************/
 
 static WRITE8_DEVICE_HANDLER ( d_pia0_ca2_w )
@@ -1498,21 +1498,21 @@ static WRITE8_DEVICE_HANDLER ( d_pia0_pa_w )
 /***************************************************************************
   PIA1 ($FF20-$FF3F) (Chip U4)
 
-  PIA1 PA0		- CASSDIN
-  PIA1 PA1		- RS232 OUT (CoCo), Printer Strobe (Dragon)
-  PIA1 PA2-PA7	- DAC
-  PIA1 PB0		- RS232 IN
-  PIA1 PB1		- Single bit sound
-  PIA1 PB2		- RAMSZ (32/64K, 16K, and 4K three position switch)
-  PIA1 PB3		- M6847 CSS
-  PIA1 PB4		- M6847 INT/EXT and M6847 GM0
-  PIA1 PB5		- M6847 GM1
-  PIA1 PB6		- M6847 GM2
-  PIA1 PB7		- M6847 A/G
-  PIA1 CA1		- CD (Carrier Detect; NYI)
-  PIA1 CA2		- CASSMOT (Cassette Motor)
-  PIA1 CB1		- CART (Cartridge Detect)
-  PIA1 CB2		- SNDEN (Sound Enable)
+  PIA1 PA0      - CASSDIN
+  PIA1 PA1      - RS232 OUT (CoCo), Printer Strobe (Dragon)
+  PIA1 PA2-PA7  - DAC
+  PIA1 PB0      - RS232 IN
+  PIA1 PB1      - Single bit sound
+  PIA1 PB2      - RAMSZ (32/64K, 16K, and 4K three position switch)
+  PIA1 PB3      - M6847 CSS
+  PIA1 PB4      - M6847 INT/EXT and M6847 GM0
+  PIA1 PB5      - M6847 GM1
+  PIA1 PB6      - M6847 GM2
+  PIA1 PB7      - M6847 A/G
+  PIA1 CA1      - CD (Carrier Detect; NYI)
+  PIA1 CA2      - CASSMOT (Cassette Motor)
+  PIA1 CB1      - CART (Cartridge Detect)
+  PIA1 CB2      - SNDEN (Sound Enable)
 ***************************************************************************/
 
 static WRITE8_DEVICE_HANDLER ( d_pia1_cb2_w )
@@ -1544,12 +1544,12 @@ static void printer_out_dragon(running_machine *machine, int data)
 static WRITE8_DEVICE_HANDLER ( d_pia1_pa_w )
 {
 	/*
-	 *	This port appears at $FF20
-	 *
-	 *	Bits
-	 *  7-2:	DAC to speaker or cassette
-	 *    1:	Serial out (CoCo), Printer strobe (Dragon)
-	 */
+     *  This port appears at $FF20
+     *
+     *  Bits
+     *  7-2:    DAC to speaker or cassette
+     *    1:    Serial out (CoCo), Printer strobe (Dragon)
+     */
 	UINT8 dac = pia6821_get_output_a(device) & 0xFC;
 	static int dclg_previous_bit;
 
@@ -1636,11 +1636,11 @@ static WRITE8_DEVICE_HANDLER( d_pia1_pb_w )
 	mc6847_ag_w(state->mc6847, BIT(data, 7));
 
 	/* PB1 will drive the sound output.  This is a rarely
-	 * used single bit sound mode. It is always connected thus
-	 * cannot be disabled.
-	 *
-	 * Source:  Page 31 of the Tandy Color Computer Service Manual
-	 */
+     * used single bit sound mode. It is always connected thus
+     * cannot be disabled.
+     *
+     * Source:  Page 31 of the Tandy Color Computer Service Manual
+     */
 	coco_sound_update(device->machine);
 }
 
@@ -1655,11 +1655,11 @@ static WRITE8_DEVICE_HANDLER( d_pia1_pb_w_coco2 )
 	mc6847_ag_w(state->mc6847, BIT(data, 7));
 
 	/* PB1 will drive the sound output.  This is a rarely
-	 * used single bit sound mode. It is always connected thus
-	 * cannot be disabled.
-	 *
-	 * Source:  Page 31 of the Tandy Color Computer Serice Manual
-	 */
+     * used single bit sound mode. It is always connected thus
+     * cannot be disabled.
+     *
+     * Source:  Page 31 of the Tandy Color Computer Serice Manual
+     */
 	coco_sound_update(device->machine);
 }
 
@@ -1684,12 +1684,12 @@ static WRITE8_DEVICE_HANDLER( dragon64_pia1_pb_w )
 /***************************************************************************
   PIA2 ($FF24-$FF28) on Daragon Alpha/Professional
 
-	PIA2 PA0		bcdir to AY-8912
-	PIA2 PA1		bc0	to AY-8912
-	PIA2 PA2		Rom switch, 0=basic rom, 1=boot rom.
-	PIA2 PA3-PA7	Unknown/unused ?
-	PIA2 PB0-PB7	connected to D0..7 of the AY8912.
-	CB1				DRQ from WD2797 disk controler.
+    PIA2 PA0        bcdir to AY-8912
+    PIA2 PA1        bc0 to AY-8912
+    PIA2 PA2        Rom switch, 0=basic rom, 1=boot rom.
+    PIA2 PA3-PA7    Unknown/unused ?
+    PIA2 PB0-PB7    connected to D0..7 of the AY8912.
+    CB1             DRQ from WD2797 disk controler.
 ***************************************************************************/
 
 static WRITE8_DEVICE_HANDLER( dgnalpha_pia2_pa_w )
@@ -1861,15 +1861,15 @@ static READ8_DEVICE_HANDLER ( d_pia1_pb_r_coco )
 	coco_state *state = device->machine->driver_data;
 
 	/* This handles the reading of the memory sense switch (pb2) for the CoCo 1,
-	 * and serial-in (pb0). Serial-in not yet implemented. */
+     * and serial-in (pb0). Serial-in not yet implemented. */
 	int result;
 
 	/* For the CoCo 1, the logic has been changed to only select 64K rams
-	   if there is more than 16K of memory, as the Color Basic 1.0 rom
-	   can only configure 4K or 16K ram banks (as documented in "Color
-	   Basic Unreveled"), doing this allows this  allows the coco driver
-	   to access 32K of ram, and also allows the cocoe driver to access
-	   the full 64K, as this uses Color Basic 1.2, which can configure 64K rams */
+       if there is more than 16K of memory, as the Color Basic 1.0 rom
+       can only configure 4K or 16K ram banks (as documented in "Color
+       Basic Unreveled"), doing this allows this  allows the coco driver
+       to access 32K of ram, and also allows the cocoe driver to access
+       the full 64K, as this uses Color Basic 1.2, which can configure 64K rams */
 
 	if (mess_ram_size > 0x8000)		/* 1 bank of 64K rams */
 		result = (pia6821_get_output_b(state->pia_0) & 0x80) >> 5;
@@ -1884,13 +1884,13 @@ static READ8_DEVICE_HANDLER ( d_pia1_pb_r_coco )
 static READ8_DEVICE_HANDLER ( d_pia1_pb_r_dragon32 )
 {
 	/* This handles the reading of the memory sense switch (pb2) for the Dragon 32,
-	 * and pb0, is the printer /busy line. */
+     * and pb0, is the printer /busy line. */
 
 	int result;
 
 	/* Of the Dragon machines, Only the Dragon 32 needs the ram select bit
-	   as both the 64 and Alpha, always have 64K rams, also the meaning of
-	   the bit is different with respect to the CoCo 1 */
+       as both the 64 and Alpha, always have 64K rams, also the meaning of
+       the bit is different with respect to the CoCo 1 */
 
 	if (mess_ram_size > 0x8000)
 		result = 0x00;		/* 1 bank of 64K, rams */
@@ -1905,8 +1905,8 @@ static READ8_DEVICE_HANDLER ( d_pia1_pb_r_coco2 )
 	coco_state *state = device->machine->driver_data;
 
 	/* This handles the reading of the memory sense switch (pb2) for the CoCo 2 and 3,
-	 * and serial-in (pb0). Serial-in not yet implemented.
-	 */
+     * and serial-in (pb0). Serial-in not yet implemented.
+     */
 	int result;
 
 	if (mess_ram_size <= 0x1000)
@@ -1920,7 +1920,7 @@ static READ8_DEVICE_HANDLER ( d_pia1_pb_r_coco2 )
 
 
 /*
-	Compusense Dragon Plus Control register
+    Compusense Dragon Plus Control register
 */
 
 /* The read handler will eventually return the 6845 status */
@@ -1930,17 +1930,17 @@ READ8_HANDLER ( plus_reg_r )
 }
 
 /*
-	When writing the bits have the following meanings :
+    When writing the bits have the following meanings :
 
-	bit	value	purpose
-	0	0	First 2k of memory map determined by bits 1 & 2
-		1	6845 display RAM mapped into first 2K of map,
+    bit value   purpose
+    0   0   First 2k of memory map determined by bits 1 & 2
+        1   6845 display RAM mapped into first 2K of map,
 
-	2,1	0,0	Normal bottom 32K or ram mapped (from mainboard).
-		0,1	First 32K of plus RAM mapped into $0000-$7FFF
-		1,0	Second 32K of plus RAM mapped into $0000-$7FFF
-		1,1	Undefined. I will assume that it's the same as 00.
-	3-7		Unused.
+    2,1 0,0 Normal bottom 32K or ram mapped (from mainboard).
+        0,1 First 32K of plus RAM mapped into $0000-$7FFF
+        1,0 Second 32K of plus RAM mapped into $0000-$7FFF
+        1,1 Undefined. I will assume that it's the same as 00.
+    3-7     Unused.
 */
 WRITE8_HANDLER ( plus_reg_w )
 {
@@ -1971,27 +1971,27 @@ WRITE8_HANDLER ( plus_reg_w )
 static SAM6883_SET_MPU_RATE( d_sam_set_mpurate )
 {
 	/* The infamous speed up poke.
-	 *
-	 * This was a SAM switch that occupied 4 addresses:
-	 *
-	 *		$FFD9	(set)	R1
-	 *		$FFD8	(clear)	R1
-	 *		$FFD7	(set)	R0
-	 *		$FFD6	(clear)	R0
-	 *
-	 * R1:R0 formed the following states:
-	 *		00	- slow          0.89 MHz
-	 *		01	- dual speed    ???
-	 *		1x	- fast          1.78 MHz
-	 *
-	 * R1 controlled whether the video addressing was speeded up and R0
-	 * did the same for the CPU.  On pre-CoCo 3 machines, setting R1 caused
-	 * the screen to display garbage because the M6847 could not display
-	 * fast enough.
-	 *
-	 * TODO:  Make the overclock more accurate.  In dual speed, ROM was a fast
-	 * access but RAM was not.  I don't know how to simulate this.
-	 */
+     *
+     * This was a SAM switch that occupied 4 addresses:
+     *
+     *      $FFD9   (set)   R1
+     *      $FFD8   (clear) R1
+     *      $FFD7   (set)   R0
+     *      $FFD6   (clear) R0
+     *
+     * R1:R0 formed the following states:
+     *      00  - slow          0.89 MHz
+     *      01  - dual speed    ???
+     *      1x  - fast          1.78 MHz
+     *
+     * R1 controlled whether the video addressing was speeded up and R0
+     * did the same for the CPU.  On pre-CoCo 3 machines, setting R1 caused
+     * the screen to display garbage because the M6847 could not display
+     * fast enough.
+     *
+     * TODO:  Make the overclock more accurate.  In dual speed, ROM was a fast
+     * access but RAM was not.  I don't know how to simulate this.
+     */
     cpu_set_clockscale(cputag_get_cpu(device->machine, "maincpu"), val ? 2 : 1);
 }
 
@@ -2003,23 +2003,23 @@ READ8_HANDLER(dragon_alpha_mapped_irq_r)
 static void setup_memory_map(running_machine *machine)
 {
 	/*
-	The following table contains the RAM block mappings for the CoCo 1/2 and Dragon computers
-	This replicates the behavior of the SAM ram size programming bits which in ther real hardware
-	allowed the use of various sizes of RAM chips, as follows :-
+    The following table contains the RAM block mappings for the CoCo 1/2 and Dragon computers
+    This replicates the behavior of the SAM ram size programming bits which in ther real hardware
+    allowed the use of various sizes of RAM chips, as follows :-
 
-	1 or 2 banks of 4K
-	1 or 2 banks of 16K
-	1 bank of 64K
-	up to 64K of static ram.
+    1 or 2 banks of 4K
+    1 or 2 banks of 16K
+    1 bank of 64K
+    up to 64K of static ram.
 
-	For the 4K and 16K chip sizes, if the second bank was empty it would be mapped to nothing.
-	For the 4K and 16K chip sizes, the banks would be mirrored at chip size*2 intervals.
+    For the 4K and 16K chip sizes, if the second bank was empty it would be mapped to nothing.
+    For the 4K and 16K chip sizes, the banks would be mirrored at chip size*2 intervals.
 
-	The following table holds the data required to implement this.
+    The following table holds the data required to implement this.
 
-	Note though it is technically possible to have 2 banks of 4K rams, for a total of 8K, I
-	have never seen a machine with this configuration, so I have not implemented it.
-	*/
+    Note though it is technically possible to have 2 banks of 4K rams, for a total of 8K, I
+    have never seen a machine with this configuration, so I have not implemented it.
+    */
 
 	struct coco_meminfo
 	{
@@ -2056,7 +2056,7 @@ static void setup_memory_map(running_machine *machine)
 	coco_state *state = machine->driver_data;
 	UINT8 memsize	= get_sam_memorysize(state->sam);
 	UINT8 maptype	= get_sam_maptype(state->sam);
-//	UINT8 pagemode	= get_sam_pagemode(machine);
+//  UINT8 pagemode  = get_sam_pagemode(machine);
 	int 		last_ram_block;		/* Last block that will be RAM, dependent on maptype */
 	int 		block_index;		/* Index of block being processed */
 	int	 	wbank;			/* bank no to go in this block */
@@ -2128,11 +2128,11 @@ static void setup_memory_map(running_machine *machine)
 static SAM6883_SET_PAGE_ONE_MODE( d_sam_set_pageonemode )
 {
 	/* Page mode - allowed switching between the low 32k and the high 32k,
-	 * assuming that 64k wasn't enabled
-	 *
-	 * TODO:  Actually implement this.  Also find out what the CoCo 3 did with
-	 * this (it probably ignored it)
-	 */
+     * assuming that 64k wasn't enabled
+     *
+     * TODO:  Actually implement this.  Also find out what the CoCo 3 did with
+     * this (it probably ignored it)
+     */
 
 	if (!get_sam_maptype(device))		// Ignored in maptype 1
 	{
@@ -2148,28 +2148,28 @@ static SAM6883_SET_PAGE_ONE_MODE( d_sam_set_pageonemode )
 static SAM6883_SET_MEMORY_SIZE( d_sam_set_memorysize )
 {
 	/* Memory size - allowed restricting memory accesses to something less than
-	 * 32k
-	 *
-	 * This was a SAM switch that occupied 4 addresses:
-	 *
-	 *		$FFDD	(set)	R1
-	 *		$FFDC	(clear)	R1
-	 *		$FFDB	(set)	R0
-	 *		$FFDA	(clear)	R0
-	 *
-	 * R1:R0 formed the following states:
-	 *		00	- 4k
-	 *		01	- 16k
-	 *		10	- 64k
-	 *		11	- static RAM (??)
-	 *
-	 * If something less than 64k was set, the low RAM would be smaller and
-	 * mirror the other parts of the RAM
-	 *
-	 * TODO:  Find out what "static RAM" is
-	 * TODO:  This should affect _all_ memory accesses, not just video ram
-	 * TODO:  Verify that the CoCo 3 ignored this
-	 */
+     * 32k
+     *
+     * This was a SAM switch that occupied 4 addresses:
+     *
+     *      $FFDD   (set)   R1
+     *      $FFDC   (clear) R1
+     *      $FFDB   (set)   R0
+     *      $FFDA   (clear) R0
+     *
+     * R1:R0 formed the following states:
+     *      00  - 4k
+     *      01  - 16k
+     *      10  - 64k
+     *      11  - static RAM (??)
+     *
+     * If something less than 64k was set, the low RAM would be smaller and
+     * mirror the other parts of the RAM
+     *
+     * TODO:  Find out what "static RAM" is
+     * TODO:  This should affect _all_ memory accesses, not just video ram
+     * TODO:  Verify that the CoCo 3 ignored this
+     */
 
 	setup_memory_map(device->machine);
 }
@@ -2279,7 +2279,7 @@ static SAM6883_SET_MAP_TYPE( d_sam_set_maptype )
 
 /*************************************
  *
- *	CoCo 3
+ *  CoCo 3
  *
  *************************************/
 
@@ -2289,15 +2289,15 @@ static SAM6883_SET_MAP_TYPE( d_sam_set_maptype )
  * translates it into a physical RAM address.  The following logical memory
  * addresses have the following bank indexes:
  *
- *	Bank 0		$0000-$1FFF
- *	Bank 1		$2000-$3FFF
- *	Bank 2		$4000-$5FFF
- *	Bank 3		$6000-$7FFF
- *	Bank 4		$8000-$9FFF
- *	Bank 5		$A000-$BFFF
- *	Bank 6		$C000-$DFFF
- *	Bank 7		$E000-$FDFF
- *	Bank 8		$FE00-$FEFF
+ *  Bank 0      $0000-$1FFF
+ *  Bank 1      $2000-$3FFF
+ *  Bank 2      $4000-$5FFF
+ *  Bank 3      $6000-$7FFF
+ *  Bank 4      $8000-$9FFF
+ *  Bank 5      $A000-$BFFF
+ *  Bank 6      $C000-$DFFF
+ *  Bank 7      $E000-$FDFF
+ *  Bank 8      $FE00-$FEFF
  *
  * The result represents a physical RAM address.  Since ROM/Cartidge space is
  * outside of the standard RAM memory map, ROM addresses get a "physical RAM"
@@ -2318,7 +2318,7 @@ offs_t coco3_mmu_translate(int bank, int offset)
 		if (coco3_gimereg[0] & 8)
 		{
 			/* this GIME register fixes logical addresses $FExx to physical
-			 * addresses $7FExx ($1FExx if 128k */
+             * addresses $7FExx ($1FExx if 128k */
 			assert(offset < 0x200);
 			return ((mess_ram_size - 0x200) & 0x7ffff) + offset;
 		}
@@ -2345,17 +2345,17 @@ offs_t coco3_mmu_translate(int bank, int offset)
 	}
 
 	/* Are we actually in ROM?
-	 *
-	 * In our world, ROM is represented by memory blocks 0x40-0x47
-	 *
-	 * 0	Extended Color Basic
-	 * 1	Color Basic
-	 * 2	Reset Initialization
-	 * 3	Super Extended Color Basic
-	 * 4-7	Cartridge ROM
-	 *
-	 * This is the level where ROM is mapped, according to Tepolt (p21)
-	 */
+     *
+     * In our world, ROM is represented by memory blocks 0x40-0x47
+     *
+     * 0    Extended Color Basic
+     * 1    Color Basic
+     * 2    Reset Initialization
+     * 3    Super Extended Color Basic
+     * 4-7  Cartridge ROM
+     *
+     * This is the level where ROM is mapped, according to Tepolt (p21)
+     */
 	if (((block & 0x3f) >= 0x3c) && !coco3_enable_64k && !forceram)
 	{
 		static const UINT8 rommap[4][4] =
@@ -2439,8 +2439,8 @@ static void coco3_mmu_update(running_machine *machine, int lowblock, int hiblock
 READ8_HANDLER(coco3_mmu_r)
 {
 	/* The high two bits are floating (high resistance).  Therefore their
-	 * value is undefined.  But we are exposing them anyways here
-	 */
+     * value is undefined.  But we are exposing them anyways here
+     */
 	return coco3_mmu[offset];
 }
 
@@ -2488,8 +2488,8 @@ READ8_HANDLER(coco3_gime_r)
 	case 4:	/* Timer MSB/LSB; these arn't readable */
 	case 5:
 		/* JK tells me that these values are indeterminate; and $7E appears
-		 * to be the value most commonly returned
-		 */
+         * to be the value most commonly returned
+         */
 		result = 0x7e;
 		break;
 
@@ -2515,16 +2515,16 @@ WRITE8_HANDLER(coco3_gime_w)
 	switch(offset)
 	{
 		case 0:
-			/*	$FF90 Initialization register 0
-			*		  Bit 7 COCO 1=CoCo compatible mode
-			*		  Bit 6 MMUEN 1=MMU enabled
-			*		  Bit 5 IEN 1 = GIME chip IRQ enabled
-			*		  Bit 4 FEN 1 = GIME chip FIRQ enabled
-			*		  Bit 3 MC3 1 = RAM at FEXX is constant
-			*		  Bit 2 MC2 1 = standard SCS (Spare Chip Select)
-			*		  Bit 1 MC1 ROM map control
-			*		  Bit 0 MC0 ROM map control
-			*/
+			/*  $FF90 Initialization register 0
+            *         Bit 7 COCO 1=CoCo compatible mode
+            *         Bit 6 MMUEN 1=MMU enabled
+            *         Bit 5 IEN 1 = GIME chip IRQ enabled
+            *         Bit 4 FEN 1 = GIME chip FIRQ enabled
+            *         Bit 3 MC3 1 = RAM at FEXX is constant
+            *         Bit 2 MC2 1 = standard SCS (Spare Chip Select)
+            *         Bit 1 MC1 ROM map control
+            *         Bit 0 MC0 ROM map control
+            */
 			coco3_mmu_update(space->machine, 0, 8);
 			{
 				if (coco3_gimereg[0] & 0x04)
@@ -2542,31 +2542,31 @@ WRITE8_HANDLER(coco3_gime_w)
 			break;
 
 		case 1:
-			/*	$FF91 Initialization register 1
-			*		  Bit 7 Unused
-			*		  Bit 6 Unused
-			*		  Bit 5 TINS Timer input select; 1 = 280 nsec, 0 = 63.5 usec
-			*		  Bit 4 Unused
-			*		  Bit 3 Unused
-			*		  Bit 2 Unused
-			*		  Bit 1 Unused
-			*		  Bit 0 TR Task register select
-			*/
+			/*  $FF91 Initialization register 1
+            *         Bit 7 Unused
+            *         Bit 6 Unused
+            *         Bit 5 TINS Timer input select; 1 = 280 nsec, 0 = 63.5 usec
+            *         Bit 4 Unused
+            *         Bit 3 Unused
+            *         Bit 2 Unused
+            *         Bit 1 Unused
+            *         Bit 0 TR Task register select
+            */
 			coco3_mmu_update(space->machine, 0, 8);
 			coco3_timer_reset(space->machine);
 			break;
 
 		case 2:
-			/*	$FF92 Interrupt request enable register
-			*		  Bit 7 Unused
-			*		  Bit 6 Unused
-			*		  Bit 5 TMR Timer interrupt
-			*		  Bit 4 HBORD Horizontal border interrupt
-			*		  Bit 3 VBORD Vertical border interrupt
-			*		! Bit 2 EI2 Serial data interrupt
-			*		  Bit 1 EI1 Keyboard interrupt
-			*		  Bit 0 EI0 Cartridge interrupt
-			*/
+			/*  $FF92 Interrupt request enable register
+            *         Bit 7 Unused
+            *         Bit 6 Unused
+            *         Bit 5 TMR Timer interrupt
+            *         Bit 4 HBORD Horizontal border interrupt
+            *         Bit 3 VBORD Vertical border interrupt
+            *       ! Bit 2 EI2 Serial data interrupt
+            *         Bit 1 EI1 Keyboard interrupt
+            *         Bit 0 EI0 Cartridge interrupt
+            */
 			if (LOG_INT_MASKING)
 			{
 				logerror("CoCo3 IRQ: Interrupts { %s%s%s%s%s%s} enabled\n",
@@ -2581,16 +2581,16 @@ WRITE8_HANDLER(coco3_gime_w)
 			break;
 
 		case 3:
-			/*	$FF93 Fast interrupt request enable register
-			*		  Bit 7 Unused
-			*		  Bit 6 Unused
-			*		  Bit 5 TMR Timer interrupt
-			*		  Bit 4 HBORD Horizontal border interrupt
-			*		  Bit 3 VBORD Vertical border interrupt
-			*		! Bit 2 EI2 Serial border interrupt
-			*		  Bit 1 EI1 Keyboard interrupt
-			*		  Bit 0 EI0 Cartridge interrupt
-			*/
+			/*  $FF93 Fast interrupt request enable register
+            *         Bit 7 Unused
+            *         Bit 6 Unused
+            *         Bit 5 TMR Timer interrupt
+            *         Bit 4 HBORD Horizontal border interrupt
+            *         Bit 3 VBORD Vertical border interrupt
+            *       ! Bit 2 EI2 Serial border interrupt
+            *         Bit 1 EI1 Keyboard interrupt
+            *         Bit 0 EI0 Cartridge interrupt
+            */
 			if (LOG_INT_MASKING)
 			{
 				logerror("CoCo3 FIRQ: Interrupts { %s%s%s%s%s%s} enabled\n",
@@ -2605,89 +2605,89 @@ WRITE8_HANDLER(coco3_gime_w)
 			break;
 
 		case 4:
-			/*	$FF94 Timer register MSB
-			*		  Bits 4-7 Unused
-			*		  Bits 0-3 High order four bits of the timer
-			*/
+			/*  $FF94 Timer register MSB
+            *         Bits 4-7 Unused
+            *         Bits 0-3 High order four bits of the timer
+            */
 			coco3_timer_reset(space->machine);
 			break;
 
 		case 5:
-			/*	$FF95 Timer register LSB
-			*		  Bits 0-7 Low order eight bits of the timer
-			*/
+			/*  $FF95 Timer register LSB
+            *         Bits 0-7 Low order eight bits of the timer
+            */
 			if (timer_was_off && (coco3_gimereg[5] != 0x00))
   	                {
   	                        /* Writes to $FF95 do not cause the timer to reset, but MESS
-  	                        * will invoke coco3_timer_reset() if $FF94/5 was previously
-  	                        * $0000.  The reason for this is because the timer is not
-  	                        * actually off when $FF94/5 are loaded with $0000; rather it
-  	                        * is continuously reloading the GIME's internal countdown
-  	                        * register, even if it isn't causing interrupts to be raised.
-  	                        *
-  	                        * Failure to do this was the cause of bug #1065.  Special
-  	                        * thanks to John Kowalski for pointing me in the right
-  	                        * direction
-				*/
+                            * will invoke coco3_timer_reset() if $FF94/5 was previously
+                            * $0000.  The reason for this is because the timer is not
+                            * actually off when $FF94/5 are loaded with $0000; rather it
+                            * is continuously reloading the GIME's internal countdown
+                            * register, even if it isn't causing interrupts to be raised.
+                            *
+                            * Failure to do this was the cause of bug #1065.  Special
+                            * thanks to John Kowalski for pointing me in the right
+                            * direction
+                */
 				coco3_timer_reset(space->machine);
   	                }
 			break;
 
 		case 8:
-			/*	$FF98 Video Mode Register
-			*		  Bit 7 BP 0 = Text modes, 1 = Graphics modes
-			*		  Bit 6 Unused
-			*		! Bit 5 BPI Burst Phase Invert (Color Set)
-			*		  Bit 4 MOCH 1 = Monochrome on Composite
-			*		! Bit 3 H50 1 = 50 Hz power, 0 = 60 Hz power
-			*		  Bits 0-2 LPR Lines per row
-			*/
+			/*  $FF98 Video Mode Register
+            *         Bit 7 BP 0 = Text modes, 1 = Graphics modes
+            *         Bit 6 Unused
+            *       ! Bit 5 BPI Burst Phase Invert (Color Set)
+            *         Bit 4 MOCH 1 = Monochrome on Composite
+            *       ! Bit 3 H50 1 = 50 Hz power, 0 = 60 Hz power
+            *         Bits 0-2 LPR Lines per row
+            */
 			break;
 
 		case 9:
-			/*	$FF99 Video Resolution Register
-			*		  Bit 7 Undefined
-			*		  Bits 5-6 LPF Lines per Field (Number of Rows)
-			*		  Bits 2-4 HRES Horizontal Resolution
-			*		  Bits 0-1 CRES Color Resolution
-			*/
+			/*  $FF99 Video Resolution Register
+            *         Bit 7 Undefined
+            *         Bits 5-6 LPF Lines per Field (Number of Rows)
+            *         Bits 2-4 HRES Horizontal Resolution
+            *         Bits 0-1 CRES Color Resolution
+            */
 			break;
 
 		case 10:
-			/*	$FF9A Border Register
-			*		  Bits 6,7 Unused
-			*		  Bits 0-5 BRDR Border color
-			*/
+			/*  $FF9A Border Register
+            *         Bits 6,7 Unused
+            *         Bits 0-5 BRDR Border color
+            */
 			break;
 
 		case 12:
-			/*	$FF9C Vertical Scroll Register
-			*		  Bits 4-7 Reserved
-			*		! Bits 0-3 VSC Vertical Scroll bits
-			*/
+			/*  $FF9C Vertical Scroll Register
+            *         Bits 4-7 Reserved
+            *       ! Bits 0-3 VSC Vertical Scroll bits
+            */
 			break;
 
 		case 11:
 		case 13:
 		case 14:
-			/*	$FF9B,$FF9D,$FF9E Vertical Offset Registers
-			*
-			*	According to JK, if an odd value is placed in $FF9E on the 1986
-			*	GIME, the GIME crashes
-			*
-			*  The reason that $FF9B is not mentioned in offical documentation
-			*  is because it is only meaninful in CoCo 3's with the 2MB upgrade
-			*/
+			/*  $FF9B,$FF9D,$FF9E Vertical Offset Registers
+            *
+            *   According to JK, if an odd value is placed in $FF9E on the 1986
+            *   GIME, the GIME crashes
+            *
+            *  The reason that $FF9B is not mentioned in offical documentation
+            *  is because it is only meaninful in CoCo 3's with the 2MB upgrade
+            */
 			break;
 
 		case 15:
 			/*
-			*	$FF9F Horizontal Offset Register
-			*		  Bit 7 HVEN Horizontal Virtual Enable
-			*		  Bits 0-6 X0-X6 Horizontal Offset Address
-			*
-			*  Unline $FF9D-E, this value can be modified mid frame
-			*/
+            *   $FF9F Horizontal Offset Register
+            *         Bit 7 HVEN Horizontal Virtual Enable
+            *         Bits 0-6 X0-X6 Horizontal Offset Address
+            *
+            *  Unline $FF9D-E, this value can be modified mid frame
+            */
 			break;
 	}
 }
@@ -2715,17 +2715,17 @@ static SAM6883_SET_MAP_TYPE( coco3_sam_set_maptype )
 /***************************************************************************
     CARTRIDGE EXPANSION SLOT
 
-	The bulk of the cartridge handling is in cococart.c and related code,
-	whereas this interfaces with the main CoCo emulation.  This code also
-	implements the hacks required to simulate the state where a CoCo
-	cartridge ties the CART line to Q, which cannot be emulated by
-	conventional techniques.
+    The bulk of the cartridge handling is in cococart.c and related code,
+    whereas this interfaces with the main CoCo emulation.  This code also
+    implements the hacks required to simulate the state where a CoCo
+    cartridge ties the CART line to Q, which cannot be emulated by
+    conventional techniques.
 
-	When the CART line is set to Q, we begin a "twiddle" session -
-	specifically the CART line is toggled on and off twice to ensure that
-	if the PIA is accepting an interrupt, that it will receive it.  We also
-	start twiddle sessions when CART is set to Q and the PIA is written to,
-	in order to pick up any interrupt enables that might happen
+    When the CART line is set to Q, we begin a "twiddle" session -
+    specifically the CART line is toggled on and off twice to ensure that
+    if the PIA is accepting an interrupt, that it will receive it.  We also
+    start twiddle sessions when CART is set to Q and the PIA is written to,
+    in order to pick up any interrupt enables that might happen
 ***************************************************************************/
 
 /*-------------------------------------------------
@@ -2741,7 +2741,7 @@ void coco_cart_w(const device_config *device, int data)
 
 /*-------------------------------------------------
     coco3_cart_w - calls coco_cart_w and
-	in addition will raise the GIME interrupt
+    in addition will raise the GIME interrupt
 -------------------------------------------------*/
 
 void coco3_cart_w(const device_config *device, int data)
@@ -2776,7 +2776,7 @@ void coco_nmi_w(const device_config *device, int data)
 
 /*-------------------------------------------------
     coco_pia_1_w - wrapper for pia_1_w() that will
-	also call twiddle Q lines, if necessary
+    also call twiddle Q lines, if necessary
 -------------------------------------------------*/
 
 WRITE8_DEVICE_HANDLER(coco_pia_1_w)

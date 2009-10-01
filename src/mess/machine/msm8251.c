@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	msm8251.c
+    msm8251.c
 
-	MSM/Intel 8251 Universal Synchronous/Asynchronous Receiver Transmitter code
+    MSM/Intel 8251 Universal Synchronous/Asynchronous Receiver Transmitter code
 
 *********************************************************************/
 
@@ -228,7 +228,7 @@ void msm8251_transmit_clock(const device_config *device)
 		/* if transmit is not empty... transmit data */
 		if ((uart->transmit_reg.flags & TRANSMIT_REGISTER_EMPTY)==0)
 		{
-	//		logerror("MSM8251\n");
+	//      logerror("MSM8251\n");
 			transmit_register_send_bit(device->machine,&uart->transmit_reg, &uart->connection);
 		}
 	}
@@ -276,10 +276,10 @@ static void msm8251_update_tx_ready(const device_config *device)
 	int tx_ready;
 
 	/* tx ready output is set if:
-		DB Buffer Empty &
-		CTS is set &
-		Transmit enable is 1
-	*/
+        DB Buffer Empty &
+        CTS is set &
+        Transmit enable is 1
+    */
 
 	tx_ready = 0;
 
@@ -392,7 +392,7 @@ WRITE8_DEVICE_HANDLER(msm8251_control_w)
 				/* finished transfering sync bytes, now expecting command */
 				uart->flags &= ~(MSM8251_EXPECTING_MODE | MSM8251_EXPECTING_SYNC_BYTE);
 				uart->sync_byte_offset = 0;
-			//	uart->status = MSM8251_STATUS_TX_EMPTY | MSM8251_STATUS_TX_READY;
+			//  uart->status = MSM8251_STATUS_TX_EMPTY | MSM8251_STATUS_TX_READY;
 			}
 		}
 		else
@@ -404,30 +404,30 @@ WRITE8_DEVICE_HANDLER(msm8251_control_w)
 			/* Synchronous or Asynchronous? */
 			if ((data & 0x03)!=0)
 			{
-				/*	Asynchronous
+				/*  Asynchronous
 
-					bit 7,6: stop bit length
-						0 = inhibit
-						1 = 1 bit
-						2 = 1.5 bits
-						3 = 2 bits
-					bit 5: parity type
-						0 = parity odd
-						1 = parity even
-					bit 4: parity test enable
-						0 = disable
-						1 = enable
-					bit 3,2: character length
-						0 = 5 bits
-						1 = 6 bits
-						2 = 7 bits
-						3 = 8 bits
-					bit 1,0: baud rate factor
-						0 = defines command byte for synchronous or asynchronous
-						1 = x1
-						2 = x16
-						3 = x64
-				*/
+                    bit 7,6: stop bit length
+                        0 = inhibit
+                        1 = 1 bit
+                        2 = 1.5 bits
+                        3 = 2 bits
+                    bit 5: parity type
+                        0 = parity odd
+                        1 = parity even
+                    bit 4: parity test enable
+                        0 = disable
+                        1 = enable
+                    bit 3,2: character length
+                        0 = 5 bits
+                        1 = 6 bits
+                        2 = 7 bits
+                        3 = 8 bits
+                    bit 1,0: baud rate factor
+                        0 = defines command byte for synchronous or asynchronous
+                        1 = x1
+                        2 = x16
+                        3 = x64
+                */
 
 				LOG(("MSM8251: Asynchronous operation\n"));
 
@@ -522,29 +522,29 @@ WRITE8_DEVICE_HANDLER(msm8251_control_w)
 #endif
 				/* not expecting mode byte now */
 				uart->flags &= ~MSM8251_EXPECTING_MODE;
-//				uart->status = MSM8251_STATUS_TX_EMPTY | MSM8251_STATUS_TX_READY;
+//              uart->status = MSM8251_STATUS_TX_EMPTY | MSM8251_STATUS_TX_READY;
 			}
 			else
 			{
-				/*	bit 7: Number of sync characters
-						0 = 1 character
-						1 = 2 character
-					bit 6: Synchronous mode
-						0 = Internal synchronisation
-						1 = External synchronisation
-					bit 5: parity type
-						0 = parity odd
-						1 = parity even
-					bit 4: parity test enable
-						0 = disable
-						1 = enable
-					bit 3,2: character length
-						0 = 5 bits
-						1 = 6 bits
-						2 = 7 bits
-						3 = 8 bits
-					bit 1,0 = 0
-				*/
+				/*  bit 7: Number of sync characters
+                        0 = 1 character
+                        1 = 2 character
+                    bit 6: Synchronous mode
+                        0 = Internal synchronisation
+                        1 = External synchronisation
+                    bit 5: parity type
+                        0 = parity odd
+                        1 = parity even
+                    bit 4: parity test enable
+                        0 = disable
+                        1 = enable
+                    bit 3,2: character length
+                        0 = 5 bits
+                        1 = 6 bits
+                        2 = 7 bits
+                        3 = 8 bits
+                    bit 1,0 = 0
+                */
 				LOG(("MSM8251: Synchronous operation\n"));
 
 				/* setup for sync byte(s) */
@@ -613,31 +613,31 @@ WRITE8_DEVICE_HANDLER(msm8251_control_w)
 		}
 
 
-		/*	bit 7:
-				0 = normal operation
-				1 = hunt mode
-			bit 6:
-				0 = normal operation
-				1 = internal reset
-			bit 5:
-				0 = /RTS set to 1
-				1 = /RTS set to 0
-			bit 4:
-				0 = normal operation
-				1 = reset error flag
-			bit 3:
-				0 = normal operation
-				1 = send break character
-			bit 2:
-				0 = receive disable
-				1 = receive enable
-			bit 1:
-				0 = /DTR set to 1
-				1 = /DTR set to 0
-			bit 0:
-				0 = transmit disable
-				1 = transmit enable
-		*/
+		/*  bit 7:
+                0 = normal operation
+                1 = hunt mode
+            bit 6:
+                0 = normal operation
+                1 = internal reset
+            bit 5:
+                0 = /RTS set to 1
+                1 = /RTS set to 0
+            bit 4:
+                0 = normal operation
+                1 = reset error flag
+            bit 3:
+                0 = normal operation
+                1 = send break character
+            bit 2:
+                0 = receive disable
+                1 = receive enable
+            bit 1:
+                0 = /DTR set to 1
+                1 = /DTR set to 0
+            bit 0:
+                0 = transmit disable
+                1 = transmit enable
+        */
 
 		uart->connection.State &=~SERIAL_STATE_RTS;
 		if (data & (1<<5))
@@ -718,7 +718,7 @@ WRITE8_DEVICE_HANDLER(msm8251_data_w)
 
 /*-------------------------------------------------
     msm8251_receive_character - called when last
-	bit of data has been received
+    bit of data has been received
 -------------------------------------------------*/
 
 static void msm8251_receive_character(const device_config *device, UINT8 ch)
@@ -761,9 +761,9 @@ READ8_DEVICE_HANDLER(msm8251_data_r)
 
 /*-------------------------------------------------
     msm8251_connect_to_serial_device - initialise
-	transfer using serial device - set the callback
-	which will be called when serial device has
-	updated it's state
+    transfer using serial device - set the callback
+    which will be called when serial device has
+    updated it's state
 -------------------------------------------------*/
 
 void msm8251_connect_to_serial_device(const device_config *device, const device_config *image)

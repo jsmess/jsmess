@@ -157,7 +157,7 @@ static void pcw16_vh_decode_mode2(bitmap_t *bitmap, int x, int y, unsigned char 
 ***************************************************************************/
 VIDEO_UPDATE( pcw16 )
 {
-	unsigned char *pScanLine = (unsigned char *)mess_ram + 0x0fc00;	//0x03c00;	//0x020FC00;
+	unsigned char *pScanLine = (unsigned char *)mess_ram + 0x0fc00;	//0x03c00;  //0x020FC00;
 
 	int y;
 	int x;
@@ -170,7 +170,7 @@ VIDEO_UPDATE( pcw16 )
 	if (pcw16_video_control & (1<<7))
 	{
 		/* colour 0 and colour 1 need to be inverted? - what happens in mode 1 and 2 - ignored? or is bit 1 toggled,
-		or is whole lot toggled? */
+        or is whole lot toggled? */
 
 		/* force border to be colour 1 */
 		border_colour = pcw16_colour_palette[1];

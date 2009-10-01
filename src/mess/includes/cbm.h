@@ -25,7 +25,7 @@ UINT8 common_cia0_port_b_r( const device_config *device, UINT8 output_a );
 
 /***********************************************
 
-	CBM Quickloads
+    CBM Quickloads
 
 ***********************************************/
 
@@ -43,7 +43,7 @@ QUICKLOAD_LOAD( cbm_c65 );
 
 /***********************************************
 
-	CBM Cartridges
+    CBM Cartridges
 
 ***********************************************/
 
@@ -76,7 +76,7 @@ typedef struct {
 
 /***********************************************
 
-	CBM Datasette Tapes
+    CBM Datasette Tapes
 
 ***********************************************/
 

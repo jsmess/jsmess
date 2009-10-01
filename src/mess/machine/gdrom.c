@@ -29,7 +29,7 @@ typedef struct
 
 static UINT8 GDROM_Cmd11_Reply[32] =
 {
-	0x00, 0x00, 0x00, 0x00, 0x00, 0xB4, 0x19, 0x00, 0x00, 0x08, 0x53, 0x45, 0x20, 0x20, 0x20, 0x20, 
+	0x00, 0x00, 0x00, 0x00, 0x00, 0xB4, 0x19, 0x00, 0x00, 0x08, 0x53, 0x45, 0x20, 0x20, 0x20, 0x20,
 	0x20, 0x20, 0x52, 0x65, 0x76, 0x20, 0x36, 0x2E, 0x34, 0x32, 0x39, 0x39, 0x30, 0x33, 0x31, 0x36
 };
 
@@ -60,7 +60,7 @@ static int scsicd_exec_command( SCSIInstance *scsiInstance, UINT8 *statusCode )
 
 	switch ( command[0] )
 	{
-		
+
 
 		case 0x03: // REQUEST SENSE
 			SCSISetPhase( scsiInstance, SCSI_PHASE_DATAIN );
@@ -72,7 +72,7 @@ static int scsicd_exec_command( SCSIInstance *scsiInstance, UINT8 *statusCode )
 				command[0], command[1],
 				command[2], command[3],
 				command[4], command[5]);
-//			if (SCSILengthFromUINT8( &command[ 4 ] ) < 32) return -1;
+//          if (SCSILengthFromUINT8( &command[ 4 ] ) < 32) return -1;
 			return 32; //SCSILengthFromUINT8( &command[ 4 ] );
 
 		case 0x12: // INQUIRY
@@ -137,7 +137,7 @@ static int scsicd_exec_command( SCSIInstance *scsiInstance, UINT8 *statusCode )
 			{
 				fatalerror("GDROM: MSF mode used for CD_READ, unsupported\n");
 				return 0;
-			} 
+			}
 			else
 			{
 				our_this->lba = (command[2]<<16 | command[3]<<8 | command[4]) - 150;

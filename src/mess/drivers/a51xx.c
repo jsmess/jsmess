@@ -1,5 +1,5 @@
 /***************************************************************************
-   
+
         A51xx
 
         12/05/2009 Skeleton driver.
@@ -12,7 +12,7 @@
 static ADDRESS_MAP_START(a5120_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x03ff ) AM_ROM
-	AM_RANGE( 0x0400, 0xffff ) AM_RAM	
+	AM_RANGE( 0x0400, 0xffff ) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( a5120_io , ADDRESS_SPACE_IO, 8)
@@ -22,7 +22,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(a5130_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x0fff ) AM_ROM
-	AM_RANGE( 0x1000, 0xffff ) AM_RAM	
+	AM_RANGE( 0x1000, 0xffff ) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( a5130_io , ADDRESS_SPACE_IO, 8)
@@ -35,8 +35,8 @@ static INPUT_PORTS_START( a5120 )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(a5120) 
-{	
+static MACHINE_RESET(a5120)
+{
 }
 
 static VIDEO_START( a5120 )
@@ -54,8 +54,8 @@ static INPUT_PORTS_START( a5130 )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(a5130) 
-{	
+static MACHINE_RESET(a5130)
+{
 }
 
 static VIDEO_START( a5130 )
@@ -73,10 +73,10 @@ static MACHINE_DRIVER_START( a5120 )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
     MDRV_CPU_PROGRAM_MAP(a5120_mem)
-    MDRV_CPU_IO_MAP(a5120_io)	
+    MDRV_CPU_IO_MAP(a5120_io)
 
     MDRV_MACHINE_RESET(a5120)
-	
+
     /* video hardware */
     MDRV_SCREEN_ADD("screen", RASTER)
     MDRV_SCREEN_REFRESH_RATE(50)
@@ -95,10 +95,10 @@ static MACHINE_DRIVER_START( a5130 )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
     MDRV_CPU_PROGRAM_MAP(a5130_mem)
-    MDRV_CPU_IO_MAP(a5130_io)	
+    MDRV_CPU_IO_MAP(a5130_io)
 
     MDRV_MACHINE_RESET(a5130)
-	
+
     /* video hardware */
     MDRV_SCREEN_ADD("screen", RASTER)
     MDRV_SCREEN_REFRESH_RATE(50)

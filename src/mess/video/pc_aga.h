@@ -8,12 +8,12 @@
   commodore pc10 320x200 in 16 colors
 
 
-	// aga
-	// 256 8x8 thick chars
-	// 256 8x8 thin chars
-	// 256 9x14 in 8x16 chars, line 3 is connected to a10
+    // aga
+    // 256 8x8 thick chars
+    // 256 8x8 thin chars
+    // 256 9x14 in 8x16 chars, line 3 is connected to a10
     ROM_LOAD("aga.chr",     0x00000, 0x02000, CRC(aca81498))
-	// hercules font of above
+    // hercules font of above
     ROM_LOAD("hercules.chr", 0x00000, 0x1000, CRC(7e8c9d76))
 
 */

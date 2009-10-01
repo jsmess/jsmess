@@ -1,142 +1,142 @@
 /************************************************************************************************
 
-	Sharp X1 (c) 1983 Sharp Corporation
+    Sharp X1 (c) 1983 Sharp Corporation
 
-	driver by Angelo Salese & Barry Rodewald
+    driver by Angelo Salese & Barry Rodewald
 
-	TODO:
-	- Understand how keyboard works and decap/dump the keyboard MCU if possible;
-	- Hook-up .tap image formats (.rom too?);
-	- Implement tape commands;
-	- Sort out / redump the BIOS gfx roms;
-	- Implement the interrupts (uses IM 2), basically used by the keyboard.
-	- Implement DMA,CTC and SIO, they are X1Turbo only features.
-	- Improve the z80DMA core, it's so incomplete that nothing that uses it works;
-	- clean-ups!
-	- x1turbo: understand how irq generation works for the ym-2151;
-	- There are various unclear video things, these are:
-		- Understand why some games still doesn't upload the proper PCG index;
-		- Implement PCG reading, used by Maison Ikkoku, Mule and Gyajiko for kanji reading.
-		  Is there a way to select which ROM to use?
-		- Implement the scrn regs;
-		- Interlace mode?
-		- Implement the new features of the x1turbo, namely the 4096 color feature amongst other
-		  things
-		- (anything else?)
+    TODO:
+    - Understand how keyboard works and decap/dump the keyboard MCU if possible;
+    - Hook-up .tap image formats (.rom too?);
+    - Implement tape commands;
+    - Sort out / redump the BIOS gfx roms;
+    - Implement the interrupts (uses IM 2), basically used by the keyboard.
+    - Implement DMA,CTC and SIO, they are X1Turbo only features.
+    - Improve the z80DMA core, it's so incomplete that nothing that uses it works;
+    - clean-ups!
+    - x1turbo: understand how irq generation works for the ym-2151;
+    - There are various unclear video things, these are:
+        - Understand why some games still doesn't upload the proper PCG index;
+        - Implement PCG reading, used by Maison Ikkoku, Mule and Gyajiko for kanji reading.
+          Is there a way to select which ROM to use?
+        - Implement the scrn regs;
+        - Interlace mode?
+        - Implement the new features of the x1turbo, namely the 4096 color feature amongst other
+          things
+        - (anything else?)
 
-	per-game specific TODO:
-	- Bosconian: title screen background is completely white because it reverts the pen used
-	  (it's gray in the Arcade version),could be either flickering for pseudo-alpha effect or it's
-	  a btanb;
-	- Mappy/Gradius: they sets 320x200 with fps = 30 Hz, due of that they are too slow (they must run at 60 Hz),
-	  HW limitation/MC6845 bug?
-	- Exoa II - Warroid: major tile width/height positioning bugs (especially during gameplay);
+    per-game specific TODO:
+    - Bosconian: title screen background is completely white because it reverts the pen used
+      (it's gray in the Arcade version),could be either flickering for pseudo-alpha effect or it's
+      a btanb;
+    - Mappy/Gradius: they sets 320x200 with fps = 30 Hz, due of that they are too slow (they must run at 60 Hz),
+      HW limitation/MC6845 bug?
+    - Exoa II - Warroid: major tile width/height positioning bugs (especially during gameplay);
 
-	Notes:
-	- An interesting feature of the Sharp X-1 is the extended i/o bank. When the ppi port c bit 5
-	  does a 1->0 transition, any write to the i/o space accesses 2 or 3 banks gradients of the bitmap RAM
-	  with a single write (generally used for layer clearances and bitmap-style sprites).
-	  Any i/o read disables this extended bitmap ram.
+    Notes:
+    - An interesting feature of the Sharp X-1 is the extended i/o bank. When the ppi port c bit 5
+      does a 1->0 transition, any write to the i/o space accesses 2 or 3 banks gradients of the bitmap RAM
+      with a single write (generally used for layer clearances and bitmap-style sprites).
+      Any i/o read disables this extended bitmap ram.
 
 =================================================================================================
 
-	X1 (CZ-800C) - November, 1982
-	 * CPU: z80A @ 4MHz, 80C49 x 2 (one for key scan, the other for TV & Cas Ctrl)
-	 * ROM: IPL (4KB) + chargen (2KB)
-	 * RAM: Main memory (64KB) + VRAM (4KB) + RAM for PCG (6KB) + GRAM (48KB, Option)
-	 * Text Mode: 80x25 or 40x25
-	 * Graphic Mode: 640x200 or 320x200, 8 colors
-	 * Sound: PSG 8 octave
-	 * I/O Ports: Centronic ports, 2 Joystick ports, Cassette port (2700 baud)
+    X1 (CZ-800C) - November, 1982
+     * CPU: z80A @ 4MHz, 80C49 x 2 (one for key scan, the other for TV & Cas Ctrl)
+     * ROM: IPL (4KB) + chargen (2KB)
+     * RAM: Main memory (64KB) + VRAM (4KB) + RAM for PCG (6KB) + GRAM (48KB, Option)
+     * Text Mode: 80x25 or 40x25
+     * Graphic Mode: 640x200 or 320x200, 8 colors
+     * Sound: PSG 8 octave
+     * I/O Ports: Centronic ports, 2 Joystick ports, Cassette port (2700 baud)
 
-	X1C (CZ-801C) - October, 1983
-	 * same but only 48KB GRAM
+    X1C (CZ-801C) - October, 1983
+     * same but only 48KB GRAM
 
-	X1D (CZ-802C) - October, 1983
-	 * same as X1C but with a 3" floppy drive (notice: 3" not 3" 1/2!!)
+    X1D (CZ-802C) - October, 1983
+     * same as X1C but with a 3" floppy drive (notice: 3" not 3" 1/2!!)
 
-	X1Cs (CZ-803C) - June, 1984
-	 * two expansion I/O ports
+    X1Cs (CZ-803C) - June, 1984
+     * two expansion I/O ports
 
-	X1Ck (CZ-804C) - June, 1984
-	 * same as X1Cs
-	 * ROM: IPL (4KB) + chargen (2KB) + Kanji 1st level
+    X1Ck (CZ-804C) - June, 1984
+     * same as X1Cs
+     * ROM: IPL (4KB) + chargen (2KB) + Kanji 1st level
 
-	X1F Model 10 (CZ-811C) - July, 1985
-	 * Re-designed
-	 * ROM: IPL (4KB) + chargen (2KB)
+    X1F Model 10 (CZ-811C) - July, 1985
+     * Re-designed
+     * ROM: IPL (4KB) + chargen (2KB)
 
-	X1F Model 20 (CZ-812C) - July, 1985
-	 * Re-designed (same as Model 10)
-	 * ROM: IPL (4KB) + chargen (2KB) + Kanji
-	 * Built Tape drive plus a 5" floppy drive was available
+    X1F Model 20 (CZ-812C) - July, 1985
+     * Re-designed (same as Model 10)
+     * ROM: IPL (4KB) + chargen (2KB) + Kanji
+     * Built Tape drive plus a 5" floppy drive was available
 
-	X1G Model 10 (CZ-820C) - July, 1986
-	 * Re-designed again
-	 * ROM: IPL (4KB) + chargen (2KB)
+    X1G Model 10 (CZ-820C) - July, 1986
+     * Re-designed again
+     * ROM: IPL (4KB) + chargen (2KB)
 
-	X1G Model 30 (CZ-822C) - July, 1986
-	 * Re-designed again (same as Model 10)
-	 * ROM: IPL (4KB) + chargen (2KB) + Kanji
-	 * Built Tape drive plus a 5" floppy drive was available
+    X1G Model 30 (CZ-822C) - July, 1986
+     * Re-designed again (same as Model 10)
+     * ROM: IPL (4KB) + chargen (2KB) + Kanji
+     * Built Tape drive plus a 5" floppy drive was available
 
-	X1twin (CZ-830C) - December, 1986
-	 * Re-designed again (same as Model 10)
-	 * ROM: IPL (4KB) + chargen (2KB) + Kanji
-	 * Built Tape drive plus a 5" floppy drive was available
-	 * It contains a PC-Engine
+    X1twin (CZ-830C) - December, 1986
+     * Re-designed again (same as Model 10)
+     * ROM: IPL (4KB) + chargen (2KB) + Kanji
+     * Built Tape drive plus a 5" floppy drive was available
+     * It contains a PC-Engine
 
-	=============  X1 Turbo series  =============
+    =============  X1 Turbo series  =============
 
-	X1turbo Model 30 (CZ-852C) - October, 1984
-	 * CPU: z80A @ 4MHz, 80C49 x 2 (one for key scan, the other for TV & Cas Ctrl)
-	 * ROM: IPL (32KB) + chargen (8KB) + Kanji (128KB)
-	 * RAM: Main memory (64KB) + VRAM (6KB) + RAM for PCG (6KB) + GRAM (96KB)
-	 * Text Mode: 80xCh or 40xCh with Ch = 10, 12, 20, 25 (same for Japanese display)
-	 * Graphic Mode: 640x200 or 320x200, 8 colors
-	 * Sound: PSG 8 octave
-	 * I/O Ports: Centronic ports, 2 Joystick ports, built-in Cassette interface,
-		2 Floppy drive for 5" disks, two expansion I/O ports
+    X1turbo Model 30 (CZ-852C) - October, 1984
+     * CPU: z80A @ 4MHz, 80C49 x 2 (one for key scan, the other for TV & Cas Ctrl)
+     * ROM: IPL (32KB) + chargen (8KB) + Kanji (128KB)
+     * RAM: Main memory (64KB) + VRAM (6KB) + RAM for PCG (6KB) + GRAM (96KB)
+     * Text Mode: 80xCh or 40xCh with Ch = 10, 12, 20, 25 (same for Japanese display)
+     * Graphic Mode: 640x200 or 320x200, 8 colors
+     * Sound: PSG 8 octave
+     * I/O Ports: Centronic ports, 2 Joystick ports, built-in Cassette interface,
+        2 Floppy drive for 5" disks, two expansion I/O ports
 
-	X1turbo Model 20 (CZ-851C) - October, 1984
-	 * same as Model 30, but only 1 Floppy drive is included
+    X1turbo Model 20 (CZ-851C) - October, 1984
+     * same as Model 30, but only 1 Floppy drive is included
 
-	X1turbo Model 10 (CZ-850C) - October, 1984
-	 * same as Model 30, but Floppy drive is optional and GRAM is 48KB (it can
-		be expanded to 96KB however)
+    X1turbo Model 10 (CZ-850C) - October, 1984
+     * same as Model 30, but Floppy drive is optional and GRAM is 48KB (it can
+        be expanded to 96KB however)
 
-	X1turbo Model 40 (CZ-862C) - July, 1985
-	 * same as Model 30, but uses tv screen (you could watch television with this)
+    X1turbo Model 40 (CZ-862C) - July, 1985
+     * same as Model 30, but uses tv screen (you could watch television with this)
 
-	X1turboII (CZ-856C) - November, 1985
-	 * same as Model 30, but restyled, cheaper and sold with utility software
+    X1turboII (CZ-856C) - November, 1985
+     * same as Model 30, but restyled, cheaper and sold with utility software
 
-	X1turboIII (CZ-870C) - November, 1986
-	 * with two High Density Floppy driver
+    X1turboIII (CZ-870C) - November, 1986
+     * with two High Density Floppy driver
 
-	X1turboZ (CZ-880C) - December, 1986
-	 * CPU: z80A @ 4MHz, 80C49 x 2 (one for key scan, the other for TV & Cas Ctrl)
-	 * ROM: IPL (32KB) + chargen (8KB) + Kanji 1st & 2nd level
-	 * RAM: Main memory (64KB) + VRAM (6KB) + RAM for PCG (6KB) + GRAM (96KB)
-	 * Text Mode: 80xCh or 40xCh with Ch = 10, 12, 20, 25 (same for Japanese display)
-	 * Graphic Mode: 640x200 or 320x200, 8 colors [in compatibility mode],
-		640x400, 8 colors (out of 4096); 320x400, 64 colors (out of 4096);
-		320x200, 4096 colors [in multimode],
-	 * Sound: PSG 8 octave + FM 8 octave
-	 * I/O Ports: Centronic ports, 2 Joystick ports, built-in Cassette interface,
-		2 Floppy drive for HD 5" disks, two expansion I/O ports
+    X1turboZ (CZ-880C) - December, 1986
+     * CPU: z80A @ 4MHz, 80C49 x 2 (one for key scan, the other for TV & Cas Ctrl)
+     * ROM: IPL (32KB) + chargen (8KB) + Kanji 1st & 2nd level
+     * RAM: Main memory (64KB) + VRAM (6KB) + RAM for PCG (6KB) + GRAM (96KB)
+     * Text Mode: 80xCh or 40xCh with Ch = 10, 12, 20, 25 (same for Japanese display)
+     * Graphic Mode: 640x200 or 320x200, 8 colors [in compatibility mode],
+        640x400, 8 colors (out of 4096); 320x400, 64 colors (out of 4096);
+        320x200, 4096 colors [in multimode],
+     * Sound: PSG 8 octave + FM 8 octave
+     * I/O Ports: Centronic ports, 2 Joystick ports, built-in Cassette interface,
+        2 Floppy drive for HD 5" disks, two expansion I/O ports
 
-	X1turboZII (CZ-881C) - December, 1987
-	 * same as turboZ, but added 64KB expansion RAM
+    X1turboZII (CZ-881C) - December, 1987
+     * same as turboZ, but added 64KB expansion RAM
 
-	X1turboZIII (CZ-888C) - December, 1988
-	 * same as turboZII, but no more built-in cassette drive
+    X1turboZIII (CZ-888C) - December, 1988
+     * same as turboZII, but no more built-in cassette drive
 
-	Please refer to http://www2s.biglobe.ne.jp/~ITTO/x1/x1menu.html for
-	more info
+    Please refer to http://www2s.biglobe.ne.jp/~ITTO/x1/x1menu.html for
+    more info
 
-	BASIC has to be loaded from external media (tape or disk), the
-	computer only has an Initial Program Loader (IPL)
+    BASIC has to be loaded from external media (tape or disk), the
+    computer only has an Initial Program Loader (IPL)
 
 ************************************************************************************************/
 
@@ -454,7 +454,7 @@ static VIDEO_UPDATE( x1 )
 	draw_fgtilemap(screen->machine,bitmap,cliprect,w);
 	draw_gfxbitmap(screen->machine,bitmap,cliprect,w,scrn_reg.disp_bank,scrn_reg.ply^0xff);
 	/* Y's uses the following as a normal buffer/work ram without anything reasonable to draw */
-//	draw_gfxbitmap(screen->machine,bitmap,cliprect,w,1);
+//  draw_gfxbitmap(screen->machine,bitmap,cliprect,w,1);
 
 	return 0;
 }
@@ -601,10 +601,10 @@ static READ8_HANDLER( sub_io_r )
 	}
 
 	/*if(key_flag == 1)
-	{
-		key_flag = 0;
-		return 0x82; //TODO: this is for shift/ctrl/kana lock etc.
-	}*/
+    {
+        key_flag = 0;
+        return 0x82; //TODO: this is for shift/ctrl/kana lock etc.
+    }*/
 
 	sub_cmd_length--;
 	sub_obf = (sub_cmd_length) ? 0x00 : 0x20;
@@ -830,7 +830,7 @@ static READ8_HANDLER( x1_rom_r )
 {
 	//UINT8 *ROM = memory_region(space->machine, "rom");
 
-//	popmessage("%06x",rom_index[0]<<16|rom_index[1]<<8|rom_index[2]<<0);
+//  popmessage("%06x",rom_index[0]<<16|rom_index[1]<<8|rom_index[2]<<0);
 
 	return 0; //ROM[rom_index[0]<<16|rom_index[1]<<8|rom_index[2]<<0];
 }
@@ -1100,9 +1100,9 @@ static WRITE8_HANDLER( x1_ex_gfxram_w )
 }
 
 /*
-	SCRN flags
+    SCRN flags
 
-	d0(01) = 0:low res            1:high res
+    d0(01) = 0:low res            1:high res
     d1(02) = 0:1 raster           1:2 raster  <- 0=400-line mode, legal when 'd0=1'
     d2(04) = 0:25(20) lines       1:12(10) lines
     d3(08) = 0:bank 0             0:bank 1    <- display
@@ -1127,7 +1127,7 @@ static WRITE8_HANDLER( x1_scrn_w )
 static WRITE8_HANDLER( x1_ply_w )
 {
 	scrn_reg.ply = data;
-//	printf("PLY = %02x\n",data);
+//  printf("PLY = %02x\n",data);
 }
 
 static WRITE8_HANDLER( x1_6845_w )
@@ -1207,9 +1207,9 @@ static UINT8 kanji_addr_l,kanji_addr_h,kanji_count;
 static UINT32 kanji_addr;
 
 /*
- *	FIXME: recheck this once that the kanji rom is redumped, it's confirmed bad for the following reasons:
- *	- A game lets you type stuff that's typed with this function, the index doesn't match with the typed char;
- *	- It search for chars that are out of the rom range;
+ *  FIXME: recheck this once that the kanji rom is redumped, it's confirmed bad for the following reasons:
+ *  - A game lets you type stuff that's typed with this function, the index doesn't match with the typed char;
+ *  - It search for chars that are out of the rom range;
  */
 static READ8_HANDLER( x1_kanji_r )
 {
@@ -1258,7 +1258,7 @@ static READ8_HANDLER( x1_io_r )
 {
 	io_bank_mode = 0; //any read disables the extended mode.
 
-	//if(offset >= 0x0704 && offset <= 0x0707)   	{ return z80ctc_r(devtag_get_device(space->machine, "ctc"), offset-0x0704); }
+	//if(offset >= 0x0704 && offset <= 0x0707)      { return z80ctc_r(devtag_get_device(space->machine, "ctc"), offset-0x0704); }
 	if(offset == 0x0e03)                    		{ return x1_rom_r(space, 0); }
 	else if(offset >= 0x0ff8 && offset <= 0x0fff)	{ return x1_fdc_r(space, offset-0xff8); }
 	else if(offset >= 0x1400 && offset <= 0x17ff)	{ return x1_pcg_r(space, offset-0x1400); }
@@ -1270,7 +1270,7 @@ static READ8_HANDLER( x1_io_r )
 	else if(offset >= 0x1f92 && offset <= 0x1f93)	{ return z80sio_d_r(devtag_get_device(space->machine, "sio"), (offset-0x1f92) & 1); }
 	else if(offset >= 0x1fa0 && offset <= 0x1fa3)	{ return z80ctc_r(devtag_get_device(space->machine, "ctc"), offset-0x1fa0); }
 	else if(offset >= 0x1fa8 && offset <= 0x1fab)	{ return z80ctc_r(devtag_get_device(space->machine, "ctc"), offset-0x1fa8); }
-//	else if(offset >= 0x1fd0 && offset <= 0x1fdf)	{ return x1_scrn_r(space,offset-0x1fd0); }
+//  else if(offset >= 0x1fd0 && offset <= 0x1fdf)   { return x1_scrn_r(space,offset-0x1fd0); }
 	else if(offset == 0x1fe0)						{ return x1_blackclip_r(space,0); }
 	else if(offset >= 0x2000 && offset <= 0x2fff)	{ return colorram[offset-0x2000]; }
 	else if(offset >= 0x3000 && offset <= 0x3fff)	{ return videoram[offset-0x3000]; }
@@ -1285,10 +1285,10 @@ static READ8_HANDLER( x1_io_r )
 static WRITE8_HANDLER( x1_io_w )
 {
 	if(io_bank_mode == 1)                        	{ x1_ex_gfxram_w(space, offset, data); }
-//	else if(offset >= 0x0704 && offset <= 0x0707)	{ z80ctc_w(devtag_get_device(space->machine, "ctc"), offset-0x0704,data); }
-//	else if(offset >= 0x0c00 && offset <= 0x0cff)	{ x1_rs232c_w(space->machine, 0, data); }
+//  else if(offset >= 0x0704 && offset <= 0x0707)   { z80ctc_w(devtag_get_device(space->machine, "ctc"), offset-0x0704,data); }
+//  else if(offset >= 0x0c00 && offset <= 0x0cff)   { x1_rs232c_w(space->machine, 0, data); }
 	else if(offset >= 0x0e00 && offset <= 0x0e02)  	{ x1_rom_w(space, offset-0xe00,data); }
-//	else if(offset >= 0x0e80 && offset <= 0x0e82)	{ x1_kanji_w(space->machine, offset-0xe80,data); }
+//  else if(offset >= 0x0e80 && offset <= 0x0e82)   { x1_kanji_w(space->machine, offset-0xe80,data); }
 	else if(offset >= 0x0ff8 && offset <= 0x0fff)	{ x1_fdc_w(space, offset-0xff8,data); }
 	else if(offset >= 0x1000 && offset <= 0x10ff)	{ x1_pal_b_w(space, 0,data); }
 	else if(offset >= 0x1100 && offset <= 0x11ff)	{ x1_pal_r_w(space, 0,data); }
@@ -1307,10 +1307,10 @@ static WRITE8_HANDLER( x1_io_w )
 	else if(offset >= 0x1f92 && offset <= 0x1f93)	{ z80sio_d_w(devtag_get_device(space->machine, "sio"), (offset-0x1f92) & 1,data); }
 	else if(offset >= 0x1fa0 && offset <= 0x1fa3)	{ z80ctc_w(devtag_get_device(space->machine, "ctc"), offset-0x1fa0,data); }
 	else if(offset >= 0x1fa8 && offset <= 0x1fab)	{ z80ctc_w(devtag_get_device(space->machine, "ctc"), offset-0x1fa8,data); }
-//	else if(offset == 0x1fb0)						{ x1turbo_pal_w(space,0,data); }
-//	else if(offset >= 0x1fb9 && offset <= 0x1fbf)	{ x1turbo_txpal_w(space,offset-0x1fb9,data); }
-//	else if(offset == 0x1fc0)						{ x1turbo_txdisp_w(space,0,data); }
-//	else if(offset == 0x1fc5)						{ x1turbo_gfxpal_w(space,0,data); }
+//  else if(offset == 0x1fb0)                       { x1turbo_pal_w(space,0,data); }
+//  else if(offset >= 0x1fb9 && offset <= 0x1fbf)   { x1turbo_txpal_w(space,offset-0x1fb9,data); }
+//  else if(offset == 0x1fc0)                       { x1turbo_txdisp_w(space,0,data); }
+//  else if(offset == 0x1fc5)                       { x1turbo_gfxpal_w(space,0,data); }
 	else if(offset >= 0x1fd0 && offset <= 0x1fdf)	{ x1_scrn_w(space,0,data); }
 	else if(offset == 0x1fe0)						{ x1_blackclip_w(space,0,data); }
 	else if(offset >= 0x2000 && offset <= 0x2fff)	{ colorram[offset-0x2000] = data; }
@@ -1344,7 +1344,7 @@ static READ8_HANDLER( x1turbo_io_r )
 	else if(offset >= 0x1fb8 && offset <= 0x1fbf)	{ return x1turbo_txpal_r(space,offset-0x1fb8); }
 	else if(offset == 0x1fc0)						{ return x1turbo_txdisp_r(space,0); }
 	else if(offset == 0x1fc5)						{ return x1turbo_gfxpal_r(space,0); }
-//	else if(offset >= 0x1fd0 && offset <= 0x1fdf)	{ return x1_scrn_r(space,offset-0x1fd0); }
+//  else if(offset >= 0x1fd0 && offset <= 0x1fdf)   { return x1_scrn_r(space,offset-0x1fd0); }
 	else if(offset == 0x1fe0)						{ return x1_blackclip_r(space,0); }
 	else if(offset >= 0x2000 && offset <= 0x2fff)	{ return colorram[offset-0x2000]; }
 	else if(offset >= 0x3000 && offset <= 0x3fff)	{ return videoram[offset-0x3000]; }
@@ -1363,7 +1363,7 @@ static WRITE8_HANDLER( x1turbo_io_w )
 	if(io_bank_mode == 1)                        	{ x1_ex_gfxram_w(space, offset, data); }
 	else if(offset == 0x0700 || offset == 0x0701)	{ ym2151_w(devtag_get_device(space->machine, "ym"), offset-0x0700,data); }
 	else if(offset >= 0x0704 && offset <= 0x0707)	{ z80ctc_w(devtag_get_device(space->machine, "ctc"), offset-0x0704,data); }
-//	else if(offset >= 0x0c00 && offset <= 0x0cff)	{ x1_rs232c_w(space->machine, 0, data); }
+//  else if(offset >= 0x0c00 && offset <= 0x0cff)   { x1_rs232c_w(space->machine, 0, data); }
 	else if(offset >= 0x0e00 && offset <= 0x0e02)  	{ x1_rom_w(space, offset-0xe00,data); }
 	else if(offset >= 0x0e80 && offset <= 0x0e83)	{ x1_kanji_w(space, offset-0xe80,data); }
 	else if(offset >= 0x0ff8 && offset <= 0x0fff)	{ x1_fdc_w(space, offset-0xff8,data); }
@@ -1433,15 +1433,15 @@ static READ8_DEVICE_HANDLER( x1_portb_r )
 {
 	//printf("PPI Port B read\n");
 	/*
-	x--- ---- "v disp"
-	-x-- ---- "sub cpu ibf"
-	--x- ---- "sub cpu obf"
-	---x ---- ROM/RAM flag (0=ROM, 1=RAM)
-	---- x--- "busy"
-	---- -x-- "v sync"
-	---- --x- "cmt read"
-	---- ---x "cmt test" (active low)
-	*/
+    x--- ---- "v disp"
+    -x-- ---- "sub cpu ibf"
+    --x- ---- "sub cpu obf"
+    ---x ---- ROM/RAM flag (0=ROM, 1=RAM)
+    ---- x--- "busy"
+    ---- -x-- "v sync"
+    ---- --x- "cmt read"
+    ---- ---x "cmt test" (active low)
+    */
 	UINT8 dat = 0;
 	vdisp = (video_screen_get_vpos(device->machine->primary_screen) < 200) ? 0x80 : 0x00;
 	dat = (input_port_read(device->machine, "SYSTEM") & 0x10) | sub_obf | vsync | vdisp;
@@ -1449,8 +1449,8 @@ static READ8_DEVICE_HANDLER( x1_portb_r )
 	if(cassette_input(devtag_get_device(device->machine,"cass")) > 0.03)
 		dat |= 0x02;
 
-//	if(cassette_get_state(devtag_get_device(device->machine,"cass")) & CASSETTE_MOTOR_DISABLED)
-//		dat &= ~0x02;  // is zero if not playing
+//  if(cassette_get_state(devtag_get_device(device->machine,"cass")) & CASSETTE_MOTOR_DISABLED)
+//      dat &= ~0x02;  // is zero if not playing
 
 	// CMT test bit is set low when the CMT Stop command is issued, and becomes
 	// high again when this bit is read.
@@ -1469,10 +1469,10 @@ static READ8_DEVICE_HANDLER( x1_portc_r )
 {
 	//printf("PPI Port C read\n");
 	/*
-	x--x xxxx <unknown>
-	-x-- ---- 320 mode (r/w)
-	--x- ---- i/o mode (r/w)
-	*/
+    x--x xxxx <unknown>
+    -x-- ---- 320 mode (r/w)
+    --x- ---- i/o mode (r/w)
+    */
 	return (io_sys & 0x9f) | hres_320 | ~io_switch;
 }
 
@@ -1877,7 +1877,7 @@ static GFXDECODE_START( x1 )
 	GFXDECODE_ENTRY( "cgrom",   0x00000, x1_chars_8x8,    0x200, 0x20 )
 	GFXDECODE_ENTRY( "pcg",     0x00000, x1_pcg_8x8,      0x000, 1 )
 	GFXDECODE_ENTRY( "cgrom",   0x01800, x1_chars_8x16,   0x200, 0x20 )
-//	GFXDECODE_ENTRY( "kanji",   0x27000, x1_chars_16x16,  0, 0x20 ) //needs to be checked when the ROM will be redumped
+//  GFXDECODE_ENTRY( "kanji",   0x27000, x1_chars_16x16,  0, 0x20 ) //needs to be checked when the ROM will be redumped
 	GFXDECODE_ENTRY( "cgrom",   0x02800, x1_chars_16x16,  0, 0x20 ) //needs to be checked when the ROM will be redumped
 GFXDECODE_END
 
@@ -1916,8 +1916,8 @@ static const z80_daisy_chain x1_daisy[] =
 {
 	{ "x1kb" },
 	{ "ctc" },
-//	{ "dma" },
-//	{ "sio" },
+//  { "dma" },
+//  { "sio" },
 	{ NULL }
 };
 
@@ -1966,21 +1966,21 @@ static INTERRUPT_GEN( x1_vbl )
 
 /*static IRQ_CALLBACK(x1_irq_callback)
 {
-	if(ctc_irq_flag != 0)
-	{
-		ctc_irq_flag = 0;
-		if(key_irq_flag == 0)  // if no other devices are pulling the IRQ line high
-			cpu_set_input_line(device, 0, CLEAR_LINE);
-		return x1_irq_vector;
-	}
-	if(key_irq_flag != 0)
-	{
-		key_irq_flag = 0;
-		if(ctc_irq_flag == 0)  // if no other devices are pulling the IRQ line high
-			cpu_set_input_line(device, 0, CLEAR_LINE);
-		return key_irq_vector;
-	}
-	return x1_irq_vector;
+    if(ctc_irq_flag != 0)
+    {
+        ctc_irq_flag = 0;
+        if(key_irq_flag == 0)  // if no other devices are pulling the IRQ line high
+            cpu_set_input_line(device, 0, CLEAR_LINE);
+        return x1_irq_vector;
+    }
+    if(key_irq_flag != 0)
+    {
+        key_irq_flag = 0;
+        if(ctc_irq_flag == 0)  // if no other devices are pulling the IRQ line high
+            cpu_set_input_line(device, 0, CLEAR_LINE);
+        return key_irq_vector;
+    }
+    return x1_irq_vector;
 }
 */
 static TIMER_CALLBACK(keyboard_callback)
@@ -2038,7 +2038,7 @@ static MACHINE_RESET( x1 )
 	//cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), x1_irq_callback);
 	timer_pulse(machine, ATTOTIME_IN_HZ(240), NULL, 0, keyboard_callback);
 	timer_pulse(machine, ATTOTIME_IN_HZ(16), NULL, 0, cmt_wind_timer);
-	
+
 	cmt_current_cmd = 0;
 	cmt_test = 0;
 	cassette_change_state(devtag_get_device(machine, "cass" ),CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
@@ -2152,7 +2152,7 @@ static MACHINE_DRIVER_START( x1turbo )
 	MDRV_CPU_IO_MAP(x1turbo_io)
 
 	MDRV_SOUND_ADD("ym", YM2151, XTAL_4MHz) //unknown clock / divider
-//	MDRV_SOUND_CONFIG(ay8910_config)
+//  MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 

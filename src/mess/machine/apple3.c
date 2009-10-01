@@ -1,15 +1,15 @@
 /***************************************************************************
 
-	machine/apple3.c
+    machine/apple3.c
 
-	Apple ///
+    Apple ///
 
 
-	VIA #0 (D VIA)
-		CA1:	1 if a cartridge is inserted, 0 otherwise
+    VIA #0 (D VIA)
+        CA1:    1 if a cartridge is inserted, 0 otherwise
 
-	VIA #1 (E VIA)
-		CA2:	1 if key pressed, 0 otherwise
+    VIA #1 (E VIA)
+        CA2:    1 if key pressed, 0 otherwise
 
 ***************************************************************************/
 
@@ -603,11 +603,11 @@ static UINT8 *apple3_get_indexed_addr(offs_t offset)
 	{
 #if 0
 		/* The Apple /// Diagnostics seems to expect that indexed writes
-		 * always write to RAM.  That image jumps to an address that is
-		 * undefined unless this code is enabled.  However, the Sara
-		 * emulator does not have corresponding code here, though Chris
-		 * Smolinski does not rule out the possibility
-		 */
+         * always write to RAM.  That image jumps to an address that is
+         * undefined unless this code is enabled.  However, the Sara
+         * emulator does not have corresponding code here, though Chris
+         * Smolinski does not rule out the possibility
+         */
 		result = apple3_bankaddr(~0, offset - 0x8000);
 #endif
 	}

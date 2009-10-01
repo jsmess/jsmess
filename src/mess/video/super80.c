@@ -1,9 +1,9 @@
 /* Super80.c written by Robbbert, 2005-2009. See the MESS wiki for documentation. */
 
 /* Notes on using MAME MC6845 Device (MMD).
-	1. Speed of MMD is about 20% slower than pre-MMD coding
-	2. Undocumented cursor start and end-lines is not supported by MMD, so we do it here
-	3. MMD doesn't support auto-screen-resize, so we do it here. */
+    1. Speed of MMD is about 20% slower than pre-MMD coding
+    2. Undocumented cursor start and end-lines is not supported by MMD, so we do it here
+    3. MMD doesn't support auto-screen-resize, so we do it here. */
 
 
 #include "driver.h"
@@ -25,42 +25,42 @@ static UINT8 options;
 
 static const UINT8 super80_rgb_palette[16*3] =
 {
-	0x00, 0x00, 0x00,	/*  0 Black		*/
-	0x00, 0x00, 0x00,	/*  1 Black		*/
-	0x00, 0x00, 0x7f,	/*  2 Blue		*/
-	0x00, 0x00, 0xff,	/*  3 Light Blue	*/
-	0x00, 0x7f, 0x00,	/*  4 Green		*/
-	0x00, 0xff, 0x00,	/*  5 Bright Green	*/
-	0x00, 0x7f, 0x7f,	/*  6 Cyan		*/
-	0x00, 0xff, 0xff,	/*  7 Turquoise		*/
-	0x7f, 0x00, 0x00,	/*  8 Dark Red		*/
-	0xff, 0x00, 0x00,	/*  9 Red		*/
-	0x7f, 0x00, 0x7f,	/* 10 Purple		*/
-	0xff, 0x00, 0xff,	/* 11 Magenta		*/
-	0x7f, 0x7f, 0x00,	/* 12 Lime		*/
-	0xff, 0xff, 0x00,	/* 13 Yellow		*/
-	0xbf, 0xbf, 0xbf,	/* 14 Off White		*/
-	0xff, 0xff, 0xff,	/* 15 White		*/
+	0x00, 0x00, 0x00,	/*  0 Black     */
+	0x00, 0x00, 0x00,	/*  1 Black     */
+	0x00, 0x00, 0x7f,	/*  2 Blue      */
+	0x00, 0x00, 0xff,	/*  3 Light Blue    */
+	0x00, 0x7f, 0x00,	/*  4 Green     */
+	0x00, 0xff, 0x00,	/*  5 Bright Green  */
+	0x00, 0x7f, 0x7f,	/*  6 Cyan      */
+	0x00, 0xff, 0xff,	/*  7 Turquoise     */
+	0x7f, 0x00, 0x00,	/*  8 Dark Red      */
+	0xff, 0x00, 0x00,	/*  9 Red       */
+	0x7f, 0x00, 0x7f,	/* 10 Purple        */
+	0xff, 0x00, 0xff,	/* 11 Magenta       */
+	0x7f, 0x7f, 0x00,	/* 12 Lime      */
+	0xff, 0xff, 0x00,	/* 13 Yellow        */
+	0xbf, 0xbf, 0xbf,	/* 14 Off White     */
+	0xff, 0xff, 0xff,	/* 15 White     */
 };
 
 static const UINT8 super80_comp_palette[16*3] =
 {
-	0x00, 0x00, 0x00,	/*  0 Black		*/
-	0x80, 0x80, 0x80,	/*  1 Grey		*/
-	0x00, 0x00, 0xff,	/*  2 Blue		*/
-	0xff, 0xff, 0x80,	/*  3 Light Yellow	*/
-	0x00, 0xff, 0x00,	/*  4 Green		*/
-	0xff, 0x80, 0xff,	/*  5 Light Magenta	*/
-	0x00, 0xff, 0xff,	/*  6 Cyan		*/
-	0xff, 0x40, 0x40,	/*  7 Light Red		*/
-	0xff, 0x00, 0x00,	/*  8 Red		*/
-	0x00, 0x80, 0x80,	/*  9 Dark Cyan		*/
-	0xff, 0x00, 0xff,	/* 10 Magenta		*/
-	0x80, 0xff, 0x80,	/* 11 Light Green	*/
-	0xff, 0xff, 0x00,	/* 12 Yellow		*/
-	0x00, 0x00, 0x80,	/* 13 Dark Blue		*/
-	0xff, 0xff, 0xff,	/* 14 White		*/
-	0x00, 0x00, 0x00,	/* 15 Black		*/
+	0x00, 0x00, 0x00,	/*  0 Black     */
+	0x80, 0x80, 0x80,	/*  1 Grey      */
+	0x00, 0x00, 0xff,	/*  2 Blue      */
+	0xff, 0xff, 0x80,	/*  3 Light Yellow  */
+	0x00, 0xff, 0x00,	/*  4 Green     */
+	0xff, 0x80, 0xff,	/*  5 Light Magenta */
+	0x00, 0xff, 0xff,	/*  6 Cyan      */
+	0xff, 0x40, 0x40,	/*  7 Light Red     */
+	0xff, 0x00, 0x00,	/*  8 Red       */
+	0x00, 0x80, 0x80,	/*  9 Dark Cyan     */
+	0xff, 0x00, 0xff,	/* 10 Magenta       */
+	0x80, 0xff, 0x80,	/* 11 Light Green   */
+	0xff, 0xff, 0x00,	/* 12 Yellow        */
+	0x00, 0x00, 0x80,	/* 13 Dark Blue     */
+	0xff, 0xff, 0xff,	/* 14 White     */
+	0x00, 0x00, 0x00,	/* 15 Black     */
 };
 
 static void palette_set_colors_rgb(running_machine *machine, const UINT8 *colors)
@@ -289,7 +289,7 @@ VIDEO_START( super80 )
 
 /*---------------------------------------------------------------
 
-	Super-80R and Super-80V
+    Super-80R and Super-80V
 
 ---------------------------------------------------------------*/
 
@@ -348,10 +348,10 @@ static void mc6845_cursor_configure(void)
 	UINT8 i,curs_type=0,r9,r10,r11;
 
 	/* curs_type holds the general cursor shape to be created
-		0 = no cursor
-		1 = partial cursor (only shows on a block of scan lines)
-		2 = full cursor
-		3 = two-part cursor (has a part at the top and bottom with the middle blank) */
+        0 = no cursor
+        1 = partial cursor (only shows on a block of scan lines)
+        2 = full cursor
+        3 = two-part cursor (has a part at the top and bottom with the middle blank) */
 
 	for ( i = 0; i < ARRAY_LENGTH(mc6845_cursor); i++) mc6845_cursor[i] = 0;		// prepare cursor by erasing old one
 
@@ -419,7 +419,7 @@ MC6845_UPDATE_ROW( super80v_update_row )
 	for (x = 0; x < x_count; x++)				// for each character
 	{
 		UINT8 inv=0;
-		//		if (x == cursor_x) inv=0xff;	/* uncomment when mame fixed */
+		//      if (x == cursor_x) inv=0xff;    /* uncomment when mame fixed */
 		mem = (ma + x) & 0xfff;
 		chr = videoram[mem];
 

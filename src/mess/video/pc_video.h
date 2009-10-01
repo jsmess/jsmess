@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	pc_video.h
+    pc_video.h
 
-	Refactoring of code common to PC video implementations
+    Refactoring of code common to PC video implementations
 
 *********************************************************************/
 

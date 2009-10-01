@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	testmess.c
+    testmess.c
 
-	MESS testing code
+    MESS testing code
 
 *********************************************************************/
 
@@ -913,7 +913,7 @@ static void command_verify_image(running_machine *machine)
 	}
 
 	/* very dirty hack - we unload the image because we cannot access it
-	 * because the file is locked */
+     * because the file is locked */
 	strcpy(filename_buf, filename);
 	image_unload(image);
 	filename = filename_buf;
@@ -1074,8 +1074,8 @@ void osd_update(running_machine *machine, int skip_redraw)
 	if (state == STATE_READY)
 	{
 		/* if we are at the end, and we are dumping screenshots, and we didn't
-		 * just dump a screenshot, dump one now
-		 */
+         * just dump a screenshot, dump one now
+         */
 		if ((test_flags & MESSTEST_ALWAYS_DUMP_SCREENSHOT) &&
 			(current_command[0].command_type != MESSTEST_COMMAND_SCREENSHOT) &&
 			(current_command[1].command_type == MESSTEST_COMMAND_END))

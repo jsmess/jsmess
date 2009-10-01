@@ -6,15 +6,15 @@
     Visit http://mamedev.org for licensing and usage restrictions.
 
 **********************************************************************
-							_____   _____
-					A1   1 |*    \_/     | 16  Vcc
-					A2   2 |			 | 15  F
-				   _LE   3 |			 | 14  G
-				  _RBO   4 |   DM9368	 | 13  A
-				  _RBI   5 |			 | 12  B
-				    A3   6 |			 | 11  C
-					A0   7 |			 | 10  D
-				   GND   8 |_____________| 9   E
+                            _____   _____
+                    A1   1 |*    \_/     | 16  Vcc
+                    A2   2 |             | 15  F
+                   _LE   3 |             | 14  G
+                  _RBO   4 |   DM9368    | 13  A
+                  _RBI   5 |             | 12  B
+                    A3   6 |             | 11  C
+                    A0   7 |             | 10  D
+                   GND   8 |_____________| 9   E
 
 **********************************************************************/
 
@@ -43,7 +43,7 @@ typedef struct _dm9368_config dm9368_config;
 struct _dm9368_config
 {
 	const char *rbo_tag;		/* device to connect RBO pin to */
-	
+
 	int digit;					/* output digit */
 };
 

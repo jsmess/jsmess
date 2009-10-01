@@ -6,49 +6,49 @@ PCB Layout
 ----------
 
 |-------------------------------------------------------------------------------|
-|	|---------------CN1---------------|		|---------------CN2---------------|	|
-|CN6																			|
-|	|---------|					|---------|				4050		4050		|
-|	| CDPR566 |					| CDP1861 |									CN3	|
-|	|---------|					|---------|										|
-|																			CN4	|
-| 7805										|---------|		 |--------|			|
-|		2114					3.521280MHz	|  4508   |		 |  4508  |		CN5	|
-|											|---------|		 |--------|			|
-|		2114												 |--------|			|
-|								7474  7400	4049  4051  4028 |  4515  |	CA3401	|	
-|		2114												 |--------|			|
-|				|-------------|													|
-|		2114	|   CDP1802	  |													|
-|				|-------------|				LED1								|
-|		2114																	|
-|											LED2								|
-|		2114	4556	4042													|
-|											LED3								|
-|  555	2114	4011	4013													|
-|											SW1									|
-|		2114																	|
-|																				|
+|   |---------------CN1---------------|     |---------------CN2---------------| |
+|CN6                                                                            |
+|   |---------|                 |---------|             4050        4050        |
+|   | CDPR566 |                 | CDP1861 |                                 CN3 |
+|   |---------|                 |---------|                                     |
+|                                                                           CN4 |
+| 7805                                      |---------|      |--------|         |
+|       2114                    3.521280MHz |  4508   |      |  4508  |     CN5 |
+|                                           |---------|      |--------|         |
+|       2114                                                 |--------|         |
+|                               7474  7400  4049  4051  4028 |  4515  | CA3401  |
+|       2114                                                 |--------|         |
+|               |-------------|                                                 |
+|       2114    |   CDP1802   |                                                 |
+|               |-------------|             LED1                                |
+|       2114                                                                    |
+|                                           LED2                                |
+|       2114    4556    4042                                                    |
+|                                           LED3                                |
+|  555  2114    4011    4013                                                    |
+|                                           SW1                                 |
+|       2114                                                                    |
+|                                                                               |
 |-------------------------------------------------------------------------------|
 
 Notes:
     All IC's shown.
-	
-    CDPR566	- Programmed CDP1832 512 x 8-Bit Static ROM
-	2114	- 2114 4096 Bit (1024x4) NMOS Static RAM
-	CDP1802	- RCA CDP1802 CMOS 8-Bit Microprocessor
-	CDP1861	- RCA CDP1861 Video Display Controller
-	CA3401	- Quad Single-Supply Op-Amp
-	CN1		- expansion interface connector
-	CN2		- parallel I/O interface connector
-	CN3		- video connector
-	CN4		- tape in connector
-	CN5		- tape out connector
-	CN6		- power connector
-	LED1	- power led
-	LED2	- Q led
-	LED3	- tape led
-	SW1		- Run/Reset switch
+
+    CDPR566 - Programmed CDP1832 512 x 8-Bit Static ROM
+    2114    - 2114 4096 Bit (1024x4) NMOS Static RAM
+    CDP1802 - RCA CDP1802 CMOS 8-Bit Microprocessor
+    CDP1861 - RCA CDP1861 Video Display Controller
+    CA3401  - Quad Single-Supply Op-Amp
+    CN1     - expansion interface connector
+    CN2     - parallel I/O interface connector
+    CN3     - video connector
+    CN4     - tape in connector
+    CN5     - tape out connector
+    CN6     - power connector
+    LED1    - power led
+    LED2    - Q led
+    LED3    - tape led
+    SW1     - Run/Reset switch
 
 */
 
@@ -56,9 +56,9 @@ Notes:
 
     TODO:
 
-	- second VP580 keypad
+    - second VP580 keypad
 
-	- VP-585 Expansion Keyboard Interface (2 keypad connectors for VP-580)
+    - VP-585 Expansion Keyboard Interface (2 keypad connectors for VP-580)
     - VP-551 Super Sound Board (4 channel sound)
     - VP-601/611 ASCII Keyboard (VP-601 58 keys, VP611 58 keys + 16 keys numerical keypad)
     - VP-700 Expanded Tiny Basic Board (4 KB ROM expansion)
@@ -67,153 +67,153 @@ Notes:
 
 /*
 
-	VP-711 COSMAC MicroComputer $199
-	(CDP18S711) Features RCA COSMAC microprocessor. 2K RAM, expandable to
-	32K (4K on-board). Built-in cassette interface and video interface.
-	16 key hexidecimal keypad. ROM operating system. CHIP-8 language and
-	machine language. Tone generator and speaker. 8-bit input port, 8-bit
-	output port, and full system expansion connector. Power supply and 3
-	manuals (VP-311, VP-320, MPM201 B) included. Completely assembled.
+    VP-711 COSMAC MicroComputer $199
+    (CDP18S711) Features RCA COSMAC microprocessor. 2K RAM, expandable to
+    32K (4K on-board). Built-in cassette interface and video interface.
+    16 key hexidecimal keypad. ROM operating system. CHIP-8 language and
+    machine language. Tone generator and speaker. 8-bit input port, 8-bit
+    output port, and full system expansion connector. Power supply and 3
+    manuals (VP-311, VP-320, MPM201 B) included. Completely assembled.
 
-	VP-44 VP-711 RAM On-Board Expansion Kit $36
-	Four type 2114 RAM IC's for expanding VP-711 on-board memory
-	to 4K bytes.
+    VP-44 VP-711 RAM On-Board Expansion Kit $36
+    Four type 2114 RAM IC's for expanding VP-711 on-board memory
+    to 4K bytes.
 
-	VP-111 MicroComputer $99
-	RCA COSMAC microprocessor. 1 K RAM expandable to 32K (4K On-
-	board). Built-in cassette interface and video interface. 16 key
-	Hexidecimal keypad. ROM operating system. CHIP-8 language and Machine
-	language. Tone generator. Assembled - user must install Cables
-	(supplied) and furnish 5 volt power supply and speaker.
+    VP-111 MicroComputer $99
+    RCA COSMAC microprocessor. 1 K RAM expandable to 32K (4K On-
+    board). Built-in cassette interface and video interface. 16 key
+    Hexidecimal keypad. ROM operating system. CHIP-8 language and Machine
+    language. Tone generator. Assembled - user must install Cables
+    (supplied) and furnish 5 volt power supply and speaker.
 
-	VP-114 VP-111 Expansion Kit $76
-	Includes I/O ports, system expansion connector and additional
-	3K of RAM. Expands VP-111 to VP-711 capability.
+    VP-114 VP-111 Expansion Kit $76
+    Includes I/O ports, system expansion connector and additional
+    3K of RAM. Expands VP-111 to VP-711 capability.
 
-	VP-155 VP-111 Cover $12
-	Attractive protective plastic cover for VP-111.
+    VP-155 VP-111 Cover $12
+    Attractive protective plastic cover for VP-111.
 
-	VP-3301 Interactive Data Terminal Available Approx. 6 Months
-	Microprocessor Based Computer Terminal with keyboard, video
-	Interface and color graphics - includes full resident and user
-	Definable character font, switch selectable configuration, cursor
-	Control, reverse video and many other features.
+    VP-3301 Interactive Data Terminal Available Approx. 6 Months
+    Microprocessor Based Computer Terminal with keyboard, video
+    Interface and color graphics - includes full resident and user
+    Definable character font, switch selectable configuration, cursor
+    Control, reverse video and many other features.
 
-	VP-590 Color Board $69
-	Displays VP-711 output in color! Program control of four
-	Background colors and eight foreground colors. CHIP-8X language
-	Adds color commands. Includes two sockets for VP-580 Expansion
-	Keyboards.
+    VP-590 Color Board $69
+    Displays VP-711 output in color! Program control of four
+    Background colors and eight foreground colors. CHIP-8X language
+    Adds color commands. Includes two sockets for VP-580 Expansion
+    Keyboards.
 
-	VP-595 Simple Sound Board $30
-	Provides 256 different frequencies in place of VP-711 single-
-	tone Output. Use with VP-590 Color Board for simultaneous color and
-	Sound. Great for simple music or sound effects! Includes speaker.
+    VP-595 Simple Sound Board $30
+    Provides 256 different frequencies in place of VP-711 single-
+    tone Output. Use with VP-590 Color Board for simultaneous color and
+    Sound. Great for simple music or sound effects! Includes speaker.
 
-	VP-550 Super Sound Board $49
-	Turn your VP-711 into a music synthesizer! Two independent
-	sound Channels. Frequency, duration and amplitude envelope (voice) of
-	Each channel under program control. On-board tempo control. Provision
-	for multi-track recording or slaving VP-711's. Output drives audio
-	preamp. Does not permit simultaneous video display.
+    VP-550 Super Sound Board $49
+    Turn your VP-711 into a music synthesizer! Two independent
+    sound Channels. Frequency, duration and amplitude envelope (voice) of
+    Each channel under program control. On-board tempo control. Provision
+    for multi-track recording or slaving VP-711's. Output drives audio
+    preamp. Does not permit simultaneous video display.
 
-	VP-551 Super Sound 4-Channel Expander Package $74
-	VP-551 provides four (4) independent sound channels with
-	frequency duration and amplitude envelope for each channel. Package
-	includes modified VP-550 super sound board, VP-576 two board
-	expander, data cassette with 4-channel PIN-8 program, and instruction
-	manual. Requires 4K RAM system and your VP-550 Super Sound Board.
+    VP-551 Super Sound 4-Channel Expander Package $74
+    VP-551 provides four (4) independent sound channels with
+    frequency duration and amplitude envelope for each channel. Package
+    includes modified VP-550 super sound board, VP-576 two board
+    expander, data cassette with 4-channel PIN-8 program, and instruction
+    manual. Requires 4K RAM system and your VP-550 Super Sound Board.
 
-	VP-570 Memory Expansion Board $95
-	Plug-in 4K static RAM memory. Jumper locates RAM in any 4K
-	block in first 32K of VP-711 memory space.
+    VP-570 Memory Expansion Board $95
+    Plug-in 4K static RAM memory. Jumper locates RAM in any 4K
+    block in first 32K of VP-711 memory space.
 
-	VP-580 Auxiliary Keyboard $20
-	Adds two-player interactive game capability to VP-711 16-key
-	keypad with cable. Connects to sockets on VP-590 Color Board or VP-
-	585 Keyboard Interface.
+    VP-580 Auxiliary Keyboard $20
+    Adds two-player interactive game capability to VP-711 16-key
+    keypad with cable. Connects to sockets on VP-590 Color Board or VP-
+    585 Keyboard Interface.
 
-	VP-585 Keyboard Interface Board $15
-	Interfaces two VP-580 Expansion Keyboards directly to the VP-
-	711. Not required when VP-590 Color Board is used.
+    VP-585 Keyboard Interface Board $15
+    Interfaces two VP-580 Expansion Keyboards directly to the VP-
+    711. Not required when VP-590 Color Board is used.
 
-	VP-560 EPROM Board $34
-	Interfaces two Intel 2716 EPROMs to VP-711. Places EPROMs any-
-	where in memory space. Can also re-allocate on-board RAM in memory
-	space.
+    VP-560 EPROM Board $34
+    Interfaces two Intel 2716 EPROMs to VP-711. Places EPROMs any-
+    where in memory space. Can also re-allocate on-board RAM in memory
+    space.
 
-	VP-565 EPROM Programmer Board $99
-	Programs Intel 2716 EPROMs with VP-711. Complete with software
-	to program, copy, and verify. On-board generation of all programming
-	voltages.
+    VP-565 EPROM Programmer Board $99
+    Programs Intel 2716 EPROMs with VP-711. Complete with software
+    to program, copy, and verify. On-board generation of all programming
+    voltages.
 
-	VP-575 Expansion Board $59
-	Plug-in board with 4 buffered and one unbuffered socket.
-	Permits use of up to 5 Accessory Boards in VP-711 Expansion Socket.
+    VP-575 Expansion Board $59
+    Plug-in board with 4 buffered and one unbuffered socket.
+    Permits use of up to 5 Accessory Boards in VP-711 Expansion Socket.
 
-	VP-576 Two-Board Expander $20
-	Plug-in board for VP-711 I/O or Expansion Socket permits use
-	of two Accessory Boards in either location.
+    VP-576 Two-Board Expander $20
+    Plug-in board for VP-711 I/O or Expansion Socket permits use
+    of two Accessory Boards in either location.
 
-	VP-601* ASCII Keyboard. 7-Bit Parallel Output $69
-	Fully encoded, 128-character ASCII alphanumeric keyboard. 58
-	light touch keys (2 user defined). Selectable "Upper-Case-Only".
+    VP-601* ASCII Keyboard. 7-Bit Parallel Output $69
+    Fully encoded, 128-character ASCII alphanumeric keyboard. 58
+    light touch keys (2 user defined). Selectable "Upper-Case-Only".
 
-	VP-606* ASCII Keyboard - Serial Output $99
-	Same as VP-601. EIA RS232C compatible, 20 mA current loop and
-	TTL outputs. Six selectable baud rates. Available mid-1980.
+    VP-606* ASCII Keyboard - Serial Output $99
+    Same as VP-601. EIA RS232C compatible, 20 mA current loop and
+    TTL outputs. Six selectable baud rates. Available mid-1980.
 
-	VP-611* ASCII/Numeric Keyboard. 7-Bit Parallel Output $89
-	ASCII Keyboard identical to VP-601 plus 16 key numeric entry
-	keyboard for easier entry of numbers.
+    VP-611* ASCII/Numeric Keyboard. 7-Bit Parallel Output $89
+    ASCII Keyboard identical to VP-601 plus 16 key numeric entry
+    keyboard for easier entry of numbers.
 
-	VP-616* ASCII/Numeric Keyboard - Serial Output $119
-	Same as VP-611. EIA RS232C compatible, 20 mA current loop and
-	TTL outputs. Six selectable baud rates. Available mid-1980.
+    VP-616* ASCII/Numeric Keyboard - Serial Output $119
+    Same as VP-611. EIA RS232C compatible, 20 mA current loop and
+    TTL outputs. Six selectable baud rates. Available mid-1980.
 
-	VP-620 Cable: ASCII Keyboards to VP-711 $20
-	Flat ribbon cable, 24" length, for connecting VP-601 or VP-
-	611 and VP-711. Includes matching connector on both ends.
+    VP-620 Cable: ASCII Keyboards to VP-711 $20
+    Flat ribbon cable, 24" length, for connecting VP-601 or VP-
+    611 and VP-711. Includes matching connector on both ends.
 
-	VP-623 Cable: Parallel Output ASCII Keyboards $20
-	Flat ribbon cable, 36" length with mating connector for VP-
-	601 or VP-611 Keyboards. Other end is unterminated.
+    VP-623 Cable: Parallel Output ASCII Keyboards $20
+    Flat ribbon cable, 36" length with mating connector for VP-
+    601 or VP-611 Keyboards. Other end is unterminated.
 
-	VP-626 Connector: Serial Output ASCII Keyboards & Terminal $7
-	25 pin solderable male "D" connector mates to VP-606, VP-616
-	or VP-3301.
+    VP-626 Connector: Serial Output ASCII Keyboards & Terminal $7
+    25 pin solderable male "D" connector mates to VP-606, VP-616
+    or VP-3301.
 
-	TC1210 9" Video Monitor $195
-	Ideal, low-cost monochrome monitor for displaying the video
-	output from your microcomputer or terminal.
+    TC1210 9" Video Monitor $195
+    Ideal, low-cost monochrome monitor for displaying the video
+    output from your microcomputer or terminal.
 
-	TC1217 17" Video Monitor $480
-	A really BIG monochrome monitor for use with your
-	microcomputer or terminal 148 sq. in. pictures.
+    TC1217 17" Video Monitor $480
+    A really BIG monochrome monitor for use with your
+    microcomputer or terminal 148 sq. in. pictures.
 
-	VP-700 Tiny BASIC ROM Board $39
-	Run Tiny BASIC on your VP-711! All BASIC code stored in ROM.
-	Requires separate ASCII keyboard.
+    VP-700 Tiny BASIC ROM Board $39
+    Run Tiny BASIC on your VP-711! All BASIC code stored in ROM.
+    Requires separate ASCII keyboard.
 
-	VP-701 Floating Point BASIC for VP-711 $49
-	16K bytes on cassette tape, includes floating point and
-	integer math, string capability and color graphics. More than 70
-	commands and statements. Available mid-1980.
+    VP-701 Floating Point BASIC for VP-711 $49
+    16K bytes on cassette tape, includes floating point and
+    integer math, string capability and color graphics. More than 70
+    commands and statements. Available mid-1980.
 
-	VP-710 Game Manual $10
-	More exciting games for your VP-711! Includes Blackjack,
-	Biorythm, Pinball, Bowling and 10 others.
+    VP-710 Game Manual $10
+    More exciting games for your VP-711! Includes Blackjack,
+    Biorythm, Pinball, Bowling and 10 others.
 
-	VP-720 Game Manual II More exciting games. Available mid-1980. $15
+    VP-720 Game Manual II More exciting games. Available mid-1980. $15
 
-	VP-311 VP-711 Instruction Manual (Included with VP-711) $5
+    VP-311 VP-711 Instruction Manual (Included with VP-711) $5
 
-	VP-320 VP-711 User Guide Manual (Included with VP-711) $5
+    VP-320 VP-711 User Guide Manual (Included with VP-711) $5
 
-	MPM-201B CDP1802 User Manual (Included with VP-711) $5
+    MPM-201B CDP1802 User Manual (Included with VP-711) $5
 
-	* Quantities of 15 or more available less case and speaker (Assembled
-	keypad and circut board only). Price on request.
+    * Quantities of 15 or more available less case and speaker (Assembled
+    keypad and circut board only). Price on request.
 
 */
 
@@ -310,9 +310,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( vip_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(CDP1861_TAG, vip_cdp1861_dispon_r, vip_cdp1861_dispoff_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(keylatch_w)
-//	AM_RANGE(0x03, 0x03) AM_DEVWRITE(CDP1863_TAG, cdp1863_str_w)
+//  AM_RANGE(0x03, 0x03) AM_DEVWRITE(CDP1863_TAG, cdp1863_str_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(bankswitch_w)
-//	AM_RANGE(0x05, 0x05) AM_DEVWRITE(CDP1862_TAG, cdp1862_bkg_w)
+//  AM_RANGE(0x05, 0x05) AM_DEVWRITE(CDP1862_TAG, cdp1862_bkg_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -364,7 +364,7 @@ static INPUT_PORTS_START( vip )
 	PORT_CONFSETTING( 0x02, "2x VP-580 Expansion Keyboard" )
 	PORT_CONFSETTING( 0x03, "VP-601 ASCII Keyboard" )
 	PORT_CONFSETTING( 0x04, "VP-611 ASCII/Numeric Keyboard" )
-	
+
 	PORT_START("VIDEO")
 	PORT_CONFNAME( 0x01, 0x00, "Video")
 	PORT_CONFSETTING( 0x00, "Standard" )
@@ -440,7 +440,7 @@ static WRITE8_HANDLER( vip_colorram_w )
 
 	state->a12 = (offset & 0x1000) ? 1 : 0;
 
-	if (!state->a12) 
+	if (!state->a12)
 	{
 		/* mask out A4 and A3 */
 		mask = 0xe7;
@@ -535,7 +535,7 @@ static CDP1802_EF_READ( vip_ef_r )
 
 static CDP1802_SC_WRITE( vip_sc_w )
 {
-//	vip_state *driver_state = device->machine->driver_data;
+//  vip_state *driver_state = device->machine->driver_data;
 
 	switch (input_port_read(device->machine, "SOUND"))
 	{
@@ -595,14 +595,14 @@ static WRITE8_DEVICE_HANDLER( vip_dma_w )
 		{
 			UINT8 mask = 0xff;
 
-			if (!state->a12) 
+			if (!state->a12)
 			{
 				/* mask out A4 and A3 */
 				mask = 0xe7;
 			}
 
 			state->color = state->colorram[offset & mask];
-			
+
 			cdp1862_dma_w(state->cdp1862, offset, data);
 		}
 		break;
@@ -674,7 +674,7 @@ static MACHINE_START( vip )
 static MACHINE_RESET( vip )
 {
 	vip_state *state = machine->driver_data;
-	
+
 	const address_space *program = cputag_get_address_space(machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM);
 	const address_space *io = cputag_get_address_space(machine, CDP1802_TAG, ADDRESS_SPACE_IO);
 
@@ -853,6 +853,6 @@ SYSTEM_CONFIG_END
 
 /* System Drivers */
 
-/*	  YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   INIT    CONFIG  COMPANY FULLNAME				FLAGS */
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   INIT    CONFIG  COMPANY FULLNAME                FLAGS */
 COMP( 1977, vip,	0,		0,		vip,		vip,	0,		vp711,	"RCA",	"Cosmac VIP (VP-711)",	GAME_SUPPORTS_SAVE | GAME_IMPERFECT_COLORS )
 COMP( 1977, vp111,	vip,	0,		vip,		vip,	0,		vp111,	"RCA",	"Cosmac VIP (VP-111)",	GAME_SUPPORTS_SAVE | GAME_IMPERFECT_COLORS )

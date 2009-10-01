@@ -56,7 +56,7 @@ int pc1350_ina(const device_config *device)
 	if (outa & 0x04)
 	{
 		data |= input_port_read(machine, "KEY8");
-	
+
 		/* At Power Up we fake a 'CLS' pressure */
 		if (power)
 			data |= 0x08;
@@ -68,7 +68,7 @@ int pc1350_ina(const device_config *device)
 	if (outa & 0x10)
 		data |= input_port_read(machine, "KEY10");
 
-	if (outa & 0xc0) 
+	if (outa & 0xc0)
 		data |= input_port_read(machine, "KEY11");
 
 	// missing lshift
@@ -119,7 +119,7 @@ static TIMER_CALLBACK(pc1350_power_up)
 MACHINE_START( pc1350 )
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	
+
 	timer_set(machine, ATTOTIME_IN_SEC(1), NULL, 0, pc1350_power_up);
 
 	memory_install_read8_handler(space, 0x6000, 0x6fff, 0, 0, SMH_BANK(1));

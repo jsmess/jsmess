@@ -9,12 +9,12 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- count
-	- stop
-	- reset
-	- reference registers
+    - count
+    - stop
+    - reset
+    - reference registers
 
 */
 
@@ -257,8 +257,8 @@ WRITE_LINE_DEVICE_HANDLER( msm58321_write_w )
 }
 
 /*-------------------------------------------------
-    msm58321_address_write_w - adddress write 
-	handshake
+    msm58321_address_write_w - adddress write
+    handshake
 -------------------------------------------------*/
 
 WRITE_LINE_DEVICE_HANDLER( msm58321_address_write_w )
@@ -276,7 +276,7 @@ WRITE_LINE_DEVICE_HANDLER( msm58321_address_write_w )
 
 WRITE_LINE_DEVICE_HANDLER( msm58321_stop_w )
 {
-//	msm58321_t *msm58321 = get_safe_token(device);
+//  msm58321_t *msm58321 = get_safe_token(device);
 
 	if (LOG) logerror("MSM58321 '%s' STOP: %u\n", device->tag, state);
 }
@@ -287,7 +287,7 @@ WRITE_LINE_DEVICE_HANDLER( msm58321_stop_w )
 
 WRITE_LINE_DEVICE_HANDLER( msm58321_test_w )
 {
-//	msm58321_t *msm58321 = get_safe_token(device);
+//  msm58321_t *msm58321 = get_safe_token(device);
 
 	if (LOG) logerror("MSM58321 '%s' TEST: %u\n", device->tag, state);
 }

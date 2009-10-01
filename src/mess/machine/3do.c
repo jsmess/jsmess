@@ -13,7 +13,7 @@ typedef struct {
 } CLIO;
 
 
-//static UINT32	unk_318_data_0 = 0;
+//static UINT32 unk_318_data_0 = 0;
 static MADAM	madam;
 static CLIO		clio;
 
@@ -30,45 +30,45 @@ WRITE32_HANDLER( nvarea_w ) {
 
 
 /*
-	I have no idea what piece of hardware this is. Possibly some kind of communication hardware.
+    I have no idea what piece of hardware this is. Possibly some kind of communication hardware.
 
-	During booting the following things get written/read:
-	write 03180000 to 03180000
-	4 read actions from 03180000, if lower bit is 1 0 1 0 then
-	write 02000000 to 03180000
-	write 04000000 to 03180000
-	write 08000000 to 03180000
-	write 10000000 to 03180000
-	write 20000000 to 03180000
-	write 40000000 to 03180000
-	write 80000000 to 03180000
-	write 00000001 to 03180000
-	write 00000002 to 03180000
-	write 00000004 to 03180000
-	write 00000008 to 03180000
-	write 00000010 to 03180000
-	write 00000020 to 03180000
-	write 00000040 to 03180000
-	write 00000080 to 03180000
-	write 00000100 to 03180000
-	read from 03180000
-	write 04000000 to 03180000
-	write 08000000 to 03180000
-	write 10000000 to 03180000
-	write 20000000 to 03180000
-	write 40000000 to 03180000
-	write 80000000 to 03180000
-	write 00000001 to 03180000
-	write 00000002 to 03180000
-	write 00000004 to 03180000
-	write 00000008 to 03180000
-	write 00000010 to 03180000
-	write 00000020 to 03180000
-	write 00000040 to 03180000
-	write 00000080 to 03180000
-	write 00000100 to 03180000
-	write 00002000 to 03180000
-	several groups of 16 write actions or 16 read actions
+    During booting the following things get written/read:
+    write 03180000 to 03180000
+    4 read actions from 03180000, if lower bit is 1 0 1 0 then
+    write 02000000 to 03180000
+    write 04000000 to 03180000
+    write 08000000 to 03180000
+    write 10000000 to 03180000
+    write 20000000 to 03180000
+    write 40000000 to 03180000
+    write 80000000 to 03180000
+    write 00000001 to 03180000
+    write 00000002 to 03180000
+    write 00000004 to 03180000
+    write 00000008 to 03180000
+    write 00000010 to 03180000
+    write 00000020 to 03180000
+    write 00000040 to 03180000
+    write 00000080 to 03180000
+    write 00000100 to 03180000
+    read from 03180000
+    write 04000000 to 03180000
+    write 08000000 to 03180000
+    write 10000000 to 03180000
+    write 20000000 to 03180000
+    write 40000000 to 03180000
+    write 80000000 to 03180000
+    write 00000001 to 03180000
+    write 00000002 to 03180000
+    write 00000004 to 03180000
+    write 00000008 to 03180000
+    write 00000010 to 03180000
+    write 00000020 to 03180000
+    write 00000040 to 03180000
+    write 00000080 to 03180000
+    write 00000100 to 03180000
+    write 00002000 to 03180000
+    several groups of 16 write actions or 16 read actions
 */
 READ32_HANDLER( unk_318_r ) {
 	logerror( "%08X: UNK_318 read offset = %08X\n", cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")), offset );

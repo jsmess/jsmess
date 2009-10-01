@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	mockngbd.h
+    mockngbd.h
 
-	Implementation of the Apple II Mockingboard
+    Implementation of the Apple II Mockingboard
 
 *********************************************************************/
 
@@ -27,7 +27,7 @@
 ***************************************************************************/
 
 /* device get info function */
-DEVICE_GET_INFO(mockingboard);	
+DEVICE_GET_INFO(mockingboard);
 
 /* slot read function */
 READ8_DEVICE_HANDLER(mockingboard_r);

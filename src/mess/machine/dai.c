@@ -154,31 +154,31 @@ MACHINE_RESET( dai )
 
 /***************************************************************************
 
-	Discrete Devices IO
+    Discrete Devices IO
 
-	FD00	POR1:	IN	bit 0	-
-				bit 1	-
-				bit 2	PIPGE: Page signal
-				bit 3	PIDTR: Serial output ready
-				bit 4	PIBU1: Button on paddle 1 (1 = closed)
-				bit 5	PIBU1: Button on paddle 2 (1 = closed)
-				bit 6	PIRPI: Random data
-				bit 7	PICAI: Cassette input data
+    FD00    POR1:   IN  bit 0   -
+                bit 1   -
+                bit 2   PIPGE: Page signal
+                bit 3   PIDTR: Serial output ready
+                bit 4   PIBU1: Button on paddle 1 (1 = closed)
+                bit 5   PIBU1: Button on paddle 2 (1 = closed)
+                bit 6   PIRPI: Random data
+                bit 7   PICAI: Cassette input data
 
-	FD01	PDLST:	IN	Single pulse used to trigger paddle timer circuit
+    FD01    PDLST:  IN  Single pulse used to trigger paddle timer circuit
 
-	FD04	POR1:	OUT	bit 0-3	Volume oscillator channel 0
-				bit 4-7	Volume oscillator channel 1
+    FD04    POR1:   OUT bit 0-3 Volume oscillator channel 0
+                bit 4-7 Volume oscillator channel 1
 
-	FD05	POR1:	OUT	bit 0-3	Volume oscillator channel 2
-				bit 4-7	Volume random noise generator
+    FD05    POR1:   OUT bit 0-3 Volume oscillator channel 2
+                bit 4-7 Volume random noise generator
 
-	FD06	POR0:	OUT	bit 0	POCAS: Cassette data output
-				bit 1-2	PDLMSK: Paddle select
-				bit 3	PDPNA:	Paddle enable
-				bit 4	POCM1:	Cassette 1 motor control (0 = run)
-				bit 5	POCM2:	Cassette 2 motor control (0 = run)
-				bit 6-7			ROM bank switching
+    FD06    POR0:   OUT bit 0   POCAS: Cassette data output
+                bit 1-2 PDLMSK: Paddle select
+                bit 3   PDPNA:  Paddle enable
+                bit 4   POCM1:  Cassette 1 motor control (0 = run)
+                bit 5   POCM2:  Cassette 2 motor control (0 = run)
+                bit 6-7         ROM bank switching
 ***************************************************************************/
 
 READ8_HANDLER( dai_io_discrete_devices_r )
@@ -244,7 +244,7 @@ WRITE8_HANDLER( dai_io_discrete_devices_w )
 
 /***************************************************************************
 
-	AMD 9911 mathematical coprocesor
+    AMD 9911 mathematical coprocesor
 
 ***************************************************************************/
 

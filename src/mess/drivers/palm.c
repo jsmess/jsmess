@@ -1,11 +1,11 @@
 /****************************************************************************
 
-	drivers/palm.c
-	Palm (MC68328) emulation
+    drivers/palm.c
+    Palm (MC68328) emulation
 
-	Driver by MooglyGuy
+    Driver by MooglyGuy
 
-	Additional bug fixing by R. Belmont
+    Additional bug fixing by R. Belmont
 
 ****************************************************************************/
 

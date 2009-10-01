@@ -17,25 +17,25 @@
 *
 * Changes:
 *
-*	10/2/2002		AK - Preliminary sound code.
-*	13/2/2002		AK - Added a hack for mode 4, other fixes.
-*	23/2/2002		AK - Use lookup tables, added sweep to mode 1. Re-wrote the square
-*						 wave generation.
-*	13/3/2002		AK - Added mode 3, better lookup tables, other adjustments.
-*	15/3/2002		AK - Mode 4 can now change frequencies.
-*	31/3/2002		AK - Accidently forgot to handle counter/consecutive for mode 1.
-*	 3/4/2002		AK - Mode 1 sweep can still occur if shift is 0.  Don't let frequency
-*						 go past the maximum allowed value. Fixed Mode 3 length table.
-*						 Slight adjustment to Mode 4's period table generation.
-*	 5/4/2002		AK - Mode 4 is done correctly, using a polynomial counter instead
-*						 of being a total hack.
-*	 6/4/2002		AK - Slight tweak to mode 3's frequency calculation.
-*	13/4/2002		AK - Reset envelope value when sound is initialized.
-*	21/4/2002		AK - Backed out the mode 3 frequency calculation change.
-*						 Merged init functions into gameboy_sound_w().
-*	14/5/2002		AK - Removed magic numbers in the fixed point math.
-*	12/6/2002		AK - Merged SOUNDx structs into one SOUND struct.
-*  26/10/2002		AK - Finally fixed channel 3!
+*   10/2/2002       AK - Preliminary sound code.
+*   13/2/2002       AK - Added a hack for mode 4, other fixes.
+*   23/2/2002       AK - Use lookup tables, added sweep to mode 1. Re-wrote the square
+*                        wave generation.
+*   13/3/2002       AK - Added mode 3, better lookup tables, other adjustments.
+*   15/3/2002       AK - Mode 4 can now change frequencies.
+*   31/3/2002       AK - Accidently forgot to handle counter/consecutive for mode 1.
+*    3/4/2002       AK - Mode 1 sweep can still occur if shift is 0.  Don't let frequency
+*                        go past the maximum allowed value. Fixed Mode 3 length table.
+*                        Slight adjustment to Mode 4's period table generation.
+*    5/4/2002       AK - Mode 4 is done correctly, using a polynomial counter instead
+*                        of being a total hack.
+*    6/4/2002       AK - Slight tweak to mode 3's frequency calculation.
+*   13/4/2002       AK - Reset envelope value when sound is initialized.
+*   21/4/2002       AK - Backed out the mode 3 frequency calculation change.
+*                        Merged init functions into gameboy_sound_w().
+*   14/5/2002       AK - Removed magic numbers in the fixed point math.
+*   12/6/2002       AK - Merged SOUNDx structs into one SOUND struct.
+*  26/10/2002       AK - Finally fixed channel 3!
 *
 ***************************************************************************************/
 
@@ -382,7 +382,7 @@ static void gb_sound_w_internal(const device_config *device, int offset, UINT8 d
 		break;
 	case NR52: /* Sound On/Off (R/W) */
 		/* Only bit 7 is writable, writing to bits 0-3 does NOT enable or
-		   disable sound.  They are read-only */
+           disable sound.  They are read-only */
 		gb->snd_control.on = (data & 0x80) >> 7;
 		if( !gb->snd_control.on )
 		{
@@ -391,7 +391,7 @@ static void gb_sound_w_internal(const device_config *device, int offset, UINT8 d
 			gb_sound_w_internal( device, NR12, 0x00 );
 			gb_sound_w_internal( device, NR13, 0xFE );
 			gb_sound_w_internal( device, NR14, 0xBF );
-//			gb_sound_w_internal( device, NR20, 0xFF );
+//          gb_sound_w_internal( device, NR20, 0xFF );
 			gb_sound_w_internal( device, NR21, 0x3F );
 			gb_sound_w_internal( device, NR22, 0x00 );
 			gb_sound_w_internal( device, NR23, 0xFF );
@@ -401,7 +401,7 @@ static void gb_sound_w_internal(const device_config *device, int offset, UINT8 d
 			gb_sound_w_internal( device, NR32, 0x9F );
 			gb_sound_w_internal( device, NR33, 0xFF );
 			gb_sound_w_internal( device, NR34, 0xBF );
-//			gb_sound_w_internal( device, NR40, 0xFF );
+//          gb_sound_w_internal( device, NR40, 0xFF );
 			gb_sound_w_internal( device, NR41, 0xFF );
 			gb_sound_w_internal( device, NR42, 0x00 );
 			gb_sound_w_internal( device, NR43, 0x00 );
@@ -567,8 +567,8 @@ static STREAM_UPDATE( gameboy_update )
 		if( gb->snd_3.on )
 		{
 			/* NOTE: This is extremely close, but not quite right.
-			   The problem is for GB frequencies above 2000 the frequency gets
-			   clipped. This is caused because gb->snd_3.pos is never 0 at the test.*/
+               The problem is for GB frequencies above 2000 the frequency gets
+               clipped. This is caused because gb->snd_3.pos is never 0 at the test.*/
 			sample = gb->snd_regs[AUD3W0 + (gb->snd_3.offset/2)];
 			if( !(gb->snd_3.offset % 2) )
 			{
@@ -624,8 +624,8 @@ static STREAM_UPDATE( gameboy_update )
 			if( gb->snd_4.pos == (gb->snd_4.period >> (FIXED_POINT + 1)) )
 			{
 				/* Using a Polynomial Counter (aka Linear Feedback Shift Register)
-				   Mode 4 has a 7 bit and 15 bit counter so we need to shift the
-				   bits around accordingly */
+                   Mode 4 has a 7 bit and 15 bit counter so we need to shift the
+                   bits around accordingly */
 				mode4_mask = (((gb->snd_4.ply_value & 0x2) >> 1) ^ (gb->snd_4.ply_value & 0x1)) << (gb->snd_4.ply_step ? 6 : 14);
 				gb->snd_4.ply_value >>= 1;
 				gb->snd_4.ply_value |= mode4_mask;
@@ -721,7 +721,7 @@ static DEVICE_START( gameboy_sound )
 		for( J = 0; J < 16; J++ )
 		{
 			/* I is the dividing ratio of frequencies
-			   J is the shift clock frequency */
+               J is the shift clock frequency */
 			gb->period_mode4_table[I][J] = ((1 << FIXED_POINT) / (524288 / ((I == 0)?0.5:I) / (1 << (J + 1)))) * gb->rate;
 		}
 	}

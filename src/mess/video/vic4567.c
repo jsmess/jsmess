@@ -849,7 +849,7 @@ INTERRUPT_GEN( vic3_raster_irq )
 			if (c64_pal)
 			{
 				if (vic2.on) vic2_drawlines (device->machine, vic2.lastline, vic2.lines, VIC2_STARTVISIBLECOLUMNS + 32, VIC2_STARTVISIBLECOLUMNS + 32 + columns + 16 - 1);
-			}			
+			}
 			else
 			{
 				if (vic2.on) vic2_drawlines (device->machine, vic2.lastline, vic2.lines, VIC2_STARTVISIBLECOLUMNS + 34, VIC2_STARTVISIBLECOLUMNS + 34 + columns + 16 - 1);
@@ -875,7 +875,7 @@ INTERRUPT_GEN( vic3_raster_irq )
 			if (c64_pal)
 			{
 				if (vic2.on) vic2_drawlines (device->machine, vic2.rasterline-1, vic2.rasterline, VIC2_STARTVISIBLECOLUMNS + 32, VIC2_STARTVISIBLECOLUMNS + 32 + columns + 16 - 1);
-			}			
+			}
 			else
 			{
 				if (vic2.on) vic2_drawlines (device->machine, vic2.rasterline-1, vic2.rasterline, VIC2_STARTVISIBLECOLUMNS + 34, VIC2_STARTVISIBLECOLUMNS + 34 + columns + 16 - 1);

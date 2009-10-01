@@ -6,27 +6,27 @@
     Visit http://mamedev.org for licensing and usage restrictions.
 
 **********************************************************************
-							_____   _____
-				   PC3   1 |*    \_/     | 40  Vcc
-				   PC4   2 |			 | 39  PC2
-			  TIMER IN   3 |			 | 38  PC1
-				 RESET   4 |			 | 37  PC0
-				   PC5   5 |			 | 36  PB7
-			_TIMER OUT   6 |			 | 35  PB6
-				 IO/_M   7 |			 | 34  PB5
-			 CE or _CE   8 |			 | 33  PB4
-				   _RD   9 |			 | 32  PB3
-				   _WR  10 |	8155	 | 31  PB2
-				   ALE  11 |	8156	 | 30  PB1
-				   AD0  12 |			 | 29  PB0
-				   AD1  13 |			 | 28  PA7
-				   AD2  14 |			 | 27  PA6
-				   AD3  15 |			 | 26  PA5
-				   AD4  16 |			 | 25  PA4
-				   AD5  17 |			 | 24  PA3
-				   AD6  18 |			 | 23  PA2
-				   AD7  19 |			 | 22  PA1
-				   Vss  20 |_____________| 21  PA0
+                            _____   _____
+                   PC3   1 |*    \_/     | 40  Vcc
+                   PC4   2 |             | 39  PC2
+              TIMER IN   3 |             | 38  PC1
+                 RESET   4 |             | 37  PC0
+                   PC5   5 |             | 36  PB7
+            _TIMER OUT   6 |             | 35  PB6
+                 IO/_M   7 |             | 34  PB5
+             CE or _CE   8 |             | 33  PB4
+                   _RD   9 |             | 32  PB3
+                   _WR  10 |    8155     | 31  PB2
+                   ALE  11 |    8156     | 30  PB1
+                   AD0  12 |             | 29  PB0
+                   AD1  13 |             | 28  PA7
+                   AD2  14 |             | 27  PA6
+                   AD3  15 |             | 26  PA5
+                   AD4  16 |             | 25  PA4
+                   AD5  17 |             | 24  PA3
+                   AD6  18 |             | 23  PA2
+                   AD7  19 |             | 22  PA1
+                   Vss  20 |_____________| 21  PA0
 
 **********************************************************************/
 

@@ -202,7 +202,7 @@ static MACHINE_DRIVER_START( odyssey2 )
 	MDRV_SOUND_CONFIG(the_voice_sp0256)
 	/* The Voice uses a speaker with its own volume control so the relative volumes to use are subjective, these sound good */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	
+
 	MDRV_IMPORT_FROM(odyssey2_cartslot)
 MACHINE_DRIVER_END
 
@@ -235,7 +235,7 @@ static MACHINE_DRIVER_START( videopac )
 	MDRV_SOUND_ADD("sp0256_speech", SP0256, 3120000)
 	MDRV_SOUND_CONFIG(the_voice_sp0256)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	
+
 	MDRV_IMPORT_FROM(odyssey2_cartslot)
 MACHINE_DRIVER_END
 
@@ -258,13 +258,13 @@ static MACHINE_DRIVER_START( g7400 )
 	MDRV_PALETTE_INIT( odyssey2 )
 
 	MDRV_VIDEO_START( odyssey2 )
-//	MDRV_VIDEO_UPDATE( odyssey2 )
+//  MDRV_VIDEO_UPDATE( odyssey2 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("custom", ODYSSEY2, 3547000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-	
+
 	MDRV_IMPORT_FROM(odyssey2_cartslot)
 MACHINE_DRIVER_END
 
@@ -281,13 +281,13 @@ ROM_START (odyssey2)
 	ROM_LOAD( "sp0256b-019.bin",   0x1000, 0x0800, CRC(19355075) SHA1(13bc08f08d161c30ff386d1f0d15676d82afde63) )
 
 	/* A note about "The Voice": Two versions of "The Voice" exist:
-	   * An earlier version with eight 2KiB speech roms, spr016-??? thru spr016-??? on a small daughterboard
-	   <note to self: fill in numbers later>
-	   * A later version with one 16KiB speech rom, spr128-003, mounted directly on the mainboard
-	   The rom contents of these two versions are EXACTLY the same.
-	   Both versions have an sp0256b-019 speech chip, which has 2KiB of its own internal speech data
-	   Thanks to kevtris for this info. - LN
-	*/
+       * An earlier version with eight 2KiB speech roms, spr016-??? thru spr016-??? on a small daughterboard
+       <note to self: fill in numbers later>
+       * A later version with one 16KiB speech rom, spr128-003, mounted directly on the mainboard
+       The rom contents of these two versions are EXACTLY the same.
+       Both versions have an sp0256b-019 speech chip, which has 2KiB of its own internal speech data
+       Thanks to kevtris for this info. - LN
+    */
 	/* External 16KiB speech ROM (spr128-003) from "The Voice" */
 	ROM_LOAD( "spr128-003.bin",   0x4000, 0x4000, CRC(66041b03) SHA1(31acbaf1ae92b3efbb5093d63b0472170699da85) )
 	/* Additional External 16KiB ROM (spr128-004) from S.I.D. the Spellbinder */

@@ -1,10 +1,10 @@
 /************************************************************************
-	crct6845
+    crct6845
 
-	MESS Driver By:
+    MESS Driver By:
 
- 	Gordon Jefferyes
- 	mess_bbc@gjeffery.dircon.co.uk
+    Gordon Jefferyes
+    mess_bbc@gjeffery.dircon.co.uk
 
  ************************************************************************/
 
@@ -47,22 +47,22 @@ when using mode 3,6 and 7 in which it is set to 2
 /* *** Part not implemented ***
 R8 interlace settings
 Interlace mode (bits 0,1)
-Bit 1	Bit 0	Description
-0		0		Normal (non-interlaced) sync mode
-1		0		Normal (non-interlaced) sync mode
-0		1		Interlace sync mode
-1		1		Interlace sync and video
+Bit 1   Bit 0   Description
+0       0       Normal (non-interlaced) sync mode
+1       0       Normal (non-interlaced) sync mode
+0       1       Interlace sync mode
+1       1       Interlace sync and video
 */
 #define R8_interlace_display_enabled crtc.registers[8]
 /* scan lines per character -1 */
 #define R9_scan_lines_per_character crtc.registers[9]
 /* *** Part not implemented yet ***
 R10 The cursor start register
-Bit 6 	Bit 5
-0		0		Solid cursor
-0		1		No cursor (This no cursor setting is working)
-1		0		slow flashing cursor
-1		1		fast flashing cursor
+Bit 6   Bit 5
+0       0       Solid cursor
+0       1       No cursor (This no cursor setting is working)
+1       0       slow flashing cursor
+1       1       fast flashing cursor
 */
 #define R10_cursor_start crtc.registers[10]
 /* cursor end row */
@@ -135,8 +135,8 @@ typedef struct m6845_state
 	int Display_Disable_Delay;
 
 	int	Vertical_Adjust_Done;
-//	int cycles_to_vsync_start;
-//	int cycles_to_vsync_end;
+//  int cycles_to_vsync_start;
+//  int cycles_to_vsync_end;
 } m6845_state;
 
 
@@ -461,14 +461,14 @@ void m6845_clock(running_machine *machine)
 			crtc.Memory_Address=(crtc.Memory_Address_of_this_Character_Row=crtc.Memory_Address_of_next_Character_Row);
 
 			/* Character row clock pulse (R9 CO out) */
-/*			crtc.Character_Row_Counter=(crtc.Character_Row_Counter+1)%128;*/
+/*          crtc.Character_Row_Counter=(crtc.Character_Row_Counter+1)%128;*/
 			crtc.Character_Row_Counter=(crtc.Character_Row_Counter+1)&0x07f;
 			if (crtc.Character_Row_Counter_Reset)
 			{
 				crtc.Character_Row_Counter_Reset=False;
 
 				/* if vertical adjust is set, the first time it will do the vertical, adjust, the
-				next time, it will not do it and complete the frame */
+                next time, it will not do it and complete the frame */
 
 				/* vertical adjust set? */
 				if (R5_vertical_total_adjust!=0)
@@ -535,10 +535,10 @@ void m6845_clock(running_machine *machine)
 				/* not active, clear counter and restart frame */
 				crtc.Vertical_Total_Adjust_Active = False;
 				crtc.Vertical_Total_Adjust_Counter = 0;
-	//			/* cause a scan-line counter reset, and a character row counter reset.
-	//			i.e. restart frame */
-	//			crtc.Scan_Line_Counter_Reset = TRUE;
-	//			crtc.Character_Row_Counter_Reset = TRUE;
+	//          /* cause a scan-line counter reset, and a character row counter reset.
+	//          i.e. restart frame */
+	//          crtc.Scan_Line_Counter_Reset = TRUE;
+	//          crtc.Character_Row_Counter_Reset = TRUE;
 
 				// KT this caused problems when R7 == 0 and R5 was set!
 				m6845_restart_frame();
@@ -823,7 +823,7 @@ static void m6845_set_new_vsync_set_time(int cycles)
 	int crtc_cycles_to_vsync_start;
 
 	/* get cycles to vsync start, or if vsync cannot be reached
-	cycles will be -1 */
+    cycles will be -1 */
 	crtc_cycles_to_vsync_start = cycles;
 
 	m6845_remove_vsync_set_timer();
@@ -884,7 +884,7 @@ static TIMER_CALLBACK( m6845_vsync_set_timer_callback )
 
 	/* if we got to here the vsync has just been set, and has just started */
 	/* the next timer will be in vsync length cycles unless it is reprogrammed as the VSYNC
-	is active, in this case, the new vsync end will be re-calculated */
+    is active, in this case, the new vsync end will be re-calculated */
 
 	/* setup time for vsync clear timer */
     m6845_set_new_vsync_clear_time(m6845_vsync_length_in_cycles());
@@ -897,7 +897,7 @@ static void m6845_recalc_cycles_to_vsync_end(void)
 	int cycles_to_vsync_end = m6845_cycles_to_vsync_end();
 
 	/* if we're in vsync, the end is important, otherwise we are waiting for the next vsync
-	to start. The start is not affected by the length of the vsync */
+    to start. The start is not affected by the length of the vsync */
 	if (crtc.VSYNC)
 	{
 		m6845_set_new_vsync_clear_time(cycles_to_vsync_end);
@@ -909,7 +909,7 @@ static void m6845_recalc_cycles_to_vsync_start(void)
 	int cycles_to_vsync_start = m6845_cycles_to_vsync();
 
 	/* if we're not in vsync, the end is important, otherwise we are waiting for the end
-	of the vsync */
+    of the vsync */
 	if (!crtc.VSYNC)
 	{
 		m6845_set_new_vsync_set_time(cycles_to_vsync_start);

@@ -711,7 +711,7 @@ ROM_START( megaduck )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 ROM_END
 
-/*    YEAR  NAME      PARENT   COMPAT   MACHINE   INPUT    INIT  CONFIG		COMPANY     FULLNAME */
+/*    YEAR  NAME      PARENT   COMPAT   MACHINE   INPUT    INIT  CONFIG     COMPANY     FULLNAME */
 CONS( 1990, gameboy,  0,       0,		gameboy,  gameboy, 0,    0,			"Nintendo", "Game Boy", 0)
 CONS( 1994, supergb,  gameboy, 0,		supergb,  gameboy, 0,    0,			"Nintendo", "Super Game Boy", 0)
 CONS( 1996, gbpocket, gameboy, 0,		gbpocket, gameboy, 0,    0,			"Nintendo", "Game Boy Pocket", 0)

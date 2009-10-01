@@ -11,8 +11,8 @@
   Sean Young
 
   NEWS:
-	- Modified memory map, now it has only 1k of RAM mapped on 8k Slot
-	- Modified I/O map, now it is handled as on a real ColecoVision:
+    - Modified memory map, now it has only 1k of RAM mapped on 8k Slot
+    - Modified I/O map, now it is handled as on a real ColecoVision:
         The I/O map is broken into 4 write and 4 read ports:
             80-9F (W) = Set both controllers to keypad mode
             80-9F (R) = Not Connected
@@ -26,39 +26,39 @@
             E0-FF (W) = Sound Chip (SN76489A)
             E0-FF (R) = Read Controller data, A1=0 -> read controller 1, A1=1 -> read controller 2
 
-	- Modified paddle handler, now it is handled as on a real ColecoVision
-	- Added support for a Driving Controller (Expansion Module #2), enabled via category
-	- Added support for a Roller Controller (Trackball), enabled via category
-	- Added support for two Super Action Controller, enabled via category
+    - Modified paddle handler, now it is handled as on a real ColecoVision
+    - Added support for a Driving Controller (Expansion Module #2), enabled via category
+    - Added support for a Roller Controller (Trackball), enabled via category
+    - Added support for two Super Action Controller, enabled via category
 
     EXTRA CONTROLLERS INFO:
 
-	-Driving Controller (Expansion Module #2). It consist of a steering wheel and a gas pedal. Only one
-	can be used on a real ColecoVision. The gas pedal is not analog, internally it is just a switch.
-	On a real ColecoVision, when the Driving Controller is enabled, the controller 1 do not work because
-	have been replaced by the Driving Controller, and controller 2 have to be used to start game, gear
-	shift, etc.
-	Driving Controller is just a spinner on controller 1 socket similar to the one on Roller Controller
-	and Super Action Controllers so you can use Roller Controller or Super Action Controllers to play
-	games requiring Driving Controller.
+    -Driving Controller (Expansion Module #2). It consist of a steering wheel and a gas pedal. Only one
+    can be used on a real ColecoVision. The gas pedal is not analog, internally it is just a switch.
+    On a real ColecoVision, when the Driving Controller is enabled, the controller 1 do not work because
+    have been replaced by the Driving Controller, and controller 2 have to be used to start game, gear
+    shift, etc.
+    Driving Controller is just a spinner on controller 1 socket similar to the one on Roller Controller
+    and Super Action Controllers so you can use Roller Controller or Super Action Controllers to play
+    games requiring Driving Controller.
 
-	-Roller Controller. Basically a trackball with four buttons (the two fire buttons from player 1 and
-	the two fire buttons from player 2). Only one Roller Controller can be used on a real ColecoVision.
-	Roller Controller is connected to both controller sockets and both controllers are conected to the Roller
-	Controller, it uses the spinner pins of both sockets to generate the X and Y signals (X from controller 1
-	and the Y from controller 2)
+    -Roller Controller. Basically a trackball with four buttons (the two fire buttons from player 1 and
+    the two fire buttons from player 2). Only one Roller Controller can be used on a real ColecoVision.
+    Roller Controller is connected to both controller sockets and both controllers are conected to the Roller
+    Controller, it uses the spinner pins of both sockets to generate the X and Y signals (X from controller 1
+    and the Y from controller 2)
 
-	-Super Action Controllers. It is a hand controller with a keypad, four buttons (the two from
-	the player pad and two more), and a spinner. This was made primarily for two player sport games, but
-	will work for every other ColecoVision game.
+    -Super Action Controllers. It is a hand controller with a keypad, four buttons (the two from
+    the player pad and two more), and a spinner. This was made primarily for two player sport games, but
+    will work for every other ColecoVision game.
 
 *******************************************************************************************************/
 
 /*
 
-	TODO:
+    TODO:
 
-	- Dina SG-1000 mode
+    - Dina SG-1000 mode
 
 */
 
@@ -93,8 +93,8 @@ static READ8_HANDLER( paddle_1_r )
 				ipt1 = input_port_read(space->machine, "SAC_KPD1");
 
 			/* Numeric pad buttons are not independent on a real ColecoVision, if you push more
-			than one, a real ColecoVision think that it is a third button, so we are going to emulate
-			the right behaviour */
+            than one, a real ColecoVision think that it is a third button, so we are going to emulate
+            the right behaviour */
 			/* Super Action Controller additional buttons are read in the same way */
 			if ((ctrl_sel & 0x07) != 0x03) /* If Driving Controller enabled -> no keypad 1*/
 			{
@@ -159,8 +159,8 @@ static READ8_HANDLER( paddle_2_r )
 				ipt2 = input_port_read(space->machine, "SAC_KPD2");
 
 			/* Numeric pad buttons are not independent on a real ColecoVision, if you push more
-			than one, a real ColecoVision think that it is a third button, so we are going to emulate
-			the right behaviour */
+            than one, a real ColecoVision think that it is a third button, so we are going to emulate
+            the right behaviour */
 			/* Super Action Controller additional buttons are read in the same way */
 			if (!(ipt2 & 0x0001)) data &= 0x0a; /* 0 */
 			if (!(ipt2 & 0x0002)) data &= 0x0d; /* 1 */
@@ -190,7 +190,7 @@ static READ8_HANDLER( paddle_2_r )
 				data = input_port_read(space->machine, "SAC_JOY2") & 0xcf;
 
 			/* If Roller Controller or P2 Super Action Controller enabled */
-			if ((ctrl_sel & 0x80) || ((ctrl_sel & 0x70) == 0x20)) 
+			if ((ctrl_sel & 0x80) || ((ctrl_sel & 0x70) == 0x20))
 			{
 				if (joy_status[1] == 0) data |= 0x30;
 				else if (joy_status[1] == 1) data |= 0x20;
@@ -369,8 +369,8 @@ static INPUT_PORTS_START( driving )
 	PORT_START("DRIV")	// Driving Controller
 	PORT_BIT( 0x0f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_CODE_DEC(KEYCODE_L) PORT_CODE_INC(KEYCODE_J) PORT_RESET PORT_CATEGORY(5)
 
-//	PORT_START("IN8")	// 
-//	PORT_BIT( 0x0f, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_CODE_DEC(KEYCODE_I) PORT_CODE_INC(KEYCODE_K) PORT_PLAYER(2) PORT_CATEGORY(5)
+//  PORT_START("IN8")   //
+//  PORT_BIT( 0x0f, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_CODE_DEC(KEYCODE_I) PORT_CODE_INC(KEYCODE_K) PORT_PLAYER(2) PORT_CATEGORY(5)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( roller )
@@ -467,7 +467,7 @@ static INTERRUPT_GEN( coleco_interrupt )
 static void coleco_vdp_interrupt(running_machine *machine, int state)
 {
     // only if it goes up
-	if (state && !last_state) 
+	if (state && !last_state)
 		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 
 	last_state = state;
@@ -476,13 +476,13 @@ static void coleco_vdp_interrupt(running_machine *machine, int state)
 static TIMER_CALLBACK( paddle_callback )
 {
 	UINT8 analog1 = 0x00;
-	UINT8 analog2 = 0x00; 
+	UINT8 analog2 = 0x00;
 	UINT8 ctrl_sel = input_port_read_safe(machine, "CTRLSEL", 0);
 
 	/* which controller shall we read? */
 	if ((ctrl_sel & 0x07) == 0x03)	// Driving controller
 		analog1 = input_port_read_safe(machine, "DRIV", 0);
-	
+
 	else
 	{
 		if ((ctrl_sel & 0x07) == 0x02)	// Super Action Controller P1
@@ -491,10 +491,10 @@ static TIMER_CALLBACK( paddle_callback )
 		if ((ctrl_sel & 0x70) == 0x20)	// Super Action Controller P2
 			analog2 = input_port_read_safe(machine, "SAC_SLIDE2", 0);
 
-		/* In principle, even if not supported by any game, I guess we could have two Super 
-		Action Controllers plugged into the Roller controller ports. Since I found no info 
-		about the behavior of sliders in such a configuration, we overwrite SAC sliders with
-		the Roller trackball inputs and actually use the latter ones, when both are selected. */
+		/* In principle, even if not supported by any game, I guess we could have two Super
+        Action Controllers plugged into the Roller controller ports. Since I found no info
+        about the behavior of sliders in such a configuration, we overwrite SAC sliders with
+        the Roller trackball inputs and actually use the latter ones, when both are selected. */
 		if (ctrl_sel & 0x80)				// Roller controller
 		{
 			analog1 = input_port_read_safe(machine, "ROLLER_X", 0);
@@ -545,15 +545,15 @@ static MACHINE_RESET( coleco )
 
 //static int coleco_cart_verify(const UINT8 *cartdata, size_t size)
 //{
-//	int retval = IMAGE_VERIFY_FAIL;
+//  int retval = IMAGE_VERIFY_FAIL;
 //
-//	/* Verify the file is in Colecovision format */
-//	if ((cartdata[0] == 0xAA) && (cartdata[1] == 0x55)) /* Production Cartridge */
-//		retval = IMAGE_VERIFY_PASS;
-//	if ((cartdata[0] == 0x55) && (cartdata[1] == 0xAA)) /* "Test" Cartridge. Some games use this method to skip ColecoVision title screen and delay */
-//		retval = IMAGE_VERIFY_PASS;
+//  /* Verify the file is in Colecovision format */
+//  if ((cartdata[0] == 0xAA) && (cartdata[1] == 0x55)) /* Production Cartridge */
+//      retval = IMAGE_VERIFY_PASS;
+//  if ((cartdata[0] == 0x55) && (cartdata[1] == 0xAA)) /* "Test" Cartridge. Some games use this method to skip ColecoVision title screen and delay */
+//      retval = IMAGE_VERIFY_PASS;
 //
-//	return retval;
+//  return retval;
 //}
 
 static DEVICE_IMAGE_LOAD( czz50_cart )
@@ -665,7 +665,7 @@ ROM_END
 
 /* System Drivers */
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT    CONFIG  COMPANY				FULLNAME							FLAGS
+//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT    CONFIG  COMPANY             FULLNAME                            FLAGS
 CONS( 1982, coleco,   0,		0,		coleco,   coleco,   0,		0,	"Coleco",			"ColecoVision",						0 )
 CONS( 1982, colecoa,  coleco,	0,		coleco,   coleco,   0,		0,	"Coleco",			"ColecoVision (Thick Characters)",	0 )
 CONS( 1983, colecob,  coleco,	0,		coleco,   coleco,   0,		0,	"Spectravideo",		"SVI-603 Coleco Game Adapter",		0 )

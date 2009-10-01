@@ -13,29 +13,29 @@ static int ROMSelection;
 static const device_config* beta;
 
 static DIRECT_UPDATE_HANDLER( atm_direct )
-{	
+{
 	UINT16 pc = cpu_get_reg(cputag_get_cpu(space->machine, "maincpu"), REG_GENPCBASE);
-	
-	if (beta->started && betadisk_is_active(beta)) 
+
+	if (beta->started && betadisk_is_active(beta))
 	{
-		if (pc >= 0x4000) 
+		if (pc >= 0x4000)
 		{
 			ROMSelection = ((spectrum_128_port_7ffd_data>>4) & 0x01) ? 1 : 0;
 			betadisk_disable(beta);
 			memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
 			memory_set_bankptr(space->machine, 1, memory_region(space->machine, "maincpu") + 0x010000 + (ROMSelection<<14));
-		} 	
+		}
 	} else if (((pc & 0xff00) == 0x3d00) && (ROMSelection==1))
 	{
 		ROMSelection = 3;
-		if (beta->started) 
+		if (beta->started)
 			betadisk_enable(beta);
-		
-	} 
-	if((address>=0x0000) && (address<=0x3fff)) 
-	{	
+
+	}
+	if((address>=0x0000) && (address<=0x3fff))
+	{
 		memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
-		if (ROMSelection == 3) {			
+		if (ROMSelection == 3) {
 			direct->raw = direct->decrypted =  memory_region(space->machine, "maincpu") + 0x018000 ;
 		} else {
 			direct->raw = direct->decrypted =  memory_region(space->machine, "maincpu") + 0x010000 + (ROMSelection<<14);
@@ -47,16 +47,16 @@ static DIRECT_UPDATE_HANDLER( atm_direct )
 }
 
 static void atm_update_memory(running_machine *machine)
-{	
+{
 	spectrum_screen_location = mess_ram + ((spectrum_128_port_7ffd_data & 8) ? (7<<14) : (5<<14));
 
 	memory_set_bankptr(machine, 4, mess_ram + ((spectrum_128_port_7ffd_data & 0x07) * 0x4000));
 
-	if (beta->started && betadisk_is_active(beta) && !( spectrum_128_port_7ffd_data & 0x10 ) ) 
-	{    
+	if (beta->started && betadisk_is_active(beta) && !( spectrum_128_port_7ffd_data & 0x10 ) )
+	{
 		ROMSelection = 3;
 	}
-	else {	
+	else {
 		/* ROM switching */
 		ROMSelection = ((spectrum_128_port_7ffd_data>>4) & 0x01) ;
 	}
@@ -77,13 +77,13 @@ static WRITE8_HANDLER(atm_port_7ffd_w)
 	atm_update_memory(space->machine);
 }
 
-static ADDRESS_MAP_START (atm_io, ADDRESS_SPACE_IO, 8)	
+static ADDRESS_MAP_START (atm_io, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x001f, 0x001f) AM_DEVREADWRITE(BETA_DISK_TAG, betadisk_status_r,betadisk_command_w) AM_MIRROR(0xff00)
 	AM_RANGE(0x003f, 0x003f) AM_DEVREADWRITE(BETA_DISK_TAG, betadisk_track_r,betadisk_track_w) AM_MIRROR(0xff00)
 	AM_RANGE(0x005f, 0x005f) AM_DEVREADWRITE(BETA_DISK_TAG, betadisk_sector_r,betadisk_sector_w) AM_MIRROR(0xff00)
 	AM_RANGE(0x007f, 0x007f) AM_DEVREADWRITE(BETA_DISK_TAG, betadisk_data_r,betadisk_data_w) AM_MIRROR(0xff00)
-	AM_RANGE(0x00fe, 0x00fe) AM_READWRITE(spectrum_port_fe_r,spectrum_port_fe_w) AM_MIRROR(0xff00) AM_MASK(0xffff) 
+	AM_RANGE(0x00fe, 0x00fe) AM_READWRITE(spectrum_port_fe_r,spectrum_port_fe_w) AM_MIRROR(0xff00) AM_MASK(0xffff)
 	AM_RANGE(0x00ff, 0x00ff) AM_DEVREADWRITE(BETA_DISK_TAG, betadisk_state_r, betadisk_param_w) AM_MIRROR(0xff00)
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(atm_port_7ffd_w)  AM_MIRROR(0x3ffd)
 	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("ay8912", ay8910_data_w) AM_MIRROR(0x3ffd)
@@ -94,7 +94,7 @@ static MACHINE_RESET( atm )
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	beta = devtag_get_device(machine, BETA_DISK_TAG);
-	
+
 	memory_install_read8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_BANK(1));
 	memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
 
@@ -103,10 +103,10 @@ static MACHINE_RESET( atm )
 		betadisk_clear_status(beta);
 	}
 
-	memory_set_direct_update_handler( space, atm_direct ); 
-	
+	memory_set_direct_update_handler( space, atm_direct );
+
 	memset(mess_ram,0,128*1024);
-	
+
 	/* Bank 5 is always in 0x4000 - 0x7fff */
 	memory_set_bankptr(machine, 2, mess_ram + (5<<14));
 
@@ -115,7 +115,7 @@ static MACHINE_RESET( atm )
 
 	spectrum_128_port_7ffd_data = 0;
 
-	atm_update_memory(machine);	
+	atm_update_memory(machine);
 }
 
 static MACHINE_DRIVER_START( atm )
@@ -123,7 +123,7 @@ static MACHINE_DRIVER_START( atm )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(atm_io)
 	MDRV_MACHINE_RESET( atm )
-	
+
 	MDRV_BETA_DISK_ADD(BETA_DISK_TAG)
 MACHINE_DRIVER_END
 
@@ -151,7 +151,7 @@ ROM_START(atm)
 
   	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
-	
+
 ROM_START(atm2)
 	ROM_REGION(0x020000, "maincpu", ROMREGION_ERASEFF)
 	ROM_SYSTEM_BIOS(0, "v1", "v.1.07.12 joined")
@@ -163,16 +163,16 @@ ROM_START(atm2)
 	ROMX_LOAD( "atmtb2-4.rom", 0x01c000, 0x4000, CRC(5869d8c4) SHA1(c3e198138f528ac4a8dff3c76cd289fd4713abff), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(2, "v3", "v.1.07.13")
 	ROMX_LOAD( "atmtb213.rom", 0x010000, 0x10000, CRC(34a91d53) SHA1(8f0af0f3c0ff1644535f20545c73d01576d6e52f), ROM_BIOS(3))
-		
+
 	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
-	ROM_REGION(0x01000, "keyboard", ROMREGION_ERASEFF)	
+	ROM_REGION(0x01000, "keyboard", ROMREGION_ERASEFF)
 	// XT Keyboard
 	ROM_LOAD( "rf2ve3.rom",  0x0000, 0x0580, CRC(35e0f9ec) SHA1(adcf14758fab8472cfa0167af7e8326c66416416))
 	// AT Keyboard
 	ROM_LOAD( "rfat710.rom", 0x0600, 0x0680, CRC(03734365) SHA1(6cb6311727fad9bc4ccb18919c3c39b37529b8e6))
 	ROM_REGION(0x08000, "charrom", ROMREGION_ERASEFF)
 	// Char gen rom
-	ROM_LOAD( "sgen.rom", 0x0000, 0x0800, CRC(1f4387d6) SHA1(93b3774dc8a486643a1bdd48c606b0c84fa0e22b))	
+	ROM_LOAD( "sgen.rom", 0x0000, 0x0800, CRC(1f4387d6) SHA1(93b3774dc8a486643a1bdd48c606b0c84fa0e22b))
 ROM_END
 
 static SYSTEM_CONFIG_START(atm)

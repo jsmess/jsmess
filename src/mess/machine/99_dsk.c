@@ -1,26 +1,26 @@
 /*
-	TI-99/4 and /4a disk controller emulation.
+    TI-99/4 and /4a disk controller emulation.
 
-	Known disk controllers:
-	* TI original SD disk controller.  First sold as a side port module
-	  (PHP1800), later as a card to be inserted in the PE-box (PHP1240).
-	  Uses a WD1771 FDC, and supports a format of 40 tracks of 9 sectors.
-	* TI DD disk controller prototype.  Uses some NEC FDC and supports 16
-	  sectors per track.  (Not emulated)
-	* CorComp FDC.  Specs unknown, but it supports DD.  (Not emulated)
-	* SNUG BwG.  A nice DD disk controller.  Supports 18 sectors per track.
-	* Myarc HFDC.  Extremely elaborate, supports DD (and even HD, provided that
-	  a) the data separator is a 9216B and not a 9216, and b) that the OS
-	  overrides the hfdc DSR, whose HD support is buggy) and MFM harddisks.
+    Known disk controllers:
+    * TI original SD disk controller.  First sold as a side port module
+      (PHP1800), later as a card to be inserted in the PE-box (PHP1240).
+      Uses a WD1771 FDC, and supports a format of 40 tracks of 9 sectors.
+    * TI DD disk controller prototype.  Uses some NEC FDC and supports 16
+      sectors per track.  (Not emulated)
+    * CorComp FDC.  Specs unknown, but it supports DD.  (Not emulated)
+    * SNUG BwG.  A nice DD disk controller.  Supports 18 sectors per track.
+    * Myarc HFDC.  Extremely elaborate, supports DD (and even HD, provided that
+      a) the data separator is a 9216B and not a 9216, and b) that the OS
+      overrides the hfdc DSR, whose HD support is buggy) and MFM harddisks.
 
-	An alternative was installing the hexbus controller (which was just a
-	prototype, and is not emulated) and connecting a hexbus floppy disk
-	controller.  The integrated hexbus port was the only supported way to
-	attach a floppy drive to a TI-99/2 or a TI-99/5.  The integrated hexbus
-	port was the recommended way to attach a floppy drive to the TI-99/8,
-	but I think this computer supported the TI-99/4(a) disk controllers, too.
+    An alternative was installing the hexbus controller (which was just a
+    prototype, and is not emulated) and connecting a hexbus floppy disk
+    controller.  The integrated hexbus port was the only supported way to
+    attach a floppy drive to a TI-99/2 or a TI-99/5.  The integrated hexbus
+    port was the recommended way to attach a floppy drive to the TI-99/8,
+    but I think this computer supported the TI-99/4(a) disk controllers, too.
 
-	Raphael Nabet, 1999-2004.
+    Raphael Nabet, 1999-2004.
 */
 
 #include "driver.h"
@@ -66,10 +66,10 @@ static int motor_on;
 static void *motor_on_timer;
 
 /*
-	call this when the state of DSKhold or DRQ/IRQ or DVENA change
+    call this when the state of DSKhold or DRQ/IRQ or DVENA change
 
-	Emulation is faulty because the CPU is actually stopped in the midst of 
-	instruction, at the end of the memory access
+    Emulation is faulty because the CPU is actually stopped in the midst of
+    instruction, at the end of the memory access
 */
 static void fdc_handle_hold(running_machine *machine)
 {
@@ -80,7 +80,7 @@ static void fdc_handle_hold(running_machine *machine)
 }
 
 /*
-	callback called at the end of DVENA pulse
+    callback called at the end of DVENA pulse
 */
 static TIMER_CALLBACK(motor_on_timer_callback)
 {
@@ -110,7 +110,7 @@ static const smc92x4_intf hfdc_intf =
 };
 
 /*
-	Convert physical sector address to sector offset in disk image
+    Convert physical sector address to sector offset in disk image
 */
 static UINT64 ti99_translate_offset(floppy_image *floppy, const struct basicdsk_geometry *geom, int track, int head, int sector)
 {
@@ -132,7 +132,7 @@ static UINT64 ti99_translate_offset(floppy_image *floppy, const struct basicdsk_
 }
 
 /*
-	support for 48TPI disks in 96TPI drives
+    support for 48TPI disks in 96TPI drives
 */
 static int ti99_tracktranslate(const device_config *image, floppy_image *floppy, int physical_track)
 {
@@ -146,7 +146,7 @@ static int ti99_tracktranslate(const device_config *image, floppy_image *floppy,
 }
 
 /*
-	Sniff the geometry of a v9t9 format disk image
+    Sniff the geometry of a v9t9 format disk image
 */
 static void ti99_guess_geometry(floppy_image *floppy, ti99_geometry *geometry, int *vote, int *success)
 {
@@ -178,17 +178,17 @@ static void ti99_guess_geometry(floppy_image *floppy, ti99_geometry *geometry, i
 		geometry->secspertrack = vib.secspertrack;
 		if (geometry->secspertrack == 0)
 			/* Some images might be like this, because the original SSSD TI
-			controller always assumes 9. */
+            controller always assumes 9. */
 			geometry->secspertrack = 9;
 		geometry->tracksperside = vib.tracksperside;
 		if (geometry->tracksperside == 0)
 			/* Some images are like this, because the original SSSD TI
-			controller always assumes 40. */
+            controller always assumes 40. */
 			geometry->tracksperside = 40;
 		geometry->sides = vib.sides;
 		if (geometry->sides == 0)
 			/* Some images are like this, because the original SSSD TI
-			controller always assumes that tracks beyond 40 are on side 2. */
+            controller always assumes that tracks beyond 40 are on side 2. */
 			geometry->sides = totsecs / (geometry->secspertrack * geometry->tracksperside);
 		geometry->density = vib.density;
 		if (geometry->density == 0)
@@ -208,7 +208,7 @@ static void ti99_guess_geometry(floppy_image *floppy, ti99_geometry *geometry, i
 	}
 
 	/* If we have been unable to parse the format, let us guess according to
-	file lenght */
+    file lenght */
 	switch (floppy_image_size(floppy))
 	{
 	case 1*40*9*256:	/* 90kbytes: SSSD */
@@ -225,9 +225,9 @@ static void ti99_guess_geometry(floppy_image *floppy, ti99_geometry *geometry, i
 		return;
 
 	case 2*40*9*256:	/* 180kbytes: either DSSD or 18-sector-per-track
-						SSDD.  We assume DSSD since DSSD is more common
-						and is supported by the original TI SD disk
-						controller. */
+                        SSDD.  We assume DSSD since DSSD is more common
+                        and is supported by the original TI SD disk
+                        controller. */
 		geometry->sides = 2;
 		geometry->tracksperside = 40;
 		geometry->secspertrack = 9;
@@ -239,8 +239,8 @@ static void ti99_guess_geometry(floppy_image *floppy, ti99_geometry *geometry, i
 		return;
 
 	case 1*40*16*256:	/* 160kbytes: 16-sector-per-track SSDD (standard
-						format for TI DD disk controller prototype, and
-						the TI hexbus disk controller???) */
+                        format for TI DD disk controller prototype, and
+                        the TI hexbus disk controller???) */
 		geometry->sides = 1;
 		geometry->tracksperside = 40;
 		geometry->secspertrack = 16;
@@ -252,8 +252,8 @@ static void ti99_guess_geometry(floppy_image *floppy, ti99_geometry *geometry, i
 		return;
 
 	case 2*40*16*256:	/* 320kbytes: 16-sector-per-track DSDD (standard
-						format for TI DD disk controller prototype, and
-						TI hexbus disk controller???) */
+                        format for TI DD disk controller prototype, and
+                        TI hexbus disk controller???) */
 		geometry->sides = 2;
 		geometry->tracksperside = 40;
 		geometry->secspertrack = 16;
@@ -265,9 +265,9 @@ static void ti99_guess_geometry(floppy_image *floppy, ti99_geometry *geometry, i
 		return;
 
 	case 2*40*18*256:	/* 360kbytes: 18-sector-per-track DSDD (standard
-						format for most third-party DD disk controllers,
-						but reportedly not supported by the original TI
-						DD disk controller) */
+                        format for most third-party DD disk controllers,
+                        but reportedly not supported by the original TI
+                        DD disk controller) */
 		geometry->sides = 2;
 		geometry->tracksperside = 40;
 		geometry->secspertrack = 18;
@@ -279,7 +279,7 @@ static void ti99_guess_geometry(floppy_image *floppy, ti99_geometry *geometry, i
 		return;
 
 	case 2*80*18*256:	/* 720kbytes: 18-sector-per-track 80-track DSDD
-						(Myarc only) */
+                        (Myarc only) */
 		geometry->sides = 2;
 		geometry->tracksperside = 80;
 		geometry->secspertrack = 18;
@@ -365,7 +365,7 @@ static void ti99_install_tracktranslate_procs(running_machine *machine)
 }
 
 /*
-	callback called whenever DRQ/IRQ state change
+    callback called whenever DRQ/IRQ state change
 */
 static WD17XX_CALLBACK( fdc_callback )
 {
@@ -394,9 +394,9 @@ const wd17xx_interface ti99_wd17xx_interface = { fdc_callback, NULL, {FLOPPY_0,F
 
 
 /*
-	Initializes all available controllers. This routine is only used in the 
-	init state of the emulator. During the normal operation, only the
-	reset routines are used.
+    Initializes all available controllers. This routine is only used in the
+    init state of the emulator. During the normal operation, only the
+    reset routines are used.
 */
 void ti99_floppy_controllers_init_all(running_machine *machine)
 {
@@ -410,7 +410,7 @@ void ti99_floppy_controllers_init_all(running_machine *machine)
 
 /*===========================================================================*/
 /*
-	TI99/4(a) Floppy disk controller card emulation
+    TI99/4(a) Floppy disk controller card emulation
 */
 
 /* prototypes */
@@ -432,7 +432,7 @@ static const ti99_peb_card_handlers_t fdc_handlers =
 };
 
 /*
-	Reset fdc card, set up handlers
+    Reset fdc card, set up handlers
 */
 void ti99_fdc_reset(running_machine *machine)
 {
@@ -453,14 +453,14 @@ void ti99_fdc_reset(running_machine *machine)
 }
 
 /*
-	Read disk CRU interface
+    Read disk CRU interface
 
-	bit 0: HLD pin
-	bit 1-3: drive n active
-	bit 4: 0: motor strobe on
-	bit 5: always 0
-	bit 6: always 1
-	bit 7: selected side
+    bit 0: HLD pin
+    bit 1-3: drive n active
+    bit 4: 0: motor strobe on
+    bit 5: always 0
+    bit 6: always 1
+    bit 7: selected side
 */
 static int fdc_cru_r(running_machine *machine, int offset)
 {
@@ -487,12 +487,12 @@ static int fdc_cru_r(running_machine *machine, int offset)
 }
 
 /*
-	Write disk CRU interface
+    Write disk CRU interface
 */
 static void fdc_cru_w(running_machine *machine, int offset, int data)
 {
 	const device_config *fdc = devtag_get_device(machine, "wd179x");
-	
+
 	switch (offset)
 	{
 	case 0:
@@ -513,10 +513,10 @@ static void fdc_cru_w(running_machine *machine, int offset, int data)
 
 	case 2:
 		/* Set disk ready/hold (bit 2)
-			0: ignore IRQ and DRQ
-			1: TMS9900 is stopped until IRQ or DRQ are set (OR the motor stops rotating - rotates
-			  for 4.23s after write to revelant CRU bit, this is not emulated and could cause
-			  the TI99 to lock...) */
+            0: ignore IRQ and DRQ
+            1: TMS9900 is stopped until IRQ or DRQ are set (OR the motor stops rotating - rotates
+              for 4.23s after write to revelant CRU bit, this is not emulated and could cause
+              the TI99 to lock...) */
 		DSKhold = data;
 		fdc_handle_hold(machine);
 		break;
@@ -567,12 +567,12 @@ static void fdc_cru_w(running_machine *machine, int offset, int data)
 
 
 /*
-	read a byte in disk DSR space
+    read a byte in disk DSR space
 */
 static  READ8_HANDLER(fdc_mem_r)
 {
 	const device_config *fdc = devtag_get_device(space->machine, "wd179x");
-	
+
 	switch (offset)
 	{
 	case 0x1FF0:					/* Status register */
@@ -589,12 +589,12 @@ static  READ8_HANDLER(fdc_mem_r)
 }
 
 /*
-	write a byte in disk DSR space
+    write a byte in disk DSR space
 */
 static WRITE8_HANDLER(fdc_mem_w)
 {
 	const device_config *fdc = devtag_get_device(space->machine, "wd179x");
-	
+
 	data ^= 0xFF;	/* inverted data bus */
 
 	switch (offset)
@@ -618,14 +618,14 @@ static WRITE8_HANDLER(fdc_mem_w)
 #if HAS_99CCFDC
 /*===========================================================================*/
 /*
-	Alternate fdc: CorcComp FDC
+    Alternate fdc: CorcComp FDC
 
-	Advantages:
-	* this card supports Double Density.
-	* this card support an additional floppy drive, for a total of 4 floppies.
+    Advantages:
+    * this card supports Double Density.
+    * this card support an additional floppy drive, for a total of 4 floppies.
 
-	References:
-	* ???
+    References:
+    * ???
 */
 
 /* prototypes */
@@ -646,7 +646,7 @@ static const ti99_peb_card_handlers_t ccfdc_handlers =
 void ti99_ccfdc_reset(running_machine *machine)
 {
 	const device_config *fdc = devtag_get_device(machine, "wd179x");
-	
+
 	ti99_disk_DSR = memory_region(machine, region_dsr) + offset_ccfdc_dsr;
 	DSEL = 0;
 	DSKnum = -1;
@@ -666,11 +666,11 @@ void ti99_ccfdc_reset(running_machine *machine)
 
 
 /*
-	Read disk CRU interface
+    Read disk CRU interface
 
-	bit 0: drive 4 active (not emulated)
-	bit 1-3: drive n active
-	bit 4-7: dip switches 1-4
+    bit 0: drive 4 active (not emulated)
+    bit 1-3: drive n active
+    bit 4-7: dip switches 1-4
 */
 static int ccfdc_cru_r(int offset)
 {
@@ -695,12 +695,12 @@ static int ccfdc_cru_r(int offset)
 
 
 /*
-	Write disk CRU interface
+    Write disk CRU interface
 */
 static void ccfdc_cru_w(running_machine *machine, int offset, int data)
 {
 	const device_config *fdc = devtag_get_device(machine, "wd179x");
-	
+
 	switch (offset)
 	{
 	case 0:
@@ -721,10 +721,10 @@ static void ccfdc_cru_w(running_machine *machine, int offset, int data)
 
 	case 2:
 		/* Set disk ready/hold (bit 2)
-			0: ignore IRQ and DRQ
-			1: TMS9900 is stopped until IRQ or DRQ are set (OR the motor stops rotating - rotates
-			  for 4.23s after write to revelant CRU bit, this is not emulated and could cause
-			  the TI99 to lock...) */
+            0: ignore IRQ and DRQ
+            1: TMS9900 is stopped until IRQ or DRQ are set (OR the motor stops rotating - rotates
+              for 4.23s after write to revelant CRU bit, this is not emulated and could cause
+              the TI99 to lock...) */
 		DSKhold = data;
 		fdc_handle_hold(machine);
 		break;
@@ -799,7 +799,7 @@ static void ccfdc_cru_w(running_machine *machine, int offset, int data)
 
 
 /*
-	read a byte in disk DSR space
+    read a byte in disk DSR space
 */
 static READ8_HANDLER(ccfdc_mem_r)
 {
@@ -811,7 +811,7 @@ static READ8_HANDLER(ccfdc_mem_r)
 }
 
 /*
-	write a byte in disk DSR space
+    write a byte in disk DSR space
 */
 static WRITE8_HANDLER(ccfdc_mem_w)
 {
@@ -821,18 +821,18 @@ static WRITE8_HANDLER(ccfdc_mem_w)
 
 /*===========================================================================*/
 /*
-	Alternate fdc: BwG card from SNUG
+    Alternate fdc: BwG card from SNUG
 
-	Advantages:
-	* this card supports Double Density.
-	* as this card includes its own RAM, it does not need to allocate a portion
-	  of VDP RAM to store I/O buffers.
-	* this card includes a MM58274C RTC.
-	* this card support an additional floppy drive, for a total of 4 floppies.
+    Advantages:
+    * this card supports Double Density.
+    * as this card includes its own RAM, it does not need to allocate a portion
+      of VDP RAM to store I/O buffers.
+    * this card includes a MM58274C RTC.
+    * this card support an additional floppy drive, for a total of 4 floppies.
 
-	Reference:
-	* BwG Disketten-Controller: Beschreibung der DSR
-		<http://home.t-online.de/home/harald.glaab/snug/bwg.pdf>
+    Reference:
+    * BwG Disketten-Controller: Beschreibung der DSR
+        <http://home.t-online.de/home/harald.glaab/snug/bwg.pdf>
 */
 
 /* prototypes */
@@ -856,12 +856,12 @@ static UINT8 *bwg_ram;
 
 
 /*
-	Reset fdc card, set up handlers
+    Reset fdc card, set up handlers
 */
 void ti99_bwg_reset(running_machine *machine)
 {
 	const device_config *fdc = devtag_get_device(machine, "wd179x");
-	
+
 	ti99_disk_DSR = memory_region(machine, region_dsr) + offset_bwg_dsr;
         bwg_ram = memory_region(machine, region_dsr) + offset_bwg_ram;
 	bwg_ram_offset = 0;
@@ -874,9 +874,9 @@ void ti99_bwg_reset(running_machine *machine)
 
 	DVENA = 0;
 	motor_on = 0;
-        
+
      	use_80_track_drives = FALSE;
-        
+
 	ti99_peb_set_card_handlers(0x1100, & bwg_handlers);
 
 	wd17xx_reset(fdc);		/* initialize the floppy disk controller */
@@ -884,11 +884,11 @@ void ti99_bwg_reset(running_machine *machine)
 }
 
 /*
-	Read disk CRU interface
+    Read disk CRU interface
 
-	bit 0: drive 4 active (not emulated)
-	bit 1-3: drive n active
-	bit 4-7: dip switches 1-4
+    bit 0: drive 4 active (not emulated)
+    bit 1-3: drive n active
+    bit 4-7: dip switches 1-4
 */
 static int bwg_cru_r(running_machine *machine, int offset)
 {
@@ -913,12 +913,12 @@ static int bwg_cru_r(running_machine *machine, int offset)
 
 
 /*
-	Write disk CRU interface
+    Write disk CRU interface
 */
 static void bwg_cru_w(running_machine *machine, int offset, int data)
 {
 	const device_config *fdc = devtag_get_device(machine, "wd179x");
-	
+
 	switch (offset)
 	{
 	case 0:
@@ -939,10 +939,10 @@ static void bwg_cru_w(running_machine *machine, int offset, int data)
 
 	case 2:
 		/* Set disk ready/hold (bit 2)
-			0: ignore IRQ and DRQ
-			1: TMS9900 is stopped until IRQ or DRQ are set (OR the motor stops rotating - rotates
-			  for 4.23s after write to revelant CRU bit, this is not emulated and could cause
-			  the TI99 to lock...) */
+            0: ignore IRQ and DRQ
+            1: TMS9900 is stopped until IRQ or DRQ are set (OR the motor stops rotating - rotates
+              for 4.23s after write to revelant CRU bit, this is not emulated and could cause
+              the TI99 to lock...) */
 		DSKhold = data;
 		fdc_handle_hold(machine);
 		break;
@@ -1030,12 +1030,12 @@ static void bwg_cru_w(running_machine *machine, int offset, int data)
 
 
 /*
-	read a byte in disk DSR space
+    read a byte in disk DSR space
 */
 static  READ8_HANDLER(bwg_mem_r)
 {
 	const device_config *fdc = devtag_get_device(space->machine, "wd179x");
-	
+
 	int reply = 0;
 
 	if (offset < 0x1c00)
@@ -1075,12 +1075,12 @@ static  READ8_HANDLER(bwg_mem_r)
 }
 
 /*
-	write a byte in disk DSR space
+    write a byte in disk DSR space
 */
 static WRITE8_HANDLER(bwg_mem_w)
 {
 	const device_config *fdc = devtag_get_device(space->machine, "wd179x");
-	
+
 	if (offset < 0x1c00)
 		;
 	else if (offset < 0x1fe0)
@@ -1120,19 +1120,19 @@ static WRITE8_HANDLER(bwg_mem_w)
 
 /*===========================================================================*/
 /*
-	Alternate fdc: HFDC card built by Myarc
+    Alternate fdc: HFDC card built by Myarc
 
-	Advantages: same as BwG, plus:
-	* high density support (only on upgraded cards, I think)
-	* hard disk support (only prehistoric mfm hard disks are supported, though)
-	* DMA support (I think the DMA controller can only access the on-board RAM)
+    Advantages: same as BwG, plus:
+    * high density support (only on upgraded cards, I think)
+    * hard disk support (only prehistoric mfm hard disks are supported, though)
+    * DMA support (I think the DMA controller can only access the on-board RAM)
 
-	This card includes a MM58274C RTC and a 9234 HFDC with its various support
-	chips.
+    This card includes a MM58274C RTC and a 9234 HFDC with its various support
+    chips.
 
-	Reference:
-	* hfdc manual
-		<ftp://ftp.whtech.com//datasheets & manuals/Hardware manuals/hfdc manual.max>
+    Reference:
+    * hfdc manual
+        <ftp://ftp.whtech.com//datasheets & manuals/Hardware manuals/hfdc manual.max>
 */
 
 /* prototypes */
@@ -1157,8 +1157,8 @@ static UINT8 *hfdc_ram;
 static int hfdc_irq_state;
 
 /*
-	Select the correct HFDC disk units.
-	floppy disks are selected by the 4 gpos instead of the select lines.
+    Select the correct HFDC disk units.
+    floppy disks are selected by the 4 gpos instead of the select lines.
 */
 static int hfdc_select_callback(int which, select_mode_t select_mode, int select_line, int gpos)
 {
@@ -1178,7 +1178,7 @@ static int hfdc_select_callback(int which, select_mode_t select_mode, int select
 	case sm_floppy_fast:
 		/* floppy disk */
 		/* We use the 4 general purpose output as select lines in order to
-		support 4 drives. */
+        support 4 drives. */
 		switch (gpos & 0xf)
 		{
 		case 1:
@@ -1208,7 +1208,7 @@ static int hfdc_select_callback(int which, select_mode_t select_mode, int select
 }
 
 /*
-	Read a byte from buffer in DMA mode
+    Read a byte from buffer in DMA mode
 */
 static UINT8 hfdc_dma_read_callback(int which, offs_t offset)
 {
@@ -1217,7 +1217,7 @@ static UINT8 hfdc_dma_read_callback(int which, offs_t offset)
 }
 
 /*
-	Write a byte to buffer in DMA mode
+    Write a byte to buffer in DMA mode
 */
 static void hfdc_dma_write_callback(int which, offs_t offset, UINT8 data)
 {
@@ -1226,7 +1226,7 @@ static void hfdc_dma_write_callback(int which, offs_t offset, UINT8 data)
 }
 
 /*
-	Called whenever the state of the sms9234 interrupt pin changes.
+    Called whenever the state of the sms9234 interrupt pin changes.
 */
 static void hfdc_int_callback(int which, int state)
 {
@@ -1236,7 +1236,7 @@ static void hfdc_int_callback(int which, int state)
 }
 
 /*
-	Reset fdc card, set up handlers
+    Reset fdc card, set up handlers
 */
 void ti99_hfdc_reset(running_machine *machine)
 {
@@ -1262,7 +1262,7 @@ void ti99_hfdc_reset(running_machine *machine)
 
 
 /*
-	Read disk CRU interface
+    Read disk CRU interface
 */
 static int hfdc_cru_r(running_machine *machine, int offset)
 {
@@ -1273,12 +1273,12 @@ static int hfdc_cru_r(running_machine *machine, int offset)
 		/* CRU bits */
 		if (cru_sel)
 			/* DIP switches.  Logic levels are inverted (on->0, off->1).  CRU
-			bit order is the reverse of DIP-switch order, too (dip 1 -> bit 7,
-			dip 8 -> bit 0).  Return value examples:
-				ff -> 4 slow 40-track DD drives
-				55 -> 4 fast 40-track DD drives
-				aa -> 4 80-track DD drives
-				00 -> 4 80-track HD drives */
+            bit order is the reverse of DIP-switch order, too (dip 1 -> bit 7,
+            dip 8 -> bit 0).  Return value examples:
+                ff -> 4 slow 40-track DD drives
+                55 -> 4 fast 40-track DD drives
+                aa -> 4 80-track DD drives
+                00 -> 4 80-track HD drives */
 			reply = use_80_track_drives ? 0x00 : 0x55;
 		else
 		{
@@ -1288,7 +1288,7 @@ static int hfdc_cru_r(running_machine *machine, int offset)
 			if (motor_on)
 				reply |= 2;
 			/*if (hfdc_dma_in_progress)
-				reply |= 4;*/
+                reply |= 4;*/
 		}
 		break;
 
@@ -1302,7 +1302,7 @@ static int hfdc_cru_r(running_machine *machine, int offset)
 
 
 /*
-	Write disk CRU interface
+    Write disk CRU interface
 */
 static void hfdc_cru_w(running_machine *machine, int offset, int data)
 {
@@ -1377,7 +1377,7 @@ static void hfdc_cru_w(running_machine *machine, int offset, int data)
 
 
 /*
-	read a byte in disk DSR space
+    read a byte in disk DSR space
 */
 static  READ8_HANDLER(hfdc_mem_r)
 {
@@ -1430,7 +1430,7 @@ static  READ8_HANDLER(hfdc_mem_r)
 }
 
 /*
-	write a byte in disk DSR space
+    write a byte in disk DSR space
 */
 static WRITE8_HANDLER(hfdc_mem_w)
 {

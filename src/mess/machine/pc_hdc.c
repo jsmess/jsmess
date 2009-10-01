@@ -2,30 +2,30 @@
 
     machine/pc_hdc.c
 
-	Functions to emulate a WD1004A-WXI hard disk controller
+    Functions to emulate a WD1004A-WXI hard disk controller
 
-	Information was gathered from various places:
-	Linux' /usr/src/linux/drivers/block/xd.c and /usr/include/linux/xd.h
-	Original IBM PC-XT technical data book
-	The WD1004A-WXI BIOS ROM image
+    Information was gathered from various places:
+    Linux' /usr/src/linux/drivers/block/xd.c and /usr/include/linux/xd.h
+    Original IBM PC-XT technical data book
+    The WD1004A-WXI BIOS ROM image
 
     TODO:
-	Still very much :)
-	The format of the so called 'POD' (power on drive paramters?) area
-	read from the MBR (master boot record) at offset 1AD to 1BD is wrong.
+    Still very much :)
+    The format of the so called 'POD' (power on drive paramters?) area
+    read from the MBR (master boot record) at offset 1AD to 1BD is wrong.
 
 
 
-	There were a lot of different Fixed Disk Adapter for the IBM pcs.
-	Xebec produced a couple of the Fixed Disk Adapter for IBM.
-	
-	One Xebec Adapter has these roms on it:
-	One MK6xxxx ROM: 62X0822__(M)_AMI_8621MAB__S68B364-P__(C)IBM_CORP_1982,1985__PHILIPPINES.12D.2364.bin
-	One 2732 ROM for the Z80: 104839RE__COPYRIGHT__XEBEC_1986.12A.2732.bin
+    There were a lot of different Fixed Disk Adapter for the IBM pcs.
+    Xebec produced a couple of the Fixed Disk Adapter for IBM.
+
+    One Xebec Adapter has these roms on it:
+    One MK6xxxx ROM: 62X0822__(M)_AMI_8621MAB__S68B364-P__(C)IBM_CORP_1982,1985__PHILIPPINES.12D.2364.bin
+    One 2732 ROM for the Z80: 104839RE__COPYRIGHT__XEBEC_1986.12A.2732.bin
 
 
-	tandon Fixed Disk Adapter found in an IBM 5150:
-	600963-001__TYPE_5.U12.2764.bin
+    tandon Fixed Disk Adapter found in an IBM 5150:
+    600963-001__TYPE_5.U12.2764.bin
 
 ***************************************************************************/
 
@@ -230,7 +230,7 @@ static hard_disk_file *pc_hdc_file(running_machine *machine, int id)
 
 	if ( img == NULL )
 		return NULL;
- 
+
 	if (!image_exists(img))
 		return NULL;
 
@@ -596,24 +596,24 @@ static TIMER_CALLBACK(pc_hdc_command)
 
 
 /*  Command format
- *	Bits	 Description
- *	7	   0
- *	xxxxxxxx command
- *	dddhhhhh drive / head
- *	ccssssss cylinder h / sector
- *	cccccccc cylinder l
- *	nnnnnnnn count
- *	xxxxxxxx control
+ *  Bits     Description
+ *  7      0
+ *  xxxxxxxx command
+ *  dddhhhhh drive / head
+ *  ccssssss cylinder h / sector
+ *  cccccccc cylinder l
+ *  nnnnnnnn count
+ *  xxxxxxxx control
  *
- *	Command format extra for set drive characteristics
- *	000000cc cylinders h
- *	cccccccc cylinders l
- *	000hhhhh heads
- *	000000cc reduced write h
- *	cccccccc reduced write l
- *	000000cc write precomp h
- *	cccccccc write precomp l
- *	eeeeeeee ecc
+ *  Command format extra for set drive characteristics
+ *  000000cc cylinders h
+ *  cccccccc cylinders l
+ *  000hhhhh heads
+ *  000000cc reduced write h
+ *  cccccccc reduced write l
+ *  000000cc write precomp h
+ *  cccccccc write precomp l
+ *  eeeeeeee ecc
  */
 static void pc_hdc_data_w(running_machine *machine, int n, int data)
 {
@@ -755,17 +755,17 @@ static UINT8 pc_hdc_status_r(int n)
 
 
 /*
-	Dipswitch configuration
+    Dipswitch configuration
 
 
-	Tandon/Western Digital Fixed Disk Controller
-	bit0-1 : Determine disk size(?)
-		Causes geometry data to be read from c8043, c8053, c8063, c8073 (?)
-		00 - 40 Mbytes
-		01 - 30 Mbytes
-		10 - 10 Mbytes
-		11 - 20 Mbytes
-	bit2-7 : unknown
+    Tandon/Western Digital Fixed Disk Controller
+    bit0-1 : Determine disk size(?)
+        Causes geometry data to be read from c8043, c8053, c8063, c8073 (?)
+        00 - 40 Mbytes
+        01 - 30 Mbytes
+        10 - 10 Mbytes
+        11 - 20 Mbytes
+    bit2-7 : unknown
 
  */
 
@@ -779,8 +779,8 @@ static UINT8 pc_hdc_dipswitch_r(int n)
 
 /*************************************************************************
  *
- *		HDC
- *		hard disk controller
+ *      HDC
+ *      hard disk controller
  *
  *************************************************************************/
 
@@ -821,7 +821,7 @@ static void pc_HDC_w(running_machine *machine, int chip, offs_t offs, UINT8 data
 
 /*************************************
  *
- *		Port handlers
+ *      Port handlers
  *
  *************************************/
 

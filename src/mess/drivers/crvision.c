@@ -1,32 +1,32 @@
 /*
-	This 1980s computer was manufactured by Vtech of Hong Kong.
-	known as: creatiVision, Dick Smith Wizzard, Funvision, Hanimex Ramses, Laser2001 and possibly others.
+    This 1980s computer was manufactured by Vtech of Hong Kong.
+    known as: creatiVision, Dick Smith Wizzard, Funvision, Hanimex Ramses, Laser2001 and possibly others.
 
-	There is also a CreatiVision Mk 2, possibly also known as the Laser 500. This was a proper computer,
-	containing a CreatiVision cartridge slot.
+    There is also a CreatiVision Mk 2, possibly also known as the Laser 500. This was a proper computer,
+    containing a CreatiVision cartridge slot.
 
-	NOTE:
+    NOTE:
 
-	If you find that the keys R,D,F,G are not working while using the BASIC cartridge,
-	please remap the Joystick 2 keys to somewhere else. By default they overlap those keys.
+    If you find that the keys R,D,F,G are not working while using the BASIC cartridge,
+    please remap the Joystick 2 keys to somewhere else. By default they overlap those keys.
 
     TODO:
 
-	- BASIC v1,v2 numbers are invisible
+    - BASIC v1,v2 numbers are invisible
     - proper keyboard emulation, need keyboard schematics
-	- memory expansion 16K/32K, can be chained
-	- centronics control/status port
-	- convert to use new cartridge system
-	- non-working cartridges:
-		* Deep Sea Adventure (6K)
-		* Locomotive (10K)
-		* Planet Defender (6K)
-		* Tennis (Dick Smith 6K)
-		* Tennis (Wimbledon 6K)
-	- homebrew roms with graphics issues:
-		* Christmas Demo 1.0
-		* Titanic Frogger Demo 1.0
-		* Titanic Frogger Demo 1.1
+    - memory expansion 16K/32K, can be chained
+    - centronics control/status port
+    - convert to use new cartridge system
+    - non-working cartridges:
+        * Deep Sea Adventure (6K)
+        * Locomotive (10K)
+        * Planet Defender (6K)
+        * Tennis (Dick Smith 6K)
+        * Tennis (Wimbledon 6K)
+    - homebrew roms with graphics issues:
+        * Christmas Demo 1.0
+        * Titanic Frogger Demo 1.0
+        * Titanic Frogger Demo 1.1
 
 */
 
@@ -60,7 +60,7 @@ static WRITE8_DEVICE_HANDLER( centronics_ctrl_w )
 /* Memory Map */
 
 static ADDRESS_MAP_START( crvision_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x0c00) AM_RAM 
+	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x0c00) AM_RAM
 	AM_RANGE(0x1000, 0x1003) AM_MIRROR(0x0ffc) AM_DEVREADWRITE(PIA6821_TAG, pia6821_r, pia6821_w)
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0ffe) AM_READ(TMS9928A_vram_r)
 	AM_RANGE(0x2001, 0x2001) AM_MIRROR(0x0ffe) AM_READ(TMS9928A_register_r)
@@ -72,7 +72,7 @@ static ADDRESS_MAP_START( crvision_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( wizzard_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x0c00) AM_RAM 
+	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x0c00) AM_RAM
 	AM_RANGE(0x1000, 0x1003) AM_MIRROR(0x0ffc) AM_DEVREADWRITE(PIA6821_TAG, pia6821_r, pia6821_w)
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0ffe) AM_READ(TMS9928A_vram_r)
 	AM_RANGE(0x2001, 0x2001) AM_MIRROR(0x0ffe) AM_READ(TMS9928A_register_r)
@@ -80,10 +80,10 @@ static ADDRESS_MAP_START( wizzard_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3001, 0x3001) AM_MIRROR(0x0ffe) AM_WRITE(TMS9928A_register_w)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(BANK_ROM2)
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(BANK_ROM1)
-//	AM_RANGE(0xc000, 0xe7ff) AM_RAMBANK(3)
+//  AM_RANGE(0xc000, 0xe7ff) AM_RAMBANK(3)
 	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE(CENTRONICS_TAG, centronics_data_w)
 	AM_RANGE(0xe801, 0xe801) AM_DEVREADWRITE(CENTRONICS_TAG, centronics_status_r, centronics_ctrl_w)
-//	AM_RANGE(0xf000, 0xf7ff) AM_RAMBANK(4)
+//  AM_RANGE(0xf000, 0xf7ff) AM_RAMBANK(4)
 	AM_RANGE(0xf800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -635,7 +635,7 @@ SYSTEM_CONFIG_END
 
 /* System Drivers */
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT       INIT    CONFIG		COMPANY						FULLNAME */
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT       INIT    CONFIG      COMPANY                     FULLNAME */
 CONS( 1982, crvision, 0,		0,		pal,		crvision,	0,		0,			"Video Technology",			"CreatiVision", 0 )
 CONS( 1982, fnvision, crvision, 0,		pal,		crvision,	0,		0,			"Video Technology",			"FunVision", 0 )
 CONS( 1982, crvisioj, crvision,	0,		ntsc,		crvision,	0,		0,			"Cheryco",					"CreatiVision (Japan)", 0 )
@@ -644,7 +644,7 @@ CONS( 1982, rameses,  crvision, 0,		pal,		crvision,	0,		0,			"Hanimex",					"Ram
 CONS( 1983, vz2000,   crvision, 0,		pal,		crvision,	0,		0,			"Dick Smith Electronics",	"VZ 2000 (Oceania)", 0 )
 CONS( 1983, crvisio2, crvision, 0,		pal,		crvision,	0,		0,			"Sanyo Video",				"CreatiVision MK-II (Germany)", 0 )
 /*
-COMP( 1983, lasr2001, 0,		0,		lasr2001,	lasr2001,	0,		lasr2001,	"Video Technology",			"Laser 2001", GAME_NOT_WORKING )
-COMP( 1983, vz2001,	  lasr2001,	0,		lasr2001,	lasr2001,	0,		lasr2001,	"Dick Smith Electronics",	"VZ 2001 (Oceania)", GAME_NOT_WORKING )
-COMP( 1983, manager,  lasr2001,	0,		lasr2001,	lasr2001,	0,		lasr2001,	"Salora",					"Manager (Finland)", GAME_NOT_WORKING )
+COMP( 1983, lasr2001, 0,        0,      lasr2001,   lasr2001,   0,      lasr2001,   "Video Technology",         "Laser 2001", GAME_NOT_WORKING )
+COMP( 1983, vz2001,   lasr2001, 0,      lasr2001,   lasr2001,   0,      lasr2001,   "Dick Smith Electronics",   "VZ 2001 (Oceania)", GAME_NOT_WORKING )
+COMP( 1983, manager,  lasr2001, 0,      lasr2001,   lasr2001,   0,      lasr2001,   "Salora",                   "Manager (Finland)", GAME_NOT_WORKING )
 */

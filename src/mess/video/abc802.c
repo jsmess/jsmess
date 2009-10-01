@@ -31,51 +31,51 @@ static MC6845_UPDATE_ROW( abc802_update_row )
 {
 	/*
 
-		PAL16R4 equation:
+        PAL16R4 equation:
 
-		IF (VCC)	*OS	  =	FC + RF / RC
-					*RG:  =	HS / *RG + *ATE / *RG + ATD / *RG + LL /
-							*RG + AT1 / *RG + AT0 / ATE + *ATD + *LL +
-							*AT1 + *AT0
-					*RI:  =	*RI + *INV / *RI + LL / *INV + *LL
-					*RF:  =	HS / *RF + *ATE / *RF + ATD / *RF + LL /
-							*RF + AT1 / *RF + AT0 / ATE + *ATD + *LL +
-							*AT1 + AT0
-					*RC:  =	HS / *RC + *ATE / *RC + *ATD / *RC + LL /
-							*RC + *ATI / *RC + AT0 / ATE + *LL + *AT1 +
-							*AT0
-		IF (VCC)	*O0	  =	*CUR + *AT0 / *CUR + ATE
-					*O1   =	*CUR + *AT1 / *CUR + ATE
+        IF (VCC)    *OS   = FC + RF / RC
+                    *RG:  = HS / *RG + *ATE / *RG + ATD / *RG + LL /
+                            *RG + AT1 / *RG + AT0 / ATE + *ATD + *LL +
+                            *AT1 + *AT0
+                    *RI:  = *RI + *INV / *RI + LL / *INV + *LL
+                    *RF:  = HS / *RF + *ATE / *RF + ATD / *RF + LL /
+                            *RF + AT1 / *RF + AT0 / ATE + *ATD + *LL +
+                            *AT1 + AT0
+                    *RC:  = HS / *RC + *ATE / *RC + *ATD / *RC + LL /
+                            *RC + *ATI / *RC + AT0 / ATE + *LL + *AT1 +
+                            *AT0
+        IF (VCC)    *O0   = *CUR + *AT0 / *CUR + ATE
+                    *O1   = *CUR + *AT1 / *CUR + ATE
 
 
-		+ = AND
-		/ = OR
-		* = Inverted
+        + = AND
+        / = OR
+        * = Inverted
 
-		ATD		Attribute data
-		ATE		Attribute enable
-		AT0,AT1	Attribute address
-		CUR		Cursor
-		FC		FLSH clock
-		HS		Horizontal sync
-		INV		Inverted signal input
-		LL		Load when Low
-		OEL		Output Enable when Low
-		RC		Row clear
-		RF		Row flash
-		RG		Row graphic
-		RI		Row inverted
+        ATD     Attribute data
+        ATE     Attribute enable
+        AT0,AT1 Attribute address
+        CUR     Cursor
+        FC      FLSH clock
+        HS      Horizontal sync
+        INV     Inverted signal input
+        LL      Load when Low
+        OEL     Output Enable when Low
+        RC      Row clear
+        RF      Row flash
+        RG      Row graphic
+        RI      Row inverted
 
-	*/
+    */
 
 	abc802_state *state = device->machine->driver_data;
 
 	int column;
 	int rf = 0, rc = 0, rg = 0;
-	
+
 	/* prevent wraparound */
 	if (y >= 240) return;
-	
+
 	y += 29;
 
 	for (column = 0; column < x_count; column++)
@@ -210,7 +210,7 @@ static const mc6845_interface abc802_mc6845_interface = {
 static VIDEO_START( abc802 )
 {
 	abc802_state *state = machine->driver_data;
-	
+
 	/* allocate memory */
 
 	state->charram = auto_alloc_array(machine, UINT8, ABC802_CHAR_RAM_SIZE);
@@ -237,13 +237,13 @@ static VIDEO_START( abc802 )
 static VIDEO_UPDATE( abc802 )
 {
 	abc802_state *state = screen->machine->driver_data;
-	
+
 	/* expand visible area to workaround MC6845 */
 	video_screen_set_visarea(screen, 0, 767, 0, 311);
 
 	/* draw text */
 	mc6845_update(state->mc6845, bitmap, cliprect);
-	
+
 	return 0;
 }
 

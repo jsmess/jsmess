@@ -130,7 +130,7 @@ static VIDEO_UPDATE( comx35 )
 	else
 	{
 		const device_config *mc6845 = devtag_get_device(screen->machine, MC6845_TAG);
-		
+
 		mc6845_update(mc6845, bitmap, cliprect);
 	}
 

@@ -1,10 +1,10 @@
 /******************************************************************************
 
-	compis_gdc.c
-	Video driver for the Intel 82720 and NEC uPD7220 GDC.
+    compis_gdc.c
+    Video driver for the Intel 82720 and NEC uPD7220 GDC.
 
-	Per Ola Ingvarsson
-	Tomas Karlsson
+    Per Ola Ingvarsson
+    Tomas Karlsson
 
  ******************************************************************************/
 

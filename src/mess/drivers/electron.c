@@ -18,7 +18,7 @@ Missing:
     - Support for ROM images
     - Support for floppy disks
     - Other peripherals
-	- Keyboard is missing the 'Break' key
+    - Keyboard is missing the 'Break' key
 
 ******************************************************************************/
 
@@ -57,7 +57,7 @@ static ADDRESS_MAP_START(electron_mem, ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( electron )
-	
+
 	PORT_START("LINE0")		/* Keyboard line 0 */
 	PORT_BIT(0x01,  IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("\xE2\x86\x92 | \\") PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR(UCHAR_MAMEKEY(RIGHT)) PORT_CHAR('|') PORT_CHAR('\\') // on the real keyboard, this would be on the 1st row, the 3rd key after 0
 	PORT_BIT(0x02,  IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("COPY") PORT_CODE(KEYCODE_END) 	PORT_CHAR(UCHAR_MAMEKEY(F1)) PORT_CHAR('[') PORT_CHAR(']')

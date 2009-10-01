@@ -1,6 +1,6 @@
 /*
 
-	X68000 Custom SASI HD controller
+    X68000 Custom SASI HD controller
 
 */
 

@@ -13,13 +13,13 @@ struct _pecom_state
 {
 	UINT8 *page_ram;		/* page memory */
 	UINT8 *charram;			/* character generator ROM */
-	int cdp1802_mode;		/* CPU mode */	
+	int cdp1802_mode;		/* CPU mode */
 	int dma;				/* memory refresh DMA */
 	const device_config *cdp1869;
 
 	/* timers */
 	emu_timer *reset_timer;	/* power on reset timer */
-	
+
 };
 
 /*----------- defined in machine/pecom.c -----------*/

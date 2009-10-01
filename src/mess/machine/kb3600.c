@@ -8,10 +8,10 @@
 **********************************************************************/
 
 /*
-	
-	TODO:
 
-	- more accurate emulation of real chip
+    TODO:
+
+    - more accurate emulation of real chip
 
 */
 
@@ -105,7 +105,7 @@ static TIMER_CALLBACK( ay3600_scan_tick )
 			}
 		}
 	}
-	
+
 	if (!ako)
 	{
 		ay3600->b = -1;

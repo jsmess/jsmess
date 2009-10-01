@@ -28,7 +28,7 @@ static READ8_HANDLER (rom_page_r)
 static WRITE8_HANDLER (rom_page_w)
 {
 	rom_page =data;
-	if (data & 8) 
+	if (data & 8)
 	{
 		int chip = (data >> 4) % 5;
 		int page = data & 7;
@@ -38,22 +38,22 @@ static WRITE8_HANDLER (rom_page_w)
 	{
 		memory_set_bankptr(space->machine, 2, mess_ram + 0xc000);
 	}
-} 
+}
 
 
 static WRITE8_HANDLER (vdisk_page_w)
 {
-	vdisk_addr = (vdisk_addr & 0x0ffff) | ((data & 0x0f)<<16); 
+	vdisk_addr = (vdisk_addr & 0x0ffff) | ((data & 0x0f)<<16);
 }
 
 static WRITE8_HANDLER (vdisk_h_w)
 {
-	vdisk_addr = (vdisk_addr & 0xf00ff) | (data<<8); 
+	vdisk_addr = (vdisk_addr & 0xf00ff) | (data<<8);
 }
 
 static WRITE8_HANDLER (vdisk_l_w)
 {
-	vdisk_addr = (vdisk_addr & 0xfff00) | data; 
+	vdisk_addr = (vdisk_addr & 0xfff00) | data;
 }
 
 static WRITE8_HANDLER (vdisk_data_w)
@@ -71,33 +71,33 @@ static READ8_HANDLER (vdisk_data_r)
 	return retVal;
 }
 
-UINT8 selectedline(UINT16 data) 
+UINT8 selectedline(UINT16 data)
 {
 	UINT8 i;
-	for(i = 0; i < 16; i++) 
+	for(i = 0; i < 16; i++)
 	{
-		if (BIT(data, i)) 
+		if (BIT(data, i))
 		{
 			return i;
 		}
-	}	
+	}
 	return 0;
 }
 
 static READ8_HANDLER ( keyboard_r )
 {
-	return key_code;	
+	return key_code;
 }
 
 static READ8_HANDLER ( keycheck_r )
 {
-	UINT8 retVal = 0x3f;	
+	UINT8 retVal = 0x3f;
 	UINT8 *keyboard = memory_region(space->machine, "keyboard");
 	UINT16 row1 = input_port_read(space->machine, "ROW1");
 	UINT16 row2 = input_port_read(space->machine, "ROW2");
 	UINT16 row3 = input_port_read(space->machine, "ROW3");
 	UINT16 row4 = input_port_read(space->machine, "ROW4");
-	UINT16 row5 = input_port_read(space->machine, "ROW5");	
+	UINT16 row5 = input_port_read(space->machine, "ROW5");
 	UINT16 all = row1 | row2 | row3 | row4 | row5;
 	UINT16 addr = (input_port_read(space->machine, "SHIFT") & 1) | (input_port_read(space->machine, "CTRL") & 1) << 1;
 	if (all != 0xff)
@@ -113,9 +113,9 @@ static READ8_HANDLER ( keycheck_r )
 		key_code = keyboard[addr];
 		keyboard_clk = ~keyboard_clk;
 
-		if (keyboard_clk) 
+		if (keyboard_clk)
 			retVal |= 0x80;
-	}	
+	}
 	return retVal;
 }
 
@@ -142,39 +142,39 @@ static WRITE8_HANDLER (speaker_w)
 
 static WRITE8_HANDLER (led_w)
 {
-//	UINT8 caps_led = BIT(data,4);
+//  UINT8 caps_led = BIT(data,4);
 }
 
 INLINE const device_config *get_floppy_image(running_machine *machine, int drive)
 {
 	return floppy_get_device(machine, drive);
-} 
+}
 
 static NEC765_GET_IMAGE( pyldin_nec765_get_image )
 {
 	return get_floppy_image(device->machine, (floppy_index & 1)^1);
 }
 UINT8 floppy_ctrl = 0;
-static WRITE8_HANDLER (floppy_w) 
+static WRITE8_HANDLER (floppy_w)
 {
 	// bit 0 is reset (if zero)
 	// bit 1 is TC state
 	// bit 2 is drive selected
 	// bit 3 is motor state
 	const device_config *floppy = devtag_get_device(space->machine, "nec765");
-	if (BIT(data,0)==0) {		
-		//reset		
+	if (BIT(data,0)==0) {
+		//reset
 		nec765_reset(floppy,0);
 	}
 	floppy_drive_set_motor_state(get_floppy_image(space->machine, BIT(data,2)), BIT(data,3));
-	
+
 	floppy_drive_set_ready_state(get_floppy_image(space->machine, 0), BIT(data,2), 0);
-	
+
 	nec765_tc_w(floppy, BIT(data,1));
-	
+
 	floppy_ctrl = data;
 }
-static READ8_HANDLER (floppy_r) 
+static READ8_HANDLER (floppy_r)
 {
 	return floppy_ctrl;
 }
@@ -202,7 +202,7 @@ static ADDRESS_MAP_START(pyl601_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0xe62a, 0xe62a ) AM_READWRITE(keycheck_r,led_w)
 	AM_RANGE( 0xe62b, 0xe62b ) AM_READWRITE(timer_r,speaker_w)
 	AM_RANGE( 0xe62d, 0xe62d ) AM_READ(video_mode_r)
-	AM_RANGE( 0xe62e, 0xe62e ) AM_READWRITE(keycheck_r,led_w)	
+	AM_RANGE( 0xe62e, 0xe62e ) AM_READWRITE(keycheck_r,led_w)
 	AM_RANGE( 0xe680, 0xe680 ) AM_WRITE(vdisk_page_w)
 	AM_RANGE( 0xe681, 0xe681 ) AM_WRITE(vdisk_h_w)
 	AM_RANGE( 0xe682, 0xe682 ) AM_WRITE(vdisk_l_w)
@@ -318,13 +318,13 @@ INPUT_PORTS_END
 static MACHINE_RESET(pyl601)
 {
 	memory_set_bankptr(machine, 1, mess_ram + 0x0000);
-	memory_set_bankptr(machine, 2, mess_ram + 0xc000);	
-	memory_set_bankptr(machine, 3, mess_ram + 0xe000);	
-	memory_set_bankptr(machine, 4, mess_ram + 0xe700);	
-	memory_set_bankptr(machine, 5, memory_region(machine, "maincpu") + 0xf000);	
-	memory_set_bankptr(machine, 6, mess_ram + 0xf000);	
-	
-	device_reset(cputag_get_cpu(machine, "maincpu"));	
+	memory_set_bankptr(machine, 2, mess_ram + 0xc000);
+	memory_set_bankptr(machine, 3, mess_ram + 0xe000);
+	memory_set_bankptr(machine, 4, mess_ram + 0xe700);
+	memory_set_bankptr(machine, 5, memory_region(machine, "maincpu") + 0xf000);
+	memory_set_bankptr(machine, 6, mess_ram + 0xf000);
+
+	device_reset(cputag_get_cpu(machine, "maincpu"));
 }
 
 static VIDEO_START( pyl601 )
@@ -344,11 +344,11 @@ static MC6845_UPDATE_ROW( pyl601_update_row )
 
 	int column, bit, i;
 	UINT8 data;
-	if (BIT(video_mode, 5) == 0) 
+	if (BIT(video_mode, 5) == 0)
 	{
 		for (column = 0; column < x_count; column++)
 		{
-			UINT8 code = mess_ram[(((ma + column) & 0x0fff) + 0xf000)];		
+			UINT8 code = mess_ram[(((ma + column) & 0x0fff) + 0xf000)];
 			code = ((code << 1) | (code >> 7)) & 0xff;
 			data = charrom[((code << 3) | (ra & 0x07)) & 0x7ff];
 			if (column == cursor_x-2)
@@ -359,24 +359,24 @@ static MC6845_UPDATE_ROW( pyl601_update_row )
 			{
 				int x = (column * 8) + bit;
 				int color = BIT(data, 7) ? 1 : 0;
-					
+
 				*BITMAP_ADDR16(bitmap, y, x) = color;
-	
+
 				data <<= 1;
 			}
 		}
 	}
-	else 
+	else
 	{
 		for (i = 0; i < x_count; i++)
-		{		
+		{
 			UINT8 data = mess_ram[(((ma + i) << 3) | (ra & 0x07)) & 0xffff];
 			for (bit = 0; bit < 8; bit++)
 			{
-				*BITMAP_ADDR16(bitmap, y, (i * 8) + bit) = BIT(data, 7) ? 1 : 0;		
+				*BITMAP_ADDR16(bitmap, y, (i * 8) + bit) = BIT(data, 7) ? 1 : 0;
 				data <<= 1;
 			}
-		}		
+		}
 	}
 }
 
@@ -390,35 +390,35 @@ static MC6845_UPDATE_ROW( pyl601a_update_row )
 	{
 		for (column = 0; column < x_count; column++)
 		{
-			UINT8 code = mess_ram[(((ma + column) & 0x0fff) + 0xf000)];		
+			UINT8 code = mess_ram[(((ma + column) & 0x0fff) + 0xf000)];
 			data = charrom[((code << 4) | (ra & 0x07)) & 0xfff];
 			if (column == cursor_x)
 			{
 				data = 0xff;
 			}
-	
+
 			for (bit = 0; bit < 8; bit++)
 			{
 				int x = (column * 8) + bit;
 				int color = BIT(data, 7) ? 1 : 0;
-					
+
 				*BITMAP_ADDR16(bitmap, y, x) = color;
-	
+
 				data <<= 1;
 			}
 		}
-	} 
-	else 
+	}
+	else
 	{
 		for (i = 0; i < x_count; i++)
-		{		
+		{
 			UINT8 data = mess_ram[(((ma + i) << 3) | (ra & 0x07)) & 0xffff];
 			for (bit = 0; bit < 8; bit++)
 			{
-				*BITMAP_ADDR16(bitmap, y, (i * 8) + bit) = BIT(data, 7) ? 1 : 0;		
+				*BITMAP_ADDR16(bitmap, y, (i * 8) + bit) = BIT(data, 7) ? 1 : 0;
 				data <<= 1;
 			}
-		}		
+		}
 	}
 }
 
@@ -483,10 +483,10 @@ static MACHINE_DRIVER_START( pyl601 )
 	MDRV_CPU_ADD("maincpu",M6800, XTAL_1MHz)
 	MDRV_CPU_PROGRAM_MAP(pyl601_mem)
 	MDRV_CPU_VBLANK_INT("screen", pyl601_interrupt)
-	
+
 	MDRV_MACHINE_RESET(pyl601)
 
-	/* video hardware */ 
+	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -496,13 +496,13 @@ static MACHINE_DRIVER_START( pyl601 )
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(monochrome_green)
 
-	MDRV_MC6845_ADD("crtc", MC6845, XTAL_2MHz, pyl601_crtc6845_interface) 
+	MDRV_MC6845_ADD("crtc", MC6845, XTAL_2MHz, pyl601_crtc6845_interface)
 
 	MDRV_VIDEO_START( pyl601 )
-	MDRV_VIDEO_UPDATE( pyl601 )	
-	
+	MDRV_VIDEO_UPDATE( pyl601 )
+
 	MDRV_NEC765A_ADD("nec765", pyldin_nec765_interface)
-	
+
 	MDRV_FLOPPY_2_DRIVES_ADD(pyldin_floppy_config)
 MACHINE_DRIVER_END
 
@@ -525,7 +525,7 @@ ROM_START( pyl601 )
 	ROM_REGION(0x0800, "gfx1",0)
 	ROM_LOAD( "video.rom",  0x0000, 0x0800, CRC(1c23ba43) SHA1(eb1cfc139858abd0aedbbf3d523f8ba55d27a11d))
 
-	ROM_REGION(0x50000, "romdisk",ROMREGION_ERASEFF)  	
+	ROM_REGION(0x50000, "romdisk",ROMREGION_ERASEFF)
 	ROM_LOAD( "rom0.rom", 0x00000, 0x10000, CRC(60103920) SHA1(ee5b4ee5b513c4a0204da751e53d63b8c6c0aab9))
 	ROM_LOAD( "rom1.rom", 0x10000, 0x10000, CRC(cb4a9b22) SHA1(dd09e4ba35b8d1a6f60e6e262aaf2f156367e385))
 	ROM_LOAD( "rom2.rom", 0x20000, 0x08000, CRC(0b7684bf) SHA1(c02ad1f2a6f484cd9d178d8b060c21c0d4e53442))

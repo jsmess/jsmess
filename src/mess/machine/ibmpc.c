@@ -141,19 +141,19 @@ WRITE16_HANDLER( pc16le_rtc_w ) { write16le_with_write8_handler(pc_rtc_w, space,
 
 /*************************************************************************
  *
- *		EXP
- *		expansion port
+ *      EXP
+ *      expansion port
  *
  *************************************************************************/
 
 // I even don't know what it is!
 static struct {
 	/*
-	  reg 0 ram behaviour if in
-	  reg 3 write 1 to enable it
-	  reg 4 ram behaviour ???
-	  reg 5,6 (5 hi, 6 lowbyte) ???
-	*/
+      reg 0 ram behaviour if in
+      reg 3 write 1 to enable it
+      reg 4 ram behaviour ???
+      reg 5,6 (5 hi, 6 lowbyte) ???
+    */
 	/* selftest in ibmpc, ibmxt */
 	UINT8 reg[8];
 } pc_expansion={ { 0,0,0,0,0,0,1 } };

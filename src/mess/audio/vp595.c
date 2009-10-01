@@ -1,8 +1,8 @@
 /**********************************************************************
 
-	RCA VP595 - VIP Simple Sound System emulation
+    RCA VP595 - VIP Simple Sound System emulation
 
-	Copyright MESS Team.
+    Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
 
 *********************************************************************/
@@ -70,7 +70,7 @@ static WRITE8_DEVICE_HANDLER( vp595_cdp1863_w )
 
 /*-------------------------------------------------
     vp595_install_readwrite_handler - install
-	or uninstall write handlers
+    or uninstall write handlers
 -------------------------------------------------*/
 
 void vp595_install_write_handlers(const device_config *device, const address_space *io, int enabled)

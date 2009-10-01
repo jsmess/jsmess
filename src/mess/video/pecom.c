@@ -82,7 +82,7 @@ static WRITE_LINE_DEVICE_HANDLER( pecom_prd_w )
 static CDP1869_INTERFACE( pecom_cdp1869_intf )
 {
 	"maincpu",
-	SCREEN_TAG,	
+	SCREEN_TAG,
 	CDP1869_COLOR_CLK_PAL,
 	CDP1869_PAL,
 	pecom_page_ram_r,
@@ -111,7 +111,7 @@ static VIDEO_START( pecom )
 	/* register for state saving */
 	state_save_register_global(machine, state->cdp1802_mode);
 	state_save_register_global(machine, state->dma);
-	state_save_register_global_pointer(machine, state->page_ram, PECOM_PAGE_RAM_SIZE);	
+	state_save_register_global_pointer(machine, state->page_ram, PECOM_PAGE_RAM_SIZE);
 }
 
 static VIDEO_UPDATE( pecom )

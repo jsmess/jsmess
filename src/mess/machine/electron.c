@@ -1,9 +1,9 @@
 /******************************************************************************
-	Acorn Electron driver
+    Acorn Electron driver
 
-	MESS Driver By:
+    MESS Driver By:
 
-	Wilbert Pol
+    Wilbert Pol
 
 ******************************************************************************/
 
@@ -15,14 +15,14 @@
 ULA electron_ula;
 static emu_timer *electron_tape_timer;
 
-static const device_config *cassette_device_image( running_machine *machine ) 
+static const device_config *cassette_device_image( running_machine *machine )
 {
 	return devtag_get_device(machine, "cassette");
 }
 
-static void electron_tape_start( void ) 
+static void electron_tape_start( void )
 {
-	if ( electron_ula.tape_running ) 
+	if ( electron_ula.tape_running )
 	{
 		return;
 	}
@@ -34,7 +34,7 @@ static void electron_tape_start( void )
 	timer_adjust_periodic(electron_tape_timer, attotime_zero, 0, ATTOTIME_IN_HZ(4800));
 }
 
-static void electron_tape_stop( void ) 
+static void electron_tape_stop( void )
 {
 	electron_ula.tape_running = 0;
 	timer_reset( electron_tape_timer, attotime_never );
@@ -45,43 +45,43 @@ static void electron_tape_stop( void )
 
 static TIMER_CALLBACK(electron_tape_timer_handler)
 {
-	if ( electron_ula.cassette_motor_mode ) 
+	if ( electron_ula.cassette_motor_mode )
 	{
 		double tap_val;
 		tap_val = cassette_input( cassette_device_image( machine ) );
-		if ( tap_val < -0.5 ) 
+		if ( tap_val < -0.5 )
 		{
 			electron_ula.tape_value = ( electron_ula.tape_value << 8 ) | TAPE_LOW;
 			electron_ula.tape_steps++;
-		} 
-		else if ( tap_val > 0.5 ) 
+		}
+		else if ( tap_val > 0.5 )
 		{
 			electron_ula.tape_value = ( electron_ula.tape_value << 8 ) | TAPE_HIGH;
 			electron_ula.tape_steps++;
-		} 
-		else 
+		}
+		else
 		{
 			electron_ula.tape_steps = 0;
 			electron_ula.bit_count = 0;
 			electron_ula.high_tone_set = 0;
 			electron_ula.tape_value = 0x80808080;
 		}
-		if ( electron_ula.tape_steps > 2 && ( electron_ula.tape_value == 0x0000FFFF || electron_ula.tape_value == 0x00FF00FF ) ) 
+		if ( electron_ula.tape_steps > 2 && ( electron_ula.tape_value == 0x0000FFFF || electron_ula.tape_value == 0x00FF00FF ) )
 		{
 			electron_ula.tape_steps = 0;
-			switch( electron_ula.bit_count ) 
+			switch( electron_ula.bit_count )
 			{
 			case 0:	/* start bit */
 				electron_ula.start_bit = ( ( electron_ula.tape_value == 0x0000FFFF ) ? 0 : 1 );
 				//logerror( "++ Read start bit: %d\n", electron_ula.start_bit );
-				if ( electron_ula.start_bit ) 
+				if ( electron_ula.start_bit )
 				{
-					if ( electron_ula.high_tone_set ) 
+					if ( electron_ula.high_tone_set )
 					{
 						electron_ula.bit_count--;
 					}
-				} 
-				else 
+				}
+				else
 				{
 					electron_ula.high_tone_set = 0;
 				}
@@ -94,17 +94,17 @@ static TIMER_CALLBACK(electron_tape_timer_handler)
 			case 9: /* stop bit */
 				electron_ula.stop_bit = ( ( electron_ula.tape_value == 0x0000FFFF ) ? 0 : 1 );
 				//logerror( "++ Read stop bit: %d\n", electron_ula.stop_bit );
-				if ( electron_ula.start_bit && electron_ula.stop_bit && electron_ula.tape_byte == 0xFF && ! electron_ula.high_tone_set ) 
+				if ( electron_ula.start_bit && electron_ula.stop_bit && electron_ula.tape_byte == 0xFF && ! electron_ula.high_tone_set )
 				{
 					electron_interrupt_handler( machine, INT_SET, INT_HIGH_TONE );
 					electron_ula.high_tone_set = 1;
-				} 
-				else if ( ! electron_ula.start_bit && electron_ula.stop_bit ) 
+				}
+				else if ( ! electron_ula.start_bit && electron_ula.stop_bit )
 				{
 					//logerror( "-- Byte read from tape: %02x\n", electron_ula.tape_byte );
 					electron_interrupt_handler( machine, INT_SET, INT_RECEIVE_FULL );
-				} 
-				else 
+				}
+				else
 				{
 					logerror( "Invalid start/stop bit combination detected: %d,%d\n", electron_ula.start_bit, electron_ula.stop_bit );
 				}
@@ -115,17 +115,17 @@ static TIMER_CALLBACK(electron_tape_timer_handler)
 	}
 }
 
-static READ8_HANDLER( electron_read_keyboard ) 
+static READ8_HANDLER( electron_read_keyboard )
 {
 	UINT8 data = 0;
 	int i;
-	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", 
+	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6",
 										"LINE7", "LINE8", "LINE9", "LINE10", "LINE11", "LINE12", "LINE13" };
-	
+
 	//logerror( "PC=%04x: keyboard read from paged rom area, address: %04x", activecpu_get_pc(), offset );
-	for( i = 0; i < 14; i++ ) 
+	for( i = 0; i < 14; i++ )
 	{
-		if( !(offset & 1) ) 
+		if( !(offset & 1) )
 			data |= input_port_read(space->machine, keynames[i]) & 0x0f;
 
 		offset = offset >> 1;
@@ -134,28 +134,28 @@ static READ8_HANDLER( electron_read_keyboard )
 	return data;
 }
 
-READ8_HANDLER( electron_jim_r ) 
+READ8_HANDLER( electron_jim_r )
 {
 	return 0xff;
 }
 
-WRITE8_HANDLER( electron_jim_w ) 
+WRITE8_HANDLER( electron_jim_w )
 {
 }
 
-READ8_HANDLER( electron_1mhz_r ) 
+READ8_HANDLER( electron_1mhz_r )
 {
 	return 0xff;
 }
 
-WRITE8_HANDLER( electron_1mhz_w ) 
+WRITE8_HANDLER( electron_1mhz_w )
 {
 }
 
-READ8_HANDLER( electron_ula_r ) 
+READ8_HANDLER( electron_ula_r )
 {
 	UINT8 data = ((UINT8 *)memory_region(space->machine, "user1"))[0x43E00 + offset];
-	switch ( offset & 0x0f ) 
+	switch ( offset & 0x0f )
 	{
 	case 0x00:	/* Interrupt status */
 		data = electron_ula.interrupt_status;
@@ -180,7 +180,7 @@ WRITE8_HANDLER( electron_ula_w )
 	const device_config *speaker = devtag_get_device(space->machine, "beep");
 	int i = electron_palette_offset[(( offset >> 1 ) & 0x03)];
 	logerror( "ULA: write offset %02x <- %02x\n", offset & 0x0f, data );
-	switch( offset & 0x0f ) 
+	switch( offset & 0x0f )
 	{
 	case 0x00:	/* Interrupt control */
 		electron_ula.interrupt_control = data;
@@ -199,50 +199,50 @@ WRITE8_HANDLER( electron_ula_w )
 		break;
 	case 0x05:	/* Interrupt clear and paging */
 		/* rom page requests are honoured when currently bank 0-7 or 12-15 is switched in,
-		 * or when 8-11 is currently switched in only switching to bank 8-15 is allowed.
-		 *
-		 * Rompages 10 and 11 both select the Basic ROM.
-		 * Rompages 8 and 9 both select the keyboard.
-		 */
-		if ( ( ( electron_ula.rompage & 0x0C ) != 0x08 ) || ( data & 0x08 ) ) 
+         * or when 8-11 is currently switched in only switching to bank 8-15 is allowed.
+         *
+         * Rompages 10 and 11 both select the Basic ROM.
+         * Rompages 8 and 9 both select the keyboard.
+         */
+		if ( ( ( electron_ula.rompage & 0x0C ) != 0x08 ) || ( data & 0x08 ) )
 		{
 			electron_ula.rompage = data & 0x0f;
-			if ( electron_ula.rompage == 8 || electron_ula.rompage == 9 ) 
+			if ( electron_ula.rompage == 8 || electron_ula.rompage == 9 )
 			{
 				electron_ula.rompage = 8;
 				memory_install_read8_handler( space, 0x8000, 0xbfff, 0, 0, electron_read_keyboard );
-			} 
-			else 
+			}
+			else
 			{
 				memory_install_read8_handler( space, 0x8000, 0xbfff, 0, 0, SMH_BANK(2) );
 			}
 			memory_set_bank(space->machine, 2, electron_ula.rompage);
 		}
-		if ( data & 0x10 ) 
+		if ( data & 0x10 )
 		{
 			electron_interrupt_handler( space->machine, INT_CLEAR, INT_DISPLAY_END );
 		}
-		if ( data & 0x20 ) 
+		if ( data & 0x20 )
 		{
 			electron_interrupt_handler( space->machine, INT_CLEAR, INT_RTC );
 		}
-		if ( data & 0x40 ) 
+		if ( data & 0x40 )
 		{
 			electron_interrupt_handler( space->machine, INT_CLEAR, INT_HIGH_TONE );
 		}
-		if ( data & 0x80 ) 
+		if ( data & 0x80 )
 		{
 		}
 		break;
 	case 0x06:	/* Counter divider */
-		if ( electron_ula.communication_mode == 0x01) 
+		if ( electron_ula.communication_mode == 0x01)
 		{
 			beep_set_frequency( speaker, 1000000 / ( 16 * ( data + 1 ) ) );
 		}
 		break;
 	case 0x07:	/* Misc. */
 		electron_ula.communication_mode = ( data >> 1 ) & 0x03;
-		switch( electron_ula.communication_mode ) 
+		switch( electron_ula.communication_mode )
 		{
 		case 0x00:	/* cassette input */
 			beep_set_state( speaker, 0 );
@@ -287,22 +287,22 @@ WRITE8_HANDLER( electron_ula_w )
 	}
 }
 
-void electron_interrupt_handler(running_machine *machine, int mode, int interrupt) 
+void electron_interrupt_handler(running_machine *machine, int mode, int interrupt)
 {
-	if ( mode == INT_SET ) 
+	if ( mode == INT_SET )
 	{
 		electron_ula.interrupt_status |= interrupt;
-	} 
-	else 
+	}
+	else
 	{
 		electron_ula.interrupt_status &= ~interrupt;
 	}
-	if ( electron_ula.interrupt_status & electron_ula.interrupt_control & ~0x83 ) 
+	if ( electron_ula.interrupt_status & electron_ula.interrupt_control & ~0x83 )
 	{
 		electron_ula.interrupt_status |= 0x01;
 		cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE );
-	} 
-	else 
+	}
+	else
 	{
 		electron_ula.interrupt_status &= ~0x01;
 		cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE );

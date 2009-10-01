@@ -35,7 +35,7 @@ static VIDEO_UPDATE( et3400 )
 
 static MACHINE_DRIVER_START( et3400 )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu", M6800, XTAL_1MHz ) 
+    MDRV_CPU_ADD("maincpu", M6800, XTAL_1MHz )
     MDRV_CPU_PROGRAM_MAP(et3400_mem)
 
     MDRV_MACHINE_RESET(et3400)

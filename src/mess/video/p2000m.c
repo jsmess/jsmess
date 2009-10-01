@@ -1,8 +1,8 @@
 /**********************************************************************
 
-	p2000m.c
+    p2000m.c
 
-	Functions to emulate video hardware of the p2000m
+    Functions to emulate video hardware of the p2000m
 
 **********************************************************************/
 
@@ -27,7 +27,7 @@ VIDEO_UPDATE( p2000m )
 	{
 		sy = (offs / 80) * 10;
 		sx = (offs % 80) * 6;
-		
+
 		if ((frame_count > 25) && (videoram[offs + 2048] & 0x40))
 			code = 32;
 		else

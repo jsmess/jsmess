@@ -1,8 +1,8 @@
 /***************************************************************************
 
-	stream.h
+    stream.h
 
-	Code for implementing Imgtool streams
+    Code for implementing Imgtool streams
 
 ***************************************************************************/
 

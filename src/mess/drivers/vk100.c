@@ -90,7 +90,7 @@ static ADDRESS_MAP_START( vk100_io , ADDRESS_SPACE_IO, 8)
 	//AM_RANGE (0x51, 0x51) AM_READ(uart_1)   // UAR
 	//AM_RANGE (0x58, 0x58) AM_READ(unknown_58)
 	//AM_RANGE (0x60, 0x60) AM_READ(unknown_60)
-	//AM_RANGE (0x68, 0x68) AM_READ(unknown_68) // NOT USED 
+	//AM_RANGE (0x68, 0x68) AM_READ(unknown_68) // NOT USED
 	//AM_RANGE (0x70, 0x70) AM_READ(unknown_70)
 	//AM_RANGE (0x78, 0x7f) AM_READ(unknown_78)
 ADDRESS_MAP_END

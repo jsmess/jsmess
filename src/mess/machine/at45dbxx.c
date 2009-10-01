@@ -1,12 +1,12 @@
 /*
 
-	Atmel Serial DataFlash
+    Atmel Serial DataFlash
 
-	(c) 2001-2007 Tim Schuerewegen
+    (c) 2001-2007 Tim Schuerewegen
 
-	AT45DB041 -  528 KByte
-	AT45DB081 - 1056 KByte
-	AT45DB161 - 2112 KByte
+    AT45DB041 -  528 KByte
+    AT45DB081 - 1056 KByte
+    AT45DB161 - 2112 KByte
 
 */
 
@@ -90,7 +90,7 @@ INLINE at45dbxx_t *get_token(const device_config *device)
 static void common_start(const device_config *device, int device_type)
 {
 	at45dbxx_t *flash = get_token(device);
-	
+
 	_logerror( 0, ("at45dbxx_init (%d)\n", device_type));
 	memset( flash, 0, sizeof( flash));
 	switch (device_type)
@@ -103,7 +103,7 @@ static void common_start(const device_config *device, int device_type)
 	flash->data = auto_alloc_array(device->machine, UINT8, flash->size);
 	flash->buffer1 = auto_alloc_array(device->machine, UINT8, flash->page_size);
 	flash->buffer2 = auto_alloc_array(device->machine, UINT8, flash->page_size);
-	
+
 	// data
 	state_save_register_item_pointer(device->machine, "at45dbxx", device->tag, 0, flash->data, flash->size);
 	// pins
@@ -392,22 +392,22 @@ void at45dbxx_save(const device_config *device, mame_file *file)
 /*
 NVRAM_HANDLER( at45dbxx )
 {
-	_logerror( 0, ("nvram_handler_at45dbxx (%p/%d)\n", file, read_or_write));
-	if (read_or_write)
-	{
-		at45dbxx_save( file);
-	}
-	else
-	{
-		if (file)
-		{
-			at45dbxx_load( file);
-		}
-		else
-		{
-			memset( flash->data, 0xFF, flash->size);
-		}
-	}
+    _logerror( 0, ("nvram_handler_at45dbxx (%p/%d)\n", file, read_or_write));
+    if (read_or_write)
+    {
+        at45dbxx_save( file);
+    }
+    else
+    {
+        if (file)
+        {
+            at45dbxx_load( file);
+        }
+        else
+        {
+            memset( flash->data, 0xFF, flash->size);
+        }
+    }
 }
 */
 

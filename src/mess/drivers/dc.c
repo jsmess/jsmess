@@ -10,7 +10,7 @@
     GD-ROM drive (modified ATAPI interface)
 
             NTSC/N  NTSC/I   PAL/N   PAL/I   VGA
-	    (x/240) (x/480) (x/240)  (x/480) (640x480)
+        (x/240) (x/480) (x/240)  (x/480) (640x480)
     VTOTAL   262     524      312     624    524
     HTOTAL   857     857      863     863    857
 
@@ -216,7 +216,7 @@ static MACHINE_DRIVER_START( dc )
 	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 
 	MDRV_PALETTE_LENGTH(0x1000)
-	
+
 	MDRV_VIDEO_START(dc)
 	MDRV_VIDEO_UPDATE(dc)
 

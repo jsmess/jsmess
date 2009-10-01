@@ -1,6 +1,6 @@
 /**********************************************************************
 
-    NEC µPD7201 Multiprotocol Serial Communications Controller emulation
+    NEC ?PD7201 Multiprotocol Serial Communications Controller emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -110,8 +110,8 @@ WRITE_LINE_DEVICE_HANDLER( upd7201_txcb_w )
 
 static DEVICE_START( upd7201 )
 {
-//	upd7201_t *upd7201 = get_safe_token(device);
-//	const upd7201_interface *intf = get_interface(device);
+//  upd7201_t *upd7201 = get_safe_token(device);
+//  const upd7201_interface *intf = get_interface(device);
 
 	/* resolve callbacks */
 
@@ -120,7 +120,7 @@ static DEVICE_START( upd7201 )
 	/* create the timers */
 
 	/* register for state saving */
-//	state_save_register_device_item(device, 0, upd7201->);
+//  state_save_register_device_item(device, 0, upd7201->);
 }
 
 /*-------------------------------------------------
@@ -142,8 +142,8 @@ DEVICE_GET_INFO( upd7201 )
 		case DEVINFO_FCT_RESET:							/* Nothing */								break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "NEC µPD7201");				break;
-		case DEVINFO_STR_FAMILY:						strcpy(info->s, "NEC µPD7201");				break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "NEC ?PD7201");				break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "NEC ?PD7201");				break;
 		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");						break;
 		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);					break;
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright MESS Team");		break;

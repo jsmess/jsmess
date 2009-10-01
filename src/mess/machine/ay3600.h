@@ -1,8 +1,8 @@
 /***************************************************************************
 
-	ay3600.h
+    ay3600.h
 
-	Include file for AY3600 keyboard; used by Apple IIs
+    Include file for AY3600 keyboard; used by Apple IIs
 
 ***************************************************************************/
 

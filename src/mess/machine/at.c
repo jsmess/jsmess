@@ -1,6 +1,6 @@
 /***************************************************************************
 
-	IBM AT Compatibles
+    IBM AT Compatibles
 
 ***************************************************************************/
 
@@ -225,7 +225,7 @@ WRITE8_HANDLER(at_page8_w)
 
 	if (LOG_PORT80 && (offset == 0))
 	{
-		logerror(" at_page8_w(): Port 80h <== 0x%02x (PC=0x%08x)\n", data, 
+		logerror(" at_page8_w(): Port 80h <== 0x%02x (PC=0x%08x)\n", data,
 							(unsigned) cpu_get_reg(cputag_get_cpu(space->machine, "maincpu"), REG_GENPC));
 	}
 
@@ -406,7 +406,7 @@ static void at_fdc_interrupt(running_machine *machine, int state)
 {
 	pic8259_set_irq_line(at_devices.pic8259_master, 6, state);
 //if ( mess_ram[0x0490] == 0x74 )
-//	mess_ram[0x0490] = 0x54;
+//  mess_ram[0x0490] = 0x54;
 }
 
 
@@ -497,7 +497,7 @@ static WRITE8_HANDLER( at_kbdc8042_p2_w )
 	logerror("%04x: writing $%02x to P2\n", cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")), data );
 
 	at_set_gate_a20( space->machine, ( data & 0x02 ) ? 1 : 0 );
-	
+
 	cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_RESET, ( data & 0x01 ) ? CLEAR_LINE : ASSERT_LINE );
 
 	/* OPT BUF FULL is connected to IR1 on the master 8259 */

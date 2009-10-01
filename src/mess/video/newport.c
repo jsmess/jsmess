@@ -1,27 +1,27 @@
 /*
-	SGI "Newport" graphics board used in the Indy and some Indigo2s
+    SGI "Newport" graphics board used in the Indy and some Indigo2s
 
-	Newport is modular, consisting of the following custom chips:
-	- REX3: Raster Engine, which is basically a blitter which can also draw antialiased lines.
-	        REX also acts as the interface to the rest of the system - all the other chips on
-		a Newport board are accessed through it.
-	- RB2: Frame buffer input controller
-	- RO1: Frame buffer output controller
-	- XMAP9: Final display generator
-	- CMAP: Palette mapper
-	- VC2: Video timing controller / CRTC
+    Newport is modular, consisting of the following custom chips:
+    - REX3: Raster Engine, which is basically a blitter which can also draw antialiased lines.
+            REX also acts as the interface to the rest of the system - all the other chips on
+        a Newport board are accessed through it.
+    - RB2: Frame buffer input controller
+    - RO1: Frame buffer output controller
+    - XMAP9: Final display generator
+    - CMAP: Palette mapper
+    - VC2: Video timing controller / CRTC
 
-	Taken from the Linux Newport driver, slave addresses for Newport devices are:
-			VC2			0
-			Both CMAPs	1
-			CMAP 0		2
-			CMAP 1		3
-			Both XMAPs	4
-			XMAP 0		5
-			XMAP 1		6
-			RAMDAC		7
-			VIDEO (CC1)	8
-			VIDEO (AB1)	9
+    Taken from the Linux Newport driver, slave addresses for Newport devices are:
+            VC2         0
+            Both CMAPs  1
+            CMAP 0      2
+            CMAP 1      3
+            Both XMAPs  4
+            XMAP 0      5
+            XMAP 1      6
+            RAMDAC      7
+            VIDEO (CC1) 8
+            VIDEO (AB1) 9
 */
 
 #include "driver.h"
@@ -589,10 +589,10 @@ READ32_HANDLER( newport_rex3_r )
 	UINT32 nTemp;
 	running_machine *machine = space->machine;
 
-//	if( offset >= ( 0x0800 / 4 ) )
-//	{
-//		verboselog(machine, 2, "%08x:\n", 0xbf0f0000 + ( offset << 2 ) );
-//	}
+//  if( offset >= ( 0x0800 / 4 ) )
+//  {
+//      verboselog(machine, 2, "%08x:\n", 0xbf0f0000 + ( offset << 2 ) );
+//  }
 	switch( offset )
 	{
 	case 0x0000/4:
@@ -894,7 +894,7 @@ static void DoREX3Command(running_machine *machine)
 		nX = nStartX;
 		nY = nStartY;
 		verboselog(machine, 3, "Tux Logo Draw: %04x, %04x = %08x\n", nX, nY, nCMAP0_Palette[ ( nREX3_HostDataPortMSW & 0xff000000 ) >> 24 ] );
-//		nREX3_Kludge_SkipLine = 1;
+//      nREX3_Kludge_SkipLine = 1;
 		nREX3_BresOctInc1 = 0;
 		video_base[ nY*(1280+64) + nX ] = nCMAP0_Palette[ ( nREX3_HostDataPortMSW & 0xff000000 ) >> 24 ];
 		nX++;
@@ -1143,10 +1143,10 @@ WRITE32_HANDLER( newport_rex3_w )
 			break;
 		}
 		nREX3_DrawMode1 = data;
-//		if( offset >= ( 0x800 / 4 ) )
-//		{
-//			DoREX3Command();
-//		}
+//      if( offset >= ( 0x800 / 4 ) )
+//      {
+//          DoREX3Command();
+//      }
 		break;
 	case 0x0004/4:
 		verboselog(machine, 2, "REX3 Draw Mode 0 Write: %08x\n", data );
@@ -1563,12 +1563,12 @@ WRITE32_HANDLER( newport_rex3_w )
 		}
 		verboselog(machine, 2, "    DCB Reg Select Adr: %d\n", ( data & 0x00000070 ) >> 4 );
 		verboselog(machine, 2, "     DCB Slave Address: %d\n", ( data & 0x00000780 ) >> 7 );
-//		verboselog(machine, 2, "    Use Sync XFer ACK:  %d\n", ( data & 0x00000800 ) >> 11 );
-//		verboselog(machine, 2, "    Use Async XFer ACK: %d\n", ( data & 0x00001000 ) >> 12 );
-//		verboselog(machine, 2, "   GIO CLK Cycle Width: %d\n", ( data & 0x0003e000 ) >> 13 );
-//		verboselog(machine, 2, "    GIO CLK Cycle Hold: %d\n", ( data & 0x007c0000 ) >> 18 );
-//		verboselog(machine, 2, "   GIO CLK Cycle Setup: %d\n", ( data & 0x0f800000 ) >> 23 );
-//		verboselog(machine, 2, "    Swap Byte Ordering: %d\n", ( data & 0x10000000 ) >> 28 );
+//      verboselog(machine, 2, "    Use Sync XFer ACK:  %d\n", ( data & 0x00000800 ) >> 11 );
+//      verboselog(machine, 2, "    Use Async XFer ACK: %d\n", ( data & 0x00001000 ) >> 12 );
+//      verboselog(machine, 2, "   GIO CLK Cycle Width: %d\n", ( data & 0x0003e000 ) >> 13 );
+//      verboselog(machine, 2, "    GIO CLK Cycle Hold: %d\n", ( data & 0x007c0000 ) >> 18 );
+//      verboselog(machine, 2, "   GIO CLK Cycle Setup: %d\n", ( data & 0x0f800000 ) >> 23 );
+//      verboselog(machine, 2, "    Swap Byte Ordering: %d\n", ( data & 0x10000000 ) >> 28 );
 		nREX3_DCBRegSelect = ( data & 0x00000070 ) >> 4;
 		nREX3_DCBSlvSelect = ( data & 0x00000780 ) >> 7;
 		nREX3_DCBMode = data & 0x1fffffff;

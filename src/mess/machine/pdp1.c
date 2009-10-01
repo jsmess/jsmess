@@ -1,12 +1,12 @@
 /*
-	pdp1 machine code
+    pdp1 machine code
 
-	includes emulation for I/O devices (with the IOT opcode) and control panel functions
+    includes emulation for I/O devices (with the IOT opcode) and control panel functions
 
-	TODO:
-	* typewriter out should overwrite the typewriter buffer
-	* improve emulation of the internals of tape reader?
-	* improve puncher timing?
+    TODO:
+    * typewriter out should overwrite the typewriter buffer
+    * improve emulation of the internals of tape reader?
+    * improve puncher timing?
 */
 
 #include <stdio.h>
@@ -47,18 +47,18 @@ int *pdp1_memory;
 
 
 /*
-	devices which are known to generate a completion pulse (source: maintainance manual 9-??,
-	and 9-20, 9-21):
-	emulated:
-	* perforated tape reader
-	* perforated tape punch
-	* typewriter output
-	* CRT display
-	unemulated:
-	* card punch (pac: 43)
-	* line printer (lpr, lsp, but NOT lfb)
+    devices which are known to generate a completion pulse (source: maintainance manual 9-??,
+    and 9-20, 9-21):
+    emulated:
+    * perforated tape reader
+    * perforated tape punch
+    * typewriter output
+    * CRT display
+    unemulated:
+    * card punch (pac: 43)
+    * line printer (lpr, lsp, but NOT lfb)
 
-	This list should probably include additional optional devices (card reader comes to mind).
+    This list should probably include additional optional devices (card reader comes to mind).
 */
 
 /* IO status word */
@@ -181,15 +181,15 @@ MACHINE_RESET( pdp1 )
 static void pdp1_machine_stop(running_machine *machine)
 {
 	/* the core will take care of freeing the timers, BUT we must set the variables
-	to NULL if we don't want to risk confusing the tape image init function */
+    to NULL if we don't want to risk confusing the tape image init function */
 	tape_reader.timer = tape_puncher.timer = typewriter.tyo_timer = dpy_timer = NULL;
 }
 
 
 /*
-	driver init function
+    driver init function
 
-	Set up the pdp1_memory pointer, and generate font data.
+    Set up the pdp1_memory pointer, and generate font data.
 */
 MACHINE_START( pdp1 )
 {
@@ -348,7 +348,7 @@ WRITE18_HANDLER(pdp1_write_mem)
 
 
 /*
-	perforated tape handling
+    perforated tape handling
 */
 
 void pdp1_get_open_mode(int id, unsigned int *readable, unsigned int *writeable, unsigned int *creatable)
@@ -377,9 +377,9 @@ DEVICE_START( pdp1_tape )
 
 
 /*
-	Open a perforated tape image
+    Open a perforated tape image
 
-	unit 0 is reader (read-only), unit 1 is puncher (write-only)
+    unit 0 is reader (read-only), unit 1 is puncher (write-only)
 */
 DEVICE_IMAGE_LOAD( pdp1_tape )
 {
@@ -396,8 +396,8 @@ DEVICE_IMAGE_LOAD( pdp1_tape )
 
 		/* restart reader IO when necessary */
 		/* note that this function may be called before pdp1_init_machine, therefore
-		before tape_reader.timer is allocated.  It does not matter, as the clutch is never
-		down at power-up, but we must not call timer_enable with a NULL parameter! */
+        before tape_reader.timer is allocated.  It does not matter, as the clutch is never
+        down at power-up, but we must not call timer_enable with a NULL parameter! */
 		if (tape_reader.timer)
 		{
 			if (tape_reader.motor_on && tape_reader.rcl)
@@ -446,7 +446,7 @@ DEVICE_IMAGE_UNLOAD( pdp1_tape )
 }
 
 /*
-	Read a byte from perforated tape
+    Read a byte from perforated tape
 */
 static int tape_read(UINT8 *reply)
 {
@@ -457,7 +457,7 @@ static int tape_read(UINT8 *reply)
 }
 
 /*
-	Write a byte to perforated tape
+    Write a byte to perforated tape
 */
 static void tape_write(UINT8 data)
 {
@@ -466,7 +466,7 @@ static void tape_write(UINT8 data)
 }
 
 /*
-	common code for tape read commands (RPA, RPB, and read-in mode)
+    common code for tape read commands (RPA, RPB, and read-in mode)
 */
 static void begin_tape_read(int binary, int nac)
 {
@@ -494,7 +494,7 @@ static void begin_tape_read(int binary, int nac)
 }
 
 /*
-	timer callback to simulate reader IO
+    timer callback to simulate reader IO
 */
 static TIMER_CALLBACK(reader_callback)
 {
@@ -544,7 +544,7 @@ static TIMER_CALLBACK(reader_callback)
 }
 
 /*
-	timer callback to generate punch completion pulse
+    timer callback to generate punch completion pulse
 */
 static TIMER_CALLBACK(puncher_callback)
 {
@@ -557,7 +557,7 @@ static TIMER_CALLBACK(puncher_callback)
 }
 
 /*
-	Initiate read of a 18-bit word in binary format from tape (used in read-in mode)
+    Initiate read of a 18-bit word in binary format from tape (used in read-in mode)
 */
 void pdp1_tape_read_binary(const device_config *device)
 {
@@ -565,17 +565,17 @@ void pdp1_tape_read_binary(const device_config *device)
 }
 
 /*
-	perforated tape reader iot callbacks
+    perforated tape reader iot callbacks
 */
 
 /*
-	rpa iot callback
+    rpa iot callback
 
-	op2: iot command operation (equivalent to mb & 077)
-	nac: nead a completion pulse
-	mb: contents of the MB register
-	io: pointer on the IO register
-	ac: contents of the AC register
+    op2: iot command operation (equivalent to mb & 077)
+    nac: nead a completion pulse
+    mb: contents of the MB register
+    io: pointer on the IO register
+    ac: contents of the AC register
 */
 /*
  * Read Perforated Tape, Alphanumeric
@@ -600,7 +600,7 @@ void iot_rpa(const device_config *device, int op2, int nac, int mb, int *io, int
 }
 
 /*
-	rpb iot callback
+    rpb iot callback
 */
 /*
  * Read Perforated Tape, Binary rpb
@@ -637,7 +637,7 @@ void iot_rpb(const device_config *device, int op2, int nac, int mb, int *io, int
 }
 
 /*
-	rrb iot callback
+    rrb iot callback
 */
 void iot_rrb(const device_config *device, int op2, int nac, int mb, int *io, int ac)
 {
@@ -649,11 +649,11 @@ void iot_rrb(const device_config *device, int op2, int nac, int mb, int *io, int
 }
 
 /*
-	perforated tape punch iot callbacks
+    perforated tape punch iot callbacks
 */
 
 /*
-	ppa iot callback
+    ppa iot callback
 */
 /*
  * Punch Perforated Tape, Alphanumeric
@@ -680,7 +680,7 @@ void iot_ppa(const device_config *device, int op2, int nac, int mb, int *io, int
 }
 
 /*
-	ppb iot callback
+    ppb iot callback
 */
 /*
  * Punch Perforated Tape, Binary
@@ -708,14 +708,14 @@ void iot_ppb(const device_config *device, int op2, int nac, int mb, int *io, int
 
 
 /*
-	Typewriter handling
+    Typewriter handling
 
-	The alphanumeric on-line typewriter is a standard device on pdp-1: it
-	can both handle keyboard input and print output text.
+    The alphanumeric on-line typewriter is a standard device on pdp-1: it
+    can both handle keyboard input and print output text.
 */
 
 /*
-	Open a file for typewriter output
+    Open a file for typewriter output
 */
 DEVICE_IMAGE_LOAD(pdp1_typewriter)
 {
@@ -733,7 +733,7 @@ DEVICE_IMAGE_UNLOAD(pdp1_typewriter)
 }
 
 /*
-	Write a character to typewriter
+    Write a character to typewriter
 */
 static void typewriter_out(running_machine *machine, UINT8 data)
 {
@@ -841,7 +841,7 @@ static void typewriter_out(running_machine *machine, UINT8 data)
 }
 
 /*
-	timer callback to generate typewriter completion pulse
+    timer callback to generate typewriter completion pulse
 */
 static TIMER_CALLBACK(tyo_callback)
 {
@@ -854,7 +854,7 @@ static TIMER_CALLBACK(tyo_callback)
 }
 
 /*
-	tyo iot callback
+    tyo iot callback
 */
 void iot_tyo(const device_config *device, int op2, int nac, int mb, int *io, int ac)
 {
@@ -896,7 +896,7 @@ void iot_tyo(const device_config *device, int op2, int nac, int mb, int *io, int
 }
 
 /*
-	tyi iot callback
+    tyi iot callback
 */
 /* When a typewriter key is struck, the code for the struck key is placed in the
  * typewriter buffer, Program Flag 1 is set, and the type-in status bit is set to
@@ -961,7 +961,7 @@ void iot_tyi(const device_config *device, int op2, int nac, int mb, int *io, int
 
 
 /*
-	timer callback to generate crt completion pulse
+    timer callback to generate crt completion pulse
 */
 static TIMER_CALLBACK(dpy_callback)
 {
@@ -970,9 +970,9 @@ static TIMER_CALLBACK(dpy_callback)
 
 
 /*
-	dpy iot callback
+    dpy iot callback
 
-	Light on one pixel on CRT
+    Light on one pixel on CRT
 */
 void iot_dpy(const device_config *device, int op2, int nac, int mb, int *io, int ac)
 {
@@ -1000,7 +1000,7 @@ void iot_dpy(const device_config *device, int op2, int nac, int mb, int *io, int
 		if (LOG_IOT_OVERLAP)
 		{
 			/* note that overlap detection is incomplete: it will only work if both DPY
-			instructions require a completion pulse */
+            instructions require a completion pulse */
 			if (timer_enable(dpy_timer, 0))
 				logerror("Error: overlapped DPY instruction: mb=0%06o, (%s)\n", (unsigned) mb, cpuexec_describe_context(device->machine));
 		}
@@ -1011,7 +1011,7 @@ void iot_dpy(const device_config *device, int op2, int nac, int mb, int *io, int
 
 
 /*
-	MIT parallel drum (variant of type 23)
+    MIT parallel drum (variant of type 23)
 */
 
 static void parallel_drum_set_il(int il)
@@ -1047,7 +1047,7 @@ static void parallel_drum_init(void)
 #endif
 
 /*
-	Open a file for drum
+    Open a file for drum
 */
 DEVICE_IMAGE_LOAD(pdp1_drum)
 {
@@ -1079,7 +1079,7 @@ void iot_dba(const device_config *device, int op2, int nac, int mb, int *io, int
 }
 
 /*
-	Read a word from drum
+    Read a word from drum
 */
 static UINT32 drum_read(int field, int position)
 {
@@ -1093,7 +1093,7 @@ static UINT32 drum_read(int field, int position)
 }
 
 /*
-	Write a word to drum
+    Write a word to drum
 */
 static void drum_write(int field, int position, UINT32 data)
 {
@@ -1162,15 +1162,15 @@ void iot_dra(const device_config *device, int op2, int nac, int mb, int *io, int
 
 
 /*
-	iot 11 callback
+    iot 11 callback
 
-	Read state of Spacewar! controllers
+    Read state of Spacewar! controllers
 
-	Not documented, except a few comments in the Spacewar! source code:
-		it should leave the control word in the io as follows.
-		high order 4 bits, rotate ccw, rotate cw, (both mean hyperspace)
-		fire rocket, and fire torpedo. low order 4 bits, same for
-		other ship. routine is entered by jsp cwg.
+    Not documented, except a few comments in the Spacewar! source code:
+        it should leave the control word in the io as follows.
+        high order 4 bits, rotate ccw, rotate cw, (both mean hyperspace)
+        fire rocket, and fire torpedo. low order 4 bits, same for
+        other ship. routine is entered by jsp cwg.
 */
 void iot_011(const device_config *device, int op2, int nac, int mb, int *io, int ac)
 {
@@ -1207,9 +1207,9 @@ void iot_011(const device_config *device, int op2, int nac, int mb, int *io, int
 
 
 /*
-	cks iot callback
+    cks iot callback
 
-	check IO status
+    check IO status
 */
 void iot_cks(const device_config *device, int op2, int nac, int mb, int *io, int ac)
 {
@@ -1221,9 +1221,9 @@ void iot_cks(const device_config *device, int op2, int nac, int mb, int *io, int
 
 
 /*
-	callback which is called when Start Clear is pulsed
+    callback which is called when Start Clear is pulsed
 
-	IO devices should reset
+    IO devices should reset
 */
 void pdp1_io_sc_callback(const device_config *device)
 {
@@ -1245,7 +1245,7 @@ void pdp1_io_sc_callback(const device_config *device)
 
 
 /*
-	typewriter keyboard handler
+    typewriter keyboard handler
 */
 static void pdp1_keyboard(running_machine *machine)
 {
@@ -1340,7 +1340,7 @@ static void pdp1_lightpen(running_machine *machine)
 }
 
 /*
-	Not a real interrupt - just handle keyboard input
+    Not a real interrupt - just handle keyboard input
 */
 INTERRUPT_GEN( pdp1_interrupt )
 {
@@ -1394,8 +1394,8 @@ INTERRUPT_GEN( pdp1_interrupt )
 		{
 			cpu_set_reg(device, PDP1_RUN, 0);
 			cpu_set_reg(device, PDP1_RIM, 0);	/* bug : we stop after reading an even-numbered word
-											(i.e. data), whereas a real pdp-1 stops after reading
-											an odd-numbered word (i.e. dio instruciton) */
+                                            (i.e. data), whereas a real pdp-1 stops after reading
+                                            an odd-numbered word (i.e. dio instruciton) */
 		}
 		if (control_transitions & pdp1_continue)
 		{

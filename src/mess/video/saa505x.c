@@ -1,58 +1,58 @@
 /************************************************************************
 SAA505X Teletext
 
-Variant		Character set
-5050		English
-5051		German
-5052		Swedish
-5053		Italian
-5054		Belgian
-5055		US ASCII
-5056		Hebrew
-5057		Cyrillic
+Variant     Character set
+5050        English
+5051        German
+5052        Swedish
+5053        Italian
+5054        Belgian
+5055        US ASCII
+5056        Hebrew
+5057        Cyrillic
 
 Pins
-1	Vss				ground
-18	Vdd				positive supply
-17	NC				not connected
+1   Vss             ground
+18  Vdd             positive supply
+17  NC              not connected
 
 Data In
 --------
-4-10	D1 to D7	in		character data inputs
+4-10    D1 to D7    in      character data inputs
 
-16	~TLC		out		transmitted large character
+16  ~TLC        out     transmitted large character
 
 Colour Our
 ----------
-21	Y		out		monochrome video output
-22	Blue		out		blue video output
-23	Green		out		green video output
-24	Red		out		red video output
-25	BLAN		out		blanking output
+21  Y       out     monochrome video output
+22  Blue        out     blue video output
+23  Green       out     green video output
+24  Red     out     red video output
+25  BLAN        out     blanking output
 
 Display Control
 ---------------
-27	PO		in		picture on in[ut
-28	DE		in		display enable input
+27  PO      in      picture on in[ut
+28  DE      in      display enable input
 
 Remote Control Data Decoder and Store
 -------------------------------------
-2	~SI   		in/out		superimposer
-3	~DATA		in		remote control data
-11	DLIM		in		remote control data clock
-12	~GLR		in		general line reset
+2   ~SI         in/out      superimposer
+3   ~DATA       in      remote control data
+11  DLIM        in      remote control data clock
+12  ~GLR        in      general line reset
 
 Timing Generator/Flash Counter
 ------------------------------
-13	DEW		in		data entry window
-19	TR6		in		6MHz input
-20	F1		in		1MHz input
-26	LOSE		in		load output shift register enable
+13  DEW     in      data entry window
+19  TR6     in      6MHz input
+20  F1      in      1MHz input
+26  LOSE        in      load output shift register enable
 
 Character Rounding
 ------------------
-14	CRS		in		character rounding select
-15	~BCS		in		big character select
+14  CRS     in      character rounding select
+15  ~BCS        in      big character select
 
 
 
@@ -1810,7 +1810,7 @@ static const char teletext_graphics[96*60]={
   0,0,0,0,0,0,
   0,0,0,0,0,0,
   0,0,0,0,0,0
-, // 0x5c '½'
+, // 0x5c '?'
   0,0,0,0,0,0,
   0,1,0,0,0,0,
   0,1,0,0,0,0,
@@ -3463,7 +3463,7 @@ void teletext_F1(running_machine *machine)
 			tt_flash=0;
 			break;
 
-		// 0x0a		End Box    NOT USED
+		// 0x0a     End Box    NOT USED
 		// 0x0b     Start Box  NOT USED
 
 		case 0x0c:	// Normal Height
@@ -3476,9 +3476,9 @@ void teletext_F1(running_machine *machine)
 			tt_start_line=tt_double_height_offset;
 			break;
 
-		// 0x0e		S0         NOT USED
-		// 0x0f		S1         NOT USED
-		// 0x10		DLE        NOT USED
+		// 0x0e     S0         NOT USED
+		// 0x0f     S1         NOT USED
+		// 0x10     DLE        NOT USED
 
 		case 0x11: case 0x12: case 0x13: case 0x14:
 		case 0x15: case 0x16: case 0x17:
@@ -3486,7 +3486,7 @@ void teletext_F1(running_machine *machine)
 			tt_colour=code&0x07;
 			break;
 
-		// 0x18		Conceal Display
+		// 0x18     Conceal Display
 
 		case 0x19:	//  Contiguois Graphics
 			tt_graphics=teletext_graphics;
@@ -3499,7 +3499,7 @@ void teletext_F1(running_machine *machine)
 				tt_lookup=tt_graphics;
 			break;
 
-		// 0x1b		ESC        NOT USED
+		// 0x1b     ESC        NOT USED
 
 		case 0x1c:  //  Black Background
 			tt_bgcolour=0;

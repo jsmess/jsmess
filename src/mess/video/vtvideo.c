@@ -20,7 +20,7 @@
 #define	VERBOSE			0
 
 #define	LOG(x)		do { if (VERBOSE) logerror x; } while (0)
-	
+
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
@@ -33,9 +33,9 @@ struct _vt_video_t
 
 	const device_config *screen;	/* screen */
 	UINT8 *gfx;		/* content of char rom */
-	    
+
     int lba7;
-    
+
     // dc012 attributes
     UINT8 scroll_latch;
     UINT8 blink_flip_flop;
@@ -44,7 +44,7 @@ struct _vt_video_t
     // dc011 attributes
     UINT8 columns;
     UINT8 height;
-    UINT8 skip_lines;	
+    UINT8 skip_lines;
     UINT8 frequency;
     UINT8 interlaced;
 };
@@ -64,7 +64,7 @@ INLINE vt_video_t *get_safe_token(const device_config *device)
 INLINE const vt_video_interface *get_interface(const device_config *device)
 {
 	assert(device != NULL);
-//	assert((device->type == dc012));
+//  assert((device->type == dc012));
 	return (const vt_video_interface *) device->static_config;
 }
 
@@ -81,7 +81,7 @@ READ8_DEVICE_HANDLER( lba7_r )
 WRITE8_DEVICE_HANDLER( dc012_w )
 {
 	vt_video_t *vt = get_safe_token(device);
-	    
+
     if ((data & 0x08)==0) {
 		if ((data & 0x04)==0) {
 			// set lower part scroll
@@ -103,7 +103,7 @@ WRITE8_DEVICE_HANDLER( dc012_w )
 			case 0x0A:
 				// set reverse field on
 				vt->reverse_field = 1;
-				break;				
+				break;
 			case 0x0B:
 				// set reverse field off
 				vt->reverse_field = 0;
@@ -146,7 +146,7 @@ WRITE8_DEVICE_HANDLER( dc011_w )
 			vt->frequency = 50;
 			vt->skip_lines = 5;
 		}
-		vt->interlaced = 0;		
+		vt->interlaced = 0;
 	}
 }
 
@@ -155,9 +155,9 @@ WRITE8_DEVICE_HANDLER( vt_video_brightness_w )
 	//palette_set_color_rgb(device->machine, 1, data, data, data);
 }
 
-static void vt_video_display_char(const device_config *device,bitmap_t *bitmap, UINT8 code, 
-	int x, int y,UINT8 scroll_region,UINT8 display_type) 
-{					
+static void vt_video_display_char(const device_config *device,bitmap_t *bitmap, UINT8 code,
+	int x, int y,UINT8 scroll_region,UINT8 display_type)
+{
 	UINT8 line=0;
    	int i,b,bit=0,j;
  	int double_width = (display_type==2) ? 1 : 0;
@@ -165,27 +165,27 @@ static void vt_video_display_char(const device_config *device,bitmap_t *bitmap, 
 
 	for (i = 0; i < 10; i++)
 	{
-		
+
 		switch(display_type) {
 			case 0 : // bottom half, double height
 					 j = (i >> 1)+5; break;
 			case 1 : // top half, double height
 				 	 j = (i >> 1); break;
-			case 2 : // double width				
+			case 2 : // double width
 			case 3 : // normal
 					 j = i;	break;
 			default : j = 0; break;
 		}
 		// modify line since that is how it is stored in rom
 		if (j==0) j=15; else j=j-1;
-		
+
 		line = vt->gfx[(code & 0x7f)*16 + j];
 		if (vt->basic_attribute==1) {
 			if ((code & 0x80)==0x80) {
 				line = line ^ 0xff;
-			}	
-		} 
-		
+			}
+		}
+
 		for (b = 0; b < 8; b++)
 		{
 			bit = ((line << b) & 0x80) ? 1 : 0;
@@ -222,9 +222,9 @@ void vt_video_update(const device_config *device, bitmap_t *bitmap, const rectan
     UINT8 scroll_region = 1; // binary 1
     UINT8 display_type = 3;  // binary 11
     UINT16 temp =0;
-    
+
 	if (devcb_call_read8(&vt->in_ram_func, 0) !=0x7f) return;
-		
+
     while(line < (vt->height + vt->skip_lines)) {
 	    code =  devcb_call_read8(&vt->in_ram_func, addr + xpos);
 	    if (code == 0x7f) {
@@ -234,8 +234,8 @@ void vt_video_update(const device_config *device, bitmap_t *bitmap, const rectan
 				{
 					vt_video_display_char(device,bitmap,code,x,ypos,scroll_region,display_type);
 				}
-	    	}    
-	    	// move to new data	
+	    	}
+	    	// move to new data
 	    	temp = devcb_call_read8(&vt->in_ram_func, addr+xpos+1)*256 + devcb_call_read8(&vt->in_ram_func, addr+xpos+2);
 	    	addr = (temp) & 0x1fff;
 	    	// if A12 is 1 then it is 0x2000 block, if 0 then 0x4000 (AVO)
@@ -246,20 +246,20 @@ void vt_video_update(const device_config *device, bitmap_t *bitmap, const rectan
 	    		ypos++;
 	    	}
 	    	xpos=0;
-	    	line++;    	    	
+	    	line++;
 	    } else {
 	    	// display regular char
 	    	if (line >= vt->skip_lines) {
 				vt_video_display_char(device,bitmap,code,xpos,ypos,scroll_region,display_type);
-			}    				
+			}
 			xpos++;
 			if (xpos > vt->columns) {
-				line++;				
+				line++;
 				xpos=0;
 			}
 	    }
 	}
-	
+
 }
 
 /*-------------------------------------------------
@@ -273,15 +273,15 @@ static DEVICE_START( vt_video )
 
 	/* resolve callbacks */
 	devcb_resolve_read8(&vt->in_ram_func, &intf->in_ram_func, device);
-	devcb_resolve_write8(&vt->clear_video_interrupt, &intf->clear_video_interrupt, device);	
+	devcb_resolve_write8(&vt->clear_video_interrupt, &intf->clear_video_interrupt, device);
 
 	/* get the screen device */
 	vt->screen = devtag_get_device(device->machine, intf->screen_tag);
 	assert(vt->screen != NULL);
-	
+
   	vt->gfx = memory_region(device->machine, intf->char_rom_region_tag);
 	assert(vt->gfx != NULL);
-	
+
 }
 
 static TIMER_CALLBACK(lba7_change)
@@ -315,7 +315,7 @@ static DEVICE_RESET( vt_video )
     vt->interlaced = 1;
 	vt->skip_lines = 2; // for 60Hz
     // LBA7 is scan line frequency update
-	timer_pulse(device->machine, ATTOTIME_IN_NSEC(31778), (void *) device, 0, lba7_change);	
+	timer_pulse(device->machine, ATTOTIME_IN_NSEC(31778), (void *) device, 0, lba7_change);
 }
 
 /*-------------------------------------------------

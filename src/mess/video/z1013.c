@@ -21,7 +21,7 @@ VIDEO_UPDATE( z1013 )
  	UINT8 code, line;
 	int y, x, b,i;
 	UINT8 *gfx = memory_region(screen->machine, "gfx1");
-	
+
 	for(y = 0; y < 32; y++ )
 	{
 		for(x = 0; x < 32; x++ )

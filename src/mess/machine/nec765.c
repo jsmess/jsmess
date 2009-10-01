@@ -1,22 +1,22 @@
 /***************************************************************************
 
-	machine/nec765.c
+    machine/nec765.c
 
-	Functions to emulate a NEC765/Intel 8272 compatible floppy disk controller
+    Functions to emulate a NEC765/Intel 8272 compatible floppy disk controller
 
-	Code by Kevin Thacker.
+    Code by Kevin Thacker.
 
-	TODO:
+    TODO:
 
     - overrun condition
-	- Scan Commands
-	- crc error in id field and crc error in data field errors
-	- disc not present, and no sectors on track for data, deleted data, write, write deleted,
-		read a track etc
+    - Scan Commands
+    - crc error in id field and crc error in data field errors
+    - disc not present, and no sectors on track for data, deleted data, write, write deleted,
+        read a track etc
         - end of cylinder condition - almost working, needs fixing  with
                 PCW and PC drivers
-	- resolve "ready" state stuff (ready state when reset for PC, ready state change while processing command AND
-	while idle)
+    - resolve "ready" state stuff (ready state when reset for PC, ready state change while processing command AND
+    while idle)
 
 ***************************************************************************/
 
@@ -118,12 +118,12 @@ struct _nec765_t
 
 	unsigned int	ncn;
 
-//	unsigned int    nec765_id_index;
+//  unsigned int    nec765_id_index;
 	char *execution_phase_data;
 	unsigned int	nec765_flags;
 
-//	unsigned char specify[2];
-//	unsigned char perpendicular_mode[1];
+//  unsigned char specify[2];
+//  unsigned char perpendicular_mode[1];
 
 	int command;
 
@@ -168,7 +168,7 @@ static const device_config *current_image(const device_config *device)
 	if (!fdc->intf->get_image)
 	{
 		if (fdc->intf->floppy_drive_tags[fdc->drive]!=NULL) {
-			image = devtag_get_device(device->machine,fdc->intf->floppy_drive_tags[fdc->drive]);			
+			image = devtag_get_device(device->machine,fdc->intf->floppy_drive_tags[fdc->drive]);
 		}
 	}
 	else
@@ -233,38 +233,38 @@ static void nec765_seek_complete(const device_config *device)
 
 	/* if a seek is done without drive connected: */
 	/*  abnormal termination of command,
-		seek complete,
-		not ready
-	*/
+        seek complete,
+        not ready
+    */
 
 	/* if a seek is done with drive connected, but disc missing: */
 	/* abnormal termination of command,
-		seek complete,
-		not ready */
+        seek complete,
+        not ready */
 
 	/* if a seek is done with drive connected and disc in drive */
 	/* seek complete */
 
 
 	/* On the PC however, it appears that recalibrates and seeks can be performed without
-	a disc in the drive. */
+    a disc in the drive. */
 
 	/* Therefore, the above output is dependant on the state of the drive */
 
 	/* In the Amstrad CPC, the drive select is provided by the NEC765. A single port is also
-	assigned for setting the drive motor state. The motor state controls the motor of the selected
-	drive */
+    assigned for setting the drive motor state. The motor state controls the motor of the selected
+    drive */
 
 	/* On the PC the drive can be selected with the DIGITAL OUTPUT REGISTER, and the motor of each
-	of the 4 possible drives is also settable using the same register */
+    of the 4 possible drives is also settable using the same register */
 
 	/* Assumption for PC: (NOT TESTED - NEEDS VERIFICATION) */
 
 	/* If a seek is done without drive connected: */
 	/* abnormal termination of command,
-		seek complete,
-		fault
-		*/
+        seek complete,
+        fault
+        */
 
 	/* if a seek is done with drive connected, but disc missing: */
 	/* seek complete */
@@ -273,14 +273,14 @@ static void nec765_seek_complete(const device_config *device)
 	/* seek complete */
 
 	/* On Amstrad CPC:
-		If drive not connected, or drive connected but disc not in drive, not ready!
-		If drive connected and drive motor on, ready!
-	   On PC:
-	    Drive is always ready!
+        If drive not connected, or drive connected but disc not in drive, not ready!
+        If drive connected and drive motor on, ready!
+       On PC:
+        Drive is always ready!
 
-		In 37c78 docs, the ready bits of the nec765 are marked as unused.
-		This indicates it is always ready!!!!!
-	*/
+        In 37c78 docs, the ready bits of the nec765 are marked as unused.
+        This indicates it is always ready!!!!!
+    */
 
 	const device_config *img = current_image(device);
 	nec765_t *fdc = get_safe_token(device);
@@ -328,12 +328,12 @@ static void nec765_seek_complete(const device_config *device)
 
 	/* set drive and side */
 	fdc->nec765_status[0] |= fdc->drive | (fdc->side<<2);
-	
+
 	nec765_set_int(device,0);
 	nec765_set_int(device,1);
 
 	fdc->nec765_flags &= ~NEC765_SEEK_ACTIVE;
-	
+
 	nec765_idle(device);
 }
 
@@ -406,7 +406,7 @@ static void nec765_timer_func(const device_config *device, int timer_type)
 	else if (fdc->timer_type == 4)
 	{
 		/* if in dma mode, a int is not generated per byte. If not in  DMA mode
-		a int is generated per byte */
+        a int is generated per byte */
 		if (fdc->nec765_flags & NEC765_DMA_MODE)
 		{
 			nec765_set_dma_drq(device,1);
@@ -510,7 +510,7 @@ static void nec765_seek_setup(const device_config *device, int is_recalibrate)
 			)
 		{
 			/* seek completed */
-//			nec765_seek_complete(device);
+//          nec765_seek_complete(device);
 			// delay for the time of 1 step, the PCW does not like immediate recalibrates
 			nec765_setup_timed_int(device,1);
 		}
@@ -711,7 +711,7 @@ is not ready.
 with error */
 static void nec765_set_ready_change_callback(const device_config *controller, const device_config *img, int state)
 {
-	nec765_t *fdc = get_safe_token(controller);	
+	nec765_t *fdc = get_safe_token(controller);
 	int drive = floppy_get_drive(img);
 
 	logerror("nec765: ready state change\n");
@@ -826,7 +826,7 @@ static int nec765_read_skip_sector(const device_config *device)
 
   - get next sector id from disc
   - if sector id matches id specified in command, it will
-	search for next data block and read data from it.
+    search for next data block and read data from it.
 
   - if the index is seen twice while it is searching for a sector, then the sector cannot be found
 */
@@ -864,7 +864,7 @@ static int nec765_get_matching_sector(const device_config *device)
 		nec765_get_next_id(device, &id);
 
 		/* tested on Amstrad CPC - All bytes must match, otherwise
-		a NO DATA error is reported */
+        a NO DATA error is reported */
 		if (id.R == fdc->nec765_command_bytes[4])
 		{
 			if (id.C == fdc->nec765_command_bytes[2])
@@ -874,10 +874,10 @@ static int nec765_get_matching_sector(const device_config *device)
 					if (id.N == fdc->nec765_command_bytes[5])
 					{
 						/* end of cylinder is set if:
-						1. sector data is read completely (i.e. no other errors occur like
-						no data.
-						2. sector being read is same specified by EOT
-						3. terminal count is not received */
+                        1. sector data is read completely (i.e. no other errors occur like
+                        no data.
+                        2. sector being read is same specified by EOT
+                        3. terminal count is not received */
 						if (fdc->nec765_command_bytes[4]==fdc->nec765_command_bytes[6])
 						{
 							/* set end of cylinder */
@@ -891,7 +891,7 @@ static int nec765_get_matching_sector(const device_config *device)
 			else
 			{
 				/* the specified sector ID was found, however, the C value specified
-				in the read/write command did not match the C value read from the disc */
+                in the read/write command did not match the C value read from the disc */
 
 				/* no data - checked on Amstrad CPC */
 				fdc->nec765_status[1] |= NEC765_ST1_NO_DATA;
@@ -901,7 +901,7 @@ static int nec765_get_matching_sector(const device_config *device)
 				if (id.C == 0x0ff)
 				{
 					/* the C value is 0x0ff which indicates a bad track in the IBM soft-sectored
-					format */
+                    format */
 					fdc->nec765_status[2] |= NEC765_ST2_BAD_CYLINDER;
 				}
 
@@ -938,10 +938,10 @@ static void nec765_read_complete(const device_config *device)
 	/* completed read command */
 
 	/* end of cylinder is set when:
-		- a whole sector has been read
-		- terminal count input is not set
-		- AND the the sector specified by EOT was read
-		*/
+        - a whole sector has been read
+        - terminal count input is not set
+        - AND the the sector specified by EOT was read
+        */
 
 	/* if end of cylinder is set, and we did receive a terminal count, then clear it */
 	if ((fdc->nec765_flags & NEC765_TC)!=0)
@@ -1131,10 +1131,10 @@ static void nec765_write_complete(const device_config *device)
 	/* completed read command */
 
 	/* end of cylinder is set when:
-	 - a whole sector has been read
-	 - terminal count input is not set
-	 - AND the the sector specified by EOT was read
-	 */
+     - a whole sector has been read
+     - terminal count input is not set
+     - AND the the sector specified by EOT was read
+     */
 
 	/* if end of cylinder is set, and we did receive a terminal count, then clear it */
 	if ((fdc->nec765_flags & NEC765_TC)!=0)
@@ -1221,16 +1221,16 @@ static int nec765_sector_count_complete(const device_config *device)
 	if (fdc->nec765_command_bytes[0] & 0x080)
 	{
 		/* it appears that in multi-track mode,
-		the EOT parameter of the command is ignored!? -
-		or is it ignored the first time and not the next, so that
-		if it is started on side 0, it will end at EOT on side 1,
-		but if started on side 1 it will end at end of track????
+        the EOT parameter of the command is ignored!? -
+        or is it ignored the first time and not the next, so that
+        if it is started on side 0, it will end at EOT on side 1,
+        but if started on side 1 it will end at end of track????
 
-		PC driver requires this to end at last sector on side 1, and
-		ignore EOT parameter.
+        PC driver requires this to end at last sector on side 1, and
+        ignore EOT parameter.
 
-		To be checked!!!!
-		*/
+        To be checked!!!!
+        */
 
 		/* if just read last sector and on side 1 - finish */
 		if ((nec765_just_read_last_sector_on_track(device)) &&
@@ -1267,53 +1267,53 @@ static int nec765_sector_count_complete(const device_config *device)
 
 	/* Multi-Track operation:
 
-	Verified on Amstrad CPC.
+    Verified on Amstrad CPC.
 
-		disc format used:
-			9 sectors per track
-			2 sides
-			Sector IDs: &01, &02, &03, &04, &05, &06, &07, &08, &09
+        disc format used:
+            9 sectors per track
+            2 sides
+            Sector IDs: &01, &02, &03, &04, &05, &06, &07, &08, &09
 
-		Command specified:
-			SIDE = 0,
-			C = 0,H = 0,R = 1, N = 2, EOT = 1
-		Sectors read:
-			Sector 1 side 0
-			Sector 1 side 1
+        Command specified:
+            SIDE = 0,
+            C = 0,H = 0,R = 1, N = 2, EOT = 1
+        Sectors read:
+            Sector 1 side 0
+            Sector 1 side 1
 
-		Command specified:
-			SIDE = 0,
-			C = 0,H = 0,R = 1, N = 2, EOT = 3
-		Sectors read:
-			Sector 1 side 0
-			Sector 2 side 0
-			Sector 3 side 0
-			Sector 1 side 1
-			Sector 2 side 1
-			Sector 3 side 1
+        Command specified:
+            SIDE = 0,
+            C = 0,H = 0,R = 1, N = 2, EOT = 3
+        Sectors read:
+            Sector 1 side 0
+            Sector 2 side 0
+            Sector 3 side 0
+            Sector 1 side 1
+            Sector 2 side 1
+            Sector 3 side 1
 
 
-		Command specified:
-			SIDE = 0,
-			C = 0, H = 0, R = 7, N = 2, EOT = 3
-		Sectors read:
-			Sector 7 side 0
-			Sector 8 side 0
-			Sector 9 side 0
-			Sector 10 not found. Error "No Data"
+        Command specified:
+            SIDE = 0,
+            C = 0, H = 0, R = 7, N = 2, EOT = 3
+        Sectors read:
+            Sector 7 side 0
+            Sector 8 side 0
+            Sector 9 side 0
+            Sector 10 not found. Error "No Data"
 
-		Command specified:
-			SIDE = 1,
-			C = 0, H = 1, R = 1, N = 2, EOT = 1
-		Sectors read:
-			Sector 1 side 1
+        Command specified:
+            SIDE = 1,
+            C = 0, H = 1, R = 1, N = 2, EOT = 1
+        Sectors read:
+            Sector 1 side 1
 
-		Command specified:
-			SIDE = 1,
-			C = 0, H = 1, R = 1, N = 2, EOT = 2
-		Sectors read:
-			Sector 1 side 1
-			Sector 1 side 2
+        Command specified:
+            SIDE = 1,
+            C = 0, H = 1, R = 1, N = 2, EOT = 2
+        Sectors read:
+            Sector 1 side 1
+            Sector 1 side 2
 
   */
 
@@ -1324,7 +1324,7 @@ static int nec765_sector_count_complete(const device_config *device)
 		if (fdc->nec765_command_bytes[0] & 0x080)
 		{
 			/* if we have reached EOT (fdc->nec765_command_bytes[6])
-			on side 1, then read is complete */
+            on side 1, then read is complete */
 			if (fdc->side==1)
 				return 1;
 
@@ -1674,7 +1674,7 @@ void nec765_update_state(const device_config *device)
 		if (fdc->nec765_flags & NEC765_SEEK_ACTIVE)
 		{
 			/* any command results in a invalid - I think that seek, recalibrate and
-			sense interrupt status may work*/
+            sense interrupt status may work*/
 			fdc->nec765_data_reg = 0;
 		}
 
@@ -1866,7 +1866,7 @@ static void nec765_setup_command(const device_config *device)
 		case 0x04:  /* sense drive status */
 			nec765_setup_drive_and_side(device);
 			img = current_image(device);
-			
+
 			fdc->nec765_status[3] = fdc->drive | (fdc->side<<2);
 
 			if (img)
@@ -1905,7 +1905,7 @@ static void nec765_setup_command(const device_config *device)
 		case 0x0a:      /* read id */
 			nec765_setup_drive_and_side(device);
 			img = current_image(device);
-			
+
 			fdc->nec765_status[0] = fdc->drive | (fdc->side<<2);
 			fdc->nec765_status[1] = 0;
 			fdc->nec765_status[2] = 0;
@@ -2197,13 +2197,13 @@ void nec765_reset(const device_config *device, int offset)
 		fdc->nec765_status[0] = 0x080 | 0x040;
 
 		/* for the purpose of pc-xt. If any of the drives have a disk inserted,
-		do not set not-ready - need to check with pc_fdc->c whether all drives
-		are checked or only the drive selected with the drive select bits?? */
+        do not set not-ready - need to check with pc_fdc->c whether all drives
+        are checked or only the drive selected with the drive select bits?? */
 
 		a_drive_is_ready = 0;
 		for (i = 0; i < 4; i++)
 		{
-			if (fdc->intf->floppy_drive_tags[i]!=NULL) {				
+			if (fdc->intf->floppy_drive_tags[i]!=NULL) {
 				if (image_exists(devtag_get_device(device->machine,fdc->intf->floppy_drive_tags[i]))) {
 					a_drive_is_ready = 1;
 					break;

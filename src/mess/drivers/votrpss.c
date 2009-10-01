@@ -19,7 +19,7 @@
 <kevtris> IOA6 = strobe (SC-01)
 <kevtris> IOA7 = vochord control, 0 = off, 1 = on
 <kevtris> IOB0-IOB7 = dip switches
-<kevtris> there ya go, complete IO port map 
+<kevtris> there ya go, complete IO port map
 <LordNLptp> cool :)
 <kevtris> I pinned the IO to the serial port from the 8251 but I don't think it's too useful
 <LordNLptp> eh, its useful
@@ -34,7 +34,7 @@
 <kevtris> 4MHz for the Z80
 <kevtris> 2MHz for the 8253 and '8910
 <kevtris> then the dividers also generate the system reset signals for the 8251
-<kevtris> and a periodic IRQ 
+<kevtris> and a periodic IRQ
 <LordNLptp> on the z80?
 <LordNLptp> ok how does that work?
 <kevtris> IRQ rate is umm

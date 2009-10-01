@@ -7,10 +7,10 @@
     c230048 - 5 is written, want 6
     c0d9d9e - where bad happens, from routine @ c0da260
 
-    c0d9d8e - R0 on return is the value to put in 
+    c0d9d8e - R0 on return is the value to put in
 
     cfffee0 - stack location when bad happens
-   
+
 */
 
 #include "driver.h"
@@ -22,7 +22,7 @@
 #include "naomi.h"
 #include "machine/gdrom.h"
 #include "devices/chd_cd.h"
-		       
+
 #define ATAPI_CYCLES_PER_SECTOR (5000)	// TBD for Dreamcast
 
 #define ATAPI_STAT_BSY	   0x80
@@ -99,7 +99,7 @@ static TIMER_CALLBACK( atapi_xfer_end )
 		ddtdata.destination = atapi_xferbase; 	// destination address
 		ddtdata.length = 2048/4;
 		ddtdata.size = 4;
-		ddtdata.buffer = sector_buffer;		
+		ddtdata.buffer = sector_buffer;
 		ddtdata.direction=1;	// 0 source to buffer, 1 buffer to destination
 		ddtdata.channel= -1;	// not used
 		ddtdata.mode= -1;		// copy from/to buffer
@@ -175,11 +175,11 @@ static READ32_HANDLER( atapi_r )
 				atapi_xfermod = 0;
 			}
 
-//			printf( "atapi_r: atapi_xferlen=%d\n", atapi_xferlen );
+//          printf( "atapi_r: atapi_xferlen=%d\n", atapi_xferlen );
 			if( atapi_xferlen != 0 )
 			{
 				atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ | ATAPI_STAT_SERVDSC;
-				gdrom_alt_status = ATAPI_STAT_DRQ | ATAPI_STAT_SERVDSC; 
+				gdrom_alt_status = ATAPI_STAT_DRQ | ATAPI_STAT_SERVDSC;
 				atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO;
 			}
 			else
@@ -264,7 +264,7 @@ static READ32_HANDLER( atapi_r )
 		mame_printf_debug("ATAPI: read reg %d = %x (PC=%x)\n", reg, data, cpu_get_pc(space->cpu));
 	}
 
-//	printf( "atapi_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
+//  printf( "atapi_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
 	return data;
 }
 
@@ -273,19 +273,19 @@ static WRITE32_HANDLER( atapi_w )
 	running_machine *machine = space->machine;
 	int reg;
 
-//	printf( "atapi_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
+//  printf( "atapi_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
 
 	if (mem_mask == 0x0000ffff)	// word-wide command write
 	{
-//		printf("atapi_w: data=%04x\n", data );
+//      printf("atapi_w: data=%04x\n", data );
 
-//		printf("ATAPI: packet write %04x\n", data);
+//      printf("ATAPI: packet write %04x\n", data);
 		atapi_data[atapi_data_ptr++] = data & 0xff;
 		atapi_data[atapi_data_ptr++] = data >> 8;
 
 		if (atapi_cdata_wait)
 		{
-//          		printf("ATAPI: waiting, ptr %d wait %d\n", atapi_data_ptr, atapi_cdata_wait);
+//                  printf("ATAPI: waiting, ptr %d wait %d\n", atapi_data_ptr, atapi_cdata_wait);
 			if (atapi_data_ptr == atapi_cdata_wait)
 			{
 				// send it to the device
@@ -303,7 +303,7 @@ static WRITE32_HANDLER( atapi_w )
 		{
 			int phase;
 
-//			printf("atapi_w: command %02x\n", atapi_data[0]&0xff );
+//          printf("atapi_w: command %02x\n", atapi_data[0]&0xff );
 
 			// reset data pointer for reading SCSI results
 			atapi_data_ptr = 0;
@@ -621,7 +621,7 @@ READ64_HANDLER( dc_mess_gdrom_r )
 		off=offset << 1;
 	}
 
-//	printf("gdrom_r: @ %x (off %x), mask %llx (PC %x)\n", offset, off, mem_mask, cpu_get_pc(space->cpu));
+//  printf("gdrom_r: @ %x (off %x), mask %llx (PC %x)\n", offset, off, mem_mask, cpu_get_pc(space->cpu));
 
 	if (offset == 3)
 	{
@@ -650,7 +650,7 @@ WRITE64_HANDLER( dc_mess_gdrom_w )
 		off=offset << 1;
 	}
 
-//	printf("GDROM: [%08x=%x]write %llx to %x, mask %llx (PC %x)\n", 0x5f7000+off*4, dat, data, offset, mem_mask, cpu_get_pc(space->cpu));
+//  printf("GDROM: [%08x=%x]write %llx to %x, mask %llx (PC %x)\n", 0x5f7000+off*4, dat, data, offset, mem_mask, cpu_get_pc(space->cpu));
 
 	if (off >= 0x20)
 	{

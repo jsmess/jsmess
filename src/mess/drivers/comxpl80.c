@@ -23,18 +23,18 @@ static WRITE8_HANDLER( pl80_port_a_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		Y motor phase A
-		1		Y motor phase B
-		2		Y motor phase C
-		3		Y motor phase D
-		4		ROM A12
-		5		ROM CE /PT5 CK
-		6		PT4 OE
-		7		SW & PE ENABLE
+        0       Y motor phase A
+        1       Y motor phase B
+        2       Y motor phase C
+        3       Y motor phase D
+        4       ROM A12
+        5       ROM CE /PT5 CK
+        6       PT4 OE
+        7       SW & PE ENABLE
 
-	*/
+    */
 
 	comxpl80_state *state = space->machine->driver_data;
 
@@ -54,7 +54,7 @@ static WRITE8_HANDLER( pl80_port_a_w )
 
 		state->plotter_data = memory_region(space->machine, "gfx2")[font_rom | state->font_addr];
 	}
-	
+
 	if (!BIT(data, 6))
 	{
 		// read data from Centronics bus
@@ -72,18 +72,18 @@ static WRITE8_HANDLER( pl80_port_b_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		Z motor phase A
-		1		Z motor phase B
-		2		Z motor phase C
-		3		Z motor phase D
-		4		ROM A8
-		5		ROM A9
-		6		ROM A10
-		7		ROM A11
+        0       Z motor phase A
+        1       Z motor phase B
+        2       Z motor phase C
+        3       Z motor phase D
+        4       ROM A8
+        5       ROM A9
+        6       ROM A10
+        7       ROM A11
 
-	*/
+    */
 
 	comxpl80_state *state = space->machine->driver_data;
 
@@ -96,18 +96,18 @@ static WRITE8_HANDLER( pl80_port_c_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		ROM A0 /X motor phase A
-		1		ROM A1 /X motor phase B
-		2		ROM A2 /X motor phase C
-		3		ROM A3 /X motor phase D
-		4		ROM A4 /ACK
-		5		ROM A5 /On-line LED
-		6		ROM A6
-		7		ROM A7
+        0       ROM A0 /X motor phase A
+        1       ROM A1 /X motor phase B
+        2       ROM A2 /X motor phase C
+        3       ROM A3 /X motor phase D
+        4       ROM A4 /ACK
+        5       ROM A5 /On-line LED
+        6       ROM A6
+        7       ROM A7
 
-	*/
+    */
 
 	comxpl80_state *state = space->machine->driver_data;
 
@@ -123,18 +123,18 @@ static READ8_HANDLER( pl80_port_d_r )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		D0 /ROM D0 /DOWN SW
-		1		D1 /ROM D1 /PEN-SEL SW
-		2		D2 /ROM D2 /UP SW
-		3		D3 /ROM D3 /CRSW
-		4		D4 /ROM D4 /ON LINE SW
-		5		D5 /ROM D5 /PE Sensor
-		6		D6 /ROM D6 /RIGHT SW
-		7		D7 /ROM D7 /LEFT SW
+        0       D0 /ROM D0 /DOWN SW
+        1       D1 /ROM D1 /PEN-SEL SW
+        2       D2 /ROM D2 /UP SW
+        3       D3 /ROM D3 /CRSW
+        4       D4 /ROM D4 /ON LINE SW
+        5       D5 /ROM D5 /PE Sensor
+        6       D6 /ROM D6 /RIGHT SW
+        7       D7 /ROM D7 /LEFT SW
 
-	*/
+    */
 
 	comxpl80_state *state = space->machine->driver_data;
 
@@ -145,16 +145,16 @@ static READ8_HANDLER( pl80_port_d_r )
 
 static ADDRESS_MAP_START( pl80_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
-/*	AM_RANGE(0x000, 0x000) AM_READWRITE(cx005_port_a_r, cx005_port_a_w)
-	AM_RANGE(0x001, 0x001) AM_READWRITE(cx005_port_b_r, cx005_port_b_w)
-	AM_RANGE(0x002, 0x002) AM_READWRITE(cx005_port_c_r, cx005_port_c_w)
-	AM_RANGE(0x003, 0x003) AM_READ(cx005_port_d_digital_r)
-	AM_RANGE(0x004, 0x004) AM_WRITE(cx005_port_a_ddr_w)
-	AM_RANGE(0x005, 0x005) AM_WRITE(cx005_port_b_ddr_w)
-	AM_RANGE(0x006, 0x006) AM_WRITE(cx005_port_c_ddr_w)
-	AM_RANGE(0x007, 0x007) AM_READ(cx005_port_d_analog_r)
-	AM_RANGE(0x008, 0x008) AM_READWRITE(cx005_timer_data_r, cx005_timer_data_w)
-	AM_RANGE(0x008, 0x008) AM_READWRITE(cx005_timer_ctrl_r, cx005_timer_ctrl_w)*/
+/*  AM_RANGE(0x000, 0x000) AM_READWRITE(cx005_port_a_r, cx005_port_a_w)
+    AM_RANGE(0x001, 0x001) AM_READWRITE(cx005_port_b_r, cx005_port_b_w)
+    AM_RANGE(0x002, 0x002) AM_READWRITE(cx005_port_c_r, cx005_port_c_w)
+    AM_RANGE(0x003, 0x003) AM_READ(cx005_port_d_digital_r)
+    AM_RANGE(0x004, 0x004) AM_WRITE(cx005_port_a_ddr_w)
+    AM_RANGE(0x005, 0x005) AM_WRITE(cx005_port_b_ddr_w)
+    AM_RANGE(0x006, 0x006) AM_WRITE(cx005_port_c_ddr_w)
+    AM_RANGE(0x007, 0x007) AM_READ(cx005_port_d_analog_r)
+    AM_RANGE(0x008, 0x008) AM_READWRITE(cx005_timer_data_r, cx005_timer_data_w)
+    AM_RANGE(0x008, 0x008) AM_READWRITE(cx005_timer_ctrl_r, cx005_timer_ctrl_w)*/
 	AM_RANGE(0x00a, 0x01f) AM_NOP // Not Used
 	AM_RANGE(0x020, 0x07f) AM_RAM // Internal RAM
 	AM_RANGE(0x080, 0xf7f) AM_ROM // Internal ROM
@@ -215,5 +215,5 @@ ROM_END
 
 /* System Drivers */
 
-//    YEAR  NAME		PARENT  COMPAT	MACHINE		INPUT     INIT	CONFIG	COMPANY							FULLNAME		FLAGS
+//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT     INIT  CONFIG  COMPANY                         FULLNAME        FLAGS
 COMP( 1987, comxpl80,	0,		0,		comxpl80,	comxpl80, 0, 	0,		"Comx World Operations Ltd",	"COMX PL-80",	GAME_NOT_WORKING | GAME_NO_SOUND )

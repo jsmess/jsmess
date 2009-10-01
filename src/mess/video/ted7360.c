@@ -1,7 +1,7 @@
 /***************************************************************************
 
-	TExt Display 7360
-	PeT mess@utanet.at
+    TExt Display 7360
+    PeT mess@utanet.at
 
 ***************************************************************************/
 /*
@@ -547,7 +547,7 @@ void ted7360_set_dma (read8_space_func dma_read,
 static void ted7360_set_interrupt (running_machine *machine, int mask)
 {
 	/* kernel itself polls for timer 2 shot (interrupt disabled!)
-	 * when cassette loading */
+     * when cassette loading */
 	ted7360[9] |= mask;
 	if ((ted7360[0xa] & ted7360[9] & 0x5e))
 	{

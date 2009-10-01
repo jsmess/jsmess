@@ -34,7 +34,7 @@ typedef struct {
 	UINT8 serin_chksum;
 	int  serin_delay;
 }	ATARI_FDC;
- 
+
 static ATARI_FDC atari_fdc;
 
 typedef struct _atari_drive atari_drive;
@@ -469,7 +469,7 @@ static void a800_serial_command(running_machine *machine)
 		switch (atari_fdc.serout_buff[1]) /* command ? */
 		{
 			case 'S':   /* status */
-				atari_set_frame_message(machine, "DRIVE #%d STATUS", drive+1);			
+				atari_set_frame_message(machine, "DRIVE #%d STATUS", drive+1);
 
 				if (VERBOSE_SERIAL)
 					logerror("atari status\n");

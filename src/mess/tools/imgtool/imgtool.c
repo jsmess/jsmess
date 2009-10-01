@@ -1,8 +1,8 @@
 /***************************************************************************
 
-	imgtool.c
+    imgtool.c
 
-	Core code for Imgtool
+    Core code for Imgtool
 
 ***************************************************************************/
 
@@ -91,7 +91,7 @@ static void (*global_warn)(const char *message);
 
 /***************************************************************************
 
-	Imgtool initialization and basics
+    Imgtool initialization and basics
 
 ***************************************************************************/
 
@@ -127,7 +127,7 @@ static imgtoolerr_t markerrorsource(imgtoolerr_t err)
 
 /*-------------------------------------------------
     internal_error - debug function for raising
-	internal errors
+    internal errors
 -------------------------------------------------*/
 
 static void internal_error(const imgtool_module *module, const char *message)
@@ -204,8 +204,8 @@ const imgtool_module *imgtool_find_module(const char *modulename)
 
 /*-------------------------------------------------
     imgtool_get_module_features - retrieves a
-	structure identifying this module's features
-	associated with an image
+    structure identifying this module's features
+    associated with an image
 -------------------------------------------------*/
 
 imgtool_module_features imgtool_get_module_features(const imgtool_module *module)
@@ -248,7 +248,7 @@ void imgtool_warn(const char *format, ...)
 
 /*-------------------------------------------------
     evaluate_module - evaluates a single file to
-	determine what module can best handle a file
+    determine what module can best handle a file
 -------------------------------------------------*/
 
 static imgtoolerr_t evaluate_module(const char *fname,
@@ -312,7 +312,7 @@ done:
 
 /*-------------------------------------------------
     imgtool_partition_image - retrieves the image
-	associated with this partition
+    associated with this partition
 -------------------------------------------------*/
 
 imgtool_image *imgtool_partition_image(imgtool_partition *partition)
@@ -324,7 +324,7 @@ imgtool_image *imgtool_partition_image(imgtool_partition *partition)
 
 /*-------------------------------------------------
     imgtool_identify_file - attempts to determine the module
-	for any given image
+    for any given image
 -------------------------------------------------*/
 
 imgtoolerr_t imgtool_identify_file(const char *fname, imgtool_module **modules, size_t count)
@@ -401,7 +401,7 @@ done:
 
 /*-------------------------------------------------
     imgtool_image_get_sector_size - gets the size
-	of a particular sector on an image
+    of a particular sector on an image
 -------------------------------------------------*/
 
 imgtoolerr_t imgtool_image_get_sector_size(imgtool_image *image, UINT32 track, UINT32 head,
@@ -418,9 +418,9 @@ imgtoolerr_t imgtool_image_get_sector_size(imgtool_image *image, UINT32 track, U
 
 /*-------------------------------------------------
     imgtool_image_get_geometry - gets the geometry
-	of an image; note that this may disagree with
-	particular sectors; this is a common copy
-	protection scheme
+    of an image; note that this may disagree with
+    particular sectors; this is a common copy
+    protection scheme
 -------------------------------------------------*/
 
 imgtoolerr_t imgtool_image_get_geometry(imgtool_image *image, UINT32 *tracks, UINT32 *heads, UINT32 *sectors)
@@ -481,7 +481,7 @@ imgtoolerr_t imgtool_image_write_sector(imgtool_image *image, UINT32 track, UINT
 
 /*-------------------------------------------------
     imgtool_image_get_block_size - gets the size of
-	a standard block on an image
+    a standard block on an image
 -------------------------------------------------*/
 
 imgtoolerr_t imgtool_image_get_block_size(imgtool_image *image, UINT32 *length)
@@ -498,7 +498,7 @@ imgtoolerr_t imgtool_image_get_block_size(imgtool_image *image, UINT32 *length)
 
 /*-------------------------------------------------
     imgtool_image_read_block - reads a standard
-	block on an image
+    block on an image
 -------------------------------------------------*/
 
 imgtoolerr_t imgtool_image_read_block(imgtool_image *image, UINT64 block, void *buffer)
@@ -514,7 +514,7 @@ imgtoolerr_t imgtool_image_read_block(imgtool_image *image, UINT64 block, void *
 
 /*-------------------------------------------------
     imgtool_image_write_block - writes a standard
-	block on an image
+    block on an image
 -------------------------------------------------*/
 
 imgtoolerr_t imgtool_image_write_block(imgtool_image *image, UINT64 block, const void *buffer)
@@ -530,7 +530,7 @@ imgtoolerr_t imgtool_image_write_block(imgtool_image *image, UINT64 block, const
 
 /*-------------------------------------------------
     imgtool_image_clear_block - clears a standard
-	block on an image
+    block on an image
 -------------------------------------------------*/
 
 imgtoolerr_t imgtool_image_clear_block(imgtool_image *image, UINT64 block, UINT8 data)
@@ -565,7 +565,7 @@ done:
 
 /*-------------------------------------------------
     imgtool_image_list_partitions - lists the
-	partitions on an image
+    partitions on an image
 -------------------------------------------------*/
 
 imgtoolerr_t imgtool_image_list_partitions(imgtool_image *image, imgtool_partition_info *partitions, size_t len)
@@ -582,7 +582,7 @@ imgtoolerr_t imgtool_image_list_partitions(imgtool_image *image, imgtool_partiti
 
 /*-------------------------------------------------
     imgtool_image_malloc - allocates memory associated with an
-	image
+    image
 -------------------------------------------------*/
 
 void *imgtool_image_malloc(imgtool_image *image, size_t size)
@@ -594,7 +594,7 @@ void *imgtool_image_malloc(imgtool_image *image, size_t size)
 
 /*-------------------------------------------------
     imgtool_image_module - returns the module associated with
-	this image
+    this image
 -------------------------------------------------*/
 
 const imgtool_module *imgtool_image_module(imgtool_image *img)
@@ -637,7 +637,7 @@ UINT64 imgtool_image_rand(imgtool_image *image)
 
 /***************************************************************************
 
-	Imgtool partition management
+    Imgtool partition management
 
 ***************************************************************************/
 
@@ -784,13 +784,13 @@ void imgtool_partition_close(imgtool_partition *partition)
 
 /***************************************************************************
 
-	Imgtool partition operations
+    Imgtool partition operations
 
 ***************************************************************************/
 
 /*-------------------------------------------------
     imgtool_partition_get_attribute_name - retrieves the human readable
-	name for an attribute
+    name for an attribute
 -------------------------------------------------*/
 
 void imgtool_partition_get_attribute_name(imgtool_partition *partition, UINT32 attribute, const imgtool_attribute *attr_value,
@@ -866,7 +866,7 @@ void imgtool_partition_get_attribute_name(imgtool_partition *partition, UINT32 a
 
 /*-------------------------------------------------
     imgtool_validitychecks - checks the validity
-	of the imgtool modules
+    of the imgtool modules
 -------------------------------------------------*/
 
 int imgtool_validitychecks(void)
@@ -1013,7 +1013,7 @@ done:
 
 /*-------------------------------------------------
     imgtool_temp_str - provides a temporary string
-	buffer used for string passing
+    buffer used for string passing
 -------------------------------------------------*/
 
 char *imgtool_temp_str(void)
@@ -1027,7 +1027,7 @@ char *imgtool_temp_str(void)
 
 /***************************************************************************
 
-	Image handling functions
+    Image handling functions
 
 ***************************************************************************/
 
@@ -1206,7 +1206,7 @@ imgtoolerr_t imgtool_image_create_byname(const char *modulename, const char *fna
 
 /*-------------------------------------------------
     imgtool_image_info - returns format specific information
-	about an image
+    about an image
 -------------------------------------------------*/
 
 imgtoolerr_t imgtool_image_info(imgtool_image *image, char *string, size_t len)
@@ -1228,7 +1228,7 @@ imgtoolerr_t imgtool_image_info(imgtool_image *image, char *string, size_t len)
 
 /*-------------------------------------------------
     cannonicalize_path - normalizes a path string
-	into a NUL delimited list
+    into a NUL delimited list
 -------------------------------------------------*/
 
 static imgtoolerr_t cannonicalize_path(imgtool_partition *partition, UINT32 flags,
@@ -1333,7 +1333,7 @@ static imgtoolerr_t cannonicalize_fork(imgtool_partition *partition, const char 
 
 /*-------------------------------------------------
     imgtool_partition_get_directory_entry - retrieves
-	the nth directory entry within a partition
+    the nth directory entry within a partition
 -------------------------------------------------*/
 
 imgtoolerr_t imgtool_partition_get_directory_entry(imgtool_partition *partition, const char *path, int index, imgtool_dirent *ent)
@@ -1377,7 +1377,7 @@ done:
 
 /*-------------------------------------------------
     imgtool_partition_get_file_size - returns free
-	space on a partition, in bytes
+    space on a partition, in bytes
 -------------------------------------------------*/
 
 imgtoolerr_t imgtool_partition_get_file_size(imgtool_partition *partition, const char *fname, UINT64 *filesize)
@@ -1422,7 +1422,7 @@ done:
 
 /*-------------------------------------------------
     imgtool_partition_list_file_attributes - identifies
-	all attributes on a file
+    all attributes on a file
 -------------------------------------------------*/
 
 imgtoolerr_t imgtool_partition_list_file_attributes(imgtool_partition *partition, const char *path, UINT32 *attrs, size_t len)
@@ -1469,7 +1469,7 @@ done:
 
 /*-------------------------------------------------
     imgtool_partition_get_file_attributes - retrieves
-	attributes on a file
+    attributes on a file
 -------------------------------------------------*/
 
 imgtoolerr_t imgtool_partition_get_file_attributes(imgtool_partition *partition, const char *path, const UINT32 *attrs, imgtool_attribute *values)
@@ -1514,7 +1514,7 @@ done:
 
 /*-------------------------------------------------
     imgtool_partition_put_file_attributes - sets
-	attributes on a file
+    attributes on a file
 -------------------------------------------------*/
 
 imgtoolerr_t imgtool_partition_put_file_attributes(imgtool_partition *partition, const char *path, const UINT32 *attrs, const imgtool_attribute *values)
@@ -1547,7 +1547,7 @@ done:
 
 /*-------------------------------------------------
     imgtool_partition_get_file_attributes - retrieves
-	an attribute on a single file
+    an attribute on a single file
 -------------------------------------------------*/
 
 imgtoolerr_t imgtool_partition_get_file_attribute(imgtool_partition *partition, const char *path, UINT32 attr, imgtool_attribute *value)
@@ -1562,7 +1562,7 @@ imgtoolerr_t imgtool_partition_get_file_attribute(imgtool_partition *partition, 
 
 /*-------------------------------------------------
     imgtool_partition_put_file_attribute - sets
-	attributes on a single file
+    attributes on a single file
 -------------------------------------------------*/
 
 imgtoolerr_t imgtool_partition_put_file_attribute(imgtool_partition *partition, const char *path, UINT32 attr, imgtool_attribute value)
@@ -1577,7 +1577,7 @@ imgtoolerr_t imgtool_partition_put_file_attribute(imgtool_partition *partition, 
 
 /*-------------------------------------------------
     imgtool_partition_get_icon_info - retrieves the
-	icon for a file stored on a partition
+    icon for a file stored on a partition
 -------------------------------------------------*/
 
 imgtoolerr_t imgtool_partition_get_icon_info(imgtool_partition *partition, const char *path, imgtool_iconinfo *iconinfo)
@@ -1623,8 +1623,8 @@ done:
 
 /*-------------------------------------------------
     imgtool_partition_suggest_file_filters - suggests
-	a list of filters appropriate for a file on a
-	partition
+    a list of filters appropriate for a file on a
+    partition
 -------------------------------------------------*/
 
 imgtoolerr_t imgtool_partition_suggest_file_filters(imgtool_partition *partition, const char *path,
@@ -1656,9 +1656,9 @@ imgtoolerr_t imgtool_partition_suggest_file_filters(imgtool_partition *partition
 		goto done;
 
 	/* Loop on resulting suggestions, and do the following:
-	 * 1.  Call check_stream if present, and remove disqualified streams
-	 * 2.  Fill in missing descriptions
-	 */
+     * 1.  Call check_stream if present, and remove disqualified streams
+     * 2.  Fill in missing descriptions
+     */
 	i = j = 0;
 	while(suggestions[i].viability)
 	{
@@ -1707,7 +1707,7 @@ done:
 
 /*-------------------------------------------------
     imgtool_partition_get_chain - retrieves the block
-	chain for a file or directory on a partition
+    chain for a file or directory on a partition
 -------------------------------------------------*/
 
 imgtoolerr_t imgtool_partition_get_chain(imgtool_partition *partition, const char *path, imgtool_chainent *chain, size_t chain_size)
@@ -1733,8 +1733,8 @@ imgtoolerr_t imgtool_partition_get_chain(imgtool_partition *partition, const cha
 
 /*-------------------------------------------------
     imgtool_partition_get_chain_string - retrieves
-	the block chain for a file or directory on a
-	partition
+    the block chain for a file or directory on a
+    partition
 -------------------------------------------------*/
 
 imgtoolerr_t imgtool_partition_get_chain_string(imgtool_partition *partition, const char *path, char *buffer, size_t buffer_len)
@@ -1804,7 +1804,7 @@ imgtoolerr_t imgtool_partition_get_chain_string(imgtool_partition *partition, co
 
 /*-------------------------------------------------
     imgtool_partition_get_free_space - returns the
-	amount of free space on a partition
+    amount of free space on a partition
 -------------------------------------------------*/
 
 imgtoolerr_t imgtool_partition_get_free_space(imgtool_partition *partition, UINT64 *sz)
@@ -1828,7 +1828,7 @@ imgtoolerr_t imgtool_partition_get_free_space(imgtool_partition *partition, UINT
 
 /*-------------------------------------------------
     imgtool_partition_read_file - starts reading
-	from a file on a partition with a stream
+    from a file on a partition with a stream
 -------------------------------------------------*/
 
 imgtoolerr_t imgtool_partition_read_file(imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *destf, filter_getinfoproc filter)
@@ -1893,7 +1893,7 @@ done:
 
 /*-------------------------------------------------
     imgtool_partition_write_file - starts writing
-	to a new file on an image with a stream
+    to a new file on an image with a stream
 -------------------------------------------------*/
 
 imgtoolerr_t imgtool_partition_write_file(imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *sourcef, option_resolution *opts, filter_getinfoproc filter)
@@ -2015,7 +2015,7 @@ done:
 
 /*-------------------------------------------------
     imgtool_partition_get_file - read a file from
-	an image, storing it into a native file
+    an image, storing it into a native file
 -------------------------------------------------*/
 
 imgtoolerr_t imgtool_partition_get_file(imgtool_partition *partition, const char *filename, const char *fork,
@@ -2085,7 +2085,7 @@ done:
 
 /*-------------------------------------------------
     imgtool_partition_put_file - read a native file
-	and store it on a partition
+    and store it on a partition
 -------------------------------------------------*/
 
 imgtoolerr_t imgtool_partition_put_file(imgtool_partition *partition, const char *newfname, const char *fork,
@@ -2132,7 +2132,7 @@ done:
 
 /*-------------------------------------------------
     imgtool_partition_delete_file - delete a file
-	on a partition
+    on a partition
 -------------------------------------------------*/
 
 imgtoolerr_t imgtool_partition_delete_file(imgtool_partition *partition, const char *fname)
@@ -2180,7 +2180,7 @@ done:
 
 /*-------------------------------------------------
     imgtool_partition_list_file_forks - lists all
-	forks on an image
+    forks on an image
 -------------------------------------------------*/
 
 imgtoolerr_t imgtool_partition_list_file_forks(imgtool_partition *partition, const char *path, imgtool_forkent *ents, size_t len)
@@ -2225,7 +2225,7 @@ done:
 
 /*-------------------------------------------------
     imgtool_partition_create_directory - creates a
-	directory on a partition
+    directory on a partition
 -------------------------------------------------*/
 
 imgtoolerr_t imgtool_partition_create_directory(imgtool_partition *partition, const char *path)
@@ -2271,7 +2271,7 @@ done:
 
 /*-------------------------------------------------
     imgtool_partition_delete_directory - deletes a
-	directory on a partition
+    directory on a partition
 -------------------------------------------------*/
 
 imgtoolerr_t imgtool_partition_delete_directory(imgtool_partition *partition, const char *path)
@@ -2317,7 +2317,7 @@ done:
 
 /*-------------------------------------------------
     imgtool_partition_get_block_size - gets the
-	size of a standard block on a partition
+    size of a standard block on a partition
 -------------------------------------------------*/
 
 imgtoolerr_t imgtool_partition_get_block_size(imgtool_partition *partition, UINT32 *length)
@@ -2329,7 +2329,7 @@ imgtoolerr_t imgtool_partition_get_block_size(imgtool_partition *partition, UINT
 
 /*-------------------------------------------------
     imgtool_partition_read_block - reads a standard
-	block on a partition
+    block on a partition
 -------------------------------------------------*/
 
 imgtoolerr_t imgtool_partition_read_block(imgtool_partition *partition, UINT64 block, void *buffer)
@@ -2343,7 +2343,7 @@ imgtoolerr_t imgtool_partition_read_block(imgtool_partition *partition, UINT64 b
 
 /*-------------------------------------------------
     imgtool_partition_write_block - writes a
-	standard block on a partition
+    standard block on a partition
 -------------------------------------------------*/
 
 imgtoolerr_t imgtool_partition_write_block(imgtool_partition *partition, UINT64 block, const void *buffer)
@@ -2357,8 +2357,8 @@ imgtoolerr_t imgtool_partition_write_block(imgtool_partition *partition, UINT64 
 
 /*-------------------------------------------------
     imgtool_partition_get_features - retrieves a
-	structure identifying this partition's features
-	associated with an image
+    structure identifying this partition's features
+    associated with an image
 -------------------------------------------------*/
 
 imgtool_partition_features imgtool_partition_get_features(imgtool_partition *partition)
@@ -2393,7 +2393,7 @@ imgtool_partition_features imgtool_partition_get_features(imgtool_partition *par
 
 /*-------------------------------------------------
     imgtool_partition_get_info_ptr - retrieves a
-	pointer associated with a partition's format
+    pointer associated with a partition's format
 -------------------------------------------------*/
 
 void *imgtool_partition_get_info_ptr(imgtool_partition *partition, UINT32 state)
@@ -2405,7 +2405,7 @@ void *imgtool_partition_get_info_ptr(imgtool_partition *partition, UINT32 state)
 
 /*-------------------------------------------------
     imgtool_partition_get_info_string - retrieves a
-	string associated with a partition's format
+    string associated with a partition's format
 -------------------------------------------------*/
 
 const char *imgtool_partition_get_info_string(imgtool_partition *partition, UINT32 state)
@@ -2417,7 +2417,7 @@ const char *imgtool_partition_get_info_string(imgtool_partition *partition, UINT
 
 /*-------------------------------------------------
     imgtool_partition_get_info_int - retrieves a
-	pointer associated with a partition's format
+    pointer associated with a partition's format
 -------------------------------------------------*/
 
 UINT64 imgtool_partition_get_info_int(imgtool_partition *partition, UINT32 state)
@@ -2429,7 +2429,7 @@ UINT64 imgtool_partition_get_info_int(imgtool_partition *partition, UINT32 state
 
 /*-------------------------------------------------
     imgtool_partition_extra_bytes - returns extra
-	bytes on a partition
+    bytes on a partition
 -------------------------------------------------*/
 
 void *imgtool_partition_extra_bytes(imgtool_partition *partition)
@@ -2456,13 +2456,13 @@ UINT64 imgtool_partition_rand(imgtool_partition *partition)
 
 /***************************************************************************
 
-	Path handling functions
+    Path handling functions
 
 ***************************************************************************/
 
 /*-------------------------------------------------
     imgtool_partition_get_root_path - retrieves
-	the path root of this partition
+    the path root of this partition
 -------------------------------------------------*/
 
 const char *imgtool_partition_get_root_path(imgtool_partition *partition)
@@ -2486,7 +2486,7 @@ const char *imgtool_partition_get_root_path(imgtool_partition *partition)
 
 /*-------------------------------------------------
     imgtool_partition_path_concatenate - retrieves
-	a pointer associated with a partition's format
+    a pointer associated with a partition's format
 -------------------------------------------------*/
 
 const char *imgtool_partition_path_concatenate(imgtool_partition *partition, const char *path1, const char *path2)
@@ -2535,7 +2535,7 @@ const char *imgtool_partition_path_concatenate(imgtool_partition *partition, con
 
 /*-------------------------------------------------
     imgtool_partition_get_base_name - retrieves
-	a base name for a partition specific path
+    a base name for a partition specific path
 -------------------------------------------------*/
 
 const char *imgtool_partition_get_base_name(imgtool_partition *partition, const char *path)
@@ -2558,13 +2558,13 @@ const char *imgtool_partition_get_base_name(imgtool_partition *partition, const 
 
 /***************************************************************************
 
-	Directory handling functions
+    Directory handling functions
 
 ***************************************************************************/
 
 /*-------------------------------------------------
     imgtool_directory_open - begins
-	enumerating files on a partition
+    enumerating files on a partition
 -------------------------------------------------*/
 
 imgtoolerr_t imgtool_directory_open(imgtool_partition *partition, const char *path, imgtool_directory **outenum)
@@ -2647,7 +2647,7 @@ void imgtool_directory_close(imgtool_directory *directory)
 
 /*-------------------------------------------------
     imgtool_directory_get_next - continues
-	enumerating files within a partition
+    enumerating files within a partition
 -------------------------------------------------*/
 
 imgtoolerr_t imgtool_directory_get_next(imgtool_directory *directory, imgtool_dirent *ent)
@@ -2659,8 +2659,8 @@ imgtoolerr_t imgtool_directory_get_next(imgtool_directory *directory, imgtool_di
 	partition = imgtool_directory_partition(directory);
 
 	/* This makes it so that drivers don't have to take care of clearing
-	 * the attributes if they don't apply
-	 */
+     * the attributes if they don't apply
+     */
 	memset(ent, 0, sizeof(*ent));
 
 	err = partition->next_enum(directory, ent);
@@ -2703,7 +2703,7 @@ imgtoolerr_t imgtool_directory_get_next(imgtool_directory *directory, imgtool_di
 
 /*-------------------------------------------------
     imgtool_directory_module - returns the module associated
-	with this directory
+    with this directory
 -------------------------------------------------*/
 
 const imgtool_module *imgtool_directory_module(imgtool_directory *directory)
@@ -2715,7 +2715,7 @@ const imgtool_module *imgtool_directory_module(imgtool_directory *directory)
 
 /*-------------------------------------------------
     imgtool_directory_extrabytes - returns extra
-	bytes on a directory
+    bytes on a directory
 -------------------------------------------------*/
 
 void *imgtool_directory_extrabytes(imgtool_directory *directory)
@@ -2728,7 +2728,7 @@ void *imgtool_directory_extrabytes(imgtool_directory *directory)
 
 /*-------------------------------------------------
     imgtool_directory_partition - returns the
-	partition associated with this directory
+    partition associated with this directory
 -------------------------------------------------*/
 
 imgtool_partition *imgtool_directory_partition(imgtool_directory *directory)
@@ -2740,7 +2740,7 @@ imgtool_partition *imgtool_directory_partition(imgtool_directory *directory)
 
 /*-------------------------------------------------
     imgtool_directory_image - returns the image
-	associated with this directory
+    associated with this directory
 -------------------------------------------------*/
 
 imgtool_image *imgtool_directory_image(imgtool_directory *directory)
@@ -2752,7 +2752,7 @@ imgtool_image *imgtool_directory_image(imgtool_directory *directory)
 
 /*-------------------------------------------------
     unknown_partition_get_info - represents an
-	unknown partition
+    unknown partition
 -------------------------------------------------*/
 
 void unknown_partition_get_info(const imgtool_class *imgclass, UINT32 state, union imgtoolinfo *info)

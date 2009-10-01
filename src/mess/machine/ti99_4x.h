@@ -1,5 +1,5 @@
 /*
-	header file for machine/ti99_4x.c
+    header file for machine/ti99_4x.c
 */
 #include "video/tms9928a.h"
 #include "machine/tms9901.h"
@@ -99,8 +99,8 @@ typedef enum
 	fdc_kind_TI,				/* TI fdc */
 	fdc_kind_BwG,				/* SNUG's BwG fdc */
 	fdc_kind_hfdc				/* Myarc's HFDC (handles SD and DD floppies (I
-									think an HD update existed) and prehistoric
-									MFM hard disks) */
+                                    think an HD update existed) and prehistoric
+                                    MFM hard disks) */
 #if HAS_99CCFDC
 	,
 	fdc_kind_CC = 0x100			/* CorComp fdc */
@@ -134,7 +134,7 @@ enum
 	config_cartslot_bit	= 14,
 	config_cartslot_mask	= 0xf, /* need four bits: covers all current and possibly future cartslots, and one auto mode */
 	config_pcode_bit	= 18,
-	config_pcode_mask	= 0x1 
+	config_pcode_mask	= 0x1
 };
 
 enum {

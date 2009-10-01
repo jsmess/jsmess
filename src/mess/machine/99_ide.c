@@ -1,20 +1,20 @@
 /*
-	Thierry Nouspikel's IDE card emulation
+    Thierry Nouspikel's IDE card emulation
 
-	This card is just a prototype.  It has been designed by Thierry Nouspikel,
-	and its description was published in 2001.  The card have been revised in
-	2004.
+    This card is just a prototype.  It has been designed by Thierry Nouspikel,
+    and its description was published in 2001.  The card have been revised in
+    2004.
 
-	The specs have been published in <http://www.nouspikel.com/ti99/ide.html>.
+    The specs have been published in <http://www.nouspikel.com/ti99/ide.html>.
 
-	The IDE interface is quite simple, since it only implements PIO transfer.
-	The card includes a clock chip to timestamp files, and an SRAM for the DSR.
-	It should be possible to use a battery backed DSR SRAM, but since the clock
-	chip includes 4kb of battery-backed RAM, a bootstrap loader can be saved in
-	the clock SRAM in order to load the DSR from the HD when the computer
-	starts.
+    The IDE interface is quite simple, since it only implements PIO transfer.
+    The card includes a clock chip to timestamp files, and an SRAM for the DSR.
+    It should be possible to use a battery backed DSR SRAM, but since the clock
+    chip includes 4kb of battery-backed RAM, a bootstrap loader can be saved in
+    the clock SRAM in order to load the DSR from the HD when the computer
+    starts.
 
-	Raphael Nabet, 2002-2004.
+    Raphael Nabet, 2002-2004.
 */
 
 #include "driver.h"
@@ -71,9 +71,9 @@ only supported ti-99/4(a) (LSByte first) mode. */
 static int tms9995_mode;
 
 /*
-	ti99_ide_interrupt()
+    ti99_ide_interrupt()
 
-	IDE interrupt callback
+    IDE interrupt callback
 */
 void ti99_ide_interrupt(const device_config *device, int state)
 {
@@ -83,9 +83,9 @@ void ti99_ide_interrupt(const device_config *device, int state)
 }
 
 /*
-	clk_interrupt_callback()
+    clk_interrupt_callback()
 
-	clock interrupt callback
+    clock interrupt callback
 */
 static void clk_interrupt_callback(running_machine *machine, int state)
 {
@@ -94,7 +94,7 @@ static void clk_interrupt_callback(running_machine *machine, int state)
 }
 
 /*
-	Initializes the ide card, set up handlers
+    Initializes the ide card, set up handlers
 */
 void ti99_ide_init(running_machine *machine)
 {
@@ -103,7 +103,7 @@ void ti99_ide_init(running_machine *machine)
 }
 
 /*
-	Reset ide card, set up handlers
+    Reset ide card, set up handlers
 */
 void ti99_ide_reset(running_machine *machine, int in_tms9995_mode)
 {
@@ -157,7 +157,7 @@ int ti99_ide_save_memcard(void)
 }
 
 /*
-	Read ide CRU interface
+    Read ide CRU interface
 */
 static int ide_cru_r(running_machine *machine, int offset)
 {
@@ -181,7 +181,7 @@ static int ide_cru_r(running_machine *machine, int offset)
 }
 
 /*
-	Write ide CRU interface
+    Write ide CRU interface
 */
 static void ide_cru_w(running_machine *machine, int offset, int data)
 {
@@ -219,7 +219,7 @@ static void ide_cru_w(running_machine *machine, int offset, int data)
 }
 
 /*
-	read a byte in ide DSR space
+    read a byte in ide DSR space
 */
 static READ8_HANDLER(ide_mem_r)
 {
@@ -284,7 +284,7 @@ static READ8_HANDLER(ide_mem_r)
 }
 
 /*
-	write a byte in ide DSR space
+    write a byte in ide DSR space
 */
 static WRITE8_HANDLER(ide_mem_w)
 {
@@ -316,9 +316,9 @@ static WRITE8_HANDLER(ide_mem_w)
 		case 2:		/* IDE registers set 1 (CS1Fx) */
 			/* latch write */
 			/*if (offset & 1)
-				output_latch = (output_latch & 0xff00) | data;
-			else
-				output_latch = (output_latch & 0x00ff) | (data << 8);*/
+                output_latch = (output_latch & 0xff00) | data;
+            else
+                output_latch = (output_latch & 0x00ff) | (data << 8);*/
 			/* latch write - bytes are swapped in 2004 IDE card */
 			if (offset & 1)
 				output_latch = (output_latch & 0x00ff) | (data << 8);
@@ -334,9 +334,9 @@ static WRITE8_HANDLER(ide_mem_w)
 		case 3:		/* IDE registers set 2 (CS3Fx) */
 			/* latch write */
 			/*if (offset & 1)
-				output_latch = (output_latch & 0xff00) | data;
-			else
-				output_latch = (output_latch & 0x00ff) | (data << 8);*/
+                output_latch = (output_latch & 0xff00) | data;
+            else
+                output_latch = (output_latch & 0x00ff) | (data << 8);*/
 			/* latch write - bytes are swapped in 2004 IDE card */
 			if (offset & 1)
 				output_latch = (output_latch & 0x00ff) | (data << 8);

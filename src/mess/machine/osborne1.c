@@ -336,14 +336,14 @@ const pia6821_interface osborne1_video_pia_config =
 
 //static const struct aica6850_interface osborne1_6850_config =
 //{
-//	10,	/* tx_clock */
-//	10,	/* rx_clock */
-//	NULL,	/* rx_pin */
-//	NULL,	/* tx_pin */
-//	NULL,	/* cts_pin */
-//	NULL,	/* rts_pin */
-//	NULL,	/* dcd_pin */
-//	NULL	/* int_callback */
+//  10, /* tx_clock */
+//  10, /* rx_clock */
+//  NULL,   /* rx_pin */
+//  NULL,   /* tx_pin */
+//  NULL,   /* cts_pin */
+//  NULL,   /* rts_pin */
+//  NULL,   /* dcd_pin */
+//  NULL    /* int_callback */
 //};
 
 
@@ -474,7 +474,7 @@ MACHINE_RESET( osborne1 )
 	{
 		floppy_install_load_proc(floppy_get_device(machine, drive), osborne1_load_proc);
 	}
-	
+
 	memory_set_direct_update_handler( space, osborne1_opbase );
 }
 
@@ -487,12 +487,12 @@ DRIVER_INIT( osborne1 )
 	memset( osborne1.empty_4K, 0xFF, 0x1000 );
 
 	/* Configure the 6850 ACIA */
-//	acia6850_config( 0, &osborne1_6850_config );
+//  acia6850_config( 0, &osborne1_6850_config );
 }
 
 
 /****************************************************************
-	Osborne1 specific daisy chain code
+    Osborne1 specific daisy chain code
 ****************************************************************/
 
 
@@ -507,7 +507,7 @@ static int osborne1_daisy_irq_ack(const device_config *device)
     /* Enable ROM and I/O when IRQ is acknowledged */
     UINT8	old_bankswitch = osborne1.bankswitch;
     const address_space* space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-    
+
     osborne1_bankswitch_w( space, 0, 0 );
     osborne1.bankswitch = old_bankswitch;
     osborne1.in_irq_handler = 1;

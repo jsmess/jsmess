@@ -1,11 +1,11 @@
 /*
 
-	SST Multi-Purpose Flash (MPF)
+    SST Multi-Purpose Flash (MPF)
 
-	(c) 2001-2007 Tim Schuerewegen
+    (c) 2001-2007 Tim Schuerewegen
 
-	SST39VF020  - 256 KByte
-	SST39VF400A - 512 Kbyte
+    SST39VF020  - 256 KByte
+    SST39VF400A - 512 Kbyte
 
 */
 
@@ -57,7 +57,7 @@ static void common_start(const device_config *device, int device_type)
 {
 	sst39vfx_t *flash = get_token(device);
 	const sst39vfx_config *config = get_config(device);
-	
+
 	_logerror( 0, ("sst39vfx_init (%d)\n", device_type));
 	memset( flash, 0, sizeof( flash));
 	switch (device_type)
@@ -106,18 +106,18 @@ UINT32 sst39vfx_get_size( const device_config *device)
 /*
 READ8_HANDLER( sst39vfx_r )
 {
-	_logerror( 1, ("sst39vfx_r (%08X)\n", offset));
-	if (flash->swap) offset = OFFSET_SWAP( offset, flash->swap);
-	return flash->data[offset];
+    _logerror( 1, ("sst39vfx_r (%08X)\n", offset));
+    if (flash->swap) offset = OFFSET_SWAP( offset, flash->swap);
+    return flash->data[offset];
 }
 */
 
 /*
 WRITE8_HANDLER( sst39vfx_w )
 {
-	_logerror( 1, ("sst39vfx_w (%08X/%02X)\n", offset, data));
-	if (flash->swap) offset = OFFSET_SWAP( offset, flash->swap);
-	flash->data[offset] = data;
+    _logerror( 1, ("sst39vfx_w (%08X/%02X)\n", offset, data));
+    if (flash->swap) offset = OFFSET_SWAP( offset, flash->swap);
+    flash->data[offset] = data;
 }
 */
 
@@ -126,7 +126,7 @@ static void sst39vfx_swap( const device_config *device)
 	int i, j;
 	UINT8 *base, temp[8];
 	sst39vfx_t *flash = get_token(device);
-	
+
 	base = flash->data;
 	for (i=0;i<flash->size;i+=flash->swap)
 	{
@@ -138,7 +138,7 @@ static void sst39vfx_swap( const device_config *device)
 void sst39vfx_load(const device_config *device, mame_file *file)
 {
 	sst39vfx_t *flash = get_token(device);
-	
+
 	_logerror( 0, ("sst39vfx_load (%p)\n", file));
 	mame_fread( file, flash->data, flash->size);
 	if (flash->swap) sst39vfx_swap(device);
@@ -147,7 +147,7 @@ void sst39vfx_load(const device_config *device, mame_file *file)
 void sst39vfx_save(const device_config *device, mame_file *file)
 {
 	sst39vfx_t *flash = get_token(device);
-	
+
 	_logerror( 0, ("sst39vfx_save (%p)\n", file));
 	if (flash->swap) sst39vfx_swap(device);
 	mame_fwrite( file, flash->data, flash->size);
@@ -157,22 +157,22 @@ void sst39vfx_save(const device_config *device, mame_file *file)
 /*
 NVRAM_HANDLER( sst39vfx )
 {
-	_logerror( 0, ("nvram_handler_sst39vfx (%p/%d)\n", file, read_or_write));
-	if (read_or_write)
-	{
-		sst39vfx_save( file);
-	}
-	else
-	{
-		if (file)
-		{
-			sst39vfx_load( file);
-		}
-		else
-		{
-			memset( flash->data, 0xFF, flash->size);
-		}
-	}
+    _logerror( 0, ("nvram_handler_sst39vfx (%p/%d)\n", file, read_or_write));
+    if (read_or_write)
+    {
+        sst39vfx_save( file);
+    }
+    else
+    {
+        if (file)
+        {
+            sst39vfx_load( file);
+        }
+        else
+        {
+            memset( flash->data, 0xFF, flash->size);
+        }
+    }
 }
 */
 

@@ -183,28 +183,28 @@ static MACHINE_DRIVER_START( pk8020 )
 
 	MDRV_VIDEO_START(pk8020)
 	MDRV_VIDEO_UPDATE(pk8020)
-	
+
     MDRV_I8255A_ADD( "ppi8255_1", pk8020_ppi8255_interface_1 )
-    MDRV_I8255A_ADD( "ppi8255_2", pk8020_ppi8255_interface_2 )	
+    MDRV_I8255A_ADD( "ppi8255_2", pk8020_ppi8255_interface_2 )
     MDRV_I8255A_ADD( "ppi8255_3", pk8020_ppi8255_interface_3 )
-    
+
     MDRV_PIT8253_ADD( "pit8253", pk8020_pit8253_intf )
 
-	MDRV_PIC8259_ADD( "pic8259", pk8020_pic8259_config )    
+	MDRV_PIC8259_ADD( "pic8259", pk8020_pic8259_config )
 	MDRV_MSM8251_ADD( "rs232", default_msm8251_interface)
 	MDRV_MSM8251_ADD( "lan", default_msm8251_interface)
-	
-	MDRV_WD1793_ADD( "wd1793", default_wd17xx_interface )	
-    
+
+	MDRV_WD1793_ADD( "wd1793", default_wd17xx_interface )
+
     /* audio hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	MDRV_SOUND_WAVE_ADD("wave", "cassette")
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	
-	MDRV_CASSETTE_ADD( "cassette", pk8020_cassette_config )	
-	
+
+	MDRV_CASSETTE_ADD( "cassette", pk8020_cassette_config )
+
 	MDRV_FLOPPY_4_DRIVES_ADD(pk8020_floppy_config)
 MACHINE_DRIVER_END
 
@@ -214,7 +214,7 @@ ROM_START( korvet )
     ROM_REGION( 0x16000, "maincpu", ROMREGION_ERASEFF )
     ROM_LOAD( "korvet11.rom", 0x10000, 0x6000, CRC(81BDC2AF) SHA1(c3484c3f1f3d252475979283c073286b8661d2b9) )
 	ROM_REGION( 0x2000, "gfx1", 0 )
-	ROM_LOAD ( "korvet2.fnt", 0x0000, 0x2000, CRC(FB1CD3D4))    
+	ROM_LOAD ( "korvet2.fnt", 0x0000, 0x2000, CRC(FB1CD3D4))
 ROM_END
 
 static SYSTEM_CONFIG_START(pk8020)

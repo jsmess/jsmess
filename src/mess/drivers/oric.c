@@ -414,7 +414,7 @@ static MACHINE_DRIVER_START( oric )
 	MDRV_VIA6522_ADD( "via6522_0", 1000000, oric_6522_interface )
 
 	MDRV_WD179X_ADD("wd179x", oric_wd17xx_interface )
-	
+
 	MDRV_FLOPPY_4_DRIVES_ADD(oric1_floppy_config)
 MACHINE_DRIVER_END
 

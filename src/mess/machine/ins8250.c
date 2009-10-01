@@ -1,10 +1,10 @@
 /**********************************************************************
 
-	National Semiconductor 8250 UART interface and emulation
+    National Semiconductor 8250 UART interface and emulation
 
    More information on the different models can be found in
    section 1.6 at this location:
-     http://www.freebsd.org/doc/en_US.ISO8859-1/articles/serial-uart/ 
+     http://www.freebsd.org/doc/en_US.ISO8859-1/articles/serial-uart/
 
 Model overview (from page above):
 
@@ -64,12 +64,12 @@ Known issues:
 
 
 History:
-	KT - 14-Jun-2000 - Improved Interrupt setting/clearing
-	KT - moved into seperate file so it can be used in Super I/O emulation and
-		any other system which uses a PC type COM port
-	KT - 24-Jun-2000 - removed pc specific input port tests. More compatible
-		with PCW16 and PCW16 doesn't requre the PC input port definitions
-		which are not required by the PCW16 hardware
+    KT - 14-Jun-2000 - Improved Interrupt setting/clearing
+    KT - moved into seperate file so it can be used in Super I/O emulation and
+        any other system which uses a PC type COM port
+    KT - 24-Jun-2000 - removed pc specific input port tests. More compatible
+        with PCW16 and PCW16 doesn't requre the PC input port definitions
+        which are not required by the PCW16 hardware
 
 **********************************************************************/
 
@@ -333,10 +333,10 @@ WRITE8_DEVICE_HANDLER( ins8250_w )
             break;
 		case 5:
 			/*
-			  This register can be written, but if you write a 1 bit into any of
-			  bits 5 - 0, you could cause an interrupt if the appropriate IER bit
-			  is set.
-			*/
+              This register can be written, but if you write a 1 bit into any of
+              bits 5 - 0, you could cause an interrupt if the appropriate IER bit
+              is set.
+            */
 			COM_LOG(1,"COM_lsr_w",("COM \"%s\" $%02x\n", device->tag, data ));
 
 			ins8250->lsr = data;
@@ -350,10 +350,10 @@ WRITE8_DEVICE_HANDLER( ins8250_w )
 			break;
 		case 6:
 			/*
-			  This register can be written, but if you write a 1 bit into any of
-			  bits 3 - 0, you could cause an interrupt if the appropriate IER bit
-			  is set.
-			 */
+              This register can be written, but if you write a 1 bit into any of
+              bits 3 - 0, you could cause an interrupt if the appropriate IER bit
+              is set.
+             */
 			COM_LOG(1,"COM_msr_w",("COM \"%s\" $%02x\n", device->tag, data ));
 
 			ins8250->msr = data;
@@ -416,7 +416,7 @@ READ8_DEVICE_HANDLER( ins8250_r )
 			data = ins8250->iir;
 			COM_LOG(2,"COM_iir_r",("COM \"%s\" $%02x\n", device->tag, data));
 			/* The documentation says that reading this register will
-			clear the int if this is the source of the int */
+            clear the int if this is the source of the int */
 			if ( ins8250->ier & COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY )
 			{
 				ins8250_clear_int(device, COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY);
@@ -502,17 +502,17 @@ void ins8250_receive(const device_config *device, int data)
 	ins8250_trigger_int(device, COM_INT_PENDING_RECEIVED_DATA_AVAILABLE);
 
 
-//	/* OUT2 + received line data avail interrupt enabled? */
-//	if( (COM_mcr[n] & 0x08) && (COM_ier[n] & 0x01) )
-//	{
-//		if (com_interface.interrupt)
-//			com_interface.interrupt(4-(n&1), 1);
+//  /* OUT2 + received line data avail interrupt enabled? */
+//  if( (COM_mcr[n] & 0x08) && (COM_ier[n] & 0x01) )
+//  {
+//      if (com_interface.interrupt)
+//          com_interface.interrupt(4-(n&1), 1);
 //
-//	}
+//  }
 }
 
 /**************************************************************************
- *	change the modem status register
+ *  change the modem status register
  **************************************************************************/
 void ins8250_handshake_in(const device_config *device, int new_msr)
 {
@@ -527,15 +527,15 @@ void ins8250_handshake_in(const device_config *device, int new_msr)
 
 	ins8250_trigger_int(device, COM_INT_PENDING_MODEM_STATUS_REGISTER);
 
-//	/* set up interrupt information register */
+//  /* set up interrupt information register */
   //  COM_iir[n] &= ~(0x06 | 0x01);
 
 //    /* OUT2 + modem status interrupt enabled? */
-//	if( (COM_mcr[n] & 0x08) && (COM_ier[n] & 0x08) )
-//	{
-//		if (com_interface.interrupt)
-//			com_interface.interrupt(4-(n&1), 1);
-//	}
+//  if( (COM_mcr[n] & 0x08) && (COM_ier[n] & 0x08) )
+//  {
+//      if (com_interface.interrupt)
+//          com_interface.interrupt(4-(n&1), 1);
+//  }
 }
 
 

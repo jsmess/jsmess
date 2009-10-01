@@ -103,7 +103,7 @@ void apple1_vh_dsp_w (int data)
 	int cursor_x, cursor_y;
 
 	/* While CLEAR SCREEN is being held down, the hardware is forced
-	   to clear the video memory, so video writes have no effect. */
+       to clear the video memory, so video writes have no effect. */
 	if (apple1_vh_clrscrn_pressed)
 		return;
 
@@ -114,24 +114,24 @@ void apple1_vh_dsp_w (int data)
 
 	if (data == '\r') {
 		/* Carriage-return moves the cursor to the start of the next
-		   line. */
+           line. */
 		cursor_x = 0;
 		cursor_y++;
 	}
 	else if (data < ' ') {
 		/* Except for carriage-return, the video hardware completely
-		   ignores all control characters. */
+           ignores all control characters. */
 		return;
 	}
 	else {
 		/* For visible characters, only 6 bits of the ASCII code are
-		   used, because the 2513 character generator ROM only
-		   contains 64 symbols.  The low 5 bits of the ASCII code are
-		   used directly.  Bit 6 is ignored, since it is the same for
-		   all the available characters in the ROM.  Bit 7 is inverted
-		   before being used as the high bit of the 6-bit ROM symbol
-		   index, because the block of 32 ASCII symbols containing the
-		   uppercase letters comes first in the ROM. */
+           used, because the 2513 character generator ROM only
+           contains 64 symbols.  The low 5 bits of the ASCII code are
+           used directly.  Bit 6 is ignored, since it is the same for
+           all the available characters in the ROM.  Bit 7 is inverted
+           before being used as the high bit of the 6-bit ROM symbol
+           index, because the block of 32 ASCII symbols containing the
+           uppercase letters comes first in the ROM. */
 
 		int romindx = (data & 0x1f) | (((data ^ 0x40) & 0x40) >> 1);
 
@@ -184,27 +184,27 @@ attotime apple1_vh_dsp_time_to_ready (running_machine *machine)
 	double cursor_hfrac;
 
 	/* The video hardware refreshes the screen by reading the
-	   character codes from its circulating shift-register memory.
-	   Because of the way this memory works, a new character can only
-	   be written into the cursor location at the moment this location
-	   is about to be read.  This happens during the first scanline of
-	   the cursor's character line, when the beam reaches the cursor's
-	   horizontal position. */
+       character codes from its circulating shift-register memory.
+       Because of the way this memory works, a new character can only
+       be written into the cursor location at the moment this location
+       is about to be read.  This happens during the first scanline of
+       the cursor's character line, when the beam reaches the cursor's
+       horizontal position. */
 
 	terminal_getcursor(apple1_terminal, &cursor_x, &cursor_y);
 	cursor_scanline = cursor_y * apple1_charlayout.height;
 
 	/* Each scanline is composed of 455 pixel times.  The first 175 of
-	   these are the horizontal blanking period; the remaining 280 are
-	   for the visible part of the scanline. */
+       these are the horizontal blanking period; the remaining 280 are
+       for the visible part of the scanline. */
 	cursor_hfrac = (175 + cursor_x * apple1_charlayout.width) / 455;
 
 	if (video_screen_get_vpos(machine->primary_screen) == cursor_scanline) {
 		/* video_screen_get_hpos() doesn't account for the horizontal
-		   blanking interval; it acts as if the scanline period is
-		   entirely composed of visible pixel times.  However, we can
-		   still use it to find what fraction of the current scanline
-		   period has elapsed. */
+           blanking interval; it acts as if the scanline period is
+           entirely composed of visible pixel times.  However, we can
+           still use it to find what fraction of the current scanline
+           period has elapsed. */
 		double current_hfrac = video_screen_get_hpos(machine->primary_screen) /
 							   video_screen_get_width(video_screen_first(machine->config));
 		if (current_hfrac < cursor_hfrac)
@@ -223,10 +223,10 @@ static void apple1_vh_cursor_blink (running_machine *machine)
 	int new_blink_on;
 
 	/* The cursor is on for 2/3 of its blink period and off for 1/3.
-	   This is most easily handled by dividing the total elapsed time
-	   by the length of the off-portion of the cycle, giving us the
-	   number of one-third-cycles elapsed, then checking the result
-	   modulo 3. */
+       This is most easily handled by dividing the total elapsed time
+       by the length of the off-portion of the cycle, giving us the
+       number of one-third-cycles elapsed, then checking the result
+       modulo 3. */
 
 	if (((int) (attotime_to_double(timer_get_time(machine)) / CURSOR_OFF_LENGTH)) % 3 < 2)
 		new_blink_on = 1;

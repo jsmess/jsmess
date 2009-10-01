@@ -6,15 +6,15 @@
     Visit http://mamedev.org for licensing and usage restrictions.
 
 **********************************************************************
-							_____   _____
-				   CS2	 1 |*    \_/     | 16  Vdd
-				 WRITE	 2 |			 | 15  XT
-				  READ	 3 |			 | 14  _XT
-					D0	 4 | MSM58321RS	 | 13  CS1
-					D1	 5 |			 | 12  TEST
-					D2	 6 |			 | 11  STOP
-					D3	 7 |			 | 10  _BUSY
-				   GND   8 |_____________| 9   ADDRESS WRITE
+                            _____   _____
+                   CS2   1 |*    \_/     | 16  Vdd
+                 WRITE   2 |             | 15  XT
+                  READ   3 |             | 14  _XT
+                    D0   4 | MSM58321RS  | 13  CS1
+                    D1   5 |             | 12  TEST
+                    D2   6 |             | 11  STOP
+                    D3   7 |             | 10  _BUSY
+                   GND   8 |_____________| 9   ADDRESS WRITE
 
 **********************************************************************/
 

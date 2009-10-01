@@ -7,7 +7,7 @@
   By R. Belmont & Harmony
 
   TODO:
-  - Raster timing issues.  Castlevania (HOD and AOS)'s raster effects 
+  - Raster timing issues.  Castlevania (HOD and AOS)'s raster effects
     work if the VBlank is fired on scanline 0, else they're offset by
     the height of the vblank region.  Is scanline 0 the start of the
     visible area?
@@ -100,7 +100,7 @@ TIMER_CALLBACK( dma_complete )
 
 	ch = param;
 
-//	printf("dma complete: ch %d\n", ch);
+//  printf("dma complete: ch %d\n", ch);
 
 	timer_adjust_oneshot(gba_state->dma_timer[ch], attotime_never, 0);
 
@@ -116,7 +116,7 @@ TIMER_CALLBACK( dma_complete )
 	// always clear active for immediate DMAs though
 	if (!((ctrl>>9) & 1) || ((ctrl & 0x3000) == 0))
 	{
-//		printf("clear active for ch %d\n", ch);
+//      printf("clear active for ch %d\n", ch);
 		gba_state->dma_regs[(ch*3)+2] &= ~0x80000000;	// clear "active" bit
 	}
 	else
@@ -182,8 +182,8 @@ static void dma_exec(running_machine *machine, FPTR ch)
 	}
 	else
 	{
-//		if (dst >= 0x6000000 && dst <= 0x6017fff)
-//			printf("DMA exec: ch %d from %08x to %08x, mode %04x, count %04x (PC %x) (%s)\n", (int)ch, src, dst, ctrl, cnt, activecpu_get_pc(), ((ctrl>>10) & 1) ? "32" : "16");
+//      if (dst >= 0x6000000 && dst <= 0x6017fff)
+//          printf("DMA exec: ch %d from %08x to %08x, mode %04x, count %04x (PC %x) (%s)\n", (int)ch, src, dst, ctrl, cnt, activecpu_get_pc(), ((ctrl>>10) & 1) ? "32" : "16");
 	}
 
 	for (i = 0; i < cnt; i++)
@@ -266,8 +266,8 @@ static void dma_exec(running_machine *machine, FPTR ch)
 	gba_state->dma_src[ch] = src;
 	gba_state->dma_dst[ch] = dst;
 
-//	printf("settng DMA timer %d for %d cycs (tmr %x)\n", ch, cnt, (UINT32)gba_state->dma_timer[ch]);
-//	timer_adjust_oneshot(gba_state->dma_timer[ch], ATTOTIME_IN_CYCLES(0, cnt), ch);
+//  printf("settng DMA timer %d for %d cycs (tmr %x)\n", ch, cnt, (UINT32)gba_state->dma_timer[ch]);
+//  timer_adjust_oneshot(gba_state->dma_timer[ch], ATTOTIME_IN_CYCLES(0, cnt), ch);
 	dma_complete(machine, NULL, ch);
 }
 
@@ -367,7 +367,7 @@ static TIMER_CALLBACK(timer_expire)
 	FPTR tmr = (FPTR) param;
 	gba_state *gba_state = machine->driver_data;
 
-//	printf("Timer %d expired, SOUNDCNT_H %04x\n", tmr, gba_state->SOUNDCNT_H);
+//  printf("Timer %d expired, SOUNDCNT_H %04x\n", tmr, gba_state->SOUNDCNT_H);
 
 	// check if timers 0 or 1 are feeding directsound
 	if (tmr == 0)
@@ -839,27 +839,27 @@ static READ32_HANDLER( gba_io_r )
 				double time, ticks;
 				int timer = offset-(0x100/4);
 
-//				printf("Read timer reg %x (PC=%x)\n", timer, cpu_get_pc(space->cpu));
+//              printf("Read timer reg %x (PC=%x)\n", timer, cpu_get_pc(space->cpu));
 
-				// update times for 
+				// update times for
 				if (gba_state->timer_regs[timer] & 0x800000)
 				{
 					time = attotime_to_double(timer_timeelapsed(gba_state->tmr_timer[timer]));
 
 					ticks = (double)(0x10000 - (gba_state->timer_regs[timer] & 0xffff));
 
-//					printf("time %f ticks %f 1/hz %f\n", time, ticks, 1.0 / gba_state->timer_hz[timer]);
+//                  printf("time %f ticks %f 1/hz %f\n", time, ticks, 1.0 / gba_state->timer_hz[timer]);
 
 					time *= ticks;
 					time /= (1.0 / gba_state->timer_hz[timer]);
 
 					elapsed = (UINT32)time;
 
-//					printf("elapsed = %x\n", elapsed);
+//                  printf("elapsed = %x\n", elapsed);
 				}
 				else
 				{
-//					printf("Reading inactive timer!\n");
+//                  printf("Reading inactive timer!\n");
 					elapsed = 0;
 				}
 
@@ -973,7 +973,7 @@ static READ32_HANDLER( gba_io_r )
 		case 0x0200/4:
 			if( (mem_mask) & 0x0000ffff )
 			{
-//				printf("Read: IE (%08x) = %04x\n", 0x04000000 + ( offset << 2 ), gba_state->IE );
+//              printf("Read: IE (%08x) = %04x\n", 0x04000000 + ( offset << 2 ), gba_state->IE );
 			}
 			if( (mem_mask) & 0xffff0000 )
 			{
@@ -1008,7 +1008,7 @@ static READ32_HANDLER( gba_io_r )
 			retval = gba_state->HALTCNT << 8;
 			break;
 		default:
-//			verboselog(machine, 0, "Unknown GBA I/O register Read: %08x (%08x)\n", 0x04000000 + ( offset << 2 ), ~mem_mask );
+//          verboselog(machine, 0, "Unknown GBA I/O register Read: %08x (%08x)\n", 0x04000000 + ( offset << 2 ), ~mem_mask );
 			break;
 	}
 	return retval;
@@ -1586,7 +1586,7 @@ static WRITE32_HANDLER( gba_io_w )
 
 				ch = offset / 3;
 
-//				printf("%08x: DMA(%d): %x to reg %d (mask %08x)\n", activecpu_get_pc(), ch, data, offset%3, ~mem_mask);
+//              printf("%08x: DMA(%d): %x to reg %d (mask %08x)\n", activecpu_get_pc(), ch, data, offset%3, ~mem_mask);
 
 				if (((offset % 3) == 2) && ((~mem_mask & 0xffff0000) == 0))
 				{
@@ -1628,7 +1628,7 @@ static WRITE32_HANDLER( gba_io_w )
 
 				COMBINE_DATA(&gba_state->timer_regs[offset]);
 
-//				printf("%x to timer %d (mask %x PC %x)\n", data, offset, ~mem_mask, cpu_get_pc(space->cpu));
+//              printf("%x to timer %d (mask %x PC %x)\n", data, offset, ~mem_mask, cpu_get_pc(space->cpu));
 
 				if (ACCESSING_BITS_0_15)
 				{
@@ -1648,7 +1648,7 @@ static WRITE32_HANDLER( gba_io_w )
 
 					gba_state->timer_hz[offset] = final;
 
-//					printf("Enabling timer %d @ %f Hz\n", offset, final);
+//                  printf("Enabling timer %d @ %f Hz\n", offset, final);
 
 					// enable the timer
 					if( !(data & 0x40000) ) // if we're not in Count-Up mode
@@ -1697,7 +1697,7 @@ static WRITE32_HANDLER( gba_io_w )
 		case 0x0130/4:
 			if( (mem_mask) & 0xffff0000 )
 			{
-//				printf("KEYCNT = %04x\n", data>>16);
+//              printf("KEYCNT = %04x\n", data>>16);
 				verboselog(machine, 2, "GBA IO Register Write: KEYCNT (%08x) = %04x (%08x)\n", 0x04000000 + ( offset << 2 ), ( data & mem_mask ) >> 16, ~mem_mask );
                 gba_state->KEYCNT = ( gba_state->KEYCNT & ( ~mem_mask >> 16 ) ) | ( ( data & mem_mask ) >> 16 );
 			}
@@ -1763,14 +1763,14 @@ static WRITE32_HANDLER( gba_io_w )
 		case 0x0200/4:
 			if( (mem_mask) & 0x0000ffff )
 			{
-//				printf("IE (%08x) = %04x raw %x (%08x) (scan %d PC %x)\n", 0x04000000 + ( offset << 2 ), data & mem_mask, data, ~mem_mask, video_screen_get_vpos(machine->primary_screen), cpu_get_pc(space->cpu));
+//              printf("IE (%08x) = %04x raw %x (%08x) (scan %d PC %x)\n", 0x04000000 + ( offset << 2 ), data & mem_mask, data, ~mem_mask, video_screen_get_vpos(machine->primary_screen), cpu_get_pc(space->cpu));
 				gba_state->IE = ( gba_state->IE & ~mem_mask ) | ( data & mem_mask );
 				 /*
-				if (gba_state->IE & gba_state->IF)
-				{
-					gba_request_irq(machine, gba_state->IF);
-				}
-				*/
+                if (gba_state->IE & gba_state->IF)
+                {
+                    gba_request_irq(machine, gba_state->IF);
+                }
+                */
 			}
 			if( (mem_mask) & 0xffff0000 )
 			{
@@ -1832,7 +1832,7 @@ static WRITE32_HANDLER( gba_io_w )
 			}
 			break;
 		default:
-//			verboselog(machine, 0, "Unknown GBA I/O register write: %08x = %08x (%08x)\n", 0x04000000 + ( offset << 2 ), data, ~mem_mask );
+//          verboselog(machine, 0, "Unknown GBA I/O register write: %08x = %08x (%08x)\n", 0x04000000 + ( offset << 2 ), data, ~mem_mask );
 			break;
 	}
 }
@@ -2252,7 +2252,7 @@ static READ32_HANDLER( eeprom_r )
 	switch (gba_state->eeprom_state)
 	{
 		case EEP_IDLE:
-//			printf("eeprom_r: @ %x, mask %08x (state %d) (PC=%x) = %d\n", offset, ~mem_mask, gba_state->eeprom_state, activecpu_get_pc(), 1);
+//          printf("eeprom_r: @ %x, mask %08x (state %d) (PC=%x) = %d\n", offset, ~mem_mask, gba_state->eeprom_state, activecpu_get_pc(), 1);
 			return 0x00010001;	// "ready"
 			break;
 
@@ -2271,7 +2271,7 @@ static READ32_HANDLER( eeprom_r )
 			if ((gba_state->eeprom_bits == 0) && (gba_state->eeprom_count))
 			{
 				gba_state->eep_data = gba_state->gba_eeprom[gba_state->eeprom_addr];
-		       //		printf("EEPROM read @ %x = %x (%x)\n", gba_state->eeprom_addr, gba_state->eep_data, (gba_state->eep_data & 0x80) ? 1 : 0);
+		       //       printf("EEPROM read @ %x = %x (%x)\n", gba_state->eeprom_addr, gba_state->eep_data, (gba_state->eep_data & 0x80) ? 1 : 0);
 				gba_state->eeprom_addr++;
 				gba_state->eeprom_bits = 8;
 			}
@@ -2288,12 +2288,12 @@ static READ32_HANDLER( eeprom_r )
 				gba_state->eeprom_state = EEP_IDLE;
 			}
 
-//			printf("out = %08x\n", out);
-//			printf("eeprom_r: @ %x, mask %08x (state %d) (PC=%x) = %08x\n", offset, ~mem_mask, gba_state->eeprom_state, activecpu_get_pc(), out);
+//          printf("out = %08x\n", out);
+//          printf("eeprom_r: @ %x, mask %08x (state %d) (PC=%x) = %08x\n", offset, ~mem_mask, gba_state->eeprom_state, activecpu_get_pc(), out);
 			return out;
 			break;
 	}
-//	printf("eeprom_r: @ %x, mask %08x (state %d) (PC=%x) = %d\n", offset, ~mem_mask, gba_state->eeprom_state, activecpu_get_pc(), 0);
+//  printf("eeprom_r: @ %x, mask %08x (state %d) (PC=%x) = %d\n", offset, ~mem_mask, gba_state->eeprom_state, activecpu_get_pc(), 0);
 	return 0;
 }
 
@@ -2306,7 +2306,7 @@ static WRITE32_HANDLER( eeprom_w )
 		data >>= 16;
 	}
 
-//	printf("eeprom_w: %x @ %x (state %d) (PC=%x)\n", data, offset, gba_state->eeprom_state, activecpu_get_pc());
+//  printf("eeprom_w: %x @ %x (state %d) (PC=%x)\n", data, offset, gba_state->eeprom_state, activecpu_get_pc());
 
 	switch (gba_state->eeprom_state)
 	{

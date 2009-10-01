@@ -38,7 +38,7 @@ typedef struct
 	int screen_mode;
 	int cassette_motor_mode;
 	int capslock_mode;
-//	int scanline;
+//  int scanline;
 	/* tape reading related */
 	UINT32 tape_value;
 	int tape_steps;

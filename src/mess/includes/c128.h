@@ -1,14 +1,14 @@
 /*****************************************************************************
  *
  * includes/c128.h
- * 
+ *
  * Commodore C128 Home Computer
- * 
+ *
  * peter.trauner@jk.uni-linz.ac.at
  *
  * Documentation: iDOC (http://www.softwolves.pp.se/idoc)
  *   Christian Janoff <mepk@c64.org>
- * 
+ *
  ****************************************************************************/
 
 #ifndef C128_H_

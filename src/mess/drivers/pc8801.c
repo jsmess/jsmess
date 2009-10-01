@@ -1,81 +1,81 @@
 /*****************************************************************************************************
 
-	NEC PC-8801 MESS Emulation
-	
-	PC-88xx Models (and similar machines like PC-80xx and PC-98DO)
+    NEC PC-8801 MESS Emulation
 
-	Model            | release |      CPU     |                      BIOS components                        |       |
-	                 |         |     clock    | N-BASIC | N88-BASIC | N88-BASIC Enh |  Sound  |  CD |  Dict |  Disk | Notes
-	==================================================================================================================================
-	PC-8001          | 1979-03 |   z80A @ 4   |    X    |     -     |       -       |    -    |  -  |   -   |   -   |
-	PC-8001A         |   ??    |   z80A @ 4   |    X    |     -     |       -       |    -    |  -  |   -   |   -   | (U)
-	PC-8801          | 1981-11 |   z80A @ 4   |    X    |     X     |       -       |    -    |  -  |   -   |   -   | (KO)
-	PC-8801A         |   ??    |   z80A @ 4   |    X    |     X     |       -       |    -    |  -  |   -   |   -   | (U)
-	PC-8001 mkII     | 1983-03 |   z80A @ 4   |    X    |     -     |       -       |    -    |  -  |   -   |   -   | (GE),(KO)
-	PC-8001 mkIIA    |   ??    |   z80A @ 4   |    X    |     -     |       -       |    -    |  -  |   -   |   -   | (U),(GE)
-	PC-8801 mkII     | 1983-11 |   z80A @ 4   |    X    |     X     |       -       |    -    |  -  |   -   | (FDM) | (K1)
-	PC-8001 mkII SR  | 1985-01 |   z80A @ 4   |    X    |     -     |       -       |    -    |  -  |   -   |   -   | (GE),(NE),(KO)
-	PC-8801 mkII SR  | 1985-03 |   z80A @ 4   |    X    |     X     |       X       |    X    |  -  |   -   | (FDM) | (K1)
-	PC-8801 mkII TR  | 1985-10 |   z80A @ 4   |    X    |     X     |       X       |    X    |  -  |   -   | (FD2) | (K1)
-	PC-8801 mkII FR  | 1985-11 |   z80A @ 4   |    X    |     X     |       X       |    X    |  -  |   -   | (FDM) | (K1)
-	PC-8801 mkII MR  | 1985-11 |   z80A @ 4   |    X    |     X     |       X       |    X    |  -  |   -   | (FDH) | (K2)
-	PC-8801 FH       | 1986-11 |  z80H @ 4/8  |    X    |     X     |       X       |    X    |  -  |   -   | (FDM) | (K2)
-	PC-8801 MH       | 1986-11 |  z80H @ 4/8  |    X    |     X     |       X       |    X    |  -  |   -   | (FDH) | (K2)
-	PC-88 VA         | 1987-03 | z80H+v30 @ 8 |    -    |     X     |       X       |    X    |  -  |   X   | (FDH) | (K2)
-	PC-8801 FA       | 1987-11 |  z80H @ 4/8  |    X    |     X     |       X       |    X    |  -  |   -   | (FD2) | (K2)
-	PC-8801 MA       | 1987-11 |  z80H @ 4/8  |    X    |     X     |       X       |    X    |  -  |   X   | (FDH) | (K2)
-	PC-88 VA2        | 1988-03 | z80H+v30 @ 8 |    -    |     X     |       X       |    X    |  -  |   X   | (FDH) | (K2)
-	PC-88 VA3        | 1988-03 | z80H+v30 @ 8 |    -    |     X     |       X       |    X    |  -  |   X   | (FD3) | (K2)
-	PC-8801 FE       | 1988-10 |  z80H @ 4/8  |    X    |     X     |       X       |    X    |  -  |   -   | (FD2) | (K2)
-	PC-8801 MA2      | 1988-10 |  z80H @ 4/8  |    X    |     X     |       X       |    X    |  -  |   X   | (FDH) | (K2)
-	PC-98 DO         | 1989-06 |   z80H @ 8   |    X    |     X     |       X       |    X    |  -  |   -   | (FDH) | (KE)
-	PC-8801 FE2      | 1989-10 |  z80H @ 4/8  |    X    |     X     |       X       |    X    |  -  |   -   | (FD2) | (K2)
-	PC-8801 MC       | 1989-11 |  z80H @ 4/8  |    X    |     X     |       X       |    X    |  X  |   X   | (FDH) | (K2)
-	PC-98 DO+        | 1990-10 |   z80H @ 8   |    X    |     X     |       X       |    X    |  -  |   -   | (FDH) | (KE)
+    PC-88xx Models (and similar machines like PC-80xx and PC-98DO)
 
-	info for PC-98 DO & DO+ refers to their 88-mode
-	
-	Disk Drive options:
-	(FDM): there exist three model of this computer: Model 10 (base model, only optional floppy drive), Model 20
-		(1 floppy drive for 5.25" 2D disks) and Model 30 (2 floppy drive for 5.25" 2D disks)
-	(FD2): 2 floppy drive for 5.25" 2D disks
-	(FDH): 2 floppy drive for both 5.25" 2D disks and 5.25" HD disks
-	(FD3): 2 floppy drive for both 5.25" 2D disks and 5.25" HD disks + 1 floppy drive for 3.5" 2TD disks
+    Model            | release |      CPU     |                      BIOS components                        |       |
+                     |         |     clock    | N-BASIC | N88-BASIC | N88-BASIC Enh |  Sound  |  CD |  Dict |  Disk | Notes
+    ==================================================================================================================================
+    PC-8001          | 1979-03 |   z80A @ 4   |    X    |     -     |       -       |    -    |  -  |   -   |   -   |
+    PC-8001A         |   ??    |   z80A @ 4   |    X    |     -     |       -       |    -    |  -  |   -   |   -   | (U)
+    PC-8801          | 1981-11 |   z80A @ 4   |    X    |     X     |       -       |    -    |  -  |   -   |   -   | (KO)
+    PC-8801A         |   ??    |   z80A @ 4   |    X    |     X     |       -       |    -    |  -  |   -   |   -   | (U)
+    PC-8001 mkII     | 1983-03 |   z80A @ 4   |    X    |     -     |       -       |    -    |  -  |   -   |   -   | (GE),(KO)
+    PC-8001 mkIIA    |   ??    |   z80A @ 4   |    X    |     -     |       -       |    -    |  -  |   -   |   -   | (U),(GE)
+    PC-8801 mkII     | 1983-11 |   z80A @ 4   |    X    |     X     |       -       |    -    |  -  |   -   | (FDM) | (K1)
+    PC-8001 mkII SR  | 1985-01 |   z80A @ 4   |    X    |     -     |       -       |    -    |  -  |   -   |   -   | (GE),(NE),(KO)
+    PC-8801 mkII SR  | 1985-03 |   z80A @ 4   |    X    |     X     |       X       |    X    |  -  |   -   | (FDM) | (K1)
+    PC-8801 mkII TR  | 1985-10 |   z80A @ 4   |    X    |     X     |       X       |    X    |  -  |   -   | (FD2) | (K1)
+    PC-8801 mkII FR  | 1985-11 |   z80A @ 4   |    X    |     X     |       X       |    X    |  -  |   -   | (FDM) | (K1)
+    PC-8801 mkII MR  | 1985-11 |   z80A @ 4   |    X    |     X     |       X       |    X    |  -  |   -   | (FDH) | (K2)
+    PC-8801 FH       | 1986-11 |  z80H @ 4/8  |    X    |     X     |       X       |    X    |  -  |   -   | (FDM) | (K2)
+    PC-8801 MH       | 1986-11 |  z80H @ 4/8  |    X    |     X     |       X       |    X    |  -  |   -   | (FDH) | (K2)
+    PC-88 VA         | 1987-03 | z80H+v30 @ 8 |    -    |     X     |       X       |    X    |  -  |   X   | (FDH) | (K2)
+    PC-8801 FA       | 1987-11 |  z80H @ 4/8  |    X    |     X     |       X       |    X    |  -  |   -   | (FD2) | (K2)
+    PC-8801 MA       | 1987-11 |  z80H @ 4/8  |    X    |     X     |       X       |    X    |  -  |   X   | (FDH) | (K2)
+    PC-88 VA2        | 1988-03 | z80H+v30 @ 8 |    -    |     X     |       X       |    X    |  -  |   X   | (FDH) | (K2)
+    PC-88 VA3        | 1988-03 | z80H+v30 @ 8 |    -    |     X     |       X       |    X    |  -  |   X   | (FD3) | (K2)
+    PC-8801 FE       | 1988-10 |  z80H @ 4/8  |    X    |     X     |       X       |    X    |  -  |   -   | (FD2) | (K2)
+    PC-8801 MA2      | 1988-10 |  z80H @ 4/8  |    X    |     X     |       X       |    X    |  -  |   X   | (FDH) | (K2)
+    PC-98 DO         | 1989-06 |   z80H @ 8   |    X    |     X     |       X       |    X    |  -  |   -   | (FDH) | (KE)
+    PC-8801 FE2      | 1989-10 |  z80H @ 4/8  |    X    |     X     |       X       |    X    |  -  |   -   | (FD2) | (K2)
+    PC-8801 MC       | 1989-11 |  z80H @ 4/8  |    X    |     X     |       X       |    X    |  X  |   X   | (FDH) | (K2)
+    PC-98 DO+        | 1990-10 |   z80H @ 8   |    X    |     X     |       X       |    X    |  -  |   -   | (FDH) | (KE)
 
-	Notes:
-	(U): US version
-	(GE): Graphic Expansion for PC-8001
-	(NE): N-BASIC Expansion for PC-8001 (similar to N88-BASIC Expansion for PC-88xx)
-	(KO): Optional Kanji ROM
-	(K1): Kanji 1st Level ROM
-	(K2): Kanji 2nd Level ROM
-	(KE): Kanji Enhanced ROM
+    info for PC-98 DO & DO+ refers to their 88-mode
 
-	Memory mounting locations: 
-	 * N-BASIC 0x0000 - 0x5fff, N-BASIC Expansion & Graph Enhhancement 0x6000 - 0x7fff
-	 * N-BASIC 0x0000 - 0x5fff, N-BASIC Expansion & Graph Enhhancement 0x6000 - 0x7fff
-	 * N88-BASIC 0x0000 - 0x7fff, N88-BASIC Expansion & Graph Enhhancement 0x6000 - 0x7fff
-	 * Sound BIOS: 0x6000 - 0x7fff
-	 * CD-ROM BISO: 0x0000 - 0x7fff
-	 * Dictionary: 0xc000 - 0xffff (32 Banks)
+    Disk Drive options:
+    (FDM): there exist three model of this computer: Model 10 (base model, only optional floppy drive), Model 20
+        (1 floppy drive for 5.25" 2D disks) and Model 30 (2 floppy drive for 5.25" 2D disks)
+    (FD2): 2 floppy drive for 5.25" 2D disks
+    (FDH): 2 floppy drive for both 5.25" 2D disks and 5.25" HD disks
+    (FD3): 2 floppy drive for both 5.25" 2D disks and 5.25" HD disks + 1 floppy drive for 3.5" 2TD disks
 
-	info from http://www.geocities.jp/retro_zzz/machines/nec/cmn_roms.html
-	also, refer to http://www.geocities.jp/retro_zzz/machines/nec/cmn_vers.html for
-		info about BASIC revisions in the various models (BASIC V2 is the BASIC
-		Expansion, if I unerstood correctly)
+    Notes:
+    (U): US version
+    (GE): Graphic Expansion for PC-8001
+    (NE): N-BASIC Expansion for PC-8001 (similar to N88-BASIC Expansion for PC-88xx)
+    (KO): Optional Kanji ROM
+    (K1): Kanji 1st Level ROM
+    (K2): Kanji 2nd Level ROM
+    (KE): Kanji Enhanced ROM
 
-	TODO: 
-		- Shouldn't it be possible to switch resolution during emulation, like many MAME 
-		games do? If yes, there would be no need of separate LoRes and HiRes drivers.
-		- Add correct CPU to various computers (right now they all use the MkIISR settings)
-		- Dump the Sound BIOS
-		- We need to support no Expanded BASIC machines (early models). Right now emulation
-		always start from BASIC V2, so machines without it only shows a black screen
-        - We need to emulate the differences in the new sets (MkIIFR, MA, MA2, MC) compared 
-		to MkIISR.
+    Memory mounting locations:
+     * N-BASIC 0x0000 - 0x5fff, N-BASIC Expansion & Graph Enhhancement 0x6000 - 0x7fff
+     * N-BASIC 0x0000 - 0x5fff, N-BASIC Expansion & Graph Enhhancement 0x6000 - 0x7fff
+     * N88-BASIC 0x0000 - 0x7fff, N88-BASIC Expansion & Graph Enhhancement 0x6000 - 0x7fff
+     * Sound BIOS: 0x6000 - 0x7fff
+     * CD-ROM BISO: 0x0000 - 0x7fff
+     * Dictionary: 0xc000 - 0xffff (32 Banks)
 
-	Usage:
-		These machines take a long time to start. Be patient (or press Insert to FastForward)
+    info from http://www.geocities.jp/retro_zzz/machines/nec/cmn_roms.html
+    also, refer to http://www.geocities.jp/retro_zzz/machines/nec/cmn_vers.html for
+        info about BASIC revisions in the various models (BASIC V2 is the BASIC
+        Expansion, if I unerstood correctly)
+
+    TODO:
+        - Shouldn't it be possible to switch resolution during emulation, like many MAME
+        games do? If yes, there would be no need of separate LoRes and HiRes drivers.
+        - Add correct CPU to various computers (right now they all use the MkIISR settings)
+        - Dump the Sound BIOS
+        - We need to support no Expanded BASIC machines (early models). Right now emulation
+        always start from BASIC V2, so machines without it only shows a black screen
+        - We need to emulate the differences in the new sets (MkIIFR, MA, MA2, MC) compared
+        to MkIISR.
+
+    Usage:
+        These machines take a long time to start. Be patient (or press Insert to FastForward)
 
 
 
@@ -286,8 +286,8 @@ the top line of keys in PC8801 keyboard is as follows
 Therefore, in Full Emulation mode, "F1" goes to 'F3' and so on
 
 Also, the Keypad has 16 keys, making impossible to map it in a satisfactory
-way to a PC keypad. Therefore, default settings for these keys in Full 
-Emulation are currently based on the effect of the key rather than on 
+way to a PC keypad. Therefore, default settings for these keys in Full
+Emulation are currently based on the effect of the key rather than on
 their real position
 
 About natural keyboards: currently,
@@ -299,7 +299,7 @@ About natural keyboards: currently,
 - "Roll Up" and "Roll Down" are mapped to 'Page Up' and 'Page Down'
 - "Help" is mapped to 'F8'
  */
- 
+
 static INPUT_PORTS_START( pc88sr )
 	PORT_START("KEY0")
 	PORT_BIT (0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_0_PAD)		PORT_CHAR(UCHAR_MAMEKEY(0_PAD))
@@ -418,13 +418,13 @@ static INPUT_PORTS_START( pc88sr )
 
 	PORT_START("KEY12")		/* port 0x0c */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	
+
 	PORT_START("KEY13")		/* port 0x0d */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	
+
 	PORT_START("KEY14")		/* port 0x0e */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	
+
 	PORT_START("KEY15")		/* port 0x0f */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -622,9 +622,9 @@ static MACHINE_DRIVER_START( pc88srl )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	MDRV_SOUND_ADD("beep", BEEP, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
-	
+
 	MDRV_NEC765A_ADD("nec765", pc8801_fdc_interface)
-	
+
 	MDRV_FLOPPY_2_DRIVES_ADD(pc88_floppy_config)
 MACHINE_DRIVER_END
 
@@ -704,7 +704,7 @@ ROM_START( pc8801 )
 	ROM_LOAD( "font.rom", 0x0000, 0x0800, CRC(56653188) SHA1(84b90f69671d4b72e8f219e1fe7cd667e976cf7f) )
 ROM_END
 
-/* The dump only included "maincpu". Other roms arbitrariely taken from PC-8801 & PC-8801 MkIISR (there should be 
+/* The dump only included "maincpu". Other roms arbitrariely taken from PC-8801 & PC-8801 MkIISR (there should be
 at least 1 Kanji ROM). */
 ROM_START( pc88m2 )
 	ROM_REGION( 0x18000, "maincpu", 0 )

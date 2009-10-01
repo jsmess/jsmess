@@ -73,7 +73,7 @@ int pc1251_inb(const device_config *device)
 {
 	int data = outb;
 
-	if (outb & 0x08) 
+	if (outb & 0x08)
 		data |= (input_port_read(device->machine, "MODE") & 0x07);
 
 	return data;

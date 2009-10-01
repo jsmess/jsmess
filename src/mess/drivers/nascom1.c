@@ -341,9 +341,9 @@ static MACHINE_DRIVER_START( nascom2 )
 	MDRV_SCREEN_VISIBLE_AREA(0, 48 * 8 - 1, 0, 16 * 14 - 1)
 	MDRV_GFXDECODE(nascom2)
 	MDRV_VIDEO_UPDATE(nascom2)
-	
+
 	MDRV_WD1793_ADD("wd1793", nascom2_wd17xx_interface )
-	
+
 	MDRV_FLOPPY_4_DRIVES_ADD(nascom2_floppy_config)
 MACHINE_DRIVER_END
 
@@ -391,23 +391,23 @@ ROM_END
 
 //static void nascom1_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 //{
-//	/* cassette */
-//	switch(state)
-//	{
-//		/* --- the following bits of info are returned as 64-bit signed integers --- */
-//		case MESS_DEVINFO_INT_TYPE:							info->i = IO_CASSETTE; break;
-//		case MESS_DEVINFO_INT_READABLE:						info->i = 1; break;
-//		case MESS_DEVINFO_INT_WRITEABLE:						info->i = 0; break;
-//		case MESS_DEVINFO_INT_CREATABLE:						info->i = 0; break;
-//		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
+//  /* cassette */
+//  switch(state)
+//  {
+//      /* --- the following bits of info are returned as 64-bit signed integers --- */
+//      case MESS_DEVINFO_INT_TYPE:                         info->i = IO_CASSETTE; break;
+//      case MESS_DEVINFO_INT_READABLE:                     info->i = 1; break;
+//      case MESS_DEVINFO_INT_WRITEABLE:                        info->i = 0; break;
+//      case MESS_DEVINFO_INT_CREATABLE:                        info->i = 0; break;
+//      case MESS_DEVINFO_INT_COUNT:                            info->i = 1; break;
 //
-//		/* --- the following bits of info are returned as pointers to data or functions --- */
-//		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(nascom1_cassette); break;
-//		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(nascom1_cassette); break;
+//      /* --- the following bits of info are returned as pointers to data or functions --- */
+//      case MESS_DEVINFO_PTR_LOAD:                         info->load = DEVICE_IMAGE_LOAD_NAME(nascom1_cassette); break;
+//      case MESS_DEVINFO_PTR_UNLOAD:                       info->unload = DEVICE_IMAGE_UNLOAD_NAME(nascom1_cassette); break;
 //
-//		/* --- the following bits of info are returned as NULL-terminated strings --- */
-//		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "cas"); break;
-//	}
+//      /* --- the following bits of info are returned as NULL-terminated strings --- */
+//      case MESS_DEVINFO_STR_FILE_EXTENSIONS:              strcpy(info->s = device_temp_str(), "cas"); break;
+//  }
 //}
 
 
@@ -416,12 +416,12 @@ static SYSTEM_CONFIG_START( nascom1 )
 	CONFIG_RAM(16 * 1024)
 	CONFIG_RAM(32 * 1024)
 	CONFIG_RAM_DEFAULT(40 * 1024)
-//	CONFIG_DEVICE(nascom1_cassette_getinfo)
+//  CONFIG_DEVICE(nascom1_cassette_getinfo)
 SYSTEM_CONFIG_END
 
 
 static SYSTEM_CONFIG_START( nascom2 )
-	CONFIG_IMPORT_FROM(nascom1)	
+	CONFIG_IMPORT_FROM(nascom1)
 SYSTEM_CONFIG_END
 
 

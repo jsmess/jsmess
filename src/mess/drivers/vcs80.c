@@ -4,7 +4,7 @@
 
     12/05/2009 Skeleton driver.
 
-	http://hc-ddr.hucki.net/entwicklungssysteme.htm#VCS_80_von_Eckhard_Schiller
+    http://hc-ddr.hucki.net/entwicklungssysteme.htm#VCS_80_von_Eckhard_Schiller
 
 ****************************************************************************/
 
@@ -92,19 +92,19 @@ INPUT_PORTS_END
 static TIMER_DEVICE_CALLBACK( vcs80_keyboard_tick )
 {
 	/*
-		
-		bit		description
 
-		PA0		keyboard and led latch bit 0
-		PA1		keyboard and led latch bit 1
-		PA2		keyboard and led latch bit 2
-		PA3		GND
-		PA4		keyboard row input 0
-		PA5		keyboard row input 1
-		PA6		keyboard row input 2
-		PA7		demultiplexer clock input
+        bit     description
 
-	*/
+        PA0     keyboard and led latch bit 0
+        PA1     keyboard and led latch bit 1
+        PA2     keyboard and led latch bit 2
+        PA3     GND
+        PA4     keyboard row input 0
+        PA5     keyboard row input 1
+        PA6     keyboard row input 2
+        PA7     demultiplexer clock input
+
+    */
 
 	vcs80_state *state = timer->machine->driver_data;
 
@@ -130,19 +130,19 @@ static TIMER_DEVICE_CALLBACK( vcs80_keyboard_tick )
 static WRITE8_DEVICE_HANDLER( pio_port_b_w )
 {
 	/*
-		
-		bit		description
 
-		PB0		VQD30 segment A
-		PB1		VQD30 segment B
-		PB2		VQD30 segment C
-		PB3		VQD30 segment D
-		PB4		VQD30 segment E
-		PB5		VQD30 segment G
-		PB6		VQD30 segment F
-		PB7		_A0
+        bit     description
 
-	*/
+        PB0     VQD30 segment A
+        PB1     VQD30 segment B
+        PB2     VQD30 segment C
+        PB3     VQD30 segment D
+        PB4     VQD30 segment E
+        PB5     VQD30 segment G
+        PB6     VQD30 segment F
+        PB7     _A0
+
+    */
 
 	vcs80_state *state = device->machine->driver_data;
 
@@ -244,5 +244,5 @@ static DRIVER_INIT( vcs80 )
 
 /* System Drivers */
 
-/*    YEAR	NAME	PARENT	COMPAT	MACHINE	INPUT	INIT	CONFIG	COMPANY				FULLNAME	FLAGS */
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY             FULLNAME    FLAGS */
 COMP( 1983, vcs80,  0,		0,		vcs80,	vcs80,	vcs80,	vcs80,	"Eckhard Schiller",	"VCS-80",	GAME_SUPPORTS_SAVE )

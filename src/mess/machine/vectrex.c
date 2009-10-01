@@ -91,7 +91,7 @@ DEVICE_IMAGE_LOAD(vectrex_cart)
 	}
 
 	/* If VIA T2 starts, reset refresh timer.
-	   This is the best strategy for most games. */
+       This is the best strategy for most games. */
 	vectrex_reset_refresh = 1;
 
 	vectrex_imager_angles = narrow_escape_angles;
@@ -114,8 +114,8 @@ DEVICE_IMAGE_LOAD(vectrex_cart)
 	{
 		vectrex_imager_angles = minestorm_3d_angles;
 
-		/* Don't reset T2 each time it's written. 
-		   This would cause jerking in mine3. */
+		/* Don't reset T2 each time it's written.
+           This would cause jerking in mine3. */
 		vectrex_reset_refresh = 0;
 	}
 
@@ -229,8 +229,8 @@ READ8_DEVICE_HANDLER(v_via_pb_r)
 	int pot;
 	static const char *const ctrlnames[] = { "CONTR1X", "CONTR1Y", "CONTR2X", "CONTR2Y" };
 
-	pot = input_port_read(device->machine, ctrlnames[(vectrex_via_out[PORTB] & 0x6) >> 1]) - 0x80; 
-	
+	pot = input_port_read(device->machine, ctrlnames[(vectrex_via_out[PORTB] & 0x6) >> 1]) - 0x80;
+
 	if (pot > (signed char)vectrex_via_out[PORTA])
 		vectrex_via_out[PORTB] |= 0x20;
 	else
@@ -326,10 +326,10 @@ WRITE8_HANDLER(vectrex_psg_port_w)
 		if (wavel < 1)
 		{
 			/* The Vectrex sends a stream of pulses which control the speed of
-			   the motor using Pulse Width Modulation. Guessed parameters are MMI
-			   (mass moment of inertia) of the color wheel, DAMPC (damping coefficient)
-			   of the whole thing and some constants of the motor's torque/speed curve.
-			   pwl is the negative pulse width and wavel is the whole wavelength. */
+               the motor using Pulse Width Modulation. Guessed parameters are MMI
+               (mass moment of inertia) of the color wheel, DAMPC (damping coefficient)
+               of the whole thing and some constants of the motor's torque/speed curve.
+               pwl is the negative pulse width and wavel is the whole wavelength. */
 
 			ang_acc = (50.0 - 1.55 * vectrex_imager_freq) / MMI;
 			vectrex_imager_freq += ang_acc * pwl + DAMPC * vectrex_imager_freq / MMI * wavel;
@@ -354,9 +354,9 @@ WRITE8_HANDLER(vectrex_psg_port_w)
 DRIVER_INIT(vectrex)
 {
 	/*
-	 * Uninitialized RAM needs to return 0xff. Otherwise the mines in
-	 * the first level of Minestorm are not evenly distributed.
-	 */
+     * Uninitialized RAM needs to return 0xff. Otherwise the mines in
+     * the first level of Minestorm are not evenly distributed.
+     */
 
 	memset(vectorram, 0xff, vectorram_size);
 }

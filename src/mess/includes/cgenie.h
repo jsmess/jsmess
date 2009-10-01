@@ -63,7 +63,7 @@ WRITE8_HANDLER ( cgenie_videoram_w );
 
 // CRTC 6845
 typedef struct
-{         
+{
 	UINT8    cursor_address_lo;
 	UINT8    cursor_address_hi;
 	UINT8    screen_address_lo;

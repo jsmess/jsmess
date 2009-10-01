@@ -1,7 +1,7 @@
 /*
-	TX-0
+    TX-0
 *
-	Raphael Nabet, 2004
+    Raphael Nabet, 2004
 */
 
 #include "driver.h"
@@ -149,7 +149,7 @@ MACHINE_RESET( tx0 )
 static void tx0_machine_stop(running_machine *machine)
 {
 	/* the core will take care of freeing the timers, BUT we must set the variables
-	to NULL if we don't want to risk confusing the tape image init function */
+    to NULL if we don't want to risk confusing the tape image init function */
 	tape_reader.timer = tape_puncher.timer = typewriter.prt_timer = dis_timer = NULL;
 }
 
@@ -166,7 +166,7 @@ MACHINE_START( tx0 )
 
 
 /*
-	perforated tape handling
+    perforated tape handling
 */
 
 void tx0_tape_get_open_mode(int id,	unsigned int *readable, unsigned int *writeable, unsigned int *creatable)
@@ -193,9 +193,9 @@ DEVICE_START( tx0_tape )
 
 
 /*
-	Open a perforated tape image
+    Open a perforated tape image
 
-	unit 0 is reader (read-only), unit 1 is puncher (write-only)
+    unit 0 is reader (read-only), unit 1 is puncher (write-only)
 */
 DEVICE_IMAGE_LOAD( tx0_tape )
 {
@@ -212,8 +212,8 @@ DEVICE_IMAGE_LOAD( tx0_tape )
 
 		/* restart reader IO when necessary */
 		/* note that this function may be called before tx0_init_machine, therefore
-		before tape_reader.timer is allocated.  It does not matter, as the clutch is never
-		down at power-up, but we must not call timer_enable with a NULL parameter! */
+        before tape_reader.timer is allocated.  It does not matter, as the clutch is never
+        down at power-up, but we must not call timer_enable with a NULL parameter! */
 		if (tape_reader.timer)
 		{
 			if (tape_reader.motor_on && tape_reader.rcl)
@@ -262,7 +262,7 @@ DEVICE_IMAGE_UNLOAD( tx0_tape )
 }
 
 /*
-	Read a byte from perforated tape
+    Read a byte from perforated tape
 */
 static int tape_read(UINT8 *reply)
 {
@@ -273,7 +273,7 @@ static int tape_read(UINT8 *reply)
 }
 
 /*
-	Write a byte to perforated tape
+    Write a byte to perforated tape
 */
 static void tape_write(UINT8 data)
 {
@@ -282,7 +282,7 @@ static void tape_write(UINT8 data)
 }
 
 /*
-	common code for tape read commands (R1C, R3C, and read-in mode)
+    common code for tape read commands (R1C, R3C, and read-in mode)
 */
 static void begin_tape_read(int binary)
 {
@@ -303,7 +303,7 @@ static void begin_tape_read(int binary)
 
 
 /*
-	timer callback to simulate reader IO
+    timer callback to simulate reader IO
 */
 static TIMER_CALLBACK(reader_callback)
 {
@@ -350,7 +350,7 @@ static TIMER_CALLBACK(reader_callback)
 }
 
 /*
-	timer callback to generate punch completion pulse
+    timer callback to generate punch completion pulse
 */
 static TIMER_CALLBACK(puncher_callback)
 {
@@ -358,7 +358,7 @@ static TIMER_CALLBACK(puncher_callback)
 }
 
 /*
-	Initiate read of a 6-bit word from tape
+    Initiate read of a 6-bit word from tape
 */
 void tx0_io_r1l(const device_config *device)
 {
@@ -366,7 +366,7 @@ void tx0_io_r1l(const device_config *device)
 }
 
 /*
-	Initiate read of a 18-bit word from tape (used in read-in mode)
+    Initiate read of a 18-bit word from tape (used in read-in mode)
 */
 void tx0_io_r3l(const device_config *device)
 {
@@ -374,7 +374,7 @@ void tx0_io_r3l(const device_config *device)
 }
 
 /*
-	Write a 7-bit word to tape (7th bit clear)
+    Write a 7-bit word to tape (7th bit clear)
 */
 void tx0_io_p6h(const device_config *device)
 {
@@ -389,7 +389,7 @@ void tx0_io_p6h(const device_config *device)
 }
 
 /*
-	Write a 7-bit word to tape (7th bit set)
+    Write a 7-bit word to tape (7th bit set)
 */
 void tx0_io_p7h(const device_config *device)
 {
@@ -405,14 +405,14 @@ void tx0_io_p7h(const device_config *device)
 
 
 /*
-	Typewriter handling
+    Typewriter handling
 
-	The alphanumeric on-line typewriter is a standard device on tx-0: it can
-	both handle keyboard input and print output text.
+    The alphanumeric on-line typewriter is a standard device on tx-0: it can
+    both handle keyboard input and print output text.
 */
 
 /*
-	Open a file for typewriter output
+    Open a file for typewriter output
 */
 DEVICE_IMAGE_LOAD(tx0_typewriter)
 {
@@ -428,7 +428,7 @@ DEVICE_IMAGE_UNLOAD(tx0_typewriter)
 }
 
 /*
-	Write a character to typewriter
+    Write a character to typewriter
 */
 static void typewriter_out(running_machine *machine, UINT8 data)
 {
@@ -438,7 +438,7 @@ static void typewriter_out(running_machine *machine, UINT8 data)
 }
 
 /*
-	timer callback to generate typewriter completion pulse
+    timer callback to generate typewriter completion pulse
 */
 static TIMER_CALLBACK(prt_callback)
 {
@@ -446,7 +446,7 @@ static TIMER_CALLBACK(prt_callback)
 }
 
 /*
-	prt io callback
+    prt io callback
 */
 void tx0_io_prt(const device_config *device)
 {
@@ -464,7 +464,7 @@ void tx0_io_prt(const device_config *device)
 
 
 /*
-	timer callback to generate crt completion pulse
+    timer callback to generate crt completion pulse
 */
 static TIMER_CALLBACK(dis_callback)
 {
@@ -472,7 +472,7 @@ static TIMER_CALLBACK(dis_callback)
 }
 
 /*
-	Plot one point on crt
+    Plot one point on crt
 */
 void tx0_io_dis(const device_config *device)
 {
@@ -490,11 +490,11 @@ void tx0_io_dis(const device_config *device)
 
 
 /*
-	Magtape support
+    Magtape support
 
-	Magtape format:
+    Magtape format:
 
-	7-track tape, 6-bit data, 1-bit parity
+    7-track tape, 6-bit data, 1-bit parity
 
 
 */
@@ -549,7 +549,7 @@ DEVICE_START( tx0_magtape )
 }
 
 /*
-	Open a magnetic tape image
+    Open a magnetic tape image
 */
 DEVICE_IMAGE_LOAD( tx0_magtape )
 {
@@ -559,8 +559,8 @@ DEVICE_IMAGE_LOAD( tx0_magtape )
 
 	/* restart IO when necessary */
 	/* note that this function may be called before tx0_init_machine, therefore
-	before magtape.timer is allocated.  We must not call timer_enable with a
-	NULL parameter! */
+    before magtape.timer is allocated.  We must not call timer_enable with a
+    NULL parameter! */
 	if (magtape.timer)
 	{
 		if (magtape.state == MTS_SELECTING)
@@ -607,7 +607,7 @@ static void magtape_callback(const device_config *device)
 
 			if ((mar & 03) != 1)
 			{	/* unimplemented device: remain in unselected state and set rwc
-				flag? */
+                flag? */
 				cpu_set_reg(device, TX0_PF, cpu_get_reg(device, TX0_PF) | PF_RWC);
 			}
 			else
@@ -689,14 +689,14 @@ static void magtape_callback(const device_config *device)
 				{
 				case MTBSS_STATE0:
 					/* STATE0 -> initial interrecord gap, longitudinal parity;
-					if longitudinal parity was all 0s, gap between longitudinal
-					parity and data, first byte of data */
+                    if longitudinal parity was all 0s, gap between longitudinal
+                    parity and data, first byte of data */
 					if (buf != 0)
 						magtape.u.backspace_state = MTBSS_STATE1;
 					break;
 				case MTBSS_STATE1:
 					/* STATE1 -> first byte of gap between longitudinal parity and
-					data, second byte of data */
+                    data, second byte of data */
 					if (buf == 0)
 						magtape.u.backspace_state = MTBSS_STATE2;
 					else
@@ -704,7 +704,7 @@ static void magtape_callback(const device_config *device)
 					break;
 				case MTBSS_STATE2:
 					/* STATE2 -> second byte of gap between longitudinal parity and
-					data */
+                    data */
 					if (buf == 0)
 						magtape.u.backspace_state = MTBSS_STATE3;
 					else
@@ -716,7 +716,7 @@ static void magtape_callback(const device_config *device)
 					break;
 				case MTBSS_STATE3:
 					/* STATE3 -> third byte of gap between longitudinal parity and
-					data */
+                    data */
 					if (buf == 0)
 						magtape.u.backspace_state = MTBSS_STATE4;
 					else
@@ -728,7 +728,7 @@ static void magtape_callback(const device_config *device)
 					break;
 				case MTBSS_STATE4:
 					/* STATE4 -> first byte of data word, first byte of
-					interrecord gap after data */
+                    interrecord gap after data */
 					if (buf == 0)
 					{
 						if (magtape.long_parity)
@@ -774,9 +774,9 @@ static void magtape_callback(const device_config *device)
 			if (image_fread(magtape.img, &buf, 1) != 1)
 			{	/* I/O error or EOF? */
 				/* The MAME fileio layer makes it very hard to make the
-				difference...  MAME seems to assume that I/O errors never
-				happen, whereas it is really easy to cause one by
-				deconnecting an external drive the image is located on!!! */
+                difference...  MAME seems to assume that I/O errors never
+                happen, whereas it is really easy to cause one by
+                deconnecting an external drive the image is located on!!! */
 				UINT64 offs;
 				offs = image_ftell(magtape.img);
 				if (image_fseek(magtape.img, 0, SEEK_END) || (offs != image_ftell(magtape.img)))
@@ -787,7 +787,7 @@ static void magtape_callback(const device_config *device)
 				else
 				{	/* end of tape -> ??? */
 					/* maybe we run past end of tape, so that tape is ejected from
-					upper reel and unit becomes unavailable??? */
+                    upper reel and unit becomes unavailable??? */
 					/*image_unload(magtape.img);*/
 					/* Or do we stop at EOT mark??? */
 					magtape.state = MTS_UNSELECTING;
@@ -865,7 +865,7 @@ static void magtape_callback(const device_config *device)
 					break;
 				case MTRDS_STATE3:
 					/* STATE3 -> first byte of new word of data, or first byte
-					of gap between data and longitudinal parity */
+                    of gap between data and longitudinal parity */
 					if (buf != 0)
 					{
 						magtape.u.read.state = MTRDS_STATE1;
@@ -883,7 +883,7 @@ static void magtape_callback(const device_config *device)
 					break;
 				case MTRDS_STATE4:
 					/* STATE4 -> second byte of gap between data and
-					longitudinal parity */
+                    longitudinal parity */
 					if (buf != 0)
 					{
 						logerror("tape seems to be corrupt\n");
@@ -896,7 +896,7 @@ static void magtape_callback(const device_config *device)
 
 				case MTRDS_STATE5:
 					/* STATE5 -> third byte of gap between data and
-					longitudinal parity */
+                    longitudinal parity */
 					if (buf != 0)
 					{
 						logerror("tape seems to be corrupt\n");
@@ -914,7 +914,7 @@ static void magtape_callback(const device_config *device)
 					{
 						logerror("invalid longitudinal parity\n");
 						/* no idea if the original tx-0 magtape controller
-						checks parity, but can't harm if we do */
+                        checks parity, but can't harm if we do */
 						cpu_set_reg(device, TX0_PF, cpu_get_reg(device, TX0_PF) | PF_PC);
 					}
 					/* set EOR and unselect... */
@@ -1070,9 +1070,9 @@ void tx0_io_cpy(const device_config *device)
 
 
 /*
-	callback which is called when reset line is pulsed
+    callback which is called when reset line is pulsed
 
-	IO devices should reset
+    IO devices should reset
 */
 void tx0_io_reset_callback(const device_config *device)
 {
@@ -1092,7 +1092,7 @@ void tx0_io_reset_callback(const device_config *device)
 
 
 /*
-	typewriter keyboard handler
+    typewriter keyboard handler
 */
 static void tx0_keyboard(running_machine *machine)
 {
@@ -1110,7 +1110,7 @@ static void tx0_keyboard(running_machine *machine)
 	{
 		typewriter_keys[i] = input_port_read(machine, twrnames[i]);
 	}
-	
+
 	for (i=0; i<4; i++)
 	{
 		typewriter_transitions = typewriter_keys[i] & (~ old_typewriter_keys[i]);
@@ -1121,7 +1121,7 @@ static void tx0_keyboard(running_machine *machine)
 			charcode = (i << 4) + j;
 			/* shuffle and insert data into LR */
 			/* BTW, I am not sure how the char code is combined with the
-			previous LR */
+            previous LR */
 			lr = (1 << 17) | ((charcode & 040) << 10) | ((charcode & 020) << 8) | ((charcode & 010) << 6) | ((charcode & 004) << 4) | ((charcode & 002) << 2) | ((charcode & 001) << 1);
 			/* write modified LR */
 			cpu_set_reg(cputag_get_cpu(machine, "maincpu"), TX0_LR, lr);
@@ -1135,7 +1135,7 @@ static void tx0_keyboard(running_machine *machine)
 }
 
 /*
-	Not a real interrupt - just handle keyboard input
+    Not a real interrupt - just handle keyboard input
 */
 INTERRUPT_GEN( tx0_interrupt )
 {

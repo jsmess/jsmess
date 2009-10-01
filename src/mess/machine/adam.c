@@ -595,16 +595,16 @@ If you have the source listing or the Rom dump, please send us.
 					break;
 				case 4: /* Read Data */
 					/*
-					AdamNet Error codes on low nibble for tape1,disk1,disk2 and on high nibble for tape2 (share DCB with tape1):
+                    AdamNet Error codes on low nibble for tape1,disk1,disk2 and on high nibble for tape2 (share DCB with tape1):
 
-						0x00  No Error (everything is OK)
-						0x01  CRC Error (block corrupt; data failed cyclic redundancy check)
-						0x02  Missing Block (attempt to access past physical end of medium)
-						0x03  Missing Media (not in drive or drive door open)
-						0x04  Missing Drive (not connected or not turned on)
-						0x05  Write-Protected (write-protect tab covered)
-						0x06  Drive Error (controller or seek failure)
-					*/
+                        0x00  No Error (everything is OK)
+                        0x01  CRC Error (block corrupt; data failed cyclic redundancy check)
+                        0x02  Missing Block (attempt to access past physical end of medium)
+                        0x03  Missing Media (not in drive or drive door open)
+                        0x04  Missing Drive (not connected or not turned on)
+                        0x05  Write-Protected (write-protect tab covered)
+                        0x06  Drive Error (controller or seek failure)
+                    */
 					if (deviceNum==1)
 					{
 						kbcode=getKeyFromBuffer();
@@ -686,9 +686,9 @@ WRITE8_HANDLER( adam_common_writes_w )
 WRITE8_HANDLER( adamnet_w )
 {
 	/*
-	If SmartWriter ROM is selected on lower Z80 memory
-	if data bit1 is 1 -> Lower 32k = EOS otherwise Lower 32k = SmartWriter
-	*/
+    If SmartWriter ROM is selected on lower Z80 memory
+    if data bit1 is 1 -> Lower 32k = EOS otherwise Lower 32k = SmartWriter
+    */
 	UINT8 *BankBase;
 	BankBase = &memory_region(space->machine, "maincpu")[0x00000];
 
@@ -796,8 +796,8 @@ READ8_HANDLER ( adam_paddle_r )
 			inport6 = input_port_read(space->machine, "controllers");
 
 			/* Numeric pad buttons are not independent on a real ColecoVision, if you push more
-			than one, a real ColecoVision think that it is a third button, so we are going to emulate
-			the right behaviour */
+            than one, a real ColecoVision think that it is a third button, so we are going to emulate
+            the right behaviour */
 
 			data = 0x0F;	/* No key pressed by default */
 			if (!(inport6&0x01)) /* If Driving Controller enabled -> no keypad 1 */
@@ -845,8 +845,8 @@ READ8_HANDLER ( adam_paddle_r )
 			inport4 = input_port_read(space->machine, "controller2_keypad2");
 
 			/* Numeric pad buttons are not independent on a real ColecoVision, if you push more
-			than one, a real ColecoVision think that it is a third button, so we are going to emulate
-			the right behaviour */
+            than one, a real ColecoVision think that it is a third button, so we are going to emulate
+            the right behaviour */
 
 			data = 0x0F;	/* No key pressed by default */
 			if (!(inport3 & 0x01)) data &= 0x0A; /* 0 */

@@ -1,9 +1,9 @@
 /*
-	Handlers for ti990 disk images
+    Handlers for ti990 disk images
 
-	Disk images are in MESS format.
+    Disk images are in MESS format.
 
-	Raphael Nabet, 2003
+    Raphael Nabet, 2003
 */
 
 #include <stdio.h>
@@ -72,7 +72,7 @@ INLINE void set_UINT32BE(UINT32BE *word, UINT32 data)
 }
 
 /*
-	disk image header
+    disk image header
 */
 typedef struct disk_image_header
 {
@@ -88,20 +88,20 @@ enum
 };
 
 /*
-	Disk structure:
+    Disk structure:
 
-	Track 0 Sector 0: see below
-	Track 0 Sector 1: list of bad ADU
-	Track 0 Sector 2 through N: disk allocation bitmap
-	Track 1 Sector 0 through N-2: optional disk program image loader
-	Track 1 Sector N-1: copy of Track 0 Sector 0
-	Track 1 Sector N: copy of Track 0 Sector 1
-	Last cylinder has disagnostic information (reported as .S$DIAG)
-	Remaining sectors are used for fdr and data.
+    Track 0 Sector 0: see below
+    Track 0 Sector 1: list of bad ADU
+    Track 0 Sector 2 through N: disk allocation bitmap
+    Track 1 Sector 0 through N-2: optional disk program image loader
+    Track 1 Sector N-1: copy of Track 0 Sector 0
+    Track 1 Sector N: copy of Track 0 Sector 1
+    Last cylinder has disagnostic information (reported as .S$DIAG)
+    Remaining sectors are used for fdr and data.
 */
 
 /*
-	SC0 record (Disk sector 0)
+    SC0 record (Disk sector 0)
 */
 typedef struct ti990_sc0
 {
@@ -144,16 +144,16 @@ typedef struct ti990_sc0
 	UINT16BE	wff;			/* WCS flag switch */
 	UINT16BE	vif;			/* track 1 select flag (whatever it means) volume information copied flag */
 	UINT16BE	sta;			/* state of disk: */
-									/*	1 = disk surface has not been tested for defects */
-									/*	2 = disk surface has been tested, but no file system has been installed */
-									/*	3 = a file system has been installed */
+									/*  1 = disk surface has not been tested for defects */
+									/*  2 = disk surface has been tested, but no file system has been installed */
+									/*  3 = a file system has been installed */
 	UINT16BE	dct;			/* disk creation time */
 	UINT16BE	fsf;			/* * * RESERVED * * */
 	/* SCOSIZ = >AA */
 } ti990_sc0;
 
 /*
-	DOR (Directory Overhead Record)
+    DOR (Directory Overhead Record)
 */
 typedef struct ti990_dor
 {
@@ -169,7 +169,7 @@ typedef struct ti990_dor
 } ti990_dor;
 
 /*
-	file flags found in fdr
+    file flags found in fdr
 */
 enum
 {
@@ -198,7 +198,7 @@ enum
 };
 
 /*
-	ACE subrecord found in FDR
+    ACE subrecord found in FDR
 */
 typedef struct ti990_ace
 {
@@ -207,7 +207,7 @@ typedef struct ti990_ace
 } ti990_ace;
 
 /*
-	FDR record
+    FDR record
 */
 typedef struct ti990_fdr
 {
@@ -248,10 +248,10 @@ typedef struct ti990_fdr
 } ti990_fdr;
 
 /*
-	ADR record: variant of FDR for Aliases
+    ADR record: variant of FDR for Aliases
 
-	The fields marked here with *** are in the ADR template to maintain
-	compatability with the FDR template.
+    The fields marked here with *** are in the ADR template to maintain
+    compatability with the FDR template.
 */
 typedef struct ti990_adr
 {
@@ -271,10 +271,10 @@ typedef struct ti990_adr
 } ti990_adr;
 
 /*
-	CDR record: variant of FDR for Channel
+    CDR record: variant of FDR for Channel
 
-	The CDR is the permanent record of a channel.  It is carried as an alias
-	of the program file in which the channel owner task resides.
+    The CDR is the permanent record of a channel.  It is carried as an alias
+    of the program file in which the channel owner task resides.
 */
 typedef struct ti990_cdr
 {
@@ -300,12 +300,12 @@ typedef struct ti990_cdr
 } ti990_cdr;
 
 /*
-	Based on contents of the flags field, catalog entries may be either an FDR,
-	an ADR or a CDR.
+    Based on contents of the flags field, catalog entries may be either an FDR,
+    an ADR or a CDR.
 
-	They may be a KDR, too, but confusion is impossible because the KDR FILL00
-	field starts at offset 4, and therefore if we try to interpret a KDR as an
-	FDR (or ADR, CDR), we will find fnm[0] and assume the FDR is empty.
+    They may be a KDR, too, but confusion is impossible because the KDR FILL00
+    field starts at offset 4, and therefore if we try to interpret a KDR as an
+    FDR (or ADR, CDR), we will find fnm[0] and assume the FDR is empty.
 */
 typedef union directory_entry
 {
@@ -317,7 +317,7 @@ typedef union directory_entry
 #if 0
 
 /*
-	tifile header: stand-alone file
+    tifile header: stand-alone file
 */
 typedef struct tifile_header
 {
@@ -335,7 +335,7 @@ typedef struct tifile_header
 
 
 /*
-	catalog entry (used for in-memory catalog)
+    catalog entry (used for in-memory catalog)
 */
 typedef struct catalog_entry
 {
@@ -346,7 +346,7 @@ typedef struct catalog_entry
 #endif
 
 /*
-	Disk geometry
+    Disk geometry
 */
 typedef struct ti990_geometry
 {
@@ -354,7 +354,7 @@ typedef struct ti990_geometry
 } ti990_geometry;
 
 /*
-	Physical sector address
+    Physical sector address
 */
 typedef struct ti990_phys_sec_address
 {
@@ -364,7 +364,7 @@ typedef struct ti990_phys_sec_address
 } ti990_phys_sec_address;
 
 /*
-	ti99 disk image descriptor
+    ti99 disk image descriptor
 */
 typedef struct ti990_image
 {
@@ -374,7 +374,7 @@ typedef struct ti990_image
 } ti990_image;
 
 /*
-	ti990 catalog iterator, used when imgtool reads the catalog
+    ti990 catalog iterator, used when imgtool reads the catalog
 */
 typedef struct ti990_iterator
 {
@@ -410,7 +410,7 @@ enum
 };
 
 static OPTION_GUIDE_START( ti990_create_optionguide )
-	/*OPTION_STRING(ti990_createopts_volname, "label",	"Volume name" )*/
+	/*OPTION_STRING(ti990_createopts_volname, "label",  "Volume name" )*/
 	OPTION_INT(ti990_createopts_cylinders, "cylinders", "Cylinders" )
 	OPTION_INT(ti990_createopts_heads, "heads", "Heads" )
 	OPTION_INT(ti990_createopts_sectors, "sectors", "Sectors" )
@@ -449,7 +449,7 @@ void ti990_get_info(const imgtool_class *imgclass, UINT32 state, union imgtoolin
 
 #ifdef UNUSED_FUNCTION
 /*
-	Convert a C string to a 8-character file name (padded with spaces if necessary)
+    Convert a C string to a 8-character file name (padded with spaces if necessary)
 */
 static void str_to_fname(char dst[8], const char *src)
 {
@@ -476,7 +476,7 @@ static void str_to_fname(char dst[8], const char *src)
 #endif
 
 /*
-	Convert a 8-character file name to a C string (removing trailing spaces if necessary)
+    Convert a 8-character file name to a C string (removing trailing spaces if necessary)
 */
 static void fname_to_str(char *dst, const char src[8], int n)
 {
@@ -510,7 +510,7 @@ static void fname_to_str(char *dst, const char src[8], int n)
 #endif
 
 /*
-	Convert physical sector address to offset
+    Convert physical sector address to offset
 */
 static unsigned phys_address_to_offset(const ti990_phys_sec_address *address, const ti990_geometry *geometry)
 {
@@ -523,13 +523,13 @@ static unsigned phys_address_to_offset(const ti990_phys_sec_address *address, co
 }
 
 /*
-	Read one sector from a disk image
+    Read one sector from a disk image
 
-	file_handle: imgtool file handle
-	address: physical sector address
-	geometry: disk geometry (sectors per track, tracks per side, sides)
-	dest: pointer to destination buffer
-	len: lenght of data to read
+    file_handle: imgtool file handle
+    address: physical sector address
+    geometry: disk geometry (sectors per track, tracks per side, sides)
+    dest: pointer to destination buffer
+    len: lenght of data to read
 */
 static int read_sector_physical_len(imgtool_stream *file_handle, const ti990_phys_sec_address *address, const ti990_geometry *geometry, void *dest, int len)
 {
@@ -552,12 +552,12 @@ static int read_sector_physical_len(imgtool_stream *file_handle, const ti990_phy
 
 #ifdef UNUSED_FUNCTION
 /*
-	Read one sector from a disk image
+    Read one sector from a disk image
 
-	file_handle: imgtool file handle
-	address: physical sector address
-	geometry: disk geometry (sectors per track, tracks per side, sides)
-	dest: pointer to a destination buffer of geometry->bytes_per_sector bytes
+    file_handle: imgtool file handle
+    address: physical sector address
+    geometry: disk geometry (sectors per track, tracks per side, sides)
+    dest: pointer to a destination buffer of geometry->bytes_per_sector bytes
 */
 static int read_sector_physical(imgtool_stream *file_handle, const ti990_phys_sec_address *address, const ti990_geometry *geometry, void *dest)
 {
@@ -566,13 +566,13 @@ static int read_sector_physical(imgtool_stream *file_handle, const ti990_phys_se
 #endif
 
 /*
-	Write one sector to a disk image
+    Write one sector to a disk image
 
-	file_handle: imgtool file handle
-	address: physical sector address
-	geometry: disk geometry (sectors per track, tracks per side, sides)
-	src: pointer to source buffer
-	len: lenght of source buffer
+    file_handle: imgtool file handle
+    address: physical sector address
+    geometry: disk geometry (sectors per track, tracks per side, sides)
+    src: pointer to source buffer
+    len: lenght of source buffer
 */
 static int write_sector_physical_len(imgtool_stream *file_handle, const ti990_phys_sec_address *address, const ti990_geometry *geometry, const void *src, int len)
 {
@@ -603,12 +603,12 @@ static int write_sector_physical_len(imgtool_stream *file_handle, const ti990_ph
 
 #ifdef UNUSED_FUNCTION
 /*
-	Write one sector to a disk image
+    Write one sector to a disk image
 
-	file_handle: imgtool file handle
-	address: physical sector address
-	geometry: disk geometry (sectors per track, tracks per side, sides)
-	dest: pointer to a source buffer of geometry->bytes_per_sector bytes
+    file_handle: imgtool file handle
+    address: physical sector address
+    geometry: disk geometry (sectors per track, tracks per side, sides)
+    dest: pointer to a source buffer of geometry->bytes_per_sector bytes
 */
 static int write_sector_physical(imgtool_stream *file_handle, const ti990_phys_sec_address *address, const ti990_geometry *geometry, const void *src)
 {
@@ -617,7 +617,7 @@ static int write_sector_physical(imgtool_stream *file_handle, const ti990_phys_s
 #endif
 
 /*
-	Convert logical sector address to physical sector address
+    Convert logical sector address to physical sector address
 */
 static void log_address_to_phys_address(int secnum, const ti990_geometry *geometry, ti990_phys_sec_address *address)
 {
@@ -628,13 +628,13 @@ static void log_address_to_phys_address(int secnum, const ti990_geometry *geomet
 }
 
 /*
-	Read one sector from a disk image
+    Read one sector from a disk image
 
-	file_handle: imgtool file handle
-	secnum: logical sector address
-	geometry: disk geometry (sectors per track, tracks per side, sides)
-	dest: pointer to destination buffer
-	len: lenght of data to read
+    file_handle: imgtool file handle
+    secnum: logical sector address
+    geometry: disk geometry (sectors per track, tracks per side, sides)
+    dest: pointer to destination buffer
+    len: lenght of data to read
 */
 static int read_sector_logical_len(imgtool_stream *file_handle, int secnum, const ti990_geometry *geometry, void *dest, int len)
 {
@@ -648,12 +648,12 @@ static int read_sector_logical_len(imgtool_stream *file_handle, int secnum, cons
 
 #ifdef UNUSED_FUNCTION
 /*
-	Read one sector from a disk image
+    Read one sector from a disk image
 
-	file_handle: imgtool file handle
-	secnum: logical sector address
-	geometry: disk geometry (sectors per track, tracks per side, sides)
-	dest: pointer to a destination buffer of geometry->bytes_per_sector bytes
+    file_handle: imgtool file handle
+    secnum: logical sector address
+    geometry: disk geometry (sectors per track, tracks per side, sides)
+    dest: pointer to a destination buffer of geometry->bytes_per_sector bytes
 */
 static int read_sector_logical(imgtool_stream *file_handle, int secnum, const ti990_geometry *geometry, void *dest)
 {
@@ -662,13 +662,13 @@ static int read_sector_logical(imgtool_stream *file_handle, int secnum, const ti
 #endif
 
 /*
-	Write one sector to a disk image
+    Write one sector to a disk image
 
-	file_handle: imgtool file handle
-	secnum: logical sector address
-	geometry: disk geometry (sectors per track, tracks per side, sides)
-	src: pointer to source buffer
-	len: lenght of source buffer
+    file_handle: imgtool file handle
+    secnum: logical sector address
+    geometry: disk geometry (sectors per track, tracks per side, sides)
+    src: pointer to source buffer
+    len: lenght of source buffer
 */
 static int write_sector_logical_len(imgtool_stream *file_handle, int secnum, const ti990_geometry *geometry, const void *src, int len)
 {
@@ -681,12 +681,12 @@ static int write_sector_logical_len(imgtool_stream *file_handle, int secnum, con
 }
 
 /*
-	Write one sector to a disk image
+    Write one sector to a disk image
 
-	file_handle: imgtool file handle
-	secnum: logical sector address
-	geometry: disk geometry (sectors per track, tracks per side, sides)
-	dest: pointer to a source buffer of geometry->bytes_per_sector bytes
+    file_handle: imgtool file handle
+    secnum: logical sector address
+    geometry: disk geometry (sectors per track, tracks per side, sides)
+    dest: pointer to a source buffer of geometry->bytes_per_sector bytes
 */
 static int write_sector_logical(imgtool_stream *file_handle, int secnum, const ti990_geometry *geometry, const void *src)
 {
@@ -700,15 +700,15 @@ static int write_sector_logical(imgtool_stream *file_handle, int secnum, const t
 
 #ifdef UNUSED_FUNCTION
 /*
-	Find the catalog entry and fdr record associated with a file name
+    Find the catalog entry and fdr record associated with a file name
 
-	image: ti990_image image record
-	fpath: path of the file to search
-	fdr: pointer to buffer where the fdr record should be stored (may be NULL)
-	catalog_index: on output, index of file catalog entry (may be NULL)
-	out_fdr_secnum: on output, sector address of the fdr (may be NULL)
-	out_parent_fdr_secnum: on output, sector offset of the fdr for the parent
-		directory fdr (-1 if root) (may be NULL)
+    image: ti990_image image record
+    fpath: path of the file to search
+    fdr: pointer to buffer where the fdr record should be stored (may be NULL)
+    catalog_index: on output, index of file catalog entry (may be NULL)
+    out_fdr_secnum: on output, sector address of the fdr (may be NULL)
+    out_parent_fdr_secnum: on output, sector offset of the fdr for the parent
+        directory fdr (-1 if root) (may be NULL)
 */
 static int find_fdr(ti990_image *image, const char fpath[MAX_PATH_LEN+1], int *catalog_index, int *out_fdr_secnum, int *out_parent_fdr_secnum)
 {
@@ -836,10 +836,10 @@ static int find_fdr(ti990_image *image, const char fpath[MAX_PATH_LEN+1], int *c
 
 #if 0
 /*
-	Allocate one sector on disk, for use as a fdr record
+    Allocate one sector on disk, for use as a fdr record
 
-	image: ti99_image image record
-	fdr_secnum: on output, logical address of a free sector
+    image: ti99_image image record
+    fdr_secnum: on output, logical address of a free sector
 */
 static int alloc_fdr_sector(ti99_image *image, int *fdr_secnum)
 {
@@ -862,11 +862,11 @@ static int alloc_fdr_sector(ti99_image *image, int *fdr_secnum)
 }
 
 /*
-	Extend a file with nb_alloc_sectors extra sectors
+    Extend a file with nb_alloc_sectors extra sectors
 
-	image: ti99_image image record
-	fdr: file fdr record
-	nb_alloc_sectors: number of sectors to allocate
+    image: ti99_image image record
+    fdr: file fdr record
+    nb_alloc_sectors: number of sectors to allocate
 */
 static int alloc_file_sectors(ti99_image *image, ti99_fdr *fdr, int nb_alloc_sectors)
 {
@@ -1032,7 +1032,7 @@ static int alloc_file_sectors(ti99_image *image, ti99_fdr *fdr, int nb_alloc_sec
 }
 
 /*
-	Allocate a new (empty) file
+    Allocate a new (empty) file
 */
 static int new_file(ti99_image *image, char filename[10], int *out_fdr_secnum/*, ti99_fdr *fdr,*/)
 {
@@ -1085,7 +1085,7 @@ static int new_file(ti99_image *image, char filename[10], int *out_fdr_secnum/*,
 }
 
 /*
-	Compare two (possibly empty) catalog entry for qsort
+    Compare two (possibly empty) catalog entry for qsort
 */
 static int qsort_catalog_compare(const void *p1, const void *p2)
 {
@@ -1104,7 +1104,7 @@ static int qsort_catalog_compare(const void *p1, const void *p2)
 #endif
 
 /*
-	Open a file as a ti990_image.
+    Open a file as a ti990_image.
 */
 static imgtoolerr_t ti990_image_init(imgtool_image *img, imgtool_stream *f)
 {
@@ -1160,7 +1160,7 @@ static imgtoolerr_t ti990_image_init(imgtool_image *img, imgtool_stream *f)
 }
 
 /*
-	close a ti990_image
+    close a ti990_image
 */
 static void ti990_image_exit(imgtool_image *img)
 {
@@ -1169,9 +1169,9 @@ static void ti990_image_exit(imgtool_image *img)
 }
 
 /*
-	get basic information on a ti990_image
+    get basic information on a ti990_image
 
-	Currently returns the volume name
+    Currently returns the volume name
 */
 static void ti990_image_info(imgtool_image *img, char *string, size_t len)
 {
@@ -1184,7 +1184,7 @@ static void ti990_image_info(imgtool_image *img, char *string, size_t len)
 }
 
 /*
-	Open the disk catalog for enumeration
+    Open the disk catalog for enumeration
 */
 static imgtoolerr_t ti990_image_beginenum(imgtool_directory *enumeration, const char *path)
 {
@@ -1210,7 +1210,7 @@ static imgtoolerr_t ti990_image_beginenum(imgtool_directory *enumeration, const 
 }
 
 /*
-	Enumerate disk catalog next entry
+    Enumerate disk catalog next entry
 */
 static imgtoolerr_t ti990_image_nextenum(imgtool_directory *enumeration, imgtool_dirent *ent)
 {
@@ -1390,7 +1390,7 @@ static imgtoolerr_t ti990_image_nextenum(imgtool_directory *enumeration, imgtool
 			iter->nrc[iter->level] = get_UINT16BE(dor.nrc)/*get_UINT32BE(iter->fdr[iter->level-1].eom)-1*/;
 			iter->index[iter->level] = 0;
 			/*if (get_UINT16BE(dor.nrc) != (get_UINT32BE(iter->xdr[iter->level-1].fdr.eom)-1))
-				printf("hiha");*/
+                printf("hiha");*/
 		}
 
 		/* go to upper level if applicable */
@@ -1402,14 +1402,14 @@ static imgtoolerr_t ti990_image_nextenum(imgtool_directory *enumeration, imgtool
 }
 
 /*
-	Free enumerator
+    Free enumerator
 */
 static void ti990_image_closeenum(imgtool_directory *enumeration)
 {
 }
 
 /*
-	Compute free space on disk image (in ADUs)
+    Compute free space on disk image (in ADUs)
 */
 static imgtoolerr_t ti990_image_freespace(imgtool_partition *partition, UINT64 *size)
 {
@@ -1449,7 +1449,7 @@ static imgtoolerr_t ti990_image_freespace(imgtool_partition *partition, UINT64 *
 
 #ifdef UNUSED_FUNCTION
 /*
-	Extract a file from a ti990_image.
+    Extract a file from a ti990_image.
 */
 static imgtoolerr_t ti990_image_readfile(imgtool_partition *partition, const char *fpath, imgtool_stream *destf)
 {
@@ -1546,7 +1546,7 @@ static imgtoolerr_t ti990_image_readfile(imgtool_partition *partition, const cha
 }
 
 /*
-	Add a file to a ti990_image.
+    Add a file to a ti990_image.
 */
 static imgtoolerr_t ti990_image_writefile(imgtool_partition *partition, const char *fpath, imgtool_stream *sourcef, option_resolution *writeoptions)
 {
@@ -1670,7 +1670,7 @@ static imgtoolerr_t ti990_image_writefile(imgtool_partition *partition, const ch
 }
 
 /*
-	Delete a file from a ti990_image.
+    Delete a file from a ti990_image.
 */
 static imgtoolerr_t ti990_image_deletefile(imgtool_partition *partition, const char *fpath)
 {
@@ -1760,7 +1760,7 @@ static imgtoolerr_t ti990_image_deletefile(imgtool_partition *partition, const c
 #endif
 
 /*
-	Create a blank ti990_image.
+    Create a blank ti990_image.
 */
 static imgtoolerr_t ti990_image_create(imgtool_image *image, imgtool_stream *f, option_resolution *createoptions)
 {

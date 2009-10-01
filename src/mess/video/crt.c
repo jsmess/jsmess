@@ -1,28 +1,28 @@
 /*
-	video/crt.c
+    video/crt.c
 
-	CRT video emulation for TX-0 and PDP-1.
+    CRT video emulation for TX-0 and PDP-1.
 
 
 Theory of operation:
 
-	What makes such CRT devices so odd is that there is no video processor, no
-	scan logic, no refresh logic.  The beam position and intensity is
-	controlled by the program completely: in order to draw an object, the
-	program must direct the beam to each point of the object, and in order to
-	refresh it, the program must redraw the object periodically.
+    What makes such CRT devices so odd is that there is no video processor, no
+    scan logic, no refresh logic.  The beam position and intensity is
+    controlled by the program completely: in order to draw an object, the
+    program must direct the beam to each point of the object, and in order to
+    refresh it, the program must redraw the object periodically.
 
-	Since the refresh rates are highly variable (completely controlled by the
-	program), I need to simulate CRT remanence: the intensity of each pixel on
-	display decreases regularly.  In order to keep this efficient, I keep a
-	list of non-black pixels, and only process these pixels on each refresh.
-	In order to improve efficiency further, I keep a distinct list for each
-	line of the display: I have found that it improves drawing speed slightly
-	(probably because it improves the cache hit rate).
+    Since the refresh rates are highly variable (completely controlled by the
+    program), I need to simulate CRT remanence: the intensity of each pixel on
+    display decreases regularly.  In order to keep this efficient, I keep a
+    list of non-black pixels, and only process these pixels on each refresh.
+    In order to improve efficiency further, I keep a distinct list for each
+    line of the display: I have found that it improves drawing speed slightly
+    (probably because it improves the cache hit rate).
 
 
-	Raphael Nabet 2002-2004
-	Based on earlier work by Chris Salomon
+    Raphael Nabet 2002-2004
+    Based on earlier work by Chris Salomon
 */
 
 #include <math.h>
@@ -57,9 +57,9 @@ static int num_intensity_levels;
 
 
 /*
-	video_start_crt
+    video_start_crt
 
-	video init
+    video init
 */
 int video_start_crt(running_machine *machine, int num_levels, int offset_x, int offset_y, int width, int height)
 {
@@ -92,9 +92,9 @@ int video_start_crt(running_machine *machine, int num_levels, int offset_x, int 
 
 
 /*
-	crt_plot
+    crt_plot
 
-	schedule a pixel to be plotted
+    schedule a pixel to be plotted
 */
 void crt_plot(int x, int y)
 {
@@ -124,9 +124,9 @@ void crt_plot(int x, int y)
 
 
 /*
-	VIDEO_EOF( crt )
+    VIDEO_EOF( crt )
 
-	keep track of time
+    keep track of time
 */
 VIDEO_EOF( crt )
 {
@@ -135,9 +135,9 @@ VIDEO_EOF( crt )
 
 
 /*
-	VIDEO_UPDATE( crt )
+    VIDEO_UPDATE( crt )
 
-	update the bitmap
+    update the bitmap
 */
 VIDEO_UPDATE( crt )
 {

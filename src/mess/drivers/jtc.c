@@ -1,5 +1,5 @@
 /***************************************************************************
-   
+
     Jugend+Technik CompJU+TEr
 
     15/07/2009 Skeleton driver.
@@ -20,18 +20,18 @@ static WRITE8_HANDLER( p2_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		P20		
-		P21		
-		P22		
-		P23		
-		P24		
-		P25		centronics strobe output
-		P26		V4093 pins 1,2
-		P27		DL299 pin 18
+        P20
+        P21
+        P22
+        P23
+        P24
+        P25     centronics strobe output
+        P26     V4093 pins 1,2
+        P27     DL299 pin 18
 
-	*/
+    */
 
 	jtc_state *state = space->machine->driver_data;
 
@@ -42,24 +42,24 @@ static READ8_HANDLER( p3_r )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		P30		tape input
-		P31
-		P32
-		P33		centronics busy input
-		P34
-		P35
-		P36		tape output
-		P37		speaker output
+        P30     tape input
+        P31
+        P32
+        P33     centronics busy input
+        P34
+        P35
+        P36     tape output
+        P37     speaker output
 
-	*/
+    */
 
 	jtc_state *state = space->machine->driver_data;
 
 	UINT8 data = 0;
 
-	data |= (cassette_input(state->cassette) < 0.0) ? 1 : 0; 
+	data |= (cassette_input(state->cassette) < 0.0) ? 1 : 0;
 	data |= centronics_busy_r(state->centronics) << 3;
 
 	return data;
@@ -69,18 +69,18 @@ static WRITE8_HANDLER( p3_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		P30		tape input
-		P31
-		P32
-		P33		centronics busy input
-		P34
-		P35
-		P36		tape output
-		P37		speaker output
+        P30     tape input
+        P31
+        P32
+        P33     centronics busy input
+        P34
+        P35
+        P36     tape output
+        P37     speaker output
 
-	*/
+    */
 
 	jtc_state *state = space->machine->driver_data;
 
@@ -246,7 +246,7 @@ static INPUT_PORTS_START( jtc )
 
 	PORT_START("Y5")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('¤')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('?')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_CHAR('R')
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V) PORT_CHAR('V')
@@ -608,7 +608,7 @@ static VIDEO_UPDATE( jtc_es40 )
 
 /* Machine Initialization */
 
-static MACHINE_START( jtc ) 
+static MACHINE_START( jtc )
 {
 	jtc_state *state = machine->driver_data;
 
@@ -636,10 +636,10 @@ static MACHINE_DRIVER_START( basic )
 	/* basic machine hardware */
     MDRV_CPU_ADD(UB8830D_TAG, UB8830D, XTAL_8MHz)
     MDRV_CPU_PROGRAM_MAP(jtc_mem)
-    MDRV_CPU_IO_MAP(jtc_io)	
+    MDRV_CPU_IO_MAP(jtc_io)
 
     MDRV_MACHINE_START(jtc)
-	
+
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(SPEAKER_TAG, SPEAKER, 0)
@@ -657,7 +657,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( jtc )
 	MDRV_IMPORT_FROM(basic)
-	
+
     /* video hardware */
     MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
     MDRV_SCREEN_REFRESH_RATE(50)
@@ -686,7 +686,7 @@ static MACHINE_DRIVER_START( jtces23 )
     /* basic machine hardware */
     MDRV_CPU_MODIFY(UB8830D_TAG)
     MDRV_CPU_PROGRAM_MAP(jtc_es23_mem)
-	
+
     /* video hardware */
     MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
     MDRV_SCREEN_REFRESH_RATE(50)
@@ -707,7 +707,7 @@ static MACHINE_DRIVER_START( jtces40 )
     /* basic machine hardware */
     MDRV_CPU_MODIFY(UB8830D_TAG)
     MDRV_CPU_PROGRAM_MAP(jtc_es40_mem)
-	
+
     /* video hardware */
     MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
     MDRV_SCREEN_REFRESH_RATE(50)
@@ -772,7 +772,7 @@ SYSTEM_CONFIG_END
 
 /* System Drivers */
 
-/*    YEAR	NAME		PARENT	COMPAT	MACHINE	INPUT	INIT	CONFIG		COMPANY					FULLNAME					FLAGS */
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG      COMPANY                 FULLNAME                    FLAGS */
 COMP( 1987, jtc,		0,       0, 	jtc, 	jtc, 	 0,		jtc,	 	  "Jugend+Technik",   "CompJU+TEr",					GAME_NOT_WORKING )
 COMP( 1988, jtces88,	jtc,     0, 	jtces88,jtc, 	 0,		jtces88,  	  "Jugend+Technik",   "CompJU+TEr (EMR-ES 1988)",	GAME_NOT_WORKING )
 COMP( 1989, jtces23,	jtc,     0, 	jtces23,jtces23, 0,		jtces23,  	  "Jugend+Technik",   "CompJU+TEr (ES 2.3)",		GAME_NOT_WORKING )

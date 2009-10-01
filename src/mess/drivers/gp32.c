@@ -34,12 +34,12 @@ static VIDEO_UPDATE( gp32 )
 		vramaddr = (vramaddr & 0x1fffff);
 		vramaddr |= (s3c240x_vidregs[5]&0xffe00000)<<1;
 
-		vram = (UINT8 *)&s3c240x_ram[(vramaddr-0x0c000000)/4]; 
+		vram = (UINT8 *)&s3c240x_ram[(vramaddr-0x0c000000)/4];
 
 		for (y = 0; y < 240; y++)
 		{
 			UINT16 *scanline = BITMAP_ADDR16(bitmap, y, 0);
-			
+
 			for (x = 0; x < 320; x++)
 			{
 				*scanline++ = vram[(160*y)+x];
@@ -82,7 +82,7 @@ static READ32_HANDLER(s3c240x_irq_r)
 
 static WRITE32_HANDLER(s3c240x_irq_w)
 {
-//	printf("%08x to interrupt controller @ 0x144000%02x\n", data, offset<<2);
+//  printf("%08x to interrupt controller @ 0x144000%02x\n", data, offset<<2);
 
 	COMBINE_DATA(&s3c240x_irq_regs[offset]);
 }
@@ -122,20 +122,20 @@ static void s3c240x_timer_recalc(running_machine *machine, int timer, UINT32 ctr
 {
 	if (ctrl_bits & 1)	// timer start?
 	{
-//		printf("starting timer %d\n", timer);
+//      printf("starting timer %d\n", timer);
 	}
 	else	// stopping is easy
 	{
-//		printf("stopping timer %d\n", timer);
+//      printf("stopping timer %d\n", timer);
 		timer_adjust_oneshot(s3c240x_timers[timer], attotime_never, 0);
-	}	
+	}
 }
 
 static WRITE32_HANDLER(s3c240x_timer_w)
 {
 	UINT32 old_value = s3c240x_timer_regs[offset];
 
-//	printf("%08x to timer @ 0x151000%02x (%s)\n", data, offset<<2, timer_reg_names[offset]);
+//  printf("%08x to timer @ 0x151000%02x (%s)\n", data, offset<<2, timer_reg_names[offset]);
 
 	COMBINE_DATA(&s3c240x_timer_regs[offset]);
 
@@ -155,7 +155,7 @@ static WRITE32_HANDLER(s3c240x_timer_w)
 		{
 			s3c240x_timer_recalc(space->machine, 2, (data>>12)&0xf, 0x24);
 		}
-		
+
 		if ((data & 0x10000) != (old_value & 0x10000))	// timer 3 status change
 		{
 			s3c240x_timer_recalc(space->machine, 3, (data>>16)&0xf, 0x30);
@@ -188,7 +188,7 @@ static UINT32 s3c240x_gpio[0x60/4];
 
 static READ32_HANDLER( s3c240x_gpio_r )
 {
-//	printf("read GPIO @ 0x156000%02x (PC %x)\n", offset*4, cpu_get_pc(space->cpu));
+//  printf("read GPIO @ 0x156000%02x (PC %x)\n", offset*4, cpu_get_pc(space->cpu));
 
 	return s3c240x_gpio[offset];
 }
@@ -197,9 +197,9 @@ static WRITE32_HANDLER( s3c240x_gpio_w )
 {
 	COMBINE_DATA(&s3c240x_gpio[offset]);
 
-//	printf("%08x to GPIO @ 0x156000%02x (PC %x)\n", data, offset*4, cpu_get_pc(space->cpu));
+//  printf("%08x to GPIO @ 0x156000%02x (PC %x)\n", data, offset*4, cpu_get_pc(space->cpu));
 
-//	if (offset == 0x30/4) printf("[%08x] %s %s\n", data, (data & 0x200) ? "SCL" : "scl", (data & 0x400) ? "SDL" : "sdl");
+//  if (offset == 0x30/4) printf("[%08x] %s %s\n", data, (data & 0x200) ? "SCL" : "scl", (data & 0x400) ? "SDL" : "sdl");
 }
 
 static ADDRESS_MAP_START( gp32_map, ADDRESS_SPACE_PROGRAM, 32 )

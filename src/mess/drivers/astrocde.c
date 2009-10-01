@@ -46,7 +46,7 @@ ADDRESS_MAP_END
  *  right gives lower numbers, and twisting to the left gives larger numbers.
  *  Paddle games like Clowns have more intuitive behavior -- twisting to the
  *  right moves the character right.
- * 
+ *
  *  There is a 24-key keypad on the system itself (6 rows, 4 columns).  It is
  *  labeled for the built-in calculator, but overlays were released for other
  *  programs, the most popular being the BASIC cartridges, which allowed a
@@ -167,7 +167,7 @@ static MACHINE_DRIVER_START( astrocde )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("astrocade1", ASTROCADE, ASTROCADE_CLOCK/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	
+
 	MDRV_CARTSLOT_ADD("cart")
 MACHINE_DRIVER_END
 

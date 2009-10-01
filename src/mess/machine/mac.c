@@ -1,71 +1,71 @@
 /****************************************************************************
 
-	machine/mac.c
+    machine/mac.c
 
-	Mac hardware - Mac 128k, 512k, 512ke, Plus, SE, Classic, II (SCSI, SCC, ADB, etc)
+    Mac hardware - Mac 128k, 512k, 512ke, Plus, SE, Classic, II (SCSI, SCC, ADB, etc)
 
-	Nate Woods
-	Ernesto Corvi
-	Raphael Nabet
-	R. Belmont
+    Nate Woods
+    Ernesto Corvi
+    Raphael Nabet
+    R. Belmont
 
-	Mac Model Feature Summary:
+    Mac Model Feature Summary:
 
                                 CPU             FDC     Kbd/Mouse  PRAM   Video
-                 - Mac 128k	68k             IWM	orig       orig   Original
-                 - Mac 512k	68k             IWM	orig       orig   Original
-                 - Mac 512ke	68k             IWM	orig       orig   Original
-                 - Mac Plus	68k             IWM	orig       ext    Original
-                 - Mac SE	68k             IWM	MacII ADB  ext    Original
-                 - Mac Classic	68k             SWIM	MacII ADB  ext    Original
-                 - Mac Portable	68k (16 MHz)    SWIM	ADB-PMU    PMU    640x480 B&W
-                 - PwrBook 100  68k (16 MHz)    SWIM	ADB-PMU    PMU    640x480 B&W
-		 - Mac II       020             IWM	MacII ADB  ext    NuBus card
-		 - Mac IIx      030             SWIM	MacII ADB  ext    NuBus card
-		 - Mac IIfx     030             SWIM	ADB-IOP    ext    NuBus card
-		 - Mac SE/30    030             SWIM    MacII ADB  ext    Internal fake NuBus card (need video declaration ROM!)
-		 - Mac IIcx     030             SWIM	ADB-CUDA   ext    NuBus card
-		 - Mac IIci     030             SWIM	ADB-CUDA   ext    Internal "RBV" type
-		 - Mac LC	020		SWIM	Egret ADB  ext    Internal "V8" type
-		 - Mac LC II	030		SWIM	Egret ADB  ext    Internal "V8" type
-		 - Mac LC III	030		SWIM	Egret ADB  ext    Internal "V8" type
+                 - Mac 128k 68k             IWM orig       orig   Original
+                 - Mac 512k 68k             IWM orig       orig   Original
+                 - Mac 512ke    68k             IWM orig       orig   Original
+                 - Mac Plus 68k             IWM orig       ext    Original
+                 - Mac SE   68k             IWM MacII ADB  ext    Original
+                 - Mac Classic  68k             SWIM    MacII ADB  ext    Original
+                 - Mac Portable 68k (16 MHz)    SWIM    ADB-PMU    PMU    640x480 B&W
+                 - PwrBook 100  68k (16 MHz)    SWIM    ADB-PMU    PMU    640x480 B&W
+         - Mac II       020             IWM MacII ADB  ext    NuBus card
+         - Mac IIx      030             SWIM    MacII ADB  ext    NuBus card
+         - Mac IIfx     030             SWIM    ADB-IOP    ext    NuBus card
+         - Mac SE/30    030             SWIM    MacII ADB  ext    Internal fake NuBus card (need video declaration ROM!)
+         - Mac IIcx     030             SWIM    ADB-CUDA   ext    NuBus card
+         - Mac IIci     030             SWIM    ADB-CUDA   ext    Internal "RBV" type
+         - Mac LC   020     SWIM    Egret ADB  ext    Internal "V8" type
+         - Mac LC II    030     SWIM    Egret ADB  ext    Internal "V8" type
+         - Mac LC III   030     SWIM    Egret ADB  ext    Internal "V8" type
 
-	Notes:
-		- The Mac Plus boot code seems to check to see the extent of ROM
-		  mirroring to determine if SCSI is available.  If the ROM is mirrored,
-		  then SCSI is not available.  Thanks to R. Belmont for making this
-		  discovery.
-		- On the SE and most later Macs, the first access to 4xxxxx turns off the overlay.
-		  However, the Mac II/IIx/IIcx (and others?) have the old-style VIA overlay control bit!
-		- The Mac II can have either a 68551 PMMU fitted or an Apple custom that handles 24 vs. 32
-		  bit addressing mode.  The ROM is *not* 32-bit clean so Mac OS normally runs in 24 bit mode,
-		  but A/UX can run 32.
-		- There are 5 known kinds of host-side ADB hardware:
-		  * "Mac II ADB" used in the SE, II, IIx, IIcx, SE/30, IIci, Quadra 610, Quadra 650, Quadra 700, 
-		     Quadra 800, Centris 610 and Centris 650.  This is a dumb state machine using the VIA.
-		  * "ADB-PMU" used in the Mac Portable and all 680x0-based PowerBooks.
-		  * "ADB-EGRET" used in the IIsi, IIvi, IIvx, Classic II, LC, LC II, LC III, Performa 460, 
-		     and Performa 600.  This is a 68HC05 with a different internal ROM than CUDA.
-		  * "ADB-IOP" (ADB driven by a 6502 coprocessor, similar to Lisa) used in the IIfx, 
-		    Quadra 900, and Quadra 950.
-		  * "ADB-CUDA" (Apple's CUDA chip, which is a 68HC05 MCU) used in the Color Classic, LC 520,
-		    LC 55x, LC 57x, LC 58x, Quadra 630, Quadra 660AV, Quadra 840AV, PowerMac 6100/7100/8100,
-		    IIcx, IIci, and PowerMac 5200.
+    Notes:
+        - The Mac Plus boot code seems to check to see the extent of ROM
+          mirroring to determine if SCSI is available.  If the ROM is mirrored,
+          then SCSI is not available.  Thanks to R. Belmont for making this
+          discovery.
+        - On the SE and most later Macs, the first access to 4xxxxx turns off the overlay.
+          However, the Mac II/IIx/IIcx (and others?) have the old-style VIA overlay control bit!
+        - The Mac II can have either a 68551 PMMU fitted or an Apple custom that handles 24 vs. 32
+          bit addressing mode.  The ROM is *not* 32-bit clean so Mac OS normally runs in 24 bit mode,
+          but A/UX can run 32.
+        - There are 5 known kinds of host-side ADB hardware:
+          * "Mac II ADB" used in the SE, II, IIx, IIcx, SE/30, IIci, Quadra 610, Quadra 650, Quadra 700,
+             Quadra 800, Centris 610 and Centris 650.  This is a dumb state machine using the VIA.
+          * "ADB-PMU" used in the Mac Portable and all 680x0-based PowerBooks.
+          * "ADB-EGRET" used in the IIsi, IIvi, IIvx, Classic II, LC, LC II, LC III, Performa 460,
+             and Performa 600.  This is a 68HC05 with a different internal ROM than CUDA.
+          * "ADB-IOP" (ADB driven by a 6502 coprocessor, similar to Lisa) used in the IIfx,
+            Quadra 900, and Quadra 950.
+          * "ADB-CUDA" (Apple's CUDA chip, which is a 68HC05 MCU) used in the Color Classic, LC 520,
+            LC 55x, LC 57x, LC 58x, Quadra 630, Quadra 660AV, Quadra 840AV, PowerMac 6100/7100/8100,
+            IIcx, IIci, and PowerMac 5200.
 
-	TODO:
-	        - Mac Portable and PowerBook 100 are similar to this hardware, but we need ROMs!
-		- Call the RTC timer
-		- SE FDHD and Classic require SWIM support.  SWIM is 100% IWM compatible with 800k drives, but
-		  becomes a different chip for 1.44MB.
-		- Check that 0x600000-0x6fffff still address RAM when overlay bit is off
-		  (IM-III seems to say it does not on Mac 128k, 512k, and 512ke).
-		- What on earth are 0x700000-0x7fffff mapped to ?
+    TODO:
+            - Mac Portable and PowerBook 100 are similar to this hardware, but we need ROMs!
+        - Call the RTC timer
+        - SE FDHD and Classic require SWIM support.  SWIM is 100% IWM compatible with 800k drives, but
+          becomes a different chip for 1.44MB.
+        - Check that 0x600000-0x6fffff still address RAM when overlay bit is off
+          (IM-III seems to say it does not on Mac 128k, 512k, and 512ke).
+        - What on earth are 0x700000-0x7fffff mapped to ?
 
 
-	Mac LC notes:
-		IOBase is 50f00000 in 32-bit mode and f00000 in 24-bit
-		VIA1 is at IOBase
-		IWM is at IOBase + 0x16000
+    Mac LC notes:
+        IOBase is 50f00000 in 32-bit mode and f00000 in 24-bit
+        VIA1 is at IOBase
+        IWM is at IOBase + 0x16000
 
 
 ****************************************************************************/
@@ -270,7 +270,7 @@ static void mac_install_memory(running_machine *machine, offs_t memory_begin, of
 
 
 /*
-	Interrupt handling
+    Interrupt handling
 */
 
 static int scc_interrupt, via_interrupt, scsi_interrupt, last_taken_interrupt;
@@ -393,7 +393,7 @@ static void set_memory_overlay(running_machine *machine, int overlay)
 
 
 /*
-	R Nabet 000531 : added keyboard code
+    R Nabet 000531 : added keyboard code
 */
 
 /* *************************************************************************
@@ -428,9 +428,9 @@ static int kbd_shift_reg;
 static int kbd_shift_count;
 
 /*
-	scan_keyboard()
+    scan_keyboard()
 
-	scan the keyboard, and returns key transition code (or NULL ($7B) if none)
+    scan the keyboard, and returns key transition code (or NULL ($7B) if none)
 */
 
 /* keyboard matrix to detect transition */
@@ -544,7 +544,7 @@ static int scan_keyboard(running_machine *machine)
 }
 
 /*
-	power-up init
+    power-up init
 */
 static void keyboard_init(void)
 {
@@ -624,7 +624,7 @@ static WRITE8_DEVICE_HANDLER(mac_via_out_cb2)
 }
 
 /*
-	called when inquiry times out (1/4s)
+    called when inquiry times out (1/4s)
 */
 static TIMER_CALLBACK(inquiry_timeout_func)
 {
@@ -634,7 +634,7 @@ static TIMER_CALLBACK(inquiry_timeout_func)
 }
 
 /*
-	called when a command is received from the mac
+    called when a command is received from the mac
 */
 static void keyboard_receive(running_machine *machine, int val)
 {
@@ -681,14 +681,14 @@ static void keyboard_receive(running_machine *machine, int val)
 		}
 
 		/* format : 1 if another device (-> keypad ?) connected | next device (-> keypad ?) number 1-8
-							| keyboard model number 1-8 | 1  */
+                            | keyboard model number 1-8 | 1  */
 		/* keyboards :
-			3 : mac 512k, US and international layout ? Mac plus ???
-			other values : Apple II keyboards ?
-		*/
+            3 : mac 512k, US and international layout ? Mac plus ???
+            other values : Apple II keyboards ?
+        */
 		/* keypads :
-			??? : standard keypad (always available on Mac Plus) ???
-		*/
+            ??? : standard keypad (always available on Mac Plus) ???
+        */
 		kbd_shift_out(machine, 0x17);	/* probably wrong */
 		break;
 
@@ -840,7 +840,7 @@ Note:  Asserting the DACK signal applies only to write operations to
   scsiRd+sIDR         $580060    Input Data Register
   scsiRd+sRESET       $580070    Reset Parity/Interrupt
 
-			 */
+             */
 
 READ16_HANDLER ( macplus_scsi_r )
 {
@@ -1056,9 +1056,9 @@ static void rtc_incticks(void)
 				++rtc_seconds[3];
 
 	/*if (++rtc_seconds[4] == 0)
-		if (++rtc_seconds[5] == 0)
-			if (++rtc_seconds[6] == 0)
-				++rtc_seconds[7];*/
+        if (++rtc_seconds[5] == 0)
+            if (++rtc_seconds[6] == 0)
+                ++rtc_seconds[7];*/
 }
 
 /* Executes a command.
@@ -1278,12 +1278,12 @@ NVRAM_HANDLER( mac )
 READ16_HANDLER ( mac_iwm_r )
 {
 	/* The first time this is called is in a floppy test, which goes from
-	 * $400104 to $400126.  After that, all access to the floppy goes through
-	 * the disk driver in the MacOS
-	 *
-	 * I just thought this would be on interest to someone trying to further
-	 * this driver along
-	 */
+     * $400104 to $400126.  After that, all access to the floppy goes through
+     * the disk driver in the MacOS
+     *
+     * I just thought this would be on interest to someone trying to further
+     * this driver along
+     */
 
 	UINT16 result = 0;
 	const device_config *fdc = devtag_get_device(space->machine, "fdc");
@@ -1331,8 +1331,8 @@ static void mac_adb_pollmouse(running_machine *machine)
 {
 	int NewX, NewY;
 
-	NewX = input_port_read(machine, "MOUSE2"); 
-	NewY = input_port_read(machine, "MOUSE1"); 
+	NewX = input_port_read(machine, "MOUSE2");
+	NewY = input_port_read(machine, "MOUSE1");
 
 	if ((NewX != adb_lastmousex) || (NewY != adb_lastmousey))
 	{
@@ -1345,8 +1345,8 @@ static void mac_adb_accummouse( running_machine *machine, UINT8 *MouseX, UINT8 *
 	int MouseCountX = 0, MouseCountY = 0;
 	int NewX, NewY;
 
-	NewX = input_port_read(machine, "MOUSE2"); 
-	NewY = input_port_read(machine, "MOUSE1"); 
+	NewX = input_port_read(machine, "MOUSE2");
+	NewY = input_port_read(machine, "MOUSE1");
 
 	/* see if it moved in the x coord */
 	if (NewX != adb_lastmousex)
@@ -1391,7 +1391,7 @@ static void mac_adb_talk(running_machine *machine)
 	addr = (adb_command>>4);
 	reg = (adb_command & 3);
 
-//	printf("Mac sent %x\n", adb_command);
+//  printf("Mac sent %x\n", adb_command);
 
 	if (adb_waiting_cmd)
 	{
@@ -1417,26 +1417,26 @@ static void mac_adb_talk(running_machine *machine)
 				break;
 
 			case 2:	// listen
-//				printf("ADB LISTEN: reg %x address %x\n", reg, addr);
+//              printf("ADB LISTEN: reg %x address %x\n", reg, addr);
 				adb_direction = 1;	// input from Mac
 				adb_listenreg = reg;
 				adb_listenaddr = addr;
 				break;
 
 			case 3: // talk
-//				printf("ADB TALK: reg %x address %x\n", reg, addr);
+//              printf("ADB TALK: reg %x address %x\n", reg, addr);
 
 				adb_direction = 0;    	// output to Mac
 				if (addr == adb_mouseaddr)
 				{
 					UINT8 mouseX, mouseY;
 
-//					printf("Talking to mouse, register %x\n", reg);
+//                  printf("Talking to mouse, register %x\n", reg);
 
 					switch (reg)
 					{
 						// read mouse
-						case 0:	
+						case 0:
 							mac_adb_accummouse(machine, &mouseX, &mouseY);
 							adb_buffer[0] = (input_port_read(machine, "MOUSE0") & 0x01) ? 0x00 : 0x80;
 							adb_buffer[0] |= mouseX & 0x7f;
@@ -1459,12 +1459,12 @@ static void mac_adb_talk(running_machine *machine)
 				}
 				else if (addr == adb_keybaddr)
 				{
-//					printf("Talking to keyboard, register %x\n", reg);
+//                  printf("Talking to keyboard, register %x\n", reg);
 
 					switch (reg)
 					{
 						// read keyboard
-						case 0:	
+						case 0:
 							adb_buffer[0] = adb_buffer[1] = 0x80;	  // nothing pressed
 							adb_datasize = 2;
 							break;
@@ -1539,14 +1539,14 @@ static READ8_DEVICE_HANDLER(mac_adb_via_in_cb2)
 	ret = (adb_send & 0x80)>>7;
 	adb_send <<= 1;
 
-//	printf("IN CB2 = %x\n", ret);
+//  printf("IN CB2 = %x\n", ret);
 
 	return ret;
 }
 
 static WRITE8_DEVICE_HANDLER(mac_adb_via_out_cb2)
 {
-//	printf("OUT CB2 = %x\n", data);
+//  printf("OUT CB2 = %x\n", data);
 	adb_command <<= 1;
 	adb_command |= data & 1;
 }
@@ -1650,27 +1650,27 @@ static void adb_reset(void)
  *
  * PORT A
  *
- *	bit 7				R	SCC Wait/Request
- *	bit 6				W	Main/Alternate screen buffer select
- *	bit 5				W	Floppy Disk Line Selection
- *	bit 4				W	Overlay/Normal memory mapping
- *	bit 3				W	Main/Alternate sound buffer
- *	bit 2-0				W	Sound Volume
+ *  bit 7               R   SCC Wait/Request
+ *  bit 6               W   Main/Alternate screen buffer select
+ *  bit 5               W   Floppy Disk Line Selection
+ *  bit 4               W   Overlay/Normal memory mapping
+ *  bit 3               W   Main/Alternate sound buffer
+ *  bit 2-0             W   Sound Volume
  *
  *
  * PORT B
  *
- *	bit 7				W	Sound enable
- *	bit 6				R	Video beam in display
- *	bit 5	(pre-ADB)	R	Mouse Y2
- *			(ADB)		W	ADB ST1
- *	bit	4	(pre-ADB)	R	Mouse X2
- *			(ADB)		W	ADB ST0
- *	bit 3	(pre-ADB)	R	Mouse button (active low)
- *			(ADB)		R	ADB INT
- *	bit 2				W	Real time clock enable
- *	bit 1				W	Real time clock data clock
- *	bit 0				RW	Real time clock data
+ *  bit 7               W   Sound enable
+ *  bit 6               R   Video beam in display
+ *  bit 5   (pre-ADB)   R   Mouse Y2
+ *          (ADB)       W   ADB ST1
+ *  bit 4   (pre-ADB)   R   Mouse X2
+ *          (ADB)       W   ADB ST0
+ *  bit 3   (pre-ADB)   R   Mouse button (active low)
+ *          (ADB)       R   ADB INT
+ *  bit 2               W   Real time clock enable
+ *  bit 1               W   Real time clock data clock
+ *  bit 0               RW  Real time clock data
  *
  */
 
@@ -1736,8 +1736,8 @@ static WRITE8_DEVICE_HANDLER(mac_via_out_a)
 	mac_set_volume(sound, data & 0x07);
 
 	/* Early Mac models had VIA A4 control overlaying.  In the Mac SE (and
-	 * possibly later models), overlay was set on reset, but cleared on the
-	 * first access to the ROM. */
+     * possibly later models), overlay was set on reset, but cleared on the
+     * first access to the ROM. */
 	if (mac_model < MODEL_MAC_SE)
 		set_memory_overlay(device->machine, (data & 0x10) >> 4);
 }
@@ -1996,7 +1996,7 @@ static const SCSIConfigTable dev_table =
 	 { SCSI_ID_6, "harddisk2", SCSI_DEVICE_HARDDISK }   /* SCSI ID 6, using CHD 0, and it's a harddisk */
 	}
 };
-				       // 41a868	    41a5ac = data copy
+				       // 41a868        41a5ac = data copy
 static const struct NCR5380interface macplus_5380intf =
 {
 	&dev_table,	// SCSI device table
@@ -2011,7 +2011,7 @@ static void macscsi_exit(running_machine *machine)
 MACHINE_START( macscsi )
 {
 	ncr5380_init(machine, &macplus_5380intf);
-	
+
 	add_exit_callback(machine, macscsi_exit);
 }
 
@@ -3040,8 +3040,8 @@ static void mac_tracetrap(const char *cpu_name_local, int addr, int trap)
 
 	case 0xa9a0:	/* _GetResource */
 		/* HACKHACK - the 'type' output assumes that the host is little endian
-		 * since this is just trace code it isn't much of an issue
-		 */
+         * since this is just trace code it isn't much of an issue
+         */
 		sprintf(s, " type='%c%c%c%c' id=%i", (char) mem[a7+3], (char) mem[a7+2],
 			(char) mem[a7+5], (char) mem[a7+4], *((INT16*) (mem + a7)));
 		break;

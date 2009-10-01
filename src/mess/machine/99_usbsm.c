@@ -1,27 +1,27 @@
 /*
-	Thierry Nouspikel's USB-SmartMedia card emulation
+    Thierry Nouspikel's USB-SmartMedia card emulation
 
-	This card features three USB ports (two host and one device) and a
-	SmartMedia interface.  The original prototype was designed by Thierry
-	Nouspikel, and its description was published in 2003; a small series of
-	approximately 100 printed-circuit boards was ordered shortly afterwards
-	by various TI users.
+    This card features three USB ports (two host and one device) and a
+    SmartMedia interface.  The original prototype was designed by Thierry
+    Nouspikel, and its description was published in 2003; a small series of
+    approximately 100 printed-circuit boards was ordered shortly afterwards
+    by various TI users.
 
-	The specs have been published in <http://www.nouspikel.com/ti99/usb.html>.
+    The specs have been published in <http://www.nouspikel.com/ti99/usb.html>.
 
-	The USB interface uses a Philips ISP1161A USB controller that supports
-	USB 2.0 full-speed (12 Mbit/s) and low-speed (1.5 Mbit/s) I/O (high speed
-	(480 Mbits/sec) is not supported, but it is hardly a problem since TI99 is
-	too slow to take advantage from high speed).  The SmartMedia interface uses
-	a few TTL buffers.  The card also includes an 8MByte StrataFlash FEEPROM
-	and 1MByte of SRAM for DSR use.
+    The USB interface uses a Philips ISP1161A USB controller that supports
+    USB 2.0 full-speed (12 Mbit/s) and low-speed (1.5 Mbit/s) I/O (high speed
+    (480 Mbits/sec) is not supported, but it is hardly a problem since TI99 is
+    too slow to take advantage from high speed).  The SmartMedia interface uses
+    a few TTL buffers.  The card also includes an 8MByte StrataFlash FEEPROM
+    and 1MByte of SRAM for DSR use.
 
-	TODO:
-	* Test SmartMedia support
-	* Implement USB controller and assorted USB devices
-	* Save DSR FEEPROM to disk
+    TODO:
+    * Test SmartMedia support
+    * Implement USB controller and assorted USB devices
+    * Save DSR FEEPROM to disk
 
-	Raphael Nabet, 2004.
+    Raphael Nabet, 2004.
 */
 
 #include "driver.h"
@@ -70,7 +70,7 @@ tms9995 CPU used by Geneve and ti-99/8. */
 static int tms9995_mode;
 
 /*
-	Initilaizes USB-SmartMedia card, set up handlers
+    Initilaizes USB-SmartMedia card, set up handlers
 */
 void ti99_usbsm_init(running_machine *machine)
 {
@@ -78,7 +78,7 @@ void ti99_usbsm_init(running_machine *machine)
 }
 
 /*
-	Reset USB-SmartMedia card, set up handlers
+    Reset USB-SmartMedia card, set up handlers
 */
 int ti99_usbsm_reset(running_machine *machine, int in_tms9995_mode)
 {
@@ -97,7 +97,7 @@ int ti99_usbsm_reset(running_machine *machine, int in_tms9995_mode)
 }
 
 /*
-	Read USB-SmartMedia CRU interface
+    Read USB-SmartMedia CRU interface
 */
 static int usbsm_cru_r(running_machine *machine, int offset)
 {
@@ -109,20 +109,20 @@ static int usbsm_cru_r(running_machine *machine, int offset)
 	{
 	case 0:
 		/*
-			bit
-			0	>1x00	0: USB Host controller requests interrupt.
-			1	>1x02	0: USB Device controller requests interrupt.
-			2	>1x04	1: USB Host controller suspended.
-			3	>1x06	1: USB Device controller suspended.
-			4	>1x08	0: Strata FEEPROM is busy.
-						1: Strata FEEPROM is ready.
-			5	>1x0A	0: SmartMedia card is busy.
-						1: SmartMedia card absent or ready.
-			6	>1x0C	0: No SmartMedia card present.
-						1: A card is in the connector.
-			7	>1x0E	0: SmartMedia card is protected.
-						1: Card absent or not protected.
-		 */
+            bit
+            0   >1x00   0: USB Host controller requests interrupt.
+            1   >1x02   0: USB Device controller requests interrupt.
+            2   >1x04   1: USB Host controller suspended.
+            3   >1x06   1: USB Device controller suspended.
+            4   >1x08   0: Strata FEEPROM is busy.
+                        1: Strata FEEPROM is ready.
+            5   >1x0A   0: SmartMedia card is busy.
+                        1: SmartMedia card absent or ready.
+            6   >1x0C   0: No SmartMedia card present.
+                        1: A card is in the connector.
+            7   >1x0E   0: SmartMedia card is protected.
+                        1: Card absent or not protected.
+         */
 		reply = 0x33;
 		if (! smartmedia_present(smartmedia))
 			reply |= 0xc0;
@@ -135,7 +135,7 @@ static int usbsm_cru_r(running_machine *machine, int offset)
 }
 
 /*
-	Write USB-SmartMedia CRU interface
+    Write USB-SmartMedia CRU interface
 */
 static void usbsm_cru_w(running_machine *machine, int offset, int data)
 {
@@ -190,7 +190,7 @@ static void usbsm_cru_w(running_machine *machine, int offset, int data)
 }
 
 /*
-	read a byte in USB-SmartMedia DSR space
+    read a byte in USB-SmartMedia DSR space
 */
 static READ8_HANDLER(usbsm_mem_r)
 {
@@ -204,7 +204,7 @@ static READ8_HANDLER(usbsm_mem_r)
 }
 
 /*
-	write a byte in USB-SmartMedia DSR space
+    write a byte in USB-SmartMedia DSR space
 */
 static WRITE8_HANDLER(usbsm_mem_w)
 {
@@ -221,7 +221,7 @@ static WRITE8_HANDLER(usbsm_mem_w)
 }
 
 /*
-	demultiplexed read in USB-SmartMedia DSR space
+    demultiplexed read in USB-SmartMedia DSR space
 */
 static UINT16 usbsm_mem_16_r(const address_space* space,offs_t offset)
 {
@@ -255,7 +255,7 @@ static UINT16 usbsm_mem_16_r(const address_space* space,offs_t offset)
 }
 
 /*
-	demultiplexed write in USB-SmartMedia DSR space
+    demultiplexed write in USB-SmartMedia DSR space
 */
 static void usbsm_mem_16_w(const address_space* space,offs_t offset, UINT16 data)
 {

@@ -176,7 +176,7 @@ static READ8_HANDLER( einstein_80col_state_r )
 
 
 /****************************************************************
-	EINSTEIN NON-Z80 DEVICES DAISY CHAIN SUPPORT
+    EINSTEIN NON-Z80 DEVICES DAISY CHAIN SUPPORT
 ****************************************************************/
 
 static DEVICE_START( einstein_daisy ) { }
@@ -898,7 +898,7 @@ static MACHINE_DRIVER_START( einstein )
 	MDRV_MACHINE_RESET(einstein)
 
 	/* this is actually clocked at the system clock 4 MHz, but this would be too fast for our
-	driver. So we update at 50Hz and hope this is good enough. */
+    driver. So we update at 50Hz and hope this is good enough. */
 	MDRV_TIMER_ADD_PERIODIC("keyboard", einstein_keyboard_timer_callback, HZ(50))
 
 	MDRV_Z80PIO_ADD(IC_I063, einstein_pio_intf)

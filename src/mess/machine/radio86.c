@@ -20,7 +20,7 @@ UINT8 radio86_tape_value;
 
 static UINT8* radio_ram_disk;
 
-void radio86_init_keyboard() 
+void radio86_init_keyboard()
 {
 	radio86_keyboard_mask = 0;
 	radio86_tape_value = 0x10;
@@ -59,12 +59,12 @@ static READ8_DEVICE_HANDLER (radio86_8255_portb_r2 )
 
 static READ8_DEVICE_HANDLER (radio86_8255_portc_r2 )
 {
-	double level = cassette_input(devtag_get_device(device->machine, "cassette"));	 									 					
+	double level = cassette_input(devtag_get_device(device->machine, "cassette"));
 	UINT8 dat = input_port_read(device->machine, "LINE8");
-	if (level <  0) { 
+	if (level <  0) {
 		dat ^= radio86_tape_value;
- 	}	
-	return dat;	
+ 	}
+	return dat;
 }
 
 static WRITE8_DEVICE_HANDLER (radio86_8255_porta_w2 )
@@ -74,7 +74,7 @@ static WRITE8_DEVICE_HANDLER (radio86_8255_porta_w2 )
 
 static WRITE8_DEVICE_HANDLER (radio86_8255_portc_w2 )
 {
-	cassette_output(devtag_get_device(device->machine, "cassette"),data & 0x01 ? 1 : -1);	
+	cassette_output(devtag_get_device(device->machine, "cassette"),data & 0x01 ? 1 : -1);
 }
 
 
@@ -102,7 +102,7 @@ I8255A_INTERFACE( mikrosha_ppi8255_interface_1 )
 
 static READ8_DEVICE_HANDLER (rk7007_8255_portc_r )
 {
-	double level = cassette_input(devtag_get_device(device->machine, "cassette"));	 									 					
+	double level = cassette_input(devtag_get_device(device->machine, "cassette"));
 	UINT8 key = 0xff;
 	if ((radio86_keyboard_mask & 0x01)!=0) { key &= input_port_read(device->machine,"CLINE0"); }
 	if ((radio86_keyboard_mask & 0x02)!=0) { key &= input_port_read(device->machine,"CLINE1"); }
@@ -113,10 +113,10 @@ static READ8_DEVICE_HANDLER (rk7007_8255_portc_r )
 	if ((radio86_keyboard_mask & 0x40)!=0) { key &= input_port_read(device->machine,"CLINE6"); }
 	if ((radio86_keyboard_mask & 0x80)!=0) { key &= input_port_read(device->machine,"CLINE7"); }
 	key &= 0xe0;
-	if (level <  0) { 
+	if (level <  0) {
 		key ^= radio86_tape_value;
- 	}	
-	return key;	
+ 	}
+	return key;
 }
 
 I8255A_INTERFACE( rk7007_ppi8255_interface )
@@ -158,7 +158,7 @@ const dma8257_interface radio86_dma =
 	{ 0, 0, 0, 0 }
 };
 
-static TIMER_CALLBACK( radio86_reset )	
+static TIMER_CALLBACK( radio86_reset )
 {
 	memory_set_bank(machine, 1, 0);
 }
@@ -167,7 +167,7 @@ static UINT8 romdisk_lsb,romdisk_msb, disk_sel;
 
 READ8_HANDLER (radio_cpu_state_r )
 {
-	return cpu_get_reg(space->cpu, I8085_STATUS);	
+	return cpu_get_reg(space->cpu, I8085_STATUS);
 }
 
 READ8_HANDLER (radio_io_r )
@@ -190,16 +190,16 @@ MACHINE_RESET( radio86 )
 }
 
 
-WRITE8_HANDLER ( radio86_pagesel ) 
+WRITE8_HANDLER ( radio86_pagesel )
 {
 	disk_sel = data;
 }
 
 static READ8_DEVICE_HANDLER (radio86_romdisk_porta_r )
 {
-	UINT8 *romdisk = memory_region(device->machine, "maincpu") + 0x10000;	
+	UINT8 *romdisk = memory_region(device->machine, "maincpu") + 0x10000;
 	if ((disk_sel & 0x0f) ==0) {
-		return romdisk[romdisk_msb*256+romdisk_lsb];	
+		return romdisk[romdisk_msb*256+romdisk_lsb];
 	} else {
 		if (disk_sel==0xdf) {
 			return radio_ram_disk[romdisk_msb*256+romdisk_lsb + 0x10000];
@@ -210,13 +210,13 @@ static READ8_DEVICE_HANDLER (radio86_romdisk_porta_r )
 }
 
 static WRITE8_DEVICE_HANDLER (radio86_romdisk_portb_w )
-{	
+{
 	romdisk_lsb = data;
 }
 
 static WRITE8_DEVICE_HANDLER (radio86_romdisk_portc_w )
-{		
-	romdisk_msb = data;	
+{
+	romdisk_msb = data;
 }
 
 I8255A_INTERFACE( radio86_ppi8255_interface_2 )
@@ -239,7 +239,7 @@ I8255A_INTERFACE( mikrosha_ppi8255_interface_2 )
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_NULL,	
+	DEVCB_NULL,
 	DEVCB_HANDLER(mikrosha_8255_font_page_w),
 	DEVCB_NULL
 };

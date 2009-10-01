@@ -1,17 +1,17 @@
 /***************************************************************************
 
-		Galeb machine driver by Miodrag Milanovic
+        Galeb machine driver by Miodrag Milanovic
 
-		23/02/2008 Sound support added.
-		22/02/2008 Preliminary driver.
-		     
+        23/02/2008 Sound support added.
+        22/02/2008 Preliminary driver.
+
 ****************************************************************************/
 
 
 #include "driver.h"
 #include "sound/dac.h"
 #include "includes/galeb.h"
- 
+
 /* Driver initialization */
 DRIVER_INIT(galeb)
 {

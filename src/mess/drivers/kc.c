@@ -204,8 +204,8 @@ ADDRESS_MAP_END
 
 
 
-/* this is a fake keyboard layout. The keys are converted into codes 
-which are transmitted by the keyboard to the base-unit. key code can 
+/* this is a fake keyboard layout. The keys are converted into codes
+which are transmitted by the keyboard to the base-unit. key code can
 be calculated as (line*8)+bit_index */
 
 /* 2008-05 FP:
@@ -367,7 +367,7 @@ static MACHINE_DRIVER_START( cpu_kc_disc )
 
 	//FIX: put right clock value for CTC
 	MDRV_Z80CTC_ADD( "z80ctc_1", KC85_4_CLOCK, kc85_disc_ctc_intf )
-	
+
 	MDRV_NEC765A_ADD("nec765", kc_fdc_interface)
 MACHINE_DRIVER_END
 
@@ -430,7 +430,7 @@ static MACHINE_DRIVER_START( kc85_4d )
 	MDRV_IMPORT_FROM( cpu_kc_disc )
 	MDRV_QUANTUM_TIME(HZ(120))
 	MDRV_MACHINE_RESET( kc85_4d )
-	
+
 	MDRV_FLOPPY_4_DRIVES_ADD(kc85_floppy_config)
 MACHINE_DRIVER_END
 
@@ -443,7 +443,7 @@ ROM_START(kc85_4)
     ROM_SYSTEM_BIOS(0, "caos42", "CAOS 4.2" )
     ROMX_LOAD("caos__c0.854", 0x12000, 0x1000, CRC(57d9ab02) SHA1(774fc2496a59b77c7c392eb5aa46420e7722797e), ROM_BIOS(1))
     ROMX_LOAD("caos__e0.854", 0x13000, 0x2000, CRC(ee273933) SHA1(4300f7ff813c1fb2d5c928dbbf1c9e1fe52a9577), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS(1, "caos41", "CAOS 4.1" )    
+	ROM_SYSTEM_BIOS(1, "caos41", "CAOS 4.1" )
   	ROMX_LOAD( "caos41c.854", 0x12000, 0x1000, CRC(c7e1c011) SHA1(acd998e3d9e8f592cd884aafc8ac4d291e40e097), ROM_BIOS(2))
   	ROMX_LOAD( "caos41e.854", 0x13000, 0x2000, CRC(60e045e5) SHA1(e19819fb477dcb742a13729a9bf5943d63abe863), ROM_BIOS(2))
 ROM_END
@@ -454,7 +454,7 @@ ROM_START(kc85_4d)
     ROM_SYSTEM_BIOS(0, "caos42", "CAOS 4.2" )
     ROMX_LOAD("caos__c0.854", 0x12000, 0x1000, CRC(57d9ab02) SHA1(774fc2496a59b77c7c392eb5aa46420e7722797e), ROM_BIOS(1))
     ROMX_LOAD("caos__e0.854", 0x13000, 0x2000, CRC(ee273933) SHA1(4300f7ff813c1fb2d5c928dbbf1c9e1fe52a9577), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS(1, "caos41", "CAOS 4.1" )    
+	ROM_SYSTEM_BIOS(1, "caos41", "CAOS 4.1" )
   	ROMX_LOAD( "caos41c.854", 0x12000, 0x1000, CRC(c7e1c011) SHA1(acd998e3d9e8f592cd884aafc8ac4d291e40e097), ROM_BIOS(2))
   	ROMX_LOAD( "caos41e.854", 0x13000, 0x2000, CRC(60e045e5) SHA1(e19819fb477dcb742a13729a9bf5943d63abe863), ROM_BIOS(2))
 
@@ -475,7 +475,7 @@ ROM_START(kc85_3)
 	ROM_SYSTEM_BIOS(4, "pi88sw", "OS PI/88 (black/white)" )
 	ROMX_LOAD( "pi88_sw.853",  0x12000, 0x2000, CRC(f7d2e8fc) SHA1(9b5c068f10ff34bc3253f5b51abad51c8da9dd5d), ROM_BIOS(5))
 	ROM_SYSTEM_BIOS(5, "pi88ws", "OS PI/88 (white/blue)" )
-	ROMX_LOAD( "pi88_ws.853",  0x12000, 0x2000, CRC(9ef4efbf) SHA1(b8b6f606b76bce9fb7fcd61a14120e5e026b6b6e), ROM_BIOS(6))	
+	ROMX_LOAD( "pi88_ws.853",  0x12000, 0x2000, CRC(9ef4efbf) SHA1(b8b6f606b76bce9fb7fcd61a14120e5e026b6b6e), ROM_BIOS(6))
 ROM_END
 
 ROM_START(kc85_2)
@@ -483,7 +483,7 @@ ROM_START(kc85_2)
 	ROM_SYSTEM_BIOS(0, "hc900", "HC900 CAOS" )
 	ROMX_LOAD( "hc900.852",    0x12000, 0x2000, CRC(e6f4c0ab) SHA1(242a777788c774c5f764313361b1e0a65139ab32), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "caos22", "CAOS 2.2" )
-	ROMX_LOAD( "caos__e0.852", 0x12000, 0x2000, CRC(48d5624c) SHA1(568dd59bfad4c604ba36bc05b094fc598a642f85), ROM_BIOS(2))	
+	ROMX_LOAD( "caos__e0.852", 0x12000, 0x2000, CRC(48d5624c) SHA1(568dd59bfad4c604ba36bc05b094fc598a642f85), ROM_BIOS(2))
 ROM_END
 
 ROM_START(kc85_5)
@@ -492,8 +492,8 @@ ROM_START(kc85_5)
 	ROM_LOAD("basic_c0.855", 0x10000, 0x8000, CRC(0ed9f8b0) SHA1(be2c68a5b461014c57e33a127c3ffb32b0ff2346))
     ROM_SYSTEM_BIOS(0, "caos44", "CAOS 4.4" )
     ROMX_LOAD( "caos__c0.855",0x18000, 0x2000, CRC(f56d5c18) SHA1(2cf8023ee71ca50b92f9f151b7519f59727d1c79), ROM_BIOS(1))
-	ROMX_LOAD( "caos__e0.855",0x1A000, 0x2000, CRC(1dbc2e6d) SHA1(53ba4394d96e287ff8af01322af1e9879d4e77c4), ROM_BIOS(1))    
-	ROM_SYSTEM_BIOS(1, "caos43", "CAOS 4.3" )    
+	ROMX_LOAD( "caos__e0.855",0x1A000, 0x2000, CRC(1dbc2e6d) SHA1(53ba4394d96e287ff8af01322af1e9879d4e77c4), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(1, "caos43", "CAOS 4.3" )
 	ROMX_LOAD( "caos43c.855", 0x18000, 0x2000, CRC(2f0f9eaa) SHA1(5342be5104206d15e7471b094c7749a8a3d708ad), ROM_BIOS(2))
 	ROMX_LOAD( "caos43e.855", 0x1A000, 0x2000, CRC(b66fc6c3) SHA1(521ac2fbded4148220f8af2d5a5ab99634364079), ROM_BIOS(2))
 ROM_END

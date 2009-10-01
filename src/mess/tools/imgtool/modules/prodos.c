@@ -1,8 +1,8 @@
 /****************************************************************************
 
-	prodos.c
+    prodos.c
 
-	Apple II ProDOS disk images
+    Apple II ProDOS disk images
 
 *****************************************************************************
 
@@ -27,13 +27,13 @@
   Offset  Length  Description
   ------  ------  -----------
        0       1  Storage type (bits 7-4)
-	                  10 - Seedling File (1 block)
-					  20 - Sapling File (2-256 blocks)
-					  30 - Tree File (257-32768 blocks)
-					  40 - Pascal Areas on ProFile HDs (???)
-					  50 - GS/OS Extended File (data and rsrc fork)
-					  E0 - Subdirectory Header
-				      F0 - Volume Header
+                      10 - Seedling File (1 block)
+                      20 - Sapling File (2-256 blocks)
+                      30 - Tree File (257-32768 blocks)
+                      40 - Pascal Areas on ProFile HDs (???)
+                      50 - GS/OS Extended File (data and rsrc fork)
+                      E0 - Subdirectory Header
+                      F0 - Volume Header
        1      15  File name (NUL padded)
       16       1  File type
       17       2  Key pointer
@@ -58,11 +58,11 @@
 
   ProDOS dates are 32-bit little endian values
 
-	bits  0- 4	Day
-	bits  5- 8	Month (0-11)
-	bits  9-15	Year (0-49 is 2000-2049, 50-99 is 1950-1999)
-	bits 16-21	Minute
-	bits 24-28	Hour
+    bits  0- 4  Day
+    bits  5- 8  Month (0-11)
+    bits  9-15  Year (0-49 is 2000-2049, 50-99 is 1950-1999)
+    bits 16-21  Minute
+    bits 24-28  Hour
 
 
   ProDOS directory and volume headers have this information:
@@ -70,10 +70,10 @@
   Offset  Length  Description
   ------  ------  -----------
       31       1  Length of the entry; generally is 39
-	  32       1  Number of entries per block; generally is 13
-	  33       2  Active entry count in directory
-	  35       2  Volume bitmap block number
-	  37       2  Total blocks on volume
+      32       1  Number of entries per block; generally is 13
+      33       2  Active entry count in directory
+      35       2  Volume bitmap block number
+      37       2  Total blocks on volume
 
   GS/OS Extended Files (storage type $5) point to an extended key block that
   contains information about the two forks.  The first half of the extended
@@ -83,41 +83,41 @@
   Offset  Length  Description
   ------  ------  -----------
        0       1  Storage type (bits 3-0, unlike the directory entry)
-	   1       2  Key pointer
-	   3       2  Blocks used
-	   5       3  File size
-	   8       1  Size of secondary info #1 (must be 18 to be valid)
-	   9       1  Secondary info #1 type (1=FInfo 2=xFInfo)
-	  10      16  FInfo or xFInfo
-	  26       1  Size of secondary info #2 (must be 18 to be valid)
-	  27       1  Secondary info #2 type (1=FInfo 2=xFInfo)
-	  28      16  FInfo or xFInfo
+       1       2  Key pointer
+       3       2  Blocks used
+       5       3  File size
+       8       1  Size of secondary info #1 (must be 18 to be valid)
+       9       1  Secondary info #1 type (1=FInfo 2=xFInfo)
+      10      16  FInfo or xFInfo
+      26       1  Size of secondary info #2 (must be 18 to be valid)
+      27       1  Secondary info #2 type (1=FInfo 2=xFInfo)
+      28      16  FInfo or xFInfo
 
   FInfo format:
 
   Offset  Length  Description
   ------  ------  -----------
        0       4  File type
-	   4       4  File creator
-	   8       2  Finder flags
+       4       4  File creator
+       8       2  Finder flags
       10       2  X Coordinate
-	  12       2  Y Coordinate
-	  14       2  Finder folder
+      12       2  Y Coordinate
+      14       2  Finder folder
 
   xFInfo format:
 
   Offset  Length  Description
   ------  ------  -----------
        0       2  Icon ID
-	   2       6  Reserved
-	   8       1  Script Code
-	   9       1  Extended flags
+       2       6  Reserved
+       8       1  Script Code
+       9       1  Extended flags
       10       2  Comment ID
-	  12       4  Put Away Directory
+      12       4  Put Away Directory
 
 
   For more info, consult ProDOS technical note #25
-	(http://web.pdx.edu/~heiss/technotes/pdos/tn.pdos.25.html)
+    (http://web.pdx.edu/~heiss/technotes/pdos/tn.pdos.25.html)
 
 *****************************************************************************/
 
@@ -839,7 +839,7 @@ static imgtoolerr_t prodos_get_next_dirent(imgtool_image *image,
 	if (is_extendedfile_storagetype(ent->storage_type))
 	{
 		/* this is a ProDOS extended file; we need to get the extended info
-		 * block */
+         * block */
 		ent->extkey_pointer	= pick_integer_le(appleenum->block_data, offset + 17, 2);
 
 		err = prodos_load_block(image, ent->extkey_pointer, buffer);
@@ -1595,7 +1595,7 @@ static imgtoolerr_t prodos_read_file_tree(imgtool_image *image, UINT32 *filesize
 		for (i = 0; i < 256; i++)
 		{
 			/* retrieve the block pointer; the two bytes are on either half
-			 * of the block */
+             * of the block */
 			sub_block = buffer[i + 256];
 			sub_block <<= 8;
 			sub_block |= buffer[i + 0];

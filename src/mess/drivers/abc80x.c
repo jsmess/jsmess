@@ -54,8 +54,8 @@
 
     TODO:
 
-	- ABC 77 keyboard
-	- bit accurate Z80 SIO/2 (cassette)
+    - ABC 77 keyboard
+    - bit accurate Z80 SIO/2 (cassette)
     - floppy controller board
     - hard disks (ABC-850 10MB, ABC-852 20MB, ABC-856 60MB)
 
@@ -387,18 +387,18 @@ static WRITE8_HANDLER( abc806_mao_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		physical block address bit 0
-		1		physical block address bit 1
-		2		physical block address bit 2
-		3		physical block address bit 3
-		4		physical block address bit 4
-		5
-		6
-		7		allocate block
+        0       physical block address bit 0
+        1       physical block address bit 1
+        2       physical block address bit 2
+        3       physical block address bit 3
+        4       physical block address bit 4
+        5
+        6
+        7       allocate block
 
-	*/
+    */
 
 	abc806_state *state = space->machine->driver_data;
 
@@ -668,7 +668,7 @@ static INPUT_PORTS_START( fake_keyboard )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( abc800 )
-//	PORT_INCLUDE(abc77)
+//  PORT_INCLUDE(abc77)
 	PORT_INCLUDE(fake_keyboard)
 
 	PORT_START("SB")
@@ -1017,7 +1017,7 @@ static ABCBUS_CONFIG( abcbus_config )
 
 static ABCBUS_CONFIG( abc802_abcbus_config )
 {
-//	{ LUXOR_55_21046, CONKORT_TAG }, won't boot with this enabled
+//  { LUXOR_55_21046, CONKORT_TAG }, won't boot with this enabled
 	{ NULL }
 };
 
@@ -1203,14 +1203,14 @@ static MACHINE_DRIVER_START( abc800m )
 	MDRV_TIMER_ADD_PERIODIC("ctc", ctc_tick, HZ(ABC800_X01/2/2/2))
 	MDRV_Z80SIO_ADD(Z80SIO_TAG, ABC800_X01/2/2, sio_intf)
 	MDRV_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, abc800_dart_intf)
-//	MDRV_ABC77_ADD(abc800_abc77_intf)
+//  MDRV_ABC77_ADD(abc800_abc77_intf)
 	MDRV_LUXOR_55_21046_ADD
 	MDRV_PRINTER_ADD("printer")
 	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
 
 	/* fake keyboard */
 	MDRV_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, USEC(2500))
-	
+
 	MDRV_FLOPPY_2_DRIVES_ADD(abc800_floppy_config)
 MACHINE_DRIVER_END
 
@@ -1240,14 +1240,14 @@ static MACHINE_DRIVER_START( abc800c )
 	MDRV_TIMER_ADD_PERIODIC("ctc", ctc_tick, HZ(ABC800_X01/2/2/2))
 	MDRV_Z80SIO_ADD(Z80SIO_TAG, ABC800_X01/2/2, sio_intf)
 	MDRV_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, abc800_dart_intf)
-//	MDRV_ABC77_ADD(abc800_abc77_intf)
+//  MDRV_ABC77_ADD(abc800_abc77_intf)
 	MDRV_LUXOR_55_21046_ADD
 	MDRV_PRINTER_ADD("printer")
 	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
 
 	/* fake keyboard */
 	MDRV_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, USEC(2500))
-	
+
 	MDRV_FLOPPY_2_DRIVES_ADD(abc800_floppy_config)
 MACHINE_DRIVER_END
 
@@ -1277,14 +1277,14 @@ static MACHINE_DRIVER_START( abc802 )
 	MDRV_TIMER_ADD_PERIODIC("ctc", ctc_tick, HZ(ABC800_X01/2/2/2))
 	MDRV_Z80SIO_ADD(Z80SIO_TAG, ABC800_X01/2/2, sio_intf)
 	MDRV_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, abc802_dart_intf)
-//	MDRV_ABC77_ADD(abc802_abc77_intf)
+//  MDRV_ABC77_ADD(abc802_abc77_intf)
 	MDRV_LUXOR_55_21046_ADD
 	MDRV_PRINTER_ADD("printer")
 	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
 
 	/* fake keyboard */
 	MDRV_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, USEC(2500))
-	
+
 	MDRV_FLOPPY_2_DRIVES_ADD(abc800_floppy_config)
 MACHINE_DRIVER_END
 
@@ -1312,14 +1312,14 @@ static MACHINE_DRIVER_START( abc806 )
 	MDRV_TIMER_ADD_PERIODIC("ctc", ctc_tick, HZ(ABC800_X01/2/2/2))
 	MDRV_Z80SIO_ADD(Z80SIO_TAG, ABC800_X01/2/2, sio_intf)
 	MDRV_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, abc806_dart_intf)
-//	MDRV_ABC77_ADD(abc806_abc77_intf)
+//  MDRV_ABC77_ADD(abc806_abc77_intf)
 	MDRV_LUXOR_55_21046_ADD
 	MDRV_PRINTER_ADD("printer")
 	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
 
 	/* fake keyboard */
 	MDRV_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, USEC(2500))
-	
+
 	MDRV_FLOPPY_2_DRIVES_ADD(abc800_floppy_config)
 MACHINE_DRIVER_END
 
@@ -1335,20 +1335,20 @@ MACHINE_DRIVER_END
     800 8"      DD88
     ABC 6-2X    ABC832
     ABC 6-3X    ABC838
-	ABC 6-52	ABC834
+    ABC 6-52    ABC834
     UFD 6.XX    Winchester
 
 
-	Floppy Controllers
+    Floppy Controllers
 
-	Art N/O
-	--------
-	55 10761-01		"old" controller
-	55 10828-01		"old" controller
-	55 20900-0x
-	55 21046-11		Luxor Conkort	25 pin D-sub connector
-	55 21046-21		Luxor Conkort	34 pin FDD connector
-	55 21046-41		Luxor Conkort	both of the above
+    Art N/O
+    --------
+    55 10761-01     "old" controller
+    55 10828-01     "old" controller
+    55 20900-0x
+    55 21046-11     Luxor Conkort   25 pin D-sub connector
+    55 21046-21     Luxor Conkort   34 pin FDD connector
+    55 21046-41     Luxor Conkort   both of the above
 
 */
 
@@ -1436,7 +1436,7 @@ ROM_START( abc806 )
 
 	ROM_REGION( 0x200, "hru2", 0 )
 	ROM_LOAD( "fgctl.bin",  0x0000, 0x0200, BAD_DUMP CRC(7a19de8d) SHA1(e7cc49e749b37f7d7dd14f3feda53eae843a8fe0) )
-//	ROM_LOAD( "64 90127-01.12g", 0x0000, 0x0200, NO_DUMP ) // "HRU II" 7621 (82S131), ABC800C HR compatibility mode palette
+//  ROM_LOAD( "64 90127-01.12g", 0x0000, 0x0200, NO_DUMP ) // "HRU II" 7621 (82S131), ABC800C HR compatibility mode palette
 
 	ROM_REGION( 0x400, "v50", 0 )
 	ROM_LOAD( "64 90242-01.7e",  0x0000, 0x0200, NO_DUMP ) // "V50" 7621 (82S131), HR vertical timing 50Hz
@@ -1596,7 +1596,7 @@ static DRIVER_INIT( abc806 )
 
 /* System Drivers */
 
-/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT    CONFIG  COMPANY             FULLNAME		FLAGS */
+/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT    CONFIG  COMPANY             FULLNAME        FLAGS */
 COMP( 1981, abc800m,    0,			0,      abc800m,    abc800, abc800, abc800, "Luxor Datorer AB", "ABC 800 M/HR", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 COMP( 1981, abc800c,    abc800m,    0,      abc800c,    abc800, abc800, abc800, "Luxor Datorer AB", "ABC 800 C/HR", GAME_NOT_WORKING )
 COMP( 1983, abc802,     0,          0,      abc802,     abc802, abc802, abc802, "Luxor Datorer AB", "ABC 802",		GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )

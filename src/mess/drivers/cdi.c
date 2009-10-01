@@ -1793,70 +1793,70 @@ static void mcd212_process_vsr(running_machine *machine, int channel, UINT32 *pi
 	//fflush(stdout);
 
 	/*
-	switch(mcd212.channel[channel].ddr & MCD212_DDR_FT)
-	{
-		case MCD212_DDR_FT_BMP:
-		case MCD212_DDR_FT_BMP2:
-			if(mcd212.channel[channel].dcr & MCD212_DCR_CM)
-			{
-				printf( "4-bit Bitmap: " );
-			}
-			else
-			{
-				static UINT8 fuck = 0;
-				printf( "8-bit Bitmap: " );
-				if(!fuck)
-				{
-					FILE* out = fopen("planea.bin","wb");
-					int i = 0;
-					for(i = 0; i < 0x80000; i += 2)
-					{
-						UINT8 temp1, temp2;
-						temp1 = planea[i/2] >> 8;
-						temp2 = planea[i/2] & 0x00ff;
-						fwrite(&temp1, 1, 1, out);
-						fwrite(&temp2, 1, 1, out);
-					}
-					fflush(out);
-					fclose(out);
-					out = fopen("planeb.bin","wb");
-					for(i = 0; i < 0x80000; i += 2)
-					{
-						UINT8 temp1, temp2;
-						temp1 = planeb[i/2] >> 8;
-						temp2 = planeb[i/2] & 0x00ff;
-						fwrite(&temp1, 1, 1, out);
-						fwrite(&temp2, 1, 1, out);
-					}
-					fflush(out);
-					fclose(out);
-					fuck++;
+    switch(mcd212.channel[channel].ddr & MCD212_DDR_FT)
+    {
+        case MCD212_DDR_FT_BMP:
+        case MCD212_DDR_FT_BMP2:
+            if(mcd212.channel[channel].dcr & MCD212_DCR_CM)
+            {
+                printf( "4-bit Bitmap: " );
+            }
+            else
+            {
+                static UINT8 fuck = 0;
+                printf( "8-bit Bitmap: " );
+                if(!fuck)
+                {
+                    FILE* out = fopen("planea.bin","wb");
+                    int i = 0;
+                    for(i = 0; i < 0x80000; i += 2)
+                    {
+                        UINT8 temp1, temp2;
+                        temp1 = planea[i/2] >> 8;
+                        temp2 = planea[i/2] & 0x00ff;
+                        fwrite(&temp1, 1, 1, out);
+                        fwrite(&temp2, 1, 1, out);
+                    }
+                    fflush(out);
+                    fclose(out);
+                    out = fopen("planeb.bin","wb");
+                    for(i = 0; i < 0x80000; i += 2)
+                    {
+                        UINT8 temp1, temp2;
+                        temp1 = planeb[i/2] >> 8;
+                        temp2 = planeb[i/2] & 0x00ff;
+                        fwrite(&temp1, 1, 1, out);
+                        fwrite(&temp2, 1, 1, out);
+                    }
+                    fflush(out);
+                    fclose(out);
+                    fuck++;
 
-				}
-			}
-			break;
-		case MCD212_DDR_FT_RLE:
-			if(mcd212.channel[channel].dcr & MCD212_DCR_CM)
-			{
-				printf( "4-bit RLE: " );
-			}
-			else
-			{
-				printf( "8-bit RLE: " );
-			}
-			break;
-		case MCD212_DDR_FT_MOSAIC:
-			if(mcd212.channel[channel].dcr & MCD212_DCR_CM)
-			{
-				printf( "4-bit Mosaic: " );
-			}
-			else
-			{
-				printf( "8-bit Mosaic: " );
-			}
-			break;
-	}
-	*/
+                }
+            }
+            break;
+        case MCD212_DDR_FT_RLE:
+            if(mcd212.channel[channel].dcr & MCD212_DCR_CM)
+            {
+                printf( "4-bit RLE: " );
+            }
+            else
+            {
+                printf( "8-bit RLE: " );
+            }
+            break;
+        case MCD212_DDR_FT_MOSAIC:
+            if(mcd212.channel[channel].dcr & MCD212_DCR_CM)
+            {
+                printf( "4-bit Mosaic: " );
+            }
+            else
+            {
+                printf( "8-bit Mosaic: " );
+            }
+            break;
+    }
+    */
 
 	while(!done)
 	{

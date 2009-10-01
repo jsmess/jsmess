@@ -148,14 +148,14 @@ Keyboard interface:
 
 Known Issues (MZ, 2009-04-26)
 - Extended Basic II does not start when a floppy controller is present
-- Multiple cartridges are not shown in the startup screen; only one 
+- Multiple cartridges are not shown in the startup screen; only one
   cartridge is presented. The slots are scanned, though. Need to check whether
   this is a bug of the operating system or of the emulation.
 - Emulation speed must be checked. I have inserted adjust_icounts, but I need to
   check whether the console experienced those delays actually. Unfortunately,
   there is almost no real hardware available.
 - Extended Basic II gets stuck with OLD MINIMEM. MiniMemory may be incompatible
-  due to the different memory layout. SAVE/OLD only works if the machine is 
+  due to the different memory layout. SAVE/OLD only works if the machine is
   neither reset nor restarted.
 */
 
@@ -199,7 +199,7 @@ ADDRESS_MAP_END
 */
 
 static ADDRESS_MAP_START(ti99_8_cru_map, ADDRESS_SPACE_IO, 8)
-//	AM_RANGE(0x0000, 0x00ff) AM_DEVREAD("tms9901", tms9901_cru_r)
+//  AM_RANGE(0x0000, 0x00ff) AM_DEVREAD("tms9901", tms9901_cru_r)
         AM_RANGE(0x0000, 0x007f) AM_DEVREAD("tms9901", tms9901_cru_r)
         AM_RANGE(0x0080, 0x00ff) AM_DEVREAD("ti99_multicart", ti99_multicart_cru_r)     /* SuperSpace cartridge */
         AM_RANGE(0x0100, 0x02ff) AM_READ(ti99_8_peb_cru_r)
@@ -422,7 +422,7 @@ static const struct tms9995reset_param ti99_8_processor_config =
 
 static const mm58274c_interface floppy_mm58274c_interface =
 {
-	1,	/* 	mode 24*/
+	1,	/*  mode 24*/
 	0   /*  first day of week */
 };
 
@@ -471,15 +471,15 @@ static MACHINE_DRIVER_START(ti99_8_60hz)
 	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
 
 	/* rtc */
-	MDRV_MM58274C_ADD("mm58274c_floppy", floppy_mm58274c_interface)		
-	
+	MDRV_MM58274C_ADD("mm58274c_floppy", floppy_mm58274c_interface)
+
 	/* tms9901 */
-	MDRV_TMS9901_ADD("tms9901", tms9901reset_param_ti99_8)	
+	MDRV_TMS9901_ADD("tms9901", tms9901reset_param_ti99_8)
 
 	MDRV_WD179X_ADD("wd179x", ti99_wd17xx_interface )
-	
-	MDRV_FLOPPY_4_DRIVES_ADD(ti99_8_floppy_config)	
-	
+
+	MDRV_FLOPPY_4_DRIVES_ADD(ti99_8_floppy_config)
+
 	MDRV_TI99_CARTRIDGE_ADD("ti99_multicart")
 	MDRV_SMARTMEDIA_ADD("smartmedia")
 	MDRV_TI99_4_RS232_CARD_ADD("rs232")
@@ -524,13 +524,13 @@ static MACHINE_DRIVER_START(ti99_8_50hz)
 	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
 
 	/* rtc */
-	MDRV_MM58274C_ADD("mm58274c_floppy", floppy_mm58274c_interface)		
-	
+	MDRV_MM58274C_ADD("mm58274c_floppy", floppy_mm58274c_interface)
+
 	/* tms9901 */
-	MDRV_TMS9901_ADD("tms9901", tms9901reset_param_ti99_8)	
+	MDRV_TMS9901_ADD("tms9901", tms9901reset_param_ti99_8)
 
 	MDRV_WD179X_ADD("wd179x", ti99_wd17xx_interface )
-	MDRV_FLOPPY_4_DRIVES_ADD(ti99_8_floppy_config)	
+	MDRV_FLOPPY_4_DRIVES_ADD(ti99_8_floppy_config)
 
 	MDRV_TI99_CARTRIDGE_ADD("ti99_multicart")
 	MDRV_SMARTMEDIA_ADD("smartmedia")

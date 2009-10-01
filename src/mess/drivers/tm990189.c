@@ -116,7 +116,7 @@ static MACHINE_RESET( tm990_189_v )
 	joy2y_timer = timer_alloc(machine, NULL, NULL);
 
 	hold_load(machine);
-	
+
 	TMS9928A_reset();
 }
 
@@ -779,7 +779,7 @@ static MACHINE_DRIVER_START(tm990_189)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
-	
+
 	/* tms9901 */
 	MDRV_TMS9901_ADD("tms9901_0", usr9901reset_param)
 	MDRV_TMS9901_ADD("tms9901_1", sys9901reset_param)

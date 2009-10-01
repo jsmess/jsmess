@@ -8,34 +8,34 @@ PCB Layout
 
 F-001-EB-REV0
 
-	 |--------------------------------------|
-	 |	40174		4073	4049	4075	|
-	 |										|
-	 |	ROM			40175	4073	4075	|
-	 |										|
-|----|		-		-		-		-		|
-|			|		|		|		| 7805	|
-|			|		|		|		|		|
-|			|		|		|		|		|
-|C			C		C		C		C		|
-|N			N		N		N		N		|
-|5			1		2		3		4		|
-|			|		|		|		|		|
-|			|		|		|		|		|
-|			|		|		|		|		|
-|			-		-		- LD1	-		|
+     |--------------------------------------|
+     |  40174       4073    4049    4075    |
+     |                                      |
+     |  ROM         40175   4073    4075    |
+     |                                      |
+|----|      -       -       -       -       |
+|           |       |       |       | 7805  |
+|           |       |       |       |       |
+|           |       |       |       |       |
+|C          C       C       C       C       |
+|N          N       N       N       N       |
+|5          1       2       3       4       |
+|           |       |       |       |       |
+|           |       |       |       |       |
+|           |       |       |       |       |
+|           -       -       - LD1   -       |
 |-------------------------------------------|
 
 Notes:
     All IC's shown.
 
     ROM     - NEC D2732D-4 4Kx8 EPROM, unlabeled
-    CN1		- COMX-35 bus connector slot 1
-    CN2		- COMX-35 bus connector slot 2
-    CN3		- COMX-35 bus connector slot 3
-    CN4		- COMX-35 bus connector slot 4
-    CN5		- COMX-35 bus PCB edge connector
-    LD1		- LED
+    CN1     - COMX-35 bus connector slot 1
+    CN2     - COMX-35 bus connector slot 2
+    CN3     - COMX-35 bus connector slot 3
+    CN4     - COMX-35 bus connector slot 4
+    CN5     - COMX-35 bus PCB edge connector
+    LD1     - LED
 
 */
 
@@ -49,29 +49,29 @@ PCB Layout
 
 F-001-FD-REV0
 
-	|---------------|
-	|      CN1      |
-|---|				|---------------------------|
-|												|
-|	40174				4068	4072		   -|
-|			ROM								   ||
-|	LS04				4072	4050	7438   C|
-|8MHz										   N|
-|						4049	4075	LS08   2|
-|LD1		WD1770							   ||
-|	40174				4503	4075	7438   -|
-|LD2											|
+    |---------------|
+    |      CN1      |
+|---|               |---------------------------|
+|                                               |
+|   40174               4068    4072           -|
+|           ROM                                ||
+|   LS04                4072    4050    7438   C|
+|8MHz                                          N|
+|                       4049    4075    LS08   2|
+|LD1        WD1770                             ||
+|   40174               4503    4075    7438   -|
+|LD2                                            |
 |-----------------------------------------------|
 
 Notes:
     All IC's shown.
 
     ROM     - "D.O.S. V1.2"
-    WD1770	- Western Digital WD1770-xx Floppy Disc Controller @ 8MHz
-    CN1		- COMX-35 bus PCB edge connector
-    CN2		- 34 pin floppy connector
-    LD1		- card selected LED
-    LD2		- floppy motor on LED
+    WD1770  - Western Digital WD1770-xx Floppy Disc Controller @ 8MHz
+    CN1     - COMX-35 bus PCB edge connector
+    CN2     - 34 pin floppy connector
+    LD1     - card selected LED
+    LD2     - floppy motor on LED
 
 */
 
@@ -85,32 +85,32 @@ PCB Layout
 
 F-003-CLM-REV 1
 
-	|---------------|
-	|      CN1      |
-|---|				|---------------------------|
-|												|
-|  MC14174	LS86	LS175	LS10	LS161		|
-|									14.31818MHz	|
-|							LS245	LS04		|
-|	 ROM1		6845						CN2	|
-|							LS374	LS165		|
-|LD2 LS138	LS157	LS157						|
-|LD1						6116	ROM2	SW1 |
-|	 LS126	LS32	LS157						|
+    |---------------|
+    |      CN1      |
+|---|               |---------------------------|
+|                                               |
+|  MC14174  LS86    LS175   LS10    LS161       |
+|                                   14.31818MHz |
+|                           LS245   LS04        |
+|    ROM1       6845                        CN2 |
+|                           LS374   LS165       |
+|LD2 LS138  LS157   LS157                       |
+|LD1                        6116    ROM2    SW1 |
+|    LS126  LS32    LS157                       |
 |-----------------------------------------------|
 
 Notes:
     All IC's shown.
 
-	6845	- Motorola MC6845P CRT Controller
-	6116	- Motorola MCM6116P15 2Kx8 Asynchronous CMOS Static RAM
+    6845    - Motorola MC6845P CRT Controller
+    6116    - Motorola MCM6116P15 2Kx8 Asynchronous CMOS Static RAM
     ROM1    - Mitsubishi 2Kx8 EPROM "C"
     ROM2    - Mitsubishi 2Kx8 EPROM "P"
-    CN1		- COMX-35 bus PCB edge connector
-	CN2		- RCA video output connector
-    LD1		- LED
-    LD2		- LED
-	SW1		- switch
+    CN1     - COMX-35 bus PCB edge connector
+    CN2     - RCA video output connector
+    LD1     - LED
+    LD2     - LED
+    SW1     - switch
 
 */
 
@@ -239,16 +239,16 @@ static void fdc_w(const address_space *space, UINT8 data)
 	const device_config *fdc = devtag_get_device(space->machine, WD1770_TAG);
 	/*
 
-		bit		description
+        bit     description
 
-		0		A0
-		1		A1
-		2		DRIVE0
-		3		DRIVE1
-		4		F9 DISB
-		5		SIDE SELECT
+        0       A0
+        1       A1
+        2       DRIVE0
+        3       DRIVE1
+        4       F9 DISB
+        5       SIDE SELECT
 
-	*/
+    */
 
 	comx35_state *state = space->machine->driver_data;
 
@@ -261,7 +261,7 @@ static void fdc_w(const address_space *space, UINT8 data)
 		if (BIT(data, 2))
 		{
 			wd17xx_set_drive(fdc,0);
-		}		
+		}
 		else if (BIT(data, 3))
 		{
 			wd17xx_set_drive(fdc,1);
@@ -288,7 +288,7 @@ static void fdc_w(const address_space *space, UINT8 data)
 
 static UINT8 printer_r(running_machine *machine)
 {
-//	comx35_state *state = machine->driver_data;
+//  comx35_state *state = machine->driver_data;
 
 	int printer = input_port_read(machine, "PRINTER") & 0x07;
 	UINT8 data = 0;
@@ -298,29 +298,29 @@ static UINT8 printer_r(running_machine *machine)
 	case PRINTER_PARALLEL:
 	case PRINTER_PLOTTER:
 		/*
-			INP 2 for the printer status, where:
-			b0=1: Acknowledge Fault
-			b1=0: Device Busy
-			b2=0: Paper Empty
-			b3=1: Device Not Selected 
-		*/
+            INP 2 for the printer status, where:
+            b0=1: Acknowledge Fault
+            b1=0: Device Busy
+            b2=0: Paper Empty
+            b3=1: Device Not Selected
+        */
 
 		data = 0x06;
 		break;
 
 	case PRINTER_SERIAL:
 		/*
-			INP 2 for the printer status and to start a new range of bits for the next byte. 
-		*/
+            INP 2 for the printer status and to start a new range of bits for the next byte.
+        */
 		break;
 
 	case PRINTER_THERMAL:
 		/*
-			INP 2 is used for the printer status, where:
-			b0=1: Printer Not Ready
-			b1=1: Energizing Head
-			b2=1: Head At Position 0 
-		*/
+            INP 2 is used for the printer status, where:
+            b0=1: Printer Not Ready
+            b1=1: Energizing Head
+            b2=1: Head At Position 0
+        */
 		break;
 	}
 
@@ -329,7 +329,7 @@ static UINT8 printer_r(running_machine *machine)
 
 static void printer_w(running_machine *machine, UINT8 data)
 {
-//	comx35_state *state = machine->driver_data;
+//  comx35_state *state = machine->driver_data;
 	int printer = input_port_read(machine, "PRINTER") & 0x07;
 
 	switch (printer)
@@ -337,26 +337,26 @@ static void printer_w(running_machine *machine, UINT8 data)
 	case PRINTER_PARALLEL:
 	case PRINTER_PLOTTER:
 		/*
-			OUT 2 is used to send a byte to the printer
-		*/
+            OUT 2 is used to send a byte to the printer
+        */
 
 		printer_output(printer_device(machine), data);
 		break;
 
 	case PRINTER_SERIAL:
 		/*
-			OUT 2 is used to send a bit to the printer
-		*/
+            OUT 2 is used to send a bit to the printer
+        */
 		break;
 
 	case PRINTER_THERMAL:
 		/*
-			OUT 2 is used to control the thermal printer where:
-			Q = 0, b0-7: Pixel 1 to 8
-			Q = 1, b7: Pixel 9 (if b0-6=#21)
-			Q = 1, b3=1: Move head right
-			Q = 1, b0-7=#12: Move head left 
-		*/
+            OUT 2 is used to control the thermal printer where:
+            Q = 0, b0-7: Pixel 1 to 8
+            Q = 1, b7: Pixel 9 (if b0-6=#21)
+            Q = 1, b3=1: Move head right
+            Q = 1, b0-7=#12: Move head left
+        */
 		break;
 	}
 }
@@ -647,7 +647,7 @@ MACHINE_START( comx35p )
 	}
 
 	/* allocate reset timer */
-	
+
 	state->reset_timer = timer_alloc(machine, reset_tick, NULL);
 
 	/* screen format */
@@ -740,20 +740,20 @@ QUICKLOAD_LOAD( comx35 )
 	case COMX_TYPE_BINARY:
 		/*
 
-			Type 1: pure machine code (i.e. no basic)
+            Type 1: pure machine code (i.e. no basic)
 
-			Byte 0 to 4: 1 - 'COMX'
-			Byte 5 and 6: Start address (1802 way; see above)
-			Byte 6 and 7: End address
-			Byte 9 and 10: Execution address
+            Byte 0 to 4: 1 - 'COMX'
+            Byte 5 and 6: Start address (1802 way; see above)
+            Byte 6 and 7: End address
+            Byte 9 and 10: Execution address
 
-			Byte 11 to Eof, should be stored in ram from start to end; execution address
-			'xxxx' for the CALL (@xxxx) basic statement to actually run the code.
+            Byte 11 to Eof, should be stored in ram from start to end; execution address
+            'xxxx' for the CALL (@xxxx) basic statement to actually run the code.
 
-		*/
+        */
 		{
 			UINT16 start_address, end_address, run_address;
-			
+
 			image_fread(image, header, 6);
 
 			start_address = header[0] << 8 | header[1];
@@ -769,21 +769,21 @@ QUICKLOAD_LOAD( comx35 )
 	case COMX_TYPE_BASIC:
 		/*
 
-			Type 2: Regular basic code or machine code followed by basic
+            Type 2: Regular basic code or machine code followed by basic
 
-			Byte 0 to 4: 2 - 'COMX'
-			Byte 5 and 6: DEFUS value, to be stored on 0x4281 and 0x4282
-			Byte 7 and 8: EOP value, to be stored on 0x4283 and 0x4284
-			Byte 9 and 10: End array, start string to be stored on 0x4292 and 0x4293
-			Byte 11 and 12: start array to be stored on 0x4294 and 0x4295
-			Byte 13 and 14: EOD and end string to be stored on 0x4299 and 0x429A
+            Byte 0 to 4: 2 - 'COMX'
+            Byte 5 and 6: DEFUS value, to be stored on 0x4281 and 0x4282
+            Byte 7 and 8: EOP value, to be stored on 0x4283 and 0x4284
+            Byte 9 and 10: End array, start string to be stored on 0x4292 and 0x4293
+            Byte 11 and 12: start array to be stored on 0x4294 and 0x4295
+            Byte 13 and 14: EOD and end string to be stored on 0x4299 and 0x429A
 
-			Byte 15 to Eof to be stored on 0x4400 and onwards
+            Byte 15 to Eof to be stored on 0x4400 and onwards
 
-			Byte 0x4281-0x429A (or at least the ones above) should be set otherwise
-			BASIC won't 'see' the code.
+            Byte 0x4281-0x429A (or at least the ones above) should be set otherwise
+            BASIC won't 'see' the code.
 
-		*/
+        */
 
 		image_fread_memory(image, 0x4281, 4);
 		image_fread_memory(image, 0x4292, 4);
@@ -794,16 +794,16 @@ QUICKLOAD_LOAD( comx35 )
 	case COMX_TYPE_BASIC_FM:
 		/*
 
-			Type 3: F&M basic load
+            Type 3: F&M basic load
 
-			Not the most important! But we designed our own basic extension, you can
-			find it in the F&M basic folder as F&M Basic.comx. When you run this all
-			basic code should start at address 0x6700 instead of 0x4400 as from
-			0x4400-0x6700 the F&M basic stuff is loaded. So format is identical to Type
-			2 except Byte 15 to Eof should be stored on 0x6700 instead. .comx files of
-			this format can also be found in the same folder as the F&M basic.comx file.
+            Not the most important! But we designed our own basic extension, you can
+            find it in the F&M basic folder as F&M Basic.comx. When you run this all
+            basic code should start at address 0x6700 instead of 0x4400 as from
+            0x4400-0x6700 the F&M basic stuff is loaded. So format is identical to Type
+            2 except Byte 15 to Eof should be stored on 0x6700 instead. .comx files of
+            this format can also be found in the same folder as the F&M basic.comx file.
 
-		*/
+        */
 
 		image_fread_memory(image, 0x4281, 4);
 		image_fread_memory(image, 0x4292, 4);
@@ -814,29 +814,29 @@ QUICKLOAD_LOAD( comx35 )
 	case COMX_TYPE_RESERVED:
 		/*
 
-			Type 4: Incorrect DATA format, I suggest to forget this one as it won't work
-			in most cases. Instead I left this one reserved and designed Type 5 instead.
+            Type 4: Incorrect DATA format, I suggest to forget this one as it won't work
+            in most cases. Instead I left this one reserved and designed Type 5 instead.
 
-		*/
+        */
 		break;
 
 	case COMX_TYPE_DATA:
 		/*
 
-			Type 5: Data load
+            Type 5: Data load
 
-			Byte 0 to 4: 5 - 'COMX'
-			Byte 5 and 6: Array length
-			Byte 7 to Eof: Basic 'data'
+            Byte 0 to 4: 5 - 'COMX'
+            Byte 5 and 6: Array length
+            Byte 7 to Eof: Basic 'data'
 
-			To load this first get the 'start array' from the running COMX, i.e. address
-			0x4295/0x4296. Calculate the EOD as 'start array' + length of the data (i.e.
-			file length - 7). Store the EOD back on 0x4299 and ox429A. Calculate the
-			'Start String' as 'start array' + 'Array length' (Byte 5 and 6). Store the
-			'Start String' on 0x4292/0x4293. Load byte 7 and onwards starting from the
-			'start array' value fetched from 0x4295/0x4296.
+            To load this first get the 'start array' from the running COMX, i.e. address
+            0x4295/0x4296. Calculate the EOD as 'start array' + length of the data (i.e.
+            file length - 7). Store the EOD back on 0x4299 and ox429A. Calculate the
+            'Start String' as 'start array' + 'Array length' (Byte 5 and 6). Store the
+            'Start String' on 0x4292/0x4293. Load byte 7 and onwards starting from the
+            'start array' value fetched from 0x4295/0x4296.
 
-		*/
+        */
 		{
 			UINT16 start_array, end_array, start_string, array_length;
 
@@ -848,7 +848,7 @@ QUICKLOAD_LOAD( comx35 )
 
 			memory_write_byte(program, 0x4299, end_array >> 8);
 			memory_write_byte(program, 0x429a, end_array & 0xff);
-			
+
 			start_string = start_array + array_length;
 
 			memory_write_byte(program, 0x4292, start_string >> 8);

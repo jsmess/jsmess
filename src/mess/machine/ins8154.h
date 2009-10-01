@@ -1,7 +1,7 @@
 /*****************************************************************************
  *
  * machine/ins8154.h
- * 
+ *
  * INS8154 N-Channel 128-by-8 Bit RAM Input/Output (RAM I/O)
  *
  ****************************************************************************/
@@ -32,7 +32,7 @@ struct _ins8154_interface
 	read8_device_func in_b_func;
 	write8_device_func out_a_func;
 	write8_device_func out_b_func;
-	ins8154_irq_func irq_func;	
+	ins8154_irq_func irq_func;
 };
 
 DEVICE_GET_INFO( ins8154 );

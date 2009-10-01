@@ -3,8 +3,8 @@
 
     MESS Driver By:
 
-	Gordon Jefferyes
-	mess_bbc@gjeffery.dircon.co.uk
+    Gordon Jefferyes
+    mess_bbc@gjeffery.dircon.co.uk
 
 ******************************************************************************/
 
@@ -85,8 +85,8 @@ WRITE8_HANDLER ( bbc_page_selectb_w )
 	if (bbc_rombank!=1)
 	{
 		memory_set_bankptr(space->machine, 4, memory_region(space->machine, "user1") + (bbc_rombank << 14));
-	} 
-	else 
+	}
+	else
 	{
 		memory_set_bankptr(space->machine, 4, memory_region(space->machine, "user2") + ((bbc_DFSType) << 14));
 	}
@@ -95,13 +95,13 @@ WRITE8_HANDLER ( bbc_page_selectb_w )
 
 WRITE8_HANDLER ( bbc_memoryb3_w )
 {
-	if (bbc_RAMSize) 
+	if (bbc_RAMSize)
 	{
 		memory_region(space->machine, "maincpu")[offset + 0x4000] = data;
 		// this array is set so that the video emulator know which addresses to redraw
 		bbc_vidmem[offset + 0x4000] = 1;
-	} 
-	else 
+	}
+	else
 	{
 		memory_region(space->machine, "maincpu")[offset] = data;
 		bbc_vidmem[offset] = 1;
@@ -127,7 +127,7 @@ WRITE8_HANDLER ( bbc_memoryb4_w )
 		if (bbc_DFSType == 3) memory_region(space->machine, "user2")[((bbc_DFSType) << 14) + offset] = data;
 	} else
 	{
-		switch (bbc_SWRAMtype) 
+		switch (bbc_SWRAMtype)
 		{
 			case 1:	if (bbc_SWRAMtype1[bbc_userport]) memory_region(space->machine, "user1")[(bbc_userport << 14) + offset] = data;
 			case 2:	if (bbc_SWRAMtype2[bbc_rombank])  memory_region(space->machine, "user1")[(bbc_rombank << 14) + offset] = data;
@@ -144,10 +144,10 @@ static int pagedRAM = 0;
 static int vdusel = 0;
 
 /*  this function should return true if
-	the instruction is in the VDU driver address ranged
-	these are set when:
-	PC is in the range c000 to dfff
-	or if pagedRAM set and PC is in the range a000 to afff
+    the instruction is in the VDU driver address ranged
+    these are set when:
+    PC is in the range c000 to dfff
+    or if pagedRAM set and PC is in the range a000 to afff
 */
 static int vdudriverset(running_machine *machine)
 {
@@ -170,8 +170,8 @@ WRITE8_HANDLER ( bbc_page_selectbp_w )
 		{
 			/* if paged ram then set 8000 to afff to read from the ram 8000 to afff */
 			memory_set_bankptr(space->machine, 4, memory_region(space->machine, "maincpu") + 0x8000);
-		} 
-		else 
+		}
+		else
 		{
 			/* if paged rom then set the rom to be read from 8000 to afff */
 			memory_set_bankptr(space->machine, 4, memory_region(space->machine, "user1") + (bbc_rombank << 14));
@@ -224,15 +224,15 @@ static DIRECT_UPDATE_HANDLER( bbcbp_direct_handler )
 	{
 		// not in shadow ram mode so just read normal ram
 		memory_set_bankptr(space->machine, 2, ram + 0x3000);
-	} 
-	else 
+	}
+	else
 	{
 		if (vdudriverset(space->machine))
 		{
 			// if VDUDriver set then read from shadow ram
 			memory_set_bankptr(space->machine, 2, ram + 0xb000);
-		} 
-		else 
+		}
+		else
 		{
 			// else read from normal ram
 			memory_set_bankptr(space->machine, 2, ram + 0x3000);
@@ -250,16 +250,16 @@ WRITE8_HANDLER ( bbc_memorybp2_w )
 		// not in shadow ram mode so just write to normal ram
 		ram[offset + 0x3000] = data;
 		bbc_vidmem[offset + 0x3000] = 1;
-	} 
-	else 
+	}
+	else
 	{
 		if (vdudriverset(space->machine))
 		{
 			// if VDUDriver set then write to shadow ram
 			ram[offset + 0xb000] = data;
 			bbc_vidmem[offset + 0xb000] = 1;
-		} 
-		else 
+		}
+		else
 		{
 			// else write to normal ram
 			ram[offset + 0x3000] = data;
@@ -323,7 +323,7 @@ WRITE8_HANDLER ( bbc_memorybp6_128_w )
 /*
 ROMSEL - &FE30 write Only
 B7 RAM 1=Page in ANDY &8000-&8FFF
-	   0=Page in ROM  &8000-&8FFF
+       0=Page in ROM  &8000-&8FFF
 B6 Not Used
 B5 Not Used
 B4 Not Used
@@ -331,20 +331,20 @@ B3-B0  Rom/Ram Bank Select
 
 ACCCON
 
-b7 IRR	1=Causes an IRQ to the processor
+b7 IRR  1=Causes an IRQ to the processor
 b6 TST  1=Selects &FC00-&FEFF read from OS-ROM
 b5 IFJ  1=Internal 1 MHz bus
-		0=External 1MHz bus
+        0=External 1MHz bus
 b4 ITU  1=Internal Tube
-		0=External Tube
-b3 Y	1=Read/Write HAZEL &C000-&DFFF RAM
-		0=Read/Write ROM &C000-&DFFF OS-ROM
-b2 X	1=Read/Write LYNNE
-		0=Read/WRITE main memory &3000-&8000
+        0=External Tube
+b3 Y    1=Read/Write HAZEL &C000-&DFFF RAM
+        0=Read/Write ROM &C000-&DFFF OS-ROM
+b2 X    1=Read/Write LYNNE
+        0=Read/WRITE main memory &3000-&8000
 b1 E    1=Causes shadow if VDU code
-		0=Main all the time
-b0 D	1=Display LYNNE as screen
-		0=Display main RAM screen
+        0=Main all the time
+b0 D    1=Display LYNNE as screen
+        0=Display main RAM screen
 
 ACCCON is a read/write register
 
@@ -409,8 +409,8 @@ WRITE8_HANDLER ( bbcm_ACCCON_write )
 	if (ACCCON_Y)
 	{
 		memory_set_bankptr(space->machine, 7, memory_region(space->machine, "maincpu") + 0x9000);
-	} 
-	else 
+	}
+	else
 	{
 		memory_set_bankptr(space->machine, 7, memory_region(space->machine, "user1") + 0x40000);
 	}
@@ -421,8 +421,8 @@ WRITE8_HANDLER ( bbcm_ACCCON_write )
 	if (ACCCON_X)
 	{
 		memory_set_bankptr( space->machine, 2, memory_region( space->machine, "maincpu" ) + 0xb000 );
-	} 
-	else 
+	}
+	else
 	{
 		memory_set_bankptr( space->machine, 2, memory_region( space->machine, "maincpu" ) + 0x3000 );
 	}
@@ -460,8 +460,8 @@ static WRITE8_HANDLER ( page_selectbm_w )
 	{
 		memory_set_bankptr(space->machine, 4, memory_region(space->machine, "maincpu") + 0x8000);
 		memory_set_bank(space->machine, 5, bbc_rombank);
-	} 
-	else 
+	}
+	else
 	{
 		memory_set_bankptr(space->machine, 4, memory_region(space->machine, "user1") + ((bbc_rombank) << 14));
 		memory_set_bank(space->machine, 5, bbc_rombank);
@@ -482,14 +482,14 @@ static DIRECT_UPDATE_HANDLER( bbcm_direct_handler )
 	if (ACCCON_X)
 	{
 		memory_set_bankptr( space->machine, 2, memory_region( space->machine, "maincpu" ) + 0xb000 );
-	} 
-	else 
+	}
+	else
 	{
 		if (ACCCON_E && bbcm_vdudriverset(space->machine))
 		{
 			memory_set_bankptr( space->machine, 2, memory_region( space->machine, "maincpu" ) + 0xb000 );
-		} 
-		else 
+		}
+		else
 		{
 			memory_set_bankptr( space->machine, 2, memory_region( space->machine, "maincpu" ) + 0x3000 );
 		}
@@ -507,15 +507,15 @@ WRITE8_HANDLER ( bbc_memorybm2_w )
 	{
 		ram[offset + 0xb000] = data;
 		bbc_vidmem[offset + 0xb000] = 1;
-	} 
-	else 
+	}
+	else
 	{
 		if (ACCCON_E && bbcm_vdudriverset(space->machine))
 		{
 			ram[offset + 0xb000] = data;
 			bbc_vidmem[offset + 0xb000] = 1;
-		} 
-		else 
+		}
+		else
 		{
 			ram[offset + 0x3000] = data;
 			bbc_vidmem[offset + 0x3000] = 1;
@@ -567,23 +567,23 @@ WRITE8_HANDLER ( bbc_memorybm7_w )
 /******************************************************************************
 &FC00-&FCFF FRED
 &FD00-&FDFF JIM
-&FE00-&FEFF SHEILA		Read					Write
-&00-&07 6845 CRTC		Video controller		Video Controller		 8 ( 2 bytes x	4 )
-&08-&0F 6850 ACIA		Serial controller		Serial Controller		 8 ( 2 bytes x	4 )
-&10-&17 Serial ULA		-						Serial system chip		 8 ( 1 byte  x  8 )
-&18-&1F uPD7002 		A to D converter	 	A to D converter		 8 ( 4 bytes x	2 )
-&20-&23 Video ULA		-						Video system chip		 4 ( 2 bytes x	2 )
-&24-&27 FDC Latch		1770 Control latch		1770 Control latch		 4 ( 1 byte  x  4 )
-&28-&2F 1770 registers  1770 Disc Controller	1170 Disc Controller	 8 ( 4 bytes x  2 )
-&30-&33 ROMSEL			-						ROM Select				 4 ( 1 byte  x  4 )
-&34-&37 ACCCON			ACCCON select reg.		ACCCON select reg		 4 ( 1 byte  x  4 )
-&38-&3F NC				-						-
-&40-&5F 6522 VIA		SYSTEM VIA				SYSTEM VIA				32 (16 bytes x	2 ) 1MHz
-&60-&7F 6522 VIA		USER VIA				USER VIA				32 (16 bytes x	2 ) 1MHz
-&80-&9F Int. Modem		Int. Modem				Int Modem
-&A0-&BF 68B54 ADLC		ECONET controller		ECONET controller		32 ( 4 bytes x	8 ) 2MHz
-&C0-&DF NC				-						-
-&E0-&FF Tube ULA		Tube system interface	Tube system interface	32 (32 bytes x  1 ) 2MHz
+&FE00-&FEFF SHEILA      Read                    Write
+&00-&07 6845 CRTC       Video controller        Video Controller         8 ( 2 bytes x  4 )
+&08-&0F 6850 ACIA       Serial controller       Serial Controller        8 ( 2 bytes x  4 )
+&10-&17 Serial ULA      -                       Serial system chip       8 ( 1 byte  x  8 )
+&18-&1F uPD7002         A to D converter        A to D converter         8 ( 4 bytes x  2 )
+&20-&23 Video ULA       -                       Video system chip        4 ( 2 bytes x  2 )
+&24-&27 FDC Latch       1770 Control latch      1770 Control latch       4 ( 1 byte  x  4 )
+&28-&2F 1770 registers  1770 Disc Controller    1170 Disc Controller     8 ( 4 bytes x  2 )
+&30-&33 ROMSEL          -                       ROM Select               4 ( 1 byte  x  4 )
+&34-&37 ACCCON          ACCCON select reg.      ACCCON select reg        4 ( 1 byte  x  4 )
+&38-&3F NC              -                       -
+&40-&5F 6522 VIA        SYSTEM VIA              SYSTEM VIA              32 (16 bytes x  2 ) 1MHz
+&60-&7F 6522 VIA        USER VIA                USER VIA                32 (16 bytes x  2 ) 1MHz
+&80-&9F Int. Modem      Int. Modem              Int Modem
+&A0-&BF 68B54 ADLC      ECONET controller       ECONET controller       32 ( 4 bytes x  8 ) 2MHz
+&C0-&DF NC              -                       -
+&E0-&FF Tube ULA        Tube system interface   Tube system interface   32 (32 bytes x  1 ) 2MHz
 ******************************************************************************/
 
 READ8_HANDLER ( bbcm_r )
@@ -591,10 +591,10 @@ READ8_HANDLER ( bbcm_r )
 long myo;
 
 	/* Now handled in bbcm_ACCCON_write PHS - 2008-10-11 */
-//	if ( ACCCON_TST )
-//	{
-//		return memory_region(space->machine, "user1")[offset+0x43c00];
-//	};
+//  if ( ACCCON_TST )
+//  {
+//      return memory_region(space->machine, "user1")[offset+0x43c00];
+//  };
 
 	if ((offset>=0x000) && (offset<=0x0ff)) /* FRED */
 	{
@@ -669,7 +669,7 @@ long myo;
 		if ((myo>=0x28) && (myo<=0x2f)) bbcm_wd1770_write(space, myo-0x28,data);  	/* disc control latch */
 		if ((myo>=0x30) && (myo<=0x33)) page_selectbm_w(space, myo-0x30,data);		/* page select */
 		if ((myo>=0x34) && (myo<=0x37)) bbcm_ACCCON_write(space, myo-0x34,data);	/* ACCCON */
-		//if ((myo>=0x38) && (myo<=0x3f)) 									/* NC ?? */
+		//if ((myo>=0x38) && (myo<=0x3f))                                   /* NC ?? */
 		if ((myo>=0x40) && (myo<=0x5f)) via_w(via_0, myo-0x40, data);
 		if ((myo>=0x60) && (myo<=0x7f)) via_w(via_1, myo-0x60, data);
 		//if ((myo>=0x80) && (myo<=0x9f))
@@ -687,15 +687,15 @@ System VIA 6522
 
 PA0-PA7
 Port A forms a slow data bus to the keyboard sound and speech processors
-PortA	Keyboard
-D0	Pin 8
-D1	Pin 9
-D2	Pin 10
-D3	Pin 11
-D4	Pin 5
-D5	Pin 6
-D6	Pin 7
-D7	Pin 12
+PortA   Keyboard
+D0  Pin 8
+D1  Pin 9
+D2  Pin 10
+D3  Pin 11
+D4  Pin 5
+D5  Pin 6
+D6  Pin 7
+D7  Pin 12
 
 PB0-PB2 outputs
 ---------------
@@ -772,11 +772,11 @@ B2 - WRITE select on the speech processor
 B3 - Keyboard write enable
 B4,B5 - these two outputs define the number to be added to the
 start of screen address in hardware to control hardware scrolling:-
-Mode	Size	Start of screen	 Number to add	B5   	B4
-0,1,2	20K	&3000		 12K		1    	1
-3		16K	&4000		 16K		0	0
-4,5		10K	&5800 (or &1800) 22K		1	0
-6		8K	&6000 (or &2000) 24K		0	1
+Mode    Size    Start of screen  Number to add  B5      B4
+0,1,2   20K &3000        12K        1       1
+3       16K &4000        16K        0   0
+4,5     10K &5800 (or &1800) 22K        1   0
+6       8K  &6000 (or &2000) 24K        0   1
 B6 - Operates the CAPS lock LED  (Pin 17 keyboard connector)
 B7 - Operates the SHIFT lock LED (Pin 16 keyboard connector)
 
@@ -823,7 +823,7 @@ INTERRUPT_GEN( bbcb_keyscan )
 		{
   			/* KBD IC4 8 input NAND gate */
   			/* set the value of via_system ca2, by checking for any keys
-    			 being pressed on the selected column */
+                 being pressed on the selected column */
 			if ((input_port_read(device->machine, colnames[column]) | 0x01) != 0xff)
 			{
 				via_ca2_w(via_0, 0, 1);
@@ -861,18 +861,18 @@ INTERRUPT_GEN( bbcm_keyscan )
 			{
 			/* KBD IC4 8 input NAND gate */
 			/* set the value of via_system ca2, by checking for any keys
-				 being pressed on the selected column */
+                 being pressed on the selected column */
 			if ((input_port_read(device->machine, colnames[column]) | 0x01) != 0xff)
 			{
 				via_ca2_w(via_0, 0, 1);
-			} 
-			else 
+			}
+			else
 			{
 				via_ca2_w(via_0, 0, 0);
 			}
 
-		} 
-		else 
+		}
+		else
 		{
 			via_ca2_w(via_0, 0, 0);
 		}
@@ -952,8 +952,8 @@ static void MC146818_set(const address_space *space)
 			{
 				via_system_porta=mc146818_port_r(space, 1);
 				//logerror("read 146818 data %d \n",via_system_porta);
-			} 
-			else 
+			}
+			else
 			{
 				mc146818_port_w(space, 1, via_system_porta);
 				//logerror("write 146818 data %d \n",via_system_porta);
@@ -1000,12 +1000,12 @@ static WRITE8_DEVICE_HANDLER( bbcb_via_system_write_portb )
 
     //logerror("SYSTEM write portb %d %d %d\n",data,bit,value);
 
-	if (value) 
+	if (value)
 	{
-		switch (bit) 
+		switch (bit)
 		{
 		case 0:
-			if (b0_sound == 0) 
+			if (b0_sound == 0)
 			{
 				b0_sound = 1;
 			}
@@ -1019,8 +1019,8 @@ static WRITE8_DEVICE_HANDLER( bbcb_via_system_write_portb )
 					MC146818_WR = 1;
 					MC146818_set(space);
 				}
-			} 
-			else 
+			}
+			else
 			{
 				if (b1_speech_read == 0)
 				{
@@ -1038,10 +1038,10 @@ static WRITE8_DEVICE_HANDLER( bbcb_via_system_write_portb )
 					MC146818_DS = 1;
 					MC146818_set(space);
 				}
-			} 
-			else 
+			}
+			else
 			{
-				if (b2_speech_write == 0) 
+				if (b2_speech_write == 0)
 				{
 					/* VSP TMS 5220 */
 					b2_speech_write = 1;
@@ -1049,47 +1049,47 @@ static WRITE8_DEVICE_HANDLER( bbcb_via_system_write_portb )
 			}
 			break;
 		case 3:
-			if (b3_keyboard == 0) 
+			if (b3_keyboard == 0)
 			{
 				b3_keyboard = 1;
 			}
 			break;
 		case 4:
-			if (b4_video0 == 0) 
+			if (b4_video0 == 0)
 			{
 				b4_video0 = 1;
 				bbc_setscreenstart(b4_video0, b5_video1);
 			}
 			break;
 		case 5:
-			if (b5_video1 == 0) 
+			if (b5_video1 == 0)
 			{
 				b5_video1 = 1;
 				bbc_setscreenstart(b4_video0, b5_video1);
 			}
 			break;
 		case 6:
-			if (b6_caps_lock_led == 0) 
+			if (b6_caps_lock_led == 0)
 			{
 				b6_caps_lock_led = 1;
 				/* call caps lock led update */
 			}
 			break;
 		case 7:
-			if (b7_shift_lock_led == 0) 
+			if (b7_shift_lock_led == 0)
 			{
 				b7_shift_lock_led = 1;
 				/* call shift lock led update */
 			}
 			break;
 		}
-	} 
-	else 
+	}
+	else
 	{
-		switch (bit) 
+		switch (bit)
 		{
 		case 0:
-			if (b0_sound == 1) 
+			if (b0_sound == 1)
 			{
 				b0_sound = 0;
 				sn76496_w(devtag_get_device(space->machine, "sn76489"), 0, via_system_porta);
@@ -1104,10 +1104,10 @@ static WRITE8_DEVICE_HANDLER( bbcb_via_system_write_portb )
 					MC146818_WR = 0;
 					MC146818_set(space);
 				}
-			} 
-			else 
+			}
+			else
 			{
-				if (b1_speech_read == 1) 
+				if (b1_speech_read == 1)
 				{
 					/* VSP TMS 5220 */
 					b1_speech_read = 0;
@@ -1123,10 +1123,10 @@ static WRITE8_DEVICE_HANDLER( bbcb_via_system_write_portb )
 					MC146818_DS = 0;
 					MC146818_set(space);
 				}
-			} 
-			else 
+			}
+			else
 			{
-				if (b2_speech_write == 1) 
+				if (b2_speech_write == 1)
 				{
 					/* VSP TMS 5220 */
 					b2_speech_write = 0;
@@ -1134,7 +1134,7 @@ static WRITE8_DEVICE_HANDLER( bbcb_via_system_write_portb )
 			}
 			break;
 		case 3:
-			if (b3_keyboard == 1) 
+			if (b3_keyboard == 1)
 			{
 				b3_keyboard = 0;
 				/* *** call keyboard enabled *** */
@@ -1142,28 +1142,28 @@ static WRITE8_DEVICE_HANDLER( bbcb_via_system_write_portb )
 			}
 			break;
 		case 4:
-			if (b4_video0 == 1) 
+			if (b4_video0 == 1)
 			{
 				b4_video0 = 0;
 				bbc_setscreenstart(b4_video0, b5_video1);
 			}
 			break;
 		case 5:
-			if (b5_video1 == 1) 
+			if (b5_video1 == 1)
 			{
 				b5_video1 = 0;
 				bbc_setscreenstart(b4_video0, b5_video1);
 			}
 			break;
 		case 6:
-			if (b6_caps_lock_led == 1) 
+			if (b6_caps_lock_led == 1)
 			{
 				b6_caps_lock_led = 0;
 				/* call caps lock led update */
 			}
 			break;
 		case 7:
-			if (b7_shift_lock_led == 1) 
+			if (b7_shift_lock_led == 1)
 			{
 				b7_shift_lock_led = 0;
 				/* call shift lock led update */
@@ -1210,17 +1210,17 @@ static int TMSrdy=1;
 
 //void bbc_TMSint(int status)
 //{
-//	TMSint=(!status)&1;
-//	TMSrdy=(!tms5220_readyq_r())&1;
-//	via_0_portb_w(0,(0xf | input_port_read(machine, "IN0")|(TMSint<<6)|(TMSrdy<<7)));
+//  TMSint=(!status)&1;
+//  TMSrdy=(!tms5220_readyq_r())&1;
+//  via_0_portb_w(0,(0xf | input_port_read(machine, "IN0")|(TMSint<<6)|(TMSrdy<<7)));
 //}
 
 
 
 static READ8_DEVICE_HANDLER( bbcb_via_system_read_portb )
 {
-//	TMSint=(!tms5220_int_r())&1;
-//	TMSrdy=(!tms5220_readyq_r())&1;
+//  TMSint=(!tms5220_int_r())&1;
+//  TMSrdy=(!tms5220_readyq_r())&1;
 
 	//logerror("SYSTEM read portb %d\n",0xf | input_port(machine, "IN0")|(TMSint<<6)|(TMSrdy<<7));
 
@@ -1438,8 +1438,8 @@ static void BBC_Cassette_motor(running_machine *machine, unsigned char status)
 	{
 		cassette_change_state(devtag_get_device(machine, "cassette"), CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 		timer_adjust_periodic(bbc_tape_timer, attotime_zero, 0, ATTOTIME_IN_HZ(44100));
-	} 
-	else 
+	}
+	else
 	{
 		cassette_change_state(devtag_get_device(machine, "cassette"), CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 		timer_reset(bbc_tape_timer, attotime_never);
@@ -1468,8 +1468,8 @@ static void	bbc_i8271_interrupt(const device_config *device, int state)
 {
 	/* I'm assuming that the nmi is edge triggered */
 	/* a interrupt from the fdc will cause a change in line state, and
-	the nmi will be triggered, but when the state changes because the int
-	is cleared this will not cause another nmi */
+    the nmi will be triggered, but when the state changes because the int
+    is cleared this will not cause another nmi */
 	/* I'll emulate it like this to be sure */
 
 	if (state!=previous_i8271_int_state)
@@ -1477,7 +1477,7 @@ static void	bbc_i8271_interrupt(const device_config *device, int state)
 		if (state)
 		{
 			/* I'll pulse it because if I used hold-line I'm not sure
-			it would clear - to be checked */
+            it would clear - to be checked */
 			cpu_set_input_line(cputag_get_cpu(device->machine, "maincpu"), INPUT_LINE_NMI,PULSE_LINE);
 		}
 	}
@@ -1584,16 +1584,16 @@ static WD17XX_CALLBACK( bbc_wd177x_callback)
 {
 	int bbc_state;
 	/* wd177x_IRQ_SET and latch bit 4 (nmi_enable) are NAND'ED together
-	   wd177x_DRQ_SET and latch bit 4 (nmi_enable) are NAND'ED together
-	   the output of the above two NAND gates are then OR'ED together and sent to the 6502 NMI line.
-		DRQ and IRQ are active low outputs from wd177x. We use wd177x_DRQ_SET for DRQ = 0,
-		and wd177x_DRQ_CLR for DRQ = 1. Similarly wd177x_IRQ_SET for IRQ = 0 and wd177x_IRQ_CLR
-		for IRQ = 1.
+       wd177x_DRQ_SET and latch bit 4 (nmi_enable) are NAND'ED together
+       the output of the above two NAND gates are then OR'ED together and sent to the 6502 NMI line.
+        DRQ and IRQ are active low outputs from wd177x. We use wd177x_DRQ_SET for DRQ = 0,
+        and wd177x_DRQ_CLR for DRQ = 1. Similarly wd177x_IRQ_SET for IRQ = 0 and wd177x_IRQ_CLR
+        for IRQ = 1.
 
-	  The above means that if IRQ or DRQ are set, a interrupt should be generated.
-	  The nmi_enable decides if interrupts are actually triggered.
-	  The nmi is edge triggered, and triggers on a +ve edge.
-	*/
+      The above means that if IRQ or DRQ are set, a interrupt should be generated.
+      The nmi_enable decides if interrupts are actually triggered.
+      The nmi is edge triggered, and triggers on a +ve edge.
+    */
 
 	logerror("callback $%02X\n", state);
 
@@ -1639,13 +1639,13 @@ static WD17XX_CALLBACK( bbc_wd177x_callback)
 	}
 
 	/* nmi is edge triggered, and triggers when the state goes from clear->set.
-	Here we are checking this transition before triggering the nmi */
+    Here we are checking this transition before triggering the nmi */
 	if (bbc_state!=previous_wd177x_int_state)
 	{
 		if (bbc_state)
 		{
 			/* I'll pulse it because if I used hold-line I'm not sure
-			it would clear - to be checked */
+            it would clear - to be checked */
 			cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI,PULSE_LINE);
 		}
 	}
@@ -1745,17 +1745,17 @@ WRITE8_HANDLER ( bbc_wd1770_write )
 
 /*********************************************
 OPUS CHALLENGER MEMORY MAP
-		Read						Write
+        Read                        Write
 
-&FCF8	1770 Status register		1770 command register
-&FCF9				1770 track register
-&FCFA				1770 sector register
-&FCFB				1770 data register
-&FCFC								1770 drive control
+&FCF8   1770 Status register        1770 command register
+&FCF9               1770 track register
+&FCFA               1770 sector register
+&FCFB               1770 data register
+&FCFC                               1770 drive control
 
 
 drive control register bits
-0	select side 0= side 0   1= side 1
+0   select side 0= side 0   1= side 1
 1   select drive 0
 2   select drive 1
 3   ?unused?
@@ -1767,13 +1767,13 @@ drive control register bits
 The RAM is accessible through JIM (page &FD). One page is visible in JIM at a time.
 The selected page is controlled by the two paging registers:
 
-&FCFE		Paging register MSB
+&FCFE       Paging register MSB
 &FCFF       Paging register LSB
 
 256K model has 1024 pages &000 to &3ff
 512K model has 2048 pages &000 to &7ff
 
-AM_RANGE(0xfc00, 0xfdff) AM_READWRITE(bbc_opus_read     , bbc_opus_write	)
+AM_RANGE(0xfc00, 0xfdff) AM_READWRITE(bbc_opus_read     , bbc_opus_write    )
 
 
 **********************************************/
@@ -1829,8 +1829,8 @@ READ8_HANDLER( bbc_opus_read )
 					return wd17xx_data_r(fdc, 0);
 			}
 
-		} 
-		else 
+		}
+		else
 		{
 			return memory_region(space->machine, "disks")[offset + (opusbank << 8)];
 		}
@@ -1871,8 +1871,8 @@ WRITE8_HANDLER (bbc_opus_write)
 					opusbank=(opusbank & 0xff00) | data;
 					break;
 			}
-		} 
-		else 
+		}
+		else
 		{
 			memory_region(space->machine, "disks")[offset + (opusbank << 8)] = data;
 		}
@@ -1963,7 +1963,7 @@ WRITE8_HANDLER ( bbcm_wd1770l_write )
 		wd17xx_set_density(fdc,DEN_MFM_LO);
 	}
 
-//	bbc_1770_IntEnabled=(((data>>4) & 0x01)==0);
+//  bbc_1770_IntEnabled=(((data>>4) & 0x01)==0);
 	bbc_1770_IntEnabled=1;
 
 }
@@ -2035,19 +2035,19 @@ DEVICE_IMAGE_LOAD( bbcb_cart )
 
 	size = image_length (image);
 
-	if (strcmp(image->tag,"cart1") == 0) 
+	if (strcmp(image->tag,"cart1") == 0)
 	{
 		index = 0;
 	}
-	if (strcmp(image->tag,"cart2") == 0) 
+	if (strcmp(image->tag,"cart2") == 0)
 	{
 		index = 1;
 	}
-	if (strcmp(image->tag,"cart3") == 0) 
+	if (strcmp(image->tag,"cart3") == 0)
 	{
 		index = 2;
 	}
-	if (strcmp(image->tag,"cart4") == 0) 
+	if (strcmp(image->tag,"cart4") == 0)
 	{
 		index = 3;
 	}
@@ -2057,7 +2057,7 @@ DEVICE_IMAGE_LOAD( bbcb_cart )
 	logerror("loading rom %s at %.4x size:%.4x\n", image_filename(image), addr, size);
 
 
-	switch (size) 
+	switch (size)
 	{
 	case 0x2000:
 		read_ = image_fread(image, mem + addr, size);
@@ -2124,12 +2124,12 @@ MACHINE_START( bbcb )
 
 	/*set up the required disc controller*/
 	//switch (bbc_DFSType) {
-	//case 0:	case 1: case 2: case 3:
+	//case 0:   case 1: case 2: case 3:
 		previous_i8271_int_state=0;
-	//	break;
+	//  break;
 	//case 4: case 5: case 6:
 		previous_wd177x_int_state=1;
-	//	break;
+	//  break;
 	//}
 }
 
@@ -2146,8 +2146,8 @@ MACHINE_RESET( bbcb )
 		/* 32K Model B */
 		memory_set_bankptr(machine, 3, ram + 0x4000);
 		bbc_set_video_memory_lookups(32);
-	} 
-	else 
+	}
+	else
 	{
 		/* 16K just repeat the lower 16K*/
 		memory_set_bankptr(machine, 3, ram);
@@ -2163,10 +2163,10 @@ MACHINE_RESET( bbcb )
 	opusbank = 0;
 	/*set up the required disc controller*/
 	//switch (bbc_DFSType) {
-	//case 0:	case 1: case 2: case 3:
-	//	break;
+	//case 0:   case 1: case 2: case 3:
+	//  break;
 	//case 4: case 5: case 6:
-	//	break;
+	//  break;
 	//}
 }
 
@@ -2213,11 +2213,11 @@ MACHINE_START( bbcm )
 
 MACHINE_RESET( bbcm )
 {
-	memory_set_bankptr(machine, 1, memory_region(machine, "maincpu"));			/* bank 1 regular lower ram		from 0000 to 2fff */
-	memory_set_bankptr(machine, 2, memory_region(machine, "maincpu") + 0x3000);	/* bank 2 screen/shadow ram		from 3000 to 7fff */
+	memory_set_bankptr(machine, 1, memory_region(machine, "maincpu"));			/* bank 1 regular lower ram     from 0000 to 2fff */
+	memory_set_bankptr(machine, 2, memory_region(machine, "maincpu") + 0x3000);	/* bank 2 screen/shadow ram     from 3000 to 7fff */
 	memory_set_bankptr(machine, 4, memory_region(machine, "user1"));         /* bank 4 is paged ROM or RAM   from 8000 to 8fff */
 	memory_set_bank(machine, 5, 0);
-	memory_set_bankptr(machine, 7, memory_region(machine, "user1") + 0x40000); /* bank 6 OS rom of RAM			from c000 to dfff */
+	memory_set_bankptr(machine, 7, memory_region(machine, "user1") + 0x40000); /* bank 6 OS rom of RAM          from c000 to dfff */
 
 	bbcb_IC32_initialise();
 

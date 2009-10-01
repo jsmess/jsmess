@@ -1,9 +1,9 @@
 /*
-	Handlers for concept floppy images
+    Handlers for concept floppy images
 
-	Disk images are in MESS format.
+    Disk images are in MESS format.
 
-	Raphael Nabet, 2003
+    Raphael Nabet, 2003
 */
 
 #include <stdio.h>
@@ -20,15 +20,15 @@ typedef struct UINT16xE
 } UINT16xE;
 
 /*
-	get_UINT16xE
+    get_UINT16xE
 
-	Read a 16-bit word, whether it is little-endian or big-endian
+    Read a 16-bit word, whether it is little-endian or big-endian
 
-	little_endian (I): non-zero if word is little-endian, zero if word is
-		big-endian
-	word (I): pointer to word to read
+    little_endian (I): non-zero if word is little-endian, zero if word is
+        big-endian
+    word (I): pointer to word to read
 
-	Returns value of word in native format
+    Returns value of word in native format
 */
 INLINE UINT16 get_UINT16xE(int little_endian, UINT16xE word)
 {
@@ -36,14 +36,14 @@ INLINE UINT16 get_UINT16xE(int little_endian, UINT16xE word)
 }
 
 /*
-	set_UINT16xE
+    set_UINT16xE
 
-	Write a 16-bit word, whether it is little-endian or big-endian
+    Write a 16-bit word, whether it is little-endian or big-endian
 
-	little_endian (I): non-zero if word is little-endian, zero if word is
-		big-endian
-	word (O): pointer to word to write
-	data (I): value to write in word, in native format
+    little_endian (I): non-zero if word is little-endian, zero if word is
+        big-endian
+    word (O): pointer to word to write
+    data (I): value to write in word, in native format
 */
 INLINE void set_UINT16xE(int little_endian, UINT16xE *word, UINT16 data)
 {
@@ -60,15 +60,15 @@ INLINE void set_UINT16xE(int little_endian, UINT16xE *word, UINT16 data)
 }
 
 /*
-	Disk structure:
+    Disk structure:
 
-	Track 0 Sector 0 & 1: bootstrap loader
-	Track 0 Sector 2 through 5: disk directory
-	Remaining sectors are used for data.
+    Track 0 Sector 0 & 1: bootstrap loader
+    Track 0 Sector 2 through 5: disk directory
+    Remaining sectors are used for data.
 */
 
 /*
-	device directory record (Disk sector 2-5)
+    device directory record (Disk sector 2-5)
 */
 
 typedef struct concept_vol_hdr_entry
@@ -106,7 +106,7 @@ typedef struct concept_dev_dir
 } concept_dev_dir;
 
 /*
-	concept disk image descriptor
+    concept disk image descriptor
 */
 typedef struct concept_image
 {
@@ -115,7 +115,7 @@ typedef struct concept_image
 } concept_image;
 
 /*
-	concept catalog iterator, used when imgtool reads the catalog
+    concept catalog iterator, used when imgtool reads the catalog
 */
 typedef struct concept_iterator
 {
@@ -166,15 +166,15 @@ void concept_get_info(const imgtool_class *imgclass, UINT32 state, union imgtool
 }
 
 /*
-	read_physical_record
+    read_physical_record
 
-	Read one 512-byte physical record from a disk image
+    Read one 512-byte physical record from a disk image
 
-	file_handle: imgtool file handle
-	secnum: physical record address
-	dest: pointer to destination buffer
+    file_handle: imgtool file handle
+    secnum: physical record address
+    dest: pointer to destination buffer
 
-	Return non-zero on error
+    Return non-zero on error
 */
 static int read_physical_record(imgtool_stream *file_handle, int secnum, void *dest)
 {
@@ -194,15 +194,15 @@ static int read_physical_record(imgtool_stream *file_handle, int secnum, void *d
 
 #ifdef UNUSED_FUNCTION
 /*
-	write_physical_record
+    write_physical_record
 
-	Write one 512-byte physical record to a disk image
+    Write one 512-byte physical record to a disk image
 
-	file_handle: imgtool file handle
-	secnum: logical sector address
-	src: pointer to source buffer
+    file_handle: imgtool file handle
+    secnum: logical sector address
+    src: pointer to source buffer
 
-	Return non-zero on error
+    Return non-zero on error
 */
 static int write_physical_record(imgtool_stream *file_handle, int secnum, const void *src)
 {
@@ -222,13 +222,13 @@ static int write_physical_record(imgtool_stream *file_handle, int secnum, const 
 #endif
 
 /*
-	Search for a file name on a concept_image
+    Search for a file name on a concept_image
 
-	image (I): image reference
-	filename (I): name of the file to search
-	entry_index (O): index of file in disk catalog
+    image (I): image reference
+    filename (I): name of the file to search
+    entry_index (O): index of file in disk catalog
 
-	Return non-zero on error
+    Return non-zero on error
 */
 static int get_catalog_entry(concept_image *image, const unsigned char *filename, int *entry_index)
 {
@@ -254,7 +254,7 @@ static int get_catalog_entry(concept_image *image, const unsigned char *filename
 }
 
 /*
-	Open a file as a concept_image.
+    Open a file as a concept_image.
 */
 static imgtoolerr_t concept_image_init(imgtool_image *img, imgtool_stream *f)
 {
@@ -289,7 +289,7 @@ static imgtoolerr_t concept_image_init(imgtool_image *img, imgtool_stream *f)
 }
 
 /*
-	close a concept_image
+    close a concept_image
 */
 static void concept_image_exit(imgtool_image *img)
 {
@@ -297,9 +297,9 @@ static void concept_image_exit(imgtool_image *img)
 }
 
 /*
-	get basic information on a concept_image
+    get basic information on a concept_image
 
-	Currently returns the volume name
+    Currently returns the volume name
 */
 static void concept_image_info(imgtool_image *img, char *string, size_t len)
 {
@@ -313,7 +313,7 @@ static void concept_image_info(imgtool_image *img, char *string, size_t len)
 }
 
 /*
-	Open the disk catalog for enumeration
+    Open the disk catalog for enumeration
 */
 static imgtoolerr_t concept_image_beginenum(imgtool_directory *enumeration, const char *path)
 {
@@ -326,7 +326,7 @@ static imgtoolerr_t concept_image_beginenum(imgtool_directory *enumeration, cons
 }
 
 /*
-	Enumerate disk catalog next entry
+    Enumerate disk catalog next entry
 */
 static imgtoolerr_t concept_image_nextenum(imgtool_directory *enumeration, imgtool_dirent *ent)
 {
@@ -387,14 +387,14 @@ static imgtoolerr_t concept_image_nextenum(imgtool_directory *enumeration, imgto
 }
 
 /*
-	Free enumerator
+    Free enumerator
 */
 static void concept_image_closeenum(imgtool_directory *enumeration)
 {
 }
 
 /*
-	Compute free space on disk image
+    Compute free space on disk image
 */
 static imgtoolerr_t concept_image_freespace(imgtool_partition *partition, UINT64 *size)
 {
@@ -420,7 +420,7 @@ static imgtoolerr_t concept_image_freespace(imgtool_partition *partition, UINT64
 }
 
 /*
-	Extract a file from a concept_image.
+    Extract a file from a concept_image.
 */
 static imgtoolerr_t concept_image_readfile(imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *destf)
 {
@@ -457,7 +457,7 @@ static imgtoolerr_t concept_image_readfile(imgtool_partition *partition, const c
 
 #if 0
 /*
-	Add a file to a concept_image.
+    Add a file to a concept_image.
 */
 static imgtoolerr_t concept_image_writefile(imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *sourcef, option_resolution *writeoptions)
 {
@@ -467,7 +467,7 @@ static imgtoolerr_t concept_image_writefile(imgtool_partition *partition, const 
 }
 
 /*
-	Delete a file from a concept_image.
+    Delete a file from a concept_image.
 */
 static imgtoolerr_t concept_image_deletefile(imgtool_partition *partition, const char *filename)
 {
@@ -477,7 +477,7 @@ static imgtoolerr_t concept_image_deletefile(imgtool_partition *partition, const
 }
 
 /*
-	Create a blank concept_image.
+    Create a blank concept_image.
 */
 static imgtoolerr_t concept_image_create(const imgtool_module *mod, imgtool_stream *f, option_resolution *createoptions)
 {

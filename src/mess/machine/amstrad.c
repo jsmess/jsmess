@@ -516,14 +516,14 @@ static void amstrad_vh_update_mode( void )
 /*
 DMA commands
 
-0RDDh 	LOAD R,D 	Load 8 bit data D to PSG register R (0<=R<=15)
-1NNNh 	PAUSE N 	Pause for N prescaled ticks (0<N<=4095)
-2NNNh 	REPEAT N 	Set loop counter to N for this stream (0<N<=4095), and mark next instruction as loop start.
-3xxxh 	(reserved) 	Do not use
-4000h 	NOP 	No operation (64us idle)
-4001h 	LOOP 	If loop counter non zero, loop back to the first instruction after REPEAT instruction and decrement loop counter.
-4010h 	INT 	Interrupt the CPU
-4020h 	STOP 	Stop processing the sound list.
+0RDDh   LOAD R,D    Load 8 bit data D to PSG register R (0<=R<=15)
+1NNNh   PAUSE N     Pause for N prescaled ticks (0<N<=4095)
+2NNNh   REPEAT N    Set loop counter to N for this stream (0<N<=4095), and mark next instruction as loop start.
+3xxxh   (reserved)  Do not use
+4000h   NOP     No operation (64us idle)
+4001h   LOOP    If loop counter non zero, loop back to the first instruction after REPEAT instruction and decrement loop counter.
+4010h   INT     Interrupt the CPU
+4020h   STOP    Stop processing the sound list.
 */
 
 static void amstrad_plus_dma_parse(running_machine *machine, int channel)
@@ -544,7 +544,7 @@ static void amstrad_plus_dma_parse(running_machine *machine, int channel)
 		return;
 	}
 	command = (mess_ram[asic.dma_addr[channel]+1] << 8) + mess_ram[asic.dma_addr[channel]];
-//	logerror("DMA #%i: address %04x: command %04x\n",channel,asic.dma_addr[channel],command);
+//  logerror("DMA #%i: address %04x: command %04x\n",channel,asic.dma_addr[channel],command);
 	switch (command & 0xf000)
 	{
 	case 0x0000:  // Load PSG register
@@ -1025,7 +1025,7 @@ static MC6845_UPDATE_ROW( amstrad_plus_update_row_sprites )
 	UINT16	*p = BITMAP_ADDR16( bitmap, y, 0 );
 	int		i;
 
-//	logerror( "amstrad_plus_update_row_sprites: ma = 0x%04x, ra = %d, y = %d, x_count = %d, cursor_x = %d\n", ma, ra, y, x_count, cursor_x );
+//  logerror( "amstrad_plus_update_row_sprites: ma = 0x%04x, ra = %d, y = %d, x_count = %d, cursor_x = %d\n", ma, ra, y, x_count, cursor_x );
 
 	for ( i = 15 * 8; i >= 0; i -= 8 )
 	{
@@ -1074,7 +1074,7 @@ static MC6845_UPDATE_ROW( aleste_update_row_mode2 )
 	UINT16	*p = BITMAP_ADDR16( bitmap, y, 0 );
 	int i;
 
-//	logerror( "aleste_update_row_mode2: ma = 0x%04x, ra = %d, y = %d, x_count = %d, cursor_x = %d\n", ma, ra, y, x_count, cursor_x );
+//  logerror( "aleste_update_row_mode2: ma = 0x%04x, ra = %d, y = %d, x_count = %d, cursor_x = %d\n", ma, ra, y, x_count, cursor_x );
 
 	for ( i = 0; i < x_count; i++ )
 	{
@@ -1120,7 +1120,7 @@ static MC6845_UPDATE_ROW( aleste_update_row_mode3 )
 	UINT16	*p = BITMAP_ADDR16( bitmap, y, 0 );
 	int i;
 
-//	logerror( "aleste_update_row_mode3: ma = 0x%04x, ra = %d, y = %d, x_count = %d, cursor_x = %d\n", ma, ra, y, x_count, cursor_x );
+//  logerror( "aleste_update_row_mode3: ma = 0x%04x, ra = %d, y = %d, x_count = %d, cursor_x = %d\n", ma, ra, y, x_count, cursor_x );
 
 	for ( i = 0; i < x_count; i++ )
 	{
@@ -1154,7 +1154,7 @@ static MC6845_UPDATE_ROW( aleste_update_row_mode3 )
 
 static MC6845_UPDATE_ROW( amstrad_update_row )
 {
-//	logerror( "amstrad_update_row: ma = 0x%04x, ra = %d, y = %d, x_count = %d, cursor_x = %d\n", ma, ra, y, x_count, cursor_x );
+//  logerror( "amstrad_update_row: ma = 0x%04x, ra = %d, y = %d, x_count = %d, cursor_x = %d\n", ma, ra, y, x_count, cursor_x );
 
 	if ( draw_function )
 		draw_function( device, bitmap, cliprect, ma, ra, y, x_count, cursor_x, param );
@@ -1685,27 +1685,27 @@ static void amstrad_setLowerRom(running_machine *machine)
 		{  // ASIC secondary lower ROM selection (bit 5: 1 = enabled)
 			if ( asic.enabled )
 			{
-//				logerror("L-ROM: Lower ROM enabled, cart bank %i\n", asic.rmr2 & 0x07 );
+//              logerror("L-ROM: Lower ROM enabled, cart bank %i\n", asic.rmr2 & 0x07 );
 				bank_base = &memory_region(machine, "maincpu")[0x4000 * ( asic.rmr2 & 0x07 )];
 				switch( asic.rmr2 & 0x18 )
 				{
 				case 0x00:
-//					logerror("L-ROM: located at &0000\n");
+//                  logerror("L-ROM: located at &0000\n");
 					memory_set_bankptr(machine,1, bank_base);
 					memory_set_bankptr(machine,2, bank_base+0x02000);
 					break;
 				case 0x08:
-//					logerror("L-ROM: located at &4000\n");
+//                  logerror("L-ROM: located at &4000\n");
 					memory_set_bankptr(machine,3, bank_base);
 					memory_set_bankptr(machine,4, bank_base+0x02000);
 					break;
 				case 0x10:
-//					logerror("L-ROM: located at &8000\n");
+//                  logerror("L-ROM: located at &8000\n");
 					memory_set_bankptr(machine,5, bank_base);
 					memory_set_bankptr(machine,6, bank_base+0x02000);
 					break;
 				case 0x18:
-//					logerror("L-ROM: located at &0000, ASIC registers enabled\n");
+//                  logerror("L-ROM: located at &0000, ASIC registers enabled\n");
 					memory_set_bankptr(machine,1, bank_base);
 					memory_set_bankptr(machine,2, bank_base+0x02000);
 					break;
@@ -1785,8 +1785,8 @@ static void AmstradCPC_GA_SetRamConfiguration(running_machine *machine)
 			Aleste_RamBanks[i] = BankAddr;
 			AmstradCPC_RamBanks[i] = BankAddr;
 		}
-	} 
-	else 
+	}
+	else
 	{/* Need to add the ram expansion configuration here ! */
 	}
 	amstrad_rethinkMemory(machine);
@@ -1862,7 +1862,7 @@ static void AmstradCPC_GA_SetRamConfiguration(running_machine *machine)
 WRITE8_HANDLER( amstrad_plus_asic_4000_w )
 {
 	video_screen_update_partial( space->machine->primary_screen, video_screen_get_vpos( space->machine->primary_screen ) );
-//	logerror("ASIC: Write to register at &%04x\n",offset+0x4000);
+//  logerror("ASIC: Write to register at &%04x\n",offset+0x4000);
 	amstrad_plus_asic_ram[offset] = data & 0x0f;
 }
 
@@ -1877,7 +1877,7 @@ WRITE8_HANDLER( amstrad_plus_asic_6000_w )
 	}
 	if(offset == 0x0800)  // Programmable raster interrupt
 	{
-//		logerror("ASIC: Wrote %02x to PRI\n",data);
+//      logerror("ASIC: Wrote %02x to PRI\n",data);
 		asic.pri = data;
 	}
 	if(offset >= 0x0801 && offset <= 0x0803)  // Split screen registers
@@ -2049,7 +2049,7 @@ Note 1 : This function is not available in the Gate-Array, but is performed by a
 static void amstrad_GateArray_write(running_machine *machine, UINT8 dataToGateArray)
 {
 /* Get Bit 7 and 6 of the dataToGateArray = Gate Array function selected */
-	switch ((dataToGateArray & 0xc0)>>6) 
+	switch ((dataToGateArray & 0xc0)>>6)
 	{
 /* Pen selection
    -------------
@@ -2132,7 +2132,7 @@ Bit 4 controls the interrupt generation. It can be used to delay interrupts.*/
 		}
 
 		/* If bit 4 of the "Select screen mode and rom configuration" register of the Gate-Array is set to "1"
-		 then the interrupt request is cleared and the 6-bit counter is reset to "0".  */
+         then the interrupt request is cleared and the 6-bit counter is reset to "0".  */
 		if ( gate_array.mrer & 0x10 )
 		{
 			amstrad_CRTC_HS_Counter = 0;
@@ -2298,11 +2298,11 @@ READ8_HANDLER ( amstrad_cpc_io_r )
 
 	unsigned char data = 0xFF;
 	unsigned int r1r0 = (unsigned int)((offset & 0x0300) >> 8);
-//	m6845_personality_t crtc_type;
+//  m6845_personality_t crtc_type;
 	int page;
 
-//	crtc_type = input_port_read_safe(space->machine, "crtc", 0);
-//	m6845_set_personality(crtc_type);
+//  crtc_type = input_port_read_safe(space->machine, "crtc", 0);
+//  m6845_set_personality(crtc_type);
 
 	if(aleste_mode & 0x04)
 	{
@@ -2317,23 +2317,23 @@ READ8_HANDLER ( amstrad_cpc_io_r )
 	/* if b14 = 0 : CRTC Read selected */
 	if ((offset & (1<<14)) == 0)
 	{
-		switch(r1r0) 
+		switch(r1r0)
 		{
 		case 0x02:
 			data = mc6845_status_r( mc6845, 0 );
-//			/* CRTC Type 1 : Read Status Register
+//          /* CRTC Type 1 : Read Status Register
 //               CRTC Type 3 or 4 : Read from selected internal 6845 register */
-//			switch(crtc_type) {
-//			case M6845_PERSONALITY_UM6845R:
-//				data = amstrad_CRTC_CR; /* Read Status Register */
-//				break;
-//			case M6845_PERSONALITY_AMS40489:
-//			case M6845_PERSONALITY_PREASIC:
-//				data = m6845_register_r(0);
-//				break;
-//			default:
-//				break;
-//			}
+//          switch(crtc_type) {
+//          case M6845_PERSONALITY_UM6845R:
+//              data = amstrad_CRTC_CR; /* Read Status Register */
+//              break;
+//          case M6845_PERSONALITY_AMS40489:
+//          case M6845_PERSONALITY_PREASIC:
+//              data = m6845_register_r(0);
+//              break;
+//          default:
+//              break;
+//          }
 			break;
 		case 0x03:
 			/* All CRTC type : Read from selected internal 6845 register Read only */
@@ -2508,12 +2508,12 @@ WRITE8_HANDLER ( amstrad_cpc_io_w )
 	}
 
 	/* if b11 = 0 : 8255 PPI Write selected - bits 9 and 8 then define the PPI function access as shown below:
-	b9 b8 | PPI Function Read/Write status
-	0  0  | Port A data  Read/Write
-	0  1  | Port B data  Read/Write
-	1  0  | Port C data  Read/Write
-	1  1  | Control      Write Only
-	*/
+    b9 b8 | PPI Function Read/Write status
+    0  0  | Port A data  Read/Write
+    0  1  | Port B data  Read/Write
+    1  0  | Port C data  Read/Write
+    1  1  | Control      Write Only
+    */
 	if ((offset & (1<<11)) == 0)
 	{
 		unsigned int Index = ((offset & 0x0300) >> 8);
@@ -2551,8 +2551,8 @@ The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which
 				{
 				case 0x00:
 					/* FDC Motor Control - Bit 0 defines the state of the FDD motor:
-					 * "1" the FDD motor will be active.
-					 * "0" the FDD motor will be in-active.*/
+                     * "1" the FDD motor will be active.
+                     * "0" the FDD motor will be in-active.*/
 					floppy_drive_set_motor_state(floppy_get_device(space->machine, 0), (data & 0x01));
 					floppy_drive_set_motor_state(floppy_get_device(space->machine, 1), (data & 0x01));
 					floppy_drive_set_ready_state(floppy_get_device(space->machine, 0), 1,1);
@@ -2570,13 +2570,13 @@ The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which
 		}
 	}
 
-	/*	Aleste Extend Port:
-		D0 - VRAM Bank 0/1 (64K)
-		D1 - MODE 0-Norm ,1-High resolution
-		D2 - MAPMOD 0-Amstrad ,1-Yamaha mapper
-		D3 - MAP Page 0/1 (256K)
-		D4 - 580WI53
-		D5 - 0-AY8910 ,1-512WI1 */
+	/*  Aleste Extend Port:
+        D0 - VRAM Bank 0/1 (64K)
+        D1 - MODE 0-Norm ,1-High resolution
+        D2 - MAPMOD 0-Amstrad ,1-Yamaha mapper
+        D3 - MAP Page 0/1 (256K)
+        D4 - 580WI53
+        D5 - 0-AY8910 ,1-512WI1 */
 	if(offset == 0xfabf)
 	{
 		aleste_mode = data;
@@ -2647,7 +2647,7 @@ static void amstrad_handle_snapshot(running_machine *machine, unsigned char *pSn
 	RegData = (pSnapshot[0x023] & 0x0ff) | ((pSnapshot[0x024] & 0x0ff)<<8);
 
 	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), Z80_PC, RegData);
-//	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), REG_SP, RegData);
+//  cpu_set_reg(cputag_get_cpu(machine, "maincpu"), REG_SP, RegData);
 
 	RegData = (pSnapshot[0x025] & 0x0ff);
 	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), Z80_IM, RegData);
@@ -2811,7 +2811,7 @@ static void amstrad_rethinkMemory(running_machine *machine)
 	}
 
 	/* multiface hardware enabled? */
-	if (multiface_hardware_enabled(machine)) 
+	if (multiface_hardware_enabled(machine))
 	{
 		multiface_rethink_memory(machine);
 	}
@@ -2864,7 +2864,7 @@ static void update_psg(running_machine *machine)
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	const device_config *ay8910 = devtag_get_device(machine, "ay");
-	
+
 	if(aleste_mode & 0x20)  // RTC selected
 	{
 		switch(aleste_rtc_function)
@@ -2954,7 +2954,7 @@ READ8_DEVICE_HANDLER (amstrad_ppi_portb_r)
 /* Set b7 with cassette tape input */
 	if(amstrad_system_type != SYSTEM_GX4000)
 	{
-		if (cassette_input(devtag_get_device(device->machine, "cassette" )) > 0.03) 
+		if (cassette_input(devtag_get_device(device->machine, "cassette" )) > 0.03)
 		{
 			data |= (1<<7);
 		}
@@ -3020,7 +3020,7 @@ WRITE8_DEVICE_HANDLER ( amstrad_ppi_portc_w )
 	/* b5 Cassette Write data */
 	if(amstrad_system_type != SYSTEM_GX4000)
 	{
-		if ((changed_data & 0x20) != 0) 
+		if ((changed_data & 0x20) != 0)
 		{
 			cassette_output(devtag_get_device(device->machine, "cassette" ),
 				((data & 0x20) ? -1.0 : +1.0));
@@ -3299,7 +3299,7 @@ MACHINE_RESET( amstrad )
 	Amstrad_ROM_Table[7] = &rom[0x018000];
 	amstrad_common_init(machine);
 	amstrad_reset_machine(machine);
-//	amstrad_init_palette(machine);
+//  amstrad_init_palette(machine);
 
 	multiface_init(machine);
 
@@ -3581,10 +3581,10 @@ DEVICE_IMAGE_LOAD(amstrad_plus_cartridge)
 
 /*static DEVICE_IMAGE_LOAD( aleste )
 {
-	if (device_load_basicdsk_floppy(image)==INIT_PASS)
-	{
-		basicdsk_set_geometry(image, 80, 2, 9, 512, 0x01, 0, FALSE);
-		return INIT_PASS;
-	}
-	return INIT_FAIL;
+    if (device_load_basicdsk_floppy(image)==INIT_PASS)
+    {
+        basicdsk_set_geometry(image, 80, 2, 9, 512, 0x01, 0, FALSE);
+        return INIT_PASS;
+    }
+    return INIT_FAIL;
 }*/

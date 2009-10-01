@@ -139,7 +139,7 @@ IMAGEMODULE(
 	t64_image_beginenum,				/* begin enumeration */
 	t64_image_nextenum,					/* enumerate next */
 	t64_image_closeenum,				/* close enumeration */
-	NULL, //t64_image_freespace,		/* free space on image */
+	NULL, //t64_image_freespace,        /* free space on image */
 	t64_image_readfile,					/* read file */
 	t64_image_writefile,				/* write file */
 	t64_image_deletefile,				/* delete file */

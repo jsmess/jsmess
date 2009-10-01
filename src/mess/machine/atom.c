@@ -1,16 +1,16 @@
 /***********************************************************************
 
-	atom.c
+    atom.c
 
-	Functions to emulate general aspects of the machine (RAM, ROM,
-	interrupts, I/O ports)
+    Functions to emulate general aspects of the machine (RAM, ROM,
+    interrupts, I/O ports)
 
-	Many thanks to Kees van Oss for:
-	1.	Tape input/output circuit diagram. It describes in great detail how the 2.4 kHz
-		tone, 2.4 kHz tone enable, tape output and tape input are connected.
-	2.	The DOS rom for the Atom so I could complete the floppy disc emulation.
-	3.	Details of the eprom expansion board for the Atom.
-	4.	His demo programs which I used to test the driver.
+    Many thanks to Kees van Oss for:
+    1.  Tape input/output circuit diagram. It describes in great detail how the 2.4 kHz
+        tone, 2.4 kHz tone enable, tape output and tape input are connected.
+    2.  The DOS rom for the Atom so I could complete the floppy disc emulation.
+    3.  Details of the eprom expansion board for the Atom.
+    4.  His demo programs which I used to test the driver.
 
 ***********************************************************************/
 
@@ -95,8 +95,8 @@ static void atom_8271_interrupt_callback(const device_config *device, int state)
 {
 	/* I'm assuming that the nmi is edge triggered */
 	/* a interrupt from the fdc will cause a change in line state, and
-	the nmi will be triggered, but when the state changes because the int
-	is cleared this will not cause another nmi */
+    the nmi will be triggered, but when the state changes because the int
+    is cleared this will not cause another nmi */
 	/* I'll emulate it like this to be sure */
 
 	if (state!=previous_i8271_int_state)
@@ -104,7 +104,7 @@ static void atom_8271_interrupt_callback(const device_config *device, int state)
 		if (state)
 		{
 			/* I'll pulse it because if I used hold-line I'm not sure
-			it would clear - to be checked */
+            it would clear - to be checked */
 			cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 		}
 	}
@@ -154,7 +154,7 @@ static TIMER_CALLBACK(atom_timer_callback)
 	timer_state^=1;
 
 	/* the 2.4 kHz signal is notted (A), and nand'ed with the 2.4kz enable, resulting
-	in B. The final cassette output is the result of tape output nand'ed with B */
+    in B. The final cassette output is the result of tape output nand'ed with B */
 
 
 	{
@@ -185,9 +185,9 @@ MACHINE_RESET( atom )
 
 	/* this is temporary */
 	/* Kees van Oss mentions that address 8-b are used for the random number
-	generator. I don't know if this is hardware, or random data because the
-	ram chips are not cleared at start-up. So at this time, these numbers
-	are poked into the memory to simulate it. When I have more details I will fix it */
+    generator. I don't know if this is hardware, or random data because the
+    ram chips are not cleared at start-up. So at this time, these numbers
+    are poked into the memory to simulate it. When I have more details I will fix it */
 	memory_region(machine, "maincpu")[0x08] = mame_rand(machine) & 0x0ff;
 	memory_region(machine, "maincpu")[0x09] = mame_rand(machine) & 0x0ff;
 	memory_region(machine, "maincpu")[0x0a] = mame_rand(machine) & 0x0ff;
@@ -282,7 +282,7 @@ READ8_DEVICE_HANDLER ( atom_8255_portb_r )
 
 	row = atom_8255_porta & 0x0f;
 	/* logerror("8255: Read port b: %02X %02X\n", input_port_read(machine, port),
-									input_port_read(machine, "KEY10") & 0xc0); */
+                                    input_port_read(machine, "KEY10") & 0xc0); */
 	return ((input_port_read(device->machine, keynames[row]) & 0x3f) | (input_port_read(device->machine, "KEY10") & 0xc0));
 }
 
@@ -312,15 +312,15 @@ READ8_DEVICE_HANDLER ( atom_8255_portc_r )
 
 /* Atom 6847 modes:
 
-0000xxxx	Text
-0001xxxx	64x64	4
-0011xxxx	128x64	2
-0101xxxx	128x64	4
-0111xxxx	128x96	2
-1001xxxx	128x96	4
-1011xxxx	128x192	2
-1101xxxx	128x192	4
-1111xxxx	256x192	2
+0000xxxx    Text
+0001xxxx    64x64   4
+0011xxxx    128x64  2
+0101xxxx    128x64  4
+0111xxxx    128x96  2
+1001xxxx    128x96  4
+1011xxxx    128x192 2
+1101xxxx    128x192 4
+1111xxxx    256x192 2
 
 */
 

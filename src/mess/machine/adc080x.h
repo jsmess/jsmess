@@ -6,21 +6,21 @@
     Visit http://mamedev.org for licensing and usage restrictions.
 
 **********************************************************************
-							_____   _____
-				   IN3	 1 |*    \_/     | 28  IN2
-				   IN4	 2 |			 | 27  IN1
-				   IN5	 3 |			 | 26  IN0
-				   IN6	 4 |			 | 25  ADD A
-				   IN7	 5 |			 | 24  ADD B
-				 START	 6 |			 | 23  ADD C
-				   EOC	 7 |   ADC0808	 | 22  ALE
-				   2-5	 8 |   ADC0809	 | 21  2-1 MSB
-		 OUTPUT ENABLE	 9 |			 | 20  2-2
-				 CLOCK	10 |			 | 19  2-3
-				   Vcc	11 |			 | 18  2-4
-				 Vref+	12 |			 | 17  2-8 LSB
-				   GND	13 |			 | 16  Vref-
-				   2-7	14 |_____________| 15  2-6
+                            _____   _____
+                   IN3   1 |*    \_/     | 28  IN2
+                   IN4   2 |             | 27  IN1
+                   IN5   3 |             | 26  IN0
+                   IN6   4 |             | 25  ADD A
+                   IN7   5 |             | 24  ADD B
+                 START   6 |             | 23  ADD C
+                   EOC   7 |   ADC0808   | 22  ALE
+                   2-5   8 |   ADC0809   | 21  2-1 MSB
+         OUTPUT ENABLE   9 |             | 20  2-2
+                 CLOCK  10 |             | 19  2-3
+                   Vcc  11 |             | 18  2-4
+                 Vref+  12 |             | 17  2-8 LSB
+                   GND  13 |             | 16  Vref-
+                   2-7  14 |_____________| 15  2-6
 
 **********************************************************************/
 

@@ -1,11 +1,11 @@
 /***************************************************************************
     mos tri port interface 6525
-	mos triple interface adapter 6523
+    mos triple interface adapter 6523
 
     peter.trauner@jk.uni-linz.ac.at
 
-	used in commodore b series
-	used in commodore c1551 floppy disk drive
+    used in commodore b series
+    used in commodore c1551 floppy disk drive
 ***************************************************************************/
 
 /*
@@ -114,9 +114,9 @@ struct _tpi6525_state
 	UINT8 port_a, ddr_a, in_a;
 	UINT8 port_b, ddr_b, in_b;
 	UINT8 port_c, ddr_c, in_c;
-	
+
 	UINT8 ca_level, cb_level, interrupt_level;
-	
+
 	UINT8 cr;
 	UINT8 air;
 
@@ -343,7 +343,7 @@ READ8_DEVICE_HANDLER( tpi6525_porta_r )
 
 	data = (data & ~tpi6525->ddr_a) | (tpi6525->ddr_a & tpi6525->port_a);
 
-	return data;	
+	return data;
 }
 
 
@@ -418,7 +418,7 @@ READ8_DEVICE_HANDLER( tpi6525_r )
 
 	case 1:
 		data = tpi6525->in_b;
-		
+
 		if (tpi6525->intf->in_b_func)
 			data &= tpi6525->intf->in_b_func(device, 0);
 
@@ -443,10 +443,10 @@ READ8_DEVICE_HANDLER( tpi6525_r )
 		else
 		{
 			data = tpi6525->in_c;
-			
+
 			if (tpi6525->intf->in_c_func)
 				data &= tpi6525->intf->in_c_func(device, 0);
-			
+
 			data = (data & ~tpi6525->ddr_c) | (tpi6525->ddr_c & tpi6525->port_c);
 		}
 
@@ -503,7 +503,7 @@ READ8_DEVICE_HANDLER( tpi6525_r )
 			data = tpi6525->air;
 			tpi6525->air = 0;
 		}
-		
+
 		tpi6525_clear_interrupt(device);
 		break;
 
@@ -530,7 +530,7 @@ WRITE8_DEVICE_HANDLER( tpi6525_w )
 			tpi6525->intf->out_a_func(device, 0, tpi6525->port_a & tpi6525->ddr_a);
 
 		break;
-		
+
 	case 1:
 		tpi6525->port_b = data;
 
@@ -573,7 +573,7 @@ WRITE8_DEVICE_HANDLER( tpi6525_w )
 
 	case 6:
 		tpi6525->cr = data;
-		
+
 		if (INTERRUPT_MODE)
 		{
 			if (CA_MANUAL_OUT)
@@ -591,7 +591,7 @@ WRITE8_DEVICE_HANDLER( tpi6525_w )
 				if (tpi6525->cb_level != CB_MANUAL_LEVEL)
 				{
 					tpi6525->cb_level = CB_MANUAL_LEVEL;
-					
+
 					if (tpi6525->intf->out_cb_func)
 						tpi6525->intf->out_cb_func(device, 0, tpi6525->cb_level);
 				}

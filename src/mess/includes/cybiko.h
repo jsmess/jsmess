@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
  * includes/cybiko.h
- * 
+ *
  * Cybiko Wireless Inter-tainment System
- * 
+ *
  * (c) 2001-2007 Tim Schuerewegen
- * 
+ *
  * Cybiko Classic (V1)
  * Cybiko Classic (V2)
  * Cybiko Xtreme

@@ -3,26 +3,26 @@
         Interact Family Computer
 
         12/05/2009 Skeleton driver - Micko
-	31/05/2009 Added notes and video - Robbbert
+    31/05/2009 Added notes and video - Robbbert
 
-	This was made by Interact Company of Ann Arbor, Michigan. However,
-	just after launch, the company collapsed. The liquidator, Protecto,
-	sold some and MicroVideo sold the rest. MicroVideo continued to
-	develop but went under 2 years later. Meanwhile, the French company
-	Lambda Systems sold a clone called the Victor Lambda. But, like the
-	Americans, Lambda Systems also collapsed. Another French company,
-	Micronique, purchased all remaining stock and intellectual rights
-	from Lambda Systems, Microvideo and Interact, and the computer becomes
-	wholly French. The computer has a name change, becoming the Hector.
-	This in turn gets upgraded (2HR, HRX, MX). The line is finally
-	retired in about 1985.
+    This was made by Interact Company of Ann Arbor, Michigan. However,
+    just after launch, the company collapsed. The liquidator, Protecto,
+    sold some and MicroVideo sold the rest. MicroVideo continued to
+    develop but went under 2 years later. Meanwhile, the French company
+    Lambda Systems sold a clone called the Victor Lambda. But, like the
+    Americans, Lambda Systems also collapsed. Another French company,
+    Micronique, purchased all remaining stock and intellectual rights
+    from Lambda Systems, Microvideo and Interact, and the computer becomes
+    wholly French. The computer has a name change, becoming the Hector.
+    This in turn gets upgraded (2HR, HRX, MX). The line is finally
+    retired in about 1985.
 
-	TO DO:
-	Keyboard
-	Cassette
-	SN76477 / Sound
-	Colour
-	Cartload
+    TO DO:
+    Keyboard
+    Cassette
+    SN76477 / Sound
+    Colour
+    Cartload
 
 ****************************************************************************/
 
@@ -97,7 +97,7 @@ static MACHINE_DRIVER_START( interact )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",8080, XTAL_2MHz)
 	MDRV_CPU_PROGRAM_MAP(interact_mem)
-//	MDRV_CPU_VBLANK_INT("maincpu", interact_interrupt)
+//  MDRV_CPU_VBLANK_INT("maincpu", interact_interrupt)
 
 	MDRV_MACHINE_RESET(interact)
 
@@ -129,7 +129,7 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG		 COMPANY   FULLNAME       FLAGS */
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG      COMPANY   FULLNAME       FLAGS */
 COMP(1979, interact, 0,        0,       interact, interact, 0,	0,  	 "Interact",   "Interact Family Computer", GAME_NOT_WORKING)
 COMP(????, hector1,  interact, 0, 	interact, interact, 0,  0,  	 "Micronique", "Hector 1",	GAME_NOT_WORKING)
 

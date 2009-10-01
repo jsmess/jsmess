@@ -851,36 +851,36 @@ static int sms_verify_cart(UINT8 *magic, int size)
 		if (!strncmp((char*)&magic[0x7FF0], "TMR SEGA", 8))
 		{
 			/* Technically, it should be this, but remove for now until verified:
-			if (!strcmp(sysname, "gamegear"))
-			{
-				if ((unsigned char)magic[0x7FFD] < 0x50)
-					retval = IMAGE_VERIFY_PASS;
-			}
-			if (!strcmp(sysname, "sms"))
-			{
-				if ((unsigned char)magic[0x7FFD] >= 0x50)
-					retval = IMAGE_VERIFY_PASS;
-			}
-			*/
+            if (!strcmp(sysname, "gamegear"))
+            {
+                if ((unsigned char)magic[0x7FFD] < 0x50)
+                    retval = IMAGE_VERIFY_PASS;
+            }
+            if (!strcmp(sysname, "sms"))
+            {
+                if ((unsigned char)magic[0x7FFD] >= 0x50)
+                    retval = IMAGE_VERIFY_PASS;
+            }
+            */
 			retval = IMAGE_VERIFY_PASS;
 		}
 	}
 
 		/* Check at $81f0 also */
 		//if (!retval) {
-	 //	 if (!strncmp(&magic[0x81f0], "TMR SEGA", 8)) {
+	 //  if (!strncmp(&magic[0x81f0], "TMR SEGA", 8)) {
 				/* Technically, it should be this, but remove for now until verified:
-				if (!strcmp(sysname, "gamegear")) {
-					if ((unsigned char)magic[0x81fd] < 0x50)
-						retval = IMAGE_VERIFY_PASS;
-				}
-				if (!strcmp(sysname, "sms")) {
-					if ((unsigned char)magic[0x81fd] >= 0x50)
-						retval = IMAGE_VERIFY_PASS;
-				}
-				*/
-		 //	 retval = IMAGE_VERIFY_PASS;
-		//	}
+                if (!strcmp(sysname, "gamegear")) {
+                    if ((unsigned char)magic[0x81fd] < 0x50)
+                        retval = IMAGE_VERIFY_PASS;
+                }
+                if (!strcmp(sysname, "sms")) {
+                    if ((unsigned char)magic[0x81fd] >= 0x50)
+                        retval = IMAGE_VERIFY_PASS;
+                }
+                */
+		 //  retval = IMAGE_VERIFY_PASS;
+		//  }
 		//}
 
 	return retval;
@@ -991,11 +991,11 @@ DEVICE_IMAGE_LOAD( sms_cart )
 	if (strcmp(image->tag,"cart4")==0)
 	{
 		index = 3;
-	}	
+	}
 	if (strcmp(image->tag,"cart5")==0)
 	{
 		index = 4;
-	}	
+	}
 	/* Check for 512-byte header */
 	if ((size / 512) & 1)
 	{

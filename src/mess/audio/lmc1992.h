@@ -1,23 +1,23 @@
 /*
 
-				LMC1992 Digitally-Controlled Stereo Tone and Volume
-					Circuit with Four-Channel Input-Selector
+                LMC1992 Digitally-Controlled Stereo Tone and Volume
+                    Circuit with Four-Channel Input-Selector
 
-								________________
-				  Data	 1	---|	   \/		|---  28  V+
-			     Clock	 2	---|				|---  27  Bypass
-			    Enable	 3	---|				|---  26  Right Input 1
-		  Left Input 1	 4	---|				|---  25  Right Input 2
-		  Left Input 2	 5	---|				|---  24  Right Input 3
-		  Left Input 3	 6	---|	        	|---  23  Right Input 4
-		  Left Input 4	 7	---|	LMC1992 	|---  22  Right Select Out
-	   Left Select Out	 8	---|	top view	|---  21  Right Select In
-		Left Select In	 9	---|				|---  20  Right Tone In
-		  Left Tone In	10	---|			    |---  19  Right Tone Out
-		 Left Tone Out	11	---|				|---  18  Right Op Amp Out
-	   Left Op Amp Out	12	---|				|---  17  Right Rear Out
-		 Left Rear Out	13  ---|				|---  16  Right Front Out
-		Left Front Out	14	---|________________|---  15  Ground
+                                ________________
+                  Data   1  ---|       \/       |---  28  V+
+                 Clock   2  ---|                |---  27  Bypass
+                Enable   3  ---|                |---  26  Right Input 1
+          Left Input 1   4  ---|                |---  25  Right Input 2
+          Left Input 2   5  ---|                |---  24  Right Input 3
+          Left Input 3   6  ---|                |---  23  Right Input 4
+          Left Input 4   7  ---|    LMC1992     |---  22  Right Select Out
+       Left Select Out   8  ---|    top view    |---  21  Right Select In
+        Left Select In   9  ---|                |---  20  Right Tone In
+          Left Tone In  10  ---|                |---  19  Right Tone Out
+         Left Tone Out  11  ---|                |---  18  Right Op Amp Out
+       Left Op Amp Out  12  ---|                |---  17  Right Rear Out
+         Left Rear Out  13  ---|                |---  16  Right Front Out
+        Left Front Out  14  ---|________________|---  15  Ground
 
 */
 

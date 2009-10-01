@@ -6,28 +6,28 @@
     Visit http://mamedev.org for licensing and usage restrictions.
 
 **********************************************************************
-							_____   _____
-				ROW Y1   1 |*    \_/     | 18  Vcc
-				ROW Y2   2 |			 | 17  DATA OUT A
-				ROW Y3   3 |			 | 16  DATA OUT B
-			    ROW Y4   4 |			 | 15  DATA OUT C
-			OSCILLATOR   5 |  MM74C922	 | 14  DATA OUT D
-		KEYBOUNCE MASK   6 |			 | 13  _OUTPUT ENABLE
-			 COLUMN X4   7 |			 | 12  DATA AVAILABLE
-			 COLUMN X3   8 |			 | 11  COLUMN X1
-				   GND   9 |_____________| 10  COLUMN X2
+                            _____   _____
+                ROW Y1   1 |*    \_/     | 18  Vcc
+                ROW Y2   2 |             | 17  DATA OUT A
+                ROW Y3   3 |             | 16  DATA OUT B
+                ROW Y4   4 |             | 15  DATA OUT C
+            OSCILLATOR   5 |  MM74C922   | 14  DATA OUT D
+        KEYBOUNCE MASK   6 |             | 13  _OUTPUT ENABLE
+             COLUMN X4   7 |             | 12  DATA AVAILABLE
+             COLUMN X3   8 |             | 11  COLUMN X1
+                   GND   9 |_____________| 10  COLUMN X2
 
-							_____   _____
-				ROW Y1	 1 |*    \_/     | 20  Vcc
-				ROW Y2	 2 |			 | 19  DATA OUT A
-				ROW Y3   3 |			 | 18  DATA OUT B
-			    ROW Y4	 4 |			 | 17  DATA OUT C
-			    ROW Y5	 5 |  MM74C923	 | 16  DATA OUT D
-			OSCILLATOR   6 |			 | 15  DATA OUT E
-		KEYBOUNCE MASK   7 |			 | 14  _OUTPUT ENABLE
-			 COLUMN X4   8 |			 | 13  DATA AVAILABLE
-			 COLUMN X3   9 |			 | 12  COLUMN X1
-				   GND  10 |_____________| 11  COLUMN X2
+                            _____   _____
+                ROW Y1   1 |*    \_/     | 20  Vcc
+                ROW Y2   2 |             | 19  DATA OUT A
+                ROW Y3   3 |             | 18  DATA OUT B
+                ROW Y4   4 |             | 17  DATA OUT C
+                ROW Y5   5 |  MM74C923   | 16  DATA OUT D
+            OSCILLATOR   6 |             | 15  DATA OUT E
+        KEYBOUNCE MASK   7 |             | 14  _OUTPUT ENABLE
+             COLUMN X4   8 |             | 13  DATA AVAILABLE
+             COLUMN X3   9 |             | 12  COLUMN X1
+                   GND  10 |_____________| 11  COLUMN X2
 
 **********************************************************************/
 

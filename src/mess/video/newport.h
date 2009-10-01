@@ -1,5 +1,5 @@
 /*
-	SGI "Newport" graphics board used in the Indy and some Indigo2s
+    SGI "Newport" graphics board used in the Indy and some Indigo2s
 
 */
 

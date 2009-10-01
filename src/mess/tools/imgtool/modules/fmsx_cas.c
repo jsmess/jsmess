@@ -7,10 +7,10 @@
 #include "utils.h"
 
 /*
-	MSX module
+    MSX module
 
-	fMSX style .cas for the MSX. Converts them to .wav files. Uses the
-	mess/formats/fmsx_cas.[ch] files, for the actual conversion.
+    fMSX style .cas for the MSX. Converts them to .wav files. Uses the
+    mess/formats/fmsx_cas.[ch] files, for the actual conversion.
 */
 
 typedef struct {

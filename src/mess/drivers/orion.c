@@ -140,19 +140,19 @@ static MACHINE_DRIVER_START( orion128 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MDRV_CASSETTE_ADD( "cassette", orion_cassette_config )
-	
-	MDRV_WD1793_ADD("wd1793", default_wd17xx_interface )	
-	
+
+	MDRV_WD1793_ADD("wd1793", default_wd17xx_interface )
+
 	MDRV_FLOPPY_4_DRIVES_ADD(orion_floppy_config)
-	
+
 	MDRV_CARTSLOT_ADD("cart")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( orion128ms )
 	MDRV_IMPORT_FROM(orion128)
 	MDRV_DEVICE_REMOVE("ppi8255_2")
-	MDRV_I8255A_ADD( "ppi8255_2", rk7007_ppi8255_interface )	
-MACHINE_DRIVER_END	
+	MDRV_I8255A_ADD( "ppi8255_2", rk7007_ppi8255_interface )
+MACHINE_DRIVER_END
 
 static const ay8910_interface orionz80_ay_interface =
 {
@@ -200,11 +200,11 @@ static MACHINE_DRIVER_START( orionz80 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MDRV_CASSETTE_ADD( "cassette", orion_cassette_config )
-	
-	MDRV_WD1793_ADD("wd1793", default_wd17xx_interface )		
-	
+
+	MDRV_WD1793_ADD("wd1793", default_wd17xx_interface )
+
 	MDRV_FLOPPY_4_DRIVES_ADD(orion_floppy_config)
-	
+
 	MDRV_CARTSLOT_ADD("cart")
 MACHINE_DRIVER_END
 
@@ -212,8 +212,8 @@ static MACHINE_DRIVER_START( orionz80ms )
 	MDRV_IMPORT_FROM(orionz80)
 
 	MDRV_DEVICE_REMOVE("ppi8255_2")
-	MDRV_I8255A_ADD( "ppi8255_2", rk7007_ppi8255_interface )	
-MACHINE_DRIVER_END	
+	MDRV_I8255A_ADD( "ppi8255_2", rk7007_ppi8255_interface )
+MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( orionpro )
     MDRV_CPU_ADD("maincpu", Z80, 5000000)
@@ -251,11 +251,11 @@ static MACHINE_DRIVER_START( orionpro )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MDRV_CASSETTE_ADD( "cassette", orion_cassette_config )
-	
+
 	MDRV_WD1793_ADD("wd1793", default_wd17xx_interface )
-	
+
 	MDRV_FLOPPY_4_DRIVES_ADD(orion_floppy_config)
-	
+
 	MDRV_CARTSLOT_ADD("cart")
 MACHINE_DRIVER_END
 

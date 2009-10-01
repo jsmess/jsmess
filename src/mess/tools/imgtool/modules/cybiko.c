@@ -1,8 +1,8 @@
 /*
 
-	Cybiko File System
+    Cybiko File System
 
-	(c) 2007 Tim Schuerewegen
+    (c) 2007 Tim Schuerewegen
 
 */
 
@@ -541,7 +541,7 @@ static OPTION_GUIDE_START( cybiko_image_createimage_optguide )
 OPTION_GUIDE_END
 
 //OPTION_GUIDE_START( cybiko_image_writefile_optguide )
-//	OPTION_INT( 'B', "boot", "Boot Flag" )
+//  OPTION_INT( 'B', "boot", "Boot Flag" )
 //OPTION_GUIDE_END
 
 void cybiko_get_info( const imgtool_class *imgclass, UINT32 state, union imgtoolinfo *info)
@@ -551,9 +551,9 @@ void cybiko_get_info( const imgtool_class *imgclass, UINT32 state, union imgtool
 		// --- the following bits of info are returned as 64-bit signed integers ---
 		case IMGTOOLINFO_INT_IMAGE_EXTRA_BYTES          : info->i = sizeof( cybiko_file_system); break;
 		case IMGTOOLINFO_INT_DIRECTORY_EXTRA_BYTES      : info->i = sizeof( cybiko_iter); break;
-//		case IMGTOOLINFO_INT_SUPPORTS_CREATION_TIME     : info->i = 1; break;
+//      case IMGTOOLINFO_INT_SUPPORTS_CREATION_TIME     : info->i = 1; break;
 		case IMGTOOLINFO_INT_SUPPORTS_LASTMODIFIED_TIME : info->i = 1; break;
-//		case IMGTOOLINFO_INT_BLOCK_SIZE                 : info->i = 264; break;
+//      case IMGTOOLINFO_INT_BLOCK_SIZE                 : info->i = 264; break;
 		// --- the following bits of info are returned as pointers to data or functions ---
 		case IMGTOOLINFO_PTR_OPEN        : info->open        = cybiko_image_open; break;
 		case IMGTOOLINFO_PTR_CREATE      : info->create      = cybiko_image_create; break;
@@ -566,7 +566,7 @@ void cybiko_get_info( const imgtool_class *imgclass, UINT32 state, union imgtool
 		case IMGTOOLINFO_PTR_WRITE_FILE  : info->write_file  = cybiko_image_write_file; break;
 		case IMGTOOLINFO_PTR_DELETE_FILE : info->delete_file = cybiko_image_delete_file; break;
 		case IMGTOOLINFO_PTR_CREATEIMAGE_OPTGUIDE : info->createimage_optguide = cybiko_image_createimage_optguide; break;
-//		case IMGTOOLINFO_PTR_WRITEFILE_OPTGUIDE   : info->writefile_optguide   = cybiko_image_writefile_optguide; break;
+//      case IMGTOOLINFO_PTR_WRITEFILE_OPTGUIDE   : info->writefile_optguide   = cybiko_image_writefile_optguide; break;
 		// --- the following bits of info are returned as NULL-terminated strings ---
 		case IMGTOOLINFO_STR_NAME            : strcpy( info->s = imgtool_temp_str(), "cybiko"); break;
 		case IMGTOOLINFO_STR_DESCRIPTION     : strcpy( info->s = imgtool_temp_str(), "Cybiko File System"); break;
@@ -574,6 +574,6 @@ void cybiko_get_info( const imgtool_class *imgclass, UINT32 state, union imgtool
 		case IMGTOOLINFO_STR_FILE_EXTENSIONS : strcpy( info->s = imgtool_temp_str(), "bin,nv"); break;
 		case IMGTOOLINFO_STR_EOLN            : strcpy( info->s = imgtool_temp_str(), "\r\n"); break;
 		case IMGTOOLINFO_STR_CREATEIMAGE_OPTSPEC : strcpy( info->s = imgtool_temp_str(), "F[0]-2"); break;
-//		case IMGTOOLINFO_STR_WRITEFILE_OPTSPEC   : strcpy( info->s = imgtool_temp_str(), "B[0]-1"); break;
+//      case IMGTOOLINFO_STR_WRITEFILE_OPTSPEC   : strcpy( info->s = imgtool_temp_str(), "B[0]-1"); break;
 	}
 }

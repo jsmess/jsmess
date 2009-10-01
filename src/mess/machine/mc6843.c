@@ -107,7 +107,7 @@ static const char *const mc6843_cmd[16] =
 
 
 
-INLINE mc6843_t* get_safe_token( const device_config *device ) 
+INLINE mc6843_t* get_safe_token( const device_config *device )
 {
 	assert( device != NULL );
 	assert( device->token != NULL );
@@ -700,7 +700,7 @@ WRITE8_DEVICE_HANDLER ( mc6843_w )
 		mc6843->data_size = 0;
 
 		/* commands are initiated by updating some flags and scheduling
-		   a bottom-half (mc6843_cont) after some delay */
+           a bottom-half (mc6843_cont) after some delay */
 
 		switch (cmd)
 		{

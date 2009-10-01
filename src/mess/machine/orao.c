@@ -1,10 +1,10 @@
 /***************************************************************************
 
-		Orao machine driver by Miodrag Milanovic
+        Orao machine driver by Miodrag Milanovic
 
-		23/02/2008 Sound support added.
-		22/02/2008 Preliminary driver.
-		     
+        23/02/2008 Sound support added.
+        22/02/2008 Preliminary driver.
+
 ****************************************************************************/
 
 #include "driver.h"
@@ -24,15 +24,15 @@ DRIVER_INIT(orao103)
 {
 	memset(orao_memory,0xff,0x6000);
 }
- 
+
 MACHINE_RESET( orao )
-{	
+{
 }
 
 READ8_HANDLER( orao_io_r )
 {
 	double level;
-	 
+
 	 switch(offset) {
 	 	/* Keyboard*/
 	 	case 0x07FC : return input_port_read(space->machine, "LINE0");
@@ -55,22 +55,22 @@ READ8_HANDLER( orao_io_r )
 	 	case 0x05FF : return input_port_read(space->machine, "LINE17");
 	 	case 0x03FE : return input_port_read(space->machine, "LINE18");
 	 	case 0x03FF : return input_port_read(space->machine, "LINE19");
-	 	/* Tape */ 
-	 	case 0x07FF : 
-	 				level = cassette_input(devtag_get_device(space->machine, "cassette"));	 									 					
-					if (level <  0) { 
-						return 0x00; 
+	 	/* Tape */
+	 	case 0x07FF :
+	 				level = cassette_input(devtag_get_device(space->machine, "cassette"));
+					if (level <  0) {
+						return 0x00;
 					}
-					return 0xff;	 									 					
+					return 0xff;
 	 }
-	 
-	 
-	 return 0xff;	
+
+
+	 return 0xff;
 }
 
 
 WRITE8_HANDLER( orao_io_w )
-{	 
+{
 	if (offset == 0x0800)
 	{
 		const device_config *dac_device = devtag_get_device(space->machine, "dac");

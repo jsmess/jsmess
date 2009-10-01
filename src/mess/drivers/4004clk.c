@@ -1,5 +1,5 @@
 /***************************************************************************
-   
+
         4004 Nixie Clock
 
         03/08/2009 Initial driver
@@ -19,7 +19,7 @@ struct __4004clk_state
 	const device_config *dac;
 };
 
-static READ8_HANDLER(data_r) 
+static READ8_HANDLER(data_r)
 {
 	return input_port_read(space->machine, "INPUT") & 0x0f;
 }
@@ -49,7 +49,7 @@ INLINE void output_set_neon_value(int index, int value)
 	output_set_indexed_value("neon", index, value);
 }
 
-static void update_nixie(running_machine *machine) 
+static void update_nixie(running_machine *machine)
 {
 	_4004clk_state *state = machine->driver_data;
 
@@ -61,14 +61,14 @@ static void update_nixie(running_machine *machine)
 	output_set_nixie_value(0,nixie_to_num((state->nixie[14] << 6) | (state->nixie[13] << 2) | (state->nixie[12] >>2)));
 }
 
-static WRITE8_HANDLER(nixie_w) 
+static WRITE8_HANDLER(nixie_w)
 {
 	_4004clk_state *state = space->machine->driver_data;
 	state->nixie[offset] = data;
 	update_nixie(space->machine);
 }
 
-static WRITE8_HANDLER(neon_w) 
+static WRITE8_HANDLER(neon_w)
 {
 	output_set_neon_value(0,BIT(data,3));
 	output_set_neon_value(1,BIT(data,2));
@@ -76,10 +76,10 @@ static WRITE8_HANDLER(neon_w)
 	output_set_neon_value(3,BIT(data,0));
 }
 
-static WRITE8_HANDLER(relays_w) 
-{	
+static WRITE8_HANDLER(relays_w)
+{
 	_4004clk_state *state = space->machine->driver_data;
-	dac_data_w(state->dac, (data & 1) ? 0x80 : 0x40); //tick - tock	
+	dac_data_w(state->dac, (data & 1) ? 0x80 : 0x40); //tick - tock
 }
 
 static ADDRESS_MAP_START(4004clk_rom, ADDRESS_SPACE_PROGRAM, 8)
@@ -87,12 +87,12 @@ static ADDRESS_MAP_START(4004clk_rom, ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(4004clk_mem, ADDRESS_SPACE_DATA, 8)
-	ADDRESS_MAP_UNMAP_HIGH	
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x007F) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( 4004clk_io , ADDRESS_SPACE_IO, 8)
-	ADDRESS_MAP_UNMAP_HIGH	
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x0e) AM_WRITE(nixie_w)
 	AM_RANGE(0x00, 0x00) AM_READ(data_r)
 	AM_RANGE(0x0f, 0x0f) AM_WRITE(neon_w)
@@ -113,11 +113,11 @@ INPUT_PORTS_START( 4004clk )
 INPUT_PORTS_END
 
 /*
-		16ms Int generator
-		  __  __
-		_| |_|
-		0 1 0 1 
-		
+        16ms Int generator
+          __  __
+        _| |_|
+        0 1 0 1
+
 */
 
 static TIMER_CALLBACK(timer_callback)
@@ -127,14 +127,14 @@ static TIMER_CALLBACK(timer_callback)
 	state->timer^=1;
 }
 
-static MACHINE_START(4004clk) 
+static MACHINE_START(4004clk)
 {
 	_4004clk_state *state = machine->driver_data;
 	state->timer = 0;
 	state->dac = devtag_get_device(machine, "dac");
 
 	timer_pulse(machine, ATTOTIME_IN_HZ(120), NULL, 0, timer_callback);
-	
+
 	/* register for state saving */
 	state_save_register_global(machine, state->timer);
 	state_save_register_global_pointer(machine, state->nixie, 6);
@@ -146,13 +146,13 @@ static MACHINE_DRIVER_START( 4004clk )
     MDRV_CPU_ADD("maincpu",I4004, XTAL_5MHz / 8)
     MDRV_CPU_PROGRAM_MAP(4004clk_rom)
     MDRV_CPU_DATA_MAP(4004clk_mem)
-    MDRV_CPU_IO_MAP(4004clk_io)	
+    MDRV_CPU_IO_MAP(4004clk_io)
 
     MDRV_MACHINE_START(4004clk)
-	
+
 	/* video hardware */
-	MDRV_DEFAULT_LAYOUT(layout_4004clk)	
-	
+	MDRV_DEFAULT_LAYOUT(layout_4004clk)
+
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("dac", DAC, 0)
@@ -182,6 +182,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG  COMPANY   				FULLNAME       		FLAGS */
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG  COMPANY                FULLNAME            FLAGS */
 COMP( 2008, 4004clk,  0,    0, 		4004clk, 	4004clk,  0,  	 0,  	 "John L. Weinrich",   "4004 Nixie Clock", GAME_SUPPORTS_SAVE)
 

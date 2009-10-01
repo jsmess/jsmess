@@ -107,8 +107,8 @@ static const mc6845_interface pc8441a_mc6845_interface = {
 /* Machine Drivers */
 
 MACHINE_DRIVER_START( pc8401a_video )
-//	MDRV_DEFAULT_LAYOUT(layout_pc8401a)
-	
+//  MDRV_DEFAULT_LAYOUT(layout_pc8401a)
+
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(pc8401a)
 
@@ -125,7 +125,7 @@ MACHINE_DRIVER_END
 
 MACHINE_DRIVER_START( pc8500_video )
 	MDRV_DEFAULT_LAYOUT(layout_pc8500)
-	
+
 	MDRV_PALETTE_LENGTH(2+8)
 	MDRV_PALETTE_INIT(pc8401a)
 

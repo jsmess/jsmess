@@ -1,8 +1,8 @@
 /****************************************************************************
 
-	vzdos.c
+    vzdos.c
 
-	Laser/VZ disk images
+    Laser/VZ disk images
 
 ****************************************************************************/
 
@@ -65,7 +65,7 @@ static const UINT8 sector_order[] =
 };
 
 /*********************************************************************
-	Internal functions
+    Internal functions
 *********************************************************************/
 
 /* get length of filename without trailing spaces */
@@ -383,7 +383,7 @@ static imgtoolerr_t vzdos_write_formatted_sector(imgtool_image *img, int track, 
 }
 
 /*********************************************************************
-	Imgtool module code
+    Imgtool module code
 *********************************************************************/
 
 static imgtoolerr_t vzdos_diskimage_beginenum(imgtool_directory *enumeration, const char *path)
@@ -814,7 +814,7 @@ static imgtoolerr_t vzdos_diskimage_create(imgtool_image *img, imgtool_stream *s
 }
 
 /*********************************************************************
-	Imgtool vz filter code
+    Imgtool vz filter code
 *********************************************************************/
 
 static imgtoolerr_t vzsnapshot_readfile(imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *destf)
@@ -909,7 +909,7 @@ void filter_vzsnapshot_getinfo(UINT32 state, union filterinfo *info)
 }
 
 /*********************************************************************
-	Imgtool module declaration
+    Imgtool module declaration
 *********************************************************************/
 
 static OPTION_GUIDE_START(vzdos_writefile_optionguide)
@@ -925,16 +925,16 @@ static OPTION_GUIDE_START(vzdos_writefile_optionguide)
 OPTION_GUIDE_END
 
 /*
-T	Basic Editor File
-B	Binary File
-D	Sequential Access Program Data File
-F	Quickwrite Document
-A	Russell Harrison's Edit Ass. File
-S	Dave Mitchell/Mark Hardwood Edit Ass. File  Start Addr A280H
-S	Quickwrite/Diskops System File/Label    	Except Above
-W	Edit Ass. with Diskops File	Start           Addr A813H
-W	E & F Word Pro with Patch 3.3 File	        End Addr D000H
-W	Russell Harrison Word Pro File              Except above two
+T   Basic Editor File
+B   Binary File
+D   Sequential Access Program Data File
+F   Quickwrite Document
+A   Russell Harrison's Edit Ass. File
+S   Dave Mitchell/Mark Hardwood Edit Ass. File  Start Addr A280H
+S   Quickwrite/Diskops System File/Label        Except Above
+W   Edit Ass. with Diskops File Start           Addr A813H
+W   E & F Word Pro with Patch 3.3 File          End Addr D000H
+W   Russell Harrison Word Pro File              Except above two
 */
 
 void vzdos_get_info(const imgtool_class *imgclass, UINT32 state, union imgtoolinfo *info)

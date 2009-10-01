@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	main.c
+    main.c
 
-	MESS testing main module
+    MESS testing main module
 
 *********************************************************************/
 
@@ -34,7 +34,7 @@ static const options_entry messtest_option_entries[] =
 
 /*************************************
  *
- *	Main and argument parsing/handling
+ *  Main and argument parsing/handling
  *
  *************************************/
 
@@ -100,7 +100,7 @@ int CLIB_DECL main(int argc, char *argv[])
 	/* run MAME's validity checks; if these fail cop out now */
 	/* NPW 16-Sep-2006 - commenting this out because this cannot be run outside of MAME */
 	//if (mame_validitychecks(-1))
-	//	goto done;
+	//  goto done;
 	/* run Imgtool's validity checks; if these fail cop out now */
 	if (imgtool_validitychecks())
 		goto done;

@@ -41,7 +41,7 @@ static ADDRESS_MAP_START( radio99_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE( 0x04, 0x04) AM_DEVWRITE  ( "dac", radio99_dac_w )
 	AM_RANGE( 0x05, 0x05) AM_READWRITE ( mikro80_8255_portc_r, mikro80_8255_portc_w )
 	AM_RANGE( 0x06, 0x06) AM_READ	   ( mikro80_8255_portb_r)
-	AM_RANGE( 0x07, 0x07) AM_WRITE 	   ( mikro80_8255_porta_w)	
+	AM_RANGE( 0x07, 0x07) AM_WRITE 	   ( mikro80_8255_porta_w)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -180,9 +180,9 @@ static MACHINE_DRIVER_START( radio99 )
     MDRV_IMPORT_FROM(mikro80)
     MDRV_CPU_MODIFY("maincpu")
     MDRV_CPU_IO_MAP(radio99_io)
-        
+
 	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 16.00)    
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 16.00)
 MACHINE_DRIVER_END
 
 
@@ -201,7 +201,7 @@ ROM_START( radio99 )
 	ROM_REGION(0x0800, "gfx1",0)
 	ROM_LOAD ("mikro80.fnt", 0x0000, 0x0800, CRC(43eb72bb) SHA1(761319cc6747661b33e84aa449cec83800543b5b) )
 ROM_END
-    
+
 
 /* Driver */
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       INIT     CONFIG COMPANY                  FULLNAME   FLAGS */

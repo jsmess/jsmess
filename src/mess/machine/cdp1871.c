@@ -142,7 +142,7 @@ INLINE const cdp1871_interface *get_interface(const device_config *device)
 
 /*-------------------------------------------------
     change_output_lines - change output line
-	state
+    state
 -------------------------------------------------*/
 
 static void change_output_lines(const device_config *device)
@@ -166,7 +166,7 @@ static void change_output_lines(const device_config *device)
 
 /*-------------------------------------------------
     clock_scan_counters - clock the keyboard
-	scan counters
+    scan counters
 -------------------------------------------------*/
 
 static void clock_scan_counters(const device_config *device)
@@ -199,7 +199,7 @@ static void detect_keypress(const device_config *device)
 	cdp1871_t *cdp1871 = get_safe_token(device);
 
 	UINT8 data = 0;
-	
+
 	switch (cdp1871->drive)
 	{
 	case 0:		data = devcb_call_read8(&cdp1871->in_d1_func, 0);	break;

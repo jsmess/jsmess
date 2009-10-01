@@ -6,50 +6,50 @@ PCB Layout
 ----------
 
 |-----------------------------------------------------------|
-|															|
-|	 |					4051	4042		2114	2114	|
-|	CN1														|
-|	 |					4051	4042		2114	2114	|
-|															|
-|	4011				4013	|--------|	2114	2114	|
-|								|  4515  |					|
-|						4013	|--------|	2114	2114	|
-|								4042						|						
-|						4011				2114	2114	|
-|								4011						|
-|						4011				2114	2114	|
-|SW1														|
-|						4011	|--------|	2114	2114	|
-|								|  PROM  |					|
-|						40107	|--------|	2114	2114	|
-|	4050	1.75MHz											|
-|						|-------------|		2114	2114	|
-|						|   CDP1802   |						|
-|						|-------------|		2114	2114	|
-|			4049											|
-|						|-------------|		2114	2114	|
-|		4.43MHz			|   CDP1864   |						|
-|						|-------------|		2114	2114	|
-|															|
-|				741				4502		2114	2114	|
-|  -														|
-|  |							2114		2114	2114	|
-| CN2														|
-|  |			4001			4051		2114	2114	|
-|  -														|
-|											2114	2114	|
+|                                                           |
+|    |                  4051    4042        2114    2114    |
+|   CN1                                                     |
+|    |                  4051    4042        2114    2114    |
+|                                                           |
+|   4011                4013    |--------|  2114    2114    |
+|                               |  4515  |                  |
+|                       4013    |--------|  2114    2114    |
+|                               4042                        |
+|                       4011                2114    2114    |
+|                               4011                        |
+|                       4011                2114    2114    |
+|SW1                                                        |
+|                       4011    |--------|  2114    2114    |
+|                               |  PROM  |                  |
+|                       40107   |--------|  2114    2114    |
+|   4050    1.75MHz                                         |
+|                       |-------------|     2114    2114    |
+|                       |   CDP1802   |                     |
+|                       |-------------|     2114    2114    |
+|           4049                                            |
+|                       |-------------|     2114    2114    |
+|       4.43MHz         |   CDP1864   |                     |
+|                       |-------------|     2114    2114    |
+|                                                           |
+|               741             4502        2114    2114    |
+|  -                                                        |
+|  |                            2114        2114    2114    |
+| CN2                                                       |
+|  |            4001            4051        2114    2114    |
+|  -                                                        |
+|                                           2114    2114    |
 |-----------------------------------------------------------|
 
 Notes:
     All IC's shown.
-	
-    PROM	- MMI6341
-	2114	- 2114 4096 Bit (1024x4) NMOS Static RAM
-	CDP1802	- RCA CDP1802 CMOS 8-Bit Microprocessor @ 1.75 MHz
-	CDP1864	- RCA CDP1864CE COS/MOS PAL Compatible Color TV Interface @ 1.75 MHz
-	CN1		- keyboard connector
-	CN2		- ASTEC RF modulator connector
-	SW1		- Run/Reset switch
+
+    PROM    - MMI6341
+    2114    - 2114 4096 Bit (1024x4) NMOS Static RAM
+    CDP1802 - RCA CDP1802 CMOS 8-Bit Microprocessor @ 1.75 MHz
+    CDP1864 - RCA CDP1864CE COS/MOS PAL Compatible Color TV Interface @ 1.75 MHz
+    CN1     - keyboard connector
+    CN2     - ASTEC RF modulator connector
+    SW1     - Run/Reset switch
 
 */
 
@@ -63,51 +63,51 @@ PCB Layout
 OK 30379
 
 |-------------------------------------------------|
-|	CN1		CN2		CN3					7805	  |
-|						1.75MHz					  |
-|								741				  |
-|				  		|-------------|			- |
-|	741	    741	  4011	|   CDP1864   |			| |
-|						|-------------|			| |
-|				  4013	|-------------|			| |
-|						|   CDP1802   |			| |
-|				  4093	|-------------|			| |
-|												C |
-|			 4051 	4042	4017		4042	N |	
-|							|-------|			4 |
-|							|  ROM  |	14556	| |
-|							|-------|			| |
-|							2114	2114		| |
-|												| |
-|							2114	2114		| |
-|												- |
-|							2114	2114		  |
-|												  |
-|							2114	2114		  |
+|   CN1     CN2     CN3                 7805      |
+|                       1.75MHz                   |
+|                               741               |
+|                       |-------------|         - |
+|   741     741   4011  |   CDP1864   |         | |
+|                       |-------------|         | |
+|                 4013  |-------------|         | |
+|                       |   CDP1802   |         | |
+|                 4093  |-------------|         | |
+|                                               C |
+|            4051   4042    4017        4042    N |
+|                           |-------|           4 |
+|                           |  ROM  |   14556   | |
+|                           |-------|           | |
+|                           2114    2114        | |
+|                                               | |
+|                           2114    2114        | |
+|                                               - |
+|                           2114    2114          |
+|                                                 |
+|                           2114    2114          |
 |-------------------------------------------------|
 
 Notes:
     All IC's shown.
-	
-    ROM		- Intersil 5504?
-	2114	- 2114UCB 4096 Bit (1024x4) NMOS Static RAM
-	CDP1802	- RCA CDP1802E CMOS 8-Bit Microprocessor @ 1.75 MHz
-	CDP1864	- RCA CDP1864CE COS/MOS PAL Compatible Color TV Interface @ 1.75 MHz
-	CN1		- tape connector
-	CN2		- video connector
-	CN3		- power connector
-	CN4		- expansion connector
+
+    ROM     - Intersil 5504?
+    2114    - 2114UCB 4096 Bit (1024x4) NMOS Static RAM
+    CDP1802 - RCA CDP1802E CMOS 8-Bit Microprocessor @ 1.75 MHz
+    CDP1864 - RCA CDP1864CE COS/MOS PAL Compatible Color TV Interface @ 1.75 MHz
+    CN1     - tape connector
+    CN2     - video connector
+    CN3     - power connector
+    CN4     - expansion connector
 
 */
 
 /*
 
-	TODO:
+    TODO:
 
-	- tape input/output
-	- tmc2000: add missing keys
-	- tmc2000: TOOL-2000 rom banking
-	- oscnano: correct time constant for EF4 RC circuit
+    - tape input/output
+    - tmc2000: add missing keys
+    - tmc2000: TOOL-2000 rom banking
+    - oscnano: correct time constant for EF4 RC circuit
 
 */
 
@@ -149,18 +149,18 @@ static WRITE8_HANDLER( tmc2000_keylatch_w )
 {
 	/*
 
-		bit		description
-		
-		0		X0
-		1		X1
-		2		X2
-		3		Y0
-		4		Y1
-		5		Y2
-		6		EXP1
-		7		EXP2
+        bit     description
 
-	*/
+        0       X0
+        1       X1
+        2       X2
+        3       Y0
+        4       Y1
+        5       Y2
+        6       EXP1
+        7       EXP2
+
+    */
 
 	tmc2000_state *state = space->machine->driver_data;
 
@@ -171,18 +171,18 @@ static WRITE8_HANDLER( oscnano_keylatch_w )
 {
 	/*
 
-		bit		description
-		
-		0		X0
-		1		X1
-		2		X2
-		3		Y0
-		4		not connected
-		5		not connected
-		6		not connected
-		7		not connected
+        bit     description
 
-	*/
+        0       X0
+        1       X1
+        2       X2
+        3       Y0
+        4       not connected
+        5       not connected
+        6       not connected
+        7       not connected
+
+    */
 
 	oscnano_state *state = space->machine->driver_data;
 

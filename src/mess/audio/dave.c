@@ -2,14 +2,14 @@
 
     "Dave" Sound Chip
 
-	DAVE SOUND CHIP FOUND IN ENTERPRISE
+    DAVE SOUND CHIP FOUND IN ENTERPRISE
 
-	 working:
+     working:
 
-	- pure tone
-	- sampled sounds
-	- 1 kHz, 50 Hz and 1 Hz ints
-	- external ints (int1 and int2) - not correct speed yet
+    - pure tone
+    - sampled sounds
+    - 1 kHz, 50 Hz and 1 Hz ints
+    - external ints (int1 and int2) - not correct speed yet
 
 **********************************************************************/
 
@@ -72,11 +72,11 @@ struct _dave_t
 
 	/* these are used to force channels on/off */
 	/* if one of the or values is 0x0ff, this means
-	the volume will be forced on,else it is dependant on
-	the state of the wave */
+    the volume will be forced on,else it is dependant on
+    the state of the wave */
 	int level_or[8];
 	/* if one of the values is 0x00, this means the
-	volume is forced off, else it is dependant on the wave */
+    volume is forced off, else it is dependant on the wave */
 	int level_and[8];
 
 	/* these are the current channel volumes in MAME form */
@@ -165,7 +165,7 @@ static DEVICE_START( dave_sound )
 	}
 
 	/* dave has 3 tone channels and 1 noise channel.
-	the volumes are mixed internally and output as left and right volume */
+    the volumes are mixed internally and output as left and right volume */
 
 	/* 3 tone channels + 1 noise channel */
 	dave->sound_stream = stream_create(device, 0, 2, device->machine->sample_rate, NULL, dave_update_sound);
@@ -321,9 +321,9 @@ static STREAM_UPDATE( dave_update_sound )
 	dave_t *dave = get_token(device);
 	stream_sample_t *buffer1, *buffer2;
 	/* 0 = channel 0 left volume, 1 = channel 0 right volume,
-	2 = channel 1 left volume, 3 = channel 1 right volume,
-	4 = channel 2 left volume, 5 = channel 2 right volume
-	6 = noise channel left volume, 7 = noise channel right volume */
+    2 = channel 1 left volume, 3 = channel 1 right volume,
+    4 = channel 2 left volume, 5 = channel 2 right volume
+    6 = noise channel left volume, 7 = noise channel right volume */
 	int output_volumes[8];
 	int left_volume;
 	int right_volume;
@@ -403,7 +403,7 @@ static STREAM_UPDATE( dave_update_sound )
 
 /*-------------------------------------------------
     dave_sound_w - used to update sound output
-	based on data writes
+    based on data writes
 -------------------------------------------------*/
 
 static WRITE8_DEVICE_HANDLER(dave_sound_w)
@@ -485,12 +485,12 @@ static WRITE8_DEVICE_HANDLER(dave_sound_w)
 
 		case 7:
 		{
-			/*	force => the value of this register is forced regardless of the wave
-					state,
-				remove => this value is force to zero so that it has no influence over
-					the final volume calculation, regardless of wave state
-				use => the volume value is dependant on the wave state and is included
-					in the final volume calculation */
+			/*  force => the value of this register is forced regardless of the wave
+                    state,
+                remove => this value is force to zero so that it has no influence over
+                    the final volume calculation, regardless of wave state
+                use => the volume value is dependant on the wave state and is included
+                    in the final volume calculation */
 
 			logerror("selectable int ");
 			switch ((data>>5) & 0x03)
@@ -719,7 +719,7 @@ READ8_DEVICE_HANDLER( dave_reg_r )
 
 /*-------------------------------------------------
     dave_set_external_int_state - negative edge
-	triggered
+    triggered
 -------------------------------------------------*/
 
 static void dave_set_external_int_state(const device_config *device, int IntID, int State)

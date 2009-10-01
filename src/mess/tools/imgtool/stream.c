@@ -1,8 +1,8 @@
 /***************************************************************************
 
-	stream.c
+    stream.c
 
-	Code for implementing Imgtool streams
+    Code for implementing Imgtool streams
 
 ***************************************************************************/
 
@@ -453,7 +453,7 @@ int stream_crc(imgtool_stream *s, unsigned long *result)
 			if (!ptr)
 				return IMGTOOLERR_OUTOFMEMORY;
 			stream_seek(s, 0, SEEK_SET);
-			if (stream_read(s, ptr, sz) != sz) 
+			if (stream_read(s, ptr, sz) != sz)
 			{
 				free(ptr);
 				return IMGTOOLERR_READERROR;

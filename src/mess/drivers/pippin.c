@@ -1,5 +1,5 @@
 /***************************************************************************
-   
+
         Bandai Pippin
 
         17/07/2009 Skeleton driver.
@@ -12,7 +12,7 @@
 #include "sound/cdda.h"
 
 static ADDRESS_MAP_START( pippin_mem, ADDRESS_SPACE_PROGRAM, 64 )
-	ADDRESS_MAP_UNMAP_HIGH	
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x005fffff) AM_RAM
 	AM_RANGE(0xf3016000, 0xf3016007) AM_NOP // ADB PORTB
 	AM_RANGE(0xf3016400, 0xf3016407) AM_NOP // ADB DDRB
@@ -34,8 +34,8 @@ INPUT_PORTS_START( pippin )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(pippin) 
-{	
+static MACHINE_RESET(pippin)
+{
 }
 
 static VIDEO_START( pippin )
@@ -53,7 +53,7 @@ static MACHINE_DRIVER_START( pippin )
     MDRV_CPU_PROGRAM_MAP(pippin_mem)
 
     MDRV_MACHINE_RESET(pippin)
-	
+
     /* video hardware */
     MDRV_SCREEN_ADD("screen", RASTER)
     MDRV_SCREEN_REFRESH_RATE(60)
@@ -80,13 +80,13 @@ MACHINE_DRIVER_END
 /* ROM definition */
 /*
 
-	BIOS versions
+    BIOS versions
 
-	dev		
-	monitor	341S0241 - 245,247,248,250
-	1.0		341S0251..254				U1-U4
-	1.2		341S0297..300				U15,U20,U31,U35
-	1.3		341S0328..331				U1/U31, U2/U35, U3/U15 and U4/U20
+    dev
+    monitor 341S0241 - 245,247,248,250
+    1.0     341S0251..254               U1-U4
+    1.2     341S0297..300               U15,U20,U31,U35
+    1.3     341S0328..331               U1/U31, U2/U35, U3/U15 and U4/U20
 
 */
 
@@ -95,7 +95,7 @@ ROM_START( pippin )
 	ROM_LOAD64_WORD_SWAP( "341s0251.u1", 0x000006, 0x100000, CRC(aaea2449) SHA1(2f63e215260a42fb7c5f2364682d5e8c0604646f) )
 	ROM_LOAD64_WORD_SWAP( "341s0252.u2", 0x000004, 0x100000, CRC(3d584419) SHA1(e29c764816755662693b25f1fb3c24faef4e9470) )
 	ROM_LOAD64_WORD_SWAP( "341s0253.u3", 0x000002, 0x100000, CRC(d8ae5037) SHA1(d46ce4d87ca1120dfe2cf2ba01451f035992b6f6) )
-	ROM_LOAD64_WORD_SWAP( "341s0254.u4", 0x000000, 0x100000, CRC(3e2851ba) SHA1(7cbf5d6999e890f5e9ab2bc4b10ca897c4dc2016) )	
+	ROM_LOAD64_WORD_SWAP( "341s0254.u4", 0x000000, 0x100000, CRC(3e2851ba) SHA1(7cbf5d6999e890f5e9ab2bc4b10ca897c4dc2016) )
 
 	ROM_REGION( 0x10000, "cdrom", 0 ) /* MATSUSHITA CR504-L OEM */
 	ROM_LOAD( "504par4.0i.ic7", 0x0000, 0x10000, CRC(25f7dd46) SHA1(ec3b3031742807924c6259af865e701827208fec) )

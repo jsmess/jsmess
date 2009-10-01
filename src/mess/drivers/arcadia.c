@@ -7,8 +7,8 @@ Consolidation and enhancment of documentation by Manfred Schneider based on prev
  TODO: implement the RESET key on the front panel
          find a dump of the charactyer ROM
          convert the drawing code to tilemap
- 
- 
+
+
  1. General
    SYSTEM
 - Signetics 2650 CPU at 3.58/4 MHz(for NTSC) or at 4,433/5 (for PAL)
@@ -27,57 +27,57 @@ Consolidation and enhancment of documentation by Manfred Schneider based on prev
 
 2. Memory map
 The memory map of the 2001 is below.
-0000 - 0FFF	4k ROM Block 1 (first 4k of a cartridge)
-1000 - 13FF		mirror of $1800-$1BFF
-1400 - 17FF		mirror of $1800-$1BFF
-1800 - 1BFF		UVI2637 Area (detail description in video/arcadia.c)
-	1800 - 18CF		Screen display , upper 13 lines, characters/palette high bits
-	18D0 - 18EF	Free for user programs.
-	18F0 - 18F7		Sprite coordinates y0x0y1x1y2x2y3x3
-	18F8 - 1908		registers of UVI
-	1909 - 197F		Unmapped
-	1980 - 19BF		User defined characters (8 possible, 8 bytes per character)
-	19C0 - 19F7		Unmapped
-	19F8 - 19FF		registers of UVI
-	1A00 - 1ACF	Screen display , lower 13 lines, characters/palette high bits
-	1AD0 - 1AFF	User memory
-	1B00 - 1BFF		mirror of 1900-19FF
-1C00 - 1FFF		mirror of 1800-1BFF
-2000 - 2FFF	4k ROM Block 2 (for 8k carts such as Jungler)
-3000 - 3FFF	mirror of 1000-1FFF
-4000 - 4FFF	mirror of 0000-0FFF
-5000 - 5FFF	mirror of 1000-1FFF
-6000 - 6FFF	mirror of 0000-0FFF
-7000 - 7FFF	mirror of 1000-1FFF
+0000 - 0FFF 4k ROM Block 1 (first 4k of a cartridge)
+1000 - 13FF     mirror of $1800-$1BFF
+1400 - 17FF     mirror of $1800-$1BFF
+1800 - 1BFF     UVI2637 Area (detail description in video/arcadia.c)
+    1800 - 18CF     Screen display , upper 13 lines, characters/palette high bits
+    18D0 - 18EF Free for user programs.
+    18F0 - 18F7     Sprite coordinates y0x0y1x1y2x2y3x3
+    18F8 - 1908     registers of UVI
+    1909 - 197F     Unmapped
+    1980 - 19BF     User defined characters (8 possible, 8 bytes per character)
+    19C0 - 19F7     Unmapped
+    19F8 - 19FF     registers of UVI
+    1A00 - 1ACF Screen display , lower 13 lines, characters/palette high bits
+    1AD0 - 1AFF User memory
+    1B00 - 1BFF     mirror of 1900-19FF
+1C00 - 1FFF     mirror of 1800-1BFF
+2000 - 2FFF 4k ROM Block 2 (for 8k carts such as Jungler)
+3000 - 3FFF mirror of 1000-1FFF
+4000 - 4FFF mirror of 0000-0FFF
+5000 - 5FFF mirror of 1000-1FFF
+6000 - 6FFF mirror of 0000-0FFF
+7000 - 7FFF mirror of 1000-1FFF
 
 The Palladium VCG memory map is as follows.
-0000 - 0FFF	4k ROM Block 1 (first 4k of a cartridge)
-1000 - 17FF		could be ROM or RAM but no Cartridge uses this
-1800 - 1BFF		UVI2637 Area (detail description in video/arcadia.c)
-	1800 - 18CF		Screen display , upper 13 lines, characters/palette high bits
-	18D0 - 18EF	Free for user programs.
-	18F0 - 18F7		Sprite coordinates y0x0y1x1y2x2y3x3
-	18F8 - 1908		registers of UVI
-	1909 - 197F		Unmapped
-	1980 - 19BF		User defined characters (8 possible, 8 bytes per character)
-	19C0 - 19F7		Unmapped
-	19F8 - 19FF		registers of UVI
-	1A00 - 1ACF	Screen display , lower 13 lines, characters/palette high bits
-	1AD0 - 1AFF	User memory
-	1B00 - 1BFF		mirror of 1900-19FF
-1C00 - 1FFF		could be ROM or RAM but no Cartridge uses this
-2000 - 2FFF	4k ROM Block  (for 8k carts such as Jungler)
-3000 - 3FFF	could be ROM or RAM but no Cartridge uses this
-4000 - 4FFF	4k ROM Block  (first 2K used by Golf)
-5000 - 5FFF	4k ROM Block
-6000 - 6FFF	4k ROM Block
-7000 - 7FFF	4k ROM Block
+0000 - 0FFF 4k ROM Block 1 (first 4k of a cartridge)
+1000 - 17FF     could be ROM or RAM but no Cartridge uses this
+1800 - 1BFF     UVI2637 Area (detail description in video/arcadia.c)
+    1800 - 18CF     Screen display , upper 13 lines, characters/palette high bits
+    18D0 - 18EF Free for user programs.
+    18F0 - 18F7     Sprite coordinates y0x0y1x1y2x2y3x3
+    18F8 - 1908     registers of UVI
+    1909 - 197F     Unmapped
+    1980 - 19BF     User defined characters (8 possible, 8 bytes per character)
+    19C0 - 19F7     Unmapped
+    19F8 - 19FF     registers of UVI
+    1A00 - 1ACF Screen display , lower 13 lines, characters/palette high bits
+    1AD0 - 1AFF User memory
+    1B00 - 1BFF     mirror of 1900-19FF
+1C00 - 1FFF     could be ROM or RAM but no Cartridge uses this
+2000 - 2FFF 4k ROM Block  (for 8k carts such as Jungler)
+3000 - 3FFF could be ROM or RAM but no Cartridge uses this
+4000 - 4FFF 4k ROM Block  (first 2K used by Golf)
+5000 - 5FFF 4k ROM Block
+6000 - 6FFF 4k ROM Block
+7000 - 7FFF 4k ROM Block
 
 
 3. ROM Images
 ROM Images are loaded into 0000-0FFF. If the ROM is an 8k ROM the
 second half of the Rom is located at 2000-2FFF. Except for the Golf cart
-which is located from 0x0000-0x0FFF and a 2kbyte block from 0x4000 only on 
+which is located from 0x0000-0x0FFF and a 2kbyte block from 0x4000 only on
 Palladium VCG.
 
 
@@ -106,8 +106,8 @@ The fire buttons are equivalent to Keypad #2 e.g. they are 1901 and
 1905 bit 3.
 
 Palladium has 4 additional key per keypad which are mapped at
-1903 palladium player 1 
-1907 palladium player 2 
+1903 palladium player 1
+1907 palladium player 2
 
 
 5. Other information
@@ -417,7 +417,7 @@ static const rgb_t arcadia_colors[] =
 static const unsigned short arcadia_palette[128+8] =  /* bgnd, fgnd */
 {
 	0,1,2,3,4,5,6,7,
-	
+
 	0,0, 0,1, 0,2, 0,3, 0,4, 0,5, 0,6, 0,7,
 	1,0, 1,1, 1,2, 1,3, 1,4, 1,5, 1,6, 1,7,
 	2,0, 2,1, 2,2, 2,3, 2,4, 2,5, 2,6, 2,7,

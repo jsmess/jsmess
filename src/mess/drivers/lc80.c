@@ -8,13 +8,13 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- HALT led
-	- KSD11 switch
-	- banking for ROM 4-5
-	- Schachcomputer SC-80
-	- CTC clock inputs
+    - HALT led
+    - KSD11 switch
+    - banking for ROM 4-5
+    - Schachcomputer SC-80
+    - CTC clock inputs
 
 */
 
@@ -144,19 +144,19 @@ static void update_display(lc80_state *state)
 static WRITE8_DEVICE_HANDLER( pio1_port_a_w )
 {
 	/*
-		
-		bit		description
 
-		PA0		VQE23 segment B
-		PA1		VQE23 segment F
-		PA2		VQE23 segment A
-		PA3		VQE23 segment G
-		PA4		VQE23 segment DP
-		PA5		VQE23 segment C
-		PA6		VQE23 segment E
-		PA7		VQE23 segment D
+        bit     description
 
-	*/
+        PA0     VQE23 segment B
+        PA1     VQE23 segment F
+        PA2     VQE23 segment A
+        PA3     VQE23 segment G
+        PA4     VQE23 segment DP
+        PA5     VQE23 segment C
+        PA6     VQE23 segment E
+        PA7     VQE23 segment D
+
+    */
 
 	lc80_state *state = device->machine->driver_data;
 
@@ -168,19 +168,19 @@ static WRITE8_DEVICE_HANDLER( pio1_port_a_w )
 static READ8_DEVICE_HANDLER( pio1_port_b_r )
 {
 	/*
-		
-		bit		description
 
-		PB0		tape input
-		PB1		tape output
-		PB2		digit 0
-		PB3		digit 1
-		PB4		digit 2
-		PB5		digit 3
-		PB6		digit 4
-		PB7		digit 5
+        bit     description
 
-	*/
+        PB0     tape input
+        PB1     tape output
+        PB2     digit 0
+        PB3     digit 1
+        PB4     digit 2
+        PB5     digit 3
+        PB6     digit 4
+        PB7     digit 5
+
+    */
 
 	lc80_state *state = device->machine->driver_data;
 
@@ -190,19 +190,19 @@ static READ8_DEVICE_HANDLER( pio1_port_b_r )
 static WRITE8_DEVICE_HANDLER( pio1_port_b_w )
 {
 	/*
-		
-		bit		description
 
-		PB0		tape input
-		PB1		tape output, speaker output, OUT led
-		PB2		digit 0
-		PB3		digit 1
-		PB4		digit 2
-		PB5		digit 3
-		PB6		digit 4
-		PB7		digit 5
+        bit     description
 
-	*/
+        PB0     tape input
+        PB1     tape output, speaker output, OUT led
+        PB2     digit 0
+        PB3     digit 1
+        PB4     digit 2
+        PB5     digit 3
+        PB6     digit 4
+        PB7     digit 5
+
+    */
 
 	lc80_state *state = device->machine->driver_data;
 
@@ -236,19 +236,19 @@ static const z80pio_interface pio1_intf =
 static READ8_DEVICE_HANDLER( pio2_port_b_r )
 {
 	/*
-		
-		bit		description
 
-		PB0		
-		PB1		
-		PB2		
-		PB3		
-		PB4		key row 0
-		PB5		key row 1
-		PB6		key row 2
-		PB7		key row 3
+        bit     description
 
-	*/
+        PB0
+        PB1
+        PB2
+        PB3
+        PB4     key row 0
+        PB5     key row 1
+        PB6     key row 2
+        PB7     key row 3
+
+    */
 
 	lc80_state *state = device->machine->driver_data;
 	UINT8 data = 0xf0;
@@ -309,7 +309,7 @@ static MACHINE_START( lc80 )
 	memory_configure_bank(machine, 2, 0, 1, memory_region(machine, Z80_TAG) + 0x800, 0); // TODO
 	memory_configure_bank(machine, 2, 1, 1, memory_region(machine, Z80_TAG) + 0x800, 0);
 	memory_set_bank(machine, 2, 1);
-	
+
 	memory_configure_bank(machine, 3, 0, 1, memory_region(machine, Z80_TAG) + 0x1000, 0); // TODO
 	memory_configure_bank(machine, 3, 1, 1, memory_region(machine, Z80_TAG) + 0x1000, 0);
 	memory_set_bank(machine, 3, 1);
@@ -411,7 +411,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( sc80 )
 	MDRV_IMPORT_FROM( lc80_2 )
-	
+
 	/* basic machine hardware */
     MDRV_CPU_MODIFY(Z80_TAG)
     MDRV_CPU_PROGRAM_MAP(sc80_mem)
@@ -455,7 +455,7 @@ SYSTEM_CONFIG_END
 
 /* System Drivers */
 
-/*    YEAR	NAME	PARENT	COMPAT	MACHINE	INPUT	INIT	CONFIG	COMPANY					FULLNAME				FLAGS */
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY                 FULLNAME                FLAGS */
 COMP( 1984, lc80,	0,		0,		lc80,	lc80,	0,		lc80,	"VEB Mikroelektronik",	"Lerncomputer LC 80",	GAME_SUPPORTS_SAVE )
 COMP( 1984, lc80_2,	lc80,	0,		lc80_2,	lc80,	0,		lc80_2,	"VEB Mikroelektronik",	"Lerncomputer LC 80.2",	GAME_SUPPORTS_SAVE )
 COMP( 1984, sc80,	lc80,	0,		lc80_2,	lc80,	0,		lc80_2,	"VEB Mikroelektronik",	"Schachcomputer SC-80",	GAME_SUPPORTS_SAVE )

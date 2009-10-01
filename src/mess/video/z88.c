@@ -201,13 +201,13 @@ VIDEO_UPDATE( z88 )
 				}
 			}
 
-//			if (byte1 & Z88_SCR_HW_FLS)
-//			{
-//				if (flash_invert)
-//				{
-//					pen1 = pen0;
-//				}
-//			}
+//          if (byte1 & Z88_SCR_HW_FLS)
+//          {
+//              if (flash_invert)
+//              {
+//                  pen1 = pen0;
+//              }
+//          }
 
 
 			/* hi-res? */

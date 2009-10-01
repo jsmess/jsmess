@@ -3,8 +3,8 @@
 
     MESS Driver By:
 
-	Gordon Jefferyes
-	mess_bbc@gjeffery.dircon.co.uk
+    Gordon Jefferyes
+    mess_bbc@gjeffery.dircon.co.uk
 
 ******************************************************************************/
 
@@ -107,8 +107,8 @@ void bbc_set_video_memory_lookups(int ramsize)
 
 
 				/* the 4 bit input port b on IC39 are produced by 4 NAND gates.
-				these NAND gates take their
-				inputs from c0 and c1 (from IC32) and ma12 (from the 6845) */
+                these NAND gates take their
+                inputs from c0 and c1 (from IC32) and ma12 (from the 6845) */
 
 				/* get bit m12 from the 6845 */
 				ma12=(ma>>12)&1;
@@ -131,9 +131,9 @@ void bbc_set_video_memory_lookups(int ramsize)
 				s=(a+b+1)&0xf;
 
 				/* if MA13 (TTXVDU) is low then IC8 and IC9 are used to calculate
-				   the memory location required for the hi res video.
-				   if MA13 is hight then IC10 and IC11 are used to calculate the memory location for the teletext chip
-				   Note: the RA0,RA1,RA2 inputs to IC8 in high res modes will need to be added else where */
+                   the memory location required for the hi res video.
+                   if MA13 is hight then IC10 and IC11 are used to calculate the memory location for the teletext chip
+                   Note: the RA0,RA1,RA2 inputs to IC8 in high res modes will need to be added else where */
 				if ((ma>>13)&1)
 				{
 					m=((ma&0x3ff)|0x3c00)|((s&0x8)<<11);
@@ -286,7 +286,7 @@ WRITE8_HANDLER ( bbc_videoULA_w )
 	else
 	  video_screen_update_partial(space->machine->primary_screen, vpos -1 );
 
-//	logerror("setting videoULA %s at %.4x size:%.4x\n",image_filename(image), addr, size);
+//  logerror("setting videoULA %s at %.4x size:%.4x\n",image_filename(image), addr, size);
 	logerror("setting videoULA %.4x to:%.4x   at :%d \n",data,offset,video_screen_get_vpos(space->machine->primary_screen) );
 
 

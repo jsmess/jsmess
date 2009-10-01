@@ -83,7 +83,7 @@ fixed frequency sound and random Noise generator.
 Calculation of sound frequency is done as follows
  1/Freq = 2 (pitch +1) * (horizontal line period)
 
- 
+
 4. Sprites
 
 Sprite pointers are at 18F0..18F7 (there are four of them). The graphics
@@ -101,16 +101,16 @@ The Palette is encoded between 19F8-19FB. This section describes the method
 by which colours are allocated. There are 8 colours, information is coded
 3 bits per colour (usually 2 colours per byte)
 
- Colour	Code	Name	
- ------		-----	------- 
-  7     		111     Black	
-  6     		110     Blue
-  5     		101     Red
-  4     		100     Magenta
-  3     		011     Green
-  2     		010     Cyan
-  1     		001     Yellow
-  0     		000     White
+ Colour Code    Name
+ ------     -----   -------
+  7             111     Black
+  6             110     Blue
+  5             101     Red
+  4             100     Magenta
+  3             011     Green
+  2             010     Cyan
+  1             001     Yellow
+  0             000     White
 
 Bits 0..2 of $19F9 are the screen colour
 Bits 3..5 of $19F9 are the colours of characters
@@ -139,7 +139,7 @@ collisions, one is for sprite/sprite collisions.
         bit 4 is sprite 1 / 3 collision (guess)
         bit 5 is sprite 2 / 3 collision (guess)
 
-	
+
 7. Graphic Mode
 19f8 bit 7 graphics mode on (lower 6 bits descripe rectangles)
 0xc0 in line switches to graphics mode in this line
@@ -156,67 +156,67 @@ collisions, one is for sprite/sprite collisions.
  8. Memory Map
  The offsets in the following memory Map are from the view of the UVI.
  In the arcadia and compatibles the base offset is $1800 thats how the CPU sees the UVI
- 
- 0000 - 00FF	external RAM
-	0000 - 00CF  	upper screen character/graphics codes organised as 16 char x 13 rows
-	00D0 - 00EF 	RAM (not used by UVI, can be used by CPU)
-	00F0			vertical offset object 0
-	00F1			horizontal offset object 0
-	00F2			vertical offset object 1
-	00F3			horizontal offset object 1
-	00F4			vertical offset object 2
-	00F5			horizontal offset object 2
-	00F6			vertical offset object 3
-	00F7			horizontal offset object 3
-	00F8 - 00FB	RAM (not used by UVI, can be used by CPU)
-	00FC			complement number of rows from the trailing edge of VRST
-				to the start of character display
-	00FD			bit0 - 6 sound frequeny,  bit 7 color mode
-	00FE			bit0 - 2 loudness, bit 3 sound enable when set, bit 4 random noise enable when set
-				bit 5 - 7 delay for row of characters
-	00FF			bit 0 - 3 DMA number, bit 4 - 7 unused
-0100 - 017F		CE area. In arcadia used for keypad.
-0180 - 01FF		internal UVI registers
-	0180 - 0187	image of object 0 or UDC-code $38
-	0188 - 018F		image of object 1 or UDC-code $39
-	0190 - 0197	image of object 2 or UDC-code $3A
-	0198 - 019F		image of object 3 or UDC-code $3B
-	01A0 - 01A7	image of UDC-code $3C
-	01A8 - 01AF	image of UDC-code $3D
-	01B0 - 01B7	image of UDC-code $3E
-	01B8 - 01BF		image of UDC-code $3F
-	01C0 - 01F7		unused
-	01F8			bit 0 - 2 alternate screen color, bit 3 - 5 alternate character color
-				bit 6 Refresh mode when set entire character field will be display twice
-				bit 7 Grahics mode
-	01F9			bit 0 - 2 screen color, bit 3 - 5 character color
-				bit 6 poti mux control
-				bit 7 character size when set size=8x8 else size=8x16
-	01FA			bit 0 - 2 color of object 3, bit 3 - 5 color of object 2
-				bit 6 size of object 3 when set size=8x8 else size=8x16
-				bit 7 size of object 2 when set size=8x8 else size=8x16
-	01FB			bit 0 - 2 color of object 1, bit 3 - 5 color of object 0
-				bit 6 size of object 1 when set size=8x8 else size=8x16
-				bit 7 size of object 0 when set size=8x8 else size=8x16
-	01FC			object - character collision bits
-				bit 0 when low object 0 collided with character
-				bit 1 when low object 1 collided with character
-				bit 2 when low object 2 collided with character
-				bit 3 when low object 3 collided with character
-				bit 4 - 7 unused set to high
-	01FD			inter object collision
-				bit 0 - when low object 1 and 2 collide
-				bit 1 - when low object 1 and 3 collide
-				bit 2 - when low object 1 and 4 collide
-				bit 3 - when low object 2 and 3 collide
-				bit 4 - when low object 2 and 4 collide
-				bit 5 - when low object 3 and 4 collide
-				bit 6 - 7 unused set to high
-	01FE			digital value of POT1 or POT3 input. Valid only during VRST
-	01FF			digital value of POT2 or POT4 input. Valid only furing VRST
-0200 - 02FF	2nd external RAM
-	0200 - 02CF	lower screen character/graphics codes organised as 16 char x 13 rows	
-	02D0 - 02FF	RAM (not used by UVI, can be used by CPU)			
+
+ 0000 - 00FF    external RAM
+    0000 - 00CF     upper screen character/graphics codes organised as 16 char x 13 rows
+    00D0 - 00EF     RAM (not used by UVI, can be used by CPU)
+    00F0            vertical offset object 0
+    00F1            horizontal offset object 0
+    00F2            vertical offset object 1
+    00F3            horizontal offset object 1
+    00F4            vertical offset object 2
+    00F5            horizontal offset object 2
+    00F6            vertical offset object 3
+    00F7            horizontal offset object 3
+    00F8 - 00FB RAM (not used by UVI, can be used by CPU)
+    00FC            complement number of rows from the trailing edge of VRST
+                to the start of character display
+    00FD            bit0 - 6 sound frequeny,  bit 7 color mode
+    00FE            bit0 - 2 loudness, bit 3 sound enable when set, bit 4 random noise enable when set
+                bit 5 - 7 delay for row of characters
+    00FF            bit 0 - 3 DMA number, bit 4 - 7 unused
+0100 - 017F     CE area. In arcadia used for keypad.
+0180 - 01FF     internal UVI registers
+    0180 - 0187 image of object 0 or UDC-code $38
+    0188 - 018F     image of object 1 or UDC-code $39
+    0190 - 0197 image of object 2 or UDC-code $3A
+    0198 - 019F     image of object 3 or UDC-code $3B
+    01A0 - 01A7 image of UDC-code $3C
+    01A8 - 01AF image of UDC-code $3D
+    01B0 - 01B7 image of UDC-code $3E
+    01B8 - 01BF     image of UDC-code $3F
+    01C0 - 01F7     unused
+    01F8            bit 0 - 2 alternate screen color, bit 3 - 5 alternate character color
+                bit 6 Refresh mode when set entire character field will be display twice
+                bit 7 Grahics mode
+    01F9            bit 0 - 2 screen color, bit 3 - 5 character color
+                bit 6 poti mux control
+                bit 7 character size when set size=8x8 else size=8x16
+    01FA            bit 0 - 2 color of object 3, bit 3 - 5 color of object 2
+                bit 6 size of object 3 when set size=8x8 else size=8x16
+                bit 7 size of object 2 when set size=8x8 else size=8x16
+    01FB            bit 0 - 2 color of object 1, bit 3 - 5 color of object 0
+                bit 6 size of object 1 when set size=8x8 else size=8x16
+                bit 7 size of object 0 when set size=8x8 else size=8x16
+    01FC            object - character collision bits
+                bit 0 when low object 0 collided with character
+                bit 1 when low object 1 collided with character
+                bit 2 when low object 2 collided with character
+                bit 3 when low object 3 collided with character
+                bit 4 - 7 unused set to high
+    01FD            inter object collision
+                bit 0 - when low object 1 and 2 collide
+                bit 1 - when low object 1 and 3 collide
+                bit 2 - when low object 1 and 4 collide
+                bit 3 - when low object 2 and 3 collide
+                bit 4 - when low object 2 and 4 collide
+                bit 5 - when low object 3 and 4 collide
+                bit 6 - 7 unused set to high
+    01FE            digital value of POT1 or POT3 input. Valid only during VRST
+    01FF            digital value of POT2 or POT4 input. Valid only furing VRST
+0200 - 02FF 2nd external RAM
+    0200 - 02CF lower screen character/graphics codes organised as 16 char x 13 rows
+    02D0 - 02FF RAM (not used by UVI, can be used by CPU)
 */
 
 #include "driver.h"
@@ -376,9 +376,9 @@ READ8_HANDLER(arcadia_video_r)
 		data=input_port_read(space->machine, "controller1_joy_x")<<3;
 	break;
     case 0x1ff:
-	if (arcadia_video.ad_select) 
+	if (arcadia_video.ad_select)
 		data=input_port_read(space->machine, "controller2_joy_y")<<3;
-	else 
+	else
 		data=input_port_read(space->machine, "controller2_joy_x")<<3;
 	break;
 #else
@@ -456,7 +456,7 @@ INLINE void arcadia_draw_char(running_machine *machine, bitmap_t *bitmap, UINT8 
 			      int y, int x)
 {
     int k,b,cc,sc, colour;
-    if (arcadia_video.multicolor) 
+    if (arcadia_video.multicolor)
 	{
 		if (charcode&0x40)
 			cc=((arcadia_video.reg.d.pal[1]>>3)&7);
@@ -468,7 +468,7 @@ INLINE void arcadia_draw_char(running_machine *machine, bitmap_t *bitmap, UINT8 
 		else
 			sc=(arcadia_video.reg.d.pal[0]&7);
 
-    } 
+    }
 	else
 	{
 	   cc=((arcadia_video.reg.d.pal[1]>>3)&1)|((charcode>>5)&6);
@@ -517,10 +517,10 @@ INLINE void arcadia_vh_draw_line(running_machine *machine, bitmap_t *bitmap,
 
     if (bitmap->height-arcadia_video.line<h)
 		h=bitmap->height-arcadia_video.line;
-    
+
 	plot_box(bitmap, 0, y, bitmap->width, h, (arcadia_video.reg.d.pal[1]&7));
     memset(arcadia_video.bg[y], 0, sizeof(arcadia_video.bg[0])*h);
-    
+
 	for (x=XPOS+arcadia_video.shift, j=0; j<16;j++,x+=8)
 	{
 		ch=chars1[j];
@@ -531,9 +531,9 @@ INLINE void arcadia_vh_draw_line(running_machine *machine, bitmap_t *bitmap,
 			switch (ch) {
 			case 0xc0: graphics=TRUE;break;
 			case 0x40: graphics=FALSE;break;
-//			case 0x80:
-//			alien invaders shields are empty 0x80
-//			    popmessage(5, "graphics code 0x80 used");
+//          case 0x80:
+//          alien invaders shields are empty 0x80
+//              popmessage(5, "graphics code 0x80 used");
 			}
 		}
 		if (graphics)
@@ -666,13 +666,13 @@ INTERRUPT_GEN( arcadia_video_line )
 
 		if (arcadia_video.charline<13)
 		{
-			if (((arcadia_video.line-arcadia_video.ypos)&(h-1))==0) 
+			if (((arcadia_video.line-arcadia_video.ypos)&(h-1))==0)
 			{
 				arcadia_vh_draw_line(device->machine, arcadia_video.bitmap, arcadia_video.charline*h+arcadia_video.ypos,
 					arcadia_video.reg.d.chars1[arcadia_video.charline]);
 			}
 		}
-		else 
+		else
 			if (arcadia_video.lines26 && (arcadia_video.charline<26))
 			{
 				if (((arcadia_video.line-arcadia_video.ypos)&(h-1))==0)

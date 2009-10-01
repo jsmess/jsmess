@@ -30,7 +30,7 @@ VIDEO_UPDATE( ac1 )
 {
 	int x,y;
 	const address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	
+
 	for(y = 0; y < 16; y++ )
 	{
 		for(x = 0; x < 64; x++ )
@@ -46,7 +46,7 @@ VIDEO_UPDATE( ac1_32 )
 {
 	int x,y;
 	const address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	
+
 	for(y = 0; y < 32; y++ )
 	{
 		for(x = 0; x < 64; x++ )

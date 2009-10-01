@@ -135,8 +135,8 @@ READ8_HANDLER(vectrex_via_r)
 	return via_r(via, offset);
 }
 
-WRITE8_HANDLER(vectrex_via_w) 
-{ 
+WRITE8_HANDLER(vectrex_via_w)
+{
 	const device_config *via = devtag_get_device(space->machine, "via6522_0");
 	attotime period;
 
@@ -160,7 +160,7 @@ WRITE8_HANDLER(vectrex_via_w)
 								  period);
 		break;
 	}
-	via_w(via, offset, data); 
+	via_w(via, offset, data);
 }
 
 
@@ -173,7 +173,7 @@ WRITE8_HANDLER(vectrex_via_w)
 static TIMER_CALLBACK(vectrex_refresh)
 {
 	/* Refresh only marks the range of vectors which will be drawn
-	 * during the next VIDEO_UPDATE. */
+     * during the next VIDEO_UPDATE. */
 	display_start = display_end;
 	display_end = vectrex_point_index;
 }
@@ -187,8 +187,8 @@ VIDEO_UPDATE(vectrex)
 
 	/* start black */
 	vector_add_point(screen->machine,
-					 vectrex_points[display_start].x, 
-					 vectrex_points[display_start].y, 
+					 vectrex_points[display_start].x,
+					 vectrex_points[display_start].y,
 					 vectrex_points[display_start].col,
 					 0);
 
@@ -230,9 +230,9 @@ void vectrex_add_point(int x, int y, rgb_t color, int intensity)
 void vectrex_add_point_stereo(int x, int y, rgb_t color, int intensity)
 {
 	if (vectrex_imager_status == 2) /* left = 1, right = 2 */
-		vectrex_add_point ((int)(y * M_SQRT1_2)+ x_center, 
-						   (int)(((x_max - x) * M_SQRT1_2)), 
-						   color, 
+		vectrex_add_point ((int)(y * M_SQRT1_2)+ x_center,
+						   (int)(((x_max - x) * M_SQRT1_2)),
+						   color,
 						   intensity);
 	else
 		vectrex_add_point ((int)(y * M_SQRT1_2),
@@ -266,7 +266,7 @@ static TIMER_CALLBACK(update_signal)
 
 	if (!ramp)
 	{
-		length = cputag_get_clock(machine, "maincpu") * INT_PER_CLOCK 
+		length = cputag_get_clock(machine, "maincpu") * INT_PER_CLOCK
 			* attotime_to_double(attotime_sub(timer_get_time(machine), vector_start_time));
 
 		x_int += length * (analog[A_X] + analog[A_ZR]);
@@ -306,7 +306,7 @@ VIDEO_START(vectrex)
 	vectrex_imager_freq = 1;
 
 	vectrex_imager_timer = timer_alloc(machine, vectrex_imager_eye, NULL);
-	timer_adjust_periodic(vectrex_imager_timer, 
+	timer_adjust_periodic(vectrex_imager_timer,
 						  ATTOTIME_IN_HZ(vectrex_imager_freq),
 						  2,
 						  ATTOTIME_IN_HZ(vectrex_imager_freq));
@@ -348,23 +348,23 @@ static WRITE8_DEVICE_HANDLER(v_via_pb_w)
 			if (lightpen_down)
 			{
 				/* Simple lin. algebra to check if pen is near
-				 * the line defined by (A_X,A_Y).
-				 * If that is the case, set a timer which goes
-				 * off when the beam reaches the pen. Exact
-				 * timing is important here.
-				 *
-				 *    lightpen
-				 *       ^
-				 *  _   /|
-				 *  b  / |
-				 *    /  |
-				 *   /   |d
-				 *  /    |
-				 * /     |
-				 * ------+---------> beam path
-				 *    l  |    _
-				 *            a
-				 */
+                 * the line defined by (A_X,A_Y).
+                 * If that is the case, set a timer which goes
+                 * off when the beam reaches the pen. Exact
+                 * timing is important here.
+                 *
+                 *    lightpen
+                 *       ^
+                 *  _   /|
+                 *  b  / |
+                 *    /  |
+                 *   /   |d
+                 *  /    |
+                 * /     |
+                 * ------+---------> beam path
+                 *    l  |    _
+                 *            a
+                 */
 				double a2, b2, ab, d2;
 				ab = (pen_x - x_int) * analog[A_X]
 					+(pen_y - y_int) * analog[A_Y];
@@ -447,12 +447,12 @@ static WRITE8_DEVICE_HANDLER(v_via_cb2_w)
 		if (vectrex_lightpen_port != 0)
 		{
 			lightpen_down = input_port_read(device->machine, "LPENCONF") & 0x10;
-			
+
 			if (lightpen_down)
 			{
 				pen_x = input_port_read(device->machine, "LPENX") * (x_max / 0xff);
 				pen_y = input_port_read(device->machine, "LPENY") * (y_max / 0xff);
-				
+
 				dx = abs(pen_x - x_int);
 				dy = abs(pen_y - y_int);
 				if (dx < 500000 && dy < 500000 && data > 0)

@@ -20,7 +20,7 @@
 
     TODO:
 
-	- move static variables to driver state
+    - move static variables to driver state
     - fix floppy interface
     - fix mouse
     - MSA disk image support
@@ -1846,7 +1846,7 @@ static MACHINE_DRIVER_START( atarist )
 	MDRV_ACIA6850_ADD("acia_1", acia_midi_intf)
 
 	MDRV_WD1772_ADD(WD1772_TAG, atarist_wd17xx_interface )
-	
+
 	MDRV_FLOPPY_2_DRIVES_ADD(atarist_floppy_config)
 
 	MDRV_IMPORT_FROM(atarist_cartslot)
@@ -1910,7 +1910,7 @@ static MACHINE_DRIVER_START( atariste )
 	MDRV_ACIA6850_ADD("acia_1", acia_midi_intf)
 
 	MDRV_WD1772_ADD(WD1772_TAG, atarist_wd17xx_interface )
-	
+
 	MDRV_FLOPPY_2_DRIVES_ADD(atarist_floppy_config)
 
 	MDRV_IMPORT_FROM(atarist_cartslot)
@@ -1968,7 +1968,7 @@ static MACHINE_DRIVER_START( stbook )
 	MDRV_ACIA6850_ADD("acia_1", acia_midi_intf)
 
 	MDRV_WD1772_ADD(WD1772_TAG, atarist_wd17xx_interface )
-	
+
 	MDRV_FLOPPY_2_DRIVES_ADD(atarist_floppy_config)
 
 	MDRV_IMPORT_FROM(atarist_cartslot)

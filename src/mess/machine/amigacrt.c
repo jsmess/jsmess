@@ -1,6 +1,6 @@
 /***************************************************************************
 
-	Amiga cartridge emulation
+    Amiga cartridge emulation
 
 TODO:
 - Investigate why the AR2/3 sometimes garble the video on exit from the cart
@@ -113,7 +113,7 @@ static WRITE16_HANDLER( amiga_ar1_chipmem_w )
 	if ( ((pc >> 16) & 0xff ) != 0xf0 )
 	{
 		/* if we're not, see if either the Spurious IRQ vector
-		   or the NMI vector are being overwritten */
+           or the NMI vector are being overwritten */
 		if ( offset == (0x60/2) || offset == (0x7c/2) )
 		{
 			/* trigger an NMI or spurious irq */
@@ -367,8 +367,8 @@ static void amiga_ar23_init( running_machine *machine, int ar3 )
 	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x440000, 0x44ffff, 0, 0, SMH_BANK(3));
 
 	/* Install Custom chip monitor */
-//	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xdff000, 0xdff1ff, 0, 0, amiga_ar23_custom_r);
-//	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xdff000, 0xdff1ff, 0, 0, amiga_ar23_custom_w);
+//  memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xdff000, 0xdff1ff, 0, 0, amiga_ar23_custom_r);
+//  memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xdff000, 0xdff1ff, 0, 0, amiga_ar23_custom_w);
 
 	/* Install status/mode handlers */
 	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400000, 0x400007, 0, mirror, amiga_ar23_mode_r);
@@ -387,7 +387,7 @@ static void amiga_ar23_init( running_machine *machine, int ar3 )
 
 /***************************************************************************
 
-	MAME/MESS hooks
+    MAME/MESS hooks
 
 ***************************************************************************/
 

@@ -8,16 +8,16 @@
     Nate Woods (current maintainer)
     Tim Lindner (VHD and other work)
 
-	Version information:
+    Version information:
 
-	Basic	Extended Basic	Disk Extended
-coco	1.0	-		-
-cocoe	1.1	1.0		1.0
-coco2	1.2	1.1		1.1
-coco2b	1.3	1.1		1.1
-coco3	1.2	2.0		1.1
-coco3p	1.2	2.0		1.1
-coco3h	1.2	2.0		1.1
+    Basic   Extended Basic  Disk Extended
+coco    1.0 -       -
+cocoe   1.1 1.0     1.0
+coco2   1.2 1.1     1.1
+coco2b  1.3 1.1     1.1
+coco3   1.2 2.0     1.1
+coco3p  1.2 2.0     1.1
+coco3h  1.2 2.0     1.1
 
 
 
@@ -542,7 +542,7 @@ static INPUT_PORTS_START( coco )
 	PORT_CONFSETTING(    0x01, "Cloud-9" )
 
 	/* Port Condition is used because you can plug Hi-Res joystick,
-	Rat Mouse and Lightgun in either ports, but not both */
+    Rat Mouse and Lightgun in either ports, but not both */
 	/* Fix me: should Rat Mouse and Diecom Light Gun be available also for coco & coco2? */
 	PORT_START("ctrl_sel")  /* Select Controller Type */
 	PORT_CATEGORY_CLASS( 0x0f, 0x01, "Right Controller Port (P1)") PORT_CHANGED( coco_joystick_mode_changed, 0 )
@@ -661,7 +661,7 @@ static INPUT_PORTS_START( coco3 )
 	PORT_CONFSETTING(    0x01, "Cloud-9" )
 
 	/* Port Condition is used because you can plug Hi-Res joystick,
-	Rat Mouse and Lightgun in either ports, but not both */
+    Rat Mouse and Lightgun in either ports, but not both */
 	/* Fix me: should Rat Mouse and Diecom Light Gun be available also for coco & coco2? */
 	PORT_START("ctrl_sel")  /* Select Controller Type */
 	PORT_CATEGORY_CLASS( 0x0f, 0x01, "Right Controller Port (P1)") PORT_CHANGED( coco_joystick_mode_changed, 0 )

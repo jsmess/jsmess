@@ -62,7 +62,7 @@ static MC6845_UPDATE_ROW( h19_update_row )
 		{
 			int x = (column * 8) + bit;
 			int color = BIT(data, 7) ? 1 : 0;
-				
+
 			*BITMAP_ADDR16(bitmap, y, x) = color;
 
 			data <<= 1;

@@ -48,12 +48,12 @@ void cbm700_vh_init(running_machine *machine)
 
 VIDEO_START( cbm700 )
 {
-	int i;	
+	int i;
 
     /* remove pixel column 9 for character codes 0 - 175 and 224 - 255 */
-	for( i = 0; i < 256; i++)	
+	for( i = 0; i < 256; i++)
 	{
-//		if( i < 176 || i > 223 )
+//      if( i < 176 || i > 223 )
 		{
 			int y;
 			for( y = 0; y < machine->gfx[0]->height; y++ ) {

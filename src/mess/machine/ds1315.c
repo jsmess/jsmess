@@ -1,10 +1,10 @@
 /*********************************************************************
 
-	ds1315.c
+    ds1315.c
 
-	Dallas Semiconductor's Phantom Time Chip DS1315.
+    Dallas Semiconductor's Phantom Time Chip DS1315.
 
-	by tim lindner, November 2001.
+    by tim lindner, November 2001.
 
 *********************************************************************/
 
@@ -193,8 +193,8 @@ WRITE8_DEVICE_HANDLER ( ds1315_w_data )
 static void ds1315_fill_raw_data(const device_config *device)
 {
 	/* This routine will (hopefully) call a standard 'C' library routine to get the current
-	   date and time and then fill in the raw data struct.
-	*/
+       date and time and then fill in the raw data struct.
+    */
 
 	mame_system_time systime;
 	ds1315_t *ds1315 = get_token(device);
@@ -231,11 +231,11 @@ static void ds1315_fill_raw_data(const device_config *device)
 static void ds1315_input_raw_data(const device_config *device)
 {
 	/* This routine is called when new date and time has been written to the
-	   clock chip. Currently we ignore setting the date and time in the clock
-	   chip.
+       clock chip. Currently we ignore setting the date and time in the clock
+       chip.
 
-	   We always return the host's time when asked.
-	*/
+       We always return the host's time when asked.
+    */
 }
 
 

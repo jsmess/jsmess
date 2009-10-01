@@ -1,6 +1,6 @@
 /***************************************************************************
 
-	Matsushita/Panasonic CDR521/522 type CDROM drive emulation
+    Matsushita/Panasonic CDR521/522 type CDROM drive emulation
 
 Notes:
 This version implements the drive found in Amiga CDTV. There are
@@ -30,7 +30,7 @@ can be expanded with support for the other drives as needed.
 typedef struct
 {
 	UINT8	enabled;		/* /ENABLE - Unit enabled */
-	UINT8	cmd_signal;		/* /CMD - Command mode	 */
+	UINT8	cmd_signal;		/* /CMD - Command mode   */
 	UINT8	stch_signal;	/* /STCH - Status Changed */
 	UINT8	sten_signal;	/* /STEN - Status Enabled */
 	UINT8	scor_signal;	/* /STEN - Subcode Ready */

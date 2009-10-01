@@ -1,11 +1,11 @@
 
 /************************************************************************
-	saa505x
+    saa505x
 
-	MESS Driver By:
+    MESS Driver By:
 
- 	Gordon Jefferyes
- 	mess_bbc@gjeffery.dircon.co.uk
+    Gordon Jefferyes
+    mess_bbc@gjeffery.dircon.co.uk
 
  ************************************************************************/
 

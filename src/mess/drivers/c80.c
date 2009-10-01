@@ -81,19 +81,19 @@ INPUT_PORTS_END
 static READ8_DEVICE_HANDLER( pio1_port_a_r )
 {
 	/*
-		
-		bit		description
 
-		PA0		keyboard row 0 input
-		PA1		keyboard row 1 input
-		PA2		keyboard row 2 input
-		PA3		
-		PA4		_BSTB input
-		PA5		display enable output (0=enabled, 1=disabled)
-		PA6		tape output
-		PA7		tape input
+        bit     description
 
-	*/
+        PA0     keyboard row 0 input
+        PA1     keyboard row 1 input
+        PA2     keyboard row 2 input
+        PA3
+        PA4     _BSTB input
+        PA5     display enable output (0=enabled, 1=disabled)
+        PA6     tape output
+        PA7     tape input
+
+    */
 
 	c80_state *state = device->machine->driver_data;
 
@@ -119,20 +119,20 @@ static READ8_DEVICE_HANDLER( pio1_port_a_r )
 static WRITE8_DEVICE_HANDLER( pio1_port_a_w )
 {
 	/*
-		
-		bit		description
 
-		PA0		keyboard row 0 input
-		PA1		keyboard row 1 input
-		PA2		keyboard row 2 input
-		PA3		
-		PA4		_BSTB input
-		PA5		display enable output (0=enabled, 1=disabled)
-		PA6		tape output
-		PA7		tape input
+        bit     description
 
-	*/
-	
+        PA0     keyboard row 0 input
+        PA1     keyboard row 1 input
+        PA2     keyboard row 2 input
+        PA3
+        PA4     _BSTB input
+        PA5     display enable output (0=enabled, 1=disabled)
+        PA6     tape output
+        PA7     tape input
+
+    */
+
 	c80_state *state = device->machine->driver_data;
 
 	state->pio1_a5 = BIT(data, 5);
@@ -148,19 +148,19 @@ static WRITE8_DEVICE_HANDLER( pio1_port_a_w )
 static WRITE8_DEVICE_HANDLER( pio1_port_b_w )
 {
 	/*
-		
-		bit		description
 
-		PB0		VQD30 segment A
-		PB1		VQD30 segment B
-		PB2		VQD30 segment C
-		PB3		VQD30 segment D
-		PB4		VQD30 segment E
-		PB5		VQD30 segment F
-		PB6		VQD30 segment G
-		PB7		VQD30 segment P
+        bit     description
 
-	*/
+        PB0     VQD30 segment A
+        PB1     VQD30 segment B
+        PB2     VQD30 segment C
+        PB3     VQD30 segment D
+        PB4     VQD30 segment E
+        PB5     VQD30 segment F
+        PB6     VQD30 segment G
+        PB7     VQD30 segment P
+
+    */
 
 	c80_state *state = device->machine->driver_data;
 
@@ -281,5 +281,5 @@ SYSTEM_CONFIG_END
 
 /* System Drivers */
 
-/*    YEAR	NAME	PARENT	COMPAT	MACHINE	INPUT	INIT	CONFIG	COMPANY				FULLNAME	FLAGS */
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY             FULLNAME    FLAGS */
 COMP( 1986, c80,	0,		0,		c80,	c80,	0,		c80,	"Joachim Czepa",	"C-80",		GAME_SUPPORTS_SAVE )

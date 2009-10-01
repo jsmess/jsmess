@@ -46,35 +46,35 @@ The keyboard matrix:
    |         |       |        |        |    |    |    |         |
    |         |       |        |        |    |    |    |         |
 
-  
+
 
 NTS information from http://web.archive.org/web/19980205154137/nts.dreamwriter.com/dreamwt4.html:
 
 File Management & Memory:
 
-· Uniquely name up to 128 files
-· Recall, rename or delete files
-· Copy files to and from PCMCIA Memory card
-· PCMCIA Memory expansion cards available for 60 or 250 pages of text
-· Working memory allows up to 20 pages of text (50KB) to be displayed
-· Storage memory allows up to 80 pages of text (128KB) in total
-· DreamLink software exports and imports documents in RTF retaining all
+?? Uniquely name up to 128 files
+?? Recall, rename or delete files
+?? Copy files to and from PCMCIA Memory card
+?? PCMCIA Memory expansion cards available for 60 or 250 pages of text
+?? Working memory allows up to 20 pages of text (50KB) to be displayed
+?? Storage memory allows up to 80 pages of text (128KB) in total
+?? DreamLink software exports and imports documents in RTF retaining all
   formatting to Macintosh or Windows PC to all commonly used Word Processing programs
-· Transfer cable provided compatible to both Macintosh and Windows PC's. 
-· T400 is field upgradeable to IR with the optional Infrared module.
+?? Transfer cable provided compatible to both Macintosh and Windows PC's.
+?? T400 is field upgradeable to IR with the optional Infrared module.
 
 Hardware:
 
-· LCD Screen displays 8 lines by 80 characters raised and tilted 30 degrees
-· Contrast Dial and feet adjust to user preference
-· Parallel and Serial ports( IR Upgrade Optional) for connectivity to printers, Macintosh and Windows PC's
-· Full size 64 key keyboard with color coded keys and quick reference menu bar
-· NiCad rechargeable batteries for up to 8 hours of continuous use prior to recharging
-· AC adapter for recharging batteries is lightweight and compact design
-· NEC V20HL 9.83 MHz processor for fast response time
-· Durable solid state construction weighing 2.2 lbs including battery pack
-· Dimensions approximately 11" wide by 8" long by 1" deep
-· FCC and CSA approved
+?? LCD Screen displays 8 lines by 80 characters raised and tilted 30 degrees
+?? Contrast Dial and feet adjust to user preference
+?? Parallel and Serial ports( IR Upgrade Optional) for connectivity to printers, Macintosh and Windows PC's
+?? Full size 64 key keyboard with color coded keys and quick reference menu bar
+?? NiCad rechargeable batteries for up to 8 hours of continuous use prior to recharging
+?? AC adapter for recharging batteries is lightweight and compact design
+?? NEC V20HL 9.83 MHz processor for fast response time
+?? Durable solid state construction weighing 2.2 lbs including battery pack
+?? Dimensions approximately 11" wide by 8" long by 1" deep
+?? FCC and CSA approved
 
 
 I/O Map:
@@ -253,7 +253,7 @@ static void nakajies_update_irqs( running_machine *machine )
 	else
 	{
 		cpu_set_input_line( state->cpu, 0, CLEAR_LINE );
-	} 
+	}
 }
 
 

@@ -174,7 +174,7 @@ PALETTE_INIT( odyssey2 )
 {
 	int i;
 
-	for ( i = 0; i < 24; i++ ) 
+	for ( i = 0; i < 24; i++ )
 	{
 		palette_set_color_rgb( machine, i, odyssey2_colors[i*3], odyssey2_colors[i*3+1], odyssey2_colors[i*3+2] );
 	}
@@ -191,7 +191,7 @@ READ8_HANDLER( odyssey2_video_r )
 			iff = 0;
 			cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 			control_status &= ~ 0x08;
-			if ( video_screen_get_hpos( space->machine->primary_screen ) < I824X_START_ACTIVE_SCAN || video_screen_get_hpos( space->machine->primary_screen ) > I824X_END_ACTIVE_SCAN ) 
+			if ( video_screen_get_hpos( space->machine->primary_screen ) < I824X_START_ACTIVE_SCAN || video_screen_get_hpos( space->machine->primary_screen ) > I824X_END_ACTIVE_SCAN )
 			{
 				data |= 1;
 			}
@@ -216,14 +216,14 @@ READ8_HANDLER( odyssey2_video_r )
 
         case 0xa5:
 
-            if ((o2_vdc.s.control & VDC_CONTROL_REG_STROBE_XY)) 
+            if ((o2_vdc.s.control & VDC_CONTROL_REG_STROBE_XY))
 			{
                 x_beam_pos = video_screen_get_hpos( space->machine->primary_screen );
-				if ( x_beam_pos < I824X_START_ACTIVE_SCAN ) 
+				if ( x_beam_pos < I824X_START_ACTIVE_SCAN )
 				{
 					x_beam_pos = x_beam_pos - I824X_START_ACTIVE_SCAN + I824X_LINE_CLOCKS;
-				} 
-				else 
+				}
+				else
 				{
 					x_beam_pos = x_beam_pos - I824X_START_ACTIVE_SCAN;
 				}
@@ -253,11 +253,11 @@ WRITE8_HANDLER( odyssey2_video_w )
         {
             /* Toggling strobe bit, tuck away values */
             x_beam_pos = video_screen_get_hpos( space->machine->primary_screen );
-			if ( x_beam_pos < I824X_START_ACTIVE_SCAN ) 
+			if ( x_beam_pos < I824X_START_ACTIVE_SCAN )
 			{
 				x_beam_pos = x_beam_pos - I824X_START_ACTIVE_SCAN + 228;
-			} 
-			else 
+			}
+			else
 			{
 				x_beam_pos = x_beam_pos - I824X_START_ACTIVE_SCAN;
 			}
@@ -277,16 +277,16 @@ WRITE8_HANDLER( odyssey2_video_w )
     o2_vdc.reg[offset] = data;
 }
 
-WRITE8_HANDLER ( odyssey2_lum_w ) 
+WRITE8_HANDLER ( odyssey2_lum_w )
 {
 	lum = data;
 }
 
 READ8_HANDLER( odyssey2_t1_r )
 {
-	if ( video_screen_get_vpos( space->machine->primary_screen ) > start_vpos && video_screen_get_vpos( space->machine->primary_screen ) < start_vblank ) 
+	if ( video_screen_get_vpos( space->machine->primary_screen ) > start_vpos && video_screen_get_vpos( space->machine->primary_screen ) < start_vblank )
 	{
-		if ( video_screen_get_hpos( space->machine->primary_screen ) >= I824X_START_ACTIVE_SCAN && video_screen_get_hpos( space->machine->primary_screen ) < I824X_END_ACTIVE_SCAN ) 
+		if ( video_screen_get_hpos( space->machine->primary_screen ) >= I824X_START_ACTIVE_SCAN && video_screen_get_hpos( space->machine->primary_screen ) < I824X_END_ACTIVE_SCAN )
 		{
 			return 1;
 		}
@@ -294,7 +294,7 @@ READ8_HANDLER( odyssey2_t1_r )
 	return 0;
 }
 
-static TIMER_CALLBACK( i824x_scanline_callback ) 
+static TIMER_CALLBACK( i824x_scanline_callback )
 {
 	UINT8	collision_map[160];
 	int		vpos = video_screen_get_vpos( machine->primary_screen );
@@ -302,12 +302,12 @@ static TIMER_CALLBACK( i824x_scanline_callback )
 	if ( vpos < start_vpos )
 		return;
 
-	if ( vpos == start_vpos ) 
+	if ( vpos == start_vpos )
 	{
 		control_status &= ~0x08;
 	}
 
-	if ( vpos < start_vblank ) 
+	if ( vpos < start_vblank )
 	{
 		rectangle rect;
 		int	sprite_width[4] = { 8, 8, 8, 8 };
@@ -325,7 +325,7 @@ static TIMER_CALLBACK( i824x_scanline_callback )
 		memset( collision_map, 0, sizeof( collision_map ) );
 
 		/* Display grid if enabled */
-		if ( o2_vdc.s.control & 0x08 ) 
+		if ( o2_vdc.s.control & 0x08 )
 		{
 			UINT16	color = ( o2_vdc.s.color & 7 ) | ( ( o2_vdc.s.color >> 3 ) & 0x08 ) | ( ( lum << 3 ) ^ 0x08 );
 			int		x_grid_offset = 8;
@@ -336,15 +336,15 @@ static TIMER_CALLBACK( i824x_scanline_callback )
 			int		j, k, y;
 
 			/* Draw horizontal part of grid */
-			for ( j = 1, y = 0; y < 9; y++, j <<= 1 ) 
+			for ( j = 1, y = 0; y < 9; y++, j <<= 1 )
 			{
-				if ( y_grid_offset + y * height <= ( vpos - start_vpos ) && ( vpos - start_vpos ) < y_grid_offset + y * height + 3 ) 
+				if ( y_grid_offset + y * height <= ( vpos - start_vpos ) && ( vpos - start_vpos ) < y_grid_offset + y * height + 3 )
 				{
-					for ( i = 0; i < 9; i++ ) 
+					for ( i = 0; i < 9; i++ )
 					{
-						if ( ( o2_vdc.s.hgrid[0][i] & j ) || ( o2_vdc.s.hgrid[1][i] & ( j >> 8 ) ) ) 
+						if ( ( o2_vdc.s.hgrid[0][i] & j ) || ( o2_vdc.s.hgrid[1][i] & ( j >> 8 ) ) )
 						{
-							for ( k = 0; k < width + 2; k++ ) 
+							for ( k = 0; k < width + 2; k++ )
 							{
 								int px = x_grid_offset + i * width + k;
 								collision_map[ px ] |= COLLISION_HORIZ_GRID_DOTS;
@@ -356,25 +356,25 @@ static TIMER_CALLBACK( i824x_scanline_callback )
 			}
 
 			/* Draw vertical part of grid */
-			for( j = 1, y = 0; y < 8; y++, j <<= 1 ) 
+			for( j = 1, y = 0; y < 8; y++, j <<= 1 )
 			{
-				if ( y_grid_offset + y * height <= ( vpos - start_vpos ) && ( vpos - start_vpos ) < y_grid_offset + ( y + 1 ) * height ) 
+				if ( y_grid_offset + y * height <= ( vpos - start_vpos ) && ( vpos - start_vpos ) < y_grid_offset + ( y + 1 ) * height )
 				{
-					for ( i = 0; i < 10; i++ ) 
+					for ( i = 0; i < 10; i++ )
 					{
-						if ( o2_vdc.s.vgrid[i] & j ) 
+						if ( o2_vdc.s.vgrid[i] & j )
 						{
-							for ( k = 0; k < w; k++ ) 
+							for ( k = 0; k < w; k++ )
 							{
 								int px = x_grid_offset + i * width + k;
 
 								/* Check if we collide with an already drawn source object */
-								if ( collision_map[ px ] & o2_vdc.s.collision ) 
+								if ( collision_map[ px ] & o2_vdc.s.collision )
 								{
 									collision_status |= COLLISION_VERTICAL_GRID;
 								}
 								/* Check if an already drawn object would collide with us */
-								if ( COLLISION_VERTICAL_GRID & o2_vdc.s.collision && collision_map[ px ] ) 
+								if ( COLLISION_VERTICAL_GRID & o2_vdc.s.collision && collision_map[ px ] )
 								{
 									collision_status |= collision_map[ px ];
 								}
@@ -388,15 +388,15 @@ static TIMER_CALLBACK( i824x_scanline_callback )
 		}
 
 		/* Display objects if enabled */
-		if ( o2_vdc.s.control & 0x20 ) 
+		if ( o2_vdc.s.control & 0x20 )
 		{
 			/* Regular foreground objects */
-			for ( i = 0; i < ARRAY_LENGTH( o2_vdc.s.foreground ); i++ ) 
+			for ( i = 0; i < ARRAY_LENGTH( o2_vdc.s.foreground ); i++ )
 			{
 				int	y = o2_vdc.s.foreground[i].y;
 				int	height = 8 - ( ( ( y >> 1 ) + o2_vdc.s.foreground[i].ptr ) & 7 );
 
-				if ( y <= ( vpos - start_vpos ) && ( vpos - start_vpos ) < y + height * 2 ) 
+				if ( y <= ( vpos - start_vpos ) && ( vpos - start_vpos ) < y + height * 2 )
 				{
 					UINT16	color = 16 + ( ( o2_vdc.s.foreground[i].color & 0x0E ) >> 1 );
 					int		offset = ( o2_vdc.s.foreground[i].ptr | ( ( o2_vdc.s.foreground[i].color & 0x01 ) << 8 ) ) + ( y >> 1 ) + ( ( vpos - start_vpos - y ) >> 1 );
@@ -404,19 +404,19 @@ static TIMER_CALLBACK( i824x_scanline_callback )
 					int		x = o2_vdc.s.foreground[i].x;
 					UINT8	m;
 
-					for ( m = 0x80; m > 0; m >>= 1, x++ ) 
+					for ( m = 0x80; m > 0; m >>= 1, x++ )
 					{
-						if ( chr & m ) 
+						if ( chr & m )
 						{
-							if ( x >= 0 && x < 160 ) 
+							if ( x >= 0 && x < 160 )
 							{
 								/* Check if we collide with an already drawn source object */
-								if ( collision_map[ x ] & o2_vdc.s.collision ) 
+								if ( collision_map[ x ] & o2_vdc.s.collision )
 								{
 									collision_status |= COLLISION_CHARACTERS;
 								}
 								/* Check if an already drawn object would collide with us */
-								if ( COLLISION_CHARACTERS & o2_vdc.s.collision && collision_map[ x ] ) 
+								if ( COLLISION_CHARACTERS & o2_vdc.s.collision && collision_map[ x ] )
 								{
 									collision_status |= collision_map[ x ];
 								}
@@ -429,38 +429,38 @@ static TIMER_CALLBACK( i824x_scanline_callback )
 			}
 
 			/* Quad objects */
-			for ( i = 0; i < ARRAY_LENGTH( o2_vdc.s.quad ); i++ ) 
+			for ( i = 0; i < ARRAY_LENGTH( o2_vdc.s.quad ); i++ )
 			{
 				int y = o2_vdc.s.quad[i].single[0].y;
 				int height = 8;
 
-				if ( y <= ( vpos - start_vpos ) && ( vpos - start_vpos ) < y + height * 2 ) 
+				if ( y <= ( vpos - start_vpos ) && ( vpos - start_vpos ) < y + height * 2 )
 				{
 					int	x = o2_vdc.s.quad[i].single[0].x;
 					int j;
 
-					for ( j = 0; j < ARRAY_LENGTH( o2_vdc.s.quad[0].single ); j++, x += 8 ) 
+					for ( j = 0; j < ARRAY_LENGTH( o2_vdc.s.quad[0].single ); j++, x += 8 )
 					{
 						int		char_height = 8 - ( ( ( y >> 1 ) + o2_vdc.s.quad[i].single[j].ptr ) & 7 );
-						if ( y <= ( vpos - start_vpos ) && ( vpos - start_vpos ) < y + char_height * 2 ) 
+						if ( y <= ( vpos - start_vpos ) && ( vpos - start_vpos ) < y + char_height * 2 )
 						{
 							UINT16 color = 16 + ( ( o2_vdc.s.quad[i].single[j].color & 0x0E ) >> 1 );
 							int	offset = ( o2_vdc.s.quad[i].single[j].ptr | ( ( o2_vdc.s.quad[i].single[j].color & 0x01 ) << 8 ) ) + ( y >> 1 ) + ( ( vpos - start_vpos - y ) >> 1 );
 							UINT8	chr = ((char*)o2_shape)[ offset & 0x1FF ];
 							UINT8	m;
-							for ( m = 0x80; m > 0; m >>= 1, x++ ) 
+							for ( m = 0x80; m > 0; m >>= 1, x++ )
 							{
-								if ( chr & m ) 
+								if ( chr & m )
 								{
-									if ( x >= 0 && x < 160 ) 
+									if ( x >= 0 && x < 160 )
 									{
 										/* Check if we collide with an already drawn source object */
-										if ( collision_map[ x ] & o2_vdc.s.collision ) 
+										if ( collision_map[ x ] & o2_vdc.s.collision )
 										{
 											collision_status |= COLLISION_CHARACTERS;
 										}
 										/* Check if an already drawn object would collide with us */
-										if ( COLLISION_CHARACTERS & o2_vdc.s.collision && collision_map[ x ] ) 
+										if ( COLLISION_CHARACTERS & o2_vdc.s.collision && collision_map[ x ] )
 										{
 											collision_status |= collision_map[ x ];
 										}
@@ -469,8 +469,8 @@ static TIMER_CALLBACK( i824x_scanline_callback )
 									}
 								}
 							}
-						} 
-						else 
+						}
+						else
 						{
 							x += 8;
 						}
@@ -479,15 +479,15 @@ static TIMER_CALLBACK( i824x_scanline_callback )
 			}
 
 			/* Sprites */
-			for ( i = 0; i < ARRAY_LENGTH( o2_vdc.s.sprites ); i++ ) 
+			for ( i = 0; i < ARRAY_LENGTH( o2_vdc.s.sprites ); i++ )
 			{
 				int y = o2_vdc.s.sprites[i].y;
 				int height = 8;
-				if ( o2_vdc.s.sprites[i].color & 4 ) 
+				if ( o2_vdc.s.sprites[i].color & 4 )
 				{
 					/* Zoomed sprite */
 					sprite_width[i] = 16;
-					if ( y <= ( vpos - start_vpos ) && ( vpos - start_vpos ) < y + height * 4 ) 
+					if ( y <= ( vpos - start_vpos ) && ( vpos - start_vpos ) < y + height * 4 )
 					{
 						UINT16 color = 16 + ( ( o2_vdc.s.sprites[i].color >> 3 ) & 0x07 );
 						UINT8	chr = o2_vdc.s.shape[i][ ( ( vpos - start_vpos - y ) >> 2 ) ];
@@ -496,32 +496,32 @@ static TIMER_CALLBACK( i824x_scanline_callback )
 
 						for ( m = 0x01; m > 0; m <<= 1, x += 2 )
 						{
-							if ( chr & m ) 
+							if ( chr & m )
 							{
-								if ( x >= 0 && x < 160 ) 
+								if ( x >= 0 && x < 160 )
 								{
 									/* Check if we collide with an already drawn source object */
-									if ( collision_map[ x ] & o2_vdc.s.collision ) 
+									if ( collision_map[ x ] & o2_vdc.s.collision )
 									{
 										collision_status |= ( 1 << i );
 									}
 									/* Check if an already drawn object would collide with us */
-									if ( ( 1 << i ) & o2_vdc.s.collision && collision_map[ x ] ) 
+									if ( ( 1 << i ) & o2_vdc.s.collision && collision_map[ x ] )
 									{
 										collision_status |= collision_map[ x ];
 									}
 									collision_map[ x ] |= ( 1 << i );
 									*BITMAP_ADDR16( tmp_bitmap, vpos, I824X_START_ACTIVE_SCAN + x ) = color;
 								}
-								if ( x >= -1 && x < 159 ) 
+								if ( x >= -1 && x < 159 )
 								{
 									/* Check if we collide with an already drawn source object */
-									if ( collision_map[ x ] & o2_vdc.s.collision ) 
+									if ( collision_map[ x ] & o2_vdc.s.collision )
 									{
 										collision_status |= ( 1 << i );
 									}
 									/* Check if an already drawn object would collide with us */
-									if ( ( 1 << i ) & o2_vdc.s.collision && collision_map[ x ] ) 
+									if ( ( 1 << i ) & o2_vdc.s.collision && collision_map[ x ] )
 									{
 										collision_status |= collision_map[ x ];
 									}
@@ -531,30 +531,30 @@ static TIMER_CALLBACK( i824x_scanline_callback )
 							}
 						}
 					}
-				} 
-				else 
+				}
+				else
 				{
 					/* Regular sprite */
-					if ( y <= ( vpos - start_vpos ) && ( vpos - start_vpos ) < y + height * 2 ) 
+					if ( y <= ( vpos - start_vpos ) && ( vpos - start_vpos ) < y + height * 2 )
 					{
 						UINT16 color = 16 + ( ( o2_vdc.s.sprites[i].color >> 3 ) & 0x07 );
 						UINT8	chr = o2_vdc.s.shape[i][ ( ( vpos - start_vpos - y ) >> 1 ) ];
 						int		x = o2_vdc.s.sprites[i].x;
 						UINT8	m;
 
-						for ( m = 0x01; m > 0; m <<= 1, x++ ) 
+						for ( m = 0x01; m > 0; m <<= 1, x++ )
 						{
 							if ( chr & m )
 							 {
-								if ( x >= 0 && x < 160 ) 
+								if ( x >= 0 && x < 160 )
 								{
 									/* Check if we collide with an already drawn source object */
-									if ( collision_map[ x ] & o2_vdc.s.collision ) 
+									if ( collision_map[ x ] & o2_vdc.s.collision )
 									{
 										collision_status |= ( 1 << i );
 									}
 									/* Check if an already drawn object would collide with us */
-									if ( ( 1 << i ) & o2_vdc.s.collision && collision_map[ x ] ) 
+									if ( ( 1 << i ) & o2_vdc.s.collision && collision_map[ x ] )
 									{
 										collision_status |= collision_map[ x ];
 									}
@@ -570,10 +570,10 @@ static TIMER_CALLBACK( i824x_scanline_callback )
 	}
 
 	/* Check for start of VBlank */
-	if ( vpos == start_vblank ) 
+	if ( vpos == start_vblank )
 	{
 		control_status |= 0x08;
-		if ( ! iff ) 
+		if ( ! iff )
 		{
 			cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
 			iff = 1;
@@ -581,14 +581,14 @@ static TIMER_CALLBACK( i824x_scanline_callback )
 	}
 }
 
-static TIMER_CALLBACK( i824x_hblank_callback ) 
+static TIMER_CALLBACK( i824x_hblank_callback )
 {
 	int vpos = video_screen_get_vpos( machine->primary_screen );
 
 	if ( vpos < start_vpos - 1 )
 		return;
 
-	if ( vpos < start_vblank - 1 ) 
+	if ( vpos < start_vblank - 1 )
 	{
 		control_status |= 0x01;
 	}
@@ -684,12 +684,12 @@ STREAM_UPDATE( odyssey2_sh_update )
 				}
 				/* Noise poly is : L=16 W=2 10000000000100001 */
 				lfsr = ( lfsr >> 1 ) | ( ( ( lfsr & 0x01 ) ^ ( ( lfsr & 0x800 ) >> 11 ) ) << 15 );
-				if ( ! lfsr ) 
+				if ( ! lfsr )
 				{
 					lfsr = 0xFFFF;
 				}
 				/* Check if noise should be applied */
-				if ( o2_vdc.s.sound & 0x10 ) 
+				if ( o2_vdc.s.sound & 0x10 )
 				{
 					*buffer |= ( lfsr & 0x01 );
 				}
@@ -719,7 +719,7 @@ STREAM_UPDATE( odyssey2_sh_update )
 }
 
 /*
-	Thomson EF9340/EF9341 extra chips in the g7400
+    Thomson EF9340/EF9341 extra chips in the g7400
  */
 
 static struct {
@@ -734,39 +734,39 @@ static struct {
 	UINT8	ram[1024];
 } ef9341;
 
-INLINE UINT16 ef9341_get_c_addr( void ) 
+INLINE UINT16 ef9341_get_c_addr( void )
 {
-	if ( ( ef9341.Y & 0x0C ) == 0x0C ) 
+	if ( ( ef9341.Y & 0x0C ) == 0x0C )
 	{
 		return 0x318 | ( ( ef9341.X & 0x38 ) << 2 ) | ( ef9341.X & 0x07 );
 	}
-	if ( ef9341.X & 0x20 ) 
+	if ( ef9341.X & 0x20 )
 	{
 		return 0x300 | ( ( ef9341.Y & 0x07 ) << 5 ) | ( ef9341.Y & 0x18 ) | ( ef9341.X & 0x07 );
 	}
 	return ( ef9341.Y << 5 ) | ef9341.X;
 }
 
-INLINE void ef9341_inc_c( void ) 
+INLINE void ef9341_inc_c( void )
 {
 	ef9341.X++;
-	if ( ef9341.X >= 40 ) 
+	if ( ef9341.X >= 40 )
 	{
 		ef9341.Y = ( ef9341.Y + 1 ) % 24;
 	}
 }
 
-void ef9341_w( int command, int b, UINT8 data ) 
+void ef9341_w( int command, int b, UINT8 data )
 {
 	logerror("ef9341 %s write, t%s, data %02X\n", command ? "command" : "data", b ? "B" : "A", data );
 
-	if ( command ) 
+	if ( command )
 	{
-		if ( b ) 
+		if ( b )
 		{
 			ef9341.TB = data;
 			ef9341.busy = 0x80;
-			switch( ef9341.TB & 0xE0 ) 
+			switch( ef9341.TB & 0xE0 )
 			{
 			case 0x00:	/* Begin row */
 				ef9341.X = 0;
@@ -792,19 +792,19 @@ void ef9341_w( int command, int b, UINT8 data )
 				break;
 			}
 			ef9341.busy = 0;
-		} 
-		else 
+		}
+		else
 		{
 			ef9341.TA = data;
 		}
-	} 
-	else 
+	}
+	else
 	{
-		if ( b ) 
+		if ( b )
 		{
 			ef9341.TB = data;
 			ef9341.busy = 0x80;
-			switch ( ef9341.M & 0xE0 ) 
+			switch ( ef9341.M & 0xE0 )
 			{
 			case 0x00:	/* Write */
 				ef9341.ram[ ef9341_get_c_addr() ] = ef9341.TB;
@@ -822,38 +822,38 @@ void ef9341_w( int command, int b, UINT8 data )
 				break;
 			}
 			ef9341.busy = 0;
-		} 
-		else 
+		}
+		else
 		{
 			ef9341.TA = data;
 		}
 	}
 }
 
-UINT8 ef9341_r( int command, int b ) 
+UINT8 ef9341_r( int command, int b )
 {
 	UINT8	data = 0xFF;
 
 	logerror("ef9341 %s read, t%s\n", command ? "command" : "data", b ? "B" : "A" );
-	if ( command ) 
+	if ( command )
 	{
-		if ( b ) 
+		if ( b )
 		{
 			data = 0xFF;
-		} 
-		else 
+		}
+		else
 		{
 			data = ef9341.busy;
 		}
-	} 
-	else 
+	}
+	else
 	{
-		if ( b ) 
+		if ( b )
 		{
 			data = ef9341.TB;
 			ef9341.busy = 0x80;
-		} 
-		else 
+		}
+		else
 		{
 			data = ef9341.TA;
 		}

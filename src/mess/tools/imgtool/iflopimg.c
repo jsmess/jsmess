@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	iflopimg.c
+    iflopimg.c
 
-	Bridge code for Imgtool into the standard floppy code
+    Bridge code for Imgtool into the standard floppy code
 
 *********************************************************************/
 
@@ -39,7 +39,7 @@ imgtoolerr_t imgtool_floppy_error(floperr_t err)
 
 
 /*********************************************************************
-	Imgtool ioprocs
+    Imgtool ioprocs
 *********************************************************************/
 
 static void imgtool_floppy_closeproc(void *file)
@@ -90,7 +90,7 @@ static const struct io_procs imgtool_noclose_ioprocs =
 
 
 /*********************************************************************
-	Imgtool handlers
+    Imgtool handlers
 *********************************************************************/
 
 struct imgtool_floppy_image

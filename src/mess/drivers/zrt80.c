@@ -1,5 +1,5 @@
 /***************************************************************************
-   
+
         DEC ZRT-80
 
         12/05/2009 Skeleton driver.
@@ -20,7 +20,7 @@ static ADDRESS_MAP_START(zrt80_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x4000, 0x43ff) AM_RAM	// Board RAM
 	// Normaly video RAM is 0x800 but could be expanded up to 8K
 	AM_RANGE(0xc000, 0xdfff) AM_RAM	 AM_BASE(&video_ram) // Video RAM
-	
+
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( zrt80_io , ADDRESS_SPACE_IO, 8)
@@ -50,7 +50,7 @@ static INPUT_PORTS_START( zrt80 )
 		PORT_DIPSETTING(    0x00, "Alternate Keyboard" )
 		PORT_DIPNAME( 0x10, 0x10, "Horizontal Sync" )
 		PORT_DIPSETTING(    0x10, "Negative" )
-		PORT_DIPSETTING(    0x00, "Positive" ) 
+		PORT_DIPSETTING(    0x00, "Positive" )
 		PORT_DIPNAME( 0x20, 0x20, "CPU" )
 		PORT_DIPSETTING(    0x20, "Operating" )
 		PORT_DIPSETTING(    0x00, "Reset" )
@@ -59,7 +59,7 @@ static INPUT_PORTS_START( zrt80 )
 		PORT_DIPSETTING(    0x00, "Positive" )
 		PORT_DIPNAME( 0x80, 0x00, "Beeper" )
 		PORT_DIPSETTING(    0x80, "Silent" )
-		PORT_DIPSETTING(    0x00, "Enable" ) 
+		PORT_DIPSETTING(    0x00, "Enable" )
 	PORT_START("DIPSW2")
 		PORT_DIPNAME( 0x0f, 0x05, "Baud rate" )
 		PORT_DIPSETTING(    0x00, "50" )
@@ -88,12 +88,12 @@ static INPUT_PORTS_START( zrt80 )
 		PORT_DIPSETTING(    0x00, "XON/XOFF" )
 		PORT_DIPNAME( 0x80, 0x80, "Line Feed" )
 		PORT_DIPSETTING(    0x80, "No LF on CR" )
-		PORT_DIPSETTING(    0x00, "Auto" ) 
+		PORT_DIPSETTING(    0x00, "Auto" )
 	PORT_START("DIPSW3")
 		PORT_DIPNAME( 0x07, 0x07, "Video" )
 		PORT_DIPSETTING(    0x00, "96 x 24 15750Hz, 50Hz" )
 		PORT_DIPSETTING(    0x01, "80 x 48 15750Hz, 50Hz" )
-		PORT_DIPSETTING(    0x02, "80 x 24 15750Hz, 50Hz" )		
+		PORT_DIPSETTING(    0x02, "80 x 24 15750Hz, 50Hz" )
 		PORT_DIPSETTING(    0x03, "96 x 24 15750Hz, 60Hz" )
 		PORT_DIPSETTING(    0x04, "80 x 48 18700Hz, 50Hz" )
 		PORT_DIPSETTING(    0x05, "80 x 24 17540Hz, 60Hz" )
@@ -112,12 +112,12 @@ static INPUT_PORTS_START( zrt80 )
 		PORT_DIPSETTING(    0x00, "Half" )
 		PORT_DIPNAME( 0x80, 0x80, "Wraparound" )
 		PORT_DIPSETTING(    0x80, "Disabled" )
-		PORT_DIPSETTING(    0x00, "Enabled" ) 
+		PORT_DIPSETTING(    0x00, "Enabled" )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(zrt80) 
-{	
+static MACHINE_RESET(zrt80)
+{
 }
 
 static VIDEO_START( zrt80 )
@@ -150,7 +150,7 @@ static MC6845_UPDATE_ROW( zrt80_update_row )
 			if (input_port_read(device->machine, "DIPSW1") & 0x04) {
 				color = color ? 0 : 1;
 			}
-				
+
 			*BITMAP_ADDR16(bitmap, y, x) = color;
 
 			data <<= 1;
@@ -189,10 +189,10 @@ static MACHINE_DRIVER_START( zrt80 )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_2_4576MHz)
     MDRV_CPU_PROGRAM_MAP(zrt80_mem)
-    MDRV_CPU_IO_MAP(zrt80_io)	
+    MDRV_CPU_IO_MAP(zrt80_io)
 
     MDRV_MACHINE_RESET(zrt80)
-	
+
     /* video hardware */
     /* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -204,11 +204,11 @@ static MACHINE_DRIVER_START( zrt80 )
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(black_and_white)
 
-	MDRV_MC6845_ADD("crtc", MC6845, XTAL_20MHz / 8, zrt80_crtc6845_interface) 
+	MDRV_MC6845_ADD("crtc", MC6845, XTAL_20MHz / 8, zrt80_crtc6845_interface)
 
     MDRV_VIDEO_START(zrt80)
     MDRV_VIDEO_UPDATE(zrt80)
-    
+
     MDRV_INS8250_ADD( "ins8250", zrt80_com_interface )
 MACHINE_DRIVER_END
 

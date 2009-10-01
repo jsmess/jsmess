@@ -326,12 +326,12 @@ static void k1ge_draw( const device_config *device, int line )
 		}
 
 		for( i = 0; i < k1ge->wba_h; i++ )
-		{       
+		{
 			p[i] = oowcol;
 		}
 
 		for( i = k1ge->wba_h + k1ge->wsi_h; i < 160; i++ )
-		{       
+		{
 			p[i] = oowcol;
 		}
 	}

@@ -1,70 +1,70 @@
 /******************************************************************************************
 
-	Kyocera Kyotronics 85 (and similar laptop computers)
-	
-	2009/04 Very Preliminary Driver (video emulation courtesy of very old code by 
-	        Hamish Coleman)
+    Kyocera Kyotronics 85 (and similar laptop computers)
 
-	Comments about bit usage from Tech References and Virtual T source.
+    2009/04 Very Preliminary Driver (video emulation courtesy of very old code by
+            Hamish Coleman)
 
-	Supported systems:
-	  - Kyosei Kyotronic 85
-	  - Olivetti M10 (slightly diff hw, BIOS is shifted by 2 words)
-	  - NEC PC-8201A (slightly diff hw)
-	  - TRS-80 Model 100
-	  - Tandy Model 102 (slightly diff hw)
-	  - Tandy Model 200 (diff video & rtc)
-	
-	To Do:
-	  - Find dumps of systems which could easily be added:
-		* Olivetti M10 Modem (US) (diff BIOS than the European version)
-		* NEC PC-8201 (original Japanese version of PC-8201A)
-		* NEC PC-8300 (similar hardware to PC-8201)
-		* NEC PC-8300 w/BradyWriter II ROMs
+    Comments about bit usage from Tech References and Virtual T source.
+
+    Supported systems:
+      - Kyosei Kyotronic 85
+      - Olivetti M10 (slightly diff hw, BIOS is shifted by 2 words)
+      - NEC PC-8201A (slightly diff hw)
+      - TRS-80 Model 100
+      - Tandy Model 102 (slightly diff hw)
+      - Tandy Model 200 (diff video & rtc)
+
+    To Do:
+      - Find dumps of systems which could easily be added:
+        * Olivetti M10 Modem (US) (diff BIOS than the European version)
+        * NEC PC-8201 (original Japanese version of PC-8201A)
+        * NEC PC-8300 (similar hardware to PC-8201)
+        * NEC PC-8300 w/BradyWriter II ROMs
 
 ******************************************************************************************/
 
 /*
 
-	TODO:
+    TODO:
 
-	-	--- memory leak warning ---
-		allocation #004834, 256 bytes (src/lib/util/astring.c:127)
-		a total of 256 bytes were not free()'d
-	- un-Y2K-hack tandy200
-	- keyboard is unresponsive for couple of seconds after boot
-	- soft power on/off
-	- IM6042 UART
-	- pc8201 48K RAM option
-	- pc8201 NEC PC-8241A video interface (TMS9918, 16K videoRAM, 8K ROM)
-	- pc8201 128K ROM cartridge
-	- pc8201 NEC PC-8233 floppy controller
-	- pc8201 NEC floppy disc drives (PC-8031-1W, PC-8031-2W, PC-80S31)
-	- trsm100 Tandy Portable Disk Drive (TPDD: 100k 3½", TPDD2: 200k 3½") (undumped HD63A01V1 MCU + full custom uPD65002, serial comms via the missing IM6042, not going to happen anytime soon)
-	- trsm100 Chipmunk disk drive (384k 3½") (full custom logic, not going to happen)
-	- trsm100 RS232/modem select
-	- tandy200 UART8251
-	- tandy200 RTC alarm
-	- tandy200 TCM5089 sound
-	- international keyboard option ROMs
+    -   --- memory leak warning ---
+        allocation #004834, 256 bytes (src/lib/util/astring.c:127)
+        a total of 256 bytes were not free()'d
+    - un-Y2K-hack tandy200
+    - keyboard is unresponsive for couple of seconds after boot
+    - soft power on/off
+    - IM6042 UART
+    - pc8201 48K RAM option
+    - pc8201 NEC PC-8241A video interface (TMS9918, 16K videoRAM, 8K ROM)
+    - pc8201 128K ROM cartridge
+    - pc8201 NEC PC-8233 floppy controller
+    - pc8201 NEC floppy disc drives (PC-8031-1W, PC-8031-2W, PC-80S31)
+    - trsm100 Tandy Portable Disk Drive (TPDD: 100k 3?", TPDD2: 200k 3?") (undumped HD63A01V1 MCU + full custom uPD65002, serial comms via the missing IM6042, not going to happen anytime soon)
+    - trsm100 Chipmunk disk drive (384k 3?") (full custom logic, not going to happen)
+    - trsm100 RS232/modem select
+    - tandy200 UART8251
+    - tandy200 RTC alarm
+    - tandy200 TCM5089 sound
+    - international keyboard option ROMs
 
 */
 
 /*
 
-						  * PC-8201/8300 HARDWARE PORT DEFINITIONS *
+                          * PC-8201/8300 HARDWARE PORT DEFINITIONS *
 
-				-Port-
-	Name       Hex  Dec   Notes
-	--------   ---  ---   -----------------------------------------
-	A8255      070  112   Video interface port A (8255)
-	B8255      071  113   Video interface port B (8255)
-	C8255      072  114   Video interface port C (8255)
-	CW8255     073  115   Video interface command/mode port (8255)
-	ROMAH      080  128   128k ROM select and MSBIT of address
-	ROMAL      084  132   Lowest 8 bits of extended ROM address
-	ROMAM      088  136   Middle eight bits of 128k ROM address
-	ROMRD      08C  140   Read data port for 128k ROM
+                -Port-
+    Name       Hex  Dec   Notes
+    --------   ---  ---   -----------------------------------------
+    A8255      070  112   Video interface port A (8255)
+    B8255      071  113   Video interface port B (8255)
+    C8255      072  114   Video interface port C (8255)
+    CW8255     073  115   Video interface command/mode port (8255)
+    ROMAH      080  128   128k ROM select and MSBIT of address
+    ROMAL      084  132   Lowest 8 bits of extended ROM address
+    ROMAM      088  136   Middle eight bits of 128k ROM address
+    ROMRD      08C  140   Read data port for 128k ROM
 
 */
 
@@ -91,19 +91,19 @@ static const device_config *cassette_device_image(running_machine *machine)
 static READ8_HANDLER( pc8201_bank_r )
 {
 	/*
-		
-		bit		signal		description
 
-		0		LADR1		select address 0 to 7fff
-		1		LADR2		select address 0 to 7fff
-		2		HADR1		select address 8000 to ffff
-		3		HADR2		select address 8000 to ffff
-		4		
-		5		
-		6		SELB		serial interface status bit 1
-		7		SELA		serial interface status bit 0
+        bit     signal      description
 
-	*/
+        0       LADR1       select address 0 to 7fff
+        1       LADR2       select address 0 to 7fff
+        2       HADR1       select address 8000 to ffff
+        3       HADR2       select address 8000 to ffff
+        4
+        5
+        6       SELB        serial interface status bit 1
+        7       SELA        serial interface status bit 0
+
+    */
 
 	kc85_state *state = space->machine->driver_data;
 
@@ -173,19 +173,19 @@ static void pc8201_bankswitch(running_machine *machine, UINT8 data)
 static WRITE8_HANDLER( pc8201_bank_w )
 {
 	/*
-		
-		bit		signal		description
 
-		0		LADR1		select address 0 to 7fff
-		1		LADR2		select address 0 to 7fff
-		2		HADR1		select address 8000 to ffff
-		3		HADR2		select address 8000 to ffff
-		4		
-		5		
-		6		
-		7		
+        bit     signal      description
 
-	*/
+        0       LADR1       select address 0 to 7fff
+        1       LADR2       select address 0 to 7fff
+        2       HADR1       select address 8000 to ffff
+        3       HADR2       select address 8000 to ffff
+        4
+        5
+        6
+        7
+
+    */
 
 	pc8201_bankswitch(space->machine, data & 0x0f);
 }
@@ -193,22 +193,22 @@ static WRITE8_HANDLER( pc8201_bank_w )
 static WRITE8_HANDLER( pc8201_ctrl_w )
 {
 	/*
-		
-		bit		signal		description
 
-		0		
-		1		
-		2
-		3		REMOTE		cassette motor
-		4		TSTB		RTC strobe
-		5		PSTB		printer strobe
-		6		SELB		serial interface select bit 1
-		7		SELA		serial interface select bit 0
+        bit     signal      description
 
-	*/
+        0
+        1
+        2
+        3       REMOTE      cassette motor
+        4       TSTB        RTC strobe
+        5       PSTB        printer strobe
+        6       SELB        serial interface select bit 1
+        7       SELA        serial interface select bit 0
+
+    */
 
 	kc85_state *state = space->machine->driver_data;
-	
+
 	/* cassette motor */
 	cassette_change_state(state->cassette, BIT(data, 3) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 
@@ -226,26 +226,26 @@ static WRITE8_HANDLER( uart_ctrl_w )
 {
 	/*
 
-		bit		signal		description
+        bit     signal      description
 
-		0		SBS			stop bit select
-		1		EPE			even parity enable
-		2		PI			parity inhibit
-		3		CLS1		character length select bit 1
-		4		CLS2		character length select bit 2
-		5		
-		6		
-		7		
+        0       SBS         stop bit select
+        1       EPE         even parity enable
+        2       PI          parity inhibit
+        3       CLS1        character length select bit 1
+        4       CLS2        character length select bit 2
+        5
+        6
+        7
 
-	*/
+    */
 /*
-	kc85_state *state = space->machine->driver_data;
+    kc85_state *state = space->machine->driver_data;
 
-	im6402_sbs_w(state->im6402, BIT(data, 0));
-	im6402_epe_w(state->im6402, BIT(data, 1));
-	im6402_pi_w(state->im6402, BIT(data, 2));
-	im6402_cls1_w(state->im6402, BIT(data, 3));
-	im6402_cls2_w(state->im6402, BIT(data, 4));
+    im6402_sbs_w(state->im6402, BIT(data, 0));
+    im6402_epe_w(state->im6402, BIT(data, 1));
+    im6402_pi_w(state->im6402, BIT(data, 2));
+    im6402_cls1_w(state->im6402, BIT(data, 3));
+    im6402_cls2_w(state->im6402, BIT(data, 4));
 */
 }
 
@@ -253,32 +253,32 @@ static READ8_HANDLER( uart_status_r )
 {
 	/*
 
-		bit		signal		description
+        bit     signal      description
 
-		0		CD			carrier detect
-		1		OE			overrun error
-		2		FE			framing error
-		3		PE			parity error
-		4		TBRE		transmit buffer register empty
-		5		RP			
-		6		+5V			
-		7		_LPS		low power sensor
+        0       CD          carrier detect
+        1       OE          overrun error
+        2       FE          framing error
+        3       PE          parity error
+        4       TBRE        transmit buffer register empty
+        5       RP
+        6       +5V
+        7       _LPS        low power sensor
 
-	*/
+    */
 /*
-	kc85_state *state = space->machine->driver_data;
+    kc85_state *state = space->machine->driver_data;
 
-	UINT8 data = 0;
+    UINT8 data = 0;
 
-	int cd = im6402_cd_r(state->im6402);
-	int oe = im6402_oe_r(state->im6402);
-	int fe = im6402_fe_r(state->im6402);
-	int pe = im6402_pe_r(state->im6402);
-	int tbre = im6402_tbre_r(state->im6402);
+    int cd = im6402_cd_r(state->im6402);
+    int oe = im6402_oe_r(state->im6402);
+    int fe = im6402_fe_r(state->im6402);
+    int pe = im6402_pe_r(state->im6402);
+    int tbre = im6402_tbre_r(state->im6402);
 
-	data = (tbre << 4) | (pe << 3) | (fe << 2) | (oe << 1) | cd;
+    data = (tbre << 4) | (pe << 3) | (fe << 2) | (oe << 1) | cd;
 
-	return data;
+    return data;
 */
 
 	return 0xf0;
@@ -288,32 +288,32 @@ static READ8_HANDLER( pc8201_uart_status_r )
 {
 	/*
 
-		bit		signal		description
+        bit     signal      description
 
-		0		_DCD/_RD	data carrier detect / ring detect
-		1		OE			overrun error
-		2		FE			framing error
-		3		PE			parity error
-		4		TBRE		transmit buffer register empty
-		5		RP			
-		6		+5V			
-		7		_LPS		low power signal
+        0       _DCD/_RD    data carrier detect / ring detect
+        1       OE          overrun error
+        2       FE          framing error
+        3       PE          parity error
+        4       TBRE        transmit buffer register empty
+        5       RP
+        6       +5V
+        7       _LPS        low power signal
 
-	*/
+    */
 /*
-	kc85_state *state = space->machine->driver_data;
+    kc85_state *state = space->machine->driver_data;
 
-	UINT8 data = 0;
+    UINT8 data = 0;
 
-	int cd = im6402_cd_r(state->im6402);
-	int oe = im6402_oe_r(state->im6402);
-	int fe = im6402_fe_r(state->im6402);
-	int pe = im6402_pe_r(state->im6402);
-	int tbre = im6402_tbre_r(state->im6402);
+    int cd = im6402_cd_r(state->im6402);
+    int oe = im6402_oe_r(state->im6402);
+    int fe = im6402_fe_r(state->im6402);
+    int pe = im6402_pe_r(state->im6402);
+    int tbre = im6402_tbre_r(state->im6402);
 
-	data = (tbre << 4) | (pe << 3) | (fe << 2) | (oe << 1) | cd;
+    data = (tbre << 4) | (pe << 3) | (fe << 2) | (oe << 1) | cd;
 
-	return data;
+    return data;
 */
 
 	return 0xf0;
@@ -323,22 +323,22 @@ static WRITE8_HANDLER( modem_w )
 {
 	/*
 
-		bit		signal		description
+        bit     signal      description
 
-		0					telephone line signal selection relay output		
-		1		EN			MC14412 enable output
-		2		
-		3		
-		4		
-		5		
-		6		
-		7		
+        0                   telephone line signal selection relay output
+        1       EN          MC14412 enable output
+        2
+        3
+        4
+        5
+        6
+        7
 
-	*/
+    */
 /*
-	kc85_state *state = space->machine->driver_data;
+    kc85_state *state = space->machine->driver_data;
 
-	mc14412_en_w(state->mc14412, BIT(data, 1));
+    mc14412_en_w(state->mc14412, BIT(data, 1));
 */
 }
 
@@ -346,18 +346,18 @@ static WRITE8_HANDLER( kc85_ctrl_w )
 {
 	/*
 
-		bit		signal		description
+        bit     signal      description
 
-		0		_STROM		ROM selection (0=standard, 1=option)
-		1		_STROBE		printer strobe output
-		2		STB			RTC strobe output
-		3		_REMOTE		cassette motor
-		4		
-		5		
-		6		
-		7		
+        0       _STROM      ROM selection (0=standard, 1=option)
+        1       _STROBE     printer strobe output
+        2       STB         RTC strobe output
+        3       _REMOTE     cassette motor
+        4
+        5
+        6
+        7
 
-	*/
+    */
 
 	kc85_state *state = space->machine->driver_data;
 
@@ -449,19 +449,19 @@ static READ8_HANDLER( tandy200_stbk_r )
 static WRITE8_HANDLER( tandy200_stbk_w )
 {
 	/*
-		
-		bit		signal	description
 
-		0		_PSTB	printer strobe output
-		1		REMOTE	cassette motor
-		2
-		3
-		4
-		5
-		6
-		7
+        bit     signal  description
 
-	*/
+        0       _PSTB   printer strobe output
+        1       REMOTE  cassette motor
+        2
+        3
+        4
+        5
+        6
+        7
+
+    */
 
 	tandy200_state *state = space->machine->driver_data;
 
@@ -495,12 +495,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kc85_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
-//	AM_RANGE(0x70, 0x70) AM_MIRROR(0x0f) optional RAM unit
-//	AM_RANGE(0x80, 0x80) AM_MIRROR(0x0f) optional I/O controller unit
-//	AM_RANGE(0x90, 0x90) AM_MIRROR(0x0f) optional answering telephone unit
-//	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0f) optional modem
+//  AM_RANGE(0x70, 0x70) AM_MIRROR(0x0f) optional RAM unit
+//  AM_RANGE(0x80, 0x80) AM_MIRROR(0x0f) optional I/O controller unit
+//  AM_RANGE(0x90, 0x90) AM_MIRROR(0x0f) optional answering telephone unit
+//  AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0f) optional modem
 	AM_RANGE(0xb0, 0xb7) AM_MIRROR(0x08) AM_DEVREADWRITE(I8155_TAG, i8155_r, i8155_w)
-//	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x0f) AM_DEVREADWRITE(IM6402_TAG, im6402_data_r, im6402_data_w)
+//  AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x0f) AM_DEVREADWRITE(IM6402_TAG, im6402_data_r, im6402_data_w)
 	AM_RANGE(0xd0, 0xd0) AM_MIRROR(0x0f) AM_READWRITE(uart_status_r, uart_ctrl_w)
 	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x0f) AM_READWRITE(keyboard_r, kc85_ctrl_w)
 	AM_RANGE(0xf0, 0xf0) AM_MIRROR(0x0e) AM_READWRITE(kc85_lcd_status_r, kc85_lcd_command_w)
@@ -509,12 +509,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( trsm100_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
-//	AM_RANGE(0x70, 0x70) AM_MIRROR(0x0f) optional RAM unit
-//	AM_RANGE(0x80, 0x80) AM_MIRROR(0x0f) optional I/O controller unit
-//	AM_RANGE(0x90, 0x90) AM_MIRROR(0x0f) optional answering telephone unit
+//  AM_RANGE(0x70, 0x70) AM_MIRROR(0x0f) optional RAM unit
+//  AM_RANGE(0x80, 0x80) AM_MIRROR(0x0f) optional I/O controller unit
+//  AM_RANGE(0x90, 0x90) AM_MIRROR(0x0f) optional answering telephone unit
 	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0f) AM_WRITE(modem_w)
 	AM_RANGE(0xb0, 0xb7) AM_MIRROR(0x08) AM_DEVREADWRITE(I8155_TAG, i8155_r, i8155_w)
-//	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x0f) AM_DEVREADWRITE(IM6402_TAG, im6402_data_r, im6402_data_w)
+//  AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x0f) AM_DEVREADWRITE(IM6402_TAG, im6402_data_r, im6402_data_w)
 	AM_RANGE(0xd0, 0xd0) AM_MIRROR(0x0f) AM_READWRITE(uart_status_r, uart_ctrl_w)
 	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x0f) AM_READWRITE(keyboard_r, kc85_ctrl_w)
 	AM_RANGE(0xf0, 0xf0) AM_MIRROR(0x0e) AM_READWRITE(kc85_lcd_status_r, kc85_lcd_command_w)
@@ -523,12 +523,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc8201_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
-//	AM_RANGE(0x70, 0x70) AM_MIRROR(0x0f) optional video interface 8255
-//	AM_RANGE(0x80, 0x80) AM_MIRROR(0x0f) optional 128K ROM cartridge
+//  AM_RANGE(0x70, 0x70) AM_MIRROR(0x0f) optional video interface 8255
+//  AM_RANGE(0x80, 0x80) AM_MIRROR(0x0f) optional 128K ROM cartridge
 	AM_RANGE(0x90, 0x90) AM_MIRROR(0x0f) AM_WRITE(pc8201_ctrl_w)
 	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0f) AM_READWRITE(pc8201_bank_r, pc8201_bank_w)
 	AM_RANGE(0xb0, 0xb7) AM_MIRROR(0x08) AM_DEVREADWRITE(I8155_TAG, i8155_r, i8155_w )
-//	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x0f) AM_DEVREADWRITE(IM6402_TAG, im6402_data_r, im6402_data_w)
+//  AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x0f) AM_DEVREADWRITE(IM6402_TAG, im6402_data_r, im6402_data_w)
 	AM_RANGE(0xd0, 0xd0) AM_MIRROR(0x0f) AM_READWRITE(pc8201_uart_status_r, uart_ctrl_w)
 	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x0f) AM_READ(keyboard_r)
 	AM_RANGE(0xf0, 0xf0) AM_MIRROR(0x0e) AM_READWRITE(kc85_lcd_status_r, kc85_lcd_command_w)
@@ -538,7 +538,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( tandy200_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x90, 0x9f) AM_DEVREADWRITE(RP5C01A_TAG, rp5c01a_r, rp5c01a_w)
-//	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0f) AM_DEVWRITE(TCM5089_TAG, tcm5089_w)
+//  AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0f) AM_DEVWRITE(TCM5089_TAG, tcm5089_w)
 	AM_RANGE(0xb0, 0xb7) AM_MIRROR(0x08) AM_DEVREADWRITE(I8155_TAG, i8155_r, i8155_w)
 	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x0e) AM_DEVREADWRITE(MSM8251_TAG, msm8251_data_r, msm8251_data_w)
 	AM_RANGE(0xc1, 0xc1) AM_MIRROR(0x0e) AM_DEVREADWRITE(MSM8251_TAG, msm8251_status_r, msm8251_control_w)
@@ -677,11 +677,11 @@ static INPUT_PORTS_START( pc8201a )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x93") PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x91") PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("DEL BKSP") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
-	
+
 	PORT_MODIFY("KEY7")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("STOP") PORT_CODE(KEYCODE_F8) PORT_CHAR(UCHAR_MAMEKEY(F8))
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) 
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED ) 
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("f.5") PORT_CODE(KEYCODE_F5) PORT_CHAR(UCHAR_MAMEKEY(F5))
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("f.4") PORT_CODE(KEYCODE_F4) PORT_CHAR(UCHAR_MAMEKEY(F4))
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("f.3") PORT_CODE(KEYCODE_F3) PORT_CHAR(UCHAR_MAMEKEY(F3))
@@ -815,17 +815,17 @@ static RP5C01A_INTERFACE( tandy200_rp5c01a_intf )
 static READ8_DEVICE_HANDLER( kc85_8155_port_c_r )
 {
 	/*
-	
-		bit		description
 
-		0		serial data input from clock chip
-		1		_BUSY signal from printer
-		2		BUSY signal from printer
-		3		data from BCR
-		4		_CTS from RS232
-		5		_DSR from RS232
+        bit     description
 
-	*/
+        0       serial data input from clock chip
+        1       _BUSY signal from printer
+        2       BUSY signal from printer
+        3       data from BCR
+        4       _CTS from RS232
+        5       _DSR from RS232
+
+    */
 
 	kc85_state *state = device->machine->driver_data;
 
@@ -842,18 +842,18 @@ static WRITE8_DEVICE_HANDLER( kc85_8155_port_a_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		LCD chip select 0, key scan 0, RTC C0
-		1		LCD chip select 1, key scan 1, RTC C1
-		2		LCD chip select 2, key scan 2, RTC C2
-		3		LCD chip select 3, key scan 3, RTC CLK
-		4		LCD chip select 4, key scan 4, RTC DATA IN
-		5		LCD chip select 5, key scan 5
-		6		LCD chip select 6, key scan 6
-		7		LCD chip select 7, key scan 7
+        0       LCD chip select 0, key scan 0, RTC C0
+        1       LCD chip select 1, key scan 1, RTC C1
+        2       LCD chip select 2, key scan 2, RTC C2
+        3       LCD chip select 3, key scan 3, RTC CLK
+        4       LCD chip select 4, key scan 4, RTC DATA IN
+        5       LCD chip select 5, key scan 5
+        6       LCD chip select 6, key scan 6
+        7       LCD chip select 7, key scan 7
 
-	*/
+    */
 
 	kc85_state *state = device->machine->driver_data;
 
@@ -882,18 +882,18 @@ static WRITE8_DEVICE_HANDLER( kc85_8155_port_b_w )
 {
 	/*
 
-		bit		signal		description
+        bit     signal      description
 
-		0					LCD chip select 8, key scan 8
-		1					LCD chip select 9
-		2					beeper data output
-		3		_RS232		modem select (0=RS232, 1=modem)
-		4		PCS			soft power off
-		5					beeper data input select (0=data from 8155 TO, 1=data from PB2)
-		6		_DTR		RS232 data terminal ready output
-		7		_RTS		RS232 request to send output
+        0                   LCD chip select 8, key scan 8
+        1                   LCD chip select 9
+        2                   beeper data output
+        3       _RS232      modem select (0=RS232, 1=modem)
+        4       PCS         soft power off
+        5                   beeper data input select (0=data from 8155 TO, 1=data from PB2)
+        6       _DTR        RS232 data terminal ready output
+        7       _RTS        RS232 request to send output
 
-	*/
+    */
 
 	kc85_state *state = device->machine->driver_data;
 
@@ -935,17 +935,17 @@ static I8155_INTERFACE( kc85_8155_intf )
 static READ8_DEVICE_HANDLER( pc8201_8155_port_c_r )
 {
 	/*
-	
-		bit		signal		description
 
-		0		CDI			clock data input
-		1		SLCT		_BUSY signal from printer
-		2		BUSY		BUSY signal from printer
-		3		BCR			bar code reader data input
-		4		_CTS		RS232 clear to send input
-		5		_DSR		RS232 DSR input
+        bit     signal      description
 
-	*/
+        0       CDI         clock data input
+        1       SLCT        _BUSY signal from printer
+        2       BUSY        BUSY signal from printer
+        3       BCR         bar code reader data input
+        4       _CTS        RS232 clear to send input
+        5       _DSR        RS232 DSR input
+
+    */
 
 	kc85_state *state = device->machine->driver_data;
 
@@ -962,18 +962,18 @@ static WRITE8_DEVICE_HANDLER( pc8201_8155_port_b_w )
 {
 	/*
 
-		bit		signal		description
+        bit     signal      description
 
-		0					LCD chip select 8, key scan 8
-		1					LCD chip select 9
-		2		_MC			melody control output
-		3		DCD/_RD		RS232 DCD/_RD select
-		4		APO			auto power off output
-		5		BELL		buzzer output (0=ring, 1=not ring)
-		6		_DTR		RS232 data terminal ready output
-		7		_RTS		RS232 request to send output
+        0                   LCD chip select 8, key scan 8
+        1                   LCD chip select 9
+        2       _MC         melody control output
+        3       DCD/_RD     RS232 DCD/_RD select
+        4       APO         auto power off output
+        5       BELL        buzzer output (0=ring, 1=not ring)
+        6       _DTR        RS232 data terminal ready output
+        7       _RTS        RS232 request to send output
 
-	*/
+    */
 
 	kc85_state *state = device->machine->driver_data;
 
@@ -1005,17 +1005,17 @@ static I8155_INTERFACE( pc8201_8155_intf )
 static READ8_DEVICE_HANDLER( tandy200_8155_port_c_r )
 {
 	/*
-	
-		bit		signal	description
 
-		0		_LPS	low power sense input
-		1		_BUSY	not busy input
-		2		BUSY	busy input
-		3		BCR		bar code reader data input
-		4		CD		carrier detect input
-		5		CDBD	carrier detect break down input
+        bit     signal  description
 
-	*/
+        0       _LPS    low power sense input
+        1       _BUSY   not busy input
+        2       BUSY    busy input
+        3       BCR     bar code reader data input
+        4       CD      carrier detect input
+        5       CDBD    carrier detect break down input
+
+    */
 
 	tandy200_state *state = device->machine->driver_data;
 
@@ -1031,18 +1031,18 @@ static WRITE8_DEVICE_HANDLER( tandy200_8155_port_a_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		print data 0, key scan 0
-		1		print data 1, key scan 1
-		2		print data 2, key scan 2
-		3		print data 3, key scan 3
-		4		print data 4, key scan 4
-		5		print data 5, key scan 5
-		6		print data 6, key scan 6
-		7		print data 7, key scan 7
+        0       print data 0, key scan 0
+        1       print data 1, key scan 1
+        2       print data 2, key scan 2
+        3       print data 3, key scan 3
+        4       print data 4, key scan 4
+        5       print data 5, key scan 5
+        6       print data 6, key scan 6
+        7       print data 7, key scan 7
 
-	*/
+    */
 
 	tandy200_state *state = device->machine->driver_data;
 
@@ -1055,18 +1055,18 @@ static WRITE8_DEVICE_HANDLER( tandy200_8155_port_b_w )
 {
 	/*
 
-		bit		signal		description
+        bit     signal      description
 
-		0					key scan 8
-		1		ORIG/ANS	(1=ORIG, 0=ANS)
-		2		_BUZZER		(0=data from 8155 TO, 1=data from PB2)
-		3		_RS232C		(1=modem, 0=RS-232)
-		4		PCS			power cut signal
-		5		BELL		buzzer data output
-		6		MEN			modem enable output
-		7		CALL		connects and disconnects the phone line
+        0                   key scan 8
+        1       ORIG/ANS    (1=ORIG, 0=ANS)
+        2       _BUZZER     (0=data from 8155 TO, 1=data from PB2)
+        3       _RS232C     (1=modem, 0=RS-232)
+        4       PCS         power cut signal
+        5       BELL        buzzer data output
+        6       MEN         modem enable output
+        7       CALL        connects and disconnects the phone line
 
-	*/
+    */
 
 	tandy200_state *state = device->machine->driver_data;
 
@@ -1198,7 +1198,7 @@ static MACHINE_START( trsm100 )
 	kc85_state *state = machine->driver_data;
 
 	const address_space *program = cputag_get_address_space(machine, I8085_TAG, ADDRESS_SPACE_PROGRAM);
-	
+
 	/* find devices */
 	state->upd1990a = devtag_get_device(machine, UPD1990A_TAG);
 	state->centronics = devtag_get_device(machine, CENTRONICS_TAG);
@@ -1390,7 +1390,7 @@ static MACHINE_DRIVER_START( trsm100 )
 	MDRV_MACHINE_START(trsm100)
 
 	/* devices */
-//	MDRV_MC14412_ADD(MC14412_TAG, XTAL_1MHz)
+//  MDRV_MC14412_ADD(MC14412_TAG, XTAL_1MHz)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( tandy200 )
@@ -1414,13 +1414,13 @@ static MACHINE_DRIVER_START( tandy200 )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-//	MDRV_TCM5089_ADD(TCM5089_TAG, XTAL_3_579545MHz)
+//  MDRV_TCM5089_ADD(TCM5089_TAG, XTAL_3_579545MHz)
 
 	/* devices */
 	MDRV_I8155_ADD(I8155_TAG, XTAL_4_9152MHz/2, tandy200_8155_intf)
 	MDRV_RP5C01A_ADD(RP5C01A_TAG, XTAL_32_768kHz, tandy200_rp5c01a_intf)
 	MDRV_MSM8251_ADD(MSM8251_TAG, /*XTAL_4_9152MHz/2,*/ tandy200_msm8251_interface)
-//	MDRV_MC14412_ADD(MC14412_TAG, XTAL_1MHz)
+//  MDRV_MC14412_ADD(MC14412_TAG, XTAL_1MHz)
 
 	/* printer */
 	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
@@ -1454,12 +1454,12 @@ ROM_END
 
 ROM_START( trsm100 )
 	/*
-		Board Code	ROM type			ROM Code			Comment
-		-------------------------------------------------------------------
-		PLX110CH1X	custom				LH535618			early North America
-		PLX110EH1X	27C256 compatible	3256C07-3J1/11US	late North America
-		PLX120CH1X	27C256 compatible	3256C05-3E1/11EP	European/Italian
-	*/
+        Board Code  ROM type            ROM Code            Comment
+        -------------------------------------------------------------------
+        PLX110CH1X  custom              LH535618            early North America
+        PLX110EH1X  27C256 compatible   3256C07-3J1/11US    late North America
+        PLX120CH1X  27C256 compatible   3256C05-3E1/11EP    European/Italian
+    */
 	ROM_REGION( 0x8000, I8085_TAG, 0 )
 	ROM_LOAD( "m100rom.m12",  0x0000, 0x8000, CRC(730a3611) SHA1(094dbc4ac5a4ea5cdf51a1ac581a40a9622bb25d) )
 
@@ -1468,7 +1468,7 @@ ROM_START( trsm100 )
 ROM_END
 
 ROM_START( olivm10 )
-	// 3256C02-4B3/I		Italian
+	// 3256C02-4B3/I        Italian
 	ROM_REGION( 0x8010, I8085_TAG, 0 )
 	ROM_LOAD( "m10rom.m12", 0x0000, 0x8000, CRC(f0e8447a) SHA1(d58867276213116a79f7074109b7d7ce02e8a3af) )
 
@@ -1506,7 +1506,7 @@ SYSTEM_CONFIG_END
 static SYSTEM_CONFIG_START( pc8201 )
 	CONFIG_RAM_DEFAULT	(16 * 1024)
 	CONFIG_RAM			(32 * 1024)
-//	CONFIG_RAM			(48 * 1024)
+//  CONFIG_RAM          (48 * 1024)
 	CONFIG_RAM			(64 * 1024)
 	CONFIG_RAM			(96 * 1024)
 SYSTEM_CONFIG_END
@@ -1531,13 +1531,13 @@ SYSTEM_CONFIG_END
 
 /* System Drivers */
 
-/*    YEAR  NAME		PARENT	COMPAT	MACHINE		INPUT		INIT	CONFIG		COMPANY					FULLNAME */
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    CONFIG      COMPANY                 FULLNAME */
 COMP( 1983,	kc85,		0,		0,		kc85,		kc85,		0,		kc85,		"Kyosei",				"Kyotronic 85 (Japan)", 0 )
 COMP( 1983, olivm10,	kc85,	0,		kc85,		olivm10,	0,		kc85,		"Olivetti",				"M-10", 0 )
-//COMP( 1983, olivm10m,	kc85,	0,		kc85,		olivm10,	0,		kc85,		"Olivetti",				"M-10 Modem (US)", 0 )
+//COMP( 1983, olivm10m, kc85,   0,      kc85,       olivm10,    0,      kc85,       "Olivetti",             "M-10 Modem (US)", 0 )
 COMP( 1983, trsm100,	0,		0,		trsm100,	kc85,		0,		trsm100,	"Tandy Radio Shack",	"TRS-80 Model 100", 0 )
 COMP( 1986, tandy102,	trsm100,0,		trsm100,	kc85,		0,		tandy102,	"Tandy Radio Shack",	"Tandy 102", 0 )
-//COMP( 1983, npc8201,	0,		0,		pc8201,		pc8201a,	0,		pc8201,		"NEC",					"PC-8201 (Japan)", 0 )
+//COMP( 1983, npc8201,  0,      0,      pc8201,     pc8201a,    0,      pc8201,     "NEC",                  "PC-8201 (Japan)", 0 )
 COMP( 1983, npc8201a,	0,		0,		pc8201,		pc8201a,	0,		pc8201,		"NEC",					"PC-8201A", 0 )
-//COMP( 1987, npc8300,	npc8201,0,		pc8300,		pc8300,		0,		pc8300,		"NEC",					"PC-8300", 0 )
+//COMP( 1987, npc8300,  npc8201,0,      pc8300,     pc8300,     0,      pc8300,     "NEC",                  "PC-8300", 0 )
 COMP( 1984, tandy200,	0,		0,		tandy200,	kc85,		0,		tandy200,	"Tandy Radio Shack",	"Tandy 200", 0 )

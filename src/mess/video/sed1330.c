@@ -9,18 +9,18 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- reset behavior
-	- busy flag timing
-	- cursor flashing
-	- display page flashing
-	- internal chargen ROM
-	- horizontal dot scroll
-	- XOR/AND/Priority-OR compositions
-	- text mode character display
-	- single panel text mode
-	- single/dual panel graphics mode
+    - reset behavior
+    - busy flag timing
+    - cursor flashing
+    - display page flashing
+    - internal chargen ROM
+    - horizontal dot scroll
+    - XOR/AND/Priority-OR compositions
+    - text mode character display
+    - single panel text mode
+    - single/dual panel graphics mode
 
 */
 
@@ -195,8 +195,8 @@ WRITE8_DEVICE_HANDLER( sed1330_command_w )
 	switch (sed1330->ir)
 	{
 /*
-	case SED1330_INSTRUCTION_SLEEP_IN:
-		break;
+    case SED1330_INSTRUCTION_SLEEP_IN:
+        break;
 */
 	case SED1330_INSTRUCTION_CSRDIR_RIGHT:
 	case SED1330_INSTRUCTION_CSRDIR_LEFT:
@@ -225,7 +225,7 @@ WRITE8_DEVICE_HANDLER( sed1330_command_w )
 READ8_DEVICE_HANDLER( sed1330_data_r )
 {
 	sed1330_t *sed1330 = get_safe_token(device);
-	
+
 	UINT8 data = devcb_call_read8(&sed1330->in_vd_func, sed1330->csr);
 
 	if (LOG) logerror("SED1330 '%s' Memory Read %02x from %04x\n", device->tag, data, sed1330->csr);
@@ -326,7 +326,7 @@ WRITE8_DEVICE_HANDLER( sed1330_data_w )
 			case SED1330_FC_FLASH_32:	logerror("SED1330 '%s' Cursor: fFR/32\n", device->tag);		break;
 			case SED1330_FC_FLASH_64:	logerror("SED1330 '%s' Cursor: fFR/64\n", device->tag);		break;
 			}
-			
+
 			switch (sed1330->fp & 0x03)
 			{
 			case SED1330_FC_OFF:		logerror("SED1330 '%s' Display Page 1: disabled\n", device->tag);		break;
@@ -334,7 +334,7 @@ WRITE8_DEVICE_HANDLER( sed1330_data_w )
 			case SED1330_FC_FLASH_32:	logerror("SED1330 '%s' Display Page 1: flash fFR/32\n", device->tag);	break;
 			case SED1330_FC_FLASH_64:	logerror("SED1330 '%s' Display Page 1: flash fFR/64\n", device->tag);	break;
 			}
-			
+
 			switch ((sed1330->fp >> 2) & 0x03)
 			{
 			case SED1330_FC_OFF:		logerror("SED1330 '%s' Display Page 2/4: disabled\n", device->tag);		break;
@@ -418,7 +418,7 @@ WRITE8_DEVICE_HANDLER( sed1330_data_w )
 		case 1:
 			sed1330->cry = (data & 0x0f) + 1;
 			sed1330->cm = BIT(data, 7);
-			if (LOG) 
+			if (LOG)
 			{
 				logerror("SED1330 '%s' Vertical Cursor Location: %u\n", device->tag, sed1330->cry);
 				logerror("SED1330 '%s' Cursor Shape: %s\n", device->tag, BIT(data, 7) ? "Block" : "Underscore");
@@ -480,7 +480,7 @@ WRITE8_DEVICE_HANDLER( sed1330_data_w )
 			sed1330->csr = (sed1330->csr & 0xff00) | data;
 			break;
 
-		case 1:		
+		case 1:
 			sed1330->csr = (data << 8) | (sed1330->csr & 0xff);
 			if (LOG) logerror("SED1330 '%s' Cursor Address %04x\n", device->tag, sed1330->csr);
 			break;
@@ -490,8 +490,8 @@ WRITE8_DEVICE_HANDLER( sed1330_data_w )
 		}
 		break;
 /*
-	case SED1330_INSTRUCTION_CSRR:
-		break;
+    case SED1330_INSTRUCTION_CSRR:
+        break;
 */
 	case SED1330_INSTRUCTION_MWRITE:
 		if (LOG) logerror("SED1330 '%s' Memory Write %02x to %04x (row %u col %u line %u)\n", device->tag, data, sed1330->csr, sed1330->csr/80/8, sed1330->csr%80, sed1330->csr/80);
@@ -501,8 +501,8 @@ WRITE8_DEVICE_HANDLER( sed1330_data_w )
 		increment_csr(sed1330);
 		break;
 /*
-	case SED1330_INSTRUCTION_MREAD:
-		break;
+    case SED1330_INSTRUCTION_MREAD:
+        break;
 */
 	default:
 		logerror("SED1330 '%s' Unsupported instruction %02x\n", device->tag, sed1330->ir);
@@ -513,7 +513,7 @@ WRITE8_DEVICE_HANDLER( sed1330_data_w )
 
 /*-------------------------------------------------
     draw_text_scanline - draw one scanline
-	(currently this only draws the text cursor)
+    (currently this only draws the text cursor)
 -------------------------------------------------*/
 
 static void draw_text_scanline(sed1330_t *sed1330, bitmap_t *bitmap, const rectangle *cliprect, int y, UINT16 va)
@@ -587,7 +587,7 @@ static void update_graphics(sed1330_t *sed1330, bitmap_t *bitmap, const rectangl
 static void update_text(sed1330_t *sed1330, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int y;
-	
+
 	if (sed1330->ws)
 	{
 		for (y = 0; y < sed1330->sl1; y++)
@@ -695,7 +695,7 @@ static DEVICE_START( sed1330 )
 
 static DEVICE_RESET( sed1330 )
 {
-//	sed1330_t *sed1330 = get_safe_token(device);
+//  sed1330_t *sed1330 = get_safe_token(device);
 
 }
 

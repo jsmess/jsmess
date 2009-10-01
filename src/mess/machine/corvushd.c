@@ -1,66 +1,66 @@
 //
-//	corvus_hd
+//  corvus_hd
 //
-//	Implementation of a Corvus Hard Drive / Host Bus Adapter pair.  The drive
-//	being emulated is a Rev B drive, functionally speaking, rather than an Omnidrive.
+//  Implementation of a Corvus Hard Drive / Host Bus Adapter pair.  The drive
+//  being emulated is a Rev B drive, functionally speaking, rather than an Omnidrive.
 //
-//	The Corvus Flat Cable HBA is a very simplistic device due to the fact that most
-//	of the smarts are in the Hard Drive itself.  What's in the hard drive includes a
+//  The Corvus Flat Cable HBA is a very simplistic device due to the fact that most
+//  of the smarts are in the Hard Drive itself.  What's in the hard drive includes a
 //  Z80 processor, 4K of EPROM and 5KB of RAM.  Ultimately, a true emulation would include
 //  the on-boad controller; however, that is outside the current scope of this code.  Maybe
 //  if I could get a Rev. B/H drive, it could be reverse-engineered to do this.
 //
-//	The Flat Cable controller has two registers:
+//  The Flat Cable controller has two registers:
 //
-//	Data -				Single byte bidirectional data transfer
-//	Status Register -	Bit 7 - Controller Ready -- off = ready, on = not ready
-//						Bit 6 - Bus Direction -- off = host-to-controller, on = controller-to-host
+//  Data -              Single byte bidirectional data transfer
+//  Status Register -   Bit 7 - Controller Ready -- off = ready, on = not ready
+//                      Bit 6 - Bus Direction -- off = host-to-controller, on = controller-to-host
 //
-//	Layout of a Corvus Hard Disk is as follows:
+//  Layout of a Corvus Hard Disk is as follows:
 //
-//	Blk	Len	Description
-//	---	---	-----------
-//	0	1	Boot Block
-//	1	1	Disk Parameter Block
-//	2	1	Diagnostic Block (prep code)
-//	3	1	Constellation Parameter Block
-//	4	2	Dispatcher Code
-//	6	2	Pipes and Semaphores code (Semaphore table contained in block 7, bytes 1-256)
-//	8	10	Mirror Controller Code
-//	18	2	LSI-11 Controller Code
-//	20	2	Pipes Controller Code
-//	22	3	Reserved for Future Use
-//	25	8	Boot Blocks 0-7.  Apple II uses 0-3, Concept uses 4-7
-//	33	4	Active User Table
-//	37	3	Reserved
+//  Blk Len Description
+//  --- --- -----------
+//  0   1   Boot Block
+//  1   1   Disk Parameter Block
+//  2   1   Diagnostic Block (prep code)
+//  3   1   Constellation Parameter Block
+//  4   2   Dispatcher Code
+//  6   2   Pipes and Semaphores code (Semaphore table contained in block 7, bytes 1-256)
+//  8   10  Mirror Controller Code
+//  18  2   LSI-11 Controller Code
+//  20  2   Pipes Controller Code
+//  22  3   Reserved for Future Use
+//  25  8   Boot Blocks 0-7.  Apple II uses 0-3, Concept uses 4-7
+//  33  4   Active User Table
+//  37  3   Reserved
 //
-//	All of the above blocks are initialized by the DDIAG program.  This can be found on the
-//	Concept FSYSGEN floppy.
-//		- Boot blocks and code blocks are initialized using the "Update Firmware on Disk" function.
-//		- Disk Parameter Block is initialized using the "Display/Modify Drive Parameters" function
+//  All of the above blocks are initialized by the DDIAG program.  This can be found on the
+//  Concept FSYSGEN floppy.
+//      - Boot blocks and code blocks are initialized using the "Update Firmware on Disk" function.
+//      - Disk Parameter Block is initialized using the "Display/Modify Drive Parameters" function
 //
-//	An on-disk structure is written with the SYSGEN utility on the same disk.  Password is "HAI"
-//
-//
-//	Corvus Hard Disk performance characteristics (from a 6MB Rev B-E drive)
-//
-//		Average Latency: 6.25ms
-//		Average Access Time: 125ms (and you thought YOUR drive was slow...)
-//		Maximum Access Time: 240ms
-//		Maximum Access Time (single track): 3ms
-//		Data Transfer Rate: 960Kb/sec
-//		Rotational Speed: 4800RPM
-//
-//	Brett Wyer
+//  An on-disk structure is written with the SYSGEN utility on the same disk.  Password is "HAI"
 //
 //
-//	TODO:
-//		Implement READY line glitch after last byte of command (Disk System Tech Ref pp. 3)
-//		Implement Read-after-Write (always happens on Rev B/H drives per Mass Storage GTI pp. 12)
-//		Implement Multiple physical drive support - Up to four
-//		Implement Drive Illegal Addresses (seek past last sector)
-//		Implement Switches on front of drive (LSI-11, MUX, Format, Reset)
-//		Implement an inter-sector delay during the FORMAT command (format happens too quickly now)
+//  Corvus Hard Disk performance characteristics (from a 6MB Rev B-E drive)
+//
+//      Average Latency: 6.25ms
+//      Average Access Time: 125ms (and you thought YOUR drive was slow...)
+//      Maximum Access Time: 240ms
+//      Maximum Access Time (single track): 3ms
+//      Data Transfer Rate: 960Kb/sec
+//      Rotational Speed: 4800RPM
+//
+//  Brett Wyer
+//
+//
+//  TODO:
+//      Implement READY line glitch after last byte of command (Disk System Tech Ref pp. 3)
+//      Implement Read-after-Write (always happens on Rev B/H drives per Mass Storage GTI pp. 12)
+//      Implement Multiple physical drive support - Up to four
+//      Implement Drive Illegal Addresses (seek past last sector)
+//      Implement Switches on front of drive (LSI-11, MUX, Format, Reset)
+//      Implement an inter-sector delay during the FORMAT command (format happens too quickly now)
 //
 
 #include "driver.h"
@@ -387,11 +387,11 @@ static corvus_cmd_t	corvus_prep_cmd[0x82];		// Prep Command sizes and their retu
 // Dump a buffer to the error log in a nice format.
 //
 // Pass:
-//		buffer:	Data to be dumped
-//		length: Number of bytes to be dumped
+//      buffer: Data to be dumped
+//      length: Number of bytes to be dumped
 //
 // Returns:
-//		nada
+//      nada
 //
 static void dump_buffer(UINT8 *buffer, UINT16 length) {
 
@@ -429,10 +429,10 @@ static void dump_buffer(UINT8 *buffer, UINT16 length) {
 // a side-effect of this command, as is awaiting_modifier.
 //
 // Pass:
-//		data:	Initial byte received from the host in Host to Controller mode
+//      data:   Initial byte received from the host in Host to Controller mode
 //
 // Returns:
-//		Whether the command was invalid or not (TRUE = invalid command)
+//      Whether the command was invalid or not (TRUE = invalid command)
 //
 static UINT8 parse_hdc_command(UINT8 data) {
 
@@ -460,7 +460,7 @@ static UINT8 parse_hdc_command(UINT8 data) {
 			case BOOT:
 			case READ_BOOT_BLOCK:
 			case GET_DRIVE_PARAMETERS:
-		//	case PARK_HEADS_REVH:
+		//  case PARK_HEADS_REVH:
 			case PARK_HEADS_OMNI:
 			case ECHO:
 			case PREP_MODE_SELECT:
@@ -473,21 +473,21 @@ static UINT8 parse_hdc_command(UINT8 data) {
 			// Double-byte commands
 			//
 			case SEMAPHORE_LOCK_CODE:
-		//	case SEMAPHORE_UNLOCK_CODE:
+		//  case SEMAPHORE_UNLOCK_CODE:
 			case SEMAPHORE_INIT_CODE:
-		//	case PIPE_READ_CODE:
-		//	case PIPE_WRITE_CODE:
-		//	case PIPE_CLOSE_CODE:
-		//	case PIPE_STATUS_CODE:
-		//	case SEMAPHORE_STATUS_CODE:
+		//  case PIPE_READ_CODE:
+		//  case PIPE_WRITE_CODE:
+		//  case PIPE_CLOSE_CODE:
+		//  case PIPE_STATUS_CODE:
+		//  case SEMAPHORE_STATUS_CODE:
 			case PIPE_OPEN_WRITE_CODE:
-		//	case PIPE_AREA_INIT_CODE:
-		//	case PIPE_OPEN_READ_CODE:
+		//  case PIPE_AREA_INIT_CODE:
+		//  case PIPE_OPEN_READ_CODE:
 			case ADDACTIVE_CODE:
-		//	case DELACTIVEUSR_REVBH_CODE:
-		//	case DELACTIVEUSR_OMNI_CODE:
-		//	case DELACTIVENUM_OMNI_CODE:
-		//	case FINDACTIVE_CODE:
+		//  case DELACTIVEUSR_REVBH_CODE:
+		//  case DELACTIVEUSR_OMNI_CODE:
+		//  case DELACTIVENUM_OMNI_CODE:
+		//  case FINDACTIVE_CODE:
 				c->awaiting_modifier = TRUE;
 				LOG(("parse_hdc_command: Double byte command recoginized: 0x%2.2x\n", data));
 				break;
@@ -535,13 +535,13 @@ static UINT8 parse_hdc_command(UINT8 data) {
 // Write a variably-sized chunk of data to the CHD file
 //
 // Pass:
-//		drv:	Drive number to write to
-//		sector:	Physical sector number to write to
-//		buffer:	Buffer to write
-//		len:	Length of the buffer (amount of data to write)
+//      drv:    Drive number to write to
+//      sector: Physical sector number to write to
+//      buffer: Buffer to write
+//      len:    Length of the buffer (amount of data to write)
 //
 // Returns:
-//		status:	Command status
+//      status: Command status
 //
 static UINT8 corvus_write_sector(running_machine *machine, UINT8 drv, UINT32 sector, UINT8 *buffer, int len) {
 
@@ -597,12 +597,12 @@ static UINT8 corvus_write_sector(running_machine *machine, UINT8 drv, UINT32 sec
 // Write a variably-sized chunk of data to the user area of the virtual Corvus drive
 //
 // Pass:
-//		dadr:	Corvus-encoded Disk Address -- Logical Sector
-//		buffer:	Buffer holding the data to be written to the disk
-//		len:	Length of the buffer
+//      dadr:   Corvus-encoded Disk Address -- Logical Sector
+//      buffer: Buffer holding the data to be written to the disk
+//      len:    Length of the buffer
 //
 // Returns:
-//		status:	Corvus status
+//      status: Corvus status
 //
 static UINT8 corvus_write_logical_sector(running_machine *machine, dadr_t *dadr, UINT8 *buffer, int len) {
 
@@ -646,13 +646,13 @@ static UINT8 corvus_write_logical_sector(running_machine *machine, dadr_t *dadr,
 // Read a variably-sized chunk of data from the CHD file
 //
 // Pass:
-//		drv:	Drive number to read from
-//		sector:	Physical sector number to read from
-//		buffer:	Buffer to hold the data read from the disk
-//		len:	Length of the buffer
+//      drv:    Drive number to read from
+//      sector: Physical sector number to read from
+//      buffer: Buffer to hold the data read from the disk
+//      len:    Length of the buffer
 //
 // Returns:
-//		status:	Corvus status
+//      status: Corvus status
 //
 static UINT8 corvus_read_sector(running_machine *machine, UINT8 drv, UINT32 sector, UINT8 *buffer, int len) {
 
@@ -697,12 +697,12 @@ static UINT8 corvus_read_sector(running_machine *machine, UINT8 drv, UINT32 sect
 // Read a variably-sized chunk of data from the user area of the virtual Corvus drive
 //
 // Pass:
-//		dadr:	Corvus-encoded Disk Address -- Logical Sector
-//		buffer:	Buffer to hold the data read from the disk
-//		len:	Length of the buffer
+//      dadr:   Corvus-encoded Disk Address -- Logical Sector
+//      buffer: Buffer to hold the data read from the disk
+//      len:    Length of the buffer
 //
 // Returns:
-//		status:	Corvus status
+//      status: Corvus status
 //
 static UINT8 corvus_read_logical_sector(running_machine *machine, dadr_t *dadr, UINT8 *buffer, int len) {
 
@@ -747,13 +747,13 @@ static UINT8 corvus_read_logical_sector(running_machine *machine, dadr_t *dadr, 
 // Lock a semaphore in the semaphore table
 //
 // Pass:
-//		name:	Name of the semaphore to lock
+//      name:   Name of the semaphore to lock
 //
 // Returns:
-//		status:	Disk status
+//      status: Disk status
 //
 // Side-effects:
-//		Fills in the semaphore result code
+//      Fills in the semaphore result code
 //
 static UINT8 corvus_lock_semaphore(running_machine *machine, UINT8 *name) {
 
@@ -825,13 +825,13 @@ static UINT8 corvus_lock_semaphore(running_machine *machine, UINT8 *name) {
 // Unock a semaphore in the semaphore table
 //
 // Pass:
-//		name:	Name of the semaphore to unlock
+//      name:   Name of the semaphore to unlock
 //
 // Returns:
-//		status:	Disk status
+//      status: Disk status
 //
 // Side-effects:
-//		Fills in the semaphore result code
+//      Fills in the semaphore result code
 //
 static UINT8 corvus_unlock_semaphore(running_machine *machine, UINT8 *name) {
 
@@ -895,10 +895,10 @@ static UINT8 corvus_unlock_semaphore(running_machine *machine, UINT8 *name) {
 // Zap all of the semaphores from the table (set them to blanks)
 //
 // Pass:
-//		Nothing
+//      Nothing
 //
 // Returns:
-//		Disk status
+//      Disk status
 //
 //
 static UINT8 corvus_init_semaphore_table( running_machine *machine ) {
@@ -926,10 +926,10 @@ static UINT8 corvus_init_semaphore_table( running_machine *machine ) {
 // Fills in the Drive Parameter packet based on the opened CHD file
 //
 // Pass:
-//		drv:	Drive number to get parameters from
+//      drv:    Drive number to get parameters from
 //
 // Returns:
-//		Status of command
+//      Status of command
 //
 static UINT8 corvus_get_drive_parameters(running_machine *machine, UINT8 drv) {
 
@@ -1035,10 +1035,10 @@ static UINT8 corvus_get_drive_parameters(running_machine *machine, UINT8 drv) {
 // Old-style Boot (0x14) command boot block reader
 //
 // Pass:
-//		block:	Boot block number to read (0-7)
+//      block:  Boot block number to read (0-7)
 //
 // Returns:
-//		status:	Status of read operation
+//      status: Status of read operation
 //
 static UINT8 corvus_read_boot_block(running_machine *machine, UINT8 block) {
 
@@ -1058,11 +1058,11 @@ static UINT8 corvus_read_boot_block(running_machine *machine, UINT8 block) {
 // Reads firmware information from the first cylinder of the drive
 //
 // Pass:
-//		head:	Head number
-//		sector:	Sector number
+//      head:   Head number
+//      sector: Sector number
 //
 // Returns:
-//		Status of command
+//      Status of command
 //
 static UINT8 corvus_read_firmware_block(running_machine *machine, UINT8 head, UINT8 sector) {
 
@@ -1088,12 +1088,12 @@ static UINT8 corvus_read_firmware_block(running_machine *machine, UINT8 head, UI
 // Writes firmware information to the first cylinder of the drive
 //
 // Pass:
-//		head:	Head number
-//		sector:	Sector number
-//		buffer:	Data to be written
+//      head:   Head number
+//      sector: Sector number
+//      buffer: Data to be written
 //
 // Returns:
-//		Status of command
+//      Status of command
 //
 static UINT8 corvus_write_firmware_block(running_machine *machine, UINT8 head, UINT8 sector, UINT8 *buffer) {
 
@@ -1119,10 +1119,10 @@ static UINT8 corvus_write_firmware_block(running_machine *machine, UINT8 head, U
 // Write the pattern provided across the entire disk
 //
 // Pass:
-//		pattern: 512-byte buffer containing the pattern to write to the whole drive
+//      pattern: 512-byte buffer containing the pattern to write to the whole drive
 //
 // Returns:
-//		Status of command
+//      Status of command
 //
 static UINT8 corvus_format_drive(running_machine *machine, UINT8 *pattern, UINT16 len) {
 
@@ -1167,10 +1167,10 @@ static UINT8 corvus_format_drive(running_machine *machine, UINT8 *pattern, UINT1
 // Returns a hard_disk_file object for a given virtual hard drive device in the concept
 //
 // Pass:
-//		id:		Drive number (1 - 15)
+//      id:     Drive number (1 - 15)
 //
 // Returns:
-//		hard_disk_file object
+//      hard_disk_file object
 //
 static hard_disk_file *corvus_hdc_file(running_machine *machine, int id) {
 	static const char *const tags[] = {
@@ -1200,10 +1200,10 @@ static hard_disk_file *corvus_hdc_file(running_machine *machine, int id) {
 // Having received a complete packet from the host, process it
 //
 // Pass:
-//		Invalid_Command_Flag:	Invalid command flag responses are handled in this routine
+//      Invalid_Command_Flag:   Invalid command flag responses are handled in this routine
 //
 // Returns:
-//		Nothing
+//      Nothing
 //
 static void corvus_process_command_packet(running_machine *machine, UINT8 invalid_command_flag) {
 
@@ -1251,9 +1251,9 @@ static void corvus_process_command_packet(running_machine *machine, UINT8 invali
 				// Semaphore commands
 				//
 				case SEMAPHORE_LOCK_CODE:
-			//	case SEMAPHORE_UNLOCK_CODE:
+			//  case SEMAPHORE_UNLOCK_CODE:
 				case SEMAPHORE_INIT_CODE:
-			//	case SEMAPHORE_STATUS_CODE:
+			//  case SEMAPHORE_STATUS_CODE:
 					switch(c->buffer.command.modifier) {
 						case SEMAPHORE_LOCK_MOD:
 							c->buffer.semaphore_locking_response.status = corvus_lock_semaphore(machine, c->buffer.lock_semaphore_command.name);
@@ -1369,10 +1369,10 @@ static void corvus_process_command_packet(running_machine *machine, UINT8 invali
 // Callback routine for completion of controller functions
 //
 // Pass:
-//		Callback Function
+//      Callback Function
 //
 // Returns:
-//		Nothing
+//      Nothing
 //
 static TIMER_CALLBACK(corvus_hdc_callback)
 {
@@ -1406,7 +1406,7 @@ static TIMER_CALLBACK(corvus_hdc_callback)
 				c->recv_bytes = 0;
 				c->xmit_bytes = 1;
 				logerror("corvus_hdc_callback: Exceeded four-second timeout for data from host, resetting communications\n");
-			} else { // if(c->recv_bytes == 0) 				   This was a variable-size command
+			} else { // if(c->recv_bytes == 0)                 This was a variable-size command
 				LOG(("corvus_hdc_callback: Executing variable-length command via four-second timeout\n"));
 				corvus_process_command_packet(machine, 0);			// Process the command
 			}
@@ -1428,10 +1428,10 @@ static TIMER_CALLBACK(corvus_hdc_callback)
 // Global routine to initialize the Hard Disk Controller structures and arrays
 //
 // Pass:
-//		Nothing
+//      Nothing
 //
 // Returns:
-//		NULL if there's no file to attach to
+//      NULL if there's no file to attach to
 //
 UINT8 corvus_hdc_init(running_machine *machine) {
 
@@ -1571,10 +1571,10 @@ UINT8 corvus_hdc_init(running_machine *machine) {
 // Global routine to read the Status Register from the Controller (Controller to Host)
 //
 // Pass:
-//		Nothing
+//      Nothing
 //
 // Returns:
-//		Value in the controller status register
+//      Value in the controller status register
 //
 READ8_HANDLER ( corvus_hdc_status_r ) {
 
@@ -1593,10 +1593,10 @@ READ8_HANDLER ( corvus_hdc_status_r ) {
 // when complete.
 //
 // Pass:
-//		Nothing
+//      Nothing
 //
 // Returns:
-//		Value in the controller data register
+//      Value in the controller data register
 //
 READ8_HANDLER ( corvus_hdc_data_r ) {
 
@@ -1624,7 +1624,7 @@ READ8_HANDLER ( corvus_hdc_data_r ) {
 
 		timer_set(space->machine, (ATTOTIME_IN_USEC(INTERBYTE_DELAY)), NULL, CALLBACK_HTC_MODE, corvus_hdc_callback);
 
-//		c->status &= ~(CONTROLLER_DIRECTION | CONTROLLER_BUSY);	// Put us in Idle, Host-to-Controller mode
+//      c->status &= ~(CONTROLLER_DIRECTION | CONTROLLER_BUSY); // Put us in Idle, Host-to-Controller mode
 	} else {
 		//
 		// Not finished with this packet.  Insert an interbyte delay and then let the host continue
@@ -1643,10 +1643,10 @@ READ8_HANDLER ( corvus_hdc_data_r ) {
 // Write to the Data Register on the Controller (Host to Controller)
 //
 // Pass:
-//		Value to write to controller data register
+//      Value to write to controller data register
 //
 // Returns:
-//		Nothing
+//      Nothing
 //
 WRITE8_HANDLER ( corvus_hdc_data_w ) {
 

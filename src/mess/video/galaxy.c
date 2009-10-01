@@ -19,10 +19,10 @@ static UINT32 start_addr = 0;
 emu_timer *gal_video_timer = NULL;
 
 TIMER_CALLBACK( gal_video )
-{	
+{
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int y, x;
-	if (galaxy_interrupts_enabled == TRUE) 
+	if (galaxy_interrupts_enabled == TRUE)
 	{
 		UINT8 *gfx = memory_region(machine, "gfx1");
 		UINT8 dat = (gal_latch_value & 0x3c) >> 2;
@@ -33,15 +33,15 @@ TIMER_CALLBACK( gal_video )
   			if (mode == 0)
 			{
   				// Text mode
-	  			if (first == 0 && (cpu_get_reg(cputag_get_cpu(machine, "maincpu"), Z80_R) & 0x1f) == 0) 
+	  			if (first == 0 && (cpu_get_reg(cputag_get_cpu(machine, "maincpu"), Z80_R) & 0x1f) == 0)
 				{
 		  			// Due to a fact that on real processor latch value is set at
 		  			// the end of last cycle we need to skip dusplay of double
 		  			// first char in each row
 		  			code = 0x00;
 		  			first = 1;
-				} 
-				else 
+				}
+				else
 				{
 					code = memory_read_byte(space,addr) & 0xbf;
 					code += (code & 0x80) >> 1;
@@ -50,7 +50,7 @@ TIMER_CALLBACK( gal_video )
 				}
 				y = gal_cnt / 48 - 2;
 				x = (gal_cnt % 48) * 8;
-				
+
 				*BITMAP_ADDR16(tmpbitmap, y, x ) = (code >> 0) & 1; x++;
 				*BITMAP_ADDR16(tmpbitmap, y, x ) = (code >> 1) & 1; x++;
 				*BITMAP_ADDR16(tmpbitmap, y, x ) = (code >> 2) & 1; x++;
@@ -60,39 +60,39 @@ TIMER_CALLBACK( gal_video )
 				*BITMAP_ADDR16(tmpbitmap, y, x ) = (code >> 6) & 1; x++;
 				*BITMAP_ADDR16(tmpbitmap, y, x ) = (code >> 7) & 1;
 			}
-			else 
+			else
 			{ // Graphics mode
-	  			if (first < 4 && (cpu_get_reg(cputag_get_cpu(machine, "maincpu"), Z80_R) & 0x1f) == 0) 
+	  			if (first < 4 && (cpu_get_reg(cputag_get_cpu(machine, "maincpu"), Z80_R) & 0x1f) == 0)
 				{
 		  			// Due to a fact that on real processor latch value is set at
 		  			// the end of last cycle we need to skip dusplay of 4 times
 		  			// first char in each row
 		  			code = 0x00;
 		  			first++;
-				} 
-				else 
+				}
+				else
 				{
 					code = memory_read_byte(space,addr) ^ 0xff;
 					first = 0;
 				}
 				y = gal_cnt / 48 - 2;
 				x = (gal_cnt % 48) * 8;
-				
+
 				/* hack - until calc of R is fixed in Z80 */
-				if (x == 11 * 8 && y == 0) 
+				if (x == 11 * 8 && y == 0)
 				{
 					start_addr = addr;
 				}
-				if ((x / 8 >= 11) && (x / 8 < 44)) 
+				if ((x / 8 >= 11) && (x / 8 < 44))
 				{
 					code = memory_read_byte(space, start_addr + y * 32 + (gal_cnt % 48) - 11) ^ 0xff;
-				} 
-				else 
+				}
+				else
 				{
 					code = 0x00;
 				}
 				/* end of hack */
-				
+
 				*BITMAP_ADDR16(tmpbitmap, y, x ) = (code >> 0) & 1; x++;
 				*BITMAP_ADDR16(tmpbitmap, y, x ) = (code >> 1) & 1; x++;
 				*BITMAP_ADDR16(tmpbitmap, y, x ) = (code >> 2) & 1; x++;
@@ -101,16 +101,16 @@ TIMER_CALLBACK( gal_video )
 				*BITMAP_ADDR16(tmpbitmap, y, x ) = (code >> 5) & 1; x++;
 				*BITMAP_ADDR16(tmpbitmap, y, x ) = (code >> 6) & 1; x++;
 				*BITMAP_ADDR16(tmpbitmap, y, x ) = (code >> 7) & 1;
-			}					
+			}
 		}
 		gal_cnt++;
-	}	
+	}
 }
 
 VIDEO_UPDATE( galaxy )
 {
 	timer_adjust_periodic(gal_video_timer, attotime_zero, 0, attotime_never);
-	if (galaxy_interrupts_enabled == FALSE) 
+	if (galaxy_interrupts_enabled == FALSE)
 	{
 		rectangle black_area = {0, 384 - 1, 0, 208 - 1};
 		bitmap_fill(tmpbitmap, &black_area, 0);

@@ -1,5 +1,5 @@
 /***************************************************************************
-   
+
     Canon Cat driver by Miodrag Milanovic
 
     12/06/2009 Skeleton driver.
@@ -23,7 +23,7 @@ static WRITE16_HANDLER( cat_video_status_w )
 }
 
 static WRITE16_HANDLER( cat_test_mode_w )
-{	
+{
 }
 
 static READ16_HANDLER( cat_modem_r )
@@ -56,15 +56,15 @@ static READ16_HANDLER( cat_keyboard_r )
 {
 	UINT16 retVal = 0;
 	// Read country code
-	if (pr_cont == 0x0900) 
+	if (pr_cont == 0x0900)
 	{
-		retVal = input_port_read(space->machine, "DIPSW1");		
+		retVal = input_port_read(space->machine, "DIPSW1");
 	}
 	// Regular keyboard read
-	if (pr_cont == 0x0800 || pr_cont == 0x0a00) 
+	if (pr_cont == 0x0800 || pr_cont == 0x0a00)
 	{
 		retVal=0xff00;
-		switch(keyboard_line) 
+		switch(keyboard_line)
 		{
 			case 0x01: retVal = input_port_read(space->machine, "LINE0") << 8; break;
 			case 0x02: retVal = input_port_read(space->machine, "LINE1") << 8; break;
@@ -79,13 +79,13 @@ static READ16_HANDLER( cat_keyboard_r )
 	return retVal;
 }
 static WRITE16_HANDLER( cat_keyboard_w )
-{	
+{
 	keyboard_line = data >> 8;
 }
 
 static WRITE16_HANDLER( cat_video_w )
 {
-/*	
+/*
  006500AE ,          ( HSS HSync Strart    89 )
  006480C2 ,          ( HST End HSync   96 )
  006400CE ,          ( HSE End H Line    104 )
@@ -115,8 +115,8 @@ static ADDRESS_MAP_START(cat_mem, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x0080000e, 0x0080000f) AM_READWRITE(cat_battery_r,cat_printer_w)
 	AM_RANGE(0x00810000, 0x0081001f) AM_DEVREADWRITE8( "duart68681", duart68681_r, duart68681_w, 0xff )
 	AM_RANGE(0x00820000, 0x008200ff) AM_READWRITE(cat_modem_r, cat_modem_w)// modem
-	AM_RANGE(0x00840000, 0x00840001) AM_WRITE(cat_video_status_w) // Video status 
-	AM_RANGE(0x00860000, 0x00860001) AM_WRITE(cat_test_mode_w) // Test mode 	
+	AM_RANGE(0x00840000, 0x00840001) AM_WRITE(cat_video_status_w) // Video status
+	AM_RANGE(0x00860000, 0x00860001) AM_WRITE(cat_test_mode_w) // Test mode
 ADDRESS_MAP_END
 
 static UINT16 *swyft_video_ram;
@@ -124,7 +124,7 @@ static UINT16 *swyft_video_ram;
 static ADDRESS_MAP_START(swyft_mem, ADDRESS_SPACE_PROGRAM, 16)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x0000ffff) AM_ROM // 64 KB ROM
-	AM_RANGE(0x00040000, 0x000fffff) AM_RAM AM_BASE(&swyft_video_ram) 
+	AM_RANGE(0x00040000, 0x000fffff) AM_RAM AM_BASE(&swyft_video_ram)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -153,7 +153,7 @@ static INPUT_PORTS_START( cat )
 	PORT_DIPSETTING(	0x7200, "South Africa" )
 	PORT_DIPSETTING(	0x7100, "Switzerland" )
 	PORT_DIPSETTING(	0x7000, "ASCII" )
-	  		
+
 	PORT_START("LINE0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_N) PORT_CHAR('n') PORT_CHAR('N')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_M) PORT_CHAR('m') PORT_CHAR('M')
@@ -250,8 +250,8 @@ static IRQ_CALLBACK(cat_int_ack)
 	return M68K_INT_ACK_AUTOVECTOR;
 }
 
-static MACHINE_RESET(cat) 
-{	
+static MACHINE_RESET(cat)
+{
 	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), cat_int_ack);
 	timer_pulse(machine, ATTOTIME_IN_HZ(120), NULL, 0, keyboard_callback);
 }
@@ -264,18 +264,18 @@ static VIDEO_UPDATE( cat )
 {
 	UINT16 code;
 	int y, x, b;
-	
-	int addr = 0;	
-	if (video_enable == 1) 
+
+	int addr = 0;
+	if (video_enable == 1)
 	{
 		for (y = 0; y < 344; y++)
 		{
 			int horpos = 0;
 			for (x = 0; x < 42; x++)
-			{			
+			{
 				code = cat_video_ram[addr++];
 				for (b = 15; b >= 0; b--)
-				{								
+				{
 					*BITMAP_ADDR16(bitmap, y, horpos++) = (code >> b) & 0x01;
 				}
 			}
@@ -292,7 +292,7 @@ static TIMER_CALLBACK( swyft_reset )
 	memset(memory_get_read_ptr(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xe2341), 0xff, 1);
 }
 
-static MACHINE_RESET(swyft) 
+static MACHINE_RESET(swyft)
 {
 	timer_set(machine, ATTOTIME_IN_USEC(10), NULL, 0, swyft_reset);
 
@@ -306,16 +306,16 @@ static VIDEO_UPDATE( swyft )
 {
 	UINT16 code;
 	int y, x, b;
-	
-	int addr = 0;	
+
+	int addr = 0;
 	for (y = 0; y < 242; y++)
 	{
 		int horpos = 0;
 		for (x = 0; x < 20; x++)
-		{			
+		{
 			code = swyft_video_ram[addr++];
 			for (b = 15; b >= 0; b--)
-			{				
+			{
 				*BITMAP_ADDR16(bitmap, y, horpos++) =  (code >> b) & 0x01;
 			}
 		}
@@ -336,12 +336,12 @@ static UINT8 duart_inp = 0x0e;
 
 static UINT8 duart_input(const device_config *device)
 {
-	if (duart_inp != 0) 
+	if (duart_inp != 0)
 	{
 		duart_inp = 0;
 		return 0x0e;
-	} 
-	else 
+	}
+	else
 	{
 		duart_inp = 0x0e;
 		return 0x00;
@@ -425,14 +425,14 @@ ROM_START( swyft )
 ROM_END
 
 ROM_START( cat )
-	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASEFF ) 
+	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASEFF )
 	// SYS ROM
 	ROM_LOAD16_BYTE( "r240l0.bin", 0x00001, 0x10000, CRC(1b89bdc4) SHA1(39c639587dc30f9d6636b46d0465f06272838432) )
 	ROM_LOAD16_BYTE( "r240h0.bin", 0x00000, 0x10000, CRC(94f89b8c) SHA1(6c336bc30636a02c625d31f3057ec86bf4d155fc) )
 	ROM_LOAD16_BYTE( "r240l1.bin", 0x20001, 0x10000, CRC(1a73be4f) SHA1(e2de2cb485f78963368fb8ceba8fb66ca56dba34) )
 	ROM_LOAD16_BYTE( "r240h1.bin", 0x20000, 0x10000, CRC(898dd9f6) SHA1(93e791dd4ed7e4afa47a04df6fdde359e41c2075) )
 
-	ROM_REGION( 0x80000, "svrom", ROMREGION_ERASEFF ) 
+	ROM_REGION( 0x80000, "svrom", ROMREGION_ERASEFF )
 ROM_END
 
 /* Driver */

@@ -4,24 +4,24 @@
 
       05/2009 Skeleton driver.
 
-      The Lynx was an 8-bit British home computer that was first released 
-      in early 1983 as a 48 kB model. 
-      The designer of the Lynx was John Shireff and several models were 
-      available with 48 kB, 96 kB (from Sep 1983) or 128 kB RAM (from Dec 
+      The Lynx was an 8-bit British home computer that was first released
+      in early 1983 as a 48 kB model.
+      The designer of the Lynx was John Shireff and several models were
+      available with 48 kB, 96 kB (from Sep 1983) or 128 kB RAM (from Dec
       1983). It was possible reach 192 kB with RAM expansions on-board.
 
-      The machine was based around a Z80A CPU clocked at 4 MHz, and featured 
-      a Motorola 6845 as video controller. It was possible to run CP/M with 
+      The machine was based around a Z80A CPU clocked at 4 MHz, and featured
+      a Motorola 6845 as video controller. It was possible to run CP/M with
       the optional 5.25" floppy disk-drive on the 96 kB and 128 kB models.
       Approximately 30,000 Lynx units were sold world-wide.
 
-      Camputers ceased trading in June 1984. Anston Technology took over in 
-      November the same year and a re-launch was planned but never happened. 
+      Camputers ceased trading in June 1984. Anston Technology took over in
+      November the same year and a re-launch was planned but never happened.
 
-      In June 1986, Anston sold everything - hardware, design rights and 
-      thousands of cassettes - to the National Lynx User Group. The group 
-      planned to produce a Super-Lynx but was too busy supplying spares and 
-      technical information to owners of existing models, and the project never 
+      In June 1986, Anston sold everything - hardware, design rights and
+      thousands of cassettes - to the National Lynx User Group. The group
+      planned to produce a Super-Lynx but was too busy supplying spares and
+      technical information to owners of existing models, and the project never
       came into being.
 
       Hardware info:
@@ -42,37 +42,37 @@
       Bank 0  |      BASIC ROM       |    Not Available       |  Ext  |  Ext
               |                      |                        |  ROM1 |  ROM2
      -------------------------------------------------------------------------
-              |                      |   
+              |                      |
       Bank 1  |        STORE         |           Workspace RAM
-              |                      |    
+              |                      |
      -------------------------------------------------------------------------
               |               |               |               |
       Bank 2  |       RED     |     BLUE      |     GREEN     |     Alt
               |               |               |               |    Green
      -------------------------------------------------------------------------
-              |   
+              |
       Bank 3  |              Available for Video Expansion
-              |   
+              |
      -------------------------------------------------------------------------
-              |         
+              |
       Bank 4  |              Available for User RAM Expansion
-              |       
+              |
 
 
 
-	48k and 96k are basically the same machine. 128k is different.
+    48k and 96k are basically the same machine. 128k is different.
 
-	The work so far is without the benefit of manuals, schematic etc [Robbbert]
+    The work so far is without the benefit of manuals, schematic etc [Robbbert]
 
-	48k, 96k:
-	Cassette operation is strange indeed. Save takes the dac output and directs
-	it to the tape. Load takes over line 0 of the keyboard and uses bits 0 and 5.
+    48k, 96k:
+    Cassette operation is strange indeed. Save takes the dac output and directs
+    it to the tape. Load takes over line 0 of the keyboard and uses bits 0 and 5.
 
-	To Do:
-	- find Break key
-	- banking (it is incomplete atm)
-	- devices (cassette, disk, printer, joysticks)
-	- find out the mc6845 clock frequency
+    To Do:
+    - find Break key
+    - banking (it is incomplete atm)
+    - devices (cassette, disk, printer, joysticks)
+    - find out the mc6845 clock frequency
 
 ****************************************************************************/
 
@@ -84,8 +84,8 @@
 static const device_config *mc6845;
 
 /* These bankswitch handlers are very incomplete, just enough to get the
-	computer working. Also, as it happens 6 times for every scanline
-	of every character, it causes a huge slowdown. */
+    computer working. Also, as it happens 6 times for every scanline
+    of every character, it causes a huge slowdown. */
 
 static WRITE8_HANDLER( lynx48k_bank_w )
 {
@@ -196,13 +196,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lynx128k_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-//	AM_RANGE(0x0050,0x0053) AM_MIRROR(0xff80) AM_READ(wd179x_r)	// uses a 1793
-//	AM_RANGE(0x0054,0x0057) AM_MIRROR(0xff80) AM_WRITE(wd179x_w)
-//	AM_RANGE(0x0058,0x0058) AM_MIRROR(0xff80) AM_WRITE(lynx128k_disk_w)
-//	AM_RANGE(0x007a,0x007b) AM_MIRROR(0xff80) AM_READ(lynx128k_joysticks_r)
-//	AM_RANGE(0x007c,0x007c) AM_MIRROR(0xff80) AM_READ(lynx128k_printer_r)
-//	AM_RANGE(0x007d,0x007d) AM_MIRROR(0xff80) AM_WRITE(lynx128k_printer_init_w)	// this is rw
-//	AM_RANGE(0x007e,0x007e) AM_MIRROR(0xff80) AM_WRITE(lynx128k_printer_w)
+//  AM_RANGE(0x0050,0x0053) AM_MIRROR(0xff80) AM_READ(wd179x_r) // uses a 1793
+//  AM_RANGE(0x0054,0x0057) AM_MIRROR(0xff80) AM_WRITE(wd179x_w)
+//  AM_RANGE(0x0058,0x0058) AM_MIRROR(0xff80) AM_WRITE(lynx128k_disk_w)
+//  AM_RANGE(0x007a,0x007b) AM_MIRROR(0xff80) AM_READ(lynx128k_joysticks_r)
+//  AM_RANGE(0x007c,0x007c) AM_MIRROR(0xff80) AM_READ(lynx128k_printer_r)
+//  AM_RANGE(0x007d,0x007d) AM_MIRROR(0xff80) AM_WRITE(lynx128k_printer_init_w) // this is rw
+//  AM_RANGE(0x007e,0x007e) AM_MIRROR(0xff80) AM_WRITE(lynx128k_printer_w)
 	AM_RANGE(0x0080,0x0080) AM_MIRROR(0xff00) AM_WRITE(SMH_NOP)		/* to be emulated */
 	AM_RANGE(0x0080,0x0080) AM_READ_PORT("LINE0")
 	AM_RANGE(0x0180,0x0180) AM_READ_PORT("LINE1")
@@ -323,14 +323,14 @@ static WRITE8_DEVICE_HANDLER( lynx128k_irq )
 
 static const UINT8 lynx48k_palette[8*3] =
 {
-	0x00, 0x00, 0x00,	/*  0 Black		*/
-	0x00, 0x00, 0xff,	/*  1 Blue		*/
-	0xff, 0x00, 0x00,	/*  2 Red		*/
-	0xff, 0x00, 0xff,	/*  3 Magenta		*/
-	0x00, 0xff, 0x00,	/*  4 Green		*/
-	0x00, 0xff, 0xff,	/*  5 Cyan		*/
-	0xff, 0xff, 0x00,	/*  6 Yellow		*/
-	0xff, 0xff, 0xff,	/*  7 White		*/
+	0x00, 0x00, 0x00,	/*  0 Black     */
+	0x00, 0x00, 0xff,	/*  1 Blue      */
+	0xff, 0x00, 0x00,	/*  2 Red       */
+	0xff, 0x00, 0xff,	/*  3 Magenta       */
+	0x00, 0xff, 0x00,	/*  4 Green     */
+	0x00, 0xff, 0xff,	/*  5 Cyan      */
+	0xff, 0xff, 0x00,	/*  6 Yellow        */
+	0xff, 0xff, 0xff,	/*  7 White     */
 };
 
 static PALETTE_INIT( lynx48k )

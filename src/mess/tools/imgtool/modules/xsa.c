@@ -181,10 +181,10 @@ static int xsa_image_readfile(imgtool_image *img, const char *fname, imgtool_str
 
 
 /****************************************************************/
-/* LZ77 data decompression										*/
-/* Copyright (c) 1994 by XelaSoft								*/
-/* version history:												*/
-/*   version 0.9, start date: 11-27-1994						*/
+/* LZ77 data decompression                                      */
+/* Copyright (c) 1994 by XelaSoft                               */
+/* version history:                                             */
+/*   version 0.9, start date: 11-27-1994                        */
 /****************************************************************/
 
 #define SHORT unsigned
@@ -204,7 +204,7 @@ typedef struct huf_node {
 } huf_node;
 
 /****************************************************************/
-/* global vars													*/
+/* global vars                                                  */
 /****************************************************************/
 static unsigned updhufcnt;
 static unsigned cpdist[tblsize+1];
@@ -217,7 +217,7 @@ static SHORT tblsizes[tblsize];
 static huf_node huftbl[2*tblsize-1];
 
 /****************************************************************/
-/* maak de huffman codeer informatie							*/
+/* maak de huffman codeer informatie                            */
 /****************************************************************/
 static void mkhuftbl( void )
 {
@@ -285,7 +285,7 @@ static void inithufinfo( void )
 }
 
 /****************************************************************/
-/* global vars													*/
+/* global vars                                                  */
 /****************************************************************/
 static imgtool_stream *in_stream, *out_stream;
 
@@ -301,7 +301,7 @@ static UINT8 bitcnt;  /* #resterende bits   */
 #define outbufsize (slwinsize+4096)
 
 /****************************************************************/
-/* The function prototypes										*/
+/* The function prototypes                                      */
 /****************************************************************/
 static void unlz77( void );       /* perform the real decompression       */
 static void charout(UINT8);      /* put a character in the output stream */
@@ -312,7 +312,7 @@ static UINT8 charin( void );       /* read a char                          */
 static UINT8 bitin( void );        /* read a bit                           */
 
 /****************************************************************/
-/* de hoofdlus													*/
+/* de hoofdlus                                                  */
 /****************************************************************/
 static int xsa_extract (imgtool_stream *in, imgtool_stream *out)
     {
@@ -346,7 +346,7 @@ static int xsa_extract (imgtool_stream *in, imgtool_stream *out)
     }
 
 /****************************************************************/
-/* the actual decompression algorithm itself					*/
+/* the actual decompression algorithm itself                    */
 /****************************************************************/
 static void unlz77( void )
 {
@@ -404,7 +404,7 @@ static void flushoutbuf( void )
 }
 
 /****************************************************************/
-/* read string length											*/
+/* read string length                                           */
 /****************************************************************/
 static unsigned rdstrlen( void )
 {
@@ -429,7 +429,7 @@ static unsigned rdstrlen( void )
 }
 
 /****************************************************************/
-/* read string pos												*/
+/* read string pos                                              */
 /****************************************************************/
 static unsigned rdstrpos( void )
 {
@@ -471,7 +471,7 @@ static unsigned rdstrpos( void )
 }
 
 /****************************************************************/
-/* read a bit from the input file								*/
+/* read a bit from the input file                               */
 /****************************************************************/
 static UINT8 bitin( void )
 {

@@ -87,11 +87,11 @@
      - bytes 08-0A: file extension, padedd with whitespaces
      - byte  0B:    file type
                     . 0 = BASIC, ASCII or binary program (B)
-	   	    . 1 = BASIC or ASCII data (D)
-		    . 2 = machine code (M)
-		    . 3 = ASCII assembler file (A)
+            . 1 = BASIC or ASCII data (D)
+            . 2 = machine code (M)
+            . 3 = ASCII assembler file (A)
      - byte  0C:    format flag
- 		    . 00 = binary (tokenized)
+            . 00 = binary (tokenized)
                     . ff = ASCII
      - byte  0D:    first block
      - bytes 0E-0F: bytes used in the last sector
@@ -1438,11 +1438,11 @@ static imgtoolerr_t thom_basic_read_file(imgtool_partition *part,
       if ( stream_read( org, &c, 1 ) < 1 ) break;
       if ( c == 0 ) {
 	/* Sometimes, linelength seems wrong and we must rely on the fact that
-	   BASIC lines are 0-terminated.
-	   At other times, there are 0 embedded within lines or extra stuff
-	   between the 0 and the following line, and so, we must rely
-	   on linelength to cut the line (!)
-	*/
+       BASIC lines are 0-terminated.
+       At other times, there are 0 embedded within lines or extra stuff
+       between the 0 and the following line, and so, we must rely
+       on linelength to cut the line (!)
+    */
 	if ( linelength > 256 ) break;
       }
       else if ( c == 0xff && ! in_str ) in_fun = 1; /* function prefix */

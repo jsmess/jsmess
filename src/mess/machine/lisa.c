@@ -1,39 +1,39 @@
 /*
-	experimental LISA driver
+    experimental LISA driver
 
-	This driver runs most ROM test code successfully, and it loads the boot
-	file, but it locks when booting from Lisa OS (probably because of floppy
-	write bug).  MacWorks boots fine, though (I think it looks when we
-	attempt to write to floppy, too).
+    This driver runs most ROM test code successfully, and it loads the boot
+    file, but it locks when booting from Lisa OS (probably because of floppy
+    write bug).  MacWorks boots fine, though (I think it looks when we
+    attempt to write to floppy, too).
 
-	TODO :
-	* fix floppy write bug
-	* *** Boot and run LisaTest !!! ***
-	* finish MMU (does not switch to bank 0 on 68k trap) --- fixed in June 2003???
-	* support hard disk to boot office system
-	* finish keyboard/mouse support
-	* finish clock support
-	* write SCC support
-	* finalize sound support (involves adding new features to the 6522 VIA core)
-	* fix warm-reset (I think I need to use a callback when 68k RESET
-	  instruction is called)
-	* write support for additionnal hardware (hard disk, etc...)
-	* emulate LISA1 (?)
-	* optimize MMU emulation !
+    TODO :
+    * fix floppy write bug
+    * *** Boot and run LisaTest !!! ***
+    * finish MMU (does not switch to bank 0 on 68k trap) --- fixed in June 2003???
+    * support hard disk to boot office system
+    * finish keyboard/mouse support
+    * finish clock support
+    * write SCC support
+    * finalize sound support (involves adding new features to the 6522 VIA core)
+    * fix warm-reset (I think I need to use a callback when 68k RESET
+      instruction is called)
+    * write support for additionnal hardware (hard disk, etc...)
+    * emulate LISA1 (?)
+    * optimize MMU emulation !
 
-	DONE (just a reminder to uplift my spirit) :
-	* the lion's share of MMU (spring 2000)
-	* video hardware (except contrast control) (spring 2000)
-	* LISA2/Mac XL floppy hardware (november 2000)
+    DONE (just a reminder to uplift my spirit) :
+    * the lion's share of MMU (spring 2000)
+    * video hardware (except contrast control) (spring 2000)
+    * LISA2/Mac XL floppy hardware (november 2000)
 
-	Credits :
-	* the lisaemu project (<http://www.sundernet.com/>) has gathered much
-	   hardware information (books, schematics...) without which this driver
-	   could never have been written
-	* The driver raised the interest of several MESS regulars (Paul Lunga,
-	  Dennis Munsie...) who supported my feeble efforts
+    Credits :
+    * the lisaemu project (<http://www.sundernet.com/>) has gathered much
+       hardware information (books, schematics...) without which this driver
+       could never have been written
+    * The driver raised the interest of several MESS regulars (Paul Lunga,
+      Dennis Munsie...) who supported my feeble efforts
 
-	Raphael Nabet, 2000-2003
+    Raphael Nabet, 2000-2003
 */
 
 #include "driver.h"
@@ -46,7 +46,7 @@
 
 
 /*
-	pointers with RAM & ROM location
+    pointers with RAM & ROM location
 */
 
 /* up to 2MB of 68k RAM (normally 1MB or 512kb), generally 16kb of ROM */
@@ -68,7 +68,7 @@ static UINT8 *videoROM_ptr;
 
 
 /*
-	MMU regs
+    MMU regs
 */
 
 static int setup;	/* MMU setup mode : allows to edit the MMU regs */
@@ -95,11 +95,11 @@ static mmu_entry mmu_regs[4][128];
 
 
 /*
-	parity logic - only hard errors are emulated for now, since
-	a) the ROMs power-up test only tests hard errors
-	b) most memory boards do not use soft errors (i.e. they only generate 1
-	  parity bit to detect errors, instead of generating several ECC bits to
-	  fix errors)
+    parity logic - only hard errors are emulated for now, since
+    a) the ROMs power-up test only tests hard errors
+    b) most memory boards do not use soft errors (i.e. they only generate 1
+      parity bit to detect errors, instead of generating several ECC bits to
+      fix errors)
 */
 
 static int diag2;			/* -> writes wrong parity data into RAM */
@@ -112,7 +112,7 @@ static UINT8 *bad_parity_table;	/* array : 1 bit set for each byte in RAM with w
 
 
 /*
-	video
+    video
 */
 static int VTMSK;				/* VBI enable */
 static int VTIR;				/* VBI pending */
@@ -121,8 +121,8 @@ static UINT16 *videoram_ptr;		/* screen bitmap base address (derived from video_
 
 
 /*
-	2 vias : one is used for communication with COPS ; the other may be used to interface
-	a hard disk
+    2 vias : one is used for communication with COPS ; the other may be used to interface
+    a hard disk
 */
 
 static READ8_DEVICE_HANDLER(COPS_via_in_b);
@@ -159,7 +159,7 @@ const via6522_interface lisa_via6522_1_intf =
 };
 
 /*
-	floppy disk interface
+    floppy disk interface
 */
 
 static int FDIR;
@@ -170,7 +170,7 @@ static int MT1;
 static int PWM_floppy_motor_speed;
 
 /*
-	lisa model identification
+    lisa model identification
 */
 static enum
 {
@@ -184,17 +184,17 @@ static struct
 {
 	unsigned int has_fast_timers : 1;	/* I/O board VIAs are clocked at 1.25 MHz (?) instead of .5 MHz (?) (Lisa 2/10, Mac XL) */
 										/* Note that the beep routine in boot ROMs implies that
-										VIA clock is 1.25 times faster with fast timers than with
-										slow timers.  I read the schematics again and again, and
-										I simply don't understand : in one case the VIA is
-										connected to the 68k E clock, which is CPUCK/10, and in
-										another case, to a generated PH2 clock which is CPUCK/4,
-										with additionnal logic to keep it in phase with the 68k
-										memory cycle.  After hearing the beep when MacWorks XL
-										boots, I bet the correct values are .625 MHz and .5 MHz.
-										Maybe the schematics are wrong, and PH2 is CPUCK/8.
-										Maybe the board uses a 6522 variant with different
-										timings. */
+                                        VIA clock is 1.25 times faster with fast timers than with
+                                        slow timers.  I read the schematics again and again, and
+                                        I simply don't understand : in one case the VIA is
+                                        connected to the 68k E clock, which is CPUCK/10, and in
+                                        another case, to a generated PH2 clock which is CPUCK/4,
+                                        with additionnal logic to keep it in phase with the 68k
+                                        memory cycle.  After hearing the beep when MacWorks XL
+                                        boots, I bet the correct values are .625 MHz and .5 MHz.
+                                        Maybe the schematics are wrong, and PH2 is CPUCK/8.
+                                        Maybe the board uses a 6522 variant with different
+                                        timings. */
 	enum
 	{
 		twiggy,			/* twiggy drives (Lisa 1) */
@@ -206,7 +206,7 @@ static struct
 } lisa_features;
 
 /*
-	protos
+    protos
 */
 
 static READ16_HANDLER ( lisa_IO_r );
@@ -214,7 +214,7 @@ static WRITE16_HANDLER ( lisa_IO_w );
 
 
 /*
-	Interrupt handling
+    Interrupt handling
 */
 
 static void lisa_field_interrupts(running_machine *machine)
@@ -223,18 +223,18 @@ static void lisa_field_interrupts(running_machine *machine)
 		return;	/* don't touch anything... */
 
 	/*if (RSIR)
-		// serial interrupt
-		cputag_set_input_line_and_vector(machine, "maincpu", M68K_IRQ_6, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
-	else if (int0)
-		// external interrupt
-		cputag_set_input_line_and_vector(machine, "maincpu", M68K_IRQ_5, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
-	else if (int1)
-		// external interrupt
-		cputag_set_input_line_and_vector(machine, "maincpu", M68K_IRQ_4, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
-	else if (int2)
-		// external interrupt
-		cputag_set_input_line_and_vector(machine, "maincpu", M68K_IRQ_3, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
-	else*/ if (KBIR)
+        // serial interrupt
+        cputag_set_input_line_and_vector(machine, "maincpu", M68K_IRQ_6, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+    else if (int0)
+        // external interrupt
+        cputag_set_input_line_and_vector(machine, "maincpu", M68K_IRQ_5, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+    else if (int1)
+        // external interrupt
+        cputag_set_input_line_and_vector(machine, "maincpu", M68K_IRQ_4, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+    else if (int2)
+        // external interrupt
+        cputag_set_input_line_and_vector(machine, "maincpu", M68K_IRQ_3, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+    else*/ if (KBIR)
 		/* COPS VIA interrupt */
 		cputag_set_input_line_and_vector(machine, "maincpu", M68K_IRQ_2, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
 	else if (FDIR || VTIR)
@@ -286,7 +286,7 @@ INLINE void set_VTIR(running_machine *machine, int value)
 
 
 /*
-	keyboard interface
+    keyboard interface
 */
 
 static int COPS_Ready;		/* COPS is about to read a command from VIA port A */
@@ -385,9 +385,9 @@ static void COPS_queue_data(running_machine *machine, const UINT8 *data, int len
 }
 
 /*
-	scan_keyboard()
+    scan_keyboard()
 
-	scan the keyboard, and add key transition codes to buffer as needed
+    scan the keyboard, and add key transition codes to buffer as needed
 */
 /* shamelessly stolen from machine/mac.c :-) */
 
@@ -447,7 +447,7 @@ static TIMER_CALLBACK(handle_mouse)
 	int new_mx, new_my;
 
 	/*if (COPS_force_unplug)
-		return;*/	/* ???? */
+        return;*/	/* ???? */
 
 	new_mx = input_port_read(machine, "MOUSE_X");
 	new_my = input_port_read(machine, "MOUSE_Y");
@@ -729,20 +729,20 @@ static void unplug_keyboard(running_machine *machine)
 static void plug_keyboard(running_machine *machine)
 {
 	/*
-		possible keyboard IDs according to Lisa Hardware Manual and boot ROM source code
+        possible keyboard IDs according to Lisa Hardware Manual and boot ROM source code
 
-		2 MSBs : "mfg code" (-> 0x80 for Keytronics, 0x00 for "APD")
-		6 LSBs :
-			0x0x : "old US keyboard"
-			0x3f : US keyboard
-			0x3d : Canadian keyboard
-			0x2f : UK
-			0x2e : German
-			0x2d : French
-			0x27 : Swiss-French
-			0x26 : Swiss-German
-			unknown : spanish, US dvorak, italian & swedish
-	*/
+        2 MSBs : "mfg code" (-> 0x80 for Keytronics, 0x00 for "APD")
+        6 LSBs :
+            0x0x : "old US keyboard"
+            0x3f : US keyboard
+            0x3d : Canadian keyboard
+            0x2f : UK
+            0x2e : German
+            0x2d : French
+            0x27 : Swiss-French
+            0x26 : Swiss-German
+            unknown : spanish, US dvorak, italian & swedish
+    */
 
 	static const UINT8 cmd[2] =
 	{
@@ -770,9 +770,9 @@ static void init_COPS(running_machine *machine)
 /* VIA1 accessors (COPS, sound, and 2 hard disk lines) */
 
 /*
-	PA0-7 (I/O) : VIA <-> COPS data bus
-	CA1 (I) : COPS sending valid data
-	CA2 (O) : VIA -> COPS handshake
+    PA0-7 (I/O) : VIA <-> COPS data bus
+    CA1 (I) : COPS sending valid data
+    CA2 (O) : VIA -> COPS handshake
 */
 static WRITE8_DEVICE_HANDLER(COPS_via_out_a)
 {
@@ -790,18 +790,18 @@ static WRITE8_DEVICE_HANDLER(COPS_via_out_ca2)
 }
 
 /*
-	PB7 (O) : CR* ("Controller Reset", used by hard disk interface) ???
-	PB6 (I) : CRDY ("COPS ready") : set low by the COPS for 20us when it is reading a command
-		from the data bus (command latched at low-to-high transition)
-	PB5 (I/O) : PR* ; as output : "parity error latch reset" (only when CR* and RESET* are
-		inactive) ; as input : low when CR* or RESET are low.
-	PB4 (I) : FDIR (floppy disk interrupt request - the fdc shared RAM should not be accessed
-		unless this bit is 1)
-	PB1-3 (O) : sound volume
-	PB0 (O) : forces disconnection of keyboard and mouse (allows to retrive keyboard ID, etc.)
+    PB7 (O) : CR* ("Controller Reset", used by hard disk interface) ???
+    PB6 (I) : CRDY ("COPS ready") : set low by the COPS for 20us when it is reading a command
+        from the data bus (command latched at low-to-high transition)
+    PB5 (I/O) : PR* ; as output : "parity error latch reset" (only when CR* and RESET* are
+        inactive) ; as input : low when CR* or RESET are low.
+    PB4 (I) : FDIR (floppy disk interrupt request - the fdc shared RAM should not be accessed
+        unless this bit is 1)
+    PB1-3 (O) : sound volume
+    PB0 (O) : forces disconnection of keyboard and mouse (allows to retrive keyboard ID, etc.)
 
-	CB1 : not used
-	CB2 (O) : sound output
+    CB1 : not used
+    CB2 (O) : sound output
 */
 static READ8_DEVICE_HANDLER(COPS_via_in_b)
 {
@@ -860,22 +860,22 @@ static void COPS_via_irq_func(const device_config *device, int val)
 /* VIA2 accessors (hard disk, and a few floppy disk lines) */
 
 /*
-	PA0-7 (I/O) : VIA <-> hard disk data bus (cf PB3)
-	CA1 (I) : hard disk BSY line
-	CA2 (O) : hard disk PSTRB* line
+    PA0-7 (I/O) : VIA <-> hard disk data bus (cf PB3)
+    CA1 (I) : hard disk BSY line
+    CA2 (O) : hard disk PSTRB* line
 */
 
 /*
-	PB7 (O) : WCNT line : set contrast latch on low-to-high transition ?
-	PB6 (I) : floppy disk DISK DIAG line
-	PB5 (I) : hard disk data DD0-7 current parity (does not depend on PB2)
-	PB4 (O) : hard disk CMD* line
-	PB3 (O) : hard disk DR/W* line ; controls the direction of the drivers on the data bus
-	PB2 (O) : when low, disables hard disk interface drivers
-	PB1 (I) : hard disk BSY line
-	PB0 (I) : hard disk OCD (Open Cable Detect) line : 0 when hard disk attached
-	CB1 : not used
-	CB2 (I) : current parity latch value
+    PB7 (O) : WCNT line : set contrast latch on low-to-high transition ?
+    PB6 (I) : floppy disk DISK DIAG line
+    PB5 (I) : hard disk data DD0-7 current parity (does not depend on PB2)
+    PB4 (O) : hard disk CMD* line
+    PB3 (O) : hard disk DR/W* line ; controls the direction of the drivers on the data bus
+    PB2 (O) : when low, disables hard disk interface drivers
+    PB1 (I) : hard disk BSY line
+    PB0 (I) : hard disk OCD (Open Cable Detect) line : 0 when hard disk attached
+    CB1 : not used
+    CB2 (I) : current parity latch value
 */
 static READ8_DEVICE_HANDLER(parallel_via_in_b)
 {
@@ -899,7 +899,7 @@ static READ8_DEVICE_HANDLER(parallel_via_in_b)
 
 
 /*
-	LISA video emulation
+    LISA video emulation
 */
 
 VIDEO_START( lisa )
@@ -907,7 +907,7 @@ VIDEO_START( lisa )
 }
 
 /*
-	Video update
+    Video update
 */
 VIDEO_UPDATE( lisa )
 {
@@ -924,7 +924,7 @@ VIDEO_UPDATE( lisa )
 	for (y = 0; y < resy; y++)
 	{
 		for (x = 0; x < resx; x++)
-//			line_buffer[x] = (v[(x+y*resx)>>4] & (0x8000 >> ((x+y*resx) & 0xf))) ? 0 : 1;
+//          line_buffer[x] = (v[(x+y*resx)>>4] & (0x8000 >> ((x+y*resx) & 0xf))) ? 0 : 1;
 			line_buffer[x] = (v[(x+y*resx)>>4] & (0x8000 >> (x & 0xf))) ? 0 : 1;
 		draw_scanline8(bitmap, 0, y, resx, line_buffer, screen->machine->pens);
 	}
@@ -947,7 +947,7 @@ static DIRECT_UPDATE_HANDLER (lisa_OPbaseoverride)
 	{
 		if (address & 0x004000)
 		{
-//			the_seg = 0;	/* correct ??? */
+//          the_seg = 0;    /* correct ??? */
 		}
 		else
 		{
@@ -1084,11 +1084,11 @@ NVRAM_HANDLER(lisa)
 
 /*void init_lisa1(void)
 {
-	lisa_model = lisa1;
-	lisa_features.has_fast_timers = 0;
-	lisa_features.floppy_hardware = twiggy;
-	lisa_features.has_double_sided_floppy = 1;
-	lisa_features.has_mac_xl_video = 0;
+    lisa_model = lisa1;
+    lisa_features.has_fast_timers = 0;
+    lisa_features.floppy_hardware = twiggy;
+    lisa_features.has_double_sided_floppy = 1;
+    lisa_features.has_mac_xl_video = 0;
 }*/
 
 DRIVER_INIT( lisa2 )
@@ -1100,7 +1100,7 @@ DRIVER_INIT( lisa2 )
 	lisa_features.floppy_hardware = sony_lisa2;
 	lisa_features.has_double_sided_floppy = 0;
 	lisa_features.has_mac_xl_video = 0;
-	
+
 	bad_parity_table = auto_alloc_array(machine, UINT8, 0x40000);  /* 1 bit per byte of CPU RAM */
 }
 
@@ -1113,7 +1113,7 @@ DRIVER_INIT( lisa210 )
 	lisa_features.floppy_hardware = sony_lisa210;
 	lisa_features.has_double_sided_floppy = 0;
 	lisa_features.has_mac_xl_video = 0;
-	
+
 	bad_parity_table = auto_alloc_array(machine, UINT8, 0x40000);  /* 1 bit per byte of CPU RAM */
 }
 
@@ -1126,7 +1126,7 @@ DRIVER_INIT( mac_xl )
 	lisa_features.floppy_hardware = sony_lisa210;
 	lisa_features.has_double_sided_floppy = 0;
 	lisa_features.has_mac_xl_video = 1;
-	
+
 	bad_parity_table = auto_alloc_array(machine, UINT8, 0x40000);  /* 1 bit per byte of CPU RAM */
 }
 
@@ -1276,16 +1276,16 @@ INTERRUPT_GEN( lisa_interrupt )
 		set_VTIR(device->machine, 1);
 	else
 		set_VTIR(device->machine, 0);
-	
+
 	/* do keyboard scan */
 	scan_keyboard(device->machine);
 }
 
 /*
-	Lots of fun with the Lisa fdc hardware
+    Lots of fun with the Lisa fdc hardware
 
-	The iwm floppy select line is connected to the drive SEL line in Lisa2 (which is why Lisa 2
-	cannot support 2 floppy drives)...
+    The iwm floppy select line is connected to the drive SEL line in Lisa2 (which is why Lisa 2
+    cannot support 2 floppy drives)...
 */
 
 INLINE void lisa_fdc_ttl_glue_access(running_machine *machine, offs_t offset)
@@ -1317,7 +1317,7 @@ INLINE void lisa_fdc_ttl_glue_access(running_machine *machine, offs_t offset)
 			}
 		}
 		/*else
-			MT1 = offset & 1;*/
+            MT1 = offset & 1;*/
 		break;
 	case 4:
 		/*DIS = offset & 1;*/	/* forbids access from the 68000 to our RAM */
@@ -1325,8 +1325,8 @@ INLINE void lisa_fdc_ttl_glue_access(running_machine *machine, offs_t offset)
 	case 5:
 		/*HDS = offset & 1;*/		/* head select (-> disk side) on twiggy */
 		/*if (lisa_features.floppy_hardware == twiggy)
-			twiggy_set_head_line(offset & 1);
-		else*/ if (lisa_features.floppy_hardware == sony_lisa210)
+            twiggy_set_head_line(offset & 1);
+        else*/ if (lisa_features.floppy_hardware == sony_lisa210)
 			sony_set_sel_line(devtag_get_device(machine, "fdc"), offset & 1);
 		break;
 	case 6:
@@ -1384,8 +1384,8 @@ WRITE8_HANDLER ( lisa_fdc_io_w )
 	case 2:	/* writes the PWM register */
 		/* the written value is used to generate the motor speed control signal */
 		/*if (lisa_features.floppy_hardware == twiggy)
-			twiggy_set_speed((256-data) * ??? + ???);
-		else*/ if (lisa_features.floppy_hardware == sony_lisa210)
+            twiggy_set_speed((256-data) * ??? + ???);
+        else*/ if (lisa_features.floppy_hardware == sony_lisa210)
 			sony_set_speed(((256-data) * 1.3) + 237);
 		break;
 
@@ -1470,7 +1470,7 @@ READ16_HANDLER ( lisa_r )
 	{	/* special setup mode */
 		if (offset & 0x002000)
 		{
-//			the_seg = 0;	/* correct ??? */
+//          the_seg = 0;    /* correct ??? */
 		}
 		else
 		{
@@ -1511,7 +1511,7 @@ READ16_HANDLER ( lisa_r )
 		offs_t address = (mmu_regs[the_seg][segment].sorg + seg_offset) & 0x1fffff;
 
 		/*logerror("read, logical address%lX\n", offset);
-		logerror("physical address%lX\n", address);*/
+        logerror("physical address%lX\n", address);*/
 
 		switch (mmu_regs[the_seg][segment].type)
 		{
@@ -1573,24 +1573,24 @@ READ16_HANDLER ( lisa_r )
 				/* this emulation is not guaranteed accurate */
 
 				/* problem : due to collisions with video, timings of the LISA CPU
-				are slightly different from timings of a bare 68k */
+                are slightly different from timings of a bare 68k */
 				/* so we use a kludge... */
 				int time_in_frame = video_screen_get_vpos(space->machine->primary_screen);
 				static int videoROM_address = 0;
 
 				/* the BOOT ROM only reads 56 bits, so there must be some wrap-around for
-				videoROM_address <= 56 */
+                videoROM_address <= 56 */
 				/* pixel clock 20MHz, memory access rate 1.25MHz, horizontal clock 22.7kHz
-				according to Apple, which must stand for 1.25MHz/55 = 22727kHz, vertical
-				clock approximately 60Hz, which means there are about 380 lines, including VBlank */
+                according to Apple, which must stand for 1.25MHz/55 = 22727kHz, vertical
+                clock approximately 60Hz, which means there are about 380 lines, including VBlank */
 				/* The values are different on the Mac XL, and I don't know the correct values
-				for sure. */
+                for sure. */
 
 				/* Something appears to be wrong with the timings, since we expect to read the
-				2nd half when v-syncing, i.e. for lines beyond the 431th or 364th one (provided
-				there are no additionnal margins).
-				This is caused by the fact that 68k timings are wrong (memory accesses are
-				interlaced with the video hardware, which is not emulated). */
+                2nd half when v-syncing, i.e. for lines beyond the 431th or 364th one (provided
+                there are no additionnal margins).
+                This is caused by the fact that 68k timings are wrong (memory accesses are
+                interlaced with the video hardware, which is not emulated). */
 				if (lisa_features.has_mac_xl_video)
 				{
 					if ((time_in_frame >= 374) && (time_in_frame <= 392))	/* these values have not been tested */
@@ -1643,7 +1643,7 @@ WRITE16_HANDLER ( lisa_w )
 	{
 		if (offset & 0x002000)
 		{
-//			the_seg = 0;	/* correct ??? */
+//          the_seg = 0;    /* correct ??? */
 		}
 		else
 		{
@@ -1945,9 +1945,9 @@ static READ16_HANDLER ( lisa_IO_r )
 			switch ((offset & 0x0600) >> 9)
 			{
 			case 0:	/* serial ports control */
-				/*SCCBCTL	        .EQU    $FCD241	        ;SCC channel B control
-				ACTL	        .EQU    2	        ;offset to SCC channel A control
-				SCCDATA	        .EQU    4	        ;offset to SCC data regs*/
+				/*SCCBCTL           .EQU    $FCD241         ;SCC channel B control
+                ACTL            .EQU    2           ;offset to SCC channel A control
+                SCCDATA         .EQU    4           ;offset to SCC data regs*/
 				break;
 
 			case 2:	/* parallel port */
@@ -2102,7 +2102,7 @@ static WRITE16_HANDLER ( lisa_IO_w )
 			COMBINE_DATA(& video_address_latch);
 			videoram_ptr = ((UINT16 *)lisa_ram_ptr) + ((video_address_latch << 6) & 0xfc000);
 			/*logerror("video address latch %X -> base address %X\n", video_address_latch,
-							(video_address_latch << 7) & 0x1f8000);*/
+                            (video_address_latch << 7) & 0x1f8000);*/
 			break;
 		}
 		break;

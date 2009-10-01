@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	ap2_lang.c
+    ap2_lang.c
 
-	Implementation of the Apple II Language Card
+    Implementation of the Apple II Language Card
 
 *********************************************************************/
 
@@ -83,7 +83,7 @@ WRITE8_DEVICE_HANDLER(apple2_langcard_w)
 
 /*-------------------------------------------------
     DEVICE_START(apple2_langcard) - device start
-	function
+    function
 -------------------------------------------------*/
 
 static DEVICE_START(apple2_langcard)
@@ -95,7 +95,7 @@ static DEVICE_START(apple2_langcard)
 
 /*-------------------------------------------------
     DEVICE_GET_INFO(apple2_langcard) - device get info
-	function
+    function
 -------------------------------------------------*/
 
 DEVICE_GET_INFO(apple2_langcard)

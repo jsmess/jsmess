@@ -62,7 +62,7 @@ static TIMER_CALLBACK(apple1_dsp_ready_start);
 static TIMER_CALLBACK(apple1_dsp_ready_end);
 
 /*****************************************************************************
-**	Structures
+**  Structures
 *****************************************************************************/
 
 /* Handlers for the PIA.  The inputs for Port B, CA1, and CB1 are
@@ -139,7 +139,7 @@ static int apple1_kbd_data = 0;
 
 
 /*****************************************************************************
-**	DRIVER_INIT:  driver-specific setup, executed once at MESS startup.
+**  DRIVER_INIT:  driver-specific setup, executed once at MESS startup.
 *****************************************************************************/
 
 DRIVER_INIT( apple1 )
@@ -153,21 +153,21 @@ DRIVER_INIT( apple1 )
 	memory_set_bankptr(machine,1, mess_ram);
 
 	/* Poll the keyboard input ports periodically.  These include both
-	   ordinary keys and the RESET and CLEAR SCREEN pushbutton
-	   switches.  We can't handle these switches in a VBLANK_INT or
-	   PERIODIC_INT because both switches need to be monitored even
-	   while the CPU is suspended during RESET; VBLANK_INT and
-	   PERIODIC_INT callbacks aren't run while the CPU is in this
-	   state.
+       ordinary keys and the RESET and CLEAR SCREEN pushbutton
+       switches.  We can't handle these switches in a VBLANK_INT or
+       PERIODIC_INT because both switches need to be monitored even
+       while the CPU is suspended during RESET; VBLANK_INT and
+       PERIODIC_INT callbacks aren't run while the CPU is in this
+       state.
 
-	   A 120-Hz poll rate seems to be fast enough to ensure no
-	   keystrokes are missed. */
+       A 120-Hz poll rate seems to be fast enough to ensure no
+       keystrokes are missed. */
 	timer_pulse(machine, ATTOTIME_IN_HZ(120), NULL, 0, apple1_kbd_poll);
 }
 
 
 /*****************************************************************************
-**	MACHINE_RESET:  actions to perform on each cold boot.
+**  MACHINE_RESET:  actions to perform on each cold boot.
 *****************************************************************************/
 
 MACHINE_RESET( apple1 )
@@ -178,7 +178,7 @@ MACHINE_RESET( apple1 )
 
 
 /*****************************************************************************
-**	apple1_verify_header
+**  apple1_verify_header
 *****************************************************************************/
 static int apple1_verify_header (UINT8 *data)
 {
@@ -205,17 +205,17 @@ static int apple1_verify_header (UINT8 *data)
 #define SNAP_HEADER_LEN			12
 
 /*****************************************************************************
-**	snapshot_load_apple1
+**  snapshot_load_apple1
 **
-**	Format of the binary snapshot image is:
+**  Format of the binary snapshot image is:
 **
-**	[ LOAD:xxyyDATA:zzzzzz...]
+**  [ LOAD:xxyyDATA:zzzzzz...]
 **
-**	where xxyy is the binary starting address (in big-endian byte
-**	order) to load the binary data zzzzzz to.
+**  where xxyy is the binary starting address (in big-endian byte
+**  order) to load the binary data zzzzzz to.
 **
-**	The image can be of arbitrary length, but it must fit in available
-**	memory.
+**  The image can be of arbitrary length, but it must fit in available
+**  memory.
 *****************************************************************************/
 SNAPSHOT_LOAD(apple1)
 {
@@ -266,19 +266,19 @@ SNAPSHOT_LOAD(apple1)
 
 
 /*****************************************************************************
-**	apple1_kbd_poll
+**  apple1_kbd_poll
 **
-**	Keyboard polling handles both ordinary keys and the special RESET
-**	and CLEAR SCREEN switches.
+**  Keyboard polling handles both ordinary keys and the special RESET
+**  and CLEAR SCREEN switches.
 **
-**	For ordinary keys, this implements 2-key rollover to reduce the
-**	chance of missed keypresses.  If we press a key and then press a
-**	second key while the first hasn't been completely released, as
-**	might happen during rapid typing, only the second key is
-**	registered; the first key is ignored.
+**  For ordinary keys, this implements 2-key rollover to reduce the
+**  chance of missed keypresses.  If we press a key and then press a
+**  second key while the first hasn't been completely released, as
+**  might happen during rapid typing, only the second key is
+**  registered; the first key is ignored.
 **
-**	If multiple newly-pressed keys are found, the one closest to the
-**	end of the input ports list is counted; the others are ignored.
+**  If multiple newly-pressed keys are found, the one closest to the
+**  end of the input ports list is counted; the others are ignored.
 *****************************************************************************/
 static TIMER_CALLBACK(apple1_kbd_poll)
 {
@@ -289,7 +289,7 @@ static TIMER_CALLBACK(apple1_kbd_poll)
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3" };
 
 	/* This holds the values of all the input ports for ordinary keys
-	   seen during the last scan. */
+       seen during the last scan. */
 	static UINT32 kbd_last_scan[] = { 0, 0, 0, 0 };
 
 	static int reset_flag = 0;
@@ -329,8 +329,8 @@ static TIMER_CALLBACK(apple1_kbd_poll)
 	}
 
 	/* Now we scan all the input ports for ordinary keys, recording
-	   new keypresses while ignoring keys that were already pressed in
-	   the last scan. */
+       new keypresses while ignoring keys that were already pressed in
+       the last scan. */
 
 	apple1_kbd_data = 0;
 	key_pressed = 0;
@@ -344,7 +344,7 @@ static TIMER_CALLBACK(apple1_kbd_poll)
 	for (port = 0; port < 4; port++)
 	{
 		UINT32 portval, newkeys;
-		
+
 		portval = input_port_read(machine, keynames[port]);
 		newkeys = portval & ~(kbd_last_scan[port]);
 
@@ -369,7 +369,7 @@ static TIMER_CALLBACK(apple1_kbd_poll)
 	if (key_pressed)
 	{
 		/* The keyboard will pulse its strobe line when a key is
-		   pressed.  A 10-usec pulse is typical. */
+           pressed.  A 10-usec pulse is typical. */
 		pia6821_ca1_w(pia, 0, 1);
 		timer_set(machine, ATTOTIME_IN_USEC(10), NULL, 0, apple1_kbd_strobe_end);
 	}
@@ -385,12 +385,12 @@ static TIMER_CALLBACK(apple1_kbd_strobe_end)
 
 
 /*****************************************************************************
-**	READ/WRITE HANDLERS
+**  READ/WRITE HANDLERS
 *****************************************************************************/
 static READ8_DEVICE_HANDLER( apple1_pia0_kbdin )
 {
 	/* Bit 7 of the keyboard input is permanently wired high.  This is
-	   what the ROM Monitor software expects. */
+       what the ROM Monitor software expects. */
 	return apple1_kbd_data | 0x80;
 }
 
@@ -403,18 +403,18 @@ static WRITE8_DEVICE_HANDLER( apple1_pia0_dspout )
 static WRITE8_DEVICE_HANDLER( apple1_pia0_dsp_write_signal )
 {
 	/* PIA output CB2 is inverted to become the DA signal, used to
-	   signal a display write to the video hardware. */
+       signal a display write to the video hardware. */
 
 	/* DA is directly connected to PIA input PB7, so the processor can
-	   read bit 7 of port B to test whether the display has completed
-	   a write. */
+       read bit 7 of port B to test whether the display has completed
+       a write. */
 	pia6821_portb_w(device, 0, (!data) << 7);
 
 	/* Once DA is asserted, the display will wait until it can perform
-	   the write, when the cursor position is about to be refreshed.
-	   Only then will it assert \RDA to signal readiness for another
-	   write.  Thus the write delay depends on the cursor position and
-	   where the display is in the refresh cycle. */
+       the write, when the cursor position is about to be refreshed.
+       Only then will it assert \RDA to signal readiness for another
+       write.  Thus the write delay depends on the cursor position and
+       where the display is in the refresh cycle. */
 	if (!data)
 		timer_set(device->machine, apple1_vh_dsp_time_to_ready(device->machine), NULL, 0, apple1_dsp_ready_start);
 }
@@ -424,9 +424,9 @@ static TIMER_CALLBACK(apple1_dsp_ready_start)
 	const device_config *pia = devtag_get_device( machine, "pia" );
 
 	/* When the display asserts \RDA to signal it is ready, it
-	   triggers a 74123 one-shot to send a 3.5-usec low pulse to PIA
-	   input CB1.  The end of this pulse will tell the PIA that the
-	   display is ready for another write. */
+       triggers a 74123 one-shot to send a 3.5-usec low pulse to PIA
+       input CB1.  The end of this pulse will tell the PIA that the
+       display is ready for another write. */
 	pia6821_cb1_w(pia, 0, 0);
 	timer_set(machine, ATTOTIME_IN_NSEC(3500), NULL, 0, apple1_dsp_ready_end);
 }
@@ -436,61 +436,61 @@ static TIMER_CALLBACK(apple1_dsp_ready_end)
 	const device_config *pia = devtag_get_device( machine, "pia" );
 
 	/* The one-shot pulse has ended; return CB1 to high, so we can do
-	   another display write. */
+       another display write. */
 	pia6821_cb1_w(pia, 0, 1);
 }
 
 
 /*****************************************************************************
-**	Cassette interface I/O
+**  Cassette interface I/O
 **
-**	The Apple I's cassette interface was a small card that plugged
-**	into the expansion connector on the motherboard.  (This was a
-**	slot-type connector, separate from the motherboard's edge
-**	connector, but with the same signals.)  The cassette interface
-**	provided separate cassette input and output jacks, some very
-**	simple interface hardware, and 256 bytes of ROM containing the
-**	cassette I/O code.
+**  The Apple I's cassette interface was a small card that plugged
+**  into the expansion connector on the motherboard.  (This was a
+**  slot-type connector, separate from the motherboard's edge
+**  connector, but with the same signals.)  The cassette interface
+**  provided separate cassette input and output jacks, some very
+**  simple interface hardware, and 256 bytes of ROM containing the
+**  cassette I/O code.
 **
-**	The interface was mostly software-controlled.  The only hardware
-**	was an output flip-flop for generating the cassette output signal,
-**	a National Semiconductor LM311 voltage comparator for generating a
-**	digital signal from the analog cassette input, an input
-**	signal-level LED, and some gates to control the interface logic
-**	and address decoding.  The cassette ROM code did most of the work
-**	of generating and interpreting tape signals.  It also contained
-**	its own mini-monitor for issuing tape read and write commands.
+**  The interface was mostly software-controlled.  The only hardware
+**  was an output flip-flop for generating the cassette output signal,
+**  a National Semiconductor LM311 voltage comparator for generating a
+**  digital signal from the analog cassette input, an input
+**  signal-level LED, and some gates to control the interface logic
+**  and address decoding.  The cassette ROM code did most of the work
+**  of generating and interpreting tape signals.  It also contained
+**  its own mini-monitor for issuing tape read and write commands.
 **
-**	The cassette interface was assigned to the $C000-$CFFF block of
-**	addresses, although it did not use most of the space in that
-**	block.  Addresses were mapped as follows:
+**  The cassette interface was assigned to the $C000-$CFFF block of
+**  addresses, although it did not use most of the space in that
+**  block.  Addresses were mapped as follows:
 **
-**		$C000-$C0FF:  Cassette I/O space.
-**					  Any access here toggles the output signal.
-**			$C000-$C07F:  Cassette output only; input disabled.
-**						  Mirrors $C100-$C17F on reads.
-**			$C080-$C0FF:  Cassette input and output.
-**						  When input low, mirrors $C180-$C1FF on reads.
-**						  When input high, both odd and even addresses
-**						  mirror even ROM addresses $C180-$C1FE.
-**		$C100-$C1FF:  Cassette ROM code.
+**      $C000-$C0FF:  Cassette I/O space.
+**                    Any access here toggles the output signal.
+**          $C000-$C07F:  Cassette output only; input disabled.
+**                        Mirrors $C100-$C17F on reads.
+**          $C080-$C0FF:  Cassette input and output.
+**                        When input low, mirrors $C180-$C1FF on reads.
+**                        When input high, both odd and even addresses
+**                        mirror even ROM addresses $C180-$C1FE.
+**      $C100-$C1FF:  Cassette ROM code.
 **
-**	Note the peculiar addressing scheme.  Data was written simply
-**	through repeated accesses, rather than by writing to an address.
-**	Data was read by reading an odd input address and comparing the
-**	ROM byte returned to detect signal changes.
+**  Note the peculiar addressing scheme.  Data was written simply
+**  through repeated accesses, rather than by writing to an address.
+**  Data was read by reading an odd input address and comparing the
+**  ROM byte returned to detect signal changes.
 **
-**	The standard tape signal was a simple square wave, although this
-**	was often greatly distorted by the cassette recorder.  A single
-**	tape record consisted of a 10-second 800-Hz leader, followed by a
-**	single short square-wave cycle used as a sync bit, followed by the
-**	tape data.  The data was encoded using a single square-wave cycle
-**	for each bit; "1" bits were at 1000 Hz, "0" bits at 2000 Hz.  (All
-**	of these frequencies are approximate and could vary due to
-**	differences in recorder speed.)  Each byte was written starting
-**	from the most significant bit; bytes were written from low to high
-**	addresses.  No error detection was provided.  Multiple records
-**	could be placed on a single tape.
+**  The standard tape signal was a simple square wave, although this
+**  was often greatly distorted by the cassette recorder.  A single
+**  tape record consisted of a 10-second 800-Hz leader, followed by a
+**  single short square-wave cycle used as a sync bit, followed by the
+**  tape data.  The data was encoded using a single square-wave cycle
+**  for each bit; "1" bits were at 1000 Hz, "0" bits at 2000 Hz.  (All
+**  of these frequencies are approximate and could vary due to
+**  differences in recorder speed.)  Each byte was written starting
+**  from the most significant bit; bytes were written from low to high
+**  addresses.  No error detection was provided.  Multiple records
+**  could be placed on a single tape.
 *****************************************************************************/
 
 static const device_config *cassette_device_image(running_machine *machine)
@@ -518,27 +518,27 @@ READ8_HANDLER( apple1_cassette_r )
 	if (offset <= 0x7f)
 	{
 		/* If the access is to address range $C000-$C07F, the cassette
-		   input signal is ignored .  In this case the value read
-		   always comes from the corresponding cassette ROM location
-		   in $C100-$C17F. */
+           input signal is ignored .  In this case the value read
+           always comes from the corresponding cassette ROM location
+           in $C100-$C17F. */
 
 		return memory_read_byte(space, 0xc100 + offset);
 	}
     else
 	{
 		/* For accesses to address range $C080-$C0FF, the cassette
-		   input signal is enabled.  If the signal is low, the value
-		   read comes from the corresponding cassette ROM location in
-		   $C180-$C1FF.  If the signal is high, the low bit of the
-		   address is masked before the corresponding cassette ROM
-		   location is accessed; e.g., a read from $C081 would return
-		   the ROM byte at $C180.  The cassette ROM routines detect
-		   changes in the cassette input signal by repeatedly reading
-		   from $C081 and comparing the values read. */
+           input signal is enabled.  If the signal is low, the value
+           read comes from the corresponding cassette ROM location in
+           $C180-$C1FF.  If the signal is high, the low bit of the
+           address is masked before the corresponding cassette ROM
+           location is accessed; e.g., a read from $C081 would return
+           the ROM byte at $C180.  The cassette ROM routines detect
+           changes in the cassette input signal by repeatedly reading
+           from $C081 and comparing the values read. */
 
 		/* (Don't try putting a non-zero "noise threshhold" here,
-		   because it can cause tape header bits on real cassette
-		   images to be misread as data bits.) */
+           because it can cause tape header bits on real cassette
+           images to be misread as data bits.) */
 		if (cassette_input(cassette_device_image(space->machine)) > 0.0)
 			return memory_read_byte(space, 0xc100 + (offset & ~1));
 		else
@@ -549,11 +549,11 @@ READ8_HANDLER( apple1_cassette_r )
 WRITE8_HANDLER( apple1_cassette_w )
 {
 	/* Writes toggle the output flip-flop in the same way that reads
-	   do; other than that they have no effect.  Any repeated accesses
-	   to the cassette I/O address range can be used to write data to
-	   cassette, and the cassette ROM always uses reads to do this.
-	   However, we still have to handle writes, since they may be done
-	   by user code. */
+       do; other than that they have no effect.  Any repeated accesses
+       to the cassette I/O address range can be used to write data to
+       cassette, and the cassette ROM always uses reads to do this.
+       However, we still have to handle writes, since they may be done
+       by user code. */
 
 	cassette_toggle_output(space->machine);
 }

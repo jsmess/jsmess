@@ -1,17 +1,17 @@
 /***************************************************************************
 
-	machine/pc8801.c
+    machine/pc8801.c
 
-	Implementation of the PC8801
+    Implementation of the PC8801
 
-	On the PC8801, there are two CPUs.  The main CPU and the FDC CPU.  Two
-	8255 PPIs are used for cross CPU communication.  These ports are connected
-	as below:
+    On the PC8801, there are two CPUs.  The main CPU and the FDC CPU.  Two
+    8255 PPIs are used for cross CPU communication.  These ports are connected
+    as below:
 
-		Main CPU 8255 port A <--> FDC CPU 8255 port B
-		Main CPU 8255 port B <--> FDC CPU 8255 port A
-		Main CPU 8255 port C (bits 7-4) <--> FDC CPU 8255 port C (bits 0-3)
-		Main CPU 8255 port C (bits 0-3) <--> FDC CPU 8255 port C (bits 7-4)
+        Main CPU 8255 port A <--> FDC CPU 8255 port B
+        Main CPU 8255 port B <--> FDC CPU 8255 port A
+        Main CPU 8255 port C (bits 7-4) <--> FDC CPU 8255 port C (bits 0-3)
+        Main CPU 8255 port C (bits 0-3) <--> FDC CPU 8255 port C (bits 7-4)
 
 ***************************************************************************/
 
@@ -227,15 +227,15 @@ READ8_HANDLER(pc88sr_inport_40)
 
 READ8_HANDLER(pc88sr_inport_30)
      /* DIP-SW1
-	bit 0: BASIC selection (0 = N-BASIC, 1 = N88-BASIC)
-	bit 1: terminal mode (0 = terminal mode, 1 = BASIC mode)
-	bit 2: startup text width (0 = 80chars/line, 1 = 40chars/line)
-	bit 3: startup text height (0 = 25lines/screen, 1 = 20lines/screen)
-	bit 4: S parameter (0 = enable, 1 = disable)
-	bit 5: operation when recevied DEL code (0 = handle DEL code,
-						 1 = ignore DEL code)
-	bit 6: universal input port 1 (currently always 1)
-	bit 7: universal input port 2 (currently always 1)
+    bit 0: BASIC selection (0 = N-BASIC, 1 = N88-BASIC)
+    bit 1: terminal mode (0 = terminal mode, 1 = BASIC mode)
+    bit 2: startup text width (0 = 80chars/line, 1 = 40chars/line)
+    bit 3: startup text height (0 = 25lines/screen, 1 = 20lines/screen)
+    bit 4: S parameter (0 = enable, 1 = disable)
+    bit 5: operation when recevied DEL code (0 = handle DEL code,
+                         1 = ignore DEL code)
+    bit 6: universal input port 1 (currently always 1)
+    bit 7: universal input port 2 (currently always 1)
       */
 {
   int r;
@@ -255,14 +255,14 @@ READ8_HANDLER(pc88sr_inport_30)
 
 READ8_HANDLER(pc88sr_inport_31)
      /* DIP-SW2
-	bit 0: serial parity (0 = enable, 1 = disable)
-	bit 1: parity type (0 = even parity, 1 = odd parity)
-	bit 2: serial bit length (0 = 8bits/char, 1 = 7bits/char)
-	bit 3: stop bit length (0 = 2bits, 1 = 1bits)
-	bit 4: X parameter (0 = enable, 1 = disable)
-	bit 5: duplex mode (0 = half, 1 = full-duplex)
-	bit 6: speed switch (0 = normal speed, 1 = high speed)
-	bit 7: N88-BASIC version (0 = V2.x, 1 = V1.x)
+    bit 0: serial parity (0 = enable, 1 = disable)
+    bit 1: parity type (0 = even parity, 1 = odd parity)
+    bit 2: serial bit length (0 = 8bits/char, 1 = 7bits/char)
+    bit 3: stop bit length (0 = 2bits, 1 = 1bits)
+    bit 4: X parameter (0 = enable, 1 = disable)
+    bit 5: duplex mode (0 = half, 1 = full-duplex)
+    bit 6: speed switch (0 = normal speed, 1 = high speed)
+    bit 7: N88-BASIC version (0 = V2.x, 1 = V1.x)
       */
 {
   int r;
@@ -744,22 +744,22 @@ static UINT8 load_8255_C(running_machine *machine, int chip)
 	}
 
 	/* NPW 11-Feb-2006 - This is a brutal no-good hack to work around bug #759
-	 *
-	 * The problem is that in MESS 0.96, a regression was introduced that
-	 * prevented the PC8801 from booting up.  The source of this regression
-	 * was the 8255 PPI rewrite.
-	 *
-	 * What seems to happen is CPU #0 does a write to 8255 #0 port C at PC=37CF
-	 * and this causes a communication to be made to CPU #1.  Under the
-	 * previous 8255 code, this write would not actually make it to the the
-	 * slave CPU, CPU #1.  After examining the data sheet, all indications are
-	 * that the new 8255 behavior is indeed correct.
-	 *
-	 * So what I'm doing is an ugly hack so that when the slave CPU #1 sees the
-	 * value written to it, I actually change this to the previous value,
-	 * cloaking the communication.  So the PC8801 now boots up, but hopefully
-	 * a correct fix can be made.
-	 */
+     *
+     * The problem is that in MESS 0.96, a regression was introduced that
+     * prevented the PC8801 from booting up.  The source of this regression
+     * was the 8255 PPI rewrite.
+     *
+     * What seems to happen is CPU #0 does a write to 8255 #0 port C at PC=37CF
+     * and this causes a communication to be made to CPU #1.  Under the
+     * previous 8255 code, this write would not actually make it to the the
+     * slave CPU, CPU #1.  After examining the data sheet, all indications are
+     * that the new 8255 behavior is indeed correct.
+     *
+     * So what I'm doing is an ugly hack so that when the slave CPU #1 sees the
+     * value written to it, I actually change this to the previous value,
+     * cloaking the communication.  So the PC8801 now boots up, but hopefully
+     * a correct fix can be made.
+     */
 	if ((chip == 1) && (result == 0xF8))
 		result = 0xF0;
 

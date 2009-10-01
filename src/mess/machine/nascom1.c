@@ -114,7 +114,7 @@ READ8_HANDLER ( nascom1_port_00_r )
 
 	if (nascom1_portstat.stat_count < 9)
 		return (input_port_read(space->machine, keynames[nascom1_portstat.stat_count]) | ~0x7f);
-	
+
 	return (0xff);
 }
 
@@ -125,20 +125,20 @@ WRITE8_HANDLER( nascom1_port_00_w )
 	cassette_change_state( devtag_get_device(space->machine, "cassette"),
 		( data & 0x10 ) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR );
 
-	if (!(data & NASCOM1_KEY_RESET)) 
+	if (!(data & NASCOM1_KEY_RESET))
 	{
 		if (nascom1_portstat.stat_flags & NASCOM1_KEY_RESET)
 			nascom1_portstat.stat_count = 0;
-	} 
-	else 
+	}
+	else
 		nascom1_portstat.stat_flags = NASCOM1_KEY_RESET;
 
-	if (!(data & NASCOM1_KEY_INCR)) 
+	if (!(data & NASCOM1_KEY_INCR))
 	{
 		if (nascom1_portstat.stat_flags & NASCOM1_KEY_INCR)
 			nascom1_portstat.stat_count++;
-	} 
-	else 
+	}
+	else
 		nascom1_portstat.stat_flags = NASCOM1_KEY_INCR;
 }
 
@@ -270,7 +270,7 @@ MACHINE_RESET( nascom1 )
 MACHINE_RESET( nascom2 )
 {
 	const device_config *fdc = devtag_get_device(machine, "wd1793");
-	
+
 	wd17xx_set_density(fdc,DEN_FM_HI);
 
 	MACHINE_RESET_CALL(nascom1);

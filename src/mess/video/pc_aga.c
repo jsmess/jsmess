@@ -417,7 +417,7 @@ static MC6845_UPDATE_ROW( cga_gfx_2bpp_update_row ) {
 	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
 	int i;
 
-//	if ( y == 0 ) logerror("cga_gfx_2bpp_update_row\n");
+//  if ( y == 0 ) logerror("cga_gfx_2bpp_update_row\n");
 	for ( i = 0; i < x_count; i++ ) {
 		UINT16 offset = ( ( ( ma + i ) << 1 ) & 0x1fff ) | ( ( y & 1 ) << 13 );
 		UINT8 data = videoram[ offset ];
@@ -470,7 +470,7 @@ static MC6845_UPDATE_ROW( cga_gfx_1bpp_update_row ) {
 
 /*************************************
  *
- *	AGA MDA/CGA read/write handlers
+ *  AGA MDA/CGA read/write handlers
  *
  *************************************/
 
@@ -817,12 +817,12 @@ WRITE8_HANDLER( pc200_cga_w )
 	switch(offset) {
 	case 4:
 		pc200.portd |= 0x20;
-//		pc_cga8_w(space, offset,data);
+//      pc_cga8_w(space, offset,data);
 		break;
 	case 8:
 		pc200.port8 = data;
 		pc200.portd |= 0x80;
-//		pc_cga8_w(space, offset,data);
+//      pc_cga8_w(space, offset,data);
 		break;
 	case 0xe:
 		pc200.portd = 0x1f;
@@ -847,7 +847,7 @@ WRITE8_HANDLER( pc200_cga_w )
 		break;
 
 	default:
-//		pc_cga8_w(space, offset,data);
+//      pc_cga8_w(space, offset,data);
 		break;
 	}
 }
@@ -874,7 +874,7 @@ READ8_HANDLER ( pc200_cga_r )
 		break;
 
 	default:
-//		result = pc_cga8_r(space, offset);
+//      result = pc_cga8_r(space, offset);
 		break;
 	}
 	return result;

@@ -43,22 +43,22 @@ static const m6502_interface apple3_m6502_interface =
 /*
 static void apple3_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
-	switch(state)
-	{
-		case MESS_DEVINFO_INT_COUNT:							info->i = 4; break;
+    switch(state)
+    {
+        case MESS_DEVINFO_INT_COUNT:                            info->i = 4; break;
 
-		case MESS_DEVINFO_INT_APPLE525_SPINFRACT_DIVIDEND:	info->i = 1; break;
-		case MESS_DEVINFO_INT_APPLE525_SPINFRACT_DIVISOR:	info->i = 4; break;
+        case MESS_DEVINFO_INT_APPLE525_SPINFRACT_DIVIDEND:  info->i = 1; break;
+        case MESS_DEVINFO_INT_APPLE525_SPINFRACT_DIVISOR:   info->i = 4; break;
 
-		case MESS_DEVINFO_STR_NAME+0:						strcpy(info->s = device_temp_str(), "slot6disk1"); break;
-		case MESS_DEVINFO_STR_NAME+1:						strcpy(info->s = device_temp_str(), "slot6disk2"); break;
-		case MESS_DEVINFO_STR_SHORT_NAME+0:					strcpy(info->s = device_temp_str(), "s6d1"); break;
-		case MESS_DEVINFO_STR_SHORT_NAME+1:					strcpy(info->s = device_temp_str(), "s6d2"); break;
-		case MESS_DEVINFO_STR_DESCRIPTION+0:					strcpy(info->s = device_temp_str(), "Slot 6 Disk #1"); break;
-		case MESS_DEVINFO_STR_DESCRIPTION+1:					strcpy(info->s = device_temp_str(), "Slot 6 Disk #2"); break;
+        case MESS_DEVINFO_STR_NAME+0:                       strcpy(info->s = device_temp_str(), "slot6disk1"); break;
+        case MESS_DEVINFO_STR_NAME+1:                       strcpy(info->s = device_temp_str(), "slot6disk2"); break;
+        case MESS_DEVINFO_STR_SHORT_NAME+0:                 strcpy(info->s = device_temp_str(), "s6d1"); break;
+        case MESS_DEVINFO_STR_SHORT_NAME+1:                 strcpy(info->s = device_temp_str(), "s6d2"); break;
+        case MESS_DEVINFO_STR_DESCRIPTION+0:                    strcpy(info->s = device_temp_str(), "Slot 6 Disk #1"); break;
+        case MESS_DEVINFO_STR_DESCRIPTION+1:                    strcpy(info->s = device_temp_str(), "Slot 6 Disk #2"); break;
 
-		default:										apple525_device_getinfo(devclass, state, info); break;
-	}
+        default:                                        apple525_device_getinfo(devclass, state, info); break;
+    }
 }
 
 */

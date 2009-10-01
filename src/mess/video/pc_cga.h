@@ -2,7 +2,7 @@
 #include "video/pc_video.h"
 
 #define CGA_PALETTE_SETS 83	/* one for colour, one for mono,
-				 * 81 for colour composite */
+                 * 81 for colour composite */
 
 #define CGA_SCREEN_NAME	"cga_screen"
 #define CGA_MC6845_NAME	"mc6845_cga"

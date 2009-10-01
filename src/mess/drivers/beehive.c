@@ -1,10 +1,10 @@
 /***************************************************************************
 
-	BEEHIVE DM3270
+    BEEHIVE DM3270
 
-	25/05/2009 Skeleton driver [Robbbert]
+    25/05/2009 Skeleton driver [Robbbert]
 
-	This is a conventional computer terminal using a serial link.
+    This is a conventional computer terminal using a serial link.
 
 ****************************************************************************/
 

@@ -1,18 +1,18 @@
 /***************************************************************************
 
-	Video hardware for CoCo/Dragon family
+    Video hardware for CoCo/Dragon family
 
-	driver by Nathan Woods
+    driver by Nathan Woods
 
-	See mess/machine/coco.c for references
+    See mess/machine/coco.c for references
 
-	TODO: Determine how the CoCo 2B (which used the M6847T1 was hooked up
-	to the M6847T1 chip to generate its text video modes.  My best guess is as
-	follows:
+    TODO: Determine how the CoCo 2B (which used the M6847T1 was hooked up
+    to the M6847T1 chip to generate its text video modes.  My best guess is as
+    follows:
 
-		GM0 would enable lowercase if INV is off, and force INV on by default
-		GM1 would toggle INV
-		GM2 enables an alternate border
+        GM0 would enable lowercase if INV is off, and force INV on by default
+        GM1 would toggle INV
+        GM2 enables an alternate border
 
 ***************************************************************************/
 

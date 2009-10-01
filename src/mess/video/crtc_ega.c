@@ -1,8 +1,8 @@
 /**********************************************************************
 
-	IBM EGA CRT Controller emulation
+    IBM EGA CRT Controller emulation
 
-	This controller is very loosely based on the mc6845.
+    This controller is very loosely based on the mc6845.
 
 **********************************************************************/
 
@@ -220,9 +220,9 @@ WRITE8_DEVICE_HANDLER( crtc_ega_register_w )
 		default:	break;
 	}
 
-//	/* display message if the Mode Control register is not zero */
-//	if ((crtc_ega->register_address_latch == 0x08) && (crtc_ega->mode_control != 0))
-//		popmessage("Mode Control %02X is not supported!!!", crtc_ega->mode_control);
+//  /* display message if the Mode Control register is not zero */
+//  if ((crtc_ega->register_address_latch == 0x08) && (crtc_ega->mode_control != 0))
+//      popmessage("Mode Control %02X is not supported!!!", crtc_ega->mode_control);
 
 	recompute_parameters(crtc_ega, FALSE);
 }

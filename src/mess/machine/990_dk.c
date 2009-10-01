@@ -1,11 +1,11 @@
 /*
-	990_dk.c: emulation of a TI FD800 'Diablo' floppy disk controller
-	controller, for use with any TI990 system (and possibly any system which
-	implements the CRU bus).
+    990_dk.c: emulation of a TI FD800 'Diablo' floppy disk controller
+    controller, for use with any TI990 system (and possibly any system which
+    implements the CRU bus).
 
-	This floppy disk controller supports IBM-format 8" SSSD and DSSD floppies.
+    This floppy disk controller supports IBM-format 8" SSSD and DSSD floppies.
 
-	Raphael Nabet 2003
+    Raphael Nabet 2003
 */
 
 #include "driver.h"
@@ -125,14 +125,14 @@ void fd800_machine_init(running_machine *machine, void (*interrupt_callback)(run
 }
 
 /*
-	Read the first id field that can be found on the floppy disk.
+    Read the first id field that can be found on the floppy disk.
 
-	unit: floppy drive index
-	head: selected head
-	cylinder_id: cylinder ID read
-	sector_id: sector ID read
+    unit: floppy drive index
+    head: selected head
+    cylinder_id: cylinder ID read
+    sector_id: sector ID read
 
-	Return TRUE if an ID was found
+    Return TRUE if an ID was found
 */
 static int fd800_read_id(int unit, int head, int *cylinder_id, int *sector_id)
 {
@@ -141,8 +141,8 @@ static int fd800_read_id(int unit, int head, int *cylinder_id, int *sector_id)
 
 	/*revolution_count = 0;
 
-	while (revolution_count < 2)
-	{*/
+    while (revolution_count < 2)
+    {*/
 		if (floppy_drive_get_next_id(fd800.drv[unit].img, head, &id))
 		{
 			if (cylinder_id)
@@ -157,14 +157,14 @@ static int fd800_read_id(int unit, int head, int *cylinder_id, int *sector_id)
 }
 
 /*
-	Find a sector by id.
+    Find a sector by id.
 
-	unit: floppy drive index
-	head: selected head
-	sector: sector ID to search
-	data_id: data ID to be used when calling sector read/write functions
+    unit: floppy drive index
+    head: selected head
+    sector: sector ID to search
+    data_id: data ID to be used when calling sector read/write functions
 
-	Return TRUE if the given sector ID was found
+    Return TRUE if the given sector ID was found
 */
 static int fd800_find_sector(int unit, int head, int sector, int *data_id)
 {
@@ -192,13 +192,13 @@ static int fd800_find_sector(int unit, int head, int sector, int *data_id)
 }
 
 /*
-	Perform seek command
+    Perform seek command
 
-	unit: floppy drive index
-	cylinder: track to seek for
-	head: head for which the seek is performed
+    unit: floppy drive index
+    cylinder: track to seek for
+    head: head for which the seek is performed
 
-	Return FALSE if the seek was successful
+    Return FALSE if the seek was successful
 */
 static int fd800_do_seek(int unit, int cylinder, int head)
 {
@@ -256,11 +256,11 @@ static int fd800_do_seek(int unit, int cylinder, int head)
 }
 
 /*
-	Perform restore command
+    Perform restore command
 
-	unit: floppy drive index
+    unit: floppy drive index
 
-	Return FALSE if the restore was successful
+    Return FALSE if the restore was successful
 */
 static int fd800_do_restore(int unit)
 {
@@ -295,7 +295,7 @@ static int fd800_do_restore(int unit)
 }
 
 /*
-	Perform a read operation for one sector
+    Perform a read operation for one sector
 */
 static void fd800_do_read(void)
 {
@@ -323,7 +323,7 @@ static void fd800_do_read(void)
 }
 
 /*
-	Perform a write operation for one sector
+    Perform a write operation for one sector
 */
 static void fd800_do_write(void)
 {
@@ -348,7 +348,7 @@ static void fd800_do_write(void)
 }
 
 /*
-	Execute a fdc command
+    Execute a fdc command
 */
 static void fd800_do_cmd(void)
 {
@@ -380,8 +380,8 @@ static void fd800_do_cmd(void)
 	switch (fd800.cmd_reg >> 12)
 	{
 	case 0:		/* select
-					bits 16-25: 0s
-					bits 26-27: unit number (0-3) */
+                    bits 16-25: 0s
+                    bits 26-27: unit number (0-3) */
 		unit = (fd800.cmd_reg >> 10) & 3;
 
 		/* reset status */
@@ -399,10 +399,10 @@ static void fd800_do_cmd(void)
 		break;
 
 	case 1:		/* seek
-					bits 16-22: cylinder number (0-76)
-					bits 23-24: 0s
-					bits 25: head number (1=upper)
-					bits 26-27: unit number (0-3) */
+                    bits 16-22: cylinder number (0-76)
+                    bits 23-24: 0s
+                    bits 25: head number (1=upper)
+                    bits 26-27: unit number (0-3) */
 		unit = (fd800.cmd_reg >> 10) & 3;
 		head = (fd800.cmd_reg >> 9) & 1;
 		cylinder = fd800.cmd_reg & 0x7f;
@@ -418,8 +418,8 @@ static void fd800_do_cmd(void)
 		break;
 
 	case 2:		/* restore
-					bits 16-25: 0s
-					bits 26-27: unit number (0-3) */
+                    bits 16-25: 0s
+                    bits 26-27: unit number (0-3) */
 		unit = (fd800.cmd_reg >> 10) & 3;
 
 		/* reset status */
@@ -433,9 +433,9 @@ static void fd800_do_cmd(void)
 		break;
 
 	case 3:		/* sector length
-					bits 16-22: sector word count (0-64)
-					bits 23-25: 0s
-					bits 26-27: unit number (0-3) */
+                    bits 16-22: sector word count (0-64)
+                    bits 23-25: 0s
+                    bits 26-27: unit number (0-3) */
 		unit = (fd800.cmd_reg >> 10) & 3;
 		seclen = fd800.cmd_reg & 0x7f;
 
@@ -457,11 +457,11 @@ static void fd800_do_cmd(void)
 		break;
 
 	case 4:		/* read
-					bits 16-20: sector number (1-26)
-					bits 21-23: 0s
-					bit 24: no sequential sectoring (1=active)
-					bit 25: head number (1=upper)
-					bits 26-27: unit number (0-3) */
+                    bits 16-20: sector number (1-26)
+                    bits 21-23: 0s
+                    bit 24: no sequential sectoring (1=active)
+                    bit 25: head number (1=upper)
+                    bits 26-27: unit number (0-3) */
 		unit = (fd800.cmd_reg >> 10) & 3;
 		head = (fd800.cmd_reg >> 9) & 1;
 		/*non_seq_mode = (fd800.cmd_reg >> 8) & 1;*/
@@ -482,9 +482,9 @@ static void fd800_do_cmd(void)
 		break;
 
 	case 5:		/* read ID
-					bits 16-24: 0s
-					bit 25: head number (1=upper)
-					bits 26-27: unit number (0-3) */
+                    bits 16-24: 0s
+                    bit 25: head number (1=upper)
+                    bits 26-27: unit number (0-3) */
 		unit = (fd800.cmd_reg >> 10) & 3;
 		head = (fd800.cmd_reg >> 9) & 1;
 
@@ -506,18 +506,18 @@ static void fd800_do_cmd(void)
 		break;
 
 	case 6:		/* read unformatted
-					bits 16-20: sector number (1-26)
-					bits 21-24: 0s
-					bit 25: head number (1=upper)
-					bits 26-27: unit number (0-3) */
+                    bits 16-20: sector number (1-26)
+                    bits 21-24: 0s
+                    bit 25: head number (1=upper)
+                    bits 26-27: unit number (0-3) */
 		/* ... */
 		break;
 
 	case 7:		/* write
-					bits 16-20: sector number (1-26)
-					bits 21-24: 0s
-					bit 25: head number (1=upper)
-					bits 26-27: unit number (0-3) */
+                    bits 16-20: sector number (1-26)
+                    bits 21-24: 0s
+                    bit 25: head number (1=upper)
+                    bits 26-27: unit number (0-3) */
 		unit = (fd800.cmd_reg >> 10) & 3;
 		head = (fd800.cmd_reg >> 9) & 1;
 		sector = fd800.cmd_reg & 0x1f;
@@ -547,10 +547,10 @@ static void fd800_do_cmd(void)
 		break;
 
 	case 8:		/* write delete
-					bits 16-20: sector number (1-26)
-					bits 21-24: 0s
-					bit 25: head number (1=upper)
-					bits 26-27: unit number (0-3) */
+                    bits 16-20: sector number (1-26)
+                    bits 21-24: 0s
+                    bit 25: head number (1=upper)
+                    bits 26-27: unit number (0-3) */
 		unit = (fd800.cmd_reg >> 10) & 3;
 		head = (fd800.cmd_reg >> 9) & 1;
 		sector = fd800.cmd_reg & 0x1f;
@@ -580,23 +580,23 @@ static void fd800_do_cmd(void)
 		break;
 
 	case 9:		/* format track
-					bits 16-23: track ID (0-255, normally current cylinder index, or 255 for bad track)
-					bit 24: verify only (1 - verify, 0 - format & verify)
-					bit 25: head number (1=upper)
-					bits 26-27: unit number (0-3) */
+                    bits 16-23: track ID (0-255, normally current cylinder index, or 255 for bad track)
+                    bit 24: verify only (1 - verify, 0 - format & verify)
+                    bit 25: head number (1=upper)
+                    bits 26-27: unit number (0-3) */
 		/* ... */
 		break;
 
 	case 10:	/* load int mask
-					bit 16: bad mask for interrupt (0 = unmask or enable interrupt)
-					bits 17-27: 0s */
+                    bit 16: bad mask for interrupt (0 = unmask or enable interrupt)
+                    bits 17-27: 0s */
 		fd800.interrupt_f_f = fd800.cmd_reg & 1;
 		fd800_field_interrupt();
 		break;
 
 	case 11:	/* stop
-					bits 16-25: 0s
-					bits 26-27: unit number (0-3) */
+                    bits 16-25: 0s
+                    bits 26-27: unit number (0-3) */
 		unit = (fd800.cmd_reg >> 10) & 3;
 
 		/* reset status */
@@ -609,9 +609,9 @@ static void fd800_do_cmd(void)
 		break;
 
 	case 12:	/* step head
-					bits 16-22: track number (0-76)
-					bits 23-25: 0s
-					bits 26-27: unit number (0-3) */
+                    bits 16-22: track number (0-76)
+                    bits 23-25: 0s
+                    bits 26-27: unit number (0-3) */
 		unit = (fd800.cmd_reg >> 10) & 3;
 		cylinder = fd800.cmd_reg & 0x7f;
 
@@ -630,48 +630,48 @@ static void fd800_do_cmd(void)
 		break;
 
 	case 13:	/* maintenance commands
-					bits 16-23: according to extended command code
-					bits 24-27: extended command code (0-7) */
+                    bits 16-23: according to extended command code
+                    bits 24-27: extended command code (0-7) */
 		switch ((fd800.cmd_reg >> 8) & 15)
 		{
 		case 0:	/* reset
-					bits 16-23: 0s */
+                    bits 16-23: 0s */
 			/* ... */
 			break;
 		case 1:	/* retry inhibit
-					bits 16-23: 0s */
+                    bits 16-23: 0s */
 			/* ... */
 			break;
 		case 2:	/* LED test
-					bit 16: 1
-					bits 17-19: 0s
-					bit 20: LED #2 enable
-					bit 21: LED #3 enable
-					bit 22: LED #4 enable
-					bit 23: enable LEDs */
+                    bit 16: 1
+                    bits 17-19: 0s
+                    bit 20: LED #2 enable
+                    bit 21: LED #3 enable
+                    bit 22: LED #4 enable
+                    bit 23: enable LEDs */
 			/* ... */
 			break;
 		case 3:	/* program error (a.k.a. invalid command)
-					bits 16-23: 0s */
+                    bits 16-23: 0s */
 			/* ... */
 			break;
 		case 4:	/* memory read
-					bits 16-20: controller memory address (shifted left by 8 to generate 9900 address)
-					bits 21-23: 0s */
+                    bits 16-20: controller memory address (shifted left by 8 to generate 9900 address)
+                    bits 21-23: 0s */
 			/* ... */
 			break;
 		case 5:	/* RAM load
-					bit 16: 0
-					bits 17-23: RAM offset (shifted left by 1 and offset by >1800 to generate 9900 address) */
+                    bit 16: 0
+                    bits 17-23: RAM offset (shifted left by 1 and offset by >1800 to generate 9900 address) */
 			/* ... */
 			break;
 		case 6:	/* RAM run
-					bit 16: 0
-					bits 17-23: RAM offset (shifted left by 1 and offset by >1800 to generate 9900 address) */
+                    bit 16: 0
+                    bits 17-23: RAM offset (shifted left by 1 and offset by >1800 to generate 9900 address) */
 			/* ... */
 			break;
 		case 7:	/* power up simulation
-					bits 16-23: 0s */
+                    bits 16-23: 0s */
 			/* ... */
 			break;
 		}
@@ -679,11 +679,11 @@ static void fd800_do_cmd(void)
 		break;
 
 	case 14:	/* IPL
-					bits 16-22: track number (0-76)
-					bit 23: 0
-					bit 24: no sequential sectoring (1=active)
-					bit 25: head number (1=upper)
-					bits 26-27: unit number (0-3) */
+                    bits 16-22: track number (0-76)
+                    bit 23: 0
+                    bit 24: no sequential sectoring (1=active)
+                    bit 25: head number (1=upper)
+                    bits 26-27: unit number (0-3) */
 		unit = (fd800.cmd_reg >> 10) & 3;
 		head = (fd800.cmd_reg >> 9) & 1;
 		/*non_seq_mode = (fd800.cmd_reg >> 8) & 1;*/
@@ -704,7 +704,7 @@ static void fd800_do_cmd(void)
 		break;
 
 	case 15:	/* Clear Status port
-					bits 16-27: 0s */
+                    bits 16-27: 0s */
 		fd800.stat_reg = 0;
 		fd800_field_interrupt();
 		break;
@@ -712,26 +712,26 @@ static void fd800_do_cmd(void)
 }
 
 /*
-	read one CRU bit
+    read one CRU bit
 
-	0-15: receive buffer
-	16-31: status:
-		16: OP complete (1 -> complete???)
-		17: Xfer ready (XFER) (1 -> ready???)
-		18: drive not ready
-		19: data check error
-		20: seek error/??????
-		21 invalid command/??????
-		22: no address mark found/??????
-		23: equipment check error/??????
-		24: ID check error
-		25: ID not found
-		26: Controller busy (CTLBSY) (0 -> controller is ready)
-		27: write protect
-		28: deleted sector detected
-		29: unit LSB
-		30: unit MSB
-		31: Interrupt (CBUSY???) (1 -> controller is ready)
+    0-15: receive buffer
+    16-31: status:
+        16: OP complete (1 -> complete???)
+        17: Xfer ready (XFER) (1 -> ready???)
+        18: drive not ready
+        19: data check error
+        20: seek error/??????
+        21 invalid command/??????
+        22: no address mark found/??????
+        23: equipment check error/??????
+        24: ID check error
+        25: ID not found
+        26: Controller busy (CTLBSY) (0 -> controller is ready)
+        27: write protect
+        28: deleted sector detected
+        29: unit LSB
+        30: unit MSB
+        31: Interrupt (CBUSY???) (1 -> controller is ready)
 */
  READ8_HANDLER(fd800_cru_r)
 {
@@ -756,16 +756,16 @@ static void fd800_do_cmd(void)
 }
 
 /*
-	write one CRU bit
+    write one CRU bit
 
-	0-15: controller data word (transmit buffer)
-	16-31: controller command word (command register)
-	16-23: parameter value
-	24: flag bit/extended command code
-	25: head select/extended command code
-	26: FD unit number LSB/extended command code
-	27: FD unit number MSB/extended command code
-	28-31: command code
+    0-15: controller data word (transmit buffer)
+    16-31: controller command word (command register)
+    16-23: parameter value
+    24: flag bit/extended command code
+    25: head select/extended command code
+    26: FD unit number LSB/extended command code
+    27: FD unit number MSB/extended command code
+    28-31: command code
 */
 WRITE8_HANDLER(fd800_cru_w)
 {

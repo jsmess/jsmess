@@ -2,8 +2,8 @@
 
     Epson PX-4
 
-	Note: We are missing a dump of the slave 7508 CPU that controls
-	the keyboard and some other things.
+    Note: We are missing a dump of the slave 7508 CPU that controls
+    the keyboard and some other things.
 
 ***************************************************************************/
 

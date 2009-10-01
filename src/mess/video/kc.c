@@ -19,38 +19,38 @@ static const unsigned short kc85_colour_table[KC85_PALETTE_SIZE] =
 };
 
 /*
-	foreground:
+    foreground:
 
-		"full" of each component
+        "full" of each component
 
-		black,
-		blue,
-		red,
-		magenta,
-		green,
-		cyan
-		yellow
-		white
+        black,
+        blue,
+        red,
+        magenta,
+        green,
+        cyan
+        yellow
+        white
 
-		"full of each component + half of another component"
-		black
-		violet
-		red/purple
-		pastel green
-		sky blue
-		yellow/green
-		white
+        "full of each component + half of another component"
+        black
+        violet
+        red/purple
+        pastel green
+        sky blue
+        yellow/green
+        white
 
-	background:
-		"half" of each component
-		black
-		dark blue
-		dark red
-		dark magenta
-		dark green
-		dark cyan
-		dark yellow
-		dark white (grey)
+    background:
+        "half" of each component
+        black
+        dark blue
+        dark red
+        dark magenta
+        dark green
+        dark cyan
+        dark yellow
+        dark white (grey)
 
  */
 
@@ -194,24 +194,24 @@ static void kc85_draw_8_pixels(bitmap_t *bitmap,int x,int y, unsigned char colou
 
 /*
 
-	- 1750000 cpu cycles per second
-	- 35000 cpu cycles per frame
-	- 35000/312 = 112.179 cycles per line
-	- 112.179/(512/8) = 1.752 cycles per 8-pixels
+    - 1750000 cpu cycles per second
+    - 35000 cpu cycles per frame
+    - 35000/312 = 112.179 cycles per line
+    - 112.179/(512/8) = 1.752 cycles per 8-pixels
 */
 
 /* Operation:
 
-	- Vertical and horizontal dimensions are split into states.
-	- Horizontal states take a multiple of horizontal cycles, and vertical states take a multiple of lines.
-	- The horizontal states comprise left border, main display, right border and horizontal retrace timing.
-	- The vertical states comprise top border, main display, bottom border and vertical retrace timing.
+    - Vertical and horizontal dimensions are split into states.
+    - Horizontal states take a multiple of horizontal cycles, and vertical states take a multiple of lines.
+    - The horizontal states comprise left border, main display, right border and horizontal retrace timing.
+    - The vertical states comprise top border, main display, bottom border and vertical retrace timing.
 
 
-	- if frame rate is 50Hz, and there are 312 lines, then the line rate is 15600Hz.
-	- Each frame takes 0.02 seconds, and each line takes 0.0000064 seconds - approx 64microseconds per line
+    - if frame rate is 50Hz, and there are 312 lines, then the line rate is 15600Hz.
+    - Each frame takes 0.02 seconds, and each line takes 0.0000064 seconds - approx 64microseconds per line
 
-	- the event list is based on cpu time
+    - the event list is based on cpu time
 
 */
 
@@ -305,7 +305,7 @@ static void kc85_common_process_cycles(struct video_update_state *video_update, 
 			/* border */
 			case 0:
 			{
-			//	video_update->render_x+=(cycles_to_do)*8;
+			//  video_update->render_x+=(cycles_to_do)*8;
 			}
 			break;
 
@@ -345,7 +345,7 @@ static void kc85_common_process_cycles(struct video_update_state *video_update, 
 			/* border */
 			case 2:
 			{
-			//	video_update->render_x+=(cycles_to_do)*8;
+			//  video_update->render_x+=(cycles_to_do)*8;
 			}
 			break;
 
@@ -441,7 +441,7 @@ static void kc85_common_vh_process_lines(struct video_update_state *video_update
 			/* border */
 			case 0:
 			{
-	//			cycles_done = cycles_to_do;
+	//          cycles_done = cycles_to_do;
 			}
 			break;
 
@@ -461,14 +461,14 @@ static void kc85_common_vh_process_lines(struct video_update_state *video_update
 			/* border */
 			case 2:
 			{
-	//			cycles_done = cycles_to_do;
+	//          cycles_done = cycles_to_do;
 			}
 			break;
 
 			/* not visible */
 			case 3:
 			{
-	//			cycles_done = cycles_to_do;
+	//          cycles_done = cycles_to_do;
 			}
 			break;
 		}

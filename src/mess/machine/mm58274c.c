@@ -1,20 +1,20 @@
 /***************************************************************************
 
-	mm58274c.c
+    mm58274c.c
 
-	mm58274c emulation
+    mm58274c emulation
 
-	Reference:
-	* National Semiconductor MM58274C Microprocessor Compatible Real Time Clock
-		<http://www.national.com/ds/MM/MM58274C.pdf>
+    Reference:
+    * National Semiconductor MM58274C Microprocessor Compatible Real Time Clock
+        <http://www.national.com/ds/MM/MM58274C.pdf>
 
-	Todo:
-	* Clock initialization will only work with the BwG: we need to provide
-	  a way to customize it.
-	* Save the config to NVRAM?
-	* Support interrupt pin output
+    Todo:
+    * Clock initialization will only work with the BwG: we need to provide
+      a way to customize it.
+    * Save the config to NVRAM?
+    * Support interrupt pin output
 
-	Raphael Nabet, 2002
+    Raphael Nabet, 2002
 
 ***************************************************************************/
 
@@ -301,7 +301,7 @@ WRITE8_DEVICE_HANDLER (mm58274c_w)
 
 
 /*
-	Set RTC interrupt flag
+    Set RTC interrupt flag
 */
 static TIMER_CALLBACK(rtc_interrupt_callback)
 {
@@ -312,7 +312,7 @@ static TIMER_CALLBACK(rtc_interrupt_callback)
 
 
 /*
-	Increment RTC clock (timed interrupt every 1/10s)
+    Increment RTC clock (timed interrupt every 1/10s)
 */
 
 static TIMER_CALLBACK(increment_rtc)

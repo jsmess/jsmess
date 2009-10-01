@@ -64,7 +64,7 @@ void draw_border(running_machine *machine, bitmap_t *bitmap,
 
 	for (Count = 0; Count < NumItems; Count++)
 	{
-//		logerror ("Event no %05d, ID = %04x, data = %04x, time = %ld\n", Count, pItem[Count].Event_ID, pItem[Count].Event_Data, (long) pItem[Count].Event_Time);
+//      logerror ("Event no %05d, ID = %04x, data = %04x, time = %ld\n", Count, pItem[Count].Event_ID, pItem[Count].Event_Data, (long) pItem[Count].Event_Time);
 	}
 
 	/* Find the first and second events with the correct ID */
@@ -85,10 +85,10 @@ void draw_border(running_machine *machine, bitmap_t *bitmap,
 	else if (NextItem >= NumItems)
 	{
 			/* Single border colour - this is not strictly correct as the
-				colour change may have occurred midway through the frame
-				or after the last visible border line however the whole
-				border would be redrawn in the correct colour during the
-				next frame anyway! */
+                colour change may have occurred midway through the frame
+                or after the last visible border line however the whole
+                border would be redrawn in the correct colour during the
+                next frame anyway! */
 			r.min_x = 0;
 			r.max_x = TotalScreenWidth-1;
 			r.min_y = 0;
@@ -111,7 +111,7 @@ void draw_border(running_machine *machine, bitmap_t *bitmap,
 			r.max_y = TotalScreenHeight-1;
 			bitmap_fill(bitmap, &r, machine->pens[CurrBorderColor]);
 
-//			logerror ("Setting border colour to %d (Last = %d, Full Refresh = %d)\n", CurrBorderColor, LastDisplayedBorderColor, full_refresh);
+//          logerror ("Setting border colour to %d (Last = %d, Full Refresh = %d)\n", CurrBorderColor, LastDisplayedBorderColor, full_refresh);
 			LastDisplayedBorderColor = CurrBorderColor;
 	}
 	else
@@ -336,7 +336,7 @@ void draw_border(running_machine *machine, bitmap_t *bitmap,
 			/* Set value to ensure redraw on next frame */
 			LastDisplayedBorderColor = -1;
 
-//			logerror ("Multi coloured border drawn (last colour = %d)\n", CurrBorderColor);
+//          logerror ("Multi coloured border drawn (last colour = %d)\n", CurrBorderColor);
 	}
 
 	/* Assume all other routines have processed their data from the list */

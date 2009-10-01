@@ -9,9 +9,9 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- text mode
+    - text mode
 
 */
 
@@ -121,7 +121,7 @@ static TIMER_CALLBACK( busy_tick )
 
 /*-------------------------------------------------
     set_busy_flag - set busy flag and arm timer
-					to clear it later
+                    to clear it later
 -------------------------------------------------*/
 
 static void set_busy_flag(hd61830_t *hd61830, int period)
@@ -199,7 +199,7 @@ WRITE8_DEVICE_HANDLER( hd61830_data_w )
 			logerror("HD61380 '%s' Display %s\n", device->tag, (data & HD61830_MODE_DISPLAY_ON) ? "On" : "Off");
 		}
 		break;
-	
+
 	case HD61830_INSTRUCTION_CHARACTER_PITCH:
 		hd61830->hp = (data & 0x07) + 1;
 		hd61830->vp = (data >> 4) + 1;

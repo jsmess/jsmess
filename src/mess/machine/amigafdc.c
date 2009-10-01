@@ -1,12 +1,12 @@
 /***************************************************************************
 
-	Amiga floppy disk controller emulation
+    Amiga floppy disk controller emulation
 
-	- The drive spins at 300 RPM = 1 Rev every 200ms
-	- At 2usec per bit, that's 12500 bytes per track, or 6250 words per track
-	- At 4usec per bit, that's 6250 bytes per track, or 3125 words per track
-	- Each standard amiga sector has 544 words per sector, and 11 sectors per track = 11968 bytes
-	- ( 12500(max) - 11968(actual) ) = 532 per track gap bytes
+    - The drive spins at 300 RPM = 1 Rev every 200ms
+    - At 2usec per bit, that's 12500 bytes per track, or 6250 words per track
+    - At 4usec per bit, that's 6250 bytes per track, or 3125 words per track
+    - Each standard amiga sector has 544 words per sector, and 11 sectors per track = 11968 bytes
+    - ( 12500(max) - 11968(actual) ) = 532 per track gap bytes
 
 ***************************************************************************/
 
@@ -622,7 +622,7 @@ static TIMER_CALLBACK(fdc_rev_proc)
 }
 
 static void start_rev_timer( int drive ) {
-//	double time;
+//  double time;
 
 	if ( fdc_status[drive].rev_timer_started ) {
 		logerror("Revolution timer started twice?!\n" );

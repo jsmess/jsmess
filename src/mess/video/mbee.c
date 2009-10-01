@@ -1,8 +1,8 @@
 /***************************************************************************
-	microbee.c
+    microbee.c
 
     video hardware
-	Juergen Buchmueller <pullmoll@t-online.de>, Dec 1999
+    Juergen Buchmueller <pullmoll@t-online.de>, Dec 1999
 
 ****************************************************************************/
 
@@ -125,7 +125,7 @@ static int keyboard_matrix_r(running_machine *machine, int offs)
 		crt.lpen_lo = offs & 0xff;
 		crt.lpen_hi = (offs >> 8) & 0x03;
 		crt.lpen_strobe = 1;
-//		logerror("mbee keyboard_matrix_r $%03X (port:%d bit:%d) = %d\n", offs, port, bit, data);
+//      logerror("mbee keyboard_matrix_r $%03X (port:%d bit:%d) = %d\n", offs, port, bit, data);
 	}
 	return data;
 }
@@ -158,10 +158,10 @@ READ8_HANDLER ( mbee_bank_netrom_r )
 
 WRITE8_HANDLER( mbee_1c_w )
 {
-/*	d7 extended graphics - not emulated
-	d5 bankswitch basic rom
-	d4 select attribute ram - not emulated
-	d3..d0 select videoram bank - not emulated */
+/*  d7 extended graphics - not emulated
+    d5 bankswitch basic rom
+    d4 select attribute ram - not emulated
+    d3..d0 select videoram bank - not emulated */
 
 	memory_set_bank(space->machine, 6, (data & 0x20) ? 1 : 0);
 }
@@ -184,8 +184,8 @@ static void m6545_update_strobe(running_machine *machine, int param)
 {
 	/*int data = */keyboard_matrix_r(machine, param);
 	crt.update_strobe = 1;
-//	if( data )
-//		logerror("6545 update_strobe_cb $%04X = $%02X\n", param, data);
+//  if( data )
+//      logerror("6545 update_strobe_cb $%04X = $%02X\n", param, data);
 }
 
 READ8_HANDLER ( m6545_status_r )
@@ -202,7 +202,7 @@ READ8_HANDLER ( m6545_status_r )
 		data |= 0x40;	/* lpen register full */
 	if( crt.update_strobe )
 		data |= 0x80;	/* update strobe has occured */
-//	logerror("6545 status_r $%02X\n", data);
+//  logerror("6545 status_r $%02X\n", data);
 	return data;
 }
 
@@ -250,29 +250,29 @@ READ8_HANDLER ( m6545_status_r )
 		data = crt.cursor_address_lo;
 		break;
 	case 16:
-//		logerror("6545 lpen_hi_r $%02X (lpen:%d upd:%d)\n", crt.lpen_hi, crt.lpen_strobe, crt.update_strobe);
+//      logerror("6545 lpen_hi_r $%02X (lpen:%d upd:%d)\n", crt.lpen_hi, crt.lpen_strobe, crt.update_strobe);
 		crt.lpen_strobe = 0;
 		crt.update_strobe = 0;
 		data = crt.lpen_hi;
 		break;
 	case 17:
-//		logerror("6545 lpen_lo_r $%02X (lpen:%d upd:%d)\n", crt.lpen_lo, crt.lpen_strobe, crt.update_strobe);
+//      logerror("6545 lpen_lo_r $%02X (lpen:%d upd:%d)\n", crt.lpen_lo, crt.lpen_strobe, crt.update_strobe);
 		crt.lpen_strobe = 0;
 		crt.update_strobe = 0;
 		data = crt.lpen_lo;
 		break;
 	case 18:
-//		logerror("6545 transp_hi_r $%02X\n", crt.transp_hi);
+//      logerror("6545 transp_hi_r $%02X\n", crt.transp_hi);
 		data = crt.transp_hi;
 		break;
 	case 19:
-//		logerror("6545 transp_lo_r $%02X\n", crt.transp_lo);
+//      logerror("6545 transp_lo_r $%02X\n", crt.transp_lo);
 		data = crt.transp_lo;
 		break;
 	case 31:
 		/* shared memory latch */
 		addr = (crt.transp_hi << 8) | crt.transp_lo;
-//		logerror("6545 transp_latch $%04X\n", addr);
+//      logerror("6545 transp_latch $%04X\n", addr);
 		m6545_update_strobe(space->machine, addr);
 		break;
 	default:
@@ -383,16 +383,16 @@ WRITE8_HANDLER ( m6545_data_w )
 	case 18:
 		data &= 63;
 		crt.transp_hi = data;
-//		logerror("6545 transp_hi_w $%02X\n", data);
+//      logerror("6545 transp_hi_w $%02X\n", data);
 		break;
 	case 19:
 		crt.transp_lo = data;
-//		logerror("6545 transp_lo_w $%02X\n", data);
+//      logerror("6545 transp_lo_w $%02X\n", data);
 		break;
 	case 31:
 		/* shared memory latch */
 		addr = (crt.transp_hi << 8) | crt.transp_lo;
-//		logerror("6545 transp_latch $%04X\n", addr);
+//      logerror("6545 transp_latch $%04X\n", addr);
 		m6545_update_strobe(space->machine, addr);
 		break;
 	default:
@@ -401,16 +401,16 @@ WRITE8_HANDLER ( m6545_data_w )
 }
 
 /* The 6845 can produce a variety of cursor shapes - all are emulated here
-	Need to find out if the 6545 works the same way */
+    Need to find out if the 6545 works the same way */
 static void mc6845_cursor_configure(void)
 {
 	UINT8 i,curs_type=0,r9,r10,r11;
 
 	/* curs_type holds the general cursor shape to be created
-		0 = no cursor
-		1 = partial cursor (only shows on a block of scan lines)
-		2 = full cursor
-		3 = two-part cursor (has a part at the top and bottom with the middle blank) */
+        0 = no cursor
+        1 = partial cursor (only shows on a block of scan lines)
+        2 = full cursor
+        3 = two-part cursor (has a part at the top and bottom with the middle blank) */
 
 	for ( i = 0; i < ARRAY_LENGTH(mc6845_cursor); i++) mc6845_cursor[i] = 0;		// prepare cursor by erasing old one
 
@@ -432,7 +432,7 @@ static void mc6845_cursor_configure(void)
 	if (curs_type > 1) for (i = 0;i < ARRAY_LENGTH(mc6845_cursor);i++) mc6845_cursor[i]=0xff; // turn on full cursor
 
 	if (curs_type == 1) for (i = r10;i < r11;i++) mc6845_cursor[i]=0xff; // for each line that should show, turn on that scan line
-		
+
 	if (curs_type == 3) for (i = r11; i < r10;i++) mc6845_cursor[i]=0; // now take a bite out of the middle
 }
 
@@ -445,7 +445,7 @@ static void mc6845_screen_configure(running_machine *machine)
 	UINT16 height = crt.vertical_displayed*(crt.scan_lines+1)-1;					// height in pixels
 	UINT16 bytes = crt.horizontal_displayed*crt.vertical_displayed-1;				// video ram needed
 
-	if (width > 0x27f) width=0x27f;	
+	if (width > 0x27f) width=0x27f;
 	if (height > 0x10f) height=0x10f;
 
 	/* Resize the screen */
@@ -575,7 +575,7 @@ VIDEO_UPDATE( mbeeic )
 PALETTE_INIT( mbeeic )
 {
 	UINT16 i;
-	UINT8 r, b, g, k; 
+	UINT8 r, b, g, k;
 	UINT8 level[] = { 0, 0x80, 0xff, 0xff };	/* off, half, full intensity */
 
 	/* set up background palette (00-63) */

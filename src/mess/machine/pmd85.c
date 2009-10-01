@@ -36,7 +36,7 @@ static emu_timer * pmd85_cassette_timer;
 static void pmd851_update_memory(running_machine *machine)
 {
 	const address_space* space = cputag_get_address_space(machine, "maincpu",ADDRESS_SPACE_PROGRAM);
-	
+
 	if (pmd85_startup_mem_map)
 	{
 		UINT8 *mem = memory_region(machine, "maincpu");
@@ -228,9 +228,9 @@ static void c2717_update_memory(running_machine *machine)
 
 /*******************************************************************************
 
-	Motherboard 8255 (PMD-85.1, PMD-85.2, PMD-85.3, Didaktik Alfa)
-	--------------------------------------------------------------
-		keyboard, speaker, LEDs
+    Motherboard 8255 (PMD-85.1, PMD-85.2, PMD-85.3, Didaktik Alfa)
+    --------------------------------------------------------------
+        keyboard, speaker, LEDs
 
 *******************************************************************************/
 
@@ -271,9 +271,9 @@ static WRITE8_DEVICE_HANDLER ( pmd85_ppi_0_portc_w )
 
 /*******************************************************************************
 
-	Motherboard 8255 (Mato)
-	-----------------------
-		keyboard, speaker, LEDs, tape
+    Motherboard 8255 (Mato)
+    -----------------------
+        keyboard, speaker, LEDs, tape
 
 *******************************************************************************/
 
@@ -305,9 +305,9 @@ static WRITE8_DEVICE_HANDLER ( mato_ppi_0_portc_w )
 
 /*******************************************************************************
 
-	I/O board 8255
-	--------------
-		GPIO/0 (K3 connector), GPIO/1 (K4 connector)
+    I/O board 8255
+    --------------
+        GPIO/0 (K3 connector), GPIO/1 (K4 connector)
 
 *******************************************************************************/
 
@@ -343,13 +343,13 @@ static WRITE8_DEVICE_HANDLER ( pmd85_ppi_1_portc_w )
 
 /*******************************************************************************
 
-	I/O board 8255
-	--------------
-		IMS-2 (K5 connector)
+    I/O board 8255
+    --------------
+        IMS-2 (K5 connector)
 
-	- 8251 - cassette recorder and V.24/IFSS (selectable by switch)
+    - 8251 - cassette recorder and V.24/IFSS (selectable by switch)
 
-	- external interfaces connector (K2)
+    - external interfaces connector (K2)
 
 *******************************************************************************/
 
@@ -385,29 +385,29 @@ static WRITE8_DEVICE_HANDLER ( pmd85_ppi_2_portc_w )
 
 /*******************************************************************************
 
-	I/O board 8251
-	--------------
-		cassette recorder and V.24/IFSS (selectable by switch)
+    I/O board 8251
+    --------------
+        cassette recorder and V.24/IFSS (selectable by switch)
 
 *******************************************************************************/
 
 /*******************************************************************************
 
-	I/O board 8253
-	--------------
+    I/O board 8253
+    --------------
 
-	Timer 0:
-		OUT0	- external interfaces connector (K2)
-		CLK0	- external interfaces connector (K2)
-		GATE0	- external interfaces connector (K2), default = 1
-	Timer 1:
-		OUT0	- external interfaces connector (K2), msm8251 (for V24 only)
-		CLK0	- hardwired to 2 MHz system clock
-		GATE0	- external interfaces connector (K2), default = 1
-	Timer 2:
-		OUT0	- unused
-		CLK0	- hardwired to 1HZ signal generator
-		GATE0	- hardwired to 5V, default = 1
+    Timer 0:
+        OUT0    - external interfaces connector (K2)
+        CLK0    - external interfaces connector (K2)
+        GATE0   - external interfaces connector (K2), default = 1
+    Timer 1:
+        OUT0    - external interfaces connector (K2), msm8251 (for V24 only)
+        CLK0    - hardwired to 2 MHz system clock
+        GATE0   - external interfaces connector (K2), default = 1
+    Timer 2:
+        OUT0    - unused
+        CLK0    - hardwired to 1HZ signal generator
+        GATE0   - hardwired to 5V, default = 1
 
 *******************************************************************************/
 
@@ -422,8 +422,8 @@ const struct pit8253_config pmd85_pit8253_interface =
 
 /*******************************************************************************
 
-	I/O board external interfaces connector (K2)
-	--------------------------------------------
+    I/O board external interfaces connector (K2)
+    --------------------------------------------
 
 *******************************************************************************/
 
@@ -431,10 +431,10 @@ const struct pit8253_config pmd85_pit8253_interface =
 
 /*******************************************************************************
 
-	ROM Module 8255
-	---------------
-		port A - data read
-		ports B, C - address select
+    ROM Module 8255
+    ---------------
+        port A - data read
+        ports B, C - address select
 
 *******************************************************************************/
 
@@ -470,24 +470,24 @@ static WRITE8_DEVICE_HANDLER ( pmd85_ppi_3_portc_w )
 
 /*******************************************************************************
 
-	I/O ports (PMD-85.1, PMD-85.2, PMD-85.3, Didaktik Alfa)
-	-------------------------------------------------------
+    I/O ports (PMD-85.1, PMD-85.2, PMD-85.3, Didaktik Alfa)
+    -------------------------------------------------------
 
-	I/O board
-	1xxx11aa	external interfaces connector (K2)
+    I/O board
+    1xxx11aa    external interfaces connector (K2)
 
-	0xxx11aa	I/O board interfaces
-		000111aa	8251 (casette recorder, V24)
-		010011aa	8255 (GPIO/0, GPIO/1)
-		010111aa	8253
-		011111aa	8255 (IMS-2)
+    0xxx11aa    I/O board interfaces
+        000111aa    8251 (casette recorder, V24)
+        010011aa    8255 (GPIO/0, GPIO/1)
+        010111aa    8253
+        011111aa    8255 (IMS-2)
 
-	Motherboard
-	1xxx01aa	8255 (keyboard, speaker, LEDs)
-			PMD-85.3 memory banking
+    Motherboard
+    1xxx01aa    8255 (keyboard, speaker, LEDs)
+            PMD-85.3 memory banking
 
-	ROM Module
-	1xxx10aa	8255 (ROM reading)
+    ROM Module
+    1xxx10aa    8255 (ROM reading)
 
 *******************************************************************************/
 
@@ -635,11 +635,11 @@ WRITE8_HANDLER ( pmd85_io_w )
 
 /*******************************************************************************
 
-	I/O ports (Mato)
-	----------------
+    I/O ports (Mato)
+    ----------------
 
-	Motherboard
-	1xxx01aa	8255 (keyboard, speaker, LEDs, tape)
+    Motherboard
+    1xxx01aa    8255 (keyboard, speaker, LEDs, tape)
 
 *******************************************************************************/
 
@@ -844,7 +844,7 @@ static TIMER_CALLBACK( pmd_reset )
 
 static DIRECT_UPDATE_HANDLER(pmd85_opbaseoverride)
 {
-	if (input_port_read(space->machine, "RESET") & 0x01) 
+	if (input_port_read(space->machine, "RESET") & 0x01)
 		timer_set(space->machine, ATTOTIME_IN_USEC(10), NULL, 0, pmd_reset);
 	return address;
 }
@@ -899,14 +899,14 @@ DRIVER_INIT ( c2717 )
 	pmd85_common_driver_init(machine);
 }
 
-static TIMER_CALLBACK( setup_machine_state ) 
+static TIMER_CALLBACK( setup_machine_state )
 {
 	const device_config *pit8253 = devtag_get_device(machine, "pit8253");
 
 	pit8253_gate_w(pit8253, 0, 1);
 	pit8253_gate_w(pit8253, 1, 1);
 	pit8253_gate_w(pit8253, 2, 1);
-	if (pmd85_model!=MATO) 
+	if (pmd85_model!=MATO)
 	{
 		msm8251_connect(devtag_get_device(machine, "uart"), &pmd85_cassette_serial_connection);
 	}
@@ -936,5 +936,5 @@ MACHINE_RESET( pmd85 )
 
 	timer_set(machine,  attotime_zero, NULL, 0, setup_machine_state );
 
-	memory_set_direct_update_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), pmd85_opbaseoverride);	
+	memory_set_direct_update_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), pmd85_opbaseoverride);
 }

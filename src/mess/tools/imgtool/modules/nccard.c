@@ -44,36 +44,36 @@ IMAGEMODULE(
 )
 
 /*
-	NC PCMCIA RAM Card uses a FAT-like filesystem
+    NC PCMCIA RAM Card uses a FAT-like filesystem
 
-	Blocks are fixed at 256 bytes in size.
+    Blocks are fixed at 256 bytes in size.
 
-	Block 0 and Block 1 are reserved for a boot program.
+    Block 0 and Block 1 are reserved for a boot program.
 
-	Block 2 is reserved for root directory.
+    Block 2 is reserved for root directory.
 
-	Block 3..(3+num_fat_blocks-1) are reserved for fat table.
+    Block 3..(3+num_fat_blocks-1) are reserved for fat table.
 
-	Block (3+num_fat_blocks).. are used for data storage.
+    Block (3+num_fat_blocks).. are used for data storage.
 
-	The FAT table uses two bytes for each entry.
+    The FAT table uses two bytes for each entry.
 
-	The blocks used by a file are stored in the table in a link-list
-	structure.
+    The blocks used by a file are stored in the table in a link-list
+    structure.
 
-	The index of the first block is stored in the directory entry.
-	This entry is looked up in the FAT table. If the entry contains
-	another number (other than 0x0ffff and 0x0fffe), this is the next
-	block used by the file. If the number is 0x0ffff this means this
-	block is the last used by the file.
+    The index of the first block is stored in the directory entry.
+    This entry is looked up in the FAT table. If the entry contains
+    another number (other than 0x0ffff and 0x0fffe), this is the next
+    block used by the file. If the number is 0x0ffff this means this
+    block is the last used by the file.
 
-	0x0fffe indicates a reserved block.
+    0x0fffe indicates a reserved block.
 
-	The maximum supported PCMCIA Ram card size is 1mb, and there are
-	4096 256-byte blocks on each card. Therefore a FAT entry uses 12-bits
-	to store the block index, leaving the top 4-bits as a status??
+    The maximum supported PCMCIA Ram card size is 1mb, and there are
+    4096 256-byte blocks on each card. Therefore a FAT entry uses 12-bits
+    to store the block index, leaving the top 4-bits as a status??
 
-	Maximum size of a file on the PCMCIA Ram card is 65536 bytes.
+    Maximum size of a file on the PCMCIA Ram card is 65536 bytes.
 */
 struct nc_card_dir_entry
 {
@@ -90,7 +90,7 @@ struct nc_card_dir_entry
 	/* format unknown */
 	unsigned char packed_date[4];
 	/* 2-byte block index. first block used by file, other blocks
-	found in fat table */
+    found in fat table */
 	unsigned char first_block_low;
 	unsigned char first_block_high;
 	/* unused?? */
@@ -232,7 +232,7 @@ static unsigned long memcard_get_free_dir_entry(struct nc_memcard *memcard)
 	}
 
 	/* out of entries within current blocks occupied by directory.
-	try to expand directory by one more block */
+    try to expand directory by one more block */
 
 	current_block = memcard_fat_get_free_block(memcard);
 
@@ -259,7 +259,7 @@ static unsigned long memcard_get_free_dir_entry(struct nc_memcard *memcard)
 
 		/* clear block */
 		/* only really necessary to clear first byte of each dir entry - but I'll clear
-		it all to give decent compressable cards */
+        it all to give decent compressable cards */
 		memset(&memcard->memcard_data[block_offset], 0, NC_BLOCK_SIZE);
 
 		/* setup fat */

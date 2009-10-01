@@ -143,7 +143,7 @@ static DEVICE_START( lmc1992 )
 
 	lmc1992->intf = device->static_config;
 
-//	assert(lmc1992->intf != NULL);
+//  assert(lmc1992->intf != NULL);
 
 	/* register for state saving */
 

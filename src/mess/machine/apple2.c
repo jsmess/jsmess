@@ -7,7 +7,7 @@
   TODO:  Make a standard set of peripherals work.
   TODO:  Allow swappable peripherals in each slot.
   TODO:  Verify correctness of C08X switches.
-			- need to do double-read before write-enable RAM
+            - need to do double-read before write-enable RAM
 
 ***************************************************************************/
 
@@ -569,7 +569,7 @@ static const apple2_memmap_entry apple2_memmap_entries[] =
 
 void apple2_setvar(running_machine *machine, UINT32 val, UINT32 mask)
 {
-	LOG(("apple2_setvar(): val=0x%06x mask=0x%06x pc=0x%04x\n", val, mask, 
+	LOG(("apple2_setvar(): val=0x%06x mask=0x%06x pc=0x%04x\n", val, mask,
 					(unsigned int) cpu_get_reg(cputag_get_cpu(machine, "maincpu"), REG_GENPC)));
 
 	assert((val & mask) == val);
@@ -796,10 +796,10 @@ INTERRUPT_GEN( apple2_interrupt )
 
 
 /***************************************************************************
-	apple2_mainram0400_w
-	apple2_mainram2000_w
-	apple2_auxram0400_w
-	apple2_auxram2000_w
+    apple2_mainram0400_w
+    apple2_mainram2000_w
+    apple2_auxram0400_w
+    apple2_auxram2000_w
 ***************************************************************************/
 
 static WRITE8_HANDLER ( apple2_mainram0400_w )
@@ -849,22 +849,22 @@ READ8_HANDLER ( apple2_c00x_r )
 /***************************************************************************
   apple2_c00x_w
 
-  C000	80STOREOFF
-  C001	80STOREON - use 80-column memory mapping
-  C002	RAMRDOFF
-  C003	RAMRDON - read from aux 48k
-  C004	RAMWRTOFF
-  C005	RAMWRTON - write to aux 48k
-  C006	INTCXROMOFF
-  C007	INTCXROMON
-  C008	ALTZPOFF
-  C009	ALTZPON - use aux ZP, stack and language card area
-  C00A	SLOTC3ROMOFF
-  C00B	SLOTC3ROMON - use external slot 3 ROM
-  C00C	80COLOFF
-  C00D	80COLON - use 80-column display mode
-  C00E	ALTCHARSETOFF
-  C00F	ALTCHARSETON - use alt character set
+  C000  80STOREOFF
+  C001  80STOREON - use 80-column memory mapping
+  C002  RAMRDOFF
+  C003  RAMRDON - read from aux 48k
+  C004  RAMWRTOFF
+  C005  RAMWRTON - write to aux 48k
+  C006  INTCXROMOFF
+  C007  INTCXROMON
+  C008  ALTZPOFF
+  C009  ALTZPON - use aux ZP, stack and language card area
+  C00A  SLOTC3ROMOFF
+  C00B  SLOTC3ROMON - use external slot 3 ROM
+  C00C  80COLOFF
+  C00D  80COLON - use 80-column display mode
+  C00E  ALTCHARSETOFF
+  C00F  ALTCHARSETON - use alt character set
 ***************************************************************************/
 
 WRITE8_HANDLER ( apple2_c00x_w )
@@ -1056,8 +1056,8 @@ READ8_HANDLER ( apple2_c06x_r )
 			break;
 		default:
 			/* c060 Empty Cassette head read
-			 * and any other non joystick c06 port returns this according to applewin
-			 */
+             * and any other non joystick c06 port returns this according to applewin
+             */
 			return apple2_getfloatingbusvalue(space->machine);
 	}
 	return result ? 0x80 : 0x00;
@@ -1281,8 +1281,8 @@ void apple2_init_common(running_machine *machine)
 	memset(mess_ram, 0, mess_ram_size);
 
 	/* --------------------------------------------- *
-	 * set up the softswitch mask/set                *
-	 * --------------------------------------------- */
+     * set up the softswitch mask/set                *
+     * --------------------------------------------- */
 	a2_mask = ~0;
 	a2_set = 0;
 
@@ -1302,8 +1302,8 @@ MACHINE_START( apple2 )
 	void *apple2cp_ce00_ram = NULL;
 
 	/* there appears to be some hidden RAM that is swapped in on the Apple
-	 * IIc plus; I have not found any official documentation but the BIOS
-	 * clearly uses this area as writeable memory */
+     * IIc plus; I have not found any official documentation but the BIOS
+     * clearly uses this area as writeable memory */
 	if (!strcmp(machine->gamedrv->name, "apple2cp"))
 		apple2cp_ce00_ram = auto_alloc_array(machine, UINT8, 0x200);
 

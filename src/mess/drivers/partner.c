@@ -191,9 +191,9 @@ static MACHINE_DRIVER_START( partner )
 	MDRV_DMA8257_ADD("dma8257", XTAL_16MHz / 9, partner_dma)
 
 	MDRV_CASSETTE_ADD( "cassette", partner_cassette_config )
-	
+
 	MDRV_WD1793_ADD("wd1793", partner_wd17xx_interface )
-	
+
 	MDRV_FLOPPY_2_DRIVES_ADD(partner_floppy_config)
 MACHINE_DRIVER_END
 

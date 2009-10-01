@@ -31,7 +31,7 @@ const unsigned short pocketc_colortable[8][2] = {
 
 PALETTE_INIT( pocketc )
 {
-	UINT8 i=0, r, b, g, color_count = 6; 
+	UINT8 i=0, r, b, g, color_count = 6;
 
 	machine->colortable = colortable_alloc(machine, color_count);
 

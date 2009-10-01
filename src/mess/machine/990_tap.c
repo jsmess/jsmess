@@ -1,31 +1,31 @@
 /*
-	990_tap.c: emulation of a generic ti990 tape controller, for use with
-	TILINE-based TI990 systems (TI990/10, /12, /12LR, /10A, Business system 300
-	and 300A).
+    990_tap.c: emulation of a generic ti990 tape controller, for use with
+    TILINE-based TI990 systems (TI990/10, /12, /12LR, /10A, Business system 300
+    and 300A).
 
-	This core will emulate the common feature set found in every tape controller.
-	Most controllers support additional features, but are still compatible with
-	the basic feature set.  I have a little documentation on two specific
-	tape controllers (MT3200 and WD800/WD800A), but I have not tried to emulate
-	controller-specific features.
-
-
-	Long description: see 2234398-9701 and 2306140-9701.
+    This core will emulate the common feature set found in every tape controller.
+    Most controllers support additional features, but are still compatible with
+    the basic feature set.  I have a little documentation on two specific
+    tape controllers (MT3200 and WD800/WD800A), but I have not tried to emulate
+    controller-specific features.
 
 
-	Raphael Nabet 2002
+    Long description: see 2234398-9701 and 2306140-9701.
+
+
+    Raphael Nabet 2002
 */
 /*
-	Image encoding:
+    Image encoding:
 
 
-	2 bytes: record len - little-endian
-	2 bytes: always 0s (length MSBs?)
-	len bytes: data
-	2 bytes: record len - little-endian
-	2 bytes: always 0s (length MSBs?)
+    2 bytes: record len - little-endian
+    2 bytes: always 0s (length MSBs?)
+    len bytes: data
+    2 bytes: record len - little-endian
+    2 bytes: always 0s (length MSBs?)
 
-	4 0s: EOF mark
+    4 0s: EOF mark
 */
 
 #include "driver.h"
@@ -86,14 +86,14 @@ enum
 	w7_tiline_parity_err	= 0x0010,
 	w7_tiline_timing_err	= 0x0008,
 	w7_tiline_timeout_err	= 0x0004,
-	/*w7_format_error		= 0x0002,*/
+	/*w7_format_error       = 0x0002,*/
 	w7_tape_error		= 0x0001
 };
 
 static const UINT16 w_mask[8] =
 {
 	0x000f,		/* Controllers should prevent overwriting of w0 status bits, and I know
-				that some controllers do so. */
+                that some controllers do so. */
 	0xffff,
 	0xffff,
 	0xffff,
@@ -124,11 +124,11 @@ DEVICE_START( ti990_tape )
 
 /*DEVICE_STOP( ti990_tape )
 {
-	d->img = NULL;
+    d->img = NULL;
 }*/
 
 /*
-	Open a tape image
+    Open a tape image
 */
 DEVICE_IMAGE_LOAD( ti990_tape )
 {
@@ -151,7 +151,7 @@ DEVICE_IMAGE_LOAD( ti990_tape )
 }
 
 /*
-	Close a tape image
+    Close a tape image
 */
 DEVICE_IMAGE_UNLOAD( ti990_tape )
 {
@@ -168,7 +168,7 @@ DEVICE_IMAGE_UNLOAD( ti990_tape )
 }
 
 /*
-	Init the tape controller core
+    Init the tape controller core
 */
 void ti990_tpc_init(running_machine *machine, void (*interrupt_callback)(running_machine *machine, int state))
 {
@@ -183,8 +183,8 @@ void ti990_tpc_init(running_machine *machine, void (*interrupt_callback)(running
 }
 
 /*
-	Parse the tape select lines, and return the corresponding tape unit.
-	(-1 if none)
+    Parse the tape select lines, and return the corresponding tape unit.
+    (-1 if none)
 */
 static int cur_tape_unit(void)
 {
@@ -209,7 +209,7 @@ static int cur_tape_unit(void)
 }
 
 /*
-	Update interrupt state
+    Update interrupt state
 */
 static void update_interrupt(running_machine *machine)
 {
@@ -220,7 +220,7 @@ static void update_interrupt(running_machine *machine)
 }
 
 /*
-	Handle the read binary forward command: read the next record on tape.
+    Handle the read binary forward command: read the next record on tape.
 */
 static void cmd_read_binary_forward(running_machine *machine)
 {
@@ -446,7 +446,7 @@ update_registers:
 }
 
 /*
-	Handle the record skip forward command: skip a specified number of records.
+    Handle the record skip forward command: skip a specified number of records.
 */
 static void cmd_record_skip_forward(running_machine *machine)
 {
@@ -582,7 +582,7 @@ update_registers:
 }
 
 /*
-	Handle the record skip reverse command: skip a specified number of records backwards.
+    Handle the record skip reverse command: skip a specified number of records backwards.
 */
 static void cmd_record_skip_reverse(running_machine *machine)
 {
@@ -740,7 +740,7 @@ update_registers:
 }
 
 /*
-	Handle the rewind command: rewind to BOT.
+    Handle the rewind command: rewind to BOT.
 */
 static void cmd_rewind(running_machine *machine)
 {
@@ -787,7 +787,7 @@ static void cmd_rewind(running_machine *machine)
 }
 
 /*
-	Handle the rewind and offline command: disable the tape unit.
+    Handle the rewind and offline command: disable the tape unit.
 */
 static void cmd_rewind_and_offline(running_machine *machine)
 {
@@ -825,7 +825,7 @@ static void cmd_rewind_and_offline(running_machine *machine)
 }
 
 /*
-	Handle the read transport status command: return the current tape status.
+    Handle the read transport status command: return the current tape status.
 */
 static void read_transport_status(running_machine *machine)
 {
@@ -865,7 +865,7 @@ static void read_transport_status(running_machine *machine)
 }
 
 /*
-	Parse command code and execute the command.
+    Parse command code and execute the command.
 */
 static void execute_command(running_machine *machine)
 {
@@ -952,7 +952,7 @@ static void execute_command(running_machine *machine)
 
 
 /*
-	Read one register in TPCS space
+    Read one register in TPCS space
 */
 READ16_HANDLER(ti990_tpc_r)
 {
@@ -963,7 +963,7 @@ READ16_HANDLER(ti990_tpc_r)
 }
 
 /*
-	Write one register in TPCS space.  Execute command if w7_idle is cleared.
+    Write one register in TPCS space.  Execute command if w7_idle is cleared.
 */
 WRITE16_HANDLER(ti990_tpc_w)
 {

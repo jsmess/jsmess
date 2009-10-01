@@ -495,7 +495,7 @@ void i8275_update(const device_config *device, bitmap_t *bitmap, const rectangle
 static DEVICE_START( i8275 )
 {
 	i8275_t *i8275 = get_safe_token(device);
-	
+
 	/* validate arguments */
 	assert(device != NULL);
 	assert(device->tag != NULL);

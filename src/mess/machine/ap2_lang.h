@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	ap2_lang.h
+    ap2_lang.h
 
-	Implementation of the Apple II Language Card
+    Implementation of the Apple II Language Card
 
 *********************************************************************/
 
@@ -28,7 +28,7 @@
 ***************************************************************************/
 
 /* device get info function */
-DEVICE_GET_INFO(apple2_langcard);	
+DEVICE_GET_INFO(apple2_langcard);
 
 /* slot read function */
 READ8_DEVICE_HANDLER(apple2_langcard_r);

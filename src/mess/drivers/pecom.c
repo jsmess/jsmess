@@ -31,7 +31,7 @@ static ADDRESS_MAP_START( pecom64_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x05, 0x05) AM_DEVWRITE(CDP1869_TAG, cdp1869_out5_w)
 	AM_RANGE(0x06, 0x06) AM_DEVWRITE(CDP1869_TAG, cdp1869_out6_w)
 	AM_RANGE(0x07, 0x07) AM_DEVWRITE(CDP1869_TAG, cdp1869_out7_w)
-ADDRESS_MAP_END 
+ADDRESS_MAP_END
 
 /* Input ports */
 /* Pecom 64 keyboard layout is as follows
@@ -156,7 +156,7 @@ static INPUT_PORTS_START( pecom )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Ch") PORT_CODE(KEYCODE_UP)  //ch up
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Del") PORT_CODE(KEYCODE_TAB) PORT_CHAR(UCHAR_MAMEKEY(DEL))
 
-	PORT_START("CNT")		
+	PORT_START("CNT")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Ctrl") PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_2)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Shift") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Caps") PORT_CODE(KEYCODE_CAPSLOCK) PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
@@ -178,20 +178,20 @@ static const cassette_config pecom_cassette_config =
 /* Machine driver */
 static MACHINE_DRIVER_START( pecom64 )
 	MDRV_DRIVER_DATA(pecom_state)
-	
-    /* basic machine hardware */ 
+
+    /* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", CDP1802, CDP1869_DOT_CLK_PAL/3)
 	MDRV_CPU_PROGRAM_MAP(pecom64_mem)
   	MDRV_CPU_IO_MAP(pecom64_io)
   	MDRV_CPU_CONFIG(pecom64_cdp1802_config)
-  	
+
   	MDRV_MACHINE_START( pecom )
   	MDRV_MACHINE_RESET( pecom )
-		
+
 	// sound and video hardware
 
 	MDRV_IMPORT_FROM(pecom_video)
-	
+
 	MDRV_CASSETTE_ADD( "cassette", pecom_cassette_config )
 MACHINE_DRIVER_END
 
@@ -208,5 +208,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME   PARENT  COMPAT  		MACHINE  	INPUT   INIT  	CONFIG	 COMPANY  FULLNAME   	FLAGS */
+/*    YEAR  NAME   PARENT  COMPAT       MACHINE     INPUT   INIT    CONFIG   COMPANY  FULLNAME      FLAGS */
 COMP( 1987, pecom64,     0,      0, 	pecom64, 	pecom, 	pecom, pecom64,  "Ei Nis", "Pecom 64",	0)

@@ -17,9 +17,9 @@
       - DPMON (3rd party)
 
     Hardware variants (ever shipped?):
-      - SOL-10, i.e. a stripped down version without expansion backplane and 
+      - SOL-10, i.e. a stripped down version without expansion backplane and
         numeric keypad
-      - SOL-PC, i.e. the single board version, basically it consisted of the 
+      - SOL-PC, i.e. the single board version, basically it consisted of the
         SOL-20 board only
 
 ****************************************************************************/

@@ -78,20 +78,20 @@ Notes: (all chips shown above)
       TMM331  - Toshiba TMM331AP 2k x8 MASKROM (DIP24)
                 Pinout (preliminary):
                            TMM331
-                        |----\/----|
-                     A7 |1       24| VCC
-                     A8 |2       23| D0
-                     A9 |3       22| D1
-                    A10 |4       21| D2
-                     A0 |5       20| D3
-                     A1 |6       19| D4
-                     A2 |7       18| D5
-                     A3 |8       17| D6
-                     A4 |9       16| D7
-                     A5 |10      15| CE (LOW)
-                     A6 |11      14| ? (unknown, leave NC?)
-                    GND |12      13| OE (LOW)
-                        |----------|
+                   ? ? ?|----\/----|
+                    ?A7?|1 ? ? ? 24| VCC
+?                    A8?|2 ? ? ? 23| D0
+?                    A9?|3 ? ? ? 22| D1
+?                   A10 |4 ? ? ? 21| D2
+                    ?A0?|5 ? ? ? 20| D3
+?                    A1?|6 ? ? ? 19| D4
+                    ?A2?|7 ? ? ? 18| D5
+                    ?A3?|8 ? ? ? 17| D6
+                    ?A4?|9 ? ? ? 16| D7
+?                    A5?|10 ? ? ?15| CE (LOW)
+?                    A6?|11 ? ? ?14| ? (unknown, leave NC?)
+                    GND?|12 ? ? ?13| OE (LOW)
+? ? ?                   |----------|
 
 */
 
@@ -140,45 +140,45 @@ Notes:
 
 /*
 
-	RCA Studio II games list
+    RCA Studio II games list
 
-	Title							Series					Dumped
-	----------------------------------------------------------------------------
-	Bowling							built-in				yes
-	Doodles							built-in				yes
-	Freeway							built-in				yes
-	Math							built-in				yes
-	Patterns						built-in				yes
-	Gunfighter/Moonship Battle		TV Arcade				no, but Guru has one
-	Space War						TV Arcade I				yes
-	Fun with Numbers				TV Arcade II			no, but Guru has one
-	Tennis/Squash					TV Arcade III			yes
-	Baseball						TV Arcade IV			yes
-	Speedway/Tag					TV Arcade				yes
-	Blackjack						TV Casino I				yes
-	Bingo							TV Casino				no
-	Math and Social Studies			TV School House I		no, but Guru has one
-	Math Fun						TV School House II		no, but Guru has one
-	Biorhythm						TV Mystic				no, but Guru has one
+    Title                           Series                  Dumped
+    ----------------------------------------------------------------------------
+    Bowling                         built-in                yes
+    Doodles                         built-in                yes
+    Freeway                         built-in                yes
+    Math                            built-in                yes
+    Patterns                        built-in                yes
+    Gunfighter/Moonship Battle      TV Arcade               no, but Guru has one
+    Space War                       TV Arcade I             yes
+    Fun with Numbers                TV Arcade II            no, but Guru has one
+    Tennis/Squash                   TV Arcade III           yes
+    Baseball                        TV Arcade IV            yes
+    Speedway/Tag                    TV Arcade               yes
+    Blackjack                       TV Casino I             yes
+    Bingo                           TV Casino               no
+    Math and Social Studies         TV School House I       no, but Guru has one
+    Math Fun                        TV School House II      no, but Guru has one
+    Biorhythm                       TV Mystic               no, but Guru has one
 
 
-	MPT-02 games list
+    MPT-02 games list
 
-	ID		Title					Series					Dumped
-	----------------------------------------------------------------------------
-	MG-201	Bingo											no
-	MG-202	Concentration Match								no, but Guru has one
-	MG-203	Star Wars										no, but Guru has one
-	MG-204	Math Fun				School House II			no, but Guru has one
-	MG-205	Pinball											no, but Guru has one
-	MG-206	Biorythm										no
-	MG-207	Tennis/Squash									no
-	MG-208	Fun with Numbers								no
-	MG-209	Computer Quiz			School House I			no
-	MG-210	Baseball										no
-	MG-211	Speedway/Tag									no
-	MG-212	Spacewar Intercept								no
-	MG-213	Gun Fight/Moon Ship								no
+    ID      Title                   Series                  Dumped
+    ----------------------------------------------------------------------------
+    MG-201  Bingo                                           no
+    MG-202  Concentration Match                             no, but Guru has one
+    MG-203  Star Wars                                       no, but Guru has one
+    MG-204  Math Fun                School House II         no, but Guru has one
+    MG-205  Pinball                                         no, but Guru has one
+    MG-206  Biorythm                                        no
+    MG-207  Tennis/Squash                                   no
+    MG-208  Fun with Numbers                                no
+    MG-209  Computer Quiz           School House I          no
+    MG-210  Baseball                                        no
+    MG-211  Speedway/Tag                                    no
+    MG-212  Spacewar Intercept                              no
+    MG-213  Gun Fight/Moon Ship                             no
 
 */
 
@@ -186,11 +186,11 @@ Notes:
 
     TODO:
 
-	- studio2 cpu clock from schematics
-	- visicom alternate videoram @ 0x1300 ?
+    - studio2 cpu clock from schematics
+    - visicom alternate videoram @ 0x1300 ?
     - mpt02/mustang cdp1864 colors
     - discrete sound
-	- Academy Apollo 80 (Germany)
+    - Academy Apollo 80 (Germany)
 
 */
 
@@ -242,7 +242,7 @@ static ADDRESS_MAP_START( visicom_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x1000, 0x10ff) AM_MIRROR(0x200) AM_RAM
 	AM_RANGE(0x1100, 0x11ff) AM_RAM
-//	AM_RANGE(0x1200, 0x12ff) AM_RAM
+//  AM_RANGE(0x1200, 0x12ff) AM_RAM
 	AM_RANGE(0x1300, 0x13ff) AM_RAM
 ADDRESS_MAP_END
 
@@ -465,7 +465,7 @@ static MACHINE_START( mpt02 )
 
 	/* find devices */
 	state->cdp1864 = devtag_get_device(machine, CDP1864_TAG);
-	
+
 	/* register for state saving */
 	state_save_register_global(machine, state->cdp1802_mode);
 	state_save_register_global(machine, state->keylatch);
@@ -559,7 +559,7 @@ static MACHINE_DRIVER_START( studio2 )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("beep", BEEP, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	
+
 	MDRV_IMPORT_FROM( studio2_cartslot )
 MACHINE_DRIVER_END
 
@@ -590,7 +590,7 @@ static MACHINE_DRIVER_START( visicom )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("beep", BEEP, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	
+
 	MDRV_IMPORT_FROM( studio2_cartslot )
 MACHINE_DRIVER_END
 
@@ -618,7 +618,7 @@ static MACHINE_DRIVER_START( mpt02 )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_CDP1864_ADD(CDP1864_TAG, CDP1864_CLOCK, mpt02_cdp1864_intf)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	
+
 	MDRV_IMPORT_FROM( studio2_cartslot )
 MACHINE_DRIVER_END
 

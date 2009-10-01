@@ -39,11 +39,11 @@ System80 and LNW80 have non-addressable links to set the baud rate. Receive and 
 It is assumed that the TRS80L2 UART setup is identical to the System80, apart from the address ports used.
 Due to the above, the only working emulated UART is for the Model 3.
 
-Cassette baud rates: 	Model I level I - 250 baud
-			Model I level II and all clones - 500 baud
-			Model III/4 - 500 and 1500 baud selectable at boot time
-			- When it says "Cass?" press L for 500 baud, or Enter otherwise.
-			LNW-80 - 500 baud @1.77MHz and 1000 baud @4MHz.
+Cassette baud rates:    Model I level I - 250 baud
+            Model I level II and all clones - 500 baud
+            Model III/4 - 500 and 1500 baud selectable at boot time
+            - When it says "Cass?" press L for 500 baud, or Enter otherwise.
+            LNW-80 - 500 baud @1.77MHz and 1000 baud @4MHz.
 
 I/O ports
 FF:
@@ -86,8 +86,8 @@ E8:
 - UART Master Reset (write) on a Model III/4
 
 Model 4 - C0-CF = hard drive (optional)
-	- 90-93 write sound (optional)
-	- 80-8F hires graphics (optional)
+    - 90-93 write sound (optional)
+    - 80-8F hires graphics (optional)
 
 About the Model II - this runs a boostrap rom, and boots a floppy. The rom is then bankswitched
 out, and RAM takes its place. There is no rom basic, and no cassette support. Display sizes are
@@ -96,29 +96,29 @@ Expansion interface for more floppy drives. The drives use 8-inch floppies holdi
 It was extremely expensive, non-standard, and not many were sold. A rom dump does not seem to exist.
 
 About the ht1080z - This was made for schools in Hungary. Each comes with a BASIC extension roms
-		which activated Hungarian features. To activate - start emulation - enter SYSTEM
-		Enter /12288 and the extensions will be installed and you are returned to READY.
-		The ht1080z is identical to the System 80, apart from the character rom.
-		The ht1080z2 has a modified extension rom and character generator.
+        which activated Hungarian features. To activate - start emulation - enter SYSTEM
+        Enter /12288 and the extensions will be installed and you are returned to READY.
+        The ht1080z is identical to the System 80, apart from the character rom.
+        The ht1080z2 has a modified extension rom and character generator.
 
 About the RTC - The time is incremented while ever the cursor is flashing. It is stored in a series
-		of bytes in the computer's work area. The bytes are in a certain order, this is:
-		seconds, minutes, hours, year, day, month. On a model 1, the seconds are stored at
-		0x4041, while on the model 4 it is 0x4217. A reboot always sets the time to zero.
+        of bytes in the computer's work area. The bytes are in a certain order, this is:
+        seconds, minutes, hours, year, day, month. On a model 1, the seconds are stored at
+        0x4041, while on the model 4 it is 0x4217. A reboot always sets the time to zero.
 
 Model 4 memory organisation -
-		Mode 0: ROM=0-37E7 and 37EA-3FFF; Printer=37E8-37E9; Keyboard=3800-3BFF; Video=3C00-3FFF
-		Mode 1: Keyboard and Video as above; 0-3FFF read=ROM and write=RAM
-		Mode 2: Keyboard=F400-F7FF; Video=F800-FFFF; the rest is RAM
-		Mode 3: All RAM
-		In the "maincpu" memory map, the first 64k is given to the ROM, keyboard, printer and video,
-			while the second 64k is RAM that is switched in as needed. The area from 4800-FFFF
-			is considered a "black hole", any writes to there will disappear.
-		The video is organised as 2 banks of 0x400 bytes, except in Mode 2 where it becomes contiguous.
+        Mode 0: ROM=0-37E7 and 37EA-3FFF; Printer=37E8-37E9; Keyboard=3800-3BFF; Video=3C00-3FFF
+        Mode 1: Keyboard and Video as above; 0-3FFF read=ROM and write=RAM
+        Mode 2: Keyboard=F400-F7FF; Video=F800-FFFF; the rest is RAM
+        Mode 3: All RAM
+        In the "maincpu" memory map, the first 64k is given to the ROM, keyboard, printer and video,
+            while the second 64k is RAM that is switched in as needed. The area from 4800-FFFF
+            is considered a "black hole", any writes to there will disappear.
+        The video is organised as 2 banks of 0x400 bytes, except in Mode 2 where it becomes contiguous.
 
 Model 4P - is the same as Model 4 except:
-		- ROM is only 0000-0FFF, while 1000-37FF is given over to RAM
-		- There is no cassette support in hardware.
+        - ROM is only 0000-0FFF, while 1000-37FF is given over to RAM
+        - There is no cassette support in hardware.
 
 ***************************************************************************
 
@@ -305,22 +305,22 @@ ADDRESS_MAP_END
 +--+---+---+---+---+---+---+---+---+  +--+---+---+---+---+---+---+---+---+
 NB: row 7 contains some originally unused bits
     only the shift bit was there in the TRS80
-	
-2008-05 FP: 
-NB2: 3:3 -> 3:7 have no correspondent keys (see 
-	below) in the usual 53-keys keyboard ( + 
-	12-keys keypad) for Model I, III and 4. Where 
-	are the symbols above coming from?
-NB3: the 12-keys keypad present in later models 
-	is mapped to the corrispondent keys of the 
-	keyboard: '0' -> '9', 'Enter', '.'
+
+2008-05 FP:
+NB2: 3:3 -> 3:7 have no correspondent keys (see
+    below) in the usual 53-keys keyboard ( +
+    12-keys keypad) for Model I, III and 4. Where
+    are the symbols above coming from?
+NB3: the 12-keys keypad present in later models
+    is mapped to the corrispondent keys of the
+    keyboard: '0' -> '9', 'Enter', '.'
 NB4: when it was added a 15-key keypad, there were
-	three functions key 'F1', 'F2', 'F3'. I found no
-	doc about their position in the matrix above, 
-	but the schematics of the clone System-80 MkII
-	(which had 4 function keys) put these keys in
-	3:4 -> 3:7. Right now they're not implemented 
-	below.
+    three functions key 'F1', 'F2', 'F3'. I found no
+    doc about their position in the matrix above,
+    but the schematics of the clone System-80 MkII
+    (which had 4 function keys) put these keys in
+    3:4 -> 3:7. Right now they're not implemented
+    below.
 
 ***************************************************************************/
 
@@ -366,8 +366,8 @@ static INPUT_PORTS_START( trs80 )
 	PORT_BIT(0x02, 0x00, IPT_KEYBOARD) PORT_NAME("Y") PORT_CODE(KEYCODE_Y) 			PORT_CHAR('y') PORT_CHAR('Y')
 	PORT_BIT(0x04, 0x00, IPT_KEYBOARD) PORT_NAME("Z") PORT_CODE(KEYCODE_Z) 			PORT_CHAR('z') PORT_CHAR('Z')
 	/* on Model I and Model III keyboards, there are only 53 keys (+ 12 keypad keys) and these are not connected:
-	on Model I, they produce arrows and '_', on Model III either produce garbage or overlap with other keys;
-	on Model 4 (which has a 15-key with 3 function keys) here are mapped 'F1', 'F2', 'F3'    */
+    on Model I, they produce arrows and '_', on Model III either produce garbage or overlap with other keys;
+    on Model 4 (which has a 15-key with 3 function keys) here are mapped 'F1', 'F2', 'F3'    */
 	PORT_BIT(0x08, 0x00, IPT_KEYBOARD) PORT_NAME("(n/c)")
 	PORT_BIT(0x10, 0x00, IPT_KEYBOARD) PORT_NAME("(n/c)")
 	PORT_BIT(0x20, 0x00, IPT_KEYBOARD) PORT_NAME("(n/c)")
@@ -503,7 +503,7 @@ static MACHINE_DRIVER_START( model1 )		// model I, level II
 	MDRV_CASSETTE_MODIFY( "cassette", trs80l2_cassette_config )
 	MDRV_QUICKLOAD_ADD("quickload", trs80_cmd, "cmd", 0.5)
 	MDRV_WD179X_ADD("wd179x", trs80_wd17xx_interface )
-	MDRV_FLOPPY_4_DRIVES_ADD(trs80_floppy_config)	
+	MDRV_FLOPPY_4_DRIVES_ADD(trs80_floppy_config)
 	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
 	MDRV_AY31015_ADD( "tr1602", trs80_ay31015_config )
 MACHINE_DRIVER_END
@@ -644,18 +644,18 @@ ROM_END
 
 ROM_START(trs80m3)
 /* ROMS we have and are missing:
-HAVE	TRS-80 Model III Level 1 ROM (U104)
-MISSING	TRS-80 Model III Level 2 (ENGLISH) ROM A (U104) ver. CRC BBC4
-MISSING	TRS-80 Model III Level 2 (ENGLISH) ROM A (U104) ver. CRC DA75
-HAVE	TRS-80 Model III Level 2 (ENGLISH) ROM A (U104) ver. CRC 9639
-HAVE	TRS-80 Model III Level 2 (ENGLISH) ROM B (U105) ver. CRC 407C
-MISSING	TRS-80 Model III Level 2 (ENGLISH) ROM C (U106) ver. CRC 2B91 - early mfg. #80040316
-MISSING	TRS-80 Model III Level 2 (ENGLISH) ROM C (U106) ver. CRC 278A - no production REV A
-HAVE	TRS-80 Model III Level 2 (ENGLISH) ROM C (U106) ver. CRC 2EF8 - Manufacturing #80040316 REV B
-HAVE	TRS-80 Model III Level 2 (ENGLISH) ROM C (U106) ver. CRC 2F84 - Manufacturing #80040316 REV C
-MISSING	TRS-80 Model III Level 2 (ENGLISH) ROM C ver. CRC 2764 - Network III v1
-HAVE	TRS-80 Model III Level 2 (ENGLISH) ROM C ver. CRC 276A - Network III v2
-MISSING	TRS-80 Model III Level 2 (BELGIUM) CRC ????
+HAVE    TRS-80 Model III Level 1 ROM (U104)
+MISSING TRS-80 Model III Level 2 (ENGLISH) ROM A (U104) ver. CRC BBC4
+MISSING TRS-80 Model III Level 2 (ENGLISH) ROM A (U104) ver. CRC DA75
+HAVE    TRS-80 Model III Level 2 (ENGLISH) ROM A (U104) ver. CRC 9639
+HAVE    TRS-80 Model III Level 2 (ENGLISH) ROM B (U105) ver. CRC 407C
+MISSING TRS-80 Model III Level 2 (ENGLISH) ROM C (U106) ver. CRC 2B91 - early mfg. #80040316
+MISSING TRS-80 Model III Level 2 (ENGLISH) ROM C (U106) ver. CRC 278A - no production REV A
+HAVE    TRS-80 Model III Level 2 (ENGLISH) ROM C (U106) ver. CRC 2EF8 - Manufacturing #80040316 REV B
+HAVE    TRS-80 Model III Level 2 (ENGLISH) ROM C (U106) ver. CRC 2F84 - Manufacturing #80040316 REV C
+MISSING TRS-80 Model III Level 2 (ENGLISH) ROM C ver. CRC 2764 - Network III v1
+HAVE    TRS-80 Model III Level 2 (ENGLISH) ROM C ver. CRC 276A - Network III v2
+MISSING TRS-80 Model III Level 2 (BELGIUM) CRC ????
 Note: Be careful when dumping rom C: if dumped on the trs-80 m3 with software, bytes 0x7e8 and 0x7e9 (addresses 0x37e8, 0x0x37e9)
       will read as 0xFF 0xFF; on the original rom, these bytes are 0x00 0x00 (for eproms) or 0xAA 0xAA (for mask roms), those two bytes are used for printer status on the trs-80 and are mapped on top of the rom; This problem should be avoided by pulling the rom chips and dumping them directly.
 */
@@ -761,7 +761,7 @@ static DRIVER_INIT( lnw80 )
 	videoram = memory_region(machine, "gfx2")+0x4000;
 }
 
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE	  INPUT    INIT      CONFIG       COMPANY  FULLNAME */
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT    INIT      CONFIG       COMPANY  FULLNAME */
 COMP( 1977, trs80,    0,	0,	trs80,    trs80,   trs80,    0,		"Tandy Radio Shack",  "TRS-80 Model I (Level I Basic)" , 0 )
 COMP( 1978, trs80l2,  trs80,	0,	model1,   trs80,   trs80l2,  0,	"Tandy Radio Shack",  "TRS-80 Model I (Level II Basic)" , 0 )
 COMP( 1983, radionic, trs80,	0,	radionic, trs80,   trs80,    0,	"Komtek",  "Radionic" , 0 )

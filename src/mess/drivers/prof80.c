@@ -1,31 +1,31 @@
 /*
 
-	PROF-80 (Prozessor RAM-Floppy Kontroller)
-	GRIP-1/2/3/4/5 (Grafik-Interface-Prozessor)
-	UNIO-1 (?)
+    PROF-80 (Prozessor RAM-Floppy Kontroller)
+    GRIP-1/2/3/4/5 (Grafik-Interface-Prozessor)
+    UNIO-1 (?)
 
-	http://www.prof80.de/
-	http://oldcomputers.dyndns.org/public/pub/rechner/conitec/info.html
+    http://www.prof80.de/
+    http://oldcomputers.dyndns.org/public/pub/rechner/conitec/info.html
 
 */
 
 /*
 
-	TODO:
+    TODO:
 
-	- PROF<>GRIP interface fails if IBFA is cleared after reading PA
-	- keyboard
-	- NE555 timeout is 10x too high
-	- GRIP does not send keys back to PROF-80
-	- grip31 does not work
-	- PROF-80 RAM banking
-	- PROF-80 floppy format
-	- GRIP model selection
-	- UNIO card (Z80-STI, Z80-SIO, 2x centronics)
-	- GRIP-COLOR (192kB color RAM)
-	- GRIP-5 (HD6345, 256KB RAM)
-	- XR color card
-	
+    - PROF<>GRIP interface fails if IBFA is cleared after reading PA
+    - keyboard
+    - NE555 timeout is 10x too high
+    - GRIP does not send keys back to PROF-80
+    - grip31 does not work
+    - PROF-80 RAM banking
+    - PROF-80 floppy format
+    - GRIP model selection
+    - UNIO card (Z80-STI, Z80-SIO, 2x centronics)
+    - GRIP-COLOR (192kB color RAM)
+    - GRIP-5 (HD6345, 256KB RAM)
+    - XR color card
+
 */
 
 #include "driver.h"
@@ -123,7 +123,7 @@ static void prof80_keyboard_scan(running_machine *machine)
 			{
 				/* latch key data */
 				keydata = ~prof80_keycodes[table][row][col];
-				
+
 				if (state->keydata != keydata)
 				{
 					state->keydata = keydata;
@@ -184,7 +184,7 @@ static void prof80_bankswitch(running_machine *machine)
 		default:
 			memory_install_readwrite8_handler(program, start_addr, end_addr, 0, 0, SMH_BANK(bank + 1), SMH_UNMAP);
 		}
-		
+
 		//logerror("Segment %u address %04x-%04x block %u\n", bank, start_addr, end_addr, block);
 	}
 }
@@ -298,18 +298,18 @@ static WRITE8_HANDLER( flr_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		FB
-		1		SB0
-		2		SB1
-		3		SB2
-		4		SA0
-		5		SA1
-		6		SA2
-		7		FA
+        0       FB
+        1       SB0
+        2       SB1
+        3       SB2
+        4       SA0
+        5       SA1
+        6       SA2
+        7       FA
 
-	*/
+    */
 
 	int fa = BIT(data, 7);
 	int sa = (data >> 4) & 0x07;
@@ -324,18 +324,18 @@ static READ8_HANDLER( status_r )
 {
 	/*
 
-		bit		signal		description
+        bit     signal      description
 
-		0		_RX
-		1
-		2
-		3
-		4		CTS
-		5		_INDEX
-		6		
-		7		CTSP
+        0       _RX
+        1
+        2
+        3
+        4       CTS
+        5       _INDEX
+        6
+        7       CTSP
 
-	*/
+    */
 
 	prof80_state *state = space->machine->driver_data;
 
@@ -346,18 +346,18 @@ static READ8_HANDLER( status2_r )
 {
 	/*
 
-		bit		signal		description
+        bit     signal      description
 
-		0		_MOTOR		floppy motor (0=on, 1=off)
-		1
-		2
-		3
-		4		JS4
-		5		JS5
-		6
-		7		_TDO
+        0       _MOTOR      floppy motor (0=on, 1=off)
+        1
+        2
+        3
+        4       JS4
+        5       JS5
+        6
+        7       _TDO
 
-	*/
+    */
 
 	prof80_state *state = space->machine->driver_data;
 
@@ -428,18 +428,18 @@ static READ8_HANDLER( stat_r )
 {
 	/*
 
-		bit		signal		description
+        bit     signal      description
 
-		0		LPA0
-		1		LPA1
-		2		LPA2
-		3		SENSE
-		4		JS0
-		5		JS1
-		6		_ERROR
-		7		LPSTB		light pen strobe
+        0       LPA0
+        1       LPA1
+        2       LPA2
+        3       SENSE
+        4       JS0
+        5       JS1
+        6       _ERROR
+        7       LPSTB       light pen strobe
 
-	*/
+    */
 
 	prof80_state *state = space->machine->driver_data;
 
@@ -484,9 +484,9 @@ static WRITE8_HANDLER( cxstb_w )
 
 static WRITE8_HANDLER( unio_ctrl_w )
 {
-//	prof80_state *state = space->machine->driver_data;
+//  prof80_state *state = space->machine->driver_data;
 
-//	int flag = BIT(data, 0);
+//  int flag = BIT(data, 0);
 	int flad = (data >> 1) & 0x07;
 
 	switch (flad)
@@ -525,12 +525,12 @@ static ADDRESS_MAP_START( prof80_mem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( prof80_io, ADDRESS_SPACE_IO, 8 )
-//	AM_RANGE(0x80, 0x8f) AM_MIRROR(0xff00) AM_DEVREADWRITE(UNIO_Z80STI_TAG, z80sti_r, z80sti_w)
-//	AM_RANGE(0x94, 0x95) AM_MIRROR(0xff00) AM_DEVREADWRITE(UNIO_Z80SIO_TAG, z80sio_d_r, z80sio_d_w)
-//	AM_RANGE(0x96, 0x97) AM_MIRROR(0xff00) AM_DEVREADWRITE(UNIO_Z80SIO_TAG, z80sio_c_r, z80sio_c_w)
+//  AM_RANGE(0x80, 0x8f) AM_MIRROR(0xff00) AM_DEVREADWRITE(UNIO_Z80STI_TAG, z80sti_r, z80sti_w)
+//  AM_RANGE(0x94, 0x95) AM_MIRROR(0xff00) AM_DEVREADWRITE(UNIO_Z80SIO_TAG, z80sio_d_r, z80sio_d_w)
+//  AM_RANGE(0x96, 0x97) AM_MIRROR(0xff00) AM_DEVREADWRITE(UNIO_Z80SIO_TAG, z80sio_c_r, z80sio_c_w)
 	AM_RANGE(0x9e, 0x9e) AM_MIRROR(0xff00) AM_WRITE(unio_ctrl_w)
-//	AM_RANGE(0x9c, 0x9c) AM_MIRROR(0xff00) AM_DEVWRITE(UNIO_CENTRONICS1_TAG, centronics_data_w)
-//	AM_RANGE(0x9d, 0x9d) AM_MIRROR(0xff00) AM_DEVWRITE(UNIO_CENTRONICS1_TAG, centronics_data_w)
+//  AM_RANGE(0x9c, 0x9c) AM_MIRROR(0xff00) AM_DEVWRITE(UNIO_CENTRONICS1_TAG, centronics_data_w)
+//  AM_RANGE(0x9d, 0x9d) AM_MIRROR(0xff00) AM_DEVWRITE(UNIO_CENTRONICS1_TAG, centronics_data_w)
 	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0xff00) AM_READ(gripc_r)
 	AM_RANGE(0xc1, 0xc1) AM_MIRROR(0xff00) AM_READWRITE(gripd_r, gripd_w)
 	AM_RANGE(0xd8, 0xd8) AM_MIRROR(0xff00) AM_WRITE(flr_w)
@@ -550,14 +550,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( grip_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(cxstb_r, cxstb_w)
-//	AM_RANGE(0x10, 0x10) AM_WRITE(ccon_w)
-//	AM_RANGE(0x11, 0x11) AM_WRITE(vol0_w)
-//	AM_RANGE(0x12, 0x12) AM_WRITE(rts_w)
+//  AM_RANGE(0x10, 0x10) AM_WRITE(ccon_w)
+//  AM_RANGE(0x11, 0x11) AM_WRITE(vol0_w)
+//  AM_RANGE(0x12, 0x12) AM_WRITE(rts_w)
 	AM_RANGE(0x13, 0x13) AM_WRITE(page_w)
-//	AM_RANGE(0x14, 0x14) AM_WRITE(cc1_w)
-//	AM_RANGE(0x15, 0x15) AM_WRITE(cc2_w)
+//  AM_RANGE(0x14, 0x14) AM_WRITE(cc1_w)
+//  AM_RANGE(0x15, 0x15) AM_WRITE(cc2_w)
 	AM_RANGE(0x16, 0x16) AM_WRITE(flash_w)
-//	AM_RANGE(0x17, 0x17) AM_WRITE(vol1_w)
+//  AM_RANGE(0x17, 0x17) AM_WRITE(vol1_w)
 	AM_RANGE(0x20, 0x2f) AM_DEVREADWRITE(Z80STI_TAG, z80sti_r, z80sti_w)
 	AM_RANGE(0x30, 0x30) AM_READWRITE(lrs_r, lrs_w)
 	AM_RANGE(0x40, 0x40) AM_READ(stat_r)
@@ -566,14 +566,14 @@ static ADDRESS_MAP_START( grip_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x53, 0x53) AM_DEVREAD(MC6845_TAG, mc6845_register_r)
 	AM_RANGE(0x60, 0x60) AM_DEVWRITE("centronics", centronics_data_w)
 	AM_RANGE(0x70, 0x73) AM_DEVREADWRITE(I8255A_TAG, i8255a_r, i8255a_w)
-//	AM_RANGE(0x80, 0x80) AM_WRITE(bl2out_w)
-//	AM_RANGE(0x90, 0x90) AM_WRITE(gr2out_w)
-//	AM_RANGE(0xa0, 0xa0) AM_WRITE(rd2out_w)
-//	AM_RANGE(0xb0, 0xb0) AM_WRITE(clrg2_w)
-//	AM_RANGE(0xc0, 0xc0) AM_WRITE(bluout_w)
-//	AM_RANGE(0xd0, 0xd0) AM_WRITE(grnout_w)
-//	AM_RANGE(0xe0, 0xe0) AM_WRITE(redout_w)
-//	AM_RANGE(0xf0, 0xf0) AM_WRITE(clrg1_w)
+//  AM_RANGE(0x80, 0x80) AM_WRITE(bl2out_w)
+//  AM_RANGE(0x90, 0x90) AM_WRITE(gr2out_w)
+//  AM_RANGE(0xa0, 0xa0) AM_WRITE(rd2out_w)
+//  AM_RANGE(0xb0, 0xb0) AM_WRITE(clrg2_w)
+//  AM_RANGE(0xc0, 0xc0) AM_WRITE(bluout_w)
+//  AM_RANGE(0xd0, 0xd0) AM_WRITE(grnout_w)
+//  AM_RANGE(0xe0, 0xe0) AM_WRITE(redout_w)
+//  AM_RANGE(0xf0, 0xf0) AM_WRITE(clrg1_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( grip5_mem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -585,14 +585,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( grip5_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(cxstb_r, cxstb_w)
-//	AM_RANGE(0x10, 0x10) AM_WRITE(eprom_w)
-//	AM_RANGE(0x11, 0x11) AM_WRITE(vol0_w)
-//	AM_RANGE(0x12, 0x12) AM_WRITE(rts_w)
+//  AM_RANGE(0x10, 0x10) AM_WRITE(eprom_w)
+//  AM_RANGE(0x11, 0x11) AM_WRITE(vol0_w)
+//  AM_RANGE(0x12, 0x12) AM_WRITE(rts_w)
 	AM_RANGE(0x13, 0x13) AM_WRITE(page_w)
-//	AM_RANGE(0x14, 0x14) AM_WRITE(str_w)
-//	AM_RANGE(0x15, 0x15) AM_WRITE(intl_w)
-//	AM_RANGE(0x16, 0x16) AM_WRITE(dpage_w)
-//	AM_RANGE(0x17, 0x17) AM_WRITE(vol1_w)
+//  AM_RANGE(0x14, 0x14) AM_WRITE(str_w)
+//  AM_RANGE(0x15, 0x15) AM_WRITE(intl_w)
+//  AM_RANGE(0x16, 0x16) AM_WRITE(dpage_w)
+//  AM_RANGE(0x17, 0x17) AM_WRITE(vol1_w)
 	AM_RANGE(0x20, 0x2f) AM_DEVREADWRITE(Z80STI_TAG, z80sti_r, z80sti_w)
 	AM_RANGE(0x30, 0x30) AM_READWRITE(lrs_r, lrs_w)
 	AM_RANGE(0x40, 0x40) AM_READ(stat_r)
@@ -602,20 +602,20 @@ static ADDRESS_MAP_START( grip5_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x60, 0x60) AM_DEVWRITE("centronics", centronics_data_w)
 	AM_RANGE(0x70, 0x73) AM_DEVREADWRITE(I8255A_TAG, i8255a_r, i8255a_w)
 
-//	AM_RANGE(0x80, 0x80) AM_WRITE(xrflgs_w)
-//	AM_RANGE(0xc0, 0xc0) AM_WRITE(xrclrg_w)
-//	AM_RANGE(0xe0, 0xe0) AM_WRITE(xrclu0_w)
-//	AM_RANGE(0xe1, 0xe1) AM_WRITE(xrclu1_w)
-//	AM_RANGE(0xe2, 0xe2) AM_WRITE(xrclu2_w)
+//  AM_RANGE(0x80, 0x80) AM_WRITE(xrflgs_w)
+//  AM_RANGE(0xc0, 0xc0) AM_WRITE(xrclrg_w)
+//  AM_RANGE(0xe0, 0xe0) AM_WRITE(xrclu0_w)
+//  AM_RANGE(0xe1, 0xe1) AM_WRITE(xrclu1_w)
+//  AM_RANGE(0xe2, 0xe2) AM_WRITE(xrclu2_w)
 
-//	AM_RANGE(0x80, 0x80) AM_WRITE(bl2out_w)
-//	AM_RANGE(0x90, 0x90) AM_WRITE(gr2out_w)
-//	AM_RANGE(0xa0, 0xa0) AM_WRITE(rd2out_w)
-//	AM_RANGE(0xb0, 0xb0) AM_WRITE(clrg2_w)
-//	AM_RANGE(0xc0, 0xc0) AM_WRITE(bluout_w)
-//	AM_RANGE(0xd0, 0xd0) AM_WRITE(grnout_w)
-//	AM_RANGE(0xe0, 0xe0) AM_WRITE(redout_w)
-//	AM_RANGE(0xf0, 0xf0) AM_WRITE(clrg1_w)
+//  AM_RANGE(0x80, 0x80) AM_WRITE(bl2out_w)
+//  AM_RANGE(0x90, 0x90) AM_WRITE(gr2out_w)
+//  AM_RANGE(0xa0, 0xa0) AM_WRITE(rd2out_w)
+//  AM_RANGE(0xb0, 0xb0) AM_WRITE(clrg2_w)
+//  AM_RANGE(0xc0, 0xc0) AM_WRITE(bluout_w)
+//  AM_RANGE(0xd0, 0xd0) AM_WRITE(grnout_w)
+//  AM_RANGE(0xe0, 0xe0) AM_WRITE(redout_w)
+//  AM_RANGE(0xf0, 0xf0) AM_WRITE(clrg1_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -650,7 +650,7 @@ static INPUT_PORTS_START( prof80 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W) PORT_CHAR('w') PORT_CHAR('W')
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('e') PORT_CHAR('E')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_CHAR('r') PORT_CHAR('R')
-	
+
 	PORT_START("ROW3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T) PORT_CHAR('t') PORT_CHAR('T')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_CHAR('y') PORT_CHAR('Y')
@@ -660,7 +660,7 @@ static INPUT_PORTS_START( prof80 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P')
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('[') PORT_CHAR('{')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']') PORT_CHAR('}')
-	
+
 	PORT_START("ROW4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("ESC") PORT_CODE(KEYCODE_ESC) PORT_CHAR(UCHAR_MAMEKEY(ESC))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad +") PORT_CODE(KEYCODE_PLUS_PAD)
@@ -670,7 +670,7 @@ static INPUT_PORTS_START( prof80 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('a') PORT_CHAR('A')
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_CHAR('s') PORT_CHAR('S')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('d') PORT_CHAR('D')
-	
+
 	PORT_START("ROW5")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('f') PORT_CHAR('F')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_CHAR('g') PORT_CHAR('G')
@@ -680,7 +680,7 @@ static INPUT_PORTS_START( prof80 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_CHAR('l') PORT_CHAR('L')
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR(':')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR('\'') PORT_CHAR('"')
-	
+
 	PORT_START("ROW6")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RETURN") PORT_CODE(KEYCODE_ENTER) PORT_CHAR('\r')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LINE FEED") PORT_CODE(KEYCODE_ENTER_PAD)
@@ -690,7 +690,7 @@ static INPUT_PORTS_START( prof80 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 3") PORT_CODE(KEYCODE_3_PAD)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z) PORT_CHAR('z') PORT_CHAR('Z')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X')
-	
+
 	PORT_START("ROW7")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('c') PORT_CHAR('C')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V) PORT_CHAR('v') PORT_CHAR('V')
@@ -700,7 +700,7 @@ static INPUT_PORTS_START( prof80 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
-	
+
 	PORT_START("ROW8")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x90") PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x93") PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
@@ -708,8 +708,8 @@ static INPUT_PORTS_START( prof80 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 0") PORT_CODE(KEYCODE_0_PAD)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad .") PORT_CODE(KEYCODE_ASTERISK)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SPACE") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
 
 	PORT_START("ROW9")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("LOCK") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
@@ -881,7 +881,7 @@ static WRITE_LINE_DEVICE_HANDLER( grip_cur_w )
 	z80sti_i2_w(driver_state->z80sti, state);
 }
 
-static const mc6845_interface grip_mc6845_interface = 
+static const mc6845_interface grip_mc6845_interface =
 {
 	SCREEN_TAG,
 	8,
@@ -947,7 +947,7 @@ static READ8_DEVICE_HANDLER( grip_ppi8255_a_r )
 {
 	/*
 
-        bit		description
+        bit     description
 
         PA0     ECB bus
         PA1     ECB bus
@@ -957,8 +957,8 @@ static READ8_DEVICE_HANDLER( grip_ppi8255_a_r )
         PA5     ECB bus
         PA6     ECB bus
         PA7     ECB bus
-    
-	*/
+
+    */
 
 	prof80_state *state = device->machine->driver_data;
 
@@ -969,7 +969,7 @@ static WRITE8_DEVICE_HANDLER( grip_ppi8255_a_w )
 {
 	/*
 
-        bit		description
+        bit     description
 
         PA0     ECB bus
         PA1     ECB bus
@@ -979,8 +979,8 @@ static WRITE8_DEVICE_HANDLER( grip_ppi8255_a_w )
         PA5     ECB bus
         PA6     ECB bus
         PA7     ECB bus
-    
-	*/
+
+    */
 
 	prof80_state *state = device->machine->driver_data;
 
@@ -991,7 +991,7 @@ static READ8_DEVICE_HANDLER( grip_ppi8255_b_r )
 {
 	/*
 
-        bit		description
+        bit     description
 
         PB0     Keyboard input
         PB1     Keyboard input
@@ -1001,8 +1001,8 @@ static READ8_DEVICE_HANDLER( grip_ppi8255_b_r )
         PB5     Keyboard input
         PB6     Keyboard input
         PB7     Keyboard input
-    
-	*/
+
+    */
 
 	prof80_state *state = device->machine->driver_data;
 
@@ -1013,18 +1013,18 @@ static WRITE8_DEVICE_HANDLER( grip_ppi8255_c_w )
 {
 	/*
 
-        bit		signal		description
+        bit     signal      description
 
-		PC0     INTRB		interrupt B output (keyboard)
-        PC1     KBF			input buffer B full output (keyboard)
-        PC2     _KBSTB		strobe B input (keyboard)
-        PC3     INTRA		interrupt A output (PROF-80)
-        PC4		_STBA		strobe A input (PROF-80)
-        PC5     IBFA		input buffer A full output (PROF-80)
-        PC6		_ACKA		acknowledge A input (PROF-80)
-        PC7     _OBFA		output buffer full output (PROF-80)
-    
-	*/
+        PC0     INTRB       interrupt B output (keyboard)
+        PC1     KBF         input buffer B full output (keyboard)
+        PC2     _KBSTB      strobe B input (keyboard)
+        PC3     INTRA       interrupt A output (PROF-80)
+        PC4     _STBA       strobe A input (PROF-80)
+        PC5     IBFA        input buffer A full output (PROF-80)
+        PC6     _ACKA       acknowledge A input (PROF-80)
+        PC7     _OBFA       output buffer full output (PROF-80)
+
+    */
 
 	prof80_state *state = device->machine->driver_data;
 
@@ -1057,18 +1057,18 @@ static READ8_DEVICE_HANDLER( grip_z80sti_gpio_r )
 {
 	/*
 
-        bit		signal		description
+        bit     signal      description
 
-        I0		CTS			RS-232 clear to send input
-        I1		DE			MC6845 display enable input
-        I2		CURSOR		MC6845 cursor input
-        I3		BUSY		Centronics busy input
-        I4		PC0			PPI8255 PC0 input
-        I5		SKBD		Serial keyboard input
-        I6		EXIN		External interrupt input
-        I7		PC3			PPI8255 PC3 input
-    
-	*/
+        I0      CTS         RS-232 clear to send input
+        I1      DE          MC6845 display enable input
+        I2      CURSOR      MC6845 cursor input
+        I3      BUSY        Centronics busy input
+        I4      PC0         PPI8255 PC0 input
+        I5      SKBD        Serial keyboard input
+        I6      EXIN        External interrupt input
+        I7      PC3         PPI8255 PC3 input
+
+    */
 
 	prof80_state *state = device->machine->driver_data;
 
@@ -1219,7 +1219,7 @@ static MACHINE_DRIVER_START( prof80 )
     MDRV_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
     MDRV_PALETTE_LENGTH(2)
     MDRV_PALETTE_INIT(black_and_white)
- 
+
     MDRV_VIDEO_START(prof80)
     MDRV_VIDEO_UPDATE(prof80)
 
@@ -1233,7 +1233,7 @@ static MACHINE_DRIVER_START( prof80 )
 
 	/* printer */
 	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
-	
+
 	MDRV_FLOPPY_4_DRIVES_ADD(prof80_floppy_config)
 MACHINE_DRIVER_END
 
@@ -1242,7 +1242,7 @@ MACHINE_DRIVER_END
 ROM_START( prof80 )
 	ROM_REGION( 0x100000, Z80_TAG, 0 )
 	ROM_DEFAULT_BIOS( "v17" )
-	
+
 	ROM_SYSTEM_BIOS( 0, "v15", "v1.5" )
 	ROMX_LOAD( "prof80v15.z7", 0xf0000, 0x02000, CRC(8f74134c) SHA1(83f9dcdbbe1a2f50006b41d406364f4d580daa1f), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "v16", "v1.6" )

@@ -58,20 +58,20 @@
 
    January 2008 - added preliminary Aleste 520EX support
                The Aleste 520EX is a Russian clone of the CPC6128, that expands on existing video mode, and can run MSX-DOS.
-			   It also adds an MC146818 RTC/NVRAM, an Intel 8253 timer, and the "Magic Sound" board, a 4-channel DMA-based
-			   sample player.  Also includes a software emulation of the MSX2 VDP, used in the ports of MSX games.
+               It also adds an MC146818 RTC/NVRAM, an Intel 8253 timer, and the "Magic Sound" board, a 4-channel DMA-based
+               sample player.  Also includes a software emulation of the MSX2 VDP, used in the ports of MSX games.
 
-			   Known issues:
-			    - The RTC doesn't always update in setup.  It expects bit 4 of register C (Update End Interrupt) to be high.
-				- Title screens appear then disappear quickly (probably because the 8253 hasn't been plugged in yet).
-				- Some video modes display wrong (still needs some work here).
-				- Vampire Killer crashes after collecting a certain key part way through stage 1.
-				- Magic Sound isn't emulated.
+               Known issues:
+                - The RTC doesn't always update in setup.  It expects bit 4 of register C (Update End Interrupt) to be high.
+                - Title screens appear then disappear quickly (probably because the 8253 hasn't been plugged in yet).
+                - Some video modes display wrong (still needs some work here).
+                - Vampire Killer crashes after collecting a certain key part way through stage 1.
+                - Magic Sound isn't emulated.
 
 
    January 2009 - changed drivers to use the mc6845 device implementation
-			   To get rid of duplicated code the drivers have been changed to use the new mc6845 device
-			   implementation. As a result the (runtime) selection of CRTC type has been removed.
+               To get rid of duplicated code the drivers have been changed to use the new mc6845 device
+               implementation. As a result the (runtime) selection of CRTC type has been removed.
 
 
 Some bugs left :
@@ -79,7 +79,7 @@ Some bugs left :
     - CRTC all type support (0,1,2,3,4) ?
     - Gate Array and CRTC aren't synchronised. (The Gate Array can change the color every microseconds?) So the multi-rasters in one line aren't supported (see yao demo p007's part)!
     - Implement full Asic for CPC+ emulation.  Soft scroll is rather dodgy.
-	- The KC Compact should not reuse the gate array functionality. Instead z8536 support should be added. (bug #42)
+    - The KC Compact should not reuse the gate array functionality. Instead z8536 support should be added. (bug #42)
 
  ******************************************************************************/
 
@@ -374,14 +374,14 @@ lk4     Frequency
    Pre-ASIC??? Amstrad?     4 In the "cost-down" CPC6128, the CRTC functionality is integrated into a single ASIC IC. This ASIC is often refered to as the "Pre-ASIC" because it preceeded the CPC+ ASIC
 As far as I know, the KC compact used HD6845S only.
 */
-//	PORT_START("crtc")
-//	PORT_CONFNAME( 0xFF, M6845_PERSONALITY_UM6845R, "CRTC Type")
-//	PORT_CONFSETTING(M6845_PERSONALITY_UM6845, "Type 0 - UM6845")
-//	PORT_CONFSETTING(M6845_PERSONALITY_HD6845S, "Type 0 - HD6845S")
-//	PORT_CONFSETTING(M6845_PERSONALITY_UM6845R, "Type 1 - UM6845R")
-//	PORT_CONFSETTING(M6845_PERSONALITY_GENUINE, "Type 2 - MC6845")
-//	PORT_CONFSETTING(M6845_PERSONALITY_AMS40489, "Type 3 - AMS40489")
-//	PORT_CONFSETTING(M6845_PERSONALITY_PREASIC, "Type 4 - Pre-ASIC")
+//  PORT_START("crtc")
+//  PORT_CONFNAME( 0xFF, M6845_PERSONALITY_UM6845R, "CRTC Type")
+//  PORT_CONFSETTING(M6845_PERSONALITY_UM6845, "Type 0 - UM6845")
+//  PORT_CONFSETTING(M6845_PERSONALITY_HD6845S, "Type 0 - HD6845S")
+//  PORT_CONFSETTING(M6845_PERSONALITY_UM6845R, "Type 1 - UM6845R")
+//  PORT_CONFSETTING(M6845_PERSONALITY_GENUINE, "Type 2 - MC6845")
+//  PORT_CONFSETTING(M6845_PERSONALITY_AMS40489, "Type 3 - AMS40489")
+//  PORT_CONFSETTING(M6845_PERSONALITY_PREASIC, "Type 4 - Pre-ASIC")
 
 	PORT_START("multiface")
 	PORT_CONFNAME(0x01, 0x00, "Multiface Two" )
@@ -901,7 +901,7 @@ static MACHINE_DRIVER_START( amstrad )
 	MDRV_CASSETTE_ADD( "cassette", amstrad_cassette_config )
 
 	MDRV_NEC765A_ADD("nec765", amstrad_nec765_interface)
-	
+
 	MDRV_FLOPPY_2_DRIVES_ADD(cpc6128_floppy_config)
 MACHINE_DRIVER_END
 
@@ -961,7 +961,7 @@ static MACHINE_DRIVER_START( cpcplus )
 	MDRV_NEC765A_ADD("nec765", amstrad_nec765_interface)
 
 	MDRV_IMPORT_FROM(cpcplus_cartslot)
-	
+
 	MDRV_FLOPPY_2_DRIVES_ADD(cpc6128_floppy_config)
 MACHINE_DRIVER_END
 
@@ -1015,7 +1015,7 @@ static MACHINE_DRIVER_START( aleste )
 	MDRV_PALETTE_INIT(aleste)
 	MDRV_NVRAM_HANDLER(mc146818)
 	MDRV_NEC765A_MODIFY("nec765", aleste_8272_interface)
-	
+
 	MDRV_FLOPPY_2_DRIVES_MODIFY(aleste_floppy_config)
 MACHINE_DRIVER_END
 

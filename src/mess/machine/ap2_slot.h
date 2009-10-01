@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	ap2_slot.h
+    ap2_slot.h
 
-	Implementation of Apple II device slots
+    Implementation of Apple II device slots
 
 *********************************************************************/
 
@@ -51,7 +51,7 @@ struct _apple2_slot_config
 ***************************************************************************/
 
 /* device get info function */
-DEVICE_GET_INFO(apple2_slot);	
+DEVICE_GET_INFO(apple2_slot);
 
 /* slot read function */
 READ8_DEVICE_HANDLER(apple2_slot_r);

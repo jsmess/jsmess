@@ -1,40 +1,40 @@
 /****************************************************************************
 
-	drivers/mac.c
-	Mac Plus & 512ke emulation
- 
-	Nate Woods, Raphael Nabet
- 
- 
-	    0x000000 - 0x3fffff     RAM/ROM (switches based on overlay)
-	    0x400000 - 0x4fffff     ROM
- 	    0x580000 - 0x5fffff     5380 NCR/Symbios SCSI peripherals chip (Mac Plus only)
- 	    0x600000 - 0x6fffff     RAM
-	    0x800000 - 0x9fffff     Zilog 8530 SCC (Serial Control Chip) Read
-	    0xa00000 - 0xbfffff     Zilog 8530 SCC (Serial Control Chip) Write
-	    0xc00000 - 0xdfffff     IWM (Integrated Woz Machine; floppy)
-	    0xe80000 - 0xefffff     Rockwell 6522 VIA
-	    0xf00000 - 0xffffef     ??? (the ROM appears to be accessing here)
-	    0xfffff0 - 0xffffff     Auto Vector
-	
-	
-	Interrupts:
-	    M68K:
-	        Level 1 from VIA
-	        Level 2 from SCC
-	        Level 4 : Interrupt switch (not implemented)
- 
-	    VIA:
-	        CA1 from VBLANK
-	        CA2 from 1 Hz clock (RTC)
-	        CB1 from Keyboard Clock
-	        CB2 from Keyboard Data
-	        SR  from Keyboard Data Ready
-	
-	    SCC:
-	        PB_EXT  from mouse Y circuitry
-	        PA_EXT  from mouse X circuitry
- 
+    drivers/mac.c
+    Mac Plus & 512ke emulation
+
+    Nate Woods, Raphael Nabet
+
+
+        0x000000 - 0x3fffff     RAM/ROM (switches based on overlay)
+        0x400000 - 0x4fffff     ROM
+        0x580000 - 0x5fffff     5380 NCR/Symbios SCSI peripherals chip (Mac Plus only)
+        0x600000 - 0x6fffff     RAM
+        0x800000 - 0x9fffff     Zilog 8530 SCC (Serial Control Chip) Read
+        0xa00000 - 0xbfffff     Zilog 8530 SCC (Serial Control Chip) Write
+        0xc00000 - 0xdfffff     IWM (Integrated Woz Machine; floppy)
+        0xe80000 - 0xefffff     Rockwell 6522 VIA
+        0xf00000 - 0xffffef     ??? (the ROM appears to be accessing here)
+        0xfffff0 - 0xffffff     Auto Vector
+
+
+    Interrupts:
+        M68K:
+            Level 1 from VIA
+            Level 2 from SCC
+            Level 4 : Interrupt switch (not implemented)
+
+        VIA:
+            CA1 from VBLANK
+            CA2 from 1 Hz clock (RTC)
+            CB1 from Keyboard Clock
+            CB2 from Keyboard Data
+            SR  from Keyboard Data Ready
+
+        SCC:
+            PB_EXT  from mouse Y circuitry
+            PA_EXT  from mouse X circuitry
+
 ****************************************************************************/
 
 #include "driver.h"
@@ -50,19 +50,19 @@
 // LC: boot needs 50f04000 bit 0 to go "1" at a49f00.  SCC.
 
 /*
-	Apple Sound Chip
+    Apple Sound Chip
 
-	Base is normally IOBase + 0x14000
-	First 0x800 bytes is buffer RAM
+    Base is normally IOBase + 0x14000
+    First 0x800 bytes is buffer RAM
 
-	Verified to be only 8 bits wide by Apple documentation.
+    Verified to be only 8 bits wide by Apple documentation.
 
-	Registers:
-	0x800: CONTROL
-	0x801: ENABLE
-	0x802: MODE
-	0x806: VOLUME
-	0x807: CHAN
+    Registers:
+    0x800: CONTROL
+    0x801: ENABLE
+    0x802: MODE
+    0x806: VOLUME
+    0x807: CHAN
 */
 
 static UINT8 mac_asc_regs[0x2000];
@@ -183,7 +183,7 @@ static MACHINE_DRIVER_START( mac512ke )
 	/* devices */
 	MDRV_IWM_ADD("fdc", mac_iwm_interface)
 	MDRV_FLOPPY_SONY_2_DRIVES_ADD(mac128512_floppy_config)
-	
+
 	MDRV_SCC8530_ADD("scc")
 	MDRV_SCC8530_ACK(mac_scc_ack)
 	MDRV_VIA6522_ADD("via6522_0", 1000000, mac_via6522_intf)
@@ -198,7 +198,7 @@ static MACHINE_DRIVER_START( macplus )
 
 	MDRV_HARDDISK_ADD( "harddisk1" )
 	MDRV_HARDDISK_ADD( "harddisk2" )
-	
+
 	MDRV_FLOPPY_SONY_2_DRIVES_MODIFY(mac_floppy_config)
 MACHINE_DRIVER_END
 

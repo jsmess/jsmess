@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	Philips PCF8593 CMOS clock/calendar circuit
+    Philips PCF8593 CMOS clock/calendar circuit
 
-	(c) 2001-2007 Tim Schuerewegen
+    (c) 2001-2007 Tim Schuerewegen
 
 *********************************************************************/
 
@@ -423,22 +423,22 @@ void pcf8593_save(const device_config *device, mame_file *file)
 /*
 NVRAM_HANDLER( pcf8593 )
 {
-	_logerror( 0, ("nvram_handler_pcf8593 (%p/%d)\n", file, read_or_write));
-	if (read_or_write)
-	{
-		pcf8593_save( file);
-	}
-	else
-	{
-		if (file)
-		{
-			pcf8593_load( file);
-		}
-		else
-		{
-			memset( rtc->data, 0, rtc->size);
-		}
-	}
+    _logerror( 0, ("nvram_handler_pcf8593 (%p/%d)\n", file, read_or_write));
+    if (read_or_write)
+    {
+        pcf8593_save( file);
+    }
+    else
+    {
+        if (file)
+        {
+            pcf8593_load( file);
+        }
+        else
+        {
+            memset( rtc->data, 0, rtc->size);
+        }
+    }
 }
 */
 

@@ -2,64 +2,64 @@
 
     m6847.c
 
-	Implementation of Motorola 6847 video hardware chip
+    Implementation of Motorola 6847 video hardware chip
 
-	Sources:
-	M6847 data sheet
-	M6847T1 info from Rainbow magazine (10/1986-12/1986)
+    Sources:
+    M6847 data sheet
+    M6847T1 info from Rainbow magazine (10/1986-12/1986)
 
 
-	AG  AS  INTEXT  INV  GM2  GM1  GM0
-	--  --  ------  ---  ---  ---  ---
-	 0   0       0    0    X    X    X	Internal Alphanumerics
-	 0   0       0    1    X    X    X	Internal Alphanumerics Inverted
-	 0   0       1    0    X    X    X	External Alphanumerics
-	 0   0       1    1    X    X    X	External Alphanumerics Inverted
-	 0   1       0    X    X    X    X  Semigraphics 4
-	 0   1       1    X    X    X    X  Semigraphics 6
-	 1   X       X    X    0    0    0  Graphics CG1 (64x64x4)	  (16 bpr)
-	 1   X       X    X    0    0    1  Graphics RG1 (128x64x2)   (16 bpr)
-	 1   X       X    X    0    1    0  Graphics CG2 (128x64x4)   (32 bpr)
-	 1   X       X    X    0    1    1  Graphics RG2 (128x96x2)   (16 bpr)
-	 1   X       X    X    1    0    0  Graphics CG3 (128x96x4)   (32 bpr)
-	 1   X       X    X    1    0    1  Graphics RG3 (128x192x2)  (16 bpr)
-	 1   X       X    X    1    1    0  Graphics CG6 (128x192x4)  (32 bpr)
-	 1   X       X    X    1    1    1  Graphics RG6 (256x192x2)  (32 bpr)
+    AG  AS  INTEXT  INV  GM2  GM1  GM0
+    --  --  ------  ---  ---  ---  ---
+     0   0       0    0    X    X    X  Internal Alphanumerics
+     0   0       0    1    X    X    X  Internal Alphanumerics Inverted
+     0   0       1    0    X    X    X  External Alphanumerics
+     0   0       1    1    X    X    X  External Alphanumerics Inverted
+     0   1       0    X    X    X    X  Semigraphics 4
+     0   1       1    X    X    X    X  Semigraphics 6
+     1   X       X    X    0    0    0  Graphics CG1 (64x64x4)    (16 bpr)
+     1   X       X    X    0    0    1  Graphics RG1 (128x64x2)   (16 bpr)
+     1   X       X    X    0    1    0  Graphics CG2 (128x64x4)   (32 bpr)
+     1   X       X    X    0    1    1  Graphics RG2 (128x96x2)   (16 bpr)
+     1   X       X    X    1    0    0  Graphics CG3 (128x96x4)   (32 bpr)
+     1   X       X    X    1    0    1  Graphics RG3 (128x192x2)  (16 bpr)
+     1   X       X    X    1    1    0  Graphics CG6 (128x192x4)  (32 bpr)
+     1   X       X    X    1    1    1  Graphics RG6 (256x192x2)  (32 bpr)
 
-	Note: The M6847 relies on an external source (typically a 6883 SAM chip)
-	to feed it bytes; so the BPR (bytes per row) figures are effectively
-	suggestions.  Mismatching modes is responsible for the semigraphic modes
-	on the CoCo.
+    Note: The M6847 relies on an external source (typically a 6883 SAM chip)
+    to feed it bytes; so the BPR (bytes per row) figures are effectively
+    suggestions.  Mismatching modes is responsible for the semigraphic modes
+    on the CoCo.
 
-	Timing:
-	(source Motorola M6847 Manual)
+    Timing:
+    (source Motorola M6847 Manual)
 
-	Horizontal Sync:  Total Period: 227.5 clock cycles
-		@ CLK(0) + DHS_F			- falling edge (high to low)
-		@ CLK(16.5) + DHS_R			- rising edge (low to high)
-		@ CLK(42)					- left border start
-		@ CLK(71.5)					- body start
-		@ CLK(199.5)				- right border start
-		@ CLK(227.5) + DHS_F		- falling edge (high to low)
-		...
+    Horizontal Sync:  Total Period: 227.5 clock cycles
+        @ CLK(0) + DHS_F            - falling edge (high to low)
+        @ CLK(16.5) + DHS_R         - rising edge (low to high)
+        @ CLK(42)                   - left border start
+        @ CLK(71.5)                 - body start
+        @ CLK(199.5)                - right border start
+        @ CLK(227.5) + DHS_F        - falling edge (high to low)
+        ...
 
-	Field Sync:	Total Period 262*227.5 clock cycles
-		@ CLK(0) + DFS_F			- falling edge (high to low)
-	    @ CLK(32*227.5) + DFS_R		- rising edge (low to high)
-		@ CLK(262*227.5) + DFS_F	- falling edge (high to low) (262.5 for the M6847Y)
+    Field Sync: Total Period 262*227.5 clock cycles
+        @ CLK(0) + DFS_F            - falling edge (high to low)
+        @ CLK(32*227.5) + DFS_R     - rising edge (low to high)
+        @ CLK(262*227.5) + DFS_F    - falling edge (high to low) (262.5 for the M6847Y)
 
-	DHS_F:	550ns
-	DHS_R:	740ns
-	DFS_F:	520ns
-	DFS_R:	500ns
+    DHS_F:  550ns
+    DHS_R:  740ns
+    DFS_F:  520ns
+    DFS_R:  500ns
 
-	The M6847T1 is a later variant of the M6847 chip that implements lower
-	case support and some other nifty features.  This chip is in the CoCo 2B.
-	I have not been able to find a pinout diagram for this chip so I am
-	assuming that the extra text modes on the CoCo 2B are activated by the
-	GM2-0 pins.  This needs to be confirmed.
+    The M6847T1 is a later variant of the M6847 chip that implements lower
+    case support and some other nifty features.  This chip is in the CoCo 2B.
+    I have not been able to find a pinout diagram for this chip so I am
+    assuming that the extra text modes on the CoCo 2B are activated by the
+    GM2-0 pins.  This needs to be confirmed.
 
-	TODO: Implement PAL support
+    TODO: Implement PAL support
 
 **********************************************************************/
 
@@ -176,7 +176,7 @@ struct _mc6847_state
 	unsigned int text_offset : 2;			/* needed for CoCo 3 */
 
 	/* video state; every scanline the video state for the scanline is copied
-	 * here and only rendered in VIDEO_UPDATE */
+     * here and only rendered in VIDEO_UPDATE */
 	int dirty;
 	int using_custom;
 	UINT32 border[384];
@@ -2020,12 +2020,12 @@ static UINT32 mix_color(double factor, UINT8 c0, UINT8 c1)
 static void apply_artifacts(running_machine *machine, UINT32 *line)
 {
 	/* Boy this code sucks; this code was adapted from the old M6847
-	 * artifacting implmentation.  The only reason that it didn't look as
-	 * horrible was because the code around it sucked as well.  Now that I
-	 * have cleaned everything up, the ugliness is much more prominent.
-	 *
-	 * Hopefully we will have a generic artifacting algorithm that plugs into
-	 * the MESS/MAME core directly so we can chuck this hack */
+     * artifacting implmentation.  The only reason that it didn't look as
+     * horrible was because the code around it sucked as well.  Now that I
+     * have cleaned everything up, the ugliness is much more prominent.
+     *
+     * Hopefully we will have a generic artifacting algorithm that plugs into
+     * the MESS/MAME core directly so we can chuck this hack */
 	static const double artifact_colors[14*3] =
 	{
 		0.157, 0.000, 0.157, /* [ 1] - dk purple   (reverse  2) */
@@ -2136,7 +2136,7 @@ static void apply_artifacts(running_machine *machine, UINT32 *line)
 static INPUT_CHANGED( artifacting_changed )
 {
 	/* TODO: not sure how to do this with a device... */
-//	set_dirty();
+//  set_dirty();
 }
 
 

@@ -100,14 +100,14 @@ ROM_END
 /*
 static ACIA6850_INTERFACE( acia_intf )
 {
-	9600, // rx clock, actually based on dipswitches
-	9600, // tx clock, actually based on dipswitches
-	DEVCB_NULL, // rx callback
-	DEVCB_NULL, // tx callback
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
+    9600, // rx clock, actually based on dipswitches
+    9600, // tx clock, actually based on dipswitches
+    DEVCB_NULL, // rx callback
+    DEVCB_NULL, // tx callback
+    DEVCB_NULL,
+    DEVCB_NULL,
+    DEVCB_NULL,
+    DEVCB_NULL
 };*/
 
 /******************************************************************************

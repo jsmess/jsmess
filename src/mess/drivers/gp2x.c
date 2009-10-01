@@ -38,7 +38,7 @@ static const char* gp2x_regnames[0x200] =
 	"",
 	"",
 	"",
-	"Active width",	
+	"Active width",
 	"Active height",
 	"HSYNC width",
 	"HSYNC start",
@@ -108,7 +108,7 @@ static const char* gp2x_regnames[0x200] =
 	"V End region A top",
 	"V End region A bottom",
 	"YUV Source region A L",	// a0
-	"YUV Source region A H",	
+	"YUV Source region A H",
 };
 #endif
 static VIDEO_UPDATE( gp2x )
@@ -122,12 +122,12 @@ static VIDEO_UPDATE( gp2x )
 			int x, y;
 			UINT16 *vram = (UINT16 *)&gp2x_ram[0x2100000/4];
 
-/*			printf("RGB still image 1 enabled, bpp %d, size is %d %d %d %d\n",
-				(gp2x_vidregs[(0xda/2)]>>9)&3,
-				gp2x_vidregs[(0xe2/2)],
-				gp2x_vidregs[(0xe4/2)],
-				gp2x_vidregs[(0xe6/2)],
-				gp2x_vidregs[(0xe8/2)]);*/
+/*          printf("RGB still image 1 enabled, bpp %d, size is %d %d %d %d\n",
+                (gp2x_vidregs[(0xda/2)]>>9)&3,
+                gp2x_vidregs[(0xe2/2)],
+                gp2x_vidregs[(0xe4/2)],
+                gp2x_vidregs[(0xe6/2)],
+                gp2x_vidregs[(0xe8/2)]);*/
 
 
 			for (y = 0; y < 240; y++)
@@ -157,12 +157,12 @@ static WRITE32_HANDLER( gp2x_lcdc_w )
 	if (mem_mask == 0xffff)
 	{
 		gp2x_vidregs[offset*2] = data;
-//		printf("%x to video reg %x (%s)\n", data, offset*2, gp2x_regnames[offset*2]);
+//      printf("%x to video reg %x (%s)\n", data, offset*2, gp2x_regnames[offset*2]);
 	}
 	else if (mem_mask == 0xffff0000)
 	{
 		gp2x_vidregs[(offset*2)+1] = data>>16;
-//		printf("%x to video reg %x (%s)\n", data>>16, (offset*2)+1, gp2x_regnames[(offset*2)+1]);
+//      printf("%x to video reg %x (%s)\n", data>>16, (offset*2)+1, gp2x_regnames[(offset*2)+1]);
 	}
 	else
 	{
@@ -213,7 +213,7 @@ static READ32_HANDLER(nand_r)
 
 			case 0x90:	// read ID
 				switch (nand_stage++)
-				{	
+				{
 					case 0:
 						return 0xec;	// Samsung
 					case 1:
@@ -227,7 +227,7 @@ static READ32_HANDLER(nand_r)
 		}
 	}
 
-//	printf("Read unknown nand offset %x\n", offset);
+//  printf("Read unknown nand offset %x\n", offset);
 
 	return 0;
 }
@@ -238,7 +238,7 @@ static WRITE32_HANDLER(nand_w)
 	{
 		case 4:	// command
 			nand_cmd = data;
-//			printf("NAND: command %x (PC %x0)\n", data, cpu_get_pc(space->cpu));
+//          printf("NAND: command %x (PC %x0)\n", data, cpu_get_pc(space->cpu));
 			nand_stage = 0;
 			nand_subword_stage = 0;
 			break;
@@ -264,7 +264,7 @@ static WRITE32_HANDLER(nand_w)
 						nand_ptr_temp &= ~0xff000000;
 						nand_ptr_temp |= data<<24;
 
-//						printf("NAND: ptr now %x, /2 %x, replacing %x\n", nand_ptr_temp, nand_ptr_temp/2, nand_ptr);
+//                      printf("NAND: ptr now %x, /2 %x, replacing %x\n", nand_ptr_temp, nand_ptr_temp/2, nand_ptr);
 						nand_ptr = nand_ptr_temp/2;
 						break;
 				}
@@ -301,7 +301,7 @@ static READ32_HANDLER(nand_ctrl_r)
 
 static WRITE32_HANDLER(nand_ctrl_w)
 {
-//	printf("%08x to nand_ctrl_w\n", data);
+//  printf("%08x to nand_ctrl_w\n", data);
 }
 
 static READ32_HANDLER(sdcard_r)

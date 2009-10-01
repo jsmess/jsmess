@@ -66,7 +66,7 @@ ROM_START( qx10 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "qx10boot.bin", 0x0000, 0x0800, CRC(f8dfcba5) SHA1(a7608f8aa7da355dcaf257ee28b66ded8974ce3a))
 	/* The first part of this rom looks like code for an embedded controller?
-		From 8300 on, looks like a characters generator */
+        From 8300 on, looks like a characters generator */
 	ROM_LOAD( "mfboard.bin", 0x8000, 0x0800, CRC(fa27f333) SHA1(73d27084ca7b002d5f370220d8da6623a6e82132))
 	/* This rom looks like a character generator */
 	ROM_LOAD( "qge.bin", 0x8800, 0x0800, CRC(ed93cb81) SHA1(579e68bde3f4184ded7d89b72c6936824f48d10b))

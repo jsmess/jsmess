@@ -11,9 +11,9 @@
 *  Special thanks to leeeeee for helping figure out what the led selftest codes actually mean
 *
 *  TODO:
-*  * DUART: 
+*  * DUART:
 *    * DUART needs to be reset on reset line activation. as is it works ok, but it should be done anyway.
-*    * DUART needs its i/o pins connected as well:    
+*    * DUART needs its i/o pins connected as well:
 *    * pins IP0, IP2, and IP3 are connected to the primary serial port:
 *      * IP0 is CTS
 *      * IP2 is DSR
@@ -595,19 +595,19 @@ READ16_HANDLER( spc_semaphore_r ) // Return state of d-latch 74ls74 @ E64 'lower
 /*
 Address maps (x = ignored; * = selects address within this range)
 68k address map:
-a23	a22	a21	a20	a19	a18	a17	a16	a15	a14	a13	a12	a11	a10	a9	a8	a7	a6	a5	a4	a3	a2	a1	(a0 via UDS/LDS)
-0	x	x	x	0	x	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*		R	ROM
-0	x	x	x	1	x	x	0	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*	*		RW	RAM (first 4 chip pairs)
-0	x	x	x	1	x	x	1	0	0	*	*	*	*	*	*	*	*	*	*	*	*	*	*		RW	RAM (last chip pair)
-0	x	x	x	1	x	x	1	0	1	x	x	x	x	x	x	x	x	x	x	x	x	x	0		W	Status LED <d7-d0>
-0	x	x	x	1	x	x	1	0	1	x	x	x	x	0	*	*	*	*	*	*	*	*	1		RW	NVRAM (read/write volatile ram, does not store to eeprom)
-0	x	x	x	1	x	x	1	0	1	x	x	x	x	1	*	*	*	*	*	*	*	*	1		RW	NVRAM (all reads do /recall from eeprom, all writes do /store to eeprom)
-0	x	x	x	1	x	x	1	1	0	x	x	x	x	x	x	x	x	x	*	*	*	*	x		RW	DUART (keep in mind that a0 is not connected)
-0	x	x	x	1	x	x	1	1	1	x	x	x	x	x	x	x	x	x	x	x	0	0	*		RW	SPC flags: fifo writable (readonly, d7), spc irq suppress (readwrite, d6), fifo error status (readonly, d5), 'fifo release'/clear-tms-fifo-error-status-bits (writeonly, d1), speech initialize/clear (readwrite, d0) [see schematic sheet 4]
-0	x	x	x	1	x	x	1	1	1	x	x	x	x	x	x	x	x	x	x	x	0	1	0?		W	SPC fifo write (clocks fifo)
-0	x	x	x	1	x	x	1	1	1	x	x	x	x	x	x	x	x	x	x	x	1	0	*		RW	TLC flags: ring detect (readonly, d15), ring detected irq enable (readwrite, d14), answer phone (readwrite, d8), tone detected (readonly, d7), tone detected irq enable (readwrite, d6) [see schematic sheet 6]
-0	x	x	x	1	x	x	1	1	1	x	x	x	x	x	x	x	x	x	x	x	1	1	*		R	TLC tone chip read, reads on bits d0-d7 only, d4-d7 are tied low; d15-d8 are probably open bus
-			  |				  |				  |				  |				  |
+a23 a22 a21 a20 a19 a18 a17 a16 a15 a14 a13 a12 a11 a10 a9  a8  a7  a6  a5  a4  a3  a2  a1  (a0 via UDS/LDS)
+0   x   x   x   0   x   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *       R   ROM
+0   x   x   x   1   x   x   0   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *       RW  RAM (first 4 chip pairs)
+0   x   x   x   1   x   x   1   0   0   *   *   *   *   *   *   *   *   *   *   *   *   *   *       RW  RAM (last chip pair)
+0   x   x   x   1   x   x   1   0   1   x   x   x   x   x   x   x   x   x   x   x   x   x   0       W   Status LED <d7-d0>
+0   x   x   x   1   x   x   1   0   1   x   x   x   x   0   *   *   *   *   *   *   *   *   1       RW  NVRAM (read/write volatile ram, does not store to eeprom)
+0   x   x   x   1   x   x   1   0   1   x   x   x   x   1   *   *   *   *   *   *   *   *   1       RW  NVRAM (all reads do /recall from eeprom, all writes do /store to eeprom)
+0   x   x   x   1   x   x   1   1   0   x   x   x   x   x   x   x   x   x   *   *   *   *   x       RW  DUART (keep in mind that a0 is not connected)
+0   x   x   x   1   x   x   1   1   1   x   x   x   x   x   x   x   x   x   x   x   0   0   *       RW  SPC flags: fifo writable (readonly, d7), spc irq suppress (readwrite, d6), fifo error status (readonly, d5), 'fifo release'/clear-tms-fifo-error-status-bits (writeonly, d1), speech initialize/clear (readwrite, d0) [see schematic sheet 4]
+0   x   x   x   1   x   x   1   1   1   x   x   x   x   x   x   x   x   x   x   x   0   1   0?      W   SPC fifo write (clocks fifo)
+0   x   x   x   1   x   x   1   1   1   x   x   x   x   x   x   x   x   x   x   x   1   0   *       RW  TLC flags: ring detect (readonly, d15), ring detected irq enable (readwrite, d14), answer phone (readwrite, d8), tone detected (readonly, d7), tone detected irq enable (readwrite, d6) [see schematic sheet 6]
+0   x   x   x   1   x   x   1   1   1   x   x   x   x   x   x   x   x   x   x   x   1   1   *       R   TLC tone chip read, reads on bits d0-d7 only, d4-d7 are tied low; d15-d8 are probably open bus
+              |               |               |               |               |
 */
 
 static ADDRESS_MAP_START(m68k_mem, ADDRESS_SPACE_PROGRAM, 16)
@@ -786,5 +786,5 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-/*    YEAR	NAME		PARENT	COMPAT	MACHINE		INPUT		INIT		CONFIG		COMPANY		FULLNAME			FLAGS */
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        CONFIG      COMPANY     FULLNAME            FLAGS */
 COMP( 1984, dectalk,	0,		0,		dectalk,	dectalk,	dectalk,	0,	"DEC",		"DECTalk DTC-01",	GAME_NOT_WORKING )

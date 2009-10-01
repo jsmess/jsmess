@@ -222,8 +222,8 @@ static void	Nick_Init(void)
 
 	Nick_CalcVisibleClocks(ENTERPRISE_SCREEN_WIDTH);
 
-//	Nick.BORDER = 0;
-//	Nick.FIXBIAS = 0;
+//  Nick.BORDER = 0;
+//  Nick.FIXBIAS = 0;
 }
 
 /* write border colour */
@@ -381,13 +381,13 @@ static void Nick_WritePixels(unsigned char DataByte, unsigned char CharIndex)
 				}
 			}
 
-//			if (Nick.LPT.RM & NICK_RM_ALTIND0)
-//			{
-//				if (Data & 0x040)
-//				{
-//					PenOffset|=0x04;
-//				}
-//			}
+//          if (Nick.LPT.RM & NICK_RM_ALTIND0)
+//          {
+//              if (Data & 0x040)
+//              {
+//                  PenOffset|=0x04;
+//              }
+//          }
 
 
 
@@ -536,13 +536,13 @@ static void Nick_WritePixelsLPIXEL(unsigned char DataByte, unsigned char CharInd
 				}
 			}
 
-//			if (Nick.LPT.RM & NICK_RM_ALTIND0)
-//			{
-//				if (Data & 0x040)
-//				{
-//					PenOffset|=0x04;
-//				}
-//			}
+//          if (Nick.LPT.RM & NICK_RM_ALTIND0)
+//          {
+//              if (Data & 0x040)
+//              {
+//                  PenOffset|=0x04;
+//              }
+//          }
 
 
 
@@ -934,7 +934,7 @@ static void	Nick_DoLine(void)
 	/* scan line count for this LPT */
 	ScanLineCount = ((~Nick.LPT.SC)+1) & 0x0ff;
 
-//	printf("ScanLineCount %02x\r\n",ScanLineCount);
+//  printf("ScanLineCount %02x\r\n",ScanLineCount);
 
 	/* update count of scanlines done so far */
 	Nick.ScanLineCount++;

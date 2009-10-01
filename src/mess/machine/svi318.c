@@ -633,7 +633,7 @@ MACHINE_RESET( svi318 )
 
 	svi.bank_switch = 0xff;
 	svi318_set_banks(machine);
-	
+
 	for(drive=0;drive<2;drive++)
 	{
 		floppy_install_load_proc(floppy_get_device(machine, drive), svi318_load_proc);

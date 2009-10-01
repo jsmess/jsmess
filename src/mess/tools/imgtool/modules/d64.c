@@ -850,7 +850,7 @@ static int d64_image_nextenum(imgtool_directory *enumeration, imgtool_dirent *en
 	ent->eof=0;
 
 	while ((iter->track >= 1) && (iter->track <= iter->image->tracks)) //safer
-//	while (iter->track != 0)
+//  while (iter->track != 0)
 	{
 		pos = iter->image->get_offset(iter->track, iter->sector);
 		for (; iter->offset<256; iter->offset += 32)

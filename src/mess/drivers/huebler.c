@@ -254,5 +254,5 @@ SYSTEM_CONFIG_END
 
 /* System Drivers */
 
-/*    YEAR	NAME		PARENT	COMPAT	MACHINE		INPUT		INIT	CONFIG		COMPANY								FULLNAME			FLAGS */
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    CONFIG      COMPANY                             FULLNAME            FLAGS */
 COMP( 1985, huebler,	0,		0,		huebler,	huebler,	0,		huebler,	"Bernd Hubler, Klaus-Peter Evert",	"Hubler/Everts",	GAME_NOT_WORKING )

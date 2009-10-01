@@ -1,5 +1,5 @@
 /***************************************************************************
-   
+
         Videotone TVC 32/64 driver
 
         12/05/2009 Skeleton driver.
@@ -14,49 +14,49 @@ static UINT8 tvc_video_mode = 0;
 
 static void tvc_set_mem_page(running_machine *machine, UINT8 data)
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);	
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	switch(data & 0x18) {
 		case 0x00 : // system ROM selected
 				memory_install_readwrite8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_BANK(1), SMH_NOP);
-				memory_set_bankptr(space->machine, 1, memory_region(machine, "sys"));	
+				memory_set_bankptr(space->machine, 1, memory_region(machine, "sys"));
 				break;
 		case 0x08 : // Cart ROM selected
 				memory_install_readwrite8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_BANK(1), SMH_NOP);
-				memory_set_bankptr(space->machine, 1, memory_region(machine, "cart"));	
+				memory_set_bankptr(space->machine, 1, memory_region(machine, "cart"));
 				break;
 		case 0x10 : // RAM selected
 				memory_install_readwrite8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_BANK(1), SMH_BANK(1));
-				memory_set_bankptr(space->machine, 1, mess_ram);	
-				break;				
+				memory_set_bankptr(space->machine, 1, mess_ram);
+				break;
 	}
 	// Bank 2 is always RAM
-	memory_set_bankptr(space->machine, 2, mess_ram + 0x4000);	
+	memory_set_bankptr(space->machine, 2, mess_ram + 0x4000);
 	if ((data & 0x20)==0) {
 		// Video RAM
-		memory_set_bankptr(space->machine, 3, mess_ram + 0x10000);	
+		memory_set_bankptr(space->machine, 3, mess_ram + 0x10000);
 	} else {
 		// System RAM page 3
-		memory_set_bankptr(space->machine, 3, mess_ram + 0x8000);	
+		memory_set_bankptr(space->machine, 3, mess_ram + 0x8000);
 	}
 	switch(data & 0xc0) {
 		case 0x00 : // Cart ROM selected
 				memory_install_readwrite8_handler(space, 0xc000, 0xffff, 0, 0, SMH_BANK(4), SMH_NOP);
-				memory_set_bankptr(space->machine, 4, memory_region(machine, "cart"));	
+				memory_set_bankptr(space->machine, 4, memory_region(machine, "cart"));
 				break;
 		case 0x40 : // System ROM selected
 				memory_install_readwrite8_handler(space, 0xc000, 0xffff, 0, 0, SMH_BANK(4), SMH_NOP);
-				memory_set_bankptr(space->machine, 4, memory_region(machine, "sys"));	
+				memory_set_bankptr(space->machine, 4, memory_region(machine, "sys"));
 				break;
 		case 0x80 : // RAM selected
 				memory_install_readwrite8_handler(space, 0xc000, 0xffff, 0, 0, SMH_BANK(4), SMH_BANK(4));
-				memory_set_bankptr(space->machine, 4, mess_ram);	
+				memory_set_bankptr(space->machine, 4, mess_ram);
 				break;
 		case 0xc0 : // External ROM selected
 				memory_install_readwrite8_handler(space, 0xc000, 0xffff, 0, 0, SMH_BANK(4), SMH_NOP);
-				memory_set_bankptr(space->machine, 4, memory_region(machine, "ext"));	
+				memory_set_bankptr(space->machine, 4, memory_region(machine, "ext"));
 				break;
-				
-	}		
+
+	}
 }
 
 static WRITE8_HANDLER( tvc_bank_w )
@@ -76,7 +76,7 @@ static WRITE8_HANDLER( tvc_palette_w )
 	//  0 I 0 G | 0 R 0 B
 	//  0 0 0 0 | I R G B
 	int i = ((data&0x40)>>3) | ((data&0x10)>>3) | (data&0x04) | (data&0x01);
-		
+
 	col[offset] = i;
 }
 
@@ -102,8 +102,8 @@ static INPUT_PORTS_START( tvc )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(tvc) 
-{	
+static MACHINE_RESET(tvc)
+{
 	memset(mess_ram,0,(64+14)*1024);
 	tvc_set_mem_page(machine, 0);
 	tvc_video_mode = 0;
@@ -124,11 +124,11 @@ static MC6845_UPDATE_ROW( tvc_update_row )
 {
 	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
 	int i;
-	
+
 	switch(tvc_video_mode) {
-		case 0 : 
+		case 0 :
 				for ( i = 0; i < x_count; i++ )
-				{		
+				{
 					UINT16 offset = i  + (y * 64);
 					UINT8 data = mess_ram[ offset + 0x10000];
 					*p = col[(data >> 7)]; p++;
@@ -143,7 +143,7 @@ static MC6845_UPDATE_ROW( tvc_update_row )
 				break;
 		case 1 :
 				for ( i = 0; i < x_count; i++ )
-				{		
+				{
 					UINT16 offset = i  + (y * 64);
 					UINT8 data = mess_ram[ offset + 0x10000];
 					*p = col[BIT(data,7)*2 + BIT(data,3)]; p++;
@@ -158,7 +158,7 @@ static MC6845_UPDATE_ROW( tvc_update_row )
 				break;
 		default:
 				for ( i = 0; i < x_count; i++ )
-				{		
+				{
 					UINT16 offset = i  + (y * 64);
 					UINT8 data = mess_ram[ offset + 0x10000];
 					*p = col[(data >> 4) & 0xf]; p++;
@@ -171,8 +171,8 @@ static MC6845_UPDATE_ROW( tvc_update_row )
 					*p = col[(data >> 0) & 0xf]; p++;
 				}
 				break;
-		
-	}	
+
+	}
 }
 
 static PALETTE_INIT( tvc )
@@ -194,7 +194,7 @@ static PALETTE_INIT( tvc )
 		{ 0xff,0x00,0x00 },
 		{ 0xff,0x00,0xff },
 		{ 0xff,0xff,0x00 },
-		{ 0xff,0xff,0xff } 
+		{ 0xff,0xff,0xff }
 	};
 	int i;
 
@@ -220,10 +220,10 @@ static MACHINE_DRIVER_START( tvc )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, 3125000)
     MDRV_CPU_PROGRAM_MAP(tvc_mem)
-    MDRV_CPU_IO_MAP(tvc_io)	
+    MDRV_CPU_IO_MAP(tvc_io)
 
     MDRV_MACHINE_RESET(tvc)
-	
+
  /* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)
@@ -233,7 +233,7 @@ static MACHINE_DRIVER_START( tvc )
 	MDRV_SCREEN_VISIBLE_AREA(0, 512 - 1, 0, 240 - 1)
 	MDRV_PALETTE_LENGTH( 16 )
 	MDRV_PALETTE_INIT(tvc)
-	
+
 	MDRV_MC6845_ADD("crtc", MC6845, 3125000, tvc_crtc6845_interface) // clk taken from schematics
 
     MDRV_VIDEO_START(tvc)
@@ -261,12 +261,12 @@ ROM_START( tvc64p )
 	ROM_REGION( 0x4000, "cart", ROMREGION_ERASEFF )
 	ROM_REGION( 0x4000, "ext", ROMREGION_ERASEFF )
 	ROM_LOAD( "tvc22_d7.64k", 0x2000, 0x2000, CRC(05e1c3a8) SHA1(abf119cf947ea32defd08b29a8a25d75f6bd4987))
-/*	
+/*
 
-	ROM_LOAD( "tvcru_d4.bin", 0x0000, 0x2000, CRC(bac5dd4f) SHA1(665a1b8c80b6ad82090803621f0c73ef9243c7d4))
-	ROM_LOAD( "tvcru_d6.bin", 0x2000, 0x2000, CRC(1e0fa0b8) SHA1(9bebb6c8f03f9641bd35c9fd45ffc13a48e5c572))
-	ROM_LOAD( "tvcru_d7.bin", 0x2000, 0x2000, CRC(70cde756) SHA1(c49662af9f6653347ead641e85777c3463cc161b))
-*/	
+    ROM_LOAD( "tvcru_d4.bin", 0x0000, 0x2000, CRC(bac5dd4f) SHA1(665a1b8c80b6ad82090803621f0c73ef9243c7d4))
+    ROM_LOAD( "tvcru_d6.bin", 0x2000, 0x2000, CRC(1e0fa0b8) SHA1(9bebb6c8f03f9641bd35c9fd45ffc13a48e5c572))
+    ROM_LOAD( "tvcru_d7.bin", 0x2000, 0x2000, CRC(70cde756) SHA1(c49662af9f6653347ead641e85777c3463cc161b))
+*/
 ROM_END
 
 ROM_START( tvc64pru )

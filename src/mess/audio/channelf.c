@@ -91,22 +91,22 @@ static DEVICE_START(channelf_sound)
 	rate = device->machine->sample_rate;
 
 	/*
-	 * 2V = 1000Hz ~= 3579535/224/16
-	 * Note 2V on the schematic is not the 2V scanline counter -
-	 *      it is the 2V vertical pixel counter
-	 *      1 pixel = 4 scanlines high
-	 *
+     * 2V = 1000Hz ~= 3579535/224/16
+     * Note 2V on the schematic is not the 2V scanline counter -
+     *      it is the 2V vertical pixel counter
+     *      1 pixel = 4 scanlines high
      *
-	 * This is a convenient way to generate the relevant frequencies,
-	 * using a DDS (Direct Digital Synthesizer)
-	 *
-	 * Essentially, you want a counter to overflow some bit position
-	 * at a fixed rate.  So, you figure out a number which you can add
-	 * to the counter at every sample, so that you will achieve this
-	 *
-	 * In this case, we want to overflow bit 16 and the 2V rate, 1000Hz.
-	 * This means we also get bit 17 = 4V, bit 18 = 8V, etc.
-	 */
+     *
+     * This is a convenient way to generate the relevant frequencies,
+     * using a DDS (Direct Digital Synthesizer)
+     *
+     * Essentially, you want a counter to overflow some bit position
+     * at a fixed rate.  So, you figure out a number which you can add
+     * to the counter at every sample, so that you will achieve this
+     *
+     * In this case, we want to overflow bit 16 and the 2V rate, 1000Hz.
+     * This means we also get bit 17 = 4V, bit 18 = 8V, etc.
+     */
 
 	/* This is the proper value to add per sample */
 	incr = 65536.0/(rate/1000.0/2.0);

@@ -1,13 +1,13 @@
 /**********************************************************************
 
-	PC-style floppy disk controller emulation
+    PC-style floppy disk controller emulation
 
-	TODO:
-		- check how the drive select from DOR register, and the drive select
-		from the fdc are related !!!!
-		- if all drives do not have a disk in them, and the fdc is reset, is a int generated?
-		(if yes, indicates drives are ready without discs, if no indicates no drives are ready)
-		- status register a, status register b
+    TODO:
+        - check how the drive select from DOR register, and the drive select
+        from the fdc are related !!!!
+        - if all drives do not have a disk in them, and the fdc is reset, is a int generated?
+        (if yes, indicates drives are ready without discs, if no indicates no drives are ready)
+        - status register a, status register b
 
 **********************************************************************/
 
@@ -237,16 +237,16 @@ static void pc_fdc_data_rate_w(running_machine *machine, UINT8 data)
 
 
 
-/*	FDC Digitial Output Register (DOR)
+/*  FDC Digitial Output Register (DOR)
 
-	|7|6|5|4|3|2|1|0|
-	 | | | | | | `------ floppy drive select (0=A, 1=B, 2=floppy C, ...)
-	 | | | | | `-------- 1 = FDC enable, 0 = hold FDC at reset
-	 | | | | `---------- 1 = DMA & I/O interface enabled
-	 | | | `------------ 1 = turn floppy drive A motor on
-	 | | `-------------- 1 = turn floppy drive B motor on
-	 | `---------------- 1 = turn floppy drive C motor on
-	 `------------------ 1 = turn floppy drive D motor on
+    |7|6|5|4|3|2|1|0|
+     | | | | | | `------ floppy drive select (0=A, 1=B, 2=floppy C, ...)
+     | | | | | `-------- 1 = FDC enable, 0 = hold FDC at reset
+     | | | | `---------- 1 = DMA & I/O interface enabled
+     | | | `------------ 1 = turn floppy drive A motor on
+     | | `-------------- 1 = turn floppy drive B motor on
+     | `---------------- 1 = turn floppy drive C motor on
+     `------------------ 1 = turn floppy drive D motor on
  */
 
 static void pc_fdc_dor_w(running_machine *machine, UINT8 data)
@@ -280,18 +280,18 @@ static void pc_fdc_dor_w(running_machine *machine, UINT8 data)
 	}
 
 	/* changing the DMA enable bit, will affect the terminal count state
-	from reaching the fdc - if dma is enabled this will send it through
-	otherwise it will be ignored */
+    from reaching the fdc - if dma is enabled this will send it through
+    otherwise it will be ignored */
 	pc_fdc_set_tc_state(machine, fdc->tc_state);
 
 	/* changing the DMA enable bit, will affect the dma drq state
-	from reaching us - if dma is enabled this will send it through
-	otherwise it will be ignored */
+    from reaching us - if dma is enabled this will send it through
+    otherwise it will be ignored */
 	pc_fdc_hw_dma_drq(pc_get_device(machine), fdc->dma_state, fdc->dma_read);
 
 	/* changing the DMA enable bit, will affect the irq state
-	from reaching us - if dma is enabled this will send it through
-	otherwise it will be ignored */
+    from reaching us - if dma is enabled this will send it through
+    otherwise it will be ignored */
 	pc_fdc_hw_interrupt(pc_get_device(machine), fdc->int_state);
 
 	/* reset? */
@@ -300,21 +300,21 @@ static void pc_fdc_dor_w(running_machine *machine, UINT8 data)
 		/* yes */
 
 			/* pc-xt expects a interrupt to be generated
-			when the fdc is reset.
-			In the FDC docs, it states that a INT will
-			be generated if READY input is true when the
-			fdc is reset.
+            when the fdc is reset.
+            In the FDC docs, it states that a INT will
+            be generated if READY input is true when the
+            fdc is reset.
 
-				It also states, that outputs to drive are set to 0.
-				Maybe this causes the drive motor to go on, and therefore
-				the ready line is set.
+                It also states, that outputs to drive are set to 0.
+                Maybe this causes the drive motor to go on, and therefore
+                the ready line is set.
 
-			This in return causes a int?? ---
+            This in return causes a int?? ---
 
 
-		what is not yet clear is if this is a result of the drives ready state
-		changing...
-		*/
+        what is not yet clear is if this is a result of the drives ready state
+        changing...
+        */
 			nec765_ready_w(pc_get_device(machine),1);
 
 		/* set FDC at reset */
@@ -330,18 +330,18 @@ static void pc_fdc_dor_w(running_machine *machine, UINT8 data)
 }
 
 
-/*	PCJr FDC Digitial Output Register (DOR)
+/*  PCJr FDC Digitial Output Register (DOR)
 
-	On a PC Jr the DOR is wired up a bit differently:
-	|7|6|5|4|3|2|1|0|
-	 | | | | | | | `--- Drive enable ( 0 = off, 1 = on )
-	 | | | | | | `----- Reserved
-	 | | | | | `------- Reserved
-	 | | | | `--------- Reserved
-	 | | | `----------- Reserved
-	 | | `------------- Watchdog Timer Enable ( 0 = watchdog disabled, 1 = watchdog enabled )
-	 | `--------------- Watchdog Timer Trigger ( on a 1->0 transition to strobe the trigger )
-	 `----------------- FDC Reset ( 0 = hold reset, 1 = release reset )
+    On a PC Jr the DOR is wired up a bit differently:
+    |7|6|5|4|3|2|1|0|
+     | | | | | | | `--- Drive enable ( 0 = off, 1 = on )
+     | | | | | | `----- Reserved
+     | | | | | `------- Reserved
+     | | | | `--------- Reserved
+     | | | `----------- Reserved
+     | | `------------- Watchdog Timer Enable ( 0 = watchdog disabled, 1 = watchdog enabled )
+     | `--------------- Watchdog Timer Trigger ( on a 1->0 transition to strobe the trigger )
+     `----------------- FDC Reset ( 0 = hold reset, 1 = release reset )
  */
 
 static TIMER_CALLBACK( watchdog_timeout )
@@ -396,21 +396,21 @@ static void pcjr_fdc_dor_w(running_machine *machine, UINT8 data)
 		/* yes */
 
 			/* pc-xt expects a interrupt to be generated
-			when the fdc is reset.
-			In the FDC docs, it states that a INT will
-			be generated if READY input is true when the
-			fdc is reset.
+            when the fdc is reset.
+            In the FDC docs, it states that a INT will
+            be generated if READY input is true when the
+            fdc is reset.
 
-				It also states, that outputs to drive are set to 0.
-				Maybe this causes the drive motor to go on, and therefore
-				the ready line is set.
+                It also states, that outputs to drive are set to 0.
+                Maybe this causes the drive motor to go on, and therefore
+                the ready line is set.
 
-			This in return causes a int?? ---
+            This in return causes a int?? ---
 
 
-		what is not yet clear is if this is a result of the drives ready state
-		changing...
-		*/
+        what is not yet clear is if this is a result of the drives ready state
+        changing...
+        */
 			nec765_ready_w(pc_get_device(machine),1);
 
 		/* set FDC at reset */
@@ -491,14 +491,14 @@ WRITE8_HANDLER ( pc_fdc_w )
 			break;
 		case 7:
 			/* Configuration Control Register
-			 *
-			 * Currently unimplemented; bits 1-0 are supposed to control data
-			 * flow rates:
-			 *		0 0		 500 kbps
-			 *		0 1		 300 kbps
-			 *		1 0		 250 kbps
-			 *		1 1		1000 kbps
-			 */
+             *
+             * Currently unimplemented; bits 1-0 are supposed to control data
+             * flow rates:
+             *      0 0      500 kbps
+             *      0 1      300 kbps
+             *      1 0      250 kbps
+             *      1 1     1000 kbps
+             */
 			break;
 	}
 }

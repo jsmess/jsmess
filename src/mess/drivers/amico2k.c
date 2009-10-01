@@ -8,8 +8,8 @@
     IC10 - Recorder PROM, yet to be found
     IC6/IC7 - PROMs reconstructed by Luigi Serrantoni
 
-    To Do: 
-     * Basically everything, in particular implement PROM (described in details 
+    To Do:
+     * Basically everything, in particular implement PROM (described in details
        at the link below) and i8255
 
     http://www.computerhistory.it/index.php?option=com_content&task=view&id=85&Itemid=117
@@ -34,7 +34,7 @@ static WRITE8_DEVICE_HANDLER( amico2k_i8255a_w )
 static ADDRESS_MAP_START(amico2k_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-//	AM_RANGE(0x0400, 0x07ff) AM_RAM	// optional expansion RAM
+//  AM_RANGE(0x0400, 0x07ff) AM_RAM // optional expansion RAM
 	AM_RANGE(0xfb00, 0xfcff) AM_ROM
 	AM_RANGE(0xfd00, 0xfd03) AM_DEVREADWRITE("i8255a", amico2k_i8255a_r, amico2k_i8255a_w)
 	AM_RANGE(0xfe00, 0xffff) AM_ROM
@@ -88,5 +88,5 @@ ROM_END
 
 /* Driver */
 
-/*	  YEAR  NAME    PARENT  COMPAT MACHINE INPUT   INIT  CONFIG COMPANY  FULLNAME                 FLAGS */
+/*    YEAR  NAME    PARENT  COMPAT MACHINE INPUT   INIT  CONFIG COMPANY  FULLNAME                 FLAGS */
 COMP( 1978, amico2k,    0,    0,     amico2k,    amico2k,    0,    0,     "A.S.EL.",   "Amico 2000",            GAME_NOT_WORKING)

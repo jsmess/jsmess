@@ -71,17 +71,17 @@
     Interestingly the data on cassette is stored in xmodem-checksum.
 
 
-	Due to bugs in the hardware and software of a real Sorcerer, the serial
-	interface misbehaves.
-	1. Sorcerer I had a hardware problem causing rs232 idle to be a space (+9v)
-	instead of mark (-9v). Fixed in Sorcerer II.
-	2. When you select a different baud for rs232, it was "remembered" but not
-	sent to port fe. It only gets sent when motor on was requested. Motor on is
-	only meaningful in a cassette operation.
-	3. The monitor software always resets the device to cassette whenever the
-	keyboard is scanned, motors altered, or an error occurred.
-	4. The above problems make rs232 communication impractical unless you write
-	your own routines or create a corrected monitor rom.
+    Due to bugs in the hardware and software of a real Sorcerer, the serial
+    interface misbehaves.
+    1. Sorcerer I had a hardware problem causing rs232 idle to be a space (+9v)
+    instead of mark (-9v). Fixed in Sorcerer II.
+    2. When you select a different baud for rs232, it was "remembered" but not
+    sent to port fe. It only gets sent when motor on was requested. Motor on is
+    only meaningful in a cassette operation.
+    3. The monitor software always resets the device to cassette whenever the
+    keyboard is scanned, motors altered, or an error occurred.
+    4. The above problems make rs232 communication impractical unless you write
+    your own routines or create a corrected monitor rom.
 
     Sound:
 
@@ -403,7 +403,7 @@ static MACHINE_DRIVER_START( exidy )
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("rom")
 	MDRV_CARTSLOT_NOT_MANDATORY
-	
+
 	MDRV_FLOPPY_4_DRIVES_ADD(exidy_floppy_config)
 MACHINE_DRIVER_END
 
@@ -415,7 +415,7 @@ static MACHINE_DRIVER_START( exidyd )
 
 	MDRV_MACHINE_START( exidy )
 	MDRV_MACHINE_RESET( exidy )
-	
+
 	MDRV_FLOPPY_4_DRIVES_REMOVE()
 MACHINE_DRIVER_END
 

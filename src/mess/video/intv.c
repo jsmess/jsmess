@@ -17,7 +17,7 @@ VIDEO_START( intv )
 
 /*
     for (i = 0; i < 8; i++) {
-		struct intv_sprite_type* s = &intv_sprite[i];
+        struct intv_sprite_type* s = &intv_sprite[i];
         s->visible = 0;
         s->xpos = 0;
         s->ypos = 0;
@@ -41,7 +41,7 @@ VIDEO_START( intv )
         }
         intv_collision_registers[i] = 0;
     }
-	for(i = 0; i < 4; i++) {
+    for(i = 0; i < 4; i++) {
         intv_color_stack[i] = 0;
     }
     intv_color_stack_mode = 0;
@@ -54,9 +54,9 @@ VIDEO_START( intv )
     intv_top_edge_inhibit = 0;
 
     intv_gramdirty = 1;
-	for(i=0;i<64;i++) {
+    for(i=0;i<64;i++) {
         intv_gram[i] = 0;
-		intv_gramdirtybytes[i] = 1;
+        intv_gramdirtybytes[i] = 1;
     }
 */
 }
@@ -592,96 +592,96 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, int tran
 /*
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, int behind_foreground)
 {
-	int i;
-	int code;
+    int i;
+    int code;
 
-	for(i=7;i>=0;--i)
-	{
-		struct intv_sprite_type *s = &intv_sprite[i];
-		if (s->visible && (s->behind_foreground == behind_foreground))
-		{
-			code = s->card;
-			if (!s->grom)
-			{
-				code %= 64;  // keep from going outside the array
-				if (s->yres == 1)
-				{
-					//if (intv_gramdirtybytes[code] == 1)
-					{
-						decodechar(machine->gfx[1],
-						   code,
-						   intv_gram,
-						   machine->config->gfxdecodeinfo[1].gfxlayout);
-						intv_gramdirtybytes[code] = 0;
-					}
-					// Draw GRAM char
-					drawgfxzoom_transpen(bitmap,&machine->screen[0].visarea,machine->gfx[1],
-						code,
-						s->color,
-						s->xflip,s->yflip,
-						s->xpos*2-16,s->ypos*2-16,
-						0x8000*s->xsize, 0x8000*s->ysize,0);
-				}
-				else
-				{
-					//if ((intv_gramdirtybytes[code] == 1) || (intv_gramdirtybytes[code+1] == 1))
-					{
-						decodechar(machine->gfx[1],
-						   code,
-						   intv_gram,
-						   machine->config->gfxdecodeinfo[1].gfxlayout);
-						decodechar(machine->gfx[1],
-						   code+1,
-						   intv_gram,
-						   machine->config->gfxdecodeinfo[1].gfxlayout);
-						intv_gramdirtybytes[code] = 0;
-						intv_gramdirtybytes[code+1] = 0;
-					}
-					// Draw GRAM char
-					drawgfxzoom_transpen(bitmap,&machine->screen[0].visarea,machine->gfx[1],
-						code,
-						s->color,
-						s->xflip,s->yflip,
-						s->xpos*2-16,s->ypos*2-16+(s->yflip)*s->ysize*8,
-						0x8000*s->xsize, 0x8000*s->ysize,0);
-					drawgfxzoom_transpen(bitmap,&machine->screen[0].visarea,machine->gfx[1],
-						code+1,
-						s->color,
-						s->xflip,s->yflip,
-						s->xpos*2-16,s->ypos*2-16+(1-s->yflip)*s->ysize*8,
-						0x8000*s->xsize, 0x8000*s->ysize,0);
-				}
-			}
-			else
-			{
-				if (s->yres == 1)
-				{
-					// Draw GROM char
-					drawgfxzoom_transpen(bitmap,&machine->screen[0].visarea,machine->gfx[0],
-						code,
-						s->color,
-						s->xflip,s->yflip,
-						s->xpos*2-16,s->ypos*2-16,
-						0x8000*s->xsize, 0x8000*s->ysize,0);
-				}
-				else
-				{
-					drawgfxzoom_transpen(bitmap,&machine->screen[0].visarea,machine->gfx[0],
-						code,
-						s->color,
-						s->xflip,s->yflip,
-						s->xpos*2-16,s->ypos*2-16+(s->yflip)*s->ysize*8,
-						0x8000*s->xsize, 0x8000*s->ysize,0);
-					drawgfxzoom_transpen(bitmap,&machine->screen[0].visarea,machine->gfx[0],
-						code+1,
-						s->color,
-						s->xflip,s->yflip,
-						s->xpos*2-16,s->ypos*2-16+(1-s->yflip)*s->ysize*8,
-						0x8000*s->xsize, 0x8000*s->ysize,0);
-				}
-			}
-		}
-	}
+    for(i=7;i>=0;--i)
+    {
+        struct intv_sprite_type *s = &intv_sprite[i];
+        if (s->visible && (s->behind_foreground == behind_foreground))
+        {
+            code = s->card;
+            if (!s->grom)
+            {
+                code %= 64;  // keep from going outside the array
+                if (s->yres == 1)
+                {
+                    //if (intv_gramdirtybytes[code] == 1)
+                    {
+                        decodechar(machine->gfx[1],
+                           code,
+                           intv_gram,
+                           machine->config->gfxdecodeinfo[1].gfxlayout);
+                        intv_gramdirtybytes[code] = 0;
+                    }
+                    // Draw GRAM char
+                    drawgfxzoom_transpen(bitmap,&machine->screen[0].visarea,machine->gfx[1],
+                        code,
+                        s->color,
+                        s->xflip,s->yflip,
+                        s->xpos*2-16,s->ypos*2-16,
+                        0x8000*s->xsize, 0x8000*s->ysize,0);
+                }
+                else
+                {
+                    //if ((intv_gramdirtybytes[code] == 1) || (intv_gramdirtybytes[code+1] == 1))
+                    {
+                        decodechar(machine->gfx[1],
+                           code,
+                           intv_gram,
+                           machine->config->gfxdecodeinfo[1].gfxlayout);
+                        decodechar(machine->gfx[1],
+                           code+1,
+                           intv_gram,
+                           machine->config->gfxdecodeinfo[1].gfxlayout);
+                        intv_gramdirtybytes[code] = 0;
+                        intv_gramdirtybytes[code+1] = 0;
+                    }
+                    // Draw GRAM char
+                    drawgfxzoom_transpen(bitmap,&machine->screen[0].visarea,machine->gfx[1],
+                        code,
+                        s->color,
+                        s->xflip,s->yflip,
+                        s->xpos*2-16,s->ypos*2-16+(s->yflip)*s->ysize*8,
+                        0x8000*s->xsize, 0x8000*s->ysize,0);
+                    drawgfxzoom_transpen(bitmap,&machine->screen[0].visarea,machine->gfx[1],
+                        code+1,
+                        s->color,
+                        s->xflip,s->yflip,
+                        s->xpos*2-16,s->ypos*2-16+(1-s->yflip)*s->ysize*8,
+                        0x8000*s->xsize, 0x8000*s->ysize,0);
+                }
+            }
+            else
+            {
+                if (s->yres == 1)
+                {
+                    // Draw GROM char
+                    drawgfxzoom_transpen(bitmap,&machine->screen[0].visarea,machine->gfx[0],
+                        code,
+                        s->color,
+                        s->xflip,s->yflip,
+                        s->xpos*2-16,s->ypos*2-16,
+                        0x8000*s->xsize, 0x8000*s->ysize,0);
+                }
+                else
+                {
+                    drawgfxzoom_transpen(bitmap,&machine->screen[0].visarea,machine->gfx[0],
+                        code,
+                        s->color,
+                        s->xflip,s->yflip,
+                        s->xpos*2-16,s->ypos*2-16+(s->yflip)*s->ysize*8,
+                        0x8000*s->xsize, 0x8000*s->ysize,0);
+                    drawgfxzoom_transpen(bitmap,&machine->screen[0].visarea,machine->gfx[0],
+                        code+1,
+                        s->color,
+                        s->xflip,s->yflip,
+                        s->xpos*2-16,s->ypos*2-16+(1-s->yflip)*s->ysize*8,
+                        0x8000*s->xsize, 0x8000*s->ysize,0);
+                }
+            }
+        }
+    }
 }
 */
 
@@ -783,7 +783,7 @@ VIDEO_UPDATE( intvkbd )
 {
 	int x,y,offs;
 	int current_row;
-//	char c;
+//  char c;
 
 	/* Draw the underlying INTV screen first */
 	VIDEO_UPDATE_CALL(generic_bitmapped);

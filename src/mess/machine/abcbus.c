@@ -33,7 +33,7 @@ void abcbus_init(running_machine *machine, const char *cputag, const abcbus_dais
 		(*tailptr)->card_select = (abcbus_card_select)device_get_info_fct((*tailptr)->device, DEVINFO_FCT_ABCBUS_CARD_SELECT);
 		tailptr = &(*tailptr)->next;
 	}
-	
+
 	astring_free(tempstring);
 
 	daisy_state = head;

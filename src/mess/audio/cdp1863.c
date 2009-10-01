@@ -1,9 +1,9 @@
 /*
 
-	TODO:
+    TODO:
 
-	- what happens if you connect both clocks?
-	- convert to sound device when possible
+    - what happens if you connect both clocks?
+    - convert to sound device when possible
 
 */
 

@@ -15,20 +15,20 @@ static ADDRESS_MAP_START(mc8020_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0bff) AM_ROM
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM AM_BASE(&mc8020_video_ram)// 1KB RAM ZRE
-	AM_RANGE(0x2000, 0x5fff) AM_ROM	
+	AM_RANGE(0x2000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mc8020_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE("z80ctc", z80ctc_r, z80ctc_w)	
+	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE("z80ctc", z80ctc_r, z80ctc_w)
 	AM_RANGE(0xf4, 0xf7) AM_DEVREADWRITE("z80pio", z80pio_r, z80pio_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mc8030_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	//  ZRE 4 * 2KB 
+	//  ZRE 4 * 2KB
 	AM_RANGE(0x0000, 0x1fff) AM_ROM // ZRE ROM's 4 * 2716
 	AM_RANGE(0x2000, 0x27ff) AM_ROM // SPE ROM's 2 * 2708
 	AM_RANGE(0x2800, 0x3fff) AM_ROM // For extension
@@ -59,9 +59,9 @@ static MACHINE_DRIVER_START( mc8020 )
     MDRV_CPU_ADD("maincpu",Z80, XTAL_2_4576MHz)
     MDRV_CPU_PROGRAM_MAP(mc8020_mem)
     MDRV_CPU_IO_MAP(mc8020_io)
-    
+
     MDRV_MACHINE_RESET(mc8020)
-    
+
     /* video hardware */
     MDRV_SCREEN_ADD("screen", RASTER)
     MDRV_SCREEN_REFRESH_RATE(50)
@@ -74,9 +74,9 @@ static MACHINE_DRIVER_START( mc8020 )
 
     MDRV_VIDEO_START(mc8020)
     MDRV_VIDEO_UPDATE(mc8020)
-    
-	MDRV_Z80PIO_ADD( "z80pio", mc8020_z80pio_intf )    
-	MDRV_Z80CTC_ADD( "z80ctc", XTAL_2_4576MHz / 100, mc8020_ctc_intf )    
+
+	MDRV_Z80PIO_ADD( "z80pio", mc8020_z80pio_intf )
+	MDRV_Z80CTC_ADD( "z80ctc", XTAL_2_4576MHz / 100, mc8020_ctc_intf )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( mc8030 )
@@ -86,7 +86,7 @@ static MACHINE_DRIVER_START( mc8030 )
     MDRV_CPU_IO_MAP(mc8030_io)
 
     MDRV_MACHINE_RESET(mc8030)
-    
+
     /* video hardware */
     MDRV_SCREEN_ADD("screen", RASTER)
     MDRV_SCREEN_REFRESH_RATE(50)
@@ -99,36 +99,36 @@ static MACHINE_DRIVER_START( mc8030 )
 
     MDRV_VIDEO_START(mc8030)
     MDRV_VIDEO_UPDATE(mc8030)
-    
-    MDRV_Z80PIO_ADD( "zve_pio", zve_z80pio_intf )	
+
+    MDRV_Z80PIO_ADD( "zve_pio", zve_z80pio_intf )
     MDRV_Z80CTC_ADD( "zve_ctc", XTAL_2_4576MHz, zve_z80ctc_intf )
-    
-	MDRV_Z80PIO_ADD( "asp_pio", asp_z80pio_intf )    
+
+	MDRV_Z80PIO_ADD( "asp_pio", asp_z80pio_intf )
 	MDRV_Z80CTC_ADD( "asp_ctc", XTAL_2_4576MHz, asp_z80ctc_intf )
-    MDRV_Z80SIO_ADD( "asp_sio", 4800, asp_z80sio_intf )    
+    MDRV_Z80SIO_ADD( "asp_sio", 4800, asp_z80sio_intf )
 MACHINE_DRIVER_END
 
 /* ROM definition */
 ROM_START( mc8020 )
    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-   ROM_SYSTEM_BIOS(0, "ver1", "Version 1")   
+   ROM_SYSTEM_BIOS(0, "ver1", "Version 1")
    ROMX_LOAD( "s01.rom",     0x0000, 0x0400, CRC(0f1c1a62) SHA1(270c0a9e8e165658f3b09d40a3e8bb3dc1b88184), ROM_BIOS(1))
-   ROMX_LOAD( "s02.rom",     0x0400, 0x0400, CRC(93b5811c) SHA1(8559d24072c9b5908a2627ff986d818308f51d59), ROM_BIOS(1))    
-   ROMX_LOAD( "s03.rom",     0x0800, 0x0400, CRC(3d32c334) SHA1(56d3012595540d03054ad3c6795ed5d929581a04), ROM_BIOS(1))   
+   ROMX_LOAD( "s02.rom",     0x0400, 0x0400, CRC(93b5811c) SHA1(8559d24072c9b5908a2627ff986d818308f51d59), ROM_BIOS(1))
+   ROMX_LOAD( "s03.rom",     0x0800, 0x0400, CRC(3d32c334) SHA1(56d3012595540d03054ad3c6795ed5d929581a04), ROM_BIOS(1))
    ROMX_LOAD( "mo01_v2.rom", 0x2000, 0x0400, CRC(7e47201c) SHA1(db49afdc5c1fe4065a979c56cbdbd3c58f5d942f), ROM_BIOS(1))
 
-   ROM_SYSTEM_BIOS(1, "ver2", "Version 2")   
+   ROM_SYSTEM_BIOS(1, "ver2", "Version 2")
    ROMX_LOAD( "s01.rom",    0x0000, 0x0400, CRC(0f1c1a62) SHA1(270c0a9e8e165658f3b09d40a3e8bb3dc1b88184), ROM_BIOS(2))
-   ROMX_LOAD( "s02_v2.rom", 0x0400, 0x0400, CRC(dd26c90a) SHA1(1108c11362fa63d21110a3b17868c1854a318c09), ROM_BIOS(2))    
-   ROMX_LOAD( "s03_v2.rom", 0x0800, 0x0400, CRC(5b64ee7b) SHA1(3b4cbfcb8e2dedcfd4a3680c81fe6ceb2211b275), ROM_BIOS(2))   
+   ROMX_LOAD( "s02_v2.rom", 0x0400, 0x0400, CRC(dd26c90a) SHA1(1108c11362fa63d21110a3b17868c1854a318c09), ROM_BIOS(2))
+   ROMX_LOAD( "s03_v2.rom", 0x0800, 0x0400, CRC(5b64ee7b) SHA1(3b4cbfcb8e2dedcfd4a3680c81fe6ceb2211b275), ROM_BIOS(2))
    ROMX_LOAD( "mo01.rom",   0x2000, 0x0400, CRC(c65a470f) SHA1(71325fed1a342149b5efc2234ecfc8adfff0a42d), ROM_BIOS(2))
 
-   ROM_SYSTEM_BIOS(2, "ver3", "Version 3")   
+   ROM_SYSTEM_BIOS(2, "ver3", "Version 3")
    ROMX_LOAD( "s01.rom",    0x0000, 0x0400, CRC(0f1c1a62) SHA1(270c0a9e8e165658f3b09d40a3e8bb3dc1b88184), ROM_BIOS(3))
-   ROMX_LOAD( "s02_v3.rom", 0x0400, 0x0400, CRC(40c7a694) SHA1(bcdf382e8dad9bb6e06d23ec018e9df55c8d8d0c), ROM_BIOS(3))    
-   ROMX_LOAD( "s03.rom",    0x0800, 0x0400, CRC(3d32c334) SHA1(56d3012595540d03054ad3c6795ed5d929581a04), ROM_BIOS(3))   
-   ROMX_LOAD( "mo01_v2.rom",0x2000, 0x0400, CRC(7e47201c) SHA1(db49afdc5c1fe4065a979c56cbdbd3c58f5d942f), ROM_BIOS(3))    
-   
+   ROMX_LOAD( "s02_v3.rom", 0x0400, 0x0400, CRC(40c7a694) SHA1(bcdf382e8dad9bb6e06d23ec018e9df55c8d8d0c), ROM_BIOS(3))
+   ROMX_LOAD( "s03.rom",    0x0800, 0x0400, CRC(3d32c334) SHA1(56d3012595540d03054ad3c6795ed5d929581a04), ROM_BIOS(3))
+   ROMX_LOAD( "mo01_v2.rom",0x2000, 0x0400, CRC(7e47201c) SHA1(db49afdc5c1fe4065a979c56cbdbd3c58f5d942f), ROM_BIOS(3))
+
    // m02 doesn't exist on board
    ROM_LOAD( "mo03.rom", 0x2800, 0x0400, CRC(29685056) SHA1(39e77658fb7af5a28112341f0893e007d73c1b7a))
    ROM_LOAD( "mo04.rom", 0x2c00, 0x0400, CRC(fd315b73) SHA1(cfb943ec8c884a9b92562d05f92faf06fe42ad68))

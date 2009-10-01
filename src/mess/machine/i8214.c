@@ -58,7 +58,7 @@ INLINE void trigger_interrupt(const device_config *device, int level)
 	i8214_t *i8214 = get_safe_token(device);
 
 	if (LOG) logerror("I8214 '%s' Interrupt Level %u\n", device->tag, level);
-	
+
 	i8214->a = level;
 
 	/* disable interrupts */

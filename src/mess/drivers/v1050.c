@@ -8,102 +8,102 @@ PCB Layout
 REV B-1
 
 |---------------------------------------------------------------------------------------------------|
-|																|----------|						|
-|			9216												|	ROM0   |		LS74			|
-|																|----------|						|
---						LS00	7406			LS255	LS393						4164	4164	|
-||		|-----------|											|----------|						|
-||		|	WD1793	|	LS14	7407	-		LS393	LS74	|  8251A   |		4164	4164	|
-||		|-----------|					|						|----------|						|
-|C										|											4164	4164	|
-|N		7406	LS00	LS74	LS14	|C		LS20	LS08	LS75								|
-|1										|N											4164	4164	|
-||										|5															|
-||		7406	LS195			LS244	|		LS04	LS32	LS08				4164	4164	|
-||										-															|
-||		|------------|  |--------|													4164	4164	|
--- BAT  |	8255A	 |  |  8214  |				LS139	LS32	LS138	LS17						|
---		|------------|  |--------|		-											4164	4164	|
-||										|C															|
-||		|--------|		LS00	LS00	|N		LS00	LS32	LS138				4164	4164	|
-|C		| 8251A  |						|6															|
-|N		|--------|		|------------|	-						|------------|						|
-|2						|	8255A	 |							|	 Z80A	 |						|
-||		1488 1489  RTC	|------------|			LS00	LS32	|------------|		LS257	LS257	|
-||																									|
---																|------------|		|------------|	|
-|														LS04	|	8255A 	 |		|	8255A	 |	|
-|																|------------|		|------------|	|
-|																									|
-|												7404								LS257	LS257	|
-|													16MHz											|
-|		LS04	LS74	LS257														9016	9016	|
-|																									|
---		LS74	LS04	LS74	LS163												9016	9016	|
-||																									|
-||																					9016	9016	|
-||		LS02	LS163	LS74	7404							7404								|
-||																					9016	9016	|
-||																									|
-|C		LS244	LS10	LS257					LS362			|----------|		9016	9016	|
-|N																|	ROM1   |						|
-|3		LS245	7404	LS273					LS32			|----------|		9016	9016	|
-||																									|
-||		7407			LS174					LS32								9016	9016	|
-||				15.36MHz																			|
-||																|------------|		9016	9016	|
---						LS09	LS04			LS12			|	 6502 	 |						|
-|																|------------|		9016	9016	|
---																									|
-|C				LS175	LS86	LS164			LS164								9016	9016	|
-|N																|------------|						|
-|4																|	 6845 	 |		LS253	LS253	|
---		7426	LS02	LS74	LS00			LS164			|------------|						|
-|																					LS253	LS253	|
-|						REV B-1	W/O 1059			S/N 492											|
+|                                                               |----------|                        |
+|           9216                                                |   ROM0   |        LS74            |
+|                                                               |----------|                        |
+--                      LS00    7406            LS255   LS393                       4164    4164    |
+||      |-----------|                                           |----------|                        |
+||      |   WD1793  |   LS14    7407    -       LS393   LS74    |  8251A   |        4164    4164    |
+||      |-----------|                   |                       |----------|                        |
+|C                                      |                                           4164    4164    |
+|N      7406    LS00    LS74    LS14    |C      LS20    LS08    LS75                                |
+|1                                      |N                                          4164    4164    |
+||                                      |5                                                          |
+||      7406    LS195           LS244   |       LS04    LS32    LS08                4164    4164    |
+||                                      -                                                           |
+||      |------------|  |--------|                                                  4164    4164    |
+-- BAT  |   8255A    |  |  8214  |              LS139   LS32    LS138   LS17                        |
+--      |------------|  |--------|      -                                           4164    4164    |
+||                                      |C                                                          |
+||      |--------|      LS00    LS00    |N      LS00    LS32    LS138               4164    4164    |
+|C      | 8251A  |                      |6                                                          |
+|N      |--------|      |------------|  -                       |------------|                      |
+|2                      |   8255A    |                          |    Z80A    |                      |
+||      1488 1489  RTC  |------------|          LS00    LS32    |------------|      LS257   LS257   |
+||                                                                                                  |
+--                                                              |------------|      |------------|  |
+|                                                       LS04    |   8255A    |      |   8255A    |  |
+|                                                               |------------|      |------------|  |
+|                                                                                                   |
+|                                               7404                                LS257   LS257   |
+|                                                   16MHz                                           |
+|       LS04    LS74    LS257                                                       9016    9016    |
+|                                                                                                   |
+--      LS74    LS04    LS74    LS163                                               9016    9016    |
+||                                                                                                  |
+||                                                                                  9016    9016    |
+||      LS02    LS163   LS74    7404                            7404                                |
+||                                                                                  9016    9016    |
+||                                                                                                  |
+|C      LS244   LS10    LS257                   LS362           |----------|        9016    9016    |
+|N                                                              |   ROM1   |                        |
+|3      LS245   7404    LS273                   LS32            |----------|        9016    9016    |
+||                                                                                                  |
+||      7407            LS174                   LS32                                9016    9016    |
+||              15.36MHz                                                                            |
+||                                                              |------------|      9016    9016    |
+--                      LS09    LS04            LS12            |    6502    |                      |
+|                                                               |------------|      9016    9016    |
+--                                                                                                  |
+|C              LS175   LS86    LS164           LS164                               9016    9016    |
+|N                                                              |------------|                      |
+|4                                                              |    6845    |      LS253   LS253   |
+--      7426    LS02    LS74    LS00            LS164           |------------|                      |
+|                                                                                   LS253   LS253   |
+|                       REV B-1 W/O 1059            S/N 492                                         |
 |---------------------------------------------------------------------------------------------------|
 
 Notes:
     All IC's shown.
 
-    ROM0	- "IC 244-032 V1.0"
-	ROM1	- "IC 244-033 V1.0"
-	Z80A	- Zilog Z8400APS Z80A CPU
-	6502	- Synertek SY6502A CPU
-	4164	- NEC D4164-2 64Kx1 Dynamic RAM
-	9016	- AMD AM9016EPC 16Kx1 Dynamic RAM
-	8214	- NEC µPB8214C Priority Interrupt Control Unit
-	8255A	- NEC D8255AC-5 Programmable Peripheral Interface
-	8251A	- NEC D8251AC Programmable Communication Interface
-	WD1793	- Mitsubishi MB8877 Floppy Disc Controller
-	9216	- SMC FDC9216 Floppy Disk Data Separator
-	1488	- Motorola MC1488 Quad Line EIA-232D Driver
-	1489	- Motorola MC1489 Quad Line Receivers
-	6845	- Hitachi HD46505SP CRT Controller
-	RTC		- OKI MSM58321RS Real Time Clock
-	BAT		- 3.4V battery
-	CN1		- parallel connector
-	CN2		- serial connector
-	CN3		- winchester connector
-	CN4		- monitor connector
-	CN5		- floppy data connector
-	CN6		- floppy power connector
+    ROM0    - "IC 244-032 V1.0"
+    ROM1    - "IC 244-033 V1.0"
+    Z80A    - Zilog Z8400APS Z80A CPU
+    6502    - Synertek SY6502A CPU
+    4164    - NEC D4164-2 64Kx1 Dynamic RAM
+    9016    - AMD AM9016EPC 16Kx1 Dynamic RAM
+    8214    - NEC ?PB8214C Priority Interrupt Control Unit
+    8255A   - NEC D8255AC-5 Programmable Peripheral Interface
+    8251A   - NEC D8251AC Programmable Communication Interface
+    WD1793  - Mitsubishi MB8877 Floppy Disc Controller
+    9216    - SMC FDC9216 Floppy Disk Data Separator
+    1488    - Motorola MC1488 Quad Line EIA-232D Driver
+    1489    - Motorola MC1489 Quad Line Receivers
+    6845    - Hitachi HD46505SP CRT Controller
+    RTC     - OKI MSM58321RS Real Time Clock
+    BAT     - 3.4V battery
+    CN1     - parallel connector
+    CN2     - serial connector
+    CN3     - winchester connector
+    CN4     - monitor connector
+    CN5     - floppy data connector
+    CN6     - floppy power connector
 
 */
 
 /*
 
-	TODO:
+    TODO:
 
-	- ?
-		Device 'u76': warning - attempt to direct-map address 00001FFD in program space
-		Device 'u76': warning - attempt to direct-map address 00001FFE in program space
-		Device 'u76': warning - attempt to direct-map address 00001FFF in program space
+    - ?
+        Device 'u76': warning - attempt to direct-map address 00001FFD in program space
+        Device 'u76': warning - attempt to direct-map address 00001FFE in program space
+        Device 'u76': warning - attempt to direct-map address 00001FFF in program space
 
-	- write to banked RAM at 0x0000-0x1fff when ROM is active
-	- real keyboard w/i8049
-	- keyboard beeper
-	- Winchester (Tandon TM501/CMI CM-5412 10MB drive on Xebec S1410 controller)
+    - write to banked RAM at 0x0000-0x1fff when ROM is active
+    - real keyboard w/i8049
+    - keyboard beeper
+    - Winchester (Tandon TM501/CMI CM-5412 10MB drive on Xebec S1410 controller)
 
 */
 
@@ -185,31 +185,31 @@ static const UINT8 v1050_keycodes[4][12][8] =
 {
 	{   /* unshifted */
 		{ 0xc0, 0xd4, 0xd8, 0xdc, 0xe0, 0xe4, 0xe8, 0xec },
-		{ 0xf0, 0xfc, 0x90, 0xf4, 0xf8, 0x94, 0xc4, 0xc8 }, 
+		{ 0xf0, 0xfc, 0x90, 0xf4, 0xf8, 0x94, 0xc4, 0xc8 },
 		{ 0xcc, 0xd0, 0x1b, 0x31, 0x32, 0x33, 0x34, 0x35 },
-		{ 0x36, 0x37, 0x38, 0x39, 0x30, 0x2d, 0x3d, 0x60 }, 
-		{ 0x08, 0x88, 0x8c, 0x71, 0x77, 0x65, 0x72, 0x74 }, 
+		{ 0x36, 0x37, 0x38, 0x39, 0x30, 0x2d, 0x3d, 0x60 },
+		{ 0x08, 0x88, 0x8c, 0x71, 0x77, 0x65, 0x72, 0x74 },
 		{ 0x79, 0x75, 0x69, 0x6f, 0x70, 0x5b, 0x5d, 0x0d },
 		{ 0x7f, 0x00, 0x80, 0x61, 0x73, 0x64, 0x66, 0x67 },
-		{ 0x68, 0x6a, 0x6b, 0x6c, 0x3b, 0x27, 0x5c, 0x84 }, 
+		{ 0x68, 0x6a, 0x6b, 0x6c, 0x3b, 0x27, 0x5c, 0x84 },
 		{ 0x00, 0x7a, 0x78, 0x63, 0x76, 0x62, 0x6e, 0x6d },
-		{ 0x2c, 0x2e, 0x2f, 0x00, 0x0a, 0x20, 0x81, 0x82 }, 
-		{ 0xb7, 0xb8, 0xb9, 0xad, 0xb4, 0xb5, 0xb6, 0xac }, 
+		{ 0x2c, 0x2e, 0x2f, 0x00, 0x0a, 0x20, 0x81, 0x82 },
+		{ 0xb7, 0xb8, 0xb9, 0xad, 0xb4, 0xb5, 0xb6, 0xac },
 		{ 0xb1, 0xb2, 0xb3, 0x83, 0xb0, 0xae, 0x00, 0x00 },
 	},
 
 	{	/* shifted */
 		{ 0xc1, 0xd5, 0xd9, 0xdd, 0xe1, 0xe5, 0xe9, 0xed },
-		{ 0xf1, 0xfd, 0x91, 0xf5, 0xf9, 0x95, 0xc5, 0xc9 }, 
+		{ 0xf1, 0xfd, 0x91, 0xf5, 0xf9, 0x95, 0xc5, 0xc9 },
 		{ 0xcd, 0xd1, 0x1b, 0x21, 0x40, 0x23, 0x24, 0x25 },
-		{ 0x5e, 0x26, 0x2a, 0x28, 0x29, 0x5f, 0x2b, 0x7e }, 
-		{ 0x08, 0x89, 0x8d, 0x51, 0x57, 0x45, 0x52, 0x54 }, 
+		{ 0x5e, 0x26, 0x2a, 0x28, 0x29, 0x5f, 0x2b, 0x7e },
+		{ 0x08, 0x89, 0x8d, 0x51, 0x57, 0x45, 0x52, 0x54 },
 		{ 0x59, 0x55, 0x49, 0x4f, 0x50, 0x7b, 0x7d, 0x0d },
 		{ 0x7f, 0x00, 0x80, 0x41, 0x53, 0x44, 0x46, 0x47 },
-		{ 0x48, 0x4a, 0x4b, 0x4c, 0x3a, 0x22, 0x7c, 0x85 }, 
+		{ 0x48, 0x4a, 0x4b, 0x4c, 0x3a, 0x22, 0x7c, 0x85 },
 		{ 0x00, 0x5a, 0x58, 0x43, 0x56, 0x42, 0x4e, 0x4d },
-		{ 0x3c, 0x3e, 0x3f, 0x0a, 0x20, 0x81, 0x82, 0xb7 }, 
-		{ 0xb8, 0xb9, 0xad, 0xb4, 0xb5, 0xb6, 0xac, 0xb1 }, 
+		{ 0x3c, 0x3e, 0x3f, 0x0a, 0x20, 0x81, 0x82, 0xb7 },
+		{ 0xb8, 0xb9, 0xad, 0xb4, 0xb5, 0xb6, 0xac, 0xb1 },
 		{ 0xb2, 0xb3, 0x83, 0xb0, 0xa0, 0x00, 0x00, 0x00 },
 	},
 
@@ -378,9 +378,9 @@ static WRITE8_HANDLER( dvint_clr_w )
 static READ8_HANDLER( keyboard_r )
 {
 	v1050_state *state = space->machine->driver_data;
-	
+
 	static const char *const KEY_ROW[] = { "X0", "X1", "X2", "X3", "X4", "X5", "X6", "X7", "X8", "X9", "XA", "XB" };
-	
+
 	return input_port_read(space->machine, KEY_ROW[state->keylatch]);
 }
 
@@ -395,23 +395,23 @@ static WRITE8_HANDLER( p2_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		P20		
-		P21		
-		P22		
-		P23		
-		P24		
-		P25		led output
-		P26		speaker (NE555) output
-		P27		serial output
+        P20
+        P21
+        P22
+        P23
+        P24
+        P25     led output
+        P26     speaker (NE555) output
+        P27     serial output
 
-	*/
+    */
 
 	v1050_state *state = space->machine->driver_data;
 
 	output_set_led_value(0, BIT(data, 5));
-//	discrete_sound_w(discrete, NODE_01, BIT(data, 6));
+//  discrete_sound_w(discrete, NODE_01, BIT(data, 6));
 	state->kb_so = BIT(data, 7);
 }
 
@@ -430,8 +430,8 @@ static ADDRESS_MAP_START( v1050_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x84, 0x87) AM_DEVREADWRITE(I8255A_DISP_TAG, i8255a_r, i8255a_w)
-//	AM_RANGE(0x88, 0x88) AM_DEVREADWRITE(I8251A_KB_TAG, msm8251_data_r, msm8251_data_w)
-//	AM_RANGE(0x89, 0x89) AM_DEVREADWRITE(I8251A_KB_TAG, msm8251_status_r, msm8251_control_w)
+//  AM_RANGE(0x88, 0x88) AM_DEVREADWRITE(I8251A_KB_TAG, msm8251_data_r, msm8251_data_w)
+//  AM_RANGE(0x89, 0x89) AM_DEVREADWRITE(I8251A_KB_TAG, msm8251_status_r, msm8251_control_w)
 	AM_RANGE(0x88, 0x88) AM_READ(v1050_get_key) AM_DEVWRITE(I8251A_KB_TAG, msm8251_data_w)
 	AM_RANGE(0x89, 0x89) AM_READ(v1050_get_key_status) AM_DEVWRITE(I8251A_KB_TAG, msm8251_control_w)
 	AM_RANGE(0x8c, 0x8c) AM_DEVREADWRITE(I8251A_SIO_TAG, msm8251_data_r, msm8251_data_w)
@@ -441,9 +441,9 @@ static ADDRESS_MAP_START( v1050_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x9c, 0x9f) AM_DEVREADWRITE(I8255A_RTC_TAG, i8255a_r, i8255a_w)
 	AM_RANGE(0xa0, 0xa0) AM_READWRITE(vint_clr_r, vint_clr_w)
 	AM_RANGE(0xb0, 0xb0) AM_READWRITE(dint_clr_r, dint_clr_w)
-	AM_RANGE(0xc0, 0xc0) AM_WRITE(v1050_i8214_w) 
+	AM_RANGE(0xc0, 0xc0) AM_WRITE(v1050_i8214_w)
 	AM_RANGE(0xd0, 0xd0) AM_WRITE(bank_w)
-//	AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE(S1410_TAG, s1410_r, s1410_w)
+//  AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE(S1410_TAG, s1410_r, s1410_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( v1050_crt_mem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -479,7 +479,7 @@ static INPUT_PORTS_START( v1050_real )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad Enter DelCh") PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 6 Pg Dn") PORT_CODE(KEYCODE_6_PAD) PORT_CHAR(UCHAR_MAMEKEY(6_PAD))
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 3 \xE2\x86\x92") PORT_CODE(KEYCODE_3_PAD) PORT_CHAR(UCHAR_MAMEKEY(3_PAD))
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED ) 
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad - DelLn") PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHAR(UCHAR_MAMEKEY(MINUS_PAD))
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 9 End") PORT_CODE(KEYCODE_9_PAD) PORT_CHAR(UCHAR_MAMEKEY(9_PAD))
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad , DelWd")
@@ -506,10 +506,10 @@ static INPUT_PORTS_START( v1050_real )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 0 Wd\xE2\x86\x90") PORT_CODE(KEYCODE_0_PAD) PORT_CHAR(UCHAR_MAMEKEY(0_PAD))
 
 	PORT_START("X4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED ) 
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 5 \xE2\x86\x91") PORT_CODE(KEYCODE_5_PAD) PORT_CHAR(UCHAR_MAMEKEY(5_PAD))
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 1 \xE2\x86\x90") PORT_CODE(KEYCODE_1_PAD) PORT_CHAR(UCHAR_MAMEKEY(1_PAD))
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED ) 
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 7 Home") PORT_CODE(KEYCODE_7_PAD) PORT_CHAR(UCHAR_MAMEKEY(7_PAD))
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 8 Last") PORT_CODE(KEYCODE_8_PAD) PORT_CHAR(UCHAR_MAMEKEY(8_PAD))
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 4 PgUp") PORT_CODE(KEYCODE_4_PAD) PORT_CHAR(UCHAR_MAMEKEY(4_PAD))
@@ -583,7 +583,7 @@ static INPUT_PORTS_START( v1050_real )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('[') PORT_CHAR('{')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']') PORT_CHAR('}')
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( v1050 )
@@ -676,7 +676,7 @@ static INPUT_PORTS_START( v1050 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('b') PORT_CHAR('B')
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N) PORT_CHAR('n') PORT_CHAR('N')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_CHAR('m') PORT_CHAR('M')
-	
+
 	PORT_START("ROW9")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')
@@ -696,7 +696,7 @@ static INPUT_PORTS_START( v1050 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 5") PORT_CODE(KEYCODE_5_PAD)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 6") PORT_CODE(KEYCODE_6_PAD)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x91") PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
-	
+
 	PORT_START("ROW11")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 1") PORT_CODE(KEYCODE_1_PAD)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 2") PORT_CODE(KEYCODE_2_PAD)
@@ -706,7 +706,7 @@ static INPUT_PORTS_START( v1050 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	
+
 	PORT_START("ROW12")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("LOCK") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("LEFT SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
@@ -782,18 +782,18 @@ static WRITE8_DEVICE_HANDLER( misc_8255_a_w )
 {
 	/*
 
-        bit		signal		description
+        bit     signal      description
 
-		PA0     f_ds<0>		drive 0 select
-        PA1     f_ds<1>		drive 1 select
-        PA2     f_ds<2>		drive 2 select
-        PA3     f_ds<3>		drive 3 select
-        PA4		f_side_1	floppy side select
-        PA5     f_pre_comp	precompensation
-        PA6		f_motor_on*	floppy motor
-        PA7     f_dden*		double density select
-    
-	*/
+        PA0     f_ds<0>     drive 0 select
+        PA1     f_ds<1>     drive 1 select
+        PA2     f_ds<2>     drive 2 select
+        PA3     f_ds<3>     drive 3 select
+        PA4     f_side_1    floppy side select
+        PA5     f_pre_comp  precompensation
+        PA6     f_motor_on* floppy motor
+        PA7     f_dden*     double density select
+
+    */
 
 	v1050_state *state = device->machine->driver_data;
 
@@ -829,18 +829,18 @@ static READ8_DEVICE_HANDLER( misc_8255_c_r )
 {
 	/*
 
-        bit		signal		description
+        bit     signal      description
 
-		PC0     pr_strobe	printer strobe
-        PC1     f_int_enb	floppy interrupt enable
+        PC0     pr_strobe   printer strobe
+        PC1     f_int_enb   floppy interrupt enable
         PC2     baud_sel_a
         PC3     baud_sel_b
-        PC4		pr_busy*	printer busy
-        PC5     pr_pe*		printer paper end
-        PC6		
-        PC7     
-    
-	*/
+        PC4     pr_busy*    printer busy
+        PC5     pr_pe*      printer paper end
+        PC6
+        PC7
+
+    */
 
 	v1050_state *state = device->machine->driver_data;
 
@@ -856,18 +856,18 @@ static WRITE8_DEVICE_HANDLER( misc_8255_c_w )
 {
 	/*
 
-        bit		signal		description
+        bit     signal      description
 
-		PC0     pr_strobe	printer strobe
-        PC1     f_int_enb	floppy interrupt enable
+        PC0     pr_strobe   printer strobe
+        PC1     f_int_enb   floppy interrupt enable
         PC2     baud_sel_a
         PC3     baud_sel_b
-        PC4		pr_busy*	printer busy
-        PC5     pr_pe*		printer paper end
-        PC6		
-        PC7     
-    
-	*/
+        PC4     pr_busy*    printer busy
+        PC5     pr_pe*      printer paper end
+        PC6
+        PC7
+
+    */
 
 	v1050_state *state = device->machine->driver_data;
 
@@ -914,18 +914,18 @@ static WRITE8_DEVICE_HANDLER( rtc_8255_b_w )
 {
 	/*
 
-        bit		signal		description
+        bit     signal      description
 
-		PB0					RS-232
-        PB1					Winchester
-        PB2					keyboard
-        PB3					floppy disk interrupt
-        PB4					vertical interrupt
-        PB5					display interrupt
-        PB6					expansion B
-        PB7					expansion A
-    
-	*/
+        PB0                 RS-232
+        PB1                 Winchester
+        PB2                 keyboard
+        PB3                 floppy disk interrupt
+        PB4                 vertical interrupt
+        PB5                 display interrupt
+        PB6                 expansion B
+        PB7                 expansion A
+
+    */
 
 	v1050_state *state = device->machine->driver_data;
 
@@ -936,18 +936,18 @@ static READ8_DEVICE_HANDLER( rtc_8255_c_r )
 {
 	/*
 
-        bit		signal		description
+        bit     signal      description
 
-		PC0     
-        PC1     
-        PC2     
-        PC3					clock busy
-        PC4					clock address write
-        PC5					clock data write
-        PC6					clock data read
-        PC7					clock device select
-    
-	*/
+        PC0
+        PC1
+        PC2
+        PC3                 clock busy
+        PC4                 clock address write
+        PC5                 clock data write
+        PC6                 clock data read
+        PC7                 clock device select
+
+    */
 
 	v1050_state *state = device->machine->driver_data;
 
@@ -958,18 +958,18 @@ static WRITE8_DEVICE_HANDLER( rtc_8255_c_w )
 {
 	/*
 
-        bit		signal		description
+        bit     signal      description
 
-		PC0     
-        PC1     
-        PC2     
-        PC3					clock busy
-        PC4					clock address write
-        PC5					clock data write
-        PC6					clock data read
-        PC7					clock device select
-    
-	*/
+        PC0
+        PC1
+        PC2
+        PC3                 clock busy
+        PC4                 clock address write
+        PC5                 clock data write
+        PC6                 clock data read
+        PC7                 clock device select
+
+    */
 
 	v1050_state *state = device->machine->driver_data;
 
@@ -1080,8 +1080,8 @@ static WD17XX_CALLBACK( v1050_mb8877_callback )
 	}
 }
 
-static const wd17xx_interface v1050_wd17xx_intf = 
-{ 
+static const wd17xx_interface v1050_wd17xx_intf =
+{
 	v1050_mb8877_callback,
 	NULL,
 	{FLOPPY_0,FLOPPY_1,NULL,NULL}
@@ -1121,7 +1121,7 @@ static MACHINE_START( v1050 )
 	/* initialize I8214 */
 	i8214_etlg_w(state->i8214, 1);
 	i8214_inte_w(state->i8214, 1);
-	
+
 	/* initialize RTC */
 	msm58321_cs1_w(state->msm58321, 1);
 
@@ -1202,8 +1202,8 @@ static MACHINE_DRIVER_START( v1050 )
     MDRV_CPU_PROGRAM_MAP(v1050_crt_mem)
 	MDRV_QUANTUM_PERFECT_CPU(M6502_TAG)
 
-//	MDRV_CPU_ADD(I8049_TAG, I8049, XTAL_4_608MHz)
-//	MDRV_CPU_IO_MAP(v1050_kbd_io)
+//  MDRV_CPU_ADD(I8049_TAG, I8049, XTAL_4_608MHz)
+//  MDRV_CPU_IO_MAP(v1050_kbd_io)
 
 	MDRV_MACHINE_START(v1050)
 	MDRV_MACHINE_RESET(v1050)
@@ -1215,10 +1215,10 @@ static MACHINE_DRIVER_START( v1050 )
 	MDRV_IMPORT_FROM(v1050_video)
 
 	/* sound hardware */
-/*	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(DISCRETE_TAG, DISCRETE, 0)
-	MDRV_SOUND_CONFIG_DISCRETE(v1050)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)*/
+/*  MDRV_SPEAKER_STANDARD_MONO("mono")
+    MDRV_SOUND_ADD(DISCRETE_TAG, DISCRETE, 0)
+    MDRV_SOUND_CONFIG_DISCRETE(v1050)
+    MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)*/
 
 	/* devices */
 	MDRV_I8214_ADD(UPB8214_TAG, XTAL_16MHz/4, v1050_8214_intf)
@@ -1230,7 +1230,7 @@ static MACHINE_DRIVER_START( v1050 )
 	MDRV_MSM8251_ADD(I8251A_KB_TAG, /*XTAL_16MHz/8,*/ kb_8251_intf)
 	MDRV_MSM8251_ADD(I8251A_SIO_TAG, /*XTAL_16MHz/8,*/ sio_8251_intf)
 	MDRV_WD1793_ADD(MB8877_TAG, /*XTAL_16MHz/16,*/ v1050_wd17xx_intf )
-	MDRV_FLOPPY_2_DRIVES_ADD(v1050_floppy_config)	
+	MDRV_FLOPPY_2_DRIVES_ADD(v1050_floppy_config)
 	MDRV_TIMER_ADD_PERIODIC(TIMER_KB_TAG, kb_8251_tick, HZ((double)XTAL_16MHz/4/13/8))
 	MDRV_TIMER_ADD_PERIODIC(TIMER_SIO_TAG, sio_8251_tick, HZ((double)XTAL_16MHz/4/13/16))
 
@@ -1259,5 +1259,5 @@ SYSTEM_CONFIG_END
 
 /* System Drivers */
 
-/*    YEAR	NAME	PARENT	COMPAT	MACHINE	INPUT	INIT	CONFIG	COMPANY								FULLNAME		FLAGS */
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY                             FULLNAME        FLAGS */
 COMP( 1983, v1050,	0,		0,		v1050,	v1050,	0,		v1050,	"Visual Technology Incorporated",	"Visual 1050",	GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )

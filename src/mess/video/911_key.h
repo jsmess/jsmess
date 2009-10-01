@@ -1,7 +1,7 @@
 /*
-	key translation table for both US and UK terminals
+    key translation table for both US and UK terminals
 
-	The only difference is that the US # character is a Pound character in UK.
+    The only difference is that the US # character is a Pound character in UK.
 */
 static const unsigned char US_key_translate[4][91] =
 {
@@ -449,7 +449,7 @@ static const unsigned char US_key_translate[4][91] =
 
 
 /*
-	key translation table for French terminals
+    key translation table for French terminals
 */
 static const unsigned char French_key_translate[4][91] =
 {
@@ -897,7 +897,7 @@ static const unsigned char French_key_translate[4][91] =
 
 
 /*
-	key translation table for German terminals
+    key translation table for German terminals
 */
 static const unsigned char German_key_translate[4][91] =
 {
@@ -1345,7 +1345,7 @@ static const unsigned char German_key_translate[4][91] =
 
 
 /*
-	key translation table for Swedish/Finnish terminals
+    key translation table for Swedish/Finnish terminals
 */
 static const unsigned char Swedish_key_translate[4][91] =
 {
@@ -1793,7 +1793,7 @@ static const unsigned char Swedish_key_translate[4][91] =
 
 
 /*
-	key translation table for Norwegian/Danish terminals
+    key translation table for Norwegian/Danish terminals
 */
 static const unsigned char Norwegian_key_translate[4][91] =
 {
@@ -2241,7 +2241,7 @@ static const unsigned char Norwegian_key_translate[4][91] =
 
 
 /*
-	key translation table for Japanese katakana terminals
+    key translation table for Japanese katakana terminals
 */
 static const unsigned char Japanese_key_translate[6][91] =
 {
@@ -2910,7 +2910,7 @@ static const unsigned char Japanese_key_translate[6][91] =
 
 #if 0
 /*
-	key translation table for Arabic terminals
+    key translation table for Arabic terminals
 */
 static const unsigned char Arabic_key_translate[6][91] =
 {
@@ -3579,7 +3579,7 @@ static const unsigned char Arabic_key_translate[6][91] =
 
 
 /*
-	key translation table for French word-processing terminals
+    key translation table for French word-processing terminals
 */
 static const unsigned char FrenchWP_key_translate[4][91] =
 {

@@ -6,31 +6,31 @@
 
   Changes:
 
-	13/2/2002		AK - MBC2 and MBC3 support and added NVRAM support.
-	23/2/2002		AK - MBC5 support, and MBC2 RAM support.
-	13/3/2002		AK - Tidied up the MBC code, window layer now has it's
-						 own palette. Tidied init code.
-	15/3/2002		AK - More init code tidying with a slight hack to stop
-						 sound when the machine starts.
-	19/3/2002		AK - Changed NVRAM code to the new battery_* functions.
-	24/3/2002		AK - Added MBC1 mode switching, and partial MBC3 RTC support.
-	28/3/2002		AK - Improved LCD status timing and interrupts.
-						 Free memory when we shutdown instead of leaking.
-	31/3/2002		AK - Handle IO memory reading so we return 0xFF for registers
-						 that are unsupported.
-	 7/4/2002		AK - Free memory from battery load/save. General tidying.
-	13/4/2002		AK - Ok, don't free memory when we shutdown as that causes
-						 a crash on reset.
-	28/4/2002		AK - General code tidying.
-						 Fixed MBC3's RAM/RTC banking.
-						 Added support for games with more than 128 ROM banks.
-	12/6/2002		AK - Rewrote the way bg and sprite palettes are handled.
-						 The window layer no longer has it's own palette.
-						 Added Super Game Boy support.
-	13/6/2002		AK - Added Game Boy Color support.
+    13/2/2002       AK - MBC2 and MBC3 support and added NVRAM support.
+    23/2/2002       AK - MBC5 support, and MBC2 RAM support.
+    13/3/2002       AK - Tidied up the MBC code, window layer now has it's
+                         own palette. Tidied init code.
+    15/3/2002       AK - More init code tidying with a slight hack to stop
+                         sound when the machine starts.
+    19/3/2002       AK - Changed NVRAM code to the new battery_* functions.
+    24/3/2002       AK - Added MBC1 mode switching, and partial MBC3 RTC support.
+    28/3/2002       AK - Improved LCD status timing and interrupts.
+                         Free memory when we shutdown instead of leaking.
+    31/3/2002       AK - Handle IO memory reading so we return 0xFF for registers
+                         that are unsupported.
+     7/4/2002       AK - Free memory from battery load/save. General tidying.
+    13/4/2002       AK - Ok, don't free memory when we shutdown as that causes
+                         a crash on reset.
+    28/4/2002       AK - General code tidying.
+                         Fixed MBC3's RAM/RTC banking.
+                         Added support for games with more than 128 ROM banks.
+    12/6/2002       AK - Rewrote the way bg and sprite palettes are handled.
+                         The window layer no longer has it's own palette.
+                         Added Super Game Boy support.
+    13/6/2002       AK - Added Game Boy Color support.
 
-	17/5/2004       WP - Added Megaduck/Cougar Boy support.
-	13/6/2005		WP - Added support for bootstrap rom banking.
+    17/5/2004       WP - Added Megaduck/Cougar Boy support.
+    13/6/2005       WP - Added support for bootstrap rom banking.
 
 ***************************************************************************/
 #define __MACHINE_GB_C
@@ -96,11 +96,11 @@ static UINT8 GBC_RAMBank;			   /* (GBC) Number of RAM bank currently used     */
 static UINT8 sgb_atf_data[4050];	   /* (SGB) Attribute files                       */
 UINT8 *sgb_tile_data;
 UINT16 sgb_pal[128];	/* SGB palette remapping */
-UINT16 sgb_pal_data[4096];	/* 512 palettes of 4 colours			*/
-UINT8 sgb_pal_map[20][18];	/* Palette tile map						*/
-UINT8 sgb_tile_map[2048];	/* 32x32 tile map data (0-tile,1-attribute)	*/
-UINT8 sgb_window_mask;		/* Current GB screen mask				*/
-UINT8 sgb_hack;				/* Flag set if we're using a hack		*/
+UINT16 sgb_pal_data[4096];	/* 512 palettes of 4 colours            */
+UINT8 sgb_pal_map[20][18];	/* Palette tile map                     */
+UINT8 sgb_tile_map[2048];	/* 32x32 tile map data (0-tile,1-attribute) */
+UINT8 sgb_window_mask;		/* Current GB screen mask               */
+UINT8 sgb_hack;				/* Flag set if we're using a hack       */
 
 static UINT8 *gb_cart = NULL;
 static UINT8 *gb_cart_ram = NULL;
@@ -160,7 +160,7 @@ static void gb_timer_increment( running_machine *machine );
 /* #define V_BANK*/			/* Display bank switching debug information */
 #endif
 
-static void gb_init_regs(running_machine *machine) 
+static void gb_init_regs(running_machine *machine)
 {
 	/* Initialize the registers */
 	SIODATA = 0x00;
@@ -170,7 +170,7 @@ static void gb_init_regs(running_machine *machine)
 	gb_io_w( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM ), 0x06, 0x00 );		/* TIMEMOD */
 }
 
-static void gb_rom16_0000( running_machine *machine, UINT8 *addr ) 
+static void gb_rom16_0000( running_machine *machine, UINT8 *addr )
 {
 	memory_set_bankptr( machine, 5, addr );
 	memory_set_bankptr( machine, 10, addr + 0x0100 );
@@ -178,23 +178,23 @@ static void gb_rom16_0000( running_machine *machine, UINT8 *addr )
 	memory_set_bankptr( machine, 11, addr + 0x0900 );
 }
 
-static void gb_rom16_4000( running_machine *machine, UINT8 *addr ) 
+static void gb_rom16_4000( running_machine *machine, UINT8 *addr )
 {
 	memory_set_bankptr( machine, 1, addr );
 	memory_set_bankptr( machine, 4, addr + 0x2000 );
 }
 
-static void gb_rom8_4000( running_machine *machine, UINT8 *addr ) 
+static void gb_rom8_4000( running_machine *machine, UINT8 *addr )
 {
 	memory_set_bankptr( machine, 1, addr );
 }
 
-static void gb_rom8_6000( running_machine *machine, UINT8 *addr ) 
+static void gb_rom8_6000( running_machine *machine, UINT8 *addr )
 {
 	memory_set_bankptr( machine, 4, addr );
 }
 
-static void gb_init(running_machine *machine) 
+static void gb_init(running_machine *machine)
 {
 	const address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
 
@@ -328,7 +328,7 @@ MACHINE_RESET( sgb )
 	memset( sgb_tile_data, 0, 0x2000 );
 
 	/* Initialize the Sound Registers */ // should be unnecessary with the bootrom
-	//gb_sound_w(devtag_get_device(machine, "custom"), 0x16,0xF0);	/* F0 for SGB */
+	//gb_sound_w(devtag_get_device(machine, "custom"), 0x16,0xF0);  /* F0 for SGB */
 	//gb_sound_w(devtag_get_device(machine, "custom"), 0x15,0xF3);
 	//gb_sound_w(devtag_get_device(machine, "custom"), 0x14,0x77);
 
@@ -337,8 +337,8 @@ MACHINE_RESET( sgb )
 	memset( sgb_atf_data, 0, sizeof(sgb_atf_data) );
 
 	/* HACKS for Donkey Kong Land 2 + 3.
-	   For some reason that I haven't figured out, they store the tile
-	   data differently.  Hacks will go once I figure it out */
+       For some reason that I haven't figured out, they store the tile
+       data differently.  Hacks will go once I figure it out */
 	sgb_hack = 0;
 
 	if (gb_cart)	// make sure cart is in
@@ -387,7 +387,7 @@ MACHINE_RESET( gbc )
 	memory_set_bankptr(machine, 6, memory_region(machine, "maincpu") + 0x100 );
 
 	/* Allocate memory for internal ram */
-	for( ii = 0; ii < 8; ii++ ) 
+	for( ii = 0; ii < 8; ii++ )
 	{
 		GBC_RAMMap[ii] = mess_ram + CGB_START_RAM_BANKS + ii * 0x1000;
 		memset (GBC_RAMMap[ii], 0, 0x1000);
@@ -401,12 +401,12 @@ static void gb_machine_stop(running_machine *machine)
 		return;
 
 	/* NOTE: The reason we save the carts RAM this way instead of using MAME's
-	   built in macros is because they force the filename to be the name of
-	   the machine.  We need to have a separate name for each game. */
+       built in macros is because they force the filename to be the name of
+       the machine.  We need to have a separate name for each game. */
 	image_battery_save(devtag_get_device(machine, "cart"), gb_cart_ram, RAMBanks * 0x2000 );
 }
 
-static void gb_set_mbc1_banks( running_machine *machine ) 
+static void gb_set_mbc1_banks( running_machine *machine )
 {
 	gb_rom16_4000( machine, ROMMap[ ROMBank ] );
 	memory_set_bankptr( machine, 2, RAMMap[ MBC1Mode ? ( ROMBank >> 5 ) : 0 ] );
@@ -454,15 +454,15 @@ static WRITE8_HANDLER( gb_rom_bank_select_mbc3 )
 static WRITE8_HANDLER( gb_rom_bank_select_mbc5 )
 {
 	/* MBC5 has a 9 bit bank select
-	  Writing into 2000-2FFF sets the lower 8 bits
-	  Writing into 3000-3FFF sets the 9th bit
-	*/
+      Writing into 2000-2FFF sets the lower 8 bits
+      Writing into 3000-3FFF sets the 9th bit
+    */
 	logerror( "0x%04X: MBC5 ROM Bank select write 0x%04X <- 0x%02X\n", cpu_get_pc( space->cpu ), offset, data );
-	if( offset & 0x1000 ) 
+	if( offset & 0x1000 )
 	{
 		ROMBank = (ROMBank & 0xFF ) | ( ( data & 0x01 ) << 8 );
-	} 
-	else 
+	}
+	else
 	{
 		ROMBank = (ROMBank & 0x100 ) | data;
 	}
@@ -470,61 +470,61 @@ static WRITE8_HANDLER( gb_rom_bank_select_mbc5 )
 	gb_rom16_4000( space->machine, ROMMap[ROMBank] );
 }
 
-static WRITE8_HANDLER( gb_ram_bank_select_mbc6 ) 
+static WRITE8_HANDLER( gb_ram_bank_select_mbc6 )
 {
 	logerror( "0x%04X: write to mbc6 ram enable area: %04X <- 0x%02X\n", cpu_get_pc( space->cpu ), offset, data );
 }
 
-static WRITE8_HANDLER( gb_rom_bank_select_mbc6_1 ) 
+static WRITE8_HANDLER( gb_rom_bank_select_mbc6_1 )
 {
 	logerror( "0x%04X: write to mbc6 rom area: 0x%04X <- 0x%02X\n", cpu_get_pc( space->cpu ), 0x2000 + offset, data );
-	if ( offset & 0x0800 ) 
+	if ( offset & 0x0800 )
 	{
-		if ( data == 0x00 ) 
+		if ( data == 0x00 )
 		{
 			gb_rom8_4000( space->machine, ROMMap[ROMBank>>1] + ( ( ROMBank & 0x01 ) ? 0x2000 : 0x0000 ) );
 		}
-	} 
-	else 
+	}
+	else
 	{
 		ROMBank = data;
 	}
 }
 
-static WRITE8_HANDLER( gb_rom_bank_select_mbc6_2 ) 
+static WRITE8_HANDLER( gb_rom_bank_select_mbc6_2 )
 {
 	logerror( "0x%04X: write to mbc6 rom area: 0x%04X <- 0x%02X\n", cpu_get_pc( space->cpu ), 0x3000 + offset, data );
-	if ( offset & 0x0800 ) 
+	if ( offset & 0x0800 )
 	{
-		if ( data == 0x00 ) 
+		if ( data == 0x00 )
 		{
 			gb_rom8_6000( space->machine, ROMMap[ROMBank00>>1] + ( ( ROMBank00 & 0x01 ) ? 0x2000 : 0x0000 ) );
 		}
-	} 
-	else 
+	}
+	else
 	{
 		ROMBank00 = data;
 	}
 }
 
-static WRITE8_HANDLER( gb_rom_bank_select_mbc7 ) 
+static WRITE8_HANDLER( gb_rom_bank_select_mbc7 )
 {
 	logerror( "0x%04X: write to mbc7 rom select register: 0x%04X <- 0x%02X\n", cpu_get_pc( space->cpu ), 0x2000 + offset, data );
 	/* Bit 12 must be set for writing to the mbc register */
-	if ( offset & 0x0100 ) 
+	if ( offset & 0x0100 )
 	{
 		ROMBank = data;
 		gb_rom16_4000( space->machine, ROMMap[ROMBank] );
 	}
 }
 
-static WRITE8_HANDLER( gb_rom_bank_unknown_mbc7 ) 
+static WRITE8_HANDLER( gb_rom_bank_unknown_mbc7 )
 {
         logerror( "0x%04X: write to mbc7 rom area: 0x%04X <- 0x%02X\n", cpu_get_pc( space->cpu ), 0x3000 + offset, data );
 	/* Bit 12 must be set for writing to the mbc register */
-	if ( offset & 0x0100 ) 
+	if ( offset & 0x0100 )
 	{
-		switch( offset & 0x7000 ) 
+		switch( offset & 0x7000 )
 		{
 		case 0x0000:	/* 0x3000-0x3fff */
 		case 0x1000:	/* 0x4000-0x4fff */
@@ -536,7 +536,7 @@ static WRITE8_HANDLER( gb_rom_bank_unknown_mbc7 )
 	}
 }
 
-static WRITE8_HANDLER( gb_rom_bank_select_wisdom ) 
+static WRITE8_HANDLER( gb_rom_bank_select_wisdom )
 {
 	logerror( "0x%04X: wisdom tree mapper write to address 0x%04X\n", cpu_get_pc( space->cpu ), offset );
 	/* The address determines the bank to select */
@@ -560,19 +560,19 @@ static WRITE8_HANDLER( gb_ram_bank_select_mbc1 )
 static WRITE8_HANDLER( gb_ram_bank_select_mbc3 )
 {
 	logerror( "0x%04X: write mbc3 ram bank select register 0x%04X <- 0x%02X\n", cpu_get_pc( space->cpu ), offset, data );
-	if( data & 0x8 ) 
+	if( data & 0x8 )
 	{	/* RTC banks */
-		if ( CartType & TIMER ) 
+		if ( CartType & TIMER )
 		{
 			MBC3RTCBank = data & 0x07;
-			if ( data < 5 ) 
+			if ( data < 5 )
 			{
 				memset( MBC3RTCData, MBC3RTCMap[MBC3RTCBank], 0x2000 );
 				memory_set_bankptr( space->machine, 2, MBC3RTCData );
 			}
 		}
-	} 
-	else 
+	}
+	else
 	{	/* RAM banks */
 		RAMBank = data & 0x3;
 		MBC3RTCBank = 0xFF;
@@ -585,7 +585,7 @@ static WRITE8_HANDLER( gb_ram_bank_select_mbc5 )
 {
 	logerror( "0x%04X: MBC5 RAM Bank select write 0x%04X <- 0x%02X\n", cpu_get_pc( space->cpu ), offset, data );
 	data &= 0x0F;
-	if( CartType & RUMBLE ) 
+	if( CartType & RUMBLE )
 	{
 		data &= 0x7;
 	}
@@ -597,7 +597,7 @@ static WRITE8_HANDLER( gb_ram_bank_select_mbc5 )
 WRITE8_HANDLER ( gb_ram_enable )
 {
 	/* FIXME: Currently we don't handle this, but a value of 0xA will enable
-	 * writing to the cart's RAM banks */
+     * writing to the cart's RAM banks */
 	logerror( "0x%04X: Write to ram enable register 0x%04X <- 0x%02X\n", cpu_get_pc( space->cpu ), offset, data );
 }
 
@@ -610,7 +610,7 @@ static WRITE8_HANDLER( gb_mem_mode_select_mbc1 )
 static WRITE8_HANDLER( gb_mem_mode_select_mbc3 )
 {
         logerror( "0x%04X: Write to mbc3 mem mode select register 0x%04X <- 0x%02X\n", cpu_get_pc( space->cpu ), offset, data );
-	if( CartType & TIMER ) 
+	if( CartType & TIMER )
 	{
 		/* FIXME: RTC Latch goes here */
 		MBC3RTCMap[0] = 50;    /* Seconds */
@@ -621,13 +621,13 @@ static WRITE8_HANDLER( gb_mem_mode_select_mbc3 )
 	}
 }
 
-static WRITE8_HANDLER( gb_ram_tama5 ) 
+static WRITE8_HANDLER( gb_ram_tama5 )
 {
 	logerror( "0x%04X: TAMA5 write 0x%04X <- 0x%02X\n", cpu_get_pc( space->cpu ), 0xA000 + offset, data );
-	switch( offset & 0x0001 ) 
+	switch( offset & 0x0001 )
 	{
 	case 0x0000:    /* Write to data register */
-		switch( gbLastTama5Command ) 
+		switch( gbLastTama5Command )
 		{
 		case 0x00:      /* Bits 0-3 for rom bank selection */
 			ROMBank = ( ROMBank & 0xF0 ) | ( data & 0x0F );
@@ -648,9 +648,9 @@ static WRITE8_HANDLER( gb_ram_tama5 )
 			break;
 		case 0x07:      /* Address selection lo */
 				/* This address always seems to written last, so we'll just
-				   execute the command here */
+                   execute the command here */
 			gbTama5Address = ( gbTama5Address & 0xF0 ) | ( data & 0x0F );
-			switch ( gbTama5Address & 0xE0 ) 
+			switch ( gbTama5Address & 0xE0 )
 			{
 			case 0x00:      /* Write memory */
 				logerror( "Write tama5 memory 0x%02X <- 0x%02X\n", gbTama5Address & 0x1F, gbTama5Byte );
@@ -661,7 +661,7 @@ static WRITE8_HANDLER( gb_ram_tama5 )
 				gbTama5Byte = gbTama5Memory[ gbTama5Address & 0x1F ];
 				break;
 			case 0x40:      /* Unknown, some kind of read */
-				if ( ( gbTama5Address & 0x1F ) == 0x12 ) 
+				if ( ( gbTama5Address & 0x1F ) == 0x12 )
 				{
 					gbTama5Byte = 0xFF;
 				}
@@ -674,7 +674,7 @@ static WRITE8_HANDLER( gb_ram_tama5 )
 		}
 		break;
 	case 0x0001:    /* Write to control register */
-		switch( data ) 
+		switch( data )
 		{
 		case 0x00:      /* Bits 0-3 for rom bank selection */
 		case 0x01:      /* Bits 4-7 for rom bank selection */
@@ -709,10 +709,10 @@ static UINT8 mmm01_reg1;
 static UINT8 mmm01_bank;
 static UINT8 mmm01_bank_mask;
 
-static WRITE8_HANDLER( gb_rom_bank_mmm01_0000_w ) 
+static WRITE8_HANDLER( gb_rom_bank_mmm01_0000_w )
 {
 	logerror( "0x%04X: write 0x%02X to 0x%04X\n", cpu_get_pc( space->cpu ), data, offset+0x000 );
-	if ( data & 0x40 ) 
+	if ( data & 0x40 )
 	{
 		mmm01_bank_offset = mmm01_reg1;
 		memory_set_bankptr( space->machine, 5, ROMMap[ mmm01_bank_offset ] );
@@ -721,30 +721,30 @@ static WRITE8_HANDLER( gb_rom_bank_mmm01_0000_w )
 	}
 }
 
-static WRITE8_HANDLER( gb_rom_bank_mmm01_2000_w ) 
+static WRITE8_HANDLER( gb_rom_bank_mmm01_2000_w )
 {
 	logerror( "0x%04X: write 0x%02X to 0x%04X\n", cpu_get_pc( space->cpu ), data, offset+0x2000 );
 
 	mmm01_reg1 = data & ROMMask;
 	mmm01_bank = mmm01_reg1 & mmm01_bank_mask;
-	if ( mmm01_bank == 0 ) 
+	if ( mmm01_bank == 0 )
 	{
 		mmm01_bank = 1;
 	}
 	gb_rom16_4000( space->machine, ROMMap[ mmm01_bank_offset + mmm01_bank ] );
 }
 
-static WRITE8_HANDLER( gb_rom_bank_mmm01_4000_w ) 
+static WRITE8_HANDLER( gb_rom_bank_mmm01_4000_w )
 {
 	logerror( "0x%04X: write 0x%02X to 0x%04X\n", cpu_get_pc( space->cpu ), data, offset+0x4000 );
 }
 
-static WRITE8_HANDLER( gb_rom_bank_mmm01_6000_w ) 
+static WRITE8_HANDLER( gb_rom_bank_mmm01_6000_w )
 {
 	logerror( "0x%04X: write 0x%02X to 0x%04X\n", cpu_get_pc( space->cpu ), data, offset+0x6000 );
 	/* Not sure if this is correct, Taito Variety Pack sets these values */
 	/* Momotarou Collection 2 writes 01 and 21 here */
-	switch( data ) 
+	switch( data )
 	{
 	case 0x30:	mmm01_bank_mask = 0x07;	break;
 	case 0x38:	mmm01_bank_mask = 0x03;	break;
@@ -754,9 +754,9 @@ static WRITE8_HANDLER( gb_rom_bank_mmm01_6000_w )
 
 /* Korean MBC1 variant mapping */
 
-static void gb_set_mbc1_kor_banks( running_machine *machine ) 
+static void gb_set_mbc1_kor_banks( running_machine *machine )
 {
-	if ( ROMBank & 0x30 ) 
+	if ( ROMBank & 0x30 )
 	{
 		gb_rom16_0000( machine, ROMMap[ ROMBank & 0x30 ] );
 	}
@@ -809,7 +809,7 @@ WRITE8_HANDLER ( gb_io_w )
 	case 0x01:						/* SB - Serial transfer data */
 		break;
 	case 0x02:						/* SC - SIO control */
-		switch( data & 0x81 ) 
+		switch( data & 0x81 )
 		{
 		case 0x00:
 		case 0x01:
@@ -832,14 +832,14 @@ WRITE8_HANDLER ( gb_io_w )
 		return;
 	case 0x05:						/* TIMA - Timer counter */
 		/* Check if the counter is being reloaded in this cycle */
-		if ( gb_timer.reloading && ( gb_timer.divcount & ( gb_timer.shift_cycles - 1 ) ) == 4 ) 
+		if ( gb_timer.reloading && ( gb_timer.divcount & ( gb_timer.shift_cycles - 1 ) ) == 4 )
 		{
 			data = TIMECNT;
 		}
 		break;
 	case 0x06:						/* TMA - Timer module */
 		/* Check if the counter is being reloaded in this cycle */
-		if ( gb_timer.reloading && ( gb_timer.divcount & ( gb_timer.shift_cycles - 1 ) ) == 4 ) 
+		if ( gb_timer.reloading && ( gb_timer.divcount & ( gb_timer.shift_cycles - 1 ) ) == 4 )
 		{
 			TIMECNT = data;
 		}
@@ -847,10 +847,10 @@ WRITE8_HANDLER ( gb_io_w )
 	case 0x07:						/* TAC - Timer control */
 		data |= 0xF8;
 		/* Check if timer is just disabled or the timer frequency is changing */
-		if ( ( ! ( data & 0x04 ) && ( TIMEFRQ & 0x04 ) ) || ( ( data & 0x04 ) && ( TIMEFRQ & 0x04 ) && ( data & 0x03 ) != ( TIMEFRQ & 0x03 ) ) ) 
+		if ( ( ! ( data & 0x04 ) && ( TIMEFRQ & 0x04 ) ) || ( ( data & 0x04 ) && ( TIMEFRQ & 0x04 ) && ( data & 0x03 ) != ( TIMEFRQ & 0x03 ) ) )
 		{
 			/* Check if TIMECNT should be incremented */
-			if ( ( gb_timer.divcount & ( gb_timer.shift_cycles - 1 ) ) >= ( gb_timer.shift_cycles >> 1 ) ) 
+			if ( ( gb_timer.divcount & ( gb_timer.shift_cycles - 1 ) ) >= ( gb_timer.shift_cycles >> 1 ) )
 			{
 				gb_timer_increment(space->machine);
 			}
@@ -869,12 +869,12 @@ WRITE8_HANDLER ( gb_io_w )
 
 WRITE8_HANDLER ( gb_io2_w )
 {
-	if ( offset == 0x10 ) 
+	if ( offset == 0x10 )
 	{
 		/* disable BIOS ROM */
 		gb_rom16_0000( space->machine, ROMMap[ROMBank00] );
-	} 
-	else 
+	}
+	else
 	{
 		gb_video_w( space, offset, data );
 	}
@@ -937,12 +937,12 @@ WRITE8_HANDLER ( sgb_io_w )
 				if (sgb_rest)
 				{
 					/* We should test for this case , but the code below won't
-					   work with the current setup */
+                       work with the current setup */
 					/* if (sgb_bytecount == 16)
-					{
-						logerror("SGB: end of block is not zero!");
-						sgb_start = 0;
-					}*/
+                    {
+                        logerror("SGB: end of block is not zero!");
+                        sgb_start = 0;
+                    }*/
 					sgb_data[sgb_bytecount] >>= 1;
 					sgb_data[sgb_bytecount] |= 0x80;
 					sgb_bitcount++;
@@ -1205,7 +1205,7 @@ WRITE8_HANDLER ( sgb_io_w )
 								break;
 							case 0x09:	/* SOU_TRN */
 								/* This command sends data to the SNES sound processor.
-								   We'll need to emulate that for this to be used */
+                                   We'll need to emulate that for this to be used */
 								/* Not Implemented */
 								break;
 							case 0x0A:	/* PAL_SET */
@@ -1351,7 +1351,7 @@ WRITE8_HANDLER ( sgb_io_w )
 								break;
 							case 0x19:	/* ? */
 								/* Called by: dkl,dkl2,dkl3,zeldadx
-								   But I don't know what it is for. */
+                                   But I don't know what it is for. */
 								/* Not Implemented */
 								break;
 							case 0x1E:	/* Used by bootrom to transfer the gb cart header */
@@ -1453,11 +1453,11 @@ DEVICE_START(gb_cart)
 	gb_dummy_ram_bank = auto_alloc_array( device->machine, UINT8, 0x2000 );
 	memset( gb_dummy_ram_bank, 0xFF, 0x2000 );
 
-	for(I = 0; I < MAX_ROMBANK; I++) 
+	for(I = 0; I < MAX_ROMBANK; I++)
 	{
 		ROMMap[I] = gb_dummy_rom_bank;
 	}
-	for(I = 0; I < MAX_RAMBANK; I++) 
+	for(I = 0; I < MAX_RAMBANK; I++)
 	{
 		RAMMap[I] = gb_dummy_ram_bank;
 	}
@@ -1607,7 +1607,7 @@ DEVICE_IMAGE_LOAD(gb_cart)
 
 	/* Check for presence of a header, and skip that header */
 	J = filesize % 0x4000;
-	if ( J == 512 ) 
+	if ( J == 512 )
 	{
 		logerror( "Rom-header found, skipping\n" );
 		image_fseek( image, J, SEEK_SET );
@@ -1615,7 +1615,7 @@ DEVICE_IMAGE_LOAD(gb_cart)
 	}
 
 	/* Verify that the file contains 16kb blocks */
-	if ( ( filesize == 0 ) || ( ( filesize % 0x4000 ) != 0 ) ) 
+	if ( ( filesize == 0 ) || ( ( filesize % 0x4000 ) != 0 ) )
 	{
 		image_seterror( image, IMAGE_ERROR_UNSPECIFIED, "Invalid rom file size" );
 		return INIT_FAIL;
@@ -1625,7 +1625,7 @@ DEVICE_IMAGE_LOAD(gb_cart)
 	gb_cart = auto_alloc_array( image->machine, UINT8, filesize );
 
 	/* Read cartridge */
-	if ( image_fread( image, gb_cart, filesize ) != filesize ) 
+	if ( image_fread( image, gb_cart, filesize ) != filesize )
 	{
 		image_seterror( image, IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file" );
 		return INIT_FAIL;
@@ -1635,7 +1635,7 @@ DEVICE_IMAGE_LOAD(gb_cart)
 	ROMBank00 = 0;
 
 	/* Check for presence of MMM01 mapper */
-	if ( filesize >= 0x8000 ) 
+	if ( filesize >= 0x8000 )
 	{
 		static const UINT8 nintendo_logo[0x18] = {
 			0xCE, 0xED, 0x66, 0x66, 0xCC, 0x0D, 0x00, 0x0B,
@@ -1644,26 +1644,26 @@ DEVICE_IMAGE_LOAD(gb_cart)
 		};
 		int	bytes_matched = 0;
 		gb_header = gb_cart + filesize - 0x8000;
-		for ( I = 0; I < 0x18; I++ ) 
+		for ( I = 0; I < 0x18; I++ )
 		{
-			if ( gb_header[0x0104 + I] == nintendo_logo[I] ) 
+			if ( gb_header[0x0104 + I] == nintendo_logo[I] )
 			{
 				bytes_matched++;
 			}
 		}
-		if ( bytes_matched == 0x18 && gb_header[0x0147] >= 0x0B && gb_header[0x0147] <= 0x0D ) 
+		if ( bytes_matched == 0x18 && gb_header[0x0147] >= 0x0B && gb_header[0x0147] <= 0x0D )
 		{
 			ROMBank00 = ( filesize / 0x4000 ) - 2;
 			mmm01_bank_offset = ROMBank00;
-		} 
-		else 
+		}
+		else
 		{
 			gb_header = gb_cart;
 		}
 	}
 
 	/* Fill in our cart details */
-	switch( gb_header[0x0147] ) 
+	switch( gb_header[0x0147] )
 	{
 	case 0x00:	MBCType = MBC_NONE;	CartType = 0;				break;
 	case 0x01:	MBCType = MBC_MBC1;	CartType = 0;				break;
@@ -1700,45 +1700,45 @@ DEVICE_IMAGE_LOAD(gb_cart)
 	}
 
 	/* Check whether we're dealing with a (possible) Wisdom Tree game here */
-	if ( gb_header[0x0147] == 0x00 ) 
+	if ( gb_header[0x0147] == 0x00 )
 	{
 		int count = 0;
-		for( I = 0x0134; I <= 0x014C; I++ ) 
+		for( I = 0x0134; I <= 0x014C; I++ )
 		{
 			count += gb_header[I];
 		}
-		if ( count == 0 ) 
+		if ( count == 0 )
 		{
 			MBCType = MBC_WISDOM;
 		}
 	}
 
 	/* Check if we're dealing with a Korean variant of the MBC1 mapper */
-	if ( MBCType == MBC_MBC1 ) 
+	if ( MBCType == MBC_MBC1 )
 	{
-		if ( gb_header[0x13F] == 0x42 && gb_header[0x140] == 0x32 && gb_header[0x141] == 0x43 && gb_header[0x142] == 0x4B ) 
+		if ( gb_header[0x13F] == 0x42 && gb_header[0x140] == 0x32 && gb_header[0x141] == 0x43 && gb_header[0x142] == 0x4B )
 		{
 			MBCType = MBC_MBC1_KOR;
 		}
 	}
-	if ( MBCType == MBC_UNKNOWN ) 
+	if ( MBCType == MBC_UNKNOWN )
 	{
 		image_seterror( image, IMAGE_ERROR_UNSUPPORTED, "Unknown mapper type" );
 		return INIT_FAIL;
 	}
-	if ( MBCType == MBC_MMM01 ) 
+	if ( MBCType == MBC_MMM01 )
 	{
-//		image_seterror( image, IMAGE_ERROR_UNSUPPORTED, "Mapper MMM01 is not supported yet" );
-//		return INIT_FAIL;
+//      image_seterror( image, IMAGE_ERROR_UNSUPPORTED, "Mapper MMM01 is not supported yet" );
+//      return INIT_FAIL;
 	}
-	if ( MBCType == MBC_MBC4 ) 
+	if ( MBCType == MBC_MBC4 )
 	{
 		image_seterror( image, IMAGE_ERROR_UNSUPPORTED, "Mapper MBC4 is not supported yet" );
 		return INIT_FAIL;
 	}
 	/* MBC7 support is still work-in-progress, so only enable it for debug builds */
 #ifndef MAME_DEBUG
-	if ( MBCType == MBC_MBC7 ) 
+	if ( MBCType == MBC_MBC7 )
 	{
 		image_seterror( image, IMAGE_ERROR_UNSUPPORTED, "Mapper MBC7 is not supported yet" );
 		return INIT_FAIL;
@@ -1746,7 +1746,7 @@ DEVICE_IMAGE_LOAD(gb_cart)
 #endif
 
 	ROMBanks = filesize / 0x4000;
-	switch( gb_header[0x0148] ) 
+	switch( gb_header[0x0148] )
 	{
 	case 0x52:
 		reported_rom_banks = 72;
@@ -1766,7 +1766,7 @@ DEVICE_IMAGE_LOAD(gb_cart)
 		reported_rom_banks = 256;
 		break;
 	}
-	if ( ROMBanks != reported_rom_banks && MBCType != MBC_WISDOM ) 
+	if ( ROMBanks != reported_rom_banks && MBCType != MBC_WISDOM )
 	{
 		logerror( "Warning loading cartridge: Filesize and reported ROM banks don't match.\n" );
 	}
@@ -1792,16 +1792,16 @@ DEVICE_IMAGE_LOAD(gb_cart)
         }
 
 	/*
-	  Handle odd-sized cartridges (72,80,96 banks)
-	  ROMBanks      ROMMask
-	  72 (1001000)  1000111 (71)
-	  80 (1010000)  1001111 (79)
-	  96 (1100000)  1011111 (95)
-	*/
+      Handle odd-sized cartridges (72,80,96 banks)
+      ROMBanks      ROMMask
+      72 (1001000)  1000111 (71)
+      80 (1010000)  1001111 (79)
+      96 (1100000)  1011111 (95)
+    */
 	ROMMask = I - 1;
-	if ( ( ROMBanks & ROMMask ) != 0 ) 
+	if ( ( ROMBanks & ROMMask ) != 0 )
 	{
-		for( ; I & ROMBanks; I++ ) 
+		for( ; I & ROMBanks; I++ )
 		{
 			ROMMap[ I ] = ROMMap[ I & ROMMask ];
 		}
@@ -1809,7 +1809,7 @@ DEVICE_IMAGE_LOAD(gb_cart)
 	}
 
 	/* Fill out the remaining rom bank pointers, if any. */
-	for ( ; I < MAX_ROMBANK; I++ ) 
+	for ( ; I < MAX_ROMBANK; I++ )
 	{
 		ROMMap[ I ] = ROMMap[ I & ROMMask ];
 	}
@@ -1849,7 +1849,7 @@ DEVICE_IMAGE_LOAD(gb_cart)
 	if( MBCType == MBC_MBC2 )
 		RAMBanks = 1;
 	/* MBC7 has 512 bytes(?) of internal RAM */
-	if ( MBCType == MBC_MBC7 ) 
+	if ( MBCType == MBC_MBC7 )
 	{
 		RAMBanks = 1;
 	}
@@ -1867,23 +1867,23 @@ DEVICE_IMAGE_LOAD(gb_cart)
 
 		/* Set up rest of the (mirrored) RAM pages */
 		RAMMask = I - 1;
-		for ( ; I < MAX_RAMBANK; I++ ) 
+		for ( ; I < MAX_RAMBANK; I++ )
 		{
 			RAMMap[ I ] = RAMMap [ I & RAMMask ];
 		}
-	} 
-	else 
+	}
+	else
 	{
 		RAMMask = 0;
 	}
 
 	/* If there's an RTC claim memory to store the RTC contents */
-	if ( CartType & TIMER ) 
+	if ( CartType & TIMER )
 	{
 		MBC3RTCData = auto_alloc_array(image->machine, UINT8, 0x2000 );
 	}
 
-	if ( MBCType == MBC_TAMA5 ) 
+	if ( MBCType == MBC_TAMA5 )
 	{
 		MBC3RTCData = auto_alloc_array(image->machine, UINT8, 0x2000 );
 		memset( gbTama5Memory, 0xFF, sizeof(gbTama5Memory) );
@@ -1909,7 +1909,7 @@ static TIMER_CALLBACK(gb_serial_timer_proc)
 	/* Decrement number of handled bits */
 	SIOCount--;
 	/* If all bits done, stop timer and trigger interrupt */
-	if ( ! SIOCount ) 
+	if ( ! SIOCount )
 	{
 		SIOCONT &= 0x7F;
 		timer_enable( gb_serial_timer, 0 );
@@ -1917,13 +1917,13 @@ static TIMER_CALLBACK(gb_serial_timer_proc)
 	}
 }
 
-INLINE void gb_timer_check_irq( running_machine *machine ) 
+INLINE void gb_timer_check_irq( running_machine *machine )
 {
 	gb_timer.reloading = 0;
-	if ( gb_timer.triggering_irq ) 
+	if ( gb_timer.triggering_irq )
 	{
 		gb_timer.triggering_irq = 0;
-		if ( TIMECNT == 0 ) 
+		if ( TIMECNT == 0 )
 		{
 			TIMECNT = TIMEMOD;
 			cputag_set_input_line(machine, "maincpu", TIM_INT, ASSERT_LINE );
@@ -1932,38 +1932,38 @@ INLINE void gb_timer_check_irq( running_machine *machine )
 	}
 }
 
-static void gb_timer_increment( running_machine *machine ) 
+static void gb_timer_increment( running_machine *machine )
 {
 	gb_timer_check_irq(machine);
 
 	TIMECNT += 1;
-	if ( TIMECNT == 0 ) 
+	if ( TIMECNT == 0 )
 	{
 		gb_timer.triggering_irq = 1;
 	}
 }
 
-void gb_timer_callback(const device_config *device, int cycles) 
+void gb_timer_callback(const device_config *device, int cycles)
 {
 	UINT16 old_gb_divcount = gb_timer.divcount;
 	gb_timer.divcount += cycles;
 
 	gb_timer_check_irq(device->machine);
 
-	if ( TIMEFRQ & 0x04 ) 
+	if ( TIMEFRQ & 0x04 )
 	{
 		UINT16 old_count = old_gb_divcount >> gb_timer.shift;
 		UINT16 new_count = gb_timer.divcount >> gb_timer.shift;
-		if ( cycles > gb_timer.shift_cycles ) 
+		if ( cycles > gb_timer.shift_cycles )
 		{
 			gb_timer_increment(device->machine);
 			old_count++;
 		}
-		if ( new_count != old_count ) 
+		if ( new_count != old_count )
 		{
 			gb_timer_increment(device->machine);
 		}
-		if ( new_count << gb_timer.shift < gb_timer.divcount ) 
+		if ( new_count << gb_timer.shift < gb_timer.divcount )
 		{
 			gb_timer_check_irq(device->machine);
 		}
@@ -1972,7 +1972,7 @@ void gb_timer_callback(const device_config *device, int cycles)
 
 WRITE8_HANDLER ( gbc_io2_w )
 {
-	switch( offset ) 
+	switch( offset )
 	{
 		case 0x0D:	/* KEY1 - Prepare speed switch */
 			cpu_set_reg( cputag_get_cpu(space->machine, "maincpu"), LR35902_SPEED, data );
@@ -1992,9 +1992,9 @@ WRITE8_HANDLER ( gbc_io2_w )
 	gbc_video_w( space, offset, data );
 }
 
-READ8_HANDLER( gbc_io2_r ) 
+READ8_HANDLER( gbc_io2_r )
 {
-	switch( offset ) 
+	switch( offset )
 	{
 	case 0x0D:	/* KEY1 */
 		return cpu_get_reg( cputag_get_cpu(space->machine, "maincpu"), LR35902_SPEED );
@@ -2060,7 +2060,7 @@ MACHINE_RESET( megaduck )
 {
 	UINT8 data;
 
-	if ( (offset & 0x0C) && ((offset & 0x0C) ^ 0x0C) ) 
+	if ( (offset & 0x0C) && ((offset & 0x0C) ^ 0x0C) )
 	{
 		offset ^= 0x0C;
 	}
@@ -2072,11 +2072,11 @@ MACHINE_RESET( megaduck )
 
 WRITE8_HANDLER ( megaduck_video_w )
 {
-	if ( !offset ) 
+	if ( !offset )
 	{
 		data = BITSWAP8(data,7,3,5,4,2,1,0,6);
 	}
-	if ( (offset & 0x0C) && ((offset & 0x0C) ^ 0x0C) ) 
+	if ( (offset & 0x0C) && ((offset & 0x0C) ^ 0x0C) )
 	{
 		offset ^= 0x0C;
 	}
@@ -2099,7 +2099,7 @@ READ8_HANDLER( megaduck_sound_r1 )
 
 WRITE8_HANDLER( megaduck_sound_w2 )
 {
-	switch(offset) 
+	switch(offset)
 	{
 		case 0x00:	gb_sound_w(devtag_get_device(space->machine, "custom"), 0x10, data );	break;
 		case 0x01:	gb_sound_w(devtag_get_device(space->machine, "custom"), 0x12, data );	break;
@@ -2161,7 +2161,7 @@ DEVICE_IMAGE_LOAD(megaduck_cart)
 	filesize = image_length(image);
 	ROMBanks = filesize / 0x4000;
 
-	if ( ( filesize == 0 ) || ( ( filesize % 0x4000 ) != 0 ) ) 
+	if ( ( filesize == 0 ) || ( ( filesize % 0x4000 ) != 0 ) )
 	{
 		image_seterror( image, IMAGE_ERROR_UNSPECIFIED, "Invalid rom file size" );
 		return INIT_FAIL;
@@ -2171,7 +2171,7 @@ DEVICE_IMAGE_LOAD(megaduck_cart)
 	gb_cart = auto_alloc_array(image->machine, UINT8, filesize);
 
 	/* Read cartridge */
-	if (image_fread (image, gb_cart, filesize) != filesize) 
+	if (image_fread (image, gb_cart, filesize) != filesize)
 	{
 		image_seterror( image, IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file" );
 		return INIT_FAIL;

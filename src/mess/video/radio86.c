@@ -11,7 +11,7 @@
 #include "video/i8275.h"
 #include "includes/radio86.h"
 
-I8275_DISPLAY_PIXELS(radio86_display_pixels) 
+I8275_DISPLAY_PIXELS(radio86_display_pixels)
 {
 	int i;
 	bitmap_t *bitmap = tmpbitmap;
@@ -26,7 +26,7 @@ I8275_DISPLAY_PIXELS(radio86_display_pixels)
 	if (rvv) {
 		pixels ^= 0xff;
 	}
-	for(i=0;i<6;i++) {		
+	for(i=0;i<6;i++) {
 		*BITMAP_ADDR16(bitmap, y, x + i) = (pixels >> (5-i)) & 1 ? (hlgt ? 2 : 1) : 0;
 	}
 }
@@ -104,7 +104,7 @@ VIDEO_UPDATE( radio86 )
 static const rgb_t radio86_palette[3] = {
 	MAKE_RGB(0x00, 0x00, 0x00), // black
 	MAKE_RGB(0xa0, 0xa0, 0xa0), // white
-	MAKE_RGB(0xff, 0xff, 0xff)	// highlight 
+	MAKE_RGB(0xff, 0xff, 0xff)	// highlight
 };
 
 PALETTE_INIT( radio86 )

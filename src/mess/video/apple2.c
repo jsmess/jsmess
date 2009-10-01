@@ -39,12 +39,12 @@ static UINT16 *dhires_artifact_map;
 #define PROFILER_VIDEOTOUCH		PROFILER_USER3
 
 /***************************************************************************
-	HELPERS
+    HELPERS
 ***************************************************************************/
 
 /*-------------------------------------------------
     effective_a2 - calculates the effective a2
-	register
+    register
 -------------------------------------------------*/
 
 INLINE UINT32 effective_a2(void)
@@ -55,7 +55,7 @@ INLINE UINT32 effective_a2(void)
 
 /*-------------------------------------------------
     compute_video_address - performs funky Apple II
-	video address lookup
+    video address lookup
 -------------------------------------------------*/
 
 static UINT32 compute_video_address(int col, int row)
@@ -87,12 +87,12 @@ static void adjust_begin_and_end_row(const rectangle *cliprect, int *beginrow, i
 
 
 /***************************************************************************
-	TEXT
+    TEXT
 ***************************************************************************/
 
 /*-------------------------------------------------
     apple2_plot_text_character - plots a single
-	textual character
+    textual character
 -------------------------------------------------*/
 
 INLINE void apple2_plot_text_character(bitmap_t *bitmap, int xpos, int ypos, int xscale, UINT32 code,
@@ -139,7 +139,7 @@ INLINE void apple2_plot_text_character(bitmap_t *bitmap, int xpos, int ypos, int
 
 /*-------------------------------------------------
     apple2_text_draw - renders text (either 40
-	column or 80 column)
+    column or 80 column)
 -------------------------------------------------*/
 
 static void apple2_text_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int page, int beginrow, int endrow)
@@ -260,7 +260,7 @@ int apple2_get_bgcolor(void)
 
 
 /***************************************************************************
-	HIGH RESOLUTION GRAPHICS
+    HIGH RESOLUTION GRAPHICS
 ***************************************************************************/
 
 static void apple2_hires_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int page, int beginrow, int endrow)
@@ -351,7 +351,7 @@ static void apple2_hires_draw(running_machine *machine, bitmap_t *bitmap, const 
 
 
 /***************************************************************************
-	VIDEO CORE
+    VIDEO CORE
 ***************************************************************************/
 
 void apple2_video_start(running_machine *machine, const UINT8 *vram, size_t vram_size, UINT32 ignored_softswitches, int hires_modulo)
@@ -416,10 +416,10 @@ void apple2_video_start(running_machine *machine, const UINT8 *vram, size_t vram
 		int len = memory_region_length(machine, "gfx1");
 		for (i = 0; i < len; i++)
 		{
-			apple2_font[i] = BITSWAP8(apple2_font[i],  7, 7, 6, 5, 4, 3, 2, 1);		
+			apple2_font[i] = BITSWAP8(apple2_font[i],  7, 7, 6, 5, 4, 3, 2, 1);
 		}
 	}
-	
+
 	/* do we need to flip the gfx? */
 	if (!strcmp(machine->gamedrv->name, "apple2")
 		|| !strcmp(machine->gamedrv->name, "apple2p")
@@ -427,7 +427,7 @@ void apple2_video_start(running_machine *machine, const UINT8 *vram, size_t vram
 		|| !strcmp(machine->gamedrv->name, "prav8m")
 		|| !strcmp(machine->gamedrv->name, "ace100")
 		|| !strcmp(machine->gamedrv->name, "apple2jp"))
-	{		
+	{
 		int len = memory_region_length(machine, "gfx1");
 		for (i = 0; i < len; i++)
 		{

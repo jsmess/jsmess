@@ -1,26 +1,26 @@
 /***************************************************************************
 
-	CoCo 3 Video Hardware
+    CoCo 3 Video Hardware
 
-	TODO:
-		- Implement "burst phase invert" (it switches the artifact colors)
-		- Figure out what Bit 3 of $FF98 is and implement it
-		- Learn more about the "mystery" CoCo 3 video modes
-		- Support the VSC register
+    TODO:
+        - Implement "burst phase invert" (it switches the artifact colors)
+        - Figure out what Bit 3 of $FF98 is and implement it
+        - Learn more about the "mystery" CoCo 3 video modes
+        - Support the VSC register
 
 
-	Mid frame raster effects (source John Kowalski)
-		Here are the things that get changed mid-frame:
- 			-palette registers ($ffb0-$ffbf)
- 			-horizontal resolution (switches between 256 and 320 pixels, $ff99)
-			-horizontal scroll position (bits 0-6 $ff9f)
-			-horizontal virtual screen (bit 7 $ff9f)
-			-pixel height (bits 0-2 $ff98)
-			-border color ($ff9a)
-		On the positive side, you don't have to worry about registers
-		$ff9d/ff9e being changed mid-frame.  Even if they are changed
-		mid-frame, they have no effect on the displayed image.  The video
-		address only gets latched at the top of the frame.
+    Mid frame raster effects (source John Kowalski)
+        Here are the things that get changed mid-frame:
+            -palette registers ($ffb0-$ffbf)
+            -horizontal resolution (switches between 256 and 320 pixels, $ff99)
+            -horizontal scroll position (bits 0-6 $ff9f)
+            -horizontal virtual screen (bit 7 $ff9f)
+            -pixel height (bits 0-2 $ff98)
+            -border color ($ff9a)
+        On the positive side, you don't have to worry about registers
+        $ff9d/ff9e being changed mid-frame.  Even if they are changed
+        mid-frame, they have no effect on the displayed image.  The video
+        address only gets latched at the top of the frame.
 
 ***************************************************************************/
 
@@ -41,7 +41,7 @@
 
 /*************************************
  *
- *	Global variables
+ *  Global variables
  *
  *************************************/
 
@@ -82,7 +82,7 @@ struct _coco3_video
 	UINT8 video_type;
 
 	/* video state; every scanline the video state for the scanline is copied
-	 * here and only rendered in VIDEO_UPDATE */
+     * here and only rendered in VIDEO_UPDATE */
 	coco3_scanline_record scanlines[384];
 };
 
@@ -92,7 +92,7 @@ static coco3_video *video;
 
 /*************************************
  *
- *	Parameters
+ *  Parameters
  *
  *************************************/
 
@@ -103,7 +103,7 @@ static coco3_video *video;
 
 /*************************************
  *
- *	Video rendering
+ *  Video rendering
  *
  *************************************/
 
@@ -134,9 +134,9 @@ static void color_batch(UINT32 *results, const UINT8 *indexes, int count)
 		if (is_black_white)
 		{
 			/* We are on a composite monitor/TV and the monochrome phase invert
-			 * flag is on in the GIME.  This means we have to average out all
-			 * colors
-			 */
+             * flag is on in the GIME.  This means we have to average out all
+             * colors
+             */
 			UINT32 red   = ((c & 0xFF0000) >> 16);
 			UINT32 green = ((c & 0x00FF00) >>  8);
 			UINT32 blue  = ((c & 0x0000FF) >>  0);
@@ -181,15 +181,15 @@ INLINE UINT8 get_char_info(const coco3_scanline_record *scanline_record,
 		if (attr & 0x40)
 		{
 			/* to quote SockMaster:
-			*
-			* The underline attribute will light up the bottom scan line of the character
-			* if the lines are set to 8 or 9.  Not appear at all when less, or appear on
-			* the 2nd to bottom scan line if set higher than 9.  Further exception being
-			* the $x7 setting where the whole screen is filled with only one line of data
-			* - but it's glitched - the line repeats over and over again every 16 scan
-			* lines..  Nobody will use this mode, but that's what happens if you want to
-			* make things really authentic :)
-			*/
+            *
+            * The underline attribute will light up the bottom scan line of the character
+            * if the lines are set to 8 or 9.  Not appear at all when less, or appear on
+            * the 2nd to bottom scan line if set higher than 9.  Further exception being
+            * the $x7 setting where the whole screen is filled with only one line of data
+            * - but it's glitched - the line repeats over and over again every 16 scan
+            * lines..  Nobody will use this mode, but that's what happens if you want to
+            * make things really authentic :)
+            */
 			switch(scanline_record->ff98 & 0x07)
 			{
 				case 0x03:	/* 8 scanlines per row */
@@ -457,7 +457,7 @@ VIDEO_UPDATE( coco3 )
 
 /*************************************
  *
- *	Miscellaneous
+ *  Miscellaneous
  *
  *************************************/
 
@@ -573,7 +573,7 @@ void coco3_prepare_scanline(int scanline)
 		video_data_size = sizeof(scanline_record->data);
 
 		/* FF9F offsets wrap around every 256 bytes, even if bit 7 is not set.
-		 * Therefore, we must split things up into two separate segments */
+         * Therefore, we must split things up into two separate segments */
 		segment_length = MIN(video_data_size, 256 - video_offset);
 		memcpy_dirty(&dirty, scanline_record->data, video_data + video_offset, segment_length);
 		memcpy_dirty(&dirty, scanline_record->data + segment_length, video_data, video_data_size - segment_length);
@@ -644,11 +644,11 @@ WRITE8_HANDLER(coco3_palette_w)
 UINT32 coco3_get_video_base(UINT8 ff9d_mask, UINT8 ff9e_mask)
 {
 	/* The purpose of the ff9d_mask and ff9e_mask is to mask out bits that are
-	 * ignored in lo-res mode.  Specifically, $FF9D is masked with $E0, and
-	 * $FF9E is masked with $3F
-	 *
-	 * John Kowalski confirms this behavior
-	 */
+     * ignored in lo-res mode.  Specifically, $FF9D is masked with $E0, and
+     * $FF9E is masked with $3F
+     *
+     * John Kowalski confirms this behavior
+     */
 	return	((offs_t) (coco3_gimereg[14] & ff9e_mask)	* 0x00008)
 		|	((offs_t) (coco3_gimereg[13] & ff9d_mask)	* 0x00800)
 		|	((offs_t) (coco3_gimereg[11] & 0x03)		* 0x80000);
@@ -665,61 +665,61 @@ static TIMER_CALLBACK(gime_fs)
 
 /*************************************
  *
- *	Initialization
+ *  Initialization
  *
  *************************************/
 
 static UINT32 get_composite_color(int color)
 {
 	/* CMP colors
-	 *
-	 * These colors are of the format IICCCC, where II is the intensity and
-	 * CCCC is the base color.  There is some weirdness because intensity
-	 * is often different for each base color.
-	 *
-	 * The code below is based on an algorithm specified in the following
-	 * CoCo BASIC program was used to approximate composite colors.
-	 * (Program by SockMaster):
-	 *
-	 * 10 POKE65497,0:DIMR(63),G(63),B(63):WIDTH80:PALETTE0,0:PALETTE8,54:CLS1
-	 * 20 SAT=92:CON=70:BRI=-50:L(0)=0:L(1)=47:L(2)=120:L(3)=255
-	 * 30 W=.4195456981879*1.01:A=W*9.2:S=A+W*5:D=S+W*5:P=0:FORH=0TO3:P=P+1
-	 * 40 BRI=BRI+CON:FORG=1TO15:R(P)=COS(A)*SAT+BRI
-	 * 50 G(P)=(COS(S)*SAT)*1+BRI:B(P)=(COS(D)*SAT)*1+BRI:P=P+1
-	 * 55 A=A+W:S=S+W:D=D+W:NEXT:R(P-16)=L(H):G(P-16)=L(H):B(P-16)=L(H)
-	 * 60 NEXT:R(63)=R(48):G(63)=G(48):B(63)=B(48)
-	 * 70 FORH=0TO63STEP1:R=INT(R(H)):G=INT(G(H)):B=INT(B(H)):IFR<0THENR=0
-	 * 80 IFG<0THENG=0
-	 * 90 IFB<0THENB=0
-	 * 91 IFR>255THENR=255
-	 * 92 IFG>255THENG=255
-	 * 93 IFB>255THENB=255
-	 * 100 PRINTRIGHT$(STR$(H),2);" $";:R=R+256:G=G+256:B=B+256
-	 * 110 PRINTRIGHT$(HEX$(R),2);",$";RIGHT$(HEX$(G),2);",$";RIGHT$(HEX$(B),2)
-	 * 115 IF(H AND15)=15 THENIFINKEY$=""THEN115ELSEPRINT
-	 * 120 NEXT
-	 *
-	 *	At one point, we used a different SockMaster program, but the colors
-	 *	produced were too dark for people's taste
-	 *
-	 *	10 POKE65497,0:DIMR(63),G(63),B(63):WIDTH80:PALETTE0,0:PALETTE8,54:CLS1
-	 *	20 SAT=92:CON=53:BRI=-16:L(0)=0:L(1)=47:L(2)=120:L(3)=255
-	 *	30 W=.4195456981879*1.01:A=W*9.2:S=A+W*5:D=S+W*5:P=0:FORH=0TO3:P=P+1
-	 *	40 BRI=BRI+CON:FORG=1TO15:R(P)=COS(A)*SAT+BRI
-	 *	50 G(P)=(COS(S)*SAT)*.50+BRI:B(P)=(COS(D)*SAT)*1.9+BRI:P=P+1
-	 *	55 A=A+W:S=S+W:D=D+W:NEXT:R(P-16)=L(H):G(P-16)=L(H):B(P-16)=L(H)
-	 *	60 NEXT:R(63)=R(48):G(63)=G(48):B(63)=B(48)
-	 *	70 FORH=0TO63STEP1:R=INT(R(H)):G=INT(G(H)):B=INT(B(H)):IFR<0THENR=0
-	 *	80 IFG<0THENG=0
-	 *	90 IFB<0THENB=0
-	 *	91 IFR>255THENR=255
-	 *	92 IFG>255THENG=255
-	 *	93 IFB>255THENB=255
-	 *	100 PRINTRIGHT$(STR$(H),2);" $";:R=R+256:G=G+256:B=B+256
-	 *	110 PRINTRIGHT$(HEX$(R),2);",$";RIGHT$(HEX$(G),2);",$";RIGHT$(HEX$(B),2)
-	 *	115 IF(H AND15)=15 THENIFINKEY$=""THEN115ELSEPRINT
-	 *	120 NEXT
-	 */
+     *
+     * These colors are of the format IICCCC, where II is the intensity and
+     * CCCC is the base color.  There is some weirdness because intensity
+     * is often different for each base color.
+     *
+     * The code below is based on an algorithm specified in the following
+     * CoCo BASIC program was used to approximate composite colors.
+     * (Program by SockMaster):
+     *
+     * 10 POKE65497,0:DIMR(63),G(63),B(63):WIDTH80:PALETTE0,0:PALETTE8,54:CLS1
+     * 20 SAT=92:CON=70:BRI=-50:L(0)=0:L(1)=47:L(2)=120:L(3)=255
+     * 30 W=.4195456981879*1.01:A=W*9.2:S=A+W*5:D=S+W*5:P=0:FORH=0TO3:P=P+1
+     * 40 BRI=BRI+CON:FORG=1TO15:R(P)=COS(A)*SAT+BRI
+     * 50 G(P)=(COS(S)*SAT)*1+BRI:B(P)=(COS(D)*SAT)*1+BRI:P=P+1
+     * 55 A=A+W:S=S+W:D=D+W:NEXT:R(P-16)=L(H):G(P-16)=L(H):B(P-16)=L(H)
+     * 60 NEXT:R(63)=R(48):G(63)=G(48):B(63)=B(48)
+     * 70 FORH=0TO63STEP1:R=INT(R(H)):G=INT(G(H)):B=INT(B(H)):IFR<0THENR=0
+     * 80 IFG<0THENG=0
+     * 90 IFB<0THENB=0
+     * 91 IFR>255THENR=255
+     * 92 IFG>255THENG=255
+     * 93 IFB>255THENB=255
+     * 100 PRINTRIGHT$(STR$(H),2);" $";:R=R+256:G=G+256:B=B+256
+     * 110 PRINTRIGHT$(HEX$(R),2);",$";RIGHT$(HEX$(G),2);",$";RIGHT$(HEX$(B),2)
+     * 115 IF(H AND15)=15 THENIFINKEY$=""THEN115ELSEPRINT
+     * 120 NEXT
+     *
+     *  At one point, we used a different SockMaster program, but the colors
+     *  produced were too dark for people's taste
+     *
+     *  10 POKE65497,0:DIMR(63),G(63),B(63):WIDTH80:PALETTE0,0:PALETTE8,54:CLS1
+     *  20 SAT=92:CON=53:BRI=-16:L(0)=0:L(1)=47:L(2)=120:L(3)=255
+     *  30 W=.4195456981879*1.01:A=W*9.2:S=A+W*5:D=S+W*5:P=0:FORH=0TO3:P=P+1
+     *  40 BRI=BRI+CON:FORG=1TO15:R(P)=COS(A)*SAT+BRI
+     *  50 G(P)=(COS(S)*SAT)*.50+BRI:B(P)=(COS(D)*SAT)*1.9+BRI:P=P+1
+     *  55 A=A+W:S=S+W:D=D+W:NEXT:R(P-16)=L(H):G(P-16)=L(H):B(P-16)=L(H)
+     *  60 NEXT:R(63)=R(48):G(63)=G(48):B(63)=B(48)
+     *  70 FORH=0TO63STEP1:R=INT(R(H)):G=INT(G(H)):B=INT(B(H)):IFR<0THENR=0
+     *  80 IFG<0THENG=0
+     *  90 IFB<0THENB=0
+     *  91 IFR>255THENR=255
+     *  92 IFG>255THENG=255
+     *  93 IFB>255THENB=255
+     *  100 PRINTRIGHT$(STR$(H),2);" $";:R=R+256:G=G+256:B=B+256
+     *  110 PRINTRIGHT$(HEX$(R),2);",$";RIGHT$(HEX$(G),2);",$";RIGHT$(HEX$(B),2)
+     *  115 IF(H AND15)=15 THENIFINKEY$=""THEN115ELSEPRINT
+     *  120 NEXT
+     */
 
 	double saturation, brightness, contrast;
 	int offset;

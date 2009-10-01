@@ -1,10 +1,10 @@
 /******************************************************************************
-	Motorola Evaluation Kit 6800 D2
-	MEK6800D2
+    Motorola Evaluation Kit 6800 D2
+    MEK6800D2
 
-	machine Driver
+    machine Driver
 
-	Juergen Buchmueller <pullmoll@t-online.de>, Jan 2000
+    Juergen Buchmueller <pullmoll@t-online.de>, Jan 2000
 
 ******************************************************************************/
 #include "driver.h"

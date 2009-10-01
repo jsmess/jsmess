@@ -488,7 +488,7 @@ static void smpc_intbackhelper(running_machine *machine)
 
 	pad = input_port_read(machine, padnames[intback_stage-2]);
 
-//	if (LOG_SMPC) logerror("SMPC: providing PAD data for intback, pad %d\n", intback_stage-2);
+//  if (LOG_SMPC) logerror("SMPC: providing PAD data for intback, pad %d\n", intback_stage-2);
 	smpc_ram[33] = 0xf1;	// no tap, direct connect
 	smpc_ram[35] = 0x02;	// saturn pad
 	smpc_ram[37] = pad>>8;
@@ -526,25 +526,25 @@ static UINT8 stv_SMPC_r8(const address_space *space, int offset)
 			if (LOG_SMPC) logerror("SMPC: SH-2 direct mode, returning data for phase %d\n", hshake);
 
 			return_data = 0x9f;
-			
+
 			switch (hshake)
 			{
 				case 0:
 					return_data = 0x90;
-//					return_data = 0xf0 | ((input_port_read(space->machine, "JOY1")>>4) & 0xf);
+//                  return_data = 0xf0 | ((input_port_read(space->machine, "JOY1")>>4) & 0xf);
 					break;
 
 				case 1:
-//					return_data = 0xf0 | ((input_port_read(space->machine, "JOY1")>>12) & 0xf); 
+//                  return_data = 0xf0 | ((input_port_read(space->machine, "JOY1")>>12) & 0xf);
 					break;
 
 				case 2:
-//					return_data = 0xf0 | ((input_port_read(space->machine, "JOY1")>>8) & 0xf);
+//                  return_data = 0xf0 | ((input_port_read(space->machine, "JOY1")>>8) & 0xf);
 					break;
 
 				case 3:
 					return_data = 0x94;
-//					return_data = 0xf0 | (input_port_read(space->machine, "JOY1")&0x8) | 0x4;
+//                  return_data = 0xf0 | (input_port_read(space->machine, "JOY1")&0x8) | 0x4;
 					break;
 			}
 		}
@@ -599,7 +599,7 @@ static void stv_SMPC_w8(const address_space *space, int offset, UINT8 data)
 
 	if (offset == 0x75)	// PDR1
 	{
-		PDR1 = (data & smpc_ram[0x79]);	
+		PDR1 = (data & smpc_ram[0x79]);
 	}
 
 	if (offset == 0x77)	// PDR2
@@ -1947,7 +1947,7 @@ static ADDRESS_MAP_START( saturn_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_MIRROR(0x01f00000) AM_SHARE(3) AM_BASE(&stv_workram_h)
 	AM_RANGE(0x20000000, 0x2007ffff) AM_ROM AM_SHARE(6)  // bios mirror
 	AM_RANGE(0x22000000, 0x24ffffff) AM_ROM AM_SHARE(7)  // cart mirror
-ADDRESS_MAP_END					     
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_BASE(&sound_ram)
@@ -2214,7 +2214,7 @@ static void saturn_init_driver(running_machine *machine, int rgn)
 	smpc_ram[0x2d] = DectoBCD(systime.local_time.minute);
 	smpc_ram[0x2f] = DectoBCD(systime.local_time.second);
 	smpc_ram[0x31] = 0x00; //CTG1=0 CTG0=0 (correct??)
-//	smpc_ram[0x33] = input_port_read(machine, "???");
+//  smpc_ram[0x33] = input_port_read(machine, "???");
  	smpc_ram[0x5f] = 0x10;
 }
 
@@ -2257,8 +2257,8 @@ static MACHINE_START( saturn )
 	state_save_register_global(machine, EXLE2);
 	state_save_register_global(machine, PDR1);
 	state_save_register_global(machine, PDR2);
-//	state_save_register_global(machine, port_sel);
-//	state_save_register_global(machine, mux_data);
+//  state_save_register_global(machine, port_sel);
+//  state_save_register_global(machine, mux_data);
 	state_save_register_global(machine, scsp_last_line);
 	state_save_register_global(machine, intback_stage);
 	state_save_register_global(machine, pmode);

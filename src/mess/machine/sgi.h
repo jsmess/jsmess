@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	sgi.h
+    sgi.h
 
-	Silicon Graphics MC (Memory Controller) code
+    Silicon Graphics MC (Memory Controller) code
 
 *********************************************************************/
 

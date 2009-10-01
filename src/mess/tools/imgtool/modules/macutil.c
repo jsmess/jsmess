@@ -1,9 +1,9 @@
 /****************************************************************************
 
-	macutil.c
+    macutil.c
 
-	Imgtool Utility code for manipulating certain Apple/Mac data structures
-	and conventions
+    Imgtool Utility code for manipulating certain Apple/Mac data structures
+    and conventions
 
 *****************************************************************************/
 

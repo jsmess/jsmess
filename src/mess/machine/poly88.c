@@ -21,7 +21,7 @@ static emu_timer * poly88_usart_timer;
 static TIMER_CALLBACK(poly88_usart_timer_callback)
 {
 	int_vector = 0xe7;
-	cpu_set_input_line(cputag_get_cpu(machine, "maincpu"), 0, HOLD_LINE);	
+	cpu_set_input_line(cputag_get_cpu(machine, "maincpu"), 0, HOLD_LINE);
 }
 
 WRITE8_HANDLER(poly_baud_rate_w)
@@ -29,7 +29,7 @@ WRITE8_HANDLER(poly_baud_rate_w)
 	logerror("poly_baud_rate_w %02x\n",data);
 	poly88_usart_timer = timer_alloc(space->machine, poly88_usart_timer_callback, NULL);
 	timer_adjust_periodic(poly88_usart_timer, attotime_zero, 0, ATTOTIME_IN_HZ(300));
-	
+
 }
 
 static UINT8 row_number(UINT8 code) {
@@ -40,25 +40,25 @@ static UINT8 row_number(UINT8 code) {
 	if BIT(code,4) return 4;
 	if BIT(code,5) return 5;
 	if BIT(code,6) return 6;
-	if BIT(code,7) return 7;	
+	if BIT(code,7) return 7;
 	return 0;
 }
 
 static TIMER_CALLBACK(keyboard_callback)
 {
 	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6" };
-	
+
 	int i;
 	UINT8 code;
 	UINT8 key_code = 0;
 	UINT8 shift = input_port_read(machine, "LINEC") & 0x02 ? 1 : 0;
 	UINT8 ctrl =  input_port_read(machine, "LINEC") & 0x01 ? 1 : 0;
-	
-	for(i = 0; i < 7; i++) 
+
+	for(i = 0; i < 7; i++)
 	{
-		
+
 		code = 	input_port_read(machine, keynames[i]);
-		if (code != 0) 
+		if (code != 0)
 		{
 			if (i==0 && shift==0) {
 				key_code = 0x30 + row_number(code) + 8*i; // for numbers and some signs
@@ -107,7 +107,7 @@ static TIMER_CALLBACK(keyboard_callback)
 				key_code = 0x00 + row_number(code) + (i-2)*8; // for letters + ctrl
 			}
 			if (i==6) {
-				switch(row_number(code)) 
+				switch(row_number(code))
 				{
 					case 0: key_code = 0x11; break;
 					case 1: key_code = 0x12; break;
@@ -121,16 +121,16 @@ static TIMER_CALLBACK(keyboard_callback)
 			}
 		}
 	}
-	if (key_code==0 && last_code !=0){		
-		int_vector = 0xef;				
-		cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);							
+	if (key_code==0 && last_code !=0){
+		int_vector = 0xef;
+		cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
 	} else {
 		last_code = key_code;
 	}
 }
 
 static IRQ_CALLBACK (poly88_irq_callback)
-{	
+{
 	return int_vector;
 }
 
@@ -151,7 +151,7 @@ static TIMER_CALLBACK(poly88_cassette_timer_callback)
 	static int clk_level_tape = 1;
 
 
-//	if (!(input_port_read(machine, "DSW0") & 0x02))	/* V.24 / Tape Switch */
+//  if (!(input_port_read(machine, "DSW0") & 0x02)) /* V.24 / Tape Switch */
 	//{
 		/* tape reading */
 		if (cassette_get_state(devtag_get_device(machine, "cassette"))&CASSETTE_PLAY)
@@ -177,7 +177,7 @@ static TIMER_CALLBACK(poly88_cassette_timer_callback)
 						}
 					}
 		}
-		
+
 		/* tape writing */
 		if (cassette_get_state(devtag_get_device(machine, "cassette"))&CASSETTE_RECORD)
 		{
@@ -198,11 +198,11 @@ static TIMER_CALLBACK(poly88_cassette_timer_callback)
 		if (!clk_level)
 			msm8251_transmit_clock(devtag_get_device(machine, "uart"));
 		clk_level = clk_level ? 0 : 1;
-//	}
+//  }
 }
 
 
-static TIMER_CALLBACK( setup_machine_state ) 
+static TIMER_CALLBACK( setup_machine_state )
 {
 	msm8251_connect(devtag_get_device(machine, "uart"), &poly88_cassette_serial_connection);
 }
@@ -217,24 +217,24 @@ DRIVER_INIT ( poly88 )
 }
 
 MACHINE_RESET(poly88)
-{	
+{
 	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), poly88_irq_callback);
 	timer_pulse(machine, ATTOTIME_IN_HZ(24000), NULL, 0, keyboard_callback);
 	intr = 0;
 	last_code = 0;
-		
+
 	timer_set(machine,  attotime_zero, NULL, 0, setup_machine_state );
 }
 
 INTERRUPT_GEN( poly88_interrupt )
 {
 	int_vector = 0xf7;
-	cpu_set_input_line(device, 0, HOLD_LINE);	
+	cpu_set_input_line(device, 0, HOLD_LINE);
 }
 static void poly88_usart_rxready (const device_config *device, int state)
 {
 	//int_vector = 0xe7;
-	//cpu_set_input_line(device, 0, HOLD_LINE);	
+	//cpu_set_input_line(device, 0, HOLD_LINE);
 }
 const msm8251_interface poly88_usart_interface=
 {
@@ -264,52 +264,52 @@ SNAPSHOT_LOAD( poly88 )
 	UINT16 recordLen;
 	UINT16 address;
 	UINT8  recordType;
-	
+
 	int pos = 0x300;
 	char name[9];
 	int i = 0;
 	int theend = 0;
 
 	image_fread(image, data, snapshot_size);
-		
+
 	while (pos<snapshot_size) {
 		for(i=0;i<9;i++) {
 			name[i] = (char) data[pos + i];
-		} 
+		}
 		pos+=8;
 		name[8] = 0;
-		
-		
+
+
 		recordNum = data[pos]+ data[pos+1]*256; pos+=2;
-		recordLen = data[pos]; pos++; 
+		recordLen = data[pos]; pos++;
 		if (recordLen==0) recordLen=0x100;
 		address = data[pos] + data[pos+1]*256; pos+=2;
 		recordType = data[pos]; pos++;
-		
-		logerror("Block :%s number:%d length: %d address=%04x type:%d\n",name,recordNum,recordLen,address, recordType);		
+
+		logerror("Block :%s number:%d length: %d address=%04x type:%d\n",name,recordNum,recordLen,address, recordType);
 		switch(recordType) {
 			case 0 :
 					/* 00 Absolute */
 					memcpy(memory_get_read_ptr(space,address ), data + pos ,recordLen);
 					break;
-			case 1 : 
+			case 1 :
 					/* 01 Comment */
 					break;
 			case 2 :
 					/* 02 End */
 					theend = 1;
 					break;
-			case 3 :		
+			case 3 :
     				/* 03 Auto Start @ Address */
     				cpu_set_reg(cputag_get_cpu(image->machine, "maincpu"), I8085_PC, address);
     				theend = 1;
     				break;
-    		case 4 : 
+    		case 4 :
     				/* 04 Data ( used by Assembler ) */
     				logerror("ASM load unsupported\n");
     				theend = 1;
     				break;
-    		case 5 : 
+    		case 5 :
     				/* 05 BASIC program file */
     				logerror("BASIC load unsupported\n");
     				theend = 1;
@@ -319,13 +319,13 @@ SNAPSHOT_LOAD( poly88 )
     				theend = 1;
 					break;
 			default: break;
-    	}		
-    			
+    	}
+
 		if (theend) {
 			break;
 		}
 		pos+=recordLen;
-	}	
+	}
 	device_reset(devtag_get_device(image->machine, "uart"));
 	return INIT_PASS;
 }

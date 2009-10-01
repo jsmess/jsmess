@@ -5,27 +5,27 @@
 
     Juergen Buchmueller, June 1998
 
-	2009-05 FP changes:
-	 Factored out MESS specific code from MAME
-	 Added skeleton support for other XL/XE machines (VERY preliminary):
-	 - a600xl based on maxaflex emulation in MAME
-	 - a1200xl sharing a800xl code without BASIC
-	 - a65xe, a65xea, a130xe, a800xe, xegs sharing a800xl code (and this is wrong 
-	  at least for xegs)
-	 Added proper dumps and labels, thanks to Freddy Offenga researches (a few
-	 are still marked BAD_DUMP while waiting for crc confirmation, since they 
-	 have been obtained by splitting whole dumps)
+    2009-05 FP changes:
+     Factored out MESS specific code from MAME
+     Added skeleton support for other XL/XE machines (VERY preliminary):
+     - a600xl based on maxaflex emulation in MAME
+     - a1200xl sharing a800xl code without BASIC
+     - a65xe, a65xea, a130xe, a800xe, xegs sharing a800xl code (and this is wrong
+      at least for xegs)
+     Added proper dumps and labels, thanks to Freddy Offenga researches (a few
+     are still marked BAD_DUMP while waiting for crc confirmation, since they
+     have been obtained by splitting whole dumps)
 
-	 To Do:
-	 - Find out why a600xl and a800xl don't work (xe machines should then follow)
-	 - Investigate supported RAM sizes and OS versions in different models 
-	 - Implement differences between various models (currently most of the
-	  XL/XE are exactly an a800xl, but this will change as soon as emulation 
-	  starts to work)
-	 - Fix various keyboard differences
-	 - Freddy emulation for 800XLF?
-	 - Add support for proto boards and expansions (a1400xl, C/PM board, etc.)
-	 - Clean up the whole driver + cart + floppy structure
+     To Do:
+     - Find out why a600xl and a800xl don't work (xe machines should then follow)
+     - Investigate supported RAM sizes and OS versions in different models
+     - Implement differences between various models (currently most of the
+      XL/XE are exactly an a800xl, but this will change as soon as emulation
+      starts to work)
+     - Fix various keyboard differences
+     - Freddy emulation for 800XLF?
+     - Add support for proto boards and expansions (a1400xl, C/PM board, etc.)
+     - Clean up the whole driver + cart + floppy structure
 
 ******************************************************************************/
 
@@ -412,7 +412,7 @@ INPUT_PORTS_END
 Small note about natural keyboard support: currently,
 - "Break" is mapped to 'F1'
 - "Clear" is mapped to 'F2'
-- "Atari" is mapped to 'F3'							*/
+- "Atari" is mapped to 'F3'                         */
 
 static INPUT_PORTS_START( atari_keyboard )
 	PORT_START("keyboard_0")
@@ -420,7 +420,7 @@ static INPUT_PORTS_START( atari_keyboard )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_J) PORT_CHAR('j') PORT_CHAR('J')
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR(':')
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Break") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(UCHAR_MAMEKEY(F1))
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNUSED) 
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_K) PORT_CHAR('k') PORT_CHAR('K')
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR('+') PORT_CHAR('\\')
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('*') PORT_CHAR('^')
@@ -480,7 +480,7 @@ static INPUT_PORTS_START( atari_keyboard )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR(')')
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('\'')
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("BackS  Delete") PORT_CODE(KEYCODE_BACKSLASH2) PORT_CHAR(8) PORT_CHAR(UCHAR_MAMEKEY(DEL)) 
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("BackS  Delete") PORT_CODE(KEYCODE_BACKSLASH2) PORT_CHAR(8) PORT_CHAR(UCHAR_MAMEKEY(DEL))
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('@')
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("<  Clear") PORT_CODE(KEYCODE_MINUS) PORT_CHAR('<') PORT_CHAR(UCHAR_MAMEKEY(F2))
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(">  Insert") PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('>') PORT_CHAR(UCHAR_MAMEKEY(INSERT))
@@ -713,7 +713,7 @@ static PALETTE_INIT( atari )
 {
 	int i;
 
-	for ( i = 0; i < sizeof(atari_palette) / 3; i++ ) 
+	for ( i = 0; i < sizeof(atari_palette) / 3; i++ )
 	{
 		palette_set_color_rgb(machine, i, atari_palette[i*3], atari_palette[i*3+1], atari_palette[i*3+2]);
 	}
@@ -791,7 +791,7 @@ static void a800xl_mmu(running_machine *machine, UINT8 new_mmu)
 		base2 = memory_region(machine, "maincpu") + 0x15000;  /* 0x0800 bytes */
 	}
 	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x5000, 0x57ff, 0, 0, rbank2, wbank2);
-	memory_set_bankptr(machine, 2, base2);	
+	memory_set_bankptr(machine, 2, base2);
 }
 
 /* BASIC was available in a separate cart, so we don't test it */
@@ -843,7 +843,7 @@ static void a1200xl_mmu(running_machine *machine, UINT8 new_mmu)
 		base2 = memory_region(machine, "maincpu") + 0x15000;  /* 0x0800 bytes */
 	}
 	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x5000, 0x57ff, 0, 0, rbank2, wbank2);
-	memory_set_bankptr(machine, 2, base2);	
+	memory_set_bankptr(machine, 2, base2);
 }
 
 /**************************************************************
@@ -1011,7 +1011,7 @@ static MACHINE_DRIVER_START( a400 )
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(FRAME_RATE_60HZ)
 	MDRV_SCREEN_SIZE(HWIDTH*8, TOTAL_LINES_60HZ)
-	
+
 	MDRV_IMPORT_FROM(a400_cartslot)
 MACHINE_DRIVER_END
 
@@ -1028,7 +1028,7 @@ static MACHINE_DRIVER_START( a400pal )
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(FRAME_RATE_50HZ)
 	MDRV_SCREEN_SIZE(HWIDTH*8, TOTAL_LINES_50HZ)
-	
+
 	MDRV_IMPORT_FROM(a400_cartslot)
 MACHINE_DRIVER_END
 
@@ -1045,7 +1045,7 @@ static MACHINE_DRIVER_START( a800 )
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(FRAME_RATE_60HZ)
 	MDRV_SCREEN_SIZE(HWIDTH*8, TOTAL_LINES_60HZ)
-	
+
 	MDRV_IMPORT_FROM(a800_cartslot)
 MACHINE_DRIVER_END
 
@@ -1081,7 +1081,7 @@ static MACHINE_DRIVER_START( a600xl )
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(FRAME_RATE_60HZ)
 	MDRV_SCREEN_SIZE(HWIDTH*8, TOTAL_LINES_60HZ)
-	
+
 	MDRV_IMPORT_FROM(a400_cartslot)
 MACHINE_DRIVER_END
 
@@ -1100,7 +1100,7 @@ static MACHINE_DRIVER_START( a800xl )
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(FRAME_RATE_60HZ)
 	MDRV_SCREEN_SIZE(HWIDTH*8, TOTAL_LINES_60HZ)
-	
+
 	MDRV_IMPORT_FROM(a400_cartslot)
 MACHINE_DRIVER_END
 
@@ -1124,7 +1124,7 @@ static MACHINE_DRIVER_START( a5200 )
 	MDRV_SCREEN_MODIFY( "screen" )
 	MDRV_SCREEN_REFRESH_RATE(FRAME_RATE_60HZ)
 	MDRV_SCREEN_SIZE(HWIDTH*8, TOTAL_LINES_60HZ)
-	
+
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("rom,bin,a52")
 	MDRV_CARTSLOT_NOT_MANDATORY
@@ -1206,7 +1206,7 @@ ROM_END
 ROM_START(a65xea)
 	ROM_REGION(0x18000, "maincpu", 0)
 	ROM_LOAD( "basic_ar.rom", 0x10000, 0x2000, CRC(c899f4d6) SHA1(043df191d1fe402e792266a108e147ffcda35130) )	// is this correct? or shall we use Rev. C?
-//	ROM_LOAD( "c101700.rom",  0x14000, 0x4000, CRC(7f9a76c8) SHA1(57eb6d87850a763f11767f53d4eaede186f831a2) )	// this was from Savetz and has wrong bits!
+//  ROM_LOAD( "c101700.rom",  0x14000, 0x4000, CRC(7f9a76c8) SHA1(57eb6d87850a763f11767f53d4eaede186f831a2) )   // this was from Savetz and has wrong bits!
 	ROM_LOAD( "c101700.rom",  0x14000, 0x4000, CRC(45f47988) SHA1(a36b8b20f657580f172749bb0625c08706ed824c) )	// Rev. 3B ?
 ROM_END
 

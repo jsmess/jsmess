@@ -57,7 +57,7 @@ static PALETTE_INIT( concept )
 
 static const mm58274c_interface concept_mm58274c_interface =
 {
-	0,	/* 	mode 24*/
+	0,	/*  mode 24*/
 	1   /*  first day of week */
 };
 
@@ -140,15 +140,15 @@ static MACHINE_DRIVER_START( concept )
 	/* no sound? */
 
 	MDRV_HARDDISK_ADD( "harddisk1" )
-	
+
 	/* rtc */
 	MDRV_MM58274C_ADD("mm58274c", concept_mm58274c_interface)
 
 	/* via */
 	MDRV_VIA6522_ADD("via6522_0", 1022750, concept_via6522_intf)
-	
+
 	MDRV_WD179X_ADD("wd179x", concept_wd17xx_interface )
-	
+
 	MDRV_FLOPPY_4_DRIVES_ADD(concept_floppy_config)
 MACHINE_DRIVER_END
 

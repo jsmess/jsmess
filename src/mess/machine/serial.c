@@ -9,24 +9,24 @@ setup serial interface software in driver and let the transfer begin */
 
 /*
 
-	the output starts at 1 level. It changes to 0 when the start bit has been transmitted.
-	This therefore signals that data is following.
-	When all data bits have been received, stop bits are transmitted with a value of 1.
+    the output starts at 1 level. It changes to 0 when the start bit has been transmitted.
+    This therefore signals that data is following.
+    When all data bits have been received, stop bits are transmitted with a value of 1.
 
-	msm8251 expects this in asynchronous mode:
-	packet format:
+    msm8251 expects this in asynchronous mode:
+    packet format:
 
-	bit count			function		value
-	1					start bit		0
-	note 1				data bits		x
-	note 2				parity bit		x
-	note 3				stop bits		1
+    bit count           function        value
+    1                   start bit       0
+    note 1              data bits       x
+    note 2              parity bit      x
+    note 3              stop bits       1
 
-	Note:
-	1. Data size can be defined (usual value is 8)
-	2. Parity bit (if parity is set to odd or even). Value of bit
-		is defined by data parity.
-	3. There should be at least 1 stop bit.
+    Note:
+    1. Data size can be defined (usual value is 8)
+    2. Parity bit (if parity is set to odd or even). Value of bit
+        is defined by data parity.
+    3. There should be at least 1 stop bit.
 */
 
 #include "driver.h"
@@ -55,7 +55,7 @@ void serial_helper_setup(void)
 	int i;
 
 	/* if sum of all bits in the byte is even, then the data
-	has even parity, otherwise it has odd parity */
+    has even parity, otherwise it has odd parity */
 	for (i=0; i<256; i++)
 	{
 		int data;
@@ -738,15 +738,15 @@ static void xmodem_setup_packet(int id)
 
 
 	/*
-	packet:
+    packet:
 
-	1 byte			SOH
-	1 byte			packet id
-	1 byte			packet id (stored 1's complemented)
-	128 bytes		data
-	1 byte			CRC-16 upper byte
-	1 byte			CRC-16 lower byte
-	*/
+    1 byte          SOH
+    1 byte          packet id
+    1 byte          packet id (stored 1's complemented)
+    128 bytes       data
+    1 byte          CRC-16 upper byte
+    1 byte          CRC-16 lower byte
+    */
 
 	/* soh */
 	xmodem_transfer.packet[count] = XMODEM_SOH;
@@ -878,12 +878,12 @@ static void serial_protocol_xmodem_sent_char(int id)
 
 /* this converts state at this end to a state the other end can accept */
 /* e.g. CTS at this end becomes RTS at other end.
-		RTS at this end becomes CTS at other end.
-		TX at this end becomes RX at other end.
-		RX at this end becomes TX at other end.
-		etc
+        RTS at this end becomes CTS at other end.
+        TX at this end becomes RX at other end.
+        RX at this end becomes TX at other end.
+        etc
 
-		The same thing is done inside the serial null-terminal lead */
+        The same thing is done inside the serial null-terminal lead */
 
 static unsigned long serial_connection_spin_bits(unsigned long input_status)
 {
@@ -941,7 +941,7 @@ void	serial_connection_link(running_machine *machine, struct serial_connection *
 {
 	/* both connections should have their in connection setup! */
 	/* the in connection is the callback they use to update their state based
-	on the output from the other side */
+    on the output from the other side */
 	connection_a->out_callback = connection_b->in_callback;
 	connection_b->out_callback = connection_a->in_callback;
 

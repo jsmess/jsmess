@@ -466,7 +466,7 @@ static void x68k_keyboard_push_scancode(running_machine* machine,unsigned char c
 		x68k_sys.keyboard.headpos = 0;
 //      mfp_trigger_irq(MFP_IRQ_RX_ERROR);
 		current_vector[6] = 0x4b;
-//		cputag_set_input_line_and_vector(machine, "maincpu",6,ASSERT_LINE,0x4b);
+//      cputag_set_input_line_and_vector(machine, "maincpu",6,ASSERT_LINE,0x4b);
 	}
 }
 
@@ -637,8 +637,8 @@ static TIMER_CALLBACK(x68k_scc_ack)
 	if(x68k_sys.mouse.bufferempty != 0)  // nothing to do if the mouse data buffer is empty
 		return;
 
-//	if((x68k_sys.ioc.irqstatus & 0xc0) != 0)
-//		return;
+//  if((x68k_sys.ioc.irqstatus & 0xc0) != 0)
+//      return;
 
 	// hard-code the IRQ vector for now, until the SCC code is more complete
 	if((scc_get_reg_a(scc, 9) & 0x08) || (scc_get_reg_b(scc, 9) & 0x08))  // SCC reg WR9 is the same for both channels
@@ -694,11 +694,11 @@ static UINT8 md_3button_r(const device_config* device, int port)
 		UINT8 porta = input_port_read(device->machine,"md3b") & 0xff;
 		UINT8 portb = (input_port_read(device->machine,"md3b") >> 8) & 0xff;
 		if(x68k_sys.mdctrl.mux1 & 0x10)
-		{	
+		{
 			return porta | 0x90;
 		}
 		else
-		{	
+		{
 			return (portb & 0x60) | (porta & 0x03) | 0x90;
 		}
 	}
@@ -707,11 +707,11 @@ static UINT8 md_3button_r(const device_config* device, int port)
 		UINT8 porta = (input_port_read(device->machine,"md3b") >> 16) & 0xff;
 		UINT8 portb = (input_port_read(device->machine,"md3b") >> 24) & 0xff;
 		if(x68k_sys.mdctrl.mux2 & 0x20)
-		{	
+		{
 			return porta | 0x90;
 		}
 		else
-		{	
+		{
 			return (portb & 0x60) | (porta & 0x03) | 0x90;
 		}
 	}
@@ -742,35 +742,35 @@ static UINT8 md_6button_r(const device_config* device, int port)
 		UINT8 porta = input_port_read(device->machine,"md6b") & 0xff;
 		UINT8 portb = (input_port_read(device->machine,"md6b") >> 8) & 0xff;
 		UINT8 extra = input_port_read(device->machine,"md6b_extra") & 0x0f;
-		
+
 		switch(x68k_sys.mdctrl.seq1)
 		{
 			case 1:
 			default:
 				if(x68k_sys.mdctrl.mux1 & 0x10)
-				{	
+				{
 					return porta | 0x90;
 				}
 				else
-				{	
+				{
 					return (portb & 0x60) | (porta & 0x03) | 0x90;
 				}
 			case 2:
 				if(x68k_sys.mdctrl.mux1 & 0x10)
-				{	
+				{
 					return porta | 0x90;
 				}
 				else
-				{	
+				{
 					return (portb & 0x60) | 0x90;
 				}
 			case 3:
 				if(x68k_sys.mdctrl.mux1 & 0x10)
-				{	
+				{
 					return (porta & 0x60) | (extra & 0x0f) | 0x90;
 				}
 				else
-				{	
+				{
 					return (portb & 0x60) | 0x9f;
 				}
 		}
@@ -786,29 +786,29 @@ static UINT8 md_6button_r(const device_config* device, int port)
 			case 1:
 			default:
 				if(x68k_sys.mdctrl.mux2 & 0x20)
-				{	
+				{
 					return porta | 0x90;
 				}
 				else
-				{	
+				{
 					return (portb & 0x60) | (porta & 0x03) | 0x90;
 				}
 			case 2:
 				if(x68k_sys.mdctrl.mux2 & 0x20)
-				{	
+				{
 					return porta | 0x90;
 				}
 				else
-				{	
+				{
 					return (portb & 0x60) | 0x90;
 				}
 			case 3:
 				if(x68k_sys.mdctrl.mux2 & 0x20)
-				{	
+				{
 					return (porta & 0x60) | (extra & 0x0f) | 0x90;
 				}
 				else
-				{	
+				{
 					return (portb & 0x60) | 0x9f;
 				}
 		}
@@ -830,11 +830,11 @@ static UINT8 xpd1lr_r(const device_config* device, int port)
 		UINT8 porta = input_port_read(device->machine,"xpd1lr") & 0xff;
 		UINT8 portb = (input_port_read(device->machine,"xpd1lr") >> 8) & 0xff;
 		if(x68k_sys.mdctrl.mux1 & 0x10)
-		{	
+		{
 			return porta;
 		}
 		else
-		{	
+		{
 			return portb | (porta & 0x60);
 		}
 	}
@@ -843,11 +843,11 @@ static UINT8 xpd1lr_r(const device_config* device, int port)
 		UINT8 porta = (input_port_read(device->machine,"xpd1lr") >> 16) & 0xff;
 		UINT8 portb = (input_port_read(device->machine,"xpd1lr") >> 24) & 0xff;
 		if(x68k_sys.mdctrl.mux2 & 0x20)
-		{	
+		{
 			return porta;
 		}
 		else
-		{	
+		{
 			return portb | (porta & 0x60);
 		}
 	}
@@ -858,7 +858,7 @@ static UINT8 xpd1lr_r(const device_config* device, int port)
 static READ8_DEVICE_HANDLER( ppi_port_a_r )
 {
 	int ctrl = input_port_read(device->machine,"ctrltype") & 0x0f;
-	
+
 	switch(ctrl)
 	{
 		case 0x00:  // standard MSX/FM-Towns joystick
@@ -873,14 +873,14 @@ static READ8_DEVICE_HANDLER( ppi_port_a_r )
 		case 0x03:  // XPD-1LR
 			return xpd1lr_r(device,1);
 	}
-	
+
 	return 0xff;
 }
 
 static READ8_DEVICE_HANDLER( ppi_port_b_r )
 {
 	int ctrl = input_port_read(device->machine,"ctrltype") & 0xf0;
-	
+
 	switch(ctrl)
 	{
 		case 0x00:  // standard MSX/FM-Towns joystick
@@ -895,7 +895,7 @@ static READ8_DEVICE_HANDLER( ppi_port_b_r )
 		case 0x30:  // XPD-1LR
 			return xpd1lr_r(device,2);
 	}
-	
+
 	return 0xff;
 }
 
@@ -919,7 +919,7 @@ static WRITE8_DEVICE_HANDLER( ppi_port_c_w )
 	static UINT16 prev1;
 	static UINT16 prev2;
 	static UINT16 prevA;
-	
+
 	ppi_port[2] = data;
 	if((data & 0x0f) != (prevA & 0x0f))
 	{
@@ -929,7 +929,7 @@ static WRITE8_DEVICE_HANDLER( ppi_port_c_w )
 		okim6258_set_divider(oki, (data >> 2) & 3);
 	}
 	prevA = data & 0x0f;
-	
+
 	// The joystick enable bits also handle the multiplexer for various controllers
 	x68k_sys.joy.joy1_enable = data & 0x10;
 	x68k_sys.mdctrl.mux1 = data & 0x10;
@@ -1017,13 +1017,13 @@ static WRITE16_HANDLER( x68k_fdc_w )
 		floppy_drive_set_ready_state(floppy_get_device(space->machine, 1),1,1);
 		floppy_drive_set_ready_state(floppy_get_device(space->machine, 2),1,1);
 		floppy_drive_set_ready_state(floppy_get_device(space->machine, 3),1,1);
-//		for(drive=0;drive<4;drive++)
-//		{
-//			if(floppy_drive_get_flag_state(floppy_get_device(machine, drive),FLOPPY_DRIVE_MOTOR_ON))
-//				output_set_indexed_value("access_drv",drive,0);
-//			else
-//				output_set_indexed_value("access_drv",drive,1);
-//		}
+//      for(drive=0;drive<4;drive++)
+//      {
+//          if(floppy_drive_get_flag_state(floppy_get_device(machine, drive),FLOPPY_DRIVE_MOTOR_ON))
+//              output_set_indexed_value("access_drv",drive,0);
+//          else
+//              output_set_indexed_value("access_drv",drive,1);
+//      }
 		logerror("FDC: Drive #%i: Drive selection set to %02x\n",data & 0x03,data);
 		break;
 	default:
@@ -1037,7 +1037,7 @@ static READ16_HANDLER( x68k_fdc_r )
 	unsigned int ret;
 	int x;
 	const device_config *fdc = devtag_get_device(space->machine, "nec72065");
-	
+
 	switch(offset)
 	{
 	case 0x00:
@@ -1262,9 +1262,9 @@ static READ16_HANDLER( x68k_sysport_r )
 
 /*static READ16_HANDLER( x68k_mfp_r )
 {
-	const device_config *x68k_mfp = devtag_get_device(space->machine, MC68901_TAG);
+    const device_config *x68k_mfp = devtag_get_device(space->machine, MC68901_TAG);
 
-	return mc68901_register_r(x68k_mfp, offset);
+    return mc68901_register_r(x68k_mfp, offset);
 }*/
 
 static READ16_HANDLER( x68k_mfp_r )
@@ -1507,8 +1507,8 @@ static WRITE16_HANDLER( x68k_sram_w )
 static READ16_HANDLER( x68k_sram_r )
 {
 	// HACKS!
-//	if(offset == 0x5a/2)  // 0x5a should be 0 if no SASI HDs are present.
-//		return 0x0000;
+//  if(offset == 0x5a/2)  // 0x5a should be 0 if no SASI HDs are present.
+//      return 0x0000;
 	if(offset == 0x08/2)
 		return mess_ram_size >> 16;  // RAM size
 	/*if(offset == 0x46/2)
@@ -1649,7 +1649,7 @@ static READ16_HANDLER( x68k_rom0_r )
        then access causes a bus error */
 	current_vector[2] = 0x02;  // bus error
 	current_irq_line = 2;
-//	cputag_set_input_line_and_vector(space->machine, "maincpu",2,ASSERT_LINE,current_vector[2]);
+//  cputag_set_input_line_and_vector(space->machine, "maincpu",2,ASSERT_LINE,current_vector[2]);
 	if(input_port_read(space->machine, "options") & 0x02)
 	{
 		offset *= 2;
@@ -1666,7 +1666,7 @@ static WRITE16_HANDLER( x68k_rom0_w )
        then access causes a bus error */
 	current_vector[2] = 0x02;  // bus error
 	current_irq_line = 2;
-//	cputag_set_input_line_and_vector(space->machine, "maincpu",2,ASSERT_LINE,current_vector[2]);
+//  cputag_set_input_line_and_vector(space->machine, "maincpu",2,ASSERT_LINE,current_vector[2]);
 	if(input_port_read(space->machine, "options") & 0x02)
 	{
 		offset *= 2;
@@ -1755,7 +1755,7 @@ static READ8_DEVICE_HANDLER( mfp_gpio_r )
 	data &= ~(x68k_sys.crtc.vblank << 4);
 	data |= 0x23;  // GPIP5 is unused, always 1
 
-//	mc68901_tai_w(mfp, x68k_sys.crtc.vblank);
+//  mc68901_tai_w(mfp, x68k_sys.crtc.vblank);
 
 	return data;
 }
@@ -1765,8 +1765,8 @@ static WRITE_LINE_DEVICE_HANDLER( mfp_irq_callback )
 	static int prev;
 	if(prev == CLEAR_LINE && state == CLEAR_LINE)  // eliminate unnecessary calls to set the IRQ line for speed reasons
 		return;
-//	if((x68k_sys.ioc.irqstatus & 0xc0) != 0)  // if the FDC is busy, then we don't want to miss that IRQ
-//		return;
+//  if((x68k_sys.ioc.irqstatus & 0xc0) != 0)  // if the FDC is busy, then we don't want to miss that IRQ
+//      return;
 	cputag_set_input_line(device->machine, "maincpu", 6, state);
 	current_vector[6] = 0;
 	prev = state;
@@ -1802,7 +1802,7 @@ static IRQ_CALLBACK(x68k_int_ack)
 		logerror("SYS: IRQ acknowledged (vector=0x%02x, line = %i)\n",current_vector[6],irqline);
 		return current_vector[6];
 	}
-	
+
 	cputag_set_input_line_and_vector(device->machine, "maincpu",irqline,CLEAR_LINE,current_vector[irqline]);
 	if(irqline == 1)  // IOSC
 	{
@@ -2101,7 +2101,7 @@ static INPUT_PORTS_START( x68000 )
 
 	PORT_START("mouse3")  // Y-axis
 	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
-	
+
 	// 3-button Megadrive gamepad
 	PORT_START("md3b")
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("MD Pad 1 Up") PORT_8WAY PORT_PLAYER(1) PORT_CATEGORY(11)
@@ -2139,7 +2139,7 @@ static INPUT_PORTS_START( x68000 )
 	PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("MD Pad 2 A Button") PORT_CATEGORY(21)
 	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_START ) PORT_PLAYER(2) PORT_NAME("MD Pad 2 Start Button") PORT_CATEGORY(21)
 	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CATEGORY(21)
-	
+
 	// 6-button Megadrive gamepad
 	PORT_START("md6b")
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("MD Pad 1 Up") PORT_8WAY PORT_PLAYER(1) PORT_CATEGORY(12)
@@ -2231,7 +2231,7 @@ static INPUT_PORTS_START( x68000 )
 INPUT_PORTS_END
 
 static void x68k_load_proc(const device_config *image)
-{	
+{
 	if(x68k_sys.ioc.irqstatus & 0x02)
 	{
 		current_vector[1] = 0x61;
@@ -2340,7 +2340,7 @@ static MACHINE_RESET( x68000 )
 		floppy_install_unload_proc(floppy_get_device(machine, drive), x68k_unload_proc);
 		floppy_install_load_proc(floppy_get_device(machine, drive), x68k_load_proc);
 	}
-	
+
 	// reset CPU
 	device_reset(cputag_get_cpu(machine, "maincpu"));
 }
@@ -2409,7 +2409,7 @@ static DRIVER_INIT( x68000 )
 	x68k_vblank_irq = timer_alloc(machine, x68k_crtc_vblank_irq,NULL);
 	mouse_timer = timer_alloc(machine, x68k_scc_ack,NULL);
 	led_timer = timer_alloc(machine, x68k_led_callback,NULL);
-	
+
 	// Initialise timers for 6-button MD controllers
 	md_6button_init(machine);
 }
@@ -2434,7 +2434,7 @@ static MACHINE_DRIVER_START( x68000 )
 	MDRV_X68KHDC_ADD( "x68k_hdc" )
 
 	MDRV_SCC8530_ADD( "scc" )
-	
+
 	MDRV_RP5C15_ADD( "rp5c15" , rtc_intf)
 
     /* video hardware */
@@ -2466,8 +2466,8 @@ static MACHINE_DRIVER_START( x68000 )
 
 	MDRV_NVRAM_HANDLER( generic_0fill )
 
-	MDRV_NEC72065_ADD("nec72065", fdc_interface)	
-	MDRV_FLOPPY_4_DRIVES_ADD(x68k_floppy_config)	
+	MDRV_NEC72065_ADD("nec72065", fdc_interface)
+	MDRV_FLOPPY_4_DRIVES_ADD(x68k_floppy_config)
 MACHINE_DRIVER_END
 
 static SYSTEM_CONFIG_START(x68000)

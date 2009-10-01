@@ -12,7 +12,7 @@
 /*----------- defined in machine/vc1541.c -----------*/
 
 /* we currently have preliminary support for 1541 & 1551 only */
-enum { 
+enum {
 	type_1541 = 0,
 	type_1541ii,
 	type_1551,
@@ -29,7 +29,7 @@ enum {
 	type_8250,
 };
 
-enum { 
+enum {
 	format_d64 = 0,			/* 1541 image, 35 tracks */
 	format_d64_err,			/* 1541 image, 35 tracks + error table */
 	format_d64_40t,			/* 1541 image, 40 tracks */
@@ -163,8 +163,8 @@ drive                         Safronic DS-50F
 
 
 
-Note: according to additional docs at zimmers.net, ROMs in these drive 
-were interchangeable: you could burn later revisions on EEPROM and put 
+Note: according to additional docs at zimmers.net, ROMs in these drive
+were interchangeable: you could burn later revisions on EEPROM and put
 them in older drives and they would work perfectly.
 
 ****************************************************************************/
@@ -177,9 +177,9 @@ them in older drives and they would work perfectly.
 	ROM_LOAD( "325303-01.ub3", 0xe000, 0x2000, CRC(10b39158) SHA1(56dfe79b26f50af4e83fd9604857756d196516b9) )
 
 /*
-    rev. 01 - It is believed to be the first revision of the 1541 firmware. The service manual says that this ROM 
+    rev. 01 - It is believed to be the first revision of the 1541 firmware. The service manual says that this ROM
         is for North America and Japan only.
-    rev. 02 - Second version of the 1541 firmware. The service manual says that this ROM was not available in North 
+    rev. 02 - Second version of the 1541 firmware. The service manual says that this ROM was not available in North
         America (Japan only?).
     rev. 03 - It is said to be the first version that is usable in Europe (in the service manual?).
     rev. 05 - From an old-style 1541 with short board.
@@ -264,7 +264,7 @@ drive                         Newtronics D502
 ****************************************************************************/
 
 // no locations available for this, I need a picture of the board
-// currently, we add 1570 to 1571, to preserve the firmware. 
+// currently, we add 1570 to 1571, to preserve the firmware.
 // this will be used later, when proper drives will be added to each system
 #define C1570_ROM( cpu ) \
 	ROM_REGION( 0x10000, cpu, 0) \
@@ -292,7 +292,7 @@ drive                         Newtronics D502
     rev. 01 - First revision of 1581 firmware
     rev. 02 - Second revision of 1581 firmware
     beta - Probably a beta version
-    1563 - This comes from a prototype unit of the so-called c128d/81 (a c128d with built-in 1581 drive). 
+    1563 - This comes from a prototype unit of the so-called c128d/81 (a c128d with built-in 1581 drive).
         Despite the label, is a 1581 firmaware
 */
 #define C1581_ROM( cpu ) \
@@ -369,12 +369,12 @@ U1                            6530 RIOT (ROM disabled)
 
 Notes: The DOS 2.7 ROM in SFD-1001 is the same as in 8250 drives. Differences:
 
-CBM 8050 - dual 5" 1/4 floppy drive, disks are written on one side 
-		with double density
-CBM	8250 / 8250LP - dual 5.25" 1/4 floppy drive, disks are written 
-		on both sides. it reads 8050-disks, LP version has smaller case
-SFD-1001 - single 5" 1/4 floppy drive, same as CBM 8250LP, but only 
-		one drive and 1541-case
+CBM 8050 - dual 5" 1/4 floppy drive, disks are written on one side
+        with double density
+CBM 8250 / 8250LP - dual 5.25" 1/4 floppy drive, disks are written
+        on both sides. it reads 8050-disks, LP version has smaller case
+SFD-1001 - single 5" 1/4 floppy drive, same as CBM 8250LP, but only
+        one drive and 1541-case
 
 ****************************************************************************/
 
@@ -422,7 +422,7 @@ drive                         Shugart 390
 ****************************************************************************/
 
 #define C4040_ROM( cpu )	\
-	ROM_REGION( 0x10000, cpu, 0 )	
+	ROM_REGION( 0x10000, cpu, 0 )
 
 // still to be sorted out
 
@@ -463,9 +463,9 @@ drive                   Tandon TM602S (9060)
 drive                   Tandon TM603S (9090)
 
 
-Note: The Commodore D9060 and D9090 can use the same firmware. The 
-difference between these units is that the jumper J14 on the DOS board 
-is open in the D9060, and closed in the D9090 to select a 4-head vs. 
+Note: The Commodore D9060 and D9090 can use the same firmware. The
+difference between these units is that the jumper J14 on the DOS board
+is open in the D9060, and closed in the D9090 to select a 4-head vs.
 6-head drive. The jumper J13 seems to be unused.
 
 ****************************************************************************/
@@ -488,7 +488,7 @@ is open in the D9060, and closed in the D9090 to select a 4-head vs.
 
 /****************************************************************************
 
-	Dual 8" floppy drive. Related to any other drive? What about 8060?
+    Dual 8" floppy drive. Related to any other drive? What about 8060?
 
 ****************************************************************************/
 

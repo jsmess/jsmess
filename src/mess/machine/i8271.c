@@ -194,7 +194,7 @@ static const device_config *current_image(const device_config *device)
 		return devtag_get_device(device->machine,i8271->intf->floppy_drive_tags[i8271->drive]);
 	} else {
 		return NULL;
-	}	
+	}
 }
 
 
@@ -1078,7 +1078,7 @@ static void i8271_command_execute(const device_config *device)
 			status |= (1<<2) | (1<<6);
 
 			/* these two do not appear to be set at all! ?? */
-			
+
 			if (i8271->intf->floppy_drive_tags[0]!=NULL) {
 				if (floppy_drive_get_flag_state(devtag_get_device(device->machine,i8271->intf->floppy_drive_tags[0]), FLOPPY_DRIVE_READY))
 				{

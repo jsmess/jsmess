@@ -1,17 +1,17 @@
 /******************************************************************************
  *
- *	kay_kbd.c
+ *  kay_kbd.c
  *
- *	Kaypro II Serial Keyboard
+ *  Kaypro II Serial Keyboard
  *
- *	Most of this is copied from the old kaypro.c,
- *	rather than re-inventing the wheel.
+ *  Most of this is copied from the old kaypro.c,
+ *  rather than re-inventing the wheel.
  *
- *	Juergen Buchmueller, July 1998
- *	Benjamin C. W. Sittler, July 1998 (new keyboard table)
+ *  Juergen Buchmueller, July 1998
+ *  Benjamin C. W. Sittler, July 1998 (new keyboard table)
  *
- *	Converted to a serial device (as far as MESS will allow)
- *	by Robbbert, April 2009.
+ *  Converted to a serial device (as far as MESS will allow)
+ *  by Robbbert, April 2009.
  *
  ******************************************************************************/
 
@@ -101,7 +101,7 @@ INPUT_PORTS_START( kay_kbd )
 	PORT_BIT(0x04, 0x00, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE)			PORT_CHAR('[') PORT_CHAR('{')
 	PORT_BIT(0x08, 0x00, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE)		PORT_CHAR(']') PORT_CHAR('}')
 	PORT_BIT(0x10, 0x00, IPT_KEYBOARD) PORT_NAME("RETURN")				PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
-	PORT_BIT(0x20, 0x00, IPT_KEYBOARD) PORT_NAME("DEL") PORT_CODE(KEYCODE_DEL)	PORT_CHAR(UCHAR_MAMEKEY(DEL)) 
+	PORT_BIT(0x20, 0x00, IPT_KEYBOARD) PORT_NAME("DEL") PORT_CODE(KEYCODE_DEL)	PORT_CHAR(UCHAR_MAMEKEY(DEL))
 	PORT_BIT(0x40, 0x00, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL)			PORT_CHAR(UCHAR_SHIFT_2)
 	PORT_BIT(0x80, 0x00, IPT_KEYBOARD) PORT_CODE(KEYCODE_CAPSLOCK)			PORT_TOGGLE PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
 
@@ -384,9 +384,9 @@ INTERRUPT_GEN( kay_kbd_interrupt )
 #if 0
 
 /******************************************************
- *	kaypro_const_w (write console status ;)
- *	bit
- *	0	flush keyboard buffer
+ *  kaypro_const_w (write console status ;)
+ *  bit
+ *  0   flush keyboard buffer
  ******************************************************/
 static WRITE8_HANDLER ( kaypro2_const_w )
 {
@@ -397,9 +397,9 @@ static WRITE8_HANDLER ( kaypro2_const_w )
 #endif
 
 /******************************************************
- *	stuff character into the keyboard buffer
- *	releases CPU if it was waiting for a key
- *	sounds bell if buffer would overflow
+ *  stuff character into the keyboard buffer
+ *  releases CPU if it was waiting for a key
+ *  sounds bell if buffer would overflow
  ******************************************************/
 static void kay_kbd_in( running_machine *machine, UINT8 data )
 {
@@ -421,9 +421,9 @@ static void kay_kbd_in( running_machine *machine, UINT8 data )
 
 UINT8 kay_kbd_c_r( void )
 {
-/*	d4 transmit buffer empty - 1=ok to send
-	d2 appears to be receive buffer empty - 1=ok to receive
-	d0 keyboard buffer empty - 1=key waiting to be used */
+/*  d4 transmit buffer empty - 1=ok to send
+    d2 appears to be receive buffer empty - 1=ok to receive
+    d0 keyboard buffer empty - 1=key waiting to be used */
 
 	UINT8 data = control_status;
 
@@ -457,11 +457,11 @@ static TIMER_CALLBACK( kay_kbd_beepoff )
 void kay_kbd_d_w( running_machine *machine, UINT8 data )
 {
 /* Beeper control - lengths need verifying
-	01 - keyclick
-	02 - short beep
-	04 - standard bell beep
-	08 - mute
-	16 - unmute */
+    01 - keyclick
+    02 - short beep
+    04 - standard bell beep
+    08 - mute
+    16 - unmute */
 
 	UINT16 length = 0;
 

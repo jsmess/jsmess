@@ -533,7 +533,7 @@ static int detect_super_chip(running_machine *machine)
 	}
 	/* Check the reset vector does not point into the super chip RAM area */
 	i = ( cart[0x0FFD] << 8 ) | cart[0x0FFC];
-	if ( ( i & 0x0FFF ) < 0x0100 ) 
+	if ( ( i & 0x0FFF ) < 0x0100 )
 	{
 		return 0;
 	}
@@ -579,9 +579,9 @@ static DEVICE_IMAGE_LOAD( a2600_cart )
 
 	image_fread(image, cart, cart_size);
 
-	if (!(cart_size == 0x4000 && detect_modef6(image->machine))) 
+	if (!(cart_size == 0x4000 && detect_modef6(image->machine)))
 	{
-		while (cart_size > 0x00800) 
+		while (cart_size > 0x00800)
 		{
 			if (!memcmp(cart, &cart[cart_size/2],cart_size/2)) cart_size /= 2;
 			else break;
@@ -590,11 +590,11 @@ static DEVICE_IMAGE_LOAD( a2600_cart )
 
 	extrainfo = image_extrainfo( image );
 
-	if ( extrainfo && extrainfo[0] ) 
+	if ( extrainfo && extrainfo[0] )
 	{
-		for ( eibd = extrainfo_banking_defs; eibd->extrainfo[0]; eibd++ ) 
+		for ( eibd = extrainfo_banking_defs; eibd->extrainfo[0]; eibd++ )
 		{
-			if ( ! mame_stricmp( eibd->extrainfo, extrainfo ) ) 
+			if ( ! mame_stricmp( eibd->extrainfo, extrainfo ) )
 			{
 				banking_mode = eibd->bank_mode;
 			}
@@ -675,7 +675,7 @@ static void mode3E_RAM_switch(running_machine *machine, UINT16 offset, UINT8 dat
 static void modeFV_switch(running_machine *machine, UINT16 offset, UINT8 data)
 {
 	//printf("ModeFV %04x\n",offset);
-	if (!FVlocked && ( cpu_get_pc(cputag_get_cpu(machine, "maincpu")) & 0x1F00 ) == 0x1F00 ) 
+	if (!FVlocked && ( cpu_get_pc(cputag_get_cpu(machine, "maincpu")) & 0x1F00 ) == 0x1F00 )
 	{
 		FVlocked = 1;
 		current_bank = current_bank ^ 0x01;
@@ -685,7 +685,7 @@ static void modeFV_switch(running_machine *machine, UINT16 offset, UINT8 data)
 }
 static void modeJVP_switch(running_machine *machine, UINT16 offset, UINT8 data)
 {
-	switch( offset ) 
+	switch( offset )
 	{
 	case 0x00:
 	case 0x20:
@@ -726,9 +726,9 @@ static WRITE8_HANDLER(modeUA_switch_w) { modeUA_switch(space->machine, offset, d
 static WRITE8_HANDLER(modeDC_switch_w) { modeDC_switch(space->machine, offset, data); }
 static WRITE8_HANDLER(mode3E_switch_w) { mode3E_switch(space->machine, offset, data); }
 static WRITE8_HANDLER(mode3E_RAM_switch_w) { mode3E_RAM_switch(space->machine, offset, data); }
-static WRITE8_HANDLER(mode3E_RAM_w) 
+static WRITE8_HANDLER(mode3E_RAM_w)
 {
-	if ( mode3E_ram_enabled ) 
+	if ( mode3E_ram_enabled )
 	{
 		ram_base[offset] = data;
 	}
@@ -739,7 +739,7 @@ static WRITE8_HANDLER(modeJVP_switch_w) { modeJVP_switch(space->machine, offset,
 
 static DIRECT_UPDATE_HANDLER( modeF6_opbase )
 {
-	if ( ( address & 0x1FFF ) >= 0x1FF6 && ( address & 0x1FFF ) <= 0x1FF9 ) 
+	if ( ( address & 0x1FFF ) >= 0x1FF6 && ( address & 0x1FFF ) <= 0x1FF9 )
 	{
 		modeF6_switch_w( space, ( address & 0x1FFF ) - 0x1FF6, 0 );
 	}
@@ -748,17 +748,17 @@ static DIRECT_UPDATE_HANDLER( modeF6_opbase )
 
 static DIRECT_UPDATE_HANDLER( modeSS_opbase )
 {
-	if ( address & 0x1000 ) 
+	if ( address & 0x1000 )
 	{
 		direct->bytemask = 0x7ff;
 		direct->bytestart = ( address & 0xf800 );
 		direct->byteend = ( address & 0xf800 ) | 0x7ff;
-		if ( address & 0x800 ) 
+		if ( address & 0x800 )
 		{
 			direct->decrypted = bank_base[2];
 			direct->raw = bank_base[2];
-		} 
-		else 
+		}
+		else
 		{
 			direct->decrypted = bank_base[1];
 			direct->raw = bank_base[1];
@@ -774,12 +774,12 @@ static READ8_HANDLER(modeSS_r)
 
 	//logerror("%04X: read from modeSS area offset = %04X\n", cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")), offset);
 	/* Check for control register "write" */
-	if ( offset == 0xFF8 ) 
+	if ( offset == 0xFF8 )
 	{
 		//logerror("%04X: write to modeSS control register data = %02X\n", cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")), modeSS_byte);
 		modeSS_write_enabled = modeSS_byte & 0x02;
 		modeSS_write_delay = modeSS_byte >> 5;
-		switch ( modeSS_byte & 0x1C ) 
+		switch ( modeSS_byte & 0x1C )
 		{
 		case 0x00:
 			bank_base[1] = extra_RAM + 2 * 0x800;
@@ -826,69 +826,69 @@ static READ8_HANDLER(modeSS_r)
 		memory_set_bankptr(space->machine, 2, bank_base[2] );
 
 		/* Check if we should stop the tape */
-		if ( cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")) == 0x00FD ) 
+		if ( cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")) == 0x00FD )
 		{
 			const device_config *img = devtag_get_device(space->machine, "cassette");
-			if ( img ) 
+			if ( img )
 			{
 				cassette_change_state(img, CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 			}
 		}
-	} 
-	else if ( offset == 0xFF9 ) 
+	}
+	else if ( offset == 0xFF9 )
 	{
 		/* Cassette port read */
 		double tap_val = cassette_input( devtag_get_device(space->machine, "cassette") );
 		//logerror("%04X: Cassette port read, tap_val = %f\n", cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")), tap_val);
-		if ( tap_val < 0 ) 
+		if ( tap_val < 0 )
 		{
 			data = 0x00;
-		} 
-		else 
+		}
+		else
 		{
 			data = 0x01;
 		}
-	} 
-	else 
+	}
+	else
 	{
 		/* Possible RAM write */
-		if ( modeSS_write_enabled ) 
+		if ( modeSS_write_enabled )
 		{
 			int diff = cputag_get_total_cycles(space->machine, "maincpu") - modeSS_byte_started;
 			//logerror("%04X: offset = %04X, %d\n", cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")), offset, diff);
-			if ( diff - modeSS_diff_adjust == 5 ) 
+			if ( diff - modeSS_diff_adjust == 5 )
 			{
 				//logerror("%04X: RAM write offset = %04X, data = %02X\n", cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")), offset, modeSS_byte );
-				if ( offset & 0x800 ) 
+				if ( offset & 0x800 )
 				{
-					if ( modeSS_high_ram_enabled ) 
+					if ( modeSS_high_ram_enabled )
 					{
 						bank_base[2][offset & 0x7FF] = modeSS_byte;
 						data = modeSS_byte;
 					}
-				} 
-				else 
+				}
+				else
 				{
 					bank_base[1][offset] = modeSS_byte;
 					data = modeSS_byte;
 				}
-			} 
-			else if ( offset < 0x0100 ) 
+			}
+			else if ( offset < 0x0100 )
 			{
 				modeSS_byte = offset;
 				modeSS_byte_started = cputag_get_total_cycles(space->machine, "maincpu");
 			}
 			/* Check for dummy read from same address */
-			if ( diff == 2 ) 
+			if ( diff == 2 )
 			{
 				modeSS_diff_adjust = 1;
-			} 
-			else 
+			}
+			else
 			{
 				modeSS_diff_adjust = 0;
 			}
-		} 
-		else if ( offset < 0x0100 ) 
+		}
+		else if ( offset < 0x0100 )
 		{
 			modeSS_byte = offset;
 			modeSS_byte_started = cputag_get_total_cycles(space->machine, "maincpu");
@@ -896,34 +896,34 @@ static READ8_HANDLER(modeSS_r)
 	}
 	/* Because the mame core caches opcode data and doesn't perform reads like normal */
 	/* we have to put in this little hack here to get Suicide Mission to work. */
-	if ( offset != 0xFF8 && ( cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")) & 0x1FFF ) == 0x1FF8 ) 
+	if ( offset != 0xFF8 && ( cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")) & 0x1FFF ) == 0x1FF8 )
 	{
 		modeSS_r( space, 0xFF8 );
 	}
 	return data;
 }
 
-INLINE void modeDPC_check_flag(UINT8 data_fetcher) 
+INLINE void modeDPC_check_flag(UINT8 data_fetcher)
 {
 	/* Set flag when low counter equals top */
-	if ( dpc.df[data_fetcher].low == dpc.df[data_fetcher].top ) 
+	if ( dpc.df[data_fetcher].low == dpc.df[data_fetcher].top )
 	{
 		dpc.df[data_fetcher].flag = 1;
 	}
 	/* Reset flag when low counter equals bottom */
-	if ( dpc.df[data_fetcher].low == dpc.df[data_fetcher].bottom ) 
+	if ( dpc.df[data_fetcher].low == dpc.df[data_fetcher].bottom )
 	{
 		dpc.df[data_fetcher].flag = 0;
 	}
 }
 
-INLINE void modeDPC_decrement_counter(UINT8 data_fetcher) 
+INLINE void modeDPC_decrement_counter(UINT8 data_fetcher)
 {
 	dpc.df[data_fetcher].low -= 1;
-	if ( dpc.df[data_fetcher].low == 0xFF ) 
+	if ( dpc.df[data_fetcher].low == 0xFF )
 	{
 		dpc.df[data_fetcher].high -= 1;
-		if ( data_fetcher > 4 && dpc.df[data_fetcher].music_mode ) 
+		if ( data_fetcher > 4 && dpc.df[data_fetcher].music_mode )
 		{
 			dpc.df[data_fetcher].low = dpc.df[data_fetcher].top;
 		}
@@ -935,9 +935,9 @@ INLINE void modeDPC_decrement_counter(UINT8 data_fetcher)
 static TIMER_CALLBACK(modeDPC_timer_callback)
 {
 	int data_fetcher;
-	for( data_fetcher = 5; data_fetcher < 8; data_fetcher++ ) 
+	for( data_fetcher = 5; data_fetcher < 8; data_fetcher++ )
 	{
-		if ( dpc.df[data_fetcher].osc_clk ) 
+		if ( dpc.df[data_fetcher].osc_clk )
 		{
 			modeDPC_decrement_counter( data_fetcher );
 		}
@@ -961,9 +961,9 @@ static READ8_HANDLER(modeDPC_r)
 	UINT8	data = 0xFF;
 
 	logerror("%04X: Read from DPC offset $%02X\n", cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")), offset);
-	if ( offset < 0x08 ) 
+	if ( offset < 0x08 )
 	{
-		switch( offset & 0x06 ) 
+		switch( offset & 0x06 )
 		{
 		case 0x00:		/* Random number generator */
 		case 0x02:
@@ -974,26 +974,26 @@ static READ8_HANDLER(modeDPC_r)
 			dpc.latch_64 = dpc.latch_62 + dpc.df[4].top;
 			dpc.dlc = ( dpc.latch_62 + dpc.df[4].top > 0xFF ) ? 1 : 0;
 			data = 0;
-			if ( dpc.df[5].music_mode && dpc.df[5].flag ) 
+			if ( dpc.df[5].music_mode && dpc.df[5].flag )
 			{
 				data |= 0x01;
 			}
-			if ( dpc.df[6].music_mode && dpc.df[6].flag ) 
+			if ( dpc.df[6].music_mode && dpc.df[6].flag )
 			{
 				data |= 0x02;
 			}
-			if ( dpc.df[7].music_mode && dpc.df[7].flag ) 
+			if ( dpc.df[7].music_mode && dpc.df[7].flag )
 			{
 				data |= 0x04;
 			}
 			return ( dpc.dlc ? dpc.movamt & 0xF0 : 0 ) | dpc_amplitude[data];
 		}
-	} 
-	else 
+	}
+	else
 	{
 		UINT8	display_data = memory_region(space->machine, "user1")[0x2000 + ( ~ ( ( dpc.df[data_fetcher].low | ( dpc.df[data_fetcher].high << 8 ) ) ) & 0x7FF ) ];
 
-		switch( offset & 0x38 ) 
+		switch( offset & 0x38 )
 		{
 		case 0x08:			/* display data */
 			data = display_data;
@@ -1018,7 +1018,7 @@ static READ8_HANDLER(modeDPC_r)
 			break;
 		}
 
-		if ( data_fetcher < 5 || ! dpc.df[data_fetcher].osc_clk ) 
+		if ( data_fetcher < 5 || ! dpc.df[data_fetcher].osc_clk )
 		{
 			modeDPC_decrement_counter( data_fetcher );
 		}
@@ -1030,7 +1030,7 @@ static WRITE8_HANDLER(modeDPC_w)
 {
 	UINT8	data_fetcher = offset & 0x07;
 
-	switch( offset & 0x38 ) 
+	switch( offset & 0x38 )
 	{
 	case 0x00:			/* Top count */
 		dpc.df[data_fetcher].top = data;
@@ -1043,11 +1043,11 @@ static WRITE8_HANDLER(modeDPC_w)
 		break;
 	case 0x10:			/* Counter low */
 		dpc.df[data_fetcher].low = data;
-		if ( data_fetcher == 4 ) 
+		if ( data_fetcher == 4 )
 		{
 			dpc.latch_64 = data;
 		}
-		if ( data_fetcher > 4 && dpc.df[data_fetcher].music_mode ) 
+		if ( data_fetcher > 4 && dpc.df[data_fetcher].music_mode )
 		{
 			dpc.df[data_fetcher].low = dpc.df[data_fetcher].top;
 		}
@@ -1057,7 +1057,7 @@ static WRITE8_HANDLER(modeDPC_w)
 		dpc.df[data_fetcher].high = data;
 		dpc.df[data_fetcher].music_mode = data & 0x10;
 		dpc.df[data_fetcher].osc_clk = data & 0x20;
-		if ( data_fetcher > 4 && dpc.df[data_fetcher].music_mode && dpc.df[data_fetcher].low == 0xFF ) 
+		if ( data_fetcher > 4 && dpc.df[data_fetcher].music_mode && dpc.df[data_fetcher].low == 0xFF )
 		{
 			dpc.df[data_fetcher].low = dpc.df[data_fetcher].top;
 			modeDPC_check_flag( data_fetcher );
@@ -1153,13 +1153,13 @@ static WRITE8_DEVICE_HANDLER(switch_A_w)
 	running_machine *machine = device->machine;
 
 	/* Left controller port */
-	if ( input_port_read(machine, "CONTROLLERS") / CATEGORY_SELECT == 0x03 ) 
+	if ( input_port_read(machine, "CONTROLLERS") / CATEGORY_SELECT == 0x03 )
 	{
 		keypad_left_column = data / 16;
 	}
 
 	/* Right controller port */
-	switch( input_port_read(machine, "CONTROLLERS") % CATEGORY_SELECT ) 
+	switch( input_port_read(machine, "CONTROLLERS") % CATEGORY_SELECT )
 	{
 	case 0x03:	/* Keypad */
 		keypad_right_column = data & 0x0F;
@@ -1177,7 +1177,7 @@ static READ8_DEVICE_HANDLER( switch_A_r )
 	UINT8 val = 0;
 
 	/* Left controller port PINs 1-4 ( 4321 ) */
-	switch( input_port_read(machine, "CONTROLLERS") / CATEGORY_SELECT ) 
+	switch( input_port_read(machine, "CONTROLLERS") / CATEGORY_SELECT )
 	{
 	case 0x00:  /* Joystick */
 	case 0x05:	/* Joystick w/Boostergrip */
@@ -1199,7 +1199,7 @@ static READ8_DEVICE_HANDLER( switch_A_r )
 	}
 
 	/* Right controller port PINs 1-4 ( 4321 ) */
-	switch( input_port_read(machine, "CONTROLLERS") % CATEGORY_SELECT ) 
+	switch( input_port_read(machine, "CONTROLLERS") % CATEGORY_SELECT )
 	{
 	case 0x00:	/* Joystick */
 	case 0x05:	/* Joystick w/Boostergrip */
@@ -1270,29 +1270,29 @@ static void install_banks(running_machine *machine, int count, unsigned init)
 	}
 }
 
-static READ16_HANDLER(a2600_read_input_port) 
+static READ16_HANDLER(a2600_read_input_port)
 {
 	int i;
 
-	switch( offset ) 
+	switch( offset )
 	{
 	case 0:	/* Left controller port PIN 5 */
-		switch ( input_port_read(space->machine, "CONTROLLERS") / CATEGORY_SELECT ) 
+		switch ( input_port_read(space->machine, "CONTROLLERS") / CATEGORY_SELECT )
 		{
 		case 0x00:	/* Joystick */
 			return TIA_INPUT_PORT_ALWAYS_OFF;
 		case 0x01:	/* Paddle */
 			return input_port_read(space->machine, "PADDLE1");
 		case 0x03:	/* Keypad */
-			for ( i = 0; i < 4; i++ ) 
+			for ( i = 0; i < 4; i++ )
 			{
-				if ( ! ( ( keypad_left_column >> i ) & 0x01 ) ) 
+				if ( ! ( ( keypad_left_column >> i ) & 0x01 ) )
 				{
-					if ( ( input_port_read(space->machine, "KEYPAD_L") >> 3*i ) & 0x01 ) 
+					if ( ( input_port_read(space->machine, "KEYPAD_L") >> 3*i ) & 0x01 )
 					{
 						return TIA_INPUT_PORT_ALWAYS_ON;
-					} 
-					else 
+					}
+					else
 					{
 						return TIA_INPUT_PORT_ALWAYS_OFF;
 					}
@@ -1306,22 +1306,22 @@ static READ16_HANDLER(a2600_read_input_port)
 		}
 		break;
 	case 1:	/* Right controller port PIN 5 */
-		switch ( input_port_read(space->machine, "CONTROLLERS") / CATEGORY_SELECT ) 
+		switch ( input_port_read(space->machine, "CONTROLLERS") / CATEGORY_SELECT )
 		{
 		case 0x00:	/* Joystick */
 			return TIA_INPUT_PORT_ALWAYS_OFF;
 		case 0x01:	/* Paddle */
 			return input_port_read(space->machine, "PADDLE3");
 		case 0x03:	/* Keypad */
-			for ( i = 0; i < 4; i++ ) 
+			for ( i = 0; i < 4; i++ )
 			{
-				if ( ! ( ( keypad_left_column >> i ) & 0x01 ) ) 
+				if ( ! ( ( keypad_left_column >> i ) & 0x01 ) )
 				{
-					if ( ( input_port_read(space->machine, "KEYPAD_L") >> 3*i ) & 0x02 ) 
+					if ( ( input_port_read(space->machine, "KEYPAD_L") >> 3*i ) & 0x02 )
 					{
 						return TIA_INPUT_PORT_ALWAYS_ON;
-					} 
-					else 
+					}
+					else
 					{
 						return TIA_INPUT_PORT_ALWAYS_OFF;
 					}
@@ -1335,22 +1335,22 @@ static READ16_HANDLER(a2600_read_input_port)
 		}
 		break;
 	case 2:	/* Left controller port PIN 9 */
-		switch ( input_port_read(space->machine, "CONTROLLERS") % CATEGORY_SELECT ) 
+		switch ( input_port_read(space->machine, "CONTROLLERS") % CATEGORY_SELECT )
 		{
 		case 0x00:	/* Joystick */
 			return TIA_INPUT_PORT_ALWAYS_OFF;
 		case 0x01:	/* Paddle */
 			return input_port_read(space->machine, "PADDLE2");
 		case 0x03:	/* Keypad */
-			for ( i = 0; i < 4; i++ ) 
+			for ( i = 0; i < 4; i++ )
 			{
-				if ( ! ( ( keypad_right_column >> i ) & 0x01 ) ) 
+				if ( ! ( ( keypad_right_column >> i ) & 0x01 ) )
 				{
-					if ( ( input_port_read(space->machine, "KEYPAD_R") >> 3*i ) & 0x01 ) 
+					if ( ( input_port_read(space->machine, "KEYPAD_R") >> 3*i ) & 0x01 )
 					{
 						return TIA_INPUT_PORT_ALWAYS_ON;
-					} 
-					else 
+					}
+					else
 					{
 						return TIA_INPUT_PORT_ALWAYS_OFF;
 					}
@@ -1364,22 +1364,22 @@ static READ16_HANDLER(a2600_read_input_port)
 		}
 		break;
 	case 3:	/* Right controller port PIN 9 */
-		switch ( input_port_read(space->machine, "CONTROLLERS") % CATEGORY_SELECT ) 
+		switch ( input_port_read(space->machine, "CONTROLLERS") % CATEGORY_SELECT )
 		{
 		case 0x00:	/* Joystick */
 			return TIA_INPUT_PORT_ALWAYS_OFF;
 		case 0x01:	/* Paddle */
 			return input_port_read(space->machine, "PADDLE4");
 		case 0x03:	/* Keypad */
-			for ( i = 0; i < 4; i++ ) 
+			for ( i = 0; i < 4; i++ )
 			{
-				if ( ! ( ( keypad_right_column >> i ) & 0x01 ) ) 
+				if ( ! ( ( keypad_right_column >> i ) & 0x01 ) )
 				{
-					if ( ( input_port_read(space->machine, "KEYPAD_R") >> 3*i ) & 0x02 ) 
+					if ( ( input_port_read(space->machine, "KEYPAD_R") >> 3*i ) & 0x02 )
 					{
 						return TIA_INPUT_PORT_ALWAYS_ON;
-					} 
-					else 
+					}
+					else
 					{
 						return TIA_INPUT_PORT_ALWAYS_OFF;
 					}
@@ -1393,7 +1393,7 @@ static READ16_HANDLER(a2600_read_input_port)
 		}
 		break;
 	case 4:	/* Left controller port PIN 6 */
-		switch ( input_port_read(space->machine, "CONTROLLERS") / CATEGORY_SELECT ) 
+		switch ( input_port_read(space->machine, "CONTROLLERS") / CATEGORY_SELECT )
 		{
 		case 0x00:	/* Joystick */
 		case 0x05:	/* Joystick w/Boostergrip */
@@ -1403,15 +1403,15 @@ static READ16_HANDLER(a2600_read_input_port)
 		case 0x02:	/* Driving */
 			return input_port_read(space->machine, "BUTTONS_L") << 3;
 		case 0x03:	/* Keypad */
-			for ( i = 0; i < 4; i++ ) 
+			for ( i = 0; i < 4; i++ )
 			{
-				if ( ! ( ( keypad_left_column >> i ) & 0x01 ) ) 
+				if ( ! ( ( keypad_left_column >> i ) & 0x01 ) )
 				{
-					if ( ( input_port_read(space->machine, "KEYPAD_L") >> 3*i ) & 0x04 ) 
+					if ( ( input_port_read(space->machine, "KEYPAD_L") >> 3*i ) & 0x04 )
 					{
 						return 0xff;
-					} 
-					else 
+					}
+					else
 					{
 						return 0x00;
 					}
@@ -1425,7 +1425,7 @@ static READ16_HANDLER(a2600_read_input_port)
 		}
 		break;
 	case 5:	/* Right controller port PIN 6 */
-		switch ( input_port_read(space->machine, "CONTROLLERS") % CATEGORY_SELECT ) 
+		switch ( input_port_read(space->machine, "CONTROLLERS") % CATEGORY_SELECT )
 		{
 		case 0x00:	/* Joystick */
 		case 0x05:	/* Joystick w/Boostergrip */
@@ -1435,15 +1435,15 @@ static READ16_HANDLER(a2600_read_input_port)
 		case 0x02:	/* Driving */
 			return input_port_read(space->machine, "BUTTONS_R") << 3;
 		case 0x03:	/* Keypad */
-			for ( i = 0; i < 4; i++ ) 
+			for ( i = 0; i < 4; i++ )
 			{
-				if ( ! ( ( keypad_right_column >> i ) & 0x01 ) ) 
+				if ( ! ( ( keypad_right_column >> i ) & 0x01 ) )
 				{
-					if ( ( input_port_read(space->machine, "KEYPAD_R") >> 3*i ) & 0x04 ) 
+					if ( ( input_port_read(space->machine, "KEYPAD_R") >> 3*i ) & 0x04 )
 					{
 						return 0xff;
-					} 
-					else 
+					}
+					else
 					{
 						return 0x00;
 					}
@@ -1468,28 +1468,28 @@ static READ16_HANDLER(a2600_read_input_port)
    Q-Bert's Qubes (NTSC,F6) at 0x1594
    Berzerk at 0xF093.
 */
-static READ8_HANDLER(a2600_get_databus_contents) 
+static READ8_HANDLER(a2600_get_databus_contents)
 {
 	UINT16	last_address, prev_address;
 	UINT8	last_byte, prev_byte;
 
 	last_address = cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")) - 1;
-	if ( ! ( last_address & 0x1080 ) ) 
+	if ( ! ( last_address & 0x1080 ) )
 	{
 		return offset;
 	}
 	last_byte = memory_read_byte(space,  last_address );
-	if ( last_byte < 0x80 || last_byte == 0xFF ) 
+	if ( last_byte < 0x80 || last_byte == 0xFF )
 	{
 		return last_byte;
 	}
 	prev_address = last_address - 1;
-	if ( ! ( prev_address & 0x1080 ) ) 
+	if ( ! ( prev_address & 0x1080 ) )
 	{
 		return last_byte;
 	}
 	prev_byte = memory_read_byte(space,  prev_address );
-	if ( prev_byte == 0xB1 ) 
+	if ( prev_byte == 0xB1 )
 	{	/* LDA (XX),Y */
 		return memory_read_byte(space,  last_byte + 1 );
 	}
@@ -1503,15 +1503,15 @@ static const rectangle visarea[4] = {
 	{ 26, 26 + 160 + 16, 48, 48 + 240 + 31 }	/* 342 */
 };
 
-static WRITE16_HANDLER( a2600_tia_vsync_callback ) 
+static WRITE16_HANDLER( a2600_tia_vsync_callback )
 {
 	int i;
 
-	for ( i = 0; i < sizeof( supported_screen_heights ) / sizeof( supported_screen_heights[0] ); i++ ) 
+	for ( i = 0; i < sizeof( supported_screen_heights ) / sizeof( supported_screen_heights[0] ); i++ )
 	{
-		if ( data >= supported_screen_heights[i] - 3 && data <= supported_screen_heights[i] + 3 ) 
+		if ( data >= supported_screen_heights[i] - 3 && data <= supported_screen_heights[i] + 3 )
 		{
-			if ( supported_screen_heights[i] != current_screen_height ) 
+			if ( supported_screen_heights[i] != current_screen_height )
 			{
 				current_screen_height = supported_screen_heights[i];
 //              video_screen_configure( machine->primary_screen, 228, current_screen_height, &visarea[i], HZ_TO_ATTOSECONDS( MASTER_CLOCK_NTSC ) * 228 * current_screen_height );
@@ -1520,15 +1520,15 @@ static WRITE16_HANDLER( a2600_tia_vsync_callback )
 	}
 }
 
-static WRITE16_HANDLER( a2600_tia_vsync_callback_pal ) 
+static WRITE16_HANDLER( a2600_tia_vsync_callback_pal )
 {
 	int i;
 
-	for ( i = 0; i < sizeof( supported_screen_heights ) / sizeof( supported_screen_heights[0] ); i++ ) 
+	for ( i = 0; i < sizeof( supported_screen_heights ) / sizeof( supported_screen_heights[0] ); i++ )
 	{
-		if ( data >= supported_screen_heights[i] - 3 && data <= supported_screen_heights[i] + 3 ) 
+		if ( data >= supported_screen_heights[i] - 3 && data <= supported_screen_heights[i] + 3 )
 		{
-			if ( supported_screen_heights[i] != current_screen_height ) 
+			if ( supported_screen_heights[i] != current_screen_height )
 			{
 				current_screen_height = supported_screen_heights[i];
 //              video_screen_configure( machine->primary_screen, 228, current_screen_height, &visarea[i], HZ_TO_ATTOSECONDS( MASTER_CLOCK_PAL ) * 228 * current_screen_height );
@@ -1571,20 +1571,20 @@ static MACHINE_START( a2600p )
 	current_reset_bank_counter = 0xFF;
 }
 
-static void set_category_value( running_machine *machine, const char* cat, const char *cat_selection ) 
+static void set_category_value( running_machine *machine, const char* cat, const char *cat_selection )
 {
 	/* NPW 22-May-2008 - FIXME */
 #if 0
 	input_port_entry	*cat_in = NULL;
 	input_port_entry	*in;
 
-	for( in = machine->input_ports; in->type != IPT_END; in++ ) 
+	for( in = machine->input_ports; in->type != IPT_END; in++ )
 	{
-		if ( in->type == IPT_CATEGORY_NAME && ! mame_stricmp( cat, input_port_name(in) ) ) 
+		if ( in->type == IPT_CATEGORY_NAME && ! mame_stricmp( cat, input_port_name(in) ) )
 		{
 			cat_in = in;
 		}
-		if ( cat_in && in->type == IPT_CATEGORY_SETTING && ! mame_stricmp( cat_selection, input_port_name(in) ) ) 
+		if ( cat_in && in->type == IPT_CATEGORY_SETTING && ! mame_stricmp( cat_selection, input_port_name(in) ) )
 		{
 			cat_in->default_value = in->default_value;
 			return;
@@ -1593,13 +1593,13 @@ static void set_category_value( running_machine *machine, const char* cat, const
 #endif
 }
 
-static void set_controller( running_machine *machine, const char *controller, unsigned int selection ) 
+static void set_controller( running_machine *machine, const char *controller, unsigned int selection )
 {
 	/* Defaulting to only joystick when joysstick and paddle are set for now... */
 	if ( selection == JOYS + PADD )
 		selection = JOYS;
 
-	switch( selection ) 
+	switch( selection )
 	{
 	case JOYS:	set_category_value( machine, controller, "Joystick" ); break;
 	case PADD:	set_category_value( machine, controller, STR_PADDLES ); break;
@@ -1645,7 +1645,7 @@ static MACHINE_RESET( a2600 )
 	if (banking_mode == 0xff) if (detect_32K_mode3F(machine)) banking_mode = mode3F;
 	if (banking_mode == 0xff) if (detect_modeE7(machine)) banking_mode = modeE7;
 
-	if (banking_mode == 0xff) 
+	if (banking_mode == 0xff)
 	{
 		switch (cart_size)
 		{
@@ -1708,11 +1708,11 @@ static MACHINE_RESET( a2600 )
 		break;
 
 	case modeF8:
-		if (!memcmp(&CART[0x1ffc],snowwhite,sizeof(snowwhite))) 
+		if (!memcmp(&CART[0x1ffc],snowwhite,sizeof(snowwhite)))
 		{
 			install_banks(machine, 1, 0x0000);
-		} 
-		else 
+		}
+		else
 		{
 			install_banks(machine, 1, 0x1000);
 		}
@@ -1890,7 +1890,7 @@ static MACHINE_RESET( a2600 )
 		memory_set_direct_update_handler(space, modeDPC_opbase_handler );
 		{
 			int	data_fetcher;
-			for( data_fetcher = 0; data_fetcher < 8; data_fetcher++ ) 
+			for( data_fetcher = 0; data_fetcher < 8; data_fetcher++ )
 			{
 				dpc.df[data_fetcher].osc_clk = 0;
 				dpc.df[data_fetcher].flag = 0;

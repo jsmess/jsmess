@@ -17,13 +17,13 @@
     Kevin Thacker [MESS driver]
 
 
-	TODO:
+    TODO:
 
-		- There are 3 different 64K RAM expansions, Masterchess checks
-		  for all of them
-		- Serial interface SI-5
-		- Floppy interface ROM isn't dumped
-		- Interrupts are wrong
+        - There are 3 different 64K RAM expansions, Masterchess checks
+          for all of them
+        - Serial interface SI-5
+        - Floppy interface ROM isn't dumped
+        - Interrupts are wrong
 
  ******************************************************************************/
 
@@ -590,7 +590,7 @@ static MACHINE_DRIVER_START( sord_m5_fd5 )
 
 	MDRV_QUANTUM_TIME(HZ(1200))
 	MDRV_MACHINE_RESET(sord_m5_fd5)
-	
+
 	MDRV_FLOPPY_4_DRIVES_ADD(sordm5_floppy_config)
 MACHINE_DRIVER_END
 

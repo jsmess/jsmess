@@ -1,15 +1,15 @@
 /*
-	header file for machine/99_peb.c
+    header file for machine/99_peb.c
 */
 
 /*
-	prototype for CRU handlers in expansion system
+    prototype for CRU handlers in expansion system
 */
 typedef int (*cru_read_handler)(running_machine *machine, int offset);
 typedef void (*cru_write_handler)(running_machine *machine, int offset, int data);
 
 /*
-	Descriptor for TI peripheral expansion cards (8-bit bus)
+    Descriptor for TI peripheral expansion cards (8-bit bus)
 */
 typedef struct ti99_peb_card_handlers_t
 {
@@ -21,9 +21,9 @@ typedef struct ti99_peb_card_handlers_t
 } ti99_peb_card_handlers_t;
 
 /*
-	Descriptor for 16-bit peripheral expansion cards designed for the snug
-	sgcpu 99/4p system.  (These cards were not designed by TI, TI always
-	regarded the ti-99 as an 8-bit system.)
+    Descriptor for 16-bit peripheral expansion cards designed for the snug
+    sgcpu 99/4p system.  (These cards were not designed by TI, TI always
+    regarded the ti-99 as an 8-bit system.)
 */
 typedef struct ti99_peb_16bit_card_handlers_t
 {
@@ -44,7 +44,7 @@ enum
 	inta_rs232_4_bit = 7-5,
 
 	/* extra "virtual" bits for devices that assert the INTA line without
-	setting a bit of the ILA register */
+    setting a bit of the ILA register */
 	inta_ide_bit     = 8,
 	inta_ide_clk_bit = 9,
 

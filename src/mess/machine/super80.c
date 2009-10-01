@@ -9,10 +9,10 @@
 #include "super80.h"
 
 /* Bits in shared variable:
-	d5 cassette LED
-	d4 super80v rom or pcg bankswitch (1=pcg ram, 0=char gen rom)
-	d2 super80v video or colour bankswitch (1=video ram, 0=colour ram)
-	d2 super80 screen off (=2mhz) or on (bursts of 2mhz at 50hz = 1mhz) */
+    d5 cassette LED
+    d4 super80v rom or pcg bankswitch (1=pcg ram, 0=char gen rom)
+    d2 super80v video or colour bankswitch (1=video ram, 0=colour ram)
+    d2 super80 screen off (=2mhz) or on (bursts of 2mhz at 50hz = 1mhz) */
 
 UINT8 super80_shared=0xff;
 
@@ -83,23 +83,23 @@ static void super80_cassette_motor( running_machine *machine, UINT8 data )
 
 static UINT8 cass_data[]={ 0, 0, 0, 0 };
 
-	/* this timer runs at 200khz and does 2 jobs:  
-	1. Scan the keyboard and present the results to the pio  
-	2. Emulate the 2 chips in the cassette input circuit  
+	/* this timer runs at 200khz and does 2 jobs:
+    1. Scan the keyboard and present the results to the pio
+    2. Emulate the 2 chips in the cassette input circuit
 
-	Reasons why it is necessary:  
-	1. The real z80pio is driven by the cpu clock and is capable of independent actions.  
-	MAME does not support this at all. If the interrupt key sequence is entered, the  
-	computer can be reset out of a hung state by the operator.  
-	2. This "emulates" U79 CD4046BCN PLL chip and U1 LM311P op-amp. U79 converts a frequency to a voltage,  
-	and U1 amplifies that voltage to digital levels. U1 has a trimpot connected, to set the midpoint.
+    Reasons why it is necessary:
+    1. The real z80pio is driven by the cpu clock and is capable of independent actions.
+    MAME does not support this at all. If the interrupt key sequence is entered, the
+    computer can be reset out of a hung state by the operator.
+    2. This "emulates" U79 CD4046BCN PLL chip and U1 LM311P op-amp. U79 converts a frequency to a voltage,
+    and U1 amplifies that voltage to digital levels. U1 has a trimpot connected, to set the midpoint.
 
-	The MDS homebrew input circuit consists of 2 op-amps followed by a D-flipflop.
-	My "read-any-system" cassette circuit was a CA3140 op-amp, the smarts being done in software.
+    The MDS homebrew input circuit consists of 2 op-amps followed by a D-flipflop.
+    My "read-any-system" cassette circuit was a CA3140 op-amp, the smarts being done in software.
 
-	bit 0 = original system (U79 and U1)
-	bit 1 = MDS fast system
-	bit 2 = CA3140 */
+    bit 0 = original system (U79 and U1)
+    bit 1 = MDS fast system
+    bit 2 = CA3140 */
 
 static TIMER_CALLBACK( super80_timer )
 {
@@ -158,13 +158,13 @@ static TIMER_CALLBACK( super80_halfspeed )
 /*************************************** PRINTER ********************************************************/
 
 /* The Super80 had an optional I/O card that plugged into the S-100 slot. The card had facility for running
-	an 8-bit Centronics printer, and a serial device at 300, 600, or 1200 baud. The I/O address range
-	was selectable via 4 dipswitches. The serial parameters (baud rate, parity, stop bits, etc) was
-	chosen with more dipswitches. Regretably, no parameters could be set by software. Currently, the
-	Centronics printer is emulated; the serial side of things may be done later, as will the dipswitches.
+    an 8-bit Centronics printer, and a serial device at 300, 600, or 1200 baud. The I/O address range
+    was selectable via 4 dipswitches. The serial parameters (baud rate, parity, stop bits, etc) was
+    chosen with more dipswitches. Regretably, no parameters could be set by software. Currently, the
+    Centronics printer is emulated; the serial side of things may be done later, as will the dipswitches.
 
-	The most commonly used I/O range is DC-DE (DC = centronics, DD = serial data, DE = serial control
-	All the home-brew roms use this, except for super80e which uses BC-BE (which we don't support yet). */
+    The most commonly used I/O range is DC-DE (DC = centronics, DD = serial data, DE = serial control
+    All the home-brew roms use this, except for super80e which uses BC-BE (which we don't support yet). */
 
 /**************************** I/O PORTS *****************************************************************/
 
@@ -173,7 +173,7 @@ READ8_HANDLER( super80_dc_r )
 	UINT8 data=0x7f;
 
 	/* bit 7 = printer busy
-	0 = printer is not busy */
+    0 = printer is not busy */
 
 	data |= centronics_busy_r(super80_printer) << 7;
 

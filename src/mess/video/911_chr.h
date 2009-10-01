@@ -1,42 +1,42 @@
 /*
-	911_chr.h: character definitions for 911_vdt.c
+    911_chr.h: character definitions for 911_vdt.c
 
-	We define the character matrix for each character.
+    We define the character matrix for each character.
 
-	The US terminal uses the standard 7-bit ASCII character set, with
-	additional graphic characters in the 32 first positions.
+    The US terminal uses the standard 7-bit ASCII character set, with
+    additional graphic characters in the 32 first positions.
 
-	The various European terminals use variants of the 7-bit ASCII character
-	set with national characters instead of various punctuation characters.
-	I think these national character sets were standardized at a point, but
-	I don't know how close to this standard the character sets used by the
-	911 VDT are.
+    The various European terminals use variants of the 7-bit ASCII character
+    set with national characters instead of various punctuation characters.
+    I think these national character sets were standardized at a point, but
+    I don't know how close to this standard the character sets used by the
+    911 VDT are.
 
-	The japanese terminal uses 8-bit character codes.  The 128 first characters
-	are identical to the US character set (except that '\' is replaced by the
-	Yen symbol), and the next 128 characters include the katakana syllabus.
-	Kanji ideograms are not supported in this scheme.
+    The japanese terminal uses 8-bit character codes.  The 128 first characters
+    are identical to the US character set (except that '\' is replaced by the
+    Yen symbol), and the next 128 characters include the katakana syllabus.
+    Kanji ideograms are not supported in this scheme.
 
-	The arabic terminal uses 8-bit character codes, too.  It requires
-	additional code in the TI990 OS for correct operation, as the keyboard
-	returns codes for isolated characters (i.e. without ligatures), which need
-	to be substituted with codes with correct context-dependent ligatures.
-	And both OS and application programs need to support the fact that the
-	writing direction can be either right-to-left or left-to-right, according
-	to whether the characters are latin or arabic.
+    The arabic terminal uses 8-bit character codes, too.  It requires
+    additional code in the TI990 OS for correct operation, as the keyboard
+    returns codes for isolated characters (i.e. without ligatures), which need
+    to be substituted with codes with correct context-dependent ligatures.
+    And both OS and application programs need to support the fact that the
+    writing direction can be either right-to-left or left-to-right, according
+    to whether the characters are latin or arabic.
 
-	As the original ROMs have not been dumped yet, I recreated the matrices
-	from various matrix printouts in TI documentation.
+    As the original ROMs have not been dumped yet, I recreated the matrices
+    from various matrix printouts in TI documentation.
 */
 /*
-	The arabic character set is not implemented, because documentation is ambiguous
-	(it says there are 115 characters, but I can hardly see 80 characters in the
-	attached table), and the character matrices are not documented.
+    The arabic character set is not implemented, because documentation is ambiguous
+    (it says there are 115 characters, but I can hardly see 80 characters in the
+    attached table), and the character matrices are not documented.
 */
 
 
 /*
-	Offsets in the char_defs array
+    Offsets in the char_defs array
 */
 enum
 {
@@ -147,7 +147,7 @@ static const char_override_t frenchWP_overrides[9] =
 };
 
 /*
-	char_defs array: character matrices for each character
+    char_defs array: character matrices for each character
 */
 static const UINT8 char_defs[char_defs_count][10] =
 {

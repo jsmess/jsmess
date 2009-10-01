@@ -7,10 +7,10 @@
 #include "utils.h"
 
 /*
-	SVI module
+    SVI module
 
-	SVI style .cas for the svi-318 and svi-328. Converts them to .wav files.
-	Uses the mess/formats/svi_cas.[ch] files, for the actual conversion.
+    SVI style .cas for the svi-318 and svi-328. Converts them to .wav files.
+    Uses the mess/formats/svi_cas.[ch] files, for the actual conversion.
 */
 
 typedef struct {

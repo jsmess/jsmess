@@ -2,7 +2,7 @@
 
   timex.c
 
-  Functions to emulate the video hardware of the Timex ZX Spectrum clones. 
+  Functions to emulate the video hardware of the Timex ZX Spectrum clones.
 
   Changes:
 

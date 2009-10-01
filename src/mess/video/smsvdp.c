@@ -1,7 +1,7 @@
 /*
-	For more information, please see:
-	- http://cgfm2.emuviews.com/txt/msvdp.txt
-	- http://www.smspower.org/forums/viewtopic.php?p=44198
+    For more information, please see:
+    - http://cgfm2.emuviews.com/txt/msvdp.txt
+    - http://www.smspower.org/forums/viewtopic.php?p=44198
 
 A scanline contains the following sections:
   - horizontal sync     1  ED      => HSYNC high/increment line counter/generate interrupts/etc
@@ -101,9 +101,9 @@ static struct _smsvdp
 	UINT8		*collision_buffer;
 
 	/* lineBuffer will be used to hold 5 lines of line data. Line #0 is the regular blitting area.
-	   Lines #1-#4 will be used as a kind of cache to be used for vertical scaling in the gamegear
-	   sms compatibility mode.
-	 */
+       Lines #1-#4 will be used as a kind of cache to be used for vertical scaling in the gamegear
+       sms compatibility mode.
+     */
 	int			*line_buffer;
 	int			current_palette[32];
 	void (*int_callback)(running_machine*,int);
@@ -150,19 +150,19 @@ static void set_display_settings( running_machine *machine )
 			smsvdp.vdp_mode = 0;
 		}
 		else
-//		if ( M1 && ! M2 && ! M3 )
-//		{
-//			smsvdp.vdp_mode = 1;
-//		}
-//		else
+//      if ( M1 && ! M2 && ! M3 )
+//      {
+//          smsvdp.vdp_mode = 1;
+//      }
+//      else
 		if ( ! M1 && M2 && ! M3 )
 		{
 			smsvdp.vdp_mode = 2;
-//		}
-//		else
-//		if ( ! M1 && ! M2 && M3 )
-//		{
-//			smsvdp.vdp_mode = 3;
+//      }
+//      else
+//      if ( ! M1 && ! M2 && M3 )
+//      {
+//          smsvdp.vdp_mode = 3;
 		}
 		else
 		{
@@ -218,9 +218,9 @@ int smsvdp_video_init( running_machine *machine, const smsvdp_configuration *con
 	smsvdp.int_callback = config->int_callback;
 
 	/* Allocate video RAM
-	   In theory the driver could have a "gfx1" and/or "gfx2" memory region
-	   of it's own. So this code could potentially cause a clash.
-	*/
+       In theory the driver could have a "gfx1" and/or "gfx2" memory region
+       of it's own. So this code could potentially cause a clash.
+    */
 	smsvdp.VRAM = memory_region_alloc( machine, "gfx1", VRAM_SIZE, ROM_REQUIRED );
 	smsvdp.CRAM = memory_region_alloc( machine, "gfx2", MAX_CRAM_SIZE, ROM_REQUIRED );
 	smsvdp.line_buffer = auto_alloc_array(machine, int, 256 * 5);
@@ -659,7 +659,7 @@ static void sms_refresh_line_mode4(int *lineBuffer, int line)
 			pixelPlotX = (0 - (xScroll & 0x07) + (tileColumn << 3) + pixelPlotX);
 			if (pixelPlotX >= 0 && pixelPlotX < 256)
 			{
-//				logerror("%x %x\n", pixelPlotX + pixelOffsetX, pixelPlotY);
+//              logerror("%x %x\n", pixelPlotX + pixelOffsetX, pixelPlotY);
 				lineBuffer[pixelPlotX] = smsvdp.current_palette[penSelected];
 				prioritySelected[pixelPlotX] = prioritySelect | ( penSelected & 0x0F );
 			}
@@ -1235,17 +1235,17 @@ static void sms_refresh_line( running_machine *machine, bitmap_t *bitmap, int pi
 		}
 
 		/* Do vertical scaling for a screen with 192 or 224 lines
-		   Lines 0-2 and 221-223 have no effect on the output on the GG screen.
-		   We will calculate the gamegear lines as follows:
-		   GG_0 = 1/6 * SMS_3 + 1/3 * SMS_4 + 1/3 * SMS_5 + 1/6 * SMS_6
-		   GG_1 = 1/6 * SMS_4 + 1/3 * SMS_5 + 1/3 * SMS_6 + 1/6 * SMS_7
-		   GG_2 = 1/6 * SMS_6 + 1/3 * SMS_7 + 1/3 * SMS_8 + 1/6 * SMS_9
-		   GG_3 = 1/6 * SMS_7 + 1/3 * SMS_8 + 1/3 * SMS_9 + 1/6 * SMS_10
-		   GG_4 = 1/6 * SMS_9 + 1/3 * SMS_10 + 1/3 * SMS_11 + 1/6 * SMS_12
-		   .....
-		   GG_142 = 1/6 * SMS_216 + 1/3 * SMS_217 + 1/3 * SMS_218 + 1/6 * SMS_219
-		   GG_143 = 1/6 * SMS_217 + 1/3 * SMS_218 + 1/3 * SMS_219 + 1/6 * SMS_220
-		*/
+           Lines 0-2 and 221-223 have no effect on the output on the GG screen.
+           We will calculate the gamegear lines as follows:
+           GG_0 = 1/6 * SMS_3 + 1/3 * SMS_4 + 1/3 * SMS_5 + 1/6 * SMS_6
+           GG_1 = 1/6 * SMS_4 + 1/3 * SMS_5 + 1/3 * SMS_6 + 1/6 * SMS_7
+           GG_2 = 1/6 * SMS_6 + 1/3 * SMS_7 + 1/3 * SMS_8 + 1/6 * SMS_9
+           GG_3 = 1/6 * SMS_7 + 1/3 * SMS_8 + 1/3 * SMS_9 + 1/6 * SMS_10
+           GG_4 = 1/6 * SMS_9 + 1/3 * SMS_10 + 1/3 * SMS_11 + 1/6 * SMS_12
+           .....
+           GG_142 = 1/6 * SMS_216 + 1/3 * SMS_217 + 1/3 * SMS_218 + 1/6 * SMS_219
+           GG_143 = 1/6 * SMS_217 + 1/3 * SMS_218 + 1/3 * SMS_219 + 1/6 * SMS_220
+        */
 		{
 			int	ggLine;
 			int	myLine = pixelPlotY + line - ( TBORDER_START + NTSC_224_TBORDER_Y_PIXELS );

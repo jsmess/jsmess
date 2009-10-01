@@ -4,22 +4,22 @@
 
     12/05/2009 Skeleton driver.
 
-	http://www.djupdal.org/tiki/
+    http://www.djupdal.org/tiki/
 
 ****************************************************************************/
 
 /*
 
-	TODO:
+    TODO:
 
-	- palette RAM should be written during HBLANK
-	- double sided disks have t0s0,t0s1,t1s0,t1s1... format
-	- DART clocks
-	- daisy chain order?
-	- winchester hard disk
-	- analog/digital I/O
-	- light pen
-	- 8088 CPU card
+    - palette RAM should be written during HBLANK
+    - double sided disks have t0s0,t0s1,t1s0,t1s1... format
+    - DART clocks
+    - daisy chain order?
+    - winchester hard disk
+    - analog/digital I/O
+    - light pen
+    - 8088 CPU card
 
 */
 
@@ -129,7 +129,7 @@ static READ8_HANDLER( keyboard_r )
 static WRITE8_HANDLER( keyboard_w )
 {
 	tiki100_state *state = space->machine->driver_data;
-	
+
 	state->keylatch = 0;
 }
 
@@ -137,21 +137,21 @@ static WRITE8_HANDLER( video_mode_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		palette entry bit 0
-		1		palette entry bit 1
-		2		palette entry bit 2
-		3		palette entry bit 3
-		4		mode select bit 0
-		5		mode select bit 1
-		6		unused
-		7		write color during HBLANK
+        0       palette entry bit 0
+        1       palette entry bit 1
+        2       palette entry bit 2
+        3       palette entry bit 3
+        4       mode select bit 0
+        5       mode select bit 1
+        6       unused
+        7       write color during HBLANK
 
-	*/
+    */
 
 	tiki100_state *state = space->machine->driver_data;
-	
+
 	state->mode = data;
 
 	if (BIT(data, 7))
@@ -167,21 +167,21 @@ static WRITE8_HANDLER( palette_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		blue intensity bit 0
-		1		blue intensity bit 1
-		2		green intensity bit 0
-		3		green intensity bit 1
-		4		green intensity bit 2
-		5		red intensity bit 0
-		6		red intensity bit 1
-		7		red intensity bit 2
+        0       blue intensity bit 0
+        1       blue intensity bit 1
+        2       green intensity bit 0
+        3       green intensity bit 1
+        4       green intensity bit 2
+        5       red intensity bit 0
+        6       red intensity bit 1
+        7       red intensity bit 2
 
-	*/
+    */
 
 	tiki100_state *state = space->machine->driver_data;
-	
+
 	state->palette = data;
 }
 
@@ -189,18 +189,18 @@ static WRITE8_HANDLER( system_w )
 {
 	/*
 
-		bit		signal	description
+        bit     signal  description
 
-		0		DRIS0	drive select 0
-		1		DRIS1	drive select 1
-		2		_ROME	enable ROM at 0000-3fff
-		3		VIRE	enable video RAM at 0000-7fff
-		4		SDEN	single density select (0=DD, 1=SD)
-		5		_LMP0	GRAFIKK key led
-		6		MOTON	floppy motor
-		7		_LMP1	LOCK key led
+        0       DRIS0   drive select 0
+        1       DRIS1   drive select 1
+        2       _ROME   enable ROM at 0000-3fff
+        3       VIRE    enable video RAM at 0000-7fff
+        4       SDEN    single density select (0=DD, 1=SD)
+        5       _LMP0   GRAFIKK key led
+        6       MOTON   floppy motor
+        7       _LMP1   LOCK key led
 
-	*/
+    */
 
 	tiki100_state *state = space->machine->driver_data;
 
@@ -252,33 +252,33 @@ static ADDRESS_MAP_START( tiki100_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x17, 0x17) AM_DEVREADWRITE(AY8912_TAG, ay8910_r, ay8910_data_w)
 	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_r, z80ctc_w)
 	AM_RANGE(0x1c, 0x1c) AM_MIRROR(0x03) AM_WRITE(system_w)
-//	AM_RANGE(0x20, 0x27) winchester controller
-//	AM_RANGE(0x60, 0x6f) analog I/O (SINTEF)
-//	AM_RANGE(0x60, 0x67) digital I/O (RVO)
-//	AM_RANGE(0x70, 0x77) analog/digital I/O
-//	AM_RANGE(0x78, 0x7b) light pen
-//	AM_RANGE(0x7e, 0x7f) 8088/87 processor w/128KB RAM
+//  AM_RANGE(0x20, 0x27) winchester controller
+//  AM_RANGE(0x60, 0x6f) analog I/O (SINTEF)
+//  AM_RANGE(0x60, 0x67) digital I/O (RVO)
+//  AM_RANGE(0x70, 0x77) analog/digital I/O
+//  AM_RANGE(0x78, 0x7b) light pen
+//  AM_RANGE(0x7e, 0x7f) 8088/87 processor w/128KB RAM
 ADDRESS_MAP_END
 
 /* Input Ports */
 
 static INPUT_PORTS_START( tiki100 )
 /*
-		|    0    |    1    |    2    |    3    |    4    |    5    |    6    |    7    |
-	----+---------+---------+---------+---------+---------+---------+---------+---------+
-	  1 | CTRL    | SHIFT   | BRYT    | RETUR   | MLMROM  | / (num) | SLETT   |         |
-	  2 | GRAFIKK | 1       | ANGRE   | a       | <       | z       | q       | LOCK    |
-	  3 | 2       | w       | s       | x       | 3       | e       | d       | c       |
-	  4 | 4       | r       | f       | v       | 5       | t       | g       | b       |
-	  5 | 6       | y       | h       | n       | 7       | u       | j       | m       |
-	  6 | 8       | i       | k       | ,       | 9       | o       | l       | .       |
-	  7 | 0       | p       | ø       | -       | +       | å       | æ       | HJELP   |
-	  8 | @       | ^       | '       | VENSTRE | UTVID   | F1      | F4      | SIDEOPP |
-	  9 | F2      | F3      | F5      | F6      | OPP     | SIDENED | VTAB    | NED     |
-	 10 | + (num) | - (num) | * (num) | 7 (num) | 8 (num) | 9 (num) | % (num) | = (num) |
-	 11 | 4 (num) | 5 (num) | 6 (num) | HTAB    | 1 (num) | 0 (num) | . (num) |         |
-	 12 | HJEM    | HØYRE   | 2 (num) | 3 (num) | ENTER   |         |         |         |
-	----+---------+---------+---------+---------+---------+---------+---------+---------+
+        |    0    |    1    |    2    |    3    |    4    |    5    |    6    |    7    |
+    ----+---------+---------+---------+---------+---------+---------+---------+---------+
+      1 | CTRL    | SHIFT   | BRYT    | RETUR   | MLMROM  | / (num) | SLETT   |         |
+      2 | GRAFIKK | 1       | ANGRE   | a       | <       | z       | q       | LOCK    |
+      3 | 2       | w       | s       | x       | 3       | e       | d       | c       |
+      4 | 4       | r       | f       | v       | 5       | t       | g       | b       |
+      5 | 6       | y       | h       | n       | 7       | u       | j       | m       |
+      6 | 8       | i       | k       | ,       | 9       | o       | l       | .       |
+      7 | 0       | p       | ?       | -       | +       | ?       | ?       | HJELP   |
+      8 | @       | ^       | '       | VENSTRE | UTVID   | F1      | F4      | SIDEOPP |
+      9 | F2      | F3      | F5      | F6      | OPP     | SIDENED | VTAB    | NED     |
+     10 | + (num) | - (num) | * (num) | 7 (num) | 8 (num) | 9 (num) | % (num) | = (num) |
+     11 | 4 (num) | 5 (num) | 6 (num) | HTAB    | 1 (num) | 0 (num) | . (num) |         |
+     12 | HJEM    | H?YRE   | 2 (num) | 3 (num) | ENTER   |         |         |         |
+    ----+---------+---------+---------+---------+---------+---------+---------+---------+
 */
 	PORT_START("ROW1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
@@ -388,7 +388,7 @@ static INPUT_PORTS_START( tiki100 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 1") PORT_CODE(KEYCODE_1_PAD)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 0") PORT_CODE(KEYCODE_0_PAD)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad .") PORT_CODE(KEYCODE_DEL_PAD)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) 
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("ROW12")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("HJEM") PORT_CODE(KEYCODE_HOME) PORT_CHAR(UCHAR_MAMEKEY(HOME))
@@ -396,9 +396,9 @@ static INPUT_PORTS_START( tiki100 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 2") PORT_CODE(KEYCODE_2_PAD)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 3") PORT_CODE(KEYCODE_3_PAD)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad ENTER") PORT_CODE(KEYCODE_ENTER_PAD)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED ) 
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) 
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) 
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 /* Video */
@@ -552,7 +552,7 @@ static const z80ctc_interface ctc_intf =
 /* FD1797 Interface */
 
 static const wd17xx_interface tiki100_wd17xx_interface =
-{ 
+{
 	NULL,
 	NULL,
 	{FLOPPY_0,FLOPPY_1,NULL,NULL}
@@ -676,7 +676,7 @@ static MACHINE_DRIVER_START( tiki100 )
     MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
     MDRV_SCREEN_SIZE(1024, 256)
     MDRV_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 256-1)
-    
+
 	MDRV_PALETTE_LENGTH(16)
 
     MDRV_VIDEO_UPDATE(tiki100)
@@ -687,7 +687,7 @@ static MACHINE_DRIVER_START( tiki100 )
 	MDRV_Z80CTC_ADD(Z80CTC_TAG, 2000000, ctc_intf)
 	MDRV_TIMER_ADD_PERIODIC("ctc", ctc_tick, HZ(2000000))
 	MDRV_WD179X_ADD(FD1797_TAG, tiki100_wd17xx_interface) // FD1767PL-02 or FD1797-PL
-	MDRV_FLOPPY_2_DRIVES_ADD(tiki100_floppy_config)	
+	MDRV_FLOPPY_2_DRIVES_ADD(tiki100_floppy_config)
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(AY8912_TAG, AY8912, 2000000)
@@ -719,6 +719,6 @@ SYSTEM_CONFIG_END
 
 /* System Drivers */
 
-/*    YEAR	NAME		PARENT		COMPAT	MACHINE		INPUT		INIT	CONFIG		COMPANY				FULLNAME		FLAGS */
+/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    CONFIG      COMPANY             FULLNAME        FLAGS */
 COMP( 1984, kontiki,	0,			0,		tiki100,	tiki100,	0,		tiki100,	"Kontiki Data A/S",	"KONTIKI 100",	GAME_SUPPORTS_SAVE )
 COMP( 1984, tiki100,	kontiki,	0,		tiki100,	tiki100,	0,		tiki100,	"Tiki Data A/S",	"TIKI 100",		GAME_SUPPORTS_SAVE )

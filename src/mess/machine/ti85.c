@@ -193,7 +193,7 @@ static void update_ti83p_memory (running_machine *machine)
 			memory_set_bankptr(machine, 3, ti8x_ram + 0x004000*(ti8x_memory_page_2&0x01));
 			memory_install_write8_handler(space, 0x8000, 0xbfff, 0, 0, SMH_BANK(3));
 		}
-		
+
 	}
 	else
 	{
@@ -399,9 +399,9 @@ MACHINE_START( ti83p )
 
 		if (ti_calculator_model == TI_83p)
 			memset(ti8x_ram, 0, sizeof(unsigned char)*32*1024);
-		
-//		memset(mem + 0x83000, 0xff, 0x1000);
-		
+
+//      memset(mem + 0x83000, 0xff, 0x1000);
+
 		ti_calculator_model = TI_83p;
 
 		timer_pulse(machine, ATTOTIME_IN_HZ(200), NULL, 0, ti85_timer_callback);
@@ -549,7 +549,7 @@ READ8_HANDLER ( ti82_port_0000_r )
 {
     UINT8* ti82_video;
 	UINT8 ti82_port11;
-	
+
 	if(ti82_video_dir == 4)
 		++ti82_video_y;
 	if(ti82_video_dir == 5)
@@ -563,7 +563,7 @@ READ8_HANDLER ( ti82_port_0000_r )
 		ti82_port11 = ti82_video_buffer[(12*ti82_video_y)+ti82_video_x];
 	else
 	{
-		ti82_video_col = ti82_video_x * 6;                                                                                                
+		ti82_video_col = ti82_video_x * 6;
 		ti82_video_bit = ti82_video_col & 7;
 		ti82_video = &ti82_video_buffer[(ti82_video_y*12)+(ti82_video_col>>3)];
 		ti82_port11 = ((((*ti82_video)<<8)+ti82_video[1])>>(10-ti82_video_bit));
@@ -601,7 +601,7 @@ READ8_HANDLER ( ti83_port_0000_r )
 
  READ8_HANDLER ( ti83_port_0002_r )
 {
-	return ti8x_port2; 
+	return ti8x_port2;
 }
 
  READ8_HANDLER ( ti83_port_0003_r )
@@ -621,7 +621,7 @@ READ8_HANDLER ( ti83_port_0000_r )
 
  READ8_HANDLER ( ti83p_port_0002_r )
 {
-	return ti8x_port2|3; 
+	return ti8x_port2|3;
 }
 
 WRITE8_HANDLER ( ti81_port_0007_w )
@@ -648,7 +648,7 @@ WRITE8_HANDLER ( ti85_port_0003_w )
 {
 	if (ti85_LCD_status && !(data&0x08))	ti85_timer_interrupt_mask = 0;
 	ti85_ON_interrupt_mask = data&0x01;
-//	ti85_timer_interrupt_mask = data&0x04;
+//  ti85_timer_interrupt_mask = data&0x04;
 	ti85_LCD_mask = data&0x02;
 	ti85_LCD_status = data&0x08;
 }
@@ -706,7 +706,7 @@ WRITE8_HANDLER ( ti82_port_0002_w )
 }
 
 WRITE8_HANDLER ( ti82_port_0010_w)
- {	
+ {
 	if (data == 0x00 || data == 0x01)
 		ti82_video_mode = data;
 	if (data >= 0x04 && data <= 0x07)
@@ -724,13 +724,13 @@ WRITE8_HANDLER ( ti82_port_0010_w)
 WRITE8_HANDLER ( ti82_port_0011_w )
 {
 	UINT8* ti82_video;
-	
+
 	if(ti82_video_mode)
 		ti82_video_buffer[(12*ti82_video_y)+ti82_video_x] = data;
 	else
 	{
 		data = data<<0x02;
-		ti82_video_col = ti82_video_x * 6;                                                                                                
+		ti82_video_col = ti82_video_x * 6;
 		ti82_video_bit = ti82_video_col & 0x07;
 		ti82_video = &ti82_video_buffer[(ti82_video_y*12)+(ti82_video_col>>3)];
 		*ti82_video = (*ti82_video & ~(0xFC>>ti82_video_bit)) | (data>>ti82_video_bit);
@@ -746,7 +746,7 @@ WRITE8_HANDLER ( ti82_port_0011_w )
 		--ti82_video_x;
 	if(ti82_video_dir == 0x07)
 		++ti82_video_x;
-	
+
 	ti82_video_x &= 15;
 	ti82_video_y &= 63;
 }
@@ -754,7 +754,7 @@ WRITE8_HANDLER ( ti82_port_0011_w )
 WRITE8_HANDLER ( ti83_port_0000_w )
 {
 	ti8x_memory_page_1 = (ti8x_memory_page_1 & 7) | ((data & 16) >> 1);
-	update_ti85_memory(space->machine);	
+	update_ti85_memory(space->machine);
 }
 
 WRITE8_HANDLER ( ti83_port_0002_w )
@@ -765,7 +765,7 @@ WRITE8_HANDLER ( ti83_port_0002_w )
 }
 
 WRITE8_HANDLER ( ti83_port_0003_w )
-{	
+{
 		if (ti85_LCD_status && !(data&0x08))	ti85_timer_interrupt_mask = 0;
 		ti85_ON_interrupt_mask = data&0x01;
 		//ti85_timer_interrupt_mask = data&0x04;
@@ -813,7 +813,7 @@ WRITE8_HANDLER ( ti83p_port_0007_w )
 }
 
 WRITE8_HANDLER ( ti83p_port_0010_w)
- {	
+ {
 	if (data == 0x00 || data == 0x01)
 		ti82_video_mode = data;
 	if (data == 0x02 || data == 0x03)
@@ -828,7 +828,7 @@ WRITE8_HANDLER ( ti83p_port_0010_w)
 		ti82_video_y = data - 0x80;
 	if (data >= 0xc8)
 		ti85_LCD_contrast = data - 0xc8;
-		
+
 }
 
 /* NVRAM functions */

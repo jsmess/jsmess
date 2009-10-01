@@ -1,17 +1,17 @@
 /***************************************************************************
-   
+
     Beta Computer
 
-	http://retro.hansotten.nl/index.php?page=beta-computer
+    http://retro.hansotten.nl/index.php?page=beta-computer
 
 ****************************************************************************/
 
 /*
 
-	TODO:
+    TODO:
 
-	- write EPROM back to file
-	- fix display flickering
+    - write EPROM back to file
+    - fix display flickering
 
 */
 
@@ -45,31 +45,31 @@ static INPUT_PORTS_START( beta )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("GO") PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED ) 
-	
+	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
+
 	PORT_START("Q7")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CHAR('0')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CHAR('5')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_CHAR('M')
-	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED ) 
-	
+	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
+
 	PORT_START("Q8")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('B')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CHAR('6')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CHAR('9')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("DA") PORT_CODE(KEYCODE_F2)
-	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED ) 
-	
+	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
+
 	PORT_START("Q9")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('C')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('D')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('E')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("AD") PORT_CODE(KEYCODE_F1)
-	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED ) 
+	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SPECIAL")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RESET") PORT_CODE(KEYCODE_R) PORT_CHANGED(trigger_reset, 0)
@@ -90,18 +90,18 @@ static READ8_DEVICE_HANDLER(beta_riot_a_r)
 {
 	/*
 
-		bit		description
+        bit     description
 
-		PA0		2716 D0, segment D, key bit 0
-		PA1		2716 D1, segment E, key bit 1
-		PA2		2716 D2, segment C, key bit 2
-		PA3		2716 D3, segment G, key bit 3
-		PA4		2716 D4, segment F, key bit 4
-		PA5		2716 D5, segment B
-		PA6		2716 D6, segment A
-		PA7		2716 D7
+        PA0     2716 D0, segment D, key bit 0
+        PA1     2716 D1, segment E, key bit 1
+        PA2     2716 D2, segment C, key bit 2
+        PA3     2716 D3, segment G, key bit 3
+        PA4     2716 D4, segment F, key bit 4
+        PA5     2716 D5, segment B
+        PA6     2716 D6, segment A
+        PA7     2716 D7
 
-	*/
+    */
 
 	beta_state *state = device->machine->driver_data;
 
@@ -113,8 +113,8 @@ static READ8_DEVICE_HANDLER(beta_riot_a_r)
 	case 7: data &= input_port_read(device->machine, "Q7"); break;
 	case 8: data &= input_port_read(device->machine, "Q8"); break;
 	case 9: data &= input_port_read(device->machine, "Q9"); break;
-	default: 
-		if (!state->eprom_oe && !state->eprom_ce) 
+	default:
+		if (!state->eprom_oe && !state->eprom_ce)
 		{
 			data = memory_region(device->machine, EPROM_TAG)[state->eprom_addr & 0x7ff];
 			popmessage("EPROM read %04x = %02x\n", state->eprom_addr & 0x7ff, data);
@@ -128,22 +128,22 @@ static WRITE8_DEVICE_HANDLER(beta_riot_a_w)
 {
 	/*
 
-		bit		description
+        bit     description
 
-		PA0		2716 D0, segment D, key bit 0
-		PA1		2716 D1, segment E, key bit 1
-		PA2		2716 D2, segment C, key bit 2
-		PA3		2716 D3, segment G, key bit 3
-		PA4		2716 D4, segment F, key bit 4
-		PA5		2716 D5, segment B
-		PA6		2716 D6, segment A
-		PA7		2716 D7
+        PA0     2716 D0, segment D, key bit 0
+        PA1     2716 D1, segment E, key bit 1
+        PA2     2716 D2, segment C, key bit 2
+        PA3     2716 D3, segment G, key bit 3
+        PA4     2716 D4, segment F, key bit 4
+        PA5     2716 D5, segment B
+        PA6     2716 D6, segment A
+        PA7     2716 D7
 
-	*/
+    */
 
 	beta_state *state = device->machine->driver_data;
 
-//	logerror("PA %02x\n", data);
+//  logerror("PA %02x\n", data);
 
 	/* display */
 	state->segment = BITSWAP8(data, 7, 3, 4, 1, 0, 2, 5, 6) & 0x7f;
@@ -162,18 +162,18 @@ static WRITE8_DEVICE_HANDLER(beta_riot_b_w)
 {
 	/*
 
-		bit		description
+        bit     description
 
-		PB0		74LS145 P0
-		PB1		74LS145 P1
-		PB2		74LS145 P2
-		PB3		74LS145 P3, 74LS164 D
-		PB4		loudspeaker, data led
-		PB5		address led, 74LS164 CP
-		PB6		2716 _OE
-		PB7		2716 _CE
+        PB0     74LS145 P0
+        PB1     74LS145 P1
+        PB2     74LS145 P2
+        PB3     74LS145 P3, 74LS164 D
+        PB4     loudspeaker, data led
+        PB5     address led, 74LS164 CP
+        PB6     2716 _OE
+        PB7     2716 _CE
 
-	*/
+    */
 
 	beta_state *state = device->machine->driver_data;
 
@@ -238,7 +238,7 @@ static DEVICE_IMAGE_UNLOAD( beta_eprom )
 
 /* Machine Initialization */
 
-static MACHINE_START( beta ) 
+static MACHINE_START( beta )
 {
 	beta_state *state = machine->driver_data;
 
@@ -265,7 +265,7 @@ static MACHINE_DRIVER_START( beta )
     MDRV_CPU_PROGRAM_MAP(beta_mem)
 
     MDRV_MACHINE_START(beta)
-	
+
     /* video hardware */
 	MDRV_DEFAULT_LAYOUT( layout_beta )
 
@@ -275,7 +275,7 @@ static MACHINE_DRIVER_START( beta )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-	MDRV_RIOT6532_ADD(M6532_TAG, XTAL_4MHz/4, beta_riot_interface)    
+	MDRV_RIOT6532_ADD(M6532_TAG, XTAL_4MHz/4, beta_riot_interface)
 
 	/* EPROM socket */
 	MDRV_CARTSLOT_ADD(EPROM_TAG)
@@ -302,5 +302,5 @@ SYSTEM_CONFIG_END
 
 /* System Drivers */
 
-/*    YEAR	NAME	PARENT	COMPAT	MACHINE	INPUT	INIT	CONFIG	COMPANY			FULLNAME	FLAGS */
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY         FULLNAME    FLAGS */
 COMP( 1984, beta,	0,		0,		beta,	beta,	0,		beta,	"Pitronics",	"Beta",		GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )

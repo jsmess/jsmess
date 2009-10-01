@@ -1,5 +1,5 @@
 /*
-	video/dgn_beta.c
+    video/dgn_beta.c
 
 The Dragon Beta uses a 68B45 for it's display generation, this is used in the
 conventional wat with a character generator ROM in the two text modes, which are
@@ -9,25 +9,25 @@ of character and attribute, in alternate bytes.
 
 The attributes decode as follows :-
 
-	7-6-5-4-3-2-1-0
-	f-u-F-F-F-B-B-B
+    7-6-5-4-3-2-1-0
+    f-u-F-F-F-B-B-B
 
-	f=flash
-	u=underline
+    f=flash
+    u=underline
 
-	FFF = foreground colour
-	BBB = bakcground colour
+    FFF = foreground colour
+    BBB = bakcground colour
 
-		000	black
-		001	red
-		010	green
-		011	yellow
-		100	blue
-		101	magenta
-		110	cyan
-		111	white
+        000 black
+        001 red
+        010 green
+        011 yellow
+        100 blue
+        101 magenta
+        110 cyan
+        111 white
 
-	If flash is true, foreground and background colours will be exchanged.
+    If flash is true, foreground and background colours will be exchanged.
 
 It is interesting to note that the 6845 uses 16 bit wide access to the ram, in contrast
 to the 8 bit accesses from the CPUs, this allows each increment of the MA lines to move
@@ -51,15 +51,15 @@ further investigation.
 However the modes supported are :-
 
 Text Modes
-		width	height	colours
-		40	25	8
-		80	25	8
+        width   height  colours
+        40  25  8
+        80  25  8
 Graphics modes
-		320	256	4
-		320	256	16
-		640	512	4
-		640	256	4**
-		640	512	2
+        320 256 4
+        320 256 16
+        640 512 4
+        640 256 4**
+        640 512 2
 
 Looking at the parts of the circuit sheet that I have seen it looks like the graphics modes
 are driven using a combination of the 6845 MA and RA lines to address more than 64K or memory
@@ -203,15 +203,15 @@ typedef enum {
 
 /* Set video control register from I28 port B, the control register is laid out as */
 /* follows :-                                                                      */
-/* 	bit	function							   */
-/*	0	WI, unknown							   */
-/*	1	Character set select, drives A12 of character rom in text mode     */
-/*	2	High (1) or Low(0) resolution if in graphics mode.		   */
-/*	3	Text (1) or Graphics(0) mode					   */
-/*	4	Control bit, Selects between colour palate and drirect drive	   */
-/*	5	F/S bit, 1=80 bytes/line, 0=40bytes/line			   */
-/*	6	Effective A14, to ram, in text mode 				   */
-/*	7	Effective A15, to ram, in text mode				   */
+/*  bit function                               */
+/*  0   WI, unknown                            */
+/*  1   Character set select, drives A12 of character rom in text mode     */
+/*  2   High (1) or Low(0) resolution if in graphics mode.         */
+/*  3   Text (1) or Graphics(0) mode                       */
+/*  4   Control bit, Selects between colour palate and drirect drive       */
+/*  5   F/S bit, 1=80 bytes/line, 0=40bytes/line               */
+/*  6   Effective A14, to ram, in text mode                    */
+/*  7   Effective A15, to ram, in text mode                */
 /* the top two address lines for the video ram, are supplied by the BB6 and PB7 on */
 /* 6821-I28, this allows the 6845 to access the full 64K address range, however    */
 /* since the ram data is addressed as a 16bit wide unit, this allows the 6845      */
@@ -257,7 +257,7 @@ static void beta_Set_HSync(running_machine *machine, int offset, int data)
 		int HW=m6845_get_register(H_SYNC_WIDTH)&0xF;	// Hsync width (in chars)
 
 		beta_scr_y++;
-//		beta_scr_x=0-(((HT-HS)-HW)*8);	// Number of dots after HS to wait before start of next line
+//      beta_scr_x=0-(((HT-HS)-HW)*8);  // Number of dots after HS to wait before start of next line
 		beta_scr_x=0-((HT-(HS+HW))*Dots);
 
 //debug_console_printf(machine, "HT=%d, HS=%d, HW=%d, (HS+HW)=%d, HT-(HS+HW)=%d\n",HT,HS,HW,(HS+HW),(HT-(HS+HW)));
@@ -288,7 +288,7 @@ static void beta_Set_VSync(running_machine *machine, int offset, int data)
 		else if (DrawInterlace==INTERLACE_ON)
 		{
 			Field=(Field+1) & 0x01;	/* Invert field */
-//			debug_console_printf(machine, "Invert field=%d\n",Field);
+//          debug_console_printf(machine, "Invert field=%d\n",Field);
 		}
 		VSyncMin=beta_scr_y;
 	}
@@ -498,7 +498,7 @@ static void plot_gfx_pixel(int x, int y, int Dot, int Colour, bitmap_t *bitmap)
 	{
 		PlotY=(y*2);//+Field;
 		DoubleY=0;
-//		debug_console_printf(machine, "Field=%d\n",Field);
+//      debug_console_printf(machine, "Field=%d\n",Field);
 	}
 
 	/* Error check, make sure we're drawing on the actual bitmap ! */
@@ -601,8 +601,8 @@ static void beta_plot_gfx_line(int x,int y, bitmap_t *bitmap)
 				Colour=ColourRAM[((Word&0x8000)>>15)];
 				plot_gfx_pixel(x,y,Dot,Colour,bitmap);
 
-//				Colour=ColourRAM[((Word&0x0080)>>7)];
-//				plot_gfx_pixel(x,y,Dot+1,Colour,bitmap);
+//              Colour=ColourRAM[((Word&0x0080)>>7)];
+//              plot_gfx_pixel(x,y,Dot+1,Colour,bitmap);
 
 				Hi=Word&0x8000;
 				Word=((Word<<1)&0xFFFE) | (Hi>>15);

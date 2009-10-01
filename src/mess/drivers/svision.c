@@ -505,7 +505,7 @@ static MACHINE_DRIVER_START( svision )
 	MDRV_SOUND_ADD("custom", SVISION, 0)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.50)
-	
+
 	/* cartridge */
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("bin,ws,sv")

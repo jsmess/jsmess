@@ -1,10 +1,10 @@
 /*********************************************************************
 
-	ds1315.h
+    ds1315.h
 
-	Dallas Semiconductor's Phantom Time Chip DS1315.
+    Dallas Semiconductor's Phantom Time Chip DS1315.
 
-	by tim lindner, November 2001.
+    by tim lindner, November 2001.
 
 *********************************************************************/
 

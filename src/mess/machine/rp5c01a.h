@@ -1,21 +1,21 @@
 /**********************************************************************
 
-	Ricoh RP5C01A Real Time Clock With Internal RAM emulation
+    Ricoh RP5C01A Real Time Clock With Internal RAM emulation
 
-	Copyright MESS Team.
+    Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
 
 **********************************************************************
-							_____   _____
-				   _CS	 1 |*    \_/     | 18  Vcc
-					CS	 2 |			 | 17  OSCOUT
-				   ADJ   3 |			 | 16  OSCIN
-				    A0	 4 |			 | 15  _ALARM
-					A1	 5 |   RP5C01A 	 | 14  D3
-					A2	 6 |			 | 13  D2
-					A3	 7 |			 | 12  D1
-				   _RD	 8 |			 | 11  D0
-				   GND   9 |_____________| 10  _WR
+                            _____   _____
+                   _CS   1 |*    \_/     | 18  Vcc
+                    CS   2 |             | 17  OSCOUT
+                   ADJ   3 |             | 16  OSCIN
+                    A0   4 |             | 15  _ALARM
+                    A1   5 |   RP5C01A   | 14  D3
+                    A2   6 |             | 13  D2
+                    A3   7 |             | 12  D1
+                   _RD   8 |             | 11  D0
+                   GND   9 |_____________| 10  _WR
 
 **********************************************************************/
 

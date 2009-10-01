@@ -282,9 +282,9 @@ static INPUT_PORTS_START(vtech1)
 	PORT_CONFNAME( 0x01, 0x01, "Autorun on Quickload")
 	PORT_CONFSETTING(    0x00, DEF_STR(No))
 	PORT_CONFSETTING(    0x01, DEF_STR(Yes))
-//	PORT_CONFNAME( 0x08, 0x08, "Cassette Speaker")
-//	PORT_CONFSETTING(    0x08, DEF_STR(On))
-//	PORT_CONFSETTING(    0x00, DEF_STR(Off))
+//  PORT_CONFNAME( 0x08, 0x08, "Cassette Speaker")
+//  PORT_CONFSETTING(    0x08, DEF_STR(On))
+//  PORT_CONFSETTING(    0x00, DEF_STR(Off))
 INPUT_PORTS_END
 
 
@@ -475,11 +475,11 @@ static Z80BIN_EXECUTE( vtech1 )
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* A Microsoft Basic program needs some manipulation before it can be run.
-	1. A start address of 7ae9 indicates a basic program which needs its pointers fixed up.
-	2. If autorun is turned off, the pointers still need fixing, but then display READY.
-	Important addresses:
-		7ae9 = start (load) address of a conventional basic program
-		791e = custom routine to fix basic pointers */
+    1. A start address of 7ae9 indicates a basic program which needs its pointers fixed up.
+    2. If autorun is turned off, the pointers still need fixing, but then display READY.
+    Important addresses:
+        7ae9 = start (load) address of a conventional basic program
+        791e = custom routine to fix basic pointers */
 
 	memory_write_word_16le(space, 0x791c, end_address + 1);
 	memory_write_word_16le(space, 0x781e, execute_address);
@@ -487,13 +487,13 @@ static Z80BIN_EXECUTE( vtech1 )
 	if (start_address == 0x7ae9)
 	{
 		UINT8 i, data[]={
-			0xe5,			// PUSH HL	;save pcode pointer
-			0x2a, 0x1c, 0x79,	// LD HL,(791C)	;get saved end_addr+1
-			0x22, 0xf9, 0x78,	// LD (78F9),HL	;move it to correct place
-			0x21, 0x39, 0x78,	// LD HL,7839	;point to control flag
-			0xcb, 0xf6,		// SET 6,(HL)	;turn on autorun (cb b6 = manual run)
-			0xcb, 0x9e,		// RES 3,(HL)	;turn off verify (just in case)
-			0xc3, 0xcf, 0x36,};	// JP 36CF	;enter bios at autorun point
+			0xe5,			// PUSH HL  ;save pcode pointer
+			0x2a, 0x1c, 0x79,	// LD HL,(791C) ;get saved end_addr+1
+			0x22, 0xf9, 0x78,	// LD (78F9),HL ;move it to correct place
+			0x21, 0x39, 0x78,	// LD HL,7839   ;point to control flag
+			0xcb, 0xf6,		// SET 6,(HL)   ;turn on autorun (cb b6 = manual run)
+			0xcb, 0x9e,		// RES 3,(HL)   ;turn off verify (just in case)
+			0xc3, 0xcf, 0x36,};	// JP 36CF  ;enter bios at autorun point
 
 		for (i = 0; i < ARRAY_LENGTH(data); i++)
 			memory_write_byte(space, 0x791e + i, data[i]);

@@ -70,7 +70,7 @@ static const device_config *trs80_fdc;
 static TIMER_CALLBACK( cassette_data_callback )
 {
 /* This does all baud rates. 250 baud (trs80), and 500 baud (all others) set bit 7 of "cassette_data".
-	1500 baud (trs80m3, trs80m4) is interrupt-driven and uses bit 0 of "cassette_data" */
+    1500 baud (trs80m3, trs80m4) is interrupt-driven and uses bit 0 of "cassette_data" */
 
 	static double old_cassette_val;
 	double new_val = cassette_input(trs80_cass);
@@ -169,7 +169,7 @@ QUICKLOAD_LOAD( trs80_cmd )
 
 /*************************************
  *
- *				Port handlers.
+ *              Port handlers.
  *
  *************************************/
 
@@ -177,18 +177,18 @@ QUICKLOAD_LOAD( trs80_cmd )
 READ8_HANDLER( trs80m4_e0_r )
 {
 /* Indicates which devices are interrupting - d6..d3 not emulated.
-	Whenever an interrupt occurs, this port is immediately read
-	to find out which device requires service. Lowest-numbered
-	bit takes precedence. We take this opportunity to clear the
-	cpu INT line.
+    Whenever an interrupt occurs, this port is immediately read
+    to find out which device requires service. Lowest-numbered
+    bit takes precedence. We take this opportunity to clear the
+    cpu INT line.
 
-	d6 RS232 Error (Any of {FE, PE, OR} errors has occured)
-	d5 RS232 Rcv (DAV indicates a char ready to be picked up from uart)
-	d4 RS232 Xmit (TBMT indicates ready to accept another char from cpu)
-	d3 I/O Bus
-	d2 RTC
-	d1 Cass 1500 baud Falling
-	d0 Cass 1500 baud Rising */
+    d6 RS232 Error (Any of {FE, PE, OR} errors has occured)
+    d5 RS232 Rcv (DAV indicates a char ready to be picked up from uart)
+    d4 RS232 Xmit (TBMT indicates ready to accept another char from cpu)
+    d3 I/O Bus
+    d2 RTC
+    d1 Cass 1500 baud Falling
+    d0 Cass 1500 baud Rising */
 
 	cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 	return ~(trs80_mask & trs80_int);
@@ -197,14 +197,14 @@ READ8_HANDLER( trs80m4_e0_r )
 READ8_HANDLER( trs80m4_e4_r )
 {
 /* Indicates which devices are interrupting - d6..d5 not emulated.
-	Whenever an NMI occurs, this port is immediately read
-	to find out which device requires service. Lowest-numbered
-	bit takes precedence. We take this opportunity to clear the
-	cpu NMI line.
+    Whenever an NMI occurs, this port is immediately read
+    to find out which device requires service. Lowest-numbered
+    bit takes precedence. We take this opportunity to clear the
+    cpu NMI line.
 
-	d7 status of FDC INTREQ (0=true)
-	d6 status of Motor Timeout (0=true)
-	d5 status of Reset signal (0=true - this will reboot the computer) */
+    d7 status of FDC INTREQ (0=true)
+    d6 status of Motor Timeout (0=true)
+    d5 status of Reset signal (0=true - this will reboot the computer) */
 
 	cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
 
@@ -214,25 +214,25 @@ READ8_HANDLER( trs80m4_e4_r )
 READ8_HANDLER( trs80m4_e8_r )
 {
 /* not emulated
-	d7 Clear-to-Send (CTS), Pin 5
-	d6 Data-Set-Ready (DSR), pin 6
-	d5 Carrier Detect (CD), pin 8
-	d4 Ring Indicator (RI), pin 22
-	d3,d2,d0 Not used
-	d1 UART Receiver Input, pin 20 (pin 20 is also DTR) */
+    d7 Clear-to-Send (CTS), Pin 5
+    d6 Data-Set-Ready (DSR), pin 6
+    d5 Carrier Detect (CD), pin 8
+    d4 Ring Indicator (RI), pin 22
+    d3,d2,d0 Not used
+    d1 UART Receiver Input, pin 20 (pin 20 is also DTR) */
 
 	return 0;
 }
 
 READ8_HANDLER( trs80m4_ea_r )
 {
-/* UART Status Register 
-	d7 Data Received ('1'=condition true) 
-	d6 Transmitter Holding Register empty ('1'=condition true) 
-	d5 Overrun Error ('1'=condition true) 
-	d4 Framing Error ('1'=condition true) 
-	d3 Parity Error ('1'=condition true) 
-	d2..d0 Not used */
+/* UART Status Register
+    d7 Data Received ('1'=condition true)
+    d6 Transmitter Holding Register empty ('1'=condition true)
+    d5 Overrun Error ('1'=condition true)
+    d4 Framing Error ('1'=condition true)
+    d3 Parity Error ('1'=condition true)
+    d2..d0 Not used */
 
 	UINT8 data=7;
 	ay31015_set_input_pin( trs80_ay31015, AY31015_SWE, 0 );
@@ -265,14 +265,14 @@ READ8_HANDLER( trs80m4_ec_r )
 READ8_HANDLER( sys80_f9_r )
 {
 /* UART Status Register - d6..d4 not emulated
-	d7 Transmit buffer empty (inverted)
-	d6 CTS pin
-	d5 DSR pin
-	d4 CD pin
-	d3 Parity Error
-	d2 Framing Error
-	d1 Overrun
-	d0 Data Available */
+    d7 Transmit buffer empty (inverted)
+    d6 CTS pin
+    d5 DSR pin
+    d4 CD pin
+    d3 Parity Error
+    d2 Framing Error
+    d1 Overrun
+    d0 Data Available */
 
 	UINT8 data=70;
 	ay31015_set_input_pin( trs80_ay31015, AY31015_SWE, 0 );
@@ -294,8 +294,8 @@ READ8_HANDLER( lnw80_fe_r )
 READ8_HANDLER( trs80_ff_r )
 {
 /* ModeSel and cassette data
-	d7 cassette data from tape
-	d2 modesel setting */
+    d7 cassette data from tape
+    d2 modesel setting */
 
 	UINT8 data = (~trs80_mode & 1) << 5;
 	return data | cassette_data;
@@ -304,9 +304,9 @@ READ8_HANDLER( trs80_ff_r )
 READ8_HANDLER( trs80m4_ff_r )
 {
 /* Return of cassette data stream from tape
-	d7 Low-speed data
-	d6..d1 info from write of port EC
-	d0 High-speed data */
+    d7 Low-speed data
+    d6..d1 info from write of port EC
+    d0 High-speed data */
 
 	trs80_int &= 0xfc;	/* clear cassette interrupts */
 
@@ -317,14 +317,14 @@ READ8_HANDLER( trs80m4_ff_r )
 WRITE8_HANDLER( trs80m4_84_w )
 {
 /* Hi-res graphics control - d6..d4 not emulated
-	d7 Page Control
-	d6 Fix upper memory
-	d5 Memory bit 1
-	d4 Memory bit 0
-	d3 Invert Video
-	d2 80/64 width
-	d1 Select bit 1
-	d0 Select bit 0 */
+    d7 Page Control
+    d6 Fix upper memory
+    d5 Memory bit 1
+    d4 Memory bit 0
+    d3 Invert Video
+    d2 80/64 width
+    d1 Select bit 1
+    d0 Select bit 0 */
 
 	/* get address space instead of io space */
 	const address_space *mem = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
@@ -458,11 +458,11 @@ WRITE8_HANDLER( trs80m4_90_w )
 WRITE8_HANDLER( trs80m4p_9c_w )		/* model 4P only - swaps the ROM with read-only RAM */
 {
 	/* Meaning of trs80_model4 variable:
-		d5..d4 memory mode (as described in section above)
-		d3 rom switch (1=enabled) only effective in mode0 and 1
-		d2 this is a Model 4P
-		d1 this is a Model 4
-		d0 Video banking exists yes/no (1=not banked) */
+        d5..d4 memory mode (as described in section above)
+        d3 rom switch (1=enabled) only effective in mode0 and 1
+        d2 this is a Model 4P
+        d1 this is a Model 4
+        d0 Video banking exists yes/no (1=not banked) */
 
 	/* get address space instead of io space */
 	const address_space *mem = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
@@ -481,19 +481,19 @@ WRITE8_HANDLER( trs80m4p_9c_w )		/* model 4P only - swaps the ROM with read-only
 				memory_set_bankptr(mem->machine, 1, memory_region(mem->machine, "maincpu"));
 				break;
 		}
-	} 
+	}
 }
 
 WRITE8_HANDLER( trs80m4_e0_w )
 {
 /* Interrupt settings - which devices are allowed to interrupt - bits align with read of E0
-	d6 Enable Rec Err
-	d5 Enable Rec Data
-	d4 Enable Xmit Emp
-	d3 Enable I/O int
-	d2 Enable RT int
-	d1 C fall Int
-	d0 C Rise Int */
+    d6 Enable Rec Err
+    d5 Enable Rec Data
+    d4 Enable Xmit Emp
+    d3 Enable I/O int
+    d2 Enable RT int
+    d1 C fall Int
+    d0 C Rise Int */
 
 	trs80_mask = data;
 }
@@ -501,8 +501,8 @@ WRITE8_HANDLER( trs80m4_e0_w )
 WRITE8_HANDLER( trs80m4_e4_w )
 {
 /* Disk to NMI interface
-	d7 1=enable disk INTRQ to generate NMI
-	d6 1=enable disk Motor Timeout to generate NMI */
+    d7 1=enable disk INTRQ to generate NMI
+    d6 1=enable disk Motor Timeout to generate NMI */
 
 	trs80_nmi_mask = data;
 }
@@ -517,22 +517,22 @@ WRITE8_HANDLER( trs80m4_e8_w )
 WRITE8_HANDLER( trs80m4_e9_w )
 {
 /* UART set baud rate. Rx = bits 0..3, Tx = bits 4..7
-	00h    50  
-	11h    75  
-	22h    110  
-	33h    134.5  
-	44h    150  
-	55h    300  
-	66h    600  
-	77h    1200  
-	88h    1800  
-	99h    2000  
-	AAh    2400  
-	BBh    3600  
-	CCh    4800  
-	DDh    7200  
-	EEh    9600  
-	FFh    19200 */
+    00h    50
+    11h    75
+    22h    110
+    33h    134.5
+    44h    150
+    55h    300
+    66h    600
+    77h    1200
+    88h    1800
+    99h    2000
+    AAh    2400
+    BBh    3600
+    CCh    4800
+    DDh    7200
+    EEh    9600
+    FFh    19200 */
 
 	int baud_clock[]={ 800, 1200, 1760, 2152, 2400, 4800, 9600, 19200, 28800, 32000, 38400, 57600, 76800, 115200, 153600, 307200 };
 	ay31015_set_receiver_clock( trs80_ay31015, baud_clock[data & 0x0f]);
@@ -544,16 +544,16 @@ WRITE8_HANDLER( trs80m4_ea_w )
 	if (trs80_reg_load)
 
 /* d2..d0 not emulated
-	d7 Even Parity Enable ('1'=even, '0'=odd) 
-	d6='1',d5='1' for 8 bits 
-	d6='0',d5='1' for 7 bits 
-	d6='1',d5='0' for 6 bits 
-	d6='0',d5='0' for 5 bits
-	d4 Stop Bit Select ('1'=two stop bits, '0'=one stop bit) 
-	d3 Parity Inhibit ('1'=disable; No parity, '0'=parity enabled) 
-	d2 Break ('0'=disable transmit data; continuous RS232 'SPACE' condition) 
-	d1 Request-to-Send (RTS), pin 4
-	d0 Data-Terminal-Ready (DTR), pin 20 */
+    d7 Even Parity Enable ('1'=even, '0'=odd)
+    d6='1',d5='1' for 8 bits
+    d6='0',d5='1' for 7 bits
+    d6='1',d5='0' for 6 bits
+    d6='0',d5='0' for 5 bits
+    d4 Stop Bit Select ('1'=two stop bits, '0'=one stop bit)
+    d3 Parity Inhibit ('1'=disable; No parity, '0'=parity enabled)
+    d2 Break ('0'=disable transmit data; continuous RS232 'SPACE' condition)
+    d1 Request-to-Send (RTS), pin 4
+    d0 Data-Terminal-Ready (DTR), pin 20 */
 
 	{
 		ay31015_set_input_pin( trs80_ay31015, AY31015_CS, 0 );
@@ -568,13 +568,13 @@ WRITE8_HANDLER( trs80m4_ea_w )
 	{
 
 /* not emulated
-	d7,d6 Not used
-	d5 Secondary Unassigned, pin 18 
-	d4 Secondary Transmit Data, pin 14 
-	d3 Secondary Request-to-Send, pin 19 
-	d2 Break ('0'=disable transmit data; continuous RS232 'SPACE' condition) 
-	d1 Data-Terminal-Ready (DTR), pin 20 
-	d0 Request-to-Send (RTS), pin 4 */
+    d7,d6 Not used
+    d5 Secondary Unassigned, pin 18
+    d4 Secondary Transmit Data, pin 14
+    d3 Secondary Request-to-Send, pin 19
+    d2 Break ('0'=disable transmit data; continuous RS232 'SPACE' condition)
+    d1 Data-Terminal-Ready (DTR), pin 20
+    d0 Request-to-Send (RTS), pin 4 */
 
 	}
 }
@@ -587,12 +587,12 @@ WRITE8_HANDLER( trs80m4_eb_w )
 WRITE8_HANDLER( trs80m4_ec_w )
 {
 /* Hardware settings - d5..d4 not emulated
-	d6 CPU fast (1=4MHz, 0=2MHz)
-	d5 1=Enable Video Wait
-	d4 1=Enable External I/O bus
-	d3 1=Enable Alternate Character Set
-	d2 Mode Select (0=64 chars, 1=32chars)
-	d1 Cassette Motor (1=On) */
+    d6 CPU fast (1=4MHz, 0=2MHz)
+    d5 1=Enable Video Wait
+    d4 1=Enable External I/O bus
+    d3 1=Enable Alternate Character Set
+    d2 Mode Select (0=64 chars, 1=32chars)
+    d1 Cassette Motor (1=On) */
 
 	cputag_set_clock(space->machine, "maincpu", data & 0x40 ? MODEL4_MASTER_CLOCK/5 : MODEL4_MASTER_CLOCK/10);
 
@@ -608,14 +608,14 @@ WRITE8_HANDLER( trs80m4_f4_w )
 /* Selection of drive and parameters - d6..d5 not emulated.
  A write also causes the selected drive motor to turn on for about 3 seconds.
  When the motor turns off, the drive is deselected.
-	d7 1=MFM, 0=FM
-	d6 1=Wait
-	d5 1=Write Precompensation enabled
-	d4 0=Side 0, 1=Side 1
-	d3 1=select drive 3
-	d2 1=select drive 2
-	d1 1=select drive 1
-	d0 1=select drive 0 */
+    d7 1=MFM, 0=FM
+    d6 1=Wait
+    d5 1=Write Precompensation enabled
+    d4 0=Side 0, 1=Side 1
+    d3 1=select drive 3
+    d2 1=select drive 2
+    d1 1=select drive 1
+    d0 1=select drive 0 */
 
 	UINT8 drive = 255;
 
@@ -645,15 +645,15 @@ WRITE8_HANDLER( trs80m4_f4_w )
 WRITE8_HANDLER( sys80_f8_w )
 {
 /* not emulated
-	d2 reset UART (XR pin)
-	d1 DTR
-	d0 RTS */
+    d2 reset UART (XR pin)
+    d1 DTR
+    d0 RTS */
 }
 
 WRITE8_HANDLER( sys80_fe_w )
 {
 /* not emulated
-	d4 select internal or external cassette player */
+    d4 select internal or external cassette player */
 
 	trs80_tape_unit = (data & 0x10) ? 2 : 1;
 }
@@ -662,10 +662,10 @@ WRITE8_HANDLER( sys80_fe_w )
 WRITE8_HANDLER( lnw80_fe_w )
 {
 /* lnw80 video options
-	d3 bankswitch lower 16k between roms and hires ram (1=hires)
-	d2 enable colour	\
-	d1 hres			/	these 2 are the bits from the MODE command of LNWBASIC
-	d0 inverse video (entire screen) */
+    d3 bankswitch lower 16k between roms and hires ram (1=hires)
+    d2 enable colour    \
+    d1 hres         /   these 2 are the bits from the MODE command of LNWBASIC
+    d0 inverse video (entire screen) */
 
 	/* get address space instead of io space */
 	const address_space *mem = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
@@ -696,9 +696,9 @@ WRITE8_HANDLER( lnw80_fe_w )
 WRITE8_HANDLER( trs80_ff_w )
 {
 /* Standard output port of Model I
-	d3 ModeSel bit
-	d2 Relay
-	d1, d0 Cassette output */
+    d3 ModeSel bit
+    d2 Relay
+    d1, d0 Cassette output */
 
 	static const double levels[4] = { 0.0, -1.0, 0.0, 1.0 };
 
@@ -716,7 +716,7 @@ WRITE8_HANDLER( trs80_ff_w )
 WRITE8_HANDLER( trs80m4_ff_w )
 {
 /* Cassette port
-	d1, d0 Cassette output */
+    d1, d0 Cassette output */
 
 	static const double levels[4] = { 0.0, -1.0, 0.0, 1.0 };
 	cassette_output( trs80_cass, levels[data & 3]);
@@ -726,15 +726,15 @@ WRITE8_HANDLER( trs80m4_ff_w )
 
 /*************************************
  *
- *		Interrupt handlers.
+ *      Interrupt handlers.
  *
  *************************************/
 
 INTERRUPT_GEN( trs80_rtc_interrupt )
 {
 /* This enables the processing of interrupts for the clock and the flashing cursor.
-	The OS counts one tick for each interrupt. The Model I has 40 ticks per
-	second, while the Model III/4 has 30. */
+    The OS counts one tick for each interrupt. The Model I has 40 ticks per
+    second, while the Model III/4 has 30. */
 
 	if (trs80_model4)	// Model 4
 	{
@@ -797,9 +797,9 @@ const wd17xx_interface trs80_wd17xx_interface = { trs80_fdc_callback, NULL, {FLO
 
 
 /*************************************
- *				     *
- *		Memory handlers      *
- *				     *
+ *                   *
+ *      Memory handlers      *
+ *                   *
  *************************************/
 
 READ8_DEVICE_HANDLER (trs80_wd179x_r)
@@ -813,10 +813,10 @@ READ8_DEVICE_HANDLER (trs80_wd179x_r)
 READ8_HANDLER ( trs80_printer_r )
 {
 	/* Bit 7 - 1 = Busy; 0 = Not Busy
-	   Bit 6 - 1 = Out of Paper; 0 = Paper
-	   Bit 5 - 1 = Printer selected; 0 = Printer not selected
-	   Bit 4 - 1 = No Fault; 0 = Fault
-	   Bits 3..0 - Not used */
+       Bit 6 - 1 = Out of Paper; 0 = Paper
+       Bit 5 - 1 = Printer selected; 0 = Printer not selected
+       Bit 4 - 1 = No Fault; 0 = Fault
+       Bits 3..0 - Not used */
 
 	UINT8 data = 0;
 	data |= centronics_busy_r(trs80_printer) << 7;
@@ -837,8 +837,8 @@ WRITE8_HANDLER( trs80_printer_w )
 WRITE8_HANDLER( trs80_cassunit_w )
 {
 /* not emulated
-	01 for unit 1 (default
-	02 for unit 2 */
+    01 for unit 1 (default
+    02 for unit 2 */
 
 	trs80_tape_unit = data;
 }
@@ -846,11 +846,11 @@ WRITE8_HANDLER( trs80_cassunit_w )
 READ8_HANDLER( trs80_irq_status_r )
 {
 /* (trs80l2) Whenever an interrupt occurs, 37E0 is read to see what devices require service.
-	d7 = RTC
-	d6 = FDC
-	d2 = Communications (not emulated)
-	All interrupting devices are serviced in a single interrupt. There is a mask byte,
-	which is dealt with by the DOS. We take the opportunity to reset the cpu INT line. */
+    d7 = RTC
+    d6 = FDC
+    d2 = Communications (not emulated)
+    All interrupting devices are serviced in a single interrupt. There is a mask byte,
+    which is dealt with by the DOS. We take the opportunity to reset the cpu INT line. */
 
 	int result = trs80_int;
 	cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
@@ -884,7 +884,7 @@ WRITE8_HANDLER( trs80_motor_w )
 		head = 0;
 		break;
 	/* These 3 combinations aren't official. Some manufacturers of double-sided disks
-		used drive select 4 to indicate the other side. */
+        used drive select 4 to indicate the other side. */
 	case 9:
 		drive = 0;
 		head = 1;
@@ -908,7 +908,7 @@ WRITE8_HANDLER( trs80_motor_w )
 }
 
 /*************************************
- *		Keyboard	     *
+ *      Keyboard         *
  *************************************/
 READ8_HANDLER( trs80_keyboard_r )
 {
@@ -936,7 +936,7 @@ READ8_HANDLER( trs80_keyboard_r )
 
 
 /*************************************
- *	Machine			     *
+ *  Machine              *
  *************************************/
 
 MACHINE_RESET( trs80 )

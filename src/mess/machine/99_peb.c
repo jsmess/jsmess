@@ -1,103 +1,103 @@
 /*
-	Peripheral expansion bus support.
+    Peripheral expansion bus support.
 
-	The ti-99/4, ti-99/4a, ti computer 99/8, myarc geneve, and snug sgcpu
-	99/4p systems all feature a bus connector that enables the connection of
-	extension cards.  (Although the hexbus is the preferred bus to add
-	additional peripherals to a ti-99/8, ti-99/8 is believed to be compatible
-	with the older PEB system.)  In the case of the TI consoles, this bus
-	connector is located on the right side of the console.
+    The ti-99/4, ti-99/4a, ti computer 99/8, myarc geneve, and snug sgcpu
+    99/4p systems all feature a bus connector that enables the connection of
+    extension cards.  (Although the hexbus is the preferred bus to add
+    additional peripherals to a ti-99/8, ti-99/8 is believed to be compatible
+    with the older PEB system.)  In the case of the TI consoles, this bus
+    connector is located on the right side of the console.
 
-	While a few extension cards connect to the side bus connector of the
-	ti-99/4(a) console directly, most extension cards were designed to be
-	inserted in a PEB instead.  The PEB (Peripheral Expansion Box) is a big box
-	with an alimentation, a few bus drivers, and several card slots, that
-	connects to the ti-99/4(a) side port.  The reason for using a PEB is that
-	daisy-chaining many modules caused the system to be unreliable due to the
-	noise produced by the successive contacts.  (As a matter of fact, TI
-	initially released most of its extension cards as side bus units, but when
-	the design proved to be unreliable, the PEB was introduced.  The TI speech
-	synthesizer was the only TI extension that remained on the side bus after
-	the introduction of the PEB, probably because TI wanted the speech
-	synthesizer to be a cheap extension, and the PEB was not cheap.)
+    While a few extension cards connect to the side bus connector of the
+    ti-99/4(a) console directly, most extension cards were designed to be
+    inserted in a PEB instead.  The PEB (Peripheral Expansion Box) is a big box
+    with an alimentation, a few bus drivers, and several card slots, that
+    connects to the ti-99/4(a) side port.  The reason for using a PEB is that
+    daisy-chaining many modules caused the system to be unreliable due to the
+    noise produced by the successive contacts.  (As a matter of fact, TI
+    initially released most of its extension cards as side bus units, but when
+    the design proved to be unreliable, the PEB was introduced.  The TI speech
+    synthesizer was the only TI extension that remained on the side bus after
+    the introduction of the PEB, probably because TI wanted the speech
+    synthesizer to be a cheap extension, and the PEB was not cheap.)
 
-	The third-party myarc geneve and snug sgcpu computers are actually cards
-	to be inserted into a PEB: they have a PC keyboard connector, and replace
-	the original ti-99 console completely.
+    The third-party myarc geneve and snug sgcpu computers are actually cards
+    to be inserted into a PEB: they have a PC keyboard connector, and replace
+    the original ti-99 console completely.
 
-	Each expansion card is assigned to one of 16 CRU address ranges.
-	I appended the names of known TI peripherals that use each port (I appended
-	'???' when I don't know what the peripheral is :-) ).
-	* 0x1000-0x10FE "For test equipment use on production line"
-	* 0x1100-0x11FE disk controller
-	* 0x1200-0x12FE modem???
-	* 0x1300-0x13FE RS232 1&2, PIO 1
-	* 0x1400-0x14FE unassigned
-	* 0x1500-0x15FE RS232 3&4, PIO 2
-	* 0x1600-0x16FE unassigned
-	* 0x1700-0x17FE hex-bus (prototypes)
-	* 0x1800-0x18FE thermal printer (early peripheral)
-	* 0x1900-0x19FE EPROM programmer??? (Mezzanine board in July 1981's TI99/7
-		prototype)
-	* 0x1A00-0x1AFE unassigned
-	* 0x1B00-0x1BFE TI GPL debugger card
-	* 0x1C00-0x1CFE Video Controller Card (Possibly the weirdest device.  This
-		card is connected to the video output of the computer, to a VCR, and a
-		video monitor.  It can control the VCR, connect the display to either
-		VCR output or computer video output, and it can read or save binary
-		data to video tape.  I think it can act as a genlock interface (i.e.
-		TMS9918 transparent background shows the video signal), too, but I am
-		not sure about this.)
-	* 0x1D00-0x1DFE IEEE 488 Controller Card ('intelligent' parallel bus,
-		schematics on ftp.whtech.com)
-	* 0x1E00-0x1EFE unassigned
-	* 0x1F00-0x1FFE P-code card (part of a complete development system)
+    Each expansion card is assigned to one of 16 CRU address ranges.
+    I appended the names of known TI peripherals that use each port (I appended
+    '???' when I don't know what the peripheral is :-) ).
+    * 0x1000-0x10FE "For test equipment use on production line"
+    * 0x1100-0x11FE disk controller
+    * 0x1200-0x12FE modem???
+    * 0x1300-0x13FE RS232 1&2, PIO 1
+    * 0x1400-0x14FE unassigned
+    * 0x1500-0x15FE RS232 3&4, PIO 2
+    * 0x1600-0x16FE unassigned
+    * 0x1700-0x17FE hex-bus (prototypes)
+    * 0x1800-0x18FE thermal printer (early peripheral)
+    * 0x1900-0x19FE EPROM programmer??? (Mezzanine board in July 1981's TI99/7
+        prototype)
+    * 0x1A00-0x1AFE unassigned
+    * 0x1B00-0x1BFE TI GPL debugger card
+    * 0x1C00-0x1CFE Video Controller Card (Possibly the weirdest device.  This
+        card is connected to the video output of the computer, to a VCR, and a
+        video monitor.  It can control the VCR, connect the display to either
+        VCR output or computer video output, and it can read or save binary
+        data to video tape.  I think it can act as a genlock interface (i.e.
+        TMS9918 transparent background shows the video signal), too, but I am
+        not sure about this.)
+    * 0x1D00-0x1DFE IEEE 488 Controller Card ('intelligent' parallel bus,
+        schematics on ftp.whtech.com)
+    * 0x1E00-0x1EFE unassigned
+    * 0x1F00-0x1FFE P-code card (part of a complete development system)
 
-	The ti-99/8 implements 16 extra ports:
-	* 0x2000-0x26ff and 0x2800-0x2fff: reserved for future expansion?
-	* 0x2700-0x27ff: internal DSR
+    The ti-99/8 implements 16 extra ports:
+    * 0x2000-0x26ff and 0x2800-0x2fff: reserved for future expansion?
+    * 0x2700-0x27ff: internal DSR
 
-	The snug sgcpu 99/4p implements 12 extra ports:
-	* 0x0400-0x0eff: free
-	* 0x0f00-0x0fff: internal DSR
+    The snug sgcpu 99/4p implements 12 extra ports:
+    * 0x0400-0x0eff: free
+    * 0x0f00-0x0fff: internal DSR
 
-	Known mappings for 3rd party cards:
-	* Horizon RAMdisk: any ports from 0 to 7 (port 0 is most common).
-	* Myarc 128k/512k (RAM and DSR ROM): port 0 (0x1000-0x11FE)
-	* Corcomp 512k (RAM and DSR ROM): port unknown
-	* Super AMS 128k/512k: port 14 (0x1E00-0x1EFE)
-	* Foundation 128k/512k: port 14 (0x1E00-0x1EFE)
-	* Gram Karte: any port (0-15)
-	* EVPC (video card): 0x1400-0x14FE
-	* HSGPL (GROM replacement): 0x1B00-0x1BFE
+    Known mappings for 3rd party cards:
+    * Horizon RAMdisk: any ports from 0 to 7 (port 0 is most common).
+    * Myarc 128k/512k (RAM and DSR ROM): port 0 (0x1000-0x11FE)
+    * Corcomp 512k (RAM and DSR ROM): port unknown
+    * Super AMS 128k/512k: port 14 (0x1E00-0x1EFE)
+    * Foundation 128k/512k: port 14 (0x1E00-0x1EFE)
+    * Gram Karte: any port (0-15)
+    * EVPC (video card): 0x1400-0x14FE
+    * HSGPL (GROM replacement): 0x1B00-0x1BFE
 
-	Of course, these devices additionally need some support routines, and
-	possibly memory-mapped I/O registers.  To do so, memory range 0x4000-5FFF
-	is shared by all cards.  The system enables each card as needed by writing
-	a 1 to the first CRU bit: when this happens the card can safely enable its
-	ROM, RAM, memory-mapped registers, etc.  Provided the ROM uses the proper
-	ROM header, the system will recognize and call peripheral I/O functions,
-	interrupt service routines, and startup routines.  (All these routines are
-	generally called DSR = Device Service Routine.)
+    Of course, these devices additionally need some support routines, and
+    possibly memory-mapped I/O registers.  To do so, memory range 0x4000-5FFF
+    is shared by all cards.  The system enables each card as needed by writing
+    a 1 to the first CRU bit: when this happens the card can safely enable its
+    ROM, RAM, memory-mapped registers, etc.  Provided the ROM uses the proper
+    ROM header, the system will recognize and call peripheral I/O functions,
+    interrupt service routines, and startup routines.  (All these routines are
+    generally called DSR = Device Service Routine.)
 
-	Also, the cards can trigger level-1 ("INTA") interrupts.  A LOAD interrupt
-	is present on the side port of the ti-99/4(a), too, but it was never used
-	by TI, AFAIK.  Also, an interrupt line called "INTB" is found on several
-	cards built by TI, but it is not connected: I am quite unsure whether it
-	was intended to be connected to the LOAD line, to the INT2 line of TMS9985,
-	or it was only to be used with the ti-99/4(a) development system running on
-	a TI990/10.  This is not the only unused feature: cards built by TI support
-	sensing of an interrupt status register and 19-bit addressing, even though
-	ti-99/4(A) does not take advantage of these features.  TI documentation
-	tells that some of these features are "defined by the Personal Computer PCC
-	at Texas Instrument", which is not very explicit (What on earth does "PCC"
-	stand for?).  Maybe it refers to the ti-99/4(a) development system running
-	on a TI990/10, or to the ti-99/7 and ti-99/8 prototypes.
+    Also, the cards can trigger level-1 ("INTA") interrupts.  A LOAD interrupt
+    is present on the side port of the ti-99/4(a), too, but it was never used
+    by TI, AFAIK.  Also, an interrupt line called "INTB" is found on several
+    cards built by TI, but it is not connected: I am quite unsure whether it
+    was intended to be connected to the LOAD line, to the INT2 line of TMS9985,
+    or it was only to be used with the ti-99/4(a) development system running on
+    a TI990/10.  This is not the only unused feature: cards built by TI support
+    sensing of an interrupt status register and 19-bit addressing, even though
+    ti-99/4(A) does not take advantage of these features.  TI documentation
+    tells that some of these features are "defined by the Personal Computer PCC
+    at Texas Instrument", which is not very explicit (What on earth does "PCC"
+    stand for?).  Maybe it refers to the ti-99/4(a) development system running
+    on a TI990/10, or to the ti-99/7 and ti-99/8 prototypes.
 
-	Note that I use 8-bit RAM handlers.  Obviously, using 16-bit handlers would
-	be equivalent and faster on a ti-99/4(a), but we need to interface the
-	extension cards not only to the ti-99/4(a), but to the geneve and ti-99/8
-	emulators as well.
+    Note that I use 8-bit RAM handlers.  Obviously, using 16-bit handlers would
+    be equivalent and faster on a ti-99/4(a), but we need to interface the
+    extension cards not only to the ti-99/4(a), but to the geneve and ti-99/8
+    emulators as well.
 */
 
 #include "driver.h"
@@ -167,7 +167,7 @@ static void (*intb_callback)(running_machine *machine, int state);
 
 
 /*
-	Initializes the expansion card handlers
+    Initializes the expansion card handlers
 
 */
 void ti99_peb_init()
@@ -178,14 +178,14 @@ void ti99_peb_init()
 
 
 /*
-	Resets the expansion card handlers
+    Resets the expansion card handlers
 
-	in_has_16bit_peb: TRUE if we are using the snug sgcpu 99/4p 16-bit
-		extensions
-	in_inta_callback: callback called when the state of INTA changes (may be
-		NULL)
-	in_intb_callback: callback called when the state of INTB changes (may be
-		NULL)
+    in_has_16bit_peb: TRUE if we are using the snug sgcpu 99/4p 16-bit
+        extensions
+    in_inta_callback: callback called when the state of INTA changes (may be
+        NULL)
+    in_intb_callback: callback called when the state of INTB changes (may be
+        NULL)
 */
 void ti99_peb_reset(int in_has_16bit_peb, void (*in_inta_callback)(running_machine *machine, int state), void (*in_intb_callback)(running_machine *machine, int state))
 {
@@ -202,12 +202,12 @@ void ti99_peb_reset(int in_has_16bit_peb, void (*in_inta_callback)(running_machi
 }
 
 /*
-	Sets the handlers for one expansion port (normal 8-bit card)
+    Sets the handlers for one expansion port (normal 8-bit card)
 
-	cru_base: CRU base address (any of 0x1000, 0x1100, 0x1200, ..., 0x1F00)
-		(snug sgcpu 99/4p accepts 0x0400, ..., 0x1F00, ti-99/8 accepts 0x1000,
-		..., 0x2F00)
-	handler: handler structure for the given card
+    cru_base: CRU base address (any of 0x1000, 0x1100, 0x1200, ..., 0x1F00)
+        (snug sgcpu 99/4p accepts 0x0400, ..., 0x1F00, ti-99/8 accepts 0x1000,
+        ..., 0x2F00)
+    handler: handler structure for the given card
 */
 void ti99_peb_set_card_handlers(int cru_base, const ti99_peb_card_handlers_t *handler)
 {
@@ -241,13 +241,13 @@ void ti99_peb_set_card_handlers(int cru_base, const ti99_peb_card_handlers_t *ha
 }
 
 /*
-	Sets the handlers for one expansion port (special 16-bit card for snug
-	sgcpu 99/4p)
+    Sets the handlers for one expansion port (special 16-bit card for snug
+    sgcpu 99/4p)
 
-	cru_base: CRU base address (any of 0x1000, 0x1100, 0x1200, ..., 0x1F00)
-		(snug sgcpu 99/4p accepts 0x0400, ..., 0x1F00, ti-99/8 accepts 0x1000,
-		..., 0x2F00)
-	handler: handler structure for the given card
+    cru_base: CRU base address (any of 0x1000, 0x1100, 0x1200, ..., 0x1F00)
+        (snug sgcpu 99/4p accepts 0x0400, ..., 0x1F00, ti-99/8 accepts 0x1000,
+        ..., 0x2F00)
+    handler: handler structure for the given card
 */
 void ti99_peb_set_16bit_card_handlers(int cru_base, const ti99_peb_16bit_card_handlers_t *handler)
 {
@@ -272,13 +272,13 @@ void ti99_peb_set_16bit_card_handlers(int cru_base, const ti99_peb_16bit_card_ha
 }
 
 /*
-	Update ila status register and assert or clear INTA interrupt line
-	accordingly.
+    Update ila status register and assert or clear INTA interrupt line
+    accordingly.
 
-	bit: bit number ([0,7] for original INTA register, [8,15] are extra
-		"virtual" bits for devices that assert the INTA line without setting a
-		bit of the ILA register)
-	state: 1 to assert bit, 0 to clear
+    bit: bit number ([0,7] for original INTA register, [8,15] are extra
+        "virtual" bits for devices that assert the INTA line without setting a
+        bit of the ILA register)
+    state: 1 to assert bit, 0 to clear
 */
 void ti99_peb_set_ila_bit(running_machine *machine, int bit, int state)
 {
@@ -297,13 +297,13 @@ void ti99_peb_set_ila_bit(running_machine *machine, int bit, int state)
 }
 
 /*
-	Update ilb status register and assert or clear INTB interrupt line
-	accordingly.
+    Update ilb status register and assert or clear INTB interrupt line
+    accordingly.
 
-	bit: bit number ([0,7] for original INTAB register, [8,15] are extra
-		"virtual" bits for devices that assert the INTB line without setting a
-		bit of the ILB register)
-	state: 1 to assert bit, 0 to clear
+    bit: bit number ([0,7] for original INTAB register, [8,15] are extra
+        "virtual" bits for devices that assert the INTB line without setting a
+        bit of the ILB register)
+    state: 1 to assert bit, 0 to clear
 */
 void ti99_peb_set_ilb_bit(running_machine *machine, int bit, int state)
 {
@@ -323,7 +323,7 @@ void ti99_peb_set_ilb_bit(running_machine *machine, int bit, int state)
 
 
 /*
-	Read CRU in range >1000->1ffe (>800->fff) (ti-99/4(a))
+    Read CRU in range >1000->1ffe (>800->fff) (ti-99/4(a))
 */
 READ8_HANDLER ( ti99_4x_peb_cru_r )
 {
@@ -340,7 +340,7 @@ READ8_HANDLER ( ti99_4x_peb_cru_r )
 }
 
 /*
-	Write CRU in range >1000->1ffe (>800->fff) (ti-99/4(a))
+    Write CRU in range >1000->1ffe (>800->fff) (ti-99/4(a))
 */
 WRITE8_HANDLER ( ti99_4x_peb_cru_w )
 {
@@ -372,7 +372,7 @@ WRITE8_HANDLER ( ti99_4x_peb_cru_w )
 }
 
 /*
-	Read mem in range >4000->5ffe (ti-99/4(a))
+    Read mem in range >4000->5ffe (ti-99/4(a))
 */
 READ16_HANDLER ( ti99_4x_peb_r )
 {
@@ -395,7 +395,7 @@ READ16_HANDLER ( ti99_4x_peb_r )
 }
 
 /*
-	Write mem in range >4000->5ffe (ti-99/4(a))
+    Write mem in range >4000->5ffe (ti-99/4(a))
 */
 WRITE16_HANDLER ( ti99_4x_peb_w )
 {
@@ -419,7 +419,7 @@ WRITE16_HANDLER ( ti99_4x_peb_w )
 
 
 /*
-	Read CRU in range >1000->1ffe (>800->fff) (Geneve)
+    Read CRU in range >1000->1ffe (>800->fff) (Geneve)
 */
  READ8_HANDLER ( geneve_peb_cru_r )
 {
@@ -436,7 +436,7 @@ WRITE16_HANDLER ( ti99_4x_peb_w )
 }
 
 /*
-	Write CRU in range >1000->1ffe (>800->fff) (Geneve)
+    Write CRU in range >1000->1ffe (>800->fff) (Geneve)
 */
 WRITE8_HANDLER ( geneve_peb_cru_w )
 {
@@ -468,7 +468,7 @@ WRITE8_HANDLER ( geneve_peb_cru_w )
 }
 
 /*
-	Read mem in range >4000->5fff (Geneve)
+    Read mem in range >4000->5fff (Geneve)
 */
  READ8_HANDLER ( geneve_peb_r )
 {
@@ -488,7 +488,7 @@ WRITE8_HANDLER ( geneve_peb_cru_w )
 }
 
 /*
-	Write mem in range >4000->5fff (Geneve)
+    Write mem in range >4000->5fff (Geneve)
 */
 WRITE8_HANDLER ( geneve_peb_w )
 {
@@ -505,7 +505,7 @@ WRITE8_HANDLER ( geneve_peb_w )
 }
 
 /*
-	Read CRU in range >1000->2ffe (>0800->17ff) (ti-99/8)
+    Read CRU in range >1000->2ffe (>0800->17ff) (ti-99/8)
 */
  READ8_HANDLER ( ti99_8_peb_cru_r )
 {
@@ -522,7 +522,7 @@ WRITE8_HANDLER ( geneve_peb_w )
 }
 
 /*
-	Write CRU in range >1000->2ffe (>0800->17ff) (ti-99/8)
+    Write CRU in range >1000->2ffe (>0800->17ff) (ti-99/8)
 */
 WRITE8_HANDLER ( ti99_8_peb_cru_w )
 {
@@ -554,7 +554,7 @@ WRITE8_HANDLER ( ti99_8_peb_cru_w )
 }
 
 /*
-	Read mem in range >4000->5fff (ti-99/8)
+    Read mem in range >4000->5fff (ti-99/8)
 */
  READ8_HANDLER ( ti99_8_peb_r )
 {
@@ -574,7 +574,7 @@ WRITE8_HANDLER ( ti99_8_peb_cru_w )
 }
 
 /*
-	Write mem in range >4000->5fff (ti-99/8)
+    Write mem in range >4000->5fff (ti-99/8)
 */
 WRITE8_HANDLER ( ti99_8_peb_w )
 {
@@ -591,7 +591,7 @@ WRITE8_HANDLER ( ti99_8_peb_w )
 }
 
 /*
-	Read CRU in range >0400->1ffe (>200->fff) (snug sgcpu 99/4p)
+    Read CRU in range >0400->1ffe (>200->fff) (snug sgcpu 99/4p)
 */
  READ8_HANDLER ( ti99_4p_peb_cru_r )
 {
@@ -608,7 +608,7 @@ WRITE8_HANDLER ( ti99_8_peb_w )
 }
 
 /*
-	Write CRU in range >0400->1ffe (>200->fff) (snug sgcpu 99/4p)
+    Write CRU in range >0400->1ffe (>200->fff) (snug sgcpu 99/4p)
 */
 WRITE8_HANDLER ( ti99_4p_peb_cru_w )
 {
@@ -658,7 +658,7 @@ WRITE8_HANDLER ( ti99_4p_peb_cru_w )
 }
 
 /*
-	Read mem in range >4000->5ffe (snug sgcpu 99/4p)
+    Read mem in range >4000->5ffe (snug sgcpu 99/4p)
 */
 READ16_HANDLER ( ti99_4p_peb_r )
 {
@@ -709,7 +709,7 @@ READ16_HANDLER ( ti99_4p_peb_r )
 }
 
 /*
-	Write mem in range >4000->5ffe (snug sgcpu 99/4p)
+    Write mem in range >4000->5ffe (snug sgcpu 99/4p)
 */
 WRITE16_HANDLER ( ti99_4p_peb_w )
 {
@@ -746,7 +746,7 @@ WRITE16_HANDLER ( ti99_4p_peb_w )
 }
 
 /*
-	Set the state of the SENILA line (snug sgcpu 99/4p)
+    Set the state of the SENILA line (snug sgcpu 99/4p)
 */
 void ti99_4p_peb_set_senila(int state)
 {
@@ -754,7 +754,7 @@ void ti99_4p_peb_set_senila(int state)
 }
 
 /*
-	Set the state of the SENILB line (snug sgcpu 99/4p)
+    Set the state of the SENILB line (snug sgcpu 99/4p)
 */
 void ti99_4p_peb_set_senilb(int state)
 {

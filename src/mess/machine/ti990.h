@@ -1,5 +1,5 @@
 /*
-	ti990.h: header file for ti990.c
+    ti990.h: header file for ti990.c
 */
 
 void ti990_reset_int(void);

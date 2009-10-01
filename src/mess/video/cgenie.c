@@ -255,9 +255,9 @@ static void cgenie_refresh_monitor(running_machine *machine, bitmap_t * bitmap, 
 		cursor = 256 * crt.cursor_address_hi + crt.cursor_address_lo;
 
 		/*
-		 * for every character in the Video RAM, check if it has been modified since
-		 * last time and update it accordingly.
-		 */
+         * for every character in the Video RAM, check if it has been modified since
+         * last time and update it accordingly.
+         */
 		for( address = 0; address < size; address++ )
 		{
 			i = (offset + address) & 0x3fff;
@@ -280,7 +280,7 @@ static void cgenie_refresh_monitor(running_machine *machine, bitmap_t * bitmap, 
 			{
 				/* get character code */
 				code = videoram[i];
-				
+
 				/* translate defined character sets */
 				code += cgenie_font_offset[(code >> 6) & 3];
 				drawgfx_opaque(bitmap, &r, machine->gfx[0], code, colorram[i&0x3ff],
@@ -304,10 +304,10 @@ static void cgenie_refresh_monitor(running_machine *machine, bitmap_t * bitmap, 
 					crt.cursor_phase++;
 					crt.cursor_visible = (crt.cursor_phase >> 3) & 1;
 				}
-				
+
 				if( !crt.cursor_visible )
 					continue;
-				
+
 				rc.min_x = r.min_x;
 				rc.max_x = r.max_x;
 				rc.min_y = r.min_y + (crt.cursor_top & 15);
@@ -334,9 +334,9 @@ static void cgenie_refresh_tv_set(running_machine *machine, bitmap_t * bitmap, c
 		cursor = 256 * crt.cursor_address_hi + crt.cursor_address_lo;
 
 		/*
-		 * for every character in the Video RAM, check if it has been modified since
-		 * last time and update it accordingly.
-		 */
+         * for every character in the Video RAM, check if it has been modified since
+         * last time and update it accordingly.
+         */
 		for( address = 0; address < size; address++ )
 		{
 			i = (offset + address) & 0x3fff;
@@ -361,7 +361,7 @@ static void cgenie_refresh_tv_set(running_machine *machine, bitmap_t * bitmap, c
 			{
 				/* get character code */
 				code = videoram[i];
-				
+
 				/* translate defined character sets */
 				code += cgenie_font_offset[(code >> 6) & 3];
 				drawgfx_opaque(tmpbitmap, &r, machine->gfx[0], code, colorram[i&0x3ff] + 16,
@@ -387,15 +387,15 @@ static void cgenie_refresh_tv_set(running_machine *machine, bitmap_t * bitmap, c
 					crt.cursor_phase++;
 					crt.cursor_visible = (crt.cursor_phase >> 3) & 1;
 				}
-				
+
 				if( !crt.cursor_visible )
 					continue;
-				
+
 				rc.min_x = r.min_x;
 				rc.max_x = r.max_x;
 				rc.min_y = r.min_y + (crt.cursor_top & 15);
 				rc.max_y = r.min_y + (crt.cursor_bottom & 15);
-				
+
 				drawgfx_opaque(tmpbitmap, &rc, machine->gfx[0], 0x7f, colorram[i&0x3ff] + 16,
 					0, 0, rc.min_x, rc.min_y);
 				drawgfx_opaque(dlybitmap, &rc, machine->gfx[0], 0x7f, colorram[i&0x3ff] + 32,

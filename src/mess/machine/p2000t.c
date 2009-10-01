@@ -42,7 +42,7 @@ static struct
 
 READ8_HANDLER (	p2000t_port_000f_r )
 {
-	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", 
+	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4",
 										"KEY5", "KEY6", "KEY7", "KEY8", "KEY9" };
 
 	if (p2000t_ports.port_101f & P2000M_101F_KEYINT)

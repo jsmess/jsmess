@@ -87,7 +87,7 @@ static UINT8 lynx_memory_config;
 
 /****************************************
 
-	Graphics Drawing
+    Graphics Drawing
 
 ****************************************/
 
@@ -164,7 +164,7 @@ INLINE void lynx_plot_pixel(const int mode, const int x, const int y, const int 
 	{
 		case NORMAL_SPRITE:
 		/* A sprite may be set to 'normal'. This means that pen number '0' will be transparent and
-		non-collideable. All other pens will be opaque and collideable */
+        non-collideable. All other pens will be opaque and collideable */
 			if (color == 0)
 				break;
 			if (!(x & 0x01))		/* Upper nibble */
@@ -198,7 +198,7 @@ INLINE void lynx_plot_pixel(const int mode, const int x, const int y, const int 
 
 		case BOUNDARY:
 		/* A sprite may be set to 'boundary'. This is a 'normal' sprite with the exception that pen
-		number 'F' is transparent (and still collideable). */
+        number 'F' is transparent (and still collideable). */
 			if (color == 0)
 				break;
 			if (!(x & 0x01))		/* Upper nibble */
@@ -237,7 +237,7 @@ INLINE void lynx_plot_pixel(const int mode, const int x, const int y, const int 
 
 		case SHADOW:
 		/* A sprite may be set to 'shadow'. This is a 'normal' sprite with the exception that pen
-		number 'E' is non-collideable (but still opaque) */
+        number 'E' is non-collideable (but still opaque) */
 			if (color == 0)
 				break;
 			if (!(x & 0x01))		/* Upper nibble */
@@ -271,8 +271,8 @@ INLINE void lynx_plot_pixel(const int mode, const int x, const int y, const int 
 
 		case BOUNDARY_SHADOW:
 		/* This sprite is a 'normal' sprite with the characteristics of both 'boundary'
-		and 'shadow'. That is, pen number 'F' is transparent (and still collideable) and
-		pen number 'E' is non-collideable (but still opaque). */
+        and 'shadow'. That is, pen number 'F' is transparent (and still collideable) and
+        pen number 'E' is non-collideable (but still opaque). */
 			if (color == 0)
 				break;
 			if (!(x & 0x01))		/* Upper nibble */
@@ -311,10 +311,10 @@ INLINE void lynx_plot_pixel(const int mode, const int x, const int y, const int 
 
 		case BACKGROUND:
 		/* A sprite may be set to 'background'. This sprite will overwrite the contents of the video and
-		collision buffers. Pens '0' and 'F' are no longer transparent. This sprite is used to initialize
-		the buffers at the start of a 'painting'. Additionally, no collision detection is done, and no write
-		to the collision depository occurs. The 'E' error will cause the pen number 'E' to be non-collideable
-		and therefore not clear the collision buffer */
+        collision buffers. Pens '0' and 'F' are no longer transparent. This sprite is used to initialize
+        the buffers at the start of a 'painting'. Additionally, no collision detection is done, and no write
+        to the collision depository occurs. The 'E' error will cause the pen number 'E' to be non-collideable
+        and therefore not clear the collision buffer */
 			if (!(x & 0x01))		/* Upper nibble */
 			{
 				*screen = (*screen & 0x0f) | (color << 4);
@@ -349,7 +349,7 @@ INLINE void lynx_plot_pixel(const int mode, const int x, const int y, const int 
 
 		case NO_COLL:
 		/* A sprite may be set to 'non-collideable'. This means that it will have no affect on the contents of
-		the collision buffer and all other collision activities are overridden (pen 'F' is not collideable). */
+        the collision buffer and all other collision activities are overridden (pen 'F' is not collideable). */
 			if (color == 0)
 				break;
 			if (!(x & 0x01))		/* Upper nibble */
@@ -361,9 +361,9 @@ INLINE void lynx_plot_pixel(const int mode, const int x, const int y, const int 
 
 		case XOR_SPRITE:
 		/* This is a 'normal' sprite with the exception that the data from the video buffer is exclusive-ored
-		with the sprite data and written back out to the video buffer. Collision activity is 'normal'. The 'E'
-		error will cause the pen number 'E' to be non-collideable and therefore not react with the collision
-		buffer */
+        with the sprite data and written back out to the video buffer. Collision activity is 'normal'. The 'E'
+        error will cause the pen number 'E' to be non-collideable and therefore not react with the collision
+        buffer */
 			if (color == 0)
 				break;
 			if (!(x & 0x01))		/* Upper nibble */
@@ -892,7 +892,7 @@ static void lynx_blitter(running_machine *machine)
 
 /****************************************
 
-	Suzy Emulation
+    Suzy Emulation
 
 ****************************************/
 
@@ -913,13 +913,13 @@ static void lynx_divide( void )
 	UINT16 right;
 	UINT32 res, mod;
 	/*
-	Hardware divide:
-				EFGH
-	*			  NP
-	----------------
-				ABCD
-	Remainder (JK)LM
-	*/
+    Hardware divide:
+                EFGH
+    *             NP
+    ----------------
+                ABCD
+    Remainder (JK)LM
+    */
 
 	left = suzy.data[MATH_H] | (suzy.data[MATH_G] << 8) | (suzy.data[MATH_F] << 16) | (suzy.data[MATH_E] << 24);
 	right = suzy.data[MATH_P] | (suzy.data[MATH_N] << 8);
@@ -936,7 +936,7 @@ static void lynx_divide( void )
 		res = left / right;
 		mod = left % right;
 	}
-//	logerror("coprocessor %8x / %8x = %4x\n", left, right, res);
+//  logerror("coprocessor %8x / %8x = %4x\n", left, right, res);
 	suzy.data[MATH_D] = res & 0xff;
 	suzy.data[MATH_C] = res >> 8;
 	suzy.data[MATH_B] = res >> 16;
@@ -953,13 +953,13 @@ static void lynx_multiply( void )
 	UINT16 left, right;
 	UINT32 res, accu;
 	/*
-	Hardware multiply:
-				  AB
-	*			  CD
-	----------------
-				EFGH
-	Accumulate	JKLM
-	*/
+    Hardware multiply:
+                  AB
+    *             CD
+    ----------------
+                EFGH
+    Accumulate  JKLM
+    */
 	suzy.accumulate_overflow = FALSE;
 
 	left = suzy.data[MATH_B] | (suzy.data[MATH_A] << 8);
@@ -1060,7 +1060,7 @@ READ8_HANDLER( suzy_read )
 		default:
 			value = suzy.data[offset];
 	}
-//	logerror("suzy read %.2x %.2x\n",offset,data);
+//  logerror("suzy read %.2x %.2x\n",offset,data);
 	return value;
 }
 
@@ -1071,8 +1071,8 @@ WRITE8_HANDLER(suzy_write)
 	/* Additional effects of a write */
 	/* Even addresses are the LSB. Any CPU write to an LSB in 0x00-0x7f will set the MSB to 0. */
 	/* This in particular holds for math quantities:  Writing to B (0x54), D (0x52),
-	F (0x62), H (0x60), K (0x6e) or M (0x6c) will force a '0' to be written to A (0x55),
-	C (0x53), E (0x63), G (0x61), J (0x6f) or L (0x6d) respectively */
+    F (0x62), H (0x60), K (0x6e) or M (0x6c) will force a '0' to be written to A (0x55),
+    C (0x53), E (0x63), G (0x61), J (0x6f) or L (0x6d) respectively */
 	switch(offset)
 	{
 	case 0x00: case 0x02: case 0x04: case 0x06: case 0x08: case 0x0a: case 0x0c: case 0x0e:
@@ -1094,7 +1094,7 @@ WRITE8_HANDLER(suzy_write)
 		break;
 	case 0x53:
 	/* If we are going to perform a signed multiplication, we store the sign and convert the number
-	to an unsigned one */
+    to an unsigned one */
 		if (suzy.data[SPRSYS] & 0x80)		/* signed math */
 		{
 			UINT16 factor, temp;
@@ -1112,7 +1112,7 @@ WRITE8_HANDLER(suzy_write)
 		break;
 	/* Writing to A will start a 16 bit multiply */
 	/* If we are going to perform a signed multiplication, we also store the sign and convert the
-	number to an unsigned one */
+    number to an unsigned one */
 	case 0x55:
 		if (suzy.data[SPRSYS] & 0x80)		/* signed math */
 		{
@@ -1141,14 +1141,14 @@ WRITE8_HANDLER(suzy_write)
 			lynx_blitter(space->machine);
 		}
 		break;
-//	case 0xb2: case 0xb3: /* Cart Bank 0 & 1 */
+//  case 0xb2: case 0xb3: /* Cart Bank 0 & 1 */
 	}
 }
 
 
 /****************************************
 
-	Mikey emulation
+    Mikey emulation
 
 ****************************************/
 
@@ -1301,7 +1301,7 @@ static void lynx_draw_lines(running_machine *machine, int newline)
 
 /****************************************
 
-	Timers
+    Timers
 
 ****************************************/
 
@@ -1361,12 +1361,12 @@ static void lynx_timer_init(running_machine *machine, int which)
 
 static void lynx_timer_signal_irq(running_machine *machine, int which)
 {
-	if ( ( lynx_timer[which].cntrl1 & 0x80 ) && ( which != 4 ) ) 
+	if ( ( lynx_timer[which].cntrl1 & 0x80 ) && ( which != 4 ) )
 	{ // irq flag handling later
 		mikey.data[0x81] |= ( 1 << which );
 		cputag_set_input_line(machine, "maincpu", M65SC02_IRQ_LINE, ASSERT_LINE);
 	}
-	switch ( which ) 
+	switch ( which )
 	{
 	case 0:
 		lynx_timer_count_down( machine, 2 );
@@ -1394,22 +1394,22 @@ static void lynx_timer_signal_irq(running_machine *machine, int which)
 
 void lynx_timer_count_down(running_machine *machine, int which)
 {
-	if ( ( lynx_timer[which].cntrl1 & 0x0f ) == 0x0f ) 
+	if ( ( lynx_timer[which].cntrl1 & 0x0f ) == 0x0f )
 	{
-		if ( lynx_timer[which].counter > 0 ) 
+		if ( lynx_timer[which].counter > 0 )
 		{
 			lynx_timer[which].counter--;
 			return;
 		}
-		if ( lynx_timer[which].counter == 0 ) 
+		if ( lynx_timer[which].counter == 0 )
 		{
 			lynx_timer[which].cntrl2 |= 8;
 			lynx_timer_signal_irq(machine, which);
-			if ( lynx_timer[which].cntrl1 & 0x10 ) 
+			if ( lynx_timer[which].cntrl1 & 0x10 )
 			{
 				lynx_timer[which].counter = lynx_timer[which].bakup;
-			} 
-			else 
+			}
+			else
 			{
 				lynx_timer[which].counter--;
 			}
@@ -1488,7 +1488,7 @@ static void lynx_timer_write(int which, int offset, UINT8 data)
 				lynx_timer[which].cntrl2 &= ~0x08;
 			break;
 		case 2:
-//			lynx_timer[which].counter = data;	// why commented out?
+//          lynx_timer[which].counter = data;   // why commented out?
 			break;
 		case 3:
 			lynx_timer[which].cntrl2 = (lynx_timer[which].cntrl2 & 0x08) | (data & ~0x08);
@@ -1518,7 +1518,7 @@ static void lynx_timer_write(int which, int offset, UINT8 data)
 
 /****************************************
 
-	UART Emulation
+    UART Emulation
 
 ****************************************/
 
@@ -1606,7 +1606,7 @@ static WRITE8_HANDLER(lynx_uart_w)
 
 /****************************************
 
-	Mikey memory handlers
+    Mikey memory handlers
 
 ****************************************/
 
@@ -1761,7 +1761,7 @@ WRITE8_HANDLER(mikey_write)
 			logerror("Trying to enable bank 1 write. %d\n", mikey.data[offset] & 0x10);
 		break;
 
-//	case 0x90: // SDONEACK - Suzy Done Acknowledge
+//  case 0x90: // SDONEACK - Suzy Done Acknowledge
 	case 0x91: // CPUSLEEP - CPU Bus Request Disable
 		mikey.data[offset] = data;
 		if (!data)
@@ -1780,7 +1780,7 @@ WRITE8_HANDLER(mikey_write)
 
 /****************************************
 
-	Init / Config
+    Init / Config
 
 ****************************************/
 
@@ -1792,7 +1792,7 @@ READ8_HANDLER( lynx_memory_config_r )
 WRITE8_HANDLER( lynx_memory_config_w )
 {
 	/* bit 7: hispeed, uses page mode accesses (4 instead of 5 cycles )
-	 * when these are safe in the cpu */
+     * when these are safe in the cpu */
 	lynx_memory_config = data;
 
 	memory_install_read8_handler(space, 0xfc00, 0xfcff, 0, 0, (data & 1) ? SMH_BANK(1) : suzy_read);
@@ -1869,7 +1869,7 @@ MACHINE_START( lynx )
 
 /****************************************
 
-	Image handling
+    Image handling
 
 ****************************************/
 
@@ -1959,8 +1959,8 @@ static DEVICE_IMAGE_LOAD( lynx_cart )
 			return INIT_FAIL;
 
 		/* 2008-10 FP: According to Handy source these should be page_size_bank0. Are we using
-		it correctly in MESS? Moreover, the next two values should be page_size_bank1. We should
-		implement this as well */
+        it correctly in MESS? Moreover, the next two values should be page_size_bank1. We should
+        implement this as well */
 		lynx_granularity = header[4] | (header[5] << 8);
 
 		logerror ("%s %dkb cartridge with %dbyte granularity from %s\n",
@@ -1971,8 +1971,8 @@ static DEVICE_IMAGE_LOAD( lynx_cart )
 	else if (!mame_stricmp (filetype, "lyx"))
 	{
 		/* 2008-10 FP: FIXME: .lyx file don't have an header, hence they miss "lynx_granularity"
-		(see above). What if bank 0 has to be loaded elsewhere? And what about bank 1?
-		These should work with most .lyx files, but we need additional info on raw cart images */
+        (see above). What if bank 0 has to be loaded elsewhere? And what about bank 1?
+        These should work with most .lyx files, but we need additional info on raw cart images */
 		if (size == 0x20000)
 			lynx_granularity = 0x0200;
 		else if (size == 0x80000)

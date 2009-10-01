@@ -1,37 +1,37 @@
 /*********************************************************************
 
-	applefdc.c
+    applefdc.c
 
-	Implementation of various Apple Floppy Disk Controllers, including
-	the classic Apple controller and the IWM (Integrated Woz Machine)
-	chip
+    Implementation of various Apple Floppy Disk Controllers, including
+    the classic Apple controller and the IWM (Integrated Woz Machine)
+    chip
 
-	The IWM chip was used as the floppy disk controller for early Macs and the
-	Apple IIgs, and was eventually superceded by the SWIM chp.
+    The IWM chip was used as the floppy disk controller for early Macs and the
+    Apple IIgs, and was eventually superceded by the SWIM chp.
 
-	Nate Woods
-	Raphael Nabet
+    Nate Woods
+    Raphael Nabet
 
-	Writing this code would not be possible if it weren't for the work of the
-	XGS and KEGS emulators which also contain IWM emulations.
+    Writing this code would not be possible if it weren't for the work of the
+    XGS and KEGS emulators which also contain IWM emulations.
 
-	TODO
-	  -	Implement the unimplemented IWM modes
-			- IWM_MODE_CLOCKSPEED
-			- IWM_MODE_BITCELLTIME
-			- IWM_MODE_HANDSHAKEPROTOCOL
-			- IWM_MODE_LATCHMODE
-	  - Investigate the differences between the IWM and the classic Apple II
-	    controller more fully.  It is currently unclear what are genuine
-		differences and what are effectively hacks that "just seem" to work.
-	  - Figure out iwm_readenable2handshake() and iwm_enable2(); they are
-	    hackish at best
-	  - Support the SWIM chip
-	  - Proper timing
-	  - This code was originally IWM specific; we need to clean up IWMisms in
-	    the code
-	  - Make it faster?
-	  - Add sound?
+    TODO
+      - Implement the unimplemented IWM modes
+            - IWM_MODE_CLOCKSPEED
+            - IWM_MODE_BITCELLTIME
+            - IWM_MODE_HANDSHAKEPROTOCOL
+            - IWM_MODE_LATCHMODE
+      - Investigate the differences between the IWM and the classic Apple II
+        controller more fully.  It is currently unclear what are genuine
+        differences and what are effectively hacks that "just seem" to work.
+      - Figure out iwm_readenable2handshake() and iwm_enable2(); they are
+        hackish at best
+      - Support the SWIM chip
+      - Proper timing
+      - This code was originally IWM specific; we need to clean up IWMisms in
+        the code
+      - Make it faster?
+      - Add sound?
 
 *********************************************************************/
 
@@ -70,26 +70,26 @@ typedef enum
 /***************************************************************************
     IWM MODE
 
-	The IWM mode has the following values:
+    The IWM mode has the following values:
 
-	Bit 7	  Reserved
-	Bit 6	  Reserved
-	Bit 5	  Reserved
-	Bit 4	! Clock speed
-			    0=7MHz;	used by Apple IIgs
-			    1=8MHz;	used by Mac (I believe)
-	Bit 3	! Bit cell time
-			    0=4usec/bit	(used for 5.25" drives)
-			    1=2usec/bit (used for 3.5" drives)
-	Bit 2	  Motor-off delay
-			    0=leave on for 1 sec after system turns it off
-			    1=turn off immediately
-	Bit 1	! Handshake protocol
-			    0=synchronous (software supplies timing for writing data; used for 5.25" drives)
-			    1=asynchronous (IWM supplies timing; used for 3.5" drives)
-	Bit 0	! Latch mode
-			    0=read data stays valid for 7usec (used for 5.25" drives)
-			    1=read data stays valid for full byte time (used for 3.5" drives)
+    Bit 7     Reserved
+    Bit 6     Reserved
+    Bit 5     Reserved
+    Bit 4   ! Clock speed
+                0=7MHz; used by Apple IIgs
+                1=8MHz; used by Mac (I believe)
+    Bit 3   ! Bit cell time
+                0=4usec/bit (used for 5.25" drives)
+                1=2usec/bit (used for 3.5" drives)
+    Bit 2     Motor-off delay
+                0=leave on for 1 sec after system turns it off
+                1=turn off immediately
+    Bit 1   ! Handshake protocol
+                0=synchronous (software supplies timing for writing data; used for 5.25" drives)
+                1=asynchronous (IWM supplies timing; used for 3.5" drives)
+    Bit 0   ! Latch mode
+                0=read data stays valid for 7usec (used for 5.25" drives)
+                1=read data stays valid for full byte time (used for 3.5" drives)
 
  ***************************************************************************/
 
@@ -157,7 +157,7 @@ INLINE const applefdc_interface *get_interface(const device_config *device)
 	static const applefdc_interface dummy_interface = {0, };
 
 	assert_is_applefdc(device);
-	return (device->static_config != NULL) 
+	return (device->static_config != NULL)
 		? (const applefdc_interface *) device->static_config
 		: &dummy_interface;
 }
@@ -253,12 +253,12 @@ static UINT8 applefdc_statusreg_r(const device_config *device)
 	const applefdc_interface *intf = get_interface(device);
 
 	/* IWM status:
-	 *
-	 * Bit 7	Sense input (write protect for 5.25" drive and general status line for 3.5")
-	 * Bit 6	Reserved
-	 * Bit 5	Drive enable (is 1 if drive is on)
-	 * Bits 4-0	Same as IWM mode bits 4-0
-	 */
+     *
+     * Bit 7    Sense input (write protect for 5.25" drive and general status line for 3.5")
+     * Bit 6    Reserved
+     * Bit 5    Drive enable (is 1 if drive is on)
+     * Bits 4-0 Same as IWM mode bits 4-0
+     */
 
 	status = iwm_enable2(device) ? 1 : (intf->read_status ? intf->read_status(device) : 0);
 
@@ -308,10 +308,10 @@ static UINT8 applefdc_read_reg(const device_config *device, int lines)
 			else
 			{
 				/*
-				 * Right now, this function assumes latch mode; which is always used for
-				 * 3.5 inch drives.  Eventually we should check to see if latch mode is
-				 * off
-				 */
+                 * Right now, this function assumes latch mode; which is always used for
+                 * 3.5 inch drives.  Eventually we should check to see if latch mode is
+                 * off
+                 */
 				if (LOG_APPLEFDC)
 				{
 					if ((fdc->mode & IWM_MODE_LATCHMODE) == 0x00)
@@ -329,8 +329,8 @@ static UINT8 applefdc_read_reg(const device_config *device, int lines)
 
 		case IWM_Q7:
 			/* Classic Apple II: Read status register
-			 * IWM: Read handshake register
-			 */
+             * IWM: Read handshake register
+             */
 			if (fdc->type == APPLEFDC_APPLE2)
 				result = applefdc_statusreg_r(device);
 			else
@@ -361,10 +361,10 @@ static void applefdc_write_reg(const device_config *device, UINT8 data)
 			else if (!iwm_enable2(device))
 			{
 				/*
-				 * Right now, this function assumes latch mode; which is always used for
-				 * 3.5 inch drives.  Eventually we should check to see if latch mode is
-				 * off
-				 */
+                 * Right now, this function assumes latch mode; which is always used for
+                 * 3.5 inch drives.  Eventually we should check to see if latch mode is
+                 * off
+                 */
 				if (LOG_APPLEFDC)
 				{
 					if ((fdc->mode & IWM_MODE_LATCHMODE) == 0)
@@ -382,7 +382,7 @@ static void applefdc_write_reg(const device_config *device, UINT8 data)
 
 /*-------------------------------------------------
     TIMER_CALLBACK(iwm_turnmotor_onoff) - timer
-	callback for turning motor on or off
+    callback for turning motor on or off
 -------------------------------------------------*/
 
 static TIMER_CALLBACK(iwm_turnmotor_onoff)

@@ -6,9 +6,9 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- proper layout
+    - proper layout
 
 */
 
@@ -160,8 +160,8 @@ static CDP1802_EF_READ( elf2_ef_r )
 {
 	/*
         EF1     CDP1861
-        EF2     
-        EF3     
+        EF2
+        EF3
         EF4     input switch
     */
 
@@ -365,5 +365,5 @@ SYSTEM_CONFIG_END
 
 /* System Drivers */
 
-/*    YEAR	NAME	PARENT	COMPAT	MACHINE	INPUT	INIT	CONFIG	COMPANY			FULLNAME	FLAGS */
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY         FULLNAME    FLAGS */
 COMP( 1978, elf2,	0,		0,		elf2,	elf2,	0,		elf2,	"Netronics",	"Elf II",	GAME_SUPPORTS_SAVE )

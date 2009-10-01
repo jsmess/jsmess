@@ -13,23 +13,23 @@
         14.05.2004 Finally fixed and readded.
 
     Changes done by Robbbert in Jan 2009:
-	- Added the NTSC/PAL diode to all systems except pc8300 which doesn't support it.
-	- Applied NTSC timings to pc8300 only, all others depend on the diode.
-	- Many keyboard fixes, and descriptions added to keys.
-	- Fixed .O files from causing an access violation.
-	- Enabled cassette saving (wav only).
-	- Many general fixes to pow3000/lambda.
-	- Added sound to pc8300/pow3000/lambda.
+    - Added the NTSC/PAL diode to all systems except pc8300 which doesn't support it.
+    - Applied NTSC timings to pc8300 only, all others depend on the diode.
+    - Many keyboard fixes, and descriptions added to keys.
+    - Fixed .O files from causing an access violation.
+    - Enabled cassette saving (wav only).
+    - Many general fixes to pow3000/lambda.
+    - Added sound to pc8300/pow3000/lambda.
 
     To do / problems:
-	- Some memory areas are not mirrored as they should.
-	- Video hardware is not fully emulated, so it does not support pseudo hi-res and hi-res modes.
-	- The screen in pc8300/pow3000/lambda jumps when you type something.
-	- lambda/pow3000 32k memory pack is unemulated, because where is the upper 16k mirror going to be?
-	- h4th and tree4th need their address maps worked out (eg, the stack is set to FB80)
-	- lambda/pow3000 joystick, connected in parallel with the 4,R,F,7,U keys, but the directions are unknown.
-	- Currently, cassettes will be saved in .wav format, even if you choose something else.
-	- Many games don't work.
+    - Some memory areas are not mirrored as they should.
+    - Video hardware is not fully emulated, so it does not support pseudo hi-res and hi-res modes.
+    - The screen in pc8300/pow3000/lambda jumps when you type something.
+    - lambda/pow3000 32k memory pack is unemulated, because where is the upper 16k mirror going to be?
+    - h4th and tree4th need their address maps worked out (eg, the stack is set to FB80)
+    - lambda/pow3000 joystick, connected in parallel with the 4,R,F,7,U keys, but the directions are unknown.
+    - Currently, cassettes will be saved in .wav format, even if you choose something else.
+    - Many games don't work.
 
 
 ****************************************************************************/
@@ -70,7 +70,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( zx80 )
 /* PORT_NAME =  Key Mode (Press Key)    Shift Mode (Press Key+Shift)    BASIC Mode (Press Key at BASIC)  */
-/* Some keys (e.g. A,S,D,F,G etc.) produce glyphs when used in Shift Mode. MESS currently cannot show 
+/* Some keys (e.g. A,S,D,F,G etc.) produce glyphs when used in Shift Mode. MESS currently cannot show
 these functions in Input (This System) menu, hence we live some empty space in the menu */
 	PORT_START("ROW0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
@@ -332,7 +332,7 @@ static PALETTE_INIT( zx80 )
 
 static PALETTE_INIT( ts1000 )
 {
-	palette_set_color(machine,0,MAKE_RGB(64, 244, 244)); /* cyan */	
+	palette_set_color(machine,0,MAKE_RGB(64, 244, 244)); /* cyan */
 	palette_set_color(machine,1,RGB_BLACK); /* black */
 	palette_set_color(machine,2,RGB_BLACK); /* black */
 	palette_set_color(machine,3,MAKE_RGB(64, 244, 244)); /* cyan */
@@ -389,7 +389,7 @@ static MACHINE_DRIVER_START( zx80 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(ZX81_PIXELS_PER_SCANLINE, ZX81_PAL_SCANLINES)
 	MDRV_SCREEN_VISIBLE_AREA(0, ZX81_PIXELS_PER_SCANLINE-1, 0, ZX81_PAL_SCANLINES-1)
-//	MDRV_GFXDECODE(zx80)
+//  MDRV_GFXDECODE(zx80)
 	MDRV_PALETTE_LENGTH(4)
 	MDRV_PALETTE_INIT(zx80)
 
@@ -413,7 +413,7 @@ static MACHINE_DRIVER_START( zx81 )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(zx81_io_map)
 
-//	MDRV_GFXDECODE(zx81)
+//  MDRV_GFXDECODE(zx81)
 
 	MDRV_CASSETTE_MODIFY( "cassette", zx81_cassette_config )
 MACHINE_DRIVER_END
@@ -437,7 +437,7 @@ static MACHINE_DRIVER_START( pc8300 )
 	MDRV_SCREEN_SIZE(ZX81_PIXELS_PER_SCANLINE, ZX81_NTSC_SCANLINES)
 	MDRV_SCREEN_VISIBLE_AREA(0, ZX81_PIXELS_PER_SCANLINE-1, 0, ZX81_NTSC_SCANLINES-1)
 
-//	MDRV_GFXDECODE(pc8300)
+//  MDRV_GFXDECODE(pc8300)
 	MDRV_PALETTE_INIT(zx80)
 MACHINE_DRIVER_END
 
@@ -448,7 +448,7 @@ static MACHINE_DRIVER_START( pow3000 )
 	MDRV_CPU_IO_MAP(pow3000_io_map)
 
 	MDRV_MACHINE_RESET(pow3000)
-//	MDRV_GFXDECODE(pc8300)
+//  MDRV_GFXDECODE(pc8300)
 	MDRV_PALETTE_INIT(zx80)
 MACHINE_DRIVER_END
 
@@ -484,7 +484,7 @@ ROM_END
 
 ROM_START(ts1500)
 	ROM_REGION( 0x10000, "maincpu",0 )
-  	ROM_LOAD( "ts1500.rom", 0x0000, 0x2000, CRC(7dd19c48) SHA1(3eb437359221b4406d236085ec66fa02278e7495) )	
+  	ROM_LOAD( "ts1500.rom", 0x0000, 0x2000, CRC(7dd19c48) SHA1(3eb437359221b4406d236085ec66fa02278e7495) )
 ROM_END
 
 ROM_START(ringo470)
@@ -522,7 +522,7 @@ ROM_START( tk85 )
 ROM_END
 
 /* This homebrew has 192k of RAM and 32k of ROM via bankswitching. One of the primary bankswitching lines is /M1,
-	which is not emulated by MAME's z80. */
+    which is not emulated by MAME's z80. */
 ROM_START( zx97 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "zx97.rom", 0x0000, 0x2000, CRC(5cf49744) SHA1(b2a486efdc7b2bc3dc8e5a441ea5532bfa3207bd) )

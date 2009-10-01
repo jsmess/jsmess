@@ -83,7 +83,7 @@
 
 static ADDRESS_MAP_START( at16_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x09ffff) AM_MIRROR(0xff000000) AM_RAMBANK(10)
-//	AM_RANGE(0x0a0000, 0x0bffff) AM_READWRITE(SMH_RAM, pc_video_videoram16le_w) AM_BASE((UINT16 **)&videoram) AM_SIZE(&videoram_size)
+//  AM_RANGE(0x0a0000, 0x0bffff) AM_READWRITE(SMH_RAM, pc_video_videoram16le_w) AM_BASE((UINT16 **)&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x0c0000, 0x0c7fff) AM_ROM
 	AM_RANGE(0x0c8000, 0x0cffff) AM_ROM
 	AM_RANGE(0x0d0000, 0x0effff) AM_RAM
@@ -96,7 +96,7 @@ static ADDRESS_MAP_START( at386_map, ADDRESS_SPACE_PROGRAM, 32 )
 	ADDRESS_MAP_GLOBAL_MASK(0x00ffffff)
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAMBANK(10)
 	AM_RANGE(0x000a0000, 0x000bffff) AM_NOP
-//	AM_RANGE(0x000b8000, 0x000bffff) AM_READWRITE(SMH_RAM, pc_video_videoram32_w) AM_BASE((UINT32 **) &videoram) AM_SIZE(&videoram_size)
+//  AM_RANGE(0x000b8000, 0x000bffff) AM_READWRITE(SMH_RAM, pc_video_videoram32_w) AM_BASE((UINT32 **) &videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x000c0000, 0x000c7fff) AM_ROM
 	AM_RANGE(0x000c8000, 0x000cffff) AM_ROM
 	AM_RANGE(0x000d0000, 0x000effff) AM_ROM
@@ -107,7 +107,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( at586_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAMBANK(10)
 	AM_RANGE(0x000a0000, 0x000bffff) AM_NOP
-//	AM_RANGE(0x000b8000, 0x000bffff) AM_READWRITE(SMH_RAM, pc_video_videoram32_w) AM_BASE((UINT32 **) &videoram) AM_SIZE(&videoram_size)
+//  AM_RANGE(0x000b8000, 0x000bffff) AM_READWRITE(SMH_RAM, pc_video_videoram32_w) AM_BASE((UINT32 **) &videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("user1", 0x20000)
 ADDRESS_MAP_END
 
@@ -163,8 +163,8 @@ static ADDRESS_MAP_START(at16_io, ADDRESS_SPACE_IO, 16)
 	AM_RANGE(0x0278, 0x027f) AM_DEVREADWRITE8("lpt_2", pc_lpt_r, pc_lpt_w, 0x00ff)
 	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE8("ns16450_3", ins8250_r, ins8250_w, 0xffff)
 	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8("ns16450_1", ins8250_r, ins8250_w, 0xffff)
-//	AM_RANGE(0x0320, 0x0323) AM_READWRITE8(pc_HDC1_r,                pc_HDC1_w, 0xffff)
-//	AM_RANGE(0x0324, 0x0327) AM_READWRITE8(pc_HDC2_r,                pc_HDC2_w, 0xffff)
+//  AM_RANGE(0x0320, 0x0323) AM_READWRITE8(pc_HDC1_r,                pc_HDC1_w, 0xffff)
+//  AM_RANGE(0x0324, 0x0327) AM_READWRITE8(pc_HDC2_r,                pc_HDC2_w, 0xffff)
 	AM_RANGE(0x0378, 0x037f) AM_DEVREADWRITE8("lpt_1", pc_lpt_r, pc_lpt_w, 0x00ff)
 #ifdef ADLIB
 	AM_RANGE(0x0388, 0x0389) AM_DEVREADWRITE("ym3812", at16_388_r, at16_388_w )
@@ -494,7 +494,7 @@ static MACHINE_DRIVER_START( ibm5170 )
 	MDRV_IMPORT_FROM( pc_hdc )
 
 	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
-	
+
 	MDRV_FLOPPY_2_DRIVES_ADD(ibmat_floppy_config)
 MACHINE_DRIVER_END
 
@@ -559,7 +559,7 @@ static MACHINE_DRIVER_START( ibm5162 )
 	MDRV_IMPORT_FROM( pc_hdc )
 
 	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
-	
+
 	MDRV_FLOPPY_2_DRIVES_ADD(ibmat_floppy_config)
 MACHINE_DRIVER_END
 
@@ -626,7 +626,7 @@ static MACHINE_DRIVER_START( ps2m30286 )
 	MDRV_IMPORT_FROM( pc_hdc )
 
 	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
-	
+
 	MDRV_FLOPPY_2_DRIVES_ADD(ibmat_floppy_config)
 MACHINE_DRIVER_END
 
@@ -695,7 +695,7 @@ static MACHINE_DRIVER_START( atvga )
 	MDRV_IMPORT_FROM( pc_hdc )
 
 	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
-	
+
 	MDRV_FLOPPY_2_DRIVES_ADD(ibmat_floppy_config)
 MACHINE_DRIVER_END
 
@@ -761,7 +761,7 @@ static MACHINE_DRIVER_START( at386 )
 	MDRV_IMPORT_FROM( pc_hdc )
 
 	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
-	
+
 	MDRV_FLOPPY_2_DRIVES_ADD(ibmat_floppy_config)
 MACHINE_DRIVER_END
 
@@ -825,9 +825,9 @@ ROM_START( ibm5170 )
 	ROMX_LOAD("6480090.u27", 0xf0000, 0x8000, CRC(99703aa9) SHA1(18022e93a0412c8477e58f8c61a87718a0b9ab0e), ROM_SKIP(1) | ROM_BIOS(2))
 	ROMX_LOAD("6480091.u47", 0xf0001, 0x8000, CRC(013ef44b) SHA1(bfa15d2180a1902cb6d38c6eed3740f5617afd16), ROM_SKIP(1) | ROM_BIOS(2))
 
-//	ROM_SYSTEM_BIOS( 2, "atdiag", "IBM PC/AT 5170 w/Super Diagnostics")
-//	ROMX_LOAD("atdiage.bin", 0xf8000, 0x4000, CRC(e8855d0c) SHA1(c9d53e61c08da0a64f43d691bf6cadae5393843a), ROM_SKIP(1) | ROM_BIOS(3))
-//	ROMX_LOAD("atdiago.bin", 0xf8001, 0x4000, CRC(606fa71d) SHA1(165e45bae7ae2da274f1e645c763c5bfcbde027b), ROM_SKIP(1) | ROM_BIOS(3))
+//  ROM_SYSTEM_BIOS( 2, "atdiag", "IBM PC/AT 5170 w/Super Diagnostics")
+//  ROMX_LOAD("atdiage.bin", 0xf8000, 0x4000, CRC(e8855d0c) SHA1(c9d53e61c08da0a64f43d691bf6cadae5393843a), ROM_SKIP(1) | ROM_BIOS(3))
+//  ROMX_LOAD("atdiago.bin", 0xf8001, 0x4000, CRC(606fa71d) SHA1(165e45bae7ae2da274f1e645c763c5bfcbde027b), ROM_SKIP(1) | ROM_BIOS(3))
 
 	ROM_REGION(0x08100, "gfx1", 0)
 	ROM_LOAD("cga.chr",     0x00000, 0x01000, CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd))
@@ -902,7 +902,7 @@ ROM_START( ibm5170a )
 ROM_END
 
 
-ROM_START( ibm5162 ) //MB p/n 62x1168 
+ROM_START( ibm5162 ) //MB p/n 62x1168
 	ROM_REGION16_LE(0x1000000,"maincpu", 0)
 	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))
 
@@ -1078,7 +1078,7 @@ ROM_START( at586 )
 ROM_END
 
 static SYSTEM_CONFIG_START(ibmat)
-	CONFIG_RAM_DEFAULT( (640+1024) * 1024 )	
+	CONFIG_RAM_DEFAULT( (640+1024) * 1024 )
 SYSTEM_CONFIG_END
 
 /***************************************************************************

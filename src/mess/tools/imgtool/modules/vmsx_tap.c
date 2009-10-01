@@ -18,15 +18,15 @@
     is an INFO block which lists all files in the archive. The TAPE block
     contains the actual data.
 
-	Original code in Virtual MSX:
+    Original code in Virtual MSX:
 
-		ftp://ftp.komkon.org/pub/EMUL8/MSX/Emulators/VMSX1SRC.zip
+        ftp://ftp.komkon.org/pub/EMUL8/MSX/Emulators/VMSX1SRC.zip
 
-	It's in the file TAPE.C.
+    It's in the file TAPE.C.
 
-	RIFF format specs:
+    RIFF format specs:
 
-		http://www.saettler.com/RIFFMCI/riffmci.html
+        http://www.saettler.com/RIFFMCI/riffmci.html
 
 
     This module converts the files to .cas files. Implemented are:
@@ -36,11 +36,11 @@
     get - gets one file. If "getall" fails, due to characters in the
           filename your FS/OS doesn't support, use:
 
-	imgtool get vmsx_tap monmsx.tap monmsx-binary.cas monmsx.cas
+    imgtool get vmsx_tap monmsx.tap monmsx-binary.cas monmsx.cas
 
     for example.
 
-	Sean Young
+    Sean Young
 */
 
 #include "osdepend.h"
@@ -197,7 +197,7 @@ static int vmsx_tap_image_read_data (TAP_IMAGE *image, char *chunk, unsigned cha
 		return IMGTOOLERR_CORRUPTIMAGE;
 
 	/* OK we've got the right data chunk. Now we can start looking for
-		the blocks */
+        the blocks */
 	pos = 0;
 	while ( (pos + 8) < size)
 		{

@@ -268,8 +268,8 @@ static MACHINE_DRIVER_START(ti99_4p_60hz)
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
-//	MDRV_SOUND_WAVE_ADD("wave", "cassette")
-//	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+//  MDRV_SOUND_WAVE_ADD("wave", "cassette")
+//  MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 	MDRV_SOUND_ADD("sn76496", SN76496, 3579545)	/* 3.579545 MHz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 	MDRV_SOUND_ADD("tms5220", TMS5220, 680000L)
@@ -284,14 +284,14 @@ static MACHINE_DRIVER_START(ti99_4p_60hz)
 	MDRV_IDE_HARDDISK_ADD( "ide_harddisk" )
 
 	/* MDRV_CASSETTE_ADD( "cassette", default_cassette_config ) */
-	
-	/* tms9901 */
-	MDRV_TMS9901_ADD("tms9901", tms9901reset_param_ti99_4x)	
 
-	MDRV_FLOPPY_4_DRIVES_ADD(ti99_4p_floppy_config)	
-	
+	/* tms9901 */
+	MDRV_TMS9901_ADD("tms9901", tms9901reset_param_ti99_4x)
+
+	MDRV_FLOPPY_4_DRIVES_ADD(ti99_4p_floppy_config)
+
 	MDRV_SMARTMEDIA_ADD("smartmedia")
-	
+
 	MDRV_TI99_4_RS232_CARD_ADD("rs232")
 MACHINE_DRIVER_END
 

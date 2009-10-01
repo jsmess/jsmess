@@ -49,9 +49,9 @@ ADDRESS_MAP_END
 // 7 - Keyboard TBMT H
 static READ8_HANDLER(vt100_flags_r)
 {
-	UINT8 retVal = 0;	
- 	retVal |= lba7_r(devtag_get_device(space->machine, "vt100_video"),0) * 0x40;	
-	retVal |= vt100_keyboard_int * 0x80;	
+	UINT8 retVal = 0;
+ 	retVal |= lba7_r(devtag_get_device(space->machine, "vt100_video"),0) * 0x40;
+	retVal |= vt100_keyboard_int * 0x80;
 	return retVal;
 }
 
@@ -60,13 +60,13 @@ static UINT8 vt100_key_scan = 0;
 static TIMER_CALLBACK(keyboard_callback)
 {
 	int i;
-	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", 
-											"LINE4", "LINE5", "LINE6", "LINE7", 
-											"LINE8", "LINE9", "LINEA", "LINEB", 
+	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3",
+											"LINE4", "LINE5", "LINE6", "LINE7",
+											"LINE8", "LINE9", "LINEA", "LINEB",
 											"LINEC", "LINED", "LINEE", "LINEF" };
 	UINT8 code;
 	if (vt100_key_scan == 1) {
-		for(i = 0; i < 16; i++) 
+		for(i = 0; i < 16; i++)
 		{
 			code = 	input_port_read(machine, keynames[i]);
 			if (code!=0xff) {
@@ -80,16 +80,16 @@ static TIMER_CALLBACK(keyboard_callback)
 
 static WRITE8_HANDLER(vt100_keyboard_w)
 {
-	
+
 	const device_config *speaker = devtag_get_device(space->machine, "speaker");
-	
+
 	output_set_value("online_led",BIT(data,5) ? 0 : 1);
 	output_set_value("local_led", BIT(data,5));
 	output_set_value("locked_led",BIT(data,4) ? 0 : 1);
 	output_set_value("l1_led", 	  BIT(data,3) ? 0 : 1);
 	output_set_value("l2_led", 	  BIT(data,2) ? 0 : 1);
 	output_set_value("l3_led", 	  BIT(data,1) ? 0 : 1);
-	output_set_value("l4_led", 	  BIT(data,0) ? 0 : 1);	
+	output_set_value("l4_led", 	  BIT(data,0) ? 0 : 1);
 	vt100_key_scan = BIT(data,6);
 	speaker_level_w(speaker, BIT(data,7));
 }
@@ -100,9 +100,9 @@ static READ8_HANDLER(vt100_keyboard_r)
 }
 static WRITE8_HANDLER(vt100_baud_rate_w)
 {
-	double baud_rate[] = { 50, 75, 110, 134.5, 150, 200, 300, 600, 1200, 
+	double baud_rate[] = { 50, 75, 110, 134.5, 150, 200, 300, 600, 1200,
 		1800, 2000, 2400, 3600, 4800, 9600, 19200 };
-	
+
 	vt100_send_baud_rate = baud_rate[(data >>4) & 0x0f];
 	vt100_recv_baud_rate = baud_rate[data & 0x0f];
 }
@@ -113,12 +113,12 @@ static WRITE8_HANDLER(vt100_nvr_latch_w)
 
 static ADDRESS_MAP_START( vt100_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	// 0x00, 0x01 PUSART  (Intel 8251)	
-	// AM_RANGE (0x00, 0x01) 
-	// 0x02 Baud rate generator	
+	// 0x00, 0x01 PUSART  (Intel 8251)
+	// AM_RANGE (0x00, 0x01)
+	// 0x02 Baud rate generator
 	AM_RANGE (0x02, 0x02) AM_WRITE(vt100_baud_rate_w)
 	// 0x22 Modem buffer
-	// AM_RANGE (0x22, 0x22) 
+	// AM_RANGE (0x22, 0x22)
 	// 0x42 Flags buffer
 	AM_RANGE (0x42, 0x42) AM_READ(vt100_flags_r)
 	// 0x42 Brightness D/A latch
@@ -134,13 +134,13 @@ static ADDRESS_MAP_START( vt100_io , ADDRESS_SPACE_IO, 8)
 	// 0xC2 Video processor DC011
 	AM_RANGE (0xc2, 0xc2) AM_DEVWRITE("vt100_video", dc011_w)
 	// 0xE2 Graphics port
-	// AM_RANGE (0xe2, 0xe2) 
+	// AM_RANGE (0xe2, 0xe2)
 ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( vt100 )
 	PORT_START("LINE0")
-		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED) 
+		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Right") PORT_CODE(KEYCODE_RIGHT)
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Left") PORT_CODE(KEYCODE_LEFT)
 		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Up") PORT_CODE(KEYCODE_UP)
@@ -168,7 +168,7 @@ static INPUT_PORTS_START( vt100 )
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Num 6") PORT_CODE(KEYCODE_6_PAD)
 	PORT_START("LINE3")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Delete") PORT_CODE(KEYCODE_DEL)
-		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED) 
+		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Break") PORT_CODE(KEYCODE_F6)
 		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Backspace") PORT_CODE(KEYCODE_BACKSPACE)
 		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Num 0") PORT_CODE(KEYCODE_0_PAD)
@@ -269,13 +269,13 @@ static VIDEO_UPDATE( vt100 )
 //          A5 - vertical fequency
 //          all other set to 1
 static IRQ_CALLBACK(vt100_irq_callback)
-{	
+{
 	UINT8 retVal = 0xc7 | (0x08 * vt100_keyboard_int) | (0x10 * vt100_receiver_int) | (0x20 * vt100_vertical_int);
 	vt100_receiver_int = 0;
 	return retVal;
-} 
+}
 
-static MACHINE_RESET(vt100) 
+static MACHINE_RESET(vt100)
 {
 	vt100_keyboard_int = 0;
 	vt100_receiver_int = 0;
@@ -286,12 +286,12 @@ static MACHINE_RESET(vt100)
 	output_set_value("l1_led", 	  1);
 	output_set_value("l2_led", 	  1);
 	output_set_value("l3_led", 	  1);
-	output_set_value("l4_led", 	  1);	
-	
+	output_set_value("l4_led", 	  1);
+
 	vt100_key_scan = 0;
-	timer_pulse(machine, ATTOTIME_IN_HZ(240), NULL, 0, keyboard_callback);	
-	
-	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), vt100_irq_callback);	
+	timer_pulse(machine, ATTOTIME_IN_HZ(240), NULL, 0, keyboard_callback);
+
+	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), vt100_irq_callback);
 }
 
 static READ8_DEVICE_HANDLER (vt100_read_video_ram_r )
@@ -301,7 +301,7 @@ static READ8_DEVICE_HANDLER (vt100_read_video_ram_r )
 
 static WRITE8_DEVICE_HANDLER (vt100_clear_video_interrupt)
 {
-	vt100_vertical_int = 0;	
+	vt100_vertical_int = 0;
 }
 
 static const vt_video_interface vt100_video_interface = {
@@ -327,7 +327,7 @@ static MACHINE_DRIVER_START( vt100 )
 	MDRV_CPU_VBLANK_INT("screen", vt100_vertical_interrupt)
 
 	MDRV_MACHINE_RESET(vt100)
-	
+
     /* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -341,9 +341,9 @@ static MACHINE_DRIVER_START( vt100 )
 	MDRV_DEFAULT_LAYOUT( layout_vt100 )
 	MDRV_VIDEO_START(generic_bitmapped)
 	MDRV_VIDEO_UPDATE(vt100)
-	
+
 	MDRV_VT100_VIDEO_ADD("vt100_video", vt100_video_interface)
-	
+
 	/* audio hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
@@ -354,7 +354,7 @@ MACHINE_DRIVER_END
  * VT100 - 1978 base model. the 'later' rom is from 1979 or 1980.
  *    The vt100 had a whole series of -XX models branching off of it; the
        ones I know of are described here, as well as anything special about
-	   them:
+       them:
  *    VT100-AA - standard model with 120vac cable \__voltage can be switched
  *    VT100-AB - standard model with 240vac cable /  inside any VT100 unit
  *    VT100-W* - word processing series:
@@ -396,7 +396,7 @@ MACHINE_DRIVER_END
    have the normal vt100 romset variant, and also can have the multiple word
    processing variations (which use the same roms as the vt100 ones do).
  * VT104 doesn't exist.
- * VT105 - 1978 vt100 with the WG waveform generator board installed 
+ * VT105 - 1978 vt100 with the WG waveform generator board installed
    (for simple chart-type line-compare-made raster graphics using some built
    in functions), AVO optional; was intended for use on the MINC analog data
    acquisition computer.
@@ -415,22 +415,22 @@ MACHINE_DRIVER_END
    AVO character rom set. Has its own base firmware roms which support block
    serial mode.
  * vt180 - 1980 vt10x (w/vt100 expansion backplane) with a z80 daughterboard
-   installed; 
+   installed;
    The daughterboard has two roms on it: 23-017e3-00 and 23-021e3-00
    (both are 0x1000 long, 2332 mask roms)
  * vk100 'gigi'- graphical terminal similar to the vt125, but somewhat more
-   primitive; more or less a vt125 without the screen; 
+   primitive; more or less a vt125 without the screen;
    very little info so far, more research needed
    see vk100.c for current driver for this
-   
+
  * Upgrade kits for vt1xx:
  * VT1xx-AA : p/n 5413206 20ma current loop interface pcb for vt100
- * VT1xx-AB : p/n 5413097 AVO board (AVO roms could be optionally ordered along with 
+ * VT1xx-AB : p/n 5413097 AVO board (AVO roms could be optionally ordered along with
               this board if needed)
  * VT1xx-AC : STP serial printer board (includes a special romset)
  * VT1xx-CA : p/n 5413206? 20ma current loop interface pcb for vt101/vt102/vt131
  * VT1xx-CB or CL: GPO "ReGIS" board vt100->vt125 upgrade kit (p/n 5414275 paddle board and 5414277 gpo board)
- 
+
  * Info about mask roms and other nasties:
  * A normal 2716 rom has pin 18: /CE; pin 20: /OE; pin 21: VPP (acts as CE2)
  * The vt100 23-031e2/23-061e2, 23-032e2, 23-033e2, and 23-034e2 mask roms
@@ -451,8 +451,8 @@ MACHINE_DRIVER_END
        Pin 21 can be jumpered to +5v for this socket at location e9 by removing jumper w4 and inserting jumper w5, allowing a normal 2716 eprom to be used.
  * The optional AVO character set roms (see below) have: pin 18: /CS2*; pin 20: /CS1; pin 21: CS3 hence they match a normal 2716
    *(this is marked on the image as if it was CS2 but the input is tied to gnd meaning it must be /CS2)
-  
- * The AVO itself can hold up to four character set roms on it (see http://www.bitsavers.org/pdf/dec/terminal/vt100/MP00633_VT100_Mar80.pdf 
+
+ * The AVO itself can hold up to four character set roms on it (see http://www.bitsavers.org/pdf/dec/terminal/vt100/MP00633_VT100_Mar80.pdf
    and http://vt100.net/dec/ek-vt1ac-ug-002.pdf )
    at least eight of these AVO roms were made, and are used as such:
  * No roms - normal vt100 system with AVO installed
@@ -487,10 +487,10 @@ ROM_START( vt100wp ) // This is from the schematics at http://www.bitsavers.org/
 // the vt103 can also use this rom set (-04 and -05 revs have it by default, -05 rev also has the optional alt charset rom by default)
 // NOTE: according to dunnington's ROMList, this is actually the VT132 romset, but I'm not convinced.
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "23-180e2-00.e56", 0x0000, 0x0800, NO_DUMP) 
-	ROM_LOAD( "23-181e2-00.e52", 0x0800, 0x0800, NO_DUMP) 
-	ROM_LOAD( "23-182e2-00.e45", 0x1000, 0x0800, NO_DUMP) 
-	ROM_LOAD( "23-183e2-00.e40", 0x1800, 0x0800, NO_DUMP) 
+	ROM_LOAD( "23-180e2-00.e56", 0x0000, 0x0800, NO_DUMP)
+	ROM_LOAD( "23-181e2-00.e52", 0x0800, 0x0800, NO_DUMP)
+	ROM_LOAD( "23-182e2-00.e45", 0x1000, 0x0800, NO_DUMP)
+	ROM_LOAD( "23-183e2-00.e40", 0x1800, 0x0800, NO_DUMP)
 
 	ROM_REGION(0x1000, "gfx1", 0)
 	ROM_LOAD( "23-018e2-00.e4", 0x0000, 0x0800, BAD_DUMP CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53)) // probably correct but needs redump
@@ -499,36 +499,36 @@ ROM_END
 
 /*
 ROM_START( vt100stp ) // This is from the VT180 technical manual at http://www.bitsavers.org/pdf/dec/terminal/vt180/EK-VT18X-TM-001_VT180_Technical_Man_Feb83.pdf
-// This is the standard vt100 cpu board, but with the rom set included with the VT1xx-AC kit  
+// This is the standard vt100 cpu board, but with the rom set included with the VT1xx-AC kit
 // which is only used when the STP 'printer port expansion' card is installed into the terminal board.
 // This romset adds the Set-up C page to the setup menu (press keypad 5 twice once you hit set-up)
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "23-095e2-00.e56", 0x0000, 0x0800, NO_DUMP) 
-	ROM_LOAD( "23-096e2-00.e52", 0x0800, 0x0800, NO_DUMP) 
-	ROM_LOAD( "23-139e2-00.e45", 0x1000, 0x0800, NO_DUMP) // revision 2?; revision 1 is 23-097e2
-	ROM_LOAD( "23-140e2-00.e40", 0x1800, 0x0800, NO_DUMP) // revision 2?; revision 1 is 23-098e2
-	ROM_REGION(0x1000, "gfx1",0)
-	ROM_LOAD( "23-018e2-00.e4", 0x0000, 0x0800, BAD_DUMP CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53)) // probably correct but needs redump
-	ROM_LOAD_OPTIONAL( "23-094e2-00.e9", 0x0800, 0x0800, NO_DUMP) // optional ?word processing? alternate character set rom
-	ROM_REGION(0x10000, "stpcpu",ROMREGION_ERASEFF)
+    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+    ROM_LOAD( "23-095e2-00.e56", 0x0000, 0x0800, NO_DUMP)
+    ROM_LOAD( "23-096e2-00.e52", 0x0800, 0x0800, NO_DUMP)
+    ROM_LOAD( "23-139e2-00.e45", 0x1000, 0x0800, NO_DUMP) // revision 2?; revision 1 is 23-097e2
+    ROM_LOAD( "23-140e2-00.e40", 0x1800, 0x0800, NO_DUMP) // revision 2?; revision 1 is 23-098e2
+    ROM_REGION(0x1000, "gfx1",0)
+    ROM_LOAD( "23-018e2-00.e4", 0x0000, 0x0800, BAD_DUMP CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53)) // probably correct but needs redump
+    ROM_LOAD_OPTIONAL( "23-094e2-00.e9", 0x0800, 0x0800, NO_DUMP) // optional ?word processing? alternate character set rom
+    ROM_REGION(0x10000, "stpcpu",ROMREGION_ERASEFF)
 // expansion board for a vt100 with a processor on it and dma, intended to act as a ram/send buffer for the STP printer board.
 // It can be populated with two banks of two eproms each, each bank either contains 2k or 4k eproms depending on the w2/w3 and w4/w5 jumpers.
 // It also has two proms on the cpu board. I don't know if it is technically necessary to have this board installed if an STP module is installed, but due to the alt stp romset, it probably is.
-	ROM_LOAD( "23-003e3-00.e10", 0x0000, 0x1000, NO_DUMP) // "EPROM 0" bank 0
-	ROM_LOAD( "23-004e3-00.e4", 0x1000, 0x1000, NO_DUMP) // "EPROM 1" bank 0
-	ROM_LOAD( "23-005e3-00.e9", 0x2000, 0x1000, NO_DUMP) // "EPROM 2" bank 1
-	ROM_LOAD( "23-006e3-00.e3", 0x3000, 0x1000, NO_DUMP) // "EPROM 3" bank 1
-	//ROM_REGION(0x0800, "gfx1",0)
-	//ROM_LOAD( "23-???e2-00.e34", 0x0000, 0x0800, NO_DUMP) // ? second gfx rom?
-	ROM_REGION(0x0400, "proms",0)
-	ROM_LOAD( "23-312a1-07.e26", 0x0000, 0x0200, NO_DUMP) // "PROM A"; handles 8085 i/o? mapping (usart, timer, dma, comm, etc)
-	ROM_LOAD( "23-313a1-07.e15", 0x0200, 0x0200, NO_DUMP) // "PROM B"; handles firmware rom mapping and memory size/page select; bit 0 = ram page, bits 1-3 unused, bits 4-7 select one eprom each
+    ROM_LOAD( "23-003e3-00.e10", 0x0000, 0x1000, NO_DUMP) // "EPROM 0" bank 0
+    ROM_LOAD( "23-004e3-00.e4", 0x1000, 0x1000, NO_DUMP) // "EPROM 1" bank 0
+    ROM_LOAD( "23-005e3-00.e9", 0x2000, 0x1000, NO_DUMP) // "EPROM 2" bank 1
+    ROM_LOAD( "23-006e3-00.e3", 0x3000, 0x1000, NO_DUMP) // "EPROM 3" bank 1
+    //ROM_REGION(0x0800, "gfx1",0)
+    //ROM_LOAD( "23-???e2-00.e34", 0x0000, 0x0800, NO_DUMP) // ? second gfx rom?
+    ROM_REGION(0x0400, "proms",0)
+    ROM_LOAD( "23-312a1-07.e26", 0x0000, 0x0200, NO_DUMP) // "PROM A"; handles 8085 i/o? mapping (usart, timer, dma, comm, etc)
+    ROM_LOAD( "23-313a1-07.e15", 0x0200, 0x0200, NO_DUMP) // "PROM B"; handles firmware rom mapping and memory size/page select; bit 0 = ram page, bits 1-3 unused, bits 4-7 select one eprom each
 ROM_END
 */
 
 ROM_START( vt103 ) // This is from the schematics at http://www.bitsavers.org/pdf/dec/terminal/vt103/MP00731_VT103_Aug80.pdf
 // This is the standard VT100 cpu board with the 'normal' roms (but later rev of eprom 0) populated but with an
-// LSI-11 backplane (instead of a normal VT100 one, hence it cannot use the AVO, WG, GPO, or VT180 Z80 boards) and 
+// LSI-11 backplane (instead of a normal VT100 one, hence it cannot use the AVO, WG, GPO, or VT180 Z80 boards) and
 // DEC TU58 dual 256k tape drive integrated; It was intended that you would put an LSI-11 cpu card in there, which
 // Would talk to the terminal as its input/output device. Several LSI-11 cpu cards were available?
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
@@ -563,7 +563,7 @@ ROM_START( vt105 ) // This is from anecdotal evidence and vt100.net, as the vt10
 	ROM_LOAD_OPTIONAL( "23-094e2-00.e9", 0x0800, 0x0800, NO_DUMP) // optional (comes default with some models) alternate character set rom
 ROM_END
 
-ROM_START( vt110 ) 
+ROM_START( vt110 )
 // This is the standard VT100 cpu board with the 'normal' roms (but later rev of eprom 0) populated but with a
 // DECDataway DPM01 board, which adds 4 or 5 special network-addressable 50ohm? current loop serial lines
 // and may add its own processor and ram to control them. see http://bitsavers.org/pdf/dec/terminal/EK-VT110_UG-001_Dec78.pdf
@@ -600,7 +600,7 @@ ROM_START( vt101 ) // p/n 5414185-01 'unupgradable/low cost' vt101/vt102/vt131 m
 // does not have integrated STP or AVO populated
 // 8085 based instead of 8080
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "23-???e4-00.e69", 0x0000, 0x2000, NO_DUMP) 
+	ROM_LOAD( "23-???e4-00.e69", 0x0000, 0x2000, NO_DUMP)
 	ROM_LOAD( "23-???e4-00.e71", 0x2000, 0x2000, NO_DUMP)
 
 	ROM_REGION(0x1000, "gfx1", 0)
@@ -639,18 +639,18 @@ ROM_END
 ROM_START( vt132 ) // This is from anecdotal evidence and vt100.net, as the vt132 schematics are not scanned
 // VT100 board with ? roms, AVO, STP, custom firmware with block serial mode; dunnington insists these roms
 // should be the 23-180e2/181e2/182e2/183e2 set, but I'm not convinced.
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "23-???e2-00.e56", 0x0000, 0x0800, NO_DUMP)
-	ROM_LOAD( "23-???e2-00.e52", 0x0800, 0x0800, NO_DUMP)
-	ROM_LOAD( "23-???e2-00.e45", 0x1000, 0x0800, NO_DUMP)
-	ROM_LOAD( "23-???e2-00.e40", 0x1800, 0x0800, NO_DUMP)
+    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+    ROM_LOAD( "23-???e2-00.e56", 0x0000, 0x0800, NO_DUMP)
+    ROM_LOAD( "23-???e2-00.e52", 0x0800, 0x0800, NO_DUMP)
+    ROM_LOAD( "23-???e2-00.e45", 0x1000, 0x0800, NO_DUMP)
+    ROM_LOAD( "23-???e2-00.e40", 0x1800, 0x0800, NO_DUMP)
 
-	ROM_REGION(0x1000, "gfx1", 0)
-	ROM_LOAD( "23-018e2-00.e4", 0x0000, 0x0800, BAD_DUMP CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53)) // probably correct but needs redump
-	ROM_LOAD_OPTIONAL( "23-094e2-00.e9", 0x0800, 0x0800, NO_DUMP) // optional (comes default with some models) alternate character set rom
+    ROM_REGION(0x1000, "gfx1", 0)
+    ROM_LOAD( "23-018e2-00.e4", 0x0000, 0x0800, BAD_DUMP CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53)) // probably correct but needs redump
+    ROM_LOAD_OPTIONAL( "23-094e2-00.e9", 0x0800, 0x0800, NO_DUMP) // optional (comes default with some models) alternate character set rom
 ROM_END
 */
-ROM_START( vt180 ) 
+ROM_START( vt180 )
 // This is the standard VT100 cpu board with the 'normal' roms (but later rev of eprom 0) populated but with a
 // Z80 daughterboard added to the expansion slot, and replacing the STP adapter (STP roms are replaced with the normal set)
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
@@ -673,7 +673,7 @@ ROM_END
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
 COMP( 1978, vt100,  0,       0,     vt100, 	 vt100, 	 0,  	  0,  	 "DEC",   "VT100",		GAME_NOT_WORKING)
 COMP( 1978, vt100wp,  vt100, 0,     vt100, 	 vt100, 	 0,  	  0,  	 "DEC",   "VT100-Wx",		GAME_NOT_WORKING)
-//COMP( 1978, vt100stp,  vt100,       0, 	vt100, 	 vt100, 	 0,  	  0,  	 "DEC",   "VT100 w/VT1xx-AC STP",		GAME_NOT_WORKING)
+//COMP( 1978, vt100stp,  vt100,       0,    vt100,   vt100,      0,       0,     "DEC",   "VT100 w/VT1xx-AC STP",       GAME_NOT_WORKING)
 COMP( 1981, vt101,  0,       0,     vt100, 	 vt100, 	 0,  	  0,  	 "DEC",   "VT101",		GAME_NOT_WORKING)
 COMP( 1981, vt102,  vt101,   0,     vt100, 	 vt100, 	 0,  	  0,  	 "DEC",   "VT102",		GAME_NOT_WORKING)
 COMP( 1979, vt103,  vt100,   0,     vt100, 	 vt100, 	 0,  	  0,  	 "DEC",   "VT103",		GAME_NOT_WORKING)
@@ -681,5 +681,5 @@ COMP( 1978, vt105,  vt100,   0,     vt100,   vt100, 	 0,  	  0,  	 "DEC",   "VT1
 COMP( 1978, vt110,  vt100,   0,     vt100, 	 vt100, 	 0,  	  0,  	 "DEC",   "VT110",		GAME_NOT_WORKING)
 COMP( 1981, vt125,  vt100,   0,     vt100, 	 vt100, 	 0,  	  0,  	 "DEC",   "VT125",		GAME_NOT_WORKING)
 COMP( 1981, vt131,  /*vt101*/0,       0,     vt100, 		vt100, 	 0,  	  0,  	 "DEC",   "VT131",		GAME_NOT_WORKING)	// this should be a vt101 clone, once the vt101 has been enabled (i.e. its roms dumped)
-//COMP( 1979, vt132,  vt100,   0,    vt100,   vt100, 	 0,  	  0,  	 "DEC",   "VT132",		GAME_NOT_WORKING)
+//COMP( 1979, vt132,  vt100,   0,    vt100,   vt100,     0,       0,     "DEC",   "VT132",      GAME_NOT_WORKING)
 COMP( 1983, vt180,  vt100,   0,     vt100,   vt100, 	 0,  	  0,  	 "DEC",   "VT180",		GAME_NOT_WORKING)

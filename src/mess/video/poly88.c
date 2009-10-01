@@ -11,7 +11,7 @@
 
 UINT8* poly_video_ram;
 
-static UINT8 mcm6571a[] = 
+static UINT8 mcm6571a[] =
 {
 	0x00,0x00,0x00,0x00,0x31,0x4A,0x44,0x4A,0x31,// 0
 	0x3C,0x22,0x3C,0x22,0x22,0x3C,0x20,0x20,0x40,// 1
@@ -154,26 +154,26 @@ static UINT8 mcm6571a_shift[] =
 	1,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0
 };
 
-static UINT8 get_mcm6571a_line(UINT8 code, UINT8 line) 
+static UINT8 get_mcm6571a_line(UINT8 code, UINT8 line)
 {
 	if (mcm6571a_shift[code]==0) {
 		if (line < 9) {
 			return mcm6571a[code*9 + line];
 		} else {
 			return 0;
-		}		
+		}
 	} else {
 		if (line < 3) {
 			return 0;
-		} else 
+		} else
 		if (line <12) {
 			return mcm6571a[code*9 + line - 3];
 		} else {
 			return 0;
-		}		
+		}
 	}
 	return 0;
-	
+
 }
 VIDEO_START( poly88 )
 {
@@ -183,9 +183,9 @@ VIDEO_UPDATE( poly88 )
 {
 	int x,y,j,b;
   	UINT16 addr;
-  	int xpos;  	
+  	int xpos;
   	UINT8 l,r;
-  
+
 	for(y = 0; y < 16; y++ )
 	{
 		addr = y*64;
@@ -195,8 +195,8 @@ VIDEO_UPDATE( poly88 )
 			UINT8 code = poly_video_ram[addr + x];
 			if ((code & 0x80)==0) {
 				for(j = 0; j < 15; j++ )
-				{	
-				  l = j/5;			
+				{
+				  l = j/5;
 				  for(b = 0; b < 10; b++ )
 				  {
 					r = b/5;
@@ -218,9 +218,9 @@ VIDEO_UPDATE( poly88 )
 					if (l==2 && r==1) {
 						*BITMAP_ADDR16(bitmap, y*15+j, xpos+b ) = BIT(code,0) ? 0 : 1;
 					}
-					
-			  		
-				  }			  			  
+
+
+				  }
 				}
 			} else {
 				for(j = 0; j < 15; j++ )
@@ -229,11 +229,11 @@ VIDEO_UPDATE( poly88 )
 				  for(b = 0; b < 7; b++ )
 				  {
 			  		*BITMAP_ADDR16(bitmap, y*15+j, xpos+b ) =  (l >> (6-b)) & 1;
-				  }			  			  
+				  }
 				  *BITMAP_ADDR16(bitmap, y*15+j, xpos+7 ) =  0;
 				  *BITMAP_ADDR16(bitmap, y*15+j, xpos+8 ) =  0;
 				  *BITMAP_ADDR16(bitmap, y*15+j, xpos+9 ) =  0;
-				  
+
 				}
 			}
 			xpos += 10;

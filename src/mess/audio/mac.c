@@ -1,8 +1,8 @@
 /***************************************************************************
 
-	mac.c
+    mac.c
 
-	Sound handler
+    Sound handler
 
 ****************************************************************************/
 
@@ -111,7 +111,7 @@ static DEVICE_START(mac_sound)
 
 
 /*
-	Set the sound enable flag (VIA port line)
+    Set the sound enable flag (VIA port line)
 */
 void mac_enable_sound(const device_config *device, int on)
 {
@@ -122,7 +122,7 @@ void mac_enable_sound(const device_config *device, int on)
 
 
 /*
-	Set the current sound buffer (one VIA port line)
+    Set the current sound buffer (one VIA port line)
 */
 void mac_set_sound_buffer(const device_config *device, int buffer)
 {
@@ -137,7 +137,7 @@ void mac_set_sound_buffer(const device_config *device, int buffer)
 
 
 /*
-	Set the current sound volume (3 VIA port line)
+    Set the current sound volume (3 VIA port line)
 */
 void mac_set_volume(const device_config *device, int volume)
 {
@@ -151,7 +151,7 @@ void mac_set_volume(const device_config *device, int volume)
 
 
 /*
-	Fetch one byte from sound buffer and put it to sound output (called every scanline)
+    Fetch one byte from sound buffer and put it to sound output (called every scanline)
 */
 void mac_sh_updatebuffer(const device_config *device)
 {

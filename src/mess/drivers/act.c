@@ -1,8 +1,8 @@
 /***************************************************************************
 
-		ACT Apricot series
+        ACT Apricot series
 
-		07/2009 Skeleton driver.
+        07/2009 Skeleton driver.
 
 ****************************************************************************/
 
@@ -89,7 +89,7 @@ ROM_END
 
 /* Driver */
 
-/*	  YEAR  NAME    PARENT  COMPAT MACHINE INPUT   INIT  CONFIG COMPANY  FULLNAME                 FLAGS */
+/*    YEAR  NAME    PARENT  COMPAT MACHINE INPUT   INIT  CONFIG COMPANY  FULLNAME                 FLAGS */
 COMP( 1984, aprixi,    0,    0,     act,    act,    0,    0,     "ACT",   "Apricot Xi",            GAME_NOT_WORKING)
 COMP( 1984, aprif1,    0,    0,     act,    act,    0,    0,     "ACT",   "Apricot F1",            GAME_NOT_WORKING)
 COMP( 1985, aprif10,   0,    0,     act,    act,    0,    0,     "ACT",   "Apricot F10",           GAME_NOT_WORKING)

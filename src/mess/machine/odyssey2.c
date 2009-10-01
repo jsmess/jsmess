@@ -105,7 +105,7 @@ READ8_HANDLER( g7400_bus_r )
 	else if (!(p1 & P1_EXT_RAM_ENABLE)) {
 		return ram[offset];
 	} else {
-//		return ef9341_r( offset & 0x02, offset & 0x01 );
+//      return ef9341_r( offset & 0x02, offset & 0x01 );
 	}
 
 	return 0;
@@ -119,7 +119,7 @@ WRITE8_HANDLER( g7400_bus_w )
 	else if (!(p1 & P1_VDC_ENABLE)) {
 		odyssey2_video_w(space, offset, data);
 	} else {
-//		ef9341_w( offset & 0x02, offset & 0x01, data );
+//      ef9341_w( offset & 0x02, offset & 0x01, data );
 	}
 }
 

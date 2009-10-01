@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	drivers/lisa.c
+    drivers/lisa.c
 
-	Experimental LISA driver
+    Experimental LISA driver
 
     Raphael Nabet, 2000
 
@@ -86,12 +86,12 @@ static const applefdc_interface lisa210_fdc_interface =
 /*
 static void lisa_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
-	switch(state)
-	{
-		case MESS_DEVINFO_INT_SONYDRIV_ALLOWABLE_SIZES:		info->i = SONY_FLOPPY_ALLOW400K | SONY_FLOPPY_ALLOW800K; break;
+    switch(state)
+    {
+        case MESS_DEVINFO_INT_SONYDRIV_ALLOWABLE_SIZES:     info->i = SONY_FLOPPY_ALLOW400K | SONY_FLOPPY_ALLOW800K; break;
 
-		default:										sonydriv_device_getinfo(devclass, state, info); break;
-	}
+        default:                                        sonydriv_device_getinfo(devclass, state, info); break;
+    }
 }
 */
 
@@ -143,7 +143,7 @@ static MACHINE_DRIVER_START( lisa )
 	/* devices */
 	MDRV_IWM_ADD("fdc", lisa2_fdc_interface)
 	MDRV_FLOPPY_SONY_2_DRIVES_ADD(lisa_floppy_config)
-	
+
 	/* via */
 	MDRV_VIA6522_ADD("via6522_0", 500000, lisa_via6522_0_intf)
 	MDRV_VIA6522_ADD("via6522_1", 500000, lisa_via6522_1_intf)
@@ -155,7 +155,7 @@ static MACHINE_DRIVER_START( lisa210 )
 	MDRV_CPU_MODIFY( "fdccpu" )
 	MDRV_CPU_PROGRAM_MAP(lisa210_fdc_map)
 
-	/* Lisa 2/10 and MacXL had a slightly different FDC interface */	
+	/* Lisa 2/10 and MacXL had a slightly different FDC interface */
 	MDRV_IWM_MODIFY("fdc", lisa210_fdc_interface)
 
 	/* via */
@@ -226,12 +226,12 @@ static INPUT_PORTS_START( lisa )
 	/* European layout */
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("~  `") PORT_CODE(KEYCODE_BACKSLASH2)
 	/* 2008-05 FP: Differences in European Layout (based on a couple of pictures found in the web):
-	- at KEYCODE_ESC, "`  ~" is replaced by "¤  #"
-	- Shift + 3  gives the pound symbol (\xC2\xA3)
-	- There is no "\  |" key after "]  }"
-	- There is an additional key at 3rd row, 3rd key from 'L', and it's  "`  ~"
-	- Between Left Shift and Z there is another key, but the image is not clear on that key
-	*/
+    - at KEYCODE_ESC, "`  ~" is replaced by "?  #"
+    - Shift + 3  gives the pound symbol (\xC2\xA3)
+    - There is no "\  |" key after "]  }"
+    - There is an additional key at 3rd row, 3rd key from 'L', and it's  "`  ~"
+    - Between Left Shift and Z there is another key, but the image is not clear on that key
+    */
 #endif
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_P)				PORT_CHAR('p') PORT_CHAR('P')
 	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSPACE)		PORT_CHAR(8)
@@ -301,24 +301,24 @@ static INPUT_PORTS_START( lisa )
 INPUT_PORTS_END
 
 	/* Note we're missing a whole bunch of lisa bootrom revisions; based on http://www.cs.dartmouth.edu/~woz/bootrom.pdf :
-	?A?(10/12/82) ?B?(11/19/82) ?C?(1/28/83) D(5/12/83) 3B(9/8/83) E(10/20/83) F(12/21/83) G(2/8/84) and H(2/24/84) are known to exist. Earlier prototypes existed as well. Only F and H are dumped. */
+    ?A?(10/12/82) ?B?(11/19/82) ?C?(1/28/83) D(5/12/83) 3B(9/8/83) E(10/20/83) F(12/21/83) G(2/8/84) and H(2/24/84) are known to exist. Earlier prototypes existed as well. Only F and H are dumped. */
 	/* Based on http://www.cs.dartmouth.edu/~woz/bootrom.pdf and other information, at least the following systems existed:
-	 * Lisa: two 890K twiggy drives, old MB (slow 500khz-clock parallel port via), old i/o board w/io40 disk rom, supports profile hdd, all bootrom revs (practically speaking, it only appeared with bootroms A, B, C, D, E or F)
-	 * Lisa2 (aka Lisa2/5): one 400K SSDD drive, old MB (slow 500khz-clock parallel port via), old i/o board w/ioa8 disk rom, supports profile hdd, bootrom revs "3B", E, F, G, H
-	 * Lisa2/10: one 400K SSDD drive, new MB (fast 1.25MHz-clock parallel port via), new i/o board w/ioa8 disk rom, internal widget 10mb drive (no profile hdd ports), bootrom revs F, G, H
-	 * MacXL: one 400K SSDD drive, new MB (fast 1.25MHz-clock parallel port via), new i/o board w/io88 disk rom, internal widget 10mb drive (no profile hdd ports), bootrom rev 3A, different screen aspect, no serial number in video state rom so lisa office would not run
-	 * Sun-remanufactured MacXL: one 800K DSDD drive, new MB (fast 1.25MHz-clock parallel port via), sun-made custom disk rom (3 revisions exist), internal custom 10mb,20mb, or 40mb drive (?no profile hdd ports?), bootrom rev 3A, different screen aspect, no serial number in video state rom so lisa apps would not run
-	 */
+     * Lisa: two 890K twiggy drives, old MB (slow 500khz-clock parallel port via), old i/o board w/io40 disk rom, supports profile hdd, all bootrom revs (practically speaking, it only appeared with bootroms A, B, C, D, E or F)
+     * Lisa2 (aka Lisa2/5): one 400K SSDD drive, old MB (slow 500khz-clock parallel port via), old i/o board w/ioa8 disk rom, supports profile hdd, bootrom revs "3B", E, F, G, H
+     * Lisa2/10: one 400K SSDD drive, new MB (fast 1.25MHz-clock parallel port via), new i/o board w/ioa8 disk rom, internal widget 10mb drive (no profile hdd ports), bootrom revs F, G, H
+     * MacXL: one 400K SSDD drive, new MB (fast 1.25MHz-clock parallel port via), new i/o board w/io88 disk rom, internal widget 10mb drive (no profile hdd ports), bootrom rev 3A, different screen aspect, no serial number in video state rom so lisa office would not run
+     * Sun-remanufactured MacXL: one 800K DSDD drive, new MB (fast 1.25MHz-clock parallel port via), sun-made custom disk rom (3 revisions exist), internal custom 10mb,20mb, or 40mb drive (?no profile hdd ports?), bootrom rev 3A, different screen aspect, no serial number in video state rom so lisa apps would not run
+     */
 	 /* the old i/o board has a battery pack on it which often leaks and destroys the board, and has a socket for an amd 2915 math co-procesor; the new i/o board lacks the battery pack and the socket for the coprocessor, and integrates some of the function of the old twiggy-to-400k drive convertor board (which all lisa2/5s had) on it, requiring a mod to be done to the old convertor if used with a new i/o board.*/
 	/* Twiggy disk format notes: twiggy disks seem to have wide '48tpi' heads, but cram 62.5tpi on the media by closely spacing the tracks! Twiggy media is DSHD-grade (needing strong magnetic field to set due to high data rate, see http://www.folklore.org/StoryView.py?project=Macintosh&story=Hide_Under_This_Desk.txt). The twiggy format is *PROBABLY* GCR encoding similar to apple2 and mac800k. The disks are 5.25" disks with TWO holes for the drive heads on both sides of the media, and the write protect notch in an unusual place (the index hole is in its normal position, though). By using variable motor speed similar to the later apple 3.5" disks, double sided disks, and tight track spacing, 871,424 bytes are stored per disk. see http://www.brouhaha.com/~eric/retrocomputing/lisa/twiggy.html
-	The drives were notoriously unreliable and were replaced by a single SSDD Sony-made varialble speed 400k drive in the lisa2, which was also used on the original macintosh. */
+    The drives were notoriously unreliable and were replaced by a single SSDD Sony-made varialble speed 400k drive in the lisa2, which was also used on the original macintosh. */
 	/* which systems used the 341-0193-A parallel interface card rom? */
 
 
 ROM_START( lisa ) /* with twiggy drives, io40 i/o rom; technically any of the bootroms will work on this. */
 	ROM_REGION16_BE(0x204000,"maincpu",0)	/* 68k rom and ram */
 	ROM_DEFAULT_BIOS( "revh" )
-	
+
 	ROM_SYSTEM_BIOS( 0, "revh", "LISA Bootrom Rev H (2/24/84)")
 	ROMX_LOAD( "341-0175-h", 0x000000, 0x2000, CRC(adfd4516) SHA1(97a89ce1218b8aa38f69f92f6f363f435c887914), ROM_SKIP(1) | ROM_BIOS(1)) /* 341-0175-H LISA Bootrom Rev H (2/24/84) (High) */
 	ROMX_LOAD( "341-0176-h", 0x000001, 0x2000, CRC(546d6603) SHA1(2a81e4d483f50ae8a2519621daeb7feb440a3e4d), ROM_SKIP(1) | ROM_BIOS(1)) /* 341-0176-H LISA Bootrom Rev H (2/24/84) (Low) */
@@ -334,7 +334,7 @@ ROM_START( lisa ) /* with twiggy drives, io40 i/o rom; technically any of the bo
 	ROM_SYSTEM_BIOS( 3, "reve", "LISA Bootrom Rev E (10/20/83)")
 	ROMX_LOAD( "341-0175-e", 0x000000, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(4)) /* 341-0175-E LISA Bootrom Rev E (10/20/83) (High) */
 	ROMX_LOAD( "341-0176-e", 0x000001, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(4)) /* 341-0176-E LISA Bootrom Rev E (10/20/83) (Low) */
-	
+
 	ROM_SYSTEM_BIOS( 4, "revd", "LISA Bootrom Rev D (5/12/83)")
 	ROMX_LOAD( "341-0175-d", 0x000000, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(5)) /* 341-0175-D LISA Bootrom Rev D (5/12/83) (High) */
 	ROMX_LOAD( "341-0176-d", 0x000001, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(5)) /* 341-0176-D LISA Bootrom Rev D (5/12/83) (Low) */
@@ -387,7 +387,7 @@ ROM_START( lisa2 ) /* internal apple codename was 'pepsi'; has one SSDD 400K dri
 	ROM_SYSTEM_BIOS( 4, "rev3b", "LISA Bootrom Rev 3B (9/8/83)") /* Earliest lisa2 rom, prototype. */
 	ROMX_LOAD( "341-0175-3b", 0x000000, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(5)) /* ?label? 341-0175-3b LISA Bootrom Rev 3B (9/8/83) (High) */
 	ROMX_LOAD( "341-0176-3b", 0x000001, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(5)) /* ?label? 341-0176-3b LISA Bootrom Rev 3B (9/8/83) (Low) */
-	
+
 	ROM_REGION(0x2000,"fdccpu",0)		/* 6504 RAM and ROM */
 	ROM_LOAD( "341-0290-b", 0x1000, 0x1000, CRC(bc6364f1) SHA1(f3164923330a51366a06d9d8a4a01ec7b0d3a8aa)) /* 341-0290-B LISA 2/5 Disk Rom (ioa8), supports profile on external port */
 
@@ -427,7 +427,7 @@ ROM_START( lisa210 ) /* newer motherboard and i/o board; has io88 i/o rom, built
 	ROM_REGION(0x4000,"widget", 0)		/* Widget HDD controller */
 	ROM_LOAD( "341-0288-a", 0x0000, 0x800, CRC(a26ef1c6) SHA1(5aaeb6ff7f7d4f7ce7c70402f75e82533635dda4)) /* 341-0288-A z8 mcu piggyback rom */
 	ROM_LOAD( "341-0289-d", 0x2000, 0x2000, CRC(25e86e95) SHA1(72a346c2074d2256adde491b930023ebdcb5f51a)) /* 341-0289-D external rom on widget board */
-	
+
 	ROM_REGION(0x100,"gfx1", 0)		/* video ROM (includes S/N) */
 	ROM_LOAD( "vidstate.rom", 0x00, 0x100, CRC(75904783) SHA1(3b0023bd90f2ca1be0b099160a566b044856885d))
 ROM_END

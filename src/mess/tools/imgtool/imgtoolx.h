@@ -1,8 +1,8 @@
 /***************************************************************************
 
-	imgtoolx.h
+    imgtoolx.h
 
-	Internal headers for Imgtool core
+    Internal headers for Imgtool core
 
 ***************************************************************************/
 

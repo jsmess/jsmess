@@ -5,18 +5,18 @@
   Routines to control the Atari 7800 video hardware
 
   TODO:
-	precise DMA cycle stealing
+    precise DMA cycle stealing
 
-	2003-06-23 ericball Kangaroo mode & 320 mode & other stuff
+    2003-06-23 ericball Kangaroo mode & 320 mode & other stuff
 
-	2002-05-14 kubecj vblank dma stop fix
+    2002-05-14 kubecj vblank dma stop fix
 
-	2002-05-13 kubecj	fixed 320C mode (displayed 2 pixels instead of one!)
-							noticed that Jinks uses 0x02-320D mode
-							implemented the mode - completely unsure if good!
-							implemented some Maria CTRL variables
+    2002-05-13 kubecj   fixed 320C mode (displayed 2 pixels instead of one!)
+                            noticed that Jinks uses 0x02-320D mode
+                            implemented the mode - completely unsure if good!
+                            implemented some Maria CTRL variables
 
-	2002-05-12 kubecj added cases for 0x01-160A, 0x05-160B as stated by docs
+    2002-05-12 kubecj added cases for 0x01-160A, 0x05-160B as stated by docs
 
 ***************************************************************************/
 
@@ -341,7 +341,7 @@ INTERRUPT_GEN( a7800_interrupt )
 	int frame_scanline;
 	UINT8 *ROM = memory_region(device->machine, "maincpu");
 	const address_space* space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	
+
 	maria_scanline++;
 
 	/* why + 1? */
@@ -372,17 +372,17 @@ INTERRUPT_GEN( a7800_interrupt )
 			maria_offset = READ_MEM(maria_dll) & 0x0f;
 			maria_holey = (READ_MEM(maria_dll) & 0x60) >> 5;
 			maria_dli = READ_MEM(maria_dll) & 0x80;
-			/*	logerror("DLL=%x\n",maria_dll); */
-			/*	logerror("DLL: DL = %x  dllctrl = %x\n",maria_dl,ROM[maria_dll]); */
+			/*  logerror("DLL=%x\n",maria_dll); */
+			/*  logerror("DLL: DL = %x  dllctrl = %x\n",maria_dl,ROM[maria_dll]); */
 		}
 
 		/*logerror( "vblank end on line %d\n", frame_scanline );*/
 	}
 
-	/*	moved start of vblank up (to prevent dma/dli happen on line -4)
-		this fix made PR Baseball happy
-		Kung-Fu Master looks worse
-		don't know about others yet */
+	/*  moved start of vblank up (to prevent dma/dli happen on line -4)
+        this fix made PR Baseball happy
+        Kung-Fu Master looks worse
+        don't know about others yet */
 	if( frame_scanline == ( a7800_lines - 4 ) )
 	{
 		/* vblank starts 4 scanlines before end of screen */
@@ -390,19 +390,19 @@ INTERRUPT_GEN( a7800_interrupt )
 		maria_vblank = 0x80;
 
 		/* fixed 2002/05/14 kubecj
-				when going vblank, dma must be stopped
-				otherwise system tries to read past end of dll
-				causing false dlis to occur, mainly causing wild
-				screen flickering
+                when going vblank, dma must be stopped
+                otherwise system tries to read past end of dll
+                causing false dlis to occur, mainly causing wild
+                screen flickering
 
-				games fixed:
-				Ace of Aces
-				Mean 18
-				Ninja Golf (end of levels)
-				Choplifter
-				Impossible Mission
-				Jinks
-		*/
+                games fixed:
+                Ace of Aces
+                Mean 18
+                Ninja Golf (end of levels)
+                Choplifter
+                Impossible Mission
+                Jinks
+        */
 
 		maria_dodma = 0;
 		/*logerror( "vblank on line %d\n\n", frame_scanline );*/
@@ -578,12 +578,12 @@ WRITE8_HANDLER( a7800_MARIA_w )
 			maria_rm = data & 0x03;
 
 			/*logerror( "MARIA CTRL: CK:%d DMA:%d CW:%d BC:%d KM:%d RM:%d\n",
-					maria_color_kill ? 1 : 0,
-					( data & 0x60 ) >> 5,
-					maria_cwidth ? 1 : 0,
-					maria_bcntl ? 1 : 0,
-					maria_kangaroo ? 1 : 0,
-					maria_rm );*/
+                    maria_color_kill ? 1 : 0,
+                    ( data & 0x60 ) >> 5,
+                    maria_cwidth ? 1 : 0,
+                    maria_bcntl ? 1 : 0,
+                    maria_kangaroo ? 1 : 0,
+                    maria_rm );*/
 
 			break;
 		case 0x1D:

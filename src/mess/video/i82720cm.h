@@ -1,10 +1,10 @@
 /******************************************************************************
 
-	i82720cm.h
-	Video driver for the Intel 82720 and NEC uPD7220 GDC.
+    i82720cm.h
+    Video driver for the Intel 82720 and NEC uPD7220 GDC.
 
-	Per Ola Ingvarsson
-	Tomas Karlsson
+    Per Ola Ingvarsson
+    Tomas Karlsson
 
  ******************************************************************************/
 
@@ -51,21 +51,21 @@ enum I82720_GDC_STATUS
 
 	/* Status register flags */
 
-	GDC_DATA_READY	 = 0x01,	/* Data ready			*/
+	GDC_DATA_READY	 = 0x01,	/* Data ready           */
 
-	GDC_FIFO_FULL	 = 0x02,	/* FIFO full			*/
+	GDC_FIFO_FULL	 = 0x02,	/* FIFO full            */
 
-	GDC_FIFO_EMPTY	 = 0x04,	/* FIFO empty			*/
+	GDC_FIFO_EMPTY	 = 0x04,	/* FIFO empty           */
 
-	GDC_DRAWING	 = 0x08,	/* Drawing in progress		*/
+	GDC_DRAWING	 = 0x08,	/* Drawing in progress      */
 
-	GDC_DMA_EXEC	 = 0x10,	/* DMA execute			*/
+	GDC_DMA_EXEC	 = 0x10,	/* DMA execute          */
 
-	GDC_VSYNC	 = 0x20,	/* Vertical sync active		*/
+	GDC_VSYNC	 = 0x20,	/* Vertical sync active     */
 
-	GDC_HBLANK	 = 0x40,	/* Horizontal blanking active	*/
+	GDC_HBLANK	 = 0x40,	/* Horizontal blanking active   */
 
-	GDC_LIGHT_PEN	 = 0x80		/* Light pen detect		*/
+	GDC_LIGHT_PEN	 = 0x80		/* Light pen detect     */
 
 };
 

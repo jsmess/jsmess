@@ -1,7 +1,7 @@
 /*
-	tms9901.h: header file for tms9901.c
+    tms9901.h: header file for tms9901.c
 
-	Raphael Nabet
+    Raphael Nabet
 */
 #ifndef __TMS9901_H__
 #define __TMS9901_H__

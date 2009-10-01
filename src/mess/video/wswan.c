@@ -223,12 +223,12 @@ static void wswan_draw_foreground_0( void ) {
 			if ( x_offset >= 0 && x_offset < WSWAN_X_PIXELS ) {
 				if ( wswan_vdp.colors_16 ) {
 					if ( col ) {
-//						if ( wswan_vdp.color_mode ) {
+//                      if ( wswan_vdp.color_mode ) {
 							wswan_plot_pixel( x_offset, wswan_vdp.current_line, pal[tile_palette][col] );
-//						} else {
-//							/* Hmmmm, what should we do here... Is this correct?? */
-//							wswan_plot_pixel( x_offset, wswan_vdp.current_line, pal[tile_palette][col] );
-//						}
+//                      } else {
+//                          /* Hmmmm, what should we do here... Is this correct?? */
+//                          wswan_plot_pixel( x_offset, wswan_vdp.current_line, pal[tile_palette][col] );
+//                      }
 					}
 				} else {
 					if ( col || !(tile_palette & 4 ) ) {
@@ -507,7 +507,7 @@ static void wswan_handle_sprites( int mask ) {
 						}
 					} else {
 						if ( x_offset < wswan_vdp.window_sprites_left || x_offset > wswan_vdp.window_sprites_right ) {
-//							continue;
+//                          continue;
 						}
 					}
 				}
@@ -558,22 +558,22 @@ void wswan_refresh_scanline( void )
 	}
 
 	/*
-	 * Draw background layer
-	 */
+     * Draw background layer
+     */
 	if ( wswan_vdp.layer_bg_enable ) {
 		wswan_draw_background();
 	}
 
 	/*
-	 * Draw sprites between background and foreground layers
-	 */
+     * Draw sprites between background and foreground layers
+     */
 	if ( wswan_vdp.sprites_enable ) {
 		wswan_handle_sprites( 0 );
 	}
 
 	/*
-	 * Draw foreground layer, taking window settings into account
-	 */
+     * Draw foreground layer, taking window settings into account
+     */
 	if ( wswan_vdp.layer_fg_enable ) {
 		switch( wswan_vdp.window_fg_mode ) {
 		case 0:	/* FG inside & outside window area */
@@ -598,8 +598,8 @@ void wswan_refresh_scanline( void )
 	}
 
 	/*
-	 * Draw sprites in front of foreground layer
-	 */
+     * Draw sprites in front of foreground layer
+     */
 	if ( wswan_vdp.sprites_enable ) {
 		wswan_handle_sprites( 0x2000 );
 	}

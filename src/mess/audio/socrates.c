@@ -11,9 +11,9 @@
 #include "streams.h"
 #include "socrates.h"
 
-typedef struct 
+typedef struct
 {
-	sound_stream *stream; 
+	sound_stream *stream;
 	UINT8 freq[2]; /* channel 1,2 frequencies */
 	UINT8 vol[2]; /* channel 1,2 volume */
 	UINT8 enable[2]; /* channel 1,2 enable */
@@ -86,7 +86,7 @@ static STREAM_UPDATE( socrates_snd_pcm_update )
 		outputs[0][i] = ((int)chip->DAC_output<<4);
 	}
 }
-   
+
 
 
 /*************************************

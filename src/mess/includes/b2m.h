@@ -30,7 +30,7 @@ struct _b2m_state
 	UINT8 b2m_color[4];
 	UINT8 b2m_localmachine;
 	UINT8 vblank_state;
-	
+
 	/* devices */
 	const device_config *fdc;
 	const device_config *pic;

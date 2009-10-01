@@ -1,20 +1,20 @@
 /****************************************************************************
 
-	ay31015.c by Robbbert, May 2008
+    ay31015.c by Robbbert, May 2008
 
-	Code for the AY-3-1014A, AY-3-1015(D), AY-5-1013(A), and AY-6-1013 UARTs
-	The HD6402 UART is compatible with the AY-3-1015 UART.
+    Code for the AY-3-1014A, AY-3-1015(D), AY-5-1013(A), and AY-6-1013 UARTs
+    The HD6402 UART is compatible with the AY-3-1015 UART.
 
-	This is cycle-accurate according to the specifications.
+    This is cycle-accurate according to the specifications.
 
-	It supports independent receive and transmit clocks,
-	and transmission and reception can occur simultaneously if desired.
+    It supports independent receive and transmit clocks,
+    and transmission and reception can occur simultaneously if desired.
 
-	Note to any MESSDEVs who might happen to stray here:
+    Note to any MESSDEVs who might happen to stray here:
 
-	- If you find bugs, please fix them yourself.
-	- If you want to convert it to a DEVICE, please do so.
-	- If you want to add support for multiple instances, please do so.
+    - If you find bugs, please fix them yourself.
+    - If you want to convert it to a DEVICE, please do so.
+    - If you want to add support for multiple instances, please do so.
 
 *****************************************************************************
 
@@ -29,21 +29,21 @@ Differences between the chip types:
 ******************************************************************************
 
 It is not clear in the documentation as to which settings will reset the device.
-	To be safe, we will always reset whenever the control register changes.
+    To be safe, we will always reset whenever the control register changes.
 
-	Also, it not clear exactly what happens under various error conditions.
-	What we do is:
-	1. During receive the stop bit processing is cut short, so we can better
-	synchronise the next byte.
-	2. If a framing error occurs, we do not signal DAV, but instead skip
-	the bad byte and start looking for the next.
+    Also, it not clear exactly what happens under various error conditions.
+    What we do is:
+    1. During receive the stop bit processing is cut short, so we can better
+    synchronise the next byte.
+    2. If a framing error occurs, we do not signal DAV, but instead skip
+    the bad byte and start looking for the next.
 
-	This device has only been tested successfully at 300 baud, with 8 bits,
-	2 stop bits and no parity.
+    This device has only been tested successfully at 300 baud, with 8 bits,
+    2 stop bits and no parity.
 
-	The bit order of the status and control registers is set up to suit the
-	Exidy driver. If you wish to use it for some other driver, use the BITSWAP8
-	macro in your driver.
+    The bit order of the status and control registers is set up to suit the
+    Exidy driver. If you wish to use it for some other driver, use the BITSWAP8
+    macro in your driver.
 
 ********************************************************************************
 
@@ -326,7 +326,7 @@ static TIMER_CALLBACK( ay31015_rx_process )
 				{
 					ay31015->status_reg |= STATUS_FE;		// framing error - the stop bit not high
 					ay31015->rx_state = PREP_TIME;		// lost sync - start over
-			//		return;
+			//      return;
 				}
 				else
 					ay31015->status_reg &= ~STATUS_FE;
@@ -357,7 +357,7 @@ static TIMER_CALLBACK( ay31015_rx_process )
 				if (ay31015->second_stop_bit)
 				{
 					/* We should wait for the full first stop bit and
-					   the beginning of the second stop bit */
+                       the beginning of the second stop bit */
 					ay31015->rx_state = SECOND_STOP_BIT;
 					ay31015->rx_pulses += ay31015->second_stop_bit - 7;
 				}
@@ -368,7 +368,7 @@ static TIMER_CALLBACK( ay31015_rx_process )
 				}
 			}
 			return;
-			
+
 		case SECOND_STOP_BIT:
 			ay31015->rx_pulses--;
 			if (!ay31015->rx_pulses)
@@ -442,7 +442,7 @@ static TIMER_CALLBACK( ay31015_tx_process )
 
 				ay31015->tx_data >>= 1;				// adjust the shift register
 			}
-				
+
 			ay31015->tx_pulses--;
 			if (!ay31015->tx_pulses)					// all data bits sent
 			{
@@ -737,7 +737,7 @@ static DEVICE_RESET( ay31015 )
 
 /*-------------------------------------------------
     DEVICE_GET_INFO(ay31015) - device getinfo
-	function
+    function
 -------------------------------------------------*/
 
 DEVICE_GET_INFO( ay31015 )

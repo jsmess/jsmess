@@ -91,7 +91,7 @@ static MACHINE_DRIVER_START( lynx )
 
 	/* devices */
 	MDRV_QUICKLOAD_ADD("quickload", lynx, "o", 0)
-	
+
 	MDRV_IMPORT_FROM(lynx_cartslot)
 MACHINE_DRIVER_END
 
@@ -173,7 +173,7 @@ static QUICKLOAD_LOAD( lynx )
 	memory_write_byte(space, 0x1fc, start & 0xff);
 	memory_write_byte(space, 0x1fd, start >> 8);
 
-	lynx_crc_keyword(devtag_get_device(image->machine, "quickload")); 
+	lynx_crc_keyword(devtag_get_device(image->machine, "quickload"));
 
 	cpu_set_reg(cpu, REG_GENPC, start);
 

@@ -1,15 +1,15 @@
 /***************************************************************************
 
-	toshiba 6721a chip approximation
-	(voice output)
+    toshiba 6721a chip approximation
+    (voice output)
 
-	not really working
+    not really working
      communication with c364 works, no speech synthesis
-	includes c364 interface hardware
+    includes c364 interface hardware
 
-	PeT mess@utanet.at
+    PeT mess@utanet.at
     documentation
- 	 www.funet.fi
+     www.funet.fi
 
 ***************************************************************************/
 

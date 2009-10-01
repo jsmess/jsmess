@@ -4,12 +4,12 @@
 
         12/05/2009 Skeleton driver.
 
-	Everything in this driver has been worked out by reading the
-	ROM and using the debugger, as no information is available.
+    Everything in this driver has been worked out by reading the
+    ROM and using the debugger, as no information is available.
 
-	Therefore, it is likely to be full of mistakes and omissions.
+    Therefore, it is likely to be full of mistakes and omissions.
 
-	Note: The $ key makes a square symbol.
+    Note: The $ key makes a square symbol.
 
 ****************************************************************************/
 
@@ -95,7 +95,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bcs3_io, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-//	AM_RANGE( 0xf8, 0xfb ) AM_DEVREADWRITE(Z80CTC,"z80ctc",z80ctc_r,z80ctc_w)
+//  AM_RANGE( 0xf8, 0xfb ) AM_DEVREADWRITE(Z80CTC,"z80ctc",z80ctc_r,z80ctc_w)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -252,7 +252,7 @@ static VIDEO_UPDATE( bcs3 )
 }
 
 /* This has 100 lines of screen data. I'm assuming that it only shows a portion of this,
-	with the cursor always in sight. */
+    with the cursor always in sight. */
 static VIDEO_UPDATE( bcs3a )
 {
 	UINT8 y,ra,chr,gfx,rat;

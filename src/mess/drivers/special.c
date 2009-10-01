@@ -82,7 +82,7 @@ ADDRESS_MAP_END
 /* Input ports */
 
 /* Inputs will need to be adapted when/if support for non-latin keys is added to natural keyboard:
-these systems have different keys to switch among alphabets!  
+these systems have different keys to switch among alphabets!
 */
 static INPUT_PORTS_START( special )
 /* Alt switches between Latin and Cyrillic alphabets */
@@ -443,7 +443,7 @@ static MACHINE_DRIVER_START( special )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MDRV_CASSETTE_ADD( "cassette", special_cassette_config )
-		
+
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( specialp )
@@ -478,9 +478,9 @@ static MACHINE_DRIVER_START( specimx )
     /* audio hardware */
 	MDRV_SOUND_ADD("custom", SPECIMX, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-		
+
 	MDRV_WD1793_ADD("wd1793", default_wd17xx_interface_2_drives )
-	
+
 	MDRV_FLOPPY_2_DRIVES_ADD(specimx_floppy_config)
 MACHINE_DRIVER_END
 
@@ -514,9 +514,9 @@ static MACHINE_DRIVER_START( erik )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MDRV_CASSETTE_ADD( "cassette", special_cassette_config )
-	
-	MDRV_WD1793_ADD("wd1793", default_wd17xx_interface_2_drives )	
-	
+
+	MDRV_WD1793_ADD("wd1793", default_wd17xx_interface_2_drives )
+
 	MDRV_FLOPPY_2_DRIVES_ADD(specimx_floppy_config)
 MACHINE_DRIVER_END
 

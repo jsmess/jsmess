@@ -1,18 +1,18 @@
 /***************************************************************************
 
-		Galeb video driver by Miodrag Milanovic
+        Galeb video driver by Miodrag Milanovic
 
-		01/03/2008 Updated to work with latest SVN code
-		22/02/2008 Preliminary driver.
-		     
+        01/03/2008 Updated to work with latest SVN code
+        22/02/2008 Preliminary driver.
+
 ****************************************************************************/
 
 
 #include "driver.h"
 #include "includes/galeb.h"
-  
+
 UINT8 *galeb_video_ram;
-    
+
 const gfx_layout galeb_charlayout =
 {
 	8, 8,				/* 8x8 characters */
@@ -27,7 +27,7 @@ const gfx_layout galeb_charlayout =
 VIDEO_START( galeb )
 {
 }
- 
+
 VIDEO_UPDATE( galeb )
 {
 	int x,y;

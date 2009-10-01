@@ -6,22 +6,22 @@
     Visit http://mamedev.org for licensing and usage restrictions.
 
 **********************************************************************
-							_______  _______
-				RD	 1	---|	   \/		|---  24  Vdd
-		    _RESET	 2	---|				|---  23  R LUM
-		      _CON	 3	---|				|---  22  G LUM
-			 B CHR	 4	---|				|---  21  GD
-			 B LUM	 5	---|				|---  20  BLG LUM
-			   BKG	 6	---|	CDP1862C	|---  19  G CHR
-		   _LD CLK	 7	---|	top view	|---  18  R CHR
-			   STP	 8	---|				|---  17  BKG CHR
-		   CLK OUT	 9	---|				|---  16  BD
-		     _SYNC	10	---|			    |---  15  BURST
-		    LUM IN	11	---|				|---  14  _XTAL
-			   Vss	12	---|________________|---  13  XTAL
+                            _______  _______
+                RD   1  ---|       \/       |---  24  Vdd
+            _RESET   2  ---|                |---  23  R LUM
+              _CON   3  ---|                |---  22  G LUM
+             B CHR   4  ---|                |---  21  GD
+             B LUM   5  ---|                |---  20  BLG LUM
+               BKG   6  ---|    CDP1862C    |---  19  G CHR
+           _LD CLK   7  ---|    top view    |---  18  R CHR
+               STP   8  ---|                |---  17  BKG CHR
+           CLK OUT   9  ---|                |---  16  BD
+             _SYNC  10  ---|                |---  15  BURST
+            LUM IN  11  ---|                |---  14  _XTAL
+               Vss  12  ---|________________|---  13  XTAL
 
 
-		   http://homepage.mac.com/ruske/cosmacelf/cdp1862.pdf
+           http://homepage.mac.com/ruske/cosmacelf/cdp1862.pdf
 
 **********************************************************************/
 
@@ -62,7 +62,7 @@ struct _cdp1862_interface
 	double lum_b;				/* blue luminance resistor value */
 	double lum_g;				/* green luminance resistor value */
 	double lum_bkg;				/* background luminance resistor value */
-	
+
 	double chr_r;				/* red chrominance resistor value */
 	double chr_b;				/* blue chrominance resistor value */
 	double chr_g;				/* green chrominance resistor value */

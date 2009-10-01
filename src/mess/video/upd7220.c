@@ -49,7 +49,7 @@ struct _upd7220_t
 	devcb_resolved_write_line	out_vsync_func;
 	devcb_resolved_write_line	out_blank_func;
 
-	int clock;						
+	int clock;
 
 	UINT8 ra[16];					/* parameter RAM */
 
@@ -76,7 +76,7 @@ struct _upd7220_t
 	UINT32 ead;						/* execute word address */
 	UINT16 dad;						/* dot address within the word */
 	UINT32 lad;						/* light pen address */
-	
+
 	int disp;						/* display zoom factor */
 	int gchr;						/* zoom factor for graphics character writing and area filling */
 	UINT16 mask;					/* mask register */
@@ -122,7 +122,7 @@ INLINE UINT16 dequeue(upd7220_t *upd7220)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    recompute_parameters - 
+    recompute_parameters -
 -------------------------------------------------*/
 #ifdef UNUSED_FUNCTION
 static void recompute_parameters(upd7220_t *upd7220)
@@ -143,7 +143,7 @@ static void recompute_parameters(upd7220_t *upd7220)
 }
 #endif
 /*-------------------------------------------------
-    update_vsync_timer - 
+    update_vsync_timer -
 -------------------------------------------------*/
 
 static void update_vsync_timer(upd7220_t *upd7220, int state)
@@ -170,7 +170,7 @@ static TIMER_CALLBACK( vsync_tick )
 }
 
 /*-------------------------------------------------
-    update_hsync_timer - 
+    update_hsync_timer -
 -------------------------------------------------*/
 
 static void update_hsync_timer(upd7220_t *upd7220, int state)
@@ -200,7 +200,7 @@ static TIMER_CALLBACK( hsync_tick )
 }
 
 /*-------------------------------------------------
-    update_blank_timer - 
+    update_blank_timer -
 -------------------------------------------------*/
 
 static void update_blank_timer(upd7220_t *upd7220, int state)

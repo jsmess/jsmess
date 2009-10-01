@@ -160,7 +160,7 @@ static PALETTE_INIT( osborne1 )
 
 static const z80_daisy_chain osborne1_daisy_chain[] =
 {
-/*	{ osborne1_z80_reset, osborne1_z80_irq_state, osborne1_z80_irq_ack, osborne1_z80_irq_reti, 0 }, */
+/*  { osborne1_z80_reset, osborne1_z80_irq_state, osborne1_z80_irq_ack, osborne1_z80_irq_reti, 0 }, */
 	{ "osborne1_daisy" },
 	{ NULL }
 };
@@ -180,7 +180,7 @@ FLOPPY_OPTIONS_START(osborne1 )
 		TRACKS([40])
 		SECTORS([10])
 		SECTOR_LENGTH([256])
-		FIRST_SECTOR_ID([1]))	
+		FIRST_SECTOR_ID([1]))
 	FLOPPY_OPTION( odd, "img", "Osborne double density", basicdsk_identify_default, basicdsk_construct_default,
 		HEADS([1])
 		TRACKS([40])
@@ -192,19 +192,19 @@ FLOPPY_OPTIONS_START(osborne1 )
 		TRACKS([40])
 		SECTORS([8])
 		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([1]))					
+		FIRST_SECTOR_ID([1]))
 	FLOPPY_OPTION( xerox, "img", "Xerox 820 Computer", basicdsk_identify_default, basicdsk_construct_default,
 		HEADS([1])
 		TRACKS([40])
 		SECTORS([18])
 		SECTOR_LENGTH([128])
-		FIRST_SECTOR_ID([1]))					
+		FIRST_SECTOR_ID([1]))
 	FLOPPY_OPTION( dec, "img", "DEC 1820 double density", basicdsk_identify_default, basicdsk_construct_default,
 		HEADS([1])
 		TRACKS([40])
 		SECTORS([9])
 		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([1]))					
+		FIRST_SECTOR_ID([1]))
 FLOPPY_OPTIONS_END
 
 static const floppy_config osborne1_floppy_config =
@@ -235,13 +235,13 @@ static MACHINE_DRIVER_START( osborne1 )
 	MDRV_SPEAKER_STANDARD_MONO( "mono" )
 	MDRV_SOUND_ADD( "beep", BEEP, 0 )
 	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
-	
+
 	MDRV_PIA6821_ADD( "pia_0", osborne1_ieee_pia_config )
 	MDRV_PIA6821_ADD( "pia_1", osborne1_video_pia_config )
 
 	MDRV_MB8877_ADD("mb8877", default_wd17xx_interface_2_drives )
-	
-	MDRV_FLOPPY_2_DRIVES_ADD(osborne1_floppy_config)	
+
+	MDRV_FLOPPY_2_DRIVES_ADD(osborne1_floppy_config)
 MACHINE_DRIVER_END
 
 

@@ -1,5 +1,5 @@
 /***************************************************************************
-   
+
         Busicom 141-PF
 
         04/08/2009 Initial driver by Miodrag Milanovic
@@ -13,7 +13,7 @@
 UINT8 busicom_printer_line[11][17];
 UINT8 busicom_printer_line_color[11];
 
-static UINT8 printer_font[]= {	
+static UINT8 printer_font[]= {
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -58,7 +58,7 @@ static UINT8 printer_font[]= {
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-	
+
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,3,4,5,6,6,5,4,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,4,6,7,7,7,7,7,7,7,7,6,4,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -1820,21 +1820,21 @@ VIDEO_START( busicom )
 
 VIDEO_UPDATE( busicom )
 {
-	int y, x, b, j;	
+	int y, x, b, j;
 	//34x44
 	for (y = 0; y < 11; y++)
 	{
 		UINT8 col = 8 * busicom_printer_line_color[y];
 		for (x = 0; x < 17; x++)
 		{
-			UINT8 chr = busicom_printer_line[y][x];			
-			for (j = 0; j < 44; j++) {				
+			UINT8 chr = busicom_printer_line[y][x];
+			for (j = 0; j < 44; j++) {
 				for (b = 0; b < 34; b++)
-				{								
+				{
 					*BITMAP_ADDR16(bitmap, (y*44)+j, x*40+b) =  printer_font[44*34 * chr + j*34 + b] + col ;
 				}
 				for (b = 34; b < 40; b++)
-				{								
+				{
 					*BITMAP_ADDR16(bitmap, (y*44)+j, x*40+b) =  0;
 				}
 
@@ -1850,11 +1850,11 @@ static UINT8 color_red[] = { 0xb0,0xb5,0xc0,0xc5,0xd0,0xd5,0xdf };
 PALETTE_INIT( busicom )
 {
 	int i;
-	for(i=0;i<8;i++) {		
+	for(i=0;i<8;i++) {
 		palette_set_color( machine, i, MAKE_RGB(color[i],color[i],color[i]) );
 	}
 	palette_set_color( machine, 8, MAKE_RGB(0xff,0xff,0xff) );
-	for(i=0;i<7;i++) {		
+	for(i=0;i<7;i++) {
 		palette_set_color( machine, i+9, MAKE_RGB(color_red[i],0x00,0x00) );
 	}
 }

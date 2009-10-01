@@ -17,66 +17,66 @@
 
 
 /*
-AUDIO_A	EQU $FD20
-AUDIO_B	EQU $FD28
-AUDIO_C	EQU $FD30
-AUDIO_D	EQU $FD38
+AUDIO_A EQU $FD20
+AUDIO_B EQU $FD28
+AUDIO_C EQU $FD30
+AUDIO_D EQU $FD38
 
-VOLUME_CNTRL	EQU 0
-FEEDBACK_ENABLE EQU 1	; enables 11/10/5..0
-OUTPUT_VALUE	EQU 2
-SHIFTER_L	EQU 3
-AUD_BAKUP	EQU 4
-AUD_CNTRL1	EQU 5
-AUD_COUNT	EQU 6
-AUD_CNTRL2	EQU 7
+VOLUME_CNTRL    EQU 0
+FEEDBACK_ENABLE EQU 1   ; enables 11/10/5..0
+OUTPUT_VALUE    EQU 2
+SHIFTER_L   EQU 3
+AUD_BAKUP   EQU 4
+AUD_CNTRL1  EQU 5
+AUD_COUNT   EQU 6
+AUD_CNTRL2  EQU 7
 
 ; AUD_CNTRL1
-FEEDBACK_7	EQU %10000000
-AUD_RESETDONE	EQU %01000000
-AUD_INTEGRATE	EQU %00100000
-AUD_RELOAD	EQU %00010000
-AUD_CNTEN	EQU %00001000
-AUD_LINK	EQU %00000111
+FEEDBACK_7  EQU %10000000
+AUD_RESETDONE   EQU %01000000
+AUD_INTEGRATE   EQU %00100000
+AUD_RELOAD  EQU %00010000
+AUD_CNTEN   EQU %00001000
+AUD_LINK    EQU %00000111
 ; link timers (0->2->4 / 1->3->5->7->Aud0->Aud1->Aud2->Aud3->1
-AUD_64us	EQU %00000110
-AUD_32us	EQU %00000101
-AUD_16us	EQU %00000100
-AUD_8us	EQU %00000011
-AUD_4us	EQU %00000010
-AUD_2us	EQU %00000001
-AUD_1us	EQU %00000000
+AUD_64us    EQU %00000110
+AUD_32us    EQU %00000101
+AUD_16us    EQU %00000100
+AUD_8us EQU %00000011
+AUD_4us EQU %00000010
+AUD_2us EQU %00000001
+AUD_1us EQU %00000000
 
 ; AUD_CNTRL2 (read only)
-; B7..B4	; shifter bits 11..8
-; B3	; who knows
-; B2	; last clock state (0->1 causes count)
-; B1	; borrow in (1 causes count)
-; B0	; borrow out (count EQU 0 and borrow in)
+; B7..B4    ; shifter bits 11..8
+; B3    ; who knows
+; B2    ; last clock state (0->1 causes count)
+; B1    ; borrow in (1 causes count)
+; B0    ; borrow out (count EQU 0 and borrow in)
 
-ATTEN_A	EQU $FD40
-ATTEN_B	EQU $FD41
-ATTEN_C	EQU $FD42
-ATTEN_D	EQU $FD43
+ATTEN_A EQU $FD40
+ATTEN_B EQU $FD41
+ATTEN_C EQU $FD42
+ATTEN_D EQU $FD43
 ; B7..B4 attenuation left ear (0 silent ..15/16 volume)
 ; B3..B0       "     right ear
 
-MPAN	EQU $FD44
+MPAN    EQU $FD44
 ; B7..B4 left ear
 ; B3..B0 right ear
 ; B7/B3 EQU Audio D
 ; a 1 enables attenuation for channel and side
 
 
-MSTEREO	EQU $FD50	; a 1 disables audio connection
-AUD_D_LEFT	EQU %10000000
-AUD_C_LEFT	EQU %01000000
-AUD_B_LEFT	EQU %00100000
-AUD_A_LEFT	EQU %00010000
-AUD_D_RIGHT	EQU %00001000
-AUD_C_RIGHT	EQU %00000100
-AUD_B_RIGHT	EQU %00000010
-AUD_A_RIGHT	EQU %00000001
+MSTEREO EQU $FD50   ; a 1 disables audio connection
+AUD_D_LEFT  EQU %10000000
+AUD_C_LEFT  EQU %01000000
+AUD_B_LEFT  EQU %00100000
+AUD_A_LEFT  EQU %00010000
+AUD_D_RIGHT EQU %00001000
+AUD_C_RIGHT EQU %00000100
+AUD_B_RIGHT EQU %00000010
+AUD_A_RIGHT EQU %00000001
 
  */
 static sound_stream *mixer_channel;
@@ -209,7 +209,7 @@ UINT8 lynx_audio_read(int offset)
 
 void lynx_audio_write(int offset, UINT8 data)
 {
-//	logerror("%.6f audio write %.2x %.2x\n", timer_get_time(machine), offset, data);
+//  logerror("%.6f audio write %.2x %.2x\n", timer_get_time(machine), offset, data);
     LYNX_AUDIO *channel=lynx_audio+((offset>>3)&3);
     stream_update(mixer_channel);
     switch (offset) {

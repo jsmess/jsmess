@@ -6,12 +6,12 @@
 #include "includes/ssystem3.h"
 
 static struct {
-  UINT8 data[5];  
+  UINT8 data[5];
   int clock;
   int count;
 } ssystem3_lcd;
 
-void ssystem3_lcd_reset(void) 
+void ssystem3_lcd_reset(void)
 {
   ssystem3_lcd.count=0; ssystem3_lcd.clock=1;
 }
@@ -214,10 +214,10 @@ VIDEO_UPDATE( ssystem3 )
 	    0, // empty
 	    1, // bauer
 	    3, // springer
-	    0x11, // läufer
+	    0x11, // l??ufer
 	    7, // turm
 	    0x1f, // dame
-	    0x17, // könig
+	    0x17, // k??nig
 	    0
 	  };
 	  int y, x;
@@ -226,14 +226,14 @@ VIDEO_UPDATE( ssystem3 )
 	      int figure, black;
 	      int xp=263+x*22;
 	      int yp=55+(y^7)*28;
-	      ssystem3_playfield_getfigure(x, y, &figure, &black);	    
+	      ssystem3_playfield_getfigure(x, y, &figure, &black);
 	      ssystem3_draw_led(bitmap, lcd_signs_on[figure]&1?1:0, xp, yp, '6');
 	      ssystem3_draw_led(bitmap, lcd_signs_on[figure]&2?1:0, xp, yp, '8');
 	      ssystem3_draw_led(bitmap, lcd_signs_on[figure]&4?1:0, xp, yp, '9');
 	      ssystem3_draw_led(bitmap, lcd_signs_on[figure]&8?1:0, xp, yp, 'b');
 	      ssystem3_draw_led(bitmap, lcd_signs_on[figure]&0x10?1:0, xp, yp, 'c');
 	      ssystem3_draw_led(bitmap, figure!=0 && black?1:0, xp, yp, '7');
-	      
+
 	    }
 	  }
 	}

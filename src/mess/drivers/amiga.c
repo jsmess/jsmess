@@ -426,8 +426,8 @@ static MACHINE_DRIVER_START( cdtv )
 	MDRV_CPU_ADD("rcmcu", M6502, XTAL_1MHz) /* 1 MHz? */
 	MDRV_CPU_PROGRAM_MAP(cdtv_rcmcu_mem)
 
-//	MDRV_CPU_ADD("lcd", LC6554, XTAL_4MHz) /* 4 MHz? */
-//	MDRV_CPU_PROGRAM_MAP(cdtv_lcd_mem)
+//  MDRV_CPU_ADD("lcd", LC6554, XTAL_4MHz) /* 4 MHz? */
+//  MDRV_CPU_PROGRAM_MAP(cdtv_lcd_mem)
 
 	MDRV_MACHINE_START( cdtv )
 	MDRV_MACHINE_RESET( cdtv )

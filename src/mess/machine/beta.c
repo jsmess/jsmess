@@ -1,10 +1,10 @@
 /*********************************************************************
 
-	beta.h
+    beta.h
 
-	Implementation of Beta disk drive support for Spectrum and clones
-	
-	04/05/2008 Created by Miodrag Milanovic
+    Implementation of Beta disk drive support for Spectrum and clones
+
+    04/05/2008 Created by Miodrag Milanovic
 
 *********************************************************************/
 #include "driver.h"
@@ -49,21 +49,21 @@ int betadisk_is_active(const device_config *device)
 void betadisk_enable(const device_config *device)
 {
 	beta_disk_state *beta = get_safe_token(device);
-	
+
 	beta->betadisk_active = 1;
 }
 
 void betadisk_disable(const device_config *device)
 {
 	beta_disk_state *beta = get_safe_token(device);
-	
+
 	beta->betadisk_active = 0;
 }
 
 void betadisk_clear_status(const device_config *device)
 {
 	beta_disk_state *beta = get_safe_token(device);
-	
+
 	beta->betadisk_status = 0;
 }
 
@@ -71,7 +71,7 @@ static WD17XX_CALLBACK( betadisk_wd179x_callback )
 {
 	const device_config *wd_device = devtag_get_device(device->machine, BETA_DISK_TAG);
 	beta_disk_state *beta = get_safe_token(wd_device);
-	if (wd_device->started) {	
+	if (wd_device->started) {
 		switch (state)
 		{
 			case WD17XX_DRQ_SET:
@@ -79,19 +79,19 @@ static WD17XX_CALLBACK( betadisk_wd179x_callback )
 				beta->betadisk_status |= (1<<6);
 			}
 			break;
-	
+
 			case WD17XX_DRQ_CLR:
 			{
 				beta->betadisk_status &=~(1<<6);
 			}
 			break;
-	
+
 			case WD17XX_IRQ_SET:
 			{
 				beta->betadisk_status |= (1<<7);
 			}
 			break;
-	
+
 			case WD17XX_IRQ_CLR:
 			{
 				beta->betadisk_status &=~(1<<7);
@@ -106,9 +106,9 @@ static const wd17xx_interface beta_wd17xx_interface = { betadisk_wd179x_callback
 READ8_DEVICE_HANDLER(betadisk_status_r)
 {
 	beta_disk_state *beta = get_safe_token(device);
-	
+
 	if (beta->betadisk_active==1) {
-		return wd17xx_status_r(beta->wd179x, offset); 
+		return wd17xx_status_r(beta->wd179x, offset);
 	} else {
 		return 0xff;
 	}
@@ -117,9 +117,9 @@ READ8_DEVICE_HANDLER(betadisk_status_r)
 READ8_DEVICE_HANDLER(betadisk_track_r)
 {
 	beta_disk_state *beta = get_safe_token(device);
-	
+
 	if (beta->betadisk_active==1) {
-		return wd17xx_track_r(beta->wd179x, offset); 
+		return wd17xx_track_r(beta->wd179x, offset);
 	} else {
 		return 0xff;
 	}
@@ -128,9 +128,9 @@ READ8_DEVICE_HANDLER(betadisk_track_r)
 READ8_DEVICE_HANDLER(betadisk_sector_r)
 {
 	beta_disk_state *beta = get_safe_token(device);
-	
+
 	if (beta->betadisk_active==1) {
-		return wd17xx_sector_r(beta->wd179x, offset); 
+		return wd17xx_sector_r(beta->wd179x, offset);
 	} else {
 		return 0xff;
 	}
@@ -138,11 +138,11 @@ READ8_DEVICE_HANDLER(betadisk_sector_r)
 
 READ8_DEVICE_HANDLER(betadisk_data_r)
 {
-	
+
 	beta_disk_state *beta = get_safe_token(device);
-	
+
 	if (beta->betadisk_active==1) {
-		return wd17xx_data_r(beta->wd179x, offset); 
+		return wd17xx_data_r(beta->wd179x, offset);
 	} else {
 		return 0xff;
 	}
@@ -151,7 +151,7 @@ READ8_DEVICE_HANDLER(betadisk_data_r)
 READ8_DEVICE_HANDLER(betadisk_state_r)
 {
 	beta_disk_state *beta = get_safe_token(device);
-	
+
 	if (beta->betadisk_active==1) {
 		return beta->betadisk_status;
 	} else {
@@ -160,55 +160,55 @@ READ8_DEVICE_HANDLER(betadisk_state_r)
 }
 
 WRITE8_DEVICE_HANDLER(betadisk_param_w)
-{ 
+{
 	beta_disk_state *beta = get_safe_token(device);
-	
+
 	if (beta->betadisk_active==1) {
-  		wd17xx_set_drive(beta->wd179x, data & 3);  
+  		wd17xx_set_drive(beta->wd179x, data & 3);
   		wd17xx_set_side (beta->wd179x,(data & 0x10) ? 0 : 1 );
   		wd17xx_set_density(beta->wd179x, data & 0x20 ? DEN_MFM_HI : DEN_FM_LO );
   		if ((data & 0x04) == 0) // reset
   		{
-  			wd17xx_reset(beta->wd179x);	
-  		}    		
+  			wd17xx_reset(beta->wd179x);
+  		}
   		beta->betadisk_status = (data & 0x3f) | beta->betadisk_status;
   	}
-} 	
+}
 
 WRITE8_DEVICE_HANDLER(betadisk_command_w)
 {
 	beta_disk_state *beta = get_safe_token(device);
-	
+
 	if (beta->betadisk_active==1) {
 		wd17xx_command_w(beta->wd179x, offset, data);
-	}	
+	}
 }
 
 WRITE8_DEVICE_HANDLER(betadisk_track_w)
 {
 	beta_disk_state *beta = get_safe_token(device);
-	
+
 	if (beta->betadisk_active==1) {
 		wd17xx_track_w(beta->wd179x, offset, data);
-	}	
+	}
 }
 
 WRITE8_DEVICE_HANDLER(betadisk_sector_w)
 {
 	beta_disk_state *beta = get_safe_token(device);
-	
+
 	if (beta->betadisk_active==1) {
 		wd17xx_sector_w(beta->wd179x, offset, data);
-	}	
+	}
 }
 
 WRITE8_DEVICE_HANDLER(betadisk_data_w)
-{	
+{
 	beta_disk_state *beta = get_safe_token(device);
-	
+
 	if (beta->betadisk_active==1) {
 		wd17xx_data_w(beta->wd179x, offset, data);
-	}	
+	}
 }
 
 static const floppy_config beta_floppy_config =
@@ -240,14 +240,14 @@ ROM_START( beta_disk )
     ROM_LOAD( "trd503kay.rom",  0x00000, 0x4000, CRC(77baccbb) SHA1(9c5fb89b57643f723246453809dad3f669bf59a3))
     ROM_LOAD( "trd503xbios.rom",0x00000, 0x4000, CRC(8be427cc) SHA1(78f423fd200e720aa6b857f00969fa1f8c7da20e))
 	ROM_LOAD( "trd503[a4].rom", 0x00000, 0x4000, CRC(c2387608) SHA1(93e0b92a3f38b59cc006d22f9c9299f5377b15e5))
-	
+
 
 	ROM_LOAD( "trd504.rom", 	0x00000, 0x4000, CRC(ba310874) SHA1(05e55e37df8eee6c68601ba9cf6c92195852ce3f))
 	ROM_LOAD( "trd504s.rom", 	0x00000, 0x4000, CRC(c5ca0423) SHA1(cb2da2c4575bc54454e4f97073c5bb37505487fe))
 	ROM_LOAD( "trd504s2.rom",   0x00000, 0x4000, CRC(1e9b59aa) SHA1(d6eb0eeb429c70d1f8f9a23ca4e2feb5f73d3120))
   	ROM_LOAD( "trd504s3.rom",   0x00000, 0x4000, CRC(1fe1d003) SHA1(33703e97cc93b7edfcc0334b64233cf81b7930db))
-  	
-	
+
+
 	ROM_LOAD( "trd504tm.rom", 	0x00000, 0x4000, CRC(2334b8c6) SHA1(2fd8944e067140324e998b59aab766f16eb5c7fb))
 	ROM_LOAD( "trd504t.rom", 	0x00000, 0x4000, CRC(e212d1e0) SHA1(745e9caf576e64a5386ad845256d28593d34cc40))
 	ROM_LOAD( "trd504tb2.rom",  0x00000, 0x4000, CRC(8d943e6b) SHA1(bf6ab329791258f02c5f695b0c7448998b709435))
@@ -264,11 +264,11 @@ ROM_START( beta_disk )
 	ROM_LOAD( "trd505h.rom", 	0x00000, 0x4000, CRC(9ba15549) SHA1(5908784cdfb782066bde08f186f0bbb6f6b80545))
 	ROM_LOAD( "trd505d.rom", 	0x00000, 0x4000, CRC(31e4be08) SHA1(dd08bdea8b5caa35569f49770e380d16bb37502b))
     ROM_LOAD( "trd505[a2].rom", 0x00000, 0x4000, CRC(a102e726) SHA1(a3f0ef7b7d8b3022f306be8d9e8a51ae699097df))
-			
+
 	ROM_LOAD( "trd56661.rom", 	0x00000, 0x4000, CRC(8528c789) SHA1(1332a01137bd537fee696ba7adddc0a15b3237c4))
 	ROM_LOAD( "trd5666hte.rom", 0x00000, 0x4000, CRC(03841161) SHA1(4e523768231130947a81247e116fc049bd6da963))
 	ROM_LOAD( "trd5613.rom",    0x00000, 0x4000, CRC(d66cda49) SHA1(dac3c8396fc4f85b5673076cc647afbe439ad17a))
-  
+
 	ROM_LOAD( "trd512.rom", 	0x00000, 0x4000, CRC(b615d6c4) SHA1(4abb90243f66df19caa84f82d0b880a6ce344eca))
 	ROM_LOAD( "trd512f.rom", 	0x00000, 0x4000, CRC(edb74f8c) SHA1(c5b2cd18926dde4a68bcd8c360ba33d6c11b8801))
 
@@ -288,21 +288,21 @@ ROM_START( beta_disk )
 	ROM_LOAD( "trd606h.rom", 	0x00000, 0x4000, CRC(6b44fdd7) SHA1(4ca7ea2bc0e62c98c9ba86a304aee3cbf88d6b09))
 
 	ROM_LOAD( "trd607m.rom", 	0x00000, 0x4000, CRC(5a062f03) SHA1(bbd68481c76e8a3f2f26847faa72c42df013b617))
-	
+
 	ROM_LOAD( "trd608.rom", 	0x00000, 0x4000, CRC(5c998d53) SHA1(c65a972e75e627336c44ea184cb9ae81dfa2069b))
   	ROM_LOAD( "trd608-2.rom", 	0x00000, 0x4000, CRC(3541b280) SHA1(2b93c1887f485639ec15860b5503dc7efb6d31d6))
   	ROM_LOAD( "trd608-3.rom", 	0x00000, 0x4000, CRC(d3e91d69) SHA1(5e367d3601d07bd2af1d6255561a5983c0e9fb5d))
-  	
+
 	ROM_LOAD( "trd609.rom",  	0x00000, 0x4000, CRC(91028924) SHA1(fa5433f73aab93c58c891ceee2cdfed0a979dfbb))
     ROM_LOAD( "trd609e.rom",    0x00000, 0x4000, CRC(46312c8c) SHA1(0ce69fe76e17a875c287e3725f6209f1c59d8bd9))
-	
+
 	ROM_LOAD( "trd610e.rom",  	0x00000, 0x4000, CRC(95395ca4) SHA1(8cda2efbf2360cd675ea8b04b43cf1746fb41f35))
-	
+
 	ROM_LOAD( "trd701.rom",		0x00000, 0x4000, CRC(47f39c0d) SHA1(53d8b8959c321618caaef5aeb270e530e8f8ada3))
-	
+
 	//Default for now
-	ROM_LOAD( "trd503.rom", 	0x00000, 0x4000, CRC(10751aba) SHA1(21695e3f2a8f796386ce66eea8a246b0ac44810c))	
-ROM_END	
+	ROM_LOAD( "trd503.rom", 	0x00000, 0x4000, CRC(10751aba) SHA1(21695e3f2a8f796386ce66eea8a246b0ac44810c))
+ROM_END
 
 
 /*-------------------------------------------------
@@ -318,10 +318,10 @@ static DEVICE_START( beta_disk )
 	assert(device->tag != NULL);
 
 	/* find our WD179x */
-	astring_printf(tempstring, "%s:%s", device->tag, "wd179x");	
+	astring_printf(tempstring, "%s:%s", device->tag, "wd179x");
 	beta->wd179x = devtag_get_device(device->machine, astring_c(tempstring));
 
-	astring_free(tempstring);	
+	astring_free(tempstring);
 }
 
 /*-------------------------------------------------
@@ -342,7 +342,7 @@ DEVICE_GET_INFO( beta_disk )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;												break;
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(beta_disk_state);							break;		
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(beta_disk_state);							break;
 		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;							break;
 
 		/* --- the following bits of info are returned as pointers --- */
@@ -353,7 +353,7 @@ DEVICE_GET_INFO( beta_disk )
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(beta_disk);					break;
 		case DEVINFO_FCT_STOP:							/* Nothing */												break;
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(beta_disk);					break;
-		
+
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Beta Disk Interface");						break;
 		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Beta Disk Interface");						break;

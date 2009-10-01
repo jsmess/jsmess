@@ -1,9 +1,9 @@
 /***************************************************************************
-	vtech2.c
+    vtech2.c
 
     video hardware
-	Juergen Buchmueller <pullmoll@t-online.de> MESS driver, Jan 2000
-	Davide Moretti <dave@rimini.com> ROM dump and hardware description
+    Juergen Buchmueller <pullmoll@t-online.de> MESS driver, Jan 2000
+    Davide Moretti <dave@rimini.com> ROM dump and hardware description
 
 ****************************************************************************/
 
@@ -137,9 +137,9 @@ VIDEO_UPDATE( laser )
 		case  0:
 		case  1:
 			/*
-			 * GR 5
-			 * 640x192 1bpp
-			 */
+             * GR 5
+             * 640x192 1bpp
+             */
 			for( y = 0; y < 192; y++ )
 			{
 				offs = offs_2[y];
@@ -156,9 +156,9 @@ VIDEO_UPDATE( laser )
 
 		case 2:
 			/*
-			 * GR 4
-			 * 320x192 1bpp with two colors per 8 pixels
-			 */
+             * GR 4
+             * 320x192 1bpp with two colors per 8 pixels
+             */
 			for( y = 0; y < 192; y++ )
 			{
 				offs = offs_2[y];
@@ -176,9 +176,9 @@ VIDEO_UPDATE( laser )
 
 		case  3:
 			/*
-			 * GR 3
-			 * 160x192 4bpp
-			 */
+             * GR 3
+             * 160x192 4bpp
+             */
 			for( y = 0; y < 192; y++ )
 			{
 				offs = offs_2[y];
@@ -196,9 +196,9 @@ VIDEO_UPDATE( laser )
 		case  4:
 		case  5:
 			/*
-			 * GR 0
-			 * 160x96 4bpp
-			 */
+             * GR 0
+             * 160x96 4bpp
+             */
 			for( y = 0; y < 96; y++ )
 			{
 				offs = offs_0[y];
@@ -215,7 +215,7 @@ VIDEO_UPDATE( laser )
 
 		case  6:
 			/*
-			 * GR 2
+             * GR 2
              * 320x192 1bpp
              */
 			for( y = 0; y < 192; y++ )
@@ -234,9 +234,9 @@ VIDEO_UPDATE( laser )
 
 		case  7:
 			/*
-			 * GR 1
-			 * 160x192 1bpp with two colors per 8 pixels
-			 */
+             * GR 1
+             * 160x192 1bpp with two colors per 8 pixels
+             */
 			for( y = 0; y < 192; y++ )
 			{
 				offs = offs_1[y];

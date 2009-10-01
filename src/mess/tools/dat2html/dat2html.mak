@@ -31,7 +31,7 @@ DAT2HTML_OBJS =								\
 #-------------------------------------------------
 # rules for building the dat2html executable
 #-------------------------------------------------
- 
+
 $(DAT2HTML): $(DAT2HTML_OBJS) $(LIBUTIL) $(ZLIB) $(LIBOCORE)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@

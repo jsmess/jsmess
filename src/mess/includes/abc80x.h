@@ -44,7 +44,7 @@ struct _abc800_state
 
 	/* keyboard state */
 	int abc77_txd;				/* ABC-77 transmit data */
-	
+
 	/* video state */
 	UINT8 *charram;				/* character RAM */
 	UINT8 *videoram;			/* HR video RAM */

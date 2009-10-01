@@ -103,7 +103,7 @@ VIDEO_UPDATE( advision )
 	for( x = (framecount % 2) * 128; x < (framecount % 2) * 128+128; x++ )
 	{
 		UINT8 *led = &state->display[x];
-		
+
 		for( y = 0; y < 8; y++ )
 		{
 			for( bit = 0; bit < 8; bit++ )

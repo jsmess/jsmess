@@ -20,12 +20,12 @@ READ8_HANDLER( galaxy_keyboard_r )
 {
 	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7" };
 
-	if (offset == 0) 
+	if (offset == 0)
 	{
 		double level = cassette_input(devtag_get_device(space->machine, "cassette"));
 		return (level >  0) ? 0xfe : 0xff;
-	} 
-	else 
+	}
+	else
 	{
 		return input_port_read(space->machine, keynames[(offset>>3) & 0x07]) & (0x01<<(offset & 0x07)) ? 0xfe : 0xff;
 	}
@@ -34,8 +34,8 @@ READ8_HANDLER( galaxy_keyboard_r )
 UINT8 gal_latch_value = 0;
 
 WRITE8_HANDLER( galaxy_latch_w )
-{	
-	double val = (((data >>6) & 1 ) + ((data >> 2) & 1) - 1) * 32000;			
+{
+	double val = (((data >>6) & 1 ) + ((data >> 2) & 1) - 1) * 32000;
 	gal_latch_value = data;
 	cassette_output(devtag_get_device(space->machine, "cassette"), val);
 }
@@ -176,7 +176,7 @@ DRIVER_INIT( galaxy )
 MACHINE_RESET( galaxy )
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	
+
 	/* ROM 2 enable/disable */
 	memory_install_read8_handler(space, 0x1000, 0x1fff, 0, 0, input_port_read(machine, "ROM2") ? SMH_BANK(10) : SMH_NOP);
 	memory_install_write8_handler(space, 0x1000, 0x1fff, 0, 0, SMH_NOP);
@@ -198,7 +198,7 @@ MACHINE_RESET( galaxyp )
 {
 	UINT8 *ROM = memory_region(machine, "maincpu");
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	
+
 	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), galaxy_irq_callback);
 
 	ROM[0x0037] = 0x29;

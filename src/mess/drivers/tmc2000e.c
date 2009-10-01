@@ -1,6 +1,6 @@
 /*
 
-	Telmac 2000E
+    Telmac 2000E
     ------------
     (c) 1980 Telercas Oy, Finland
 
@@ -214,7 +214,7 @@ static CDP1802_EF_READ( tmc2000e_ef_r )
 	// tape in
 
 	if (cassette_input(state->cassette) > +1.0) flags -= EF2;
-	
+
 	// keyboard
 
 	if (~input_port_read(device->machine, keynames[state->keylatch / 8]) & (1 << (state->keylatch % 8))) flags -= EF3;
@@ -324,7 +324,7 @@ static MACHINE_DRIVER_START( tmc2000e )
 
 	// video hardware
 	MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16) 
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(XTAL_1_75MHz, CDP1864_SCREEN_WIDTH, CDP1864_HBLANK_END, CDP1864_HBLANK_START, CDP1864_TOTAL_SCANLINES, CDP1864_SCANLINE_VBLANK_END, CDP1864_SCANLINE_VBLANK_START)
 
 	MDRV_PALETTE_LENGTH(8)
@@ -338,8 +338,8 @@ static MACHINE_DRIVER_START( tmc2000e )
 	/* devices */
 	MDRV_PRINTER_ADD("printer")
 	MDRV_CASSETTE_ADD("cassette", tmc2000_cassette_config)
-	
-	MDRV_FLOPPY_4_DRIVES_ADD(tmc2000e_floppy_config)	
+
+	MDRV_FLOPPY_4_DRIVES_ADD(tmc2000e_floppy_config)
 MACHINE_DRIVER_END
 
 /* ROMs */

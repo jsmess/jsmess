@@ -42,15 +42,15 @@ VIDEO_UPDATE( mz80k )
 {
 	int x,y;
 	const address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	mz80k_vertical = mz80k_vertical ? 0 : 1;	
+	mz80k_vertical = mz80k_vertical ? 0 : 1;
 	mz80k_cursor_cnt++;
 	if (mz80k_cursor_cnt==64) mz80k_cursor_cnt = 0;
-		
+
 	for(y = 0; y < 25; y++ )
 	{
 		for(x = 0; x < 40; x++ )
 		{
-			int code = memory_read_byte(space,0xD000 + x + y*40);		
+			int code = memory_read_byte(space,0xD000 + x + y*40);
 			drawgfx_opaque(bitmap, NULL, screen->machine->gfx[0],  code , 0, 0,0, x*8,y*8);
 		}
 	}

@@ -15,31 +15,31 @@
 UINT8 fk1_video_rol;
 /*
 Port A:
-		Printer
-Port B: 
-		Keyboard
+        Printer
+Port B:
+        Keyboard
 Port C:
-	READING :
-		7 - / OBF(buffer overflow for the printer)
-		6 - INTE printer 
-		5 - ERROR printer
-		4 - /PEND, lack of paper
-		3 - INTR printer
-		2 - INTE keyboard 
-		1 - IBF (data from the keyboard)
-		0 - INTR keyboard
-	WRITING :  
-		6 - INTE printer
-		2 - INTE keyboard
+    READING :
+        7 - / OBF(buffer overflow for the printer)
+        6 - INTE printer
+        5 - ERROR printer
+        4 - /PEND, lack of paper
+        3 - INTR printer
+        2 - INTE keyboard
+        1 - IBF (data from the keyboard)
+        0 - INTR keyboard
+    WRITING :
+        6 - INTE printer
+        2 - INTE keyboard
  */
 
 static WRITE8_DEVICE_HANDLER (fk1_ppi_1_a_w )
 {
-//	logerror("fk1_ppi_1_a_w %02x\n",data);
+//  logerror("fk1_ppi_1_a_w %02x\n",data);
 }
 static WRITE8_DEVICE_HANDLER (fk1_ppi_1_b_w )
 {
-//	logerror("fk1_ppi_1_b_w %02x\n",data);
+//  logerror("fk1_ppi_1_b_w %02x\n",data);
 }
 static WRITE8_DEVICE_HANDLER (fk1_ppi_1_c_w )
 {
@@ -53,12 +53,12 @@ static READ8_DEVICE_HANDLER (fk1_ppi_1_a_r )
 }
 static READ8_DEVICE_HANDLER (fk1_ppi_1_b_r )
 {
-//	logerror("fk1_ppi_1_b_r\n");
+//  logerror("fk1_ppi_1_b_r\n");
 	return 0;
 }
 static READ8_DEVICE_HANDLER (fk1_ppi_1_c_r )
 {
-//	logerror("fk1_ppi_1_c_r\n");
+//  logerror("fk1_ppi_1_c_r\n");
 	return 0;
 }
 I8255A_INTERFACE( fk1_ppi8255_interface_1 )
@@ -66,49 +66,49 @@ I8255A_INTERFACE( fk1_ppi8255_interface_1 )
 	DEVCB_HANDLER(fk1_ppi_1_a_r),
 	DEVCB_HANDLER(fk1_ppi_1_b_r),
 	DEVCB_HANDLER(fk1_ppi_1_c_r),
-	DEVCB_HANDLER(fk1_ppi_1_a_w),	
+	DEVCB_HANDLER(fk1_ppi_1_a_w),
 	DEVCB_HANDLER(fk1_ppi_1_b_w),
 	DEVCB_HANDLER(fk1_ppi_1_c_w)
 };
 
 /*
-Port A: 
-	Writing data to disk
+Port A:
+    Writing data to disk
 Port B:
-	Reading data from disk
-Port C:	 
-	READING:
-		7 - / OF A data write to disk, 
-		6 - INTE A, 
-		5 - Select the drive A, B, 
-		4 - Not connected
-		3 - INTR A
-		2 - INTE B read data, 
-		1 - IBF B read data, 
-		0 - INTR B 
+    Reading data from disk
+Port C:
+    READING:
+        7 - / OF A data write to disk,
+        6 - INTE A,
+        5 - Select the drive A, B,
+        4 - Not connected
+        3 - INTR A
+        2 - INTE B read data,
+        1 - IBF B read data,
+        0 - INTR B
 
-	WRITING:
-		6 - INTE A - reading data 
-		2 - INTE B - writing data 
+    WRITING:
+        6 - INTE A - reading data
+        2 - INTE B - writing data
 */
 static WRITE8_DEVICE_HANDLER (fk1_ppi_2_a_w )
 {
-//	logerror("write to disk %02x\n",data);
+//  logerror("write to disk %02x\n",data);
 }
 
 static WRITE8_DEVICE_HANDLER (fk1_ppi_2_c_w )
 {
-//	logerror("fk1_ppi_2_c_w %02x\n",data);
+//  logerror("fk1_ppi_2_c_w %02x\n",data);
 }
 
 static READ8_DEVICE_HANDLER (fk1_ppi_2_b_r )
 {
-//	logerror("read from disk\n");
+//  logerror("read from disk\n");
 	return 0;
 }
 static READ8_DEVICE_HANDLER (fk1_ppi_2_c_r )
 {
-//	logerror("fk1_ppi_2_c_r\n");
+//  logerror("fk1_ppi_2_c_r\n");
 	return 0;
 }
 I8255A_INTERFACE( fk1_ppi8255_interface_2 )
@@ -116,7 +116,7 @@ I8255A_INTERFACE( fk1_ppi8255_interface_2 )
 	DEVCB_NULL,
 	DEVCB_HANDLER(fk1_ppi_2_b_r),
 	DEVCB_HANDLER(fk1_ppi_2_c_r),
-	DEVCB_HANDLER(fk1_ppi_2_a_w),	
+	DEVCB_HANDLER(fk1_ppi_2_a_w),
 	DEVCB_NULL,
 	DEVCB_HANDLER(fk1_ppi_2_c_w)
 };
@@ -125,31 +125,31 @@ I8255A_INTERFACE( fk1_ppi8255_interface_2 )
 /*
 
 Port A:
-	6 - / disk, authorization disk operations, 
-	3 - INTE MOUSE, permit suspension from mouse, 
-	2 - INTE RTC from the system clock of 50 Hz, 
-	1 and 0 - to set the type for hours write to the disk (01 index, 11 address mark, mark the date, 00 other). 
+    6 - / disk, authorization disk operations,
+    3 - INTE MOUSE, permit suspension from mouse,
+    2 - INTE RTC from the system clock of 50 Hz,
+    1 and 0 - to set the type for hours write to the disk (01 index, 11 address mark, mark the date, 00 other).
 
 Port B:
-	Video ROL register
-Port C 
+    Video ROL register
+Port C
 
-	READING:
-	7 - INDEX ( index mark on the disk) 
-	6 - I do not know, 
-	5 - WRITE_PROTECT the protected disk, 
-	4 - TRAC_00 as a sign of trace 
-	
-	WRITING:
-	3 - HEAD LOAD
-	2 - TRACK_43
-	1 - DIRC - direction to set the direction of stepping disk 
-	0 - STEP, move disk (0 1 .. 0.). 
+    READING:
+    7 - INDEX ( index mark on the disk)
+    6 - I do not know,
+    5 - WRITE_PROTECT the protected disk,
+    4 - TRAC_00 as a sign of trace
+
+    WRITING:
+    3 - HEAD LOAD
+    2 - TRACK_43
+    1 - DIRC - direction to set the direction of stepping disk
+    0 - STEP, move disk (0 1 .. 0.).
 
 */
 static WRITE8_DEVICE_HANDLER (fk1_ppi_3_a_w )
 {
-//	logerror("fk1_ppi_3_a_w %02x\n",data);
+//  logerror("fk1_ppi_3_a_w %02x\n",data);
 }
 static WRITE8_DEVICE_HANDLER (fk1_ppi_3_b_w )
 {
@@ -157,12 +157,12 @@ static WRITE8_DEVICE_HANDLER (fk1_ppi_3_b_w )
 }
 static WRITE8_DEVICE_HANDLER (fk1_ppi_3_c_w )
 {
-//	logerror("fk1_ppi_3_c_w %02x\n",data);
+//  logerror("fk1_ppi_3_c_w %02x\n",data);
 }
 
 static READ8_DEVICE_HANDLER (fk1_ppi_3_a_r )
 {
-//	logerror("fk1_ppi_3_a_r\n");
+//  logerror("fk1_ppi_3_a_r\n");
 	return 0;
 }
 static READ8_DEVICE_HANDLER (fk1_ppi_3_b_r )
@@ -171,7 +171,7 @@ static READ8_DEVICE_HANDLER (fk1_ppi_3_b_r )
 }
 static READ8_DEVICE_HANDLER (fk1_ppi_3_c_r )
 {
-//	logerror("fk1_ppi_3_c_r\n");
+//  logerror("fk1_ppi_3_c_r\n");
 	return 0;
 }
 I8255A_INTERFACE( fk1_ppi8255_interface_3 )
@@ -179,7 +179,7 @@ I8255A_INTERFACE( fk1_ppi8255_interface_3 )
 	DEVCB_HANDLER(fk1_ppi_3_a_r),
 	DEVCB_HANDLER(fk1_ppi_3_b_r),
 	DEVCB_HANDLER(fk1_ppi_3_c_r),
-	DEVCB_HANDLER(fk1_ppi_3_a_w),	
+	DEVCB_HANDLER(fk1_ppi_3_a_w),
 	DEVCB_HANDLER(fk1_ppi_3_b_w),
 	DEVCB_HANDLER(fk1_ppi_3_c_w)
 };
@@ -192,7 +192,7 @@ static PIT8253_OUTPUT_CHANGED(fk1_pit_out0)
 
 static PIT8253_OUTPUT_CHANGED(fk1_pit_out1)
 {
-	// Timeout for disk operation 
+	// Timeout for disk operation
 	logerror("PIT8253_OUTPUT_CHANGED(fk1_pit_out1)\n");
 }
 
@@ -222,10 +222,10 @@ const struct pit8253_config fk1_pit8253_intf =
 };
 
 /*
-	0 no interrupt allowed, 
-	1 allowed INTR-7, 
-	2 allowed INTR-7 and INTR-6, 
-	8 any interruption allowed. 
+    0 no interrupt allowed,
+    1 allowed INTR-7,
+    2 allowed INTR-7 and INTR-6,
+    8 any interruption allowed.
 */
 
 WRITE8_HANDLER( fk1_intr_w )
@@ -237,8 +237,8 @@ READ8_HANDLER( fk1_bank_ram_r )
 {
 	const address_space *space_mem = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	memory_install_write8_handler(space_mem, 0x0000, 0x3fff, 0, 0, SMH_BANK(1));
-	memory_set_bankptr(space->machine, 1, mess_ram); 
-	memory_set_bankptr(space->machine, 2, mess_ram + 0x4000); 
+	memory_set_bankptr(space->machine, 1, mess_ram);
+	memory_set_bankptr(space->machine, 2, mess_ram + 0x4000);
 	return 0;
 }
 
@@ -246,36 +246,36 @@ READ8_HANDLER( fk1_bank_rom_r )
 {
 	const address_space *space_mem = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	memory_install_write8_handler(space_mem, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
-	memory_set_bankptr(space->machine, 1, memory_region(space->machine, "maincpu")); 
-	memory_set_bankptr(space->machine, 2, mess_ram + 0x10000); 
+	memory_set_bankptr(space->machine, 1, memory_region(space->machine, "maincpu"));
+	memory_set_bankptr(space->machine, 2, mess_ram + 0x10000);
 	return 0;
 }
 
 /*
-	4 - FORMAT authorization
-	3 - READ_ADDRESS_MARK
-	2 - READ_DATA_MARK
-	1 - WRITE 
-	0 - READ 
-	Functions are allowed in one. 
+    4 - FORMAT authorization
+    3 - READ_ADDRESS_MARK
+    2 - READ_DATA_MARK
+    1 - WRITE
+    0 - READ
+    Functions are allowed in one.
 */
 WRITE8_HANDLER( fk1_disk_w )
 {
-//	logerror("fk1_disk_w %02x\n",data);
+//  logerror("fk1_disk_w %02x\n",data);
 }
 
 /*
-7 and 6 - 1 to connected mouse and 0 if not connected, 
+7 and 6 - 1 to connected mouse and 0 if not connected,
 5 - / T2, right-click
 4 - / T1, left-click
-3 - / BY, Y-axis 
-2 - / AY, Y-axis 
-1 - / BX, X-axis 
+3 - / BY, Y-axis
+2 - / AY, Y-axis
+1 - / BX, X-axis
 0 - / AX, X-axis
 */
 READ8_HANDLER( fk1_mouse_r )
 {
-//	logerror("fk1_mouse_r\n");
+//  logerror("fk1_mouse_r\n");
 	return 0;
 }
 
@@ -283,7 +283,7 @@ READ8_HANDLER( fk1_mouse_r )
 
 WRITE8_HANDLER( fk1_reset_int_w )
 {
-	logerror("fk1_reset_int_w\n");	
+	logerror("fk1_reset_int_w\n");
 }
 
 static ADDRESS_MAP_START(fk1_mem, ADDRESS_SPACE_PROGRAM, 8)
@@ -324,25 +324,25 @@ UINT8 int_vector;
 
 static TIMER_CALLBACK(keyboard_callback)
 {
-	if (input_port_read(machine, "LINE0")) {		
-		int_vector = 6;	
+	if (input_port_read(machine, "LINE0")) {
+		int_vector = 6;
 		cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
 	}
 }
 
 /*
-7 – DATA_READY
-6 – TIMEOUT
-5 – OVERFLOW
-4 – RTC_50HZ
-3 – MOUSE
-2 – SIO
-1 – KEYBOARD
-0 – PRINTER
+7 ? DATA_READY
+6 ? TIMEOUT
+5 ? OVERFLOW
+4 ? RTC_50HZ
+3 ? MOUSE
+2 ? SIO
+1 ? KEYBOARD
+0 ? PRINTER
 */
 
 static IRQ_CALLBACK (fk1_irq_callback)
-{		
+{
 	logerror("IRQ %02x\n",int_vector*2);
 	return int_vector * 2;
 }
@@ -362,7 +362,7 @@ static MACHINE_RESET(fk1)
 	memory_set_bankptr(machine, 2, mess_ram + 0x10000); // VRAM
 	memory_set_bankptr(machine, 3, mess_ram + 0x8000);
 	memory_set_bankptr(machine, 4, mess_ram + 0xc000);
-	
+
 	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), fk1_irq_callback);
 	timer_pulse(machine, ATTOTIME_IN_HZ(24000), NULL, 0, keyboard_callback);
 	timer_pulse(machine, ATTOTIME_IN_HZ(50), NULL, 0, vsync_callback);
@@ -411,13 +411,13 @@ static MACHINE_DRIVER_START( fk1 )
 
     MDRV_VIDEO_START(fk1)
     MDRV_VIDEO_UPDATE(fk1)
-    
+
 	MDRV_PIT8253_ADD( "pit8253", fk1_pit8253_intf )
 	MDRV_I8255A_ADD( "ppi8255_1", fk1_ppi8255_interface_1 )
-	MDRV_I8255A_ADD( "ppi8255_2", fk1_ppi8255_interface_2 )		    
-	MDRV_I8255A_ADD( "ppi8255_3", fk1_ppi8255_interface_3 )        
+	MDRV_I8255A_ADD( "ppi8255_2", fk1_ppi8255_interface_2 )
+	MDRV_I8255A_ADD( "ppi8255_3", fk1_ppi8255_interface_3 )
 	/* uart */
-	MDRV_MSM8251_ADD("uart", default_msm8251_interface)    
+	MDRV_MSM8251_ADD("uart", default_msm8251_interface)
 MACHINE_DRIVER_END
 
 static SYSTEM_CONFIG_START(fk1)
@@ -428,9 +428,9 @@ SYSTEM_CONFIG_END
 ROM_START( fk1 )
     ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
     ROM_SYSTEM_BIOS( 0, "orig", "Original BIOS" )
-	ROMX_LOAD( "fk1.u65", 	   0x0000, 0x0800, CRC(145561f8) SHA1(a4eb17d773e51b34620c508b6cebcb4531ae99c2), ROM_BIOS(1)) 
+	ROMX_LOAD( "fk1.u65", 	   0x0000, 0x0800, CRC(145561f8) SHA1(a4eb17d773e51b34620c508b6cebcb4531ae99c2), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 1, "diag", "Diag BIOS" )
-	ROMX_LOAD( "fk1-diag.u65", 0x0000, 0x0800, CRC(e0660ae1) SHA1(6ad609049b28f27126af0a8a6224362351073dee), ROM_BIOS(2)) 
+	ROMX_LOAD( "fk1-diag.u65", 0x0000, 0x0800, CRC(e0660ae1) SHA1(6ad609049b28f27126af0a8a6224362351073dee), ROM_BIOS(2))
 ROM_END
 
 /* Driver */

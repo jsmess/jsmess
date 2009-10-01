@@ -1,12 +1,12 @@
 /***************************************************************************
 
-	video/oric.c
+    video/oric.c
 
-	All graphic effects are supported including mid-line changes.
-	There may be some small bugs.
+    All graphic effects are supported including mid-line changes.
+    There may be some small bugs.
 
-	TODO:
-	- speed up this code a bit?
+    TODO:
+    - speed up this code a bit?
 
 ***************************************************************************/
 
@@ -24,7 +24,7 @@ struct oric_vh_state
 {
 	/* foreground and background colour used for rendering */
 	/* if flash attribute is set, these two will both be equal
-	to background colour */
+    to background colour */
 	int active_foreground_colour;
 	int active_background_colour;
 	/* current foreground and background colour */
@@ -159,7 +159,7 @@ static void oric_vh_update_attribute(running_machine *machine,int c)
 
 			/* a different charset base is used depending on the video mode */
 			/* hires takes all the data from 0x0a000 through to about 0x0bf68,
-			so the charset is moved to 0x09800 */
+            so the charset is moved to 0x09800 */
 			/* text mode starts at 0x0bb80 and so the charset is in a different location */
 			if (vh_state.mode & (1<<2))
 			{
@@ -171,7 +171,7 @@ static void oric_vh_update_attribute(running_machine *machine,int c)
 					vh_state.char_base = memory_get_read_ptr(space, 0x09800);
 
 				/* changing the mode also changes the position of the standard charset
-				and alternative charset */
+                and alternative charset */
 				oric_refresh_charset();
 			}
 			else
@@ -184,7 +184,7 @@ static void oric_vh_update_attribute(running_machine *machine,int c)
 					vh_state.char_base = memory_get_read_ptr(space, 0x0b400);
 
 				/* changing the mode also changes the position of the standard charset
-				and alternative charset */
+                and alternative charset */
 				oric_refresh_charset();
 			}
 		}
@@ -277,7 +277,7 @@ VIDEO_UPDATE( oric )
 			if (y<200)
 			{
 				/* calculate fetch address based on current line and
-				current mode */
+                current mode */
 				if (hires_active)
 				{
 					read_addr = (unsigned long)read_addr_base + (unsigned long)byte_offset + (unsigned long)(y*40);
@@ -347,7 +347,7 @@ VIDEO_UPDATE( oric )
 					if (vh_state.text_attributes & (1<<1))
 					{
 						/* if char line is even, top half of character is displayed,
-						if char line is odd, bottom half of character is displayed */
+                        if char line is odd, bottom half of character is displayed */
 						int double_height_flag = ((y>>3) & 0x01);
 
 						/* calculate line to fetch */

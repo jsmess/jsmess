@@ -316,13 +316,13 @@ static MACHINE_DRIVER_START( dgnbeta )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 
 	MDRV_VIDEO_UPDATE( dgnbeta )
-	
+
 	MDRV_PIA6821_ADD( "pia_0", dgnbeta_pia_intf[0] )
 	MDRV_PIA6821_ADD( "pia_1", dgnbeta_pia_intf[1] )
 	MDRV_PIA6821_ADD( "pia_2", dgnbeta_pia_intf[2] )
 
-	MDRV_WD179X_ADD("wd179x", dgnbeta_wd17xx_interface )	
-	
+	MDRV_WD179X_ADD("wd179x", dgnbeta_wd17xx_interface )
+
 	MDRV_FLOPPY_4_DRIVES_ADD(dgnbeta_floppy_config)
 MACHINE_DRIVER_END
 

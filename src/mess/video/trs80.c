@@ -9,14 +9,14 @@
 #include "includes/trs80.h"
 
 /* Bit assignment for "trs80_mode"
-	d7 Page select
-	d6 LNW80 switch to graphics ram
-	d5 LNW80 colour or monochrome (1=colour)
-	d4 LNW80 lores or hires (1=hires) also does 64 or 80 chars per line
-	d3 LNW80 invert entire screen / Model III/4 Invert characters with bit 7 set (1=invert)
-	d2 80/40 or 64/32 characters per line (1=80)
-	d1 7 or 8 bit video (1=requires 7-bit, 0=don't care)
-	d0 80/64 or 40/32 characters per line (1=32) */
+    d7 Page select
+    d6 LNW80 switch to graphics ram
+    d5 LNW80 colour or monochrome (1=colour)
+    d4 LNW80 lores or hires (1=hires) also does 64 or 80 chars per line
+    d3 LNW80 invert entire screen / Model III/4 Invert characters with bit 7 set (1=invert)
+    d2 80/40 or 64/32 characters per line (1=80)
+    d1 7 or 8 bit video (1=requires 7-bit, 0=don't care)
+    d0 80/64 or 40/32 characters per line (1=32) */
 
 static UINT16 start_address=0;
 static UINT8 crtc_reg;
@@ -25,12 +25,12 @@ static UINT8 trs80_size_store;
 WRITE8_HANDLER( trs80m4_88_w )
 {
 /* This is for the programming of the CRTC registers.
-	However this CRTC is mask-programmed, and only the
-	start address register can be used. The cursor and
-	light-pen facilities are ignored. The character clock
-	is changed depending on the screen size chosen.
-	Therefore it is easier to use normal
-	coding rather than the mc6845 device. */
+    However this CRTC is mask-programmed, and only the
+    start address register can be used. The cursor and
+    light-pen facilities are ignored. The character clock
+    is changed depending on the screen size chosen.
+    Therefore it is easier to use normal
+    coding rather than the mc6845 device. */
 
 	if (!offset) crtc_reg = data & 0x1f;
 
@@ -84,7 +84,7 @@ VIDEO_UPDATE( trs80 )
 					*p++ = ( chr & gfxbit ) ? 1 : 0;
 					*p++ = ( chr & gfxbit ) ? 1 : 0;
 					*p++ = ( chr & gfxbit ) ? 1 : 0;
-					gfxbit <<= 1; 
+					gfxbit <<= 1;
 					*p++ = ( chr & gfxbit ) ? 1 : 0;
 					*p++ = ( chr & gfxbit ) ? 1 : 0;
 					*p++ = ( chr & gfxbit ) ? 1 : 0;
@@ -209,7 +209,7 @@ VIDEO_UPDATE( trs80m4 )
 	return 0;
 }
 
-/* 7 or 8-bit video, 64/32 characters per line = ht1080z, ht1080z2, ht108064 */		
+/* 7 or 8-bit video, 64/32 characters per line = ht1080z, ht1080z2, ht108064 */
 VIDEO_UPDATE( ht1080z )
 {
 	UINT8 y,ra,chr,gfx,gfxbit;
@@ -241,7 +241,7 @@ VIDEO_UPDATE( ht1080z )
 					*p++ = ( chr & gfxbit ) ? 1 : 0;
 					*p++ = ( chr & gfxbit ) ? 1 : 0;
 					*p++ = ( chr & gfxbit ) ? 1 : 0;
-					gfxbit <<= 1; 
+					gfxbit <<= 1;
 					*p++ = ( chr & gfxbit ) ? 1 : 0;
 					*p++ = ( chr & gfxbit ) ? 1 : 0;
 					*p++ = ( chr & gfxbit ) ? 1 : 0;
@@ -276,7 +276,7 @@ VIDEO_UPDATE( lnw80 )
 	UINT16 sy=0,ma=0,x,y,ra;
 	UINT8 *FNT = memory_region(screen->machine, "gfx1");
 	UINT8 cols = (trs80_mode & 0x10) ? 80 : 64;
-	
+
 	/* Although the OS can select 32-character mode, it is not supported by hardware */
 	if (trs80_mode != trs80_size_store)
 	{
@@ -310,7 +310,7 @@ VIDEO_UPDATE( lnw80 )
 							*p++ = ( chr & gfxbit ) ? fg : bg;
 							*p++ = ( chr & gfxbit ) ? fg : bg;
 							*p++ = ( chr & gfxbit ) ? fg : bg;
-							gfxbit <<= 1; 
+							gfxbit <<= 1;
 							*p++ = ( chr & gfxbit ) ? fg : bg;
 							*p++ = ( chr & gfxbit ) ? fg : bg;
 							*p++ = ( chr & gfxbit ) ? fg : bg;
@@ -346,7 +346,7 @@ VIDEO_UPDATE( lnw80 )
 
 					for (x = 0; x < 0x40; x++)
 					{
-						gfx = gfxram[ y | x | ra];		
+						gfx = gfxram[ y | x | ra];
 						/* Display 6 pixels in normal region */
 						*p++ = ( gfx & 0x01 ) ? fg : bg;
 						*p++ = ( gfx & 0x02 ) ? fg : bg;
@@ -358,7 +358,7 @@ VIDEO_UPDATE( lnw80 )
 
 					for (x = 0; x < 0x10; x++)
 					{
-						gfx = gfxram[ 0x3000 | x | (ra & 0xc00) | ((ra & 0x3000) >> 8)];		
+						gfx = gfxram[ 0x3000 | x | (ra & 0xc00) | ((ra & 0x3000) >> 8)];
 						/* Display 6 pixels in extended region */
 						*p++ = ( gfx & 0x01 ) ? fg : bg;
 						*p++ = ( gfx & 0x02 ) ? fg : bg;
@@ -373,7 +373,7 @@ VIDEO_UPDATE( lnw80 )
 
 		case 0x20:					// MODE 2
 			/* it seems the text video ram can have an effect in this mode,
-				not explained clearly, so not emulated */
+                not explained clearly, so not emulated */
 			for (y = 0; y < 0x400; y+=0x40)
 			{
 				for (ra = 0; ra < 0x3000; ra+=0x400)
@@ -382,7 +382,7 @@ VIDEO_UPDATE( lnw80 )
 
 					for (x = 0; x < 0x40; x++)
 					{
-						gfx = gfxram[ y | x | ra];		
+						gfx = gfxram[ y | x | ra];
 						/* Display 6 pixels in normal region */
 						fg = (gfx & 0x38) >> 3;
 						*p++ = fg;
@@ -399,8 +399,8 @@ VIDEO_UPDATE( lnw80 )
 
 		case 0x30:					// MODE 3
 			/* the manual does not explain at all how colour is determined
-				for the extended area. Further, the background colour
-				is not mentioned anywhere. Black is assumed. */
+                for the extended area. Further, the background colour
+                is not mentioned anywhere. Black is assumed. */
 			for (y = 0; y < 0x400; y+=0x40)
 			{
 				for (ra = 0; ra < 0x3000; ra+=0x400)
@@ -410,12 +410,12 @@ VIDEO_UPDATE( lnw80 )
 					for (x = 0; x < 0x40; x++)
 					{
 						gfx = gfxram[ y | x | ra];
-						fg = (videoram[ 0x3c00 | x | y ] & 0x38) >> 3;		
+						fg = (videoram[ 0x3c00 | x | y ] & 0x38) >> 3;
 						/* Display 6 pixels in normal region */
 						*p++ = ( gfx & 0x01 ) ? fg : bg;
 						*p++ = ( gfx & 0x02 ) ? fg : bg;
 						*p++ = ( gfx & 0x04 ) ? fg : bg;
-						fg = videoram[ 0x3c00 | x | y ] & 0x07;		
+						fg = videoram[ 0x3c00 | x | y ] & 0x07;
 						*p++ = ( gfx & 0x08 ) ? fg : bg;
 						*p++ = ( gfx & 0x10 ) ? fg : bg;
 						*p++ = ( gfx & 0x20 ) ? fg : bg;
@@ -423,13 +423,13 @@ VIDEO_UPDATE( lnw80 )
 
 					for (x = 0; x < 0x10; x++)
 					{
-						gfx = gfxram[ 0x3000 | x | (ra & 0xc00) | ((ra & 0x3000) >> 8)];		
-						fg = (gfxram[ 0x3c00 | x | y ] & 0x38) >> 3;		
+						gfx = gfxram[ 0x3000 | x | (ra & 0xc00) | ((ra & 0x3000) >> 8)];
+						fg = (gfxram[ 0x3c00 | x | y ] & 0x38) >> 3;
 						/* Display 6 pixels in extended region */
 						*p++ = ( gfx & 0x01 ) ? fg : bg;
 						*p++ = ( gfx & 0x02 ) ? fg : bg;
 						*p++ = ( gfx & 0x04 ) ? fg : bg;
-						fg = gfxram[ 0x3c00 | x | y ] & 0x07;		
+						fg = gfxram[ 0x3c00 | x | y ] & 0x07;
 						*p++ = ( gfx & 0x08 ) ? fg : bg;
 						*p++ = ( gfx & 0x10 ) ? fg : bg;
 						*p++ = ( gfx & 0x20 ) ? fg : bg;

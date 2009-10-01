@@ -22,43 +22,43 @@ static UINT16 bk_drive;
 static TIMER_CALLBACK(keyboard_callback)
 {
 	UINT8 code, i, j;
-	static const char *const keynames[] = { "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", 
+	static const char *const keynames[] = { "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6",
 										"LINE7", "LINE8", "LINE9", "LINE10", "LINE11" };
 
-	for(i = 1; i < 12; i++) 
+	for(i = 1; i < 12; i++)
 	{
 		code = 	input_port_read(machine, keynames[i-1]);
-		if (code != 0) 
+		if (code != 0)
 		{
-			for(j = 0; j < 8; j++) 
+			for(j = 0; j < 8; j++)
 			{
-				if (code == (1 << j)) 
+				if (code == (1 << j))
 				{
 					key_code = j + i*8;
 					break;
 				}
 			}
-			if ((input_port_read(machine, "LINE0") & 4) == 4) 
+			if ((input_port_read(machine, "LINE0") & 4) == 4)
 			{
-				if (i==6 || i==7) 
+				if (i==6 || i==7)
 				{
 					key_code -= 16;
 				}
 
 			}
-			if ((input_port_read(machine, "LINE0") & 4) == 4) 
+			if ((input_port_read(machine, "LINE0") & 4) == 4)
 			{
-				if (i>=8 && i<=11) 
+				if (i>=8 && i<=11)
 				{
 					key_code += 32;
 				}
 			}
 			key_pressed = 0x40;
-			if ((input_port_read(machine, "LINE0") & 2) == 0) 
+			if ((input_port_read(machine, "LINE0") & 2) == 0)
 			{
 				key_irq_vector = 0x30;
-			} 
-			else 
+			}
+			else
 			{
 				key_irq_vector = 0xBC;
 			}
@@ -89,30 +89,30 @@ MACHINE_RESET( bk0010 )
 	bk_scrool = 01330;
 }
 
-READ16_HANDLER (bk_key_state_r) 
-{		
+READ16_HANDLER (bk_key_state_r)
+{
 	return kbd_state;
 }
-READ16_HANDLER (bk_key_code_r) 
+READ16_HANDLER (bk_key_code_r)
 {
 	kbd_state &= ~0x80; // mark reading done
 	key_pressed = 0;
 	return key_code;
 }
-READ16_HANDLER (bk_vid_scrool_r) 
+READ16_HANDLER (bk_vid_scrool_r)
 {
 	return bk_scrool;
 }
 
-READ16_HANDLER (bk_key_press_r) 
+READ16_HANDLER (bk_key_press_r)
 {
-	double level = cassette_input(devtag_get_device(space->machine, "cassette"));	 									 					
+	double level = cassette_input(devtag_get_device(space->machine, "cassette"));
 	UINT16 cas;
-	if (level < 0) 
-	{ 
-	 	cas = 0x00; 
- 	} 
-	else 
+	if (level < 0)
+	{
+	 	cas = 0x00;
+ 	}
+	else
 	{
 		cas = 0x20;
 	}
@@ -120,17 +120,17 @@ READ16_HANDLER (bk_key_press_r)
 	return 0x8080 | key_pressed | cas;
 }
 
-WRITE16_HANDLER(bk_key_state_w) 
+WRITE16_HANDLER(bk_key_state_w)
 {
 	kbd_state = (kbd_state & ~0x40) | (data & 0x40);
 }
 
-WRITE16_HANDLER(bk_vid_scrool_w) 
+WRITE16_HANDLER(bk_vid_scrool_w)
 {
 	bk_scrool = data;
 }
 
-WRITE16_HANDLER(bk_key_press_w) 
+WRITE16_HANDLER(bk_key_press_w)
 {
 }
 
@@ -141,23 +141,23 @@ READ16_HANDLER (bk_floppy_cmd_r)
 
 WRITE16_HANDLER(bk_floppy_cmd_w)
 {
-	if ((data & 1) == 1) 
+	if ((data & 1) == 1)
 	{
 		bk_drive = 0;
 	}
-	if ((data & 2) == 2) 
+	if ((data & 2) == 2)
 	{
 		bk_drive = 1;
 	}
-	if ((data & 4) == 4) 
+	if ((data & 4) == 4)
 	{
 		bk_drive = 2;
 	}
-	if ((data & 8) == 8) 
+	if ((data & 8) == 8)
 	{
 		bk_drive = 3;
 	}
-	if (data == 0) 
+	if (data == 0)
 	{
 		bk_drive = -1;
 	}

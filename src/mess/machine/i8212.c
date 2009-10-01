@@ -138,7 +138,7 @@ static DEVICE_START( i8212 )
 	devcb_resolve_write_line(&i8212->out_int_func, &intf->out_int_func, device);
 	devcb_resolve_read8(&i8212->in_di_func, &intf->in_di_func, device);
 	devcb_resolve_write8(&i8212->out_do_func, &intf->out_do_func, device);
-	
+
 	/* register for state saving */
 	state_save_register_device_item(device, 0, i8212->md);
 	state_save_register_device_item(device, 0, i8212->stb);

@@ -17,9 +17,9 @@
 
    count of entries
     name 0x13
-	string blocks 0x13
-	char type 0x13
-	string bytes_in_last_block 0x13
+    string blocks 0x13
+    char type 0x13
+    string bytes_in_last_block 0x13
 
    data for the entries
     filled up to 254 byte blocks
@@ -65,7 +65,7 @@ IMAGEMODULE(
 	0,									/* flags */
 	lynx_image_init,				/* init function */
 	lynx_image_exit,				/* exit function */
-	NULL,//lynx_image_info,		/* info function */
+	NULL,//lynx_image_info,     /* info function */
 	lynx_image_beginenum,			/* begin enumeration */
 	lynx_image_nextenum,			/* enumerate next */
 	lynx_image_closeenum,			/* close enumeration */

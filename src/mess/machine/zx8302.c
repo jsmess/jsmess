@@ -9,7 +9,7 @@
 
 /*
 
-	TODO:
+    TODO:
 
     - microdrive
     - RTC register write
@@ -159,7 +159,7 @@ static void zx8302_interrupt(const device_config *device, UINT8 line)
 
 /*-------------------------------------------------
     zx8302_irq_status_r - interrupt status
-	register
+    register
 -------------------------------------------------*/
 
 READ8_DEVICE_HANDLER( zx8302_irq_status_r )
@@ -171,7 +171,7 @@ READ8_DEVICE_HANDLER( zx8302_irq_status_r )
 
 /*-------------------------------------------------
     zx8302_irq_acknowledge_w - interrupt
-	acknowledge
+    acknowledge
 -------------------------------------------------*/
 
 WRITE8_DEVICE_HANDLER( zx8302_irq_acknowledge_w )
@@ -208,28 +208,28 @@ static void zx8302_ipc_comm_tick(const device_config *device)
 {
 	/*
 
-		IPC <-> ZX8302 serial link protocol
-		***********************************
+        IPC <-> ZX8302 serial link protocol
+        ***********************************
 
-		Send bit to IPC
-		---------------
+        Send bit to IPC
+        ---------------
 
-		1. ZX start bit (COMDATA = 0)
-		2. IPC clock (COMCTL = 0, COMTL = 1)
-		3. ZX data bit (COMDATA = 0/1)
-		4. IPC clock (COMCTL = 0, COMTL = 1)
-		5. ZX stop bit (COMDATA = 1)
+        1. ZX start bit (COMDATA = 0)
+        2. IPC clock (COMCTL = 0, COMTL = 1)
+        3. ZX data bit (COMDATA = 0/1)
+        4. IPC clock (COMCTL = 0, COMTL = 1)
+        5. ZX stop bit (COMDATA = 1)
 
-		Receive bit from IPC
-		--------------------
+        Receive bit from IPC
+        --------------------
 
-		1. ZX start bit (COMDATA = 0)
-		2. IPC clock (COMCTL = 0, COMTL = 1)
-		3. IPC data bit (COMDATA = 0/1)
-		4. IPC clock (COMCTL = 0, COMTL = 1)
-		5. IPC stop bit (COMDATA = 1)
+        1. ZX start bit (COMDATA = 0)
+        2. IPC clock (COMCTL = 0, COMTL = 1)
+        3. IPC data bit (COMDATA = 0/1)
+        4. IPC clock (COMCTL = 0, COMTL = 1)
+        5. IPC stop bit (COMDATA = 1)
 
-	*/
+    */
 
 	zx8302_t *zx8302 = get_safe_token(device);
 
@@ -472,7 +472,7 @@ READ8_DEVICE_HANDLER( zx8302_rtc_r )
 
 WRITE8_DEVICE_HANDLER( zx8302_rtc_w )
 {
-//	zx8302_t *zx8302 = get_safe_token(device);
+//  zx8302_t *zx8302 = get_safe_token(device);
 
 	if (LOG) logerror("ZX8302 Real Time Clock Register: %02x\n", data);
 }
@@ -493,7 +493,7 @@ static TIMER_CALLBACK( zx8302_gap_tick )
 
 /*-------------------------------------------------
     zx8302_get_selected_microdrive - gets the
-	index of the selected microdrive
+    index of the selected microdrive
 -------------------------------------------------*/
 
 static int zx8302_get_selected_microdrive(const device_config *device)
@@ -512,7 +512,7 @@ static int zx8302_get_selected_microdrive(const device_config *device)
 
 /*-------------------------------------------------
     zx8302_get_microdrive_status - gets the
-	status of the selected microdrive
+    status of the selected microdrive
 -------------------------------------------------*/
 
 static UINT8 zx8302_get_microdrive_status(const device_config *device)
@@ -578,7 +578,7 @@ READ8_DEVICE_HANDLER( zx8302_mdv_track_r )
 
 /*-------------------------------------------------
     zx8302_mdv_control_w - microdrive control
-	register
+    register
 -------------------------------------------------*/
 
 WRITE8_DEVICE_HANDLER( zx8302_mdv_control_w )
@@ -749,7 +749,7 @@ static DEVICE_START( zx8302 )
 
 static DEVICE_RESET( zx8302 )
 {
-//	zx8302_t *zx8302 = get_safe_token(device);
+//  zx8302_t *zx8302 = get_safe_token(device);
 
 }
 

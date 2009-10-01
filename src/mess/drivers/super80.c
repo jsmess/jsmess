@@ -32,7 +32,7 @@ UINT8 *pcgram;
 /**************************** MEMORY AND I/O MAPPINGS *****************************************************************/
 
 /* A read_byte or write_byte to unmapped memory crashes MESS, and UNMAP doesnt fix it.
-	This makes the H and E monitor commands show FF */
+    This makes the H and E monitor commands show FF */
 static READ8_HANDLER( super80_read_ff ) { return 0xff; }
 
 static ADDRESS_MAP_START( super80_map, ADDRESS_SPACE_PROGRAM, 8 )

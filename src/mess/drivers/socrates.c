@@ -3,16 +3,16 @@
 *  V-tech Socrates Driver
 *  By Jonathan Gevaryahu AKA Lord Nightmare
 *  with dumping help from Kevin 'kevtris' Horton
-*  
+*
 *  (driver structure copied from vtech1.c)
 TODO:
-	fix glitches with keyboard input (double keys still don't work, super painter letter entry still doesn't work)
-	hook up hblank
-	hook up mouse
-	add waitstates for ram access (lack of this causes the system to run way too fast)
-	find and hook up any timers/interrupt controls
-	switch cartridges over to a CART system rather than abusing BIOS
-	
+    fix glitches with keyboard input (double keys still don't work, super painter letter entry still doesn't work)
+    hook up hblank
+    hook up mouse
+    add waitstates for ram access (lack of this causes the system to run way too fast)
+    find and hook up any timers/interrupt controls
+    switch cartridges over to a CART system rather than abusing BIOS
+
 
 
   Socrates Educational Video System
@@ -30,17 +30,17 @@ TODO:
             |                |
         0000|----------------|
 
-	* cartridge lives in banks 10 onward, see below
+    * cartridge lives in banks 10 onward, see below
 
         Banked rom area (4000-7fff) bankswitching
         Bankswitching is achieved by writing to I/O port 0 (mirrored on 1-7)
-	Bank 	   ROM_REGION        Contents
-	0          0x00000 - 0x03fff System ROM page 0
-	1          0x04000 - 0x07fff System ROM page 1
-	2          0x08000 - 0x0bfff System ROM page 2
+    Bank       ROM_REGION        Contents
+    0          0x00000 - 0x03fff System ROM page 0
+    1          0x04000 - 0x07fff System ROM page 1
+    2          0x08000 - 0x0bfff System ROM page 2
         ... etc ...
-	E          0x38000 - 0x38fff System ROM page E
-	F          0x3c000 - 0x3ffff System ROM page F
+    E          0x38000 - 0x38fff System ROM page E
+    F          0x3c000 - 0x3ffff System ROM page F
        10          0x40000 - 0x43fff Expansion Cartridge page 0 (cart ROM 0x0000-0x3fff)
        11          0x44000 - 0x47fff Expansion Cartridge page 1 (cart ROM 0x4000-0x7fff)
         ... etc ...
@@ -180,7 +180,7 @@ MACHINE_RESET( socrates )
  socrates.kb_latch_low[0] = 0xFF;
  socrates.kb_latch_high[0] = 0x8F;
  socrates.kb_latch_low[1] = 0x00;
- socrates.kb_latch_high[1] = 0x01; 
+ socrates.kb_latch_high[1] = 0x01;
  socrates.kb_latch_mouse = 0;
  socrates.io40_latch = 0;
  socrates.hblankstate = 0;
@@ -318,32 +318,32 @@ WRITE8_HANDLER( speech_command ) // write 0x4x, some sort of bitfield; speech ch
 /* all this really tells us is: 0x80 is the speech start command;
    all commands are open bus on readback of 4 bits EXCEPT for 0x60 and 0xE0, which are the CTP active and inactive versions of the same command */
 /*  following is hd38880 info:
-	microcomputer interface of hd38880 is usually 7 wires:
-	FP		frame pulse, involved with READ command somehow
-	SYBS1	data line bit 0, bidirectional
-	SYBS2	data line bit 1, "
-	SYBS3	data line bit 2, " 
-	SYBS4	data line bit 3, "
-	CTP		Command pulse line, sort of a 'write' line
-	CMV		More or less the 'command is being written' line which is active whenenever any command sequence is being written and during readback.
+    microcomputer interface of hd38880 is usually 7 wires:
+    FP      frame pulse, involved with READ command somehow
+    SYBS1   data line bit 0, bidirectional
+    SYBS2   data line bit 1, "
+    SYBS3   data line bit 2, "
+    SYBS4   data line bit 3, "
+    CTP     Command pulse line, sort of a 'write' line
+    CMV     More or less the 'command is being written' line which is active whenenever any command sequence is being written and during readback.
 
-	The instructions which the hd38880 can be sent are: (msb first/to the left), blank instructions are invalid
-	0000	(nop?, used as a dummy read/write during direction change??? invalid when used alone?)
-	0001
-	0010	ADSET (Transfer address to "vsm-alike serial roms") <followed by 5 nybbles>
-	0011	READ (read nybble) <bus changes from cpu->speechchip to speechchip->sys and you get as many nybbles as you pulse the CTP line for, address auto-increments>
-	0100	INT1 (initialize 1) <followed by one nybble>
-	0101
-	0110	INT2 (initialize 2) <followed by one nybble>
-	0111
-	1000	SYSPD (set speed) <followed by one nybble>
-	1001
-	1010	STOP
-	1011	CONDT (Read state P1) <bus changes from cpu->speechchip to speechchip->sys and you get one nybble>
-	1100	START
-	1101
-	1110	SSTART (same as start but syspd speed is ignored and forced to be set to 9 (scale = 1.0))
-	1111
+    The instructions which the hd38880 can be sent are: (msb first/to the left), blank instructions are invalid
+    0000    (nop?, used as a dummy read/write during direction change??? invalid when used alone?)
+    0001
+    0010    ADSET (Transfer address to "vsm-alike serial roms") <followed by 5 nybbles>
+    0011    READ (read nybble) <bus changes from cpu->speechchip to speechchip->sys and you get as many nybbles as you pulse the CTP line for, address auto-increments>
+    0100    INT1 (initialize 1) <followed by one nybble>
+    0101
+    0110    INT2 (initialize 2) <followed by one nybble>
+    0111
+    1000    SYSPD (set speed) <followed by one nybble>
+    1001
+    1010    STOP
+    1011    CONDT (Read state P1) <bus changes from cpu->speechchip to speechchip->sys and you get one nybble>
+    1100    START
+    1101
+    1110    SSTART (same as start but syspd speed is ignored and forced to be set to 9 (scale = 1.0))
+    1111
 end hd38880 info.*/
 /* the socrates speech chip does not QUITE match the hd38880 though, but is very similar */
 	switch(data&0xF0)
@@ -447,14 +447,14 @@ WRITE8_HANDLER( socrates_scroll_w )
 /* NTSC-based Palette stuff */
 // max for I and Q
 #define M_I 0.5957
-#define M_Q 0.5226 
+#define M_Q 0.5226
  /* luma amplitudes, measured on scope */
 #define LUMAMAX 1.420
 #define LUMA_COL_0 0.355, 0.139, 0.205, 0, 0.569, 0.355, 0.419, 0.205, 0.502, 0.288, 0.358, 0.142, 0.720, 0.502, 0.571, 0.358,
 #define LUMA_COL_COMMON 0.52, 0.52, 0.52, 0.52, 0.734, 0.734, 0.734, 0.734, 0.667, 0.667, 0.667, 0.667, 0.885, 0.885, 0.885, 0.885,
 #define LUMA_COL_2 0.574, 0.6565, 0.625, 0.71, 0.792, 0.87, 0.8425, 0.925, 0.724, 0.8055, 0.7825, 0.865, 0.94275, 1.0225, 0.99555, 1.07525,
 #define LUMA_COL_5 0.4585, 0.382, 0.4065, 0.337, 0.6715, 0.5975, 0.6205, 0.5465, 0.6075, 0.531, 0.5555, 0.45, 0.8255, 0.7455, 0.774, 0.6985,
-#define LUMA_COL_F 0.690, 0.904, 0.830, 1.053, 0.910, 1.120, 1.053, 1.270, 0.840, 1.053, 0.990, 1.202, 1.053, 1.270, 1.202, 1.420 
+#define LUMA_COL_F 0.690, 0.904, 0.830, 1.053, 0.910, 1.120, 1.053, 1.270, 0.840, 1.053, 0.990, 1.202, 1.053, 1.270, 1.202, 1.420
  /* chroma amplitudes, measured on scope */
 #define CHROMAMAX 0.42075
 #define CHROMA_COL_COMMON 0.148, 0.3125, 0.26475, 0.42075, 0.148, 0.3125, 0.26475, 0.42075, 0.148, 0.3125, 0.26475, 0.42075, 0.148, 0.3125, 0.26475, 0.42075,
@@ -466,7 +466,7 @@ WRITE8_HANDLER( socrates_scroll_w )
 static rgb_t socrates_create_color(UINT8 color)
 {
 rgb_t composedcolor;
-double lumatable[256] = { 
+double lumatable[256] = {
     LUMA_COL_0
     LUMA_COL_COMMON
     LUMA_COL_2
@@ -484,7 +484,7 @@ double lumatable[256] = {
     LUMA_COL_COMMON
     LUMA_COL_F
   };
-double chromaintensity[256] = { 
+double chromaintensity[256] = {
   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
     CHROMA_COL_COMMON
     CHROMA_COL_2
@@ -645,21 +645,21 @@ static ADDRESS_MAP_START(z80_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x08, 0x08) AM_READWRITE(socrates_ram_bank_r, socrates_ram_bank_w) AM_MIRROR(0x7) /* ram banks select - RW - 4 low bits; Format: 0b****HHLL where LL controls whether window 0 points at ram area: 0b00: 0x0000-0x3fff; 0b01: 0x4000-0x7fff; 0b10: 0x8000-0xbfff; 0b11: 0xc000-0xffff. HH controls the same thing for window 1 */
 	AM_RANGE(0x10, 0x17) AM_READWRITE(read_f3, socrates_sound_w) AM_MIRROR (0x8) /* sound section:
         0x10 - W - frequency control for channel 1 (louder channel) - 01=high pitch, ff=low; time between 1->0/0->1 transitions = (XTAL_21_4772MHz/(512+256) / (freq_reg+1)) (note that this is double the actual frequency since each full low and high squarewave pulse is two transitions)
-	0x11 - W - frequency control for channel 2 (softer channel) - 01=high pitch, ff=low; same equation as above
-	0x12 - W - 0b***EVVVV enable, volume control for channel 1
-	0x13 - W - 0b***EVVVV enable, volume control for channel 2
-	0x14-0x17 - 0bE??????? enable, unknown for channel 3; produces well defined dmc waves when bit 7 is set, and one or two other bits
-	This may be some sort of debug register for serial-dmc banging out some internal rom from the asic, maybe color data?
-	No writes to ram seem to change the waveforms produced, in my limited testing.
-	0x80 produces about a very very quiet 1/8 duty cycle wave at 60hz or so
-	0xC0 produces a DMC wave read from an unknown address at around 342hz
-	0x
-	*/
+    0x11 - W - frequency control for channel 2 (softer channel) - 01=high pitch, ff=low; same equation as above
+    0x12 - W - 0b***EVVVV enable, volume control for channel 1
+    0x13 - W - 0b***EVVVV enable, volume control for channel 2
+    0x14-0x17 - 0bE??????? enable, unknown for channel 3; produces well defined dmc waves when bit 7 is set, and one or two other bits
+    This may be some sort of debug register for serial-dmc banging out some internal rom from the asic, maybe color data?
+    No writes to ram seem to change the waveforms produced, in my limited testing.
+    0x80 produces about a very very quiet 1/8 duty cycle wave at 60hz or so
+    0xC0 produces a DMC wave read from an unknown address at around 342hz
+    0x
+    */
 	AM_RANGE(0x20, 0x21) AM_READWRITE(read_f3, socrates_scroll_w) AM_MIRROR (0xe) /* graphics section:
-	0x20 - W - lsb offset of screen display
-	0x21 - W - msb offset of screen display
-	resulting screen line is one of 512 total offsets on 128-byte boundaries in the whole 64k ram
-	*/
+    0x20 - W - lsb offset of screen display
+    0x21 - W - msb offset of screen display
+    resulting screen line is one of 512 total offsets on 128-byte boundaries in the whole 64k ram
+    */
 	AM_RANGE(0x30, 0x30) AM_READWRITE(read_f3, unknownlatch_30) AM_MIRROR (0xf) /* unknown, write only. may relate to waitstate timing? */
 	AM_RANGE(0x40, 0x40) AM_READWRITE(status_and_speech, speech_command ) AM_MIRROR(0xf) /* reads status register for vblank/hblank/speech, also reads and writes speech module */
 	AM_RANGE(0x50, 0x50) AM_READWRITE(socrates_keyboard_low_r, socrates_keyboard_clear) AM_MIRROR(0xE) /* Keyboard keycode low, latched on keypress, can be unlatched by writing anything here */
@@ -677,81 +677,81 @@ ADDRESS_MAP_END
 keycode low
 |   keycode high
 |   |   key name
-00	01	No key pressed
+00  01  No key pressed
 // pads on the sides of the kb; this acts like a giant bitfield, both dpads/buttons can send data at once
-00	81	left dpad right
-00	82	left dpad up 
-00	84	left dpad left
-00	88	left dpad down
-01	80	right dpad down
-02	80	right dpad left
-04	80	right dpad up
-08	80	right dpad right
-10	80	left red button
-20	80	right red button
+00  81  left dpad right
+00  82  left dpad up
+00  84  left dpad left
+00  88  left dpad down
+01  80  right dpad down
+02  80  right dpad left
+04  80  right dpad up
+08  80  right dpad right
+10  80  left red button
+20  80  right red button
 // top row (right to left)
-44	82	ENTER
-44	83	MENU
-44	84	ANSWER
-44	85	HELP
-44	86	ERASE
-44	87	divide_sign
-44	88	multiply_sign
-44	89	minus_sign
-44	80	plus_sign
+44  82  ENTER
+44  83  MENU
+44  84  ANSWER
+44  85  HELP
+44  86  ERASE
+44  87  divide_sign
+44  88  multiply_sign
+44  89  minus_sign
+44  80  plus_sign
 //second row (right to left)
-43	81	0
-43	82	9
-43	83	8
-43	84	7
-43	85	6
-43	86	5
-43	87	4
-43	88	3
-43	89	2
-43	80	1
+43  81  0
+43  82  9
+43  83  8
+43  84  7
+43  85  6
+43  86  5
+43  87  4
+43  88  3
+43  89  2
+43  80  1
 // third row (right to left)
-42	82	I/La
-42	83	H/So
-42	84	G/Fa
-42	85	F/Mi
-42	86	E/Re
-42	87	D/Do
-42	88	C/Ti.
-42	89	B/La.
-42	80	A/So.
-42	81	hyphen/period
+42  82  I/La
+42  83  H/So
+42  84  G/Fa
+42  85  F/Mi
+42  86  E/Re
+42  87  D/Do
+42  88  C/Ti.
+42  89  B/La.
+42  80  A/So.
+42  81  hyphen/period
 // fourth row (right to left)
-41	81	S
-41	82	R
-41	83	Q/NEW
-41	84	P/PLAY
-41	85	O/PAUSE
-41	86	N/Fa`
-41	87	M/Mi`
-41	88	L/Re`
-41	89	K/Do`
-41	80	J/Ti
+41  81  S
+41  82  R
+41  83  Q/NEW
+41  84  P/PLAY
+41  85  O/PAUSE
+41  86  N/Fa`
+41  87  M/Mi`
+41  88  L/Re`
+41  89  K/Do`
+41  80  J/Ti
 // fifth row (right to left)
-40	82	SPACE
-40	83	Z
-40	84	Y
-40	85	X
-40	86	W
-40	87	V
-40	88	U
-40	89	T
-50	80	SHIFT
+40  82  SPACE
+40  83  Z
+40  84  Y
+40  85  X
+40  86  W
+40  87  V
+40  88  U
+40  89  T
+50  80  SHIFT
 // socrates mouse pad (separate from keyboard)
-8x	8y	mouse movement
+8x  8y  mouse movement
 x: down = 1 (small) thru 7 (large), up = 8 (small) thru F (large)
 y: right = 1 (small) thru 7 (large), left = 8 (small) thru F (large)
-90	80	right click
-A0	80	left click
-B0	80	both buttons click
-90	81	right click (mouse movement in queue, will be in regs after next latch clear)
-A0	81	left click (mouse movement in queue, will be in regs after next latch clear)
-B0	81	both buttons click (mouse movement in queue, will be in regs after next latch clear)
+90  80  right click
+A0  80  left click
+B0  80  both buttons click
+90  81  right click (mouse movement in queue, will be in regs after next latch clear)
+A0  81  left click (mouse movement in queue, will be in regs after next latch clear)
+B0  81  both buttons click (mouse movement in queue, will be in regs after next latch clear)
 // socrates touch pad
 // unknown yet, but probably uses the 60/70/c0/d0/e0/f0 low reg vals
 */
@@ -770,18 +770,18 @@ static INPUT_PORTS_START( socrates )
 	PORT_BIT(0x00000200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_RALT) PORT_CHAR(UCHAR_MAMEKEY(RALT)) PORT_NAME("Right D-pad Button") // 20 80
 	PORT_BIT(0xfffffc00, IP_ACTIVE_HIGH, IPT_UNUSED)
 	/* alt w/left and right keypad keys swapped
-	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT)) PORT_NAME("Left D-pad Right") // 00 81
-	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP)) PORT_NAME("Left D-pad Up") // 00 82
-	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT)) PORT_NAME("Left D-pad Left") // 00 84
-	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN)) PORT_NAME("Left D-pad Down") // 00 88
-	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2_PAD) PORT_CHAR(UCHAR_MAMEKEY(2_PAD)) PORT_NAME("Right D-pad Down") // 01 80
-	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4_PAD) PORT_CHAR(UCHAR_MAMEKEY(4_PAD)) PORT_NAME("Right D-pad Left") // 02 80
-	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8_PAD) PORT_CHAR(UCHAR_MAMEKEY(8_PAD)) PORT_NAME("Right D-pad Up") // 04 80
-	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6_PAD) PORT_CHAR(UCHAR_MAMEKEY(6_PAD)) PORT_NAME("Right D-pad Right") // 08 80
-	PORT_BIT(0x00000100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_RALT) PORT_CHAR(UCHAR_MAMEKEY(RALT)) PORT_NAME("Left D-pad Button") // 10 80
-	PORT_BIT(0x00000200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD)) PORT_NAME("Right D-pad Button") // 20 80
-	PORT_BIT(0xfffffc00, IP_ACTIVE_HIGH, IPT_UNUSED)
-	*/
+    PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT)) PORT_NAME("Left D-pad Right") // 00 81
+    PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP)) PORT_NAME("Left D-pad Up") // 00 82
+    PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT)) PORT_NAME("Left D-pad Left") // 00 84
+    PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN)) PORT_NAME("Left D-pad Down") // 00 88
+    PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2_PAD) PORT_CHAR(UCHAR_MAMEKEY(2_PAD)) PORT_NAME("Right D-pad Down") // 01 80
+    PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4_PAD) PORT_CHAR(UCHAR_MAMEKEY(4_PAD)) PORT_NAME("Right D-pad Left") // 02 80
+    PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8_PAD) PORT_CHAR(UCHAR_MAMEKEY(8_PAD)) PORT_NAME("Right D-pad Up") // 04 80
+    PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6_PAD) PORT_CHAR(UCHAR_MAMEKEY(6_PAD)) PORT_NAME("Right D-pad Right") // 08 80
+    PORT_BIT(0x00000100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_RALT) PORT_CHAR(UCHAR_MAMEKEY(RALT)) PORT_NAME("Left D-pad Button") // 10 80
+    PORT_BIT(0x00000200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD)) PORT_NAME("Right D-pad Button") // 20 80
+    PORT_BIT(0xfffffc00, IP_ACTIVE_HIGH, IPT_UNUSED)
+    */
 
 	PORT_START("keyboard_50") // lowest 'row' (technically the shift key is on the 5th row but it has its own keycode)
 	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1) PORT_NAME("SHIFT") // 5x xx
@@ -801,7 +801,7 @@ static INPUT_PORTS_START( socrates )
 
 	PORT_START("keyboard_41") // 4th row
 	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_J) PORT_CHAR('J') PORT_NAME("J/Ti") // 41 80
-	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_S) PORT_CHAR('S') PORT_NAME("S") // 41 81 
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_S) PORT_CHAR('S') PORT_NAME("S") // 41 81
 	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_R) PORT_CHAR('R') PORT_NAME("R") // 41 82
 	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q) PORT_CHAR('Q') PORT_NAME("Q/NEW") // 41 83
 	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_P) PORT_CHAR('P') PORT_NAME("P/PLAY") // 41 84
@@ -814,7 +814,7 @@ static INPUT_PORTS_START( socrates )
 
 	PORT_START("keyboard_42") // 3rd row
 	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_A) PORT_CHAR('A') PORT_NAME("A/So.") // 42 80
-	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('-') PORT_NAME("-/.") // 42 81 
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('-') PORT_NAME("-/.") // 42 81
 	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_I) PORT_CHAR('I') PORT_NAME("I/La") // 42 82
 	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_H) PORT_CHAR('H') PORT_NAME("H/So") // 42 83
 	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_G) PORT_CHAR('G') PORT_NAME("G/Fa") // 42 84
@@ -827,7 +827,7 @@ static INPUT_PORTS_START( socrates )
 
 	PORT_START("keyboard_43") // 2nd row
 	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_NAME("1") // 43 80
-	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_NAME("0") // 43 81 
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_NAME("0") // 43 81
 	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_NAME("9") // 43 82
 	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_NAME("8") // 43 83
 	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_NAME("7") // 43 84
@@ -840,7 +840,7 @@ static INPUT_PORTS_START( socrates )
 
 	PORT_START("keyboard_44") // 1st row
 	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('+') PORT_NAME("+") // 44 80
-	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_UNUSED) // 44 81 
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_UNUSED) // 44 81
 	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13) PORT_NAME("ENTER") // 44 82
 	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_HOME) PORT_CHAR(UCHAR_MAMEKEY(HOME)) PORT_NAME("MENU") // 44 83
 	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_PGUP) PORT_CHAR(UCHAR_MAMEKEY(PGUP)) PORT_NAME("ANSWER") // 44 84
@@ -850,7 +850,7 @@ static INPUT_PORTS_START( socrates )
 	PORT_BIT(0x00000100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ASTERISK) PORT_CHAR('*') PORT_NAME("*") // 44 88
 	PORT_BIT(0x00000200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_NAME("-") // 44 89
 	PORT_BIT(0xfffffc00, IP_ACTIVE_HIGH, IPT_UNUSED)
-	
+
 	// mouse goes here
 INPUT_PORTS_END
 
@@ -912,36 +912,36 @@ ROM_START(socrates)
     /* Socrates US NTSC */
 	/* all cart roms are 28 pin 23c1000/tc531000 128Kx8 roms */
 	/* cart port pinout:
-	(looking into end of disk-shaped cartridge with label/top side pointing to the right)
-	A15 -> 19  18 -- VCC
-	A14 -> 20  17 <- A16
-	A13 -> 21  16 <- A12
-	 A8 -> 22  15 <- A7
-	 A9 -> 23  14 <- A6
-	A11 -> 24  13 <- A5
-	 A3 -> 25  12 <- A4
-	 A2 -> 26  11 <- A10
-	 D7 <- 27  10 <- A1
-	 D6 <- 28  9 <- A0
-	 D5 <- 29  8 -> D0
-	 D4 <- 30  7 -> D1
-	 D3 <- 31  6 -> D2
-	  ? ?? 32  5 ?? ?
-	A17 -> 33  4 ?? ?
-	  ? ?? 34  3 ?? ?
-	/CE -> 35  2 ?? ?
-	GND -- 36  1 -- GND
-	Note that a17 goes to what would be pin 2 if a 32 pin rom were installed, which is not the case. (pins 1, 31 and 32 would be tied to vcc)
-	
-	Cartridge check procedure by socrates is, after screen init and check for speech synth,
-	bankswitch to bank 0x10 (i.e. first 0x4000 of cart appears at 4000-7fff in z80 space),
-	do following tests; if any tests fail, jump to 0x0015 (socrates main menu)
-	* read 0x7ff0(0x3ff0 in cart rom) and compare to 0xAA
-	* read 0x7ff1(0x3ff1 in cart rom) and compare to 0x55
-	* read 0x7ff2(0x3ff2 in cart rom) and compare to 0xE7
-	* read 0x7ff3(0x3ff3 in cart rom) and compare to 0x18
-	if all tests passed, jump to 0x4000 (0x0000 in cart rom)
-	*/
+    (looking into end of disk-shaped cartridge with label/top side pointing to the right)
+    A15 -> 19  18 -- VCC
+    A14 -> 20  17 <- A16
+    A13 -> 21  16 <- A12
+     A8 -> 22  15 <- A7
+     A9 -> 23  14 <- A6
+    A11 -> 24  13 <- A5
+     A3 -> 25  12 <- A4
+     A2 -> 26  11 <- A10
+     D7 <- 27  10 <- A1
+     D6 <- 28  9 <- A0
+     D5 <- 29  8 -> D0
+     D4 <- 30  7 -> D1
+     D3 <- 31  6 -> D2
+      ? ?? 32  5 ?? ?
+    A17 -> 33  4 ?? ?
+      ? ?? 34  3 ?? ?
+    /CE -> 35  2 ?? ?
+    GND -- 36  1 -- GND
+    Note that a17 goes to what would be pin 2 if a 32 pin rom were installed, which is not the case. (pins 1, 31 and 32 would be tied to vcc)
+
+    Cartridge check procedure by socrates is, after screen init and check for speech synth,
+    bankswitch to bank 0x10 (i.e. first 0x4000 of cart appears at 4000-7fff in z80 space),
+    do following tests; if any tests fail, jump to 0x0015 (socrates main menu)
+    * read 0x7ff0(0x3ff0 in cart rom) and compare to 0xAA
+    * read 0x7ff1(0x3ff1 in cart rom) and compare to 0x55
+    * read 0x7ff2(0x3ff2 in cart rom) and compare to 0xE7
+    * read 0x7ff3(0x3ff3 in cart rom) and compare to 0x18
+    if all tests passed, jump to 0x4000 (0x0000 in cart rom)
+    */
     ROM_DEFAULT_BIOS("nocart")
     ROM_LOAD("27-00817-000-000.u1", 0x00000, 0x40000, CRC(80f5aa20) SHA1(4fd1ff7f78b5dd2582d5de6f30633e4e4f34ca8f)) // Label: "(Vtech) 27-00817-000-000 // (C)1987 VIDEO TECHNOLOGY // 8811 D"
     ROM_SYSTEM_BIOS( 0, "nocart", "Socrates w/o cartridge installed")
@@ -977,7 +977,7 @@ ROM_START(socrates)
     ROM_LOAD_OPTIONAL("speech_eng_vsm3.bin", 0x8000, 0x4000, CRC(972384aa) SHA1(FFCB1D633CA6BFFC7F481EC505DA447E5B847F16)) // 16k in serial rom
     ROM_FILL(0xC000, 0x4000, 0xff) // last vsm isn't present, FF fill
 ROM_END
-    
+
 ROM_START(socratfc)
     ROM_REGION(0x80000, "maincpu", 0)
     /* Socrates SAITOUT (French Canadian) NTSC */

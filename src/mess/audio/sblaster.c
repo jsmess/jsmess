@@ -1,8 +1,8 @@
 /***************************************************************************
 
-	audio/sblaster.c
+    audio/sblaster.c
 
-	Soundblaster code
+    Soundblaster code
 
 ****************************************************************************/
 
@@ -55,7 +55,7 @@
 typedef enum { OFF, INPUT, OUTPUT } MODE;
 static struct {
 	SOUNDBLASTER_CONFIG config;
-//	int channel;
+//  int channel;
 
 	MODE mode;
 	int on;

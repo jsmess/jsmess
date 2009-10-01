@@ -11,7 +11,7 @@
 
     TODO:
 
-	- calculate colors from luminance/chrominance resistors
+    - calculate colors from luminance/chrominance resistors
 
 */
 

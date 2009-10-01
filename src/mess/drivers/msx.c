@@ -415,11 +415,11 @@ PC keyboards, common MSX keyboards have a couple of keys which do not fit usual 
 
 These keys corresponds to the following symbols
 
-	input_port	| msx	| msxuk	| msxjp	| msxkr	|hotbit	|expert	|
-	-------------------------------------------------------------
-	BACKSLASH2	|  \ |	|  \ |	|  ´ |	| won |	|  \ ^	|  { }	|
-	-------------------------------------------------------------
-	TILDE		|  DK*	|  DK*	|  _	|  _	|  < >	|  / ?	|
+    input_port  | msx   | msxuk | msxjp | msxkr |hotbit |expert |
+    -------------------------------------------------------------
+    BACKSLASH2  |  \ |  |  \ |  |  ? |  | won | |  \ ^  |  { }  |
+    -------------------------------------------------------------
+    TILDE       |  DK*  |  DK*  |  _    |  _    |  < >  |  / ?  |
 
 * DK = "Dead Key"
 Notice that 'expert' input_ports covers both versions 1.0 and 1.1.
@@ -1076,9 +1076,9 @@ static MACHINE_DRIVER_START( msx )
 	MDRV_CASSETTE_ADD( "cassette", msx_cassette_config )
 
 	MDRV_WD179X_ADD("wd179x", msx_wd17xx_interface )
-	
+
 	MDRV_FLOPPY_2_DRIVES_ADD(msx_floppy_config)
-	
+
 	MDRV_IMPORT_FROM(msx_cartslot)
 MACHINE_DRIVER_END
 
@@ -1151,7 +1151,7 @@ static MACHINE_DRIVER_START( msx2 )
 	MDRV_WD179X_ADD("wd179x", msx_wd17xx_interface )
 
 	MDRV_FLOPPY_2_DRIVES_ADD(msx_floppy_config)
-	
+
 	MDRV_IMPORT_FROM(msx_cartslot)
 MACHINE_DRIVER_END
 
@@ -2128,8 +2128,8 @@ MSX_LAYOUT_INIT (bruc100)
 	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
 	MSX_LAYOUT_SLOT (3, 0, 0, 4, RAM_MM, 0x10000, 0x0000)	/* 64KB RAM */
 MSX_LAYOUT_END
- 
-  
+
+
 /********************************  MSX 2 **********************************/
 
 /* MSX2 */
@@ -3303,7 +3303,7 @@ ROM_END
 
 MSX_LAYOUT_INIT (hx23)
 	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
-	MSX_LAYOUT_SLOT (0, 0, 2, 2, RAM, 0x8000, 0x8000)	/* 32KB RAM	*/
+	MSX_LAYOUT_SLOT (0, 0, 2, 2, RAM, 0x8000, 0x8000)	/* 32KB RAM */
 	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
 	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
 	MSX_LAYOUT_SLOT (3, 0, 0, 2, RAM, 0x8000, 0x0000)	/* 32KB RAM */

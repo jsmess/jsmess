@@ -1,8 +1,8 @@
 /**********************************************************************
 
-	RCA VP595 - VIP Simple Sound System emulation
+    RCA VP595 - VIP Simple Sound System emulation
 
-	Copyright MESS Team.
+    Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
 
 **********************************************************************/

@@ -1,5 +1,5 @@
 /***************************************************************************
-   
+
         Busicom 141-PF
 
         04/08/2009 Initial driver by Miodrag Milanovic
@@ -19,16 +19,16 @@ static UINT8 get_bit_selected(UINT32 val,int num)
 	int i;
 	for(i=0;i<num;i++) {
 		if (BIT(val,i)==0) return i;
-	}	
+	}
 	return 0;
 }
-static READ8_HANDLER(keyboard_r) 
+static READ8_HANDLER(keyboard_r)
 {
 	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8" , "LINE9"};
 	return input_port_read(space->machine,keynames[get_bit_selected(keyboard_shifter & 0x3ff,10)]);
 }
 
-static READ8_HANDLER(printer_r) 
+static READ8_HANDLER(printer_r)
 {
 	UINT8 retVal = 0;
 	if (drum_index==0) retVal |= 1;
@@ -37,7 +37,7 @@ static READ8_HANDLER(printer_r)
 }
 
 
-static WRITE8_HANDLER(shifter_w) 
+static WRITE8_HANDLER(shifter_w)
 {
 	if (BIT(data,0)) {
 		keyboard_shifter <<= 1;
@@ -49,19 +49,19 @@ static WRITE8_HANDLER(shifter_w)
 	}
 }
 
-static WRITE8_HANDLER(printer_w) 
+static WRITE8_HANDLER(printer_w)
 {
-	int i,j;	
-	if (BIT(data,0)) {		
+	int i,j;
+	if (BIT(data,0)) {
 		logerror("color : %02x %02x %d\n",BIT(data,0),data,drum_index);
-		busicom_printer_line_color[10] = 1;		
-		
+		busicom_printer_line_color[10] = 1;
+
 	}
 	if (BIT(data,1)) {
 		for(i=3;i<18;i++) {
 			if(BIT(printer_shifter,i)) {
-				busicom_printer_line[10][i-3] = drum_index + 1;				
-			} 
+				busicom_printer_line[10][i-3] = drum_index + 1;
+			}
 		}
 		if(BIT(printer_shifter,0)) {
 			busicom_printer_line[10][15] = drum_index + 13 + 1;
@@ -71,7 +71,7 @@ static WRITE8_HANDLER(printer_w)
 		}
 	}
 	if (BIT(data,3)) {
-		
+
 		for(j=0;j<10;j++) {
 			for(i=0;i<17;i++) {
 				busicom_printer_line[j][i] = busicom_printer_line[j+1][i];
@@ -80,17 +80,17 @@ static WRITE8_HANDLER(printer_w)
 		}
 		for(i=0;i<17;i++) {
 			busicom_printer_line[10][i] = 0;
-		}		
+		}
 		busicom_printer_line_color[10] = 0;
-		
+
 	}
 }
-static WRITE8_HANDLER(status_w) 
+static WRITE8_HANDLER(status_w)
 {
-/*	UINT8 mem_lamp = BIT(data,0);
-	UINT8 over_lamp = BIT(data,1);
-	UINT8 minus_lamp = BIT(data,2);
-*/	
+/*  UINT8 mem_lamp = BIT(data,0);
+    UINT8 over_lamp = BIT(data,1);
+    UINT8 minus_lamp = BIT(data,2);
+*/
 	//logerror("status %c %c %c\n",mem_lamp ? 'M':'x',over_lamp ? 'O':'x',minus_lamp ? '-':'x');
 }
 
@@ -99,7 +99,7 @@ static WRITE8_HANDLER(printer_ctrl_w)
 }
 
 static ADDRESS_MAP_START(busicom_rom, ADDRESS_SPACE_PROGRAM, 8)
-	ADDRESS_MAP_UNMAP_HIGH	
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x04FF) AM_ROM
 ADDRESS_MAP_END
 
@@ -168,7 +168,7 @@ INPUT_PORTS_START( busicom )
 			PORT_CONFSETTING( 0x04, "4" )
 			PORT_CONFSETTING( 0x05, "5" )
 			PORT_CONFSETTING( 0x06, "6" )
-			PORT_CONFSETTING( 0x08, "8" )		
+			PORT_CONFSETTING( 0x08, "8" )
 	PORT_START("LINE9")
 		PORT_CONFNAME( 0x0f, 0x00, "Rounding")
 			PORT_CONFSETTING( 0x01, "/N" )
@@ -186,24 +186,24 @@ static TIMER_CALLBACK(timer_callback)
 	timer ^=1;
 	if (timer==1) drum_index++;
 	if (drum_index==13) drum_index=0;
-	i4004_set_test(cputag_get_cpu(machine, "maincpu"),timer);	
-	
+	i4004_set_test(cputag_get_cpu(machine, "maincpu"),timer);
+
 }
-static MACHINE_RESET(busicom) 
+static MACHINE_RESET(busicom)
 {
 	int i,j;
 	drum_index =0;
 	keyboard_shifter = 0;
 	printer_shifter = 0;
 	timer_pulse(machine, ATTOTIME_IN_MSEC(28*2), NULL, 0, timer_callback);
-	
+
 	for(i=0;i<17;i++) {
 		for(j=0;j<11;j++) {
 			busicom_printer_line[j][i] = 0;
 			busicom_printer_line_color[j] = 0;
 		}
 	}
-	
+
 }
 
 static const char layout_busicom [] = "busicom";
@@ -213,10 +213,10 @@ static MACHINE_DRIVER_START( busicom )
     MDRV_CPU_ADD("maincpu",I4004, 750000)
     MDRV_CPU_PROGRAM_MAP(busicom_rom)
     MDRV_CPU_DATA_MAP(busicom_mem)
-    MDRV_CPU_IO_MAP(busicom_io)	
+    MDRV_CPU_IO_MAP(busicom_io)
 
     MDRV_MACHINE_RESET(busicom)
-	
+
     /* video hardware */
     MDRV_SCREEN_ADD("screen", RASTER)
     MDRV_SCREEN_REFRESH_RATE(50)
@@ -226,9 +226,9 @@ static MACHINE_DRIVER_START( busicom )
     MDRV_SCREEN_VISIBLE_AREA(0, 40*17-1, 0, 44*11-1)
     MDRV_PALETTE_LENGTH(16)
     MDRV_PALETTE_INIT(busicom)
-    
+
 	MDRV_VIDEO_START(busicom)
-	MDRV_VIDEO_UPDATE(busicom)	    
+	MDRV_VIDEO_UPDATE(busicom)
 MACHINE_DRIVER_END
 
 /* ROM definition */

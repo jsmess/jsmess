@@ -1,69 +1,69 @@
 /*
 
-	Ricoh RP5C15 Real-time Clock
-	Written by Barry Rodewald
-	Started 04/07/07
+    Ricoh RP5C15 Real-time Clock
+    Written by Barry Rodewald
+    Started 04/07/07
 
-	Registers are separated into two banks, switchable through
-	the LSB of the MODE register.
+    Registers are separated into two banks, switchable through
+    the LSB of the MODE register.
 
-	Date and time are stored in BCD, one digit to each register
+    Date and time are stored in BCD, one digit to each register
 
-	Register	BANK 0					BANK 1
-	0			Timer seconds			CLKOUT
-	1			Timer seconds (10s)		RTC Adjustment
-	2			Timer minutes			Alarm minutes
-	3			Timer minutes (10s)		Alarm minutes (10s)
-	4			Timer hours				Alarm hours
-	5			Timer hours (10s)		Alarm hours (10s)
-	6			Timer day-of-week		Alarm day-of-week
-	7			Timer day				Alarm day
-	8			Timer day (10s)			Alarm day (10s)
-	9			Timer month				(unused)
-	10			Timer month (10s)		12/24 hour clock selection
-	11			Timer year				Years until next leap year
-	12			Timer year (10s)		(unused)
-	13			MODE register			MODE register
-	14			TEST register			TEST register
-	15			RESET register			RESET register
+    Register    BANK 0                  BANK 1
+    0           Timer seconds           CLKOUT
+    1           Timer seconds (10s)     RTC Adjustment
+    2           Timer minutes           Alarm minutes
+    3           Timer minutes (10s)     Alarm minutes (10s)
+    4           Timer hours             Alarm hours
+    5           Timer hours (10s)       Alarm hours (10s)
+    6           Timer day-of-week       Alarm day-of-week
+    7           Timer day               Alarm day
+    8           Timer day (10s)         Alarm day (10s)
+    9           Timer month             (unused)
+    10          Timer month (10s)       12/24 hour clock selection
+    11          Timer year              Years until next leap year
+    12          Timer year (10s)        (unused)
+    13          MODE register           MODE register
+    14          TEST register           TEST register
+    15          RESET register          RESET register
 
 
-	CLKOUT (W/O) - on the X68000, this is connected to the Timer LED
-		xxxxx000 = always high (on)
-		xxxxx001 = 16384Hz
-		xxxxx010 =  1024Hz
-		xxxxx011 =   128Hz
-		xxxxx100 =    16Hz
-		xxxxx101 =     1Hz
-		xxxxx110 =  1/60Hz
-		xxxxx111 =  always low (off)
+    CLKOUT (W/O) - on the X68000, this is connected to the Timer LED
+        xxxxx000 = always high (on)
+        xxxxx001 = 16384Hz
+        xxxxx010 =  1024Hz
+        xxxxx011 =   128Hz
+        xxxxx100 =    16Hz
+        xxxxx101 =     1Hz
+        xxxxx110 =  1/60Hz
+        xxxxx111 =  always low (off)
 
-	Adjustment register (R/W)
-		bit 0 = if set, will reset the seconds to zero, and if the
-		        seconds were > 30, increment the minutes by 1.
-		        Always returns 0.
+    Adjustment register (R/W)
+        bit 0 = if set, will reset the seconds to zero, and if the
+                seconds were > 30, increment the minutes by 1.
+                Always returns 0.
 
-	12/24 hour clock register (R/W) (not implemented yet)
-		bit 0 = selects 12 or 24 hour clock
-		        presumably, on reading, returns AM/PM status.
+    12/24 hour clock register (R/W) (not implemented yet)
+        bit 0 = selects 12 or 24 hour clock
+                presumably, on reading, returns AM/PM status.
 
-	Leap year register
-		bit 0,1 = returns number of years until next leap year.
-		          Is simply year % 4.
+    Leap year register
+        bit 0,1 = returns number of years until next leap year.
+                  Is simply year % 4.
 
-	MODE register (R/W)
-		bit 0 = if set, selects BANK 1, if reset, selects BANK 0
-		bit 2 = Alarm enable
-		bit 3 = Timer enable
+    MODE register (R/W)
+        bit 0 = if set, selects BANK 1, if reset, selects BANK 0
+        bit 2 = Alarm enable
+        bit 3 = Timer enable
 
-	TEST register (not implemented yet)
-		bits 0-3 = generally all set to 0, use is unknown.
+    TEST register (not implemented yet)
+        bits 0-3 = generally all set to 0, use is unknown.
 
-	RESET register (not implemented yet)
-		bit 0 = Alarm reset
-		bit 1 = Timer reset
-		bit 2 = if set, 16Hz pulse is off
-		bit 3 = if set, 1Hz pulse is off
+    RESET register (not implemented yet)
+        bit 0 = Alarm reset
+        bit 1 = Timer reset
+        bit 2 = if set, 16Hz pulse is off
+        bit 3 = if set, 1Hz pulse is off
 
 */
 

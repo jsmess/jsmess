@@ -22,22 +22,22 @@
 
 const unsigned char dai_palette[16*3] =
 {
-	0x00, 0x00, 0x00,	/*  0 Black		*/
-	0x00, 0x00, 0x8b,	/*  1 Dark Blue		*/
-	0xb1, 0x00, 0x95,	/*  2 Purple Red	*/
-	0xff, 0x00, 0x00,	/*  3 Red		*/
-	0x75, 0x2e, 0x50,	/*  4 Purple Brown	*/
-	0x00, 0xb2, 0x38,	/*  5 Emerald Green	*/
-	0x98, 0x62, 0x00,	/*  6 Kakhi Brown	*/
-	0xae, 0x7a, 0x00,	/*  7 Mustard Brown	*/
-	0x89, 0x89, 0x89,	/*  8 Grey		*/
-	0xa1, 0x6f, 0xff,	/*  9 Middle Blue	*/
-	0xff, 0xa5, 0x00,	/* 10 Orange		*/
-	0xff, 0x99, 0xff,	/* 11 Pink		*/
-	0x9e, 0xf4, 0xff,	/* 12 Light Blue	*/
-	0xb3, 0xff, 0xbb,	/* 13 Light Green	*/
-	0xff, 0xff, 0x28,	/* 14 Light Yellow	*/
-	0xff, 0xff, 0xff,	/* 15 White		*/
+	0x00, 0x00, 0x00,	/*  0 Black     */
+	0x00, 0x00, 0x8b,	/*  1 Dark Blue     */
+	0xb1, 0x00, 0x95,	/*  2 Purple Red    */
+	0xff, 0x00, 0x00,	/*  3 Red       */
+	0x75, 0x2e, 0x50,	/*  4 Purple Brown  */
+	0x00, 0xb2, 0x38,	/*  5 Emerald Green */
+	0x98, 0x62, 0x00,	/*  6 Kakhi Brown   */
+	0xae, 0x7a, 0x00,	/*  7 Mustard Brown */
+	0x89, 0x89, 0x89,	/*  8 Grey      */
+	0xa1, 0x6f, 0xff,	/*  9 Middle Blue   */
+	0xff, 0xa5, 0x00,	/* 10 Orange        */
+	0xff, 0x99, 0xff,	/* 11 Pink      */
+	0x9e, 0xf4, 0xff,	/* 12 Light Blue    */
+	0xb3, 0xff, 0xbb,	/* 13 Light Green   */
+	0xff, 0xff, 0x28,	/* 14 Light Yellow  */
+	0xff, 0xff, 0xff,	/* 15 White     */
 };
 
 static unsigned short dai_4_colours_palette[4];
@@ -46,7 +46,7 @@ PALETTE_INIT( dai )
 {
 	int i;
 
-	for ( i = 0; i < sizeof(dai_palette) / 3; i++ ) 
+	for ( i = 0; i < sizeof(dai_palette) / 3; i++ )
 	{
 		palette_set_color_rgb(machine, i, dai_palette[i * 3], dai_palette[i * 3 + 1], dai_palette[i * 3 + 2]);
 	}
@@ -71,30 +71,30 @@ VIDEO_UPDATE( dai )
 	UINT16 current_video_memory_address = dai_video_memory_start;
 
 	UINT8 mode;			/* mode byte of line
-					   bits 0-3 - line repeat count
-					   bits 4-5 - resolution control
-					   bits 6-7 - display mode control */
+                       bits 0-3 - line repeat count
+                       bits 4-5 - resolution control
+                       bits 6-7 - display mode control */
 	UINT8 colour;			/* colour byte of line
-					   bits 0-3 - one of 16 colours
-					   bits 4-5 - colour register for update
-					   bit  6   - if unset force 'unit colour mode'
-					   bit  7   - enable coulor change
-					              if unset bits 0-5 are ignored */
+                       bits 0-3 - one of 16 colours
+                       bits 4-5 - colour register for update
+                       bit  6   - if unset force 'unit colour mode'
+                       bit  7   - enable coulor change
+                                  if unset bits 0-5 are ignored */
 	UINT8 line_repeat_count;	/* number of horizontalraster scans
-					   for which same data will be displayed
-					   0000 - 2 lines
-				  	   each additional repeat adds 2 scans */
+                       for which same data will be displayed
+                       0000 - 2 lines
+                       each additional repeat adds 2 scans */
 	UINT8 horizontal_resolution;	/* number of blobs per line
-					   00 - 88 (low resolution graphics)
-					   01 - 176 (medium resolution graphics)
-					   10 - 352 (high resolution graphics)
-					   11 - 528 (text with 66 chars per line) */
+                       00 - 88 (low resolution graphics)
+                       01 - 176 (medium resolution graphics)
+                       10 - 352 (high resolution graphics)
+                       11 - 528 (text with 66 chars per line) */
 	UINT8 display_mode;		/* determine how data will be used
-					   to generate the picture
-					   00 - four colour graphics
-					   01 - four colour characters
-					   10 - sixteen colour graphics
-				 	   11 - sixteen colour characters */
+                       to generate the picture
+                       00 - four colour graphics
+                       01 - four colour characters
+                       10 - sixteen colour graphics
+                       11 - sixteen colour characters */
 	UINT8 unit_mode;
 
 	UINT8 current_data_1, current_data_2;

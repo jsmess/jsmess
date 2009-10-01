@@ -8,7 +8,7 @@
 
     TODO:
 
-	- HRU II PROM reading
+    - HRU II PROM reading
 
 */
 
@@ -38,21 +38,21 @@ WRITE8_HANDLER( abc806_hrs_w )
 {
 	/*
 
-		bit		signal	description
+        bit     signal  description
 
-		0		VM14	visible screen memory area bit 0
-		1		VM15	visible screen memory area bit 1
-		2		VM16	visible screen memory area bit 2
-		3		VM17	visible screen memory area bit 3
-		4		F14		cpu accessible screen memory area bit 0
-		5		F15		cpu accessible screen memory area bit 1
-		6		F16		cpu accessible screen memory area bit 2
-		7		F17		cpu accessible screen memory area bit 3
+        0       VM14    visible screen memory area bit 0
+        1       VM15    visible screen memory area bit 1
+        2       VM16    visible screen memory area bit 2
+        3       VM17    visible screen memory area bit 3
+        4       F14     cpu accessible screen memory area bit 0
+        5       F15     cpu accessible screen memory area bit 1
+        6       F16     cpu accessible screen memory area bit 2
+        7       F17     cpu accessible screen memory area bit 3
 
-	*/
+    */
 
 	abc806_state *state = space->machine->driver_data;
-	
+
 	state->hrs = data;
 }
 
@@ -110,18 +110,18 @@ READ8_HANDLER( abc806_cli_r )
 
 	/*
 
-		bit		description
+        bit     description
 
-		0		HRU II data bit 0
-		1		HRU II data bit 1
-		2		HRU II data bit 2
-		3		HRU II data bit 3
-		4		
-		5		
-		6		
-		7		RTC data output
+        0       HRU II data bit 0
+        1       HRU II data bit 1
+        2       HRU II data bit 2
+        3       HRU II data bit 3
+        4
+        5
+        6
+        7       RTC data output
 
-	*/
+    */
 
 	UINT16 hru2_addr = (state->hru2_a8 << 8) | (offset >> 8);
 	UINT8 data = state->hru2_prom[hru2_addr] & 0x0f;
@@ -137,18 +137,18 @@ READ8_HANDLER( abc806_sti_r )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		
-		1		
-		2		
-		3		
-		4		
-		5		
-		6		
-		7		PROT DOUT
+        0
+        1
+        2
+        3
+        4
+        5
+        6
+        7       PROT DOUT
 
-	*/
+    */
 
 	return 0x7f;
 }
@@ -225,7 +225,7 @@ static MC6845_UPDATE_ROW( abc806_update_row )
 	if (y >= 240) return;
 
 	y += state->sync + 27;
-	
+
 	for (column = 0; column < x_count; column++)
 	{
 		UINT8 data = state->charram[(ma + column) & 0x7ff];
@@ -312,7 +312,7 @@ static MC6845_UPDATE_ROW( abc806_update_row )
 
 			chargen_data <<= 1;
 		}
-		
+
 		if (e5 || e6)
 		{
 			column++;
@@ -425,7 +425,7 @@ static void abc806_hr_update(running_machine *machine, bitmap_t *bitmap, const r
 static VIDEO_START(abc806)
 {
 	abc806_state *state = machine->driver_data;
-	
+
 	int i;
 
 	/* initialize variables */
@@ -487,7 +487,7 @@ static VIDEO_UPDATE( abc806 )
 
 	/* clear screen */
 	bitmap_fill(bitmap, cliprect, 0);
-	
+
 	if (!state->txoff)
 	{
 		/* draw text */
@@ -496,7 +496,7 @@ static VIDEO_UPDATE( abc806 )
 
 	/* draw HR graphics */
 	abc806_hr_update(screen->machine, bitmap, cliprect);
-	
+
 	return 0;
 }
 

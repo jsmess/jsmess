@@ -10,23 +10,23 @@
 
     TODO:
 
-	- Tyche bios is broken
-	- several disk interfaces (720K/1.44MB/3.2MB)
-	- discrete sound
-	- Gold Card (68000 @ 16MHz, 2MB RAM)
-	- Super Gold Card (68020 @ 24MHz, 4MB RAM)
-	- QLToolkit II ROM
-	- GST 68kOS ROM
-	- natural keyboard SHIFT does not work, it causes characters to be skipped altogether
-	- get modified Danish version to boot (e.g. MD_DESEL was patched to jump to 0x1cd5e)
-	- ICL One Per Desk / British Telecom Merlin Tonto / Telecom Australia Computerphone / Mega OPD (US)
-	- OPD: 68008P8 @ 7.5MHz, ZX8301 @ 12MHz, CDP65C51E1 @ 1.8432MHz, 128K RAM, 2K NVRAM, 128K ROM (4x32), 16K speech ROM, ADM7910 modem, TMS5220 speech, 2x100K microdrives, RTC 1/1/1970, 1xRS-423
-	- Sandy Q-XT 640 (original motherboard, Super QBoard 512KB, Centronics, Super Toolkit II, FDC, 1 or 2 3.5" 1MB drives, 3 expansion slots)
-	- CST Thor PC 1F (720K 3.5")
-	- CST Thor PC 2F (2x 720k 3.5")
-	- CST Thor PC 2FW (20MB Winchester + 720K 3.5")
-	- CST Thor 20 (68020)
-	- CST Thor 21 (68020+68881)
+    - Tyche bios is broken
+    - several disk interfaces (720K/1.44MB/3.2MB)
+    - discrete sound
+    - Gold Card (68000 @ 16MHz, 2MB RAM)
+    - Super Gold Card (68020 @ 24MHz, 4MB RAM)
+    - QLToolkit II ROM
+    - GST 68kOS ROM
+    - natural keyboard SHIFT does not work, it causes characters to be skipped altogether
+    - get modified Danish version to boot (e.g. MD_DESEL was patched to jump to 0x1cd5e)
+    - ICL One Per Desk / British Telecom Merlin Tonto / Telecom Australia Computerphone / Mega OPD (US)
+    - OPD: 68008P8 @ 7.5MHz, ZX8301 @ 12MHz, CDP65C51E1 @ 1.8432MHz, 128K RAM, 2K NVRAM, 128K ROM (4x32), 16K speech ROM, ADM7910 modem, TMS5220 speech, 2x100K microdrives, RTC 1/1/1970, 1xRS-423
+    - Sandy Q-XT 640 (original motherboard, Super QBoard 512KB, Centronics, Super Toolkit II, FDC, 1 or 2 3.5" 1MB drives, 3 expansion slots)
+    - CST Thor PC 1F (720K 3.5")
+    - CST Thor PC 2F (2x 720k 3.5")
+    - CST Thor PC 2FW (20MB Winchester + 720K 3.5")
+    - CST Thor 20 (68020)
+    - CST Thor 21 (68020+68881)
     - CST Thor XVI CF    (Workstation, 68000 @ 8 MHz, M6802, 68682 DUART)
     - CST Thor XVI IF    (Single Floppy)
     - CST Thor XVI FF    (Dual Floppy)
@@ -641,7 +641,7 @@ static FLOPPY_OPTIONS_START(ql)
 		TRACKS([80])
 		SECTORS([40])
 		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([1]))		
+		FIRST_SECTOR_ID([1]))
 FLOPPY_OPTIONS_END
 
 static const floppy_config ql_floppy_config =
@@ -696,7 +696,7 @@ static MACHINE_DRIVER_START( ql )
 	MDRV_CARTSLOT_EXTENSION_LIST("bin")
 	MDRV_CARTSLOT_NOT_MANDATORY
 	MDRV_CARTSLOT_LOAD(ql_cart)
-	
+
 	MDRV_FLOPPY_2_DRIVES_ADD(ql_floppy_config)
 MACHINE_DRIVER_END
 
@@ -709,9 +709,9 @@ static MACHINE_DRIVER_START( opd )
 
 	MDRV_CPU_ADD(I8051_TAG, I8051, X4)
 	MDRV_CPU_IO_MAP(ipc_io_map)
-	
+
 	MDRV_DEVICE_REMOVE("cart")
-	
+
 	MDRV_FLOPPY_2_DRIVES_REMOVE()
 MACHINE_DRIVER_END
 
@@ -721,7 +721,7 @@ static MACHINE_DRIVER_START( ql_ntsc )
 	MDRV_SCREEN_MODIFY(SCREEN_TAG)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_SIZE(960, 262)
-	MDRV_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)	
+	MDRV_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -765,9 +765,9 @@ ROM_START( ql )
 
 	ROM_IPC
 	/*
-	ROM_REGION( 0x400, "plds", 0 )
-	ROM_LOAD( "hal16l8.ic38", 0x0000, 0x0400, NO_DUMP )
-	*/
+    ROM_REGION( 0x400, "plds", 0 )
+    ROM_LOAD( "hal16l8.ic38", 0x0000, 0x0400, NO_DUMP )
+    */
 ROM_END
 
 ROM_START( ql_us )
@@ -920,7 +920,7 @@ static SYSTEM_CONFIG_START( ql )
 	CONFIG_RAM			(384 * 1024) // 256K expansion
 	CONFIG_RAM			(640 * 1024) // 512K expansion
 	CONFIG_RAM			(896 * 1024) // Trump Card
-	CONFIG_DEVICE(ql_serial_getinfo)	
+	CONFIG_DEVICE(ql_serial_getinfo)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START( opd )

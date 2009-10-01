@@ -1,11 +1,11 @@
 /***************************************************************************
 
-	Univac Terminals
+    Univac Terminals
 
-	The terminals are models UTS20, UTS30, UTS40, UTS50 and SVT1120,
-	however only the UTS20 is dumped (program roms only).
+    The terminals are models UTS20, UTS30, UTS40, UTS50 and SVT1120,
+    however only the UTS20 is dumped (program roms only).
 
-	25/05/2009 Skeleton driver [Robbbert].
+    25/05/2009 Skeleton driver [Robbbert].
 
 ****************************************************************************/
 

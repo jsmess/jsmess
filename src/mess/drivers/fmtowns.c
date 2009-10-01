@@ -1,37 +1,37 @@
 /*
 
-	Fujitsu FM-Towns
-	
-	Japanese computer system released in 1989.
-	
-	CPU:  AMD 80386SX(DX?) (80387 available as add-on?)
-	Sound:  Yamaha YM3438
-	        Ricoh RF5c68
-	Video:  VGA + some custom extra video hardware
-	        320x200 - 640x480
-	        16 - 32768 colours from a possible palette of between 4096 and
-	          16.7m colours (depending on video mode)
-	        1024 sprites (16x16)
-	        
-	        
-	Fujitsu FM-Towns Marty
-	
-	Japanese console, based on the FM-Towns computer, using an AMD 80386SX CPU,
-	released in 1993 
+    Fujitsu FM-Towns
+
+    Japanese computer system released in 1989.
+
+    CPU:  AMD 80386SX(DX?) (80387 available as add-on?)
+    Sound:  Yamaha YM3438
+            Ricoh RF5c68
+    Video:  VGA + some custom extra video hardware
+            320x200 - 640x480
+            16 - 32768 colours from a possible palette of between 4096 and
+              16.7m colours (depending on video mode)
+            1024 sprites (16x16)
 
 
-	16/5/09:  Skeleton driver.
+    Fujitsu FM-Towns Marty
 
-	Issues: BIOS requires 386 protected mode.
+    Japanese console, based on the FM-Towns computer, using an AMD 80386SX CPU,
+    released in 1993
+
+
+    16/5/09:  Skeleton driver.
+
+    Issues: BIOS requires 386 protected mode.
 
 */
 
 /* I/O port map (incomplete, could well be incorrect too)
  *
  * 0x0000   : Master 8259 PIC
- * 0x0002   : Master 8259 PIC 
+ * 0x0002   : Master 8259 PIC
  * 0x0010   : Slave 8259 PIC
- * 0x0012   : Slave 8259 PIC 
+ * 0x0012   : Slave 8259 PIC
  * 0x0020 RW: bit 0 = soft reset (read/write), bit 6 = power off (write), bit 7 = NMI vector protect
  * 0x0022  W: bit 7 = power off (write)
  * 0x0025 R : returns 0x00? (read)
@@ -320,7 +320,7 @@ static READ8_HANDLER( towns_cmos8_r )
 static WRITE8_HANDLER( towns_cmos8_w )
 {
 	UINT8* cmos = (UINT8*)towns_cmos;
-	
+
 	cmos[offset] = data;
 }
 
@@ -350,7 +350,7 @@ static WRITE8_HANDLER( towns_sys480_w )
 static ADDRESS_MAP_START(towns_mem, ADDRESS_SPACE_PROGRAM, 32)
   // memory map based on FM-Towns/Bochs (Bochs modified to emulate the FM-Towns)
   // may not be (and probably is not) correct
-  AM_RANGE(0x00000000, 0x000bffff) AM_RAM 
+  AM_RANGE(0x00000000, 0x000bffff) AM_RAM
   AM_RANGE(0x000c0000, 0x000c7fff) AM_RAM AM_BASE(&towns_gfxvram)  // GVRAM
   AM_RANGE(0x000c8000, 0x000cffff) AM_RAM AM_BASE(&towns_txtvram) // TVRAM
 //  AM_RANGE(0x000ca000, 0x000cafff) AM_RAM AM_BASE(&towns_txtvram) // TVRAM
@@ -445,7 +445,7 @@ static VIDEO_UPDATE( towns )
 {
 	int x,y;
 	int pixel = 0;
-	
+
 	for(y=0;y<480;y++)
 	{
 		for(x=0;x<640;x++)
@@ -455,7 +455,7 @@ static VIDEO_UPDATE( towns )
 				pixel = 0;
 		}
 	}
-	
+
     return 0;
 }
 
@@ -465,11 +465,11 @@ static const struct pit8253_config towns_pit8253_config =
 		{
 			307200,
 			NULL
-		}, 
+		},
 		{
 			307200,
 			NULL
-		}, 
+		},
 		{
 			307200,
 			NULL
@@ -477,13 +477,13 @@ static const struct pit8253_config towns_pit8253_config =
 	}
 };
 
-static const struct pic8259_interface towns_pic8259_master_config = 
+static const struct pic8259_interface towns_pic8259_master_config =
 {
 	NULL
 };
 
 
-static const struct pic8259_interface towns_pic8259_slave_config = 
+static const struct pic8259_interface towns_pic8259_slave_config =
 {
 	NULL
 };
@@ -503,18 +503,18 @@ static MACHINE_DRIVER_START( towns )
     MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
     MDRV_SCREEN_SIZE(640, 480)
     MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-    
+
     /* sound hardware */
     MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("fm", YM3438, 53693100 / 7) // actual clock speed unknown
-//	MDRV_SOUND_CONFIG(ym3438_interface)
+//  MDRV_SOUND_CONFIG(ym3438_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MDRV_SOUND_ADD("pcm", RF5C68, 2150000)  // actual clock speed unknown
-//	MDRV_SOUND_CONFIG(rf5c68_interface)
+//  MDRV_SOUND_CONFIG(rf5c68_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-    
+
     MDRV_PIT8253_ADD("pit",towns_pit8253_config)
-    
+
 	MDRV_PIC8259_ADD( "pic8259_master", towns_pic8259_master_config )
 
 	MDRV_PIC8259_ADD( "pic8259_slave", towns_pic8259_slave_config )

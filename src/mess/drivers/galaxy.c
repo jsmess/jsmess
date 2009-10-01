@@ -41,14 +41,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START (galaxy_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x2000, 0x2037) AM_MIRROR(0x07c0) AM_READ ( galaxy_keyboard_r )
-	AM_RANGE(0x2038, 0x203f) AM_MIRROR(0x07c0) AM_WRITE ( galaxy_latch_w )	
+	AM_RANGE(0x2038, 0x203f) AM_MIRROR(0x07c0) AM_WRITE ( galaxy_latch_w )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START (galaxyp_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM // ROM A
 	AM_RANGE(0x1000, 0x1fff) AM_ROM // ROM B
 	AM_RANGE(0x2000, 0x2037) AM_MIRROR(0x07c0) AM_READ ( galaxy_keyboard_r )
-	AM_RANGE(0x2038, 0x203f) AM_MIRROR(0x07c0) AM_WRITE ( galaxy_latch_w )	
+	AM_RANGE(0x2038, 0x203f) AM_MIRROR(0x07c0) AM_WRITE ( galaxy_latch_w )
 	AM_RANGE(0xe000, 0xefff) AM_ROM // ROM C
 	AM_RANGE(0xf000, 0xffff) AM_ROM // ROM D
 ADDRESS_MAP_END
@@ -211,7 +211,7 @@ static MACHINE_DRIVER_START( galaxyp )
 
 	MDRV_VIDEO_START( generic_bitmapped )
 	MDRV_VIDEO_UPDATE( galaxy )
-	
+
 	/* snapshot */
 	MDRV_SNAPSHOT_ADD("snapshot", galaxy, "gal", 0)
 

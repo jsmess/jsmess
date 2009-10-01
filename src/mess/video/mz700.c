@@ -1,11 +1,11 @@
 /***************************************************************************
- *	Sharp MZ700
+ *  Sharp MZ700
  *
- *	video hardware
+ *  video hardware
  *
- *	Juergen Buchmueller <pullmoll@t-online.de>, Jul 2000
+ *  Juergen Buchmueller <pullmoll@t-online.de>, Jul 2000
  *
- *	Reference: http://sharpmz.computingmuseum.com
+ *  Reference: http://sharpmz.computingmuseum.com
  *
  ***************************************************************************/
 

@@ -1,19 +1,19 @@
 /**********************************************************************
 
-	RCA VP550 - VIP Super Sound System emulation
+    RCA VP550 - VIP Super Sound System emulation
 
-	Copyright MESS Team.
+    Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
 
 *********************************************************************/
 
 /*
 
-	TODO:
+    TODO:
 
-	- tempo control
-	- mono/stereo mode
-	- VP551 memory map
+    - tempo control
+    - mono/stereo mode
+    - VP551 memory map
 
 */
 
@@ -138,7 +138,7 @@ static WRITE8_DEVICE_HANDLER( vp550_vlmn_w )
 {
 	//float gain = 0.625f * (data & 0x0f);
 
-//	sound_set_output_gain(device, 0, gain);
+//  sound_set_output_gain(device, 0, gain);
 
 	if (LOG) logerror("VP550 '%s' Volume: %u\n", device->tag, data & 0x0f);
 }
@@ -150,13 +150,13 @@ static WRITE8_DEVICE_HANDLER( vp550_vlmn_w )
 static WRITE8_DEVICE_HANDLER( vp550_sync_w )
 {
 	timer_device_enable(device, BIT(data, 0));
-	
+
 	if (LOG) logerror("VP550 Interrupt Enable: %u\n", BIT(data, 0));
 }
 
 /*-------------------------------------------------
     vp550_install_readwrite_handler - install
-	or uninstall write handlers
+    or uninstall write handlers
 -------------------------------------------------*/
 
 void vp550_install_write_handlers(const device_config *device, const address_space *program, int enabled)
@@ -185,7 +185,7 @@ void vp550_install_write_handlers(const device_config *device, const address_spa
 
 /*-------------------------------------------------
     vp551_install_readwrite_handler - install
-	or uninstall write handlers
+    or uninstall write handlers
 -------------------------------------------------*/
 
 void vp551_install_write_handlers(const device_config *device, const address_space *program, int enabled)
@@ -199,7 +199,7 @@ void vp551_install_write_handlers(const device_config *device, const address_spa
 static TIMER_DEVICE_CALLBACK( sync_tick )
 {
 	cpu_set_input_line(timer->machine->firstcpu, CDP1802_INPUT_LINE_INT, ASSERT_LINE);
-	
+
 	if (LOG) logerror("VP550 Interrupt\n");
 }
 

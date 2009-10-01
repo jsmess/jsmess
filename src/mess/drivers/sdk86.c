@@ -1,5 +1,5 @@
 /***************************************************************************
-   
+
         Intel SDK-86
 
         12/05/2009 Skeleton driver.
@@ -23,8 +23,8 @@ static INPUT_PORTS_START( sdk86 )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(sdk86) 
-{	
+static MACHINE_RESET(sdk86)
+{
 }
 
 static VIDEO_START( sdk86 )
@@ -40,10 +40,10 @@ static MACHINE_DRIVER_START( sdk86 )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",I8086, XTAL_5MHz) /* jumper selection slow it down on 2.5MHz*/
     MDRV_CPU_PROGRAM_MAP(sdk86_mem)
-    MDRV_CPU_IO_MAP(sdk86_io)	
+    MDRV_CPU_IO_MAP(sdk86_io)
 
     MDRV_MACHINE_RESET(sdk86)
-	
+
     /* video hardware */
     MDRV_SCREEN_ADD("screen", RASTER)
     MDRV_SCREEN_REFRESH_RATE(50)
@@ -65,7 +65,7 @@ ROM_START( sdk86 )
   	ROM_LOAD16_BYTE( "0456_104531-001.a36", 0xfe000, 0x0800, CRC(f9c4a809) SHA1(aea324c3f52dd393f1eed2b856ba11f050a35b93))
   	ROM_LOAD16_BYTE( "0457_104532-001.a37", 0xfe001, 0x0800, CRC(a245ba5c) SHA1(7f67277f866fca5377cb123e9cc405b5fdfe61d3))
 	ROM_LOAD16_BYTE( "0169_102042-001.a27", 0xff000, 0x0800, CRC(3f46311a) SHA1(a97e6861b736f26230b9adbf5cd2576a9f60d626))
-  	ROM_LOAD16_BYTE( "0170_102043-001.a30", 0xff001, 0x0800, CRC(65924471) SHA1(5d258695bf585f89179dfa0a113a0eeeabd5ee2b))  
+  	ROM_LOAD16_BYTE( "0170_102043-001.a30", 0xff001, 0x0800, CRC(65924471) SHA1(5d258695bf585f89179dfa0a113a0eeeabd5ee2b))
 ROM_END
 
 /* Driver */

@@ -156,13 +156,13 @@ static void pcw_update_irqs(running_machine *machine)
 	else
 		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
 
-	// set IRQ line, timer pulses IRQ line, all other devices hold it as necessary		
+	// set IRQ line, timer pulses IRQ line, all other devices hold it as necessary
 	if(fdc_interrupt_code == 1 && (pcw_system_status & 0x20))
 	{
 		cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
 		return;
 	}
-	
+
 	if(pcw_timer_irq_flag != 0)
 	{
 		cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
@@ -244,7 +244,7 @@ static void pcw_update_read_memory_block(running_machine *machine, int block, in
 		memory_install_read8_handler(space,
 			block * 0x04000 + 0x3ff0, block * 0x04000 + 0x3fff, 0, 0,
 			pcw_keyboard_r);
-//		LOG(("MEM: read block %i -> bank %i\n",block,bank));
+//      LOG(("MEM: read block %i -> bank %i\n",block,bank));
 	}
 	else
 	{
@@ -252,7 +252,7 @@ static void pcw_update_read_memory_block(running_machine *machine, int block, in
 		memory_install_read8_handler(space,
 			block * 0x04000 + 0x0000, block * 0x04000 + 0x3fff, 0, 0,
 			(read8_space_func) (STATIC_BANK1 + (FPTR)block));
-//		LOG(("MEM: read block %i -> bank %i\n",block,bank));
+//      LOG(("MEM: read block %i -> bank %i\n",block,bank));
 	}
 	memory_set_bankptr(machine, block + 1, mess_ram + ((bank * 0x4000) % mess_ram_size));
 }
@@ -262,7 +262,7 @@ static void pcw_update_read_memory_block(running_machine *machine, int block, in
 static void pcw_update_write_memory_block(running_machine *machine, int block, int bank)
 {
 	memory_set_bankptr(machine, block + 5, mess_ram + ((bank * 0x4000) % mess_ram_size));
-//	LOG(("MEM: write block %i -> bank %i\n",block,bank));
+//  LOG(("MEM: write block %i -> bank %i\n",block,bank));
 }
 
 
@@ -376,7 +376,7 @@ static WRITE8_HANDLER(pcw_bank_select_w)
 	pcw_banks[offset] = data;
 
 	pcw_update_mem(space->machine, offset, data);
-	//popmessage("RAM Banks: %02x %02x %02x %02x",pcw_banks[0],pcw_banks[1],pcw_banks[2],pcw_banks[3]); 
+	//popmessage("RAM Banks: %02x %02x %02x %02x",pcw_banks[0],pcw_banks[1],pcw_banks[2],pcw_banks[3]);
 }
 
 static WRITE8_HANDLER(pcw_bank_force_selection_w)
@@ -568,8 +568,8 @@ static READ8_HANDLER(pcw_system_status_r)
 {
 	/* from Jacob Nevins docs */
 	UINT8 ret = pcw_get_sys_status(space->machine);
-	
-//	LOG(("SYS: Status port returning %02x\n",ret));
+
+//  LOG(("SYS: Status port returning %02x\n",ret));
 	return ret;
 }
 
@@ -693,7 +693,7 @@ static WRITE8_HANDLER(pcw9512_parallel_w)
 
 static ADDRESS_MAP_START(pcw_io, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x000, 0x07f) AM_READWRITE(pcw_fdc_r,					pcw_fdc_w)  
+	AM_RANGE(0x000, 0x07f) AM_READWRITE(pcw_fdc_r,					pcw_fdc_w)
 	AM_RANGE(0x080, 0x0ef) AM_READWRITE(pcw_expansion_r,			pcw_expansion_w)
 	AM_RANGE(0x0f0, 0x0f3) AM_WRITE(								pcw_bank_select_w)
 	AM_RANGE(0x0f4, 0x0f4) AM_READWRITE(pcw_interrupt_counter_r,	pcw_bank_force_selection_w)
@@ -739,7 +739,7 @@ static MACHINE_RESET( pcw )
 {
 	/* ram paging is actually undefined at power-on */
 	pcw_bank_force = 0x00;
-	
+
 	pcw_banks[0] = 0x80;
 	pcw_banks[1] = 0x81;
 	pcw_banks[2] = 0x82;
@@ -759,10 +759,10 @@ static DRIVER_INIT(pcw)
 
 	cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), 0, 0x0ff);
 
-	/* copy boot code into RAM - yes, it's skipping a step, 
-	   but there is no verified dump of the boot sequence */
+	/* copy boot code into RAM - yes, it's skipping a step,
+       but there is no verified dump of the boot sequence */
 
-	memset(mess_ram,0x00,mess_ram_size);	
+	memset(mess_ram,0x00,mess_ram_size);
 	for(x=0;x<256;x++)
 		mess_ram[x+2] = code[x];
 
@@ -792,7 +792,7 @@ b1:   k0     ptr    ]      -      9      7      5      3      2             extr
 b0:   f4     exit   del>   =      0      8      6      4      1             f6
       &3FF0  &3FF1  &3FF2  &3FF3  &3FF4  &3FF5  &3FF6  &3FF7  &3FF8  &3FF9  &3FFA
 
-2008-05 FP: 
+2008-05 FP:
 Small note about atural keyboard: currently,
 - "Paste" is mapped to 'F9'
 - "Exit" is mapped to 'F10'
@@ -921,8 +921,8 @@ static INPUT_PORTS_START(pcw)
 	PORT_START("LINE12")	/* 0x03ffc */
 	PORT_BIT(0xff, 0x00,	 IPT_UNUSED)
 
-	/* 2008-05  FP: not sure if this key is correct, "Caps Lock" is already mapped above. 
-	For now, I let it with no default mapping. */
+	/* 2008-05  FP: not sure if this key is correct, "Caps Lock" is already mapped above.
+    For now, I let it with no default mapping. */
 	PORT_START("LINE13")	/* 0x03ffd */
 	PORT_BIT(0x3f, 0x000, IPT_UNUSED)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("SHIFT LOCK") //PORT_CODE(KEYCODE_CAPSLOCK)
@@ -1008,9 +1008,9 @@ static MACHINE_DRIVER_START( pcw )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("beep", BEEP, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	
+
 	MDRV_NEC765A_ADD("nec765", pcw_nec765_interface)
-	
+
 	MDRV_FLOPPY_2_DRIVES_ADD(pcw_floppy_config)
 MACHINE_DRIVER_END
 
@@ -1032,7 +1032,7 @@ MACHINE_DRIVER_END
 /* I am loading the boot-program outside of the Z80 memory area, because it
 is banked. */
 /* 8256boot.bin is not a real ROM, it is what is loaded into RAM by the boot sequence
-   It was typed in by hand based on the disassembly found at 
+   It was typed in by hand based on the disassembly found at
    http://www.chiark.greenend.org.uk/~jacobn/cpm/pcwboot.html  */
 
 // for now all models use the same rom
@@ -1040,7 +1040,7 @@ is banked. */
 	ROM_START(model)												\
 		ROM_REGION(0x010000, "maincpu",0)							\
 		ROM_FILL(0x0000,0x10000,0x00)											\
-/*		ROM_LOAD("pcwboot.bin", 0x010000, 608, BAD_DUMP CRC(679b0287) SHA1(5dde974304e3376ace00850d6b4c8ec3b674199e))*/	\
+/*      ROM_LOAD("pcwboot.bin", 0x010000, 608, BAD_DUMP CRC(679b0287) SHA1(5dde974304e3376ace00850d6b4c8ec3b674199e))*/	\
 		ROM_REGION(256,"bootcode",0)								\
 		ROM_LOAD("8256boot.bin", 0, 256, NO_DUMP CRC(d55925bd) SHA1(bca6a47d657557be99cb8580d4bf90968d8dde4a))	\
 	ROM_END															\

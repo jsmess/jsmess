@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	msm8251.h
+    msm8251.h
 
-	MSM/Intel 8251 Universal Synchronous/Asynchronous Receiver Transmitter code
+    MSM/Intel 8251 Universal Synchronous/Asynchronous Receiver Transmitter code
 
 *********************************************************************/
 

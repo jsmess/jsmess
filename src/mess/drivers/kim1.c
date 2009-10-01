@@ -282,7 +282,7 @@ static TIMER_CALLBACK( kim1_update_leds )
 	for ( i = 0; i < 6; i++ )
 	{
 		if ( kim1_led_time[i] )
-			kim1_led_time[i]--; 
+			kim1_led_time[i]--;
 		else
 			output_set_digit_value( i, 0 );
 	}

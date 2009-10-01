@@ -1,15 +1,15 @@
 /***************************************************************************
-   
-    P8000 
 
-    09/2009 Skeleton driver based on Matt Knoth's emulator. 
+    P8000
+
+    09/2009 Skeleton driver based on Matt Knoth's emulator.
     P8000emu (http://knothusa.net/Home.php) has been a great source of info.
     Other info from
       * http://www.pofo.de/P8000/notes/books/
       * http://www.pofo.de/P8000/
 
     TODO:
-      * add Z8001 core so that we can handle the 16bit IO Map (Z8000 uses a 
+      * add Z8001 core so that we can handle the 16bit IO Map (Z8000 uses a
         8bit IO Map, and hence I commented out the whole map)
       * add floppy emulation to 8 bit board
       * properly implement Z80 daisy chain in 16 bit board
@@ -69,12 +69,12 @@ static ADDRESS_MAP_START(p8k_memmap, ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(p8k_iomap, ADDRESS_SPACE_IO, 8)
-//	AM_RANGE(0x00, 0x07) // MH7489
+//  AM_RANGE(0x00, 0x07) // MH7489
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("z80ctc_0", z80ctc_r, z80ctc_w)
 	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("z80pio_0", z80pio_alt_r, z80pio_alt_w)
 	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE("z80pio_1", z80pio_alt_r, z80pio_alt_w)
 	AM_RANGE(0x1c, 0x1f) AM_DEVREADWRITE("z80pio_2", z80pio_alt_r, z80pio_alt_w)	// we still need to add the FDC related part of this one
-//	AM_RANGE(0x20, 0x23) // FDC
+//  AM_RANGE(0x20, 0x23) // FDC
 	AM_RANGE(0x24, 0x27) AM_DEVREADWRITE("z80sio_0", sio2_r, sio2_w)
 	AM_RANGE(0x28, 0x2b) AM_DEVREADWRITE("z80sio_1", sio2_r, sio2_w)
 	AM_RANGE(0x2c, 0x2f) AM_DEVREADWRITE("z80ctc_1", z80ctc_r, z80ctc_w)
@@ -150,7 +150,7 @@ static WRITE16_DEVICE_HANDLER( p8k_16_ctc_w )
 }
 
 static ADDRESS_MAP_START(p8k_16_iomap, ADDRESS_SPACE_IO, 16)
-//	AM_RANGE(0x0fef0, 0x0feff) // clock
+//  AM_RANGE(0x0fef0, 0x0feff) // clock
 	AM_RANGE(0x0ff80, 0x0ff87) AM_DEVREADWRITE("z80sio_0", p8k_16_sio_r, p8k_16_sio_w)
 	AM_RANGE(0x0ff88, 0x0ff8f) AM_DEVREADWRITE("z80sio_1", p8k_16_sio_r, p8k_16_sio_w)
 	AM_RANGE(0x0ff90, 0x0ff97) AM_DEVREADWRITE("z80pio_0", p8k_16_pio_r, p8k_16_pio_w)
@@ -158,13 +158,13 @@ static ADDRESS_MAP_START(p8k_16_iomap, ADDRESS_SPACE_IO, 16)
 	AM_RANGE(0x0ffa0, 0x0ffa7) AM_DEVREADWRITE("z80pio_2", p8k_16_pio_r, p8k_16_pio_w)
 	AM_RANGE(0x0ffa8, 0x0ffaf) AM_DEVREADWRITE("z80ctc_0", p8k_16_ctc_r, p8k_16_ctc_w)
 	AM_RANGE(0x0ffb0, 0x0ffb7) AM_DEVREADWRITE("z80ctc_1", p8k_16_ctc_r, p8k_16_ctc_w)
-//	AM_RANGE(0x0ffc0, 0x0ffc1) // SCR
-//	AM_RANGE(0x0ffc8, 0x0ffc9) // SBR
-//	AM_RANGE(0x0ffd0, 0x0ffd1) // NBR
-//	AM_RANGE(0x0ffd8, 0x0ffd9) // SNVR
-//	AM_RANGE(0x0ffe0, 0x0ffe1) // RETI
-//	AM_RANGE(0x0fff0, 0x0fff1) // TRPL
-//	AM_RANGE(0x0fff8, 0x0fff9) // IF1L
+//  AM_RANGE(0x0ffc0, 0x0ffc1) // SCR
+//  AM_RANGE(0x0ffc8, 0x0ffc9) // SBR
+//  AM_RANGE(0x0ffd0, 0x0ffd1) // NBR
+//  AM_RANGE(0x0ffd8, 0x0ffd9) // SNVR
+//  AM_RANGE(0x0ffe0, 0x0ffe1) // RETI
+//  AM_RANGE(0x0fff0, 0x0fff1) // TRPL
+//  AM_RANGE(0x0fff8, 0x0fff9) // IF1L
 ADDRESS_MAP_END
 
 #endif
@@ -175,11 +175,11 @@ INPUT_PORTS_START( p8k )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET( p8k ) 
+static MACHINE_RESET( p8k )
 {
 }
 
-static MACHINE_RESET( p8k_16 ) 
+static MACHINE_RESET( p8k_16 )
 {
 }
 
@@ -194,7 +194,7 @@ static VIDEO_UPDATE( p8k )
 
 
 /***************************************************************************
-   
+
     P8000 8bit Peripherals
 
 ****************************************************************************/
@@ -245,7 +245,7 @@ static const z80ctc_interface p8k_ctc_0_intf =
 /* Z80 CTC 1 */
 // to implement: callbacks!
 // manual states the callbacks should go to
-// Baud Gen 0, Baud Gen 1, Baud Gen 2, 
+// Baud Gen 0, Baud Gen 1, Baud Gen 2,
 
 static const z80ctc_interface p8k_ctc_1_intf =
 {
@@ -347,7 +347,7 @@ static const z80_daisy_chain p8k_daisy_chain[] =
 
 
 /***************************************************************************
-   
+
     P8000 16bit Peripherals
 
 ****************************************************************************/
@@ -468,7 +468,7 @@ static const z80_daisy_chain p8k_16_daisy_chain[] =
 };
 
 /***************************************************************************
-   
+
     Machine Drivers
 
 ****************************************************************************/
@@ -480,7 +480,7 @@ static MACHINE_DRIVER_START( p8k )
 	MDRV_CPU_PROGRAM_MAP(p8k_memmap)
 	MDRV_CPU_IO_MAP(p8k_iomap)
 
-//	MDRV_MACHINE_START( p8000_8 )
+//  MDRV_MACHINE_START( p8000_8 )
 	MDRV_MACHINE_RESET(p8k)
 
 	/* peripheral hardware */
@@ -517,9 +517,9 @@ static MACHINE_DRIVER_START( p8k_16 )
 	MDRV_CPU_ADD("maincpu", Z8000, XTAL_4MHz )	// actually z8001, appropriate changes pending
 	MDRV_CPU_CONFIG(p8k_16_daisy_chain)
 	MDRV_CPU_PROGRAM_MAP(p8k_16_memmap)
-//	MDRV_CPU_IO_MAP(p8k_16_iomap)
+//  MDRV_CPU_IO_MAP(p8k_16_iomap)
 
-//	MDRV_MACHINE_START( p8000_16 )
+//  MDRV_MACHINE_START( p8000_16 )
 	MDRV_MACHINE_RESET(p8k_16)
 
 	/* peripheral hardware */

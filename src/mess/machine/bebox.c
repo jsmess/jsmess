@@ -1,89 +1,89 @@
 /***************************************************************************
 
-	machine/bebox.c
+    machine/bebox.c
 
-	BeBox
+    BeBox
 
-	Memory map:
+    Memory map:
 
-	00000000 - 3FFFFFFF   Physical RAM
-	40000000 - 7FFFFFFF   Motherboard glue registers
-	80000000 - 807FFFFF   ISA I/O
-	81000000 - BF7FFFFF   PCI I/O
-	BFFFFFF0 - BFFFFFFF   PCI/ISA interrupt acknowledge
-	FF000000 - FFFFFFFF   ROM/flash
+    00000000 - 3FFFFFFF   Physical RAM
+    40000000 - 7FFFFFFF   Motherboard glue registers
+    80000000 - 807FFFFF   ISA I/O
+    81000000 - BF7FFFFF   PCI I/O
+    BFFFFFF0 - BFFFFFFF   PCI/ISA interrupt acknowledge
+    FF000000 - FFFFFFFF   ROM/flash
 
-	In ISA space, peripherals are generally in similar places as they are on
-	standard PC hardware (e.g. - the keyboard is 80000060 and 80000064).  The
-	following table shows more:
+    In ISA space, peripherals are generally in similar places as they are on
+    standard PC hardware (e.g. - the keyboard is 80000060 and 80000064).  The
+    following table shows more:
 
-	Keyboard/Mouse      (Intel 8242)   80000060, 80000064
-	Real Time Clock     (BQ3285)       80000070, 80000074
-	IDE ATA Interface                  800001F0-F7, 800003F6-7
-	COM2                               800002F8-F
-	GeekPort A/D Control               80000360-1
-	GeekPort A/D Data                  80000362-3
-	GeekPort A/D Rate                  80000364
-	GeekPort OE                        80000366
-	Infrared Interface                 80000368-A
-	COM3                               80000380-7
-	COM4                               80000388-F
-	GeekPort D/A                       80000390-3
-	GeekPort GPA/GPB                   80000394
-	Joystick Buttons                   80000397
-	SuperIO Config (PReP standard)     80000398-9
-	MIDI Port 1                        800003A0-7
-	MIDI Port 2                        800003A8-F
-	Parallel                           800003BC-E
-	Floppy                             800003F0-7
-	COM1                               800003F8-F
-	AD1848                             80000830-4
+    Keyboard/Mouse      (Intel 8242)   80000060, 80000064
+    Real Time Clock     (BQ3285)       80000070, 80000074
+    IDE ATA Interface                  800001F0-F7, 800003F6-7
+    COM2                               800002F8-F
+    GeekPort A/D Control               80000360-1
+    GeekPort A/D Data                  80000362-3
+    GeekPort A/D Rate                  80000364
+    GeekPort OE                        80000366
+    Infrared Interface                 80000368-A
+    COM3                               80000380-7
+    COM4                               80000388-F
+    GeekPort D/A                       80000390-3
+    GeekPort GPA/GPB                   80000394
+    Joystick Buttons                   80000397
+    SuperIO Config (PReP standard)     80000398-9
+    MIDI Port 1                        800003A0-7
+    MIDI Port 2                        800003A8-F
+    Parallel                           800003BC-E
+    Floppy                             800003F0-7
+    COM1                               800003F8-F
+    AD1848                             80000830-4
 
 
   Interrupt bit masks:
 
-	bit 31	- N/A (used to set/clear masks)
-	bit 30	- SMI interrupt to CPU 0 (CPU 0 only)
-	bit 29	- SMI interrupt to CPU 1 (CPU 1 only)
-	bit 28	- Unused
-	bit 27	- COM1 (PC IRQ #4)
-	bit 26	- COM2 (PC IRQ #3)
-	bit 25	- COM3
-	bit 24	- COM4
-	bit 23	- MIDI1
-	bit 22	- MIDI2
-	bit 21	- SCSI
-	bit 20	- PCI Slot #1
-	bit 19	- PCI Slot #2
-	bit 18	- PCI Slot #3
-	bit 17	- Sound
-	bit 16	- Keyboard (PC IRQ #1)
-	bit 15	- Real Time Clock (PC IRQ #8)
-	bit 14	- PC IRQ #5
-	bit 13	- Floppy Disk (PC IRQ #6)
-	bit 12	- Parallel Port (PC IRQ #7)
-	bit 11	- PC IRQ #9
-	bit 10	- PC IRQ #10
-	bit  9	- PC IRQ #11
-	bit  8	- Mouse (PC IRQ #12)
-	bit  7	- IDE (PC IRQ #14)
-	bit  6	- PC IRQ #15
-	bit  5	- PIC8259
-	bit  4  - Infrared Controller
-	bit  3  - Analog To Digital
-	bit  2  - GeekPort
-	bit  1  - Unused
-	bit  0  - Unused
+    bit 31  - N/A (used to set/clear masks)
+    bit 30  - SMI interrupt to CPU 0 (CPU 0 only)
+    bit 29  - SMI interrupt to CPU 1 (CPU 1 only)
+    bit 28  - Unused
+    bit 27  - COM1 (PC IRQ #4)
+    bit 26  - COM2 (PC IRQ #3)
+    bit 25  - COM3
+    bit 24  - COM4
+    bit 23  - MIDI1
+    bit 22  - MIDI2
+    bit 21  - SCSI
+    bit 20  - PCI Slot #1
+    bit 19  - PCI Slot #2
+    bit 18  - PCI Slot #3
+    bit 17  - Sound
+    bit 16  - Keyboard (PC IRQ #1)
+    bit 15  - Real Time Clock (PC IRQ #8)
+    bit 14  - PC IRQ #5
+    bit 13  - Floppy Disk (PC IRQ #6)
+    bit 12  - Parallel Port (PC IRQ #7)
+    bit 11  - PC IRQ #9
+    bit 10  - PC IRQ #10
+    bit  9  - PC IRQ #11
+    bit  8  - Mouse (PC IRQ #12)
+    bit  7  - IDE (PC IRQ #14)
+    bit  6  - PC IRQ #15
+    bit  5  - PIC8259
+    bit  4  - Infrared Controller
+    bit  3  - Analog To Digital
+    bit  2  - GeekPort
+    bit  1  - Unused
+    bit  0  - Unused
 
-	Be documentation uses PowerPC bit numbering conventions (i.e. - bit #0 is
-	the most significant bit)
+    Be documentation uses PowerPC bit numbering conventions (i.e. - bit #0 is
+    the most significant bit)
 
-	PCI Devices:
-		#0		Motorola MPC105
-		#11		Intel 82378 PCI/ISA bridge
-		#12		NCR 53C810 SCSI
+    PCI Devices:
+        #0      Motorola MPC105
+        #11     Intel 82378 PCI/ISA bridge
+        #12     NCR 53C810 SCSI
 
-	More hardware information at http://www.netbsd.org/Ports/bebox/hardware.html
+    More hardware information at http://www.netbsd.org/Ports/bebox/hardware.html
 
 ***************************************************************************/
 
@@ -128,7 +128,7 @@ static struct {
 
 /*************************************
  *
- *	Interrupts and Motherboard Registers
+ *  Interrupts and Motherboard Registers
  *
  *************************************/
 
@@ -236,10 +236,10 @@ WRITE64_HANDLER( bebox_crossproc_interrupts_w )
 			if (LOG_INTERRUPTS)
 			{
 /*
-				logerror("bebox_crossproc_interrupts_w(): CPU #%d %s %s\n",
-					crossproc_map[i].cpunum, line ? "Asserting" : "Clearing",
-					(crossproc_map[i].inputline == PPC_INPUT_LINE_SMI) ? "SMI" : "TLBISYNC");
-					*/
+                logerror("bebox_crossproc_interrupts_w(): CPU #%d %s %s\n",
+                    crossproc_map[i].cpunum, line ? "Asserting" : "Clearing",
+                    (crossproc_map[i].inputline == PPC_INPUT_LINE_SMI) ? "SMI" : "TLBISYNC");
+                    */
 			}
 
 			cputag_set_input_line(space->machine, cputags[crossproc_map[i].cpunum], crossproc_map[i].inputline, line);
@@ -344,7 +344,7 @@ static void bebox_set_irq_bit(running_machine *machine, unsigned int interrupt_b
 
 /*************************************
  *
- *	COM ports
+ *  COM ports
  *
  *************************************/
 
@@ -401,7 +401,7 @@ const ins8250_interface bebox_uart_inteface_3 =
 
 /*************************************
  *
- *	Floppy Disk Controller
+ *  Floppy Disk Controller
  *
  *************************************/
 
@@ -427,7 +427,7 @@ static void bebox_fdc_dma_drq(running_machine *machine, int state, int read_)
 static const device_config *bebox_fdc_get_image(running_machine *machine, int floppy_index)
 {
 	/* the BeBox boot ROM seems to query for floppy #1 when it should be
-	 * querying for floppy #0 */
+     * querying for floppy #0 */
 	return floppy_get_device(machine, 0);
 }
 
@@ -448,7 +448,7 @@ static const struct pc_fdc_interface bebox_fdc_interface =
 
 /*************************************
  *
- *	8259 PIC
+ *  8259 PIC
  *
  *************************************/
 
@@ -468,7 +468,7 @@ READ64_HANDLER( bebox_interrupt_ack_r )
  * pic8259 configuration
  *
  *************************************************************/
- 
+
 static PIC8259_SET_INT_LINE( bebox_pic8259_master_set_int_line ) {
 	bebox_set_irq_bit(device->machine, 5, interrupt);
 }
@@ -493,7 +493,7 @@ const struct pic8259_interface bebox_pic8259_slave_config = {
 
 /*************************************
  *
- *	Floppy/IDE/ATA
+ *  Floppy/IDE/ATA
  *
  *************************************/
 
@@ -551,7 +551,7 @@ void bebox_ide_interrupt(const device_config *device, int state)
 
 /*************************************
  *
- *	Video card (Cirrus Logic CL-GD5430)
+ *  Video card (Cirrus Logic CL-GD5430)
  *
  *************************************/
 
@@ -618,7 +618,7 @@ static const struct pc_vga_interface bebox_vga_interface =
 
 /*************************************
  *
- *	8237 DMA
+ *  8237 DMA
  *
  *************************************/
 
@@ -794,7 +794,7 @@ const struct dma8237_interface bebox_dma8237_2_config =
 
 /*************************************
  *
- *	8254 PIT
+ *  8254 PIT
  *
  *************************************/
 
@@ -827,7 +827,7 @@ const struct pit8253_config bebox_pit8254_config =
 
 /*************************************
  *
- *	Flash ROM
+ *  Flash ROM
  *
  *************************************/
 
@@ -859,7 +859,7 @@ WRITE64_HANDLER( bebox_flash_w )
 
 /*************************************
  *
- *	Keyboard
+ *  Keyboard
  *
  *************************************/
 
@@ -886,7 +886,7 @@ static const struct kbdc8042_interface bebox_8042_interface =
 
 /*************************************
  *
- *	SCSI
+ *  SCSI
  *
  *************************************/
 
@@ -1016,14 +1016,14 @@ void scsi53c810_pci_write(const device_config *busdevice, const device_config *d
 		{
 			case 0x04:
 				/* command
-				 *
-				 * bit 8:	SERR/ Enable
-				 * bit 6:	Enable Parity Response
-				 * bit 4:	Write and Invalidate Mode
-				 * bit 2:	Enable Bus Mastering
-				 * bit 1:	Enable Memory Space
-				 * bit 0:	Enable IO Space
-				 */
+                 *
+                 * bit 8:   SERR/ Enable
+                 * bit 6:   Enable Parity Response
+                 * bit 4:   Write and Invalidate Mode
+                 * bit 2:   Enable Bus Mastering
+                 * bit 1:   Enable Memory Space
+                 * bit 0:   Enable IO Space
+                 */
 				if (data & 0x02)
 				{
 					/* brutal ugly hack; at some point the PCI code should be handling this stuff */
@@ -1070,7 +1070,7 @@ static TIMER_CALLBACK( bebox_get_devices ) {
 
 /*************************************
  *
- *	Driver main
+ *  Driver main
  *
  *************************************/
 
@@ -1138,13 +1138,13 @@ DRIVER_INIT( bebox )
 	memory_install_write64_handler(space_1, vram_begin, vram_end, 0, 0, bebox_video_w);
 
 	/* The following is a verrrry ugly hack put in to support NetBSD for
-	 * NetBSD.  When NetBSD/bebox it does most of its work on CPU #0 and then
-	 * lets CPU #1 go.  However, it seems that CPU #1 jumps into never-never
-	 * land, crashes, and then goes into NetBSD's crash handler which catches
-	 * it.  The current PowerPC core cannot catch this trip into never-never
-	 * land properly, and MESS crashes.  In the interim, this "mitten" catches
-	 * the crash
-	 */
+     * NetBSD.  When NetBSD/bebox it does most of its work on CPU #0 and then
+     * lets CPU #1 go.  However, it seems that CPU #1 jumps into never-never
+     * land, crashes, and then goes into NetBSD's crash handler which catches
+     * it.  The current PowerPC core cannot catch this trip into never-never
+     * land properly, and MESS crashes.  In the interim, this "mitten" catches
+     * the crash
+     */
 	{
 		static UINT64 ops[2] =
 		{

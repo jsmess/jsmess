@@ -4,37 +4,37 @@
 
         12/05/2009 Skeleton driver.
 
-	Execution of this monitor rom starts at F800.
+    Execution of this monitor rom starts at F800.
 
-	I/O sequence:	read 0A, discard result
-			read 0B, output result to 0B
-			send the sequence AA 40 4E 37 to 01, then to 03 (programming a device?)
-			L1:read 03 to see if display device is ready
-			write ascii character to 02 goto L1 until signon message is displayed
-			in same fashion display top of memory (F800)
-			display prompt character (*) wait for input
-			read 03 to see if a key is being input, if so read 02 and display it
-			if illegal input, display ? then display prompt on a new line
+    I/O sequence:   read 0A, discard result
+            read 0B, output result to 0B
+            send the sequence AA 40 4E 37 to 01, then to 03 (programming a device?)
+            L1:read 03 to see if display device is ready
+            write ascii character to 02 goto L1 until signon message is displayed
+            in same fashion display top of memory (F800)
+            display prompt character (*) wait for input
+            read 03 to see if a key is being input, if so read 02 and display it
+            if illegal input, display ? then display prompt on a new line
 
-	To summarise:	out 01 and out 03 - program a device
-			out 02 - display a character
-			in 02 - read character from keyboard
-			in 03 - get busy status of display (bit 0) and keyboard (bit 1) High=ready
+    To summarise:   out 01 and out 03 - program a device
+            out 02 - display a character
+            in 02 - read character from keyboard
+            in 03 - get busy status of display (bit 0) and keyboard (bit 1) High=ready
 
 *****************************************************************************************************/
 
 /*
 
-	TODO:
+    TODO:
 
-	- terminal
-	- keyboard
-	- ROM should be mirrored every 2K at boot
-	- 2/4 MHz jumper J2
-	- floppy
-	- memory expansion
-	- COM5016
-	- CTC
+    - terminal
+    - keyboard
+    - ROM should be mirrored every 2K at boot
+    - 2/4 MHz jumper J2
+    - floppy
+    - memory expansion
+    - COM5016
+    - CTC
 
 */
 
@@ -56,12 +56,12 @@ static WRITE8_HANDLER( mmu_w )
 {
 	/*
 
-		bit		description
-		
-		0		A16
-		1		A17
+        bit     description
 
-	*/
+        0       A16
+        1       A17
+
+    */
 }
 
 static WRITE8_HANDLER( prom_toggle_w )
@@ -181,7 +181,7 @@ static COM8116_INTERFACE( com5016_intf )
 	DEVCB_LINE(com5016_fr_w),	/* fR output */
 	DEVCB_LINE(com5016_ft_w),	/* fT output */
 	{ 101376, 67584, 46080, 37686, 33792, 16896, 8448, 4224, 2816, 2534, 2112, 1408, 1056, 704, 528, 264 },	// WRONG
-	{ 101376, 67584, 46080, 37686, 33792, 16896, 8448, 4224, 2816, 2534, 2112, 1408, 1056, 704, 528, 264 },	// WRONG	
+	{ 101376, 67584, 46080, 37686, 33792, 16896, 8448, 4224, 2816, 2534, 2112, 1408, 1056, 704, 528, 264 },	// WRONG
 };
 
 /* Printer 8251A Interface */
@@ -262,8 +262,8 @@ static WD17XX_CALLBACK( wd1795_callback )
 	}
 }
 
-static const wd17xx_interface wd1795_intf = 
-{ 
+static const wd17xx_interface wd1795_intf =
+{
 	wd1795_callback,
 	NULL,
 	{FLOPPY_0,FLOPPY_1,NULL,NULL}
@@ -364,7 +364,7 @@ static MACHINE_DRIVER_START( xor100 )
 	MDRV_Z80CTC_ADD(Z80CTC_TAG, XTAL_8MHz/2, ctc_intf)
 	MDRV_COM8116_ADD(COM5016_TAG, 5000000, com5016_intf) // COM5016
 	MDRV_WD179X_ADD(WD1795_TAG, /*XTAL_8MHz/8,*/ wd1795_intf ) // WD1795-02
-	MDRV_FLOPPY_2_DRIVES_ADD(xor100_floppy_config)	
+	MDRV_FLOPPY_2_DRIVES_ADD(xor100_floppy_config)
 
 	MDRV_CASSETTE_ADD(CASSETTE_TAG, xor100_cassette_config)
 MACHINE_DRIVER_END
@@ -379,10 +379,10 @@ ROM_END
 /* System Configuration */
 
 static SYSTEM_CONFIG_START( xor100 )
-	CONFIG_RAM_DEFAULT( 64 * 1024 )	
+	CONFIG_RAM_DEFAULT( 64 * 1024 )
 SYSTEM_CONFIG_END
 
 /* System Drivers */
 
-/*    YEAR	NAME		PARENT	COMPAT	MACHINE		INPUT		INIT	CONFIG		COMPANY					FULLNAME		FLAGS */
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    CONFIG      COMPANY                 FULLNAME        FLAGS */
 COMP( 1982, xor100,		0,		0,		xor100,		xor100,		0,		xor100,		"Xor Data Science",		"XOR S-100-12",	GAME_NOT_WORKING )

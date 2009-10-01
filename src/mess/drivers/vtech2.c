@@ -87,7 +87,7 @@ static ADDRESS_MAP_START(vtech2_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x45, 0x45) AM_WRITE(laser_two_color_w)
 ADDRESS_MAP_END
 
-/* 2008-05 FP: 
+/* 2008-05 FP:
 Small note about natural keyboard: currently,
 - "Graph" is mapped to 'F11'
 - "Del Line" is mapped to 'F12'
@@ -214,8 +214,8 @@ static INPUT_PORTS_START( laser500 )
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Ins") PORT_CODE(KEYCODE_INSERT)			PORT_CHAR(UCHAR_MAMEKEY(INSERT))
 INPUT_PORTS_END
 
-/* 2008-05 FP: I wasn't able to find a good picture of the laser 350 to verify the mapping of the emulated keyboard. 
-However, old-computers.com describes it as a laser 500/700 in a laser 300/310 case. The missing inputs seem to 
+/* 2008-05 FP: I wasn't able to find a good picture of the laser 350 to verify the mapping of the emulated keyboard.
+However, old-computers.com describes it as a laser 500/700 in a laser 300/310 case. The missing inputs seem to
 confirm this. */
 static INPUT_PORTS_START( laser350 )
 	PORT_INCLUDE( laser500 )

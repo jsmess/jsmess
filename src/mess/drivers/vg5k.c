@@ -2,7 +2,7 @@
 
     Philips VG-5000mu
 
-	05/2009 Skeleton driver.
+    05/2009 Skeleton driver.
 
     Informations ( see the very informative http://vg5k.free.fr/ ):
      - Variants: Radiola VG5000 and Schneider VG5000
@@ -19,14 +19,14 @@
      - Keyboard: 63 keys AZERTY, Caps Lock, CTRL key to access 33 BASIC instructions
      - I/O: Tape recorder connector (1200/2400 bauds), Scart connector to TV (RGB),
        External PSU (VU0022) connector, Bus connector (2x25 pins)
-     - There are 2 versions of the VG5000 ROM, one with Basic v1.0, 
+     - There are 2 versions of the VG5000 ROM, one with Basic v1.0,
        contained in two 8 KB ROMs, and one with Basic 1.1, contained in
        a single 16 KB ROM.
      - RAM: 24 KB (3 x 8 KB) type SRAM D4168C, more precisely:
          2 x 8 KB, used by the system
          1 x 8 KB, used by the video processor
      - Memory Map:
-		 $0000 - $3fff  BASIC + monitor
+         $0000 - $3fff  BASIC + monitor
          $4000 - $47cf  Screen
          $47d0 - $7fff  reserved area for BASIC, variables, etc
          $8000 - $bfff  Memory Expansion 16K or ROM cart

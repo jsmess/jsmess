@@ -1,10 +1,10 @@
 /******************************************************************************
-	Motorola Evaluation Kit 6800 D2
+    Motorola Evaluation Kit 6800 D2
     MEK6800D2
 
     video driver
 
-	Juergen Buchmueller <pullmoll@t-online.de>, Jan 2000
+    Juergen Buchmueller <pullmoll@t-online.de>, Jan 2000
 
 ******************************************************************************/
 
@@ -19,7 +19,7 @@ PALETTE_INIT( mekd2 )
 
 	for (i = 0; i < 16; i++)
 		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(24 + (i + 1) * (i + 1) - 1, (i + 1) * (i + 1) / 4, 0));
-	
+
 	colortable_palette_set_color(machine->colortable, 16, MAKE_RGB(0, 0, 0));
 	colortable_palette_set_color(machine->colortable, 17, MAKE_RGB(30, 30, 30));
 	colortable_palette_set_color(machine->colortable, 18, MAKE_RGB(90, 90, 90));

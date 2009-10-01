@@ -18,10 +18,10 @@ static ADDRESS_MAP_START(sapi1_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1000, 0x1fff) AM_ROM // Extension ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x2400, 0x27ff) AM_READWRITE(sapi1_keyboard_r, sapi1_keyboard_w) // PORT 0 - keyboard	
+	AM_RANGE(0x2400, 0x27ff) AM_READWRITE(sapi1_keyboard_r, sapi1_keyboard_w) // PORT 0 - keyboard
 	//AM_RANGE(0x2800, 0x2bff) AM_NOP // PORT 1
 	//AM_RANGE(0x2c00, 0x2fff) AM_NOP // PORT 2
-	//AM_RANGE(0x3000, 0x33ff) AM_NOP // 3214		
+	//AM_RANGE(0x3000, 0x33ff) AM_NOP // 3214
 	AM_RANGE(0x3800, 0x3fff) AM_RAM AM_BASE(&sapi_video_ram) // AND-1 (video RAM)
 	AM_RANGE(0x4000, 0x4000) AM_RAM // REM-1
 ADDRESS_MAP_END

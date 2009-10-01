@@ -345,8 +345,8 @@ static MACHINE_DRIVER_START( tmc600 )
 
 	/* cassette */
 	MDRV_CASSETTE_ADD(CASSETTE_TAG, tmc600_cassette_config)
-	
-	MDRV_FLOPPY_4_DRIVES_ADD(tmc600_floppy_config)	
+
+	MDRV_FLOPPY_4_DRIVES_ADD(tmc600_floppy_config)
 MACHINE_DRIVER_END
 
 /* ROMs */

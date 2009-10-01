@@ -21,7 +21,7 @@ VIDEO_UPDATE( irisha )
  	UINT8 col;
 	int y, x, b;
 	const address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	
+
 	// draw image
 	for (y = 0; y < 200; y++)
 	{

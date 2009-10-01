@@ -1,10 +1,10 @@
 /***************************************************************************
 
-	IBM PC junior
-	Tandy 1000 Graphics Adapter (T1T) section
+    IBM PC junior
+    Tandy 1000 Graphics Adapter (T1T) section
 
-	Note that in the IBM PC Junior world, the term 'vga' is not the 'vga' that
-	most people think of
+    Note that in the IBM PC Junior world, the term 'vga' is not the 'vga' that
+    most people think of
 
 ***************************************************************************/
 
@@ -16,7 +16,7 @@
 
 /***************************************************************************
 
-	Static declarations
+    Static declarations
 
 ***************************************************************************/
 
@@ -88,7 +88,7 @@ MACHINE_DRIVER_END
 
 /***************************************************************************
 
-	Methods
+    Methods
 
 ***************************************************************************/
 
@@ -124,13 +124,13 @@ static struct
 		UINT8 index;
 		UINT8 data[0x20];
 		/* see vgadoc
-		   0 mode control 1
-		   1 palette mask
-		   2 border color
-		   3 mode control 2
-		   4 reset
-		   0x10-0x1f palette registers
-		*/
+           0 mode control 1
+           1 palette mask
+           2 border color
+           3 mode control 2
+           4 reset
+           0x10-0x1f palette registers
+        */
 	} reg;
 
 	UINT8 bank;
@@ -318,7 +318,7 @@ static MC6845_UPDATE_ROW( pcjr_gfx_2bpp_high_update_row )
 		UINT8 data0 = vid[ offset ];
 		UINT8 data1 = vid[ offset + 1 ];
 
-		*p = pcjr.palette_base + pcjr.reg.data[ 0x10 + ( ( ( data0 & 0x80 ) >> 7 ) | ( ( data1 & 0x80 ) >> 6 ) ) ]; p++; 
+		*p = pcjr.palette_base + pcjr.reg.data[ 0x10 + ( ( ( data0 & 0x80 ) >> 7 ) | ( ( data1 & 0x80 ) >> 6 ) ) ]; p++;
 		*p = pcjr.palette_base + pcjr.reg.data[ 0x10 + ( ( ( data0 & 0x40 ) >> 6 ) | ( ( data1 & 0x40 ) >> 5 ) ) ]; p++;
 		*p = pcjr.palette_base + pcjr.reg.data[ 0x10 + ( ( ( data0 & 0x20 ) >> 5 ) | ( ( data1 & 0x20 ) >> 4 ) ) ]; p++;
 		*p = pcjr.palette_base + pcjr.reg.data[ 0x10 + ( ( ( data0 & 0x10 ) >> 4 ) | ( ( data1 & 0x10 ) >> 3 ) ) ]; p++;
@@ -332,17 +332,17 @@ static MC6845_UPDATE_ROW( pcjr_gfx_2bpp_high_update_row )
 
 static MC6845_UPDATE_ROW( t1000_gfx_2bpp_tga_update_row )
 {
-	UINT16	*p = BITMAP_ADDR16(bitmap, y, 0); 
+	UINT16	*p = BITMAP_ADDR16(bitmap, y, 0);
 	UINT8	*vid = pcjr.displayram + ( ra << 13 );
-	int i; 
+	int i;
 
 	if ( y == 0 ) logerror("t1000_gfx_2bpp_tga_update_row\n");
 	for ( i = 0; i < x_count; i++ )
 	{
 		UINT16 offset = ( ( ma + i ) << 1 ) & 0x1fff;
-		UINT8 data = vid[ offset ]; 
+		UINT8 data = vid[ offset ];
 		UINT16 data2 = ( vid[ offset + 1 ] ) << 1;
-        
+
 		*p = pcjr.reg.data[ 0x10 + ( ( ( data2 & 0x100 ) | ( data & 0x80 ) ) >> 7 ) ]; p++;
 		*p = pcjr.reg.data[ 0x10 + ( ( ( data2 & 0x80 ) | ( data & 0x40 ) ) >> 6 ) ]; p++;
 		*p = pcjr.reg.data[ 0x10 + ( ( ( data2 & 0x40 ) | ( data & 0x20 ) ) >> 5 ) ]; p++;
@@ -540,7 +540,7 @@ static void pc_pcjr_mode_switch( running_machine *machine )
 
 
 /*
- * 3d8 rW	T1T mode control register (see #P138)
+ * 3d8 rW   T1T mode control register (see #P138)
  */
 static void pc_t1t_mode_control_w(int data)
 {
@@ -556,7 +556,7 @@ static int pc_t1t_mode_control_r(void)
 }
 
 /*
- * 3d9 ?W	color select register on color adapter
+ * 3d9 ?W   color select register on color adapter
  */
 static void pc_t1t_color_select_w(int data)
 {
@@ -597,17 +597,17 @@ static int pc_t1t_status_r(void)
 }
 
 /*
- * 3db -W	light pen strobe reset (on any value)
+ * 3db -W   light pen strobe reset (on any value)
  */
 static void pc_t1t_lightpen_strobe_w(int data)
 {
-//	pc_port[0x3db] = data;
+//  pc_port[0x3db] = data;
 }
 
 
 /*
- * 3da -W	(mono EGA/mono VGA) feature control register
- *			(see PORT 03DAh-W for details; VGA, see PORT 03CAh-R)
+ * 3da -W   (mono EGA/mono VGA) feature control register
+ *          (see PORT 03DAh-W for details; VGA, see PORT 03CAh-R)
  */
 static void pc_t1t_vga_index_w(int data)
 {
@@ -704,15 +704,15 @@ static int pc_t1t_vga_data_r(void)
 }
 
 /*
- * 3df RW	display bank, access bank, mode
- * bit 0-2	Identifies the page of main memory being displayed in units of 16K.
- *			0: 0K, 1: 16K...7: 112K. In 32K modes (bits 6-7 = 2) only 0,2,4 and
- *			6 are valid, as the next page will also be used.
- *	   3-5	Identifies the page of main memory that can be read/written at B8000h
- *			in units of 16K. 0: 0K, 1: 16K...7: 112K. In 32K modes (bits 6-7 = 2)
- *			only 0,2,4 and 6 are valid, as the next page will also be used.
- *	   6-7	Display mode. 0: Text, 1: 16K graphics mode (4,5,6,8)
- *			2: 32K graphics mode (9,Ah)
+ * 3df RW   display bank, access bank, mode
+ * bit 0-2  Identifies the page of main memory being displayed in units of 16K.
+ *          0: 0K, 1: 16K...7: 112K. In 32K modes (bits 6-7 = 2) only 0,2,4 and
+ *          6 are valid, as the next page will also be used.
+ *     3-5  Identifies the page of main memory that can be read/written at B8000h
+ *          in units of 16K. 0: 0K, 1: 16K...7: 112K. In 32K modes (bits 6-7 = 2)
+ *          only 0,2,4 and 6 are valid, as the next page will also be used.
+ *     6-7  Display mode. 0: Text, 1: 16K graphics mode (4,5,6,8)
+ *          2: 32K graphics mode (9,Ah)
  */
 static void pc_t1t_bank_w(running_machine *machine, int data)
 {
@@ -775,8 +775,8 @@ static int pc_t1t_bank_r(void)
 
 /*************************************************************************
  *
- *		T1T
- *		Tandy 1000 / PCjr
+ *      T1T
+ *      Tandy 1000 / PCjr
  *
  *************************************************************************/
 
@@ -826,7 +826,7 @@ WRITE8_HANDLER( pc_pcjr_w )
 
 	switch( offset )
 	{
-		case 0: case 4: 
+		case 0: case 4:
 			devconf = devtag_get_device(space->machine, T1000_MC6845_NAME);
 			mc6845_address_w( devconf, offset, data );
 			break;

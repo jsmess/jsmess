@@ -1,8 +1,8 @@
 /***************************************************************************
 
-	pc_vga.h
+    pc_vga.h
 
-	PC standard VGA adaptor
+    PC standard VGA adaptor
 
 ***************************************************************************/
 
@@ -73,25 +73,25 @@ WRITE16_HANDLER( vga_port16le_03d0_w );
   (mda/hgc lines bit 8 not identical to ega/vga)
 
   standard ega/vga dipswitches
-  00000000	320x200
-  00000001	640x200 hanging
-  00000010	640x200 hanging
-  00000011	640x200 hanging
+  00000000  320x200
+  00000001  640x200 hanging
+  00000010  640x200 hanging
+  00000011  640x200 hanging
 
-  00000100	640x350 hanging
-  00000101	640x350 hanging EGA mono
-  00000110	320x200
-  00000111	640x200
+  00000100  640x350 hanging
+  00000101  640x350 hanging EGA mono
+  00000110  320x200
+  00000111  640x200
 
-  00001000	640x200
-  00001001	640x200
-  00001010	720x350 partial visible
-  00001011	720x350 partial visible
+  00001000  640x200
+  00001001  640x200
+  00001010  720x350 partial visible
+  00001011  720x350 partial visible
 
-  00001100	320x200
-  00001101	320x200
-  00001110	320x200
-  00001111	320x200
+  00001100  320x200
+  00001101  320x200
+  00001110  320x200
+  00001111  320x200
 
 */
 

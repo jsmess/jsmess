@@ -1,23 +1,23 @@
 /*
-	733 ASR emulation
+    733 ASR emulation
 
-	We are emulating a TI Model 733 ASR ("Silent 700") data terminal,
-	interfaced through a TI asynchronous EIA/TTY interface module.
+    We are emulating a TI Model 733 ASR ("Silent 700") data terminal,
+    interfaced through a TI asynchronous EIA/TTY interface module.
 
-	The ASR features a printer, a keyboard and a tape unit (which is not
-	emulated).  The ASR is attached to the computer with a serial interface.
+    The ASR features a printer, a keyboard and a tape unit (which is not
+    emulated).  The ASR is attached to the computer with a serial interface.
 
-	References:
-	945401-9701 Model 990/4 Computer System Field Maintainance Manual p. C-1,
-	945250-9701 990 Computer Family Systems Handbook pp. 5-9 through 5-16,
-	0943442-9701 Model 990 Computer Reference Manual Preliminary pp. 3-13
-	through 3-21 and 3-39 through 3-44.
+    References:
+    945401-9701 Model 990/4 Computer System Field Maintainance Manual p. C-1,
+    945250-9701 990 Computer Family Systems Handbook pp. 5-9 through 5-16,
+    0943442-9701 Model 990 Computer Reference Manual Preliminary pp. 3-13
+    through 3-21 and 3-39 through 3-44.
 
-	TODO:
-	* separate ASR emulation from EIA interface emulation?
-	* implement tape interface?
+    TODO:
+    * separate ASR emulation from EIA interface emulation?
+    * implement tape interface?
 
-	Raphael Nabet 2003
+    Raphael Nabet 2003
 */
 
 #include "driver.h"
@@ -47,8 +47,8 @@ static const rectangle asr_scroll_clear_window =
 static struct
 {
 	/*UINT8 OutQueue[ASROutQueueSize];
-	int OutQueueHead;
-	int OutQueueLen;*/
+    int OutQueueHead;
+    int OutQueueLen;*/
 
 	UINT8 recv_buf;
 	UINT8 xmit_buf;
@@ -84,7 +84,7 @@ enum
 
 static const gfx_layout fontlayout =
 {
-	6, 8,			/* 6*8 characters */
+    6, 8,           /* 6*8 characters */
 	/*96*/128,				/* 96 characters */
 	1,				/* 1 bit per pixel */
 	{ 0 },
@@ -104,7 +104,7 @@ PALETTE_INIT( asr733 )
 }
 
 /*
-	Initialize the asr core
+    Initialize the asr core
 */
 void asr733_init(running_machine *machine)
 {
@@ -314,16 +314,16 @@ static void asr_receive_callback(int dummy)
 #endif
 
 /*
-	0-7: receive buffer
-	8: XMITING transmit in progress, 1 if transmitting
-	9: TIMERR timing error, 1 if error
-	10: RCR reverse channel receive, not used
-	    "ASR733/33 ID" 1 -> TTY (???) (2270509-9701 pp. G-9 & G-10)
-	11: WRQ write request, 1 if ready to transmit
-	12: RRQ read request, 1 if ready to receive
-	13: DCD data carrier detect, not used
-	14: DSR data set ready, 1 if online
-	15: INT interrupt, 1 if interrupt
+    0-7: receive buffer
+    8: XMITING transmit in progress, 1 if transmitting
+    9: TIMERR timing error, 1 if error
+    10: RCR reverse channel receive, not used
+        "ASR733/33 ID" 1 -> TTY (???) (2270509-9701 pp. G-9 & G-10)
+    11: WRQ write request, 1 if ready to transmit
+    12: RRQ read request, 1 if ready to receive
+    13: DCD data carrier detect, not used
+    14: DSR data set ready, 1 if online
+    15: INT interrupt, 1 if interrupt
 */
 static int asr733_cru_r(int offset, int unit)
 {
@@ -346,15 +346,15 @@ static int asr733_cru_r(int offset, int unit)
 }
 
 /*
-	0-7: transmit buffer
-	8: not used
-	9: DTR data terminal ready (set to 1)
-	10: RTS request to send (set to 1)
-	11: CLRWRQ clear write request (write any value to execute)
-	12: CLRRRQ clear read request (write any value to execute)
-	13: CLRNSF clear new status flag - clear DSR/DCD interrupts (write any value to execute)
-	14: enable interrupts, 1 to enable interrupts
-	15: diagnostic mode, 0 for normal mode
+    0-7: transmit buffer
+    8: not used
+    9: DTR data terminal ready (set to 1)
+    10: RTS request to send (set to 1)
+    11: CLRWRQ clear write request (write any value to execute)
+    12: CLRRRQ clear read request (write any value to execute)
+    13: CLRNSF clear new status flag - clear DSR/DCD interrupts (write any value to execute)
+    14: enable interrupts, 1 to enable interrupts
+    15: diagnostic mode, 0 for normal mode
 */
 static void asr733_cru_w(running_machine *machine, int offset, int data, int unit)
 {
@@ -417,7 +417,7 @@ WRITE8_HANDLER(asr733_0_cru_w)
 
 
 /*
-	Video refresh
+    Video refresh
 */
 void asr733_refresh(running_machine *machine, bitmap_t *bitmap, int unit, int x, int y)
 {
@@ -602,8 +602,8 @@ static const unsigned char key_translate[3][51] =
 
 
 /*
-	keyboard handler: should be called regularly by machine code, for instance
-	every Video Blank Interrupt.
+    keyboard handler: should be called regularly by machine code, for instance
+    every Video Blank Interrupt.
 */
 void asr733_keyboard(running_machine *machine, int unit)
 {

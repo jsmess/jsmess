@@ -1,11 +1,11 @@
 /*
 
-	TODO:
+    TODO:
 
-	- double screen width to allow for medium resolution
-	- STe pixelofs
-	- blitter hog
-	- high resolution
+    - double screen width to allow for medium resolution
+    - STe pixelofs
+    - blitter hog
+    - high resolution
 
 */
 

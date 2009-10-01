@@ -1,7 +1,7 @@
 /***************************************************************************
-   
+
         MMD-1 & MMD-2 driver by Miodrag Milanovic
-		
+
         12/05/2009 Initial version
 
 ****************************************************************************/
@@ -67,7 +67,7 @@ static READ8_HANDLER (mmd1_keyboard_r)
 	if (BIT(line2,5)==0) return 13;
 	if (BIT(line2,6)==0) return 14;
 	if (BIT(line2,7)==0) return 15;
-		
+
 	return 0xff;
 }
 
@@ -76,7 +76,7 @@ static ADDRESS_MAP_START(mmd1_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x00ff ) AM_ROM // Main ROM
 	AM_RANGE( 0x0100, 0x01ff ) AM_ROM // Expansion slot
 	AM_RANGE( 0x0200, 0x02ff ) AM_RAM
-	AM_RANGE( 0x0300, 0x03ff ) AM_RAM	
+	AM_RANGE( 0x0300, 0x03ff ) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mmd1_io , ADDRESS_SPACE_IO, 8)
@@ -93,7 +93,7 @@ static ADDRESS_MAP_START(mmd2_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x0400, 0x07ff ) AM_RAM // WE1
 	AM_RANGE( 0x0800, 0x0bff ) AM_RAM // WE2
 	AM_RANGE( 0x0c00, 0x0fff ) AM_RAM // WE3
-	
+
 	AM_RANGE( 0xd800, 0xdfff ) AM_ROM // ROM label 330
 	AM_RANGE( 0xe000, 0xe7ff ) AM_ROM // ROM label 340
 	AM_RANGE( 0xe800, 0xefff ) AM_RAM // ROM label 350
@@ -116,7 +116,7 @@ static INPUT_PORTS_START( mmd1 )
 			PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4") PORT_CODE(KEYCODE_4)
 			PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5") PORT_CODE(KEYCODE_5)
 			PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6") PORT_CODE(KEYCODE_6)
-			PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7") PORT_CODE(KEYCODE_7)	
+			PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7") PORT_CODE(KEYCODE_7)
 	PORT_START("LINE2")
 			PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("S") PORT_CODE(KEYCODE_S)
 			PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -125,7 +125,7 @@ static INPUT_PORTS_START( mmd1 )
 			PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("H") PORT_CODE(KEYCODE_H)
 			PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("L") PORT_CODE(KEYCODE_L)
 			PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A") PORT_CODE(KEYCODE_A)
-			PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("B") PORT_CODE(KEYCODE_B)	
+			PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("B") PORT_CODE(KEYCODE_B)
 	PORT_START("LINE3")
 			PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("R") PORT_CODE(KEYCODE_R)
 INPUT_PORTS_END
@@ -133,42 +133,42 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( mmd2 )
 /*
-DIP switches: 
-WE 0      - Write enable for addresses $0000..$03FF 
-WE 1      - Write enable for addresses $0400..$07FF 
-WE 2      - Write enable for addresses $0800..$0BFF 
-WE 3      - Write enable for addresses $0C00..$0FFF 
-SPARE     - ??? 
-HEX OCT   - choose display and entry to be in Hexadecimal or Octal 
-PUP RESET - ??? 
+DIP switches:
+WE 0      - Write enable for addresses $0000..$03FF
+WE 1      - Write enable for addresses $0400..$07FF
+WE 2      - Write enable for addresses $0800..$0BFF
+WE 3      - Write enable for addresses $0C00..$0FFF
+SPARE     - ???
+HEX OCT   - choose display and entry to be in Hexadecimal or Octal
+PUP RESET - ???
 EXEC USER - update binary LED's with data entry? Or not?
-(in either setting, outputs to ports 0,1,2 still show) 
+(in either setting, outputs to ports 0,1,2 still show)
 
 Keyboard
-0  1  2  3   	PREV  STORE  NEXT  STEP  
-4  5  6  7   	HIGH  LOW  GO  OPTION  
-8  9  A  B   	LOAD  DUMP  PROM  COPY  
-C  D  E  F   	MEM  REGS  AUX  CANCEL  
+0  1  2  3      PREV  STORE  NEXT  STEP
+4  5  6  7      HIGH  LOW  GO  OPTION
+8  9  A  B      LOAD  DUMP  PROM  COPY
+C  D  E  F      MEM  REGS  AUX  CANCEL
 
 */
 INPUT_PORTS_END
 
-static MACHINE_RESET(mmd1) 
-{	
+static MACHINE_RESET(mmd1)
+{
 }
 
-static MACHINE_RESET(mmd2) 
-{	
+static MACHINE_RESET(mmd2)
+{
 }
 
 static MACHINE_DRIVER_START( mmd1 )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",8080, 6750000 / 9)
     MDRV_CPU_PROGRAM_MAP(mmd1_mem)
-    MDRV_CPU_IO_MAP(mmd1_io)	
+    MDRV_CPU_IO_MAP(mmd1_io)
 
     MDRV_MACHINE_RESET(mmd1)
-	
+
 	/* video hardware */
 	MDRV_DEFAULT_LAYOUT(layout_mmd1)
 MACHINE_DRIVER_END
@@ -177,10 +177,10 @@ static MACHINE_DRIVER_START( mmd2 )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",8080, 6750000 / 9)
     MDRV_CPU_PROGRAM_MAP(mmd2_mem)
-    MDRV_CPU_IO_MAP(mmd2_io)	
+    MDRV_CPU_IO_MAP(mmd2_io)
 
     MDRV_MACHINE_RESET(mmd2)
-	
+
 	/* video hardware */
 	MDRV_DEFAULT_LAYOUT(layout_mmd2)
 MACHINE_DRIVER_END

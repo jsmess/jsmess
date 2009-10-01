@@ -1,5 +1,5 @@
 /*
-	990_hd.h: include file for 990_hd.c
+    990_hd.h: include file for 990_hd.c
 */
 #ifndef __990_HD_H_
 #define __990_HD_H_

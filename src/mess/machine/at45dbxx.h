@@ -1,12 +1,12 @@
 /*
 
-	Atmel Serial DataFlash
+    Atmel Serial DataFlash
 
-	(c) 2001-2007 Tim Schuerewegen
+    (c) 2001-2007 Tim Schuerewegen
 
-	AT45DB041 -  528 KByte
-	AT45DB081 - 1056 KByte
-	AT45DB161 - 2112 KByte
+    AT45DB041 -  528 KByte
+    AT45DB081 - 1056 KByte
+    AT45DB161 - 2112 KByte
 
 */
 

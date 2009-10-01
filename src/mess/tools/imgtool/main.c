@@ -1,8 +1,8 @@
 /***************************************************************************
 
-	main.c
+    main.c
 
-	Imgtool command line front end
+    Imgtool command line front end
 
 ***************************************************************************/
 
@@ -345,8 +345,8 @@ static int cmd_put(const struct command *c, int argc, char *argv[])
 	}
 
 	/* ugh I hate the way this function is set up, this is because the
-	 * arguments depend on the partition; something that requires some
-	 * rudimentary parsing */
+     * arguments depend on the partition; something that requires some
+     * rudimentary parsing */
 	if (argc >= 2)
 	{
 		/* open up the image */

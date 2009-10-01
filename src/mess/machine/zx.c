@@ -1,8 +1,8 @@
 /***************************************************************************
-	zx.c
+    zx.c
 
     machine driver
-	Juergen Buchmueller <pullmoll@t-online.de>, Dec 1999
+    Juergen Buchmueller <pullmoll@t-online.de>, Dec 1999
 
 ****************************************************************************/
 
@@ -25,7 +25,7 @@ static UINT8 zx_tape_bit = 0x80;
 
 static WRITE8_HANDLER( zx_ram_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "maincpu");	
+	UINT8 *RAM = memory_region(space->machine, "maincpu");
 	RAM[offset + 0x4000] = data;
 
 	if (data & 0x40)
@@ -43,7 +43,7 @@ static WRITE8_HANDLER( zx_ram_w )
 /* I know this looks really pointless... but it has to be here */
 READ8_HANDLER( zx_ram_r )
 {
-	UINT8 *RAM = memory_region(space->machine, "maincpu");	
+	UINT8 *RAM = memory_region(space->machine, "maincpu");
 	return RAM[offset | 0xc000];
 }
 
@@ -102,9 +102,9 @@ static TIMER_CALLBACK(zx_tape_pulse)
 READ8_HANDLER ( zx80_io_r )
 {
 /* port FE = read keyboard, NTSC/PAL diode, and cass bit; turn off HSYNC-generator/cass-out
-	The upper 8 bits are used to select a keyboard scan line
+    The upper 8 bits are used to select a keyboard scan line
 
-	The diode doesn't make any visual difference, but it's in the schematic, and used by the code. */
+    The diode doesn't make any visual difference, but it's in the schematic, and used by the code. */
 
 	UINT8 data = 0xff;
 	UINT8 offs = offset & 0xff;
@@ -138,10 +138,10 @@ READ8_HANDLER ( zx80_io_r )
 			zx_ula_bkgnd(space->machine, 0);
 			ula_irq_active = 0;
 
-//			LOG_ZX81_IOR("ULA IRQs off");
+//          LOG_ZX81_IOR("ULA IRQs off");
 		}
-//		else
-//		{
+//      else
+//      {
 			if ((cassette_input(devtag_get_device(space->machine, "cassette")) < -0.75) && zx_tape_bit)
 			{
 				zx_tape_bit = 0x00;
@@ -150,12 +150,12 @@ READ8_HANDLER ( zx80_io_r )
 
 			data &= ~zx_tape_bit;
 
-//			LOG_ZX81_IOR("Tape");
-//		}
+//          LOG_ZX81_IOR("Tape");
+//      }
 		if (ula_frame_vsync == 3)
 		{
 			ula_frame_vsync = 2;
-//			LOG_ZX81_VSYNC;
+//          LOG_ZX81_VSYNC;
 		}
 	}
 	else
@@ -167,8 +167,8 @@ READ8_HANDLER ( zx80_io_r )
 READ8_HANDLER ( zx81_io_r )
 {
 /* port FB = read printer status, not emulated
-	FE = read keyboard, NTSC/PAL diode, and cass bit; turn off HSYNC-generator/cass-out
-	The upper 8 bits are used to select a keyboard scan line */
+    FE = read keyboard, NTSC/PAL diode, and cass bit; turn off HSYNC-generator/cass-out
+    The upper 8 bits are used to select a keyboard scan line */
 
 	UINT8 data = 0xff;
 	UINT8 offs = offset & 0xff;
@@ -202,7 +202,7 @@ READ8_HANDLER ( zx81_io_r )
 			zx_ula_bkgnd(space->machine, 0);
 			ula_irq_active = 0;
 
-//			LOG_ZX81_IOR("ULA IRQs off");
+//          LOG_ZX81_IOR("ULA IRQs off");
 		}
 		else
 		{
@@ -214,12 +214,12 @@ READ8_HANDLER ( zx81_io_r )
 
 			data &= ~zx_tape_bit;
 
-//			LOG_ZX81_IOR("Tape");
+//          LOG_ZX81_IOR("Tape");
 		}
 		if (ula_frame_vsync == 3)
 		{
 			ula_frame_vsync = 2;
-//			LOG_ZX81_VSYNC;
+//          LOG_ZX81_VSYNC;
 		}
 	}
 	else
@@ -231,11 +231,11 @@ READ8_HANDLER ( zx81_io_r )
 READ8_HANDLER ( pc8300_io_r )
 {
 /* port F5 = sound
-	F6 = unknown
-	FB = read printer status, not emulated
-	FE = read keyboard and cass bit; turn off HSYNC-generator/cass-out
-	The upper 8 bits are used to select a keyboard scan line.
-	No TV diode */
+    F6 = unknown
+    FB = read printer status, not emulated
+    FE = read keyboard and cass bit; turn off HSYNC-generator/cass-out
+    The upper 8 bits are used to select a keyboard scan line.
+    No TV diode */
 
 	UINT8 data = 0xff;
 	UINT8 offs = offset & 0xff;
@@ -274,7 +274,7 @@ READ8_HANDLER ( pc8300_io_r )
 			zx_ula_bkgnd(space->machine, 0);
 			ula_irq_active = 0;
 
-//			LOG_ZX81_IOR("ULA IRQs off");
+//          LOG_ZX81_IOR("ULA IRQs off");
 		}
 		else
 		{
@@ -286,12 +286,12 @@ READ8_HANDLER ( pc8300_io_r )
 
 			data &= ~zx_tape_bit;
 
-//			LOG_ZX81_IOR("Tape");
+//          LOG_ZX81_IOR("Tape");
 		}
 		if (ula_frame_vsync == 3)
 		{
 			ula_frame_vsync = 2;
-//			LOG_ZX81_VSYNC;
+//          LOG_ZX81_VSYNC;
 		}
 	}
 	else
@@ -303,11 +303,11 @@ READ8_HANDLER ( pc8300_io_r )
 READ8_HANDLER ( pow3000_io_r )
 {
 /* port 7E = read NTSC/PAL diode
-	F5 = sound
-	F6 = unknown
-	FB = read printer status, not emulated
-	FE = read keyboard and cass bit; turn off HSYNC-generator/cass-out
-	The upper 8 bits are used to select a keyboard scan line */
+    F5 = sound
+    F6 = unknown
+    FB = read printer status, not emulated
+    FE = read keyboard and cass bit; turn off HSYNC-generator/cass-out
+    The upper 8 bits are used to select a keyboard scan line */
 
 	UINT8 data = 0xff;
 	UINT8 offs = offset & 0xff;
@@ -362,12 +362,12 @@ READ8_HANDLER ( pow3000_io_r )
 
 			data &= ~zx_tape_bit;
 
-//			LOG_ZX81_IOR("Tape");
+//          LOG_ZX81_IOR("Tape");
 		}
 		if (ula_frame_vsync == 3)
 		{
 			ula_frame_vsync = 2;
-//			LOG_ZX81_VSYNC;
+//          LOG_ZX81_VSYNC;
 		}
 	}
 	else
@@ -379,7 +379,7 @@ READ8_HANDLER ( pow3000_io_r )
 WRITE8_HANDLER( zx80_io_w )
 {
 /* port FF = write HSYNC and cass data */
-	
+
 	UINT8 offs = offset & 0xff;
 
 	if (offs == 0xff)
@@ -391,11 +391,11 @@ WRITE8_HANDLER( zx80_io_w )
 WRITE8_HANDLER ( zx81_io_w )
 {
 /* port F5 = unknown, pc8300/pow3000/lambda only
-	F6 = unknown, pc8300/pow3000/lambda only
-	FB = write data to printer, not emulated
-	FD = turn off NMI generator
-	FE = turn on NMI generator
-	FF = write HSYNC and cass data */
+    F6 = unknown, pc8300/pow3000/lambda only
+    FB = write data to printer, not emulated
+    FD = turn off NMI generator
+    FE = turn on NMI generator
+    FF = write HSYNC and cass data */
 
 	const device_config *screen = video_screen_first(space->machine->config);
 	int height = video_screen_get_height(screen);

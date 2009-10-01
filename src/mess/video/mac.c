@@ -1,12 +1,12 @@
 /***************************************************************************
 
-	video/mac.c
+    video/mac.c
 
-	Macintosh video hardware
+    Macintosh video hardware
 
-	Emulates the video hardware for compact Macintosh series (original
-	Macintosh (128k, 512k, 512ke), Macintosh Plus, Macintosh SE, Macintosh
-	Classic)
+    Emulates the video hardware for compact Macintosh series (original
+    Macintosh (128k, 512k, 512ke), Macintosh Plus, Macintosh SE, Macintosh
+    Classic)
 
 ***************************************************************************/
 

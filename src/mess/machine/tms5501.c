@@ -1,21 +1,21 @@
 /*********************************************************************
 
-	tms5501.c
+    tms5501.c
 
-	TMS5501 input/output controller
+    TMS5501 input/output controller
 
-	Krzysztof Strzecha, Nathan Woods, 2003
-	Based on TMS9901 emulator by Raphael Nabet
+    Krzysztof Strzecha, Nathan Woods, 2003
+    Based on TMS9901 emulator by Raphael Nabet
 
-	21-May-2004 -	Fixed interrupt queue overflow bug (not really fixed
-			previously).
-	06-Mar-2004 -   Fixed bug in sensor input.
-	01-Mar-2004 -	Interrupt queue overrun problem fixed.
-	19-Oct-2003 -	Status register added. Reset fixed. Some cleanups.
-			INTA enable/disable.
+    21-May-2004 -   Fixed interrupt queue overflow bug (not really fixed
+            previously).
+    06-Mar-2004 -   Fixed bug in sensor input.
+    01-Mar-2004 -   Interrupt queue overrun problem fixed.
+    19-Oct-2003 -   Status register added. Reset fixed. Some cleanups.
+            INTA enable/disable.
 
-	TODO:
-	- SIO
+    TODO:
+    - SIO
 
 *********************************************************************/
 
@@ -427,13 +427,13 @@ WRITE8_DEVICE_HANDLER( tms5501_w )
 			break;
 		case 0x04:
 			/* Command register
-				bit 0: reset
-				bit 1: send break, '1' - serial output is high impedance
-				bit 2: int 7 select: '0' - timer 5, '1' - IN7 of the DCE-bus
-				bit 3: int ack enable, '0' - disabled, '1' - enabled
-				bits 4-5: test bits, normally '0'
-				bits 6-7: not used, normally '0'
-			   bits 1-5 are latched */
+                bit 0: reset
+                bit 1: send break, '1' - serial output is high impedance
+                bit 2: int 7 select: '0' - timer 5, '1' - IN7 of the DCE-bus
+                bit 3: int ack enable, '0' - disabled, '1' - enabled
+                bits 4-5: test bits, normally '0'
+                bits 6-7: not used, normally '0'
+               bits 1-5 are latched */
 
 			tms->command = data & TMS5501_COMMAND_LATCHED_BITS;
 			LOG_TMS5501(device, "Command register write", data);
@@ -443,14 +443,14 @@ WRITE8_DEVICE_HANDLER( tms5501_w )
 			break;
 		case 0x05:
 			/* Serial rate register
-				bit 0: 110 baud
-				bit 1: 150 baud
-				bit 2: 300 baud
-				bit 3: 1200 baud
-				bit 4: 2400 baud
-				bit 5: 4800 baud
-				bit 6: 9600 baud
-				bit 7: '0' - two stop bits, '1' - one stop bit */
+                bit 0: 110 baud
+                bit 1: 150 baud
+                bit 2: 300 baud
+                bit 3: 1200 baud
+                bit 4: 2400 baud
+                bit 5: 4800 baud
+                bit 6: 9600 baud
+                bit 7: '0' - two stop bits, '1' - one stop bit */
 
 			tms->sio_rate = data;
 			LOG_TMS5501(device, "Serial rate write", data);
@@ -467,14 +467,14 @@ WRITE8_DEVICE_HANDLER( tms5501_w )
 			break;
 		case 0x08:
 			/* Interrupt mask register
-				bit 0: Timer 1 has expired (UTIM)
-				bit 1: Timer 2 has expired
-				bit 2: External interrupt (STKIM)
-				bit 3: Timer 3 has expired (SNDIM)
-				bit 4: Serial receiver loaded
-				bit 5: Serial transmitter empty
-				bit 6: Timer 4 has expired (KBIM)
-				bit 7: Timer 5 has expired or IN7 (CLKIM) */
+                bit 0: Timer 1 has expired (UTIM)
+                bit 1: Timer 2 has expired
+                bit 2: External interrupt (STKIM)
+                bit 3: Timer 3 has expired (SNDIM)
+                bit 4: Serial receiver loaded
+                bit 5: Serial transmitter empty
+                bit 6: Timer 4 has expired (KBIM)
+                bit 7: Timer 5 has expired or IN7 (CLKIM) */
 
 			tms->interrupt_mask = data;
 			LOG_TMS5501(device, "Interrupt mask write", data);

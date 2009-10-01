@@ -1,9 +1,9 @@
 /******************************************************************************
-	Acorn Electron driver
+    Acorn Electron driver
 
-	MESS Driver By:
+    MESS Driver By:
 
-	Wilbert Pol
+    Wilbert Pol
 
 ******************************************************************************/
 
@@ -252,7 +252,7 @@ VIDEO_UPDATE( electron )
 		}
 		break;
 	}
-	
+
 	return 0;
 }
 

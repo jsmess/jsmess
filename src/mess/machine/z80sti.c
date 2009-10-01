@@ -9,11 +9,11 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- timers (other than delay mode)
-	- serial I/O
-	- reset behavior
+    - timers (other than delay mode)
+    - serial I/O
+    - reset behavior
 
 */
 
@@ -118,7 +118,7 @@ static const int INT_LEVEL_TIMER[] =
 /* interrupt vectors */
 static const UINT8 INT_VECTOR[] =
 {
-	0x00, 0x02, 0x04, 0x06, 0x08, 0x0a, 0x0c, 0x0e, 
+	0x00, 0x02, 0x04, 0x06, 0x08, 0x0a, 0x0c, 0x0e,
 	0x10, 0x12, 0x14, 0x16, 0x18, 0x1a, 0x1c, 0x1e
 };
 
@@ -208,7 +208,7 @@ INLINE const z80sti_interface *get_interface(const device_config *device)
 
 /*-------------------------------------------------
     check_interrupts - set the interrupt request
-	line state
+    line state
 -------------------------------------------------*/
 
 static void check_interrupts(z80sti_t *z80sti)
@@ -423,7 +423,7 @@ WRITE8_DEVICE_HANDLER( z80sti_w )
 		int i;
 		LOG(("Z80STI '%s' Interrupt Pending Register B: %x\n", device->tag, data));
 		z80sti->ipr &= (z80sti->ipr & 0xff00) | data;
-		
+
 		for (i = 0; i < 16; i++)
 		{
 			if (!BIT(z80sti->ipr, i) && (z80sti->int_state[i] == Z80_DAISY_INT)) z80sti->int_state[i] = 0;
@@ -438,7 +438,7 @@ WRITE8_DEVICE_HANDLER( z80sti_w )
 		int i;
 		LOG(("Z80STI '%s' Interrupt Pending Register A: %x\n", device->tag, data));
 		z80sti->ipr &= (data << 8) | (z80sti->ipr & 0xff);
-		
+
 		for (i = 0; i < 16; i++)
 		{
 			if (!BIT(z80sti->ipr, i) && (z80sti->int_state[i] == Z80_DAISY_INT)) z80sti->int_state[i] = 0;
@@ -510,21 +510,21 @@ WRITE8_DEVICE_HANDLER( z80sti_w )
 		z80sti->tdr[TIMER_A] = data;
 		break;
 /*
-	case Z80STI_REGISTER_UCR:
-		z80sti->ucr = data;
-		break;
+    case Z80STI_REGISTER_UCR:
+        z80sti->ucr = data;
+        break;
 
-	case Z80STI_REGISTER_RSR:
-		z80sti->rsr = data;
-		break;
+    case Z80STI_REGISTER_RSR:
+        z80sti->rsr = data;
+        break;
 
-	case Z80STI_REGISTER_TSR:
-		z80sti->tsr = data;
-		break;
+    case Z80STI_REGISTER_TSR:
+        z80sti->tsr = data;
+        break;
 
-	case Z80STI_REGISTER_UDR:
-		z80sti->udr = data;
-		break;
+    case Z80STI_REGISTER_UDR:
+        z80sti->udr = data;
+        break;
 */
 	default:
 		LOG(("Z80STI '%s' Unsupported Register %x\n", device->tag, offset & 0x0f));
@@ -674,7 +674,7 @@ static int z80sti_irq_state(const device_config *device)
 	}
 
 	LOG(("Z80STI '%s' Interrupt State: %u\n", device->tag, state));
-	
+
 	return state;
 }
 
@@ -703,7 +703,7 @@ static int z80sti_irq_ack(const device_config *device)
 
 			/* set interrupt in-service register bit */
 			z80sti->isr |= (1 << i);
-			
+
 			check_interrupts(z80sti);
 
 			LOG(("Z80STI '%s' Interrupt Acknowledge Vector: %02x\n", device->tag, vector));
@@ -713,7 +713,7 @@ static int z80sti_irq_ack(const device_config *device)
 	}
 
 	logerror("z80sti_irq_ack: failed to find an interrupt to ack!\n");
-	
+
 	return 0;
 }
 

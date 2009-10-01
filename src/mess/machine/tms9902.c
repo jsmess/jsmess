@@ -1,7 +1,7 @@
 /*
-	TMS9902 Asynchronous Communication Controller
+    TMS9902 Asynchronous Communication Controller
 
-	Raphael Nabet, 2003
+    Raphael Nabet, 2003
 */
 
 #include <math.h>
@@ -10,16 +10,16 @@
 #include "tms9902.h"
 
 /*
-	TMS9902 emulation.
+    TMS9902 emulation.
 
 Overview:
-	TMS9902 is an asynchronous serial controller for use with the TI990 and
-	TMS9900 family.  It provides serial I/O, three extra I/O pins (namely RTS,
-	DSR and CTS), and a timer.  It communicates with the CPU through the CRU
-	I/O bus, and one interrupt pin.
+    TMS9902 is an asynchronous serial controller for use with the TI990 and
+    TMS9900 family.  It provides serial I/O, three extra I/O pins (namely RTS,
+    DSR and CTS), and a timer.  It communicates with the CPU through the CRU
+    I/O bus, and one interrupt pin.
 
 Pins:
-	(...)
+    (...)
 
 */
 
@@ -34,8 +34,8 @@ struct _tms9902_t
 	/* driver-specific configuration */
 	/* tms9902 clock rate (PHI* pin, normally connected to TMS9900 Phi3*) */
 	/* Official range is 2MHz-3.3MHz.  Some tms9902s were sold as "MP9214", and
-	were tested for speeds up to 4MHz, provided the clk4m control bit is set.
-	(warning: 3MHz on a tms9900 is equivalent to 12MHz on a tms9995 or tms99000) */
+    were tested for speeds up to 4MHz, provided the clk4m control bit is set.
+    (warning: 3MHz on a tms9900 is equivalent to 12MHz on a tms9995 or tms99000) */
 	double clock_rate;
 
 	/* CRU interface */
@@ -122,7 +122,7 @@ INLINE tms9902_t *get_token(const device_config *device)
 
 
 /*
-	should be called after any change to int_state or enabled_ints.
+    should be called after any change to int_state or enabled_ints.
 */
 static void field_interrupts(const device_config *device)
 {
@@ -143,10 +143,10 @@ static void field_interrupts(const device_config *device)
 
 
 /*
-	function device should be called by the driver when the state of CTS changes
+    function device should be called by the driver when the state of CTS changes
 
-	state == 0: CTS* is inactive (high)
-	state != 0: CTS* is active (low)
+    state == 0: CTS* is inactive (high)
+    state != 0: CTS* is active (low)
 */
 void tms9902_set_cts(const device_config *device, int state)
 {
@@ -171,10 +171,10 @@ void tms9902_set_cts(const device_config *device, int state)
 
 
 /*
-	function device should be called by the driver when the state of DSR changes
+    function device should be called by the driver when the state of DSR changes
 
-	state == 0: DSR* is inactive (high)
-	state != 0: DSR* is active (low)
+    state == 0: DSR* is inactive (high)
+    state != 0: DSR* is active (low)
 */
 void tms9902_set_dsr(const device_config *device, int state)
 {
@@ -206,8 +206,8 @@ void tms9902_push_data(const device_config *device, int data)
 
 
 /*
-	This call-back is called by the MESS timer system when the decrementer
-	reaches 0.
+    This call-back is called by the MESS timer system when the decrementer
+    reaches 0.
 */
 static TIMER_CALLBACK(decrementer_callback)
 {
@@ -221,7 +221,7 @@ static TIMER_CALLBACK(decrementer_callback)
 }
 
 /*
-	load the content of clockinvl into the decrementer
+    load the content of clockinvl into the decrementer
 */
 static void reload_interval_timer(const device_config *device)
 {
@@ -301,21 +301,21 @@ static void initiate_transmit(const device_config *device)
 
 
 /*----------------------------------------------------------------
-	TMS9902 CRU interface.
+    TMS9902 CRU interface.
 ----------------------------------------------------------------*/
 
 /*
-	Read a 8 bit chunk from tms9902.
+    Read a 8 bit chunk from tms9902.
 
-	signification:
-	bit 0-7: RBR0-7 Receive Buffer register
-	bit 8: not used (always 0)
-	bit 9: RCVERR Receive Error (RFER | ROVER | RPER)
-	bit 10: RPER Receive Parity Error
-	bit 11: ROVER Receive Overrun Error
-	bit 12: RFER Receive Framing Error
-	bit 13-15: not emulated, normally used for diagnostics
-	bit 16: RBINT (RBRL&RIENB)
+    signification:
+    bit 0-7: RBR0-7 Receive Buffer register
+    bit 8: not used (always 0)
+    bit 9: RCVERR Receive Error (RFER | ROVER | RPER)
+    bit 10: RPER Receive Parity Error
+    bit 11: ROVER Receive Overrun Error
+    bit 12: RFER Receive Framing Error
+    bit 13-15: not emulated, normally used for diagnostics
+    bit 16: RBINT (RBRL&RIENB)
 */
 READ8_DEVICE_HANDLER( tms9902_cru_r )
 {
@@ -361,10 +361,10 @@ READ8_DEVICE_HANDLER( tms9902_cru_r )
 }
 
 /*
-	Write 1 bit to tms9902.
+    Write 1 bit to tms9902.
 
-	signification:
-	...
+    signification:
+    ...
 */
 WRITE8_DEVICE_HANDLER( tms9902_cru_w )
 {

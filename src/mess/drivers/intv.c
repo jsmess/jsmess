@@ -16,7 +16,7 @@
  *            Separate stic & video better, get rid of *2 for kbd comp
  *          Add better runtime cart loading
  *          Switch to tilemap system
- *		Add IntelliVoice Support
+ *      Add IntelliVoice Support
  * Note from kevtris about IntelliVoice Hookup:
 <kevtris> the intv uses a special chip
 <kevtris> called the SPB640
@@ -214,7 +214,7 @@ INPUT_PORTS_END
 
 2008-05 FP:
 The keyboard layout is quite strange, with '[' and ']' at the two ends of the 1st row,
-'Esc' in the 2nd row (between 'Tab' and 'Q'), and with Cursor keys and 'Enter' where 
+'Esc' in the 2nd row (between 'Tab' and 'Q'), and with Cursor keys and 'Enter' where
 you would expect the braces. Moreover, Shift + Cursor keys produce characters.
 The emulated layout moves 'Esc', '[' and ']' to their usual position.
 
@@ -334,10 +334,10 @@ static INPUT_PORTS_START( intvkbd )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_5_PAD)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6_PAD)
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7_PAD)
-	
+
 	/* 2008-05 FP: I include here the controller inputs to make happy the read_handler.
-	Please remove this (and re-tag accordingly the inputs above) if intv_right_control_r 
-	is supposed to scan the keyboard inputs when the Keyboard Component is connected */
+    Please remove this (and re-tag accordingly the inputs above) if intv_right_control_r
+    is supposed to scan the keyboard inputs when the Keyboard Component is connected */
 	PORT_INCLUDE( intv )
 INPUT_PORTS_END
 

@@ -1,8 +1,8 @@
 /****************************************************************************
 
-	os9.c
+    os9.c
 
-	CoCo OS-9 disk images
+    CoCo OS-9 disk images
 
 ****************************************************************************/
 
@@ -236,7 +236,7 @@ static int os9_interpret_dirent(void *entry, char **filename, UINT32 *lsn, int *
 
 /*-------------------------------------------------
     os9_decode_file_header - reads a file/directory
-	entry from an LSN, and decodes it
+    entry from an LSN, and decodes it
 -------------------------------------------------*/
 
 static imgtoolerr_t os9_decode_file_header(imgtool_image *image,
@@ -401,7 +401,7 @@ static imgtoolerr_t os9_set_file_size(imgtool_image *image,
 		}
 
 		/* keep in mind that the sector_map might not parallel our expected
-		 * current LSN count; we should tolerate this abnormality */
+         * current LSN count; we should tolerate this abnormality */
 		current_lsn_count = lsn;
 
 		while(current_lsn_count > new_lsn_count)
@@ -477,8 +477,8 @@ static imgtoolerr_t os9_set_file_size(imgtool_image *image,
 
 /*-------------------------------------------------
     os9_lookup_path - walks an OS-9 directory
-	structure to find a file, or optionally, create
-	a file
+    structure to find a file, or optionally, create
+    a file
 -------------------------------------------------*/
 
 static imgtoolerr_t os9_lookup_path(imgtool_image *img, const char *path,
@@ -551,7 +551,7 @@ static imgtoolerr_t os9_lookup_path(imgtool_image *img, const char *path,
 		if (index >= dir_size)
 		{
 			/* if we're not creating, or we are creating but we have not fully
-			 * transversed the directory, error out */
+             * transversed the directory, error out */
 			if (!create || path[strlen(path) + 1])
 			{
 				err = IMGTOOLERR_PATHNOTFOUND;
@@ -914,8 +914,8 @@ static imgtoolerr_t os9_diskimage_nextenum(imgtool_directory *enumeration, imgto
 			pick_string(dir_entry, 0, 28, filename);
 
 			/* we have certain expectations of the directory contents; the
-			 * first directory entry should be "..", the second ".", and
-			 * subsequent entries should never be "." or ".." */
+             * first directory entry should be "..", the second ".", and
+             * subsequent entries should never be "." or ".." */
 			switch(os9enum->index)
 			{
 				case 0:

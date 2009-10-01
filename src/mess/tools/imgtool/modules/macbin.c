@@ -1,8 +1,8 @@
 /****************************************************************************
 
-	macbin.c
+    macbin.c
 
-	MacBinary filter for use with Mac and ProDOS drivers
+    MacBinary filter for use with Mac and ProDOS drivers
 
 *****************************************************************************
 
@@ -11,36 +11,36 @@
   Offset  Length  Description
   ------  ------  -----------
        0       1  [I]   Magic byte (0x00)
-	   1      64  [I]   File name (Pascal String)
+       1      64  [I]   File name (Pascal String)
       65       4  [I]   File Type Code
-	  69       4  [I]   File Creator Code
-	  73       1  [I]   Finder Flags (bits 15-8)
-	  74       1  [I]   Magic byte (0x00)
-	  75       2  [I]   File Vertical Position
-	  77       2  [I]   File Horizontal Position
-	  79       2  [I]   Window/Folder ID
-	  81       1  [I]   Protected (bit 0)
-	  82       1  [I]   Magic byte (0x00)
-	  83       4  [I]   Data Fork Length
-	  87       4  [I]   Resource Fork Length
-	  91       4  [I]   Creation Date
-	  95       4  [I]   Last Modified Date
-	  99       2  [I]   "Get Info" comment length
+      69       4  [I]   File Creator Code
+      73       1  [I]   Finder Flags (bits 15-8)
+      74       1  [I]   Magic byte (0x00)
+      75       2  [I]   File Vertical Position
+      77       2  [I]   File Horizontal Position
+      79       2  [I]   Window/Folder ID
+      81       1  [I]   Protected (bit 0)
+      82       1  [I]   Magic byte (0x00)
+      83       4  [I]   Data Fork Length
+      87       4  [I]   Resource Fork Length
+      91       4  [I]   Creation Date
+      95       4  [I]   Last Modified Date
+      99       2  [I]   "Get Info" comment length
      101       1  [II]  Finder Flags (bits 7-0)
-	 102       4  [III] MacBinary III Signature 'mBIN'
-	 106       1  [III] Script of Filename
-	 107       1  [III] Extended Finder Flags
-	 116       4  [II]  Unpacked Length
-	 120       2  [II]  Secondary Header Length
-	 122       1  [II]  MacBinary II Version Number (II: 0x81, III: 0x82)
-	 123       1  [II]  Minimum Compatible MacBinary II Version Number (0x81)
-	 124       2  [II]  CRC of previous 124 bytes
+     102       4  [III] MacBinary III Signature 'mBIN'
+     106       1  [III] Script of Filename
+     107       1  [III] Extended Finder Flags
+     116       4  [II]  Unpacked Length
+     120       2  [II]  Secondary Header Length
+     122       1  [II]  MacBinary II Version Number (II: 0x81, III: 0x82)
+     123       1  [II]  Minimum Compatible MacBinary II Version Number (0x81)
+     124       2  [II]  CRC of previous 124 bytes
 
-	For more information, consult http://www.lazerware.com/formats/macbinary.html
+    For more information, consult http://www.lazerware.com/formats/macbinary.html
 
-	TODO: I believe that the script code is some sort of identifier identifying
-	the character set used for the filename.  If this is true, we are not
-	handling that properly
+    TODO: I believe that the script code is some sort of identifier identifying
+    the character set used for the filename.  If this is true, we are not
+    handling that properly
 
 *****************************************************************************/
 

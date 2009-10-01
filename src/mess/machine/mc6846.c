@@ -81,7 +81,7 @@ typedef struct
 
 
 
-INLINE mc6846_t* get_safe_token( const device_config *device ) 
+INLINE mc6846_t* get_safe_token( const device_config *device )
 {
 	assert( device != NULL );
 	assert( device->token != NULL );

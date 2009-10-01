@@ -1,10 +1,10 @@
 /************************************************************************
-	crct6845
+    crct6845
 
-	MESS Driver By:
+    MESS Driver By:
 
- 	Gordon Jefferyes
- 	mess_bbc@gjeffery.dircon.co.uk
+    Gordon Jefferyes
+    mess_bbc@gjeffery.dircon.co.uk
 
  ************************************************************************/
 

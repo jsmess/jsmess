@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	testzpth.c
+    testzpth.c
 
-	Code for testing zip paths
+    Code for testing zip paths
 
 *********************************************************************/
 
@@ -12,7 +12,7 @@
 
 /*-------------------------------------------------
     dir_entry_type_string - gets a string
-	representation of a osd_dir_entry_type
+    representation of a osd_dir_entry_type
 -------------------------------------------------*/
 
 static const char *dir_entry_type_string(osd_dir_entry_type type)
@@ -105,7 +105,7 @@ void node_testzippath(xml_data_node *node)
 		{
 			report_message(MSG_FAILURE, "File sizes match, but contents do not");
 			goto done;
-		}		
+		}
 	}
 
 	/* try doing a directory listing */

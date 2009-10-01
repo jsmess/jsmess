@@ -6,27 +6,27 @@
     Visit http://mamedev.org for licensing and usage restrictions.
 
 **********************************************************************
-							_____   _____
-				DTACKL   1 |*    \_/     | 40  WEL
-				   A17   2 |			 | 39  PCENL
-				   A16   3 |			 | 38  VDA
-				  RDWL   4 |			 | 37  ROWL
-				 DSMCL   5 |			 | 36  TX0EL
-				   VCC   6 |			 | 35  XTAL2
-				CLKCPU   7 |			 | 34  XTAL1
-				  RASL   8 |			 | 33  ROM0EH
-				 CAS0L   9 |			 | 32  BLUE
-				 CAS1L  10 |	ZX8301	 | 31  GREEN
-				VSYNCH  11 |	 ULA	 | 30  RED
-				CSYNCL  12 |			 | 29  DB7
-				   DA0  13 |			 | 28  DA7
-				   DB0  14 |			 | 27  DA6
-				   VDD  15 |			 | 26  DB6
-				   DB1  16 |			 | 25  DB5
-				   DA1  17 |			 | 24  DA5
-				   DA2  18 |			 | 23  DB4
-				   DB2  19 |			 | 22  DA4
-				   DA3  20 |_____________| 21  DB3
+                            _____   _____
+                DTACKL   1 |*    \_/     | 40  WEL
+                   A17   2 |             | 39  PCENL
+                   A16   3 |             | 38  VDA
+                  RDWL   4 |             | 37  ROWL
+                 DSMCL   5 |             | 36  TX0EL
+                   VCC   6 |             | 35  XTAL2
+                CLKCPU   7 |             | 34  XTAL1
+                  RASL   8 |             | 33  ROM0EH
+                 CAS0L   9 |             | 32  BLUE
+                 CAS1L  10 |    ZX8301   | 31  GREEN
+                VSYNCH  11 |     ULA     | 30  RED
+                CSYNCL  12 |             | 29  DB7
+                   DA0  13 |             | 28  DA7
+                   DB0  14 |             | 27  DA6
+                   VDD  15 |             | 26  DB6
+                   DB1  16 |             | 25  DB5
+                   DA1  17 |             | 24  DA5
+                   DA2  18 |             | 23  DB4
+                   DB2  19 |             | 22  DA4
+                   DA3  20 |_____________| 21  DB3
 
 **********************************************************************/
 

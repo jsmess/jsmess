@@ -1,8 +1,8 @@
 /****************************************************************************
 
-	modules.h
+    modules.h
 
-	Code that creates the "canonical" Imgtool library
+    Code that creates the "canonical" Imgtool library
 
 ****************************************************************************/
 

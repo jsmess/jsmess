@@ -13,7 +13,7 @@
 
 extern UINT8 orion128_video_mode;
 extern UINT8 orion128_video_page;
-extern UINT8 orion128_video_width;  
+extern UINT8 orion128_video_width;
 extern UINT8 orion_video_mode_mask ;
 extern UINT8 orionpro_pseudo_color;
 
@@ -31,9 +31,9 @@ extern INTERRUPT_GEN( orionz80_interrupt );
 extern READ8_HANDLER ( orion128_system_r );
 extern WRITE8_HANDLER ( orion128_system_w );
 extern READ8_HANDLER ( orion128_romdisk_r );
-extern WRITE8_HANDLER ( orion128_romdisk_w );    
-extern WRITE8_HANDLER ( orion128_video_mode_w );    
-extern WRITE8_HANDLER ( orion128_memory_page_w );    
+extern WRITE8_HANDLER ( orion128_romdisk_w );
+extern WRITE8_HANDLER ( orion128_video_mode_w );
+extern WRITE8_HANDLER ( orion128_memory_page_w );
 extern WRITE8_HANDLER ( orion128_video_page_w );
 extern WRITE8_HANDLER ( orionz80_memory_page_w );
 extern WRITE8_HANDLER ( orionz80_dispatcher_w );
@@ -48,7 +48,7 @@ extern MACHINE_START( orionpro );
 extern MACHINE_RESET( orionpro );
 extern READ8_HANDLER ( orionpro_io_r );
 extern WRITE8_HANDLER ( orionpro_io_w );
-    
+
 /*----------- defined in video/orion.c -----------*/
 
 extern VIDEO_START( orion128 );

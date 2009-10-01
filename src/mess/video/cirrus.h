@@ -1,8 +1,8 @@
 /***************************************************************************
 
-	video/cirrus.h
+    video/cirrus.h
 
-	Cirrus SVGA card emulation (preliminary)
+    Cirrus SVGA card emulation (preliminary)
 
 ***************************************************************************/
 

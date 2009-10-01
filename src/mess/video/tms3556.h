@@ -1,5 +1,5 @@
 /*
-	tms3556.h: header file for tms3556.c
+    tms3556.h: header file for tms3556.c
 */
 
 READ8_HANDLER(tms3556_vram_r);

@@ -145,11 +145,11 @@ MACHINE_START( cgenie )
 	head = 0;
 
 	/*
-	 * Every fifth cycle is a wait cycle, so I reduced
-	 * the overlocking by one fitfth
-	 * Underclocking causes the tape loading to not work.
-	 */
-//	cpunum_set_clockscale(machine, 0, 0.80);
+     * Every fifth cycle is a wait cycle, so I reduced
+     * the overlocking by one fitfth
+     * Underclocking causes the tape loading to not work.
+     */
+//  cpunum_set_clockscale(machine, 0, 0.80);
 
 	/* Initialize some patterns to be displayed in graphics mode */
 	for( i = 0; i < 256; i++ )
@@ -164,7 +164,7 @@ MACHINE_START( cgenie )
 
 /*************************************
  *
- *				Port handlers.
+ *              Port handlers.
  *
  *************************************/
 
@@ -266,9 +266,9 @@ int cgenie_port_xx_r( int offset )
 }
 
 /*************************************
- *									 *
- *		Memory handlers 			 *
- *									 *
+ *                                   *
+ *      Memory handlers              *
+ *                                   *
  *************************************/
 
 static UINT8 psg_a_out = 0x00;
@@ -482,7 +482,7 @@ WRITE8_HANDLER( cgenie_motor_w )
 }
 
 /*************************************
- *		Keyboard					 *
+ *      Keyboard                     *
  *************************************/
  READ8_HANDLER( cgenie_keyboard_r )
 {
@@ -516,7 +516,7 @@ WRITE8_HANDLER( cgenie_motor_w )
 }
 
 /*************************************
- *		Video RAM					 *
+ *      Video RAM                    *
  *************************************/
 
 int cgenie_videoram_r( int offset )
@@ -580,7 +580,7 @@ WRITE8_HANDLER( cgenie_fontram_w )
 
 /*************************************
  *
- *		Interrupt handlers.
+ *      Interrupt handlers.
  *
  *************************************/
 

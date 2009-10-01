@@ -1,6 +1,6 @@
 /* ay31015.h
 
-	Written for MESS by Robbbert on May 29th, 2008.
+    Written for MESS by Robbbert on May 29th, 2008.
 
 */
 

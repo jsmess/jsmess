@@ -23,7 +23,7 @@ static MACHINE_START(apexc)
 
 /*
     APEXC RAM loading/saving from cylinder image
-	
+
     Note that, in an actual APEXC, the RAM contents are not read from the cylinder :
     the cylinder IS the RAM.
 

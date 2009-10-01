@@ -283,6 +283,6 @@ SYSTEM_CONFIG_END
     GAME DRIVERS
 ***************************************************************************/
 
-/*	 YEAR  NAME			PARENT  COMPAT  MACHINE  INPUT   INIT    CONFIG  COMPANY     FULLNAME  FLAGS */
+/*   YEAR  NAME         PARENT  COMPAT  MACHINE  INPUT   INIT    CONFIG  COMPANY     FULLNAME  FLAGS */
 COMP(1977, aim65,		0,      0,      aim65,   aim65,  0,      aim65,  "Rockwell", "AIM 65", 0)
 COMP(1981, aim65_40,	aim65,  0,      aim65,	 aim65,  0,      aim65,  "Rockwell", "AIM 65/40", GAME_NOT_WORKING)

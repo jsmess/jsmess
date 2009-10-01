@@ -107,7 +107,7 @@ static void abc80_update(running_machine *machine, bitmap_t *bitmap, const recta
 			UINT8 data = 0;
 			int cursor, blank, tecken, graf, versal;
 			int bit;
-			
+
 			if (hsync_data & ABC80_K5_LINE_END)
 				c = 0;
 
@@ -116,15 +116,15 @@ static void abc80_update(running_machine *machine, bitmap_t *bitmap, const recta
 
 			/*
 
-				Video RAM Addressing Scheme
+                Video RAM Addressing Scheme
 
-				A9 A8 A7 A6 A5 A4 A3 A2 A1 A0
-				R2 R1 R0 xx xx xx xx C2 C1 C0
+                A9 A8 A7 A6 A5 A4 A3 A2 A1 A0
+                R2 R1 R0 xx xx xx xx C2 C1 C0
 
-				A6 A5 A4 A3 = 00 C5 C4 C3 + R4 R3 R4 R3
+                A6 A5 A4 A3 = 00 C5 C4 C3 + R4 R3 R4 R3
 
-			*/
-			
+            */
+
 			videoram_addr = ((r & 0x07) << 7) | ((((c >> 3) & 0x07) + ((r >> 3) | (r >> 1))) & 0x0f) | (c & 0x07);
 			videoram_data = videoram[videoram_addr];
 			attr_addr = ((dh & dv) << 7) & (data & 0x7f);

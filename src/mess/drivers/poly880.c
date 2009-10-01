@@ -4,7 +4,7 @@
 
     12/05/2009 Skeleton driver.
 
-	http://www.kc85-museum.de/books/poly880/index.html
+    http://www.kc85-museum.de/books/poly880/index.html
 
 ****************************************************************************/
 
@@ -19,13 +19,13 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- SEND/SCON
-	- MCYCL (activate single stepping)
-	- CYCL (single step)
-	- layout LEDs (address bus, data bus, command bus, MCYCL)
-	- RAM expansion
+    - SEND/SCON
+    - MCYCL (activate single stepping)
+    - CYCL (single step)
+    - layout LEDs (address bus, data bus, command bus, MCYCL)
+    - RAM expansion
 
 */
 
@@ -84,7 +84,7 @@ static INPUT_CHANGED( trigger_nmi )
 static INPUT_PORTS_START( poly880 )
 	PORT_START("KI1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("GO") PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED ) 
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("EXEC") PORT_CODE(KEYCODE_ENTER)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("BACK") PORT_CODE(KEYCODE_BACKSPACE)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("REG") PORT_CODE(KEYCODE_R)
@@ -154,19 +154,19 @@ static const z80ctc_interface ctc_intf =
 static WRITE8_DEVICE_HANDLER( pio1_port_a_w )
 {
 	/*
-		
-		bit		signal	description
 
-		PA0		SD0		segment E
-		PA1		SD1		segment D
-		PA2		SD2		segment C
-		PA3		SD3		segment P
-		PA4		SD4		segment G
-		PA5		SD5		segment A
-		PA6		SD6		segment F
-		PA7		SD7		segment B
+        bit     signal  description
 
-	*/
+        PA0     SD0     segment E
+        PA1     SD1     segment D
+        PA2     SD2     segment C
+        PA3     SD3     segment P
+        PA4     SD4     segment G
+        PA5     SD5     segment A
+        PA6     SD6     segment F
+        PA7     SD7     segment B
+
+    */
 
 	poly880_state *state = device->machine->driver_data;
 
@@ -178,19 +178,19 @@ static WRITE8_DEVICE_HANDLER( pio1_port_a_w )
 static READ8_DEVICE_HANDLER( pio1_port_b_r )
 {
 	/*
-		
-		bit		signal	description
 
-		PB0		TTY
-		PB1		MIN		tape input
-		PB2		MOUT	tape output
-		PB3		
-		PB4		KI1		key row 1 input
-		PB5		KI2		key row 2 input
-		PB6		SCON
-		PB7		KI3		key row 3 input
+        bit     signal  description
 
-	*/
+        PB0     TTY
+        PB1     MIN     tape input
+        PB2     MOUT    tape output
+        PB3
+        PB4     KI1     key row 1 input
+        PB5     KI2     key row 2 input
+        PB6     SCON
+        PB7     KI3     key row 3 input
+
+    */
 
 	poly880_state *state = device->machine->driver_data;
 
@@ -213,19 +213,19 @@ static READ8_DEVICE_HANDLER( pio1_port_b_r )
 static WRITE8_DEVICE_HANDLER( pio1_port_b_w )
 {
 	/*
-		
-		bit		signal	description
 
-		PB0		TTY		teletype serial output
-		PB1		MIN
-		PB2		MOUT	tape output
-		PB3		
-		PB4		KI1		key row 1 input
-		PB5		KI2		key row 2 input
-		PB6		SCON
-		PB7		KI3		key row 3 input
+        bit     signal  description
 
-	*/
+        PB0     TTY     teletype serial output
+        PB1     MIN
+        PB2     MOUT    tape output
+        PB3
+        PB4     KI1     key row 1 input
+        PB5     KI2     key row 2 input
+        PB6     SCON
+        PB7     KI3     key row 3 input
+
+    */
 
 	poly880_state *state = device->machine->driver_data;
 
@@ -325,5 +325,5 @@ SYSTEM_CONFIG_END
 
 /* System Drivers */
 
-/*    YEAR	NAME		PARENT	COMPAT	MACHINE		INPUT		INIT	CONFIG		COMPANY				FULLNAME				FLAGS */
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    CONFIG      COMPANY             FULLNAME                FLAGS */
 COMP( 1983, poly880,	0,		0,		poly880,	poly880,	0,		poly880,	"VEB Polytechnik",	"Poly-Computer 880",	GAME_SUPPORTS_SAVE )

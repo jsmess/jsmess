@@ -234,7 +234,7 @@ static DEVICE_START(vic6560_sound)
 	channel = stream_create(device, 0, 1, device->machine->sample_rate, 0, vic6560_update);
 
 	/* buffer for fastest played sample for 5 second
-	 * so we have enough data for min 5 second */
+     * so we have enough data for min 5 second */
 	noisesize = NOISE_FREQUENCY_MAX * NOISE_BUFFER_SIZE_SEC;
 	noise = auto_alloc_array(device->machine, INT8, noisesize);
 	{

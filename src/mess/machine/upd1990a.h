@@ -1,19 +1,19 @@
 /**********************************************************************
 
-	NEC uPD1990AC Serial I/O Calendar & Clock emulation
+    NEC uPD1990AC Serial I/O Calendar & Clock emulation
 
-	Copyright MESS Team.
+    Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
 
 **********************************************************************
-							_____   _____
-				    C2	 1 |*    \_/     | 14  Vdd
-					C1	 2 |			 | 13  XTAL
-					C0	 3 |			 | 12  _XTAL
-				   STB	 4 |  uPD1990AC	 | 11  OUT ENBL
-					CS	 5 |			 | 10  TP
-			   DATA IN	 6 |			 | 9   DATA OUT
-				   GND   7 |_____________| 8   CLK
+                            _____   _____
+                    C2   1 |*    \_/     | 14  Vdd
+                    C1   2 |             | 13  XTAL
+                    C0   3 |             | 12  _XTAL
+                   STB   4 |  uPD1990AC  | 11  OUT ENBL
+                    CS   5 |             | 10  TP
+               DATA IN   6 |             | 9   DATA OUT
+                   GND   7 |_____________| 8   CLK
 
 **********************************************************************/
 

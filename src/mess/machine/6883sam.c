@@ -1,53 +1,53 @@
 /**********************************************************************
 
-	Motorola 6883 SAM interface and emulation
+    Motorola 6883 SAM interface and emulation
 
-	This function emulates all the functionality of one M6883
-	synchronous address multiplexer.
+    This function emulates all the functionality of one M6883
+    synchronous address multiplexer.
 
-	Note that the real SAM chip was intimately involved in things like
-	memory and video addressing, which are things that the MAME core
-	largely handles.  Thus, this code only takes care of a small part
-	of the SAM's actual functionality; it simply tracks the SAM
-	registers and handles things like save states.  It then delegates
-	the bulk of the responsibilities back to the host.
+    Note that the real SAM chip was intimately involved in things like
+    memory and video addressing, which are things that the MAME core
+    largely handles.  Thus, this code only takes care of a small part
+    of the SAM's actual functionality; it simply tracks the SAM
+    registers and handles things like save states.  It then delegates
+    the bulk of the responsibilities back to the host.
 
-	The Motorola 6883 SAM has 16 bits worth of state, but the state is changed
-	by writing into a 32 byte address space; odd bytes set bits and even bytes
-	clear bits.  Here is the layout:
+    The Motorola 6883 SAM has 16 bits worth of state, but the state is changed
+    by writing into a 32 byte address space; odd bytes set bits and even bytes
+    clear bits.  Here is the layout:
 
-		31	Set		TY	Map Type			0: RAM/ROM	1: All RAM
-		30	Clear	TY	Map Type
-		29	Set		M1	Memory Size			00: 4K		10: 64K Dynamic
-		28	Clear	M1	Memory Size			01: 16K		11: 64K Static
-		27	Set		M0	Memory Size
-		26	Clear	M0	Memory Size
-		25	Set		R1	MPU Rate			00: Slow	10: Fast
-		24	Clear	R1	MPU Rate			01: Dual	11: Fast
-		23	Set		R0	MPU Rate
-		22	Clear	R0	MPU Rate
-		21	Set		P1	Page #1				0: Low		1: High
-		20	Clear	P1	Page #1
-		19	Set		F6	Display Offset
-		18	Clear	F6	Display Offset
-		17	Set		F5	Display Offset
-		16	Clear	F5	Display Offset
-		15	Set		F4	Display Offset
-		14	Clear	F4	Display Offset
-		13	Set		F3	Display Offset
-		12	Clear	F3	Display Offset
-		11	Set		F2	Display Offset
-		10	Clear	F2	Display Offset
-		 9	Set		F1	Display Offset
-		 8	Clear	F1	Display Offset
-		 7	Set		F0	Display Offset
-		 6	Clear	F0	Display Offset
-		 5	Set		V2	VDG Mode
-		 4	Clear	V2	VDG Mode
-		 3	Set		V1	VDG Mode
-		 2	Clear	V1	VDG Mode
-		 1	Set		V0	VDG Mode
-		 0	Clear	V0	VDG Mode
+        31  Set     TY  Map Type            0: RAM/ROM  1: All RAM
+        30  Clear   TY  Map Type
+        29  Set     M1  Memory Size         00: 4K      10: 64K Dynamic
+        28  Clear   M1  Memory Size         01: 16K     11: 64K Static
+        27  Set     M0  Memory Size
+        26  Clear   M0  Memory Size
+        25  Set     R1  MPU Rate            00: Slow    10: Fast
+        24  Clear   R1  MPU Rate            01: Dual    11: Fast
+        23  Set     R0  MPU Rate
+        22  Clear   R0  MPU Rate
+        21  Set     P1  Page #1             0: Low      1: High
+        20  Clear   P1  Page #1
+        19  Set     F6  Display Offset
+        18  Clear   F6  Display Offset
+        17  Set     F5  Display Offset
+        16  Clear   F5  Display Offset
+        15  Set     F4  Display Offset
+        14  Clear   F4  Display Offset
+        13  Set     F3  Display Offset
+        12  Clear   F3  Display Offset
+        11  Set     F2  Display Offset
+        10  Clear   F2  Display Offset
+         9  Set     F1  Display Offset
+         8  Clear   F1  Display Offset
+         7  Set     F0  Display Offset
+         6  Clear   F0  Display Offset
+         5  Set     V2  VDG Mode
+         4  Clear   V2  VDG Mode
+         3  Set     V1  VDG Mode
+         2  Clear   V1  VDG Mode
+         1  Set     V0  VDG Mode
+         0  Clear   V0  VDG Mode
 
 **********************************************************************/
 

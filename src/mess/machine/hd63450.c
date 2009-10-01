@@ -1,7 +1,7 @@
 /*
     Hitachi HD63450 DMA Controller
 
-	Largely based on documentation of the Sharp X68000
+    Largely based on documentation of the Sharp X68000
 */
 
 #include "machine/hd63450.h"
@@ -130,8 +130,8 @@ void hd63450_write(const device_config* device, int offset, int data, UINT16 mem
 	case 0x00:  // CSR / CER
 		if(ACCESSING_BITS_8_15)
 		{
-//			dmac->reg[channel].csr = (data & 0xff00) >> 8;
-//			logerror("DMA#%i: Channel status write : %02x\n",channel,dmac.reg[channel].csr);
+//          dmac->reg[channel].csr = (data & 0xff00) >> 8;
+//          logerror("DMA#%i: Channel status write : %02x\n",channel,dmac.reg[channel].csr);
 		}
 		// CER is read-only, so no action needed there.
 		break;
@@ -353,7 +353,7 @@ void hd63450_single_transfer(const device_config* device, int x)
 						break;
 					}
 				}
-//				logerror("DMA#%i: byte transfer %08lx -> %08lx  (byte = %02x)\n",x,dmac.reg[x].dar,dmac.reg[x].mar,data);
+//              logerror("DMA#%i: byte transfer %08lx -> %08lx  (byte = %02x)\n",x,dmac.reg[x].dar,dmac.reg[x].mar,data);
 			}
 			else  // memory -> device
 			{
@@ -391,7 +391,7 @@ void hd63450_single_transfer(const device_config* device, int x)
 						break;
 					}
 				}
-//				logerror("DMA#%i: byte transfer %08lx -> %08lx\n",x,dmac->reg[x].mar,dmac->reg[x].dar);
+//              logerror("DMA#%i: byte transfer %08lx -> %08lx\n",x,dmac->reg[x].mar,dmac->reg[x].dar);
 			}
 
 

@@ -5,15 +5,15 @@
   Machine file to handle emulation of the Sega Mega Drive & Genesis.
 
 
-	2008-09: Moved here cart code and custom mapper handlers. Hopefully,
-		it will make painless the future merging with HazeMD
-	2008-10: Fixed SRAM, matching as much as possible HazeMD. Some game is 
-		not detected, however. E.g. Sonic 3. Also some games seem false
-		positives (e.g. Wonderboy 5: according to its headers it should
-		have 1byte of SRAM). Better detection routines would be welcome.
-	2009-06: Changed SRAM code, fixing more games, including Sonic 3. The
-		false positives seem only some of the games using EEPROM. Todo
-		list in mess/drivers/genesis.c includes EEPROM emulation.
+    2008-09: Moved here cart code and custom mapper handlers. Hopefully,
+        it will make painless the future merging with HazeMD
+    2008-10: Fixed SRAM, matching as much as possible HazeMD. Some game is
+        not detected, however. E.g. Sonic 3. Also some games seem false
+        positives (e.g. Wonderboy 5: according to its headers it should
+        have 1byte of SRAM). Better detection routines would be welcome.
+    2009-06: Changed SRAM code, fixing more games, including Sonic 3. The
+        false positives seem only some of the games using EEPROM. Todo
+        list in mess/drivers/genesis.c includes EEPROM emulation.
 
 ***************************************************************************/
 
@@ -91,13 +91,13 @@ static WRITE16_HANDLER( genesis_ssf2_bank_w )
 	static int lastoffset = -1,lastdata = -1;
 	UINT8 *ROM = memory_region(space->machine, "maincpu");
 
-	if ((lastoffset != offset) || (lastdata != data)) 
+	if ((lastoffset != offset) || (lastdata != data))
 	{
 		lastoffset = offset; lastdata = data;
 		switch (offset << 1)
 		{
 			case 0x00: /* write protect register // this is not a write protect, but seems to do nothing useful but reset bank0 after the checksum test (red screen otherwise) */
-				if (data == 2) 
+				if (data == 2)
 				{
 					memcpy(ROM + 0x000000, ROM + 0x400000 + (((data & 0xf) - 2) * 0x080000), 0x080000);
 				}
@@ -129,12 +129,12 @@ static WRITE16_HANDLER( genesis_ssf2_bank_w )
 
 /*static WRITE16_HANDLER( g_l3alt_pdat_w )
 {
-	g_l3alt_pdat = data;
+    g_l3alt_pdat = data;
 }
 
 static WRITE16_HANDLER( g_l3alt_pcmd_w )
 {
-	g_l3alt_pcmd = data;
+    g_l3alt_pcmd = data;
 }
 */
 
@@ -180,7 +180,7 @@ static READ16_HANDLER( g_l3alt_prot_r )
 			break;
 	}
 
-/*	printf("%06x: g_l3alt_pdat_w %04x g_l3alt_pcmd_w %04x return %04x\n", activecpu_get_pc(), g_l3alt_pdat, g_l3alt_pcmd, retdata); */
+/*  printf("%06x: g_l3alt_pdat_w %04x g_l3alt_pcmd_w %04x return %04x\n", activecpu_get_pc(), g_l3alt_pdat, g_l3alt_pcmd, retdata); */
 
 	return retdata;
 }
@@ -308,12 +308,12 @@ static READ16_HANDLER( g_chifi3_prot_r )
 	UINT32 retdat;
 
 	/* not 100% correct, there may be some relationship between the reads here
-	and the writes made at the start of the game.. */
+    and the writes made at the start of the game.. */
 
 	/*
-	04dc10 chifi3, prot_r? 2800
-	04cefa chifi3, prot_r? 65262
-	*/
+    04dc10 chifi3, prot_r? 2800
+    04cefa chifi3, prot_r? 65262
+    */
 
 	if (cpu_get_pc(space->cpu) == 0x01782) // makes 'VS' screen appear
 	{
@@ -623,8 +623,8 @@ static WRITE16_HANDLER( genesis_sram_toggle )
 {
 
 	/* unsure if this is actually supposed to toggle or just switch on?
-	* Yet to encounter game that utilizes
-	*/
+    * Yet to encounter game that utilizes
+    */
 	genesis_sram_active = (data & 1) ? 1 : 0;
 	genesis_sram_readonly = (data & 2) ? 1 : 0;
 
@@ -830,7 +830,7 @@ static void setup_megadriv_custom_mappers(running_machine *machine)
 
 		memcpy(&ROM[0x400000], &ROM[relocate], 0x80000);
 
-		for (mirroraddr = 0; mirroraddr < 0x400000; mirroraddr += 0x2000) 
+		for (mirroraddr = 0; mirroraddr < 0x400000; mirroraddr += 0x2000)
 		{
 			memcpy(ROM + mirroraddr, ROM + relocate + 0x7e000, 0x002000); /* copy last 8kb across the whole rom region */
 		}
@@ -853,19 +853,19 @@ static void setup_megadriv_custom_mappers(running_machine *machine)
 	}
 
 	/* Disable SRAM handlers if it's a game using EEPROM to save
-	progresses. Currently EEPROM is not emulated. */
+    progresses. Currently EEPROM is not emulated. */
 	if (!has_serial_eeprom)
 	{
 		/* Info from DGen: If SRAM does not overlap main ROM, set it active by
-		default since a few games can't manage to properly switch it on/off. */
+        default since a few games can't manage to properly switch it on/off. */
 		if (genesis_last_loaded_image_length <= genesis_sram_start)
 			genesis_sram_active = 1;
 
 		memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa130f0, 0xa130f1, 0, 0, genesis_sram_toggle);
 
 		/* Sonic 1 included in Sonic Classics doesn't have SRAM and
-		does lots of ROM access at this range, then only install read/
-		write handlers if SRAM is active to not slow down emulation. */
+        does lots of ROM access at this range, then only install read/
+        write handlers if SRAM is active to not slow down emulation. */
 		if (genesis_sram_active)
 			install_sram_rw_handlers (machine);
 	}
@@ -1095,7 +1095,7 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 
 	/* Detect carts which need additional handlers */
 	{
-		static const unsigned char smouse_sig[] = { 0x4d, 0xf9, 0x00, 0x40, 0x00, 0x02 }, 
+		static const unsigned char smouse_sig[] = { 0x4d, 0xf9, 0x00, 0x40, 0x00, 0x02 },
 			mjlover_sig[]	= { 0x13, 0xf9, 0x00, 0x40, 0x00, 0x00 }, // move.b  ($400000).l,($FFFF0C).l (partial)
 			squir_sig[]		= { 0x26, 0x79, 0x00, 0xff, 0x00, 0xfa },
 			bugsl_sig[]		= { 0x20, 0x12, 0x13, 0xc0, 0x00, 0xff },
@@ -1226,9 +1226,9 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 	/* check if cart has battery save */
 
 	/* For games using SRAM, unfortunately there are ROMs without info
-	about it in header. The solution adopted is do the mapping anyway,
-	then active SRAM later if the game will access it. */
-	
+    about it in header. The solution adopted is do the mapping anyway,
+    then active SRAM later if the game will access it. */
+
 	if (ROM[0x1b1] == 'R' && ROM[0x1b0] == 'A')
 	{
 		/* SRAM info found in header */
@@ -1239,7 +1239,7 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 			genesis_sram_end = genesis_sram_start + 0x0FFFF;
 
 		/* for some games using serial EEPROM, difference between SRAM
-		end to start is 0 or 1. Currently EEPROM is not emulated. */
+        end to start is 0 or 1. Currently EEPROM is not emulated. */
 		if ((genesis_sram_end - genesis_sram_start) < 2)
 			has_serial_eeprom = 1;
 		else
@@ -1262,9 +1262,9 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 	megadriv_backupram = (UINT16*) (ROM + (genesis_sram_start & 0x3fffff));
 
 	/* Until serial EEPROM is emulated, clears one byte at beginning of
-	backup RAM, but only if the value is 0xFFFF, to not break MLBPA Sports
-	Talk Baseball. With this hack some games at least run (NBA Jam, Evander
-	Holyfield's Real Deal Boxing, Greatest Heavyweights of the Ring) */
+    backup RAM, but only if the value is 0xFFFF, to not break MLBPA Sports
+    Talk Baseball. With this hack some games at least run (NBA Jam, Evander
+    Holyfield's Real Deal Boxing, Greatest Heavyweights of the Ring) */
 	if (has_serial_eeprom && megadriv_backupram[0] == 0xffff)
 		megadriv_backupram[0] = 0xff00;
 

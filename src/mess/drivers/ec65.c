@@ -1,5 +1,5 @@
 /***************************************************************************
-   
+
         EC-65
 
         16/07/2009 Initial driver.
@@ -34,7 +34,7 @@ static ADDRESS_MAP_START(ec65_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xe110, 0xe11f) AM_DEVREADWRITE(VIA6522_1_TAG, via_r, via_w)
 	AM_RANGE(0xe130, 0xe133) AM_DEVREADWRITE(ACIA6551_TAG,  acia_6551_r, acia_6551_w )
 	AM_RANGE(0xe140, 0xe140) AM_DEVWRITE(MC6845_TAG, mc6845_address_w)
-	AM_RANGE(0xe141, 0xe141) AM_DEVREADWRITE(MC6845_TAG, mc6845_register_r , mc6845_register_w)	
+	AM_RANGE(0xe141, 0xe141) AM_DEVREADWRITE(MC6845_TAG, mc6845_register_r , mc6845_register_w)
 	AM_RANGE(0xe400, 0xe7ff) AM_RAM // 1KB on-board RAM
 	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE(&video_ram)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
@@ -95,36 +95,36 @@ static WRITE8_DEVICE_HANDLER( ec65_via_write_b )
 
 const via6522_interface ec65_via_1_intf=
 {
-	DEVCB_NULL,   /* in_a_func */   
-	DEVCB_HANDLER(ec65_via_read_b),   /* in_b_func */   
-	DEVCB_NULL,     /* in_ca1_func */ 
-	DEVCB_NULL,                       /* in_cb1_func */ 
-	DEVCB_NULL,                       /* in_ca2_func */ 
-	DEVCB_NULL,                       /* in_cb2_func */ 
-	DEVCB_HANDLER(ec65_via_write_a),  /* out_a_func */  
-	DEVCB_HANDLER(ec65_via_write_b),  /* out_b_func */  
+	DEVCB_NULL,   /* in_a_func */
+	DEVCB_HANDLER(ec65_via_read_b),   /* in_b_func */
+	DEVCB_NULL,     /* in_ca1_func */
+	DEVCB_NULL,                       /* in_cb1_func */
+	DEVCB_NULL,                       /* in_ca2_func */
+	DEVCB_NULL,                       /* in_cb2_func */
+	DEVCB_HANDLER(ec65_via_write_a),  /* out_a_func */
+	DEVCB_HANDLER(ec65_via_write_b),  /* out_b_func */
 	DEVCB_NULL,                       /* out_ca1_func */
 	DEVCB_NULL,                       /* out_cb1_func */
 	DEVCB_NULL,                       /* out_ca2_func */
 	DEVCB_NULL,                       /* out_cb2_func */
-	DEVCB_NULL,                       /* irq_func */    
+	DEVCB_NULL,                       /* irq_func */
 };
 
 const via6522_interface ec65_via_0_intf=
 {
-	DEVCB_HANDLER(ec65_via_read_a),      /* in_a_func */   
-	DEVCB_NULL,      /* in_b_func */   
-	DEVCB_HANDLER(ec65_read_ca1),      /* in_ca1_func */ 
-	DEVCB_NULL,      /* in_cb1_func */ 
-	DEVCB_NULL,      /* in_ca2_func */ 
-	DEVCB_NULL,      /* in_cb2_func */ 
-	DEVCB_NULL,      /* out_a_func */  
-	DEVCB_NULL,      /* out_b_func */  
+	DEVCB_HANDLER(ec65_via_read_a),      /* in_a_func */
+	DEVCB_NULL,      /* in_b_func */
+	DEVCB_HANDLER(ec65_read_ca1),      /* in_ca1_func */
+	DEVCB_NULL,      /* in_cb1_func */
+	DEVCB_NULL,      /* in_ca2_func */
+	DEVCB_NULL,      /* in_cb2_func */
+	DEVCB_NULL,      /* out_a_func */
+	DEVCB_NULL,      /* out_b_func */
 	DEVCB_NULL,      /* out_ca1_func */
 	DEVCB_NULL,      /* out_cb1_func */
 	DEVCB_NULL,      /* out_ca2_func */
 	DEVCB_NULL,      /* out_cb2_func */
-	DEVCB_NULL,      /* irq_func */    
+	DEVCB_NULL,      /* irq_func */
 };
 
 /* Input ports */
@@ -133,7 +133,7 @@ INPUT_PORTS_START( ec65 )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(ec65) 
+static MACHINE_RESET(ec65)
 {
 }
 
@@ -162,12 +162,12 @@ static MC6845_UPDATE_ROW( ec65_update_row )
 		{
 			data = 0xff;
 		}
-		
+
 		for (bit = 0; bit < 8; bit++)
 		{
 			int x = (column * 8) + bit;
 			int color = BIT(data, 7) ? 1 : 0;
-				
+
 			*BITMAP_ADDR16(bitmap, y, x) = color;
 
 			data <<= 1;
@@ -195,7 +195,7 @@ static MACHINE_DRIVER_START( ec65 )
     MDRV_CPU_PROGRAM_MAP(ec65_mem)
 
     MDRV_MACHINE_RESET(ec65)
-	
+
     /* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -206,11 +206,11 @@ static MACHINE_DRIVER_START( ec65 )
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(black_and_white)
 
-	MDRV_MC6845_ADD(MC6845_TAG, MC6845, XTAL_16MHz / 8, ec65_crtc6845_interface) 
-	
+	MDRV_MC6845_ADD(MC6845_TAG, MC6845, XTAL_16MHz / 8, ec65_crtc6845_interface)
+
     MDRV_VIDEO_START(ec65)
     MDRV_VIDEO_UPDATE(ec65)
-    
+
     /* devices */
 	MDRV_PIA6821_ADD( PIA6821_TAG, ec65_pia_interface )
 	MDRV_ACIA6850_ADD(ACIA6850_TAG, ec65_acia_intf)
@@ -225,7 +225,7 @@ static MACHINE_DRIVER_START( ec65k )
     MDRV_CPU_PROGRAM_MAP(ec65k_mem)
 
     MDRV_MACHINE_RESET(ec65)
-	
+
     /* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -236,8 +236,8 @@ static MACHINE_DRIVER_START( ec65k )
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(black_and_white)
 
-	MDRV_MC6845_ADD(MC6845_TAG, MC6845, XTAL_16MHz / 8, ec65_crtc6845_interface) 
-	
+	MDRV_MC6845_ADD(MC6845_TAG, MC6845, XTAL_16MHz / 8, ec65_crtc6845_interface)
+
     MDRV_VIDEO_START(ec65)
     MDRV_VIDEO_UPDATE(ec65)
 MACHINE_DRIVER_END

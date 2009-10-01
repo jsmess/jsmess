@@ -1,7 +1,7 @@
 /*
-	TX-0
+    TX-0
 
-	Raphael Nabet, 2004
+    Raphael Nabet, 2004
 */
 
 #include "driver.h"
@@ -37,7 +37,7 @@ static void tx0_draw_panel(running_machine *machine, bitmap_t *bitmap);
 
 
 /*
-	video init
+    video init
 */
 VIDEO_START( tx0 )
 {
@@ -56,7 +56,7 @@ VIDEO_START( tx0 )
 
 
 /*
-	schedule a pixel to be plotted
+    schedule a pixel to be plotted
 */
 void tx0_plot(int x, int y)
 {
@@ -68,7 +68,7 @@ void tx0_plot(int x, int y)
 
 
 /*
-	VIDEO_UPDATE( tx0 ): effectively redraw the screen
+    VIDEO_UPDATE( tx0 ): effectively redraw the screen
 */
 VIDEO_UPDATE( tx0 )
 {
@@ -84,7 +84,7 @@ VIDEO_UPDATE( tx0 )
 
 
 /*
-	Operator control panel code
+    Operator control panel code
 */
 
 enum
@@ -237,7 +237,7 @@ static void tx0_draw_hline(bitmap_t *bitmap, int x, int y, int width, int color)
 #endif
 
 /*
-	draw the operator control panel (fixed backdrop)
+    draw the operator control panel (fixed backdrop)
 */
 static void tx0_draw_panel_backdrop(running_machine *machine, bitmap_t *bitmap)
 {
@@ -284,7 +284,7 @@ static void tx0_draw_panel_backdrop(running_machine *machine, bitmap_t *bitmap)
 
 
 /*
-	draw the operator control panel (dynamic elements)
+    draw the operator control panel (dynamic elements)
 */
 static void tx0_draw_panel(running_machine *machine, bitmap_t *bitmap)
 {
@@ -326,7 +326,7 @@ static void tx0_draw_panel(running_machine *machine, bitmap_t *bitmap)
 
 
 /*
-	Typewriter code
+    Typewriter code
 */
 
 
@@ -420,7 +420,7 @@ void tx0_typewriter_drawchar(running_machine *machine, int character)
 	case 020:
 		/* color shift */
 		/*color = color_typewriter_black;
-		color = color_typewriter_red;*/
+        color = color_typewriter_red;*/
 		break;
 
 	case 043:

@@ -1,5 +1,5 @@
 /*
-	smartmed.h: header file for smartmed.c
+    smartmed.h: header file for smartmed.c
 */
 
 #ifndef __SMARTMEDIA_H__

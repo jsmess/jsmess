@@ -1,5 +1,5 @@
 /***************************************************************************
-   
+
         Elektronika MK-85
 
         12/05/2009 Skeleton driver.
@@ -20,8 +20,8 @@ static INPUT_PORTS_START( mk85 )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(mk85) 
-{	
+static MACHINE_RESET(mk85)
+{
 }
 
 static VIDEO_START( mk85 )
@@ -43,9 +43,9 @@ static MACHINE_DRIVER_START( mk85 )
     MDRV_CPU_ADD("maincpu",T11, XTAL_4MHz)
     MDRV_CPU_CONFIG(t11_data)
     MDRV_CPU_PROGRAM_MAP(mk85_mem)
-    
+
     MDRV_MACHINE_RESET(mk85)
-	
+
     /* video hardware */
     MDRV_SCREEN_ADD("screen", RASTER)
     MDRV_SCREEN_REFRESH_RATE(50)

@@ -283,9 +283,9 @@ N/C - Not connected or just dont know!
 2008-05 FP:
 Notice that I updated the matrix above with the following new info:
 l1:b1 is LOCK: you press it with CTRL to switch to Caps, you press it again to switch back
-	(you can also use it with ALT)
+    (you can also use it with ALT)
 l3:b7 is ESC: you use it to exit from nested programs (e.g. if you start to write a program in BASIC,
-	then start EXDOS, you can use ESC to go back to BASIC without losing the program you were writing)
+    then start EXDOS, you can use ESC to go back to BASIC without losing the program you were writing)
 
 According to pictures and manuals, there seem to be no more keys connected, so I label the remaining N/C
 as IPT_UNUSED.
@@ -460,7 +460,7 @@ static MACHINE_DRIVER_START( ep64 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MDRV_WD1770_ADD("wd1770", enterp_wd1770_interface )
-	
+
 	MDRV_FLOPPY_4_DRIVES_ADD(enterprise_floppy_config)
 MACHINE_DRIVER_END
 

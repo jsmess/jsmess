@@ -22,14 +22,14 @@
      * 4 8-bit audio channels (2 for left, 2 for right)
      * Gamepad, Serial port, 2 Gameports, Interfaces for keyboard
 
-	2009-05 Fabio Priuli:
-	Amiga 1200 support is just sketched (I basically took cd32 and removed Akiko). I connected
-	the floppy drive in the same way as in amiga.c but it seems to be not working, since I
-	tried to load WB3.1 with no success. However, this problem may be due to anything: maybe
-	the floppy code must be connected elsewhere, or the .adf image is broken, or I made some
-	stupid mistake in the CIA interfaces.
-	Later, it could be wise to re-factor this source and merge the non-AGA code with
-	mess/drivers/amiga.c
+    2009-05 Fabio Priuli:
+    Amiga 1200 support is just sketched (I basically took cd32 and removed Akiko). I connected
+    the floppy drive in the same way as in amiga.c but it seems to be not working, since I
+    tried to load WB3.1 with no success. However, this problem may be due to anything: maybe
+    the floppy code must be connected elsewhere, or the .adf image is broken, or I made some
+    stupid mistake in the CIA interfaces.
+    Later, it could be wise to re-factor this source and merge the non-AGA code with
+    mess/drivers/amiga.c
 */
 
 #include "driver.h"
@@ -631,7 +631,7 @@ SYSTEM_CONFIG_END
 
 /***************************************************************************************************/
 
-/*	  YEAR  NAME     PARENT   COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY       FULLNAME */
+/*    YEAR  NAME     PARENT   COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY       FULLNAME */
 COMP( 1992, a1200n,  0,       0,      a1200n, a1200,  a1200,  a1200,  "Commodore",  "Amiga 1200 (NTSC)" , GAME_NOT_WORKING )
 COMP( 1992, a1200p,  a1200n,  0,      a1200p, a1200,  a1200,  a1200,  "Commodore",  "Amiga 1200 (PAL)" , GAME_NOT_WORKING )
 CONS( 1993, cd32,    0,       0,      cd32,   cd32,   cd32,   0,      "Commodore",  "Amiga CD32 (NTSC)" , GAME_NOT_WORKING )

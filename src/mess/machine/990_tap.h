@@ -1,5 +1,5 @@
 /*
-	990_tap.h: include file for 990_tap.c
+    990_tap.h: include file for 990_tap.c
 */
 
 DEVICE_START( ti990_tape );

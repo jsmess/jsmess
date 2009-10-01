@@ -4,7 +4,7 @@
     [ DC012 and DC011 emulation ]
 
     01/05/2009 Initial implementation [Miodrag Milanovic]
-    
+
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
 

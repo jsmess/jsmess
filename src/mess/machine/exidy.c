@@ -34,10 +34,10 @@ The serial code (which was never connected to the outside) is disabled for now.
     Transmit and receive clocks are connected to the same clock */
 
 	/* if rs232 is disabled, receive clock is linked to cassette hardware */
-//	if (exidy_fe & 0x80)
-//	{
+//  if (exidy_fe & 0x80)
+//  {
 		connect to rs232
-//	}
+//  }
 //}
 #endif
 
@@ -77,7 +77,7 @@ static TIMER_CALLBACK(exidy_cassette_tc)
 		case 0x00:				/* Cassette 300 baud */
 
 			/* loading a tape - this is basically the same as the super80.
-				We convert the 1200/2400 Hz signal to a 0 or 1, and send it to the uart. */
+                We convert the 1200/2400 Hz signal to a 0 or 1, and send it to the uart. */
 
 			cass_data.input.length++;
 
@@ -92,7 +92,7 @@ static TIMER_CALLBACK(exidy_cassette_tc)
 			}
 
 			/* saving a tape - convert the serial stream from the uart, into 1200 and 2400 Hz frequencies.
-				Synchronisation of the frequency pulses to the uart is extremely important. */
+                Synchronisation of the frequency pulses to the uart is extremely important. */
 
 			cass_data.output.length++;
 			if (!(cass_data.output.length & 0x1f))
@@ -243,12 +243,12 @@ WRITE8_HANDLER(exidy_fe_w)
 		if (data & 0x80)
 		{
 		/* connect to serial device (not yet emulated) */
-//			timer_adjust_periodic(serial_timer, attotime_zero, 0, ATTOTIME_IN_HZ(baud_rate));
+//          timer_adjust_periodic(serial_timer, attotime_zero, 0, ATTOTIME_IN_HZ(baud_rate));
 		}
 		else
 		{
 		/* connect to tape */
-//			hd6402_connect(&cassette_serial_connection);
+//          hd6402_connect(&cassette_serial_connection);
 		}
 	}
 }
@@ -326,15 +326,15 @@ READ8_HANDLER(exidy_fe_r)
 READ8_HANDLER(exidy_ff_r)
 {
 	/* The use of the parallel port as a general purpose port is not emulated.
-	Currently the only use is to read the printer status in the Centronics CENDRV bios routine.
-	This uses bit 7. The other bits have been set high (=nothing plugged in).
-	This fixes those games that use a joystick. */
+    Currently the only use is to read the printer status in the Centronics CENDRV bios routine.
+    This uses bit 7. The other bits have been set high (=nothing plugged in).
+    This fixes those games that use a joystick. */
 
 	const device_config *printer = devtag_get_device(space->machine, "centronics");
 	UINT8 data=0x7f;
 
 	/* bit 7 = printer busy
-	0 = printer is not busy */
+    0 = printer is not busy */
 
 	data |= centronics_busy_r(printer) << 7;
 
@@ -353,20 +353,20 @@ Z80BIN_EXECUTE( exidy )
 		return;					/* can't run a program if the cartridge isn't in */
 
 	/* Since Exidy Basic is by Microsoft, it needs some preprocessing before it can be run.
-	1. A start address of 01D5 indicates a basic program which needs its pointers fixed up.
-	2. If autorunning, jump to C689 (command processor), else jump to C3DD (READY prompt).
-	Important addresses:
-		01D5 = start (load) address of a conventional basic program
-		C858 = an autorun basic program will have this exec address on the tape
-		C3DD = part of basic that displays READY and lets user enter input */
+    1. A start address of 01D5 indicates a basic program which needs its pointers fixed up.
+    2. If autorunning, jump to C689 (command processor), else jump to C3DD (READY prompt).
+    Important addresses:
+        01D5 = start (load) address of a conventional basic program
+        C858 = an autorun basic program will have this exec address on the tape
+        C3DD = part of basic that displays READY and lets user enter input */
 
 	if ((start_address == 0x1d5) || (execute_address == 0xc858))
 	{
 		UINT8 i, data[]={
-			0xcd, 0x26, 0xc4,	// CALL C426	;set up other pointers
-			0x21, 0xd4, 1,		// LD HL,01D4	;start of program address (used by C689)
-			0x36, 0,		// LD (HL),00	;make sure dummy end-of-line is there
-			0xc3, 0x89, 0xc6,};	// JP C689	;run program
+			0xcd, 0x26, 0xc4,	// CALL C426    ;set up other pointers
+			0x21, 0xd4, 1,		// LD HL,01D4   ;start of program address (used by C689)
+			0x36, 0,		// LD (HL),00   ;make sure dummy end-of-line is there
+			0xc3, 0x89, 0xc6,};	// JP C689  ;run program
 
 		for (i = 0; i < ARRAY_LENGTH(data); i++)
 			memory_write_byte(space, 0xf01f + i, data[i]);
@@ -392,7 +392,7 @@ Z80BIN_EXECUTE( exidy )
 
 MACHINE_START( exidy )
 {
-//	serial_timer = timer_alloc(machine, exidy_serial_timer_callback, NULL);
+//  serial_timer = timer_alloc(machine, exidy_serial_timer_callback, NULL);
 	cassette_timer = timer_alloc(machine, exidy_cassette_tc, NULL);
 }
 

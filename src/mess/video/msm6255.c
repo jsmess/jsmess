@@ -380,8 +380,8 @@ static DEVICE_START( msm6255 )
 	msm6255_t *msm6255 = get_safe_token(device);
 
 	/* resolve callbacks */
-	msm6255->intf = device->static_config;	
-	assert(msm6255->intf->char_ram_r != NULL);	
+	msm6255->intf = device->static_config;
+	assert(msm6255->intf->char_ram_r != NULL);
 
 	/* get the screen */
 	msm6255->screen = devtag_get_device(device->machine, msm6255->intf->screen_tag);

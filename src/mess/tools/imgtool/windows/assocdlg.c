@@ -1,6 +1,6 @@
 //============================================================
 //
-//	wimgtool.c - Win32 Imgtool File Association Dialog
+//  wimgtool.c - Win32 Imgtool File Association Dialog
 //
 //============================================================
 

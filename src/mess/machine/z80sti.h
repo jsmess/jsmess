@@ -6,27 +6,27 @@
     Visit http://mamedev.org for licensing and usage restrictions.
 
 **********************************************************************
-							_____   _____
-				   TAO   1 |*    \_/     | 40  Vcc
-				   TBO   2 |			 | 39  RC
-				   TCO   3 |			 | 38  SI
-				   TDO   4 |			 | 37  SO
-				   TCK   5 |			 | 36  TC
-				   _M1   6 |			 | 35  A0
-				  _RES   7 |			 | 34  A1
-					I0   8 |			 | 33  A2
-					I1   9 |			 | 32  A3
-					I2  10 |   MK3801	 | 31  _WR
-				    I3  11 |   Z80-STI	 | 30  _CE
-					I4  12 |			 | 29  _RD
-				    I5  13 |			 | 28  D7
-				    I6  14 |			 | 27  D6
-				    I7  15 |			 | 26  D5
-				   IEI  16 |			 | 25  D4
-				  _INT  17 |			 | 24  D3
-				   IEO  18 |			 | 23  D2
-				 _IORQ  19 |			 | 22  D1
-				   Vss  20 |_____________| 21  D0
+                            _____   _____
+                   TAO   1 |*    \_/     | 40  Vcc
+                   TBO   2 |             | 39  RC
+                   TCO   3 |             | 38  SI
+                   TDO   4 |             | 37  SO
+                   TCK   5 |             | 36  TC
+                   _M1   6 |             | 35  A0
+                  _RES   7 |             | 34  A1
+                    I0   8 |             | 33  A2
+                    I1   9 |             | 32  A3
+                    I2  10 |   MK3801    | 31  _WR
+                    I3  11 |   Z80-STI   | 30  _CE
+                    I4  12 |             | 29  _RD
+                    I5  13 |             | 28  D7
+                    I6  14 |             | 27  D6
+                    I7  15 |             | 26  D5
+                   IEI  16 |             | 25  D4
+                  _INT  17 |             | 24  D3
+                   IEO  18 |             | 23  D2
+                 _IORQ  19 |             | 22  D1
+                   Vss  20 |_____________| 21  D0
 
 **********************************************************************/
 
@@ -66,19 +66,19 @@ struct _z80sti_interface
 
 	/* this gets called for each read of the SI pin (pin 38) */
 	devcb_read_line			in_si_func;
-	
+
 	/* this gets called for each change of the SO pin (pin 37) */
 	devcb_write_line		out_so_func;
 
 	/* this gets called for each change of the TAO pin (pin 1) */
 	devcb_write_line		out_tao_func;
-	
+
 	/* this gets called for each change of the TBO pin (pin 2) */
 	devcb_write_line		out_tbo_func;
-	
+
 	/* this gets called for each change of the TCO pin (pin 3) */
 	devcb_write_line		out_tco_func;
-	
+
 	/* this gets called for each change of the TDO pin (pin 4) */
 	devcb_write_line		out_tdo_func;
 

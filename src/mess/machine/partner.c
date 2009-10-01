@@ -36,7 +36,7 @@ static WD17XX_CALLBACK( partner_wd17xx_callback )
 			break;
 		case WD17XX_IRQ_SET:
 			break;
-		case WD17XX_DRQ_CLR:				
+		case WD17XX_DRQ_CLR:
 			break;
 		case WD17XX_DRQ_SET:
 			dma8257_drq_w(dma8257, 0, 1);
@@ -49,11 +49,11 @@ const wd17xx_interface partner_wd17xx_interface = { partner_wd17xx_callback, NUL
 MACHINE_START(partner)
 {
 	const device_config *fdc = devtag_get_device(machine, "wd1793");
-	wd17xx_set_density (fdc,DEN_MFM_HI);	
+	wd17xx_set_density (fdc,DEN_MFM_HI);
 	wd17xx_set_pause_time(fdc,10);
 }
 
-static void partner_window_1(running_machine *machine, UINT8 bank, UINT16 offset,UINT8 *rom) 
+static void partner_window_1(running_machine *machine, UINT8 bank, UINT16 offset,UINT8 *rom)
 {
 	switch(partner_win_mem_page) {
 	    case 2 : // FDD BIOS
@@ -68,7 +68,7 @@ static void partner_window_1(running_machine *machine, UINT8 bank, UINT16 offset
 	}
 }
 
-static void partner_window_2(running_machine *machine, UINT8 bank, UINT16 offset,UINT8 *rom) 
+static void partner_window_2(running_machine *machine, UINT8 bank, UINT16 offset,UINT8 *rom)
 {
 	switch(partner_win_mem_page) {
 	    case 4 : // MCPG FONT
@@ -82,10 +82,10 @@ static void partner_window_2(running_machine *machine, UINT8 bank, UINT16 offset
 
 static READ8_HANDLER ( partner_floppy_r ) {
 	const device_config *fdc = devtag_get_device(space->machine, "wd1793");
-	
+
 	if (offset<0x100) {
 		switch(offset & 3) {
-			case 0x00 : return wd17xx_status_r(fdc,0); 
+			case 0x00 : return wd17xx_status_r(fdc,0);
 			case 0x01 : return wd17xx_track_r(fdc,0);
 			case 0x02 : return wd17xx_sector_r(fdc,0);
 			default   :
@@ -93,12 +93,12 @@ static READ8_HANDLER ( partner_floppy_r ) {
 		}
 	} else {
 		return 0;
-	}	
+	}
 }
 
 static WRITE8_HANDLER ( partner_floppy_w ) {
 	const device_config *fdc = devtag_get_device(space->machine, "wd1793");
-	
+
 	if (offset<0x100) {
 		switch(offset & 3) {
 			case 0x00 : wd17xx_command_w(fdc,0,data); break;
@@ -112,8 +112,8 @@ static WRITE8_HANDLER ( partner_floppy_w ) {
 		}
 		if (((data >> 3) & 1)==1) {
 			wd17xx_set_drive(fdc,1);
-		}		
-		wd17xx_set_side(fdc,data >> 7);	 	
+		}
+		wd17xx_set_side(fdc,data >> 7);
 	}
 }
 
@@ -126,7 +126,7 @@ static void partner_iomap_bank(running_machine *machine,UINT8 *rom)
 				memory_install_write8_handler(space, 0xdc00, 0xddff, 0, 0, partner_floppy_w);
 				memory_install_read8_handler (space, 0xdc00, 0xddff, 0, 0, partner_floppy_r);
 				break;
-		case 4 : 
+		case 4 :
 				// Timer
 				break;
 		default : // BIOS
@@ -138,7 +138,7 @@ static void partner_bank_switch(running_machine *machine)
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *rom = memory_region(machine, "maincpu");
-	
+
 	memory_install_write8_handler(space, 0x0000, 0x07ff, 0, 0, SMH_BANK(1));
 	memory_install_write8_handler(space, 0x0800, 0x3fff, 0, 0, SMH_BANK(2));
 	memory_install_write8_handler(space, 0x4000, 0x5fff, 0, 0, SMH_BANK(3));
@@ -196,70 +196,70 @@ static void partner_bank_switch(running_machine *machine)
     // BANK 5 (0x8000 - 0x9fff)
 	switch (partner_mem_page) {
 		case 5:
-		case 10: 
+		case 10:
 				//window 2
 				memory_install_write8_handler(space, 0x8000, 0x9fff, 0, 0, SMH_UNMAP);
 				partner_window_2(machine, 5, 0, rom);
 				break;
 		case 8:
-		case 9: 
+		case 9:
 				//window 1
 				memory_install_write8_handler(space, 0x8000, 0x9fff, 0, 0, SMH_UNMAP);
 				partner_window_1(machine, 5, 0, rom);
 				break;
-		case 7: 
+		case 7:
 				memory_set_bankptr(machine, 5, mess_ram + 0x0000);
 				break;
-		default: 				
+		default:
 				memory_set_bankptr(machine, 5, mess_ram + 0x8000);
 				break;
 	}
-    
+
     // BANK 6 (0xa000 - 0xb7ff)
 	switch (partner_mem_page) {
 		case 5:
-		case 10: 
+		case 10:
 				//window 2
 				memory_install_write8_handler(space, 0xa000, 0xb7ff, 0, 0, SMH_UNMAP);
 				partner_window_2(machine, 6, 0, rom);
 				break;
 		case 6:
-		case 8: 
+		case 8:
 				//BASIC
 				memory_install_write8_handler(space, 0xa000, 0xb7ff, 0, 0, SMH_UNMAP);
-				memory_set_bankptr(machine, 6, rom + 0x12000); // BASIC				
+				memory_set_bankptr(machine, 6, rom + 0x12000); // BASIC
 				break;
-		case 7: 
+		case 7:
 				memory_set_bankptr(machine, 6, mess_ram + 0x2000);
 				break;
-		default: 				
+		default:
 				memory_set_bankptr(machine, 6, mess_ram + 0xa000);
 				break;
-	}    
+	}
 
     // BANK 7 (0xb800 - 0xbfff)
 	switch (partner_mem_page) {
 		case 4:
 		case 5:
-		case 10: 
+		case 10:
 				//window 2
 				memory_install_write8_handler(space, 0xb800, 0xbfff, 0, 0, SMH_UNMAP);
 				partner_window_2(machine, 7, 0x1800, rom);
 				break;
 		case 6:
-		case 8: 
+		case 8:
 				//BASIC
 				memory_install_write8_handler(space, 0xb800, 0xbfff, 0, 0, SMH_UNMAP);
-				memory_set_bankptr(machine, 7, rom + 0x13800); // BASIC				
+				memory_set_bankptr(machine, 7, rom + 0x13800); // BASIC
 				break;
-		case 7: 
+		case 7:
 				memory_set_bankptr(machine, 7, mess_ram + 0x3800);
 				break;
-		default: 				
+		default:
 				memory_set_bankptr(machine, 7, mess_ram + 0xb800);
 				break;
-	}    
-	
+	}
+
     // BANK 8 (0xc000 - 0xc7ff)
 	switch (partner_mem_page) {
 		case 7:
@@ -272,7 +272,7 @@ static void partner_bank_switch(running_machine *machine)
 				break;
 		default:
 				memory_set_bankptr(machine, 8, mess_ram + 0xc000);
-				break;			
+				break;
 	}
 
     // BANK 9 (0xc800 - 0xcfff)
@@ -292,7 +292,7 @@ static void partner_bank_switch(running_machine *machine)
 				break;
 		default:
 				memory_set_bankptr(machine, 9, mess_ram + 0xc800);
-				break;			
+				break;
 	}
 
     // BANK 10 (0xd000 - 0xd7ff)
@@ -308,12 +308,12 @@ static void partner_bank_switch(running_machine *machine)
 				break;
 		default:
 				memory_set_bankptr(machine, 10, mess_ram + 0xd000);
-				break;			
+				break;
 	}
 
 	// BANK 11 (0xdc00 - 0xddff)
 	partner_iomap_bank(machine,rom);
-	
+
     // BANK 12 (0xe000 - 0xe7ff)
 	if (partner_mem_page==1) {
 		memory_set_bankptr(machine, 12, rom + 0x10000);
@@ -321,7 +321,7 @@ static void partner_bank_switch(running_machine *machine)
 		//window 1
 		partner_window_1(machine, 12, 0, rom);
 	}
-	
+
     // BANK 13 (0xe800 - 0xffff)
 	switch (partner_mem_page) {
 		case 3:
@@ -330,11 +330,11 @@ static void partner_bank_switch(running_machine *machine)
 				// window 1
 				partner_window_1(machine, 13, 0x800, rom);
 				break;
-		default:		
-				// BIOS		
+		default:
+				// BIOS
 				memory_set_bankptr(machine, 13, rom + 0x10800);
 				break;
-	}	
+	}
 }
 
 WRITE8_HANDLER ( partner_win_memory_page_w )

@@ -1,9 +1,9 @@
 /****************************************************************************
 
-	library.c
+    library.c
 
-	Code relevant to the Imgtool library; analgous to the MESS/MAME driver
-	list.
+    Code relevant to the Imgtool library; analgous to the MESS/MAME driver
+    list.
 
 ****************************************************************************/
 

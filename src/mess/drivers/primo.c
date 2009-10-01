@@ -26,8 +26,8 @@ Primo variants:
     A-48 - 32kB RAM + 16KB ROM
     A-64 - 48kB RAM + 16KB ROM
     B-32 - 16kB RAM + 16KB ROM
-	B-48 - 32kB RAM + 16KB ROM
-	B-64 - 48kB RAM + 16KB ROM
+    B-48 - 32kB RAM + 16KB ROM
+    B-64 - 48kB RAM + 16KB ROM
 
 CPU:
     U880D (DDR clone of Z80), 2.5 MHz
@@ -282,7 +282,7 @@ static MACHINE_DRIVER_START( primoa32 )
 
 	/* floppy from serial bus */
 	/* for some reason machine/primo.c sets up the serial bus
-	but no floppy drive has been apparently added... incomplete driver? */
+    but no floppy drive has been apparently added... incomplete driver? */
 	MDRV_IMPORT_FROM(simulated_drive)
 
 	/* cartridge */
@@ -406,15 +406,15 @@ ROM_END
 
 /*static void primo_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
-	switch(state)
-	{
-		case MESS_DEVINFO_STR_DESCRIPTION+0:					strcpy(info->s = device_temp_str(), "EPROM Expansion Bank #1"); break;
-		case MESS_DEVINFO_STR_DESCRIPTION+1:					strcpy(info->s = device_temp_str(), "EPROM Expansion Bank #2"); break;
-		case MESS_DEVINFO_STR_DESCRIPTION+2:					strcpy(info->s = device_temp_str(), "EPROM Expansion Bank #3"); break;
-		case MESS_DEVINFO_STR_DESCRIPTION+3:					strcpy(info->s = device_temp_str(), "EPROM Expansion Bank #4"); break;
+    switch(state)
+    {
+        case MESS_DEVINFO_STR_DESCRIPTION+0:                    strcpy(info->s = device_temp_str(), "EPROM Expansion Bank #1"); break;
+        case MESS_DEVINFO_STR_DESCRIPTION+1:                    strcpy(info->s = device_temp_str(), "EPROM Expansion Bank #2"); break;
+        case MESS_DEVINFO_STR_DESCRIPTION+2:                    strcpy(info->s = device_temp_str(), "EPROM Expansion Bank #3"); break;
+        case MESS_DEVINFO_STR_DESCRIPTION+3:                    strcpy(info->s = device_temp_str(), "EPROM Expansion Bank #4"); break;
 
-		default:										cartslot_device_getinfo(devclass, state, info); break;
-	}
+        default:                                        cartslot_device_getinfo(devclass, state, info); break;
+    }
 }
 
 */

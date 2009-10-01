@@ -1,8 +1,8 @@
 /****************************************************************************
 
-	rsdos.c
+    rsdos.c
 
-	CoCo RS-DOS disk images
+    CoCo RS-DOS disk images
 
 ****************************************************************************/
 
@@ -42,7 +42,7 @@ struct rsdos_direnum
 
 
 /*********************************************************************
-	Imgtool module code
+    Imgtool module code
 *********************************************************************/
 
 #define MAX_DIRENTS		((18-2)*(256/32))
@@ -480,8 +480,8 @@ static imgtoolerr_t rsdos_diskimage_writefile(imgtool_partition *partition, cons
 	while(sz > 0);
 
 	/* Now that we are done with the file, we need to specify the final entry
-	 * in the file allocation table
-	 */
+     * in the file allocation table
+     */
 	*gptr = 0xc0 + ((i + 255) / 256);
 
 	/* Now we need to find an empty directory entry */
@@ -578,7 +578,7 @@ static imgtoolerr_t rsdos_diskimage_suggesttransfer(imgtool_partition *partition
 
 
 /*********************************************************************
-	Imgtool module declaration
+    Imgtool module declaration
 *********************************************************************/
 
 static OPTION_GUIDE_START( coco_rsdos_writefile_optionguide )

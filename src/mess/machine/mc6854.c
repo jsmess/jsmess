@@ -216,7 +216,7 @@ static const int word_length[4] = { 5, 6, 7, 8 };
 
 
 
-INLINE mc6854_t* get_safe_token( const device_config *device ) 
+INLINE mc6854_t* get_safe_token( const device_config *device )
 {
 	assert( device != NULL );
 	assert( device->token != NULL );

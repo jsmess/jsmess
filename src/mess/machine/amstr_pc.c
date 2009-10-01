@@ -49,10 +49,10 @@ port 03de write/read
    fc818
    fc87d display amstrad ..
     fca17 keyboard check
-	 fca69
-	 fd680
+     fca69
+     fd680
       fd7f9
-	 fca7b !keyboard interrupt routine for this check
+     fca7b !keyboard interrupt routine for this check
  */
 
 
@@ -84,7 +84,7 @@ port 03de write/read
    fc5fa
     the following when language selection not 0 (test for presence of 0x80000..0x9ffff ram)
     fc60e
-	fc667
+    fc667
    fc678
    fc6e5
    fc72e

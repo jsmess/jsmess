@@ -43,11 +43,11 @@ IMAGEMODULE(
 	rom16_image_beginenum,			/* begin enumeration */
 	rom16_image_nextenum,			/* enumerate next */
 	rom16_image_closeenum,			/* close enumeration */
-	NULL, //crt_image_freespace,			/* free space on image */
+	NULL, //crt_image_freespace,            /* free space on image */
 	rom16_image_readfile,			/* read file */
 	rom16_image_writefile,			/* write file */
 	NULL,			/* delete file */
-	NULL,//	rom16_image_create,				/* create image */
+	NULL,// rom16_image_create,             /* create image */
 	NULL,
 	NULL,
 	NULL,							/* file options */
@@ -209,7 +209,7 @@ static int rom16_image_writefile(imgtool_image *img, const char *fname, imgtool_
 #if 0
 static int rom16_image_create(imgtool_stream *f, const ResolvedOption *options_)
 {
-//	if (options_->label) strcpy(header.name, options->label);
+//  if (options_->label) strcpy(header.name, options->label);
 	return (stream_write(f, &header, sizeof(crt_header)) == sizeof(crt_header))
 		? 0 : IMGTOOLERR_WRITEERROR;
 }

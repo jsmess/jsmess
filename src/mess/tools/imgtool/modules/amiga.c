@@ -1,8 +1,8 @@
 /****************************************************************************
 
-	amiga.c
+    amiga.c
 
-	Amiga floppies
+    Amiga floppies
 
 ****************************************************************************/
 
@@ -1053,7 +1053,7 @@ static imgtoolerr_t walk_hash_chain(imgtool_image *img, const char *path, int st
 	}
 
 	/* if we haven't found the right filename but there are linked entries,
-	 * walk up the chain */
+     * walk up the chain */
 	if ((*cmp)(name, path) != 0 && hash_chain != 0)
 	{
 		*prev_block = start_block;

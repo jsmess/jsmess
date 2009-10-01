@@ -1,13 +1,13 @@
 /***************************************************************************
 
-	CPS Changer
+    CPS Changer
 
-	Although this is split off from MAME, it still uses machine/kabuki.c
-	This in turn includes cps1.h.
-	Therefore we must call our include by the same name, in order to
-	override the mame include, and thereby remove any compilation errors.
-	It also means we can get rid of the various bodges of the past, and
-	no more ifdefs are needed in the mame code.
+    Although this is split off from MAME, it still uses machine/kabuki.c
+    This in turn includes cps1.h.
+    Therefore we must call our include by the same name, in order to
+    override the mame include, and thereby remove any compilation errors.
+    It also means we can get rid of the various bodges of the past, and
+    no more ifdefs are needed in the mame code.
 
 ***************************************************************************/
 
@@ -194,7 +194,7 @@ static WRITE16_HANDLER( cps1_eeprom_port_w )
 
 /***************************************
 
-	Address Maps
+    Address Maps
 
 ****************************************/
 
@@ -254,7 +254,7 @@ ADDRESS_MAP_END
 
 /***********************************************************
 
-	Inputs and Dips
+    Inputs and Dips
 
 ***********************************************************/
 
@@ -310,7 +310,7 @@ INPUT_PORTS_END
 
 /***************************************
 
-	Graphics Decode
+    Graphics Decode
 
 ****************************************/
 
@@ -441,7 +441,7 @@ MACHINE_DRIVER_END
 
 /***************************************
 
-	Driver Initialisation
+    Driver Initialisation
 
 ****************************************/
 
@@ -454,7 +454,7 @@ static DRIVER_INIT( wof )
 
 /***************************************
 
-	Roms
+    Roms
 
 ***************************************/
 
@@ -599,7 +599,7 @@ ROM_END
 
 /***************************************************************************
 
-	Game driver(s)
+    Game driver(s)
 
 ***************************************************************************/
 

@@ -1,5 +1,5 @@
 /*
-	990_dk.h: include file for 990_dk.c
+    990_dk.h: include file for 990_dk.c
 */
 
 FLOPPY_OPTIONS_EXTERN(fd800);

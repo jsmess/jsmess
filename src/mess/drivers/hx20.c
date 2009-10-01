@@ -1,5 +1,5 @@
 /***************************************************************************
-   
+
         Epson HX20
 
         29/09/2009 Skeleton driver.
@@ -10,7 +10,7 @@
 #include "cpu/m6800/m6800.h"
 
 static ADDRESS_MAP_START(ehx20_mem, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x0000, 0x0fff) AM_RAM // I/O	
+	AM_RANGE(0x0000, 0x0fff) AM_RAM // I/O
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -19,8 +19,8 @@ INPUT_PORTS_START( ehx20 )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(ehx20) 
-{	
+static MACHINE_RESET(ehx20)
+{
 }
 
 static VIDEO_START( ehx20 )
@@ -38,7 +38,7 @@ static MACHINE_DRIVER_START( ehx20 )
     MDRV_CPU_PROGRAM_MAP(ehx20_mem)
 
     MDRV_MACHINE_RESET(ehx20)
-	
+
     /* video hardware */
     MDRV_SCREEN_ADD("screen", RASTER)
     MDRV_SCREEN_REFRESH_RATE(50)

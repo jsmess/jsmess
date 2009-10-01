@@ -1,6 +1,6 @@
 /***************************************************************************
 
-	NOTE: ****** Specbusy: press N, R, or E to boot *************
+    NOTE: ****** Specbusy: press N, R, or E to boot *************
 
 
         Spectrum/Inves/TK90X etc. memory map:
@@ -212,7 +212,7 @@ static  READ8_HANDLER(spectrum_plus3_port_2ffd_r)
 void spectrum_plus3_update_memory(running_machine *machine)
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	
+
 	if (spectrum_128_port_7ffd_data & 8)
 	{
 			logerror("+3 SCREEN 1: BLOCK 7\n");
@@ -337,7 +337,7 @@ static WRITE8_HANDLER(spectrum_plus3_port_1ffd_w)
 The function decodes the ports appropriately */
 static ADDRESS_MAP_START (spectrum_plus3_io, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(spectrum_port_fe_r,spectrum_port_fe_w) AM_MIRROR(0xfffe) AM_MASK(0xffff) 
+	AM_RANGE(0x0000, 0x0000) AM_READWRITE(spectrum_port_fe_r,spectrum_port_fe_w) AM_MIRROR(0xfffe) AM_MASK(0xffff)
 	AM_RANGE(0x001f, 0x001f) AM_READ(spectrum_port_1f_r) AM_MIRROR(0xff00)
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(spectrum_plus3_port_7ffd_w) AM_MIRROR(0x3ffd)
 	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("ay8912", ay8910_data_w) AM_MIRROR(0x3ffd)
@@ -350,7 +350,7 @@ ADDRESS_MAP_END
 static MACHINE_RESET( spectrum_plus3 )
 {
 	memset(mess_ram,0,128*1024);
-	
+
 	/* Initial configuration */
 	spectrum_128_port_7ffd_data = 0;
 	spectrum_plus3_port_1ffd_data = 0;
@@ -374,7 +374,7 @@ static MACHINE_DRIVER_START( spectrum_plus3 )
 	MDRV_SCREEN_REFRESH_RATE(50.01)
 
 	MDRV_MACHINE_RESET( spectrum_plus3 )
-	
+
 	MDRV_NEC765A_ADD("nec765", spectrum_plus3_nec765_interface)
 	MDRV_FLOPPY_2_DRIVES_ADD(specpls3_floppy_config)
 MACHINE_DRIVER_END
@@ -424,7 +424,7 @@ ROM_START(specpl3e)
 	ROMX_LOAD("romb-en.rom",0x18000,0x8000, CRC(ef8d5d92) SHA1(983aa53aa76e25a3af123c896016bacf6829b72b), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 1, "sp", "Spanish" )
 	ROMX_LOAD("roma-es.rom",0x10000,0x8000, CRC(ba694b4b) SHA1(d15d9e43950483cffc79f1cfa89ecb114a88f6c2), ROM_BIOS(2))
-	ROMX_LOAD("romb-es.rom",0x18000,0x8000, CRC(61ed94db) SHA1(935b14c13db75d872de8ad0d591aade0adbbc355), ROM_BIOS(2))	
+	ROMX_LOAD("romb-es.rom",0x18000,0x8000, CRC(61ed94db) SHA1(935b14c13db75d872de8ad0d591aade0adbbc355), ROM_BIOS(2))
 	ROM_CART_LOAD("cart", 0x10000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
@@ -460,7 +460,7 @@ static SYSTEM_CONFIG_START(specpls3)
 SYSTEM_CONFIG_END
 
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE			INPUT       INIT    CONFIG      COMPANY     FULLNAME */
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE         INPUT       INIT    CONFIG      COMPANY     FULLNAME */
 COMP( 1987, specpl2a, spec128,  0,		spectrum_plus3, spec_plus,	0,		specpls3,	"Amstrad plc",          "ZX Spectrum +2a" , 0 )
 COMP( 1987, specpls3, spec128,  0,		spectrum_plus3, spec_plus,	0,		specpls3,	"Amstrad plc",          "ZX Spectrum +3" , 0 )
 COMP( 2000, specpl3e, spec128,  0,		spectrum_plus3, spec_plus,	0,		specpls3,	"Amstrad plc",          "ZX Spectrum +3e" , GAME_COMPUTER_MODIFIED )

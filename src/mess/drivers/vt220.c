@@ -1,5 +1,5 @@
 /***************************************************************************
-   
+
         DEC VT220
 
         30/06/2009 Skeleton driver.
@@ -20,8 +20,8 @@ ADDRESS_MAP_END
 INPUT_PORTS_START( vt220 )
 INPUT_PORTS_END
 
-static MACHINE_RESET(vt220) 
-{	
+static MACHINE_RESET(vt220)
+{
 	memset(mess_ram,0,16*1024);
 }
 
@@ -39,10 +39,10 @@ static MACHINE_DRIVER_START( vt220 )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", I8051, XTAL_16MHz)
     MDRV_CPU_PROGRAM_MAP(vt220_mem)
-    MDRV_CPU_IO_MAP(vt220_io)	
+    MDRV_CPU_IO_MAP(vt220_io)
 
     MDRV_MACHINE_RESET(vt220)
-	
+
     /* video hardware */
     MDRV_SCREEN_ADD("screen", RASTER)
     MDRV_SCREEN_REFRESH_RATE(50)
@@ -71,6 +71,6 @@ ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
 COMP( 1983, vt220,  0,       0, 	vt220, 	vt220, 	 0,  	  vt220,  	 "DEC",   "VT220",		GAME_NOT_WORKING)
-//COMP( 1983, vt240,  0,       0, 	vt220, 	vt220, 	 0,  	  vt220,  	 "DEC",   "VT240",		GAME_NOT_WORKING)
-//COMP( 1983, vt241,  0,       0, 	vt220, 	vt220, 	 0,  	  vt220,  	 "DEC",   "VT241",		GAME_NOT_WORKING)
+//COMP( 1983, vt240,  0,       0,   vt220,  vt220,   0,       vt220,     "DEC",   "VT240",      GAME_NOT_WORKING)
+//COMP( 1983, vt241,  0,       0,   vt220,  vt220,   0,       vt220,     "DEC",   "VT241",      GAME_NOT_WORKING)
 

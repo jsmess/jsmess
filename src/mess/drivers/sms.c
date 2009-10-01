@@ -246,10 +246,10 @@ static INPUT_PORTS_START( gg )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START ) PORT_NAME("Start") /* Game Gear START */
 INPUT_PORTS_END
 
-static PALETTE_INIT( sms ) 
+static PALETTE_INIT( sms )
 {
 	int i;
-	for( i = 0; i < 64; i++ ) 
+	for( i = 0; i < 64; i++ )
 	{
 		int r = i & 0x03;
 		int g = ( i & 0x0C ) >> 2;
@@ -275,10 +275,10 @@ static PALETTE_INIT( sms )
 	palette_set_color_rgb(machine, 64+15, 255, 255, 255 );
 }
 
-static PALETTE_INIT( gamegear ) 
+static PALETTE_INIT( gamegear )
 {
 	int i;
-	for( i = 0; i < 4096; i++ ) 
+	for( i = 0; i < 4096; i++ )
 	{
 		int r = i & 0x000F;
 		int g = ( i & 0x00F0 ) >> 4;
@@ -292,22 +292,22 @@ static const smsvdp_configuration config_315_5246 = { MODEL_315_5246, sms_int_ca
 static const smsvdp_configuration config_315_5378 = { MODEL_315_5378, sms_int_callback };
 static const smsvdp_configuration config_store = { MODEL_315_5124, sms_store_int_callback };
 
-static VIDEO_START(sega_315_5124) 
+static VIDEO_START(sega_315_5124)
 {
 	smsvdp_video_init( machine, &config_315_5124 );
 }
 
-static VIDEO_START(sega_315_5246) 
+static VIDEO_START(sega_315_5246)
 {
 	smsvdp_video_init( machine, &config_315_5246 );
 }
 
-static VIDEO_START(sega_315_5378) 
+static VIDEO_START(sega_315_5378)
 {
 	smsvdp_video_init( machine, &config_315_5378 );
 }
 
-static VIDEO_START(sega_store_315_5124) 
+static VIDEO_START(sega_store_315_5124)
 {
 	smsvdp_video_init( machine, &config_store );
 }
@@ -346,7 +346,7 @@ static MACHINE_DRIVER_START(sms1ntsc)
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("smsiii", SMSIII, XTAL_53_693175MHz/15)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	
+
 	MDRV_IMPORT_FROM( sms_cartslot )
 MACHINE_DRIVER_END
 
@@ -413,7 +413,7 @@ static MACHINE_DRIVER_START(sms1pal)
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("smsiii", SMSIII, MASTER_CLOCK_PAL/15)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	
+
 	MDRV_IMPORT_FROM( sms_cartslot )
 MACHINE_DRIVER_END
 

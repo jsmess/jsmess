@@ -2,7 +2,7 @@
 
     pc_turbo.c
 
-	The PC "turbo" button
+    The PC "turbo" button
 
 **********************************************************************/
 

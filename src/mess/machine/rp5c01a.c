@@ -1,22 +1,22 @@
 /**********************************************************************
 
-	Ricoh RP5C01A Real Time Clock With Internal RAM emulation
+    Ricoh RP5C01A Real Time Clock With Internal RAM emulation
 
-	Copyright MESS Team.
+    Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
 
 *********************************************************************/
 
 /*
 
-	TODO:
+    TODO:
 
-	- divide frequencies from device clock
-	- mask out unused bits in register writes
-	- clock adjust
-	- 12 hour clock
-	- leap year counter
-	- timer reset
+    - divide frequencies from device clock
+    - mask out unused bits in register writes
+    - clock adjust
+    - 12 hour clock
+    - leap year counter
+    - timer reset
 
 */
 
@@ -79,7 +79,7 @@ struct _rp5c01a_t
 	UINT8 reg[4][13];			/* clock registers */
 
 	UINT8 mode;					/* mode register */
-    
+
 	/* timers */
 	emu_timer *clock_timer;
 	emu_timer *alarm_timer;
@@ -114,7 +114,7 @@ INLINE const rp5c01a_interface *get_interface(const device_config *device)
 
 WRITE_LINE_DEVICE_HANDLER( rp5c01a_adj_w )
 {
-//	rp5c01a_t *rp5c01a = get_safe_token(device);
+//  rp5c01a_t *rp5c01a = get_safe_token(device);
 
 }
 

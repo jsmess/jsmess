@@ -1,12 +1,12 @@
 /*
-	Atmel at29c040a flash EEPROM
+    Atmel at29c040a flash EEPROM
 
-	512k*8 FEEPROM, organized in pages of 256 bytes.
+    512k*8 FEEPROM, organized in pages of 256 bytes.
 
-	References:
-	Datasheets were found on Atmel's site (www.atmel.com)
+    References:
+    Datasheets were found on Atmel's site (www.atmel.com)
 
-	Raphael Nabet 2003
+    Raphael Nabet 2003
 */
 
 #include "driver.h"
@@ -24,19 +24,19 @@
 #define BYTE_ADDRESS_MASK   0x000ff
 
 /*
-	at29c40a state
+    at29c40a state
 
-	Command states (s_cmd_0 is the initial state):
-	s_cmd_0: default state
-	s_cmd_1: state after writing aa to 5555
-	s_cmd_2: state after writing 55 to 2aaa
+    Command states (s_cmd_0 is the initial state):
+    s_cmd_0: default state
+    s_cmd_1: state after writing aa to 5555
+    s_cmd_2: state after writing 55 to 2aaa
 
-	Programming states (s_programming_0 is the initial state):
-	s_programming_0: default state
-	s_programming_1: a program and enable/disable lock command  has been
-		executed, but programming has not actually started.
-	s_programming_2: the programming buffer is being written to
-	s_programming_3: the programming buffer is being burnt to flash ROM
+    Programming states (s_programming_0 is the initial state):
+    s_programming_0: default state
+    s_programming_1: a program and enable/disable lock command  has been
+        executed, but programming has not actually started.
+    s_programming_2: the programming buffer is being written to
+    s_programming_3: the programming buffer is being burnt to flash ROM
 */
 static struct
 {
@@ -75,7 +75,7 @@ static struct
 
 
 /*
-	programming timer callback
+    programming timer callback
 */
 static TIMER_CALLBACK(at29c040a_programming_timer_callback)
 {
@@ -118,8 +118,8 @@ static TIMER_CALLBACK(at29c040a_programming_timer_callback)
 }
 
 /*
-	Initialize one FEEPROM chip: may be called at driver init or image load
-	time (or machine init time if you don't use MESS image core)
+    Initialize one FEEPROM chip: may be called at driver init or image load
+    time (or machine init time if you don't use MESS image core)
 */
 void at29c040a_init_data_ptr(int id, UINT8 *data_ptr)
 {
@@ -127,7 +127,7 @@ void at29c040a_init_data_ptr(int id, UINT8 *data_ptr)
 }
 
 /*
-	Initialize one FEEPROM chip: must be called at machine init time
+    Initialize one FEEPROM chip: must be called at machine init time
 */
 void at29c040a_init(running_machine *machine,int id)
 {
@@ -135,7 +135,7 @@ void at29c040a_init(running_machine *machine,int id)
 }
 
 /*
-	load the contents of one FEEPROM file
+    load the contents of one FEEPROM file
 */
 int at29c040a_file_load(int id, mame_file *file)
 {
@@ -148,7 +148,7 @@ int at29c040a_file_load(int id, mame_file *file)
 		return 1;
 
 	/* chip state: lower boot block lockout, higher boot block lockout,
-	software data protect */
+    software data protect */
 	if (mame_fread(file, & buf, 1) != 1)
 		return 1;
 	at29c040a[id].s_lower_bbl = (buf >> 2) & 1;
@@ -165,7 +165,7 @@ int at29c040a_file_load(int id, mame_file *file)
 }
 
 /*
-	save the FEEPROM contents to file
+    save the FEEPROM contents to file
 */
 int at29c040a_file_save(int id, mame_file *file)
 {
@@ -177,7 +177,7 @@ int at29c040a_file_save(int id, mame_file *file)
 		return 1;
 
 	/* chip state: lower boot block lockout, higher boot block lockout,
-	software data protect */
+    software data protect */
 	buf = (at29c040a[id].s_lower_bbl << 2) | (at29c040a[id].s_higher_bbl << 1) | at29c040a[id].s_sdp;
 	if (mame_fwrite(file, & buf, 1) != 1)
 		return 1;
@@ -195,7 +195,7 @@ int at29c040a_get_dirty_flag(int id)
 }
 
 /*
-	read a byte from FEEPROM
+    read a byte from FEEPROM
 */
 UINT8 at29c040a_r(int id, offs_t offset)
 {
@@ -212,7 +212,7 @@ UINT8 at29c040a_r(int id, offs_t offset)
 	if (at29c040a[id].s_pgm == s_pgm_1)
 	{
 		/* attempty to access a locked out boot block: cancel programming
-		command if necessary */
+        command if necessary */
 		at29c040a[id].s_pgm = s_pgm_0;
 		at29c040a[id].s_enabling_sdb = FALSE;
 		at29c040a[id].s_disabling_sdb = FALSE;
@@ -266,7 +266,7 @@ UINT8 at29c040a_r(int id, offs_t offset)
 }
 
 /*
-	write a byte to FEEPROM
+    write a byte to FEEPROM
 */
 void at29c040a_w(int id, offs_t offset, UINT8 data)
 {
@@ -404,7 +404,7 @@ void at29c040a_w(int id, offs_t offset, UINT8 data)
 			|| ((offset >= FEEPROM_SIZE-BOOT_BLOCK_SIZE) && at29c040a[id].s_higher_bbl))
 		{
 			/* attempty to access a locked out boot block: cancel programming
-			command if necessary */
+            command if necessary */
 			at29c040a[id].s_pgm = s_pgm_0;
 			at29c040a[id].s_enabling_sdb = FALSE;
 			at29c040a[id].s_disabling_sdb = FALSE;

@@ -1,6 +1,6 @@
 /***************************************************************************
 
-	MESS specific Atari init and Cartridge code for Atari 8 bit systems
+    MESS specific Atari init and Cartridge code for Atari 8 bit systems
 
 ***************************************************************************/
 
@@ -94,7 +94,7 @@ static void ms_atari_machine_start(running_machine *machine, int type, int has_c
 {
 	offs_t ram_top;
 	offs_t ram_size;
-	
+
 	/* set atari type (needed for banks above) */
 	atari = type;
 

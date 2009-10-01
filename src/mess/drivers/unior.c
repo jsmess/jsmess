@@ -1,5 +1,5 @@
 /***************************************************************************
-   
+
         Unior
 
         12/05/2009 Skeleton driver.
@@ -24,8 +24,8 @@ static INPUT_PORTS_START( unior )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(unior) 
-{	
+static MACHINE_RESET(unior)
+{
 }
 
 static VIDEO_START( unior )
@@ -41,10 +41,10 @@ static MACHINE_DRIVER_START( unior )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",8080, 2222222)
     MDRV_CPU_PROGRAM_MAP(unior_mem)
-    MDRV_CPU_IO_MAP(unior_io)	
+    MDRV_CPU_IO_MAP(unior_io)
 
     MDRV_MACHINE_RESET(unior)
-	
+
     /* video hardware */
     MDRV_SCREEN_ADD("screen", RASTER)
     MDRV_SCREEN_REFRESH_RATE(50)

@@ -1,14 +1,14 @@
 /*
-	tms3556 emulation
+    tms3556 emulation
 
-	TODO:
-	* implement remaining flags in control registers
-	* test the whole thing
-	* find the bloody tms3556 manual.  I mean the register and VRAM interfaces
-	  are mostly guesswork full of hacks, and I'd like to compare it with
-	  documentation.
+    TODO:
+    * implement remaining flags in control registers
+    * test the whole thing
+    * find the bloody tms3556 manual.  I mean the register and VRAM interfaces
+      are mostly guesswork full of hacks, and I'd like to compare it with
+      documentation.
 
-	Raphael Nabet, 2004
+    Raphael Nabet, 2004
 */
 
 #include "driver.h"
@@ -38,7 +38,7 @@ static struct
 	/* c/g flag (mixed mode only) */
 	int cg_flag;
 	/* character line counter (decrements from 10, 0 when we have reached last
-	line of character row) */
+    line of character row) */
 	int char_line_counter;
 	/* double height phase flags (one per horizontal character position) */
 	int dbl_h_phase[40];
@@ -68,13 +68,13 @@ static PALETTE_INIT(tms3556);
 #pragma mark BUS INTERFACE
 #endif
 /*
-	bus interface
+    bus interface
 */
 
 /*
-	tms3556_vram_r
+    tms3556_vram_r
 
-	read a byte from tms3556 VRAM port
+    read a byte from tms3556 VRAM port
 */
 READ8_HANDLER(tms3556_vram_r)
 {
@@ -93,9 +93,9 @@ READ8_HANDLER(tms3556_vram_r)
 }
 
 /*
-	tms3556_vram_w
+    tms3556_vram_w
 
-	write a byte to tms3556 VRAM port
+    write a byte to tms3556 VRAM port
 */
 WRITE8_HANDLER(tms3556_vram_w)
 {
@@ -110,9 +110,9 @@ WRITE8_HANDLER(tms3556_vram_w)
 }
 
 /*
-	tms3556_reg_r
+    tms3556_reg_r
 
-	read a byte from tms3556 register port
+    read a byte from tms3556 register port
 */
 READ8_HANDLER(tms3556_reg_r)
 {
@@ -124,16 +124,16 @@ READ8_HANDLER(tms3556_reg_r)
 		vdp.reg_access_phase = 0;
 	}
 	/*else
-	{	// ???
-	}*/
+    {   // ???
+    }*/
 
 	return reply;
 }
 
 /*
-	tms3556_reg_w
+    tms3556_reg_w
 
-	write a byte to tms3556 register port
+    write a byte to tms3556 register port
 */
 WRITE8_HANDLER(tms3556_reg_w)
 {
@@ -155,7 +155,7 @@ WRITE8_HANDLER(tms3556_reg_w)
 		}
 		else if (vdp.reg_ptr == 9)
 		{	/* I don't understand what is going on, but it is the only way to
-			get this to work */
+            get this to work */
 			vdp.addressRegs[vdp.reg_ptr-8] = ((vdp.controlRegs[2] << 8) | vdp.controlRegs[1]) + 1;
 			vdp.reg_access_phase = 0;
 			vdp.magical_mystery_flag = 0;
@@ -187,13 +187,13 @@ WRITE8_HANDLER(tms3556_reg_w)
 #pragma mark INITIALIZATION CODE
 #endif
 /*
-	initialization code
+    initialization code
 */
 
 /*
-	mdrv_tms3556
+    mdrv_tms3556
 
-	machine struct initialization helper
+    machine struct initialization helper
 */
 MACHINE_DRIVER_START( tms3556 )
 	/* video hardware */
@@ -216,9 +216,9 @@ MACHINE_DRIVER_END
 
 
 /*
-	PALETTE_INIT( tms3556 )
+    PALETTE_INIT( tms3556 )
 
-	Create our 8-color RGB palette
+    Create our 8-color RGB palette
 */
 static PALETTE_INIT( tms3556 )
 {
@@ -235,9 +235,9 @@ static PALETTE_INIT( tms3556 )
 }
 
 /*
-	tms3556_init
+    tms3556_init
 
-	tms3556 core init (called at video init time)
+    tms3556 core init (called at video init time)
 */
 void tms3556_init(running_machine *machine, int vram_size)
 {
@@ -256,9 +256,9 @@ void tms3556_init(running_machine *machine, int vram_size)
 }
 
 /*
-	tms3556_reset
+    tms3556_reset
 
-	tms3556 reset (should be called at machine init time)
+    tms3556 reset (should be called at machine init time)
 */
 void tms3556_reset(void)
 {
@@ -283,13 +283,13 @@ void tms3556_reset(void)
 #pragma mark REDRAW CODE
 #endif
 /*
-	redraw code
+    redraw code
 */
 
 /*
-	tms3556_draw_line_empty
+    tms3556_draw_line_empty
 
-	draw an empty line (used for top and bottom borders, and screen off mode)
+    draw an empty line (used for top and bottom borders, and screen off mode)
 */
 static void tms3556_draw_line_empty(UINT16 *ln)
 {
@@ -303,10 +303,10 @@ static void tms3556_draw_line_empty(UINT16 *ln)
 }
 
 /*
-	tms3556_draw_line_text_common
+    tms3556_draw_line_text_common
 
-	draw a line of text (called by tms3556_draw_line_text and
-	tms3556_draw_line_mixed)
+    draw a line of text (called by tms3556_draw_line_text and
+    tms3556_draw_line_mixed)
 */
 static void tms3556_draw_line_text_common(UINT16 *ln)
 {
@@ -417,10 +417,10 @@ static void tms3556_draw_line_text_common(UINT16 *ln)
 }
 
 /*
-	tms3556_draw_line_bitmap_common
+    tms3556_draw_line_bitmap_common
 
-	draw a line of bitmap (called by tms3556_draw_line_bitmap and
-	tms3556_draw_line_mixed)
+    draw a line of bitmap (called by tms3556_draw_line_bitmap and
+    tms3556_draw_line_mixed)
 */
 static void tms3556_draw_line_bitmap_common(UINT16 *ln)
 {
@@ -464,9 +464,9 @@ static void tms3556_draw_line_bitmap_common(UINT16 *ln)
 }
 
 /*
-	tms3556_draw_line_text
+    tms3556_draw_line_text
 
-	draw a line in text mode
+    draw a line in text mode
 */
 static void tms3556_draw_line_text(UINT16 *ln)
 {
@@ -477,9 +477,9 @@ static void tms3556_draw_line_text(UINT16 *ln)
 }
 
 /*
-	tms3556_draw_line_bitmap
+    tms3556_draw_line_bitmap
 
-	draw a line in bitmap mode
+    draw a line in bitmap mode
 */
 static void tms3556_draw_line_bitmap(UINT16 *ln)
 {
@@ -493,9 +493,9 @@ static void tms3556_draw_line_bitmap(UINT16 *ln)
 }
 
 /*
-	tms3556_draw_line_mixed
+    tms3556_draw_line_mixed
 
-	draw a line in mixed mode
+    draw a line in mixed mode
 */
 static void tms3556_draw_line_mixed(UINT16 *ln)
 {
@@ -527,9 +527,9 @@ static void tms3556_draw_line_mixed(UINT16 *ln)
 }
 
 /*
-	tms3556_draw_line
+    tms3556_draw_line
 
-	draw a line.  If non-interlaced mode, duplicate the line.
+    draw a line.  If non-interlaced mode, duplicate the line.
 */
 static void tms3556_draw_line(bitmap_t *bmp, int line)
 {
@@ -539,10 +539,10 @@ static void tms3556_draw_line(bitmap_t *bmp, int line)
 	double_lines = 0;
 
 	/*if (vdp.controlRegs[4] & 0x??)
-	{	// interlaced mode
-		ln = BITMAP_ADDR16(bmp, line, vdp.field);
-	}
-	else*/
+    {   // interlaced mode
+        ln = BITMAP_ADDR16(bmp, line, vdp.field);
+    }
+    else*/
 	{	/* non-interlaced mode */
 		ln = BITMAP_ADDR16(bmp, line, 0);
 		ln2 = BITMAP_ADDR16(bmp, line, 1);
@@ -578,9 +578,9 @@ static void tms3556_draw_line(bitmap_t *bmp, int line)
 
 
 /*
-	tms3556_interrupt_start_vblank
+    tms3556_interrupt_start_vblank
 
-	Do vblank-time tasks
+    Do vblank-time tasks
 */
 static void tms3556_interrupt_start_vblank(void)
 {
@@ -612,9 +612,9 @@ static void tms3556_interrupt_start_vblank(void)
 }
 
 /*
-	tms3556_interrupt
+    tms3556_interrupt
 
-	scanline handler
+    scanline handler
 */
 void tms3556_interrupt()
 {

@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	6551.h
+    6551.h
 
-	MOS Technology 6551 Asynchronous Communications Interface Adapter
+    MOS Technology 6551 Asynchronous Communications Interface Adapter
 
 *********************************************************************/
 

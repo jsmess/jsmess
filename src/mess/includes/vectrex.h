@@ -47,7 +47,7 @@ VIDEO_START( raaspec );
 WRITE8_HANDLER  ( raaspec_led_w );
 
 READ8_HANDLER ( vectrex_via_r );
-WRITE8_HANDLER ( vectrex_via_w ); 
+WRITE8_HANDLER ( vectrex_via_w );
 
 void vectrex_add_point_stereo (int x, int y, rgb_t color, int intensity);
 void vectrex_add_point (int x, int y, rgb_t color, int intensity);

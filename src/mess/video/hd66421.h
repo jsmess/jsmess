@@ -1,8 +1,8 @@
 /*
 
-	Hitachi HD66421 LCD Controller/Driver
+    Hitachi HD66421 LCD Controller/Driver
 
-	(c) 2001-2007 Tim Schuerewegen
+    (c) 2001-2007 Tim Schuerewegen
 
 */
 

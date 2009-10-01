@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	sgi.c
+    sgi.c
 
-	Silicon Graphics MC (Memory Controller) code
+    Silicon Graphics MC (Memory Controller) code
 
 *********************************************************************/
 
@@ -241,12 +241,12 @@ READ32_HANDLER( mc_r )
 	case 0x203c:
 		verboselog( space->machine, 0, "DMA Zoom Count Read: %08x (%08x)\n", nMC_DMAZoomByteCnt, mem_mask );
 		return nMC_DMAZoomByteCnt;
-//	case 0x2040:
-//	case 0x2044:
-//		verboselog( space->machine, 2, "DMA Start Write: %08x (%08x)\n", data, mem_mask );
+//  case 0x2040:
+//  case 0x2044:
+//      verboselog( space->machine, 2, "DMA Start Write: %08x (%08x)\n", data, mem_mask );
 		// Start DMA
-//		nMC_DMARunning = 1;
-//		break;
+//      nMC_DMARunning = 1;
+//      break;
 	case 0x2048:
 	case 0x204c:
 		verboselog( space->machine, 0, "VDMA Running Read: %08x (%08x)\n", nMC_DMARunning, mem_mask );

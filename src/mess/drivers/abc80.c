@@ -45,7 +45,7 @@ Notes:
     74S263  - Texas Instruments SN74S263N Row Output Character Generator
     MC1488  - Texas Instruments MC1488 Quadruple Line Driver
     MC1489  - Texas Instruments MC1489 Quadruple Line Receiver
-	8205	- ?
+    8205    - ?
     CN1     - RS-232 connector
     CN2     - ABC bus connector (DIN 41612)
     CN3     - video connector
@@ -62,12 +62,12 @@ Notes:
 
     TODO:
 
-	- memory bank switching using ABC80/13 PROM
-	- proper keyboard controller emulation
-	- get BASIC v1 dump
-	- MyAB 80-column card
-	- GeJo 80-column card
-	- Mikrodatorn 64K expansion
+    - memory bank switching using ABC80/13 PROM
+    - proper keyboard controller emulation
+    - get BASIC v1 dump
+    - MyAB 80-column card
+    - GeJo 80-column card
+    - Mikrodatorn 64K expansion
     - floppy
     - printer
     - IEC
@@ -97,18 +97,18 @@ static WRITE8_HANDLER( abc80_sound_w )
 {
 	/*
 
-		Bit Name     Description
+        Bit Name     Description
 
-		0  SYSENA   1 On, 0 Off (inverted)
-		1  EXTVCO   00 High freq, 01 Low freq
-		2  VCOSEL   10 SLF cntrl, 11 SLF ctrl
-		3  MIXSELB  000 VCO, 001 Noise, 010 SLF
-		4  MIXSELA  011 VCO+Noise, 100 SLF+Noise, 101 SLF+VCO
-		5  MIXSELC  110 SLF+VCO+Noise, 111 Quiet
-		6  ENVSEL2  00 VCO, 01 Rakt igenom
-		7  ENVSEL1  10 Monovippa, 11 VCO alt.pol.
+        0  SYSENA   1 On, 0 Off (inverted)
+        1  EXTVCO   00 High freq, 01 Low freq
+        2  VCOSEL   10 SLF cntrl, 11 SLF ctrl
+        3  MIXSELB  000 VCO, 001 Noise, 010 SLF
+        4  MIXSELA  011 VCO+Noise, 100 SLF+Noise, 101 SLF+VCO
+        5  MIXSELC  110 SLF+VCO+Noise, 111 Quiet
+        6  ENVSEL2  00 VCO, 01 Rakt igenom
+        7  ENVSEL1  10 Monovippa, 11 VCO alt.pol.
 
-	*/
+    */
 	const device_config *sn76477 = devtag_get_device(space->machine, "sn76477");
 
 	sn76477_enable_w(sn76477, ~data & 0x01);
@@ -374,20 +374,20 @@ static READ8_DEVICE_HANDLER( abc80_pio_port_a_r )
 {
 	/*
 
-		PIO Port A
+        PIO Port A
 
-		bit		description
+        bit     description
 
-		0		keyboard data
-		1		keyboard data
-		2		keyboard data
-		3		keyboard data
-		4		keyboard data
-		5		keyboard data
-		6		keyboard data
-		7		keyboard strobe
+        0       keyboard data
+        1       keyboard data
+        2       keyboard data
+        3       keyboard data
+        4       keyboard data
+        5       keyboard data
+        6       keyboard data
+        7       keyboard strobe
 
-	*/
+    */
 
 	abc80_state *state = device->machine->driver_data;
 
@@ -398,18 +398,18 @@ static READ8_DEVICE_HANDLER( abc80_pio_port_b_r )
 {
 	/*
 
-		PIO Channel B
+        PIO Channel B
 
-		0  R    RS-232C RxD
-		1  R    RS-232C _CTS
-		2  R    RS-232C _DCD
-		3  W    RS-232C TxD
-		4  W    RS-232C _RTS
-		5  W    Cassette Motor
-		6  W    Cassette Data
-		7  R    Cassette Data
+        0  R    RS-232C RxD
+        1  R    RS-232C _CTS
+        2  R    RS-232C _DCD
+        3  W    RS-232C TxD
+        4  W    RS-232C _RTS
+        5  W    Cassette Motor
+        6  W    Cassette Data
+        7  R    Cassette Data
 
-	*/
+    */
 
 	abc80_state *state = device->machine->driver_data;
 
@@ -423,18 +423,18 @@ static WRITE8_DEVICE_HANDLER( abc80_pio_port_b_w )
 {
 	/*
 
-		PIO Channel B
+        PIO Channel B
 
-		0  R    RS-232C RxD
-		1  R    RS-232C _CTS
-		2  R    RS-232C _DCD
-		3  W    RS-232C TxD
-		4  W    RS-232C _RTS
-		5  W    Cassette Motor
-		6  W    Cassette Data
-		7  R    Cassette Data
+        0  R    RS-232C RxD
+        1  R    RS-232C _CTS
+        2  R    RS-232C _DCD
+        3  W    RS-232C TxD
+        4  W    RS-232C _RTS
+        5  W    Cassette Motor
+        6  W    Cassette Data
+        7  R    Cassette Data
 
-	*/
+    */
 
 	abc80_state *state = device->machine->driver_data;
 
@@ -549,7 +549,7 @@ static MACHINE_DRIVER_START( abc80 )
 
 	/* cassette */
 	MDRV_CASSETTE_ADD("cassette", default_cassette_config)
-	
+
 	MDRV_FLOPPY_2_DRIVES_ADD(abc80_floppy_config)
 MACHINE_DRIVER_END
 
@@ -640,6 +640,6 @@ SYSTEM_CONFIG_END
 
 /* Drivers */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY								FULLNAME					FLAGS */
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY                             FULLNAME                    FLAGS */
 COMP( 1978, abc80,  0,      0,      abc80,  abc80,  0,      abc80,  "Luxor Datorer AB",					"ABC 80 (Sweden, Finland)",	GAME_SUPPORTS_SAVE )
 COMP( 1978, abc80h, abc80,  0,      abc80,  abc80,  0,      abc80,  "Budapesti Radiotechnikai Gyar",	"ABC 80 (Hungary)",			GAME_SUPPORTS_SAVE )

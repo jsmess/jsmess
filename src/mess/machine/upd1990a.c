@@ -1,17 +1,17 @@
 /**********************************************************************
 
-	NEC uPD1990AC Serial I/O Calendar & Clock emulation
+    NEC uPD1990AC Serial I/O Calendar & Clock emulation
 
-	Copyright MESS Team.
+    Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
 
 *********************************************************************/
 
 /*
 
-	TODO:
+    TODO:
 
-	- test mode
+    - test mode
 
 */
 
@@ -57,7 +57,7 @@ struct _upd1990a_t
 	int c;						/* command */
 	int clk;					/* shift clock */
 	int tp;						/* time pulse */
-    
+
 	/* timers */
 	emu_timer *clock_timer;
 	emu_timer *data_out_timer;
@@ -155,7 +155,7 @@ WRITE_LINE_DEVICE_HANDLER( upd1990a_stb_w )
 
 		case UPD1990A_MODE_SHIFT:
 			if (LOG) logerror("UPD1990A Shift Mode\n");
-			
+
 			/* enable time counter */
 			timer_enable(upd1990a->clock_timer, 1);
 
@@ -201,7 +201,7 @@ WRITE_LINE_DEVICE_HANDLER( upd1990a_stb_w )
 		case UPD1990A_MODE_TIME_READ:
 			{
 			int i;
-			
+
 			if (LOG) logerror("UPD1990A Time Read Mode\n");
 
 			/* enable time counter */
@@ -226,14 +226,14 @@ WRITE_LINE_DEVICE_HANDLER( upd1990a_stb_w )
 
 		case UPD1990A_MODE_TP_64HZ_SET:
 			if (LOG) logerror("UPD1990A TP = 64 Hz Set Mode\n");
-			
+
 			/* 64 Hz time pulse */
 			timer_adjust_periodic(upd1990a->tp_timer, attotime_zero, 0, ATTOTIME_IN_HZ(64*2));
 			break;
 
 		case UPD1990A_MODE_TP_256HZ_SET:
 			if (LOG) logerror("UPD1990A TP = 256 Hz Set Mode\n");
-			
+
 			/* 256 Hz time pulse */
 			timer_adjust_periodic(upd1990a->tp_timer, attotime_zero, 0, ATTOTIME_IN_HZ(256*2));
 			break;

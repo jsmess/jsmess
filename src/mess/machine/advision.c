@@ -14,7 +14,7 @@
 
 /*
     8048 Ports:
-    
+
     P1  Bit 0..1  - RAM bank select
         Bit 3..7  - Keypad input
 
@@ -147,16 +147,16 @@ WRITE8_HANDLER( advision_av_control_w )
 	if ((state->video_enable == 0x00) && (data & 0x10))
 	{
 		advision_vh_update(space->machine, state->video_hpos);
-		
+
 		state->video_hpos++;
-		
+
 		if (state->video_hpos > 255)
 		{
 			state->video_hpos = 0;
 			logerror("HPOS OVERFLOW\n");
 		}
 	}
-	
+
 	state->video_enable = data & 0x10;
 	state->video_bank = (data & 0xe0) >> 5;
 }

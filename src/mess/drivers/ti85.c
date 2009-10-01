@@ -162,7 +162,7 @@ TI-83Plus ports:
     7: Memory page 2
     10: Controll port for the display controller
     11: Data port for the display controller
-	
+
 TI-85 ports:
     0: Video buffer offset (write only)
     1: Keypad
@@ -477,7 +477,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START (ti83)
 	PORT_INCLUDE( ti82 )
-	
+
 	PORT_START("BATTERY")
 		PORT_DIPNAME( 0x01, 0x01, "Battery Status" )
 		PORT_DIPSETTING( 0x01, DEF_STR( Normal ) )
@@ -571,7 +571,7 @@ static MACHINE_DRIVER_START( ti83p )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(ti86_mem)
 	MDRV_CPU_IO_MAP(ti83p_io)
-	
+
 	MDRV_MACHINE_START( ti83p )
 	MDRV_VIDEO_UPDATE( ti82 )
 
@@ -611,7 +611,7 @@ ROM_START (ti82)
 	ROMX_LOAD( "ti82v18.bin", 0x10000, 0x20000, CRC(6a320f03) SHA1(9ee15ebf0a1f8bde5bef982b5db4ce120c605d29), ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS( 3, "v19", "V 19.0" )
 	ROMX_LOAD( "ti82v19.bin", 0x10000, 0x20000, CRC(ed4cf9ff) SHA1(10dc2d01c62b4e971a6ed7ebc75ca0f2e3dc4f95), ROM_BIOS(4) )
-	//Rom versions according to ticalc.org 3*, 4*, 7*, 8.0, 10.0, 12.0, 15.0, 16.0, 17.0, 18.0, 19.0, 19.006 
+	//Rom versions according to ticalc.org 3*, 4*, 7*, 8.0, 10.0, 12.0, 15.0, 16.0, 17.0, 18.0, 19.0, 19.006
 ROM_END
 
 ROM_START (ti83)
@@ -644,7 +644,7 @@ ROM_START (ti83p)
 	ROM_SYSTEM_BIOS( 1, "v103m", "V 1.03 [m]" )
     ROMX_LOAD( "ti83pv103m.bin", 0x10000, 0x80000, CRC(281c9375) SHA1(80d698fed42976015a3e53fd59ebe7f49699b27e), ROM_BIOS(2))
     ROM_SYSTEM_BIOS( 2, "v103m2", "V 1.03 [m2]" )
-  	ROMX_LOAD( "ti83pv103m2.bin", 0x10000, 0x80000, CRC(690d9d30) SHA1(d215d3880e06c2ae31ec24b21d542d5bb2f3935b), ROM_BIOS(3))			
+  	ROMX_LOAD( "ti83pv103m2.bin", 0x10000, 0x80000, CRC(690d9d30) SHA1(d215d3880e06c2ae31ec24b21d542d5bb2f3935b), ROM_BIOS(3))
 	ROM_SYSTEM_BIOS( 3, "v110", "V 1.10" )
 	ROMX_LOAD( "ti83pv110.bin", 0x10000, 0x80000, CRC(62683990) SHA1(F86CDEFE4ED5EF9965CD9EB667CB859E2CB10E19), ROM_BIOS(4) )
 	ROM_SYSTEM_BIOS( 4, "v112", "V 1.12" )
@@ -696,7 +696,7 @@ ROM_START (ti86)
 	ROMX_LOAD( "ti86v15.bin", 0x10000, 0x40000, BAD_DUMP CRC(e6e10546) SHA1(5ca63fdfc965ae3fb8e0695263cf9da41f6ecb90), ROM_BIOS(4) )
 	ROM_SYSTEM_BIOS( 4, "v16", "V 1.6" )
 	ROMX_LOAD( "ti86v16.bin", 0x10000, 0x40000, CRC(37e02acc) SHA1(b5ad204885e5dde23a22f18f8d5eaffca69d638d), ROM_BIOS(5) )
-	//Rom versions according to ticalc.org 1.2, 1.3, 1.4, 1.5, 1.6 
+	//Rom versions according to ticalc.org 1.2, 1.3, 1.4, 1.5, 1.6
 ROM_END
 
 
@@ -713,7 +713,7 @@ ROM_START (ti84pse)
 	ROM_SYSTEM_BIOS( 0, "v241", "V 2.41" )
 	ROMX_LOAD( "ti84sev241.bin", 0x10000, 0x200000, CRC(5758db36) SHA1(7daa4f22e9b5dc8a1cc8fd31bceece9fa8b43515), ROM_BIOS(1) )
 ROM_END
-  
+
 static void ti85_serial_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* serial */

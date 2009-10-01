@@ -45,7 +45,7 @@ static DEVICE_START(dai_sound)
 	dai_input[0] = dai_input[1] = dai_input[2] = 0;
 
 	mixer_channel = stream_create(device, 0, 2, device->machine->sample_rate, 0, dai_sh_update);
-	
+
 	logerror ("sample rate: %d\n", device->machine->sample_rate);
 }
 

@@ -47,14 +47,14 @@
 static READ8_DEVICE_HANDLER( compis_ppi_r )
 {
 /* Port 3 is the control port and mame returns a hardcoded FF, but compis
-	does not like it. Code at that point:
-	F8DBD:	mov dx, 3
-		in al, dx
-		and al, 8
-		je F8DF1
-	The jump must be taken to succeed. It seems that the read should
-	return some kind of status rather than FF. Until this matter is
-	resolved, this will have to do. - R */
+    does not like it. Code at that point:
+    F8DBD:  mov dx, 3
+        in al, dx
+        and al, 8
+        je F8DF1
+    The jump must be taken to succeed. It seems that the read should
+    return some kind of status rather than FF. Until this matter is
+    resolved, this will have to do. - R */
 
 	if (offset == 3) return 0;
 	else
@@ -113,8 +113,8 @@ Small note about natural keyboard: currently,
 - "Compis S" is mapped to 'F6'
 - "Avbryt" is mapped to 'F7'
 - "Inpassa" is mapped to 'Insert'
-- "Sök" is mapped to "Print Screen"
-- "Utplåna"is mapped to 'Delete'
+- "S?k" is mapped to "Print Screen"
+- "Utpl?na"is mapped to 'Delete'
 - "Start / Stop" is mapped to 'Pause'
 - "TabL" is mapped to 'Page Up'
 - "TabR" is mapped to 'Page Down'
@@ -244,7 +244,7 @@ static const unsigned i86_address_mask = 0x000fffff;
 
 static const mm58274c_interface compis_mm58274c_interface =
 {
-	0,	/* 	mode 24*/
+	0,	/*  mode 24*/
 	1   /*  first day of week */
 };
 
@@ -301,7 +301,7 @@ static MACHINE_DRIVER_START( compis )
 	MDRV_MM58274C_ADD("mm58274c", compis_mm58274c_interface)
 
 	MDRV_NEC765A_ADD("nec765", compis_fdc_interface)
-	
+
 	MDRV_FLOPPY_2_DRIVES_ADD(compis_floppy_config)
 MACHINE_DRIVER_END
 

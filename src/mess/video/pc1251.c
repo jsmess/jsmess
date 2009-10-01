@@ -128,14 +128,14 @@ VIDEO_UPDATE( pc1251 )
 	color[0] = pocketc_colortable[PC1251_CONTRAST][0];
 	color[1] = pocketc_colortable[PC1251_CONTRAST][1];
 
-	for (x=RIGHT,y=DOWN, i=0; i<60; x+=3) 
+	for (x=RIGHT,y=DOWN, i=0; i<60; x+=3)
 	{
 		for (j=0; j<5; j++, i++, x+=3)
 			drawgfx_opaque(bitmap, 0, screen->machine->gfx[0], pc1251_lcd.reg[i],
 					PC1251_CONTRAST,0,0,
 					x,y);
 	}
-	for (i=0x7b; i>=0x40; x+=3) 
+	for (i=0x7b; i>=0x40; x+=3)
 	{
 		for (j=0; j<5; j++, i--, x+=3)
 			drawgfx_opaque(bitmap, 0, screen->machine->gfx[0], pc1251_lcd.reg[i],
@@ -161,8 +161,8 @@ VIDEO_UPDATE( pc1251 )
 						pc1251_lcd.reg[0x3e] & 0x04 ? color[1] : color[0]);
 
 	/* 0x3c 1 def?, 4 g, 8 de
-	   0x3d 2 shift, 4 rad, 8 error
-	   0x3e 1 pro?, 2 run?, 4rsv?*/
+       0x3d 2 shift, 4 rad, 8 error
+       0x3e 1 pro?, 2 run?, 4rsv?*/
 	return 0;
 }
 

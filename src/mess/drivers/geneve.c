@@ -216,7 +216,7 @@
 #include "machine/smartmed.h"
 #include "devices/harddriv.h"
 #include "machine/idectrl.h"
-#include "machine/smc92x4.h" 
+#include "machine/smc92x4.h"
 #include "machine/mm58274c.h"
 
 
@@ -448,14 +448,14 @@ static const tms5220_interface geneve_tms5220interface =
 
 static const mm58274c_interface geneve_mm58274c_interface =
 {
-	1,	/* 	mode 24*/
+	1,	/*  mode 24*/
 	0   /*  first day of week */
 };
 
 
 static const mm58274c_interface floppy_mm58274c_interface =
 {
-	1,	/* 	mode 24*/
+	1,	/*  mode 24*/
 	0   /*  first day of week */
 };
 
@@ -505,20 +505,20 @@ static MACHINE_DRIVER_START(geneve_60hz)
 	MDRV_IMPORT_FROM( smc92x4_hd )
 
 	MDRV_IDE_HARDDISK_ADD( "ide_harddisk" )
-	
+
 	/* rtc */
 	MDRV_MM58274C_ADD("mm58274c", geneve_mm58274c_interface)
 	MDRV_MM58274C_ADD("mm58274c_floppy", floppy_mm58274c_interface)
-	
+
 	/* tms9901 */
-	MDRV_TMS9901_ADD("tms9901", tms9901reset_param_ti99)	
-	
+	MDRV_TMS9901_ADD("tms9901", tms9901reset_param_ti99)
+
 	MDRV_WD179X_ADD("wd179x", ti99_wd17xx_interface )
-	
+
 	MDRV_FLOPPY_4_DRIVES_ADD(geneve_floppy_config)
-	
+
 	MDRV_SMARTMEDIA_ADD("smartmedia")
-	
+
 	MDRV_TI99_4_RS232_CARD_ADD("rs232")
 MACHINE_DRIVER_END
 

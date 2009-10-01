@@ -6,44 +6,44 @@
   Notes on Port 3D8
   (http://www.clipx.net/ng/interrupts_and_ports/ng2d045.php)
 
-	Port 3D8  -  Color/VGA Mode control register
+    Port 3D8  -  Color/VGA Mode control register
 
-			xx1x xxxx  Attribute bit 7. 0=blink, 1=Intesity
-			xxx1 xxxx  640x200 mode
-			xxxx 1xxx  Enable video signal
-			xxxx x1xx  Select B/W mode
-			xxxx xx1x  Select graphics
-			xxxx xxx1  80x25 text
-
-
-	The usage of the above control register for various modes is:
-			xx10 1100  40x25 alpha B/W
-			xx10 1000  40x25 alpha color
-			xx10 1101  80x25 alpha B/W
-			xx10 1001  80x25 alpha color
-			xxx0 1110  320x200 graph B/W
-			xxx0 1010  320x200 graph color
-			xxx1 1110  640x200 graph B/W
+            xx1x xxxx  Attribute bit 7. 0=blink, 1=Intesity
+            xxx1 xxxx  640x200 mode
+            xxxx 1xxx  Enable video signal
+            xxxx x1xx  Select B/W mode
+            xxxx xx1x  Select graphics
+            xxxx xxx1  80x25 text
 
 
-	PC1512 display notes
+    The usage of the above control register for various modes is:
+            xx10 1100  40x25 alpha B/W
+            xx10 1000  40x25 alpha color
+            xx10 1101  80x25 alpha B/W
+            xx10 1001  80x25 alpha color
+            xxx0 1110  320x200 graph B/W
+            xxx0 1010  320x200 graph color
+            xxx1 1110  640x200 graph B/W
 
-	The PC1512 built-in display adaptor is an emulation of IBM's CGA.  Unlike a
-	real CGA, it is not built around a real MC6845 controller, and so attempts
-	to get custom video modes out of it may not work as expected. Its 640x200
-	CGA mode can be set up to be a 16-color mode rather than mono.
 
-	If you program it with BIOS calls, the PC1512 behaves just like a real CGA,
-	except:
+    PC1512 display notes
 
-	- The 'greyscale' text modes (0 and 2) behave just like the 'color'
-	  ones (1 and 3). On a color monitor both are in color; on a mono
-	  monitor both are in greyscale.
-	- Mode 5 (the 'greyscale' graphics mode) displays in color, using
-	  an alternative color palette: Cyan, Red and White.
-	- The undocumented 160x100x16 "graphics" mode works correctly.
+    The PC1512 built-in display adaptor is an emulation of IBM's CGA.  Unlike a
+    real CGA, it is not built around a real MC6845 controller, and so attempts
+    to get custom video modes out of it may not work as expected. Its 640x200
+    CGA mode can be set up to be a 16-color mode rather than mono.
 
-	(source John Elliott http://www.seasip.info/AmstradXT/pc1512disp.html)
+    If you program it with BIOS calls, the PC1512 behaves just like a real CGA,
+    except:
+
+    - The 'greyscale' text modes (0 and 2) behave just like the 'color'
+      ones (1 and 3). On a color monitor both are in color; on a mono
+      monitor both are in greyscale.
+    - Mode 5 (the 'greyscale' graphics mode) displays in color, using
+      an alternative color palette: Cyan, Red and White.
+    - The undocumented 160x100x16 "graphics" mode works correctly.
+
+    (source John Elliott http://www.seasip.info/AmstradXT/pc1512disp.html)
 
 
   Cursor signal handling:
@@ -97,7 +97,7 @@
 
 /***************************************************************************
 
-	Static declarations
+    Static declarations
 
 ***************************************************************************/
 
@@ -230,7 +230,7 @@ MACHINE_DRIVER_END
 
 /***************************************************************************
 
-	Local variables and declarations
+    Local variables and declarations
 
 ***************************************************************************/
 
@@ -416,7 +416,7 @@ static void ntsc_decode(struct ntsc_decoder *ntsc, UINT8 *input, UINT8 *output, 
 
 /***************************************************************************
 
-	Methods
+    Methods
 
 ***************************************************************************/
 
@@ -471,9 +471,9 @@ static VIDEO_START( pc_cga )
 	const address_space *spaceio = cpu_get_address_space(machine->firstcpu, ADDRESS_SPACE_IO);
 
 	/* Changed video RAM size to full 32k, for cards which support the
-	 * Plantronics chipset.
-	 * TODO: Cards which don't support Plantronics should repeat at
-	 * BC000h */
+     * Plantronics chipset.
+     * TODO: Cards which don't support Plantronics should repeat at
+     * BC000h */
 	buswidth = cpu_get_databus_width(machine->firstcpu, ADDRESS_SPACE_PROGRAM);
 	switch(buswidth)
 	{
@@ -897,7 +897,7 @@ if (NTSC_FILTER)
 		int b = ( ntsc_decoded[samp_index+2] + ntsc_decoded[samp_index+5] ) / 2;
 		*p = 0x8000 + ( ( ( r & 0xF8 ) << 7 ) | ( ( g & 0xF8 ) << 2 ) | ( ( b & 0xF8 ) >> 3 ) );
 		p++;
-		samp_index +=6; 
+		samp_index +=6;
 	}
 }
 }
@@ -1040,7 +1040,7 @@ static void pc_cga_set_palette_luts(void)
 }
 
 /*
- *	rW	CGA mode control register (see #P138)
+ *  rW  CGA mode control register (see #P138)
  *
  *  x x x 0 1 0 0 0 - 320x200, 40x25 text. Colour on RGB and composite monitors.
  *  x x x 0 1 0 0 1 - 640x200, 80x25 text. Colour on RGB and composite monitors.
@@ -1162,7 +1162,7 @@ static void pc_cga_mode_control_w(running_machine *machine, int data)
 
 
 /*
- *	?W	reserved for color select register on color adapter
+ *  ?W  reserved for color select register on color adapter
  */
 static void pc_cga_color_select_w(running_machine *machine, int data)
 {
@@ -1192,8 +1192,8 @@ static void pc_cga_plantronics_w(running_machine *machine, int data)
 
 /*************************************************************************
  *
- *		CGA
- *		color graphics adapter
+ *      CGA
+ *      color graphics adapter
  *
  *************************************************************************/
 
@@ -1265,30 +1265,30 @@ static WRITE32_HANDLER( pc_cga32le_w ) { write32le_with_write8_handler(pc_cga8_w
 //
 
 //INLINE void pgfx_plot_unit_4bpp(bitmap_t *bitmap,
-//							 int x, int y, int offs)
+//                           int x, int y, int offs)
 //{
-//	int color, values[2];
-//	int i;
+//  int color, values[2];
+//  int i;
 //
-//	if (cga.plantronics & 0x40)
-//	{
-//		values[0] = videoram[offs | 0x4000];
-//		values[1] = videoram[offs];
-//	}
-//	else
-//	{
-//		values[0] = videoram[offs];
-//		values[1] = videoram[offs | 0x4000];
-//	}
-//	for (i=3; i>=0; i--)
-//	{
-//		color = ((values[0] & 0x3) << 1) |
-//			((values[1] & 2)   >> 1) |
-//			((values[1] & 1)   << 3);
-//		*BITMAP_ADDR16(bitmap, y, x+i) = Machine->pens[color];
-//		values[0]>>=2;
-//		values[1]>>=2;
-//	}
+//  if (cga.plantronics & 0x40)
+//  {
+//      values[0] = videoram[offs | 0x4000];
+//      values[1] = videoram[offs];
+//  }
+//  else
+//  {
+//      values[0] = videoram[offs];
+//      values[1] = videoram[offs | 0x4000];
+//  }
+//  for (i=3; i>=0; i--)
+//  {
+//      color = ((values[0] & 0x3) << 1) |
+//          ((values[1] & 2)   >> 1) |
+//          ((values[1] & 1)   << 3);
+//      *BITMAP_ADDR16(bitmap, y, x+i) = Machine->pens[color];
+//      values[0]>>=2;
+//      values[1]>>=2;
+//  }
 //}
 //
 //
@@ -1301,74 +1301,74 @@ static WRITE32_HANDLER( pc_cga32le_w ) { write32le_with_write8_handler(pc_cga8_w
 //
 //static void cga_pgfx_4bpp(bitmap_t *bitmap, struct mscrtc6845 *crtc)
 //{
-//	int i, sx, sy, sh;
-//	int	offs = mscrtc6845_get_start(crtc)*2;
-//	int lines = mscrtc6845_get_char_lines(crtc);
-//	int height = mscrtc6845_get_char_height(crtc);
-//	int columns = mscrtc6845_get_char_columns(crtc)*2;
+//  int i, sx, sy, sh;
+//  int offs = mscrtc6845_get_start(crtc)*2;
+//  int lines = mscrtc6845_get_char_lines(crtc);
+//  int height = mscrtc6845_get_char_height(crtc);
+//  int columns = mscrtc6845_get_char_columns(crtc)*2;
 //
-//	for (sy=0; sy<lines; sy++,offs=(offs+columns)&0x1fff)
-//	{
-//		for (sh=0; sh<height; sh++, offs|=0x2000)
-//		{
-//			// char line 0 used as a12 line in graphic mode
-//			if (!(sh & 1))
-//			{
-//				for (i=offs, sx=0; sx<columns; sx++, i=(i+1)&0x1fff)
-//				{
-//					pgfx_plot_unit_4bpp(bitmap, sx*4, sy*height+sh, i);
-//				}
-//			}
-//			else
-//			{
-//				for (i=offs|0x2000, sx=0; sx<columns; sx++, i=((i+1)&0x1fff)|0x2000)
-//				{
-//					pgfx_plot_unit_4bpp(bitmap, sx*4, sy*height+sh, i);
-//				}
-//			}
-//		}
-//	}
+//  for (sy=0; sy<lines; sy++,offs=(offs+columns)&0x1fff)
+//  {
+//      for (sh=0; sh<height; sh++, offs|=0x2000)
+//      {
+//          // char line 0 used as a12 line in graphic mode
+//          if (!(sh & 1))
+//          {
+//              for (i=offs, sx=0; sx<columns; sx++, i=(i+1)&0x1fff)
+//              {
+//                  pgfx_plot_unit_4bpp(bitmap, sx*4, sy*height+sh, i);
+//              }
+//          }
+//          else
+//          {
+//              for (i=offs|0x2000, sx=0; sx<columns; sx++, i=((i+1)&0x1fff)|0x2000)
+//              {
+//                  pgfx_plot_unit_4bpp(bitmap, sx*4, sy*height+sh, i);
+//              }
+//          }
+//      }
+//  }
 //}
 //
 //
 //
 //INLINE void pgfx_plot_unit_2bpp(bitmap_t *bitmap,
-//					 int x, int y, const UINT16 *palette, int offs)
+//                   int x, int y, const UINT16 *palette, int offs)
 //{
-//	int i;
-//	UINT8 bmap[2], values[2];
-//	UINT16 *dest;
+//  int i;
+//  UINT8 bmap[2], values[2];
+//  UINT16 *dest;
 //
-//	if (cga.plantronics & 0x40)
-//	{
-//		values[0] = videoram[offs];
-//		values[1] = videoram[offs | 0x4000];
-//	}
-//	else
-//	{
-//		values[0] = videoram[offs | 0x4000];
-//		values[1] = videoram[offs];
-//	}
-//	bmap[0] = bmap[1] = 0;
-//	for (i=3; i>=0; i--)
-//	{
-//		bmap[0] = bmap[0] << 1; if (values[0] & 0x80) bmap[0] |= 1;
-//		bmap[0] = bmap[0] << 1; if (values[1] & 0x80) bmap[0] |= 1;
-//		bmap[1] = bmap[1] << 1; if (values[0] & 0x08) bmap[1] |= 1;
-//		bmap[1] = bmap[1] << 1; if (values[1] & 0x08) bmap[1] |= 1;
-//		values[0] = values[0] << 1;
-//		values[1] = values[1] << 1;
-//	}
+//  if (cga.plantronics & 0x40)
+//  {
+//      values[0] = videoram[offs];
+//      values[1] = videoram[offs | 0x4000];
+//  }
+//  else
+//  {
+//      values[0] = videoram[offs | 0x4000];
+//      values[1] = videoram[offs];
+//  }
+//  bmap[0] = bmap[1] = 0;
+//  for (i=3; i>=0; i--)
+//  {
+//      bmap[0] = bmap[0] << 1; if (values[0] & 0x80) bmap[0] |= 1;
+//      bmap[0] = bmap[0] << 1; if (values[1] & 0x80) bmap[0] |= 1;
+//      bmap[1] = bmap[1] << 1; if (values[0] & 0x08) bmap[1] |= 1;
+//      bmap[1] = bmap[1] << 1; if (values[1] & 0x08) bmap[1] |= 1;
+//      values[0] = values[0] << 1;
+//      values[1] = values[1] << 1;
+//  }
 //
-//	dest = BITMAP_ADDR16(bitmap, y, x);
-//	*(dest++) = palette[(bmap[0] >> 6) & 0x03];
-//	*(dest++) = palette[(bmap[0] >> 4) & 0x03];
-//	*(dest++) = palette[(bmap[0] >> 2) & 0x03];
-//	*(dest++) = palette[(bmap[0] >> 0) & 0x03];
-//	*(dest++) = palette[(bmap[1] >> 6) & 0x03];
-//	*(dest++) = palette[(bmap[1] >> 4) & 0x03];
-//	*(dest++) = palette[(bmap[1] >> 2) & 0x03];
-//	*(dest++) = palette[(bmap[1] >> 0) & 0x03];
+//  dest = BITMAP_ADDR16(bitmap, y, x);
+//  *(dest++) = palette[(bmap[0] >> 6) & 0x03];
+//  *(dest++) = palette[(bmap[0] >> 4) & 0x03];
+//  *(dest++) = palette[(bmap[0] >> 2) & 0x03];
+//  *(dest++) = palette[(bmap[0] >> 0) & 0x03];
+//  *(dest++) = palette[(bmap[1] >> 6) & 0x03];
+//  *(dest++) = palette[(bmap[1] >> 4) & 0x03];
+//  *(dest++) = palette[(bmap[1] >> 2) & 0x03];
+//  *(dest++) = palette[(bmap[1] >> 0) & 0x03];
 //}
 //
 //
@@ -1381,60 +1381,60 @@ static WRITE32_HANDLER( pc_cga32le_w ) { write32le_with_write8_handler(pc_cga8_w
 //
 //static void cga_pgfx_2bpp(bitmap_t *bitmap, struct mscrtc6845 *crtc)
 //{
-//	int i, sx, sy, sh;
-//	int	offs = mscrtc6845_get_start(crtc)*2;
-//	int lines = mscrtc6845_get_char_lines(crtc);
-//	int height = mscrtc6845_get_char_height(crtc);
-//	int columns = mscrtc6845_get_char_columns(crtc)*2;
-//	int colorset = cga.color_select & 0x3F;
-//	const UINT16 *palette;
+//  int i, sx, sy, sh;
+//  int offs = mscrtc6845_get_start(crtc)*2;
+//  int lines = mscrtc6845_get_char_lines(crtc);
+//  int height = mscrtc6845_get_char_height(crtc);
+//  int columns = mscrtc6845_get_char_columns(crtc)*2;
+//  int colorset = cga.color_select & 0x3F;
+//  const UINT16 *palette;
 //
-//	/* Most chipsets use bit 2 of the mode control register to
-//	 * access a third palette. But not consistently. */
-//	pc_cga_check_palette();
-//	switch(CGA_CHIPSET)
-//	{
-//		/* The IBM Professional Graphics Controller behaves like
-//		 * the PC1512, btw. */
-//		case CGA_CHIPSET_PC1512:
-//		if ((colorset < 32) && (cga.mode_control & 4)) colorset += 64;
-//		break;
+//  /* Most chipsets use bit 2 of the mode control register to
+//   * access a third palette. But not consistently. */
+//  pc_cga_check_palette();
+//  switch(CGA_CHIPSET)
+//  {
+//      /* The IBM Professional Graphics Controller behaves like
+//       * the PC1512, btw. */
+//      case CGA_CHIPSET_PC1512:
+//      if ((colorset < 32) && (cga.mode_control & 4)) colorset += 64;
+//      break;
 //
-//		case CGA_CHIPSET_IBM:
-//		case CGA_CHIPSET_PC200:
-//		case CGA_CHIPSET_ATI:
-//		case CGA_CHIPSET_PARADISE:
-//		if (cga.mode_control & 4) colorset = (colorset & 0x1F) + 64;
-//		break;
-//	}
+//      case CGA_CHIPSET_IBM:
+//      case CGA_CHIPSET_PC200:
+//      case CGA_CHIPSET_ATI:
+//      case CGA_CHIPSET_PARADISE:
+//      if (cga.mode_control & 4) colorset = (colorset & 0x1F) + 64;
+//      break;
+//  }
 //
 //
-//	/* The fact that our palette is located in cga_colortable is a vestigial
-//	 * aspect from when we were doing that ugly trick where drawgfx() would
-//	 * handle graphics drawing.  Truthfully, we should probably be using
-//	 * palette_set_color_rgb() here and not doing the palette lookup in the loop
-//	 */
-//	palette = &cga_colortable[256*2 + 16*2] + colorset * 4;
+//  /* The fact that our palette is located in cga_colortable is a vestigial
+//   * aspect from when we were doing that ugly trick where drawgfx() would
+//   * handle graphics drawing.  Truthfully, we should probably be using
+//   * palette_set_color_rgb() here and not doing the palette lookup in the loop
+//   */
+//  palette = &cga_colortable[256*2 + 16*2] + colorset * 4;
 //
-//	for (sy=0; sy<lines; sy++,offs=(offs+columns)&0x1fff) {
+//  for (sy=0; sy<lines; sy++,offs=(offs+columns)&0x1fff) {
 //
-//		for (sh=0; sh<height; sh++)
-//		{
-//			if (!(sh&1)) { // char line 0 used as a12 line in graphic mode
-//				for (i=offs, sx=0; sx<columns; sx++, i=(i+1)&0x1fff)
-//				{
-//					pgfx_plot_unit_2bpp(bitmap, sx*8, sy*height+sh, palette, i);
-//				}
-//			}
-//			else
-//			{
-//				for (i=offs|0x2000, sx=0; sx<columns; sx++, i=((i+1)&0x1fff)|0x2000)
-//				{
-//					pgfx_plot_unit_2bpp(bitmap, sx*8, sy*height+sh, palette, i);
-//				}
-//			}
-//		}
-//	}
+//      for (sh=0; sh<height; sh++)
+//      {
+//          if (!(sh&1)) { // char line 0 used as a12 line in graphic mode
+//              for (i=offs, sx=0; sx<columns; sx++, i=(i+1)&0x1fff)
+//              {
+//                  pgfx_plot_unit_2bpp(bitmap, sx*8, sy*height+sh, palette, i);
+//              }
+//          }
+//          else
+//          {
+//              for (i=offs|0x2000, sx=0; sx<columns; sx++, i=((i+1)&0x1fff)|0x2000)
+//              {
+//                  pgfx_plot_unit_2bpp(bitmap, sx*8, sy*height+sh, palette, i);
+//              }
+//          }
+//      }
+//  }
 //}
 
 

@@ -30,7 +30,7 @@ DRIVER_INIT(pp01)
 static void pp01_video_w(UINT8 block,UINT16 offset,UINT8 data,UINT8 part)
 {
 	UINT16 addroffset = part ? 0x1000  : 0x0000;
-	
+
 	if (BIT(pp01_video_write_mode,3)) {
 		// Copy mode
 		if(BIT(pp01_video_write_mode,0)) {
@@ -58,7 +58,7 @@ static void pp01_video_w(UINT8 block,UINT16 offset,UINT8 data,UINT8 part)
 		if (block==2) {
 			mess_ram[0xe000+offset+addroffset] = data;
 		}
-	}	
+	}
 }
 
 static WRITE8_HANDLER (pp01_video_r_1_w)
@@ -89,8 +89,8 @@ static WRITE8_HANDLER (pp01_video_b_2_w)
 
 
 static void pp01_set_memory(running_machine *machine,UINT8 block, UINT8 data)
-{	
-	UINT8 *mem = memory_region(machine, "maincpu");	
+{
+	UINT8 *mem = memory_region(machine, "maincpu");
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT16 startaddr = block*0x1000;
 	UINT16 endaddr   = ((block+1)*0x1000)-1;
@@ -99,42 +99,42 @@ static void pp01_set_memory(running_machine *machine,UINT8 block, UINT8 data)
 		// This is RAM
 		memory_install_read8_handler (space, startaddr, endaddr, 0, 0, SMH_BANK(blocknum));
 		switch(data) {
-			case 0xe6 : 
-					memory_install_write8_handler(space, startaddr, endaddr, 0, 0, pp01_video_r_1_w);	
+			case 0xe6 :
+					memory_install_write8_handler(space, startaddr, endaddr, 0, 0, pp01_video_r_1_w);
 					break;
-			case 0xe7 : 
-					memory_install_write8_handler(space, startaddr, endaddr, 0, 0, pp01_video_r_2_w);	
+			case 0xe7 :
+					memory_install_write8_handler(space, startaddr, endaddr, 0, 0, pp01_video_r_2_w);
 					break;
-			case 0xea : 
-					memory_install_write8_handler(space, startaddr, endaddr, 0, 0, pp01_video_g_1_w);	
+			case 0xea :
+					memory_install_write8_handler(space, startaddr, endaddr, 0, 0, pp01_video_g_1_w);
 					break;
-			case 0xeb : 
-					memory_install_write8_handler(space, startaddr, endaddr, 0, 0, pp01_video_g_2_w);	
+			case 0xeb :
+					memory_install_write8_handler(space, startaddr, endaddr, 0, 0, pp01_video_g_2_w);
 					break;
-			case 0xee : 
-					memory_install_write8_handler(space, startaddr, endaddr, 0, 0, pp01_video_b_1_w);	
+			case 0xee :
+					memory_install_write8_handler(space, startaddr, endaddr, 0, 0, pp01_video_b_1_w);
 					break;
-			case 0xef : 
-					memory_install_write8_handler(space, startaddr, endaddr, 0, 0, pp01_video_b_2_w);	
+			case 0xef :
+					memory_install_write8_handler(space, startaddr, endaddr, 0, 0, pp01_video_b_2_w);
 					break;
-			
+
 			default :
-					memory_install_write8_handler(space, startaddr, endaddr, 0, 0, SMH_BANK(blocknum));	
+					memory_install_write8_handler(space, startaddr, endaddr, 0, 0, SMH_BANK(blocknum));
 					break;
 		}
-		
+
 		memory_set_bankptr(machine, blocknum, mess_ram + (data & 0x0F)* 0x1000);
 	} else if (data>=0xF8) {
 		memory_install_read8_handler (space, startaddr, endaddr, 0, 0, SMH_BANK(blocknum));
-		memory_install_write8_handler(space, startaddr, endaddr, 0, 0, SMH_UNMAP);	
+		memory_install_write8_handler(space, startaddr, endaddr, 0, 0, SMH_UNMAP);
 		memory_set_bankptr(machine, blocknum, mem + ((data & 0x0F)-8)* 0x1000+0x10000);
 	} else {
 		logerror("%02x %02x\n",block,data);
-		memory_install_read8_handler (space, startaddr, endaddr, 0, 0, SMH_UNMAP);	
-		memory_install_write8_handler(space, startaddr, endaddr, 0, 0, SMH_UNMAP);	
+		memory_install_read8_handler (space, startaddr, endaddr, 0, 0, SMH_UNMAP);
+		memory_install_write8_handler(space, startaddr, endaddr, 0, 0, SMH_UNMAP);
 	}
 }
-	
+
 MACHINE_RESET( pp01 )
 {
 	int i;
@@ -145,7 +145,7 @@ MACHINE_RESET( pp01 )
 	}
 }
 
-WRITE8_HANDLER (pp01_mem_block_w) 
+WRITE8_HANDLER (pp01_mem_block_w)
 {
 	memory_block[offset] = data;
 	pp01_set_memory(space->machine, offset, data);
@@ -198,7 +198,7 @@ static READ8_DEVICE_HANDLER (pp01_8255_porta_r )
 	return pp01_video_scroll;
 }
 static WRITE8_DEVICE_HANDLER (pp01_8255_porta_w )
-{	
+{
 	pp01_video_scroll = data;
 }
 
@@ -207,22 +207,22 @@ static READ8_DEVICE_HANDLER (pp01_8255_portb_r )
 {
 	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7",
 											"LINE8", "LINE9", "LINEA", "LINEB", "LINEC", "LINED", "LINEE", "LINEF" };
-	
+
 	return (input_port_read(device->machine,keynames[pp01_key_line]) & 0x3F) | (input_port_read(device->machine,"LINEALL") & 0xC0);
 }
 static WRITE8_DEVICE_HANDLER (pp01_8255_portb_w )
-{	
+{
 	//logerror("pp01_8255_portb_w %02x\n",data);
-	
+
 }
 
 static WRITE8_DEVICE_HANDLER (pp01_8255_portc_w )
-{	
+{
 	pp01_key_line = data & 0x0f;
 }
 
 static READ8_DEVICE_HANDLER (pp01_8255_portc_r )
-{	
+{
 	return 0xff;
 }
 

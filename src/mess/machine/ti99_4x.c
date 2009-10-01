@@ -1,53 +1,53 @@
 /*
-	Machine code for TI99/4, TI-99/4A, TI-99/8, and SNUG SGCPU (a.k.a. 99/4P).
-	Raphael Nabet, 1999-2003.
-	Some code was originally derived from Ed Swartz's V9T9.
+    Machine code for TI99/4, TI-99/4A, TI-99/8, and SNUG SGCPU (a.k.a. 99/4P).
+    Raphael Nabet, 1999-2003.
+    Some code was originally derived from Ed Swartz's V9T9.
 
-	References:
-	* The TI-99/4A Tech Pages.  Great site with complete technical description
-	  of the TI99/4a.
-		<http://www.nouspikel.com/ti99/titech.htm>
-	* ftp.whtech.com has schematics and hardware documentations.  The documents
-	  of most general interest are:
-		<ftp://ftp.whtech.com//datasheets/Hardware manuals/99-4  console specification and schematic.pdf>
-		<ftp://ftp.whtech.com//datasheets/Hardware manuals/99-4A Console and peripheral Expansion System Technical Data.pdf>
-	  Schematics for various extension cards are available in the same directory.
-	* V9T9 source code.  This older emulator was often fairly accurate.
-	* Harald Glaab's site has software and documentation for the various SNUG
-	  cards: 99/4P (nicknamed "SGCPU"), EVPC, BwG.
-		<http://home.t-online.de/home/harald.glaab/snug/>
-	* The TI-99/4 CPU ROM is the only source of information for the IR remote
-	  handset controller protocol.  I have written a document that explains
-	  this protocol.
-	* TI-99/8 ROM source code (6 PC99 disk images):
-		<ftp://ftp.whtech.com//source/998Source Disk1.DSK>
-		...
-		<ftp://ftp.whtech.com//source/998Source Disk6.DSK>
-	* TI-99/8 schematics.  This is a valuable source of information, BUT the
-	  schematics describe an early prototype (no Extended Basic, etc.).
-		<ftp://ftp.whtech.com//datasheets & manuals/99-8 Computer/99-8 schematic.max>
-	  I have written an index for the signals on these schematics.
+    References:
+    * The TI-99/4A Tech Pages.  Great site with complete technical description
+      of the TI99/4a.
+        <http://www.nouspikel.com/ti99/titech.htm>
+    * ftp.whtech.com has schematics and hardware documentations.  The documents
+      of most general interest are:
+        <ftp://ftp.whtech.com//datasheets/Hardware manuals/99-4  console specification and schematic.pdf>
+        <ftp://ftp.whtech.com//datasheets/Hardware manuals/99-4A Console and peripheral Expansion System Technical Data.pdf>
+      Schematics for various extension cards are available in the same directory.
+    * V9T9 source code.  This older emulator was often fairly accurate.
+    * Harald Glaab's site has software and documentation for the various SNUG
+      cards: 99/4P (nicknamed "SGCPU"), EVPC, BwG.
+        <http://home.t-online.de/home/harald.glaab/snug/>
+    * The TI-99/4 CPU ROM is the only source of information for the IR remote
+      handset controller protocol.  I have written a document that explains
+      this protocol.
+    * TI-99/8 ROM source code (6 PC99 disk images):
+        <ftp://ftp.whtech.com//source/998Source Disk1.DSK>
+        ...
+        <ftp://ftp.whtech.com//source/998Source Disk6.DSK>
+    * TI-99/8 schematics.  This is a valuable source of information, BUT the
+      schematics describe an early prototype (no Extended Basic, etc.).
+        <ftp://ftp.whtech.com//datasheets & manuals/99-8 Computer/99-8 schematic.max>
+      I have written an index for the signals on these schematics.
 
 Emulated:
-	* All TI99 basic console hardware, except a few tricks in TMS9901 emulation.
-	* Cartridges with ROM (either non-paged or paged), RAM (minimemory) and
-	  GROM.  Supercart and MBX support are not finished.
-	* Speech Synthesizer, with standard speech ROM (no speech ROM expansion).
-	* Disk emulation (SSSD disk images with TI fdc, both SSSD and DSDD with
-	  SNUG's BwG and HFDC fdcs).
-	* Hard disk (HFDC and IDE).
-	* Mechatronics mouse.
-	* save minimemory contents 
+    * All TI99 basic console hardware, except a few tricks in TMS9901 emulation.
+    * Cartridges with ROM (either non-paged or paged), RAM (minimemory) and
+      GROM.  Supercart and MBX support are not finished.
+    * Speech Synthesizer, with standard speech ROM (no speech ROM expansion).
+    * Disk emulation (SSSD disk images with TI fdc, both SSSD and DSDD with
+      SNUG's BwG and HFDC fdcs).
+    * Hard disk (HFDC and IDE).
+    * Mechatronics mouse.
+    * save minimemory contents
 
-	Compatibility looks quite good.
+    Compatibility looks quite good.
 
 Issues:
-	* floppy disk timings are not emulated (general issue)
+    * floppy disk timings are not emulated (general issue)
 
 TODO:
-	* support for other peripherals and DSRs as documentation permits
-	* implement the EVPC palette chip
-	* finish 99/4p support: ROM6, HSGPL (implemented, but not fully debugged)
+    * support for other peripherals and DSRs as documentation permits
+    * implement the EVPC palette chip
+    * finish 99/4p support: ROM6, HSGPL (implemented, but not fully debugged)
 */
 
 #include <math.h>
@@ -90,12 +90,12 @@ static void ti99_myarcxram_init(running_machine *machine);
 static void ti99_evpc_reset(running_machine *machine);
 
 /*
-	pointer to extended RAM area
+    pointer to extended RAM area
 */
 static UINT16 *xRAM_ptr;
 
 /*
-	Configuration
+    Configuration
 */
 /* model of ti99 in emulation */
 static enum
@@ -150,82 +150,82 @@ static int KeyCol;
 static int AlphaLockLine;
 
 /*
-	GROM support.
+    GROM support.
 
 In short:
 
-	TI99/4x hardware supports GROMs.  GROMs are slow ROM devices, which are
-	interfaced via a 8-bit data bus, and include an internal address pointer
-	which is incremented after each read.  This implies that accesses are
-	faster when reading consecutive bytes, although the address pointer can be
-	read and written at any time.
+    TI99/4x hardware supports GROMs.  GROMs are slow ROM devices, which are
+    interfaced via a 8-bit data bus, and include an internal address pointer
+    which is incremented after each read.  This implies that accesses are
+    faster when reading consecutive bytes, although the address pointer can be
+    read and written at any time.
 
-	They are generally used to store programs in GPL (Graphic Programming
-	Language: a proprietary, interpreted language - the interpreter takes most
-	of a TI99/4(a) CPU ROMs).  They can used to store large pieces of data,
-	too.
+    They are generally used to store programs in GPL (Graphic Programming
+    Language: a proprietary, interpreted language - the interpreter takes most
+    of a TI99/4(a) CPU ROMs).  They can used to store large pieces of data,
+    too.
 
-	Both TI-99/4 and TI-99/4a include three GROMs, with some start-up code,
-	system routines and TI-Basic.  TI99/4 includes an additional Equation
-	Editor.  According to the preliminary schematics found on ftp.whtech.com,
-	TI-99/8 includes the three standard GROMs and 16 GROMs for the UCSD
-	p-system.  TI99/2 does not include GROMs at all, and was not designed to
-	support any, although it should be relatively easy to create an expansion
-	card with the GPL interpreter and a /4a cartridge port.
+    Both TI-99/4 and TI-99/4a include three GROMs, with some start-up code,
+    system routines and TI-Basic.  TI99/4 includes an additional Equation
+    Editor.  According to the preliminary schematics found on ftp.whtech.com,
+    TI-99/8 includes the three standard GROMs and 16 GROMs for the UCSD
+    p-system.  TI99/2 does not include GROMs at all, and was not designed to
+    support any, although it should be relatively easy to create an expansion
+    card with the GPL interpreter and a /4a cartridge port.
 
 The simple way:
 
-	Each GROM is logically 8kb long.
+    Each GROM is logically 8kb long.
 
-	Communication with GROM is done with 4 memory-mapped locations.  You can read or write
-	a 16-bit address pointer, and read data from GROMs.  One register allows to write data, too,
-	which would support some GRAMs, but AFAIK TI never built such GRAMs (although docs from TI
-	do refer to this possibility).
+    Communication with GROM is done with 4 memory-mapped locations.  You can read or write
+    a 16-bit address pointer, and read data from GROMs.  One register allows to write data, too,
+    which would support some GRAMs, but AFAIK TI never built such GRAMs (although docs from TI
+    do refer to this possibility).
 
-	Since address are 16-bit long, you can have up to 8 GROMs.  So, a cartridge may
-	include up to 5 GROMs.  (Actually, there is a way more GROMs can be used - see below...)
+    Since address are 16-bit long, you can have up to 8 GROMs.  So, a cartridge may
+    include up to 5 GROMs.  (Actually, there is a way more GROMs can be used - see below...)
 
-	The address pointer is incremented after each GROM operation, but it will always remain
-	within the bounds of the currently selected GROM (e.g. after 0x3fff comes 0x2000).
+    The address pointer is incremented after each GROM operation, but it will always remain
+    within the bounds of the currently selected GROM (e.g. after 0x3fff comes 0x2000).
 
 Some details:
 
-	Original TI-built GROM are 6kb long, but take 8kb in address space.  The extra 2kb can be
-	read, and follow the following formula:
-		GROM[0x1800+offset] = GROM[0x0800+offset] | GROM[0x1000+offset];
-	(sounds like address decoding is incomplete - we are lucky we don't burn any silicon when
-	doing so...)
+    Original TI-built GROM are 6kb long, but take 8kb in address space.  The extra 2kb can be
+    read, and follow the following formula:
+        GROM[0x1800+offset] = GROM[0x0800+offset] | GROM[0x1000+offset];
+    (sounds like address decoding is incomplete - we are lucky we don't burn any silicon when
+    doing so...)
 
-	Needless to say, some hackers simulated 8kb GRAMs and GROMs with normal RAM/PROM chips and
-	glue logic.
+    Needless to say, some hackers simulated 8kb GRAMs and GROMs with normal RAM/PROM chips and
+    glue logic.
 
 GPL ports:
 
-	When accessing the GROMs registers, 8 address bits (cpu_addr & 0x03FC) may
-	be used as a port number, which permits the use of up to 256 independant
-	GROM ports, with 64kb of address space in each.  TI99/4(a) ROMs can take
-	advantage of the first 16 ports: it will look for GPL programs in every
-	GROM of the 16 first ports.  Additionally, while the other 240 ports cannot
-	contain standard GROMs with GPL code, they may still contain custom GROMs
-	with data.
+    When accessing the GROMs registers, 8 address bits (cpu_addr & 0x03FC) may
+    be used as a port number, which permits the use of up to 256 independant
+    GROM ports, with 64kb of address space in each.  TI99/4(a) ROMs can take
+    advantage of the first 16 ports: it will look for GPL programs in every
+    GROM of the 16 first ports.  Additionally, while the other 240 ports cannot
+    contain standard GROMs with GPL code, they may still contain custom GROMs
+    with data.
 
-	Note, however, that the TI99/4(a) console does not decode the page number, so console GROMs
-	occupy the first 24kb of EVERY port, and cartridge GROMs occupy the next 40kb of EVERY port
-	(with the exception of one demonstration from TI that implements several distinct ports).
-	(Note that the TI99/8 console does have the required decoder.)  Fortunately, GROM drivers
-	have a relatively high impedance, and therefore extension cards can use TTL drivers to impose
-	another value on the data bus with no risk of burning the console GROMs.  This hack permits
-	the addition of additionnal GROMs in other ports, with the only side effect that whenever
-	the address pointer in port N is altered, the address pointer of console GROMs in port 0
-	is altered, too.  Overriding the system GROMs with custom code is possible, too (some hackers
-	have done so), but I would not recommended it, as connecting such a device to a TI99/8 might
-	burn some drivers.
+    Note, however, that the TI99/4(a) console does not decode the page number, so console GROMs
+    occupy the first 24kb of EVERY port, and cartridge GROMs occupy the next 40kb of EVERY port
+    (with the exception of one demonstration from TI that implements several distinct ports).
+    (Note that the TI99/8 console does have the required decoder.)  Fortunately, GROM drivers
+    have a relatively high impedance, and therefore extension cards can use TTL drivers to impose
+    another value on the data bus with no risk of burning the console GROMs.  This hack permits
+    the addition of additionnal GROMs in other ports, with the only side effect that whenever
+    the address pointer in port N is altered, the address pointer of console GROMs in port 0
+    is altered, too.  Overriding the system GROMs with custom code is possible, too (some hackers
+    have done so), but I would not recommended it, as connecting such a device to a TI99/8 might
+    burn some drivers.
 
-	The p-code card (-> UCSD Pascal system) contains 8 GROMs, all in port 16.  This port is not
-	in the range recognized by the TI ROMs (0-15), and therefore it is used by the p-code DSR ROMs
-	as custom data.  Additionally, some hackers used the extra ports to implement "GRAM" devices.
+    The p-code card (-> UCSD Pascal system) contains 8 GROMs, all in port 16.  This port is not
+    in the range recognized by the TI ROMs (0-15), and therefore it is used by the p-code DSR ROMs
+    as custom data.  Additionally, some hackers used the extra ports to implement "GRAM" devices.
 
-	The handling of cartridge GROMs has moved to ti99cart.c.	
+    The handling of cartridge GROMs has moved to ti99cart.c.
 */
 
 /* descriptor for console GROMs */
@@ -265,8 +265,8 @@ static const device_config *cartslots;
 
 /*===========================================================================*/
 /*
-	General purpose code:
-	initialization, cart loading, etc.
+    General purpose code:
+    initialization, cart loading, etc.
 */
 
 static void create_grom_high2k(int first, int last)
@@ -331,7 +331,7 @@ DRIVER_INIT( ti99_8 )
 	UINT8 *mem = memory_region(machine, "maincpu");
 	ti99_model = model_99_8;
 	has_evpc = FALSE;
-	
+
 	/* set up memory pointers */
 	xRAM_ptr_8 = mem + offset_xram_8;
 	ROM0_ptr_8 = mem + offset_rom0_8;
@@ -342,7 +342,7 @@ DRIVER_INIT( ti99_8 )
 
 	/* Pull this one up here. */
 	ti99_8_enable_rom_and_ports = 1;
-	
+
 	console_GROMs.data_ptr = memory_region(machine, region_grom);
 	create_grom_high2k(0x0000, 0x5fff);
 
@@ -419,7 +419,7 @@ MACHINE_START( ti99_4ev_60hz)
     ti99_common_init(machine, 0);
 }
 
-void ti99_common_init(running_machine *machine, const TMS9928a_interface *gfxparm) 
+void ti99_common_init(running_machine *machine, const TMS9928a_interface *gfxparm)
 {
 	if (gfxparm != 0)
 		TMS9928A_configure(gfxparm);
@@ -432,16 +432,16 @@ void ti99_common_init(running_machine *machine, const TMS9928a_interface *gfxpar
 	ti99_ide_init(machine);
 	ti99_hsgpl_init(machine);
 	ti99_usbsm_init(machine);
-	
+
 	/* Find the cartslot device and cache it. This is a string search,
-	   and we don't want to repeat it on each memory access. */
+       and we don't want to repeat it on each memory access. */
 	cartslots = devtag_get_device(machine, "ti99_multicart");
 	assert(cartslots != NULL);
 }
 
 
 /*
-	ti99_init_machine(); called before ti99_load_rom...
+    ti99_init_machine(); called before ti99_load_rom...
 */
 MACHINE_RESET( ti99 )
 {
@@ -470,13 +470,13 @@ MACHINE_RESET( ti99 )
 		memory_set_bankptr(machine, 1, memory_region(machine, "maincpu") + offset_sram);
 	}
 
-/*	if (ti99_model != model_99_4p)
-	{
-		if (ti99_model == model_99_8)
-			current_page_ptr_8 = cartridge_pages_8[0];
-		else
-			current_page_ptr = cartridge_pages[0];
-	} */
+/*  if (ti99_model != model_99_4p)
+    {
+        if (ti99_model == model_99_8)
+            current_page_ptr_8 = cartridge_pages_8[0];
+        else
+            current_page_ptr = cartridge_pages[0];
+    } */
 
 	if (!has_evpc) TMS9928A_reset();
         else v9938_reset(0);
@@ -510,7 +510,7 @@ MACHINE_RESET( ti99 )
 	has_hsgpl = ((ti99_model == model_99_4p) || (input_port_read(machine, "CFG") >> config_hsgpl_bit) & config_hsgpl_mask);
 	has_usb_sm = (input_port_read(machine, "CFG") >> config_usbsm_bit) & config_usbsm_mask;
 	has_pcode = (input_port_read(machine, "CFG") >> config_pcode_bit) & config_pcode_mask;
-	
+
 	/* set up optional expansion hardware */
 	ti99_peb_reset(ti99_model == model_99_4p, tms9901_set_int1, NULL);
 
@@ -520,7 +520,7 @@ MACHINE_RESET( ti99 )
 	if (ti99_model == model_99_4p)
 		ti99_4p_internal_dsr_reset(machine);
 
-        if (has_speech) 
+        if (has_speech)
 	{
 		static const spchroms_interface speech_intf = { region_speech_rom };
 
@@ -635,7 +635,7 @@ void machine_stop_ti99(void)
 
 
 /*
-	video initialization.
+    video initialization.
 */
 VIDEO_START( ti99_4ev )
 {
@@ -644,8 +644,8 @@ VIDEO_START( ti99_4ev )
 }
 
 /*
-	VBL interrupt  (mmm...  actually, it happens when the beam enters the lower
-	border, so it is not a genuine VBI, but who cares ?)
+    VBL interrupt  (mmm...  actually, it happens when the beam enters the lower
+    border, so it is not a genuine VBI, but who cares ?)
 */
 INTERRUPT_GEN( ti99_vblank_interrupt )
 {
@@ -671,8 +671,8 @@ INTERRUPT_GEN( ti99_4ev_hblank_interrupt )
 }
 
 /*
-	Backdoor function that is called by hsgpl, so that the machine code knows
-	whether hsgpl or console GROMs are active
+    Backdoor function that is called by hsgpl, so that the machine code knows
+    whether hsgpl or console GROMs are active
 */
 void set_hsgpl_crdena(int data)
 {
@@ -685,20 +685,20 @@ void set_hsgpl_crdena(int data)
 #pragma mark MEMORY HANDLERS
 #endif
 /*
-	Memory handlers.
+    Memory handlers.
 
-	TODO:
-	* actually implement GRAM support and GPL port support
+    TODO:
+    * actually implement GRAM support and GPL port support
 */
 
 /*
-	Same as MRA16_NOP, but with an additionnal delay caused by the 16->8 bit
-	bus multiplexer.
+    Same as MRA16_NOP, but with an additionnal delay caused by the 16->8 bit
+    bus multiplexer.
 */
 READ16_HANDLER ( ti99_nop_8_r )
 {
 	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
-//	cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
+//  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
 
 	return (0);
 }
@@ -706,11 +706,11 @@ READ16_HANDLER ( ti99_nop_8_r )
 WRITE16_HANDLER ( ti99_nop_8_w )
 {
 	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
-//	cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
+//  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
 }
 
 /*
-	99/4p cartridge space: mapped either to internal ROM6 or to HSGPL.
+    99/4p cartridge space: mapped either to internal ROM6 or to HSGPL.
 */
 READ16_HANDLER ( ti99_4p_cart_r )
 {
@@ -718,7 +718,7 @@ READ16_HANDLER ( ti99_4p_cart_r )
 		return ti99_4p_internal_ROM6[offset];
 
 	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
-//	cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
+//  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
 
 	if (hsgpl_crdena)
 		/* hsgpl is enabled */
@@ -736,7 +736,7 @@ WRITE16_HANDLER ( ti99_4p_cart_w )
 	}
 
 	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
-//	cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
+//  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
 
 	if (hsgpl_crdena)
 		/* hsgpl is enabled */
@@ -745,52 +745,52 @@ WRITE16_HANDLER ( ti99_4p_cart_w )
 
 /*---------------------------------------------------------------------------*/
 /*
-	memory-mapped register handlers.
+    memory-mapped register handlers.
 
 Theory:
 
-	These are registers to communicate with several peripherals.
-	These registers are all 8-bit-wide, and are located at even adresses between
-	0x8400 and 0x9FFE.
-	The registers are identified by (addr & 1C00), and, for VDP and GPL access,
-	by (addr & 2).  These registers are either read-only or write-only.  (Or,
-	more accurately, (addr & 4000) disables register read, whereas
-	!(addr & 4000) disables register write.)
+    These are registers to communicate with several peripherals.
+    These registers are all 8-bit-wide, and are located at even adresses between
+    0x8400 and 0x9FFE.
+    The registers are identified by (addr & 1C00), and, for VDP and GPL access,
+    by (addr & 2).  These registers are either read-only or write-only.  (Or,
+    more accurately, (addr & 4000) disables register read, whereas
+    !(addr & 4000) disables register write.)
 
-	Memory mapped registers list:
-	- write sound chip. (8400-87FE)
-	- read VDP memory. (8800-8BFC), (addr&2) == 0
-	- read VDP status. (8802-8BFE), (addr&2) == 2
-	- write VDP memory. (8C00-8FFC), (addr&2) == 0
-	- write VDP address and VDP register. (8C02-8FFE), (addr&2) == 2
-	- read speech synthesis chip. (9000-93FE)
-	- write speech synthesis chip. (9400-97FE)
-	- read GPL memory. (9800-9BFC), (addr&2) == 0 (1)
-	- read GPL adress. (9802-9BFE), (addr&2) == 2 (1)
-	- write GPL memory. (9C00-9FFC), (addr&2) == 0 (1)
-	- write GPL adress. (9C02-9FFE), (addr&2) == 2 (1)
+    Memory mapped registers list:
+    - write sound chip. (8400-87FE)
+    - read VDP memory. (8800-8BFC), (addr&2) == 0
+    - read VDP status. (8802-8BFE), (addr&2) == 2
+    - write VDP memory. (8C00-8FFC), (addr&2) == 0
+    - write VDP address and VDP register. (8C02-8FFE), (addr&2) == 2
+    - read speech synthesis chip. (9000-93FE)
+    - write speech synthesis chip. (9400-97FE)
+    - read GPL memory. (9800-9BFC), (addr&2) == 0 (1)
+    - read GPL adress. (9802-9BFE), (addr&2) == 2 (1)
+    - write GPL memory. (9C00-9FFC), (addr&2) == 0 (1)
+    - write GPL adress. (9C02-9FFE), (addr&2) == 2 (1)
 
 (1) on some hardware, (addr & 0x3FC) provides a GPL page number.
 */
 
 /*
-	TMS9919 sound chip write
+    TMS9919 sound chip write
 */
 WRITE16_HANDLER ( ti99_wsnd_w )
 {
 	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
-//	cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
+//  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
 
 	sn76496_w(devtag_get_device(space->machine, "sn76496"), offset, (data >> 8) & 0xff);
 }
 
 /*
-	TMS9918(A)/9928(A)/9929(A) VDP read
+    TMS9918(A)/9928(A)/9929(A) VDP read
 */
 READ16_HANDLER ( ti99_rvdp_r )
 {
 	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
-//	cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
+//  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
 
 	if (offset & 1)
 	{	/* read VDP status */
@@ -803,12 +803,12 @@ READ16_HANDLER ( ti99_rvdp_r )
 }
 
 /*
-	TMS9918(A)/9928(A)/9929(A) vdp write
+    TMS9918(A)/9928(A)/9929(A) vdp write
 */
 WRITE16_HANDLER ( ti99_wvdp_w )
 {
 	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
-//	cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
+//  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
 
 	if (offset & 1)
 	{	/* write VDP address */
@@ -821,12 +821,12 @@ WRITE16_HANDLER ( ti99_wvdp_w )
 }
 
 /*
-	V38 VDP read
+    V38 VDP read
 */
 READ16_HANDLER ( ti99_rv38_r )
 {
 	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
-//	cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
+//  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
 
 	if (offset & 1)
 	{	/* read VDP status */
@@ -839,12 +839,12 @@ READ16_HANDLER ( ti99_rv38_r )
 }
 
 /*
-	V38 vdp write
+    V38 vdp write
 */
 WRITE16_HANDLER ( ti99_wv38_w )
 {
 	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
-//	cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
+//  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
 
 	switch (offset & 3)
 	{
@@ -868,7 +868,7 @@ WRITE16_HANDLER ( ti99_wv38_w )
 }
 
 /*
-	TMS0285 speech chip read
+    TMS0285 speech chip read
 */
 static READ16_HANDLER ( ti99_rspeech_r )
 {
@@ -884,7 +884,7 @@ static void speech_kludge_callback(int dummy)
 	if (! tms5220_readyq_r())
 	{
 		/* Weirdly enough, we are always seeing some problems even though
-		everything is working fine. */
+        everything is working fine. */
 		attotime time_to_ready = double_to_attotime(tms5220_time_to_ready());
 		logerror("ti99/4a speech says aaargh!\n");
 		logerror("(time to ready: %f -> %d)\n", time_to_ready, (int) ceil(3000000*time_to_ready));
@@ -894,7 +894,7 @@ static void speech_kludge_callback(int dummy)
 #endif
 
 /*
-	TMS0285 speech chip write
+    TMS0285 speech chip write
 */
 static WRITE16_HANDLER ( ti99_wspeech_w )
 {
@@ -902,9 +902,9 @@ static WRITE16_HANDLER ( ti99_wspeech_w )
 
 #if 1
 	/* the stupid design of the tms5220 core means that ready is cleared when
-	there are 15 bytes in FIFO.  It should be 16.  Of course, if it were the
-	case, we would need to store the value on the bus, which would be more
-	complex. */
+    there are 15 bytes in FIFO.  It should be 16.  Of course, if it were the
+    case, we would need to store the value on the bus, which would be more
+    complex. */
 	if (! tms5220_readyq_r(devtag_get_device(space->machine, "tms5220")))
 	{
 		attotime time_to_ready = double_to_attotime(tms5220_time_to_ready(devtag_get_device(space->machine, "tms5220")));
@@ -925,27 +925,27 @@ static UINT8 GROM_dataread(void)
 	UINT8 reply;
 	if (console_GROMs.addr >= 0x6000)
 	{
-		/* Pass the (one and only) program counter for GROMs. The 
-		   buffer is set and used in the cartridge chip. */
+		/* Pass the (one and only) program counter for GROMs. The
+           buffer is set and used in the cartridge chip. */
 		reply = cartridge_grom_read(cartslots, console_GROMs.addr-0x6000);
 	}
-	else 
+	else
 	{
-		/* GROMs are buffered. Data is retrieved from a buffer, 
-		while the buffer is replaced with the next cell 
-		content. */
+		/* GROMs are buffered. Data is retrieved from a buffer,
+        while the buffer is replaced with the next cell
+        content. */
 		reply = console_GROMs.buf;
-		
+
 		/* Get next value, put it in buffer. Note that the
-		GROM wraps at 8K boundaries. */
+        GROM wraps at 8K boundaries. */
 		console_GROMs.buf = console_GROMs.data_ptr[console_GROMs.addr];
 	}
 
-//	printf("GROM address = %04x, reply = %02x\n", console_GROMs.addr, reply>>8);
-	/* The program counter wraps at each GROM chip size (8K), 
-	   so 0x5fff + 1 = 0x4000. */
+//  printf("GROM address = %04x, reply = %02x\n", console_GROMs.addr, reply>>8);
+	/* The program counter wraps at each GROM chip size (8K),
+       so 0x5fff + 1 = 0x4000. */
 	console_GROMs.addr = ((console_GROMs.addr + 1) & 0x1FFF) | (console_GROMs.addr & 0xE000);
-	
+
 	/* Reset the read and write address flipflops. */
 	console_GROMs.raddr_LSB = console_GROMs.waddr_LSB = FALSE;
 
@@ -953,52 +953,52 @@ static UINT8 GROM_dataread(void)
 }
 
 /*
-	GPL read
+    GPL read
 */
 READ16_HANDLER ( ti99_grom_r )
 {
 	UINT16 reply;
 
 	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4 /*20+3*/);		/* from 4 to 23? */
-//	cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
+//  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
 
 	/* This implementation features a multislot cartridge system which
-	   is based on multiple GROM base addresses. The standard base 
-	   is >9800 (slot 0). When we access the port >9804, we switch to 
-	   slot 1, >9808 is slot 2, ... >983C is slot 15. Although theoretically
-	   we could address up to 256 banks, the TI operating system does not
-	   check more than 16 banks.
-	   Cartridges may also contain ROMs which need to be banked 
-	   simultaneously. We use the cartridge slot number to swap the ROM at
-	   >6000, or RAM if available. I don't know whether this is the way
-	   Texas Instruments envisaged it in the OS, but it is the only
-	   plausible way to allow for GROM+ROM cartridges.
-	   Note that some cartridges may have programming flaws which only 
-	   appear when the cartridge is used in a higher-numbered slot.
-	   Parsec is one example which only runs in slot 0 as the 
-	   programmers hard-coded an access to GROM port 0. Note: This *may*
-	   be worked around if we make sure that switching only occurs
-	   when the address is set, not when data is read or written. But
-	   it's not clear whether this has unwanted side effects.
-	*/
-	
+       is based on multiple GROM base addresses. The standard base
+       is >9800 (slot 0). When we access the port >9804, we switch to
+       slot 1, >9808 is slot 2, ... >983C is slot 15. Although theoretically
+       we could address up to 256 banks, the TI operating system does not
+       check more than 16 banks.
+       Cartridges may also contain ROMs which need to be banked
+       simultaneously. We use the cartridge slot number to swap the ROM at
+       >6000, or RAM if available. I don't know whether this is the way
+       Texas Instruments envisaged it in the OS, but it is the only
+       plausible way to allow for GROM+ROM cartridges.
+       Note that some cartridges may have programming flaws which only
+       appear when the cartridge is used in a higher-numbered slot.
+       Parsec is one example which only runs in slot 0 as the
+       programmers hard-coded an access to GROM port 0. Note: This *may*
+       be worked around if we make sure that switching only occurs
+       when the address is set, not when data is read or written. But
+       it's not clear whether this has unwanted side effects.
+    */
+
 	/* Activates a slot in the multi-cartridge extender. */
 	cartridge_slot_set(cartslots, (offset & 0x01fe)/2);
-	
+
 	if (offset & 1)
 	{	/* Read GROM address
-		   We only have one GROM program counter for the console GROMs
-		   and all cartridge GROMs in all banks(!). Hardware 
-		   implementations must take this into account as well. Thus,
-		   we use a structure here in the console, rather than separate
-		   counters in each GROM chip. */
-		
-		/* When reading, reset the hi/lo flag byte for writing. 
-		   TODO: Verify this with a real machine. */
+           We only have one GROM program counter for the console GROMs
+           and all cartridge GROMs in all banks(!). Hardware
+           implementations must take this into account as well. Thus,
+           we use a structure here in the console, rather than separate
+           counters in each GROM chip. */
+
+		/* When reading, reset the hi/lo flag byte for writing.
+           TODO: Verify this with a real machine. */
 		console_GROMs.waddr_LSB = FALSE;
 
 		/* Address reading is done in two steps; first, the high byte
-		   is transferred, then the low byte. */
+           is transferred, then the low byte. */
 		if (console_GROMs.raddr_LSB)
 		{
 			/* second pass */
@@ -1013,9 +1013,9 @@ READ16_HANDLER ( ti99_grom_r )
 		}
 	}
 	else
-	{	
+	{
 		/* Read GROM data */
-		reply = ((UINT16)GROM_dataread()) << 8;		
+		reply = ((UINT16)GROM_dataread()) << 8;
 	}
 
 	if (hsgpl_crdena)
@@ -1026,35 +1026,35 @@ READ16_HANDLER ( ti99_grom_r )
 }
 
 /*
-	GPL write
+    GPL write
 */
 WRITE16_HANDLER ( ti99_grom_w )
 {
 	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4/*20+3*/);		/* from 4 to 23? */
-//	cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
+//  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
 
 	/* Activates a slot in the multi-cartridge extender. */
 	cartridge_slot_set(cartslots, (offset & 0x01fe)/2);
 
 	// 1001 1wbb bbbb bbr0
-	
+
 	if (offset & 1)
 	{	/* write GROM address */
 		/* see comments above */
 		console_GROMs.raddr_LSB = FALSE;
-		
+
 		/* Implements the internal flipflop.
-		   The Editor/Assembler manuals says that the current address
-		   plus one is returned. This effect is properly emulated
-		   as we are using a read-ahead buffer.
-		*/
+           The Editor/Assembler manuals says that the current address
+           plus one is returned. This effect is properly emulated
+           as we are using a read-ahead buffer.
+        */
 		if (console_GROMs.waddr_LSB)
 		{
 			/* Accept low byte (2nd write) */
 			console_GROMs.addr = (console_GROMs.addr & 0xFF00) | ((data >> 8) & 0xFF);
-			
-			/* Setting the address causes a new read, putting the 
-			   value into the buffer. We don't need the value here. */
+
+			/* Setting the address causes a new read, putting the
+               value into the buffer. We don't need the value here. */
 			GROM_dataread();
 			console_GROMs.waddr_LSB = FALSE;
 		}
@@ -1071,10 +1071,10 @@ WRITE16_HANDLER ( ti99_grom_w )
 		/* write GROM data */
 		/* the console GROMs are always affected */
 		/* BTW, console GROMs are never GRAMs, therefore there is no
-		   need to actually write anything, so we just read ahead 
-		   TODO: There could be cartridges with GRAM, so this must be
-		   fixed.
-		*/
+           need to actually write anything, so we just read ahead
+           TODO: There could be cartridges with GRAM, so this must be
+           fixed.
+        */
 		GROM_dataread();
 		console_GROMs.raddr_LSB = console_GROMs.waddr_LSB = FALSE;
 	}
@@ -1084,21 +1084,21 @@ WRITE16_HANDLER ( ti99_grom_w )
 }
 
 /*
-	GROM read for TI-99/8
-	For comments, see the handler for TI-99/4A
+    GROM read for TI-99/8
+    For comments, see the handler for TI-99/4A
 */
 static READ8_HANDLER ( ti99_grom_r8 )
 {
 	UINT8 reply;
 
 	cpu_adjust_icount(space->machine->firstcpu,-4);
-	
+
 	/* Activates a slot in the multi-cartridge extender. */
 	// 1001 1wbb bbbb bbr0
 	cartridge_slot_set(cartslots, (offset & 0x03fc)/4);
-	
+
 	if (offset & 2)
-	{	
+	{
 		console_GROMs.waddr_LSB = FALSE;
 
 		if (console_GROMs.raddr_LSB)
@@ -1113,14 +1113,14 @@ static READ8_HANDLER ( ti99_grom_r8 )
 		}
 	}
 	else
-		reply = GROM_dataread();		
+		reply = GROM_dataread();
 
 	return reply;
 }
 
 /*
-	GROM write for TI-99/8
-	For comments, see the handler for TI-99/4A
+    GROM write for TI-99/8
+    For comments, see the handler for TI-99/4A
 */
 static WRITE8_HANDLER ( ti99_grom_w8 )
 {
@@ -1128,14 +1128,14 @@ static WRITE8_HANDLER ( ti99_grom_w8 )
 
 	/* Activates a slot in the multi-cartridge extender. */
 	cartridge_slot_set(cartslots, (offset & 0x03fc)/4);
-	
+
 	if (offset & 2)
 	{
 		console_GROMs.raddr_LSB = FALSE;
 		if (console_GROMs.waddr_LSB)
 		{
 			console_GROMs.addr = (console_GROMs.addr & 0xFF00) | (data & 0xFF);
-			
+
 			GROM_dataread();
 			console_GROMs.waddr_LSB = FALSE;
 		}
@@ -1155,23 +1155,23 @@ static WRITE8_HANDLER ( ti99_grom_w8 )
 
 
 /*
-	GROM read for TI-99/4p
+    GROM read for TI-99/4p
 */
 READ16_HANDLER ( ti99_4p_grom_r )
 {
 	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);		/* HSGPL is located on 8-bit bus? */
-//	cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
+//  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
 
 	return /*hsgpl_crdena ?*/ ti99_hsgpl_gpl_r(space, offset, mem_mask) /*: 0*/;
 }
 
 /*
-	GROM write
+    GROM write
 */
 WRITE16_HANDLER ( ti99_4p_grom_w )
 {
 	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);		/* HSGPL is located on 8-bit bus? */
-//	cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
+//  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
 
 	/*if (hsgpl_crdena)*/
 		ti99_hsgpl_gpl_w(space, offset, data, mem_mask);
@@ -1192,8 +1192,8 @@ READ8_HANDLER( ti99_8_r )
 
 	if (ti99_8_enable_rom_and_ports)
 	{
-		/* This is only important for address access 0000-1fff and 
-		   8000-9fff. Outside, the mapper mode is used. */
+		/* This is only important for address access 0000-1fff and
+           8000-9fff. Outside, the mapper mode is used. */
 		if ((offset >= 0x0000) && (offset < 0x2000))
 		{
 			/* ROM */
@@ -1212,8 +1212,8 @@ READ8_HANDLER( ti99_8_r )
 				break;
 
 			case 1:
-				/* >8400 - >840f: sound (cannot read) 
-				   >8410 - >87ff: SRAM */
+				/* >8400 - >840f: sound (cannot read)
+                   >8410 - >87ff: SRAM */
 				if (offset >= 0x8410)
 					reply = sRAM_ptr_8[offset & 0x1fff];
 				break;
@@ -1268,11 +1268,11 @@ READ8_HANDLER( ti99_8_r )
 
 	/* test read protect */
 	/*if (mapper_reg & 0x20000000)
-		;*/
+        ;*/
 
 	/* test execute protect */
 	/*if (mapper_reg & 0x40000000)
-		;*/
+        ;*/
 
 	if (offset < 0x010000)
 		/* Read RAM */
@@ -1304,9 +1304,9 @@ READ8_HANDLER( ti99_8_r )
 			/* ff6000 - ff7fff: cartridge ROM space */
 			offset &= 0x1fff;
 
-			/* We do not support hsgpl here because it is a 16 bit 
-			   system. Just check the cartridges.  */
-			reply = ti99_multicart8_r(multicart8, offset); 
+			/* We do not support hsgpl here because it is a 16 bit
+               system. Just check the cartridges.  */
+			reply = ti99_multicart8_r(multicart8, offset);
 			break;
 
 		case 5:
@@ -1406,9 +1406,9 @@ WRITE8_HANDLER ( ti99_8_w )
 					cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-48*4);		/* this is just an approx. minimum, it can be much more */
 
 					/* the stupid design of the tms5220 core means that ready is cleared when
-					there are 15 bytes in FIFO.  It should be 16.  Of course, if it were the
-					case, we would need to store the value on the bus, which would be more
-					complex. */
+                    there are 15 bytes in FIFO.  It should be 16.  Of course, if it were the
+                    case, we would need to store the value on the bus, which would be more
+                    complex. */
 					if (! tms5220_readyq_r(devtag_get_device(space->machine, "tms5220")))
 					{
 						attotime time_to_ready = double_to_attotime(tms5220_time_to_ready(devtag_get_device(space->machine, "tms5220")));
@@ -1441,13 +1441,13 @@ WRITE8_HANDLER ( ti99_8_w )
 	}
 
 	mapper_reg = ti99_8_mapper_regs[page];
-	
-	/* 4 KiB page size */ 
+
+	/* 4 KiB page size */
 	offset = (mapper_reg + (offset & 0x0fff)) & 0x00ffffff;
 
 	/* test write protect */
 	/*if (mapper_reg & 0x80000000)
-		;*/
+        ;*/
 
 	if (offset < 0x010000)
 	{	/* Write RAM */
@@ -1477,7 +1477,7 @@ WRITE8_HANDLER ( ti99_8_w )
 		case 3:
 			/* cartridge space */
 			/* We do not support HSGPL for the 99/8 at this time. */
-			ti99_multicart8_w(multicart8, offset & 0x1fff, data); 
+			ti99_multicart8_w(multicart8, offset & 0x1fff, data);
 			break;
 
 		case 5:
@@ -1501,28 +1501,28 @@ WRITE8_HANDLER ( ti99_8_w )
 #pragma mark TI-99/4 HANDSETS
 #endif
 /*
-	Handset support (TI99/4 only)
+    Handset support (TI99/4 only)
 
-	The ti99/4 was intended to support some so-called "IR remote handsets".
-	This feature was canceled at the last minute (reportedly ten minutes before
-	the introductory press conference in June 1979), but the first thousands of
-	99/4 units had the required port, and the support code was seemingly not
-	deleted from ROMs until the introduction of the ti99/4a in 1981.  You could
-	connect up to 4 20-key keypads, and up to 4 joysticks with a maximum
-	resolution of 15 levels on each axis.
+    The ti99/4 was intended to support some so-called "IR remote handsets".
+    This feature was canceled at the last minute (reportedly ten minutes before
+    the introductory press conference in June 1979), but the first thousands of
+    99/4 units had the required port, and the support code was seemingly not
+    deleted from ROMs until the introduction of the ti99/4a in 1981.  You could
+    connect up to 4 20-key keypads, and up to 4 joysticks with a maximum
+    resolution of 15 levels on each axis.
 
-	The keyboard DSR was able to couple two 20-key keypads together to emulate
-	a full 40-key keyboard.  Keyboard modes 0, 1 and 2 would select either the
-	console keyboard with its two wired remote controllers (i.e. joysticks), or
-	remote handsets 1 and 2 with their associated IR remote controllers (i.e.
-	joysticks), according to which was currently active.
+    The keyboard DSR was able to couple two 20-key keypads together to emulate
+    a full 40-key keyboard.  Keyboard modes 0, 1 and 2 would select either the
+    console keyboard with its two wired remote controllers (i.e. joysticks), or
+    remote handsets 1 and 2 with their associated IR remote controllers (i.e.
+    joysticks), according to which was currently active.
 */
 
 /*
-	ti99_handset_poll_bus()
+    ti99_handset_poll_bus()
 
-	Poll the current state of the 4-bit data bus that goes from the I/R
-	receiver to the tms9901.
+    Poll the current state of the 4-bit data bus that goes from the I/R
+    receiver to the tms9901.
 */
 static int ti99_handset_poll_bus(void)
 {
@@ -1530,12 +1530,12 @@ static int ti99_handset_poll_bus(void)
 }
 
 /*
-	ti99_handset_ack_callback()
+    ti99_handset_ack_callback()
 
-	Handle data acknowledge sent by the ti-99/4 handset ISR (through tms9901
-	line P0).  This function is called by a delayed timer 30us after the state
-	of P0 is changed, because, in one occasion, the ISR asserts the line before
-	it reads the data, so we need to delay the acknowledge process.
+    Handle data acknowledge sent by the ti-99/4 handset ISR (through tms9901
+    line P0).  This function is called by a delayed timer 30us after the state
+    of P0 is changed, because, in one occasion, the ISR asserts the line before
+    it reads the data, so we need to delay the acknowledge process.
 */
 static TIMER_CALLBACK(ti99_handset_ack_callback)
 {
@@ -1547,10 +1547,10 @@ static TIMER_CALLBACK(ti99_handset_ack_callback)
 	if (handset_buflen == 1)
 	{
 		/* Unless I am missing something, the third and last nybble of the
-		message is not acknowledged by the DSR in any way, and the first nybble
-		of next message is not requested for either, so we need to decide on
-		our own when we can post a new event.  Currently, we wait for 1000us
-		after the DSR acknowledges the second nybble. */
+        message is not acknowledged by the DSR in any way, and the first nybble
+        of next message is not requested for either, so we need to decide on
+        our own when we can post a new event.  Currently, we wait for 1000us
+        after the DSR acknowledges the second nybble. */
 		timer_set(machine, ATTOTIME_IN_USEC(1000), NULL, 0, ti99_handset_ack_callback);
 	}
 
@@ -1560,9 +1560,9 @@ static TIMER_CALLBACK(ti99_handset_ack_callback)
 }
 
 /*
-	ti99_handset_set_ack()
+    ti99_handset_set_ack()
 
-	Handler for tms9901 P0 pin (handset data acknowledge)
+    Handler for tms9901 P0 pin (handset data acknowledge)
 */
 static WRITE8_DEVICE_HANDLER( ti99_handset_set_ack )
 {
@@ -1576,13 +1576,13 @@ static WRITE8_DEVICE_HANDLER( ti99_handset_set_ack )
 }
 
 /*
-	ti99_handset_post_message()
+    ti99_handset_post_message()
 
-	Post a 12-bit message: trigger an interrupt on the tms9901, and store the
-	message in the I/R receiver buffer so that the handset ISR will read this
-	message.
+    Post a 12-bit message: trigger an interrupt on the tms9901, and store the
+    message in the I/R receiver buffer so that the handset ISR will read this
+    message.
 
-	message: 12-bit message to post (only the 12 LSBits are meaningful)
+    message: 12-bit message to post (only the 12 LSBits are meaningful)
 */
 static void ti99_handset_post_message(running_machine *machine, int message)
 {
@@ -1594,13 +1594,13 @@ static void ti99_handset_post_message(running_machine *machine, int message)
 }
 
 /*
-	ti99_handset_poll_keyboard()
+    ti99_handset_poll_keyboard()
 
-	Poll the current state of one given handset keypad.
+    Poll the current state of one given handset keypad.
 
-	num: number of the keypad to poll (0-3)
+    num: number of the keypad to poll (0-3)
 
-	Returns TRUE if the handset state has changed and a message was posted.
+    Returns TRUE if the handset state has changed and a message was posted.
 */
 static int ti99_handset_poll_keyboard(running_machine *machine, int num)
 {
@@ -1615,7 +1615,7 @@ static int ti99_handset_poll_keyboard(running_machine *machine, int num)
 	key_buf = ( input_port_read(machine, keynames[num]) | (input_port_read(machine, keynames[num + 1]) << 16) ) >> (4*num);
 
 	/* If a key was previously pressed, this key was not shift, and this key is
-	still down, then don't change the current key press. */
+    still down, then don't change the current key press. */
 	if (previous_key[num] && (previous_key[num] != 0x24)
 			&& (key_buf & (1 << (previous_key[num] & 0x1f))))
 	{
@@ -1626,7 +1626,7 @@ static int ti99_handset_poll_keyboard(running_machine *machine, int num)
 		else
 		{
 			/* the shift modifier state has changed: we need to update the
-			keyboard state */
+            keyboard state */
 			if (key_buf & 0x0008)
 			{	/* shift has been pressed down */
 				previous_key[num] = current_key = previous_key[num] | 0x20;
@@ -1654,8 +1654,8 @@ static int ti99_handset_poll_keyboard(running_machine *machine, int num)
 
 			if (current_key != 0x24)
 				/* If this is the shift key, any other key we may find will
-				have higher priority; otherwise, we may exit the loop and keep
-				the key we have just found. */
+                have higher priority; otherwise, we may exit the loop and keep
+                the key we have just found. */
 				break;
 		}
 	}
@@ -1674,13 +1674,13 @@ static int ti99_handset_poll_keyboard(running_machine *machine, int num)
 }
 
 /*
-	ti99_handset_poll_joystick()
+    ti99_handset_poll_joystick()
 
-	Poll the current state of one given handset joystick.
+    Poll the current state of one given handset joystick.
 
-	num: number of the joystick to poll (0-3)
+    num: number of the joystick to poll (0-3)
 
-	Returns TRUE if the handset state has changed and a message was posted.
+    Returns TRUE if the handset state has changed and a message was posted.
 */
 static int ti99_handset_poll_joystick(running_machine *machine, int num)
 {
@@ -1712,7 +1712,7 @@ static int ti99_handset_poll_joystick(running_machine *machine, int num)
 
 		/* set sign */
 		/* note that we set the sign if the joystick position is 0 to work
-		around a bug in the ti99/4 ROMs */
+        around a bug in the ti99/4 ROMs */
 		if (current_joy_x <= 0)
 		{
 			message |= 0x040;
@@ -1751,9 +1751,9 @@ static int ti99_handset_poll_joystick(running_machine *machine, int num)
 }
 
 /*
-	ti99_handset_task()
+    ti99_handset_task()
 
-	Manage handsets, posting an event if the state of any handset has changed.
+    Manage handsets, posting an event if the state of any handset has changed.
 */
 static void ti99_handset_task(running_machine *machine)
 {
@@ -1791,45 +1791,45 @@ static void ti99_handset_task(running_machine *machine)
 static void mecmouse_select(int selnow, int stick1, int stick2)
 {
 	/* The Mechatronic mouse is connected to the joystick port and occupies
-	   both joystick select lines and the switch lines. From these five 
-	   lines, left/right/down are used for the motion (i.e. 3 motion steps 
-	   for positive and four for negative motion and one for rest), 
-	   the fire line is used for the secondary mouse button, and the up 
-	   line is used for the primary button.
-	   The mouse motion is delivered by the same lines for both directions;
-	   this requires swapping the axes. According to the source code of
-	   the accompanying mouse driver, the readout of the current axis is
-	   done by selecting joystick 1, then joystick 2. The axis swapping is
-	   achieved by selecting stick 1 again. When selecting stick 2, the
-	   second axis is seen on the input lines.
-	   Interrupting this sequence will lead to swapped axes. This is
-	   prevented by resetting the toggle when the mouse is deselected 
-	   (neither 1 nor 2 are selected).
+       both joystick select lines and the switch lines. From these five
+       lines, left/right/down are used for the motion (i.e. 3 motion steps
+       for positive and four for negative motion and one for rest),
+       the fire line is used for the secondary mouse button, and the up
+       line is used for the primary button.
+       The mouse motion is delivered by the same lines for both directions;
+       this requires swapping the axes. According to the source code of
+       the accompanying mouse driver, the readout of the current axis is
+       done by selecting joystick 1, then joystick 2. The axis swapping is
+       achieved by selecting stick 1 again. When selecting stick 2, the
+       second axis is seen on the input lines.
+       Interrupting this sequence will lead to swapped axes. This is
+       prevented by resetting the toggle when the mouse is deselected
+       (neither 1 nor 2 are selected).
 
-	   The joystick lines are selected as follows:
-	   TI-99/4:  Stick 1: P4=1, P3=0, P2=1 (5)
-	             Stick 2: P4=1, P3=1, P2=0 (6)
-		
-	   TI-99/4A: Stick 1: P4=1, P3=1, P2=0 (6)
-	             Stick 2: P4=1, P3=1, P2=1 (7)
+       The joystick lines are selected as follows:
+       TI-99/4:  Stick 1: P4=1, P3=0, P2=1 (5)
+                 Stick 2: P4=1, P3=1, P2=0 (6)
 
-	   TI-99/8:  Stick 1: P3=1, P2=1, P1=1, P0=0 (14)
-	             Stick 2: P3=1, P2=1, P1=1, P0=1 (15)
-		     
-	   Geneve: n/a, has own mouse handling via v9938
-	   
-	   As we can only deliver at max 3 steps positive and 4 steps negative,
-	   we split the delta so that subsequent queries add up to the actual
-	   delta. That is, one delta of +10 yields a 3+3+3+1. 
-	   
-	   mecmouse_x holds the current delta to be counted down for x
-	   (y accordingly)
+       TI-99/4A: Stick 1: P4=1, P3=1, P2=0 (6)
+                 Stick 2: P4=1, P3=1, P2=1 (7)
 
-	   mecmouse_x_buf is the current step count reported to CRU
-	   
-	   Michael Zapf, 2008-01-22
-	*/
-	
+       TI-99/8:  Stick 1: P3=1, P2=1, P1=1, P0=0 (14)
+                 Stick 2: P3=1, P2=1, P1=1, P0=1 (15)
+
+       Geneve: n/a, has own mouse handling via v9938
+
+       As we can only deliver at max 3 steps positive and 4 steps negative,
+       we split the delta so that subsequent queries add up to the actual
+       delta. That is, one delta of +10 yields a 3+3+3+1.
+
+       mecmouse_x holds the current delta to be counted down for x
+       (y accordingly)
+
+       mecmouse_x_buf is the current step count reported to CRU
+
+       Michael Zapf, 2008-01-22
+    */
+
 	if (selnow==stick2) {
 		if (mecmouse_sel==stick1) {
 			if (! mecmouse_read_y)
@@ -1844,7 +1844,7 @@ static void mecmouse_select(int selnow, int stick1, int stick2)
 				mecmouse_x -= mecmouse_x_buf;
 				mecmouse_x_buf = (mecmouse_x_buf-1) & 7;
 			}
-			else 
+			else
 			{
 				/* Sample y motion. */
 				if (mecmouse_y < -4)
@@ -1859,7 +1859,7 @@ static void mecmouse_select(int selnow, int stick1, int stick2)
 		}
 		mecmouse_sel = selnow;
 	}
-	else if (selnow==stick1) 
+	else if (selnow==stick1)
 	{
 		if (mecmouse_sel==stick2)
 		{
@@ -1868,7 +1868,7 @@ static void mecmouse_select(int selnow, int stick1, int stick2)
 		}
 		mecmouse_sel = selnow;
 	}
-	else 
+	else
 	{
 		/* Reset the axis toggle when the mouse is deselected */
 		mecmouse_read_y = 0;
@@ -1886,7 +1886,7 @@ static void mecmouse_poll(running_machine *machine)
 
 	/* compute x delta */
 	delta_x = new_mx - last_mx;
-	
+
 	/* check for wrap */
 	if (delta_x > 0x80)
 		delta_x = -0x100+delta_x;
@@ -1922,54 +1922,54 @@ static void mecmouse_poll(running_machine *machine)
 #pragma mark TMS9901 INTERFACE
 #endif
 /*
-	TI99/4x-specific tms9901 I/O handlers
+    TI99/4x-specific tms9901 I/O handlers
 
-	See mess/machine/tms9901.c for generic tms9901 CRU handlers.
+    See mess/machine/tms9901.c for generic tms9901 CRU handlers.
 
-	BTW, although TMS9900 is generally big-endian, it is little endian as far as CRU is
-	concerned. (i.e. bit 0 is the least significant)
+    BTW, although TMS9900 is generally big-endian, it is little endian as far as CRU is
+    concerned. (i.e. bit 0 is the least significant)
 
 KNOWN PROBLEMS:
-	* a read or write to bits 16-31 causes TMS9901 to quit timer mode.  The problem is:
-	  on a TI99/4A, any memory access causes a dummy CRU read.  Therefore, TMS9901 can quit
-	  timer mode even though the program did not explicitely ask... and THIS is impossible
-	  to emulate efficiently (we would have to check every memory operation).
+    * a read or write to bits 16-31 causes TMS9901 to quit timer mode.  The problem is:
+      on a TI99/4A, any memory access causes a dummy CRU read.  Therefore, TMS9901 can quit
+      timer mode even though the program did not explicitely ask... and THIS is impossible
+      to emulate efficiently (we would have to check every memory operation).
 */
 /*
-	TMS9901 interrupt handling on a TI99/4(a).
+    TMS9901 interrupt handling on a TI99/4(a).
 
-	TI99/4(a) uses the following interrupts:
-	INT1: external interrupt (used by RS232 controller, for instance)
-	INT2: VDP interrupt
-	TMS9901 timer interrupt (overrides INT3)
-	INT12: handset interrupt (only on a TI-99/4 with the handset prototypes)
+    TI99/4(a) uses the following interrupts:
+    INT1: external interrupt (used by RS232 controller, for instance)
+    INT2: VDP interrupt
+    TMS9901 timer interrupt (overrides INT3)
+    INT12: handset interrupt (only on a TI-99/4 with the handset prototypes)
 
-	Three (occasionally four) interrupts are used by the system (INT1, INT2,
-	timer, and INT12 on a TI-99/4 with remote handset prototypes), out of 15/16
-	possible interrupts.  Keyboard pins can be used as interrupt pins, too, but
-	this is not emulated (it's a trick, anyway, and I don't know any program
-	which uses it).
+    Three (occasionally four) interrupts are used by the system (INT1, INT2,
+    timer, and INT12 on a TI-99/4 with remote handset prototypes), out of 15/16
+    possible interrupts.  Keyboard pins can be used as interrupt pins, too, but
+    this is not emulated (it's a trick, anyway, and I don't know any program
+    which uses it).
 
-	When an interrupt line is set (and the corresponding bit in the interrupt mask is set),
-	a level 1 interrupt is requested from the TMS9900.  This interrupt request lasts as long as
-	the interrupt pin and the revelant bit in the interrupt mask are set.
+    When an interrupt line is set (and the corresponding bit in the interrupt mask is set),
+    a level 1 interrupt is requested from the TMS9900.  This interrupt request lasts as long as
+    the interrupt pin and the revelant bit in the interrupt mask are set.
 
-	TIMER interrupts are kind of an exception, since they are not associated with an external
-	interrupt pin, and I guess it takes a write to the 9901 CRU bit 3 ("SBO 3") to clear
-	the pending interrupt (or am I wrong once again ?).
+    TIMER interrupts are kind of an exception, since they are not associated with an external
+    interrupt pin, and I guess it takes a write to the 9901 CRU bit 3 ("SBO 3") to clear
+    the pending interrupt (or am I wrong once again ?).
 
 nota:
-	All interrupt routines notify (by software) the TMS9901 of interrupt
-	recognition (with a "SBO n").  However, unless I am missing something, this
-	has absolutely no consequence on the TMS9901 (except for the TIMER
-	interrupt routine), and interrupt routines would work fine without this
-	SBO instruction.  This is quite weird.  Maybe the interrupt recognition
-	notification is needed on TMS9985, or any other weird variant of TMS9900
-	(how about the TI-99 development system connected to a TI990/10?).
+    All interrupt routines notify (by software) the TMS9901 of interrupt
+    recognition (with a "SBO n").  However, unless I am missing something, this
+    has absolutely no consequence on the TMS9901 (except for the TIMER
+    interrupt routine), and interrupt routines would work fine without this
+    SBO instruction.  This is quite weird.  Maybe the interrupt recognition
+    notification is needed on TMS9985, or any other weird variant of TMS9900
+    (how about the TI-99 development system connected to a TI990/10?).
 */
 
 /*
-	set the state of int1 (called by the peb core)
+    set the state of int1 (called by the peb core)
 */
 static void tms9901_set_int1(running_machine *machine, int state)
 {
@@ -1977,7 +1977,7 @@ static void tms9901_set_int1(running_machine *machine, int state)
 }
 
 /*
-	set the state of int2 (called by the tms9928 core)
+    set the state of int2 (called by the tms9928 core)
 */
 void tms9901_set_int2(running_machine *machine, int state)
 {
@@ -1985,14 +1985,14 @@ void tms9901_set_int2(running_machine *machine, int state)
 }
 
 /*
-	Called by the 9901 core whenever the state of INTREQ and IC0-3 changes
+    Called by the 9901 core whenever the state of INTREQ and IC0-3 changes
 */
 static TMS9901_INT_CALLBACK( tms9901_interrupt_callback )
 {
 	if (intreq)
 	{
 		/* On TI99, TMS9900 IC0-3 lines are not connected to TMS9901,
-		 * but hard-wired to force level 1 interrupts */
+         * but hard-wired to force level 1 interrupts */
 		cputag_set_input_line_and_vector(device->machine, "maincpu", 0, ASSERT_LINE, 1);	/* interrupt it, baby */
 	}
 	else
@@ -2002,12 +2002,12 @@ static TMS9901_INT_CALLBACK( tms9901_interrupt_callback )
 }
 
 /*
-	Read pins INT3*-INT7* of TI99's 9901.
+    Read pins INT3*-INT7* of TI99's 9901.
 
-	signification:
-	 (bit 1: INT1 status)
-	 (bit 2: INT2 status)
-	 bit 3-7: keyboard status bits 0 to 4
+    signification:
+     (bit 1: INT1 status)
+     (bit 2: INT2 status)
+     bit 3-7: keyboard status bits 0 to 4
 */
 static READ8_DEVICE_HANDLER( ti99_R9901_0 )
 {
@@ -2033,7 +2033,7 @@ static READ8_DEVICE_HANDLER( ti99_R9901_0 )
 	{
 		answer = ((input_port_read(device->machine, keynames[KeyCol >> 1]) >> ((KeyCol & 1) * 8)) << 3) & 0xF8;
 	}
-	
+
 	if ((ti99_model == model_99_4a) || (ti99_model == model_99_4p))
 	{
 		if (! AlphaLockLine)
@@ -2044,13 +2044,13 @@ static READ8_DEVICE_HANDLER( ti99_R9901_0 )
 }
 
 /*
-	Read pins INT8*-INT15* of TI99's 9901.
+    Read pins INT8*-INT15* of TI99's 9901.
 
-	signification:
-	 bit 0-2: keyboard status bits 5 to 7
-	 bit 3: tape input mirror
-	 (bit 4: IR remote handset interrupt)
-	 bit 5-7: weird, not emulated
+    signification:
+     bit 0-2: keyboard status bits 5 to 7
+     bit 3: tape input mirror
+     (bit 4: IR remote handset interrupt)
+     bit 5-7: weird, not emulated
 */
 static READ8_DEVICE_HANDLER( ti99_R9901_1 )
 {
@@ -2063,18 +2063,18 @@ static READ8_DEVICE_HANDLER( ti99_R9901_1 )
 	{
 		answer = ((input_port_read(device->machine, keynames[KeyCol >> 1]) >> ((KeyCol & 1) * 8)) >> 5) & 0x07;
 	}
-	
+
 	/* we don't take CS2 into account, as CS2 is a write-only unit */
 	/*if (cassette_input(devtag_get_device(device->machine, "cassette1")) > 0)
-		answer |= 8;*/
+        answer |= 8;*/
 
 	return answer;
 }
 
 /*
-	Read pins P0-P7 of TI99's 9901.
+    Read pins P0-P7 of TI99's 9901.
 
-	 bit 1: handset data clock pin
+     bit 1: handset data clock pin
 */
 static READ8_DEVICE_HANDLER( ti99_R9901_2 )
 {
@@ -2082,10 +2082,10 @@ static READ8_DEVICE_HANDLER( ti99_R9901_2 )
 }
 
 /*
-	Read pins P8-P15 of TI99's 9901.
+    Read pins P8-P15 of TI99's 9901.
 
-	 bit 26: IR handset interrupt
-	 bit 27: tape input
+     bit 26: IR handset interrupt
+     bit 27: tape input
 */
 static READ8_DEVICE_HANDLER( ti99_R9901_3 )
 {
@@ -2113,7 +2113,7 @@ static READ8_DEVICE_HANDLER( ti99_R9901_3 )
 
 
 /*
-	WRITE key column select (P2-P4)
+    WRITE key column select (P2-P4)
 */
 static WRITE8_DEVICE_HANDLER( ti99_KeyC )
 {
@@ -2121,14 +2121,14 @@ static WRITE8_DEVICE_HANDLER( ti99_KeyC )
 		KeyCol |= 1 << (offset-2);
 	else
 		KeyCol &= ~ (1 << (offset-2));
-	
+
         if (has_mecmouse)
                 mecmouse_select(KeyCol, (ti99_model == model_99_4) ? 5 : 6,
-					(ti99_model == model_99_4) ? 6 : 7); 
+					(ti99_model == model_99_4) ? 6 : 7);
 }
 
 /*
-	WRITE alpha lock line - TI99/4a only (P5)
+    WRITE alpha lock line - TI99/4a only (P5)
 */
 static WRITE8_DEVICE_HANDLER( ti99_AlphaW )
 {
@@ -2137,14 +2137,14 @@ static WRITE8_DEVICE_HANDLER( ti99_AlphaW )
 }
 
 /*
-	Read pins INT3*-INT7* of TI99's 9901.
+    Read pins INT3*-INT7* of TI99's 9901.
 
-	signification:
-	 (bit 1: INT1 status)
-	 (bit 2: INT2 status)
-	 bits 3-4: unused?
-	 bit 5: ???
-	 bit 6-7: keyboard status bits 0 through 1
+    signification:
+     (bit 1: INT1 status)
+     (bit 2: INT2 status)
+     bits 3-4: unused?
+     bit 5: ???
+     bit 6-7: keyboard status bits 0 through 1
 */
 static READ8_DEVICE_HANDLER( ti99_8_R9901_0 )
 {
@@ -2166,18 +2166,18 @@ static READ8_DEVICE_HANDLER( ti99_8_R9901_0 )
 	{
 		answer = (input_port_read(device->machine, keynames[KeyCol]) << 6) & 0xC0;
 	}
-	
+
 	return answer;
 }
 
 /*
-	Read pins INT8*-INT15* of TI99's 9901.
+    Read pins INT8*-INT15* of TI99's 9901.
 
-	signification:
-	 bit 0-2: keyboard status bits 2 to 4
-	 bit 3: tape input mirror
-	 (bit 4: IR remote handset interrupt)
-	 bit 5-7: weird, not emulated
+    signification:
+     bit 0-2: keyboard status bits 2 to 4
+     bit 3: tape input mirror
+     (bit 4: IR remote handset interrupt)
+     bit 5-7: weird, not emulated
 */
 static READ8_DEVICE_HANDLER( ti99_8_R9901_1 )
 {
@@ -2199,16 +2199,16 @@ static READ8_DEVICE_HANDLER( ti99_8_R9901_1 )
 	{
 		answer = (input_port_read(device->machine, keynames[KeyCol]) >> 2) & 0x07;
 	}
-	
+
 	/* we don't take CS2 into account, as CS2 is a write-only unit */
 	/*if (cassette_input(devtag_get_device(machine, "cassette")) > 0)
-		answer |= 8;*/
+        answer |= 8;*/
 
 	return answer;
 }
 
 /*
-	WRITE key column select (P0-P3)
+    WRITE key column select (P0-P3)
 */
 static WRITE8_DEVICE_HANDLER( ti99_8_KeyC )
 {
@@ -2232,7 +2232,7 @@ static WRITE8_DEVICE_HANDLER( ti99_8_PTGEN )
 }
 
 /*
-	command CS1/CS2 tape unit motor (P6-P7)
+    command CS1/CS2 tape unit motor (P6-P7)
 */
 static WRITE8_DEVICE_HANDLER( ti99_CS_motor )
 {
@@ -2250,21 +2250,21 @@ static WRITE8_DEVICE_HANDLER( ti99_CS_motor )
 }
 
 /*
-	audio gate (P8)
+    audio gate (P8)
 
-	Set to 1 before using tape: this enables the mixing of tape input sound
-	with computer sound.
+    Set to 1 before using tape: this enables the mixing of tape input sound
+    with computer sound.
 
-	We do not really need to emulate this as the tape recorder generates sound
-	on its own.
+    We do not really need to emulate this as the tape recorder generates sound
+    on its own.
 */
 static WRITE8_DEVICE_HANDLER( ti99_audio_gate )
 {
 }
 
 /*
-	tape output (P9)
-	I think polarity is correct, but don't take my word for it.
+    tape output (P9)
+    I think polarity is correct, but don't take my word for it.
 */
 static WRITE8_DEVICE_HANDLER( ti99_CS_output )
 {
@@ -2287,9 +2287,9 @@ static WRITE8_DEVICE_HANDLER( ti99_CS_output )
 #pragma mark 99/8 INTERNAL DSR
 #endif
 /*
-	TI 99/8 internal DSR support.
+    TI 99/8 internal DSR support.
 
-	Includes a few specific signals, and an extra ROM.
+    Includes a few specific signals, and an extra ROM.
 */
 
 /* prototypes */
@@ -2318,8 +2318,8 @@ static void ti99_8_internal_dsr_reset(running_machine *machine)
 }
 
 /* write CRU bit:
-	bit0: enable/disable internal DSR ROM,
-	bit1: hard reset */
+    bit0: enable/disable internal DSR ROM,
+    bit1: hard reset */
 static void ti99_8_internal_dsr_cru_w(running_machine *machine, int offset, int data)
 {
 	switch (offset)
@@ -2344,9 +2344,9 @@ static  READ8_HANDLER(ti99_8_internal_dsr_r)
 #pragma mark SGCPU INTERNAL DSR
 #endif
 /*
-	SNUG SGCPU (a.k.a. 99/4p) internal DSR support.
+    SNUG SGCPU (a.k.a. 99/4p) internal DSR support.
 
-	Includes a few specific signals, and an extra ROM.
+    Includes a few specific signals, and an extra ROM.
 */
 
 /* prototypes */
@@ -2382,10 +2382,10 @@ static void ti99_4p_internal_dsr_reset(running_machine *machine)
 }
 
 /* write CRU bit:
-	bit0: enable/disable internal DSR ROM,
-	bit1: enable/disable internal cartridge ROM
-	bit2: set/clear senila
-	bit3: set/clear senilb*/
+    bit0: enable/disable internal DSR ROM,
+    bit1: enable/disable internal cartridge ROM
+    bit2: set/clear senila
+    bit3: set/clear senilb*/
 static void ti99_4p_internal_dsr_cru_w(running_machine *machine, int offset, int data)
 {
 	switch (offset)
@@ -2424,10 +2424,10 @@ static READ16_HANDLER(ti99_4p_internal_dsr_r)
 #endif
 /*===========================================================================*/
 /*
-	TI memory extension support.
+    TI memory extension support.
 
-	Simple 8-bit DRAM: 32kb in two chunks of 8kb and 24kb repectively.
-	Since the RAM is on the 8-bit bus, there is an additionnal delay.
+    Simple 8-bit DRAM: 32kb in two chunks of 8kb and 24kb repectively.
+    Since the RAM is on the 8-bit bus, there is an additionnal delay.
 */
 
 static READ16_HANDLER ( ti99_TIxramlow_r );
@@ -2438,7 +2438,7 @@ static WRITE16_HANDLER ( ti99_TIxramhigh_w );
 static void ti99_TIxram_init(running_machine *machine)
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	
+
 	memory_install_read16_handler(space, 0x2000, 0x3fff, 0, 0, ti99_TIxramlow_r);
 	memory_install_write16_handler(space, 0x2000, 0x3fff, 0, 0, ti99_TIxramlow_w);
 	memory_install_read16_handler(space, 0xa000, 0xffff, 0, 0, ti99_TIxramhigh_r);
@@ -2449,7 +2449,7 @@ static void ti99_TIxram_init(running_machine *machine)
 static READ16_HANDLER ( ti99_TIxramlow_r )
 {
 	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
-//	cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
+//  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
 
 	return xRAM_ptr[offset];
 }
@@ -2457,7 +2457,7 @@ static READ16_HANDLER ( ti99_TIxramlow_r )
 static WRITE16_HANDLER ( ti99_TIxramlow_w )
 {
 	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
-//	cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
+//  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
 
 	COMBINE_DATA(xRAM_ptr + offset);
 }
@@ -2466,7 +2466,7 @@ static WRITE16_HANDLER ( ti99_TIxramlow_w )
 static READ16_HANDLER ( ti99_TIxramhigh_r )
 {
 	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
-//	cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
+//  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
 
 	return xRAM_ptr[offset+0x1000];
 }
@@ -2474,7 +2474,7 @@ static READ16_HANDLER ( ti99_TIxramhigh_r )
 static WRITE16_HANDLER ( ti99_TIxramhigh_w )
 {
 	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
-//	cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
+//  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
 
 	COMBINE_DATA(xRAM_ptr + offset+0x1000);
 }
@@ -2482,10 +2482,10 @@ static WRITE16_HANDLER ( ti99_TIxramhigh_w )
 
 /*===========================================================================*/
 /*
-	Super AMS memory extension support.
+    Super AMS memory extension support.
 
-	Up to 1Mb of SRAM.  Straightforward mapper, works with 4kb chunks.  The mapper was designed
-	to be extendable with other RAM areas.
+    Up to 1Mb of SRAM.  Straightforward mapper, works with 4kb chunks.  The mapper was designed
+    to be extendable with other RAM areas.
 */
 
 /* prototypes */
@@ -2518,7 +2518,7 @@ static void ti99_sAMSxram_init(running_machine *machine)
 	int i;
 
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	
+
 	memory_install_read16_handler(space, 0x2000, 0x3fff, 0, 0, ti99_sAMSxramlow_r);
 	memory_install_write16_handler(space, 0x2000, 0x3fff, 0, 0, ti99_sAMSxramlow_w);
 	memory_install_read16_handler(space, 0xa000, 0xffff, 0, 0, ti99_sAMSxramhigh_r);
@@ -2533,8 +2533,8 @@ static void ti99_sAMSxram_init(running_machine *machine)
 }
 
 /* write CRU bit:
-	bit0: enable/disable mapper registers in DSR space,
-	bit1: enable/disable address mapping */
+    bit0: enable/disable mapper registers in DSR space,
+    bit1: enable/disable address mapping */
 static void sAMS_cru_w(running_machine *machine, int offset, int data)
 {
 	if (offset == 1)
@@ -2557,7 +2557,7 @@ static WRITE8_HANDLER(sAMS_mapper_w)
 static READ16_HANDLER ( ti99_sAMSxramlow_r )
 {
 	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
-//	cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
+//  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
 
 	if (sAMS_mapper_on)
 		return xRAM_ptr[(offset&0x7ff)+sAMSlookup[(0x1000+offset)>>11]];
@@ -2568,7 +2568,7 @@ static READ16_HANDLER ( ti99_sAMSxramlow_r )
 static WRITE16_HANDLER ( ti99_sAMSxramlow_w )
 {
 	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
-//	cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
+//  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
 
 	if (sAMS_mapper_on)
 		COMBINE_DATA(xRAM_ptr + (offset&0x7ff)+sAMSlookup[(0x1000+offset)>>11]);
@@ -2580,7 +2580,7 @@ static WRITE16_HANDLER ( ti99_sAMSxramlow_w )
 static READ16_HANDLER ( ti99_sAMSxramhigh_r )
 {
 	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
-//	cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
+//  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
 
 	if (sAMS_mapper_on)
 		return xRAM_ptr[(offset&0x7ff)+sAMSlookup[(0x5000+offset)>>11]];
@@ -2591,7 +2591,7 @@ static READ16_HANDLER ( ti99_sAMSxramhigh_r )
 static WRITE16_HANDLER ( ti99_sAMSxramhigh_w )
 {
 	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
-//	cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
+//  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
 
 	if (sAMS_mapper_on)
 		COMBINE_DATA(xRAM_ptr + (offset&0x7ff)+sAMSlookup[(0x5000+offset)>>11]);
@@ -2602,10 +2602,10 @@ static WRITE16_HANDLER ( ti99_sAMSxramhigh_w )
 
 /*===========================================================================*/
 /*
-	SNUG SGCPU (a.k.a. 99/4p) Super AMS clone support.
-	Compatible with Super AMS, but uses a 16-bit bus.
+    SNUG SGCPU (a.k.a. 99/4p) Super AMS clone support.
+    Compatible with Super AMS, but uses a 16-bit bus.
 
-	Up to 1Mb of SRAM.  Straightforward mapper, works with 4kb chunks.
+    Up to 1Mb of SRAM.  Straightforward mapper, works with 4kb chunks.
 */
 
 /* prototypes */
@@ -2634,21 +2634,21 @@ static void ti99_4p_mapper_init(running_machine *machine)
 
 	/* Not required at run-time */
 	/*memory_install_read16_handler(space, 0x2000, 0x2fff, SMH_BANK(3));
-	memory_install_write16_handler(space, 0x2000, 0x2fff, SMH_BANK(3));
-	memory_install_read16_handler(space, 0x3000, 0x3fff, SMH_BANK(4));
-	memory_install_write16_handler(space, 0x3000, 0x3fff, SMH_BANK(4));
-	memory_install_read16_handler(space, 0xa000, 0xafff, SMH_BANK(5));
-	memory_install_write16_handler(space, 0xa000, 0xafff, SMH_BANK(5));
-	memory_install_read16_handler(space, 0xb000, 0xbfff, SMH_BANK(6));
-	memory_install_write16_handler(space, 0xb000, 0xbfff, SMH_BANK(6));
-	memory_install_read16_handler(space, 0xc000, 0xcfff, SMH_BANK(7));
-	memory_install_write16_handler(space, 0xc000, 0xcfff, SMH_BANK(7));
-	memory_install_read16_handler(space, 0xd000, 0xdfff, SMH_BANK(8));
-	memory_install_write16_handler(space, 0xd000, 0xdfff, SMH_BANK(8));
-	memory_install_read16_handler(space, 0xe000, 0xefff, SMH_BANK(9));
-	memory_install_write16_handler(space, 0xe000, 0xefff, SMH_BANK(9));
-	memory_install_read16_handler(space, 0xf000, 0xffff, SMH_BANK(10));
-	memory_install_write16_handler(space, 0xf000, 0xffff, SMH_BANK(10));*/
+    memory_install_write16_handler(space, 0x2000, 0x2fff, SMH_BANK(3));
+    memory_install_read16_handler(space, 0x3000, 0x3fff, SMH_BANK(4));
+    memory_install_write16_handler(space, 0x3000, 0x3fff, SMH_BANK(4));
+    memory_install_read16_handler(space, 0xa000, 0xafff, SMH_BANK(5));
+    memory_install_write16_handler(space, 0xa000, 0xafff, SMH_BANK(5));
+    memory_install_read16_handler(space, 0xb000, 0xbfff, SMH_BANK(6));
+    memory_install_write16_handler(space, 0xb000, 0xbfff, SMH_BANK(6));
+    memory_install_read16_handler(space, 0xc000, 0xcfff, SMH_BANK(7));
+    memory_install_write16_handler(space, 0xc000, 0xcfff, SMH_BANK(7));
+    memory_install_read16_handler(space, 0xd000, 0xdfff, SMH_BANK(8));
+    memory_install_write16_handler(space, 0xd000, 0xdfff, SMH_BANK(8));
+    memory_install_read16_handler(space, 0xe000, 0xefff, SMH_BANK(9));
+    memory_install_write16_handler(space, 0xe000, 0xefff, SMH_BANK(9));
+    memory_install_read16_handler(space, 0xf000, 0xffff, SMH_BANK(10));
+    memory_install_write16_handler(space, 0xf000, 0xffff, SMH_BANK(10));*/
 
 	ti99_peb_set_16bit_card_handlers(0x1e00, & ti99_4p_mapper_handlers);
 
@@ -2679,8 +2679,8 @@ static void ti99_4p_mapper_init(running_machine *machine)
 }
 
 /* write CRU bit:
-	bit0: enable/disable mapper registers in DSR space,
-	bit1: enable/disable address mapping */
+    bit0: enable/disable mapper registers in DSR space,
+    bit1: enable/disable address mapping */
 static void ti99_4p_mapper_cru_w(running_machine *machine, int offset, int data)
 {
 	int i;
@@ -2754,9 +2754,9 @@ static WRITE16_HANDLER(ti99_4p_mapper_w)
 
 /*===========================================================================*/
 /*
-	myarc-ish memory extension support (foundation, and myarc clones).
+    myarc-ish memory extension support (foundation, and myarc clones).
 
-	Up to 512kb of RAM.  Straightforward mapper, works with 32kb chunks.
+    Up to 512kb of RAM.  Straightforward mapper, works with 32kb chunks.
 */
 
 static int myarc_cru_r(running_machine *machine, int offset);
@@ -2785,7 +2785,7 @@ static int myarc_page_offset_mask;
 static void ti99_myarcxram_init(running_machine *machine)
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	
+
 	memory_install_read16_handler(space, 0x2000, 0x3fff, 0, 0, ti99_myarcxramlow_r);
 	memory_install_write16_handler(space, 0x2000, 0x3fff, 0, 0, ti99_myarcxramlow_w);
 	memory_install_read16_handler(space, 0xa000, 0xffff, 0, 0, ti99_myarcxramhigh_r);
@@ -2824,7 +2824,7 @@ static void ti99_myarcxram_init(running_machine *machine)
 }
 
 /* read CRU bit:
-	bit 1-2 (128kb) or 1-4 (512kb): read current map offset */
+    bit 1-2 (128kb) or 1-4 (512kb): read current map offset */
 static int myarc_cru_r(running_machine *machine, int offset)
 {
 	/*if (offset == 0)*/	/* right??? */
@@ -2834,7 +2834,7 @@ static int myarc_cru_r(running_machine *machine, int offset)
 }
 
 /* write CRU bit:
-	bit 1-2 (128kb) or 1-4 (512kb): write map offset */
+    bit 1-2 (128kb) or 1-4 (512kb): write map offset */
 static void myarc_cru_w(running_machine *machine, int offset, int data)
 {
 	offset &= 0x7;	/* right??? */
@@ -2888,7 +2888,7 @@ static WRITE16_HANDLER ( ti99_myarcxramhigh_w )
 #pragma mark EVPC VIDEO CARD
 #endif
 /*
-	SNUG's EVPC emulation
+    SNUG's EVPC emulation
 */
 
 /* prototypes */
@@ -2917,7 +2917,7 @@ static const ti99_peb_card_handlers_t evpc_handlers =
 
 
 /*
-	Reset evpc card, set up handlers
+    Reset evpc card, set up handlers
 */
 static void ti99_evpc_reset(running_machine *machine)
 {
@@ -2930,7 +2930,7 @@ static void ti99_evpc_reset(running_machine *machine)
 }
 
 /*
-	Read evpc CRU interface
+    Read evpc CRU interface
 */
 static int evpc_cru_r(running_machine *machine, int offset)
 {
@@ -2938,7 +2938,7 @@ static int evpc_cru_r(running_machine *machine, int offset)
 }
 
 /*
-	Write evpc CRU interface
+    Write evpc CRU interface
 */
 static void evpc_cru_w(running_machine *machine, int offset, int data)
 {
@@ -2994,7 +2994,7 @@ static struct
 } evpc_palette;
 
 /*
-	read a byte in evpc DSR space
+    read a byte in evpc DSR space
 */
 static  READ8_HANDLER(evpc_mem_r)
 {
@@ -3073,7 +3073,7 @@ static  READ8_HANDLER(evpc_mem_r)
 }
 
 /*
-	write a byte in evpc DSR space
+    write a byte in evpc DSR space
 */
 static WRITE8_HANDLER(evpc_mem_w)
 {

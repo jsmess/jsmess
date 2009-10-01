@@ -1,10 +1,10 @@
 /*********************************************************************
 
-	beta.h
+    beta.h
 
-	Implementation of Beta disk drive support for Spectrum and clones
-	
-	04/05/2008 Created by Miodrag Milanovic
+    Implementation of Beta disk drive support for Spectrum and clones
+
+    04/05/2008 Created by Miodrag Milanovic
 
 *********************************************************************/
 #ifndef BETA_H
@@ -28,7 +28,7 @@ void beta_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union 
 
 #define MDRV_BETA_DISK_REMOVE(_tag)		\
     MDRV_DEVICE_REMOVE(_tag)
-	
+
 READ8_DEVICE_HANDLER(betadisk_status_r);
 READ8_DEVICE_HANDLER(betadisk_track_r);
 READ8_DEVICE_HANDLER(betadisk_sector_r);
@@ -43,5 +43,5 @@ WRITE8_DEVICE_HANDLER(betadisk_data_w);
 
 /* device interface */
 DEVICE_GET_INFO( beta_disk );
-	
+
 #endif /* BETA_H */

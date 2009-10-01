@@ -1,5 +1,5 @@
 /***************************************************************************
-   
+
         Nanos
 
         12/05/2009 Skeleton driver.
@@ -109,10 +109,10 @@ static const z80_daisy_chain nanos_daisy_chain[] =
 };
 static ADDRESS_MAP_START( nanos_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)	
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	/* CPU card */
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("z80pio", z80pio_r, z80pio_w)
-	
+
 	/* I/O card */
 	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("z80pio_0", z80pio_r, z80pio_w)
 	AM_RANGE(0x84, 0x84) AM_DEVREADWRITE("z80sio_0", z80sio_d_r, z80sio_d_w)
@@ -121,7 +121,7 @@ static ADDRESS_MAP_START( nanos_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x87, 0x87) AM_DEVREADWRITE("z80sio_0", z80sio_c_r, z80sio_c_w)
 	AM_RANGE(0x88, 0x8B) AM_DEVREADWRITE("z80pio_1", z80pio_r, z80pio_w)
 	AM_RANGE(0x8C, 0x8F) AM_DEVREADWRITE("z80ctc_0", z80ctc_r, z80ctc_w)
-	
+
 	/* FDC card */
 	AM_RANGE(0x92, 0x92) AM_WRITE(nanos_tc_w)
 	AM_RANGE(0x94, 0x94) AM_DEVREAD("nec765", nec765_status_r)
@@ -132,17 +132,17 @@ static ADDRESS_MAP_START( nanos_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0xA2, 0xA2) AM_DEVREADWRITE("z80sio_1", z80sio_d_r, z80sio_d_w)
 	AM_RANGE(0xA3, 0xA3) AM_DEVREADWRITE("z80sio_1", z80sio_c_r, z80sio_c_w)
 	AM_RANGE(0xA4, 0xA7) AM_DEVREADWRITE("z80ctc_1", z80ctc_r, z80ctc_w)
-	
-	/* 256-k RAM card I  - 	64k OS-Memory + 192k-RAM-Floppy */
+
+	/* 256-k RAM card I  -  64k OS-Memory + 192k-RAM-Floppy */
 	//AM_RANGE(0xC0, 0xC7)
-	
-	/* 256-k RAM card II - 	64k OS-Memory + 192k-RAM-Floppy */
+
+	/* 256-k RAM card II -  64k OS-Memory + 192k-RAM-Floppy */
 	//AM_RANGE(0xC8, 0xCF)
 ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( nanos )
-	PORT_START("LINEC")	
+	PORT_START("LINEC")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Ctrl") PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNUSED)
@@ -165,12 +165,12 @@ static INPUT_PORTS_START( nanos )
 	PORT_START("LINE1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("8") PORT_CODE(KEYCODE_8)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("9") PORT_CODE(KEYCODE_9)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(":") PORT_CODE(KEYCODE_QUOTE) 
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(";") PORT_CODE(KEYCODE_COLON) 
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(",") PORT_CODE(KEYCODE_COMMA) 
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("-") PORT_CODE(KEYCODE_MINUS) 
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(":") PORT_CODE(KEYCODE_QUOTE)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(";") PORT_CODE(KEYCODE_COLON)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(",") PORT_CODE(KEYCODE_COMMA)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("-") PORT_CODE(KEYCODE_MINUS)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(".") PORT_CODE(KEYCODE_STOP)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("/") PORT_CODE(KEYCODE_SLASH) 
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("/") PORT_CODE(KEYCODE_SLASH)
 
 	PORT_START("LINE2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("@") PORT_CODE(KEYCODE_END)
@@ -191,7 +191,7 @@ static INPUT_PORTS_START( nanos )
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("M") PORT_CODE(KEYCODE_M)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("N") PORT_CODE(KEYCODE_N)
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("O") PORT_CODE(KEYCODE_O)
-                                                 
+
 	PORT_START("LINE4")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("P") PORT_CODE(KEYCODE_P)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Q") PORT_CODE(KEYCODE_Q)
@@ -201,26 +201,26 @@ static INPUT_PORTS_START( nanos )
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("U") PORT_CODE(KEYCODE_U)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("V") PORT_CODE(KEYCODE_V)
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("W") PORT_CODE(KEYCODE_W)
-                        
+
 	PORT_START("LINE5")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("X") PORT_CODE(KEYCODE_X)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Z") PORT_CODE(KEYCODE_Z)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Y") PORT_CODE(KEYCODE_Y)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("[") PORT_CODE(KEYCODE_OPENBRACE) 
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("[") PORT_CODE(KEYCODE_OPENBRACE)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("\\") PORT_CODE(KEYCODE_BACKSLASH)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("]")  PORT_CODE(KEYCODE_CLOSEBRACE)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("~")  PORT_CODE(KEYCODE_TILDE)
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("DEL")PORT_CODE(KEYCODE_BACKSPACE)
-	
+
 	PORT_START("LINE6")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_RIGHT)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_UP)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_DOWN)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Space") PORT_CODE(KEYCODE_SPACE)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("LF") PORT_CODE(KEYCODE_RALT) 
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Tab") PORT_CODE(KEYCODE_TAB) 
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Enter") PORT_CODE(KEYCODE_ENTER) 	
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("LF") PORT_CODE(KEYCODE_RALT)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Tab") PORT_CODE(KEYCODE_TAB)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Enter") PORT_CODE(KEYCODE_ENTER)
 INPUT_PORTS_END
 
 
@@ -231,11 +231,11 @@ static VIDEO_START( nanos )
 
 static VIDEO_UPDATE( nanos )
 {
-//	static UINT8 framecnt=0;
+//  static UINT8 framecnt=0;
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma=0,x;
 
-//	framecnt++;
+//  framecnt++;
 
 	for (y = 0; y < 25; y++)
 	{
@@ -275,7 +275,7 @@ UINT8 key_command;
 UINT8 last_code = 0;
 UINT8 key_pressed = 0xff;
 static READ8_DEVICE_HANDLER (nanos_port_a_r)
-{	
+{
 	UINT8 retVal;
 	if (key_command==0)  {
 		return key_pressed;
@@ -294,7 +294,7 @@ static READ8_DEVICE_HANDLER (nanos_port_b_r)
 
 static WRITE8_DEVICE_HANDLER (nanos_port_b_w)
 {
-	key_command = BIT(data,1); 
+	key_command = BIT(data,1);
 	if (BIT(data,7)) {
 		memory_set_bankptr(device->machine, 1, memory_region(device->machine, "maincpu"));
 	} else {
@@ -309,25 +309,25 @@ static UINT8 row_number(UINT8 code) {
 	if BIT(code,4) return 4;
 	if BIT(code,5) return 5;
 	if BIT(code,6) return 6;
-	if BIT(code,7) return 7;	
+	if BIT(code,7) return 7;
 	return 0;
 }
 
 static TIMER_CALLBACK(keyboard_callback)
 {
 	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6" };
-	
+
 	int i;
 	UINT8 code;
 	UINT8 key_code = 0;
 	UINT8 shift = input_port_read(machine, "LINEC") & 0x02 ? 1 : 0;
 	UINT8 ctrl =  input_port_read(machine, "LINEC") & 0x01 ? 1 : 0;
-	key_pressed = 0xff;	
-	for(i = 0; i < 7; i++) 
+	key_pressed = 0xff;
+	for(i = 0; i < 7; i++)
 	{
-		
+
 		code = 	input_port_read(machine, keynames[i]);
-		if (code != 0) 
+		if (code != 0)
 		{
 			if (i==0 && shift==0) {
 				key_code = 0x30 + row_number(code) + 8*i; // for numbers and some signs
@@ -376,7 +376,7 @@ static TIMER_CALLBACK(keyboard_callback)
 				key_code = 0x00 + row_number(code) + (i-2)*8; // for letters + ctrl
 			}
 			if (i==6) {
-				switch(row_number(code)) 
+				switch(row_number(code))
 				{
 					case 0: key_code = 0x11; break;
 					case 1: key_code = 0x12; break;
@@ -390,25 +390,25 @@ static TIMER_CALLBACK(keyboard_callback)
 			}
 			last_code = key_code;
 		}
-	}	
-	if (key_code==0){		
-		key_pressed = 0xf7;				
+	}
+	if (key_code==0){
+		key_pressed = 0xf7;
 	}
 }
 
-static MACHINE_RESET(nanos) 
-{	
+static MACHINE_RESET(nanos)
+{
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	
-	memory_install_write8_handler(space, 0x0000, 0x0fff, 0, 0, SMH_BANK(3));		
-	memory_install_write8_handler(space, 0x1000, 0xffff, 0, 0, SMH_BANK(2));	
-	
+
+	memory_install_write8_handler(space, 0x0000, 0x0fff, 0, 0, SMH_BANK(3));
+	memory_install_write8_handler(space, 0x1000, 0xffff, 0, 0, SMH_BANK(2));
+
 	memory_set_bankptr(machine, 1, memory_region(machine, "maincpu"));
 	memory_set_bankptr(machine, 2, mess_ram + 0x1000);
 	memory_set_bankptr(machine, 3, mess_ram);
-	
+
 	floppy_drive_set_motor_state(floppy_get_device(space->machine, 0), 1);
-	
+
 	floppy_drive_set_ready_state(floppy_get_device(space->machine, 0), 1,1);
 	timer_pulse(machine, ATTOTIME_IN_HZ(24000), NULL, 0, keyboard_callback);
 }
@@ -454,12 +454,12 @@ static MACHINE_DRIVER_START( nanos )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
     MDRV_CPU_PROGRAM_MAP(nanos_mem)
-    MDRV_CPU_IO_MAP(nanos_io)	
+    MDRV_CPU_IO_MAP(nanos_io)
     MDRV_CPU_CONFIG(nanos_daisy_chain)
 
 
     MDRV_MACHINE_RESET(nanos)
-	
+
     /* video hardware */
     MDRV_SCREEN_ADD("screen", RASTER)
     MDRV_SCREEN_REFRESH_RATE(50)
@@ -472,7 +472,7 @@ static MACHINE_DRIVER_START( nanos )
 
     MDRV_VIDEO_START(nanos)
     MDRV_VIDEO_UPDATE(nanos)
-    
+
     /* devices */
 	MDRV_Z80CTC_ADD( "z80ctc_0", XTAL_4MHz, ctc_intf)
 	MDRV_Z80CTC_ADD( "z80ctc_1", XTAL_4MHz, ctc_intf)
@@ -482,8 +482,8 @@ static MACHINE_DRIVER_START( nanos )
 	MDRV_Z80SIO_ADD( "z80sio_1", XTAL_4MHz, sio_intf)
 	MDRV_Z80PIO_ADD( "z80pio", nanos_z80pio_intf )
 	/* NEC765 */
-	MDRV_NEC765A_ADD("nec765", nanos_nec765_interface)    
-	
+	MDRV_NEC765A_ADD("nec765", nanos_nec765_interface)
+
 	MDRV_FLOPPY_4_DRIVES_ADD(nanos_floppy_config)
 MACHINE_DRIVER_END
 

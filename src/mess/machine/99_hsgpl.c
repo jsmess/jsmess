@@ -1,7 +1,7 @@
 /*
-	SNUG HSGPL card emulation.
+    SNUG HSGPL card emulation.
 
-	Raphael Nabet, 2003.
+    Raphael Nabet, 2003.
 */
 
 #include "driver.h"
@@ -11,73 +11,73 @@
 #include "at29040.h"
 
 /*
-	Supports 16 banks of 8 GROMs (8kbytes each) with 16 associated banks of
-	32kbytes (8kbytes*4) of module ROM, 2 banks of 8 GRAMs with 2 associated
-	banks of 32 kbytes of RAM, and 512kbytes of DSR.  Roms are implemented with
-	512kbyte EEPROMs (1 for DSR, 2 for GROMs, 1 for cartridge ROM).  RAM is
-	implemented with 128kbyte SRAMs (1 for GRAM, 1 for cartridge RAM - only the
-	first 64kbytes of the cartridge RAM chip is used).
+    Supports 16 banks of 8 GROMs (8kbytes each) with 16 associated banks of
+    32kbytes (8kbytes*4) of module ROM, 2 banks of 8 GRAMs with 2 associated
+    banks of 32 kbytes of RAM, and 512kbytes of DSR.  Roms are implemented with
+    512kbyte EEPROMs (1 for DSR, 2 for GROMs, 1 for cartridge ROM).  RAM is
+    implemented with 128kbyte SRAMs (1 for GRAM, 1 for cartridge RAM - only the
+    first 64kbytes of the cartridge RAM chip is used).
 
-	CRU bits:
-	   Name    Equates Meaning
-	>0 DEN     DSRENA  DSR Enable
-	>1 GRMENA  GRMENA  Enable GRAM instead of GROM in banks 0 and 1
-	>2 BNKINH* BNKENA  Disable banking
-	>3 PG0     PG0
-	>4 PG1     PG1
-	>5 PG2     PG2     Paging-Bits for DSR-area
-	>6 PG3     PG3
-	>7 PG4     PG4
-	>8 PG5     PG5
-	>9 CRDENA  CRDENA  Activate memory areas of HSGPL (i.e. enable HSGPL GROM and ROM6 ports)
-	>A WRIENA  WRIENA  write enable for RAM and GRAM (and flash GROM!)
-	>B SCENA   SCARTE  Activate SuperCart-banking
-	>C LEDENA  LEDENA  light LED on
-	>D -       -       free
-	>E MBXENA  MBXENA  Activate MBX-Banking
-	>F RAMENA  RAMENA  Enable RAM6000 instead of ROM6000 in banks 0 and 1
+    CRU bits:
+       Name    Equates Meaning
+    >0 DEN     DSRENA  DSR Enable
+    >1 GRMENA  GRMENA  Enable GRAM instead of GROM in banks 0 and 1
+    >2 BNKINH* BNKENA  Disable banking
+    >3 PG0     PG0
+    >4 PG1     PG1
+    >5 PG2     PG2     Paging-Bits for DSR-area
+    >6 PG3     PG3
+    >7 PG4     PG4
+    >8 PG5     PG5
+    >9 CRDENA  CRDENA  Activate memory areas of HSGPL (i.e. enable HSGPL GROM and ROM6 ports)
+    >A WRIENA  WRIENA  write enable for RAM and GRAM (and flash GROM!)
+    >B SCENA   SCARTE  Activate SuperCart-banking
+    >C LEDENA  LEDENA  light LED on
+    >D -       -       free
+    >E MBXENA  MBXENA  Activate MBX-Banking
+    >F RAMENA  RAMENA  Enable RAM6000 instead of ROM6000 in banks 0 and 1
 
 
-	Direct access ports for all memory areas (the original manual gives
-	>9880->989C and >9C80->9C9C for ROM6000, but this is incorrect):
+    Direct access ports for all memory areas (the original manual gives
+    >9880->989C and >9C80->9C9C for ROM6000, but this is incorrect):
 
-	Module bank	Read	Write	Read ROM6000		Write ROM6000
-				GROM	GROM
-	0			>9800	>9C00	>9860 Offset >0000	>9C60 Offset >0000
-	1			>9804	>9C04	>9860 Offset >8000	>9C60 Offset >8000
-	2			>9808	>9C08	>9864 Offset >0000	>9C64 Offset >0000
-	3			>980C	>9C0C	>9864 Offset >8000	>9C64 Offset >8000
-	4			>9810	>9C10	>9868 Offset >0000	>9C68 Offset >0000
-	5			>9814	>9C14	>9868 Offset >8000	>9C68 Offset >8000
-	6			>9818	>9C18	>986C Offset >0000	>9C6C Offset >0000
-	7			>981C	>9C1C	>986C Offset >8000	>9C6C Offset >8000
-	8			>9820	>9C20	>9870 Offset >0000	>9C70 Offset >0000
-	9			>9824	>9C24	>9870 Offset >8000	>9C70 Offset >8000
-	10			>9828	>9C28	>9874 Offset >0000	>9C74 Offset >0000
-	11			>982C	>9C2C	>9874 Offset >8000	>9C74 Offset >8000
-	12			>9830	>9C30	>9878 Offset >0000	>9C78 Offset >0000
-	13			>9834	>9C34	>9878 Offset >8000	>9C78 Offset >8000
-	14			>9838	>9C38	>987C Offset >0000	>9C7C Offset >0000
-	15			>983C	>9C3C	>987C Offset >8000	>9C7C Offset >8000
+    Module bank Read    Write   Read ROM6000        Write ROM6000
+                GROM    GROM
+    0           >9800   >9C00   >9860 Offset >0000  >9C60 Offset >0000
+    1           >9804   >9C04   >9860 Offset >8000  >9C60 Offset >8000
+    2           >9808   >9C08   >9864 Offset >0000  >9C64 Offset >0000
+    3           >980C   >9C0C   >9864 Offset >8000  >9C64 Offset >8000
+    4           >9810   >9C10   >9868 Offset >0000  >9C68 Offset >0000
+    5           >9814   >9C14   >9868 Offset >8000  >9C68 Offset >8000
+    6           >9818   >9C18   >986C Offset >0000  >9C6C Offset >0000
+    7           >981C   >9C1C   >986C Offset >8000  >9C6C Offset >8000
+    8           >9820   >9C20   >9870 Offset >0000  >9C70 Offset >0000
+    9           >9824   >9C24   >9870 Offset >8000  >9C70 Offset >8000
+    10          >9828   >9C28   >9874 Offset >0000  >9C74 Offset >0000
+    11          >982C   >9C2C   >9874 Offset >8000  >9C74 Offset >8000
+    12          >9830   >9C30   >9878 Offset >0000  >9C78 Offset >0000
+    13          >9834   >9C34   >9878 Offset >8000  >9C78 Offset >8000
+    14          >9838   >9C38   >987C Offset >0000  >9C7C Offset >0000
+    15          >983C   >9C3C   >987C Offset >8000  >9C7C Offset >8000
 
-	Module bank	Read	Write	Read RAM6000		Write RAM6000
-				GRAM	GRAM
-	16 (Ram)	>9880	>9C80	>98C0 Offset >0000	>9CC0 Offset >0000
-	17 (Ram)	>9884	>9C84	>98C0 Offset >8000	>9CC0 Offset >8000
+    Module bank Read    Write   Read RAM6000        Write RAM6000
+                GRAM    GRAM
+    16 (Ram)    >9880   >9C80   >98C0 Offset >0000  >9CC0 Offset >0000
+    17 (Ram)    >9884   >9C84   >98C0 Offset >8000  >9CC0 Offset >8000
 
-	DSR bank	Read	Write
-	0 - 7		>9840	>9C40
-	8 - 15		>9844	>9C44
-	16 - 23		>9848	>9C48
-	24 - 31		>984C	>9C4C
-	32 - 39		>9850	>9C50
-	40 - 47		>9854	>9C54
-	48 - 55		>9858	>9C58
-	56 - 63		>985C	>9C5C
+    DSR bank    Read    Write
+    0 - 7       >9840   >9C40
+    8 - 15      >9844   >9C44
+    16 - 23     >9848   >9C48
+    24 - 31     >984C   >9C4C
+    32 - 39     >9850   >9C50
+    40 - 47     >9854   >9C54
+    48 - 55     >9858   >9C58
+    56 - 63     >985C   >9C5C
 
-	Note: Writing only works for areas set up as RAM.  To write to the
-		FEEPROMs, you must used the algorithm specified by their respective
-		manufacturer.
+    Note: Writing only works for areas set up as RAM.  To write to the
+        FEEPROMs, you must used the algorithm specified by their respective
+        manufacturer.
 */
 
 static struct
@@ -251,7 +251,7 @@ int ti99_hsgpl_save_memcard(running_machine *machine)
 }
 
 /*
-	Initialize hsgpl card, set up handlers
+    Initialize hsgpl card, set up handlers
 */
 void ti99_hsgpl_init(running_machine *machine)
 {
@@ -270,7 +270,7 @@ void ti99_hsgpl_init(running_machine *machine)
 }
 
 /*
-	Reset hsgpl card
+    Reset hsgpl card
 */
 void ti99_hsgpl_reset(running_machine *machine)
 {
@@ -287,7 +287,7 @@ void ti99_hsgpl_reset(running_machine *machine)
 
 
 /*
-	Write hsgpl CRU interface
+    Write hsgpl CRU interface
 */
 static void hsgpl_cru_w(running_machine *machine, int offset, int data)
 {
@@ -303,7 +303,7 @@ static void hsgpl_cru_w(running_machine *machine, int offset, int data)
 }
 
 /*
-	read a byte in hsgpl DSR space
+    read a byte in hsgpl DSR space
 */
 static  READ8_HANDLER(hsgpl_dsr_r)
 {
@@ -313,7 +313,7 @@ static  READ8_HANDLER(hsgpl_dsr_r)
 }
 
 /*
-	GPL read
+    GPL read
 */
 READ16_HANDLER ( ti99_hsgpl_gpl_r )
 {
@@ -341,7 +341,7 @@ READ16_HANDLER ( ti99_hsgpl_gpl_r )
 	}
 	else
 	{	/* read GPL data */
-		//reply = (data_ptr ? ((int) data_ptr[hsgpl.addr]) : 0) << 8;	/* read data */
+		//reply = (data_ptr ? ((int) data_ptr[hsgpl.addr]) : 0) << 8;   /* read data */
 
 		switch (port)
 		{
@@ -425,7 +425,7 @@ READ16_HANDLER ( ti99_hsgpl_gpl_r )
 }
 
 /*
-	GPL write
+    GPL write
 */
 WRITE16_HANDLER ( ti99_hsgpl_gpl_w )
 {
@@ -535,7 +535,7 @@ WRITE16_HANDLER ( ti99_hsgpl_gpl_w )
 }
 
 /*
-	Cartridge space read
+    Cartridge space read
 */
 READ16_HANDLER ( ti99_hsgpl_rom6_r )
 {
@@ -586,7 +586,7 @@ READ16_HANDLER ( ti99_hsgpl_rom6_r )
 }
 
 /*
-	Cartridge space write
+    Cartridge space write
 */
 WRITE16_HANDLER ( ti99_hsgpl_rom6_w )
 {
@@ -605,8 +605,8 @@ WRITE16_HANDLER ( ti99_hsgpl_rom6_w )
 	}
 
 	/* MBX: RAM in 0x6c00-0x6ffd (it is unclear whether the MBX RAM area is
-	enabled/disabled by the wriena bit).  I guess RAM is unpaged, but it is
-	not implemented */
+    enabled/disabled by the wriena bit).  I guess RAM is unpaged, but it is
+    not implemented */
 	if ((hsgpl.cru_reg & cr_wriena) || ((hsgpl.cru_reg & cr_mbxena) && (offset >= 0x0600) && (offset <= 0x07fe)))
 	{
 		switch (port)
@@ -636,9 +636,9 @@ WRITE16_HANDLER ( ti99_hsgpl_rom6_w )
 		case 14:
 		case 15:
 			/* feeprom is normally written to using GPL ports, and I don't know
-			writing through >6000 page is enabled */
+            writing through >6000 page is enabled */
 			/*at29c040a_w(feeprom_rom6, 1 + 2*offset + 0x2000*hsgpl.cur_bank + 0x8000*port, data);
-			at29c040a_w(feeprom_rom6, 2*offset + 0x2000*hsgpl.cur_bank + 0x8000*port, data >> 8);*/
+            at29c040a_w(feeprom_rom6, 2*offset + 0x2000*hsgpl.cur_bank + 0x8000*port, data >> 8);*/
 			break;
 
 		case 32:

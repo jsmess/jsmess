@@ -371,9 +371,9 @@ static int crt_image_deletefile(imgtool_image *img, const char *fname);
 static int crt_image_create(const imgtool_module *mod, imgtool_stream *f, const ResolvedOption *_options);
 
 /*
-	IMAGE_USES_FTYPE|IMAGE_USES_FADDR|IMAGE_USES_FBANK
-	|IMAGE_USES_HARDWARE_TYPE|IMAGE_USES_GAME_LINE
-	|IMAGE_USES_EXROM_LINE|IMAGE_USES_LABEL, //flags
+    IMAGE_USES_FTYPE|IMAGE_USES_FADDR|IMAGE_USES_FBANK
+    |IMAGE_USES_HARDWARE_TYPE|IMAGE_USES_GAME_LINE
+    |IMAGE_USES_EXROM_LINE|IMAGE_USES_LABEL, //flags
 */
 
 static const struct OptionTemplate c64crt_fileeopts[] =
@@ -416,7 +416,7 @@ IMAGEMODULE(
 	crt_image_beginenum,			/* begin enumeration */
 	crt_image_nextenum,			/* enumerate next */
 	crt_image_closeenum,			/* close enumeration */
-	NULL, //crt_image_freespace,			/* free space on image */
+	NULL, //crt_image_freespace,            /* free space on image */
 	crt_image_readfile,			/* read file */
 	crt_image_writefile,			/* write file */
 	crt_image_deletefile,			/* delete file */

@@ -1,29 +1,29 @@
 /***************************************************************************
 
-	Video Graphics Adapter (VGA) section
+    Video Graphics Adapter (VGA) section
 
-	Nathan Woods	npwoods@mess.org
-	Peter Trauner	PeT mess@utanet.at
+    Nathan Woods    npwoods@mess.org
+    Peter Trauner   PeT mess@utanet.at
 
-	This code takes care of installing the various VGA memory and port
-	handlers
+    This code takes care of installing the various VGA memory and port
+    handlers
 
-	The VGA standard is compatible with MDA, CGA, Hercules, EGA
-	(mda, cga, hercules not real register compatible)
-	several vga cards drive also mda, cga, ega monitors
-	some vga cards have register compatible mda, cga, hercules modes
+    The VGA standard is compatible with MDA, CGA, Hercules, EGA
+    (mda, cga, hercules not real register compatible)
+    several vga cards drive also mda, cga, ega monitors
+    some vga cards have register compatible mda, cga, hercules modes
 
-	ega/vga
-	64k (early ega 16k) words of 32 bit memory
+    ega/vga
+    64k (early ega 16k) words of 32 bit memory
 
 
-	ROM declarations:
+    ROM declarations:
 
-	(oti 037 chip)
+    (oti 037 chip)
     ROM_LOAD("oakvga.bin", 0xc0000, 0x8000, 0x318c5f43)
-	(tseng labs famous et4000 isa vga card (oem))
+    (tseng labs famous et4000 isa vga card (oem))
     ROM_LOAD("et4000b.bin", 0xc0000, 0x8000, 0xa903540d)
-	(tseng labs famous et4000 isa vga card)
+    (tseng labs famous et4000 isa vga card)
     ROM_LOAD("et4000.bin", 0xc0000, 0x8000, 0xf01e4be0)
 
 ***************************************************************************/
@@ -37,7 +37,7 @@
 
 /***************************************************************************
 
-	Static declarations
+    Static declarations
 
 ***************************************************************************/
 
@@ -56,7 +56,7 @@ static pc_video_update_proc pc_ega_choosevideomode(running_machine *machine, int
 
 /***************************************************************************
 
-	MachineDriver stuff
+    MachineDriver stuff
 
 ***************************************************************************/
 

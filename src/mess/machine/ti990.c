@@ -1,14 +1,14 @@
 /*
-	machine/ti990.c
+    machine/ti990.c
 
-	Emulation for a few generic aspects of TI990
+    Emulation for a few generic aspects of TI990
 */
 
 #include "driver.h"
 #include "ti990.h"
 
 /*
-	Interrupt priority encoder.  Actually part of the CPU board.
+    Interrupt priority encoder.  Actually part of the CPU board.
 */
 static UINT16 intlines;
 
@@ -73,7 +73,7 @@ void ti990_set_int13(running_machine *machine, int state)
 }
 
 /*
-	hold and debounce load line (emulation is inaccurate)
+    hold and debounce load line (emulation is inaccurate)
 */
 
 static TIMER_CALLBACK(clear_load)
@@ -88,7 +88,7 @@ void ti990_hold_load(running_machine *machine)
 }
 
 /*
-	line interrupt
+    line interrupt
 */
 
 /* ckon_state: 1 if line clock active (RTCLR flip-flop on TI990/10 schematics -
@@ -111,48 +111,48 @@ void ti990_ckon_ckof_callback(const device_config *device, int state)
 
 
 /*
-	Control panel emulation
+    Control panel emulation
 
-	three panel types
-	* operator panel
-	* programmer panel
-	* MDU (external unit connected instead of the control panel, as seen in
-	  945401-9701 p. 2-5 though 2-15)
+    three panel types
+    * operator panel
+    * programmer panel
+    * MDU (external unit connected instead of the control panel, as seen in
+      945401-9701 p. 2-5 though 2-15)
 
-	Operator panel:
-	* Power led
-	* Fault led
-	* Off/On/Load switch
+    Operator panel:
+    * Power led
+    * Fault led
+    * Off/On/Load switch
 
-	Programmer panel:
-	* 16 status light, 32 switches, IDLE, RUN leds
-	* interface to a low-level debugger in ROMs
+    Programmer panel:
+    * 16 status light, 32 switches, IDLE, RUN leds
+    * interface to a low-level debugger in ROMs
 
-	* MDU:
-	* includes a programmer panel, a tape unit, and a few parts
-	  (diagnostic tape, diagnostic ROMs, etc.)
+    * MDU:
+    * includes a programmer panel, a tape unit, and a few parts
+      (diagnostic tape, diagnostic ROMs, etc.)
 
-	CRU output:
-	0-7: lights 0-7
-	8: increment scan
-	9: clear scan (according to 990 handbook)
-	A: run light (additionally sets all data LEDs to 1s, the scan count to 0b10 and enables the HALT/SIE switch)
-	B: fault light
-	C: Memory Error Interrupt clear
-	D: Start panel timer
-	E: Set SIE function (interrupt after 2 instructions are executed)
-	F: flag (according to 990 handbook)
+    CRU output:
+    0-7: lights 0-7
+    8: increment scan
+    9: clear scan (according to 990 handbook)
+    A: run light (additionally sets all data LEDs to 1s, the scan count to 0b10 and enables the HALT/SIE switch)
+    B: fault light
+    C: Memory Error Interrupt clear
+    D: Start panel timer
+    E: Set SIE function (interrupt after 2 instructions are executed)
+    F: flag (according to 990 handbook)
 
-	input :
-	0-7: switches 0-7 (or data from MDU tape)
-	8: scan count bit 1
-	9: scan count bit 0
-	A: timer active
-	B: programmer panel not present or locked
-	C: char in MDU tape unit buffer?
-	D: unused?
-	E: if 0, MDU unit present
-	F: flag (according to 990 handbook)
+    input :
+    0-7: switches 0-7 (or data from MDU tape)
+    8: scan count bit 1
+    9: scan count bit 0
+    A: timer active
+    B: programmer panel not present or locked
+    C: char in MDU tape unit buffer?
+    D: unused?
+    E: if 0, MDU unit present
+    F: flag (according to 990 handbook)
 */
 
  READ8_HANDLER ( ti990_panel_read )
@@ -169,7 +169,7 @@ WRITE8_HANDLER ( ti990_panel_write )
 
 
 /*
-	CPU board soft reset (RSET instruction)
+    CPU board soft reset (RSET instruction)
 */
 void ti990_cpuboard_reset(void)
 {

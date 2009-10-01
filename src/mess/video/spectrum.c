@@ -31,11 +31,11 @@ VIDEO_START( spectrum )
 {
 	spectrum_frame_number = 0;
 	spectrum_flash_invert = 0;
-	
+
 	EventList_Initialise(machine, 30000);
 
 	retrace_cycles = SPEC_RETRACE_CYCLES;
-	
+
 	spectrum_screen_location = spectrum_video_ram;
 }
 
@@ -45,7 +45,7 @@ VIDEO_START( spectrum_128 )
 	spectrum_flash_invert = 0;
 
 	EventList_Initialise(machine, 30000);
-	
+
 	retrace_cycles = SPEC128_RETRACE_CYCLES;
 }
 
@@ -170,11 +170,11 @@ VIDEO_UPDATE( spectrum )
 static const rgb_t spectrum_palette[16] = {
 	MAKE_RGB(0x00, 0x00, 0x00),
 	MAKE_RGB(0x00, 0x00, 0xbf),
-	MAKE_RGB(0xbf, 0x00, 0x00), 
+	MAKE_RGB(0xbf, 0x00, 0x00),
 	MAKE_RGB(0xbf, 0x00, 0xbf),
-	MAKE_RGB(0x00, 0xbf, 0x00), 
+	MAKE_RGB(0x00, 0xbf, 0x00),
 	MAKE_RGB(0x00, 0xbf, 0xbf),
-	MAKE_RGB(0xbf, 0xbf, 0x00), 
+	MAKE_RGB(0xbf, 0xbf, 0x00),
 	MAKE_RGB(0xbf, 0xbf, 0xbf),
 	MAKE_RGB(0x00, 0x00, 0x00),
 	MAKE_RGB(0x00, 0x00, 0xff),

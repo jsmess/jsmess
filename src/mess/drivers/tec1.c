@@ -1,6 +1,6 @@
 /***************************************************************************
 
-	TEC-1 driver, written by Robbbert in April, 2009 for MESS.
+    TEC-1 driver, written by Robbbert in April, 2009 for MESS.
 
 The TEC-1 was a single-board "computer" described in Talking Electronics
 magazine, issues number 10 and 11. Talking Electronics do not have dates on
@@ -57,7 +57,7 @@ static const device_config *tec1_speaker;
 
 /***************************************************************************
 
-	Display
+    Display
 
 ***************************************************************************/
 
@@ -71,14 +71,14 @@ static void tec1_display(void)
 
 static WRITE8_HANDLER( tec1_segment_w )
 {
-/*	d7 segment d
-	d6 segment e
-	d5 segment c
-	d4 segment dot
-	d3 segment b
-	d2 segment g
-	d1 segment f
-	d0 segment a */
+/*  d7 segment d
+    d6 segment e
+    d5 segment c
+    d4 segment dot
+    d3 segment b
+    d2 segment g
+    d1 segment f
+    d0 segment a */
 
 	tec1_segment = BITSWAP8(data, 4, 2, 1, 6, 7, 5, 3, 0);
 	if (tec1_digit) tec1_display();
@@ -86,14 +86,14 @@ static WRITE8_HANDLER( tec1_segment_w )
 
 static WRITE8_HANDLER( tec1_digit_w )
 {
-/* 	d7 speaker
-	d6 not used
-	d5 data digit 1
-	d4 data digit 2
-	d3 address digit 1
-	d2 address digit 2
-	d1 address digit 3
-	d0 address digit 4 */
+/*  d7 speaker
+    d6 not used
+    d5 data digit 1
+    d4 data digit 2
+    d3 address digit 1
+    d2 address digit 2
+    d1 address digit 3
+    d0 address digit 4 */
 
 	speaker_level_w(tec1_speaker, (data & 0x80) ? 1 : 0);
 
@@ -104,7 +104,7 @@ static WRITE8_HANDLER( tec1_digit_w )
 
 /***************************************************************************
 
-	Keyboard
+    Keyboard
 
 ***************************************************************************/
 
@@ -113,7 +113,7 @@ static READ8_HANDLER( tec1_kbd_r )
 	cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
 	return tec1_kbd;
 }
-	
+
 static UINT8 tec1_convert_col_to_bin( UINT8 col, UINT8 row )
 {
 	UINT8 data = row;
@@ -146,8 +146,8 @@ static TIMER_CALLBACK( tec1_kbd_callback )
 	/* if previous key is still held, bail out */
 	if (input_port_read(machine, keynames[row]))
 		if (tec1_convert_col_to_bin(input_port_read(machine, keynames[row]), row) == tec1_kbd)
-			return; 
-		
+			return;
+
 	row++;
 	row &= 3;
 
@@ -162,7 +162,7 @@ static TIMER_CALLBACK( tec1_kbd_callback )
 
 /***************************************************************************
 
-	Machine
+    Machine
 
 ***************************************************************************/
 
@@ -176,7 +176,7 @@ static MACHINE_RESET( tec1 )
 
 /***************************************************************************
 
-	Address Map
+    Address Map
 
 ***************************************************************************/
 
@@ -196,7 +196,7 @@ ADDRESS_MAP_END
 
 /**************************************************************************
 
-	Keyboard Layout
+    Keyboard Layout
 
 ***************************************************************************/
 
@@ -233,7 +233,7 @@ INPUT_PORTS_END
 
 /***************************************************************************
 
-	Machine driver
+    Machine driver
 
 ***************************************************************************/
 
@@ -257,18 +257,18 @@ MACHINE_DRIVER_END
 
 /***************************************************************************
 
-	Game driver
+    Game driver
 
 ***************************************************************************/
 
 ROM_START(tec1)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("tec1.rom",    0x0000, 0x0800, CRC(b3390c36) SHA1(18aabc68d473206b7fc4e365c6b57a4e218482c3) )
-//	ROM_SYSTEM_BIOS(0, "tec1", "TEC-1")
-//	ROMX_LOAD("tec1.rom",    0x0000, 0x0800, CRC(b3390c36) SHA1(18aabc68d473206b7fc4e365c6b57a4e218482c3), ROM_BIOS(1))
-//	ROM_SYSTEM_BIOS(1, "tec1a", "TEC-1A")
-//	ROMX_LOAD("tec1a.rom",   0x0000, 0x0800, CRC(60daea3c) SHA1(383b7e7f02e91fb18c87eb03c5949e31156771d4), ROM_BIOS(2))
+//  ROM_SYSTEM_BIOS(0, "tec1", "TEC-1")
+//  ROMX_LOAD("tec1.rom",    0x0000, 0x0800, CRC(b3390c36) SHA1(18aabc68d473206b7fc4e365c6b57a4e218482c3), ROM_BIOS(1))
+//  ROM_SYSTEM_BIOS(1, "tec1a", "TEC-1A")
+//  ROMX_LOAD("tec1a.rom",   0x0000, 0x0800, CRC(60daea3c) SHA1(383b7e7f02e91fb18c87eb03c5949e31156771d4), ROM_BIOS(2))
 ROM_END
 
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE	  INPUT    INIT      CONFIG       COMPANY  FULLNAME */
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT    INIT      CONFIG       COMPANY  FULLNAME */
 COMP( 1984, tec1,     0,      0,      tec1,       tec1,    0,        0,		"Talking Electronics magazine",  "TEC-1" , 0 )

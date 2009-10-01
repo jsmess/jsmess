@@ -1,13 +1,13 @@
 /***************************************************************************
 
-	machine/pc.c
+    machine/pc.c
 
-	Functions to emulate general aspects of the machine
-	(RAM, ROM, interrupts, I/O ports)
+    Functions to emulate general aspects of the machine
+    (RAM, ROM, interrupts, I/O ports)
 
-	The information herein is heavily based on
-	'Ralph Browns Interrupt List'
-	Release 52, Last Change 20oct96
+    The information herein is heavily based on
+    'Ralph Browns Interrupt List'
+    Release 52, Last Change 20oct96
 
 ***************************************************************************/
 
@@ -629,14 +629,14 @@ static READ8_DEVICE_HANDLER (ibm5150_ppi_porta_r)
 	if (pc_ppi.keyboard_clear)
 	{
 		/*   0  0 - no floppy drives
-		 *   1  Not used
-		 * 2-3  The number of memory banks on the system board
-		 * 4-5  Display mode
-		 *	    11 = monochrome
-		 *      10 - color 80x25
-		 *      01 - color 40x25
-		 * 6-7  The number of floppy disk drives
-		 */
+         *   1  Not used
+         * 2-3  The number of memory banks on the system board
+         * 4-5  Display mode
+         *      11 = monochrome
+         *      10 - color 80x25
+         *      01 - color 40x25
+         * 6-7  The number of floppy disk drives
+         */
 		data = input_port_read(device->machine, "DSW0") & 0xF3;
 		switch ( mess_ram_size )
 		{
@@ -856,14 +856,14 @@ static READ8_DEVICE_HANDLER (ibm5160_ppi_porta_r)
 	if (pc_ppi.keyboard_clear)
 	{
 		/*   0  0 - no floppy drives
-		 *   1  Not used
-		 * 2-3  The number of memory banks on the system board
-		 * 4-5  Display mode
-		 *	    11 = monochrome
-		 *      10 - color 80x25
-		 *      01 - color 40x25
-		 * 6-7  The number of floppy disk drives
-		 */
+         *   1  Not used
+         * 2-3  The number of memory banks on the system board
+         * 4-5  Display mode
+         *      11 = monochrome
+         *      10 - color 80x25
+         *      01 - color 40x25
+         * 6-7  The number of floppy disk drives
+         */
 		data = input_port_read(device->machine, "DSW0");
 	}
 	else
@@ -884,7 +884,7 @@ static READ8_DEVICE_HANDLER ( ibm5160_ppi_portc_r )
 	data&=~0x80; // no parity error
 	data&=~0x40; // no error on expansion board
 	/* KB port C: equipment flags */
-//	if (pc_port[0x61] & 0x08)
+//  if (pc_port[0x61] & 0x08)
 	if (pc_ppi.portc_switch_high)
 	{
 		/* read hi nibble of S2 */
@@ -951,14 +951,14 @@ static READ8_DEVICE_HANDLER (pc_ppi_porta_r)
 	if (pc_ppi.keyboard_clear)
 	{
 		/*   0  0 - no floppy drives
-		 *   1  Not used
-		 * 2-3  The number of memory banks on the system board
-		 * 4-5  Display mode
-		 *      11 = monochrome
-		 *      10 - color 80x25
-		 *      01 - color 40x25
-		 * 6-7  The number of floppy disk drives
-		 */
+         *   1  Not used
+         * 2-3  The number of memory banks on the system board
+         * 4-5  Display mode
+         *      11 = monochrome
+         *      10 - color 80x25
+         *      01 - color 40x25
+         * 6-7  The number of floppy disk drives
+         */
 		data = input_port_read(device->machine, "DSW0");
 	}
 	else
@@ -1206,9 +1206,9 @@ DRIVER_INIT( europc )
 		gfx[i] = i;
 
 	/*
-	  fix century rom bios bug !
-	  if year <79 month (and not CENTURY) is loaded with 0x20
-	*/
+      fix century rom bios bug !
+      if year <79 month (and not CENTURY) is loaded with 0x20
+    */
 	if (rom[0xff93e]==0xb6){ // mov dh,
 		UINT8 a;
 		rom[0xff93e]=0xb5; // mov ch,
@@ -1219,7 +1219,7 @@ DRIVER_INIT( europc )
 	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
 
 	europc_rtc_init(machine);
-//	europc_rtc_set_time(machine);
+//  europc_rtc_set_time(machine);
 }
 
 DRIVER_INIT( t1000hx )

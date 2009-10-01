@@ -59,7 +59,7 @@ static INT32 cmd_ptr, d_ptr, d_limit;
 static UINT8 n5380_Data[512];
 
 #if NCR5380_DEVICE_CONVERSION
-typedef struct _ncr5380_t ncr5380_t;	
+typedef struct _ncr5380_t ncr5380_t;
 struct _ncr5380_t
 {
 	SCSIInstance *devices[8];
@@ -438,12 +438,12 @@ void *ncr5380_get_device(int id)
 
 /* device interface */
 #if NCR5380_DEVICE_CONVERSION
-static DEVICE_START( ncr5380 ) 
+static DEVICE_START( ncr5380 )
 {
 }
 
 
-static DEVICE_RESET( ncr5380 ) 
+static DEVICE_RESET( ncr5380 )
 {
 }
 

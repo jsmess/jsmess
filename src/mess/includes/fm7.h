@@ -1,7 +1,7 @@
 /*
- * 
+ *
  *  FM-7 header file
- * 
+ *
  */
 
 #ifndef FM7_H_

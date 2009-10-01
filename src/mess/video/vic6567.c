@@ -1,16 +1,16 @@
 /***************************************************************************
 
-	Video Interface Chip (6567R8 for NTSC system and 6569 for PAL system)
-	PeT mess@utanet.at
+    Video Interface Chip (6567R8 for NTSC system and 6569 for PAL system)
+    PeT mess@utanet.at
 
-	A part of the code (cycle routine and drawing routines) is a modified version of the vic ii emulation used in 
-	commodore 64 emulator "frodo" by Christian Bauer
+    A part of the code (cycle routine and drawing routines) is a modified version of the vic ii emulation used in
+    commodore 64 emulator "frodo" by Christian Bauer
 
-	http://frodo.cebix.net/
-	The rights on the source code remain at the author.
-	It may not - not even in parts - used for commercial purposes without explicit written permission by the author.
-	Permission to use it for non-commercial purposes is hereby granted als long as my copyright notice remains in the program.
-	You are not allowed to use the source to create and distribute a modified version of Frodo.
+    http://frodo.cebix.net/
+    The rights on the source code remain at the author.
+    It may not - not even in parts - used for commercial purposes without explicit written permission by the author.
+    Permission to use it for non-commercial purposes is hereby granted als long as my copyright notice remains in the program.
+    You are not allowed to use the source to create and distribute a modified version of Frodo.
 
 ***************************************************************************/
 /* mos videochips
@@ -328,7 +328,7 @@ void vic6567_init (int chip_vic2e, int pal,
 	vic2.dma_read_color = dma_read_color;
 	vic2.interrupt = irq;
 	vic2.vic2e = chip_vic2e;
-	
+
 	vic2.on = TRUE;
 }
 
@@ -881,7 +881,7 @@ VIDEO_START( vic2 )
 	vic2.rasterline = 0; // VIC2_LINES - 1;
 
 	// from 1 to 63 (PAL) or from 1 to 65 (NTSC)
-	vic2.rasterX = 63; 
+	vic2.rasterX = 63;
 
 	// immediately call the timer to handle the first line
 	if (vic2.pal)
@@ -1554,7 +1554,7 @@ TIMER_CALLBACK( line_timer_callback )
 
 	default:
 		vic2.rasterX++;
-		
+
 		break;
 	}
 
@@ -2352,7 +2352,7 @@ TIMER_CALLBACK( PAL_timer_callback )
 		ResumeCPU
 
 		vic2.cycle++;
-		break;		
+		break;
 
 	// Refresh, fetch if bad line
 	case 12:
@@ -2487,7 +2487,7 @@ TIMER_CALLBACK( PAL_timer_callback )
 
 	// Graphics
 
-	case 19:	
+	case 19:
 	case 20:
 	case 21:
 	case 22:
@@ -2497,7 +2497,7 @@ TIMER_CALLBACK( PAL_timer_callback )
 	case 26:
 	case 27:
 	case 28:
-	case 29:	
+	case 29:
 	case 30:
 	case 31:
 	case 32:
@@ -2910,7 +2910,7 @@ TIMER_CALLBACK( NTSC_timer_callback )
 		ResumeCPU
 
 		vic2.cycle++;
-		break;		
+		break;
 
 	// Refresh, fetch if bad line
 	case 12:
@@ -3045,7 +3045,7 @@ TIMER_CALLBACK( NTSC_timer_callback )
 
 	// Graphics
 
-	case 19:	
+	case 19:
 	case 20:
 	case 21:
 	case 22:
@@ -3055,7 +3055,7 @@ TIMER_CALLBACK( NTSC_timer_callback )
 	case 26:
 	case 27:
 	case 28:
-	case 29:	
+	case 29:
 	case 30:
 	case 31:
 	case 32:

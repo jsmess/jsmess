@@ -39,7 +39,7 @@ typedef struct _msm6255_interface msm6255_interface;
 struct _msm6255_interface
 {
 	const char *screen_tag;		/* screen we are acting on */
-	
+
 	int character_clock;		/* the character clock of the chip */
 
 	/* ROM/RAM data read function */

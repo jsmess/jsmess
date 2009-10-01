@@ -4,9 +4,9 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- bright in reverse video
+    - bright in reverse video
 
 */
 
@@ -102,7 +102,7 @@ static WRITE_LINE_DEVICE_HANDLER( v1050_vsync_changed )
 	v1050_set_int(device->machine, INT_VSYNC, state);
 }
 
-static const mc6845_interface v1050_mc6845_intf = 
+static const mc6845_interface v1050_mc6845_intf =
 {
 	SCREEN_TAG,
 	8,
@@ -130,7 +130,7 @@ static PALETTE_INIT( v1050 )
 static VIDEO_START( v1050 )
 {
 	v1050_state *state = machine->driver_data;
-	
+
 	/* find devices */
 	state->mc6845 = devtag_get_device(machine, H46505_TAG);
 
@@ -149,7 +149,7 @@ static VIDEO_UPDATE( v1050 )
 	v1050_state *state = screen->machine->driver_data;
 
 	mc6845_update(state->mc6845, bitmap, cliprect);
-	
+
 	return 0;
 }
 

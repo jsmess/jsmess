@@ -546,7 +546,7 @@ FLOPPY_OPTIONS_START( samcoupe )
 		SECTORS(1-[10]-12)
 		SECTOR_LENGTH(128/256/[512]/1024)
 		FIRST_SECTOR_ID([1])
-	)	
+	)
 FLOPPY_OPTIONS_END
 
 static const floppy_config samcoupe_floppy_config =
@@ -589,7 +589,7 @@ static MACHINE_DRIVER_START( samcoupe )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MDRV_SOUND_ADD("saa1099", SAA1099, SAMCOUPE_XTAL_X1/3) /* 8 MHz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	
+
 	MDRV_FLOPPY_2_DRIVES_ADD(samcoupe_floppy_config)
 MACHINE_DRIVER_END
 

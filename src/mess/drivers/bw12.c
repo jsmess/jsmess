@@ -1,25 +1,25 @@
 /***************************************************************************
-   
+
     Bondwell 12/14
 
     12/05/2009 Skeleton driver.
 
-	- Z80A CPU 4MHz
-	- 64KB RAM (BW 12), 128KB RAM (BW 14)
-	- 4KB ROM System
-	- NEC765A Floppy controller
-	- 2 x 5.25" Floppy drives 48 tpi SSDD (BW 12), DSDD (BW 14)
-	- MC6845 Video controller
-	- 2KB RAM Video buffer
-	- 4KB ROM Character set
-	- Z80SIO Serial interface
-	- MC6821 Parallel interface
-	- I8253 Counter-timer 
-	- MC1408 8-bit DAC sound
-	- KB3600 PRO (AY-5-3600 PRO) Keyboard controller
+    - Z80A CPU 4MHz
+    - 64KB RAM (BW 12), 128KB RAM (BW 14)
+    - 4KB ROM System
+    - NEC765A Floppy controller
+    - 2 x 5.25" Floppy drives 48 tpi SSDD (BW 12), DSDD (BW 14)
+    - MC6845 Video controller
+    - 2KB RAM Video buffer
+    - 4KB ROM Character set
+    - Z80SIO Serial interface
+    - MC6821 Parallel interface
+    - I8253 Counter-timer
+    - MC1408 8-bit DAC sound
+    - KB3600 PRO (AY-5-3600 PRO) Keyboard controller
 
-	http://www.eld.leidenuniv.nl/~moene/Home/sitemap/
-	http://www.baltissen.org/newhtm/schemas.htm
+    http://www.eld.leidenuniv.nl/~moene/Home/sitemap/
+    http://www.baltissen.org/newhtm/schemas.htm
 
 ****************************************************************************/
 
@@ -40,10 +40,10 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- Osborne 1 DD disk format
-	- floppy motor off timer
+    - Osborne 1 DD disk format
+    - floppy motor off timer
 
 */
 
@@ -110,10 +110,10 @@ static void bw12_set_floppy_motor_off_timer(running_machine *machine)
 		/* trigger floppy motor off NE556 timer */
 		/*
 
-			R18 = RES_K(100)
-			C11 = CAP_U(4.7)
+            R18 = RES_K(100)
+            C11 = CAP_U(4.7)
 
-		*/
+        */
 		timer_adjust_oneshot(state->floppy_motor_off_timer, attotime_zero, 0);
 	}
 }
@@ -218,31 +218,31 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( bw12 )
 	/*
 
-	  KB3600 PRO2 Keyboard matrix
+      KB3600 PRO2 Keyboard matrix
 
-		  | Y0  | Y1  | Y2  | Y3  | Y4  | Y5  | Y6  | Y7  | Y8  | Y9  |
-		  |     |     |     |     |     |     |     |     |     |     |
-	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
-	  X0  |  7  |  8  |  9  |  0  |  1  |  2  |  3  |  4  |  5  |  6  |
-	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
-	  X1  |  U  |  I  |  O  |  P  |  Q  |  W  |  E  |  R  |  T  |  Y  |
-	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
-	  X2  | F15 | F16 | RET | N.  | SP  | LOCK| F11 | F12 | F13 | F14 |
-	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
-	  X3  | F7  | F8  | F9  | F10 | F1  | F2  | F3  | F4  | F5  | F6  |
-	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
-	  X4  | LEFT|RIGHT| N3  | BS  |  @  |     |  -  |  ]  | UP  | DOWN|
-	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
-	  X5  | N9  | CL  | N2  | LF  | DEL | HT  |ARROW|  [  | N7  | N8  |
-	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
-	  X6  |  M  |  ,  |  .  |  /  |  Z  |  X  |  C  |  V  |  B  |  N  |
-	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
-	  X7  |  J  |  K  |  L  |  ;  |  A  |  S  |  D  |  F  |  G  |  H  |
-	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
-	  X8  | N6  |  -  | N1  | N0  | ESC |     |  :  | NRET| N4  | N5  |
-	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
+          | Y0  | Y1  | Y2  | Y3  | Y4  | Y5  | Y6  | Y7  | Y8  | Y9  |
+          |     |     |     |     |     |     |     |     |     |     |
+      ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
+      X0  |  7  |  8  |  9  |  0  |  1  |  2  |  3  |  4  |  5  |  6  |
+      ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
+      X1  |  U  |  I  |  O  |  P  |  Q  |  W  |  E  |  R  |  T  |  Y  |
+      ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
+      X2  | F15 | F16 | RET | N.  | SP  | LOCK| F11 | F12 | F13 | F14 |
+      ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
+      X3  | F7  | F8  | F9  | F10 | F1  | F2  | F3  | F4  | F5  | F6  |
+      ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
+      X4  | LEFT|RIGHT| N3  | BS  |  @  |     |  -  |  ]  | UP  | DOWN|
+      ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
+      X5  | N9  | CL  | N2  | LF  | DEL | HT  |ARROW|  [  | N7  | N8  |
+      ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
+      X6  |  M  |  ,  |  .  |  /  |  Z  |  X  |  C  |  V  |  B  |  N  |
+      ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
+      X7  |  J  |  K  |  L  |  ;  |  A  |  S  |  D  |  F  |  G  |  H  |
+      ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
+      X8  | N6  |  -  | N1  | N0  | ESC |     |  :  | NRET| N4  | N5  |
+      ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
 
-	*/
+    */
 
 	PORT_START("X0")
 	PORT_BIT( 0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('\'')
@@ -380,7 +380,7 @@ static MC6845_UPDATE_ROW( bw12_update_row )
 		{
 			int x = (column * 8) + bit;
 			int color = BIT(data, 7);
-				
+
 			*BITMAP_ADDR16(bitmap, y, x) = color;
 
 			data <<= 1;
@@ -419,7 +419,7 @@ static VIDEO_UPDATE( bw12 )
 
 	mc6845_update(state->mc6845, bitmap, cliprect);
 
-	return 0;	
+	return 0;
 }
 
 /* NEC765 Interface */
@@ -465,22 +465,22 @@ static WRITE_LINE_DEVICE_HANDLER( bw12_interrupt )
 static READ8_DEVICE_HANDLER( bw12_pia6821_pa_r )
 {
 	/*
-		
-		bit		description
 
-		PA0     Input from Centronics BUSY status
-		PA1     Input from Centronics ERROR status
-		PA2     Input from Centronics PAPER OUT status
-		PA3     Input from FDC MOTOR
-		PA4     Input from PIT OUT2
-		PA5     Input from keyboard strobe
-		PA6     Input from keyboard serial data
-		PA7     Input from FDC interrupt
+        bit     description
 
-	*/
-	
+        PA0     Input from Centronics BUSY status
+        PA1     Input from Centronics ERROR status
+        PA2     Input from Centronics PAPER OUT status
+        PA3     Input from FDC MOTOR
+        PA4     Input from PIT OUT2
+        PA5     Input from keyboard strobe
+        PA6     Input from keyboard serial data
+        PA7     Input from FDC interrupt
+
+    */
+
 	bw12_state *state = device->machine->driver_data;
-	
+
 	UINT8 data = 0;
 
 	data |= centronics_busy_r(state->centronics);
@@ -524,7 +524,7 @@ static WRITE_LINE_DEVICE_HANDLER( bw12_pia6821_cb2_w )
 	{
 		/* keyboard shift clock */
 		driver_state->key_shift++;
-		
+
 		if (driver_state->key_shift < 10)
 		{
 			driver_state->key_sin = driver_state->key_data[driver_state->key_shift];
@@ -689,7 +689,7 @@ static MACHINE_START( bw12 )
 
 	/* allocate floppy motor off timer */
 	state->floppy_motor_off_timer = timer_alloc(machine, floppy_motor_off_tick, NULL);
-	
+
 	/* setup memory banking */
 	memory_configure_bank(machine, 1, 0, 1, memory_region(machine, Z80_TAG), 0);
 	memory_configure_bank(machine, 1, 1, 1, mess_ram, 0);
@@ -765,11 +765,11 @@ static MACHINE_DRIVER_START( bw12 )
 	/* basic machine hardware */
     MDRV_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
     MDRV_CPU_PROGRAM_MAP(bw12_mem)
-    MDRV_CPU_IO_MAP(bw12_io)	
+    MDRV_CPU_IO_MAP(bw12_io)
 
     MDRV_MACHINE_START(bw12)
     MDRV_MACHINE_RESET(bw12)
-	
+
     /* video hardware */
 	MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -785,7 +785,7 @@ static MACHINE_DRIVER_START( bw12 )
     MDRV_VIDEO_UPDATE(bw12)
 
 	MDRV_MC6845_ADD(MC6845_TAG, MC6845, XTAL_16MHz/8, bw12_mc6845_interface)
-	
+
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
@@ -801,7 +801,7 @@ static MACHINE_DRIVER_START( bw12 )
 
 	/* printer */
 	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, bw12_centronics_intf)
-	
+
 	MDRV_FLOPPY_2_DRIVES_ADD(bw12_floppy_config)
 MACHINE_DRIVER_END
 
@@ -828,6 +828,6 @@ SYSTEM_CONFIG_END
 
 /* System Drivers */
 
-/*    YEAR	NAME	PARENT	COMPAT	MACHINE	INPUT	INIT	CONFIG	COMPANY								FULLNAME		FLAGS */
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY                             FULLNAME        FLAGS */
 COMP( 1984,	bw12,	0,		0,		bw12, 	bw12,	0,		bw12,	"Bondwell International Limited",   "Bondwell 12",	GAME_SUPPORTS_SAVE )
 COMP( 1984,	bw14,	bw12,	0,		bw12,	bw12,	0,		bw14,	"Bondwell International Limited",   "Bondwell 14",	GAME_SUPPORTS_SAVE )

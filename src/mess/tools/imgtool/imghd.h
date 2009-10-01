@@ -1,8 +1,8 @@
 /****************************************************************************
 
-	imghd.h
+    imghd.h
 
-	Bridge between Imgtool and CHD hard disk images
+    Bridge between Imgtool and CHD hard disk images
 
 ****************************************************************************/
 

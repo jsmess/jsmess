@@ -80,7 +80,7 @@ MACHINE_RESET( gamecom )
 	gamecom_clock_timer = timer_alloc(machine,  gamecom_clock_timer_callback , NULL);
 
 	/* intialize the empty dummy bank */
-	if ( dummy_bank == NULL ) 
+	if ( dummy_bank == NULL )
 	{
 		dummy_bank = auto_alloc_array(machine, UINT8, 8 * 1024 );
 	}
@@ -95,53 +95,53 @@ MACHINE_RESET( gamecom )
 	gamecom_internal_w( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), SM8521_WDTC, 0x38 );
 }
 
-static void gamecom_set_mmu( running_machine *machine, int mmu, UINT8 data ) 
+static void gamecom_set_mmu( running_machine *machine, int mmu, UINT8 data )
 {
-	if ( data < 32 ) 
+	if ( data < 32 )
 	{
 		/* select internal ROM bank */
 		memory_set_bankptr( machine, mmu, memory_region(machine, "user1") + (data << 13) );
-	} 
-	else 
+	}
+	else
 	{
 		/* select cartridge bank */
-		if ( cartridge == NULL ) 
+		if ( cartridge == NULL )
 		{
 			memory_set_bankptr( machine, mmu, dummy_bank );
-		} 
-		else 
+		}
+		else
 		{
 			memory_set_bankptr( machine, mmu, cartridge + ( data << 13 ) );
 		}
 	}
 }
 
-static void handle_stylus_press( running_machine *machine, UINT8 column ) 
+static void handle_stylus_press( running_machine *machine, UINT8 column )
 {
 	static const UINT16 row_data[10] = { 0x3FE, 0x3FD, 0x3FB, 0x3F7, 0x3EF, 0x3DF, 0x3BF, 0x37F, 0x2FF, 0x1FF };
 	static UINT32 stylus_x;
 	static UINT32 stylus_y;
 
-	if ( column == 0 ) 
+	if ( column == 0 )
 	{
-		if ( ! ( input_port_read(machine, "IN2") & 0x04 ) ) 
+		if ( ! ( input_port_read(machine, "IN2") & 0x04 ) )
 		{
 			stylus_x = input_port_read(machine, "STYX") >> 4;
 			stylus_y = input_port_read(machine, "STYY") >> 4;
-		} 
-		else 
+		}
+		else
 		{
 			stylus_x = 16;
 			stylus_y = 16;
 		}
 	}
 
-	if ( stylus_x == column ) 
+	if ( stylus_x == column )
 	{
 		cpu_set_reg( cputag_get_cpu(machine, "maincpu"), SM8500_P0, row_data[stylus_y] & 0xFF );
 		cpu_set_reg( cputag_get_cpu(machine, "maincpu"), SM8500_P1, ( cpu_get_reg( cputag_get_cpu(machine, "maincpu"), SM8500_P1 ) & 0xFC ) | ( ( row_data[stylus_y] >> 8 ) & 0x03 ) );
-	} 
-	else 
+	}
+	else
 	{
 		cpu_set_reg( cputag_get_cpu(machine, "maincpu"), SM8500_P0, 0xFF );
 		cpu_set_reg( cputag_get_cpu(machine, "maincpu"), SM8500_P1, ( cpu_get_reg( cputag_get_cpu(machine, "maincpu"), SM8500_P1 ) & 0xFC ) | 0x03 );
@@ -150,13 +150,13 @@ static void handle_stylus_press( running_machine *machine, UINT8 column )
 
 WRITE8_HANDLER( gamecom_internal_w )
 {
-	if ( offset >= 0x80 ) 
+	if ( offset >= 0x80 )
 	{
 		internal_ram[offset] = data;
 		return;
 	}
 
-	switch( offset ) 
+	switch( offset )
 	{
 	case SM8521_IE0:	cpu_set_reg( cputag_get_cpu(space->machine, "maincpu"), SM8500_IE0, data ); return;
 	case SM8521_IE1:	cpu_set_reg( cputag_get_cpu(space->machine, "maincpu"), SM8500_IE1, data ); return;
@@ -165,7 +165,7 @@ WRITE8_HANDLER( gamecom_internal_w )
 	case SM8521_P0:		cpu_set_reg( cputag_get_cpu(space->machine, "maincpu"), SM8500_P0, data ); return;
 	case SM8521_P1:		cpu_set_reg( cputag_get_cpu(space->machine, "maincpu"), SM8500_P1, data ); return;
 	case SM8521_P2:		cpu_set_reg( cputag_get_cpu(space->machine, "maincpu"), SM8500_P2, data );
-				switch( ( cpu_get_reg( cputag_get_cpu(space->machine, "maincpu"), SM8500_P1 ) << 8 ) | data ) 
+				switch( ( cpu_get_reg( cputag_get_cpu(space->machine, "maincpu"), SM8500_P1 ) << 8 ) | data )
 				{
 				case 0xFBFF:	/* column #0 */
 						/* P0 bit 0 cleared => 01 */
@@ -250,7 +250,7 @@ WRITE8_HANDLER( gamecom_internal_w )
 				/* P3 bit7 clear, bit6 set -> enable cartridge port #0? */
 				/* P3 bit6 clear, bit7 set -> enable cartridge port #1? */
 				cpu_set_reg( cputag_get_cpu(space->machine, "maincpu"), SM8500_P3, data );
-				switch( data & 0xc0 ) 
+				switch( data & 0xc0 )
 				{
 				case 0x40: cartridge = cartridge1; break;
 				case 0x80: cartridge = cartridge2; break;
@@ -290,7 +290,7 @@ WRITE8_HANDLER( gamecom_internal_w )
 
 	/* Video hardware and DMA */
 	case SM8521_LCDC:
-//		logerror( "%X: Setting LCDC to %X\n", activecpu_get_pc(), data );
+//      logerror( "%X: Setting LCDC to %X\n", activecpu_get_pc(), data );
 		break;
 	case SM8521_LCH:
 		break;
@@ -302,7 +302,7 @@ WRITE8_HANDLER( gamecom_internal_w )
 		gamecom_dma.decrement_x = data & 0x08;
 		gamecom_dma.decrement_y = data & 0x10;
 		gamecom_dma.enabled = data & 0x80;
-		if ( gamecom_dma.enabled ) 
+		if ( gamecom_dma.enabled )
 		{
 			gamecom_dma_init(space->machine);
 		}
@@ -344,21 +344,21 @@ WRITE8_HANDLER( gamecom_internal_w )
 		gamecom_timer[1].counter = 0;
 		break;
 	case SM8521_CLKT:	/* bit 6-7 */
-		if ( data & 0x80 ) 
+		if ( data & 0x80 )
 		{
 			/* timer run */
-			if ( data & 0x40 ) 
+			if ( data & 0x40 )
 			{
 				/* timer resolution 1 minute */
 				timer_adjust_periodic(gamecom_clock_timer, ATTOTIME_IN_SEC(1), 0, ATTOTIME_IN_SEC(60));
-			} 
-			else 
+			}
+			else
 			{
 				/* TImer resolution 1 second */
 				timer_adjust_periodic(gamecom_clock_timer, ATTOTIME_IN_SEC(1), 0, ATTOTIME_IN_SEC(1));
 			}
-		} 
-		else 
+		}
+		else
 		{
 			/* disable timer reset */
 			timer_enable( gamecom_clock_timer, 0 );
@@ -384,12 +384,12 @@ WRITE8_HANDLER( gamecom_internal_w )
 READ8_HANDLER( gamecom_internal_r )
 {
 	/* NPW 22-Dec-2008 - Shouldn't this entire function be moved to an internal memory map of the CPU core? */
-	if ( offset >= 0x80 ) 
+	if ( offset >= 0x80 )
 	{
 		return internal_ram[offset];
 	}
 
-	switch( offset ) 
+	switch( offset )
 	{
 	case SM8521_R0:  case SM8521_R1:  case SM8521_R2:  case SM8521_R3:
 	case SM8521_R4:  case SM8521_R5:  case SM8521_R6:  case SM8521_R7:
@@ -417,8 +417,8 @@ READ8_HANDLER( gamecom_internal_r )
 	case SM8521_P3C:	return cpu_get_reg( cputag_get_cpu(space->machine, "maincpu"), SM8500_P3C );
 	case SM8521_TM0D:	return gamecom_timer[0].counter;
 	case SM8521_TM1D:	return gamecom_timer[1].counter;
-//	case SM8521_CLKT:	/* bit 0-5 read only, 6-7 read/write */
-//			return ( gamecom_internal_registers[offset] & 0xC0 ) | ( clock_timer_val & 0x3F );
+//  case SM8521_CLKT:   /* bit 0-5 read only, 6-7 read/write */
+//          return ( gamecom_internal_registers[offset] & 0xC0 ) | ( clock_timer_val & 0x3F );
 
 	/* Reserved addresses */
 	case SM8521_18: case SM8521_1B:
@@ -429,7 +429,7 @@ READ8_HANDLER( gamecom_internal_r )
 	case SM8521_55: case SM8521_56: case SM8521_57: case SM8521_58:
 	case SM8521_59: case SM8521_5A: case SM8521_5B: case SM8521_5C:
 	case SM8521_5D:
-//		logerror( "%X: Read from reserved address (0x%02X)\n", cpu_get_pc(space->cpu), offset );
+//      logerror( "%X: Read from reserved address (0x%02X)\n", cpu_get_pc(space->cpu), offset );
 		break;
 
 	}
@@ -438,9 +438,9 @@ READ8_HANDLER( gamecom_internal_r )
 
 /* The manual is not conclusive as to which bit of the DMVP register (offset 0x3D) determines
    which page for source or destination is used */
-static void gamecom_dma_init(running_machine *machine) 
+static void gamecom_dma_init(running_machine *machine)
 {
-	if ( gamecom_dma.decrement_x || gamecom_dma.decrement_y ) 
+	if ( gamecom_dma.decrement_x || gamecom_dma.decrement_y )
 	{
 		logerror( "TODO: Decrement-x and decrement-y are not supported yet\n" );
 	}
@@ -462,9 +462,9 @@ static void gamecom_dma_init(running_machine *machine)
 	gamecom_dma.palette[3] = ( gamecom_internal_registers[SM8521_DMPL] & 0xC0 ) >> 6;
 	gamecom_dma.source_mask = 0x1FFF;
 	gamecom_dma.dest_mask = 0x1FFF;
-//	logerror("DMA: width %Xx%X, source (%X,%X), dest (%X,%X), transfer_mode %X, banks %X \n", gamecom_dma.width_x, gamecom_dma.width_y, gamecom_dma.source_x, gamecom_dma.source_y, gamecom_dma.dest_x, gamecom_dma.dest_y, gamecom_dma.transfer_mode, gamecom_internal_registers[SM8521_DMVP] );
-//	logerror( "   Palette: %d, %d, %d, %d\n", gamecom_dma.palette[0], gamecom_dma.palette[1], gamecom_dma.palette[2], gamecom_dma.palette[3] );
-	switch( gamecom_dma.transfer_mode ) 
+//  logerror("DMA: width %Xx%X, source (%X,%X), dest (%X,%X), transfer_mode %X, banks %X \n", gamecom_dma.width_x, gamecom_dma.width_y, gamecom_dma.source_x, gamecom_dma.source_y, gamecom_dma.dest_x, gamecom_dma.dest_y, gamecom_dma.transfer_mode, gamecom_internal_registers[SM8521_DMVP] );
+//  logerror( "   Palette: %d, %d, %d, %d\n", gamecom_dma.palette[0], gamecom_dma.palette[1], gamecom_dma.palette[2], gamecom_dma.palette[3] );
+	switch( gamecom_dma.transfer_mode )
 	{
 	case 0x00:
 		/* VRAM->VRAM */
@@ -473,14 +473,14 @@ static void gamecom_dma_init(running_machine *machine)
 		break;
 	case 0x02:
 		/* ROM->VRAM */
-//		logerror( "DMA DMBR = %X\n", gamecom_internal_registers[SM8521_DMBR] );
+//      logerror( "DMA DMBR = %X\n", gamecom_internal_registers[SM8521_DMBR] );
 		gamecom_dma.source_width = 64;
-		if ( gamecom_internal_registers[SM8521_DMBR] < 16 ) 
+		if ( gamecom_internal_registers[SM8521_DMBR] < 16 )
 		{
 			gamecom_dma.source_bank = memory_region(machine, "user1") + (gamecom_internal_registers[SM8521_DMBR] << 14);
 			gamecom_dma.source_mask = 0x3FFF;
-		} 
-		else 
+		}
+		else
 		{
 			logerror( "TODO: Reading from external ROMs not supported yet\n" );
 			gamecom_dma.source_bank = memory_region(machine, "user1");
@@ -513,17 +513,17 @@ static void gamecom_dma_init(running_machine *machine)
    Their usage is also not explained properly in the manuals. Guess we'll have to wait
    for them to show up in some rom images...
  */
-void gamecom_handle_dma( const device_config *device, int cycles ) 
+void gamecom_handle_dma( const device_config *device, int cycles )
 {
 	unsigned y_count, x_count;
 	/* If not enabled, ignore */
-	if ( ! gamecom_dma.enabled ) 
+	if ( ! gamecom_dma.enabled )
 	{
 		return;
 	}
-	for( y_count = 0; y_count <= gamecom_dma.width_y; y_count++ ) 
+	for( y_count = 0; y_count <= gamecom_dma.width_y; y_count++ )
 	{
-		for( x_count = 0; x_count <= gamecom_dma.width_x; x_count++ ) 
+		for( x_count = 0; x_count <= gamecom_dma.width_x; x_count++ )
 		{
 			int source_pixel = 0;
 			int dest_pixel = 0;
@@ -531,7 +531,7 @@ void gamecom_handle_dma( const device_config *device, int cycles )
 			int dest_addr = gamecom_dma.dest_current & gamecom_dma.dest_mask;
 			/* handle DMA for 1 pixel */
 			/* Read pixel data */
-			switch ( gamecom_dma.source_x_current & 0x03 ) 
+			switch ( gamecom_dma.source_x_current & 0x03 )
 			{
 			case 0x00: source_pixel = ( gamecom_dma.source_bank[src_addr] & 0xC0 ) >> 6; break;
 			case 0x01: source_pixel = ( gamecom_dma.source_bank[src_addr] & 0x30 ) >> 4; break;
@@ -539,9 +539,9 @@ void gamecom_handle_dma( const device_config *device, int cycles )
 			case 0x03: source_pixel = ( gamecom_dma.source_bank[src_addr] & 0x03 );      break;
 			}
 
-			if ( !gamecom_dma.overwrite_mode && source_pixel == 0 ) 
+			if ( !gamecom_dma.overwrite_mode && source_pixel == 0 )
 			{
-				switch ( gamecom_dma.dest_x_current & 0x03 ) 
+				switch ( gamecom_dma.dest_x_current & 0x03 )
 				{
 				case 0x00: dest_pixel = ( gamecom_dma.dest_bank[dest_addr] & 0xC0 ) >> 6; break;
 				case 0x01: dest_pixel = ( gamecom_dma.dest_bank[dest_addr] & 0x30 ) >> 4; break;
@@ -555,7 +555,7 @@ void gamecom_handle_dma( const device_config *device, int cycles )
 			/* Not sure if this should be done before the compound stuff - WP */
 			source_pixel = gamecom_dma.palette[ source_pixel ];
 			/* Write pixel data */
-			switch( gamecom_dma.dest_x_current & 0x03 ) 
+			switch( gamecom_dma.dest_x_current & 0x03 )
 			{
 			case 0x00:
 				gamecom_dma.dest_bank[dest_addr] = ( gamecom_dma.dest_bank[dest_addr] & 0x3F ) | ( source_pixel << 6 );
@@ -572,24 +572,24 @@ void gamecom_handle_dma( const device_config *device, int cycles )
 			}
 
 			/* Advance a pixel */
-			if ( gamecom_dma.decrement_x ) 
+			if ( gamecom_dma.decrement_x )
 			{
 				gamecom_dma.source_x_current--;
-				if ( ( gamecom_dma.source_x_current & 0x03 ) == 0x03 ) 
+				if ( ( gamecom_dma.source_x_current & 0x03 ) == 0x03 )
 				{
 					gamecom_dma.source_current--;
 				}
-			} 
-			else 
+			}
+			else
 			{
 				gamecom_dma.source_x_current++;
-				if ( ( gamecom_dma.source_x_current & 0x03 ) == 0x00 ) 
+				if ( ( gamecom_dma.source_x_current & 0x03 ) == 0x00 )
 				{
 					gamecom_dma.source_current++;
 				}
 			}
 			gamecom_dma.dest_x_current++;
-			if ( ( gamecom_dma.dest_x_current & 0x03 ) == 0x00 ) 
+			if ( ( gamecom_dma.dest_x_current & 0x03 ) == 0x00 )
 			{
 				gamecom_dma.dest_current++;
 			}
@@ -607,30 +607,30 @@ void gamecom_handle_dma( const device_config *device, int cycles )
 	cputag_set_input_line(device->machine, "maincpu", DMA_INT, HOLD_LINE );
 }
 
-void gamecom_update_timers( const device_config *device, int cycles ) 
+void gamecom_update_timers( const device_config *device, int cycles )
 {
-	if ( gamecom_timer[0].enabled ) 
+	if ( gamecom_timer[0].enabled )
 	{
 		gamecom_timer[0].state_count += cycles;
-		while ( gamecom_timer[0].state_count >= gamecom_timer[0].state_limit ) 
+		while ( gamecom_timer[0].state_count >= gamecom_timer[0].state_limit )
 		{
 			gamecom_timer[0].state_count -= gamecom_timer[0].state_limit;
 			gamecom_timer[0].counter++;
-			if ( gamecom_timer[0].counter == gamecom_timer[0].check_value ) 
+			if ( gamecom_timer[0].counter == gamecom_timer[0].check_value )
 			{
 				gamecom_timer[0].counter = 0;
 				cputag_set_input_line(device->machine, "maincpu", TIM0_INT, HOLD_LINE );
 			}
 		}
 	}
-	if ( gamecom_timer[1].enabled ) 
+	if ( gamecom_timer[1].enabled )
 	{
 		gamecom_timer[1].state_count += cycles;
-		while ( gamecom_timer[1].state_count >= gamecom_timer[1].state_limit ) 
+		while ( gamecom_timer[1].state_count >= gamecom_timer[1].state_limit )
 		{
 			gamecom_timer[1].state_count -= gamecom_timer[1].state_limit;
 			gamecom_timer[1].counter++;
-			if ( gamecom_timer[1].counter == gamecom_timer[1].check_value ) 
+			if ( gamecom_timer[1].counter == gamecom_timer[1].check_value )
 			{
 				gamecom_timer[1].counter = 0;
 				cputag_set_input_line(device->machine, "maincpu", TIM1_INT, HOLD_LINE );
@@ -639,12 +639,12 @@ void gamecom_update_timers( const device_config *device, int cycles )
 	}
 }
 
-WRITE8_HANDLER( gamecom_vram_w ) 
+WRITE8_HANDLER( gamecom_vram_w )
 {
 	gamecom_vram[offset] = data;
 }
 
-READ8_HANDLER( gamecom_vram_r ) 
+READ8_HANDLER( gamecom_vram_r )
 {
 	return gamecom_vram[offset];
 }
@@ -660,12 +660,12 @@ DEVICE_IMAGE_LOAD( gamecom_cart )
 	int load_offset = 0;
 
 	/* allocate memory on first load of a cartridge */
-	if ( cartridge1 == NULL ) 
+	if ( cartridge1 == NULL )
 	{
 		cartridge1 = auto_alloc_array(image->machine, UINT8, 2048 * 1024 );
 	}
 	filesize = image_length( image );
-	switch( filesize ) 
+	switch( filesize )
 	{
 	case 0x008000: load_offset = 0;        break;  /* 32 KB */
 	case 0x040000: load_offset = 0;        break;  /* 256KB */
@@ -677,7 +677,7 @@ DEVICE_IMAGE_LOAD( gamecom_cart )
 		logerror( "Error loading cartridge: Invalid file size.\n" );
 		return INIT_FAIL;
 	}
-	if ( image_fread( image, cartridge1 + load_offset, filesize ) != filesize ) 
+	if ( image_fread( image, cartridge1 + load_offset, filesize ) != filesize )
 	{
 		logerror( "Error loading cartridge: Unable to read from file: %s.\n", image_filename(image) );
 		return INIT_FAIL;

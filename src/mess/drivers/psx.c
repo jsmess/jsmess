@@ -379,7 +379,7 @@ static DIRECT_UPDATE_HANDLER( psx_setopbase )
 			load_cpe( cpu, exe_buffer, exe_size ) ||
 			load_psf( cpu, exe_buffer, exe_size ) )
 		{
-/*			DEBUGGER_BREAK; */
+/*          DEBUGGER_BREAK; */
 
 			address = cpu_get_reg( cpu, PSXCPU_PC );
 		}

@@ -33,7 +33,7 @@ VIDEO_UPDATE( pp01 )
                 *BITMAP_ADDR16(bitmap, y,  x*8+(7-b)) =  col;
             }
         }
-    }   
+    }
 	return 0;
 }
 

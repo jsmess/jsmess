@@ -55,7 +55,7 @@ static void tandy1000_write_eeprom(UINT8 data)
 {
 	if (!eeprom.clock && (data&4) )
 	{
-//				logerror("!!!tandy1000 eeprom %.2x %.2x\n",eeprom.state, data);
+//              logerror("!!!tandy1000 eeprom %.2x %.2x\n",eeprom.state, data);
 		switch (eeprom.state)
 		{
 		case 0:
@@ -165,7 +165,7 @@ static struct
 
 WRITE8_HANDLER ( pc_t1t_p37x_w )
 {
-//	DBG_LOG(2,"T1T_p37x_w",("%.5x #%d $%02x\n", cpu_get_pc( space->cpu),offset, data));
+//  DBG_LOG(2,"T1T_p37x_w",("%.5x #%d $%02x\n", cpu_get_pc( space->cpu),offset, data));
 	if (offset!=4)
 		logerror("T1T_p37x_w %.5x #%d $%02x\n", cpu_get_pc( space->cpu),offset, data);
 	tandy.data[offset]=data;
@@ -180,7 +180,7 @@ WRITE8_HANDLER ( pc_t1t_p37x_w )
  READ8_HANDLER ( pc_t1t_p37x_r )
 {
 	int data = tandy.data[offset];
-//	DBG_LOG(1,"T1T_p37x_r",("%.5x #%d $%02x\n", cpu_get_pc( space->cpu), offset, data));
+//  DBG_LOG(1,"T1T_p37x_r",("%.5x #%d $%02x\n", cpu_get_pc( space->cpu), offset, data));
     return data;
 }
 
@@ -213,7 +213,7 @@ WRITE8_HANDLER ( tandy1000_pio_w )
 		break;
 	case 2:
 		tandy_ppi.portc = data;
-		if (data & 8) 
+		if (data & 8)
 			cpu_set_clockscale(cputag_get_cpu(space->machine, "maincpu"), 1);
 		else
 			cpu_set_clockscale(cputag_get_cpu(space->machine, "maincpu"), 4.77/8);
@@ -233,10 +233,10 @@ WRITE8_HANDLER ( tandy1000_pio_w )
 		data=tandy_ppi.portb;
 		break;
 	case 2:
-//		if (tandy1000hx) {
-//		data=tandy_ppi.portc; // causes problems (setuphx)
+//      if (tandy1000hx) {
+//      data=tandy_ppi.portc; // causes problems (setuphx)
 		if (!tandy1000_read_eeprom()) data&=~0x10;
-//	}
+//  }
 		break;
 	}
 	return data;
@@ -369,7 +369,7 @@ INPUT_PORTS_START( t1000_keyboard )
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F9") PORT_CODE(KEYCODE_F9) /* F9                          43  C3 */
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F10") PORT_CODE(KEYCODE_F10) /* F10                         44  C4 */
 	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("NumLock") PORT_CODE(KEYCODE_NUMLOCK) PORT_TOGGLE/* Num Lock                    45  C5 */
-	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Hold") PORT_CODE(KEYCODE_SCRLOCK) /*		                     46  C6 */
+	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Hold") PORT_CODE(KEYCODE_SCRLOCK) /*                           46  C6 */
 	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 7 \\") PORT_CODE(KEYCODE_7_PAD) /* Keypad 7                    47  C7 */
 	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 8 ~") PORT_CODE(KEYCODE_8_PAD) /* Keypad 8                    48  C8 */
 	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 9 (PgUp)") PORT_CODE(KEYCODE_9_PAD) /* Keypad 9  (PgUp)            49  C9 */

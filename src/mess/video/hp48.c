@@ -86,42 +86,42 @@ PALETTE_INIT ( hp48 )
 
 
         The LCD is 131x64 pixels and has two components:
-	- a main screen
-	- a menu screen
+    - a main screen
+    - a menu screen
 
-	The main height (M) and the menu height (m) can be changed with the constraints:
-	- m+M=64
-	- M>=2
+    The main height (M) and the menu height (m) can be changed with the constraints:
+    - m+M=64
+    - M>=2
 
-	Pixels are 1-bit, packed in memory.
+    Pixels are 1-bit, packed in memory.
 
-	The start address of both screens can be changed independently
-	(this allows smooth, pixel-precise vertical scrooling of both parts).
-	They must be even addresses (in nibbles).
+    The start address of both screens can be changed independently
+    (this allows smooth, pixel-precise vertical scrooling of both parts).
+    They must be even addresses (in nibbles).
 
-	The stride (offset in nibbles between two scanlines) can be changed for the main screen.	
-	It must be even.
-	It is fixed to 34 for the menu screen.
-	
-	The bit offset for the first column of the main screen can be changed
-	(this allows smooth, pixel-precise horizontal scrooling).
-	It is always 0 for the menu screen.
+    The stride (offset in nibbles between two scanlines) can be changed for the main screen.
+    It must be even.
+    It is fixed to 34 for the menu screen.
 
-	Above the LCD, there are 6 annonciators that can be independently turned
-	on and off (and independetly from the LCD). 
-	They are not handled here, but through output_set_value.
+    The bit offset for the first column of the main screen can be changed
+    (this allows smooth, pixel-precise horizontal scrooling).
+    It is always 0 for the menu screen.
+
+    Above the LCD, there are 6 annonciators that can be independently turned
+    on and off (and independetly from the LCD).
+    They are not handled here, but through output_set_value.
  */
 
 
 /*
         In theory, the LCD is monorchrome, with a global adjustable contrast (32 levels).
-	However, by switching between screens at each refresh (64 Hz), one can achieve the
-	illusion of grayscale, with moderate flickering.
-	This technique was very widespread.
-	We emulate it by simply averaging between the last few (HP48_NB_SCREENS) frames.
-	
-	HP48_NB_SCREENS should be a multiple of the period of screen flips to avoid
-	flickering in the emulation.
+    However, by switching between screens at each refresh (64 Hz), one can achieve the
+    illusion of grayscale, with moderate flickering.
+    This technique was very widespread.
+    We emulate it by simply averaging between the last few (HP48_NB_SCREENS) frames.
+
+    HP48_NB_SCREENS should be a multiple of the period of screen flips to avoid
+    flickering in the emulation.
  */
 
 
@@ -151,23 +151,23 @@ VIDEO_UPDATE ( hp48 )
 
 	LOG(( "%f hp48 video_update called: ", attotime_to_double(timer_get_time(screen->machine)) ));
 
-	if ( !display || refresh ) 
-	{ 
+	if ( !display || refresh )
+	{
 		LOG(( "display off\n" ));
 		bitmap_fill( bitmap, NULL, 0 );
-		return 0;		
+		return 0;
 	}
 
 	/* correcting factors */
 	if ( right_margin & 0x800 ) right_margin -= 0x1000;
 	if ( last_line <= 1 ) last_line = 0x3f;
 
-	LOG(( "on=%i lmargin=%i rmargin=%i contrast=%i start=%05x lline=%i menu=%05x\n", 
-	      display, left_margin, right_margin, contrast, bitmap_start, last_line, menu_start )); 
+	LOG(( "on=%i lmargin=%i rmargin=%i contrast=%i start=%05x lline=%i menu=%05x\n",
+	      display, left_margin, right_margin, contrast, bitmap_start, last_line, menu_start ));
 
 	/* draw main bitmap */
 	addr = bitmap_start;
-	for ( y = 0; y <= last_line; y++ ) 
+	for ( y = 0; y <= last_line; y++ )
 	{
 		xp = -left_margin;
 		for ( x = 0; x < 34; x++, addr++ )
@@ -179,7 +179,7 @@ VIDEO_UPDATE ( hp48 )
 
 	/* draw menu bitmap */
 	addr = menu_start;
-	for ( ; y <= 0x3f; y++ ) 
+	for ( ; y <= 0x3f; y++ )
 	{
 		xp = 0;
 		for ( x = 0; x < 34; x++, addr++ )
@@ -200,7 +200,7 @@ VIDEO_UPDATE ( hp48 )
 			}
 			acc = (acc * 255) / (33 * HP48_NB_SCREENS);
 			*BITMAP_ADDR16( bitmap, y, x ) = acc;
-		}		
+		}
 	}
 
 	hp48_cur_screen = (hp48_cur_screen + 1) % HP48_NB_SCREENS;

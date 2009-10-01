@@ -1,10 +1,10 @@
 /******************************************************************************
 
-	i82720.h
+    i82720.h
 
-	Video driver for the Intel 82720 and NEC uPD7220 GDC.
-	Per Ola Ingvarsson
-	Tomas Karlsson
+    Video driver for the Intel 82720 and NEC uPD7220 GDC.
+    Per Ola Ingvarsson
+    Tomas Karlsson
 
  ******************************************************************************/
 

@@ -6,9 +6,9 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- abc800c
+    - abc800c
 
 */
 
@@ -76,10 +76,10 @@ static MC6845_UPDATE_ROW( abc800m_update_row )
 	abc800_state *state = device->machine->driver_data;
 
 	int column;
-	
+
 	/* prevent wraparound */
 	if (y >= 240) return;
-	
+
 	y += 29;
 
 	for (column = 0; column < x_count; column++)
@@ -202,7 +202,7 @@ static void abc800c_hr_update(running_machine *machine, bitmap_t *bitmap, const 
 static VIDEO_START( abc800m )
 {
 	abc800_state *state = machine->driver_data;
-	
+
 	/* allocate memory */
 
 	state->charram = auto_alloc_array(machine, UINT8, ABC800M_CHAR_RAM_SIZE);
@@ -228,7 +228,7 @@ static VIDEO_START( abc800m )
 static VIDEO_START( abc800c )
 {
 	abc800_state *state = machine->driver_data;
-	
+
 	/* allocate memory */
 
 	state->charram = auto_alloc_array(machine, UINT8, ABC800C_CHAR_RAM_SIZE);
@@ -261,13 +261,13 @@ static VIDEO_UPDATE( abc800m )
 
 	/* draw HR graphics */
 	abc800m_hr_update(screen->machine, bitmap, cliprect);
-	
+
 	if (!BIT(state->fgctl, 7))
 	{
 		/* draw text */
 		mc6845_update(state->mc6845, bitmap, cliprect);
 	}
-	
+
 	return 0;
 }
 
@@ -280,13 +280,13 @@ static VIDEO_UPDATE( abc800c )
 
 	/* draw HR graphics */
 	abc800c_hr_update(screen->machine, bitmap, cliprect);
-	
+
 	if (!BIT(state->fgctl, 7))
 	{
 		/* draw text */
 		abc800c_update(screen->machine, bitmap, cliprect);
 	}
-	
+
 	return 0;
 }
 

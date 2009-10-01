@@ -15,11 +15,11 @@
 DEVICE_GET_INFO( mm58274c );
 
 /* interface */
-/* 
-	Initializes the clock chip. 
-	day1 must be set to a value from 0 (sunday), 1 (monday) ... 
-	to 6 (saturday)	and is needed to correctly retrieve the day-of-week 
-	from the host system clock.
+/*
+    Initializes the clock chip.
+    day1 must be set to a value from 0 (sunday), 1 (monday) ...
+    to 6 (saturday) and is needed to correctly retrieve the day-of-week
+    from the host system clock.
 */
 typedef struct _mm58274c_interface mm58274c_interface;
 struct _mm58274c_interface

@@ -325,7 +325,7 @@ static MACHINE_DRIVER_START( svi318 )
 	MDRV_CASSETTE_ADD( "cassette", svi318_cassette_config )
 
 	MDRV_WD179X_ADD("wd179x", svi_wd17xx_interface )
-	
+
 	MDRV_FLOPPY_2_DRIVES_ADD(svi318_floppy_config)
 
 	MDRV_IMPORT_FROM( svi318_cartslot )
@@ -410,7 +410,7 @@ static MACHINE_DRIVER_START( svi328_806 )
 	MDRV_WD179X_ADD("wd179x", svi_wd17xx_interface )
 
 	MDRV_FLOPPY_2_DRIVES_ADD(svi318_floppy_config)
-	
+
 	MDRV_IMPORT_FROM( svi318_cartslot )
 MACHINE_DRIVER_END
 

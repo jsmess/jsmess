@@ -61,7 +61,7 @@ ADDRESS_MAP_END
 
 /* port i/o functions */
 static ADDRESS_MAP_START( jupiter_io , ADDRESS_SPACE_IO, 8)
-	AM_RANGE( 0x0000, 0xffff ) AM_READWRITE( jupiter_io_r, jupiter_port_fe_w ) 
+	AM_RANGE( 0x0000, 0xffff ) AM_READWRITE( jupiter_io_r, jupiter_port_fe_w )
 ADDRESS_MAP_END
 
 
@@ -170,7 +170,7 @@ static READ8_HANDLER( jupiter_io_r )
 	}
 	if ( ! ( offset & 0x8000 ) )
 	{
-//		cassette_output( devtag_get_device(space->machine, "cassette"), -1 );
+//      cassette_output( devtag_get_device(space->machine, "cassette"), -1 );
 		speaker_level_w(speaker,0);
 		data = ( data & 0xe0 ) | ( data & input_port_read( space->machine, "KEY7" ) );;
 	}
@@ -185,7 +185,7 @@ static READ8_HANDLER( jupiter_io_r )
 static WRITE8_HANDLER( jupiter_port_fe_w )
 {
 	const device_config *speaker = devtag_get_device(space->machine, "speaker");
-//	cassette_output( devtag_get_device(machine, "cassette"), 1 );
+//  cassette_output( devtag_get_device(machine, "cassette"), 1 );
 	speaker_level_w(speaker,1);
 }
 
@@ -334,7 +334,7 @@ static MACHINE_DRIVER_START( jupiter )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MDRV_CASSETTE_ADD( "cassette", jupiter_cassette_config )
-	
+
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("ace")
 	MDRV_CARTSLOT_NOT_MANDATORY

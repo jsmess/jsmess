@@ -8,11 +8,11 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- Turtles music is monotonous
-	- convert to discrete sound
-	- screen pincushion distortion
+    - Turtles music is monotonous
+    - convert to discrete sound
+    - screen pincushion distortion
 
 */
 
@@ -24,7 +24,7 @@
 #include "sound/dac.h"
 
 /* Memory Maps */
- 
+
 static ADDRESS_MAP_START( program_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_ROMBANK(1)
 	AM_RANGE(0x0400, 0x0fff) AM_ROM
@@ -122,6 +122,6 @@ ROM_START( advision )
 ROM_END
 
 /* Game Driver */
-	
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE   INPUT     INIT        CONFIG      COMPANY					FULLNAME			FLAGS */
+
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE   INPUT     INIT        CONFIG      COMPANY                 FULLNAME            FLAGS */
 CONS( 1982, advision,	0,		0,		advision, advision,	0,			0,	"Entex Electronics",	"Adventure Vision", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )

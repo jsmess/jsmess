@@ -158,10 +158,10 @@ VIDEO_UPDATE( pc1401 )
 		}
     }
 
-	pocketc_draw_special(bitmap, RIGHT+149, DOWN+24, line, 
+	pocketc_draw_special(bitmap, RIGHT+149, DOWN+24, line,
 			pc1401_lcd.reg[0x3c] & 0x08 ? color[1] : color[0]);
-	
-	pocketc_draw_special(bitmap, RIGHT, DOWN-10, busy, 
+
+	pocketc_draw_special(bitmap, RIGHT, DOWN-10, busy,
 			pc1401_lcd.reg[0x3d] & 0x01 ? color[1] : color[0]);
 
 	pocketc_draw_special(bitmap, RIGHT+18, DOWN-10, def,

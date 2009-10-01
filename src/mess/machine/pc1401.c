@@ -43,37 +43,37 @@ int pc1401_ina(const device_config *device)
 {
 	int data = outa;
 
-	if (outb & 0x01) 
+	if (outb & 0x01)
 		data |= input_port_read(device->machine, "KEY0");
 
-	if (outb & 0x02) 
+	if (outb & 0x02)
 		data |= input_port_read(device->machine, "KEY1");
 
-	if (outb & 0x04) 
+	if (outb & 0x04)
 		data |= input_port_read(device->machine, "KEY2");
 
-	if (outb & 0x08) 
+	if (outb & 0x08)
 		data |= input_port_read(device->machine, "KEY3");
 
-	if (outb & 0x10) 
+	if (outb & 0x10)
 		data |= input_port_read(device->machine, "KEY4");
 
-	if (outb & 0x20) 
+	if (outb & 0x20)
 	{
 		data |= input_port_read(device->machine, "KEY5");
-	
+
 		/* At Power Up we fake a 'C-CE' pressure */
 		if (power)
 			data |= 0x01;
 	}
 
-	if (outa & 0x01) 
+	if (outa & 0x01)
 		data |= input_port_read(device->machine, "KEY6");
 
-	if (outa & 0x02) 
+	if (outa & 0x02)
 		data |= input_port_read(device->machine, "KEY7");
 
-	if (outa & 0x04) 
+	if (outa & 0x04)
 		data |= input_port_read(device->machine, "KEY8");
 
 	if (outa & 0x08)
@@ -95,7 +95,7 @@ int pc1401_inb(const device_config *device)
 {
 	int data=outb;
 
-	if (input_port_read(device->machine, "EXTRA") & 0x04) 
+	if (input_port_read(device->machine, "EXTRA") & 0x04)
 		data |= 0x01;
 
 	return data;
@@ -148,11 +148,11 @@ DRIVER_INIT( pc1401 )
 #if 0
 	char sucker[]={
 		/* this routine dump the memory (start 0)
-		   in an endless loop,
-		   the pc side must be started before this
-		   its here to allow verification of the decimal data
-		   in mame disassembler
-		*/
+           in an endless loop,
+           the pc side must be started before this
+           its here to allow verification of the decimal data
+           in mame disassembler
+        */
 #if 1
 		18,4,/*lip xl */
 		2,0,/*lia 0 startaddress low */
@@ -183,7 +183,7 @@ DRIVER_INIT( pc1401 )
 /*400f x: */
 		/* dump external memory */
 		4, /*ix */
-		87,/*				 ldd */
+		87,/*                ldd */
 #endif
 		218,/*exab */
 
@@ -192,19 +192,19 @@ DRIVER_INIT( pc1401 )
 		0,4,/*lii 4 */
 
 		/*a: */
-		218,/*				  exab */
-		90,/*				  sl */
-		218,/*				  exab */
-		18,94,/*			lip 94 */
-		96,252,/*				  anma 252 */
+		218,/*                exab */
+		90,/*                 sl */
+		218,/*                exab */
+		18,94,/*            lip 94 */
+		96,252,/*                 anma 252 */
 		2,2, /*lia 2 */
-		196,/*				  adcm */
-		95,/*				  outf */
+		196,/*                adcm */
+		95,/*                 outf */
 		/*b:  */
 		204,/*inb */
 		102,128,/*tsia 0x80 */
 #if 0
-		41,4,/*			   jnzm b */
+		41,4,/*            jnzm b */
 #else
 		/* input not working reliable! */
 		/* so handshake removed, PC side must run with disabled */
@@ -212,19 +212,19 @@ DRIVER_INIT( pc1401 )
 		78,20, /*wait 20 */
 #endif
 
-		218,/*				  exab */
-		90,/*				  sl */
-		218,/*				  exab */
-		18,94,/*			lip 94 */
+		218,/*                exab */
+		90,/*                 sl */
+		218,/*                exab */
+		18,94,/*            lip 94 */
 		96,252,/*anma 252 */
-		2,0,/*				  lia 0 */
+		2,0,/*                lia 0 */
 		196,/*adcm */
-		95,/*				  outf */
+		95,/*                 outf */
 		/*c:  */
 		204,/*inb */
 		102,128,/*tsia 0x80 */
 #if 0
-		57,4,/*			   jzm c */
+		57,4,/*            jzm c */
 #else
 		78,20, /*wait 20 */
 #endif
@@ -234,14 +234,14 @@ DRIVER_INIT( pc1401 )
 
 		41,41,/*jnzm x: */
 
-		55,/*				rtn */
+		55,/*               rtn */
 	};
 
 	for (i=0; i<sizeof(sucker);i++) pc1401_mem[0x4000+i]=sucker[i];
 	logerror("%d %d\n",i, 0x4000+i);
 #endif
 
-	for (i=0; i<128; i++) 
+	for (i=0; i<128; i++)
 		gfx[i]=i;
 
 	timer_set(machine, ATTOTIME_IN_SEC(1), NULL, 0, pc1401_power_up);

@@ -9,35 +9,35 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- daisy chaining
-	- correct gpio_timer period
-	- disable GPIO3/4 interrupts when timer A/B in pulse mode
-	- spurious interrupt
+    - daisy chaining
+    - correct gpio_timer period
+    - disable GPIO3/4 interrupts when timer A/B in pulse mode
+    - spurious interrupt
 
-		If you look at the MFP datasheet it is obvious that it can generate the conditions for a spurious interrupt.
-		However the fact that they indeed happen in the ST is quite interesting.
+        If you look at the MFP datasheet it is obvious that it can generate the conditions for a spurious interrupt.
+        However the fact that they indeed happen in the ST is quite interesting.
 
-		The MFP will generate a spurious interrupt if interrupts are disabled (by changing the IERA/IERB registers)
-		at the “precise point”. The precise point would be after the system (but not necessarily the CPU, see below)
-		triggered an MFP interrupt, and before the CPU drives the interrupt acknowledge cycle.
+        The MFP will generate a spurious interrupt if interrupts are disabled (by changing the IERA/IERB registers)
+        at the ???precise point???. The precise point would be after the system (but not necessarily the CPU, see below)
+        triggered an MFP interrupt, and before the CPU drives the interrupt acknowledge cycle.
 
-		If the MFP was connected directly to the CPU, spurious interrupts probably couldn’t happen. However in the
-		ST, GLUE seats in the middle and handles all the interrupt timing. It is possible that GLUE introduces a
-		delay between detecting a change in the MFP interrupt request signal and actually propagating the change to
-		the CPU IPL signals (it is even possible that GLUE make some kind of latching). This would create a window
-		long enough for the “precise point” described above.
+        If the MFP was connected directly to the CPU, spurious interrupts probably couldn???t happen. However in the
+        ST, GLUE seats in the middle and handles all the interrupt timing. It is possible that GLUE introduces a
+        delay between detecting a change in the MFP interrupt request signal and actually propagating the change to
+        the CPU IPL signals (it is even possible that GLUE make some kind of latching). This would create a window
+        long enough for the ???precise point??? described above.
 
-		"yes, the spurious interrupt occurs when i mask a timer. i did not notice an occurance of the SPI when changing data and control registers.
-		if i kill interrupts with the status reg before masking the timer interrupt, then the SPI occurs as soon as the status register is set to re-enable interrupts."
+        "yes, the spurious interrupt occurs when i mask a timer. i did not notice an occurance of the SPI when changing data and control registers.
+        if i kill interrupts with the status reg before masking the timer interrupt, then the SPI occurs as soon as the status register is set to re-enable interrupts."
 
-	- divide serial clock by 16
-	- synchronous mode
-	- 1.5/2 stop bits
-	- interrupt on receiver break end
-	- interrupt on character boundaries during break transmission
-	- loopback mode
+    - divide serial clock by 16
+    - synchronous mode
+    - 1.5/2 stop bits
+    - interrupt on receiver break end
+    - interrupt on character boundaries during break transmission
+    - loopback mode
 
 */
 
@@ -340,7 +340,7 @@ INLINE const mc68901_interface *get_interface(const device_config *device)
 
 /*-------------------------------------------------
     check_interrupts - set the interrupt request
-	line state
+    line state
 -------------------------------------------------*/
 
 static void check_interrupts(const device_config *device)
@@ -406,7 +406,7 @@ static TIMER_CALLBACK( gpio_poll_tick )
 
 /*-------------------------------------------------
     rx_buffer_full - signal receive buffer full
-	interrupt
+    interrupt
 -------------------------------------------------*/
 
 static void rx_buffer_full(const device_config *device)
@@ -438,8 +438,8 @@ static void rx_error(const device_config *device)
 }
 
 /*-------------------------------------------------
-    tx_buffer_empty - signal transmit buffer 
-	empty interrupt
+    tx_buffer_empty - signal transmit buffer
+    empty interrupt
 -------------------------------------------------*/
 
 static void tx_buffer_empty(const device_config *device)
@@ -648,7 +648,7 @@ static void tx_starting(const device_config *device)
 static void tx_break(const device_config *device)
 {
 	mc68901_t *mc68901 = get_safe_token(device);
-	
+
 	if (mc68901->tsr & MC68901_TSR_XMIT_ENABLE)
 	{
 		if (mc68901->tsr & MC68901_TSR_BREAK)
@@ -717,7 +717,7 @@ static void tx_enabled(const device_config *device)
 			{
 				/* transmit start bit */
 				TXD(0);
-				
+
 				/* load transmit buffer */
 				mc68901->tx_buffer = mc68901->udr;
 				mc68901->tx_bits = 0;
@@ -1258,7 +1258,7 @@ WRITE8_DEVICE_HANDLER( mc68901_register_w )
 		case MC68901_UCR_START_STOP_1_15:
 			mc68901->rxtx_start = 1;
 			mc68901->rxtx_stop = 1;
-			if (LOG) logerror("MC68901 Start Bits : 1, Stop Bits : 1½, Format : asynchronous\n");
+			if (LOG) logerror("MC68901 Start Bits : 1, Stop Bits : 1??, Format : asynchronous\n");
 			break;
 		case MC68901_UCR_START_STOP_1_2:
 			mc68901->rxtx_start = 1;

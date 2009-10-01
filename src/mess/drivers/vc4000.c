@@ -29,11 +29,11 @@ There are four different types of Cartridges with the following memory mapping.
 Type 1: 2K Rom or EPROM mapped from $0000 - $07FF
 Type 2: 4K Rom or EPROM mapped from $0000 - $0FFF
 Type 3: 4K Rom + 1K Ram
-	Rom is mapped from $0000 - $0FFF
-	Ram is mapped from $1000 - $13FF and mirrored from $1800 - $1BFF
+    Rom is mapped from $0000 - $0FFF
+    Ram is mapped from $1000 - $13FF and mirrored from $1800 - $1BFF
 Type 4: 6K Rom + 1K Ram
-	Rom is mapped from $0000 - $15FF (only 5,5K ROM visible to the CPU)
-	Ram is mapped from $1800 - $1BFF
+    Rom is mapped from $0000 - $15FF (only 5,5K ROM visible to the CPU)
+    Ram is mapped from $1800 - $1BFF
 
 One other type is known for Radofin (compatible to VC4000, but not the Cartridge Pins)
 which consisted of 2K ROM and 2K RAM which are properly mapped as follows:
@@ -44,13 +44,13 @@ elektor TV Game Computer which is a kind of developer machine for the VC4000.
 
 Go to the bottom to see the game list and emulation status of each.
 ******************************************************************************/
-   
+
 #include "driver.h"
 #include "cpu/s2650/s2650.h"
 
 #include "includes/vc4000.h"
 #include "devices/cartslot.h"
-#include "devices/snapquik.h" 
+#include "devices/snapquik.h"
 
 static QUICKLOAD_LOAD( vc4000 );
 
@@ -174,8 +174,8 @@ static const rgb_t vc4000_palette[] =
 	MAKE_RGB(200, 200, 0), // yellow
 	MAKE_RGB(200, 200, 200), // white
 	/* sprite colors
-	The control line simply inverts the RGB lines all at once.
-	We can do that in the code with ^7 */
+    The control line simply inverts the RGB lines all at once.
+    We can do that in the code with ^7 */
 };
 
 static PALETTE_INIT( vc4000 )
@@ -207,7 +207,7 @@ static DEVICE_IMAGE_LOAD( vc4000_cart )
 		memory_set_bankptr(machine, 1, memory_region(machine, "maincpu") + 0x1000);
 		memory_set_bankptr(machine, 2, memory_region(machine, "maincpu") + 0x1000);
 	}
-		
+
 	if (size > 0)
 	{
 		image_fread(image, memory_region(machine, "maincpu") + 0x0000, size);
@@ -218,7 +218,7 @@ static DEVICE_IMAGE_LOAD( vc4000_cart )
 
 static MACHINE_DRIVER_START( vc4000 )
 	/* basic machine hardware */
-//	MDRV_CPU_ADD("maincpu", S2650, 865000)        /* 3550000/4, 3580000/3, 4430000/3 */
+//  MDRV_CPU_ADD("maincpu", S2650, 865000)        /* 3550000/4, 3580000/3, 4430000/3 */
 	MDRV_CPU_ADD("maincpu", S2650, 3546875/4)
 	MDRV_CPU_PROGRAM_MAP(vc4000_mem)
 	MDRV_CPU_IO_MAP(vc4000_io)
@@ -274,32 +274,32 @@ QUICKLOAD_LOAD(vc4000)
 	read_ = image_fread(image, quick_data, quick_length);
 	if (read_ != quick_length)
 		return INIT_FAIL;
-	
+
 	if (quick_data[0] != 2)
 		return INIT_FAIL;
-		
-	quick_addr = quick_data[1] * 256 + quick_data[2];	
-	
+
+	quick_addr = quick_data[1] * 256 + quick_data[2];
+
 	//if ((quick_addr + quick_length - 5) > 0x1000)
-	//	return INIT_FAIL;
-	
-	memory_write_byte(space, 0x08be, quick_data[3]);	
-	memory_write_byte(space, 0x08bf, quick_data[4]);	
-	
+	//  return INIT_FAIL;
+
+	memory_write_byte(space, 0x08be, quick_data[3]);
+	memory_write_byte(space, 0x08bf, quick_data[4]);
+
 	for (i = 0; i < quick_length - 5; i++)
 	{	if ((quick_addr + i) < 0x1000)
 			memory_write_byte(space, i + quick_addr, quick_data[i+5]);
 	}
-	
+
 	logerror("quick loading at %.4x size:%.4x\n", quick_addr, (quick_length-5));
 	return INIT_PASS;
 }
 
 
-/*   YEAR	NAME	PARENT	COMPAT	MACHINE	INPUT	INIT	CONFIG	COMPANY		FULLNAME */
+/*   YEAR   NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY     FULLNAME */
 CONS(1978,	vc4000,	0,	0,	vc4000,	vc4000,	0,	0,	"Interton",	"VC 4000", GAME_IMPERFECT_GRAPHICS )
 
-/*	Game List and Emulation Status
+/*  Game List and Emulation Status
 
 When you load a game it will normally appear to be unresponsive. Most carts contain a number of variants
 of each game (e.g. Difficulty, Player1 vs Player2 or Player1 vs Computer, etc).
@@ -318,133 +318,133 @@ The list is rather incomplete, information will be added as it becomes available
 
 The game names and numbers were obtained from the Amigan Software site.
 
-Cart Num	Name
+Cart Num    Name
 ----------------------------------------------
-1.		Grand Prix / Car Races / Autosport / Motor Racing / Road Race
+1.      Grand Prix / Car Races / Autosport / Motor Racing / Road Race
 Config: Paddle, NAC
 Status: Working
 Controls: Left-Right: Steer; Up: Accelerate
 
-2.		Black Jack
+2.      Black Jack
 Status: Not working (some digits missing; indicator missing; dealer's cards missing)
 Controls: set bet with S and D; A to deal; 1 to hit, 2 to stay; Q accept insurance, E to decline; double-up (unknown key)
 Indicator: E make a bet then deal; I choose insurance; - you lost; + you won; X hit or stay
 
-3.		Olympics / Paddle Games / Bat & Ball / Pro Sport 60 / Sportsworld
+3.      Olympics / Paddle Games / Bat & Ball / Pro Sport 60 / Sportsworld
 Config: Paddle, NAC
 Status: Working
 
-4.		Tank Battle / Combat
+4.      Tank Battle / Combat
 Config: Button, 90
 Status: Working
 Controls: Left-Right: Steer; Up: Accelerate; Fire: Shoot
 
-5.		Maths 1
+5.      Maths 1
 Status: Working
 Controls: Z difficulty; X = addition or subtraction; C ask question; A=1;S=2;D=3;Q=4;W=5;E=6;1=7;2=8;3=9;0=0; C enter
 
-6.		Maths 2
+6.      Maths 2
 Status: Not working
 Controls: Same as above.
 
-7.		Air Sea Attack / Air Sea Battle
+7.      Air Sea Attack / Air Sea Battle
 Config: Button, 90
 Status: Working
 Controls: Left-Right: Move; Fire: Shoot
 
-8.		Treasure Hunt / Capture the Flag / Concentration / Memory Match
+8.      Treasure Hunt / Capture the Flag / Concentration / Memory Match
 Config: Buttons
 Status: Working
 
-9.		Labyrinth / Maze / Intelligence 1
+9.      Labyrinth / Maze / Intelligence 1
 Config: Buttons
 Status: Working
 
-10.		Winter Sports
+10.     Winter Sports
 Notes: Background colours should be Cyan and White instead of Red and Black
 
-11.		Hippodrome / Horse Race
+11.     Hippodrome / Horse Race
 
-12.		Hunting / Shooting Gallery
+12.     Hunting / Shooting Gallery
 
-13.		Chess 1
+13.     Chess 1
 Status: Can't see what you're typing, wrong colours
 
-14.		Moto-cros
+14.     Moto-cros
 
-15.		Four in a row / Intelligence 2
+15.     Four in a row / Intelligence 2
 Config: Buttons
 Status: Working
 Notes: Seems the unused squares should be black. The screen jumps about while the computer is "thinking".
 
-16.		Code Breaker / Master Mind / Intelligence 3 / Challenge
+16.     Code Breaker / Master Mind / Intelligence 3 / Challenge
 
-17.		Circus
+17.     Circus
 STatus: severe gfx issues
 
-18.		Boxing / Prize Fight
+18.     Boxing / Prize Fight
 
-19.		Outer Space / Spacewar / Space Attack / Outer Space Combat
+19.     Outer Space / Spacewar / Space Attack / Outer Space Combat
 
-20.		Melody Simon / Musical Memory / Follow the Leader / Musical Games / Electronic Music / Face the Music
+20.     Melody Simon / Musical Memory / Follow the Leader / Musical Games / Electronic Music / Face the Music
 
-21.		Capture / Othello / Reversi / Attack / Intelligence 4
+21.     Capture / Othello / Reversi / Attack / Intelligence 4
 Config: Buttons
 Status: Working
 Notes: Seems the unused squares should be black
 
-22.		Chess 2
+22.     Chess 2
 Status: Can't see what you're typing, wrong colours
 
-23.		Pinball / Flipper / Arcade
+23.     Pinball / Flipper / Arcade
 Status: gfx issues
 
-24.		Soccer
+24.     Soccer
 
-25.		Bowling / NinePins
+25.     Bowling / NinePins
 Config: Paddle, rotated 90 degrees, up/down autocentre, left-right does not
 Status: Working
 
-26.		Draughts
+26.     Draughts
 
-27.		Golf
+27.     Golf
 Status: gfx issues
 
-28.		Cockpit
+28.     Cockpit
 Status: gfx issues
 
-29.		Metropolis / Hangman
+29.     Metropolis / Hangman
 Status: gfx issues
 
-30.		Solitaire
+30.     Solitaire
 
-31.		Casino
+31.     Casino
 Status: gfx issues, items missing and unplayable
 Controls: 1 or 3=START; q=GO; E=STOP; D=$; Z=^; X=tens; C=units
 
-32.		Invaders / Alien Invasion / Earth Invasion
+32.     Invaders / Alien Invasion / Earth Invasion
 Status: Works
 Config: Buttons
 
-33.		Super Invaders
+33.     Super Invaders
 Status: Stars are missing, colours are wrong
 Config: Buttons (90)
 
-36.		BackGammon
+36.     BackGammon
 Status: Not all counters are visible, Dice & game number not visible.
 Controls: Fire=Exec; 1=D+; 3=D-; Q,W,E=4,5,6; A,S,D=1,2,3; Z=CL; X=STOP; C=SET
 
-37.		Monster Man / Spider's Web
+37.     Monster Man / Spider's Web
 Status: Works
 Config: Buttons
 
-38.		Hyperspace
+38.     Hyperspace
 Status: Works
 Config: Buttons (90)
 Controls: 3 - status button; Q,W,E,A,S,D,Z,X,C selects which galaxy to visit
 
 
-40.		Super Space
+40.     Super Space
 Status: Works, some small gfx issues near the bottom
 Config: Buttons
 

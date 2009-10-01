@@ -1,7 +1,7 @@
 /*
- * 
+ *
  *  Fujitsu Micro 7 Video functions
- * 
+ *
  */
 
 #include "driver.h"
@@ -38,7 +38,7 @@ extern UINT8 fm7_type;
 
 /*
  * Main CPU: Sub-CPU interface (port 0xfd05)
- * 
+ *
  * Read:
  *   bit 7: Sub-CPU busy (or halted)
  *   bit 0: EXTDET (?)
@@ -50,13 +50,13 @@ extern UINT8 fm7_type;
 READ8_HANDLER( fm7_subintf_r )
 {
 	UINT8 ret = 0x00;
-	
+
 	if(fm7_video.sub_busy != 0 || fm7_video.sub_halt != 0)
 		ret |= 0x80;
-		
+
 	ret |= 0x7e;
 	//ret |= 0x01; // EXTDET (not implemented yet)
-	
+
 	return ret;
 }
 
@@ -95,7 +95,7 @@ READ8_HANDLER( fm7_cancel_ack )
 }
 
 /*
- * Reading from 0xd404 (sub-CPU) causes an "Attention" FIRQ on the main CPU 
+ * Reading from 0xd404 (sub-CPU) causes an "Attention" FIRQ on the main CPU
  */
 READ8_HANDLER( fm7_attn_irq_r )
 {
@@ -106,7 +106,7 @@ READ8_HANDLER( fm7_attn_irq_r )
 
 /*
  *  Sub CPU: I/O port 0xd409
- * 
+ *
  *  On read, enables VRAM access
  *  On write, disables VRAM access
  */
@@ -130,7 +130,7 @@ static void fm7_alu_mask_write(UINT32 offset, int bank, UINT8 dat)
 {
 	UINT8 temp;
 	int page = 0;
-	
+
 	if(offset >= 0xc000)
 		page = 1;
 
@@ -139,7 +139,7 @@ static void fm7_alu_mask_write(UINT32 offset, int bank, UINT8 dat)
 		fm7_video_ram[(offset & 0x3fff) + (bank * 0x4000) + (page * 0xc000)] = dat;
 		return;
 	}
-	
+
 	temp = fm7_video_ram[(offset & 0x3fff) + (bank * 0x4000) + (page * 0xc000)];
 	if(fm7_alu.command & 0x20)
 	{  // "not equal" write mode
@@ -151,7 +151,7 @@ static void fm7_alu_mask_write(UINT32 offset, int bank, UINT8 dat)
 		temp &= ~fm7_alu.compare_data;
 		dat &= fm7_alu.compare_data;
 	}
-	
+
 	fm7_video_ram[(offset & 0x3fff) + (bank * 0x4000) + (page * 0xc000)] = temp | dat;
 }
 
@@ -159,7 +159,7 @@ static void fm7_alu_function_compare(UINT32 offset)
 {
 	// COMPARE - compares which colors match those in the compare registers
 	// can be used on its own, or when bit 6 of the command register is high.
-	
+
 	UINT8 red,green,blue;
 	UINT8 dat = 0;
 	UINT8 colour;
@@ -168,7 +168,7 @@ static void fm7_alu_function_compare(UINT32 offset)
 	int match;
 	int page = 0;
 	UINT8 bit = 0x80;
-	
+
 	if(offset >= 0xc000)
 	{
 		page = 1;
@@ -176,13 +176,13 @@ static void fm7_alu_function_compare(UINT32 offset)
 	}
 	else
 		offset += fm7_video.vram_offset;
-	
+
 	blue = fm7_video_ram[(offset & 0x3fff) + (page * 0xc000)];
 	red = fm7_video_ram[(offset & 0x3fff) + 0x4000 + (page * 0xc000)];
 	green = fm7_video_ram[(offset & 0x3fff) + 0x8000 + (page * 0xc000)];
 
 	banks = (~fm7_alu.bank_disable) & 0x07;
-	
+
 	for(x=0;x<8;x++) // loop through each pixel
 	{
 		colour = 0;
@@ -192,7 +192,7 @@ static void fm7_alu_function_compare(UINT32 offset)
 			colour |= 2;
 		if(green & bit)
 			colour |= 4;
-			
+
 		match = 0;
 		for(y=0;y<8;y++)  // loop through each compare register
 		{
@@ -204,7 +204,7 @@ static void fm7_alu_function_compare(UINT32 offset)
 		}
 		if(match != 0)
 			dat |= bit;
-		
+
 		bit >>= 1;
 	}
 	fm7_alu.compare_data = dat;
@@ -217,10 +217,10 @@ static void fm7_alu_function_pset(UINT32 offset)
 	UINT8 dat;
 	int page = 0;
 	UINT8 mask;
-	
+
 	if(fm7_alu.command & 0x40)
 		fm7_alu_function_compare(offset);
-	
+
 	if(offset >= 0xc000)
 	{
 		page = 1;
@@ -228,7 +228,7 @@ static void fm7_alu_function_pset(UINT32 offset)
 	}
 	else
 		offset += fm7_video.vram_offset;
-	
+
 	for(x=0;x<3;x++) // cycle through banks
 	{
 		if(!(fm7_alu.bank_disable & (1 << x)))
@@ -237,11 +237,11 @@ static void fm7_alu_function_pset(UINT32 offset)
 				dat = 0xff;
 			else
 				dat = 0;
-	
+
 			mask = (fm7_video_ram[(offset & 0x3fff) + (x * 0x4000) + (page * 0xc000)]) & fm7_alu.mask;
 			dat &= ~fm7_alu.mask;
 			dat |= mask;
-			
+
 			fm7_alu_mask_write(offset,x,dat);
 		}
 	}
@@ -253,10 +253,10 @@ static void fm7_alu_function_or(UINT32 offset)
 	UINT8 dat;
 	int page = 0;
 	UINT8 mask;
-	
+
 	if(fm7_alu.command & 0x40)
 		fm7_alu_function_compare(offset);
-	
+
 	if(offset >= 0xc000)
 	{
 		page = 1;
@@ -264,7 +264,7 @@ static void fm7_alu_function_or(UINT32 offset)
 	}
 	else
 		offset += fm7_video.vram_offset;
-	
+
 	for(x=0;x<3;x++) // cycle through banks
 	{
 		if(!(fm7_alu.bank_disable & (1 << x)))
@@ -273,14 +273,14 @@ static void fm7_alu_function_or(UINT32 offset)
 				dat = 0xff;
 			else
 				dat = 0;
-	
+
 			mask = (fm7_video_ram[(offset & 0x3fff) + (x * 0x4000) + (page * 0xc000)]);
 			dat |= mask;
-			
+
 			mask &= fm7_alu.mask;
 			dat &= ~fm7_alu.mask;
 			dat |= mask;
-				
+
 			fm7_alu_mask_write(offset,x,dat);
 		}
 	}
@@ -292,10 +292,10 @@ static void fm7_alu_function_and(UINT32 offset)
 	UINT8 dat;
 	int page = 0;
 	UINT8 mask;
-	
+
 	if(fm7_alu.command & 0x40)
 		fm7_alu_function_compare(offset);
-	
+
 	if(offset >= 0xc000)
 	{
 		page = 1;
@@ -303,7 +303,7 @@ static void fm7_alu_function_and(UINT32 offset)
 	}
 	else
 		offset += fm7_video.vram_offset;
-	
+
 	for(x=0;x<3;x++) // cycle through banks
 	{
 		if(!(fm7_alu.bank_disable & (1 << x)))
@@ -312,14 +312,14 @@ static void fm7_alu_function_and(UINT32 offset)
 				dat = 0xff;
 			else
 				dat = 0;
-	
+
 			mask = (fm7_video_ram[(offset & 0x3fff) + (x * 0x4000) + (page * 0xc000)]);
 			dat &= mask;
-			
+
 			mask &= fm7_alu.mask;
 			dat &= ~fm7_alu.mask;
 			dat |= mask;
-				
+
 			fm7_alu_mask_write(offset,x,dat);
 		}
 	}
@@ -331,10 +331,10 @@ static void fm7_alu_function_xor(UINT32 offset)
 	UINT8 dat;
 	int page = 0;
 	UINT8 mask;
-	
+
 	if(fm7_alu.command & 0x40)
 		fm7_alu_function_compare(offset);
-	
+
 	if(offset >= 0xc000)
 	{
 		page = 1;
@@ -342,7 +342,7 @@ static void fm7_alu_function_xor(UINT32 offset)
 	}
 	else
 		offset += fm7_video.vram_offset;
-	
+
 	for(x=0;x<3;x++) // cycle through banks
 	{
 		if(!(fm7_alu.bank_disable & (1 << x)))
@@ -351,14 +351,14 @@ static void fm7_alu_function_xor(UINT32 offset)
 				dat = 0xff;
 			else
 				dat = 0;
-	
+
 			mask = (fm7_video_ram[(offset & 0x3fff) + (x * 0x4000) + (page * 0xc000)]);
 			dat ^= mask;
-			
+
 			mask &= fm7_alu.mask;
 			dat &= ~fm7_alu.mask;
 			dat |= mask;
-				
+
 			fm7_alu_mask_write(offset,x,dat);
 		}
 	}
@@ -370,10 +370,10 @@ static void fm7_alu_function_not(UINT32 offset)
 	UINT8 dat;
 	int page = 0;
 	UINT8 mask;
-	
+
 	if(fm7_alu.command & 0x40)
 		fm7_alu_function_compare(offset);
-	
+
 	if(offset >= 0xc000)
 	{
 		page = 1;
@@ -381,7 +381,7 @@ static void fm7_alu_function_not(UINT32 offset)
 	}
 	else
 		offset += fm7_video.vram_offset;
-	
+
 	for(x=0;x<3;x++) // cycle through banks
 	{
 		if(!(fm7_alu.bank_disable & (1 << x)))
@@ -390,14 +390,14 @@ static void fm7_alu_function_not(UINT32 offset)
 				dat = 0xff;
 			else
 				dat = 0;
-	
+
 			mask = (fm7_video_ram[(offset & 0x3fff) + (x * 0x4000) + (page * 0xc000)]);
 			dat = ~mask;
-			
+
 			mask &= fm7_alu.mask;
 			dat &= ~fm7_alu.mask;
 			dat |= mask;
-				
+
 			fm7_alu_mask_write(offset,x,dat);
 		}
 	}
@@ -410,10 +410,10 @@ static void fm7_alu_function_invalid(UINT32 offset)
 	UINT8 dat;
 	int page = 0;
 	UINT8 mask;
-	
+
 	if(fm7_alu.command & 0x40)
 		fm7_alu_function_compare(offset);
-	
+
 	if(offset >= 0xc000)
 	{
 		page = 1;
@@ -421,15 +421,15 @@ static void fm7_alu_function_invalid(UINT32 offset)
 	}
 	else
 		offset += fm7_video.vram_offset;
-	
+
 	for(x=0;x<3;x++) // cycle through banks
 	{
 		if(!(fm7_alu.bank_disable & (1 << x)))
 		{
 			mask = (fm7_video_ram[(offset & 0x3fff) + (x * 0x4000) + (page * 0xc000)]);
-			
+
 			dat = mask & fm7_alu.mask;
-				
+
 			fm7_alu_mask_write(offset,x,dat);
 		}
 	}
@@ -442,10 +442,10 @@ static void fm7_alu_function_tilepaint(UINT32 offset)
 	UINT8 dat = 0;
 	int page = 0;
 	UINT8 mask;
-	
+
 	if(fm7_alu.command & 0x40)
 		fm7_alu_function_compare(offset);
-	
+
 	if(offset >= 0xc000)
 	{
 		page = 1;
@@ -453,7 +453,7 @@ static void fm7_alu_function_tilepaint(UINT32 offset)
 	}
 	else
 		offset += fm7_video.vram_offset;
-	
+
 	for(x=0;x<3;x++) // cycle through banks
 	{
 		if(!(fm7_alu.bank_disable & (1 << x)))
@@ -473,10 +473,10 @@ static void fm7_alu_function_tilepaint(UINT32 offset)
 			dat &= ~fm7_alu.mask;
 			mask = (fm7_video_ram[(offset & 0x3fff) + (x * 0x4000) + (page * 0xc000)]) & fm7_alu.mask;
 			dat |= mask;
-	
+
 			fm7_alu_mask_write(offset,x,dat);
 		}
-	}	
+	}
 }
 
 static void fm7_alu_function(UINT32 offset)
@@ -514,8 +514,8 @@ static UINT32 fm7_line_set_pixel(int x, int y)
 {
 	UINT32 addr;
 	UINT8 pixel_mask[8] = {0x7f, 0xbf, 0xdf, 0xef, 0xf7, 0xfb, 0xfd, 0xfe };
-	
-	
+
+
 	if(fm7_video.modestatus & 0x40) // 320 pixels wide
 	{
 		addr = (x >> 3) + (y * 40);
@@ -528,13 +528,13 @@ static UINT32 fm7_line_set_pixel(int x, int y)
 	addr &= 0x3fff;
 	if(fm7_video.active_video_page != 0)
 		addr += 0xc000;
-	
+
 	if(fm7_alu.command & 0x80)  // ALU must be active
 	{
 		fm7_alu.mask = pixel_mask[x & 0x07];
 		fm7_alu_function(addr);
 	}
-	
+
 	return addr;
 }
 
@@ -550,12 +550,12 @@ static void fm77av_line_draw(running_machine* machine)
 	int byte_count = 0;
 	UINT16 old_addr = 0xffff;
 	UINT16 addr;
-	
+
 	fm7_alu.busy = 1;
-	
+
 	horiz = x2 - x1;
 	vert = y2 - y1;
-	
+
 	if(horiz < 0)
 	{
 		dirx = -1;
@@ -570,7 +570,7 @@ static void fm77av_line_draw(running_machine* machine)
 	}
 	else
 		diry = 1;
-		
+
 	if(horiz == 0 && vert == 0)
 	{
 		fm7_line_set_pixel(x1,y1);
@@ -624,7 +624,7 @@ static void fm77av_line_draw(running_machine* machine)
 			if(rep < 0)
 			{
 				rep += horiz;
-				y1 += diry; 
+				y1 += diry;
 			}
 		}
 	}
@@ -646,11 +646,11 @@ static void fm77av_line_draw(running_machine* machine)
 			if(rep < 0)
 			{
 				rep += vert;
-				x1 += dirx; 
+				x1 += dirx;
 			}
 		}
 	}
-	
+
 	// set timer to disable busy flag
 	// 1/16 us for each byte changed
 	timer_set(machine,ATTOTIME_IN_USEC(byte_count/16),NULL,0,fm77av_alu_task_end);
@@ -670,12 +670,12 @@ READ8_HANDLER( fm7_vram_r )
 		return 0xff;
 	if((offset < 0xc000 && offset >=0x8000) && (fm7_video.multi_page & 0x04))
 		return 0xff;
-	
+
 	if(fm7_alu.command & 0x80) // ALU active, writes to VRAM even when reading it (go figure)
 	{
 		fm7_alu_function(offset+page);
 	}
-	
+
 	if(fm7_video.modestatus & 0x40)
 	{
 		if(fm7_video.active_video_page != 0)
@@ -697,7 +697,7 @@ WRITE8_HANDLER( fm7_vram_w )
 {
 	int offs;
 	UINT16 page = 0x0000;
-	
+
 	if(fm7_video.active_video_page != 0)
 		page = 0xc000;
 
@@ -713,7 +713,7 @@ WRITE8_HANDLER( fm7_vram_w )
 		fm7_alu_function(offset+page);
 		return;
 	}
-		
+
 	if(fm7_video.modestatus & 0x40)
 	{
 		if(fm7_video.active_video_page != 0)
@@ -728,7 +728,7 @@ WRITE8_HANDLER( fm7_vram_w )
 		else
 			offs = (offset & 0xc000) | ((offset + fm7_video.vram_offset) & 0x3fff);
 	}
-//	if(fm7_video.vram_access != 0)
+//  if(fm7_video.vram_access != 0)
 		fm7_video_ram[offs+page] = data;
 }
 
@@ -750,13 +750,13 @@ WRITE8_HANDLER( fm7_vram_banked_w )
 		return;
 	if((offset < 0xc000 && offset >=0x8000) && (fm7_video.multi_page & 0x04))
 		return;
-		
+
 	if(fm7_alu.command & 0x80) // ALU active
 	{
 		fm7_alu_function(offset+page);
 		return;
 	}
-	
+
 	if(fm7_video.modestatus & 0x40)
 	{
 		if(fm7_video.active_video_page != 0)
@@ -920,7 +920,7 @@ WRITE8_HANDLER( fm7_vramB_w )
 
 /*
  *  Sub CPU: I/O port 0xd408
- * 
+ *
  *  On read, enables the CRT display
  *  On write, disables the CRT display
  */
@@ -937,21 +937,21 @@ WRITE8_HANDLER( fm7_crt_w )
 
 /*
  *  Sub CPU: I/O ports 0xd40e - 0xd40f
- * 
+ *
  *  0xd40e: bits 0-6 - offset in bytes (high byte) (bit 6 is used for 400 line video only)
  *  0xd40f: bits 0-7 - offset in bytes (low byte)
  */
 WRITE8_HANDLER( fm7_vram_offset_w )
 {
 	UINT16 new_offset = 0;
-		
+
 	switch(offset)
 	{
 		case 0:
 			if(fm7_video.active_video_page != 0)
 				new_offset = ((data & 0x3f) << 8) | (fm7_video.vram_offset2 & 0x00ff);
 			else
-				new_offset = ((data & 0x3f) << 8) | (fm7_video.vram_offset & 0x00ff); 
+				new_offset = ((data & 0x3f) << 8) | (fm7_video.vram_offset & 0x00ff);
 			break;
 		case 1:  // low 5 bits are used on FM-77AV and later only
 			if(fm7_type == SYS_FM7)
@@ -974,7 +974,7 @@ WRITE8_HANDLER( fm7_vram_offset_w )
 				}
 			}
 			break;
-	}	
+	}
 	if(fm7_video.active_video_page != 0)
 		fm7_video.vram_offset2 = new_offset;
 	else
@@ -984,9 +984,9 @@ WRITE8_HANDLER( fm7_vram_offset_w )
 /*
  *  Main CPU: port 0xfd37
  *  Multipage
- * 	Port is write-only
- * 
- * 	bits 6-4: VRAM planes to display (G,R,B) (1=disable)
+ *  Port is write-only
+ *
+ *  bits 6-4: VRAM planes to display (G,R,B) (1=disable)
  *  bits 2-0: VRAM CPU access (G,R,B) (1=disable)
  */
 WRITE8_HANDLER( fm7_multipage_w )
@@ -1010,14 +1010,14 @@ READ8_HANDLER( fm7_palette_r )
 WRITE8_HANDLER( fm7_palette_w )
 {
 	UINT8 r = 0,g = 0,b = 0;
-	
+
 	if(data & 0x04)
 		g = 0xff;
 	if(data & 0x02)
 		r = 0xff;
 	if(data & 0x01)
 		b = 0xff;
-		
+
 	palette_set_color(space->machine,offset,MAKE_RGB(r,g,b));
 	fm7_video.fm7_pal[offset] = data & 0x07;
 }
@@ -1026,17 +1026,17 @@ WRITE8_HANDLER( fm7_palette_w )
  *  Main CPU: 0xfd30 - 0xfd34
  *  Analog colour palette (FM-77AV and later only)
  *  All ports are write-only.
- * 
+ *
  *  fd30: colour select(?) high 4 bits (LC11-LC8)
  *  fd31: colour select(?) low 8 bits (LC7-LC0)
  *  fd32: blue level (4 bits)
  *  fd33: red level (4 bits)
- *  fd34: green level (4 bits) 
+ *  fd34: green level (4 bits)
  */
 WRITE8_HANDLER( fm77av_analog_palette_w )
 {
 	int val;
-	
+
 	switch(offset)
 	{
 		case 0:
@@ -1074,14 +1074,14 @@ WRITE8_HANDLER( fm77av_analog_palette_w )
 
 /*
  *   Sub CPU: 0xd430 - BUSY/NMI/Bank register (FM77AV series only)
- * 
+ *
  *   On read:  bit 7 - 0 if in VBlank
  *             bit 4 - ALU busy(0)/ready(1)
  *             bit 2 - VSync status (1 if active?)
  *             bit 0 - RESET
- * 
- * 	 On write: bits 1-0 - CGROM select (maps to 0xd800)
- * 	           bit 2 - fine offset enable (enables OA4-OA0 bits in VRAM offset)
+ *
+ *   On write: bits 1-0 - CGROM select (maps to 0xd800)
+ *             bit 2 - fine offset enable (enables OA4-OA0 bits in VRAM offset)
  *             bit 5 - active VRAM page
  *             bit 6 - display VRAM page
  *             bit 7 - NMI mask register (1=mask)
@@ -1089,19 +1089,19 @@ WRITE8_HANDLER( fm77av_analog_palette_w )
 READ8_HANDLER( fm77av_video_flags_r )
 {
 	UINT8 ret = 0xff;
-	
+
 	if(video_screen_get_vblank(space->machine->primary_screen))
 		ret &= ~0x80;
-	
+
 	if(fm7_alu.busy != 0)
 		ret &= ~0x10;
-	
+
 	if(fm7_video.vsync_flag == 0)
 		ret &= ~0x04;
 
 	if(!fm7_video.sub_reset)
 		ret &= ~0x01;
-		
+
 	return ret;
 }
 
@@ -1118,7 +1118,7 @@ WRITE8_HANDLER( fm77av_video_flags_w )
 }
 
 /*
- *  Main CPU: port 0xfd12 
+ *  Main CPU: port 0xfd12
  *  Sub mode status register  (FM-77AV or later)
  *  bit 6 (R/W) - Video mode width(?) 0=640 (default) 1=320.
  *  bit 1 (R/O) - DISPTMG status (0=blank)
@@ -1127,16 +1127,16 @@ WRITE8_HANDLER( fm77av_video_flags_w )
 READ8_HANDLER( fm77av_sub_modestatus_r )
 {
 	UINT8 ret = 0x00;
-	
+
 	ret |= 0xbc;
 	ret |= (fm7_video.modestatus & 0x40);
-	
+
 	if(!video_screen_get_vblank(space->machine->primary_screen))
 		ret |= 0x02;
-		
+
 	if(fm7_video.vsync_flag != 0)
 		ret |= 0x01;
-	
+
 	return ret;
 }
 
@@ -1163,43 +1163,43 @@ WRITE8_HANDLER( fm77av_sub_modestatus_w )
 /*
  *  Main CPU: port 0xfd13
  *  Sub Bank select register
- * 
+ *
  *  bits 1 and 0 select which subsys ROM to be banked into sub CPU space
  *  on the FM-77AV40 and later, bit 2 can also selected to bank in sub monitor RAM.
  */
 WRITE8_HANDLER( fm77av_sub_bank_w )
 {
-//	UINT8* RAM = memory_region(space->machine,"sub");
+//  UINT8* RAM = memory_region(space->machine,"sub");
 	UINT8* ROM;
 	static int prev;
-	
+
 	if((data & 0x03) == (prev & 0x03))
 		return;
-	
+
 	fm7_video.subrom = data & 0x03;
 	switch (data & 0x03)
 	{
 		case 0x00:  // Type C, 640x200 (as used on the FM-7)
 			ROM = memory_region(space->machine,"subsys_c");
-		//	memory_set_bankptr(space->machine,20,ROM);
+		//  memory_set_bankptr(space->machine,20,ROM);
 			memory_set_bankptr(space->machine,21,ROM+0x800);
 			logerror("VID: Sub ROM Type C selected\n");
 			break;
 		case 0x01:  // Type A, 640x200
 			ROM = memory_region(space->machine,"subsys_a");
-		//	memory_set_bankptr(space->machine,20,RAM+0xd800);
+		//  memory_set_bankptr(space->machine,20,RAM+0xd800);
 			memory_set_bankptr(space->machine,21,ROM);
 			logerror("VID: Sub ROM Type A selected\n");
 			break;
 		case 0x02:  // Type B, 320x200
 			ROM = memory_region(space->machine,"subsys_b");
-		//	memory_set_bankptr(space->machine,20,RAM+0xd800);
+		//  memory_set_bankptr(space->machine,20,RAM+0xd800);
 			memory_set_bankptr(space->machine,21,ROM);
 			logerror("VID: Sub ROM Type B selected\n");
 			break;
 		case 0x03:  // CG Font?
 			ROM = memory_region(space->machine,"subsyscg");
-		//	memory_set_bankptr(space->machine,20,RAM+0xd800);
+		//  memory_set_bankptr(space->machine,20,RAM+0xd800);
 			memory_set_bankptr(space->machine,21,ROM);
 			logerror("VID: Sub ROM CG selected\n");
 			break;
@@ -1215,7 +1215,7 @@ WRITE8_HANDLER( fm77av_sub_bank_w )
 /*
  *  Sub CPU: ports 0xd410-0xd42b (FM-77AV and later only)
  *  Video operations
- * 
+ *
  *  0xd410 (R/W): Command register
  *                bit 7: 0=DIS 1=Start
  *                bits 6-5: MBIT1, MBIT2
@@ -1238,7 +1238,7 @@ WRITE8_HANDLER( fm77av_sub_bank_w )
  *  0xd424-25(W): Line X0 (High-Low, X9-X0)
  *  0xd426-27(W): Line Y0 (High-Low, Y8-Y0)
  *  0xd428-29(W): Line X1 (High-Low, X9-X0)
- *  0xd42a-2b(W): Line Y1 (High-Low, Y8-Y0) 
+ *  0xd42a-2b(W): Line Y1 (High-Low, Y8-Y0)
  */
 READ8_HANDLER( fm77av_alu_r )
 {
@@ -1269,7 +1269,7 @@ READ8_HANDLER( fm77av_alu_r )
 WRITE8_HANDLER( fm77av_alu_w )
 {
 	UINT16 dat;
-	
+
 	switch(offset)
 	{
 		case 0x00:
@@ -1297,81 +1297,81 @@ WRITE8_HANDLER( fm77av_alu_w )
 			break;
 		case 0x0b:
 			fm7_alu.bank_disable = data & 0x03;
-//			logerror("ALU: write to bank disable register - %02x\n",data);
+//          logerror("ALU: write to bank disable register - %02x\n",data);
 			break;
 		case 0x0c:
 			fm7_alu.tilepaint_b = data;
-//			logerror("ALU: write to tilepaint (blue) register - %02x\n",data);
+//          logerror("ALU: write to tilepaint (blue) register - %02x\n",data);
 			break;
 		case 0x0d:
 			fm7_alu.tilepaint_r = data;
-//			logerror("ALU: write to tilepaint (red) register - %02x\n",data);
+//          logerror("ALU: write to tilepaint (red) register - %02x\n",data);
 			break;
 		case 0x0e:
 			fm7_alu.tilepaint_g = data;
-//			logerror("ALU: write to tilepaint (green) register - %02x\n",data);
+//          logerror("ALU: write to tilepaint (green) register - %02x\n",data);
 			break;
 		case 0x10:
 			dat = ((data & 0x1f) << 8) | (fm7_alu.addr_offset & 0x00ff);
 			fm7_alu.addr_offset = dat;
-//			logerror("ALU: write to address offset (high) register - %02x (%04x)\n",data,fm7_alu.addr_offset);
+//          logerror("ALU: write to address offset (high) register - %02x (%04x)\n",data,fm7_alu.addr_offset);
 			break;
 		case 0x11:
 			dat = (fm7_alu.addr_offset & 0xff00) | data;
 			fm7_alu.addr_offset = dat;
-//			logerror("ALU: write to address offset (low) register - %02x (%04x)\n",data,fm7_alu.addr_offset);
+//          logerror("ALU: write to address offset (low) register - %02x (%04x)\n",data,fm7_alu.addr_offset);
 			break;
 		case 0x12:
 			dat = (data << 8) | (fm7_alu.line_style & 0x00ff);
 			fm7_alu.line_style = dat;
-//			logerror("ALU: write to line style (high) register - %02x (%04x)\n",data,fm7_alu.line_style);
+//          logerror("ALU: write to line style (high) register - %02x (%04x)\n",data,fm7_alu.line_style);
 			break;
 		case 0x13:
 			dat = (fm7_alu.line_style & 0xff00) | data;
 			fm7_alu.line_style = dat;
-//			logerror("ALU: write to line style (low) register - %02x (%04x)\n",data,fm7_alu.line_style);
+//          logerror("ALU: write to line style (low) register - %02x (%04x)\n",data,fm7_alu.line_style);
 			break;
 		case 0x14:
 			dat = ((data & 0x03) << 8) | (fm7_alu.x0 & 0x00ff);
 			fm7_alu.x0 = dat;
-//			logerror("ALU: write to X0 (high) register - %02x (%04x)\n",data,fm7_alu.x0);
+//          logerror("ALU: write to X0 (high) register - %02x (%04x)\n",data,fm7_alu.x0);
 			break;
 		case 0x15:
 			dat = (fm7_alu.x0 & 0xff00) | data;
 			fm7_alu.x0 = dat;
-//			logerror("ALU: write to X0 (low) register - %02x (%04x)\n",data,fm7_alu.x0);
+//          logerror("ALU: write to X0 (low) register - %02x (%04x)\n",data,fm7_alu.x0);
 			break;
 		case 0x16:
 			dat = ((data & 0x01) << 8) | (fm7_alu.y0 & 0x00ff);
 			fm7_alu.y0 = dat;
-//			logerror("ALU: write to Y0 (high) register - %02x (%04x)\n",data,fm7_alu.y0);
+//          logerror("ALU: write to Y0 (high) register - %02x (%04x)\n",data,fm7_alu.y0);
 			break;
 		case 0x17:
 			dat = (fm7_alu.y0 & 0xff00) | data;
 			fm7_alu.y0 = dat;
-//			logerror("ALU: write to Y0 (low) register - %02x (%04x)\n",data,fm7_alu.y0);
+//          logerror("ALU: write to Y0 (low) register - %02x (%04x)\n",data,fm7_alu.y0);
 			break;
 		case 0x18:
 			dat = ((data & 0x03) << 8) | (fm7_alu.x1 & 0x00ff);
 			fm7_alu.x1 = dat;
-//			logerror("ALU: write to X1 (high) register - %02x (%04x)\n",data,fm7_alu.x1);
+//          logerror("ALU: write to X1 (high) register - %02x (%04x)\n",data,fm7_alu.x1);
 			break;
 		case 0x19:
 			dat = (fm7_alu.x1 & 0xff00) | data;
 			fm7_alu.x1 = dat;
-//			logerror("ALU: write to X1 (low) register - %02x (%04x)\n",data,fm7_alu.x1);
+//          logerror("ALU: write to X1 (low) register - %02x (%04x)\n",data,fm7_alu.x1);
 			break;
 		case 0x1a:
 			dat = ((data & 0x01) << 8) | (fm7_alu.y1 & 0x00ff);
 			fm7_alu.y1 = dat;
-//			logerror("ALU: write to Y1 (high) register - %02x (%04x)\n",data,fm7_alu.y1);
+//          logerror("ALU: write to Y1 (high) register - %02x (%04x)\n",data,fm7_alu.y1);
 			break;
 		case 0x1b:
 			dat = (fm7_alu.y1 & 0xff00) | data;
 			fm7_alu.y1 = dat;
 			// draw line
 			fm77av_line_draw(space->machine);
-//			logerror("ALU: write to Y1 (low) register - %02x (%04x)\n",data,fm7_alu.y1);
+//          logerror("ALU: write to Y1 (low) register - %02x (%04x)\n",data,fm7_alu.y1);
 			break;
 		default:
 			logerror("ALU: write 0x%02x to invalid register 0x%02x\n",data,offset);
@@ -1397,10 +1397,10 @@ READ8_HANDLER( fm7_sub_ram_ports_banked_r )
 {
 	UINT8* RAM = memory_region(space->machine,"maincpu");
 	UINT8* ROM;
-	
+
 	if(!fm7_video.sub_halt)
 		return 0xff;
-		
+
 	if(offset < 0x380)  // work RAM
 		return RAM[0x1d000+offset];
 	if(offset >= 0x380 && offset < 0x400) // shared RAM
@@ -1412,10 +1412,10 @@ READ8_HANDLER( fm7_sub_ram_ports_banked_r )
 		ROM = memory_region(space->machine,"subsyscg");
 		return ROM[(fm7_video.cgrom*0x800)+(offset-0x800)];
 	}
-	
+
 	if(offset >= 0x410 && offset <= 0x42b)
 		return fm77av_alu_r(space,offset-0x410);
-	
+
 	switch(offset)
 	{
 		case 0x400:
@@ -1440,7 +1440,7 @@ READ8_HANDLER( fm7_sub_ram_ports_banked_r )
 			return fm77av_key_encoder_r(space,offset-0x431);
 		default:
 			logerror("Unmapped read from sub CPU port 0xd%03x via MMR banking\n",offset);
-			return 0xff; 
+			return 0xff;
 	}
 	return 0xff;
 }
@@ -1467,13 +1467,13 @@ WRITE8_HANDLER( fm7_sub_ram_ports_banked_w )
 		RAM[0x1d000+offset] = data;
 		return;
 	}
-		
+
 	if(offset >= 0x410 && offset <= 0x42b)
 	{
 		fm77av_alu_w(space,offset-0x410,data);
 		return;
 	}
-		
+
 	switch(offset)
 	{
 		case 0x408:
@@ -1504,20 +1504,20 @@ WRITE8_HANDLER( fm7_sub_ram_ports_banked_w )
 READ8_HANDLER( fm7_console_ram_banked_r )
 {
 	UINT8* RAM = memory_region(space->machine,"maincpu");
-	
+
 	if(!fm7_video.sub_halt)
 		return 0xff;
-		
+
 	return RAM[0x1c000+offset];
 }
 
 WRITE8_HANDLER( fm7_console_ram_banked_w )
 {
 	UINT8* RAM = memory_region(space->machine,"maincpu");
-	
+
 	if(!fm7_video.sub_halt)
 		return;
-		
+
 	RAM[0x1c000+offset] = data;
 }
 
@@ -1547,7 +1547,7 @@ VIDEO_UPDATE( fm7 )
     UINT16 col;
     int y, x, b;
     UINT16 page = 0x0000;
-    
+
     if(fm7_video.display_video_page != 0)
     	page = 0xc000;
 
@@ -1583,7 +1583,7 @@ VIDEO_UPDATE( fm7 )
 		    	}
 	            for (b = 0; b < 8; b++)
 	            {
-	            	col = (((code_b >> b) & 0x01) ? 8 : 0) | (((code_b2 >> b) & 0x01) ? 4 : 0) | (((code_b3 >> b) & 0x01) ? 2 : 0) | (((code_b4 >> b) & 0x01) ? 1 : 0); 
+	            	col = (((code_b >> b) & 0x01) ? 8 : 0) | (((code_b2 >> b) & 0x01) ? 4 : 0) | (((code_b3 >> b) & 0x01) ? 2 : 0) | (((code_b4 >> b) & 0x01) ? 1 : 0);
 	            	col |= (((code_g >> b) & 0x01) ? 128 : 0) | (((code_g2 >> b) & 0x01) ? 64 : 0) | (((code_g3 >> b) & 0x01) ? 32 : 0) | (((code_g4 >> b) & 0x01) ? 16 : 0);
 	            	col |= (((code_r >> b) & 0x01) ? 2048 : 0) | (((code_r2 >> b) & 0x01) ? 1024 : 0) | (((code_r3 >> b) & 0x01) ? 512 : 0) | (((code_r4 >> b) & 0x01) ? 256 : 0);
 					col += 8;  // use analog palette
@@ -1629,7 +1629,7 @@ static const rgb_t fm7_initial_palette[8] = {
 PALETTE_INIT( fm7 )
 {
 	int x;
-	
+
 	palette_set_colors(machine, 0, fm7_initial_palette, ARRAY_LENGTH(fm7_initial_palette));
 	for(x=0;x<8;x++)
 		fm7_video.fm7_pal[x] = x;

@@ -5,10 +5,10 @@
     05/2009 Skeleton driver.
 
 
-    This should be emulated alongside PS1 (and especially its memory cards, 
+    This should be emulated alongside PS1 (and especially its memory cards,
     since Pocket Station games were dowloaded from PS1 games into flash RAM
-    after the unit had been inserted in the memory card slot). 
-    While waiting for full PS1 emulation in MESS, we collect here info on the 
+    after the unit had been inserted in the memory card slot).
+    While waiting for full PS1 emulation in MESS, we collect here info on the
     system and its BIOS.
 
     CPU: ARM7T (32 bit RISC Processor)
@@ -16,7 +16,7 @@
     Graphics: 32 x 32 dot monochrome LCD
     Sound: Miniature speaker (12 bit PCM) x 1 unit
     Input: 5 input buttons, 1 reset button
-    Infrared communication: Bi-directional (supports IrDA based and 
+    Infrared communication: Bi-directional (supports IrDA based and
         conventional remote control systems)
     Other: 1 LED indicator
 
@@ -30,31 +30,31 @@
 #include "cpu/arm7/arm7.h"
 
 static ADDRESS_MAP_START(pockstat_mem, ADDRESS_SPACE_PROGRAM, 32)
-/*	AM_RANGE(0x00000000, 0x000007ff) AM_RAM
-	AM_RANGE(0x02000000, 0x0201ffff) Flash ROM
-	AM_RANGE(0x04000000, 0x04003fff) AM_ROM
-	AM_RANGE(0x08000000, 0x0801ffff) Same as 0x02 above. Mirrors every 128KB.
-	AM_RANGE(0x0a000000, 0x0a000003) IRQs currently triggered
-	AM_RANGE(0x0a000004, 0x0a000007) Raw status
-	AM_RANGE(0x0a000008, 0x0a00000b) Which IRQs are enabled
-	AM_RANGE(0x0a00000c, 0x0a00000f) Disable IRQs (write only)
-	AM_RANGE(0x0a000010, 0x0a000013) IRQ service signal (write only)
-	AM_RANGE(0x0a800000, 0x0a800003) Timer 0 period
-	AM_RANGE(0x0a800004, 0x0a800007) Timer 0 current value
-	AM_RANGE(0x0a800008, 0x0a80000b) Timer 0 control
-	AM_RANGE(0x0a800010, 0x0a800013) Timer 1 period
-	AM_RANGE(0x0a800014, 0x0a800017) Timer 1 current value
-	AM_RANGE(0x0a800018, 0x0a80001b) Timer 1 control
-	AM_RANGE(0x0a800020, 0x0a800023) Timer 2 period
-	AM_RANGE(0x0a800024, 0x0a800027) Timer 2 current value
-	AM_RANGE(0x0a800028, 0x0a80002b) Timer 2 control
-	AM_RANGE(0x0b000000, 0x0b000003) Internal CPU Clock control
-	AM_RANGE(0x0b800000, 0x0b800003) RTC control word
-	AM_RANGE(0x0b800004, 0x0b800007) RTC Modify value (write only)
-	AM_RANGE(0x0b800008, 0x0b80000b) RTC Time of day + day of week (read only)
-	AM_RANGE(0x0b80000c, 0x0b80000f) RTC Date (read only)
-	AM_RANGE(0x0d000000, 0x0b000003) LCD control word
-	AM_RANGE(0x0d000100, 0x0b00017f) LCD buffer - 1 word per scanline	*/
+/*  AM_RANGE(0x00000000, 0x000007ff) AM_RAM
+    AM_RANGE(0x02000000, 0x0201ffff) Flash ROM
+    AM_RANGE(0x04000000, 0x04003fff) AM_ROM
+    AM_RANGE(0x08000000, 0x0801ffff) Same as 0x02 above. Mirrors every 128KB.
+    AM_RANGE(0x0a000000, 0x0a000003) IRQs currently triggered
+    AM_RANGE(0x0a000004, 0x0a000007) Raw status
+    AM_RANGE(0x0a000008, 0x0a00000b) Which IRQs are enabled
+    AM_RANGE(0x0a00000c, 0x0a00000f) Disable IRQs (write only)
+    AM_RANGE(0x0a000010, 0x0a000013) IRQ service signal (write only)
+    AM_RANGE(0x0a800000, 0x0a800003) Timer 0 period
+    AM_RANGE(0x0a800004, 0x0a800007) Timer 0 current value
+    AM_RANGE(0x0a800008, 0x0a80000b) Timer 0 control
+    AM_RANGE(0x0a800010, 0x0a800013) Timer 1 period
+    AM_RANGE(0x0a800014, 0x0a800017) Timer 1 current value
+    AM_RANGE(0x0a800018, 0x0a80001b) Timer 1 control
+    AM_RANGE(0x0a800020, 0x0a800023) Timer 2 period
+    AM_RANGE(0x0a800024, 0x0a800027) Timer 2 current value
+    AM_RANGE(0x0a800028, 0x0a80002b) Timer 2 control
+    AM_RANGE(0x0b000000, 0x0b000003) Internal CPU Clock control
+    AM_RANGE(0x0b800000, 0x0b800003) RTC control word
+    AM_RANGE(0x0b800004, 0x0b800007) RTC Modify value (write only)
+    AM_RANGE(0x0b800008, 0x0b80000b) RTC Time of day + day of week (read only)
+    AM_RANGE(0x0b80000c, 0x0b80000f) RTC Date (read only)
+    AM_RANGE(0x0d000000, 0x0b000003) LCD control word
+    AM_RANGE(0x0d000100, 0x0b00017f) LCD buffer - 1 word per scanline   */
 ADDRESS_MAP_END
 
 /* Input ports */

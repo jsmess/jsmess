@@ -1,16 +1,16 @@
 /*
-	SMC9224 and SMC9234 Hard and Floppy Disk Controller (HFDC)
+    SMC9224 and SMC9234 Hard and Floppy Disk Controller (HFDC)
 
-	This controller handles MFM and FM encoded floppy disks and hard disks.
-	The SMC9224 is used in some DEC systems.  The SMC9234 is used in the Myarc
-	HFDC card for the TI99/4a.  The main difference between the two chips is
-	the way the ECC bytes are computed; there are differences in the way seek
-	times are computed, too.
+    This controller handles MFM and FM encoded floppy disks and hard disks.
+    The SMC9224 is used in some DEC systems.  The SMC9234 is used in the Myarc
+    HFDC card for the TI99/4a.  The main difference between the two chips is
+    the way the ECC bytes are computed; there are differences in the way seek
+    times are computed, too.
 
-	References:
-	* SMC HDC9234 preliminary data book (1988)
+    References:
+    * SMC HDC9234 preliminary data book (1988)
 
-	Raphael Nabet, 2003
+    Raphael Nabet, 2003
 */
 
 #include "driver.h"
@@ -22,16 +22,16 @@
 #define MAX_SECTOR_LEN 2048	/* ??? */
 
 /*
-	hfdc state structure
+    hfdc state structure
 */
 typedef struct hfdc_t
 {
 	UINT8 status;		/* command status register */
 	UINT8 disk_sel;		/* disk selection state */
 	UINT8 regs[10+6];	/* 4th through 10th registers are actually 2 distinct
-						registers each (one is r/o and the other w/o).  The
-						11th register ("data") is only used for communication
-						with the drive in non-DMA modes??? */
+                        registers each (one is r/o and the other w/o).  The
+                        11th register ("data") is only used for communication
+                        with the drive in non-DMA modes??? */
 	int reg_ptr;
 	int (*select_callback)(int which, select_mode_t select_mode, int select_line, int gpos);
 	UINT8 (*dma_read_callback)(int which, offs_t offset);
@@ -65,7 +65,7 @@ enum
 };
 
 /*
-	Definition of bits in the status register
+    Definition of bits in the status register
 */
 #define ST_INTPEND	(1<<7)		/* interrupt pending */
 #define ST_DMAREQ	(1<<6)		/* DMA request */
@@ -76,7 +76,7 @@ enum
 #define ST_BADSECT	(1<<0)		/* bad sector */
 
 /*
-	Definition of the termination codes
+    Definition of the termination codes
 */
 #define ST_TC_SUCCESS	(0<<3)	/* Successful completion */
 #define ST_TC_RDIDERR	(1<<3)	/* Error in READ-ID sequence */
@@ -85,7 +85,7 @@ enum
 
 
 /*
-	Definition of bits in the Termination-Conditions register
+    Definition of bits in the Termination-Conditions register
 */
 #define TC_CRCPRE	(1<<7)		/* CRC register preset, must be 1 */
 #define TC_UNUSED	(1<<6)		/* bit 6 is not used and must be 0 */
@@ -97,7 +97,7 @@ enum
 #define TC_TWRFLT	(1<<0)		/* interrupt on write-fault (HDD only) */
 
 /*
-	Definition of bits in the Chip-Status register
+    Definition of bits in the Chip-Status register
 */
 #define CS_RETREQ	(1<<7)		/* retry required */
 #define CS_ECCATT	(1<<6)		/* ECC correction attempted */
@@ -108,7 +108,7 @@ enum
 #define CS_PRESDRV	(3<<0)		/* present drive selected */
 
 /*
-	Definition of bits in the Disk-Status register
+    Definition of bits in the Disk-Status register
 */
 #define DS_SELACK	(1<<7)		/* select acknowledge (harddisk only!) */
 #define DS_INDEX	(1<<6)		/* index point */
@@ -122,12 +122,12 @@ enum
 static hfdc_t hfdc[MAX_HFDC];
 
 /*
-	Perform the read id field sequence for a floppy disk (but do not perform
-	any implied seek)
+    Perform the read id field sequence for a floppy disk (but do not perform
+    any implied seek)
 
-	which: udc controller index
-	disk_unit: floppy drive index
-	head: selected head
+    which: udc controller index
+    disk_unit: floppy drive index
+    head: selected head
 */
 static int floppy_read_id(running_machine *machine,int which, int disk_unit, int head)
 {
@@ -156,10 +156,10 @@ static int floppy_read_id(running_machine *machine,int which, int disk_unit, int
 }
 
 /*
-	Perform the verify sequence for a floppy disk
+    Perform the verify sequence for a floppy disk
 
-	which: udc controller index
-	disk_unit: floppy drive index
+    which: udc controller index
+    disk_unit: floppy drive index
 */
 static int floppy_find_sector(running_machine *machine,int which, int disk_unit, int cylinder, int head, int check_secnum, int sector, int *sector_data_id, int *sector_len)
 {
@@ -355,7 +355,7 @@ static int harddisk_read_id(int which, int disk_unit, int head)
 	hfdc[which].regs[hfdc_reg_cur_head] = ((hd[disk_unit].current_cylinder >> 4) & 0x70) | head;
 	hfdc[which].regs[hfdc_reg_read_6] = 0xfe;	/* ident byte */
 	/*if ()
-		hfdc[which].regs[hfdc_reg_chip_stat] |= CS_DELDATA;*/
+        hfdc[which].regs[hfdc_reg_chip_stat] |= CS_DELDATA;*/
 
 	return TRUE;
 }
@@ -463,7 +463,7 @@ static UINT8 harddisk_get_disk_status(int which, int disk_unit)
 	{
 		reply |= DS_SELACK;
 		/*if ()
-			reply |= DS_INDEX;*/
+            reply |= DS_INDEX;*/
 		reply |= DS_SKCOM;
 		if (hd[disk_unit].current_cylinder == 0)
 			reply |= DS_TRK00;
@@ -472,7 +472,7 @@ static UINT8 harddisk_get_disk_status(int which, int disk_unit)
 		if (hd[disk_unit].hd_handle)
 			reply |= DS_READY;
 		/*if ()
-			reply |= DS_WRFAULT;*/
+            reply |= DS_WRFAULT;*/
 	}
 
 	return reply;
@@ -481,7 +481,7 @@ static UINT8 harddisk_get_disk_status(int which, int disk_unit)
 
 
 /*
-	Initialize the controller
+    Initialize the controller
 */
 void smc92x4_init(int which, const smc92x4_intf *intf)
 {
@@ -495,7 +495,7 @@ void smc92x4_init(int which, const smc92x4_intf *intf)
 }
 
 /*
-	Reset the controller
+    Reset the controller
 */
 void smc92x4_reset(int which)
 {
@@ -510,7 +510,7 @@ void smc92x4_reset(int which)
 }
 
 /*
-	Change the state of IRQ
+    Change the state of IRQ
 */
 static void smc92x4_set_interrupt(int which, int state)
 {
@@ -527,7 +527,7 @@ static void smc92x4_set_interrupt(int which, int state)
 }
 
 /*
-	Select currently selected drive
+    Select currently selected drive
 */
 static int get_selected_drive(int which, select_mode_t *select_mode, int *disk_unit)
 {
@@ -560,7 +560,7 @@ static int get_selected_drive(int which, select_mode_t *select_mode, int *disk_u
 }
 
 /*
-	Assert Command Done status bit, triggering interrupts as needed
+    Assert Command Done status bit, triggering interrupts as needed
 */
 INLINE void set_command_done(int which)
 {
@@ -594,7 +594,7 @@ INLINE void step(running_machine *machine,int which, select_mode_t select_mode, 
 }
 
 /*
-	Perform the read_id phase on a drive
+    Perform the read_id phase on a drive
 */
 INLINE int read_id(running_machine *machine,int which, select_mode_t select_mode, int disk_unit, int head,
 					int do_implied_seek, int desired_cylinder)
@@ -675,7 +675,7 @@ INLINE int read_id(running_machine *machine,int which, select_mode_t select_mode
 }
 
 /*
-	Get the status of a drive
+    Get the status of a drive
 */
 INLINE UINT8 get_disk_status(running_machine *machine,int which, select_mode_t select_mode, int disk_unit)
 {
@@ -707,7 +707,7 @@ INLINE UINT8 get_disk_status(running_machine *machine,int which, select_mode_t s
 }
 
 /*
-	Handle the step command
+    Handle the step command
 */
 static void do_step(running_machine *machine,int which, int mode)
 {
@@ -738,7 +738,7 @@ cleanup:
 }
 
 /*
-	Handle the restore command
+    Handle the restore command
 */
 static void do_restore(running_machine *machine,int which, int mode)
 {
@@ -755,7 +755,7 @@ static void do_restore(running_machine *machine,int which, int mode)
 	{
 		/* no unit has been selected */
 		/* the drive status will be 0, therefore the SEEK_COMPLETE bit will be
-		cleared, which is what we want */
+        cleared, which is what we want */
 		goto cleanup;
 	}
 
@@ -790,11 +790,11 @@ cleanup:
 }
 
 /*
-	Handle the read command
+    Handle the read command
 
-	which: disk controller selected
-	physical_flag: if 1, read consecutive sectors, ignoring sector IDs
-	mode: extra flags (ignored)
+    which: disk controller selected
+    physical_flag: if 1, read consecutive sectors, ignoring sector IDs
+    mode: extra flags (ignored)
 */
 static void do_read(running_machine *machine,int which, int physical_flag, int mode)
 {
@@ -835,7 +835,7 @@ static void do_read(running_machine *machine,int which, int physical_flag, int m
 
 #if 0
 	/* if we enable write-protect test in read operations, the ti99 HFDC DSR is
-	unable to read write-protected floppies! */
+    unable to read write-protected floppies! */
 	if ((hfdc[which].regs[hfdc_reg_term] & TC_TWPROT)
 			&& (get_disk_status(machine,which, select_mode, disk_unit) & DS_WRPROT))
 	{
@@ -902,11 +902,11 @@ cleanup:
 }
 
 /*
-	Handle the write command
+    Handle the write command
 
-	which: disk controller selected
-	physical_flag: if 1, ignore CRC/ECC bytes??? (ignored)
-	mode: extra flags (ignored)
+    which: disk controller selected
+    physical_flag: if 1, ignore CRC/ECC bytes??? (ignored)
+    mode: extra flags (ignored)
 */
 static void do_write(running_machine *machine,int which, int physical_flag, int mode)
 {
@@ -1011,7 +1011,7 @@ cleanup:
 }
 
 /*
-	Process a command
+    Process a command
 */
 static void smc92x4_process_command(running_machine *machine,int which, int opcode)
 {
@@ -1041,7 +1041,7 @@ static void smc92x4_process_command(running_machine *machine,int which, int opco
 				case 0x03:
 					/* RESTORE DRIVE */
 					/* bit 0: 0 -> command ends after last seek pulse, 1 -> command
-						ends when the drive asserts the seek complete pin */
+                        ends when the drive asserts the seek complete pin */
 					logerror("smc92x4 restore command %X\n", opcode & 0x01);
 					do_restore(machine,which, opcode & 0x01);
 					break;
@@ -1052,7 +1052,7 @@ static void smc92x4_process_command(running_machine *machine,int which, int opco
 				/* STEP IN/OUT ONE CYLINDER */
 				/* bit 1: direction (0 -> inward, 1 -> outward i.e. toward cyl #0) */
 				/* bit 0: 0 -> command ends after last seek pulse, 1 -> command
-					ends when the drive asserts the seek complete pin */
+                    ends when the drive asserts the seek complete pin */
 				logerror("smc92x4 step command %X\n", opcode & 0x3);
 				do_step(machine,which, opcode & 0x03);
 			}
@@ -1072,8 +1072,8 @@ static void smc92x4_process_command(running_machine *machine,int which, int opco
 			/* DRSELECT */
 			/* bit 4: if 1, apply head load delay */
 			/* bit 3 & 2: disk type (0-3): 0 for hard disk in IBM-AT format, 1
-				for hard disk in standard SMC format, 2 for high-speed (8" or
-				HD(?)) floppy, 3 for low-speed (5"1/4 DD?) floppy disk */
+                for hard disk in standard SMC format, 2 for high-speed (8" or
+                HD(?)) floppy, 3 for low-speed (5"1/4 DD?) floppy disk */
 			/* bit 1 & 0: unit number (0-3)*/
 			logerror("smc92x4 drselect command %X\n", opcode & 0xf);
 			hfdc[which].disk_sel = opcode & 0xf;
@@ -1099,10 +1099,10 @@ static void smc92x4_process_command(running_machine *machine,int which, int opco
 			{
 				/* READ */
 				/* bits 2-1: 0 -> read physical, 1 -> read track, 2 -> read
-					logical with implied seek, 3 -> read logical with no
-					implied seek */
+                    logical with implied seek, 3 -> read logical with no
+                    implied seek */
 				/* bit 0: 0 -> do not transfer data (transfer ID fields for
-					read track command), 1 -> transfer data */
+                    read track command), 1 -> transfer data */
 				switch ((opcode >> 1) & 0x3)
 				{
 				case 0:
@@ -1124,7 +1124,7 @@ static void smc92x4_process_command(running_machine *machine,int which, int opco
 		case 0x7:
 			/* FORMAT TRACK */
 			/* bit 4: 0 -> write deleted data mark instead of normal address
-				mark */
+                mark */
 			/* bit 3: 1 -> write with reduced current */
 			/* bit 2-0: write precompensation value */
 			logerror("smc92x4 formattrack command %X\n", opcode & 0xf);
@@ -1163,11 +1163,11 @@ static void smc92x4_process_command(running_machine *machine,int which, int opco
 }
 
 /*
-	Memory accessors
+    Memory accessors
 */
 
 /*
-	Read a byte of data from a smc99x4 controller
+    Read a byte of data from a smc99x4 controller
 */
 int smc92x4_r(running_machine *machine,int which, int offset)
 {
@@ -1206,7 +1206,7 @@ int smc92x4_r(running_machine *machine,int which, int offset)
 }
 
 /*
-	Write a byte to a smc99x4 controller
+    Write a byte to a smc99x4 controller
 */
 void smc92x4_w(running_machine *machine,int which, int offset, int data)
 {

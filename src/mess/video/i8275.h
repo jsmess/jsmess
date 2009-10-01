@@ -34,7 +34,7 @@ struct _i8275_interface
 	const char *screen_tag;		/* screen we are acting on */
 	int width;					/* char width in pixels */
 	int char_delay;				/* delay of display char */
-	
+
 	devcb_write_line out_drq_func;
 
 	devcb_write_line out_irq_func;

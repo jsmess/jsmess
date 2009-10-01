@@ -1,14 +1,14 @@
 /*
-	spchroms.c - This is an emulator for "typical" speech ROMs from TI, as used by TI99/4(a).
+    spchroms.c - This is an emulator for "typical" speech ROMs from TI, as used by TI99/4(a).
 
-	In order to support its speech processor, TI designed some ROMs with a 1-bit data bus
-	and 4-bit address bus (multiplexed 5 times to provide a 18-bit address).
-	A fairly complete description of such a ROM (tms6100) is found in the tms5220 datasheet.
+    In order to support its speech processor, TI designed some ROMs with a 1-bit data bus
+    and 4-bit address bus (multiplexed 5 times to provide a 18-bit address).
+    A fairly complete description of such a ROM (tms6100) is found in the tms5220 datasheet.
 
-	One notable thing is that the address is a byte address (*NOT* a bit address).
+    One notable thing is that the address is a byte address (*NOT* a bit address).
 
-	This file is designed to be interfaced with the tms5220 core.
-	Interfacing it with the tms5110 would make sense, too.
+    This file is designed to be interfaced with the tms5220 core.
+    Interfacing it with the tms5110 would make sense, too.
 */
 
 #include "driver.h"
@@ -22,7 +22,7 @@ static int load_pointer = 0;			/* which 4-bit nibble will be affected by load ad
 static int ROM_bits_count;				/* current bit position in ROM */
 
 /*
-	set the speech ROMs
+    set the speech ROMs
 */
 void spchroms_config(running_machine *machine, const spchroms_interface *intf)
 {
@@ -40,7 +40,7 @@ void spchroms_config(running_machine *machine, const spchroms_interface *intf)
 }
 
 /*
-	Read 'count' bits serially from speech ROM
+    Read 'count' bits serially from speech ROM
 */
 int spchroms_read(const device_config *device, int count)
 {
@@ -78,12 +78,12 @@ int spchroms_read(const device_config *device, int count)
 }
 
 /*
-	Write an address nibble to speech ROM
+    Write an address nibble to speech ROM
 */
 void spchroms_load_address(const device_config *device, int data)
 {
 	/* tms5220 data sheet says that if we load only one 4-bit nibble, it won't work.
-	  This code does not care about this. */
+      This code does not care about this. */
 	speechROMaddr = ( (speechROMaddr & ~(0xf << load_pointer))
 		| (((unsigned long) (data & 0xf)) << load_pointer) ) & TMS5220_ADDRESS_MASK;
 	load_pointer += 4;
@@ -91,12 +91,12 @@ void spchroms_load_address(const device_config *device, int data)
 }
 
 /*
-	Perform a read and branch command
+    Perform a read and branch command
 */
 void spchroms_read_and_branch(const device_config *device)
 {
 	/* tms5220 data sheet says that if more than one speech ROM (tms6100) is present,
-	  there is a bus contention.  This code does not care about this. */
+      there is a bus contention.  This code does not care about this. */
 	if (speechROMaddr < speechROMlen-1)
 		speechROMaddr = (speechROMaddr & 0x3c000UL)
 			| (((((unsigned long) speechrom_data[speechROMaddr]) << 8)

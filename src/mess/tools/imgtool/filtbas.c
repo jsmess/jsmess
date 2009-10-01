@@ -1,14 +1,14 @@
 /****************************************************************************
 
-	filtbas.c
+    filtbas.c
 
-	Filter for Microsoft-style tokenized BASIC files
+    Filter for Microsoft-style tokenized BASIC files
 
-	BASIC files typically follow the following format:
+    BASIC files typically follow the following format:
 
-		int8     $ff
-		int16    <TOTAL LENGTH>
-		...
+        int8     $ff
+        int16    <TOTAL LENGTH>
+        ...
         int16    <PTR_NEXT_LINE>
         int16    <LINE_NUM>
         int8[]   <TOKENISED_DATA>
@@ -66,7 +66,7 @@ struct _basictokens
 
 /*-------------------------------------------------
     basic_readfile - reads a file and decodes
-	BASIC tokens into ASCII text
+    BASIC tokens into ASCII text
 -------------------------------------------------*/
 
 static imgtoolerr_t basic_readfile(const basictokens *tokens,
@@ -169,7 +169,7 @@ done:
 
 /*-------------------------------------------------
     basic_writefile - translates ASCII text to
-	BASIC tokens and writes it to a file
+    BASIC tokens and writes it to a file
 -------------------------------------------------*/
 
 static imgtoolerr_t basic_writefile(const basictokens *tokens,
@@ -234,7 +234,7 @@ static imgtoolerr_t basic_writefile(const basictokens *tokens,
 				line_number *= 10;
 				line_number += (buf[pos++] - '0');
 			}
-			
+
 			/* determine address */
 			if (tokens->baseaddress != 0)
 			{
@@ -257,7 +257,7 @@ static imgtoolerr_t basic_writefile(const basictokens *tokens,
 				place_integer_be(line_header, 0, 2, address);
 				place_integer_be(line_header, 2, 2, line_number);
 			}
-			
+
 			/* emit line header */
 			stream_write(mem_stream, line_header, sizeof(line_header));
 

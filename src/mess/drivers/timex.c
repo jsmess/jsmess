@@ -1,6 +1,6 @@
 /***************************************************************************
 
-	NOTE: ****** Specbusy: press N, R, or E to boot *************
+    NOTE: ****** Specbusy: press N, R, or E to boot *************
 
 
         Spectrum/Inves/TK90X etc. memory map:
@@ -542,7 +542,7 @@ void ts2068_update_memory(running_machine *machine)
 	memory_install_write8_handler(space, 0xe000, 0xffff, 0, 0, wh);
 }
 
-static ADDRESS_MAP_START (ts2068_io, ADDRESS_SPACE_IO, 8)	
+static ADDRESS_MAP_START (ts2068_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x1f, 0x1f) AM_READ( spectrum_port_1f_r ) AM_MIRROR(0xff00)
 	AM_RANGE(0x7f, 0x7f) AM_READ( spectrum_port_7f_r ) AM_MIRROR(0xff00)
 	AM_RANGE(0xdf, 0xdf) AM_READ( spectrum_port_df_r ) AM_MIRROR(0xff00)
@@ -586,11 +586,11 @@ static WRITE8_HANDLER (tc2048_port_ff_w)
 }
 
 static ADDRESS_MAP_START (tc2048_io, ADDRESS_SPACE_IO, 8)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(spectrum_port_fe_r,spectrum_port_fe_w) AM_MIRROR(0xfffe) AM_MASK(0xffff) 
+	AM_RANGE(0x00, 0x00) AM_READWRITE(spectrum_port_fe_r,spectrum_port_fe_w) AM_MIRROR(0xfffe) AM_MASK(0xffff)
 	AM_RANGE(0x1f, 0x1f) AM_READ(spectrum_port_1f_r) AM_MIRROR(0xff00)
 	AM_RANGE(0x7f, 0x7f) AM_READ(spectrum_port_7f_r) AM_MIRROR(0xff00)
 	AM_RANGE(0xdf, 0xdf) AM_READ(spectrum_port_df_r) AM_MIRROR(0xff00)
-	AM_RANGE(0xff, 0xff) AM_READWRITE(ts2068_port_ff_r,tc2048_port_ff_w)  AM_MIRROR(0xff00)	
+	AM_RANGE(0xff, 0xff) AM_READWRITE(ts2068_port_ff_r,tc2048_port_ff_w)  AM_MIRROR(0xff00)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START (tc2048_mem, ADDRESS_SPACE_PROGRAM, 8)
@@ -628,14 +628,14 @@ static MACHINE_DRIVER_START( ts2068 )
 	/* sound */
 	MDRV_SOUND_REPLACE("ay8912", AY8912, XTAL_14_112MHz/8)        /* From Schematic; 1.764 MHz */
 	MDRV_SOUND_CONFIG(spectrum_ay_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)	
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* cartridge */
 	MDRV_CARTSLOT_MODIFY("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("dck")
 	MDRV_CARTSLOT_NOT_MANDATORY
 	MDRV_CARTSLOT_LOAD(timex_cart)
-	MDRV_CARTSLOT_UNLOAD(timex_cart)		
+	MDRV_CARTSLOT_UNLOAD(timex_cart)
 MACHINE_DRIVER_END
 
 

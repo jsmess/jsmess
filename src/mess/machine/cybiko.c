@@ -1,12 +1,12 @@
 /*
 
-	Cybiko Wireless Inter-tainment System
+    Cybiko Wireless Inter-tainment System
 
-	(c) 2001-2007 Tim Schuerewegen
+    (c) 2001-2007 Tim Schuerewegen
 
-	Cybiko Classic (V1)
-	Cybiko Classic (V2)
-	Cybiko Xtreme
+    Cybiko Classic (V1)
+    Cybiko Classic (V2)
+    Cybiko Xtreme
 
 */
 
@@ -111,28 +111,28 @@ DRIVER_INIT( cybikoxt )
 /*
 NVRAM_HANDLER( cybikov1 )
 {
-	_logerror( 0, ("nvram_handler_cybikov1 (%p/%d)\n", file, read_or_write));
-	nvram_handler_at45dbxx( machine, file, read_or_write);
-	nvram_handler_pcf8593( machine, file, read_or_write);
+    _logerror( 0, ("nvram_handler_cybikov1 (%p/%d)\n", file, read_or_write));
+    nvram_handler_at45dbxx( machine, file, read_or_write);
+    nvram_handler_pcf8593( machine, file, read_or_write);
 }
 */
 
 /*
 NVRAM_HANDLER( cybikov2 )
 {
-	_logerror( 0, ("nvram_handler_cybikov2 (%p/%d)\n", file, read_or_write));
-	nvram_handler_at45dbxx( machine, file, read_or_write);
-	nvram_handler_sst39vfx( machine, file, read_or_write);
-	nvram_handler_pcf8593( machine, file, read_or_write);
+    _logerror( 0, ("nvram_handler_cybikov2 (%p/%d)\n", file, read_or_write));
+    nvram_handler_at45dbxx( machine, file, read_or_write);
+    nvram_handler_sst39vfx( machine, file, read_or_write);
+    nvram_handler_pcf8593( machine, file, read_or_write);
 }
 */
 
 /*
 NVRAM_HANDLER( cybikoxt )
 {
-	_logerror( 0, ("nvram_handler_cybikoxt (%p/%d)\n", file, read_or_write));
-	nvram_handler_sst39vfx( machine, file, read_or_write);
-	nvram_handler_pcf8593( machine, file, read_or_write);
+    _logerror( 0, ("nvram_handler_cybikoxt (%p/%d)\n", file, read_or_write));
+    nvram_handler_sst39vfx( machine, file, read_or_write);
+    nvram_handler_pcf8593( machine, file, read_or_write);
 }
 */
 
@@ -235,7 +235,7 @@ MACHINE_START( cybikov1 )
 MACHINE_START( cybikov2 )
 {
 	const device_config *flash2 = devtag_get_device(machine, "flash2");
-	
+
 	_logerror( 0, ("machine_start_cybikov2\n"));
 	// real-time clock
 	nvram_system_load( machine, "rtc", cybiko_pcf8593_load, 0);
@@ -349,7 +349,7 @@ static void cybiko_rs232_init( void)
 {
 	_logerror( 0, ("cybiko_rs232_init\n"));
 	memset( &rs232, 0, sizeof( rs232));
-//	timer_pulse(machine,  TIME_IN_HZ( 10), NULL, 0, rs232_timer_callback);
+//  timer_pulse(machine,  TIME_IN_HZ( 10), NULL, 0, rs232_timer_callback);
 }
 
 static void cybiko_rs232_exit( void)
@@ -437,19 +437,19 @@ static READ8_HANDLER( cybiko_key_r_byte )
 	UINT8 data = 0xFF;
 	int i;
 	static const char *const keynames[] = { "A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8", "A9" };
-	
+
 	_logerror( 2, ("cybiko_key_r_byte (%08X)\n", offset));
 	// A11
-	if (!(offset & (1 << 11))) 
+	if (!(offset & (1 << 11)))
 		data &= 0xFE;
 	// A1 .. A9
-	for (i=1; i<10; i++) 
+	for (i=1; i<10; i++)
 	{
-		if (!(offset & (1 << i))) 
+		if (!(offset & (1 << i)))
 			data &= input_port_read(space->machine, keynames[i-1]);
 	}
 	// A0
-	if (!(offset & (1 <<  0))) 
+	if (!(offset & (1 <<  0)))
 		data |= 0xFF;
 	//
 	return data;
@@ -481,10 +481,10 @@ static READ8_HANDLER( cybiko_io_reg_r )
 		// serial dataflash
 		case H8S_IO_PORT3 :  {
 				const device_config *device = devtag_get_device(space->machine, "flash1");
-				if (at45dbxx_pin_so(device)) data = data | H8S_P3_RXD1; 
+				if (at45dbxx_pin_so(device)) data = data | H8S_P3_RXD1;
 			}
 			break;
-			
+
 		// rs232
 		case H8S_IO_PORT5 : if (cybiko_rs232_pin_rxd()) data = data | H8S_P5_RXD2; break;
 		// real-time clock
@@ -609,7 +609,7 @@ READ16_HANDLER( cybiko_unk2_r )
 		case 0x000 : return 0xBA0B; // magic (part 1)
 		case 0x002 : return 0xAB15; // magic (part 2)
 		case 0x004 : return (0x07 << 8) | (0x07 ^0xFF); // brightness (or contrast) & value xor FF
-//		case 0x006 : return 0x2B57; // do not show "Free Games and Applications at www.cybiko.com" screen
+//      case 0x006 : return 0x2B57; // do not show "Free Games and Applications at www.cybiko.com" screen
 		case 0x008 : return 0xDEBA; // enable debug output
 		case 0x016 : return 0x5000 | 0x03FF; // ?
 		case 0x7FC : return 0x22A1; // crc32 (part 1)

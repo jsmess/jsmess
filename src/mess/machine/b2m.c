@@ -1,9 +1,9 @@
 /***************************************************************************
 
-		Bashkiria-2M machine driver by Miodrag Milanovic
+        Bashkiria-2M machine driver by Miodrag Milanovic
 
-		28/03/2008 Preliminary driver.
-		     
+        28/03/2008 Preliminary driver.
+
 ****************************************************************************/
 
 
@@ -18,7 +18,7 @@
 #include "includes/b2m.h"
 
 static READ8_HANDLER (b2m_keyboard_r )
-{		
+{
 	UINT8 key = 0x00;
 	if (offset < 0x100) {
 		if ((offset & 0x01)!=0) { key |= input_port_read(space->machine,"LINE0"); }
@@ -28,7 +28,7 @@ static READ8_HANDLER (b2m_keyboard_r )
 		if ((offset & 0x10)!=0) { key |= input_port_read(space->machine,"LINE4"); }
 		if ((offset & 0x20)!=0) { key |= input_port_read(space->machine,"LINE5"); }
 		if ((offset & 0x40)!=0) { key |= input_port_read(space->machine,"LINE6"); }
-		if ((offset & 0x80)!=0) { key |= input_port_read(space->machine,"LINE7"); }					
+		if ((offset & 0x80)!=0) { key |= input_port_read(space->machine,"LINE7"); }
 	} else {
 		if ((offset & 0x01)!=0) { key |= input_port_read(space->machine,"LINE8"); }
 		if ((offset & 0x02)!=0) { key |= input_port_read(space->machine,"LINE9"); }
@@ -38,11 +38,11 @@ static READ8_HANDLER (b2m_keyboard_r )
 }
 
 
-static void b2m_set_bank(running_machine *machine,int bank) 
+static void b2m_set_bank(running_machine *machine,int bank)
 {
 	UINT8 *rom;
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	
+
 	memory_install_write8_handler(space, 0x0000, 0x27ff, 0, 0, SMH_BANK(1));
 	memory_install_write8_handler(space, 0x2800, 0x2fff, 0, 0, SMH_BANK(2));
 	memory_install_write8_handler(space, 0x3000, 0x6fff, 0, 0, SMH_BANK(3));
@@ -54,12 +54,12 @@ static void b2m_set_bank(running_machine *machine,int bank)
 		case 0 :
 		case 1 :
 						memory_install_write8_handler(space, 0xe000, 0xffff, 0, 0, SMH_UNMAP);
-						
+
 						memory_set_bankptr(machine, 1, mess_ram);
 						memory_set_bankptr(machine, 2, mess_ram + 0x2800);
 						memory_set_bankptr(machine, 3, mess_ram + 0x3000);
 						memory_set_bankptr(machine, 4, mess_ram + 0x7000);
-						memory_set_bankptr(machine, 5, rom + 0x10000);						
+						memory_set_bankptr(machine, 5, rom + 0x10000);
 						break;
 #if 0
 		case 1 :
@@ -70,57 +70,57 @@ static void b2m_set_bank(running_machine *machine,int bank)
 						memory_set_bankptr(machine, 2, mess_ram + 0x2800);
 						memory_set_bankptr(machine, 3, rom + 0x12000);
 						memory_set_bankptr(machine, 4, rom + 0x16000);
-						memory_set_bankptr(machine, 5, rom + 0x10000);						
+						memory_set_bankptr(machine, 5, rom + 0x10000);
 						break;
 #endif
 		case 2 :
-						memory_install_write8_handler(space, 0x2800, 0x2fff, 0, 0, SMH_UNMAP);			
+						memory_install_write8_handler(space, 0x2800, 0x2fff, 0, 0, SMH_UNMAP);
 						memory_install_write8_handler(space, 0xe000, 0xffff, 0, 0, SMH_UNMAP);
 
 						memory_set_bankptr(machine, 1, mess_ram);
-						memory_install_read8_handler(space, 0x2800, 0x2fff, 0, 0, b2m_keyboard_r);			
+						memory_install_read8_handler(space, 0x2800, 0x2fff, 0, 0, b2m_keyboard_r);
 						memory_set_bankptr(machine, 3, mess_ram + 0x10000);
 						memory_set_bankptr(machine, 4, mess_ram + 0x7000);
-						memory_set_bankptr(machine, 5, rom + 0x10000);						
+						memory_set_bankptr(machine, 5, rom + 0x10000);
 						break;
 		case 3 :
-						memory_install_write8_handler(space, 0x2800, 0x2fff, 0, 0, SMH_UNMAP);			
+						memory_install_write8_handler(space, 0x2800, 0x2fff, 0, 0, SMH_UNMAP);
 						memory_install_write8_handler(space, 0xe000, 0xffff, 0, 0, SMH_UNMAP);
 
 						memory_set_bankptr(machine, 1, mess_ram);
-						memory_install_read8_handler(space, 0x2800, 0x2fff, 0, 0, b2m_keyboard_r);			
+						memory_install_read8_handler(space, 0x2800, 0x2fff, 0, 0, b2m_keyboard_r);
 						memory_set_bankptr(machine, 3, mess_ram + 0x14000);
 						memory_set_bankptr(machine, 4, mess_ram + 0x7000);
-						memory_set_bankptr(machine, 5, rom + 0x10000);						
+						memory_set_bankptr(machine, 5, rom + 0x10000);
 						break;
 		case 4 :
-						memory_install_write8_handler(space, 0x2800, 0x2fff, 0, 0, SMH_UNMAP);			
+						memory_install_write8_handler(space, 0x2800, 0x2fff, 0, 0, SMH_UNMAP);
 						memory_install_write8_handler(space, 0xe000, 0xffff, 0, 0, SMH_UNMAP);
 
 						memory_set_bankptr(machine, 1, mess_ram);
-						memory_install_read8_handler(space, 0x2800, 0x2fff, 0, 0, b2m_keyboard_r);			
+						memory_install_read8_handler(space, 0x2800, 0x2fff, 0, 0, b2m_keyboard_r);
 						memory_set_bankptr(machine, 3, mess_ram + 0x18000);
 						memory_set_bankptr(machine, 4, mess_ram + 0x7000);
-						memory_set_bankptr(machine, 5, rom + 0x10000);						
-					
+						memory_set_bankptr(machine, 5, rom + 0x10000);
+
 						break;
 		case 5 :
-						memory_install_write8_handler(space, 0x2800, 0x2fff, 0, 0, SMH_UNMAP);			
+						memory_install_write8_handler(space, 0x2800, 0x2fff, 0, 0, SMH_UNMAP);
 						memory_install_write8_handler(space, 0xe000, 0xffff, 0, 0, SMH_UNMAP);
 
 						memory_set_bankptr(machine, 1, mess_ram);
-						memory_install_read8_handler(space, 0x2800, 0x2fff, 0, 0, b2m_keyboard_r);			
+						memory_install_read8_handler(space, 0x2800, 0x2fff, 0, 0, b2m_keyboard_r);
 						memory_set_bankptr(machine, 3, mess_ram + 0x1c000);
 						memory_set_bankptr(machine, 4, mess_ram + 0x7000);
-						memory_set_bankptr(machine, 5, rom + 0x10000);						
-					
+						memory_set_bankptr(machine, 5, rom + 0x10000);
+
 						break;
 		case 6 :
 						memory_set_bankptr(machine, 1, mess_ram);
 						memory_set_bankptr(machine, 2, mess_ram + 0x2800);
 						memory_set_bankptr(machine, 3, mess_ram + 0x3000);
 						memory_set_bankptr(machine, 4, mess_ram + 0x7000);
-						memory_set_bankptr(machine, 5, mess_ram + 0xe000);					
+						memory_set_bankptr(machine, 5, mess_ram + 0xe000);
 						break;
 		case 7 :
 						memory_install_write8_handler(space, 0x0000, 0x27ff, 0, 0, SMH_UNMAP);
@@ -128,12 +128,12 @@ static void b2m_set_bank(running_machine *machine,int bank)
 						memory_install_write8_handler(space, 0x3000, 0x6fff, 0, 0, SMH_UNMAP);
 						memory_install_write8_handler(space, 0x7000, 0xdfff, 0, 0, SMH_UNMAP);
 						memory_install_write8_handler(space, 0xe000, 0xffff, 0, 0, SMH_UNMAP);
-						
-						memory_set_bankptr(machine, 1, rom + 0x10000);	
-						memory_set_bankptr(machine, 2, rom + 0x10000);	
-						memory_set_bankptr(machine, 3, rom + 0x10000);	
-						memory_set_bankptr(machine, 4, rom + 0x10000);	
-						memory_set_bankptr(machine, 5, rom + 0x10000);						
+
+						memory_set_bankptr(machine, 1, rom + 0x10000);
+						memory_set_bankptr(machine, 2, rom + 0x10000);
+						memory_set_bankptr(machine, 3, rom + 0x10000);
+						memory_set_bankptr(machine, 4, rom + 0x10000);
+						memory_set_bankptr(machine, 5, rom + 0x10000);
 						break;
 	}
 }
@@ -141,13 +141,13 @@ static void b2m_set_bank(running_machine *machine,int bank)
 static PIT8253_OUTPUT_CHANGED(bm2_pit_out0)
 {
 	b2m_state *st = device->machine->driver_data;
-	pic8259_set_irq_line(st->pic,1,state);		
+	pic8259_set_irq_line(st->pic,1,state);
 }
 
 
 static PIT8253_OUTPUT_CHANGED(bm2_pit_out1)
-{	
-	b2m_state *st = device->machine->driver_data;	
+{
+	b2m_state *st = device->machine->driver_data;
 	speaker_level_w(st->speaker, state);
 
 }
@@ -177,18 +177,18 @@ const struct pit8253_config b2m_pit8253_intf =
 };
 
 static WRITE8_DEVICE_HANDLER (b2m_8255_porta_w )
-{	
+{
 	b2m_state *state = device->machine->driver_data;
 	state->b2m_8255_porta = data;
 }
 static WRITE8_DEVICE_HANDLER (b2m_8255_portb_w )
-{	
+{
 	b2m_state *state = device->machine->driver_data;
 	state->b2m_video_scroll = data;
 }
 
 static WRITE8_DEVICE_HANDLER (b2m_8255_portc_w )
-{	
+{
 	b2m_state *state = device->machine->driver_data;
 
 	state->b2m_8255_portc = data;
@@ -215,9 +215,9 @@ I8255A_INTERFACE( b2m_ppi8255_interface_1 )
 
 
 static WRITE8_DEVICE_HANDLER (b2m_ext_8255_portc_w )
-{		
+{
 	UINT8 drive = ((data >> 1) & 1) ^ 1;
-	UINT8 side  = (data  & 1) ^ 1;	
+	UINT8 side  = (data  & 1) ^ 1;
 	b2m_state *state = device->machine->driver_data;
 
 	if (state->b2m_drive!=drive) {
@@ -244,12 +244,12 @@ static READ8_DEVICE_HANDLER (b2m_romdisk_porta_r )
 {
 	b2m_state *state = device->machine->driver_data;
 
-	UINT8 *romdisk = memory_region(device->machine, "maincpu") + 0x12000;		
-	return romdisk[state->b2m_romdisk_msb*256+state->b2m_romdisk_lsb];	
+	UINT8 *romdisk = memory_region(device->machine, "maincpu") + 0x12000;
+	return romdisk[state->b2m_romdisk_msb*256+state->b2m_romdisk_lsb];
 }
 
 static WRITE8_DEVICE_HANDLER (b2m_romdisk_portb_w )
-{	
+{
 	b2m_state *state = device->machine->driver_data;
 	state->b2m_romdisk_lsb = data;
 }
@@ -257,7 +257,7 @@ static WRITE8_DEVICE_HANDLER (b2m_romdisk_portb_w )
 static WRITE8_DEVICE_HANDLER (b2m_romdisk_portc_w )
 {
 	b2m_state *state = device->machine->driver_data;
-	state->b2m_romdisk_msb = data & 0x7f;	
+	state->b2m_romdisk_msb = data & 0x7f;
 }
 
 I8255A_INTERFACE( b2m_ppi8255_interface_3 )
@@ -271,31 +271,31 @@ I8255A_INTERFACE( b2m_ppi8255_interface_3 )
 };
 
 static PIC8259_SET_INT_LINE( b2m_pic_set_int_line )
-{		
-	cputag_set_input_line(device->machine, "maincpu", 0, interrupt ?  HOLD_LINE : CLEAR_LINE);  
-} 
+{
+	cputag_set_input_line(device->machine, "maincpu", 0, interrupt ?  HOLD_LINE : CLEAR_LINE);
+}
 
 /* Driver initialization */
 DRIVER_INIT(b2m)
 {
 	b2m_state *state = machine->driver_data;
 
-	memset(mess_ram,0,128*1024);	
+	memset(mess_ram,0,128*1024);
 	state->vblank_state = 0;
 }
 
-WRITE8_HANDLER ( b2m_palette_w ) 
+WRITE8_HANDLER ( b2m_palette_w )
 {
 	b2m_state *state = space->machine->driver_data;
 
 	UINT8 b = (3 - ((data >> 6) & 3)) * 0x55;
 	UINT8 g = (3 - ((data >> 4) & 3)) * 0x55;
 	UINT8 r = (3 - ((data >> 2) & 3)) * 0x55;
-	
+
 	UINT8 bw = (3 - (data & 3)) * 0x55;
-	
-	state->b2m_color[offset & 3] = data;		
-	
+
+	state->b2m_color[offset & 3] = data;
+
 	if (input_port_read(space->machine,"MONITOR")==1) {
 		palette_set_color_rgb(space->machine,offset, r, g, b);
 	} else {
@@ -309,13 +309,13 @@ READ8_HANDLER ( b2m_palette_r )
 	return state->b2m_color[offset];
 }
 
-WRITE8_HANDLER ( b2m_localmachine_w ) 
+WRITE8_HANDLER ( b2m_localmachine_w )
 {
 	b2m_state *state = space->machine->driver_data;
 	state->b2m_localmachine = data;
 }
 
-READ8_HANDLER ( b2m_localmachine_r ) 
+READ8_HANDLER ( b2m_localmachine_r )
 {
 	b2m_state *state = space->machine->driver_data;
 	return state->b2m_localmachine;
@@ -335,7 +335,7 @@ MACHINE_START(b2m)
 	state->speaker = devtag_get_device(machine, "speaker");
 
 	wd17xx_set_pause_time(state->fdc,10);
-	
+
 	/* register for state saving */
 	state_save_register_global(machine, state->b2m_8255_porta);
 	state_save_register_global(machine, state->b2m_video_scroll);
@@ -348,30 +348,30 @@ MACHINE_START(b2m)
 	state_save_register_global_pointer(machine, state->b2m_color, 4);
 	state_save_register_global(machine, state->b2m_localmachine);
 	state_save_register_global(machine, state->vblank_state);
-	
+
 	state_save_register_postload(machine, b2m_postload, NULL);
 }
 
 static IRQ_CALLBACK(b2m_irq_callback)
-{	
+{
 	b2m_state *state = device->machine->driver_data;
 	return pic8259_acknowledge(state->pic);
-} 
+}
 
 const struct pic8259_interface b2m_pic8259_config = {
 	b2m_pic_set_int_line
 };
 
 INTERRUPT_GEN (b2m_vblank_interrupt)
-{	
+{
 	b2m_state *state = device->machine->driver_data;
 	state->vblank_state++;
 	if (state->vblank_state>1) state->vblank_state=0;
-	pic8259_set_irq_line(state->pic, 0, state->vblank_state);		
+	pic8259_set_irq_line(state->pic, 0, state->vblank_state);
 }
 
 MACHINE_RESET(b2m)
-{	
+{
 	b2m_state *state = machine->driver_data;
 	state->b2m_side = 0;
 	state->b2m_drive = 0;

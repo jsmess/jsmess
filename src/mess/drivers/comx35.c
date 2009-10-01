@@ -1,12 +1,12 @@
 /*
 
-	TODO:
+    TODO:
 
-	- unreliable DOS commands?
-	- tape input/output
-	- PL-80 plotter
-	- serial printer
-	- thermal printer
+    - unreliable DOS commands?
+    - tape input/output
+    - PL-80 plotter
+    - serial printer
+    - thermal printer
 
 */
 
@@ -71,7 +71,7 @@ static INPUT_PORTS_START( comx35 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('&')
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('´')
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('?')
 
 	PORT_START("D2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('[')
@@ -386,11 +386,11 @@ static MACHINE_DRIVER_START( comx35_pal )
 
 	/* peripheral hardware */
 	MDRV_CDP1871_ADD(CDP1871_TAG, comx35_cdp1871_intf, CDP1869_CPU_CLK_PAL / 8)
-	MDRV_WD1770_ADD(WD1770_TAG, comx35_wd17xx_interface )	
+	MDRV_WD1770_ADD(WD1770_TAG, comx35_wd17xx_interface )
 	MDRV_QUICKLOAD_ADD("quickload", comx35, "comx", 0)
 	MDRV_CASSETTE_ADD(CASSETTE_TAG, comx35_cassette_config)
 	MDRV_PRINTER_ADD("printer")
-	
+
 	MDRV_FLOPPY_2_DRIVES_ADD(comx35_floppy_config)
 MACHINE_DRIVER_END
 
@@ -411,11 +411,11 @@ static MACHINE_DRIVER_START( comx35_ntsc )
 
 	/* peripheral hardware */
 	MDRV_CDP1871_ADD(CDP1871_TAG, comx35_cdp1871_intf, CDP1869_CPU_CLK_NTSC / 8)
-	MDRV_WD1770_ADD(WD1770_TAG, comx35_wd17xx_interface )	
+	MDRV_WD1770_ADD(WD1770_TAG, comx35_wd17xx_interface )
 	MDRV_QUICKLOAD_ADD("quickload", comx35, "comx", 0)
 	MDRV_CASSETTE_ADD(CASSETTE_TAG, comx35_cassette_config)
 	MDRV_PRINTER_ADD("printer")
-	
+
 	MDRV_FLOPPY_2_DRIVES_ADD(comx35_floppy_config)
 MACHINE_DRIVER_END
 
@@ -467,6 +467,6 @@ SYSTEM_CONFIG_END
 
 /* System Drivers */
 
-//    YEAR  NAME		PARENT  COMPAT	MACHINE		INPUT     INIT	CONFIG    COMPANY						FULLNAME			FLAGS
+//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT     INIT  CONFIG    COMPANY                       FULLNAME            FLAGS
 COMP( 1983, comx35p,	0,		0,		comx35_pal,	comx35,   0, 	comx35,   "Comx World Operations Ltd",	"COMX 35 (PAL)",	GAME_IMPERFECT_SOUND )
 COMP( 1983, comx35n,	comx35p,0,		comx35_ntsc,comx35,   0, 	comx35,   "Comx World Operations Ltd",	"COMX 35 (NTSC)",	GAME_IMPERFECT_SOUND )

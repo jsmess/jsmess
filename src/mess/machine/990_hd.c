@@ -1,19 +1,19 @@
 /*
-	990_hd.c: emulation of a generic ti990 hard disk controller, for use with
-	TILINE-based TI990 systems (TI990/10, /12, /12LR, /10A, Business system 300
-	and 300A).
+    990_hd.c: emulation of a generic ti990 hard disk controller, for use with
+    TILINE-based TI990 systems (TI990/10, /12, /12LR, /10A, Business system 300
+    and 300A).
 
-	This core will emulate the common feature set found in every disk controller.
-	Most controllers support additional features, but are still compatible with
-	the basic feature set.  I have a little documentation on two specific
-	disk controllers (WD900 and WD800/WD800A), but I have not tried to emulate
-	controller-specific features.
-
-
-	Long description: see 2234398-9701 and 2306140-9701.
+    This core will emulate the common feature set found in every disk controller.
+    Most controllers support additional features, but are still compatible with
+    the basic feature set.  I have a little documentation on two specific
+    disk controllers (WD900 and WD800/WD800A), but I have not tried to emulate
+    controller-specific features.
 
 
-	Raphael Nabet 2002-2003
+    Long description: see 2234398-9701 and 2306140-9701.
+
+
+    Raphael Nabet 2002-2003
 */
 
 #include "driver.h"
@@ -52,10 +52,10 @@ INLINE UINT32 get_UINT32BE(UINT32BE word)
 
 /*INLINE void set_UINT32BE(UINT32BE *word, UINT32 data)
 {
-	word->bytes[0] = (data >> 24) & 0xff;
-	word->bytes[1] = (data >> 16) & 0xff;
-	word->bytes[2] = (data >> 8) & 0xff;
-	word->bytes[3] = data & 0xff;
+    word->bytes[0] = (data >> 24) & 0xff;
+    word->bytes[1] = (data >> 16) & 0xff;
+    word->bytes[2] = (data >> 8) & 0xff;
+    word->bytes[3] = data & 0xff;
 }*/
 
 /* disk image header */
@@ -104,15 +104,15 @@ enum
 	w0_unsafe			= 0x1000,
 	w0_end_of_cylinder	= 0x0800,
 	w0_seek_incomplete	= 0x0400,
-	/*w0_offset_active	= 0x0200,*/
+	/*w0_offset_active  = 0x0200,*/
 	w0_pack_change		= 0x0100,
 
 	w0_attn_lines		= 0x00f0,
 	w0_attn_mask		= 0x000f,
 
 	w1_extended_command	= 0xc000,
-	/*w1_strobe_early		= 0x2000,
-	w1_strobe_late		= 0x1000,*/
+	/*w1_strobe_early       = 0x2000,
+    w1_strobe_late      = 0x1000,*/
 	w1_transfer_inhibit	= 0x0800,
 	w1_command			= 0x0700,
 	w1_offset			= 0x0080,
@@ -128,7 +128,7 @@ enum
 	w7_complete			= 0x4000,
 	w7_error			= 0x2000,
 	w7_int_enable		= 0x1000,
-	/*w7_lock_out			= 0x0800,*/
+	/*w7_lock_out           = 0x0800,*/
 	w7_retry			= 0x0400,
 	w7_ecc				= 0x0200,
 	w7_abnormal_completion	= 0x0100,
@@ -146,7 +146,7 @@ enum
 static const UINT16 w_mask[8] =
 {
 	0x000f,		/* Controllers should prevent overwriting of w0 status bits, and I know
-				that some controllers do so. */
+                that some controllers do so. */
 	0xffff,
 	0xffff,
 	0xffff,
@@ -187,11 +187,11 @@ static int get_id_from_device( const device_config *device )
 
 /*DEVICE_STOP( ti990_hd )
 {
-	d->img = NULL;
+    d->img = NULL;
 }*/
 
 /*
-	Initialize hard disk unit and open a hard disk image
+    Initialize hard disk unit and open a hard disk image
 */
 static DEVICE_IMAGE_LOAD( ti990_hd )
 {
@@ -231,7 +231,7 @@ static DEVICE_IMAGE_LOAD( ti990_hd )
 
 		/* use custom image header. */
 		/* to convert old header-less images to this format, insert a 16-byte
-		header as follow: 00 00 03 8f  00 00 00 05  00 00 00 21  00 00 01 00 */
+        header as follow: 00 00 03 8f  00 00 00 05  00 00 00 21  00 00 01 00 */
 		image_fseek(d->img, 0, SEEK_SET);
 		bytes_read = image_fread(d->img, &custom_header, sizeof(custom_header));
 		if (bytes_read != sizeof(custom_header))
@@ -268,7 +268,7 @@ static DEVICE_IMAGE_LOAD( ti990_hd )
 }
 
 /*
-	close a hard disk image
+    close a hard disk image
 */
 static DEVICE_IMAGE_UNLOAD( ti990_hd )
 {
@@ -287,7 +287,7 @@ static DEVICE_IMAGE_UNLOAD( ti990_hd )
 }
 
 /*
-	Return true if a HD image has been loaded
+    Return true if a HD image has been loaded
 */
 INLINE int is_unit_loaded(int unit)
 {
@@ -308,7 +308,7 @@ INLINE int is_unit_loaded(int unit)
 }
 
 /*
-	Init the hdc core
+    Init the hdc core
 */
 MACHINE_START(ti990_hdc)
 {
@@ -344,8 +344,8 @@ void ti990_hdc_init(running_machine *machine, void (*interrupt_callback)(running
 
 
 /*
-	Parse the disk select lines, and return the corresponding tape unit.
-	(-1 if none)
+    Parse the disk select lines, and return the corresponding tape unit.
+    (-1 if none)
 */
 static int cur_disk_unit(void)
 {
@@ -370,7 +370,7 @@ static int cur_disk_unit(void)
 }
 
 /*
-	Update interrupt state
+    Update interrupt state
 */
 static void update_interrupt(running_machine *machine)
 {
@@ -381,9 +381,9 @@ static void update_interrupt(running_machine *machine)
 }
 
 /*
-	Check that a sector address is valid.
+    Check that a sector address is valid.
 
-	Terminate current command and return non-zero if the address is invalid.
+    Terminate current command and return non-zero if the address is invalid.
 */
 static int check_sector_address(running_machine *machine, int unit, unsigned int cylinder, unsigned int head, unsigned int sector)
 {
@@ -409,7 +409,7 @@ static int check_sector_address(running_machine *machine, int unit, unsigned int
 }
 
 /*
-	Seek to sector whose address is given
+    Seek to sector whose address is given
 */
 static int sector_to_lba(running_machine *machine, int unit, unsigned int cylinder, unsigned int head, unsigned int sector, unsigned int *lba)
 {
@@ -422,7 +422,7 @@ static int sector_to_lba(running_machine *machine, int unit, unsigned int cylind
 }
 
 /*
-	Read one given sector
+    Read one given sector
 */
 static int read_sector(int unit, unsigned int lba, void *buffer, unsigned int bytes_to_read)
 {
@@ -452,7 +452,7 @@ static int read_sector(int unit, unsigned int lba, void *buffer, unsigned int by
 }
 
 /*
-	Write one given sector
+    Write one given sector
 */
 static int write_sector(int unit, unsigned int lba, const void *buffer, unsigned int bytes_to_write)
 {
@@ -482,7 +482,7 @@ static int write_sector(int unit, unsigned int lba, const void *buffer, unsigned
 }
 
 /*
-	Handle the store registers command: read the drive geometry.
+    Handle the store registers command: read the drive geometry.
 */
 static void store_registers(running_machine *machine)
 {
@@ -539,9 +539,9 @@ static void store_registers(running_machine *machine)
 }
 
 /*
-	Handle the write format command: format a complete track on disk.
+    Handle the write format command: format a complete track on disk.
 
-	The emulation just clears the track data in the disk image.
+    The emulation just clears the track data in the disk image.
 */
 static void write_format(running_machine *machine)
 {
@@ -611,7 +611,7 @@ static void write_format(running_machine *machine)
 }
 
 /*
-	Handle the read data command: read a variable number of sectors from disk.
+    Handle the read data command: read a variable number of sectors from disk.
 */
 static void read_data(running_machine *machine)
 {
@@ -711,7 +711,7 @@ static void read_data(running_machine *machine)
 }
 
 /*
-	Handle the write data command: write a variable number of sectors from disk.
+    Handle the write data command: write a variable number of sectors from disk.
 */
 static void write_data(running_machine *machine)
 {
@@ -823,7 +823,7 @@ static void write_data(running_machine *machine)
 }
 
 /*
-	Handle the unformatted read command: read drive geometry information.
+    Handle the unformatted read command: read drive geometry information.
 */
 static void unformatted_read(running_machine *machine)
 {
@@ -897,7 +897,7 @@ static void unformatted_read(running_machine *machine)
 }
 
 /*
-	Handle the restore command: return to track 0.
+    Handle the restore command: return to track 0.
 */
 static void restore(running_machine *machine)
 {
@@ -922,14 +922,14 @@ static void restore(running_machine *machine)
 	hdc.d[dsk_sel].unsafe = 0;		/* I think */
 
 	/*if (seek_to_sector(dsk_sel, 0, 0, 0))
-		return;*/
+        return;*/
 
 	hdc.w[7] |= w7_idle | w7_complete;
 	update_interrupt(machine);
 }
 
 /*
-	Parse command code and execute the command.
+    Parse command code and execute the command.
 */
 static void execute_command(running_machine *machine)
 {
@@ -989,7 +989,7 @@ static void execute_command(running_machine *machine)
 }
 
 /*
-	Read one register in TPCS space
+    Read one register in TPCS space
 */
 READ16_HANDLER(ti990_hdc_r)
 {
@@ -1000,7 +1000,7 @@ READ16_HANDLER(ti990_hdc_r)
 }
 
 /*
-	Write one register in TPCS space.  Execute command if w7_idle is cleared.
+    Write one register in TPCS space.  Execute command if w7_idle is cleared.
 */
 WRITE16_HANDLER(ti990_hdc_w)
 {

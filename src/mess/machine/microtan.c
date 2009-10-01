@@ -630,10 +630,10 @@ INTERRUPT_GEN( microtan_interrupt )
 
 	while ( !chg && row > 0)
 	{
-		new = input_port_read(device->machine, keynames[row - 1]); 
-		chg = keyrows[--row] ^ new; 
+		new = input_port_read(device->machine, keynames[row - 1]);
+		chg = keyrows[--row] ^ new;
 	}
-    if (!chg) 
+    if (!chg)
 		--row;
 
     if (row >= 0)
@@ -645,7 +645,7 @@ INTERRUPT_GEN( microtan_interrupt )
         /* CapsLock LED */
 		if( row == 3 && chg == 0x80 )
 			set_led_status(1, (keyrows[3] & 0x80) ? 0 : 1);
-		
+
         if (new & chg)  /* key(s) pressed ? */
         {
             mod = 0;
@@ -717,7 +717,7 @@ static void microtan_snapshot_copy(running_machine *machine, UINT8 *snapshot_buf
 	const device_config *via_0 = devtag_get_device(machine, "via6522_0");
 	const device_config *via_1 = devtag_get_device(machine, "via6522_1");
 	const device_config *ay8910 = devtag_get_device(machine, "ay8910.1");
-	
+
     /* check for .DMP file format */
     if (snapshot_size == 8263)
     {
@@ -931,7 +931,7 @@ MACHINE_RESET( microtan )
 {
     int i;
 	static const char *const keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7", "ROW8" };
-	
+
 	for (i = 1; i < 10;  i++)
 	{
         keyrows[i] = input_port_read(machine, keynames[i-1]);

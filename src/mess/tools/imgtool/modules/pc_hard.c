@@ -1,8 +1,8 @@
 /****************************************************************************
 
-	pc_hard.c
+    pc_hard.c
 
-	PC hard drives
+    PC hard drives
 
 *****************************************************************************
 
@@ -15,7 +15,7 @@
      462      16  Partion #2 info
      478      16  Partion #3 info
      494      16  Partion #4 info
-	 510       2  Magic bytes (0x55 0xAA)
+     510       2  Magic bytes (0x55 0xAA)
 
 
   Partition info format:
@@ -23,28 +23,28 @@
   Offset  Length  Description
   ------  ------  -----------
        0       1  Bootable (0x80=bootable 0x00=not bootable)
-	   1       1  Starting head
-	   2       1  Starting sector (bits 5-0) and high bits of starting track (bits 6-5)
-	   3       1  Low bits of starting track
-	   4       1  Partition type:
-				       0x00		Unused
-					   0x?1		FAT12	(0-15 MB)
-					   0x?2		XENIX
-					   0x?4		FAT16	(16-32 MB)
-					   0x?6		FAT16`	(32 MB-2 GB)
-					   0x?7		HPFS or NTFS
-					   0x?A		Boot Manager
-					   0x?B		FAT32	(512 MB-2 TB)
-					   0x?C		FAT32	(512 MB-2 TB LBA)
-					   0x1?		OS/2 Boot manager/Win95 hidden
-					   0xC?		DR-DOS secured partition
-					   0xD?		Multiuser DOS secured partition
-					   0xE?		SpeedStor extended partition
-	   5       1  Ending head
-	   6       1  Ending sector (bits 5-0) and high bits of ending track (bits 6-5)
-	   7       1  Low bits of ending track
-	   8       4  Sector index of beginning of partition
-	  12       4  Total sectors in partition
+       1       1  Starting head
+       2       1  Starting sector (bits 5-0) and high bits of starting track (bits 6-5)
+       3       1  Low bits of starting track
+       4       1  Partition type:
+                       0x00     Unused
+                       0x?1     FAT12   (0-15 MB)
+                       0x?2     XENIX
+                       0x?4     FAT16   (16-32 MB)
+                       0x?6     FAT16`  (32 MB-2 GB)
+                       0x?7     HPFS or NTFS
+                       0x?A     Boot Manager
+                       0x?B     FAT32   (512 MB-2 TB)
+                       0x?C     FAT32   (512 MB-2 TB LBA)
+                       0x1?     OS/2 Boot manager/Win95 hidden
+                       0xC?     DR-DOS secured partition
+                       0xD?     Multiuser DOS secured partition
+                       0xE?     SpeedStor extended partition
+       5       1  Ending head
+       6       1  Ending sector (bits 5-0) and high bits of ending track (bits 6-5)
+       7       1  Low bits of ending track
+       8       4  Sector index of beginning of partition
+      12       4  Total sectors in partition
 
 ****************************************************************************/
 

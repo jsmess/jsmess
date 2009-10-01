@@ -1,5 +1,5 @@
 /*
-	ataridev.h
+    ataridev.h
 
 */
 

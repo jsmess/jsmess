@@ -1,32 +1,32 @@
 /***************************************************************************
 
-	Motorola 6845 CRT controller and emulation
+    Motorola 6845 CRT controller and emulation
 
-	This code emulates the functionality of the 6845 chip, and also
-	supports the functionality of chips related to the 6845
+    This code emulates the functionality of the 6845 chip, and also
+    supports the functionality of chips related to the 6845
 
-	Peter Trauner
-	Nathan Woods
+    Peter Trauner
+    Nathan Woods
 
-	Registers
-		00 - Horiz. total characters
-		01 - Horiz. displayed characters per line
-		02 - Horiz. synch position
-		03 - Horiz. synch width in characters
-		04 - Vert. total lines
-		05 - Vert. total adjust (scan lines)
-		06 - Vert. displayed rows
-		07 - Vert. synch position (character rows)
-		08 - Interlace mode
-		09 - Maximum scan line address
-		0A - Cursor start (scan line)
-		0B - Cursor end (scan line)
-		0C - Start address (MSB)
-		0D - Start address (LSB)
-		0E - Cursor address (MSB) (read/write)
-		0F - Cursor address (LSB) (read/write)
-		10 - Light pen (MSB)   (read only)
-		11 - Light pen (LSB)   (read only)
+    Registers
+        00 - Horiz. total characters
+        01 - Horiz. displayed characters per line
+        02 - Horiz. synch position
+        03 - Horiz. synch width in characters
+        04 - Vert. total lines
+        05 - Vert. total adjust (scan lines)
+        06 - Vert. displayed rows
+        07 - Vert. synch position (character rows)
+        08 - Interlace mode
+        09 - Maximum scan line address
+        0A - Cursor start (scan line)
+        0B - Cursor end (scan line)
+        0C - Start address (MSB)
+        0D - Start address (LSB)
+        0E - Cursor address (MSB) (read/write)
+        0F - Cursor address (LSB) (read/write)
+        10 - Light pen (MSB)   (read only)
+        11 - Light pen (LSB)   (read only)
 
 ***************************************************************************/
 
@@ -37,7 +37,7 @@
 
 /***************************************************************************
 
-	Type definitions
+    Type definitions
 
 ***************************************************************************/
 
@@ -60,14 +60,14 @@ struct mscrtc6845 *mscrtc6845;
 
 /***************************************************************************
 
-	Local variables
+    Local variables
 
 ***************************************************************************/
 
 /*-------------------------------------------------
-	mscrtc6845_reg_mask - an array specifying how
-	much of any given register "registers", per
-	m6845 personality
+    mscrtc6845_reg_mask - an array specifying how
+    much of any given register "registers", per
+    m6845 personality
 -------------------------------------------------*/
 
 static const struct reg_mask mscrtc6845_reg_mask[2][18] =
@@ -99,7 +99,7 @@ static const UINT8 pc1512_defaults[] =
 
 /***************************************************************************
 
-	Functions
+    Functions
 
 ***************************************************************************/
 
@@ -282,8 +282,8 @@ int mscrtc6845_port_w(struct mscrtc6845 *crtc, int offset, UINT8 data)
 			}
 
 			/* since the PC1512 does not support the number of lines register directly,
-			 * this value is keyed off of register 9
-			 */
+             * this value is keyed off of register 9
+             */
 			if ((crtc->config.personality == M6845_PERSONALITY_PC1512) && (idx == 9))
 			{
 				UINT8 char_height;

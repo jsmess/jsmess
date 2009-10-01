@@ -1,19 +1,19 @@
 /*
-	smartmed.c: SmartMedia Flash ROM emulation
+    smartmed.c: SmartMedia Flash ROM emulation
 
-	The SmartMedia is a Flash ROM in a fancy card.  It is used in a variety of
-	digital devices (still cameras...) and can be interfaced with a computer.
+    The SmartMedia is a Flash ROM in a fancy card.  It is used in a variety of
+    digital devices (still cameras...) and can be interfaced with a computer.
 
-	References:
-	Datasheets for various SmartMedia chips were found on Samsung and Toshiba's
-	sites (http://www.toshiba.com/taec and
-	http://www.samsung.com/Products/Semiconductor/Flash/FlashCard/SmartMedia)
+    References:
+    Datasheets for various SmartMedia chips were found on Samsung and Toshiba's
+    sites (http://www.toshiba.com/taec and
+    http://www.samsung.com/Products/Semiconductor/Flash/FlashCard/SmartMedia)
 
-	TODO:
-	* support multi-plane mode?
-	* use HD-format images instead of our experimental custom format?
+    TODO:
+    * support multi-plane mode?
+    * use HD-format images instead of our experimental custom format?
 
-	Raphael Nabet 2004
+    Raphael Nabet 2004
 */
 
 #include "driver.h"
@@ -38,10 +38,10 @@ INLINE UINT32 get_UINT32BE(UINT32BE word)
 
 /*INLINE void set_UINT32BE(UINT32BE *word, UINT32 data)
 {
-	word->bytes[0] = (data >> 24) & 0xff;
-	word->bytes[1] = (data >> 16) & 0xff;
-	word->bytes[2] = (data >> 8) & 0xff;
-	word->bytes[3] = data & 0xff;
+    word->bytes[0] = (data >> 24) & 0xff;
+    word->bytes[1] = (data >> 16) & 0xff;
+    word->bytes[2] = (data >> 8) & 0xff;
+    word->bytes[3] = data & 0xff;
 }*/
 
 /* SmartMedia image header */
@@ -111,7 +111,7 @@ INLINE smartmedia_t *get_safe_token(const device_config *device)
 
 
 /*
-	Init a SmartMedia image
+    Init a SmartMedia image
 */
 DEVICE_START( smartmedia )
 {
@@ -134,7 +134,7 @@ DEVICE_START( smartmedia )
 }
 
 /*
-	Load a SmartMedia image
+    Load a SmartMedia image
 */
 DEVICE_IMAGE_LOAD( smartmedia )
 {
@@ -178,7 +178,7 @@ DEVICE_IMAGE_LOAD( smartmedia )
 }
 
 /*
-	Unload a SmartMedia image
+    Unload a SmartMedia image
 */
 DEVICE_IMAGE_UNLOAD( smartmedia )
 {
@@ -215,12 +215,12 @@ int smartmedia_protected(const device_config *device)
 }
 
 /*
-	write a byte to SmartMedia command port
+    write a byte to SmartMedia command port
 */
 void smartmedia_command_w(const device_config *device, UINT8 data)
 {
 	smartmedia_t *sm = get_safe_token(device);
-	
+
 	if (!smartmedia_present(device))
 		return;
 
@@ -286,7 +286,7 @@ void smartmedia_command_w(const device_config *device, UINT8 data)
 		}
 		break;
 	/*case 0x11:
-		break;*/
+        break;*/
 	case 0x60:
 		sm->mode = SM_M_ERASE;
 		sm->page_addr = 0;
@@ -312,12 +312,12 @@ void smartmedia_command_w(const device_config *device, UINT8 data)
 		sm->mode = SM_M_READSTATUS;
 		break;
 	/*case 0x71:
-		break;*/
+        break;*/
 	case 0x90:
 		sm->mode = SM_M_READID;
 		break;
 	/*case 0x91:
-		break;*/
+        break;*/
 	default:
 		logerror("smartmedia: unsupported command 0x%02x\n", data);
 		sm->mode = SM_M_INIT;
@@ -326,12 +326,12 @@ void smartmedia_command_w(const device_config *device, UINT8 data)
 }
 
 /*
-	write a byte to SmartMedia address port
+    write a byte to SmartMedia address port
 */
 void smartmedia_address_w(const device_config *device, UINT8 data)
 {
 	smartmedia_t *sm = get_safe_token(device);
-	
+
 	if (!smartmedia_present(device))
 		return;
 
@@ -380,7 +380,7 @@ void smartmedia_address_w(const device_config *device, UINT8 data)
 }
 
 /*
-	read a byte from SmartMedia data port
+    read a byte from SmartMedia data port
 */
 UINT8 smartmedia_data_r(const device_config *device)
 {
@@ -425,12 +425,12 @@ UINT8 smartmedia_data_r(const device_config *device)
 }
 
 /*
-	write a byte to SmartMedia data port
+    write a byte to SmartMedia data port
 */
 void smartmedia_data_w(const device_config *device, UINT8 data)
 {
 	smartmedia_t *sm = get_safe_token(device);
-	
+
 	if (!smartmedia_present(device))
 		return;
 
@@ -456,13 +456,13 @@ void smartmedia_data_w(const device_config *device, UINT8 data)
 
 
 /*
-	Initialize one SmartMedia chip: may be called at driver init or image load
-	time (or machine init time if you don't use MESS image core)
+    Initialize one SmartMedia chip: may be called at driver init or image load
+    time (or machine init time if you don't use MESS image core)
 */
 static DEVICE_RESET(smartmedia)
 {
 	smartmedia_t *sm = get_safe_token(device);
-	
+
 	sm->mode = SM_M_INIT;
 	sm->pointer_mode = SM_PM_A;
 	sm->status = (sm->status & 0x80) | 0x40;
@@ -471,11 +471,11 @@ static DEVICE_RESET(smartmedia)
 
 DEVICE_GET_INFO( smartmedia )
 {
-	switch ( state ) 
+	switch ( state )
 	{
 		case DEVINFO_INT_CLASS:	                    info->i = DEVICE_CLASS_PERIPHERAL;                         break;
 		case DEVINFO_INT_TOKEN_BYTES:				info->i = sizeof(smartmedia_t);				break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:		info->i = 0;	
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:		info->i = 0;
 		case DEVINFO_INT_IMAGE_TYPE:	            info->i = IO_MEMCARD;                                      break;
 		case DEVINFO_INT_IMAGE_READABLE:            info->i = 1;                                               break;
 		case DEVINFO_INT_IMAGE_WRITEABLE:			info->i = 1;                                               break;

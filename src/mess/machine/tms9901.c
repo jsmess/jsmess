@@ -1,7 +1,7 @@
 /*
-	TMS9901 Programmable System Interface
+    TMS9901 Programmable System Interface
 
-	Raphael Nabet, 2000-2004
+    Raphael Nabet, 2000-2004
 */
 
 #include <math.h>
@@ -10,78 +10,78 @@
 #include "tms9901.h"
 
 /*
-	TMS9901 emulation.
+    TMS9901 emulation.
 
 Overview:
-	TMS9901 is a support chip for TMS9900.  It handles interrupts, provides
-	several I/O pins, and a timer (a.k.a. clock: it is merely a register which
-	decrements regularly and can generate an interrupt when it reaches 0).
+    TMS9901 is a support chip for TMS9900.  It handles interrupts, provides
+    several I/O pins, and a timer (a.k.a. clock: it is merely a register which
+    decrements regularly and can generate an interrupt when it reaches 0).
 
-	It communicates with the TMS9900 with the CRU bus, and with the rest of the
-	world with a number of parallel I/O pins.
+    It communicates with the TMS9900 with the CRU bus, and with the rest of the
+    world with a number of parallel I/O pins.
 
-	I/O and timer functions should work with any other 990/99xx/99xxx CPU.
-	On the other hand, interrupt handling was primarily designed for tms9900
-	and 99000 based systems: other CPUs can support interrupts, but not the 16
-	distinct interrupt vectors.
+    I/O and timer functions should work with any other 990/99xx/99xxx CPU.
+    On the other hand, interrupt handling was primarily designed for tms9900
+    and 99000 based systems: other CPUs can support interrupts, but not the 16
+    distinct interrupt vectors.
 
 Pins:
-	Vcc, Vss: power supply
-	Phi*: system clock (connected to TMS9900 Phi3* or TMS9980 CLKOUT*)
-	RST1*: reset input
-	CRUIN, CRUOUT, CRUCLK, CE*, S0-S4: CRU bus (CPU interface)
-	INTREQ*, IC0-IC3: interrupt bus (CPU interface)
-	INT*1-INT*6: used as interrupt/input pins.
-	P0-P6: used as input/output pins.
-	INT*7/P15-INT*15/P7: used as either interrupt/input or input/output pins.
-	  Note that a pin cannot be used simultaneously as output and as interrupt.
-	  (This is mostly obvious, but it implies that you cannot trigger an
-	  interrupt by setting the output state of a pin, which is not SO obvious.)
+    Vcc, Vss: power supply
+    Phi*: system clock (connected to TMS9900 Phi3* or TMS9980 CLKOUT*)
+    RST1*: reset input
+    CRUIN, CRUOUT, CRUCLK, CE*, S0-S4: CRU bus (CPU interface)
+    INTREQ*, IC0-IC3: interrupt bus (CPU interface)
+    INT*1-INT*6: used as interrupt/input pins.
+    P0-P6: used as input/output pins.
+    INT*7/P15-INT*15/P7: used as either interrupt/input or input/output pins.
+      Note that a pin cannot be used simultaneously as output and as interrupt.
+      (This is mostly obvious, but it implies that you cannot trigger an
+      interrupt by setting the output state of a pin, which is not SO obvious.)
 
 Interrupt handling:
-	After each clock cycle, TMS9901 latches the state of INT1*-INT15* (except
-	pins which are set as output pins).  If the clock is enabled, it replaces
-	INT3* with an internal timer interrupt flag.  Then it inverts the value and
-	performs a bit-wise AND with the interrupt mask.
+    After each clock cycle, TMS9901 latches the state of INT1*-INT15* (except
+    pins which are set as output pins).  If the clock is enabled, it replaces
+    INT3* with an internal timer interrupt flag.  Then it inverts the value and
+    performs a bit-wise AND with the interrupt mask.
 
-	If there are some unmasked interrupt bits, INTREQ* is asserted and the code
-	of the lowest active interrupt is placed on IC0-IC3.  If these pins are
-	duly connected to the tms9900 INTREQ* and IC0-IC3 pins, the result is that
-	asserting an INTn* on tms9901 will cause a level-n interrupt request on the
-	tms9900, provided that this interrupt pin is not masked in tms9901, and
-	that no unmasked higher-priority (i.e. lower-level) interrupt pin is set.
+    If there are some unmasked interrupt bits, INTREQ* is asserted and the code
+    of the lowest active interrupt is placed on IC0-IC3.  If these pins are
+    duly connected to the tms9900 INTREQ* and IC0-IC3 pins, the result is that
+    asserting an INTn* on tms9901 will cause a level-n interrupt request on the
+    tms9900, provided that this interrupt pin is not masked in tms9901, and
+    that no unmasked higher-priority (i.e. lower-level) interrupt pin is set.
 
-	This interrupt request lasts for as long as the interrupt pin and the
-	relevant bit in the interrupt mask are set (level-triggered interrupts).
-	(The request may be shadowed by a higher-priority interrupt request, but
-	it will resume when the higher-priority request ends.)
+    This interrupt request lasts for as long as the interrupt pin and the
+    relevant bit in the interrupt mask are set (level-triggered interrupts).
+    (The request may be shadowed by a higher-priority interrupt request, but
+    it will resume when the higher-priority request ends.)
 
-	TIMER interrupts are kind of an exception, since they are not associated
-	with an external interrupt pin.  I think there is an internal timer
-	interrupt flag that is set when the decrementer reaches 0, and is cleared
-	by a write to the 9901 int*3 enable bit ("SBO 3" in interrupt mode).
+    TIMER interrupts are kind of an exception, since they are not associated
+    with an external interrupt pin.  I think there is an internal timer
+    interrupt flag that is set when the decrementer reaches 0, and is cleared
+    by a write to the 9901 int*3 enable bit ("SBO 3" in interrupt mode).
 
 TODO:
-	* Emulate the RST1* input.  Note that RST1* active (low) makes INTREQ*
-	  inactive (high) with IC0-IC3 = 0.
-	* the clock read register is updated every time the timer decrements when
-	  the TMS9901 is not in clock mode.  This probably implies that if the
-	  clock mode is cleared and re-asserted immediately, the tms9901 may fail
-	  to update the clock read register: this is not emulated.
-	* The clock mode is entered when a 1 is written to the control bit.  It is
-	  exited when a 0 is written to the control bit or the a tms9901 select bit
-	  greater than 15 is accessed.  According to the data sheet, "when CE* is
-	  inactive (HIGH), the PSI is not disabled from seeing the select lines.
-	  As the CPU is accessing memory, A10-A14 could very easily have a value of
-	  15 or greater" (this is assuming that S0-S4 are connected to A10-A14,
-	  which makes sense with most tms9900 family members).  There is no way
-	  this "feature" (I would call it a hardware bug) can be emulated
-	  efficiently, as we would need to watch every memory access.
+    * Emulate the RST1* input.  Note that RST1* active (low) makes INTREQ*
+      inactive (high) with IC0-IC3 = 0.
+    * the clock read register is updated every time the timer decrements when
+      the TMS9901 is not in clock mode.  This probably implies that if the
+      clock mode is cleared and re-asserted immediately, the tms9901 may fail
+      to update the clock read register: this is not emulated.
+    * The clock mode is entered when a 1 is written to the control bit.  It is
+      exited when a 0 is written to the control bit or the a tms9901 select bit
+      greater than 15 is accessed.  According to the data sheet, "when CE* is
+      inactive (HIGH), the PSI is not disabled from seeing the select lines.
+      As the CPU is accessing memory, A10-A14 could very easily have a value of
+      15 or greater" (this is assuming that S0-S4 are connected to A10-A14,
+      which makes sense with most tms9900 family members).  There is no way
+      this "feature" (I would call it a hardware bug) can be emulated
+      efficiently, as we would need to watch every memory access.
 */
 
 
 /*
-	tms9901 state structure
+    tms9901 state structure
 */
 
 
@@ -94,10 +94,10 @@ struct _tms9901_t
 {
 	/* interrupt registers */
 	int supported_int_mask;	/* mask:  bit #n is set if pin #n is supported as an interrupt pin,
-							  i.e. the driver sends a notification whenever the pin state changes */
+                              i.e. the driver sends a notification whenever the pin state changes */
 							/* setting these bits is not required, but it saves you the trouble of
-							  saving the state of interrupt pins and feeding it to the port read
-							  handlers again */
+                              saving the state of interrupt pins and feeding it to the port read
+                              handlers again */
 	int int_state;			/* state of the int1-int15 lines */
 	int timer_int_pending;	/* timer int pending (overrides int3 pin if timer enabled) */
 	int enabled_ints;		/* interrupt enable mask */
@@ -114,17 +114,17 @@ struct _tms9901_t
 	void *timer;			/* MESS timer, used to emulate the decrementer register */
 
 	int clockinvl;			/* clock interval, loaded in decrementer when it reaches 0.
-							  0 means decrementer off */
+                              0 means decrementer off */
 	int latchedtimer;		/* when we go into timer mode, the decrementer is copied there to allow to read it reliably */
 
 	int mode9901;			/* TMS9901 current mode
-							  0 = so-called interrupt mode (read interrupt
-							    state, write interrupt enable mask)
-							  1 = clock mode (read/write clock interval) */
+                              0 = so-called interrupt mode (read interrupt
+                                state, write interrupt enable mask)
+                              1 = clock mode (read/write clock interval) */
 
 	/* tms9901 clock rate (PHI* pin, normally connected to TMS9900 Phi3*) */
 	/* decrementer rate equates PHI* rate/64 (e.g. 46875Hz for a 3MHz clock)
-	(warning: 3MHz on a tms9900 is equivalent to 12MHz on a tms9995 or tms99000) */
+    (warning: 3MHz on a tms9900 is equivalent to 12MHz on a tms9995 or tms99000) */
 	double clock_rate;
 
 	/* Pointer to interface */
@@ -145,13 +145,13 @@ INLINE tms9901_t *get_token(const device_config *device)
 
 
 /*
-	utilities
+    utilities
 */
 
 
 /*
-	return the number of the first (i.e. least significant) non-zero bit among
-	the 16 first bits
+    return the number of the first (i.e. least significant) non-zero bit among
+    the 16 first bits
 */
 static int find_first_bit(int value)
 {
@@ -190,7 +190,7 @@ static int find_first_bit(int value)
 }
 
 /*
-	should be called after any change to int_state or enabled_ints.
+    should be called after any change to int_state or enabled_ints.
 */
 static void tms9901_field_interrupts(const device_config *device)
 {
@@ -214,7 +214,7 @@ static void tms9901_field_interrupts(const device_config *device)
 	if (current_ints)
 	{
 		/* find which interrupt tripped us:
-		  we simply look for the first bit set to 1 in current_ints... */
+          we simply look for the first bit set to 1 in current_ints... */
 		int level = find_first_bit(current_ints);
 
 		tms->int_pending = TRUE;
@@ -233,13 +233,13 @@ static void tms9901_field_interrupts(const device_config *device)
 
 
 /*
-	function which should be called by the driver when the state of an INTn*
-	pin changes (only required if the pin is set up as an interrupt pin)
+    function which should be called by the driver when the state of an INTn*
+    pin changes (only required if the pin is set up as an interrupt pin)
 
-	state == 0: INTn* is inactive (high)
-	state != 0: INTn* is active (low)
+    state == 0: INTn* is inactive (high)
+    state != 0: INTn* is active (low)
 
-	0<=pin_number<=15
+    0<=pin_number<=15
 */
 void tms9901_set_single_int(const device_config *device, int pin_number, int state)
 {
@@ -256,8 +256,8 @@ void tms9901_set_single_int(const device_config *device, int pin_number, int sta
 
 
 /*
-	This call-back is called by the MESS timer system when the decrementer
-	reaches 0.
+    This call-back is called by the MESS timer system when the decrementer
+    reaches 0.
 */
 static TIMER_CALLBACK(decrementer_callback)
 {
@@ -270,7 +270,7 @@ static TIMER_CALLBACK(decrementer_callback)
 }
 
 /*
-	load the content of clockinvl into the decrementer
+    load the content of clockinvl into the decrementer
 */
 static void tms9901_timer_reload(const device_config *device)
 {
@@ -288,21 +288,21 @@ static void tms9901_timer_reload(const device_config *device)
 
 
 /*----------------------------------------------------------------
-	TMS9901 CRU interface.
+    TMS9901 CRU interface.
 ----------------------------------------------------------------*/
 
 /*
-	Read a 8 bit chunk from tms9901.
+    Read a 8 bit chunk from tms9901.
 
-	signification:
-	bit 0: mode9901
-	if (mode9901 == 0)
-	 bit 1-15: current status of the INT1*-INT15* pins
-	else
-	 bit 1-14: current timer value
-	 bit 15: value of the INTREQ* (interrupt request to TMS9900) pin.
+    signification:
+    bit 0: mode9901
+    if (mode9901 == 0)
+     bit 1-15: current status of the INT1*-INT15* pins
+    else
+     bit 1-14: current timer value
+     bit 15: value of the INTREQ* (interrupt request to TMS9900) pin.
 
-	bit 16-31: current status of the P0-P15 pins (quits timer mode, too...)
+    bit 16-31: current status of the P0-P15 pins (quits timer mode, too...)
 */
 READ8_DEVICE_HANDLER ( tms9901_cru_r )
 {
@@ -373,17 +373,17 @@ READ8_DEVICE_HANDLER ( tms9901_cru_r )
 }
 
 /*
-	Write 1 bit to tms9901.
+    Write 1 bit to tms9901.
 
-	signification:
-	bit 0: write mode9901
-	if (mode9901 == 0)
-	 bit 1-15: write interrupt mask register
-	else
-	 bit 1-14: write timer period
-	 bit 15: if written value == 0, soft reset (just resets all I/O pins as input)
+    signification:
+    bit 0: write mode9901
+    if (mode9901 == 0)
+     bit 1-15: write interrupt mask register
+    else
+     bit 1-14: write timer period
+     bit 15: if written value == 0, soft reset (just resets all I/O pins as input)
 
-	bit 16-31: set output state of P0-P15 (and set them as output pin) (quit timer mode, too...)
+    bit 16-31: set output state of P0-P15 (and set them as output pin) (quit timer mode, too...)
 */
 WRITE8_DEVICE_HANDLER ( tms9901_cru_w )
 {
@@ -402,7 +402,7 @@ WRITE8_DEVICE_HANDLER ( tms9901_cru_w )
 			if (tms->mode9901)
 			{
 				/* we are switching to clock mode: latch the current value of
-				the decrementer register */
+                the decrementer register */
 				if (tms->clockinvl)
 					tms->latchedtimer = ceil(attotime_to_double(timer_timeleft(tms->timer)) * (tms->clock_rate / 64.));
 				else
@@ -429,11 +429,11 @@ WRITE8_DEVICE_HANDLER ( tms9901_cru_w )
 	case 0x0D:
 	case 0x0E:
 		/*
-			write one bit to 9901 (bits 1-14)
+            write one bit to 9901 (bits 1-14)
 
-			mode9901==0 ?  Disable/Enable an interrupt
-			            :  Bit in clock interval
-		*/
+            mode9901==0 ?  Disable/Enable an interrupt
+                        :  Bit in clock interval
+        */
 		/* offset is the index of the modified bit of register (-> interrupt number -1) */
 		if (tms->mode9901)
 		{	/* modify clock interval */

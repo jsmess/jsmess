@@ -31,10 +31,10 @@ static ADDRESS_MAP_START( vector06_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE( 0x00, 0x03) AM_READWRITE(vector_8255_1_r, vector_8255_1_w )
 	AM_RANGE( 0x04, 0x07) AM_READWRITE(vector_8255_2_r, vector_8255_2_w )
 	AM_RANGE( 0x0C, 0x0C) AM_WRITE ( vector06_color_set )
-	AM_RANGE( 0x18, 0x18) AM_DEVREADWRITE("wd1793", wd17xx_data_r,wd17xx_data_w) 		
-	AM_RANGE( 0x19, 0x19) AM_DEVREADWRITE("wd1793", wd17xx_sector_r,wd17xx_sector_w) 
-	AM_RANGE( 0x1A, 0x1A) AM_DEVREADWRITE("wd1793", wd17xx_track_r,wd17xx_track_w) 
-  	AM_RANGE( 0x1B, 0x1B) AM_DEVREADWRITE("wd1793", wd17xx_status_r,wd17xx_command_w) 
+	AM_RANGE( 0x18, 0x18) AM_DEVREADWRITE("wd1793", wd17xx_data_r,wd17xx_data_w)
+	AM_RANGE( 0x19, 0x19) AM_DEVREADWRITE("wd1793", wd17xx_sector_r,wd17xx_sector_w)
+	AM_RANGE( 0x1A, 0x1A) AM_DEVREADWRITE("wd1793", wd17xx_track_r,wd17xx_track_w)
+  	AM_RANGE( 0x1B, 0x1B) AM_DEVREADWRITE("wd1793", wd17xx_status_r,wd17xx_command_w)
   	AM_RANGE( 0x1C, 0x1C) AM_WRITE(vector_disc_w)
 ADDRESS_MAP_END
 
@@ -122,10 +122,10 @@ static INPUT_PORTS_START( vector06 )
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT)
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Ctrl") PORT_CODE(KEYCODE_LCONTROL)
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Rus/Lat") PORT_CODE(KEYCODE_LALT)
-	PORT_START("RESET") 
-		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Reset") PORT_CODE(KEYCODE_F11)		
-		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Reset 2") PORT_CODE(KEYCODE_F12)		
-	
+	PORT_START("RESET")
+		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Reset") PORT_CODE(KEYCODE_F11)
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Reset 2") PORT_CODE(KEYCODE_F12)
+
 INPUT_PORTS_END
 
 static const cassette_config vector_cassette_config =
@@ -155,7 +155,7 @@ static const floppy_config vector_floppy_config =
 static MACHINE_DRIVER_START( vector06 )
   /* basic machine hardware */
   	MDRV_CPU_ADD("maincpu", 8080, 3000000)
-//	MDRV_CPU_ADD("maincpu", Z80, 3000000)
+//  MDRV_CPU_ADD("maincpu", Z80, 3000000)
   	MDRV_CPU_PROGRAM_MAP(vector06_mem)
   	MDRV_CPU_IO_MAP(vector06_io)
   	MDRV_CPU_VBLANK_INT("screen", vector06_interrupt)
@@ -185,9 +185,9 @@ static MACHINE_DRIVER_START( vector06 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MDRV_CASSETTE_ADD( "cassette", vector_cassette_config )
-	
-	MDRV_WD1793_ADD("wd1793", default_wd17xx_interface_2_drives )	
-	MDRV_FLOPPY_2_DRIVES_ADD(vector_floppy_config)	
+
+	MDRV_WD1793_ADD("wd1793", default_wd17xx_interface_2_drives )
+	MDRV_FLOPPY_2_DRIVES_ADD(vector_floppy_config)
 
 	/* cartridge */
 	MDRV_CARTSLOT_ADD("cart")
@@ -219,7 +219,7 @@ ROM_START( vec1200 )
   	ROM_LOAD( "vec1200.bin", 0x10000, 0x2000, CRC(37349224) SHA1(060fbb2c1a89040c929521cfd58cb6f1431a8b75))
   	ROM_CART_LOAD("cart", 0x18000, 0x8000, ROM_FILL_FF | ROM_OPTIONAL)
     ROM_REGION( 0x0200, "palette", 0 )
-  	ROM_LOAD( "palette.bin", 0x0000, 0x0200, CRC(74b7376b) SHA1(fb56b60babd7e6ed68e5f4e791ad2800d7ef6729))    
+  	ROM_LOAD( "palette.bin", 0x0000, 0x0200, CRC(74b7376b) SHA1(fb56b60babd7e6ed68e5f4e791ad2800d7ef6729))
 ROM_END
 ROM_START( pk6128c )
     ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF )
@@ -233,7 +233,7 @@ SYSTEM_CONFIG_END
 
 /* Driver */
 
-/*    YEAR  NAME    	 PARENT  COMPAT  MACHINE     INPUT       INIT     CONFIG COMPANY                  FULLNAME   FLAGS */
+/*    YEAR  NAME         PARENT  COMPAT  MACHINE     INPUT       INIT     CONFIG COMPANY                  FULLNAME   FLAGS */
 COMP( 1987, vector06, 	 0,  	 	0,	vector06, 	vector06, 	vector06, vector06,  "", 					 "Vector 06c",	 GAME_NOT_WORKING)
 COMP( 1987, vec1200, 	 vector06, 	0,	vector06, 	vector06, 	vector06, vector06,  "", 					 "Vector 1200",	 GAME_NOT_WORKING)
 COMP( 1987, pk6128c, 	 vector06,  0,	vector06, 	vector06, 	vector06, vector06,  "", 					 "PK-6128c",	 GAME_NOT_WORKING)

@@ -9,10 +9,10 @@
 
 /*
 
-	TODO:
-	
-	- update frequency from interface capacitor value
-	- debounce from interface capacitor value
+    TODO:
+
+    - update frequency from interface capacitor value
+    - debounce from interface capacitor value
 
 */
 
@@ -73,7 +73,7 @@ INLINE const mm74c922_interface *get_interface(const device_config *device)
 
 /*-------------------------------------------------
     change_output_lines - change output line
-	state
+    state
 -------------------------------------------------*/
 
 static void change_output_lines(const device_config *device)
@@ -92,7 +92,7 @@ static void change_output_lines(const device_config *device)
 
 /*-------------------------------------------------
     clock_scan_counters - clock the keyboard
-	scan counters
+    scan counters
 -------------------------------------------------*/
 
 static void clock_scan_counters(const device_config *device)

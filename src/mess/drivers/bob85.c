@@ -36,7 +36,7 @@ static READ8_HANDLER(bob85_keyboard_r)
 			case 0x20 : retVal = 0x85; break;
 			case 0x40 : retVal = 0x86; break;
 			case 0x80 : retVal = 0x87; break;
-			default : retVal = 0; break;				
+			default : retVal = 0; break;
 		}
 	}
 	if (line1!=0) {
@@ -60,7 +60,7 @@ static READ8_HANDLER(bob85_keyboard_r)
 			case 0x08 : retVal |= 0xC0; break;
 			case 0x10 : retVal |= 0xD0; break;
 			case 0x20 : retVal |= 0xF0; break;
-			default :  break;	
+			default :  break;
 		}
 	}
 	if (retVal != prev_key) {
@@ -71,16 +71,16 @@ static READ8_HANDLER(bob85_keyboard_r)
 		if (count_key <1) {
 			count_key++;
 			return retVal;
-		} else {			
+		} else {
 			return 0;
 		}
 	}
-	
+
 	if (retVal == 0) {
 		prev_key = 0;
 		count_key = 0;
-	}	
-	
+	}
+
 	return retVal;
 }
 
@@ -91,8 +91,8 @@ static WRITE8_HANDLER(bob85_7seg_w)
 
 static ADDRESS_MAP_START( bob85_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE ( 0x0A, 0x0A ) AM_READ(bob85_keyboard_r)	
-	AM_RANGE ( 0x0A, 0x0F ) AM_WRITE(bob85_7seg_w)	
+	AM_RANGE ( 0x0A, 0x0A ) AM_READ(bob85_keyboard_r)
+	AM_RANGE ( 0x0A, 0x0F ) AM_WRITE(bob85_7seg_w)
 ADDRESS_MAP_END
 
 /* Input ports */

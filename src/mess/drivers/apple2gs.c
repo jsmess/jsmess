@@ -153,41 +153,41 @@ static const es5503_interface apple2gs_es5503_interface =
 /*
 static void apple2gs_floppy35_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
-	// 3.5" floppy 
-	switch(state)
-	{
-		case MESS_DEVINFO_INT_SONYDRIV_ALLOWABLE_SIZES:		info->i = SONY_FLOPPY_ALLOW400K | SONY_FLOPPY_ALLOW800K | SONY_FLOPPY_SUPPORT2IMG; break;
+    // 3.5" floppy
+    switch(state)
+    {
+        case MESS_DEVINFO_INT_SONYDRIV_ALLOWABLE_SIZES:     info->i = SONY_FLOPPY_ALLOW400K | SONY_FLOPPY_ALLOW800K | SONY_FLOPPY_SUPPORT2IMG; break;
 
-		case MESS_DEVINFO_STR_NAME+0:						strcpy(info->s = device_temp_str(), "slot5disk1"); break;
-		case MESS_DEVINFO_STR_NAME+1:						strcpy(info->s = device_temp_str(), "slot5disk2"); break;
-		case MESS_DEVINFO_STR_SHORT_NAME+0:					strcpy(info->s = device_temp_str(), "s5d1"); break;
-		case MESS_DEVINFO_STR_SHORT_NAME+1:					strcpy(info->s = device_temp_str(), "s5d2"); break;
-		case MESS_DEVINFO_STR_DESCRIPTION+0:					strcpy(info->s = device_temp_str(), "Slot 5 Disk #1"); break;
-		case MESS_DEVINFO_STR_DESCRIPTION+1:					strcpy(info->s = device_temp_str(), "Slot 5 Disk #2"); break;
+        case MESS_DEVINFO_STR_NAME+0:                       strcpy(info->s = device_temp_str(), "slot5disk1"); break;
+        case MESS_DEVINFO_STR_NAME+1:                       strcpy(info->s = device_temp_str(), "slot5disk2"); break;
+        case MESS_DEVINFO_STR_SHORT_NAME+0:                 strcpy(info->s = device_temp_str(), "s5d1"); break;
+        case MESS_DEVINFO_STR_SHORT_NAME+1:                 strcpy(info->s = device_temp_str(), "s5d2"); break;
+        case MESS_DEVINFO_STR_DESCRIPTION+0:                    strcpy(info->s = device_temp_str(), "Slot 5 Disk #1"); break;
+        case MESS_DEVINFO_STR_DESCRIPTION+1:                    strcpy(info->s = device_temp_str(), "Slot 5 Disk #2"); break;
 
-		default:										sonydriv_device_getinfo(devclass, state, info); break;
-	}
+        default:                                        sonydriv_device_getinfo(devclass, state, info); break;
+    }
 }
 
 
 
 static void apple2gs_floppy525_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
-	// 5.25" floppy 
-	switch(state)
-	{
-		case MESS_DEVINFO_INT_APPLE525_SPINFRACT_DIVIDEND:	info->i = 15; break;
-		case MESS_DEVINFO_INT_APPLE525_SPINFRACT_DIVISOR:	info->i = 16; break;
+    // 5.25" floppy
+    switch(state)
+    {
+        case MESS_DEVINFO_INT_APPLE525_SPINFRACT_DIVIDEND:  info->i = 15; break;
+        case MESS_DEVINFO_INT_APPLE525_SPINFRACT_DIVISOR:   info->i = 16; break;
 
-		case MESS_DEVINFO_STR_NAME+0:						strcpy(info->s = device_temp_str(), "slot6disk1"); break;
-		case MESS_DEVINFO_STR_NAME+1:						strcpy(info->s = device_temp_str(), "slot6disk2"); break;
-		case MESS_DEVINFO_STR_SHORT_NAME+0:					strcpy(info->s = device_temp_str(), "s6d1"); break;
-		case MESS_DEVINFO_STR_SHORT_NAME+1:					strcpy(info->s = device_temp_str(), "s6d2"); break;
-		case MESS_DEVINFO_STR_DESCRIPTION+0:					strcpy(info->s = device_temp_str(), "Slot 6 Disk #1"); break;
-		case MESS_DEVINFO_STR_DESCRIPTION+1:					strcpy(info->s = device_temp_str(), "Slot 6 Disk #2"); break;
+        case MESS_DEVINFO_STR_NAME+0:                       strcpy(info->s = device_temp_str(), "slot6disk1"); break;
+        case MESS_DEVINFO_STR_NAME+1:                       strcpy(info->s = device_temp_str(), "slot6disk2"); break;
+        case MESS_DEVINFO_STR_SHORT_NAME+0:                 strcpy(info->s = device_temp_str(), "s6d1"); break;
+        case MESS_DEVINFO_STR_SHORT_NAME+1:                 strcpy(info->s = device_temp_str(), "s6d2"); break;
+        case MESS_DEVINFO_STR_DESCRIPTION+0:                    strcpy(info->s = device_temp_str(), "Slot 6 Disk #1"); break;
+        case MESS_DEVINFO_STR_DESCRIPTION+1:                    strcpy(info->s = device_temp_str(), "Slot 6 Disk #2"); break;
 
-		default:										apple525_device_getinfo(devclass, state, info); break;
-	}
+        default:                                        apple525_device_getinfo(devclass, state, info); break;
+    }
 }*/
 
 static const floppy_config apple2gs_floppy35_floppy_config =
@@ -234,9 +234,9 @@ static MACHINE_DRIVER_START( apple2gs )
 	/* replace the old-style FDC with an IWM */
 	MDRV_DEVICE_REMOVE("fdc")
 	MDRV_IWM_ADD("fdc", apple2_fdc_interface)
-	/* SCC */	
+	/* SCC */
 	MDRV_SCC8530_ADD("scc")
-	
+
 	MDRV_FLOPPY_APPLE_2_DRIVES_REMOVE()
 	MDRV_FLOPPY_APPLE_2_DRIVES_ADD(apple2gs_floppy525_floppy_config,15,16)
 	MDRV_FLOPPY_SONY_2_DRIVES_ADDITIONAL_ADD(apple2gs_floppy35_floppy_config)

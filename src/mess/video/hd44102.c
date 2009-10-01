@@ -9,11 +9,11 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- 4 bit mode
-	- busy flag
-	- reset flag
+    - 4 bit mode
+    - busy flag
+    - reset flag
 
 */
 
@@ -224,7 +224,7 @@ void hd44102_update(const device_config *device, bitmap_t *bitmap, const rectang
 			if ((sy >= cliprect->min_y) && (sy <= cliprect->max_y) && (sx >= cliprect->min_x) && (sx <= cliprect->max_x))
 			{
 				int color = (hd44102->status & HD44102_STATUS_DISPLAY_OFF) ? 0 : BIT(data, z % 8);
-				
+
 				*BITMAP_ADDR16(bitmap, sy, sx) = color;
 			}
 

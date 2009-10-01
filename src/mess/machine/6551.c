@@ -1,14 +1,14 @@
 /*********************************************************************
 
-	6551.h
+    6551.h
 
-	MOS Technology 6551 Asynchronous Communications Interface Adapter
+    MOS Technology 6551 Asynchronous Communications Interface Adapter
 
-	A1 A0  Write                    Read
-	 0  0  Transmit Data Register   Receiver Data Register
-	 0  1  Programmed Reset         Status Register
-	 1  0              Command Register
-	 1  1              Control Register
+    A1 A0  Write                    Read
+     0  0  Transmit Data Register   Receiver Data Register
+     0  1  Programmed Reset         Status Register
+     1  0              Command Register
+     1  1              Control Register
 
 *********************************************************************/
 
@@ -75,7 +75,7 @@ INLINE acia6551_t *get_token(const device_config *device)
 
 /*-------------------------------------------------
     acia_6551_in_callback - called when other side
-	has updated state
+    has updated state
 -------------------------------------------------*/
 
 static void acia_6551_in_callback(running_machine *machine, int id, unsigned long state)
@@ -128,7 +128,7 @@ static TIMER_CALLBACK(acia_6551_timer_callback)
 	/* if transmit is not empty... transmit data */
 	if ((acia->transmit_reg.flags & TRANSMIT_REGISTER_EMPTY)==0)
 	{
-	//	logerror("UART6551\n");
+	//  logerror("UART6551\n");
 		transmit_register_send_bit(machine, &acia->transmit_reg, &acia->connection);
 	}
 }
@@ -248,15 +248,15 @@ READ8_DEVICE_HANDLER(acia_6551_r)
 		break;
 
 	/*
-	Status			          cleared by
-	b0	Parity error * (1: error)       self clearing **
-	b1	Framing error * (1: error)      self clearing **
-	b2	Overrun * (1: error)            self clearing **
-	b3	Receive Data Register Full (1: full)  Read Receive Data Register
-	b4	Transmit Data Reg Empty (1: empty) Write Transmit Data Register
-	b5	DCD (0: DCD low, 1: DCD high) Not resettable, reflects DCD state
-	b6	DSR (0: DSR low, 1: DCD high) Not resettable, reflects DSR state
-	b7	IRQ (0: no int., 1: interrupt)  Read Status Register
+    Status                    cleared by
+    b0  Parity error * (1: error)       self clearing **
+    b1  Framing error * (1: error)      self clearing **
+    b2  Overrun * (1: error)            self clearing **
+    b3  Receive Data Register Full (1: full)  Read Receive Data Register
+    b4  Transmit Data Reg Empty (1: empty) Write Transmit Data Register
+    b5  DCD (0: DCD low, 1: DCD high) Not resettable, reflects DCD state
+    b6  DSR (0: DSR low, 1: DCD high) Not resettable, reflects DSR state
+    b7  IRQ (0: no int., 1: interrupt)  Read Status Register
     */
 		case 1:
         {
@@ -340,32 +340,32 @@ WRITE8_DEVICE_HANDLER(acia_6551_w)
 
 
 		/*
-		Command Register:
+        Command Register:
 
-		b0	Data Terminal Ready
-			0 : disable receiver and all interrupts (DTR high)
-			1 : enable receiver and all interrupts (DTR low)
-		b1	Receiver Interrupt Enable
-			0 : IRQ interrupt enabled from bit 3 of status register
-			1 : IRQ interrupt disabled
-		b3,b2	Transmitter Control
-				Transmit Interrupt    RTS level    Transmitter
-			00	   disabled		high		off
-			01	   enabled		low		on
-			10	   disabled		low		on
-			11	   disabled		low	   Transmit BRK
-		b4	Normal/Echo Mode for Receiver
-			0 : normal
-			1 : echo (bits 2 and 3 must be 0)
-		b5	Parity Enable
-			0 : parity disabled, no parity bit generated or received
-			1 : parity enabled
-		b7,b6	Parity
-			00 : odd parity receiver and transmitter
-			01 : even parity receiver and transmitter
-			10 : mark parity bit transmitted, parity check disabled
-			11 : space parity bit transmitted, parity check disabled
-		*/
+        b0  Data Terminal Ready
+            0 : disable receiver and all interrupts (DTR high)
+            1 : enable receiver and all interrupts (DTR low)
+        b1  Receiver Interrupt Enable
+            0 : IRQ interrupt enabled from bit 3 of status register
+            1 : IRQ interrupt disabled
+        b3,b2   Transmitter Control
+                Transmit Interrupt    RTS level    Transmitter
+            00     disabled     high        off
+            01     enabled      low     on
+            10     disabled     low     on
+            11     disabled     low    Transmit BRK
+        b4  Normal/Echo Mode for Receiver
+            0 : normal
+            1 : echo (bits 2 and 3 must be 0)
+        b5  Parity Enable
+            0 : parity disabled, no parity bit generated or received
+            1 : parity enabled
+        b7,b6   Parity
+            00 : odd parity receiver and transmitter
+            01 : even parity receiver and transmitter
+            10 : mark parity bit transmitted, parity check disabled
+            11 : space parity bit transmitted, parity check disabled
+        */
 
 		case 2:
 		{
@@ -403,39 +403,39 @@ WRITE8_DEVICE_HANDLER(acia_6551_w)
 		break;
 
 		/*
-		Control register:
+        Control register:
 
-		b3-b0	baud rate generator:
-			0000 : 16x external clock
-			0001 : 50 baud
-			0010 : 75 25
-			0011 : 110 35
-			0100 : 134.5
-			0101 : 150
-			0110 : 300 150
-			0111 : 600 300
-			1000 : 1200	600
-			1001 : 1800	600
-			1010 : 2400 600
-			1011 : 3600 1200
-			1100 : 4800 1200
-			1101 : 7200 2400
-			1110 : 9600 2400
-			1111 : 19,200 9600
-		b4	receiver clock source
-			0 : external receiver clock
-			1 : baud rate generator
-		b6,b5	word length
-			00 : 8 bits
-			01 : 7
-			10 : 6
-			11 : 5
-		b7	stop bits
-			0 : 1 stop bit
-			1 : 2 stop bits
-			    (1 stop bit if parity and word length = 8)
-			    (1 1/2 stop bits if word length = 5 and no parity)
-		*/
+        b3-b0   baud rate generator:
+            0000 : 16x external clock
+            0001 : 50 baud
+            0010 : 75 25
+            0011 : 110 35
+            0100 : 134.5
+            0101 : 150
+            0110 : 300 150
+            0111 : 600 300
+            1000 : 1200 600
+            1001 : 1800 600
+            1010 : 2400 600
+            1011 : 3600 1200
+            1100 : 4800 1200
+            1101 : 7200 2400
+            1110 : 9600 2400
+            1111 : 19,200 9600
+        b4  receiver clock source
+            0 : external receiver clock
+            1 : baud rate generator
+        b6,b5   word length
+            00 : 8 bits
+            01 : 7
+            10 : 6
+            11 : 5
+        b7  stop bits
+            0 : 1 stop bit
+            1 : 2 stop bits
+                (1 stop bit if parity and word length = 8)
+                (1 1/2 stop bits if word length = 5 and no parity)
+        */
 		case 3:
 		{
 			unsigned char previous_control_register;

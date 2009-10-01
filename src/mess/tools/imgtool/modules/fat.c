@@ -1,8 +1,8 @@
 /****************************************************************************
 
-	fat.c
+    fat.c
 
-	PC FAT disk images
+    PC FAT disk images
 
 *****************************************************************************
 
@@ -15,7 +15,7 @@
      462      16  Partion #2 info
      478      16  Partion #3 info
      494      16  Partion #4 info
-	 510       2  Magic bytes (0x55 0xAA)
+     510       2  Magic bytes (0x55 0xAA)
 
 
   Partition info format:
@@ -23,28 +23,28 @@
   Offset  Length  Description
   ------  ------  -----------
        0       1  Active byte (0x80=active 0x00=inactive)
-	   1       1  Starting head
-	   2       1  Starting sector (bits 5-0) and high bits of starting track (bits 6-5)
-	   3       1  Low bits of starting track
-	   4       1  Partition type:
-				       0x00		Unused
-					   0x?1		FAT12	(0-15 MB)
-					   0x?2		XENIX
-					   0x?4		FAT16	(16-32 MB)
-					   0x?6		FAT16`	(32 MB-2 GB)
-					   0x?7		HPFS or NTFS
-					   0x?A		Boot Manager
-					   0x?B		FAT32	(512 MB-2 TB)
-					   0x?C		FAT32	(512 MB-2 TB LBA)
-					   0x1?		OS/2 Boot manager/Win95 hidden
-					   0xC?		DR-DOS secured partition
-					   0xD?		Multiuser DOS secured partition
-					   0xE?		SpeedStor extended partition
-	   5       1  Ending head
-	   6       1  Ending sector (bits 5-0) and high bits of ending track (bits 6-5)
-	   7       1  Low bits of ending track
-	   8       4  Sector index of beginning of partition
-	  12       4  Total sectors in partition
+       1       1  Starting head
+       2       1  Starting sector (bits 5-0) and high bits of starting track (bits 6-5)
+       3       1  Low bits of starting track
+       4       1  Partition type:
+                       0x00     Unused
+                       0x?1     FAT12   (0-15 MB)
+                       0x?2     XENIX
+                       0x?4     FAT16   (16-32 MB)
+                       0x?6     FAT16`  (32 MB-2 GB)
+                       0x?7     HPFS or NTFS
+                       0x?A     Boot Manager
+                       0x?B     FAT32   (512 MB-2 TB)
+                       0x?C     FAT32   (512 MB-2 TB LBA)
+                       0x1?     OS/2 Boot manager/Win95 hidden
+                       0xC?     DR-DOS secured partition
+                       0xD?     Multiuser DOS secured partition
+                       0xE?     SpeedStor extended partition
+       5       1  Ending head
+       6       1  Ending sector (bits 5-0) and high bits of ending track (bits 6-5)
+       7       1  Low bits of ending track
+       8       4  Sector index of beginning of partition
+      12       4  Total sectors in partition
 
 
   Boot sector format:
@@ -52,30 +52,30 @@
   Offset  Length  Description
   ------  ------  -----------
        0       3  Jump instruction (to skip over header on boot)
-	   3       8  OEM Name
+       3       8  OEM Name
       11       2  Bytes per sector
-	  13       1  Sectors per cluster
-	  14       2  Reserved sector count (including boot sector)
-	  16       1  Number of FATs (file allocation tables)
-	  17       2  Number of root directory entries
-	  19       2  Total sectors (bits 0-15)
-	  21       1  Media descriptor
-	  22       2  Sectors per FAT
-	  24       2  Sectors per track
-	  26       2  Number of heads
-	  28       4  Hidden sectors
-	  32       4  Total sectors (bits 16-47)
-	  36       1  Physical drive number
+      13       1  Sectors per cluster
+      14       2  Reserved sector count (including boot sector)
+      16       1  Number of FATs (file allocation tables)
+      17       2  Number of root directory entries
+      19       2  Total sectors (bits 0-15)
+      21       1  Media descriptor
+      22       2  Sectors per FAT
+      24       2  Sectors per track
+      26       2  Number of heads
+      28       4  Hidden sectors
+      32       4  Total sectors (bits 16-47)
+      36       1  Physical drive number
       37       1  Current head
-	  38       1  Signature
-	  39       4  ID
-	  43      11  Volume Label
-	  54       8  FAT file system type
-	  62     448  Boot machine code
-	 510       2  Magic bytes (0x55 0xAA)
+      38       1  Signature
+      39       4  ID
+      43      11  Volume Label
+      54       8  FAT file system type
+      62     448  Boot machine code
+     510       2  Magic bytes (0x55 0xAA)
 
   For more information:
-	http://support.microsoft.com/kb/q140418/
+    http://support.microsoft.com/kb/q140418/
 
 
   Directory Entry Format:
@@ -83,52 +83,52 @@
   Offset  Length  Description
   ------  ------  -----------
        0       8  DOS File Name (padded with spaces)
-	   8       3  DOS File Extension (padded with spaces)
-	  11       1  File Attributes
-	  12       2  Unknown
-	  14       4  Time of Creation
-	  18       2  Last Access Time
-	  20       2  EA-Index (OS/2 stuff)
-	  22       4  Last Modified Time
-	  26       2  First Cluster
-	  28       4  File Size
+       8       3  DOS File Extension (padded with spaces)
+      11       1  File Attributes
+      12       2  Unknown
+      14       4  Time of Creation
+      18       2  Last Access Time
+      20       2  EA-Index (OS/2 stuff)
+      22       4  Last Modified Time
+      26       2  First Cluster
+      28       4  File Size
 
 
   Dates and times are stored in separate words; when together, the time is
   first and the date is second.
 
-	Time:
-		bits 15-11		Hour
-		bits 10- 5		Minute
-		bits  4- 0		Second / 2
+    Time:
+        bits 15-11      Hour
+        bits 10- 5      Minute
+        bits  4- 0      Second / 2
 
-	Date:
-		bits 15- 9		Year - 1980
-		bits  8- 5		Month
-		bits  4- 0		Day
+    Date:
+        bits 15- 9      Year - 1980
+        bits  8- 5      Month
+        bits  4- 0      Day
 
   LFN Entry Format:
 
   Offset  Length  Description
   ------  ------  -----------
        0       1  Sequence Number (bit 6 is set on highest sequence)
-	   1      10  Name characters (five UTF-16LE chars)
-	  11       1  Attributes (always 0x0F)
-	  12       1  Reserved (always 0x00)
-	  13       1  Checksum of short filename entry
-	  14      12  Name characters (six UTF-16LE chars)
-	  26       2  Entry Cluster (always 0x00)
-	  28       4  Name characters (two UTF-16LE chars)
+       1      10  Name characters (five UTF-16LE chars)
+      11       1  Attributes (always 0x0F)
+      12       1  Reserved (always 0x00)
+      13       1  Checksum of short filename entry
+      14      12  Name characters (six UTF-16LE chars)
+      26       2  Entry Cluster (always 0x00)
+      28       4  Name characters (two UTF-16LE chars)
 
   Valid characters in DOS file names:
-	- Upper case letters A-Z
-	- Numbers 0-9
-	- Space (though there is no way to identify a trailing space)
-	- ! # $ % & ( ) - @ ^ _ ` { } ~
-	- Characters 128-255 (though the code page is indeterminate)
+    - Upper case letters A-Z
+    - Numbers 0-9
+    - Space (though there is no way to identify a trailing space)
+    - ! # $ % & ( ) - @ ^ _ ` { } ~
+    - Characters 128-255 (though the code page is indeterminate)
 
   For more information:
-	http://en.wikipedia.org/wiki/File_Allocation_Table
+    http://en.wikipedia.org/wiki/File_Allocation_Table
 
 ****************************************************************************/
 
@@ -1295,15 +1295,15 @@ static imgtoolerr_t fat_read_dirent(imgtool_partition *partition, fat_file *file
 	disk_info = fat_get_partition_info(partition);
 
 	/* The first eight bytes of a FAT directory entry is a blank padded name
-	 *
-	 * The first byte can be special:
-	 *	0x00 - entry is available and no further entry is used
-	 *	0x05 - first character is actually 0xe5
-	 *	0x2E - dot entry; either '.' or '..'
-	 *	0xE5 - entry has been erased and is available
-	 *
-	 * Byte 11 is the attributes; and 0x0F denotes a LFN entry
-	 */
+     *
+     * The first byte can be special:
+     *  0x00 - entry is available and no further entry is used
+     *  0x05 - first character is actually 0xe5
+     *  0x2E - dot entry; either '.' or '..'
+     *  0xE5 - entry has been erased and is available
+     *
+     * Byte 11 is the attributes; and 0x0F denotes a LFN entry
+     */
 	do
 	{
 		entry_index = file->index;
@@ -1650,7 +1650,7 @@ static void fat_bump_dirent(imgtool_partition *partition, UINT8 *entry, size_t e
 	}
 
 	/* since we changed the short file name, we need to recalc the checksums
-	 * in the LFN entries */
+     * in the LFN entries */
 	fat_calc_dirent_lfnchecksum(entry, entry_len);
 }
 

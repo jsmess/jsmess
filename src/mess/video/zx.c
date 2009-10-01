@@ -1,18 +1,18 @@
 /***************************************************************************
-	zx.c
+    zx.c
 
     video hardware
-	Juergen Buchmueller <pullmoll@t-online.de>, Dec 1999
+    Juergen Buchmueller <pullmoll@t-online.de>, Dec 1999
 
-	The ZX has a very unorthodox video RAM system.  To start a scanline,
-	the CPU must jump to video RAM at 0xC000, which is a mirror of the
-	RAM at 0x4000.  The video chip (ULA?) pulls a switcharoo and changes
-	the video bytes as they are fetched by the CPU.
+    The ZX has a very unorthodox video RAM system.  To start a scanline,
+    the CPU must jump to video RAM at 0xC000, which is a mirror of the
+    RAM at 0x4000.  The video chip (ULA?) pulls a switcharoo and changes
+    the video bytes as they are fetched by the CPU.
 
-	The video chip draws the scanline until a HALT instruction (0x76) is
-	reached, which indicates no further video RAM for this scanline.  Any
-	other video byte is used to generate a tile and at the same time,
-	appears to the CPU as a NOP (0x00) instruction.
+    The video chip draws the scanline until a HALT instruction (0x76) is
+    reached, which indicates no further video RAM for this scanline.  Any
+    other video byte is used to generate a tile and at the same time,
+    appears to the CPU as a NOP (0x00) instruction.
 
 ****************************************************************************/
 
@@ -57,7 +57,7 @@ void zx_ula_bkgnd(running_machine *machine, int color)
 
 		new_y = video_screen_get_vpos(machine->primary_screen);
 		new_x = video_screen_get_hpos(machine->primary_screen);
-/*		logerror("zx_ula_bkgnd: %3d,%3d - %3d,%3d\n", old_x, old_y, new_x, new_y);*/
+/*      logerror("zx_ula_bkgnd: %3d,%3d - %3d,%3d\n", old_x, old_y, new_x, new_y);*/
 		y = old_y;
 		for (;;)
 		{
@@ -88,21 +88,21 @@ void zx_ula_bkgnd(running_machine *machine, int color)
 
 /*
  * PAL:  310 total lines,
- *			  0.. 55 vblank
- *			 56..247 192 visible lines
- *			248..303 vblank
- *			304...	 vsync
+ *            0.. 55 vblank
+ *           56..247 192 visible lines
+ *          248..303 vblank
+ *          304...   vsync
  * NTSC: 262 total lines
- *			  0.. 31 vblank
- *			 32..223 192 visible lines
- *			224..233 vblank
+ *            0.. 31 vblank
+ *           32..223 192 visible lines
+ *          224..233 vblank
  */
 static TIMER_CALLBACK(zx_ula_nmi)
 {
 	/*
-	 * An NMI is issued on the ZX81 every 64us for the blanked
-	 * scanlines at the top and bottom of the display.
-	 */
+     * An NMI is issued on the ZX81 every 64us for the blanked
+     * scanlines at the top and bottom of the display.
+     */
 	const device_config *screen = video_screen_first(machine->config);
 	int height = video_screen_get_height(screen);
 	rectangle r = *video_screen_get_visible_area(screen);
@@ -110,7 +110,7 @@ static TIMER_CALLBACK(zx_ula_nmi)
 
 	r.min_y = r.max_y = ula_scanline_count;
 	bitmap_fill(bitmap, &r, 1);
-//	logerror("ULA %3d[%d] NMI, R:$%02X, $%04x\n", video_screen_get_vpos(machine->primary_screen), ula_scancode_count, (unsigned) cpu_get_reg(cputag_get_cpu(machine, "maincpu"), Z80_R), (unsigned) cpu_get_reg(cputag_get_cpu(machine, "maincpu"), Z80_PC));
+//  logerror("ULA %3d[%d] NMI, R:$%02X, $%04x\n", video_screen_get_vpos(machine->primary_screen), ula_scancode_count, (unsigned) cpu_get_reg(cputag_get_cpu(machine, "maincpu"), Z80_R), (unsigned) cpu_get_reg(cputag_get_cpu(machine, "maincpu"), Z80_PC));
 	cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 	if (++ula_scanline_count == height)
 		ula_scanline_count = 0;
@@ -120,13 +120,13 @@ static TIMER_CALLBACK(zx_ula_irq)
 {
 
 	/*
-	 * An IRQ is issued on the ZX80/81 whenever the R registers
-	 * bit 6 goes low. In MESS this IRQ timed from the first read
-	 * from the copy of the DFILE in the upper 32K in zx_ula_r().
-	 */
+     * An IRQ is issued on the ZX80/81 whenever the R registers
+     * bit 6 goes low. In MESS this IRQ timed from the first read
+     * from the copy of the DFILE in the upper 32K in zx_ula_r().
+     */
 	if (ula_irq_active)
 	{
-//		logerror("ULA %3d[%d] IRQ, R:$%02X, $%04x\n", video_screen_get_vpos(machine->primary_screen), ula_scancode_count, (unsigned) cpu_get_reg(cputag_get_cpu(machine, "maincpu"), Z80_R), (unsigned) cpu_get_reg(cputag_get_cpu(machine, "maincpu"), Z80_PC));
+//      logerror("ULA %3d[%d] IRQ, R:$%02X, $%04x\n", video_screen_get_vpos(machine->primary_screen), ula_scancode_count, (unsigned) cpu_get_reg(cputag_get_cpu(machine, "maincpu"), Z80_R), (unsigned) cpu_get_reg(cputag_get_cpu(machine, "maincpu"), Z80_PC));
 
 		ula_irq_active = 0;
 		cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);

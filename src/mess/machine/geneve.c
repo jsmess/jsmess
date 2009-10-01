@@ -1,6 +1,6 @@
 /*
-	Machine code for Myarc Geneve.
-	Raphael Nabet, 2003.
+    Machine code for Myarc Geneve.
+    Raphael Nabet, 2003.
 */
 
 #include <math.h>
@@ -30,7 +30,7 @@ static void poll_keyboard(running_machine *machine);
 static void poll_mouse(running_machine *machine);
 
 /*
-	pointers to memory areas
+    pointers to memory areas
 */
 /* pointer to boot ROM */
 static UINT8 *ROM_ptr;
@@ -42,7 +42,7 @@ static UINT8 *SRAM_ptr;
 static UINT8 *DRAM_ptr;
 
 /*
-	Configuration
+    Configuration
 */
 /* TRUE if speech synthesizer present */
 static char has_speech;
@@ -87,17 +87,17 @@ static int KeyAutoRepeatTimer;
 static void machine_stop_geneve(running_machine *machine);
 
 /*
-	GROM support.
+    GROM support.
 
-	The Geneve does not include any GROM, but it features a simple GROM emulator.
+    The Geneve does not include any GROM, but it features a simple GROM emulator.
 
-	One oddity is that, since the Geneve does not use a look-ahead buffer, GPL
-	data is always off one byte, i.e. GPL bytes 0, 1, 2... are stored in bytes
-	1, 2, 3... of pages >38->3f (byte 0 of page >38 is has GPL address >ffff).
+    One oddity is that, since the Geneve does not use a look-ahead buffer, GPL
+    data is always off one byte, i.e. GPL bytes 0, 1, 2... are stored in bytes
+    1, 2, 3... of pages >38->3f (byte 0 of page >38 is has GPL address >ffff).
 
-	I think that I have once read that the geneve GROM emulator does not
-	emulate wrap-around within a GROM, i.e. address >1fff is followed by >2000
-	(instead of >0000 with a real GROM).
+    I think that I have once read that the geneve GROM emulator does not
+    emulate wrap-around within a GROM, i.e. address >1fff is followed by >2000
+    (instead of >0000 with a real GROM).
 */
 static struct
 {
@@ -106,9 +106,9 @@ static struct
 } GPL_port;
 
 /*
-	Cartridge support
+    Cartridge support
 
-	The Geneve does not have a cartridge port, but it has cartridge emulation.
+    The Geneve does not have a cartridge port, but it has cartridge emulation.
 */
 static int cartridge_page;
 
@@ -138,8 +138,8 @@ enum
 
 /*===========================================================================*/
 /*
-	General purpose code:
-	initialization, cart loading, etc.
+    General purpose code:
+    initialization, cart loading, etc.
 */
 
 DRIVER_INIT( geneve )
@@ -155,8 +155,8 @@ DRIVER_INIT( genmod )
 MACHINE_START( geneve )
 {
 	/* Initialize all. Actually, at this point, we don't know
-	   how the switches are set. Later we use the configuration switches to
-	   determine which one to use. */
+       how the switches are set. Later we use the configuration switches to
+       determine which one to use. */
 	ti99_peb_init();
 	ti99_floppy_controllers_init_all(machine);
 	ti99_ide_init(machine);
@@ -257,7 +257,7 @@ static void machine_stop_geneve(running_machine *machine)
 
 
 /*
-	video initialization.
+    video initialization.
 */
 VIDEO_START(geneve)
 {
@@ -266,7 +266,7 @@ VIDEO_START(geneve)
 }
 
 /*
-	scanline interrupt
+    scanline interrupt
 */
 INTERRUPT_GEN( geneve_hblank_interrupt )
 {
@@ -281,7 +281,7 @@ INTERRUPT_GEN( geneve_hblank_interrupt )
 }
 
 /*
-	inta is connected to both tms9901 IRQ1 line and to tms9995 INT4/EC line.
+    inta is connected to both tms9901 IRQ1 line and to tms9995 INT4/EC line.
 */
 static void inta_callback(running_machine *machine, int state)
 {
@@ -290,7 +290,7 @@ static void inta_callback(running_machine *machine, int state)
 }
 
 /*
-	intb is connected to tms9901 IRQ12 line.
+    intb is connected to tms9901 IRQ12 line.
 */
 static void intb_callback(running_machine *machine, int state)
 {
@@ -304,11 +304,11 @@ static void intb_callback(running_machine *machine, int state)
 #pragma mark MEMORY HANDLERS
 #endif
 /*
-	Memory handlers.
+    Memory handlers.
 */
 
 /*
-	TMS5200 speech chip read
+    TMS5200 speech chip read
 */
 static  READ8_HANDLER ( geneve_speech_r )
 {
@@ -324,17 +324,17 @@ static void speech_kludge_callback(int dummy)
 	if (! tms5220_readyq_r(devtag_get_device(space->machine, "tms5220")))
 	{
 		/* Weirdly enough, we are always seeing some problems even though
-		everything is working fine. */
+        everything is working fine. */
 		/*attotime time_to_ready = double_to_attotime(tms5220_time_to_ready());
-		logerror("ti99/4a speech says aaargh!\n");
-		logerror("(time to ready: %f -> %d)\n", time_to_ready, (int) ceil(3000000*time_to_ready));*/
+        logerror("ti99/4a speech says aaargh!\n");
+        logerror("(time to ready: %f -> %d)\n", time_to_ready, (int) ceil(3000000*time_to_ready));*/
 	}
 }
 
 #endif
 
 /*
-	TMS5200 speech chip write
+    TMS5200 speech chip write
 */
 static WRITE8_HANDLER ( geneve_speech_w )
 {
@@ -342,9 +342,9 @@ static WRITE8_HANDLER ( geneve_speech_w )
 
 #if 1
 	/* the stupid design of the tms5220 core means that ready is cleared when
-	there are 15 bytes in FIFO.  It should be 16.  Of course, if it were the
-	case, we would need to store the value on the bus, which would be more
-	complex. */
+    there are 15 bytes in FIFO.  It should be 16.  Of course, if it were the
+    case, we would need to store the value on the bus, which would be more
+    complex. */
 	if (! tms5220_readyq_r(devtag_get_device(space->machine, "tms5220")))
 	{
 		attotime time_to_ready = double_to_attotime(tms5220_time_to_ready(devtag_get_device(space->machine, "tms5220")));
@@ -553,16 +553,16 @@ READ8_HANDLER ( geneve_r )
 
 	offset &= 0x1fff;
 
-	/* Although we could have 128K boot ROM (page f0...ff), the stock 
-	   Geneve only has 16K. The address is incompletely decoded, so page
-	   f0 is mirrored on all even pages up to fe, and f1 is mirrored on
-	   f3, f5, ... ff.
-	   Currently, MESS is delivered with the 16K ROM only. So for the time
-	   being, we won't lose much if we mask the page bits.
-	   Michael Zapf, 2008-01-23
-	*/
+	/* Although we could have 128K boot ROM (page f0...ff), the stock
+       Geneve only has 16K. The address is incompletely decoded, so page
+       f0 is mirrored on all even pages up to fe, and f1 is mirrored on
+       f3, f5, ... ff.
+       Currently, MESS is delivered with the 16K ROM only. So for the time
+       being, we won't lose much if we mask the page bits.
+       Michael Zapf, 2008-01-23
+    */
 	if (page > 0xf1) page &= 0xf1;
-	
+
 	switch (page)
 	{
 	case 0xf0:
@@ -653,9 +653,9 @@ WRITE8_HANDLER ( geneve_w )
 				page_lookup[offset-0xf110] = data;
 				return;
 
-			/*case 0xf118:	// read-only register???
-				key_buf = data;
-				return*/
+			/*case 0xf118:  // read-only register???
+                key_buf = data;
+                return*/
 
 			case 0xf120:
 				sn76496_w(devtag_get_device(space->machine, "sn76496"), 0, data);
@@ -706,9 +706,9 @@ WRITE8_HANDLER ( geneve_w )
 				page_lookup[offset-0x8000] = data;
 				return;
 
-			/*case 0x8008:	// read-only register???
-				key_buf = data;
-				return*/
+			/*case 0x8008:  // read-only register???
+                key_buf = data;
+                return*/
 
 			case 0x8010:
 			case 0x8011:
@@ -852,9 +852,9 @@ WRITE8_HANDLER ( geneve_w )
 	offset &= 0x1fff;
 
 	/* ROM is incompletely decoded. Pages f0, f2, f4 ... fe all map to the
-	   first 8K Boot ROM; f1, ..., ff to the second 8K. See above. */
+       first 8K Boot ROM; f1, ..., ff to the second 8K. See above. */
 	if (page > 0xf1) page &= 0xf1;
-	   
+
 	switch (page)
 	{
 	case 0xf0:
@@ -961,7 +961,7 @@ WRITE8_HANDLER ( geneve_peb_mode_cru_w )
 static void read_key_if_possible(running_machine *machine)
 {
 	/* if keyboard reset is not asserted, and key clock is enabled, and key
-	buffer clear is disabled, and key queue is not empty. */
+    buffer clear is disabled, and key queue is not empty. */
 	if ((! KeyReset) && (mode_flags & mf_keyclock) && (mode_flags & mf_keyclear) && KeyQueueLen)
 	{
 		tms9901_set_single_int(devtag_get_device(machine, "tms9901"), 8, 1);
@@ -991,15 +991,15 @@ static void poll_keyboard(running_machine *machine)
 		0x1d,	/* right control */
 		0x38,	/* alt gr */
 		/* extra codes are 0x5b for Left Windows, 0x5c for Right Windows, 0x5d
-		for Menu, 0x5e for power, 0x5f for sleep, 0x63 for wake, but I doubt
-		any Geneve program would take advantage of these. */
+        for Menu, 0x5e for power, 0x5f for sleep, 0x63 for wake, but I doubt
+        any Geneve program would take advantage of these. */
 
 		/* extended key that is equivalent to a non-extended key
-		with shift off */
+        with shift off */
 		0x35,	/* pad slash */
 
 		/* extended keys that are equivalent to non-extended keys
-		with numlock off */
+        with numlock off */
 		0x47,	/* home */
 		0x48,	/* up */
 		0x49,	/* page up */
@@ -1045,7 +1045,7 @@ static void poll_keyboard(running_machine *machine)
 
 					/* Release Fake Shift/Unshift if another key is pressed */
 					/* We do so if a key is released, though it is actually
-					required only if it is a modifier key */
+                    required only if it is a modifier key */
 					/*if (pressed)*/
 					{
 						if (KeyFakeShiftState)
@@ -1148,8 +1148,8 @@ static void poll_keyboard(running_machine *machine)
 					else if (keycode == 0x6f)
 					{	/* emulate pause (F15) key */
 						/* this is a bit complex, as Pause -> Ctrl+NumLock and
-						Ctrl+Pause -> Ctrl+ScrLock.  Furthermore, there is no
-						repeat or release. */
+                        Ctrl+Pause -> Ctrl+ScrLock.  Furthermore, there is no
+                        repeat or release. */
 						if (pressed)
 						{
 							if (KeyCtrlState)
@@ -1253,34 +1253,34 @@ static void poll_mouse(running_machine *machine)
 #pragma mark TMS9901 INTERFACE
 #endif
 /*
-	Geneve-specific tms9901 I/O handlers
+    Geneve-specific tms9901 I/O handlers
 
-	See mess/machine/tms9901.c for generic tms9901 CRU handlers.
+    See mess/machine/tms9901.c for generic tms9901 CRU handlers.
 */
 /*
-	TMS9901 interrupt handling on a Geneve.
+    TMS9901 interrupt handling on a Geneve.
 
-	Geneve uses the following interrupts:
-	INT1: external interrupt (used by RS232 controller, for instance) -
-	  connected to tms9995 int4, too.
-	INT2: VDP interrupt
-	TMS9901 timer interrupt? (overrides INT3)
-	INT8: keyboard interrupt???
-	INT10: mouse interrupt???
-	INT11: clock interrupt???
-	INT12: INTB interrupt from PE-bus
+    Geneve uses the following interrupts:
+    INT1: external interrupt (used by RS232 controller, for instance) -
+      connected to tms9995 int4, too.
+    INT2: VDP interrupt
+    TMS9901 timer interrupt? (overrides INT3)
+    INT8: keyboard interrupt???
+    INT10: mouse interrupt???
+    INT11: clock interrupt???
+    INT12: INTB interrupt from PE-bus
 */
 
 /*
-	set the state of int2 (called by tms9928 core)
+    set the state of int2 (called by tms9928 core)
 */
 /*void tms9901_set_int2(int state)
 {
-	tms9901_set_single_int(devtag_get_device(machine, "tms9901"), 2, state);
+    tms9901_set_single_int(devtag_get_device(machine, "tms9901"), 2, state);
 }*/
 
 /*
-	Called by the 9901 core whenever the state of INTREQ and IC0-3 changes
+    Called by the 9901 core whenever the state of INTREQ and IC0-3 changes
 */
 static TMS9901_INT_CALLBACK( tms9901_interrupt_callback )
 {
@@ -1289,12 +1289,12 @@ static TMS9901_INT_CALLBACK( tms9901_interrupt_callback )
 }
 
 /*
-	Read pins INT3*-INT7* of Geneve 9901.
+    Read pins INT3*-INT7* of Geneve 9901.
 
-	signification:
-	 (bit 1: INT1 status)
-	 (bit 2: INT2 status)
-	 bit 3-7: joystick status
+    signification:
+     (bit 1: INT1 status)
+     (bit 2: INT2 status)
+     bit 3-7: joystick status
 */
 static READ8_DEVICE_HANDLER( R9901_0 )
 {
@@ -1306,16 +1306,16 @@ static READ8_DEVICE_HANDLER( R9901_0 )
 }
 
 /*
-	Read pins INT8*-INT15* of Geneve 9901.
+    Read pins INT8*-INT15* of Geneve 9901.
 
-	signification:
-	 (bit 0: keyboard interrupt)
-	 bit 1: unused
-	 bit 2: mouse right button
-	 (bit 3: clock interrupt)
-	 (bit 4: INTB from PE-bus)
-	 bit 5 & 7: used as output
-	 bit 6: unused
+    signification:
+     (bit 0: keyboard interrupt)
+     bit 1: unused
+     bit 2: mouse right button
+     (bit 3: clock interrupt)
+     (bit 4: INTB from PE-bus)
+     bit 5 & 7: used as output
+     bit 6: unused
 */
 static READ8_DEVICE_HANDLER( R9901_1 )
 {
@@ -1327,7 +1327,7 @@ static READ8_DEVICE_HANDLER( R9901_1 )
 }
 
 /*
-	Read pins P0-P7 of Geneve 9901.
+    Read pins P0-P7 of Geneve 9901.
 */
 static READ8_DEVICE_HANDLER( R9901_2 )
 {
@@ -1335,8 +1335,8 @@ static READ8_DEVICE_HANDLER( R9901_2 )
 }
 
 /*
-	Read pins P8-P15 of Geneve 9901.
-	bit 4: mouse right button
+    Read pins P8-P15 of Geneve 9901.
+    bit 4: mouse right button
 */
 static READ8_DEVICE_HANDLER( R9901_3 )
 {
@@ -1350,21 +1350,21 @@ static READ8_DEVICE_HANDLER( R9901_3 )
 
 
 /*
-	Write PE bus reset line
+    Write PE bus reset line
 */
 static WRITE8_DEVICE_HANDLER( W9901_PE_bus_reset )
 {
 }
 
 /*
-	Write VDP reset line
+    Write VDP reset line
 */
 static WRITE8_DEVICE_HANDLER( W9901_VDP_reset )
 {
 }
 
 /*
-	Write joystick select line
+    Write joystick select line
 */
 static WRITE8_DEVICE_HANDLER( W9901_JoySel )
 {
@@ -1388,18 +1388,18 @@ static WRITE8_DEVICE_HANDLER( W9901_KeyboardReset )
 		KeyAutoRepeatKey = 0;
 	}
 	/*else
-		poll_keyboard(space->machine);*/
+        poll_keyboard(space->machine);*/
 }
 
 /*
-	Write external mem cycles (0=long, 1=short)
+    Write external mem cycles (0=long, 1=short)
 */
 static WRITE8_DEVICE_HANDLER( W9901_ext_mem_wait_states )
 {
 }
 
 /*
-	Write vdp wait cycles (1=add 15 cycles, 0=add none)
+    Write vdp wait cycles (1=add 15 cycles, 0=add none)
 */
 static WRITE8_DEVICE_HANDLER( W9901_VDP_wait_states )
 {

@@ -4,18 +4,18 @@
 
         Driver by Mariusz Wojcieszek
 
-		ToDo:
-		- map keys with Polish characters
-		- add reading of computer number (read of FE port when bit 4 of port F7 is set)
-		- printing (LPRINT from ZX Basic) hangs waiting for bit 0 of DD register (port C of PPI8255),
-		  may be a bug in handshake implementation of PPI (both PPI implementations are affected)
-		- 8251 DTR and DTS signals are connected (with some additional logic) to NMI of Z80, this
-		  is not emulated
-		- 8251 is used for JUNET network (a network of Elwro 800 Junior computers, allows sharing
-		  floppy disc drives and printers) - network is not emulated
-		- when RAM is mapped at 0x0000 - 0x1fff (in CP/J mode), reading a location 66 with /M1=0
-		  (effectively reading NMI vector) is hardwired to return 0xDF (RST #18) - this is not emulated
-		  (note that in CP/J mode address 66 is used for FCB)
+        ToDo:
+        - map keys with Polish characters
+        - add reading of computer number (read of FE port when bit 4 of port F7 is set)
+        - printing (LPRINT from ZX Basic) hangs waiting for bit 0 of DD register (port C of PPI8255),
+          may be a bug in handshake implementation of PPI (both PPI implementations are affected)
+        - 8251 DTR and DTS signals are connected (with some additional logic) to NMI of Z80, this
+          is not emulated
+        - 8251 is used for JUNET network (a network of Elwro 800 Junior computers, allows sharing
+          floppy disc drives and printers) - network is not emulated
+        - when RAM is mapped at 0x0000 - 0x1fff (in CP/J mode), reading a location 66 with /M1=0
+          (effectively reading NMI vector) is hardwired to return 0xDF (RST #18) - this is not emulated
+          (note that in CP/J mode address 66 is used for FCB)
 
 ****************************************************************************/
 
@@ -76,7 +76,7 @@ static void elwro800jr_mmu_w(running_machine *machine, UINT8 data)
 	UINT8 *prom = memory_region(machine, "proms") + 0x200;
 	UINT8 cs;
 	UINT8 ls175;
-	
+
 	ls175 = BITSWAP8(data, 7, 6, 5, 4, 4, 5, 7, 6) & 0x0f;
 
 	cs = prom[((0x0000 >> 10) | (ls175 << 6)) & 0x1ff];
@@ -519,12 +519,12 @@ static MACHINE_DRIVER_START( elwro800 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MDRV_CASSETTE_ADD( "cassette", elwro800jr_cassette_config )
-	
+
 	MDRV_FLOPPY_2_DRIVES_ADD(elwro800jr_floppy_config)
 MACHINE_DRIVER_END
 
 static SYSTEM_CONFIG_START(elwro800)
-	CONFIG_RAM_DEFAULT(64 * 1024)	
+	CONFIG_RAM_DEFAULT(64 * 1024)
 SYSTEM_CONFIG_END
 
 /*************************************

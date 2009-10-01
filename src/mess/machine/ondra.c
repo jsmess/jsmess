@@ -30,16 +30,16 @@ static UINT8 ondra_bank2_status;
 static READ8_HANDLER( ondra_keyboard_r )
 {
 	UINT8 retVal = 0x00;
-	UINT8 ondra_keyboard_line = offset & 0x000f;	
-	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8", "LINE9" }; 	
+	UINT8 ondra_keyboard_line = offset & 0x000f;
+	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8", "LINE9" };
 	double valcas = cassette_input(cassette_device_image(space->machine));
 	if ( valcas < 0.00) {
 		retVal = 0x80;
-	}	
+	}
 	if (ondra_keyboard_line > 9) {
 		retVal |= 0x1f;
 	} else {
-		retVal |= input_port_read(space->machine, keynames[ondra_keyboard_line]);	
+		retVal |= input_port_read(space->machine, keynames[ondra_keyboard_line]);
 	}
 	return retVal;
  }
@@ -84,7 +84,7 @@ WRITE8_HANDLER( ondra_port_0a_w )
 
 static TIMER_CALLBACK(nmi_check_callback)
 {
-	if ((input_port_read(machine, "NMI") & 1) == 1) 
+	if ((input_port_read(machine, "NMI") & 1) == 1)
 	{
 		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
@@ -95,7 +95,7 @@ MACHINE_RESET( ondra )
 	ondra_bank1_status = 0;
 	ondra_bank2_status = 0;
 	ondra_update_banks(machine);
-	
+
 	timer_pulse(machine, ATTOTIME_IN_HZ(10), NULL, 0, nmi_check_callback);
 }
 

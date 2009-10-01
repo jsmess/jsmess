@@ -1,31 +1,31 @@
 /*****************************************************************************
  *
- *	 pc1403.c
- *	 portable sharp pc1403 video emulator interface
+ *   pc1403.c
+ *   portable sharp pc1403 video emulator interface
  *   (sharp pocket computers)
  *
- *	 Copyright (c) 2001 Peter Trauner, all rights reserved.
+ *   Copyright (c) 2001 Peter Trauner, all rights reserved.
  *
- *	 - This source code is released as freeware for non-commercial purposes.
- *	 - You are free to use and redistribute this code in modified or
- *	   unmodified form, provided you list me in the credits.
- *	 - If you modify this source code, you must add a notice to each modified
- *	   source file that it has been changed.  If you're a nice person, you
- *	   will clearly mark each change too.  :)
- *	 - If you wish to use this for commercial purposes, please contact me at
- *	   peter.trauner@jk.uni-linz.ac.at
- *	 - The author of this copywritten work reserves the right to change the
- *	   terms of its usage and license at any time, including retroactively
- *	 - This entire notice must remain in the source code.
+ *   - This source code is released as freeware for non-commercial purposes.
+ *   - You are free to use and redistribute this code in modified or
+ *     unmodified form, provided you list me in the credits.
+ *   - If you modify this source code, you must add a notice to each modified
+ *     source file that it has been changed.  If you're a nice person, you
+ *     will clearly mark each change too.  :)
+ *   - If you wish to use this for commercial purposes, please contact me at
+ *     peter.trauner@jk.uni-linz.ac.at
+ *   - The author of this copywritten work reserves the right to change the
+ *     terms of its usage and license at any time, including retroactively
+ *   - This entire notice must remain in the source code.
  *
  * History of changes:
  * 21.07.2001 Several changes listed below were made by Mario Konegger
  *            (konegger@itp.tu-graz.ac.at)
- *	      Placed the grafical symbols onto the right place and added
- *	      some symbols, so the display is correct rebuit.
- *	      Added a strange behaviour of the display concerning the on/off
- *	      state and the BUSY-symbol, which I found out with experiments
- *	      with my own pc1403.
+ *        Placed the grafical symbols onto the right place and added
+ *        some symbols, so the display is correct rebuit.
+ *        Added a strange behaviour of the display concerning the on/off
+ *        state and the BUSY-symbol, which I found out with experiments
+ *        with my own pc1403.
  *****************************************************************************/
 
 #include "driver.h"
@@ -165,38 +165,38 @@ VIDEO_UPDATE( pc1403 )
 	color[2] = pocketc_colortable[CONTRAST][1];
 	color[1] = (pc1403_portc & 1) ? color[2] : color[0];
 
-	if (pc1403_portc & 1) 
+	if (pc1403_portc & 1)
 	{
 		for (x=RIGHT, y=DOWN, i=0; i<6*5; x+=2) {
 			for (j=0; j<5; j++, i++, x+=2)
 			drawgfx_opaque(bitmap, 0, screen->machine->gfx[0], pc1403_lcd.reg[i],CONTRAST,0,0,
 				x,y);
 		}
-		for (i=9*5; i<12*5; x+=2) 
+		for (i=9*5; i<12*5; x+=2)
 		{
 			for (j=0; j<5; j++, i++, x+=2)
 			drawgfx_opaque(bitmap, 0, screen->machine->gfx[0], pc1403_lcd.reg[i],CONTRAST,0,0,
 				x,y);
 		}
-		for (i=6*5; i<9*5; x+=2) 
+		for (i=6*5; i<9*5; x+=2)
 		{
 			for (j=0; j<5; j++, i++, x+=2)
 			drawgfx_opaque(bitmap, 0, screen->machine->gfx[0], pc1403_lcd.reg[i],CONTRAST,0,0,
 				x,y);
 		}
-		for (i=0x7b-3*5; i>0x7b-6*5; x+=2) 
+		for (i=0x7b-3*5; i>0x7b-6*5; x+=2)
 		{
 			for (j=0; j<5; j++, i--, x+=2)
 				drawgfx_opaque(bitmap, 0, screen->machine->gfx[0], pc1403_lcd.reg[i],CONTRAST,0,0,
 				x,y);
 		}
-		for (i=0x7b; i>0x7b-3*5; x+=2) 
+		for (i=0x7b; i>0x7b-3*5; x+=2)
 		{
 			for (j=0; j<5; j++, i--, x+=2)
 			drawgfx_opaque(bitmap, 0, screen->machine->gfx[0], pc1403_lcd.reg[i],CONTRAST,0,0,
 				x,y);
 		}
-		for (i=0x7b-6*5; i>0x7b-12*5; x+=2) 
+		for (i=0x7b-6*5; i>0x7b-12*5; x+=2)
 		{
 			for (j=0; j<5; j++, i--, x+=2)
 			drawgfx_opaque(bitmap, 0, screen->machine->gfx[0], pc1403_lcd.reg[i],CONTRAST,0,0,
@@ -207,7 +207,7 @@ VIDEO_UPDATE( pc1403 )
     /* But if computer is off, busy is hidden. */
     if(!(pc1403_portc&8))
     {
-		if (pc1403_portc&1) 
+		if (pc1403_portc&1)
 			pocketc_draw_special(bitmap, RIGHT, DOWN-13, busy,
 				pc1403_lcd.reg[0x3d] & 1 ? color[2] : color[0]);
 

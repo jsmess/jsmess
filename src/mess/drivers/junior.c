@@ -1,5 +1,5 @@
 /***************************************************************************
-   
+
         Elektor Junior
 
         17/07/2009 Skeleton driver.
@@ -14,7 +14,7 @@
 static UINT8		junior_port_a;
 static UINT8		junior_port_b;
 static UINT8		junior_led_time[6];
- 
+
 
  static ADDRESS_MAP_START(junior_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0x1FFF)
@@ -163,7 +163,7 @@ static TIMER_CALLBACK( junior_update_leds )
 	for ( i = 0; i < 6; i++ )
 	{
 		if ( junior_led_time[i] )
-			junior_led_time[i]--; 
+			junior_led_time[i]--;
 		else
 			output_set_digit_value( i, 0 );
 	}
@@ -177,8 +177,8 @@ static MACHINE_START( junior )
 }
 
 
-static MACHINE_RESET(junior) 
-{	
+static MACHINE_RESET(junior)
+{
 	int i;
 
 	timer_pulse(machine,  ATTOTIME_IN_HZ(50), NULL, 0, junior_update_leds );
@@ -198,7 +198,7 @@ static MACHINE_DRIVER_START( junior )
 
 	MDRV_MACHINE_START( junior )
     MDRV_MACHINE_RESET(junior)
-	
+
     /* video hardware */
     MDRV_DEFAULT_LAYOUT( layout_junior )
 

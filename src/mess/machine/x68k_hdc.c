@@ -1,6 +1,6 @@
 /*
 
-	X68000 custom SASI Hard Disk controller
+    X68000 custom SASI Hard Disk controller
 
  0xe96001 (R/W) - SASI data I/O
  0xe96003 (W)   - SEL signal high (0)
@@ -258,14 +258,14 @@ WRITE16_DEVICE_HANDLER( x68k_hdc_w )
 				case SASI_CMD_FORMAT_UNIT:
 				case SASI_CMD_FORMAT_UNIT_06:
 					/*
-						Format Unit command format  (differs from SASI spec?)
-						0 |   0x06
-						1 |   Unit number (0-7) | LBA MSB (high 5 bits)
-						2 |   LBA
-						3 |   LBA LSB
-						4 |   ??  (usually 0x01)
-						5 |   ??
-					*/
+                        Format Unit command format  (differs from SASI spec?)
+                        0 |   0x06
+                        1 |   Unit number (0-7) | LBA MSB (high 5 bits)
+                        2 |   LBA
+                        3 |   LBA LSB
+                        4 |   ??  (usually 0x01)
+                        5 |   ??
+                    */
 						sasi->phase = SASI_PHASE_STATUS;
 						sasi->io = 1;  // Output
 						sasi->status_port |= 0x04;  // C/D remains the same
@@ -323,7 +323,7 @@ WRITE16_DEVICE_HANDLER( x68k_hdc_w )
 		break;
 	}
 
-//	logerror("SASI: write to HDC, offset %04x, data %04x\n",offset,data);
+//  logerror("SASI: write to HDC, offset %04x, data %04x\n",offset,data);
 }
 
 READ16_DEVICE_HANDLER( x68k_hdc_r )
@@ -427,7 +427,7 @@ READ16_DEVICE_HANDLER( x68k_hdc_r )
 		}
 		return 0x00;
 	case 0x01:
-//		logerror("SASI: [%08x] read from status port, read 0x%02x\n",activecpu_get_pc(),sasi->status_port);
+//      logerror("SASI: [%08x] read from status port, read 0x%02x\n",activecpu_get_pc(),sasi->status_port);
 		return sasi->status_port;
 	case 0x02:
 		return 0xff;  // write-only

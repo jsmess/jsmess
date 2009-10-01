@@ -1,16 +1,16 @@
 /*
 
-			  CDP1863 CMOS 8-Bit Programmable Frequency Generator
+              CDP1863 CMOS 8-Bit Programmable Frequency Generator
 
-								________________
-				_RESET	 1	---|	   \/		|---  16  Vdd
-			     CLK 2	 2	---|				|---  15  OE
-				 CLK 1	 3	---|				|---  14  OUT
-				   STR	 4	---|	CDP1863C	|---  13  DI7
-				   DI0	 5	---|				|---  12  DI6
-				   DI1	 6	---|				|---  11  DI5
-				   DI2	 7	---|				|---  10  DI4
-				   Vss	 8	---|________________|---  9   DI3
+                                ________________
+                _RESET   1  ---|       \/       |---  16  Vdd
+                 CLK 2   2  ---|                |---  15  OE
+                 CLK 1   3  ---|                |---  14  OUT
+                   STR   4  ---|    CDP1863C    |---  13  DI7
+                   DI0   5  ---|                |---  12  DI6
+                   DI1   6  ---|                |---  11  DI5
+                   DI2   7  ---|                |---  10  DI4
+                   Vss   8  ---|________________|---  9   DI3
 
 */
 

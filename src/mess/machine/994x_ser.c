@@ -1,23 +1,23 @@
 /*
-	TI99/4(a) RS232 card emulation
+    TI99/4(a) RS232 card emulation
 
-	This card features two RS232C ports (which share one single connector) and
-	one centronics-like fully bi-directional parallel port.  Each TI99 system
-	can accomodate two such RS232 cards (provided a resistor is moved in one of
-	the cards to change its CRU base address from >1300 to >1500), for a total
-	of four RS232 ports and two parallel ports.
+    This card features two RS232C ports (which share one single connector) and
+    one centronics-like fully bi-directional parallel port.  Each TI99 system
+    can accomodate two such RS232 cards (provided a resistor is moved in one of
+    the cards to change its CRU base address from >1300 to >1500), for a total
+    of four RS232 ports and two parallel ports.
 
-	The card is fairly simple: two 9902 chips handle one serial port each, two
-	unidirectional TTL buffers handle the PIO data bus, there is extra TTL for
-	address decoding and CRU interface, and a DSR ROM.
+    The card is fairly simple: two 9902 chips handle one serial port each, two
+    unidirectional TTL buffers handle the PIO data bus, there is extra TTL for
+    address decoding and CRU interface, and a DSR ROM.
 
-	References:
-	<http://www.nouspikel.com/ti99/rs232c.htm>: great description of the
-		hardware and software aspects.
-	<ftp://ftp.whtech.com//datasheets/TMS9902A.max>: tms9902a datasheet
-	<ftp://ftp.whtech.com//datasheets/Hardware manuals/ti rs232 card schematic.max>
+    References:
+    <http://www.nouspikel.com/ti99/rs232c.htm>: great description of the
+        hardware and software aspects.
+    <ftp://ftp.whtech.com//datasheets/TMS9902A.max>: tms9902a datasheet
+    <ftp://ftp.whtech.com//datasheets/Hardware manuals/ti rs232 card schematic.max>
 
-	Raphael Nabet, 2003.
+    Raphael Nabet, 2003.
 */
 
 #include "driver.h"
@@ -53,7 +53,7 @@ struct _pio_t
 	int pio_in_buffer;
 	int pio_readable;
 	int pio_writable;
-	int pio_write;  	// 1 if image is to be written to	
+	int pio_write;  	// 1 if image is to be written to
 };
 
 typedef struct _card_t card_t;
@@ -70,7 +70,7 @@ INLINE pio_t *get_safe_token_pio(const device_config *device)
 
 	return (pio_t *)device->token;
 }
-		
+
 static const ti99_peb_card_handlers_t rs232_handlers =
 {
 	rs232_cru_r,
@@ -80,7 +80,7 @@ static const ti99_peb_card_handlers_t rs232_handlers =
 };
 
 /*
-	Initialize pio unit and open image
+    Initialize pio unit and open image
 */
 static DEVICE_IMAGE_LOAD( ti99_4_pio )
 {
@@ -89,7 +89,7 @@ static DEVICE_IMAGE_LOAD( ti99_4_pio )
 	pio->pio_readable = ! image_has_been_created(image);
 	/* tell whether the image is writable */
 	pio->pio_writable = image_is_writable(image);
-	
+
 	if (pio->pio_write && pio->pio_writable)
 		pio->pio_handshakein = 0;	/* receiver ready */
 	else
@@ -99,7 +99,7 @@ static DEVICE_IMAGE_LOAD( ti99_4_pio )
 }
 
 /*
-	close a pio image
+    close a pio image
 */
 static DEVICE_IMAGE_UNLOAD( ti99_4_pio )
 {
@@ -126,19 +126,19 @@ static DEVICE_RESET( ti99_4_pio )
 	pio->pio_write = 1;
 }
 /*
-	Initialize rs232 unit and open image
+    Initialize rs232 unit and open image
 */
 static DEVICE_IMAGE_LOAD( ti99_4_rs232 )
 {
 	const device_config *tms9902 = NULL;
-		
+
 	if (strcmp(image->tag, "rs232:port0")) {
 		tms9902 = devtag_get_device(image->machine, "rs232:tms9902_0");
 	}
 	if (strcmp(image->tag, "rs232:port1")) {
 		tms9902 = devtag_get_device(image->machine, "rs232:tms9902_1");
 	}
-		
+
 	if (image)
 	{
 		tms9902_set_cts(tms9902, 1);
@@ -154,14 +154,14 @@ static DEVICE_IMAGE_LOAD( ti99_4_rs232 )
 }
 
 /*
-	close a rs232 image
+    close a rs232 image
 */
 static DEVICE_IMAGE_UNLOAD( ti99_4_rs232 )
-{	
+{
 }
 
 /*
-	Initializes rs232 card, set up handlers
+    Initializes rs232 card, set up handlers
 */
 static DEVICE_START( ti99_4_rs232 )
 {
@@ -169,7 +169,7 @@ static DEVICE_START( ti99_4_rs232 )
 }
 
 /*
-	Reset rs232 card, set up handlers
+    Reset rs232 card, set up handlers
 */
 static DEVICE_RESET( ti99_4_rs232 )
 {
@@ -178,7 +178,7 @@ static DEVICE_RESET( ti99_4_rs232 )
 	ti99_peb_set_card_handlers(0x1300, & rs232_handlers);
 }
 
-static READ8_DEVICE_HANDLER(ti99_4_pio_r) 
+static READ8_DEVICE_HANDLER(ti99_4_pio_r)
 {
 	pio_t *pio = get_safe_token_pio(device);
 	UINT8 reply = 0x00;
@@ -199,7 +199,7 @@ static READ8_DEVICE_HANDLER(ti99_4_pio_r)
 	return reply;
 }
 
-static READ8_DEVICE_HANDLER(ti99_4_pio_buf_r) 
+static READ8_DEVICE_HANDLER(ti99_4_pio_buf_r)
 {
 	pio_t *pio = get_safe_token_pio(device);
 	return pio->pio_direction ? pio->pio_in_buffer : pio->pio_out_buffer;
@@ -285,12 +285,12 @@ static WRITE8_DEVICE_HANDLER(ti99_4_pio_w)
 			pio->led = data;
 			break;
 	}
-}			
+}
 /*
-	Read rs232 card CRU interface
+    Read rs232 card CRU interface
 
-	bit 0: always 0
-	...
+    bit 0: always 0
+    ...
 */
 static int rs232_cru_r(running_machine *machine, int offset)
 {
@@ -332,7 +332,7 @@ static int rs232_cru_r(running_machine *machine, int offset)
 }
 
 /*
-	Write rs232 card CRU interface
+    Write rs232 card CRU interface
 */
 static void rs232_cru_w(running_machine *machine, int offset, int data)
 {
@@ -361,7 +361,7 @@ static void rs232_cru_w(running_machine *machine, int offset, int data)
 
 
 /*
-	read a byte in rs232 DSR space
+    read a byte in rs232 DSR space
 */
 static  READ8_HANDLER(rs232_mem_r)
 {
@@ -382,13 +382,13 @@ static  READ8_HANDLER(rs232_mem_r)
 }
 
 /*
-	write a byte in rs232 DSR space
+    write a byte in rs232 DSR space
 */
 static WRITE8_HANDLER(rs232_mem_w)
 {
 	if (offset >= 0x1000)
 	{
-		/* PIO */		
+		/* PIO */
 		ti99_4_pio_buf_w(devtag_get_device(space->machine, "rs232:pio"), offset, data);
 	}
 	else
@@ -398,7 +398,7 @@ static WRITE8_HANDLER(rs232_mem_w)
 }
 
 /*
-	rs232 interrupt handler
+    rs232 interrupt handler
 */
 static TMS9902_INT_CALLBACK( int_callback_0 )
 {
@@ -430,8 +430,8 @@ const tms9902_interface tms9902_params_0 =
 {
 	3000000.,				/* clock rate (3MHz) */
 	int_callback_0,			/* called when interrupt pin state changes */
-	NULL,//rts_callback,			/* called when Request To Send pin state changes */
-	NULL,//brk_callback,			/* called when BReaK state changes */
+	NULL,//rts_callback,            /* called when Request To Send pin state changes */
+	NULL,//brk_callback,            /* called when BReaK state changes */
 	xmit_callback_0			/* called when a character is transmitted */
 };
 
@@ -439,14 +439,14 @@ const tms9902_interface tms9902_params_1 =
 {
 	3000000.,				/* clock rate (3MHz) */
 	int_callback_1,			/* called when interrupt pin state changes */
-	NULL,//rts_callback,			/* called when Request To Send pin state changes */
-	NULL,//brk_callback,			/* called when BReaK state changes */
+	NULL,//rts_callback,            /* called when Request To Send pin state changes */
+	NULL,//brk_callback,            /* called when BReaK state changes */
 	xmit_callback_1			/* called when a character is transmitted */
 };
 
 DEVICE_GET_INFO( ti99_4_rs232 )
 {
-	switch ( state ) 
+	switch ( state )
 	{
 		case DEVINFO_INT_CLASS:	                    info->i = DEVICE_CLASS_PERIPHERAL;                         break;
 		case DEVINFO_INT_TOKEN_BYTES:				info->i = sizeof(card_t);							break;
@@ -455,7 +455,7 @@ DEVICE_GET_INFO( ti99_4_rs232 )
 		case DEVINFO_INT_IMAGE_READABLE:            info->i = 1;                                               break;
 		case DEVINFO_INT_IMAGE_WRITEABLE:			info->i = 1;                                               break;
 		case DEVINFO_INT_IMAGE_CREATABLE:	     	info->i = 1;                                               break;
-				
+
 		case DEVINFO_FCT_START:		                info->start = DEVICE_START_NAME( ti99_4_rs232 );              break;
 		case DEVINFO_FCT_RESET:						info->reset = DEVICE_RESET_NAME( ti99_4_rs232 );			break;
 		case DEVINFO_FCT_IMAGE_LOAD:		        info->f = (genf *) DEVICE_IMAGE_LOAD_NAME( ti99_4_rs232 );    break;
@@ -476,10 +476,10 @@ DEVICE_GET_INFO( ti99_4_rs232 );
 #define MDRV_TI99_4_RS232_ADD(_tag) \
 	MDRV_DEVICE_ADD(_tag, TI99_4_RS232, 0)
 
-	
+
 DEVICE_GET_INFO( ti99_4_pio )
 {
-	switch ( state ) 
+	switch ( state )
 	{
 		case DEVINFO_INT_CLASS:	                    info->i = DEVICE_CLASS_PERIPHERAL;                         break;
 		case DEVINFO_INT_TOKEN_BYTES:				info->i = sizeof(pio_t);							break;
@@ -488,7 +488,7 @@ DEVICE_GET_INFO( ti99_4_pio )
 		case DEVINFO_INT_IMAGE_READABLE:            info->i = 1;                                               break;
 		case DEVINFO_INT_IMAGE_WRITEABLE:			info->i = 1;                                               break;
 		case DEVINFO_INT_IMAGE_CREATABLE:	     	info->i = 1;                                               break;
-				
+
 		case DEVINFO_FCT_START:		                info->start = DEVICE_START_NAME( ti99_4_pio );              break;
 		case DEVINFO_FCT_RESET:						info->reset = DEVICE_RESET_NAME( ti99_4_pio );			break;
 		case DEVINFO_FCT_IMAGE_LOAD:		        info->f = (genf *) DEVICE_IMAGE_LOAD_NAME( ti99_4_pio );    break;
@@ -520,15 +520,15 @@ static DEVICE_RESET( ti99_4_rs232_card )
 
 DEVICE_GET_INFO( ti99_4_rs232_card )
 {
-	switch ( state ) 
+	switch ( state )
 	{
 		case DEVINFO_INT_CLASS:	                    info->i = DEVICE_CLASS_PERIPHERAL;                         break;
 		case DEVINFO_INT_TOKEN_BYTES:				info->i = sizeof(card_t);							break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:		info->i = 0;								break;
 		case DEVINFO_FCT_START:		                info->start = DEVICE_START_NAME( ti99_4_rs232_card );              break;
 		case DEVINFO_FCT_RESET:						info->reset = DEVICE_RESET_NAME( ti99_4_rs232_card );			break;
-	
-		case DEVINFO_PTR_MACHINE_CONFIG:			info->machine_config = MACHINE_DRIVER_NAME(ti99_4_rs232);		break;		
+
+		case DEVINFO_PTR_MACHINE_CONFIG:			info->machine_config = MACHINE_DRIVER_NAME(ti99_4_rs232);		break;
 		case DEVINFO_STR_NAME:		                strcpy( info->s, "TI99 RS232 card");	                         break;
 		case DEVINFO_STR_FAMILY:                    strcpy(info->s, "TI99 RS232 card");	                         break;
 		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");										break;

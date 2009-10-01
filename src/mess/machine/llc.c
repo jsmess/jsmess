@@ -16,7 +16,7 @@ UINT8 code = 0;
 static UINT8 llc1_key_state = 0;
 
 static READ8_DEVICE_HANDLER (llc1_port_b_r)
-{	
+{
 	UINT8 retVal = 0;
 	if (code!=0) {
 		if (llc1_key_state==0) {
@@ -27,7 +27,7 @@ static READ8_DEVICE_HANDLER (llc1_port_b_r)
 				llc1_key_state = 2;
 				retVal = 0;
 			} else {
-				llc1_key_state = 0;				
+				llc1_key_state = 0;
 				retVal = code;
 				code =0;
 			}
@@ -41,7 +41,7 @@ static READ8_DEVICE_HANDLER (llc1_port_b_r)
 
 static READ8_DEVICE_HANDLER (llc1_port_a_r)
 {
-	return 0;	
+	return 0;
 }
 
 
@@ -72,29 +72,29 @@ static TIMER_CALLBACK(keyboard_callback)
 {
 	int i,j;
 	UINT8 c;
-	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", 
+	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4",
 		"LINE5", "LINE6", "LINE7", "LINE8", "LINE9", "LINE10", "LINE11" };
 
-	for(i = 0; i < 12; i++) 
+	for(i = 0; i < 12; i++)
 	{
 		c = input_port_read(machine, keynames[i]);
-		if (c != 0) 
+		if (c != 0)
 		{
-			for(j = 0; j < 8; j++) 
+			for(j = 0; j < 8; j++)
 			{
-				if (c == (1 << j)) 
+				if (c == (1 << j))
 				{
 					code = j + i*8;
 					break;
 				}
-			}			
+			}
 		}
 	}
 }
 
 /* Driver initialization */
 DRIVER_INIT(llc1)
-{	
+{
 }
 
 MACHINE_RESET( llc1 )
@@ -114,36 +114,36 @@ DRIVER_INIT(llc2)
 MACHINE_RESET( llc2 )
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	
+
 	memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
 	memory_set_bankptr(machine, 1, memory_region(machine, "maincpu"));
-	
+
 	memory_install_write8_handler(space, 0x4000, 0x5fff, 0, 0, SMH_UNMAP);
-	memory_set_bankptr(machine, 2, memory_region(machine, "maincpu") + 0x4000);	
+	memory_set_bankptr(machine, 2, memory_region(machine, "maincpu") + 0x4000);
 
 	memory_install_write8_handler(space, 0x6000, 0xbfff, 0, 0, SMH_UNMAP);
-	memory_set_bankptr(machine, 3, memory_region(machine, "maincpu") + 0x6000);	
+	memory_set_bankptr(machine, 3, memory_region(machine, "maincpu") + 0x6000);
 
 	memory_install_write8_handler(space, 0xc000, 0xffff, 0, 0, SMH_BANK(4));
-	memory_set_bankptr(machine, 4, mess_ram + 0xc000);	
+	memory_set_bankptr(machine, 4, mess_ram + 0xc000);
 
 }
 
 WRITE8_HANDLER( llc2_rom_disable_w )
-{	
+{
 	const address_space *mem_space = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	
+
 	memory_install_write8_handler(mem_space, 0x0000, 0xbfff, 0, 0, SMH_BANK(1));
-	memory_set_bankptr(space->machine, 1, mess_ram); 
+	memory_set_bankptr(space->machine, 1, mess_ram);
 
 	memory_install_write8_handler(mem_space, 0x4000, 0x5fff, 0, 0, SMH_BANK(2));
-	memory_set_bankptr(space->machine, 2, mess_ram + 0x4000);	
+	memory_set_bankptr(space->machine, 2, mess_ram + 0x4000);
 
 	memory_install_write8_handler(mem_space, 0x6000, 0xbfff, 0, 0, SMH_BANK(3));
-	memory_set_bankptr(space->machine, 3, mess_ram + 0x6000);	
+	memory_set_bankptr(space->machine, 3, mess_ram + 0x6000);
 
 	memory_install_write8_handler(mem_space, 0xc000, 0xffff, 0, 0, SMH_BANK(4));
-	memory_set_bankptr(space->machine, 4, mess_ram + 0xc000);	
+	memory_set_bankptr(space->machine, 4, mess_ram + 0xc000);
 
 }
 
@@ -153,15 +153,15 @@ WRITE8_HANDLER( llc2_basic_enable_w )
 	const address_space *mem_space = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	if (data & 0x02) {
 		memory_install_write8_handler(mem_space, 0x4000, 0x5fff, 0, 0, SMH_UNMAP);
-		memory_set_bankptr(space->machine, 2, memory_region(space->machine, "maincpu") + 0x10000);			
+		memory_set_bankptr(space->machine, 2, memory_region(space->machine, "maincpu") + 0x10000);
 	} else {
 		memory_install_write8_handler(mem_space, 0x4000, 0x5fff, 0, 0, SMH_BANK(2));
-		memory_set_bankptr(space->machine, 2, mess_ram + 0x4000);	
+		memory_set_bankptr(space->machine, 2, mess_ram + 0x4000);
 	}
-	
+
 }
 static READ8_DEVICE_HANDLER (llc2_port_b_r)
-{	
+{
 	return 0;
 }
 
@@ -174,10 +174,10 @@ static UINT8 key_pos(UINT8 val) {
 	if (BIT(val,5)) return 6;
 	if (BIT(val,6)) return 7;
 	if (BIT(val,7)) return 8;
-	return 0;			
+	return 0;
 }
 static READ8_DEVICE_HANDLER (llc2_port_a_r)
-{	
+{
 	UINT8 *k7659 = memory_region(device->machine, "k7659");
 	UINT8 retVal = 0;
 	UINT8 a1 = input_port_read(device->machine, "A1");
@@ -213,16 +213,16 @@ static READ8_DEVICE_HANDLER (llc2_port_a_r)
 		code = 0x90 + key_pos(a10);
 	} else if (a11!=0) {
 		code = 0xA0 + key_pos(a11);
-	}	
-	if (code!=0) {				
+	}
+	if (code!=0) {
 		if (BIT(a8,6) || BIT(a8,7)) {
 			code |= 0x100;
 		} else if (BIT(a12,6)) {
 			code |= 0x200;
 		}
 		retVal = k7659[code] | 0x80;
-	} 
-	return retVal;	
+	}
+	return retVal;
 }
 
 

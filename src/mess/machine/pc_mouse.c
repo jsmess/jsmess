@@ -1,8 +1,8 @@
 /***************************************************************************
 
-	machine/pc_mouse.c
+    machine/pc_mouse.c
 
-	Code for emulating PC-style serial mouses
+    Code for emulating PC-style serial mouses
 
 ***************************************************************************/
 
@@ -51,7 +51,7 @@ static void	pc_mouse_queue_data(int data)
 }
 
 /**************************************************************************
- *	Check for mouse moves and buttons. Build delta x/y packets
+ *  Check for mouse moves and buttons. Build delta x/y packets
  **************************************************************************/
 static TIMER_CALLBACK(pc_mouse_scan)
 {
@@ -124,31 +124,31 @@ static TIMER_CALLBACK(pc_mouse_scan)
 				break;
 
 				/* mouse systems mouse
-				from "PC Mouse information" by Tomi Engdahl */
+                from "PC Mouse information" by Tomi Engdahl */
 
 				/*
-				The data is sent in 5 byte packets in following format:
-						D7      D6      D5      D4      D3      D2      D1      D0
+                The data is sent in 5 byte packets in following format:
+                        D7      D6      D5      D4      D3      D2      D1      D0
 
-				1.      1       0       0       0       0       LB      CB      RB
-				2.      X7      X6      X5      X4      X3      X2      X1      X0
-				3.      Y7      Y6      Y5      Y4      Y3      Y4      Y1      Y0
-				4.      X7'     X6'     X5'     X4'     X3'     X2'     X1'     X0'
-				5.      Y7'     Y6'     Y5'     Y4'     Y3'     Y4'     Y1'     Y0'
+                1.      1       0       0       0       0       LB      CB      RB
+                2.      X7      X6      X5      X4      X3      X2      X1      X0
+                3.      Y7      Y6      Y5      Y4      Y3      Y4      Y1      Y0
+                4.      X7'     X6'     X5'     X4'     X3'     X2'     X1'     X0'
+                5.      Y7'     Y6'     Y5'     Y4'     Y3'     Y4'     Y1'     Y0'
 
-				LB is left button state (0=pressed, 1=released)
-				CB is center button state (0=pressed, 1=released)
-				RB is right button state (0=pressed, 1=released)
-				X7-X0 movement in X direction since last packet in signed byte
-					  format (-128..+127), positive direction right
-				Y7-Y0 movement in Y direction since last packet in signed byte
-					  format (-128..+127), positive direction up
-				X7'-X0' movement in X direction since sending of X7-X0 packet in signed byte
-					  format (-128..+127), positive direction right
-				Y7'-Y0' movement in Y direction since sending of Y7-Y0 in signed byte
-					  format (-128..+127), positive direction up
+                LB is left button state (0=pressed, 1=released)
+                CB is center button state (0=pressed, 1=released)
+                RB is right button state (0=pressed, 1=released)
+                X7-X0 movement in X direction since last packet in signed byte
+                      format (-128..+127), positive direction right
+                Y7-Y0 movement in Y direction since last packet in signed byte
+                      format (-128..+127), positive direction up
+                X7'-X0' movement in X direction since sending of X7-X0 packet in signed byte
+                      format (-128..+127), positive direction right
+                Y7'-Y0' movement in Y direction since sending of Y7-Y0 in signed byte
+                      format (-128..+127), positive direction up
 
-				The last two bytes in the packet (bytes 4 and 5) contains information about movement data changes which have occured after data butes 2 and 3 have been sent. */
+                The last two bytes in the packet (bytes 4 and 5) contains information about movement data changes which have occured after data butes 2 and 3 have been sent. */
 
 				case TYPE_MOUSE_SYSTEMS:
 				{
@@ -192,7 +192,7 @@ static TIMER_CALLBACK(pc_mouse_scan)
 
 
 /**************************************************************************
- *	Check for mouse control line changes and (de-)install timer
+ *  Check for mouse control line changes and (de-)install timer
  **************************************************************************/
 
 INS8250_HANDSHAKE_OUT( pc_mouse_handshake_in )
@@ -247,7 +247,7 @@ INS8250_HANDSHAKE_OUT( pc_mouse_handshake_in )
 
 
 /**************************************************************************
- *	Mouse INPUT_PORT declarations
+ *  Mouse INPUT_PORT declarations
  **************************************************************************/
 
 INPUT_PORTS_START( pc_mouse_mousesystems )

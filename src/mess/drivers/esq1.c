@@ -5,36 +5,36 @@
     Ensoniq ESQ-1 and SQ-80 Digital Wave Synthesizers
     Preliminary driver by R. Belmont
 
-	Map for ESQ-1:
-	0000-1fff: OS RAM
-	2000-3fff: Cartridge
-	4000-5fff: SEQRAM
-	6000-63ff: ES5503 DOC
-	6400-67ff: MC2681 DUART
-	6800-6fff: AD7524 (CV_MUX)
-	7000-7fff: OS ROM low (banked)
-	8000-ffff: OS ROM high (fixed)
+    Map for ESQ-1:
+    0000-1fff: OS RAM
+    2000-3fff: Cartridge
+    4000-5fff: SEQRAM
+    6000-63ff: ES5503 DOC
+    6400-67ff: MC2681 DUART
+    6800-6fff: AD7524 (CV_MUX)
+    7000-7fff: OS ROM low (banked)
+    8000-ffff: OS ROM high (fixed)
 
-	Map for SQ-80:
-	0000-1fff: OS RAM
-	2000-3fff: Cartridge
-	4000-5fff: DOSRAM or SEQRAM (banked)
-	6000-63ff: ES5503 DOC
-	6400-67ff: MC2681 DUART
-	6800-6bff: AD7524 (CV_MUX)
-	6c00-6dff: Mapper (bit 0 only - determines DOSRAM or SEQRAM at 4000)
-	6e00-6fff: WD1772 FDC (not present on ESQ1)
-	7000-7fff: OS ROM low (banked)
-	8000-ffff: OS ROM high (fixed)
+    Map for SQ-80:
+    0000-1fff: OS RAM
+    2000-3fff: Cartridge
+    4000-5fff: DOSRAM or SEQRAM (banked)
+    6000-63ff: ES5503 DOC
+    6400-67ff: MC2681 DUART
+    6800-6bff: AD7524 (CV_MUX)
+    6c00-6dff: Mapper (bit 0 only - determines DOSRAM or SEQRAM at 4000)
+    6e00-6fff: WD1772 FDC (not present on ESQ1)
+    7000-7fff: OS ROM low (banked)
+    8000-ffff: OS ROM high (fixed)
 
-	CV_MUX area:
-	write to        output goes to
-	$68f8 	$00 	D/A converter
-	$68f0 	-$08 	Filter Frequency (FF)
-	$68e8 	-$10 	Filter Resonance (Q)
-	$68d8 	-$20 	Final DCA (ENV4)
-	$68b8 	-$40 	Panning (PAN)
-	$6878 	-$80 	Floppy (Motor/LED on)
+    CV_MUX area:
+    write to        output goes to
+    $68f8   $00     D/A converter
+    $68f0   -$08    Filter Frequency (FF)
+    $68e8   -$10    Filter Resonance (Q)
+    $68d8   -$20    Final DCA (ENV4)
+    $68b8   -$40    Panning (PAN)
+    $6878   -$80    Floppy (Motor/LED on)
 
 If SEQRAM is mapped at 4000, DUART port 2 determines the 32KB "master bank" and ports 0 and 1
 determine which of the 4 8KB "sub banks" is visible.
@@ -45,11 +45,11 @@ IRQ sources are the DUART and the DRQ line from the FDC (SQ-80 only).
 NMI is from the IRQ line on the FDC (again, SQ-80 only).
 
 TODO:
-	- Actual 2681 DUART emulation
-	- VFD display
-	- Keyboard
-	- Analog filters and VCA on the back end of the 5503
-	- SQ-80 support (additional banking, FDC)
+    - Actual 2681 DUART emulation
+    - VFD display
+    - Keyboard
+    - Analog filters and VCA on the back end of the 5503
+    - SQ-80 support (additional banking, FDC)
 
 ***************************************************************************/
 
@@ -97,13 +97,13 @@ static void recalc_osrom_bank(running_machine *machine)
 {
 	int bank = ((uart_outputport >> 1) & 0x7) ^ 7;
 
-//	printf("bank %d => offset %x (PC=%x)\n", bank, bank * 0x1000, cpu_get_pc(machine->cpu[0]));
+//  printf("bank %d => offset %x (PC=%x)\n", bank, bank * 0x1000, cpu_get_pc(machine->cpu[0]));
 	memory_set_bankptr(machine, 1, memory_region(machine, "osrom") + (bank * 0x1000) );
 }
 
 static READ8_HANDLER( uart_r )
 {
-//	printf("Read UART @ %x\n", offset);
+//  printf("Read UART @ %x\n", offset);
 
 	switch (offset)
 	{
@@ -119,12 +119,12 @@ static WRITE8_HANDLER( uart_w )
 {
 	uart_regs[offset] = data;
 
-//	printf("%x to UART %x\n", data, offset);
+//  printf("%x to UART %x\n", data, offset);
 
 	switch (offset)
 	{
-		case 0xb: 
-//			printf("%02x to 6500\n", data);
+		case 0xb:
+//          printf("%02x to 6500\n", data);
 			break;
 
 		case 0xe:	// set output port bits
@@ -193,13 +193,13 @@ CONS( 1987, esq1, 0, 0, esq1, esq1, 0, 0, "Ensoniq", "ESQ-1", GAME_NOT_WORKING )
 /*
 
 7 to UART 6                counter/timer upper
-d0 to UART 7               counter/timer lower                                                 
+d0 to UART 7               counter/timer lower
 60 to UART 4               aux control (C/T timer mode using external clock)
-20 to UART a               command register B                                                 
-30 to UART a               command register B                                                 
-10 to UART a               command register B                                                 
+20 to UART a               command register B
+30 to UART a               command register B
+10 to UART a               command register B
 13 to UART 8               mode register B => 8 bits no parity
-f to UART 8                mode register B => force odd parity, 8 bits (?)                                                
+f to UART 8                mode register B => force odd parity, 8 bits (?)
 ee to UART 9               clock select register B
 5 to UART a                command register B (Enable Tx/Enable Rx)
 e7 to UART b               Tx holding register B (send E7 to display)

@@ -1,27 +1,27 @@
 /*
 
-	Sharp X68000 video functions
-	driver by Barry Rodewald
+    Sharp X68000 video functions
+    driver by Barry Rodewald
 
-	X68000 video hardware (there are some minor revisions to these custom chips across various X680x0 models):
-		Custom sprite controller "Cynthia"
-		Custom CRT controller "Vinas / Vicon"
-		Custom video controller "VSOP / VIPS"
-		Custom video data selector "Cathy"
+    X68000 video hardware (there are some minor revisions to these custom chips across various X680x0 models):
+        Custom sprite controller "Cynthia"
+        Custom CRT controller "Vinas / Vicon"
+        Custom video controller "VSOP / VIPS"
+        Custom video data selector "Cathy"
 
-	In general terms:
-		1 "Text" layer - effectively a 4bpp bitmap split into 4 planes at 1bpp each
-		                 512kB "text" VRAM
-		                 can write to multiple planes at once
-						 can copy one character line to another character line
-						 is 1024x1024 in size
-		Up to 4 graphic layers - can be 4 layers with a 16 colour palette, 2 layers with a 256 colour palette,
-		                         or 1 layer at 16-bit RGB.
-								 512k graphic VRAM
-								 all layers are 512x512, but at 16 colours, the 4 layers can be combined into 1 1024x1024 layer
-								 one or more layers can be cleared at once quickly with a simple hardware function
-		 2 tilemapped layers - can be 8x8 or 16x16, 16 colours per tile, max 256 colours overall
-		 1 sprite layer - up to 128 16x16 sprites, 16 colours per sprite, maximum 16 sprites per scanline (not yet implemented).
+    In general terms:
+        1 "Text" layer - effectively a 4bpp bitmap split into 4 planes at 1bpp each
+                         512kB "text" VRAM
+                         can write to multiple planes at once
+                         can copy one character line to another character line
+                         is 1024x1024 in size
+        Up to 4 graphic layers - can be 4 layers with a 16 colour palette, 2 layers with a 256 colour palette,
+                                 or 1 layer at 16-bit RGB.
+                                 512k graphic VRAM
+                                 all layers are 512x512, but at 16 colours, the 4 layers can be combined into 1 1024x1024 layer
+                                 one or more layers can be cleared at once quickly with a simple hardware function
+         2 tilemapped layers - can be 8x8 or 16x16, 16 colours per tile, max 256 colours overall
+         1 sprite layer - up to 128 16x16 sprites, 16 colours per sprite, maximum 16 sprites per scanline (not yet implemented).
 
 */
 
@@ -128,8 +128,8 @@ static TIMER_CALLBACK(x68k_crtc_operation_end)
 
 static void x68k_crtc_refresh_mode(running_machine *machine)
 {
-//	rectangle rect;
-//	double scantime;
+//  rectangle rect;
+//  double scantime;
 	rectangle scr,visiblescr;
 	int length;
 
@@ -181,8 +181,8 @@ static void x68k_crtc_refresh_mode(running_machine *machine)
 	if(visiblescr.max_y >= scr.max_y - 1)
 		visiblescr.max_y = scr.max_y - 2;
 
-//	logerror("CRTC regs - %i %i %i %i  - %i %i %i %i - %i - %i\n",x68k_sys.crtc.reg[0],x68k_sys.crtc.reg[1],x68k_sys.crtc.reg[2],x68k_sys.crtc.reg[3],
-//		x68k_sys.crtc.reg[4],x68k_sys.crtc.reg[5],x68k_sys.crtc.reg[6],x68k_sys.crtc.reg[7],x68k_sys.crtc.reg[8],x68k_sys.crtc.reg[9]);
+//  logerror("CRTC regs - %i %i %i %i  - %i %i %i %i - %i - %i\n",x68k_sys.crtc.reg[0],x68k_sys.crtc.reg[1],x68k_sys.crtc.reg[2],x68k_sys.crtc.reg[3],
+//      x68k_sys.crtc.reg[4],x68k_sys.crtc.reg[5],x68k_sys.crtc.reg[6],x68k_sys.crtc.reg[7],x68k_sys.crtc.reg[8],x68k_sys.crtc.reg[9]);
 	logerror("video_screen_configure(machine->primary_screen,%i,%i,[%i,%i,%i,%i],55.45)\n",scr.max_x,scr.max_y,visiblescr.min_x,visiblescr.min_y,visiblescr.max_x,visiblescr.max_y);
 	video_screen_configure(machine->primary_screen,scr.max_x,scr.max_y,&visiblescr,HZ_TO_ATTOSECONDS(55.45));
 }
@@ -233,7 +233,7 @@ TIMER_CALLBACK(x68k_hsync)
 		{
 			if(oddscanline == 1)
 			{
-				int scan = video_screen_get_vpos(machine->primary_screen); 
+				int scan = video_screen_get_vpos(machine->primary_screen);
 				if(scan > x68k_sys.crtc.vend)
 					scan = x68k_sys.crtc.vbegin;
 				else
@@ -271,8 +271,8 @@ TIMER_CALLBACK(x68k_hsync)
 		{
 			hsync_time = video_screen_get_time_until_pos(machine->primary_screen,video_screen_get_vpos(machine->primary_screen)+1,x68k_sys.crtc.hbegin);
 			timer_adjust_oneshot(x68k_scanline_timer, hsync_time, 1);
-	//		if(!(x68k_sys.mfp.gpio & 0x40))  // if GPIP6 is active, clear it
-	//			x68k_sys.mfp.gpio |= 0x40;
+	//      if(!(x68k_sys.mfp.gpio & 0x40))  // if GPIP6 is active, clear it
+	//          x68k_sys.mfp.gpio |= 0x40;
 		}
 	}
 }
@@ -480,24 +480,24 @@ WRITE16_HANDLER( x68k_crtc_w )
 				memset(x68k_gvram+0x30000,0,0x20000);
 			}
 			timer_set(space->machine, ATTOTIME_IN_MSEC(10), NULL, 0x02,x68k_crtc_operation_end);  // time taken to do operation is a complete guess.
-//			popmessage("CRTC: High-speed gfx screen clear [0x%02x]",x68k_sys.crtc.reg[21] & 0x0f);
+//          popmessage("CRTC: High-speed gfx screen clear [0x%02x]",x68k_sys.crtc.reg[21] & 0x0f);
 		}
 		break;
 	}
-//	logerror("CRTC: [%08x] Wrote %04x to CRTC register %i\n",cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")),data,offset);
+//  logerror("CRTC: [%08x] Wrote %04x to CRTC register %i\n",cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")),data,offset);
 }
 
 READ16_HANDLER( x68k_crtc_r )
 {
-/*	switch(offset)
-	{
-	default:
-		logerror("CRTC: [%08x] Read from CRTC register %i\n",activecpu_get_pc(),offset);
-		return 0xff;
-	}*/
+/*  switch(offset)
+    {
+    default:
+        logerror("CRTC: [%08x] Read from CRTC register %i\n",activecpu_get_pc(),offset);
+        return 0xff;
+    }*/
 	if(offset < 24)
 	{
-//		logerror("CRTC: [%08x] Read %04x from CRTC register %i\n",cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")),x68k_sys.crtc.reg[offset],offset);
+//      logerror("CRTC: [%08x] Read %04x from CRTC register %i\n",cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")),x68k_sys.crtc.reg[offset],offset);
 		switch(offset)
 		{
 		case 9:
@@ -520,7 +520,7 @@ READ16_HANDLER( x68k_crtc_r )
 	}
 	if(offset == 576) // operation port, operation bits are set to 0 when operation is complete
 		return x68k_sys.crtc.operation;
-//	logerror("CRTC: [%08x] Read from unknown CRTC register %i\n",activecpu_get_pc(),offset);
+//  logerror("CRTC: [%08x] Read from unknown CRTC register %i\n",activecpu_get_pc(),offset);
 	return 0xffff;
 }
 
@@ -528,20 +528,20 @@ WRITE16_HANDLER( x68k_gvram_w )
 {
 	int xloc,yloc,pageoffset;
 	/*
-	   G-VRAM usage is determined by colour depth and "real" screen size.
+       G-VRAM usage is determined by colour depth and "real" screen size.
 
-	   For screen size of 1024x1024, all G-VRAM space is used, in one big page.
-	   At 1024x1024 real screen size, colour depth is always 4bpp, and ranges from
-	   0xc00000-0xdfffff.
+       For screen size of 1024x1024, all G-VRAM space is used, in one big page.
+       At 1024x1024 real screen size, colour depth is always 4bpp, and ranges from
+       0xc00000-0xdfffff.
 
-	   For screen size of 512x512, the colour depth determines the page usage.
-	   16 colours = 4 pages
-	   256 colours = 2 pages
-	   65,536 colours = 1 page
-	   Page 1 - 0xc00000-0xc7ffff    Page 2 - 0xc80000-0xcfffff
-	   Page 3 - 0xd00000-0xd7ffff    Page 4 - 0xd80000-0xdfffff
-	*/
-	
+       For screen size of 512x512, the colour depth determines the page usage.
+       16 colours = 4 pages
+       256 colours = 2 pages
+       65,536 colours = 1 page
+       Page 1 - 0xc00000-0xc7ffff    Page 2 - 0xc80000-0xcfffff
+       Page 3 - 0xd00000-0xd7ffff    Page 4 - 0xd80000-0xdfffff
+    */
+
 	// handle different G-VRAM page setups
 	if(x68k_sys.crtc.reg[20] & 0x08)  // G-VRAM set to buffer
 	{
@@ -588,7 +588,7 @@ WRITE16_HANDLER( x68k_gvram_w )
 				logerror("G-VRAM written while layer setup is undefined.\n");
 		}
 	}
-	
+
 	pageoffset = offset & 0xfffff;
 	xloc = pageoffset % 1024;
 	yloc = pageoffset / 1024;
@@ -662,7 +662,7 @@ READ16_HANDLER( x68k_gvram_r )
 
 	if(x68k_sys.crtc.reg[20] & 0x08)  // G-VRAM set to buffer
 		return x68k_gvram[offset];
-	
+
 	switch(x68k_sys.crtc.reg[20] & 0x0300)  // colour setup determines G-VRAM use
 	{
 		case 0x0300: // 65,536 colour (RGB) - 16-bits per word
@@ -693,7 +693,7 @@ READ16_HANDLER( x68k_gvram_r )
 			logerror("G-VRAM read while layer setup is undefined.\n");
 			ret = 0xffff;
 	}
-	
+
 	return ret;
 }
 
@@ -750,23 +750,23 @@ WRITE16_HANDLER( x68k_spriteram_w )
 	COMBINE_DATA(x68k_spriteram+offset);
 	x68k_sys.video.tile8_dirty[offset / 16] = 1;
 	x68k_sys.video.tile16_dirty[offset / 64] = 1;
-	if(offset < 0x2000) 
-	{ 
-        tilemap_mark_all_tiles_dirty(x68k_bg1_8); 
-        tilemap_mark_all_tiles_dirty(x68k_bg1_16); 
-        tilemap_mark_all_tiles_dirty(x68k_bg0_8); 
-        tilemap_mark_all_tiles_dirty(x68k_bg0_16); 
-    } 
-    if(offset >= 0x2000 && offset < 0x3000) 
-    { 
-        tilemap_mark_tile_dirty(x68k_bg1_8,offset & 0x0fff); 
-        tilemap_mark_tile_dirty(x68k_bg1_16,offset & 0x0fff); 
-    } 
-    if(offset >= 0x3000) 
-    { 
-        tilemap_mark_tile_dirty(x68k_bg0_8,offset & 0x0fff); 
-        tilemap_mark_tile_dirty(x68k_bg0_16,offset & 0x0fff); 
-    } 
+	if(offset < 0x2000)
+	{
+        tilemap_mark_all_tiles_dirty(x68k_bg1_8);
+        tilemap_mark_all_tiles_dirty(x68k_bg1_16);
+        tilemap_mark_all_tiles_dirty(x68k_bg0_8);
+        tilemap_mark_all_tiles_dirty(x68k_bg0_16);
+    }
+    if(offset >= 0x2000 && offset < 0x3000)
+    {
+        tilemap_mark_tile_dirty(x68k_bg1_8,offset & 0x0fff);
+        tilemap_mark_tile_dirty(x68k_bg1_16,offset & 0x0fff);
+    }
+    if(offset >= 0x3000)
+    {
+        tilemap_mark_tile_dirty(x68k_bg0_8,offset & 0x0fff);
+        tilemap_mark_tile_dirty(x68k_bg0_16,offset & 0x0fff);
+    }
 }
 
 READ16_HANDLER( x68k_spriteram_r )
@@ -780,7 +780,7 @@ static void x68k_draw_text(running_machine* machine,bitmap_t* bitmap, int xscr, 
 	UINT32 loc;  // location in TVRAM
 	UINT32 colour;
 	int bit;
-	
+
 	for(line=rect.min_y;line<=rect.max_y;line++)  // per scanline
 	{
 		// adjust for scroll registers
@@ -823,7 +823,7 @@ static void x68k_draw_gfx(bitmap_t* bitmap,rectangle cliprect)
 
 	if(x68k_sys.crtc.reg[20] & 0x0800)  // if graphic layers are set to buffer, then they aren't visible
 		return;
-		
+
 	for(priority=3;priority>=0;priority--)
 	{
 		if(x68k_sys.crtc.reg[20] & 0x0400)  // 1024x1024 "real" screen size - use 1024x1024 16-colour gfx layer
@@ -872,7 +872,7 @@ static void x68k_draw_gfx(bitmap_t* bitmap,rectangle cliprect)
 						yscr = x68k_sys.crtc.vbegin-(x68k_sys.crtc.reg[13 + (gpage*2)] & 0x1ff);
 						copyscrollbitmap_trans(bitmap, x68k_get_gfx_page(gpage,GFX256), 1, &xscr, 1, &yscr, &cliprect,0);
 					}
- 				}				
+ 				}
 				break;
 			case 0x00:
 				// 16 colour gfx screen
@@ -897,34 +897,34 @@ static void x68k_draw_gfx(bitmap_t* bitmap,rectangle cliprect)
 static void x68k_draw_sprites(running_machine *machine, bitmap_t* bitmap, int priority, rectangle cliprect)
 {
 	/*
-	   0xeb0000 - 0xeb07ff - Sprite registers (up to 128)
-	       + 00 : b9-0,  Sprite X position
-		   + 02 : b9-0,  Sprite Y position
-		   + 04 : b15,   Vertical Reversing (flipping?)
-		          b14,   Horizontal Reversing
-				  b11-8, Sprite colour
-				  b7-0,  Sprite tile code (in PCG)
-		   + 06 : b1-0,  Priority
-		                 00 = Sprite not displayed
+       0xeb0000 - 0xeb07ff - Sprite registers (up to 128)
+           + 00 : b9-0,  Sprite X position
+           + 02 : b9-0,  Sprite Y position
+           + 04 : b15,   Vertical Reversing (flipping?)
+                  b14,   Horizontal Reversing
+                  b11-8, Sprite colour
+                  b7-0,  Sprite tile code (in PCG)
+           + 06 : b1-0,  Priority
+                         00 = Sprite not displayed
 
-	   0xeb0800 - BG0 X Scroll  (10-bit)
-	   0xeb0802 - BG0 Y Scroll
-	   0xeb0804 - BG1 X Scroll
-	   0xeb0806 - BG1 Y Scroll
-	   0xeb0808 - BG control
-	              b9,    BG/Sprite display (RAM and register access is faster if 1)
-				  b4,    PCG area 1 available
-				  b3,    BG1 display enable
-				  b1,    PCG area 0 available
-				  b0,    BG0 display enable
-	   0xeb080a - Horizontal total (like CRTC reg 0 - is 0xff if in 256x256?)
-	   0xeb080c - Horizontal display position (like CRTC reg 2 - +4)
-	   0xeb080e - Vertical display position (like CRTC reg 6)
-	   0xeb0810 - Resolution setting
-	              b4,    "L/H" (apparently 15kHz/31kHz switch for sprites/BG?)
-				  b3-2,  V-Res
-				  b1-0,  H-Res (0 = 8x8 tilemaps, 1 = 16x16 tilemaps, 2 or 3 = unknown)
-	*/
+       0xeb0800 - BG0 X Scroll  (10-bit)
+       0xeb0802 - BG0 Y Scroll
+       0xeb0804 - BG1 X Scroll
+       0xeb0806 - BG1 Y Scroll
+       0xeb0808 - BG control
+                  b9,    BG/Sprite display (RAM and register access is faster if 1)
+                  b4,    PCG area 1 available
+                  b3,    BG1 display enable
+                  b1,    PCG area 0 available
+                  b0,    BG0 display enable
+       0xeb080a - Horizontal total (like CRTC reg 0 - is 0xff if in 256x256?)
+       0xeb080c - Horizontal display position (like CRTC reg 2 - +4)
+       0xeb080e - Vertical display position (like CRTC reg 6)
+       0xeb0810 - Resolution setting
+                  b4,    "L/H" (apparently 15kHz/31kHz switch for sprites/BG?)
+                  b3-2,  V-Res
+                  b1-0,  H-Res (0 = 8x8 tilemaps, 1 = 16x16 tilemaps, 2 or 3 = unknown)
+    */
 	int ptr,pri;
 
 	for(ptr=508;ptr>=0;ptr-=4)  // stepping through sprites
@@ -1068,7 +1068,7 @@ VIDEO_START( x68000 )
 	tilemap_set_transparent_pen(x68k_bg0_16,0);
 	tilemap_set_transparent_pen(x68k_bg1_16,0);
 
-//	timer_adjust_periodic(x68k_scanline_timer, attotime_zero, 0, ATTOTIME_IN_HZ(55.45)/568);
+//  timer_adjust_periodic(x68k_scanline_timer, attotime_zero, 0, ATTOTIME_IN_HZ(55.45)/568);
 }
 
 VIDEO_UPDATE( x68000 )
@@ -1091,8 +1091,8 @@ VIDEO_UPDATE( x68000 )
 		x68k_bg0 = x68k_bg0_16;
 		x68k_bg1 = x68k_bg1_16;
 	}
-//	rect.max_x=x68k_sys.crtc.width;
-//	rect.max_y=x68k_sys.crtc.height;
+//  rect.max_x=x68k_sys.crtc.width;
+//  rect.max_y=x68k_sys.crtc.height;
 	bitmap_fill(bitmap,cliprect,0);
 
 	if(x68k_sys.sysport.contrast == 0)  // if monitor contrast is 0, then don't bother displaying anything
@@ -1100,8 +1100,8 @@ VIDEO_UPDATE( x68000 )
 
 	rect.min_x=x68k_sys.crtc.hbegin;
 	rect.min_y=x68k_sys.crtc.vbegin;
-//	rect.max_x=rect.min_x + x68k_sys.crtc.visible_width-1;
-//	rect.max_y=rect.min_y + x68k_sys.crtc.visible_height-1;
+//  rect.max_x=rect.min_x + x68k_sys.crtc.visible_width-1;
+//  rect.max_y=rect.min_y + x68k_sys.crtc.visible_height-1;
 	rect.max_x=x68k_sys.crtc.hend;
 	rect.max_y=x68k_sys.crtc.vend;
 
@@ -1185,8 +1185,8 @@ VIDEO_UPDATE( x68000 )
 	{
 		x68k_sys.mfp.isra = 0;
 		x68k_sys.mfp.isrb = 0;
-//		mfp_trigger_irq(MFP_IRQ_GPIP6);
-//		cputag_set_input_line_and_vector(machine, "maincpu",6,ASSERT_LINE,0x43);
+//      mfp_trigger_irq(MFP_IRQ_GPIP6);
+//      cputag_set_input_line_and_vector(machine, "maincpu",6,ASSERT_LINE,0x43);
 	}
 	if(input_code_pressed(screen->machine,KEYCODE_9))
 	{
@@ -1202,26 +1202,26 @@ VIDEO_UPDATE( x68000 )
 #endif
 
 #ifdef MAME_DEBUG
-//	popmessage("Layer priorities [%04x] - Txt: %i  Spr: %i  Gfx: %i  Layer Pri0-3: %i %i %i %i",x68k_sys.video.reg[1],x68k_sys.video.text_pri,x68k_sys.video.sprite_pri,
-//		x68k_sys.video.gfx_pri,x68k_sys.video.gfxlayer_pri[0],x68k_sys.video.gfxlayer_pri[1],x68k_sys.video.gfxlayer_pri[2],x68k_sys.video.gfxlayer_pri[3]);
-//	popmessage("CRTC regs - %i %i %i %i  - %i %i %i %i - %i - %i",x68k_sys.crtc.reg[0],x68k_sys.crtc.reg[1],x68k_sys.crtc.reg[2],x68k_sys.crtc.reg[3],
-//		x68k_sys.crtc.reg[4],x68k_sys.crtc.reg[5],x68k_sys.crtc.reg[6],x68k_sys.crtc.reg[7],x68k_sys.crtc.reg[8],x68k_sys.crtc.reg[9]);
-//	popmessage("Visible resolution = %ix%i (%s) Screen size = %ix%i",x68k_sys.crtc.visible_width,x68k_sys.crtc.visible_height,x68k_sys.crtc.interlace ? "Interlaced" : "Non-interlaced",x68k_sys.crtc.video_width,x68k_sys.crtc.video_height);
-//	popmessage("VBlank : x68k_scanline = %i",x68k_scanline);
-//	popmessage("CRTC/BG compare H-TOTAL %i/%i H-DISP %i/%i V-DISP %i/%i BG Res %02x",x68k_sys.crtc.reg[0],x68k_spritereg[0x405],x68k_sys.crtc.reg[2],x68k_spritereg[0x406],
-//		x68k_sys.crtc.reg[6],x68k_spritereg[0x407],x68k_spritereg[0x408]);
-//	popmessage("IER %02x %02x  IPR %02x %02x  ISR %02x %02x  IMR %02x %02x", x68k_sys.mfp.iera,x68k_sys.mfp.ierb,x68k_sys.mfp.ipra,x68k_sys.mfp.iprb,
-//		x68k_sys.mfp.isra,x68k_sys.mfp.isrb,x68k_sys.mfp.imra,x68k_sys.mfp.imrb);
-//	popmessage("BG Scroll - BG0 X %i Y %i  BG1 X %i Y %i",x68k_spriteram[0x400],x68k_spriteram[0x401],x68k_spriteram[0x402],x68k_spriteram[0x403]);
-//	popmessage("Keyboard buffer position = %i",x68k_sys.keyboard.headpos);
-//	popmessage("IERA = 0x%02x, IERB = 0x%02x",x68k_sys.mfp.iera,x68k_sys.mfp.ierb);
-//	popmessage("IPRA = 0x%02x, IPRB = 0x%02x",x68k_sys.mfp.ipra,x68k_sys.mfp.iprb);
-//	popmessage("uPD72065 status = %02x",nec765_status_r(machine, 0));
-//	popmessage("Layer enable - 0x%02x",x68k_sys.video.reg[2] & 0xff);
-//	popmessage("Graphic layer scroll - %i, %i - %i, %i - %i, %i - %i, %i",
-//		x68k_sys.crtc.reg[12],x68k_sys.crtc.reg[13],x68k_sys.crtc.reg[14],x68k_sys.crtc.reg[15],x68k_sys.crtc.reg[16],x68k_sys.crtc.reg[17],x68k_sys.crtc.reg[18],x68k_sys.crtc.reg[19]);
-//	popmessage("IOC IRQ status - %02x",x68k_sys.ioc.irqstatus);
-//	popmessage("RAM: mouse data - %02x %02x %02x %02x",mess_ram[0x931],mess_ram[0x930],mess_ram[0x933],mess_ram[0x932]);
+//  popmessage("Layer priorities [%04x] - Txt: %i  Spr: %i  Gfx: %i  Layer Pri0-3: %i %i %i %i",x68k_sys.video.reg[1],x68k_sys.video.text_pri,x68k_sys.video.sprite_pri,
+//      x68k_sys.video.gfx_pri,x68k_sys.video.gfxlayer_pri[0],x68k_sys.video.gfxlayer_pri[1],x68k_sys.video.gfxlayer_pri[2],x68k_sys.video.gfxlayer_pri[3]);
+//  popmessage("CRTC regs - %i %i %i %i  - %i %i %i %i - %i - %i",x68k_sys.crtc.reg[0],x68k_sys.crtc.reg[1],x68k_sys.crtc.reg[2],x68k_sys.crtc.reg[3],
+//      x68k_sys.crtc.reg[4],x68k_sys.crtc.reg[5],x68k_sys.crtc.reg[6],x68k_sys.crtc.reg[7],x68k_sys.crtc.reg[8],x68k_sys.crtc.reg[9]);
+//  popmessage("Visible resolution = %ix%i (%s) Screen size = %ix%i",x68k_sys.crtc.visible_width,x68k_sys.crtc.visible_height,x68k_sys.crtc.interlace ? "Interlaced" : "Non-interlaced",x68k_sys.crtc.video_width,x68k_sys.crtc.video_height);
+//  popmessage("VBlank : x68k_scanline = %i",x68k_scanline);
+//  popmessage("CRTC/BG compare H-TOTAL %i/%i H-DISP %i/%i V-DISP %i/%i BG Res %02x",x68k_sys.crtc.reg[0],x68k_spritereg[0x405],x68k_sys.crtc.reg[2],x68k_spritereg[0x406],
+//      x68k_sys.crtc.reg[6],x68k_spritereg[0x407],x68k_spritereg[0x408]);
+//  popmessage("IER %02x %02x  IPR %02x %02x  ISR %02x %02x  IMR %02x %02x", x68k_sys.mfp.iera,x68k_sys.mfp.ierb,x68k_sys.mfp.ipra,x68k_sys.mfp.iprb,
+//      x68k_sys.mfp.isra,x68k_sys.mfp.isrb,x68k_sys.mfp.imra,x68k_sys.mfp.imrb);
+//  popmessage("BG Scroll - BG0 X %i Y %i  BG1 X %i Y %i",x68k_spriteram[0x400],x68k_spriteram[0x401],x68k_spriteram[0x402],x68k_spriteram[0x403]);
+//  popmessage("Keyboard buffer position = %i",x68k_sys.keyboard.headpos);
+//  popmessage("IERA = 0x%02x, IERB = 0x%02x",x68k_sys.mfp.iera,x68k_sys.mfp.ierb);
+//  popmessage("IPRA = 0x%02x, IPRB = 0x%02x",x68k_sys.mfp.ipra,x68k_sys.mfp.iprb);
+//  popmessage("uPD72065 status = %02x",nec765_status_r(machine, 0));
+//  popmessage("Layer enable - 0x%02x",x68k_sys.video.reg[2] & 0xff);
+//  popmessage("Graphic layer scroll - %i, %i - %i, %i - %i, %i - %i, %i",
+//      x68k_sys.crtc.reg[12],x68k_sys.crtc.reg[13],x68k_sys.crtc.reg[14],x68k_sys.crtc.reg[15],x68k_sys.crtc.reg[16],x68k_sys.crtc.reg[17],x68k_sys.crtc.reg[18],x68k_sys.crtc.reg[19]);
+//  popmessage("IOC IRQ status - %02x",x68k_sys.ioc.irqstatus);
+//  popmessage("RAM: mouse data - %02x %02x %02x %02x",mess_ram[0x931],mess_ram[0x930],mess_ram[0x933],mess_ram[0x932]);
 #endif
 	return 0;
 }

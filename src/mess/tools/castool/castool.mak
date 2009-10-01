@@ -62,7 +62,7 @@ CASTOOL_LIB_OBJS =						\
 	$(MESS_FORMATS)/ioprocs.o			\
 	$(MESS_FORMATS)/cassimg.o			\
 	$(MESS_FORMATS)/wavfile.o			\
-	
+
 
 $(LIBCASTOOL): $(CASTOOL_LIB_OBJS)
 

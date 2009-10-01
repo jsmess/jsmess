@@ -1,14 +1,14 @@
 /***************************************************************************
- *	Microtan 65
+ *  Microtan 65
  *
- *	video hardware
+ *  video hardware
  *
- *	Juergen Buchmueller <pullmoll@t-online.de>, Jul 2000
+ *  Juergen Buchmueller <pullmoll@t-online.de>, Jul 2000
  *
- *	Thanks go to Geoff Macdonald <mail@geoff.org.uk>
+ *  Thanks go to Geoff Macdonald <mail@geoff.org.uk>
  *  for his site http:://www.geo255.redhotant.com
- *	and to Fabrice Frances <frances@ensica.fr>
- *	for his site http://www.ifrance.com/oric/microtan.html
+ *  and to Fabrice Frances <frances@ensica.fr>
+ *  for his site http://www.ifrance.com/oric/microtan.html
  *
  ***************************************************************************/
 

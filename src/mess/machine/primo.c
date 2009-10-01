@@ -1,11 +1,11 @@
 /*******************************************************************************
 
-	primo.c
+    primo.c
 
-	Functions to emulate general aspects of Microkey Primo computers
-	(RAM, ROM, interrupts, I/O ports)
+    Functions to emulate general aspects of Microkey Primo computers
+    (RAM, ROM, interrupts, I/O ports)
 
-	Krzysztof Strzecha
+    Krzysztof Strzecha
 
 *******************************************************************************/
 
@@ -31,7 +31,7 @@ static int serial_atn = 1, serial_clock = 1, serial_data = 1;
 
 /*******************************************************************************
 
-	Interrupt callback
+    Interrupt callback
 
 *******************************************************************************/
 
@@ -43,7 +43,7 @@ INTERRUPT_GEN( primo_vblank_interrupt )
 
 /*******************************************************************************
 
-	Memory banking
+    Memory banking
 
 *******************************************************************************/
 
@@ -74,7 +74,7 @@ static void primo_update_memory(running_machine *machine)
 
 /*******************************************************************************
 
-	IO read/write handlers
+    IO read/write handlers
 
 *******************************************************************************/
 
@@ -120,7 +120,7 @@ READ8_HANDLER( primo_be_2_r )
 		data &= ~0x10;
 
 	// bit 3 - SRQ
-//	data &= (!cbm_serial_request_read(serbus, 0)) ? ~0x08 : ~0x00;
+//  data &= (!cbm_serial_request_read(serbus, 0)) ? ~0x08 : ~0x00;
 
 	// bit 2 - joystic 2 (not implemeted yet)
 
@@ -198,7 +198,7 @@ WRITE8_HANDLER( primo_ki_2_w )
 
 	if (data & 0x04)
 		logerror ("SRQ WRITE\n");
-//	logerror ("IOW KI-2 data:%02x\n", data);
+//  logerror ("IOW KI-2 data:%02x\n", data);
 }
 
 WRITE8_HANDLER( primo_FD_w )
@@ -212,7 +212,7 @@ WRITE8_HANDLER( primo_FD_w )
 
 /*******************************************************************************
 
-	Driver initialization
+    Driver initialization
 
 *******************************************************************************/
 
@@ -241,7 +241,7 @@ DRIVER_INIT( primo64 )
 
 /*******************************************************************************
 
-	Machine initialization
+    Machine initialization
 
 *******************************************************************************/
 
@@ -268,7 +268,7 @@ MACHINE_RESET( primob )
 
 /*******************************************************************************
 
-	Snapshot files (.pss)
+    Snapshot files (.pss)
 
 *******************************************************************************/
 
@@ -337,7 +337,7 @@ SNAPSHOT_LOAD( primo )
 
 /*******************************************************************************
 
-	Quicload files (.pp)
+    Quicload files (.pp)
 
 *******************************************************************************/
 

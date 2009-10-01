@@ -19,9 +19,9 @@ static UINT8 kaypro_system_port;
 
 /***********************************************************
 
-	PIO
+    PIO
 
-	Port B is unused on both PIOs
+    Port B is unused on both PIOs
 
 ************************************************************/
 
@@ -32,7 +32,7 @@ static void kaypro_interrupt(const device_config *device, int state)
 
 static READ8_DEVICE_HANDLER( pio_system_r )
 {
-/*	d3 Centronics ready flag */
+/*  d3 Centronics ready flag */
 
 	UINT8 data = ~centronics_busy_r(kaypro_printer) << 3;
 	return (kaypro_system_port & 0xf7) | (data & 8) ;
@@ -40,13 +40,13 @@ static READ8_DEVICE_HANDLER( pio_system_r )
 
 static WRITE8_DEVICE_HANDLER( pio_system_w )
 {
-/*	d7 bank select
-	d6 disk drive motors - not emulated
-	d5 double-density enable (0=double density)
-	d4 Centronics strobe
-	d2 side select (1=side 1)
-	d1 drive B
-	d0 drive A */
+/*  d7 bank select
+    d6 disk drive motors - not emulated
+    d5 double-density enable (0=double density)
+    d4 Centronics strobe
+    d2 side select (1=side 1)
+    d1 drive B
+    d0 drive A */
 
 	/* get address space */
 	const address_space *mem = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
@@ -133,9 +133,9 @@ WRITE8_DEVICE_HANDLER( kayproii_pio_w )
 
 /***********************************************************
 
-	KAYPRO2X SYSTEM PORT
+    KAYPRO2X SYSTEM PORT
 
-	The PIOs were replaced by a few standard 74xx chips
+    The PIOs were replaced by a few standard 74xx chips
 
 ************************************************************/
 
@@ -147,14 +147,14 @@ READ8_HANDLER( kaypro2x_system_port_r )
 
 WRITE8_HANDLER( kaypro2x_system_port_w )
 {
-/*	d7 bank select
-	d6 alternate character set (write only)
-	d5 double-density enable
-	d4 disk drive motors - not emulated
-	d3 Centronics strobe
-	d2 side select (appears that 0=side 1?)
-	d1 drive B
-	d0 drive A */
+/*  d7 bank select
+    d6 alternate character set (write only)
+    d5 double-density enable
+    d4 disk drive motors - not emulated
+    d3 Centronics strobe
+    d2 side select (appears that 0=side 1?)
+    d1 drive B
+    d0 drive A */
 
 	/* get address space */
 	const address_space *mem = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
@@ -192,32 +192,32 @@ WRITE8_HANDLER( kaypro2x_system_port_w )
 
 /***********************************************************************
 
-	SIO
-	Baud rate setup commented out until MAME includes the feature.
+    SIO
+    Baud rate setup commented out until MAME includes the feature.
 
-	On Kaypro2x, Channel B on both SIOs is hardwired to 300 baud.
+    On Kaypro2x, Channel B on both SIOs is hardwired to 300 baud.
 
-	Both devices on sio2 (printer and modem) are not emulated.
+    Both devices on sio2 (printer and modem) are not emulated.
 
 ************************************************************************/
 
 /* Set baud rate. bits 0..3 Rx and Tx are tied together. Baud Rate Generator is a AY-5-8116, SMC8116, etc.
-	00h    50  
-	11h    75  
-	22h    110  
-	33h    134.5  
-	44h    150  
-	55h    300  
-	66h    600  
-	77h    1200  
-	88h    1800  
-	99h    2000  
-	AAh    2400  
-	BBh    3600  
-	CCh    4800  
-	DDh    7200  
-	EEh    9600  
-	FFh    19200 */
+    00h    50
+    11h    75
+    22h    110
+    33h    134.5
+    44h    150
+    55h    300
+    66h    600
+    77h    1200
+    88h    1800
+    99h    2000
+    AAh    2400
+    BBh    3600
+    CCh    4800
+    DDh    7200
+    EEh    9600
+    FFh    19200 */
 
 static const int baud_clock[]={ 800, 1200, 1760, 2152, 2400, 4800, 9600, 19200, 28800, 32000, 38400, 57600, 76800, 115200, 153600, 307200 };
 
@@ -225,24 +225,24 @@ WRITE8_HANDLER( kaypro_baud_a_w )	/* channel A - RS232C */
 {
 	data &= 0x0f;
 
-//	z80sio_set_rx_clock( kaypro_z80sio, baud_clock[data], 0);
-//	z80sio_set_tx_clock( kaypro_z80sio, baud_clock[data], 0);
+//  z80sio_set_rx_clock( kaypro_z80sio, baud_clock[data], 0);
+//  z80sio_set_tx_clock( kaypro_z80sio, baud_clock[data], 0);
 }
 
 WRITE8_HANDLER( kayproii_baud_b_w )	/* Channel B - Keyboard - only usable speed is 300 baud */
 {
 	data &= 0x0f;
 
-//	z80sio_set_rx_clock( kaypro_z80sio, baud_clock[data], 1);
-//	z80sio_set_tx_clock( kaypro_z80sio, baud_clock[data], 1);
+//  z80sio_set_rx_clock( kaypro_z80sio, baud_clock[data], 1);
+//  z80sio_set_tx_clock( kaypro_z80sio, baud_clock[data], 1);
 }
 
 WRITE8_HANDLER( kaypro2x_baud_a_w )	/* Channel A on 2nd SIO - Serial Printer */
 {
 	data &= 0x0f;
 
-//	z80sio_set_rx_clock( kaypro2x_z80sio, baud_clock[data], 0);
-//	z80sio_set_tx_clock( kaypro2x_z80sio, baud_clock[data], 0);
+//  z80sio_set_rx_clock( kaypro2x_z80sio, baud_clock[data], 0);
+//  z80sio_set_tx_clock( kaypro2x_z80sio, baud_clock[data], 0);
 }
 
 const z80sio_interface kaypro_sio_intf =
@@ -261,13 +261,13 @@ READ8_DEVICE_HANDLER( kaypro_sio_r )
 		return z80sio_d_r(device, 0);
 	else
 	if (offset == 1)
-//		return z80sio_d_r(device, 1);
+//      return z80sio_d_r(device, 1);
 		return kay_kbd_d_r();
 	else
 	if (offset == 2)
 		return z80sio_c_r(device, 0);
 	else
-//		return z80sio_c_r(device, 1);
+//      return z80sio_c_r(device, 1);
 		return kay_kbd_c_r();
 }
 
@@ -277,7 +277,7 @@ WRITE8_DEVICE_HANDLER( kaypro_sio_w )
 		z80sio_d_w(device, 0, data);
 	else
 	if (offset == 1)
-//		z80sio_d_w(device, 1, data);
+//      z80sio_d_w(device, 1, data);
 		kay_kbd_d_w(device->machine, data);
 	else
 	if (offset == 2)
@@ -317,12 +317,12 @@ WRITE8_DEVICE_HANDLER( kaypro2x_sio_w )
 
 /*************************************************************************************
 
-	Floppy DIsk
+    Floppy DIsk
 
-	If DRQ or IRQ is set, and cpu is halted, the NMI goes low.
-	Since the HALT occurs last (and has no callback mechanism), we need to set
-	a short delay, to give time for the processor to execute the HALT before NMI
-	becomes active.
+    If DRQ or IRQ is set, and cpu is halted, the NMI goes low.
+    Since the HALT occurs last (and has no callback mechanism), we need to set
+    a short delay, to give time for the processor to execute the HALT before NMI
+    becomes active.
 
 *************************************************************************************/
 
@@ -349,7 +349,7 @@ const wd17xx_interface kaypro_wd1793_interface = { kaypro_fdc_callback, NULL, {F
 
 /***********************************************************
 
-	Machine
+    Machine
 
 ************************************************************/
 
@@ -378,12 +378,12 @@ MACHINE_RESET( kaypro2x )
 
 /***********************************************************
 
-	Quickload
+    Quickload
 
-	This loads a .COM file to address 0x100 then jumps
-	there. Sometimes .COM has been renamed to .CPM to
-	prevent windows going ballistic. These can be loaded
-	as well.
+    This loads a .COM file to address 0x100 then jumps
+    there. Sometimes .COM has been renamed to .CPM to
+    prevent windows going ballistic. These can be loaded
+    as well.
 
 ************************************************************/
 
@@ -402,7 +402,7 @@ QUICKLOAD_LOAD( kayproii )
 		RAM[i+0x100] = data;
 	}
 
-//	if (input_port_read(image->machine, "CONFIG") & 1)
+//  if (input_port_read(image->machine, "CONFIG") & 1)
 	{
 		pio_system_w(kayproii_z80pio_s, 0, kaypro_system_port & 0x7f);	// switch TPA in
 		RAM[0x80]=0;							// clear out command tail
@@ -428,7 +428,7 @@ QUICKLOAD_LOAD( kaypro2x )
 		RAM[i+0x100] = data;
 	}
 
-//	if (input_port_read(image->machine, "CONFIG") & 1)
+//  if (input_port_read(image->machine, "CONFIG") & 1)
 	{
 		kaypro2x_system_port_w(space, 0, kaypro_system_port & 0x7f);
 		RAM[0x80]=0;

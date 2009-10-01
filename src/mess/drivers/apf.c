@@ -523,7 +523,7 @@ static INPUT_PORTS_START( apf_m1000 )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PAD 2/LEFT 5") PORT_CODE(KEYCODE_5_PAD) PORT_PLAYER(2)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PAD 2/LEFT 8") PORT_CODE(KEYCODE_8_PAD) PORT_PLAYER(2)
 
-//	PORT_INCLUDE( m6847_artifacting ) // breaks apfimag keyboard
+//  PORT_INCLUDE( m6847_artifacting ) // breaks apfimag keyboard
 INPUT_PORTS_END
 
 
@@ -667,7 +667,7 @@ static const mc6847_interface apf_mc6847_intf =
 
 static MACHINE_DRIVER_START( apf_imagination )
 	/* basic machine hardware */
-	//	MDRV_CPU_ADD("maincpu", M6800, 3750000)        /* 7.8336 MHz, only 6800p type used 1 MHz max*/
+	//  MDRV_CPU_ADD("maincpu", M6800, 3750000)        /* 7.8336 MHz, only 6800p type used 1 MHz max*/
 	MDRV_CPU_ADD("maincpu", M6800, 1000000 )        /* backgammon uses timing from vertical interrupt to switch between video modes during frame */
 	MDRV_CPU_PROGRAM_MAP(apf_imagination_map)
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -728,7 +728,7 @@ ROM_END
 ROM_START(apfm1000)
 	ROM_REGION(0x10000+0x0800,"maincpu",0)
 	ROM_LOAD("apf_4000.rom",0x010000, 0x0800, CRC(2a331a33) SHA1(387b90882cd0b66c192d9cbaa3bec250f897e4f1))
-//	ROM_LOAD("apf-m1000rom.bin",0x010000, 0x0800, CRC(cc6ac840) SHA1(1110a234bcad99bd0894ad44c591389d16376ca4))
+//  ROM_LOAD("apf-m1000rom.bin",0x010000, 0x0800, CRC(cc6ac840) SHA1(1110a234bcad99bd0894ad44c591389d16376ca4))
 	ROM_CART_LOAD("cart", 0x8000, 0x2000, ROM_OPTIONAL)
 ROM_END
 

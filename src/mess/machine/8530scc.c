@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	8530scc.c
+    8530scc.c
 
-	Zilog 8530 SCC (Serial Control Chip) code
+    Zilog 8530 SCC (Serial Control Chip) code
 
 *********************************************************************/
 
@@ -291,7 +291,7 @@ WRITE8_DEVICE_HANDLER(scc_w)
 					scc->mode = 1;
 					scc->reg = data & 0x0f;
 					logerror("SCC: Port B Reg select - %i\n",scc->reg);
-//					scc_putbreg(device, data & 0xf0);
+//                  scc_putbreg(device, data & 0xf0);
 				}
 			}
 			else
@@ -310,7 +310,7 @@ WRITE8_DEVICE_HANDLER(scc_w)
 					scc->mode = 1;
 					scc->reg = data & 0x0f;
 					logerror("SCC: Port A Reg select - %i\n", scc->reg);
-//					scc_putareg(device, data & 0xf0);
+//                  scc_putareg(device, data & 0xf0);
 				}
 			}
 			else

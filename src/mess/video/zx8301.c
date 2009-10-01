@@ -9,10 +9,10 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- use resnet for colors
-	- proper video timing
+    - use resnet for colors
+    - proper video timing
 
 */
 
@@ -170,7 +170,7 @@ WRITE8_DEVICE_HANDLER( zx8301_ram_w )
 
 /*-------------------------------------------------
     zx8301_draw_line_mode4 - high resolution
-	line drawing routine
+    line drawing routine
 -------------------------------------------------*/
 
 static void zx8301_draw_line_mode4(const device_config *device, bitmap_t *bitmap, int y, UINT16 da)
@@ -200,7 +200,7 @@ static void zx8301_draw_line_mode4(const device_config *device, bitmap_t *bitmap
 
 /*-------------------------------------------------
     zx8301_draw_line_mode4 - low resolution
-	line drawing routine
+    line drawing routine
 -------------------------------------------------*/
 
 static void zx8301_draw_line_mode8(const device_config *device, bitmap_t *bitmap, int y, UINT16 da)
@@ -331,7 +331,7 @@ static DEVICE_START( zx8301 )
 
 static DEVICE_RESET( zx8301 )
 {
-//	zx8301_t *zx8301 = get_safe_token(device);
+//  zx8301_t *zx8301 = get_safe_token(device);
 }
 
 /*-------------------------------------------------
