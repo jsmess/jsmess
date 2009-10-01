@@ -76,10 +76,10 @@ irq vector 06: operates with $fa28, $fa2e, $fd1b ;hblank? joypad irq?
 irq vector 08: tests ppi port c, puts port A to $fa1d,puts 0x02 to [$fa19] ;tape data ready
 irq vector 0A: writes 0x00 to [$fa19]
 irq vector 0C: writes 0x00 to [$fa19]
-irq vector 0E: same as 2, (A = 0x03, B = 0x00)
+irq vector 0E: same as 2, (A = 0x03, B = 0x00) ;? any press has the same effect as two enter pressed, break input?
 irq vector 10: same as 2, (A = 0x03, B = 0x00)
 irq vector 12: writes 0x10 to [$fa19] ;end of tape reached
-irq vector 14: same as 2, (A = 0x00, B = 0x01)
+irq vector 14: same as 2, (A = 0x00, B = 0x01) ;kanji lock enabled
 irq vector 16: tests ppi port c, writes the result to $feca. ;vblank
 
 
@@ -97,7 +97,7 @@ static UINT8 *pc6001_video_ram;
 static UINT8 irq_vector = 0x00;
 static UINT8 cas_switch,sys_latch;
 
-#define CAS_LENGTH 0x12e5
+#define CAS_LENGTH 0x3b9c
 
 static VIDEO_START( pc6001 )
 {
@@ -123,27 +123,49 @@ static VIDEO_UPDATE( pc6001 )
 
 	attr = pc6001_video_ram[0];
 
-	if(attr & 0x80) // 128x192 4 colors mode
+	if(attr & 0x80) // gfx mode
 	{
-		int shrink_x = 2*4;
-		int shrink_y = (attr & 8) ? 1 : 2;
-		int w = (shrink_x == 8) ? 32 : 16;
-
-		for(y=0;y<(192/shrink_y);y++)
+		if(attr & 0x10) // 256x192x1 mode (FIXME: might be a different trigger)
 		{
-			for(x=0;x<w;x++)
+			for(y=0;y<192;y++)
 			{
-				tile = pc6001_video_ram[(x+(y*32))+0x200];
-
-				for(yi=0;yi<shrink_y;yi++)
+				for(x=0;x<32;x++)
 				{
-					for(xi=0;xi<shrink_x;xi++)
-					{
-						int i;
-						i = (shrink_x == 8) ? (xi & 0x06) : (xi & 0x0c)>>1;
-						color = ((tile >> i) & 3)+8;
+					tile = pc6001_video_ram[(x+(y*32))+0x200];
 
-						*BITMAP_ADDR16(bitmap, ((y*shrink_y+yi)+24), (x*shrink_x+((shrink_x-1)-xi))+32) = screen->machine->pens[color];
+					for(xi=0;xi<8;xi++)
+					{
+						color = ((tile)>>(7-xi) & 1) ? 7 : 0;
+
+						*BITMAP_ADDR16(bitmap, (y+24), (x*8+xi)+32) = screen->machine->pens[color];
+					}
+				}
+			}
+		}
+		else // 128x192x2 mode
+		{
+			int shrink_x = 2*4;
+			int shrink_y = (attr & 8) ? 1 : 2;
+			int w = (shrink_x == 8) ? 32 : 16;
+			int col_bank = ((attr & 2)<<1);
+
+			for(y=0;y<(192/shrink_y);y++)
+			{
+				for(x=0;x<w;x++)
+				{
+					tile = pc6001_video_ram[(x+(y*32))+0x200];
+
+					for(yi=0;yi<shrink_y;yi++)
+					{
+						for(xi=0;xi<shrink_x;xi++)
+						{
+							int i;
+							i = (shrink_x == 8) ? (xi & 0x06) : (xi & 0x0c)>>1;
+							color = ((tile >> i) & 3)+8;
+							color+= col_bank;
+
+							*BITMAP_ADDR16(bitmap, ((y*shrink_y+yi)+24), (x*shrink_x+((shrink_x-1)-xi))+32) = screen->machine->pens[color];
+						}
 					}
 				}
 			}
@@ -318,9 +340,9 @@ static INPUT_PORTS_START( pc6001 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("P2")
@@ -328,9 +350,9 @@ static INPUT_PORTS_START( pc6001 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("key1") //0x00-0x1f
@@ -436,6 +458,13 @@ static INPUT_PORTS_START( pc6001 )
 	PORT_BIT(0x20000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("]") PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR(']')
 	PORT_BIT(0x40000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("^") PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('^')
 	PORT_BIT(0x80000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("_")
+
+	PORT_START("key_modifiers")
+	PORT_BIT(0x00000001,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL)
+	PORT_BIT(0x00000002,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT)
+	PORT_BIT(0x00000004,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("KANA") PORT_CODE(KEYCODE_RCONTROL) PORT_TOGGLE
+	PORT_BIT(0x00000008,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("CAPS") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
+	PORT_BIT(0x00000010,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("GRPH") PORT_CODE(KEYCODE_LALT)
 INPUT_PORTS_END
 
 static INTERRUPT_GEN( pc6001_interrupt )
@@ -515,7 +544,11 @@ static UINT8 check_keyboard_press(running_machine *machine)
 {
 	const char* portnames[3] = { "key1","key2","key3" };
 	int i,port_i,scancode;
+	UINT8 shift_pressed,caps_lock;
 	scancode = 0;
+
+	shift_pressed = (input_port_read(machine,"key_modifiers") & 2)>>1;
+	caps_lock = (input_port_read(machine,"key_modifiers") & 8)>>3;
 
 	for(port_i=0;port_i<3;port_i++)
 	{
@@ -523,6 +556,12 @@ static UINT8 check_keyboard_press(running_machine *machine)
 		{
 			if((input_port_read(machine,portnames[port_i])>>i) & 1)
 			{
+				if((shift_pressed != caps_lock) && scancode >= 0x41 && scancode <= 0x5f)
+					scancode+=0x20;
+
+				if(shift_pressed && scancode >= 0x31 && scancode <= 0x39)
+					scancode-=0x10;
+
 				return scancode;
 			}
 			scancode++;
@@ -673,7 +712,7 @@ ROM_START( pc6001 )	/* screen = 8000-83FF */
 
 	ROM_REGION( 0x10000, "cas", ROMREGION_ERASEFF )
 	/* Load here your tape for now (and change the cas length macro according to what MESS returns) */
-//	ROM_LOAD( "block.cas", 0x0000, CAS_LENGTH, CRC(1) SHA1(1) )
+//	ROM_LOAD( "the amazon.cas", 0x0000, CAS_LENGTH, CRC(1) SHA1(1) )
 ROM_END
 
 ROM_START( pc6001a )
