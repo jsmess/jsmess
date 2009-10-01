@@ -243,6 +243,7 @@ FLOPPY_CONSTRUCT( imd_dsk_construct )
 	tag->heads = 1;
 	do {
 		floppy_image_read(floppy, header, pos, 5);
+		if ((header[2] & 1)==1) tag->heads = 2;
 		tag->track_offsets[(header[1]<<1) + (header[2] & 1)] = pos;
 		sector_num = header[3];
 		pos += 5 + sector_num; // skip header and sector numbering map
@@ -262,7 +263,9 @@ FLOPPY_CONSTRUCT( imd_dsk_construct )
 		}
 		tag->tracks += 1;
 	} while(pos < floppy_image_size(floppy));
-
+	if (tag->heads==2) {
+		tag->tracks = tag->tracks / 2;
+	}
 	callbacks = floppy_callbacks(floppy);
 	callbacks->read_sector = imd_read_sector;
 	callbacks->read_indexed_sector = imd_read_indexed_sector;
