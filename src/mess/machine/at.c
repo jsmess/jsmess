@@ -697,7 +697,7 @@ DRIVER_INIT( at586 )
 }
 
 
-
+/*
 static void at_map_vga_memory(running_machine *machine, offs_t begin, offs_t end, read8_space_func rh, write8_space_func wh)
 {
 	int buswidth;
@@ -715,14 +715,14 @@ static void at_map_vga_memory(running_machine *machine, offs_t begin, offs_t end
 	}
 }
 
-
+*/
 
 static READ8_HANDLER( input_port_0_r ) { return input_port_read(space->machine, "IN0"); }
 
 static const struct pc_vga_interface vga_interface =
 {
 	1,
-	at_map_vga_memory,
+	NULL, //at_map_vga_memory,
 
 	input_port_0_r,
 
