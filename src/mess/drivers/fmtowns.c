@@ -83,10 +83,22 @@ static UINT8 ftimer;
 static UINT8 nmi_mask;
 static UINT8 compat_mode;
 static UINT8 towns_system_port;
+static UINT32 towns_ankcg_enable;
+static UINT32 towns_mainmem_enable;
+static UINT32 towns_ram_enable;
 static UINT32* towns_vram;
 static UINT32* towns_cmos;
-static UINT32* towns_gfxvram;
-static UINT32* towns_txtvram;
+static UINT8* towns_gfxvram;
+static UINT8* towns_txtvram;
+static UINT8 towns_vram_wplane;
+static UINT8 towns_vram_rplane;
+static UINT8 towns_palette_select;
+static UINT8 towns_palette_r[256];
+static UINT8 towns_palette_g[256];
+static UINT8 towns_palette_b[256];
+static UINT8 towns_degipal[8];
+
+static void towns_update_video_banks(const address_space* space);
 
 static READ8_HANDLER(towns_system_r)
 {
@@ -209,26 +221,66 @@ static WRITE8_HANDLER(towns_video_5c8_w)
 	logerror("VID: wrote 0x%02x to port %04x\n",data,offset+0x5c8);
 }
 
+/* Video/CRTC
+ * 
+ * 0xfd90 - palette colour select
+ * 0xfd92/4/6 - BRG value
+ * 0xfd98-9f  - degipal(?)
+ */
 static READ8_HANDLER(towns_video_fd90_r)
 {
-	logerror("VID: read port %04x\n",offset+0xfd90);
+	switch(offset)
+	{
+		case 0x00:
+			return towns_palette_select;
+		case 0x02:
+			return towns_palette_r[towns_palette_select];
+		case 0x04:
+			return towns_palette_g[towns_palette_select];
+		case 0x06:
+			return towns_palette_b[towns_palette_select];
+		case 0x08:
+		case 0x09:
+		case 0x0a:
+		case 0x0b:
+		case 0x0c:
+		case 0x0d:
+		case 0x0e:
+		case 0x0f:
+			return towns_degipal[offset-0x08];
+	}
+//	logerror("VID: read port %04x\n",offset+0xfd90);
 	return 0x00;
 }
 
 static WRITE8_HANDLER(towns_video_fd90_w)
 {
-	logerror("VID: wrote 0x%02x to port %04x\n",data,offset+0xfd90);
-}
-
-static READ8_HANDLER(towns_video_ff81_r)
-{
-	logerror("VID: read port ff81\n");
-	return 0x00;
-}
-
-static WRITE8_HANDLER(towns_video_ff81_w)
-{
-	logerror("VID: wrote 0x%02x to port ff81\n",data);
+	switch(offset)
+	{
+		case 0x00:
+			towns_palette_select = data;
+			break;
+		case 0x02:
+			towns_palette_r[towns_palette_select] = data;
+			break;
+		case 0x04:
+			towns_palette_g[towns_palette_select] = data;
+			break;
+		case 0x06:
+			towns_palette_b[towns_palette_select] = data;
+			break;
+		case 0x08:
+		case 0x09:
+		case 0x0a:
+		case 0x0b:
+		case 0x0c:
+		case 0x0d:
+		case 0x0e:
+		case 0x0f:
+			towns_degipal[offset-0x08] = data;
+			break;
+	}
+//	logerror("VID: wrote 0x%02x to port %04x\n",data,offset+0xfd90);
 }
 
 static READ8_HANDLER(towns_keyboard_r)
@@ -268,7 +320,7 @@ static READ32_HANDLER(towns_sys5e8_r)
 			if(ACCESSING_BITS_0_7)
 			{
 				logerror("SYS: read RAM size port\n");
-				return 0x06;  // 6MB is standard for the Marty
+				return 0x08;  // 6MB is standard for the Marty
 			}
 			break;
 		case 0x01:
@@ -334,6 +386,113 @@ static WRITE32_HANDLER( towns_cmos_w )
 	COMBINE_DATA(towns_cmos+offset);
 }
 
+static WRITE8_HANDLER( towns_gfx_w )
+{
+	if(towns_mainmem_enable != 0)
+	{
+		mess_ram[offset+0xc0000] = data;
+		return;
+	}
+	if(towns_vram_wplane & 0x01)
+		towns_gfxvram[offset] = data;
+	if(towns_vram_wplane & 0x02)
+		towns_gfxvram[offset + 0x8000] = data;
+	if(towns_vram_wplane & 0x04)
+		towns_gfxvram[offset + 0x10000] = data;
+	if(towns_vram_wplane & 0x08)
+		towns_gfxvram[offset + 0x18000] = data;
+}
+
+static READ8_HANDLER( towns_video_cff80_r )
+{
+	if(towns_mainmem_enable != 0)
+		return mess_ram[offset+0xcff80];
+	
+	switch(offset)
+	{
+		case 0x01:  // read/write plane select (bit 0-3 write, bit 6-7 read)
+			return ((towns_vram_rplane << 6) & 0xc0) | towns_vram_wplane;
+		case 0x19:  // ANK CG ROM
+			if(towns_ankcg_enable != 0)
+				return 0x01;
+			else
+				return 0x00;
+		default:
+			logerror("VGA: read from invalid or unimplemented memory-mapped port %05x\n",0xcff80+offset*4);
+	}
+	
+	return 0;
+}
+
+static WRITE8_HANDLER( towns_video_cff80_w )
+{
+	if(towns_mainmem_enable != 0)
+	{
+		mess_ram[offset+0xcff80] = data;
+		return;
+	}
+
+	switch(offset)
+	{
+		case 0x01:  // read/write plane select (bit 0-3 write, bit 6-7 read)
+			towns_vram_wplane = data & 0x0f;
+			towns_vram_rplane = (data & 0xc0) >> 6;
+			towns_update_video_banks(space);
+			logerror("VGA: VRAM wplane select = 0x%02x\n",towns_vram_wplane);
+			break;
+		case 0x19:  // ANK CG ROM
+			towns_ankcg_enable = data & 0x00000100;
+			towns_update_video_banks(space);
+			break;
+		default:
+			logerror("VGA: write %08x to invalid or unimplemented memory-mapped port %05x\n",data,0xcff80+offset);
+	}
+}
+
+static void towns_update_video_banks(const address_space* space)
+{
+	UINT8* ROM;
+	
+	if(towns_mainmem_enable != 0)  // first MB is RAM
+	{
+		memory_set_bankptr(space->machine,1,mess_ram+0xc0000);
+		memory_set_bankptr(space->machine,2,mess_ram+0xc8000);
+		memory_set_bankptr(space->machine,3,mess_ram+0xc9000);
+		memory_set_bankptr(space->machine,4,mess_ram+0xca000);
+		memory_set_bankptr(space->machine,5,mess_ram+0xca000);
+		memory_set_bankptr(space->machine,10,mess_ram+0xca800);
+		memory_set_bankptr(space->machine,6,mess_ram+0xcb000);
+		memory_set_bankptr(space->machine,7,mess_ram+0xcb000);
+		memory_set_bankptr(space->machine,8,mess_ram+0xcc000);
+		memory_set_bankptr(space->machine,11,mess_ram+0xf8000);
+		memory_set_bankptr(space->machine,12,mess_ram+0xf8000);
+		return;
+	}
+	else  // enable I/O ports and VRAM
+	{
+		ROM = memory_region(space->machine,"user");
+
+		memory_set_bankptr(space->machine,1,towns_gfxvram+(towns_vram_rplane*0x8000));
+		memory_set_bankptr(space->machine,2,towns_txtvram);
+		memory_set_bankptr(space->machine,3,mess_ram+0xc9000);
+		if(towns_ankcg_enable == 0)
+			memory_set_bankptr(space->machine,4,ROM+0x180000+0x3d000);  // ANK CG 8x8
+		else
+			memory_set_bankptr(space->machine,4,towns_txtvram+0x2000);
+		memory_set_bankptr(space->machine,5,towns_txtvram+0x2000);
+		memory_set_bankptr(space->machine,10,mess_ram+0xca800);
+		if(towns_ankcg_enable == 0)
+			memory_set_bankptr(space->machine,6,ROM+0x180000+0x3d800);  // ANK CG 8x16
+		else
+			memory_set_bankptr(space->machine,6,mess_ram+0xcb000);
+		memory_set_bankptr(space->machine,7,mess_ram+0xcb000);
+		memory_set_bankptr(space->machine,8,mess_ram+0xcc000);
+		memory_set_bankptr(space->machine,11,ROM+0x238000);
+		memory_set_bankptr(space->machine,12,mess_ram+0xf8000);
+		return;
+	}
+}
+
 static READ8_HANDLER( towns_sys480_r )
 {
 	if(towns_system_port & 0x02)
@@ -345,20 +504,58 @@ static READ8_HANDLER( towns_sys480_r )
 static WRITE8_HANDLER( towns_sys480_w )
 {
 	towns_system_port = data;
+	towns_ram_enable = data & 0x02;
+	towns_update_video_banks(space);
+}
+
+static WRITE32_HANDLER( towns_video_404_w )
+{
+	if(ACCESSING_BITS_0_7)
+	{
+		towns_mainmem_enable = data & 0x80;
+		towns_update_video_banks(space);
+	}
+}
+
+static READ32_HANDLER( towns_video_404_r )
+{
+	if(towns_mainmem_enable != 0)
+		return 0x00000080;
+	
+	return 0;
+}
+
+static READ8_HANDLER(towns_video_ff81_r)
+{
+	return ((towns_vram_rplane << 6) & 0xc0) | towns_vram_wplane;
+}
+
+static WRITE8_HANDLER(towns_video_ff81_w)
+{
+	towns_vram_wplane = data & 0x0f;
+	towns_vram_rplane = (data & 0xc0) >> 6;
+	towns_update_video_banks(space);
+	logerror("VGA: VRAM wplane select (I/O) = 0x%02x\n",towns_vram_wplane);
 }
 
 static ADDRESS_MAP_START(towns_mem, ADDRESS_SPACE_PROGRAM, 32)
   // memory map based on FM-Towns/Bochs (Bochs modified to emulate the FM-Towns)
   // may not be (and probably is not) correct
   AM_RANGE(0x00000000, 0x000bffff) AM_RAM
-  AM_RANGE(0x000c0000, 0x000c7fff) AM_RAM AM_BASE(&towns_gfxvram)  // GVRAM
-  AM_RANGE(0x000c8000, 0x000cffff) AM_RAM AM_BASE(&towns_txtvram) // TVRAM
-//  AM_RANGE(0x000ca000, 0x000cafff) AM_RAM AM_BASE(&towns_txtvram) // TVRAM
+  AM_RANGE(0x000c0000, 0x000c7fff) AM_READ(SMH_BANK(1))
+  AM_RANGE(0x000c0000, 0x000c7fff) AM_WRITE8(towns_gfx_w,0xffffffff) 
+  AM_RANGE(0x000c8000, 0x000c8fff) AM_READWRITE(SMH_BANK(2),SMH_BANK(2))
+  AM_RANGE(0x000c9000, 0x000c9fff) AM_READWRITE(SMH_BANK(3),SMH_BANK(3))
+  AM_RANGE(0x000ca000, 0x000ca7ff) AM_READWRITE(SMH_BANK(4),SMH_BANK(5))
+  AM_RANGE(0x000ca800, 0x000cafff) AM_READWRITE(SMH_BANK(10),SMH_BANK(10))
+  AM_RANGE(0x000cb000, 0x000cbfff) AM_READWRITE(SMH_BANK(6),SMH_BANK(7)) 
+  AM_RANGE(0x000cc000, 0x000cff7f) AM_READWRITE(SMH_BANK(8),SMH_BANK(8))
+  AM_RANGE(0x000cff80, 0x000cffff) AM_READWRITE8(towns_video_cff80_r,towns_video_cff80_w,0xffffffff) 
   AM_RANGE(0x000d0000, 0x000d7fff) AM_RAM
   AM_RANGE(0x000d8000, 0x000d9fff) AM_READWRITE(towns_cmos_r,towns_cmos_w) // CMOS? RAM
-  AM_RANGE(0x000da000, 0x000effff) AM_RAM
-  AM_RANGE(0x000f0000, 0x000f7fff) AM_RAM
-  AM_RANGE(0x000f8000, 0x000fffff) AM_RAM AM_REGION("user",0x238000)  // BOOT (SYSTEM) ROM
+  AM_RANGE(0x000da000, 0x000effff) AM_RAM //READWRITE(SMH_BANK(11),SMH_BANK(11))
+  AM_RANGE(0x000f0000, 0x000f7fff) AM_RAM //READWRITE(SMH_BANK(12),SMH_BANK(12))
+  AM_RANGE(0x000f8000, 0x000fffff) AM_READWRITE(SMH_BANK(11),SMH_BANK(12))
   AM_RANGE(0x00100000, 0x005fffff) AM_RAM  // some extra RAM - seems to be needed to boot
   AM_RANGE(0x80000000, 0x8003ffff) AM_RAM AM_MIRROR(0x1c0000) AM_BASE(&towns_vram) // VRAM
   AM_RANGE(0x81000000, 0x8101ffff) AM_RAM  // Sprite RAM
@@ -387,7 +584,7 @@ static ADDRESS_MAP_START( towns_io , ADDRESS_SPACE_IO, 32)
   AM_RANGE(0x0200,0x020f) AM_READWRITE8(towns_floppy_r, towns_floppy_w, 0xffffffff)
   // CRTC / Video
   AM_RANGE(0x0400,0x0403) AM_NOP  // R/O (0x400)
-  AM_RANGE(0x0404,0x0407) AM_NOP  // R/W (0x404)
+  AM_RANGE(0x0404,0x0407) AM_READWRITE(towns_video_404_r, towns_video_404_w)  // R/W (0x404)
   AM_RANGE(0x0440,0x045f) AM_READWRITE8(towns_video_440_r, towns_video_440_w, 0xffffffff)
   // System port
   AM_RANGE(0x0480,0x0483) AM_READWRITE8(towns_sys480_r,towns_sys480_w,0xff000000)  // R/W (0x480)
@@ -426,8 +623,8 @@ static DRIVER_INIT( towns )
 {
 	towns_vram = auto_alloc_array(machine,UINT32,0x20000);
 	towns_cmos = auto_alloc_array(machine,UINT32,0x2000/(sizeof(UINT32)));
-	towns_gfxvram = auto_alloc_array(machine,UINT32,0x8000/(sizeof(UINT32)));
-	towns_txtvram = auto_alloc_array(machine,UINT32,0x8000/(sizeof(UINT32)));
+	towns_gfxvram = auto_alloc_array(machine,UINT8,0x200000);
+	towns_txtvram = auto_alloc_array(machine,UINT8,0x8000);
 }
 
 static MACHINE_RESET( towns )
@@ -435,6 +632,11 @@ static MACHINE_RESET( towns )
 	ftimer = 0x00;
 	nmi_mask = 0x00;
 	compat_mode = 0x00;
+	towns_ankcg_enable = 0x00;
+	towns_mainmem_enable = 0x00;
+	towns_ram_enable = 0x00;
+	towns_update_video_banks(cpu_get_address_space(cputag_get_cpu(machine,"maincpu"),ADDRESS_SPACE_PROGRAM));
+	towns_vram_wplane = 0x00;
 }
 
 static VIDEO_START( towns )
@@ -444,15 +646,27 @@ static VIDEO_START( towns )
 static VIDEO_UPDATE( towns )
 {
 	int x,y;
-	int pixel = 0;
+	UINT8 dat1,dat2,dat3,dat4;
+	int bit;
+	UINT8 colour;
 
 	for(y=0;y<480;y++)
 	{
 		for(x=0;x<640;x++)
 		{
-			*BITMAP_ADDR32(bitmap,y,x) = towns_vram[pixel++];
-			if(pixel >= 0x20000)
-				pixel = 0;
+			bit = 7 - (x & 0x07);
+			dat1 = towns_gfxvram[(x/8) + (y*0x50)];
+			dat2 = towns_gfxvram[(x/8) + (y*0x50) + 0x8000];
+			dat3 = towns_gfxvram[(x/8) + (y*0x50) + 0x10000];
+			dat4 = towns_gfxvram[(x/8) + (y*0x50) + 0x18000];
+			colour = (dat1 & (1 << bit) ? 8 : 0) 
+				| (dat2 & (1 << bit) ? 4 : 0)
+				| (dat3 & (1 << bit) ? 2 : 0)
+				| (dat4 & (1 << bit) ? 1 : 0);
+			*BITMAP_ADDR32(bitmap,y,x) = 
+				(towns_palette_r[colour] << 16)
+				| (towns_palette_g[colour] << 8)
+				| (towns_palette_b[colour]); 
 		}
 	}
 
@@ -487,6 +701,10 @@ static const struct pic8259_interface towns_pic8259_slave_config =
 {
 	NULL
 };
+
+static SYSTEM_CONFIG_START(towns)
+	CONFIG_RAM_DEFAULT(0x6000000)  // 6MB will do to start, standard amount for the Marty
+SYSTEM_CONFIG_END
 
 static MACHINE_DRIVER_START( towns )
     /* basic machine hardware */
@@ -551,7 +769,7 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT    INIT    CONFIG COMPANY      FULLNAME            FLAGS */
-COMP( 1989, fmtowns,  0,    0, 		towns, 		towns, 	 towns,  	 0,  	"Fujitsu",   "FM-Towns",		 GAME_NOT_WORKING)
-COMP( 1989, fmtownsa, fmtowns, 0, 	towns, 		towns, 	 towns,  	 0,  	"Fujitsu",   "FM-Towns (alternate)", GAME_NOT_WORKING)
-CONS( 1993, fmtmarty, 0,    0, 		towns, 		towns, 	 towns,  	 0,  	"Fujitsu",   "FM-Towns Marty",	 GAME_NOT_WORKING)
+COMP( 1989, fmtowns,  0,    0, 		towns, 		towns, 	 towns,  	 towns,  	"Fujitsu",   "FM-Towns",		 GAME_NOT_WORKING)
+COMP( 1989, fmtownsa, fmtowns, 0, 	towns, 		towns, 	 towns,  	 towns,  	"Fujitsu",   "FM-Towns (alternate)", GAME_NOT_WORKING)
+CONS( 1993, fmtmarty, 0,    0, 		towns, 		towns, 	 towns,  	 towns,  	"Fujitsu",   "FM-Towns Marty",	 GAME_NOT_WORKING)
 
