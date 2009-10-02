@@ -91,6 +91,7 @@ irq vector 16: tests ppi port c, writes the result to $feca. ;vblank
 #include "machine/msm8251.h"
 #include "video/m6847.h"
 #include "sound/ay8910.h"
+#include "devices/cartslot.h"
 
 static UINT8 *pc6001_ram;
 static UINT8 *pc6001_video_ram;
@@ -98,7 +99,7 @@ static UINT8 irq_vector = 0x00;
 static UINT8 cas_switch,sys_latch;
 static UINT32 cas_offset;
 
-#define CAS_LENGTH 0x64c8
+#define CAS_LENGTH 0x1655
 
 static VIDEO_START( pc6001 )
 {
@@ -318,9 +319,41 @@ static WRITE8_DEVICE_HANDLER(nec_ppi8255_w) {
          	default: break;
 		}
 		port_c_8255 |= 0xa8;
+
+		{
+			UINT8 *gfx_data = memory_region(device->machine, "gfx1");
+			UINT8 *ext_rom = memory_region(device->machine, "cart_img");
+
+			//printf("%02x\n",data);
+
+			if((data & 0x0f) == 0x05)
+				memory_set_bankptr(device->machine, 1, &ext_rom[0x2000]);
+			if((data & 0x0f) == 0x04)
+				memory_set_bankptr(device->machine, 1, &gfx_data[0]);
+		}
 	}
 	i8255a_w(device,offset,data);
 }
+
+static ADDRESS_MAP_START(pc6001_map, ADDRESS_SPACE_PROGRAM, 8)
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x4000, 0x5fff) AM_ROM AM_REGION("cart_img",0)
+	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xffff) AM_RAM AM_BASE(&pc6001_ram)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( pc6001_io , ADDRESS_SPACE_IO, 8)
+	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("uart", msm8251_data_r,msm8251_data_w)
+	AM_RANGE(0x81, 0x81) AM_DEVREADWRITE("uart", msm8251_status_r,msm8251_control_w)
+	AM_RANGE(0x90, 0x93) AM_DEVREADWRITE("ppi8255", nec_ppi8255_r, nec_ppi8255_w)
+	AM_RANGE(0xa0, 0xa0) AM_DEVWRITE("ay8910", ay8910_address_w)
+	AM_RANGE(0xa1, 0xa1) AM_DEVWRITE("ay8910", ay8910_data_w)
+	AM_RANGE(0xa2, 0xa2) AM_DEVREAD("ay8910", ay8910_r)
+	AM_RANGE(0xb0, 0xb0) AM_WRITE(pc6001_system_latch_w)
+ADDRESS_MAP_END
 
 /*
 	ROM_REGION( 0x28000, "maincpu", ROMREGION_ERASEFF )
@@ -424,25 +457,6 @@ static WRITE8_HANDLER( work_ram5_w ) { UINT8 *ROM = memory_region(space->machine
 static WRITE8_HANDLER( work_ram6_w ) { UINT8 *ROM = memory_region(space->machine, "maincpu"); ROM[offset+WRAM(6)] = data; }
 static WRITE8_HANDLER( work_ram7_w ) { UINT8 *ROM = memory_region(space->machine, "maincpu"); ROM[offset+WRAM(7)] = data; }
 
-
-static ADDRESS_MAP_START(pc6001_map, ADDRESS_SPACE_PROGRAM, 8)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x4fff) AM_MIRROR(0x3000) AM_ROM AM_REGION("gfx1",0)
-	AM_RANGE(0x8000, 0xffff) AM_RAM AM_BASE(&pc6001_ram)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( pc6001_io , ADDRESS_SPACE_IO, 8)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("uart", msm8251_data_r,msm8251_data_w)
-	AM_RANGE(0x81, 0x81) AM_DEVREADWRITE("uart", msm8251_status_r,msm8251_control_w)
-	AM_RANGE(0x90, 0x93) AM_DEVREADWRITE("ppi8255", nec_ppi8255_r, nec_ppi8255_w)
-	AM_RANGE(0xa0, 0xa0) AM_DEVWRITE("ay8910", ay8910_address_w)
-	AM_RANGE(0xa1, 0xa1) AM_DEVWRITE("ay8910", ay8910_data_w)
-	AM_RANGE(0xa2, 0xa2) AM_DEVREAD("ay8910", ay8910_r)
-	AM_RANGE(0xb0, 0xb0) AM_WRITE(pc6001_system_latch_w)
-ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(pc6001m2_map, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -636,12 +650,12 @@ static READ8_DEVICE_HANDLER (pc6001_8255_portb_r )
 
 static WRITE8_DEVICE_HANDLER (pc6001_8255_portb_w )
 {
-	//logerror("pc6001_8255_portb_w %02x\n",data);
+//	printf("pc6001_8255_portb_w %02x\n",data);
 }
 
 static WRITE8_DEVICE_HANDLER (pc6001_8255_portc_w )
 {
-	//logerror("pc6001_8255_portc_w %02x\n",data);
+//	printf("pc6001_8255_portc_w %02x\n",data);
 }
 
 static READ8_DEVICE_HANDLER (pc6001_8255_portc_r )
@@ -853,6 +867,10 @@ static MACHINE_DRIVER_START( pc6001 )
 	/* uart */
 	MDRV_MSM8251_ADD("uart", pc6001_usart_interface)
 
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("bin")
+	MDRV_CARTSLOT_NOT_MANDATORY
+
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("ay8910", AY8910, XTAL_4MHz/2)
 	MDRV_SOUND_CONFIG(pc6001_ay_interface)
@@ -883,12 +901,16 @@ ROM_START( pc6001 )	/* screen = 8000-83FF */
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "basicrom.60", 0x0000, 0x4000, CRC(54c03109) SHA1(c622fefda3cdc2b87a270138f24c05828b5c41d2) )
 
-	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "cgrom60.60", 0x0000, 0x1000, CRC(b0142d32) SHA1(9570495b10af5b1785802681be94b0ea216a1e26) )
+	ROM_RELOAD(             0x1000, 0x1000 )
 
 	ROM_REGION( 0x10000, "cas", ROMREGION_ERASEFF )
 	/* Load here your tape for now (and change the cas length macro according to what MESS returns) */
-//	ROM_LOAD( "trick boy.cas", 0x0000, CAS_LENGTH, CRC(1) SHA1(1) )
+//	ROM_LOAD( "car.cas", 0x0000, CAS_LENGTH, CRC(1) SHA1(1) )
+
+	ROM_REGION( 0x4000, "cart_img", ROMREGION_ERASE00 )
+	ROM_CART_LOAD("cart", 0x0000, 0x3fff, ROM_OPTIONAL | ROM_MIRROR)
 ROM_END
 
 ROM_START( pc6001a )
@@ -899,6 +921,9 @@ ROM_START( pc6001a )
 	ROM_LOAD( "cgrom60.60a", 0x0000, 0x1000, CRC(49c21d08) SHA1(9454d6e2066abcbd051bad9a29a5ca27b12ec897) )
 
 	ROM_REGION( 0x10000, "cas", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x4000, "cart_img", ROMREGION_ERASE00 )
+	ROM_CART_LOAD("cart", 0x0000, 0x3fff, ROM_OPTIONAL | ROM_MIRROR)
 ROM_END
 
 ROM_START( pc6001m2 )
@@ -913,6 +938,9 @@ ROM_START( pc6001m2 )
 	ROM_COPY( "maincpu", 0x1c000, 0x00000, 0x1000 )
 
 	ROM_REGION( 0x10000, "cas", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x4000, "cart_img", ROMREGION_ERASE00 )
+	ROM_CART_LOAD("cart", 0x0000, 0x3fff, ROM_OPTIONAL | ROM_MIRROR)
 ROM_END
 
 ROM_START( pc6001sr )
@@ -925,6 +953,9 @@ ROM_START( pc6001sr )
 	ROM_LOAD( "cgrom68.64", 0x0000, 0x4000, CRC(73bc3256) SHA1(5f80d62a95331dc39b2fb448a380fd10083947eb) )
 
 	ROM_REGION( 0x10000, "cas", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x4000, "cart_img", ROMREGION_ERASE00 )
+	ROM_CART_LOAD("cart", 0x0000, 0x3fff, ROM_OPTIONAL | ROM_MIRROR)
 ROM_END
 
 ROM_START( pc6600 )	/* Variant of pc6001m2 */
@@ -938,6 +969,9 @@ ROM_START( pc6600 )	/* Variant of pc6001m2 */
 	ROM_LOAD( "kanjirom.66", 0x4000, 0x8000, CRC(20c8f3eb) SHA1(4c9f30f0a2ebbe70aa8e697f94eac74d8241cadd) )
 
 	ROM_REGION( 0x10000, "cas", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x4000, "cart_img", ROMREGION_ERASE00 )
+	ROM_CART_LOAD("cart", 0x0000, 0x3fff, ROM_OPTIONAL | ROM_MIRROR)
 ROM_END
 
 /* There exists an alternative (incomplete?) dump, consisting of more .68 pieces, but it's been probably created for emulators:
@@ -954,6 +988,9 @@ ROM_START( pc6600sr )	/* Variant of pc6001sr */
 	ROM_LOAD( "cgrom68.68", 0x0000, 0x4000, CRC(73bc3256) SHA1(5f80d62a95331dc39b2fb448a380fd10083947eb) )
 
 	ROM_REGION( 0x10000, "cas", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x4000, "cart_img", ROMREGION_ERASE00 )
+	ROM_CART_LOAD("cart", 0x0000, 0x3fff, ROM_OPTIONAL | ROM_MIRROR)
 ROM_END
 
 /*    YEAR  NAME      PARENT   COMPAT MACHINE   INPUT     INIT    CONFIG     COMPANY  FULLNAME          FLAGS */
