@@ -704,7 +704,7 @@ WRITE64_HANDLER( dc_mess_g1_ctrl_w )
 	old = g1bus_regs[reg];
 
 	g1bus_regs[reg] = dat; // 5f7400+reg*4=dat
-	mame_printf_verbose("G1CTRL: [%08x=%x] write %llx to %x, mask %" I64FMT "x\n", 0x5f7400+reg*4, dat, data, offset, mem_mask);
+	mame_printf_verbose("G1CTRL: [%08x=%x] write %" I64FMT "x to %x, mask %" I64FMT "x\n", 0x5f7400+reg*4, dat, data, offset, mem_mask);
 	switch (reg)
 	{
 	case SB_GDST:
