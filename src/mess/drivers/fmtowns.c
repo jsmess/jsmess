@@ -97,6 +97,9 @@ static UINT8 towns_palette_r[256];
 static UINT8 towns_palette_g[256];
 static UINT8 towns_palette_b[256];
 static UINT8 towns_degipal[8];
+static UINT16 towns_kanji_offset;
+static UINT8 towns_kanji_code_h;
+static UINT8 towns_kanji_code_l;
 
 static void towns_update_video_banks(const address_space* space);
 
@@ -405,6 +408,7 @@ static WRITE8_HANDLER( towns_gfx_w )
 
 static READ8_HANDLER( towns_video_cff80_r )
 {
+	UINT8* ROM = memory_region(space->machine,"user");
 	if(towns_mainmem_enable != 0)
 		return mess_ram[offset+0xcff80];
 	
@@ -412,6 +416,10 @@ static READ8_HANDLER( towns_video_cff80_r )
 	{
 		case 0x01:  // read/write plane select (bit 0-3 write, bit 6-7 read)
 			return ((towns_vram_rplane << 6) & 0xc0) | towns_vram_wplane;
+		case 0x16:  // Kanji character data
+			return ROM[(towns_kanji_offset << 1) + 0x180000];
+		case 0x17:  // Kanji character data
+			return ROM[(towns_kanji_offset++ << 1) + 0x180001];
 		case 0x19:  // ANK CG ROM
 			if(towns_ankcg_enable != 0)
 				return 0x01;
@@ -439,6 +447,36 @@ static WRITE8_HANDLER( towns_video_cff80_w )
 			towns_vram_rplane = (data & 0xc0) >> 6;
 			towns_update_video_banks(space);
 			logerror("VGA: VRAM wplane select = 0x%02x\n",towns_vram_wplane);
+			break;
+		case 0x14:  // Kanji offset (high)
+			towns_kanji_code_h = data & 0x7f;
+			break;
+		case 0x15:  // Kanji offset (low)
+			towns_kanji_code_l = data & 0x7f;
+			// this is a little over the top...
+			if(towns_kanji_code_h < 0x30)
+			{
+				towns_kanji_offset = ((towns_kanji_code_l & 0x1f) << 4)
+				                   | (((towns_kanji_code_l - 0x20) & 0x20) << 8)
+				                   | (((towns_kanji_code_l - 0x20) & 0x40) << 6)
+				                   | ((towns_kanji_code_h & 0x07) << 9);
+			}
+			else if(towns_kanji_code_h < 0x70)
+			{
+				towns_kanji_offset = ((towns_kanji_code_l & 0x1f) << 4)
+				                   + (((towns_kanji_code_l - 0x20) & 0x60) << 8)
+				                   + ((towns_kanji_code_h & 0x0f) << 9)
+				                   + (((towns_kanji_code_h - 0x30) & 0x70) * 0xc00)
+				                   + 0x8000;
+			}
+			else
+			{
+				towns_kanji_offset = ((towns_kanji_code_l & 0x1f) << 4)
+				                   | (((towns_kanji_code_l - 0x20) & 0x20) << 8)
+				                   | (((towns_kanji_code_l - 0x20) & 0x40) << 6)
+				                   | ((towns_kanji_code_h & 0x07) << 9)
+				                   | 0x38000;
+			}
 			break;
 		case 0x19:  // ANK CG ROM
 			towns_ankcg_enable = data & 0x00000100;
@@ -702,6 +740,23 @@ static const struct pic8259_interface towns_pic8259_slave_config =
 	NULL
 };
 
+// for debugging
+static const gfx_layout x1_chars_16x16 =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	1,
+	{ 0 },
+	{ 0, 1, 2, 3, 4, 5, 6, 7,8,9,10,11,12,13,14,15 },
+	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
+	16*16
+};
+
+/* decoded for debugging purpose, this will be nuked in the end... */
+static GFXDECODE_START( towns )
+	GFXDECODE_ENTRY( "user",   0x180000, x1_chars_16x16,  0, 0x100 ) //needs to be checked when the ROM will be redumped
+GFXDECODE_END
+
 static SYSTEM_CONFIG_START(towns)
 	CONFIG_RAM_DEFAULT(0x6000000)  // 6MB will do to start, standard amount for the Marty
 SYSTEM_CONFIG_END
@@ -721,6 +776,7 @@ static MACHINE_DRIVER_START( towns )
     MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
     MDRV_SCREEN_SIZE(640, 480)
     MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+    MDRV_GFXDECODE(towns)
 
     /* sound hardware */
     MDRV_SPEAKER_STANDARD_MONO("mono")
