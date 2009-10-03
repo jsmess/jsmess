@@ -406,7 +406,7 @@ static READ32_HANDLER(towns_sys5e8_r)
 			if(ACCESSING_BITS_0_7)
 			{
 				logerror("SYS: read RAM size port\n");
-				return 0x08;  // 6MB is standard for the Marty
+				return 0x06;  // 6MB is standard for the Marty
 			}
 			break;
 		case 0x01:
@@ -460,6 +460,26 @@ static WRITE8_HANDLER( towns_cmos8_w )
 	UINT8* cmos = (UINT8*)towns_cmos;
 
 	cmos[offset] = data;
+}
+
+static READ8_HANDLER( towns_cmos_low_r )
+{
+	UINT8* cmos = (UINT8*)towns_cmos;
+
+	if(towns_mainmem_enable != 0)
+		return mess_ram[offset + 0xd8000];
+		
+	return cmos[offset];
+}
+
+static WRITE8_HANDLER( towns_cmos_low_w )
+{
+	UINT8* cmos = (UINT8*)towns_cmos;
+
+	if(towns_mainmem_enable != 0)
+		mess_ram[offset+0xd8000] = data;
+	else
+		cmos[offset] = data;
 }
 
 static READ32_HANDLER( towns_cmos_r )
@@ -673,7 +693,7 @@ static ADDRESS_MAP_START(towns_mem, ADDRESS_SPACE_PROGRAM, 32)
   AM_RANGE(0x000cc000, 0x000cff7f) AM_READWRITE(SMH_BANK(8),SMH_BANK(8))
   AM_RANGE(0x000cff80, 0x000cffff) AM_READWRITE8(towns_video_cff80_r,towns_video_cff80_w,0xffffffff) 
   AM_RANGE(0x000d0000, 0x000d7fff) AM_RAM
-  AM_RANGE(0x000d8000, 0x000d9fff) AM_READWRITE(towns_cmos_r,towns_cmos_w) // CMOS? RAM
+  AM_RANGE(0x000d8000, 0x000d9fff) AM_READWRITE8(towns_cmos_low_r,towns_cmos_low_w,0xffffffff) // CMOS? RAM
   AM_RANGE(0x000da000, 0x000effff) AM_RAM //READWRITE(SMH_BANK(11),SMH_BANK(11))
   AM_RANGE(0x000f0000, 0x000f7fff) AM_RAM //READWRITE(SMH_BANK(12),SMH_BANK(12))
   AM_RANGE(0x000f8000, 0x000fffff) AM_READWRITE(SMH_BANK(11),SMH_BANK(12))
