@@ -320,11 +320,11 @@ static READ8_HANDLER(towns_video_fd90_r)
 		case 0x00:
 			return towns_palette_select;
 		case 0x02:
-			return towns_palette_r[towns_palette_select];
-		case 0x04:
-			return towns_palette_g[towns_palette_select];
-		case 0x06:
 			return towns_palette_b[towns_palette_select];
+		case 0x04:
+			return towns_palette_r[towns_palette_select];
+		case 0x06:
+			return towns_palette_g[towns_palette_select];
 		case 0x08:
 		case 0x09:
 		case 0x0a:
@@ -347,13 +347,13 @@ static WRITE8_HANDLER(towns_video_fd90_w)
 			towns_palette_select = data;
 			break;
 		case 0x02:
-			towns_palette_r[towns_palette_select] = data;
+			towns_palette_b[towns_palette_select] = data;
 			break;
 		case 0x04:
-			towns_palette_g[towns_palette_select] = data;
+			towns_palette_r[towns_palette_select] = data;
 			break;
 		case 0x06:
-			towns_palette_b[towns_palette_select] = data;
+			towns_palette_g[towns_palette_select] = data;
 			break;
 		case 0x08:
 		case 0x09:
@@ -366,7 +366,7 @@ static WRITE8_HANDLER(towns_video_fd90_w)
 			towns_degipal[offset-0x08] = data;
 			break;
 	}
-//	logerror("VID: wrote 0x%02x to port %04x\n",data,offset+0xfd90);
+	logerror("VID: wrote 0x%02x to port %04x\n",data,offset+0xfd90);
 }
 
 static READ8_HANDLER(towns_keyboard_r)
@@ -800,10 +800,10 @@ static VIDEO_UPDATE( towns )
 			dat2 = towns_gfxvram[(x/8) + (y*0x50) + 0x8000];
 			dat3 = towns_gfxvram[(x/8) + (y*0x50) + 0x10000];
 			dat4 = towns_gfxvram[(x/8) + (y*0x50) + 0x18000];
-			colour = (dat1 & (1 << bit) ? 8 : 0) 
-				| (dat2 & (1 << bit) ? 4 : 0)
-				| (dat3 & (1 << bit) ? 2 : 0)
-				| (dat4 & (1 << bit) ? 1 : 0);
+			colour = (dat1 & (1 << bit) ? 1 : 0) 
+				| (dat2 & (1 << bit) ? 2 : 0)
+				| (dat3 & (1 << bit) ? 4 : 0)
+				| (dat4 & (1 << bit) ? 8 : 0);
 			*BITMAP_ADDR32(bitmap,y,x) = 
 				(towns_palette_r[colour] << 16)
 				| (towns_palette_g[colour] << 8)
