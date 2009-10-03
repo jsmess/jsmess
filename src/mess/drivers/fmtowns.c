@@ -48,7 +48,7 @@
  * 0x006c RW: returns 0x00? (read) timer? (write)
  * 0x00a0-af: DMA controller 1 (uPD71071)
  * 0x00b0-bf: DMA controller 2 (uPD71071)
- * 0x0200-0f: Floppy controller (unknown)
+ * 0x0200-0f: Floppy controller (MB8877A)
  * 0x0400   : Video / CRTC (unknown)
  * 0x0404   : Video / CRTC (unknown)
  * 0x0440-5f: Video / CRTC (unknown)
@@ -78,6 +78,8 @@
 #include "sound/rf5c68.h"
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
+#include "machine/wd17xx.h"
+#include "devices/flopdrv.h"
 
 static UINT8 ftimer;
 static UINT8 nmi_mask;
@@ -100,6 +102,7 @@ static UINT8 towns_degipal[8];
 static UINT16 towns_kanji_offset;
 static UINT8 towns_kanji_code_h;
 static UINT8 towns_kanji_code_l;
+static int towns_selected_drive;
 
 static void towns_update_video_banks(const address_space* space);
 
@@ -191,15 +194,95 @@ static WRITE8_HANDLER(towns_dma2_w)
 	logerror("DMA#2: wrote 0x%02x to register %i\n",data,offset);
 }
 
+/*
+ *  Floppy Disc Controller (MB8877A)
+ */
 static READ8_HANDLER(towns_floppy_r)
 {
-	logerror("PCM: read register %i\n",offset);
+	const device_config* fdc = devtag_get_device(space->machine,"fdc");
+
+	switch(offset)
+	{
+		case 0x00:
+			return wd17xx_status_r(fdc,offset/2);
+		case 0x02:
+			return wd17xx_track_r(fdc,offset/2);
+		case 0x04:
+			return wd17xx_sector_r(fdc,offset/2);
+		case 0x06:
+			return wd17xx_data_r(fdc,offset/2);
+		case 0x08:  // selected drive status?
+			logerror("FDC: read from offset 0x08\n");
+			if(towns_selected_drive < 1 || towns_selected_drive > 2)
+				return 0x01;
+			else
+				return 0x07;
+		case 0x0e: // DRVCHG
+			logerror("FDC: read from offset 0x0e\n");
+			return 0x00;
+		default:
+			logerror("FDC: read from invalid or unimplemented register %02x\n",offset);
+	}
 	return 0x00;
 }
 
 static WRITE8_HANDLER(towns_floppy_w)
 {
-	logerror("PCM: wrote 0x%02x to register %i\n",data,offset);
+	const device_config* fdc = devtag_get_device(space->machine,"fdc");
+
+	switch(offset)
+	{
+		case 0x00:
+			wd17xx_command_w(fdc,offset/2,data);
+			break;
+		case 0x02:
+			wd17xx_track_w(fdc,offset/2,data);
+			break;
+		case 0x04:
+			wd17xx_sector_w(fdc,offset/2,data);
+			break;
+		case 0x06:
+			wd17xx_data_w(fdc,offset/2,data);
+			break;
+		case 0x08:
+			// bit 5 - CLKSEL
+			if(data & 0x10)
+			{
+				if(towns_selected_drive != 0)
+				{
+					floppy_drive_set_motor_state(floppy_get_device(space->machine, towns_selected_drive-1), data & 0x10);
+					floppy_drive_set_ready_state(floppy_get_device(space->machine, towns_selected_drive-1), data & 0x10,0);
+				}
+			}
+			// bit 2 - HDISEL
+			// bit 1 - DDEN
+			// bit 0 - IRQMSK
+			logerror("FDC: write %02x to offset 0x08\n",data); 
+			break;
+		case 0x0c:  // drive select
+			switch(data & 0x0f)
+			{
+				case 0x00:
+					towns_selected_drive = 0;  // No drive selected
+					break;
+				case 0x01:
+					towns_selected_drive = 1;
+					break;
+				case 0x02:
+					towns_selected_drive = 2;
+					break;
+				case 0x04:
+					towns_selected_drive = 3;
+					break;
+				case 0x08:
+					towns_selected_drive = 4;
+					break;
+			}
+			logerror("FDC: drive select %02x\n",data);
+			break;
+		default:
+			logerror("FDC: write %02x to invalid or unimplemented register %02x\n",data,offset);
+	}
 }
 
 static READ8_HANDLER(towns_video_440_r)
@@ -740,6 +823,20 @@ static const struct pic8259_interface towns_pic8259_slave_config =
 	NULL
 };
 
+static const wd17xx_interface towns_mb8877a_interface =
+{
+	NULL,
+	NULL,
+	{FLOPPY_0,FLOPPY_1,FLOPPY_2,FLOPPY_3}
+};
+
+static const floppy_config towns_floppy_config =
+{
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(default),
+	DO_NOT_KEEP_GEOMETRY
+};
+
 // for debugging
 static const gfx_layout x1_chars_16x16 =
 {
@@ -792,6 +889,9 @@ static MACHINE_DRIVER_START( towns )
 	MDRV_PIC8259_ADD( "pic8259_master", towns_pic8259_master_config )
 
 	MDRV_PIC8259_ADD( "pic8259_slave", towns_pic8259_slave_config )
+
+	MDRV_MB8877_ADD("fdc",towns_mb8877a_interface)
+	MDRV_FLOPPY_2_DRIVES_ADD(towns_floppy_config)
 
     MDRV_VIDEO_START(towns)
     MDRV_VIDEO_UPDATE(towns)
