@@ -155,13 +155,13 @@ static void init_nes_core( running_machine *machine )
 			mmc_write_mid = mapper->mmc_write_mid;
 			mmc_write = mapper->mmc_write;
 			ppu_latch = mapper->ppu_latch;
-//          mmc_irq = mmc_list[i].mmc_irq;
 		}
 		else
 		{
 			logerror("Mapper %d is not yet supported, defaulting to no mapper.\n",nes.mapper);
 			mmc_write_low = mmc_write_mid = mmc_write = NULL;
 			mmc_read_low = NULL;
+			ppu_latch = NULL;
 		}
 	}
 
@@ -684,8 +684,8 @@ DEVICE_IMAGE_LOAD( nes_cart )
 
 				if (unif_board == NULL)
 				{
-					logerror("Unsupported UNIF board.\n");
-//                  return INIT_FAIL;
+					fatalerror("Unsupported UNIF board.\n");
+//                  logerror("Unsupported UNIF board.\n");
 				}
 			}
 			else if ((magic2[0] == 'R') && (magic2[1] == 'E') && (magic2[2] == 'A') && (magic2[3] == 'D'))
