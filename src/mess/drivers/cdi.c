@@ -59,7 +59,6 @@ static UINT16 *planea;
 static UINT16 *planeb;
 
 emu_timer *test_timer;
-emu_timer *mouse_timer;
 
 #define ENABLE_UART_PRINTING (0)
 
@@ -77,6 +76,56 @@ INLINE void verboselog(running_machine *machine, int n_level, const char *s_fmt,
 		logerror( "%08x: %s", cpu_get_pc(cputag_get_cpu(machine, "maincpu")), buf );
 	}
 }
+
+/***********************
+* Forward declarations *
+***********************/
+
+// SCC68070
+static void scc68070_set_timer_callback(int channel);
+static TIMER_CALLBACK( scc68070_timer0_callback );
+static READ16_HANDLER( scc68070_periphs_r );
+static WRITE16_HANDLER( scc68070_periphs_w );
+
+// CDIC
+static READ16_HANDLER( cdic_r );
+static WRITE16_HANDLER( cdic_w );
+
+// SLAVE
+static TIMER_CALLBACK( slave_trigger_readback_int );
+static void slave_prepare_readback(running_machine *machine, attotime delay, UINT8 channel, UINT8 count, UINT8 data0, UINT8 data1, UINT8 data2, UINT8 data3, UINT8 cmd);
+static void perform_mouse_update(running_machine *machine);
+static INPUT_CHANGED( mouse_update );
+static READ16_HANDLER( slave_r );
+static WRITE16_HANDLER( slave_w );
+
+// RTC
+static READ16_HANDLER( m48t08_r );
+static WRITE16_HANDLER( m48t08_w );
+
+// Platform-specific
+static void cdi220_draw_lcd(running_machine *machine, int y);
+
+// MCD212
+static READ16_HANDLER(mcd212_r);
+static WRITE16_HANDLER(mcd212_w);
+INLINE void mcd212_set_register(running_machine *machine, int channel, UINT8 reg, UINT32 value);
+INLINE void mcd212_set_vsr(int channel, UINT32 value);
+INLINE UINT32 mcd212_get_vsr(int channel);
+INLINE void mcd212_set_dcp(int channel, UINT32 value);
+INLINE UINT32 mcd212_get_dcp(int channel);
+INLINE void mcd212_set_display_parameters(int channel, UINT8 value);
+static void mcd212_process_ica(running_machine *machine, int channel);
+static void mcd212_process_dca(running_machine *machine, int channel);
+static void mcd212_process_vsr(running_machine *machine, int channel, UINT32 *pixels);
+static void mcd212_draw_cursor(running_machine *machine, UINT32 *scanline, int y);
+static void mcd212_mix_lines(running_machine *machine, UINT32 *plane_a, UINT32 *plane_b, UINT32 *out);
+static void mcd212_draw_scanline(running_machine *machine, int y);
+TIMER_CALLBACK( mcd212_perform_scan );
+static VIDEO_START(cdi);
+
+// Miscellaneous
+TIMER_CALLBACK( test_timer_callback );
 
 /***********************
 * On-board peripherals *
@@ -279,7 +328,7 @@ typedef struct
 	scc68070_mmu_regs_t mmu;
 } scc68070_regs_t;
 
-scc68070_regs_t scc68070_regs;
+static scc68070_regs_t scc68070_regs;
 
 static void scc68070_set_timer_callback(int channel)
 {
@@ -289,7 +338,7 @@ static void scc68070_set_timer_callback(int channel)
 	{
 		case 0:
 			compare = 0x10000 - scc68070_regs.timers.timer0;
-			period = attotime_mul(ATTOTIME_IN_HZ(CLOCK_A/3), compare);
+			period = attotime_mul(ATTOTIME_IN_HZ(CLOCK_A/10), compare);
             timer_adjust_oneshot(scc68070_regs.timers.timer0_timer, period, 0);
 			break;
 		default:
@@ -297,7 +346,7 @@ static void scc68070_set_timer_callback(int channel)
 	}
 }
 
-TIMER_CALLBACK( scc68070_timer0_callback )
+static TIMER_CALLBACK( scc68070_timer0_callback )
 {
 	scc68070_regs.timers.timer0 = scc68070_regs.timers.reload_register;
 	scc68070_regs.timers.timer_status_register |= TSR_OV0;
@@ -860,22 +909,53 @@ static READ16_HANDLER( uart_loopback_enable )
 
 typedef struct
 {
-	UINT16 unknown0x3ffa;
-	UINT16 unknown0x3ffe;
+	UINT16 busy_clear_countdown;
+	UINT16 command; 			// CDIC Command Register (0x303c00)
+	UINT32 time;				// CDIC Time Register (0x303c02)
+	UINT16 file;				// CDIC File Register (0x303c06)
+	UINT32 channel; 			// CDIC Channel Register (0x303c08)
+	UINT16 audio_channel;		// CDIC Audio Channel Register (0x303c0c)
+
+	UINT16 audio_buffer;		// CDIC Audio Buffer Register (0x303ff4)
+	UINT16 x_buffer;			// CDIC X-Buffer Register (0x303ff6)
+	UINT16 dma_control;			// CDIC DMA Control Register (0x303ff8)
+	UINT16 z_buffer;			// CDIC Z-Buffer Register (0x303ffa)
+	UINT16 interrupt_vector;	// CDIC Interrupt Vector Register (0x303ffc)
+	UINT16 data_buffer;			// CDIC Data Buffer Register (0x303ffe)
+
+	emu_timer *interrupt_timer;
 } cdic_regs_t;
 
-cdic_regs_t cdic_regs;
+static cdic_regs_t cdic_regs;
+
+static TIMER_CALLBACK( cdic_trigger_readback_int )
+{
+	cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), M68K_IRQ_4, 128);
+	cputag_set_input_line(machine, "maincpu", M68K_IRQ_4, ASSERT_LINE);
+	timer_adjust_oneshot(cdic_regs.interrupt_timer, attotime_never, 0);
+}
 
 static READ16_HANDLER( cdic_r )
 {
-	offset += 0x3c80/2;
+	offset += 0x3c00/2;
 	verboselog(space->machine, 0, "cdic_r: UNIMPLEMENTED: Unknown address: %04x & %04x\n", offset*2, mem_mask);
 	switch(offset)
 	{
+		case 0x3c00/2: // Command register
+			return cdic_regs.command;
+		case 0x3ff4/2:
+			return cdic_regs.audio_buffer;
+		case 0x3ff6/2:
+			return cdic_regs.x_buffer | 0x8000;
 		case 0x3ffa/2:
-			return 0xd7fe;
+			return cdic_regs.z_buffer;
 		case 0x3ffe/2:
-			return 0;//(cdic_regs.unknown0x3ffe == 0x8000) ? 0 : 0xc000;
+		{
+			UINT16 temp = cdic_regs.data_buffer;
+			cdic_regs.data_buffer &= 0x7fff;
+			cputag_set_input_line(space->machine, "maincpu", M68K_IRQ_4, CLEAR_LINE);
+			return temp | 0x1600;
+		}
 		default:
 			return 0;
 	}
@@ -883,12 +963,35 @@ static READ16_HANDLER( cdic_r )
 
 static WRITE16_HANDLER( cdic_w )
 {
-	offset += 0x3c80/2;
+	offset += 0x3c00/2;
 	verboselog(space->machine, 0, "cdic_w: UNIMPLEMENTED: Unknown address: %04x = %04x & %04x\n", offset*2, data, mem_mask);
 	switch(offset)
 	{
+		case 0x3c00/2: // Command register
+			COMBINE_DATA(&cdic_regs.command);
+			break;
+		case 0x3c02/2: // Time register (MSW)
+			cdic_regs.time &= 0x0000ffff;
+			cdic_regs.time |= (data & mem_mask) << 16;
+			break;
+		case 0x3c04/2: // Time register (LSW)
+			cdic_regs.time &= 0xffff0000;
+			cdic_regs.time |= data & mem_mask;
+			cdic_regs.data_buffer |= data & 0x3f00;
+			break;
 		case 0x3ffe/2:
-			COMBINE_DATA(&cdic_regs.unknown0x3ffe);
+			COMBINE_DATA(&cdic_regs.data_buffer);
+			if(cdic_regs.data_buffer == 0xc000)
+			{
+				//cdic_regs.data_buffer &= ~0x4000;
+				switch(cdic_regs.command)
+				{
+					case 0x29: // Read Mode 1
+						timer_adjust_oneshot(cdic_regs.interrupt_timer, ATTOTIME_IN_HZ(10), 0);
+						//slave_prepare_readback(space->machine, ATTOTIME_IN_HZ(10000), 3, 4, 0x01, 0x02, 0x03, 0x04, 0x00);
+						break;
+				}
+			}
 			break;
 	}
 }
@@ -898,12 +1001,13 @@ typedef struct
 	UINT8 out_buf[4];
 	UINT8 out_index;
 	UINT8 out_count;
+	UINT8 out_cmd;
 } slave_channel_t;
 
 typedef struct
 {
 	slave_channel_t channel[4];
-	emu_timer *int_timer;
+	emu_timer *interrupt_timer;
 
 	UINT8 in_buf[17];
 	UINT8 in_index;
@@ -913,21 +1017,20 @@ typedef struct
 
 	UINT8 xbus_interrupt_enable;
 
-	emu_timer *readback_timer;
-
 	UINT8 lcd_state[16];
 } slave_regs_t;
 
-slave_regs_t slave_regs;
+static slave_regs_t slave_regs;
 
-static TIMER_CALLBACK( trigger_readback_int )
+static TIMER_CALLBACK( slave_trigger_readback_int )
 {
+	verboselog(machine, 0, "Asserting IRQ2\n" );
 	cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), M68K_IRQ_2, 26);
 	cputag_set_input_line(machine, "maincpu", M68K_IRQ_2, ASSERT_LINE);
-	timer_adjust_oneshot(slave_regs.int_timer, ATTOTIME_IN_HZ(10000), 0);
+	timer_adjust_oneshot(slave_regs.interrupt_timer, attotime_never, 0);
 }
 
-static void slave_prepare_readback(running_machine *machine, int use_delay, attotime delay, UINT8 channel, UINT8 count, UINT8 data0, UINT8 data1, UINT8 data2, UINT8 data3)
+static void slave_prepare_readback(running_machine *machine, attotime delay, UINT8 channel, UINT8 count, UINT8 data0, UINT8 data1, UINT8 data2, UINT8 data3, UINT8 cmd)
 {
 	slave_regs.channel[channel].out_index = 0;
 	slave_regs.channel[channel].out_count = count;
@@ -935,32 +1038,26 @@ static void slave_prepare_readback(running_machine *machine, int use_delay, atto
 	slave_regs.channel[channel].out_buf[1] = data1;
 	slave_regs.channel[channel].out_buf[2] = data2;
 	slave_regs.channel[channel].out_buf[3] = data3;
+	slave_regs.channel[channel].out_cmd = cmd;
 
-	if(use_delay)
-	{
-		timer_adjust_oneshot(slave_regs.readback_timer, delay, 0);
-	}
-	else
-	{
-		cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), M68K_IRQ_2, 26);
-		cputag_set_input_line(machine, "maincpu", M68K_IRQ_2, ASSERT_LINE);
-		timer_adjust_oneshot(slave_regs.int_timer, ATTOTIME_IN_HZ(10000), 0);
-	}
+	timer_adjust_oneshot(slave_regs.interrupt_timer, delay, 0);
 }
 
-static void mouse_update(running_machine *machine)
+static void perform_mouse_update(running_machine *machine)
 {
 	UINT16 x = input_port_read(machine, "MOUSEX");
 	UINT16 y = input_port_read(machine, "MOUSEY");
 	UINT8 buttons = input_port_read(machine, "MOUSEBTN");
 
-	slave_prepare_readback(machine, 0, ATTOTIME_IN_HZ(1), 0, 4, ((x & 0x380) >> 7) | (buttons << 4), x & 0x7f, (y & 0x380) >> 7, y & 0x7f);
+	if(slave_regs.polling_active)
+	{
+		slave_prepare_readback(machine, ATTOTIME_IN_HZ(10000), 0, 4, ((x & 0x380) >> 7) | (buttons << 4), x & 0x7f, (y & 0x380) >> 7, y & 0x7f, 0xf7);
+	}
 }
 
-static TIMER_CALLBACK( mouse_update_callback )
+static INPUT_CHANGED( mouse_update )
 {
-	mouse_update(machine);
-	timer_adjust_oneshot(mouse_timer, ATTOTIME_IN_HZ(60), 0);
+	perform_mouse_update(field->port->machine);
 }
 
 static READ16_HANDLER( slave_r )
@@ -968,20 +1065,32 @@ static READ16_HANDLER( slave_r )
 	if(slave_regs.channel[offset].out_count)
 	{
 		UINT8 ret = slave_regs.channel[offset].out_buf[slave_regs.channel[offset].out_index];
-		if(offset != 0)
+		verboselog(space->machine, 0, "slave_r: Channel %d: %d, %02x\n", offset, slave_regs.channel[offset].out_index, ret );
+		if(slave_regs.channel[offset].out_index == 0)
 		{
-			verboselog(space->machine, 0, "slave_r: Channel %d: %d, %02x\n", offset, slave_regs.channel[offset].out_index, slave_regs.channel[offset].out_buf[slave_regs.channel[offset].out_index] );
+			switch(slave_regs.channel[offset].out_cmd)
+			{
+				case 0xb0:
+				case 0xb1:
+				case 0xf0:
+				case 0xf7:
+					verboselog(space->machine, 0, "slave_r: De-asserting IRQ2\n" );
+					cputag_set_input_line(space->machine, "maincpu", M68K_IRQ_2, CLEAR_LINE);
+					break;
+			}
 		}
 		slave_regs.channel[offset].out_index++;
 		slave_regs.channel[offset].out_count--;
 		if(!slave_regs.channel[offset].out_count)
 		{
 			slave_regs.channel[offset].out_index = 0;
+			slave_regs.channel[offset].out_cmd = 0;
 			memset(slave_regs.channel[offset].out_buf, 0, 4);
 		}
 		return ret;
 	}
-	return 0;
+	verboselog(space->machine, 0, "slave_r: Channel %d: %d\n", offset, slave_regs.channel[offset].out_index );
+	return 0xff;
 }
 
 static WRITE16_HANDLER( slave_w )
@@ -989,7 +1098,54 @@ static WRITE16_HANDLER( slave_w )
 	switch(offset)
 	{
 		case 0:
-			verboselog(space->machine, 0, "slave_w: Channel %d: Unknown register: %02x\n", offset, data & 0x00ff );
+			if(slave_regs.in_index)
+			{
+				verboselog(space->machine, 0, "slave_w: Channel %d: %d = %02x\n", offset, slave_regs.in_index, data & 0x00ff );
+				slave_regs.in_buf[slave_regs.in_index] = data & 0x00ff;
+				slave_regs.in_index++;
+				if(slave_regs.in_index == slave_regs.in_count)
+				{
+					switch(slave_regs.in_buf[0])
+					{
+						case 0xc0: case 0xc1: case 0xc2: case 0xc3: case 0xc4: case 0xc5: case 0xc6: case 0xc7:
+						case 0xc8: case 0xc9: case 0xca: case 0xcb: case 0xcc: case 0xcd: case 0xce: case 0xcf:
+						case 0xd0: case 0xd1: case 0xd2: case 0xd3: case 0xd4: case 0xd5: case 0xd6: case 0xd7:
+						case 0xd8: case 0xd9: case 0xda: case 0xdb: case 0xdc: case 0xdd: case 0xde: case 0xdf:
+						case 0xe0: case 0xe1: case 0xe2: case 0xe3: case 0xe4: case 0xe5: case 0xe6: case 0xe7:
+						case 0xe8: case 0xe9: case 0xea: case 0xeb: case 0xec: case 0xed: case 0xee: case 0xef:
+						case 0xf0: case 0xf1: case 0xf2: case 0xf3: case 0xf4: case 0xf5: case 0xf6: case 0xf7:
+						case 0xf8: case 0xf9: case 0xfa: case 0xfb: case 0xfc: case 0xfd: case 0xfe: case 0xff:	// Update Mouse Position
+							//perform_mouse_update(space->machine);
+							memset(slave_regs.in_buf, 0, 17);
+							slave_regs.in_index = 0;
+							slave_regs.in_count = 0;
+							break;
+					}
+				}
+			}
+			else
+			{
+				slave_regs.in_buf[slave_regs.in_index] = data & 0x00ff;
+				slave_regs.in_index++;
+				switch(data & 0x00ff)
+				{
+					case 0xc0: case 0xc1: case 0xc2: case 0xc3: case 0xc4: case 0xc5: case 0xc6: case 0xc7:
+					case 0xc8: case 0xc9: case 0xca: case 0xcb: case 0xcc: case 0xcd: case 0xce: case 0xcf:
+					case 0xd0: case 0xd1: case 0xd2: case 0xd3: case 0xd4: case 0xd5: case 0xd6: case 0xd7:
+					case 0xd8: case 0xd9: case 0xda: case 0xdb: case 0xdc: case 0xdd: case 0xde: case 0xdf:
+					case 0xe0: case 0xe1: case 0xe2: case 0xe3: case 0xe4: case 0xe5: case 0xe6: case 0xe7:
+					case 0xe8: case 0xe9: case 0xea: case 0xeb: case 0xec: case 0xed: case 0xee: case 0xef:
+					case 0xf0: case 0xf1: case 0xf2: case 0xf3: case 0xf4: case 0xf5: case 0xf6: case 0xf7:
+					case 0xf8: case 0xf9: case 0xfa: case 0xfb: case 0xfc: case 0xfd: case 0xfe: case 0xff:
+						verboselog(space->machine, 0, "slave_w: Channel %d: Update Mouse Position (0x%02x)\n", offset, data & 0x00ff );
+						slave_regs.in_count = 3;
+						break;
+					default:
+						verboselog(space->machine, 0, "slave_w: Channel %d: Unknown register: %02x\n", offset, data & 0x00ff );
+						slave_regs.in_index = 0;
+						break;
+				}
+			}
 			break;
 		case 1:
 			if(slave_regs.in_index)
@@ -1007,6 +1163,11 @@ static WRITE16_HANDLER( slave_w )
 							slave_regs.in_index = 0;
 							slave_regs.in_count = 0;
 							break;
+						default:
+							memset(slave_regs.in_buf, 0, 17);
+							slave_regs.in_index = 0;
+							slave_regs.in_count = 0;
+							break;
 					}
 				}
 			}
@@ -1016,6 +1177,9 @@ static WRITE16_HANDLER( slave_w )
 				{
 					default:
 						verboselog(space->machine, 0, "slave_w: Channel %d: Unknown register: %02x\n", offset, data & 0x00ff );
+						memset(slave_regs.in_buf, 0, 17);
+						slave_regs.in_index = 0;
+						slave_regs.in_count = 0;
 						break;
 				}
 			}
@@ -1031,7 +1195,10 @@ static WRITE16_HANDLER( slave_w )
 					switch(slave_regs.in_buf[0])
 					{
 						case 0xf0: // Set Front Panel LCD
-							memcpy(slave_regs.lcd_state, slave_regs.in_buf + 1, 16);
+							memset(slave_regs.in_buf + 1, 0, 16);
+							slave_regs.in_count = 17;
+							break;
+						default:
 							memset(slave_regs.in_buf, 0, 17);
 							slave_regs.in_index = 0;
 							slave_regs.in_count = 0;
@@ -1051,7 +1218,9 @@ static WRITE16_HANDLER( slave_w )
 						break;
 					default:
 						verboselog(space->machine, 0, "slave_w: Channel %d: Unknown register: %02x\n", offset, data & 0x00ff );
+						memset(slave_regs.in_buf, 0, 17);
 						slave_regs.in_index = 0;
+						slave_regs.in_count = 0;
 						break;
 				}
 			}
@@ -1070,7 +1239,18 @@ static WRITE16_HANDLER( slave_w )
 							memset(slave_regs.in_buf, 0, 17);
 							slave_regs.in_index = 0;
 							slave_regs.in_count = 0;
-							slave_prepare_readback(space->machine, 1, ATTOTIME_IN_HZ(1), 0, 4, 0xb0, 0, 0, 0);
+							slave_prepare_readback(space->machine, ATTOTIME_IN_HZ(4), 3, 4, 0xb0, 0x00, 0x02, 0x15, 0xb0);
+							break;
+						//case 0xb1: // Request Disc Base
+							//memset(slave_regs.in_buf, 0, 17);
+							//slave_regs.in_index = 0;
+							//slave_regs.in_count = 0;
+							//slave_prepare_readback(space->machine, ATTOTIME_IN_HZ(10000), 3, 4, 0xb1, 0x00, 0x02, 0x00, 0xb1);
+							break;
+						default:
+							memset(slave_regs.in_buf, 0, 17);
+							slave_regs.in_index = 0;
+							slave_regs.in_count = 0;
 							break;
 					}
 				}
@@ -1085,17 +1265,29 @@ static WRITE16_HANDLER( slave_w )
 						verboselog(space->machine, 0, "slave_w: Channel %d: Request Disc Status (0xb0)\n", offset );
 						slave_regs.in_count = 4;
 						break;
+					case 0xb1: // Request Disc Status
+						verboselog(space->machine, 0, "slave_w: Channel %d: Request Disc Base (0xb1)\n", offset );
+						slave_regs.in_count = 4;
+						break;
+					case 0xf0: // Get SLAVE revision
+						verboselog(space->machine, 0, "slave_w: Channel %d: Get SLAVE Revision (0xf0)\n", offset );
+						slave_regs.in_index = 0;
+						slave_regs.in_buf[0] = 0;
+						slave_regs.channel[0].out_index = 0;
+						slave_regs.channel[0].out_count = 2;
+						slave_regs.channel[0].out_buf[0] = 0x32;
+						slave_regs.channel[0].out_buf[1] = 0x31;
+						slave_regs.channel[0].out_cmd = 0xf0;
+						slave_prepare_readback(space->machine, ATTOTIME_IN_HZ(10000), 2, 2, 0xf6, 1, 0, 0, 0xf0);
+						break;
 					case 0xf6: // NTSC/PAL
 						verboselog(space->machine, 0, "slave_w: Channel %d: Check NTSC/PAL (0xf6)\n", offset );
-						slave_regs.channel[2].out_buf[0] = slave_regs.in_buf[0];
-						slave_regs.channel[2].out_buf[1] = 0x01;
+						slave_prepare_readback(space->machine, attotime_never, 2, 2, 0xf6, 1, 0, 0, 0xf6);
 						slave_regs.in_index = 0;
 						break;
 					case 0xf7: // Activate input polling
 						verboselog(space->machine, 0, "slave_w: Channel %d: Activate Input Polling (0xf7)\n", offset );
 						slave_regs.polling_active = 1;
-						mouse_update(space->machine);
-						timer_adjust_oneshot(mouse_timer, ATTOTIME_IN_HZ(60), 0);
 						slave_regs.in_index = 0;
 						break;
 					case 0xfa: // Enable X-Bus interrupts
@@ -1105,18 +1297,14 @@ static WRITE16_HANDLER( slave_w )
 						break;
 					default:
 						verboselog(space->machine, 0, "slave_w: Channel %d: Unknown register: %02x\n", offset, data & 0x00ff );
+						memset(slave_regs.in_buf, 0, 17);
 						slave_regs.in_index = 0;
+						slave_regs.in_count = 0;
 						break;
 				}
 			}
 			break;
 	}
-}
-
-TIMER_CALLBACK( slave_int_callback )
-{
-	cputag_set_input_line(machine, "maincpu", M68K_IRQ_2, CLEAR_LINE);
-	timer_adjust_oneshot(slave_regs.int_timer, attotime_never, 0);
 }
 
 typedef struct
@@ -2202,16 +2390,22 @@ TIMER_CALLBACK( test_timer_callback )
 *      Memory maps       *
 *************************/
 
-static ADDRESS_MAP_START( cdi_mem, ADDRESS_SPACE_PROGRAM, 16 )
+static READ16_HANDLER(cdic_ram_r)
+{
+	verboselog(space->machine, 0, "cdic_ram_r: %08x & %04x\n", 0x300000 + offset*2, mem_mask);
+	return mame_rand(space->machine);
+}
+
+static ADDRESS_MAP_START( cdimono1_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_BASE(&planea)
 	AM_RANGE(0x00200000, 0x0027ffff) AM_RAM AM_BASE(&planeb)
 #if ENABLE_UART_PRINTING
 	AM_RANGE(0x00301400, 0x00301403) AM_READ(uart_loopback_enable)
-	AM_RANGE(0x00301404, 0x00303c7f) AM_RAM
+	//AM_RANGE(0x00301404, 0x00303bff) AM_RAM
 #else
-	AM_RANGE(0x00301400, 0x00303c7f) AM_RAM
+	AM_RANGE(0x00300000, 0x00303bff) AM_READ(cdic_ram_r)
 #endif
-	AM_RANGE(0x00303c80, 0x00303fff) AM_READWRITE(cdic_r, cdic_w)
+	AM_RANGE(0x00303c00, 0x00303fff) AM_READWRITE(cdic_r, cdic_w)
 	AM_RANGE(0x00310000, 0x00317fff) AM_READWRITE(slave_r, slave_w)
 	//AM_RANGE(0x00318000, 0x0031ffff) AM_NOP
 	AM_RANGE(0x00320000, 0x00323fff) AM_READWRITE(m48t08_r, m48t08_w)
@@ -2228,14 +2422,14 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( cdi )
 	PORT_START("MOUSEX")
-	PORT_BIT(0x3ff, 0x000, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(0)
+	PORT_BIT(0x3ff, 0x000, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_CHANGED(mouse_update, 0)
 
 	PORT_START("MOUSEY")
-	PORT_BIT(0x3ff, 0x000, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(0)
+	PORT_BIT(0x1ff, 0x000, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_CHANGED(mouse_update, 0)
 
 	PORT_START("MOUSEBTN")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_CODE(MOUSECODE_BUTTON1) PORT_NAME("Mouse Button 1")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_CODE(MOUSECODE_BUTTON2) PORT_NAME("Mouse Button 2")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_CODE(MOUSECODE_BUTTON1) PORT_NAME("Mouse Button 1") PORT_CHANGED(mouse_update, 0)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_CODE(MOUSECODE_BUTTON2) PORT_NAME("Mouse Button 2") PORT_CHANGED(mouse_update, 0)
 	PORT_BIT(0xfc, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
@@ -2251,25 +2445,24 @@ static MACHINE_RESET( cdi )
 	test_timer = timer_alloc(machine, test_timer_callback, 0);
 	timer_adjust_oneshot(test_timer, attotime_never, 0);
 
-	slave_regs.int_timer = timer_alloc(machine, slave_int_callback, 0);
-	timer_adjust_oneshot(slave_regs.int_timer, attotime_never, 0);
+	slave_regs.interrupt_timer = timer_alloc(machine, slave_trigger_readback_int, 0);
+	timer_adjust_oneshot(slave_regs.interrupt_timer, attotime_never, 0);
 
-	slave_regs.readback_timer = timer_alloc(machine, trigger_readback_int, 0);
-	timer_adjust_oneshot(slave_regs.readback_timer, attotime_never, 0);
-
-	mouse_timer = timer_alloc(machine, mouse_update_callback, 0);
-	timer_adjust_oneshot(mouse_timer, attotime_never, 0);
+	cdic_regs.interrupt_timer = timer_alloc(machine, cdic_trigger_readback_int, 0);
+	timer_adjust_oneshot(cdic_regs.interrupt_timer, attotime_never, 0);
 
 	device_reset(cputag_get_cpu(machine, "maincpu"));
+
+	cdic_regs.z_buffer = 0;
 }
 
 /*************************
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_DRIVER_START( cdi )
+static MACHINE_DRIVER_START( cdimono1 )
 	MDRV_CPU_ADD("maincpu", SCC68070, CLOCK_A/2)	/* SCC-68070 CCA84 datasheet */
-	MDRV_CPU_PROGRAM_MAP(cdi_mem)
+	MDRV_CPU_PROGRAM_MAP(cdimono1_mem)
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -2285,10 +2478,6 @@ static MACHINE_DRIVER_START( cdi )
 
 	MDRV_MACHINE_RESET(cdi)
 
-	//MDRV_SPEAKER_STANDARD_MONO("mono")
-	//MDRV_SOUND_ADD("ym", YM2413, CLOCK_A/12)
-	//MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
 	MDRV_CDROM_ADD( "cdrom" )
 MACHINE_DRIVER_END
 
@@ -2296,26 +2485,23 @@ MACHINE_DRIVER_END
 *        Rom Load        *
 *************************/
 
-ROM_START( cdi )
+ROM_START( cdimono1 )
 	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_SYSTEM_BIOS( 0, "mcdi200", "Magnavox CD-i 200" )
 	ROMX_LOAD( "cdi200.rom", 0x000000, 0x80000, CRC(40c4e6b9) SHA1(d961de803c89b3d1902d656ceb9ce7c02dccb40a), ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS( 1, "cdi220", "Philips CD-i 220" )
-	ROMX_LOAD( "cdi220.rom", 0x000000, 0x80000, CRC(40c4e6b9) SHA1(d961de803c89b3d1902d656ceb9ce7c02dccb40a), ROM_BIOS(2) )
-	ROM_SYSTEM_BIOS( 2, "pcdi490", "Philips CD-i 490" )
-	ROMX_LOAD( "cdi490.rom", 0x000000, 0x80000, CRC(e115f45b) SHA1(f71be031a5dfa837de225081b2ddc8dcb74a0552), ROM_BIOS(3) )
-	ROM_SYSTEM_BIOS( 3, "pcdi910m", "Philips CD-i 910" )
-	ROMX_LOAD( "cdi910.rom", 0x000000, 0x80000,  CRC(8ee44ed6) SHA1(3fcdfa96f862b0cb7603fb6c2af84cac59527b05), ROM_BIOS(4) )
-	/* Bad dump? */
-	/* ROM_SYSTEM_BIOS( 4, "cdi205", "Philips CD-i 205" ) */
-	/* ROMX_LOAD( "cdi205.rom", 0x000000, 0x7fc00, CRC(79ab41b2) SHA1(656890bbd3115b235bc8c6b1cf29a99e9db37c1b), ROM_BIOS(5) ) */
-	//ROM_REGION(0x2000, "nvram", 0)
-	//ROM_LOAD("initial.nv", 0x0000, 0x2000, CRC(12345678) SHA1(1234567812345678123456781234567812345678))
+	ROM_SYSTEM_BIOS( 1, "pcdi220", "Philips CD-i 220" )
+	ROMX_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(12345678) SHA1(1234567812345678123456781234567812345678), ROM_BIOS(2) )
+	// This one is a Mono-IV board, needs to be a separate driver
+	//ROM_SYSTEM_BIOS( 1, "pcdi490", "Philips CD-i 490" )
+	//ROMX_LOAD( "cdi490.rom", 0x000000, 0x80000, CRC(e115f45b) SHA1(f71be031a5dfa837de225081b2ddc8dcb74a0552), ROM_BIOS(3) )
+	// This one is a Mini-MMC board, needs to be a separate driver
+	//ROM_SYSTEM_BIOS( 2, "pcdi910m", "Philips CD-i 910" )
+	//ROMX_LOAD( "cdi910.rom", 0x000000, 0x80000,  CRC(8ee44ed6) SHA1(3fcdfa96f862b0cb7603fb6c2af84cac59527b05), ROM_BIOS(4) )
 ROM_END
 
 /*************************
 *      Game driver(s)    *
 *************************/
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT   INIT    CONFIG  COMPANY     FULLNAME   FLAGS */
-CONS( 1991, cdi,        0,      0,      cdi,        cdi,    0,      0,      "Philips",  "CD-i",   GAME_NO_SOUND | GAME_NOT_WORKING )
+/*    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     INIT      CONFIG    COMPANY     FULLNAME   FLAGS */
+CONS( 1991, cdimono1, 0,        0,        cdimono1, cdi,      0,        0,        "Philips",  "CD-i (Mono-I)",   GAME_NO_SOUND | GAME_NOT_WORKING )
