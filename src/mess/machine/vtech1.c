@@ -197,6 +197,7 @@ SNAPSHOT_LOAD(vtech1)
 		char message[256];
 		snprintf(message, ARRAY_LENGTH(message), "SNAPLOAD: %s\nInsufficient RAM - need %04X",pgmname,size);
 		image_seterror(image, IMAGE_ERROR_INVALIDIMAGE, message);
+		image_message(image, "SNAPLOAD: %s\nInsufficient RAM - need %04X",pgmname,size);
 		return INIT_FAIL;
 	}
 
@@ -227,6 +228,7 @@ SNAPSHOT_LOAD(vtech1)
 
 	default:
 		image_seterror(image, IMAGE_ERROR_UNSUPPORTED, "Snapshot format not supported.");
+		image_message(image, "Snapshot format not supported.");
 		return INIT_FAIL;
 	}
 

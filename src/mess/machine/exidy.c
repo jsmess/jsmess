@@ -405,6 +405,7 @@ SNAPSHOT_LOAD(exidy)
 	if (snapshot_size != 0x1001c)
 	{
 		image_seterror(image, IMAGE_ERROR_INVALIDIMAGE, "Snapshot must be 65564 bytes");
+		image_message(image, "Snapshot must be 65564 bytes");
 		return INIT_FAIL;
 	}
 

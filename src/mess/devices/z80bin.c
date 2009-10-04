@@ -42,6 +42,7 @@ static int z80bin_load_file(const device_config *image, const char *file_type, U
 		if (ch == EOF)
 		{
 			image_seterror(image, IMAGE_ERROR_INVALIDIMAGE, "Unexpected EOF while getting file name");
+			image_message(image, " Unexpected EOF while getting file name");
 			return INIT_FAIL;
 		}
 
@@ -50,6 +51,7 @@ static int z80bin_load_file(const device_config *image, const char *file_type, U
 			if (i >= (ARRAY_LENGTH(pgmname) - 1))
 			{
 				image_seterror(image, IMAGE_ERROR_INVALIDIMAGE, "File name too long");
+				image_message(image, " File name too long");
 				return INIT_FAIL;
 			}
 
@@ -63,6 +65,7 @@ static int z80bin_load_file(const device_config *image, const char *file_type, U
 	if (image_fread(image, args, sizeof(args)) != sizeof(args))
 	{
 		image_seterror(image, IMAGE_ERROR_INVALIDIMAGE, "Unexpected EOF while getting file size");
+		image_message(image, " Unexpected EOF while getting file size");
 		return INIT_FAIL;
 	}
 
@@ -82,6 +85,7 @@ static int z80bin_load_file(const device_config *image, const char *file_type, U
 		{
 			snprintf(message, ARRAY_LENGTH(message), "%s: Unexpected EOF while writing byte to %04X", pgmname, (unsigned) j);
 			image_seterror(image, IMAGE_ERROR_INVALIDIMAGE, message);
+			image_message(image, "%s: Unexpected EOF while writing byte to %04X", pgmname, (unsigned) j);
 			return INIT_FAIL;
 		}
 		memory_write_byte(cputag_get_address_space(image->machine,"maincpu",ADDRESS_SPACE_PROGRAM), j, data);

@@ -240,12 +240,19 @@ QUICKLOAD_LOAD( mbee )
 		{
 			j = 0x8c0 + i;
 
-			if (image_fread(image, &data, 1) != 1) return INIT_FAIL;
+			if (image_fread(image, &data, 1) != 1)
+			{
+				image_message(image, "Unexpected EOF");
+				return INIT_FAIL;
+			}
 
 			if ((j < mbee_size) || (j > 0xefff))
 				memory_write_byte(space, j, data);
 			else
+			{
+				image_message(image, "Not enough memory in this microbee");
 				return INIT_FAIL;
+			}
 		}
 
 		if (sw)
@@ -263,12 +270,19 @@ QUICKLOAD_LOAD( mbee )
 		{
 			j = 0x100 + i;
 
-			if (image_fread(image, &data, 1) != 1) return INIT_FAIL;
+			if (image_fread(image, &data, 1) != 1)
+			{
+				image_message(image, "Unexpected EOF");
+				return INIT_FAIL;
+			}
 
 			if ((j < mbee_size) || (j > 0xefff))
 				memory_write_byte(space, j, data);
 			else
+			{
+				image_message(image, "Not enough memory in this microbee");
 				return INIT_FAIL;
+			}
 		}
 
 		if (sw) cpu_set_reg(cpu, REG_GENPC, 0x100);
