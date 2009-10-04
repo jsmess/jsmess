@@ -5,6 +5,7 @@
 *******************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "sound/speaker.h"
 #include "sound/wave.h"
 #include "machine/ctronics.h"
@@ -334,7 +335,7 @@ READ8_HANDLER(exidy_ff_r)
 	UINT8 data=0x7f;
 
 	/* bit 7 = printer busy
-    0 = printer is not busy */
+	0 = printer is not busy */
 
 	data |= centronics_busy_r(printer) << 7;
 
@@ -388,6 +389,51 @@ Z80BIN_EXECUTE( exidy )
 		if (autorun)
 			cpu_set_reg(cputag_get_cpu(machine, "maincpu"), REG_GENPC, execute_address);
 	}
+}
+
+/******************************************************************************
+ Snapshot Handling
+******************************************************************************/
+
+SNAPSHOT_LOAD(exidy)
+{
+	UINT8 *ptr = memory_region(image->machine, "maincpu");
+	const device_config *cpu = cputag_get_cpu(image->machine, "maincpu");
+	const UINT8 header[28];
+
+	/* check size */
+	if (snapshot_size != 0x1001c)
+	{
+		image_seterror(image, IMAGE_ERROR_INVALIDIMAGE, "Snapshot must be 65564 bytes");
+		return INIT_FAIL;
+	}
+
+	/* get the header */
+	image_fread(image, &header, sizeof(header));
+
+	/* write it to ram */
+	image_fread(image, ptr, 0x10000);
+
+	/* patch CPU registers */
+	cpu_set_reg(cpu, Z80_I, header[0]);
+	cpu_set_reg(cpu, Z80_HL2, header[1] | (header[2] << 8));
+	cpu_set_reg(cpu, Z80_DE2, header[3] | (header[4] << 8));
+	cpu_set_reg(cpu, Z80_BC2, header[5] | (header[6] << 8));
+	cpu_set_reg(cpu, Z80_AF2, header[7] | (header[8] << 8));
+	cpu_set_reg(cpu, Z80_HL, header[9] | (header[10] << 8));
+	cpu_set_reg(cpu, Z80_DE, header[11] | (header[12] << 8));
+	cpu_set_reg(cpu, Z80_BC, header[13] | (header[14] << 8));
+	cpu_set_reg(cpu, Z80_IY, header[15] | (header[16] << 8));
+	cpu_set_reg(cpu, Z80_IX, header[17] | (header[18] << 8));
+	cpu_set_reg(cpu, Z80_IFF1, header[19]&2 ? 1 : 0);
+	cpu_set_reg(cpu, Z80_IFF2, header[19]&4 ? 1 : 0);
+	cpu_set_reg(cpu, Z80_R, header[20]);
+	cpu_set_reg(cpu, Z80_AF, header[21] | (header[22] << 8));
+	cpu_set_reg(cpu, REG_GENSP, header[23] | (header[24] << 8));
+	cpu_set_reg(cpu, Z80_IM, header[25]);
+	cpu_set_reg(cpu, REG_GENPC, header[26] | (header[27] << 8));
+
+	return INIT_PASS;
 }
 
 MACHINE_START( exidy )

@@ -156,26 +156,25 @@ static READ8_HANDLER( exidy_read_ff ) { return 0xff; }
 static ADDRESS_MAP_START( exidy_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_RAMBANK(1)
-	AM_RANGE(0x0800, 0x7fff) AM_RAM		/* ram 32k machine */
-	AM_RANGE(0x8000, 0xbbff) AM_READWRITE(exidy_read_ff, SMH_NOP)
-	AM_RANGE(0xbc00, 0xbcff) AM_ROM		/* disk bios */
+	AM_RANGE(0x0800, 0xbbff) AM_RAM AM_REGION("maincpu", 0x0800)
+	AM_RANGE(0xbc00, 0xbcff) AM_ROM						/* disk bios */
 	AM_RANGE(0xbd00, 0xbdff) AM_READWRITE(exidy_read_ff, SMH_NOP)
 	AM_RANGE(0xbe00, 0xbe03) AM_DEVREADWRITE("wd179x", wd17xx_r, wd17xx_w)
 	AM_RANGE(0xbe04, 0xbfff) AM_READWRITE(exidy_read_ff, SMH_NOP)
-	AM_RANGE(0xc000, 0xefff) AM_ROM		/* rom pac and bios */
+	AM_RANGE(0xc000, 0xefff) AM_ROM						/* rom pac and bios */
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_REGION("maincpu", 0xf000)		/* screen ram */
-	AM_RANGE(0xf800, 0xfbff) AM_ROM		/* char rom */
-	AM_RANGE(0xfc00, 0xffff) AM_RAM	AM_REGION("maincpu", 0xfc00)	/* programmable chars */
+	AM_RANGE(0xf800, 0xfbff) AM_ROM						/* char rom */
+	AM_RANGE(0xfc00, 0xffff) AM_RAM	AM_REGION("maincpu", 0xfc00)		/* programmable chars */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( exidyd_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_RAMBANK(1)
-	AM_RANGE(0x0800, 0xbfff) AM_RAM		/* ram 48k cassette-based machine */
-	AM_RANGE(0xc000, 0xefff) AM_ROM		/* rom pac and bios */
+	AM_RANGE(0x0800, 0xbfff) AM_RAM AM_REGION("maincpu", 0x0800)
+	AM_RANGE(0xc000, 0xefff) AM_ROM						/* rom pac and bios */
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_REGION("maincpu", 0xf000)		/* screen ram */
-	AM_RANGE(0xf800, 0xfbff) AM_ROM		/* char rom */
-	AM_RANGE(0xfc00, 0xffff) AM_RAM	AM_REGION("maincpu", 0xfc00)	/* programmable chars */
+	AM_RANGE(0xf800, 0xfbff) AM_ROM						/* char rom */
+	AM_RANGE(0xfc00, 0xffff) AM_RAM	AM_REGION("maincpu", 0xfc00)		/* programmable chars */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( exidy_io, ADDRESS_SPACE_IO, 8)
@@ -392,6 +391,7 @@ static MACHINE_DRIVER_START( exidy )
 	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
 
 	/* quickload */
+	MDRV_SNAPSHOT_ADD("snapshot", exidy, "snp", 2)
 	MDRV_Z80BIN_QUICKLOAD_ADD("quickload", exidy, 2)
 
 	MDRV_CASSETTE_ADD( "cassette1", exidy_cassette_config )

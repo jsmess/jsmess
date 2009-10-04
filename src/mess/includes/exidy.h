@@ -22,6 +22,7 @@ WRITE8_HANDLER(exidy_ff_w);
 MACHINE_START( exidy );
 MACHINE_RESET( exidy );
 Z80BIN_EXECUTE( exidy );
+SNAPSHOT_LOAD( exidy );
 
 
 /*----------- defined in video/exidy.c -----------*/
