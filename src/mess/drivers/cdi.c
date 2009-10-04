@@ -1130,7 +1130,6 @@ static WRITE16_HANDLER( cdic_w )
 			break;
 		case 0x3ffe/2:
 		{
-			UINT16 temp = cdic_regs.data_buffer;
 			verboselog(space->machine, 0, "cdic_w: Data Buffer Register = %04x & %04x\n", data, mem_mask);
 			COMBINE_DATA(&cdic_regs.data_buffer);
 			if((cdic_regs.data_buffer & 0xc000) == 0xc000)
