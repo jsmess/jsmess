@@ -2644,14 +2644,12 @@ ROM_START( cdimono1 )
 	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_SYSTEM_BIOS( 0, "mcdi200", "Magnavox CD-i 200" )
 	ROMX_LOAD( "cdi200.rom", 0x000000, 0x80000, CRC(40c4e6b9) SHA1(d961de803c89b3d1902d656ceb9ce7c02dccb40a), ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS( 1, "pcdi220", "Philips CD-i 220" )
-	ROMX_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(12345678) SHA1(1234567812345678123456781234567812345678), ROM_BIOS(2) )
 	// This one is a Mono-IV board, needs to be a separate driver
 	//ROM_SYSTEM_BIOS( 1, "pcdi490", "Philips CD-i 490" )
-	//ROMX_LOAD( "cdi490.rom", 0x000000, 0x80000, CRC(e115f45b) SHA1(f71be031a5dfa837de225081b2ddc8dcb74a0552), ROM_BIOS(3) )
+	//ROMX_LOAD( "cdi490.rom", 0x000000, 0x80000, CRC(e115f45b) SHA1(f71be031a5dfa837de225081b2ddc8dcb74a0552), ROM_BIOS(2) )
 	// This one is a Mini-MMC board, needs to be a separate driver
 	//ROM_SYSTEM_BIOS( 2, "pcdi910m", "Philips CD-i 910" )
-	//ROMX_LOAD( "cdi910.rom", 0x000000, 0x80000,  CRC(8ee44ed6) SHA1(3fcdfa96f862b0cb7603fb6c2af84cac59527b05), ROM_BIOS(4) )
+	//ROMX_LOAD( "cdi910.rom", 0x000000, 0x80000,  CRC(8ee44ed6) SHA1(3fcdfa96f862b0cb7603fb6c2af84cac59527b05), ROM_BIOS(3) )
 ROM_END
 
 /*************************
