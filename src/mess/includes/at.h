@@ -9,6 +9,17 @@
 #ifndef AT_H_
 #define AT_H_
 
+typedef struct _at_state at_state;
+struct _at_state
+{
+	const device_config *maincpu;
+	const device_config	*pic8259_master;
+	const device_config	*pic8259_slave;
+	const device_config	*dma8237_1;
+	const device_config	*dma8237_2;
+	const device_config	*pit8254;
+};
+
 
 /*----------- defined in machine/at.c -----------*/
 

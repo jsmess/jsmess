@@ -449,6 +449,7 @@ static const floppy_config ibmat_floppy_config =
 };
 
 static MACHINE_DRIVER_START( ibm5170 )
+	MDRV_DRIVER_DATA(at_state)
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I80286, 6000000 /*6000000*/)
 	MDRV_CPU_PROGRAM_MAP(at16_map)
@@ -518,6 +519,7 @@ MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( ibm5162 )
+	MDRV_DRIVER_DATA(at_state)
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I80286, 6000000 /*6000000*/)
 	MDRV_CPU_PROGRAM_MAP(at16_map)
@@ -577,6 +579,7 @@ MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( ps2m30286 )
+	MDRV_DRIVER_DATA(at_state)
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I80286, 12000000)
 	MDRV_CPU_PROGRAM_MAP(at16_map)
@@ -644,6 +647,7 @@ MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( atvga )
+	MDRV_DRIVER_DATA(at_state)
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I80286, 12000000)
 	MDRV_CPU_PROGRAM_MAP(at16_map)
@@ -713,6 +717,7 @@ MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( at386 )
+	MDRV_DRIVER_DATA(at_state)
     /* basic machine hardware */
 	/* original at 6 MHz, at03 8 megahertz */
 	MDRV_CPU_ADD("maincpu", I386, 12000000)

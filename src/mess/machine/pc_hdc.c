@@ -110,7 +110,7 @@ static int data_cnt = 0;                /* data count */
 static UINT8 *buffer;					/* data buffer */
 static UINT8 *buffer_ptr = 0;			/* data pointer */
 static UINT8 hdc_control;
-static void (*hdc_set_irq)(int,int);
+static void (*hdc_set_irq)(running_machine *,int,int);
 static const device_config *pc_hdc_dma8237;
 
 
@@ -177,7 +177,7 @@ static const char *const hdc_command_names[] =
 
 static TIMER_CALLBACK(pc_hdc_command);
 
-int pc_hdc_setup(running_machine *machine, void (*hdc_set_irq_func)(int,int))
+int pc_hdc_setup(running_machine *machine, void (*hdc_set_irq_func)(running_machine *,int,int))
 {
 	int i;
 
@@ -237,7 +237,7 @@ static hard_disk_file *pc_hdc_file(running_machine *machine, int id)
 	return mess_hd_get_hard_disk_file(img);
 }
 
-static void pc_hdc_result(int n, int set_error_info)
+static void pc_hdc_result(running_machine *machine,int n, int set_error_info)
 {
 	int irq;
 
@@ -245,7 +245,7 @@ static void pc_hdc_result(int n, int set_error_info)
 	irq = (dip[n] & 0x40) ? 5 : 2;
 
 	if ( ( hdc_control & 0x02 ) && hdc_set_irq ) {
-		hdc_set_irq( irq, 1 );
+		hdc_set_irq( machine, irq, 1 );
 	}
 
 	if (LOG_HDC_STATUS)
@@ -591,7 +591,7 @@ static TIMER_CALLBACK(pc_hdc_command)
 			break;
 
 	}
-	pc_hdc_result(n, set_error_info);
+	pc_hdc_result(machine, n, set_error_info);
 }
 
 
@@ -656,7 +656,7 @@ static void pc_hdc_data_w(running_machine *machine, int n, int data)
 				data_cnt = 0;
 				status[n] |= STA_INPUT;
 				csb[n] |= CSB_ERROR | 0x20; /* unknown command */
-				pc_hdc_result(n, 1);
+				pc_hdc_result(machine, n, 1);
 				break;
 		}
 		if( data_cnt )
@@ -720,7 +720,7 @@ static void pc_hdc_control_w(running_machine *machine, int n, int data)
 	hdc_control = data;
 
 	if ( ! ( hdc_control & 0x02 ) && hdc_set_irq ) {
-		hdc_set_irq( irq, 0 );
+		hdc_set_irq( machine, irq, 0 );
 	}
 }
 

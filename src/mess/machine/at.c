@@ -36,15 +36,6 @@
 #define LOG_PORT80	0
 #define LOG_KBDC	0
 
-static struct {
-	const device_config *maincpu;
-	const device_config	*pic8259_master;
-	const device_config	*pic8259_slave;
-	const device_config	*dma8237_1;
-	const device_config	*dma8237_2;
-	const device_config	*pit8254;
-} at_devices;
-
 static const SOUNDBLASTER_CONFIG soundblaster = { 1,5, {1,0} };
 
 
@@ -60,7 +51,8 @@ static PIC8259_SET_INT_LINE( at_pic8259_master_set_int_line ) {
 
 
 static PIC8259_SET_INT_LINE( at_pic8259_slave_set_int_line ) {
-	pic8259_set_irq_line( at_devices.pic8259_master, 2, interrupt);
+	at_state *st = device->machine->driver_data;
+	pic8259_set_irq_line( st->pic8259_master, 2, interrupt);
 }
 
 
@@ -115,8 +107,9 @@ static void at_speaker_set_input(running_machine *machine, UINT8 data)
 
 static PIT8253_OUTPUT_CHANGED( at_pit8254_out0_changed )
 {
-	if ( at_devices.pic8259_master ) {
-		pic8259_set_irq_line(at_devices.pic8259_master, 0, state);
+	at_state *st = device->machine->driver_data;
+	if ( st->pic8259_master ) {
+		pic8259_set_irq_line(st->pic8259_master, 0, state);
 	}
 }
 
@@ -151,13 +144,15 @@ static void at_set_gate_a20(running_machine *machine, int a20)
 }
 
 
-static void at_set_irq_line(int irq, int state) {
-	pic8259_set_irq_line(at_devices.pic8259_master, irq, state);
+static void at_set_irq_line(running_machine *machine,int irq, int state) {
+	at_state *st = machine->driver_data;
+	pic8259_set_irq_line(st->pic8259_master, irq, state);
 }
 
 
 static void at_set_keyb_int(running_machine *machine, int state) {
-	pic8259_set_irq_line(at_devices.pic8259_master, 1, state);
+	at_state *st = machine->driver_data;
+	pic8259_set_irq_line(st->pic8259_master, 1, state);
 }
 
 
@@ -182,7 +177,8 @@ static void init_at_common(running_machine *machine, const struct kbdc8042_inter
 
 static void at_keyboard_interrupt(running_machine *machine, int state)
 {
-	pic8259_set_irq_line(at_devices.pic8259_master, 1, state);
+	at_state *st = machine->driver_data;
+	pic8259_set_irq_line(st->pic8259_master, 1, state);
 }
 
 
@@ -248,7 +244,8 @@ WRITE8_HANDLER(at_page8_w)
 
 static DMA8237_HRQ_CHANGED( pc_dma_hrq_changed )
 {
-	cpu_set_input_line(at_devices.maincpu, INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+	at_state *st = device->machine->driver_data;
+	cpu_set_input_line(st->maincpu, INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* Assert HLDA */
 	dma8237_set_hlda( device, state );
@@ -337,12 +334,14 @@ const struct dma8237_interface at_dma8237_2_config =
 /* called when a interrupt is set/cleared from com hardware */
 static INS8250_INTERRUPT( at_com_interrupt_1 )
 {
-	pic8259_set_irq_line(at_devices.pic8259_master, 4, state);
+	at_state *st = device->machine->driver_data;
+	pic8259_set_irq_line(st->pic8259_master, 4, state);
 }
 
 static INS8250_INTERRUPT( at_com_interrupt_2 )
 {
-	pic8259_set_irq_line(at_devices.pic8259_master, 3, state);
+	at_state *st = device->machine->driver_data;
+	pic8259_set_irq_line(st->pic8259_master, 3, state);
 }
 
 /* called when com registers read/written - used to update peripherals that
@@ -404,7 +403,8 @@ const ins8250_interface ibm5170_com_interface[4]=
 
 static void at_fdc_interrupt(running_machine *machine, int state)
 {
-	pic8259_set_irq_line(at_devices.pic8259_master, 6, state);
+	at_state *st = machine->driver_data;
+	pic8259_set_irq_line(st->pic8259_master, 6, state);
 //if ( mess_ram[0x0490] == 0x74 )
 //  mess_ram[0x0490] = 0x54;
 }
@@ -412,7 +412,8 @@ static void at_fdc_interrupt(running_machine *machine, int state)
 
 static void at_fdc_dma_drq(running_machine *machine, int state, int read_)
 {
-	dma8237_drq_write( at_devices.dma8237_1, FDC_DMA, state);
+	at_state *st = machine->driver_data;
+	dma8237_drq_write( st->dma8237_1, FDC_DMA, state);
 }
 
 static const device_config *at_get_device(running_machine *machine)
@@ -430,7 +431,8 @@ static const struct pc_fdc_interface fdc_interface =
 
 
 static int at_get_out2(running_machine *machine) {
-	return pit8253_get_output(at_devices.pit8254, 2 );
+	at_state *st = machine->driver_data;
+	return pit8253_get_output(st->pit8254, 2 );
 }
 
 
@@ -494,6 +496,8 @@ static READ8_HANDLER( at_kbdc8042_p2_r )
 
 static WRITE8_HANDLER( at_kbdc8042_p2_w )
 {
+	at_state *st = space->machine->driver_data;
+	
 	logerror("%04x: writing $%02x to P2\n", cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")), data );
 
 	at_set_gate_a20( space->machine, ( data & 0x02 ) ? 1 : 0 );
@@ -501,8 +505,8 @@ static WRITE8_HANDLER( at_kbdc8042_p2_w )
 	cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_RESET, ( data & 0x01 ) ? CLEAR_LINE : ASSERT_LINE );
 
 	/* OPT BUF FULL is connected to IR1 on the master 8259 */
-	if ( at_devices.pic8259_master )
-		pic8259_set_irq_line(at_devices.pic8259_master, 1, ( data & 0x10 ) ? ASSERT_LINE : CLEAR_LINE );
+	if ( st->pic8259_master )
+		pic8259_set_irq_line(st->pic8259_master, 1, ( data & 0x10 ) ? ASSERT_LINE : CLEAR_LINE );
 
 	at_kbdc8042.clock_signal = ( data & 0x40 ) ? 1 : 0;
 	at_kbdc8042.data_signal = ( data & 0x80 ) ? 1 : 0;
@@ -562,7 +566,8 @@ READ8_HANDLER(at_kbdc8042_r)
 {
 	static int poll_delay = 4;
     UINT8 data = 0;
-
+	at_state *st = space->machine->driver_data;
+	
 	switch ( offset )
 	{
 	case 0:		/* A2 is wired to 8042 A0 */
@@ -581,7 +586,7 @@ READ8_HANDLER(at_kbdc8042_r)
 		}
 		data = (data & ~0x10) | ( at_kbdc8042.offset1 & 0x10 );
 
-		if ( pit8253_get_output(at_devices.pit8254, 2 ) )
+		if ( pit8253_get_output(st->pit8254, 2 ) )
 			data |= 0x20;
 		else
 			data &= ~0x20; /* ps2m30 wants this */
@@ -607,6 +612,7 @@ READ8_HANDLER(at_kbdc8042_r)
 
 WRITE8_HANDLER(at_kbdc8042_w)
 {
+	at_state *st = space->machine->driver_data;
 	if (LOG_KBDC)
 		logerror("kbdc8042_8_w(): ofset=%d data=0x%02x\n", offset, data);
 
@@ -617,7 +623,7 @@ WRITE8_HANDLER(at_kbdc8042_w)
 
 	case 1:
 		at_kbdc8042.speaker = data;
-		pit8253_gate_w( at_devices.pit8254, 2, data & 1);
+		pit8253_gate_w( st->pit8254, 2, data & 1);
 		at_speaker_set_spkrdata( space->machine, data & 0x02 );
 		break;
 
@@ -769,7 +775,8 @@ DRIVER_INIT( ps2m30286 )
 
 static IRQ_CALLBACK(at_irq_callback)
 {
-	return pic8259_acknowledge( at_devices.pic8259_master);
+	at_state *st = device->machine->driver_data;
+	return pic8259_acknowledge( st->pic8259_master);
 }
 
 
@@ -784,12 +791,13 @@ MACHINE_START( at )
 
 MACHINE_RESET( at )
 {
-	at_devices.maincpu = devtag_get_device(machine, "maincpu");
-	at_devices.pic8259_master = devtag_get_device(machine, "pic8259_master");
-	at_devices.pic8259_slave = devtag_get_device(machine, "pic8259_slave");
-	at_devices.dma8237_1 = devtag_get_device(machine, "dma8237_1");
-	at_devices.dma8237_2 = devtag_get_device(machine, "dma8237_2");
-	at_devices.pit8254 = devtag_get_device(machine, "pit8254");
+	at_state *st = machine->driver_data;
+	st->maincpu = devtag_get_device(machine, "maincpu");
+	st->pic8259_master = devtag_get_device(machine, "pic8259_master");
+	st->pic8259_slave = devtag_get_device(machine, "pic8259_slave");
+	st->dma8237_1 = devtag_get_device(machine, "dma8237_1");
+	st->dma8237_2 = devtag_get_device(machine, "dma8237_2");
+	st->pit8254 = devtag_get_device(machine, "pit8254");
 	pc_mouse_set_serial_port( devtag_get_device(machine, "ns16450_0") );
 }
 

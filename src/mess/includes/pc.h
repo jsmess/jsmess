@@ -9,6 +9,34 @@
 
 #include "machine/ins8250.h"
 #include "machine/i8255a.h"
+	
+typedef struct _pc_state pc_state;
+struct _pc_state
+{
+	const device_config *maincpu;
+	const device_config	*pic8259;
+	const device_config	*dma8237;
+	const device_config	*pit8253;
+	/* U73 is an LS74 - dual flip flop */
+	/* Q2 is set by OUT1 from the 8253 and goes to DRQ1 on the 8237 */
+	UINT8	u73_q2;
+	UINT8	out1;
+	UINT8 dma_offset[2][4];	
+	UINT8 pc_spkrdata;
+	UINT8 pc_input;		
+
+	int						ppi_portc_switch_high;
+	int						ppi_speaker;
+	int						ppi_keyboard_clear;
+	UINT8					ppi_keyb_clock;
+	UINT8					ppi_portb;
+	UINT8					ppi_clock_signal;
+	UINT8					ppi_data_signal;
+	UINT8					ppi_shift_register;
+	UINT8					ppi_shift_enable;
+	write8_space_func		ppi_clock_callback;
+	write8_space_func		ppi_data_callback;	
+};
 
 /*----------- defined in machine/pc.c -----------*/
 
@@ -23,11 +51,11 @@ extern const i8255a_interface ibm5160_ppi8255_interface;
 extern const i8255a_interface pc_ppi8255_interface;
 extern const i8255a_interface pcjr_ppi8255_interface;
 
-UINT8 pc_speaker_get_spk(void);
+UINT8 pc_speaker_get_spk(running_machine *machine);
 void pc_speaker_set_spkrdata(running_machine *machine, UINT8 data);
 void pc_speaker_set_input(running_machine *machine, UINT8 data);
 
-void mess_init_pc_common( running_machine *machine, UINT32 flags, void (*set_keyb_int_func)(running_machine *, int), void (*set_hdc_int_func)(int,int));
+void mess_init_pc_common( running_machine *machine, UINT32 flags, void (*set_keyb_int_func)(running_machine *, int), void (*set_hdc_int_func)(running_machine *,int,int));
 
 WRITE8_HANDLER( pc_nmi_enable_w );
 READ8_HANDLER( pcjr_nmi_enable_r );

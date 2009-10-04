@@ -1387,6 +1387,7 @@ static const floppy_config ibmpc_floppy_config =
 
 
 static MACHINE_DRIVER_START( pcmda )
+	MDRV_DRIVER_DATA(pc_state)
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V20, 4772720)
 	MDRV_CPU_PROGRAM_MAP(pc8_map)
@@ -1448,6 +1449,7 @@ MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( pcherc )
+	MDRV_DRIVER_DATA(pc_state)
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V20, 4772720)
 	MDRV_CPU_PROGRAM_MAP(pc8_map)
@@ -1514,6 +1516,7 @@ static const cassette_config ibm5150_cassette_config =
 };
 
 static MACHINE_DRIVER_START( ibm5150 )
+	MDRV_DRIVER_DATA(pc_state)
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8088, XTAL_14_31818MHz/3)
 	MDRV_CPU_PROGRAM_MAP(pc8_map)
@@ -1577,6 +1580,7 @@ MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( pccga )
+	MDRV_DRIVER_DATA(pc_state)
 	/* basic machine hardware */
 	MDRV_CPU_PC(pc8, pc8, I8088, 4772720, pc_frame_interrupt)	/* 4,77 MHz */
 
@@ -1635,6 +1639,7 @@ MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( europc )
+	MDRV_DRIVER_DATA(pc_state)
 	/* basic machine hardware */
 	MDRV_CPU_PC(europc, europc, I8088, 4772720*2, pc_frame_interrupt)
 
@@ -1684,6 +1689,7 @@ MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( ibm5160 )
+	MDRV_DRIVER_DATA(pc_state)
 	/* basic machine hardware */
 	MDRV_CPU_PC(pc8, pc8, I8088, XTAL_14_31818MHz/3, pc_frame_interrupt)
 
@@ -1740,6 +1746,7 @@ MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( pc200 )
+	MDRV_DRIVER_DATA(pc_state)
 	/* basic machine hardware */
 	MDRV_CPU_PC(pc1640, pc200, I8086, 8000000, pc_frame_interrupt)
 
@@ -1782,6 +1789,7 @@ MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( pc1512 )
+	MDRV_DRIVER_DATA(pc_state)
 	/* basic machine hardware */
 	MDRV_CPU_PC(pc1640, pc1640, I8086, 8000000, pc_frame_interrupt)
 
@@ -1826,6 +1834,7 @@ MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( pc1640 )
+	MDRV_DRIVER_DATA(pc_state)
 	/* basic machine hardware */
 	MDRV_CPU_PC(pc1640, pc1640, I8086, 8000000, pc_vga_frame_interrupt)
 
@@ -1870,6 +1879,7 @@ MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( xtvga )
+	MDRV_DRIVER_DATA(pc_state)
 	/* basic machine hardware */
 	MDRV_CPU_PC(pc16, pc16, I8086, 12000000, pc_vga_frame_interrupt)
 
@@ -1926,6 +1936,7 @@ MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( t1000hx )
+	MDRV_DRIVER_DATA(pc_state)
 	/* basic machine hardware */
 	MDRV_CPU_PC(tandy1000, tandy1000, I8088, 8000000, pc_frame_interrupt)
 
@@ -1970,6 +1981,7 @@ MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( t1000_16 )
+	MDRV_DRIVER_DATA(pc_state)
 	/* basic machine hardware */
 	MDRV_CPU_PC(tandy1000_16, tandy1000_16, I8086, XTAL_28_63636MHz / 3, pc_frame_interrupt)
 
@@ -2014,6 +2026,7 @@ MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( ibmpcjr )
+	MDRV_DRIVER_DATA(pc_state)
 	/* basic machine hardware */
 	MDRV_CPU_PC(ibmpcjr, ibmpcjr, I8088, 4900000, pcjr_frame_interrupt)	/* TODO: Get correct cpu frequency, probably XTAL_14_31818MHz/3 */
 
