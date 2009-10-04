@@ -57,6 +57,7 @@ TODO:
 
 static UINT16 *planea;
 static UINT16 *planeb;
+static UINT16 *cdram;
 
 emu_timer *test_timer;
 
@@ -243,7 +244,7 @@ typedef struct
 
 	UINT8 reserved1[3];
 
-	UINT8 transfer_counter;
+	UINT16 transfer_counter;
 
 	UINT32 memory_address_counter;
 
@@ -516,14 +517,7 @@ static READ16_HANDLER( scc68070_periphs_r )
 			}
 			return (scc68070_regs.dma.channel[(offset - 0x2000) / 32].sequence_control << 8) | scc68070_regs.dma.channel[(offset - 0x2000) / 32].channel_control;
 		case 0x400a/2:
-			if(ACCESSING_BITS_0_7)
-			{
-				verboselog(space->machine, 2, "scc68070_periphs_r: DMA(%d) Memory Transfer Counter Low: %02x & %04x\n", (offset - 0x2000) / 32, scc68070_regs.dma.channel[(offset - 0x2000) / 32].transfer_counter, mem_mask);
-			}
-			if(ACCESSING_BITS_8_15)
-			{
-				verboselog(space->machine, 0, "scc68070_periphs_r: DMA(%d) Memory Transfer Counter High (invalid): %04x\n", (offset - 0x2000) / 32, mem_mask);
-			}
+			verboselog(space->machine, 2, "scc68070_periphs_r: DMA(%d) Memory Transfer Counter: %04x & %04x\n", (offset - 0x2000) / 32, scc68070_regs.dma.channel[(offset - 0x2000) / 32].transfer_counter, mem_mask);
 			return scc68070_regs.dma.channel[(offset - 0x2000) / 32].transfer_counter;
 		case 0x400c/2:
 		case 0x404c/2:
@@ -531,7 +525,7 @@ static READ16_HANDLER( scc68070_periphs_r )
 			return (scc68070_regs.dma.channel[(offset - 0x2000) / 32].memory_address_counter >> 16);
 		case 0x400e/2:
 		case 0x404e/2:
-			verboselog(space->machine, 2, "scc68070_periphs_r: DMA(%d) Memory Address Counter (Low Word): %04x & %04x\n", (offset - 0x2000) / 32, scc68070_regs.dma.channel[(offset - 0x2000) / 32].device_address_counter, mem_mask);
+			verboselog(space->machine, 2, "scc68070_periphs_r: DMA(%d) Memory Address Counter (Low Word): %04x & %04x\n", (offset - 0x2000) / 32, scc68070_regs.dma.channel[(offset - 0x2000) / 32].memory_address_counter, mem_mask);
 			return scc68070_regs.dma.channel[(offset - 0x2000) / 32].memory_address_counter;
 		case 0x4014/2:
 		case 0x4054/2:
@@ -770,7 +764,7 @@ static WRITE16_HANDLER( scc68070_periphs_w )
 			if(ACCESSING_BITS_8_15)
 			{
 				verboselog(space->machine, 2, "scc68070_periphs_w: DMA(%d) Status: %04x & %04x\n", (offset - 0x2000) / 32, data, mem_mask);
-				scc68070_regs.dma.channel[(offset - 0x2000) / 32].channel_status = data >> 8;
+				scc68070_regs.dma.channel[(offset - 0x2000) / 32].channel_status &= ~(data & 0xb0);
 			}
 			break;
 		case 0x4004/2:
@@ -778,7 +772,7 @@ static WRITE16_HANDLER( scc68070_periphs_w )
 			if(ACCESSING_BITS_0_7)
 			{
 				verboselog(space->machine, 2, "scc68070_periphs_w: DMA(%d) Operation Control Register: %04x & %04x\n", (offset - 0x2000) / 32, data, mem_mask);
-				scc68070_regs.dma.channel[(offset - 0x2000) / 32].operation_control = data >> 8;
+				scc68070_regs.dma.channel[(offset - 0x2000) / 32].operation_control = data & 0x00ff;
 			}
 			if(ACCESSING_BITS_8_15)
 			{
@@ -791,7 +785,11 @@ static WRITE16_HANDLER( scc68070_periphs_w )
 			if(ACCESSING_BITS_0_7)
 			{
 				verboselog(space->machine, 2, "scc68070_periphs_w: DMA(%d) Channel Control Register: %04x & %04x\n", (offset - 0x2000) / 32, data, mem_mask);
-				scc68070_regs.dma.channel[(offset - 0x2000) / 32].channel_control = data >> 8;
+				scc68070_regs.dma.channel[(offset - 0x2000) / 32].channel_control = data & 0x007f;
+				if(data & CCR_SO)
+				{
+					scc68070_regs.dma.channel[(offset - 0x2000) / 32].channel_status |= CSR_COC;
+				}
 			}
 			if(ACCESSING_BITS_8_15)
 			{
@@ -800,15 +798,8 @@ static WRITE16_HANDLER( scc68070_periphs_w )
 			}
 			break;
 		case 0x400a/2:
-			if(ACCESSING_BITS_0_7)
-			{
-				verboselog(space->machine, 2, "scc68070_periphs_w: DMA(%d) Memory Transfer Counter Low: %04x & %04x\n", (offset - 0x2000) / 32, data, mem_mask);
-				scc68070_regs.dma.channel[(offset - 0x2000) / 32].transfer_counter = data >> 8;
-			}
-			if(ACCESSING_BITS_8_15)
-			{
-				verboselog(space->machine, 0, "scc68070_periphs_w: DMA(%d) Memory Transfer Counter High (invalid): %04x & %04x\n", (offset - 0x2000) / 32, data, mem_mask);
-			}
+			verboselog(space->machine, 2, "scc68070_periphs_w: DMA(%d) Memory Transfer Counter: %04x & %04x\n", (offset - 0x2000) / 32, data, mem_mask);
+			COMBINE_DATA(&scc68070_regs.dma.channel[(offset - 0x2000) / 32].transfer_counter);
 			break;
 		case 0x400c/2:
 		case 0x404c/2:
@@ -923,40 +914,148 @@ typedef struct
 	UINT16 interrupt_vector;	// CDIC Interrupt Vector Register (0x303ffc)
 	UINT16 data_buffer;			// CDIC Data Buffer Register (0x303ffe)
 
+	UINT8 buffer_target;
+
 	emu_timer *interrupt_timer;
+	cdrom_file *cd;
 } cdic_regs_t;
 
 static cdic_regs_t cdic_regs;
 
 static TIMER_CALLBACK( cdic_trigger_readback_int )
 {
-	cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), M68K_IRQ_4, 128);
-	cputag_set_input_line(machine, "maincpu", M68K_IRQ_4, ASSERT_LINE);
-	timer_adjust_oneshot(cdic_regs.interrupt_timer, attotime_never, 0);
+	switch(cdic_regs.command)
+	{
+		case 0x29: // Read Mode 1
+		{
+			UINT8 buffer[2560] = { 0 };
+			UINT32 msf = cdic_regs.time >> 8;
+			UINT32 lba = 0;
+			int index = 0;
+			UINT8 nybbles[6] =
+			{
+				 msf & 0x0000000f,
+				(msf & 0x000000f0) >> 4,
+				(msf & 0x00000f00) >> 8,
+				(msf & 0x0000f000) >> 12,
+				(msf & 0x000f0000) >> 16,
+				(msf & 0x00f00000) >> 20
+			};
+			nybbles[2] -= 2;
+			if(nybbles[2] > 9)
+			{
+				nybbles[2] += 10;
+				nybbles[3]--;
+			}
+			lba = nybbles[0] + nybbles[1]*10 + ((nybbles[2] + nybbles[3]*10)*75) + ((nybbles[4] + nybbles[5]*10)*75*60);
+			printf( "Reading Mode 1 sector from MSF location %06x\n", cdic_regs.time | 2 );
+			verboselog(machine, 0, "Reading Mode 1 sector from MSF location %06x\n", cdic_regs.time | 2 );
+			cdrom_read_data(cdic_regs.cd, lba, buffer, CD_TRACK_MODE1);
+			cdic_regs.data_buffer ^= 0x0001;
+			for(index = 0; index < 2048/2; index++)
+			{
+				cdram[0xa00/2 + index] = (buffer[index*2 + 1] << 8) | buffer[index*2];
+			}
+
+			printf( "Setting CDIC interrupt line\n" );
+			verboselog(machine, 0, "Setting CDIC interrupt line\n" );
+			cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), M68K_IRQ_4, 128);
+			cputag_set_input_line(machine, "maincpu", M68K_IRQ_4, ASSERT_LINE);
+			timer_adjust_oneshot(cdic_regs.interrupt_timer, attotime_never, 0);
+			cdic_regs.x_buffer |= 0x8000;
+			cdic_regs.data_buffer |= cdic_regs.buffer_target;
+			cdic_regs.buffer_target ^= 1;
+			break;
+		}
+		case 0x2a: // Read Mode 2
+		{
+			UINT8 buffer[2448] = { 0 };
+			UINT32 msf = cdic_regs.time >> 8;
+			UINT32 lba = 0;
+			int index = 0;
+			UINT8 nybbles[6] =
+			{
+				 msf & 0x0000000f,
+				(msf & 0x000000f0) >> 4,
+				(msf & 0x00000f00) >> 8,
+				(msf & 0x0000f000) >> 12,
+				(msf & 0x000f0000) >> 16,
+				(msf & 0x00f00000) >> 20
+			};
+			nybbles[2] -= 2;
+			if(nybbles[2] > 9)
+			{
+				nybbles[2] += 10;
+				nybbles[3]--;
+			}
+			lba = nybbles[0] + nybbles[1]*10 + ((nybbles[2] + nybbles[3]*10)*75) + ((nybbles[4] + nybbles[5]*10)*75*60);
+			printf( "Reading Mode 2 sector from MSF location %06x\n", cdic_regs.time | 2 );
+			verboselog(machine, 0, "Reading Mode 2 sector from MSF location %06x\n", cdic_regs.time | 2 );
+
+			cdrom_read_data(cdic_regs.cd, lba, buffer, CD_TRACK_MODE2);
+			cdic_regs.data_buffer ^= 0x0001;
+			for(index = 0; index < 2352/2; index++)
+			{
+				cdram[0xa00/2 + index] = (buffer[index*2 + 1] << 8) | buffer[index*2];
+			}
+
+			printf( "Setting CDIC interrupt line\n" );
+			verboselog(machine, 0, "Setting CDIC interrupt line\n" );
+			cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), M68K_IRQ_4, 128);
+			cputag_set_input_line(machine, "maincpu", M68K_IRQ_4, ASSERT_LINE);
+			timer_adjust_oneshot(cdic_regs.interrupt_timer, attotime_never, 0);
+			cdic_regs.x_buffer |= 0x8000;
+			cdic_regs.data_buffer |= cdic_regs.buffer_target;
+			cdic_regs.buffer_target ^= 1;
+			break;
+		}
+		case 0x2e:
+			break;
+	}
 }
 
 static READ16_HANDLER( cdic_r )
 {
 	offset += 0x3c00/2;
-	verboselog(space->machine, 0, "cdic_r: UNIMPLEMENTED: Unknown address: %04x & %04x\n", offset*2, mem_mask);
 	switch(offset)
 	{
 		case 0x3c00/2: // Command register
+			verboselog(space->machine, 0, "cdic_r: Command Register = %04x & %04x\n", cdic_regs.command, mem_mask);
 			return cdic_regs.command;
+		case 0x3c08/2: // Channel register (MSW)
+			verboselog(space->machine, 0, "cdic_r: Channel Register (MSW) = %04x & %04x\n", cdic_regs.channel >> 16, mem_mask);
+			return cdic_regs.channel >> 16;
+		case 0x3c0a/2: // Channel register (LSW)
+			verboselog(space->machine, 0, "cdic_r: Channel Register (LSW) = %04x & %04x\n", cdic_regs.channel & 0x0000ffff, mem_mask);
+			return cdic_regs.channel & 0x0000ffff;
+		case 0x3c0c/2: // Audio Channel register
+			verboselog(space->machine, 0, "cdic_r: Audio Channel Register = %04x & %04x\n", cdic_regs.audio_channel, mem_mask);
+			return cdic_regs.audio_channel;
 		case 0x3ff4/2:
+			verboselog(space->machine, 0, "cdic_r: Audio Buffer Register = %04x & %04x\n", cdic_regs.audio_buffer, mem_mask);
 			return cdic_regs.audio_buffer;
 		case 0x3ff6/2:
-			return cdic_regs.x_buffer | 0x8000;
+		{
+			UINT16 temp = cdic_regs.x_buffer;
+			cdic_regs.x_buffer &= 0x7fff;
+			verboselog(space->machine, 0, "cdic_r: X-Buffer Register = %04x & %04x\n", temp, mem_mask);
+			return temp;
+		}
 		case 0x3ffa/2:
+			verboselog(space->machine, 0, "cdic_r: Z-Buffer Register = %04x & %04x\n", cdic_regs.z_buffer, mem_mask);
 			return cdic_regs.z_buffer;
 		case 0x3ffe/2:
 		{
 			UINT16 temp = cdic_regs.data_buffer;
 			cdic_regs.data_buffer &= 0x7fff;
 			cputag_set_input_line(space->machine, "maincpu", M68K_IRQ_4, CLEAR_LINE);
-			return temp | 0x1600;
+			verboselog(space->machine, 0, "cdic_r: Data buffer Register = %04x & %04x\n", temp, mem_mask);
+			verboselog(space->machine, 0, "Clearing CDIC interrupt line\n" );
+			printf("Clearing CDIC interrupt line\n" );
+			return temp | 1;
 		}
 		default:
+			verboselog(space->machine, 0, "cdic_r: UNIMPLEMENTED: Unknown address: %04x & %04x\n", offset*2, mem_mask);
 			return 0;
 	}
 }
@@ -964,34 +1063,84 @@ static READ16_HANDLER( cdic_r )
 static WRITE16_HANDLER( cdic_w )
 {
 	offset += 0x3c00/2;
-	verboselog(space->machine, 0, "cdic_w: UNIMPLEMENTED: Unknown address: %04x = %04x & %04x\n", offset*2, data, mem_mask);
 	switch(offset)
 	{
 		case 0x3c00/2: // Command register
+			verboselog(space->machine, 0, "cdic_w: Command Register = %04x & %04x\n", data, mem_mask);
 			COMBINE_DATA(&cdic_regs.command);
 			break;
 		case 0x3c02/2: // Time register (MSW)
 			cdic_regs.time &= 0x0000ffff;
 			cdic_regs.time |= (data & mem_mask) << 16;
+			verboselog(space->machine, 0, "cdic_w: Time Register (MSW) = %04x & %04x\n", data, mem_mask);
 			break;
 		case 0x3c04/2: // Time register (LSW)
 			cdic_regs.time &= 0xffff0000;
 			cdic_regs.time |= data & mem_mask;
-			cdic_regs.data_buffer |= data & 0x3f00;
+			verboselog(space->machine, 0, "cdic_w: Time Register (LSW) = %04x & %04x\n", data, mem_mask);
+			break;
+		case 0x3c06/2: // File register
+			verboselog(space->machine, 0, "cdic_w: File Register = %04x & %04x\n", data, mem_mask);
+			COMBINE_DATA(&cdic_regs.file);
+			break;
+		case 0x3c08/2: // Channel register (MSW)
+			cdic_regs.channel &= 0x0000ffff;
+			cdic_regs.channel |= (data & mem_mask) << 16;
+			verboselog(space->machine, 0, "cdic_w: Channel Register (MSW) = %04x & %04x\n", data, mem_mask);
+			break;
+		case 0x3c0a/2: // Channel register (LSW)
+			cdic_regs.channel &= 0xffff0000;
+			cdic_regs.channel |= data & mem_mask;
+			verboselog(space->machine, 0, "cdic_w: Channel Register (LSW) = %04x & %04x\n", data, mem_mask);
+			break;
+		case 0x3c0c/2: // Audio Channel register
+			verboselog(space->machine, 0, "cdic_w: Audio Channel Register = %04x & %04x\n", data, mem_mask);
+			COMBINE_DATA(&cdic_regs.audio_channel);
+			break;
+		case 0x3ff8/2:
+		{
+			UINT32 start = scc68070_regs.dma.channel[0].memory_address_counter;
+			UINT32 count = scc68070_regs.dma.channel[0].transfer_counter;
+			UINT32 index = 0;
+			UINT32 src_index = (data & 0x7fff) >> 1;
+			UINT16 *memory = planea;
+			verboselog(space->machine, 0, "cdic_w: DMA Control Register = %04x & %04x\n", data, mem_mask);
+			verboselog(space->machine, 0, "Doing copy, transferring %04x bytes\n", count * 2 );
+			printf("Doing copy, transferring %04x bytes\n", count * 2 );
+			if((start & 0x00f00000) == 0x00200000)
+			{
+				start -= 0x00200000;
+				memory = planeb;
+			}
+			for(index = start / 2; index < (start / 2 + count); index++)
+			{
+				memory[index] = (cdram[src_index] >> 8) | (cdram[src_index] << 8);
+				src_index++;
+			}
+			scc68070_regs.dma.channel[0].memory_address_counter += scc68070_regs.dma.channel[0].transfer_counter * 2;
+			break;
+		}
+		case 0x3ffa/2:
+			verboselog(space->machine, 0, "cdic_w: Z-Buffer Register = %04x & %04x\n", data, mem_mask);
+			COMBINE_DATA(&cdic_regs.z_buffer);
+			break;
+		case 0x3ffc/2:
+			verboselog(space->machine, 0, "cdic_w: Interrupt Vector Register = %04x & %04x\n", data, mem_mask);
+			COMBINE_DATA(&cdic_regs.interrupt_vector);
 			break;
 		case 0x3ffe/2:
+		{
+			UINT16 temp = cdic_regs.data_buffer;
+			verboselog(space->machine, 0, "cdic_w: Data Buffer Register = %04x & %04x\n", data, mem_mask);
 			COMBINE_DATA(&cdic_regs.data_buffer);
-			if(cdic_regs.data_buffer == 0xc000)
+			if((cdic_regs.data_buffer & 0xc000) == 0xc000)
 			{
-				//cdic_regs.data_buffer &= ~0x4000;
-				switch(cdic_regs.command)
-				{
-					case 0x29: // Read Mode 1
-						timer_adjust_oneshot(cdic_regs.interrupt_timer, ATTOTIME_IN_HZ(10), 0);
-						//slave_prepare_readback(space->machine, ATTOTIME_IN_HZ(10000), 3, 4, 0x01, 0x02, 0x03, 0x04, 0x00);
-						break;
-				}
+				timer_adjust_oneshot(cdic_regs.interrupt_timer, ATTOTIME_IN_HZ(60), 0);
 			}
+			break;
+		}
+		default:
+			verboselog(space->machine, 0, "cdic_w: UNIMPLEMENTED: Unknown address: %04x = %04x & %04x\n", offset*2, data, mem_mask);
 			break;
 	}
 }
@@ -2392,8 +2541,8 @@ TIMER_CALLBACK( test_timer_callback )
 
 static READ16_HANDLER(cdic_ram_r)
 {
-	verboselog(space->machine, 0, "cdic_ram_r: %08x & %04x\n", 0x300000 + offset*2, mem_mask);
-	return mame_rand(space->machine);
+	verboselog(space->machine, 0, "cdic_ram_r: %08x = %04x & %04x\n", 0x00300000 + offset*2, cdram[offset], mem_mask);
+	return cdram[offset];
 }
 
 static ADDRESS_MAP_START( cdimono1_mem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -2403,7 +2552,7 @@ static ADDRESS_MAP_START( cdimono1_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00301400, 0x00301403) AM_READ(uart_loopback_enable)
 	//AM_RANGE(0x00301404, 0x00303bff) AM_RAM
 #else
-	AM_RANGE(0x00300000, 0x00303bff) AM_READ(cdic_ram_r)
+	AM_RANGE(0x00300000, 0x00303bff) AM_READ(cdic_ram_r) AM_BASE(&cdram)
 #endif
 	AM_RANGE(0x00303c00, 0x00303fff) AM_READWRITE(cdic_r, cdic_w)
 	AM_RANGE(0x00310000, 0x00317fff) AM_READWRITE(slave_r, slave_w)
@@ -2437,6 +2586,7 @@ static MACHINE_RESET( cdi )
 {
 	UINT16 *src   = (UINT16*)memory_region( machine, "maincpu" );
 	UINT16 *dst   = planea;
+	const device_config *cdrom_dev = devtag_get_device(machine, "cdrom");
 	memcpy(dst, src, 0x8);
 
 	scc68070_regs.timers.timer0_timer = timer_alloc(machine, scc68070_timer0_callback, 0);
@@ -2450,6 +2600,11 @@ static MACHINE_RESET( cdi )
 
 	cdic_regs.interrupt_timer = timer_alloc(machine, cdic_trigger_readback_int, 0);
 	timer_adjust_oneshot(cdic_regs.interrupt_timer, attotime_never, 0);
+
+	if( cdrom_dev )
+	{
+		cdic_regs.cd = mess_cd_get_cdrom_file(cdrom_dev);
+	}
 
 	device_reset(cputag_get_cpu(machine, "maincpu"));
 
