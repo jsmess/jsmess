@@ -433,7 +433,7 @@ $(MAMEOBJ)/atari.a: \
 	$(DRIVERS)/skyraid.o $(AUDIO)/skyraid.o $(VIDEO)/skyraid.o \
 	$(DRIVERS)/sprint2.o $(AUDIO)/sprint2.o $(VIDEO)/sprint2.o \
 	$(DRIVERS)/sprint4.o $(VIDEO)/sprint4.o $(AUDIO)/sprint4.o \
-	$(DRIVERS)/sprint8.o $(VIDEO)/sprint8.o \
+	$(DRIVERS)/sprint8.o $(AUDIO)/sprint8.o $(VIDEO)/sprint8.o \
 	$(DRIVERS)/starshp1.o $(AUDIO)/starshp1.o $(VIDEO)/starshp1.o \
 	$(DRIVERS)/starwars.o $(MACHINE)/starwars.o $(AUDIO)/starwars.o \
 	$(DRIVERS)/subs.o $(MACHINE)/subs.o $(AUDIO)/subs.o $(VIDEO)/subs.o \
@@ -1128,7 +1128,7 @@ $(MAMEOBJ)/sega.a: \
 	$(DRIVERS)/segas18.o $(VIDEO)/segas18.o \
 	$(DRIVERS)/segas24.o $(MACHINE)/segas24.o $(VIDEO)/segas24.o \
 	$(DRIVERS)/segas32.o $(MACHINE)/segas32.o $(VIDEO)/segas32.o \
-	$(DRIVERS)/segae.o $(VIDEO)/segasyse.o \
+	$(DRIVERS)/segamsys.o $(DRIVERS)/segae.o \
 	$(DRIVERS)/segaxbd.o $(VIDEO)/segaxbd.o \
 	$(DRIVERS)/segaybd.o $(VIDEO)/segaybd.o \
 	$(DRIVERS)/ssf2md.o \
@@ -1575,6 +1575,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/norautp.o  $(AUDIO)/norautp.o \
 	$(DRIVERS)/oneshot.o $(VIDEO)/oneshot.o \
 	$(DRIVERS)/onetwo.o \
+	$(DRIVERS)/othello.o \
 	$(DRIVERS)/othldrby.o $(VIDEO)/othldrby.o \
 	$(DRIVERS)/pachifev.o \
 	$(DRIVERS)/pangofun.o \

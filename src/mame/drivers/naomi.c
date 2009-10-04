@@ -4070,10 +4070,24 @@ ROM_START( gunsur2 )
 	ROM_REGION( 0x200000, "maincpu", 0)
 	NAOMI_BIOS
 
-	ROM_REGION( 0xb800000, "user1", ROMREGION_ERASEFF)
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASEFF)
         ROM_LOAD( "bhf1vere.2f",  0x0000000, 0x0800000, CRC(121ea283) SHA1(e4bf2b90fa3d42727b8393ffa2c5a8863914a630) )
         ROM_LOAD( "bhf1ma2.4m",   0x2000000, 0x1000000, CRC(8073dec7) SHA1(2d4173ff0de37b95a8cb02e1b572a9cdeb448c24) )
+        ROM_LOAD( "bhf1ma3.4l",   0x3000000, 0x1000000, CRC(43cd16a4) SHA1(86258df34b652a614129efd4c825c62ff1382318) )
+        ROM_LOAD( "bhf1ma4.4k",   0x4000000, 0x1000000, CRC(f6aebed8) SHA1(687057aacb45ebffe3b5cf2b8dd52d24039392f1) )
+        ROM_LOAD( "bhf1ma5.4j",   0x5000000, 0x1000000, CRC(b5e1b582) SHA1(47763113e6917bbf48840292c08d4f63c3ce085a) )
+        ROM_LOAD( "bhf1ma6.4h",   0x6000000, 0x1000000, CRC(345fd824) SHA1(61ebc12c7cd7f2e2c5173cc0f57240855ec99c6f) )
+        ROM_LOAD( "bhf1ma7.4f",   0x7000000, 0x1000000, CRC(465ecff1) SHA1(f9eabc77ed8135fa77c8e40335e6b3df1a64042c) )
+        ROM_LOAD( "bhf1ma8.4d",   0x8000000, 0x1000000, CRC(76c92354) SHA1(0049b10144d65f574d14d9ad9d1d5380bf154532) )
+        ROM_LOAD( "bhf1ma9.4e",   0x9000000, 0x1000000, CRC(d45a46ee) SHA1(c12764f5ba17f10fb309e47450bb89fbef51e252) )
+        ROM_LOAD( "bhf1ma10.4c",  0xa000000, 0x1000000, CRC(8c38d1f7) SHA1(3fbc280590c49fa094c1fc1e23d6c9d0031298c5) )
+        ROM_LOAD( "bhf1ma11.4b",  0xb000000, 0x1000000, CRC(f49153c4) SHA1(85d5583cac492317ba52dc7a31a443f5f26a67c9) )
+        ROM_LOAD( "bhf1ma12.6p",  0xc000000, 0x1000000, CRC(0e2bdd9a) SHA1(e2f82d2c9e33da1a297d79a0324558d0ff614172) )
+        ROM_LOAD( "bhf1ma13.6n",  0xd000000, 0x1000000, CRC(055718ad) SHA1(355c4780231a4361aa6237dd34819b60d9df0fc7) )
+        ROM_LOAD( "bhf1ma14.6m",  0xe000000, 0x1000000, CRC(d06c9bd7) SHA1(54668a2fd31059976890da92709c18f308634887) )
+        ROM_LOAD( "bhf1ma15.6l",  0xf000000, 0x1000000, CRC(db3c396b) SHA1(da0e125d627ce890906ca100081ab0685e11c0ef) )
 ROM_END
+
 
 /* GD-ROM titles - a PIC supplies a decryption key
 
@@ -5280,6 +5294,44 @@ ROM_START( vf4cart )
         ROM_LOAD( "mpr-23784.ic11", 0xa800000, 0x1000000, CRC(f74f2fee) SHA1(84b07baa6d116727e66ef27e24ba6484c3393891) )
 ROM_END
 
+/*
+    This is the same nonsense layout rom board as gram2000, and just like
+    that it tests IC1 which doesn't exist - is it a mirror, or protection
+    related?  There is no physical rom for it, also note, the roms are
+    interleaved, so each test is testing 2 roms and the labeling / ic
+    positions on the cart don't relate to the display in test mode.
+
+    Desired IC1 @ 0x800000 sums from the header = 9f39 fdc4
+
+    We need a USB dump of this from 0x800000 to 0x1000000.
+*/
+ROM_START( vf4evoct )
+	NAOMI2_BIOS
+
+	ROM_REGION( 0xb000000, "user1", ROMREGION_ERASEFF)
+        ROM_LOAD( "epr-23934.ic11",  0x0000000, 0x400000, CRC(656a7d84) SHA1(e407ddc923b399de99cb06a8831ef8fb328cfe64) )
+        ROM_LOAD32_WORD( "mpr-23912.ic17s", 0x1000000, 0x800000, CRC(b2b13d97) SHA1(978bcdab7e4f220b464d5b9fa27870b5176283ca) )
+        ROM_LOAD32_WORD( "mpr-23913.ic18",  0x1000002, 0x800000, CRC(560de9d2) SHA1(e065abb62346f5e50f654ac77beb54ee1bfc1a08) )
+        ROM_LOAD32_WORD( "mpr-23914.ic19s", 0x2000000, 0x800000, CRC(a2104728) SHA1(48b752b6266b4d44fcb16fe179fb44ca58e11db0) )
+        ROM_LOAD32_WORD( "mpr-23915.ic20",  0x2000002, 0x800000, CRC(295d32f0) SHA1(4cabb1ab54dad2cef7207f8d7a78f609d35800fb) )
+        ROM_LOAD32_WORD( "mpr-23916.ic21s", 0x3000000, 0x800000, CRC(d725fdd3) SHA1(ab3a79dfcbaa65b5a085a429bcb76c1d3940d590) )
+        ROM_LOAD32_WORD( "mpr-23917.ic22",  0x3000002, 0x800000, CRC(8794c8e8) SHA1(a2542ad8c063f77749fbc4429ec74bba26939556) )
+        ROM_LOAD32_WORD( "mpr-23918.ic23s", 0x4000000, 0x800000, CRC(7a3da170) SHA1(72d05430cd8cd12c47ccd36bf171eaadfb987708) )
+        ROM_LOAD32_WORD( "mpr-23919.ic24",  0x4000002, 0x800000, CRC(59601746) SHA1(514b00ee44d64593c2d257b48ac20b42ee2a402a) )
+        ROM_LOAD32_WORD( "mpr-23920.ic25s", 0x5000000, 0x800000, CRC(6ae07021) SHA1(b018db4f868d9ebcde44759d8aea44d789958087) )
+        ROM_LOAD32_WORD( "mpr-23921.ic26",  0x5000002, 0x800000, CRC(42028253) SHA1(aa5a3953e4306f4f69c1be568d515af249e6ab1e) )
+        ROM_LOAD32_WORD( "mpr-23922.ic27s", 0x6000000, 0x800000, CRC(baf47df2) SHA1(d5c04e03a69a4ac8c8c066c0c750bef236e8c172) )
+        ROM_LOAD32_WORD( "mpr-23923.ic28",  0x6000002, 0x800000, CRC(5c31b7e7) SHA1(cf1307400f7bd4b8dda840544a348eee34710256) )
+        ROM_LOAD32_WORD( "mpr-23924.ic29",  0x7000000, 0x800000, CRC(6dfe19d9) SHA1(99b13ef752c7b8f7812ea5c3bce19cbf122008b6) )
+        ROM_LOAD32_WORD( "mpr-23925.ic30s", 0x7000002, 0x800000, CRC(e9ec870a) SHA1(cdf385096e7fe15de98cea6ae5aabf3016e007a9) )
+        ROM_LOAD32_WORD( "mpr-23926.ic31",  0x8000000, 0x800000, CRC(2c650728) SHA1(328748b2c786eb77c9d05280e88367cfb7b79777) )
+        ROM_LOAD32_WORD( "mpr-23927.ic32s", 0x8000002, 0x800000, CRC(f36a765b) SHA1(ecd09db0961b0d11000c8744a2cfcf3fa473eea6) )
+        ROM_LOAD32_WORD( "mpr-23928.ic33",  0x9000000, 0x800000, CRC(0ee92b02) SHA1(d0d26f4257a022b42b59cf4f9305a3cb2dc67f4b) )
+        ROM_LOAD32_WORD( "mpr-23929.ic34s", 0x9000002, 0x800000, CRC(d768f242) SHA1(3ade29b094308d870ecac53cfe77b843d50af85a) )
+        ROM_LOAD32_WORD( "mpr-23930.ic35",  0xa000000, 0x800000, CRC(0e45e4c4) SHA1(974b83d4cc35e8ac9f83d04ebd395f1e2196e829) )
+        ROM_LOAD32_WORD( "mpr-23931.ic36s", 0xa000002, 0x800000, CRC(12ecd2f0) SHA1(3222d4d9d3e30c297a072a8888c28503306db40c) )
+ROM_END
+
 ROM_START( clubkrte )
 	NAOMI2_BIOS
 
@@ -5532,7 +5584,8 @@ GAME( 2001, naomi2,   0,        naomi,    naomi,    0, ROT0, "Sega",            
 /* Complete Dumps */
 GAME( 2001, vstrik3c, naomi2,  naomi,    naomi,    0,  ROT0,  "Sega",          "Virtua Striker 3 (Cart) (USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2001, wldrider, naomi2,  naomi,    naomi,    0,  ROT0,  "Sega",          "Wild Riders (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-GAME( 2001, vf4cart,  naomi2,  naomi,    naomi,    0,  ROT0,  "Sega",          "Virtua Fighter 4 (Cart)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+GAME( 2001, vf4cart,  naomi2,  naomi,    naomi,    0,  ROT0,  "Sega",          "Virtua Fighter 4 (Cartridge)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+GAME( 2001, vf4evoct,  naomi2,  naomi,   naomi,    0,  ROT0,  "Sega",          "Virtua Fighter 4 Evolution (Cartridge)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2002, clubkrte, naomi2,  naomi,    naomi,    0,  ROT0,  "Sega",          "Club Kart: European Session", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 
 /* GDS-xxxx (Sega first party games) */

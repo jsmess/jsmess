@@ -109,6 +109,7 @@ struct dst_oneshot_context
 	double	countdown;
 	int		state;
 	int		last_trig;
+	int		type;
 };
 
 struct dss_ramp_context
@@ -272,31 +273,20 @@ static DISCRETE_RESET(dst_comp_adder)
  *
  * DST_CLAMP - Simple signal clamping circuit
  *
- * input[0]    - Enable ramp
- * input[1]    - Input value
- * input[2]    - Minimum value
- * input[3]    - Maximum value
- * input[4]    - Clamp output when disabled
+ * input[0]    - Input value
+ * input[1]    - Minimum value
+ * input[2]    - Maximum value
  *
  ************************************************************************/
-#define DST_CLAMP__ENABLE	DISCRETE_INPUT(0)
-#define DST_CLAMP__IN		DISCRETE_INPUT(1)
-#define DST_CLAMP__MIN		DISCRETE_INPUT(2)
-#define DST_CLAMP__MAX		DISCRETE_INPUT(3)
-#define DST_CLAMP__CLAMP	DISCRETE_INPUT(4)
+#define DST_CLAMP__IN		DISCRETE_INPUT(0)
+#define DST_CLAMP__MIN		DISCRETE_INPUT(1)
+#define DST_CLAMP__MAX		DISCRETE_INPUT(2)
 
 static DISCRETE_STEP(dst_clamp)
 {
-	if(DST_CLAMP__ENABLE)
-	{
-		if (DST_CLAMP__IN < DST_CLAMP__MIN) node->output[0] = DST_CLAMP__MIN;
-		else if (DST_CLAMP__IN > DST_CLAMP__MAX) node->output[0] = DST_CLAMP__MAX;
-		else node->output[0]= DST_CLAMP__IN;
-	}
-	else
-	{
-		node->output[0] = DST_CLAMP__CLAMP;
-	}
+	if (DST_CLAMP__IN < DST_CLAMP__MIN) node->output[0] = DST_CLAMP__MIN;
+	else if (DST_CLAMP__IN > DST_CLAMP__MAX) node->output[0] = DST_CLAMP__MAX;
+	else node->output[0]= DST_CLAMP__IN;
 }
 
 
@@ -1167,7 +1157,7 @@ static DISCRETE_STEP(dst_mixer)
 			bit_mask = bit_mask << 1;
 			}
 		}
-		else
+		else if (c_bit_flag != 0)
 		{
 			/* no r_nodes, so just do high pass filtering */
 			for (bit = 0; bit < context->size; bit++)
@@ -1181,6 +1171,20 @@ static DISCRETE_STEP(dst_mixer)
 					vTemp -= context->v_cap[bit];
 				}
 				i += ((type == DISC_MIXER_IS_OP_AMP) ? v_ref - vTemp : vTemp) / info->r[bit];
+			}
+		}
+		else
+		{
+			/* no r_nodes or c_nodes, mixing only */
+			if (type == DISC_MIXER_IS_OP_AMP)
+			{
+				for (bit = 0; bit < context->size; bit++)
+					i += ( v_ref - DST_MIXER__IN(bit) ) / info->r[bit];
+			}
+			else
+			{
+				for (bit = 0; bit < context->size; bit++)
+					i += DST_MIXER__IN(bit) / info->r[bit];
 			}
 		}
 
@@ -1221,6 +1225,7 @@ static DISCRETE_STEP(dst_mixer)
 		node->output[0] = 0;
 	}
 }
+
 
 static DISCRETE_RESET(dst_mixer)
 {
@@ -1366,7 +1371,7 @@ static DISCRETE_RESET(dst_multiplex)
 {
 	struct dst_size_context *context = (struct dst_size_context *)node->context;
 
-	context->size = node->active_inputs - 2;
+	context->size = node->active_inputs - 1;
 
 	DISCRETE_STEP_CALL(dst_multiplex);
 }
@@ -1414,19 +1419,19 @@ static DISCRETE_STEP(dst_oneshot)
 			context->last_trig = trigger;
 
 			/* Is it the proper edge trigger */
-			if ((DST_ONESHOT__TYPE & DISC_ONESHOT_REDGE) ? trigger : !trigger)
+			if ((context->type & DISC_ONESHOT_REDGE) ? trigger : !trigger)
 			{
 				if (!context->state)
 				{
 					/* We have first trigger */
 					context->state     = 1;
-					node->output[0]    = (DST_ONESHOT__TYPE & DISC_OUT_ACTIVE_LOW) ? 0 : DST_ONESHOT__AMP;
+					node->output[0]    = (context->type & DISC_OUT_ACTIVE_LOW) ? 0 : DST_ONESHOT__AMP;
 					context->countdown = DST_ONESHOT__WIDTH;
 				}
 				else
 				{
 					/* See if we retrigger */
-					if (DST_ONESHOT__TYPE & DISC_ONESHOT_RETRIG)
+					if (context->type & DISC_ONESHOT_RETRIG)
 					{
 						/* Retrigger */
 						context->countdown = DST_ONESHOT__WIDTH;
@@ -1441,7 +1446,7 @@ static DISCRETE_STEP(dst_oneshot)
 			context->countdown -= node->info->sample_time;
 			if(context->countdown <= 0.0)
 			{
-				node->output[0]    = (DST_ONESHOT__TYPE & DISC_OUT_ACTIVE_LOW) ? DST_ONESHOT__AMP : 0;
+				node->output[0]    = (context->type & DISC_OUT_ACTIVE_LOW) ? DST_ONESHOT__AMP : 0;
 				context->countdown = 0;
 				context->state     = 0;
 			}
@@ -1458,7 +1463,9 @@ static DISCRETE_RESET(dst_oneshot)
 	context->state     = 0;
 
  	context->last_trig = 0;
- 	node->output[0] = (DST_ONESHOT__TYPE & DISC_OUT_ACTIVE_LOW) ? DST_ONESHOT__AMP : 0;
+ 	context->type = DST_ONESHOT__TYPE;
+
+ 	node->output[0] = (context->type & DISC_OUT_ACTIVE_LOW) ? DST_ONESHOT__AMP : 0;
 }
 
 

@@ -92,6 +92,8 @@ VIDEO_UPDATE( polygonet );
 
 READ32_HANDLER( polygonet_ttl_ram_r );
 WRITE32_HANDLER( polygonet_ttl_ram_w );
+READ32_HANDLER( polygonet_roz_ram_r );
+WRITE32_HANDLER( polygonet_roz_ram_w );
 
 static int init_eeprom_count;
 
@@ -246,11 +248,11 @@ static WRITE32_HANDLER( shared_ram_write )
 	COMBINE_DATA(&shared_ram[offset]) ;
 
 	logerror("68k WRITING %04x & %04x to shared ram %x & %x [%08x] (@%x)\n", (shared_ram[offset] & 0xffff0000) >> 16,
-																             (shared_ram[offset] & 0x0000ffff),
-																              0xc000 + (offset<<1),
-																              0xc000 +((offset<<1)+1),
-																		      mem_mask,
-																		      cpu_get_pc(space->cpu));
+																			 (shared_ram[offset] & 0x0000ffff),
+																			  0xc000 + (offset<<1),
+																			  0xc000 +((offset<<1)+1),
+																			  mem_mask,
+																			  cpu_get_pc(space->cpu));
 
 	/* write to the current dsp56k word */
 	if (mem_mask | (0xffff0000))
@@ -272,12 +274,12 @@ static WRITE32_HANDLER( dsp_w_lines )
 	/* 0x01000000 is the reset line - 0 is high, 1 is low */
 	if ((data >> 24) & 0x01)
 	{
-		logerror("RESET CLEARED\n");
+//      logerror("RESET CLEARED\n");
 		cputag_set_input_line(space->machine, "dsp", DSP56K_IRQ_RESET, CLEAR_LINE);
 	}
 	else
 	{
-		logerror("RESET ASSERTED\n");
+//      logerror("RESET ASSERTED\n");
 		cputag_set_input_line(space->machine, "dsp", DSP56K_IRQ_RESET, ASSERT_LINE);
 
 		/* A little hacky - I can't seem to set these lines anywhere else where reset is asserted, so i do it here */
@@ -403,9 +405,10 @@ static UINT8 dsp56k_bank_num(const device_config* cpu, UINT8 bank_group)
 		const UINT16 bit1   = (portC & 0x0001) >> 0;
 		return (bits32 | bit1);
 	}
-
-	if (bank_group == INVALID_BANK_GROUP)
+	else if (bank_group == INVALID_BANK_GROUP)
+	{
 		fatalerror("Plygonet: dsp56k bank num invalid.\n");
+	}
 
 	return 0;
 }
@@ -524,7 +527,8 @@ static WRITE16_HANDLER( dsp56k_ram_bank04_write )
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x200000, 0x21ffff) AM_RAM_WRITE(plygonet_palette_w) AM_BASE(&paletteram32)
-	AM_RANGE(0x440000, 0x440fff) AM_RAM		/* PSVR: PSAC2 VRAM? */
+	AM_RANGE(0x400000, 0x40001f) AM_RAM AM_BASE((UINT32**)&K053936_0_ctrl)
+	AM_RANGE(0x440000, 0x440fff) AM_READWRITE(polygonet_roz_ram_r, polygonet_roz_ram_w)
 	AM_RANGE(0x480000, 0x4bffff) AM_READ(polygonet_eeprom_r)
 	AM_RANGE(0x4C0000, 0x4fffff) AM_WRITE(polygonet_eeprom_w)
 	AM_RANGE(0x500000, 0x503fff) AM_RAM_WRITE(shared_ram_write) AM_BASE(&shared_ram)
@@ -602,18 +606,18 @@ static const k054539_interface k054539_config =
 };
 
 /**********************************************************************************/
-
 static const gfx_layout bglayout =
 {
 	16,16,
-	RGN_FRAC(1,1),
+	1024,
 	4,
 	{ 0, 1, 2, 3 },
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4, 8*4,
-	  9*4, 10*4, 11*4, 12*4, 13*4, 14*4, 15*4 },
 	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
  	  8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
-	128*8
+	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4, 8*4,
+	  9*4, 10*4, 11*4, 12*4, 13*4, 14*4, 15*4 },
+
+	  128*8
 };
 
 static GFXDECODE_START( plygonet )
@@ -660,7 +664,7 @@ static MACHINE_DRIVER_START( plygonet )
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(48, 48+384-1, 0, 32*8-1)
+	MDRV_SCREEN_VISIBLE_AREA(64, 64+368-1, 0, 32*8-1)
 
 	MDRV_PALETTE_LENGTH(32768)
 
@@ -681,16 +685,18 @@ static MACHINE_DRIVER_START( plygonet )
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.75)
 MACHINE_DRIVER_END
 
+
+/**********************************************************************************/
 static INPUT_PORTS_START( polygonet )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 )	/* SW1 (changes player color).  It's mapped on the JAMMA connector and plugs into an external switch mech. */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON5 )	/* SW2 (changes player color).  It's mapped on the JAMMA connector and plugs into an external switch mech. */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON6 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON7 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 )	/* SW1 (changes player color).  It's mapped on the JAMMA connector and plugs into an external switch mech. */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 )	/* SW2 (changes player color).  It's mapped on the JAMMA connector and plugs into an external switch mech. */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP )	PORT_PLAYER(1)
@@ -699,10 +705,34 @@ static INPUT_PORTS_START( polygonet )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN )	PORT_PLAYER(1)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON8 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON9 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( polynetw )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 )	/* SW1 (changes player color).  It's mapped on the JAMMA connector and plugs into an external switch mech. */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 )	/* SW2 (changes player color).  It's mapped on the JAMMA connector and plugs into an external switch mech. */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )	PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )	PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )	PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )	PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+
+/**********************************************************************************/
 static DRIVER_INIT(polygonet)
 {
 	/* Set default bankswitch */
@@ -720,6 +750,8 @@ static DRIVER_INIT(polygonet)
 	dsp56k_update_handler = memory_set_direct_update_handler(cputag_get_address_space(machine, "dsp", ADDRESS_SPACE_PROGRAM), plygonet_dsp56k_direct_handler);
 }
 
+
+/**********************************************************************************/
 ROM_START( plygonet )
 	/* main program */
 	ROM_REGION( 0x200000, "maincpu", 0)
@@ -775,5 +807,5 @@ ROM_END
 
 /*          ROM       parent   machine   inp        init */
 GAME( 1993, plygonet, 0,       plygonet, polygonet, polygonet, ROT90, "Konami", "Polygonet Commanders (ver UAA)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 1993, polynetw, 0,       plygonet, polygonet, polygonet, ROT90, "Konami", "Poly-Net Warriors (ver JAA)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1993, polynetw, 0,       plygonet, polynetw,  polygonet, ROT90, "Konami", "Poly-Net Warriors (ver JAA)", GAME_NOT_WORKING | GAME_NO_SOUND )
 

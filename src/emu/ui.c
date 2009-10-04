@@ -255,7 +255,7 @@ int ui_display_startup_screens(running_machine *machine, int first_time, int sho
 
 	/* disable everything if we are using -str for 300 or fewer seconds, or if we're the empty driver,
        or if we are debugging */
-	if (!first_time || (str > 0 && str < 60*5) || machine->gamedrv == &driver_empty || (machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if (!first_time || (str > 0 && str < 60*5) || machine->gamedrv == &GAME_NAME(empty) || (machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
 		show_gameinfo = show_warnings = show_disclaimer = FALSE;
 
 	/* initialize the on-screen display system */
@@ -266,7 +266,7 @@ int ui_display_startup_screens(running_machine *machine, int first_time, int sho
 	for (state = 0; state < maxstate && !mame_is_scheduled_event_pending(machine) && !ui_menu_is_force_game_select(); state++)
 	{
 		/* default to standard colors */
-		messagebox_backcolor = UI_FILLCOLOR;
+		messagebox_backcolor = UI_BACKGROUND_COLOR;
 
 		/* pick the next state */
 		switch (state)
@@ -281,9 +281,9 @@ int ui_display_startup_screens(running_machine *machine, int first_time, int sho
 				{
 					ui_set_handler(handler_messagebox_ok, 0);
 					if (machine->gamedrv->flags & (GAME_WRONG_COLORS | GAME_IMPERFECT_COLORS | GAME_REQUIRES_ARTWORK | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NO_SOUND))
-						messagebox_backcolor = UI_YELLOWCOLOR;
+						messagebox_backcolor = UI_YELLOW_COLOR;
 					if (machine->gamedrv->flags & (GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION))
-						messagebox_backcolor = UI_REDCOLOR;
+						messagebox_backcolor = UI_RED_COLOR;
 				}
 				break;
 
@@ -330,7 +330,7 @@ void ui_set_startup_text(running_machine *machine, const char *text, int force)
 
 	/* copy in the new text */
 	astring_cpyc(messagebox_text, text);
-	messagebox_backcolor = UI_FILLCOLOR;
+	messagebox_backcolor = UI_BACKGROUND_COLOR;
 
 	/* don't update more than 4 times/second */
 	if (force || (curtime - lastupdatetime) > osd_ticks_per_second() / 4)
@@ -470,12 +470,11 @@ float ui_get_string_width(const char *s)
 
 void ui_draw_outlined_box(float x0, float y0, float x1, float y1, rgb_t backcolor)
 {
-	float hw = UI_LINE_WIDTH * 0.5f;
 	render_ui_add_rect(x0, y0, x1, y1, backcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-	render_ui_add_line(x0 + hw, y0 + hw, x1 - hw, y0 + hw, UI_LINE_WIDTH, ARGB_WHITE, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-	render_ui_add_line(x1 - hw, y0 + hw, x1 - hw, y1 - hw, UI_LINE_WIDTH, ARGB_WHITE, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-	render_ui_add_line(x1 - hw, y1 - hw, x0 + hw, y1 - hw, UI_LINE_WIDTH, ARGB_WHITE, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-	render_ui_add_line(x0 + hw, y1 - hw, x0 + hw, y0 + hw, UI_LINE_WIDTH, ARGB_WHITE, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+	render_ui_add_line(x0, y0, x1, y0, UI_LINE_WIDTH, UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+	render_ui_add_line(x1, y0, x1, y1, UI_LINE_WIDTH, UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+	render_ui_add_line(x1, y1, x0, y1, UI_LINE_WIDTH, UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+	render_ui_add_line(x0, y1, x0, y0, UI_LINE_WIDTH, UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 }
 
 
@@ -485,7 +484,7 @@ void ui_draw_outlined_box(float x0, float y0, float x1, float y1, rgb_t backcolo
 
 void ui_draw_text(const char *buf, float x, float y)
 {
-	ui_draw_text_full(buf, x, y, 1.0f - x, JUSTIFY_LEFT, WRAP_WORD, DRAW_OPAQUE, ARGB_WHITE, ARGB_BLACK, NULL, NULL);
+	ui_draw_text_full(buf, x, y, 1.0f - x, JUSTIFY_LEFT, WRAP_WORD, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
 }
 
 
@@ -730,7 +729,7 @@ void ui_draw_text_box(const char *text, int justify, float xpos, float ypos, rgb
 					 target_x + target_width + UI_BOX_LR_BORDER,
 					 target_y + target_height + UI_BOX_TB_BORDER, backcolor);
 	ui_draw_text_full(text, target_x, target_y, target_width,
-				justify, WRAP_WORD, DRAW_NORMAL, ARGB_WHITE, ARGB_BLACK, NULL, NULL);
+				justify, WRAP_WORD, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
 }
 
 
@@ -746,7 +745,7 @@ void CLIB_DECL ui_popup_time(int seconds, const char *text, ...)
 	/* extract the text */
 	va_start(arg,text);
 	astring_vprintf(messagebox_text, text, arg);
-	messagebox_backcolor = UI_FILLCOLOR;
+	messagebox_backcolor = UI_BACKGROUND_COLOR;
 	va_end(arg);
 
 	/* set a timer */

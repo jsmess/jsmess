@@ -170,7 +170,7 @@ static void extra_text_draw_box(float origx1, float origx2, float origy, float y
 	}
 
 	/* draw a box */
-	ui_draw_outlined_box(x1, y1, x2, y2, UI_FILLCOLOR);
+	ui_draw_outlined_box(x1, y1, x2, y2, UI_BACKGROUND_COLOR);
 
 	/* take off the borders */
 	x1 += UI_BOX_LR_BORDER;

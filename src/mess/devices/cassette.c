@@ -377,7 +377,7 @@ static void device_display_cassette(const device_config *image)
 		(int) length);
 
 	/* draw the cassette */
-	ui_draw_text_box(buf, JUSTIFY_LEFT, x, y, UI_FILLCOLOR);
+	ui_draw_text_box(buf, JUSTIFY_LEFT, x, y, UI_BACKGROUND_COLOR);
 }
 
 

@@ -36,49 +36,65 @@ struct dso_wavelog_context
  *
  *************************************/
 
-static DISCRETE_START( dso_task )
+static void task_check(discrete_task *task, const discrete_task *dest_task)
 {
-	discrete_task_context *task =  (discrete_task_context *) node->context;
 	int inputnum;
 	const linked_list_entry *node_entry;
 	const linked_list_entry *step_entry;
 
-	/* Determine, which nodes in the task are referenced in the main task
+	/* Determine, which nodes in the task are referenced by nodes in dest_task
      * and add them to the list of nodes to be buffered for further processing
      */
 	for (node_entry = task->list; node_entry != NULL; node_entry = node_entry->next)
 	{
-		node_description *node = (node_description *) node_entry->ptr;
-		int found = 0;
+		const node_description *task_node = (node_description *) node_entry->ptr;
 
-		for (step_entry = node->info->step_list; step_entry != NULL; step_entry = step_entry->next)
+		for (step_entry = dest_task->list; step_entry != NULL; step_entry = step_entry->next)
 		{
-			node_description *snode = (node_description *) step_entry->ptr;
+			node_description *dest_node = (node_description *) step_entry->ptr;
 
 			/* loop over all active inputs */
-			for (inputnum = 0; inputnum < snode->active_inputs; inputnum++)
+			for (inputnum = 0; inputnum < dest_node->active_inputs; inputnum++)
 			{
-				int inputnode = snode->block->input_node[inputnum];
+				int inputnode = dest_node->block->input_node[inputnum];
 				if IS_VALUE_A_NODE(inputnode)
 				{
-					if (NODE_DEFAULT_NODE(node->block->node) == NODE_DEFAULT_NODE(inputnode))
+					if (NODE_DEFAULT_NODE(task_node->block->node) == NODE_DEFAULT_NODE(inputnode))
 					{
-						int i;
-						found = 0;
+						discrete_source_node *source;
+						int i, found = -1;
+
 						for (i = 0; i < task->numbuffered; i++)
 							if (task->nodes[i]->block->node == inputnode)
-								found = 1;
-						if (!found)
+							{
+								found = i;
+								break;
+							}
+
+						if (found<0)
 						{
 							if (task->numbuffered >= DISCRETE_MAX_TASK_OUTPUTS)
 								fatalerror("dso_task_start - Number of maximum buffered nodes exceeded");
 
-							discrete_log(node->info, "dso_task_start - buffering %d(%d) in task %p referenced by %d", NODE_INDEX(inputnode), NODE_CHILD_NODE_NUM(inputnode), task, NODE_BLOCKINDEX(snode));
-							task->node_buf[task->numbuffered] = auto_alloc_array(node->info->device->machine, double, 2048);
-							task->dest[task->numbuffered] = (double **) &snode->input[inputnum];
-							task->nodes[task->numbuffered] = discrete_find_node(node->info, inputnode);
+							task->node_buf[task->numbuffered] = auto_alloc_array(task_node->info->device->machine, double, 2048);
+							task->source[task->numbuffered] = (double *) dest_node->input[inputnum];
+							task->nodes[task->numbuffered] = discrete_find_node(task_node->info, inputnode);
+							i = task->numbuffered;
 							task->numbuffered++;
 						}
+						discrete_log(task_node->info, "dso_task_start - buffering %d(%d) in task %p group %d referenced by %d group %d", NODE_INDEX(inputnode), NODE_CHILD_NODE_NUM(inputnode), task, task->task_group, NODE_BLOCKINDEX(dest_node), dest_task->task_group);
+
+						/* register into source list */
+						source = auto_alloc(dest_node->info->device->machine, discrete_source_node);
+						linked_list_add(dest_node->info,
+								(linked_list_entry **) (FPTR) &dest_task->source_list,
+								source);
+						source->task = task;
+						source->output_node = i;
+
+						/* point the input to a buffered location */
+						dest_node->input[inputnum] = &source->buffer;
+
 					}
 				}
 			}
@@ -86,14 +102,48 @@ static DISCRETE_START( dso_task )
 	}
 }
 
-static DISCRETE_STEP( dso_task )
+static DISCRETE_START( dso_task_start )
 {
-	discrete_task_context *task =  (discrete_task_context *) node->context;
+	discrete_task *task =  (discrete_task *) node->context;
+	const linked_list_entry *task_entry;
+
+	task->task_group = (int) DISCRETE_INPUT(0);
+
+	if (task->task_group < 0 || task->task_group >= DISCRETE_MAX_TASK_GROUPS)
+		fatalerror("discrete_dso_task: illegal task_group %d", task->task_group);
+
+	for (task_entry = node->info->task_list; task_entry != NULL; task_entry = task_entry->next)
+	{
+		discrete_task *dest_task = (discrete_task *) task_entry->ptr;
+
+		if (task->task_group > dest_task->task_group)
+			task_check(dest_task, task);
+	}
+
+}
+
+static DISCRETE_STEP( dso_task_end )
+{
+	discrete_task *task =  (discrete_task *) node->context;
 	int i;
 
 	for (i = 0; i < task->numbuffered; i++)
-		*(task->ptr[i]++) = **task->dest[i]; //DISCRETE_INPUT(i);
+		*(task->ptr[i]++) = *task->source[i];
 }
+
+static DISCRETE_STEP( dso_task_start )
+{
+	const discrete_task *task =  (discrete_task *) node->context;
+	const linked_list_entry *entry;
+
+	/* update source node buffer */
+	for (entry = task->source_list; entry != 0; entry = entry->next)
+	{
+		discrete_source_node *sn = (discrete_source_node *) entry->ptr;
+		sn->buffer = *sn->ptr++;
+	}
+}
+
 
 static DISCRETE_RESET( dso_task )
 {

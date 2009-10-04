@@ -430,7 +430,6 @@ static MACHINE_DRIVER_START( telstrat)
 	MDRV_CPU_PROGRAM_MAP( telestrat_mem)
 
 	MDRV_MACHINE_START( telestrat )
-	MDRV_MACHINE_RESET( NULL )
 
 	/* acia */
 	MDRV_ACIA6551_ADD("acia")

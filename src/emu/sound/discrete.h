@@ -16,6 +16,7 @@
  *  Coding started in November 2000
  *
  *  Additions/bugfix February 2003 - D.Renaud, F.Palazzolo, K.Wilkins
+ *  Discrete parallel tasks 2009 - Couriersud
  *
  ***********************************************************************
  *
@@ -95,7 +96,7 @@
  *      DISCRETE_INPUT_LOGIC(NODE_01)
  *      DISCRETE_SQUAREWFIX(NODE_11, 1, 0.5, 1, 50, 1.0/2, 0)   // Output 0:1
  *      DISCRETE_SINEWAVE(NODE_12, NODE_11, 2000, 10000, 0, 0)
- *      DISCRETE_LOGIC_INVERT(NODE_13, 1, NODE_11)
+ *      DISCRETE_LOGIC_INVERT(NODE_13, NODE_11)
  *      DISCRETE_SINEWAVE(NODE_14, NODE_13, 4000, 10000, 0, 0)
  *      DISCRETE_ADDER2(NODE_20, NODE_01, NODE_12, NODE_14)
  *      DISCRETE_OUTPUT(NODE_20, 1)
@@ -303,7 +304,7 @@
  * DISCRETE_555_CC(NODE,RESET,VIN,R,C,RBIAS,RGND,RDIS,OPTIONS)
  * DISCRETE_555_VCO1(NODE,RESET,VIN,OPTIONS)
  * DISCRETE_555_VCO1_CV(NODE,RESET,VIN,CTRLV,OPTIONS)
- * DISCRETE_566(NODE,VMOD,R,C,OPTIONS)
+ * DISCRETE_566(NODE,VMOD,R,C,VPOS,VNEG,VCHARGE,OPTIONS)
  * DISCRETE_74LS624(NODE,VMOD,VRNG,C,OUTTYPE)
  *
  * DISCRETE_CUSTOM1(NODE,IN0,INFO)
@@ -811,6 +812,8 @@
  *     discrete_op_amp_osc_info = {type, r1, r2, r3, r4, r5, r6, r7, r8, c, vP}
  *
  * Note: Set all unused components to 0.
+ *       _OUT_SQW can also be replaced with
+ *                _OUT_ENERGY, _OUT_LOGIC_X, _OUT_COUNT_F_X, _OUT_COUNT_R_X
  *
  *  Types:
  *
@@ -840,6 +843,38 @@
  *
  * EXAMPLES: see Polaris, Amazing Maze
  *
+ *          --------------------------------------------------
+ *
+ *     DISC_OP_AMP_OSCILLATOR_2 | DISC_OP_AMP_IS_NORTON
+ *          Basic Norton Op Amp Oscillator circuit.
+ *
+ *       .-------------------------------------------> DISC_OP_AMP_OSCILLATOR_OUT_CAP
+ *       |
+ *       |       r1
+ *       +------ZZZZ-----.
+ *       |               |
+ *       |         |\    |
+ *       |    r2   | \   |
+ *       +---ZZZZ--|- \  |
+ *       |         |   >-+-------> DISC_OP_AMP_OSCILLATOR_OUT_SQW
+ *      --- c      |+ /  |
+ *      ---    .---| /   |
+ *       |     |   |/    |
+ *      gnd    |         |
+ *             |   r3    |
+ *             +--ZZZZ---'
+ *             |
+ *             Z
+ *             Z r4
+ *             Z
+ *             |
+ *             ^
+ *             vP
+ *
+ * Note: All values are static.
+ *
+ * EXAMPLES: see Space Walk
+ *
  ***********************************************************************
  *
  * DISCRETE_OP_AMP_VCOn - Various single power supply op-amp VCO circuits
@@ -856,6 +891,8 @@
  *     discrete_op_amp_osc_info = {type, r1, r2, r3, r4, r5, r6, r7, r8, c, vP}
  *
  * Note: Set all unused components to 0.
+ *       _OUT_SQW can also be replaced with
+ *                _OUT_ENERGY, _OUT_LOGIC_X, _OUT_COUNT_F_X, _OUT_COUNT_R_X
  *
  *  Types:
  *
@@ -1193,34 +1230,30 @@
  *
  *                        .------------.
  *                        |            |
- *    ENAB       -0------>|            |
+ *    INP0       -0------>|            |
  *                        |            |
- *    INP0       -1------>|            |
+ *    MIN        -1------>|   CLAMP    |---->   Netlist node
  *                        |            |
- *    MIN        -2------>|   CLAMP    |---->   Netlist node
- *                        |            |
- *    MAX        -3------>|            |
- *                        |            |
- *    CLAMP      -4------>|            |
+ *    MAX        -2------>|            |
  *                        |            |
  *                        '------------'
  *
  *  Declaration syntax
  *
  *        DISCRETE_CLAMP(name of node,
- *                       enable,
  *                       input node,
  *                       minimum node or static value,
- *                       maximum node or static value,
- *                       clamp node or static value when disabled)
+ *                       maximum node or static value),
  *
  *  Example config line
  *
- *     DISCRETE_CLAMP(NODE_9,NODE_10,NODE_11,2.0,10.0,5.0)
+ *     DISCRETE_CLAMP(NODE_9,NODE_10,2.0,10.0)
  *
- *  Node10 when not zero will allow clamp to operate forcing the value
- *  on the node output, to be within the MIN/MAX boundard. When enable
- *  is set to zero the node will output the clamp value
+ *  Force the value on the node output, to be within the MIN/MAX
+ *  boundary.  In this example the output is clamped to the range
+ *  of 2.0 to 10.0 inclusive.
+ *
+ * EXAMPLES: Sprint 8
  *
  ***********************************************************************
  *
@@ -2893,7 +2926,7 @@
  *        options,        - bit mapped options
  *        v_pos,          - B+ voltage of 555
  *        v_charge,       - voltage (or node) to charge circuit  (Defaults to v_pos)
- *        v_out_high,     - High output voltage of 555 (Defaults to v_pos - 1.2V)
+ *        v_out_high     - High output voltage of 555 (Defaults to v_pos - 1.2V)
  *    }
  *
  * The last 2 options of discrete_555_desc can use the following defaults:
@@ -2993,6 +3026,9 @@
  *     DISC_555_TRIGGER_IS_VOLTAGE - Input is actual voltage.
  *                                   Voltage must drop below
  *                                   trigger to activate.
+ *     DISC_555_TRIGGER_IS_COUNT   - 1 when trigger, allows passing of x_time.
+ *                                   Mainly connected with other module using
+ *                                   a xxx_COUNT_F_X type.
  *     DISC_555_TRIGGER_DISCHARGES_CAP - some circuits connect an external
  *                                       device (transistor) to the cap to
  *                                       discharge it when the trigger is
@@ -3006,8 +3042,9 @@
  *  Waveform Types: (ORed with trigger types)
  *     DISC_555_OUT_SQW     - Output is Squarewave.  0 or v_out_high. (DEFAULT)
  *     DISC_555_OUT_CAP     - Output is Timing Capacitor 'C' voltage.
+ *     DISC_555_OUT_ENERGY  - see DISCRETE_555_MSTABLE.
  *
- * EXAMPLES: see Frogs
+ * EXAMPLES: see Frogs, Sprint 8
  *
  ***********************************************************************
  *
@@ -3179,11 +3216,10 @@
  *                  vMod node or static value,
  *                  R node or static value in ohms,
  *                  C node or static value in Farads,
- *                  address of discrete_566_desc structure)
- *
- *     discrete_566_desc = {options, v_pos, v_neg, v_charge}
- *       Note: v_charge can be static value, a node
- *             or use DEFAULT_566_CHARGE to connect to v_pos
+ *                  v_pos static value
+ *                  v_neg static value
+ *                  v_charge node or static value
+ *                  options)
  *
  *  Output Types:
  *     DISC_566_OUT_DC - Output is actual DC. (DEFAULT)
@@ -3193,6 +3229,10 @@
  *     DISC_566_OUT_SQUARE   - Pin 3 Square Wave Output (DEFAULT)
  *     DISC_566_OUT_TRIANGLE - Pin 4 Triangle Wave Output
  *     DISC_566_OUT_LOGIC    - Internal Flip/Flop Output
+ *     DISC_566_COUNT_F      - # of falling edges
+ *     DISC_566_COUNT_R      - # of rising edges
+ *     DISC_566_COUNT_F_X    - # of falling edges with x-time
+ *     DISC_566_COUNT_R_X    - # of rising edges with x-time
  *
  * EXAMPLES: see Starship 1
  *
@@ -3407,6 +3447,7 @@
 #define DISCRETE_MAX_INPUTS					10
 #define DISCRETE_MAX_OUTPUTS			 	8
 #define DISCRETE_MAX_TASK_OUTPUTS			8
+#define DISCRETE_MAX_TASK_GROUPS			8
 
 
 /*************************************
@@ -3487,7 +3528,7 @@
 /* Mixer types */
 #define DISC_MIXER_IS_RESISTOR				0
 #define DISC_MIXER_IS_OP_AMP				1
-#define DISC_MIXER_IS_OP_AMP_WITH_RI	 	2	// Used only internally.  Use DISC_MIXER_IS_OP_AMP
+#define DISC_MIXER_IS_OP_AMP_WITH_RI	 	2	/* Used only internally.  Use DISC_MIXER_IS_OP_AMP */
 
 /* Triggered Op Amp Functions */
 enum
@@ -3505,7 +3546,7 @@ enum
 
 
 /* Common Op Amp Flags and values */
-#define DISC_OP_AMP_IS_NORTON				0x01
+#define DISC_OP_AMP_IS_NORTON				0x100
 #define OP_AMP_NORTON_VBE					0.5		// This is the norton junction voltage. Used only internally.
 #define OP_AMP_VP_RAIL_OFFSET				1.5		// This is how close an op-amp can get to the vP rail. Used only internally.
 
@@ -3533,14 +3574,20 @@ enum
 
 
 /* Op Amp Oscillator Flags */
-#define DISC_OP_AMP_OSCILLATOR_1			0x00
-#define DISC_OP_AMP_OSCILLATOR_VCO_1		0x80
-#define DISC_OP_AMP_OSCILLATOR_VCO_2		0x90
-#define DISC_OP_AMP_OSCILLATOR_VCO_3		0xa0
-#define DISC_OP_AMP_OSCILLATOR_OUT_CAP		0x00
-#define DISC_OP_AMP_OSCILLATOR_OUT_SQW		0x02
-
 #define DISC_OP_AMP_OSCILLATOR_TYPE_MASK	(0xf0 | DISC_OP_AMP_IS_NORTON)	// Used only internally.
+#define DISC_OP_AMP_OSCILLATOR_1			0x00
+#define DISC_OP_AMP_OSCILLATOR_2			0x10
+#define DISC_OP_AMP_OSCILLATOR_VCO_1		0x20
+#define DISC_OP_AMP_OSCILLATOR_VCO_2		0x30
+#define DISC_OP_AMP_OSCILLATOR_VCO_3		0x40
+
+#define DISC_OP_AMP_OSCILLATOR_OUT_MASK			0x07
+#define DISC_OP_AMP_OSCILLATOR_OUT_CAP			0x00
+#define DISC_OP_AMP_OSCILLATOR_OUT_SQW			0x01
+#define DISC_OP_AMP_OSCILLATOR_OUT_ENERGY		0x02
+#define DISC_OP_AMP_OSCILLATOR_OUT_LOGIC_X		0x03
+#define DISC_OP_AMP_OSCILLATOR_OUT_COUNT_F_X	0x04
+#define DISC_OP_AMP_OSCILLATOR_OUT_COUNT_R_X	0x05
 
 /* Schmitt Oscillator Options */
 #define DISC_SCHMITT_OSC_IN_IS_LOGIC		0x00
@@ -3559,7 +3606,9 @@ enum
 #define DISC_555_OUT_AC						0x10
 
 #define DISC_555_TRIGGER_IS_LOGIC			0x00
-#define DISC_555_TRIGGER_IS_VOLTAGE			0x40
+#define DISC_555_TRIGGER_IS_VOLTAGE			0x20
+#define DISC_555_TRIGGER_IS_COUNT			0x40
+#define DSD_555_TRIGGER_TYPE_MASK			0x60
 #define DISC_555_TRIGGER_DISCHARGES_CAP		0x80
 
 #define DISC_555_OUT_SQW					0x00	/* Squarewave */
@@ -3585,10 +3634,12 @@ enum
 #define DISC_566_OUT_SQUARE					0x00	/* Squarewave */
 #define DISC_566_OUT_TRIANGLE				0x10	/* Triangle waveform */
 #define DISC_566_OUT_LOGIC					0x20	/* 0/1 logic output */
-
-#define DISC_566_OUT_MASK					0x30	/* Bits that define output type.
+#define DISC_566_OUT_COUNT_F				0x30
+#define DISC_566_OUT_COUNT_R				0x40
+#define DISC_566_OUT_COUNT_F_X				0x50
+#define DISC_566_OUT_COUNT_R_X				0x60
+#define DISC_566_OUT_MASK					0x70	/* Bits that define output type.
                                                      * Used only internally in module. */
-#define DEFAULT_566_CHARGE	-1
 
 /* LS624 output flags */
 #define DISC_LS624_OUT_ENERGY				0x01
@@ -3698,17 +3749,29 @@ struct _linked_list_entry
 	linked_list_entry 	*next;
 };
 
-typedef struct _discrete_task_context discrete_task_context;
-struct _discrete_task_context
+typedef struct _discrete_task discrete_task;
+struct _discrete_task
 {
 	const linked_list_entry *list;
 
+	int					task_group;
 	int 				numbuffered;
 	double 				*ptr[DISCRETE_MAX_TASK_OUTPUTS];
 	double 				*node_buf[DISCRETE_MAX_TASK_OUTPUTS];
 	node_description	*nodes[DISCRETE_MAX_TASK_OUTPUTS];
-	double 				**dest[DISCRETE_MAX_TASK_OUTPUTS];
+	double 				*source[DISCRETE_MAX_TASK_OUTPUTS];
 
+	/* list of source nodes */
+	linked_list_entry	*source_list;		/* discrete_source_node */
+};
+
+typedef struct _discrete_source_node discrete_source_node;
+struct _discrete_source_node
+{
+	const discrete_task	*task;
+	int					output_node;
+	double				buffer;
+	double				*ptr;
 };
 
 struct _discrete_info
@@ -3725,9 +3788,6 @@ struct _discrete_info
 
 	/* list of all nodes */
 	linked_list_entry	 *node_list;		/* node_description * */
-
-	/* list of nodes which step */
-	linked_list_entry	 *step_list;		/* node_description * */
 
 	/* list of discrete blocks after prescan (IMPORT, DELETE, REPLACE) */
 	linked_list_entry	 *block_list;		/* discrete_sound_block * */
@@ -3787,7 +3847,7 @@ struct _discrete_lfsr_desc
 typedef struct _discrete_op_amp_osc_info discrete_op_amp_osc_info;
 struct _discrete_op_amp_osc_info
 {
-	int		type;
+	UINT32	type;
 	double	r1;
 	double	r2;
 	double	r3;
@@ -3843,7 +3903,7 @@ struct _discrete_dac_r1_ladder
 typedef struct _discrete_integrate_info discrete_integrate_info;
 struct _discrete_integrate_info
 {
-	int		type;
+	UINT32	type;
 	double	r1;		// r1a + r1b
 	double	r2;		// r2a + r2b
 	double	r3;		// r3a + r3b
@@ -3876,7 +3936,7 @@ struct _discrete_mixer_desc
 typedef struct _discrete_op_amp_info discrete_op_amp_info;
 struct _discrete_op_amp_info
 {
-	int		type;
+	UINT32	type;
 	double	r1;
 	double	r2;
 	double	r3;
@@ -3890,7 +3950,7 @@ struct _discrete_op_amp_info
 typedef struct _discrete_op_amp_1sht_info discrete_op_amp_1sht_info;
 struct _discrete_op_amp_1sht_info
 {
-	int		type;
+	UINT32	type;
 	double	r1;
 	double	r2;
 	double	r3;
@@ -3984,16 +4044,6 @@ struct _discrete_555_vco1_desc
 	double v_pos;				/* B+ voltage of 555 */
 	double v_charge;			/* (ignored) */
 	double v_out_high;			/* High output voltage of 555 (Defaults to v_pos - 1.2V) */
-};
-
-
-typedef struct _discrete_566_desc discrete_566_desc;
-struct _discrete_566_desc
-{
-	int		options;	// bit mapped options
-	double	v_pos;		// B+ voltage of 566
-	double	v_neg;		// B- voltage of 566
-	double	v_charge;
 };
 
 
@@ -4318,7 +4368,7 @@ enum
 #define DISCRETE_ADDER2(NODE,ENAB,INP0,INP1)                            { NODE, DST_ADDER       , 3, { ENAB,INP0,INP1 }, { ENAB,INP0,INP1 }, NULL, "DISCRETE_ADDER2" },
 #define DISCRETE_ADDER3(NODE,ENAB,INP0,INP1,INP2)                       { NODE, DST_ADDER       , 4, { ENAB,INP0,INP1,INP2 }, { ENAB,INP0,INP1,INP2 }, NULL, "DISCRETE_ADDER3" },
 #define DISCRETE_ADDER4(NODE,ENAB,INP0,INP1,INP2,INP3)                  { NODE, DST_ADDER       , 5, { ENAB,INP0,INP1,INP2,INP3 }, { ENAB,INP0,INP1,INP2,INP3 }, NULL, "DISCRETE_ADDER4" },
-#define DISCRETE_CLAMP(NODE,ENAB,INP0,MIN,MAX,CLAMP)                    { NODE, DST_CLAMP       , 5, { ENAB,INP0,MIN,MAX,CLAMP }, { ENAB,INP0,MIN,MAX,CLAMP }, NULL, "DISCRETE_CLAMP" },
+#define DISCRETE_CLAMP(NODE,INP0,MIN,MAX)                               { NODE, DST_CLAMP       , 3, { INP0,MIN,MAX }, { INP0,MIN,MAX }, NULL, "DISCRETE_CLAMP" },
 #define DISCRETE_DIVIDE(NODE,ENAB,INP0,INP1)                            { NODE, DST_DIVIDE      , 3, { ENAB,INP0,INP1 }, { ENAB,INP0,INP1 }, NULL, "DISCRETE_DIVIDE" },
 #define DISCRETE_GAIN(NODE,INP0,GAIN)                                   { NODE, DST_GAIN        , 3, { INP0,NODE_NC,NODE_NC }, { INP0,GAIN,0 }, NULL, "DISCRETE_GAIN" },
 #define DISCRETE_INVERT(NODE,INP0)                                      { NODE, DST_GAIN        , 3, { INP0,NODE_NC,NODE_NC }, { INP0,-1,0 }, NULL, "DISCRETE_INVERT" },
@@ -4350,7 +4400,7 @@ enum
 #define DISCRETE_MULTIPLEX8(NODE,ADDR,INP0,INP1,INP2,INP3,INP4,INP5,INP6,INP7) { NODE, DST_MULTIPLEX, 9, { ADDR,INP0,INP1,INP2,INP3,INP4,INP5,INP6,INP7 }, { ADDR,INP0,INP1,INP2,INP3,INP4,INP5,INP6,INP7 }, NULL, "DISCRETE_MULTIPLEX8" },
 #define DISCRETE_MULTIPLY(NODE,INP0,INP1)                               { NODE, DST_GAIN        , 3, { INP0,INP1,NODE_NC }, { INP0,INP1,0 }, NULL, "DISCRETE_MULTIPLY" },
 #define DISCRETE_MULTADD(NODE,INP0,INP1,INP2)                           { NODE, DST_GAIN        , 3, { INP0,INP1,INP2 }, { INP0,INP1,INP2 }, NULL, "DISCRETE_MULTADD" },
-#define DISCRETE_ONESHOT(NODE,TRIG,AMPL,WIDTH,TYPE)                     { NODE, DST_ONESHOT     , 5, { NODE_NC,TRIG,AMPL,WIDTH,NODE_NC }, { 0,TRIG,AMPL,WIDTH,TYPE }, NULL, "DISCRETE_ONESHOT" },
+#define DISCRETE_ONESHOT(NODE,TRIG,AMPL,WIDTH,TYPE)                     { NODE, DST_ONESHOT     , 5, { 0,TRIG,AMPL,WIDTH,NODE_NC }, { 0,TRIG,AMPL,WIDTH,TYPE }, NULL, "DISCRETE_ONESHOT" },
 #define DISCRETE_ONESHOTR(NODE,RESET,TRIG,AMPL,WIDTH,TYPE)              { NODE, DST_ONESHOT     , 5, { RESET,TRIG,AMPL,WIDTH,NODE_NC }, { RESET,TRIG,AMPL,WIDTH,TYPE }, NULL, "One Shot Resetable" },
 #define DISCRETE_ONOFF(NODE,ENAB,INP0)                                  { NODE, DST_GAIN        , 3, { ENAB,INP0,NODE_NC }, { 0,1,0 }, NULL, "DISCRETE_ONOFF" },
 #define DISCRETE_RAMP(NODE,ENAB,RAMP,GRAD,START,END,CLAMP)              { NODE, DST_RAMP        , 6, { ENAB,RAMP,GRAD,START,END,CLAMP }, { ENAB,RAMP,GRAD,START,END,CLAMP }, NULL, "DISCRETE_RAMP" },
@@ -4422,7 +4472,7 @@ enum
 #define DISCRETE_555_CC(NODE,RESET,VIN,R,C,RBIAS,RGND,RDIS,OPTIONS)     { NODE, DSD_555_CC      , 7, { RESET,VIN,R,C,RBIAS,RGND,RDIS }, { RESET,VIN,R,C,RBIAS,RGND,RDIS }, OPTIONS, "DISCRETE_555_CC" },
 #define DISCRETE_555_VCO1(NODE,RESET,VIN,OPTIONS)                       { NODE, DSD_555_VCO1    , 3, { RESET,VIN,NODE_NC }, { RESET,VIN,-1 }, OPTIONS, "DISCRETE_555_VCO1" },
 #define DISCRETE_555_VCO1_CV(NODE,RESET,VIN,CTRLV,OPTIONS)              { NODE, DSD_555_VCO1    , 3, { RESET,VIN,CTRLV }, { RESET,VIN,CTRLV }, OPTIONS, "DISCRETE_555_VCO1_CV" },
-#define DISCRETE_566(NODE,VMOD,R,C,OPTIONS)                             { NODE, DSD_566         , 3, { VMOD,R,C }, { VMOD,R,C }, OPTIONS, "DISCRETE_566" },
+#define DISCRETE_566(NODE,VMOD,R,C,VPOS,VNEG,VCHARGE,OPTIONS)           { NODE, DSD_566         , 7, { VMOD,R,C,NODE_NC,NODE_NC,VCHARGE,NODE_NC }, { VMOD,R,C,VPOS,VNEG,VCHARGE,OPTIONS }, NULL, "DISCRETE_566" },
 #define DISCRETE_74LS624(NODE,VMOD,VRNG,C,OUTTYPE)                      { NODE, DSD_LS624       , 4, { VMOD,NODE_NC,NODE_NC,NODE_NC }, { VMOD,VRNG,C,OUTTYPE }, NULL, "DISCRETE_74LS624" },
 
 /* NOP */
@@ -4444,7 +4494,7 @@ enum
 
 /* parallel tasks */
 
-#define DISCRETE_TASK_START()                                           { NODE_SPECIAL, DSO_TASK_START,0, { 0 }, { 0 }, NULL, "DISCRETE_TASK_START" },
+#define DISCRETE_TASK_START(TASK_GROUP)                                 { NODE_SPECIAL, DSO_TASK_START,1, { NODE_NC, NODE_NC }, { TASK_GROUP, 0 }, NULL, "DISCRETE_TASK_START" },
 #define DISCRETE_TASK_END()                                             { NODE_SPECIAL, DSO_TASK_END , 1, { 0 }, { 0 }, NULL, "DISCRETE_TASK_END" },
 //#define DISCRETE_TASK_SYNC()                                          { NODE_SPECIAL, DSO_TASK_SYNC, 0, { 0 }, { 0 }, NULL, "DISCRETE_TASK_SYNC" },
 
