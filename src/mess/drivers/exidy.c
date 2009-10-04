@@ -147,7 +147,7 @@ The sorcerer has a UART device used by the serial interface and the cassette sys
 #include "devices/cartslot.h"
 #include "machine/ay31015.h"
 #include "devices/flopdrv.h"
-#include "formats/basicdsk.h"
+#include "formats/exidydsk.h"
 #include "includes/exidy.h"
 
 
@@ -338,15 +338,6 @@ static const cassette_config exidy_cassette_config =
 	NULL,
 	CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED
 };
-
-static FLOPPY_OPTIONS_START(exidy)
-	FLOPPY_OPTION(exidy, "dsk", "Exidy disk image", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([2])
-		TRACKS([80])
-		SECTORS([9])
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([1]))
-FLOPPY_OPTIONS_END
 
 static const floppy_config exidy_floppy_config =
 {
