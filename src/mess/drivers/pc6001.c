@@ -13,6 +13,8 @@
 		   so this implementation will be used in the end.
 		B) It's easier to me to see what the attribute vram does since I don't
 		   have any docs atm.
+	- cassette handling requires a decap of the MCU. It could be possible to
+	  do some tight synch between the master CPU and a code simulation...
 
 ==================================================================================
 
@@ -91,7 +93,11 @@ irq vector 16: tests ppi port c, writes the result to $feca. ;vblank
 #include "machine/msm8251.h"
 #include "video/m6847.h"
 #include "sound/ay8910.h"
+#include "sound/wave.h"
+
+#include "devices/cassette.h"
 #include "devices/cartslot.h"
+#include "formats/p6001_cas.h"
 
 static UINT8 *pc6001_ram;
 static UINT8 *pc6001_video_ram;
@@ -246,12 +252,18 @@ static WRITE8_HANDLER ( pc6001_system_latch_w )
 	pc6001_video_ram =  pc6001_ram + startaddr[(data >> 1) & 0x03] - 0x8000;
 
 	if((!(sys_latch & 8)) && data & 0x8) //PLAY tape cmd
+	{
 		cas_switch = 1;
+		cassette_change_state(devtag_get_device(space->machine, "cass" ),CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
+		cassette_change_state(devtag_get_device(space->machine, "cass" ),CASSETTE_PLAY,CASSETTE_MASK_UISTATE);
+	}
 	if((sys_latch & 8) && ((data & 0x8) == 0)) //STOP tape cmd
 	{
 		cas_switch = 0;
-		irq_vector = 0x00;
-		cputag_set_input_line(space->machine,"maincpu", 0, ASSERT_LINE);
+		cassette_change_state(devtag_get_device(space->machine, "cass" ),CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
+		cassette_change_state(devtag_get_device(space->machine, "cass" ),CASSETTE_STOPPED,CASSETTE_MASK_UISTATE);
+		//irq_vector = 0x00;
+		//cputag_set_input_line(space->machine,"maincpu", 0, ASSERT_LINE);
 	}
 
 	sys_latch = data;
@@ -483,6 +495,7 @@ static ADDRESS_MAP_START( pc6001m2_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0xb0, 0xb0) AM_WRITE(pc6001_system_latch_w)
 	AM_RANGE(0xf0, 0xf0) AM_WRITE(pc6001m2_bank_r0_w)
 	AM_RANGE(0xf1, 0xf1) AM_WRITE(pc6001m2_bank_r1_w)
+	//0xf2 w bank
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -726,12 +739,29 @@ static UINT8 check_keyboard_press(running_machine *machine)
 
 static TIMER_CALLBACK(cassette_callback)
 {
-	UINT8 *gfx_data = memory_region(machine, "cas");
+	//UINT8 *gfx_data = memory_region(machine, "cas");
 
 	if(cas_switch == 1)
 	{
-		cur_keycode = gfx_data[cas_offset++];
+		static UINT8 cas_data_i = 0x80,cas_data_poll;
+		//cur_keycode = gfx_data[cas_offset++];
+		if(cassette_input(devtag_get_device(machine,"cass")) > 0.03)
+			cas_data_poll|= cas_data_i;
+		else
+			cas_data_poll&=~cas_data_i;
+		if(cas_data_i == 1)
+		{
+			cur_keycode = cas_data_poll;
+			cas_data_i = 0x80;
+			/* data ready, poll irq */
+			irq_vector = 0x08;
+			cputag_set_input_line(machine,"maincpu", 0, ASSERT_LINE);
+		}
+		else
+			cas_data_i>>=1;
+
 		//popmessage("%04x %02x",cas_offset,cas_switch);
+		#if 0
 		if(cas_offset >= CAS_LENGTH)
 		{
 			cas_offset = 0;
@@ -739,11 +769,7 @@ static TIMER_CALLBACK(cassette_callback)
 			irq_vector = 0x12;
 			cputag_set_input_line(machine,"maincpu", 0, ASSERT_LINE);
 		}
-		else
-		{
-			irq_vector = 0x08;
-			cputag_set_input_line(machine,"maincpu", 0, ASSERT_LINE);
-		}
+		#endif
 	}
 }
 
@@ -837,6 +863,12 @@ static PALETTE_INIT(pc6001)
 		palette_set_color(machine, i+8,defcolors[i]);
 }
 
+static const cassette_config pc6001_cassette_config =
+{
+	pc6001_cassette_formats,
+	NULL,
+	CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED
+};
 
 static MACHINE_DRIVER_START( pc6001 )
 	/* basic machine hardware */
@@ -871,10 +903,14 @@ static MACHINE_DRIVER_START( pc6001 )
 	MDRV_CARTSLOT_EXTENSION_LIST("bin")
 	MDRV_CARTSLOT_NOT_MANDATORY
 
+	MDRV_CASSETTE_ADD("cass",pc6001_cassette_config)
+
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("ay8910", AY8910, XTAL_4MHz/2)
 	MDRV_SOUND_CONFIG(pc6001_ay_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MDRV_SOUND_WAVE_ADD("wave","cass")
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( pc6001m2 )

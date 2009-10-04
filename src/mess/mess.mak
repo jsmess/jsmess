@@ -1019,6 +1019,7 @@ $(MESSOBJ)/nec.a:				\
 	$(MESS_MACHINE)/pce.o		\
 	$(MESS_DRIVERS)/pce.o		\
 	$(MESS_DRIVERS)/pcfx.o		\
+	$(MESS_FORMATS)/p6001_cas.o	\
 	$(MESS_DRIVERS)/pc6001.o	\
 	$(MESS_DRIVERS)/pc8401a.o	\
 	$(MESS_VIDEO)/pc8401a.o		\
