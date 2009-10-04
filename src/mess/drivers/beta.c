@@ -86,7 +86,7 @@ static void update_display(beta_state *state)
 	}
 }
 
-static READ8_DEVICE_HANDLER(beta_riot_a_r)
+static READ8_DEVICE_HANDLER( beta_riot_a_r )
 {
 	/*
 
@@ -124,7 +124,7 @@ static READ8_DEVICE_HANDLER(beta_riot_a_r)
 	return data;
 }
 
-static WRITE8_DEVICE_HANDLER(beta_riot_a_w)
+static WRITE8_DEVICE_HANDLER( beta_riot_a_w )
 {
 	/*
 
@@ -153,12 +153,12 @@ static WRITE8_DEVICE_HANDLER(beta_riot_a_w)
 	state->eprom_data = data;
 }
 
-static READ8_DEVICE_HANDLER(beta_riot_b_r)
+static READ8_DEVICE_HANDLER( beta_riot_b_r )
 {
 	return 0;
 }
 
-static WRITE8_DEVICE_HANDLER(beta_riot_b_w)
+static WRITE8_DEVICE_HANDLER( beta_riot_b_w )
 {
 	/*
 
@@ -213,18 +213,13 @@ static WRITE8_DEVICE_HANDLER(beta_riot_b_w)
 	state->old_data = data;
 }
 
-static WRITE_LINE_DEVICE_HANDLER( beta_riot_irq )
-{
-	cputag_set_input_line(device->machine, M6502_TAG, M6502_IRQ_LINE, state ? HOLD_LINE : CLEAR_LINE);
-}
-
 static const riot6532_interface beta_riot_interface =
 {
 	DEVCB_HANDLER(beta_riot_a_r),
 	DEVCB_HANDLER(beta_riot_b_r),
 	DEVCB_HANDLER(beta_riot_a_w),
 	DEVCB_HANDLER(beta_riot_b_w),
-	DEVCB_LINE(beta_riot_irq)
+	DEVCB_CPU_INPUT_LINE(M6502_TAG, M6502_IRQ_LINE)
 };
 
 /* Quickload */
