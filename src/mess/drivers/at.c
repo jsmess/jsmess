@@ -978,8 +978,10 @@ ROM_START( at )
 	ROM_RELOAD(0xff0001,0x8000)
     ROM_LOAD16_BYTE("at110387.0", 0xf0000, 0x8000, CRC(65ae1f97) SHA1(91a29c7deecf7a9afbba330e64e0eee9aafee4d1))
 	ROM_RELOAD(0xff0000,0x8000)
-	ROM_REGION(0x08100, "gfx1", 0)
-    ROM_LOAD("cga.chr",     0x00000, 0x01000, CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd))
+
+	/* Character rom */
+	ROM_REGION(0x2000,"gfx1", 0)
+	ROM_LOAD("5788005.u33", 0x00000, 0x2000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f))
 
 	ROM_REGION(0x50000, "gfx2", ROMREGION_ERASE00)
 
@@ -1019,8 +1021,10 @@ ROM_START( neat )
 	ROM_RELOAD(0xff0000,0x8000)
     ROM_LOAD16_BYTE("at030389.1", 0xf0001, 0x8000, CRC(4e90f294) SHA1(18c21fd8d7e959e2292a9afbbaf78310f9cad12f))
 	ROM_RELOAD(0xff0001,0x8000)
-	ROM_REGION(0x08100, "gfx1", 0)
-    ROM_LOAD("cga.chr",     0x00000, 0x01000, CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd))
+
+	/* Character rom */
+	ROM_REGION(0x2000,"gfx1", 0)
+	ROM_LOAD("5788005.u33", 0x00000, 0x2000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f))
 
 	ROM_REGION(0x50000, "gfx2", ROMREGION_ERASE00)
 
@@ -1109,8 +1113,8 @@ COMP ( 1984, ibm5170,  0,       ibm5160, ibm5170,   atcga,	atega,	    ibmat,   "
 COMP ( 1985, ibm5170a, ibm5170, 0,       ibm5170a,  atcga,      atega,      ibmat,   "International Business Machines",  "IBM PC/AT 5170 8MHz", GAME_NOT_WORKING )
 COMP ( 1985, ibm5162,  ibm5170, 0,       ibm5162,   atcga,      atcga,      ibmat,   "International Business Machines",  "IBM PC/XT-286 5162", GAME_NOT_WORKING )
 COMP ( 1988, i8530286, ibm5170, 0,       ps2m30286, atvga,	ps2m30286,  ibmat,   "International Business Machines",  "IBM PS2 Model 30 286", GAME_NOT_WORKING )
-COMP ( 1987, at,       ibm5170, 0,       ibm5170a,  atcga,	atcga,	    ibmat,   "",  "PC/AT (CGA, MF2 Keyboard)", GAME_NOT_WORKING )
-COMP ( 1989, neat,     ibm5170, 0,       ibm5170a,  atcga,	atcga,	    ibmat,   "",  "NEAT (CGA, MF2 Keyboard)", GAME_NOT_WORKING )
+COMP ( 1987, at,       ibm5170, 0,       ibm5162,  atcga,	atcga,	    ibmat,   "",  "PC/AT (CGA, MF2 Keyboard)", GAME_NOT_WORKING )
+COMP ( 1989, neat,     ibm5170, 0,       ibm5162,  atcga,	atcga,	    ibmat,   "",  "NEAT (CGA, MF2 Keyboard)", GAME_NOT_WORKING )
 COMP ( 1988, at386,    ibm5170, 0,       at386,     atcga,	at386,	    ibmat,   "MITAC INC",  "PC/AT 386(CGA, MF2 Keyboard)", GAME_NOT_WORKING )
 COMP ( 1990, at486,    ibm5170, 0,       at486,     atcga,	at386,	    ibmat,   "",  "PC/AT 486(CGA, MF2 Keyboard)", GAME_NOT_WORKING )
 COMP ( 1990, at586,    ibm5170, 0,       at586,     atcga,	at586,	    ibmat,   "",  "PC/AT 586(CGA, MF2 Keyboard)", GAME_NOT_WORKING )
