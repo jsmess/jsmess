@@ -679,7 +679,7 @@ DRIVER_INIT( at386 )
 {
 	static const struct kbdc8042_interface at8042 =
 	{
-		KBDC8042_AT386, at_set_gate_a20, at_keyboard_interrupt, at_get_out2
+		KBDC8042_STANDARD, at_set_gate_a20, at_keyboard_interrupt, at_get_out2
 	};
 	init_at_common(machine, &at8042);
 

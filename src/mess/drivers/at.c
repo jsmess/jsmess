@@ -55,6 +55,8 @@
 #include "sound/speaker.h"
 #include "sound/saa1099.h"
 
+#include "memconv.h"
+
 /* window resizing with dirtybuffering traping in xmess window */
 
 #define ym3812_StdClock 3579545
@@ -148,6 +150,16 @@ static WRITE16_DEVICE_HANDLER( at16_388_w )
 	}
 }
 
+READ32_HANDLER( at_kbdc8042_32le_r )
+{
+	return read32le_with_read8_handler(at_kbdc8042_r, space, offset, mem_mask);
+}
+
+WRITE32_HANDLER( at_kbdc8042_32le_w )
+{
+	write32le_with_write8_handler(at_kbdc8042_w, space, offset, data, mem_mask);
+}
+
 static ADDRESS_MAP_START(at16_io, ADDRESS_SPACE_IO, 16)
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", dma8237_r, dma8237_w, 0xffff)
 	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("pic8259_master", pic8259_r, pic8259_w, 0xffff)
@@ -180,7 +192,7 @@ static ADDRESS_MAP_START(at386_io, ADDRESS_SPACE_IO, 32)
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", dma8237_r, dma8237_w, 0xffffffff)
 	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("pic8259_master", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8("pit8254", pit8253_r, pit8253_w, 0xffffffff)
-	AM_RANGE(0x0060, 0x006f) AM_READWRITE(kbdc8042_32le_r,			kbdc8042_32le_w)
+	AM_RANGE(0x0060, 0x006f) AM_READWRITE(at_kbdc8042_32le_r,      at_kbdc8042_32le_w)
 	AM_RANGE(0x0070, 0x007f) AM_READWRITE(mc146818_port32le_r,		mc146818_port32le_w)
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r,				at_page8_w, 0xffffffff)
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_slave", pic8259_r, pic8259_w, 0xffffffff)
@@ -202,7 +214,7 @@ static ADDRESS_MAP_START(at586_io, ADDRESS_SPACE_IO, 32)
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", dma8237_r, dma8237_w, 0xffffffff)
 	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("pic8259_master", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8("pit8254", pit8253_r, pit8253_w, 0xffffffff)
-	AM_RANGE(0x0060, 0x006f) AM_READWRITE(kbdc8042_32le_r,			kbdc8042_32le_w)
+	AM_RANGE(0x0060, 0x006f) AM_READWRITE(at_kbdc8042_32le_r,      at_kbdc8042_32le_w)
 	AM_RANGE(0x0070, 0x007f) AM_READWRITE(mc146818_port32le_r,		mc146818_port32le_w)
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r,				at_page8_w, 0xffffffff)
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_slave", pic8259_r, pic8259_w, 0xffffffff)
