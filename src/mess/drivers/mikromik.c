@@ -15,59 +15,57 @@
 
 /*
 
-    TODO:
+	TODO:
 
-    - floppy RECALL
-    - keyboard (arrows, CAPS LOCK, punctuation, keypad stop)
-    - CP/M loading crashes
-    - ALL RAM CHIPS FAIL shows a screenful of garbage (DMA error?)
-    - PCB layout
-    - NEC ?PD7220 (devicify Intel 82720 GDC)
-    - NEC ?PD7201
+	- MBASIC cannot load program from floppy (does not use DMA transfer)
+	- cursor not visible
+	- accurate video timing
+	- floppy RECALL
+	- floppy TC only during DACK
+	- PCB layout
+	- NEC uPD7220 GDC (convert Intel 82720 from compis.c into a device)
+	- NEC uPD7201 MPSC
 
 */
 
 /*
 
-    Nokia Elektroniikka pj
-    Controller ILC 9534
+	Nokia Elektroniikka pj
 
-    Parts:
+	Controller ILC 9534
+	FDC-Interface ILC 9530
 
-    6,144 MHz xtal (CPU clock)
-    18,720 MHz xtal (pixel clock)
-    16 MHz xtal (FDC clock)
-    Intel 8085AP (CPU)
-    Intel 8253-5P (PIT)
-    Intel 8275P (CRTC)
-    Intel 8212P (I/OP)
-    Intel 8237A-5P (DMAC)
-    NEC ?PD7220C (GDC)
-    NEC ?PD7201P (MPSC=uart)
-    NEC ?PD765 (FDC)
-    TMS4116-15 (16Kx4 DRAM)*4 = 32KB Video RAM for 7220
-    2164-6P (64Kx1 DRAM)*8 = 64KB Work RAM
+	Parts:
 
-    DMA channels:
+	6,144 MHz xtal (CPU clock)
+	18,720 MHz xtal (pixel clock)
+	16 MHz xtal (FDC clock)
+	Intel 8085AP (CPU)
+	Intel 8253-5P (PIT)
+	Intel 8275P (CRTC)
+	Intel 8212P (I/OP)
+	Intel 8237A-5P (DMAC)
+	NEC uPD7220C (GDC)
+	NEC uPD7201P (MPSC=uart)
+	NEC uPD765 (FDC)
+	TMS4116-15 (16Kx4 DRAM)*4 = 32KB Video RAM for 7220
+	2164-6P (64Kx1 DRAM)*8 = 64KB Work RAM
 
-    0   CRT
-    1   MPSC transmit
-    2   MPSC receive
-    3   FDC
+	DMA channels:
+	
+	0	CRT
+	1	MPSC transmit
+	2	MPSC receive
+	3	FDC
 
-    Interrupts:
+	Interrupts:
 
-    INTR    MPSC INT
-    RST5.5  FDC IRQ
-    RST6.5  8212 INT
-    RST7.5  DMA EOP
+	INTR	MPSC INT
+	RST5.5	FDC IRQ
+	RST6.5	8212 INT
+	RST7.5	DMA EOP
 
 */
-
-INLINE const device_config *get_floppy_image(running_machine *machine, int drive)
-{
-	return floppy_get_device(machine, drive);
-}
 
 /* Read/Write Handlers */
 
@@ -112,13 +110,16 @@ static WRITE8_HANDLER( ls259_w )
 		break;
 
 	case 6: /* LLEN */
+		//logerror("LLEN %u\n", d);
 		state->llen = d;
 		break;
 
 	case 7: /* MOTOR ON */
 		//logerror("MOTOR %u\n", d);
-		floppy_drive_set_motor_state(get_floppy_image(space->machine, 0), d);
-		floppy_drive_set_ready_state(get_floppy_image(space->machine, 0), d, 1);
+		floppy_drive_set_motor_state(floppy_get_device(space->machine, 0), d);
+		floppy_drive_set_ready_state(floppy_get_device(space->machine, 0), d, 1);
+		floppy_drive_set_motor_state(floppy_get_device(space->machine, 1), d);
+		floppy_drive_set_ready_state(floppy_get_device(space->machine, 1), d, 1);
 
 		if (input_port_read(space->machine, "T5")) nec765_ready_w(state->upd765, d);
 		break;
@@ -138,7 +139,7 @@ static ADDRESS_MAP_START( mm1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xff50, 0xff50) AM_MIRROR(0x8e) AM_DEVREAD(UPD765_TAG, nec765_status_r)
 	AM_RANGE(0xff51, 0xff51) AM_MIRROR(0x8e) AM_DEVREADWRITE(UPD765_TAG, nec765_data_r, nec765_data_w)
 	AM_RANGE(0xff60, 0xff67) AM_MIRROR(0x88) AM_WRITE(ls259_w)
-//  AM_RANGE(0xff70, 0xff7f) AM_MIRROR(0x80) AM_DEVREADWRITE(UPD7220_TAG, i82720_r, i82720_w)
+//	AM_RANGE(0xff70, 0xff7f) AM_MIRROR(0x80) AM_DEVREADWRITE(UPD7220_TAG, i82720_r, i82720_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -149,8 +150,8 @@ static INPUT_PORTS_START( mm1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('\"')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F1") PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1))
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_CHAR('s') PORT_CHAR('S')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F2") PORT_CODE(KEYCODE_F2) PORT_CHAR(UCHAR_MAMEKEY(F2))
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("TAB") PORT_CODE(KEYCODE_TAB) PORT_CHAR('\t')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("TAB") PORT_CODE(KEYCODE_TAB) PORT_CHAR('\t')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F2") PORT_CODE(KEYCODE_F2) PORT_CHAR(UCHAR_MAMEKEY(F2))
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('a') PORT_CHAR('A')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_CHAR('q') PORT_CHAR('Q')
 
@@ -196,38 +197,38 @@ static INPUT_PORTS_START( mm1 )
 
 	PORT_START("ROW5")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('+') PORT_CHAR('?')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('?') PORT_CHAR('`')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("DEL") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xC2\xB4 '") PORT_CODE(KEYCODE_EQUALS) PORT_CHAR(0x00B4) PORT_CHAR('`')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x96")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR(':')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("ESC") PORT_CODE(KEYCODE_ESC) PORT_CHAR(UCHAR_MAMEKEY(ESC))
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('-') PORT_CHAR('_')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('-') PORT_CHAR('_')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xC3\xA5 \xC3\x85") PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR(0x00E5) PORT_CHAR(0x00C5)
 
 	PORT_START("ROW6")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) // PORT_CHAR('<') PORT_CHAR('>')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) // ba
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) // bb
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH2) PORT_CHAR('<') PORT_CHAR('>')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad .") PORT_CODE(KEYCODE_DEL_PAD)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x90") PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RETURN") PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHAR(13)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) // PORT_CHAR('~') PORT_CHAR('^')
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) // bc
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('~') PORT_CHAR('^')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x93") PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LF")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) // PORT_CHAR('@') PORT_CHAR('*')
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('@') PORT_CHAR('*')
 
 	PORT_START("ROW7")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 8") PORT_CODE(KEYCODE_8_PAD)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 9") PORT_CODE(KEYCODE_9_PAD)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) // bf
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x92") PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 2") PORT_CODE(KEYCODE_2_PAD)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 6") PORT_CODE(KEYCODE_6_PAD)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) // be
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("DEL") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 3") PORT_CODE(KEYCODE_3_PAD)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 5") PORT_CODE(KEYCODE_5_PAD)
 
 	PORT_START("ROW8")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) // e4
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CAPS LOCK") PORT_CODE(KEYCODE_CAPSLOCK)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 7") PORT_CODE(KEYCODE_7_PAD)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) // bd
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x91") PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xC3\xA4 \xC3\x84") PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(0x00E4) PORT_CHAR(0x00C4)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 4") PORT_CODE(KEYCODE_4_PAD)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SPACE") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
@@ -250,7 +251,7 @@ static INPUT_PORTS_START( mm1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Right SHIFT") PORT_CODE(KEYCODE_RSHIFT)
 
 	PORT_START("T5")
-	PORT_CONFNAME( 0x01, 0x01, "Floppy Drive Type")
+	PORT_CONFNAME( 0x01, 0x00, "Floppy Drive Type")
 	PORT_CONFSETTING( 0x00, "640 KB" )
 	PORT_CONFSETTING( 0x01, "160/320 KB" )
 INPUT_PORTS_END
@@ -260,7 +261,7 @@ INPUT_PORTS_END
 static WRITE_LINE_DEVICE_HANDLER( drqcrt_w )
 {
 	mm1_state *driver_state = device->machine->driver_data;
-	//logerror("i8275 DMA\n");
+
 	dma8237_drq_write(driver_state->i8237, DMA_CRT, state);
 }
 
@@ -270,7 +271,7 @@ static I8275_DISPLAY_PIXELS( crtc_display_pixels )
 
 	UINT8 data = state->char_rom[(charcode << 4) | linecount];
 	int i;
-
+	
 	for (i = 0; i < 8; i++)
 	{
 		*BITMAP_ADDR16(tmpbitmap, y, x + i) = BIT(data, i);
@@ -370,14 +371,14 @@ static DMA8237_HRQ_CHANGED( dma_hrq_changed )
 static DMA8237_MEM_READ( memory_dma_r )
 {
 	const address_space *program = cputag_get_address_space(device->machine, I8085A_TAG, ADDRESS_SPACE_PROGRAM);
-//  logerror("DMA read %04x\n", offset);
+
 	return memory_read_byte(program, offset);
 }
 
 static DMA8237_MEM_WRITE( memory_dma_w )
 {
 	const address_space *program = cputag_get_address_space(device->machine, I8085A_TAG, ADDRESS_SPACE_PROGRAM);
-//  logerror("DMA write %04x:%02x\n", offset, data);
+
 	memory_write_byte(program, offset, data);
 }
 
@@ -394,7 +395,7 @@ static DMA8237_CHANNEL_READ( mpsc_dack_r )
 
 	/* clear data request */
 	dma8237_drq_write(state->i8237, DMA_MPSC_RX, CLEAR_LINE);
-
+	
 	return upd7201_hai_r(state->upd7201, 0);
 }
 
@@ -411,15 +412,13 @@ static DMA8237_CHANNEL_WRITE( mpsc_dack_w )
 static DMA8237_CHANNEL_READ( fdc_dack_r )
 {
 	mm1_state *state = device->machine->driver_data;
-	UINT8 data = nec765_dack_r(state->upd765, 0);
-//logerror("FDC DACK read %02x\n", data);
-	return data;
+	
+	return nec765_dack_r(state->upd765, 0);
 }
 
 static DMA8237_CHANNEL_WRITE( fdc_dack_w )
 {
 	mm1_state *state = device->machine->driver_data;
-//logerror("FDC DACK write %02x\n", data);
 
 	nec765_dack_w(state->upd765, 0, data);
 }
@@ -431,7 +430,7 @@ static DMA8237_OUT_EOP( tc_w )
 	/* floppy terminal count */
 	nec765_tc_w(driver_state->upd765, !state);
 
-	cputag_set_input_line(device->machine, I8085A_TAG, I8085_RST75_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, I8085A_TAG, I8085_RST75_LINE, state);
 }
 
 static const struct dma8237_interface mm1_dma8237_intf =
@@ -445,7 +444,7 @@ static const struct dma8237_interface mm1_dma8237_intf =
 	tc_w
 };
 
-/* ?PD765 Interface */
+/* uPD765 Interface */
 
 static NEC765_DMA_REQUEST( drq_w )
 {
@@ -509,7 +508,7 @@ static const struct pit8253_config mm1_pit8253_intf =
 	}
 };
 
-/* ?PD7201 Interface */
+/* uPD7201 Interface */
 
 static WRITE_LINE_DEVICE_HANDLER( drq2_w )
 {
@@ -574,6 +573,90 @@ static I8085_CONFIG( mm1_i8085_config )
 	DEVCB_DEVICE_LINE(SPEAKER_TAG, speaker_level_w)	/* SOD changed callback (8085A only) */
 };
 
+/* Keyboard */
+
+static TIMER_DEVICE_CALLBACK( kbclk_tick )
+{
+	mm1_state *state = timer->machine->driver_data;
+	static const char *const keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7", "ROW8", "ROW9" };
+
+	UINT8 data = input_port_read(timer->machine, keynames[state->drive]);
+	UINT8 special = input_port_read(timer->machine, "SPECIAL");
+	int ctrl = BIT(special, 0);
+	int shift = BIT(special, 2) & BIT(special, 1);
+	UINT8 keydata = 0xff;
+
+	if (!BIT(data, state->sense))
+	{
+		/* get key data from PROM */
+		keydata = state->key_rom[(ctrl << 8) | (shift << 7) | (state->drive << 3) | (state->sense)];
+	}
+	
+	if (state->keydata != keydata)
+	{
+		/* latch key data */
+		state->keydata = keydata;
+
+		if (keydata != 0xff)
+		{
+			/* strobe in key data */
+			i8212_stb_w(state->i8212, 1);
+			i8212_stb_w(state->i8212, 0);
+		}
+	}
+
+	if (keydata == 0xff)
+	{
+		/* increase scan counters */
+		state->sense++;
+
+		if (state->sense == 8)
+		{
+			state->sense = 0;
+			state->drive++;
+
+			if (state->drive == 10)
+			{
+				state->drive = 0;
+			}
+		}
+	}
+}
+
+/* Floppy Configuration */
+
+static FLOPPY_OPTIONS_START( mm1 )
+	FLOPPY_OPTION( mm1_640kb, "dsk", "Nokia MikroMikko 1 640KB disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([80])
+		SECTORS([8]) /* 3:1 sector skew (1,4,7,2,5,8,3,6) */
+		SECTOR_LENGTH([512])
+		FIRST_SECTOR_ID([1]))
+FLOPPY_OPTIONS_END
+
+static FLOPPY_OPTIONS_START( mm2 )
+	FLOPPY_OPTION( mm2_360kb, "dsk", "Nokia MikroMikko 2 360KB disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([40])
+		SECTORS([9])
+		SECTOR_LENGTH([512])
+		FIRST_SECTOR_ID([1]))
+
+	FLOPPY_OPTION( mm2_720kb, "dsk", "Nokia MikroMikko 2 720KB disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([40])
+		SECTORS([18])
+		SECTOR_LENGTH([512])
+		FIRST_SECTOR_ID([1]))
+FLOPPY_OPTIONS_END
+
+static const floppy_config mm1_floppy_config =
+{
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(mm1),
+	DO_NOT_KEEP_GEOMETRY
+};
+
 /* Machine Initialization */
 
 static MACHINE_START( mm1 )
@@ -613,93 +696,17 @@ static MACHINE_RESET( mm1 )
 {
 	mm1_state *state = machine->driver_data;
 	const address_space *program = cputag_get_address_space(machine, I8085A_TAG, ADDRESS_SPACE_PROGRAM);
+	int i;
 
-	memory_install_readwrite8_handler(program, 0x0000, 0x0fff, 0, 0, SMH_BANK(1), SMH_UNMAP);
-	memory_set_bank(machine, 1, 0);
+	/* reset LS259 */
+	for (i = 0; i < 8; i++) ls259_w(program, i, 0);
 
+	/* set FDC ready */
 	if (!input_port_read(machine, "T5")) nec765_ready_w(state->upd765, 1);
-}
 
-static FLOPPY_OPTIONS_START( mm1 )
-	FLOPPY_OPTION( mm1_640kb, "dsk", "Nokia MikroMikko 1 640KB disk image", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([2])
-		TRACKS([80])
-		SECTORS([8])
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([1]))
-FLOPPY_OPTIONS_END
-
-static FLOPPY_OPTIONS_START( mm2 )
-	FLOPPY_OPTION( mm2_360kb, "dsk", "Nokia MikroMikko 2 360KB disk image", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([2])
-		TRACKS([40])
-		SECTORS([9])
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([1]))
-
-	FLOPPY_OPTION( mm2_720kb, "dsk", "Nokia MikroMikko 2 720KB disk image", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([2])
-		TRACKS([40])
-		SECTORS([18])
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([1]))
-FLOPPY_OPTIONS_END
-
-static const floppy_config mm1_floppy_config =
-{
-	FLOPPY_DRIVE_DS_80,
-	FLOPPY_OPTIONS_NAME(mm1),
-	DO_NOT_KEEP_GEOMETRY
-};
-
-/* Keyboard */
-
-static TIMER_DEVICE_CALLBACK( kbclk_tick )
-{
-	mm1_state *state = timer->machine->driver_data;
-	static const char *const keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7", "ROW8", "ROW9" };
-
-	UINT8 data = input_port_read(timer->machine, keynames[state->drive]);
-	UINT8 special = input_port_read(timer->machine, "SPECIAL");
-	int ctrl = BIT(special, 0);
-	int shift = BIT(special, 2) | BIT(special, 1);
-	UINT8 keydata = 0xff;
-
-	if (!BIT(data, state->sense))
-	{
-		/* get key data from PROM */
-		keydata = state->key_rom[(ctrl << 8) | (shift << 7) | (state->drive << 3) | (state->sense)];
-	}
-
-	if (state->keydata != keydata)
-	{
-		/* latch key data */
-		state->keydata = keydata;
-
-		if (keydata != 0xff)
-		{
-			/* strobe in key data */
-			i8212_stb_w(state->i8212, 0);
-			i8212_stb_w(state->i8212, 1);
-		}
-	}
-
-	if (keydata == 0xff)
-	{
-		/* increase scan counters */
-		state->sense++;
-
-		if (state->sense == 8)
-		{
-			state->sense = 0;
-			state->drive++;
-
-			if (state->drive == 10)
-			{
-				state->drive = 0;
-			}
-		}
-	}
+	/* reset FDC */
+	nec765_reset_w(state->upd765, 1);
+	nec765_reset_w(state->upd765, 0);
 }
 
 /* Machine Drivers */
@@ -715,7 +722,7 @@ static MACHINE_DRIVER_START( mm1 )
 	MDRV_MACHINE_START(mm1)
 	MDRV_MACHINE_RESET(mm1)
 
-	MDRV_TIMER_ADD_PERIODIC("kbclk", kbclk_tick, HZ(XTAL_6_144MHz/2/8))
+	MDRV_TIMER_ADD_PERIODIC("kbclk", kbclk_tick, HZ(2500)) //HZ(XTAL_6_144MHz/2/8))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD( SCREEN_TAG, RASTER )
@@ -744,7 +751,7 @@ static MACHINE_DRIVER_START( mm1 )
 	MDRV_PIT8253_ADD(I8253_TAG, mm1_pit8253_intf)
 	MDRV_NEC765A_ADD(UPD765_TAG, /* XTAL_16MHz/2/2, */ mm1_nec765_intf)
 	MDRV_UPD7201_ADD(UPD7201_TAG, XTAL_6_144MHz/2, mm1_upd7201_intf)
-
+	
 	MDRV_FLOPPY_2_DRIVES_ADD(mm1_floppy_config)
 MACHINE_DRIVER_END
 
@@ -799,5 +806,5 @@ SYSTEM_CONFIG_END
 /* System Drivers */
 
 //    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    CONFIG    COMPANY           FULLNAME                FLAGS
-COMP( 1981, mm1m6,		0,		0,		mm1m6,		mm1,		0, 		mm1m6,	  "Nokia Data",		"MikroMikko 1 M6",		GAME_NOT_WORKING )
+COMP( 1981, mm1m6,		0,		0,		mm1m6,		mm1,		0, 		mm1m6,	  "Nokia Data",		"MikroMikko 1 M6",		GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 COMP( 1981, mm1m7,		mm1m6,	0,		mm1m6,		mm1,		0, 		mm1m7,	  "Nokia Data",		"MikroMikko 1 M7",		GAME_NOT_WORKING )
