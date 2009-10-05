@@ -851,6 +851,7 @@ $(MESSOBJ)/fairch.a:			\
 
 $(MESSOBJ)/fujitsu.a:			\
 	$(MESS_DRIVERS)/fmtowns.o	\
+	$(MESS_MACHINE)/upd71071.o	\
 	$(MESS_DRIVERS)/fm7.o		\
 	$(MESS_VIDEO)/fm7.o			\
 	$(MESS_FORMATS)/fm7_cas.o	\

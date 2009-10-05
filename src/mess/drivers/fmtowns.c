@@ -78,8 +78,10 @@
 #include "sound/rf5c68.h"
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
+#include "formats/basicdsk.h"
 #include "machine/wd17xx.h"
 #include "devices/flopdrv.h"
+#include "machine/upd71071.h"
 
 static UINT8 ftimer;
 static UINT8 nmi_mask;
@@ -174,29 +176,59 @@ static WRITE8_HANDLER(towns_sys6c_w)
 
 static READ8_HANDLER(towns_dma1_r)
 {
+	const device_config* dev = devtag_get_device(space->machine,"dma_1");
+
 	logerror("DMA#1: read register %i\n",offset);
-	return 0x00;
+	return upd71071_r(dev,offset);
 }
 
 static WRITE8_HANDLER(towns_dma1_w)
 {
+	const device_config* dev = devtag_get_device(space->machine,"dma_1");
+
 	logerror("DMA#1: wrote 0x%02x to register %i\n",data,offset);
+	upd71071_w(dev,offset,data);
 }
 
 static READ8_HANDLER(towns_dma2_r)
 {
+	const device_config* dev = devtag_get_device(space->machine,"dma_2");
+
 	logerror("DMA#2: read register %i\n",offset);
-	return 0x00;
+	return upd71071_r(dev,offset);
 }
 
 static WRITE8_HANDLER(towns_dma2_w)
 {
+	const device_config* dev = devtag_get_device(space->machine,"dma_2");
+
 	logerror("DMA#2: wrote 0x%02x to register %i\n",data,offset);
+	upd71071_w(dev,offset,data);
 }
 
 /*
  *  Floppy Disc Controller (MB8877A)
  */
+ 
+static WD17XX_CALLBACK(towns_fdc_irq)
+{
+	const device_config* dev = devtag_get_device(device->machine,"dma_1");
+	
+	switch(state)
+	{
+		case WD17XX_IRQ_CLR:
+			break;
+		case WD17XX_IRQ_SET:
+			break;
+		case WD17XX_DRQ_CLR:
+			upd71071_dmarq(dev,0,0);
+			break;
+		case WD17XX_DRQ_SET:
+			upd71071_dmarq(dev,1,0);
+			break;
+	}
+}
+ 
 static READ8_HANDLER(towns_floppy_r)
 {
 	const device_config* fdc = devtag_get_device(space->machine,"fdc");
@@ -233,6 +265,11 @@ static WRITE8_HANDLER(towns_floppy_w)
 	switch(offset)
 	{
 		case 0x00:
+			// Commands 0xd0 and 0xfe (Write Track) are apparently ignored?
+			if(data == 0xd0)
+				return;
+			if(data == 0xfe)
+				return;
 			wd17xx_command_w(fdc,offset/2,data);
 			break;
 		case 0x02:
@@ -283,6 +320,18 @@ static WRITE8_HANDLER(towns_floppy_w)
 		default:
 			logerror("FDC: write %02x to invalid or unimplemented register %02x\n",data,offset);
 	}
+}
+
+UINT16 towns_fdc_dma_r(running_machine* machine)
+{
+	const device_config* fdc = devtag_get_device(machine,"fdc");
+	return wd17xx_data_r(fdc,0);
+}
+
+void towns_fdc_dma_w(running_machine* machine, UINT16 data)
+{
+	const device_config* fdc = devtag_get_device(machine,"fdc");
+	wd17xx_data_w(fdc,0,data);	
 }
 
 static READ8_HANDLER(towns_video_440_r)
@@ -679,6 +728,31 @@ static WRITE8_HANDLER(towns_video_ff81_w)
 	logerror("VGA: VRAM wplane select (I/O) = 0x%02x\n",towns_vram_wplane);
 }
 
+/*
+ *  I/O ports 0x4c0-0x4cf
+ *  CD-ROM driver (SCSI?)
+ */
+static READ8_HANDLER(towns_cdrom_r)
+{
+	switch(offset)
+	{
+		case 0x00:
+			return 0x01;
+		default:
+			logerror("CD: read port %02x\n",offset*2);
+			return 0x00;
+	}
+}
+
+static WRITE8_HANDLER(towns_cdrom_w)
+{
+	switch(offset)
+	{
+		default:
+			logerror("CD: read port %02x\n",offset*2);
+	}
+}
+
 static ADDRESS_MAP_START(towns_mem, ADDRESS_SPACE_PROGRAM, 32)
   // memory map based on FM-Towns/Bochs (Bochs modified to emulate the FM-Towns)
   // may not be (and probably is not) correct
@@ -718,7 +792,7 @@ static ADDRESS_MAP_START( towns_io , ADDRESS_SPACE_IO, 32)
   AM_RANGE(0x0040,0x0047) AM_DEVREADWRITE8("pit",pit8253_r, pit8253_w, 0x00ff00ff)
   AM_RANGE(0x0060,0x0063) AM_READWRITE8(towns_port60_r, towns_port60_w, 0x000000ff)
   AM_RANGE(0x006c,0x006f) AM_READWRITE8(towns_sys6c_r,towns_sys6c_w, 0x000000ff)
-  // DMA controllers (uPD71071?)
+  // DMA controllers (uPD71071)
   AM_RANGE(0x00a0,0x00af) AM_READWRITE8(towns_dma1_r, towns_dma1_w, 0xffffffff)
   AM_RANGE(0x00b0,0x00bf) AM_READWRITE8(towns_dma2_r, towns_dma2_w, 0xffffffff)
   // Floppy controller
@@ -728,9 +802,9 @@ static ADDRESS_MAP_START( towns_io , ADDRESS_SPACE_IO, 32)
   AM_RANGE(0x0404,0x0407) AM_READWRITE(towns_video_404_r, towns_video_404_w)  // R/W (0x404)
   AM_RANGE(0x0440,0x045f) AM_READWRITE8(towns_video_440_r, towns_video_440_w, 0xffffffff)
   // System port
-  AM_RANGE(0x0480,0x0483) AM_READWRITE8(towns_sys480_r,towns_sys480_w,0xff000000)  // R/W (0x480)
+  AM_RANGE(0x0480,0x0483) AM_READWRITE8(towns_sys480_r,towns_sys480_w,0x000000ff)  // R/W (0x480)
   // CD-ROM
-  AM_RANGE(0x04c0,0x04cf) AM_NOP
+  AM_RANGE(0x04c0,0x04cf) AM_READWRITE8(towns_cdrom_r,towns_cdrom_w,0x00ff00ff)
   // Joystick / Mouse ports(?)
   AM_RANGE(0x04d0,0x04d3) AM_READ(towns_padport_r)
   // Sound (YM3438 [FM], RF5c68 [PCM])
@@ -845,16 +919,33 @@ static const struct pic8259_interface towns_pic8259_slave_config =
 
 static const wd17xx_interface towns_mb8877a_interface =
 {
-	NULL,
+	towns_fdc_irq,
 	NULL,
 	{FLOPPY_0,FLOPPY_1,FLOPPY_2,FLOPPY_3}
 };
 
+FLOPPY_OPTIONS_START( towns )
+	FLOPPY_OPTION( fmt_bin, "bin", "BIN disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([77])
+		SECTORS([8])
+		SECTOR_LENGTH([1024])
+		FIRST_SECTOR_ID([1]))
+FLOPPY_OPTIONS_END
+
 static const floppy_config towns_floppy_config =
 {
 	FLOPPY_DRIVE_DS_80,
-	FLOPPY_OPTIONS_NAME(default),
+	FLOPPY_OPTIONS_NAME(towns),
 	DO_NOT_KEEP_GEOMETRY
+};
+
+static const upd71071_intf towns_dma_config =
+{
+	"maincpu",
+	1000000,
+	{ towns_fdc_dma_r, 0, 0, 0 },
+	{ towns_fdc_dma_w, 0, 0, 0 }
 };
 
 // for debugging
@@ -912,6 +1003,9 @@ static MACHINE_DRIVER_START( towns )
 
 	MDRV_MB8877_ADD("fdc",towns_mb8877a_interface)
 	MDRV_FLOPPY_2_DRIVES_ADD(towns_floppy_config)
+
+	MDRV_UPD71071_ADD("dma_1",towns_dma_config)
+	MDRV_UPD71071_ADD("dma_2",towns_dma_config)
 
     MDRV_VIDEO_START(towns)
     MDRV_VIDEO_UPDATE(towns)
