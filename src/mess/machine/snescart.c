@@ -212,6 +212,7 @@ static void snes_machine_stop(running_machine *machine)
 
 MACHINE_START( snes_mess )
 {
+	snes_ram = memory_region(machine, "maincpu");
 	add_exit_callback(machine, snes_machine_stop);
 	MACHINE_START_CALL(snes);
 }
@@ -345,8 +346,6 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 	UINT8 valid_mode20, valid_mode21, valid_mode25;
 	unsigned char *ROM;
 	int length;
-
-	memory_region_alloc(machine, "maincpu", 0x1000000, 0);
 
 	snes_ram = memory_region(machine, "maincpu");
 	memset( snes_ram, 0, 0x1000000 );
@@ -809,6 +808,6 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 MACHINE_DRIVER_START( snes_cartslot )
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("smc,sfc,fig,swc")
-	MDRV_CARTSLOT_MANDATORY
+	MDRV_CARTSLOT_NOT_MANDATORY
 	MDRV_CARTSLOT_LOAD(snes_cart)
 MACHINE_DRIVER_END
