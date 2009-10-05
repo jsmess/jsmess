@@ -17,13 +17,11 @@
 
 	TODO:
 
-	- MBASIC cannot load program from floppy (does not use DMA transfer)
-	- cursor not visible
-	- accurate video timing
-	- floppy RECALL
-	- floppy TC only during DACK
-	- PCB layout
 	- NEC uPD7220 GDC (convert Intel 82720 from compis.c into a device)
+	- accurate video timing
+	- floppy DRQ during RECALL = 0
+	- write floppy TC only during DACK
+	- PCB layout
 	- NEC uPD7201 MPSC
 
 */
@@ -258,6 +256,13 @@ INPUT_PORTS_END
 
 /* Video */
 
+static PALETTE_INIT( mm1 )
+{
+	palette_set_color(machine, 0, RGB_BLACK); /* black */
+	palette_set_color_rgb(machine, 1, 0x00, 0xc0, 0x00); /* green */
+	palette_set_color_rgb(machine, 2, 0x00, 0xff, 0x00); /* bright green */
+}
+
 static WRITE_LINE_DEVICE_HANDLER( drqcrt_w )
 {
 	mm1_state *driver_state = device->machine->driver_data;
@@ -269,12 +274,26 @@ static I8275_DISPLAY_PIXELS( crtc_display_pixels )
 {
 	mm1_state *state = device->machine->driver_data;
 
-	UINT8 data = state->char_rom[(charcode << 4) | linecount];
+	UINT8 romdata = state->char_rom[(charcode << 4) | linecount];
+
+	int d0 = BIT(romdata, 0);
+	int d7 = BIT(romdata, 7);
+	int gpa0 = BIT(gpa, 0);
+	int llen = state->llen;
 	int i;
+
+	UINT8 data = (romdata << 1) | (d7 & d0);
 	
 	for (i = 0; i < 8; i++)
 	{
-		*BITMAP_ADDR16(tmpbitmap, y, x + i) = BIT(data, i);
+		int qh = BIT(data, i);
+		int video_in = ((((d7 & llen) | !vsp) & !gpa0) & qh) | lten;
+		int compl_in = rvv;
+		int hlt_in = hlgt;
+
+		int color = hlt_in ? 2 : (video_in ^ compl_in);
+
+		*BITMAP_ADDR16(tmpbitmap, y, x + i) = color;
 	}
 }
 
@@ -733,8 +752,8 @@ static MACHINE_DRIVER_START( mm1 )
 	//MDRV_SCREEN_RAW_PARAMS(XTAL_18_720MHz, ...)
 
 	MDRV_GFXDECODE(mm1)
-	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(monochrome_green)
+	MDRV_PALETTE_LENGTH(3)
+	MDRV_PALETTE_INIT(mm1)
 
 	MDRV_VIDEO_START(mm1)
 	MDRV_VIDEO_UPDATE(mm1)
