@@ -6,6 +6,7 @@
 
     Preliminary MAME driver by Roberto Fresca, David Haywood & Angelo Salese
     MESS improvements by Harmony
+    Help provided by CD-i Fan
 
 
 *******************************************************************************
@@ -804,25 +805,25 @@ static WRITE16_HANDLER( scc68070_periphs_w )
 		case 0x400c/2:
 		case 0x404c/2:
 			verboselog(space->machine, 2, "scc68070_periphs_w: DMA(%d) Memory Address Counter (High Word): %04x & %04x\n", (offset - 0x2000) / 32, data, mem_mask);
-			scc68070_regs.dma.channel[(offset - 0x2000) / 32].memory_address_counter &= mem_mask << 16;
+			scc68070_regs.dma.channel[(offset - 0x2000) / 32].memory_address_counter &= ~(mem_mask << 16);
 			scc68070_regs.dma.channel[(offset - 0x2000) / 32].memory_address_counter |= data << 16;
 			break;
 		case 0x400e/2:
 		case 0x404e/2:
 			verboselog(space->machine, 2, "scc68070_periphs_w: DMA(%d) Memory Address Counter (Low Word): %04x & %04x\n", (offset - 0x2000) / 32, data, mem_mask);
-			scc68070_regs.dma.channel[(offset - 0x2000) / 32].memory_address_counter &= (0xffff0000) | mem_mask;
+			scc68070_regs.dma.channel[(offset - 0x2000) / 32].memory_address_counter &= ~mem_mask;
 			scc68070_regs.dma.channel[(offset - 0x2000) / 32].memory_address_counter |= data;
 			break;
 		case 0x4014/2:
 		case 0x4054/2:
 			verboselog(space->machine, 2, "scc68070_periphs_w: DMA(%d) Device Address Counter (High Word): %04x & %04x\n", (offset - 0x2000) / 32, data, mem_mask);
-			scc68070_regs.dma.channel[(offset - 0x2000) / 32].device_address_counter &= mem_mask << 16;
+			scc68070_regs.dma.channel[(offset - 0x2000) / 32].device_address_counter &= ~(mem_mask << 16);
 			scc68070_regs.dma.channel[(offset - 0x2000) / 32].device_address_counter |= data << 16;
 			break;
 		case 0x4016/2:
 		case 0x4056/2:
 			verboselog(space->machine, 2, "scc68070_periphs_w: DMA(%d) Device Address Counter (Low Word): %04x & %04x\n", (offset - 0x2000) / 32, data, mem_mask);
-			scc68070_regs.dma.channel[(offset - 0x2000) / 32].device_address_counter &= (0xffff0000) | mem_mask;
+			scc68070_regs.dma.channel[(offset - 0x2000) / 32].device_address_counter &= ~mem_mask;
 			scc68070_regs.dma.channel[(offset - 0x2000) / 32].device_address_counter |= data;
 			break;
 
@@ -927,6 +928,7 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 	switch(cdic_regs.command)
 	{
 		case 0x29: // Read Mode 1
+		case 0x2a: // Read Mode 2
 		{
 			UINT8 buffer[2560] = { 0 };
 			UINT32 msf = cdic_regs.time >> 8;
@@ -948,68 +950,56 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 				nybbles[3]--;
 			}
 			lba = nybbles[0] + nybbles[1]*10 + ((nybbles[2] + nybbles[3]*10)*75) + ((nybbles[4] + nybbles[5]*10)*75*60);
-			printf( "Reading Mode 1 sector from MSF location %06x\n", cdic_regs.time | 2 );
-			verboselog(machine, 0, "Reading Mode 1 sector from MSF location %06x\n", cdic_regs.time | 2 );
-			cdrom_read_data(cdic_regs.cd, lba, buffer, CD_TRACK_MODE1);
+
+			printf( "Reading Mode %d sector from MSF location %06x\n", cdic_regs.command - 0x28, cdic_regs.time | 2 );
+			verboselog(machine, 0, "Reading Mode %d sector from MSF location %06x\n", cdic_regs.command - 0x28, cdic_regs.time | 2 );
+
 			cdic_regs.data_buffer ^= 0x0001;
-			for(index = 0; index < 2048/2; index++)
+
+			cdrom_read_data(cdic_regs.cd, lba, buffer, CD_TRACK_RAW_DONTCARE);
+			for(index = 6; index < 2352/2; index++)
 			{
-				cdram[0xa00/2 + index] = (buffer[index*2 + 1] << 8) | buffer[index*2];
+				cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + (index - 6)] = (buffer[index*2] << 8) | buffer[index*2 + 1];
 			}
 
 			printf( "Setting CDIC interrupt line\n" );
 			verboselog(machine, 0, "Setting CDIC interrupt line\n" );
 			cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), M68K_IRQ_4, 128);
 			cputag_set_input_line(machine, "maincpu", M68K_IRQ_4, ASSERT_LINE);
-			timer_adjust_oneshot(cdic_regs.interrupt_timer, attotime_never, 0);
+
+			timer_adjust_oneshot(cdic_regs.interrupt_timer, ATTOTIME_IN_HZ(75), 0); // 75Hz = 1x CD-ROM speed
+
 			cdic_regs.x_buffer |= 0x8000;
-			cdic_regs.data_buffer |= cdic_regs.buffer_target;
-			cdic_regs.buffer_target ^= 1;
+
+			cdic_regs.data_buffer |= 0x4000;
+			cdic_regs.data_buffer &= 0x7fff;
+
+			cdic_regs.time += 0x100;
+			if((cdic_regs.time & 0x00000f00) == 0xa00)
+			{
+				cdic_regs.time &= 0xfffff0ff;
+				cdic_regs.time += 0x00001000;
+			}
+			if((cdic_regs.time & 0x0000ff00) == 0x7500)
+			{
+				cdic_regs.time &= 0xffff00ff;
+				cdic_regs.time += 0x00010000;
+				if((cdic_regs.time & 0xf0000) == 0xa0000)
+				{
+					cdic_regs.time &= 0xfff0ffff;
+					cdic_regs.time += 0x100000;
+					if((cdic_regs.time & 0xf00000) == 0xf00000)
+					{
+						cdic_regs.time &= 0xff0fffff;
+						cdic_regs.time += 0x01000000;
+					}
+				}
+			}
 			break;
 		}
-		case 0x2a: // Read Mode 2
-		{
-			UINT8 buffer[2448] = { 0 };
-			UINT32 msf = cdic_regs.time >> 8;
-			UINT32 lba = 0;
-			int index = 0;
-			UINT8 nybbles[6] =
-			{
-				 msf & 0x0000000f,
-				(msf & 0x000000f0) >> 4,
-				(msf & 0x00000f00) >> 8,
-				(msf & 0x0000f000) >> 12,
-				(msf & 0x000f0000) >> 16,
-				(msf & 0x00f00000) >> 20
-			};
-			nybbles[2] -= 2;
-			if(nybbles[2] > 9)
-			{
-				nybbles[2] += 10;
-				nybbles[3]--;
-			}
-			lba = nybbles[0] + nybbles[1]*10 + ((nybbles[2] + nybbles[3]*10)*75) + ((nybbles[4] + nybbles[5]*10)*75*60);
-			printf( "Reading Mode 2 sector from MSF location %06x\n", cdic_regs.time | 2 );
-			verboselog(machine, 0, "Reading Mode 2 sector from MSF location %06x\n", cdic_regs.time | 2 );
-
-			cdrom_read_data(cdic_regs.cd, lba, buffer, CD_TRACK_MODE2);
-			cdic_regs.data_buffer ^= 0x0001;
-			for(index = 0; index < 2352/2; index++)
-			{
-				cdram[0xa00/2 + index] = (buffer[index*2 + 1] << 8) | buffer[index*2];
-			}
-
-			printf( "Setting CDIC interrupt line\n" );
-			verboselog(machine, 0, "Setting CDIC interrupt line\n" );
-			cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), M68K_IRQ_4, 128);
-			cputag_set_input_line(machine, "maincpu", M68K_IRQ_4, ASSERT_LINE);
-			timer_adjust_oneshot(cdic_regs.interrupt_timer, attotime_never, 0);
-			cdic_regs.x_buffer |= 0x8000;
-			cdic_regs.data_buffer |= cdic_regs.buffer_target;
-			cdic_regs.buffer_target ^= 1;
-			break;
-		}
-		case 0x2e:
+		case 0x2e: // Abort
+			timer_adjust_oneshot(cdic_regs.interrupt_timer, ATTOTIME_IN_HZ(75), 0); // 75Hz = 1x CD-ROM speed
+			cdic_regs.data_buffer &= 0x7fff;
 			break;
 	}
 }
@@ -1047,12 +1037,11 @@ static READ16_HANDLER( cdic_r )
 		case 0x3ffe/2:
 		{
 			UINT16 temp = cdic_regs.data_buffer;
-			cdic_regs.data_buffer &= 0x7fff;
 			cputag_set_input_line(space->machine, "maincpu", M68K_IRQ_4, CLEAR_LINE);
 			verboselog(space->machine, 0, "cdic_r: Data buffer Register = %04x & %04x\n", temp, mem_mask);
 			verboselog(space->machine, 0, "Clearing CDIC interrupt line\n" );
 			printf("Clearing CDIC interrupt line\n" );
-			return temp | 1;
+			return temp;
 		}
 		default:
 			verboselog(space->machine, 0, "cdic_r: UNIMPLEMENTED: Unknown address: %04x & %04x\n", offset*2, mem_mask);
@@ -1070,12 +1059,12 @@ static WRITE16_HANDLER( cdic_w )
 			COMBINE_DATA(&cdic_regs.command);
 			break;
 		case 0x3c02/2: // Time register (MSW)
-			cdic_regs.time &= 0x0000ffff;
+			cdic_regs.time &= ~(mem_mask << 16);
 			cdic_regs.time |= (data & mem_mask) << 16;
 			verboselog(space->machine, 0, "cdic_w: Time Register (MSW) = %04x & %04x\n", data, mem_mask);
 			break;
 		case 0x3c04/2: // Time register (LSW)
-			cdic_regs.time &= 0xffff0000;
+			cdic_regs.time &= ~mem_mask;
 			cdic_regs.time |= data & mem_mask;
 			verboselog(space->machine, 0, "cdic_w: Time Register (LSW) = %04x & %04x\n", data, mem_mask);
 			break;
@@ -1084,12 +1073,12 @@ static WRITE16_HANDLER( cdic_w )
 			COMBINE_DATA(&cdic_regs.file);
 			break;
 		case 0x3c08/2: // Channel register (MSW)
-			cdic_regs.channel &= 0x0000ffff;
+			cdic_regs.channel &= ~(mem_mask << 16);
 			cdic_regs.channel |= (data & mem_mask) << 16;
 			verboselog(space->machine, 0, "cdic_w: Channel Register (MSW) = %04x & %04x\n", data, mem_mask);
 			break;
 		case 0x3c0a/2: // Channel register (LSW)
-			cdic_regs.channel &= 0xffff0000;
+			cdic_regs.channel &= ~mem_mask;
 			cdic_regs.channel |= data & mem_mask;
 			verboselog(space->machine, 0, "cdic_w: Channel Register (LSW) = %04x & %04x\n", data, mem_mask);
 			break;
@@ -1104,6 +1093,7 @@ static WRITE16_HANDLER( cdic_w )
 			UINT32 index = 0;
 			UINT32 src_index = (data & 0x7fff) >> 1;
 			UINT16 *memory = planea;
+			verboselog(space->machine, 0, "memory address counter: %08x\n", scc68070_regs.dma.channel[0].memory_address_counter);
 			verboselog(space->machine, 0, "cdic_w: DMA Control Register = %04x & %04x\n", data, mem_mask);
 			verboselog(space->machine, 0, "Doing copy, transferring %04x bytes\n", count * 2 );
 			printf("Doing copy, transferring %04x bytes\n", count * 2 );
@@ -1114,8 +1104,7 @@ static WRITE16_HANDLER( cdic_w )
 			}
 			for(index = start / 2; index < (start / 2 + count); index++)
 			{
-				memory[index] = (cdram[src_index] >> 8) | (cdram[src_index] << 8);
-				src_index++;
+				memory[index] = cdram[src_index++];
 			}
 			scc68070_regs.dma.channel[0].memory_address_counter += scc68070_regs.dma.channel[0].transfer_counter * 2;
 			break;
@@ -1132,9 +1121,22 @@ static WRITE16_HANDLER( cdic_w )
 		{
 			verboselog(space->machine, 0, "cdic_w: Data Buffer Register = %04x & %04x\n", data, mem_mask);
 			COMBINE_DATA(&cdic_regs.data_buffer);
-			if((cdic_regs.data_buffer & 0xc000) == 0xc000)
+			cdic_regs.data_buffer &= 0xbfff;
+			if(cdic_regs.data_buffer & 0x8000)
 			{
-				timer_adjust_oneshot(cdic_regs.interrupt_timer, ATTOTIME_IN_HZ(60), 0);
+				switch(cdic_regs.command)
+				{
+					case 0x23: // Reset Mode 1
+					case 0x24: // Reset Mode 2
+					case 0x2e: // Abort
+						timer_adjust_oneshot(cdic_regs.interrupt_timer, attotime_never, 0);
+						cdic_regs.data_buffer &= 0x3fff;
+						break;
+					case 0x29: // Read Mode 1
+					case 0x2a: // Read Mode 2
+						timer_adjust_oneshot(cdic_regs.interrupt_timer, ATTOTIME_IN_HZ(75), 0); // 75Hz = 1x CD-ROM speed
+						break;
+				}
 			}
 			break;
 		}
@@ -1465,13 +1467,13 @@ m48t08_regs_t m48t08;
 
 static READ16_HANDLER( m48t08_r )
 {
-	verboselog(space->machine, 11, "m48t08_r: %04x = %02x & %04x\n", offset, m48t08.nvram[offset], mem_mask );
+	verboselog(space->machine, 6, "m48t08_r: %04x = %02x & %04x\n", offset, m48t08.nvram[offset], mem_mask );
 	return m48t08.nvram[offset] << 8;
 }
 
 static WRITE16_HANDLER( m48t08_w )
 {
-	verboselog(space->machine, 11, "m48t08_w: %04x = %02x\n", offset, data >> 8);
+	verboselog(space->machine, 6, "m48t08_w: %04x = %02x\n", offset, data >> 8);
 	switch(offset)
 	{
 		case 0x1ff9:
@@ -2538,6 +2540,12 @@ TIMER_CALLBACK( test_timer_callback )
 *      Memory maps       *
 *************************/
 
+static WRITE16_HANDLER(cdic_ram_w)
+{
+	verboselog(space->machine, 0, "cdic_ram_w: %08x = %04x & %04x\n", 0x00300000 + offset*2, data, mem_mask);
+	COMBINE_DATA(&cdram[offset]);
+}
+
 static READ16_HANDLER(cdic_ram_r)
 {
 	verboselog(space->machine, 0, "cdic_ram_r: %08x = %04x & %04x\n", 0x00300000 + offset*2, cdram[offset], mem_mask);
@@ -2551,7 +2559,7 @@ static ADDRESS_MAP_START( cdimono1_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00301400, 0x00301403) AM_READ(uart_loopback_enable)
 	//AM_RANGE(0x00301404, 0x00303bff) AM_RAM
 #else
-	AM_RANGE(0x00300000, 0x00303bff) AM_READ(cdic_ram_r) AM_BASE(&cdram)
+	AM_RANGE(0x00300000, 0x00303bff) AM_READWRITE(cdic_ram_r, cdic_ram_w) AM_BASE(&cdram)
 #endif
 	AM_RANGE(0x00303c00, 0x00303fff) AM_READWRITE(cdic_r, cdic_w)
 	AM_RANGE(0x00310000, 0x00317fff) AM_READWRITE(slave_r, slave_w)
@@ -2643,6 +2651,8 @@ ROM_START( cdimono1 )
 	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_SYSTEM_BIOS( 0, "mcdi200", "Magnavox CD-i 200" )
 	ROMX_LOAD( "cdi200.rom", 0x000000, 0x80000, CRC(40c4e6b9) SHA1(d961de803c89b3d1902d656ceb9ce7c02dccb40a), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "mcdi200", "Philips CD-i 220 F2" )
+	ROMX_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(279683ca) SHA1(53360a1f21ddac952e95306ced64186a3fc0b93e), ROM_BIOS(2) )
 	// This one is a Mono-IV board, needs to be a separate driver
 	//ROM_SYSTEM_BIOS( 1, "pcdi490", "Philips CD-i 490" )
 	//ROMX_LOAD( "cdi490.rom", 0x000000, 0x80000, CRC(e115f45b) SHA1(f71be031a5dfa837de225081b2ddc8dcb74a0552), ROM_BIOS(2) )
