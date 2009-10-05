@@ -1229,7 +1229,9 @@ INLINE void prepare_scanline(running_machine *machine, mc6847_state *mc6847, int
 			/* has the border color changed? */
 			attrs = update_attributes(mc6847);
 
-			if (attrs != mc6847->attrs[scanline])
+			/* commenting out cause it breaks the coco3 border,
+			 * the whole 'attr' handling needs to be rewritten anyway
+			if (attrs != mc6847->attrs[scanline]) */
 			{
 				mc6847->dirty = TRUE;
 				mc6847->attrs[scanline] = attrs;
@@ -1295,8 +1297,8 @@ static TIMER_CALLBACK( hs_fall )
 	if (LOG_HS)
 		logerror("hs_fall(): time=%s\n", attotime_string(timer_get_time(machine), ATTOTIME_STRING_PRECISION));
 
-	mc6847->hs = CLEAR_LINE;
-	devcb_call_write_line(&mc6847->out_hs_func, CLEAR_LINE);
+	mc6847->hs = ASSERT_LINE;
+	devcb_call_write_line(&mc6847->out_hs_func, mc6847->hs);
 }
 
 static TIMER_CALLBACK( hs_rise )
@@ -1311,8 +1313,8 @@ static TIMER_CALLBACK( hs_rise )
 	timer_adjust_oneshot(mc6847->hs_fall_timer,
 		attotime_make(0, mc6847->horizontal_sync_period), 0);
 
-	mc6847->hs = ASSERT_LINE;
-	devcb_call_write_line(&mc6847->out_hs_func, ASSERT_LINE);
+	mc6847->hs = CLEAR_LINE;
+	devcb_call_write_line(&mc6847->out_hs_func, mc6847->hs);
 
 	prepare_scanline(machine, mc6847, 0);
 }
@@ -1776,8 +1778,6 @@ static DEVICE_START( mc6847 )
 	assert(device->static_config != NULL);
 	assert(device->inline_config != NULL);
 
-
-
 	/* identify proper M6847 variant */
 	assert(cfg->type < ARRAY_LENGTH(variants));
 	v = &variants[cfg->type];
@@ -1914,7 +1914,7 @@ DEVICE_GET_INFO( mc6847 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(mc6847_state);					break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = sizeof(mc6847_config);				break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_OTHER;					break;
+		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_VIDEO;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(mc6847);		break;
