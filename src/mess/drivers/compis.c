@@ -311,11 +311,31 @@ MACHINE_DRIVER_END
 
 ***************************************************************************/
 
-ROM_START (compis)
-     ROM_REGION (0x100000, "maincpu", 0)
-     ROM_LOAD ("compis.rom", 0xf0000, 0x10000, CRC(89877688) SHA1(7daa1762f24e05472eafc025879da90fe61d0225))
+ROM_START( compis )
+	ROM_REGION16_LE( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "sa883003.u39", 0xf0000, 0x4000, CRC(3cca66db) SHA1(cac36c9caa2f5bb42d7a6d5b84f419318628935f) )
+	ROM_LOAD16_BYTE( "sa883003.u35", 0xf0001, 0x4000, CRC(43c38e76) SHA1(f32e43604107def2c2259898926d090f2ed62104) )
+	ROM_LOAD16_BYTE( "sa883003.u40", 0xf8000, 0x4000, CRC(195ef6bf) SHA1(eaf8ae897e1a4b62d3038ff23777ce8741b766ef) )
+	ROM_LOAD16_BYTE( "sa883003.u36", 0xf8001, 0x4000, CRC(7c918f56) SHA1(8ba33d206351c52f44f1aa76cc4d7f292dcef761) )
+
+	ROM_REGION( 0x800, "i8749", 0 )
+	ROM_LOAD( "cmpkey13.u1", 0x0000, 0x0800, CRC(4de53979) SHA1(cc20311c6ecaf8d8bfe891dc55233fa22d86bc85) )
 ROM_END
 
+ROM_START( compis2 )
+	ROM_REGION16_LE( 0x100000, "maincpu", 0 )
+	ROM_DEFAULT_BIOS( "v303" )
+	ROM_SYSTEM_BIOS( 0, "v302", "Compis II v3.02 (1986-09-09)" )
+	ROMX_LOAD( "comp302.u39", 0xf0000, 0x8000, CRC(16a7651e) SHA1(4cbd4ba6c6c915c04dfc913ec49f87c1dd7344e3), ROM_BIOS(1) | ROM_SKIP(1) )
+	ROMX_LOAD( "comp302.u35", 0xf0001, 0x8000, CRC(ae546bef) SHA1(572e45030de552bb1949a7facbc885b8bf033fc6), ROM_BIOS(1) | ROM_SKIP(1) )
+	ROM_SYSTEM_BIOS( 1, "v303", "Compis II v3.03 (1987-03-09)" )
+	ROMX_LOAD( "rysa094.u39", 0xf0000, 0x8000, CRC(e7302bff) SHA1(44ea20ef4008849af036c1a945bc4f27431048fb), ROM_BIOS(2) | ROM_SKIP(1) )
+	ROMX_LOAD( "rysa094.u35", 0xf0001, 0x8000, CRC(b0694026) SHA1(eb6b2e3cb0f42fd5ffdf44f70e652ecb9714ce30), ROM_BIOS(2) | ROM_SKIP(1) )
+
+	ROM_REGION( 0x800, "i8749", 0 )
+	ROM_LOAD( "cmpkey13.u1", 0x0000, 0x0800, CRC(3f87d138) SHA1(c04e2d325b9c04818bc7c47c3bf32b13862b11ec) )
+ROM_END
 
 /*   YEAR   NAME        PARENT  COMPAT MACHINE  INPUT   INIT    CONFIG  COMPANY     FULLNAME */
 COMP(1985,	compis,		0,		0,     compis,	compis,	compis,	0,	"Telenova", "Compis" , GAME_NOT_WORKING)
+COMP(1986,	compis2,	compis,	0,     compis,	compis,	compis,	0,	"Telenova", "Compis II" , GAME_NOT_WORKING)

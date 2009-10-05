@@ -1072,6 +1072,7 @@ const game_driver * const drivers[] =
 
     /* Telenova */
     DRIVER(compis)      /* 1985 Telenova Compis                             */
+    DRIVER(compis2)     /* 1985 Telenova Compis                             */
 
     /* Multitech */
     DRIVER(mpf1)        /* 1979 Multitech Micro Professor 1                 */
