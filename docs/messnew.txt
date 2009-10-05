@@ -15,6 +15,7 @@ Systems Promoted from GAME_NOT_WORKING:
 
 Skeleton drivers: 
 -----------------
+- Cosmicos
 - Epson HX20
 
 

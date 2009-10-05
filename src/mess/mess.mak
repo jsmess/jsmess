@@ -828,6 +828,7 @@ $(MESSOBJ)/epoch.a:				\
 
 $(MESSOBJ)/epson.a:				\
 	$(MESS_DRIVERS)/ex800.o		\
+	$(MESS_DRIVERS)/hx20.o		\
 	$(MESS_DRIVERS)/lx800.o		\
 	$(MESS_MACHINE)/e05a03.o	\
 	$(MESS_MACHINE)/pf10.o		\
@@ -1497,7 +1498,7 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/mmd1.o		\
 	$(MESS_DRIVERS)/ptcsol.o	\
 	$(MESS_DRIVERS)/p8k.o		\
-	$(MESS_DRIVERS)/hx20.o		\
+	$(MESS_DRIVERS)/cosmicos.o	\
 
 
 
@@ -1538,6 +1539,7 @@ $(MESS_DRIVERS)/amico2k.o:	$(MESS_LAYOUT)/amico2k.lh
 $(MESS_DRIVERS)/beta.o:		$(MESS_LAYOUT)/beta.lh
 $(MESS_DRIVERS)/bob85.o:	$(MESS_LAYOUT)/bob85.lh
 $(MESS_DRIVERS)/coco.o:		$(MESS_LAYOUT)/coco3.lh
+$(MESS_DRIVERS)/cosmicos.o:	$(MESS_LAYOUT)/cosmicos.lh
 $(MESS_DRIVERS)/c80.o:		$(MESS_LAYOUT)/c80.lh
 $(MESS_DRIVERS)/dectalk.o:	$(MESS_LAYOUT)/dectalk.lh
 $(MESS_DRIVERS)/elf.o:		$(MESS_LAYOUT)/elf2.lh
