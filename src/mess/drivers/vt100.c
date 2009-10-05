@@ -430,7 +430,9 @@ MACHINE_DRIVER_END
  * VT1xx-AC : STP serial printer board (includes a special romset)
  * VT1xx-CA : p/n 5413206? 20ma current loop interface pcb for vt101/vt102/vt131
  * VT1xx-CB or CL: GPO "ReGIS" board vt100->vt125 upgrade kit (p/n 5414275 paddle board and 5414277 gpo board)
-
+ * VT1xx-CE : DECWord Conversion kit
+ * VT1xx-FB : Anti-glare kit
+ 
  * Info about mask roms and other nasties:
  * A normal 2716 rom has pin 18: /CE; pin 20: /OE; pin 21: VPP (acts as CE2)
  * The vt100 23-031e2/23-061e2, 23-032e2, 23-033e2, and 23-034e2 mask roms
@@ -483,7 +485,7 @@ ROM_START( vt100 ) // This is from the schematics at http://www.bitsavers.org/pd
 ROM_END
 
 ROM_START( vt100wp ) // This is from the schematics at http://www.bitsavers.org/pdf/dec/terminal/vt100/MP00633_VT100_Mar80.pdf
-// This is the standard vt100 cpu board, with the ?word processing? romset
+// This is the standard vt100 cpu board, with the ?word processing? romset, included in the VT1xx-CE kit?
 // the vt103 can also use this rom set (-04 and -05 revs have it by default, -05 rev also has the optional alt charset rom by default)
 // NOTE: according to dunnington's ROMList, this is actually the VT132 romset, but I'm not convinced.
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
