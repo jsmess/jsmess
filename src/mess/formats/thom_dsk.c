@@ -19,7 +19,7 @@ static const int sap_magic_num = 0xB3; /* simple XOR crypt */
 
 
 static const char sap_header[] =
-	"SYSTEME D'ARCHIVAGE PUKALL S.A.P. "
+	"\001SYSTEME D'ARCHIVAGE PUKALL S.A.P. "
 	"(c) Alexandre PUKALL Avril 1998";
 
 
@@ -31,11 +31,22 @@ static const UINT16 sap_crc[] =
 
 struct sap_dsk_tag
 {
-	int heads;
 	int tracks;
 	int sector_size;
+        int sector_pos[80][16]; /* remember sector position in file */
 };
 
+static UINT16 thom_sap_crc( UINT8* data, int size )
+{
+        int i;
+        UINT16 crc = 0xffff, crc2;
+        for ( i = 0; i < size; i++ )
+        {
+                crc2 = ( crc >> 4 ) ^ sap_crc[ ( crc ^ data[i] ) & 15 ];
+                crc = ( crc2 >> 4 ) ^ sap_crc[ ( crc2 ^ (data[i] >> 4) ) & 15 ];
+        }
+        return crc;
+}
 
 static struct sap_dsk_tag *get_tag(floppy_image *floppy)
 {
@@ -48,7 +59,7 @@ static struct sap_dsk_tag *get_tag(floppy_image *floppy)
 static FLOPPY_IDENTIFY(sap_dsk_identify)
 {
 	char header[0x100];
-	floppy_image_read(floppy, header, 1, sizeof(sap_header));
+	floppy_image_read(floppy, header, 0, sizeof(sap_header));
 	if (!memcmp( header, sap_header, sizeof(sap_header) ) )
 	{
 		*vote= 100;
@@ -71,17 +82,21 @@ static int sap_get_tracks_per_disk(floppy_image *floppy)
 static floperr_t get_offset(floppy_image *floppy, int head, int track, int sector, int sector_is_index, UINT64 *offset)
 {
 	UINT64 offs;
+        struct sap_dsk_tag *tag = get_tag(floppy);
 	/* translate the sector to a raw sector */
 	if (!sector_is_index)
 	{
 		sector -= 1;
 	}
 	/* check to see if we are out of range */
-	if ((head < 0) || (head >= 1) || (track < 0) || (track >=get_tag(floppy)->tracks)
+	if ((head < 0) || (head >= 1) || (track < 0) || (track >=tag->tracks)
 			|| (sector < 0) || (sector >= 16))
 		return FLOPPY_ERROR_SEEKERROR;
 
-	offs = 0x42 + track * ((get_tag(floppy)->sector_size + 6)* 16) + sector * (get_tag(floppy)->sector_size + 6) + 4;
+        offs = tag->sector_pos[track][sector];
+       if (offs <= 0 )
+                return FLOPPY_ERROR_SEEKERROR;
+
 	if (offset)
 		*offset = offs;
 	return FLOPPY_ERROR_SUCCESS;
@@ -99,7 +114,7 @@ static floperr_t internal_sap_read_sector(floppy_image *floppy, int head, int tr
 	if (err)
 		return err;
 
-	floppy_image_read(floppy, buffer, offset, buflen);
+	floppy_image_read(floppy, buffer, offset+4, buflen);
 	buf = (UINT8*)buffer;
 	for (i=0;i<buflen;i++) {
 		buf[i] ^= sap_magic_num;
@@ -113,18 +128,26 @@ static floperr_t internal_sap_write_sector(floppy_image *floppy, int head, int t
 {
 	UINT64 offset;
 	floperr_t err;
-	UINT8 *buf;
+	UINT8 buf[256+6];
+        UINT16 crc;
 	int i;
-
 	err = get_offset(floppy, head, track, sector, sector_is_index, &offset);
 	if (err)
 		return err;
 
-	buf = (UINT8*)buffer;
+        /* buf = 4-byte header + sector + 2-byte CRC */
+	floppy_image_read(floppy, buf, offset, 4);
 	for (i=0;i<buflen;i++) {
-		buf[i] ^= sap_magic_num;
-	}
-	floppy_image_write(floppy, buffer, offset, buflen);
+		buf[i+4] = ((UINT8*)buffer)[i];
+	}        
+        crc = thom_sap_crc( buf, buflen+4 );
+        buf[buflen+4] = crc >> 8;
+        buf[buflen+5] = crc & 0xff;
+	for (i=0;i<buflen;i++) {
+		buf[i+4] ^= sap_magic_num;
+	}        
+	floppy_image_write(floppy, buf, offset, buflen+6);
+
 	return FLOPPY_ERROR_SUCCESS;
 }
 
@@ -172,7 +195,7 @@ static floperr_t sap_get_indexed_sector_info(floppy_image *floppy, int head, int
 	sector_index += 1;
 	err = get_offset(floppy, head, track, sector_index, FALSE, &offset);
 
-	floppy_image_read(floppy, header, offset-4, 4);
+	floppy_image_read(floppy, header, offset, 4);
 	if (cylinder)
 		*cylinder = header[2];
 	if (side)
@@ -187,23 +210,75 @@ static floperr_t sap_get_indexed_sector_info(floppy_image *floppy, int head, int
 	return err;
 }
 
+static floperr_t sap_post_format(floppy_image *floppy, option_resolution *params)
+{
+        int track,sector;
+        int pos;
+        UINT8 buf[256], header[4];
+	struct sap_dsk_tag *tag;
+        tag = (struct sap_dsk_tag *) floppy_create_tag(floppy, SAP_DSK_TAG, sizeof(struct sap_dsk_tag));
+
+        /* default options */
+        if ( !tag->tracks ) 
+        {
+                tag->tracks = 80;        
+                tag->sector_size = 256;
+        }
+
+        /* create SAP file header */
+        floppy_image_write( floppy, sap_header, 0, 66 );
+
+        for ( track = 0; track < 80; track++ )
+                for ( sector = 0; sector < 16; sector++ )
+                        tag->sector_pos[track][sector] = 0;
+
+        /* create all sectors with valid header and CRC */
+ 	memset(buf, 0xe5, 256);
+        pos = 0x42;
+        header[0] = (tag->sector_size==128) ? 1 : 0;
+        header[1] = 0;
+        for ( track = 0, pos = 0x42; track < tag->tracks; track++ )
+                for ( sector = 0; sector < 16; sector++, pos += tag->sector_size + 6 ) {
+                        tag->sector_pos[track][sector] = pos;
+                        header[2] = track;
+                        header[3] = sector + 1;
+                        floppy_image_write(floppy, header, pos, 4);
+                        sap_write_indexed_sector( floppy, 0, track, sector, buf, tag->sector_size, 0 );
+                }
+        
+        return FLOPPY_ERROR_SUCCESS;
+}
+
 
 static FLOPPY_CONSTRUCT(sap_dsk_construct)
 {
 	struct FloppyCallbacks *callbacks;
 	struct sap_dsk_tag *tag;
-	int i;
-	UINT8 header[4];
+	int i,j;
+	UINT8 fmt;
 	tag = (struct sap_dsk_tag *) floppy_create_tag(floppy, SAP_DSK_TAG, sizeof(struct sap_dsk_tag));
 	if (!tag)
 		return FLOPPY_ERROR_OUTOFMEMORY;
 
-	floppy_image_read(floppy, header, 0, 1);
-	if (header[0]==1) tag->sector_size = 256; else tag->sector_size = 128;
+        /* guess format */
+	floppy_image_read(floppy, &fmt, 0x42, 1);
+	if ( fmt==1 ) tag->sector_size = 128; else tag->sector_size = 256;
+
+        /* start with an empty offset table */
+        tag->tracks = 0;
+        for ( i = 0; i < 80; i++ )
+                for ( j = 0; j < 16; j++ )
+                        tag->sector_pos[i][j] = 0;
+
+        /* count tracks & fill sector offset table */
 	for ( i = 0x42; i+4 < floppy_image_size(floppy); i += tag->sector_size + 6 ) // CRC 2 bytes + 4 bytes sector header
 	{
-		floppy_image_read(floppy, header, i, 4);
-		tag->tracks = header[2] + 1;
+                UINT8 sector, track;
+		floppy_image_read(floppy, &track, i+2, 1);
+		floppy_image_read(floppy, &sector, i+3, 1);
+                if ( track >= 80 || sector < 1 || sector > 16 ) continue;
+                if ( track > tag->tracks ) tag->tracks = track+1;
+                tag->sector_pos[track][sector-1] = i;
 	}
 	callbacks = floppy_callbacks(floppy);
 	callbacks->read_sector = sap_read_sector;
@@ -214,6 +289,7 @@ static FLOPPY_CONSTRUCT(sap_dsk_construct)
 	callbacks->get_heads_per_disk = sap_get_heads_per_disk;
 	callbacks->get_tracks_per_disk = sap_get_tracks_per_disk;
 	callbacks->get_indexed_sector_info = sap_get_indexed_sector_info;
+	callbacks->post_format = sap_post_format;
 
 	return FLOPPY_ERROR_SUCCESS;
 }
@@ -276,36 +352,43 @@ static FLOPPY_CONSTRUCT(qdd_dsk_construct)
 /* ----------------------------------------------------------------------- */
 
 FLOPPY_OPTIONS_START(thomson)
-	FLOPPY_OPTION(qdd,"qd", "Thomson QDD floppy disk image",	qdd_dsk_identify, qdd_dsk_construct,
+
+	FLOPPY_OPTION(fdmfm2, "fd", "Thomson FD (MFM) 80 tracks disk image (3\"1/2 DD)", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([1])
+		TRACKS([80])
+		SECTORS([16])
+		SECTOR_LENGTH([256])
+		FIRST_SECTOR_ID([1]))
+
+	FLOPPY_OPTION(fdmfm, "fd", "Thomson FD (MFM) 40 tracks disk image (5\"1/4 DD)", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([1])
+		TRACKS([40])
+		SECTORS([16])
+		SECTOR_LENGTH([256])
+		FIRST_SECTOR_ID([1]))
+
+	FLOPPY_OPTION(fd2, "fd", "Thomson FD (FM) 80 tracks disk image (3\"1/2 SD)", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([1])
+		TRACKS([80])
+		SECTORS([16])
+		SECTOR_LENGTH([128])
+		FIRST_SECTOR_ID([1]))
+
+	FLOPPY_OPTION(fd, "fd", "Thomson FD (FM) 40 tracks disk image (5\"1/4 SD)", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([1])
+		TRACKS([40])
+		SECTORS([16])
+		SECTOR_LENGTH([128])
+		FIRST_SECTOR_ID([1]))
+ 
+        FLOPPY_OPTION(sap,"sap", "Thomson SAP floppy disk image",	sap_dsk_identify, sap_dsk_construct, NULL)
+
+	FLOPPY_OPTION(qdd,"qd", "Thomson QDD floppy disk image (2\"8 SD)",	qdd_dsk_identify, qdd_dsk_construct, 
 		HEADS([1])
 		TRACKS([1])
 		SECTORS([400])
 		SECTOR_LENGTH([128])
 		FIRST_SECTOR_ID([0]))
-	FLOPPY_OPTION(sap,"sap", "Thomson SAP floppy disk image",	sap_dsk_identify, sap_dsk_construct, NULL)
-	FLOPPY_OPTION(fd, "fd", "Thomson FD (FM) 40 tracks disk image", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([1])
-		TRACKS([40])
-		SECTORS([16])
-		SECTOR_LENGTH([128])
-		FIRST_SECTOR_ID([1]))
-	FLOPPY_OPTION(fd2, "fd", "Thomson FD (FM) 80 tracks disk image", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([1])
-		TRACKS([80])
-		SECTORS([16])
-		SECTOR_LENGTH([128])
-		FIRST_SECTOR_ID([1]))
-	FLOPPY_OPTION(fdmfm, "fd", "Thomson FD (MFM) 40 tracks disk image", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([1])
-		TRACKS([40])
-		SECTORS([16])
-		SECTOR_LENGTH([256])
-		FIRST_SECTOR_ID([1]))
-	FLOPPY_OPTION(fdmfm2, "fd", "Thomson FD (MFM) 80 tracks disk image", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([1])
-		TRACKS([80])
-		SECTORS([16])
-		SECTOR_LENGTH([256])
-		FIRST_SECTOR_ID([1]))
+
 FLOPPY_OPTIONS_END
 

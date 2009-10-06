@@ -121,7 +121,7 @@ static int thom_floppy_make_sector( const device_config* img, chrn_id id, UINT8*
 		memset( dst, 0x00, 6 ); /* synchro bytes */
 		dst[ 6 ] = 0xfb; /* data field mark */
 		floppy_drive_read_sector_data
-			( img, id.H, id.R, dst + 7, sector_size );
+			( img, id.H, id.data_id, dst + 7, sector_size );
 		dst[ sector_size + 7 ] = 0; /* TODO: CRC */
 		dst[ sector_size + 8 ] = 0; /* TODO: CRC */
 		memset( dst + sector_size + 9, 0xff, 22 ); /* end mark */
@@ -133,7 +133,7 @@ static int thom_floppy_make_sector( const device_config* img, chrn_id id, UINT8*
 		memset( dst, 0xa1, 3 ); /* synchro bytes */
 		dst[ 3 ] = 0xfb; /* data field mark */
 		floppy_drive_read_sector_data
-			( img, id.H, id.R, dst + 4, sector_size );
+			( img, id.H, id.data_id, dst + 4, sector_size );
 		dst[ sector_size + 4 ] = 0; /* TODO: CRC */
 		dst[ sector_size + 5 ] = 0; /* TODO: CRC */
 		memset( dst + sector_size + 6, 0xF7, 74 ); /* end mark */
@@ -330,19 +330,9 @@ static WRITE8_HANDLER( to7_5p14_w )
 
 static void to7_5p14_reset( running_machine *machine )
 {
-	int i;
 	const device_config *fdc = devtag_get_device(machine, "wd2793");
 	LOG(( "to7_5p14_reset: CD 90-640 controller\n" ));
 	wd17xx_reset(fdc);
-	for ( i = 0; i < floppy_get_count( machine ); i++ )
-	{
-		const device_config * img = floppy_get_device( machine, i );
-		if (img) {
-			floppy_drive_set_ready_state( img, FLOPPY_DRIVE_READY, 0 );
-			floppy_drive_set_rpm( img, 300. );
-			floppy_drive_seek( img, - floppy_drive_get_current_track( img ) );
-		}
-	}
 }
 
 
@@ -664,6 +654,7 @@ static void to7_qdd_write_byte( running_machine *machine, UINT8 data )
 
 			floppy_drive_format_sector( to7_qdd_image(machine),
 						    0, sector, 0, 0, sector, 128, filler );
+                        thom_floppy_active( machine, 1 );
 			to7qdd->start_idx = to7qdd->data_idx;
 		}
 
@@ -692,6 +683,7 @@ static void to7_qdd_write_byte( running_machine *machine, UINT8 data )
 				      attotime_to_double(timer_get_time(machine)), cpu_get_previouspc(cputag_get_cpu(machine, "maincpu")), sector ));
 
 				floppy_drive_write_sector_data( to7_qdd_image(machine), 0, sector, to7qdd->data + to7qdd->start_idx + 1, 128, 0 );
+                                thom_floppy_active( machine, 1 );
 			}
 
 			to7qdd->start_idx = to7qdd->data_idx;
@@ -918,6 +910,7 @@ static struct _thmfc1
 
 	UINT8   op;
 	UINT8   sector;            /* target sector, in [1,16] */
+        UINT32  sector_id;
 	UINT8   track;             /* current track, in [0,79] */
 	UINT8   side;              /* current side, 0 or 1 */
 	UINT8   drive;             /* 0 to 3 */
@@ -989,7 +982,7 @@ static void thmfc_floppy_index_pulse_cb ( const device_config *controller,const 
 
 
 
-static int thmfc_floppy_find_sector ( running_machine *machine,chrn_id* dst )
+static int thmfc_floppy_find_sector ( running_machine *machine, chrn_id* dst )
 {
 	const device_config* img = thmfc_floppy_image(machine);
 	chrn_id id;
@@ -1034,9 +1027,9 @@ static void thmfc_floppy_cmd_complete( running_machine *machine )
 
 	if ( thmfc1->op == THMFC1_OP_WRITE_SECT )
 	{
-		/* TODO: detect ddam (?) */
 		const device_config * img = thmfc_floppy_image(machine);
-		floppy_drive_write_sector_data( img, thmfc1->side, thmfc1->sector, thmfc1->data + 3, thmfc1->data_size - 3, 0 );
+		floppy_drive_write_sector_data( img, thmfc1->side, thmfc1->sector_id, thmfc1->data + 3, thmfc1->data_size - 3, 0 );
+                thom_floppy_active( machine, 1 );
 	}
 	thmfc1->op = THMFC1_OP_RESET;
 	thmfc1->stat0 |= THMFC1_STAT0_FINISHED;
@@ -1156,6 +1149,7 @@ static void thmfc_floppy_qdd_write_byte ( running_machine *machine, UINT8 data )
 			LOG(( "%f $%04x thmfc_floppy_qdd_write_byte: id field, sector=%i\n", attotime_to_double(timer_get_time(machine)), cpu_get_previouspc(cputag_get_cpu(machine, "maincpu")), sector ));
 
 			floppy_drive_format_sector( thmfc_floppy_image(machine), 0, sector, 0, 0, sector, 128, filler );
+                        thom_floppy_active( machine, 1 );
 			thmfc1->data_idx = 0;
 		}
 
@@ -1185,6 +1179,7 @@ static void thmfc_floppy_qdd_write_byte ( running_machine *machine, UINT8 data )
 				      attotime_to_double(timer_get_time(machine)), cpu_get_previouspc(cputag_get_cpu(machine, "maincpu")), sector ));
 
 				floppy_drive_write_sector_data( img, 0, sector, thmfc1->data + thmfc1->data_idx, 128, 0 );
+                                thom_floppy_active( machine, 1 );
 			}
 
 			thmfc1->data_idx = 0;
@@ -1243,7 +1238,12 @@ static void thmfc_floppy_format_byte ( running_machine *machine, UINT8 data )
 				UINT8 sector = thmfc1->data[6];
 				UINT8 length = thmfc1->data[7]; /* actually, log length */
 				UINT8 filler = 0xe5;            /* standard Thomson filler */
-				floppy_drive_format_sector( img, side, sector, track, thmfc1->side, sector, length, filler );
+                                chrn_id id;
+                                if ( thmfc_floppy_find_sector( machine, &id ) ) 
+                                {                                        
+                                        floppy_drive_format_sector( img, side, thmfc1->sector_id, track, thmfc1->side, sector, length, filler );
+                                        thom_floppy_active( machine, 1 );
+                                }
 			}
 
 			thmfc1->data_idx = 0;
@@ -1353,8 +1353,9 @@ WRITE8_HANDLER ( thmfc_floppy_w )
 		case THMFC1_OP_WRITE_SECT:
 			if ( qdd )
 				logerror( "thmfc_floppy_w: smart operation 1 not supported for QDD\n" );
-			else if ( thmfc_floppy_find_sector( space->machine, NULL ) )
+			else if ( thmfc_floppy_find_sector( space->machine, &id ) )
 			{
+                                thmfc1->sector_id = id.data_id;
 				thmfc1->data_idx = 0;
 				thmfc1->data_size = thmfc1->sector_size + 3; /* A1 A1 FB <data> */
 				thmfc1->data_finish = thmfc1->sector_size + 3;
@@ -1447,6 +1448,7 @@ WRITE8_HANDLER ( thmfc_floppy_w )
 				seek = (data & 0x20) ? 1 : -1;
 			motor =  (data >> 2) & 1;
 			thmfc1->drive |= 1 ^ ((data >> 6) & 1);
+                        img = thmfc_floppy_image(space->machine);
 		}
 
 		thom_floppy_active( space->machine, 0 );
@@ -1565,6 +1567,7 @@ void thmfc_floppy_init( running_machine *machine )
 
 	state_save_register_global( machine, thmfc1->op );
 	state_save_register_global( machine, thmfc1->sector );
+	state_save_register_global( machine, thmfc1->sector_id );
 	state_save_register_global( machine, thmfc1->track );
 	state_save_register_global( machine, thmfc1->side );
 	state_save_register_global( machine, thmfc1->drive );

@@ -54,11 +54,7 @@
 /* TODO (roughly in decreasing priority order):
    ----
 
-   - support all cartridge bank switching methods
-   - THMFC1 support for single density
-   - internal TO9 mouse port (untested)
-   - better state save
-   - support for CD 90-015 floppy controller
+   - internal, keyboard-attached TO9 mouse port (untested)
    - floppy: 2-sided or 4-sided .fd images
    - printer post-processing => postscript
    - RS232 serial port extensions: CC 90-232, RF 57-932
@@ -710,31 +706,30 @@ static MACHINE_DRIVER_START ( to7 )
 
 /* floppy */
      MDRV_MC6843_ADD( "mc6843", to7_6843_itf )
+     MDRV_WD2793_ADD( "wd2793", default_wd17xx_interface )
+     MDRV_FLOPPY_4_DRIVES_ADD(thomson_floppy_config)
 
 /* network */
      MDRV_MC6854_ADD( "mc6854", to7_network_iface )
 
-	/* pia */
-	MDRV_PIA6821_ADD( THOM_PIA_SYS, to7_pia6821_sys )
-	MDRV_PIA6821_ADD( THOM_PIA_IO, to7_pia6821_io )
-	MDRV_PIA6821_ADD( THOM_PIA_GAME, to7_pia6821_game )
-	MDRV_PIA6821_ADD( THOM_PIA_MODEM, to7_pia6821_modem )
-
+/* pia */
+     MDRV_PIA6821_ADD( THOM_PIA_SYS, to7_pia6821_sys )
+     MDRV_PIA6821_ADD( THOM_PIA_IO, to7_pia6821_io )
+     MDRV_PIA6821_ADD( THOM_PIA_GAME, to7_pia6821_game )
+     MDRV_PIA6821_ADD( THOM_PIA_MODEM, to7_pia6821_modem )
+     
 /* acia */
-    MDRV_ACIA6551_ADD("acia")
-
+     MDRV_ACIA6551_ADD("acia")
+     
 /* modem */
-    MDRV_ACIA6850_ADD( "acia6850", to7_modem )
+     MDRV_ACIA6850_ADD( "acia6850", to7_modem )
 
-    MDRV_WD2793_ADD("wd2793", default_wd17xx_interface )
+/* cartridge */
+     MDRV_CARTSLOT_ADD("cart")
+     MDRV_CARTSLOT_EXTENSION_LIST("m7,rom")
+     MDRV_CARTSLOT_NOT_MANDATORY
+     MDRV_CARTSLOT_LOAD(to7_cartridge)
 
-	MDRV_FLOPPY_4_DRIVES_ADD(thomson_floppy_config)
-
-	/* cartridge */
-	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("m7,rom")
-	MDRV_CARTSLOT_NOT_MANDATORY
-	MDRV_CARTSLOT_LOAD(to7_cartridge)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START ( t9000 )
