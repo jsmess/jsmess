@@ -27,6 +27,7 @@
 #include "machine/ctronics.h"
 #include "devices/cassette.h"
 #include "sound/ay8910.h"
+#include "devices/flopdrv.h"
 
 
 UINT8 *oric_ram;
@@ -661,30 +662,15 @@ static void oric_jasmin_set_mem_0x0c000(running_machine *machine)
 	}
 }
 
-static WD17XX_CALLBACK( oric_jasmin_wd179x_callback )
+/* DRQ is connected to interrupt */
+static WRITE_LINE_DEVICE_HANDLER( oric_jasmin_wd179x_drq_w )
 {
-	switch (state)
-	{
-		/* DRQ is connected to interrupt */
-		case WD17XX_DRQ_CLR:
-		{
-			oric_irqs &=~(1<<1);
+	if (state)
+		oric_irqs |= (1<<1);
+	else
+		oric_irqs &=~(1<<1);
 
-			oric_refresh_ints(device->machine);
-		}
-		break;
-
-		case WD17XX_DRQ_SET:
-		{
-			oric_irqs |= (1<<1);
-
-			oric_refresh_ints(device->machine);
-		}
-		break;
-
-		default:
-			break;
-	}
+	oric_refresh_ints(device->machine);
 }
 
 static READ8_HANDLER (oric_jasmin_r)
@@ -815,44 +801,25 @@ static void oric_microdisc_refresh_wd179x_ints(running_machine *machine)
 	oric_refresh_ints(machine);
 }
 
-static WD17XX_CALLBACK( oric_microdisc_wd179x_callback )
+static WRITE_LINE_DEVICE_HANDLER( oric_microdisc_wd179x_intrq_w )
 {
-	switch (state)
-	{
-		case WD17XX_IRQ_CLR:
-		{
-			port_314_r |=(1<<7);
+	oric_wd179x_int_state = state;
 
-			oric_wd179x_int_state = 0;
+	if (state)
+		port_314_r &= ~(1<<7);
+	else
+		port_314_r |=(1<<7);
 
-			oric_microdisc_refresh_wd179x_ints(device->machine);
-		}
-		break;
-
-		case WD17XX_IRQ_SET:
-		{
-			port_314_r &= ~(1<<7);
-
-			oric_wd179x_int_state = 1;
-
-			oric_microdisc_refresh_wd179x_ints(device->machine);
-		}
-		break;
-
-		case WD17XX_DRQ_CLR:
-		{
-			port_318_r |= (1<<7);
-		}
-		break;
-
-		case WD17XX_DRQ_SET:
-		{
-			port_318_r &=~(1<<7);
-		}
-		break;
-	}
+	oric_microdisc_refresh_wd179x_ints(device->machine);
 }
 
+static WRITE_LINE_DEVICE_HANDLER( oric_microdisc_wd179x_drq_w )
+{
+	if (state)
+		port_318_r &=~(1<<7);
+	else
+		port_318_r |= (1<<7);
+}
 
 static void	oric_microdisc_set_mem_0x0c000(running_machine *machine)
 {
@@ -1045,8 +1012,13 @@ static void oric_install_microdisc_interface(running_machine *machine)
 
 /*********************************************************/
 
+static WRITE_LINE_DEVICE_HANDLER( oric_wd179x_intrq_w )
+{
+	if ((input_port_read(device->machine, "FLOPPY") & 0x07) == ORIC_FLOPPY_INTERFACE_MICRODISC)
+		oric_microdisc_wd179x_intrq_w(device, state);
+}
 
-static WD17XX_CALLBACK(oric_wd179x_callback)
+static WRITE_LINE_DEVICE_HANDLER( oric_wd179x_drq_w )
 {
 	switch (input_port_read(device->machine, "FLOPPY") &  0x07)
 	{
@@ -1055,15 +1027,21 @@ static WD17XX_CALLBACK(oric_wd179x_callback)
 		case ORIC_FLOPPY_INTERFACE_APPLE2:
 			return;
 		case ORIC_FLOPPY_INTERFACE_MICRODISC:
-			oric_microdisc_wd179x_callback(device, state, param);
+			oric_microdisc_wd179x_drq_w(device, state);
 			return;
 		case ORIC_FLOPPY_INTERFACE_JASMIN:
-			oric_jasmin_wd179x_callback(device, state, param);
+			oric_jasmin_wd179x_drq_w(device, state);
 			return;
 	}
 }
 
-const wd17xx_interface oric_wd17xx_interface = { oric_wd179x_callback, NULL, {FLOPPY_0,FLOPPY_1,FLOPPY_2,FLOPPY_3} };
+const wd17xx_interface oric_wd17xx_interface =
+{
+	DEVCB_LINE(oric_wd179x_intrq_w),
+	DEVCB_LINE(oric_wd179x_drq_w),
+	NULL,
+	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
+};
 
 static void oric_common_init_machine(running_machine *machine)
 {

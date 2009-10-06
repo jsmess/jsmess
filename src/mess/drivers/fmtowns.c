@@ -118,21 +118,21 @@ static void towns_init_serial_rom(void)
 	int x,y;
 	char code[7] = "USTIJUF";
 	memset(towns_serial_rom,0,256/8);
-	
+
 	for(x=72;x<=194;x++)  // set these bits to 1
 		towns_serial_rom[x/8] |= (1 << (x%8));
-	
+
 	y=0;
 	for(x=195;x<=251;x++)
 	{
 		if(code[y/8] & (1 << (y % 8)))
 			towns_serial_rom[x/8] |= (1 << (x%8));
 	}
-	
+
 	// add Machine ID
 	towns_serial_rom[7] = 0x01;
 	towns_serial_rom[8] = 0x01;
-	
+
 	// serial number?
 	towns_serial_rom[2] = 0x10;
 	towns_serial_rom[3] = 0x6e;
@@ -144,7 +144,7 @@ static void towns_init_serial_rom(void)
 static READ8_HANDLER(towns_system_r)
 {
 	UINT8 ret = 0;
-	
+
 	switch(offset)
 	{
 		case 0x00:
@@ -170,7 +170,7 @@ static READ8_HANDLER(towns_system_r)
 			/* Bit 0 = data, bit 6 = CLK, bit 7 = RESET, bit 5 is always 1? */
 			ret = (towns_serial_rom[towns_srom_position/8] & (1 << (towns_srom_position%8))) ? 1 : 0;
 			ret |= towns_srom_clk;
-			ret |= towns_srom_reset; 
+			ret |= towns_srom_reset;
 			//logerror("SYS: (0x32) Serial ROM read [0x%02x, pos=%i]\n",ret,towns_srom_position);
 			return ret;
 		default:
@@ -203,7 +203,7 @@ static WRITE8_HANDLER(towns_system_w)
 			if((data & 0x80) && towns_srom_reset == 0) // reset
 			{  // reset to beginning
 				towns_srom_position = 0;
-			}			
+			}
 			towns_srom_clk = data & 0x40;
 			towns_srom_reset = data & 0x80;
 			break;
@@ -259,26 +259,12 @@ static WRITE8_HANDLER(towns_dma2_w)
 /*
  *  Floppy Disc Controller (MB8877A)
  */
- 
-static WD17XX_CALLBACK(towns_fdc_irq)
+
+static WRITE_LINE_DEVICE_HANDLER( towns_mb8877a_drq_w )
 {
-	const device_config* dev = devtag_get_device(device->machine,"dma_1");
-	
-	switch(state)
-	{
-		case WD17XX_IRQ_CLR:
-			break;
-		case WD17XX_IRQ_SET:
-			break;
-		case WD17XX_DRQ_CLR:
-			upd71071_dmarq(dev,0,0);
-			break;
-		case WD17XX_DRQ_SET:
-			upd71071_dmarq(dev,1,0);
-			break;
-	}
+	upd71071_dmarq(device, state, 0);
 }
- 
+
 static READ8_HANDLER(towns_floppy_r)
 {
 	const device_config* fdc = devtag_get_device(space->machine,"fdc");
@@ -344,7 +330,7 @@ static WRITE8_HANDLER(towns_floppy_w)
 			// bit 2 - HDISEL
 			// bit 1 - DDEN
 			// bit 0 - IRQMSK
-			logerror("FDC: write %02x to offset 0x08\n",data); 
+			logerror("FDC: write %02x to offset 0x08\n",data);
 			break;
 		case 0x0c:  // drive select
 			switch(data & 0x0f)
@@ -381,7 +367,7 @@ UINT16 towns_fdc_dma_r(running_machine* machine)
 void towns_fdc_dma_w(running_machine* machine, UINT16 data)
 {
 	const device_config* fdc = devtag_get_device(machine,"fdc");
-	wd17xx_data_w(fdc,0,data);	
+	wd17xx_data_w(fdc,0,data);
 }
 
 static READ8_HANDLER(towns_video_440_r)
@@ -407,7 +393,7 @@ static WRITE8_HANDLER(towns_video_5c8_w)
 }
 
 /* Video/CRTC
- * 
+ *
  * 0xfd90 - palette colour select
  * 0xfd92/4/6 - BRG value
  * 0xfd98-9f  - degipal(?)
@@ -567,7 +553,7 @@ static READ8_HANDLER( towns_cmos_low_r )
 
 	if(towns_mainmem_enable != 0)
 		return mess_ram[offset + 0xd8000];
-		
+
 	return cmos[offset];
 }
 
@@ -613,7 +599,7 @@ static READ8_HANDLER( towns_video_cff80_r )
 	UINT8* ROM = memory_region(space->machine,"user");
 	if(towns_mainmem_enable != 0)
 		return mess_ram[offset+0xcff80];
-	
+
 	switch(offset)
 	{
 		case 0x01:  // read/write plane select (bit 0-3 write, bit 6-7 read)
@@ -630,7 +616,7 @@ static READ8_HANDLER( towns_video_cff80_r )
 		default:
 			logerror("VGA: read from invalid or unimplemented memory-mapped port %05x\n",0xcff80+offset*4);
 	}
-	
+
 	return 0;
 }
 
@@ -692,7 +678,7 @@ static WRITE8_HANDLER( towns_video_cff80_w )
 static void towns_update_video_banks(const address_space* space)
 {
 	UINT8* ROM;
-	
+
 	if(towns_mainmem_enable != 0)  // first MB is RAM
 	{
 		memory_set_bankptr(space->machine,1,mess_ram+0xc0000);
@@ -761,7 +747,7 @@ static READ32_HANDLER( towns_video_404_r )
 {
 	if(towns_mainmem_enable != 0)
 		return 0x00000080;
-	
+
 	return 0;
 }
 
@@ -813,14 +799,14 @@ static ADDRESS_MAP_START(towns_mem, ADDRESS_SPACE_PROGRAM, 32)
   // may not be (and probably is not) correct
   AM_RANGE(0x00000000, 0x000bffff) AM_RAM
   AM_RANGE(0x000c0000, 0x000c7fff) AM_READ(SMH_BANK(1))
-  AM_RANGE(0x000c0000, 0x000c7fff) AM_WRITE8(towns_gfx_w,0xffffffff) 
+  AM_RANGE(0x000c0000, 0x000c7fff) AM_WRITE8(towns_gfx_w,0xffffffff)
   AM_RANGE(0x000c8000, 0x000c8fff) AM_READWRITE(SMH_BANK(2),SMH_BANK(2))
   AM_RANGE(0x000c9000, 0x000c9fff) AM_READWRITE(SMH_BANK(3),SMH_BANK(3))
   AM_RANGE(0x000ca000, 0x000ca7ff) AM_READWRITE(SMH_BANK(4),SMH_BANK(5))
   AM_RANGE(0x000ca800, 0x000cafff) AM_READWRITE(SMH_BANK(10),SMH_BANK(10))
-  AM_RANGE(0x000cb000, 0x000cbfff) AM_READWRITE(SMH_BANK(6),SMH_BANK(7)) 
+  AM_RANGE(0x000cb000, 0x000cbfff) AM_READWRITE(SMH_BANK(6),SMH_BANK(7))
   AM_RANGE(0x000cc000, 0x000cff7f) AM_READWRITE(SMH_BANK(8),SMH_BANK(8))
-  AM_RANGE(0x000cff80, 0x000cffff) AM_READWRITE8(towns_video_cff80_r,towns_video_cff80_w,0xffffffff) 
+  AM_RANGE(0x000cff80, 0x000cffff) AM_READWRITE8(towns_video_cff80_r,towns_video_cff80_w,0xffffffff)
   AM_RANGE(0x000d0000, 0x000d7fff) AM_RAM
   AM_RANGE(0x000d8000, 0x000d9fff) AM_READWRITE8(towns_cmos_low_r,towns_cmos_low_w,0xffffffff) // CMOS? RAM
   AM_RANGE(0x000da000, 0x000effff) AM_RAM //READWRITE(SMH_BANK(11),SMH_BANK(11))
@@ -878,7 +864,7 @@ static ADDRESS_MAP_START( towns_io , ADDRESS_SPACE_IO, 32)
   // Keyboard (8042 MCU)
   AM_RANGE(0x0600,0x0607) AM_READWRITE8(towns_keyboard_r, towns_keyboard_w,0x00ff00ff)
   // No idea what this is currently...
-  AM_RANGE(0x0c30,0x0c33) AM_READ8(towns_unknown_r,0x00ff0000) 
+  AM_RANGE(0x0c30,0x0c33) AM_READ8(towns_unknown_r,0x00ff0000)
   // CMOS
   AM_RANGE(0x3000,0x3fff) AM_READWRITE8(towns_cmos8_r, towns_cmos8_w,0x00ff00ff)
   // CRTC / Video (again)
@@ -933,14 +919,14 @@ static VIDEO_UPDATE( towns )
 			dat2 = towns_gfxvram[(x/8) + (y*0x50) + 0x8000];
 			dat3 = towns_gfxvram[(x/8) + (y*0x50) + 0x10000];
 			dat4 = towns_gfxvram[(x/8) + (y*0x50) + 0x18000];
-			colour = (dat1 & (1 << bit) ? 1 : 0) 
+			colour = (dat1 & (1 << bit) ? 1 : 0)
 				| (dat2 & (1 << bit) ? 2 : 0)
 				| (dat3 & (1 << bit) ? 4 : 0)
 				| (dat4 & (1 << bit) ? 8 : 0);
-			*BITMAP_ADDR32(bitmap,y,x) = 
+			*BITMAP_ADDR32(bitmap,y,x) =
 				(towns_palette_r[colour] << 16)
 				| (towns_palette_g[colour] << 8)
-				| (towns_palette_b[colour]); 
+				| (towns_palette_b[colour]);
 		}
 	}
 
@@ -978,7 +964,8 @@ static const struct pic8259_interface towns_pic8259_slave_config =
 
 static const wd17xx_interface towns_mb8877a_interface =
 {
-	towns_fdc_irq,
+	DEVCB_NULL,
+	DEVCB_DEVICE_LINE("dma_1", towns_mb8877a_drq_w),
 	NULL,
 	{FLOPPY_0,FLOPPY_1,FLOPPY_2,FLOPPY_3}
 };

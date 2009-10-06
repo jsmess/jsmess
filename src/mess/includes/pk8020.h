@@ -11,7 +11,6 @@
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
 #include "machine/msm8251.h"
-#include "machine/wd17xx.h"
 #include "devices/cassette.h"
 #include "sound/speaker.h"
 #include "sound/wave.h"

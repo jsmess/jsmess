@@ -100,6 +100,7 @@
 #include "machine/ay31015.h"
 #include "machine/kr2376.h"
 #include "video/m6847.h"
+#include "machine/wd17xx.h"
 
 /* Layout */
 #include "z80ne.lh"

@@ -123,6 +123,8 @@ Notes:
 #include "video/mc6845.h"
 #include "includes/comx35.h"
 #include "machine/rescap.h"
+#include "devices/flopdrv.h"
+
 
 enum
 {
@@ -183,37 +185,27 @@ static int dos_card_active(running_machine *machine)
 }
 
 /* Floppy Disc Controller */
-static WD17XX_CALLBACK( comx35_fdc_callback )
+static WRITE_LINE_DEVICE_HANDLER( comx35_fdc_intrq_w )
+{
+	comx35_state *driver_state = device->machine->driver_data;
+	driver_state->fdc_irq = state;
+}
+
+static WRITE_LINE_DEVICE_HANDLER( comx35_fdc_drq_w )
 {
 	comx35_state *driver_state = device->machine->driver_data;
 
-	switch (state)
-	{
-	case WD17XX_IRQ_SET:
-		driver_state->fdc_irq = 1;
-		break;
-
-	case WD17XX_IRQ_CLR:
-		driver_state->fdc_irq = 0;
-		break;
-
-	case WD17XX_DRQ_SET:
-		if (driver_state->fdc_drq_enable)
-		{
-			driver_state->cdp1802_ef4 = 1;
-		}
-		break;
-
-	case WD17XX_DRQ_CLR:
-		if (driver_state->fdc_drq_enable)
-		{
-			driver_state->cdp1802_ef4 = 0;
-		}
-		break;
-	}
+	if (driver_state->fdc_drq_enable)
+		driver_state->cdp1802_ef4 = state;
 }
 
-const wd17xx_interface comx35_wd17xx_interface = { comx35_fdc_callback, NULL, {FLOPPY_0,FLOPPY_1,FLOPPY_2,FLOPPY_3} };
+const wd17xx_interface comx35_wd17xx_interface =
+{
+	DEVCB_LINE(comx35_fdc_intrq_w),
+	DEVCB_LINE(comx35_fdc_drq_w),
+	NULL,
+	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
+};
 
 static UINT8 fdc_r(const address_space *space)
 {

@@ -7,6 +7,7 @@
 **********************************************************************/
 
 #include "includes/thomson.h"
+#include "machine/wd17xx.h"
 
 
 #define VERBOSE 0 /* 0, 1 or 2 */

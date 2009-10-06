@@ -11,7 +11,6 @@
 #ifndef Z80NE_H_
 #define Z80NE_H_
 
-#include "machine/wd17xx.h"
 
 /***************************************************************************
     CONSTANTS

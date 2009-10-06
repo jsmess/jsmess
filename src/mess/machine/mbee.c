@@ -9,6 +9,7 @@
 ****************************************************************************/
 
 #include "driver.h"
+#include "devices/flopdrv.h"
 #include "includes/mbee.h"
 
 static UINT8 mbee_vsync;
@@ -124,15 +125,29 @@ WRITE8_DEVICE_HANDLER( mbee_pio_w )
 
 *************************************************************************************/
 
-static WD17XX_CALLBACK( mbee_fdc_callback )
+static WRITE_LINE_DEVICE_HANDLER( mbee_fdc_intrq_w )
 {
-	if (WD17XX_IRQ_SET || WD17XX_DRQ_SET)
+	if (state)
 		fdc_status |= 0x80;
 	else
 		fdc_status &= 0x7f;
 }
 
-const wd17xx_interface mbee_wd17xx_interface = { mbee_fdc_callback, NULL, {FLOPPY_0, FLOPPY_1, NULL, NULL }};
+static WRITE_LINE_DEVICE_HANDLER( mbee_fdc_drq_w )
+{
+	if (state)
+		fdc_status |= 0x80;
+	else
+		fdc_status &= 0x7f;
+}
+
+const wd17xx_interface mbee_wd17xx_interface =
+{
+	DEVCB_LINE(mbee_fdc_intrq_w),
+	DEVCB_LINE(mbee_fdc_drq_w),
+	NULL,
+	{FLOPPY_0, FLOPPY_1, NULL, NULL }
+};
 
 READ8_HANDLER ( mbee_fdc_status_r )
 {

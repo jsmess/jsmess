@@ -68,6 +68,7 @@
 
 #include "driver.h"
 #include "cococart.h"
+#include "flopdrv.h"
 #include "includes/coco.h"
 #include "machine/wd17xx.h"
 #include "machine/ds1315.h"
@@ -135,7 +136,8 @@ typedef enum
     PROTOTYPES
 ***************************************************************************/
 
-static WD17XX_CALLBACK( fdc_callback );
+static WRITE_LINE_DEVICE_HANDLER( fdc_intrq_w );
+static WRITE_LINE_DEVICE_HANDLER( fdc_drq_w );
 
 
 /***************************************************************************
@@ -144,7 +146,8 @@ static WD17XX_CALLBACK( fdc_callback );
 
 static const wd17xx_interface coco_wd17xx_interface =
 {
-	fdc_callback,
+	DEVCB_LINE(fdc_intrq_w),
+	DEVCB_LINE(fdc_drq_w),
 	NULL,
 	{FLOPPY_0,FLOPPY_1,FLOPPY_2,FLOPPY_3}
 };
@@ -193,34 +196,26 @@ INLINE rtc_type_t real_time_clock(const device_config *device)
 
 
 /*-------------------------------------------------
-    fdc_callback - callback from the FDC
+    fdc_intrq_w - callback from the FDC
 -------------------------------------------------*/
 
-static WD17XX_CALLBACK( fdc_callback )
+static WRITE_LINE_DEVICE_HANDLER( fdc_intrq_w )
 {
-	const device_config *fdc_device = device->owner;
-	fdc_t *fdc = get_token(fdc_device);
+	fdc_t *fdc = get_token(device->owner);
+	fdc->intrq = state;
+	(*fdc->hwtype->update_lines)(device->owner);
+}
 
-	switch(state)
-	{
-		case WD17XX_IRQ_CLR:
-			fdc->intrq = 0;
-			break;
 
-		case WD17XX_IRQ_SET:
-			fdc->intrq = 1;
-			break;
+/*-------------------------------------------------
+    fdc_drq_w - callback from the FDC
+-------------------------------------------------*/
 
-		case WD17XX_DRQ_CLR:
-			fdc->drq = 0;
-			break;
-
-		case WD17XX_DRQ_SET:
-			fdc->drq = 1;
-			break;
-	}
-
-	(*fdc->hwtype->update_lines)(fdc_device);
+static WRITE_LINE_DEVICE_HANDLER( fdc_drq_w )
+{
+	fdc_t *fdc = get_token(device->owner);
+	fdc->drq = state;
+	(*fdc->hwtype->update_lines)(device->owner);
 }
 
 

@@ -184,17 +184,24 @@ static MACHINE_RESET( enterprise )
     FLOPPY/EXDOS
 ***************************************************************************/
 
-static WD17XX_CALLBACK( enterp_wd1770_callback )
+static WRITE_LINE_DEVICE_HANDLER( enterp_wd1770_intrq_w )
 {
 	ep_state *ep = device->machine->driver_data;
 
-	switch (state)
-	{
-	case WD17XX_IRQ_CLR: ep->exdos_card_value &= ~0x02; break;
-	case WD17XX_IRQ_SET: ep->exdos_card_value |= 0x02; break;
-	case WD17XX_DRQ_CLR: ep->exdos_card_value &= ~0x80; break;
-	case WD17XX_DRQ_SET: ep->exdos_card_value |= 0x80; break;
-	}
+	if (state)
+		ep->exdos_card_value |= 0x02;
+	else
+		ep->exdos_card_value &= ~0x02;
+}
+
+static WRITE_LINE_DEVICE_HANDLER( enterp_wd1770_drq_w )
+{
+	ep_state *ep = device->machine->driver_data;
+
+	if (state)
+		ep->exdos_card_value |= 0x80;
+	else
+		ep->exdos_card_value &= ~0x80;
 }
 
 
@@ -412,7 +419,13 @@ INPUT_PORTS_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-static const wd17xx_interface enterp_wd1770_interface = { enterp_wd1770_callback, NULL, {FLOPPY_0,FLOPPY_1,FLOPPY_2,FLOPPY_3} };
+static const wd17xx_interface enterp_wd1770_interface =
+{
+	DEVCB_LINE(enterp_wd1770_intrq_w),
+	DEVCB_LINE(enterp_wd1770_drq_w),
+	NULL,
+	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
+};
 
 static FLOPPY_OPTIONS_START(enterprise)
 	FLOPPY_OPTION(enterprise, "dsk,img", "Enterprise disk image", basicdsk_identify_default, basicdsk_construct_default,

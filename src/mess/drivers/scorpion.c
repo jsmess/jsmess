@@ -153,9 +153,8 @@ http://www.z88forever.org.uk/zxplus3e/
 #include "sound/ay8910.h"
 #include "sound/speaker.h"
 #include "formats/tzx_cas.h"
-
-#include "machine/wd17xx.h"
 #include "machine/beta.h"
+
 
 /****************************************************************************************************/
 /* Zs Scorpion 256 */

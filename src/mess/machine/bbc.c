@@ -15,6 +15,7 @@
 #include "sound/tms5220.h"
 #include "machine/6522via.h"
 #include "machine/wd17xx.h"
+#include "devices/flopdrv.h"
 #include "includes/bbc.h"
 #include "machine/upd7002.h"
 #include "machine/i8271.h"
@@ -1550,8 +1551,9 @@ static WRITE8_HANDLER( bbc_i8271_write )
 ***************************************/
 
 static int  drive_control;
-/* bit 0: 1 = drq set, bit 1: 1 = irq set */
-static int	bbc_wd177x_drq_irq_state;
+static int bbc_wd177x_irq_state;
+static int bbc_wd177x_drq_state;
+
 
 static int previous_wd177x_int_state;
 
@@ -1580,54 +1582,24 @@ density disc image
 
 static int bbc_1770_IntEnabled;
 
-static WD17XX_CALLBACK( bbc_wd177x_callback)
+/* wd177x_IRQ_SET and latch bit 4 (nmi_enable) are NAND'ED together
+   wd177x_DRQ_SET and latch bit 4 (nmi_enable) are NAND'ED together
+   the output of the above two NAND gates are then OR'ED together and sent to the 6502 NMI line.
+    DRQ and IRQ are active low outputs from wd177x. We use wd177x_DRQ_SET for DRQ = 0,
+    and wd177x_DRQ_CLR for DRQ = 1. Similarly wd177x_IRQ_SET for IRQ = 0 and wd177x_IRQ_CLR
+    for IRQ = 1.
+
+  The above means that if IRQ or DRQ are set, a interrupt should be generated.
+  The nmi_enable decides if interrupts are actually triggered.
+  The nmi is edge triggered, and triggers on a +ve edge.
+*/
+
+static void bbc_update_fdq_int(running_machine *machine, int state)
 {
 	int bbc_state;
-	/* wd177x_IRQ_SET and latch bit 4 (nmi_enable) are NAND'ED together
-       wd177x_DRQ_SET and latch bit 4 (nmi_enable) are NAND'ED together
-       the output of the above two NAND gates are then OR'ED together and sent to the 6502 NMI line.
-        DRQ and IRQ are active low outputs from wd177x. We use wd177x_DRQ_SET for DRQ = 0,
-        and wd177x_DRQ_CLR for DRQ = 1. Similarly wd177x_IRQ_SET for IRQ = 0 and wd177x_IRQ_CLR
-        for IRQ = 1.
-
-      The above means that if IRQ or DRQ are set, a interrupt should be generated.
-      The nmi_enable decides if interrupts are actually triggered.
-      The nmi is edge triggered, and triggers on a +ve edge.
-    */
-
-	logerror("callback $%02X\n", state);
-
-
-	/* update bbc_wd177x_drq_irq_state depending on event */
-	switch (state)
-	{
-        case WD17XX_DRQ_SET:
-		{
-			bbc_wd177x_drq_irq_state |= 1;
-		}
-		break;
-
-		case WD17XX_DRQ_CLR:
-		{
-			bbc_wd177x_drq_irq_state &= ~1;
-		}
-		break;
-
-		case  WD17XX_IRQ_SET:
-		{
-			bbc_wd177x_drq_irq_state |= (1<<1);
-		}
-		break;
-
-		case WD17XX_IRQ_CLR:
-		{
-			bbc_wd177x_drq_irq_state &= ~(1<<1);
-		}
-		break;
-	}
 
 	/* if drq or irq is set, and interrupt is enabled */
-	if (((bbc_wd177x_drq_irq_state & 3)!=0) && (bbc_1770_IntEnabled))
+	if ((bbc_wd177x_irq_state || bbc_wd177x_drq_state) && (bbc_1770_IntEnabled))
 	{
 		/* int trigger */
 		bbc_state = 1;
@@ -1646,18 +1618,31 @@ static WD17XX_CALLBACK( bbc_wd177x_callback)
 		{
 			/* I'll pulse it because if I used hold-line I'm not sure
             it would clear - to be checked */
-			cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI,PULSE_LINE);
+			cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI,PULSE_LINE);
 		}
 	}
 
 	previous_wd177x_int_state = bbc_state;
-
 }
 
-const wd17xx_interface bbc_wd17xx_interface = {
-	bbc_wd177x_callback,
+static WRITE_LINE_DEVICE_HANDLER( bbc_wd177x_intrq_w )
+{
+	bbc_wd177x_irq_state = state;
+	bbc_update_fdq_int(device->machine, state);
+}
+
+static WRITE_LINE_DEVICE_HANDLER( bbc_wd177x_drq_w )
+{
+	bbc_wd177x_drq_state = state;
+	bbc_update_fdq_int(device->machine, state);
+}
+
+const wd17xx_interface bbc_wd17xx_interface =
+{
+	DEVCB_LINE(bbc_wd177x_intrq_w),
+	DEVCB_LINE(bbc_wd177x_drq_w),
 	NULL,
-	{FLOPPY_0,FLOPPY_1,NULL,NULL}
+	{FLOPPY_0, FLOPPY_1, NULL, NULL}
 };
 
 static WRITE8_HANDLER(bbc_wd177x_status_w)

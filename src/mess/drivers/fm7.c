@@ -439,23 +439,14 @@ WRITE8_HANDLER( fm7_init_en_w )
  *  Main CPU: I/O ports 0xfd18 - 0xfd1f
  *  Floppy Disk Controller (MB8877A)
  */
-static WD17XX_CALLBACK( fm7_fdc_irq )
+static WRITE_LINE_DEVICE_HANDLER( fm7_fdc_intrq_w )
 {
-	switch(state)
-	{
-		case WD17XX_IRQ_CLR:
-			fdc_irq_flag = 0;
-			break;
-		case WD17XX_IRQ_SET:
-			fdc_irq_flag = 1;
-			break;
-		case WD17XX_DRQ_CLR:
-			fdc_drq_flag = 0;
-			break;
-		case WD17XX_DRQ_SET:
-			fdc_drq_flag = 1;
-			break;
-	}
+	fdc_irq_flag = state;
+}
+
+static WRITE_LINE_DEVICE_HANDLER( fm7_fdc_drq_w )
+{
+	fdc_drq_flag = state;
 }
 
 static READ8_HANDLER( fm7_fdc_r )
@@ -1808,9 +1799,10 @@ static MACHINE_RESET(fm7)
 
 static const wd17xx_interface fm7_mb8877a_interface =
 {
-	fm7_fdc_irq,
+	DEVCB_LINE(fm7_fdc_intrq_w),
+	DEVCB_LINE(fm7_fdc_drq_w),
 	NULL,
-	{FLOPPY_0,FLOPPY_1,FLOPPY_2,FLOPPY_3}
+	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 
 static const ay8910_interface fm7_psg_intf =

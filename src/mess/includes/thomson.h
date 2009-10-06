@@ -21,7 +21,6 @@
 #include "devices/cartslot.h"
 #include "includes/serial.h"
 #include "devices/cassette.h"
-#include "machine/wd17xx.h"
 #include "machine/mc6843.h"
 #include "machine/mc6846.h"
 #include "machine/mc6854.h"

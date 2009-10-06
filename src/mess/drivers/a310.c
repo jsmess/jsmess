@@ -31,6 +31,7 @@
 
 #include "driver.h"
 #include "machine/wd17xx.h"
+#include "devices/flopdrv.h"
 #include "cpu/arm/arm.h"
 #include "sound/dac.h"
 #include "includes/archimds.h"
@@ -44,26 +45,20 @@ static VIDEO_UPDATE( a310 )
 	return 0;
 }
 
-static WD17XX_CALLBACK ( a310_wd177x_callback )
+static WRITE_LINE_DEVICE_HANDLER( a310_wd177x_intrq_w )
 {
-	switch (state)
-	{
-		case WD17XX_IRQ_CLR:
-			archimedes_clear_fiq(device->machine, ARCHIMEDES_FIQ_FLOPPY);
-			break;
+	if (state)
+		archimedes_request_fiq(device->machine, ARCHIMEDES_FIQ_FLOPPY);
+	else
+		archimedes_clear_fiq(device->machine, ARCHIMEDES_FIQ_FLOPPY);
+}
 
-		case WD17XX_IRQ_SET:
-			archimedes_request_fiq(device->machine, ARCHIMEDES_FIQ_FLOPPY);
-			break;
-
-		case WD17XX_DRQ_CLR:
-			archimedes_clear_fiq(device->machine, ARCHIMEDES_FIQ_FLOPPY_DRQ);
-			break;
-
-		case WD17XX_DRQ_SET:
-			archimedes_request_fiq(device->machine, ARCHIMEDES_FIQ_FLOPPY_DRQ);
-			break;
-	}
+static WRITE_LINE_DEVICE_HANDLER( a310_wd177x_drq_w )
+{
+	if (state)
+		archimedes_request_fiq(device->machine, ARCHIMEDES_FIQ_FLOPPY_DRQ);
+	else
+		archimedes_clear_fiq(device->machine, ARCHIMEDES_FIQ_FLOPPY_DRQ);
 }
 
 static DRIVER_INIT(a310)
@@ -205,10 +200,12 @@ static INPUT_PORTS_START( a310 )
 	PORT_BIT (0xf8, 0x80, IPT_UNUSED)
 INPUT_PORTS_END
 
-static const wd17xx_interface a310_wd17xx_interface = {
-	a310_wd177x_callback,
+static const wd17xx_interface a310_wd17xx_interface =
+{
+	DEVCB_LINE(a310_wd177x_intrq_w),
+	DEVCB_LINE(a310_wd177x_drq_w),
 	NULL,
-	{FLOPPY_0,FLOPPY_1,FLOPPY_2,FLOPPY_3}
+	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 
 static MACHINE_DRIVER_START( a310 )

@@ -710,18 +710,29 @@ set on 7FFDH bit 2 always to 0 (some use it as disk change reset)
 
 */
 
-static WD17XX_CALLBACK( msx_wd179x_int )
+static WRITE_LINE_DEVICE_HANDLER( msx_wd179x_intrq_w )
 {
-	switch (state)
-	{
-		case WD17XX_IRQ_CLR: msx1.dsk_stat |= 0x40; break;
-		case WD17XX_IRQ_SET: msx1.dsk_stat &= ~0x40; break;
-		case WD17XX_DRQ_CLR: msx1.dsk_stat |= 0x80; break;
-		case WD17XX_DRQ_SET: msx1.dsk_stat &= ~0x80; break;
-	}
+	if (state)
+		msx1.dsk_stat &= ~0x40;
+	else
+		msx1.dsk_stat |= 0x40;
 }
 
-const wd17xx_interface msx_wd17xx_interface = { msx_wd179x_int, NULL, {FLOPPY_0,FLOPPY_1,NULL,NULL} };
+static WRITE_LINE_DEVICE_HANDLER( msx_wd179x_drq_w )
+{
+	if (state)
+		msx1.dsk_stat &= ~0x80;
+	else
+		msx1.dsk_stat |= 0x80;
+}
+
+const wd17xx_interface msx_wd17xx_interface =
+{
+	DEVCB_LINE(msx_wd179x_intrq_w),
+	DEVCB_LINE(msx_wd179x_drq_w),
+	NULL,
+	{FLOPPY_0, FLOPPY_1, NULL, NULL}
+};
 
 FLOPPY_OPTIONS_START(msx)
 	FLOPPY_OPTION(msx, "dsk", "MSX SS", basicdsk_identify_default, basicdsk_construct_default,

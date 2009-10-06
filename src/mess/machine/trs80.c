@@ -20,6 +20,8 @@
 
 /* Devices */
 #include "devices/cassette.h"
+#include "devices/flopdrv.h"
+
 
 #ifdef MAME_DEBUG
 #define VERBOSE 1
@@ -773,27 +775,28 @@ INTERRUPT_GEN( trs80_fdc_interrupt )	/* not used - should it be? */
 	trs80_fdc_interrupt_internal(device->machine);
 }
 
-static WD17XX_CALLBACK( trs80_fdc_callback )
+static WRITE_LINE_DEVICE_HANDLER( trs80_fdc_intrq_w )
 {
-	switch (state)
+	if (state)
 	{
-		case WD17XX_IRQ_CLR:
-			if (trs80_model4)
-				trs80_nmi_data = 0;
-			else
-				trs80_int &= ~IRQ_M1_FDC;
-			break;
-		case WD17XX_IRQ_SET:
-			trs80_fdc_interrupt_internal(device->machine);
-			break;
-		case WD17XX_DRQ_CLR:
-		case WD17XX_DRQ_SET:
-			/* do nothing */
-			break;
+		trs80_fdc_interrupt_internal(device->machine);
+	}
+	else
+	{
+		if (trs80_model4)
+			trs80_nmi_data = 0;
+		else
+			trs80_int &= ~IRQ_M1_FDC;
 	}
 }
 
-const wd17xx_interface trs80_wd17xx_interface = { trs80_fdc_callback, NULL, {FLOPPY_0,FLOPPY_1,FLOPPY_2,FLOPPY_3} };
+const wd17xx_interface trs80_wd17xx_interface =
+{
+	DEVCB_LINE(trs80_fdc_intrq_w),
+	DEVCB_NULL,
+	NULL,
+	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
+};
 
 
 /*************************************

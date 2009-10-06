@@ -197,6 +197,10 @@ typedef enum
 typedef struct _wd17xx_t wd17xx_t;
 struct _wd17xx_t
 {
+	/* callbacks */
+	devcb_resolved_write_line out_intrq_func;
+	devcb_resolved_write_line out_drq_func;
+
 	DENSITY   density;				/* FM/MFM, single / double density */
 	wd17xx_type_t type;
 	UINT8	track_reg;				/* value of track register */
@@ -816,24 +820,12 @@ static void wd17xx_read_sector(const device_config *device)
 
 
 
-static void wd17xx_callback(const device_config *device, wd17xx_state_t state)
-{
-	wd17xx_t *w = get_safe_token(device);
-	void *param = NULL;
-	if (w->intf->callback_param)
-		param = (*w->intf->callback_param)(device);
-	if (w->intf->callback)
-		(*w->intf->callback)(device, state, param);
-}
-
-
-
 static void	wd17xx_set_irq(const device_config *device)
 {
 	wd17xx_t *w = get_safe_token(device);
+
 	w->status &= ~STA_2_BUSY;
-	/* generate an IRQ */
-	wd17xx_callback(device, WD17XX_IRQ_SET);
+	devcb_call_write_line(&w->out_intrq_func, ASSERT_LINE);
 }
 
 
@@ -1015,8 +1007,8 @@ static void wd17xx_clear_data_request(const device_config *device)
 	wd17xx_t *w = get_safe_token(device);
 
 //  w->status_drq = 0;
-	wd17xx_callback(device, WD17XX_DRQ_CLR);
 	w->status &= ~STA_2_DRQ;
+	devcb_call_write_line(&w->out_drq_func, CLEAR_LINE);
 }
 
 
@@ -1034,8 +1026,8 @@ static void wd17xx_set_data_request(const device_config *device)
 
 	/* set drq */
 //  w->status_drq = STA_2_DRQ;
-	wd17xx_callback(device, WD17XX_DRQ_SET);
 	w->status |= STA_2_DRQ;
+	devcb_call_write_line(&w->out_drq_func, ASSERT_LINE);
 }
 
 
@@ -1166,7 +1158,7 @@ void wd17xx_set_pause_time(const device_config *device,int usec)
 	wd17xx_t *w = get_safe_token(device);
 	int result = w->status;
 
-	wd17xx_callback(device, WD17XX_IRQ_CLR);
+	devcb_call_write_line(&w->out_intrq_func, CLEAR_LINE);
 
 	/* type 1 command or force int command? */
 	if ((w->command_type==TYPE_I) || (w->command_type==TYPE_IV))
@@ -1332,7 +1324,7 @@ WRITE8_DEVICE_HANDLER ( wd17xx_command_w )
 	floppy_drive_set_motor_state(wd17xx_current_image(device), 1);
 	floppy_drive_set_ready_state(wd17xx_current_image(device), 1,0);
 	/* also cleared by writing command */
-	wd17xx_callback(device, WD17XX_IRQ_CLR);
+	devcb_call_write_line(&w->out_intrq_func, CLEAR_LINE);
 
 	/* clear write protected. On read sector, read track and read dam, write protected bit is clear */
 	w->status &= ~((1<<6) | (1<<5) | (1<<4));
@@ -1743,8 +1735,8 @@ WRITE8_DEVICE_HANDLER( wd17xx_w )
 	}
 }
 
-const wd17xx_interface default_wd17xx_interface = { NULL, NULL, { FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3} };
-const wd17xx_interface default_wd17xx_interface_2_drives = { NULL, NULL, { FLOPPY_0, FLOPPY_1, NULL, NULL} };
+const wd17xx_interface default_wd17xx_interface = { DEVCB_NULL, DEVCB_NULL, NULL, { FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3} };
+const wd17xx_interface default_wd17xx_interface_2_drives = { DEVCB_NULL, DEVCB_NULL, NULL, { FLOPPY_0, FLOPPY_1, NULL, NULL} };
 
 /* device interface */
 static void common_start(const device_config *device, wd17xx_type_t device_type)
@@ -1765,6 +1757,10 @@ static void common_start(const device_config *device, wd17xx_type_t device_type)
 	w->timer_rs = timer_alloc(device->machine, wd17xx_read_sector_callback, (void*)device);
 	w->timer_ws = timer_alloc(device->machine, wd17xx_write_sector_callback, (void*)device);
 	w->pause_time = 40;
+
+	/* resolve callbacks */
+	devcb_resolve_write_line(&w->out_intrq_func, &w->intf->out_intrq_func, device);
+	devcb_resolve_write_line(&w->out_drq_func, &w->intf->out_drq_func, device);
 }
 
 static DEVICE_RESET( wd17xx )

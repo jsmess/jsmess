@@ -80,32 +80,34 @@ static void atarist_fdc_dma_transfer(running_machine *machine)
 	}
 }
 
-static WD17XX_CALLBACK( atarist_fdc_callback )
+static WRITE_LINE_DEVICE_HANDLER( atarist_fdc_intrq_w )
+{
+	atarist_state *driver_state = device->machine->driver_data;
+	driver_state->fdc_irq = state;
+}
+
+static WRITE_LINE_DEVICE_HANDLER( atarist_fdc_drq_w )
 {
 	atarist_state *driver_state = device->machine->driver_data;
 
-	switch (state)
+	if (state)
 	{
-	case WD17XX_IRQ_SET:
-		driver_state->fdc_irq = 1;
-		break;
-
-	case WD17XX_IRQ_CLR:
-		driver_state->fdc_irq = 0;
-		break;
-
-	case WD17XX_DRQ_SET:
 		driver_state->fdc_status |= ATARIST_FLOPPY_STATUS_FDC_DATA_REQUEST;
 		atarist_fdc_dma_transfer(device->machine);
-		break;
-
-	case WD17XX_DRQ_CLR:
+	}
+	else
+	{
 		driver_state->fdc_status &= ~ATARIST_FLOPPY_STATUS_FDC_DATA_REQUEST;
-		break;
 	}
 }
 
-static const wd17xx_interface atarist_wd17xx_interface = { atarist_fdc_callback, NULL, {FLOPPY_0,FLOPPY_1, NULL,NULL} };
+static const wd17xx_interface atarist_wd17xx_interface =
+{
+	DEVCB_LINE(atarist_fdc_intrq_w),
+	DEVCB_LINE(atarist_fdc_drq_w),
+	NULL,
+	{FLOPPY_0, FLOPPY_1, NULL, NULL}
+};
 
 static READ16_HANDLER( atarist_fdc_data_r )
 {

@@ -12,6 +12,8 @@
 #include "machine/wd17xx.h"
 #include "cpu/m68000/m68000.h"
 #include "includes/corvushd.h"
+#include "devices/flopdrv.h"
+
 
 #define VERBOSE 1
 
@@ -578,26 +580,29 @@ static void concept_fdc_init(running_machine *machine, int slot)
 	install_expansion_slot(slot, concept_fdc_reg_r, concept_fdc_reg_w, concept_fdc_rom_r, NULL);
 }
 
-static WD17XX_CALLBACK( fdc_callback )
+static WRITE_LINE_DEVICE_HANDLER( concept_fdc_intrq_w )
 {
-	switch (state)
-	{
-		case WD17XX_IRQ_CLR:
-			fdc_local_status &= ~LS_INT_mask;
-			break;
-		case WD17XX_IRQ_SET:
-			fdc_local_status |= LS_INT_mask;
-			break;
-		case WD17XX_DRQ_CLR:
-			fdc_local_status &= ~LS_DRQ_mask;
-			break;
-		case WD17XX_DRQ_SET:
-			fdc_local_status |= LS_DRQ_mask;
-			break;
-	}
+	if (state)
+		fdc_local_status |= LS_INT_mask;
+	else
+		fdc_local_status &= ~LS_INT_mask;
 }
 
-const wd17xx_interface concept_wd17xx_interface = { fdc_callback, NULL, {FLOPPY_0,FLOPPY_1,FLOPPY_2,FLOPPY_3}};
+static WRITE_LINE_DEVICE_HANDLER( concept_fdc_drq_w )
+{
+	if (state)
+		fdc_local_status |= LS_DRQ_mask;
+	else
+		fdc_local_status &= ~LS_DRQ_mask;
+}
+
+const wd17xx_interface concept_wd17xx_interface =
+{
+	DEVCB_LINE(concept_fdc_intrq_w),
+	DEVCB_LINE(concept_fdc_drq_w),
+	NULL,
+	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
+};
 
 static  READ8_HANDLER(concept_fdc_reg_r)
 {

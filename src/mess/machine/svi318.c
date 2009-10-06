@@ -305,32 +305,30 @@ WRITE8_HANDLER( svi318_psg_port_b_w )
 typedef struct
 {
 	UINT8 driveselect;
-	UINT8 irq_drq;
+	int drq;
+	int irq;
 	UINT8 heads[2];
 } SVI318_FDC_STRUCT;
 
 static SVI318_FDC_STRUCT svi318_fdc;
 
-static WD17XX_CALLBACK( svi_fdc_callback )
+static WRITE_LINE_DEVICE_HANDLER( svi_fdc_intrq_w )
 {
-	switch( state )
-	{
-	case WD17XX_IRQ_CLR:
-		svi318_fdc.irq_drq &= ~0x80;
-		break;
-	case WD17XX_IRQ_SET:
-		svi318_fdc.irq_drq |= 0x80;
-		break;
-	case WD17XX_DRQ_CLR:
-		svi318_fdc.irq_drq &= ~0x40;
-		break;
-	case WD17XX_DRQ_SET:
-		svi318_fdc.irq_drq |= 0x40;
-		break;
-	}
+	svi318_fdc.irq = state;
 }
 
-const wd17xx_interface svi_wd17xx_interface = { svi_fdc_callback, NULL, {FLOPPY_0,FLOPPY_1,NULL,NULL} };
+static WRITE_LINE_DEVICE_HANDLER( svi_fdc_drq_w )
+{
+	svi318_fdc.drq = state;
+}
+
+const wd17xx_interface svi_wd17xx_interface =
+{
+	DEVCB_LINE(svi_fdc_intrq_w),
+	DEVCB_LINE(svi_fdc_drq_w),
+	NULL,
+	{FLOPPY_0, FLOPPY_1, NULL, NULL}
+};
 
 static WRITE8_HANDLER( svi318_fdc_drive_motor_w )
 {
@@ -360,7 +358,12 @@ static WRITE8_HANDLER( svi318_fdc_density_side_w )
 
 static READ8_HANDLER( svi318_fdc_irqdrq_r )
 {
-	return svi318_fdc.irq_drq;
+	UINT8 result = 0;
+
+	result |= svi318_fdc.drq << 6;
+	result |= svi318_fdc.irq << 7;
+
+	return result;
 }
 
 MC6845_UPDATE_ROW( svi806_crtc6845_update_row )

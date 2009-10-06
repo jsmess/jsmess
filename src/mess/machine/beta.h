@@ -7,10 +7,9 @@
     04/05/2008 Created by Miodrag Milanovic
 
 *********************************************************************/
-#ifndef BETA_H
-#define BETA_H
+#ifndef __BETA_H__
+#define __BETA_H__
 
-#include "machine/wd17xx.h"
 
 int betadisk_is_active(const device_config *device);
 void betadisk_enable(const device_config *device);
@@ -44,4 +43,4 @@ WRITE8_DEVICE_HANDLER(betadisk_data_w);
 /* device interface */
 DEVICE_GET_INFO( beta_disk );
 
-#endif /* BETA_H */
+#endif /* __BETA_H__ */

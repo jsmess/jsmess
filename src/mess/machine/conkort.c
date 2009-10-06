@@ -93,6 +93,8 @@ Notes:
 #include "cpu/z80/z80daisy.h"
 #include "machine/wd17xx.h"
 #include "machine/abcbus.h"
+#include "devices/flopdrv.h"
+
 
 /***************************************************************************
     PARAMETERS
@@ -695,58 +697,34 @@ static const z80_daisy_chain fast_daisy_chain[] =
 
 /* FD1791 */
 
-static WD17XX_CALLBACK( slow_wd1791_callback )
+static WRITE_LINE_DEVICE_HANDLER( slow_wd1791_intrq_w )
 {
 	slow_t *conkort = get_safe_token_machine_slow(device->machine);
-
-	switch(state)
-	{
-		case WD17XX_IRQ_CLR:
-			conkort->fdc_irq = 0;
-			break;
-		case WD17XX_IRQ_SET:
-			conkort->fdc_irq = 1;
-			break;
-		case WD17XX_DRQ_CLR:
-			break;
-		case WD17XX_DRQ_SET:
-			break;
-	}
+	conkort->fdc_irq = state;
 }
 
 static const wd17xx_interface slow_wd17xx_interface =
 {
-	slow_wd1791_callback,
+	DEVCB_LINE(slow_wd1791_intrq_w),
+	DEVCB_NULL,
 	NULL,
-	{FLOPPY_0,FLOPPY_1,FLOPPY_2,FLOPPY_3}
+	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 
 /* FD1793 */
 
-static WD17XX_CALLBACK( fast_wd1793_callback )
+static WRITE_LINE_DEVICE_HANDLER( fast_wd1793_drq_w )
 {
 	fast_t *conkort = get_safe_token_machine_fast(device->machine);
-
-	switch(state)
-	{
-		case WD17XX_IRQ_CLR:
-			break;
-		case WD17XX_IRQ_SET:
-			break;
-		case WD17XX_DRQ_CLR:
-			z80dma_rdy_w(conkort->z80dma, 0, 0);
-			break;
-		case WD17XX_DRQ_SET:
-			z80dma_rdy_w(conkort->z80dma, 0, 1);
-			break;
-	}
+	z80dma_rdy_w(conkort->z80dma, 0, state);
 }
 
 static const wd17xx_interface fast_wd17xx_interface =
 {
-	fast_wd1793_callback,
+	DEVCB_NULL,
+	DEVCB_LINE(fast_wd1793_drq_w),
 	NULL,
-	{FLOPPY_0,FLOPPY_1,FLOPPY_2,FLOPPY_3}
+	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 
 /* Machine Driver */

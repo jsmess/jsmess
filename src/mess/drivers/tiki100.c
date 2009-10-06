@@ -553,9 +553,10 @@ static const z80ctc_interface ctc_intf =
 
 static const wd17xx_interface tiki100_wd17xx_interface =
 {
+	DEVCB_NULL,
+	DEVCB_NULL,
 	NULL,
-	NULL,
-	{FLOPPY_0,FLOPPY_1,NULL,NULL}
+	{FLOPPY_0, FLOPPY_1, NULL, NULL}
 };
 
 /* AY-3-8912 Interface */

@@ -5,6 +5,7 @@
 #include "machine/kay_kbd.h"
 #include "devices/snapquik.h"
 #include "includes/kaypro.h"
+#include "devices/flopdrv.h"
 
 
 static const device_config *kayproii_z80pio_g;
@@ -329,23 +330,34 @@ WRITE8_DEVICE_HANDLER( kaypro2x_sio_w )
 static TIMER_CALLBACK( kaypro_timer_callback )
 {
 	if (cpu_get_reg(cputag_get_cpu(machine, "maincpu"), Z80_HALT))
-		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, 1);
+		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-
-static WD17XX_CALLBACK( kaypro_fdc_callback )
+static WRITE_LINE_DEVICE_HANDLER( kaypro_fdc_intrq_w )
 {
-	if ((state == WD17XX_DRQ_SET) || (state == WD17XX_IRQ_SET))
-	{
+	if (state)
 		timer_set(device->machine, ATTOTIME_IN_USEC(25), NULL, 0, kaypro_timer_callback);
-	}
 	else
-	{
-		cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, 0);
-	}
+		cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-const wd17xx_interface kaypro_wd1793_interface = { kaypro_fdc_callback, NULL, {FLOPPY_0,FLOPPY_1,NULL,NULL} };
+static WRITE_LINE_DEVICE_HANDLER( kaypro_fdc_drq_w )
+{
+	if (state)
+		timer_set(device->machine, ATTOTIME_IN_USEC(25), NULL, 0, kaypro_timer_callback);
+	else
+		cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
+
+}
+
+const wd17xx_interface kaypro_wd1793_interface =
+{
+	DEVCB_LINE(kaypro_fdc_intrq_w),
+	DEVCB_LINE(kaypro_fdc_drq_w),
+	NULL,
+	{FLOPPY_0, FLOPPY_1, NULL, NULL}
+};
+
 
 /***********************************************************
 

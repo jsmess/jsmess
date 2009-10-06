@@ -244,29 +244,12 @@ static const z80ctc_interface ctc_intf =
 
 /* WD1795-02 Interface */
 
-static WD17XX_CALLBACK( wd1795_callback )
-{
-	switch (state)
-	{
-	case WD17XX_IRQ_CLR:
-		break;
-
-	case WD17XX_IRQ_SET:
-		break;
-
-	case WD17XX_DRQ_CLR:
-		break;
-
-	case WD17XX_DRQ_SET:
-		break;
-	}
-}
-
 static const wd17xx_interface wd1795_intf =
 {
-	wd1795_callback,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	NULL,
-	{FLOPPY_0,FLOPPY_1,NULL,NULL}
+	{FLOPPY_0, FLOPPY_1, NULL, NULL}
 };
 
 /* Machine Initialization */

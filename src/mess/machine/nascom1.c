@@ -16,6 +16,8 @@
 /* Devices */
 #include "devices/snapquik.h"
 #include "devices/cassette.h"
+#include "devices/flopdrv.h"
+
 
 #define NASCOM1_KEY_RESET	0x02
 #define NASCOM1_KEY_INCR	0x01
@@ -54,19 +56,23 @@ static struct
  *
  *************************************/
 
-static WD17XX_CALLBACK( nascom2_fdc_callback )
+static WRITE_LINE_DEVICE_HANDLER( nascom2_fdc_intrq_w )
 {
-	switch (state)
-	{
-	case WD17XX_IRQ_SET: nascom2_fdc.irq = 1; break;
-	case WD17XX_IRQ_CLR: nascom2_fdc.irq = 0; break;
-	case WD17XX_DRQ_SET: nascom2_fdc.drq = 1; break;
-	case WD17XX_DRQ_CLR: nascom2_fdc.drq = 0; break;
-	}
+	nascom2_fdc.irq = state;
 }
 
+static WRITE_LINE_DEVICE_HANDLER( nascom2_fdc_drq_w )
+{
+	nascom2_fdc.drq = state;
+}
 
-const wd17xx_interface nascom2_wd17xx_interface = { nascom2_fdc_callback, NULL, {FLOPPY_0,FLOPPY_1,FLOPPY_2,FLOPPY_3} };
+const wd17xx_interface nascom2_wd17xx_interface =
+{
+	DEVCB_LINE(nascom2_fdc_intrq_w),
+	DEVCB_LINE(nascom2_fdc_drq_w),
+	NULL,
+	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
+};
 
 
 READ8_HANDLER( nascom2_fdc_select_r )

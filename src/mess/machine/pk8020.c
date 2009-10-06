@@ -8,8 +8,9 @@
 
 
 #include "driver.h"
-#include "cpu/i8085/i8085.h"
 #include "includes/pk8020.h"
+#include "cpu/i8085/i8085.h"
+#include "machine/wd17xx.h"
 
 static UINT8 attr = 0;
 static UINT8 text_attr = 0;

@@ -367,30 +367,39 @@ static void ti99_install_tracktranslate_procs(running_machine *machine)
 /*
     callback called whenever DRQ/IRQ state change
 */
-static WD17XX_CALLBACK( fdc_callback )
+static WRITE_LINE_DEVICE_HANDLER( ti99_fdc_intrq_w )
 {
-	switch (state)
+	if (state)
 	{
-	case WD17XX_IRQ_CLR:
-		DRQ_IRQ_status &= ~fdc_IRQ;
-		ti99_peb_set_ilb_bit(device->machine, intb_fdc_bit, 0);
-		break;
-	case WD17XX_IRQ_SET:
 		DRQ_IRQ_status |= fdc_IRQ;
 		ti99_peb_set_ilb_bit(device->machine, intb_fdc_bit, 1);
-		break;
-	case WD17XX_DRQ_CLR:
-		DRQ_IRQ_status &= ~fdc_DRQ;
-		break;
-	case WD17XX_DRQ_SET:
-		DRQ_IRQ_status |= fdc_DRQ;
-		break;
+	}
+	else
+	{
+		DRQ_IRQ_status &= ~fdc_IRQ;
+		ti99_peb_set_ilb_bit(device->machine, intb_fdc_bit, 0);
 	}
 
 	fdc_handle_hold(device->machine);
 }
 
-const wd17xx_interface ti99_wd17xx_interface = { fdc_callback, NULL, {FLOPPY_0,FLOPPY_1,FLOPPY_2,FLOPPY_3} };
+static WRITE_LINE_DEVICE_HANDLER( ti99_fdc_drq_w )
+{
+	if (state)
+		DRQ_IRQ_status |= fdc_DRQ;
+	else
+		DRQ_IRQ_status &= ~fdc_DRQ;
+
+	fdc_handle_hold(device->machine);
+}
+
+const wd17xx_interface ti99_wd17xx_interface =
+{
+	DEVCB_LINE(ti99_fdc_intrq_w),
+	DEVCB_LINE(ti99_fdc_drq_w),
+	NULL,
+	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
+};
 
 
 /*

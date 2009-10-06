@@ -67,6 +67,7 @@
 #include "machine/6551.h"
 #include "image.h"
 #include "machine/wd17xx.h"
+#include "devices/flopdrv.h"
 
 #include "debug/debugcpu.h"
 #include "debug/debugcon.h"
@@ -923,36 +924,29 @@ static void cpu1_recalc_firq(running_machine *machine, int state)
 /* Dragon Beta onboard FDC */
 /********************************************************************************************/
 
-static WD17XX_CALLBACK( dgnbeta_fdc_callback )
+/* The INTRQ line goes through pia2 ca1, in exactly the same way as DRQ from DragonDos does */
+static WRITE_LINE_DEVICE_HANDLER( dgnbeta_fdc_intrq_w )
 {
-	/* The INTRQ line goes through pia2 ca1, in exactly the same way as DRQ from DragonDos does */
-	/* DRQ is routed through various logic to the FIRQ inturrupt line on *BOTH* CPUs */
-	const device_config *pia_2 = devtag_get_device( device->machine, "pia_2" );
-
-	switch(state)
-	{
-		case WD17XX_IRQ_CLR:
-			pia6821_ca1_w(pia_2, 0, CLEAR_LINE);
-			break;
-		case WD17XX_IRQ_SET:
-			pia6821_ca1_w(pia_2, 0, ASSERT_LINE);
-			break;
-		case WD17XX_DRQ_CLR:
-			/*wd2797_drq=CLEAR_LINE;*/
-			cpu1_recalc_firq(device->machine, CLEAR_LINE);
-			break;
-		case WD17XX_DRQ_SET:
-			/*wd2797_drq=ASSERT_LINE;*/
-			cpu1_recalc_firq(device->machine, ASSERT_LINE);
-			break;
-	}
-
-	LOG_DISK(("dgnbeta_fdc_callback(%d)\n",state));
+	LOG_DISK(("dgnbeta_fdc_intrq_w(%d)\n", state));
+	pia6821_ca1_w(device, 0, state);
 }
 
-const wd17xx_interface dgnbeta_wd17xx_interface = { dgnbeta_fdc_callback, NULL, {FLOPPY_0,FLOPPY_1,FLOPPY_2,FLOPPY_3}};
+/* DRQ is routed through various logic to the FIRQ inturrupt line on *BOTH* CPUs */
+static WRITE_LINE_DEVICE_HANDLER( dgnbeta_fdc_drq_w )
+{
+	LOG_DISK(("dgnbeta_fdc_drq_w(%d)\n", state));
+	cpu1_recalc_firq(device->machine, state);
+}
 
- READ8_HANDLER(dgnbeta_wd2797_r)
+const wd17xx_interface dgnbeta_wd17xx_interface =
+{
+	DEVCB_DEVICE_LINE("pia_2", dgnbeta_fdc_intrq_w),
+	DEVCB_LINE(dgnbeta_fdc_drq_w),
+	NULL,
+	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
+};
+
+READ8_HANDLER(dgnbeta_wd2797_r)
 {
 	int result = 0;
 	const device_config *fdc = devtag_get_device(space->machine, "wd179x");

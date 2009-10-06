@@ -873,27 +873,6 @@ static WRITE8_HANDLER( rom_data_w )
 //static UINT8 fdc_side;
 //static UINT8 fdc_drive;
 
-static WD17XX_CALLBACK( x1_fdc_irq )
-{
-	#if 0
-	switch(state)
-	{
-		case WD17XX_IRQ_CLR:
-			fdc_irq_flag = 0;
-			break;
-		case WD17XX_IRQ_SET:
-			fdc_irq_flag = 1;
-			break;
-		case WD17XX_DRQ_CLR:
-			fdc_drq_flag = 0;
-			break;
-		case WD17XX_DRQ_SET:
-			fdc_drq_flag = 1;
-			break;
-	}
-	#endif
-}
-
 static READ8_HANDLER( x1_fdc_r )
 {
 	const device_config* dev = devtag_get_device(space->machine,"fdc");
@@ -954,9 +933,10 @@ static WRITE8_HANDLER( x1_fdc_w )
 
 static const wd17xx_interface x1_mb8877a_interface =
 {
-	x1_fdc_irq,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	NULL,
-	{FLOPPY_0,FLOPPY_1,FLOPPY_2,FLOPPY_3}
+	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 
 /*************************************

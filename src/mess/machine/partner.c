@@ -16,6 +16,7 @@
 #include "video/i8275.h"
 #include "includes/radio86.h"
 #include "includes/partner.h"
+#include "devices/flopdrv.h"
 
 static UINT8 partner_mem_page;
 static UINT8 partner_win_mem_page;
@@ -27,24 +28,19 @@ DRIVER_INIT(partner)
 	radio86_tape_value = 0x80;
 }
 
-static WD17XX_CALLBACK( partner_wd17xx_callback )
+static WRITE_LINE_DEVICE_HANDLER( partner_wd17xx_drq_w )
 {
-	const device_config *dma8257 = devtag_get_device(device->machine, "dma8257");
-	switch(state)
-	{
-		case WD17XX_IRQ_CLR:
-			break;
-		case WD17XX_IRQ_SET:
-			break;
-		case WD17XX_DRQ_CLR:
-			break;
-		case WD17XX_DRQ_SET:
-			dma8257_drq_w(dma8257, 0, 1);
-			break;
-	}
+	if (state)
+		dma8257_drq_w(device, 0, 1);
 }
 
-const wd17xx_interface partner_wd17xx_interface = { partner_wd17xx_callback, NULL, {FLOPPY_0,FLOPPY_1,NULL,NULL} };
+const wd17xx_interface partner_wd17xx_interface =
+{
+	DEVCB_NULL,
+	DEVCB_DEVICE_LINE("dma8257", partner_wd17xx_drq_w),
+	NULL,
+	{FLOPPY_0, FLOPPY_1, NULL, NULL}
+};
 
 MACHINE_START(partner)
 {

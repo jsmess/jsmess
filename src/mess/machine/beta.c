@@ -67,41 +67,33 @@ void betadisk_clear_status(const device_config *device)
 	beta->betadisk_status = 0;
 }
 
-static WD17XX_CALLBACK( betadisk_wd179x_callback )
+static WRITE_LINE_DEVICE_HANDLER( betadisk_wd179x_intrq_w )
 {
-	const device_config *wd_device = devtag_get_device(device->machine, BETA_DISK_TAG);
-	beta_disk_state *beta = get_safe_token(wd_device);
-	if (wd_device->started) {
-		switch (state)
-		{
-			case WD17XX_DRQ_SET:
-			{
-				beta->betadisk_status |= (1<<6);
-			}
-			break;
+	beta_disk_state *beta = get_safe_token(device->owner);
 
-			case WD17XX_DRQ_CLR:
-			{
-				beta->betadisk_status &=~(1<<6);
-			}
-			break;
-
-			case WD17XX_IRQ_SET:
-			{
-				beta->betadisk_status |= (1<<7);
-			}
-			break;
-
-			case WD17XX_IRQ_CLR:
-			{
-				beta->betadisk_status &=~(1<<7);
-			}
-			break;
-		}
-	}
+	if (state)
+		beta->betadisk_status |= (1<<7);
+	else
+		beta->betadisk_status &=~(1<<7);
 }
 
-static const wd17xx_interface beta_wd17xx_interface = { betadisk_wd179x_callback, NULL, {FLOPPY_0,FLOPPY_1,FLOPPY_2,FLOPPY_3} };
+static WRITE_LINE_DEVICE_HANDLER( betadisk_wd179x_drq_w )
+{
+	beta_disk_state *beta = get_safe_token(device->owner);
+
+	if (state)
+		beta->betadisk_status |= (1<<6);
+	else
+		beta->betadisk_status &=~(1<<6);
+}
+
+static const wd17xx_interface beta_wd17xx_interface =
+{
+	DEVCB_LINE(betadisk_wd179x_intrq_w),
+	DEVCB_LINE(betadisk_wd179x_drq_w),
+	NULL,
+	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
+};
 
 READ8_DEVICE_HANDLER(betadisk_status_r)
 {

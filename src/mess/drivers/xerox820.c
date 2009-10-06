@@ -492,35 +492,38 @@ static const z80_daisy_chain xerox820_daisy_chain[] =
 
 /* WD1771 Interface */
 
-static WD17XX_CALLBACK( wd1771_callback )
+static WRITE_LINE_DEVICE_HANDLER( xerox820_wd1771_intrq_w )
 {
 	xerox820_state *driver_state = device->machine->driver_data;
-
 	int halt = cpu_get_reg(cputag_get_cpu(device->machine, Z80_TAG), Z80_HALT);
 
-	switch (state)
-	{
-	case WD17XX_IRQ_CLR: driver_state->fdc_irq = 0; break;
-	case WD17XX_IRQ_SET: driver_state->fdc_irq = 1; break;
-	case WD17XX_DRQ_CLR: driver_state->fdc_drq = 0; break;
-	case WD17XX_DRQ_SET: driver_state->fdc_drq = 1; break;
-	}
+	driver_state->fdc_irq = state;
 
-	if (halt && (driver_state->fdc_irq | driver_state->fdc_drq))
-	{
+	if (halt && state)
 		cputag_set_input_line(device->machine, Z80_TAG, INPUT_LINE_NMI, ASSERT_LINE);
-	}
 	else
-	{
 		cputag_set_input_line(device->machine, Z80_TAG, INPUT_LINE_NMI, CLEAR_LINE);
-	}
+}
+
+static WRITE_LINE_DEVICE_HANDLER( xerox820_wd1771_drq_w )
+{
+	xerox820_state *driver_state = device->machine->driver_data;
+	int halt = cpu_get_reg(cputag_get_cpu(device->machine, Z80_TAG), Z80_HALT);
+
+	driver_state->fdc_drq = state;
+
+	if (halt && state)
+		cputag_set_input_line(device->machine, Z80_TAG, INPUT_LINE_NMI, ASSERT_LINE);
+	else
+		cputag_set_input_line(device->machine, Z80_TAG, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 static const wd17xx_interface wd1771_intf =
 {
-	wd1771_callback,
+	DEVCB_LINE(xerox820_wd1771_intrq_w),
+	DEVCB_LINE(xerox820_wd1771_drq_w),
 	NULL,
-	{FLOPPY_0,FLOPPY_1,NULL,NULL}
+	{FLOPPY_0, FLOPPY_1, NULL, NULL}
 };
 
 /* COM8116 Interface */

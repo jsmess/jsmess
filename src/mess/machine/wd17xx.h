@@ -7,10 +7,11 @@
 
 *********************************************************************/
 
-#ifndef WD179X_H
-#define WD179X_H
+#ifndef __WD17XX_H__
+#define __WD17XX_H__
 
-#include "devices/flopdrv.h"
+#include "devcb.h"
+
 
 /***************************************************************************
     MACROS
@@ -26,17 +27,10 @@
 #define WD177X		DEVICE_GET_INFO_NAME(wd177x)
 #define MB8877		DEVICE_GET_INFO_NAME(mb8877)
 
+
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
-
-typedef enum
-{
-	WD17XX_IRQ_CLR,
-	WD17XX_IRQ_SET,
-	WD17XX_DRQ_CLR,
-	WD17XX_DRQ_SET
-} wd17xx_state_t;
 
 typedef enum
 {
@@ -46,9 +40,6 @@ typedef enum
 	DEN_MFM_HI
 } DENSITY;
 
-typedef void (*wd17xx_callback_func)(const device_config *device, wd17xx_state_t state, void *param);
-#define WD17XX_CALLBACK(name)	void name(const device_config *device, wd17xx_state_t state, void *param )
-
 typedef void* (*wd17xx_param_callback_func)(const device_config *device);
 #define WD17XX_PARAM_CALLBACK(name)	void* name(const device_config *device)
 
@@ -56,7 +47,8 @@ typedef void* (*wd17xx_param_callback_func)(const device_config *device);
 typedef struct _wd17xx_interface wd17xx_interface;
 struct _wd17xx_interface
 {
-	wd17xx_callback_func callback;
+	devcb_write_line out_intrq_func;
+	devcb_write_line out_drq_func;
 	wd17xx_param_callback_func callback_param;
 	const char *floppy_drive_tags[4];
 };
@@ -101,6 +93,8 @@ void wd17xx_set_pause_time(const device_config *device, int usec); /* default is
 
 extern const wd17xx_interface default_wd17xx_interface;
 extern const wd17xx_interface default_wd17xx_interface_2_drives;
+
+
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
@@ -142,7 +136,4 @@ extern const wd17xx_interface default_wd17xx_interface_2_drives;
 	MDRV_DEVICE_CONFIG(_intrf)
 
 
-#endif /* WD179X_H */
-
-
-
+#endif /* __WD17XX_H__ */

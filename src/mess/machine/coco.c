@@ -99,6 +99,7 @@ easier to manage.
 #include "sound/ay8910.h"
 #include "devices/cococart.h"
 #include "devices/cartslot.h"
+#include "devices/flopdrv.h"
 
 
 /***************************************************************************
@@ -1748,36 +1749,35 @@ static void dragon_page_rom(running_machine *machine, int romswitch)
 /* Dragon Alpha onboard FDC */
 /********************************************************************************************/
 
-static WD17XX_CALLBACK( dgnalpha_fdc_callback )
+/* The NMI line on the alphaAlpha is gated through IC16 (early PLD), and is gated by pia2 CA2  */
+static WRITE_LINE_DEVICE_HANDLER( dgnalpha_fdc_intrq_w )
 {
-	/* The NMI line on the alphaAlpha is gated through IC16 (early PLD), and is gated by pia2 CA2  */
-	/* The DRQ line goes through pia2 cb1, in exactly the same way as DRQ from DragonDos does */
-	/* for pia1 cb1 */
 	coco_state *cstate = device->machine->driver_data;
 
-	switch(state)
+	if (state)
 	{
-		case WD17XX_IRQ_CLR:
-			cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
-			break;
-		case WD17XX_IRQ_SET:
-			if(dgnalpha_just_reset)
-			{
-				dgnalpha_just_reset = 0;
-			}
-			else
-			{
-				if (pia6821_get_output_ca2_z(cstate->pia_2))
-					cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
-			}
-			break;
-		case WD17XX_DRQ_CLR:
-			pia6821_cb1_w(cstate->pia_2, 0, CARTLINE_CLEAR);
-			break;
-		case WD17XX_DRQ_SET:
-			pia6821_cb1_w(cstate->pia_2, 0, CARTLINE_ASSERTED);
-			break;
+		if(dgnalpha_just_reset)
+		{
+			dgnalpha_just_reset = 0;
+		}
+		else
+		{
+			if (pia6821_get_output_ca2_z(cstate->pia_2))
+				cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
+		}
 	}
+	else
+	{
+		cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
+	}
+}
+
+/* The DRQ line goes through pia2 cb1, in exactly the same way as DRQ from DragonDos does */
+/* for pia1 cb1 */
+static WRITE_LINE_DEVICE_HANDLER( dgnalpha_fdc_drq_w )
+{
+	coco_state *cstate = device->machine->driver_data;
+	pia6821_cb1_w(cstate->pia_2, 0, state ? CARTLINE_ASSERTED : CARTLINE_CLEAR);
 }
 
 /* The Dragon Alpha hardware reverses the order of the WD2797 registers */
@@ -2919,11 +2919,14 @@ MACHINE_START( dgnalpha )
 	dgnalpha_just_reset=1;
 }
 
-const wd17xx_interface dgnalpha_wd17xx_interface = {
-	dgnalpha_fdc_callback,
+const wd17xx_interface dgnalpha_wd17xx_interface =
+{
+	DEVCB_LINE(dgnalpha_fdc_intrq_w),
+	DEVCB_LINE(dgnalpha_fdc_drq_w),
 	NULL,
-	{FLOPPY_0,FLOPPY_1,FLOPPY_2,FLOPPY_3}
+	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
+
 /******* Machine Setups CoCos **********/
 
 MACHINE_START( coco )

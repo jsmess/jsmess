@@ -1048,31 +1048,24 @@ static msm8251_interface sio_8251_intf =
 
 /* MB8877 Interface */
 
-static WD17XX_CALLBACK( v1050_mb8877_callback )
+static WRITE_LINE_DEVICE_HANDLER( v1050_mb8877_intrq_w )
 {
 	v1050_state *driver_state = device->machine->driver_data;
 
 	if (driver_state->f_int_enb)
+		v1050_set_int(device->machine, INT_FLOPPY, state);
 	{
-		switch (state)
-		{
-		case WD17XX_IRQ_CLR:
-			v1050_set_int(device->machine, INT_FLOPPY, 0);
-			break;
-
-		case WD17XX_IRQ_SET:
-			v1050_set_int(device->machine, INT_FLOPPY, 1);
-			break;
-
-		case WD17XX_DRQ_CLR:
-			cputag_set_input_line(device->machine, Z80_TAG, INPUT_LINE_NMI, CLEAR_LINE);
-			break;
-
-		case WD17XX_DRQ_SET:
-			cputag_set_input_line(device->machine, Z80_TAG, INPUT_LINE_NMI, ASSERT_LINE);
-			break;
-		}
+		v1050_set_int(device->machine, INT_FLOPPY, 0);
+		cputag_set_input_line(device->machine, Z80_TAG, INPUT_LINE_NMI, CLEAR_LINE);
 	}
+}
+
+static WRITE_LINE_DEVICE_HANDLER( v1050_mb8877_drq_w )
+{
+	v1050_state *driver_state = device->machine->driver_data;
+
+	if (driver_state->f_int_enb)
+		cputag_set_input_line(device->machine, Z80_TAG, INPUT_LINE_NMI, state);
 	else
 	{
 		v1050_set_int(device->machine, INT_FLOPPY, 0);
@@ -1082,7 +1075,8 @@ static WD17XX_CALLBACK( v1050_mb8877_callback )
 
 static const wd17xx_interface v1050_wd17xx_intf =
 {
-	v1050_mb8877_callback,
+	DEVCB_LINE(v1050_mb8877_intrq_w),
+	DEVCB_LINE(v1050_mb8877_drq_w),
 	NULL,
 	{FLOPPY_0,FLOPPY_1,NULL,NULL}
 };

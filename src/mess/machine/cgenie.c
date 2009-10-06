@@ -15,6 +15,7 @@
 #include "devices/cassette.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
+#include "devices/flopdrv.h"
 
 
 #define AYWriteReg(chip,port,value) \
@@ -425,32 +426,33 @@ INTERRUPT_GEN( cgenie_timer_interrupt )
 	}
 }
 
-static  WD17XX_CALLBACK( cgenie_fdc_callback )
+static WRITE_LINE_DEVICE_HANDLER( cgenie_fdc_intrq_w )
 {
 	/* if disc hardware is not enabled, do not cause an int */
 	if (!( input_port_read(device->machine, "DSW0") & 0x80 ))
 		return;
 
-	switch( state )
+	if (state)
 	{
-		case WD17XX_IRQ_CLR:
-			irq_status &= ~IRQ_FDC;
-			break;
-		case WD17XX_IRQ_SET:
-			if( (irq_status & IRQ_FDC) == 0 )
-			{
-				irq_status |= IRQ_FDC;
-				cputag_set_input_line(device->machine, "maincpu", 0, HOLD_LINE);
-			}
-			break;
-		case WD17XX_DRQ_CLR:
-		case WD17XX_DRQ_SET:
-			/* do nothing */
-			break;
+		if( (irq_status & IRQ_FDC) == 0 )
+		{
+			irq_status |= IRQ_FDC;
+			cputag_set_input_line(device->machine, "maincpu", 0, HOLD_LINE);
+		}
+	}
+	else
+	{
+		irq_status &= ~IRQ_FDC;
 	}
 }
 
-const wd17xx_interface cgenie_wd17xx_interface = { cgenie_fdc_callback, NULL, {FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3} };
+const wd17xx_interface cgenie_wd17xx_interface =
+{
+	DEVCB_LINE(cgenie_fdc_intrq_w),
+	DEVCB_NULL,
+	NULL,
+	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
+};
 
 WRITE8_HANDLER( cgenie_motor_w )
 {
