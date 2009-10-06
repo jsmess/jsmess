@@ -397,7 +397,6 @@ const wd17xx_interface ti99_wd17xx_interface =
 {
 	DEVCB_LINE(ti99_fdc_intrq_w),
 	DEVCB_LINE(ti99_fdc_drq_w),
-	NULL,
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 

@@ -966,7 +966,6 @@ static const wd17xx_interface towns_mb8877a_interface =
 {
 	DEVCB_NULL,
 	DEVCB_DEVICE_LINE("dma_1", towns_mb8877a_drq_w),
-	NULL,
 	{FLOPPY_0,FLOPPY_1,FLOPPY_2,FLOPPY_3}
 };
 

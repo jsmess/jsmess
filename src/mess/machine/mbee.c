@@ -145,7 +145,6 @@ const wd17xx_interface mbee_wd17xx_interface =
 {
 	DEVCB_LINE(mbee_fdc_intrq_w),
 	DEVCB_LINE(mbee_fdc_drq_w),
-	NULL,
 	{FLOPPY_0, FLOPPY_1, NULL, NULL }
 };
 

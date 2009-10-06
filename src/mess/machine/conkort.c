@@ -707,7 +707,6 @@ static const wd17xx_interface slow_wd17xx_interface =
 {
 	DEVCB_LINE(slow_wd1791_intrq_w),
 	DEVCB_NULL,
-	NULL,
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 
@@ -723,7 +722,6 @@ static const wd17xx_interface fast_wd17xx_interface =
 {
 	DEVCB_NULL,
 	DEVCB_LINE(fast_wd1793_drq_w),
-	NULL,
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 

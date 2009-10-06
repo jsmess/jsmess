@@ -730,7 +730,6 @@ const wd17xx_interface msx_wd17xx_interface =
 {
 	DEVCB_LINE(msx_wd179x_intrq_w),
 	DEVCB_LINE(msx_wd179x_drq_w),
-	NULL,
 	{FLOPPY_0, FLOPPY_1, NULL, NULL}
 };
 

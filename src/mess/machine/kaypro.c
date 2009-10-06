@@ -354,7 +354,6 @@ const wd17xx_interface kaypro_wd1793_interface =
 {
 	DEVCB_LINE(kaypro_fdc_intrq_w),
 	DEVCB_LINE(kaypro_fdc_drq_w),
-	NULL,
 	{FLOPPY_0, FLOPPY_1, NULL, NULL}
 };
 

@@ -204,7 +204,6 @@ static const wd17xx_interface a310_wd17xx_interface =
 {
 	DEVCB_LINE(a310_wd177x_intrq_w),
 	DEVCB_LINE(a310_wd177x_drq_w),
-	NULL,
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 

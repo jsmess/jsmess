@@ -40,18 +40,15 @@ typedef enum
 	DEN_MFM_HI
 } DENSITY;
 
-typedef void* (*wd17xx_param_callback_func)(const device_config *device);
-#define WD17XX_PARAM_CALLBACK(name)	void* name(const device_config *device)
-
 /* Interface */
 typedef struct _wd17xx_interface wd17xx_interface;
 struct _wd17xx_interface
 {
 	devcb_write_line out_intrq_func;
 	devcb_write_line out_drq_func;
-	wd17xx_param_callback_func callback_param;
 	const char *floppy_drive_tags[4];
 };
+
 
 /***************************************************************************
     FUNCTION PROTOTYPES

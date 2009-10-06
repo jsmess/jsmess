@@ -796,7 +796,6 @@ static const wd17xx_interface bw2_wd17xx_interface =
 {
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
 	DEVCB_LINE(bw2_wd17xx_drq_w),
-	NULL,
 	{FLOPPY_0, FLOPPY_1, NULL, NULL}
 };
 

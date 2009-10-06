@@ -105,7 +105,6 @@ static const wd17xx_interface atarist_wd17xx_interface =
 {
 	DEVCB_LINE(atarist_fdc_intrq_w),
 	DEVCB_LINE(atarist_fdc_drq_w),
-	NULL,
 	{FLOPPY_0, FLOPPY_1, NULL, NULL}
 };
 

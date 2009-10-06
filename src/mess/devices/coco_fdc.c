@@ -148,7 +148,6 @@ static const wd17xx_interface coco_wd17xx_interface =
 {
 	DEVCB_LINE(fdc_intrq_w),
 	DEVCB_LINE(fdc_drq_w),
-	NULL,
 	{FLOPPY_0,FLOPPY_1,FLOPPY_2,FLOPPY_3}
 };
 

@@ -1641,7 +1641,6 @@ const wd17xx_interface bbc_wd17xx_interface =
 {
 	DEVCB_LINE(bbc_wd177x_intrq_w),
 	DEVCB_LINE(bbc_wd177x_drq_w),
-	NULL,
 	{FLOPPY_0, FLOPPY_1, NULL, NULL}
 };
 

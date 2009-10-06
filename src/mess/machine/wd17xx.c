@@ -1735,8 +1735,8 @@ WRITE8_DEVICE_HANDLER( wd17xx_w )
 	}
 }
 
-const wd17xx_interface default_wd17xx_interface = { DEVCB_NULL, DEVCB_NULL, NULL, { FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3} };
-const wd17xx_interface default_wd17xx_interface_2_drives = { DEVCB_NULL, DEVCB_NULL, NULL, { FLOPPY_0, FLOPPY_1, NULL, NULL} };
+const wd17xx_interface default_wd17xx_interface = { DEVCB_NULL, DEVCB_NULL, { FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3} };
+const wd17xx_interface default_wd17xx_interface_2_drives = { DEVCB_NULL, DEVCB_NULL, { FLOPPY_0, FLOPPY_1, NULL, NULL} };
 
 /* device interface */
 static void common_start(const device_config *device, wd17xx_type_t device_type)

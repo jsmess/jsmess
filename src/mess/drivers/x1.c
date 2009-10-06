@@ -935,9 +935,9 @@ static const wd17xx_interface x1_mb8877a_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
-	NULL,
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
+
 
 /*************************************
  *

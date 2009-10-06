@@ -555,7 +555,6 @@ static const wd17xx_interface tiki100_wd17xx_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
-	NULL,
 	{FLOPPY_0, FLOPPY_1, NULL, NULL}
 };
 

@@ -1077,7 +1077,6 @@ static const wd17xx_interface v1050_wd17xx_intf =
 {
 	DEVCB_LINE(v1050_mb8877_intrq_w),
 	DEVCB_LINE(v1050_mb8877_drq_w),
-	NULL,
 	{FLOPPY_0,FLOPPY_1,NULL,NULL}
 };
 

@@ -38,7 +38,6 @@ const wd17xx_interface partner_wd17xx_interface =
 {
 	DEVCB_NULL,
 	DEVCB_DEVICE_LINE("dma8257", partner_wd17xx_drq_w),
-	NULL,
 	{FLOPPY_0, FLOPPY_1, NULL, NULL}
 };
 

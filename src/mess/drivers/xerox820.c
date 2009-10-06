@@ -522,7 +522,6 @@ static const wd17xx_interface wd1771_intf =
 {
 	DEVCB_LINE(xerox820_wd1771_intrq_w),
 	DEVCB_LINE(xerox820_wd1771_drq_w),
-	NULL,
 	{FLOPPY_0, FLOPPY_1, NULL, NULL}
 };
 

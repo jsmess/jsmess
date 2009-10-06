@@ -423,7 +423,6 @@ static const wd17xx_interface enterp_wd1770_interface =
 {
 	DEVCB_LINE(enterp_wd1770_intrq_w),
 	DEVCB_LINE(enterp_wd1770_drq_w),
-	NULL,
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 

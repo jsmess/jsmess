@@ -1039,7 +1039,6 @@ const wd17xx_interface oric_wd17xx_interface =
 {
 	DEVCB_LINE(oric_wd179x_intrq_w),
 	DEVCB_LINE(oric_wd179x_drq_w),
-	NULL,
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 
