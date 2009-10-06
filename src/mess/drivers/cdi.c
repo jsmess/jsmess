@@ -64,7 +64,7 @@ emu_timer *test_timer;
 
 #define ENABLE_UART_PRINTING (0)
 
-#define VERBOSE_LEVEL	(6)
+#define VERBOSE_LEVEL	(0)
 
 INLINE void verboselog(running_machine *machine, int n_level, const char *s_fmt, ...)
 {
@@ -449,7 +449,7 @@ static READ16_HANDLER( scc68070_periphs_r )
 			}
 			if(ACCESSING_BITS_8_15)
 			{
-				verboselog(space->machine, 11, "scc68070_periphs_r: Timer Status Register: %02x & %04x\n", scc68070_regs.timers.timer_status_register, mem_mask);
+				verboselog(space->machine, 12, "scc68070_periphs_r: Timer Status Register: %02x & %04x\n", scc68070_regs.timers.timer_status_register, mem_mask);
 			}
 			return (scc68070_regs.timers.timer_status_register << 8) | scc68070_regs.timers.timer_control_register;
 			break;
@@ -710,7 +710,7 @@ static WRITE16_HANDLER( scc68070_periphs_w )
 			}
 			if(ACCESSING_BITS_8_15)
 			{
-				verboselog(space->machine, 11, "scc68070_periphs_w: Timer Status Register: %04x & %04x\n", data, mem_mask);
+				verboselog(space->machine, 12, "scc68070_periphs_w: Timer Status Register: %04x & %04x\n", data, mem_mask);
 				scc68070_regs.timers.timer_status_register &= ~(data >> 8);
 				if(!scc68070_regs.timers.timer_status_register)
 				{
@@ -969,7 +969,16 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 
 			timer_adjust_oneshot(cdic_regs.interrupt_timer, ATTOTIME_IN_HZ(75), 0); // 75Hz = 1x CD-ROM speed
 
-			cdic_regs.x_buffer |= 0x8000;
+			/* This is wrong, can't figure out right now what's right
+			if(cdic_regs.audio_channel & 0x8000)
+			{
+				cdic_regs.z_buffer |= 0x2000;
+				cdic_regs.audio_buffer |= 0x8000;
+			}
+			else
+			{*/
+				cdic_regs.x_buffer |= 0x8000;
+			//}
 
 			cdic_regs.data_buffer |= 0x4000;
 			cdic_regs.data_buffer &= 0x7fff;
@@ -999,7 +1008,7 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 		}
 		case 0x2e: // Abort
 			timer_adjust_oneshot(cdic_regs.interrupt_timer, ATTOTIME_IN_HZ(75), 0); // 75Hz = 1x CD-ROM speed
-			cdic_regs.data_buffer &= 0x7fff;
+			cdic_regs.data_buffer &= 0x3fff;
 			break;
 	}
 }
@@ -1128,12 +1137,12 @@ static WRITE16_HANDLER( cdic_w )
 				{
 					case 0x23: // Reset Mode 1
 					case 0x24: // Reset Mode 2
-					case 0x2e: // Abort
 						timer_adjust_oneshot(cdic_regs.interrupt_timer, attotime_never, 0);
 						cdic_regs.data_buffer &= 0x3fff;
 						break;
 					case 0x29: // Read Mode 1
 					case 0x2a: // Read Mode 2
+					case 0x2e: // Abort
 						timer_adjust_oneshot(cdic_regs.interrupt_timer, ATTOTIME_IN_HZ(75), 0); // 75Hz = 1x CD-ROM speed
 						break;
 				}
@@ -1467,13 +1476,13 @@ m48t08_regs_t m48t08;
 
 static READ16_HANDLER( m48t08_r )
 {
-	verboselog(space->machine, 6, "m48t08_r: %04x = %02x & %04x\n", offset, m48t08.nvram[offset], mem_mask );
+	verboselog(space->machine, 11, "m48t08_r: %04x = %02x & %04x\n", offset, m48t08.nvram[offset], mem_mask );
 	return m48t08.nvram[offset] << 8;
 }
 
 static WRITE16_HANDLER( m48t08_w )
 {
-	verboselog(space->machine, 6, "m48t08_w: %04x = %02x\n", offset, data >> 8);
+	verboselog(space->machine, 11, "m48t08_w: %04x = %02x\n", offset, data >> 8);
 	switch(offset)
 	{
 		case 0x1ff9:
@@ -1682,7 +1691,7 @@ static READ16_HANDLER(mcd212_r)
 		case 0x10/2:
 			if(ACCESSING_BITS_0_7)
 			{
-				verboselog(space->machine, 11, "mcd212_r: Status Register %d: %02x & %04x\n", channel + 1, mcd212.channel[1 - (offset / 8)].csrr, mem_mask);
+				verboselog(space->machine, 12, "mcd212_r: Status Register %d: %02x & %04x\n", channel + 1, mcd212.channel[1 - (offset / 8)].csrr, mem_mask);
 				if(channel == 0)
 				{
 					return mcd212.channel[0].csrr | 0x20;
@@ -1975,7 +1984,7 @@ static void mcd212_process_ica(running_machine *machine, int channel)
 				break;
 			case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15: case 0x16: case 0x17: // NOP
 			case 0x18: case 0x19: case 0x1a: case 0x1b: case 0x1c: case 0x1d: case 0x1e: case 0x1f:
-				verboselog(machine, 11, "%08x: %08x: ICA %d: NOP\n", addr * 2 + channel * 0x200000, cmd, channel );
+				verboselog(machine, 12, "%08x: %08x: ICA %d: NOP\n", addr * 2 + channel * 0x200000, cmd, channel );
 				break;
 			case 0x20: case 0x21: case 0x22: case 0x23: case 0x24: case 0x25: case 0x26: case 0x27: // RELOAD DCP
 			case 0x28: case 0x29: case 0x2a: case 0x2b: case 0x2c: case 0x2d: case 0x2e: case 0x2f:
@@ -2059,7 +2068,7 @@ static void mcd212_process_dca(running_machine *machine, int channel)
 				break;
 			case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15: case 0x16: case 0x17: // NOP
 			case 0x18: case 0x19: case 0x1a: case 0x1b: case 0x1c: case 0x1d: case 0x1e: case 0x1f:
-				verboselog(machine, 11, "%08x: %08x: DCA %d: NOP\n", addr * 2 + channel * 0x200000, cmd, channel );
+				verboselog(machine, 12, "%08x: %08x: DCA %d: NOP\n", addr * 2 + channel * 0x200000, cmd, channel );
 				break;
 			case 0x20: case 0x21: case 0x22: case 0x23: case 0x24: case 0x25: case 0x26: case 0x27: // RELOAD DCP
 			case 0x28: case 0x29: case 0x2a: case 0x2b: case 0x2c: case 0x2d: case 0x2e: case 0x2f:
@@ -2120,81 +2129,43 @@ static void mcd212_process_dca(running_machine *machine, int channel)
 	}
 }
 
+static UINT8 mcd212_dyuv_quantizer[16] = { 0, 1, 4, 9, 16, 27, 44, 79, 128, 177, 212, 229, 240, 247, 252, 255 };
+
+INLINE UINT8 MCD212_LIM(INT32 in)
+{
+    if(in < 0)
+    {
+        return 0;
+    }
+    else if(in > 255)
+    {
+        return 255;
+    }
+    return (UINT8)in;
+}
+
 static void mcd212_process_vsr(running_machine *machine, int channel, UINT32 *pixels)
 {
 	UINT8 *data = channel ? (UINT8*)planeb : (UINT8*)planea;
 	UINT32 vsr = mcd212_get_vsr(channel) & 0x0007ffff;
 	UINT8 done = 0;
 	int x = 0;
+	UINT32 icm_mask = channel ? 0x00000f00 : 0x0000000f;
+	UINT32 icm_shift = channel ? 8 : 0;
+	UINT8 icm = (mcd212.channel[0].image_coding_method & icm_mask) >> icm_shift;
 
 	//printf( "vsr before: %08x: ", vsr );
 	//fflush(stdout);
 
-	/*
-    switch(mcd212.channel[channel].ddr & MCD212_DDR_FT)
-    {
-        case MCD212_DDR_FT_BMP:
-        case MCD212_DDR_FT_BMP2:
-            if(mcd212.channel[channel].dcr & MCD212_DCR_CM)
-            {
-                printf( "4-bit Bitmap: " );
-            }
-            else
-            {
-                static UINT8 fuck = 0;
-                printf( "8-bit Bitmap: " );
-                if(!fuck)
-                {
-                    FILE* out = fopen("planea.bin","wb");
-                    int i = 0;
-                    for(i = 0; i < 0x80000; i += 2)
-                    {
-                        UINT8 temp1, temp2;
-                        temp1 = planea[i/2] >> 8;
-                        temp2 = planea[i/2] & 0x00ff;
-                        fwrite(&temp1, 1, 1, out);
-                        fwrite(&temp2, 1, 1, out);
-                    }
-                    fflush(out);
-                    fclose(out);
-                    out = fopen("planeb.bin","wb");
-                    for(i = 0; i < 0x80000; i += 2)
-                    {
-                        UINT8 temp1, temp2;
-                        temp1 = planeb[i/2] >> 8;
-                        temp2 = planeb[i/2] & 0x00ff;
-                        fwrite(&temp1, 1, 1, out);
-                        fwrite(&temp2, 1, 1, out);
-                    }
-                    fflush(out);
-                    fclose(out);
-                    fuck++;
-
-                }
-            }
-            break;
-        case MCD212_DDR_FT_RLE:
-            if(mcd212.channel[channel].dcr & MCD212_DCR_CM)
-            {
-                printf( "4-bit RLE: " );
-            }
-            else
-            {
-                printf( "8-bit RLE: " );
-            }
-            break;
-        case MCD212_DDR_FT_MOSAIC:
-            if(mcd212.channel[channel].dcr & MCD212_DCR_CM)
-            {
-                printf( "4-bit Mosaic: " );
-            }
-            else
-            {
-                printf( "8-bit Mosaic: " );
-            }
-            break;
-    }
-    */
+	if(!icm)
+	{
+		for(; x < 768; x++)
+		{
+			pixels[x++] = 0x00070707;
+			pixels[x] = 0x00070707;
+		}
+		done = 1;
+	}
 
 	while(!done)
 	{
@@ -2213,13 +2184,80 @@ static void mcd212_process_vsr(running_machine *machine, int channel, UINT32 *pi
 				else
 				{
 					// 8-bit Bitmap
-					for(; x < 768; x++)
+					UINT32 mask = channel ? 0x00000f00 : 0x0000000f;
+					UINT32 shift = channel ? 8 : 0;
+					if(icm == 5)
 					{
-						pixels[x++] = mcd212.channel[channel].clut[((channel == 1) ? 0x80 : 0x00) + (byte & 0x7f)];
-						pixels[x] = mcd212.channel[channel].clut[((channel == 1) ? 0x80 : 0x00) + (byte & 0x7f)];
-						byte = data[vsr++ ^ 1];
+						UINT8 y;
+						INT16 u;
+						INT16 v;
+						switch(channel)
+						{
+							case 0:
+								y = (mcd212.channel[0].dyuv_abs_start_a >> 16) & 0x000000ff;
+								u = (mcd212.channel[0].dyuv_abs_start_a >>  8) & 0x000000ff;
+								v = (mcd212.channel[0].dyuv_abs_start_a >>  0) & 0x000000ff;
+								break;
+							case 1:
+								y = (mcd212.channel[1].dyuv_abs_start_b >> 16) & 0x000000ff;
+								u = (mcd212.channel[1].dyuv_abs_start_b >>  8) & 0x000000ff;
+								v = (mcd212.channel[1].dyuv_abs_start_b >>  0) & 0x000000ff;
+								break;
+							default:
+								y = u = v = 0x80;
+								break;
+						}
+						for(; x < 768;)
+						{
+							UINT8 r, g, b;
+							UINT16 curr = (byte << 8) | data[vsr++ ^ 1];
+							UINT16 next = (x < 766) ? ((data[(vsr + 1) ^ 1] << 8) | data[(vsr + 2) ^ 1]) : curr;
+							UINT8 y0 = (INT8)mcd212_dyuv_quantizer[(curr >>  8) & 0x000f];
+							INT16 u0 = (INT8)mcd212_dyuv_quantizer[(curr >> 12) & 0x000f];
+							INT16 v0 = (INT8)mcd212_dyuv_quantizer[(curr >>  4) & 0x000f];
+							UINT8 y1 = (INT8)mcd212_dyuv_quantizer[(curr >>  0) & 0x000f];
+							INT16 ut = (INT8)mcd212_dyuv_quantizer[(next >> 12) & 0x000f];
+							INT16 vt = (INT8)mcd212_dyuv_quantizer[(next >>  4) & 0x000f];
+							INT16 u1 = (u0 + ut) / 2;
+							INT16 v1 = (v0 + vt) / 2;
+							u += u0;
+							v += v0;
+							y += y0;
+            				r = MCD212_LIM( ((y << 8) + 351 * (v - 128)) >> 8 );
+            				g = MCD212_LIM( ((y << 8) + (86 * (u - 128) + 179 * (v - 128))) >> 8 );
+            				b = MCD212_LIM( ((y << 8) + 444 * (u - 128)) >> 8 );
+            				pixels[x++] = (r << 16) | (g << 8) | b;
+            				pixels[x++] = (r << 16) | (g << 8) | b;
+							u += u1;
+							v += v1;
+							y += y1;
+            				r = MCD212_LIM( ((y << 8) + 351 * (v - 128)) >> 8 );
+            				g = MCD212_LIM( ((y << 8) + (86 * (u - 128) + 179 * (v - 128))) >> 8 );
+            				b = MCD212_LIM( ((y << 8) + 444 * (u - 128)) >> 8 );
+            				pixels[x++] = (r << 16) | (g << 8) | b;
+            				pixels[x++] = (r << 16) | (g << 8) | b;
+							byte = data[vsr++ ^ 1];
+						}
+						mcd212_set_vsr(channel, vsr - 1);
 					}
-					mcd212_set_vsr(channel, vsr - 1);
+					else if(((mcd212.channel[0].image_coding_method & mask) >> shift) == 0x3)
+					{
+						for(; x < 768; x++)
+						{
+							pixels[x++] = mcd212.channel[channel].clut[((channel == 1) ? 0x80 : 0x00) + (byte & 0x7f)];
+							pixels[x] = mcd212.channel[channel].clut[((channel == 1) ? 0x80 : 0x00) + (byte & 0x7f)];
+							byte = data[vsr++ ^ 1];
+						}
+						mcd212_set_vsr(channel, vsr - 1);
+					}
+					else
+					{
+						for(; x < 768; x++)
+						{
+							pixels[x++] = 0x00070707;
+							pixels[x] = 0x00070707;
+						}
+					}
 				}
 				done = 1;
 				break;
@@ -2292,6 +2330,12 @@ static void mcd212_process_vsr(running_machine *machine, int channel, UINT32 *pi
 	//mcd212_set_vsr(channel, vsr);
 }
 
+static const UINT32 mcd212_4bpp_color[16] =
+{
+	0x00000000, 0x0000007f, 0x00007f00, 0x00007f7f, 0x007f0000, 0x007f007f, 0x007f7f00, 0x007f7f7f,
+	0x00000000, 0x000000ff, 0x0000ff00, 0x0000ffff, 0x00ff0000, 0x00ff00ff, 0x00ffff00, 0x00ffffff
+};
+
 static void mcd212_draw_cursor(running_machine *machine, UINT32 *scanline, int y)
 {
 	if(mcd212.channel[0].cursor_control & MCD212_CURCNT_EN)
@@ -2302,52 +2346,7 @@ static void mcd212_draw_cursor(running_machine *machine, UINT32 *scanline, int y
 		cury += 22;
 		if(y >= cury && y < (cury + 16))
 		{
-			UINT32 color = 0;
-			switch(mcd212.channel[0].cursor_control & MCD212_CURCNT_COLOR)
-			{
-				case 0x01:
-					color = 0x0000007f;
-					break;
-				case 0x02:
-					color = 0x00007f00;
-					break;
-				case 0x03:
-					color = 0x00007f7f;
-					break;
-				case 0x04:
-					color = 0x007f0000;
-					break;
-				case 0x05:
-					color = 0x007f007f;
-					break;
-				case 0x06:
-					color = 0x007f7f00;
-					break;
-				case 0x07:
-					color = 0x007f7f7f;
-					break;
-				case 0x09:
-					color = 0x000000ff;
-					break;
-				case 0x0a:
-					color = 0x0000ff00;
-					break;
-				case 0x0b:
-					color = 0x0000ffff;
-					break;
-				case 0x0c:
-					color = 0x00ff0000;
-					break;
-				case 0x0d:
-					color = 0x00ff00ff;
-					break;
-				case 0x0e:
-					color = 0x00ffff00;
-					break;
-				case 0x0f:
-					color = 0x00ffffff;
-					break;
-			}
+			UINT32 color = mcd212_4bpp_color[mcd212.channel[0].cursor_control & MCD212_CURCNT_COLOR];
 			y -= cury;
 			for(x = curx; x < curx + 16; x++)
 			{
@@ -2366,82 +2365,90 @@ static void mcd212_draw_cursor(running_machine *machine, UINT32 *scanline, int y
 static void mcd212_mix_lines(running_machine *machine, UINT32 *plane_a, UINT32 *plane_b, UINT32 *out)
 {
 	int x = 0;
-	UINT32 backdrop = 0;
-	if(mcd212.channel[0].transparency_control != 0x800101)
-	{
-		verboselog(machine, 11, "Unhandled transparency control value for mixing, %08x, visual results may not be accurate\n", mcd212.channel[0].transparency_control);
-	}
-	switch(mcd212.channel[0].backdrop_color)
-	{
-		case 0x01:
-			backdrop = 0x0000007f;
-			break;
-		case 0x02:
-			backdrop = 0x00007f00;
-			break;
-		case 0x03:
-			backdrop = 0x00007f7f;
-			break;
-		case 0x04:
-			backdrop = 0x007f0000;
-			break;
-		case 0x05:
-			backdrop = 0x007f007f;
-			break;
-		case 0x06:
-			backdrop = 0x007f7f00;
-			break;
-		case 0x07:
-			backdrop = 0x007f7f7f;
-			break;
-		case 0x09:
-			backdrop = 0x000000ff;
-			break;
-		case 0x0a:
-			backdrop = 0x0000ff00;
-			break;
-		case 0x0b:
-			backdrop = 0x0000ffff;
-			break;
-		case 0x0c:
-			backdrop = 0x00ff0000;
-			break;
-		case 0x0d:
-			backdrop = 0x00ff00ff;
-			break;
-		case 0x0e:
-			backdrop = 0x00ffff00;
-			break;
-		case 0x0f:
-			backdrop = 0x00ffffff;
-			break;
-	}
+	UINT32 backdrop = mcd212_4bpp_color[mcd212.channel[0].backdrop_color];
 	for(x = 0; x < 768; x++)
 	{
 		out[x] = backdrop;
-		switch(mcd212.channel[0].plane_order)
+		if(!(mcd212.channel[0].transparency_control & MCD212_TCR_DISABLE_MX))
 		{
-			case MCD212_POR_AB:
-				if(plane_a[x] != mcd212.channel[0].transparent_color_a)
+			INT32 weight_a = mcd212.channel[0].weight_factor_a;
+			INT32 weight_b = mcd212.channel[1].weight_factor_b;
+			INT32 ar = (plane_a[x] >> 16) & 0x000000ff;
+			INT32 ag = (plane_a[x] >>  8) & 0x000000ff;
+			INT32 ab = (plane_a[x] >>  0) & 0x000000ff;
+			INT32 br = (plane_b[x] >> 16) & 0x000000ff;
+			INT32 bg = (plane_b[x] >>  8) & 0x000000ff;
+			INT32 bb = (plane_b[x] >>  0) & 0x000000ff;
+			UINT8 abr = MCD212_LIM((MCD212_LIM(ar - 16) * weight_a) / 64 + (MCD212_LIM(br - 16) * weight_b) / 64 + 16);
+			UINT8 abg = MCD212_LIM((MCD212_LIM(ag - 16) * weight_a) / 64 + (MCD212_LIM(bg - 16) * weight_b) / 64 + 16);
+			UINT8 abb = MCD212_LIM((MCD212_LIM(ab - 16) * weight_a) / 64 + (MCD212_LIM(bb - 16) * weight_b) / 64 + 16);
+			out[x] = (abr << 16) | (abg << 8) | abb;
+		}
+		else
+		{
+			UINT8 transparency_mode[2] =
+			{
+				(mcd212.channel[0].transparency_control >> 0) & 0x0f,
+				(mcd212.channel[0].transparency_control >> 8) & 0x0f
+			};
+			UINT8 plane_enable[2] =
+			{
+				0,
+				0
+			};
+			int index = 0;
+			for(index = 0; index < 2; index++)
+			{
+				UINT32 *plane = index ? plane_b : plane_a;
+				UINT32 transparent_color = index ? mcd212.channel[1].transparent_color_b : mcd212.channel[0].transparent_color_a;
+				switch(transparency_mode[index])
 				{
-					out[x] = plane_a[x];
+					case 0:
+						plane_enable[index] = 0;
+						break;
+					case 1:
+						if(plane[x] != transparent_color)
+						{
+							plane_enable[index] = 1;
+						}
+						break;
+					case 8:
+						plane_enable[index] = 1;
+						break;
+					case 9:
+						if(plane[x] == transparent_color)
+						{
+							plane_enable[index] = 1;
+						}
+						break;
+					default:
+						verboselog(machine, 0, "Unhandled transparency mode for plane %c: %d\n", index ? 'B' : 'A', transparency_mode[index]);
+						break;
 				}
-				else if(plane_b[x] != mcd212.channel[1].transparent_color_b)
-				{
-					out[x] = plane_b[x];
-				}
-				else
-				break;
-			case MCD212_POR_BA:
-				if(plane_b[x] != mcd212.channel[1].transparent_color_b)
-				{
-					out[x] = plane_b[x];
-				}
-				else if(plane_a[x] != mcd212.channel[0].transparent_color_a)
-				{
-					out[x] = plane_a[x];
-				}
-				break;
+			}
+			switch(mcd212.channel[0].plane_order)
+			{
+				case MCD212_POR_AB:
+					if(plane_enable[0])
+					{
+						out[x] = plane_a[x];
+					}
+					else if(plane_enable[1])
+					{
+						out[x] = plane_b[x];
+					}
+					break;
+				case MCD212_POR_BA:
+					if(plane_enable[1])
+					{
+						out[x] = plane_b[x];
+					}
+					else if(plane_enable[0])
+					{
+						out[x] = plane_a[x];
+					}
+					break;
+			}
 		}
 	}
 }
