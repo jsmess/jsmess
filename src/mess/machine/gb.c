@@ -2002,6 +2002,8 @@ READ8_HANDLER( gbc_io2_r )
 		return cpu_get_reg( cputag_get_cpu(space->machine, "maincpu"), LR35902_SPEED );
 	case 0x16:	/* RP - Infrared port */
 		break;
+	case 0x30:	/* SVBK - RAM bank select */
+		return GBC_RAMBank;
 	default:
 		break;
 	}
