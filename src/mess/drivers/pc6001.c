@@ -8,13 +8,14 @@
 	TODO:
 	- Hook up tape loading, images that are floating around the net are already
 	  ADC'ed, so they should be easy to implement (but not exactly faithful)
+	- cassette handling requires a decap of the MCU. It could be possible to
+	  do some tight synch between the master CPU and a code simulation,but I think
+	  it's not worth the effort...
 	- Currently rewriting the video part without the MC6847 for two reasons:
 		A) the later models have a custom video chip in the place of the MC6847,
 		   so this implementation will be used in the end.
 		B) It's easier to me to see what the attribute vram does since I don't
 		   have any docs atm.
-	- cassette handling requires a decap of the MCU. It could be possible to
-	  do some tight synch between the master CPU and a code simulation...
 
 ==================================================================================
 
@@ -941,6 +942,9 @@ ROM_START( pc6001 )	/* screen = 8000-83FF */
 	ROM_LOAD( "cgrom60.60", 0x0000, 0x1000, CRC(b0142d32) SHA1(9570495b10af5b1785802681be94b0ea216a1e26) )
 	ROM_RELOAD(             0x1000, 0x1000 )
 
+	ROM_REGION( 0x1000, "mcu", ROMREGION_ERASEFF )
+	ROM_LOAD( "i8049", 0x0000, 0x1000, NO_DUMP )
+
 	ROM_REGION( 0x10000, "cas", ROMREGION_ERASEFF )
 	/* Load here your tape for now (and change the cas length macro according to what MESS returns) */
 //	ROM_LOAD( "car.cas", 0x0000, CAS_LENGTH, CRC(1) SHA1(1) )
@@ -956,6 +960,9 @@ ROM_START( pc6001a )
 	ROM_REGION( 0x1000, "gfx1", 0 )
 	ROM_LOAD( "cgrom60.60a", 0x0000, 0x1000, CRC(49c21d08) SHA1(9454d6e2066abcbd051bad9a29a5ca27b12ec897) )
 
+	ROM_REGION( 0x1000, "mcu", ROMREGION_ERASEFF )
+	ROM_LOAD( "i8049", 0x0000, 0x1000, NO_DUMP )
+
 	ROM_REGION( 0x10000, "cas", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x4000, "cart_img", ROMREGION_ERASE00 )
@@ -969,6 +976,9 @@ ROM_START( pc6001m2 )
 	ROM_LOAD( "cgrom60.62",  0x1c000, 0x2000, CRC(81eb5d95) SHA1(53d8ae9599306ff23bf95208d2f6cc8fed3fc39f) )
 	ROM_LOAD( "cgrom60m.62", 0x1e000, 0x2000, CRC(3ce48c33) SHA1(f3b6c63e83a17d80dde63c6e4d86adbc26f84f79) )
 	ROM_LOAD( "kanjirom.62", 0x20000, 0x8000, CRC(20c8f3eb) SHA1(4c9f30f0a2ebbe70aa8e697f94eac74d8241cadd) )
+
+	ROM_REGION( 0x1000, "mcu", ROMREGION_ERASEFF )
+	ROM_LOAD( "i8049", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
 	ROM_COPY( "maincpu", 0x1c000, 0x00000, 0x1000 )
@@ -984,6 +994,9 @@ ROM_START( pc6001sr )
 	/* If you split this into 4x 8000, the first 3 need to load to 0-7FFF (via bankswitch). The 4th part looks like gfx data */
 	ROM_LOAD( "systemrom1.64", 0x0000, 0x10000, CRC(b6fc2db2) SHA1(dd48b1eee60aa34780f153359f5da7f590f8dff4) )
 	ROM_LOAD( "systemrom2.64", 0x10000, 0x10000, CRC(55a62a1d) SHA1(3a19855d290fd4ac04e6066fe4a80ecd81dc8dd7) )
+
+	ROM_REGION( 0x1000, "mcu", ROMREGION_ERASEFF )
+	ROM_LOAD( "i8049", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
 	ROM_LOAD( "cgrom68.64", 0x0000, 0x4000, CRC(73bc3256) SHA1(5f80d62a95331dc39b2fb448a380fd10083947eb) )
@@ -1004,6 +1017,9 @@ ROM_START( pc6600 )	/* Variant of pc6001m2 */
 	ROM_LOAD( "cgrom66.66",  0x2000, 0x2000, CRC(3ce48c33) SHA1(f3b6c63e83a17d80dde63c6e4d86adbc26f84f79) )
 	ROM_LOAD( "kanjirom.66", 0x4000, 0x8000, CRC(20c8f3eb) SHA1(4c9f30f0a2ebbe70aa8e697f94eac74d8241cadd) )
 
+	ROM_REGION( 0x1000, "mcu", ROMREGION_ERASEFF )
+	ROM_LOAD( "i8049", 0x0000, 0x1000, NO_DUMP )
+
 	ROM_REGION( 0x10000, "cas", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x4000, "cart_img", ROMREGION_ERASE00 )
@@ -1022,6 +1038,9 @@ ROM_START( pc6600sr )	/* Variant of pc6001sr */
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
 	ROM_LOAD( "cgrom68.68", 0x0000, 0x4000, CRC(73bc3256) SHA1(5f80d62a95331dc39b2fb448a380fd10083947eb) )
+
+	ROM_REGION( 0x1000, "mcu", ROMREGION_ERASEFF )
+	ROM_LOAD( "i8049", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x10000, "cas", ROMREGION_ERASEFF )
 

@@ -6,19 +6,19 @@
 
     TODO:
     - Understand how keyboard works and decap/dump the keyboard MCU if possible;
-    - Hook-up .tap image formats (.rom too?);
+    - Hook-up remaining .tap image formats;
+    - Implement .rom format support (needs an image for it);
+    - Implement write support for the .d88 based images, later x1turbo games uses it as a copy
+      protection mechanism;
     - Implement tape commands;
     - Sort out / redump the BIOS gfx roms;
-    - Implement the interrupts (uses IM 2), basically used by the keyboard.
-    - Implement DMA,CTC and SIO, they are X1Turbo only features.
-    - Improve the z80DMA core, it's so incomplete that nothing that uses it works;
+    - Implement SIO, they are X1Turbo only features.
     - clean-ups!
-    - x1turbo: understand how irq generation works for the ym-2151;
     - There are various unclear video things, these are:
         - Understand why some games still doesn't upload the proper PCG index;
         - Implement PCG reading, used by Maison Ikkoku, Mule and Gyajiko for kanji reading.
           Is there a way to select which ROM to use?
-        - Implement the scrn regs;
+        - Implement the remaining scrn regs;
         - Interlace mode?
         - Implement the new features of the x1turbo, namely the 4096 color feature amongst other
           things
@@ -1265,13 +1265,13 @@ static READ8_HANDLER( x1_io_r )
 	else if(offset >= 0x1900 && offset <= 0x19ff)	{ return sub_io_r(space, 0); }
 	else if(offset >= 0x1a00 && offset <= 0x1aff)	{ return ppi8255_r(devtag_get_device(space->machine, "ppi8255_0"), (offset-0x1a00) & 3); }
 	else if(offset >= 0x1b00 && offset <= 0x1bff)	{ return ay8910_r(devtag_get_device(space->machine, "ay"), 0); }
-	else if(offset >= 0x1f80 && offset <= 0x1f8f)	{ return z80dma_r(devtag_get_device(space->machine, "dma"), 0); }
-	else if(offset >= 0x1f90 && offset <= 0x1f91)	{ return z80sio_c_r(devtag_get_device(space->machine, "sio"), (offset-0x1f90) & 1); }
-	else if(offset >= 0x1f92 && offset <= 0x1f93)	{ return z80sio_d_r(devtag_get_device(space->machine, "sio"), (offset-0x1f92) & 1); }
+//	else if(offset >= 0x1f80 && offset <= 0x1f8f)	{ return z80dma_r(devtag_get_device(space->machine, "dma"), 0); }
+//	else if(offset >= 0x1f90 && offset <= 0x1f91)	{ return z80sio_c_r(devtag_get_device(space->machine, "sio"), (offset-0x1f90) & 1); }
+//	else if(offset >= 0x1f92 && offset <= 0x1f93)	{ return z80sio_d_r(devtag_get_device(space->machine, "sio"), (offset-0x1f92) & 1); }
 	else if(offset >= 0x1fa0 && offset <= 0x1fa3)	{ return z80ctc_r(devtag_get_device(space->machine, "ctc"), offset-0x1fa0); }
 	else if(offset >= 0x1fa8 && offset <= 0x1fab)	{ return z80ctc_r(devtag_get_device(space->machine, "ctc"), offset-0x1fa8); }
 //  else if(offset >= 0x1fd0 && offset <= 0x1fdf)   { return x1_scrn_r(space,offset-0x1fd0); }
-	else if(offset == 0x1fe0)						{ return x1_blackclip_r(space,0); }
+//	else if(offset == 0x1fe0)						{ return x1_blackclip_r(space,0); }
 	else if(offset >= 0x2000 && offset <= 0x2fff)	{ return colorram[offset-0x2000]; }
 	else if(offset >= 0x3000 && offset <= 0x3fff)	{ return videoram[offset-0x3000]; }
 	else if(offset >= 0x4000 && offset <= 0xffff)	{ return gfx_bitmap_ram[offset-0x4000+(scrn_reg.gfx_bank*0xc000)]; }
@@ -1302,9 +1302,9 @@ static WRITE8_HANDLER( x1_io_w )
 	else if(offset >= 0x1c00 && offset <= 0x1cff)	{ ay8910_address_w(devtag_get_device(space->machine, "ay"), 0,data); }
 	else if(offset >= 0x1d00 && offset <= 0x1dff)	{ rom_bank_1_w(space,0,data); }
 	else if(offset >= 0x1e00 && offset <= 0x1eff)	{ rom_bank_0_w(space,0,data); }
-	else if(offset >= 0x1f80 && offset <= 0x1f8f)	{ z80dma_w(devtag_get_device(space->machine, "dma"), 0,data); }
-	else if(offset >= 0x1f90 && offset <= 0x1f91)	{ z80sio_c_w(devtag_get_device(space->machine, "sio"), (offset-0x1f90) & 1,data); }
-	else if(offset >= 0x1f92 && offset <= 0x1f93)	{ z80sio_d_w(devtag_get_device(space->machine, "sio"), (offset-0x1f92) & 1,data); }
+//	else if(offset >= 0x1f80 && offset <= 0x1f8f)	{ z80dma_w(devtag_get_device(space->machine, "dma"), 0,data); }
+//	else if(offset >= 0x1f90 && offset <= 0x1f91)	{ z80sio_c_w(devtag_get_device(space->machine, "sio"), (offset-0x1f90) & 1,data); }
+//	else if(offset >= 0x1f92 && offset <= 0x1f93)	{ z80sio_d_w(devtag_get_device(space->machine, "sio"), (offset-0x1f92) & 1,data); }
 	else if(offset >= 0x1fa0 && offset <= 0x1fa3)	{ z80ctc_w(devtag_get_device(space->machine, "ctc"), offset-0x1fa0,data); }
 	else if(offset >= 0x1fa8 && offset <= 0x1fab)	{ z80ctc_w(devtag_get_device(space->machine, "ctc"), offset-0x1fa8,data); }
 //  else if(offset == 0x1fb0)                       { x1turbo_pal_w(space,0,data); }
@@ -1312,7 +1312,7 @@ static WRITE8_HANDLER( x1_io_w )
 //  else if(offset == 0x1fc0)                       { x1turbo_txdisp_w(space,0,data); }
 //  else if(offset == 0x1fc5)                       { x1turbo_gfxpal_w(space,0,data); }
 	else if(offset >= 0x1fd0 && offset <= 0x1fdf)	{ x1_scrn_w(space,0,data); }
-	else if(offset == 0x1fe0)						{ x1_blackclip_w(space,0,data); }
+//	else if(offset == 0x1fe0)						{ x1_blackclip_w(space,0,data); }
 	else if(offset >= 0x2000 && offset <= 0x2fff)	{ colorram[offset-0x2000] = data; }
 	else if(offset >= 0x3000 && offset <= 0x3fff)	{ videoram[offset-0x3000] = pcg_write_addr = data; }
 	else if(offset >= 0x4000 && offset <= 0xffff)	{ gfx_bitmap_ram[offset-0x4000+(scrn_reg.gfx_bank*0xc000)] = data; }
@@ -1916,6 +1916,13 @@ static const z80_daisy_chain x1_daisy[] =
 {
 	{ "x1kb" },
 	{ "ctc" },
+	{ NULL }
+};
+
+static const z80_daisy_chain x1turbo_daisy[] =
+{
+	{ "x1kb" },
+	{ "ctc" },
 //  { "dma" },
 //  { "sio" },
 	{ NULL }
@@ -2103,8 +2110,6 @@ static MACHINE_DRIVER_START( x1 )
 	MDRV_CPU_CONFIG(x1_daisy)
 
 	MDRV_Z80CTC_ADD( "ctc", XTAL_4MHz , ctc_intf )
-	MDRV_Z80SIO_ADD( "sio", XTAL_4MHz , sio_intf )
-	MDRV_Z80DMA_ADD( "dma", XTAL_4MHz , x1_dma )
 
 	MDRV_DEVICE_ADD("x1kb", DEVICE_GET_INFO_NAME(x1_keyboard_getinfo), 0)
 
@@ -2150,6 +2155,10 @@ static MACHINE_DRIVER_START( x1turbo )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(x1turbo_io)
+	MDRV_CPU_CONFIG(x1turbo_daisy)
+
+	MDRV_Z80SIO_ADD( "sio", XTAL_4MHz , sio_intf )
+	MDRV_Z80DMA_ADD( "dma", XTAL_4MHz , x1_dma )
 
 	MDRV_SOUND_ADD("ym", YM2151, XTAL_4MHz) //unknown clock / divider
 //  MDRV_SOUND_CONFIG(ay8910_config)
@@ -2261,7 +2270,7 @@ ROM_END
 
 
 /*    YEAR  NAME       PARENT  COMPAT   MACHINE  INPUT  INIT  CONFIG COMPANY   FULLNAME      FLAGS */
-COMP( 1982, x1,        0,      0,       x1,      x1,    0,    0,    "Sharp",  "X1 (CZ-800C)",         GAME_NOT_WORKING)
-COMP( 1984, x1ck,      x1,     0,       x1,      x1,    0,    0,    "Sharp",  "X1Ck (CZ-804C)",       GAME_NOT_WORKING)
+COMP( 1982, x1,        0,      0,       x1,      x1,    0,    0,    "Sharp",  "X1 (CZ-800C)",         0)
+COMP( 1984, x1ck,      x1,     0,       x1,      x1,    0,    0,    "Sharp",  "X1Ck (CZ-804C)",       0)
 COMP( 1984, x1turbo,   x1,     0,       x1turbo, x1,    0,    0,    "Sharp",  "X1 Turbo (CZ-850C)",   GAME_NOT_WORKING)
 COMP( 1986, x1turboz,  x1,     0,       x1turbo, x1,    0,    0,    "Sharp",  "X1 Turbo Z (CZ-880C)", GAME_NOT_WORKING)
