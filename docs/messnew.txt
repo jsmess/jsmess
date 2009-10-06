@@ -10,6 +10,7 @@ Systems Promoted from GAME_NOT_WORKING:
 - Beta [Curt Coder]
 - Microbee 56k [Robbbert]
 - TRS-80 Model 4P [Robbbert]
+- Nokia MikroMikko 1 M6 [Curt Coder, Kara Trace]
 
 
 
@@ -30,6 +31,9 @@ System Driver Changes:
   disk drives.  [Dirk Best]
 
 - [GBCOLOR] Added BIOS.  [Wilbert Pol]
+
+- [MIKROMIK] Added proper ROM dumps, fixed keyboard and 
+  added drive B: motor. [Curt Coder, Kara Trace]
 
 - [MPF1] Cleaned up, added cassette support.  [Dirk Best]
 
