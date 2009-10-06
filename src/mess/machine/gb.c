@@ -1984,6 +1984,8 @@ WRITE8_HANDLER ( gbc_io2_w )
 			break;
 		case 0x30:	/* SVBK - RAM bank select */
 			GBC_RAMBank = data & 0x7;
+			if ( ! GBC_RAMBank )
+				GBC_RAMBank = 1;
 			memory_set_bankptr (space->machine, 3, GBC_RAMMap[GBC_RAMBank]);
 			break;
 		default:
