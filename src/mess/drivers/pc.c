@@ -2639,9 +2639,10 @@ ROM_START( dgone )
 	ROM_REGION(0x100000,"maincpu", 0)
 	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) /* WDC IDE Superbios 2.0 (06/28/89) Expansion Rom C8000-C9FFF  */
 	ROM_LOAD( "dgone.bin",  0xf8000, 0x08000, CRC(2c38c86e) SHA1(c0f85a000d1d13cd354965689e925d677822549e))
-
-	ROM_REGION(0x08100, "gfx1", 0)
-	ROM_LOAD("cga.chr", 0x00000, 0x01000, CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd)) // from an unknown clone cga card
+	
+	/* IBM 1501981(CGA) and 1501985(MDA) Character rom */
+	ROM_REGION(0x2000,"gfx1", 0)
+	ROM_LOAD("5788005.u33", 0x00000, 0x2000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f)) /* "AMI 8412PI // 5788005 // (C) IBM CORP. 1981 // KOREA" */
 
 	/* 8051 keytronic keyboard controller */
 	ROM_REGION( 0x2000, KEYTRONIC_KB3270PC_CPU, 0 )
