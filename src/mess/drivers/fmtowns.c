@@ -105,11 +105,46 @@ static UINT16 towns_kanji_offset;
 static UINT8 towns_kanji_code_h;
 static UINT8 towns_kanji_code_l;
 static int towns_selected_drive;
+static UINT8* towns_serial_rom;
+static int towns_srom_position;
+static UINT8 towns_srom_clk;
+static UINT8 towns_srom_reset;
 
 static void towns_update_video_banks(const address_space* space);
 
+static void towns_init_serial_rom(void)
+{
+	// TODO: init serial ROM contents
+	int x,y;
+	char code[7] = "USTIJUF";
+	memset(towns_serial_rom,0,256/8);
+	
+	for(x=72;x<=194;x++)  // set these bits to 1
+		towns_serial_rom[x/8] |= (1 << (x%8));
+	
+	y=0;
+	for(x=195;x<=251;x++)
+	{
+		if(code[y/8] & (1 << (y % 8)))
+			towns_serial_rom[x/8] |= (1 << (x%8));
+	}
+	
+	// add Machine ID
+	towns_serial_rom[7] = 0x01;
+	towns_serial_rom[8] = 0x01;
+	
+	// serial number?
+	towns_serial_rom[2] = 0x10;
+	towns_serial_rom[3] = 0x6e;
+	towns_serial_rom[4] = 0x54;
+	towns_serial_rom[5] = 0x32;
+	towns_serial_rom[6] = 0x10;
+}
+
 static READ8_HANDLER(towns_system_r)
 {
+	UINT8 ret = 0;
+	
 	switch(offset)
 	{
 		case 0x00:
@@ -119,7 +154,7 @@ static READ8_HANDLER(towns_system_r)
 			logerror("SYS: port 0x25 read\n");
 			return 0x00;
 		case 0x06:
-			logerror("SYS: (0x26) timer read\n");
+			//logerror("SYS: (0x26) timer read\n");
 			ftimer -= 0x13;
 			return ftimer;
 		case 0x08:
@@ -132,10 +167,14 @@ static READ8_HANDLER(towns_system_r)
 			logerror("SYS: (0x31) Machine ID read\n");
 			return 0x01;
 		case 0x12:
-			logerror("SYS: (0x32) Serial(?) read\n");
-			return 0x00;
+			/* Bit 0 = data, bit 6 = CLK, bit 7 = RESET, bit 5 is always 1? */
+			ret = (towns_serial_rom[towns_srom_position/8] & (1 << (towns_srom_position%8))) ? 1 : 0;
+			ret |= towns_srom_clk;
+			ret |= towns_srom_reset; 
+			//logerror("SYS: (0x32) Serial ROM read [0x%02x, pos=%i]\n",ret,towns_srom_position);
+			return ret;
 		default:
-			logerror("SYS: Unknown system port read (0x%02x)\n",offset);
+			//logerror("SYS: Unknown system port read (0x%02x)\n",offset+0x20);
 			return 0x00;
 	}
 }
@@ -155,7 +194,18 @@ static WRITE8_HANDLER(towns_system_w)
 			nmi_mask = data & 0x01;
 			break;
 		case 0x12:
-			logerror("SYS: (0x32) Serial(?) write %02x\n",data);
+			//logerror("SYS: (0x32) Serial ROM write %02x\n",data);
+			// clocks on low-to-high transition
+			if((data & 0x40) && towns_srom_clk == 0) // CLK
+			{  // advance to next bit
+				towns_srom_position++;
+			}
+			if((data & 0x80) && towns_srom_reset == 0) // reset
+			{  // reset to beginning
+				towns_srom_position = 0;
+			}			
+			towns_srom_clk = data & 0x40;
+			towns_srom_reset = data & 0x80;
 			break;
 		default:
 			logerror("SYS: Unknown system port write 0x%02x (0x%02x)\n",data,offset);
@@ -244,7 +294,7 @@ static READ8_HANDLER(towns_floppy_r)
 		case 0x06:
 			return wd17xx_data_r(fdc,offset/2);
 		case 0x08:  // selected drive status?
-			logerror("FDC: read from offset 0x08\n");
+			//logerror("FDC: read from offset 0x08\n");
 			if(towns_selected_drive < 1 || towns_selected_drive > 2)
 				return 0x01;
 			else
@@ -285,7 +335,7 @@ static WRITE8_HANDLER(towns_floppy_w)
 			// bit 5 - CLKSEL
 			if(data & 0x10)
 			{
-				if(towns_selected_drive != 0)
+				if(towns_selected_drive != 0 && towns_selected_drive < 2)
 				{
 					floppy_drive_set_motor_state(floppy_get_device(space->machine, towns_selected_drive-1), data & 0x10);
 					floppy_drive_set_ready_state(floppy_get_device(space->machine, towns_selected_drive-1), data & 0x10,0);
@@ -753,6 +803,11 @@ static WRITE8_HANDLER(towns_cdrom_w)
 	}
 }
 
+static READ8_HANDLER(towns_unknown_r)
+{
+	return 0x08;
+}
+
 static ADDRESS_MAP_START(towns_mem, ADDRESS_SPACE_PROGRAM, 32)
   // memory map based on FM-Towns/Bochs (Bochs modified to emulate the FM-Towns)
   // may not be (and probably is not) correct
@@ -822,6 +877,8 @@ static ADDRESS_MAP_START( towns_io , ADDRESS_SPACE_IO, 32)
   AM_RANGE(0x05e8,0x05ef) AM_READWRITE(towns_sys5e8_r, towns_sys5e8_w)
   // Keyboard (8042 MCU)
   AM_RANGE(0x0600,0x0607) AM_READWRITE8(towns_keyboard_r, towns_keyboard_w,0x00ff00ff)
+  // No idea what this is currently...
+  AM_RANGE(0x0c30,0x0c33) AM_READ8(towns_unknown_r,0x00ff0000) 
   // CMOS
   AM_RANGE(0x3000,0x3fff) AM_READWRITE8(towns_cmos8_r, towns_cmos8_w,0x00ff00ff)
   // CRTC / Video (again)
@@ -840,6 +897,8 @@ static DRIVER_INIT( towns )
 	towns_cmos = auto_alloc_array(machine,UINT32,0x2000/(sizeof(UINT32)));
 	towns_gfxvram = auto_alloc_array(machine,UINT8,0x200000);
 	towns_txtvram = auto_alloc_array(machine,UINT8,0x8000);
+	towns_serial_rom = auto_alloc_array(machine,UINT8,256/8);
+	towns_init_serial_rom();
 }
 
 static MACHINE_RESET( towns )
