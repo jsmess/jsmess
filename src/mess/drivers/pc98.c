@@ -209,8 +209,59 @@
 #include "driver.h"
 #include "cpu/i386/i386.h"
 
+static UINT32 *pc9801_vram;
+
+static VIDEO_START( pc9801 )
+{
+}
+
+static VIDEO_UPDATE( pc9801 )
+{
+	const gfx_element *gfx = screen->machine->gfx[0];
+	int count = 0x00000;
+	int y,x;
+
+
+	for (y=0;y<64;y++)
+	{
+		for (x=0;x<64;x+=2)
+		{
+			int tile;
+
+			tile = (pc9801_vram[count] & 0x00ff0000)>>16;
+			drawgfx_opaque(bitmap,cliprect,gfx,tile,0,0,0,(x+1)*8,y*8);
+
+			tile = pc9801_vram[count] & 0x000000ff;
+			drawgfx_opaque(bitmap,cliprect,gfx,tile,0,0,0,(x+0)*8,y*8);
+
+			count++;
+		}
+	}
+
+	return 0;
+}
+
 static ADDRESS_MAP_START( pc9801_mem, ADDRESS_SPACE_PROGRAM, 32)
-	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM
+	AM_RANGE(0x00000000, 0x0000ffff) AM_RAM
+	AM_RANGE(0x000a0000, 0x000bffff) AM_RAM AM_BASE(&pc9801_vram)
+	AM_RANGE(0x000e0000, 0x000fffff) AM_ROM AM_REGION("maincpu",0)//AM_REGION("memory",0xf8000)
+	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("maincpu",0)
+ADDRESS_MAP_END
+
+static READ32_HANDLER( test1_r )
+{
+	return 0x00008000; //avoid a pitfall, otherwise the code will execute a retf without anything in the stack!
+}
+
+static READ32_HANDLER( test2_r )
+{
+	return mame_rand(space->machine);
+}
+
+static ADDRESS_MAP_START( pc9801_io, ADDRESS_SPACE_IO, 32)
+	AM_RANGE(0x0034, 0x0037) AM_READ(test1_r)
+	AM_RANGE(0x0060, 0x0063) AM_READ(test2_r)
+	AM_RANGE(0x00a0, 0x00a3) AM_READ(test2_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc9821_mem, ADDRESS_SPACE_PROGRAM, 32)
@@ -230,15 +281,6 @@ static MACHINE_RESET(pc9821)
 {
 }
 
-static VIDEO_START( pc9801 )
-{
-}
-
-static VIDEO_UPDATE( pc9801 )
-{
-	return 0;
-}
-
 static VIDEO_START( pc9821 )
 {
 }
@@ -248,12 +290,28 @@ static VIDEO_UPDATE( pc9821 )
 	return 0;
 }
 
+static const gfx_layout charset =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	1,
+	{ 0 },
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8
+};
+
+static GFXDECODE_START( pc9801 )
+	GFXDECODE_ENTRY( "gfx1",   0x00000, charset,    0x000, 0x01 )
+GFXDECODE_END
+
 /* I suspect the dump for pc9801 comes from a i386 later model... the original machine would use a i8086 @ 5Mhz CPU (see notes at top) */
 /* More investigations are required, but in the meanwhile I set a I386 as main CPU */
 static MACHINE_DRIVER_START( pc9801 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I386, 16000000)
 	MDRV_CPU_PROGRAM_MAP(pc9801_mem)
+	MDRV_CPU_IO_MAP(pc9801_io)
 
 	MDRV_MACHINE_RESET(pc9801)
 
@@ -266,6 +324,7 @@ static MACHINE_DRIVER_START( pc9801 )
 	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(black_and_white)
+	MDRV_GFXDECODE(pc9801)
 
 	MDRV_VIDEO_START(pc9801)
 	MDRV_VIDEO_UPDATE(pc9801)
@@ -300,7 +359,7 @@ MACHINE_DRIVER_END
 ROM_START( pc9801 )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "bios.rom", 0x00000, 0x18000, CRC(315d2703) SHA1(4f208d1dbb68373080d23bff5636bb6b71eb7565) )
-	ROM_LOAD( "itf.rom",  0x00000, 0x08000, CRC(c1815325) SHA1(a2fb11c000ed7c976520622cfb7940ed6ddc904e) )
+	ROM_LOAD( "itf.rom",  0x18000, 0x08000, CRC(c1815325) SHA1(a2fb11c000ed7c976520622cfb7940ed6ddc904e) )
 
 	/* where shall we load this? */
 	ROM_REGION( 0x100000, "memory", 0 )
@@ -317,7 +376,7 @@ ROM_START( pc9801 )
 	ROM_LOAD( "sound.rom", 0x0000, 0x4000, CRC(80eabfde) SHA1(e09c54152c8093e1724842c711aed6417169db23) )
 
 	ROM_REGION( 0x50000, "gfx1", 0 )
-	ROM_LOAD( "font.rom", 0x00000, 0x46800, CRC(da370e7a) SHA1(584d0c7fde8c7eac1f76dc5e242102261a878c5e) )
+	ROM_LOAD( "font.rom", 0x00000, 0x46800, BAD_DUMP CRC(da370e7a) SHA1(584d0c7fde8c7eac1f76dc5e242102261a878c5e) )
 ROM_END
 
 ROM_START( pc9821 )
@@ -329,7 +388,7 @@ ROM_START( pc9821 )
 	ROM_LOAD( "sound.rom", 0x0000, 0x4000, CRC(a21ef796) SHA1(34137c287c39c44300b04ee97c1e6459bb826b60) )
 
 	ROM_REGION( 0x50000, "gfx1", 0 )
-	ROM_LOAD( "font.rom", 0x00000, 0x46800, CRC(a61c0649) SHA1(554b87377d176830d21bd03964dc71f8e98676b1) )
+	ROM_LOAD( "font.rom", 0x00000, 0x46800, BAD_DUMP CRC(a61c0649) SHA1(554b87377d176830d21bd03964dc71f8e98676b1) )
 ROM_END
 
 
