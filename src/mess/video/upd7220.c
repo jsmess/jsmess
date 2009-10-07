@@ -448,7 +448,7 @@ static void recompute_parameters(const device_config *device)
 /*-------------------------------------------------
     advance_ead - advance EAD pointer
 -------------------------------------------------*/
-
+#if 0
 static void advance_ead(upd7220_t *upd7220)
 {
 	switch (upd7220->draw_mode & 0x07)
@@ -494,7 +494,7 @@ static void advance_ead(upd7220_t *upd7220)
 
 	upd7220->ead &= 0x3ffff;
 }
-
+#endif
 /*-------------------------------------------------
     translate_command - translate command byte
 -------------------------------------------------*/
