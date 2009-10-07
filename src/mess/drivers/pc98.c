@@ -208,6 +208,7 @@
 
 #include "driver.h"
 #include "cpu/i386/i386.h"
+#include "machine/8255ppi.h"
 
 static UINT32 *pc9801_vram;
 
@@ -241,27 +242,163 @@ static VIDEO_UPDATE( pc9801 )
 	return 0;
 }
 
+static READ8_HANDLER( sys_port_r )
+{
+	if(offset & 1)
+		return ppi8255_r(devtag_get_device(space->machine, "ppi8255_0"), (offset & 6) >> 1);
+
+	logerror("RS-232c R access %02x\n",offset >> 1);
+	return 0xff;
+}
+
+
+static WRITE8_HANDLER( sys_port_w )
+{
+	if(offset & 1)
+		ppi8255_w(devtag_get_device(space->machine, "ppi8255_0"), (offset & 6) >> 1, data);
+	else
+		logerror("RS-232c W access %02x %02x\n",offset >> 1,data);
+}
+
+static READ8_HANDLER( sio_port_r )
+{
+	if(!(offset & 1))
+		return ppi8255_r(devtag_get_device(space->machine, "ppi8255_1"), (offset & 6) >> 1);
+
+	logerror("keyboard R access %02x\n",offset >> 1);
+	return 0xff;
+}
+
+
+static WRITE8_HANDLER( sio_port_w )
+{
+	if(!(offset & 1))
+		ppi8255_w(devtag_get_device(space->machine, "ppi8255_1"), (offset & 6) >> 1, data);
+	else
+		logerror("keyboard W access %02x %02x\n",offset >> 1,data);
+}
+
+/*
+#define UPD7220_SR_DATA_READY			0x01
+#define UPD7220_SR_FIFO_FULL			0x02
+#define UPD7220_SR_FIFO_EMPTY			0x04
+#define UPD7220_SR_DRAWING_IN_PROGRESS	0x08
+#define UPD7220_SR_DMA_EXECUTE			0x10
+#define UPD7220_SR_VSYNC_ACTIVE			0x20
+#define UPD7220_SR_HBLANK_ACTIVE		0x40
+#define UPD7220_SR_LIGHT_PEN_DETECT		0x80
+*/
+static READ8_HANDLER( crtc_status_r )
+{
+	UINT8 vsync = input_port_read(space->machine, "VBLANK") & 0x20;
+
+	return 0x04 | vsync;//mame_rand(space->machine);
+}
+
+static READ8_HANDLER( crtc_fifo_r )
+{
+	return 0x00;//mame_rand(space->machine);
+}
+
+static WRITE8_HANDLER( crtc_param_w )
+{
+}
+
+static WRITE8_HANDLER( crtc_cmd_w )
+{
+}
+
+
+static READ8_HANDLER( port_60_r )
+{
+	if(offset == 0)
+		return crtc_status_r(space, 0);
+	if(offset == 2)
+		return crtc_fifo_r(space,0);
+
+	return 0xff;
+}
+
+static WRITE8_HANDLER( port_60_w )
+{
+	if(offset == 0)
+		crtc_param_w(space, 0,data);
+	if(offset == 2)
+		crtc_cmd_w(space,0,data);
+}
+
+static READ8_HANDLER( port_a0_r )
+{
+	if(offset == 0)
+		return crtc_status_r(space, 0);
+	if(offset == 2)
+		return crtc_fifo_r(space,0);
+
+	return 0xff;
+}
+
+static WRITE8_HANDLER( port_a0_w )
+{
+	if(offset == 0)
+		crtc_param_w(space, 0,data);
+	if(offset == 2)
+		crtc_cmd_w(space,0,data);
+}
+
 static ADDRESS_MAP_START( pc9801_mem, ADDRESS_SPACE_PROGRAM, 32)
-	AM_RANGE(0x00000000, 0x0000ffff) AM_RAM
+	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	AM_RANGE(0x000a0000, 0x000bffff) AM_RAM AM_BASE(&pc9801_vram)
-	AM_RANGE(0x000e0000, 0x000fffff) AM_ROM AM_REGION("maincpu",0)//AM_REGION("memory",0xf8000)
+	AM_RANGE(0x000e0000, 0x000fffff) AM_ROM AM_REGION("maincpu",0)
 	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("maincpu",0)
 ADDRESS_MAP_END
 
-static READ32_HANDLER( test1_r )
-{
-	return 0x00008000; //avoid a pitfall, otherwise the code will execute a retf without anything in the stack!
-}
 
-static READ32_HANDLER( test2_r )
-{
-	return mame_rand(space->machine);
-}
 
 static ADDRESS_MAP_START( pc9801_io, ADDRESS_SPACE_IO, 32)
-	AM_RANGE(0x0034, 0x0037) AM_READ(test1_r)
-	AM_RANGE(0x0060, 0x0063) AM_READ(test2_r)
-	AM_RANGE(0x00a0, 0x00a3) AM_READ(test2_r)
+//	AM_RANGE(0x0000, 0x0000) pic8259
+//	AM_RANGE(0x0002, 0x0002)
+//	AM_RANGE(0x0020, 0x0020) rtc
+//	AM_RANGE(0x0022, 0x0022)
+//	AM_RANGE(0x0030, 0x0030) rs232c (i8251 1)
+//	AM_RANGE(0x0032, 0x0032)
+//	AM_RANGE(0x0031, 0x0031) system port (ppi8255 1)
+//	AM_RANGE(0x0033, 0x0033)
+//	AM_RANGE(0x0035, 0x0035)
+//	AM_RANGE(0x0037, 0x0037)
+	AM_RANGE(0x0030, 0x0037) AM_READWRITE8(sys_port_r,sys_port_w,0xffffffff)
+//	AM_RANGE(0x0040, 0x0040) printer port (ppi8255 2)
+//	AM_RANGE(0x0042, 0x0042)
+//	AM_RANGE(0x0044, 0x0044)
+//	AM_RANGE(0x0046, 0x0046)
+//	AM_RANGE(0x0041, 0x0041) keyboard (i8251 2)
+//	AM_RANGE(0x0043, 0x0043)
+	AM_RANGE(0x0040, 0x0047) AM_READWRITE8(sio_port_r,sio_port_w,0xffffffff)
+//	AM_RANGE(0x0060, 0x0060) uPD7220 status reg / param write (for chars)
+//	AM_RANGE(0x0062, 0x0062) uPD7220 fifo read / cmd write
+	AM_RANGE(0x0060, 0x0063) AM_READWRITE8(port_60_r,port_60_w,0xffffffff)
+//	AM_RANGE(0x0064, 0x0064) V-SYNC related write
+//	AM_RANGE(0x0068, 0x0068) Flip-Flop 1 r/w
+//	AM_RANGE(0x006a, 0x006a) Flip-Flop 2 r/w
+//	AM_RANGE(0x006e, 0x006e) Flip-Flop 3 r/w
+//	AM_RANGE(0x0070, 0x0070) crtc registers
+//	AM_RANGE(0x0072, 0x0072)
+//	AM_RANGE(0x0074, 0x0074)
+//	AM_RANGE(0x0076, 0x0076)
+//	AM_RANGE(0x0078, 0x0078)
+//	AM_RANGE(0x007a, 0x007a)
+//	AM_RANGE(0x0071, 0x0071) pit8253
+//	AM_RANGE(0x0073, 0x0073)
+//	AM_RANGE(0x0075, 0x0075)
+//	AM_RANGE(0x0077, 0x0077)
+//	AM_RANGE(0x007c, 0x007c) GRCG mode write
+//	AM_RANGE(0x007e, 0x007e) GRCG tile write
+//	AM_RANGE(0x00a0, 0x00a0) uPD7220 status reg / param write (for gfx)
+//	AM_RANGE(0x00a2, 0x00a2) uPD7220 fifo read / cmd write
+	AM_RANGE(0x00a0, 0x00a3) AM_READWRITE8(port_a0_r,port_a0_w,0xffffffff)
+// 	AM_RANGE(0x00e0, 0x00ef) DMA
+//	AM_RANGE(0x043f, 0x043f) EMS select (bankswitch)
+
+//	(and many more...)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc9821_mem, ADDRESS_SPACE_PROGRAM, 32)
@@ -270,6 +407,8 @@ ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( pc9801 )
+	PORT_START("VBLANK")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_VBLANK )
 INPUT_PORTS_END
 
 
@@ -305,6 +444,66 @@ static GFXDECODE_START( pc9801 )
 	GFXDECODE_ENTRY( "gfx1",   0x00000, charset,    0x000, 0x01 )
 GFXDECODE_END
 
+/*
+ * PPI8255
+ */
+
+static READ8_DEVICE_HANDLER( pc98_porta_r )
+{
+	printf("PPI Port A read\n");
+	return 0x00;
+}
+
+static READ8_DEVICE_HANDLER( pc98_portb_r )
+{
+	static UINT8 tmp;
+
+	tmp ^= 1; //<- actually related to the RTC somehow
+	//printf("PPI Port B read\n");
+	return 0xf8 | tmp;
+}
+
+static READ8_DEVICE_HANDLER( pc98_portc_r )
+{
+	printf("PPI Port C read\n");
+	return 0x00;
+}
+
+static WRITE8_DEVICE_HANDLER( pc98_porta_w )
+{
+	printf("PPI Port A write %02x\n",data);
+}
+
+static WRITE8_DEVICE_HANDLER( pc98_portb_w )
+{
+	printf("PPI Port B write %02x\n",data);
+}
+
+static WRITE8_DEVICE_HANDLER( pc98_portc_w )
+{
+	printf("PPI Port C write %02x\n",data);
+}
+
+static const ppi8255_interface ppi8255_intf =
+{
+	DEVCB_HANDLER(pc98_porta_r),					/* Port A read */
+	DEVCB_HANDLER(pc98_portb_r),					/* Port B read */
+	DEVCB_HANDLER(pc98_portc_r),					/* Port C read */
+	DEVCB_HANDLER(pc98_porta_w),					/* Port A write */
+	DEVCB_HANDLER(pc98_portb_w),					/* Port B write */
+	DEVCB_HANDLER(pc98_portc_w)						/* Port C write */
+};
+
+static const ppi8255_interface printer_intf =
+{
+	DEVCB_NULL,					/* Port A read */
+	DEVCB_NULL,					/* Port B read */
+	DEVCB_NULL,					/* Port C read */
+	DEVCB_NULL,					/* Port A write */
+	DEVCB_NULL,					/* Port B write */
+	DEVCB_NULL					/* Port C write */
+};
+
 /* I suspect the dump for pc9801 comes from a i386 later model... the original machine would use a i8086 @ 5Mhz CPU (see notes at top) */
 /* More investigations are required, but in the meanwhile I set a I386 as main CPU */
 static MACHINE_DRIVER_START( pc9801 )
@@ -314,6 +513,9 @@ static MACHINE_DRIVER_START( pc9801 )
 	MDRV_CPU_IO_MAP(pc9801_io)
 
 	MDRV_MACHINE_RESET(pc9801)
+
+	MDRV_PPI8255_ADD( "ppi8255_0", ppi8255_intf )
+	MDRV_PPI8255_ADD( "ppi8255_1", printer_intf )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
