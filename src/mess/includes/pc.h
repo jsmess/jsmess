@@ -69,6 +69,7 @@ DRIVER_INIT( pcmda );
 DRIVER_INIT( europc );
 DRIVER_INIT( bondwell );
 DRIVER_INIT( pc200 );
+DRIVER_INIT( ppc512 );
 DRIVER_INIT( pc1512 );
 DRIVER_INIT( pc1640 );
 DRIVER_INIT( pc_vga );

@@ -437,6 +437,45 @@ static ADDRESS_MAP_START(ibmpcjr_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE("ins8250_0", ins8250_r, ins8250_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( ppc512_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x00000, 0x7ffff) AM_RAMBANK(10)
+	AM_RANGE(0x80000, 0xbffff) AM_NOP
+	AM_RANGE(0xc0000, 0xc7fff) AM_ROM
+	AM_RANGE(0xc8000, 0xcffff) AM_ROM
+	AM_RANGE(0xd0000, 0xeffff) AM_NOP
+	AM_RANGE(0xf0000, 0xfffff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( ppc640_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x00000, 0x9ffff) AM_RAMBANK(10)
+	AM_RANGE(0xa0000, 0xbffff) AM_NOP
+	AM_RANGE(0xc0000, 0xc7fff) AM_ROM
+	AM_RANGE(0xc8000, 0xcffff) AM_ROM
+	AM_RANGE(0xd0000, 0xeffff) AM_NOP
+	AM_RANGE(0xf0000, 0xfffff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(ppc512_io, ADDRESS_SPACE_IO, 16)
+	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE8("dma8237", dma8237_r, dma8237_w, 0xffff)
+	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE8("pic8259", pic8259_r, pic8259_w, 0xffff)
+	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE8("pit8253", pit8253_r, pit8253_w, 0xffff)
+	AM_RANGE(0x0060, 0x0065) AM_READWRITE(pc1640_16le_port60_r,			pc1640_16le_port60_w)
+	AM_RANGE(0x0070, 0x0071) AM_READWRITE(mc146818_port16le_r,		mc146818_port16le_w)
+	AM_RANGE(0x0078, 0x0079) AM_READWRITE(pc1640_16le_mouse_x_r,			pc1640_16le_mouse_x_w)
+	AM_RANGE(0x007a, 0x007b) AM_READWRITE(pc1640_16le_mouse_y_r,			pc1640_16le_mouse_y_w)
+	AM_RANGE(0x0080, 0x0087) AM_READWRITE8(pc_page_r,					pc_page_w, 0xffff)
+	AM_RANGE(0x0200, 0x0207) AM_READWRITE(pc16le_JOY_r,					pc16le_JOY_w)
+	AM_RANGE(0x0278, 0x027b) AM_READ(pc200_16le_port278_r) AM_DEVWRITE8("lpt_2", pc_lpt_w, 0x00ff)
+	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE8("ins8250_3", ins8250_r, ins8250_w, 0xffff)
+	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8("ins8250_1", ins8250_r, ins8250_w, 0xffff)
+	AM_RANGE(0x0320, 0x0323) AM_READWRITE(pc16le_HDC1_r,				pc16le_HDC1_w)
+	AM_RANGE(0x0324, 0x0327) AM_READWRITE(pc16le_HDC2_r,				pc16le_HDC2_w)
+	AM_RANGE(0x0378, 0x037b) AM_READ(pc200_16le_port378_r) AM_DEVWRITE8("lpt_1", pc_lpt_w, 0x00ff)
+	AM_RANGE(0x03bc, 0x03bf) AM_DEVREADWRITE8("lpt_0", pc_lpt_r, pc_lpt_w, 0x00ff)
+	AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE8("ins8250_2", ins8250_r, ins8250_w, 0xffff)
+	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE8(pc_fdc_r,					pc_fdc_w, 0xffff)
+	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8("ins8250_0", ins8250_r, ins8250_w, 0xffff)
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc200_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x9ffff) AM_RAMBANK(10)
@@ -1830,6 +1869,60 @@ static MACHINE_DRIVER_START( pc200 )
 MACHINE_DRIVER_END
 
 
+
+
+static MACHINE_DRIVER_START( ppc512 )
+	MDRV_DRIVER_DATA(pc_state)
+	/* basic machine hardware */
+	MDRV_CPU_ADD("maincpu", V30, 8000000)
+	MDRV_CPU_PROGRAM_MAP(ppc512_map)
+	MDRV_CPU_IO_MAP(ppc512_io)
+	MDRV_CPU_VBLANK_INT_HACK(pc_frame_interrupt, 4)
+	
+
+	MDRV_MACHINE_START(pc)
+	MDRV_MACHINE_RESET(pc)
+
+	MDRV_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
+
+	MDRV_DMA8237_ADD( "dma8237", ibm5150_dma8237_config )
+
+	MDRV_PIC8259_ADD( "pic8259", ibm5150_pic8259_config )
+
+	MDRV_I8255A_ADD( "ppi8255", pc_ppi8255_interface )
+
+	MDRV_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
+	MDRV_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
+	MDRV_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2] )			/* TODO: Verify model */
+	MDRV_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3] )			/* TODO: Verify model */
+
+	/* video hardware */
+	MDRV_IMPORT_FROM( pcvideo_pc200 )
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
+	/* printer */
+	MDRV_PC_LPT_ADD("lpt_0", pc_lpt_config)
+	MDRV_PC_LPT_ADD("lpt_1", pc_lpt_config)
+	MDRV_PC_LPT_ADD("lpt_2", pc_lpt_config)
+
+	/* harddisk */
+	MDRV_IMPORT_FROM( pc_hdc )
+
+	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
+
+	MDRV_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( ppc640 )
+	MDRV_IMPORT_FROM( ppc512 )
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_PROGRAM_MAP(ppc640_map)
+MACHINE_DRIVER_END
+
 static MACHINE_DRIVER_START( pc1512 )
 	MDRV_DRIVER_DATA(pc_state)
 	/* basic machine hardware */
@@ -2612,8 +2705,8 @@ ROM_START( ppc512 )
 	ROM_REGION16_LE(0x100000,"maincpu", 0)
 	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) /* WDC IDE Superbios 2.0 (06/28/89) Expansion Rom C8000-C9FFF  */
 	// special bios at 0xe0000 !?
-	ROM_LOAD16_BYTE("40107.v1", 0xfc001, 0x2000, CRC(4e37e769) SHA1(88be3d3375ec3b0a7041dbcea225b197e50d4bfe)) // v1.9
-	ROM_LOAD16_BYTE("40108.v1", 0xfc000, 0x2000, CRC(4f0302d9) SHA1(e4d69ca98c3b98f3705a2902b16746360043f039)) // v1.9
+	ROM_LOAD16_BYTE("40107.v1", 0xfc000, 0x2000, CRC(4e37e769) SHA1(88be3d3375ec3b0a7041dbcea225b197e50d4bfe)) // v1.9
+	ROM_LOAD16_BYTE("40108.v1", 0xfc001, 0x2000, CRC(4f0302d9) SHA1(e4d69ca98c3b98f3705a2902b16746360043f039)) // v1.9
 	// also mapped to f0000, f4000, f8000
 	ROM_REGION(0x08100,"gfx1", 0)
 	ROM_LOAD("40109.bin",     0x00000, 0x08000, CRC(a8b67639) SHA1(99663bfb61798526e092205575370c2ad34249a1))
@@ -2625,8 +2718,8 @@ ROM_START( ppc640 )
 	ROM_REGION16_LE(0x100000,"maincpu", 0)
 	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) /* WDC IDE Superbios 2.0 (06/28/89) Expansion Rom C8000-C9FFF  */
 	// special bios at 0xe0000 !?
-	ROM_LOAD16_BYTE("40107.v2", 0xfc001, 0x2000, CRC(0785b63e) SHA1(4dbde6b9e9500298bb6241a8daefd85927f1ad28)) // v2.1
-	ROM_LOAD16_BYTE("40108.v2", 0xfc000, 0x2000, CRC(5351cf8c) SHA1(b4dbf11b39378ab4afd2107d3fe54a99fffdedeb)) // v2.1
+	ROM_LOAD16_BYTE("40107.v2", 0xfc000, 0x2000, CRC(0785b63e) SHA1(4dbde6b9e9500298bb6241a8daefd85927f1ad28)) // v2.1
+	ROM_LOAD16_BYTE("40108.v2", 0xfc001, 0x2000, CRC(5351cf8c) SHA1(b4dbf11b39378ab4afd2107d3fe54a99fffdedeb)) // v2.1
 	// also mapped to f0000, f4000, f8000
 	ROM_REGION(0x08100,"gfx1", 0)
 	ROM_LOAD("40109.bin",     0x00000, 0x08000, CRC(a8b67639) SHA1(99663bfb61798526e092205575370c2ad34249a1))
@@ -2699,6 +2792,10 @@ static SYSTEM_CONFIG_START(ibm5160)
 	CONFIG_RAM_DEFAULT( 640 * 1024 )
 SYSTEM_CONFIG_END
 
+static SYSTEM_CONFIG_START(ppc512)
+	CONFIG_RAM_DEFAULT( 512 * 1024 )
+SYSTEM_CONFIG_END
+
 static SYSTEM_CONFIG_START(pcjr)
 //  CONFIG_RAM( 128 * 1024 )
 	CONFIG_RAM_DEFAULT( 640 * 1024 )
@@ -2729,8 +2826,8 @@ COMP(  1989,    t1000rl,    ibm5150,    0,  t1000_16,   tandy1t,    t1000hx,    
 COMP(  1982,	ibm5160,	ibm5150,	0,	ibm5160,    ibm5150,	ibm5150,	ibm5160, "International Business Machines",  "IBM XT 5160" , 0)
 COMP(  1988,	pc200,		ibm5150,	0,	pc200,		pc200,		pc200,		ibm5160, "Sinclair Research",  "PC200 Professional Series", GAME_NOT_WORKING)
 COMP(  1988,	pc20,		ibm5150,	0,	pc200,		pc200,		pc200,		ibm5160, "Amstrad plc",  "Amstrad PC20" , GAME_NOT_WORKING)
-COMP(  1987,	ppc512,		ibm5150,	0,	pc200,		pc200,		pc200,		ibm5160, "Amstrad plc",  "Amstrad PPC512", GAME_NOT_WORKING)
-COMP(  1987,	ppc640,		ibm5150,	0,	pc200,		pc200,		pc200,		ibm5160, "Amstrad plc",  "Amstrad PPC640", GAME_NOT_WORKING)
+COMP(  1987,	ppc512,		ibm5150,	0,	ppc512,		pc200,		ppc512,		ppc512, "Amstrad plc",  "Amstrad PPC512", GAME_NOT_WORKING)
+COMP(  1987,	ppc640,		ibm5150,	0,	ppc640,		pc200,		ppc512,		ibm5160, "Amstrad plc",  "Amstrad PPC640", GAME_NOT_WORKING)
 COMP(  1986,	pc1512,		ibm5150,	0,	pc1512,     pc1512,		pc1512,		ibm5160, "Amstrad plc",  "Amstrad PC1512 (version 1)", GAME_NOT_WORKING)
 COMP(  198?,	pc1512v2,	ibm5150,	0,	pc1512,     pc1512,		pc1512,		ibm5160, "Amstrad plc",  "Amstrad PC1512 (version 2)", GAME_NOT_WORKING)
 COMP(  1987,	pc1640,		ibm5150,	0,	pc1640,     pc1640,		pc1640,		ibm5160, "Amstrad plc",  "Amstrad PC1640 / PC6400 (US)", GAME_NOT_WORKING )
