@@ -814,15 +814,14 @@ static struct {
 // but now cga and mda are splitted in mess
 WRITE8_HANDLER( pc200_cga_w )
 {
+	pc_aga_cga_w(space, offset,data);
 	switch(offset) {
 	case 4:
-		pc200.portd |= 0x20;
-//      pc_cga8_w(space, offset,data);
+		pc200.portd |= 0x20;	
 		break;
 	case 8:
 		pc200.port8 = data;
-		pc200.portd |= 0x80;
-//      pc_cga8_w(space, offset,data);
+		pc200.portd |= 0x80;		
 		break;
 	case 0xe:
 		pc200.portd = 0x1f;
@@ -847,14 +846,13 @@ WRITE8_HANDLER( pc200_cga_w )
 		break;
 
 	default:
-//      pc_cga8_w(space, offset,data);
 		break;
 	}
 }
 
 READ8_HANDLER ( pc200_cga_r )
 {
-	UINT8 result = 0;
+	UINT8 result = 0xff;
 
 	switch(offset) {
 	case 8:
@@ -874,7 +872,7 @@ READ8_HANDLER ( pc200_cga_r )
 		break;
 
 	default:
-//      result = pc_cga8_r(space, offset);
+		result = pc_aga_cga_r(space, offset);
 		break;
 	}
 	return result;
