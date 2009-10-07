@@ -361,6 +361,11 @@ static MACHINE_RESET( spectrum_plus3 )
 
 static const floppy_config specpls3_floppy_config =
 {
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	FLOPPY_DRIVE_SS_40,
 	FLOPPY_OPTIONS_NAME(default),
 	DO_NOT_KEEP_GEOMETRY

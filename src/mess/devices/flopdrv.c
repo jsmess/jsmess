@@ -32,6 +32,13 @@
 typedef struct _floppy_drive floppy_drive;
 struct _floppy_drive
 {
+	/* callbacks */
+	devcb_resolved_write_line out_idx_func;
+	devcb_resolved_read_line in_mon_func;
+	devcb_resolved_write_line out_tk00_func;
+	devcb_resolved_write_line out_wpt_func;
+	devcb_resolved_write_line out_rdy_func;
+
 	const floppy_config	*config;
 
 	/* flags */
@@ -292,6 +299,8 @@ static void floppy_drive_index_func(const device_config *img)
 		timer_adjust_oneshot(pDrive->index_timer, double_to_attotime(ms/20/1000.0), 0);
 	}
 
+	devcb_call_write_line(&pDrive->out_idx_func, pDrive->index);
+
 	if (pDrive->index_pulse_callback)
 		pDrive->index_pulse_callback(pDrive->controller, img, pDrive->index);
 }
@@ -352,6 +361,8 @@ void floppy_drive_set_flag_state(const device_config *img, int flag, int state)
 		if (flag & FLOPPY_DRIVE_READY)
 		{
 			/* trigger state change callback */
+			devcb_call_write_line(&drv->out_rdy_func, new_state);
+
 			if (drv->ready_state_change_callback)
 				drv->ready_state_change_callback(drv->controller, img, new_state);
 		}
@@ -681,9 +692,16 @@ void floppy_drive_set_controller(const device_config *img, const device_config *
 /* ----------------------------------------------------------------------- */
 DEVICE_START( floppy )
 {
-	floppy_drive	*floppy = get_safe_token( device );
+	floppy_drive *floppy = get_safe_token( device );
 	floppy->config = device->static_config;
 	floppy_drive_init(device);
+
+	/* resolve callbacks */
+	devcb_resolve_write_line(&floppy->out_idx_func, &floppy->config->out_idx_func, device);
+	devcb_resolve_read_line(&floppy->in_mon_func, &floppy->config->in_mon_func, device);
+	devcb_resolve_write_line(&floppy->out_tk00_func, &floppy->config->out_tk00_func, device);
+	devcb_resolve_write_line(&floppy->out_wpt_func, &floppy->config->out_wpt_func, device);
+	devcb_resolve_write_line(&floppy->out_rdy_func, &floppy->config->out_rdy_func, device);
 }
 
 static int internal_floppy_device_load(const device_config *image, int create_format, option_resolution *create_args)
@@ -836,6 +854,15 @@ int floppy_get_count(running_machine *machine)
     if (devtag_get_device(machine,FLOPPY_2)) cnt++;
     if (devtag_get_device(machine,FLOPPY_3)) cnt++;
 	return cnt;
+}
+
+/* write protect signal, active low */
+READ_LINE_DEVICE_HANDLER( floppy_wpt_r )
+{
+	if (floppy_drive_get_flag_state(device, FLOPPY_DRIVE_DISK_WRITE_PROTECTED))
+		return CLEAR_LINE;
+	else
+		return ASSERT_LINE;
 }
 
 /*************************************

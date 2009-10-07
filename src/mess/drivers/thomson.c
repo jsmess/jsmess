@@ -635,6 +635,11 @@ INPUT_PORTS_END
 
 static const floppy_config thomson_floppy_config =
 {
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	FLOPPY_DRIVE_DS_80,
 	FLOPPY_OPTIONS_NAME(thomson),
 	DO_NOT_KEEP_GEOMETRY
@@ -717,10 +722,10 @@ static MACHINE_DRIVER_START ( to7 )
      MDRV_PIA6821_ADD( THOM_PIA_IO, to7_pia6821_io )
      MDRV_PIA6821_ADD( THOM_PIA_GAME, to7_pia6821_game )
      MDRV_PIA6821_ADD( THOM_PIA_MODEM, to7_pia6821_modem )
-     
+
 /* acia */
      MDRV_ACIA6551_ADD("acia")
-     
+
 /* modem */
      MDRV_ACIA6850_ADD( "acia6850", to7_modem )
 

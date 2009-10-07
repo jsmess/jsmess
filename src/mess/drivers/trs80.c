@@ -455,6 +455,11 @@ static const ay31015_config trs80_ay31015_config =
 
 static const floppy_config trs80_floppy_config =
 {
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	FLOPPY_DRIVE_DS_80,
 	FLOPPY_OPTIONS_NAME(trs80),
 	DO_NOT_KEEP_GEOMETRY

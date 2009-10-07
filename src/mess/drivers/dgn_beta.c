@@ -286,6 +286,11 @@ static PALETTE_INIT( dgnbeta )
 
 static const floppy_config dgnbeta_floppy_config =
 {
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	FLOPPY_DRIVE_DS_80,
 	FLOPPY_OPTIONS_NAME(coco),
 	DO_NOT_KEEP_GEOMETRY

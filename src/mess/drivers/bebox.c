@@ -105,6 +105,11 @@ ADDRESS_MAP_END
 
 static const floppy_config bebox_floppy_config =
 {
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	FLOPPY_DRIVE_DS_80,
 	FLOPPY_OPTIONS_NAME(pc),
 	DO_NOT_KEEP_GEOMETRY

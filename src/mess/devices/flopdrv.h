@@ -1,9 +1,10 @@
 /* flopdrv provides simple emulation of a disc drive */
 /* the 8271, nec765 and wd179x use this */
 
-#ifndef FLOPDRV_H
-#define FLOPDRV_H
+#ifndef __FLOPDRV_H__
+#define __FLOPDRV_H__
 
+#include "devcb.h"
 #include "device.h"
 #include "image.h"
 #include "formats/flopimg.h"
@@ -31,6 +32,12 @@ typedef enum
 typedef struct floppy_config_t	floppy_config;
 struct floppy_config_t
 {
+	devcb_write_line out_idx_func;  /* index */
+	devcb_read_line  in_mon_func;   /* motor on */
+	devcb_write_line out_tk00_func; /* track 00 */
+	devcb_write_line out_wpt_func;  /* write protect */
+	devcb_write_line out_rdy_func;  /* ready */
+
 	floppy_type floppy_type;
 	const struct FloppyFormat *formats;
 	keep_geometry keep_drive_geometry;
@@ -128,6 +135,12 @@ void flopimg_alloc_custom_data(const device_config *image,void *custom);
 
 void floppy_drive_set_geometry(const device_config *img, floppy_type type);
 
+READ_LINE_DEVICE_HANDLER( floppy_idx_r );
+WRITE_LINE_DEVICE_HANDLER( floppy_mon_w );
+READ_LINE_DEVICE_HANDLER( floppy_tk00_r );
+READ_LINE_DEVICE_HANDLER( floppy_wpt_r );
+READ_LINE_DEVICE_HANDLER( floppy_rdy_r );
+
 #define FLOPPY	DEVICE_GET_INFO_NAME(floppy)
 DEVICE_GET_INFO(floppy);
 
@@ -195,4 +208,4 @@ extern DEVICE_IMAGE_UNLOAD( floppy );
 	MDRV_DEVICE_REMOVE(FLOPPY_0)		\
 	MDRV_DEVICE_REMOVE(FLOPPY_1)
 
-#endif /* FLOPDRV_H */
+#endif /* __FLOPDRV_H__ */

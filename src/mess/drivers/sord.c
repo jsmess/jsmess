@@ -569,6 +569,11 @@ FLOPPY_OPTIONS_END
 
 static const floppy_config sordm5_floppy_config =
 {
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	FLOPPY_DRIVE_SS_40,
 	FLOPPY_OPTIONS_NAME(sordm5),
 	DO_NOT_KEEP_GEOMETRY

@@ -50,7 +50,7 @@
 	2164-6P (64Kx1 DRAM)*8 = 64KB Work RAM
 
 	DMA channels:
-	
+
 	0	CRT
 	1	MPSC transmit
 	2	MPSC receive
@@ -283,7 +283,7 @@ static I8275_DISPLAY_PIXELS( crtc_display_pixels )
 	int i;
 
 	UINT8 data = (romdata << 1) | (d7 & d0);
-	
+
 	for (i = 0; i < 8; i++)
 	{
 		int qh = BIT(data, i);
@@ -414,7 +414,7 @@ static DMA8237_CHANNEL_READ( mpsc_dack_r )
 
 	/* clear data request */
 	dma8237_drq_write(state->i8237, DMA_MPSC_RX, CLEAR_LINE);
-	
+
 	return upd7201_hai_r(state->upd7201, 0);
 }
 
@@ -431,7 +431,7 @@ static DMA8237_CHANNEL_WRITE( mpsc_dack_w )
 static DMA8237_CHANNEL_READ( fdc_dack_r )
 {
 	mm1_state *state = device->machine->driver_data;
-	
+
 	return nec765_dack_r(state->upd765, 0);
 }
 
@@ -610,7 +610,7 @@ static TIMER_DEVICE_CALLBACK( kbclk_tick )
 		/* get key data from PROM */
 		keydata = state->key_rom[(ctrl << 8) | (shift << 7) | (state->drive << 3) | (state->sense)];
 	}
-	
+
 	if (state->keydata != keydata)
 	{
 		/* latch key data */
@@ -671,6 +671,11 @@ FLOPPY_OPTIONS_END
 
 static const floppy_config mm1_floppy_config =
 {
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	FLOPPY_DRIVE_DS_80,
 	FLOPPY_OPTIONS_NAME(mm1),
 	DO_NOT_KEEP_GEOMETRY
@@ -770,7 +775,7 @@ static MACHINE_DRIVER_START( mm1 )
 	MDRV_PIT8253_ADD(I8253_TAG, mm1_pit8253_intf)
 	MDRV_NEC765A_ADD(UPD765_TAG, /* XTAL_16MHz/2/2, */ mm1_nec765_intf)
 	MDRV_UPD7201_ADD(UPD7201_TAG, XTAL_6_144MHz/2, mm1_upd7201_intf)
-	
+
 	MDRV_FLOPPY_2_DRIVES_ADD(mm1_floppy_config)
 MACHINE_DRIVER_END
 

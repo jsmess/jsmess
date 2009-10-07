@@ -5,7 +5,7 @@
 	Preliminary driver by Mariusz Wojcieszek
 
 	Status:
-	Driver boots and load CP/M from floppy image. Needs upd7220 for gfx 
+	Driver boots and load CP/M from floppy image. Needs upd7220 for gfx
 	and keyboard hooked to upd7021.
 
 	Done:
@@ -33,7 +33,7 @@
 */
 
 typedef struct _qx10_state qx10_state;
-struct _qx10_state 
+struct _qx10_state
 {
 	int		mc146818_offset;
 
@@ -125,6 +125,11 @@ static WRITE8_HANDLER(cmos_sel_w)
 
 static const floppy_config qx10_floppy_config =
 {
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	FLOPPY_DRIVE_DS_80,
 	FLOPPY_OPTIONS_NAME(default),
 	DO_NOT_KEEP_GEOMETRY
@@ -238,7 +243,7 @@ static DMA8237_OUT_EOP( tc_w )
 	Channel 2: GDC
 	Channel 3: Option slots
 */
-static const struct dma8237_interface qx10_dma8237_1_interface = 
+static const struct dma8237_interface qx10_dma8237_1_interface =
 {
 	MAIN_CLK/4,		/* speed of DMA accesses (per byte) */
 	dma_hrq_changed,/* function that will be called when HRQ may have changed */
@@ -389,7 +394,7 @@ static const struct pit8253_config qx10_pit8253_2_config =
 	IR6		Floppy controller interrupt
 */
 
-static PIC8259_SET_INT_LINE( qx10_pic8259_master_set_int_line ) 
+static PIC8259_SET_INT_LINE( qx10_pic8259_master_set_int_line )
 {
 	cputag_set_input_line(device->machine, "maincpu", 0, interrupt ? HOLD_LINE : CLEAR_LINE);
 }
@@ -413,7 +418,7 @@ static const struct pic8259_interface qx10_pic8259_master_config =
 
 */
 
-static PIC8259_SET_INT_LINE( qx10_pic8259_slave_set_int_line ) 
+static PIC8259_SET_INT_LINE( qx10_pic8259_slave_set_int_line )
 {
 	pic8259_set_irq_line(((qx10_state*)device->machine->driver_data)->pic8259_master, 7, interrupt);
 }
@@ -547,7 +552,7 @@ static MACHINE_DRIVER_START( qx10 )
 MACHINE_DRIVER_END
 
 static SYSTEM_CONFIG_START(qx10)
-	CONFIG_RAM_DEFAULT(256 * 1024)	
+	CONFIG_RAM_DEFAULT(256 * 1024)
 SYSTEM_CONFIG_END
 
 /* ROM definition */

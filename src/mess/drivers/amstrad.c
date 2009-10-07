@@ -838,6 +838,11 @@ static const cassette_config amstrad_cassette_config =
 
 static const floppy_config cpc6128_floppy_config =
 {
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	FLOPPY_DRIVE_SS_40,
 	FLOPPY_OPTIONS_NAME(default),
 	DO_NOT_KEEP_GEOMETRY
@@ -845,6 +850,11 @@ static const floppy_config cpc6128_floppy_config =
 
 static const floppy_config aleste_floppy_config =
 {
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	FLOPPY_DRIVE_DS_80,
 	FLOPPY_OPTIONS_NAME(msx),
 	DO_NOT_KEEP_GEOMETRY

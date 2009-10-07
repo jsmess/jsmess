@@ -137,6 +137,11 @@ static const applefdc_interface mac_iwm_interface =
 ***************************************************************************/
 static const floppy_config mac128512_floppy_config = //SONY_FLOPPY_ALLOW400K
 {
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	FLOPPY_DRIVE_DS_80,
 	FLOPPY_OPTIONS_NAME(apple35_mac),
 	DO_NOT_KEEP_GEOMETRY
@@ -145,6 +150,11 @@ static const floppy_config mac128512_floppy_config = //SONY_FLOPPY_ALLOW400K
 
 static const floppy_config mac_floppy_config = //SONY_FLOPPY_ALLOW400K | SONY_FLOPPY_ALLOW800K
 {
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	FLOPPY_DRIVE_DS_80,
 	FLOPPY_OPTIONS_NAME(apple35_mac),
 	DO_NOT_KEEP_GEOMETRY

@@ -250,6 +250,11 @@ static const mm58274c_interface compis_mm58274c_interface =
 
 static const floppy_config compis_floppy_config =
 {
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	FLOPPY_DRIVE_DS_80,
 	FLOPPY_OPTIONS_NAME(compis),
 	DO_NOT_KEEP_GEOMETRY

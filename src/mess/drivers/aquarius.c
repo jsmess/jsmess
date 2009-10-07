@@ -439,6 +439,11 @@ FLOPPY_OPTIONS_END
 
 static const floppy_config aquarius_floppy_config =
 {
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	FLOPPY_DRIVE_DS_80,
 	FLOPPY_OPTIONS_NAME(aquarius),
 	DO_NOT_KEEP_GEOMETRY

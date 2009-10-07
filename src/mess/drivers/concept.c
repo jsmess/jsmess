@@ -108,6 +108,11 @@ FLOPPY_OPTIONS_END
 
 static const floppy_config concept_floppy_config =
 {
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	FLOPPY_DRIVE_DS_80,
 	FLOPPY_OPTIONS_NAME(concept),
 	DO_NOT_KEEP_GEOMETRY

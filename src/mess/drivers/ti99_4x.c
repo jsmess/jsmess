@@ -517,6 +517,11 @@ static const mm58274c_interface floppy_mm58274c_interface =
 
 static const floppy_config ti99_4_floppy_config =
 {
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	FLOPPY_DRIVE_DS_80,
 	FLOPPY_OPTIONS_NAME(ti99),
 	KEEP_GEOMETRY

@@ -577,6 +577,11 @@ static void apple2_floppy_getinfo(const mess_device_class *devclass, UINT32 stat
 */
 static const floppy_config apple2_floppy_config =
 {
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	FLOPPY_DRIVE_DS_80,
 	FLOPPY_OPTIONS_NAME(apple2),
 	DO_NOT_KEEP_GEOMETRY

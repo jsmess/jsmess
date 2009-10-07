@@ -233,6 +233,11 @@ static const tms5220_interface ti99_4p_tms5220interface =
 
 static const floppy_config ti99_4p_floppy_config =
 {
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	FLOPPY_DRIVE_DS_80,
 	FLOPPY_OPTIONS_NAME(ti99),
 	DO_NOT_KEEP_GEOMETRY

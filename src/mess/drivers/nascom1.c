@@ -323,6 +323,11 @@ FLOPPY_OPTIONS_END
 
 static const floppy_config nascom2_floppy_config =
 {
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	FLOPPY_DRIVE_DS_80,
 	FLOPPY_OPTIONS_NAME(nascom2),
 	DO_NOT_KEEP_GEOMETRY

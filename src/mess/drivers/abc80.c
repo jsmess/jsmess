@@ -506,6 +506,11 @@ static MACHINE_START( abc80 )
 
 static const floppy_config abc80_floppy_config =
 {
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	FLOPPY_DRIVE_DS_80,
 	FLOPPY_OPTIONS_NAME(abc80),
 	DO_NOT_KEEP_GEOMETRY

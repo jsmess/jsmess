@@ -239,7 +239,14 @@ struct _wd17xx_t
 	devcb_resolved_write_line out_intrq_func;
 	devcb_resolved_write_line out_drq_func;
 
+	/* state of input lines */
+	int rdy;      /* ready, enable precomp */
+	int tr00;     /* track 00 */
+	int idx;      /* index */
+	int wprt;     /* write protect */
+
 	/* state of output lines */
+	int mo;       /* motor on */
 	int dirc;     /* direction */
 	int drq;      /* data request */
 	int intrq;    /* interrupt request */
@@ -1131,6 +1138,36 @@ void wd17xx_set_pause_time(const device_config *device, int usec)
 /***************************************************************************
     DEVICE HANDLERS
 ***************************************************************************/
+
+WRITE_LINE_DEVICE_HANDLER( wd17xx_rdy_w )
+{
+	wd17xx_t *w = get_safe_token(device);
+	w->rdy = state;
+}
+
+READ_LINE_DEVICE_HANDLER( wd17xx_mo_r )
+{
+	wd17xx_t *w = get_safe_token(device);
+	return w->mo;
+}
+
+WRITE_LINE_DEVICE_HANDLER( wd17xx_tr00_w )
+{
+	wd17xx_t *w = get_safe_token(device);
+	w->tr00 = state;
+}
+
+WRITE_LINE_DEVICE_HANDLER( wd17xx_idx_w )
+{
+	wd17xx_t *w = get_safe_token(device);
+	w->idx = state;
+}
+
+WRITE_LINE_DEVICE_HANDLER( wd17xx_wprt_w )
+{
+	wd17xx_t *w = get_safe_token(device);
+	w->wprt = state;
+}
 
 READ_LINE_DEVICE_HANDLER( wd17xx_drq_r )
 {
