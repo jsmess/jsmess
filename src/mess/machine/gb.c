@@ -325,18 +325,12 @@ MACHINE_RESET( sgb )
 	gb_init_regs(machine);
 
 	gb_rom16_0000( machine, ROMMap[ROMBank00] ? ROMMap[ROMBank00] : gb_dummy_rom_bank );
-	//gb_rom16_0000( machine, ROMMap[ROMBank00] ); // which of these is correct?
 
 	/* Enable BIOS rom */
 	memory_set_bankptr(machine, 5, memory_region(machine, "maincpu") );
 
 	sgb_tile_data = auto_alloc_array_clear(machine, UINT8, 0x2000 );
 	memset( sgb_tile_data, 0, 0x2000 );
-
-	/* Initialize the Sound Registers */ // should be unnecessary with the bootrom
-	//gb_sound_w(devtag_get_device(machine, "custom"), 0x16,0xF0);  /* F0 for SGB */
-	//gb_sound_w(devtag_get_device(machine, "custom"), 0x15,0xF3);
-	//gb_sound_w(devtag_get_device(machine, "custom"), 0x14,0x77);
 
 	sgb_window_mask = 0;
 	memset( sgb_pal_map, 0, sizeof(sgb_pal_map) );
