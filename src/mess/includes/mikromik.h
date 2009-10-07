@@ -44,6 +44,7 @@ struct _mm1_state
 	const device_config		*i8275;
 	const device_config		*upd765;
 	const device_config		*upd7201;
+	const device_config		*upd7220;
 	const device_config		*speaker;
 };
 

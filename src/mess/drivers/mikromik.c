@@ -9,7 +9,6 @@
 #include "machine/pit8253.h"
 #include "machine/upd7201.h"
 #include "video/i8275.h"
-#include "video/i82720.h"
 #include "video/upd7220.h"
 #include "sound/speaker.h"
 
@@ -17,7 +16,9 @@
 
 	TODO:
 
-	- NEC uPD7220 GDC (convert Intel 82720 from compis.c into a device)
+	- floppy access violation
+	- add HRTC/VRTC output to i8275
+	- NEC uPD7220 GDC
 	- accurate video timing
 	- floppy DRQ during RECALL = 0
 	- write floppy TC only during DACK
@@ -50,7 +51,7 @@
 	2164-6P (64Kx1 DRAM)*8 = 64KB Work RAM
 
 	DMA channels:
-
+	
 	0	CRT
 	1	MPSC transmit
 	2	MPSC receive
@@ -137,7 +138,16 @@ static ADDRESS_MAP_START( mm1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xff50, 0xff50) AM_MIRROR(0x8e) AM_DEVREAD(UPD765_TAG, nec765_status_r)
 	AM_RANGE(0xff51, 0xff51) AM_MIRROR(0x8e) AM_DEVREADWRITE(UPD765_TAG, nec765_data_r, nec765_data_w)
 	AM_RANGE(0xff60, 0xff67) AM_MIRROR(0x88) AM_WRITE(ls259_w)
-//	AM_RANGE(0xff70, 0xff71) AM_MIRROR(0x8e) AM_DEVREADWRITE(UPD7220_TAG, i82720_r, i82720_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( mm1m6_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_IMPORT_FROM(mm1_map)
+	AM_RANGE(0xff70, 0xff71) AM_MIRROR(0x8e) AM_DEVREADWRITE(UPD7220_TAG, upd7220_r, upd7220_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( mm1_upd7220_map, 0, 16 )
+	AM_RANGE(0x00000, 0x07fff) AM_RAM
+	AM_RANGE(0x08000, 0x3ffff) AM_UNMAP // wrong
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -283,7 +293,7 @@ static I8275_DISPLAY_PIXELS( crtc_display_pixels )
 	int i;
 
 	UINT8 data = (romdata << 1) | (d7 & d0);
-
+	
 	for (i = 0; i < 8; i++)
 	{
 		int qh = BIT(data, i);
@@ -309,15 +319,20 @@ static const i8275_interface mm1_i8275_intf =
 
 static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 {
+	int i;
+
+	for (i = 0; i < 16; i++)
+	{
+		int color = BIT(data, i);
+		
+		*BITMAP_ADDR16(bitmap, y, x + i) = color;
+	}
 }
 
 static UPD7220_INTERFACE( mm1_upd7220_intf )
 {
 	SCREEN_TAG,
-	8,
 	hgdc_display_pixels,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -338,9 +353,12 @@ static VIDEO_UPDATE( mm1 )
 {
 	mm1_state *state = screen->machine->driver_data;
 
+	/* text */
 	i8275_update(state->i8275, bitmap, cliprect);
+	copybitmap(bitmap, tmpbitmap, 0, 0, 0, 0, cliprect);
 
-	VIDEO_UPDATE_CALL(generic_bitmapped);
+	/* graphics */
+	//upd7220_update(state->i8275, bitmap, cliprect);
 
 	return 0;
 }
@@ -414,7 +432,7 @@ static DMA8237_CHANNEL_READ( mpsc_dack_r )
 
 	/* clear data request */
 	dma8237_drq_write(state->i8237, DMA_MPSC_RX, CLEAR_LINE);
-
+	
 	return upd7201_hai_r(state->upd7201, 0);
 }
 
@@ -431,7 +449,7 @@ static DMA8237_CHANNEL_WRITE( mpsc_dack_w )
 static DMA8237_CHANNEL_READ( fdc_dack_r )
 {
 	mm1_state *state = device->machine->driver_data;
-
+	
 	return nec765_dack_r(state->upd765, 0);
 }
 
@@ -610,7 +628,7 @@ static TIMER_DEVICE_CALLBACK( kbclk_tick )
 		/* get key data from PROM */
 		keydata = state->key_rom[(ctrl << 8) | (shift << 7) | (state->drive << 3) | (state->sense)];
 	}
-
+	
 	if (state->keydata != keydata)
 	{
 		/* latch key data */
@@ -694,6 +712,7 @@ static MACHINE_START( mm1 )
 	state->i8275 = devtag_get_device(machine, I8275_TAG);
 	state->upd765 = devtag_get_device(machine, UPD765_TAG);
 	state->upd7201 = devtag_get_device(machine, UPD7201_TAG);
+	state->upd7220 = devtag_get_device(machine, UPD7220_TAG);
 	state->speaker = devtag_get_device(machine, SPEAKER_TAG);
 
 	/* find memory regions */
@@ -763,6 +782,8 @@ static MACHINE_DRIVER_START( mm1 )
 	MDRV_VIDEO_START(mm1)
 	MDRV_VIDEO_UPDATE(mm1)
 
+	MDRV_I8275_ADD(I8275_TAG, mm1_i8275_intf)
+
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(SPEAKER_TAG, SPEAKER, 0)
@@ -770,19 +791,23 @@ static MACHINE_DRIVER_START( mm1 )
 
 	/* peripheral hardware */
 	MDRV_I8212_ADD(I8212_TAG, mm1_i8212_intf)
-	MDRV_I8275_ADD(I8275_TAG, mm1_i8275_intf)
 	MDRV_DMA8237_ADD(I8237_TAG, /* XTAL_6_144MHz/2, */ mm1_dma8237_intf)
 	MDRV_PIT8253_ADD(I8253_TAG, mm1_pit8253_intf)
 	MDRV_NEC765A_ADD(UPD765_TAG, /* XTAL_16MHz/2/2, */ mm1_nec765_intf)
 	MDRV_UPD7201_ADD(UPD7201_TAG, XTAL_6_144MHz/2, mm1_upd7201_intf)
-
+	
 	MDRV_FLOPPY_2_DRIVES_ADD(mm1_floppy_config)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( mm1m6 )
 	MDRV_IMPORT_FROM(mm1)
 
-	MDRV_UPD7220_ADD(UPD7220_TAG, 0, mm1_upd7220_intf)
+	/* basic system hardware */
+	MDRV_CPU_MODIFY(I8085A_TAG)
+	MDRV_CPU_PROGRAM_MAP(mm1_map)
+
+	/* video hardware */
+	MDRV_UPD7220_ADD(UPD7220_TAG, XTAL_18_720MHz/8, mm1_upd7220_intf, mm1_upd7220_map)
 MACHINE_DRIVER_END
 
 /* ROMs */
