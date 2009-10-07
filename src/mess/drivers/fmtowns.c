@@ -91,7 +91,7 @@ static UINT32 towns_ankcg_enable;
 static UINT32 towns_mainmem_enable;
 static UINT32 towns_ram_enable;
 static UINT32* towns_vram;
-static UINT32* towns_cmos;
+static UINT8* towns_cmos;
 static UINT8* towns_gfxvram;
 static UINT8* towns_txtvram;
 static UINT8 towns_vram_wplane;
@@ -327,7 +327,7 @@ static WRITE8_HANDLER(towns_floppy_w)
 					floppy_drive_set_ready_state(floppy_get_device(space->machine, towns_selected_drive-1), data & 0x10,0);
 				}
 			}
-			// bit 2 - HDISEL
+			wd17xx_set_side(fdc,(data & 0x04)>>2);
 			// bit 1 - DDEN
 			// bit 0 - IRQMSK
 			logerror("FDC: write %02x to offset 0x08\n",data);
@@ -340,15 +340,19 @@ static WRITE8_HANDLER(towns_floppy_w)
 					break;
 				case 0x01:
 					towns_selected_drive = 1;
+					wd17xx_set_drive(fdc,0);
 					break;
 				case 0x02:
 					towns_selected_drive = 2;
+					wd17xx_set_drive(fdc,1);
 					break;
 				case 0x04:
 					towns_selected_drive = 3;
+					wd17xx_set_drive(fdc,2);
 					break;
 				case 0x08:
 					towns_selected_drive = 4;
+					wd17xx_set_drive(fdc,3);
 					break;
 			}
 			logerror("FDC: drive select %02x\n",data);
@@ -535,46 +539,38 @@ static READ32_HANDLER(towns_padport_r)
 
 static READ8_HANDLER( towns_cmos8_r )
 {
-	UINT8* cmos = (UINT8*)towns_cmos;
-
-	return cmos[offset];
+	return towns_cmos[offset];
 }
 
 static WRITE8_HANDLER( towns_cmos8_w )
 {
-	UINT8* cmos = (UINT8*)towns_cmos;
-
-	cmos[offset] = data;
+	towns_cmos[offset] = data;
 }
 
 static READ8_HANDLER( towns_cmos_low_r )
 {
-	UINT8* cmos = (UINT8*)towns_cmos;
-
 	if(towns_mainmem_enable != 0)
 		return mess_ram[offset + 0xd8000];
 
-	return cmos[offset];
+	return towns_cmos[offset];
 }
 
 static WRITE8_HANDLER( towns_cmos_low_w )
 {
-	UINT8* cmos = (UINT8*)towns_cmos;
-
 	if(towns_mainmem_enable != 0)
 		mess_ram[offset+0xd8000] = data;
 	else
-		cmos[offset] = data;
+		towns_cmos[offset] = data;
 }
 
-static READ32_HANDLER( towns_cmos_r )
+static READ8_HANDLER( towns_cmos_r )
 {
 	return towns_cmos[offset];
 }
 
-static WRITE32_HANDLER( towns_cmos_w )
+static WRITE8_HANDLER( towns_cmos_w )
 {
-	COMBINE_DATA(towns_cmos+offset);
+	towns_cmos[offset] = data;
 }
 
 static WRITE8_HANDLER( towns_gfx_w )
@@ -818,7 +814,7 @@ static ADDRESS_MAP_START(towns_mem, ADDRESS_SPACE_PROGRAM, 32)
   AM_RANGE(0xc2000000, 0xc207ffff) AM_ROM AM_REGION("user",0x000000)  // OS ROM
   AM_RANGE(0xc2080000, 0xc20fffff) AM_ROM AM_REGION("user",0x100000)  // DIC ROM
   AM_RANGE(0xc2100000, 0xc213ffff) AM_ROM AM_REGION("user",0x180000)  // FONT ROM
-  AM_RANGE(0xc2140000, 0xc2141fff) AM_READWRITE(towns_cmos_r,towns_cmos_w) // CMOS (mirror?)
+  AM_RANGE(0xc2140000, 0xc2141fff) AM_READWRITE8(towns_cmos_r,towns_cmos_w,0xffffffff) // CMOS (mirror?)
   AM_RANGE(0xc2200000, 0xc2200fff) AM_NOP  // WAVE RAM
   AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("user",0x200000)  // SYSTEM ROM
 ADDRESS_MAP_END
@@ -880,7 +876,7 @@ INPUT_PORTS_END
 static DRIVER_INIT( towns )
 {
 	towns_vram = auto_alloc_array(machine,UINT32,0x20000);
-	towns_cmos = auto_alloc_array(machine,UINT32,0x2000/(sizeof(UINT32)));
+	towns_cmos = auto_alloc_array(machine,UINT8,0x2000);
 	towns_gfxvram = auto_alloc_array(machine,UINT8,0x200000);
 	towns_txtvram = auto_alloc_array(machine,UINT8,0x8000);
 	towns_serial_rom = auto_alloc_array(machine,UINT8,256/8);
@@ -1047,7 +1043,7 @@ static MACHINE_DRIVER_START( towns )
 	MDRV_PIC8259_ADD( "pic8259_slave", towns_pic8259_slave_config )
 
 	MDRV_MB8877_ADD("fdc",towns_mb8877a_interface)
-	MDRV_FLOPPY_2_DRIVES_ADD(towns_floppy_config)
+	MDRV_FLOPPY_4_DRIVES_ADD(towns_floppy_config)
 
 	MDRV_UPD71071_ADD("dma_1",towns_dma_config)
 	MDRV_UPD71071_ADD("dma_2",towns_dma_config)

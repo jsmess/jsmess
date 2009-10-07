@@ -152,11 +152,12 @@ void upd71071_dmarq(const device_config* device, int state,int channel)
 
 	if(state != 0)
 	{
+		dmac->dmarq[channel] = 1;  // DMARQ line is set
+		dmac->reg.status |= (0x10 << channel);
+
 		// start transfer
 		if(dmac->reg.mask & (1 << channel))  // is channel masked?
 			return;
-		
-		dmac->dmarq[channel] = 1;  // DMARQ line is set
 		
 		switch(dmac->reg.mode_control[channel] & 0xc0)
 		{
@@ -178,6 +179,7 @@ void upd71071_dmarq(const device_config* device, int state,int channel)
 	else
 	{
 		dmac->dmarq[channel] = 0;  // clear DMARQ line
+		dmac->reg.status &= ~(0x10 << channel);
 	}
 }
 
