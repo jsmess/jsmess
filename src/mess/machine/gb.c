@@ -68,13 +68,13 @@ enum {
 #define MAX_ROMBANK 512
 #define MAX_RAMBANK 256
 
-#define JOYPAD		gb_io[0x00]	/* Joystick: 1.1.P15.P14.P13.P12.P11.P10       */
-#define SIODATA		gb_io[0x01]	/* Serial IO data buffer                       */
-#define SIOCONT		gb_io[0x02]	/* Serial IO control register                  */
-#define DIVREG		gb_io[0x04]	/* Divider register (???)                      */
-#define TIMECNT		gb_io[0x05]	/* Timer counter. Gen. int. when it overflows  */
-#define TIMEMOD		gb_io[0x06]	/* New value of TimeCount after it overflows   */
-#define TIMEFRQ		gb_io[0x07]	/* Timer frequency and start/stop switch       */
+#define JOYPAD		gb_driver_data.gb_io[0x00]	/* Joystick: 1.1.P15.P14.P13.P12.P11.P10       */
+#define SIODATA		gb_driver_data.gb_io[0x01]	/* Serial IO data buffer                       */
+#define SIOCONT		gb_driver_data.gb_io[0x02]	/* Serial IO control register                  */
+#define DIVREG		gb_driver_data.gb_io[0x04]	/* Divider register (???)                      */
+#define TIMECNT		gb_driver_data.gb_io[0x05]	/* Timer counter. Gen. int. when it overflows  */
+#define TIMEMOD		gb_driver_data.gb_io[0x06]	/* New value of TimeCount after it overflows   */
+#define TIMEFRQ		gb_driver_data.gb_io[0x07]	/* Timer frequency and start/stop switch       */
 
 static UINT16 MBCType;				   /* MBC type: 0 for none                        */
 static UINT8 CartType;				   /* Cart Type (battery, ram, timer etc)         */
@@ -104,7 +104,6 @@ UINT8 sgb_hack;				/* Flag set if we're using a hack       */
 
 static UINT8 *gb_cart = NULL;
 static UINT8 *gb_cart_ram = NULL;
-static UINT8 gb_io[0x10];
 static UINT8 *gb_dummy_rom_bank = NULL;
 static UINT8 *gb_dummy_ram_bank = NULL;
 /* TAMA5 related global variables */
@@ -112,17 +111,24 @@ static UINT8 gbTama5Memory[32];
 static UINT8 gbTama5Byte;
 static UINT8 gbTama5Address;
 static UINT8 gbLastTama5Command;
-/* Timer related globals */
-static struct gb_timer_struct {
-	UINT16	divcount;
-	UINT8	shift;
-	UINT16	shift_cycles;
-	UINT8	triggering_irq;
-	UINT8	reloading;
-} gb_timer;
-/* Serial I/O related */
-static UINT32 SIOCount;			/* Serial I/O counter                          */
-static emu_timer	*gb_serial_timer = NULL;
+
+typedef struct _gb_state gb_state;
+struct _gb_state {
+	UINT8		gb_io[0x10];
+
+	/* Timer related */
+	UINT16		divcount;
+	UINT8		shift;
+	UINT16		shift_cycles;
+	UINT8		triggering_irq;
+	UINT8		reloading;
+
+	/* Serial I/O related */
+	UINT32		SIOCount;		/* Serial I/O counter */
+	emu_timer	*gb_serial_timer;
+};
+
+static gb_state gb_driver_data;
 
 /*
   Prototypes
@@ -283,12 +289,12 @@ static void gb_init(running_machine *machine)
 	gb_sound_w(devtag_get_device(space->machine, "custom"), 0x16, 0x00 );       /* Initialize sound hardware */
 
 	/* Allocate the serial timer, and disable it */
-	gb_serial_timer = timer_alloc(machine,  gb_serial_timer_proc , NULL);
-	timer_enable( gb_serial_timer, 0 );
+	gb_driver_data.gb_serial_timer = timer_alloc(machine,  gb_serial_timer_proc , NULL);
+	timer_enable( gb_driver_data.gb_serial_timer, 0 );
 
-	gb_timer.divcount = 0;
-	gb_timer.triggering_irq = 0;
-	gb_io[0x07] = 0xF8;		/* Upper bits of TIMEFRQ register are set to 1 */
+	gb_driver_data.divcount = 0;
+	gb_driver_data.triggering_irq = 0;
+	gb_driver_data.gb_io[0x07] = 0xF8;		/* Upper bits of TIMEFRQ register are set to 1 */
 }
 
 MACHINE_START( gb )
@@ -307,7 +313,7 @@ MACHINE_RESET( gb )
 	/* Enable BIOS rom */
 	memory_set_bankptr(machine, 5, memory_region(machine, "maincpu") );
 
-	gb_timer.divcount = 0x0004;
+	gb_driver_data.divcount = 0x0004;
 }
 
 MACHINE_RESET( sgb )
@@ -348,7 +354,7 @@ MACHINE_RESET( sgb )
 				sgb_hack = 1;
 	}
 
-	gb_timer.divcount = 0x0004; //0xABC8; // needs to be fixed for bootrom, probably should be 0x0004 like dmg
+	gb_driver_data.divcount = 0x0004;
 }
 
 MACHINE_RESET( gbpocket )
@@ -367,7 +373,7 @@ MACHINE_RESET( gbpocket )
 	/* Enable BIOS rom if we have one */
 	gb_rom16_0000( machine, ROMMap[ROMBank00] ? ROMMap[ROMBank00] : gb_dummy_rom_bank );
 
-	gb_timer.divcount = 0xABC8;
+	gb_driver_data.divcount = 0xABC8;
 }
 
 MACHINE_RESET( gbc )
@@ -814,32 +820,32 @@ WRITE8_HANDLER ( gb_io_w )
 		case 0x00:
 		case 0x01:
 		case 0x80:				/* enabled & external clock */
-			SIOCount = 0;
+			gb_driver_data.SIOCount = 0;
 			break;
 		case 0x81:				/* enabled & internal clock */
 			SIODATA = 0xFF;
-			SIOCount = 8;
-			timer_adjust_periodic(gb_serial_timer, cputag_clocks_to_attotime(space->machine, "maincpu", 512), 0, cputag_clocks_to_attotime(space->machine, "maincpu", 512));
-			timer_enable( gb_serial_timer, 1 );
+			gb_driver_data.SIOCount = 8;
+			timer_adjust_periodic(gb_driver_data.gb_serial_timer, cputag_clocks_to_attotime(space->machine, "maincpu", 512), 0, cputag_clocks_to_attotime(space->machine, "maincpu", 512));
+			timer_enable( gb_driver_data.gb_serial_timer, 1 );
 			break;
 		}
 		break;
 	case 0x04:						/* DIV - Divider register */
 		/* Force increment of TIMECNT register */
-		if ( gb_timer.divcount >= 16 )
+		if ( gb_driver_data.divcount >= 16 )
 			gb_timer_increment(space->machine);
-		gb_timer.divcount = 0;
+		gb_driver_data.divcount = 0;
 		return;
 	case 0x05:						/* TIMA - Timer counter */
 		/* Check if the counter is being reloaded in this cycle */
-		if ( gb_timer.reloading && ( gb_timer.divcount & ( gb_timer.shift_cycles - 1 ) ) == 4 )
+		if ( gb_driver_data.reloading && ( gb_driver_data.divcount & ( gb_driver_data.shift_cycles - 1 ) ) == 4 )
 		{
 			data = TIMECNT;
 		}
 		break;
 	case 0x06:						/* TMA - Timer module */
 		/* Check if the counter is being reloaded in this cycle */
-		if ( gb_timer.reloading && ( gb_timer.divcount & ( gb_timer.shift_cycles - 1 ) ) == 4 )
+		if ( gb_driver_data.reloading && ( gb_driver_data.divcount & ( gb_driver_data.shift_cycles - 1 ) ) == 4 )
 		{
 			TIMECNT = data;
 		}
@@ -850,13 +856,13 @@ WRITE8_HANDLER ( gb_io_w )
 		if ( ( ! ( data & 0x04 ) && ( TIMEFRQ & 0x04 ) ) || ( ( data & 0x04 ) && ( TIMEFRQ & 0x04 ) && ( data & 0x03 ) != ( TIMEFRQ & 0x03 ) ) )
 		{
 			/* Check if TIMECNT should be incremented */
-			if ( ( gb_timer.divcount & ( gb_timer.shift_cycles - 1 ) ) >= ( gb_timer.shift_cycles >> 1 ) )
+			if ( ( gb_driver_data.divcount & ( gb_driver_data.shift_cycles - 1 ) ) >= ( gb_driver_data.shift_cycles >> 1 ) )
 			{
 				gb_timer_increment(space->machine);
 			}
 		}
-		gb_timer.shift = timer_shifts[data & 0x03];
-		gb_timer.shift_cycles = 1 << gb_timer.shift;
+		gb_driver_data.shift = timer_shifts[data & 0x03];
+		gb_driver_data.shift_cycles = 1 << gb_driver_data.shift;
 		break;
 	case 0x0F:						/* IF - Interrupt flag */
 		data &= 0x1F;
@@ -864,7 +870,7 @@ WRITE8_HANDLER ( gb_io_w )
 		break;
 	}
 
-	gb_io[offset] = data;
+	gb_driver_data.gb_io[offset] = data;
 }
 
 WRITE8_HANDLER ( gb_io2_w )
@@ -1405,7 +1411,7 @@ WRITE8_HANDLER ( sgb_io_w )
 			return;
 	}
 
-	gb_io[offset] = data;
+	gb_driver_data.gb_io[offset] = data;
 }
 
 /* Interrupt Enable register */
@@ -1425,7 +1431,7 @@ READ8_HANDLER ( gb_io_r )
 	switch(offset)
 	{
 		case 0x04:
-			return ( gb_timer.divcount >> 8 ) & 0xFF;
+			return ( gb_driver_data.divcount >> 8 ) & 0xFF;
 		case 0x00:
 		case 0x01:
 		case 0x02:
@@ -1433,7 +1439,7 @@ READ8_HANDLER ( gb_io_r )
 		case 0x05:
 		case 0x06:
 		case 0x07:
-			return gb_io[offset];
+			return gb_driver_data.gb_io[offset];
 		case 0x0F:
 			/* Make sure the internal states are up to date */
 			return 0xE0 | cpu_get_reg( cputag_get_cpu(space->machine, "maincpu"), LR35902_IF );
@@ -1907,27 +1913,27 @@ static TIMER_CALLBACK(gb_serial_timer_proc)
 	/* Shift in a received bit */
 	SIODATA = (SIODATA << 1) | 0x01;
 	/* Decrement number of handled bits */
-	SIOCount--;
+	gb_driver_data.SIOCount--;
 	/* If all bits done, stop timer and trigger interrupt */
-	if ( ! SIOCount )
+	if ( ! gb_driver_data.SIOCount )
 	{
 		SIOCONT &= 0x7F;
-		timer_enable( gb_serial_timer, 0 );
+		timer_enable( gb_driver_data.gb_serial_timer, 0 );
 		cputag_set_input_line(machine, "maincpu", SIO_INT, ASSERT_LINE);
 	}
 }
 
 INLINE void gb_timer_check_irq( running_machine *machine )
 {
-	gb_timer.reloading = 0;
-	if ( gb_timer.triggering_irq )
+	gb_driver_data.reloading = 0;
+	if ( gb_driver_data.triggering_irq )
 	{
-		gb_timer.triggering_irq = 0;
+		gb_driver_data.triggering_irq = 0;
 		if ( TIMECNT == 0 )
 		{
 			TIMECNT = TIMEMOD;
 			cputag_set_input_line(machine, "maincpu", TIM_INT, ASSERT_LINE );
-			gb_timer.reloading = 1;
+			gb_driver_data.reloading = 1;
 		}
 	}
 }
@@ -1939,22 +1945,22 @@ static void gb_timer_increment( running_machine *machine )
 	TIMECNT += 1;
 	if ( TIMECNT == 0 )
 	{
-		gb_timer.triggering_irq = 1;
+		gb_driver_data.triggering_irq = 1;
 	}
 }
 
 void gb_timer_callback(const device_config *device, int cycles)
 {
-	UINT16 old_gb_divcount = gb_timer.divcount;
-	gb_timer.divcount += cycles;
+	UINT16 old_gb_divcount = gb_driver_data.divcount;
+	gb_driver_data.divcount += cycles;
 
 	gb_timer_check_irq(device->machine);
 
 	if ( TIMEFRQ & 0x04 )
 	{
-		UINT16 old_count = old_gb_divcount >> gb_timer.shift;
-		UINT16 new_count = gb_timer.divcount >> gb_timer.shift;
-		if ( cycles > gb_timer.shift_cycles )
+		UINT16 old_count = old_gb_divcount >> gb_driver_data.shift;
+		UINT16 new_count = gb_driver_data.divcount >> gb_driver_data.shift;
+		if ( cycles > gb_driver_data.shift_cycles )
 		{
 			gb_timer_increment(device->machine);
 			old_count++;
@@ -1963,7 +1969,7 @@ void gb_timer_callback(const device_config *device, int cycles)
 		{
 			gb_timer_increment(device->machine);
 		}
-		if ( new_count << gb_timer.shift < gb_timer.divcount )
+		if ( new_count << gb_driver_data.shift < gb_driver_data.divcount )
 		{
 			gb_timer_check_irq(device->machine);
 		}
