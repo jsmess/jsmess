@@ -2,6 +2,12 @@
 
     NEC PC-98 computer series
 
+	preliminary driver by Angelo Salese
+
+	Reminder: tests A20 line feature, afaik it's NOT supported by the i386 core (along with protected mode / MMU)
+
+========================================================================================
+
     This series features a huge number of models released between 1982 and 1997. They
     were not IBM PC-compatible, but they had similar hardware (and software: in the
     1990s, they run MS Windows as OS)
@@ -209,11 +215,15 @@
 #include "driver.h"
 #include "cpu/i386/i386.h"
 #include "machine/8255ppi.h"
+#include "machine/pit8253.h"
 
 static UINT32 *pc9801_vram;
+static UINT32 *gfx_bitmap_ram;
+static UINT8 ems_bank;
 
 static VIDEO_START( pc9801 )
 {
+	gfx_bitmap_ram = auto_alloc_array(machine, UINT32, 0x18000*2);
 }
 
 static VIDEO_UPDATE( pc9801 )
@@ -345,9 +355,73 @@ static WRITE8_HANDLER( port_a0_w )
 		crtc_cmd_w(space,0,data);
 }
 
+static WRITE8_HANDLER( ems_sel_w )
+{
+	if(offset == 3)
+	{
+		if(data == 0x22)
+			ems_bank = 1;
+		if(data == 0x20)
+			ems_bank = 0;
+		//printf("%02x %02x\n",offset,data);
+	}
+}
+
+static READ8_HANDLER( port_70_r )
+{
+	if(offset & 1)
+	{
+		logerror("pit port $70 R access %02x\n",offset >> 1);
+		return mame_rand(space->machine);//pit8253_r(devtag_get_device(space->machine, "pit8253"), (offset & 6) >> 1);
+	}
+
+	logerror("crtc port $70 R access %02x\n",offset >> 1);
+	return 0xff;
+}
+
+static WRITE8_HANDLER( port_70_w )
+{
+	if(offset & 1)
+	{
+		logerror("pit port $70 W access %02x %02x\n",offset >> 1,data);
+		pit8253_w(devtag_get_device(space->machine, "pit8253"), (offset & 6) >> 1, data);
+	}
+	else
+		logerror("crtc port $70 W access %02x %02x\n",offset >> 1,data);
+}
+
+/* FIXME */
+static READ8_HANDLER( port_00_r )
+{
+	if(!(offset & 1))
+	{
+		logerror("pic8259 port $00 R access %02x\n",offset >> 1);
+		return mame_rand(space->machine);//pic8259_r(devtag_get_device(space->machine, "pic8259"), (offset & 6) >> 1);
+	}
+
+	logerror("??? port $00 R access %02x\n",offset >> 1);
+	return 0xff;
+}
+
+static WRITE8_HANDLER( port_00_w )
+{
+	if(!(offset & 1))
+	{
+		logerror("pic8259 port $00 W access %02x %02x\n",offset >> 1,data);
+		//pic8259_w(devtag_get_device(space->machine, "pic8259"), (offset & 6) >> 1, data);
+	}
+	else
+		logerror("??? port $00 W access %02x %02x\n",offset >> 1,data);
+}
+
+static READ32_HANDLER( gfx_bitmap_ram_r ) { return gfx_bitmap_ram[offset+ems_bank*0x18000/4]; }
+static WRITE32_HANDLER( gfx_bitmap_ram_w ) { gfx_bitmap_ram[offset+ems_bank*0x18000/4] = data; }
+
 static ADDRESS_MAP_START( pc9801_mem, ADDRESS_SPACE_PROGRAM, 32)
-	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
-	AM_RANGE(0x000a0000, 0x000bffff) AM_RAM AM_BASE(&pc9801_vram)
+	AM_RANGE(0x00000000, 0x0009ffff) AM_MIRROR(0x00100000) AM_RAM
+	AM_RANGE(0x000a0000, 0x000a3fff) AM_RAM AM_BASE(&pc9801_vram) //vram + attr
+	AM_RANGE(0x000a4000, 0x000a4fff) AM_RAM //cg window
+	AM_RANGE(0x000a8000, 0x000bffff) AM_READWRITE(gfx_bitmap_ram_r,gfx_bitmap_ram_w)
 	AM_RANGE(0x000e0000, 0x000fffff) AM_ROM AM_REGION("maincpu",0)
 	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("maincpu",0)
 ADDRESS_MAP_END
@@ -355,27 +429,12 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( pc9801_io, ADDRESS_SPACE_IO, 32)
-//	AM_RANGE(0x0000, 0x0000) pic8259
-//	AM_RANGE(0x0002, 0x0002)
+	AM_RANGE(0x0000, 0x000f) AM_READWRITE8(port_00_r,port_00_w,0xffffffff) // pic8259 (even ports)
 //	AM_RANGE(0x0020, 0x0020) rtc
 //	AM_RANGE(0x0022, 0x0022)
-//	AM_RANGE(0x0030, 0x0030) rs232c (i8251 1)
-//	AM_RANGE(0x0032, 0x0032)
-//	AM_RANGE(0x0031, 0x0031) system port (ppi8255 1)
-//	AM_RANGE(0x0033, 0x0033)
-//	AM_RANGE(0x0035, 0x0035)
-//	AM_RANGE(0x0037, 0x0037)
-	AM_RANGE(0x0030, 0x0037) AM_READWRITE8(sys_port_r,sys_port_w,0xffffffff)
-//	AM_RANGE(0x0040, 0x0040) printer port (ppi8255 2)
-//	AM_RANGE(0x0042, 0x0042)
-//	AM_RANGE(0x0044, 0x0044)
-//	AM_RANGE(0x0046, 0x0046)
-//	AM_RANGE(0x0041, 0x0041) keyboard (i8251 2)
-//	AM_RANGE(0x0043, 0x0043)
-	AM_RANGE(0x0040, 0x0047) AM_READWRITE8(sio_port_r,sio_port_w,0xffffffff)
-//	AM_RANGE(0x0060, 0x0060) uPD7220 status reg / param write (for chars)
-//	AM_RANGE(0x0062, 0x0062) uPD7220 fifo read / cmd write
-	AM_RANGE(0x0060, 0x0063) AM_READWRITE8(port_60_r,port_60_w,0xffffffff)
+	AM_RANGE(0x0030, 0x0037) AM_READWRITE8(sys_port_r,sys_port_w,0xffffffff) // rs232c (even ports) / system ppi8255 (odd ports)
+	AM_RANGE(0x0040, 0x0047) AM_READWRITE8(sio_port_r,sio_port_w,0xffffffff) // printer ppi8255 (even ports) / keyboard (odd ports)
+	AM_RANGE(0x0060, 0x0063) AM_READWRITE8(port_60_r,port_60_w,0xffffffff) // uPD7220 status & fifo (R) / param & cmd (W) master (even ports)
 //	AM_RANGE(0x0064, 0x0064) V-SYNC related write
 //	AM_RANGE(0x0068, 0x0068) Flip-Flop 1 r/w
 //	AM_RANGE(0x006a, 0x006a) Flip-Flop 2 r/w
@@ -386,17 +445,12 @@ static ADDRESS_MAP_START( pc9801_io, ADDRESS_SPACE_IO, 32)
 //	AM_RANGE(0x0076, 0x0076)
 //	AM_RANGE(0x0078, 0x0078)
 //	AM_RANGE(0x007a, 0x007a)
-//	AM_RANGE(0x0071, 0x0071) pit8253
-//	AM_RANGE(0x0073, 0x0073)
-//	AM_RANGE(0x0075, 0x0075)
-//	AM_RANGE(0x0077, 0x0077)
 //	AM_RANGE(0x007c, 0x007c) GRCG mode write
 //	AM_RANGE(0x007e, 0x007e) GRCG tile write
-//	AM_RANGE(0x00a0, 0x00a0) uPD7220 status reg / param write (for gfx)
-//	AM_RANGE(0x00a2, 0x00a2) uPD7220 fifo read / cmd write
-	AM_RANGE(0x00a0, 0x00a3) AM_READWRITE8(port_a0_r,port_a0_w,0xffffffff)
+	AM_RANGE(0x0070, 0x007f) AM_READWRITE8(port_70_r,port_70_w,0xffffffff) // crtc regs (even ports) / pit8253 (odd ports)
+	AM_RANGE(0x00a0, 0x00a3) AM_READWRITE8(port_a0_r,port_a0_w,0xffffffff) // uPD7220 status & fifo (R) / param & cmd (W) slave (even ports)
 // 	AM_RANGE(0x00e0, 0x00ef) DMA
-//	AM_RANGE(0x043f, 0x043f) EMS select (bankswitch)
+	AM_RANGE(0x043c, 0x043f) AM_WRITE8(ems_sel_w,0xffffffff)
 
 //	(and many more...)
 ADDRESS_MAP_END
@@ -504,6 +558,27 @@ static const ppi8255_interface printer_intf =
 	DEVCB_NULL					/* Port C write */
 };
 
+static PIT8253_OUTPUT_CHANGED( pc_timer0_w )
+{
+//	pic8259_set_irq_line(filetto_devices.pic8259_1, 0, state);
+}
+
+static const struct pit8253_config pit8253_config =
+{
+	{
+		{
+			4772720/4,				/* heartbeat IRQ */
+			pc_timer0_w
+		}, {
+			4772720/4,				/* dram refresh */
+			NULL
+		}, {
+			4772720/4,				/* pio port c pin 4, and speaker polling enough */
+			NULL
+		}
+	}
+};
+
 /* I suspect the dump for pc9801 comes from a i386 later model... the original machine would use a i8086 @ 5Mhz CPU (see notes at top) */
 /* More investigations are required, but in the meanwhile I set a I386 as main CPU */
 static MACHINE_DRIVER_START( pc9801 )
@@ -516,6 +591,7 @@ static MACHINE_DRIVER_START( pc9801 )
 
 	MDRV_PPI8255_ADD( "ppi8255_0", ppi8255_intf )
 	MDRV_PPI8255_ADD( "ppi8255_1", printer_intf )
+	MDRV_PIT8253_ADD( "pit8253", pit8253_config )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
