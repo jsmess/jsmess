@@ -18,6 +18,12 @@
     - resolve "ready" state stuff (ready state when reset for PC, ready state change while processing command AND
     while idle)
 
+	Changes:
+	091006 (Mariusz Wojcieszek, changes needed by QX-10):
+	- allowed "Sense Interrupt Status" command when Seek is active
+	- DIO bit in status register (0x40) is cleared when "Read Data" command is executed,
+	  it is later set during result phase.
+
 ***************************************************************************/
 
 #include "driver.h"
@@ -583,7 +589,8 @@ static void nec765_seek_setup(const device_config *device, int is_recalibrate)
 static void nec765_setup_execution_phase_read(const device_config *device, char *ptr, int size)
 {
 	nec765_t *fdc = get_safe_token(device);
-	fdc->FDC_main |= 0x040;                     /* FDC->CPU */
+
+	fdc->FDC_main &= ~0x040;                     /* FDC->CPU */
 
 	fdc->nec765_transfer_bytes_count = 0;
 	fdc->nec765_transfer_bytes_remaining = size;
@@ -1675,7 +1682,8 @@ void nec765_update_state(const device_config *device)
 		{
 			/* any command results in a invalid - I think that seek, recalibrate and
             sense interrupt status may work*/
-			fdc->nec765_data_reg = 0;
+			if (fdc->nec765_data_reg != 8)	/* Sense Interrupt Status */
+				fdc->nec765_data_reg = 0;
 		}
 
 		fdc->nec765_command_bytes[0] = fdc->nec765_data_reg;
@@ -1738,7 +1746,8 @@ READ8_DEVICE_HANDLER(nec765_data_r)
 {
 	nec765_t *fdc = get_safe_token(device);
 
-	if ((fdc->FDC_main & 0x0c0) == 0x0c0)
+//	if ((fdc->FDC_main & 0x0c0) == 0x0c0)
+	if ((fdc->FDC_main & 0x080) == 0x080)
 	{
 		if (
 			(fdc->nec765_phase == NEC765_EXECUTION_PHASE_READ) ||

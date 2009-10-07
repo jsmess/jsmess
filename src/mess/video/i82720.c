@@ -15,6 +15,7 @@
 #include "driver.h"
 #include "i82720.h"
 #include "i82720cm.h"
+#include "memconv.h"
 #include <math.h>
 
 /*-------------------------------------------------------------------------*/
@@ -1222,10 +1223,10 @@ static int gdc_nbr_expected_params(UINT8 command)
 /* Name: compis_gdc_w                                                      */
 /* Desc: GDC - 82720 Write handler   GDC   82720                           */
 /*-------------------------------------------------------------------------*/
-WRITE16_HANDLER ( compis_gdc_w )
+WRITE8_HANDLER ( compis_gdc_w )
 {
    /* FIXME: Move to better place. Must be signed and larger than 8 bits */
-   static INT16 last_command = -1;
+   static INT8 last_command = -1;
    /* FIXME: Move to better place */
    static int nbr_expected_params = 17;
 
@@ -1282,9 +1283,9 @@ WRITE16_HANDLER ( compis_gdc_w )
 /* Name: compis_gdc_r                                                      */
 /* Desc: GDC - 82720 Read handler                                          */
 /*-------------------------------------------------------------------------*/
-READ16_HANDLER (compis_gdc_r)
+READ8_HANDLER (compis_gdc_r)
 {
-	UINT16 data;
+	UINT8 data;
 
 	data = 0xff;
 
@@ -1463,3 +1464,7 @@ void compis_init(const compis_gdc_interface *intf)
 {
 	sIntf = *intf;
 }
+
+READ16_HANDLER ( compis_gdc_16_r ) { return compis_gdc_r(space, offset); }
+WRITE16_HANDLER ( compis_gdc_16_w ) { compis_gdc_w(space, offset, data); }
+

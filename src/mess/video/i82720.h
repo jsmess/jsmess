@@ -15,8 +15,11 @@
 ** The I/O functions
 */
 
-READ16_HANDLER ( compis_gdc_r );
-WRITE16_HANDLER ( compis_gdc_w );
+READ8_HANDLER ( compis_gdc_r );
+WRITE8_HANDLER ( compis_gdc_w );
+
+READ16_HANDLER ( compis_gdc_16_r );
+WRITE16_HANDLER ( compis_gdc_16_w );
 
 /*
 ** This next function must be called 50 times per second,
