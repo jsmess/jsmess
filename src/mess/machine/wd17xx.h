@@ -73,6 +73,8 @@ void wd17xx_set_drive(const device_config *device, UINT8);		/* set drive wd179x 
 void wd17xx_set_side(const device_config *device, UINT8);		/* set side wd179x is accessing */
 void wd17xx_set_density(const device_config *device, DENSITY);	/* set density */
 
+void wd17xx_set_pause_time(const device_config *device, int usec); /* default is 40 usec if not set */
+
 READ8_DEVICE_HANDLER( wd17xx_status_r );
 READ8_DEVICE_HANDLER( wd17xx_track_r );
 READ8_DEVICE_HANDLER( wd17xx_sector_r );
@@ -86,7 +88,8 @@ WRITE8_DEVICE_HANDLER( wd17xx_data_w );
 READ8_DEVICE_HANDLER( wd17xx_r );
 WRITE8_DEVICE_HANDLER( wd17xx_w );
 
-void wd17xx_set_pause_time(const device_config *device, int usec); /* default is 40 usec if not set */
+READ_LINE_DEVICE_HANDLER( wd17xx_drq_r );
+READ_LINE_DEVICE_HANDLER( wd17xx_intrq_r );
 
 extern const wd17xx_interface default_wd17xx_interface;
 extern const wd17xx_interface default_wd17xx_interface_2_drives;
