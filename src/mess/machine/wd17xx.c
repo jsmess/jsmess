@@ -251,6 +251,8 @@ struct _wd17xx_t
 	int drq;      /* data request */
 	int intrq;    /* interrupt request */
 
+	int stepping_rate[4];  /* track stepping rate in ms */
+
 	DENSITY   density;				/* FM/MFM, single / double density */
 	wd17xx_type_t type;
 	UINT8	track_reg;				/* value of track register */
@@ -1739,7 +1741,7 @@ WRITE8_DEVICE_HANDLER( wd17xx_w )
     MAME DEVICE INTERFACE
 ***************************************************************************/
 
-static void common_start(const device_config *device, wd17xx_type_t device_type)
+static DEVICE_START( wd1770 )
 {
 	wd17xx_t *w = get_safe_token(device);
 
@@ -1748,7 +1750,6 @@ static void common_start(const device_config *device, wd17xx_type_t device_type)
 	w->intf = device->static_config;
 
 	w->status = STA_1_TRACK0;
-	w->type = device_type;
 	w->density = DEN_MFM_LO;
 	w->busy_timer = timer_alloc(device->machine, wd17xx_busy_callback, (void*)device);
 	w->timer = timer_alloc(device->machine, wd17xx_misc_timer_callback, (void*)device);
@@ -1759,9 +1760,99 @@ static void common_start(const device_config *device, wd17xx_type_t device_type)
 	/* resolve callbacks */
 	devcb_resolve_write_line(&w->out_intrq_func, &w->intf->out_intrq_func, device);
 	devcb_resolve_write_line(&w->out_drq_func, &w->intf->out_drq_func, device);
+
+	/* model specific values */
+	w->type = WD_TYPE_1770;
+
+	w->stepping_rate[0] = 6;
+	w->stepping_rate[1] = 12;
+	w->stepping_rate[2] = 20;
+	w->stepping_rate[3] = 30;
 }
 
-static DEVICE_RESET( wd17xx )
+static DEVICE_START( wd1771 )
+{
+	wd17xx_t *w = get_safe_token(device);
+
+	DEVICE_START_CALL(wd1770);
+
+	w->type = WD_TYPE_1771;
+}
+
+static DEVICE_START( wd1772 )
+{
+	wd17xx_t *w = get_safe_token(device);
+
+	DEVICE_START_CALL(wd1770);
+
+	w->type = WD_TYPE_1772;
+
+	w->stepping_rate[0] = 6;
+	w->stepping_rate[1] = 12;
+	w->stepping_rate[2] = 20;
+	w->stepping_rate[3] = 30;
+}
+
+static DEVICE_START( wd1773 )
+{
+	wd17xx_t *w = get_safe_token(device);
+
+	DEVICE_START_CALL(wd1770);
+
+	w->type = WD_TYPE_1773;
+
+	w->stepping_rate[0] = 6;
+	w->stepping_rate[1] = 12;
+	w->stepping_rate[2] = 2;
+	w->stepping_rate[3] = 3;
+}
+
+static DEVICE_START( wd179x )
+{
+	wd17xx_t *w = get_safe_token(device);
+
+	DEVICE_START_CALL(wd1770);
+
+	w->type = WD_TYPE_179X;
+}
+
+static DEVICE_START( wd1793 )
+{
+	wd17xx_t *w = get_safe_token(device);
+
+	DEVICE_START_CALL(wd1770);
+
+	w->type = WD_TYPE_1793;
+}
+
+static DEVICE_START( wd2793 )
+{
+	wd17xx_t *w = get_safe_token(device);
+
+	DEVICE_START_CALL(wd1770);
+
+	w->type = WD_TYPE_2793;
+}
+
+static DEVICE_START( wd177x )
+{
+	wd17xx_t *w = get_safe_token(device);
+
+	DEVICE_START_CALL(wd1770);
+
+	w->type = WD_TYPE_177X;
+}
+
+static DEVICE_START( mb8877 )
+{
+	wd17xx_t *w = get_safe_token(device);
+
+	DEVICE_START_CALL(wd1770);
+
+	w->type = WD_TYPE_MB8877;
+}
+
+static DEVICE_RESET( wd1770 )
 {
 	wd17xx_t *w = get_safe_token(device);
 	int i;
@@ -1788,177 +1879,61 @@ static DEVICE_RESET( wd17xx )
 
 void wd17xx_reset(const device_config *device)
 {
-	DEVICE_RESET_CALL( wd17xx );
+	DEVICE_RESET_CALL( wd1770 );
 }
 
-static DEVICE_START( wd1770 )
-{
-	common_start(device, WD_TYPE_1770);
-}
-static DEVICE_START( wd1771 )
-{
-	common_start(device, WD_TYPE_1771);
-}
-static DEVICE_START( wd1772 )
-{
-	common_start(device, WD_TYPE_1772);
-}
-static DEVICE_START( wd1773 )
-{
-	common_start(device, WD_TYPE_1773);
-}
-static DEVICE_START( wd179x )
-{
-	common_start(device, WD_TYPE_179X);
-}
-static DEVICE_START( wd1793 )
-{
-	common_start(device, WD_TYPE_1793);
-}
-static DEVICE_START( wd2793 )
-{
-	common_start(device, WD_TYPE_2793);
-}
-static DEVICE_START( wd177x )
-{
-	common_start(device, WD_TYPE_177X);
-}
-static DEVICE_START( mb8877 )
-{
-	common_start(device, WD_TYPE_MB8877);
-}
 
-DEVICE_GET_INFO( wd1770 )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(wd17xx_t);					break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
+/***************************************************************************
+    DEVICE GETINFO
+***************************************************************************/
 
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(wd1770);		break;
-		case DEVINFO_FCT_STOP:							/* Nothing */								break;
-		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(wd17xx);		break;
+static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "WD1770");						break;
-		case DEVINFO_STR_FAMILY:						strcpy(info->s, "WD17xx");						break;
-		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");							break;
-		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);							break;
-		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright MESS Team");			break;
-	}
-}
+#define DEVTEMPLATE_ID(p,s)				p##wd1770##s
+#define DEVTEMPLATE_STATE				wd17xx_t
+#define DEVTEMPLATE_FEATURES			DT_HAS_START | DT_HAS_RESET
+#define DEVTEMPLATE_NAME				"WD1770"
+#define DEVTEMPLATE_FAMILY				"WD17xx"
+#define DEVTEMPLATE_VERSION				"1.0"
+#define DEVTEMPLATE_CREDITS				"Copyright MESS Team"
+#include "devtempl.h"
 
-DEVICE_GET_INFO( wd1771 )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "WD1771");				break;
+#define DEVTEMPLATE_DERIVED_ID(p,s)		p##wd1771##s
+#define DEVTEMPLATE_DERIVED_FEATURES	DT_HAS_START
+#define DEVTEMPLATE_DERIVED_NAME		"WD1771"
+#include "devtempl.h"
 
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(wd1771);	break;
+#define DEVTEMPLATE_DERIVED_ID(p,s)		p##wd1772##s
+#define DEVTEMPLATE_DERIVED_FEATURES	DT_HAS_START
+#define DEVTEMPLATE_DERIVED_NAME		"WD1772"
+#include "devtempl.h"
 
-		default: 										DEVICE_GET_INFO_CALL(wd1770);				break;
-	}
-}
+#define DEVTEMPLATE_DERIVED_ID(p,s)		p##wd1773##s
+#define DEVTEMPLATE_DERIVED_FEATURES	DT_HAS_START
+#define DEVTEMPLATE_DERIVED_NAME		"WD1773"
+#include "devtempl.h"
 
-DEVICE_GET_INFO( wd1772 )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "WD1772");				break;
+#define DEVTEMPLATE_DERIVED_ID(p,s)		p##wd179x##s
+#define DEVTEMPLATE_DERIVED_FEATURES	DT_HAS_START
+#define DEVTEMPLATE_DERIVED_NAME		"WD179x"
+#include "devtempl.h"
 
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(wd1772);	break;
+#define DEVTEMPLATE_DERIVED_ID(p,s)		p##wd1793##s
+#define DEVTEMPLATE_DERIVED_FEATURES	DT_HAS_START
+#define DEVTEMPLATE_DERIVED_NAME		"WD1793"
+#include "devtempl.h"
 
-		default: 										DEVICE_GET_INFO_CALL(wd1770);				break;
-	}
-}
+#define DEVTEMPLATE_DERIVED_ID(p,s)		p##wd2793##s
+#define DEVTEMPLATE_DERIVED_FEATURES	DT_HAS_START
+#define DEVTEMPLATE_DERIVED_NAME		"WD2793"
+#include "devtempl.h"
 
-DEVICE_GET_INFO( wd1773 )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "WD1773");				break;
+#define DEVTEMPLATE_DERIVED_ID(p,s)		p##wd177x##s
+#define DEVTEMPLATE_DERIVED_FEATURES	DT_HAS_START
+#define DEVTEMPLATE_DERIVED_NAME		"WD179x"
+#include "devtempl.h"
 
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(wd1773);	break;
-
-		default: 										DEVICE_GET_INFO_CALL(wd1770);				break;
-	}
-}
-
-DEVICE_GET_INFO( wd179x )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "WD179x");				break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(wd179x);	break;
-
-		default: 										DEVICE_GET_INFO_CALL(wd1770);				break;
-	}
-}
-
-DEVICE_GET_INFO( wd1793 )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "WD1793");				break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(wd1793);	break;
-
-		default: 										DEVICE_GET_INFO_CALL(wd1770);				break;
-	}
-}
-
-DEVICE_GET_INFO( wd2793 )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "WD2793");				break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(wd2793);	break;
-
-		default: 										DEVICE_GET_INFO_CALL(wd1770);				break;
-	}
-}
-
-DEVICE_GET_INFO( wd177x )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "WD177x");				break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(wd177x);	break;
-
-		default: 										DEVICE_GET_INFO_CALL(wd1770);				break;
-	}
-}
-
-DEVICE_GET_INFO( mb8877 )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "MB8877");				break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(mb8877);	break;
-
-		default: 										DEVICE_GET_INFO_CALL(wd1770);				break;
-	}
-}
+#define DEVTEMPLATE_DERIVED_ID(p,s)		p##mb8877##s
+#define DEVTEMPLATE_DERIVED_FEATURES	DT_HAS_START
+#define DEVTEMPLATE_DERIVED_NAME		"MB8877"
+#include "devtempl.h"
