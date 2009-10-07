@@ -16,27 +16,27 @@
 #include "cpu/lr35902/lr35902.h"
 #include "profiler.h"
 
-#define LCDCONT		gb_vid_regs[0x00]	/* LCD control register                       */
-#define LCDSTAT		gb_vid_regs[0x01]	/* LCD status register                        */
-#define SCROLLY		gb_vid_regs[0x02]	/* Starting Y position of the background      */
-#define SCROLLX		gb_vid_regs[0x03]	/* Starting X position of the background      */
-#define CURLINE		gb_vid_regs[0x04]	/* Current screen line being scanned          */
-#define CMPLINE		gb_vid_regs[0x05]	/* Gen. int. when scan reaches this line      */
-#define BGRDPAL		gb_vid_regs[0x07]	/* Background palette                         */
-#define SPR0PAL		gb_vid_regs[0x08]	/* Sprite palette #0                          */
-#define SPR1PAL		gb_vid_regs[0x09]	/* Sprite palette #1                          */
-#define WNDPOSY		gb_vid_regs[0x0A]	/* Window Y position                          */
-#define WNDPOSX		gb_vid_regs[0x0B]	/* Window X position                          */
-#define KEY1		gb_vid_regs[0x0D]	/* Prepare speed switch                       */
-#define HDMA1		gb_vid_regs[0x11]	/* HDMA source high byte                      */
-#define HDMA2		gb_vid_regs[0x12]	/* HDMA source low byte                       */
-#define HDMA3		gb_vid_regs[0x13]	/* HDMA destination high byte                 */
-#define HDMA4		gb_vid_regs[0x14]	/* HDMA destination low byte                  */
-#define HDMA5		gb_vid_regs[0x15]	/* HDMA length/mode/start                     */
-#define GBCBCPS		gb_vid_regs[0x28]	/* Backgound palette spec                     */
-#define GBCBCPD		gb_vid_regs[0x29]	/* Backgound palette data                     */
-#define GBCOCPS		gb_vid_regs[0x2A]	/* Object palette spec                        */
-#define GBCOCPD		gb_vid_regs[0x2B]	/* Object palette data                        */
+#define LCDCONT		gb_lcd.gb_vid_regs[0x00]	/* LCD control register                       */
+#define LCDSTAT		gb_lcd.gb_vid_regs[0x01]	/* LCD status register                        */
+#define SCROLLY		gb_lcd.gb_vid_regs[0x02]	/* Starting Y position of the background      */
+#define SCROLLX		gb_lcd.gb_vid_regs[0x03]	/* Starting X position of the background      */
+#define CURLINE		gb_lcd.gb_vid_regs[0x04]	/* Current screen line being scanned          */
+#define CMPLINE		gb_lcd.gb_vid_regs[0x05]	/* Gen. int. when scan reaches this line      */
+#define BGRDPAL		gb_lcd.gb_vid_regs[0x07]	/* Background palette                         */
+#define SPR0PAL		gb_lcd.gb_vid_regs[0x08]	/* Sprite palette #0                          */
+#define SPR1PAL		gb_lcd.gb_vid_regs[0x09]	/* Sprite palette #1                          */
+#define WNDPOSY		gb_lcd.gb_vid_regs[0x0A]	/* Window Y position                          */
+#define WNDPOSX		gb_lcd.gb_vid_regs[0x0B]	/* Window X position                          */
+#define KEY1		gb_lcd.gb_vid_regs[0x0D]	/* Prepare speed switch                       */
+#define HDMA1		gb_lcd.gb_vid_regs[0x11]	/* HDMA source high byte                      */
+#define HDMA2		gb_lcd.gb_vid_regs[0x12]	/* HDMA source low byte                       */
+#define HDMA3		gb_lcd.gb_vid_regs[0x13]	/* HDMA destination high byte                 */
+#define HDMA4		gb_lcd.gb_vid_regs[0x14]	/* HDMA destination low byte                  */
+#define HDMA5		gb_lcd.gb_vid_regs[0x15]	/* HDMA length/mode/start                     */
+#define GBCBCPS		gb_lcd.gb_vid_regs[0x28]	/* Backgound palette spec                     */
+#define GBCBCPD		gb_lcd.gb_vid_regs[0x29]	/* Backgound palette data                     */
+#define GBCOCPS		gb_lcd.gb_vid_regs[0x2A]	/* Object palette spec                        */
+#define GBCOCPD		gb_lcd.gb_vid_regs[0x2B]	/* Object palette data                        */
 
 enum {
 	UNLOCKED=0,
@@ -45,13 +45,6 @@ enum {
 
 #define _NR_GB_VID_REGS		0x40
 
-static UINT8 bg_zbuf[160];
-static UINT8 gb_vid_regs[_NR_GB_VID_REGS];
-static UINT16 cgb_bpal[32];	/* CGB current background palette table */
-static UINT16 cgb_spal[32];	/* CGB current background palette table */
-static UINT8 gb_bpal[4];	/* Background palette       */
-static UINT8 gb_spal0[4];	/* Sprite 0 palette     */
-static UINT8 gb_spal1[4];	/* Sprite 1 palette     */
 static UINT8 *gb_oam;
 UINT8 *gb_vram;
 static UINT8 *gb_vram_ptr;
@@ -78,6 +71,16 @@ struct layer_struct {
 
 static struct gb_lcd_struct {
 	int	window_lines_drawn;
+
+	UINT8	gb_vid_regs[_NR_GB_VID_REGS];
+	UINT8	bg_zbuf[160];
+
+	UINT16	cgb_bpal[32];	/* CGB current background palette table */
+	UINT16	cgb_spal[32];	/* CGB current sprite palette table */
+
+	UINT8	gb_bpal[4];		/* Background palette */
+	UINT8	gb_spal0[4];	/* Sprite 0 palette */
+	UINT8	gb_spal1[4];	/* Sprite 1 palette */
 
 	/* Things used to render current line */
 	int	current_line;		/* Current line */
@@ -194,10 +197,10 @@ PALETTE_INIT( gbc )
 
 	/* Background is initialised as white */
 	for( ii = 0; ii < 32; ii++ )
-		cgb_bpal[ii] = 32767;
+		gb_lcd.cgb_bpal[ii] = 32767;
 	/* Sprites are supposed to be uninitialized, but we'll make them black */
 	for( ii = 0; ii < 32; ii++ )
-		cgb_spal[ii] = 0;
+		gb_lcd.cgb_spal[ii] = 0;
 }
 
 PALETTE_INIT( megaduck )
@@ -290,7 +293,7 @@ INLINE void gb_update_sprites ( void )
 			UINT8 bit, *spal;
 			int xindex, adr;
 
-			spal = (oam[3] & 0x10) ? gb_spal1 : gb_spal0;
+			spal = (oam[3] & 0x10) ? gb_lcd.gb_spal1 : gb_lcd.gb_spal0;
 			xindex = oam[1] - 8;
 			if (oam[3] & 0x40)		   /* flip y ? */
 			{
@@ -308,7 +311,7 @@ INLINE void gb_update_sprites ( void )
 				for (bit = 0; bit < 8; bit++, xindex++)
 				{
 					register int colour = ((data & 0x0100) ? 2 : 0) | ((data & 0x0001) ? 1 : 0);
-					if (colour && !bg_zbuf[xindex] && xindex >= 0 && xindex < 160)
+					if (colour && !gb_lcd.bg_zbuf[xindex] && xindex >= 0 && xindex < 160)
 						gb_plot_pixel(bitmap, xindex, yindex, spal[colour]);
 					data >>= 1;
 				}
@@ -326,7 +329,7 @@ INLINE void gb_update_sprites ( void )
 				for (bit = 0; bit < 8 && xindex < 160; bit++, xindex++)
 				{
 					register int colour = ((data & 0x8000) ? 2 : 0) | ((data & 0x0080) ? 1 : 0);
-					if (colour && !bg_zbuf[xindex] && xindex >= 0 && xindex < 160)
+					if (colour && !gb_lcd.bg_zbuf[xindex] && xindex >= 0 && xindex < 160)
 						gb_plot_pixel(bitmap, xindex, yindex, spal[colour]);
 					data <<= 1;
 				}
@@ -410,7 +413,7 @@ static void gb_update_scanline( running_machine *machine )
 				r.min_y = r.max_y = gb_lcd.current_line;
 				r.min_x = gb_lcd.start_x;
 				r.max_x = gb_lcd.end_x - 1;
-				bitmap_fill( bitmap, &r , gb_bpal[0]);
+				bitmap_fill( bitmap, &r , gb_lcd.gb_bpal[0]);
 			}
 			while ( l < 2 )
 			{
@@ -442,8 +445,8 @@ static void gb_update_scanline( running_machine *machine )
 					while ( ( gb_lcd.layer[l].xshift < 8 ) && i )
 					{
 						register int colour = ( ( data & 0x8000 ) ? 2 : 0 ) | ( ( data & 0x0080 ) ? 1 : 0 );
-						gb_plot_pixel( bitmap, xindex, gb_lcd.current_line, gb_bpal[ colour ] );
-						bg_zbuf[ xindex ] = colour;
+						gb_plot_pixel( bitmap, xindex, gb_lcd.current_line, gb_lcd.gb_bpal[ colour ] );
+						gb_lcd.bg_zbuf[ xindex ] = colour;
 						xindex++;
 						data <<= 1;
 						gb_lcd.layer[l].xshift++;
@@ -531,7 +534,7 @@ INLINE void sgb_update_sprites (void)
 			INT16 xindex;
 			int adr;
 
-			spal = (oam[3] & 0x10) ? gb_spal1 : gb_spal0;
+			spal = (oam[3] & 0x10) ? gb_lcd.gb_spal1 : gb_lcd.gb_spal0;
 			xindex = oam[1] - 8;
 			if (oam[3] & 0x40)		   /* flip y ? */
 			{
@@ -555,7 +558,7 @@ INLINE void sgb_update_sprites (void)
 				for (bit = 0; bit < 8; bit++, xindex++)
 				{
 					register int colour = ((data & 0x0100) ? 2 : 0) | ((data & 0x0001) ? 1 : 0);
-					if ((xindex >= SGB_XOFFSET && xindex < SGB_XOFFSET + 160) && colour && !bg_zbuf[xindex - SGB_XOFFSET])
+					if ((xindex >= SGB_XOFFSET && xindex < SGB_XOFFSET + 160) && colour && !gb_lcd.bg_zbuf[xindex - SGB_XOFFSET])
 						gb_plot_pixel(bitmap, xindex, yindex, sgb_pal[pal + spal[colour]]);
 					data >>= 1;
 				}
@@ -573,7 +576,7 @@ INLINE void sgb_update_sprites (void)
 				for (bit = 0; bit < 8; bit++, xindex++)
 				{
 					register int colour = ((data & 0x8000) ? 2 : 0) | ((data & 0x0080) ? 1 : 0);
-					if ((xindex >= SGB_XOFFSET && xindex < SGB_XOFFSET + 160) && colour && !bg_zbuf[xindex - SGB_XOFFSET])
+					if ((xindex >= SGB_XOFFSET && xindex < SGB_XOFFSET + 160) && colour && !gb_lcd.bg_zbuf[xindex - SGB_XOFFSET])
 						gb_plot_pixel(bitmap, xindex, yindex, sgb_pal[pal + spal[colour]]);
 					data <<= 1;
 				}
@@ -804,8 +807,8 @@ static void sgb_update_scanline( running_machine *machine )
 					while( ( gb_lcd.layer[l].xshift < 8 ) && i )
 					{
 						register int colour = ( ( data & 0x8000 ) ? 2 : 0 ) | ( ( data & 0x0080 ) ? 1 : 0 );
-						gb_plot_pixel( bitmap, xindex + SGB_XOFFSET, gb_lcd.current_line + SGB_YOFFSET, sgb_pal[ sgb_palette + gb_bpal[colour]] );
-						bg_zbuf[xindex] = colour;
+						gb_plot_pixel( bitmap, xindex + SGB_XOFFSET, gb_lcd.current_line + SGB_YOFFSET, sgb_pal[ sgb_palette + gb_lcd.gb_bpal[colour]] );
+						gb_lcd.bg_zbuf[xindex] = colour;
 						xindex++;
 						data <<= 1;
 						gb_lcd.layer[l].xshift++;
@@ -918,11 +921,11 @@ INLINE void cgb_update_sprites ( running_machine *machine )
 				for (bit = 0; bit < 8; bit++, xindex++)
 				{
 					register int colour = ((data & 0x0100) ? 2 : 0) | ((data & 0x0001) ? 1 : 0);
-					if (colour && !bg_zbuf[xindex] && xindex >= 0 && xindex < 160)
+					if (colour && !gb_lcd.bg_zbuf[xindex] && xindex >= 0 && xindex < 160)
 					{
 						if ( ! gb_lcd.gbc_mode )
-							colour = pal ? gb_spal1[colour] : gb_spal0[colour];
-						gb_plot_pixel(bitmap, xindex, yindex, cgb_spal[pal + colour]);
+							colour = pal ? gb_lcd.gb_spal1[colour] : gb_lcd.gb_spal0[colour];
+						gb_plot_pixel(bitmap, xindex, yindex, gb_lcd.cgb_spal[pal + colour]);
 					}
 					data >>= 1;
 				}
@@ -931,13 +934,13 @@ INLINE void cgb_update_sprites ( running_machine *machine )
 				for (bit = 0; bit < 8; bit++, xindex++)
 				{
 					register int colour = ((data & 0x0100) ? 2 : 0) | ((data & 0x0001) ? 1 : 0);
-					if((bg_zbuf[xindex] & 0x80) && (bg_zbuf[xindex] & 0x7f) && (LCDCONT & 0x1))
+					if((gb_lcd.bg_zbuf[xindex] & 0x80) && (gb_lcd.bg_zbuf[xindex] & 0x7f) && (LCDCONT & 0x1))
 						colour = 0;
 					if (colour && xindex >= 0 && xindex < 160)
 					{
 						if ( ! gb_lcd.gbc_mode )
-							colour = pal ? gb_spal1[colour] : gb_spal0[colour];
-						gb_plot_pixel(bitmap, xindex, yindex, cgb_spal[pal + colour]);
+							colour = pal ? gb_lcd.gb_spal1[colour] : gb_lcd.gb_spal0[colour];
+						gb_plot_pixel(bitmap, xindex, yindex, gb_lcd.cgb_spal[pal + colour]);
 					}
 					data >>= 1;
 				}
@@ -946,11 +949,11 @@ INLINE void cgb_update_sprites ( running_machine *machine )
 				for (bit = 0; bit < 8; bit++, xindex++)
 				{
 					register int colour = ((data & 0x8000) ? 2 : 0) | ((data & 0x0080) ? 1 : 0);
-					if (colour && !bg_zbuf[xindex] && xindex >= 0 && xindex < 160)
+					if (colour && !gb_lcd.bg_zbuf[xindex] && xindex >= 0 && xindex < 160)
 					{
 						if ( ! gb_lcd.gbc_mode )
-							colour = pal ? gb_spal1[colour] : gb_spal0[colour];
-						gb_plot_pixel(bitmap, xindex, yindex, cgb_spal[pal + colour]);
+							colour = pal ? gb_lcd.gb_spal1[colour] : gb_lcd.gb_spal0[colour];
+						gb_plot_pixel(bitmap, xindex, yindex, gb_lcd.cgb_spal[pal + colour]);
 					}
 					data <<= 1;
 				}
@@ -959,13 +962,13 @@ INLINE void cgb_update_sprites ( running_machine *machine )
 				for (bit = 0; bit < 8; bit++, xindex++)
 				{
 					register int colour = ((data & 0x8000) ? 2 : 0) | ((data & 0x0080) ? 1 : 0);
-					if((bg_zbuf[xindex] & 0x80) && (bg_zbuf[xindex] & 0x7f) && (LCDCONT & 0x1))
+					if((gb_lcd.bg_zbuf[xindex] & 0x80) && (gb_lcd.bg_zbuf[xindex] & 0x7f) && (LCDCONT & 0x1))
 						colour = 0;
 					if (colour && xindex >= 0 && xindex < 160)
 					{
 						if ( ! gb_lcd.gbc_mode )
-							colour = pal ? gb_spal1[colour] : gb_spal0[colour];
-						gb_plot_pixel(bitmap, xindex, yindex, cgb_spal[pal + colour]);
+							colour = pal ? gb_lcd.gb_spal1[colour] : gb_lcd.gb_spal0[colour];
+						gb_plot_pixel(bitmap, xindex, yindex, gb_lcd.cgb_spal[pal + colour]);
 					}
 					data <<= 1;
 				}
@@ -1103,8 +1106,8 @@ static void cgb_update_scanline ( running_machine *machine )
 							colour = ( ( data & 0x8000 ) ? 2 : 0 ) | ( ( data & 0x0080 ) ? 1 : 0 );
 							data <<= 1;
 						}
-						gb_plot_pixel( bitmap, xindex, gb_lcd.current_line, cgb_bpal[ ( ! gb_lcd.gbc_mode ) ? gb_bpal[colour] : ( ( gbcmap[ gb_lcd.layer[l].xindex ] & 0x07 ) * 4 ) + colour ] );
-						bg_zbuf[ xindex ] = colour + ( gbcmap[ gb_lcd.layer[l].xindex ] & 0x80 );
+						gb_plot_pixel( bitmap, xindex, gb_lcd.current_line, gb_lcd.cgb_bpal[ ( ! gb_lcd.gbc_mode ) ? gb_lcd.gb_bpal[colour] : ( ( ( gbcmap[ gb_lcd.layer[l].xindex ] & 0x07 ) * 4 ) + colour ) ] );
+						gb_lcd.bg_zbuf[ xindex ] = colour + ( gbcmap[ gb_lcd.layer[l].xindex ] & 0x80 );
 						xindex++;
 						gb_lcd.layer[l].xshift++;
 						i--;
@@ -1297,10 +1300,10 @@ void gb_video_init( running_machine *machine, int mode )
 	gb_bgdtab = gb_vram + 0x1C00;
 	gb_wndtab = gb_vram + 0x1C00;
 
-	gb_vid_regs[0x06] = 0xFF;
+	gb_lcd.gb_vid_regs[0x06] = 0xFF;
 	for( i = 0x0c; i < _NR_GB_VID_REGS; i++ )
 	{
-		gb_vid_regs[i] = 0xFF;
+		gb_lcd.gb_vid_regs[i] = 0xFF;
 	}
 
 	LCDSTAT = 0x80;
@@ -1313,7 +1316,7 @@ void gb_video_init( running_machine *machine, int mode )
 	/* Initialize palette arrays */
 	for( i = 0; i < 4; i++ )
 	{
-		gb_bpal[i] = gb_spal0[i] = gb_spal1[i] = i;
+		gb_lcd.gb_bpal[i] = gb_lcd.gb_spal0[i] = gb_lcd.gb_spal1[i] = i;
 	}
 
 	switch( mode )
@@ -2028,7 +2031,7 @@ static void gb_lcd_switch_on( running_machine *machine )
 
 READ8_HANDLER( gb_video_r )
 {
-	return gb_vid_regs[offset];
+	return gb_lcd.gb_vid_regs[offset];
 }
 
 READ8_HANDLER( gb_vram_r )
@@ -2160,24 +2163,24 @@ WRITE8_HANDLER ( gb_video_w )
 		return;
 	case 0x07:						/* BGP - Background Palette */
 		update_scanline( space->machine );
-		gb_bpal[0] = data & 0x3;
-		gb_bpal[1] = (data & 0xC) >> 2;
-		gb_bpal[2] = (data & 0x30) >> 4;
-		gb_bpal[3] = (data & 0xC0) >> 6;
+		gb_lcd.gb_bpal[0] = data & 0x3;
+		gb_lcd.gb_bpal[1] = (data & 0xC) >> 2;
+		gb_lcd.gb_bpal[2] = (data & 0x30) >> 4;
+		gb_lcd.gb_bpal[3] = (data & 0xC0) >> 6;
 		break;
 	case 0x08:						/* OBP0 - Object Palette 0 */
 //      update_scanline( machine );
-		gb_spal0[0] = data & 0x3;
-		gb_spal0[1] = (data & 0xC) >> 2;
-		gb_spal0[2] = (data & 0x30) >> 4;
-		gb_spal0[3] = (data & 0xC0) >> 6;
+		gb_lcd.gb_spal0[0] = data & 0x3;
+		gb_lcd.gb_spal0[1] = (data & 0xC) >> 2;
+		gb_lcd.gb_spal0[2] = (data & 0x30) >> 4;
+		gb_lcd.gb_spal0[3] = (data & 0xC0) >> 6;
 		break;
 	case 0x09:						/* OBP1 - Object Palette 1 */
 //      update_scanline( machine );
-		gb_spal1[0] = data & 0x3;
-		gb_spal1[1] = (data & 0xC) >> 2;
-		gb_spal1[2] = (data & 0x30) >> 4;
-		gb_spal1[3] = (data & 0xC0) >> 6;
+		gb_lcd.gb_spal1[0] = data & 0x3;
+		gb_lcd.gb_spal1[1] = (data & 0xC) >> 2;
+		gb_lcd.gb_spal1[2] = (data & 0x30) >> 4;
+		gb_lcd.gb_spal1[3] = (data & 0xC0) >> 6;
 		break;
 	case 0x02:						/* SCY - Scroll Y */
 	case 0x03:						/* SCX - Scroll X */
@@ -2188,7 +2191,7 @@ WRITE8_HANDLER ( gb_video_w )
 	default:						/* Unknown register, no change */
 		return;
 	}
-	gb_vid_regs[ offset ] = data;
+	gb_lcd.gb_vid_regs[ offset ] = data;
 }
 
 READ8_HANDLER( gbc_video_r )
@@ -2208,7 +2211,7 @@ READ8_HANDLER( gbc_video_r )
 		}
 		break;
 	}
-	return gb_vid_regs[offset];
+	return gb_lcd.gb_vid_regs[offset];
 }
 
 WRITE8_HANDLER ( gbc_video_w )
@@ -2290,22 +2293,22 @@ WRITE8_HANDLER ( gbc_video_w )
 		break;
 	case 0x07:      /* BGP - GB background palette */
 		update_scanline( space->machine );
-		gb_bpal[0] = data & 0x3;
-		gb_bpal[1] = (data & 0xC) >> 2;
-		gb_bpal[2] = (data & 0x30) >> 4;
-		gb_bpal[3] = (data & 0xC0) >> 6;
+		gb_lcd.gb_bpal[0] = data & 0x3;
+		gb_lcd.gb_bpal[1] = (data & 0xC) >> 2;
+		gb_lcd.gb_bpal[2] = (data & 0x30) >> 4;
+		gb_lcd.gb_bpal[3] = (data & 0xC0) >> 6;
 		break;
 	case 0x08:      /* OBP0 - GB Object 0 palette */
-		gb_spal0[0] = data & 0x3;
-		gb_spal0[1] = (data & 0xC) >> 2;
-		gb_spal0[2] = (data & 0x30) >> 4;
-		gb_spal0[3] = (data & 0xC0) >> 6;
+		gb_lcd.gb_spal0[0] = data & 0x3;
+		gb_lcd.gb_spal0[1] = (data & 0xC) >> 2;
+		gb_lcd.gb_spal0[2] = (data & 0x30) >> 4;
+		gb_lcd.gb_spal0[3] = (data & 0xC0) >> 6;
 		break;
 	case 0x09:      /* OBP1 - GB Object 1 palette */
-		gb_spal1[0] = data & 0x3;
-		gb_spal1[1] = (data & 0xC) >> 2;
-		gb_spal1[2] = (data & 0x30) >> 4;
-		gb_spal1[3] = (data & 0xC0) >> 6;
+		gb_lcd.gb_spal1[0] = data & 0x3;
+		gb_lcd.gb_spal1[1] = (data & 0xC) >> 2;
+		gb_lcd.gb_spal1[2] = (data & 0x30) >> 4;
+		gb_lcd.gb_spal1[3] = (data & 0xC0) >> 6;
 		break;
 	case 0x0c:		/* Undocumented register involved in selecting gb/gbc mode */
 		logerror( "Write to undocumented register: %X = %X\n", offset, data );
@@ -2346,7 +2349,7 @@ WRITE8_HANDLER ( gbc_video_w )
 			/* H-Blank DMA */
 			gb_lcd.hdma_enabled = 1;
 			data &= 0x7f;
-			gb_vid_regs[offset] = data;
+			gb_lcd.gb_vid_regs[offset] = data;
 			/* Check if HDMA should be immediately performed */
 			if ( gb_lcd.hdma_possible )
 			{
@@ -2365,7 +2368,7 @@ WRITE8_HANDLER ( gbc_video_w )
 		}
 		if( GBCBCPS & 0x1 )
 		{
-			cgb_bpal[ ( GBCBCPS >> 1 ) & 0x1F ] = ( ( data & 0x7F ) << 8 ) | BP;
+			gb_lcd.cgb_bpal[ ( GBCBCPS >> 1 ) & 0x1F ] = ( ( data & 0x7F ) << 8 ) | BP;
 		}
 		else
 			BP = data;
@@ -2384,7 +2387,7 @@ WRITE8_HANDLER ( gbc_video_w )
 		}
 		if( GBCOCPS & 0x1 )
 		{
-			cgb_spal[ ( GBCOCPS >> 1 ) & 0x1F ] = ( ( data & 0x7F ) << 8 ) | OP;
+			gb_lcd.cgb_spal[ ( GBCOCPS >> 1 ) & 0x1F ] = ( ( data & 0x7F ) << 8 ) | OP;
 		}
 		else
 			OP = data;
@@ -2425,6 +2428,6 @@ WRITE8_HANDLER ( gbc_video_w )
 		return;
 	}
 
-	gb_vid_regs[offset] = data;
+	gb_lcd.gb_vid_regs[offset] = data;
 }
 
