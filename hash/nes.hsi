@@ -18349,7 +18349,7 @@
 	</hash>
 	<hash crc32="30f9bb46" sha1="5d9d519b84e245891928f3482a42a071e4402b6c" name="Dragon Quest VIII (ES-1077) (Ch)">
 		<status>GoodNES Verified Image</status>
-		<extrainfo>242 2 32 0</extrainfo>
+		<extrainfo>242 130 32 0</extrainfo>
 
 	</hash>
 	<hash crc32="ac9895cc" sha1="bb1967b0947989ffd9fcf6b10b81ae036110491a" name="Dragon Scroll - Yomigaerishi Maryuu (J)">
@@ -20375,7 +20375,7 @@
 	</hash>
 	<hash crc32="3f15d20d" sha1="1d7417d31e19b590afceb6a8a6e7b9cab9f9b475" name="Famicom Jump II - Saikyou no 7 Nin (J)">
 		<status>GoodNES Verified Image</status>
-		<extrainfo>153 2 32 0</extrainfo>
+		<extrainfo>153 130 32 0</extrainfo>
 
 	</hash>
 	<hash crc32="f76aa523" sha1="7348a4530054205925f3182aa5f12dd4d8a19410" name="Famicom Jump II - Saikyou no 7 Nin (J)">
@@ -27155,7 +27155,7 @@
 
 	</hash>
 	<hash crc32="5e36d3be" sha1="9bddfd1440e001b2f5b70657266a118fc6478c80" name="HES 6-in-1 (HES)">
-		<extrainfo>113 0 16 16</extrainfo>
+		<extrainfo>113 128 16 16</extrainfo>
 
 	</hash>
 	<hash crc32="2930bb11" sha1="fcb775693f5bfe463100f62c648e98356a477156" name="Hi! Mario by Excel (SMB1 Hack)">
@@ -29859,17 +29859,17 @@
 	</hash>
 	<hash crc32="92a3d007" sha1="68315afb344108cb0d43e119ba0353d5a44bd489" name="Impossible Mission II (U)">
 		<status>GoodNES Verified Image</status>
-		<extrainfo>34 1 4 8</extrainfo>
+		<extrainfo>34 129 4 8</extrainfo>
 
 	</hash>
 	<hash crc32="685705ac" sha1="1dde911681ce8461f19376e04c2581c3f3914ed4" name="Impossible Mission II (U)">
 		<status>Known Bad Image</status>
-		<extrainfo>34 1 4 8</extrainfo>
+		<extrainfo>34 129 4 8</extrainfo>
 
 	</hash>
 	<hash crc32="0ba9f385" sha1="2032bdda5ec067130584be6e7e8fb83d235a23f8" name="Impossible Mission II (U)">
 		<status>Overdumped Image</status>
-		<extrainfo>34 1 4 8</extrainfo>
+		<extrainfo>34 129 4 8</extrainfo>
 
 	</hash>
 	<hash crc32="c8228b54" sha1="6429ff0427ac2d614d553a356d48b66d06d1bddf" name="Incredible Crash Dummies, The (E)">
@@ -36249,7 +36249,7 @@
 
 	</hash>
 	<hash crc32="243a8735" sha1="7e4180432726a433c46ba2206d9e13b32761c11e" name="Major League (J)">
-		<extrainfo>32 0 8 16</extrainfo>
+		<extrainfo>32 128 8 16</extrainfo>
 
 	</hash>
 	<hash crc32="a03a422b" sha1="a2eb5fb422a88a1f38a9e7236164f9f251d32c24" name="Major League Baseball (U) (PRG0)">
@@ -52847,7 +52847,7 @@
 
 	</hash>
 	<hash crc32="cd373baa" sha1="d94b55c600975751a0bf8333029aecd076de3e3a" name="Samurai Spirits (Rex Soft)">
-		<extrainfo>116 0 16 64</extrainfo>
+		<extrainfo>14 0 16 64</extrainfo>
 
 	</hash>
 	<hash crc32="9ba5251c" sha1="078a4be73464ef248594be767a447f2cee9fbae2" name="Samus Super Metroid Look by Grond (Metroid Hack)">
@@ -69369,7 +69369,7 @@
 	</hash>
 	<hash crc32="695cb142" sha1="9edb84ad6eac88bd220d4ac75a157d9e14af97c6" name="Uchuusen - Cosmo Carrier (J)">
 		<status>Known Bad Image</status>
-		<extrainfo>78 8 8 16</extrainfo>
+		<extrainfo>78 136 8 16</extrainfo>
 
 	</hash>
 	<hash crc32="fc7371a2" sha1="62238ccecc24ca41f131aa8b3e0669b5df06721a" name="Uchuusen - Cosmo Carrier (J) [hFFE][T+Eng0.25_Gil Galad]">
@@ -69381,7 +69381,7 @@
 
 	</hash>
 	<hash crc32="3d1c3137" sha1="23d302b901c2b6c1e969bab7b2a45c392c06fb5b" name="Uchuusen - Cosmo Carrier (J)">
-		<extrainfo>78 8 8 16</extrainfo>
+		<extrainfo>78 136 8 16</extrainfo>
 
 	</hash>
 	<hash crc32="8b57ad40" sha1="01707d94f3f00ca887a6abdc42191bde94ba1f68" name="Udx Vs Donkey Kong (Donkey Kong PRG1 Hack)">
@@ -72869,11 +72869,11 @@
 	</hash>
 	<hash crc32="260d32e0" sha1="2d03f3105af3149cc070f7a72b868660cd905304" name="Yong Zhe Dou E Long - Dragon Quest VII (Ch)">
 		<status>Known Bad Image</status>
-		<extrainfo>4 2 64 0</extrainfo>
+		<extrainfo>245 2 64 0</extrainfo>
 
 	</hash>
 	<hash crc32="345ee51a" sha1="9c801071d1aac7b280468c38bf1b61fde99b5fd0" name="Yong Zhe Dou E Long - Dragon Quest VII (Ch)">
-		<extrainfo>4 2 64 0</extrainfo>
+		<extrainfo>245 2 64 0</extrainfo>
 
 	</hash>
 	<hash crc32="e7ead93b" sha1="4e48695ed4ef4db19fbb3806d25397c371a479cd" name="Yoshi (U)">

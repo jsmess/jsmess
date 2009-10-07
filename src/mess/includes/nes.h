@@ -14,8 +14,8 @@
     CONSTANTS
 ***************************************************************************/
 
-#define NTSC_CLOCK		N2A03_DEFAULTCLOCK	/* 1.789772 MHz */
-#define PAL_CLOCK		(26601712.0/16)		/* 1.662607 MHz */
+#define NTSC_CLOCK           N2A03_DEFAULTCLOCK     /* 1.789772 MHz */
+#define PAL_CLOCK	           (26601712.0/16)        /* 1.662607 MHz */
 
 
 /***************************************************************************
@@ -46,11 +46,15 @@ struct nes_struct
 	UINT8 prg_chunks;
 	UINT8 chr_chunks;
 
+	UINT8 format;	// 1 = iNES, 2 = UNIF
+
 	/* system variables which don't change at run-time */
-	UINT16 mapper;
+	UINT16 mapper;		// for iNES
+	const char *board;	// for UNIF
 	UINT8 four_screen_vram;
 	UINT8 hard_mirroring;
 	UINT8 slow_banking;
+	UINT8 crc_hack;	// this is needed to detect different boards sharing the same Mappers (shame on .nes format)
 
 	UINT8 *rom;
 	UINT8 *vrom;

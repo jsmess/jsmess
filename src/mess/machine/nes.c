@@ -75,7 +75,7 @@ static void init_nes_core( running_machine *machine )
 	nes.wram = memory_region(machine, "user1");
 
 	/* Brutal hack put in as a consequence of the new memory system; we really
-     * need to fix the NES code */
+       need to fix the NES code */
 	memory_install_read8_handler(space, 0x0000, 0x07ff, 0, 0x1800, SMH_BANK(10));
 	memory_install_write8_handler(space, 0x0000, 0x07ff, 0, 0x1800, SMH_BANK(10));
 
@@ -87,6 +87,7 @@ static void init_nes_core( running_machine *machine )
 	nes_battery_ram = nes.wram;
 
 	/* Set up the memory handlers for the mapper */
+	//if (nes.format == 1)
 	switch (nes.mapper)
 	{
 		case 20:
@@ -106,25 +107,9 @@ static void init_nes_core( running_machine *machine )
 			memory_set_bankptr(machine, 1, &nes.rom[0xe000]);
 			memory_set_bankptr(machine, 2, nes_fds.data );
 			break;
-		case 40:
-			nes.slow_banking = 1;
-			memory_install_read8_handler(space, 0x8000, 0x9fff, 0, 0, SMH_BANK(1));
-			memory_install_read8_handler(space, 0xa000, 0xbfff, 0, 0, SMH_BANK(2));
-			memory_install_read8_handler(space, 0xc000, 0xdfff, 0, 0, SMH_BANK(3));
-			memory_install_read8_handler(space, 0xe000, 0xffff, 0, 0, SMH_BANK(4));
-			memory_set_bankptr(machine, 1, memory_region(machine, "maincpu") + 0x6000);
-			memory_set_bankptr(machine, 2, memory_region(machine, "maincpu") + 0x8000);
-			memory_set_bankptr(machine, 3, memory_region(machine, "maincpu") + 0xa000);
-			memory_set_bankptr(machine, 4, memory_region(machine, "maincpu") + 0xc000);
-
-			/* FIXME: this is wrong, but at least it fixes the crash */
-			memory_install_read8_handler(space, 0x6000, 0x7fff, 0, 0, SMH_BANK(5));
-			memory_set_bankptr(machine, 5, memory_region(machine, "maincpu") + 0xe000);
-
-			/* Game runs code in between banks, so we do things different here */
-			memory_install_write8_handler(space, 0x6000, 0x7fff, 0, 0, nes_mid_mapper_w);
-			memory_install_write8_handler(space, 0x8000, 0xffff, 0, 0, nes_mapper_w);
-			break;
+		case 50:
+			memory_install_write8_handler(space, 0x4020, 0x403f, 0, 0, mapper50_add_w);
+			memory_install_write8_handler(space, 0x40a0, 0x40bf, 0, 0, mapper50_add_w);
 		default:
 			nes.slow_banking = 0;
 			memory_install_read8_handler(space, 0x6000, 0x7fff, 0, 0, SMH_BANK(5));
@@ -165,6 +150,9 @@ static void init_nes_core( running_machine *machine )
 		}
 	}
 
+	//else if (nes.format == 2)
+	//TODO: we have to set up memory banking for unif board as in the mapper case
+
 	/* Load a battery file, but only if there's no trainer since they share */
 	/* overlapping memory. */
 	if (nes.trainer)
@@ -202,7 +190,11 @@ MACHINE_RESET( nes )
 	nes.mid_ram_enable = 1;
 
 	/* Reset the mapper variables. Will also mark the char-gen ram as dirty */
+	//if (nes.format == 1)
 	mapper_reset(machine, nes.mapper);
+
+	//if (nes.format == 2)
+	//unif_reset(machine, nes.board);
 
 	/* Reset the serial input ports */
 	in_0.shift = 0;
@@ -451,6 +443,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 
 	if (!mame_stricmp(filetype, "nes"))
 	{
+		nes.format = 1;	// TODO: use this to select between mapper_reset / unif_reset
 		/* Verify the file is in iNES format */
 		memset(magic, '\0', sizeof(magic));
 		image_fread(image, magic, 4);
@@ -468,7 +461,8 @@ DEVICE_IMAGE_LOAD( nes_cart )
 			if (4 == sscanf(mapinfo,"%d %d %d %d", &mapint1, &mapint2, &mapint3, &mapint4))
 			{
 				nes.mapper = mapint1;
-				local_options = mapint2;
+				local_options = mapint2 & 0x0f;
+				nes.crc_hack = mapint2 & 0xf0;	// this is used to differentiate among variants of the same Mapper (see nes_mmc.c)
 				nes.prg_chunks = mapint3;
 				nes.chr_chunks = mapint4;
 				logerror("NES.HSI info: %d %d %d %d\n", mapint1, mapint2, mapint3, mapint4);
@@ -636,6 +630,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 		UINT32 size = image_length(image);
 		const unif *unif_board;
 
+		nes.format = 2;	// TODO: use this to select between mapper_reset / unif_reset
 		/* Verify the file is in iNES format */
 		memset(magic, '\0', sizeof(magic));
 		image_fread(image, magic, 4);

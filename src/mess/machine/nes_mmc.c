@@ -10,70 +10,94 @@
     You can find the latest version of the doc at http://www.romhacking.net/docs/362/
 
 
+    Missing components:
+    * Currently, we are not emulating 4-screen mirroring (only 3 games use it)
+    * We need a better way to implement CPU cycle based IRQ. Currently we update their counter once every scanline
+      but, with this approach, every time 114 clocks have passed and for certain games it is too much!
+    * We need to emulate additional sound hardware in mappers 019, 024, 026, 069, 085 (and possibly other ones)
+    * We need to emulate EEPROM in mapper 016 and 159
+    * Barcode World (mapper 069) and Datach games (mapper 157) need Barcode Reader emulation
+      Notice that for mapper 157, the barcode reader enters in the irq, so glitches may be related to this!
+    * Karaoke Studio (mapper 188) misses input devices
+
     Known issues on specific mappers:
 
+    * 000 F1 Race requires more precise PPU timing. It currently has plenty of 1-line glitches.
     * 001 AD&D Hillsfar and Bill & Ted are broken. We need to ignore the case of writes happening on 2
           consecutive CPU cycles because these games use dirty tricks to reset counters (see note in mapper1_w)
     * 001, 155 We don't handle (yet) WRAM enable/disable bit
-    * 002, 003 Bus conflict?
-    * 005 has some issues (e.g. Just Breed is not working), RAM banking needs hardware flags to determine size
+    * 002, 003, 094, 097, 152 Bus conflict?
+    * 005 has issues (see e.g. Just Breed or Metal Slader Glory), RAM banking needs hardware flags to determine size
+    * 014 in-game graphics is glitched
     * 015 Shanghai Tycoon has corrupted graphics
-    * 016 some graphics problem (e.g. Rokudenashi Blues misses some element of graphics)
-    * 018 Pizza Pop and Plasma Ball shows graphics issues for this mapper
-    * 024, 026, 085 Registers of the additional sound hardware are not emulated
-    * 032 Major League is not properly working: check missing windows or field graphics in top view screens
-          (it requires one hack to support both boards using this mapper)
     * 033 has still some graphics problem (e.g. missing text in Akira)
-    * 034 Impossible Mission 2 is not working
+    * 034 Impossible Mission II does not show graphics
     * 038 seems to miss inputs. separate reads?
     * 039 Study n Game 32 in 1 misses keyboard and starts differently than in NEStopia
-    * 040 is not dealing correctly 0x6000-0x7fff (this got broken long ago)
     * 042 Ai Senshi Nicol has broken graphics (our Mapper 42 implementation does not handle CHR banks)
     * 051 only half of the games work
-    * 064 has some IRQ problems - see Skull & Crossbones. Klax has broken graphics.
-    * 065 Spartan X 2 has various glitches
-    * 067 display issues, but vrom fixed
+    * 064 has many IRQ problems (due to the way we implement CPU based IRQ) - see Skull & Crossbones.
+          Klax has problems as well (even if it uses scanline based IRQ, according to Disch's docs).
+    * 067 some 1-line glitches that cannot be solved without a better implementation for cycle-based IRQs
     * 071 Fire Hawk is not properly working (it requires one hack to support both boards using this mapper)
     * 072, 086, 092 lack samples support (maybe others as well)
+    * 073 16 bit IRQ mode is not implemented
     * 077 Requires 4-screen mirroring. Currently, it is very glitchy
-    * 078 Cosmo Carrier is not working (it requires one hack to support both boards using this mapper).
-          also, we lack NT mirroring
-    * 082 has chr-rom banking problems. Also mapper is in the middle of sram, which is unemulated.
     * 083 has serious glitches
-    * 091 lacks IRQ needed by MK2
-    * 094 Bus conflict?
-    * 096 is preliminary (no correct chr switch in connection to NT)
-    * 097 Bus conflict?
+    * 096 is preliminary (no correct chr switch in connection to PPU)
     * 104 Not all the games work
     * 107 Are the scrolling glitches (check status bar) correct? NEStopia behaves similarly
     * 112 Master Shooter is not working and misses some graphics
-    * 113 is not following docs (missing NT mirroring and high CHR bit)
-    * 115 (formerly 248) is preliminary
-    * 118 mirroring is a guess, chr-rom banking is likely different
-    * 143 are dancing block borders (in the intro) correct?
-    * 146 Pyramid 2 does not work
-    * 150 some problems (Magic Cubes, Mahjong Academy, others?), maybe mirroring related
-    * 152 Bus conflict?
+    * 117 In-game glitches
+    * 119 Pin Bot has glitches when the ball is in the upper half of the screen
+    * 133 Qi Wang starts with corrupted graphics (ingame seems better)
+    * 143 are Dancing Block borders (in the intro) correct?
+    * 153 Famicom Jump II variant is not working, for some reason
+    * 158 In addition to IRQ problems (same as 64), mirroring was just a guess (wrong?). info needed!
     * 164 preliminary - no sprites?
     * 176 has some graphics problem
     * 178 Fan Kong Jin Ying is not working (but not even in NEStopia)
     * 180 Crazy Climber controller?
+    * 185 we emulate it like plain Mapper 3, but it's not: Mighty BombJack and Seicross don't work
+    * 187, 198, 208, 215 have some PRG banking issues - preliminary!
     * 188 needs mic input (reads from 0x6000-0x7fff)
+    * 197 Super Fighter 3 has some glitch in-game (maybe mirroring?)
+    * 222 is only preliminar (wrong IRQ, mirroring or CHR banking?)
     * 225 115-in-1 has glitches in the menu (games seem fine)
     * 228 seems wrong. e.g. Action52 starts with a game rather than in the menu
     * 229 is preliminary
     * 230 not working yet (needs a value to flip at reset)
-    * 231 not working yet
     * 232 has graphics glitches
     * 241 Commandos is not working (but not even in NEStopia)
-    * 242 DQ7 is not working (it requires one hack to support both boards using this mapper)
-    * 243 has glitches in Sachen logo
+    * 242 In Dragon Quest VIII graphics of the main character is not drawn (it seems similar to Shanghai Tycoon [map15]
+          because in place of the missing graphics we get glitches in the left border)
+    * 249 only half of the games work (and Du Bao Ying Hao seems to suffer the same problem as DQ8 and Shanghai Tycoon)
+    * 252 shows logo, but doesn't reach the game
     * 255 does not really select game (same in NEStopia apparently)
+
+    A few Mappers suffer of hardware conflict: original dumpers have used the same mapper number for more than
+    a kind of boards. In these cases (and only in these cases) we exploit nes.hsi to set up accordingly
+    emulation. Games which requires this hack are the following:
+    * 032 - Major League needs hardwired mirroring (missing windows and glitched field in top view, otherwise)
+    * 034 - Impossible Mission II is not like BxROM games (it writes to 0x7ffd-0x7fff, instead of 0x8000). It is still
+          unplayable though (see above)
+    * 078 - Cosmo Carrier needs a different mirroring than Holy Diver
+    * 113 - HES 6-in-1 requires mirroring (check Bookyman playfield), while other games break with this (check AV Soccer)
+    * 153 - Famicom Jump II uses a different board (or the same in a very different way)
+    * 242 - DQ8 has no mirroring (missing graphics is due to other reasons though)
 
     Details to investigate:
     * 034 writes to 0x8000-0xffff should not be used for NINA-001 and BNROM, only unlicensed BxROM...
     * 144 we ignore writes to 0x8000 while NEStopia does not. is it a problem?
     * 240 we do not map writes to 0x4020-0x40ff. is this a problem?
+    * some other emus uses mapper 210 for mapper 019 games without additional sound hardware and mirroring capabilities
+      (in 210 mirroring is hardwired). However, simply initializing mirroring to Vertical in 019 seems to fix all glitches
+      in 210 games, so there seems to be no reason to have this duplicate mapper
+
+    Some mappers copy PRG rom in SRAM region. Below is a list of those which does it (in MESS) to further
+    investigate if we are supporting them in the right way (e.g. do any of the following have conflicts with SRAM?):
+    * 065 (Gimmick! breaks badly without it)
+    * 040, 042, 050
 
     Remember that the MMC # does not equal the mapper #. In particular, Mapper 4 is
     in fact MMC3, Mapper 9 is MMC2 and Mapper 10 is MMC4. Makes perfect sense, right?
@@ -134,7 +158,9 @@ static chr_bank chr_map[8];  //quick banking structure, because some of this cha
 static name_table nt_page[4];  //quick banking structure for a maximum of 4K of RAM/ROM/ExRAM
 
 static int IRQ_enable, IRQ_enable_latch;
-static UINT16 IRQ_count, IRQ_count_latch, IRQ_reload;
+static UINT16 IRQ_count, IRQ_count_latch;
+static UINT8 IRQ_toggle;
+static UINT8 IRQ_reset;
 static UINT8 IRQ_status;
 static UINT8 IRQ_mode;
 
@@ -155,8 +181,11 @@ static UINT8 mmc_chr_source;		// This is set at init to CHRROM or CHRRAM. a few 
 static UINT8 mmc_cmd1, mmc_cmd2;	// These represent registers where the mapper writes important values
 static UINT8 mmc_count;			// This is used as counter in mappers like 1 and 45
 
-static int prg_bank[4];			// Many mappers writes only some bits of the selected bank (for both PRG and CHR),
-static int vrom_bank[16];		// hence these are handy to latch bank values.
+static int mmc_prg_base, mmc_prg_mask;	// MMC3 based multigame carts select a block of banks by using these (and then act like normal MMC3),
+static int mmc_chr_base, mmc_chr_mask;	// while MMC3 and clones (mapper 118 & 119) simply set them as 0 and 0xff resp.
+
+static UINT8 prg_bank[4];			// Many mappers writes only some bits of the selected bank (for both PRG and CHR),
+static UINT8 vrom_bank[16];			// hence these are handy to latch bank values.
 
 
 // FIXME: mapper specific variables should be unified as much as possible to make easier future implementation of save states
@@ -166,11 +195,8 @@ static UINT8 MMC1_regs[4];
 
 static UINT8 MMC2_regs[4];	// these replace bank0/bank0_hi/bank1/bank1_hi
 
-static int MMC3_cmd;
 UINT8* extended_ntram;
 
-static int mmc_prg_base, mmc_prg_mask;	// MMC3 based multigame carts select a block of banks by using these (and then act like normal MMC3),
-static int mmc_chr_base, mmc_chr_mask;	// while MMC3 and clones (mapper 118 & 119) simply set them as 0 and 0xff resp.
 
 static int MMC5_rom_bank_mode;
 static int MMC5_vrom_bank_mode;
@@ -181,9 +207,10 @@ static int MMC5_floodattr;
 UINT8 MMC5_vram[0x400];
 int MMC5_vram_control;
 
+// these might be unified in single mmc_reg[] array, together with mmc_cmd1 & mmc_cmd2
+// but be careful that MMC3 clones often use mmc_cmd1/mmc_cmd2 (from base MMC3) AND additional regs below!
 static UINT8 mapper45_reg[4];
 static UINT8 mapper51_reg[3];
-static UINT8 mapper64_reg[11];
 static UINT8 mapper83_reg[10];
 static UINT8 mapper83_low_reg[4];
 static UINT8 mapper95_reg[4];
@@ -194,6 +221,31 @@ static UINT8 sachen_reg[8];	// used by mappers 137, 138, 139 & 141
 static UINT8 mapper12_reg;
 static UINT8 map52_reg_written;
 static UINT8 map114_reg, map114_reg_enabled;
+static UINT8 map215_reg[4];
+static UINT8 map217_reg[4];
+static UINT8 map249_reg;
+static UINT8 map14_reg[2];
+static UINT8 mapper121_reg[3];
+static UINT8 mapper187_reg[4];
+static UINT8 map208_reg[5];
+
+
+static UINT8 extra_bank[16];	// some MMC3 clone have 2 series of PRG/CHR banks...
+					// we collect them all here: first 4 elements PRG banks, then 6/8 CHR banks
+
+// mapper 68 needs these for NT mirroring!
+static int m68_mirror;
+static int m0, m1;
+
+
+// FDS / mapper 20 need these for disks (to be added to fds struct?)
+static int fds_last_side;
+static int fds_count;
+
+// Famicom Jump II is identified as Mapper 153, but it works in a completely different way.
+// in particular, it requires these (not needed by other Mapper 153 games)
+static UINT8 map153_reg[8];
+static UINT8 map153_bank_latch;
 
 static int mapper_warning;
 
@@ -217,7 +269,7 @@ static emu_timer	*nes_irq_timer;
     - nes_mid_mapper_r/w take care of accesses to 0x6000-0x7fff
     - nes_mapper_w takes care of writes to 0x8000-0xffff
     some mappers may access 0x4018-0x4100: this must be taken
-    care separately in init_nes_core (see e.g. mapper 40)
+    care separately in init_nes_core
 
 *************************************************************/
 
@@ -326,22 +378,11 @@ WRITE8_HANDLER( nes_mapper_w )
 	else
 	{
 		logerror("Unimplemented mapper write, offset: %04x, data: %02x\n", offset, data);
-#if 1
+#ifdef MAME_DEBUG
 		if (!mapper_warning)
 		{
 			logerror("This game is writing to the mapper area but no mapper is set. You may get better results by switching to a valid mapper.\n");
 			mapper_warning = 1;
-		}
-
-		switch (offset)
-		{
-			/* Hacked mapper for the 24-in-1 NES_ROM. */
-			/* It's really 35-in-1, and it's mostly different versions of Battle City. Unfortunately, the vrom dumps are bad */
-			case 0x7fde:
-				data &= (nes.prg_chunks - 1);
-				memory_set_bankptr(space->machine, 3, &nes.rom[data * 0x4000 + 0x10000]);
-				memory_set_bankptr(space->machine, 4, &nes.rom[data * 0x4000 + 0x12000]);
-				break;
 		}
 #endif
 	}
@@ -435,6 +476,16 @@ static void prg8_ef( running_machine *machine, int bank )
 		memcpy(&nes.rom[0xe000], &nes.rom[bank * 0x2000 + 0x10000], 0x2000);
 	else
 		memory_set_bankptr(machine, 4, &nes.rom[bank * 0x2000 + 0x10000]);
+}
+
+/* We define an additional helper to map PRG-ROM to 0x6000-0x7000 */
+// TODO: are we implementing this correctly in the mappers which uses it? check!
+
+static void prg8_67( running_machine *machine, int bank )
+{
+	/* assumes that bank references an 8k chunk */
+	bank &= ((nes.prg_chunks << 1) - 1);
+	memory_set_bankptr(machine, 5, &nes.rom[bank * 0x2000 + 0x10000]);
 }
 
 /* CHR ROM in 1K, 2K, 4K or 8K blocks */
@@ -866,31 +917,25 @@ static WRITE8_HANDLER( mapper3_w )
   operate like a common MMC3 board on that specific block. To emulate this
   we use the concept of bases and masks. Original MMC3 boards simply
   set base = 0 and mask = 0xff at start and never change them */
+/* Notice that, atm, there is no way to directly handle MMC3 clone mappers
+  which use custom routines to set PRG/CHR. For these mappers we have to
+  re-define the 0x8000-0xffff handler at least for offsets 0 & 1 (i.e. the
+  offsets where are used set_prg/set_chr) by using the mapper-specific routines,
+  and then we can fall back to mapper4_w for the remaining offsets */
 
 static void mapper4_set_prg( running_machine *machine, int prg_base, int prg_mask )
 {
-	int prg0_bank = prg_base | (prg_bank[0] & prg_mask);
-	int prg1_bank = prg_base | (prg_bank[1] & prg_mask);
-	int last_bank = prg_base | prg_mask;
+	UINT8 prg_flip = (mmc_cmd1 & 0x40) ? 2 : 0;
 
-	if (MMC3_cmd & 0x40)
-	{
-		prg8_89(machine, last_bank - 1);
-		prg8_cd(machine, prg0_bank);
-	}
-	else
-	{
-		prg8_89(machine, prg0_bank);
-		prg8_cd(machine, last_bank - 1);
-	}
-
-	prg8_ab(machine, prg1_bank);
-	prg8_ef(machine, last_bank);
+	prg8_89(machine, prg_base | (prg_bank[0 ^ prg_flip] & prg_mask));
+	prg8_ab(machine, prg_base | (prg_bank[1] & prg_mask));
+	prg8_cd(machine, prg_base | (prg_bank[2 ^ prg_flip] & prg_mask));
+	prg8_ef(machine, prg_base | (prg_bank[3] & prg_mask));
 }
 
 static void mapper4_set_chr( running_machine *machine, UINT8 chr, int chr_base, int chr_mask )
 {
-	UINT8 chr_page = (MMC3_cmd & 0x80) >> 5;
+	UINT8 chr_page = (mmc_cmd1 & 0x80) >> 5;
 
 	chr1_x(machine, chr_page ^ 0, chr_base | ((vrom_bank[0] & ~0x01) & chr_mask), chr);
 	chr1_x(machine, chr_page ^ 1, chr_base | ((vrom_bank[0] |  0x01) & chr_mask), chr);
@@ -902,9 +947,10 @@ static void mapper4_set_chr( running_machine *machine, UINT8 chr, int chr_base, 
 	chr1_x(machine, chr_page ^ 7, chr_base | (vrom_bank[5] & chr_mask), chr);
 }
 
+/* Here, IRQ counter decrements every scanline. */
 static void mapper4_irq( const device_config *device, int scanline, int vblank, int blanked )
 {
-	if ((scanline < PPU_BOTTOM_VISIBLE_SCANLINE) /*|| (scanline == ppu_scanlines_per_frame-1)*/)
+	if (scanline < PPU_BOTTOM_VISIBLE_SCANLINE)
 	{
 		int priorCount = IRQ_count;
 		if ((IRQ_count == 0))
@@ -932,8 +978,8 @@ static WRITE8_HANDLER( mapper4_w )
 	switch (offset & 0x6001)
 	{
 		case 0x0000:
-			MMC3_helper = MMC3_cmd ^ data;
-			MMC3_cmd = data;
+			MMC3_helper = mmc_cmd1 ^ data;
+			mmc_cmd1 = data;
 
 			/* Has PRG Mode changed? */
 			if (MMC3_helper & 0x40)
@@ -945,10 +991,10 @@ static WRITE8_HANDLER( mapper4_w )
 			break;
 
 		case 0x0001:
-			cmd = MMC3_cmd & 0x07;
+			cmd = mmc_cmd1 & 0x07;
 			switch (cmd)
 			{
-				case 0: case 1:	// these do not need to be separated because we shift banks in set_chr!
+				case 0: case 1:	// these do not need to be separated: we take care of them in set_chr!
 				case 2: case 3: case 4: case 5:
 					vrom_bank[cmd] = data;
 					mapper4_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
@@ -971,19 +1017,19 @@ static WRITE8_HANDLER( mapper4_w )
 			nes.mid_ram_enable = data;
 			break;
 
-		case 0x4000: /* IRQ scanline counter */
+		case 0x4000:
 			IRQ_count_latch = data;
 			break;
 
-		case 0x4001: /* IRQ scanline latch */
+		case 0x4001: /* some sources state that here we must have IRQ_count = IRQ_count_latch */
 			IRQ_count = 0;
 			break;
 
-		case 0x6000: /* Disable IRQs */
+		case 0x6000:
 			IRQ_enable = 0;
 			break;
 
-		case 0x6001: /* Enable IRQs */
+		case 0x6001:
 			IRQ_enable = 1;
 			break;
 
@@ -1100,7 +1146,7 @@ static WRITE8_HANDLER( mapper5_l_w )
 	/* Send $5000-$5015 to the sound chip */
 	if ((offset >= 0xf00) && (offset <= 0xf15))
 	{
-		nes_psg_w (state->sound, offset & 0x1f, data);
+		nes_psg_w(state->sound, offset & 0x1f, data);
 		return;
 	}
 
@@ -1153,7 +1199,7 @@ static WRITE8_HANDLER( mapper5_l_w )
 
 		/* tile data for MMC5 flood-fill NT mode */
 		case 0x1006:
-			MMC5_floodtile=data;
+			MMC5_floodtile = data;
 			break;
 
 		/* attr data for MMC5 flood-fill NT mode */
@@ -1288,7 +1334,6 @@ static WRITE8_HANDLER( mapper5_l_w )
 					vrom_bank[0] = data;
 //                  mapper5_sync_vrom(0);
 					chr1_0(space->machine, vrom_bank[0], CHRROM);
-//                  ppu2c0x_set_videorom_bank(state->ppu, 0, 1, vrom_bank[0], 64);
 //                  nes_vram_sprite[0] = vrom_bank[0] * 64;
 //                  vrom_next[0] = 4;
 //                  vrom_page_a = 1;
@@ -1309,7 +1354,6 @@ static WRITE8_HANDLER( mapper5_l_w )
 					vrom_bank[1] = data;
 //                  mapper5_sync_vrom(0);
 					chr1_1(space->machine, vrom_bank[1], CHRROM);
-					//ppu2c0x_set_videorom_bank(state->ppu, 1, 1, vrom_bank[1], 64);
 //                  nes_vram_sprite[1] = vrom_bank[0] * 64;
 //                  vrom_next[1] = 5;
 //                  vrom_page_a = 1;
@@ -1326,7 +1370,6 @@ static WRITE8_HANDLER( mapper5_l_w )
 					vrom_bank[2] = data;
 //                  mapper5_sync_vrom(0);
 					chr1_2(space->machine, vrom_bank[2], CHRROM);
-//                  ppu2c0x_set_videorom_bank(state->ppu, 2, 1, vrom_bank[2], 64);
 //                  nes_vram_sprite[2] = vrom_bank[0] * 64;
 //                  vrom_next[2] = 6;
 //                  vrom_page_a = 1;
@@ -1350,7 +1393,6 @@ static WRITE8_HANDLER( mapper5_l_w )
 					vrom_bank[3] = data;
 //                  mapper5_sync_vrom(0);
 					chr1_3(space->machine, vrom_bank[3], CHRROM);
-//                  ppu2c0x_set_videorom_bank(state->ppu, 3, 1, vrom_bank[3], 64);
 //                  nes_vram_sprite[3] = vrom_bank[0] * 64;
 //                  vrom_next[3] = 7;
 //                  vrom_page_a = 1;
@@ -1367,7 +1409,6 @@ static WRITE8_HANDLER( mapper5_l_w )
 					vrom_bank[4] = data;
 //                  mapper5_sync_vrom(0);
 					chr1_4(space->machine, vrom_bank[4], CHRROM);
-//                  ppu2c0x_set_videorom_bank(state->ppu, 4, 1, vrom_bank[4], 64);
 //                  nes_vram_sprite[4] = vrom_bank[0] * 64;
 //                  vrom_next[0] = 0;
 //                  vrom_page_a = 0;
@@ -1388,7 +1429,6 @@ static WRITE8_HANDLER( mapper5_l_w )
 					vrom_bank[5] = data;
 //                  mapper5_sync_vrom(0);
 					chr1_5(space->machine, vrom_bank[5], CHRROM);
-//                  ppu2c0x_set_videorom_bank(state->ppu, 5, 1, vrom_bank[5], 64);
 //                  nes_vram_sprite[5] = vrom_bank[0] * 64;
 //                  vrom_next[1] = 1;
 //                  vrom_page_a = 0;
@@ -1405,7 +1445,6 @@ static WRITE8_HANDLER( mapper5_l_w )
 					vrom_bank[6] = data;
 //                  mapper5_sync_vrom(0);
 					chr1_6(space->machine, vrom_bank[6], CHRROM);
-//                  ppu2c0x_set_videorom_bank(state->ppu, 6, 1, vrom_bank[6], 64);
 //                  nes_vram_sprite[6] = vrom_bank[0] * 64;
 //                  vrom_next[2] = 2;
 //                  vrom_page_a = 0;
@@ -1434,7 +1473,6 @@ static WRITE8_HANDLER( mapper5_l_w )
 					vrom_bank[7] = data;
 //                  mapper5_sync_vrom(0);
 					chr1_7(space->machine, vrom_bank[7], CHRROM);
-//                  ppu2c0x_set_videorom_bank(state->ppu, 7, 1, vrom_bank[7], 64);
 //                  nes_vram_sprite[7] = vrom_bank[0] * 64;
 //                  vrom_next[3] = 3;
 //                  vrom_page_a = 0;
@@ -1453,7 +1491,6 @@ static WRITE8_HANDLER( mapper5_l_w )
 //                  nes_vram[0 + (vrom_page_a*4)] = data * 64;
 //                  nes_vram[0] = data * 64;
 					chr1_4(space->machine, data, CHRROM);
-//                  ppu2c0x_set_videorom_bank(state->ppu, 4, 1, data, 64);
 //                  mapper5_sync_vrom(1);
 					if (!vrom_page_b)
 					{
@@ -1479,7 +1516,6 @@ static WRITE8_HANDLER( mapper5_l_w )
 //                  nes_vram[1 + (vrom_page_a*4)] = data * 64;
 //                  nes_vram[1] = data * 64;
 					chr1_5(space->machine, data, CHRROM);
-//                  ppu2c0x_set_videorom_bank(state->ppu, 5, 1, data, 64);
 //                  mapper5_sync_vrom(1);
 					if (!vrom_page_b)
 					{
@@ -1500,7 +1536,6 @@ static WRITE8_HANDLER( mapper5_l_w )
 //                  nes_vram[2 + (vrom_page_a*4)] = data * 64;
 //                  nes_vram[2] = data * 64;
 					chr1_6(space->machine, data, CHRROM);
-//                  ppu2c0x_set_videorom_bank(state->ppu, 6, 1, data, 64);
 //                  mapper5_sync_vrom(1);
 					if (!vrom_page_b)
 					{
@@ -1537,7 +1572,6 @@ static WRITE8_HANDLER( mapper5_l_w )
 //                  nes_vram[3 + (vrom_page_a*4)] = data * 64;
 //                  nes_vram[3] = data * 64;
 					chr1_7(space->machine, data, CHRROM);
-//                  ppu2c0x_set_videorom_bank(state->ppu, 7, 1, data, 64);
 //                  mapper5_sync_vrom(1);
 					if (!vrom_page_b)
 					{
@@ -1582,9 +1616,72 @@ static WRITE8_HANDLER( mapper5_w )
     Known Boards: FFE4 Copier Board
     Games: Hacked versions of games
 
-    In MESS: Unsupported, low priority
+    In MESS: Supported? Not sure if we could also have ExRAM or not...
+       However, priority is pretty low for this mapper.
 
 *************************************************************/
+
+/* Here, IRQ counter decrements every CPU cycle. Since we update it every scanline,
+we need to decrement it by 114 (Each scanline consists of 341 dots and, on NTSC,
+there are 3 dots to every 1 CPU cycle, hence 114 is the number of cycles per scanline ) */
+static void ffe_irq( const device_config *device, int scanline, int vblank, int blanked )
+{
+	/* 114 is the number of cycles per scanline */
+	/* TODO: change to reflect the actual number of cycles spent */
+	if (IRQ_enable)
+	{
+		if ((0xffff - IRQ_count) < 114)
+		{
+			cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
+			IRQ_count = 0xffff;
+			IRQ_enable = 0;
+		}
+		IRQ_count -= 114;
+	}
+}
+
+static WRITE8_HANDLER( mapper6_l_w )
+{
+	LOG_MMC(("mapper6_l_w, offset: %04x, data: %02x\n", offset, data));
+
+	switch (offset)
+	{
+		case 0x1fe:
+			mmc_cmd1 = data & 0x80;
+			set_nt_mirroring((data & 0x10) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
+			break;
+		case 0x1ff:
+			set_nt_mirroring((data & 0x10) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			break;
+
+		case 0x401:
+			IRQ_enable = data & 0x01;
+			break;
+		case 0x402:
+			IRQ_count = (IRQ_count & 0xff00) | data;
+			break;
+		case 0x403:
+			IRQ_enable = 1;
+			IRQ_count = (IRQ_count & 0x00ff) | (data << 8);
+			break;
+	}
+}
+
+static WRITE8_HANDLER( mapper6_w )
+{
+	LOG_MMC(("mapper6_w, offset: %04x, data: %02x\n", offset, data));
+
+	if (!mmc_cmd1)	// when in "FFE mode" we are forced to use CHRRAM/EXRAM bank?
+	{
+		prg16_89ab(space->machine, data >> 2);
+		// chr8(space->machine, data & 0x03, ???);
+		// due to lack of info on the exact behavior, we simply act as if mmc_cmd=1
+		if (mmc_chr_source == CHRROM)
+			chr8(space->machine, data & 0x03, CHRROM);
+	}
+	else if (mmc_chr_source == CHRROM)			// otherwise, we can use CHRROM (when present)
+		chr8(space->machine, data, CHRROM);
+}
 
 /*************************************************************
 
@@ -1613,7 +1710,7 @@ static WRITE8_HANDLER( mapper7_w )
     Known Boards: FFE3 Copier Board
     Games: Hacked versions of games
 
-    In MESS: Supported
+    In MESS: Supported? (I have no games to test this)
 
 *************************************************************/
 
@@ -1622,11 +1719,8 @@ static WRITE8_HANDLER( mapper8_w )
 	LOG_MMC(("mapper8_w, offset: %04x, data: %02x\n", offset, data));
 
 	chr8(space->machine, data & 0x07, CHRROM);
-	data = (data >> 3) & (nes.prg_chunks - 1);
-	memory_set_bankptr(space->machine, 1, &nes.rom[data * 0x4000 + 0x10000]);
-	memory_set_bankptr(space->machine, 2, &nes.rom[data * 0x4000 + 0x12000]);
+	prg16_89ab(space->machine, data >> 3);
 }
-
 
 /*************************************************************
 
@@ -1669,6 +1763,7 @@ static void mapper9_latch (const device_config *device, offs_t offset)
 
 static WRITE8_HANDLER( mapper9_w )
 {
+	LOG_MMC(("mapper9_w, offset: %04x, data: %02x\n", offset, data));
 	switch (offset & 0x7000)
 	{
 		case 0x2000:
@@ -1678,25 +1773,21 @@ static WRITE8_HANDLER( mapper9_w )
 			MMC2_regs[0] = data;
 			if (mmc_cmd1 == 0xfd)
 				chr4_0(space->machine, MMC2_regs[0], CHRROM);
-			LOG_MMC(("MMC2 VROM switch #1 (low): %02x\n", MMC2_regs[0]));
 			break;
 		case 0x4000:
 			MMC2_regs[1] = data;
 			if (mmc_cmd1 == 0xfe)
 				chr4_0(space->machine, MMC2_regs[1], CHRROM);
-			LOG_MMC(("MMC2 VROM switch #1 (high): %02x\n", MMC2_regs[1]));
 			break;
 		case 0x5000:
 			MMC2_regs[2] = data;
 			if (mmc_cmd2 == 0xfd)
 				chr4_4(space->machine, MMC2_regs[2], CHRROM);
-			LOG_MMC(("MMC2 VROM switch #2 (low): %02x\n", data));
 			break;
 		case 0x6000:
 			MMC2_regs[3] = data;
 			if (mmc_cmd2 == 0xfe)
 				chr4_4(space->machine, MMC2_regs[3], CHRROM);
-			LOG_MMC(("MMC2 VROM switch #2 (high): %02x\n", data));
 			break;
 		case 0x7000:
 			set_nt_mirroring((data & 0x01) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
@@ -1748,7 +1839,7 @@ static WRITE8_HANDLER( mapper11_w )
 {
 	LOG_MMC(("mapper11_w, offset: %04x, data: %02x\n", offset, data));
 
-	chr8(space->machine, data >> 4, CHRROM);
+	chr8(space->machine, data >> 4, mmc_chr_source);
 	prg32(space->machine, data & 0x0f);
 }
 
@@ -1781,7 +1872,7 @@ static READ8_HANDLER( mapper12_l_r )
 
 static void mapper12_set_chr( running_machine *machine )
 {
-	UINT8 chr_page = (MMC3_cmd & 0x80) >> 5;
+	UINT8 chr_page = (mmc_cmd1 & 0x80) >> 5;
 
 	chr1_x(machine, chr_page ^ 0, ((mapper12_reg & 0x01) << 8) | (vrom_bank[0] & ~0x01), CHRROM);
 	chr1_x(machine, chr_page ^ 1, ((mapper12_reg & 0x01) << 8) | (vrom_bank[0] |  0x01), CHRROM);
@@ -1801,8 +1892,8 @@ static WRITE8_HANDLER( mapper12_w )
 	switch (offset & 0x6001)
 	{
 	case 0x0000:
-		MMC3_helper = MMC3_cmd ^ data;
-		MMC3_cmd = data;
+		MMC3_helper = mmc_cmd1 ^ data;
+		mmc_cmd1 = data;
 
 		/* Has PRG Mode changed? */
 		if (MMC3_helper & 0x40)
@@ -1814,10 +1905,10 @@ static WRITE8_HANDLER( mapper12_w )
 		break;
 
 	case 0x0001:
-		cmd = MMC3_cmd & 0x07;
+		cmd = mmc_cmd1 & 0x07;
 		switch (cmd)
 		{
-		case 0: case 1:	// these do not need to be separated because we shift banks in set_chr!
+		case 0: case 1:	// these do not need to be separated: we take care of them in set_chr!
 		case 2: case 3: case 4: case 5:
 			vrom_bank[cmd] = data;
 			mapper12_set_chr(space->machine);
@@ -1858,13 +1949,151 @@ static WRITE8_HANDLER( mapper13_w )
     Mapper 14
 
     Known Boards: Bootleg Board by Rex Soft (SL1632)
-    Games: [no games in nes.hsi]
+    Games: Samurai Spirits
 
     MMC3 clone
 
-    In MESS: Unsupported
+    In MESS: Supported
 
 *************************************************************/
+
+static void mapper14_set_prg( running_machine *machine, int prg_base, int prg_mask )
+{
+	if (map14_reg[0] & 0x02)
+	{
+		mapper4_set_prg(machine, prg_base, prg_mask);
+	}
+	else
+	{
+		prg8_89(machine, extra_bank[0]);
+		prg8_ab(machine, extra_bank[1]);
+		prg8_cd(machine, extra_bank[2]);
+		prg8_ef(machine, extra_bank[3]);
+	}
+}
+
+static void mapper14_set_chr( running_machine *machine, UINT8 chr, int chr_base, int chr_mask )
+{
+	static const UINT8 conv_table[8] = {5, 5, 5, 5, 3, 3, 1, 1};
+	UINT8 chr_page = (mmc_cmd1 & 0x80) >> 5;
+	UINT8 bank[8];
+	UINT8 chr_base2[8];
+	int i;
+
+	if (map14_reg[0] & 0x02)
+	{
+		for(i = 0; i < 8; i++)
+		{
+			bank[i] = vrom_bank[i];
+			chr_base2[i] = chr_base | ((map14_reg[0] << conv_table[i]) & 0x100);
+		}
+	}
+	else
+	{
+		for(i = 0; i < 8; i++)
+		{
+			bank[i] = extra_bank[i + 4];	// first 4 extra_banks are PRG
+			chr_base2[i] = chr_base;
+		}
+	}
+
+	chr1_x(machine, chr_page ^ 0, chr_base2[0] | (bank[0] & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 1, chr_base2[1] | (bank[1] & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 2, chr_base2[2] | (bank[2] & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 3, chr_base2[3] | (bank[3] & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 4, chr_base2[4] | (bank[4] & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 5, chr_base2[5] | (bank[5] & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 6, chr_base2[6] | (bank[6] & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 7, chr_base2[7] | (bank[7] & chr_mask), chr);
+}
+
+static WRITE8_HANDLER( mapper14_w )
+{
+	UINT8 map14_helper1, map14_helper2, MMC3_helper, cmd;
+	LOG_MMC(("mapper14_w, offset: %04x, data: %02x\n", offset, data));
+
+	if (offset == 0x2131)
+	{
+		map14_reg[0] = data;
+		mapper14_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+		mapper14_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
+
+		if (!(map14_reg[0] & 0x02))
+			set_nt_mirroring(map14_reg[1] & 0x01 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	}
+
+	if (map14_reg[0] & 0x02)
+	{
+		switch (offset & 0x6001)
+		{
+		case 0x0000:
+			MMC3_helper = mmc_cmd1 ^ data;
+			mmc_cmd1 = data;
+
+			/* Has PRG Mode changed? */
+			if (MMC3_helper & 0x40)
+				mapper14_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+
+			/* Has CHR Mode changed? */
+			if (MMC3_helper & 0x80)
+				mapper14_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
+			break;
+
+		case 0x0001:
+			cmd = mmc_cmd1 & 0x07;
+			switch (cmd)
+			{
+				case 0: case 1:	// these have to be changed due to the different way mapper14_set_chr works (it handles 1k banks)!
+					vrom_bank[2 * cmd] = data;
+					vrom_bank[2 * cmd + 1] = data;
+					mapper14_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
+					break;
+				case 2: case 3: case 4: case 5:
+					vrom_bank[cmd + 2] = data;
+					mapper14_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
+					break;
+				case 6:
+				case 7:
+					prg_bank[cmd - 6] = data;
+					mapper14_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+					break;
+			}
+			break;
+
+		case 0x2000:
+			set_nt_mirroring(map14_reg[1] & 0x01 ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
+			break;
+
+		default:
+			mapper4_w(space, offset, data);
+			break;
+		}
+	}
+	else if (offset >= 0x3000 && offset <= 0x6003 )
+	{
+		map14_helper1 = (offset & 0x01) << 2;
+		offset = ((offset & 0x02) | (offset >> 10)) >> 1;
+		map14_helper2 = ((offset + 2) & 0x07) + 4; // '+4' because first 4 extra_banks are for PRG!
+		extra_bank[map14_helper2] = (extra_bank[map14_helper2] & (0xf0 >> map14_helper1)) | ((data & 0x0f) << map14_helper1);
+		mapper14_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
+	}
+	else
+	{
+		switch (offset & 0x7003)
+		{
+		case 0x0000:
+		case 0x2000:
+			extra_bank[offset >> 13] = data;
+			mapper14_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+			break;
+
+		case 0x1000:
+			map14_reg[1] = data;
+			set_nt_mirroring(map14_reg[1] & 0x01 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			break;
+		}
+	}
+}
 
 /*************************************************************
 
@@ -1899,7 +2128,7 @@ static WRITE8_HANDLER( mapper15_w )
 			prg8_89(space->machine, map15_helper);
 			prg8_ab(space->machine, map15_helper + 1);
 			prg8_cd(space->machine, map15_helper + 1);
-			prg8_ef(space->machine, map15_helper);
+			prg8_ef(space->machine, map15_helper + 1);
 			break;
 		case 0x002:
 			map15_helper |= map15_flip;
@@ -1913,7 +2142,7 @@ static WRITE8_HANDLER( mapper15_w )
 			prg8_89(space->machine, map15_helper);
 			prg8_ab(space->machine, map15_helper + 1);
 			prg8_cd(space->machine, map15_helper);
-			prg8_ef(space->machine, map15_helper);
+			prg8_ef(space->machine, map15_helper + 1);
 			break;
 	}
 }
@@ -1927,20 +2156,25 @@ static WRITE8_HANDLER( mapper15_w )
           Dragon Ball Z II & III, Rokudenashi Blues, SD Gundam
           Gaiden - KGM2
 
+    At the moment, we don't support EEPROM I/O
+
     In MESS: Supported
 
 *************************************************************/
 
+/* Here, IRQ counter decrements every CPU cycle. Since we update it every scanline,
+we need to decrement it by 114 (Each scanline consists of 341 dots and, on NTSC,
+there are 3 dots to every 1 CPU cycle, hence 114 is the number of cycles per scanline ) */
 static void bandai_irq( const device_config *device, int scanline, int vblank, int blanked )
 {
 	/* 114 is the number of cycles per scanline */
 	/* TODO: change to reflect the actual number of cycles spent */
-
 	if (IRQ_enable)
 	{
 		if (IRQ_count <= 114)
 		{
 			cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
+			IRQ_count = (0xffff - 114 + IRQ_count); 	// wrap around the 16 bits counter
 		}
 		IRQ_count -= 114;
 	}
@@ -1956,7 +2190,7 @@ static WRITE8_HANDLER( mapper16_m_w )
 		case 2: case 3:
 		case 4: case 5:
 		case 6: case 7:
-			chr1_x(space->machine, offset & 0x07, data, CHRROM);
+			chr1_x(space->machine, offset & 0x07, data, mmc_chr_source);
 			break;
 		case 8:
 			prg16_89ab(space->machine, data);
@@ -1964,8 +2198,8 @@ static WRITE8_HANDLER( mapper16_m_w )
 		case 9:
 			switch (data & 0x03)
 			{
-				case 0: set_nt_mirroring(PPU_MIRROR_HORZ); break;
-				case 1: set_nt_mirroring(PPU_MIRROR_VERT); break;
+				case 0: set_nt_mirroring(PPU_MIRROR_VERT); break;
+				case 1: set_nt_mirroring(PPU_MIRROR_HORZ); break;
 				case 2: set_nt_mirroring(PPU_MIRROR_LOW); break;
 				case 3: set_nt_mirroring(PPU_MIRROR_HIGH); break;
 			}
@@ -1974,12 +2208,10 @@ static WRITE8_HANDLER( mapper16_m_w )
 			IRQ_enable = data & 0x01;
 			break;
 		case 0x0b:
-			IRQ_count &= 0xff00;
-			IRQ_count |= data;
+			IRQ_count = (IRQ_count & 0xff00) | data;
 			break;
 		case 0x0c:
-			IRQ_count &= 0x00ff;
-			IRQ_count |= (data << 8);
+			IRQ_count = (IRQ_count & 0x00ff) | (data << 8);
 			break;
 		default:
 			logerror("** uncaught mapper 16 write, offset: %04x, data: %02x\n", offset, data);
@@ -2001,7 +2233,8 @@ static WRITE8_HANDLER( mapper16_w )
     Known Boards: FFE8 Copier Board
     Games: Hacked versions of games
 
-    In MESS: Supported. it also uses mapper4_irq.
+    In MESS: Supported?. IRQ support is just a guess (used to
+      use MMC3 IRQ but it was wrong and it never enabled it)
 
 *************************************************************/
 
@@ -2011,36 +2244,37 @@ static WRITE8_HANDLER( mapper17_l_w )
 
 	switch (offset)
 	{
-		/* $42fe - mirroring */
 		case 0x1fe:
-			if (data & 0x10)
-				set_nt_mirroring(PPU_MIRROR_LOW);
-			else
-				set_nt_mirroring(PPU_MIRROR_HIGH);
+			set_nt_mirroring((data & 0x10) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
 			break;
-		/* $42ff - mirroring */
 		case 0x1ff:
-			if (data & 0x10)
-				set_nt_mirroring(PPU_MIRROR_HORZ);
-			else
-				set_nt_mirroring(PPU_MIRROR_VERT);
+			set_nt_mirroring((data & 0x10) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			break;
-		/* $4501 - $4503 */
-//      case 0x401:
-//      case 0x402:
-//      case 0x403:
-			/* IRQ control */
-//          break;
-		/* $4504 - $4507 : 8k PRG-Rom switch */
+
+		case 0x401:
+			IRQ_enable = data & 0x01;
+			break;
+		case 0x402:
+			IRQ_count = (IRQ_count & 0xff00) | data;
+			break;
+		case 0x403:
+			IRQ_enable = 1;
+			IRQ_count = (IRQ_count & 0x00ff) | (data << 8);
+			break;
+
 		case 0x404:
-		case 0x405:
-		case 0x406:
-		case 0x407:
-			data &= ((nes.prg_chunks << 1) - 1);
-//          LOG_MMC(("Mapper 17 bank switch, bank: %02x, data: %02x\n", offset & 0x03, data));
-			memory_set_bankptr(space->machine, (offset & 0x03) + 1, &nes.rom[0x2000 * (data) + 0x10000]);
+			prg8_89(space->machine, data);
 			break;
-		/* $4510 - $4517 : 1k CHR-Rom switch */
+		case 0x405:
+			prg8_ab(space->machine, data);
+			break;
+		case 0x406:
+			prg8_cd(space->machine, data);
+			break;
+		case 0x407:
+			prg8_ef(space->machine, data);
+			break;
+
 		case 0x410:
 		case 0x411:
 		case 0x412:
@@ -2049,11 +2283,7 @@ static WRITE8_HANDLER( mapper17_l_w )
 		case 0x415:
 		case 0x416:
 		case 0x417:
-			chr1_x(space->machine, offset&7, data&((nes.chr_chunks << 3) - 1), CHRROM);
-//          ppu2c0x_set_videorom_bank(state->ppu, offset & 0x07, 1, data, 64);
-			break;
-		default:
-			logerror("** uncaught mapper 17 write, offset: %04x, data: %02x\n", offset, data);
+			chr1_x(space->machine, offset & 7, data, CHRROM);
 			break;
 	}
 }
@@ -2070,46 +2300,53 @@ static WRITE8_HANDLER( mapper17_l_w )
     In MESS: Supported
 
 *************************************************************/
-
+/* Here, IRQ counter decrements every CPU cycle. Since we update it every scanline,
+we need to decrement it by 114 (Each scanline consists of 341 dots and, on NTSC,
+there are 3 dots to every 1 CPU cycle, hence 114 is the number of cycles per scanline ) */
 static void jaleco_irq( const device_config *device, int scanline, int vblank, int blanked )
 {
-	if (scanline <= PPU_BOTTOM_VISIBLE_SCANLINE)
+	/* Increment & check the IRQ scanline counter */
+	if (IRQ_enable)
 	{
-		/* Increment & check the IRQ scanline counter */
-		if (IRQ_enable)
+		LOG_MMC(("scanline: %d, irq count: %04x\n", scanline, IRQ_count));
+		if (IRQ_mode & 0x08)
 		{
-			IRQ_count -= 0x100;
-
-			LOG_MMC(("scanline: %d, irq count: %04x\n", scanline, IRQ_count));
-			if (IRQ_mode & 0x08)
+			if ((IRQ_count & 0x000f) < 114)	// always true, but we only update the IRQ once per scanlines so we cannot be more precise :(
 			{
-				if ((IRQ_count & 0x0f) == 0x00)
-					/* rollover every 0x10 */
-					cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
-			}
-			else if (IRQ_mode & 0x04)
-			{
-				if ((IRQ_count & 0x0ff) == 0x00)
-					/* rollover every 0x100 */
-					cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
-			}
-			else if (IRQ_mode & 0x02)
-			{
-				if ((IRQ_count & 0x0fff) == 0x000)
-					/* rollover every 0x1000 */
-					cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
-			}
-			else if (IRQ_count == 0)
-				/* rollover at 0x10000 */
 				cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
+				IRQ_count = (IRQ_count & ~0x000f) | (0x0f - (114 & 0x0f) + (IRQ_count & 0x000f)); // sort of wrap around the counter
+			}
+			// decrements should not affect upper bits, so we don't do anything here (114 > 0x0f)
 		}
-	}
-	else
-	{
-		IRQ_count = IRQ_count_latch;
+		else if (IRQ_mode & 0x04)
+		{
+			if ((IRQ_count & 0x00ff) < 114)
+			{
+				cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
+				IRQ_count = (IRQ_count & ~0x00ff) | (0xff - 114 + (IRQ_count & 0x00ff)); 	// wrap around the 8 bits counter
+			}
+			else
+				IRQ_count -= 114;
+		}
+		else if (IRQ_mode & 0x02)
+		{
+			if ((IRQ_count & 0x0fff)  < 114)
+			{
+				cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
+				IRQ_count = (IRQ_count & ~0x0fff) | (0xfff - 114 + (IRQ_count & 0x0fff)); 	// wrap around the 12 bits counter
+			}
+			else
+				IRQ_count -= 114;
+		}
+		else if (IRQ_count < 114)
+		{
+			cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
+			IRQ_count = (0xffff - 114 + IRQ_count); 	// wrap around the 16 bits counter
+		}
+		else
+			IRQ_count -= 114;
 	}
 }
-
 
 static WRITE8_HANDLER( mapper18_w )
 {
@@ -2119,32 +2356,26 @@ static WRITE8_HANDLER( mapper18_w )
 	switch (offset & 0x7003)
 	{
 		case 0x0000:
-			/* Switch 8k bank at $8000 - low 4 bits */
 			prg_bank[0] = (prg_bank[0] & 0xf0) | (data & 0x0f);
 			prg8_89(space->machine, prg_bank[0]);
 			break;
 		case 0x0001:
-			/* Switch 8k bank at $8000 - high 4 bits */
 			prg_bank[0] = (prg_bank[0] & 0x0f) | (data << 4);
 			prg8_89(space->machine, prg_bank[0]);
 			break;
 		case 0x0002:
-			/* Switch 8k bank at $a000 - low 4 bits */
 			prg_bank[1] = (prg_bank[1] & 0xf0) | (data & 0x0f);
 			prg8_ab(space->machine, prg_bank[1]);
 			break;
 		case 0x0003:
-			/* Switch 8k bank at $a000 - high 4 bits */
 			prg_bank[1] = (prg_bank[1] & 0x0f) | (data << 4);
 			prg8_ab(space->machine, prg_bank[1]);
 			break;
 		case 0x1000:
-			/* Switch 8k bank at $c000 - low 4 bits */
 			prg_bank[2] = (prg_bank[2] & 0xf0) | (data & 0x0f);
 			prg8_cd(space->machine, prg_bank[2]);
 			break;
 		case 0x1001:
-			/* Switch 8k bank at $c000 - high 4 bits */
 			prg_bank[2] = (prg_bank[2] & 0x0f) | (data << 4);
 			prg8_cd(space->machine, prg_bank[2]);
 			break;
@@ -2152,80 +2383,49 @@ static WRITE8_HANDLER( mapper18_w )
 		/* $9002, 3 (1002, 3) uncaught = Jaleco Baseball writes 0 */
 		/* believe it's related to battery-backed ram enable/disable */
 
-		case 0x2000:
-		case 0x2001:
-		case 0x2002:
-		case 0x2003:
-		case 0x3000:
-		case 0x3001:
-		case 0x3002:
-		case 0x3003:
-		case 0x4000:
-		case 0x4001:
-		case 0x4002:
-		case 0x4003:
-		case 0x5000:
-		case 0x5001:
-		case 0x5002:
-		case 0x5003:
-			bank = ((offset & 0x7000) - 0x2000) / 0x0400 + ((offset & 0x0002) >> 1);
+		case 0x2000: case 0x2001: case 0x2002: case 0x2003:
+		case 0x3000: case 0x3001: case 0x3002: case 0x3003:
+		case 0x4000: case 0x4001: case 0x4002: case 0x4003:
+		case 0x5000: case 0x5001: case 0x5002: case 0x5003:
+			bank = ((offset & 0x7000) - 0x2000) / 0x0800 + ((offset & 0x0002) >> 1);
 			if (offset & 0x0001)
-				vrom_bank[bank] = (vrom_bank[bank] & 0x0f) | (data << 4);
+				vrom_bank[bank] = (vrom_bank[bank] & 0x0f) | ((data & 0x0f)<< 4);
 			else
 				vrom_bank[bank] = (vrom_bank[bank] & 0xf0) | (data & 0x0f);
 
 			chr1_x(space->machine, bank, vrom_bank[bank], CHRROM);
 			break;
 
-/* LBO - these are unverified */
-
-		case 0x6000: /* IRQ scanline counter - low byte, low nibble */
+		case 0x6000:
 			IRQ_count_latch = (IRQ_count_latch & 0xfff0) | (data & 0x0f);
-			LOG_MMC(("     Mapper 18 copy/set irq latch (l-l): %02x\n", data));
 			break;
-		case 0x6001: /* IRQ scanline counter - low byte, high nibble */
+		case 0x6001:
 			IRQ_count_latch = (IRQ_count_latch & 0xff0f) | ((data & 0x0f) << 4);
-			LOG_MMC(("     Mapper 18 copy/set irq latch (l-h): %02x\n", data));
 			break;
 		case 0x6002:
-			IRQ_count_latch = (IRQ_count_latch & 0xf0ff) | ((data & 0x0f) << 9);
-			LOG_MMC(("     Mapper 18 copy/set irq latch (h-l): %02x\n", data));
+			IRQ_count_latch = (IRQ_count_latch & 0xf0ff) | ((data & 0x0f) << 8);
 			break;
 		case 0x6003:
-			IRQ_count_latch = (IRQ_count_latch & 0x0fff) | ((data & 0x0f) << 13);
-			LOG_MMC(("     Mapper 18 copy/set irq latch (h-h): %02x\n", data));
+			IRQ_count_latch = (IRQ_count_latch & 0x0fff) | ((data & 0x0f) << 12);
 			break;
 
-/* LBO - these 2 are likely wrong */
-
-		case 0x7000: /* IRQ Control 0 */
-			if (data & 0x01)
-			{
-//              IRQ_enable = 1;
-				IRQ_count = IRQ_count_latch;
-			}
-			LOG_MMC(("     Mapper 18 IRQ Control 0: %02x\n", data));
+		case 0x7000:
+			IRQ_count = IRQ_count_latch;
 			break;
-		case 0x7001: /* IRQ Control 1 */
+		case 0x7001:
 			IRQ_enable = data & 0x01;
 			IRQ_mode = data & 0x0e;
-			LOG_MMC(("     Mapper 18 IRQ Control 1: %02x\n", data));
 			break;
 
-		case 0x7002: /* Misc */
+		case 0x7002:
 			switch (data & 0x03)
 			{
-				case 0: set_nt_mirroring(PPU_MIRROR_LOW); break;
-				case 1: set_nt_mirroring(PPU_MIRROR_HIGH); break;
-				case 2: set_nt_mirroring(PPU_MIRROR_VERT); break;
-				case 3: set_nt_mirroring(PPU_MIRROR_HORZ); break;
+				case 0: set_nt_mirroring(PPU_MIRROR_HORZ); break;
+				case 1: set_nt_mirroring(PPU_MIRROR_VERT); break;
+				case 2: set_nt_mirroring(PPU_MIRROR_LOW); break;
+				case 3: set_nt_mirroring(PPU_MIRROR_HIGH); break;
 			}
 			break;
-
-/* $f003 uncaught, writes 0(start) & various(ingame) */
-//      case 0x7003:
-//          IRQ_count = data;
-//          break;
 
 		default:
 			logerror("Mapper 18 uncaught addr: %04x value: %02x\n", offset + 0x8000, data);
@@ -2245,20 +2445,27 @@ static WRITE8_HANDLER( mapper18_w )
 
 *************************************************************/
 
+/* Here, IRQ counter decrements every CPU cycle. Since we update it every scanline,
+we need to decrement it by 114 (Each scanline consists of 341 dots and, on NTSC,
+there are 3 dots to every 1 CPU cycle, hence 114 is the number of cycles per scanline ) */
 static void namcot_irq( const device_config *device, int scanline, int vblank, int blanked )
 {
 	if (IRQ_enable)
 	{
-		if (IRQ_count == 0x7fff)
+		if (IRQ_count >= (0x7fff - 114))
+		{
 			cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
+			IRQ_count = 0;
+		}
 		else
-			IRQ_count++;
+			IRQ_count += 114;
 	}
 }
 
 static WRITE8_HANDLER( mapper19_l_w )
 {
 	LOG_MMC(("mapper19_l_w, offset: %04x, data: %02x\n", offset, data));
+	offset += 0x100;
 
 	switch (offset & 0x1800)
 	{
@@ -2278,6 +2485,7 @@ static WRITE8_HANDLER( mapper19_l_w )
 static READ8_HANDLER( mapper19_l_r )
 {
 	LOG_MMC(("mapper19_l_r, offset: %04x\n", offset));
+	offset += 0x100;
 
 	switch (offset & 0x1800)
 	{
@@ -2288,6 +2496,14 @@ static READ8_HANDLER( mapper19_l_r )
 		default:
 			return 0x00;
 	}
+}
+
+static void mapper19_set_mirror( UINT8 page, UINT8 data )
+{
+	if (!(data < 0xe0))
+		set_nt_page(page, CIRAM, data & 0x01, 1);
+	else
+		set_nt_page(page, ROM, data, 0);
 }
 
 static WRITE8_HANDLER( mapper19_w )
@@ -2302,25 +2518,29 @@ static WRITE8_HANDLER( mapper19_w )
 			chr1_x(space->machine, offset / 0x800, data, CHRROM);
 			break;
 		case 0x4000:
-			set_nt_page(0, CIRAM, data & 0x01, 1);
+			mapper19_set_mirror(0, data);
 			break;
 		case 0x4800:
-			set_nt_page(1, CIRAM, data & 0x01, 1);
+			mapper19_set_mirror(1, data);
 			break;
 		case 0x5000:
-			set_nt_page(2, CIRAM, data & 0x01, 1);
+			mapper19_set_mirror(2, data);
 			break;
 		case 0x5800:
-			set_nt_page(3, CIRAM, data & 0x01, 1);
+			mapper19_set_mirror(3, data);
 			break;
 		case 0x6000:
-			prg8_89(space->machine, data);
+			prg8_89(space->machine, data & 0x3f);
 			break;
 		case 0x6800:
-			prg8_ab(space->machine, data);
+			mmc_cmd1 = data & 0xc0;		// this should enable High CHRRAM, but we still have to properly implement it!
+			prg8_ab(space->machine, data & 0x3f);
 			break;
 		case 0x7000:
-			prg8_cd(space->machine, data);
+			prg8_cd(space->machine, data & 0x3f);
+			break;
+		case 0x7800:
+			LOG_MMC(("Mapper 19 sound address write, data: %02x\n", data));
 			break;
 	}
 }
@@ -2341,7 +2561,6 @@ static void fds_irq( const device_config *device, int scanline, int vblank, int 
 	if (IRQ_enable_latch)
 		cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
 
-	/* Increment & check the IRQ scanline counter */
 	if (IRQ_enable)
 	{
 		if (IRQ_count <= 114)
@@ -2357,10 +2576,7 @@ static void fds_irq( const device_config *device, int scanline, int vblank, int 
 
 READ8_HANDLER( fds_r )
 {
-	int ret = 0x00;
-	static int last_side = 0;
-	static int count = 0;
-
+	UINT8 ret = 0x00;
 	LOG_MMC(("fds_r, offset: %04x\n", offset));
 
 	switch (offset)
@@ -2383,15 +2599,15 @@ READ8_HANDLER( fds_r )
 			/* return "no disk" status if disk is unloaded */
 			if (nes_fds.data == NULL)
 				ret = 1;
-			else if (last_side != nes_fds.current_side)
+			else if (fds_last_side != nes_fds.current_side)
 			{
 				/* If we've switched disks, report "no disk" for a few reads */
 				ret = 1;
-				count ++;
-				if (count == 50)
+				fds_count ++;
+				if (fds_count == 50)
 				{
-					last_side = nes_fds.current_side;
-					count = 0;
+					fds_last_side = nes_fds.current_side;
+					fds_count = 0;
 				}
 			}
 			else
@@ -2416,38 +2632,34 @@ WRITE8_HANDLER( fds_w )
 
 	switch (offset)
 	{
-		case 0x00: /* $4020 */
-			IRQ_count_latch &= ~0xff;
-			IRQ_count_latch |= data;
+		case 0x00:
+			IRQ_count = (IRQ_count & 0xff00) | data;
 			break;
-		case 0x01: /* $4021 */
-			IRQ_count_latch &= ~0xff00;
-			IRQ_count_latch |= (data << 8);
+		case 0x01:
+			IRQ_count = (IRQ_count & 0x00ff) | (data << 8);
 			break;
-		case 0x02: /* $4022 */
+		case 0x02:
 			IRQ_count = IRQ_count_latch;
 			IRQ_enable = data;
 			break;
-		case 0x03: /* $4023 */
+		case 0x03:
 			// d0 = sound io (1 = enable)
 			// d1 = disk io (1 = enable)
 			break;
-		case 0x04: /* $4024 */
+		case 0x04:
 			/* write data out to disk */
 			break;
-		case 0x05: /* $4025 */
+		case 0x05:
+			nes_fds.write_reg = data;
+
 			nes_fds.motor_on = data & 0x01;
-			if (data & 0x02) nes_fds.head_position = 0;
+			if (data & 0x02)
+				nes_fds.head_position = 0;
 			nes_fds.read_mode = data & 0x04;
-			if (data & 0x08)
-				set_nt_mirroring(PPU_MIRROR_HORZ);
-			else
-				set_nt_mirroring(PPU_MIRROR_VERT);
+			set_nt_mirroring((data & 0x08) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			if ((!(data & 0x40)) && (nes_fds.write_reg & 0x40))
 				nes_fds.head_position -= 2; // ???
 			IRQ_enable_latch = data & 0x80;
-
-			nes_fds.write_reg = data;
 			break;
 	}
 
@@ -2502,122 +2714,98 @@ static WRITE8_HANDLER( konami_vrc4_w )
 			prg8_ab(space->machine, data);
 			break;
 		case 0x3000:
-			/* Switch 1k vrom at $0000 - low 4 bits */
 			vrom_bank[0] = (vrom_bank[0] & 0xf0) | (data & 0x0f);
 			chr1_0(space->machine, vrom_bank[0], CHRROM);
 			break;
 		case 0x3002:
-			/* Switch 1k vrom at $0000 - high 4 bits */
 			vrom_bank[0] = (vrom_bank[0] & 0x0f) | (data << 4);
 			chr1_0(space->machine, vrom_bank[0], CHRROM);
 			break;
 		case 0x3001:
 		case 0x3004:
-			/* Switch 1k vrom at $0400 - low 4 bits */
 			vrom_bank[1] = (vrom_bank[1] & 0xf0) | (data & 0x0f);
 			chr1_1(space->machine, vrom_bank[1], CHRROM);
 			break;
 		case 0x3003:
 		case 0x3006:
-			/* Switch 1k vrom at $0400 - high 4 bits */
 			vrom_bank[1] = (vrom_bank[1] & 0x0f) | (data << 4);
 			chr1_1(space->machine, vrom_bank[1], CHRROM);
 			break;
 		case 0x4000:
-			/* Switch 1k vrom at $0800 - low 4 bits */
 			vrom_bank[2] = (vrom_bank[2] & 0xf0) | (data & 0x0f);
 			chr1_2(space->machine, vrom_bank[2], CHRROM);
 			break;
 		case 0x4002:
-			/* Switch 1k vrom at $0800 - high 4 bits */
 			vrom_bank[2] = (vrom_bank[2] & 0x0f) | (data << 4);
 			chr1_2(space->machine, vrom_bank[2], CHRROM);
 			break;
 		case 0x4001:
 		case 0x4004:
-			/* Switch 1k vrom at $0c00 - low 4 bits */
 			vrom_bank[3] = (vrom_bank[3] & 0xf0) | (data & 0x0f);
 			chr1_3(space->machine, vrom_bank[3], CHRROM);
 			break;
 		case 0x4003:
 		case 0x4006:
-			/* Switch 1k vrom at $0c00 - high 4 bits */
 			vrom_bank[3] = (vrom_bank[3] & 0x0f) | (data << 4);
 			chr1_3(space->machine, vrom_bank[3], CHRROM);
 			break;
 		case 0x5000:
-			/* Switch 1k vrom at $1000 - low 4 bits */
 			vrom_bank[4] = (vrom_bank[4] & 0xf0) | (data & 0x0f);
 			chr1_4(space->machine, vrom_bank[4], CHRROM);
 			break;
 		case 0x5002:
-			/* Switch 1k vrom at $1000 - high 4 bits */
 			vrom_bank[4] = (vrom_bank[4] & 0x0f) | (data << 4);
 			chr1_4(space->machine, vrom_bank[4], CHRROM);
 			break;
 		case 0x5001:
 		case 0x5004:
-			/* Switch 1k vrom at $1400 - low 4 bits */
 			vrom_bank[5] = (vrom_bank[5] & 0xf0) | (data & 0x0f);
 			chr1_5(space->machine, vrom_bank[5], CHRROM);
 			break;
 		case 0x5003:
 		case 0x5006:
-			/* Switch 1k vrom at $1400 - high 4 bits */
 			vrom_bank[5] = (vrom_bank[5] & 0x0f) | (data << 4);
 			chr1_5(space->machine, vrom_bank[5], CHRROM);
 			break;
 		case 0x6000:
-			/* Switch 1k vrom at $1800 - low 4 bits */
 			vrom_bank[6] = (vrom_bank[6] & 0xf0) | (data & 0x0f);
 			chr1_6(space->machine, vrom_bank[6], CHRROM);
 			break;
 		case 0x6002:
-			/* Switch 1k vrom at $1800 - high 4 bits */
 			vrom_bank[6] = (vrom_bank[6] & 0x0f) | (data << 4);
 			chr1_6(space->machine, vrom_bank[6], CHRROM);
 			break;
 		case 0x6001:
 		case 0x6004:
-			/* Switch 1k vrom at $1c00 - low 4 bits */
 			vrom_bank[7] = (vrom_bank[7] & 0xf0) | (data & 0x0f);
 			chr1_7(space->machine, vrom_bank[7], CHRROM);
 			break;
 		case 0x6003:
 		case 0x6006:
-			/* Switch 1k vrom at $1c00 - high 4 bits */
 			vrom_bank[7] = (vrom_bank[7] & 0x0f) | (data << 4);
 			chr1_7(space->machine, vrom_bank[7], CHRROM);
 			break;
+
 		case 0x7000:
-			/* Set low 4 bits of latch */
-			IRQ_count_latch &= ~0x0f;
-			IRQ_count_latch |= data & 0x0f;
-//          LOG_MMC(("konami_vrc4 irq_latch low: %02x\n", IRQ_count_latch));
+			IRQ_count_latch = (IRQ_count_latch & 0xf0) | (data & 0x0f);
 			break;
 		case 0x7002:
 		case 0x7040:
-			/* Set high 4 bits of latch */
-			IRQ_count_latch &= ~0xf0;
-			IRQ_count_latch |= (data << 4) & 0xf0;
-//          LOG_MMC(("konami_vrc4 irq_latch high: %02x\n", IRQ_count_latch));
+			IRQ_count_latch = (IRQ_count_latch & 0x0f) | ((data & 0x0f) << 4 );
 			break;
 		case 0x7004:
 		case 0x7001:
 		case 0x7080:
+			IRQ_mode = data & 0x04;	// currently not implemented: 0 = prescaler mode / 1 = CPU mode
 			IRQ_enable = data & 0x02;
 			IRQ_enable_latch = data & 0x01;
 			if (data & 0x02)
 				IRQ_count = IRQ_count_latch;
-//          LOG_MMC(("konami_vrc4 irq_count set: %02x\n", IRQ_count));
-//          LOG_MMC(("konami_vrc4 enable: %02x\n", IRQ_enable));
-//          LOG_MMC(("konami_vrc4 enable latch: %02x\n", IRQ_enable_latch));
 			break;
 		case 0x7006:
 		case 0x7003:
 		case 0x70c0:
 			IRQ_enable = IRQ_enable_latch;
-//          LOG_MMC(("konami_vrc4 enable copy: %02x\n", IRQ_enable));
 			break;
 		default:
 			LOG_MMC(("konami_vrc4_w uncaught offset: %04x value: %02x\n", offset, data));
@@ -2656,14 +2844,12 @@ static WRITE8_HANDLER( konami_vrc2a_w )
 		}
 		break;
 	case 0x2000:
-		/* Switch 8k bank at $a000 */
 		prg8_ab(space->machine, data);
 		break;
 	case 0x3000:
 	case 0x4000:
 	case 0x5000:
 	case 0x6000:
-		/* switch 1k vrom at $0000-$1c00 */
 		bank = ((offset & 0x7000) - 0x3000) / 0x0800 + (offset & 0x0001);
 		/* Notice that we store the banks as in other VRC, but then we take vrom_bank>>1 because it's VRC2A!*/
 		if (offset & 0x0002)
@@ -2751,19 +2937,18 @@ static WRITE8_HANDLER( konami_vrc2b_w )
 		else
 			vrom_bank[bank] = (vrom_bank[bank] & 0xf0) | (data & 0x0f);
 
-		chr1_x(space->machine, bank, vrom_bank[bank], CHRROM);
+		chr1_x(space->machine, bank, vrom_bank[bank], mmc_chr_source);
 		break;
 	case 0x7000:
-		/* Set low 4 bits of latch */
 		IRQ_count_latch &= ~0x0f;
 		IRQ_count_latch |= data & 0x0f;
 		break;
 	case 0x7001:
-		/* Set high 4 bits of latch */
 		IRQ_count_latch &= ~0xf0;
 		IRQ_count_latch |= (data << 4) & 0xf0;
 		break;
 	case 0x7002:
+		IRQ_mode = data & 0x04;	// currently not implemented: 0 = prescaler mode / 1 = CPU mode
 		IRQ_enable = data & 0x02;
 		IRQ_enable_latch = data & 0x01;
 		if (data & 0x02)
@@ -2836,6 +3021,7 @@ static WRITE8_HANDLER( konami_vrc6a_w )
 			IRQ_count_latch = data;
 			break;
 		case 0x7001:
+			IRQ_mode = data & 0x04;	// currently not implemented: 0 = prescaler mode / 1 = CPU mode
 			IRQ_enable = data & 0x02;
 			IRQ_enable_latch = data & 0x01;
 			if (data & 0x02)
@@ -2908,6 +3094,7 @@ static WRITE8_HANDLER( konami_vrc6b_w )
 			IRQ_enable = IRQ_enable_latch;
 			break;
 		case 0x7002:
+			IRQ_mode = data & 0x04;	// currently not implemented: 0 = prescaler mode / 1 = CPU mode
 			IRQ_enable = data & 0x02;
 			IRQ_enable_latch = data & 0x01;
 			if (data & 0x02)
@@ -2983,6 +3170,9 @@ static WRITE8_HANDLER( konami_vrc6b_w )
     Games: Ai Sensei no Oshiete, Image Fight, Kaiketsu
           Yanchamaru 2, Maikyuu Shima, Paaman, Paaman 2
 
+    A crc check is required to support Major League (which uses
+    a slightly different board)
+
     In MESS: Supported.
 
 *************************************************************/
@@ -2998,7 +3188,8 @@ static WRITE8_HANDLER( mapper32_w )
 			break;
 		case 0x1000:
 			mmc_cmd1 = data & 0x02;
-			set_nt_mirroring((data & 0x01) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			if (!nes.crc_hack)	// Major League has hardwired mirroring (it would have required a separate mapper)
+				set_nt_mirroring((data & 0x01) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			break;
 		case 0x2000:
 			prg8_ab(space->machine, data);
@@ -3029,7 +3220,7 @@ static WRITE8_HANDLER( mapper33_w )
 {
 	LOG_MMC(("mapper33_w, offset: %04x, data: %02x\n", offset, data));
 
-	switch (offset & 0x7003)
+	switch (offset & 0x6003)
 	{
 		case 0x0000:
 			set_nt_mirroring((data & 0x40) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
@@ -3067,6 +3258,11 @@ static WRITE8_HANDLER( mapper33_w )
     Games: Deadly Tower, Impossible Mission II, Titanic 1912,
           Dance Xtreme
 
+    There actually exist TWO different kind of boards using
+    this mapper. NINA-001 is not compatible with the other
+    kind of board, so Impossible Mission II requires a crc check
+    to be supported.
+
     In MESS: Supported.
 
 *************************************************************/
@@ -3075,8 +3271,10 @@ static WRITE8_HANDLER( mapper34_m_w )
 {
 	LOG_MMC(("mapper34_m_w, offset: %04x, data: %02x\n", offset, data));
 
-	switch (offset)
+	if (nes.crc_hack)	// is it AVE Nina-01?
 	{
+		switch (offset)
+		{
 		case 0x1ffd:
 			prg32(space->machine, data);
 			break;
@@ -3086,6 +3284,7 @@ static WRITE8_HANDLER( mapper34_m_w )
 		case 0x1fff:
 			chr4_4(space->machine, data, CHRROM);
 			break;
+		}
 	}
 }
 
@@ -3095,7 +3294,8 @@ static WRITE8_HANDLER( mapper34_w )
 	/* Deadly Towers is really a Mapper 34 game - the demo screens look wrong using mapper 7. */
 	LOG_MMC(("mapper34_w, offset: %04x, data: %02x\n", offset, data));
 
-	prg32(space->machine, data);
+	if (!nes.crc_hack) 	// is it plain BxROM?
+		prg32(space->machine, data);
 }
 
 /*************************************************************
@@ -3201,7 +3401,7 @@ static WRITE8_HANDLER( mapper39_w )
     Mapper 40
 
     Known Boards: Unknown Bootleg Board
-    Games: Super Mario Bros. 2 Lost Levels Pirate
+    Games: Super Mario Bros. 2 Pirate (Jpn version of SMB2)
 
     In MESS: Supported.
 
@@ -3209,13 +3409,16 @@ static WRITE8_HANDLER( mapper39_w )
 
 static void mapper40_irq( const device_config *device, int scanline, int vblank, int blanked )
 {
-	/* Decrement & check the IRQ scanline counter */
 	if (IRQ_enable)
 	{
-		if (--IRQ_count == 0)
+		if ((0xfff - IRQ_count) <= 114)
 		{
+			IRQ_count = (IRQ_count + 1) & 0xfff;
+			IRQ_enable = 0;
 			cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
 		}
+		else
+			IRQ_count += 114;
 	}
 }
 
@@ -3227,13 +3430,12 @@ static WRITE8_HANDLER( mapper40_w )
 	{
 		case 0x0000:
 			IRQ_enable = 0;
-			IRQ_count = 37; /* Hardcoded scanline scroll */
+			IRQ_count = 0;
 			break;
 		case 0x2000:
 			IRQ_enable = 1;
 			break;
 		case 0x6000:
-			/* Game runs code between banks, use slow but sure method */
 			prg8_cd(space->machine, data);
 			break;
 	}
@@ -3287,7 +3489,7 @@ static WRITE8_HANDLER( mapper42_w )
 		switch(offset & 0x03)
 		{
 		case 0x00:
-			memory_set_bankptr(space->machine, 5, &nes.rom[(data & ((nes.prg_chunks << 1) - 1)) * 0x2000 + 0x10000]);
+			prg8_67(space->machine, data);
 			break;
 		case 0x01:
 			set_nt_mirroring((data & 0x08) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
@@ -3316,7 +3518,8 @@ static WRITE8_HANDLER( mapper42_w )
     Known Boards: Unknown Bootleg Board
     Games: Super Mario Bros. 2 Pirate (LF36)
 
-    In MESS: Supported.
+    In MESS: Supported? The only image I found is not working
+       (not even in NEStopia).
 
 *************************************************************/
 
@@ -3457,7 +3660,7 @@ static WRITE8_HANDLER( mapper45_m_w )
     Known Boards: Rumblestation Board
     Games: Rumblestation 15 in 1
 
-    In MESS: Partially Supported.
+    In MESS: Supported.
 
 *************************************************************/
 
@@ -3512,9 +3715,63 @@ static WRITE8_HANDLER( mapper47_m_w )
     Games: Bakushou!! Jinsei Gekijou 3, Bubble Bobble 2,
           Captain Saver, Don Doko Don 2, Flintstones, Jetsons
 
-    In MESS: Unsupported.
+    This is basically Mapper 33 + IRQ. Notably, IRQ works the
+    same as MMC3 irq, BUT latch values are "inverted" (XOR'ed
+    with 0xff) and there is a little delay (not implemented yet)
+    We simply use MMC3 IRQ and XOR the value written in the
+    register 0xc000 below
+
+    In MESS: Supported.
 
 *************************************************************/
+
+static WRITE8_HANDLER( mapper48_w )
+{
+	LOG_MMC(("mapper48_w, offset: %04x, data: %02x\n", offset, data));
+
+	switch (offset & 0x6003)
+	{
+		case 0x0000:
+			prg8_89(space->machine, data);
+			break;
+		case 0x0001:
+			prg8_ab(space->machine, data);
+			break;
+		case 0x0002:
+			chr2_0(space->machine, data, CHRROM);
+			break;
+		case 0x0003:
+			chr2_2(space->machine, data, CHRROM);
+			break;
+		case 0x2000:
+			chr1_4(space->machine, data, CHRROM);
+			break;
+		case 0x2001:
+			chr1_5(space->machine, data, CHRROM);
+			break;
+		case 0x2002:
+			chr1_6(space->machine, data, CHRROM);
+			break;
+		case 0x2003:
+			chr1_7(space->machine, data, CHRROM);
+			break;
+		case 0x4000:
+			IRQ_count_latch = (0x100 - data) & 0xff;
+			break;
+		case 0x4001:
+			IRQ_count = IRQ_count_latch;
+			break;
+		case 0x4002:
+			IRQ_enable = 1;
+			break;
+		case 0x4003:
+			IRQ_enable = 0;
+			break;
+		case 0x6000:
+			set_nt_mirroring((data & 0x40) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			break;
+	}
+}
 
 /*************************************************************
 
@@ -3556,11 +3813,59 @@ static WRITE8_HANDLER( mapper49_m_w )
     Mapper 50
 
     Known Boards: Unknown Bootleg Board
-    Games: Super Mario Bros. Pirate Alt. Levels
+    Games: Super Mario Bros. 2 Pirate (Jpn version of SMB2)
 
-    In MESS: Unsupported.
+    This was marked as Alt. Levels. is it true?
+
+    In MESS: Supported.
 
 *************************************************************/
+
+static void mapper50_irq( const device_config *device, int scanline, int vblank, int blanked )
+{
+	if (IRQ_enable)
+	{
+		if (IRQ_count < 0x1000)
+		{
+			if ((0x1000 - IRQ_count) <= 114)
+				cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
+			else
+				IRQ_count += 114;
+		}
+		else
+			IRQ_count += 114;
+
+		IRQ_count &= 0xffff;	// according to docs is 16bit counter -> it wraps only after 0xffff
+	}
+}
+
+static WRITE8_HANDLER( mapper50_l_w )
+{
+	UINT8 prg;
+	LOG_MMC(("mapper50_l_w, offset: %04x, data: %02x\n", offset, data));
+	offset += 0x100;
+
+	switch (offset & 0x160)
+	{
+	case 0x020:
+		prg = (data & 0x08) | ((data & 0x06) >> 1) | ((data & 0x01) << 2);
+		prg8_cd(space->machine, prg);
+		break;
+	case 0x120:
+		IRQ_enable = data & 0x01;
+		break;
+	}
+}
+
+/* This goes to 0x4020-0x403f */
+WRITE8_HANDLER( mapper50_add_w )
+{
+	UINT8 prg;
+	LOG_MMC(("mapper50_add_w, offset: %04x, data: %02x\n", offset, data));
+
+	prg = (data & 0x08) | ((data & 0x06) >> 1) | ((data & 0x01) << 2);
+	prg8_cd(space->machine, prg);
+}
 
 /*************************************************************
 
@@ -3569,7 +3874,7 @@ static WRITE8_HANDLER( mapper49_m_w )
     Known Boards: Unknown Multigame Bootleg Board
     Games: 11 in 1 Ball Games
 
-    In MESS: Supported.
+    In MESS: Partially Supported.
 
 *************************************************************/
 
@@ -3583,8 +3888,8 @@ static void mapper51_set_banks( running_machine *machine )
 	}
 	else
 	{
-		prg16_cdef(machine, (mapper51_reg[1] * 2) + 1);
-		prg16_89ab(machine, mapper51_reg[2] * 2);
+		prg16_89ab(machine, (mapper51_reg[1] << 1) | (mapper51_reg[0] >> 1));
+		prg16_cdef(machine, (mapper51_reg[1] << 1) | 0x07);
 	}
 }
 
@@ -3600,12 +3905,17 @@ static WRITE8_HANDLER( mapper51_w )
 {
 	LOG_MMC(("mapper51_w, offset: %04x, data: %02x\n", offset, data));
 
-	if (offset & 0x4000)
-		mapper51_reg[2] = data;
-	else
-		mapper51_reg[1] = data;
-
-	mapper51_set_banks(space->machine);
+	switch (offset & 0x6000)
+	{
+	case 0x4000:	// here we also update reg[0] upper bit
+		mapper51_reg[0] = (mapper51_reg[0] & 0x01) | ((data >> 3) & 0x02);
+	case 0x0000:
+	case 0x2000:
+	case 0x6000:
+		mapper51_reg[1] = data & 0x0f;
+		mapper51_set_banks(space->machine);
+		break;
+	}
 }
 
 /*************************************************************
@@ -3634,7 +3944,7 @@ static WRITE8_HANDLER( mapper52_m_w )
 		map52_helper1 = (data & 0x08);
 		map52_helper2 = (data & 0x40);
 
-		mmc_prg_base = map52_helper1 ? ((data & 0x06) << 4) : ((data & 0x07) << 4);
+		mmc_prg_base = map52_helper1 ? ((data & 0x07) << 4) : ((data & 0x06) << 4);
 		mmc_prg_mask = map52_helper1 ? 0x0f : 0x1f;
 		mmc_chr_base = ((data & 0x20) << 4) | ((data & 0x04) << 6) | (map52_helper2 ? ((data & 0x10) << 3) : 0);
 		mmc_chr_mask = map52_helper2 ? 0x7f : 0xff;
@@ -3654,7 +3964,7 @@ static WRITE8_HANDLER( mapper52_m_w )
     Known Boards: Unknown Multigame Bootleg Board
     Games: Supervision 16 in 1
 
-    In MESS: Unsupported.
+    In MESS: Unsupported (SRAM banks can go in mid-regions).
 
 *************************************************************/
 
@@ -3770,7 +4080,7 @@ static WRITE8_HANDLER( mapper58_w )
     Known Boards: Unknown Multigame Bootleg Board
     Games: 4 in 1, 35 in 1
 
-    In MESS: Unsupported.
+    In MESS: Unsupported (these are reset-based and have dips).
 
 *************************************************************/
 
@@ -3859,96 +4169,164 @@ static WRITE8_HANDLER( mapper62_w )
     Games: Klax, Road Runner, Rolling Thunder, Shinobi, Skulls
           & Croosbones, Xybots
 
-    In MESS: Supported. It also uses mapper4_irq.
+    In MESS: Partially Supported. It also uses mapper4_irq.
 
 *************************************************************/
 
-static void mapper64_set_banks( running_machine *machine )
+static void mapper64_irq( const device_config *device, int scanline, int vblank, int blanked )
 {
+	if (!IRQ_mode)	// we are in scanline mode!
+	{
+		if (scanline < PPU_BOTTOM_VISIBLE_SCANLINE)
+		{
+			if (!IRQ_reset)
+			{
+				if (!IRQ_count)
+					IRQ_count = IRQ_count_latch;
+				else
+				{
+					IRQ_count--;
+					if (IRQ_enable && !blanked && !IRQ_count)
+					{
+						LOG_MMC(("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline,
+								video_screen_get_vpos(device->machine->primary_screen), video_screen_get_hpos(device->machine->primary_screen)));
+						cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
+					}
+				}
+			}
+			else
+			{
+				IRQ_reset = 0;
+				IRQ_count = IRQ_count_latch + 1;
+			}
+		}
+	}
+	/* otherwise, we are in CPU cycles mode --> decrement count of 114 every scanline
+     --> in the meanwhile anything can have happened to IRQ_reset and we would not know
+     --> Skulls and Crossbones does not show anything!! */
+	else
+	{
+//      if (!IRQ_reset)
+		{
+			if (IRQ_count <= 114)
+				IRQ_count = IRQ_count_latch;
+			else
+			{
+				IRQ_count -= 114;
+				if (IRQ_enable && !blanked && (IRQ_count <= 114))
+				{
+					LOG_MMC(("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline,
+							video_screen_get_vpos(device->machine->primary_screen), video_screen_get_hpos(device->machine->primary_screen)));
+					cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
+				}
+			}
+		}
+//      else
+//      {
+//          IRQ_reset = 0;
+//          IRQ_count = IRQ_count_latch + 1;
+//      }
+	}
+}
+
+static void mapper64_set_prg( running_machine *machine )
+{
+	UINT8 prg_mode = mmc_cmd1 & 0x40;
+
+	prg8_89(machine, prg_bank[prg_mode ? 2: 0]);
+	prg8_ab(machine, prg_bank[prg_mode ? 0: 1]);
+	prg8_cd(machine, prg_bank[prg_mode ? 1: 2]);
+}
+
+static void mapper64_set_chr( running_machine *machine )
+{
+	UINT8 chr_page = (mmc_cmd1 & 0x80) >> 5;
+
 	if (mmc_cmd1 & 0x20)
 	{
-		chr1_0(machine, mapper64_reg[0], CHRROM);
-		chr1_2(machine, mapper64_reg[1], CHRROM);
-		chr1_1(machine, mapper64_reg[8], CHRROM);
-		chr1_3(machine, mapper64_reg[9], CHRROM);
+		chr1_x(machine, 0 ^ chr_page, vrom_bank[0], CHRROM);
+		chr1_x(machine, 1 ^ chr_page, vrom_bank[8], CHRROM);
+		chr1_x(machine, 2 ^ chr_page, vrom_bank[1], CHRROM);
+		chr1_x(machine, 3 ^ chr_page, vrom_bank[9], CHRROM);
 	}
 	else
 	{
-		chr1_0(machine, mapper64_reg[0] & 0xfe, CHRROM);
-		chr1_1(machine, (mapper64_reg[0] & 0xfe) | 1, CHRROM);
-		chr1_2(machine, mapper64_reg[1] & 0xfe, CHRROM);
-		chr1_3(machine, (mapper64_reg[1] & 0xfe) | 1, CHRROM);
+		chr1_x(machine, 0 ^ chr_page, vrom_bank[0] & ~0x01, CHRROM);
+		chr1_x(machine, 1 ^ chr_page, vrom_bank[0] |  0x01, CHRROM);
+		chr1_x(machine, 2 ^ chr_page, vrom_bank[1] & ~0x01, CHRROM);
+		chr1_x(machine, 3 ^ chr_page, vrom_bank[1] |  0x01, CHRROM);
 	}
 
-	chr1_4(machine, mapper64_reg[2], CHRROM);
-	chr1_5(machine, mapper64_reg[3], CHRROM);
-	chr1_6(machine, mapper64_reg[4], CHRROM);
-	chr1_7(machine, mapper64_reg[5], CHRROM);
-
-	prg8_89(machine, mapper64_reg[6]);
-	prg8_ab(machine, mapper64_reg[7]);
-	prg8_cd(machine, mapper64_reg[10]);
-}
-
-static WRITE8_HANDLER( mapper64_m_w )
-{
-	LOG_MMC(("mapper64_m_w, offset: %04x, data: %02x\n", offset, data));
+	chr1_x(machine, 4 ^ chr_page, vrom_bank[2], CHRROM);
+	chr1_x(machine, 5 ^ chr_page, vrom_bank[3], CHRROM);
+	chr1_x(machine, 6 ^ chr_page, vrom_bank[4], CHRROM);
+	chr1_x(machine, 7 ^ chr_page, vrom_bank[5], CHRROM);
 }
 
 static WRITE8_HANDLER( mapper64_w )
 {
-/* TODO: something in the IRQ handling hoses Skull & Crossbones */
+	UINT8 map64_helper, cmd;
+	LOG_MMC(("mapper64_w offset: %04x, data: %02x\n", offset, data));
 
-//  LOG_MMC(("mapper64_w offset: %04x, data: %02x, scanline: %d\n", offset, data, current_scanline));
-
-	switch (offset & 0x7001)
+	switch (offset & 0x6001)
 	{
 		case 0x0000:
+			map64_helper = mmc_cmd1 ^ data;
 			mmc_cmd1 = data;
+
+			/* Has PRG Mode changed? */
+			if (map64_helper & 0x40)
+				mapper64_set_prg(space->machine);
+
+			/* Has CHR Mode changed? */
+			if (map64_helper & 0xa0)
+				mapper64_set_chr(space->machine);
 			break;
+
 		case 0x0001:
-			if ((mmc_cmd1 & 0x0f) < 10)
-				mapper64_reg[mmc_cmd1 & 0x0f] = data;
-			if ((mmc_cmd1 & 0x0f) == 0x0f)
-				mapper64_reg[10] = data;
-
-			mapper64_set_banks(space->machine);
+			cmd = mmc_cmd1 & 0x0f;
+			switch (cmd)
+			{
+				case 0: case 1:
+				case 2: case 3:
+				case 4: case 5:
+					vrom_bank[cmd] = data;
+					mapper64_set_chr(space->machine);
+					break;
+				case 6: case 7:
+					prg_bank[cmd - 6] = data;
+					mapper64_set_prg(space->machine);
+					break;
+				case 8: case 9:
+					vrom_bank[cmd - 2] = data;
+					mapper64_set_chr(space->machine);
+					break;
+				case 0x0f:
+					prg_bank[2] = data;
+					mapper64_set_prg(space->machine);
+					break;
+			}
 			break;
+
 		case 0x2000:
-			/* Not sure if the one-screen mirroring applies to this mapper */
-			if (data & 0x40)
-				set_nt_mirroring(PPU_MIRROR_HIGH);
-			else
-				set_nt_mirroring((data & 0x01) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			set_nt_mirroring((data & 0x01) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			break;
-		case 0x4000: /* $c000 - IRQ scanline counter */
-			IRQ_count_latch = data;
-			if (0)
-				IRQ_count = IRQ_count_latch;
 
-			LOG_MMC(("     MMC3 copy/set irq latch: %02x\n", data));
+		case 0x4000:
+			IRQ_count_latch = data;
 			break;
 
 		case 0x4001: /* $c001 - IRQ scanline latch */
-			IRQ_count = IRQ_count_latch;
 			IRQ_mode = data & 0x01;
-			LOG_MMC(("     MMC3 set latch: %02x\n", data));
+			IRQ_reset = 1;
 			break;
 
-		case 0x6000: /* $e000 - Disable IRQs */
+		case 0x6000:
 			IRQ_enable = 0;
-			if (0)
-				IRQ_count = IRQ_count_latch;
-
-			LOG_MMC(("     MMC3 disable irqs: %02x\n", data));
 			break;
 
-		case 0x6001: /* $e001 - Enable IRQs */
+		case 0x6001:
 			IRQ_enable = 1;
-			if (0)
-				IRQ_count = IRQ_count_latch;
-
-			LOG_MMC(("     MMC3 enable irqs: %02x\n", data));
 			break;
 
 		default:
@@ -3969,13 +4347,20 @@ static WRITE8_HANDLER( mapper64_w )
 
 *************************************************************/
 
+/* Here, IRQ counter decrements every CPU cycle. Since we update it every scanline,
+we need to decrement it by 114 (Each scanline consists of 341 dots and, on NTSC,
+there are 3 dots to every 1 CPU cycle, hence 114 is the number of cycles per scanline ) */
 static void irem_irq( const device_config *device, int scanline, int vblank, int blanked )
 {
-	/* Increment & check the IRQ scanline counter */
 	if (IRQ_enable)
 	{
-		if (--IRQ_count == 0)
+		IRQ_count -= 114;
+
+		if (IRQ_count <= 114)
+		{
+			IRQ_enable = 0;
 			cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
+		}
 	}
 }
 
@@ -3983,28 +4368,34 @@ static WRITE8_HANDLER( mapper65_w )
 {
 	LOG_MMC(("mapper65_w, offset %04x, data: %02x\n", offset, data));
 
-	switch (offset & 0x7007)
+	switch (offset & 0x7fff)
 	{
 		case 0x0000:
 			prg8_89(space->machine, data);
-			LOG_MMC(("     Mapper 65 switch ($8000) value: %02x\n", data));
 			break;
+
 		case 0x1001:
-			if (data & 0x80)
-				set_nt_mirroring(PPU_MIRROR_HORZ);
-			else
-				set_nt_mirroring(PPU_MIRROR_VERT);
+			set_nt_mirroring((data & 0x80) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			break;
+
+		case 0x1003:
+			IRQ_enable = data & 0x80;
+			break;
+
+		case 0x1004:
+			IRQ_count = IRQ_count_latch;
+			break;
+
 		case 0x1005:
-			IRQ_count = data << 1;
+			IRQ_count_latch = (IRQ_count_latch & 0x00ff) | (data << 8);
 			break;
+
 		case 0x1006:
-			IRQ_enable = IRQ_count;
+			IRQ_count_latch = (IRQ_count_latch & 0xff00) | data;
 			break;
 
 		case 0x2000:
 			prg8_ab(space->machine, data);
-			LOG_MMC(("     Mapper 65 switch ($a000) value: %02x\n", data));
 			break;
 
 		case 0x3000:
@@ -4015,17 +4406,14 @@ static WRITE8_HANDLER( mapper65_w )
 		case 0x3005:
 		case 0x3006:
 		case 0x3007:
-			/* Switch 1k VROM at $0000-$1c00 */
 			chr1_x(space->machine, offset & 0x07, data, CHRROM);
 			break;
 
 		case 0x4000:
 			prg8_cd(space->machine, data);
-			LOG_MMC(("     Mapper 65 switch ($c000) value: %02x\n", data));
 			break;
 
 		default:
-			LOG_MMC(("Mapper 65 addr: %04x value: %02x\n", offset + 0x8000, data));
 			break;
 	}
 }
@@ -4057,62 +4445,74 @@ static WRITE8_HANDLER( mapper66_w )
     Known Boards: Sunsoft 3
     Games: Fantasy Zone 2, Mito Koumon
 
-    In MESS: Supported. It also uses mapper4_irq.
+    In MESS: Supported.
 
 *************************************************************/
+
+/* Here, IRQ counter decrements every CPU cycle. Since we update it every scanline,
+we need to decrement it by 114 (Each scanline consists of 341 dots and, on NTSC,
+there are 3 dots to every 1 CPU cycle, hence 114 is the number of cycles per scanline ) */
+static void mapper67_irq( const device_config *device, int scanline, int vblank, int blanked )
+{
+	/* TODO: change to reflect the actual number of cycles spent: both using 114 or cycling 114,114,113
+    produces a 1-line glitch in Fantasy Zone 2: it really requires the counter to be updated each CPU cycle! */
+	if (IRQ_enable)
+	{
+		if (IRQ_count <= 114)
+		{
+			IRQ_enable = 0;
+			IRQ_count = 0xffff;
+			cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
+		}
+		else
+			IRQ_count -= 114;
+	}
+}
 
 static WRITE8_HANDLER( mapper67_w )
 {
 	LOG_MMC(("mapper67_w, offset %04x, data: %02x\n", offset, data));
-	switch (offset & 0x7801)
+	switch (offset & 0x7800)
 	{
-//      case 0x0000: /* IRQ acknowledge */
-//          IRQ_enable = 0;
-//          break;
-		case 0x0800:
-			chr2_0(space->machine, data, CHRROM);
-			break;
-		case 0x1800:
-			chr2_2(space->machine, data, CHRROM);
-			break;
-		case 0x2800:
-			chr2_4(space->machine, data, CHRROM);
-			break;
-		case 0x3800:
-			chr2_6(space->machine, data, CHRROM);
-			break;
-		case 0x4800:
-//          nes_vram[5] = data * 64;
-//          break;
-		case 0x4801:
-			/* IRQ count? */
-			IRQ_count = IRQ_count_latch;
-			IRQ_count_latch = data;
-			break;
-		case 0x5800:
-//          chr4_0(space->machine, data);
-//          break;
-		case 0x5801:
-			IRQ_enable = data;
-			break;
-		case 0x6800:
-		case 0x6801:
-			switch (data & 3)
-			{
-				case 0x00: set_nt_mirroring(PPU_MIRROR_VERT); break;
-				case 0x01: set_nt_mirroring(PPU_MIRROR_HORZ); break;
-				case 0x02: set_nt_mirroring(PPU_MIRROR_LOW); break;
-				case 0x03: set_nt_mirroring(PPU_MIRROR_HIGH); break;
-			}
-			break;
-		case 0x7800:
-		case 0x7801:
-			prg16_89ab(space->machine, data);
-			break;
-		default:
-			LOG_MMC(("mapper67_w uncaught offset: %04x, data: %02x\n", offset, data));
-			break;
-
+	case 0x0800:
+		chr2_0(space->machine, data, CHRROM);
+		break;
+	case 0x1800:
+		chr2_2(space->machine, data, CHRROM);
+		break;
+	case 0x2800:
+		chr2_4(space->machine, data, CHRROM);
+		break;
+	case 0x3800:
+		chr2_6(space->machine, data, CHRROM);
+		break;
+	case 0x4000:
+	case 0x4800:
+		IRQ_toggle ^= 1;
+		if (IRQ_toggle)
+			IRQ_count = (IRQ_count & 0x00ff) | (data << 8);
+		else
+			IRQ_count = (IRQ_count & 0xff00) | data;
+		break;
+	case 0x5800:
+		IRQ_enable = data & 0x10;
+		IRQ_toggle = 0;
+		break;
+	case 0x6800:
+		switch (data & 3)
+		{
+			case 0x00: set_nt_mirroring(PPU_MIRROR_VERT); break;
+			case 0x01: set_nt_mirroring(PPU_MIRROR_HORZ); break;
+			case 0x02: set_nt_mirroring(PPU_MIRROR_LOW); break;
+			case 0x03: set_nt_mirroring(PPU_MIRROR_HIGH); break;
+		}
+		break;
+	case 0x7800:
+		prg16_89ab(space->machine, data);
+		break;
+	default:
+		LOG_MMC(("mapper67_w uncaught offset: %04x, data: %02x\n", offset, data));
+		break;
 	}
 }
 
@@ -4129,9 +4529,6 @@ static WRITE8_HANDLER( mapper67_w )
 
 static void mapper68_mirror( running_machine *machine, int m68_mirror, int m0, int m1 )
 {
-	/* The 0x20000 (128k) offset is a magic number */
-	#define M68_OFFSET 0x20000
-
 	switch (m68_mirror)
 	{
 		case 0x00:
@@ -4147,55 +4544,48 @@ static void mapper68_mirror( running_machine *machine, int m68_mirror, int m0, i
 			set_nt_mirroring(PPU_MIRROR_HIGH);
 			break;
 		case 0x10:
-			set_nt_page(0, ROM, m0 | 0x80, 0);	//(m0 << 10) + M68_OFFSET);
-			set_nt_page(1, ROM, m1 | 0x80, 0);	//(m1 << 10) + M68_OFFSET);
-			set_nt_page(2, ROM, m0 | 0x80, 0);	//(m0 << 10) + M68_OFFSET);
-			set_nt_page(3, ROM, m1 | 0x80, 0);	//(m1 << 10) + M68_OFFSET);
+			set_nt_page(0, ROM, m0 | 0x80, 0);
+			set_nt_page(1, ROM, m1 | 0x80, 0);
+			set_nt_page(2, ROM, m0 | 0x80, 0);
+			set_nt_page(3, ROM, m1 | 0x80, 0);
 			break;
 		case 0x11:
-			set_nt_page(0, ROM, m0 | 0x80, 0);	//(m0 << 10) + M68_OFFSET);
-			set_nt_page(1, ROM, m0 | 0x80, 0);	//(m0 << 10) + M68_OFFSET);
-			set_nt_page(2, ROM, m1 | 0x80, 0);	//(m1 << 10) + M68_OFFSET);
-			set_nt_page(3, ROM, m1 | 0x80, 0);	//(m1 << 10) + M68_OFFSET);
+			set_nt_page(0, ROM, m0 | 0x80, 0);
+			set_nt_page(1, ROM, m0 | 0x80, 0);
+			set_nt_page(2, ROM, m1 | 0x80, 0);
+			set_nt_page(3, ROM, m1 | 0x80, 0);
 			break;
 		case 0x12:
-			set_nt_page(0, ROM, m0 | 0x80, 0);	//(m0 << 10) + M68_OFFSET);
-			set_nt_page(1, ROM, m0 | 0x80, 0);	//(m0 << 10) + M68_OFFSET);
-			set_nt_page(2, ROM, m0 | 0x80, 0);	//(m0 << 10) + M68_OFFSET);
-			set_nt_page(3, ROM, m0 | 0x80, 0);	//(m0 << 10) + M68_OFFSET);
+			set_nt_page(0, ROM, m0 | 0x80, 0);
+			set_nt_page(1, ROM, m0 | 0x80, 0);
+			set_nt_page(2, ROM, m0 | 0x80, 0);
+			set_nt_page(3, ROM, m0 | 0x80, 0);
 			break;
 		case 0x13:
-			set_nt_page(0, ROM, m1 | 0x80, 0);	//(m1 << 10) + M68_OFFSET);
-			set_nt_page(1, ROM, m1 | 0x80, 0);	//(m1 << 10) + M68_OFFSET);
-			set_nt_page(2, ROM, m1 | 0x80, 0);	//(m1 << 10) + M68_OFFSET);
-			set_nt_page(3, ROM, m1 | 0x80, 0);	//(m1 << 10) + M68_OFFSET);
+			set_nt_page(0, ROM, m1 | 0x80, 0);
+			set_nt_page(1, ROM, m1 | 0x80, 0);
+			set_nt_page(2, ROM, m1 | 0x80, 0);
+			set_nt_page(3, ROM, m1 | 0x80, 0);
 			break;
 	}
 }
 
 static WRITE8_HANDLER( mapper68_w )
 {
-	static int m68_mirror;
-	static int m0, m1;
-
 	LOG_MMC(("mapper68_w, offset %04x, data: %02x\n", offset, data));
 
 	switch (offset & 0x7000)
 	{
 		case 0x0000:
-			/* Switch 2k VROM at $0000 */
 			chr2_0(space->machine, data, CHRROM);
 			break;
 		case 0x1000:
-			/* Switch 2k VROM at $0800 */
 			chr2_2(space->machine, data, CHRROM);
 			break;
 		case 0x2000:
-			/* Switch 2k VROM at $1000 */
 			chr2_4(space->machine, data, CHRROM);
 			break;
 		case 0x3000:
-			/* Switch 2k VROM at $1800 */
 			chr2_6(space->machine, data, CHRROM);
 			break;
 		case 0x4000:
@@ -4225,70 +4615,72 @@ static WRITE8_HANDLER( mapper68_w )
 
     Known Boards: JLROM, JSROM, Sunsoft 5B, Sunsoft FME7 and
          Custom
-    Games: Barcode World, Batman - Return of the Joker, Gimmick!,
-          Splatter House - Wanpaku Graffiti
+    Games: Barcode World, Batman - Return of the Joker, Gimmick!
 
     In MESS: Supported.
 
 *************************************************************/
 
-/* should this be used for Mapper 67 as well?!? */
-static void sunsoft_irq( const device_config *device, int scanline, int vblank, int blanked )
+/* Here, IRQ counter decrements every CPU cycle. Since we update it every scanline,
+we need to decrement it by 114 (Each scanline consists of 341 dots and, on NTSC,
+there are 3 dots to every 1 CPU cycle, hence 114 is the number of cycles per scanline ) */
+static void mapper69_irq( const device_config *device, int scanline, int vblank, int blanked )
 {
-	/* 114 is the number of cycles per scanline */
 	/* TODO: change to reflect the actual number of cycles spent */
-
-	if (IRQ_enable)
+	if ((IRQ_enable & 0x80) && (IRQ_enable & 0x01))
 	{
 		if (IRQ_count <= 114)
 		{
+			IRQ_count = 0xffff;
 			cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
 		}
-		IRQ_count -= 114;
+		else
+			IRQ_count -= 114;
+	}
+	else if (IRQ_enable & 0x01)	// if enable bit is not set, only decrement the counter!
+	{
+		if (IRQ_count <= 114)
+			IRQ_count = 0xffff;
+		else
+			IRQ_count -= 114;
 	}
 }
 
 static WRITE8_HANDLER( mapper69_w )
 {
-	static int cmd = 0;
 	LOG_MMC(("mapper69_w, offset %04x, data: %02x\n", offset, data));
 
-	switch (offset & 0x7000)
+	switch (offset & 0x6000)
 	{
 		case 0x0000:
-			cmd = data & 0x0f;
+			mmc_cmd1 = data & 0x0f;
 			break;
 
 		case 0x2000:
-			switch (cmd)
+			switch (mmc_cmd1)
 			{
 				case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7:
-					chr1_x(space->machine, cmd, data, CHRROM);
-					//ppu2c0x_set_videorom_bank(state->ppu, cmd, 1, data, 64);
+					chr1_x(space->machine, mmc_cmd1, data, CHRROM);
 					break;
 
-				/* TODO: deal with bankswitching/write-protecting the mid-mapper area */
+				/* TODO: deal properly with bankswitching/write-protecting the mid-mapper area */
 				case 8:
-#if 0
 					if (!(data & 0x40))
-					{
-						memory_set_bankptr(space->machine, 5, &nes.rom[(data & 0x3f) * 0x2000 + 0x10000]);
-					}
-					else
-#endif
-						LOG_MMC(("mapper69_w, cmd 8, data: %02x\n", data));
+						prg8_67(space->machine, data & 0x3f);
+					else if (data & 0x80)
+						memory_set_bankptr(space->machine, 5, &nes.wram[(data & 0x3f) * 0x2000]);
 					break;
 
 				case 9:
 					prg8_89(space->machine, data);
 					break;
-				case 10:
+				case 0x0a:
 					prg8_ab(space->machine, data);
 					break;
-				case 11:
+				case 0x0b:
 					prg8_cd(space->machine, data);
 					break;
-				case 12:
+				case 0x0c:
 					switch (data & 0x03)
 					{
 						case 0x00: set_nt_mirroring(PPU_MIRROR_VERT); break;
@@ -4297,17 +4689,21 @@ static WRITE8_HANDLER( mapper69_w )
 						case 0x03: set_nt_mirroring(PPU_MIRROR_HIGH); break;
 					}
 					break;
-				case 13:
+				case 0x0d:
 					IRQ_enable = data;
 					break;
-				case 14:
+				case 0x0e:
 					IRQ_count = (IRQ_count & 0xff00) | data;
 					break;
-				case 15:
+				case 0x0f:
 					IRQ_count = (IRQ_count & 0x00ff) | (data << 8);
 					break;
 			}
 			break;
+
+		/* Here we would have sound command for Sunsoft 5b variant */
+//      case 0x4000:
+//      case 0x6000:
 
 		default:
 			logerror("mapper69_w uncaught %04x value: %02x\n", offset + 0x8000, data);
@@ -4473,7 +4869,7 @@ static void waixing_set_mirror( UINT8 nt )
 
 static void mapper74_set_chr( running_machine *machine, int chr_base, int chr_mask )
 {
-	UINT8 chr_page = (MMC3_cmd & 0x80) >> 5;
+	UINT8 chr_page = (mmc_cmd1 & 0x80) >> 5;
 	UINT8 chr_src[6];
 	int i;
 
@@ -4498,8 +4894,8 @@ static WRITE8_HANDLER( mapper74_w )
 	switch (offset & 0x6001)
 	{
 	case 0x0000:
-		MMC3_helper = MMC3_cmd ^ data;
-		MMC3_cmd = data;
+		MMC3_helper = mmc_cmd1 ^ data;
+		mmc_cmd1 = data;
 
 		/* Has PRG Mode changed? */
 		if (MMC3_helper & 0x40)
@@ -4511,10 +4907,10 @@ static WRITE8_HANDLER( mapper74_w )
 		break;
 
 	case 0x0001:
-		cmd = MMC3_cmd & 0x07;
+		cmd = mmc_cmd1 & 0x07;
 		switch (cmd)
 		{
-		case 0: case 1:	// these do not need to be separated because we shift banks in set_chr!
+		case 0: case 1:	// these do not need to be separated: we take care of them in set_chr!
 		case 2: case 3: case 4: case 5:
 			vrom_bank[cmd] = data;
 			mapper74_set_chr(space->machine, mmc_chr_base, mmc_chr_mask);
@@ -4635,7 +5031,7 @@ static WRITE8_HANDLER( mapper76_w )
     Known Boards: Irem LROG017
     Games: Napoleon Senki
 
-    In MESS: Supported.
+    In MESS: Partially Supported (it needs 4-screen mirroring).
 
 *************************************************************/
 
@@ -4655,18 +5051,24 @@ static WRITE8_HANDLER( mapper77_w )
     Games: Holy Diver, Portopia Renzoku Satsujin Jiken,
           Uchuusen - Cosmo Carrier
 
-    In MESS: Partially Supported.
+    A crc check is required to support Cosmo Carrier (which uses
+    a slightly different board)
+
+    In MESS: Supported.
 
 *************************************************************/
 
 static WRITE8_HANDLER( mapper78_w )
 {
 	LOG_MMC(("mapper78_w, offset: %04x, data: %02x\n", offset, data));
-	/* Switch 8k VROM bank */
-	chr8(space->machine, (data & 0xf0) >> 4, CHRROM);
 
-	/* Switch 16k ROM bank */
-	prg16_89ab(space->machine, data & 0x0f);
+	if (nes.crc_hack)		// Jaleco JF16 board has different mirroring even if uses same mapper number :(
+		set_nt_mirroring((data & 0x08) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
+	else
+		set_nt_mirroring((data & 0x08) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
+
+	chr8(space->machine, (data & 0xf0) >> 4, CHRROM);
+	prg16_89ab(space->machine, data & 0x07);
 }
 
 /*************************************************************
@@ -4715,27 +5117,21 @@ static WRITE8_HANDLER( mapper80_m_w )
 	switch (offset)
 	{
 		case 0x1ef0:
-			/* Switch 2k VROM at $0000 */
 			chr2_0(space->machine, (data & 0x7f) >> 1, CHRROM);
 			break;
 		case 0x1ef1:
-			/* Switch 2k VROM at $0000 */
 			chr2_2(space->machine, (data & 0x7f) >> 1, CHRROM);
 			break;
 		case 0x1ef2:
-			/* Switch 1k VROM at $1000 */
 			chr1_4(space->machine, data, CHRROM);
 			break;
 		case 0x1ef3:
-			/* Switch 1k VROM at $1400 */
 			chr1_5(space->machine, data, CHRROM);
 			break;
 		case 0x1ef4:
-			/* Switch 1k VROM at $1800 */
 			chr1_6(space->machine, data, CHRROM);
 			break;
 		case 0x1ef5:
-			/* Switch 1k VROM at $1c00 */
 			chr1_7(space->machine, data, CHRROM);
 			break;
 		case 0x1ef6:
@@ -4743,17 +5139,14 @@ static WRITE8_HANDLER( mapper80_m_w )
 			break;
 		case 0x1efa:
 		case 0x1efb:
-			/* Switch 8k ROM at $8000 */
 			prg8_89(space->machine, data);
 			break;
 		case 0x1efc:
 		case 0x1efd:
-			/* Switch 8k ROM at $a000 */
 			prg8_ab(space->machine, data);
 			break;
 		case 0x1efe:
 		case 0x1eff:
-			/* Switch 8k ROM at $c000 */
 			prg8_cd(space->machine, data);
 			break;
 		default:
@@ -4777,7 +5170,7 @@ static WRITE8_HANDLER( mapper80_m_w )
 
     Mapper 82
 
-    Known Boards: Taito X1017
+    Known Boards: Taito X1-017
     Games: Kyuukyoku Harikiri Koushien, Kyuukyoku Harikiri
           Stadium, SD Keiji - Blader
 
@@ -4787,42 +5180,37 @@ static WRITE8_HANDLER( mapper80_m_w )
 
 static WRITE8_HANDLER( mapper82_m_w )
 {
-	static int vrom_switch;
-
-	/* This mapper has problems */
-
 	LOG_MMC(("mapper82_m_w, offset: %04x, data: %02x\n", offset, data));
 
 	switch (offset)
 	{
 		case 0x1ef0:
-			if (vrom_switch)
-				chr2_4(space->machine, data, CHRROM);
+			if (mmc_cmd1)
+				chr2_4(space->machine, data >> 1, CHRROM);
 			else
-				chr2_0(space->machine, data, CHRROM);
+				chr2_0(space->machine, data >> 1, CHRROM);
 			break;
 		case 0x1ef1:
-			if (vrom_switch)
+			if (mmc_cmd1)
 				chr2_6(space->machine, data, CHRROM);
 			else
 				chr2_2(space->machine, data, CHRROM);
 			break;
 		case 0x1ef2:
-			chr1_x(space->machine, 4 ^ vrom_switch, data, CHRROM);
+			chr1_x(space->machine, 4 ^ mmc_cmd1, data, CHRROM);
 			break;
 		case 0x1ef3:
-			chr1_x(space->machine, 5 ^ vrom_switch, data, CHRROM);
+			chr1_x(space->machine, 5 ^ mmc_cmd1, data, CHRROM);
 			break;
 		case 0x1ef4:
-			chr1_x(space->machine, 6 ^ vrom_switch, data, CHRROM);
+			chr1_x(space->machine, 6 ^ mmc_cmd1, data, CHRROM);
 			break;
 		case 0x1ef5:
-			chr1_x(space->machine, 7 ^ vrom_switch, data, CHRROM);
+			chr1_x(space->machine, 7 ^ mmc_cmd1, data, CHRROM);
 			break;
 		case 0x1ef6:
-			set_nt_mirroring((data & 0x1) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
-			//doc says 1= swapped. Causes in-game issues, but mostly fixes title screen
-			vrom_switch = ((data & 0x02) << 1);
+			set_nt_mirroring((data & 0x01) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
+			mmc_cmd1 = ((data & 0x02) << 1);
 			break;
 
 		case 0x1efa:
@@ -4975,18 +5363,15 @@ static WRITE8_HANDLER( konami_vrc7_w )
 	switch (offset & 0x7018)
 	{
 		case 0x0000:
-			/* Switch 8k bank at $8000 */
 			prg8_89(space->machine, data);
 			break;
 		case 0x0008:
 		case 0x0010:
 		case 0x0018:
-			/* Switch 8k bank at $a000 */
 			prg8_ab(space->machine, data);
 			break;
 
 		case 0x1000:
-			/* Switch 8k bank at $c000 */
 			prg8_cd(space->machine, data);
 			break;
 
@@ -5025,6 +5410,7 @@ static WRITE8_HANDLER( konami_vrc7_w )
 			IRQ_count_latch = data;
 			break;
 		case 0x7000:
+			IRQ_mode = data & 0x04;	// currently not implemented: 0 = prescaler mode / 1 = CPU mode
 			IRQ_enable = data & 0x02;
 			IRQ_enable_latch = data & 0x01;
 			if (data & 0x02)
@@ -5160,7 +5546,10 @@ static WRITE8_HANDLER( mapper89_w )
     Games: Mortal Kombat II, Street Fighter III, Super Mario
           Kart Rider
 
-    In MESS: Partially supported.
+    This board uses an IRQ system very similar to MMC3. We indeed
+    use mapper4_irq, but there is some small glitch!
+
+    In MESS: Supported.
 
 *************************************************************/
 
@@ -5168,7 +5557,7 @@ static WRITE8_HANDLER( mapper91_m_w )
 {
 	LOG_MMC(("mapper91_m_w, offset: %04x, data: %02x\n", offset, data));
 
-	switch (offset & 0x7000)
+	switch (offset & 0x1000)
 	{
 		case 0x0000:
 			switch (offset & 0x03)
@@ -5180,10 +5569,12 @@ static WRITE8_HANDLER( mapper91_m_w )
 			}
 			break;
 		case 0x1000:
-			switch (offset & 0x01)
+			switch (offset & 0x03)
 			{
 				case 0x00: prg8_89(space->machine, data); break;
 				case 0x01: prg8_ab(space->machine, data); break;
+				case 0x02: IRQ_enable = 0; IRQ_count = 0; break;
+				case 0x03: IRQ_enable = 1; IRQ_count = 7; break;
 			}
 			break;
 		default:
@@ -5487,9 +5878,69 @@ static WRITE8_HANDLER( mapper104_w )
     Known Boards: Unknown Bootleg Board
     Games: Super Mario Bros. 3 Pirate
 
-    In MESS: Unsupported.
+    In MESS: Supported.
 
 *************************************************************/
+
+static void mapper106_irq( const device_config *device, int scanline, int vblank, int blanked )
+{
+	if (IRQ_enable)
+	{
+		if ((0xffff - IRQ_count) < 114)
+		{
+			cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
+			IRQ_enable = 0;
+		}
+
+		IRQ_count = (IRQ_count + 114) & 0xffff;
+	}
+}
+
+static WRITE8_HANDLER( mapper106_w )
+{
+	LOG_MMC(("mapper106_w, offset: %04x, data: %02x\n", offset, data));
+	switch (offset & 0x0f)
+	{
+	case 0x00:
+	case 0x02:
+		chr1_x(space->machine, offset & 0x07, data & 0xfe, CHRROM);
+		break;
+	case 0x01:
+	case 0x03:
+		chr1_x(space->machine, offset & 0x07, data | 0x01, CHRROM);
+		break;
+	case 0x04: case 0x05:
+	case 0x06: case 0x07:
+		chr1_x(space->machine, offset & 0x07, data, CHRROM);
+		break;
+	case 0x08:
+		prg8_89(space->machine, data | 0x10);
+		break;
+	case 0x09:
+		prg8_ab(space->machine, data);
+		break;
+	case 0x0a:
+		prg8_cd(space->machine, data);
+		break;
+	case 0x0b:
+		prg8_ef(space->machine, data | 0x10);
+		break;
+	case 0x0c:
+		set_nt_mirroring((data & 0x01) ?  PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+		break;
+	case 0x0d:
+		IRQ_count = 0;
+		IRQ_enable = 0;
+		break;
+	case 0x0e:
+		IRQ_count = (IRQ_count & 0xff00) | data;
+		break;
+	case 0x0f:
+		IRQ_count = (IRQ_count & 0x00ff) | (data << 8);
+		IRQ_enable = 1;
+		break;
+	}
+}
 
 /*************************************************************
 
@@ -5640,8 +6091,10 @@ static WRITE8_HANDLER( mapper113_l_w )
 
 	if (!(offset & 0x100))
 	{
-		prg32(space->machine, data >> 3);
-		chr8(space->machine, data & 0x07, CHRROM);
+		prg32(space->machine, (data & 0x38) >> 3);
+		chr8(space->machine, (data & 0x07) | ((data & 0x40) >> 3), CHRROM);
+		if (nes.crc_hack)	// this breaks AV Soccer but it is needed by HES 6-in-1!
+			set_nt_mirroring((data & 0x80) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
 	}
 }
 
@@ -5726,108 +6179,75 @@ static WRITE8_HANDLER( mapper114_w )
 
     MMC3 clone
 
-    In MESS: Partally Supported
+    In MESS: Supported
 
 *************************************************************/
 
-static void mapper115_set_prg( running_machine *machine )
+static void mapper115_set_prg( running_machine *machine, int prg_base, int prg_mask  )
 {
-	if (mapper115_reg[3] & 0x80)
-	{
-		prg16_89ab(machine, mapper115_reg[3] & 0x0f);
-	}
+	if (mapper115_reg[0] & 0x80)
+		prg32(machine, mapper115_reg[0] >> 1);
 	else
-	{
-		prg8_89(machine, mapper115_reg[1] & 0x1f);
-		prg8_ab(machine, mapper115_reg[2] & 0x1f);
-	}
+		mapper4_set_prg(machine, prg_base, prg_mask);
 }
 
 static WRITE8_HANDLER( mapper115_m_w )
 {
 	LOG_MMC(("mapper115_m_w, offset: %04x, data: %02x\n", offset, data));
 
-	mapper115_reg[3] = data;
-	mapper115_set_prg(space->machine);
-}
-
-static WRITE8_HANDLER( mapper115_w )
-{
-	LOG_MMC(("mapper115_w, offset: %04x, data: %02x\n", offset, data));
-
-	switch (offset & 0x7001)
+	switch (offset & 0x01)
 	{
-	case 0x0000:
+	case 0x00:
 		mapper115_reg[0] = data;
+		mapper115_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
 		break;
-	case 0x0001:
-		switch (mapper115_reg[0] & 0x07)
-		{
-		case 0:
-			chr2_0(space->machine, data >> 1, CHRROM);
-			break;
-		case 1:
-			chr2_2(space->machine, data >> 1, CHRROM);
-			break;
-		case 2:
-			chr1_4(space->machine, data, CHRROM);
-			break;
-		case 3:
-			chr1_5(space->machine, data, CHRROM);
-			break;
-		case 4:
-			chr1_6(space->machine, data, CHRROM);
-			break;
-		case 5:
-			chr1_7(space->machine, data, CHRROM);
-			break;
-		case 6:
-			mapper115_reg[1] = data;
-			mapper115_set_prg(space->machine);
-			break;
-		case 7:
-			mapper115_reg[2] = data;
-			mapper115_set_prg(space->machine);
-			break;
-		}
-		break;
-	case 0x2000:
-		set_nt_mirroring((data & 0x01) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
-		break;
-	case 0x4000:
-		IRQ_count_latch = data;
-		break;
-	case 0x4001:
-		IRQ_count = IRQ_count_latch;
-		break;
-	case 0x6000:
-		IRQ_enable = 0;
-		break;
-	case 0x6001:
-		IRQ_enable = 1;
+	case 0x01:
+		mmc_chr_base = (data & 0x01) ? 0x100 : 0x000;
+		mapper4_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
 		break;
 	}
 }
 
-static void mapper115_irq( const device_config *device, int scanline, int vblank, int blanked )
+static WRITE8_HANDLER( mapper115_w )
 {
-	if ((scanline < PPU_BOTTOM_VISIBLE_SCANLINE) /*|| (scanline == ppu_scanlines_per_frame-1)*/)
-	{
-		int priorCount = IRQ_count;
-		if ((IRQ_count == 0) || IRQ_reload)
-		{
-			IRQ_count = IRQ_count_latch;
-			IRQ_reload = 0;
-		}
-		else
-			IRQ_count --;
+	UINT8 map115_helper, cmd;
+	LOG_MMC(("mapper115_w, offset: %04x, data: %02x\n", offset, data));
 
-		if (IRQ_enable && !blanked && (IRQ_count == 0) && priorCount)
-		{
-			LOG_MMC(("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline,
-					video_screen_get_vpos(device->machine->primary_screen), video_screen_get_hpos(device->machine->primary_screen)));
-			cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
-		}
+	switch (offset & 0x6001)
+	{
+		case 0x0000:
+			map115_helper = mmc_cmd1 ^ data;
+			mmc_cmd1 = data;
+
+			/* Has PRG Mode changed? */
+			if (map115_helper & 0x40)
+				mapper115_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+
+			/* Has CHR Mode changed? */
+			if (map115_helper & 0x80)
+				mapper4_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
+			break;
+
+		case 0x0001:
+			cmd = mmc_cmd1 & 0x07;
+			switch (cmd)
+			{
+				case 0: case 1:	// these do not need to be separated: we take care of them in set_chr!
+				case 2: case 3: case 4: case 5:
+					vrom_bank[cmd] = data;
+					mapper4_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
+					break;
+				case 6:
+				case 7:
+					prg_bank[cmd - 6] = data;
+					mapper115_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+					break;
+			}
+			break;
+
+		default:
+			mapper4_w(space, offset, data);
+			break;
 	}
 }
 
@@ -5853,6 +6273,67 @@ static void mapper115_irq( const device_config *device, int scanline, int vblank
 
 *************************************************************/
 
+static void mapper117_irq( const device_config *device, int scanline, int vblank, int blanked )
+{
+//  if (scanline < PPU_BOTTOM_VISIBLE_SCANLINE)
+	{
+		if (IRQ_enable && IRQ_count)
+		{
+			IRQ_count--;
+			if (!IRQ_count)
+				cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
+		}
+	}
+}
+
+static WRITE8_HANDLER( mapper117_w )
+{
+	LOG_MMC(("mapper117_w, offset: %04x, data: %02x\n", offset, data));
+
+	switch (offset)
+	{
+	case 0x0000:
+		prg8_89(space->machine, data);
+		break;
+	case 0x0001:
+		prg8_ab(space->machine, data);
+		break;
+	case 0x0002:
+		prg8_cd(space->machine, data);
+		break;
+	case 0x0003:
+		prg8_ef(space->machine, data);
+		break;
+	case 0x2000:
+	case 0x2001:
+	case 0x2002:
+	case 0x2003:
+	case 0x2004:
+	case 0x2005:
+	case 0x2006:
+	case 0x2007:
+		chr1_x(space->machine, offset & 0x07, data, CHRROM);
+		break;
+
+	case 0x5000:
+		set_nt_mirroring((data & 0x01) ?  PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+		break;
+
+	case 0x4001:
+		IRQ_count_latch = data;
+		break;
+	case 0x4002:
+		// IRQ cleared
+		break;
+	case 0x4003:
+		IRQ_count = IRQ_count_latch;
+		break;
+	case 0x6000:
+		IRQ_enable = data & 0x01;
+		break;
+	}
+}
+
 /*************************************************************
 
     Mapper 118
@@ -5865,27 +6346,66 @@ static void mapper115_irq( const device_config *device, int scanline, int vblank
 
 *************************************************************/
 
+static void mapper118_set_mirror( void )
+{
+	if (mmc_cmd1 & 0x80)
+	{
+		set_nt_page(0, CIRAM, (vrom_bank[2] & 0x80) >> 7, 1);
+		set_nt_page(1, CIRAM, (vrom_bank[3] & 0x80) >> 7, 1);
+		set_nt_page(2, CIRAM, (vrom_bank[4] & 0x80) >> 7, 1);
+		set_nt_page(3, CIRAM, (vrom_bank[5] & 0x80) >> 7, 1);
+	}
+	else
+	{
+		set_nt_page(0, CIRAM, (vrom_bank[0] & 0x80) >> 7, 1);
+		set_nt_page(1, CIRAM, (vrom_bank[0] & 0x80) >> 7, 1);
+		set_nt_page(2, CIRAM, (vrom_bank[1] & 0x80) >> 7, 1);
+		set_nt_page(3, CIRAM, (vrom_bank[1] & 0x80) >> 7, 1);
+	}
+}
+
 static WRITE8_HANDLER( mapper118_w )
 {
+	UINT8 MMC3_helper, cmd;
 	LOG_MMC(("mapper118_w, offset: %04x, data: %02x\n", offset, data));
 
 	switch (offset & 0x6001)
 	{
-		case 0x2000: /* $a000 */
-			LOG_MMC(("     mapper 118 mirroring: %02x\n", data));
-			switch (data & 0x02)
+		case 0x0000:
+			MMC3_helper = mmc_cmd1 ^ data;
+			mmc_cmd1 = data;
+
+			/* Has PRG Mode changed? */
+			if (MMC3_helper & 0x40)
+				mapper4_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+
+			/* Has CHR Mode changed? */
+			if (MMC3_helper & 0x80)
 			{
-				case 0x00: set_nt_mirroring(PPU_MIRROR_LOW); break;
-				case 0x01: set_nt_mirroring(PPU_MIRROR_LOW); break;
+				mapper118_set_mirror();
+				mapper4_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
 			}
 			break;
 
-		case 0x4000: /* $c000 - IRQ scanline counter */
-			IRQ_count = data;
+		case 0x0001:
+			cmd = mmc_cmd1 & 0x07;
+			switch (cmd)
+			{
+				case 0: case 1:
+				case 2: case 3: case 4: case 5:
+					vrom_bank[cmd] = data;
+					mapper118_set_mirror();
+					mapper4_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
+					break;
+				case 6:
+				case 7:
+					prg_bank[cmd - 6] = data;
+					mapper4_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+					break;
+			}
 			break;
 
-		case 0x4001: /* $c001 - IRQ scanline latch */
-			IRQ_count_latch = data;
+		case 0x2000:
 			break;
 
 		default:
@@ -5907,66 +6427,50 @@ static WRITE8_HANDLER( mapper118_w )
 
 static void mapper119_set_chr( running_machine *machine )
 {
-	UINT8 chr_page = (MMC3_cmd & 0x80) >> 5;
+	UINT8 chr_page = (mmc_cmd1 & 0x80) >> 5;
+	UINT8 chr_src[6], chr_mask[6];
+	int i;
 
-	if (vrom_bank[0] & 0x40)
-		chr2_x(machine, chr_page ^ 0, (vrom_bank[0] >> 1) & 0x03, CHRRAM);
-	else
-		chr2_x(machine, chr_page ^ 0, ((vrom_bank[0] & 0x3f) >> 1), CHRROM);
+	for (i = 0; i < 6; i++)
+	{
+		chr_src[i] = (vrom_bank[i] & 0x40) ? CHRRAM : CHRROM;
+		chr_mask[i] =  (vrom_bank[i] & 0x40) ? 0x07 : 0x3f;
+	}
 
-	if (vrom_bank[1] & 0x40)
-		chr2_x(machine, chr_page ^ 2, (vrom_bank[1] >> 1) & 0x03, CHRRAM);
-	else
-		chr2_x(machine, chr_page ^ 2, ((vrom_bank[1] & 0x3f) >> 1), CHRROM);
-
-	if (vrom_bank[2] & 0x40)
-		chr1_x(machine, chr_page ^ 4, vrom_bank[2] & 0x07, CHRRAM);
-	else
-		chr1_x(machine, chr_page ^ 4, vrom_bank[2] & 0x3f, CHRROM);
-
-	if (vrom_bank[3] & 0x40)
-		chr1_x(machine, chr_page ^ 5, vrom_bank[3] & 0x07, CHRRAM);
-	else
-		chr1_x(machine, chr_page ^ 5, vrom_bank[3] & 0x3f, CHRROM);
-
-	if (vrom_bank[4] & 0x40)
-		chr1_x(machine, chr_page ^ 6, vrom_bank[4] & 0x07, CHRRAM);
-	else
-		chr1_x(machine, chr_page ^ 6, vrom_bank[4] & 0x3f, CHRROM);
-
-	if (vrom_bank[5] & 0x40)
-		chr1_x(machine, chr_page ^ 7, vrom_bank[5] & 0x07, CHRRAM);
-	else
-		chr1_x(machine, chr_page ^ 7, vrom_bank[5] & 0x3f, CHRROM);
+	chr1_x(machine, chr_page ^ 0, ((vrom_bank[0] & ~0x01) & chr_mask[0]), chr_src[0]);
+	chr1_x(machine, chr_page ^ 1, ((vrom_bank[0] |  0x01) & chr_mask[0]), chr_src[0]);
+	chr1_x(machine, chr_page ^ 2, ((vrom_bank[1] & ~0x01) & chr_mask[1]), chr_src[1]);
+	chr1_x(machine, chr_page ^ 3, ((vrom_bank[1] |  0x01) & chr_mask[1]), chr_src[1]);
+	chr1_x(machine, chr_page ^ 4, (vrom_bank[2] & chr_mask[2]), chr_src[2]);
+	chr1_x(machine, chr_page ^ 5, (vrom_bank[3] & chr_mask[3]), chr_src[3]);
+	chr1_x(machine, chr_page ^ 6, (vrom_bank[4] & chr_mask[4]), chr_src[4]);
+	chr1_x(machine, chr_page ^ 7, (vrom_bank[5] & chr_mask[5]), chr_src[5]);
 }
 
 static WRITE8_HANDLER( mapper119_w )
 {
-	static UINT8 last_bank = 0xff;
+	UINT8 MMC3_helper, cmd;
 	LOG_MMC(("mapper119_w, offset: %04x, data: %02x\n", offset, data));
 
 	switch (offset & 0x6001)
 	{
-		case 0x0000: /* $8000 */
-			MMC3_cmd = data;
+		case 0x0000:
+			MMC3_helper = mmc_cmd1 ^ data;
+			mmc_cmd1 = data;
 
-			/* Toggle between switching $8000 and $c000 */
-			if (last_bank != (data & 0xc0))
-			{
-				/* Reset the banks */
+			/* Has PRG Mode changed? */
+			if (MMC3_helper & 0x40)
 				mapper4_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
-				mapper119_set_chr(space->machine);
-				LOG_MMC(("     MMC3 reset banks\n"));
-			}
-			last_bank = data & 0xc0;
-			break;
 
+			/* Has CHR Mode changed? */
+			if (MMC3_helper & 0x80)
+				mapper119_set_chr(space->machine);
+			break;
 		case 0x0001: /* $8001 */
-		{
-			UINT8 cmd = MMC3_cmd & 0x07;
+			cmd = mmc_cmd1 & 0x07;
 			switch (cmd)
 			{
-				case 0: case 1:	// these do not need to be separated because we shift banks in set_chr!
+				case 0: case 1:	// these do not need to be separated: we take care of them in set_chr!
 				case 2: case 3: case 4: case 5:
 					vrom_bank[cmd] = data;
 					mapper119_set_chr(space->machine);
@@ -5978,7 +6482,7 @@ static WRITE8_HANDLER( mapper119_w )
 					break;
 			}
 			break;
-		}
+
 		default:
 			mapper4_w(space, offset, data);
 			break;
@@ -6005,9 +6509,136 @@ static WRITE8_HANDLER( mapper119_w )
 
     MMC3 clone
 
-    In MESS: Unsupported.
+    In MESS: Supported.
 
 *************************************************************/
+
+static WRITE8_HANDLER( mapper121_l_w )
+{
+	LOG_MMC(("mapper12_l_w, offset: %04x, data: %02x\n", offset, data));
+	offset += 0x100;
+
+	if (!(offset < 0x1000))
+	{
+		switch (data & 0x03)
+		{
+		case 0x00:
+		case 0x03:
+			mapper121_reg[2] = 0x00;
+			break;
+		case 0x01:
+			mapper121_reg[2] = 0x83;
+			break;
+		case 0x02:
+			mapper121_reg[2] = 0x42;
+			break;
+		}
+	}
+}
+
+static READ8_HANDLER( mapper121_l_r )
+{
+	LOG_MMC(("mapper12_l_r, offset: %04x\n", offset));
+	offset += 0x100;
+
+	if (!(offset < 0x1000))
+		return mapper121_reg[2];
+	else
+		return 0;
+}
+
+static void mapper121_set_prg( running_machine *machine, int prg_base, int prg_mask )
+{
+	UINT8 prg_flip = (mmc_cmd1 & 0x40) ? 2 : 0;
+	UINT8 new_bank2, new_bank3;
+
+	new_bank2 = mapper121_reg[0] ? mapper121_reg[0] : prg_bank[2 ^ prg_flip];
+	new_bank3 = mapper121_reg[1] ? mapper121_reg[1] : prg_bank[3];
+
+	prg8_89(machine, prg_base | (prg_bank[0 ^ prg_flip] & prg_mask));
+	prg8_ab(machine, prg_base | (prg_bank[1] & prg_mask));
+	prg8_cd(machine, prg_base | (new_bank2 & prg_mask));
+	prg8_ef(machine, prg_base | (new_bank3 & prg_mask));
+}
+
+static WRITE8_HANDLER( mapper121_w )
+{
+	UINT8 MMC3_helper, cmd;
+	LOG_MMC(("mapper121_w, offset: %04x, data: %02x\n", offset, data));
+
+	if ((offset < 0x2000) && (offset & 0x03) == 0x03)
+	{
+		switch (data)
+		{
+		case 0x20:
+			mapper121_reg[1] = 0x13;
+			break;
+		case 0x26:
+			mapper121_reg[1] = 0x08;
+			break;
+		case 0x28:
+			mapper121_reg[0] = 0x0c;
+			break;
+		case 0x29:
+			mapper121_reg[1] = 0x1b;
+			break;
+		case 0xab:
+			mapper121_reg[1] = 0x07;
+			break;
+		case 0xec:
+		case 0xef:
+			mapper121_reg[1] = 0x0d;
+			break;
+		case 0xff:
+			mapper121_reg[1] = 0x09;
+			break;
+		default:
+			mapper121_reg[0] = 0x0;
+			mapper121_reg[1] = 0x0;
+			break;
+		}
+	}
+	else
+	{
+		switch (offset & 0x6001)
+		{
+		case 0x0000:
+			MMC3_helper = mmc_cmd1 ^ data;
+			mmc_cmd1 = data;
+
+			/* Has PRG Mode changed? */
+			if (MMC3_helper & 0x40)
+				mapper121_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+
+			/* Has CHR Mode changed? */
+			if (MMC3_helper & 0x80)
+				mapper4_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
+			break;
+
+		case 0x0001:
+			cmd = mmc_cmd1 & 0x07;
+			switch (cmd)
+			{
+			case 0: case 1:
+			case 2: case 3: case 4: case 5:
+				vrom_bank[cmd] = data;
+				mapper4_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
+				break;
+			case 6:
+			case 7:
+				prg_bank[cmd - 6] = data;
+				mapper121_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+				break;
+			}
+			break;
+
+		default:
+			mapper4_w(space, offset, data);
+			break;
+		}
+	}
+	mapper121_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+}
 
 /*************************************************************
 
@@ -6183,10 +6814,7 @@ static WRITE8_HANDLER( mapper133_m_w )
 {
 	LOG_MMC(("mapper133_l_w %04x:%02x\n", offset, data));
 
-	if (offset == 0)
-{
-	prg32(space->machine, data >> 2);
-	chr8(space->machine, data, CHRROM);}
+	mapper133_l_w(space, offset & 0xff, data);	// offset does not really count for this mapper
 }
 
 /*************************************************************
@@ -6194,13 +6822,28 @@ static WRITE8_HANDLER( mapper133_m_w )
     Mapper 134
 
     Known Boards: Unknown Multigame Bootleg Board (4646B)
-    Games: 2 in 1 - Family Camp & Aladdin 4
+    Games: 2 in 1 - Family Kid & Aladdin 4
 
     MMC3 clone
 
-    In MESS: Unsupported.
+    In MESS: Supported.
 
 *************************************************************/
+
+static WRITE8_HANDLER( mapper134_m_w )
+{
+	LOG_MMC(("mapper134_m_w, offset: %04x, data: %02x\n", offset, data));
+
+	if (offset == 0x01)
+	{
+		mmc_prg_base = (data & 0x02) << 4;
+		mmc_prg_mask = 0x1f;
+		mmc_chr_base = (data & 0x20) << 3;
+		mmc_chr_mask = 0xff;
+		mapper4_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+		mapper4_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
+	}
+}
 
 /*************************************************************
 
@@ -6283,8 +6926,7 @@ static WRITE8_HANDLER( mapper137_l_w )
 {
 	LOG_MMC(("mapper137_l_w, offset: %04x, data: %02x\n", offset, data));
 
-	/* write happens only if we are at 0x4100 + k * 0x200,
-    but 0x4100 is offset = 0 */
+	/* write happens only if we are at 0x4100 + k * 0x200, but 0x4100 is offset = 0 */
 	if (!(offset & 0x100))
 	{
 		if (!(offset & 0x01))
@@ -6319,7 +6961,7 @@ static WRITE8_HANDLER( mapper137_m_w )
 {
 	LOG_MMC(("mapper137_m_w, offset: %04x, data: %02x\n", offset, data));
 
-	mapper137_l_w(space, offset + 0x100, data);
+	mapper137_l_w(space, (offset + 0x100) & 0xfff, data);
 }
 
 /*************************************************************
@@ -6338,8 +6980,7 @@ static WRITE8_HANDLER( mapper138_l_w )
 	UINT8 bank_helper1 = 0, bank_helper2 = 0;
 	LOG_MMC(("mapper138_l_w, offset: %04x, data: %02x\n", offset, data));
 
-	/* write happens only if we are at 0x4100 + k * 0x200,
-    but 0x4100 is offset = 0 */
+	/* write happens only if we are at 0x4100 + k * 0x200, but 0x4100 is offset = 0 */
 	if (!(offset & 0x100))
 	{
 		if (!(offset & 0x01))
@@ -6376,7 +7017,7 @@ static WRITE8_HANDLER( mapper138_m_w )
 {
 	LOG_MMC(("mapper138_m_w, offset: %04x, data: %02x\n", offset, data));
 
-	mapper138_l_w(space, offset + 0x100, data);
+	mapper138_l_w(space, (offset + 0x100) & 0xfff, data);
 }
 
 /*************************************************************
@@ -6395,8 +7036,7 @@ static WRITE8_HANDLER( mapper139_l_w )
 	UINT8 bank_helper1 = 0, bank_helper2 = 0;
 	LOG_MMC(("mapper139_l_w, offset: %04x, data: %02x\n", offset, data));
 
-	/* write happens only if we are at 0x4100 + k * 0x200,
-    but 0x4100 is offset = 0 */
+	/* write happens only if we are at 0x4100 + k * 0x200, but 0x4100 is offset = 0 */
 	if (!(offset & 0x100))
 	{
 		if (!(offset & 0x01))
@@ -6433,7 +7073,7 @@ static WRITE8_HANDLER( mapper139_m_w )
 {
 	LOG_MMC(("mapper139_m_w, offset: %04x, data: %02x\n", offset, data));
 
-	mapper139_l_w(space, offset + 0x100, data);
+	mapper139_l_w(space, (offset + 0x100) & 0xfff, data);
 }
 
 /*************************************************************
@@ -6472,8 +7112,7 @@ static WRITE8_HANDLER( mapper141_l_w )
 	UINT8 bank_helper1 = 0, bank_helper2 = 0;
 	LOG_MMC(("mapper141_l_w, offset: %04x, data: %02x\n", offset, data));
 
-	/* write happens only if we are at 0x4100 + k * 0x200,
-    but 0x4100 is offset = 0 */
+	/* write happens only if we are at 0x4100 + k * 0x200, but 0x4100 is offset = 0 */
 	if (!(offset & 0x100))
 	{
 		if (!(offset & 0x01))
@@ -6510,7 +7149,7 @@ static WRITE8_HANDLER( mapper141_m_w )
 {
 	LOG_MMC(("mapper141_m_w, offset: %04x, data: %02x\n", offset, data));
 
-	mapper141_l_w(space, offset + 0x100, data);
+	mapper141_l_w(space, (offset + 0x100) & 0xfff, data);
 }
 
 /*************************************************************
@@ -6539,8 +7178,7 @@ static READ8_HANDLER( mapper143_l_r )
 {
 	LOG_MMC(("mapper143_l_r, offset: %04x\n", offset));
 
-	/* the address is read only if we are at 0x4100 + k * 0x200,
-    but 0x4100 is offset = 0 */
+	/* the address is read only if we are at 0x4100 + k * 0x200, but 0x4100 is offset = 0 */
 	if (!(offset & 0x100))
 		return (~offset & 0x3f) | 0x40;
 	else
@@ -6568,7 +7206,7 @@ static WRITE8_HANDLER( mapper144_w )
 	if ((offset & 0x7fff) == 0)
 		return;
 
-	data = data |(memory_read_byte(space, offset) & 1);
+	data = data | (memory_read_byte(space, offset) & 1);
 
 	chr8(space->machine, data >> 4, CHRROM);
 	prg32(space->machine, data & 0x07);
@@ -6638,14 +7276,14 @@ static WRITE8_HANDLER( mapper147_m_w )
 {
 	LOG_MMC(("mapper147_m_w, offset: %04x, data: %02x\n", offset, data));
 
-	mapper147_l_w(space, offset + 0x100, data);
+	mapper147_l_w(space, (offset + 0x100) & 0xfff, data);
 }
 
 static WRITE8_HANDLER( mapper147_w )
 {
 	LOG_MMC(("mapper147_w, offset: %04x, data: %02x\n", offset, data));
 
-	mapper147_l_w(space, offset + 0x100, data);
+	mapper147_l_w(space, (offset + 0x100) & 0xfff, data);
 }
 
 /*************************************************************
@@ -6706,8 +7344,7 @@ static WRITE8_HANDLER( mapper150_l_w )
 {
 	LOG_MMC(("mapper150_l_w, offset: %04x, data: %02x\n", offset, data));
 
-	/* write happens only if we are at 0x4100 + k * 0x200,
-    but 0x4100 is offset = 0 */
+	/* write happens only if we are at 0x4100 + k * 0x200, but 0x4100 is offset = 0 */
 	if (!(offset & 0x100))
 	{
 		if (!(offset & 0x01))
@@ -6757,7 +7394,7 @@ static WRITE8_HANDLER( mapper150_m_w )
 {
 	LOG_MMC(("mapper150_m_w, offset: %04x, data: %02x\n", offset, data));
 
-	mapper150_l_w(space, offset + 0x100, data);
+	mapper150_l_w(space, (offset + 0x100) & 0xfff, data);
 }
 
 /*************************************************************
@@ -6800,9 +7437,65 @@ static WRITE8_HANDLER( mapper152_w )
     Games: Dragon Ball, Dragon Ball 3, Famicom Jump, Famicom
           Jump II
 
-    In MESS: Unsupported.
+    This mapper should be exactly like Mapper 16, but with
+    SRAM in place of EEPROM. Hence, writes to 0x6000-0x7fff
+    go to SRAM (not sure if there exist boards with no SRAM
+    and no EEPROM... investigate!)
+    Famicom Jump II uses a different board (or uses the same
+    board in a very different way)
+
+    In MESS: Supported.
 
 *************************************************************/
+
+static void mapper153_set_prg( running_machine *machine )
+{
+	UINT8 mmc_helper = 0;
+	int i;
+
+	for (i = 0; i < 8; i++)
+		mmc_helper |= ((map153_reg[i] & 0x01) << 4);
+
+	map153_bank_latch = mmc_helper | (map153_bank_latch & 0x0f);
+
+	prg16_89ab(machine, map153_bank_latch);
+	prg16_cdef(machine, mmc_helper | 0x0f);
+}
+
+static WRITE8_HANDLER( mapper153_m_w )
+{
+	LOG_MMC(("mapper153_m_w, offset: %04x, data: %02x\n", offset, data));
+
+	if (nes.crc_hack)		// Famicom Jump II uses a different board
+	{
+		switch (offset & 0x0f)	// there is no CHRROM and prg banking works differently
+		{
+		case 0: case 1:
+		case 2: case 3:
+		case 4: case 5:
+		case 6: case 7:
+			map153_reg[offset & 0x07] = data;
+			mapper153_set_prg(space->machine);
+			break;
+		case 8:
+			map153_bank_latch = (data & 0x0f) | (map153_bank_latch & 0x10);
+			prg16_89ab(space->machine, map153_bank_latch);
+			break;
+		default:
+			mapper16_m_w(space, offset & 0x0f, data);
+			break;
+		}
+	}
+	else
+		mapper16_m_w(space, offset, data);
+}
+
+static WRITE8_HANDLER( mapper153_w )
+{
+	LOG_MMC(("mapper153_w, offset: %04x, data: %02x\n", offset, data));
+
+	mapper153_w(space, offset, data);
+}
 
 /*************************************************************
 
@@ -6823,26 +7516,22 @@ static WRITE8_HANDLER( mapper154_w )
 	switch (offset & 1)
 	{
 	case 0:
-		{
-			set_nt_mirroring((data & 0x40) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
-			mmc_cmd1 = data & 7;
-			break;
-		}
+		set_nt_mirroring((data & 0x40) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
+		mmc_cmd1 = data & 7;
+		break;
 	case 1:
+		switch (mmc_cmd1)
 		{
-			switch (mmc_cmd1)
-			{
-				case 0: chr2_0(space->machine, data >> 1, CHRROM); break;
-				case 1: chr2_2(space->machine, data >> 1, CHRROM); break;
-				case 2: chr1_4(space->machine, data | 0x40, CHRROM); break;
-				case 3: chr1_5(space->machine, data | 0x40, CHRROM); break;
-				case 4: chr1_6(space->machine, data | 0x40, CHRROM); break;
-				case 5: chr1_7(space->machine, data | 0x40, CHRROM); break;
-				case 6: prg8_89(space->machine, data); break;
-				case 7: prg8_ab(space->machine, data); break;
-			}
-			break;
+			case 0: chr2_0(space->machine, data >> 1, CHRROM); break;
+			case 1: chr2_2(space->machine, data >> 1, CHRROM); break;
+			case 2: chr1_4(space->machine, data | 0x40, CHRROM); break;
+			case 3: chr1_5(space->machine, data | 0x40, CHRROM); break;
+			case 4: chr1_6(space->machine, data | 0x40, CHRROM); break;
+			case 5: chr1_7(space->machine, data | 0x40, CHRROM); break;
+			case 6: prg8_89(space->machine, data); break;
+			case 7: prg8_ab(space->machine, data); break;
 		}
+		break;
 	}
 }
 
@@ -6915,8 +7604,11 @@ static WRITE8_HANDLER( mapper156_w )
     Known Boards: Bandai Datach Board
     Games: Datach Games
 
-    In MESS: Unsupported. Needs reads from 0x6000-0x7fff for the
-      Datach barcode reader
+    This mapper is basically Mapper 16 + Datach reader. We
+    currently do not support the Barcode reader.
+
+    In MESS: Partially supported. Needs reads from 0x6000-0x7fff
+      for the Datach barcode reader
 
 *************************************************************/
 
@@ -6927,9 +7619,79 @@ static WRITE8_HANDLER( mapper156_w )
     Known Boards: Tengen 800037
     Games: Alien Syndrome
 
-    In MESS: Unsupported.
+    In MESS: Very preliminary support.
 
 *************************************************************/
+
+// probably wrong...
+static void mapper158_set_mirror( running_machine *machine )
+{
+	UINT8 nt_mode = mmc_cmd1 & 0x80;
+
+	set_nt_page(0, ROM, vrom_bank[nt_mode ? 2 : 0], 0);
+	set_nt_page(1, ROM, vrom_bank[nt_mode ? 3 : 0], 0);
+	set_nt_page(2, ROM, vrom_bank[nt_mode ? 4 : 1], 0);
+	set_nt_page(3, ROM, vrom_bank[nt_mode ? 5 : 1], 0);
+}
+
+static WRITE8_HANDLER( mapper158_w )
+{
+	UINT8 map158_helper, cmd;
+	LOG_MMC(("mapper158_w offset: %04x, data: %02x\n", offset, data));
+
+	switch (offset & 0x6001)
+	{
+		case 0x0000:
+			map158_helper = mmc_cmd1 ^ data;
+			mmc_cmd1 = data;
+
+			/* Has PRG Mode changed? */
+			if (map158_helper & 0x40)
+				mapper64_set_prg(space->machine);
+
+			/* Has CHR Mode changed? */
+			if (map158_helper & 0xa0)
+			{
+				mapper64_set_chr(space->machine);
+				mapper158_set_mirror(space->machine);
+			}
+			break;
+
+		case 0x0001:
+			cmd = mmc_cmd1 & 0x0f;
+			switch (cmd)
+			{
+				case 0: case 1:
+				case 2: case 3:
+				case 4: case 5:
+					vrom_bank[cmd] = data;
+					mapper64_set_chr(space->machine);
+					mapper158_set_mirror(space->machine);
+					break;
+				case 6: case 7:
+					prg_bank[cmd - 6] = data;
+					mapper64_set_prg(space->machine);
+					break;
+				case 8: case 9:
+					vrom_bank[cmd - 2] = data;
+					mapper64_set_chr(space->machine);
+					mapper158_set_mirror(space->machine);
+					break;
+				case 0x0f:
+					prg_bank[2] = data;
+					mapper64_set_prg(space->machine);
+					break;
+			}
+			break;
+
+		case 0x2000:
+			break;
+
+		default:
+			mapper64_w(space, offset, data);
+			break;
+	}
+}
 
 /*************************************************************
 
@@ -6938,7 +7700,10 @@ static WRITE8_HANDLER( mapper156_w )
     Known Boards: Bandai Board
     Games: Dragon Ball Z, Magical Taruruuto-kun, SD Gundam Gaiden
 
-    In MESS: Unsupported.
+    This is exactly like Mapper 16, but with different EEPROM I/O.
+    At the moment we don't support EEPROM in either mapper.
+
+    In MESS: Supported.
 
 *************************************************************/
 
@@ -7349,8 +8114,9 @@ static WRITE8_HANDLER( mapper178_l_w )
 static WRITE8_HANDLER( mapper179_l_w )
 {
 	LOG_MMC(("mapper179_l_w, offset: %04x, data: %02x\n", offset, data));
+	offset += 0x4100;
 
-	if ((offset - 0x100) & 0x1000)
+	if (offset & 0x5000)
 		prg32(space->machine, data >> 1);
 }
 
@@ -7447,31 +8213,14 @@ static WRITE8_HANDLER( mapper182_w )
 		}
 		break;
 	case 0x6003:
-		IRQ_count = data;
-		IRQ_enable = 1;
-		break;
-	}
-}
-
-static void mapper182_irq( const device_config *device, int scanline, int vblank, int blanked )
-{
-	if ((scanline < PPU_BOTTOM_VISIBLE_SCANLINE) /*|| (scanline == ppu_scanlines_per_frame-1)*/)
-	{
-		int priorCount = IRQ_count;
-		if ((IRQ_count == 0) || IRQ_reload)
+		if (data)
 		{
-			IRQ_count = IRQ_count_latch;
-			IRQ_reload = 0;
+			IRQ_count = data;
+			IRQ_enable = 1;
 		}
 		else
-			IRQ_count --;
-
-		if (IRQ_enable && !blanked && (IRQ_count == 0) && priorCount)
-		{
-			LOG_MMC(("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline,
-					video_screen_get_vpos(device->machine->primary_screen), video_screen_get_hpos(device->machine->primary_screen)));
-			cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
-		}
+			IRQ_enable = 0;
+		break;
 	}
 }
 
@@ -7516,9 +8265,17 @@ static WRITE8_HANDLER( mapper184_m_w )
     Known Boards: CNROM
     Games: B-Wings, Mighty Bomb Jack, Seicross, Spy vs. Spy
 
-    In MESS: Unsupported.
+    In MESS: Very Preliminar Support. We act like it is mapper 3
+    but we need to emulate the read back from 0x8000-0xfff!
 
 *************************************************************/
+
+static WRITE8_HANDLER( mapper185_w )
+{
+	LOG_MMC(("mapper3_w offset: %04x, data: %02x\n", offset, data));
+
+	chr8(space->machine, data, CHRROM);
+}
 
 /*************************************************************
 
@@ -7541,9 +8298,155 @@ static WRITE8_HANDLER( mapper184_m_w )
 
     MMC3 clone
 
-    In MESS: Unsupported.
+    In MESS: Preliminary Support.
 
 *************************************************************/
+
+static void mapper187_set_prg( running_machine *machine, int prg_base, int prg_mask )
+{
+	UINT8 prg_flip = (mmc_cmd1 & 0x40) ? 2 : 0;
+
+	if (!(mapper187_reg[0] & 0x80))
+	{
+		prg8_89(machine, prg_base | (prg_bank[0 ^ prg_flip] & prg_mask));
+		prg8_ab(machine, prg_base | (prg_bank[1] & prg_mask));
+		prg8_cd(machine, prg_base | (prg_bank[2 ^ prg_flip] & prg_mask));
+		prg8_ef(machine, prg_base | (prg_bank[3] & prg_mask));
+	}
+}
+
+static void mapper187_set_chr( running_machine *machine, UINT8 chr, int chr_base, int chr_mask )
+{
+	UINT8 chr_page = (mmc_cmd1 & 0x80) >> 5;
+	UINT8 new_base[8];
+	int i;
+
+	for (i = 0; i < 8; i++)
+		new_base[i] = ((i & 0x04) == chr_page)? (chr_base | 0x100) : chr_base;
+
+	chr1_x(machine, chr_page ^ 0, new_base[0] | ((vrom_bank[0] & ~0x01) & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 1, new_base[1] | ((vrom_bank[0] |  0x01) & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 2, new_base[2] | ((vrom_bank[1] & ~0x01) & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 3, new_base[3] | ((vrom_bank[1] |  0x01) & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 4, new_base[4] | (vrom_bank[2] & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 5, new_base[5] | (vrom_bank[3] & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 6, new_base[6] | (vrom_bank[4] & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 7, new_base[7] | (vrom_bank[5] & chr_mask), chr);
+}
+
+static WRITE8_HANDLER( mapper187_l_w )
+{
+	UINT8 new_bank;
+	LOG_MMC(("mapper187_l_w, offset: %04x, data: %02x\n", offset, data));
+	offset += 0x100;
+
+	if (offset == 0x1000)
+	{
+		switch (data & 0x03)
+		{
+		case 0x00:
+		case 0x01:
+			mapper187_reg[1] = 0x83;
+			break;
+		case 0x02:
+			mapper187_reg[1] = 0x42;
+			break;
+		case 0x03:
+			mapper187_reg[1] = 0x00;
+			break;
+		}
+	}
+
+	if (!(offset <= 0x1000))
+	{
+		mapper187_reg[0] = data;
+
+		if (mapper187_reg[0] & 0x80)
+		{
+			new_bank = (mapper187_reg[0] & 0x1f);
+
+			if (mapper187_reg[0] & 0x20)
+				prg32(space->machine, new_bank >> 2);
+			else
+			{
+				prg16_89ab(space->machine, new_bank);
+				prg16_cdef(space->machine, new_bank);
+			}
+		}
+		else
+			mapper187_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+	}
+}
+
+static READ8_HANDLER( mapper187_l_r )
+{
+	LOG_MMC(("mapper187_l_r, offset: %04x\n", offset));
+	offset += 0x100;
+
+	if (!(offset < 0x1000))
+		return mapper187_reg[1];
+	else
+		return 0;
+}
+
+static WRITE8_HANDLER( mapper187_w )
+{
+	UINT8 MMC3_helper, cmd;
+	LOG_MMC(("mapper187_w, offset: %04x, data: %02x\n", offset, data));
+
+	switch (offset & 0x6003)
+	{
+	case 0x0000:
+		mapper187_reg[2] = 1;
+		MMC3_helper = mmc_cmd1 ^ data;
+		mmc_cmd1 = data;
+
+		/* Has PRG Mode changed? */
+		if (MMC3_helper & 0x40)
+			mapper187_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+
+		/* Has CHR Mode changed? */
+		if (MMC3_helper & 0x80)
+			mapper187_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
+		break;
+
+	case 0x0001:
+		if (mapper187_reg[2])
+		{
+			cmd = mmc_cmd1 & 0x07;
+			switch (cmd)
+			{
+			case 0: case 1:
+			case 2: case 3: case 4: case 5:
+				vrom_bank[cmd] = data;
+				mapper187_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
+				break;
+			case 6:
+			case 7:
+				prg_bank[cmd - 6] = data;
+				mapper187_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+				break;
+			}
+		}
+		break;
+
+	case 0x0002:
+		break;
+
+	case 0x0003:
+		mapper187_reg[2] = 0;
+
+		if (data == 0x28)
+			prg8_cd(space->machine, 0x17);
+		else if (data == 0x2a)
+			prg8_ab(space->machine, 0x0f);
+		break;
+
+	default:
+		mapper4_w(space, offset, data);
+		break;
+	}
+}
 
 /*************************************************************
 
@@ -7572,9 +8475,58 @@ static WRITE8_HANDLER( mapper188_w )
 
     MMC3 clone
 
-    In MESS: Unsupported.
+    In MESS: Supported.
 
 *************************************************************/
+
+static WRITE8_HANDLER( mapper189_l_w )
+{
+	LOG_MMC(("mapper189_l_w, offset: %04x, data: %02x\n", offset, data));
+
+	prg32(space->machine, (data >> 4) | data);
+}
+
+static WRITE8_HANDLER( mapper189_m_w )
+{
+	LOG_MMC(("mapper189_m_w, offset: %04x, data: %04x\n", offset, data));
+
+	mapper189_l_w(space, offset & 0xff, data);	// offset does not really count for this mapper
+}
+
+/* This is like mapper4 but with no PRG bankswitch (beacuse it is handled by low writes) */
+static WRITE8_HANDLER( mapper189_w )
+{
+	UINT8 MMC3_helper, cmd;
+	LOG_MMC(("mapper189_w, offset: %04x, data: %02x\n", offset, data));
+
+	switch (offset & 0x6001)
+	{
+	case 0x0000:
+		MMC3_helper = mmc_cmd1 ^ data;
+		mmc_cmd1 = data;
+
+		/* Has CHR Mode changed? */
+		if (MMC3_helper & 0x80)
+			mapper4_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
+		break;
+
+	case 0x0001:
+		cmd = mmc_cmd1 & 0x07;
+		switch (cmd)
+		{
+		case 0: case 1:
+		case 2: case 3: case 4: case 5:
+			vrom_bank[cmd] = data;
+			mapper4_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
+			break;
+		}
+		break;
+
+	default:
+		mapper4_w(space, offset, data);
+		break;
+	}
+}
 
 /*************************************************************
 
@@ -7594,11 +8546,75 @@ static WRITE8_HANDLER( mapper188_w )
     Known Boards: Type B by Waixing
     Games: Sugoro Quest (C)
 
-    MMC3 clone
+    MMC3 clone. This is a minor modification of Mapper 74,
+    in the sense that it is the same board except for the
+    CHRRAM pages.
 
-    In MESS: Unsupported.
+    In MESS: Supported.
 
 *************************************************************/
+
+static void mapper191_set_chr( running_machine *machine, int chr_base, int chr_mask )
+{
+	UINT8 chr_page = (mmc_cmd1 & 0x80) >> 5;
+	UINT8 chr_src[6];
+	int i;
+
+	for (i = 0; i < 6; i++)
+		chr_src[i] = (vrom_bank[i] & 0x80) ? CHRRAM : CHRROM;
+
+	chr1_x(machine, chr_page ^ 0, chr_base | ((vrom_bank[0] & ~0x01) & chr_mask), chr_src[0]);
+	chr1_x(machine, chr_page ^ 1, chr_base | ((vrom_bank[0] |  0x01) & chr_mask), chr_src[0]);
+	chr1_x(machine, chr_page ^ 2, chr_base | ((vrom_bank[1] & ~0x01) & chr_mask), chr_src[1]);
+	chr1_x(machine, chr_page ^ 3, chr_base | ((vrom_bank[1] |  0x01) & chr_mask), chr_src[1]);
+	chr1_x(machine, chr_page ^ 4, chr_base | (vrom_bank[2] & chr_mask), chr_src[2]);
+	chr1_x(machine, chr_page ^ 5, chr_base | (vrom_bank[3] & chr_mask), chr_src[3]);
+	chr1_x(machine, chr_page ^ 6, chr_base | (vrom_bank[4] & chr_mask), chr_src[4]);
+	chr1_x(machine, chr_page ^ 7, chr_base | (vrom_bank[5] & chr_mask), chr_src[5]);
+}
+
+static WRITE8_HANDLER( mapper191_w )
+{
+	UINT8 MMC3_helper, cmd;
+	LOG_MMC(("mapper191_w, offset: %04x, data: %02x\n", offset, data));
+
+	switch (offset & 0x6001)
+	{
+	case 0x0000:
+		MMC3_helper = mmc_cmd1 ^ data;
+		mmc_cmd1 = data;
+
+		/* Has PRG Mode changed? */
+		if (MMC3_helper & 0x40)
+			mapper4_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+
+		/* Has CHR Mode changed? */
+		if (MMC3_helper & 0x80)
+			mapper191_set_chr(space->machine, mmc_chr_base, mmc_chr_mask);
+		break;
+
+	case 0x0001:
+		cmd = mmc_cmd1 & 0x07;
+		switch (cmd)
+		{
+		case 0: case 1:	// these do not need to be separated: we take care of them in set_chr!
+		case 2: case 3: case 4: case 5:
+			vrom_bank[cmd] = data;
+			mapper191_set_chr(space->machine, mmc_chr_base, mmc_chr_mask);
+			break;
+		case 6:
+		case 7:
+			prg_bank[cmd - 6] = data;
+			mapper4_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+			break;
+		}
+		break;
+
+	default:
+		mapper74_w(space, offset, data);
+		break;
+	}
+}
 
 /*************************************************************
 
@@ -7607,11 +8623,75 @@ static WRITE8_HANDLER( mapper188_w )
     Known Boards: Type C by Waixing
     Games: Ying Lie Qun Xia Zhuan, Young Chivalry
 
-    MMC3 clone
+    MMC3 clone. This is a minor modification of Mapper 74,
+    in the sense that it is the same board except for the
+    CHRRAM pages.
 
-    In MESS: Unsupported.
+    In MESS: Supported.
 
 *************************************************************/
+
+static void mapper192_set_chr( running_machine *machine, int chr_base, int chr_mask )
+{
+	UINT8 chr_page = (mmc_cmd1 & 0x80) >> 5;
+	UINT8 chr_src[6];
+	int i;
+
+	for (i = 0; i < 6; i++)
+		chr_src[i] = ((vrom_bank[i] == 0x08) || (vrom_bank[i] == 0x09) || (vrom_bank[i] == 0x0a) || (vrom_bank[i] == 0x0b)) ? CHRRAM : CHRROM;
+
+	chr1_x(machine, chr_page ^ 0, chr_base | ((vrom_bank[0] & ~0x01) & chr_mask), chr_src[0]);
+	chr1_x(machine, chr_page ^ 1, chr_base | ((vrom_bank[0] |  0x01) & chr_mask), chr_src[0]);
+	chr1_x(machine, chr_page ^ 2, chr_base | ((vrom_bank[1] & ~0x01) & chr_mask), chr_src[1]);
+	chr1_x(machine, chr_page ^ 3, chr_base | ((vrom_bank[1] |  0x01) & chr_mask), chr_src[1]);
+	chr1_x(machine, chr_page ^ 4, chr_base | (vrom_bank[2] & chr_mask), chr_src[2]);
+	chr1_x(machine, chr_page ^ 5, chr_base | (vrom_bank[3] & chr_mask), chr_src[3]);
+	chr1_x(machine, chr_page ^ 6, chr_base | (vrom_bank[4] & chr_mask), chr_src[4]);
+	chr1_x(machine, chr_page ^ 7, chr_base | (vrom_bank[5] & chr_mask), chr_src[5]);
+}
+
+static WRITE8_HANDLER( mapper192_w )
+{
+	UINT8 MMC3_helper, cmd;
+	LOG_MMC(("mapper192_w, offset: %04x, data: %02x\n", offset, data));
+
+	switch (offset & 0x6001)
+	{
+	case 0x0000:
+		MMC3_helper = mmc_cmd1 ^ data;
+		mmc_cmd1 = data;
+
+		/* Has PRG Mode changed? */
+		if (MMC3_helper & 0x40)
+			mapper4_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+
+		/* Has CHR Mode changed? */
+		if (MMC3_helper & 0x80)
+			mapper192_set_chr(space->machine, mmc_chr_base, mmc_chr_mask);
+		break;
+
+	case 0x0001:
+		cmd = mmc_cmd1 & 0x07;
+		switch (cmd)
+		{
+		case 0: case 1:	// these do not need to be separated: we take care of them in set_chr!
+		case 2: case 3: case 4: case 5:
+			vrom_bank[cmd] = data;
+			mapper192_set_chr(space->machine, mmc_chr_base, mmc_chr_mask);
+			break;
+		case 6:
+		case 7:
+			prg_bank[cmd - 6] = data;
+			mapper4_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+			break;
+		}
+		break;
+
+	default:
+		mapper74_w(space, offset, data);
+		break;
+	}
+}
 
 /*************************************************************
 
@@ -7655,11 +8735,75 @@ static WRITE8_HANDLER( mapper193_m_w )
     Known Boards: Type D by Waixing
     Games: Super Robot Taisen (C)
 
-    MMC3 clone
+    MMC3 clone. This is a minor modification of Mapper 74,
+    in the sense that it is the same board except for the
+    CHRRAM pages.
 
-    In MESS: Unsupported.
+    In MESS: Supported.
 
 *************************************************************/
+
+static void mapper194_set_chr( running_machine *machine, int chr_base, int chr_mask )
+{
+	UINT8 chr_page = (mmc_cmd1 & 0x80) >> 5;
+	UINT8 chr_src[6];
+	int i;
+
+	for (i = 0; i < 6; i++)
+		chr_src[i] = (vrom_bank[i] < 0x02) ? CHRRAM : CHRROM;
+
+	chr1_x(machine, chr_page ^ 0, chr_base | ((vrom_bank[0] & ~0x01) & chr_mask), chr_src[0]);
+	chr1_x(machine, chr_page ^ 1, chr_base | ((vrom_bank[0] |  0x01) & chr_mask), chr_src[0]);
+	chr1_x(machine, chr_page ^ 2, chr_base | ((vrom_bank[1] & ~0x01) & chr_mask), chr_src[1]);
+	chr1_x(machine, chr_page ^ 3, chr_base | ((vrom_bank[1] |  0x01) & chr_mask), chr_src[1]);
+	chr1_x(machine, chr_page ^ 4, chr_base | (vrom_bank[2] & chr_mask), chr_src[2]);
+	chr1_x(machine, chr_page ^ 5, chr_base | (vrom_bank[3] & chr_mask), chr_src[3]);
+	chr1_x(machine, chr_page ^ 6, chr_base | (vrom_bank[4] & chr_mask), chr_src[4]);
+	chr1_x(machine, chr_page ^ 7, chr_base | (vrom_bank[5] & chr_mask), chr_src[5]);
+}
+
+static WRITE8_HANDLER( mapper194_w )
+{
+	UINT8 MMC3_helper, cmd;
+	LOG_MMC(("mapper194_w, offset: %04x, data: %02x\n", offset, data));
+
+	switch (offset & 0x6001)
+	{
+	case 0x0000:
+		MMC3_helper = mmc_cmd1 ^ data;
+		mmc_cmd1 = data;
+
+		/* Has PRG Mode changed? */
+		if (MMC3_helper & 0x40)
+			mapper4_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+
+		/* Has CHR Mode changed? */
+		if (MMC3_helper & 0x80)
+			mapper194_set_chr(space->machine, mmc_chr_base, mmc_chr_mask);
+		break;
+
+	case 0x0001:
+		cmd = mmc_cmd1 & 0x07;
+		switch (cmd)
+		{
+		case 0: case 1:	// these do not need to be separated: we take care of them in set_chr!
+		case 2: case 3: case 4: case 5:
+			vrom_bank[cmd] = data;
+			mapper194_set_chr(space->machine, mmc_chr_base, mmc_chr_mask);
+			break;
+		case 6:
+		case 7:
+			prg_bank[cmd - 6] = data;
+			mapper4_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+			break;
+		}
+		break;
+
+	default:
+		mapper74_w(space, offset, data);
+		break;
+	}
+}
 
 /*************************************************************
 
@@ -7669,11 +8813,75 @@ static WRITE8_HANDLER( mapper193_m_w )
     Games: Captain Tsubasa Vol. II (C), Chaos World, God
           Slayer (C), Zu Qiu Xiao Jiang
 
-    MMC3 clone
+    MMC3 clone. This is a minor modification of Mapper 74,
+    in the sense that it is the same board except for the
+    CHRRAM pages.
 
-    In MESS: Unsupported.
+    In MESS: Supported.
 
 *************************************************************/
+
+static void mapper195_set_chr( running_machine *machine, int chr_base, int chr_mask )
+{
+	UINT8 chr_page = (mmc_cmd1 & 0x80) >> 5;
+	UINT8 chr_src[6];
+	int i;
+
+	for (i = 0; i < 6; i++)
+		chr_src[i] = (vrom_bank[i] < 0x04) ? CHRRAM : CHRROM;
+
+	chr1_x(machine, chr_page ^ 0, chr_base | ((vrom_bank[0] & ~0x01) & chr_mask), chr_src[0]);
+	chr1_x(machine, chr_page ^ 1, chr_base | ((vrom_bank[0] |  0x01) & chr_mask), chr_src[0]);
+	chr1_x(machine, chr_page ^ 2, chr_base | ((vrom_bank[1] & ~0x01) & chr_mask), chr_src[1]);
+	chr1_x(machine, chr_page ^ 3, chr_base | ((vrom_bank[1] |  0x01) & chr_mask), chr_src[1]);
+	chr1_x(machine, chr_page ^ 4, chr_base | (vrom_bank[2] & chr_mask), chr_src[2]);
+	chr1_x(machine, chr_page ^ 5, chr_base | (vrom_bank[3] & chr_mask), chr_src[3]);
+	chr1_x(machine, chr_page ^ 6, chr_base | (vrom_bank[4] & chr_mask), chr_src[4]);
+	chr1_x(machine, chr_page ^ 7, chr_base | (vrom_bank[5] & chr_mask), chr_src[5]);
+}
+
+static WRITE8_HANDLER( mapper195_w )
+{
+	UINT8 MMC3_helper, cmd;
+	LOG_MMC(("mapper195_w, offset: %04x, data: %02x\n", offset, data));
+
+	switch (offset & 0x6001)
+	{
+	case 0x0000:
+		MMC3_helper = mmc_cmd1 ^ data;
+		mmc_cmd1 = data;
+
+		/* Has PRG Mode changed? */
+		if (MMC3_helper & 0x40)
+			mapper4_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+
+		/* Has CHR Mode changed? */
+		if (MMC3_helper & 0x80)
+			mapper195_set_chr(space->machine, mmc_chr_base, mmc_chr_mask);
+		break;
+
+	case 0x0001:
+		cmd = mmc_cmd1 & 0x07;
+		switch (cmd)
+		{
+		case 0: case 1:	// these do not need to be separated: we take care of them in set_chr!
+		case 2: case 3: case 4: case 5:
+			vrom_bank[cmd] = data;
+			mapper195_set_chr(space->machine, mmc_chr_base, mmc_chr_mask);
+			break;
+		case 6:
+		case 7:
+			prg_bank[cmd - 6] = data;
+			mapper4_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+			break;
+		}
+		break;
+
+	default:
+		mapper74_w(space, offset, data);
+		break;
+	}
+}
 
 /*************************************************************
 
@@ -7693,35 +8901,7 @@ static WRITE8_HANDLER( mapper196_w )
 {
 	LOG_MMC(("mapper196_w, offset: %04x, data: %02x\n", offset, data));
 
-	switch (offset & 0x6004)
-	{
-	case 0x0000:
-		mapper4_w(space, 0x0000, data);
-		break;
-	case 0x0004:
-		mapper4_w(space, 0x0001, data);
-		break;
-	case 0x2000:
-		set_nt_mirroring(data & 0x01 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);	// diff with MMC3: not check for data & 0x40
-		break;
-	case 0x2004:
-		mapper4_w(space, 0x2001, data);
-		break;
-	case 0x4000:
-		mapper4_w(space, 0x4000, data);
-		break;
-	case 0x4004:
-		mapper4_w(space, 0x4001, data);
-		break;
-	case 0x6000:
-		mapper4_w(space, 0x6000, data);
-		break;
-	case 0x6004:
-		mapper4_w(space, 0x6001, data);
-		break;
-	default:
-		break;
-	}
+	mapper4_w(space, (offset & 0x6000) | ((offset & 0x04) >> 2), data);
 }
 
 /*************************************************************
@@ -7733,9 +8913,58 @@ static WRITE8_HANDLER( mapper196_w )
 
     MMC3 clone
 
-    In MESS: Unsupported.
+    In MESS: Supported.
 
 *************************************************************/
+
+static void mapper197_set_chr( running_machine *machine, UINT8 chr_source, int chr_base, int chr_mask )
+{
+	chr4_0(machine, chr_base | ((vrom_bank[0] >> 1) & chr_mask), chr_source);
+	chr2_4(machine, chr_base | (vrom_bank[1] & chr_mask), chr_source);
+	chr2_6(machine, chr_base | (vrom_bank[2] & chr_mask), chr_source);
+}
+
+static WRITE8_HANDLER( mapper197_w )
+{
+	UINT8 MMC3_helper, cmd;
+	LOG_MMC(("mapper197_w, offset: %04x, data: %02x\n", offset, data));
+
+	switch (offset & 0x6001)
+	{
+	case 0x0000:
+		MMC3_helper = mmc_cmd1 ^ data;
+		mmc_cmd1 = data;
+
+		/* Has PRG Mode changed? */
+		if (MMC3_helper & 0x40)
+			mapper4_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+
+		/* Has CHR Mode changed? */
+		if (MMC3_helper & 0x80)
+			mapper197_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
+		break;
+
+	case 0x0001:
+		cmd = mmc_cmd1 & 0x0f;
+		switch (cmd)
+		{
+		case 0: case 2: case 4:
+			vrom_bank[cmd >> 1] = data;
+			mapper197_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
+			break;
+		case 6:
+		case 7:
+			prg_bank[cmd - 6] = data;
+			mapper4_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+			break;
+		}
+		break;
+
+	default:
+		mapper4_w(space, offset, data);
+		break;
+	}
+}
 
 /*************************************************************
 
@@ -7744,11 +8973,64 @@ static WRITE8_HANDLER( mapper196_w )
     Known Boards: Type F by Waixing
     Games: Tenchi wo Kurau II (C)
 
-    MMC3 clone
+    MMC3 clone.
 
-    In MESS: Unsupported.
+    In MESS: Preliminary support.
 
 *************************************************************/
+
+static void mapper198_set_prg( running_machine *machine, int prg_base, int prg_mask )
+{
+	UINT8 prg_flip = (mmc_cmd1 & 0x40) ? 2 : 0;
+
+	prg8_89(machine, prg_base | (prg_bank[0 ^ prg_flip] & prg_mask));
+	prg8_ab(machine, prg_base | (prg_bank[1] & prg_mask));
+	prg8_cd(machine, prg_base | (prg_bank[2 ^ prg_flip] & prg_mask));
+	prg8_ef(machine, prg_base | (prg_bank[3] & prg_mask));
+}
+
+static WRITE8_HANDLER( mapper198_w )
+{
+	UINT8 MMC3_helper, cmd;
+	LOG_MMC(("mapper198_w, offset: %04x, data: %02x\n", offset, data));
+
+	switch (offset & 0x6001)
+	{
+	case 0x0000:
+		MMC3_helper = mmc_cmd1 ^ data;
+		mmc_cmd1 = data;
+
+		/* Has PRG Mode changed? */
+		if (MMC3_helper & 0x40)
+			mapper198_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+
+		/* Has CHR Mode changed? */
+		if (MMC3_helper & 0x80)
+			mapper4_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
+		break;
+
+	case 0x0001:
+		cmd = mmc_cmd1 & 0x07;
+		switch (cmd)
+		{
+		case 0: case 1:	// these do not need to be separated: we take care of them in set_chr!
+		case 2: case 3: case 4: case 5:
+			vrom_bank[cmd] = data;
+			mapper4_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
+			break;
+		case 6:
+		case 7:
+			prg_bank[cmd - 6] = data & ((data > 0x3f) ? 0x4f : 0x3f);
+			mapper198_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+			break;
+		}
+		break;
+
+	default:
+		mapper74_w(space, offset, data);
+		break;
+	}
+}
 
 /*************************************************************
 
@@ -7760,9 +9042,77 @@ static WRITE8_HANDLER( mapper196_w )
 
     MMC3 clone
 
-    In MESS: Unsupported.
+    In MESS: Supported.
 
 *************************************************************/
+
+static void mapper199_set_chr( running_machine *machine, int chr_base, int chr_mask )
+{
+	UINT8 chr_page = (mmc_cmd1 & 0x80) >> 5;
+	UINT8 chr_src[8];
+	int i;
+
+	for (i = 0; i < 8; i++)
+		chr_src[i] = (vrom_bank[i] < 0x08) ? CHRRAM : CHRROM;
+
+	chr1_x(machine, chr_page ^ 0, chr_base | (vrom_bank[0] & chr_mask), chr_src[0]);
+	chr1_x(machine, chr_page ^ 1, chr_base | (vrom_bank[6] & chr_mask), chr_src[6]);
+	chr1_x(machine, chr_page ^ 2, chr_base | (vrom_bank[1] & chr_mask), chr_src[1]);
+	chr1_x(machine, chr_page ^ 3, chr_base | (vrom_bank[7] & chr_mask), chr_src[7]);
+	chr1_x(machine, chr_page ^ 4, chr_base | (vrom_bank[2] & chr_mask), chr_src[2]);
+	chr1_x(machine, chr_page ^ 5, chr_base | (vrom_bank[3] & chr_mask), chr_src[3]);
+	chr1_x(machine, chr_page ^ 6, chr_base | (vrom_bank[4] & chr_mask), chr_src[4]);
+	chr1_x(machine, chr_page ^ 7, chr_base | (vrom_bank[5] & chr_mask), chr_src[5]);
+}
+
+static WRITE8_HANDLER( mapper199_w )
+{
+	UINT8 MMC3_helper, cmd;
+	LOG_MMC(("mapper199_w, offset: %04x, data: %02x\n", offset, data));
+
+	switch (offset & 0x6001)
+	{
+	case 0x0000:
+		MMC3_helper = mmc_cmd1 ^ data;
+		mmc_cmd1 = data;
+
+		/* Has PRG Mode changed? */
+		if (MMC3_helper & 0x40)
+			mapper4_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+
+		/* Has CHR Mode changed? */
+		if (MMC3_helper & 0x80)
+			mapper199_set_chr(space->machine, mmc_chr_base, mmc_chr_mask);
+		break;
+
+	case 0x0001:
+		cmd = mmc_cmd1 & 0x0f;
+		switch (cmd)
+		{
+		case 0: case 1:	// these do not need to be separated: we take care of them in set_chr!
+		case 2: case 3: case 4: case 5:
+			vrom_bank[cmd] = data;
+			mapper199_set_chr(space->machine, mmc_chr_base, mmc_chr_mask);
+			break;
+		case 6:
+		case 7:
+		case 8:
+		case 9:
+			prg_bank[cmd - 6] = data;
+			mapper4_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+			break;
+		case 0x0a: case 0x0b:
+			vrom_bank[cmd - 4] = data;
+			mapper199_set_chr(space->machine, mmc_chr_base, mmc_chr_mask);
+			break;
+		}
+		break;
+
+	default:
+		mapper4_w(space, offset, data);
+		break;
+	}
+}
 
 /*************************************************************
 
@@ -7882,9 +9232,24 @@ static WRITE8_HANDLER( mapper204_w )
 
     MMC3 clone
 
-    In MESS: Unsupported.
+    In MESS: Supported.
 
 *************************************************************/
+
+static WRITE8_HANDLER( mapper205_m_w )
+{
+	LOG_MMC(("mapper205_m_w, offset: %04x, data: %02x\n", offset, data));
+
+	if (offset & 0x0800)
+	{
+		mmc_prg_base = (data & 0x03) << 4;
+		mmc_prg_mask = (data & 0x02) ? 0x0f : 0x1f;
+		mmc_chr_base = (data & 0x03) << 7;
+		mmc_chr_mask = (data & 0x02) ? 0x7f : 0xff;
+		mapper4_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+		mapper4_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
+	}
+}
 
 /*************************************************************
 
@@ -7986,9 +9351,87 @@ static WRITE8_HANDLER( mapper207_m_w )
 
     MMC3 clone. It also requires reads from 0x5000-0x7fff.
 
-    In MESS: Unsupported.
+    In MESS: Preliminary Support.
 
 *************************************************************/
+
+static WRITE8_HANDLER( mapper208_l_w )
+{
+	static const UINT8 conv_table[256] =
+	{
+		0x59,0x59,0x59,0x59,0x59,0x59,0x59,0x59,0x59,0x49,0x19,0x09,0x59,0x49,0x19,0x09,
+		0x59,0x59,0x59,0x59,0x59,0x59,0x59,0x59,0x51,0x41,0x11,0x01,0x51,0x41,0x11,0x01,
+		0x59,0x59,0x59,0x59,0x59,0x59,0x59,0x59,0x59,0x49,0x19,0x09,0x59,0x49,0x19,0x09,
+		0x59,0x59,0x59,0x59,0x59,0x59,0x59,0x59,0x51,0x41,0x11,0x01,0x51,0x41,0x11,0x01,
+		0x00,0x10,0x40,0x50,0x00,0x10,0x40,0x50,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+		0x08,0x18,0x48,0x58,0x08,0x18,0x48,0x58,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+		0x00,0x10,0x40,0x50,0x00,0x10,0x40,0x50,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+		0x08,0x18,0x48,0x58,0x08,0x18,0x48,0x58,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+		0x59,0x59,0x59,0x59,0x59,0x59,0x59,0x59,0x58,0x48,0x18,0x08,0x58,0x48,0x18,0x08,
+		0x59,0x59,0x59,0x59,0x59,0x59,0x59,0x59,0x50,0x40,0x10,0x00,0x50,0x40,0x10,0x00,
+		0x59,0x59,0x59,0x59,0x59,0x59,0x59,0x59,0x58,0x48,0x18,0x08,0x58,0x48,0x18,0x08,
+		0x59,0x59,0x59,0x59,0x59,0x59,0x59,0x59,0x50,0x40,0x10,0x00,0x50,0x40,0x10,0x00,
+		0x01,0x11,0x41,0x51,0x01,0x11,0x41,0x51,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+		0x09,0x19,0x49,0x59,0x09,0x19,0x49,0x59,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+		0x01,0x11,0x41,0x51,0x01,0x11,0x41,0x51,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+		0x09,0x19,0x49,0x59,0x09,0x19,0x49,0x59,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00
+	};
+
+	LOG_MMC(("mapper208_l_w, offset: %04x, data: %02x\n", offset, data));
+
+	if (!(offset < 0x1700))
+		map208_reg[offset & 0x03] = data ^ conv_table[map208_reg[4]];
+	else if (!(offset < 0xf00))
+		map208_reg[4] = data;
+	else if (!(offset < 0x700))
+		prg32(space->machine, ((data >> 3) & 0x02) | (data & 0x01));
+}
+
+static READ8_HANDLER( mapper208_l_r )
+{
+	LOG_MMC(("mapper208_l_r, offset: %04x\n", offset));
+
+	if (!(offset < 0x1700))
+		return map208_reg[offset & 0x03];
+
+	return 0x00;
+}
+
+/* This is like mapper4 but with no PRG bankswitch (beacuse it is handled by low writes) */
+// replace with map189_w... they are the same!!
+static WRITE8_HANDLER( mapper208_w )
+{
+	UINT8 MMC3_helper, cmd;
+	LOG_MMC(("mapper208_w, offset: %04x, data: %02x\n", offset, data));
+
+	switch (offset & 0x6001)
+	{
+	case 0x0000:
+		MMC3_helper = mmc_cmd1 ^ data;
+		mmc_cmd1 = data;
+
+		/* Has CHR Mode changed? */
+		if (MMC3_helper & 0x80)
+			mapper4_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
+		break;
+
+	case 0x0001:
+		cmd = mmc_cmd1 & 0x07;
+		switch (cmd)
+		{
+		case 0: case 1:
+		case 2: case 3: case 4: case 5:
+			vrom_bank[cmd] = data;
+			mapper4_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
+			break;
+		}
+		break;
+
+	default:
+		mapper4_w(space, offset, data);
+		break;
+	}
+}
 
 /*************************************************************
 
@@ -8008,6 +9451,15 @@ static WRITE8_HANDLER( mapper207_m_w )
 
     Known Boards: Undocumented / Unused ?!?
     Games: ----------
+
+    For some emulators, this is the same as Mapper 19 but it
+    has hardwired mirroring and no additional sound hardware.
+    Initializing Mirroring to Vertical in Mapper 19 seems to
+    fix all glitches in 'so-called' Mapper 210 games, so there
+    seems to be no reason to have this duplicate mapper (at
+    least until we emulate additional sound hardware... if sound
+    writes would create conflicts, we might consider to split the
+    mapper in two variants)
 
     In MESS: ----------
 
@@ -8100,9 +9552,183 @@ static WRITE8_HANDLER( mapper214_w )
     MMC3 clone. Also, it probably needs a hack to support both
     variants (Boogerman & MK3).
 
-    In MESS: Unsupported.
+    In MESS: Preliminary support.
 
 *************************************************************/
+
+// remove mask & base parameters!
+static void mapper215_set_prg( running_machine *machine, int prg_base, int prg_mask )
+{
+	if (map215_reg[0] & 0x80)
+	{
+		prg16_89ab(machine, (map215_reg[0] & 0xf0) | (map215_reg[1] & 0x10));
+		prg16_cdef(machine, (map215_reg[0] & 0xf0) | (map215_reg[1] & 0x10));
+	}
+	else
+	{
+		mmc_prg_base = (map215_reg[1] & 0x08) ? 0x20 : (map215_reg[1] & 0x10);
+		mmc_prg_mask = (map215_reg[1] & 0x08) ? 0x1f : 0x0f;
+
+		mapper4_set_prg(machine, mmc_prg_base, mmc_prg_mask);
+	}
+}
+
+static void mapper215_set_chr( running_machine *machine, UINT8 chr )
+{
+	UINT8 chr_page = (mmc_cmd1 & 0x80) >> 5;
+	int chr_base = (map215_reg[1] & 0x04) ? 0x100 : ((map215_reg[1] & 0x10) << 3);
+	int chr_mask = (map215_reg[1] & 0x04) ? 0xff : 0x7f;
+
+	chr1_x(machine, chr_page ^ 0, chr_base | ((vrom_bank[0] & ~0x01) & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 1, chr_base | ((vrom_bank[0] |  0x01) & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 2, chr_base | ((vrom_bank[1] & ~0x01) & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 3, chr_base | ((vrom_bank[1] |  0x01) & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 4, chr_base | (vrom_bank[2] & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 5, chr_base | (vrom_bank[3] & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 6, chr_base | (vrom_bank[4] & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 7, chr_base | (vrom_bank[5] & chr_mask), chr);
+}
+
+static WRITE8_HANDLER( mapper215_l_w )
+{
+	LOG_MMC(("mapper215_l_w, offset: %04x, data: %02x\n", offset, data));
+	offset += 0x100;
+
+	if (offset == 0x1000)
+	{
+		map215_reg[0] = data;
+		mapper215_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+	}
+	else if (offset == 0x1001)
+	{
+		map215_reg[1] = data;
+		mapper215_set_chr(space->machine, mmc_chr_source);
+	}
+	else if (offset == 0x1007)
+	{
+		mmc_cmd1 = 0;
+		map215_reg[2] = data;
+		mapper215_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+		mapper215_set_chr(space->machine, mmc_chr_source);
+	}
+}
+
+static WRITE8_HANDLER( mapper215_w )
+{
+	UINT8 MMC3_helper, cmd;
+	static const UINT8 conv_table[8] = {0,2,5,3,6,1,7,4};
+	LOG_MMC(("mapper215_w, offset: %04x, data: %02x\n", offset, data));
+
+	if (!map215_reg[2]) // in this case we act like MMC3, only with alt prg/chr handlers
+	{
+		switch (offset & 0x6001)
+		{
+		case 0x0000:
+			MMC3_helper = mmc_cmd1 ^ data;
+			mmc_cmd1 = data;
+
+			/* Has PRG Mode changed? */
+			if (MMC3_helper & 0x40)
+				mapper215_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+
+			/* Has CHR Mode changed? */
+			if (MMC3_helper & 0x80)
+				mapper215_set_chr(space->machine, mmc_chr_source);
+			break;
+
+		case 0x0001:
+			cmd = mmc_cmd1 & 0x07;
+			switch (cmd)
+			{
+			case 0: case 1:	// these do not need to be separated: we take care of them in set_chr!
+			case 2: case 3: case 4: case 5:
+				vrom_bank[cmd] = data;
+				mapper215_set_chr(space->machine, mmc_chr_source);
+				break;
+			case 6:
+			case 7:
+				prg_bank[cmd - 6] = data;
+				mapper215_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+				break;
+			}
+			break;
+
+		default:
+			mapper4_w(space, offset, data);
+			break;
+		}
+	}
+	else
+	{
+		switch (offset & 0x6001)
+		{
+		case 0x0000:
+			break;
+
+		case 0x0001:
+			cmd = mmc_cmd1 & 0x07;
+			if (map215_reg[3] && ((map215_reg[0] & 0x80) == 0 || cmd < 6))	// if we use the prg16 banks and cmd=6,7 DON'T enter!
+			{
+				map215_reg[3] = 0;
+				switch (cmd)
+				{
+				case 0: case 1:	// these do not need to be separated: we take care of them in set_chr!
+				case 2: case 3: case 4: case 5:
+					vrom_bank[cmd] = data;
+					mapper215_set_chr(space->machine, mmc_chr_source);
+					break;
+				case 6:
+				case 7:
+					prg_bank[cmd - 6] = data;
+					mapper215_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+					break;
+				}
+			}
+			break;
+
+		case 0x2000:
+			data = (data & 0xc0) | conv_table[data & 0x07];
+			MMC3_helper = mmc_cmd1 ^ data;
+			mmc_cmd1 = data;
+
+			/* Has PRG Mode changed? */
+			if (MMC3_helper & 0x40)
+				mapper215_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+
+			/* Has CHR Mode changed? */
+			if (MMC3_helper & 0x80)
+				mapper215_set_chr(space->machine, mmc_chr_source);
+
+			map215_reg[3] = 1;
+			break;
+
+//      case 0x2001:
+//          mapper4_w(space, 0x4001, data);
+//          break;
+
+		case 0x4000:
+			set_nt_mirroring(((data >> 7) | data) & 0x01 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			break;
+
+		case 0x4001:
+			mapper4_w(space, 0x6001, data);
+			break;
+
+//      case 0x6000:
+//          mapper4_w(space, 0x6000, data);
+//          break;
+
+		case 0x6001:
+			mapper4_w(space, 0x4000, data);
+			mapper4_w(space, 0x4001, data);
+			break;
+
+		default:
+			mapper4_w(space, offset, data);
+			break;
+		}
+	}
+}
 
 /*************************************************************
 
@@ -8135,9 +9761,169 @@ static WRITE8_HANDLER( mapper216_w )
 
     MMC3 clone
 
-    In MESS: Unsupported.
+    In MESS: Supported.
 
 *************************************************************/
+
+// remove mask & base parameters!
+static void mapper217_set_prg( running_machine *machine, int prg_base, int prg_mask )
+{
+	mmc_prg_base = (map217_reg[1] & 0x08) ? 0 : (map217_reg[1] & 0x10);
+	mmc_prg_mask = (map217_reg[1] & 0x08) ? 0x1f : 0x0f;
+
+	mmc_prg_base |= ((map217_reg[1] & 0x03) << 5);
+
+	mapper4_set_prg(machine, mmc_prg_base, mmc_prg_mask);
+}
+
+static void mapper217_set_chr( running_machine *machine, UINT8 chr )
+{
+	UINT8 chr_page = (mmc_cmd1 & 0x80) >> 5;
+	int chr_base = (map217_reg[1] & 0x08) ? 0x00 : ((map217_reg[1] & 0x10) << 3);
+	int chr_mask = (map217_reg[1] & 0x08) ? 0xff : 0x7f;
+
+	chr_base |= ((map217_reg[1] & 0x03) << 8);
+
+	chr1_x(machine, chr_page ^ 0, chr_base | ((vrom_bank[0] & ~0x01) & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 1, chr_base | ((vrom_bank[0] |  0x01) & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 2, chr_base | ((vrom_bank[1] & ~0x01) & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 3, chr_base | ((vrom_bank[1] |  0x01) & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 4, chr_base | (vrom_bank[2] & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 5, chr_base | (vrom_bank[3] & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 6, chr_base | (vrom_bank[4] & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 7, chr_base | (vrom_bank[5] & chr_mask), chr);
+}
+
+static WRITE8_HANDLER( mapper217_l_w )
+{
+	UINT8 bank;
+	LOG_MMC(("mapper217_l_w, offset: %04x, data: %02x\n", offset, data));
+	offset += 0x100;
+
+	if (offset == 0x1000)
+	{
+		map217_reg[0] = data;
+		if (data & 0x80)
+		{
+			bank = (data & 0x0f) | ((map217_reg[1] & 0x03) << 4);
+			prg16_89ab(space->machine, bank);
+			prg16_cdef(space->machine, bank);
+		}
+		else
+			mapper217_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+	}
+	else if (offset == 0x1001)
+	{
+		map217_reg[1] = data;
+		mapper217_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+	}
+	else if (offset == 0x1007)
+	{
+		map217_reg[2] = data;
+	}
+}
+
+static WRITE8_HANDLER( mapper217_w )
+{
+	UINT8 MMC3_helper, cmd;
+	static const UINT8 conv_table[8] = {0, 6, 3, 7, 5, 2, 4, 1};
+	LOG_MMC(("mapper217_w, offset: %04x, data: %02x\n", offset, data));
+
+	if (!map217_reg[2]) // in this case we act like MMC3, only with alt prg/chr handlers
+	{
+		switch (offset & 0x6001)
+		{
+		case 0x0000:
+			MMC3_helper = mmc_cmd1 ^ data;
+			mmc_cmd1 = data;
+
+			/* Has PRG Mode changed? */
+			if (MMC3_helper & 0x40)
+				mapper217_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+
+			/* Has CHR Mode changed? */
+			if (MMC3_helper & 0x80)
+				mapper217_set_chr(space->machine, mmc_chr_source);
+			break;
+
+		case 0x0001:
+			cmd = mmc_cmd1 & 0x07;
+			switch (cmd)
+			{
+			case 0: case 1:	// these do not need to be separated: we take care of them in set_chr!
+			case 2: case 3: case 4: case 5:
+				vrom_bank[cmd] = data;
+				mapper217_set_chr(space->machine, mmc_chr_source);
+				break;
+			case 6:
+			case 7:
+				prg_bank[cmd - 6] = data;
+				mapper217_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+				break;
+			}
+			break;
+
+		default:
+			mapper4_w(space, offset, data);
+			break;
+		}
+	}
+	else
+	{
+		switch (offset & 0x6001)
+		{
+		case 0x0000:
+			mapper4_w(space, 0xc000, data);
+			break;
+
+		case 0x0001:
+			data = (data & 0xc0) | conv_table[data & 0x07];
+			MMC3_helper = mmc_cmd1 ^ data;
+			mmc_cmd1 = data;
+
+			/* Has PRG Mode changed? */
+			if (MMC3_helper & 0x40)
+				mapper217_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+
+			/* Has CHR Mode changed? */
+			if (MMC3_helper & 0x80)
+				mapper217_set_chr(space->machine, mmc_chr_source);
+
+			map217_reg[3] = 1;
+			break;
+
+		case 0x2000:
+			cmd = mmc_cmd1 & 0x07;
+			if (map217_reg[3])
+			{
+				map217_reg[3] = 0;
+				switch (cmd)
+				{
+				case 0: case 1:	// these do not need to be separated: we take care of them in set_chr!
+				case 2: case 3: case 4: case 5:
+					vrom_bank[cmd] = data;
+					mapper217_set_chr(space->machine, mmc_chr_source);
+					break;
+				case 6:
+				case 7:
+					prg_bank[cmd - 6] = data;
+					mapper217_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+					break;
+				}
+			}
+			break;
+
+
+		case 0x2001:
+			set_nt_mirroring(data & 0x01 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			break;
+
+		default:
+			mapper4_w(space, offset, data);
+			break;
+		}
+	}
+}
 
 /*************************************************************
 
@@ -8235,6 +10021,54 @@ static WRITE8_HANDLER( mapper221_w )
     In MESS: Unsupported.
 
 *************************************************************/
+
+/* Scanline based IRQ ? */
+static void mapper222_irq( const device_config *device, int scanline, int vblank, int blanked )
+{
+	if (scanline < PPU_BOTTOM_VISIBLE_SCANLINE)
+	{
+		if (!IRQ_count || ++IRQ_count < 240)
+			return;
+
+		IRQ_count = 0;
+		LOG_MMC(("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline,
+				video_screen_get_vpos(device->machine->primary_screen), video_screen_get_hpos(device->machine->primary_screen)));
+		cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
+	}
+}
+
+static WRITE8_HANDLER( mapper222_w )
+{
+	UINT8 bank;
+	LOG_MMC(("mapper222_w, offset: %04x, data: %02x\n", offset, data));
+
+	switch (offset & 0x7003)
+	{
+	case 0x0000:
+		prg8_89(space->machine, data);
+		break;
+	case 0x1000:
+		set_nt_mirroring((data & 0x01) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+		break;
+	case 0x2000:
+		prg8_ab(space->machine, data);
+		break;
+	case 0x3000:
+	case 0x3002:
+	case 0x4000:
+	case 0x4002:
+	case 0x5000:
+	case 0x5002:
+	case 0x6000:
+	case 0x6002:
+		bank = ((offset & 0x7000) - 0x3000) / 0x0800 + ((offset & 0x0002) >> 3);
+		chr1_x(space->machine, bank, data, CHRROM);
+		break;
+	case 0x7000:
+		IRQ_count = data;
+		break;
+	}
+}
 
 /*************************************************************
 
@@ -8399,61 +10233,40 @@ static WRITE8_HANDLER( mapper227_w )
     Known Boards: Bootleg Board by Active Enterprise
     Games: Action 52, Cheetah Men II
 
-    In MESS: Only Partially Supported.
+    In MESS: Partially Supported.
 
 *************************************************************/
 
 static WRITE8_HANDLER( mapper228_w )
 {
-	/* The address lines double as data */
-	/* --mPPppppPP-cccc */
-	int bank;
-	int chr;
-
+	int prg_bank, prg_chip, chr_bank;
+	UINT8 prg_mode;
 	LOG_MMC(("mapper228_w, offset: %04x, data: %02x\n", offset, data));
 
-	/* Determine low 4 bits of program bank */
-	bank = (offset & 0x780) >> 7;
+	set_nt_mirroring((offset & 0x2000) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 
-#if 1
-	/* Determine high 2 bits of program bank */
-	switch (offset & 0x1800)
+	chr_bank = (data & 0x03) | ((offset & 0x0f) << 2);
+	chr8(space->machine, chr_bank, CHRROM);
+
+	prg_bank = (offset & 0x7c0) >> 6;
+	prg_chip = (offset & 0x1800) >> 11;
+	prg_mode = offset & 0x20;
+
+	switch (prg_chip)
 	{
-		case 0x0800:
-			bank |= 0x10;
-			break;
-		case 0x1800:
-			bank |= 0x20;
-			break;
+		case 0: break;			// we are already at the correct bank
+		case 1: prg_bank |= 0x10; break;	// chip 1 starts at block 16
+		case 2: break;			// chip 2 was an empty socket
+		case 3: prg_bank |= 0x20; break;	// chip 3 starts at block 32
 	}
-#else
-	bank |= (offset & 0x1800) >> 7;
-#endif
 
-	/* see if the bank value is 16k or 32k */
-	if (offset & 0x20)
+	if (prg_mode)
 	{
-		/* 16k bank value, adjust */
-		bank <<= 1;
-		if (offset & 0x40)
-			bank ++;
-
-		prg16_89ab(space->machine, bank);
-		prg16_cdef(space->machine, bank);
+		prg16_89ab(space->machine, prg_bank);
+		prg16_cdef(space->machine, prg_bank);
 	}
 	else
-	{
-		prg32(space->machine, bank);
-	}
-
-	if (offset & 0x2000)
-		set_nt_mirroring(PPU_MIRROR_HORZ);
-	else
-		set_nt_mirroring(PPU_MIRROR_VERT);
-
-	/* Now handle vrom banking */
-	chr = (data & 0x03) + ((offset & 0x0f) << 2);
-	chr8(space->machine, chr, CHRROM);
+		prg32(space->machine, prg_bank >> 1);
 }
 
 /*************************************************************
@@ -8493,7 +10306,8 @@ static WRITE8_HANDLER( mapper229_w )
     Known Boards: Unknown Bootleg Multigame Board
     Games: 22 in 1
 
-    In MESS: Supported. Needs a reset to work (not possible yet)
+    In MESS: Partially Supported. It would need a reset
+       to work (not possible yet)
 
 *************************************************************/
 
@@ -8539,7 +10353,7 @@ static WRITE8_HANDLER( mapper231_w )
 	set_nt_mirroring((offset & 0x80) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 
 	prg16_89ab(space->machine, (offset & 0x1e));
-	prg16_cdef(space->machine, (offset & 0x1e) + (data & 0x20) ? 1 : 0);
+	prg16_cdef(space->machine, (offset & 0x1e) | ((offset & 0x20) ? 1 : 0));
 }
 
 /*************************************************************
@@ -8721,10 +10535,12 @@ static WRITE8_HANDLER( mapper241_w )
     Simple mapper: writes to 0x8000-0xffff sets prg32 banks to
         (offset>>3)&f. written data&3 sets the mirroring (with
         switched high/low compared to the standard one). However,
-        a second variant DQ7 and requires no NT mirroring.
-        Currently, we do not support this variant.
+        a second variant DQ8 and requires no NT mirroring.
 
-    In MESS: Partial Support.
+    A crc check is required to support Dragon Quest VIII (which
+    uses a slightly different board)
+
+    In MESS: Supported.
 
 *************************************************************/
 
@@ -8732,9 +10548,18 @@ static WRITE8_HANDLER( mapper242_w )
 {
 	LOG_MMC(("mapper242_w, offset: %04x, data: %02x\n", offset, data));
 
-	prg32(space->machine, (offset >> 3) & 0x0f);
+	prg32(space->machine, offset >> 3);
 
-	waixing_set_mirror(data & 0x03);
+	if (!nes.crc_hack)	// DQ8 board does not have this / Zan Shi does
+	{
+		switch (data & 0x03)
+		{
+			case 0: set_nt_mirroring(PPU_MIRROR_VERT); break;
+			case 1: set_nt_mirroring(PPU_MIRROR_HORZ); break;
+			case 2: set_nt_mirroring(PPU_MIRROR_LOW); break;
+			case 3: set_nt_mirroring(PPU_MIRROR_HIGH); break;
+		}
+	}
 }
 
 /*************************************************************
@@ -8754,8 +10579,7 @@ static WRITE8_HANDLER( mapper243_l_w )
 {
 	LOG_MMC(("mapper243_l_w, offset: %04x, data: %02x\n", offset, data));
 
-	/* write happens only if we are at 0x4100 + k * 0x200,
-    but 0x4100 is offset = 0 */
+	/* write happens only if we are at 0x4100 + k * 0x200, but 0x4100 is offset = 0 */
 	if (!(offset & 0x100))
 	{
 		if (!(offset & 0x01))
@@ -8829,13 +10653,57 @@ static WRITE8_HANDLER( mapper244_w )
     Mapper 245
 
     Known Boards: Type H by Waixing
-    Games: Ying Xiong Yuan Yi Jing Chuan Qi
+    Games: Ying Xiong Yuan Yi Jing Chuan Qi, Yong Zhe Dou E
+         Long - Dragon Quest VII
 
     MMC3 clone. More info to come.
 
-    In MESS: Unsupported.
+    In MESS: Supported.
 
 *************************************************************/
+
+static WRITE8_HANDLER( mapper245_w )
+{
+	UINT8 cmd, map245_helper;
+	LOG_MMC(("mapper245_w, offset: %04x, data: %02x\n", offset, data));
+
+	switch (offset & 0x6001)
+	{
+	case 0x0001:
+		cmd = mmc_cmd1 & 0x0f;
+		switch (cmd)
+		{
+		case 0: 	// in this case we set prg_base in addition to vrom_bank!
+			mmc_prg_base = (data << 5) & 0x40;
+			mmc_prg_mask = 0x3f;
+			mapper4_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+		case 1: case 2: case 3: case 4: case 5:
+			vrom_bank[cmd] = data;
+			if (nes.chr_chunks > 0)
+				mapper4_set_chr(space->machine, CHRROM, mmc_chr_base, mmc_chr_mask);
+			else	// according to Disch's docs, mmc_cmd1&0x80 swaps 4k CHRRAM banks
+			{
+				map245_helper = /*(mmc_cmd1 & 0x80) ? 1 : */0;
+				chr4_0(space->machine, 0 ^ map245_helper, CHRRAM);
+				chr4_4(space->machine, 1 ^ map245_helper, CHRRAM);
+			}
+			break;
+		case 6:
+		case 7:
+			prg_bank[cmd - 6] = data;
+			mapper4_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+			break;
+		}
+		break;
+
+	case 0x2001:
+		break;
+
+	default:
+		mapper4_w(space, offset, data);
+		break;
+	}
+}
 
 /*************************************************************
 
@@ -8917,15 +10785,113 @@ static WRITE8_HANDLER( mapper246_m_w )
 
     Mapper 249
 
-    Known Boards: Waixing Security 0 & 1
+    Known Boards: Waixing with Security Chip
     Games: Duo Bao Xiao Ying Hao - Guang Ming yu An Hei Chuan Shuo,
            Myth Struggle, San Shi Liu Ji, Shui Hu Zhuan
 
     MMC3 clone
 
-    In MESS: Unsupported.
+    In MESS: Partially Supported.
 
 *************************************************************/
+
+static void mapper249_set_prg( running_machine *machine, int prg_base, int prg_mask )
+{
+	int i;
+
+	if (map249_reg)
+	{
+		for (i = 0; i < 4; i ++)	// should this apply only to bank[0],bank[1]?
+		{
+			prg_bank[i] = ((prg_bank[i] & 0x01)) | ((prg_bank[i] >> 3) & 0x02) |
+					((prg_bank[i] >> 1) & 0x04) | ((prg_bank[i] << 2) & 0x18);
+		}
+	}
+
+	mapper4_set_prg(machine, prg_base, prg_mask);
+}
+
+static void mapper249_set_chr( running_machine *machine, int chr_base, int chr_mask )
+{
+	UINT8 chr_page = (mmc_cmd1 & 0x80) >> 5;
+	int i;
+
+	if (map249_reg)
+	{
+		for (i = 0; i < 6; i ++)
+		{
+			vrom_bank[i] = ((vrom_bank[i] & 0x03)) | ((vrom_bank[i] >> 1) & 0x04) |
+						((vrom_bank[i] >> 4) & 0x08) | ((vrom_bank[i] >> 2) & 0x10) |
+						((vrom_bank[i] << 3) & 0x20) | ((vrom_bank[i] << 2) & 0xc0);
+		}
+	}
+
+	chr1_x(machine, chr_page ^ 0, chr_base | ((vrom_bank[0] & ~0x01) & chr_mask), mmc_chr_source);
+	chr1_x(machine, chr_page ^ 1, chr_base | ((vrom_bank[0] |  0x01) & chr_mask), mmc_chr_source);
+	chr1_x(machine, chr_page ^ 2, chr_base | ((vrom_bank[1] & ~0x01) & chr_mask), mmc_chr_source);
+	chr1_x(machine, chr_page ^ 3, chr_base | ((vrom_bank[1] |  0x01) & chr_mask), mmc_chr_source);
+	chr1_x(machine, chr_page ^ 4, chr_base | (vrom_bank[2] & chr_mask), mmc_chr_source);
+	chr1_x(machine, chr_page ^ 5, chr_base | (vrom_bank[3] & chr_mask), mmc_chr_source);
+	chr1_x(machine, chr_page ^ 6, chr_base | (vrom_bank[4] & chr_mask), mmc_chr_source);
+	chr1_x(machine, chr_page ^ 7, chr_base | (vrom_bank[5] & chr_mask), mmc_chr_source);
+}
+
+static WRITE8_HANDLER( mapper249_l_w )
+{
+	LOG_MMC(("mapper249_l_w, offset: %04x, data: %02x\n", offset, data));
+
+	offset += 0x100;
+
+	if (offset == 0x1000)
+	{
+		map249_reg = data & 0x02;
+		mapper249_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+		mapper249_set_chr(space->machine, mmc_prg_base, mmc_prg_mask);
+	}
+}
+
+static WRITE8_HANDLER( mapper249_w )
+{
+	UINT8 MMC3_helper, cmd;
+	LOG_MMC(("mapper249_w, offset: %04x, data: %02x\n", offset, data));
+
+	switch (offset & 0x6001)
+	{
+	case 0x0000:
+		MMC3_helper = mmc_cmd1 ^ data;
+		mmc_cmd1 = data;
+
+		/* Has PRG Mode changed? */
+		if (MMC3_helper & 0x40)
+			mapper249_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+
+		/* Has CHR Mode changed? */
+		if (MMC3_helper & 0x80)
+			mapper249_set_chr(space->machine, mmc_chr_base, mmc_chr_mask);
+		break;
+
+	case 0x0001:
+		cmd = mmc_cmd1 & 0x07;
+		switch (cmd)
+		{
+		case 0: case 1:	// these do not need to be separated: we take care of them in set_chr!
+		case 2: case 3: case 4: case 5:
+			vrom_bank[cmd] = data;
+			mapper249_set_chr(space->machine, mmc_chr_base, mmc_chr_mask);
+			break;
+		case 6:
+		case 7:
+			prg_bank[cmd - 6] = data;
+			mapper249_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+			break;
+		}
+		break;
+
+	default:
+		mapper4_w(space, offset, data);
+		break;
+	}
+}
 
 /*************************************************************
 
@@ -8935,8 +10901,7 @@ static WRITE8_HANDLER( mapper246_m_w )
     Games: Time Diver Avenger
 
     This acts basically like a MMC3 with different use of write
-    address. According to NEStopia, there is also a slightly
-    different way to set NT mirroring (see below).
+    address.
 
     In MESS: Supported.
 
@@ -8946,15 +10911,7 @@ static WRITE8_HANDLER( mapper250_w )
 {
 	LOG_MMC(("mapper250_w, offset: %04x, data: %02x\n", offset, data));
 
-	switch (offset & 0x6001)
-	{
-	case 0x2000:
-		set_nt_mirroring(data & 0x01 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);	// diff with MMC3: not check for data & 0x40
-		break;
-	default:
-		mapper4_w(space, (offset & 0x6000) | ((offset & 0x400) >> 10), offset & 0xff);
-		break;
-	}
+	mapper4_w(space, (offset & 0x6000) | ((offset & 0x400) >> 10), offset & 0xff);
 }
 
 /*************************************************************
@@ -8975,9 +10932,59 @@ static WRITE8_HANDLER( mapper250_w )
     Known Boards: Unknown Bootleg Board by Waixing
     Games: San Guo Zhi
 
+    This board uses Konami IRQ
+
     In MESS: Unsupported.
 
 *************************************************************/
+
+static WRITE8_HANDLER( mapper252_w )
+{
+	UINT8 mmc_helper, bank;
+	LOG_MMC(("mapper252_w, offset: %04x, data: %02x\n", offset, data));
+
+	switch (offset & 0x7000)
+	{
+	case 0x0000:
+		prg8_89(space->machine, data);
+		break;
+	case 0x2000:
+		prg8_ab(space->machine, data);
+		break;
+	case 0x3000:
+	case 0x4000:
+	case 0x5000:
+	case 0x6000:
+		bank = ((offset & 0x7000) - 0x3000) / 0x0800 + ((offset & 0x0008) >> 3);
+		mmc_helper = offset & 0x04;
+		if (mmc_helper)
+			vrom_bank[bank] = (vrom_bank[bank] & 0x0f) | ((data & 0x0f) << 4);
+		else
+			vrom_bank[bank] = (vrom_bank[bank] & 0xf0) | (data & 0x0f);
+		chr1_x(space->machine, bank, vrom_bank[bank], CHRROM);
+		break;
+	case 0xf000:
+		switch (offset & 0x0c)
+		{
+		case 0x00:
+			IRQ_count_latch = (IRQ_count_latch & 0xf0) | (data & 0x0f);
+			break;
+		case 0x04:
+			IRQ_count_latch = (IRQ_count_latch & 0x0f) | ((data & 0x0f) << 4);
+			break;
+		case 0x08:
+			IRQ_enable = data & 0x02;
+			IRQ_enable_latch = data & 0x01;
+			if (data & 0x02)
+				IRQ_count = IRQ_count_latch;
+			break;
+		case 0x0c:
+			IRQ_enable = IRQ_enable_latch;
+			break;
+		}
+		break;
+	}
+}
 
 /*************************************************************
 
@@ -9011,7 +11018,7 @@ static WRITE8_HANDLER( mapper250_w )
     Known Boards: Unknown Bootleg Board
     Games: 110 in 1
 
-    In MESS: Unsupported.
+    In MESS: Preliminary support.
 
 *************************************************************/
 
@@ -9040,163 +11047,251 @@ static WRITE8_HANDLER( mapper255_w )
 
 static const mmc mmc_list[] =
 {
-/*  INES   DESC                     LOW_W, LOW_R, MED_W, HIGH_W, PPU_latch, scanline CB, hblank CB */
-	{  0, "No Mapper",            NULL, NULL, NULL, NULL, NULL, NULL, NULL },
-	{  1, "MMC1",                 NULL, NULL, NULL, mapper1_w, NULL, NULL, NULL },
-	{  2, "74161/32 ROM sw",      NULL, NULL, NULL, mapper2_w, NULL, NULL, NULL },
-	{  3, "74161/32 VROM sw",     NULL, NULL, NULL, mapper3_w, NULL, NULL, NULL },
-	{  4, "MMC3",                 NULL, NULL, NULL, mapper4_w, NULL, NULL, mapper4_irq },
-	{  5, "MMC5",                 mapper5_l_w, mapper5_l_r, NULL, mapper5_w, NULL, NULL, mapper5_irq },
-	{  7, "ROM Switch",           NULL, NULL, NULL, mapper7_w, NULL, NULL, NULL },
-	{  8, "FFE F3xxxx",           NULL, NULL, NULL, mapper8_w, NULL, NULL, NULL },
-	{  9, "MMC2",                 NULL, NULL, NULL, mapper9_w, mapper9_latch, NULL, NULL},
-	{ 10, "MMC4",                 NULL, NULL, NULL, mapper10_w, mapper9_latch, NULL, NULL },
-	{ 11, "Color Dreams Mapper",  NULL, NULL, NULL, mapper11_w, NULL, NULL, NULL },
-	{ 12, "Rex Soft DBZ5",        mapper12_l_w, mapper12_l_r, NULL, mapper12_w, NULL, NULL, mapper4_irq },
-	{ 13, "CP-ROM",               NULL, NULL,	NULL, mapper13_w, NULL, NULL, NULL },
-	{ 15, "100-in-1",             NULL, NULL, NULL, mapper15_w, NULL, NULL, NULL },
-	{ 16, "Bandai",               NULL, NULL, mapper16_m_w, mapper16_w, NULL,NULL,  bandai_irq },
-	{ 17, "FFE F8xxx",            mapper17_l_w, NULL, NULL, NULL, NULL, NULL, mapper4_irq },
-	{ 18, "Jaleco",               NULL, NULL, NULL, mapper18_w, NULL, NULL, jaleco_irq },
-	{ 19, "Namco 106",            mapper19_l_w, mapper19_l_r, NULL, mapper19_w, NULL, NULL, namcot_irq },
-	{ 20, "Famicom Disk System",  NULL, NULL, NULL, NULL, NULL, NULL, fds_irq },
-	{ 21, "Konami VRC 4",         NULL, NULL, NULL, konami_vrc4_w, NULL, NULL, konami_irq },
-	{ 22, "Konami VRC 2a",        NULL, NULL, NULL, konami_vrc2a_w, NULL, NULL, NULL },
-	{ 23, "Konami VRC 2b",        NULL, NULL, NULL, konami_vrc2b_w, NULL, NULL, konami_irq },
-	{ 24, "Konami VRC 6a",        NULL, NULL, NULL, konami_vrc6a_w, NULL, NULL, konami_irq },
-	{ 25, "Konami VRC 4",         NULL, NULL, NULL, konami_vrc4_w, NULL, NULL, konami_irq },
-	{ 26, "Konami VRC 6b",        NULL, NULL, NULL, konami_vrc6b_w, NULL, NULL, konami_irq },
-	{ 32, "Irem G-101",           NULL, NULL, NULL, mapper32_w, NULL, NULL, NULL },
-	{ 33, "Taito TC0190",         NULL, NULL, NULL, mapper33_w, NULL, NULL, NULL },
-	{ 34, "Nina-1",               NULL, NULL, mapper34_m_w, mapper34_w, NULL, NULL, NULL },
-	{ 36, "TXC Policeman",        NULL, NULL, NULL, mapper36_w, NULL, NULL, NULL },
-	{ 37, "ZZ Board",             NULL, NULL, mapper37_m_w, mapper4_w, NULL, NULL, mapper4_irq },
-	{ 38, "Crime Buster",         NULL, NULL, mapper38_m_w, NULL, NULL, NULL, NULL },
-	{ 39, "Subor Study n Game",   NULL, NULL, NULL, mapper39_w, NULL, NULL, NULL },
-	{ 40, "SMB2j (bootleg)",      NULL, NULL, NULL, mapper40_w, NULL, NULL, mapper40_irq },
-	{ 41, "Caltron 6-in-1",       NULL, NULL, mapper41_m_w, mapper41_w, NULL, NULL, NULL },
-	{ 42, "Mario Baby",           NULL, NULL, NULL, mapper42_w, NULL, NULL, NULL },
-	{ 43, "150-in-1",             NULL, NULL, NULL, mapper43_w, NULL, NULL, NULL },
-	{ 44, "7-in-1 MMC3",          NULL, NULL, NULL, mapper44_w, NULL, NULL, mapper4_irq },
-	{ 45, "X-in-1 MMC3",          NULL, NULL, mapper45_m_w, mapper4_w, NULL, NULL, mapper4_irq },
-	{ 46, "15-in-1 Color Dreams", NULL, NULL, mapper46_m_w, mapper46_w, NULL, NULL, NULL },
-	{ 47, "2-in-1 MMC3",          NULL, NULL, mapper47_m_w, mapper4_w, NULL, NULL, mapper4_irq },
-	{ 49, "4-in-1 MMC3",          NULL, NULL, mapper49_m_w, mapper4_w, NULL, NULL, mapper4_irq },
-	{ 51, "11-in-1",              NULL, NULL, mapper51_m_w, mapper51_w, NULL, NULL, NULL },
-	{ 52, "Mario 7-in-1",         NULL, NULL, mapper52_m_w, mapper4_w, NULL, NULL, mapper4_irq },
-	{ 57, "6-in-1",               NULL, NULL, NULL, mapper57_w, NULL, NULL, NULL },
-	{ 58, "X-in-1",               NULL, NULL, NULL, mapper58_w, NULL, NULL, NULL },
-	{ 61, "20-in-1",              NULL, NULL, NULL, mapper61_w, NULL, NULL, NULL },
-	{ 62, "X-in-1",               NULL, NULL, NULL, mapper62_w, NULL, NULL, NULL },
-	{ 64, "Tengen",               NULL, NULL, mapper64_m_w, mapper64_w, NULL, NULL, mapper4_irq },
-	{ 65, "Irem H3001",           NULL, NULL, NULL, mapper65_w, NULL, NULL, irem_irq },
-	{ 66, "74161/32 Jaleco",      NULL, NULL, NULL, mapper66_w, NULL, NULL, NULL },
-	{ 67, "SunSoft 3",            NULL, NULL, NULL, mapper67_w, NULL, NULL, mapper4_irq },
-	{ 68, "SunSoft 4",            NULL, NULL, NULL, mapper68_w, NULL, NULL, NULL },
-	{ 69, "SunSoft 5",            NULL, NULL, NULL, mapper69_w, NULL, NULL, sunsoft_irq },
-	{ 70, "74161/32 Bandai",      NULL, NULL, NULL, mapper70_w, NULL, NULL, NULL },
-	{ 71, "Camerica",             NULL, NULL, mapper71_m_w, mapper71_w, NULL, NULL, NULL },
-	{ 72, "74161/32 Jaleco",      NULL, NULL, NULL, mapper72_w, NULL, NULL, NULL },
-	{ 73, "Konami VRC 3",         NULL, NULL, NULL, mapper73_w, NULL, NULL, konami_irq },
-	{ 74, "Waixing Type A",       NULL, NULL, NULL, mapper74_w, NULL, NULL, mapper4_irq },
-	{ 75, "Konami VRC 1",         NULL, NULL, NULL, mapper75_w, NULL, NULL, NULL },
-	{ 76, "Namco 109",            NULL, NULL, NULL, mapper76_w, NULL, NULL, NULL },
-	{ 77, "74161/32 ?",           NULL, NULL, NULL, mapper77_w, NULL, NULL, NULL },
-	{ 78, "74161/32 Irem",        NULL, NULL, NULL, mapper78_w, NULL, NULL, NULL },
-	{ 79, "Nina-3 (AVE)",         mapper79_l_w, NULL, NULL, NULL, NULL, NULL, NULL },
-	{ 80, "Taito X1-005 Ver. A",  NULL, NULL, mapper80_m_w, NULL, NULL, NULL, NULL },
-	{ 82, "Taito C075",           NULL, NULL, mapper82_m_w, NULL, NULL, NULL, NULL },
-	{ 83, "Cony",                 mapper83_l_w, mapper83_l_r, NULL, mapper83_w, NULL, NULL, NULL },
-	{ 84, "Pasofami",             NULL, NULL, NULL, NULL, NULL, NULL, NULL },
-	{ 85, "Konami VRC 7",         NULL, NULL, NULL, konami_vrc7_w, NULL, NULL, konami_irq },
-	{ 86, "Jaleco Early Mapper 2",NULL, NULL, mapper86_m_w, NULL, NULL, NULL, NULL },
-	{ 87, "74161/32 VROM sw-a",   NULL, NULL, mapper87_m_w, NULL, NULL, NULL, NULL },
-	{ 88, "Namco 118",            NULL, NULL, NULL, mapper88_w, NULL, NULL, NULL },
-	{ 89, "Sunsoft Early",        NULL, NULL, NULL, mapper89_w, NULL, NULL, NULL },
-// 90 - pirate mapper
-	{ 91, "HK-SF3 (bootleg)",     NULL, NULL, mapper91_m_w, NULL, NULL, NULL, NULL },
-	{ 92, "Jaleco Early Mapper 1",NULL, NULL, NULL, mapper92_w, NULL, NULL, NULL },
-	{ 93, "Sunsoft LS161",        NULL, NULL, NULL, mapper93_w, NULL, NULL, NULL },
-	{ 94, "Capcom LS161",         NULL, NULL, NULL, mapper94_w, NULL, NULL, NULL },
-	{ 95, "Namco ??",             NULL, NULL, NULL, mapper95_w, NULL, NULL, NULL },
-	{ 96, "74161/32",             NULL, NULL, NULL, mapper96_w, NULL, NULL, NULL },
-	{ 97, "Irem - PRG HI",        NULL, NULL, NULL, mapper97_w, NULL, NULL, NULL },
-// 99 - vs. system
-// 100 - images hacked to work with nesticle
-	{ 101, "?? LS161",            NULL, NULL, mapper101_m_w, mapper101_w, NULL, NULL, NULL },
-	{ 104, "Golden Five",         NULL, NULL, NULL, mapper104_w, NULL, NULL, NULL },
-	{ 107, "Magic Dragon",        NULL, NULL, NULL, mapper107_w, NULL, NULL, NULL },
-	{ 112, "Asper",               NULL, NULL, NULL, mapper112_w, NULL, NULL, NULL },
-	{ 113, "Sachen/Hacker/Nina",  mapper113_l_w, NULL, NULL, NULL, NULL, NULL, NULL },
-	{ 114, "The Lion King",       NULL, NULL, mapper114_m_w, mapper114_w, NULL, NULL, mapper4_irq },
-	{ 115, "Bao Qing Tian",       NULL, NULL, mapper115_m_w, mapper115_w, NULL, NULL, mapper115_irq },
-	{ 118, "MMC3?",               NULL, NULL, NULL, mapper118_w, NULL, NULL, mapper4_irq },
-	{ 119, "MMC3 - Pinbot",       NULL, NULL, NULL, mapper119_w, NULL, NULL, mapper4_irq },
-	{ 132, "TXC T22211A",         mapper132_l_w, mapper132_l_r, NULL, mapper132_w, NULL, NULL, NULL },
-	{ 133, "Sachen SA72008",      mapper133_l_w, NULL, mapper133_m_w, NULL, NULL, NULL, NULL },
-	{ 136, "Sachen TCU01",        mapper136_l_w, mapper136_l_r, NULL, NULL, NULL, NULL, NULL },
-	{ 137, "Sachen 8259D",        mapper137_l_w, NULL, mapper137_m_w, NULL, NULL, NULL, NULL },
-	{ 138, "Sachen 8259B",        mapper138_l_w, NULL, mapper138_m_w, NULL, NULL, NULL, NULL },
-	{ 139, "Sachen 8259C",        mapper139_l_w, NULL, mapper139_m_w, NULL, NULL, NULL, NULL },
-	{ 140, "Jaleco",              NULL, NULL, mapper_140_m_w, NULL, NULL, NULL, NULL },
-	{ 141, "Sachen 8259A",        mapper141_l_w, NULL, mapper141_m_w, NULL, NULL, NULL, NULL },
-	{ 143, "Sachen TCA01",        NULL, mapper143_l_r, NULL, NULL, NULL, NULL, NULL },
-	{ 144, "AGCI 50282",          NULL, NULL, NULL, mapper144_w, NULL, NULL, NULL }, //Death Race only
-	{ 145, "Sachen SA72007",      mapper145_l_w, NULL, NULL, NULL, NULL, NULL, NULL },
-	{ 146, "Sachen SA0161M",      mapper79_l_w, NULL, NULL, NULL, NULL, NULL, NULL }, // basically same as Mapper 79 (Nina006)
-	{ 147, "Sachen TCU02",        mapper147_l_w, NULL, mapper147_m_w, mapper147_w, NULL, NULL, NULL },
-	{ 148, "Sachen SA0037",       NULL, NULL, NULL, mapper148_w, NULL, NULL, NULL },
-	{ 149, "Sachen SA0036",       NULL, NULL, NULL, mapper149_w, NULL, NULL, NULL },
-	{ 150, "Sachen 74LS374B",     mapper150_l_w, mapper150_l_r, mapper150_m_w, NULL, NULL, NULL, NULL },
-	{ 152, "Taito Discrete",      NULL, NULL, NULL, mapper152_w, NULL, NULL, NULL },
-	{ 154, "Devil Man",           NULL, NULL, NULL, mapper154_w, NULL, NULL, NULL },
-	{ 155, "Devil Man",           NULL, NULL, NULL, mapper1_w, NULL, NULL, NULL }, // diff compared to MMC1 concern WRAM (unsupported for MMC1 as well, atm)
-	{ 156, "Open Corp. DAOU36",   NULL, NULL, NULL, mapper156_w, NULL, NULL, NULL },
-	{ 164, "Final Fantasy V",     mapper164_l_w, NULL, NULL, mapper164_w, NULL, NULL, NULL },
-	{ 166, "Subor Board Type 1",  NULL, NULL, NULL, mapper166_w, NULL, NULL, NULL },
-	{ 167, "Subor Board Type 2",  NULL, NULL, NULL, mapper167_w, NULL, NULL, NULL },
-	{ 171, "Kaiser KS7058",       NULL, NULL, NULL, mapper171_w, NULL, NULL, NULL },
-	{ 172, "TXC T22211B",         mapper132_l_w, mapper132_l_r, NULL, mapper172_w, NULL, NULL, NULL },
-	{ 173, "TXC T22211C",         mapper132_l_w, mapper173_l_r, NULL, mapper132_w, NULL, NULL, NULL },
-	{ 176, "Zhi Li Xiao Zhuan Yuan",mapper176_l_w, NULL, NULL, NULL, NULL, NULL, NULL },
-	{ 177, "Henggedianzi Board",  NULL, NULL, NULL, mapper177_w, NULL, NULL, NULL },
-	{ 178, "San Guo Zhong Lie Zhuan",mapper178_l_w, NULL, NULL, NULL, NULL, NULL, NULL },
-	{ 179, "Xing He Zhan Shi",    mapper179_l_w, NULL, NULL, mapper179_w, NULL, NULL, NULL },
-	{ 180, "Nihon Bussan - PRG HI",NULL, NULL, NULL, mapper180_w, NULL, NULL, NULL },
-	{ 182, "Super games",         NULL, NULL, NULL, mapper182_w, NULL, NULL, mapper182_irq },
-	{ 184, "Sunsoft VROM/4K",     NULL, NULL, mapper184_m_w, NULL, NULL, NULL, NULL },
-	{ 188, "UNROM reversed",      NULL, NULL, NULL, mapper188_w, NULL, NULL, NULL },
-	{ 193, "Fighting Hero",       NULL, NULL, mapper193_m_w, NULL, NULL, NULL, NULL },
-	{ 196, "Super Mario Bros. 11",NULL, NULL, NULL, mapper196_w, NULL, NULL, mapper4_irq },
-	{ 200, "X-in-1",              NULL, NULL, NULL, mapper200_w, NULL, NULL, NULL },
-	{ 201, "X-in-1",              NULL, NULL, NULL, mapper201_w, NULL, NULL, NULL },
-	{ 202, "150-in-1",            NULL, NULL, NULL, mapper202_w, NULL, NULL, NULL },
-	{ 203, "35-in-1",             NULL, NULL, NULL, mapper203_w, NULL, NULL, NULL },
-	{ 204, "64-in-1",             NULL, NULL, NULL, mapper204_w, NULL, NULL, NULL },
-	{ 206, "MIMIC-1",             NULL, NULL, NULL, mapper206_w, NULL, NULL, mapper4_irq },
-	{ 207, "Taito X1-005 Ver. B", NULL, NULL, mapper207_m_w, NULL, NULL, NULL, NULL },
-	{ 212, "Super HIK 300-in-1",  NULL, NULL, NULL, mapper212_w, NULL, NULL, NULL },
-	{ 213, "9999999-in-1",        NULL, NULL, NULL, mapper213_w, NULL, NULL, NULL },
-	{ 214, "Super Gun 20-in-1",   NULL, NULL, NULL, mapper214_w, NULL, NULL, NULL },
-	{ 216, "RCM GS2015",          NULL, NULL, NULL, mapper216_w, NULL, NULL, NULL },
-	{ 221, "X-in-1 (N625092)",    NULL, NULL, NULL, mapper221_w, NULL, NULL, NULL },
-	{ 225, "72-in-1 bootleg",     NULL, NULL, NULL, mapper225_w, NULL, NULL, NULL },
-	{ 226, "76-in-1 bootleg",     NULL, NULL, NULL, mapper226_w, NULL, NULL, NULL },
-	{ 227, "1200-in-1 bootleg",   NULL, NULL, NULL, mapper227_w, NULL, NULL, NULL },
-	{ 228, "Action 52",           NULL, NULL, NULL, mapper228_w, NULL, NULL, NULL },
-	{ 229, "31-in-1",             NULL, NULL, NULL, mapper229_w, NULL, NULL, NULL },
-	{ 230, "22-in-1",             NULL, NULL, NULL, mapper230_w, NULL, NULL, NULL },
-	{ 231, "Nina-7 (AVE)",        NULL, NULL, NULL, mapper231_w, NULL, NULL, NULL },
-	{ 232, "Quattro",             NULL, NULL, mapper232_w, mapper232_w, NULL, NULL, NULL },
-// 234 - maxi-15
-	{ 240, "Jing Ke Xin Zhuan",   mapper240_l_w, NULL, NULL, NULL, NULL, NULL, NULL },
-	{ 241, "Education 18-in-1",   NULL, mapper241_l_r, NULL, mapper241_w, NULL, NULL, NULL },
-	{ 242, "Wai Xing Zhan Shi",   NULL, NULL, NULL, mapper242_w, NULL, NULL, NULL },
-	{ 243, "Sachen 74LS374A",     mapper243_l_w, NULL, NULL, NULL, NULL, NULL, NULL },
-	{ 244, "Decathlon",           NULL, NULL, NULL, mapper244_w, NULL, NULL, NULL },
-	{ 246, "Fong Shen Bang",      NULL, NULL, mapper246_m_w, NULL, NULL, NULL, NULL },
-	{ 250, "Time Diver Avenger",  NULL, NULL, NULL, mapper250_w, NULL, NULL, mapper4_irq },
-	{ 255, "X-in-1",              NULL, NULL, NULL, mapper255_w, NULL, NULL, NULL },
+/*  INES   DESC                          LOW_W, LOW_R, MED_W, HIGH_W, PPU_latch, scanline CB, hblank CB */
+	{  0, "No Mapper",                 NULL, NULL, NULL, NULL, NULL, NULL, NULL },
+	{  1, "MMC1",                      NULL, NULL, NULL, mapper1_w, NULL, NULL, NULL },
+	{  2, "Ux-ROM",                    NULL, NULL, NULL, mapper2_w, NULL, NULL, NULL },
+	{  3, "Cx-ROM",                    NULL, NULL, NULL, mapper3_w, NULL, NULL, NULL },
+	{  4, "MMC3",                      NULL, NULL, NULL, mapper4_w, NULL, NULL, mapper4_irq },
+	{  5, "MMC5",                      mapper5_l_w, mapper5_l_r, NULL, mapper5_w, NULL, NULL, mapper5_irq },
+	{  6, "FFE F4xxxx",                mapper6_l_w, NULL, NULL, mapper6_w, NULL, NULL, ffe_irq },
+	{  7, "Ax-ROM",                    NULL, NULL, NULL, mapper7_w, NULL, NULL, NULL },
+	{  8, "FFE F3xxxx",                NULL, NULL, NULL, mapper8_w, NULL, NULL, NULL },
+	{  9, "MMC2",                      NULL, NULL, NULL, mapper9_w, mapper9_latch, NULL, NULL},
+	{ 10, "MMC4",                      NULL, NULL, NULL, mapper10_w, mapper9_latch, NULL, NULL },
+	{ 11, "Color Dreams",              NULL, NULL, NULL, mapper11_w, NULL, NULL, NULL },
+	{ 12, "Rex Soft DBZ5",             mapper12_l_w, mapper12_l_r, NULL, mapper12_w, NULL, NULL, mapper4_irq },
+	{ 13, "CP-ROM",                    NULL, NULL,	NULL, mapper13_w, NULL, NULL, NULL },
+	{ 14, "Rex Soft SL1632",           NULL, NULL, NULL, mapper14_w, NULL, NULL, mapper4_irq },
+	{ 15, "100-in-1",                  NULL, NULL, NULL, mapper15_w, NULL, NULL, NULL },
+	{ 16, "Bandai LZ93D50 - 24C02",    NULL, NULL, mapper16_m_w, mapper16_w, NULL,NULL,  bandai_irq },
+	{ 17, "FFE F8xxx",                 mapper17_l_w, NULL, NULL, NULL, NULL, NULL, ffe_irq },
+	{ 18, "Jaleco SS88006",            NULL, NULL, NULL, mapper18_w, NULL, NULL, jaleco_irq },
+	{ 19, "Namcot 106 + N106",         mapper19_l_w, mapper19_l_r, NULL, mapper19_w, NULL, NULL, namcot_irq },
+	{ 20, "Famicom Disk System",       NULL, NULL, NULL, NULL, NULL, NULL, fds_irq },
+	{ 21, "Konami VRC 4",              NULL, NULL, NULL, konami_vrc4_w, NULL, NULL, konami_irq },
+	{ 22, "Konami VRC 2a",             NULL, NULL, NULL, konami_vrc2a_w, NULL, NULL, NULL },
+	{ 23, "Konami VRC 2b",             NULL, NULL, NULL, konami_vrc2b_w, NULL, NULL, konami_irq },
+	{ 24, "Konami VRC 6a",             NULL, NULL, NULL, konami_vrc6a_w, NULL, NULL, konami_irq },
+	{ 25, "Konami VRC 4",              NULL, NULL, NULL, konami_vrc4_w, NULL, NULL, konami_irq },
+	{ 26, "Konami VRC 6b",             NULL, NULL, NULL, konami_vrc6b_w, NULL, NULL, konami_irq },
+// 27 World Hero
+// 28, 29, 30, 31 Unused
+	{ 32, "Irem G-101",                NULL, NULL, NULL, mapper32_w, NULL, NULL, NULL },
+	{ 33, "Taito TC0190FMC",           NULL, NULL, NULL, mapper33_w, NULL, NULL, NULL },
+	{ 34, "Nina-001",                  NULL, NULL, mapper34_m_w, mapper34_w, NULL, NULL, NULL },
+// 35 Unused
+	{ 36, "TXC Policeman",             NULL, NULL, NULL, mapper36_w, NULL, NULL, NULL },
+	{ 37, "ZZ Board",                  NULL, NULL, mapper37_m_w, mapper4_w, NULL, NULL, mapper4_irq },
+	{ 38, "Crime Buster",              NULL, NULL, mapper38_m_w, NULL, NULL, NULL, NULL },
+	{ 39, "Subor Study n Game",        NULL, NULL, NULL, mapper39_w, NULL, NULL, NULL },
+	{ 40, "SMB2 JPN (bootleg)",        NULL, NULL, NULL, mapper40_w, NULL, NULL, mapper40_irq },
+	{ 41, "Caltron 6-in-1",            NULL, NULL, mapper41_m_w, mapper41_w, NULL, NULL, NULL },
+	{ 42, "Mario Baby",                NULL, NULL, NULL, mapper42_w, NULL, NULL, NULL },
+	{ 43, "150-in-1",                  NULL, NULL, NULL, mapper43_w, NULL, NULL, NULL },
+	{ 44, "SuperBig 7-in-1",           NULL, NULL, NULL, mapper44_w, NULL, NULL, mapper4_irq },
+	{ 45, "X-in-1 MMC3",               NULL, NULL, mapper45_m_w, mapper4_w, NULL, NULL, mapper4_irq },
+	{ 46, "Rumblestation",             NULL, NULL, mapper46_m_w, mapper46_w, NULL, NULL, NULL },
+	{ 47, "QJ Board",                  NULL, NULL, mapper47_m_w, mapper4_w, NULL, NULL, mapper4_irq },
+	{ 48, "Taito TC0190FMC PAL16R4",   NULL, NULL, NULL, mapper48_w, NULL, NULL, mapper4_irq },
+	{ 49, "Super HIK 4-in-1",          NULL, NULL, mapper49_m_w, mapper4_w, NULL, NULL, mapper4_irq },
+	{ 50, "SMB2 JPN (bootleg 2)",      mapper50_l_w, NULL, NULL, NULL, NULL, NULL, mapper50_irq },
+	{ 51, "Ballgames 11-in-1",         NULL, NULL, mapper51_m_w, mapper51_w, NULL, NULL, NULL },
+	{ 52, "Mario 7-in-1",              NULL, NULL, mapper52_m_w, mapper4_w, NULL, NULL, mapper4_irq },
+// 53 Supervision 16-in-1
+// 54 Novel Diamond X-in-1
+// 55 Genius SMB
+// 56 Kaiser KS202
+	{ 57, "GKA 6-in-1",                NULL, NULL, NULL, mapper57_w, NULL, NULL, NULL },
+	{ 58, "GKB X-in-1",                NULL, NULL, NULL, mapper58_w, NULL, NULL, NULL },
+// 59 Unused
+// 60 4-in-1 Reset based
+	{ 61, "Tetris Family 20-in-1",     NULL, NULL, NULL, mapper61_w, NULL, NULL, NULL },
+	{ 62, "Super 700-in-1",            NULL, NULL, NULL, mapper62_w, NULL, NULL, NULL },
+// 63 CH001 X-in-1
+	{ 64, "Tengen 800032",             NULL, NULL, NULL, mapper64_w, NULL, NULL, mapper64_irq },
+	{ 65, "Irem H3001",                NULL, NULL, NULL, mapper65_w, NULL, NULL, irem_irq },
+	{ 66, "Gx-ROM",                    NULL, NULL, NULL, mapper66_w, NULL, NULL, NULL },
+	{ 67, "SunSoft 3",                 NULL, NULL, NULL, mapper67_w, NULL, NULL, mapper67_irq },
+	{ 68, "SunSoft 4",                 NULL, NULL, NULL, mapper68_w, NULL, NULL, NULL },
+	{ 69, "SunSoft FME",               NULL, NULL, NULL, mapper69_w, NULL, NULL, mapper69_irq },
+	{ 70, "74161/32 Bandai",           NULL, NULL, NULL, mapper70_w, NULL, NULL, NULL },
+	{ 71, "Camerica",                  NULL, NULL, mapper71_m_w, mapper71_w, NULL, NULL, NULL },
+	{ 72, "74161/32 Jaleco",           NULL, NULL, NULL, mapper72_w, NULL, NULL, NULL },
+	{ 73, "Konami VRC 3",              NULL, NULL, NULL, mapper73_w, NULL, NULL, konami_irq },
+	{ 74, "Waixing Type A",            NULL, NULL, NULL, mapper74_w, NULL, NULL, mapper4_irq },
+	{ 75, "Konami VRC 1",              NULL, NULL, NULL, mapper75_w, NULL, NULL, NULL },
+	{ 76, "Namco 3446",                NULL, NULL, NULL, mapper76_w, NULL, NULL, NULL },
+	{ 77, "Irem LROG017",              NULL, NULL, NULL, mapper77_w, NULL, NULL, NULL },
+	{ 78, "Irem Holy Diver",           NULL, NULL, NULL, mapper78_w, NULL, NULL, NULL },
+	{ 79, "Nina-03",                   mapper79_l_w, NULL, NULL, NULL, NULL, NULL, NULL },
+	{ 80, "Taito X1-005 Ver. A",       NULL, NULL, mapper80_m_w, NULL, NULL, NULL, NULL },
+// 81 Unused
+	{ 82, "Taito X1-017",              NULL, NULL, mapper82_m_w, NULL, NULL, NULL, NULL },
+	{ 83, "Cony",                      mapper83_l_w, mapper83_l_r, NULL, mapper83_w, NULL, NULL, NULL },
+	{ 84, "Pasofami hacked images?",   NULL, NULL, NULL, NULL, NULL, NULL, NULL },
+	{ 85, "Konami VRC 7",              NULL, NULL, NULL, konami_vrc7_w, NULL, NULL, konami_irq },
+	{ 86, "Jaleco JF13",               NULL, NULL, mapper86_m_w, NULL, NULL, NULL, NULL },
+	{ 87, "74139/74",                  NULL, NULL, mapper87_m_w, NULL, NULL, NULL, NULL },
+	{ 88, "Namcot 34x3",               NULL, NULL, NULL, mapper88_w, NULL, NULL, NULL },
+	{ 89, "Sunsoft 2b",                NULL, NULL, NULL, mapper89_w, NULL, NULL, NULL },
+// 90 JY Company Type A
+	{ 91, "HK-SF3 (bootleg)",          NULL, NULL, mapper91_m_w, NULL, NULL, NULL, mapper4_irq },
+	{ 92, "Jaleco JF19 / JF21",        NULL, NULL, NULL, mapper92_w, NULL, NULL, NULL },
+	{ 93, "Sunsoft 2A",                NULL, NULL, NULL, mapper93_w, NULL, NULL, NULL },
+	{ 94, "Capcom LS161",              NULL, NULL, NULL, mapper94_w, NULL, NULL, NULL },
+	{ 95, "Namcot 3425",               NULL, NULL, NULL, mapper95_w, NULL, NULL, NULL },
+	{ 96, "Bandai OekaKids",           NULL, NULL, NULL, mapper96_w, NULL, NULL, NULL },
+	{ 97, "Irem Kaiketsu",             NULL, NULL, NULL, mapper97_w, NULL, NULL, NULL },
+// 98 Unused
+// 99 VS. system
+// 100 images hacked to work with nesticle?
+	{ 101, "Jaleco?? LS161",           NULL, NULL, mapper101_m_w, mapper101_w, NULL, NULL, NULL },
+// 102 Unused
+// 103 Bootleg cart 2708
+	{ 104, "Golden Five",              NULL, NULL, NULL, mapper104_w, NULL, NULL, NULL },
+// 105 Nintendo World Championship
+	{ 106, "SMB3 (bootleg)",           NULL, NULL, NULL, mapper106_w, NULL, NULL, mapper106_irq },
+	{ 107, "Magic Dragon",             NULL, NULL, NULL, mapper107_w, NULL, NULL, NULL },
+// 108 Whirlwind
+// 109, 110 Unused
+// 111 Ninja Ryuukenden Chinese?
+	{ 112, "Asder",                    NULL, NULL, NULL, mapper112_w, NULL, NULL, NULL },
+	{ 113, "Sachen/Hacker/Nina",       mapper113_l_w, NULL, NULL, NULL, NULL, NULL, NULL },
+	{ 114, "The Lion King",            NULL, NULL, mapper114_m_w, mapper114_w, NULL, NULL, mapper4_irq },
+	{ 115, "Kasing",                   NULL, NULL, mapper115_m_w, mapper115_w, NULL, NULL, mapper4_irq },
+// 116 Someri Team
+	{ 117, "Future Media",             NULL, NULL, NULL, mapper117_w, NULL, NULL, mapper117_irq },
+	{ 118, "TKS-ROM / TLS-ROM",        NULL, NULL, NULL, mapper118_w, NULL, NULL, mapper4_irq },
+	{ 119, "TQ-ROM",                   NULL, NULL, NULL, mapper119_w, NULL, NULL, mapper4_irq },
+// 120 FDS bootleg
+	{ 121, "K - Panda Prince",         mapper121_l_w, mapper121_l_r, NULL, mapper121_w, NULL, NULL, mapper4_irq },
+// 122 Unused
+// 123 K H2288
+// 124, 125 Unused
+// 126 Powerjoy 84-in-1
+// 127, 128, 129, 130, 131 Unused
+	{ 132, "TXC T22211A",              mapper132_l_w, mapper132_l_r, NULL, mapper132_w, NULL, NULL, NULL },
+	{ 133, "Sachen SA72008",           mapper133_l_w, NULL, mapper133_m_w, NULL, NULL, NULL, NULL },
+	{ 134, "Family 4646B",             NULL, NULL, mapper134_m_w, mapper4_w, NULL, NULL, mapper4_irq },
+// 135 Unused
+	{ 136, "Sachen TCU01",             mapper136_l_w, mapper136_l_r, NULL, NULL, NULL, NULL, NULL },
+	{ 137, "Sachen 8259D",             mapper137_l_w, NULL, mapper137_m_w, NULL, NULL, NULL, NULL },
+	{ 138, "Sachen 8259B",             mapper138_l_w, NULL, mapper138_m_w, NULL, NULL, NULL, NULL },
+	{ 139, "Sachen 8259C",             mapper139_l_w, NULL, mapper139_m_w, NULL, NULL, NULL, NULL },
+	{ 140, "Jaleco JF11",              NULL, NULL, mapper_140_m_w, NULL, NULL, NULL, NULL },
+	{ 141, "Sachen 8259A",             mapper141_l_w, NULL, mapper141_m_w, NULL, NULL, NULL, NULL },
+// 142 Kaiser KS7032
+	{ 143, "Sachen TCA01",             NULL, mapper143_l_r, NULL, NULL, NULL, NULL, NULL },
+	{ 144, "AGCI 50282",               NULL, NULL, NULL, mapper144_w, NULL, NULL, NULL }, //Death Race only
+	{ 145, "Sachen SA72007",           mapper145_l_w, NULL, NULL, NULL, NULL, NULL, NULL },
+	{ 146, "Sachen SA0161M",           mapper79_l_w, NULL, NULL, NULL, NULL, NULL, NULL }, // basically same as Mapper 79 (Nina006)
+	{ 147, "Sachen TCU02",             mapper147_l_w, NULL, mapper147_m_w, mapper147_w, NULL, NULL, NULL },
+	{ 148, "Sachen SA0037",            NULL, NULL, NULL, mapper148_w, NULL, NULL, NULL },
+	{ 149, "Sachen SA0036",            NULL, NULL, NULL, mapper149_w, NULL, NULL, NULL },
+	{ 150, "Sachen 74LS374B",          mapper150_l_w, mapper150_l_r, mapper150_m_w, NULL, NULL, NULL, NULL },
+// 151 Konami VS. system
+	{ 152, "Taito 74161/161",          NULL, NULL, NULL, mapper152_w, NULL, NULL, NULL },
+	{ 153, "Bandai LZ93D50",           NULL, NULL, mapper153_m_w, mapper153_w, NULL,NULL,  bandai_irq },
+	{ 154, "Namcot 34xx",              NULL, NULL, NULL, mapper154_w, NULL, NULL, NULL },
+	{ 155, "SK-ROM",                   NULL, NULL, NULL, mapper1_w, NULL, NULL, NULL }, // diff compared to MMC1 concern WRAM (unsupported for MMC1 as well, atm)
+	{ 156, "Open Corp. DAOU36",        NULL, NULL, NULL, mapper156_w, NULL, NULL, NULL },
+	{ 157, "Bandai Datach Board",      NULL, NULL, mapper16_m_w, mapper16_w, NULL,NULL,  bandai_irq },	// no Datach Reader -> we fall back to mapper 16
+	{ 158, "Tengen T800037",           NULL, NULL, NULL, mapper158_w, NULL, NULL, mapper64_irq },
+	{ 159, "Bandai LZ93D50 - 24C01",   NULL, NULL, mapper16_m_w, mapper16_w, NULL,NULL,  bandai_irq },
+// 160, 161, 162 Unused
+// 163 Nanjing
+	{ 164, "Final Fantasy V",          mapper164_l_w, NULL, NULL, mapper164_w, NULL, NULL, NULL },
+// 165 Waixing SH2
+	{ 166, "Subor Board Type 1",       NULL, NULL, NULL, mapper166_w, NULL, NULL, NULL },
+	{ 167, "Subor Board Type 2",       NULL, NULL, NULL, mapper167_w, NULL, NULL, NULL },
+// 168 Racermate Challenger II
+// 169 Unused
+// 170 Fujiya
+	{ 171, "Kaiser KS7058",            NULL, NULL, NULL, mapper171_w, NULL, NULL, NULL },
+	{ 172, "TXC T22211B",              mapper132_l_w, mapper132_l_r, NULL, mapper172_w, NULL, NULL, NULL },
+	{ 173, "TXC T22211C",              mapper132_l_w, mapper173_l_r, NULL, mapper132_w, NULL, NULL, NULL },
+// 174 Unused
+// 175 Kaiser KS7022
+	{ 176, "Zhi Li Xiao Zhuan Yuan",   mapper176_l_w, NULL, NULL, NULL, NULL, NULL, NULL },
+	{ 177, "Henggedianzi Board",       NULL, NULL, NULL, mapper177_w, NULL, NULL, NULL },
+	{ 178, "San Guo Zhong Lie Zhuan",  mapper178_l_w, NULL, NULL, NULL, NULL, NULL, NULL },
+	{ 179, "Xing He Zhan Shi",         mapper179_l_w, NULL, NULL, mapper179_w, NULL, NULL, NULL },
+	{ 180, "Nihon Bussan UN-ROM",      NULL, NULL, NULL, mapper180_w, NULL, NULL, NULL },
+// 181 Unused
+	{ 182, "Hosenkan",                 NULL, NULL, NULL, mapper182_w, NULL, NULL, mapper4_irq },
+// 183 FDS bootleg
+	{ 184, "Sunsoft 1",                NULL, NULL, mapper184_m_w, NULL, NULL, NULL, NULL },
+	{ 185, "CN-ROM",                   NULL, NULL, NULL, mapper185_w, NULL, NULL, NULL },
+// 186 Fukutake
+	{ 187, "King of Fighters 96",      mapper187_l_w, mapper187_l_r, NULL, mapper187_w, NULL, NULL, mapper4_irq },
+	{ 188, "Bandai Karaoke",           NULL, NULL, NULL, mapper188_w, NULL, NULL, NULL },
+	{ 189, "TXC TW Board",             mapper189_l_w, NULL, mapper189_m_w, mapper189_w, NULL, NULL, mapper4_irq },
+// 190 Unused
+	{ 191, "Waixing Type B",           NULL, NULL, NULL, mapper191_w, NULL, NULL, mapper4_irq },
+	{ 192, "Waixing Type C",           NULL, NULL, NULL, mapper192_w, NULL, NULL, mapper4_irq },
+	{ 193, "Fighting Hero",            NULL, NULL, mapper193_m_w, NULL, NULL, NULL, NULL },
+	{ 194, "Waixing Type D",           NULL, NULL, NULL, mapper194_w, NULL, NULL, mapper4_irq },
+	{ 195, "Waixing Type E",           NULL, NULL, NULL, mapper195_w, NULL, NULL, mapper4_irq },
+	{ 196, "Super Mario Bros. 11",     NULL, NULL, NULL, mapper196_w, NULL, NULL, mapper4_irq },
+	{ 197, "Super Fighter 3",          NULL, NULL, NULL, mapper197_w, NULL, NULL, mapper4_irq },
+	{ 198, "Waixing Type F",           NULL, NULL, NULL, mapper198_w, NULL, NULL, mapper4_irq },
+	{ 199, "Waixing Type G",           NULL, NULL, NULL, mapper199_w, NULL, NULL, mapper4_irq },
+	{ 200, "36-in-1",                  NULL, NULL, NULL, mapper200_w, NULL, NULL, NULL },
+	{ 201, "21-in-1",                  NULL, NULL, NULL, mapper201_w, NULL, NULL, NULL },
+	{ 202, "150-in-1",                 NULL, NULL, NULL, mapper202_w, NULL, NULL, NULL },
+	{ 203, "35-in-1",                  NULL, NULL, NULL, mapper203_w, NULL, NULL, NULL },
+	{ 204, "64-in-1",                  NULL, NULL, NULL, mapper204_w, NULL, NULL, NULL },
+	{ 205, "15-in-1",                  NULL, NULL, mapper205_m_w, mapper4_w, NULL, NULL, mapper4_irq },
+	{ 206, "MIMIC-1",                  NULL, NULL, NULL, mapper206_w, NULL, NULL, mapper4_irq },
+	{ 207, "Taito X1-005 Ver. B",      NULL, NULL, mapper207_m_w, NULL, NULL, NULL, NULL },
+	{ 208, "Gouder G3717",             mapper208_l_w, mapper208_l_r, NULL, mapper208_w, NULL, NULL, mapper4_irq },
+// 209 JY Company Type B
+// 210 Some emu uses this as Mapper 19 without some features
+// 211 JY Company Type C
+	{ 212, "Super HIK 300-in-1",       NULL, NULL, NULL, mapper212_w, NULL, NULL, NULL },
+	{ 213, "9999999-in-1",             NULL, NULL, NULL, mapper213_w, NULL, NULL, NULL },
+	{ 214, "Super Gun 20-in-1",        NULL, NULL, NULL, mapper214_w, NULL, NULL, NULL },
+	{ 215, "Super Game Boogerman",     mapper215_l_w, NULL, NULL, mapper215_w, NULL, NULL, mapper4_irq },
+	{ 216, "RCM GS2015",               NULL, NULL, NULL, mapper216_w, NULL, NULL, NULL },
+	{ 217, "Golden Card 6-in-1",       mapper217_l_w, NULL, NULL, mapper217_w, NULL, NULL, mapper4_irq },
+// 218 Unused
+// 219 Bootleg a9746
+// 220 Summer Carnival '92??
+	{ 221, "X-in-1 (N625092)",         NULL, NULL, NULL, mapper221_w, NULL, NULL, NULL },
+	{ 222, "Dragonninja Bootleg",      NULL, NULL, NULL, mapper222_w, NULL, NULL, mapper222_irq },
+// 223 Waixing Type I
+// 224 Waixing Type J
+	{ 225, "72-in-1 bootleg",          NULL, NULL, NULL, mapper225_w, NULL, NULL, NULL },
+	{ 226, "76-in-1 bootleg",          NULL, NULL, NULL, mapper226_w, NULL, NULL, NULL },
+	{ 227, "1200-in-1 bootleg",        NULL, NULL, NULL, mapper227_w, NULL, NULL, NULL },
+	{ 228, "Action 52",                NULL, NULL, NULL, mapper228_w, NULL, NULL, NULL },
+	{ 229, "31-in-1",                  NULL, NULL, NULL, mapper229_w, NULL, NULL, NULL },
+	{ 230, "22-in-1",                  NULL, NULL, NULL, mapper230_w, NULL, NULL, NULL },
+	{ 231, "20-in-1",                  NULL, NULL, NULL, mapper231_w, NULL, NULL, NULL },
+	{ 232, "Quattro",                  NULL, NULL, mapper232_w, mapper232_w, NULL, NULL, NULL },
+// 233 Super 22 Games
+// 234 AVE Maxi 15
+// 235 Golden Game x-in-1
+// 236 Game 800-in-1
+// 237 Unused
+// 238 Bootleg 6035052
+// 239 Unused
+	{ 240, "Jing Ke Xin Zhuan",        mapper240_l_w, NULL, NULL, NULL, NULL, NULL, NULL },
+	{ 241, "Education 18-in-1",        NULL, mapper241_l_r, NULL, mapper241_w, NULL, NULL, NULL },
+	{ 242, "Wai Xing Zhan Shi",        NULL, NULL, NULL, mapper242_w, NULL, NULL, NULL },
+	{ 243, "Sachen 74LS374A",          mapper243_l_w, NULL, NULL, NULL, NULL, NULL, NULL },
+	{ 244, "Decathlon",                NULL, NULL, NULL, mapper244_w, NULL, NULL, NULL },
+	{ 245, "Waixing Type H",           NULL, NULL, NULL, mapper245_w, NULL, NULL, mapper4_irq },
+	{ 246, "Fong Shen Bang",           NULL, NULL, mapper246_m_w, NULL, NULL, NULL, NULL },
+// 247, 248 Unused
+	{ 249, "Waixing Security Board",   mapper249_l_w, NULL, NULL, mapper249_w, NULL, NULL, mapper4_irq },
+	{ 250, "Time Diver Avenger",       NULL, NULL, NULL, mapper250_w, NULL, NULL, mapper4_irq },
+// 251 Shen Hua Jian Yun III??
+	{ 252, "Waixing San Guo Zhi",      NULL, NULL, NULL, mapper252_w, NULL, NULL, konami_irq },
+// 253 Super 8-in-1 99 King Fighter??
+// 254 Pikachu Y2K
+	{ 255, "110-in-1",                 NULL, NULL, NULL, mapper255_w, NULL, NULL, NULL },
 };
 
 
@@ -9255,19 +11350,22 @@ int mapper_reset( running_machine *machine, int mmc_num )
 
 	MMC5_vram_control = 0;
 
+	/* Point the WRAM/battery area to the first RAM bank */
+	if (mmc_num != 20)
+		memory_set_bankptr(space->machine, 5, &nes.wram[0x0000]);
+
 	/* Here, we init a few helpers: 4 prg banks and 16 chr banks - some mappers use them */
 	for (i = 0; i < 4; i++)
-	{
 		prg_bank[i] = 0;
-		vrom_bank[4 * i + 0] = 0;
-		vrom_bank[4 * i + 1] = 0;
-		vrom_bank[4 * i + 2] = 0;
-		vrom_bank[4 * i + 3] = 0;
-	}
+	for (i = 0; i < 16; i++)
+		vrom_bank[i] = 0;
+	for (i = 0; i < 16; i++)
+		extra_bank[i] = 0;
 
-	/* Point the WRAM/battery area to the first RAM bank */
-	if (mmc_num != 20 && mmc_num != 40)
-		memory_set_bankptr(space->machine, 5, &nes.wram[0x0000]);
+	/* Finally, we init IRQ-related quantities. */
+	IRQ_enable = IRQ_enable_latch = 0;
+	IRQ_count = IRQ_count_latch = 0;
+	IRQ_toggle = 0;
 
 	switch (mmc_num)
 	{
@@ -9296,14 +11394,12 @@ int mapper_reset( running_machine *machine, int mmc_num )
 			prg32(space->machine, 0);
 			break;
 		case 3:
-			/* Doesn't bank-switch */
+		case 185:
 			prg32(space->machine, 0);
 			break;
 		case 4:
-		case 74:
 		case 206:
 			/* Only MMC3 and clones seem to use 4-screen! */
-
 			/* hardware uses an 8K RAM chip, but can't address the high 4K! */
 			/* that much is documented for Nintendo Gauntlet boards */
 			if(nes.four_screen_vram)
@@ -9315,20 +11411,22 @@ int mapper_reset( running_machine *machine, int mmc_num )
 				set_nt_page(3, CART_NTRAM, 3, 1);
 			}
 		case 12:
+		case 74:
 		case 118:
 		case 119:
+		case 191:
+		case 192:
+		case 194:
+		case 195:
 		case 196:
+		case 245:
 		case 250:
-			/* Can switch 8k prg banks */
-			IRQ_enable = 0;
-			IRQ_count = IRQ_count_latch = 0;
-			IRQ_reload = 0;
-			prg_bank[0] = 0xfe;
-			prg_bank[1] = 0xff;
-			MMC3_cmd = 0;
+			prg_bank[0] = prg_bank[2] = 0xfe;	// prg_bank[2] & prg_bank[3] remain always the same in most MMC3 variants
+			prg_bank[1] = prg_bank[3] = 0xff;	// but some pirate clone mappers change them after writing certain registers
+			mmc_cmd1 = 0;
 			mmc_cmd2 = 0x80;
 			mmc_prg_base = mmc_chr_base = 0;
-			mmc_prg_mask = mmc_chr_mask = 0xff;
+			mmc_prg_mask = mmc_chr_mask = 0xff;	// these could be init'ed as xxx_chunks-1 and they would work the same
 			mmc_chr_source = nes.chr_chunks ? CHRROM : CHRRAM;
 			mapper4_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
 			mapper4_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
@@ -9338,11 +11436,15 @@ int mapper_reset( running_machine *machine, int mmc_num )
 			MMC5_rom_bank_mode = 3;
 			MMC5_vrom_bank_mode = 0;
 			MMC5_vram_protect = 0;
-			IRQ_enable = 0;
-			IRQ_count = 0;
 			nes.mid_ram_enable = 0;
 			prg16_89ab(space->machine, nes.prg_chunks - 2);
 			prg16_cdef(space->machine, nes.prg_chunks - 1);
+			break;
+		case 6:
+			mmc_cmd1 = 0;
+			mmc_chr_source = nes.chr_chunks ? CHRROM : CHRRAM;
+			prg16_89ab(space->machine, 0);
+			prg16_cdef(space->machine, 7);
 			break;
 		case 7:
 			/* Bankswitches 32k at a time */
@@ -9350,15 +11452,11 @@ int mapper_reset( running_machine *machine, int mmc_num )
 			prg16_89ab(space->machine, 0);
 			prg16_cdef(space->machine, nes.prg_chunks - 1);
 			break;
-		case 96:
 		case 8:
-			/* Switches 16k banks at $8000, 1st 2 16k banks loaded on reset */
+		case 96:
 			prg32(space->machine, 0);
 			break;
 		case 9:
-			/* Can switch 8k prg banks */
-			/* Note that the iNES header defines the number of banks as 8k in size, rather than 16k */
-			/* Reset VROM latches */
 			MMC2_regs[0] = MMC2_regs[2] = 0;
 			MMC2_regs[1] = MMC2_regs[3] = 0;
 			mmc_cmd1 = mmc_cmd2 = 0xfe;
@@ -9376,23 +11474,50 @@ int mapper_reset( running_machine *machine, int mmc_num )
 			prg16_89ab(space->machine, 0);
 			prg16_cdef(space->machine, nes.prg_chunks - 1);
 			break;
-		case 11:	/* Switches 32k banks, 1st 32k bank loaded on reset (?) May be more like mapper 7... */
+		case 11:
+			mmc_chr_source = nes.chr_chunks ? CHRROM : CHRRAM;	// NINA-07 has no CHRROM
 			prg32(space->machine, 0);
 			break;
-		case 15:	/* Can switch 8k prg banks */
+		case 14:
+			extra_bank[2] = 0xfe;
+			extra_bank[3] = 0xff;
+			extra_bank[0] = extra_bank[1] = extra_bank[4] = extra_bank[5] = extra_bank[6] = 0;
+			extra_bank[7] = extra_bank[8] = extra_bank[9] = extra_bank[0xa] = extra_bank[0xb] = 0;
+			map14_reg[0] = map14_reg[1] = 0;
+			prg_bank[0] = prg_bank[2] = 0xfe;
+			prg_bank[1] = prg_bank[3] = 0xff;
+			mmc_cmd1 = 0;
+			mmc_cmd2 = 0x80;
+			mmc_prg_base = mmc_chr_base = 0;
+			mmc_prg_mask = mmc_chr_mask = 0xff;
+			mmc_chr_source = nes.chr_chunks ? CHRROM : CHRRAM;
+			mapper4_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+			mapper4_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
+			break;
+		case 15:
 			set_nt_mirroring(PPU_MIRROR_VERT);
 			prg32(space->machine, 0);
 			break;
 		case 16:
 		case 17:
 		case 18:
-		case 19:
+		case 157:
+		case 159:
+			mmc_cmd1 = 0;
 			prg16_89ab(space->machine, 0);
 			prg16_cdef(space->machine, nes.prg_chunks - 1);
+			mmc_chr_source = nes.chr_chunks ? CHRROM : CHRRAM;
+			break;
+		case 19:
+			mmc_cmd1 = 0;
+			prg16_89ab(space->machine, 0);
+			prg16_cdef(space->machine, nes.prg_chunks - 1);
+			mmc_chr_source = nes.chr_chunks ? CHRROM : CHRRAM;
+			set_nt_mirroring(PPU_MIRROR_VERT);
 			break;
 		case 20:
-			IRQ_enable = IRQ_enable_latch = 0;
-			IRQ_count = IRQ_count_latch = 0;
+			fds_last_side = 0;
+			fds_count = 0;
 			nes_fds.motor_on = 0;
 			nes_fds.door_closed = 0;
 			nes_fds.current_side = 1;
@@ -9401,13 +11526,24 @@ int mapper_reset( running_machine *machine, int mmc_num )
 			nes_fds.read_mode = nes_fds.write_reg = 0;
 			break;
 		case 21:
-		case 25:
-			IRQ_enable = IRQ_enable_latch = 0;
-			IRQ_count = IRQ_count_latch = 0;
-			/* fall through */
 		case 22:
 		case 23:
+		case 24:
+		case 25:
+		case 26:
 		case 33:
+		case 48:
+		case 73:
+		case 75:
+		case 80:
+		case 82:
+		case 85:
+		case 87:
+		case 117:
+		case 207:
+		case 222:
+		case 252:
+			mmc_chr_source = nes.chr_chunks ? CHRROM : CHRRAM;
 			prg16_89ab(space->machine, 0);
 			prg16_cdef(space->machine, nes.prg_chunks - 1);
 			break;
@@ -9415,28 +11551,16 @@ int mapper_reset( running_machine *machine, int mmc_num )
 			mmc_cmd1 = 0;
 			prg16_89ab(space->machine, 0);
 			prg16_cdef(space->machine, nes.prg_chunks - 1);
-//          set_nt_mirroring(PPU_MIRROR_HIGH);  // this would be needed for Major League
-			break;
-		case 24:
-		case 26:
-		case 73:
-		case 75:
-			IRQ_enable = IRQ_enable_latch = 0;
-			IRQ_count = IRQ_count_latch = 0;
-			prg16_89ab(space->machine, 0);
-			prg16_cdef(space->machine, nes.prg_chunks - 1);
+			if (nes.crc_hack)
+				set_nt_mirroring(PPU_MIRROR_HIGH);  // needed by Major League
 			break;
 		case 34:
-			/* Can switch 32k prg banks */
 			prg32(space->machine, 0);
 			break;
 		case 37:
-			IRQ_enable = 0;
-			IRQ_count = IRQ_count_latch = 0;
-			IRQ_reload = 0;
-			prg_bank[0] = 0xfe;
-			prg_bank[1] = 0xff;
-			MMC3_cmd = 0;
+			prg_bank[0] = prg_bank[2] = 0xfe;
+			prg_bank[1] = prg_bank[3] = 0xff;
+			mmc_cmd1 = 0;
 			mmc_cmd2 = 0x80;
 			mmc_prg_base = mmc_chr_base = 0;
 			mmc_prg_mask = 0x07;
@@ -9446,15 +11570,11 @@ int mapper_reset( running_machine *machine, int mmc_num )
 			mapper4_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
 			break;
 		case 40:
-			IRQ_enable = 0;
-			IRQ_count = 0;
-			/* Who's your daddy? */
-			memcpy(&nes.rom[0x6000], &nes.rom[((nes.prg_chunks << 1) - 2) * 0x2000 + 0x10000], 0x2000);
-			//ugly hack to deal with iNES header usage of chunk count.
-			prg8_89(space->machine, (nes.prg_chunks << 1) - 4);
-			prg8_ab(space->machine, (nes.prg_chunks << 1) - 3);
-			prg8_cd(space->machine, 0);
-			prg8_ef(space->machine, (nes.prg_chunks << 1) - 1);
+			prg8_67(space->machine, 0xfe);
+			prg8_89(space->machine, 0xfc);
+			prg8_ab(space->machine, 0xfd);
+			prg8_cd(space->machine, 0xfe);
+			prg8_ef(space->machine, 0xff);
 			break;
 		case 41:
 			mmc_cmd1 = 0;
@@ -9470,12 +11590,9 @@ int mapper_reset( running_machine *machine, int mmc_num )
 		case 44:
 		case 47:
 		case 49:
-			IRQ_enable = 0;
-			IRQ_count = IRQ_count_latch = 0;
-			IRQ_reload = 0;
-			prg_bank[0] = 0xfe;
-			prg_bank[1] = 0xff;
-			MMC3_cmd = 0;
+			prg_bank[0] = prg_bank[2] = 0xfe;
+			prg_bank[1] = prg_bank[3] = 0xff;
+			mmc_cmd1 = 0;
 			mmc_cmd2 = 0x80;
 			mmc_prg_base = mmc_chr_base = 0;
 			mmc_prg_mask = 0x0f;
@@ -9485,11 +11602,8 @@ int mapper_reset( running_machine *machine, int mmc_num )
 			mapper4_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
 			break;
 		case 45:
-			IRQ_enable = 0;
-			IRQ_count = IRQ_count_latch = 0;
-			IRQ_reload = 0;
-			prg_bank[0] = 0xfe;
-			prg_bank[1] = 0xff;
+			prg_bank[0] = prg_bank[2] = 0xfe;
+			prg_bank[1] = prg_bank[3] = 0xff;
 			mmc_cmd1 = 0;
 			mmc_cmd2 = 0x80;
 			mmc_chr_source = nes.chr_chunks ? CHRROM : CHRRAM;
@@ -9506,12 +11620,23 @@ int mapper_reset( running_machine *machine, int mmc_num )
 			prg32(space->machine, 0);
 			chr8(space->machine, 0, CHRROM);
 			break;
+		case 50:
+			prg8_67(space->machine, 0x0f);
+			prg8_89(space->machine, 0x08);
+			prg8_ab(space->machine, 0x09);
+			prg8_cd(space->machine, 0);
+			prg8_ef(space->machine, 0x0b);
+			break;
+		case 51:
+			mapper51_reg[0] = 0x01;
+			mapper51_reg[1] = 0x00;
+			mapper51_set_banks(space->machine);
+			break;
 		case 52:
-			IRQ_enable = 0;
-			IRQ_count = IRQ_count_latch = 0;
-			IRQ_reload = 0;
 			prg_bank[0] = 0xfe;
+			prg_bank[2] = 0xfe;
 			prg_bank[1] = 0xff;
+			prg_bank[3] = 0xff;
 			mmc_cmd1 = 0;
 			mmc_cmd2 = 0x80;
 			map52_reg_written = 0;
@@ -9523,12 +11648,6 @@ int mapper_reset( running_machine *machine, int mmc_num )
 			mapper4_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
 			mapper4_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
 			memory_set_bankptr(space->machine, 5, nes.wram);
-			break;
-		case 51:
-			mapper51_reg[0] = 0x01;
-			mapper51_reg[1] = 0x00;
-			mapper51_reg[2] = 0x00;
-			mapper51_set_banks(space->machine);
 			break;
 		case 57:
 			mmc_cmd1 = 0x00;
@@ -9547,25 +11666,23 @@ int mapper_reset( running_machine *machine, int mmc_num )
 			prg32(space->machine, 0);
 			break;
 		case 64:
-			/* Can switch 3 8k prg banks */
+		case 158:
+			mmc_cmd1 = 0;
 			prg16_89ab(space->machine, nes.prg_chunks - 1);
 			prg16_cdef(space->machine, nes.prg_chunks - 1);
 			break;
 		case 65:
-			IRQ_enable = 0;
-			IRQ_count = 0;
-			prg16_89ab(space->machine, 0);
-			prg16_cdef(space->machine, nes.prg_chunks - 1);
-			break;
 		case 67:
-		case 68:
 		case 69:
 		case 71:
 		case 72:
 		case 78:
 		case 92:
-			IRQ_enable = IRQ_enable_latch = 0;
-			IRQ_count = IRQ_count_latch = 0;
+			prg16_89ab(space->machine, 0);
+			prg16_cdef(space->machine, nes.prg_chunks - 1);
+			break;
+		case 68:
+			m68_mirror = m0 = m1 = 0;
 			prg16_89ab(space->machine, 0);
 			prg16_cdef(space->machine, nes.prg_chunks - 1);
 			break;
@@ -9598,19 +11715,9 @@ int mapper_reset( running_machine *machine, int mmc_num )
 			chr8(space->machine, 0, CHRROM);
 			prg32(space->machine, 0);
 			break;
-		case 80:
-		case 207:
-		case 82:
-		case 85:
-			mmc_chr_source = nes.chr_chunks ? CHRROM : CHRRAM;
-			prg16_89ab(space->machine, 0);
-			prg16_cdef(space->machine, nes.prg_chunks - 1);
-			break;
-//      case 70:
-		case 87:
 		case 228:
-			prg16_89ab(space->machine, 0);
-			prg16_cdef(space->machine, nes.prg_chunks - 1);
+			chr8(space->machine, 0, CHRROM);
+			prg32(space->machine, 0);
 			break;
 		case 83:
 			mapper83_reg[9] = 0x0f;
@@ -9670,14 +11777,17 @@ int mapper_reset( running_machine *machine, int mmc_num )
 			prg16_89ab(space->machine, 0x00);
 			prg16_cdef(space->machine, 0x0f);
 			break;
+		case 106:
+			prg8_89(space->machine, (nes.prg_chunks << 1) - 1);
+			prg8_ab(space->machine, 0);
+			prg8_cd(space->machine, 0);
+			prg8_ef(space->machine, (nes.prg_chunks << 1) - 1);
+			break;
 		case 114:
-			IRQ_enable = 0;
-			IRQ_count = IRQ_count_latch = 0;
-			IRQ_reload = 0;
 			map114_reg = map114_reg_enabled = 0;
-			prg_bank[0] = 0xfe;
-			prg_bank[1] = 0xff;
-			MMC3_cmd = 0;
+			prg_bank[0] = prg_bank[2] = 0xfe;
+			prg_bank[1] = prg_bank[3] = 0xff;
+			mmc_cmd1 = 0;
 			mmc_cmd2 = 0x80;
 			mmc_prg_base = mmc_chr_base = 0;
 			mmc_prg_mask = mmc_chr_mask = 0xff;
@@ -9686,14 +11796,46 @@ int mapper_reset( running_machine *machine, int mmc_num )
 			mapper4_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
 			break;
 		case 115:
-			mapper115_reg[0] = mapper115_reg[1] = mapper115_reg[2] = mapper115_reg[3] = 0;
-			prg32(space->machine, 0xff);
+			mapper115_reg[0] = 0;
+			prg_bank[0] = prg_bank[2] = 0xfe;
+			prg_bank[1] = prg_bank[3] = 0xff;
+			mmc_cmd1 = 0;
+			mmc_cmd2 = 0x80;
+			mmc_prg_base = mmc_chr_base = 0;
+			mmc_prg_mask = mmc_chr_mask = 0xff;
+			mmc_chr_source = nes.chr_chunks ? CHRROM : CHRRAM;
+			mapper4_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+			mapper4_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
+			break;
+		case 121:
+			prg_bank[0] = prg_bank[2] = 0xfe;
+			prg_bank[1] = prg_bank[3] = 0xff;
+			mapper121_reg[0] = mapper121_reg[1] = mapper121_reg[2] = 0;
+			mmc_cmd1 = 0;
+			mmc_cmd2 = 0x80;
+			mmc_prg_base = mmc_chr_base = 0;
+			mmc_prg_mask = mmc_chr_mask = 0xff;
+			mmc_chr_source = nes.chr_chunks ? CHRROM : CHRRAM;
+			mapper4_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+			mapper4_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
 			break;
 		case 132:
 		case 172:
 		case 173:
 			txc_reg[0] = txc_reg[1] = txc_reg[2] = txc_reg[3] = 0;
 			prg32(space->machine, 0);
+			break;
+		case 134:
+			prg_bank[0] = prg_bank[2] = 0xfe;
+			prg_bank[1] = prg_bank[3] = 0xff;
+			mmc_cmd1 = 0;
+			mmc_cmd2 = 0x80;
+			mmc_prg_base = mmc_chr_base = 0;
+			mmc_prg_mask = 0x1f;
+			mmc_chr_mask = 0xff;
+			mmc_chr_source = nes.chr_chunks ? CHRROM : CHRRAM;
+			mapper4_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+			mapper4_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
 			break;
 		case 166:
 			subor_reg[0] = subor_reg[1] = subor_reg[2] = subor_reg[3] = 0;
@@ -9718,8 +11860,8 @@ int mapper_reset( running_machine *machine, int mmc_num )
 		case 138:
 		case 139:
 		case 141:
-			mmc_chr_source = nes.chr_chunks ? CHRROM : CHRRAM;
 			mmc_cmd1 = 0;
+			mmc_chr_source = nes.chr_chunks ? CHRROM : CHRRAM;
 			prg32(space->machine, 0);
 			chr8(space->machine, 0, mmc_chr_source);
 			set_nt_mirroring(PPU_MIRROR_VERT);
@@ -9749,6 +11891,19 @@ int mapper_reset( running_machine *machine, int mmc_num )
 			prg16_cdef(space->machine, nes.prg_chunks - 1);
 			chr8(space->machine, 0, CHRROM);
 			break;
+		case 153:
+			mmc_cmd1 = 0;
+			prg16_89ab(space->machine, 0);
+			prg16_cdef(space->machine, nes.prg_chunks - 1);
+			mmc_chr_source = nes.chr_chunks ? CHRROM : CHRRAM;
+			// Famicom Jump II needs also the following!
+			for (i = 0; i < 8; i++)
+				map153_reg[i] = 0;
+
+			map153_bank_latch = 0;
+			if (nes.crc_hack)
+				mapper153_set_prg(space->machine);
+			break;
 		case 154:
 			prg16_89ab(space->machine, nes.prg_chunks - 2);
 			prg16_cdef(space->machine, nes.prg_chunks - 1);
@@ -9774,17 +11929,73 @@ int mapper_reset( running_machine *machine, int mmc_num )
 			prg16_cdef(space->machine, 0);
 			break;
 		case 182:
-			IRQ_enable = 0;
-			IRQ_count = 0;
 			prg32(space->machine, (nes.prg_chunks - 1) >> 1);
 			break;
 		case 188:
 			prg16_89ab(space->machine, 0);
 			prg16_cdef(space->machine, (nes.prg_chunks - 1) ^ 0x08);
 			break;
+		case 187:
+			prg_bank[0] = prg_bank[2] = 0xfe;
+			prg_bank[1] = prg_bank[3] = 0xff;
+			mapper187_reg[0] = mapper187_reg[1] = mapper187_reg[2] = mapper187_reg[3] = 0;
+			mmc_cmd1 = 0;
+			mmc_cmd2 = 0x80;
+			mmc_prg_base = mmc_chr_base = 0;
+			mmc_prg_mask = mmc_chr_mask = 0xff;
+			mmc_chr_source = nes.chr_chunks ? CHRROM : CHRRAM;
+			mapper187_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+			mapper187_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
+			break;
+		case 189:
+			mmc_cmd1 = 0;
+			mmc_cmd2 = 0x80;
+			mmc_chr_base = 0;
+			mmc_chr_mask = 0xff;
+			mmc_chr_source = nes.chr_chunks ? CHRROM : CHRRAM;
+			prg32(space->machine, 0);
+			mapper4_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
+			break;
 		case 193:
 			prg32(space->machine, (nes.prg_chunks - 1) >> 1);
 			set_nt_mirroring(PPU_MIRROR_VERT);
+			break;
+		case 197:
+			prg_bank[0] = prg_bank[2] = 0xfe;
+			prg_bank[1] = prg_bank[3] = 0xff;
+			mmc_cmd1 = 0;
+			mmc_cmd2 = 0x80;
+			mmc_prg_base = mmc_chr_base = 0;
+			mmc_prg_mask = mmc_chr_mask = 0xff;
+			mmc_chr_source = nes.chr_chunks ? CHRROM : CHRRAM;
+			mapper4_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+			mapper197_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
+			break;
+		case 198:
+			prg_bank[0] = 0x00;
+			prg_bank[1] = 0x01;
+			prg_bank[2] = 0x4e;
+			prg_bank[3] = 0x4f;
+			mmc_cmd1 = 0;
+			mmc_cmd2 = 0x80;
+			mmc_prg_base = mmc_chr_base = 0;
+			mmc_prg_mask = mmc_chr_mask = 0xff;
+			mmc_chr_source = nes.chr_chunks ? CHRROM : CHRRAM;
+			mapper198_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+			mapper4_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
+			break;
+		case 199:
+			prg_bank[0] = 0x00;
+			prg_bank[1] = 0x01;
+			prg_bank[2] = 0x3e;
+			prg_bank[3] = 0x3f;
+			mmc_cmd1 = 0;
+			mmc_cmd2 = 0x80;
+			mmc_prg_base = mmc_chr_base = 0;
+			mmc_prg_mask = mmc_chr_mask = 0xff;
+			mmc_chr_source = nes.chr_chunks ? CHRROM : CHRRAM;
+			mapper4_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+			mapper199_set_chr(space->machine, mmc_chr_base, mmc_chr_mask);
 			break;
 		case 200:
 			prg16_89ab(space->machine, nes.prg_chunks - 1);
@@ -9803,14 +12014,71 @@ int mapper_reset( running_machine *machine, int mmc_num )
 			prg16_cdef(space->machine, 0);
 			chr8(space->machine, 0, CHRROM);
 			break;
+		case 205:
+			prg_bank[0] = prg_bank[2] = 0xfe;
+			prg_bank[1] = prg_bank[3] = 0xff;
+			mmc_cmd1 = 0;
+			mmc_cmd2 = 0x80;
+			mmc_prg_base = 0x10;
+			mmc_prg_mask = 0x1f;
+			mmc_chr_base = 0;
+			mmc_chr_mask = 0xff;
+			mmc_chr_source = nes.chr_chunks ? CHRROM : CHRRAM;
+			mapper4_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+			mapper4_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
+			break;
+		case 208:
+			prg_bank[0] = prg_bank[2] = 0xfe;
+			prg_bank[1] = prg_bank[3] = 0xff;
+			map208_reg[0] = map208_reg[1] = map208_reg[2] = map208_reg[3] = map208_reg[4] = 0;
+			mmc_cmd1 = 0;
+			mmc_cmd2 = 0x80;
+			mmc_prg_base = mmc_chr_base = 0;
+			mmc_prg_mask = mmc_chr_mask = 0xff;
+			mmc_chr_source = nes.chr_chunks ? CHRROM : CHRRAM;
+			mapper4_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+			mapper4_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
+			break;
 		case 212:
 			chr8(space->machine, 0xff, CHRROM);
 			prg32(space->machine, 0xff);
+			break;
+		case 215:
+			prg_bank[0] = 0x00;
+			prg_bank[2] = 0xfe;
+			prg_bank[1] = 0x01;
+			prg_bank[3] = 0xff;
+			mmc_cmd1 = 0;
+			mmc_cmd2 = 0x80;
+			map215_reg[0] = 0x00;
+			map215_reg[1] = 0xff;
+			map215_reg[2] = 0x04;
+			map215_reg[3] = 0;
+			mmc_prg_base = 0;
+			mmc_prg_mask = 0x1f;
+			mmc_chr_source = nes.chr_chunks ? CHRROM : CHRRAM;
+			mapper215_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+			mapper215_set_chr(space->machine, mmc_chr_source);
 			break;
 		case 216:
 			mmc_chr_source = nes.chr_chunks ? CHRROM : CHRRAM;
 			prg32(space->machine, 0);
 			chr8(space->machine, 0, mmc_chr_source);
+			break;
+		case 217:
+			map217_reg[0] = 0x00;
+			map217_reg[1] = 0xff;
+			map217_reg[2] = 0x03;
+			map217_reg[3] = 0;
+			prg_bank[0] = prg_bank[2] = 0xfe;
+			prg_bank[1] = prg_bank[3] = 0xff;
+			mmc_cmd1 = 0;
+			mmc_cmd2 = 0x80;
+			mmc_prg_base = mmc_chr_base = 0;
+			mmc_prg_mask = mmc_chr_mask = 0xff;
+			mmc_chr_source = nes.chr_chunks ? CHRROM : CHRRAM;
+			mapper217_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+			mapper217_set_chr(space->machine, mmc_chr_source);
 			break;
 		case 221:
 			mmc_cmd1 = 0;
@@ -9843,7 +12111,7 @@ int mapper_reset( running_machine *machine, int mmc_num )
 			break;
 		case 231:
 			prg16_89ab(space->machine, 0);
-			prg16_cdef(space->machine, 0);
+			prg16_cdef(space->machine, nes.prg_chunks - 1);
 			set_nt_mirroring(PPU_MIRROR_VERT);
 			break;
 		case 232:
@@ -9860,6 +12128,18 @@ int mapper_reset( running_machine *machine, int mmc_num )
 			break;
 		case 246:
 			prg32(space->machine, 0xff);
+			break;
+		case 249:
+			prg_bank[0] = prg_bank[2] = 0xfe;
+			prg_bank[1] = prg_bank[3] = 0xff;
+			mmc_cmd1 = 0;
+			mmc_cmd2 = 0x80;
+			map249_reg = 0;
+			mmc_prg_base = mmc_chr_base = 0;
+			mmc_prg_mask = mmc_chr_mask = 0xff;
+			mmc_chr_source = nes.chr_chunks ? CHRROM : CHRRAM;
+			mapper249_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+			mapper249_set_chr(space->machine, mmc_chr_base, mmc_chr_mask);
 			break;
 		default:
 			/* Mapper not supported */
@@ -9879,10 +12159,28 @@ int mapper_reset( running_machine *machine, int mmc_num )
 
 *************************************************************/
 
+enum
+{
+CHRRAM_0 = 0,
+CHRRAM_1,
+CHRRAM_2,
+CHRRAM_4,
+CHRRAM_6,
+CHRRAM_8,
+CHRRAM_16,
+CHRRAM_32
+};
+
+enum
+{
+NROM = 0,
+SACHEN_8259A
+};
+
 static const unif unif_list[] =
 {
-/*       UNIF                       LOW_W, LOW_R, MED_W, HIGH_W, PPU_latch, scanline CB, hblank CB */
-	{ "UNL-Sachen-8259A",         mapper141_l_w, NULL, mapper141_m_w, NULL, NULL, NULL, NULL },
+/*       UNIF                       LOW_W, LOW_R, MED_W, HIGH_W, PPU_latch, scanline CB, hblank CB     PRG  CHR  NVW  WRAM  CRAM       NMT    IDX*/
+	{ "UNL-SACHEN-8259A",         mapper141_l_w, NULL, mapper141_m_w, NULL, NULL, NULL, NULL,        256, 256,   0,    0, CHRRAM_0,  0,     SACHEN_8259A},
 };
 
 const unif *nes_unif_lookup( const char *board )
@@ -9890,8 +12188,55 @@ const unif *nes_unif_lookup( const char *board )
 	int i;
 	for (i = 0; i < sizeof(unif_list) / sizeof(unif_list[0]); i++)
 	{
-		if (unif_list[i].board == board)
+		if (!mame_stricmp(unif_list[i].board, board))
 			return &unif_list[i];
 	}
 	return NULL;
 }
+
+
+// WIP code - not very satisfactory... we would end up with a lot of duplicate code...
+int unif_reset( running_machine *machine, const char *board )
+{
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	nes_state *state = machine->driver_data;
+	int err = 0;
+	const unif *unif_board;
+
+	if (nes.chr_chunks == 0)
+		chr8(machine, 0,CHRRAM);
+	else
+		chr8(machine, 0,CHRROM);
+
+	/* Set the mapper irq callback */
+	unif_board = nes_unif_lookup(board);
+
+	if (unif_board == NULL)
+		fatalerror("Unimplemented UNIF Board");
+
+	ppu2c0x_set_scanline_callback(state->ppu, unif_board ? unif_board->mmc_scanline : NULL);
+	ppu2c0x_set_hblank_callback(state->ppu, unif_board ? unif_board->mmc_hblank : NULL);
+
+	if (!nes_irq_timer)
+		nes_irq_timer = timer_alloc(machine, nes_irq_callback, NULL);
+
+	/* Point the WRAM/battery area to the first RAM bank */
+	memory_set_bankptr(space->machine, 5, &nes.wram[0x0000]);
+
+	switch (unif_board->board_idx)
+	{
+		case SACHEN_8259A:
+			mmc_cmd1 = 0;
+			mmc_chr_source = nes.chr_chunks ? CHRROM : CHRRAM;
+			prg32(space->machine, 0);
+			chr8(space->machine, 0, mmc_chr_source);
+			set_nt_mirroring(PPU_MIRROR_VERT);
+			break;
+		default:
+			/* Mapper not supported */
+			err = 2;
+			break;
+	}
+	return err;
+}
+

@@ -4,6 +4,7 @@
 typedef struct __mmc
 {
 	int iNesMapper; /* iNES Mapper # */
+
 	const char *desc;     /* Mapper description */
 	write8_space_func mmc_write_low; /* $4100-$5fff write routine */
 	read8_space_func mmc_read_low; /* $4100-$5fff read routine */
@@ -19,6 +20,7 @@ const mmc *nes_mapper_lookup(int mapper);
 typedef struct __unif
 {
 	const char *board; /* UNIF board */
+
 	write8_space_func mmc_write_low; /* $4100-$5fff write routine */
 	read8_space_func mmc_read_low; /* $4100-$5fff read routine */
 	write8_space_func mmc_write_mid; /* $6000-$7fff write routine */
@@ -26,6 +28,14 @@ typedef struct __unif
 	void (*ppu_latch)(const device_config *device, offs_t offset);
 	ppu2c0x_scanline_cb		mmc_scanline;
 	ppu2c0x_hblank_cb		mmc_hblank;
+
+	int prgrom;
+	int chrrom;
+	int nvwram;
+	int wram;
+	int chrram;
+	int nt;
+	int board_idx;
 } unif;
 
 const unif *nes_unif_lookup(const char *board);
@@ -43,7 +53,8 @@ extern write8_space_func mmc_write_mid;
 extern read8_space_func mmc_read_mid;
 extern write8_space_func mmc_write;
 
-int mapper_reset (running_machine *machine, int mapperNum);
+int mapper_reset( running_machine *machine, int mapperNum );
+int unif_reset( running_machine *machine, const char *board );
 
 WRITE8_HANDLER( nes_low_mapper_w );
 READ8_HANDLER( nes_low_mapper_r );
@@ -57,5 +68,6 @@ READ8_HANDLER( nes_nt_r );
 
 READ8_HANDLER( fds_r );
 WRITE8_HANDLER( fds_w );
+WRITE8_HANDLER( mapper50_add_w );
 
 #endif
