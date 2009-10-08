@@ -226,26 +226,62 @@ static VIDEO_START( pc9801 )
 	gfx_bitmap_ram = auto_alloc_array(machine, UINT32, 0x18000*2);
 }
 
+/*
+attrib ram is:
+bit 0: secret / hidden (?)
+bit 1: blink
+bit 2: reverse video
+bit 3: underline
+bit 4: vertical line / simple gfx (toggled by flip-flop bit) (?)
+bit 5-7: BRG colors
+*/
+
 static VIDEO_UPDATE( pc9801 )
 {
-	const gfx_element *gfx = screen->machine->gfx[0];
-	int count = 0x00000;
+//	const gfx_element *gfx = screen->machine->gfx[0];
 	int y,x;
+	int yi,xi;
+	UINT8 *gfx_data = memory_region(screen->machine, "gfx1");
 
-
-	for (y=0;y<64;y++)
+	for (y=0;y<24;y++)
 	{
-		for (x=0;x<64;x+=2)
+		for (x=0;x<40;x++)
 		{
-			int tile;
+			for(yi=0;yi<8;yi++)
+			{
+				for(xi=0;xi<8;xi++)
+				{
+					int tile,attr,pen[3],pen_mask,color;
 
-			tile = (pc9801_vram[count] & 0x00ff0000)>>16;
-			drawgfx_opaque(bitmap,cliprect,gfx,tile,0,0,0,(x+1)*8,y*8);
+					tile = (pc9801_vram[(x+y*40)] & 0x00ff0000) >> 16;
+					attr = (pc9801_vram[((x+y*40)+0x2000/4)] & 0x00ff0000) >> 16;
 
-			tile = pc9801_vram[count] & 0x000000ff;
-			drawgfx_opaque(bitmap,cliprect,gfx,tile,0,0,0,(x+0)*8,y*8);
+					pen_mask = (attr & 0xe0)>>5;
 
-			count++;
+					pen[0] = gfx_data[(tile*8)+yi]>>(7-xi) & (pen_mask & 1)>>0;
+					pen[1] = gfx_data[(tile*8)+yi]>>(7-xi) & (pen_mask & 2)>>1;
+					pen[2] = gfx_data[(tile*8)+yi]>>(7-xi) & (pen_mask & 4)>>2;
+
+					color = pen[2]<<2|pen[1]<<1|pen[0]<<0;
+
+					if(((x*2+1)*8+xi)<video_screen_get_visible_area(screen->machine->primary_screen)->max_x && (y*8+yi)<video_screen_get_visible_area(screen->machine->primary_screen)->max_y)
+						*BITMAP_ADDR16(bitmap, y*8+yi, (x*2+1)*8+xi) = screen->machine->pens[color];
+
+					tile = (pc9801_vram[(x+y*40)] & 0x000000ff) >> 0;
+					attr = (pc9801_vram[((x+y*40)+0x2000/4)] & 0x000000ff) >> 0;
+
+					pen_mask = (attr & 0xe0)>>5;
+
+					pen[0] = gfx_data[(tile*8)+yi]>>(7-xi) & (pen_mask & 1)>>0;
+					pen[1] = gfx_data[(tile*8)+yi]>>(7-xi) & (pen_mask & 2)>>1;
+					pen[2] = gfx_data[(tile*8)+yi]>>(7-xi) & (pen_mask & 4)>>2;
+
+					color = pen[2]<<2|pen[1]<<1|pen[0]<<0;
+
+					if(((x*2+0)*8+xi)<video_screen_get_visible_area(screen->machine->primary_screen)->max_x && (y*8+yi)<video_screen_get_visible_area(screen->machine->primary_screen)->max_y)
+						*BITMAP_ADDR16(bitmap, y*8+yi, (x*2+0)*8+xi) = screen->machine->pens[color];
+				}
+			}
 		}
 	}
 
@@ -579,6 +615,14 @@ static const struct pit8253_config pit8253_config =
 	}
 };
 
+static PALETTE_INIT( pc9801 )
+{
+	int i;
+
+	for(i=0;i<8;i++)
+		palette_set_color_rgb(machine, i+0x000, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
+}
+
 /* I suspect the dump for pc9801 comes from a i386 later model... the original machine would use a i8086 @ 5Mhz CPU (see notes at top) */
 /* More investigations are required, but in the meanwhile I set a I386 as main CPU */
 static MACHINE_DRIVER_START( pc9801 )
@@ -600,8 +644,8 @@ static MACHINE_DRIVER_START( pc9801 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(640, 480)
 	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(black_and_white)
+	MDRV_PALETTE_LENGTH(8)
+	MDRV_PALETTE_INIT(pc9801)
 	MDRV_GFXDECODE(pc9801)
 
 	MDRV_VIDEO_START(pc9801)
