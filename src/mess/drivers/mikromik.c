@@ -16,7 +16,6 @@
 
 	TODO:
 
-	- floppy access violation
 	- add HRTC/VRTC output to i8275
 	- NEC uPD7220 GDC
 	- accurate video timing
@@ -131,7 +130,7 @@ static ADDRESS_MAP_START( mm1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK(1)
 	AM_RANGE(0x1000, 0xfeff) AM_RAM
 	AM_RANGE(0xff00, 0xff0f) AM_MIRROR(0x80) AM_DEVREADWRITE(I8237_TAG, dma8237_r, dma8237_w)
-	AM_RANGE(0xff10, 0xff13) AM_MIRROR(0x8c) AM_DEVREADWRITE(UPD7201_TAG, upd7201_cd_ba_r, upd7201_cd_ba_w)
+//	AM_RANGE(0xff10, 0xff13) AM_MIRROR(0x8c) AM_DEVREADWRITE(UPD7201_TAG, upd7201_cd_ba_r, upd7201_cd_ba_w)
     AM_RANGE(0xff20, 0xff21) AM_MIRROR(0x8e) AM_DEVREADWRITE(I8275_TAG, i8275_r, i8275_w)
 	AM_RANGE(0xff30, 0xff33) AM_MIRROR(0x8c) AM_DEVREADWRITE(I8253_TAG, pit8253_r, pit8253_w)
 	AM_RANGE(0xff40, 0xff40) AM_MIRROR(0x8f) AM_DEVREADWRITE(I8212_TAG, i8212_r, i8212_w)
@@ -323,9 +322,7 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 
 	for (i = 0; i < 16; i++)
 	{
-		int color = BIT(data, i);
-		
-		*BITMAP_ADDR16(bitmap, y, x + i) = color;
+		if (BIT(data, i)) *BITMAP_ADDR16(bitmap, y, x + i) = 1;
 	}
 }
 
@@ -358,7 +355,7 @@ static VIDEO_UPDATE( mm1 )
 	copybitmap(bitmap, tmpbitmap, 0, 0, 0, 0, cliprect);
 
 	/* graphics */
-	//upd7220_update(state->i8275, bitmap, cliprect);
+	upd7220_update(state->upd7220, bitmap, cliprect);
 
 	return 0;
 }
@@ -804,7 +801,7 @@ static MACHINE_DRIVER_START( mm1m6 )
 
 	/* basic system hardware */
 	MDRV_CPU_MODIFY(I8085A_TAG)
-	MDRV_CPU_PROGRAM_MAP(mm1_map)
+	MDRV_CPU_PROGRAM_MAP(mm1m6_map)
 
 	/* video hardware */
 	MDRV_UPD7220_ADD(UPD7220_TAG, XTAL_18_720MHz/8, mm1_upd7220_intf, mm1_upd7220_map)

@@ -149,7 +149,7 @@ struct _upd7220_t
 
 	UINT8 sr;						/* status register */
 	UINT8 cr;						/* command register */
-	UINT8 pr[16];					/* parameter byte register */
+	UINT8 pr[17];					/* parameter byte register */
 	int param_ptr;					/* parameter pointer */
 
 	UINT8 fifo[16];					/* FIFO data queue */
@@ -195,6 +195,7 @@ INLINE upd7220_t *get_safe_token(const device_config *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
+	assert((device->type == UPD7220));
 	return (upd7220_t *)device->token;
 }
 
@@ -215,7 +216,7 @@ INLINE void fifo_clear(upd7220_t *upd7220)
 		upd7220->fifo_flag[i] = FIFO_EMPTY;
 	}
 
-	upd7220->fifo_ptr = 0;
+	upd7220->fifo_ptr = -1;
 
 	upd7220->sr &= ~UPD7220_SR_DATA_READY;
 	upd7220->sr |= UPD7220_SR_FIFO_EMPTY;
@@ -246,12 +247,12 @@ INLINE void fifo_set_direction(upd7220_t *upd7220, int dir)
 
 INLINE void queue(upd7220_t *upd7220, UINT8 data, int flag)
 {
-	if (upd7220->fifo_ptr < 16)
+	if (upd7220->fifo_ptr < 15)
 	{
+		upd7220->fifo_ptr++;
+
 		upd7220->fifo[upd7220->fifo_ptr] = data;
 		upd7220->fifo_flag[upd7220->fifo_ptr] = flag;
-
-		upd7220->fifo_ptr++;
 
 		if (upd7220->fifo_ptr == 16)
 		{
@@ -411,21 +412,21 @@ static void recompute_parameters(const device_config *device)
 {
 	upd7220_t *upd7220 = get_safe_token(device);
 
-	int horiz_pix_total = upd7220->hs + upd7220->hbp + upd7220->aw + upd7220->hfp;
+	int horiz_pix_total = (upd7220->hs + upd7220->hbp + upd7220->aw + upd7220->hfp) * 16;
 	int vert_pix_total = upd7220->vs + upd7220->vbp + upd7220->al + upd7220->vfp;
 
-	attoseconds_t refresh = HZ_TO_ATTOSECONDS(upd7220->clock) / horiz_pix_total / vert_pix_total;
+	attoseconds_t refresh = HZ_TO_ATTOSECONDS(device->clock) * horiz_pix_total * vert_pix_total;
 	
 	rectangle visarea;
 
-	visarea.min_x = upd7220->hs + upd7220->hbp;
+	visarea.min_x = (upd7220->hs + upd7220->hbp) * 16;
 	visarea.min_y = upd7220->vs + upd7220->vbp;
-	visarea.max_x = horiz_pix_total - upd7220->hfp - 1;
+	visarea.max_x = horiz_pix_total - (upd7220->hfp * 16) - 1;
 	visarea.max_y = vert_pix_total - upd7220->vfp - 1;
 
 	if (LOG)
 	{
-		logerror("uPD7220 '%s' Screen: width %u height x %u\n", device->tag, horiz_pix_total, vert_pix_total);
+		logerror("uPD7220 '%s' Screen: width %u height %u refresh %f\n", device->tag, horiz_pix_total, vert_pix_total, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
 		logerror("uPD7220 '%s' Visible Area: (%u, %u) - (%u, %u)\n", device->tag, visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y);
 	}
 
@@ -554,6 +555,8 @@ static int translate_command(UINT8 data)
 			switch (data & 0xf0)
 			{
 			case UPD7220_COMMAND_PRAM:
+				command = COMMAND_PRAM;
+				break;
 			default:
 				switch (data & 0xe4)
 				{
@@ -592,7 +595,7 @@ static void process_fifo(const device_config *device)
 	if (flag == FIFO_COMMAND)
 	{
 		upd7220->cr = data;
-		upd7220->param_ptr = 0;
+		upd7220->param_ptr = 1;
 	}
 	else
 	{
@@ -607,11 +610,11 @@ static void process_fifo(const device_config *device)
 		break;
 
 	case COMMAND_RESET: /* reset */
-		if (LOG) logerror("uPD7220 '%s' RESET\n", device->tag);
-
 		switch (upd7220->param_ptr)
 		{
 		case 0:
+			if (LOG) logerror("uPD7220 '%s' RESET\n", device->tag);
+
 			upd7220->de = 0;
 			upd7220->ra[0] = upd7220->ra[1] = upd7220->ra[2] = 0;
 			upd7220->ra[3] = 0x19;
@@ -620,18 +623,32 @@ static void process_fifo(const device_config *device)
 			upd7220->mask = 0;
 			break;
 
-		case 8:
+		case 9:
 			upd7220->mode = upd7220->pr[1];
 			upd7220->aw = upd7220->pr[2] + 2;
 			upd7220->hs = (upd7220->pr[3] & 0x1f) + 1;
-			upd7220->vs = ((upd7220->pr[4] & 0x03) << 2) | (upd7220->pr[3] >> 5);
+			upd7220->vs = ((upd7220->pr[4] & 0x03) << 3) | (upd7220->pr[3] >> 5);
 			upd7220->hfp = (upd7220->pr[4] >> 2) + 1;
 			upd7220->hbp = (upd7220->pr[5] & 0x3f) + 1;
 			upd7220->vfp = upd7220->pr[6] & 0x3f;
-			upd7220->al = ((upd7220->pr[8] & 0x03) << 8) | upd7220->pr[7];
+			upd7220->al = ((upd7220->pr[8] & 0x03) << 8) | upd7220->pr[7]; // TODO wrong!
 			upd7220->vbp = upd7220->pr[8] >> 2;
 
 			upd7220->pitch = upd7220->aw;
+
+			if (LOG)
+			{
+				logerror("uPD7220 '%s' Mode: %02x\n", device->tag, upd7220->mode);
+				logerror("uPD7220 '%s' AW: %u\n", device->tag, upd7220->aw);
+				logerror("uPD7220 '%s' HS: %u\n", device->tag, upd7220->hs);
+				logerror("uPD7220 '%s' VS: %u\n", device->tag, upd7220->vs);
+				logerror("uPD7220 '%s' HFP: %u\n", device->tag, upd7220->hfp);
+				logerror("uPD7220 '%s' HBP: %u\n", device->tag, upd7220->hbp);
+				logerror("uPD7220 '%s' VFP: %u\n", device->tag, upd7220->vfp);
+				logerror("uPD7220 '%s' AL: %u\n", device->tag, upd7220->al);
+				logerror("uPD7220 '%s' VBP: %u\n", device->tag, upd7220->vbp);
+				logerror("uPD7220 '%s' PITCH: %u\n", device->tag, upd7220->pitch);
+			}
 
 			recompute_parameters(device);
 			break;
@@ -639,12 +656,12 @@ static void process_fifo(const device_config *device)
 		break;
 
 	case COMMAND_SYNC: /* sync format specify */
-		if (upd7220->param_ptr == 8)
+		if (upd7220->param_ptr == 9)
 		{
 			upd7220->mode = upd7220->pr[1];
 			upd7220->aw = upd7220->pr[2] + 2;
 			upd7220->hs = (upd7220->pr[3] & 0x1f) + 1;
-			upd7220->vs = ((upd7220->pr[4] & 0x03) << 2) | (upd7220->pr[3] >> 5);
+			upd7220->vs = ((upd7220->pr[4] & 0x03) << 3) | (upd7220->pr[3] >> 5);
 			upd7220->hfp = (upd7220->pr[4] >> 2) + 1;
 			upd7220->hbp = (upd7220->pr[5] & 0x3f) + 1;
 			upd7220->vfp = upd7220->pr[6] & 0x3f;
@@ -652,6 +669,20 @@ static void process_fifo(const device_config *device)
 			upd7220->vbp = upd7220->pr[8] >> 2;
 
 			upd7220->pitch = upd7220->aw;
+
+			if (LOG)
+			{
+				logerror("uPD7220 '%s' Mode: %02x\n", device->tag, upd7220->mode);
+				logerror("uPD7220 '%s' AW: %u\n", device->tag, upd7220->aw);
+				logerror("uPD7220 '%s' HS: %u\n", device->tag, upd7220->hs);
+				logerror("uPD7220 '%s' VS: %u\n", device->tag, upd7220->vs);
+				logerror("uPD7220 '%s' HFP: %u\n", device->tag, upd7220->hfp);
+				logerror("uPD7220 '%s' HBP: %u\n", device->tag, upd7220->hbp);
+				logerror("uPD7220 '%s' VFP: %u\n", device->tag, upd7220->vfp);
+				logerror("uPD7220 '%s' AL: %u\n", device->tag, upd7220->al);
+				logerror("uPD7220 '%s' VBP: %u\n", device->tag, upd7220->vbp);
+				logerror("uPD7220 '%s' PITCH: %u\n", device->tag, upd7220->pitch);
+			}
 
 			recompute_parameters(device);
 		}
@@ -666,7 +697,7 @@ static void process_fifo(const device_config *device)
 		break;
 
 	case COMMAND_CCHAR: /* cursor & character characteristics */
-		if (upd7220->param_ptr == 3)
+		if (upd7220->param_ptr == 4)
 		{
 			upd7220->lr = (upd7220->pr[1] & 0x1f) + 1;
 			upd7220->dc = BIT(upd7220->pr[1], 7);
@@ -701,7 +732,7 @@ static void process_fifo(const device_config *device)
 		break;
 
 	case COMMAND_CURS: /* cursor position specify */
-		if (upd7220->param_ptr == 3)
+		if (upd7220->param_ptr == 4)
 		{
 			upd7220->ead = ((upd7220->pr[3] & 0x03) << 16) | (upd7220->pr[2] << 8) | upd7220->pr[1];
 			upd7220->dad = upd7220->pr[3] >> 4;
@@ -735,7 +766,7 @@ static void process_fifo(const device_config *device)
 		{
 			upd7220->pitch = data;
 
-			if (LOG) logerror("uPD7220 '%s' PITCH: %02x\n", device->tag, upd7220->pitch);
+			if (LOG) logerror("uPD7220 '%s' PITCH: %u\n", device->tag, upd7220->pitch);
 		}		
 		break;
 
@@ -749,7 +780,7 @@ static void process_fifo(const device_config *device)
 		break;
 
 	case COMMAND_MASK: /* mask register load */
-		if (upd7220->param_ptr == 2)
+		if (upd7220->param_ptr == 3)
 		{
 			upd7220->mask = (upd7220->pr[2] << 8) | upd7220->pr[1];
 
@@ -930,17 +961,17 @@ static void update_graphics(const device_config *device, bitmap_t *bitmap, const
 //	int im2 = BIT(upd7220->ra[7], 6);
 	int wd2 = BIT(upd7220->ra[7], 7);
 
-	int x, y;
+	int sx, y;
 
 	/* display partition area 1 */
 	for (y = 0; y < len1; y++)
 	{
 		UINT32 addr = sad1 + (y * upd7220->pitch);
 		
-		for (x = 0; x < (upd7220->aw + 2); x += 16)
+		for (sx = 0; sx < upd7220->aw; sx++)
 		{
-			UINT16 data = memory_raw_read_word(upd7220->vram, addr & 0x3ffff);
-			upd7220->display_func(device, bitmap, y, x, addr, data);
+			UINT16 data = memory_raw_read_word(device->space[0], addr & 0x3ffff);
+			upd7220->display_func(device, bitmap, y, sx << 4, addr, data);
 			if (wd1) addr += 2; else addr++;
 		}
 	}
@@ -950,10 +981,10 @@ static void update_graphics(const device_config *device, bitmap_t *bitmap, const
 	{
 		UINT32 addr = sad2 + (y * upd7220->pitch);
 		
-		for (x = 0; x < (upd7220->aw + 2); x += 16)
+		for (sx = 0; sx < upd7220->aw; sx++)
 		{
-			UINT16 data = memory_raw_read_word(upd7220->vram, addr);
-			upd7220->display_func(device, bitmap, y, x, addr, data);
+			UINT16 data = memory_raw_read_word(device->space[0], addr);
+			upd7220->display_func(device, bitmap, y, sx << 4, addr, data);
 			if (wd2) addr += 2; else addr++;
 		}
 	}
@@ -965,8 +996,13 @@ static void update_graphics(const device_config *device, bitmap_t *bitmap, const
 
 void upd7220_update(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	// TODO check mode
-	update_graphics(device, bitmap, cliprect);
+	upd7220_t *upd7220 = get_safe_token(device);
+
+	if (upd7220->de)
+	{
+		// TODO check mode
+		update_graphics(device, bitmap, cliprect);
+	}
 }
 
 /*-------------------------------------------------
@@ -1015,6 +1051,7 @@ static DEVICE_START( upd7220 )
 	upd7220->blank_timer = timer_alloc(device->machine, blank_tick, (void *)device);
 
 	/* set initial values */
+	upd7220->fifo_ptr = -1;
 	upd7220->sr = UPD7220_SR_FIFO_EMPTY;
 
 	for (i = 0; i < 16; i++)
@@ -1076,7 +1113,6 @@ DEVICE_GET_INFO( upd7220 )
 		case DEVINFO_INT_DATABUS_WIDTH_0:				info->i = 16;										break;
 		case DEVINFO_INT_ADDRBUS_WIDTH_0:				info->i = 18;										break;
 		case DEVINFO_INT_ADDRBUS_SHIFT_0:				info->i = 0;										break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;										break;
 		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;					break;
 
 		/* --- the following bits of info are returned as pointers --- */
