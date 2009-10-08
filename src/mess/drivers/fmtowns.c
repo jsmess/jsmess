@@ -109,6 +109,10 @@ static UINT8* towns_serial_rom;
 static int towns_srom_position;
 static UINT8 towns_srom_clk;
 static UINT8 towns_srom_reset;
+static UINT8 towns_rtc_select;
+static UINT8 towns_rtc_data;
+static UINT8 towns_rtc_reg[16];
+emu_timer* towns_rtc_timer;
 
 static void towns_update_video_banks(const address_space* space);
 
@@ -139,6 +143,31 @@ static void towns_init_serial_rom(void)
 	towns_serial_rom[4] = 0x54;
 	towns_serial_rom[5] = 0x32;
 	towns_serial_rom[6] = 0x10;
+}
+
+static void towns_init_rtc(void)
+{
+	// for now, we'll just keep a static time stored here
+	// seconds
+	towns_rtc_reg[0] = 0;
+	towns_rtc_reg[1] = 3;
+	// minutes
+	towns_rtc_reg[2] = 2;
+	towns_rtc_reg[3] = 1;
+	// hours
+	towns_rtc_reg[4] = 8;
+	towns_rtc_reg[5] = 0;
+	// weekday
+	towns_rtc_reg[6] = 2;
+	// day
+	towns_rtc_reg[7] = 1;
+	towns_rtc_reg[8] = 1;
+	// month
+	towns_rtc_reg[9] = 6;
+	towns_rtc_reg[10] = 0;
+	// year
+	towns_rtc_reg[11] = 9;
+	towns_rtc_reg[12] = 0; 
 }
 
 static READ8_HANDLER(towns_system_r)
@@ -788,6 +817,82 @@ static WRITE8_HANDLER(towns_cdrom_w)
 	}
 }
 
+/* CMOS RTC
+ * 0x70: Data port
+ * 0x80: Register select
+ */
+static READ32_HANDLER(towns_rtc_r)
+{
+	if(ACCESSING_BITS_0_7)
+		return 0x80 | towns_rtc_reg[towns_rtc_select];
+		
+	return 0x00;
+}
+
+static WRITE32_HANDLER(towns_rtc_w)
+{
+	if(ACCESSING_BITS_0_7)
+		towns_rtc_data = data;;
+}
+
+static WRITE32_HANDLER(towns_rtc_select_w)
+{
+	if(ACCESSING_BITS_0_7)
+	{
+		if(!(data & 0x80))
+		{
+			if(data & 0x01)
+				towns_rtc_select = towns_rtc_data & 0x0f;
+		}
+	}
+}
+
+static void rtc_hour(void)
+{
+	towns_rtc_reg[4]++;
+	if(towns_rtc_reg[4] > 4 && towns_rtc_reg[5] == 2)
+	{
+		towns_rtc_reg[4] = 0;
+		towns_rtc_reg[5] = 0;
+	}
+	else if(towns_rtc_reg[4] > 9)
+	{
+		towns_rtc_reg[4] = 0;
+		towns_rtc_reg[5]++;
+	}
+}
+
+static void rtc_minute(void)
+{
+	towns_rtc_reg[2]++;
+	if(towns_rtc_reg[2] > 9)
+	{
+		towns_rtc_reg[2] = 0;
+		towns_rtc_reg[3]++;
+		if(towns_rtc_reg[3] > 5)
+		{
+			towns_rtc_reg[3] = 0;
+			rtc_hour();
+		}
+	}
+}
+
+static TIMER_CALLBACK(rtc_second)
+{
+	// increase RTC time by one second
+	towns_rtc_reg[0]++;
+	if(towns_rtc_reg[0] > 9)
+	{
+		towns_rtc_reg[0] = 0;
+		towns_rtc_reg[1]++;
+		if(towns_rtc_reg[1] > 5)
+		{
+			towns_rtc_reg[1] = 0;
+			rtc_minute();
+		}
+	}
+}
+
 static READ8_HANDLER(towns_unknown_r)
 {
 	return 0x08;
@@ -795,13 +900,27 @@ static READ8_HANDLER(towns_unknown_r)
 
 static IRQ_CALLBACK( towns_irq_callback )
 {
-	const device_config* dev = devtag_get_device(device->machine,"pic8259_master");
-	return pic8259_acknowledge(dev);
+	const device_config* pic1 = devtag_get_device(device->machine,"pic8259_master");
+	const device_config* pic2 = devtag_get_device(device->machine,"pic8259_slave");
+	int r;
+	
+	r = pic8259_acknowledge(pic2);
+	if(r == 0)
+	{
+		r = pic8259_acknowledge(pic1);
+	}
+	
+	return r; 
 }
 
 static PIC8259_SET_INT_LINE( towns_pic_irq )
 {
 	cputag_set_input_line(device->machine,"maincpu",0,interrupt ? ASSERT_LINE : CLEAR_LINE);
+}
+
+static PIC8259_SET_INT_LINE( towns_slave_pic_irq )
+{
+	cputag_set_input_line(device->machine,"maincpu",7,interrupt ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static PIT8253_OUTPUT_CHANGED( towns_pit_out0_changed )
@@ -850,6 +969,8 @@ static ADDRESS_MAP_START( towns_io , ADDRESS_SPACE_IO, 32)
   AM_RANGE(0x0060,0x0063) AM_READWRITE8(towns_port60_r, towns_port60_w, 0x000000ff)
   AM_RANGE(0x006c,0x006f) AM_READWRITE8(towns_sys6c_r,towns_sys6c_w, 0x000000ff)
   // 0x0070/0x0080 - CMOS RTC
+  AM_RANGE(0x0070,0x0073) AM_READWRITE(towns_rtc_r,towns_rtc_w)
+  AM_RANGE(0x0080,0x0083) AM_WRITE(towns_rtc_select_w)
   // DMA controllers (uPD71071)
   AM_RANGE(0x00a0,0x00af) AM_READWRITE8(towns_dma1_r, towns_dma1_w, 0xffffffff)
   AM_RANGE(0x00b0,0x00bf) AM_READWRITE8(towns_dma2_r, towns_dma2_w, 0xffffffff)
@@ -902,6 +1023,8 @@ static DRIVER_INIT( towns )
 	towns_txtvram = auto_alloc_array(machine,UINT8,0x8000);
 	towns_serial_rom = auto_alloc_array(machine,UINT8,256/8);
 	towns_init_serial_rom();
+	towns_init_rtc();
+	towns_rtc_timer = timer_alloc(machine,rtc_second,NULL);
 	
 	cpu_set_irq_callback(cputag_get_cpu(machine,"maincpu"), towns_irq_callback);
 }
@@ -916,6 +1039,7 @@ static MACHINE_RESET( towns )
 	towns_ram_enable = 0x00;
 	towns_update_video_banks(cpu_get_address_space(cputag_get_cpu(machine,"maincpu"),ADDRESS_SPACE_PROGRAM));
 	towns_vram_wplane = 0x00;
+	timer_adjust_periodic(towns_rtc_timer,attotime_zero,0,ATTOTIME_IN_HZ(1));
 }
 
 static VIDEO_START( towns )
@@ -978,7 +1102,7 @@ static const struct pic8259_interface towns_pic8259_master_config =
 
 static const struct pic8259_interface towns_pic8259_slave_config =
 {
-	NULL
+	towns_slave_pic_irq
 };
 
 static const wd17xx_interface towns_mb8877a_interface =
