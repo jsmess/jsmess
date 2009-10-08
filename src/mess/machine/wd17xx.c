@@ -2,7 +2,7 @@
 
     wd17xx.c
 
-    Implementations of the Western Digitial 17xx and 19xx families of
+    Implementations of the Western Digital 17xx and 19xx families of
     floppy disk controllers
 
 
@@ -232,8 +232,8 @@ enum
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _wd17xx_t wd17xx_t;
-struct _wd17xx_t
+typedef struct _wd1770_state wd1770_state;
+struct _wd1770_state
 {
 	/* callbacks */
 	devcb_resolved_write_line out_intrq_func;
@@ -337,12 +337,12 @@ static void wd17xx_index_pulse_callback(const device_config *controller,const de
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE wd17xx_t *get_safe_token(const device_config *device)
+INLINE wd1770_state *get_safe_token(const device_config *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
 
-	return (wd17xx_t *)device->token;
+	return (wd1770_state *)device->token;
 }
 
 
@@ -375,7 +375,7 @@ static void calc_crc(UINT16 *crc, UINT8 value)
 
 static int wd17xx_has_side_select(const device_config *device)
 {
-	wd17xx_t *w = get_safe_token(device);
+	wd1770_state *w = get_safe_token(device);
 	return (w->type == WD_TYPE_1773) || (w->type == WD_TYPE_1793) || (w->type == WD_TYPE_2793);
 }
 
@@ -399,7 +399,7 @@ static int wd17xx_get_datarate_in_us(DENSITY density)
 /* clear a data request */
 static void wd17xx_clear_drq(const device_config *device)
 {
-	wd17xx_t *w = get_safe_token(device);
+	wd1770_state *w = get_safe_token(device);
 
 	w->status &= ~STA_2_DRQ;
 
@@ -410,7 +410,7 @@ static void wd17xx_clear_drq(const device_config *device)
 /* set data request */
 static void wd17xx_set_drq(const device_config *device)
 {
-	wd17xx_t *w = get_safe_token(device);
+	wd1770_state *w = get_safe_token(device);
 
 	if (w->status & STA_2_DRQ)
 		w->status |= STA_2_LOST_DAT;
@@ -424,7 +424,7 @@ static void wd17xx_set_drq(const device_config *device)
 /* clear interrupt request */
 static void	wd17xx_clear_intrq(const device_config *device)
 {
-	wd17xx_t *w = get_safe_token(device);
+	wd1770_state *w = get_safe_token(device);
 
 	w->intrq = CLEAR_LINE;
 	devcb_call_write_line(&w->out_intrq_func, w->intrq);
@@ -433,7 +433,7 @@ static void	wd17xx_clear_intrq(const device_config *device)
 /* set interrupt request */
 static void	wd17xx_set_intrq(const device_config *device)
 {
-	wd17xx_t *w = get_safe_token(device);
+	wd1770_state *w = get_safe_token(device);
 
 	w->status &= ~STA_2_BUSY;
 
@@ -446,7 +446,7 @@ static void	wd17xx_set_intrq(const device_config *device)
 static TIMER_CALLBACK( wd17xx_busy_callback )
 {
 	const device_config *device = ptr;
-	wd17xx_t *w = get_safe_token(device);
+	wd1770_state *w = get_safe_token(device);
 	wd17xx_set_intrq(device);
 	timer_reset(w->busy_timer, attotime_never);
 }
@@ -455,7 +455,7 @@ static TIMER_CALLBACK( wd17xx_busy_callback )
 
 static void wd17xx_set_busy(const device_config *device, attotime duration)
 {
-	wd17xx_t *w = get_safe_token(device);
+	wd1770_state *w = get_safe_token(device);
 
 	w->status |= STA_1_BUSY;
 	timer_adjust_oneshot(w->busy_timer, duration, 0);
@@ -467,7 +467,7 @@ static void wd17xx_set_busy(const device_config *device, attotime duration)
 
 static void wd17xx_restore(const device_config *device)
 {
-	wd17xx_t *w = get_safe_token(device);
+	wd1770_state *w = get_safe_token(device);
 	UINT8 step_counter;
 
 	if (w->drive == NULL)
@@ -515,7 +515,7 @@ static void wd17xx_restore(const device_config *device)
 /* track writing, converted to format commands */
 static void write_track(const device_config *device)
 {
-	wd17xx_t *w = get_safe_token(device);
+	wd1770_state *w = get_safe_token(device);
 	int i;
 	for (i=0;i+4<w->data_offset;)
 	{
@@ -541,7 +541,7 @@ static void write_track(const device_config *device)
 /* read an entire track */
 static void read_track(const device_config *device)
 {
-	wd17xx_t *w = get_safe_token(device);
+	wd1770_state *w = get_safe_token(device);
 #if 0
 	UINT8 *psrc;		/* pointer to track format structure */
 	UINT8 *pdst;		/* pointer to track buffer */
@@ -680,7 +680,7 @@ static void read_track(const device_config *device)
 static void wd17xx_read_id(const device_config *device)
 {
 	chrn_id id;
-	wd17xx_t *w = get_safe_token(device);
+	wd1770_state *w = get_safe_token(device);
 
 	w->status &= ~(STA_2_CRC_ERR | STA_2_REC_N_FND);
 
@@ -736,7 +736,7 @@ static void wd17xx_read_id(const device_config *device)
 
 static void wd17xx_index_pulse_callback(const device_config *controller, const device_config *img, int state)
 {
-	wd17xx_t *w = get_safe_token(controller);
+	wd1770_state *w = get_safe_token(controller);
 
 	if (img != w->drive)
 		return;
@@ -753,7 +753,7 @@ static int wd17xx_locate_sector(const device_config *device)
 {
 	UINT8 revolution_count;
 	chrn_id id;
-	wd17xx_t *w = get_safe_token(device);
+	wd1770_state *w = get_safe_token(device);
 
 	revolution_count = 0;
 
@@ -798,7 +798,7 @@ static int wd17xx_locate_sector(const device_config *device)
 
 static int wd17xx_find_sector(const device_config *device)
 {
-	wd17xx_t *w = get_safe_token(device);
+	wd1770_state *w = get_safe_token(device);
 	if ( wd17xx_locate_sector(device) )
 	{
 		return 1;
@@ -820,7 +820,7 @@ static int wd17xx_find_sector(const device_config *device)
 /* read a sector */
 static void wd17xx_read_sector(const device_config *device)
 {
-	wd17xx_t *w = get_safe_token(device);
+	wd1770_state *w = get_safe_token(device);
 	w->data_offset = 0;
 
 	/* side compare? */
@@ -849,7 +849,7 @@ static TIMER_CALLBACK(wd17xx_misc_timer_callback)
 {
 	const device_config *device = ptr;
 	int callback_type = param;
-	wd17xx_t *w = get_safe_token(device);
+	wd1770_state *w = get_safe_token(device);
 
 	switch(callback_type) {
 	case MISCCALLBACK_COMMAND:
@@ -879,7 +879,7 @@ or bytes missed */
 static void wd17xx_complete_command(const device_config *device, int delay)
 {
 	int usecs;
-	wd17xx_t *w = get_safe_token(device);
+	wd1770_state *w = get_safe_token(device);
 
 	w->data_count = 0;
 
@@ -905,7 +905,7 @@ static void wd17xx_complete_command(const device_config *device, int delay)
 
 static void wd17xx_write_sector(const device_config *device)
 {
-	wd17xx_t *w = get_safe_token(device);
+	wd1770_state *w = get_safe_token(device);
 	/* at this point, the disc is write enabled, and data
      * has been transfered into our buffer - now write it to
      * the disc image or to the real disc
@@ -934,7 +934,7 @@ static void wd17xx_verify_seek(const device_config *device)
 {
 	UINT8 revolution_count;
 	chrn_id id;
-	wd17xx_t *w = get_safe_token(device);
+	wd1770_state *w = get_safe_token(device);
 
 	revolution_count = 0;
 
@@ -977,7 +977,7 @@ static void wd17xx_verify_seek(const device_config *device)
 static TIMER_CALLBACK( wd17xx_read_sector_callback )
 {
 	const device_config *device = ptr;
-	wd17xx_t *w = get_safe_token(device);
+	wd1770_state *w = get_safe_token(device);
 
 	/* ok, start that read! */
 
@@ -999,7 +999,7 @@ static TIMER_CALLBACK( wd17xx_read_sector_callback )
 static TIMER_CALLBACK(wd17xx_write_sector_callback)
 {
 	const device_config *device = ptr;
-	wd17xx_t *w = get_safe_token(device);
+	wd1770_state *w = get_safe_token(device);
 
 	/* ok, start that write! */
 
@@ -1051,7 +1051,7 @@ static TIMER_CALLBACK(wd17xx_write_sector_callback)
 static void wd17xx_timed_data_request(const device_config *device)
 {
 	int usecs;
-	wd17xx_t *w = get_safe_token(device);
+	wd1770_state *w = get_safe_token(device);
 
 	usecs = wd17xx_get_datarate_in_us(w->density);
 
@@ -1065,7 +1065,7 @@ static void wd17xx_timed_data_request(const device_config *device)
 static void wd17xx_timed_read_sector_request(const device_config *device)
 {
 	int usecs;
-	wd17xx_t *w = get_safe_token(device);
+	wd1770_state *w = get_safe_token(device);
 
 	usecs = w->pause_time; /* How long should we wait? How about 40 micro seconds? */
 
@@ -1079,7 +1079,7 @@ static void wd17xx_timed_read_sector_request(const device_config *device)
 static void wd17xx_timed_write_sector_request(const device_config *device)
 {
 	int usecs;
-	wd17xx_t *w = get_safe_token(device);
+	wd1770_state *w = get_safe_token(device);
 
 	usecs = w->pause_time; /* How long should we wait? How about 40 micro seconds? */
 
@@ -1095,7 +1095,7 @@ static void wd17xx_timed_write_sector_request(const device_config *device)
 /* use this to determine which drive is controlled by WD */
 void wd17xx_set_drive(const device_config *device, UINT8 drive)
 {
-	wd17xx_t *w = get_safe_token(device);
+	wd1770_state *w = get_safe_token(device);
 
 	if (VERBOSE)
 		logerror("wd17xx_set_drive: $%02x\n", drive);
@@ -1106,7 +1106,7 @@ void wd17xx_set_drive(const device_config *device, UINT8 drive)
 
 void wd17xx_set_side(const device_config *device, UINT8 head)
 {
-	wd17xx_t *w = get_safe_token(device);
+	wd1770_state *w = get_safe_token(device);
 
 	if (VERBOSE)
 	{
@@ -1119,7 +1119,7 @@ void wd17xx_set_side(const device_config *device, UINT8 head)
 
 void wd17xx_set_density(const device_config *device, DENSITY density)
 {
-	wd17xx_t *w = get_safe_token(device);
+	wd1770_state *w = get_safe_token(device);
 
 	if (VERBOSE)
 	{
@@ -1132,7 +1132,7 @@ void wd17xx_set_density(const device_config *device, DENSITY density)
 
 void wd17xx_set_pause_time(const device_config *device, int usec)
 {
-	wd17xx_t *w = get_safe_token(device);
+	wd1770_state *w = get_safe_token(device);
 	w->pause_time = usec;
 }
 
@@ -1143,50 +1143,50 @@ void wd17xx_set_pause_time(const device_config *device, int usec)
 
 WRITE_LINE_DEVICE_HANDLER( wd17xx_rdy_w )
 {
-	wd17xx_t *w = get_safe_token(device);
+	wd1770_state *w = get_safe_token(device);
 	w->rdy = state;
 }
 
 READ_LINE_DEVICE_HANDLER( wd17xx_mo_r )
 {
-	wd17xx_t *w = get_safe_token(device);
+	wd1770_state *w = get_safe_token(device);
 	return w->mo;
 }
 
 WRITE_LINE_DEVICE_HANDLER( wd17xx_tr00_w )
 {
-	wd17xx_t *w = get_safe_token(device);
+	wd1770_state *w = get_safe_token(device);
 	w->tr00 = state;
 }
 
 WRITE_LINE_DEVICE_HANDLER( wd17xx_idx_w )
 {
-	wd17xx_t *w = get_safe_token(device);
+	wd1770_state *w = get_safe_token(device);
 	w->idx = state;
 }
 
 WRITE_LINE_DEVICE_HANDLER( wd17xx_wprt_w )
 {
-	wd17xx_t *w = get_safe_token(device);
+	wd1770_state *w = get_safe_token(device);
 	w->wprt = state;
 }
 
 READ_LINE_DEVICE_HANDLER( wd17xx_drq_r )
 {
-	wd17xx_t *w = get_safe_token(device);
+	wd1770_state *w = get_safe_token(device);
 	return w->drq;
 }
 
 READ_LINE_DEVICE_HANDLER( wd17xx_intrq_r )
 {
-	wd17xx_t *w = get_safe_token(device);
+	wd1770_state *w = get_safe_token(device);
 	return w->intrq;
 }
 
 /* read the FDC status register. This clears IRQ line too */
 READ8_DEVICE_HANDLER( wd17xx_status_r )
 {
-	wd17xx_t *w = get_safe_token(device);
+	wd1770_state *w = get_safe_token(device);
 	int result = w->status;
 
 	wd17xx_clear_intrq(device);
@@ -1243,7 +1243,7 @@ READ8_DEVICE_HANDLER( wd17xx_status_r )
 /* read the FDC track register */
 READ8_DEVICE_HANDLER( wd17xx_track_r )
 {
-	wd17xx_t *w = get_safe_token(device);
+	wd1770_state *w = get_safe_token(device);
 
 	if (VERBOSE)
 		logerror("wd17xx_track_r: $%02X\n", w->track_reg);
@@ -1254,7 +1254,7 @@ READ8_DEVICE_HANDLER( wd17xx_track_r )
 /* read the FDC sector register */
 READ8_DEVICE_HANDLER( wd17xx_sector_r )
 {
-	wd17xx_t *w = get_safe_token(device);
+	wd1770_state *w = get_safe_token(device);
 
 	if (VERBOSE)
 		logerror("wd17xx_sector_r: $%02X\n", w->sector);
@@ -1265,7 +1265,7 @@ READ8_DEVICE_HANDLER( wd17xx_sector_r )
 /* read the FDC data register */
 READ8_DEVICE_HANDLER( wd17xx_data_r )
 {
-	wd17xx_t *w = get_safe_token(device);
+	wd1770_state *w = get_safe_token(device);
 
 	if (w->data_count >= 1)
 	{
@@ -1342,7 +1342,7 @@ READ8_DEVICE_HANDLER( wd17xx_data_r )
 /* write the FDC command register */
 WRITE8_DEVICE_HANDLER( wd17xx_command_w )
 {
-	wd17xx_t *w = get_safe_token(device);
+	wd1770_state *w = get_safe_token(device);
 
 	floppy_drive_set_motor_state(w->drive, 1);
 	floppy_drive_set_ready_state(w->drive, 1,0);
@@ -1652,7 +1652,7 @@ WRITE8_DEVICE_HANDLER( wd17xx_command_w )
 /* write the FDC track register */
 WRITE8_DEVICE_HANDLER( wd17xx_track_w )
 {
-	wd17xx_t *w = get_safe_token(device);
+	wd1770_state *w = get_safe_token(device);
 
 	w->track_reg = data;
 
@@ -1663,7 +1663,7 @@ WRITE8_DEVICE_HANDLER( wd17xx_track_w )
 /* write the FDC sector register */
 WRITE8_DEVICE_HANDLER( wd17xx_sector_w )
 {
-	wd17xx_t *w = get_safe_token(device);
+	wd1770_state *w = get_safe_token(device);
 
 	w->sector = data;
 
@@ -1674,7 +1674,7 @@ WRITE8_DEVICE_HANDLER( wd17xx_sector_w )
 /* write the FDC data register */
 WRITE8_DEVICE_HANDLER( wd17xx_data_w )
 {
-	wd17xx_t *w = get_safe_token(device);
+	wd1770_state *w = get_safe_token(device);
 
 	if (w->data_count > 0)
 	{
@@ -1743,7 +1743,7 @@ WRITE8_DEVICE_HANDLER( wd17xx_w )
 
 static DEVICE_START( wd1770 )
 {
-	wd17xx_t *w = get_safe_token(device);
+	wd1770_state *w = get_safe_token(device);
 
 	assert(device->static_config != NULL);
 
@@ -1772,7 +1772,7 @@ static DEVICE_START( wd1770 )
 
 static DEVICE_START( wd1771 )
 {
-	wd17xx_t *w = get_safe_token(device);
+	wd1770_state *w = get_safe_token(device);
 
 	DEVICE_START_CALL(wd1770);
 
@@ -1781,7 +1781,7 @@ static DEVICE_START( wd1771 )
 
 static DEVICE_START( wd1772 )
 {
-	wd17xx_t *w = get_safe_token(device);
+	wd1770_state *w = get_safe_token(device);
 
 	DEVICE_START_CALL(wd1770);
 
@@ -1795,7 +1795,7 @@ static DEVICE_START( wd1772 )
 
 static DEVICE_START( wd1773 )
 {
-	wd17xx_t *w = get_safe_token(device);
+	wd1770_state *w = get_safe_token(device);
 
 	DEVICE_START_CALL(wd1770);
 
@@ -1809,7 +1809,7 @@ static DEVICE_START( wd1773 )
 
 static DEVICE_START( wd179x )
 {
-	wd17xx_t *w = get_safe_token(device);
+	wd1770_state *w = get_safe_token(device);
 
 	DEVICE_START_CALL(wd1770);
 
@@ -1818,7 +1818,7 @@ static DEVICE_START( wd179x )
 
 static DEVICE_START( wd1793 )
 {
-	wd17xx_t *w = get_safe_token(device);
+	wd1770_state *w = get_safe_token(device);
 
 	DEVICE_START_CALL(wd1770);
 
@@ -1827,7 +1827,7 @@ static DEVICE_START( wd1793 )
 
 static DEVICE_START( wd2793 )
 {
-	wd17xx_t *w = get_safe_token(device);
+	wd1770_state *w = get_safe_token(device);
 
 	DEVICE_START_CALL(wd1770);
 
@@ -1836,7 +1836,7 @@ static DEVICE_START( wd2793 )
 
 static DEVICE_START( wd177x )
 {
-	wd17xx_t *w = get_safe_token(device);
+	wd1770_state *w = get_safe_token(device);
 
 	DEVICE_START_CALL(wd1770);
 
@@ -1845,7 +1845,7 @@ static DEVICE_START( wd177x )
 
 static DEVICE_START( mb8877 )
 {
-	wd17xx_t *w = get_safe_token(device);
+	wd1770_state *w = get_safe_token(device);
 
 	DEVICE_START_CALL(wd1770);
 
@@ -1854,7 +1854,7 @@ static DEVICE_START( mb8877 )
 
 static DEVICE_RESET( wd1770 )
 {
-	wd17xx_t *w = get_safe_token(device);
+	wd1770_state *w = get_safe_token(device);
 	int i;
 
 	for (i = 0; i < 4; i++)
@@ -1890,7 +1890,6 @@ void wd17xx_reset(const device_config *device)
 static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 
 #define DEVTEMPLATE_ID(p,s)				p##wd1770##s
-#define DEVTEMPLATE_STATE				wd17xx_t
 #define DEVTEMPLATE_FEATURES			DT_HAS_START | DT_HAS_RESET
 #define DEVTEMPLATE_NAME				"WD1770"
 #define DEVTEMPLATE_FAMILY				"WD17xx"
