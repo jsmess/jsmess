@@ -452,7 +452,7 @@ static void recompute_parameters(const device_config *device)
 /*-------------------------------------------------
     advance_ead - advance EAD pointer
 -------------------------------------------------*/
-
+#ifdef UNUSED_FUNCTION
 #define EAD			upd7220->ead
 #define DAD			upd7220->dad
 #define P			upd7220->pitch
@@ -510,7 +510,7 @@ static void advance_ead(upd7220_t *upd7220)
 
 	EAD &= 0x3ffff;
 }
-
+#endif
 /*-------------------------------------------------
     translate_command - translate command byte
 -------------------------------------------------*/
