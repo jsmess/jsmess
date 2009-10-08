@@ -18,7 +18,7 @@
 
 #define LOG_ICW		0
 #define LOG_OCW		0
-#define LOG_GENERAL	0
+#define LOG_GENERAL	1
 
 typedef enum
 {

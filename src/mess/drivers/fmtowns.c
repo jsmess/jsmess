@@ -709,7 +709,10 @@ static void towns_update_video_banks(const address_space* space)
 			memory_set_bankptr(space->machine,6,mess_ram+0xcb000);
 		memory_set_bankptr(space->machine,7,mess_ram+0xcb000);
 		memory_set_bankptr(space->machine,8,mess_ram+0xcc000);
-		memory_set_bankptr(space->machine,11,ROM+0x238000);
+		if(towns_system_port & 0x02)
+			memory_set_bankptr(space->machine,11,mess_ram+0xf8000);
+		else
+			memory_set_bankptr(space->machine,11,ROM+0x238000);
 		memory_set_bankptr(space->machine,12,mess_ram+0xf8000);
 		return;
 	}
@@ -790,6 +793,23 @@ static READ8_HANDLER(towns_unknown_r)
 	return 0x08;
 }
 
+static IRQ_CALLBACK( towns_irq_callback )
+{
+	const device_config* dev = devtag_get_device(device->machine,"pic8259_master");
+	return pic8259_acknowledge(dev);
+}
+
+static PIC8259_SET_INT_LINE( towns_pic_irq )
+{
+	cputag_set_input_line(device->machine,"maincpu",0,interrupt ? ASSERT_LINE : CLEAR_LINE);
+}
+
+static PIT8253_OUTPUT_CHANGED( towns_pit_out0_changed )
+{
+	const device_config* dev = devtag_get_device(device->machine,"pic8259_master");
+	pic8259_set_irq_line(dev,0,state);
+}
+
 static ADDRESS_MAP_START(towns_mem, ADDRESS_SPACE_PROGRAM, 32)
   // memory map based on FM-Towns/Bochs (Bochs modified to emulate the FM-Towns)
   // may not be (and probably is not) correct
@@ -829,6 +849,7 @@ static ADDRESS_MAP_START( towns_io , ADDRESS_SPACE_IO, 32)
   AM_RANGE(0x0040,0x0047) AM_DEVREADWRITE8("pit",pit8253_r, pit8253_w, 0x00ff00ff)
   AM_RANGE(0x0060,0x0063) AM_READWRITE8(towns_port60_r, towns_port60_w, 0x000000ff)
   AM_RANGE(0x006c,0x006f) AM_READWRITE8(towns_sys6c_r,towns_sys6c_w, 0x000000ff)
+  // 0x0070/0x0080 - CMOS RTC
   // DMA controllers (uPD71071)
   AM_RANGE(0x00a0,0x00af) AM_READWRITE8(towns_dma1_r, towns_dma1_w, 0xffffffff)
   AM_RANGE(0x00b0,0x00bf) AM_READWRITE8(towns_dma2_r, towns_dma2_w, 0xffffffff)
@@ -881,6 +902,8 @@ static DRIVER_INIT( towns )
 	towns_txtvram = auto_alloc_array(machine,UINT8,0x8000);
 	towns_serial_rom = auto_alloc_array(machine,UINT8,256/8);
 	towns_init_serial_rom();
+	
+	cpu_set_irq_callback(cputag_get_cpu(machine,"maincpu"), towns_irq_callback);
 }
 
 static MACHINE_RESET( towns )
@@ -934,7 +957,7 @@ static const struct pit8253_config towns_pit8253_config =
 	{
 		{
 			307200,
-			NULL
+			towns_pit_out0_changed
 		},
 		{
 			307200,
@@ -949,7 +972,7 @@ static const struct pit8253_config towns_pit8253_config =
 
 static const struct pic8259_interface towns_pic8259_master_config =
 {
-	NULL
+	towns_pic_irq
 };
 
 
