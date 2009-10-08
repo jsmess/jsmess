@@ -915,12 +915,12 @@ static IRQ_CALLBACK( towns_irq_callback )
 
 static PIC8259_SET_INT_LINE( towns_pic_irq )
 {
-	cputag_set_input_line(device->machine,"maincpu",0,interrupt ? HOLD_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine,"maincpu",0,interrupt ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static PIC8259_SET_INT_LINE( towns_slave_pic_irq )
 {
-	cputag_set_input_line(device->machine,"maincpu",7,interrupt ? HOLD_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine,"maincpu",7,interrupt ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static PIT8253_OUTPUT_CHANGED( towns_pit_out0_changed )
