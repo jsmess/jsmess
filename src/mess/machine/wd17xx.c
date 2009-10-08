@@ -2,9 +2,50 @@
 
     wd17xx.c
 
-    Implementations of the Western Digital 17xx and 19xx families of
+    Implementations of the Western Digital 17xx and 27xx families of
     floppy disk controllers
 
+
+    Models:
+
+              DAL   DD   Side   Clock       Remark
+      ---------------------------------------------------------
+      FD1771                    1 or 2 MHz  First model
+      FD1781         x          1 or 2 MHz
+      FD1791         x          1 or 2 MHz
+      FD1792                    1 or 2 MHz
+      FD1793   x     x          1 or 2 MHz
+      FD1794   x                1 or 2 MHz
+      FD1795         x     x    1 or 2 MHz
+      FD1797   x     x     x    1 or 2 MHz
+      FD1761         x          1 MHz
+      FD1762                    1 MHz       ?
+      FD1763   x     x          1 MHz
+      FD1764   x                1 MHz       ?
+      FD1765         x     x    1 MHz
+      FD1767   x     x     x    1 MHz
+      WD2791         x          1 or 2 MHz  Internal data separator
+      WD2793   x     x          1 or 2 MHz  Internal data separator
+      WD2795         x     x    1 or 2 MHz  Internal data separator
+      WD2797   x     x     x    1 or 2 MHz  Internal data separator
+      WD1770         x          8 MHz       Motor On signal
+      WD1772         x          8 MHz       Motor On signal, Faster stepping rates
+      WD1773         x          8 MHz       Enable precomp line
+
+      Notes: - In general, later models include all features of earlier models
+             - DAL: Data access lines, x = TRUE; otherwise inverted
+             - DD: Double density support
+             - Side: Has side select support
+             - ?: Unknown if it really exists
+
+    Clones:
+
+      - SMC FD179x
+      - Fujitsu MB8876 -> FD1791, MB8877 -> FD1793
+      - VLSI VL177x
+
+
+    Changelog:
 
     Kevin Thacker
         - Removed disk image code and replaced it with floppy drive functions.
@@ -239,34 +280,41 @@ struct _wd1770_state
 	devcb_resolved_write_line out_intrq_func;
 	devcb_resolved_write_line out_drq_func;
 
-	/* state of input lines */
-	int rdy;      /* ready, enable precomp */
-	int tr00;     /* track 00 */
-	int idx;      /* index */
-	int wprt;     /* write protect */
+	/* input lines */
+	int mr;            /* master reset */
+	int rdy;           /* ready, enable precomp */
+	int tr00;          /* track 00 */
+	int idx;           /* index */
+	int wprt;          /* write protect */
+	int dden;          /* double density */
 
-	/* state of output lines */
-	int mo;       /* motor on */
-	int dirc;     /* direction */
-	int drq;      /* data request */
-	int intrq;    /* interrupt request */
+	/* output lines */
+	int mo;            /* motor on */
+	int dirc;          /* direction */
+	int drq;           /* data request */
+	int intrq;         /* interrupt request */
+
+	/* register */
+	UINT8 data_shift;
+	UINT8 data;
+	UINT8 track;
+	UINT8 sector;
+	UINT8 command;
+	UINT8 status;
 
 	int stepping_rate[4];  /* track stepping rate in ms */
+
 
 	DENSITY   density;				/* FM/MFM, single / double density */
 	wd17xx_type_t type;
 	UINT8	track_reg;				/* value of track register */
-	UINT8	data;					/* value of data register */
-	UINT8	command;				/* last command written */
 	UINT8	command_type;			/* last command type */
-	UINT8	sector; 				/* current sector # */
 	UINT8	head;					/* current head # */
 
 	UINT8	read_cmd;				/* last read command issued */
 	UINT8	write_cmd;				/* last write command issued */
 	INT8	direction;				/* last step direction */
 
-	UINT8	status; 				/* status register */
 	UINT8	status_drq; 			/* status register data request bit */
 	UINT8	status_ipl; 			/* status register toggle index pulse bit */
 	UINT8	busy_count; 			/* how long to keep busy bit set */
@@ -465,7 +513,7 @@ static void wd17xx_set_busy(const device_config *device, attotime duration)
 
 /* BUSY COUNT DOESN'T WORK PROPERLY! */
 
-static void wd17xx_restore(const device_config *device)
+static void wd17xx_command_restore(const device_config *device)
 {
 	wd1770_state *w = get_safe_token(device);
 	UINT8 step_counter;
@@ -500,7 +548,7 @@ static void wd17xx_restore(const device_config *device)
 	}
 
 	/* update track reg */
-	w->track_reg = 0;
+	w->track = 0;
 #if 0
 	/* simulate seek time busy signal */
 	w->busy_count = 0;	//w->busy_count * ((w->data & FDC_STEP_RATE) + 1);
@@ -724,7 +772,7 @@ static void wd17xx_read_id(const device_config *device)
 	{
 		/* record not found */
 		w->status |= STA_2_REC_N_FND;
-		//w->sector = w->track_reg;
+		//w->sector = w->track;
 		if (VERBOSE)
 			logerror("read id failed\n");
 
@@ -764,7 +812,7 @@ static int wd17xx_locate_sector(const device_config *device)
 		if (floppy_drive_get_next_id(w->drive, w->hd, &id))
 		{
 			/* compare track */
-			if (id.C == w->track_reg)
+			if (id.C == w->track)
 			{
 				/* compare head, if we were asked to */
 				if (!wd17xx_has_side_select(device) || (id.H == w->head) || (w->head == (UINT8) ~0))
@@ -808,7 +856,7 @@ static int wd17xx_find_sector(const device_config *device)
 	w->status |= STA_2_REC_N_FND;
 
 	if (VERBOSE)
-		logerror("track %d sector %d not found!\n", w->track_reg, w->sector);
+		logerror("track %d sector %d not found!\n", w->track, w->sector);
 
 	wd17xx_complete_command(device, DELAY_ERROR);
 
@@ -949,7 +997,7 @@ static void wd17xx_verify_seek(const device_config *device)
 		if (floppy_drive_get_next_id(w->drive, w->hd, &id))
 		{
 			/* compare track */
-			if (id.C == w->track_reg)
+			if (id.C == w->track)
 			{
 				if (VERBOSE)
 					logerror("seek verify succeeded!\n");
@@ -1141,42 +1189,71 @@ void wd17xx_set_pause_time(const device_config *device, int usec)
     DEVICE HANDLERS
 ***************************************************************************/
 
+/* master reset */
+WRITE_LINE_DEVICE_HANDLER( wd17xx_mr_w )
+{
+	wd1770_state *w = get_safe_token(device);
+
+	/* reset device when going from high to low */
+	if (w->mr && state == CLEAR_LINE)
+	{
+		w->command = 0x03;
+		w->status &= ~STA_1_NOT_READY; /* ? */
+	}
+
+	/* execute restore command when going from low to high */
+	if (w->mr == CLEAR_LINE && state)
+	{
+		wd17xx_command_restore(device);
+		w->sector = 0x01;
+	}
+
+	w->mr = state;
+}
+
+/* ready and enable precomp (1773 only) */
 WRITE_LINE_DEVICE_HANDLER( wd17xx_rdy_w )
 {
 	wd1770_state *w = get_safe_token(device);
 	w->rdy = state;
 }
 
+/* motor on, 1770 and 1772 only */
 READ_LINE_DEVICE_HANDLER( wd17xx_mo_r )
 {
 	wd1770_state *w = get_safe_token(device);
 	return w->mo;
 }
 
+/* track zero */
 WRITE_LINE_DEVICE_HANDLER( wd17xx_tr00_w )
 {
 	wd1770_state *w = get_safe_token(device);
 	w->tr00 = state;
 }
 
+/* index pulse */
 WRITE_LINE_DEVICE_HANDLER( wd17xx_idx_w )
 {
 	wd1770_state *w = get_safe_token(device);
 	w->idx = state;
 }
 
+/* write protect status */
 WRITE_LINE_DEVICE_HANDLER( wd17xx_wprt_w )
 {
 	wd1770_state *w = get_safe_token(device);
 	w->wprt = state;
 }
 
+/* data request */
 READ_LINE_DEVICE_HANDLER( wd17xx_drq_r )
 {
 	wd1770_state *w = get_safe_token(device);
 	return w->drq;
 }
 
+/* interrupt request */
 READ_LINE_DEVICE_HANDLER( wd17xx_intrq_r )
 {
 	wd1770_state *w = get_safe_token(device);
@@ -1246,9 +1323,9 @@ READ8_DEVICE_HANDLER( wd17xx_track_r )
 	wd1770_state *w = get_safe_token(device);
 
 	if (VERBOSE)
-		logerror("wd17xx_track_r: $%02X\n", w->track_reg);
+		logerror("wd17xx_track_r: $%02X\n", w->track);
 
-	return w->track_reg;
+	return w->track;
 }
 
 /* read the FDC sector register */
@@ -1509,7 +1586,7 @@ WRITE8_DEVICE_HANDLER( wd17xx_command_w )
 		if (VERBOSE)
 			logerror("wd17xx_command_w $%02X RESTORE\n", data);
 
-		wd17xx_restore(device);
+		wd17xx_command_restore(device);
 	}
 
 	if ((data & ~FDC_MASK_TYPE_I) == FDC_SEEK)
@@ -1517,18 +1594,18 @@ WRITE8_DEVICE_HANDLER( wd17xx_command_w )
 		UINT8 newtrack;
 
 		if (VERBOSE)
-			logerror("old track: $%02x new track: $%02x\n", w->track_reg, w->data);
+			logerror("old track: $%02x new track: $%02x\n", w->track, w->data);
 		w->command_type = TYPE_I;
 
 		/* setup step direction */
-		if (w->track_reg < w->data)
+		if (w->track < w->data)
 		{
 			if (VERBOSE)
 				logerror("direction: +1\n");
 
 			w->direction = 1;
 		}
-		else if (w->track_reg > w->data)
+		else if (w->track > w->data)
 		{
 			if (VERBOSE)
 				logerror("direction: -1\n");
@@ -1544,13 +1621,13 @@ WRITE8_DEVICE_HANDLER( wd17xx_command_w )
 		w->busy_count = 0;
 
 		/* keep stepping until reached track programmed */
-		while (w->track_reg != newtrack)
+		while (w->track != newtrack)
 		{
 			/* update time to simulate seek time busy signal */
 			w->busy_count++;
 
 			/* update track reg */
-			w->track_reg += w->direction;
+			w->track += w->direction;
 
 			floppy_drive_seek(w->drive, w->direction);
 		}
@@ -1577,7 +1654,7 @@ WRITE8_DEVICE_HANDLER( wd17xx_command_w )
 		floppy_drive_seek(w->drive, w->direction);
 
 		if (data & FDC_STEP_UPDATE)
-			w->track_reg += w->direction;
+			w->track += w->direction;
 
 #if 0
 		wd17xx_set_intrq(device);
@@ -1600,7 +1677,7 @@ WRITE8_DEVICE_HANDLER( wd17xx_command_w )
 		floppy_drive_seek(w->drive, w->direction);
 
 		if (data & FDC_STEP_UPDATE)
-			w->track_reg += w->direction;
+			w->track += w->direction;
 #if 0
 		wd17xx_set_intrq(device);
 #endif
@@ -1622,7 +1699,7 @@ WRITE8_DEVICE_HANDLER( wd17xx_command_w )
 		floppy_drive_seek(w->drive, w->direction);
 
 		if (data & FDC_STEP_UPDATE)
-			w->track_reg += w->direction;
+			w->track += w->direction;
 
 #if 0
 		wd17xx_set_intrq(device);
@@ -1654,7 +1731,7 @@ WRITE8_DEVICE_HANDLER( wd17xx_track_w )
 {
 	wd1770_state *w = get_safe_token(device);
 
-	w->track_reg = data;
+	w->track = data;
 
 	if (VERBOSE)
 		logerror("wd17xx_track_w $%02X\n", data);
@@ -1764,6 +1841,7 @@ static DEVICE_START( wd1770 )
 	/* model specific values */
 	w->type = WD_TYPE_1770;
 
+	/* stepping rate depends on the clock */
 	w->stepping_rate[0] = 6;
 	w->stepping_rate[1] = 12;
 	w->stepping_rate[2] = 20;
@@ -1787,10 +1865,11 @@ static DEVICE_START( wd1772 )
 
 	w->type = WD_TYPE_1772;
 
+	/* the 1772 has faster track stepping rates */
 	w->stepping_rate[0] = 6;
 	w->stepping_rate[1] = 12;
-	w->stepping_rate[2] = 20;
-	w->stepping_rate[3] = 30;
+	w->stepping_rate[2] = 2;
+	w->stepping_rate[3] = 3;
 }
 
 static DEVICE_START( wd1773 )
@@ -1800,11 +1879,6 @@ static DEVICE_START( wd1773 )
 	DEVICE_START_CALL(wd1770);
 
 	w->type = WD_TYPE_1773;
-
-	w->stepping_rate[0] = 6;
-	w->stepping_rate[1] = 12;
-	w->stepping_rate[2] = 2;
-	w->stepping_rate[3] = 3;
 }
 
 static DEVICE_START( wd179x )
@@ -1857,6 +1931,11 @@ static DEVICE_RESET( wd1770 )
 	wd1770_state *w = get_safe_token(device);
 	int i;
 
+	/* set the default state of some input lines */
+	w->mr = ASSERT_LINE;
+	w->wprt = ASSERT_LINE;
+	w->dden = ASSERT_LINE;
+
 	for (i = 0; i < 4; i++)
 	{
 		if(w->intf->floppy_drive_tags[i]!=NULL) {
@@ -1874,7 +1953,7 @@ static DEVICE_RESET( wd1770 )
 	w->hd = 0;
 	w->hld_count = 0;
 
-	wd17xx_restore(device);
+	wd17xx_command_restore(device);
 }
 
 void wd17xx_reset(const device_config *device)
