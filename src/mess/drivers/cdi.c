@@ -11,39 +11,18 @@
 
 *******************************************************************************
 
-
-    *** Hardware Notes ***
-
-    These are actually the specs of the Philips CD-i console.
-
-    Identified:
-
-    - CPU:  1x Philips SCC 68070 CCA84 (16 bits Microprocessor, PLCC) @ 15 MHz
-    - VSC:  1x Philips SCC 66470 CAB (Video and System Controller, QFP)
-
-    - Crystals:   1x 30.0000 MHz.
-                  1x 19.6608 MHz.
-
-
-*******************************************************************************
-
 STATUS:
 
-BIOSes will run until attempting an OS call using the methods described here:
-http://www.icdia.co.uk/microware/tech/tech_2.pdf
+Some games will start up, but fail horribly.
 
 TODO:
 
 -Proper handling of the 68070 (68k with 32 address lines instead of 24)
  & handle the extra features properly (UART,DMA,Timers etc.)
 
--Proper emulation of the 66470 and/or MCD212 Video Chip (still many unhandled features)
+-Full emulation of the 66470 and/or MCD212 Video Chip (still many unhandled features)
 
--Inputs;
-
--Unknown sound chip (it's an ADPCM with eight channels);
-
--Many unknown memory maps;
+-Unknown sound chip (CD-i ADPCM);
 
 *******************************************************************************/
 
@@ -64,8 +43,11 @@ emu_timer *test_timer;
 
 #define ENABLE_UART_PRINTING (0)
 
-#define VERBOSE_LEVEL	(0)
+#define VERBOSE_LEVEL	(11)
 
+#define ENABLE_VERBOSE_LOG (0)
+
+#if ENABLE_VERBOSE_LOG
 INLINE void verboselog(running_machine *machine, int n_level, const char *s_fmt, ...)
 {
 	if( VERBOSE_LEVEL >= n_level )
@@ -78,6 +60,9 @@ INLINE void verboselog(running_machine *machine, int n_level, const char *s_fmt,
 		logerror( "%08x: %s", cpu_get_pc(cputag_get_cpu(machine, "maincpu")), buf );
 	}
 }
+#else
+#define verboselog(x,y,z,...)
+#endif
 
 /***********************
 * Forward declarations *
@@ -959,29 +944,13 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 			cdrom_read_data(cdic_regs.cd, lba, buffer, CD_TRACK_RAW_DONTCARE);
 			for(index = 6; index < 2352/2; index++)
 			{
+				if(cdic_regs.time == 0x00332300 || cdic_regs.time == 0x00332400)
+				{
+					//printf( "%02x %02x ", buffer[index*2], buffer[index*2 + 1] );
+				}
 				cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + (index - 6)] = (buffer[index*2] << 8) | buffer[index*2 + 1];
 			}
-
-			printf( "Setting CDIC interrupt line\n" );
-			verboselog(machine, 0, "Setting CDIC interrupt line\n" );
-			cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), M68K_IRQ_4, 128);
-			cputag_set_input_line(machine, "maincpu", M68K_IRQ_4, ASSERT_LINE);
-
-			timer_adjust_oneshot(cdic_regs.interrupt_timer, ATTOTIME_IN_HZ(75), 0); // 75Hz = 1x CD-ROM speed
-
-			/* This is wrong, can't figure out right now what's right
-			if(cdic_regs.audio_channel & 0x8000)
-			{
-				cdic_regs.z_buffer |= 0x2000;
-				cdic_regs.audio_buffer |= 0x8000;
-			}
-			else
-			{*/
-				cdic_regs.x_buffer |= 0x8000;
-			//}
-
-			cdic_regs.data_buffer |= 0x4000;
-			cdic_regs.data_buffer &= 0x7fff;
+			//printf( "\n" );
 
 			cdic_regs.time += 0x100;
 			if((cdic_regs.time & 0x00000f00) == 0xa00)
@@ -1004,6 +973,30 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 					}
 				}
 			}
+
+			if(((buffer[22] & 0x24) == 0x24) && (cdic_regs.channel & cdic_regs.audio_channel & (1 << buffer[21])))
+			{
+				// Ignore the audio sector for now.
+			}
+			else if((buffer[22] & 0x0e) == 0x00)
+			{
+				// Empty message sector, ignore it
+			}
+			else //if((buffer[22] & 0x04) == 0x04)
+			{
+				cdic_regs.x_buffer |= 0x8000;
+
+				cdic_regs.data_buffer |= 0x4000;
+				cdic_regs.data_buffer &= 0x7fff;
+
+				printf( "Setting CDIC interrupt line\n" );
+				verboselog(machine, 0, "Setting CDIC interrupt line\n" );
+				cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), M68K_IRQ_4, 128);
+				cputag_set_input_line(machine, "maincpu", M68K_IRQ_4, ASSERT_LINE);
+			}
+
+			timer_adjust_oneshot(cdic_regs.interrupt_timer, ATTOTIME_IN_HZ(75), 0); // 75Hz = 1x CD-ROM speed
+
 			break;
 		}
 		case 0x2e: // Abort
@@ -1114,7 +1107,12 @@ static WRITE16_HANDLER( cdic_w )
 			for(index = start / 2; index < (start / 2 + count); index++)
 			{
 				memory[index] = cdram[src_index++];
+				if(cdic_regs.time == 0x00332400 || cdic_regs.time == 0x00332500)
+				{
+					printf( "%04x ", cdram[src_index - 1] );
+				}
 			}
+			printf( "\n" );
 			scc68070_regs.dma.channel[0].memory_address_counter += scc68070_regs.dma.channel[0].transfer_counter * 2;
 			break;
 		}
@@ -1545,6 +1543,7 @@ typedef struct
 	UINT16 vsr;
 	UINT16 ddr;
 	UINT16 dcp;
+	UINT32 dca;
 	UINT32 clut[256];
 	UINT32 image_coding_method;
 	UINT32 transparency_control;
@@ -1694,22 +1693,22 @@ static READ16_HANDLER(mcd212_r)
 				verboselog(space->machine, 12, "mcd212_r: Status Register %d: %02x & %04x\n", channel + 1, mcd212.channel[1 - (offset / 8)].csrr, mem_mask);
 				if(channel == 0)
 				{
-					return mcd212.channel[0].csrr | 0x20;
+					return mcd212.channel[0].csrr;
 				}
 				else
 				{
 					UINT8 old_csr = mcd212.channel[1].csrr;
 					UINT8 interrupt1 = (scc68070_regs.lir >> 4) & 7;
-					UINT8 interrupt2 = scc68070_regs.lir & 7;
+					//UINT8 interrupt2 = scc68070_regs.lir & 7;
 					mcd212.channel[1].csrr &= ~(MCD212_CSR2R_IT1 | MCD212_CSR2R_IT2);
 					if(interrupt1)
 					{
 						cputag_set_input_line(space->machine, "maincpu", M68K_IRQ_1 + (interrupt1 - 1), CLEAR_LINE);
 					}
-					if(interrupt2)
-					{
-						cputag_set_input_line(space->machine, "maincpu", M68K_IRQ_1 + (interrupt2 - 1), CLEAR_LINE);
-					}
+					//if(interrupt2)
+					//{
+					//	cputag_set_input_line(space->machine, "maincpu", M68K_IRQ_1 + (interrupt2 - 1), CLEAR_LINE);
+					//}
 					return old_csr;
 				}
 			}
@@ -1722,22 +1721,18 @@ static READ16_HANDLER(mcd212_r)
 		case 0x12/2:
 			verboselog(space->machine, 2, "mcd212_r: Display Command Register %d: %04x & %04x\n", (1 - (offset / 8)) + 1, mcd212.channel[1 - (offset / 8)].dcr, mem_mask);
 			return mcd212.channel[1 - (offset / 8)].dcr;
-			break;
 		case 0x04/2:
 		case 0x14/2:
 			verboselog(space->machine, 2, "mcd212_r: Video Start Register %d: %04x & %04x\n", (1 - (offset / 8)) + 1, mcd212.channel[1 - (offset / 8)].vsr, mem_mask);
 			return mcd212.channel[1 - (offset / 8)].vsr;
-			break;
 		case 0x08/2:
 		case 0x18/2:
 			verboselog(space->machine, 2, "mcd212_r: Display Decoder Register %d: %04x & %04x\n", (1 - (offset / 8)) + 1, mcd212.channel[1 - (offset / 8)].ddr, mem_mask);
 			return mcd212.channel[1 - (offset / 8)].ddr;
-			break;
 		case 0x0a/2:
 		case 0x1a/2:
 			verboselog(space->machine, 2, "mcd212_r: DCA Pointer Register %d: %04x & %04x\n", (1 - (offset / 8)) + 1, mcd212.channel[1 - (offset / 8)].dcp, mem_mask);
 			return mcd212.channel[1 - (offset / 8)].dcp;
-			break;
 		default:
 			verboselog(space->machine, 2, "mcd212_r: Unknown Register %d & %04x\n", (1 - (offset / 8)) + 1, mem_mask);
 			break;
@@ -2012,7 +2007,7 @@ static void mcd212_process_ica(running_machine *machine, int channel)
 			case 0x68: case 0x69: case 0x6a: case 0x6b: case 0x6c: case 0x6d: case 0x6e: case 0x6f:
 				verboselog(machine, 11, "%08x: %08x: ICA %d: INTERRUPT\n", addr * 2 + channel * 0x200000, cmd, channel );
 				mcd212.channel[1].csrr |= 1 << (2 - channel);
-				if(mcd212.channel[1].csrr & MCD212_CSR2R_IT1)
+				if(mcd212.channel[1].csrr & (MCD212_CSR2R_IT1 | MCD212_CSR2R_IT2))
 				{
 					UINT8 interrupt = (scc68070_regs.lir >> 4) & 7;
 					if(interrupt)
@@ -2021,6 +2016,7 @@ static void mcd212_process_ica(running_machine *machine, int channel)
 						cputag_set_input_line(machine, "maincpu", M68K_IRQ_1 + (interrupt - 1), ASSERT_LINE);
 					}
 				}
+				/*
 				if(mcd212.channel[1].csrr & MCD212_CSR2R_IT2)
 				{
 					UINT8 interrupt = scc68070_regs.lir & 7;
@@ -2030,6 +2026,7 @@ static void mcd212_process_ica(running_machine *machine, int channel)
 						cputag_set_input_line(machine, "maincpu", M68K_IRQ_1 + (interrupt - 1), ASSERT_LINE);
 					}
 				}
+				*/
 				break;
 			case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d: case 0x7e: case 0x7f: // RELOAD DISPLAY PARAMETERS
 				verboselog(machine, 11, "%08x: %08x: ICA %d: RELOAD DISPLAY PARAMETERS\n", addr * 2 + channel * 0x200000, cmd, channel );
@@ -2049,10 +2046,12 @@ static void mcd212_process_ica(running_machine *machine, int channel)
 static void mcd212_process_dca(running_machine *machine, int channel)
 {
 	UINT16 *dca = channel ? planeb : planea;
-	UINT32 addr = mcd212_get_dcp(channel) / 2;
+	UINT32 addr = (mcd212.channel[channel].dca & 0x0007ffff) / 2; //(mcd212_get_dcp(channel) & 0x0007ffff) / 2; // mcd212.channel[channel].dca / 2;
 	UINT32 cmd = 0;
 	UINT32 count = 0;
-	UINT32 max = (mcd212.channel[channel].dcr & MCD212_DCR_CM) ? 64 : 32;
+	UINT32 max = 64; //(mcd212.channel[channel].dcr & MCD212_DCR_CM) ? 64 : 32;
+	UINT8 addr_changed = 0;
+	//printf( "max = %d\n", max );
 	while(1)
 	{
 		UINT8 stop = 0;
@@ -2068,7 +2067,7 @@ static void mcd212_process_dca(running_machine *machine, int channel)
 				break;
 			case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15: case 0x16: case 0x17: // NOP
 			case 0x18: case 0x19: case 0x1a: case 0x1b: case 0x1c: case 0x1d: case 0x1e: case 0x1f:
-				verboselog(machine, 12, "%08x: %08x: DCA %d: NOP\n", addr * 2 + channel * 0x200000, cmd, channel );
+				verboselog(machine, 11, "%08x: %08x: DCA %d: NOP\n", addr * 2 + channel * 0x200000, cmd, channel );
 				break;
 			case 0x20: case 0x21: case 0x22: case 0x23: case 0x24: case 0x25: case 0x26: case 0x27: // RELOAD DCP
 			case 0x28: case 0x29: case 0x2a: case 0x2b: case 0x2c: case 0x2d: case 0x2e: case 0x2f:
@@ -2078,6 +2077,8 @@ static void mcd212_process_dca(running_machine *machine, int channel)
 			case 0x38: case 0x39: case 0x3a: case 0x3b: case 0x3c: case 0x3d: case 0x3e: case 0x3f:
 				verboselog(machine, 11, "%08x: %08x: DCA %d: RELOAD DCP and STOP\n", addr * 2 + channel * 0x200000, cmd, channel );
 				mcd212_set_dcp(channel, cmd & 0x001fffff);
+				addr = (cmd & 0x0007ffff) / 2;
+				addr_changed = 1;
 				stop = 1;
 				break;
 			case 0x40: case 0x41: case 0x42: case 0x43: case 0x44: case 0x45: case 0x46: case 0x47: // RELOAD VSR
@@ -2095,15 +2096,16 @@ static void mcd212_process_dca(running_machine *machine, int channel)
 			case 0x68: case 0x69: case 0x6a: case 0x6b: case 0x6c: case 0x6d: case 0x6e: case 0x6f:
 				verboselog(machine, 11, "%08x: %08x: DCA %d: INTERRUPT\n", addr * 2 + channel * 0x200000, cmd, channel );
 				mcd212.channel[1].csrr |= 1 << (2 - channel);
-				if(mcd212.channel[1].csrr & MCD212_CSR2R_IT1)
+				if(mcd212.channel[1].csrr & (MCD212_CSR2R_IT1 | MCD212_CSR2R_IT2))
 				{
 					UINT8 interrupt = (scc68070_regs.lir >> 4) & 7;
 					if(interrupt)
 					{
-						cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), M68K_IRQ_1 + (interrupt - 1), 24 + interrupt);
+						cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), M68K_IRQ_1 + (interrupt - 1), 56 + interrupt);
 						cputag_set_input_line(machine, "maincpu", M68K_IRQ_1 + (interrupt - 1), ASSERT_LINE);
 					}
 				}
+				/*
 				if(mcd212.channel[1].csrr & MCD212_CSR2R_IT2)
 				{
 					UINT8 interrupt = scc68070_regs.lir & 7;
@@ -2113,6 +2115,7 @@ static void mcd212_process_dca(running_machine *machine, int channel)
 						cputag_set_input_line(machine, "maincpu", M68K_IRQ_1 + (interrupt - 1), ASSERT_LINE);
 					}
 				}
+				*/
 				break;
 			case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d: case 0x7e: case 0x7f: // RELOAD DISPLAY PARAMETERS
 				verboselog(machine, 11, "%08x: %08x: DCA %d: RELOAD DISPLAY PARAMETERS\n", addr * 2 + channel * 0x200000, cmd, channel );
@@ -2127,6 +2130,7 @@ static void mcd212_process_dca(running_machine *machine, int channel)
 			break;
 		}
 	}
+	mcd212.channel[channel].dca = addr * 2;
 }
 
 static UINT8 mcd212_dyuv_quantizer[16] = { 0, 1, 4, 9, 16, 27, 44, 79, 128, 177, 212, 229, 240, 247, 252, 255 };
@@ -2164,7 +2168,7 @@ static void mcd212_process_vsr(running_machine *machine, int channel, UINT32 *pi
 			pixels[x++] = 0x00070707;
 			pixels[x] = 0x00070707;
 		}
-		done = 1;
+		return;
 	}
 
 	while(!done)
@@ -2184,8 +2188,6 @@ static void mcd212_process_vsr(running_machine *machine, int channel, UINT32 *pi
 				else
 				{
 					// 8-bit Bitmap
-					UINT32 mask = channel ? 0x00000f00 : 0x0000000f;
-					UINT32 shift = channel ? 8 : 0;
 					if(icm == 5)
 					{
 						UINT8 y;
@@ -2240,7 +2242,7 @@ static void mcd212_process_vsr(running_machine *machine, int channel, UINT32 *pi
 						}
 						mcd212_set_vsr(channel, vsr - 1);
 					}
-					else if(((mcd212.channel[0].image_coding_method & mask) >> shift) == 0x3)
+					else if(icm == 3)
 					{
 						for(; x < 768; x++)
 						{
@@ -2480,6 +2482,7 @@ TIMER_CALLBACK( mcd212_perform_scan )
 		{
 			// Process ICA
 			int index = 0;
+			verboselog(machine, 0, "FRAME START\n" );
 			mcd212.channel[0].csrr &= 0x7f;
 			for(index = 0; index < 2; index++)
 			{
@@ -2505,8 +2508,16 @@ TIMER_CALLBACK( mcd212_perform_scan )
 			{
 				if(mcd212.channel[index].dcr & MCD212_DCR_DCA)
 				{
+					if(scanline == 22)
+					{
+						mcd212.channel[index].dca = mcd212_get_dcp(index);
+					}
 					mcd212_process_dca(machine, index);
 				}
+			}
+			if(scanline == 261)
+			{
+				mcd212.channel[0].csrr ^= 0x20;
 			}
 		}
 	}
@@ -2623,6 +2634,7 @@ static MACHINE_RESET( cdi )
 	device_reset(cputag_get_cpu(machine, "maincpu"));
 
 	cdic_regs.z_buffer = 0;
+	cdic_regs.channel = 0xffffffff;
 }
 
 /*************************
