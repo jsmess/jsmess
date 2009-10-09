@@ -216,6 +216,8 @@
 #include "cpu/i386/i386.h"
 #include "machine/8255ppi.h"
 #include "machine/pit8253.h"
+#include "machine/8237dma.h"
+#include "machine/pic8259.h"
 
 static UINT32 *pc9801_vram;
 static UINT32 *gfx_bitmap_ram;
@@ -408,7 +410,8 @@ static READ8_HANDLER( port_70_r )
 	if(offset & 1)
 	{
 		logerror("pit port $70 R access %02x\n",offset >> 1);
-		return mame_rand(space->machine);//pit8253_r(devtag_get_device(space->machine, "pit8253"), (offset & 6) >> 1);
+		/* FIXME */
+		return pit8253_r(devtag_get_device(space->machine, "pit8253"), (offset & 6) >> 1);
 	}
 
 	logerror("crtc port $70 R access %02x\n",offset >> 1);
@@ -426,17 +429,16 @@ static WRITE8_HANDLER( port_70_w )
 		logerror("crtc port $70 W access %02x %02x\n",offset >> 1,data);
 }
 
-/* FIXME */
 static READ8_HANDLER( port_00_r )
 {
 	if(!(offset & 1))
 	{
 		logerror("pic8259 port $00 R access %02x\n",offset >> 1);
-		return mame_rand(space->machine);//pic8259_r(devtag_get_device(space->machine, "pic8259"), (offset & 6) >> 1);
+		return pic8259_r(devtag_get_device(space->machine, "pic8259_master"), (offset & 6) >> 1);
 	}
 
-	logerror("??? port $00 R access %02x\n",offset >> 1);
-	return 0xff;
+	//logerror("DMA port $00 R access %02x\n",offset >> 1);
+	return dma8237_r(devtag_get_device(space->machine, "dma8237_1"), (offset & 0x1e) >> 1);
 }
 
 static WRITE8_HANDLER( port_00_w )
@@ -444,10 +446,13 @@ static WRITE8_HANDLER( port_00_w )
 	if(!(offset & 1))
 	{
 		logerror("pic8259 port $00 W access %02x %02x\n",offset >> 1,data);
-		//pic8259_w(devtag_get_device(space->machine, "pic8259"), (offset & 6) >> 1, data);
+		pic8259_w(devtag_get_device(space->machine, "pic8259_master"), (offset & 6) >> 1, data);
 	}
 	else
-		logerror("??? port $00 W access %02x %02x\n",offset >> 1,data);
+	{
+		//logerror("DMA port $00 W access %02x %02x\n",offset >> 1,data);
+		dma8237_w(devtag_get_device(space->machine, "dma8237_1"), (offset & 0x1e) >> 1, data);
+	}
 }
 
 static READ32_HANDLER( gfx_bitmap_ram_r ) { return gfx_bitmap_ram[offset+ems_bank*0x18000/4]; }
@@ -465,7 +470,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( pc9801_io, ADDRESS_SPACE_IO, 32)
-	AM_RANGE(0x0000, 0x000f) AM_READWRITE8(port_00_r,port_00_w,0xffffffff) // pic8259 (even ports)
+	AM_RANGE(0x0000, 0x001f) AM_READWRITE8(port_00_r,port_00_w,0xffffffff) // pic8259 (even ports) / dma (odd ports)
 //	AM_RANGE(0x0020, 0x0020) rtc
 //	AM_RANGE(0x0022, 0x0022)
 	AM_RANGE(0x0030, 0x0037) AM_READWRITE8(sys_port_r,sys_port_w,0xffffffff) // rs232c (even ports) / system ppi8255 (odd ports)
@@ -501,14 +506,53 @@ static INPUT_PORTS_START( pc9801 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_VBLANK )
 INPUT_PORTS_END
 
+static IRQ_CALLBACK(irq_callback)
+{
+	int r = 0;
+	//r = pic8259_acknowledge( devtag_get_device( machine, "pic8259_slave" ));
+	//if (r==0)
+	{
+		r = pic8259_acknowledge( devtag_get_device( device->machine, "pic8259_master" ))/2; //Explictly needs 0x10/2 on POST?
+		//printf("%02x ACK\n",r);
+	}
+	return r;
+}
 
 static MACHINE_RESET(pc9801)
 {
+	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), irq_callback);
 }
 
 static MACHINE_RESET(pc9821)
 {
+	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), irq_callback);
 }
+
+/*************************************************************
+ *
+ * pic8259 configuration
+ *
+ *************************************************************/
+
+static PIC8259_SET_INT_LINE( pc98_master_set_int_line ) {
+	//printf("%02x\n",interrupt);
+	cputag_set_input_line(device->machine, "maincpu", 0, interrupt ? HOLD_LINE : CLEAR_LINE);
+}
+
+
+//static PIC8259_SET_INT_LINE( pc98_slave_set_int_line ) {
+//	pic8259_set_irq_line( devtag_get_device( machine, "pic8259_master" ), 2, interrupt);
+//}
+
+
+static const struct pic8259_interface pic8259_master_config = {
+	pc98_master_set_int_line
+};
+
+
+//static const struct pic8259_interface pic8259_slave_config = {
+//	pc98_slave_set_int_line
+//};
 
 static VIDEO_START( pc9821 )
 {
@@ -540,7 +584,7 @@ GFXDECODE_END
 
 static READ8_DEVICE_HANDLER( pc98_porta_r )
 {
-	printf("PPI Port A read\n");
+	//printf("PPI Port A read\n");
 	return 0x00;
 }
 
@@ -555,23 +599,23 @@ static READ8_DEVICE_HANDLER( pc98_portb_r )
 
 static READ8_DEVICE_HANDLER( pc98_portc_r )
 {
-	printf("PPI Port C read\n");
+	//printf("PPI Port C read\n");
 	return 0x00;
 }
 
 static WRITE8_DEVICE_HANDLER( pc98_porta_w )
 {
-	printf("PPI Port A write %02x\n",data);
+	//printf("PPI Port A write %02x\n",data);
 }
 
 static WRITE8_DEVICE_HANDLER( pc98_portb_w )
 {
-	printf("PPI Port B write %02x\n",data);
+	//printf("PPI Port B write %02x\n",data);
 }
 
 static WRITE8_DEVICE_HANDLER( pc98_portc_w )
 {
-	printf("PPI Port C write %02x\n",data);
+	//printf("PPI Port C write %02x\n",data);
 }
 
 static const ppi8255_interface ppi8255_intf =
@@ -596,20 +640,20 @@ static const ppi8255_interface printer_intf =
 
 static PIT8253_OUTPUT_CHANGED( pc_timer0_w )
 {
-//	pic8259_set_irq_line(filetto_devices.pic8259_1, 0, state);
+	pic8259_set_irq_line(devtag_get_device( device->machine, "pic8259_master" ), 0, state);
 }
 
 static const struct pit8253_config pit8253_config =
 {
 	{
 		{
-			4772720/4,				/* heartbeat IRQ */
+			16000000/4,				/* heartbeat IRQ */
 			pc_timer0_w
 		}, {
-			4772720/4,				/* dram refresh */
+			16000000/4,				/* dram refresh */
 			NULL
 		}, {
-			4772720/4,				/* pio port c pin 4, and speaker polling enough */
+			16000000/4,				/* pio port c pin 4, and speaker polling enough */
 			NULL
 		}
 	}
@@ -622,6 +666,97 @@ static PALETTE_INIT( pc9801 )
 	for(i=0;i<8;i++)
 		palette_set_color_rgb(machine, i+0x000, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
 }
+
+static UINT8 dma_offset[2][4];
+
+#if 0
+static UINT8 at_pages[0x10];
+
+
+static READ8_HANDLER(at_page8_r)
+{
+	UINT8 data = at_pages[offset % 0x10];
+
+	switch(offset % 8) {
+	case 1:
+		data = dma_offset[(offset / 8) & 1][2];
+		break;
+	case 2:
+		data = dma_offset[(offset / 8) & 1][3];
+		break;
+	case 3:
+		data = dma_offset[(offset / 8) & 1][1];
+		break;
+	case 7:
+		data = dma_offset[(offset / 8) & 1][0];
+		break;
+	}
+	return data;
+}
+
+
+static WRITE8_HANDLER(at_page8_w)
+{
+	at_pages[offset % 0x10] = data;
+
+	switch(offset % 8) {
+	case 1:
+		dma_offset[(offset / 8) & 1][2] = data;
+		break;
+	case 2:
+		dma_offset[(offset / 8) & 1][3] = data;
+		break;
+	case 3:
+		dma_offset[(offset / 8) & 1][1] = data;
+		break;
+	case 7:
+		dma_offset[(offset / 8) & 1][0] = data;
+		break;
+	}
+}
+#endif
+
+static DMA8237_HRQ_CHANGED( pc_dma_hrq_changed )
+{
+	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+
+	/* Assert HLDA */
+	dma8237_set_hlda( device, state );
+}
+
+
+static DMA8237_MEM_READ( pc_dma_read_byte )
+{
+	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	offs_t page_offset = (((offs_t) dma_offset[0][channel]) << 16)
+		& 0xFF0000;
+
+	return memory_read_byte(space, page_offset + offset);
+}
+
+
+static DMA8237_MEM_WRITE( pc_dma_write_byte )
+{
+	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	offs_t page_offset = (((offs_t) dma_offset[0][channel]) << 16)
+		& 0xFF0000;
+
+	memory_write_byte(space, page_offset + offset, data);
+}
+
+
+static const struct dma8237_interface dma8237_1_config =
+{
+	XTAL_14_31818MHz/3,
+
+	pc_dma_hrq_changed,
+	pc_dma_read_byte,
+	pc_dma_write_byte,
+
+	{ NULL, NULL, NULL, NULL },
+	{ NULL, NULL, NULL, NULL },
+	NULL
+};
 
 /* I suspect the dump for pc9801 comes from a i386 later model... the original machine would use a i8086 @ 5Mhz CPU (see notes at top) */
 /* More investigations are required, but in the meanwhile I set a I386 as main CPU */
@@ -636,10 +771,13 @@ static MACHINE_DRIVER_START( pc9801 )
 	MDRV_PPI8255_ADD( "ppi8255_0", ppi8255_intf )
 	MDRV_PPI8255_ADD( "ppi8255_1", printer_intf )
 	MDRV_PIT8253_ADD( "pit8253", pit8253_config )
+	MDRV_DMA8237_ADD( "dma8237_1", dma8237_1_config )
+	MDRV_PIC8259_ADD( "pic8259_master", pic8259_master_config )
+//	MDRV_PIC8259_ADD( "pic8259_slave", pic8259_slave_config )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
+	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(640, 480)
