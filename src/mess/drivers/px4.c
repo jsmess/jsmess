@@ -13,7 +13,7 @@
 #include "machine/ctronics.h"
 #include "devices/cartslot.h"
 #include "devices/cassette.h"
-#include "machine/pf10.h"
+#include "machine/tf20.h"
 #include "px4.lh"
 
 
@@ -1072,8 +1072,8 @@ static MACHINE_DRIVER_START( px4 )
 	MDRV_CARTSLOT_ADD("capsule2")
 	MDRV_CARTSLOT_NOT_MANDATORY
 
-	/* pf10 floppy drive */
-	MDRV_PF10_ADD("pf10")
+	/* tf20 floppy drive */
+	MDRV_TF20_ADD("tf20")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( px4p )
