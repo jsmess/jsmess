@@ -853,7 +853,11 @@ static void a1200xl_mmu(running_machine *machine, UINT8 new_mmu)
  **************************************************************/
 
 static WRITE8_DEVICE_HANDLER(a1200xl_pia_pb_w) { a1200xl_mmu(device->machine, data); }
-static WRITE8_DEVICE_HANDLER(a800xl_pia_pb_w) { a800xl_mmu(device->machine, data); }
+static WRITE8_DEVICE_HANDLER(a800xl_pia_pb_w) 
+{
+	if ( pia6821_get_port_b_z_mask(device) != 0xff )
+		a800xl_mmu(device->machine, data); 
+}
 
 static const pokey_interface atari_pokey_interface =
 {
@@ -969,7 +973,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( atari_common_nodac )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6510, FREQ_17_EXACT)
+	MDRV_CPU_ADD("maincpu", M6502, FREQ_17_EXACT)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1104,6 +1108,20 @@ static MACHINE_DRIVER_START( a800xl )
 	MDRV_IMPORT_FROM(a400_cartslot)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( a800xlpal )
+	MDRV_IMPORT_FROM( a800xl )
+
+	MDRV_CPU_MODIFY( "maincpu" )
+	MDRV_CPU_CLOCK( 1773000 )
+	MDRV_CPU_VBLANK_INT_HACK(a800_interrupt, TOTAL_LINES_50HZ)
+
+	MDRV_SCREEN_MODIFY("screen")
+	MDRV_SCREEN_REFRESH_RATE(FRAME_RATE_50HZ)
+	MDRV_SCREEN_SIZE(HWIDTH*8, TOTAL_LINES_50HZ)
+
+	MDRV_SOUND_MODIFY("pokey")
+	MDRV_SOUND_CLOCK(1773000)
+MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( a1200xl )
 	MDRV_IMPORT_FROM( a800xl )
@@ -1193,9 +1211,12 @@ ROM_END
 
 ROM_START(a800xl)
 	ROM_REGION(0x18000, "maincpu", 0)
+	ROM_FILL( 0, 0x10000, 0x00 )
 	ROM_LOAD( "co60302a.rom", 0x10000, 0x2000, CRC(f0202fb3) SHA1(7ad88dd99ff4a6ee66f6d162074db6f8bef7a9b6) )	// Rev. B
 	ROM_LOAD( "co61598b.rom", 0x14000, 0x4000, CRC(1f9cd270) SHA1(ae4f523ba08b6fd59f3cae515a2b2410bbd98f55) )	// Rev. 2
 ROM_END
+
+#define rom_a800xlp rom_a800xl
 
 ROM_START(a65xe)
 	ROM_REGION(0x18000, "maincpu", 0)
@@ -1289,19 +1310,9 @@ SYSTEM_CONFIG_END
  *
  **************************************************************/
 
-// VERY WIP code to load OS at start and, hopefully, go on with the implementation...
 static DRIVER_INIT( a800xl )
 {
-	UINT8 *rom = memory_region(machine, "maincpu");
-
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa000, 0xbfff, 0, 0, SMH_BANK(1), SMH_UNMAP);
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x5000, 0x57ff, 0, 0, SMH_BANK(2), SMH_UNMAP);
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xcfff, 0, 0, SMH_BANK(3), SMH_UNMAP);
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd800, 0xffff, 0, 0, SMH_BANK(4), SMH_UNMAP);
-	memory_set_bankptr(machine, 1, rom + 0x10000);
-	memory_set_bankptr(machine, 2, rom + 0x15000);
-	memory_set_bankptr(machine, 3, rom + 0x14000);
-	memory_set_bankptr(machine, 4, rom + 0x15800);
+	a800xl_mmu(machine, 0xff);
 }
 
 static DRIVER_INIT( a600xl )
@@ -1322,12 +1333,13 @@ COMP ( 1979, a400pal,  a400,     0,     a400pal,    a800,    0,      a400,    "A
 COMP ( 1979, a800,     0,        0,     a800,       a800,    0,      a800,    "Atari",   "Atari 800 (NTSC)", 0)
 COMP ( 1979, a800pal,  a800,     0,     a800pal,    a800,    0,      a800,    "Atari",   "Atari 800 (PAL)",  0)
 COMP ( 1982, a1200xl,  a800,     0,     a1200xl,    a800xl,  a800xl, a800,    "Atari",   "Atari 1200XL",     GAME_NOT_WORKING )		// 64k RAM
-COMP ( 1983, a600xl,   a800,     0,     a600xl,     a800xl,  a600xl, a5200,   "Atari",   "Atari 600XL",      GAME_NOT_WORKING )		// 16k RAM
-COMP ( 1983, a800xl,   a800,     0,     a800xl,     a800xl,  a800xl, a800,    "Atari",   "Atari 800XL",      GAME_NOT_WORKING )		// 64k RAM
-COMP ( 1986, a65xe,    0,        0,     a800xl,     a800xl,  a800xl, a800,    "Atari",   "Atari 65XE",       GAME_NOT_WORKING )		// 64k RAM
-COMP ( 1986, a65xea,   a65xe,    0,     a800xl,     a800xl,  a800xl, a800,    "Atari",   "Atari 65XE (Arabic)", GAME_NOT_WORKING )
-COMP ( 1986, a130xe,   a65xe,    0,     a800xl,     a800xl,  a800xl, a800,    "Atari",   "Atari 130XE",      GAME_NOT_WORKING )		// 128k RAM
-COMP ( 1986, a800xe,   a65xe,    0,     a800xl,     a800xl,  a800xl, a800,    "Atari",   "Atari 800XE",      GAME_NOT_WORKING )		// 64k RAM
+COMP ( 1983, a600xl,   a800xl,   0,     a600xl,     a800xl,  a600xl, a5200,   "Atari",   "Atari 600XL",      GAME_NOT_WORKING )		// 16k RAM
+COMP ( 1983, a800xl,   0,		 0,     a800xl,     a800xl,  a800xl, a800,    "Atari",   "Atari 800XL (NTSC)",GAME_IMPERFECT_GRAPHICS )		// 64k RAM
+COMP ( 1983, a800xlp,  a800xl,	 0,     a800xlpal,  a800xl,  a800xl, a800,    "Atari",   "Atari 800XL (PAL)", GAME_IMPERFECT_GRAPHICS )		// 64k RAM
+COMP ( 1986, a65xe,    a800xl,   0,     a800xl,     a800xl,  a800xl, a800,    "Atari",   "Atari 65XE",       GAME_NOT_WORKING )		// 64k RAM
+COMP ( 1986, a65xea,   a800xl,   0,     a800xl,     a800xl,  a800xl, a800,    "Atari",   "Atari 65XE (Arabic)", GAME_NOT_WORKING )
+COMP ( 1986, a130xe,   a800xl,   0,     a800xl,     a800xl,  a800xl, a800,    "Atari",   "Atari 130XE",      GAME_NOT_WORKING )		// 128k RAM
+COMP ( 1986, a800xe,   a800xl,   0,     a800xl,     a800xl,  a800xl, a800,    "Atari",   "Atari 800XE",      GAME_NOT_WORKING )		// 64k RAM
 COMP ( 1987, xegs,     0,        0,     a800xl,     a800xl,  a800xl, a800,    "Atari",   "Atari XE Game System", GAME_NOT_WORKING )	// 64k RAM
 
 CONS ( 1982, a5200,    0,        0,     a5200,      a5200,   0,      a5200,    "Atari",   "Atari 5200",       0)

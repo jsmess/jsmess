@@ -7,11 +7,11 @@ New System Drivers Supported (in no particular order):
 
 Systems Promoted from GAME_NOT_WORKING:
 ---------------------------------------
+- Atari 800XL [Mariusz Wojcieszek]
 - Beta [Curt Coder]
 - Microbee 56k [Robbbert]
 - TRS-80 Model 4P [Robbbert]
 - Nokia MikroMikko 1 M6 [Curt Coder, Kara Trace]
-
 
 
 Skeleton drivers: 

@@ -343,6 +343,7 @@ const game_driver * const drivers[] =
     DRIVER( a1200xl )   /* 1982 Atari 1200 XL                               */
     DRIVER( a600xl )    /* 1983 Atari 600 XL                                */
     DRIVER( a800xl )    /* 1983 Atari 800 XL                                */
+    DRIVER( a800xlp )   /* 1983 Atari 800 XL (PAL)                          */
     DRIVER( a65xe )     /* 1986 Atari 65 XE (XL Extended)                   */
     DRIVER( a65xea )    /* 1986? Atari 65 XE Arabic                         */
     DRIVER( a130xe )    /* 1986 Atari 130 XE                                */

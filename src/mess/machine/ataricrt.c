@@ -125,6 +125,15 @@ static void ms_atari_machine_start(running_machine *machine, int type, int has_c
 		add_reset_callback(machine, cart_reset);
 }
 
+static void ms_atari800xl_machine_start(running_machine *machine, int type, int has_cart)
+{
+	/* set atari type (needed for banks above) */
+	atari = type;
+
+	/* cartridge */
+	if (has_cart)
+		add_reset_callback(machine, cart_reset);
+}
 
 /*************************************
  *
@@ -199,7 +208,7 @@ DEVICE_IMAGE_UNLOAD( a800_cart )
 MACHINE_START( a800xl )
 {
 	atari_machine_start(machine);
-	ms_atari_machine_start(machine, ATARI_800XL, TRUE);
+	ms_atari800xl_machine_start(machine, ATARI_800XL, TRUE);
 }
 
 DEVICE_IMAGE_LOAD( a800xl_cart )
