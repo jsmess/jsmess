@@ -97,12 +97,18 @@ static DEVICE_START( messram )
 {
 	messram_state *messram = get_safe_token(device);
 	ram_config *config = device->inline_config;
-	const char *ramsize_string = options_get_string(mame_options(), OPTION_RAMSIZE);
 
-	/* if we have a command line option, use it */
-	if ((ramsize_string != NULL) && (ramsize_string[0] != '\0'))
-		messram->size = parse_string(ramsize_string);
-	else
+	/* the device named 'messram' can get ram options from command line */
+	if (strcmp(device->tag, "messram") == 0)
+	{
+		const char *ramsize_string = options_get_string(mame_options(), OPTION_RAMSIZE);
+
+		if ((ramsize_string != NULL) && (ramsize_string[0] != '\0'))
+			messram->size = parse_string(ramsize_string);
+	}
+
+	/* if we didn't get a size yet, use the default */
+	if (messram->size == 0)
 		messram->size = parse_string(config->default_size);
 
 	/* allocate space for the ram */
