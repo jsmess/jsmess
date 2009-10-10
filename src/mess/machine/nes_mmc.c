@@ -39,7 +39,6 @@
     * 064 has many IRQ problems (due to the way we implement CPU based IRQ) - see Skull & Crossbones.
           Klax has problems as well (even if it uses scanline based IRQ, according to Disch's docs).
     * 067 some 1-line glitches that cannot be solved without a better implementation for cycle-based IRQs
-    * 071 Fire Hawk is not properly working (it requires one hack to support both boards using this mapper)
     * 072, 086, 092 lack samples support (maybe others as well)
     * 073 16 bit IRQ mode is not implemented
     * 077 Requires 4-screen mirroring. Currently, it is very glitchy
@@ -81,6 +80,7 @@
     * 032 - Major League needs hardwired mirroring (missing windows and glitched field in top view, otherwise)
     * 034 - Impossible Mission II is not like BxROM games (it writes to 0x7ffd-0x7fff, instead of 0x8000). It is still
           unplayable though (see above)
+    * 071 - Fire Hawk is different from other Camerica games (no hardwired mirroring)
     * 078 - Cosmo Carrier needs a different mirroring than Holy Diver
     * 113 - HES 6-in-1 requires mirroring (check Bookyman playfield), while other games break with this (check AV Soccer)
     * 153 - Famicom Jump II uses a different board (or the same in a very different way)
@@ -4750,19 +4750,24 @@ static WRITE8_HANDLER( mapper70_w )
 
 *************************************************************/
 
-static WRITE8_HANDLER( mapper71_m_w )
-{
-	LOG_MMC(("mapper71_m_w offset: %04x, data: %02x\n", offset, data));
-
-	prg16_89ab(space->machine, data);
-}
-
 static WRITE8_HANDLER( mapper71_w )
 {
 	LOG_MMC(("mapper71_w offset: %04x, data: %02x\n", offset, data));
 
-	if (offset >= 0x4000)
+	switch (offset & 0x7000)
+	{
+	case 0x0000:
+	case 0x1000:
+		if (nes.crc_hack)
+			set_nt_mirroring((data & 0x10) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
+		break;
+	case 0x4000:
+	case 0x5000:
+	case 0x6000:
+	case 0x7000:
 		prg16_89ab(space->machine, data);
+		break;
+	}
 }
 
 /*************************************************************
@@ -11116,7 +11121,7 @@ static const mmc mmc_list[] =
 	{ 68, "SunSoft 4",                 NULL, NULL, NULL, mapper68_w, NULL, NULL, NULL },
 	{ 69, "SunSoft FME",               NULL, NULL, NULL, mapper69_w, NULL, NULL, mapper69_irq },
 	{ 70, "74161/32 Bandai",           NULL, NULL, NULL, mapper70_w, NULL, NULL, NULL },
-	{ 71, "Camerica",                  NULL, NULL, mapper71_m_w, mapper71_w, NULL, NULL, NULL },
+	{ 71, "Camerica",                  NULL, NULL, NULL, mapper71_w, NULL, NULL, NULL },
 	{ 72, "74161/32 Jaleco",           NULL, NULL, NULL, mapper72_w, NULL, NULL, NULL },
 	{ 73, "Konami VRC 3",              NULL, NULL, NULL, mapper73_w, NULL, NULL, konami_irq },
 	{ 74, "Waixing Type A",            NULL, NULL, NULL, mapper74_w, NULL, NULL, mapper4_irq },
@@ -11377,7 +11382,7 @@ int mapper_reset( running_machine *machine, int mmc_num )
 		case 155:
 			mmc_cmd1 = 0;
 			mmc_count = 0;
-			MMC1_regs[0] = 0x0f;
+			MMC1_regs[0] = 0;//0x0f;
 			MMC1_regs[1] = MMC1_regs[2] = MMC1_regs[3] = 0;
 			set_nt_mirroring(PPU_MIRROR_HORZ);
 			MMC1_set_chr(space->machine);
@@ -11674,7 +11679,6 @@ int mapper_reset( running_machine *machine, int mmc_num )
 		case 65:
 		case 67:
 		case 69:
-		case 71:
 		case 72:
 		case 78:
 		case 92:
@@ -11688,6 +11692,11 @@ int mapper_reset( running_machine *machine, int mmc_num )
 			break;
 		case 70:
 			prg16_89ab(space->machine, nes.prg_chunks - 2);
+			prg16_cdef(space->machine, nes.prg_chunks - 1);
+			break;
+		case 71:
+			set_nt_mirroring(PPU_MIRROR_HORZ);
+			prg16_89ab(space->machine, 0);
 			prg16_cdef(space->machine, nes.prg_chunks - 1);
 			break;
 		case 76:
@@ -12180,7 +12189,7 @@ SACHEN_8259A
 static const unif unif_list[] =
 {
 /*       UNIF                       LOW_W, LOW_R, MED_W, HIGH_W, PPU_latch, scanline CB, hblank CB     PRG  CHR  NVW  WRAM  CRAM       NMT    IDX*/
-	{ "UNL-SACHEN-8259A",         mapper141_l_w, NULL, mapper141_m_w, NULL, NULL, NULL, NULL,        256, 256,   0,    0, CHRRAM_0,  0,     SACHEN_8259A},
+	{ "UNL-SACHEN-8259A",         mapper141_l_w, NULL, mapper141_m_w, NULL, NULL, NULL, NULL,         16,  32,   0,    0, CHRRAM_0,  0,     SACHEN_8259A},
 };
 
 const unif *nes_unif_lookup( const char *board )

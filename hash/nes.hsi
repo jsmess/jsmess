@@ -22681,22 +22681,22 @@
 	</hash>
 	<hash crc32="1bc686a8" sha1="334781c830f135cf30a33e392d8aaa4afdc223f9" name="Fire Hawk (Camerica)">
 		<status>GoodNES Verified Image</status>
-		<extrainfo>71 0 8 0</extrainfo>
+		<extrainfo>71 128 8 0</extrainfo>
 
 	</hash>
 	<hash crc32="827bfda8" sha1="a0236196f983960f18396b4635ef7c54f3614542" name="Fire Hawk (Camerica)">
 		<status>Known Bad Image</status>
-		<extrainfo>71 0 4 8</extrainfo>
+		<extrainfo>71 128 4 8</extrainfo>
 
 	</hash>
 	<hash crc32="ce090b49" sha1="b4ae7c551f1b81b89a3e7b1e344a39180a1f8ee3" name="Fire Hawk (Camerica)">
 		<status>Known Bad Image</status>
-		<extrainfo>71 0 8 0</extrainfo>
+		<extrainfo>71 128 8 0</extrainfo>
 
 	</hash>
 	<hash crc32="3210b546" sha1="77bbc6a7428b03133803f57c9cc048b9699af0f3" name="Fire Hawk (Camerica)">
 		<status>Overdumped Image</status>
-		<extrainfo>71 0 8 0</extrainfo>
+		<extrainfo>71 128 8 0</extrainfo>
 
 	</hash>
 	<hash crc32="89a963a3" sha1="ced25f5252d27ba771dfe45a671aa7e64aa3692b" name="Firefly Demo by Loopy (PD)">
