@@ -25,11 +25,15 @@
     * 000 F1 Race requires more precise PPU timing. It currently has plenty of 1-line glitches.
     * 001 AD&D Hillsfar and Bill & Ted are broken. We need to ignore the case of writes happening on 2
           consecutive CPU cycles because these games use dirty tricks to reset counters (see note in mapper1_w)
+    * 001 Yoshi flashes in-game. Zombie Hunter regressed. Rocket Ranger and Back to the Future have heavily corrupted graphics
     * 001, 155 We don't handle (yet) WRAM enable/disable bit
     * 002, 003, 094, 097, 152 Bus conflict?
+    * 004 Mendel Palace has never worked properly
     * 005 has issues (see e.g. Just Breed or Metal Slader Glory), RAM banking needs hardware flags to determine size
+    * 007 Marble Madness has small graphics corruptions
     * 014 in-game graphics is glitched
     * 015 Shanghai Tycoon has corrupted graphics
+    * 025 TMNT & TMNT2 Jpn do not work
     * 033 has still some graphics problem (e.g. missing text in Akira)
     * 034 Impossible Mission II does not show graphics
     * 038 seems to miss inputs. separate reads?
@@ -39,10 +43,12 @@
     * 064 has many IRQ problems (due to the way we implement CPU based IRQ) - see Skull & Crossbones.
           Klax has problems as well (even if it uses scanline based IRQ, according to Disch's docs).
     * 067 some 1-line glitches that cannot be solved without a better implementation for cycle-based IRQs
+    * 071 Micro Machines has various small graphics problems. Fire Hawk is flashing all the times.
     * 072, 086, 092 lack samples support (maybe others as well)
     * 073 16 bit IRQ mode is not implemented
     * 077 Requires 4-screen mirroring. Currently, it is very glitchy
     * 083 has serious glitches
+    * 088 Quinty has never worked properly
     * 096 is preliminary (no correct chr switch in connection to PPU)
     * 104 Not all the games work
     * 107 Are the scrolling glitches (check status bar) correct? NEStopia behaves similarly
@@ -80,7 +86,7 @@
     * 032 - Major League needs hardwired mirroring (missing windows and glitched field in top view, otherwise)
     * 034 - Impossible Mission II is not like BxROM games (it writes to 0x7ffd-0x7fff, instead of 0x8000). It is still
           unplayable though (see above)
-    * 071 - Fire Hawk is different from other Camerica games (no hardwired mirroring)
+    * 071 - Fire Hawk is different from other Camerica games (no hardwired mirroring). Without crc_hack no helicopter graphics
     * 078 - Cosmo Carrier needs a different mirroring than Holy Diver
     * 113 - HES 6-in-1 requires mirroring (check Bookyman playfield), while other games break with this (check AV Soccer)
     * 153 - Famicom Jump II uses a different board (or the same in a very different way)
@@ -11382,7 +11388,7 @@ int mapper_reset( running_machine *machine, int mmc_num )
 		case 155:
 			mmc_cmd1 = 0;
 			mmc_count = 0;
-			MMC1_regs[0] = 0;//0x0f;
+			MMC1_regs[0] = 0x0f;
 			MMC1_regs[1] = MMC1_regs[2] = MMC1_regs[3] = 0;
 			set_nt_mirroring(PPU_MIRROR_HORZ);
 			MMC1_set_chr(space->machine);

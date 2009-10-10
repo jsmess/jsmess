@@ -598,8 +598,8 @@ DEVICE_IMAGE_LOAD( nes_cart )
 		logerror("**\n");
 		logerror("Mapper: %d\n", nes.mapper);
 		logerror("PRG chunks: %02x, size: %06x\n", nes.prg_chunks, 0x4000 * nes.prg_chunks);
-      printf("Mapper: %d\n", nes.mapper);
-      printf("PRG chunks: %02x, size: %06x\n", nes.prg_chunks, 0x4000 * nes.prg_chunks);
+//      printf("Mapper: %d\n", nes.mapper);
+//      printf("PRG chunks: %02x, size: %06x\n", nes.prg_chunks, 0x4000 * nes.prg_chunks);
 
 		/* Read in any chr chunks */
 		if (nes.chr_chunks > 0)
@@ -629,8 +629,8 @@ DEVICE_IMAGE_LOAD( nes_cart )
 
 		logerror("CHR chunks: %02x, size: %06x\n", nes.chr_chunks, 0x4000 * nes.chr_chunks);
 		logerror("**\n");
-      printf("CHR chunks: %02x, size: %06x\n", nes.chr_chunks, 0x4000 * nes.chr_chunks);
-      printf("**\n");
+//      printf("CHR chunks: %02x, size: %06x\n", nes.chr_chunks, 0x4000 * nes.chr_chunks);
+//      printf("**\n");
 
 		/* Attempt to load a battery file for this ROM. If successful, we */
 		/* must wait until later to move it to the system memory. */
@@ -689,7 +689,6 @@ DEVICE_IMAGE_LOAD( nes_cart )
 			/* What kind of chunk do we have here? */
 			if ((magic2[0] == 'M') && (magic2[1] == 'A') && (magic2[2] == 'P') && (magic2[3] == 'R'))
 			{
-//				int i;
 				logerror("[MAPR] chunk found: ");
 				image_fread(image, &buffer, 4);
 				chunk_length = buffer[0] | (buffer[1] << 8) | (buffer[2] << 16) | (buffer[3] << 24);
@@ -700,10 +699,6 @@ DEVICE_IMAGE_LOAD( nes_cart )
 				read_length += (chunk_length + 8);
 
 				unif_board = nes_unif_lookup(unif_mapr);
-
-//				for(i = 0; i < chunk_length; i++)
-//					logerror("%c", unif_mapr[i]);
-//				logerror("\n");
 				logerror("%s\n", unif_mapr);
 
 				if (unif_board == NULL)
@@ -718,7 +713,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 				nes.chr_chunks = unif_board->chrrom;
 				nes.battery = unif_board->wram;	// we should implement WRAM banks...
 				nes.hard_mirroring = unif_board->nt;
-//				nes.four_screen_vram = ;
+//              nes.four_screen_vram = ;
 
 				/* Free the regions that were allocated by the ROM loader */
 				memory_region_free(image->machine, "maincpu");
