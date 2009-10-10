@@ -1257,6 +1257,7 @@ WRITE8_HANDLER ( sgb_io_w )
 								break;
 							case 0x0B:	/* PAL_TRN */
 								{
+									UINT8 *gb_vram = gb_get_vram_ptr( space->machine );
 									UINT16 I, col;
 
 									for( I = 0; I < 2048; I++ )
@@ -1292,14 +1293,15 @@ WRITE8_HANDLER ( sgb_io_w )
 								break;
 							case 0x13:	/* CHR_TRN */
 								if( sgb_data[1] & 0x1 )
-									memcpy( sgb_tile_data + 4096, gb_vram + 0x0800, 4096 );
+									memcpy( sgb_tile_data + 4096, gb_get_vram_ptr(space->machine) + 0x0800, 4096 );
 								else
-									memcpy( sgb_tile_data, gb_vram + 0x0800, 4096 );
+									memcpy( sgb_tile_data, gb_get_vram_ptr(space->machine) + 0x0800, 4096 );
 								break;
 							case 0x14:	/* PCT_TRN */
 								{
 									int I;
 									UINT16 col;
+									UINT8 *gb_vram = gb_get_vram_ptr( space->machine );
 									if( sgb_hack )
 									{
 										memcpy( sgb_tile_map, gb_vram + 0x1000, 2048 );
@@ -1321,7 +1323,7 @@ WRITE8_HANDLER ( sgb_io_w )
 								}
 								break;
 							case 0x15:	/* ATTR_TRN */
-								memcpy( sgb_atf_data, gb_vram + 0x0800, 4050 );
+								memcpy( sgb_atf_data, gb_get_vram_ptr( space->machine ) + 0x0800, 4050 );
 								break;
 							case 0x16:	/* ATTR_SET */
 								{

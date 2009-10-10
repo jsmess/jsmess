@@ -45,17 +45,6 @@ enum {
 
 #define _NR_GB_VID_REGS		0x40
 
-static UINT8 *gb_oam;
-UINT8 *gb_vram;
-static UINT8 *gb_vram_ptr;
-static UINT8	*gb_chrgen;	/* Character generator           */
-static UINT8	*gb_bgdtab;	/* Background character table    */
-static UINT8	*gb_wndtab;	/* Window character table        */
-static UINT8	gb_tile_no_mod;
-static UINT8	*gbc_chrgen;	/* Character generator           */
-static UINT8	*gbc_bgdtab;	/* Background character table    */
-static UINT8	*gbc_wndtab;	/* Window character table        */
-
 struct layer_struct {
 	UINT8  enabled;
 	UINT8  *bg_tiles;
@@ -108,6 +97,17 @@ static struct gb_lcd_struct {
 	struct layer_struct	layer[2];
 	emu_timer	*lcd_timer;
 	int gbc_mode;
+
+	UINT8	*gb_vram;		/* Pointer to VRAM */
+	UINT8	*gb_oam;		/* Pointer to OAM memory */
+	UINT8	*gb_vram_ptr;
+	UINT8	*gb_chrgen;		/* Character generator */
+	UINT8	*gb_bgdtab;		/* Background character table */
+	UINT8	*gb_wndtab;		/* Window character table */
+	UINT8	gb_tile_no_mod;
+	UINT8	*gbc_chrgen;	/* CGB Character generator */
+	UINT8	*gbc_bgdtab;	/* CGB Background character table */
+	UINT8	*gbc_wndtab;	/* CGB Window character table */
 } gb_lcd;
 
 static void (*update_scanline)( running_machine *machine );
@@ -225,7 +225,7 @@ INLINE void gb_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
 static void gb_select_sprites( void )
 {
 	int	i, /*yindex,*/ line, height;
-	UINT8	*oam = gb_oam + 39 * 4;
+	UINT8	*oam = gb_lcd.gb_oam + 39 * 4;
 
 	gb_lcd.sprCount = 0;
 
@@ -282,8 +282,8 @@ INLINE void gb_update_sprites ( void )
 	yindex = gb_lcd.current_line;
 	line = gb_lcd.current_line + 16;
 
-	oam = gb_oam + 39 * 4;
-	vram = gb_vram;
+	oam = gb_lcd.gb_oam + 39 * 4;
+	vram = gb_lcd.gb_vram;
 	for (i = 39; i >= 0; i--)
 	{
 		/* if sprite is on current line && x-coordinate && x-coordinate is < 168 */
@@ -375,8 +375,8 @@ static void gb_update_scanline( running_machine *machine )
 			if ( gb_lcd.layer[0].enabled )
 			{
 				gb_lcd.layer[0].bgline = ( SCROLLY + gb_lcd.current_line ) & 0xFF;
-				gb_lcd.layer[0].bg_map = gb_bgdtab;
-				gb_lcd.layer[0].bg_tiles = gb_chrgen;
+				gb_lcd.layer[0].bg_map = gb_lcd.gb_bgdtab;
+				gb_lcd.layer[0].bg_tiles = gb_lcd.gb_chrgen;
 				gb_lcd.layer[0].xindex = SCROLLX >> 3;
 				gb_lcd.layer[0].xshift = SCROLLX & 7;
 				gb_lcd.layer[0].xstart = 0;
@@ -392,8 +392,8 @@ static void gb_update_scanline( running_machine *machine )
 					xpos = 0;
 
 				gb_lcd.layer[1].bgline = gb_lcd.window_lines_drawn;
-				gb_lcd.layer[1].bg_map = gb_wndtab;
-				gb_lcd.layer[1].bg_tiles = gb_chrgen;
+				gb_lcd.layer[1].bg_map = gb_lcd.gb_wndtab;
+				gb_lcd.layer[1].bg_tiles = gb_lcd.gb_chrgen;
 				gb_lcd.layer[1].xindex = 0;
 				gb_lcd.layer[1].xshift = 0;
 				gb_lcd.layer[1].xstart = xpos;
@@ -436,7 +436,7 @@ static void gb_update_scanline( running_machine *machine )
 					i = gb_lcd.layer[l].xend;
 				i = i - xindex;
 
-				tile_index = ( map[ gb_lcd.layer[l].xindex ] ^ gb_tile_no_mod ) * 16;
+				tile_index = ( map[ gb_lcd.layer[l].xindex ] ^ gb_lcd.gb_tile_no_mod ) * 16;
 				data = tiles[ tile_index ] | ( tiles[ tile_index+1 ] << 8 );
 				data <<= gb_lcd.layer[l].xshift;
 
@@ -464,7 +464,7 @@ static void gb_update_scanline( running_machine *machine )
 
 						gb_lcd.layer[l].xindex = ( gb_lcd.layer[l].xindex + 1 ) & 31;
 						gb_lcd.layer[l].xshift = 0;
-						tile_index = ( map[ gb_lcd.layer[l].xindex ] ^ gb_tile_no_mod ) * 16;
+						tile_index = ( map[ gb_lcd.layer[l].xindex ] ^ gb_lcd.gb_tile_no_mod ) * 16;
 						data = tiles[ tile_index ] | ( tiles[ tile_index+1 ] << 8 );
 					}
 				}
@@ -522,8 +522,8 @@ INLINE void sgb_update_sprites (void)
 	yindex = gb_lcd.current_line + SGB_YOFFSET;
 	line = gb_lcd.current_line + 16;
 
-	oam = gb_oam + 39 * 4;
-	vram = gb_vram;
+	oam = gb_lcd.gb_oam + 39 * 4;
+	vram = gb_lcd.gb_vram;
 	for (i = 39; i >= 0; i--)
 	{
 		/* if sprite is on current line && x-coordinate && x-coordinate is < 168 */
@@ -694,8 +694,8 @@ static void sgb_update_scanline( running_machine *machine )
 			if ( gb_lcd.layer[0].enabled )
 			{
 				gb_lcd.layer[0].bgline = ( SCROLLY + gb_lcd.current_line ) & 0xFF;
-				gb_lcd.layer[0].bg_map = gb_bgdtab;
-				gb_lcd.layer[0].bg_tiles = gb_chrgen;
+				gb_lcd.layer[0].bg_map = gb_lcd.gb_bgdtab;
+				gb_lcd.layer[0].bg_tiles = gb_lcd.gb_chrgen;
 				gb_lcd.layer[0].xindex = SCROLLX >> 3;
 				gb_lcd.layer[0].xshift = SCROLLX & 7;
 				gb_lcd.layer[0].xstart = 0;
@@ -712,8 +712,8 @@ static void sgb_update_scanline( running_machine *machine )
 					xpos = 0;
 
 				gb_lcd.layer[1].bgline = gb_lcd.window_lines_drawn;
-				gb_lcd.layer[1].bg_map = gb_wndtab;
-				gb_lcd.layer[1].bg_tiles = gb_chrgen;
+				gb_lcd.layer[1].bg_map = gb_lcd.gb_wndtab;
+				gb_lcd.layer[1].bg_tiles = gb_lcd.gb_chrgen;
 				gb_lcd.layer[1].xindex = 0;
 				gb_lcd.layer[1].xshift = 0;
 				gb_lcd.layer[1].xstart = xpos;
@@ -795,7 +795,7 @@ static void sgb_update_scanline( running_machine *machine )
 					i = gb_lcd.layer[l].xend;
 				i = i - xindex;
 
-				tile_index = (map[gb_lcd.layer[l].xindex] ^ gb_tile_no_mod) * 16;
+				tile_index = (map[gb_lcd.layer[l].xindex] ^ gb_lcd.gb_tile_no_mod) * 16;
 				data = tiles[tile_index] | ( tiles[tile_index + 1] << 8 );
 				data <<= gb_lcd.layer[l].xshift;
 
@@ -826,7 +826,7 @@ static void sgb_update_scanline( running_machine *machine )
 
 						gb_lcd.layer[l].xindex = ( gb_lcd.layer[l].xindex + 1 ) & 31;
 						gb_lcd.layer[l].xshift = 0;
-						tile_index = ( map[ gb_lcd.layer[l].xindex ] ^ gb_tile_no_mod ) * 16;
+						tile_index = ( map[ gb_lcd.layer[l].xindex ] ^ gb_lcd.gb_tile_no_mod ) * 16;
 						data = tiles[ tile_index ] | ( tiles[ tile_index + 1 ] << 8 );
 						sgb_palette = sgb_pal_map[ ( gb_lcd.end_x - i ) >> 3 ][ gb_lcd.current_line >> 3 ] << 2;
 					}
@@ -887,7 +887,7 @@ INLINE void cgb_update_sprites ( running_machine *machine )
 	yindex = gb_lcd.current_line;
 	line = gb_lcd.current_line + 16;
 
-	oam = gb_oam + 39 * 4;
+	oam = gb_lcd.gb_oam + 39 * 4;
 	for (i = 39; i >= 0; i--)
 	{
 		/* if sprite is on current line && x-coordinate && x-coordinate is < 168 */
@@ -905,11 +905,11 @@ INLINE void cgb_update_sprites ( running_machine *machine )
 			xindex = oam[1] - 8;
 			if (oam[3] & 0x40)		   /* flip y ? */
 			{
-				data = *((UINT16 *) &gb_vram[ ((oam[3] & 0x8)<<10) + (oam[2] & tilemask) * 16 + (height - 1 - line + oam[0]) * 2]);
+				data = *((UINT16 *) &gb_lcd.gb_vram[ ((oam[3] & 0x8)<<10) + (oam[2] & tilemask) * 16 + (height - 1 - line + oam[0]) * 2]);
 			}
 			else
 			{
-				data = *((UINT16 *) &gb_vram[ ((oam[3] & 0x8)<<10) + (oam[2] & tilemask) * 16 + (line - oam[0]) * 2]);
+				data = *((UINT16 *) &gb_lcd.gb_vram[ ((oam[3] & 0x8)<<10) + (oam[2] & tilemask) * 16 + (line - oam[0]) * 2]);
 			}
 #ifndef LSB_FIRST
 			data = (data << 8) | (data >> 8);
@@ -1004,8 +1004,8 @@ static void cgb_update_scanline ( running_machine *machine )
 			if ( gb_lcd.layer[0].enabled )
 			{
 				gb_lcd.layer[0].bgline = ( SCROLLY + gb_lcd.current_line ) & 0xFF;
-				gb_lcd.layer[0].bg_map = gb_bgdtab;
-				gb_lcd.layer[0].gbc_map = gbc_bgdtab;
+				gb_lcd.layer[0].bg_map = gb_lcd.gb_bgdtab;
+				gb_lcd.layer[0].gbc_map = gb_lcd.gbc_bgdtab;
 				gb_lcd.layer[0].xindex = SCROLLX >> 3;
 				gb_lcd.layer[0].xshift = SCROLLX & 7;
 				gb_lcd.layer[0].xstart = 0;
@@ -1022,8 +1022,8 @@ static void cgb_update_scanline ( running_machine *machine )
 					xpos = 0;
 
 				gb_lcd.layer[1].bgline = gb_lcd.window_lines_drawn;
-				gb_lcd.layer[1].bg_map = gb_wndtab;
-				gb_lcd.layer[1].gbc_map = gbc_wndtab;
+				gb_lcd.layer[1].bg_map = gb_lcd.gb_wndtab;
+				gb_lcd.layer[1].gbc_map = gb_lcd.gbc_wndtab;
 				gb_lcd.layer[1].xindex = 0;
 				gb_lcd.layer[1].xshift = 0;
 				gb_lcd.layer[1].xstart = xpos;
@@ -1059,7 +1059,7 @@ static void cgb_update_scanline ( running_machine *machine )
 				}
 				map = gb_lcd.layer[l].bg_map + ( ( gb_lcd.layer[l].bgline << 2 ) & 0x3E0 );
 				gbcmap = gb_lcd.layer[l].gbc_map + ( ( gb_lcd.layer[l].bgline << 2 ) & 0x3E0 );
-				tiles = ( gbcmap[ gb_lcd.layer[l].xindex ] & 0x08 ) ? gbc_chrgen : gb_chrgen;
+				tiles = ( gbcmap[ gb_lcd.layer[l].xindex ] & 0x08 ) ? gb_lcd.gbc_chrgen : gb_lcd.gb_chrgen;
 
 				/* Check for vertical flip */
 				if ( gbcmap[ gb_lcd.layer[l].xindex ] & 0x40 )
@@ -1078,7 +1078,7 @@ static void cgb_update_scanline ( running_machine *machine )
 					i = gb_lcd.layer[l].xend;
 				i = i - xindex;
 
-				tile_index = ( map[ gb_lcd.layer[l].xindex ] ^ gb_tile_no_mod ) * 16;
+				tile_index = ( map[ gb_lcd.layer[l].xindex ] ^ gb_lcd.gb_tile_no_mod ) * 16;
 				data = tiles[ tile_index ] | ( tiles[ tile_index + 1 ] << 8 );
 				/* Check for horinzontal flip */
 				if ( gbcmap[ gb_lcd.layer[l].xindex ] & 0x20 )
@@ -1124,7 +1124,7 @@ static void cgb_update_scanline ( running_machine *machine )
 
 						gb_lcd.layer[l].xindex = ( gb_lcd.layer[l].xindex + 1 ) & 31;
 						gb_lcd.layer[l].xshift = 0;
-						tiles = ( gbcmap[ gb_lcd.layer[l].xindex ] & 0x08 ) ? gbc_chrgen : gb_chrgen;
+						tiles = ( gbcmap[ gb_lcd.layer[l].xindex ] & 0x08 ) ? gb_lcd.gbc_chrgen : gb_lcd.gb_chrgen;
 
 						/* Check for vertical flip */
 						if ( gbcmap[ gb_lcd.layer[l].xindex ] & 0x40 )
@@ -1135,7 +1135,7 @@ static void cgb_update_scanline ( running_machine *machine )
 						{
 							tiles += ( ( gb_lcd.layer[l].bgline & 0x07 ) << 1 );
 						}
-						tile_index = ( map[ gb_lcd.layer[l].xindex ] ^ gb_tile_no_mod ) * 16;
+						tile_index = ( map[ gb_lcd.layer[l].xindex ] ^ gb_lcd.gb_tile_no_mod ) * 16;
 						data = tiles[ tile_index ] | ( tiles[ tile_index + 1 ] << 8 );
 					}
 				}
@@ -1288,17 +1288,18 @@ void gb_video_init( running_machine *machine, int mode )
 	int vram_size = 0x2000;
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
-	if (mode == GB_VIDEO_CGB) vram_size = 0x4000;
-
-	if (!memory_region(machine, "gfx1")) gb_vram = memory_region_alloc( machine, "gfx1", vram_size, 0 );
-	if (!memory_region(machine, "gfx2")) gb_oam = memory_region_alloc( machine, "gfx2", 0x100, 0 );
-	memset( gb_vram, 0, vram_size );
 	memset( &gb_lcd, 0, sizeof(gb_lcd) );
 
-	gb_vram_ptr = gb_vram;
-	gb_chrgen = gb_vram;
-	gb_bgdtab = gb_vram + 0x1C00;
-	gb_wndtab = gb_vram + 0x1C00;
+	if (mode == GB_VIDEO_CGB) vram_size = 0x4000;
+
+	gb_lcd.gb_vram = memory_region_alloc( machine, "gfx1", vram_size, 0 );
+	gb_lcd.gb_oam = memory_region_alloc( machine, "gfx2", 0x100, 0 );
+	memset( gb_lcd.gb_vram, 0, vram_size );
+
+	gb_lcd.gb_vram_ptr = gb_lcd.gb_vram;
+	gb_lcd.gb_chrgen = gb_lcd.gb_vram;
+	gb_lcd.gb_bgdtab = gb_lcd.gb_vram + 0x1C00;
+	gb_lcd.gb_wndtab = gb_lcd.gb_vram + 0x1C00;
 
 	gb_lcd.gb_vid_regs[0x06] = 0xFF;
 	for( i = 0x0c; i < _NR_GB_VID_REGS; i++ )
@@ -1328,7 +1329,7 @@ void gb_video_init( running_machine *machine, int mode )
 		/* set the scanline update function */
 		update_scanline = gb_update_scanline;
 
-		memcpy( gb_oam, dmg_oam_fingerprint, 0x100 );
+		memcpy( gb_lcd.gb_oam, dmg_oam_fingerprint, 0x100 );
 
 		break;
 	case GB_VIDEO_MGB:
@@ -1339,13 +1340,13 @@ void gb_video_init( running_machine *machine, int mode )
 		/* Initialize part of VRAM. This code must be deleted when we have added the bios dump */
 		for( i = 1; i < 0x0D; i++ )
 		{
-			gb_vram[ 0x1903 + i ] = i;
-			gb_vram[ 0x1923 + i ] = i + 0x0C;
+			gb_lcd.gb_vram[ 0x1903 + i ] = i;
+			gb_lcd.gb_vram[ 0x1923 + i ] = i + 0x0C;
 		}
-		gb_vram[ 0x1910 ] = 0x19;
+		gb_lcd.gb_vram[ 0x1910 ] = 0x19;
 
 
-		memcpy( gb_oam, mgb_oam_fingerprint, 0x100 );
+		memcpy( gb_lcd.gb_oam, mgb_oam_fingerprint, 0x100 );
 
 		/* Make sure the VBlank interrupt is set when the first instruction gets executed */
 		timer_set(machine,  cputag_clocks_to_attotime(machine, "maincpu", 1), NULL, 0, gb_video_init_vbl );
@@ -1376,12 +1377,12 @@ void gb_video_init( running_machine *machine, int mode )
 		/* set the scanline update function */
 		update_scanline = cgb_update_scanline;
 
-		memcpy( gb_oam, cgb_oam_fingerprint, 0x100 );
+		memcpy( gb_lcd.gb_oam, cgb_oam_fingerprint, 0x100 );
 
-		gb_chrgen = gb_vram;
-		gbc_chrgen = gb_vram + 0x2000;
-		gb_bgdtab = gb_wndtab = gb_vram + 0x1C00;
-		gbc_bgdtab = gbc_wndtab = gb_vram + 0x3C00;
+		gb_lcd.gb_chrgen = gb_lcd.gb_vram;
+		gb_lcd.gbc_chrgen = gb_lcd.gb_vram + 0x2000;
+		gb_lcd.gb_bgdtab = gb_lcd.gb_wndtab = gb_lcd.gb_vram + 0x1C00;
+		gb_lcd.gbc_bgdtab = gb_lcd.gbc_wndtab = gb_lcd.gb_vram + 0x3C00;
 
 		/* HDMA disabled */
 		gb_lcd.hdma_enabled = 0;
@@ -2036,7 +2037,7 @@ READ8_HANDLER( gb_video_r )
 
 READ8_HANDLER( gb_vram_r )
 {
-	return ( gb_lcd.vram_locked == LOCKED ) ? 0xFF : gb_vram_ptr[offset];
+	return ( gb_lcd.vram_locked == LOCKED ) ? 0xFF : gb_lcd.gb_vram_ptr[offset];
 }
 
 WRITE8_HANDLER( gb_vram_w )
@@ -2045,12 +2046,12 @@ WRITE8_HANDLER( gb_vram_w )
 	{
 		return;
 	}
-	gb_vram_ptr[offset] = data;
+	gb_lcd.gb_vram_ptr[offset] = data;
 }
 
 READ8_HANDLER( gb_oam_r )
 {
-	return ( gb_lcd.oam_locked == LOCKED ) ? 0xFF : gb_oam[offset];
+	return ( gb_lcd.oam_locked == LOCKED ) ? 0xFF : gb_lcd.gb_oam[offset];
 }
 
 WRITE8_HANDLER( gb_oam_w )
@@ -2059,7 +2060,7 @@ WRITE8_HANDLER( gb_oam_w )
 	{
 		return;
 	}
-	gb_oam[offset] = data;
+	gb_lcd.gb_oam[offset] = data;
 }
 
 WRITE8_HANDLER ( gb_video_w )
@@ -2067,10 +2068,10 @@ WRITE8_HANDLER ( gb_video_w )
 	switch (offset)
 	{
 	case 0x00:						/* LCDC - LCD Control */
-		gb_chrgen = gb_vram + ((data & 0x10) ? 0x0000 : 0x0800);
-		gb_tile_no_mod = (data & 0x10) ? 0x00 : 0x80;
-		gb_bgdtab = gb_vram + ((data & 0x08) ? 0x1C00 : 0x1800 );
-		gb_wndtab = gb_vram + ((data & 0x40) ? 0x1C00 : 0x1800 );
+		gb_lcd.gb_chrgen = gb_lcd.gb_vram + ((data & 0x10) ? 0x0000 : 0x0800);
+		gb_lcd.gb_tile_no_mod = (data & 0x10) ? 0x00 : 0x80;
+		gb_lcd.gb_bgdtab = gb_lcd.gb_vram + ((data & 0x08) ? 0x1C00 : 0x1800 );
+		gb_lcd.gb_wndtab = gb_lcd.gb_vram + ((data & 0x40) ? 0x1C00 : 0x1800 );
 		/* if LCD controller is switched off, set STAT and LY to 00 */
 		if ( ! ( data & 0x80 ) )
 		{
@@ -2155,7 +2156,7 @@ WRITE8_HANDLER ( gb_video_w )
 		break;
 	case 0x06:						/* DMA - DMA Transfer and Start Address */
 		{
-			UINT8 *P = gb_oam;
+			UINT8 *P = gb_lcd.gb_oam;
 			offset = (UINT16) data << 8;
 			for (data = 0; data < 0xA0; data++)
 				*P++ = memory_read_byte (space, offset++);
@@ -2221,13 +2222,13 @@ WRITE8_HANDLER ( gbc_video_w )
 	switch( offset )
 	{
 	case 0x00:      /* LCDC - LCD Control */
-		gb_chrgen = gb_vram + ((data & 0x10) ? 0x0000 : 0x0800);
-		gbc_chrgen = gb_vram + ((data & 0x10) ? 0x2000 : 0x2800);
-		gb_tile_no_mod = (data & 0x10) ? 0x00 : 0x80;
-		gb_bgdtab = gb_vram + ((data & 0x08) ? 0x1C00 : 0x1800);
-		gbc_bgdtab = gb_vram + ((data & 0x08) ? 0x3C00 : 0x3800);
-		gb_wndtab = gb_vram + ((data & 0x40) ? 0x1C00 : 0x1800);
-		gbc_wndtab = gb_vram + ((data & 0x40) ? 0x3C00 : 0x3800);
+		gb_lcd.gb_chrgen = gb_lcd.gb_vram + ((data & 0x10) ? 0x0000 : 0x0800);
+		gb_lcd.gbc_chrgen = gb_lcd.gb_vram + ((data & 0x10) ? 0x2000 : 0x2800);
+		gb_lcd.gb_tile_no_mod = (data & 0x10) ? 0x00 : 0x80;
+		gb_lcd.gb_bgdtab = gb_lcd.gb_vram + ((data & 0x08) ? 0x1C00 : 0x1800);
+		gb_lcd.gbc_bgdtab = gb_lcd.gb_vram + ((data & 0x08) ? 0x3C00 : 0x3800);
+		gb_lcd.gb_wndtab = gb_lcd.gb_vram + ((data & 0x40) ? 0x1C00 : 0x1800);
+		gb_lcd.gbc_wndtab = gb_lcd.gb_vram + ((data & 0x40) ? 0x3C00 : 0x3800);
 		/* if LCD controller is switched off, set STAT to 00 */
 		if ( ! ( data & 0x80 ) )
 		{
@@ -2314,7 +2315,7 @@ WRITE8_HANDLER ( gbc_video_w )
 		logerror( "Write to undocumented register: %X = %X\n", offset, data );
 		break;
 	case 0x0F:		/* VBK - VRAM bank select */
-		gb_vram_ptr = gb_vram + ( data & 0x01 ) * 0x2000;
+		gb_lcd.gb_vram_ptr = gb_lcd.gb_vram + ( data & 0x01 ) * 0x2000;
 		data |= 0xFE;
 		break;
 	case 0x11:      /* HDMA1 - HBL General DMA - Source High */
@@ -2429,5 +2430,11 @@ WRITE8_HANDLER ( gbc_video_w )
 	}
 
 	gb_lcd.gb_vid_regs[offset] = data;
+}
+
+
+UINT8 *gb_get_vram_ptr(running_machine *machine)
+{
+	return gb_lcd.gb_vram_ptr;
 }
 

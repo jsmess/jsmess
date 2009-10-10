@@ -112,8 +112,6 @@ enum
 	GB_VIDEO_CGB
 };
 
-extern UINT8 *gb_vram;
-
 PALETTE_INIT( gb );
 PALETTE_INIT( gbp );
 PALETTE_INIT( sgb );
@@ -123,6 +121,7 @@ PALETTE_INIT( megaduck );
 READ8_HANDLER( gb_video_r );
 WRITE8_HANDLER( gb_video_w );
 void gb_video_init( running_machine *machine, int mode );
+UINT8 *gb_get_vram_ptr(running_machine *machine);
 
 
 #endif /* GB_H_ */
