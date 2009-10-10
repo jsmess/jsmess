@@ -404,7 +404,7 @@ static BOOL CALLBACK monitor_enum_callback(HMONITOR handle, HDC dc, LPRECT rect,
 	assert(result);
 
 	// allocate a new monitor info
-	monitor = alloc_or_die(sizeof(*monitor));
+	monitor = alloc_or_die(sdl_monitor_info);
 	memset(monitor, 0, sizeof(*monitor));
 
 	// copy in the data

@@ -173,8 +173,8 @@ ifdef PTR64
 CCOMFLAGS += -arch x86_64
 LDFLAGS += -arch x86_64
 else
-CCOMFLAGS += -arch i386
-LDFLAGS += -arch i386
+CCOMFLAGS += -m32 -arch i386
+LDFLAGS += -m32 -arch i386
 endif
 endif
 endif
@@ -342,9 +342,8 @@ endif
 
 SDLMAIN = $(SDLOBJ)/SDLMain_tmpl.o
 
-# the new debugger relies on GTK+ in addition to the base SDLMAME needs
+# the newest debugger uses Cocoa
 OSDOBJS += $(SDLOBJ)/debugosx.o
-LIBS += -framework Carbon
 endif	# Mac OS X
 
 # OS2: add the necessary libraries
