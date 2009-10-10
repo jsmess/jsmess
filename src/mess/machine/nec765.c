@@ -173,8 +173,12 @@ static const device_config *current_image(const device_config *device)
 
 	if (!fdc->intf->get_image)
 	{
-		if (fdc->intf->floppy_drive_tags[fdc->drive]!=NULL) {
-			image = devtag_get_device(device->machine,fdc->intf->floppy_drive_tags[fdc->drive]);
+		if (fdc->intf->floppy_drive_tags[fdc->drive] != NULL)
+		{
+			if (device->owner != NULL)
+				image = device_find_child_by_tag(device->owner, fdc->intf->floppy_drive_tags[fdc->drive]);
+			else
+				image = devtag_get_device(device->machine, fdc->intf->floppy_drive_tags[fdc->drive]);
 		}
 	}
 	else
@@ -2212,8 +2216,17 @@ void nec765_reset(const device_config *device, int offset)
 		a_drive_is_ready = 0;
 		for (i = 0; i < 4; i++)
 		{
-			if (fdc->intf->floppy_drive_tags[i]!=NULL) {
-				if (image_exists(devtag_get_device(device->machine,fdc->intf->floppy_drive_tags[i]))) {
+			if (fdc->intf->floppy_drive_tags[i]!=NULL)
+			{
+				const device_config *img;
+
+				if (device->owner != NULL)
+					img = device_find_child_by_tag(device->owner, fdc->intf->floppy_drive_tags[i]);
+				else
+					img = devtag_get_device(device->machine, fdc->intf->floppy_drive_tags[i]);
+
+				if (image_exists(img))
+				{
 					a_drive_is_ready = 1;
 					break;
 				}
@@ -2332,8 +2345,15 @@ static DEVICE_RESET( nec765 )
 	int i;
 	nec765_t *fdc = get_safe_token(device);
 	for (i = 0; i < 4; i++) {
-		if (fdc->intf->floppy_drive_tags[i]!=NULL) {
-			const device_config *img = devtag_get_device(device->machine,fdc->intf->floppy_drive_tags[i]);
+		if (fdc->intf->floppy_drive_tags[i]!=NULL)
+		{
+			const device_config *img;
+
+			if (device->owner != NULL)
+				img = device_find_child_by_tag(device->owner, fdc->intf->floppy_drive_tags[i]);
+			else
+				img = devtag_get_device(device->machine, fdc->intf->floppy_drive_tags[i]);
+
 			floppy_drive_set_controller(img, device);
 			floppy_drive_set_ready_state_change_callback(img, nec765_set_ready_change_callback);
 		}
