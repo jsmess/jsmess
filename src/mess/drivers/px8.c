@@ -10,6 +10,23 @@
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
+#include "cpu/m6800/m6800.h"
+
+
+/***************************************************************************
+    CONSTANTS
+***************************************************************************/
+
+#define XTAL_CR1		XTAL_9_8304MHz
+#define XTAL_CR2		XTAL_32_768kHz
+
+/* interrupt sources */
+#define INT0_7508		0x01
+#define INT1_SERIAL		0x02
+#define INT2_RS232		0x04
+#define INT3_BARCODE	0x08
+#define INT4_FRC		0x10
+#define INT5_OPTION		0x20
 
 
 /***************************************************************************
@@ -17,7 +34,6 @@
 ***************************************************************************/
 
 static ADDRESS_MAP_START( px8_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -25,6 +41,13 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( px8_io , ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( px8_slave_mem, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x8000, 0x97ff) AM_RAM /* vram */
+	AM_RANGE(0x9800, 0xefff) AM_NOP
+	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("slave", 0) /* internal mask rom */
+ADDRESS_MAP_END
+
 
 
 /***************************************************************************
@@ -54,10 +77,17 @@ INPUT_PORTS_END
 ***************************************************************************/
 
 static MACHINE_DRIVER_START( px8 )
-    /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu", Z80, XTAL_4MHz)
-    MDRV_CPU_PROGRAM_MAP(px8_mem)
-    MDRV_CPU_IO_MAP(px8_io)
+    /* main cpu (uPD70008) */
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_CR1 / 4) /* 2.45 MHz */
+	MDRV_CPU_PROGRAM_MAP(px8_mem)
+	MDRV_CPU_IO_MAP(px8_io)
+
+    /* slave cpu (HD6303) */
+	MDRV_CPU_ADD("slave", M6803, XTAL_CR1 / 4) /* 614 kHz */
+	MDRV_CPU_PROGRAM_MAP(px8_slave_mem)
+
+    /* sub CPU (uPD7508) */
+//	MDRV_CPU_ADD("sub", UPD7508, 200000) /* 200 kHz */
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", LCD)
@@ -91,7 +121,7 @@ ROM_START( px8 )
 	ROM_LOAD("upd7508.bin", 0x0000, 0x1000, NO_DUMP)
 
 	ROM_REGION(0x1000, "slave", 0)
-	ROM_LOAD("hd6301.bin", 0x0000, 0x1000, NO_DUMP)
+	ROM_LOAD("hd6303.bin", 0x0000, 0x1000, NO_DUMP)
 ROM_END
 
 
