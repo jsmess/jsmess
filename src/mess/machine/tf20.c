@@ -264,8 +264,6 @@ static DEVICE_START( tf20 )
 
 static DEVICE_RESET( tf20 )
 {
-	tf20_state *tf20 = get_safe_token(device);
-
 	const device_config *cpu = device_find_child_by_tag(device, "tf20");
 	const address_space *prg = cpu_get_address_space(cpu, ADDRESS_SPACE_PROGRAM);
 
