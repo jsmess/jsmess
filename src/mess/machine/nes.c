@@ -886,6 +886,8 @@ DEVICE_START(nes_disk)
 	nes.battery = 0;
 	nes.prg_chunks = nes.chr_chunks = 0;
 
+	/* initialize the system as if using a mapper 20 cart */
+	nes.format = 1;
 	nes.mapper = 20;
 	nes.four_screen_vram = 0;
 	nes.hard_mirroring = 0;
