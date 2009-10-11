@@ -270,6 +270,7 @@ MACHINE_RESET( specimx )
 	specimx_set_bank(machine, 2,0x00); // Initiali load ROM disk
 	specimx_color = 0x70;
 	timer_set(machine,  attotime_zero, NULL, 0, setup_pit8253_gates );
+	wd17xx_set_pause_time(devtag_get_device(machine, "wd1793"),12);
 }
 
 READ8_HANDLER ( specimx_disk_ctrl_r )

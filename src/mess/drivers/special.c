@@ -20,6 +20,7 @@
 #include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
 #include "formats/rk_cas.h"
+#include "formats/smx_dsk.h"
 #include "machine/wd17xx.h"
 
 /* Address maps */
@@ -393,16 +394,6 @@ static const cassette_config special_cassette_config =
 	NULL,
 	CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED
 };
-
-
-static FLOPPY_OPTIONS_START(specimx)
-	FLOPPY_OPTION(specimx, "odi,img", "Specialist MX disk image", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([2])
-		TRACKS([80])
-		SECTORS([5])
-		SECTOR_LENGTH([1024])
-		FIRST_SECTOR_ID([1]))
-FLOPPY_OPTIONS_END
 
 static const floppy_config specimx_floppy_config =
 {

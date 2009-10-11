@@ -1292,6 +1292,7 @@ $(MESSOBJ)/sord.a:				\
 $(MESSOBJ)/special.a:			\
 	$(MESS_AUDIO)/special.o		\
 	$(MESS_DRIVERS)/special.o	\
+	$(MESS_FORMATS)/smx_dsk.o	\
 	$(MESS_MACHINE)/special.o	\
 	$(MESS_VIDEO)/special.o		\
 
