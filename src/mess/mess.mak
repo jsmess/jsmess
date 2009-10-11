@@ -1424,7 +1424,6 @@ $(MESSOBJ)/trs.a:				\
 	$(MESS_DEVICES)/coco_pak.o	\
 	$(MESS_DEVICES)/coco_232.o	\
 	$(MESS_DEVICES)/orch90.o	\
-	$(MESS_MACHINE)/mc10.o		\
 	$(MESS_DRIVERS)/mc10.o		\
 	$(MESS_MACHINE)/trs80.o		\
 	$(MESS_VIDEO)/trs80.o		\
