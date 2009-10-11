@@ -84,6 +84,30 @@
  * 		IRQ12 - Printer port
  * 		IRQ13 - Sound (FM?), Mouse
  * 		IRQ15 - PCM 
+ * 
+ * Machine ID list (I/O port 0x31)
+ * 
+	1(01h)	FM-TOWNS 1/2
+	2(02h)	FM-TOWNS 1F/2F/1H/2H
+	3(03h)	FM-TOWNS 10F/20F/40H/80H
+	4(04h)	FM-TOWNSII UX
+	5(05h)	FM-TOWNSII CX
+	6(06h)	FM-TOWNSII UG
+	7(07h)	FM-TOWNSII HR
+	8(08h)	FM-TOWNSII HG
+	9(09h)	FM-TOWNSII UR
+	11(0Bh)	FM-TOWNSII MA
+	12(0Ch)	FM-TOWNSII MX
+	13(0Dh)	FM-TOWNSII ME
+	14(0Eh)	TOWNS Application Card (PS/V Vision)
+	15(0Fh)	FM-TOWNSII MF/Fresh/Fresh・TV
+	16(10h)	FM-TOWNSII SN
+	17(11h)	FM-TOWNSII HA/HB/HC
+	19(13h)	FM-TOWNSII EA/Fresh・T/Fresh・ET/Fresh・FT
+	20(14h)	FM-TOWNSII Fresh・E/Fresh・ES/Fresh・FS
+	22(16h)	FMV-TOWNS H/Fresh・GS/Fresh・GT/H2
+	23(17h)	FMV-TOWNS H20
+	74(4Ah)	FM-TOWNS MARTY
  */
 
 #include "driver.h"
@@ -129,38 +153,48 @@ static UINT8 towns_rtc_reg[16];
 emu_timer* towns_rtc_timer;
 static UINT8 towns_timer_mask;
 static UINT8 towns_crtc_mix;
+static UINT16 towns_machine_id;  // default is 0x0101
 
 
 static void towns_update_video_banks(const address_space* space);
 static PIC8259_SET_INT_LINE( towns_pic_irq );
 
-static void towns_init_serial_rom(void)
+static void towns_init_serial_rom(running_machine* machine)
 {
 	// TODO: init serial ROM contents
-	int x,y;
-	char code[7] = "USTIJUF";
+	int x;
+	char code[8] = { 0x04,0x65,0x54,0xA4,0x95,0x45,0x35,0x5F };
+	UINT8* srom = memory_region(machine,"serial");
+	
 	memset(towns_serial_rom,0,256/8);
-
-	for(x=72;x<=194;x++)  // set these bits to 1
-		towns_serial_rom[x/8] |= (1 << (x%8));
-
-	y=0;
-	for(x=195;x<=251;x++)
+	
+	if(srom)
 	{
-		if(code[y/8] & (1 << (y % 8)))
-			towns_serial_rom[x/8] |= (1 << (x%8));
+		memcpy(towns_serial_rom,srom,32);
+		towns_machine_id = (towns_serial_rom[0x18] << 8) | towns_serial_rom[0x17];
+		popmessage("Machine ID in serial ROM: %04x",towns_machine_id);
+		return;
+	}
+
+	for(x=8;x<=21;x++)
+		towns_serial_rom[x] = 0xff;
+	
+	for(x=0;x<=7;x++)
+	{
+		towns_serial_rom[x] = code[x];
 	}
 
 	// add Machine ID
-	towns_serial_rom[7] = 0x01;
-	towns_serial_rom[8] = 0x01;
+	towns_machine_id = 0x0101;
+	towns_serial_rom[0x17] = 0x01;
+	towns_serial_rom[0x18] = 0x01;
 
 	// serial number?
-	towns_serial_rom[2] = 0x10;
-	towns_serial_rom[3] = 0x6e;
-	towns_serial_rom[4] = 0x54;
-	towns_serial_rom[5] = 0x32;
-	towns_serial_rom[6] = 0x10;
+	towns_serial_rom[29] = 0x10;
+	towns_serial_rom[28] = 0x6e;
+	towns_serial_rom[27] = 0x54;
+	towns_serial_rom[26] = 0x32;
+	towns_serial_rom[25] = 0x10;
 }
 
 static void towns_init_rtc(void)
@@ -209,10 +243,10 @@ static READ8_HANDLER(towns_system_r)
 			return nmi_mask & 0x01;
 		case 0x10:
 			logerror("SYS: (0x30) Machine ID read\n");
-			return 0x01;
+			return (towns_machine_id >> 8) & 0xff;
 		case 0x11:
 			logerror("SYS: (0x31) Machine ID read\n");
-			return 0x01;
+			return towns_machine_id & 0xff;
 		case 0x12:
 			/* Bit 0 = data, bit 6 = CLK, bit 7 = RESET, bit 5 is always 1? */
 			ret = (towns_serial_rom[towns_srom_position/8] & (1 << (towns_srom_position%8))) ? 1 : 0;
@@ -747,6 +781,8 @@ static void towns_update_video_banks(const address_space* space)
 
 	if(towns_mainmem_enable != 0)  // first MB is RAM
 	{
+		ROM = memory_region(space->machine,"user");
+
 		memory_set_bankptr(space->machine,1,mess_ram+0xc0000);
 		memory_set_bankptr(space->machine,2,mess_ram+0xc8000);
 		memory_set_bankptr(space->machine,3,mess_ram+0xc9000);
@@ -756,7 +792,10 @@ static void towns_update_video_banks(const address_space* space)
 		memory_set_bankptr(space->machine,6,mess_ram+0xcb000);
 		memory_set_bankptr(space->machine,7,mess_ram+0xcb000);
 		memory_set_bankptr(space->machine,8,mess_ram+0xcc000);
-		memory_set_bankptr(space->machine,11,mess_ram+0xf8000);
+		if(towns_system_port & 0x02)
+			memory_set_bankptr(space->machine,11,mess_ram+0xf8000);
+		else
+			memory_set_bankptr(space->machine,11,ROM+0x238000);
 		memory_set_bankptr(space->machine,12,mess_ram+0xf8000);
 		return;
 	}
@@ -1089,11 +1128,17 @@ static DRIVER_INIT( towns )
 	towns_gfxvram = auto_alloc_array(machine,UINT8,0x200000);
 	towns_txtvram = auto_alloc_array(machine,UINT8,0x8000);
 	towns_serial_rom = auto_alloc_array(machine,UINT8,256/8);
-	towns_init_serial_rom();
+	towns_init_serial_rom(machine);
 	towns_init_rtc();
 	towns_rtc_timer = timer_alloc(machine,rtc_second,NULL);
 	
 	cpu_set_irq_callback(cputag_get_cpu(machine,"maincpu"), towns_irq_callback);
+}
+
+static DRIVER_INIT( marty )
+{
+	DRIVER_INIT_CALL(towns);
+	towns_machine_id = 0x034a;
 }
 
 static MACHINE_RESET( towns )
@@ -1298,10 +1343,25 @@ ROM_START( fmtmarty )
 	ROM_CONTINUE(0x200000,0x40000)
 ROM_END
 
+ROM_START( carmarty )
+  ROM_REGION32_LE( 0x480000, "user", 0)
+	ROM_LOAD("fmt_dos.rom",  0x000000, 0x080000, CRC(2bc2af96) SHA1(99cd51c5677288ad8ef711b4ac25d981fd586884) )
+	ROM_LOAD("fmt_dic.rom",  0x100000, 0x080000, CRC(82d1daa2) SHA1(7564020dba71deee27184824b84dbbbb7c72aa4e) )
+	ROM_LOAD("fmt_fnt.rom",  0x180000, 0x040000, CRC(dd6fd544) SHA1(a216482ea3162f348fcf77fea78e0b2e4288091a) )
+	ROM_LOAD("fmt_sys.rom",  0x200000, 0x040000, CRC(e1ff7ce1) SHA1(e6c359177e4e9fb5bbb7989c6bbf6e95c091fd88) )
+	ROM_LOAD("mar_ex0.rom",  0x280000, 0x080000, CRC(e248bfbd) SHA1(0ce89952a7901dd4d256939a6bc8597f87e51ae7) )
+	ROM_LOAD("mar_ex1.rom",  0x300000, 0x080000, CRC(ab2e94f0) SHA1(4b3378c772302622f8e1139ed0caa7da1ab3c780) )
+	ROM_LOAD("mar_ex2.rom",  0x380000, 0x080000, CRC(ce150ec7) SHA1(1cd8c39f3b940e03f9fe999ebcf7fd693f843d04) )
+	ROM_LOAD("mar_ex3.rom",  0x400000, 0x080000, CRC(582fc7fc) SHA1(a77d8014e41e9ff0f321e156c0fe1a45a0c5e58e) )
+  ROM_REGION( 0x20, "serial", 0)
+    ROM_LOAD("mytowns.rom",  0x00, 0x20, CRC(bc58eba6) SHA1(483087d823c3952cc29bd827e5ef36d12c57ad49) )
+ROM_END
+
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT    INIT    CONFIG COMPANY      FULLNAME            FLAGS */
-COMP( 1989, fmtowns,  0,    0, 		towns, 		towns, 	 towns,  	 towns,  	"Fujitsu",   "FM-Towns",		 GAME_NOT_WORKING)
-COMP( 1989, fmtownsa, fmtowns, 0, 	towns, 		towns, 	 towns,  	 towns,  	"Fujitsu",   "FM-Towns (alternate)", GAME_NOT_WORKING)
-CONS( 1993, fmtmarty, 0,    0, 		towns, 		towns, 	 towns,  	 towns,  	"Fujitsu",   "FM-Towns Marty",	 GAME_NOT_WORKING)
+/*    YEAR  NAME    PARENT  COMPAT  	MACHINE     INPUT    INIT    CONFIG COMPANY      FULLNAME            FLAGS */
+COMP( 1989, fmtowns,  0,    	0, 		towns, 		towns, 	 towns,  	 towns,  	"Fujitsu",   "FM-Towns",		 GAME_NOT_WORKING)
+COMP( 1989, fmtownsa, fmtowns,	0, 		towns, 		towns, 	 towns,  	 towns,  	"Fujitsu",   "FM-Towns (alternate)", GAME_NOT_WORKING)
+CONS( 1993, fmtmarty, 0,    	0, 		towns, 		towns, 	 marty,  	 towns,  	"Fujitsu",   "FM-Towns Marty",	 GAME_NOT_WORKING)
+CONS( 1994, carmarty, fmtmarty,	0, 		towns, 		towns, 	 towns,  	 towns,  	"Fujitsu",   "FM-Towns Car Marty",	 GAME_NOT_WORKING)
 
