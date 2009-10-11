@@ -39,7 +39,7 @@
  * 0x0028 RW: bit 0 = NMI mask (read/write)
  * 0x0030 R : Machine ID (low)
  * 0x0031 R : Machine ID (high)
- * 0x0032 RW: bit 7 = RESET, bit 6 = CLK (serial?)
+ * 0x0032 RW: bit 7 = RESET, bit 6 = CLK, bit 0 = data (serial ROM)
  * 0x0040   : 8253 PIT counter 0
  * 0x0042   : 8253 PIT counter 1
  * 0x0044   : 8253 PIT counter 2
@@ -50,9 +50,9 @@
  * 0x00b0-bf: DMA controller 2 (uPD71071)
  * 0x0200-0f: Floppy controller (MB8877A)
  * 0x0400   : Video / CRTC (unknown)
- * 0x0404   : Video / CRTC (unknown)
+ * 0x0404   : Enable whole first MB of RAM (disable VRAM, CMOS, BIOS ROM)
  * 0x0440-5f: Video / CRTC (unknown)
- * 0x0480 RW: bit 1 = some sort of RAM switch?
+ * 0x0480 RW: bit 1 = disable BIOS ROM
  * 0x04c0-cf: CD-ROM controller (unknown? SCSI?)
  * 0x04d5   : Sound mute
  * 0x04d8   : YM3438 control port A / status
@@ -70,6 +70,20 @@
  * 0x3000 - 0x3fff : CMOS RAM
  * 0xfd90-a0: CRTC / Video
  * 0xff81: CRTC / Video - returns value in RAM location 0xcff81?
+ * 
+ * IRQ list
+ * 
+ * 		IRQ0 - PIT Timer IRQ
+ * 		IRQ1 - Keyboard
+ * 		IRQ2 - Serial Port
+ * 		IRQ6 - Floppy Disc Drive
+ * 		IRQ7 - PIC Cascade IRQ
+ * 		IRQ8 - SCSI controller
+ * 		IRQ9 - Built-in CD-ROM controller
+ * 		IRQ11 - VSync interrupt
+ * 		IRQ12 - Printer port
+ * 		IRQ13 - Sound (FM?), Mouse
+ * 		IRQ15 - PCM 
  */
 
 #include "driver.h"
@@ -113,8 +127,12 @@ static UINT8 towns_rtc_select;
 static UINT8 towns_rtc_data;
 static UINT8 towns_rtc_reg[16];
 emu_timer* towns_rtc_timer;
+static UINT8 towns_timer_mask;
+static UINT8 towns_crtc_mix;
+
 
 static void towns_update_video_banks(const address_space* space);
+static PIC8259_SET_INT_LINE( towns_pic_irq );
 
 static void towns_init_serial_rom(void)
 {
@@ -498,21 +516,39 @@ static WRITE8_HANDLER(towns_keyboard_w)
 	logerror("KB: wrote 0x%02x to offset %02x\n",data,offset);
 }
 
+/*
+ *  Port 0x60 - PIT Timer control
+ *  On read:	bit 0: Timer 0 output level
+ * 				bit 1: Timer 1 output level
+ * 				bits 4-2: Timer masks (timer 2 = sound)
+ *  On write:	bits 2-0: Timer mask set
+ * 				bit 7: Timer 0 output reset
+ */
 static READ8_HANDLER(towns_port60_r)
 {
 	UINT8 val = 0x00;
-	if ( pit8253_get_output(devtag_get_device(space->machine, "pit"), 2 ) )
-		val |= 0x20;
-	else
-		val &= ~0x20;
+	
+	if ( pit8253_get_output(devtag_get_device(space->machine, "pit"), 0 ) )
+		val |= 0x01;
+	if ( pit8253_get_output(devtag_get_device(space->machine, "pit"), 1 ) )
+		val |= 0x02;
 
+	val |= (towns_timer_mask & 0x07) << 2;
+	
 	logerror("PIT: port 0x60 read, returning 0x%02x\n",val);
 	return val;
 }
 
 static WRITE8_HANDLER(towns_port60_w)
 {
-	pit8253_gate_w(devtag_get_device(space->machine, "pit"), 2, data & 1);
+	const device_config* dev = devtag_get_device(space->machine,"pic8259_master");
+
+	if(data & 0x80)
+	{
+		towns_pic_irq(dev,0);
+	}
+	towns_timer_mask = data & 0x07;
+	// bit 2 = sound (beeper?)
 	logerror("PIT: wrote 0x%02x to port 0x60\n",data);
 }
 
@@ -627,6 +663,8 @@ static READ8_HANDLER( towns_video_cff80_r )
 
 	switch(offset)
 	{
+		case 0x00:  // mix register
+			return towns_crtc_mix;
 		case 0x01:  // read/write plane select (bit 0-3 write, bit 6-7 read)
 			return ((towns_vram_rplane << 6) & 0xc0) | towns_vram_wplane;
 		case 0x16:  // Kanji character data
@@ -655,6 +693,9 @@ static WRITE8_HANDLER( towns_video_cff80_w )
 
 	switch(offset)
 	{
+		case 0x00:  // mix register
+			towns_crtc_mix = data;
+			break;
 		case 0x01:  // read/write plane select (bit 0-3 write, bit 6-7 read)
 			towns_vram_wplane = data & 0x0f;
 			towns_vram_rplane = (data & 0xc0) >> 6;
@@ -898,6 +939,12 @@ static READ8_HANDLER(towns_unknown_r)
 	return 0x08;
 }
 
+static READ8_HANDLER(towns_41ff_r)
+{
+	logerror("I/O port 0x41ff read\n");
+	return 0x01;
+}
+
 static IRQ_CALLBACK( towns_irq_callback )
 {
 	const device_config* pic1 = devtag_get_device(device->machine,"pic8259_master");
@@ -915,18 +962,36 @@ static IRQ_CALLBACK( towns_irq_callback )
 
 static PIC8259_SET_INT_LINE( towns_pic_irq )
 {
-	cputag_set_input_line(device->machine,"maincpu",0,interrupt ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine,"maincpu",0,interrupt ? HOLD_LINE : CLEAR_LINE);
+	logerror("PIC#1: set IRQ line to %i\n",interrupt);
 }
 
 static PIC8259_SET_INT_LINE( towns_slave_pic_irq )
 {
-	cputag_set_input_line(device->machine,"maincpu",7,interrupt ? ASSERT_LINE : CLEAR_LINE);
+	const device_config* dev = devtag_get_device(device->machine,"pic8259_master");
+
+	pic8259_set_irq_line(dev,7,interrupt);
+	logerror("PIC#2: set IRQ line to %i\n",interrupt);
 }
 
 static PIT8253_OUTPUT_CHANGED( towns_pit_out0_changed )
 {
 	const device_config* dev = devtag_get_device(device->machine,"pic8259_master");
-	pic8259_set_irq_line(dev,0,state);
+	
+	if(towns_timer_mask & 0x01)
+	{
+		pic8259_set_irq_line(dev,0,state);
+	}
+}
+
+static PIT8253_OUTPUT_CHANGED( towns_pit_out1_changed )
+{
+	const device_config* dev = devtag_get_device(device->machine,"pic8259_master");
+	
+	if(towns_timer_mask & 0x02)
+	{
+		pic8259_set_irq_line(dev,0,state);
+	}
 }
 
 static ADDRESS_MAP_START(towns_mem, ADDRESS_SPACE_PROGRAM, 32)
@@ -1005,6 +1070,8 @@ static ADDRESS_MAP_START( towns_io , ADDRESS_SPACE_IO, 32)
   AM_RANGE(0x0c30,0x0c33) AM_READ8(towns_unknown_r,0x00ff0000)
   // CMOS
   AM_RANGE(0x3000,0x3fff) AM_READWRITE8(towns_cmos8_r, towns_cmos8_w,0x00ff00ff)
+  // Something (MS-DOS wants this 0x41ff be 1
+  AM_RANGE(0x41fc,0x41ff) AM_READ8(towns_41ff_r,0xff000000)
   // CRTC / Video (again)
   AM_RANGE(0xfd90,0xfda3) AM_READWRITE8(towns_video_fd90_r, towns_video_fd90_w, 0xffffffff)
   AM_RANGE(0xff80,0xff83) AM_READWRITE8(towns_video_ff81_r, towns_video_ff81_w, 0x0000ff00)
@@ -1085,7 +1152,7 @@ static const struct pit8253_config towns_pit8253_config =
 		},
 		{
 			307200,
-			NULL
+			towns_pit_out1_changed
 		},
 		{
 			307200,
