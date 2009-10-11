@@ -14,6 +14,7 @@
 #include "devices/messram.h"
 #include "machine/upd7201.h"
 #include "machine/nec765.h"
+#include "devices/flopdrv.h"
 
 
 /***************************************************************************
@@ -199,7 +200,19 @@ static const nec765_interface tf20_nec765a_intf =
 	NULL,
 	NULL,
 	NEC765_RDY_PIN_CONNECTED,
-	{NULL, NULL, NULL, NULL}
+	{FLOPPY_0, FLOPPY_1, NULL, NULL}
+};
+
+static const floppy_config tf20_floppy_config =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(default),
+	DO_NOT_KEEP_GEOMETRY
 };
 
 static MACHINE_DRIVER_START( tf20 )
@@ -216,6 +229,9 @@ static MACHINE_DRIVER_START( tf20 )
 
 	/* upd7201 serial interface */
 	MDRV_UPD7201_ADD("3a", XTAL_CR1 / 2, tf20_upd7201_intf)
+
+	/* 2 floppy drives */
+	MDRV_FLOPPY_2_DRIVES_ADD(tf20_floppy_config)
 MACHINE_DRIVER_END
 
 
@@ -241,6 +257,9 @@ static DEVICE_START( tf20 )
 	tf20->ram = device_find_child_by_tag(device, "ram");
 	tf20->upd765a = device_find_child_by_tag(device, "5a");
 	tf20->upd7201 = device_find_child_by_tag(device, "3a");
+
+	/* enable second half of ram */
+	memory_set_bankptr(device->machine, 22, messram_get_ptr(tf20->ram) + 0x8000);
 }
 
 static DEVICE_RESET( tf20 )
@@ -253,9 +272,6 @@ static DEVICE_RESET( tf20 )
 	/* enable rom */
 	memory_install_readwrite8_handler(prg, 0x0000, 0x07ff, 0, 0x7800, SMH_BANK(21), SMH_NOP);
 	memory_set_bankptr(device->machine, 21, cpu->region);
-
-	/* enable second half of ram */
-	memory_set_bankptr(device->machine, 22, messram_get_ptr(tf20->ram) + 0x8000);
 }
 
 DEVICE_GET_INFO( tf20 )
