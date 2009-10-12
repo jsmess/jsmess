@@ -68,3 +68,32 @@ VIDEO_UPDATE( mac )
 	}
 	return 0;
 }
+
+VIDEO_UPDATE( macse30 )
+{
+	UINT32 video_base;
+	const UINT16 *video_ram;
+	UINT16 word;
+	UINT16 *line;
+	int y, x, b;
+
+	video_base = screen_buffer ? 0x8000 : 0;
+	video_ram = (const UINT16 *) &se30_vram[video_base/4];
+
+	for (y = 0; y < MAC_V_VIS; y++)
+	{
+		line = BITMAP_ADDR16(bitmap, y, 0);
+
+		for (x = 0; x < MAC_H_VIS; x += 16)
+		{
+//			word = *(video_ram++);
+			word = video_ram[((y * MAC_H_VIS)/16) + ((x/16)^1)];
+			for (b = 0; b < 16; b++)
+			{
+				line[x + b] = (word >> (15 - b)) & 0x0001;
+			}
+		}
+	}
+	return 0;
+}
+

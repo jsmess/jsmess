@@ -2,6 +2,8 @@
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
+- Macintosh II (FDHD), IIx, IIcx, IIci, IIsi, LC, 
+  LC II, and Classic II (not working) [R. Belmont]
 - P8000 (not working) [Matt Knoth, Fabio Priuli]
 
 
@@ -31,6 +33,9 @@ System Driver Changes:
   disk drives.  [Dirk Best]
 
 - [GBCOLOR] Added BIOS.  [Wilbert Pol]
+
+- [MAC] Greatly expanded support for post-68000 models.  Many
+  now POST and want a disk to boot from. [R. Belmont]
 
 - [MIKROMIK] Added proper ROM dumps, fixed keyboard and 
   added drive B: motor. [Curt Coder, Kara Trace]

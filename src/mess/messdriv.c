@@ -332,8 +332,16 @@ const game_driver * const drivers[] =
     DRIVER( mac512ke )  /* 1986 Apple Macintosh 512ke                       */
     DRIVER( macplus )   /* 1986 Apple Macintosh Plus                        */
     DRIVER( macse )     /* 1987 Apple Macintosh SE                          */
+    DRIVER( mac2fdhd )	/* 1988 Apple Macintosh II (FDHD) */
+    DRIVER( maciix )	/* 1988 Apple Macintosh IIx */ 
+    DRIVER( macse30 )	/* 1989 Apple Macintosh SE/30 */
+    DRIVER( maciicx )	/* 1989 Apple Macintosh IIcx */  
+    DRIVER( maciici )	/* 1989 Apple Macintosh IIci */  
     DRIVER( macclasc )  /* 1990 Apple Macintosh Classic                     */
-//  DRIVER( maclc )     /* 1990 Apple Macintosh LC                          */
+    DRIVER( maclc )	/* 1990 Apple Macintosh LC */
+    DRIVER( maciisi )	/* 1990 Apple Macintosh IIsi */
+    DRIVER( macclas2 )	/* 1991 Apple Macintosh Classic II */
+    DRIVER( maclc2 )	/* 1991 Apple Macintosh LC II */
 
     /* Atari */
     DRIVER( a400 )      /* 1979 Atari 400                                   */
