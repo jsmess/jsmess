@@ -7997,13 +7997,12 @@ M68KMAKE_OP(pea, 32, ., .)
 
 M68KMAKE_OP(pflush, 32, ., .)
 {
-	if ((CPU_TYPE_IS_040_PLUS(m68k->cpu_type)) && (m68k->has_pmmu))
+	if ((CPU_TYPE_IS_EC020_PLUS(m68k->cpu_type)) && (m68k->has_pmmu))
 	{
-		// Nothing to do, unless address translation cache is emulated
 		logerror("680x0: unhandled PFLUSH\n");
 		return;
 	}
-	m68ki_exception_illegal(m68k);
+	m68ki_exception_1111(m68k);
 }
 
 M68KMAKE_OP(pmove, 32, ., .)
@@ -8011,16 +8010,90 @@ M68KMAKE_OP(pmove, 32, ., .)
 	UINT16 modes;
 	UINT32 ea;
 
-	modes = m68ki_read_imm_16(m68k);
-	ea = M68KMAKE_GET_EA_AY_32;
-
 	if ((CPU_TYPE_IS_EC020_PLUS(m68k->cpu_type)) && (m68k->has_pmmu))
 	{
-		logerror("680x0: unhandled PMOVE modes %x ea %x\n", modes, ea);
+		modes = m68ki_read_imm_16(m68k);
+		ea = M68KMAKE_GET_EA_AY_32;
+		
+		if ((modes & 0xfde0) == 0x2000)	// PLOAD
+		{
+			logerror("680x0: unhandled PLOAD\n");
+			return;
+		}
+
+		if ((modes & 0xe200) == 0x2000)	// PFLUSHA
+		{
+			logerror("680x0: unhandled PFLUSHA\n");
+			return;
+		}
+
+		switch ((modes>>13) & 0x7)
+		{
+			case 0:	// MC68030/040 form with FD bit
+			case 2:	// MC68881 form, FD never set
+				if (modes & 0x200)
+				{
+					logerror("680x0: PMOVE from MMU not supported\n");
+				}
+				else
+				{
+				 	switch ((modes>>10) & 7)
+					{
+						case 0:	// translation control register
+							m68k->mmu_tc = memory_read_word_32be(m68k->program, ea)<<16;
+							m68k->mmu_tc |= memory_read_word_32be(m68k->program, ea+2);
+
+							if (m68k->mmu_tc & 0x80000000)
+							{
+								m68k->pmmu_enabled = 1;
+							}
+							else
+							{
+								m68k->pmmu_enabled = 0;
+							}
+							break;
+
+						case 2:	// supervisor root pointer
+							m68k->mmu_srp_limit = memory_read_word_32be(m68k->program, ea)<<16;
+							m68k->mmu_srp_limit |= memory_read_word_32be(m68k->program, ea+2);
+							m68k->mmu_srp_aptr = memory_read_word_32be(m68k->program, ea+4)<<16;
+							m68k->mmu_srp_aptr |= memory_read_word_32be(m68k->program, ea+6);
+							break;
+
+						case 3:	// CPU root pointer
+							m68k->mmu_crp_limit = memory_read_word_32be(m68k->program, ea)<<16;
+							m68k->mmu_crp_limit |= memory_read_word_32be(m68k->program, ea+2);
+							m68k->mmu_crp_aptr = memory_read_word_32be(m68k->program, ea+4)<<16;
+							m68k->mmu_crp_aptr |= memory_read_word_32be(m68k->program, ea+6);
+							break;
+
+						default:
+							logerror("680x0: PMOVE to unknown MMU register %x\n", (modes>>10) & 7);
+							break;
+					}
+				}
+				break;
+
+			case 3:	// MC68030 to/from status reg
+				if (modes & 0x200)
+				{
+					memory_write_word_32be(m68k->program, ea, m68k->mmu_sr);
+				}
+				else
+				{
+					m68k->mmu_sr = memory_read_word_32be(m68k->program, ea);
+				}
+				break;
+
+			default:
+				logerror("680x0: unknown PMOVE mode %x (modes %04x) (PC %x)\n", (modes>>13) & 0x7, modes, m68k->pc);
+				break;
+		}
+
 	}
 	else
 	{
-		m68ki_exception_illegal(m68k);
+		m68ki_exception_1111(m68k);
 	}
 }
 
