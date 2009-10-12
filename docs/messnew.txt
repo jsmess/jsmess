@@ -56,6 +56,9 @@ System Driver Changes:
 
 - [SAMCOUPE] Improved Mode 1 graphics.  [Dirk Best]
 
+- [SMS] Fixed rapid-fire to only fire when buttons are
+  pressed. (Bug #1864)  [Enik Land]
+
 - [SPECTRUM] Fixed bug #803 48K SNA load routine bad PC. [Miodrag Milanovic]
 
 - [TRS80] Model 4 and 4P can boot from floppy disk. [Robbbert]

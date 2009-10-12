@@ -168,14 +168,14 @@ static void sms_get_inputs(const address_space *space)
 	case 0x00:  /* Joystick */
 		data = input_port_read(machine, "PORT_DC");
 		/* Rapid Fire setting for Button A */
-		if ( input_port_read(machine, "RFU") & 0x01 )
+		if ( !(data & 0x10 ) && ( input_port_read(machine, "RFU") & 0x01) )
 		{
-			data = ( data & 0xEF ) | ( rapid_fire_state_1 & 0x10 );
+			data |= rapid_fire_state_1 & 0x10;
 		}
 		/* Check Rapid Fire setting for Button B */
-		if ( input_port_read(machine, "RFU") & 0x02 )
+		if ( !(data & 0x20) && (input_port_read(machine, "RFU") & 0x02) )
 		{
-			data = ( data & 0xDF ) | ( rapid_fire_state_1 & 0x20 );
+			data |= rapid_fire_state_1 & 0x20;
 		}
 		sms_input_port0 = ( sms_input_port0 & 0xC0 ) | ( data & 0x3F );
 		break;
@@ -221,13 +221,13 @@ static void sms_get_inputs(const address_space *space)
 		data = input_port_read(machine, "PORT_DC");
 		sms_input_port0 = ( sms_input_port0 & 0x3F ) | ( data & 0xC0 );
 		data = input_port_read(machine, "PORT_DD");
-		if ( input_port_read(machine, "RFU") & 0x04 )
+		if ( !(data & 0x04) && (input_port_read(machine, "RFU") & 0x04) )
 		{
-			data = ( data & 0xFB ) | ( rapid_fire_state_2 & 0x04 );
+			data |= rapid_fire_state_2 & 0x04;
 		}
-		if ( input_port_read(machine, "RFU") & 0x08 )
+		if ( !(data & 0x08) && (input_port_read(machine, "RFU") & 0x08) )
 		{
-			data = ( data & 0xF7 ) | ( rapid_fire_state_2 & 0x08 );
+			data |= rapid_fire_state_2 & 0x08;
 		}
 		sms_input_port1 = ( sms_input_port1 & 0xF0 ) | ( data & 0x0F );
 		break;
