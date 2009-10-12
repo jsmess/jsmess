@@ -43,7 +43,7 @@ emu_timer *test_timer;
 
 #define ENABLE_UART_PRINTING (0)
 
-#define VERBOSE_LEVEL	(6)
+#define VERBOSE_LEVEL	(11)
 
 #define ENABLE_VERBOSE_LOG (1)
 
@@ -2067,7 +2067,7 @@ static void mcd212_process_dca(running_machine *machine, int channel)
 				break;
 			case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15: case 0x16: case 0x17: // NOP
 			case 0x18: case 0x19: case 0x1a: case 0x1b: case 0x1c: case 0x1d: case 0x1e: case 0x1f:
-				verboselog(machine, 11, "%08x: %08x: DCA %d: NOP\n", addr * 2 + channel * 0x200000, cmd, channel );
+				verboselog(machine, 12, "%08x: %08x: DCA %d: NOP\n", addr * 2 + channel * 0x200000, cmd, channel );
 				break;
 			case 0x20: case 0x21: case 0x22: case 0x23: case 0x24: case 0x25: case 0x26: case 0x27: // RELOAD DCP
 			case 0x28: case 0x29: case 0x2a: case 0x2b: case 0x2c: case 0x2d: case 0x2e: case 0x2f:
@@ -2196,8 +2196,8 @@ static void mcd212_process_vsr(running_machine *machine, int channel, UINT32 *pi
 	{
 		for(; x < 768; x++)
 		{
-			pixels[x++] = 0x00070707;
-			pixels[x] = 0x00070707;
+			pixels[x++] = 0;
+			pixels[x] = 0;
 		}
 		return;
 	}
@@ -2298,8 +2298,8 @@ static void mcd212_process_vsr(running_machine *machine, int channel, UINT32 *pi
 					{
 						for(; x < 768; x++)
 						{
-							pixels[x++] = 0x00070707;
-							pixels[x] = 0x00070707;
+							pixels[x++] = 0;
+							pixels[x] = 0;
 						}
 					}
 				}
@@ -2326,8 +2326,8 @@ static void mcd212_process_vsr(running_machine *machine, int channel, UINT32 *pi
 							// Go to the end of the line
 							for(; x < 768; x++)
 							{
-								pixels[x++] = mcd212.channel[channel].clut[((channel == 1) ? 0x80 : 0x00) + (byte & 0x7f)];
-								pixels[x] = mcd212.channel[channel].clut[((channel == 1) ? 0x80 : 0x00) + (byte & 0x7f)];
+								pixels[x++] = mcd212.channel[channel].clut[byte & 0x7f];
+								pixels[x] = mcd212.channel[channel].clut[byte & 0x7f];
 							}
 							done = 1;
 							mcd212_set_vsr(channel, vsr);
