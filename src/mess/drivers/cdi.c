@@ -2391,14 +2391,34 @@ static void mcd212_draw_cursor(running_machine *machine, UINT32 *scanline, int y
 		{
 			UINT32 color = mcd212_4bpp_color[mcd212.channel[0].cursor_control & MCD212_CURCNT_COLOR];
 			y -= cury;
-			for(x = curx; x < curx + 16; x++)
+			if(mcd212.channel[0].cursor_control & MCD212_CURCNT_CUW)
 			{
-				if(mcd212.channel[0].cursor_pattern[y] & (1 << (15 - (x - curx))))
+				for(x = curx; x < curx + 64 && x < 768; x++)
 				{
-					scanline[x] = color;
+					if(mcd212.channel[0].cursor_pattern[y] & (1 << (15 - ((x - curx) >> 2))))
+					{
+						scanline[x++] = color;
+						scanline[x++] = color;
+						scanline[x++] = color;
+						scanline[x] = color;
+					}
+					else
+					{
+					}
 				}
-				else
+			}
+			else
+			{
+				for(x = curx; x < curx + 32 && x < 768; x++)
 				{
+					if(mcd212.channel[0].cursor_pattern[y] & (1 << (15 - ((x - curx) >> 1))))
+					{
+						scanline[x++] = color;
+						scanline[x] = color;
+					}
+					else
+					{
+					}
 				}
 			}
 		}
