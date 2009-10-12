@@ -317,10 +317,6 @@ static TIMER_CALLBACK(smsvdp_display_callback)
 			}
 		}
 
-		if ( video_skip_this_frame() )
-		{
-			return;
-		}
 		sms_update_palette();
 
 		/* Draw left border */
@@ -367,11 +363,6 @@ static TIMER_CALLBACK(smsvdp_display_callback)
 			smsvdp.line_counter -= 1;
 		}
 
-		if ( video_skip_this_frame() )
-		{
-			return;
-		}
-
 		sms_update_palette();
 
 		/* Check if display is disabled */
@@ -403,11 +394,6 @@ static TIMER_CALLBACK(smsvdp_display_callback)
 	/* Check if we're in the top border area */
 	if ( vpos >= vpos_limit )
 	{
-		if ( video_skip_this_frame() )
-		{
-			return;
-		}
-
 		sms_update_palette();
 
 		/* Draw left border */
