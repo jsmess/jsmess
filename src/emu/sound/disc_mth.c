@@ -175,10 +175,14 @@ struct dst_tvca_op_amp_context
 	double	exponent_d[2];	/* Discharge exponents based on function F3 */
 	double	exponent2[2];	/* Discharge/charge exponents based on function F4 */
 	double	exponent3[2];	/* Discharge/charge exponents based on function F5 */
+	double	exponent4;		/* Discharge/charge exponents for c4 */
 	double	v_cap1;			/* charge on cap c1 */
 	double	v_cap2;			/* charge on cap c2 */
 	double	v_cap3;			/* charge on cap c3 */
+	double	v_cap4;			/* charge on cap c4 */
 	double	r67;			/* = r6 + r7 (for easy use later) */
+	UINT8	has_c4;
+	UINT8	has_r4;
 };
 
 
@@ -1087,11 +1091,11 @@ static DISCRETE_STEP(dst_mixer)
 	double	v_ref = info->vRef;
 	double	rI = info->rI;
 
-	if (DST_MIXER__ENABLE)
+	if (EXPECTED(DST_MIXER__ENABLE))
 	{
 		r_total = context->r_total;
 
-		if (context->r_node_bit_flag != 0)
+		if (UNEXPECTED(context->r_node_bit_flag != 0))
 		{
 			/* loop and do any high pass filtering for connected caps */
 			/* but first see if there is an r_node for the current path */
@@ -1157,7 +1161,7 @@ static DISCRETE_STEP(dst_mixer)
 			bit_mask = bit_mask << 1;
 			}
 		}
-		else if (c_bit_flag != 0)
+		else if (UNEXPECTED(c_bit_flag != 0))
 		{
 			/* no r_nodes, so just do high pass filtering */
 			for (bit = 0; bit < context->size; bit++)
@@ -1176,7 +1180,7 @@ static DISCRETE_STEP(dst_mixer)
 		else
 		{
 			/* no r_nodes or c_nodes, mixing only */
-			if (type == DISC_MIXER_IS_OP_AMP)
+			if (UNEXPECTED(type == DISC_MIXER_IS_OP_AMP))
 			{
 				for (bit = 0; bit < context->size; bit++)
 					i += ( v_ref - DST_MIXER__IN(bit) ) / info->r[bit];
@@ -1188,7 +1192,7 @@ static DISCRETE_STEP(dst_mixer)
 			}
 		}
 
-		if (type == DISC_MIXER_IS_OP_AMP_WITH_RI)
+		if (UNEXPECTED(type == DISC_MIXER_IS_OP_AMP_WITH_RI))
 			i += v_ref / rI;
 
 		r_total = 1.0 / r_total;
@@ -1197,13 +1201,13 @@ static DISCRETE_STEP(dst_mixer)
          * If op-amp then summing formula is used. */
 		v = i * ((type == DISC_MIXER_IS_OP_AMP) ? info->rF : r_total);
 
-		if (type == DISC_MIXER_IS_OP_AMP_WITH_RI)
+		if (UNEXPECTED(type == DISC_MIXER_IS_OP_AMP_WITH_RI))
 			v = v_ref + (context->gain * (v_ref - v));
 
 		/* Do the low pass filtering for cF */
-		if (info->cF != 0)
+		if (EXPECTED(info->cF != 0))
 		{
-			if (r_node_bit_flag != 0)
+			if (UNEXPECTED(r_node_bit_flag != 0))
 			{
 				/* Re-calculate exponent if resistor nodes are used */
 				context->exponent_c_f =  RC_CHARGE_EXP(r_total * info->cF);
@@ -1213,7 +1217,7 @@ static DISCRETE_STEP(dst_mixer)
 		}
 
 		/* Do the high pass filtering for cAmp */
-		if (info->cAmp != 0)
+		if (EXPECTED(info->cAmp != 0))
 		{
 			context->v_cap_amp += (v - context->v_cap_amp) * context->exponent_c_amp;
 			v -= context->v_cap_amp;
@@ -1404,7 +1408,7 @@ static DISCRETE_STEP(dst_oneshot)
 	/* If the state is triggered we will need to countdown later */
 	int do_count = context->state;
 
-	if (DST_ONESHOT__RESET)
+	if (UNEXPECTED(DST_ONESHOT__RESET))
 	{
 		/* Hold in Reset */
 		node->output[0] = 0;
@@ -1413,7 +1417,7 @@ static DISCRETE_STEP(dst_oneshot)
 	else
 	{
 		/* are we at an edge? */
-		if (trigger != context->last_trig)
+		if (UNEXPECTED(trigger != context->last_trig))
 		{
 			/* There has been a trigger edge */
 			context->last_trig = trigger;
@@ -1441,7 +1445,7 @@ static DISCRETE_STEP(dst_oneshot)
 			}
 		}
 
-		if (do_count)
+		if (UNEXPECTED(do_count))
 		{
 			context->countdown -= node->info->sample_time;
 			if(context->countdown <= 0.0)
@@ -2023,12 +2027,32 @@ static DISCRETE_STEP(dst_tvca_op_amp)
 		i_pos += context->v_cap3 / info->r11;
 	}
 
-
 	/* Calculate output current. */
 	i_out = i_pos - i_neg;
 	if (i_out < 0) i_out = 0;
+
 	/* Convert to voltage for final output. */
-	node->output[0] = i_out * info->r4;
+	if (context->has_c4)
+	{
+		if (context->has_r4)
+		{
+			/* voltage across r4 charging cap */
+			i_out *= info->r4;
+			/* exponential charge */
+			context->v_cap4 += (i_out - context->v_cap4) * context->exponent4;
+		}
+		else
+		/* linear charge */
+			context->v_cap4 += i_out / context->exponent4;
+		if (context->v_cap4 < 0)
+			context->v_cap4 = 0;
+		node->output[0] = context->v_cap4;
+	}
+	else
+		node->output[0] = i_out * info->r4;
+
+
+
 	/* Clip the output if needed. */
 	if (node->output[0] > context->v_out_max) node->output[0] = context->v_out_max;
 }
@@ -2063,10 +2087,15 @@ static DISCRETE_RESET(dst_tvca_op_amp)
 	context->v_trig2      = (info->v2 - 0.6 - OP_AMP_NORTON_VBE) * RES_VOLTAGE_DIVIDER(info->r8, info->r9);
 	context->exponent2[0] = RC_CHARGE_EXP(info->r9 * info->c2);
 	context->exponent2[1] = RC_CHARGE_EXP(RES_2_PARALLEL(info->r8, info->r9) * info->c2);
-	context->v_cap3  = 0;
-	context->v_trig3 = (info->v3 - 0.6 - OP_AMP_NORTON_VBE) * RES_VOLTAGE_DIVIDER(info->r10, info->r11);
+	context->v_cap3       = 0;
+	context->v_trig3      = (info->v3 - 0.6 - OP_AMP_NORTON_VBE) * RES_VOLTAGE_DIVIDER(info->r10, info->r11);
 	context->exponent3[0] = RC_CHARGE_EXP(info->r11 * info->c3);
 	context->exponent3[1] = RC_CHARGE_EXP(RES_2_PARALLEL(info->r10, info->r11) * info->c3);
+	context->v_cap4       = 0;
+	if (info->r4 != 0) context->has_r4 = 1;
+	if (info->c4 != 0) context->has_c4 = 1;
+	if (context->has_r4 && context->has_c4)
+		context->exponent4    = RC_CHARGE_EXP(info->r4 * info->c4);
 
 	DISCRETE_STEP_CALL(dst_tvca_op_amp);
 }

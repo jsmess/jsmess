@@ -7,6 +7,7 @@ New System Drivers Supported (in no particular order):
 - P8000 (not working) [Matt Knoth, Fabio Priuli]
 
 
+
 Systems Promoted from GAME_NOT_WORKING:
 ---------------------------------------
 - Atari 800XL [Mariusz Wojcieszek]
@@ -14,6 +15,7 @@ Systems Promoted from GAME_NOT_WORKING:
 - Microbee 56k [Robbbert]
 - TRS-80 Model 4P [Robbbert]
 - Nokia MikroMikko 1 M6 [Curt Coder, Kara Trace]
+
 
 
 Skeleton drivers: 
@@ -74,7 +76,7 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
-- The core is based on MAME 0.134u2.  This incorporates all features of the
+- The core is based on MAME 0.134u3.  This incorporates all features of the
   update to this core.  [MAME team]
 
 - Moved implementation to device.  [Miodrag Milanovic]

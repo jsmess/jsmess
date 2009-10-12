@@ -3,6 +3,7 @@ enum {
 	ARKUNK=0,  /* unknown bootlegs for inclusion of possible new sets */
 	ARKANGC,
 	ARKANGC2,
+	BLOCK2,
 	ARKBLOCK,
 	ARKBLOC2,
 	ARKGCBL,
@@ -47,6 +48,7 @@ extern WRITE8_HANDLER( arkanoid_68705_ddrC_w );
 extern CUSTOM_INPUT( arkanoid_68705_input_r );
 extern CUSTOM_INPUT( arkanoid_input_mux );
 
+extern READ8_HANDLER( arkanoid_bootleg_f000_r );
 extern READ8_HANDLER( arkanoid_bootleg_f002_r );
 extern WRITE8_HANDLER( arkanoid_bootleg_d018_w );
 extern READ8_HANDLER( arkanoid_bootleg_d008_r );

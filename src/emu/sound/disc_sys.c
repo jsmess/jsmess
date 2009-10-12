@@ -36,7 +36,7 @@ struct dso_wavelog_context
  *
  *************************************/
 
-static void task_check(discrete_task *task, const discrete_task *dest_task)
+static void task_check(discrete_task *task, discrete_task *dest_task)
 {
 	int inputnum;
 	const linked_list_entry *node_entry;
@@ -76,7 +76,8 @@ static void task_check(discrete_task *task, const discrete_task *dest_task)
 							if (task->numbuffered >= DISCRETE_MAX_TASK_OUTPUTS)
 								fatalerror("dso_task_start - Number of maximum buffered nodes exceeded");
 
-							task->node_buf[task->numbuffered] = auto_alloc_array(task_node->info->device->machine, double, 2048);
+							task->node_buf[task->numbuffered] = auto_alloc_array(task_node->info->device->machine, double,
+									((task_node->info->sample_rate + STREAMS_UPDATE_FREQUENCY) / STREAMS_UPDATE_FREQUENCY));
 							task->source[task->numbuffered] = (double *) dest_node->input[inputnum];
 							task->nodes[task->numbuffered] = discrete_find_node(task_node->info, inputnode);
 							i = task->numbuffered;
@@ -87,7 +88,7 @@ static void task_check(discrete_task *task, const discrete_task *dest_task)
 						/* register into source list */
 						source = auto_alloc(dest_node->info->device->machine, discrete_source_node);
 						linked_list_add(dest_node->info,
-								(linked_list_entry **) (FPTR) &dest_task->source_list,
+								&dest_task->source_list,
 								source);
 						source->task = task;
 						source->output_node = i;
@@ -137,7 +138,7 @@ static DISCRETE_STEP( dso_task_start )
 	const linked_list_entry *entry;
 
 	/* update source node buffer */
-	for (entry = task->source_list; entry != 0; entry = entry->next)
+	for (entry = task->source_list; entry != NULL; entry = entry->next)
 	{
 		discrete_source_node *sn = (discrete_source_node *) entry->ptr;
 		sn->buffer = *sn->ptr++;

@@ -174,6 +174,8 @@ const game_driver * const drivers[] =
 	DRIVER( streakng )	/* [1980] Shoei */
 	DRIVER( pacmanbl )	/* bootleg */
 	DRIVER( pacmanbla )	/* bootleg */
+	DRIVER( phoenxp2 )	/* bootleg */
+	DRIVER( atlantisb )	/* bootleg */
 	DRIVER( devilfsg )	/* (c) 1984 Vision / Artic (bootleg?) */
 	DRIVER( zigzag )	/* (c) 1982 LAX */
 	DRIVER( zigzag2 )	/* (c) 1982 LAX */
@@ -1759,6 +1761,7 @@ const game_driver * const drivers[] =
 	DRIVER( arkbloc2 )	/* bootleg */
 	DRIVER( arkgcbl )	/* bootleg */
 	DRIVER( paddle2 )	/* bootleg */
+	DRIVER( block2 )	/* bootleg */
 	DRIVER( arkatayt )	/* bootleg */
 	DRIVER( arktayt2 )	/* bootleg */
 	DRIVER( arkatour )	/* ??? (c) 1987 Taito America Corporation + Romstar license (US) */
@@ -1889,6 +1892,7 @@ const game_driver * const drivers[] =
 	/* Taito H-System games */
 	DRIVER( syvalion )	/* B51 (c) 1988 Taito Corporation (Japan) */
 	DRIVER( recordbr )	/* B56 (c) 1988 Taito Corporation Japan (World) */
+	DRIVER( gogold )	/* B56 (c) 1988 Taito Corporation (Japan) */
 	DRIVER( dleague )	/* C02 (c) 1990 Taito Corporation (Japan) */
 
 	/* Taito B-System games */
@@ -3517,6 +3521,7 @@ V-V                           TP-027
 	DRIVER( astrob2 )	/* (c) 1981 */
 	DRIVER( astrob2a )	/* (c) 1981 */
 	DRIVER( astrob1 )	/* (c) 1981 */
+	DRIVER( astrode )	/* (c) 1981 */
 	DRIVER( 005 )		/* (c) 1981 */
 	DRIVER( monsterb )	/* (c) 1982 */
 	DRIVER( monsterb2 )	/* (c) 1982 */
@@ -4074,7 +4079,7 @@ DokiDoki Penguin Land *not confirmed
 	DRIVER( sanjeon )	/* 1999.04 Sanjun Sujun (Sega / Deniam) */
 	DRIVER( danchih )	/* 1999.06 Danchi de Hanafuda Okusan Komeya Desuyo! (Altron (Tecmo License)) */
 	DRIVER( ffreveng )	/* 1999.09 Final Fight Revenge (Capcom) */
-						/* 2000.12 Danchi de Quiz Okusan Yontaku Desuyo! (Altron) */
+	DRIVER( danchiq )	/* 2000.12 Danchi de Quiz Okusan Yontaku Desuyo! (Altron) */
 
 	/* Sega Model 2 Games */
 
@@ -9152,10 +9157,11 @@ Other Sun games
 	DRIVER( 4roses )	/* (c) 1999 Unknown */
 	DRIVER( 4rosesa )	/* (c) 1999 Unknown */
 	DRIVER( big10 )		/* (c) 198? Unknown */
-	DRIVER( bingor1 )	/* (c) 198? Unknown */
-	DRIVER( bingor2 )	/* (c) 198? Unknown */
-	DRIVER( bingor3 )	/* (c) 198? Unknown */
-	DRIVER( bingor4 )	/* (c) 198? Unknown */
+	DRIVER( bingor1 )	/* (c) 2002 Unknown */
+	DRIVER( bingor2 )	/* (c) 2002 Unknown */
+	DRIVER( bingor3 )	/* (c) 2002 Unknown */
+	DRIVER( bingor4 )	/* (c) 2002 Unknown */
+	DRIVER( bingor5 )	/* (c) 2002 Unknown */
 
 	/* InterFlip / Recreativos Franco */
 	DRIVER( videopkr )	/* (c) 1984 InterFlip */
@@ -9547,14 +9553,18 @@ Other Sun games
 	/* Hi-Soft */
 	DRIVER( himesiki )	/* (c) 1989 Hi-Soft */
 
-	/* Hi-Lo Poker-based */
-	DRIVER( gtipoker )	/* (c) 1983 GTI Inc */
+	/* Draw Poker Hi-Lo based */
 	DRIVER( norautp )	/* (c) 1988? Noraut Ltd */
 	DRIVER( norautjp )	/* (c) 1988? Noraut Ltd */
 	DRIVER( norautrh )	/* (c) 1988? Noraut Ltd */
 	DRIVER( norautu )	/* (c) 1988? Noraut Ltd */
 	DRIVER( norautv3 )	/* (c) 1988? Noraut Ltd */
 	DRIVER( norautpn )	/* (c) 1990? unknown */
+	DRIVER( pma )		/* PMA */
+	DRIVER( dphl )		/* (c) M. Kramer Inc. 1983 */
+	DRIVER( dphla )		/* unknown */
+	DRIVER( gtipoker )	/* (c) 1983 GTI Inc */
+	DRIVER( tpoker2 )	/* (c) 1993 Micro Manufacturing, Inc. */
 
 	/* Sanki Denshi Kogyo */
 	DRIVER( pachifev )	/* (c) 1983? */
@@ -9586,7 +9596,7 @@ Other Sun games
 	//DRIVER( mfish_8 ) /* (c) 2002 */
 	//DRIVER( mfish_9 ) /* (c) 2002 */
 	//DRIVER( mfish_10 )    /* (c) 2002 */
-	//DRIVER( mfish_11 )    /* (c) 2002 */
+	DRIVER( mfish_11 )	/* (c) 2002 */
 	DRIVER( mfish_12 )	/* (c) 2002 */
 	DRIVER( mfish_12a )	/* (c) 2002 */
 	//DRIVER( mfish_13 )    /* (c) 2002 */
@@ -9638,6 +9648,7 @@ Other Sun games
 	//DRIVER( garage_3 )    /* (c) 2004 */
 	DRIVER( garage_4 )	/* (c) 2004 */
 	DRIVER( garage_4a )	/* (c) 2004 */
+	DRIVER( garage_4b )	/* (c) 2004 */
 	DRIVER( garage_5 )	/* (c) 2004 */
 	DRIVER( garage_5a )	/* (c) 2004 */
 
@@ -9651,6 +9662,7 @@ Other Sun games
 	/* Sweet Life */
 	DRIVER( sweetl )	/* (c) 2004 */
 	DRIVER( sweetla )	/* (c) 2004 */
+	DRIVER( sweetlb )	/* (c) 2004 */
 
 	/* Resident */
 	//DRIVER( resdnt )  /* (c) 2004 */
@@ -9663,8 +9675,16 @@ Other Sun games
 
 	/* Pirate */
 	//DRIVER( pirate )  /* (c) 2005 */
-	DRIVER( pirate_1 )	/* (c) 2005 */
-	//DRIVER( pirate_2 )/* (c) 2005 */
+	DRIVER( pirate_2 )	/* (c) 2005 */
+	DRIVER( pirate_3 )	/* (c) 2005 */
+
+	/* Pirate 2 */
+	DRIVER( pirate2 )	/* (c) 2006 */
+	DRIVER( pirate2a )	/* (c) 2006 */
+	DRIVER( pirate2b )	/* (c) 2006 */
+	DRIVER( pirate2c )	/* (c) 2006 */
+	DRIVER( pirate2d )	/* (c) 2006 */
+	DRIVER( pirate2e )	/* (c) 2006 */
 
 	/* Island 2 */
 	DRIVER( island2 )	/* (c) 2006 */
@@ -9674,8 +9694,10 @@ Other Sun games
 	DRIVER( keks )		/* (c) 2006 */
 	DRIVER( keksa )		/* (c) 2006 */
 	DRIVER( keksb )		/* (c) 2006 */
+	DRIVER( keksc )		/* (c) 2006 */
 	DRIVER( keks_2 )	/* (c) 2006 */
 	DRIVER( keks_2a )	/* (c) 2006 */
+	DRIVER( keks_2b )	/* (c) 2006 */
 
 /* Drivers below are mechanical games, usually with no video display, requiring external artwork to function.
        These are currently mostly 'fruit machine' style games, although this may later be extended to system logic

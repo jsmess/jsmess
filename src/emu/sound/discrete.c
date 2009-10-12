@@ -40,6 +40,24 @@
 #include "discrete.h"
 #include "eminline.h"
 
+/*************************************
+ *
+ *  Performance
+ *
+ *************************************/
+
+/*
+ * Normally, the discrete core processes 960 samples per update.
+ * With the various buffers involved, this on a Core2 is not as
+ * performant as processing 240 samples 4 times.
+ * The setting most probably depends on CPU and which modules are
+ * run and how many tasks are defined.
+ *
+ * Values < 32 exhibit poor performance (too much overhead) while
+ * Values > 500 have a slightly worse performace (too much cache misses?).
+ */
+
+#define MAX_SAMPLES_PER_TASK_SLICE	(240)
 
 /*************************************
  *
@@ -60,31 +78,18 @@
 
 /*************************************
  *
- *  Structures
- *
- *************************************/
-
-typedef struct _task_info task_info;
-struct _task_info
-{
-	discrete_task *task;
-	int samples;
-};
-
-
-/*************************************
- *
  *  Prototypes
  *
  *************************************/
 
 static void init_nodes(discrete_info *info, const linked_list_entry *block_list, const device_config *device);
 static void find_input_nodes(const discrete_info *info);
-static node_description *discrete_find_node(const discrete_info *info, const int node);
+static node_description *discrete_find_node(const discrete_info *info, int node);
 static DEVICE_RESET( discrete );
 static STREAM_UPDATE( discrete_stream_update );
 static STREAM_UPDATE( buffer_stream_update );
 
+static int profiling = DISCRETE_PROFILING;
 
 /*************************************
  *
@@ -313,7 +318,17 @@ INLINE void step_nodes_in_list(const linked_list_entry *list)
 {
 	const linked_list_entry *entry;
 
-	if (DISCRETE_PROFILING)
+	if (EXPECTED(!profiling))
+	{
+		for (entry = list; entry != NULL; entry = entry->next)
+		{
+			node_description *node = (node_description *) entry->ptr;
+
+			/* Now step the node */
+			(*node->step)(node);
+		}
+	}
+	else
 	{
 		osd_ticks_t last = get_profile_ticks();
 
@@ -322,19 +337,9 @@ INLINE void step_nodes_in_list(const linked_list_entry *list)
 			node_description *node = (node_description *) entry->ptr;
 
 			node->run_time -= last;
-			(*node->module->step)(node);
+			(*node->step)(node);
 			last = get_profile_ticks();
 			node->run_time += last;
-		}
-	}
-	else
-	{
-		for (entry = list; entry != NULL; entry = entry->next)
-		{
-			node_description *node = (node_description *) entry->ptr;
-
-			/* Now step the node */
-			(*node->module->step)(node);
 		}
 	}
 }
@@ -599,7 +604,7 @@ static DEVICE_STOP( discrete )
 
 	osd_work_queue_free(info->queue);
 
-	if (DISCRETE_PROFILING)
+	if (profiling)
 	{
 		display_profiling(info);
 	}
@@ -648,8 +653,8 @@ static DEVICE_RESET( discrete )
 			(*node->module->reset)(node);
 
 		/* otherwise, just step it */
-		else if (node->module->step)
-			(*node->module->step)(node);
+		else if (node->step)
+			(*node->step)(node);
 	}
 }
 
@@ -661,30 +666,52 @@ static DEVICE_RESET( discrete )
 
 static void *task_callback(void *param, int threadid)
 {
-	const task_info *ti = (task_info *) param;
+	const linked_list_entry *list = (linked_list_entry *) param;
 	const linked_list_entry *entry;
-	discrete_task *task = ti->task;
-	int samples, i;
+	int samples;
 
-	/* set up task buffers */
-	for (i = 0; i < task->numbuffered; i++)
-		task->ptr[i] = task->node_buf[i];
-
-	/* initialize sources */
-	for (entry = task->source_list; entry != 0; entry = entry->next)
+	do
 	{
-		discrete_source_node *sn = (discrete_source_node *) entry->ptr;
-		sn->ptr = sn->task->node_buf[sn->output_node];
-	}
+		for (entry = list; entry != 0; entry = entry->next)
+		{
+			discrete_task 		*task = (discrete_task *) entry->ptr;
+			INT32				prev_id;
 
-	samples = ti->samples;
-	while (samples-- > 0)
-	{
-		/* step */
-		step_nodes_in_list(task->list);
-	}
+			/* try to lock */
+			prev_id = compare_exchange32(&task->threadid, -1, threadid);
+			if (prev_id == -1 && task->threadid == threadid)
+			{
+				linked_list_entry	*src_entry;
 
-	free(param);
+				samples = MIN(task->samples, MAX_SAMPLES_PER_TASK_SLICE);
+
+				/* check dependencies */
+				for (src_entry = task->source_list; src_entry != NULL; src_entry = src_entry->next)
+				{
+					discrete_source_node *sn = (discrete_source_node *) src_entry->ptr;
+					int avail;
+
+					avail = sn->task->ptr[sn->output_node] - sn->ptr;
+					if (avail < samples)
+						samples = avail;
+				}
+
+				task->samples -= samples;
+				while (samples > 0)
+				{
+					/* step */
+					step_nodes_in_list(task->list);
+					samples--;
+				}
+				if (task->samples == 0)
+				{
+					return NULL;
+				}
+				task->threadid = -1;
+			}
+		}
+	} while (1);
+
 	return NULL;
 }
 
@@ -706,7 +733,8 @@ static STREAM_UPDATE( discrete_stream_update )
 {
 	discrete_info *info = (discrete_info *)param;
 	const linked_list_entry *entry;
-	int outputnum, task_group;
+	int outputnum;
+	//, task_group;
 
 	if (samples == 0)
 		return;
@@ -724,28 +752,36 @@ static STREAM_UPDATE( discrete_stream_update )
 		context->ptr = (stream_sample_t *) inputs[context->stream_in_number];
 	}
 
-	for (task_group = 0; task_group < DISCRETE_MAX_TASK_GROUPS; task_group++)
+	/* Setup tasks */
+	for (entry = info->task_list; entry != 0; entry = entry->next)
 	{
-		/* Queue tasks */
-		for (entry = info->task_list; entry != 0; entry = entry->next)
+		discrete_task 		*task = (discrete_task *) entry->ptr;
+		linked_list_entry	*src_entry;
+		int					i;
+
+		task->samples = samples;
+		task->threadid = -1;
+
+		/* set up task buffers */
+		for (i = 0; i < task->numbuffered; i++)
+			task->ptr[i] = task->node_buf[i];
+
+		/* initialize sources */
+		for (src_entry = task->source_list; src_entry != 0; src_entry = src_entry->next)
 		{
-			discrete_task *task = (discrete_task *) entry->ptr;
-
-			if (task->task_group == task_group)
-			{
-				task_info *ti = (task_info *)malloc(sizeof(task_info));
-
-				/* Fire task */
-				ti->task = task;
-				ti->samples = samples;
-				osd_work_item_queue(info->queue, task_callback, (void *) ti, WORK_ITEM_FLAG_AUTO_RELEASE);
-			}
+			discrete_source_node *sn = (discrete_source_node *) src_entry->ptr;
+			sn->ptr = sn->task->node_buf[sn->output_node];
 		}
-		/* and wait for them */
-		osd_work_queue_wait(info->queue, osd_ticks_per_second()*10);
 	}
 
-	if (DISCRETE_PROFILING)
+	for (entry = info->task_list; entry != 0; entry = entry->next)
+	{
+		/* Fire a work item for each task */
+		osd_work_item_queue(info->queue, task_callback, (void *) info->task_list, WORK_ITEM_FLAG_AUTO_RELEASE);
+	}
+	osd_work_queue_wait(info->queue, osd_ticks_per_second()*10);
+
+	if (profiling)
 	{
 		info->total_samples += samples;
 		info->total_stream_updates++;
@@ -822,6 +858,9 @@ static void init_nodes(discrete_info *info, const linked_list_entry *block_list,
 			node->custom = custom->custom;
 		}
 
+		/* copy initial / default step function */
+		node->step = node->module->step;
+
 		/* allocate memory if necessary */
 		if (node->module->contextsize)
 			node->context = auto_alloc_array_clear(device->machine, UINT8, node->module->contextsize);
@@ -895,7 +934,7 @@ static void init_nodes(discrete_info *info, const linked_list_entry *block_list,
 
 		/* our running order just follows the order specified */
 		/* does the node step ? */
-		if (node->module->step != NULL)
+		if (node->step != NULL)
 		{
 			/* do we belong to a task? */
 			if (task_node_list_ptr == NULL)
@@ -939,6 +978,30 @@ static void init_nodes(discrete_info *info, const linked_list_entry *block_list,
  *
  *************************************/
 
+/* attempt to group all static node parameters together.
+ * Has a negative impact on performance - but it should
+ * reduce memory bandwidth - this is weird. */
+
+#if 0
+static double dbuf[10240] = { 0.0, 1.0 };
+static int dbufptr = 2;
+
+static double *getDoublePtr(double val)
+{
+	int i;
+	for (i=0; i<dbufptr; i+=1)
+	{
+		if (dbuf[i] == val)
+		{
+			return &dbuf[i];
+		}
+	}
+	dbuf[dbufptr] = val;
+	dbufptr+=1;
+	return &dbuf[dbufptr-1];
+}
+#endif
+
 static void find_input_nodes(const discrete_info *info)
 {
 	const linked_list_entry *entry;
@@ -979,7 +1042,8 @@ static void find_input_nodes(const discrete_info *info)
 				}
 				else
 				{
-					node->input[inputnum] = &(block->initial[inputnum]);
+					node->input[inputnum] = &(node->block->initial[inputnum]);
+					//node->input[inputnum] = getDoublePtr(node->block->initial[inputnum]);
 				}
 			}
 		}

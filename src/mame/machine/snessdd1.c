@@ -1,3 +1,13 @@
+/***************************************************************************
+
+  snessdd1.c
+
+  File to handle emulation of the SNES "S-DD1" add-on chip.
+
+  Based on Andreas Naive Public Domain code.
+
+***************************************************************************/
+
 static UINT8 sdd1_read(running_machine* machine, UINT32 addr);
 
 typedef struct //Input Manager

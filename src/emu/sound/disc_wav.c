@@ -199,7 +199,7 @@ static DISCRETE_STEP(dss_counter)
 		max = DSS_COUNTER__MAX;
 
 	ds_clock = DSS_COUNTER__CLOCK;
-	if (context->clock_type == DISC_CLK_IS_FREQ)
+	if (UNEXPECTED(context->clock_type == DISC_CLK_IS_FREQ))
 	{
 		/* We need to keep clocking the internal clock even if disabled. */
 		cycles = (context->t_left + node->info->sample_time) * ds_clock;
@@ -215,7 +215,7 @@ static DISCRETE_STEP(dss_counter)
 
 
 	/* If reset enabled then set output to the reset value.  No x_time in reset. */
-	if (DSS_COUNTER__RESET)
+	if (UNEXPECTED(DSS_COUNTER__RESET))
 	{
 		context->count = DSS_COUNTER__INIT;
 		node->output[0] = context->count;
@@ -226,7 +226,7 @@ static DISCRETE_STEP(dss_counter)
      * Only count if module is enabled.
      * This has the effect of holding the output at it's current value.
      */
-	if (DSS_COUNTER__ENABLE)
+	if (EXPECTED(DSS_COUNTER__ENABLE))
 	{
 		last_count = context->count;
 
@@ -260,7 +260,7 @@ static DISCRETE_STEP(dss_counter)
 
 		node->output[0] = context->is_7492 ? disc_7492_count[context->count] : context->count;
 
-		if (context->count != last_count)
+		if (EXPECTED(context->count != last_count))
 		{
 			/* the x_time is only output if the output changed. */
 			switch (context->out_type)
@@ -759,6 +759,7 @@ static DISCRETE_STEP(dss_op_amp_osc)
 	UINT8 force_charge = 0;
 	UINT8 enable = DSS_OP_AMP_OSC__ENABLE;
 	UINT8 update_exponent = 0;
+	UINT8 flip_flop = context->flip_flop;
 	int count_f = 0;
 	int count_r = 0;
 
@@ -837,6 +838,7 @@ static DISCRETE_STEP(dss_op_amp_osc)
 			/* we need to mix any bias and all modulation voltages together. */
 			charge[0] = context->i_fixed;
 			v = DSS_OP_AMP_OSC__VMOD1 - OP_AMP_NORTON_VBE;
+			if (v < 0) v = 0;
 			charge[0] += v / info->r1;
 			if (info->r6 != 0)
 			{
@@ -859,7 +861,7 @@ static DISCRETE_STEP(dss_op_amp_osc)
 	{
 		if (context->is_linear_charge)
 		{
-			if ((context->flip_flop ^ context->flip_flop_xor) || force_charge)
+			if ((flip_flop ^ context->flip_flop_xor) || force_charge)
 			{
 				/* Charging */
 				/* iC=C*dv/dt  works out to dv=iC*dt/C */
@@ -869,8 +871,8 @@ static DISCRETE_STEP(dss_op_amp_osc)
 				/* has it charged past upper limit? */
 				if (v_cap_next > context->threshold_high)
 				{
-					context->flip_flop = context->flip_flop_xor;
-					if (context->flip_flop)
+					flip_flop = context->flip_flop_xor;
+					if (flip_flop)
 						count_r++;
 					else
 						count_f++;
@@ -885,7 +887,7 @@ static DISCRETE_STEP(dss_op_amp_osc)
 						/* calculate the overshoot time */
 						dt = info->c * (v_cap_next - context->threshold_high) / charge[1];
 						x_time = dt;
-						v_cap = context->threshold_high;
+						v_cap_next = context->threshold_high;
 					}
 				}
 			}
@@ -898,15 +900,15 @@ static DISCRETE_STEP(dss_op_amp_osc)
 				/* has it discharged past lower limit? */
 				if (v_cap_next < context->threshold_low)
 				{
-					context->flip_flop = !context->flip_flop_xor;
-					if (context->flip_flop)
+					flip_flop = !context->flip_flop_xor;
+					if (flip_flop)
 						count_r++;
 					else
 						count_f++;
 					/* calculate the overshoot time */
 					dt = info->c * (context->threshold_low - v_cap_next) / charge[0];
 					x_time = dt;
-					v_cap = context->threshold_low;
+					v_cap_next = context->threshold_low;
 				}
 			}
 		}
@@ -917,7 +919,7 @@ static DISCRETE_STEP(dss_op_amp_osc)
 			else
 				exponent = context->charge_exp;
 
-			if (context->flip_flop)
+			if (flip_flop)
 			{
 				/* Charging */
 				v_cap_next = v_cap + ((context->v_out_high - v_cap) * exponent);
@@ -929,8 +931,8 @@ static DISCRETE_STEP(dss_op_amp_osc)
 					dt = context->charge_rc  * log(1.0 / (1.0 - ((v_cap_next - context->threshold_high) / (context->v_out_high - v_cap))));
 					x_time = dt;
 					v_cap_next = 0;
-					v_cap      = context->threshold_high;
-					context->flip_flop = 0;
+					v_cap_next = context->threshold_high;
+					flip_flop = 0;
 					count_f++;
 					update_exponent = 1;
 				}
@@ -946,29 +948,34 @@ static DISCRETE_STEP(dss_op_amp_osc)
 				{
 					dt = context->charge_rc * log(1.0 / (1.0 - ((context->threshold_low - v_cap_next) / v_cap)));
 					x_time = dt;
-					v_cap  = context->threshold_low;
-					context->flip_flop = 1;
+					v_cap_next = context->threshold_low;
+					flip_flop = 1;
 					count_r++;
 					update_exponent = 1;
 				}
 			}
 		}
-		context->v_cap = v_cap_next;
+		v_cap = v_cap_next;
 	} while(dt);
+	context->v_cap = v_cap;
 
 	x_time = dt / node->info->sample_time;
 
 	switch (context->output_type)
 	{
 		case DISC_OP_AMP_OSCILLATOR_OUT_CAP:
-			node->output[0] = v_cap_next;
+			node->output[0] = v_cap;
 			break;
 		case DISC_OP_AMP_OSCILLATOR_OUT_ENERGY:
 			if (x_time == 0) x_time = 1.0;
-			node->output[0]  = context->v_out_high * (context->flip_flop ? x_time : (1.0 - x_time));
+			node->output[0]  = context->v_out_high * (flip_flop ? x_time : (1.0 - x_time));
 			break;
 		case DISC_OP_AMP_OSCILLATOR_OUT_SQW:
-			node->output[0] = context->flip_flop * context->v_out_high ;
+			if (count_f + count_r >= 2)
+				/* force at least 1 toggle */
+				node->output[0] = context->flip_flop ? 0 : context->v_out_high;
+			else
+				node->output[0] = flip_flop * context->v_out_high;
 			break;
 		case DISC_OP_AMP_OSCILLATOR_OUT_COUNT_F_X:
 			node->output[0] = count_f ? count_f + x_time : count_f;
@@ -980,6 +987,7 @@ static DISCRETE_STEP(dss_op_amp_osc)
 			node->output[0] = context->flip_flop + x_time;
 			break;
 	}
+	context->flip_flop = flip_flop;
 }
 
 static DISCRETE_RESET(dss_op_amp_osc)

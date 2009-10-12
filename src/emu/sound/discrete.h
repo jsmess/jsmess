@@ -285,8 +285,8 @@
  * DISCRETE_FILTER1(NODE,ENAB,INP0,FREQ,TYPE)
  * DISCRETE_FILTER2(NODE,ENAB,INP0,FREQ,DAMP,TYPE)
  *
- * DISCRETE_CRFILTER(NODE,ENAB,IN0,RVAL,CVAL)
- * DISCRETE_CRFILTER_VREF(NODE,ENAB,IN0,RVAL,CVAL,VREF)
+ * DISCRETE_CRFILTER(NODE,IN0,RVAL,CVAL)
+ * DISCRETE_CRFILTER_VREF(NODE,IN0,RVAL,CVAL,VREF)
  * DISCRETE_OP_AMP_FILTER(NODE,ENAB,INP0,INP1,TYPE,INFO)
  * DISCRETE_RCDISC(NODE,ENAB,IN0,RVAL,CVAL)
  * DISCRETE_RCDISC2(NODE,SWITCH,INP0,RVAL0,INP1,RVAL1,CVAL)
@@ -295,8 +295,8 @@
  * DISCRETE_RCDISC5(NODE,ENAB,IN0,RVAL,CVAL)
  * DISCRETE_RCINTEGRATE(NODE,INP0,RVAL0,RVAL1,RVAL2,CVAL,vP,TYPE)
  * DISCRETE_RCDISC_MODULATED(NODE,INP0,INP1,RVAL0,RVAL1,RVAL2,RVAL3,CVAL,VP)
- * DISCRETE_RCFILTER(NODE,ENAB,IN0,RVAL,CVAL)
- * DISCRETE_RCFILTER_VREF(NODE,ENAB,IN0,RVAL,CVAL,VREF)
+ * DISCRETE_RCFILTER(NODE,IN0,RVAL,CVAL)
+ * DISCRETE_RCFILTER_VREF(NODE,IN0,RVAL,CVAL,VREF)
  *
  * DISCRETE_555_ASTABLE(NODE,RESET,R1,R2,C,OPTIONS)
  * DISCRETE_555_ASTABLE_CV(NODE,RESET,R1,R2,C,CTRLV,OPTIONS)
@@ -2115,7 +2115,7 @@
  *                              input 1 node or static value,
  *                              address of discrete_op_amp_tvca_info structure)
  *
- *     discrete_op_amp_tvca_info = { r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11, c1, c2, c3, v1, v2, v3, vP, f0, f1, f2, f3, f4, f5}
+ *     discrete_op_amp_tvca_info = { r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11, c1, c2, c3, c4, v1, v2, v3, vP, f0, f1, f2, f3, f4, f5}
  *
  * Note: Set all unused components to 0.
  *       Set all unused functions to DISC_OP_AMP_TRIGGER_FUNCTION_NONE
@@ -2125,11 +2125,11 @@
  *       vP is the op-amp B+.
  *
  *             r2a
- *   IN0 >----ZZZZ-----.               r1
- *           .----.    |     vP >------ZZZZ---.
- *           | F0 |----+                      |
- *           '----'    |                r2b   |    r4
- *             r3a     '---------------ZZZZ---+---ZZZZ--.
+ *   IN0 >----ZZZZ-----.               r1         c4
+ *           .----.    |     vP >------ZZZZ---+---||----.
+ *           | F0 |----+                      |         |
+ *           '----'    |                r2b   |    r4   |
+ *             r3a     '---------------ZZZZ---+---ZZZZ--+
  *   IN1 >----ZZZZ---.                        |         |
  *           .----.  |                  r3b   |  |\     |
  *           | F1 |--+-----------------ZZZZ---+  | \    |
@@ -2223,36 +2223,34 @@
  *
  *                        .------------.
  *                        |            |
- *    ENAB       -0------}| CR FILTER  |
+ *                        | CR FILTER  |
  *                        |            |
- *    INPUT1     -1------}| --| |-+--  |
+ *    INPUT1     -0------}| --| |-+--  |
  *                        |   C   |    |----}   Netlist node
- *    RVAL       -2------}|       Z    |
+ *    RVAL       -1------}|       Z    |
  *                        |       Z R  |
- *    CVAL       -3------}|       |    |
+ *    CVAL       -2------}|       |    |
  *                        |      vRef  |
  *                        '------------'
  *
  *  Declaration syntax
  *
  *     DISCRETE_CRFILTER(name of node,
- *                       enable
  *                       input node (or value)
- *                       resistor value in OHMS
- *                       capacitor value in FARADS)
+ *                       resistor node or static value in OHMS
+ *                       capacitor node or static value in FARADS)
  *
  *     DISCRETE_CRFILTER_VREF(name of node,
- *                            enable
  *                            input node (or value)
  *                            resistor value in OHMS
  *                            capacitor value in FARADS,
- *                            vRef static value)
+ *                            vRef node or static value)
  *
  *  Example config line
  *
- *     DISCRETE_CRFILTER(NODE_11,1,NODE_10,100,CAP_U(1))
+ *     DISCRETE_CRFILTER(NODE_11,NODE_10,100,CAP_U(1))
  *
- *  Defines an always enabled CR filter with a 100R & 1uF network
+ *  Defines a CR filter with a 100R & 1uF network
  *  the input is fed from NODE_10.
  *
  *  This can be also thought of as a high pass filter with a 3dB cutoff
@@ -2478,33 +2476,38 @@
  ***********************************************************************
  *
  * DISCRETE_RCDISC - Simple single pole RC discharge network
+ * DISCRETE_RCFILTER_VREF - Same but refrenced to vRef not 0V
  *
  *                        .------------.
  *                        |            |
- *    ENAB       -0------>| RC         |
+ *                        | RC         |
  *                        |            |
- *    INPUT1     -1------>| -ZZZZ-+--  |
+ *    INPUT1     -0------>| -ZZZZ-+--  |
  *                        |   R   |    |---->   Netlist node
- *    RVAL       -2------>|      ---   |
+ *    RVAL       -1------>|      ---   |
  *                        |      ---C  |
- *    CVAL       -3------>|       |    |
- *                        |            |
+ *    CVAL       -2------>|       |    |
+ *                        |      vref  |
  *                        '------------'
  *
  *  Declaration syntax
  *
  *     DISCRETE_RCFILTER(name of node,
- *                       enable,
  *                       input node (or value),
  *                       resistor value in OHMS,
  *                       capacitor value in FARADS)
  *
+ *     DISCRETE_RCFILTER_VREF(name of node,
+ *                            input node (or value)
+ *                            resistor value in OHMS
+ *                            capacitor value in FARADS,
+ *                            vRef node or static value)
+ *
  *  Example config line
  *
- *     DISCRETE_RCDISC(NODE_11,NODE_10,10,100,CAP_U(1))
+ *     DISCRETE_RCDISC(NODE_11,10,100,CAP_U(1))
  *
- *  When enabled by NODE_10, C discharges from 10v as indicated by RC
- *  of 100R & 1uF.
+ *  C discharges from 10v as indicated by RC of 100R & 1uF.
  *
  ***********************************************************************
  *
@@ -3409,6 +3412,8 @@
 #define RC_DISCHARGE_EXP_DT(rc, dt)				(exp(-(dt) / (rc)))
 #define RC_DISCHARGE_NEG_EXP_DT(rc, dt)			(exp((dt) / (rc)))
 
+#define FREQ_OF_555(_r1, _r2, _c)	(1.49 / ((_r1 + 2 * _r2) * _c))
+
 /*************************************
  *
  *  Interface & Naming
@@ -3447,7 +3452,7 @@
 #define DISCRETE_MAX_INPUTS					10
 #define DISCRETE_MAX_OUTPUTS			 	8
 #define DISCRETE_MAX_TASK_OUTPUTS			8
-#define DISCRETE_MAX_TASK_GROUPS			8
+#define DISCRETE_MAX_TASK_GROUPS			10
 
 
 /*************************************
@@ -3715,18 +3720,21 @@ struct _discrete_module
 
 struct _node_description
 {
+	/* this declaration order seems to be optimal */
 	double				output[DISCRETE_MAX_OUTPUTS];		/* The node's last output value */
 
+	DISCRETE_FUNC((*step));									/* Called to execute one time delta of output update */
+	void *				context;							/* Contextual information specific to this node type */
+
+	const double *		input[DISCRETE_MAX_INPUTS];			/* Addresses of Input values */
 	int					active_inputs;						/* Number of active inputs on this node type */
 	int					input_is_node;						/* Bit Flags.  1 in bit location means input_is_node */
-	const double *		input[DISCRETE_MAX_INPUTS];			/* Addresses of Input values */
 
-	void *				context;							/* Contextual information specific to this node type */
 	const void *		custom;								/* Custom function specific initialisation data */
 
 	const discrete_module *module;							/* Node's module info */
-	const discrete_sound_block *block;						/* Points to the node's setup block. */
 	const discrete_info *info;								/* Points to the parent */
+	const discrete_sound_block *block;						/* Points to the node's setup block. */
 
 	osd_ticks_t			run_time;
 };
@@ -3745,8 +3753,8 @@ struct _node_description
 typedef struct _linked_list_entry	linked_list_entry;
 struct _linked_list_entry
 {
-	const void 			*ptr;
 	linked_list_entry 	*next;
+	const void 			*ptr;
 };
 
 typedef struct _discrete_task discrete_task;
@@ -3754,24 +3762,28 @@ struct _discrete_task
 {
 	const linked_list_entry *list;
 
-	int					task_group;
-	int 				numbuffered;
-	double 				*ptr[DISCRETE_MAX_TASK_OUTPUTS];
-	double 				*node_buf[DISCRETE_MAX_TASK_OUTPUTS];
-	node_description	*nodes[DISCRETE_MAX_TASK_OUTPUTS];
-	double 				*source[DISCRETE_MAX_TASK_OUTPUTS];
+	volatile INT32			threadid;
+	volatile int			samples;
 
 	/* list of source nodes */
-	linked_list_entry	*source_list;		/* discrete_source_node */
+	linked_list_entry		*source_list;		/* discrete_source_node */
+
+	int						task_group;
+	int 					numbuffered;
+	double					*ptr[DISCRETE_MAX_TASK_OUTPUTS];
+	const double 			*source[DISCRETE_MAX_TASK_OUTPUTS];
+
+	double					*node_buf[DISCRETE_MAX_TASK_OUTPUTS];
+	const node_description	*nodes[DISCRETE_MAX_TASK_OUTPUTS];
 };
 
 typedef struct _discrete_source_node discrete_source_node;
 struct _discrete_source_node
 {
 	const discrete_task	*task;
+	const double		*ptr;
 	int					output_node;
 	double				buffer;
-	double				*ptr;
 };
 
 struct _discrete_info
@@ -3980,6 +3992,7 @@ struct _discrete_op_amp_tvca_info
 	double	c1;
 	double	c2;
 	double	c3;
+	double	c4;
 	double	v1;
 	double	v2;
 	double	v3;
@@ -4436,8 +4449,8 @@ enum
 #define DISCRETE_FILTER2(NODE,ENAB,INP0,FREQ,DAMP,TYPE)                 { NODE, DST_FILTER2     , 5, { ENAB,INP0,NODE_NC,NODE_NC,NODE_NC }, { ENAB,INP0,FREQ,DAMP,TYPE }, NULL, "DISCRETE_FILTER2" },
 /* Component specific */
 #define DISCRETE_SALLEN_KEY_FILTER(NODE,ENAB,INP0,TYPE,INFO)            { NODE, DST_SALLEN_KEY  , 3, { ENAB,INP0,NODE_NC }, { ENAB,INP0,TYPE }, INFO, "DISCRETE_SALLEN_KEY_FILTER" },
-#define DISCRETE_CRFILTER(NODE,ENAB,INP0,RVAL,CVAL)                     { NODE, DST_CRFILTER    , 4, { ENAB,INP0,NODE_NC,NODE_NC }, { ENAB,INP0,RVAL,CVAL }, NULL, "DISCRETE_CRFILTER" },
-#define DISCRETE_CRFILTER_VREF(NODE,ENAB,INP0,RVAL,CVAL,VREF)           { NODE, DST_CRFILTER    , 5, { ENAB,INP0,NODE_NC,NODE_NC,NODE_NC }, { ENAB,INP0,RVAL,CVAL,VREF }, NULL, "DISCRETE_CRFILTER_VREF" },
+#define DISCRETE_CRFILTER(NODE,INP0,RVAL,CVAL)                          { NODE, DST_CRFILTER    , 4, { INP0,RVAL,CVAL }, { INP0,RVAL,CVAL }, NULL, "DISCRETE_CRFILTER" },
+#define DISCRETE_CRFILTER_VREF(NODE,INP0,RVAL,CVAL,VREF)                { NODE, DST_CRFILTER    , 5, { INP0,RVAL,CVAL,VREF }, { INP0,RVAL,CVAL,VREF }, NULL, "DISCRETE_CRFILTER_VREF" },
 #define DISCRETE_OP_AMP_FILTER(NODE,ENAB,INP0,INP1,TYPE,INFO)           { NODE, DST_OP_AMP_FILT , 4, { ENAB,INP0,INP1,NODE_NC }, { ENAB,INP0,INP1,TYPE }, INFO, "DISCRETE_OP_AMP_FILTER" },
 #define DISCRETE_RCDISC(NODE,ENAB,INP0,RVAL,CVAL)                       { NODE, DST_RCDISC      , 4, { ENAB,INP0,NODE_NC,NODE_NC }, { ENAB,INP0,RVAL,CVAL }, NULL, "DISCRETE_RCDISC" },
 #define DISCRETE_RCDISC2(NODE,SWITCH,INP0,RVAL0,INP1,RVAL1,CVAL)        { NODE, DST_RCDISC2     , 6, { SWITCH,INP0,NODE_NC,INP1,NODE_NC,NODE_NC }, { SWITCH,INP0,RVAL0,INP1,RVAL1,CVAL }, NULL, "DISCRETE_RCDISC2" },
@@ -4445,9 +4458,9 @@ enum
 #define DISCRETE_RCDISC4(NODE,ENAB,INP0,RVAL0,RVAL1,RVAL2,CVAL,VP,TYPE) { NODE, DST_RCDISC4     , 8, { ENAB,INP0,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC }, { ENAB,INP0,RVAL0,RVAL1,RVAL2,CVAL,VP,TYPE }, NULL, "DISCRETE_RCDISC4" },
 #define DISCRETE_RCDISC5(NODE,ENAB,INP0,RVAL,CVAL)                      { NODE, DST_RCDISC5     , 4, { ENAB,INP0,NODE_NC,NODE_NC }, { ENAB,INP0,RVAL,CVAL }, NULL, "DISCRETE_RCDISC5" },
 #define DISCRETE_RCDISC_MODULATED(NODE,INP0,INP1,RVAL0,RVAL1,RVAL2,RVAL3,CVAL,VP)	{ NODE, DST_RCDISC_MOD, 8, { INP0,INP1,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC }, { INP0,INP1,RVAL0,RVAL1,RVAL2,RVAL3,CVAL,VP }, NULL, "DISCRETE_RCDISC_MODULATED" },
-#define DISCRETE_RCFILTER(NODE,ENAB,INP0,RVAL,CVAL)                     { NODE, DST_RCFILTER    , 4, { ENAB,INP0,NODE_NC,NODE_NC }, { ENAB,INP0,RVAL,CVAL }, NULL, "DISCRETE_RCFILTER" },
+#define DISCRETE_RCFILTER(NODE,INP0,RVAL,CVAL)                          { NODE, DST_RCFILTER    , 3, { INP0,RVAL,CVAL }, { INP0,RVAL,CVAL }, NULL, "DISCRETE_RCFILTER" },
+#define DISCRETE_RCFILTER_VREF(NODE,INP0,RVAL,CVAL,VREF)                { NODE, DST_RCFILTER    , 4, { INP0,RVAL,CVAL,VREF }, { INP0,RVAL,CVAL,VREF }, NULL, "DISCRETE_RCFILTER_VREF" },
 #define DISCRETE_RCFILTER_SW(NODE,ENAB,INP0,SW,RVAL,CVAL1,CVAL2,CVAL3,CVAL4) { NODE, DST_RCFILTER_SW, 8, { ENAB,INP0,SW,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC }, { ENAB,INP0,SW,RVAL,CVAL1,CVAL2,CVAL3,CVAL4 }, NULL, "DISCRETE_RCFILTER_SW" },
-#define DISCRETE_RCFILTER_VREF(NODE,ENAB,INP0,RVAL,CVAL,VREF)           { NODE, DST_RCFILTER    , 5, { ENAB,INP0,NODE_NC,NODE_NC,NODE_NC }, { ENAB,INP0,RVAL,CVAL,VREF }, NULL, "DISCRETE_RCFILTER_VREF" },
 #define DISCRETE_RCINTEGRATE(NODE,INP0,RVAL0,RVAL1,RVAL2,CVAL,vP,TYPE)  { NODE, DST_RCINTEGRATE , 7, { INP0,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC }, { INP0,RVAL0,RVAL1,RVAL2,CVAL,vP,TYPE }, NULL, "DISCRETE_RCINTEGRATE" },
 /* For testing - seem to be buggered.  Use versions not ending in N. */
 #define DISCRETE_RCDISCN(NODE,ENAB,INP0,RVAL,CVAL)                      { NODE, DST_RCDISCN     , 4, { ENAB,INP0,NODE_NC,NODE_NC }, { ENAB,INP0,RVAL,CVAL }, NULL, "DISCRETE_RCDISCN" },

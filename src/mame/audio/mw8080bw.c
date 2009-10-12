@@ -80,7 +80,7 @@ static const discrete_op_amp_tvca_info midway_music_tvca_info =
 	0,
 	CAP_U(.001),			/* c500 */
 	0,
-	0,
+	0, 0,
 	12,			/* v1 */
 	0,			/* v2 */
 	0,			/* v3 */
@@ -327,7 +327,7 @@ static DISCRETE_SOUND_START(tornbase)
 	/* 47K resistor (R601) and 0.047uF capacitor (C601)
        There is also a 50K pot acting as a volume control, but we output at
        the maximum volume as MAME has its own volume adjustment */
-	DISCRETE_CRFILTER(TORNBASE_TONE_SND_FILT, 1, TORNBASE_TONE_SND, RES_K(47), CAP_U(0.047))
+	DISCRETE_CRFILTER(TORNBASE_TONE_SND_FILT, TORNBASE_TONE_SND, RES_K(47), CAP_U(0.047))
 
 	/* amplify for output */
 	DISCRETE_OUTPUT(TORNBASE_TONE_SND_FILT, 32767)
@@ -554,7 +554,6 @@ static DISCRETE_SOUND_START(maze)
 
 	/* The following circuits remove DC poping noises when the tone is switched in/out. */
 	DISCRETE_CRFILTER_VREF(NODE_40,
-					1,							/* ENAB */
 					NODE_36,					/* IN0 */
 					RES_K(250),					/* R311, R312, R402, R403 in parallel */
 					CAP_U(0.1),					/* c301 */
@@ -565,12 +564,10 @@ static DISCRETE_SOUND_START(maze)
 					2.5,						/* INP0 - center voltage of R402, R403 */
 					NODE_40)					/* INP1 */
 	DISCRETE_CRFILTER(NODE_42,
-					1,							/* ENAB */
 					NODE_41,					/* IN0 */
 					RES_K(56 + 390),			/* R404 + R405 */
 					CAP_P(0.01)	)				/* C401 */
 	DISCRETE_RCFILTER(NODE_43,
-					1,							/* ENAB */
 					NODE_42,					/* IN0 */
 					RES_K(56),					/* R404 */
 					CAP_P(4700)	)				/* C400 */
@@ -653,7 +650,7 @@ static const discrete_op_amp_tvca_info boothill_tone_tvca_info =
 	0,
 	CAP_U(.001),
 	0,
-	0,
+	0, 0,
 	12,
 	0,
 	0,
@@ -682,7 +679,7 @@ static const discrete_op_amp_tvca_info boothill_shot_tvca_info =
 	0,
 	CAP_U(0.22),
 	0,
-	0,
+	0, 0,
 	12,
 	0,
 	0,
@@ -708,7 +705,7 @@ static const discrete_op_amp_tvca_info boothill_hit_tvca_info =
 	0,
 	0,
 	0,
-	0,
+	0, 0,
 	CAP_U(1),
 	0,
 	0,
@@ -788,23 +785,23 @@ static DISCRETE_SOUND_START(boothill)
 	DISCRETE_LFSR_NOISE(BOOTHILL_NOISE, 1, 1, 7700, 12.0, 0, 12.0/2, &midway_lfsr)
 
 	DISCRETE_OP_AMP_TRIG_VCA(NODE_30, BOOTHILL_LEFT_SHOT_EN, 0, 0, BOOTHILL_NOISE, 0, &boothill_shot_tvca_info)
-	DISCRETE_RCFILTER(NODE_31, 1, NODE_30, RES_K(12), CAP_U(.01))
-	DISCRETE_RCFILTER(BOOTHILL_L_SHOT_SND, 1, NODE_31, RES_K(12) + RES_K(68), CAP_U(.0022))
+	DISCRETE_RCFILTER(NODE_31, NODE_30, RES_K(12), CAP_U(.01))
+	DISCRETE_RCFILTER(BOOTHILL_L_SHOT_SND, NODE_31, RES_K(12) + RES_K(68), CAP_U(.0022))
 
 	DISCRETE_OP_AMP_TRIG_VCA(NODE_35, BOOTHILL_RIGHT_SHOT_EN, 0, 0, BOOTHILL_NOISE, 0, &boothill_shot_tvca_info)
-	DISCRETE_RCFILTER(NODE_36, 1, NODE_35, RES_K(12), CAP_U(.01))
-	DISCRETE_RCFILTER(BOOTHILL_R_SHOT_SND, 1, NODE_36, RES_K(12) + RES_K(68), CAP_U(.0033))
+	DISCRETE_RCFILTER(NODE_36, NODE_35, RES_K(12), CAP_U(.01))
+	DISCRETE_RCFILTER(BOOTHILL_R_SHOT_SND, NODE_36, RES_K(12) + RES_K(68), CAP_U(.0033))
 
 	/************************************************
      * Hit sounds
      ************************************************/
 	DISCRETE_OP_AMP_TRIG_VCA(NODE_40, BOOTHILL_LEFT_HIT_EN, 0, 0, BOOTHILL_NOISE, 0, &boothill_hit_tvca_info)
-	DISCRETE_RCFILTER(NODE_41, 1, NODE_40, RES_K(12), CAP_U(.033))
-	DISCRETE_RCFILTER(BOOTHILL_L_HIT_SND, 1, NODE_41, RES_K(12) + RES_K(100), CAP_U(.0033))
+	DISCRETE_RCFILTER(NODE_41, NODE_40, RES_K(12), CAP_U(.033))
+	DISCRETE_RCFILTER(BOOTHILL_L_HIT_SND, NODE_41, RES_K(12) + RES_K(100), CAP_U(.0033))
 
 	DISCRETE_OP_AMP_TRIG_VCA(NODE_45, BOOTHILL_RIGHT_HIT_EN, 0, 0, BOOTHILL_NOISE, 0, &boothill_hit_tvca_info)
-	DISCRETE_RCFILTER(NODE_46, 1, NODE_45, RES_K(12), CAP_U(.0033))
-	DISCRETE_RCFILTER(BOOTHILL_R_HIT_SND, 1, NODE_46, RES_K(12) + RES_K(100), CAP_U(.0022))
+	DISCRETE_RCFILTER(NODE_46, NODE_45, RES_K(12), CAP_U(.0033))
+	DISCRETE_RCFILTER(BOOTHILL_R_HIT_SND, NODE_46, RES_K(12) + RES_K(100), CAP_U(.0022))
 
 	/************************************************
      * Combine all sound sources.
@@ -933,7 +930,7 @@ static const discrete_op_amp_tvca_info checkmat_op_amp_tvca =
 	0,			/* r11 - not used */
 	CAP_U(1),	/* C300 */
 	0,			/* c2 - not used */
-	0,			/* c3 - not used */
+	0, 0,		/* c3, c4 - not used */
 	5,			/* v1 */
 	0,			/* v2 */
 	0,			/* v3 */
@@ -1030,7 +1027,6 @@ static DISCRETE_SOUND_START(checkmat)
 
 	/* The following circuits remove DC poping noises when the tone is switched in/out. */
 	DISCRETE_CRFILTER_VREF(NODE_31,
-					1,							/* ENAB */
 					NODE_30,					/* IN0 */
 					RES_K(250),					/* R409, R415, R414, R413 in parallel */
 					CAP_U(0.1),					/* c401 */
@@ -1041,12 +1037,10 @@ static DISCRETE_SOUND_START(checkmat)
 					2.5,						/* INP0 - center voltage of R413, R414 */
 					NODE_31)					/* INP1 */
 	DISCRETE_CRFILTER(NODE_33,
-					1,							/* ENAB */
 					NODE_32,					/* IN0 */
 					RES_K(56 + 47 + 200),		/* R412 + R408 + part of R411 */
 					CAP_P(0.01)	)				/* C404 */
 	DISCRETE_RCFILTER(CHECKMAT_TONE_SND,
-					1,							/* ENAB */
 					NODE_33,					/* IN0 */
 					RES_K(56),					/* R412 */
 					CAP_P(4700)	)				/* C403 */
@@ -1132,7 +1126,7 @@ static const discrete_op_amp_tvca_info desertgu_rifle_shot_tvca_info =
 	0,
 	CAP_U(0.47),
 	0,
-	0,
+	0, 0,
 	12,			/* v1 */
 	0,			/* v2 */
 	0,			/* v3 */
@@ -1236,8 +1230,8 @@ static DISCRETE_SOUND_START(desertgu)
 	DISCRETE_LFSR_NOISE(DESERTGU_NOISE, 1, 1, 7515, 12.0, 0, 12.0/2, &midway_lfsr)
 
 	DISCRETE_OP_AMP_TRIG_VCA(NODE_30, DESERTGU_RIFLE_SHOT_EN, 0, 0, DESERTGU_NOISE, 0, &desertgu_rifle_shot_tvca_info)
-	DISCRETE_RCFILTER(NODE_31, 1, NODE_30, RES_K(12), CAP_U(.01))
-	DISCRETE_CRFILTER(DESERTGU_RIFLE_SHOT_SND, 1, NODE_31, RES_K(12) + RES_K(68), CAP_U(.0022))
+	DISCRETE_RCFILTER(NODE_31, NODE_30, RES_K(12), CAP_U(.01))
+	DISCRETE_CRFILTER(DESERTGU_RIFLE_SHOT_SND, NODE_31, RES_K(12) + RES_K(68), CAP_U(.0022))
 
 	/************************************************
      * Bottle hit sound
@@ -1801,6 +1795,7 @@ static const discrete_op_amp_tvca_info clowns_pop_tvca_info =
 	CAP_U(.015),	/* c300 */
 	CAP_U(.1),		/* c301 */
 	CAP_U(.082),	/* c302 */
+	0,				/* no c4 */
 	5,			/* v1 */
 	5,			/* v2 */
 	5,			/* v3 */
@@ -1842,7 +1837,7 @@ static const discrete_op_amp_tvca_info clowns_sb_hit_tvca_info =
 	0,0,0,0,
 	CAP_U(1),		/* c201 */
 	0,
-	0,
+	0, 0,
 	5,			/* v1 */
 	0,			/* v2 */
 	0,			/* v3 */
@@ -1909,8 +1904,8 @@ static DISCRETE_SOUND_START(clowns)
 	DISCRETE_LFSR_NOISE(CLOWNS_NOISE, 1, 1, 7700, 12.0, 0, 12.0/2, &midway_lfsr)
 
 	DISCRETE_OP_AMP_TRIG_VCA(NODE_30, CLOWNS_POP_TOP_EN, CLOWNS_POP_MIDDLE_EN, CLOWNS_POP_BOTTOM_EN, CLOWNS_NOISE, 0, &clowns_pop_tvca_info)
-	DISCRETE_RCFILTER(NODE_31, 1, NODE_30, RES_K(15), CAP_U(.01))
-	DISCRETE_CRFILTER(NODE_32, 1, NODE_31, RES_K(15) + RES_K(39), CAP_U(.01))
+	DISCRETE_RCFILTER(NODE_31, NODE_30, RES_K(15), CAP_U(.01))
+	DISCRETE_CRFILTER(NODE_32, NODE_31, RES_K(15) + RES_K(39), CAP_U(.01))
 	DISCRETE_GAIN(CLOWNS_POP_SND, NODE_32, RES_K(39)/(RES_K(15) + RES_K(39)))
 
 	/************************************************
@@ -2052,6 +2047,20 @@ WRITE8_DEVICE_HANDLER( clowns_audio_2_w )
 #define SPACWALK_R305		RES_K(3680)
 #define SPACWALK_R307		RES_K(20)
 #define SPACWALK_R308		RES_K(20)	/* not labeled but it's beside R307 */
+#define SPACWALK_R400		RES_K(1)
+#define SPACWALK_R401		RES_K(200)
+#define SPACWALK_R403		RES_K(51)
+#define SPACWALK_R404		RES_K(220)
+#define SPACWALK_R406		RES_M(1)
+#define SPACWALK_R407		RES_K(820)
+#define SPACWALK_R410		RES_K(47)
+#define SPACWALK_R411		RES_K(300)
+#define SPACWALK_R412		RES_K(330)
+#define SPACWALK_R413		RES_M(1)
+#define SPACWALK_R414		RES_M(1)
+#define SPACWALK_R416		RES_M(4.7)
+#define SPACWALK_R417		RES_K(10)
+#define SPACWALK_R418		RES_K(100)
 #define SPACWALK_R419		RES_K(2.7)
 #define SPACWALK_R420		RES_K(20)
 #define SPACWALK_R421		RES_K(11)
@@ -2069,6 +2078,12 @@ WRITE8_DEVICE_HANDLER( clowns_audio_2_w )
 #define SPACWALK_C302		CAP_U(2.2)
 #define SPACWALK_C303		CAP_U(0.0047)
 #define SPACWALK_C304		CAP_U(0.0047)	/* not labeled but it's beside C303 */
+#define SPACWALK_C401		CAP_U(1)
+#define SPACWALK_C402		CAP_U(0.68)
+#define SPACWALK_C403		CAP_U(0.0022)
+#define SPACWALK_C451		CAP_U(0.001)
+#define SPACWALK_C452		CAP_U(0.001)
+#define SPACWALK_C453		CAP_U(0.001)
 #define SPACWALK_C602		CAP_U(1)
 
 
@@ -2078,7 +2093,7 @@ static const discrete_op_amp_tvca_info spacwalk_hit_tvca_info =
 	SPACWALK_RJ3, 0, SPACWALK_R300,						/* r5, r6, r7 */
 	SPACWALK_RJ3, SPACWALK_R301,						/* r8, r9 */
 	SPACWALK_RJ3, SPACWALK_R302,						/* r10, r11 */
-	SPACWALK_C300, SPACWALK_C301, SPACWALK_C302,		/* c1, c2, c3 */
+	SPACWALK_C300, SPACWALK_C301, SPACWALK_C302, 0,		/* c1, c2, c3, c4 */
 	5, 5, 5, 12,										/* v1, v2, v3, vP */
 	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
 	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
@@ -2101,7 +2116,7 @@ static const discrete_op_amp_tvca_info spacwalk_sb_hit_tvca_info =
 	SPACWALK_R207,	SPACWALK_R205, 0, SPACWALK_R208,	/* r1, r2, r3, r4 */
 	SPACWALK_RJ3, 0, SPACWALK_R206,						/* r5, r6, r7 */
 	0, 0, 0, 0					,						/* r8, r9, r10, r11 */
-	SPACWALK_C201, 0, 0,								/* c1, c2, c3 */
+	SPACWALK_C201, 0, 0, 0,								/* c1, c2, c3, c4 */
 	5, 0, 0, 12,										/* v1, v2, v3, vP */
 	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
 	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
@@ -2111,9 +2126,40 @@ static const discrete_op_amp_tvca_info spacwalk_sb_hit_tvca_info =
 	DISC_OP_AMP_TRIGGER_FUNCTION_NONE
 };
 
+static const discrete_integrate_info spacwalk_sb_miss_integrate =
+{
+	DISC_INTEGRATE_OP_AMP_1 | DISC_OP_AMP_IS_NORTON,
+	SPACWALK_R406, SPACWALK_R401, 0, SPACWALK_C402,	/* r1, r2, r3, c */
+	12, 12,	/* v1, vP */
+	0, 0, 0	/* f0, f1, f2 */
+};
+
+static const discrete_op_amp_osc_info spacwalk_sb_miss_vco =
+{
+	DISC_OP_AMP_OSCILLATOR_VCO_3 | DISC_OP_AMP_IS_NORTON | DISC_OP_AMP_OSCILLATOR_OUT_SQW,
+	SPACWALK_R407, SPACWALK_R412, SPACWALK_R410, SPACWALK_R411, SPACWALK_R413, 0, 0, 0,	/* r1, r2, r3, r4, r5, r6, r7, r8 */
+	SPACWALK_C403, 12												/* c, vP */
+};
+
+static const discrete_op_amp_filt_info spacwalk_sb_miss_filter =
+{
+	/* we use r1, not r2 because vref is taken into acount by the CRFILTER */
+	SPACWALK_R417, 0, SPACWALK_R414, 0, SPACWALK_R416,	/* r1, r2, r3, r4, rF */
+	SPACWALK_C451, SPACWALK_C452, 0,					/* c1, c2, c3 */
+	0, 12, 0											/* vRef, vP, vN */
+};
+
+static const discrete_op_amp_info spacwalk_sb_miss_amp =
+{
+	DISC_OP_AMP_IS_NORTON,
+	SPACWALK_R418, SPACWALK_R404, 0, SPACWALK_R403,	/* r1, r2, r3, r4 */
+	0,	/* c */
+	0, 12,	/* vN, vP */
+};
+
 static const discrete_op_amp_osc_info spacwalk_spaceship_osc =
 {
-	DISC_OP_AMP_OSCILLATOR_2 | DISC_OP_AMP_IS_NORTON,
+	DISC_OP_AMP_OSCILLATOR_2 | DISC_OP_AMP_IS_NORTON | DISC_OP_AMP_OSCILLATOR_OUT_CAP,
 	RES_K(75), RES_M(1), RES_M(6.8), RES_M(2.4), 0, 0, 0, 0,	/* r1, r2, r3, r4, r5, r6, r7, r8 */
 	CAP_U(2.2), 12												/* c, vP */
 };
@@ -2139,11 +2185,9 @@ static const discrete_mixer_desc spacwalk_mixer =
  ************************************************/
 #define SPACWALK_SPRINGBOARD_HIT_CIRCUIT(_num)                                              \
 DISCRETE_RCFILTER(NODE_RELATIVE(NODE_29, _num),                                             \
-	1,												/* ENAB */                              \
 	SPACWALK_NOISE,									/* IN0 */                               \
 	RES_K(330), CAP_U(.1))                                                                  \
 DISCRETE_RCFILTER(NODE_RELATIVE(NODE_31, _num),                                             \
-	1,												/* ENAB */                              \
 	NODE_RELATIVE(NODE_29, _num),					/* IN0 */                               \
 	RES_K(330) + RES_K(150), CAP_U(.1))                                                     \
 DISCRETE_OP_AMP_VCO1(NODE_RELATIVE(NODE_33, _num),	/* IC M2-3, pin 5 */                    \
@@ -2202,11 +2246,9 @@ DISCRETE_GAIN(NODE_RELATIVE(SPACWALK_SPRINGBOARD_HIT1_SND, _num - 1),           
 		SPACWALK_NOISE, 0,						/* IN0, IN1 */
 		&spacwalk_hit_tvca_info)
 	DISCRETE_RCFILTER(NODE_21,
-		1,										/* ENAB */
 		NODE_20,								/* IN0 */
 		SPACWALK_R307, SPACWALK_C303)
 	DISCRETE_RCFILTER(SPACWALK_TARGET_HIT_SND,
-		1,										/* ENAB */
 		NODE_21,								/* IN0 */
 		SPACWALK_R307 + SPACWALK_R308, SPACWALK_C304)
 
@@ -2220,12 +2262,35 @@ DISCRETE_GAIN(NODE_RELATIVE(SPACWALK_SPRINGBOARD_HIT1_SND, _num - 1),           
 	/************************************************
      * Springboard miss sound
      ************************************************/
-	DISCRETE_CONSTANT(SPACWALK_SPRINGBOARD_MISS_SND, 0)
+	DISCRETE_RCDISC2(NODE_50,					/* voltage on C401 */
+		SPACWALK_SPRINGBOARD_MISS_EN,			/* SWITCH */
+		OP_AMP_NORTON_VBE, RES_2_PARALLEL(SPACWALK_R401, SPACWALK_R407),	/* INP0,RVAL0 */
+		12.0 - .5, SPACWALK_R400,				/* INP1,RVAL1 */
+		SPACWALK_C401)
+	DISCRETE_INTEGRATE(NODE_51,					/* IC K4, pin 9 */
+		NODE_50, 0,								/* TRG0,TRG1*/
+		&spacwalk_sb_miss_integrate)
+	DISCRETE_OP_AMP_VCO1(NODE_52,				/* IC K4, pin 5 */
+		1,										/* ENAB */
+		NODE_50,								/* VMOD1 */
+		&spacwalk_sb_miss_vco)
+	DISCRETE_CRFILTER(NODE_53,
+		NODE_52,								/* IN0 */
+		SPACWALK_R417, SPACWALK_C453)
+	/* this filter type probably does not work right. I need to test it. */
+	DISCRETE_OP_AMP_FILTER(NODE_54,				/* IC K3, pin 5 */
+		1,										/* ENAB */
+		NODE_53, 0,								/* INP0,INP1 */
+		DISC_OP_AMP_FILTER_IS_BAND_PASS_1M | DISC_OP_AMP_IS_NORTON, &spacwalk_sb_miss_filter)
+	DISCRETE_OP_AMP(SPACWALK_SPRINGBOARD_MISS_SND,	/* IC K4, pin 10 */
+		1,										/* ENAB */
+		NODE_54, NODE_51,						/* IN0,IN1 */
+		&spacwalk_sb_miss_amp)
 
 	/************************************************
      * Space ship sound
      ************************************************/
-	DISCRETE_OP_AMP_OSCILLATOR(NODE_60,			/* 2.2uF cap near IC JK-2 */
+	DISCRETE_OP_AMP_OSCILLATOR(NODE_60,			/* voltage on 2.2uF cap near IC JK-2 */
 		1,										/* ENAB */
 		&spacwalk_spaceship_osc)
 	DISCRETE_OP_AMP_VCO1(NODE_61,				/* IC JK-2, pin 5 */
@@ -2233,11 +2298,9 @@ DISCRETE_GAIN(NODE_RELATIVE(SPACWALK_SPRINGBOARD_HIT1_SND, _num - 1),           
 		NODE_60,								/* VMOD1*/
 		&spacwalk_spaceship_vco)
 	DISCRETE_RCFILTER(NODE_62,
-		1,										/* ENAB */
 		NODE_61,								/* IN0 */
 		RES_K(1), CAP_U(0.15))
 	DISCRETE_RCFILTER(SPACWALK_SPACE_SHIP_SND,
-		1,										/* ENAB */
 		NODE_62,								/* IN0 */
 		RES_K(1) + RES_K(10), CAP_U(0.015))
 
@@ -2296,34 +2359,229 @@ WRITE8_DEVICE_HANDLER( spacwalk_audio_2_w )
  *
  *  Shuffleboard
  *
+ *  Discrete sound emulation: Oct 2009, D.R.
+ *
  *************************************/
 
-/* Noise clock was breadboarded and measured at 1210Hz */
+ /* Discrete Sound Input Nodes */
+#define SHUFFLE_ROLLING_1_EN		NODE_01
+#define SHUFFLE_ROLLING_2_EN		NODE_02
+#define SHUFFLE_ROLLING_3_EN		NODE_03
+#define SHUFFLE_FOUL_EN				NODE_04
+#define SHUFFLE_ROLLOVER_EN			NODE_05
+#define SHUFFLE_CLICK_EN			NODE_06
+
+/* Discrete Sound Output Nodes */
+#define SHUFFLE_NOISE				NODE_10
+#define SHUFFLE_ROLLING_SND			NODE_11
+#define SHUFFLE_FOUL_SND			NODE_12
+#define SHUFFLE_ROLLOVER_SND		NODE_13
+#define SHUFFLE_CLICK_SND			NODE_14
+
+/* Parts List - Resistors */
+#define SHUFFLE_R300	RES_K(33)
+#define SHUFFLE_R400	RES_K(200)
+#define SHUFFLE_R401	RES_K(3)
+#define SHUFFLE_R402	RES_K(5.6)
+#define SHUFFLE_R403	RES_K(5.6)
+#define SHUFFLE_R404	RES_M(1)
+#define SHUFFLE_R406	RES_K(300)
+#define SHUFFLE_R407	RES_K(680)
+#define SHUFFLE_R408	RES_K(680)
+#define SHUFFLE_R409	RES_K(680)
+#define SHUFFLE_R410	RES_K(680)
+#define SHUFFLE_R411	RES_K(680)
+#define SHUFFLE_R412	RES_M(2.7)
+#define SHUFFLE_R500	RES_K(300)
+#define SHUFFLE_R503	RES_M(2.7)
+#define SHUFFLE_R504	RES_K(680)
+#define SHUFFLE_R505	RES_K(680)
+#define SHUFFLE_R506	RES_K(100)
+#define SHUFFLE_R507	RES_K(47)
+#define SHUFFLE_R508	RES_K(47)
+#define SHUFFLE_R509	RES_K(100)
+#define SHUFFLE_R511	RES_M(2)
+#define SHUFFLE_R512	RES_M(5.6)
+#define SHUFFLE_R513	RES_K(680)
+#define SHUFFLE_R514	RES_M(1.5)
+#define SHUFFLE_R515	RES_M(1)
+#define SHUFFLE_R516	RES_K(510)
+
+/* Parts List - Capacitors */
+#define SHUFFLE_C300	CAP_U(0.1)
+#define SHUFFLE_C400	CAP_U(0.1)
+#define SHUFFLE_C401	CAP_U(1)
+#define SHUFFLE_C402	CAP_U(1)
+#define SHUFFLE_C403	CAP_U(1)
+#define SHUFFLE_C404	CAP_U(0.1)
+#define SHUFFLE_C405	CAP_U(0.1)
+#define SHUFFLE_C500	CAP_U(0.1)
+#define SHUFFLE_C503	CAP_U(0.0022)
+#define SHUFFLE_C504	CAP_U(0.0022)
+#define SHUFFLE_C505	CAP_U(0.33)
+#define SHUFFLE_C506	CAP_U(1)
+#define SHUFFLE_C507	CAP_U(1)
+#define SHUFFLE_C508	CAP_U(1)
+
+#define SHUFFLE_HSYNC	15750	/* unmeasured */
+#define SHUFFLE_1V		SHUFFLE_HSYNC / 2
+#define SHUFFLE_32V		SHUFFLE_1V / 32
+
+
+static const discrete_op_amp_tvca_info shuffle_rolling_tvca =
+{
+	SHUFFLE_R512, 0, 0, SHUFFLE_R511,					/* r1, r2, r3, r4 */
+	RES_K(10), 0, SHUFFLE_R516,							/* r5, r6, r7 */
+	RES_K(10), SHUFFLE_R515,							/* r8, r9 */
+	RES_K(10), SHUFFLE_R514,							/* r10, r11 */
+	SHUFFLE_C508, SHUFFLE_C507, SHUFFLE_C506, SHUFFLE_C505,		/* c1, c2, c3, c4 */
+	12, 12, 12, 12,										/* v1, v2, v3, vP */
+	0, 0, DISC_OP_AMP_TRIGGER_FUNCTION_TRG0, 0,			/* f0, f1, f2, f3 */
+	DISC_OP_AMP_TRIGGER_FUNCTION_TRG1,					/* f4 */
+	DISC_OP_AMP_TRIGGER_FUNCTION_TRG2					/* f5 */
+};
+
+static const discrete_op_amp_info shuffle_rolling_amp =
+{
+	DISC_OP_AMP_IS_NORTON,
+	SHUFFLE_R513, SHUFFLE_R505, SHUFFLE_R503, SHUFFLE_R504,	/* r1, r2, r3, r4 */
+	0,						/* c */
+	0, 12,					/* vN, vP */
+};
+
+static const discrete_op_amp_tvca_info shuffle_foul_tvca =
+{
+	SHUFFLE_R412, SHUFFLE_R411, 0, SHUFFLE_R408,		/* r1, r2, r3, r4 */
+	RES_K(1), 0, SHUFFLE_R406,							/* r5, r6, r7 */
+	0, 0, 0, 0,											/* r8, r9, r10, r11 */
+	SHUFFLE_C404, 0, 0,	0,								/* c1, c2, c3, c4 */
+	5, 0, 0, 12,										/* v1, v2, v3, vP */
+	0, 0, DISC_OP_AMP_TRIGGER_FUNCTION_TRG0, 0, 0, 0	/* f0, f1, f2, f3, f4, f5 */
+};
+
+static const discrete_op_amp_tvca_info shuffle_rollover_tvca =
+{
+	SHUFFLE_R404, SHUFFLE_R410, 0, SHUFFLE_R407,		/* r1, r2, r3, r4 */
+	RES_K(10), 0, SHUFFLE_R409,							/* r5, r6, r7 */
+	0, 0, 0, 0,											/* r8, r9, r10, r11 */
+	SHUFFLE_C405, 0, 0,	0,								/* c1, c2, c3, c4 */
+	12, 0, 0, 12,										/* v1, v2, v3, vP */
+	0, 0, DISC_OP_AMP_TRIGGER_FUNCTION_TRG0, 0, 0, 0	/* f0, f1, f2, f3, f4, f5 */
+};
+
+static const discrete_mixer_desc shuffle_mixer =
+{
+	DISC_MIXER_IS_RESISTOR,
+	{SHUFFLE_R500, SHUFFLE_R400, SHUFFLE_R403 + SHUFFLE_R402 + SHUFFLE_R401, SHUFFLE_R300},
+	{0},		/* r_nodes */
+	{SHUFFLE_C500, SHUFFLE_C400, SHUFFLE_C401, SHUFFLE_C300},
+	0, 0, 0, 0, 0 ,1		/* rI, rF, cF, cAmp, vRef, gain */
+};
+
+
+static DISCRETE_SOUND_START(shuffle)
+	DISCRETE_INPUT_LOGIC(SHUFFLE_ROLLING_1_EN)
+	DISCRETE_INPUT_LOGIC(SHUFFLE_ROLLING_2_EN)
+	DISCRETE_INPUT_LOGIC(SHUFFLE_ROLLING_3_EN)
+	DISCRETE_INPUT_LOGIC(SHUFFLE_FOUL_EN)
+	DISCRETE_INPUT_LOGIC(SHUFFLE_ROLLOVER_EN)
+	DISCRETE_INPUTX_LOGIC(SHUFFLE_CLICK_EN, 11.5, 0, 0)
+
+	/* Noise clock was breadboarded and measured at 1210Hz */
+	DISCRETE_LFSR_NOISE(SHUFFLE_NOISE,			/* IC N5, pin 10 */
+		1, 1,									/* ENAB, RESET */
+		1210, 12.0, 0, 12.0 / 2, &midway_lfsr)	/* CLK,AMPL,FEED,BIAS,LFSRTB */
+
+	/************************************************
+     * Shuffle rolling
+     ************************************************/
+	DISCRETE_OP_AMP_TRIG_VCA(NODE_20,			/* IC P3-4, pin 5 */
+		SHUFFLE_ROLLING_1_EN, SHUFFLE_ROLLING_2_EN, SHUFFLE_ROLLING_3_EN,	/* TRG0,TRG1,TRG2 */
+		0, 0,									/*IN0,IN1 */
+		&shuffle_rolling_tvca)
+	DISCRETE_OP_AMP(NODE_21,					/* IC P3-4, pin 4 */
+		1,										/* ENAB */
+		SHUFFLE_NOISE, NODE_20,					/* IN0,IN1 */
+		&shuffle_rolling_amp)
+	/* filter not accurate */
+	DISCRETE_FILTER1(NODE_22, 1, NODE_21, 800, DISC_FILTER_LOWPASS)
+	DISCRETE_GAIN(SHUFFLE_ROLLING_SND, NODE_22, .2)
+
+	/************************************************
+     * Foul
+     ************************************************/
+	DISCRETE_SQUAREWFIX(NODE_30,				/* 32V is a guess, scan of schematic is missing actual tone value used */
+		1, SHUFFLE_32V, DEFAULT_TTL_V_LOGIC_1, 50, DEFAULT_TTL_V_LOGIC_1 / 2, 0)	/* ENAB,FREQ,AMP,DUTY,BIAS,PHASE */
+	DISCRETE_OP_AMP_TRIG_VCA(SHUFFLE_FOUL_SND,	/* IC M3-4, pin 5 */
+		SHUFFLE_FOUL_EN, 0, 0,					/* TRG0,TRG1,TRG2 */
+		NODE_30, 0,								/*IN0,IN1 */
+		&shuffle_foul_tvca)
+
+	/************************************************
+     * Shuffle rollover
+     ************************************************/
+	DISCRETE_OP_AMP_TRIG_VCA(NODE_40,			/* IC M3-4, pin 4 */
+		SHUFFLE_ROLLOVER_EN, 0, 0,				/* TRG0,TRG1,TRG2 */
+		SHUFFLE_NOISE, 0,						/*IN0,IN1 */
+		&shuffle_rollover_tvca)
+	DISCRETE_RCFILTER(NODE_41,
+		NODE_40,								/* IN0 */
+		SHUFFLE_R403, SHUFFLE_C403)
+	DISCRETE_RCFILTER(SHUFFLE_ROLLOVER_SND,
+		NODE_41,								/* IN0 */
+		SHUFFLE_R403 + SHUFFLE_R402, SHUFFLE_C402)
+
+	/************************************************
+     * Click
+     ************************************************/
+	/* filter not accurate */
+	DISCRETE_FILTER1(NODE_50, 1, SHUFFLE_CLICK_EN, 300, DISC_FILTER_LOWPASS)
+	DISCRETE_GAIN(SHUFFLE_CLICK_SND, NODE_50, .3)
+
+	/************************************************
+     * Combine all sound sources.
+     ************************************************/
+	DISCRETE_MIXER4(NODE_90,
+		1,										/* ENAB */
+		SHUFFLE_ROLLING_SND,
+		SHUFFLE_FOUL_SND,
+		SHUFFLE_ROLLOVER_SND,
+		SHUFFLE_CLICK_SND,
+		&shuffle_mixer)
+	DISCRETE_OUTPUT(NODE_90, 59200)
+DISCRETE_SOUND_END
 
 
 MACHINE_DRIVER_START( shuffle_audio )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
+	MDRV_SOUND_CONFIG_DISCRETE(shuffle)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
 
-WRITE8_HANDLER( shuffle_audio_1_w )
+WRITE8_DEVICE_HANDLER( shuffle_audio_1_w )
 {
-	/* if (data & 0x01)  enable CLICK (balls collide) sound */
+	discrete_sound_w(device, SHUFFLE_CLICK_EN, (data >> 0) & 0x01);
 
-	/* if (data & 0x02)  enable SHUFFLE ROLLOVER sound */
+	discrete_sound_w(device, SHUFFLE_ROLLOVER_EN, (data >> 1) & 0x01);
 
-	sound_global_enable(space->machine, (data >> 2) & 0x01);
+	sound_global_enable(device->machine, (data >> 2) & 0x01);
 
-	/* set SHUFFLE ROLLING sound((data >> 3) & 0x07)  0, if not rolling,
-                                                      faster rolling = higher number */
+	discrete_sound_w(device, NODE_29, (data >> 3) & 0x07);
+
+	discrete_sound_w(device, SHUFFLE_ROLLING_3_EN, (data >> 3) & 0x01);
+	discrete_sound_w(device, SHUFFLE_ROLLING_2_EN, (data >> 4) & 0x01);
+	discrete_sound_w(device, SHUFFLE_ROLLING_1_EN, (data >> 5) & 0x01);
 
 	/* D6 and D7 are not connected */
 }
 
 
-WRITE8_HANDLER( shuffle_audio_2_w )
+WRITE8_DEVICE_HANDLER( shuffle_audio_2_w )
 {
-	/* if (data & 0x01)  enable FOUL sound */
+	discrete_sound_w(device, SHUFFLE_FOUL_EN, (data >> 0) & 0x01);
 
 	coin_counter_w(0, (data >> 1) & 0x01);
 
@@ -2352,7 +2610,7 @@ static DISCRETE_SOUND_START(dogpatch)
 	/************************************************
      * Filter it to be AC.
      ************************************************/
-	DISCRETE_CRFILTER(NODE_91, 1, MIDWAY_TONE_SND, RES_K(100), CAP_U(0.1))
+	DISCRETE_CRFILTER(NODE_91, MIDWAY_TONE_SND, RES_K(100), CAP_U(0.1))
 
 	DISCRETE_OUTPUT(NODE_91, 5000)
 
@@ -2572,7 +2830,7 @@ static const discrete_op_amp_tvca_info spcenctr_player_shot_tvca =
 	0,									/* no r11 */
 	CAP_U(1),							/* C506 */
 	0,									/* no c2 */
-	0,									/* no c3 */
+	0, 0,								/* no c3, c4 */
 	12,									/* v1 */
 	0,									/* no v2 */
 	0,									/* no v3 */
@@ -2601,7 +2859,7 @@ static const discrete_op_amp_tvca_info spcenctr_crash_tvca =
 	0,									/* no r11 */
 	CAP_U(2.2),							/* C304 */
 	0,									/* no c2 */
-	0,									/* no c3 */
+	0, 0,								/* no c3, c4 */
 	5,									/* v1 */
 	0,									/* no v2 */
 	0,									/* no v3 */
@@ -2630,7 +2888,7 @@ static const discrete_op_amp_tvca_info spcenctr_explosion_tvca =
 	0,									/* no r11 */
 	CAP_U(2.2),							/* C400 */
 	0,									/* no c2 */
-	0,									/* no c3 */
+	0, 0,								/* no c3, c4 */
 	12,									/* v1 */
 	0,									/* no v2 */
 	0,									/* no v3 */
@@ -2731,7 +2989,6 @@ static DISCRETE_SOUND_START(spcenctr)
 					DISC_OP_AMP_FILTER_IS_BAND_PASS_1M | DISC_OP_AMP_IS_NORTON,
 					&spcenctr_enemy_ship_shot_filt)
 	DISCRETE_CRFILTER(SPCENCTR_ENEMY_SHIP_SHOT_SND,
-					1,									/* ENAB */
 					NODE_23,							/* IN0 */
 					RES_K(1.8),							/* R116 */
 					CAP_U(0.1) )						/* C104 */
@@ -2758,7 +3015,6 @@ static DISCRETE_SOUND_START(spcenctr)
 					0,									/* MIN */
 					12)									/* MAX */
 	DISCRETE_CRFILTER(NODE_34,
-					1,									/* ENAB */
 					SPCENCTR_NOISE,						/* IN0 */
 					RES_M(1) + RES_K(330),				/* R507, R509 */
 					CAP_U(0.1) )						/* C503 */
@@ -2836,12 +3092,10 @@ static DISCRETE_SOUND_START(spcenctr)
 					0,							/* no IN1 */
 					&spcenctr_explosion_tvca)
 	DISCRETE_RCFILTER(NODE_71,
-					1,							/* ENAB */
 					NODE_70,					/* IN0 */
 					RES_K(1.8),					/* R405 */
 					CAP_U(0.22) )				/* C401 */
 	DISCRETE_RCFILTER(SPCENCTR_EXPLOSION_SND,
-					1,							/* ENAB */
 					NODE_71,					/* IN0 */
 					RES_K(1.8) + RES_K(3.6),	/* R405 + R406 */
 					CAP_U(0.22) )				/* C402 */
@@ -3062,7 +3316,7 @@ static const discrete_op_amp_tvca_info bowler_fowl_tvca =
 	0,									/* no r11 */
 	CAP_U(0.1),							/* C1050 */
 	0,									/* no c2 */
-	0,									/* no c3 */
+	0, 0,								/* no c3, c4 */
 	5,									/* v1 */
 	0,									/* no v2 */
 	0,									/* no v3 */
@@ -3102,7 +3356,6 @@ static DISCRETE_SOUND_START(bowler)
 					0,							/* no IN1 */
 					&bowler_fowl_tvca)
 	DISCRETE_CRFILTER(BOWLER_FOWL_SND,
-					1,							/* ENAB */
 					NODE_21,					/* IN0 */
 					RES_K(68),					/* R1120 */
 					CAP_U(0.1) )				/* C1048 */
@@ -3484,7 +3737,7 @@ static const discrete_op_amp_tvca_info invaders_explosion_tvca =
 	0,									/* no r11 */
 	CAP_U(1),							/* C26 */
 	0,									/* no c2 */
-	0,									/* no c3 */
+	0, 0,								/* no c3, c4 */
 	12.0 - OP_AMP_NORTON_VBE,			/* v1 */
 	0,									/* no v2 */
 	0,									/* no v3 */
@@ -3570,7 +3823,7 @@ static const discrete_op_amp_tvca_info invaders_missle_tvca =
 	0,									/* no r11 */
 	CAP_U(0.1),							/* C14 */
 	0,									/* no c2 */
-	0,									/* no c3 */
+	0, 0,								/* no c3, c4 */
 	5,									/* v1 */
 	0,									/* no v2 */
 	0,									/* no v3 */
@@ -3666,12 +3919,10 @@ static const discrete_mixer_desc invaders_mixer =
 					CAP_U(0.1),										/* C29 */           \
 					&invaders_thump_555)                                                \
 	DISCRETE_RCFILTER(INVADERS_NODE(32, _board),                                        \
-					1,												/* ENAB */          \
 					INVADERS_NODE(31, _board),						/* IN0 */           \
 					100,											/* R132 */          \
 					CAP_U(4.7) )									/* C31 */           \
 	DISCRETE_RCFILTER(INVADERS_NODE(INVADERS_FLEET_SND, _board),                        \
-					1,												/* ENAB */          \
 					INVADERS_NODE(32, _board),						/* IN0 */           \
 					100 + 100,										/* R132 + R133 */   \
 					CAP_U(10) )										/* C32 */
@@ -3747,12 +3998,10 @@ static const discrete_mixer_desc invaders_mixer =
 					0,												/* no IN1 */        \
 					&invaders_explosion_tvca)                                           \
 	DISCRETE_RCFILTER(INVADERS_NODE(62, _board),                                        \
-					1,												/* ENAB */          \
 					INVADERS_NODE(61, _board),						/* IN0 */           \
 					RES_K(5.6),										/* R84 */           \
 					CAP_U(0.1) )									/* C27 */           \
 	DISCRETE_RCFILTER(INVADERS_NODE(INVADERS_EXPLOSION_SND, _board),                    \
-					1,												/* ENAB */          \
 					INVADERS_NODE(62, _board),						/* IN0 */           \
 					RES_K(5.6) + RES_K(6.8),						/* R84 + R85 */     \
 					CAP_U(0.1) )									/* C28 */
@@ -3781,7 +4030,6 @@ static const discrete_mixer_desc invaders_mixer =
 					0,														/* MIN */               \
 					12)														/* MAX */               \
 	DISCRETE_CRFILTER(INVADERS_NODE(74, _board),        					                        \
-					1,														/* ENAB */              \
 					INVADERS_NOISE,											/* IN0 */               \
 					RES_M(1) + RES_K(330),									/* R29, R11 */          \
 					CAP_U(0.1) )											/* C57 */               \
@@ -3908,14 +4156,93 @@ WRITE8_DEVICE_HANDLER( invaders_audio_2_w )
 #define BLUESHRK_SHARK_SND		NODE_15
 #define BLUESHRK_SHOT_SND		NODE_16
 
+/* Parts List - Resistors */
+#define BLUESHRK_R300	RES_M(1)
+#define BLUESHRK_R301	RES_K(100)
+#define BLUESHRK_R302	RES_M(1)
+#define BLUESHRK_R303	RES_K(33)
+#define BLUESHRK_R304	RES_K(120)
+#define BLUESHRK_R305	RES_M(1)
+#define BLUESHRK_R306	RES_K(470)
+#define BLUESHRK_R307	RES_K(680)
+#define BLUESHRK_R308	RES_M(1)
+#define BLUESHRK_R309	RES_M(1)
+#define BLUESHRK_R310	RES_K(680)
+#define BLUESHRK_R311	RES_K(1)
+#define BLUESHRK_R312	RES_K(100)
+#define BLUESHRK_R313	RES_M(1)
+#define BLUESHRK_R314	RES_M(1)
+#define BLUESHRK_R315	RES_M(4.7)
+#define BLUESHRK_R316	RES_M(2.2)
+#define BLUESHRK_R317	RES_K(10)
+#define BLUESHRK_R318	RES_M(1)
+#define BLUESHRK_R319	RES_K(680)
+#define BLUESHRK_R320	RES_M(2.7)
+#define BLUESHRK_R321	RES_K(680)
+#define BLUESHRK_R324	RES_K(750)
+#define BLUESHRK_R520	RES_K(510)
+#define BLUESHRK_R521	RES_K(22)
+#define BLUESHRK_R529	RES_K(33)
+#define BLUESHRK_R601	RES_K(47)
+#define BLUESHRK_R602	RES_K(22)
+#define BLUESHRK_R603	RES_K(39)
+#define BLUESHRK_R604	RES_K(1)
+#define BLUESHRK_R605	RES_M(1)
+#define BLUESHRK_R730	RES_K(56)
 
-static const discrete_555_desc blueshrk_555_H1A =
+/* Parts List - Capacitors */
+#define BLUESHRK_C300	CAP_U(0.1)
+#define BLUESHRK_C301	CAP_P(470)
+#define BLUESHRK_C302	CAP_P(470)
+#define BLUESHRK_C303	CAP_U(0.47)
+#define BLUESHRK_C304	CAP_U(1)
+#define BLUESHRK_C305	CAP_U(1)
+#define BLUESHRK_C508	CAP_U(1)
+#define BLUESHRK_C600	CAP_U(2.2)
+#define BLUESHRK_C602	CAP_U(0.022)
+#define BLUESHRK_C603	CAP_U(0.01)
+#define BLUESHRK_C604	CAP_U(0.015)
+#define BLUESHRK_C606	CAP_U(1)
+#define BLUESHRK_C704	CAP_U(1)
+#define BLUESHRK_C900	CAP_U(10)
+
+
+static const discrete_op_amp_osc_info blueshark_octopus_osc =
 {
-	DISC_555_OUT_SQW | DISC_555_OUT_DC | DISC_555_TRIGGER_IS_LOGIC,
-	5,				/* B+ voltage of 555 */
-	DEFAULT_555_VALUES
+	DISC_OP_AMP_OSCILLATOR_1 | DISC_OP_AMP_IS_NORTON | DISC_OP_AMP_OSCILLATOR_OUT_CAP,
+	BLUESHRK_R300, BLUESHRK_R303, BLUESHRK_R301, BLUESHRK_R304, BLUESHRK_R302, 0, 0, 0,	/* r1, r2, r3, r4, r5, r6, r7, r8 */
+	BLUESHRK_C300, 12				/*c, vP */
 };
 
+static const discrete_op_amp_osc_info blueshark_octopus_vco =
+{
+	DISC_OP_AMP_OSCILLATOR_VCO_1 | DISC_OP_AMP_IS_NORTON | DISC_OP_AMP_OSCILLATOR_OUT_SQW,
+	BLUESHRK_R305, BLUESHRK_R306, BLUESHRK_R307, BLUESHRK_R309, BLUESHRK_R308, 0, 0, 0,	/* r1, r2, r3, r4, r5, r6, r7, r8 */
+	BLUESHRK_C301, 12				/*c, vP */
+};
+
+static const discrete_op_amp_1sht_info blueshark_octopus_oneshot =
+{
+	DISC_OP_AMP_1SHT_1 | DISC_OP_AMP_IS_NORTON,
+	BLUESHRK_R315, BLUESHRK_R312, BLUESHRK_R314, BLUESHRK_R313, BLUESHRK_R316,	/* r1, r2, r3, r4, r5 */
+	BLUESHRK_C303, BLUESHRK_C302,												/* c1, c2 */
+	0, 12																		/* vN, vP */
+};
+
+static const discrete_integrate_info blueshark_octopus_integrate =
+{
+	DISC_INTEGRATE_OP_AMP_1 | DISC_OP_AMP_IS_NORTON,
+	BLUESHRK_R318, BLUESHRK_R317, 0, BLUESHRK_C304,		/* r1, r2, r3, c */
+	12, 12,												/* v1, vP */
+	0, 0, 0												/* f0, f1, f2 */
+};
+
+static const discrete_op_amp_info blueshark_octopus_amp =
+{
+	DISC_OP_AMP_IS_NORTON,
+	BLUESHRK_R310, BLUESHRK_R319, BLUESHRK_R320, BLUESHRK_R321,	/* r1, r2, r3, r4 */
+	0, 0, 12														/* c, vN, vP */
+};
 
 static const discrete_555_desc blueshrk_555_H1B =
 {
@@ -3928,31 +4255,19 @@ static const discrete_555_desc blueshrk_555_H1B =
 
 static const discrete_mixer_desc blueshrk_mixer =
 {
-	DISC_MIXER_IS_OP_AMP,
-	{ RES_K(750),
-	  1.0/(1.0/RES_K(510) + 1.0/RES_K(22)),
-	  RES_M(1),
-	  RES_K(56) },
-	{ 0 },
-	{ CAP_U(1),
-	  CAP_U(1),
-	  CAP_U(1),
-	  CAP_U(1) },
-	0,
-	RES_K(100),
-	0,
-	CAP_U(0.1),
-	0,		/* Vref */
-	700		/* final gain */
+	DISC_MIXER_IS_RESISTOR,
+	{BLUESHRK_R324, RES_2_PARALLEL(BLUESHRK_R520, BLUESHRK_R521) + BLUESHRK_R529, BLUESHRK_R604 + BLUESHRK_R605, BLUESHRK_R730},
+	{0},	/* r_node */
+	{BLUESHRK_C305, BLUESHRK_C508, BLUESHRK_C606, BLUESHRK_C704},
+	0, 0, 0, BLUESHRK_C900, 0, 1	/* rI, rF, cF, cAmp, vRef, gain */
 };
-
 
 static DISCRETE_SOUND_START(blueshrk)
 
 	/************************************************
      * Input register mapping
      ************************************************/
-	DISCRETE_INPUT_LOGIC(BLUESHRK_OCTOPUS_EN)
+	DISCRETE_INPUTX_LOGIC(BLUESHRK_OCTOPUS_EN, 12, 0, 0)
 	DISCRETE_INPUT_LOGIC(BLUESHRK_HIT_EN)
 	DISCRETE_INPUT_LOGIC(BLUESHRK_SHARK_EN)
 	DISCRETE_INPUT_LOGIC(BLUESHRK_SHOT_EN)
@@ -3961,25 +4276,22 @@ static DISCRETE_SOUND_START(blueshrk)
 	/************************************************
      * Octopus sound
      ************************************************/
-	DISCRETE_CONSTANT(BLUESHRK_OCTOPUS_SND, 0)	/* placeholder for incomplete sound */
-
-	/************************************************
-     * Hit sound
-     ************************************************/
-	/* the 555 trigger is connected to the cap, so when reset goes high, the 555 is triggered */
-	/* but the 555_MSTABLE does not currently allow connection of the trigger to the cap */
-	/* so we will cheat and add a pulse 1 sample wide to trigger it */
-	DISCRETE_ONESHOT(NODE_30, BLUESHRK_HIT_EN, 1, /* 1 sample wide */ 0, DISC_ONESHOT_REDGE | DISC_ONESHOT_NORETRIG | DISC_OUT_ACTIVE_LOW)
-	DISCRETE_555_MSTABLE(NODE_31, BLUESHRK_HIT_EN, NODE_30, RES_K(47), CAP_U(2.2), &blueshrk_555_H1A)
-	DISCRETE_LOGIC_INVERT(NODE_32, BLUESHRK_HIT_EN)
-	DISCRETE_COUNTER(NODE_33, 1, /*RST*/ NODE_32, /*CLK*/ NODE_31, 1, DISC_COUNT_UP, 0, DISC_CLK_ON_F_EDGE)
-	DISCRETE_SWITCH(NODE_34, 1, NODE_33, CAP_U(0.015) + CAP_U(0.01), CAP_U(0.022))
-	DISCRETE_555_ASTABLE(BLUESHRK_HIT_SND, BLUESHRK_HIT_EN, RES_K(22), RES_K(39), NODE_34, &blueshrk_555_H1B)
-
-	/************************************************
-     * Shark sound
-     ************************************************/
-	DISCRETE_CONSTANT(BLUESHRK_SHARK_SND, 0)	/* paceholder for incomplete sound */
+	DISCRETE_OP_AMP_OSCILLATOR(NODE_20,			/* IC M5, pin 5 */
+		1,										/* ENAB */
+		&blueshark_octopus_osc)
+	DISCRETE_OP_AMP_VCO1(NODE_21,				/* IC M5, pin 10 */
+		1,										/* ENAB */
+		NODE_20,								/* VMOD1 */
+		&blueshark_octopus_vco)
+	DISCRETE_OP_AMP_ONESHOT(NODE_22,			/* IC J5, pin 10 */
+		BLUESHRK_OCTOPUS_EN, &blueshark_octopus_oneshot)
+	DISCRETE_INTEGRATE(NODE_23,					/* IC J5, pin 5 */
+		NODE_22, 0,								/* TRG0,TRG1 */
+		&blueshark_octopus_integrate)
+	DISCRETE_OP_AMP(BLUESHRK_OCTOPUS_SND,		/* IC J5, pin 4 */
+		1,										/* ENAB */
+		NODE_21, NODE_23,						/* IN0,IN1 */
+		&blueshark_octopus_amp)
 
 	/************************************************
      * Shot sound
@@ -3987,11 +4299,40 @@ static DISCRETE_SOUND_START(blueshrk)
 	DISCRETE_CONSTANT(BLUESHRK_SHOT_SND, 0)		/* placeholder for incomplete sound */
 
 	/************************************************
+     * Hit sound
+     ************************************************/
+	DISCRETE_COUNTER(NODE_40,							/* IC H3, pin 5 */
+		1, BLUESHRK_HIT_EN,								/* ENAB,RESET */
+		FREQ_OF_555(BLUESHRK_R601, 0, BLUESHRK_C600),	/* CLK */
+		1, DISC_COUNT_UP, 0,							/* MAX,DIR,INIT0 */
+		DISC_CLK_IS_FREQ)
+	DISCRETE_SWITCH(NODE_41,					/* value of toggled caps */
+		1,										/* ENAB */
+		NODE_40,								/* SWITCH */
+		BLUESHRK_C602 + BLUESHRK_C603,			/* INP0 - IC H3, pin 5 low */
+		BLUESHRK_C604)							/* INP1 - IC H3, pin 6 low  */
+	DISCRETE_555_ASTABLE(BLUESHRK_HIT_SND,		/* IC H2, pin 2 */
+		BLUESHRK_HIT_EN,						/* RESET */
+		BLUESHRK_R602, BLUESHRK_R603, NODE_41,	/* R1,R2,C */
+		&blueshrk_555_H1B)
+
+	/************************************************
+     * Shark sound
+     ************************************************/
+	DISCRETE_CONSTANT(BLUESHRK_SHARK_SND, 0)	/* paceholder for incomplete sound */
+
+	/************************************************
      * Combine all sound sources.
      ************************************************/
-	DISCRETE_MIXER4(NODE_91, BLUESHRK_GAME_ON_EN, BLUESHRK_OCTOPUS_SND, BLUESHRK_HIT_SND, BLUESHRK_SHARK_SND, BLUESHRK_SHOT_SND, &blueshrk_mixer)
+	DISCRETE_MIXER4(NODE_91,
+		BLUESHRK_GAME_ON_EN,
+		BLUESHRK_OCTOPUS_SND,
+		BLUESHRK_SHOT_SND,
+		BLUESHRK_HIT_SND,
+		BLUESHRK_SHARK_SND,
+		&blueshrk_mixer)
 
-	DISCRETE_OUTPUT(NODE_91, 1)
+	DISCRETE_OUTPUT(NODE_91, 240000)
 DISCRETE_SOUND_END
 
 
@@ -4007,16 +4348,16 @@ WRITE8_DEVICE_HANDLER( blueshrk_audio_w )
 {
 	discrete_sound_w(device, BLUESHRK_GAME_ON_EN, (data >> 0) & 0x01);
 
-	/* discrete_sound_w(device, BLUESHRK_SHOT_EN, (data >> 1) & 0x01); */
+	discrete_sound_w(device, BLUESHRK_SHOT_EN, (data >> 1) & 0x01);
 
 	discrete_sound_w(device, BLUESHRK_HIT_EN, (data >> 2) & 0x01);
 
-	/* discrete_sound_w(device, BLUESHRK_SHARK_EN, (data >> 3) & 0x01); */
+	discrete_sound_w(device, BLUESHRK_SHARK_EN, (data >> 3) & 0x01);
 
 	/* if (data & 0x10)  enable KILLED DIVER sound, this circuit
        doesn't appear to be on the schematics */
 
-	/* discrete_sound_w(device, BLUESHRK_OCTOPUS_EN, (data >> 5) & 0x01); */
+	discrete_sound_w(device, BLUESHRK_OCTOPUS_EN, (data >> 5) & 0x01);
 
 	/* D6 and D7 are not connected */
 }

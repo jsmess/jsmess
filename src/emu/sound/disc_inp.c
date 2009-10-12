@@ -34,9 +34,9 @@ struct dss_adjustment_context
 struct dss_input_context
 {
 	stream_sample_t *ptr;			/* current in ptr for stream */
-	UINT8		data;				/* data written */
 	double 		gain;				/* node gain */
 	double		offset;				/* node offset */
+	UINT8		data;				/* data written */
 	UINT8		is_stream;
 	UINT8		is_buffered;
 	UINT32		stream_in_number;
@@ -155,7 +155,7 @@ static DISCRETE_STEP(dss_adjustment)
 	INT32  rawportval = input_port_read_direct(context->port);
 
 	/* only recompute if the value changed from last time */
-	if (rawportval != context->lastpval)
+	if (UNEXPECTED(rawportval != context->lastpval))
 	{
 		double portval   = (double)(rawportval - context->pmin) * context->pscale;
 		double scaledval = portval * context->scale + context->min;
@@ -288,7 +288,7 @@ static DISCRETE_STEP(dss_input_stream)
 	/* the context pointer is set to point to the current input stream data in discrete_stream_update */
 	struct dss_input_context *context = (struct dss_input_context *)node->context;
 
-	if (context->ptr)
+	if (EXPECTED(context->ptr))
 	{
 		node->output[0] = (*context->ptr) * context->gain + context->offset;
 		context->ptr++;
@@ -302,7 +302,7 @@ static DISCRETE_RESET(dss_input_stream)
 	struct dss_input_context *context = (struct dss_input_context *)node->context;
 
 	context->ptr = NULL;
-	//context->data = 0;
+	context->data = 0;
 }
 
 static DISCRETE_START(dss_input_stream)

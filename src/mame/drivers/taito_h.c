@@ -12,9 +12,9 @@ Yasuhiro Ogawa. Thank you, Yasu.
 
 Supported games :
 ==================
- Syvalion          (C) 1988 Taito
- Record Breaker    (C) 1988 Taito
- Dynamite League   (C) 1990 Taito
+ Syvalion                           (C) 1988 Taito
+ Record Breaker / Go For The Gold   (C) 1988 Taito
+ Dynamite League                    (C) 1990 Taito
 
 
 System specs :
@@ -67,16 +67,26 @@ Stephh's notes (based on the game M68000 code and some tests) :
     (see code at 0x002af8). Another write to this address is done at 0x002a96.
 
 
-2) 'recordbr'
+2) 'recordbr' and 'gogold'
 
   - Region stored at 0x07fffe.w
+  - Title stored at 0x07ff9a.w :
+      * 0x0000 : "Go For The Gold"
+      * 0x0001 : "Recordbreaker"
   - Sets :
-      * 'recordbr' : region = 0x0003
+      * 'recordbr' : region = 0x0003 and title = 0x0001
+      * 'gogold'   : region = 0x0001 and title = 0x0000
   - Coinage relies on the region (code at 0x00144a) :
-      * 0x0001 (Japan), 0x0002 (US), 0x0005 (US, Romstar licence) use TAITO_COINAGE_JAPAN_OLD
+      * 0x0001 (Japan), 0x0002 (US), 0x0005 (World, Romstar licence) and
+        0x0006 (US, Romstar licence) use TAITO_COINAGE_JAPAN_OLD
       * 0x0003 (World), 0x0004 (licenced to xxx) and
         0x0007 (licenced to PHOENIX ELECTRONICS CO.) use TAITO_COINAGE_WORLD
-  - Notice screen only if region = 0x0001
+  - Notice screen only if region = 0x0000 or region = 0x0001
+
+  - Debug Mode (from Shimapong)
+    1. Hold Service Switch at boot (key "9")
+    2. Input the following sequence at the "Service Switch Error" message screen:
+    1P Start, 1P Start, 1P Start, Service Switch, 1P Start
 
 
 3) 'dleague'
@@ -122,7 +132,10 @@ flipscreen.
 Recordbr: missing hand of opponent when he ends in swimming
 race and you're still on the blocks. Bug?
 
-Recordbr: loads of unmapped IOC reads and writes.
+Recordbr: loads of unmapped IOC reads and writes. Need to map Player 3 & 4 controls.
+
+what is the rom loaded into region user1? (see go gold / dynamite league)
+some kind of zoom table?
 
 ****************************************************************************/
 
@@ -414,6 +427,14 @@ static INPUT_PORTS_START( recordbr )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )                 /* IPT_BUTTON4 (PL2) in service mode */
 INPUT_PORTS_END
 
+
+static INPUT_PORTS_START( gogold )
+	PORT_INCLUDE(recordbr)
+
+	PORT_MODIFY("DSWA")
+	TAITO_COINAGE_JAPAN_OLD
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( dleague )
 	/* 0x200000 -> 0x100526.b ($526,A5) */
 	PORT_START("DSWA")
@@ -503,7 +524,6 @@ GFXDECODE_END
 
 static GFXDECODE_START( dleague )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout, 0,     32 )
-	GFXDECODE_ENTRY( "gfx2", 0, charlayout, 32*16, 16    )	// seems to be bogus...?
 GFXDECODE_END
 
 
@@ -688,30 +708,64 @@ ROM_END
 
 ROM_START( recordbr )
 	ROM_REGION( 0x80000, "maincpu", 0 )		/* main cpu */
-	ROM_LOAD16_BYTE( "b56-17.rom", 0x00000, 0x20000, CRC(3e0a9c35) SHA1(900a741b2abbbbe883b9d78162a88b4397af1a56) )
-	ROM_LOAD16_BYTE( "b56-16.rom", 0x00001, 0x20000, CRC(b447f12c) SHA1(58ee30337836f260c7fbda728dac93f06d861ec4) )
-	ROM_LOAD16_BYTE( "b56-15.rom", 0x40000, 0x20000, CRC(b346e282) SHA1(f6b4a2e9093a33d19c2eaf3ef9801179f39a83a3) )
-	ROM_LOAD16_BYTE( "b56-21.rom", 0x40001, 0x20000, CRC(e5f63790) SHA1(b81db7690a989146c438609d9633ddcb1fd219dd) )
+	ROM_LOAD16_BYTE( "b56-17.bin", 0x00000, 0x20000, CRC(3e0a9c35) SHA1(900a741b2abbbbe883b9d78162a88b4397af1a56) )
+	ROM_LOAD16_BYTE( "b56-16.bin", 0x00001, 0x20000, CRC(b447f12c) SHA1(58ee30337836f260c7fbda728dac93f06d861ec4) )
+	ROM_LOAD16_BYTE( "b56-15.bin", 0x40000, 0x20000, CRC(b346e282) SHA1(f6b4a2e9093a33d19c2eaf3ef9801179f39a83a3) )
+	ROM_LOAD16_BYTE( "b56-21.bin", 0x40001, 0x20000, CRC(e5f63790) SHA1(b81db7690a989146c438609d9633ddcb1fd219dd) )
 
 	ROM_REGION( 0x1c000, "audiocpu", 0 )		/* sound cpu */
-	ROM_LOAD( "b56-19.rom", 0x00000, 0x04000, CRC(c68085ee) SHA1(78634216a622a08c20dae0422283c4a7ed360546) )
+	ROM_LOAD( "b56-19.bin", 0x00000, 0x04000, CRC(c68085ee) SHA1(78634216a622a08c20dae0422283c4a7ed360546) )
 	ROM_CONTINUE(           0x10000, 0x0c000 )
 
 	ROM_REGION( 0x400000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "b56-04",     0x000000, 0x20000, CRC(f7afdff0) SHA1(8f8ea0e8da20913426ff3b58d7bb63bd352d3fb4) )
-	ROM_LOAD16_BYTE( "b56-08",     0x000001, 0x20000, CRC(c9f0d38a) SHA1(aa22f1a06e00f90c546eebcd8b42da3e3c7d0781) )
-	ROM_LOAD16_BYTE( "b56-03",     0x100000, 0x20000, CRC(4045fd44) SHA1(a84be9eedba7aed30d4f2841016784f8024d9443) )
-	ROM_LOAD16_BYTE( "b56-07",     0x100001, 0x20000, CRC(0c76e4c8) SHA1(e50d1bd6e8ec967ba03bd14097a9bd560aa2decc) )
-	ROM_LOAD16_BYTE( "b56-02",     0x200000, 0x20000, CRC(68c604ec) SHA1(75b26bfa53efa63b9c7a026f4226213364550cad) )
-	ROM_LOAD16_BYTE( "b56-06",     0x200001, 0x20000, CRC(5fbcd302) SHA1(22e7d835643945d501edc693dbe4efc8d4d074a7) )
-	ROM_LOAD16_BYTE( "b56-01.rom", 0x300000, 0x20000, CRC(766b7260) SHA1(f7d7176af614f06e8c66e890e4d194ffb6f7af73) )
-	ROM_LOAD16_BYTE( "b56-05.rom", 0x300001, 0x20000, CRC(ed390378) SHA1(0275e5ead206028bfcff7ecbe11c7ab961e648ea) )
+	ROM_LOAD16_BYTE( "b56-04.bin", 0x000000, 0x20000, CRC(f7afdff0) SHA1(8f8ea0e8da20913426ff3b58d7bb63bd352d3fb4) )
+	ROM_LOAD16_BYTE( "b56-08.bin", 0x000001, 0x20000, CRC(c9f0d38a) SHA1(aa22f1a06e00f90c546eebcd8b42da3e3c7d0781) )
+	ROM_LOAD16_BYTE( "b56-03.bin", 0x100000, 0x20000, CRC(4045fd44) SHA1(a84be9eedba7aed30d4f2841016784f8024d9443) )
+	ROM_LOAD16_BYTE( "b56-07.bin", 0x100001, 0x20000, CRC(0c76e4c8) SHA1(e50d1bd6e8ec967ba03bd14097a9bd560aa2decc) )
+	ROM_LOAD16_BYTE( "b56-02.bin", 0x200000, 0x20000, CRC(68c604ec) SHA1(75b26bfa53efa63b9c7a026f4226213364550cad) )
+	ROM_LOAD16_BYTE( "b56-06.bin", 0x200001, 0x20000, CRC(5fbcd302) SHA1(22e7d835643945d501edc693dbe4efc8d4d074a7) )
+	ROM_LOAD16_BYTE( "b56-01.bin", 0x300000, 0x20000, CRC(766b7260) SHA1(f7d7176af614f06e8c66e890e4d194ffb6f7af73) )
+	ROM_LOAD16_BYTE( "b56-05.bin", 0x300001, 0x20000, CRC(ed390378) SHA1(0275e5ead206028bfcff7ecbe11c7ab961e648ea) )
 
 	ROM_REGION( 0x80000, "ym.deltat", 0 )	/* samples */
 	ROM_LOAD( "b56-09.bin", 0x00000, 0x80000, CRC(7fd9ee68) SHA1(edc4455b3f6a6f30f418d03c6e53af875542a325) )
 
 	ROM_REGION( 0x80000, "ym", 0 )	/* samples */
 	ROM_LOAD( "b56-10.bin", 0x00000, 0x80000, CRC(de1bce59) SHA1(aa3aea30d6f53e60d9a0d4ec767e1b261d5efc8a) )
+
+	ROM_REGION( 0x02000, "user1", 0 ) /* zoom table / mixing? */
+	ROM_LOAD( "b56-18.bin", 0x00000, 0x02000, CRC(c88f0bbe) SHA1(18c87c744fbeca35d13033e50f62e5383eb4ec2c) )
+ROM_END
+
+ROM_START( gogold )
+	ROM_REGION( 0x80000, "maincpu", 0 )		/* main cpu */
+	ROM_LOAD16_BYTE( "b56-17.bin", 0x00000, 0x20000, CRC(3e0a9c35) SHA1(900a741b2abbbbe883b9d78162a88b4397af1a56) )
+	ROM_LOAD16_BYTE( "b56-16.bin", 0x00001, 0x20000, CRC(b447f12c) SHA1(58ee30337836f260c7fbda728dac93f06d861ec4) )
+	ROM_LOAD16_BYTE( "b56-15.bin", 0x40000, 0x20000, CRC(b346e282) SHA1(f6b4a2e9093a33d19c2eaf3ef9801179f39a83a3) )
+	ROM_LOAD16_BYTE( "b56-14.bin", 0x40001, 0x20000, CRC(b6c195b9) SHA1(80541d9a686fdc1850d764d8e00ba03526e7174c) )
+
+	ROM_REGION( 0x1c000, "audiocpu", 0 )		/* sound cpu */
+	ROM_LOAD( "b56-19.bin", 0x00000, 0x04000, CRC(c68085ee) SHA1(78634216a622a08c20dae0422283c4a7ed360546) )
+	ROM_CONTINUE(           0x10000, 0x0c000 )
+
+	ROM_REGION( 0x400000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "b56-04.bin", 0x000000, 0x20000, CRC(f7afdff0) SHA1(8f8ea0e8da20913426ff3b58d7bb63bd352d3fb4) )
+	ROM_LOAD16_BYTE( "b56-08.bin", 0x000001, 0x20000, CRC(c9f0d38a) SHA1(aa22f1a06e00f90c546eebcd8b42da3e3c7d0781) )
+	ROM_LOAD16_BYTE( "b56-03.bin", 0x100000, 0x20000, CRC(4045fd44) SHA1(a84be9eedba7aed30d4f2841016784f8024d9443) )
+	ROM_LOAD16_BYTE( "b56-07.bin", 0x100001, 0x20000, CRC(0c76e4c8) SHA1(e50d1bd6e8ec967ba03bd14097a9bd560aa2decc) )
+	ROM_LOAD16_BYTE( "b56-02.bin", 0x200000, 0x20000, CRC(68c604ec) SHA1(75b26bfa53efa63b9c7a026f4226213364550cad) )
+	ROM_LOAD16_BYTE( "b56-06.bin", 0x200001, 0x20000, CRC(5fbcd302) SHA1(22e7d835643945d501edc693dbe4efc8d4d074a7) )
+	ROM_LOAD16_BYTE( "b56-01.bin", 0x300000, 0x20000, CRC(766b7260) SHA1(f7d7176af614f06e8c66e890e4d194ffb6f7af73) )
+	ROM_LOAD16_BYTE( "b56-05.bin", 0x300001, 0x20000, CRC(ed390378) SHA1(0275e5ead206028bfcff7ecbe11c7ab961e648ea) )
+
+	ROM_REGION( 0x80000, "ym.deltat", 0 )	/* samples */
+	ROM_LOAD( "b56-09.bin", 0x00000, 0x80000, CRC(7fd9ee68) SHA1(edc4455b3f6a6f30f418d03c6e53af875542a325) )
+
+	ROM_REGION( 0x80000, "ym", 0 )	/* samples */
+	ROM_LOAD( "b56-10.bin", 0x00000, 0x80000, CRC(de1bce59) SHA1(aa3aea30d6f53e60d9a0d4ec767e1b261d5efc8a) )
+
+	ROM_REGION( 0x02000, "user1", 0 ) /* zoom table / mixing? */
+	ROM_LOAD( "b56-18.bin", 0x00000, 0x02000, CRC(c88f0bbe) SHA1(18c87c744fbeca35d13033e50f62e5383eb4ec2c) )
 ROM_END
 
 ROM_START( dleague )
@@ -739,7 +793,7 @@ ROM_START( dleague )
 	ROM_LOAD16_BYTE( "c02-09.9",  0x380000, 0x20000, CRC(a614d234) SHA1(dc68a6a8cf89ab82edc571853249643aa304d37f) )
 	ROM_LOAD16_BYTE( "c02-13.20", 0x380001, 0x20000, CRC(8eb3194d) SHA1(98290f77a03826cdf7c8238dd35da1f9349d5cf5) )
 
-	ROM_REGION( 0x02000, "gfx2", 0 )
+	ROM_REGION( 0x02000, "user1", 0 ) /* zoom table / mixing? */
 	ROM_LOAD( "c02-18.22", 0x00000, 0x02000, CRC(c88f0bbe) SHA1(18c87c744fbeca35d13033e50f62e5383eb4ec2c) )
 
 	ROM_REGION( 0x80000, "ym", 0 )	/* samples */
@@ -750,4 +804,5 @@ ROM_END
 /*  ( YEAR  NAME      PARENT    MACHINE   INPUT     INIT     MONITOR  COMPANY  FULLNAME */
 GAME( 1988, syvalion, 0,        syvalion, syvalion, 0,       ROT0,    "Taito Corporation", "Syvalion (Japan)", 0 )
 GAME( 1988, recordbr, 0,        recordbr, recordbr, 0,       ROT0,    "Taito Corporation Japan", "Recordbreaker (World)", 0 )
+GAME( 1988, gogold,   recordbr, recordbr, gogold,   0,       ROT0,    "Taito Corporation", "Go For The Gold (Japan)", 0 )
 GAME( 1990, dleague,  0,        dleague,  dleague,  0,       ROT0,    "Taito Corporation", "Dynamite League (Japan)", 0 )
