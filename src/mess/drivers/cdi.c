@@ -43,9 +43,9 @@ emu_timer *test_timer;
 
 #define ENABLE_UART_PRINTING (0)
 
-#define VERBOSE_LEVEL	(11)
+#define VERBOSE_LEVEL	(6)
 
-#define ENABLE_VERBOSE_LOG (0)
+#define ENABLE_VERBOSE_LOG (1)
 
 #if ENABLE_VERBOSE_LOG
 INLINE void verboselog(running_machine *machine, int n_level, const char *s_fmt, ...)
@@ -325,7 +325,7 @@ static void scc68070_set_timer_callback(int channel)
 	{
 		case 0:
 			compare = 0x10000 - scc68070_regs.timers.timer0;
-			period = attotime_mul(ATTOTIME_IN_HZ(CLOCK_A/10), compare);
+			period = attotime_mul(ATTOTIME_IN_HZ(CLOCK_A/30), compare);
             timer_adjust_oneshot(scc68070_regs.timers.timer0_timer, period, 0);
 			break;
 		default:
@@ -936,7 +936,7 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 			}
 			lba = nybbles[0] + nybbles[1]*10 + ((nybbles[2] + nybbles[3]*10)*75) + ((nybbles[4] + nybbles[5]*10)*75*60);
 
-			printf( "Reading Mode %d sector from MSF location %06x\n", cdic_regs.command - 0x28, cdic_regs.time | 2 );
+			//printf( "Reading Mode %d sector from MSF location %06x\n", cdic_regs.command - 0x28, cdic_regs.time | 2 );
 			verboselog(machine, 0, "Reading Mode %d sector from MSF location %06x\n", cdic_regs.command - 0x28, cdic_regs.time | 2 );
 
 			cdic_regs.data_buffer ^= 0x0001;
@@ -989,7 +989,7 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 				cdic_regs.data_buffer |= 0x4000;
 				cdic_regs.data_buffer &= 0x7fff;
 
-				printf( "Setting CDIC interrupt line\n" );
+				//printf( "Setting CDIC interrupt line\n" );
 				verboselog(machine, 0, "Setting CDIC interrupt line\n" );
 				cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), M68K_IRQ_4, 128);
 				cputag_set_input_line(machine, "maincpu", M68K_IRQ_4, ASSERT_LINE);
@@ -1042,7 +1042,7 @@ static READ16_HANDLER( cdic_r )
 			cputag_set_input_line(space->machine, "maincpu", M68K_IRQ_4, CLEAR_LINE);
 			verboselog(space->machine, 0, "cdic_r: Data buffer Register = %04x & %04x\n", temp, mem_mask);
 			verboselog(space->machine, 0, "Clearing CDIC interrupt line\n" );
-			printf("Clearing CDIC interrupt line\n" );
+			//printf("Clearing CDIC interrupt line\n" );
 			return temp;
 		}
 		default:
@@ -1098,7 +1098,7 @@ static WRITE16_HANDLER( cdic_w )
 			verboselog(space->machine, 0, "memory address counter: %08x\n", scc68070_regs.dma.channel[0].memory_address_counter);
 			verboselog(space->machine, 0, "cdic_w: DMA Control Register = %04x & %04x\n", data, mem_mask);
 			verboselog(space->machine, 0, "Doing copy, transferring %04x bytes\n", count * 2 );
-			printf("Doing copy, transferring %04x bytes\n", count * 2 );
+			//printf("Doing copy, transferring %04x bytes\n", count * 2 );
 			if((start & 0x00f00000) == 0x00200000)
 			{
 				start -= 0x00200000;
@@ -1109,10 +1109,10 @@ static WRITE16_HANDLER( cdic_w )
 				memory[index] = cdram[src_index++];
 				if(cdic_regs.time == 0x00332400 || cdic_regs.time == 0x00332500)
 				{
-					printf( "%04x ", cdram[src_index - 1] );
+					//printf( "%04x ", cdram[src_index - 1] );
 				}
 			}
-			printf( "\n" );
+			//printf( "\n" );
 			scc68070_regs.dma.channel[0].memory_address_counter += scc68070_regs.dma.channel[0].transfer_counter * 2;
 			break;
 		}
@@ -1135,12 +1135,12 @@ static WRITE16_HANDLER( cdic_w )
 				{
 					case 0x23: // Reset Mode 1
 					case 0x24: // Reset Mode 2
+					case 0x2e: // Abort
 						timer_adjust_oneshot(cdic_regs.interrupt_timer, attotime_never, 0);
 						cdic_regs.data_buffer &= 0x3fff;
 						break;
 					case 0x29: // Read Mode 1
 					case 0x2a: // Read Mode 2
-					case 0x2e: // Abort
 						timer_adjust_oneshot(cdic_regs.interrupt_timer, ATTOTIME_IN_HZ(75), 0); // 75Hz = 1x CD-ROM speed
 						break;
 				}
@@ -1230,6 +1230,7 @@ static READ16_HANDLER( slave_r )
 				case 0xb0:
 				case 0xb1:
 				case 0xf0:
+				case 0xf3:
 				case 0xf7:
 					verboselog(space->machine, 0, "slave_r: De-asserting IRQ2\n" );
 					cputag_set_input_line(space->machine, "maincpu", M68K_IRQ_2, CLEAR_LINE);
@@ -1402,8 +1403,8 @@ static WRITE16_HANDLER( slave_w )
 							//memset(slave_regs.in_buf, 0, 17);
 							//slave_regs.in_index = 0;
 							//slave_regs.in_count = 0;
-							//slave_prepare_readback(space->machine, ATTOTIME_IN_HZ(10000), 3, 4, 0xb1, 0x00, 0x02, 0x00, 0xb1);
-							break;
+							//slave_prepare_readback(space->machine, ATTOTIME_IN_HZ(10000), 3, 4, 0xb1, 0x00, 0x00, 0x00, 0xb1);
+							//break;
 						default:
 							memset(slave_regs.in_buf, 0, 17);
 							slave_regs.in_index = 0;
@@ -1428,14 +1429,13 @@ static WRITE16_HANDLER( slave_w )
 						break;
 					case 0xf0: // Get SLAVE revision
 						verboselog(space->machine, 0, "slave_w: Channel %d: Get SLAVE Revision (0xf0)\n", offset );
+						slave_prepare_readback(space->machine, ATTOTIME_IN_HZ(10000), 2, 2, 0x32, 0x31, 0, 0, 0xf0);
 						slave_regs.in_index = 0;
-						slave_regs.in_buf[0] = 0;
-						slave_regs.channel[0].out_index = 0;
-						slave_regs.channel[0].out_count = 2;
-						slave_regs.channel[0].out_buf[0] = 0x32;
-						slave_regs.channel[0].out_buf[1] = 0x31;
-						slave_regs.channel[0].out_cmd = 0xf0;
-						slave_prepare_readback(space->machine, ATTOTIME_IN_HZ(10000), 2, 2, 0xf6, 1, 0, 0, 0xf0);
+						break;
+					case 0xf3: // Query Pointer Type
+						verboselog(space->machine, 0, "slave_w: Channel %d: Query Pointer Type (0xf3)\n", offset );
+						slave_regs.in_index = 0;
+						slave_prepare_readback(space->machine, ATTOTIME_IN_HZ(10000), 2, 2, 0xf3, 1, 0, 0, 0xf3);
 						break;
 					case 0xf6: // NTSC/PAL
 						verboselog(space->machine, 0, "slave_w: Channel %d: Check NTSC/PAL (0xf6)\n", offset );
@@ -2133,7 +2133,38 @@ static void mcd212_process_dca(running_machine *machine, int channel)
 	mcd212.channel[channel].dca = addr * 2;
 }
 
-static UINT8 mcd212_dyuv_quantizer[16] = { 0, 1, 4, 9, 16, 27, 44, 79, 128, 177, 212, 229, 240, 247, 252, 255 };
+typedef UINT8 BYTE68K;
+typedef UINT16 WORD68K;
+typedef INT16 SWORD68K;
+
+#define BYTE68K_MAX 255
+
+//* Delta decoding array.
+static BYTE68K mcd212_abDelta[16] = { 0, 1, 4, 9, 16, 27, 44, 79, 128, 177, 212, 229, 240, 247, 252, 255 };
+
+//* Color limit array.
+BYTE68K mcd212_abLimit[3 * BYTE68K_MAX];
+
+//* Color clamp array.
+BYTE68K mcd212_abClamp[3 * BYTE68K_MAX];
+
+//* U-to-B matrix array.
+SWORD68K mcd212_abMatrixUB[BYTE68K_MAX + 1];
+
+//* U-to-G matrix array.
+SWORD68K mcd212_abMatrixUG[BYTE68K_MAX + 1];
+
+//* V-to-G matrix array.
+SWORD68K mcd212_abMatrixVG[BYTE68K_MAX + 1];
+
+//* V-to-R matrix array.
+SWORD68K mcd212_abMatrixVR[BYTE68K_MAX + 1];
+
+//* Delta-Y decoding array.
+BYTE68K mcd212_abDeltaY[BYTE68K_MAX + 1];
+
+//* Delta-U/V decoding array.
+BYTE68K mcd212_abDeltaUV[BYTE68K_MAX + 1];
 
 INLINE UINT8 MCD212_LIM(INT32 in)
 {
@@ -2190,55 +2221,66 @@ static void mcd212_process_vsr(running_machine *machine, int channel, UINT32 *pi
 					// 8-bit Bitmap
 					if(icm == 5)
 					{
-						UINT8 y;
-						INT16 u;
-						INT16 v;
+						BYTE68K bY;
+						BYTE68K bU;
+						BYTE68K bV;
 						switch(channel)
 						{
 							case 0:
-								y = (mcd212.channel[0].dyuv_abs_start_a >> 16) & 0x000000ff;
-								u = (mcd212.channel[0].dyuv_abs_start_a >>  8) & 0x000000ff;
-								v = (mcd212.channel[0].dyuv_abs_start_a >>  0) & 0x000000ff;
+								bY = (mcd212.channel[0].dyuv_abs_start_a >> 16) & 0x000000ff;
+								bU = (mcd212.channel[0].dyuv_abs_start_a >>  8) & 0x000000ff;
+								bV = (mcd212.channel[0].dyuv_abs_start_a >>  0) & 0x000000ff;
 								break;
 							case 1:
-								y = (mcd212.channel[1].dyuv_abs_start_b >> 16) & 0x000000ff;
-								u = (mcd212.channel[1].dyuv_abs_start_b >>  8) & 0x000000ff;
-								v = (mcd212.channel[1].dyuv_abs_start_b >>  0) & 0x000000ff;
+								bY = (mcd212.channel[1].dyuv_abs_start_b >> 16) & 0x000000ff;
+								bU = (mcd212.channel[1].dyuv_abs_start_b >>  8) & 0x000000ff;
+								bV = (mcd212.channel[1].dyuv_abs_start_b >>  0) & 0x000000ff;
 								break;
 							default:
-								y = u = v = 0x80;
+								bY = bU = bV = 0x80;
 								break;
 						}
 						for(; x < 768;)
 						{
-							UINT8 r, g, b;
-							UINT16 curr = (byte << 8) | data[vsr++ ^ 1];
-							UINT16 next = (x < 766) ? ((data[(vsr + 1) ^ 1] << 8) | data[(vsr + 2) ^ 1]) : curr;
-							UINT8 y0 = (INT8)mcd212_dyuv_quantizer[(curr >>  8) & 0x000f];
-							INT16 u0 = (INT8)mcd212_dyuv_quantizer[(curr >> 12) & 0x000f];
-							INT16 v0 = (INT8)mcd212_dyuv_quantizer[(curr >>  4) & 0x000f];
-							UINT8 y1 = (INT8)mcd212_dyuv_quantizer[(curr >>  0) & 0x000f];
-							INT16 ut = (INT8)mcd212_dyuv_quantizer[(next >> 12) & 0x000f];
-							INT16 vt = (INT8)mcd212_dyuv_quantizer[(next >>  4) & 0x000f];
-							INT16 u1 = (u0 + ut) / 2;
-							INT16 v1 = (v0 + vt) / 2;
-							u += u0;
-							v += v0;
-							y += y0;
-            				r = MCD212_LIM( ((y << 8) + 351 * (v - 128)) >> 8 );
-            				g = MCD212_LIM( ((y << 8) + (86 * (u - 128) + 179 * (v - 128))) >> 8 );
-            				b = MCD212_LIM( ((y << 8) + 444 * (u - 128)) >> 8 );
-            				pixels[x++] = (r << 16) | (g << 8) | b;
-            				pixels[x++] = (r << 16) | (g << 8) | b;
-							u += u1;
-							v += v1;
-							y += y1;
-            				r = MCD212_LIM( ((y << 8) + 351 * (v - 128)) >> 8 );
-            				g = MCD212_LIM( ((y << 8) + (86 * (u - 128) + 179 * (v - 128))) >> 8 );
-            				b = MCD212_LIM( ((y << 8) + 444 * (u - 128)) >> 8 );
-            				pixels[x++] = (r << 16) | (g << 8) | b;
-            				pixels[x++] = (r << 16) | (g << 8) | b;
-							byte = data[vsr++ ^ 1];
+            				BYTE68K b0 = byte;
+            				BYTE68K bU1 = bU + mcd212_abDeltaUV[b0];
+            				BYTE68K bY0 = bY + mcd212_abDeltaY[b0];
+
+            				BYTE68K b1 = data[vsr++ ^ 1];
+            				BYTE68K bV1 = bV + mcd212_abDeltaUV[b1];
+            				BYTE68K bY1 = bY0 + mcd212_abDeltaY[b1];
+
+            				BYTE68K bU0 = (bU + bU1) >> 1;
+            				BYTE68K bV0 = (bV + bV1) >> 1;
+
+							BYTE68K *pbLimit;
+							BYTE68K bB, bG, bR;
+
+							bY = bY0;
+							bU = bU0;
+							bV = bV0;
+
+            				pbLimit = mcd212_abLimit + bY + BYTE68K_MAX;
+            				bB = pbLimit[mcd212_abMatrixUB[bU]];
+            				bG = pbLimit[mcd212_abMatrixUG[bU] + mcd212_abMatrixVG[bV]];
+            				bR = pbLimit[mcd212_abMatrixVR[bV]];
+
+            				pixels[x++] = (bR << 16) | (bG << 8) | bB;
+            				pixels[x++] = (bR << 16) | (bG << 8) | bB;
+
+            				bY = bY1;
+            				bU = bU1;
+            				bV = bV1;
+
+            				pbLimit = mcd212_abLimit + bY + BYTE68K_MAX;
+            				bB = pbLimit[mcd212_abMatrixUB[bU]];
+            				bG = pbLimit[mcd212_abMatrixUG[bU] + mcd212_abMatrixVG[bV]];
+            				bR = pbLimit[mcd212_abMatrixVR[bV]];
+
+            				pixels[x++] = (bR << 16) | (bG << 8) | bB;
+            				pixels[x++] = (bR << 16) | (bG << 8) | bB;
+
+            				byte = data[vsr++ ^ 1];
 						}
 						mcd212_set_vsr(channel, vsr - 1);
 					}
@@ -2273,7 +2315,6 @@ static void mcd212_process_vsr(running_machine *machine, int channel, UINT32 *pi
 				else
 				{
 					// 8-bit RLE
-					fflush(stdout);
 					if(byte & 0x80)
 					{
 						// Run length
@@ -2526,6 +2567,37 @@ TIMER_CALLBACK( mcd212_perform_scan )
 
 static VIDEO_START(cdi)
 {
+	WORD68K w = 0;
+	SWORD68K sw = 0;
+	WORD68K d = 0;
+
+    // Initialize delta decoding arrays for each unsigned byte value b.
+    for(d = 0; d < BYTE68K_MAX + 1; d++)
+    {
+        mcd212_abDeltaY[d] = mcd212_abDelta[d & 15];
+    }
+
+    // Initialize delta decoding arrays for each unsigned byte value b.
+    for(d = 0; d < (BYTE68K_MAX + 1); d++)
+    {
+        mcd212_abDeltaUV[d] = mcd212_abDelta[d >> 4];
+    }
+
+    // Initialize color limit and clamp arrays.
+	for(w = 0; w < 3 * BYTE68K_MAX; w++)
+	{
+		mcd212_abLimit[w] = (w < BYTE68K_MAX + 16) ?  0 : w <= 16 + 2 * BYTE68K_MAX ? w - BYTE68K_MAX - 16 : BYTE68K_MAX;
+		mcd212_abClamp[w] = (w < BYTE68K_MAX + 32) ? 16 : w <= 16 + 2 * BYTE68K_MAX ? w - BYTE68K_MAX - 16 : BYTE68K_MAX;
+	}
+
+	for (sw = 0; sw < 0x100; sw++)
+	{
+		mcd212_abMatrixUB[sw] = (444 * (sw - 128)) / 256;
+		mcd212_abMatrixUG[sw] = - (86 * (sw - 128)) / 256;
+		mcd212_abMatrixVG[sw] = - (179 * (sw - 128)) / 256;
+		mcd212_abMatrixVR[sw] = (351 * (sw - 128)) / 256;
+	}
+
 	VIDEO_START_CALL(generic_bitmapped);
 	mcd212.channel[0].csrr = 0x00;
 	mcd212.channel[1].csrr = 0x00;
@@ -2558,6 +2630,7 @@ TIMER_CALLBACK( test_timer_callback )
 *      Memory maps       *
 *************************/
 
+/*
 static WRITE16_HANDLER(cdic_ram_w)
 {
 	verboselog(space->machine, 0, "cdic_ram_w: %08x = %04x & %04x\n", 0x00300000 + offset*2, data, mem_mask);
@@ -2569,20 +2642,20 @@ static READ16_HANDLER(cdic_ram_r)
 	verboselog(space->machine, 0, "cdic_ram_r: %08x = %04x & %04x\n", 0x00300000 + offset*2, cdram[offset], mem_mask);
 	return cdram[offset];
 }
+*/
 
 static ADDRESS_MAP_START( cdimono1_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_BASE(&planea)
 	AM_RANGE(0x00200000, 0x0027ffff) AM_RAM AM_BASE(&planeb)
 #if ENABLE_UART_PRINTING
 	AM_RANGE(0x00301400, 0x00301403) AM_READ(uart_loopback_enable)
-	//AM_RANGE(0x00301404, 0x00303bff) AM_RAM
-#else
-	AM_RANGE(0x00300000, 0x00303bff) AM_READWRITE(cdic_ram_r, cdic_ram_w) AM_BASE(&cdram)
 #endif
+	//AM_RANGE(0x00300000, 0x00303bff) AM_READWRITE(cdic_ram_r, cdic_ram_w) AM_BASE(&cdram)
+	AM_RANGE(0x00300000, 0x00303bff) AM_RAM AM_BASE(&cdram)
 	AM_RANGE(0x00303c00, 0x00303fff) AM_READWRITE(cdic_r, cdic_w)
 	AM_RANGE(0x00310000, 0x00317fff) AM_READWRITE(slave_r, slave_w)
 	//AM_RANGE(0x00318000, 0x0031ffff) AM_NOP
-	AM_RANGE(0x00320000, 0x00323fff) AM_READWRITE(m48t08_r, m48t08_w)
+	AM_RANGE(0x00320000, 0x00323fff) AM_READWRITE(m48t08_r, m48t08_w) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x00400000, 0x0047ffff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x004fffe0, 0x004fffff) AM_READWRITE(mcd212_r, mcd212_w)
 	AM_RANGE(0x00500000, 0x0057ffff) AM_RAM
@@ -2654,6 +2727,7 @@ static MACHINE_DRIVER_START( cdimono1 )
 
 	MDRV_PALETTE_LENGTH(0x100)
 
+	MDRV_NVRAM_HANDLER(generic_0fill)
 	MDRV_VIDEO_START(cdi)
 	MDRV_VIDEO_UPDATE(generic_bitmapped)
 
