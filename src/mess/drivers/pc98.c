@@ -221,11 +221,15 @@
 
 static UINT32 *pc9801_vram;
 static UINT32 *gfx_bitmap_ram;
+static UINT32 *work_ram_banked;
 static UINT8 ems_bank;
+static UINT8 wram_bank;
+
 
 static VIDEO_START( pc9801 )
 {
 	gfx_bitmap_ram = auto_alloc_array(machine, UINT32, 0x18000*2);
+	work_ram_banked = auto_alloc_array(machine, UINT32, 0x2000*0xfe); //shouldn't be here
 }
 
 /*
@@ -395,6 +399,19 @@ static WRITE8_HANDLER( port_a0_w )
 
 static WRITE8_HANDLER( ems_sel_w )
 {
+//	printf("%02x %02x\n",offset,data);
+
+	if(offset == 1)
+	{
+		UINT8 *ROM = memory_region(space->machine, "cpudata");
+
+		if(data == 0x00 || data == 0x10)
+			memory_set_bankptr(space->machine, 1, &ROM[0x20000]);
+
+		if(data == 0x02 || data == 0x12)
+			memory_set_bankptr(space->machine, 1, &ROM[0x00000]);
+	}
+
 	if(offset == 3)
 	{
 		if(data == 0x22)
@@ -455,16 +472,77 @@ static WRITE8_HANDLER( port_00_w )
 	}
 }
 
+static UINT8 gate_a20;
+
+static READ8_HANDLER( port_f0_r )
+{
+	if(offset == 0x02)
+		return (gate_a20 ^ 1) | 0x2e;
+	else if(offset == 0x06)
+		return (gate_a20 ^ 1) | 0x5e;
+
+	return 0x00;
+}
+
+static WRITE8_HANDLER( port_f0_w )
+{
+	if(offset == 0x00)
+	{
+		//cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_RESET, PULSE_LINE);
+	}
+
+	if(offset == 0x02)
+	{
+		gate_a20 = 1;
+		cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_A20, gate_a20);
+	}
+	if(offset == 0x06)
+	{
+		if(data == 0x02)
+		{
+			gate_a20 = 1;
+			cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_A20, gate_a20);
+		}
+		else if(data == 0x03)
+		{
+			gate_a20 = 0;
+			cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_A20, gate_a20);
+		}
+	}
+}
+
+static UINT8 wram_latch_reg;
+
+static READ8_HANDLER( wram_sel_r )
+{
+	return (wram_bank << 1) | wram_latch_reg;
+}
+
+static WRITE8_HANDLER( wram_sel_w )
+{
+	wram_bank = (data & 0xfe) >> 1;
+	wram_latch_reg = data & 1; //<- correct?
+	//printf("%02x\n",wram_bank);
+}
+
 static READ32_HANDLER( gfx_bitmap_ram_r ) { return gfx_bitmap_ram[offset+ems_bank*0x18000/4]; }
-static WRITE32_HANDLER( gfx_bitmap_ram_w ) { gfx_bitmap_ram[offset+ems_bank*0x18000/4] = data; }
+static WRITE32_HANDLER( gfx_bitmap_ram_w ) { COMBINE_DATA(&gfx_bitmap_ram[offset+ems_bank*0x18000/4]); }
+
+static READ32_HANDLER( wram_bank_r ) { return work_ram_banked[offset+wram_bank*0x2000/4]; }
+static WRITE32_HANDLER( wram_bank_w ) { COMBINE_DATA(&work_ram_banked[offset+wram_bank*0x2000/4]); }
+
+static READ32_HANDLER( wram_ide_r ) { return work_ram_banked[offset+4*0x2000/4]; } //todo: ide hookup & calculate the correct bank number here
+static WRITE32_HANDLER( wram_ide_w ) { COMBINE_DATA(&work_ram_banked[offset+4*0x2000/4]); }
 
 static ADDRESS_MAP_START( pc9801_mem, ADDRESS_SPACE_PROGRAM, 32)
-	AM_RANGE(0x00000000, 0x0009ffff) AM_MIRROR(0x00100000) AM_RAM
+	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM
+	AM_RANGE(0x00080000, 0x0009ffff) AM_READWRITE(wram_bank_r,wram_bank_w)
 	AM_RANGE(0x000a0000, 0x000a3fff) AM_RAM AM_BASE(&pc9801_vram) //vram + attr
 	AM_RANGE(0x000a4000, 0x000a4fff) AM_RAM //cg window
 	AM_RANGE(0x000a8000, 0x000bffff) AM_READWRITE(gfx_bitmap_ram_r,gfx_bitmap_ram_w)
-	AM_RANGE(0x000e0000, 0x000fffff) AM_ROM AM_REGION("maincpu",0)
-	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("maincpu",0)
+	AM_RANGE(0x000c0000, 0x000dffff) AM_READWRITE(wram_ide_r,wram_ide_w)
+	AM_RANGE(0x000e0000, 0x000fffff) AM_ROMBANK(1)
+	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROMBANK(1)
 ADDRESS_MAP_END
 
 
@@ -491,7 +569,9 @@ static ADDRESS_MAP_START( pc9801_io, ADDRESS_SPACE_IO, 32)
 	AM_RANGE(0x0070, 0x007f) AM_READWRITE8(port_70_r,port_70_w,0xffffffff) // crtc regs (even ports) / pit8253 (odd ports)
 	AM_RANGE(0x00a0, 0x00a3) AM_READWRITE8(port_a0_r,port_a0_w,0xffffffff) // uPD7220 status & fifo (R) / param & cmd (W) slave (even ports)
 // 	AM_RANGE(0x00e0, 0x00ef) DMA
+	AM_RANGE(0x00f0, 0x00ff) AM_READWRITE8(port_f0_r,port_f0_w,0xffffffff)
 	AM_RANGE(0x043c, 0x043f) AM_WRITE8(ems_sel_w,0xffffffff)
+	AM_RANGE(0x0460, 0x0463) AM_READWRITE8(wram_sel_r,wram_sel_w,0xffffffff)
 
 //	(and many more...)
 ADDRESS_MAP_END
@@ -518,14 +598,38 @@ static IRQ_CALLBACK(irq_callback)
 	return r;
 }
 
+#include "cpu/i386/i386priv.h"
+
+
 static MACHINE_RESET(pc9801)
 {
+	UINT8 *ROM = memory_region(machine, "cpudata");
+
 	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), irq_callback);
+
+	cputag_set_input_line(machine, "maincpu", INPUT_LINE_A20, 0);
+
+	gate_a20 = 0;
+	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), I386_EIP, 0xffff0+0x10000);
+
+	memory_set_bankptr(machine, 1, &ROM[0x20000]);
+
+	wram_bank = 0;
 }
 
 static MACHINE_RESET(pc9821)
 {
+	UINT8 *ROM = memory_region(machine, "cpudata");
 	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), irq_callback);
+
+	cputag_set_input_line(machine, "maincpu", INPUT_LINE_A20, 0);
+
+	gate_a20 = 0;
+	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), I386_EIP, 0xffff0+0x10000);
+
+	memory_set_bankptr(machine, 1, &ROM[0x20000]);
+
+	wram_bank = 0;
 }
 
 /*************************************************************
@@ -817,9 +921,9 @@ MACHINE_DRIVER_END
 
 /* I strongly suspect this dump comes from a later machine, like an i386-based one, but I could be wrong... */
 ROM_START( pc9801 )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "bios.rom", 0x00000, 0x18000, CRC(315d2703) SHA1(4f208d1dbb68373080d23bff5636bb6b71eb7565) )
-	ROM_LOAD( "itf.rom",  0x18000, 0x08000, CRC(c1815325) SHA1(a2fb11c000ed7c976520622cfb7940ed6ddc904e) )
+	ROM_REGION( 0x60000, "cpudata", ROMREGION_ERASEFF )
+	ROM_LOAD( "bios.rom", 0x08000, 0x18000, CRC(315d2703) SHA1(4f208d1dbb68373080d23bff5636bb6b71eb7565) )
+	ROM_LOAD( "itf.rom",  0x38000, 0x08000, CRC(c1815325) SHA1(a2fb11c000ed7c976520622cfb7940ed6ddc904e) )
 
 	/* where shall we load this? */
 	ROM_REGION( 0x100000, "memory", 0 )
@@ -840,9 +944,9 @@ ROM_START( pc9801 )
 ROM_END
 
 ROM_START( pc9821 )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "bios.rom", 0x00000, 0x18000, CRC(34a19a59) SHA1(2e92346727b0355bc1ec9a7ded1b444a4917f2b9) )
-	ROM_LOAD( "itf.rom",  0x00000, 0x08000, CRC(dd4c7bb8) SHA1(cf3aa193df2722899066246bccbed03f2e79a74a) )
+	ROM_REGION( 0x60000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "bios.rom", 0x08000, 0x18000, CRC(34a19a59) SHA1(2e92346727b0355bc1ec9a7ded1b444a4917f2b9) )
+	ROM_LOAD( "itf.rom",  0x38000, 0x08000, CRC(dd4c7bb8) SHA1(cf3aa193df2722899066246bccbed03f2e79a74a) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "sound.rom", 0x0000, 0x4000, CRC(a21ef796) SHA1(34137c287c39c44300b04ee97c1e6459bb826b60) )
