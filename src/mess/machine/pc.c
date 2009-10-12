@@ -605,7 +605,7 @@ static READ8_DEVICE_HANDLER (ibm5150_ppi_porta_r)
 	int data = 0xFF;
 	running_machine *machine = device->machine;
 	pc_state *st = device->machine->driver_data;
-	
+
 	/* KB port A */
 	if (st->ppi_keyboard_clear)
 	{
@@ -806,7 +806,7 @@ static WRITE8_HANDLER( ibm5150_kb_set_clock_signal )
 static WRITE8_HANDLER( ibm5150_kb_set_data_signal )
 {
 	pc_state *st = space->machine->driver_data;
-	
+
 	st->ppi_data_signal = data;
 
 	st->ppi_data_callback( space, 0, st->ppi_data_signal );
@@ -816,7 +816,7 @@ static WRITE8_HANDLER( ibm5150_kb_set_data_signal )
 static void ibm5150_set_keyboard_interface( running_machine *machine, write8_space_func clock_cb, write8_space_func data_cb )
 {
 	pc_state *st = machine->driver_data;
-	
+
 	st->ppi_clock_callback = clock_cb;
 	st->ppi_data_callback = data_cb;
 }
@@ -840,7 +840,7 @@ static READ8_DEVICE_HANDLER (ibm5160_ppi_porta_r)
 	int data = 0xFF;
 	running_machine *machine = device->machine;
 	pc_state *st = device->machine->driver_data;
-	
+
 	/* KB port A */
 	if (st->ppi_keyboard_clear)
 	{
@@ -935,7 +935,7 @@ I8255A_INTERFACE( ibm5160_ppi8255_interface )
 
 static READ8_DEVICE_HANDLER (pc_ppi_porta_r)
 {
-	int data = 0xFF;	
+	int data = 0xFF;
 	running_machine *machine = device->machine;
 	pc_state *st = device->machine->driver_data;
 
@@ -1181,7 +1181,7 @@ DRIVER_INIT( pccga )
 DRIVER_INIT( bondwell )
 {
 	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_PC, NULL, pc_set_irq_line);
-	pc_turbo_setup(machine, 0, "DSW2", 0x02, 4.77/12, 1);
+	pc_turbo_setup(machine, machine->firstcpu, "DSW2", 0x02, 4.77/12, 1);
 
 	/* Attach keyboard to the keyboard controller */
 	ibm5150_set_keyboard_interface( machine, kb_keytronic_set_clock_signal, kb_keytronic_set_data_signal );
@@ -1223,7 +1223,7 @@ DRIVER_INIT( europc )
 DRIVER_INIT( t1000hx )
 {
 	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
-	pc_turbo_setup(machine, 0, "DSW2", 0x02, 4.77/12, 1);
+	pc_turbo_setup(machine, machine->firstcpu, "DSW2", 0x02, 4.77/12, 1);
 }
 
 DRIVER_INIT( pc200 )
@@ -1239,7 +1239,7 @@ DRIVER_INIT( pc200 )
 	memory_install_read16_handler( space, 0xb0000, 0xbffff, 0, 0, pc200_videoram16le_r );
 	memory_install_write16_handler( space, 0xb0000, 0xbffff, 0, 0, pc200_videoram16le_w );
 	videoram_size=0x10000;
-	videoram=memory_region(machine, "maincpu")+0xb0000;	
+	videoram=memory_region(machine, "maincpu")+0xb0000;
 	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
 }
 
@@ -1256,7 +1256,7 @@ DRIVER_INIT( ppc512 )
 	memory_install_read16_handler( space, 0xb0000, 0xbffff, 0, 0, pc200_videoram16le_r );
 	memory_install_write16_handler( space, 0xb0000, 0xbffff, 0, 0, pc200_videoram16le_w );
 	videoram_size=0x10000;
-	videoram=memory_region(machine, "maincpu")+0xb0000;	
+	videoram=memory_region(machine, "maincpu")+0xb0000;
 	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
 	mc146818_init(machine, MC146818_IGNORE_CENTURY);
 }

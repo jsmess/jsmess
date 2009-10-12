@@ -142,7 +142,7 @@ static DRIVER_INIT( palm )
 
 static const mc68328_interface palm_dragonball_iface =
 {
-    0,
+	"maincpu",
 
     NULL,                   // Port A Output
     NULL,                   // Port B Output

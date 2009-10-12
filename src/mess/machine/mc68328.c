@@ -8,7 +8,6 @@
 **********************************************************************/
 
 #include "driver.h"
-#include "mslegacy.h"
 #include "cpu/m68000/m68000.h"
 #include "includes/mc68328.h"
 #include "mc68328.h"
@@ -31,7 +30,7 @@ INLINE void verboselog(running_machine *machine, int n_level, const char *s_fmt,
 static void mc68328_set_interrupt_line(const device_config *device, UINT32 line, UINT32 active)
 {
     mc68328_t* mc68328 = mc68328_get_safe_token( device );
-	const device_config *cpu = cpu_get_by_index(device->machine, mc68328->iface->parent_m68k_cpu_index);
+    const device_config *cpu = devtag_get_device(device->machine, mc68328->iface->m68k_cpu_tag);
 
     if(active)
     {

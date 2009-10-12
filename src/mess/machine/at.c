@@ -497,7 +497,7 @@ static READ8_HANDLER( at_kbdc8042_p2_r )
 static WRITE8_HANDLER( at_kbdc8042_p2_w )
 {
 	at_state *st = space->machine->driver_data;
-	
+
 	logerror("%04x: writing $%02x to P2\n", cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")), data );
 
 	at_set_gate_a20( space->machine, ( data & 0x02 ) ? 1 : 0 );
@@ -567,7 +567,7 @@ READ8_HANDLER(at_kbdc8042_r)
 	static int poll_delay = 4;
     UINT8 data = 0;
 	at_state *st = space->machine->driver_data;
-	
+
 	switch ( offset )
 	{
 	case 0:		/* A2 is wired to 8042 A0 */
@@ -746,7 +746,7 @@ DRIVER_INIT( at_vga )
 	};
 
 	init_at_common(machine, &at8042);
-	pc_turbo_setup(machine, 0, "DSW2", 0x02, 4.77/12, 1);
+	pc_turbo_setup(machine, machine->firstcpu, "DSW2", 0x02, 4.77/12, 1);
 	pc_vga_init(machine, &vga_interface, NULL);
 
 	/* Attach keyboard to the keyboard controller */
@@ -763,7 +763,7 @@ DRIVER_INIT( ps2m30286 )
 		KBDC8042_PS2, at_set_gate_a20, at_keyboard_interrupt, at_get_out2
 	};
 	init_at_common(machine, &at8042);
-	pc_turbo_setup(machine, 0, "DSW2", 0x02, 4.77/12, 1);
+	pc_turbo_setup(machine, machine->firstcpu, "DSW2", 0x02, 4.77/12, 1);
 	pc_vga_init(machine, &vga_interface, NULL);
 
 	/* Attach keyboard to the keyboard controller */

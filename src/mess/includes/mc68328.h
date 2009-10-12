@@ -97,7 +97,7 @@
 typedef struct _mc68328_interface mc68328_interface;
 struct _mc68328_interface
 {
-    int parent_m68k_cpu_index;
+    const char *m68k_cpu_tag;
 
     write8_device_func  out_port_a_func;    /* 8-bit output */
     write8_device_func  out_port_b_func;    /* 8-bit output */

@@ -7,13 +7,12 @@
 **********************************************************************/
 
 #include "driver.h"
-#include "mslegacy.h"
 #include "pc_turbo.h"
 
 
 struct pc_turbo_info
 {
-	int cpunum;
+	const device_config *cpu;
 	const char *port;
 	int mask;
 	int cur_val;
@@ -33,18 +32,18 @@ static TIMER_CALLBACK(pc_turbo_callback)
 	if (val != ti->cur_val)
 	{
 		ti->cur_val = val;
-		cpu_set_clockscale(cpu_get_by_index(machine, ti->cpunum), val ? ti->on_speed : ti->off_speed);
+		cpu_set_clockscale(ti->cpu, val ? ti->on_speed : ti->off_speed);
 	}
 }
 
 
 
-int pc_turbo_setup(running_machine *machine, int cpunum, const char *port, int mask, double off_speed, double on_speed)
+int pc_turbo_setup(running_machine *machine, const device_config *cpu, const char *port, int mask, double off_speed, double on_speed)
 {
 	struct pc_turbo_info *ti;
 
 	ti = auto_alloc(machine, struct pc_turbo_info);
-	ti->cpunum = cpunum;
+	ti->cpu = cpu;
 	ti->port = port;
 	ti->mask = mask;
 	ti->cur_val = -1;

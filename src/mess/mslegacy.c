@@ -76,20 +76,3 @@ const char * ui_getstring (int string_num)
 {
 	return mess_default_text[string_num];
 }
-
-
-
-/***************************************************************************
-    CPU
-***************************************************************************/
-
-const device_config *cpu_get_by_index(running_machine *machine, int index)
-{
-	const device_config *cpu = cpu_first(machine->config);
-	while((cpu != NULL) && (index > 0))
-	{
-		cpu = cpu_next(cpu);
-		index--;
-	}
-	return cpu;
-}
