@@ -944,13 +944,8 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 			cdrom_read_data(cdic_regs.cd, lba, buffer, CD_TRACK_RAW_DONTCARE);
 			for(index = 6; index < 2352/2; index++)
 			{
-				if(cdic_regs.time == 0x00332300 || cdic_regs.time == 0x00332400)
-				{
-					//printf( "%02x %02x ", buffer[index*2], buffer[index*2 + 1] );
-				}
 				cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + (index - 6)] = (buffer[index*2] << 8) | buffer[index*2 + 1];
 			}
-			//printf( "\n" );
 
 			cdic_regs.time += 0x100;
 			if((cdic_regs.time & 0x00000f00) == 0xa00)
@@ -1175,6 +1170,12 @@ typedef struct
 	UINT8 xbus_interrupt_enable;
 
 	UINT8 lcd_state[16];
+
+	UINT16 real_mouse_x;
+	UINT16 real_mouse_y;
+
+	UINT16 fake_mouse_x;
+	UINT16 fake_mouse_y;
 } slave_regs_t;
 
 static slave_regs_t slave_regs;
@@ -1205,6 +1206,31 @@ static void perform_mouse_update(running_machine *machine)
 	UINT16 x = input_port_read(machine, "MOUSEX");
 	UINT16 y = input_port_read(machine, "MOUSEY");
 	UINT8 buttons = input_port_read(machine, "MOUSEBTN");
+
+	UINT16 old_mouse_x = slave_regs.real_mouse_x;
+	UINT16 old_mouse_y = slave_regs.real_mouse_y;
+
+	slave_regs.real_mouse_x = x & 0x3ff;
+	slave_regs.real_mouse_y = y & 0x3ff;
+
+	if(slave_regs.real_mouse_x == 0xffff)
+	{
+		slave_regs.fake_mouse_x = slave_regs.real_mouse_x;
+		slave_regs.fake_mouse_y = slave_regs.real_mouse_y;
+	}
+	else
+	{
+		old_mouse_x = 0xffff;
+		old_mouse_y = 0xffff;
+		slave_regs.fake_mouse_x = x & 0x3ff;
+		slave_regs.fake_mouse_y = y & 0x3ff;
+	}
+
+	slave_regs.fake_mouse_x += (slave_regs.real_mouse_x - old_mouse_x);
+	slave_regs.fake_mouse_y += (slave_regs.real_mouse_y - old_mouse_y);
+
+	x = slave_regs.fake_mouse_x;
+	y = slave_regs.fake_mouse_y;
 
 	if(slave_regs.polling_active)
 	{
@@ -1251,6 +1277,28 @@ static READ16_HANDLER( slave_r )
 	return 0xff;
 }
 
+static void set_mouse_position(running_machine* machine)
+{
+	UINT16 x, y;
+
+	printf( "old fake mouse x: %04x\n", slave_regs.fake_mouse_x );
+	printf( "old fake mouse y: %04x\n", slave_regs.fake_mouse_y );
+
+	slave_regs.fake_mouse_y = (slave_regs.fake_mouse_y & 0xff80) | (slave_regs.in_buf[1] & 0x7f);
+	slave_regs.fake_mouse_x = (slave_regs.fake_mouse_x & 0xff80) | (slave_regs.in_buf[2] & 0x7f);
+
+	x = slave_regs.fake_mouse_x;
+	y = slave_regs.fake_mouse_y;
+
+	printf( "new fake mouse x: %04x\n", slave_regs.fake_mouse_x );
+	printf( "new fake mouse y: %04x\n", slave_regs.fake_mouse_y );
+
+	if(slave_regs.polling_active)
+	{
+		slave_prepare_readback(machine, ATTOTIME_IN_HZ(10000), 0, 4, (x & 0x380) >> 7, x & 0x7f, (y & 0x380) >> 7, y & 0x7f, 0xf7);
+	}
+}
+
 static WRITE16_HANDLER( slave_w )
 {
 	switch(offset)
@@ -1273,7 +1321,7 @@ static WRITE16_HANDLER( slave_w )
 						case 0xe8: case 0xe9: case 0xea: case 0xeb: case 0xec: case 0xed: case 0xee: case 0xef:
 						case 0xf0: case 0xf1: case 0xf2: case 0xf3: case 0xf4: case 0xf5: case 0xf6: case 0xf7:
 						case 0xf8: case 0xf9: case 0xfa: case 0xfb: case 0xfc: case 0xfd: case 0xfe: case 0xff:	// Update Mouse Position
-							//perform_mouse_update(space->machine);
+							set_mouse_position(space->machine);
 							memset(slave_regs.in_buf, 0, 17);
 							slave_regs.in_index = 0;
 							slave_regs.in_count = 0;
@@ -1789,7 +1837,7 @@ INLINE void mcd212_set_register(running_machine *machine, int channel, UINT8 reg
 		case 0xb0: case 0xb1: case 0xb2: case 0xb3: case 0xb4: case 0xb5: case 0xb6: case 0xb7:
 		case 0xb8: case 0xb9: case 0xba: case 0xbb: case 0xbc: case 0xbd: case 0xbe: case 0xbf:
 			verboselog(machine, 11, "          %04xxxxx: %d: CLUT[%d] = %08x\n", channel * 0x20, channel, mcd212.channel[channel].clut_bank * 0x40 + (reg - 0x80), value );
-			mcd212.channel[channel].clut[mcd212.channel[channel].clut_bank * 0x40 + (reg - 0x80)] = value;
+			mcd212.channel[0].clut[mcd212.channel[channel].clut_bank * 0x40 + (reg - 0x80)] = value;
 			break;
 		case 0xc0: // Image Coding Method
 			if(channel == 0)
@@ -1814,7 +1862,7 @@ INLINE void mcd212_set_register(running_machine *machine, int channel, UINT8 reg
 			break;
 		case 0xc3: // CLUT Bank Register
 			verboselog(machine, 11, "          %04xxxxx: %d: CLUT Bank Register = %08x\n", channel * 0x20, channel, value & 3);
-			mcd212.channel[channel].clut_bank = value & 0x00000003;
+			mcd212.channel[channel].clut_bank = channel ? (2 | (value & 0x00000001)) : (value & 0x00000003);
 			break;
 		case 0xc4: // Transparent Color A
 			if(channel == 0)
@@ -1887,7 +1935,7 @@ INLINE void mcd212_set_register(running_machine *machine, int channel, UINT8 reg
 		case 0xd5:
 		case 0xd6:
 		case 0xd7:
-			verboselog(machine, 11, "          %04xxxxx: %d: Region Control %d = %08x\n", channel * 0x20, channel, reg & 7, value );
+			verboselog(machine, 6, "          %04xxxxx: %d: Region Control %d = %08x\n", channel * 0x20, channel, reg & 7, value );
 			mcd212.channel[channel].region_control[reg & 7] = value;
 			break;
 		case 0xd8: // Backdrop Color
@@ -2049,7 +2097,7 @@ static void mcd212_process_dca(running_machine *machine, int channel)
 	UINT32 addr = (mcd212.channel[channel].dca & 0x0007ffff) / 2; //(mcd212_get_dcp(channel) & 0x0007ffff) / 2; // mcd212.channel[channel].dca / 2;
 	UINT32 cmd = 0;
 	UINT32 count = 0;
-	UINT32 max = 64; //(mcd212.channel[channel].dcr & MCD212_DCR_CM) ? 64 : 32;
+	UINT32 max = 64;
 	UINT8 addr_changed = 0;
 	//printf( "max = %d\n", max );
 	while(1)
@@ -2130,6 +2178,13 @@ static void mcd212_process_dca(running_machine *machine, int channel)
 			break;
 		}
 	}
+	if(!addr_changed)
+	{
+		if(count < max)
+		{
+			addr += (max - count) >> 1;
+		}
+	}
 	mcd212.channel[channel].dca = addr * 2;
 }
 
@@ -2179,6 +2234,18 @@ INLINE UINT8 MCD212_LIM(INT32 in)
     return (UINT8)in;
 }
 
+INLINE UINT8 BYTE_TO_CLUT7(int channel, UINT8 byte)
+{
+	if(channel)
+	{
+		return 0x80 + (byte & 0x7f);
+	}
+	else
+	{
+		return byte & 0x7f;
+	}
+}
+
 static void mcd212_process_vsr(running_machine *machine, int channel, UINT32 *pixels)
 {
 	UINT8 *data = channel ? (UINT8*)planeb : (UINT8*)planea;
@@ -2192,7 +2259,7 @@ static void mcd212_process_vsr(running_machine *machine, int channel, UINT32 *pi
 	//printf( "vsr before: %08x: ", vsr );
 	//fflush(stdout);
 
-	if(!icm)
+	if(!icm || !vsr)
 	{
 		for(; x < 768; x++)
 		{
@@ -2288,8 +2355,8 @@ static void mcd212_process_vsr(running_machine *machine, int channel, UINT32 *pi
 					{
 						for(; x < 768; x++)
 						{
-							pixels[x++] = mcd212.channel[channel].clut[((channel == 1) ? 0x80 : 0x00) + (byte & 0x7f)];
-							pixels[x] = mcd212.channel[channel].clut[((channel == 1) ? 0x80 : 0x00) + (byte & 0x7f)];
+							pixels[x++] = mcd212.channel[0].clut[BYTE_TO_CLUT7(channel, byte)];
+							pixels[x] = mcd212.channel[0].clut[BYTE_TO_CLUT7(channel, byte)];
 							byte = data[vsr++ ^ 1];
 						}
 						mcd212_set_vsr(channel, vsr - 1);
@@ -2326,8 +2393,8 @@ static void mcd212_process_vsr(running_machine *machine, int channel, UINT32 *pi
 							// Go to the end of the line
 							for(; x < 768; x++)
 							{
-								pixels[x++] = mcd212.channel[channel].clut[byte & 0x7f];
-								pixels[x] = mcd212.channel[channel].clut[byte & 0x7f];
+								pixels[x++] = mcd212.channel[0].clut[BYTE_TO_CLUT7(channel, byte & 0x7f)];
+								pixels[x] = mcd212.channel[0].clut[BYTE_TO_CLUT7(channel, byte & 0x7f)];
 							}
 							done = 1;
 							mcd212_set_vsr(channel, vsr);
@@ -2339,8 +2406,8 @@ static void mcd212_process_vsr(running_machine *machine, int channel, UINT32 *pi
 							//fflush(stdout);
 							for(; x < end && x < 768; x++)
 							{
-								pixels[x++] = mcd212.channel[channel].clut[byte & 0x7f];
-								pixels[x] = mcd212.channel[channel].clut[byte & 0x7f];
+								pixels[x++] = mcd212.channel[0].clut[BYTE_TO_CLUT7(channel, byte & 0x7f)];
+								pixels[x] = mcd212.channel[0].clut[BYTE_TO_CLUT7(channel, byte & 0x7f)];
 							}
 							if(x >= 768)
 							{
@@ -2352,8 +2419,8 @@ static void mcd212_process_vsr(running_machine *machine, int channel, UINT32 *pi
 					else
 					{
 						// Single pixel
-						pixels[x++] = mcd212.channel[channel].clut[byte & 0x7f];
-						pixels[x++] = mcd212.channel[channel].clut[byte & 0x7f];
+						pixels[x++] = mcd212.channel[0].clut[BYTE_TO_CLUT7(channel, byte & 0x7f)];
+						pixels[x++] = mcd212.channel[0].clut[BYTE_TO_CLUT7(channel, byte & 0x7f)];
 						if(x >= 768)
 						{
 							done = 1;
@@ -2728,6 +2795,9 @@ static MACHINE_RESET( cdi )
 
 	cdic_regs.z_buffer = 0;
 	cdic_regs.channel = 0xffffffff;
+
+	slave_regs.real_mouse_x = 0xffff;
+	slave_regs.real_mouse_y = 0xffff;
 }
 
 /*************************
