@@ -342,7 +342,7 @@ static void device_display_cassette(const device_config *image)
 
 	/* choose a location on the screen */
 	x = 0.0f;
-	y = 0;
+	y = 0.5f;
 
 	device = device_list_first( image->machine->config->devicelist, CASSETTE );
 
@@ -352,7 +352,7 @@ static void device_display_cassette(const device_config *image)
 		device = device_list_next( device, CASSETTE );
 	}
 
-	y *= ui_get_line_height();
+	y *= ui_get_line_height() + 2.0f * UI_BOX_TB_BORDER;
 	/* choose which frame of the animation we are at */
 	n = ((int) position / ANIMATION_FPS) % ANIMATION_FRAMES;
 #if 0
