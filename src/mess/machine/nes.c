@@ -146,7 +146,7 @@ static void init_nes_core( running_machine *machine )
 			logerror("Mapper %d is not yet supported, defaulting to no mapper.\n",nes.mapper);
 			mmc_write_low = mmc_write_mid = mmc_write = NULL;
 			mmc_read_low = NULL;
-			ppu_latch = NULL;
+//			ppu_latch = NULL;
 		}
 	}
 	else if (nes.format == 2)
