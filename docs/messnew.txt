@@ -20,6 +20,7 @@ Systems Promoted from GAME_NOT_WORKING:
 
 Skeleton drivers: 
 -----------------
+- Amiga 3000
 - Cosmicos
 - Epson HX20
 

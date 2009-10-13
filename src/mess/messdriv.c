@@ -333,10 +333,10 @@ const game_driver * const drivers[] =
     DRIVER( macplus )   /* 1986 Apple Macintosh Plus                        */
     DRIVER( macse )     /* 1987 Apple Macintosh SE                          */
     DRIVER( mac2fdhd )	/* 1988 Apple Macintosh II (FDHD) */
-    DRIVER( maciix )	/* 1988 Apple Macintosh IIx */ 
+    DRIVER( maciix )	/* 1988 Apple Macintosh IIx */
     DRIVER( macse30 )	/* 1989 Apple Macintosh SE/30 */
-    DRIVER( maciicx )	/* 1989 Apple Macintosh IIcx */  
-    DRIVER( maciici )	/* 1989 Apple Macintosh IIci */  
+    DRIVER( maciicx )	/* 1989 Apple Macintosh IIcx */
+    DRIVER( maciici )	/* 1989 Apple Macintosh IIci */
     DRIVER( macclasc )  /* 1990 Apple Macintosh Classic                     */
     DRIVER( maclc )	/* 1990 Apple Macintosh LC */
     DRIVER( maciisi )	/* 1990 Apple Macintosh IIsi */
@@ -477,6 +477,7 @@ const game_driver * const drivers[] =
     DRIVER( a1000n )    /* Commodore Amiga 1000 - NTSC                      */
     DRIVER( a1000p )    /* Commodore Amiga 1000 - PAL                       */
     DRIVER( cdtv )      /* Commodore CDTV                                   */
+    DRIVER( a3000 )     /* Commodore Amiga 3000                             */
     DRIVER( a1200n )    /* Commodore Amiga 1200 - NTSC                      */
     DRIVER( a1200p )    /* Commodore Amiga 1200 - PAL                       */
     DRIVER( cd32 )      /* Commodore Amiga CD32                             */
