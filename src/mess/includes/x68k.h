@@ -236,6 +236,10 @@ WRITE16_HANDLER( x68k_gvram_w );
 READ16_HANDLER( x68k_gvram_r );
 WRITE16_HANDLER( x68k_tvram_w );
 READ16_HANDLER( x68k_tvram_r );
+WRITE32_HANDLER( x68k_gvram32_w );
+READ32_HANDLER( x68k_gvram32_r );
+WRITE32_HANDLER( x68k_tvram32_w );
+READ32_HANDLER( x68k_tvram32_r );
 VIDEO_UPDATE( x68000 );
 VIDEO_START( x68000 );
 

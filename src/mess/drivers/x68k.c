@@ -1520,6 +1520,27 @@ static READ16_HANDLER( x68k_sram_r )
 	return generic_nvram16[offset];
 }
 
+static READ32_HANDLER( x68k_sram32_r )
+{
+	if(offset == 0x08/4)
+		return mess_ram_size >> 16;  // RAM size
+	/*if(offset == 0x46/2)
+        return 0x0024;
+    if(offset == 0x6e/2)
+        return 0xff00;
+    if(offset == 0x70/2)
+        return 0x0700;*/
+	return generic_nvram32[offset];
+}
+
+static WRITE32_HANDLER( x68k_sram32_w )
+{
+	if(x68k_sys.sysport.sram_writeprotect == 0x31)
+	{
+		COMBINE_DATA(generic_nvram32+offset);
+	}
+}
+
 static WRITE16_HANDLER( x68k_vid_w )
 {
 	int val;
@@ -1760,6 +1781,19 @@ static READ8_DEVICE_HANDLER( mfp_gpio_r )
 	return data;
 }
 
+static WRITE8_DEVICE_HANDLER( x68030_adpcm_w )
+{
+	switch(offset)
+	{
+		case 0x00:
+			okim6258_ctrl_w(device,0,data);
+			break;
+		case 0x01:
+			okim6258_data_w(device,0,data);
+			break;
+	}
+}
+
 static WRITE_LINE_DEVICE_HANDLER( mfp_irq_callback )
 {
 	static int prev;
@@ -1847,6 +1881,39 @@ static ADDRESS_MAP_START(x68k_map, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0xec0000, 0xecffff) AM_NOP  // User I/O
 //  AM_RANGE(0xed0000, 0xed3fff) AM_READWRITE(sram_r, sram_w) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0xed0000, 0xed3fff) AM_RAMBANK(4) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0xed4000, 0xefffff) AM_NOP
+	AM_RANGE(0xf00000, 0xffffff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(x68030_map, ADDRESS_SPACE_PROGRAM, 32)
+	AM_RANGE(0x000000, 0xbfffff) AM_RAMBANK(1)
+	AM_RANGE(0xbffffc, 0xbfffff) AM_READWRITE16(x68k_rom0_r, x68k_rom0_w,0xffffffff)
+//  AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(x68k_gvram_r, x68k_gvram_w) AM_BASE(&x68k_gvram)
+//  AM_RANGE(0xe00000, 0xe7ffff) AM_READWRITE(x68k_tvram_r, x68k_tvram_w) AM_BASE(&x68k_tvram)
+	AM_RANGE(0xc00000, 0xdfffff) AM_RAMBANK(2)
+	AM_RANGE(0xe00000, 0xe7ffff) AM_RAMBANK(3)
+	AM_RANGE(0xe80000, 0xe81fff) AM_READWRITE16(x68k_crtc_r, x68k_crtc_w,0xffffffff)
+	AM_RANGE(0xe82000, 0xe83fff) AM_READWRITE16(x68k_vid_r, x68k_vid_w,0xffffffff)
+	AM_RANGE(0xe84000, 0xe85fff) AM_READWRITE16(x68k_dmac_r, x68k_dmac_w,0xffffffff)
+	AM_RANGE(0xe86000, 0xe87fff) AM_READWRITE16(x68k_areaset_r, x68k_areaset_w,0xffffffff)
+	AM_RANGE(0xe88000, 0xe89fff) AM_READWRITE16(x68k_mfp_r, x68k_mfp_w,0xffffffff)
+	AM_RANGE(0xe8a000, 0xe8bfff) AM_DEVREADWRITE16("rp5c15", x68k_rtc_r, x68k_rtc_w,0xffffffff)
+//  AM_RANGE(0xe8c000, 0xe8dfff) AM_READWRITE(x68k_printer_r, x68k_printer_w)
+	AM_RANGE(0xe8e000, 0xe8ffff) AM_READWRITE16(x68k_sysport_r, x68k_sysport_w,0xffffffff)
+	AM_RANGE(0xe90000, 0xe91fff) AM_READWRITE16(x68k_fm_r, x68k_fm_w,0xffffffff)
+	AM_RANGE(0xe92000, 0xe92003) AM_DEVREADWRITE8("okim6258", okim6258_status_r, x68030_adpcm_w, 0x00ff00ff)
+	AM_RANGE(0xe94000, 0xe95fff) AM_READWRITE16(x68k_fdc_r, x68k_fdc_w,0xffffffff)
+	AM_RANGE(0xe96000, 0xe97fff) AM_DEVREADWRITE16("x68k_hdc",x68k_hdc_r, x68k_hdc_w,0xffffffff)
+	AM_RANGE(0xe98000, 0xe99fff) AM_READWRITE16(x68k_scc_r, x68k_scc_w,0xffffffff)
+	AM_RANGE(0xe9a000, 0xe9bfff) AM_DEVREADWRITE16("ppi8255", x68k_ppi_r, x68k_ppi_w,0xffffffff)
+	AM_RANGE(0xe9c000, 0xe9dfff) AM_READWRITE16(x68k_ioc_r, x68k_ioc_w,0xffffffff)
+	AM_RANGE(0xeafa00, 0xeafa1f) AM_READWRITE16(x68k_exp_r, x68k_exp_w,0xffffffff)
+	AM_RANGE(0xeafa80, 0xeafa8b) AM_READWRITE16(x68k_areaset_r, x68k_enh_areaset_w,0xffffffff)
+	AM_RANGE(0xeb0000, 0xeb7fff) AM_READWRITE16(x68k_spritereg_r, x68k_spritereg_w,0xffffffff)
+	AM_RANGE(0xeb8000, 0xebffff) AM_READWRITE16(x68k_spriteram_r, x68k_spriteram_w,0xffffffff)
+	AM_RANGE(0xec0000, 0xecffff) AM_NOP  // User I/O
+//  AM_RANGE(0xed0000, 0xed3fff) AM_READWRITE(sram_r, sram_w) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0xed0000, 0xed3fff) AM_RAMBANK(4) AM_BASE(&generic_nvram32) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0xed4000, 0xefffff) AM_NOP
 	AM_RANGE(0xf00000, 0xffffff) AM_ROM
 ADDRESS_MAP_END
@@ -2358,14 +2425,43 @@ static MACHINE_START( x68000 )
 	memory_install_read16_handler(space,0x000000,mess_ram_size-1,mess_ram_size-1,0,(read16_space_func)1);
 	memory_install_write16_handler(space,0x000000,mess_ram_size-1,mess_ram_size-1,0,(write16_space_func)1);
 	memory_set_bankptr(machine, 1,mess_ram);
-	memory_install_read16_handler(space,0xc00000,0xdfffff,0x1fffff,0,(read16_space_func)x68k_gvram_r);
-	memory_install_write16_handler(space,0xc00000,0xdfffff,0x1fffff,0,(write16_space_func)x68k_gvram_w);
+	memory_install_read16_handler(space,0xc00000,0xdfffff,0x3fffff,0,x68k_gvram_r);
+	memory_install_write16_handler(space,0xc00000,0xdfffff,0x3fffff,0,x68k_gvram_w);
 	memory_set_bankptr(machine, 2,x68k_gvram);  // so that code in VRAM is executable - needed for Terra Cresta
-	memory_install_read16_handler(space,0xe00000,0xe7ffff,0x07ffff,0,(read16_space_func)x68k_tvram_r);
-	memory_install_write16_handler(space,0xe00000,0xe7ffff,0x07ffff,0,(write16_space_func)x68k_tvram_w);
+	memory_install_read16_handler(space,0xe00000,0xe7ffff,0x07ffff,0,x68k_tvram_r);
+	memory_install_write16_handler(space,0xe00000,0xe7ffff,0x07ffff,0,x68k_tvram_w);
 	memory_set_bankptr(machine, 3,x68k_tvram);  // so that code in VRAM is executable - needed for Terra Cresta
-	memory_install_read16_handler(space,0xed0000,0xed3fff,0x003fff,0,(read16_space_func)x68k_sram_r);
-	memory_install_write16_handler(space,0xed0000,0xed3fff,0x003fff,0,(write16_space_func)x68k_sram_w);
+	memory_install_read16_handler(space,0xed0000,0xed3fff,0x003fff,0,x68k_sram_r);
+	memory_install_write16_handler(space,0xed0000,0xed3fff,0x003fff,0,x68k_sram_w);
+	memory_set_bankptr(machine, 4,generic_nvram16);  // so that code in SRAM is executable, there is an option for booting from SRAM
+
+	// start keyboard timer
+	timer_adjust_periodic(kb_timer, attotime_zero, 0, ATTOTIME_IN_MSEC(5));  // every 5ms
+
+	// start mouse timer
+	timer_adjust_periodic(mouse_timer, attotime_zero, 0, ATTOTIME_IN_MSEC(1));  // a guess for now
+	x68k_sys.mouse.inputtype = 0;
+
+	// start LED timer
+	timer_adjust_periodic(led_timer, attotime_zero, 0, ATTOTIME_IN_MSEC(400));
+}
+
+static MACHINE_START( x68030 )
+{
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	/*  Install RAM handlers  */
+	x68k_spriteram = (UINT16*)memory_region(machine, "user1");
+	memory_install_read32_handler(space,0x000000,mess_ram_size-1,mess_ram_size-1,0,(read32_space_func)1);
+	memory_install_write32_handler(space,0x000000,mess_ram_size-1,mess_ram_size-1,0,(write32_space_func)1);
+	memory_set_bankptr(machine, 1,mess_ram);
+	memory_install_read32_handler(space,0xc00000,0xdfffff,0x3fffff,0,x68k_gvram32_r);
+	memory_install_write32_handler(space,0xc00000,0xdfffff,0x3fffff,0,x68k_gvram32_w);
+	memory_set_bankptr(machine, 2,x68k_gvram);  // so that code in VRAM is executable - needed for Terra Cresta
+	memory_install_read32_handler(space,0xe00000,0xe7ffff,0x07ffff,0,x68k_tvram32_r);
+	memory_install_write32_handler(space,0xe00000,0xe7ffff,0x07ffff,0,x68k_tvram32_w);
+	memory_set_bankptr(machine, 3,x68k_tvram);  // so that code in VRAM is executable - needed for Terra Cresta
+	memory_install_read32_handler(space,0xed0000,0xed3fff,0x003fff,0,x68k_sram32_r);
+	memory_install_write32_handler(space,0xed0000,0xed3fff,0x003fff,0,x68k_sram32_w);
 	memory_set_bankptr(machine, 4,generic_nvram16);  // so that code in SRAM is executable, there is an option for booting from SRAM
 
 	// start keyboard timer
@@ -2417,6 +2513,11 @@ static DRIVER_INIT( x68000 )
 
 	// Initialise timers for 6-button MD controllers
 	md_6button_init(machine);
+}
+
+static DRIVER_INIT( x68030 )
+{
+	DRIVER_INIT_CALL( x68000 );
 }
 
 static MACHINE_DRIVER_START( x68000 )
@@ -2475,6 +2576,23 @@ static MACHINE_DRIVER_START( x68000 )
 	MDRV_FLOPPY_4_DRIVES_ADD(x68k_floppy_config)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( x68kxvi )
+	MDRV_IMPORT_FROM( x68000 )
+	
+	MDRV_CPU_REPLACE("maincpu", M68000, 16000000)  /* 16 MHz */
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( x68030 )
+	MDRV_IMPORT_FROM( x68000 )
+	
+	MDRV_CPU_REPLACE("maincpu", M68030, 25000000)  /* 25 MHz 68EC030 */
+	MDRV_CPU_PROGRAM_MAP(x68030_map)
+
+	MDRV_MACHINE_START( x68030 )
+	MDRV_MACHINE_RESET( x68000 )
+MACHINE_DRIVER_END
+
+
 static SYSTEM_CONFIG_START(x68000)
 	CONFIG_RAM(0x100000)
 	CONFIG_RAM(0x200000)
@@ -2508,6 +2626,48 @@ ROM_START( x68000 )
 	ROM_FILL(0x000,0x20000,0x00)
 ROM_END
 
+ROM_START( x68kxvi )
+	ROM_REGION16_BE(0x1000000, "maincpu", 0)  // 16MB address space
+	ROM_DEFAULT_BIOS("ipl11")
+	ROM_LOAD( "cgrom.dat",  0xf00000, 0xc0000, CRC(9f3195f1) SHA1(8d72c5b4d63bb14c5dbdac495244d659aa1498b6) )
+	ROM_SYSTEM_BIOS(0, "ipl10",  "IPL-ROM V1.0 (87/05/07)")
+	ROMX_LOAD( "iplrom.dat", 0xfe0000, 0x20000, CRC(72bdf532) SHA1(0ed038ed2133b9f78c6e37256807424e0d927560), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS(1, "ipl11",  "IPL-ROM V1.1 (91/01/11)")
+	ROMX_LOAD( "iplromxv.dat", 0xfe0000, 0x020000, CRC(00eeb408) SHA1(e33cdcdb69cd257b0b211ef46e7a8b144637db57), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS(2, "ipl12",  "IPL-ROM V1.2 (91/10/24)")
+	ROMX_LOAD( "iplromco.dat", 0xfe0000, 0x020000, CRC(6c7ef608) SHA1(77511fc58798404701f66b6bbc9cbde06596eba7), ROM_BIOS(3) )
+	ROM_SYSTEM_BIOS(3, "ipl13",  "IPL-ROM V1.3 (92/11/27)")
+	ROMX_LOAD( "iplrom30.dat", 0xfe0000, 0x020000, CRC(e8f8fdad) SHA1(239e9124568c862c31d9ec0605e32373ea74b86a), ROM_BIOS(4) )
+	ROM_REGION(0x8000, "user1",0)  // For Background/Sprite decoding
+	ROM_FILL(0x0000,0x8000,0x00)
+	ROM_REGION(0x20000, "user2", 0)
+	ROM_FILL(0x000,0x20000,0x00)
+	ROM_REGION(0x8000, "scsi", 0)
+	ROM_LOAD("scsiindat.rom",0x000000, 0x008000, NO_DUMP )
+ROM_END
+
+ROM_START( x68030 )
+	ROM_REGION16_BE(0x1000000, "maincpu", 0)  // 16MB address space
+	ROM_DEFAULT_BIOS("ipl13")
+	ROM_LOAD( "cgrom.dat",  0xf00000, 0xc0000, CRC(9f3195f1) SHA1(8d72c5b4d63bb14c5dbdac495244d659aa1498b6) )
+	ROM_SYSTEM_BIOS(0, "ipl10",  "IPL-ROM V1.0 (87/05/07)")
+	ROMX_LOAD( "iplrom.dat", 0xfe0000, 0x20000, CRC(72bdf532) SHA1(0ed038ed2133b9f78c6e37256807424e0d927560), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS(1, "ipl11",  "IPL-ROM V1.1 (91/01/11)")
+	ROMX_LOAD( "iplromxv.dat", 0xfe0000, 0x020000, CRC(00eeb408) SHA1(e33cdcdb69cd257b0b211ef46e7a8b144637db57), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS(2, "ipl12",  "IPL-ROM V1.2 (91/10/24)")
+	ROMX_LOAD( "iplromco.dat", 0xfe0000, 0x020000, CRC(6c7ef608) SHA1(77511fc58798404701f66b6bbc9cbde06596eba7), ROM_BIOS(3) )
+	ROM_SYSTEM_BIOS(3, "ipl13",  "IPL-ROM V1.3 (92/11/27)")
+	ROMX_LOAD( "iplrom30.dat", 0xfe0000, 0x020000, CRC(e8f8fdad) SHA1(239e9124568c862c31d9ec0605e32373ea74b86a), ROM_BIOS(4) )
+	ROM_REGION(0x8000, "user1",0)  // For Background/Sprite decoding
+	ROM_FILL(0x0000,0x8000,0x00)
+	ROM_REGION(0x20000, "user2", 0)
+	ROM_FILL(0x000,0x20000,0x00)
+	ROM_REGION(0x8000, "scsi", 0)
+	ROM_LOAD("scsiindat.rom",0x000000, 0x008000, NO_DUMP )
+ROM_END
+
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY     FULLNAME        FLAGS */
-COMP( 1987, x68000, 0,      0,      x68000, x68000, x68000, x68000, "Sharp",    "Sharp X68000", GAME_IMPERFECT_GRAPHICS )
+COMP( 1987, x68000, 0,      0,      x68000, x68000, x68000, x68000, "Sharp",    "X68000", GAME_IMPERFECT_GRAPHICS )
+COMP( 1991, x68kxvi,x68000, 0,      x68kxvi,x68000, x68000, x68000, "Sharp",    "X68000 XVI", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
+COMP( 1993, x68030, x68000, 0,      x68030, x68000, x68030, x68000, "Sharp",    "X68030", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )

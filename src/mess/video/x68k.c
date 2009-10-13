@@ -702,6 +702,54 @@ READ16_HANDLER( x68k_tvram_r )
 	return x68k_tvram[offset];
 }
 
+READ32_HANDLER( x68k_tvram32_r )
+{
+	UINT32 ret = 0;
+	
+	if(ACCESSING_BITS_0_15)
+		ret |= (x68k_tvram_r(space,(offset*2)+1,0xffff));
+	if(ACCESSING_BITS_16_31)
+		ret |= x68k_tvram_r(space,offset*2,0xffff) << 16;
+
+	return ret;
+}
+
+READ32_HANDLER( x68k_gvram32_r )
+{
+	UINT32 ret = 0;
+	
+	if(ACCESSING_BITS_0_15)
+		ret |= x68k_gvram_r(space,offset*2+1,0xffff);
+	if(ACCESSING_BITS_16_31)
+		ret |= x68k_gvram_r(space,offset*2,0xffff) << 16;
+
+	return ret;
+}
+
+WRITE32_HANDLER( x68k_tvram32_w )
+{
+	if(ACCESSING_BITS_0_7)
+		x68k_tvram_w(space,(offset*2)+1,data,0x00ff);
+	if(ACCESSING_BITS_8_15)
+		x68k_tvram_w(space,(offset*2)+1,data,0xff00);
+	if(ACCESSING_BITS_16_23)
+		x68k_tvram_w(space,offset*2,data >> 16,0x00ff);
+	if(ACCESSING_BITS_24_31)
+		x68k_tvram_w(space,offset*2,data >> 16,0xff00);
+}
+
+WRITE32_HANDLER( x68k_gvram32_w )
+{
+	if(ACCESSING_BITS_0_7)
+		x68k_gvram_w(space,(offset*2)+1,data,0x00ff);
+	if(ACCESSING_BITS_8_15)
+		x68k_gvram_w(space,(offset*2)+1,data,0xff00);
+	if(ACCESSING_BITS_16_23)
+		x68k_gvram_w(space,offset*2,data >> 16,0x00ff);
+	if(ACCESSING_BITS_24_31)
+		x68k_gvram_w(space,offset*2,data >> 16,0xff00);
+}
+
 WRITE16_HANDLER( x68k_spritereg_w )
 {
 	COMBINE_DATA(x68k_spritereg+offset);

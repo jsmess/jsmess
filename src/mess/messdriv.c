@@ -633,6 +633,8 @@ const game_driver * const drivers[] =
     DRIVER( x1turboz )  /* 1986 Sharp X1 TurboZ                             */
 
     DRIVER( x68000 )    /* Sharp X68000 (1987)                              */
+    DRIVER( x68kxvi )   /* Sharp X68000 XVI (1991)                          */
+    DRIVER( x68030 )    /* Sharp X68030 (1993)                              */
 
     /* Silicon Graphics */
     DRIVER( ip204415 )  /* IP20: Indigo 1, R4400, 150MHz                    */
