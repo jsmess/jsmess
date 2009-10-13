@@ -4,42 +4,16 @@
 
 	MESS specific generic functions
 
+	TODO: This code needs to be removed, update the drivers
+	using it.
+
 *********************************************************************/
 
-#ifndef MSCOMMON_H
-#define MSCOMMON_H
-
-#ifdef __cplusplus
-extern "C" {
-#endif
+#ifndef __MSCOMMON_H__
+#define __MSCOMMON_H__
 
 #include "driver.h"
 
-/***************************************************************************
-
-	Terminal code
-
-***************************************************************************/
-
-struct terminal;
-
-struct terminal *terminal_create(
-	running_machine *machine,
-	int gfx, int blank_char, int char_bits,
-	int (*getcursorcode)(int original_code),
-	int num_cols, int num_rows);
-
-void terminal_draw(bitmap_t *dest, const rectangle *cliprect,
-	struct terminal *terminal);
-void terminal_putchar(struct terminal *terminal, int x, int y, int ch);
-int terminal_getchar(struct terminal *terminal, int x, int y);
-void terminal_putblank(struct terminal *terminal, int x, int y);
-void terminal_setcursor(struct terminal *terminal, int x, int y);
-void terminal_hidecursor(struct terminal *terminal);
-void terminal_showcursor(struct terminal *terminal);
-void terminal_getcursor(struct terminal *terminal, int *x, int *y);
-void terminal_fill(struct terminal *terminal, int val);
-void terminal_clear(struct terminal *terminal);
 
 /***************************************************************************
 
@@ -67,8 +41,4 @@ extern const char radius_2_led[];
 
 /**************************************************************************/
 
-#ifdef __cplusplus
-}
-#endif
-
-#endif /* MSCOMMON_H */
+#endif /* __MSCOMMON_H__ */

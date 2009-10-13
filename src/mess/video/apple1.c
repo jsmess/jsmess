@@ -64,6 +64,171 @@
 #include "includes/apple1.h"
 #include "mscommon.h"
 
+
+/***************************************************************************
+
+	Terminal code
+
+***************************************************************************/
+
+typedef short termchar_t;
+
+struct terminal
+{
+	tilemap *tm;
+	int gfx;
+	int blank_char;
+	int char_bits;
+	int num_cols;
+	int num_rows;
+	int (*getcursorcode)(int original_code);
+	int cur_offset;
+	int cur_hidden;
+	termchar_t mem[1];
+};
+
+static struct terminal *current_terminal;
+
+static TILE_GET_INFO(terminal_gettileinfo)
+{
+	int ch, gfxfont, code, color;
+
+	ch = current_terminal->mem[tile_index];
+	code = ch & ((1 << current_terminal->char_bits) - 1);
+	color = ch >> current_terminal->char_bits;
+	gfxfont = current_terminal->gfx;
+
+	if ((tile_index == current_terminal->cur_offset) && !current_terminal->cur_hidden && current_terminal->getcursorcode)
+		code = current_terminal->getcursorcode(code);
+
+	SET_TILE_INFO(
+		gfxfont,	/* gfx */
+		code,		/* character */
+		color,		/* color */
+		0);			/* flags */
+}
+
+static void terminal_draw(bitmap_t *dest, const rectangle *cliprect, struct terminal *terminal)
+{
+	current_terminal = terminal;
+	tilemap_draw(dest, cliprect, terminal->tm, 0, 0);
+	current_terminal = NULL;
+}
+
+static void verify_coords(struct terminal *terminal, int x, int y)
+{
+	assert(x >= 0);
+	assert(y >= 0);
+	assert(x < terminal->num_cols);
+	assert(y < terminal->num_rows);
+}
+
+static void terminal_putchar(struct terminal *terminal, int x, int y, int ch)
+{
+	int offs;
+
+	verify_coords(terminal, x, y);
+
+	offs = y * terminal->num_cols + x;
+	if (terminal->mem[offs] != ch)
+	{
+		terminal->mem[offs] = ch;
+		tilemap_mark_tile_dirty(terminal->tm, offs);
+	}
+}
+
+static int terminal_getchar(struct terminal *terminal, int x, int y)
+{
+	int offs;
+
+	verify_coords(terminal, x, y);
+	offs = y * terminal->num_cols + x;
+	return terminal->mem[offs];
+}
+
+static void terminal_putblank(struct terminal *terminal, int x, int y)
+{
+	terminal_putchar(terminal, x, y, terminal->blank_char);
+}
+
+static void terminal_dirtycursor(struct terminal *terminal)
+{
+	if (terminal->cur_offset >= 0)
+		tilemap_mark_tile_dirty(terminal->tm, terminal->cur_offset);
+}
+
+static void terminal_setcursor(struct terminal *terminal, int x, int y)
+{
+	terminal_dirtycursor(terminal);
+	terminal->cur_offset = y * terminal->num_cols + x;
+	terminal_dirtycursor(terminal);
+}
+
+static void terminal_hidecursor(struct terminal *terminal)
+{
+	terminal->cur_hidden = 1;
+	terminal_dirtycursor(terminal);
+}
+
+static void terminal_showcursor(struct terminal *terminal)
+{
+	terminal->cur_hidden = 0;
+	terminal_dirtycursor(terminal);
+}
+
+static void terminal_getcursor(struct terminal *terminal, int *x, int *y)
+{
+	*x = terminal->cur_offset % terminal->num_cols;
+	*y = terminal->cur_offset / terminal->num_cols;
+}
+
+static void terminal_fill(struct terminal *terminal, int val)
+{
+	int i;
+	for (i = 0; i < terminal->num_cols * terminal->num_rows; i++)
+		terminal->mem[i] = val;
+	tilemap_mark_all_tiles_dirty(terminal->tm);
+}
+
+static void terminal_clear(struct terminal *terminal)
+{
+	terminal_fill(terminal, terminal->blank_char);
+}
+
+struct terminal *terminal_create(
+	running_machine *machine,
+	int gfx, int blank_char, int char_bits,
+	int (*getcursorcode)(int original_code),
+	int num_cols, int num_rows)
+{
+	struct terminal *term;
+	int char_width, char_height;
+
+	char_width = machine->gfx[gfx]->width;
+	char_height = machine->gfx[gfx]->height;
+
+	term = (struct terminal *) auto_alloc_array(machine, char, sizeof(struct terminal) - sizeof(term->mem)
+		+ (num_cols * num_rows * sizeof(termchar_t)));
+
+	term->tm = tilemap_create(machine, terminal_gettileinfo, tilemap_scan_rows,
+		char_width, char_height, num_cols, num_rows);
+
+	term->gfx = gfx;
+	term->blank_char = blank_char;
+	term->char_bits = char_bits;
+	term->num_cols = num_cols;
+	term->num_rows = num_rows;
+	term->getcursorcode = getcursorcode;
+	term->cur_offset = -1;
+	term->cur_hidden = 0;
+	terminal_clear(term);
+	return term;
+}
+
+
+/**************************************************************************/
+
+
 static struct terminal *apple1_terminal;
 
 int apple1_vh_clrscrn_pressed = 0;		/* flag for CLEAR SCREEN switch */
