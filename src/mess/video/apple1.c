@@ -62,7 +62,6 @@
 
 #include "driver.h"
 #include "includes/apple1.h"
-#include "mscommon.h"
 
 
 /***************************************************************************

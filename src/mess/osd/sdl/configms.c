@@ -10,7 +10,6 @@
 #include "menu.h"
 #include "device.h"
 #include "configms.h"
-#include "mscommon.h"
 #include "pool.h"
 #include "config.h"
 
