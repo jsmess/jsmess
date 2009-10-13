@@ -1154,7 +1154,7 @@ static offs_t scanline_to_address(mc6847_state *mc6847, int scanline)
 	if (mc6847->ag)
 	{
 		/* graphics */
-		int gm = (mc6847->gm0 << 2) | (mc6847->gm1 << 1) | mc6847->gm2;
+		int gm = (mc6847->gm2 << 2) | (mc6847->gm1 << 1) | mc6847->gm0;
 
 		switch (gm)
 		{
