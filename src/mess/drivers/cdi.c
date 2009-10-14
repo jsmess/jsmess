@@ -1176,6 +1176,7 @@ static WRITE16_HANDLER( cdic_w )
 					case 0x29: // Read Mode 1
 					case 0x2a: // Read Mode 2
 						timer_adjust_oneshot(cdic_regs.interrupt_timer, ATTOTIME_IN_HZ(75), 0); // 75Hz = 1x CD-ROM speed
+						cdic_regs.data_buffer &= 0xfffe;
 						break;
 					default:
 						fatalerror( "Unknown CDIC command: %02x\n", cdic_regs.command );
@@ -1279,7 +1280,7 @@ static void perform_mouse_update(running_machine *machine)
 
 	if(slave_regs.polling_active)
 	{
-		slave_prepare_readback(machine, ATTOTIME_IN_HZ(10000), 0, 4, ((x & 0x380) >> 7) | (buttons << 4), x & 0x7f, (y & 0x380) >> 7, y & 0x7f, 0xf7);
+		slave_prepare_readback(machine, attotime_zero, 0, 4, ((x & 0x380) >> 7) | (buttons << 4), x & 0x7f, (y & 0x380) >> 7, y & 0x7f, 0xf7);
 	}
 }
 
@@ -1336,7 +1337,7 @@ static void set_mouse_position(running_machine* machine)
 
 	if(slave_regs.polling_active)
 	{
-		slave_prepare_readback(machine, ATTOTIME_IN_HZ(10000), 0, 4, (x & 0x380) >> 7, x & 0x7f, (y & 0x380) >> 7, y & 0x7f, 0xf7);
+		//slave_prepare_readback(machine, attotime_zero, 0, 4, (x & 0x380) >> 7, x & 0x7f, (y & 0x380) >> 7, y & 0x7f, 0xf7);
 	}
 }
 
