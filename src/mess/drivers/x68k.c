@@ -1523,7 +1523,7 @@ static READ16_HANDLER( x68k_sram_r )
 static READ32_HANDLER( x68k_sram32_r )
 {
 	if(offset == 0x08/4)
-		return mess_ram_size >> 16;  // RAM size
+		return (mess_ram_size & 0xffff0000);  // RAM size
 	/*if(offset == 0x46/2)
         return 0x0024;
     if(offset == 0x6e/2)
@@ -1639,15 +1639,25 @@ static WRITE16_HANDLER( x68k_enh_areaset_w )
 static TIMER_CALLBACK(x68k_fake_bus_error)
 {
 	int val = param;
+	int v;
+	
+	if(strcmp(machine->gamedrv->name,"x68030") == 0)
+		v = 0x0b;
+	else
+		v = 0x09;
 
 	// rather hacky, but this generally works for programs that check for MIDI hardware
-	if(mess_ram[0x09] != 0x02)  // normal vector for bus errors points to 02FF0540
+	if(mess_ram[v] != 0x02)  // normal vector for bus errors points to 02FF0540
 	{
 		int addr = (mess_ram[0x09] << 24) | (mess_ram[0x08] << 16) |(mess_ram[0x0b] << 8) | mess_ram[0x0a];
 		int sp = cpu_get_reg(cputag_get_cpu(machine, "maincpu"), REG_GENSP);
 		int pc = cpu_get_reg(cputag_get_cpu(machine, "maincpu"), REG_GENPC);
 		int sr = cpu_get_reg(cputag_get_cpu(machine, "maincpu"), M68K_SR);
 		//int pda = cpu_get_reg(cputag_get_cpu(machine, "maincpu"), M68K_PREF_DATA);
+		if(strcmp(machine->gamedrv->name,"x68030") == 0)
+		{  // byte order varies on the 68030
+			addr = (mess_ram[0x0b] << 24) | (mess_ram[0x0a] << 16) |(mess_ram[0x09] << 8) | mess_ram[0x08];
+		}
 		cpu_set_reg(cputag_get_cpu(machine, "maincpu"), REG_GENSP, sp - 14);
 		mess_ram[sp-11] = (val & 0xff000000) >> 24;
 		mess_ram[sp-12] = (val & 0x00ff0000) >> 16;
@@ -1882,7 +1892,9 @@ static ADDRESS_MAP_START(x68k_map, ADDRESS_SPACE_PROGRAM, 16)
 //  AM_RANGE(0xed0000, 0xed3fff) AM_READWRITE(sram_r, sram_w) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0xed0000, 0xed3fff) AM_RAMBANK(4) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0xed4000, 0xefffff) AM_NOP
-	AM_RANGE(0xf00000, 0xffffff) AM_ROM
+	AM_RANGE(0xf00000, 0xfbffff) AM_ROM
+	AM_RANGE(0xfc0000, 0xfdffff) AM_READWRITE(x68k_rom0_r, x68k_rom0_w)
+	AM_RANGE(0xfe0000, 0xffffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(x68030_map, ADDRESS_SPACE_PROGRAM, 32)
@@ -1915,7 +1927,9 @@ static ADDRESS_MAP_START(x68030_map, ADDRESS_SPACE_PROGRAM, 32)
 //  AM_RANGE(0xed0000, 0xed3fff) AM_READWRITE(sram_r, sram_w) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0xed0000, 0xed3fff) AM_RAMBANK(4) AM_BASE(&generic_nvram32) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0xed4000, 0xefffff) AM_NOP
-	AM_RANGE(0xf00000, 0xffffff) AM_ROM
+	AM_RANGE(0xf00000, 0xfbffff) AM_ROM
+	AM_RANGE(0xfc0000, 0xfdffff) AM_READWRITE16(x68k_rom0_r, x68k_rom0_w,0xffffffff)
+	AM_RANGE(0xfe0000, 0xffffff) AM_ROM
 ADDRESS_MAP_END
 
 static WRITE8_DEVICE_HANDLER( mfp_tdo_w )
@@ -2453,6 +2467,9 @@ static MACHINE_START( x68030 )
 	x68k_spriteram = (UINT16*)memory_region(machine, "user1");
 	memory_install_read32_handler(space,0x000000,mess_ram_size-1,mess_ram_size-1,0,(read32_space_func)1);
 	memory_install_write32_handler(space,0x000000,mess_ram_size-1,mess_ram_size-1,0,(write32_space_func)1);
+	// mirror? Human68k 3.02 explicitly adds 0x3000000 to some pointers
+	memory_install_read32_handler(space,0x3000000,0x3000000+mess_ram_size-1,mess_ram_size-1,0,(read32_space_func)1);
+	memory_install_write32_handler(space,0x3000000,0x3000000+mess_ram_size-1,mess_ram_size-1,0,(write32_space_func)1);
 	memory_set_bankptr(machine, 1,mess_ram);
 	memory_install_read32_handler(space,0xc00000,0xdfffff,0x3fffff,0,x68k_gvram32_r);
 	memory_install_write32_handler(space,0xc00000,0xdfffff,0x3fffff,0,x68k_gvram32_w);
@@ -2462,7 +2479,7 @@ static MACHINE_START( x68030 )
 	memory_set_bankptr(machine, 3,x68k_tvram);  // so that code in VRAM is executable - needed for Terra Cresta
 	memory_install_read32_handler(space,0xed0000,0xed3fff,0x003fff,0,x68k_sram32_r);
 	memory_install_write32_handler(space,0xed0000,0xed3fff,0x003fff,0,x68k_sram32_w);
-	memory_set_bankptr(machine, 4,generic_nvram16);  // so that code in SRAM is executable, there is an option for booting from SRAM
+	memory_set_bankptr(machine, 4,generic_nvram32);  // so that code in SRAM is executable, there is an option for booting from SRAM
 
 	// start keyboard timer
 	timer_adjust_periodic(kb_timer, attotime_zero, 0, ATTOTIME_IN_MSEC(5));  // every 5ms
@@ -2643,7 +2660,7 @@ ROM_START( x68kxvi )
 	ROM_REGION(0x20000, "user2", 0)
 	ROM_FILL(0x000,0x20000,0x00)
 	ROM_REGION(0x8000, "scsi", 0)
-	ROM_LOAD("scsiindat.rom",0x000000, 0x008000, NO_DUMP )
+	ROM_LOAD("scsiinrom.dat",0x000000, 0x008000, NO_DUMP )
 ROM_END
 
 ROM_START( x68030 )
@@ -2663,7 +2680,7 @@ ROM_START( x68030 )
 	ROM_REGION(0x20000, "user2", 0)
 	ROM_FILL(0x000,0x20000,0x00)
 	ROM_REGION(0x8000, "scsi", 0)
-	ROM_LOAD("scsiindat.rom",0x000000, 0x008000, NO_DUMP )
+	ROM_LOAD("scsiinrom.dat",0x000000, 0x008000, NO_DUMP )
 ROM_END
 
 
