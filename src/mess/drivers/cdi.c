@@ -91,22 +91,23 @@ static READ16_HANDLER( m48t08_r );
 static WRITE16_HANDLER( m48t08_w );
 
 // Platform-specific
-INLINE void cdi220_draw_lcd(running_machine *machine, int y);
+static void cdi220_draw_lcd(running_machine *machine, int y);
 
 // MCD212
 static READ16_HANDLER(mcd212_r);
 static WRITE16_HANDLER(mcd212_w);
-INLINE void mcd212_set_register(running_machine *machine, int channel, UINT8 reg, UINT32 value);
-INLINE void mcd212_set_vsr(int channel, UINT32 value);
-INLINE UINT32 mcd212_get_vsr(int channel);
-INLINE void mcd212_set_dcp(int channel, UINT32 value);
-INLINE UINT32 mcd212_get_dcp(int channel);
-INLINE void mcd212_set_display_parameters(int channel, UINT8 value);
-INLINE void mcd212_process_ica(running_machine *machine, int channel);
-INLINE void mcd212_process_dca(running_machine *machine, int channel);
-INLINE void mcd212_process_vsr(running_machine *machine, int channel, UINT32 *pixels);
-INLINE void mcd212_draw_cursor(running_machine *machine, UINT32 *scanline, int y);
-INLINE void mcd212_mix_lines(running_machine *machine, UINT32 *plane_a, UINT32 *plane_b, UINT32 *out);
+static void mcd212_set_register(running_machine *machine, int channel, UINT8 reg, UINT32 value);
+static void mcd212_set_vsr(int channel, UINT32 value);
+static UINT32 mcd212_get_vsr(int channel);
+static void mcd212_set_dcp(int channel, UINT32 value);
+static UINT32 mcd212_get_dcp(int channel);
+static void mcd212_set_display_parameters(int channel, UINT8 value);
+static void mcd212_process_ica(running_machine *machine, int channel);
+static void mcd212_process_dca(running_machine *machine, int channel);
+static void mcd212_update_region_arrays(running_machine *machine);
+static void mcd212_process_vsr(running_machine *machine, int channel, UINT8 *pixels_r, UINT8 *pixels_g, UINT8 *pixels_b);
+static void mcd212_draw_cursor(running_machine *machine, UINT32 *scanline, int y);
+static void mcd212_mix_lines(running_machine *machine, UINT8 *plane_a_r, UINT8 *plane_a_g, UINT8 *plane_a_b, UINT8 *plane_b_r, UINT8 *plane_b_g, UINT8 *plane_b_b, UINT32 *out);
 static void mcd212_draw_scanline(running_machine *machine, int y);
 TIMER_CALLBACK( mcd212_perform_scan );
 static VIDEO_START(cdi);
@@ -906,6 +907,39 @@ typedef struct
 	cdrom_file *cd;
 } cdic_regs_t;
 
+#define CDIC_SECTOR_SYNC		0
+
+#define CDIC_SECTOR_HEADER		12
+
+#define CDIC_SECTOR_MODE		15
+
+#define CDIC_SECTOR_FILE1		16
+#define CDIC_SECTOR_CHAN1		17
+#define CDIC_SECTOR_SUBMODE1	18
+#define CDIC_SECTOR_CODING1		19
+
+#define CDIC_SECTOR_FILE2		20
+#define CDIC_SECTOR_CHAN2		21
+#define CDIC_SECTOR_SUBMODE2	22
+#define CDIC_SECTOR_CODING2		23
+
+#define CDIC_SECTOR_DATA		24
+
+#define CDIC_SECTOR_SIZE		2352
+
+#define CDIC_SECTOR_DATASIZE	2048
+#define CDIC_SECTOR_AUDIOSIZE	2304
+#define CDIC_SECTOR_VIDEOSIZE	2324
+
+#define CDIC_SUBMODE_EOF		0x80
+#define CDIC_SUBMODE_RT			0x40
+#define CDIC_SUBMODE_FORM		0x20
+#define CDIC_SUBMODE_TRIG		0x10
+#define CDIC_SUBMODE_DATA		0x08
+#define CDIC_SUBMODE_AUDIO		0x04
+#define CDIC_SUBMODE_VIDEO		0x02
+#define CDIC_SUBMODE_EOR		0x01
+
 static cdic_regs_t cdic_regs;
 
 static TIMER_CALLBACK( cdic_trigger_readback_int )
@@ -939,6 +973,7 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 			//printf( "Reading Mode %d sector from MSF location %06x\n", cdic_regs.command - 0x28, cdic_regs.time | 2 );
 			verboselog(machine, 0, "Reading Mode %d sector from MSF location %06x\n", cdic_regs.command - 0x28, cdic_regs.time | 2 );
 
+			cdic_regs.z_buffer ^= 0x0001;
 			cdic_regs.data_buffer ^= 0x0001;
 
 			cdrom_read_data(cdic_regs.cd, lba, buffer, CD_TRACK_RAW_DONTCARE);
@@ -974,30 +1009,24 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 				}
 			}
 
-			if(((buffer[22] & 0x2e) == 0x24) && (cdic_regs.channel & cdic_regs.audio_channel & (1 << buffer[21])))
+			if(((buffer[CDIC_SECTOR_SUBMODE2] & (CDIC_SUBMODE_FORM | CDIC_SUBMODE_DATA | CDIC_SUBMODE_AUDIO | CDIC_SUBMODE_VIDEO)) == (CDIC_SUBMODE_FORM | CDIC_SUBMODE_AUDIO)) &&
+			   (cdic_regs.channel & cdic_regs.audio_channel & (1 << buffer[CDIC_SECTOR_CHAN2])))
 			{
 				// Ignore the audio sector for now.
-				if(!(buffer[22] & 0x10))
-				{
-					verboselog(machine, 0, "Audio sector, ignored\n" );
-				}
-				else
-				{
-					cdic_regs.x_buffer |= 0x8000;
+				cdic_regs.x_buffer |= 0x8000;
 
-					cdic_regs.data_buffer |= 0x4000;
-					cdic_regs.data_buffer &= 0x7fff;
+				cdic_regs.data_buffer |= 0x4000;
+				cdic_regs.data_buffer &= 0x7fff;
 
-					//printf( "Setting CDIC interrupt line\n" );
-					verboselog(machine, 0, "Setting CDIC interrupt line\n" );
-					cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), M68K_IRQ_4, 128);
-					cputag_set_input_line(machine, "maincpu", M68K_IRQ_4, ASSERT_LINE);
-				}
+				//printf( "Setting CDIC interrupt line\n" );
+				verboselog(machine, 0, "Setting CDIC interrupt line\n" );
+				cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), M68K_IRQ_4, 128);
+				cputag_set_input_line(machine, "maincpu", M68K_IRQ_4, ASSERT_LINE);
 			}
-			else if((buffer[22] & 0x0e) == 0x00)
+			else if((buffer[CDIC_SECTOR_SUBMODE2] & (CDIC_SUBMODE_DATA | CDIC_SUBMODE_AUDIO | CDIC_SUBMODE_VIDEO)) == 0x00)
 			{
 				// Ignore the audio sector for now.
-				if(!(buffer[22] & 0x10))
+				if(!(buffer[CDIC_SECTOR_SUBMODE2] & CDIC_SUBMODE_TRIG))
 				{
 					verboselog(machine, 0, "Message sector, ignored\n" );
 				}
@@ -1014,7 +1043,7 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 					cputag_set_input_line(machine, "maincpu", M68K_IRQ_4, ASSERT_LINE);
 				}
 			}
-			else //if((buffer[22] & 0x04) == 0x04)
+			else
 			{
 				cdic_regs.x_buffer |= 0x8000;
 
@@ -1027,7 +1056,10 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 				cputag_set_input_line(machine, "maincpu", M68K_IRQ_4, ASSERT_LINE);
 			}
 
-			timer_adjust_oneshot(cdic_regs.interrupt_timer, ATTOTIME_IN_HZ(75), 0); // 75Hz = 1x CD-ROM speed
+			if(!(buffer[CDIC_SECTOR_SUBMODE2] & CDIC_SUBMODE_EOF))
+			{
+				timer_adjust_oneshot(cdic_regs.interrupt_timer, ATTOTIME_IN_HZ(75), 0); // 75Hz = 1x CD-ROM speed
+			}
 
 			break;
 		}
@@ -1320,7 +1352,7 @@ static void set_mouse_position(running_machine* machine)
 {
 	UINT16 x, y;
 
-	printf( "Set mouse position: %02x %02x %02x\n", slave_regs.in_buf[0], slave_regs.in_buf[1], slave_regs.in_buf[2] );
+	//printf( "Set mouse position: %02x %02x %02x\n", slave_regs.in_buf[0], slave_regs.in_buf[1], slave_regs.in_buf[2] );
 
 	slave_regs.fake_mouse_y = ((slave_regs.in_buf[1] & 0x0f) << 6) | (slave_regs.in_buf[0] & 0x3f);
 	slave_regs.fake_mouse_x = ((slave_regs.in_buf[1] & 0x70) << 3) | slave_regs.in_buf[2];
@@ -1627,7 +1659,9 @@ typedef struct
 	UINT16 ddr;
 	UINT16 dcp;
 	UINT32 dca;
-	UINT32 clut[256];
+	UINT8 clut_r[256];
+	UINT8 clut_g[256];
+	UINT8 clut_b[256];
 	UINT32 image_coding_method;
 	UINT32 transparency_control;
 	UINT32 plane_order;
@@ -1648,15 +1682,16 @@ typedef struct
 	UINT32 backdrop_color;
 	UINT32 mosaic_hold_a;
 	UINT32 mosaic_hold_b;
-	UINT32 weight_factor_a;
-	UINT32 weight_factor_b;
+	UINT8 weight_factor_a[768];
+	UINT8 weight_factor_b[768];
 } mcd212_channel_t;
 
 typedef struct
 {
 	mcd212_channel_t channel[2];
 	emu_timer *scan_timer;
-	UINT8 region_flag[2];
+	UINT8 region_flag_0[768];
+	UINT8 region_flag_1[768];
 } mcd212_t;
 
 mcd212_t mcd212;
@@ -1754,7 +1789,7 @@ static const UINT16 cdi220_lcd_char[20*22] =
 	0x1000, 0x1000, 0x1000, 0x1000, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0400, 0x0400, 0x0400, 0x0400
 };
 
-INLINE void cdi220_draw_lcd(running_machine *machine, int y)
+static void cdi220_draw_lcd(running_machine *machine, int y)
 {
 	bitmap_t *bitmap = tmpbitmap;
 	UINT32 *scanline = BITMAP_ADDR32(bitmap, y, 0);
@@ -1876,7 +1911,7 @@ static WRITE16_HANDLER(mcd212_w)
 	}
 }
 
-INLINE void mcd212_set_register(running_machine *machine, int channel, UINT8 reg, UINT32 value)
+static void mcd212_set_register(running_machine *machine, int channel, UINT8 reg, UINT32 value)
 {
 	switch(reg)
 	{
@@ -1888,8 +1923,10 @@ INLINE void mcd212_set_register(running_machine *machine, int channel, UINT8 reg
 		case 0xa8: case 0xa9: case 0xaa: case 0xab: case 0xac: case 0xad: case 0xae: case 0xaf:
 		case 0xb0: case 0xb1: case 0xb2: case 0xb3: case 0xb4: case 0xb5: case 0xb6: case 0xb7:
 		case 0xb8: case 0xb9: case 0xba: case 0xbb: case 0xbc: case 0xbd: case 0xbe: case 0xbf:
-			verboselog(machine, 6, "          %04xxxxx: %d: CLUT[%d] = %08x\n", channel * 0x20, channel, mcd212.channel[channel].clut_bank * 0x40 + (reg - 0x80), value );
-			mcd212.channel[0].clut[mcd212.channel[channel].clut_bank * 0x40 + (reg - 0x80)] = value;
+			verboselog(machine, 11, "          %04xxxxx: %d: CLUT[%d] = %08x\n", channel * 0x20, channel, mcd212.channel[channel].clut_bank * 0x40 + (reg - 0x80), value );
+			mcd212.channel[0].clut_r[mcd212.channel[channel].clut_bank * 0x40 + (reg - 0x80)] = (UINT8)(value >> 16);
+			mcd212.channel[0].clut_g[mcd212.channel[channel].clut_bank * 0x40 + (reg - 0x80)] = (UINT8)(value >>  8);
+			mcd212.channel[0].clut_b[mcd212.channel[channel].clut_bank * 0x40 + (reg - 0x80)] = (UINT8)(value >>  0);
 			break;
 		case 0xc0: // Image Coding Method
 			if(channel == 0)
@@ -1989,6 +2026,7 @@ INLINE void mcd212_set_register(running_machine *machine, int channel, UINT8 reg
 		case 0xd7:
 			verboselog(machine, 6, "          %04xxxxx: %d: Region Control %d = %08x\n", channel * 0x20, channel, reg & 7, value );
 			mcd212.channel[0].region_control[reg & 7] = value;
+			mcd212_update_region_arrays(machine);
 			break;
 		case 0xd8: // Backdrop Color
 			if(channel == 0)
@@ -2015,44 +2053,46 @@ INLINE void mcd212_set_register(running_machine *machine, int channel, UINT8 reg
 			if(channel == 0)
 			{
 				verboselog(machine, 6, "          %04xxxxx: %d: Weight Factor A = %08x\n", channel * 0x20, channel, value );
-				mcd212.channel[channel].weight_factor_a = value;
+				memset(mcd212.channel[channel].weight_factor_a, value & 0x000000ff, 768);
+				mcd212_update_region_arrays(machine);
 			}
 			break;
 		case 0xdc: // Weight Factor B
 			if(channel == 1)
 			{
 				verboselog(machine, 6, "          %04xxxxx: %d: Weight Factor B = %08x\n", channel * 0x20, channel, value );
-				mcd212.channel[channel].weight_factor_b = value;
+				memset(mcd212.channel[channel].weight_factor_b, value & 0x000000ff, 768);
+				mcd212_update_region_arrays(machine);
 			}
 			break;
 	}
 }
 
-INLINE void mcd212_set_vsr(int channel, UINT32 value)
+static void mcd212_set_vsr(int channel, UINT32 value)
 {
 	mcd212.channel[channel].vsr = value & 0x0000ffff;
 	mcd212.channel[channel].dcr &= 0xffc0;
 	mcd212.channel[channel].dcr |= (value >> 16) & 0x003f;
 }
 
-INLINE UINT32 mcd212_get_vsr(int channel)
+static UINT32 mcd212_get_vsr(int channel)
 {
 	return ((mcd212.channel[channel].dcr & 0x3f) << 16) | mcd212.channel[channel].vsr;
 }
 
-INLINE void mcd212_set_dcp(int channel, UINT32 value)
+static void mcd212_set_dcp(int channel, UINT32 value)
 {
 	mcd212.channel[channel].dcp = value & 0x0000ffff;
 	mcd212.channel[channel].ddr &= 0xffc0;
 	mcd212.channel[channel].ddr |= (value >> 16) & 0x003f;
 }
 
-INLINE UINT32 mcd212_get_dcp(int channel)
+static UINT32 mcd212_get_dcp(int channel)
 {
 	return ((mcd212.channel[channel].ddr & 0x3f) << 16) | mcd212.channel[channel].dcp;
 }
 
-INLINE void mcd212_set_display_parameters(int channel, UINT8 value)
+static void mcd212_set_display_parameters(int channel, UINT8 value)
 {
 	mcd212.channel[channel].ddr &= 0xf0ff;
 	mcd212.channel[channel].ddr |= (value & 0x0f) << 8;
@@ -2060,7 +2100,7 @@ INLINE void mcd212_set_display_parameters(int channel, UINT8 value)
 	mcd212.channel[channel].dcr |= (value & 0x10) << 7;
 }
 
-INLINE void mcd212_process_ica(running_machine *machine, int channel)
+static void mcd212_process_ica(running_machine *machine, int channel)
 {
 	UINT16 *ica = channel ? planeb : planea;
 	UINT32 addr = 0x000400/2;
@@ -2143,7 +2183,7 @@ INLINE void mcd212_process_ica(running_machine *machine, int channel)
 	}
 }
 
-INLINE void mcd212_process_dca(running_machine *machine, int channel)
+static void mcd212_process_dca(running_machine *machine, int channel)
 {
 	UINT16 *dca = channel ? planeb : planea;
 	UINT32 addr = (mcd212.channel[channel].dca & 0x0007ffff) / 2; //(mcd212_get_dcp(channel) & 0x0007ffff) / 2; // mcd212.channel[channel].dca / 2;
@@ -2322,20 +2362,129 @@ INLINE UINT8 BYTE_TO_CLUT(int channel, int icm, UINT8 byte)
 	return 0;
 }
 
-INLINE void mcd212_process_region(running_machine *machine, int channel, int x)
+static void mcd212_update_region_arrays(running_machine *machine)
 {
-	if(mcd212.channel[0].image_coding_method & MCD212_ICM_NR)
+	int x = 0;
+	for(x = 0; x < 768; x++)
 	{
-		int reg = 0;
-		int flag = 0;
-
-		for(flag = 0; flag < 2; flag++)
+		if(mcd212.channel[0].image_coding_method & MCD212_ICM_NR)
 		{
-			for(reg = 0; reg < 4; reg++)
+			int reg = 0;
+			int flag = 0;
+
+			for(flag = 0; flag < 2; flag++)
 			{
-				if(x == (mcd212.channel[0].region_control[flag*4 + reg] & MCD212_RC_X))
+				for(reg = 0; reg < 4; reg++)
 				{
-					switch(mcd212.channel[0].region_control[flag*4 + reg] & MCD212_RC_OP)
+					if(x > (mcd212.channel[0].region_control[flag*4 + reg] & MCD212_RC_X))
+					{
+						break;
+					}
+					if(x == (mcd212.channel[0].region_control[flag*4 + reg] & MCD212_RC_X))
+					{
+						switch(mcd212.channel[0].region_control[flag*4 + reg] & MCD212_RC_OP)
+						{
+							case 0: // End of region control for line
+								break;
+							case 1:
+							case 2:
+							case 3: // Not used
+								break;
+							case 4: // Change weight of plane A
+								mcd212.channel[0].weight_factor_a[x] = (mcd212.channel[0].region_control[flag*4 + reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
+								break;
+							case 5:	// Not used
+								break;
+							case 6: // Change weight of plane B
+								mcd212.channel[1].weight_factor_b[x] = (mcd212.channel[0].region_control[flag*4 + reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
+								break;
+							case 7:	// Not used
+								break;
+							case 8: // Reset region flag
+								if(flag)
+								{
+									mcd212.region_flag_1[x] = 0;
+								}
+								else
+								{
+									mcd212.region_flag_0[x] = 0;
+								}
+								break;
+							case 9: // Set region flag
+								if(flag)
+								{
+									mcd212.region_flag_1[x] = 1;
+								}
+								else
+								{
+									mcd212.region_flag_0[x] = 1;
+								}
+								break;
+							case 10:	// Not used
+							case 11:	// Not used
+								break;
+							case 12: // Reset region flag and change weight of plane A
+								mcd212.channel[0].weight_factor_a[x] = (mcd212.channel[0].region_control[flag*4 + reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
+								if(flag)
+								{
+									mcd212.region_flag_1[x] = 0;
+								}
+								else
+								{
+									mcd212.region_flag_0[x] = 0;
+								}
+								break;
+							case 13: // Set region flag and change weight of plane A
+								mcd212.channel[0].weight_factor_a[x] = (mcd212.channel[0].region_control[flag*4 + reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
+								if(flag)
+								{
+									mcd212.region_flag_1[x] = 1;
+								}
+								else
+								{
+									mcd212.region_flag_0[x] = 1;
+								}
+								break;
+							case 14: // Reset region flag and change weight of plane B
+								mcd212.channel[1].weight_factor_b[x] = (mcd212.channel[0].region_control[flag*4 + reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
+								if(flag)
+								{
+									mcd212.region_flag_1[x] = 0;
+								}
+								else
+								{
+									mcd212.region_flag_0[x] = 0;
+								}
+								break;
+							case 15: // Set region flag and change weight of plane B
+								mcd212.channel[1].weight_factor_b[x] = (mcd212.channel[0].region_control[flag*4 + reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
+								if(flag)
+								{
+									mcd212.region_flag_1[x] = 1;
+								}
+								else
+								{
+									mcd212.region_flag_0[x] = 1;
+								}
+								break;
+						}
+					}
+				}
+			}
+		}
+		else
+		{
+			int reg = 0;
+			for(reg = 0; reg < 8; reg++)
+			{
+				int flag = (mcd212.channel[0].region_control[reg] & MCD212_RC_RF) >> MCD212_RC_RF_SHIFT;
+				if(x > (mcd212.channel[0].region_control[reg] & MCD212_RC_X))
+				{
+					return;
+				}
+				if(x == (mcd212.channel[0].region_control[reg] & MCD212_RC_X))
+				{
+					switch((mcd212.channel[0].region_control[reg] & MCD212_RC_OP) >> MCD212_RC_OP_SHIFT)
 					{
 						case 0: // End of region control for line
 							break;
@@ -2344,109 +2493,92 @@ INLINE void mcd212_process_region(running_machine *machine, int channel, int x)
 						case 3: // Not used
 							break;
 						case 4: // Change weight of plane A
-							mcd212.channel[0].weight_factor_a = (mcd212.channel[0].region_control[flag*4 + reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
+							mcd212.channel[0].weight_factor_a[x] = (mcd212.channel[0].region_control[reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
+							verboselog(machine, 0, "New weight factor A: %d\n", mcd212.channel[0].weight_factor_a[x]);
 							break;
 						case 5:	// Not used
 							break;
 						case 6: // Change weight of plane B
-							mcd212.channel[1].weight_factor_b = (mcd212.channel[0].region_control[flag*4 + reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
+							mcd212.channel[1].weight_factor_b[x] = (mcd212.channel[0].region_control[reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
+							verboselog(machine, 0, "New weight factor B: %d\n", mcd212.channel[1].weight_factor_b[x]);
 							break;
 						case 7:	// Not used
 							break;
 						case 8: // Reset region flag
-							mcd212.region_flag[flag] = 0;
+							if(flag)
+							{
+								mcd212.region_flag_1[x] = 0;
+							}
+							else
+							{
+								mcd212.region_flag_0[x] = 0;
+							}
 							break;
 						case 9: // Set region flag
-							mcd212.region_flag[flag] = 1;
+							if(flag)
+							{
+								mcd212.region_flag_1[x] = 1;
+							}
+							else
+							{
+								mcd212.region_flag_0[x] = 1;
+							}
 							break;
 						case 10:	// Not used
 						case 11:	// Not used
 							break;
 						case 12: // Reset region flag and change weight of plane A
-							mcd212.channel[0].weight_factor_a = (mcd212.channel[0].region_control[flag*4 + reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
-							mcd212.region_flag[flag] = 0;
+							mcd212.channel[0].weight_factor_a[x] = (mcd212.channel[0].region_control[reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
+							if(flag)
+							{
+								mcd212.region_flag_1[x] = 0;
+							}
+							else
+							{
+								mcd212.region_flag_0[x] = 0;
+							}
 							break;
 						case 13: // Set region flag and change weight of plane A
-							mcd212.channel[0].weight_factor_a = (mcd212.channel[0].region_control[flag*4 + reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
-							mcd212.region_flag[flag] = 1;
+							mcd212.channel[0].weight_factor_a[x] = (mcd212.channel[0].region_control[reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
+							if(flag)
+							{
+								mcd212.region_flag_1[x] = 1;
+							}
+							else
+							{
+								mcd212.region_flag_0[x] = 1;
+							}
 							break;
 						case 14: // Reset region flag and change weight of plane B
-							mcd212.channel[1].weight_factor_b = (mcd212.channel[0].region_control[flag*4 + reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
-							mcd212.region_flag[flag] = 0;
+							mcd212.channel[1].weight_factor_b[x] = (mcd212.channel[0].region_control[reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
+							if(flag)
+							{
+								mcd212.region_flag_1[x] = 0;
+							}
+							else
+							{
+								mcd212.region_flag_0[x] = 0;
+							}
 							break;
 						case 15: // Set region flag and change weight of plane B
-							mcd212.channel[1].weight_factor_b = (mcd212.channel[0].region_control[flag*4 + reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
-							mcd212.region_flag[flag] = 1;
+							mcd212.channel[1].weight_factor_b[x] = (mcd212.channel[0].region_control[reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
+							if(flag)
+							{
+								mcd212.region_flag_1[x] = 1;
+							}
+							else
+							{
+								mcd212.region_flag_0[x] = 1;
+							}
 							break;
 					}
 				}
 			}
 		}
 	}
-	else
-	{
-		int reg = 0;
-		for(reg = 0; reg < 8; reg++)
-		{
-			int flag = (mcd212.channel[0].region_control[reg] & MCD212_RC_RF) >> MCD212_RC_RF_SHIFT;
-			if((mcd212.channel[0].region_control[reg] & MCD212_RC_X) > x)
-			{
-				break;
-			}
-			if(x == (mcd212.channel[0].region_control[reg] & MCD212_RC_X))
-			{
-				switch((mcd212.channel[0].region_control[reg] & MCD212_RC_OP) >> MCD212_RC_OP_SHIFT)
-				{
-					case 0: // End of region control for line
-						break;
-					case 1:
-					case 2:
-					case 3: // Not used
-						break;
-					case 4: // Change weight of plane A
-						mcd212.channel[0].weight_factor_a = (mcd212.channel[0].region_control[reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
-						verboselog(machine, 0, "New weight factor A: %d\n", mcd212.channel[0].weight_factor_a);
-						break;
-					case 5:	// Not used
-						break;
-					case 6: // Change weight of plane B
-						mcd212.channel[1].weight_factor_b = (mcd212.channel[0].region_control[reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
-						verboselog(machine, 0, "New weight factor B: %d\n", mcd212.channel[1].weight_factor_b);
-						break;
-					case 7:	// Not used
-						break;
-					case 8: // Reset region flag
-						mcd212.region_flag[flag] = 0;
-						break;
-					case 9: // Set region flag
-						mcd212.region_flag[flag] = 1;
-						break;
-					case 10:	// Not used
-					case 11:	// Not used
-						break;
-					case 12: // Reset region flag and change weight of plane A
-						mcd212.channel[0].weight_factor_a = (mcd212.channel[0].region_control[reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
-						mcd212.region_flag[flag] = 0;
-						break;
-					case 13: // Set region flag and change weight of plane A
-						mcd212.channel[0].weight_factor_a = (mcd212.channel[0].region_control[reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
-						mcd212.region_flag[flag] = 1;
-						break;
-					case 14: // Reset region flag and change weight of plane B
-						mcd212.channel[1].weight_factor_b = (mcd212.channel[0].region_control[reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
-						mcd212.region_flag[flag] = 0;
-						break;
-					case 15: // Set region flag and change weight of plane B
-						mcd212.channel[1].weight_factor_b = (mcd212.channel[0].region_control[reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
-						mcd212.region_flag[flag] = 1;
-						break;
-				}
-			}
-		}
-	}
 }
 
-INLINE void mcd212_process_vsr(running_machine *machine, int channel, UINT32 *pixels)
+static void mcd212_process_vsr(running_machine *machine, int channel, UINT8 *pixels_r, UINT8 *pixels_g, UINT8 *pixels_b)
 {
 	UINT8 *data = channel ? (UINT8*)planeb : (UINT8*)planea;
 	UINT32 vsr = mcd212_get_vsr(channel) & 0x0007ffff;
@@ -2455,25 +2587,25 @@ INLINE void mcd212_process_vsr(running_machine *machine, int channel, UINT32 *pi
 	UINT32 icm_mask = channel ? MCD212_ICM_MODE2 : MCD212_ICM_MODE1;
 	UINT32 icm_shift = channel ? MCD212_ICM_MODE2_SHIFT : MCD212_ICM_MODE1_SHIFT;
 	UINT8 icm = (mcd212.channel[0].image_coding_method & icm_mask) >> icm_shift;
+	UINT8 *clut_r = mcd212.channel[0].clut_r;
+	UINT8 *clut_g = mcd212.channel[0].clut_g;
+	UINT8 *clut_b = mcd212.channel[0].clut_b;
 
 	//printf( "vsr before: %08x: ", vsr );
 	//fflush(stdout);
 
 	if(!icm || !vsr)
 	{
-		for(; x < 768; x++)
-		{
-			pixels[x++] = 0x00101010;
-			pixels[x] = 0x00101010;
-		}
+		memset(pixels_r, 0x10, 768);
+		memset(pixels_g, 0x10, 768);
+		memset(pixels_b, 0x10, 768);
 		return;
 	}
 
 	while(!done)
 	{
-		UINT8 byte = data[vsr++ ^ 1];
-		//printf( "%02x ", byte );
-		//fflush(stdout);
+		UINT8 byte = data[(vsr & 0x0007ffff) ^ 1];
+		vsr++;
 		switch(mcd212.channel[channel].ddr & MCD212_DDR_FT)
 		{
 			case MCD212_DDR_FT_BMP:
@@ -2507,13 +2639,13 @@ INLINE void mcd212_process_vsr(running_machine *machine, int channel, UINT32 *pi
 								bY = bU = bV = 0x80;
 								break;
 						}
-						for(; x < 768;)
+						for(; x < 768; x += 4)
 						{
             				BYTE68K b0 = byte;
             				BYTE68K bU1 = bU + mcd212_abDeltaUV[b0];
             				BYTE68K bY0 = bY + mcd212_abDeltaY[b0];
 
-            				BYTE68K b1 = data[vsr++ ^ 1];
+            				BYTE68K b1 = data[(vsr & 0x0007ffff) ^ 1];
             				BYTE68K bV1 = bV + mcd212_abDeltaUV[b1];
             				BYTE68K bY1 = bY0 + mcd212_abDeltaY[b1];
 
@@ -2521,63 +2653,75 @@ INLINE void mcd212_process_vsr(running_machine *machine, int channel, UINT32 *pi
             				BYTE68K bV0 = (bV + bV1) >> 1;
 
 							BYTE68K *pbLimit;
-							BYTE68K bB, bG, bR;
+
+							vsr++;
 
 							bY = bY0;
 							bU = bU0;
 							bV = bV0;
 
             				pbLimit = mcd212_abLimit + bY + BYTE68K_MAX;
-            				bB = pbLimit[mcd212_abMatrixUB[bU]];
-            				bG = pbLimit[mcd212_abMatrixUG[bU] + mcd212_abMatrixVG[bV]];
-            				bR = pbLimit[mcd212_abMatrixVR[bV]];
 
-            				pixels[x++] = (bR << 16) | (bG << 8) | bB;
-            				pixels[x++] = (bR << 16) | (bG << 8) | bB;
+            				pixels_r[x + 0] = pixels_r[x + 1] = pbLimit[mcd212_abMatrixVR[bV]];
+            				pixels_g[x + 0] = pixels_g[x + 1] = pbLimit[mcd212_abMatrixUG[bU] + mcd212_abMatrixVG[bV]];
+            				pixels_b[x + 0] = pixels_b[x + 1] = pbLimit[mcd212_abMatrixUB[bU]];
 
             				bY = bY1;
             				bU = bU1;
             				bV = bV1;
 
             				pbLimit = mcd212_abLimit + bY + BYTE68K_MAX;
-            				bB = pbLimit[mcd212_abMatrixUB[bU]];
-            				bG = pbLimit[mcd212_abMatrixUG[bU] + mcd212_abMatrixVG[bV]];
-            				bR = pbLimit[mcd212_abMatrixVR[bV]];
 
-            				pixels[x++] = (bR << 16) | (bG << 8) | bB;
-            				pixels[x++] = (bR << 16) | (bG << 8) | bB;
+            				pixels_r[x + 2] = pixels_r[x + 3] = pbLimit[mcd212_abMatrixVR[bV]];
+            				pixels_g[x + 2] = pixels_g[x + 3] = pbLimit[mcd212_abMatrixUG[bU] + mcd212_abMatrixVG[bV]];
+            				pixels_b[x + 2] = pixels_b[x + 3] = pbLimit[mcd212_abMatrixUB[bU]];
 
-            				byte = data[vsr++ ^ 1];
+            				byte = data[(vsr & 0x0007ffff) ^ 1];
 
+							vsr++;
 						}
-						mcd212_set_vsr(channel, vsr - 1);
+						mcd212_set_vsr(channel, (vsr - 1) & 0x0007ffff);
 					}
 					else if(icm == 3 || icm == 4)
 					{
-						for(; x < 768; x++)
+						for(; x < 768; x += 2)
 						{
-							pixels[x++] = mcd212.channel[0].clut[BYTE_TO_CLUT(channel, icm, byte)];
-							pixels[x] = mcd212.channel[0].clut[BYTE_TO_CLUT(channel, icm, byte)];
-							byte = data[vsr++ ^ 1];
+							UINT8 clut_entry = BYTE_TO_CLUT(channel, icm, byte);
+							pixels_r[x + 0] = clut_r[clut_entry];
+							pixels_g[x + 0] = clut_g[clut_entry];
+							pixels_b[x + 0] = clut_b[clut_entry];
+							pixels_r[x + 1] = clut_r[clut_entry];
+							pixels_g[x + 1] = clut_g[clut_entry];
+							pixels_b[x + 1] = clut_b[clut_entry];
+							byte = data[(vsr & 0x0007ffff) ^ 1];
+							vsr++;
 						}
-						mcd212_set_vsr(channel, vsr - 1);
+						mcd212_set_vsr(channel, (vsr - 1) & 0x0007ffff);
 					}
 					else if(icm == 11)
 					{
-						for(; x < 768; x++)
+						for(; x < 768; x += 2)
 						{
-							pixels[x++] = mcd212.channel[0].clut[BYTE_TO_CLUT(channel, icm, byte >> 4)];
-							pixels[x]   = mcd212.channel[0].clut[BYTE_TO_CLUT(channel, icm, byte)];
-							byte = data[vsr++ ^ 1];
+							UINT8 even_entry = BYTE_TO_CLUT(channel, icm, byte >> 4);
+							UINT8 odd_entry = BYTE_TO_CLUT(channel, icm, byte);
+							pixels_r[x + 0] = clut_r[even_entry];
+							pixels_g[x + 0] = clut_g[even_entry];
+							pixels_b[x + 0] = clut_b[even_entry];
+							pixels_r[x + 1] = clut_r[odd_entry];
+							pixels_g[x + 1] = clut_g[odd_entry];
+							pixels_b[x + 1] = clut_b[odd_entry];
+							byte = data[(vsr & 0x0007ffff) ^ 1];
+							vsr++;
 						}
-						mcd212_set_vsr(channel, vsr - 1);
+						mcd212_set_vsr(channel, (vsr - 1) & 0x0007ffff);
 					}
 					else
 					{
 						for(; x < 768; x++)
 						{
-							pixels[x++] = 0x00101010;
-							pixels[x] = 0x00101010;
+							pixels_r[x] = 0x10;
+							pixels_g[x] = 0x10;
+							pixels_b[x] = 0x10;
 						}
 					}
 				}
@@ -2594,14 +2738,23 @@ INLINE void mcd212_process_vsr(running_machine *machine, int channel, UINT32 *pi
 					if(byte & 0x80)
 					{
 						// Run length
-						UINT8 length = data[vsr++ ^ 1];
+						UINT8 length = data[((vsr++) & 0x0007ffff) ^ 1];
 						if(!length)
 						{
+							UINT8 clut_entry = BYTE_TO_CLUT(channel, icm, byte);
+							UINT8 r = clut_r[clut_entry];
+							UINT8 g = clut_g[clut_entry];
+							UINT8 b = clut_b[clut_entry];
 							// Go to the end of the line
 							for(; x < 768; x++)
 							{
-								pixels[x++] = mcd212.channel[0].clut[BYTE_TO_CLUT(channel, icm, byte)];
-								pixels[x] = mcd212.channel[0].clut[BYTE_TO_CLUT(channel, icm, byte)];
+								pixels_r[x] = r;
+								pixels_g[x] = g;
+								pixels_b[x] = b;
+								x++;
+								pixels_r[x] = r;
+								pixels_g[x] = g;
+								pixels_b[x] = b;
 							}
 							done = 1;
 							mcd212_set_vsr(channel, vsr);
@@ -2609,10 +2762,19 @@ INLINE void mcd212_process_vsr(running_machine *machine, int channel, UINT32 *pi
 						else
 						{
 							int end = x + (length * 2);
+							UINT8 clut_entry = BYTE_TO_CLUT(channel, icm, byte);
+							UINT8 r = clut_r[clut_entry];
+							UINT8 g = clut_g[clut_entry];
+							UINT8 b = clut_b[clut_entry];
 							for(; x < end && x < 768; x++)
 							{
-								pixels[x++] = mcd212.channel[0].clut[BYTE_TO_CLUT(channel, icm, byte)];
-								pixels[x] = mcd212.channel[0].clut[BYTE_TO_CLUT(channel, icm, byte)];
+								pixels_r[x] = r;
+								pixels_g[x] = g;
+								pixels_b[x] = b;
+								x++;
+								pixels_r[x] = r;
+								pixels_g[x] = g;
+								pixels_b[x] = b;
 							}
 							if(x >= 768)
 							{
@@ -2624,8 +2786,15 @@ INLINE void mcd212_process_vsr(running_machine *machine, int channel, UINT32 *pi
 					else
 					{
 						// Single pixel
-						pixels[x++] = mcd212.channel[0].clut[BYTE_TO_CLUT(channel, icm, byte)];
-						pixels[x++] = mcd212.channel[0].clut[BYTE_TO_CLUT(channel, icm, byte)];
+						UINT8 clut_entry = BYTE_TO_CLUT(channel, icm, byte);
+						pixels_r[x] = clut_r[clut_entry];
+						pixels_g[x] = clut_g[clut_entry];
+						pixels_b[x] = clut_b[clut_entry];
+						x++;
+						pixels_r[x] = clut_r[clut_entry];
+						pixels_g[x] = clut_g[clut_entry];
+						pixels_b[x] = clut_b[clut_entry];
+						x++;
 						if(x >= 768)
 						{
 							done = 1;
@@ -2651,7 +2820,7 @@ static const UINT32 mcd212_4bpp_color[16] =
 	0x00101010, 0x001010e6, 0x0010e610, 0x0010e6e6, 0x00e61010, 0x00e610e6, 0x00e6e610, 0x00e6e6e6
 };
 
-INLINE void mcd212_draw_cursor(running_machine *machine, UINT32 *scanline, int y)
+static void mcd212_draw_cursor(running_machine *machine, UINT32 *scanline, int y)
 {
 	if(mcd212.channel[0].cursor_control & MCD212_CURCNT_EN)
 	{
@@ -2696,100 +2865,144 @@ INLINE void mcd212_draw_cursor(running_machine *machine, UINT32 *scanline, int y
 	}
 }
 
-INLINE void mcd212_mix_lines(running_machine *machine, UINT32 *plane_a, UINT32 *plane_b, UINT32 *out)
+static void mcd212_mix_lines(running_machine *machine, UINT8 *plane_a_r, UINT8 *plane_a_g, UINT8 *plane_a_b, UINT8 *plane_b_r, UINT8 *plane_b_g, UINT8 *plane_b_b, UINT32 *out)
 {
 	int x = 0;
 	UINT32 backdrop = mcd212_4bpp_color[mcd212.channel[0].backdrop_color];
+	UINT8 transparency_mode_a = (mcd212.channel[0].transparency_control >> 0) & 0x0f;
+	UINT8 transparency_mode_b = (mcd212.channel[0].transparency_control >> 8) & 0x0f;
+	UINT8 transparent_color_a_r = (UINT8)(mcd212.channel[0].transparent_color_a >> 16);
+	UINT8 transparent_color_a_g = (UINT8)(mcd212.channel[0].transparent_color_a >>  8);
+	UINT8 transparent_color_a_b = (UINT8)(mcd212.channel[0].transparent_color_a >>  0);
+	UINT8 transparent_color_b_r = (UINT8)(mcd212.channel[1].transparent_color_b >> 16);
+	UINT8 transparent_color_b_g = (UINT8)(mcd212.channel[1].transparent_color_b >>  8);
+	UINT8 transparent_color_b_b = (UINT8)(mcd212.channel[1].transparent_color_b >>  0);
 	for(x = 0; x < 768; x++)
 	{
 		out[x] = backdrop;
-		mcd212_process_region(machine, 0, x);
-		mcd212_process_region(machine, 1, x);
 		if(!(mcd212.channel[0].transparency_control & MCD212_TCR_DISABLE_MX))
 		{
-			INT32 weight_a = mcd212.channel[0].weight_factor_a;
-			INT32 weight_b = mcd212.channel[1].weight_factor_b;
-			INT32 ar = (plane_a[x] >> 16) & 0x000000ff;
-			INT32 ag = (plane_a[x] >>  8) & 0x000000ff;
-			INT32 ab = (plane_a[x] >>  0) & 0x000000ff;
-			INT32 br = (plane_b[x] >> 16) & 0x000000ff;
-			INT32 bg = (plane_b[x] >>  8) & 0x000000ff;
-			INT32 bb = (plane_b[x] >>  0) & 0x000000ff;
-			UINT8 abr = MCD212_LIM((MCD212_LIM(ar - 16) * weight_a) / 64 + (MCD212_LIM(br - 16) * weight_b) / 64 + 16);
-			UINT8 abg = MCD212_LIM((MCD212_LIM(ag - 16) * weight_a) / 64 + (MCD212_LIM(bg - 16) * weight_b) / 64 + 16);
-			UINT8 abb = MCD212_LIM((MCD212_LIM(ab - 16) * weight_a) / 64 + (MCD212_LIM(bb - 16) * weight_b) / 64 + 16);
+			UINT8 abr = MCD212_LIM(((MCD212_LIM((INT32)plane_a_r[x] - 16) * mcd212.channel[0].weight_factor_a[x]) >> 6) + ((MCD212_LIM((INT32)plane_b_r[x] - 16) * mcd212.channel[1].weight_factor_b[x]) >> 6) + 16);
+			UINT8 abg = MCD212_LIM(((MCD212_LIM((INT32)plane_a_g[x] - 16) * mcd212.channel[0].weight_factor_a[x]) >> 6) + ((MCD212_LIM((INT32)plane_b_g[x] - 16) * mcd212.channel[1].weight_factor_b[x]) >> 6) + 16);
+			UINT8 abb = MCD212_LIM(((MCD212_LIM((INT32)plane_a_b[x] - 16) * mcd212.channel[0].weight_factor_a[x]) >> 6) + ((MCD212_LIM((INT32)plane_b_b[x] - 16) * mcd212.channel[1].weight_factor_b[x]) >> 6) + 16);
 			out[x] = (abr << 16) | (abg << 8) | abb;
 		}
 		else
 		{
-			UINT8 transparency_mode[2] =
+			UINT8 plane_enable_a = 0;
+			UINT8 plane_enable_b = 0;
+			UINT8 plane_a_r_cur = plane_a_r[x];
+			UINT8 plane_a_g_cur = plane_a_g[x];
+			UINT8 plane_a_b_cur = plane_a_b[x];
+			UINT8 plane_b_r_cur = plane_b_r[x];
+			UINT8 plane_b_g_cur = plane_b_g[x];
+			UINT8 plane_b_b_cur = plane_b_b[x];
+			switch(transparency_mode_a)
 			{
-				(mcd212.channel[0].transparency_control >> 0) & 0x0f,
-				(mcd212.channel[0].transparency_control >> 8) & 0x0f
-			};
-			UINT8 plane_enable[2] =
+				case 0:
+					plane_enable_a = 0;
+					break;
+				case 1:
+					plane_enable_a = (plane_a_r_cur != transparent_color_a_r || plane_a_g_cur != transparent_color_a_g || plane_a_b_cur != transparent_color_a_b);
+					break;
+				case 3:
+					plane_enable_a = mcd212.region_flag_0[x];
+					break;
+				case 4:
+					plane_enable_a = mcd212.region_flag_1[x];
+					break;
+				case 5:
+					plane_enable_a = (plane_a_r_cur != transparent_color_a_r || plane_a_g_cur != transparent_color_a_g || plane_a_b_cur != transparent_color_a_b || mcd212.region_flag_0[x] == 1);
+					break;
+				case 6:
+					plane_enable_a = (plane_a_r_cur != transparent_color_a_r || plane_a_g_cur != transparent_color_a_g || plane_a_b_cur != transparent_color_a_b || mcd212.region_flag_1[x] == 1);
+					break;
+				case 8:
+					plane_enable_a = 1;
+					break;
+				case 9:
+					plane_enable_a = (plane_a_r_cur == transparent_color_a_r && plane_a_g_cur == transparent_color_a_g && plane_a_b_cur == transparent_color_a_b);
+					break;
+				case 11:
+					plane_enable_a = !mcd212.region_flag_0[x];
+					break;
+				case 12:
+					plane_enable_a = !mcd212.region_flag_1[x];
+					break;
+				case 13:
+					plane_enable_a = (plane_a_r_cur == transparent_color_a_r && plane_a_g_cur == transparent_color_a_g && plane_a_b_cur == transparent_color_a_b && mcd212.region_flag_0[x] == 0);
+					break;
+				case 14:
+					plane_enable_a = (plane_a_r_cur == transparent_color_a_r && plane_a_g_cur == transparent_color_a_g && plane_a_b_cur == transparent_color_a_b && mcd212.region_flag_1[x] == 0);
+					break;
+				default:
+					verboselog(machine, 0, "Unhandled transparency mode for plane A: %d\n", transparency_mode_a);
+					plane_enable_a = 1;
+					break;
+			}
+			switch(transparency_mode_b)
 			{
-				0,
-				0
-			};
-			int index = 0;
-			for(index = 0; index < 2; index++)
-			{
-				UINT32 *plane = index ? plane_b : plane_a;
-				UINT32 transparent_color = index ? mcd212.channel[1].transparent_color_b : mcd212.channel[0].transparent_color_a;
-				switch(transparency_mode[index])
-				{
-					case 0:
-						plane_enable[index] = 0;
-						break;
-					case 1:
-						if(plane[x] != transparent_color)
-						{
-							plane_enable[index] = 1;
-						}
-						break;
-					case 5:
-						// Todo
-						if(plane[x] != transparent_color)
-						{
-							plane_enable[index] = 1;
-						}
-						break;
-					case 8:
-						plane_enable[index] = 1;
-						break;
-					case 9:
-						if(plane[x] == transparent_color)
-						{
-							plane_enable[index] = 1;
-						}
-						break;
-					default:
-						verboselog(machine, 0, "Unhandled transparency mode for plane %c: %d\n", index ? 'B' : 'A', transparency_mode[index]);
-						plane_enable[index] = 1;
-						break;
-				}
+				case 0:
+					plane_enable_b = 0;
+					break;
+				case 1:
+					plane_enable_b = (plane_b_r_cur != transparent_color_b_r || plane_b_g_cur != transparent_color_b_g || plane_b_b_cur != transparent_color_b_b);
+					break;
+				case 3:
+					plane_enable_b = mcd212.region_flag_0[x];
+					break;
+				case 4:
+					plane_enable_b = mcd212.region_flag_1[x];
+					break;
+				case 5:
+					plane_enable_b = (plane_b_r_cur != transparent_color_b_r || plane_b_g_cur != transparent_color_b_g || plane_b_b_cur != transparent_color_b_b || mcd212.region_flag_0[x] == 1);
+					break;
+				case 6:
+					plane_enable_b = (plane_b_r_cur != transparent_color_b_r || plane_b_g_cur != transparent_color_b_g || plane_b_b_cur != transparent_color_b_b || mcd212.region_flag_1[x] == 1);
+					break;
+				case 8:
+					plane_enable_b = 1;
+					break;
+				case 9:
+					plane_enable_b = (plane_b_r_cur == transparent_color_b_r && plane_b_g_cur == transparent_color_b_g && plane_b_b_cur == transparent_color_b_b);
+					break;
+				case 11:
+					plane_enable_b = !mcd212.region_flag_0[x];
+					break;
+				case 12:
+					plane_enable_b = !mcd212.region_flag_1[x];
+					break;
+				case 13:
+					plane_enable_b = (plane_b_r_cur == transparent_color_b_r && plane_b_g_cur == transparent_color_b_g && plane_b_b_cur == transparent_color_b_b && mcd212.region_flag_0[x] == 0);
+					break;
+				case 14:
+					plane_enable_b = (plane_b_r_cur == transparent_color_b_r && plane_b_g_cur == transparent_color_b_g && plane_b_b_cur == transparent_color_b_b && mcd212.region_flag_1[x] == 0);
+					break;
+				default:
+					verboselog(machine, 0, "Unhandled transparency mode for plane B: %d\n", transparency_mode_b);
+					plane_enable_b = 1;
+					break;
 			}
 			switch(mcd212.channel[0].plane_order)
 			{
 				case MCD212_POR_AB:
-					if(plane_enable[0])
+					if(plane_enable_a)
 					{
-						out[x] = plane_a[x];
+						out[x] = (plane_a_r_cur << 16) | (plane_a_g_cur << 8) | plane_a_b_cur;
 					}
-					else if(plane_enable[1])
+					else if(plane_enable_b)
 					{
-						out[x] = plane_b[x];
+						out[x] = (plane_b_r_cur << 16) | (plane_b_g_cur << 8) | plane_b_b_cur;
 					}
 					break;
 				case MCD212_POR_BA:
-					if(plane_enable[1])
+					if(plane_enable_b)
 					{
-						out[x] = plane_b[x];
+						out[x] = (plane_b_r_cur << 16) | (plane_b_g_cur << 8) | plane_b_b_cur;
 					}
-					else if(plane_enable[0])
+					else if(plane_enable_a)
 					{
-						out[x] = plane_a[x];
+						out[x] = (plane_a_r_cur << 16) | (plane_a_g_cur << 8) | plane_a_b_cur;
 					}
 					break;
 			}
@@ -2800,14 +3013,14 @@ INLINE void mcd212_mix_lines(running_machine *machine, UINT32 *plane_a, UINT32 *
 static void mcd212_draw_scanline(running_machine *machine, int y)
 {
 	bitmap_t *bitmap = tmpbitmap;
-	UINT32 plane_a[768];
-	UINT32 plane_b[768];
+	UINT8 plane_a_r[768], plane_a_g[768], plane_a_b[768];
+	UINT8 plane_b_r[768], plane_b_g[768], plane_b_b[768];
 	UINT32 out[768];
 	UINT32 *scanline = BITMAP_ADDR32(bitmap, y, 0);
 	int x;
-	mcd212_process_vsr(machine, 0, plane_a);
-	mcd212_process_vsr(machine, 1, plane_b);
-	mcd212_mix_lines(machine, plane_a, plane_b, out);
+	mcd212_process_vsr(machine, 0, plane_a_r, plane_a_g, plane_a_b);
+	mcd212_process_vsr(machine, 1, plane_b_r, plane_b_g, plane_b_b);
+	mcd212_mix_lines(machine, plane_a_r, plane_a_g, plane_a_b, plane_b_r, plane_b_g, plane_b_b, out);
 	for(x = 0; x < 768; x++)
 	{
 		scanline[x] = out[x];
@@ -3019,7 +3232,7 @@ static MACHINE_RESET( cdi )
 *************************/
 
 static MACHINE_DRIVER_START( cdimono1 )
-	MDRV_CPU_ADD("maincpu", SCC68070, CLOCK_A/2)	/* SCC-68070 CCA84 datasheet */
+	MDRV_CPU_ADD("maincpu", SCC68070, CLOCK_A/3)
 	MDRV_CPU_PROGRAM_MAP(cdimono1_mem)
 
 	MDRV_SCREEN_ADD("screen", RASTER)
