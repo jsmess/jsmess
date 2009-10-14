@@ -49,8 +49,6 @@ extern const char layout_lcd[];	/* generic 1:1 lcd screen layout */
 
 extern const char mess_disclaimer[];
 
-UINT32 hash_data_extract_crc32(const char *d);
-
 
 
 /***************************************************************************/

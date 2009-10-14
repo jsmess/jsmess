@@ -14,7 +14,7 @@
 
 #include "mame.h"
 #include "image.h"
-#include "mess.h"
+#include "hash.h"
 #include "unzip.h"
 #include "devices/flopdrv.h"
 #include "utils.h"
@@ -168,6 +168,28 @@ static void memory_error(const char *message)
 
 
 /*-------------------------------------------------
+    hash_data_extract_crc32 - extract crc32 value
+    from hash string
+-------------------------------------------------*/
+
+static UINT32 hash_data_extract_crc32(const char *d)
+{
+	UINT32 crc = 0;
+	UINT8 crc_bytes[4];
+
+	if (hash_data_extract_binary_checksum(d, HASH_CRC, crc_bytes) == 1)
+	{
+		crc = (((UINT32) crc_bytes[0]) << 24)
+			| (((UINT32) crc_bytes[1]) << 16)
+			| (((UINT32) crc_bytes[2]) << 8)
+			| (((UINT32) crc_bytes[3]) << 0);
+	}
+	return crc;
+}
+
+
+
+/*-------------------------------------------------
     image_init - initialize the core image system
 -------------------------------------------------*/
 
@@ -233,14 +255,14 @@ void image_init(running_machine *machine)
         	if (device_get_info_ptr(slot->dev, DEVINFO_PTR_IMAGE_CREATE_OPTSPEC + i)) {
 	            /* allocate a new format */
 	            format = auto_alloc_clear(machine, image_device_format);
-	
+
 	            /* populate it */
 	            format->index       = cnt;
 	            format->name        = auto_strdup(machine, device_get_info_string(slot->dev, DEVINFO_STR_IMAGE_CREATE_OPTNAME + i));
 	            format->description = auto_strdup(machine, device_get_info_string(slot->dev, DEVINFO_STR_IMAGE_CREATE_OPTDESC + i));
 	            format->extensions  = auto_strdup(machine, device_get_info_string(slot->dev, DEVINFO_STR_IMAGE_CREATE_OPTEXTS + i));
 	            format->optspec     = device_get_info_ptr(slot->dev, DEVINFO_PTR_IMAGE_CREATE_OPTSPEC + i);
-	
+
 	            /* and append it to the list */
 	            *formatptr = format;
 	            formatptr = &format->next;

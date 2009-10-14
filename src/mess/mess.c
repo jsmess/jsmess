@@ -14,7 +14,6 @@
 #include "devices/flopdrv.h"
 #include "utils.h"
 #include "image.h"
-#include "hash.h"
 #include "messopts.h"
 
 #include "lcd.lh"
@@ -285,21 +284,4 @@ int mess_count_compatible_drivers(const game_driver *drv)
 		drv = mess_next_compatible_driver(drv);
 	}
 	return count;
-}
-
-
-
-UINT32 hash_data_extract_crc32(const char *d)
-{
-	UINT32 crc = 0;
-	UINT8 crc_bytes[4];
-
-	if (hash_data_extract_binary_checksum(d, HASH_CRC, crc_bytes) == 1)
-	{
-		crc = (((UINT32) crc_bytes[0]) << 24)
-			| (((UINT32) crc_bytes[1]) << 16)
-			| (((UINT32) crc_bytes[2]) << 8)
-			| (((UINT32) crc_bytes[3]) << 0);
-	}
-	return crc;
 }
