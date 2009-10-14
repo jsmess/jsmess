@@ -3995,6 +3995,9 @@ static int dsk_image_init(imgtool_image *img, imgtool_stream *f, ti99_img_format
 	/* open disk image at level 2 */
 	image->type = L2I_DSK;
 
+	/* @BN@ */
+	/* Copy in the allocation bit map! */
+	memcpy(image->abm, vib.abm, 200);
 	/* first compute AU size and number of AUs */
 	totphysrecs = get_UINT16BE(vib.totphysrecs);
 
@@ -4256,7 +4259,9 @@ static imgtoolerr_t dsk_image_nextenum(imgtool_directory *enumeration, imgtool_d
 			snprintf(ent->attr, sizeof(ent->attr) / sizeof(ent->attr[0]), "DIR");
 
 			/* len in physrecs */
-			ent->filesize = 1;
+			/* @BN@ return length in bytes */
+			/* ent->filesize = 1; */
+			ent->filesize = 256;
 
 			/* recurse subdirectory */
 			iter->listing_subdirs = 0;	/* no need to list subdirs as only the
@@ -4298,7 +4303,9 @@ static imgtoolerr_t dsk_image_nextenum(imgtool_directory *enumeration, imgtool_d
 							fdr.reclen,
 							(fdr.flags & fdr99_f_wp) ? " R/O" : "");
 			/* len in physrecs */
-			ent->filesize = get_UINT16BE(fdr.fphysrecs);
+			/* @BN@ return length in bytes */
+			/* ent->filesize = get_UINT16BE(fdr.fphysrecs); */
+			ent->filesize = (get_UINT16BE(fdr.fphysrecs)+1)*256;
 
 			iter->index[iter->level]++;
 		}
@@ -4391,7 +4398,9 @@ static imgtoolerr_t win_image_nextenum(imgtool_directory *enumeration, imgtool_d
 			snprintf(ent->attr, sizeof(ent->attr) / sizeof(ent->attr[0]), "DIR");
 
 			/* len in physrecs */
-			ent->filesize = 2;
+			/* @BN@ return length in bytes */
+			/* ent->filesize = 2; */
+			ent->filesize = 512;
 
 			/* recurse subdirectory */
 			/*iter->listing_subdirs = 1;*/
@@ -4438,7 +4447,9 @@ static imgtoolerr_t win_image_nextenum(imgtool_directory *enumeration, imgtool_d
 							fdr.reclen,
 							(fdr.flags & fdr99_f_wp) ? " R/O" : "");
 			/* len in physrecs */
-			ent->filesize = get_win_fdr_fphysrecs(&fdr);
+			/* @BN@ return length in bytes */
+			/* ent->filesize = get_win_fdr_fphysrecs(&fdr); */
+			ent->filesize = (get_win_fdr_fphysrecs(&fdr)+1)*256;
 
 			iter->index[iter->level]++;
 		}
@@ -4464,7 +4475,9 @@ static imgtoolerr_t ti99_image_freespace(imgtool_partition *partition, UINT64 *s
 			freeAUs++;
 	}
 
-	*size = freeAUs;
+	/* @BN@ return free space in bytes */
+	/*    *size = freeAUs; */
+	*size = freeAUs*256;
 
 	return IMGTOOLERR_SUCCESS;
 }

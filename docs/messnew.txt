@@ -74,7 +74,7 @@ User Interface Changes:
 
 Imgtool Changes:
 ----------------
-(none)
+- Fixes for problems with TI99/4A disks.  [Barry Nelson]
 
 
 
