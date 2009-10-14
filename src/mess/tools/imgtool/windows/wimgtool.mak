@@ -12,7 +12,7 @@ WIMGTOOL = wimgtool$(EXE)
 
 # wimgtool directories
 WIMGTOOLSRC = $(MESSSRC)/tools/imgtool/windows
-WIMGTOOLOBJ = $(MESSOBJ)/tools/imgtool/windows
+WIMGTOOLOBJ = $(MESS_TOOLS)/imgtool/windows
 
 
 
@@ -23,19 +23,19 @@ WIMGTOOLOBJ = $(MESSOBJ)/tools/imgtool/windows
 OBJDIRS += $(WIMGTOOLOBJ)
 
 WIMGTOOL_OBJS = \
-	$(MESSOBJ)/pile.o								\
-	$(MESSOBJ)/toolerr.o							\
-	$(MESSOBJ)/osd/windows/opcntrl.o				\
-	$(MESSOBJ)/osd/windows/winutils.o				\
-	$(MESSOBJ)/tools/imgtool/stubs.o				\
-	$(MESSOBJ)/tools/imgtool/windows/wmain.o		\
-	$(MESSOBJ)/tools/imgtool/windows/wimgtool.o		\
-	$(MESSOBJ)/tools/imgtool/windows/attrdlg.o		\
-	$(MESSOBJ)/tools/imgtool/windows/assoc.o		\
-	$(MESSOBJ)/tools/imgtool/windows/assocdlg.o		\
-	$(MESSOBJ)/tools/imgtool/windows/hexview.o		\
-	$(MESSOBJ)/tools/imgtool/windows/secview.o		\
-	$(MESSOBJ)/tools/imgtool/windows/wimgtool.res	\
+	$(MESSOBJ)/pile.o							\
+	$(MESS_TOOLS)/toolerr.o						\
+	$(MESSOBJ)/osd/windows/opcntrl.o			\
+	$(MESSOBJ)/osd/windows/winutils.o			\
+	$(MESS_TOOLS)/imgtool/stubs.o				\
+	$(MESS_TOOLS)/imgtool/windows/wmain.o		\
+	$(MESS_TOOLS)/imgtool/windows/wimgtool.o	\
+	$(MESS_TOOLS)/imgtool/windows/attrdlg.o		\
+	$(MESS_TOOLS)/imgtool/windows/assoc.o		\
+	$(MESS_TOOLS)/imgtool/windows/assocdlg.o	\
+	$(MESS_TOOLS)/imgtool/windows/hexview.o		\
+	$(MESS_TOOLS)/imgtool/windows/secview.o		\
+	$(MESS_TOOLS)/imgtool/windows/wimgtool.res	\
 
 
 

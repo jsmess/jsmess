@@ -11,7 +11,7 @@
 MESSTEST = messtest$(EXE)
 
 # messtest directories
-OBJDIRS += $(MESSOBJ)/tools/messtest
+MESSTESTOBJ = $(MESS_TOOLS)/messtest
 
 
 
@@ -19,15 +19,18 @@ OBJDIRS += $(MESSOBJ)/tools/messtest
 # messtest objects
 #-------------------------------------------------
 
+# messtest directories
+OBJDIRS += $(MESSTESTOBJ)
+
 MESSTEST_OBJS =	\
-	$(MESSOBJ)/pile.o						\
-	$(MESSOBJ)/tools/messtest/main.o		\
-	$(MESSOBJ)/tools/messtest/core.o		\
-	$(MESSOBJ)/tools/messtest/testmess.o	\
-	$(MESSOBJ)/tools/messtest/testimgt.o	\
-	$(MESSOBJ)/tools/messtest/testzpth.o	\
-	$(MESSOBJ)/tools/messtest/tststubs.o	\
-	$(MESSOBJ)/tools/messtest/tstutils.o	\
+	$(MESSOBJ)/pile.o			\
+	$(MESSTESTOBJ)/main.o		\
+	$(MESSTESTOBJ)/core.o		\
+	$(MESSTESTOBJ)/testmess.o	\
+	$(MESSTESTOBJ)/testimgt.o	\
+	$(MESSTESTOBJ)/testzpth.o	\
+	$(MESSTESTOBJ)/tststubs.o	\
+	$(MESSTESTOBJ)/tstutils.o	\
 
 
 

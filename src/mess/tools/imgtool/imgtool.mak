@@ -14,7 +14,7 @@ IMGTOOL = imgtool$(EXE)
 CFLAGS += -I$(SRC)/$(TARGET)/tools/imgtool
 
 # imgtool directories
-IMGTOOLOBJ = $(MESSOBJ)/tools/imgtool
+IMGTOOLOBJ = $(MESS_TOOLS)/imgtool
 IMGTOOL_MODULES = $(IMGTOOLOBJ)/modules
 
 
@@ -105,7 +105,7 @@ $(LIBIMGTOOL): $(IMGTOOL_LIB_OBJS)
 IMGTOOL_OBJS = \
 	$(IMGTOOLOBJ)/main.o \
 	$(IMGTOOLOBJ)/stubs.o \
-	$(MESSOBJ)/toolerr.o
+	$(MESS_TOOLS)/toolerr.o
 
 
 

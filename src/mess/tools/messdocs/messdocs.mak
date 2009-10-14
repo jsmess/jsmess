@@ -15,7 +15,7 @@ HELPOBJ = $(OBJ)/help
 MESSHELP = mess.chm
 
 # add our stuff to the global variables
-OBJDIRS += $(MESSOBJ)/tools/messdocs
+OBJDIRS += $(MESS_TOOLS)/messdocs
 
 # html help compiler
 HHC = @-hhc
@@ -29,7 +29,7 @@ HHC = @-hhc
 MESSDOCS_OBJS = \
 	$(MESSOBJ)/tools/messdocs/messdocs.o	\
 	$(MESSOBJ)/utils.o						\
-	$(MESSOBJ)/toolerr.o					\
+	$(MESS_TOOLS)/toolerr.o					\
 
 
 
