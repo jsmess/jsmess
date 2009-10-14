@@ -39,11 +39,20 @@ struct _floppy_drive
 	devcb_resolved_write_line out_wpt_func;
 	devcb_resolved_write_line out_rdy_func;
 
+	/* state of input lines */
+	int drtn; /* direction */
+	int stp;  /* step */
+	int wtg;  /* write gate */
+
 	/* state of output lines */
 	int idx;  /* index pulse */
 	int tk00; /* track 00 */
 	int wpt;  /* write protect */
 	int rdy;  /* ready */
+
+	/* drive select logic */
+	int drive_id;
+	int active;
 
 	const floppy_config	*config;
 
@@ -704,6 +713,9 @@ DEVICE_START( floppy )
 	floppy->config = device->static_config;
 	floppy_drive_init(device);
 
+	floppy->drive_id = floppy_get_drive(device);
+	floppy->active = FALSE;
+
 	/* resolve callbacks */
 	devcb_resolve_write_line(&floppy->out_idx_func, &floppy->config->out_idx_func, device);
 	devcb_resolve_read_line(&floppy->in_mon_func, &floppy->config->in_mon_func, device);
@@ -864,14 +876,122 @@ int floppy_get_count(running_machine *machine)
 	return cnt;
 }
 
+
+/* drive select 0 */
+WRITE_LINE_DEVICE_HANDLER( floppy_ds0_w )
+{
+	floppy_drive *drive = get_safe_token(device);
+
+	if (state == CLEAR_LINE)
+		drive->active = (drive->drive_id == 0);
+}
+
+/* drive select 1 */
+WRITE_LINE_DEVICE_HANDLER( floppy_ds1_w )
+{
+	floppy_drive *drive = get_safe_token(device);
+
+	if (state == CLEAR_LINE)
+		drive->active = (drive->drive_id == 1);
+}
+
+/* drive select 2 */
+WRITE_LINE_DEVICE_HANDLER( floppy_ds2_w )
+{
+	floppy_drive *drive = get_safe_token(device);
+
+	if (state == CLEAR_LINE)
+		drive->active = (drive->drive_id == 2);
+}
+
+/* drive select 3 */
+WRITE_LINE_DEVICE_HANDLER( floppy_ds3_w )
+{
+	floppy_drive *drive = get_safe_token(device);
+
+	if (state == CLEAR_LINE)
+		drive->active = (drive->drive_id == 3);
+}
+
+/* shortcut to write all four ds lines */
+WRITE8_DEVICE_HANDLER( floppy_ds_w )
+{
+	floppy_ds0_w(device, BIT(data, 0));
+	floppy_ds1_w(device, BIT(data, 1));
+	floppy_ds2_w(device, BIT(data, 2));
+	floppy_ds3_w(device, BIT(data, 3));
+}
+
+/* direction */
+WRITE_LINE_DEVICE_HANDLER( floppy_drtn_w )
+{
+	floppy_drive *drive = get_safe_token(device);
+	drive->drtn = state;
+}
+
+/* write data */
+WRITE_LINE_DEVICE_HANDLER( floppy_wtd_w )
+{
+
+}
+
+/* step */
+WRITE_LINE_DEVICE_HANDLER( floppy_stp_w )
+{
+	floppy_drive *drive = get_safe_token(device);
+
+	/* move head one track when going from high to low and write gate is high */
+	if (drive->active && drive->stp && state == CLEAR_LINE && drive->wtg)
+	{
+		/* move head according to the direction line */
+		if (drive->drtn)
+		{
+			/* move head outward */
+			drive->current_track--;
+
+			/* are we at track 0 now? */
+			if (drive->current_track <= 0)
+			{
+				drive->current_track = 0;
+				drive->tk00 = CLEAR_LINE;
+			}
+			else
+				drive->tk00 = ASSERT_LINE;
+		}
+		else
+		{
+			/* move head inward */
+			drive->current_track++;
+
+			/* are we over the maximum? */
+			if (drive->current_track >= drive->max_track)
+				drive->current_track = drive->max_track - 1;
+
+			/* we can't be at track 0 here, so reset the line */
+			drive->tk00 = ASSERT_LINE;
+		}
+
+		/* update track 0 line with new status */
+		devcb_call_write_line(&drive->out_tk00_func, drive->tk00);
+	}
+
+	drive->stp = state;
+}
+
+/* write gate */
+WRITE_LINE_DEVICE_HANDLER( floppy_wtg_w )
+{
+	floppy_drive *drive = get_safe_token(device);
+	drive->wtg = state;
+}
+
 /* write protect signal, active low */
 READ_LINE_DEVICE_HANDLER( floppy_wpt_r )
 {
-	if (floppy_drive_get_flag_state(device, FLOPPY_DRIVE_DISK_WRITE_PROTECTED))
-		return CLEAR_LINE;
-	else
-		return ASSERT_LINE;
+	floppy_drive *drive = get_safe_token(device);
+	return drive->wpt;
 }
+
 
 /*************************************
  *

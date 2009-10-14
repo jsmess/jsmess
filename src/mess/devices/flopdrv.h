@@ -135,8 +135,19 @@ void flopimg_alloc_custom_data(const device_config *image,void *custom);
 
 void floppy_drive_set_geometry(const device_config *img, floppy_type type);
 
+/* drive select lines */
+WRITE_LINE_DEVICE_HANDLER( floppy_ds0_w );
+WRITE_LINE_DEVICE_HANDLER( floppy_ds1_w );
+WRITE_LINE_DEVICE_HANDLER( floppy_ds2_w );
+WRITE_LINE_DEVICE_HANDLER( floppy_ds3_w );
+WRITE8_DEVICE_HANDLER( floppy_ds_w );
+
 READ_LINE_DEVICE_HANDLER( floppy_idx_r );
 WRITE_LINE_DEVICE_HANDLER( floppy_mon_w );
+WRITE_LINE_DEVICE_HANDLER( floppy_drtn_w );
+WRITE_LINE_DEVICE_HANDLER( floppy_stp_w );
+WRITE_LINE_DEVICE_HANDLER( floppy_wtd_w );
+WRITE_LINE_DEVICE_HANDLER( floppy_wtg_w );
 READ_LINE_DEVICE_HANDLER( floppy_tk00_r );
 READ_LINE_DEVICE_HANDLER( floppy_wpt_r );
 READ_LINE_DEVICE_HANDLER( floppy_rdy_r );
