@@ -948,23 +948,28 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 			}
 
 			cdic_regs.time += 0x100;
-			if((cdic_regs.time & 0x00000f00) == 0xa00)
+			if((cdic_regs.time & 0x00000f00) == 0x00000a00)
 			{
 				cdic_regs.time &= 0xfffff0ff;
 				cdic_regs.time += 0x00001000;
 			}
-			if((cdic_regs.time & 0x0000ff00) == 0x7500)
+			if((cdic_regs.time & 0x0000ff00) == 0x00007500)
 			{
 				cdic_regs.time &= 0xffff00ff;
 				cdic_regs.time += 0x00010000;
-				if((cdic_regs.time & 0xf0000) == 0xa0000)
+				if((cdic_regs.time & 0x000f0000) == 0x000a0000)
 				{
 					cdic_regs.time &= 0xfff0ffff;
-					cdic_regs.time += 0x100000;
-					if((cdic_regs.time & 0xf00000) == 0xf00000)
+					cdic_regs.time += 0x00100000;
+					if((cdic_regs.time & 0x00f00000) == 0x00a00000)
 					{
 						cdic_regs.time &= 0xff0fffff;
 						cdic_regs.time += 0x01000000;
+						if((cdic_regs.time & 0x0f000000) == 0x0a000000)
+						{
+							cdic_regs.time &= 0xf0ffffff;
+							cdic_regs.time += 0x10000000;
+						}
 					}
 				}
 			}
@@ -983,7 +988,6 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 					cdic_regs.data_buffer |= 0x4000;
 					cdic_regs.data_buffer &= 0x7fff;
 
-					verboselog(machine, 0, "EOF, access should stop here\n" );
 					//printf( "Setting CDIC interrupt line\n" );
 					verboselog(machine, 0, "Setting CDIC interrupt line\n" );
 					cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), M68K_IRQ_4, 128);
@@ -992,7 +996,23 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 			}
 			else if((buffer[22] & 0x0e) == 0x00)
 			{
-				// Empty message sector, ignore it
+				// Ignore the audio sector for now.
+				if(!(buffer[22] & 0x10))
+				{
+					verboselog(machine, 0, "Message sector, ignored\n" );
+				}
+				else
+				{
+					cdic_regs.x_buffer |= 0x8000;
+
+					cdic_regs.data_buffer |= 0x4000;
+					cdic_regs.data_buffer &= 0x7fff;
+
+					//printf( "Setting CDIC interrupt line\n" );
+					verboselog(machine, 0, "Setting CDIC interrupt line\n" );
+					cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), M68K_IRQ_4, 128);
+					cputag_set_input_line(machine, "maincpu", M68K_IRQ_4, ASSERT_LINE);
+				}
 			}
 			else //if((buffer[22] & 0x04) == 0x04)
 			{
@@ -1001,7 +1021,6 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 				cdic_regs.data_buffer |= 0x4000;
 				cdic_regs.data_buffer &= 0x7fff;
 
-				verboselog(machine, 0, "EOF, access should stop here\n" );
 				//printf( "Setting CDIC interrupt line\n" );
 				verboselog(machine, 0, "Setting CDIC interrupt line\n" );
 				cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), M68K_IRQ_4, 128);
@@ -1127,12 +1146,7 @@ static WRITE16_HANDLER( cdic_w )
 			for(index = start / 2; index < (start / 2 + count); index++)
 			{
 				memory[index] = cdram[src_index++];
-				if(cdic_regs.time == 0x00332400 || cdic_regs.time == 0x00332500)
-				{
-					//printf( "%04x ", cdram[src_index - 1] );
-				}
 			}
-			//printf( "\n" );
 			scc68070_regs.dma.channel[0].memory_address_counter += scc68070_regs.dma.channel[0].transfer_counter * 2;
 			break;
 		}
@@ -1162,6 +1176,9 @@ static WRITE16_HANDLER( cdic_w )
 					case 0x29: // Read Mode 1
 					case 0x2a: // Read Mode 2
 						timer_adjust_oneshot(cdic_regs.interrupt_timer, ATTOTIME_IN_HZ(75), 0); // 75Hz = 1x CD-ROM speed
+						break;
+					default:
+						fatalerror( "Unknown CDIC command: %02x\n", cdic_regs.command );
 						break;
 				}
 			}
@@ -1235,24 +1252,27 @@ static void perform_mouse_update(running_machine *machine)
 	UINT16 old_mouse_x = slave_regs.real_mouse_x;
 	UINT16 old_mouse_y = slave_regs.real_mouse_y;
 
+	if(slave_regs.real_mouse_x == 0xffff)
+	{
+		old_mouse_x = x & 0x3ff;
+		old_mouse_y = y & 0x3ff;
+	}
+
 	slave_regs.real_mouse_x = x & 0x3ff;
 	slave_regs.real_mouse_y = y & 0x3ff;
 
-	if(slave_regs.real_mouse_x == 0xffff)
-	{
-		slave_regs.fake_mouse_x = slave_regs.real_mouse_x;
-		slave_regs.fake_mouse_y = slave_regs.real_mouse_y;
-	}
-	else
-	{
-		old_mouse_x = 0xffff;
-		old_mouse_y = 0xffff;
-		slave_regs.fake_mouse_x = x & 0x3ff;
-		slave_regs.fake_mouse_y = y & 0x3ff;
-	}
-
 	slave_regs.fake_mouse_x += (slave_regs.real_mouse_x - old_mouse_x);
 	slave_regs.fake_mouse_y += (slave_regs.real_mouse_y - old_mouse_y);
+
+	while(slave_regs.fake_mouse_x > 0x3ff)
+	{
+		slave_regs.fake_mouse_x += 0x400;
+	}
+
+	while(slave_regs.fake_mouse_y > 0x3ff)
+	{
+		slave_regs.fake_mouse_y += 0x400;
+	}
 
 	x = slave_regs.fake_mouse_x;
 	y = slave_regs.fake_mouse_y;
@@ -1306,17 +1326,13 @@ static void set_mouse_position(running_machine* machine)
 {
 	UINT16 x, y;
 
-	printf( "old fake mouse x: %04x\n", slave_regs.fake_mouse_x );
-	printf( "old fake mouse y: %04x\n", slave_regs.fake_mouse_y );
+	printf( "Set mouse position: %02x %02x %02x\n", slave_regs.in_buf[0], slave_regs.in_buf[1], slave_regs.in_buf[2] );
 
-	slave_regs.fake_mouse_y = (slave_regs.fake_mouse_y & 0xff80) | (slave_regs.in_buf[1] & 0x7f);
-	slave_regs.fake_mouse_x = (slave_regs.fake_mouse_x & 0xff80) | (slave_regs.in_buf[2] & 0x7f);
+	slave_regs.fake_mouse_y = ((slave_regs.in_buf[1] & 0x0f) << 6) | (slave_regs.in_buf[0] & 0x3f);
+	slave_regs.fake_mouse_x = ((slave_regs.in_buf[1] & 0x70) << 3) | slave_regs.in_buf[2];
 
 	x = slave_regs.fake_mouse_x;
 	y = slave_regs.fake_mouse_y;
-
-	printf( "new fake mouse x: %04x\n", slave_regs.fake_mouse_x );
-	printf( "new fake mouse y: %04x\n", slave_regs.fake_mouse_y );
 
 	if(slave_regs.polling_active)
 	{
@@ -2367,7 +2383,6 @@ INLINE void mcd212_process_region(running_machine *machine, int channel, int x)
 							mcd212.region_flag[flag] = 1;
 							break;
 					}
-					break;
 				}
 			}
 		}
@@ -2430,7 +2445,6 @@ INLINE void mcd212_process_region(running_machine *machine, int channel, int x)
 						mcd212.region_flag[flag] = 1;
 						break;
 				}
-				break;
 			}
 		}
 	}
@@ -2566,8 +2580,8 @@ INLINE void mcd212_process_vsr(running_machine *machine, int channel, UINT32 *pi
 					{
 						for(; x < 768; x++)
 						{
-							pixels[x++] = 0;
-							pixels[x] = 0;
+							pixels[x++] = 0x00101010;
+							pixels[x] = 0x00101010;
 						}
 					}
 				}
@@ -2637,18 +2651,17 @@ INLINE void mcd212_process_vsr(running_machine *machine, int channel, UINT32 *pi
 
 static const UINT32 mcd212_4bpp_color[16] =
 {
-	0x00000000, 0x0000007f, 0x00007f00, 0x00007f7f, 0x007f0000, 0x007f007f, 0x007f7f00, 0x007f7f7f,
-	0x00000000, 0x000000ff, 0x0000ff00, 0x0000ffff, 0x00ff0000, 0x00ff00ff, 0x00ffff00, 0x00ffffff
+	0x00101010, 0x0010107a, 0x00107a10, 0x00107a7a, 0x007a1010, 0x007a107a, 0x007a7a10, 0x007a7a7a,
+	0x00101010, 0x001010e6, 0x0010e610, 0x0010e6e6, 0x00e61010, 0x00e610e6, 0x00e6e610, 0x00e6e6e6
 };
 
 INLINE void mcd212_draw_cursor(running_machine *machine, UINT32 *scanline, int y)
 {
 	if(mcd212.channel[0].cursor_control & MCD212_CURCNT_EN)
 	{
-		UINT16 curx = mcd212.channel[0].cursor_position & 0x3ff;
-		UINT16 cury = (mcd212.channel[0].cursor_position >> 12) & 0x3ff;
+		UINT16 curx =  mcd212.channel[0].cursor_position        & 0x3ff;
+		UINT16 cury = ((mcd212.channel[0].cursor_position >> 12) & 0x3ff) + 22;
 		UINT32 x = 0;
-		cury += 22;
 		if(y >= cury && y < (cury + 16))
 		{
 			UINT32 color = mcd212_4bpp_color[mcd212.channel[0].cursor_control & MCD212_CURCNT_COLOR];
@@ -2961,10 +2974,10 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( cdi )
 	PORT_START("MOUSEX")
-	PORT_BIT(0x3ff, 0x000, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_CHANGED(mouse_update, 0)
+	PORT_BIT(0x3ff, 0x000, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_MINMAX(0x000, 0x3ff) PORT_KEYDELTA(0) PORT_CHANGED(mouse_update, 0)
 
 	PORT_START("MOUSEY")
-	PORT_BIT(0x1ff, 0x000, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_CHANGED(mouse_update, 0)
+	PORT_BIT(0x3ff, 0x000, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_MINMAX(0x000, 0x3ff) PORT_KEYDELTA(0) PORT_CHANGED(mouse_update, 0)
 
 	PORT_START("MOUSEBTN")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_CODE(MOUSECODE_BUTTON1) PORT_NAME("Mouse Button 1") PORT_CHANGED(mouse_update, 0)
