@@ -23,7 +23,7 @@ MESSTESTOBJ = $(MESS_TOOLS)/messtest
 OBJDIRS += $(MESSTESTOBJ)
 
 MESSTEST_OBJS =	\
-	$(MESSOBJ)/pile.o			\
+	$(MESS_TOOLS)/pile.o		\
 	$(MESSTESTOBJ)/main.o		\
 	$(MESSTESTOBJ)/core.o		\
 	$(MESSTESTOBJ)/testmess.o	\

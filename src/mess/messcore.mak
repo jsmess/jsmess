@@ -46,7 +46,6 @@ MESS_FORMATS = $(MESSOBJ)/formats
 MESS_LAYOUT = $(MESSOBJ)/layout
 MESS_MACHINE = $(MESSOBJ)/machine
 MESS_VIDEO = $(MESSOBJ)/video
-MESS_TOOLS = $(MESSOBJ)/tools
 
 
 OBJDIRS += \

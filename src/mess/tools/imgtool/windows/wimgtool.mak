@@ -23,7 +23,7 @@ WIMGTOOLOBJ = $(MESS_TOOLS)/imgtool/windows
 OBJDIRS += $(WIMGTOOLOBJ)
 
 WIMGTOOL_OBJS = \
-	$(MESSOBJ)/pile.o							\
+	$(MESS_TOOLS)/pile.o						\
 	$(MESS_TOOLS)/toolerr.o						\
 	$(MESSOBJ)/osd/windows/opcntrl.o			\
 	$(MESSOBJ)/osd/windows/winutils.o			\

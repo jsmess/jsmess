@@ -1531,6 +1531,7 @@ $(MESS_VIDEO)/gba.o: 		$(MESSSRC)/video/gbamode0.c \
 $(MESS_MACHINE)/nes_mmc.o: 	$(MESSSRC)/machine/nes_ines.c \
 				$(MESSSRC)/machine/nes_unif.c \
 
+
 #-------------------------------------------------
 # layout dependencies
 #-------------------------------------------------
@@ -1580,44 +1581,16 @@ $(MESS_DRIVERS)/z80ne.o:	$(MESS_LAYOUT)/z80ne.lh   \
 							$(MESS_LAYOUT)/z80netb.lh \
 							$(MESS_LAYOUT)/z80netf.lh
 
+
 #-------------------------------------------------
 # MESS-specific tools
 #-------------------------------------------------
 
-ifdef BUILD_IMGTOOL
-include $(MESSSRC)/tools/imgtool/imgtool.mak
-TOOLS += $(IMGTOOL)
-endif
-
-ifdef BUILD_CASTOOL
-include $(MESSSRC)/tools/castool/castool.mak
-TOOLS += $(CASTOOL)
-endif
-
-ifdef BUILD_MESSTEST
-include $(MESSSRC)/tools/messtest/messtest.mak
-TOOLS += $(MESSTEST)
-endif
-
-ifdef BUILD_DAT2HTML
-include $(MESSSRC)/tools/dat2html/dat2html.mak
-TOOLS += $(DAT2HTML)
-endif
-
-# include OS-specific MESS stuff
-ifeq ($(OSD),windows)
-include $(MESSSRC)/tools/messdocs/messdocs.mak
-
-ifdef BUILD_WIMGTOOL
-include $(MESSSRC)/tools/imgtool/windows/wimgtool.mak
-TOOLS += $(WIMGTOOL)
-endif
-endif
-
+include $(MESSSRC)/tools/tools.mak
 
 
 #-------------------------------------------------
 # MESS special OSD rules
 #-------------------------------------------------
 
-include $(SRC)/mess/osd/$(OSD)/$(OSD).mak
+include $(MESSSRC)/osd/$(OSD)/$(OSD).mak
