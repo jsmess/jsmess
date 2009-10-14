@@ -17,13 +17,13 @@
 #define FLAG_REGION_JAPAN	0x00400000
 
 
-#define IS_GAMEGEAR			( sms_flags & FLAG_GAMEGEAR )
-#define HAS_BIOS_0400		( sms_flags & FLAG_BIOS_0400 )
-#define HAS_BIOS_2000		( sms_flags & FLAG_BIOS_2000 )
-#define HAS_BIOS_FULL		( sms_flags & FLAG_BIOS_FULL )
-#define HAS_BIOS			( sms_flags & ( FLAG_BIOS_0400 | FLAG_BIOS_2000 | FLAG_BIOS_FULL ) )
-#define HAS_FM				( sms_flags & FLAG_FM )
-#define IS_REGION_JAPAN		( sms_flags & FLAG_REGION_JAPAN )
+#define IS_GAMEGEAR			( sms_state.flags & FLAG_GAMEGEAR )
+#define HAS_BIOS_0400		( sms_state.flags & FLAG_BIOS_0400 )
+#define HAS_BIOS_2000		( sms_state.flags & FLAG_BIOS_2000 )
+#define HAS_BIOS_FULL		( sms_state.flags & FLAG_BIOS_FULL )
+#define HAS_BIOS			( sms_state.flags & ( FLAG_BIOS_0400 | FLAG_BIOS_2000 | FLAG_BIOS_FULL ) )
+#define HAS_FM				( sms_state.flags & FLAG_FM )
+#define IS_REGION_JAPAN		( sms_state.flags & FLAG_REGION_JAPAN )
 
 
 #define CF_CODEMASTERS_MAPPER	0x01
@@ -34,67 +34,71 @@
 
 #define MAX_CARTRIDGES		16
 
-static UINT8 smsBiosPageCount;
-static UINT8 smsFMDetect;
-static UINT8 smsVersion;
-static int smsPaused;
 
-static UINT8 biosPort;
-static UINT32 sms_flags;
-static UINT8 *BIOS;
+typedef struct _sms_driver_data sms_driver_data;
+struct _sms_driver_data {
+	UINT8	BiosPageCount;
+	UINT8	FMDetect;
+	UINT8	Version;
+	int		Paused;
+	UINT8	biosPort;
+	UINT32	flags;
+	UINT8	*BIOS;
+	UINT8	*mapper_ram;
+	UINT8	mapper[4];
+	UINT8	*banking_bios[5];	/* we are going to use 1-4, same as bank numbers */
+	UINT8	*banking_cart[5];	/* we are going to use 1-4, same as bank numbers */
+	UINT8	*banking_none[5];	/* we are going to use 1-4, same as bank numbers */
+	UINT8	ggSIO[5];
+	UINT8	store_control;
+	UINT8	input_port0;
+	UINT8	input_port1;
 
-static UINT8 *sms_mapper_ram;
-static UINT8 sms_mapper[4];
-static UINT8 *sms_banking_bios[5]; /* we are going to use 1-4, same as bank numbers */
-static UINT8 *sms_banking_cart[5]; /* we are going to use 1-4, same as bank numbers */
-static UINT8 *sms_banking_none[5]; /* we are going to use 1-4, same as bank numbers */
-static UINT8 ggSIO[5];
-static UINT8 sms_store_control = 0;
+	/* Data needed for Rapid Fire Unit support */
+	emu_timer	*rapid_fire_timer;
+	UINT8	rapid_fire_state_1;
+	UINT8	rapid_fire_state_2;
 
-static UINT8 sms_input_port0;
-static UINT8 sms_input_port1;
+	/* Data needed for Paddle Control controller */
+	UINT32	last_paddle_read_time;
+	UINT8	paddle_read_state;
 
-/* Data needed for Rapid Fire Unit support */
-static emu_timer	*rapid_fire_timer;
-static UINT8 rapid_fire_state_1;
-static UINT8 rapid_fire_state_2;
+	/* Data needed for Sports Pad controller */
+	UINT32	last_sports_pad_time_1;
+	UINT32	last_sports_pad_time_2;
+	UINT8	sports_pad_state_1;
+	UINT8	sports_pad_state_2;
+	UINT8	sports_pad_last_data_1;
+	UINT8	sports_pad_last_data_2;
+	UINT8	sports_pad_1_x;
+	UINT8	sports_pad_1_y;
+	UINT8	sports_pad_2_x;
+	UINT8	sports_pad_2_y;
 
-/* Data needed for Paddle Control controller */
-static UINT32 last_paddle_read_time;
-static UINT8 paddle_read_state;
+	/* Cartridge slot info */
+	UINT8	current_cartridge;
+	struct
+	{
+		UINT8	*ROM;			/* Pointer to ROM image data */
+		UINT32	size;			/* Size of the ROM image */
+		UINT8	features;		/* on-cartridge special hardware */
+		UINT8	*cartSRAM;		/* on-cartridge SRAM */
+		UINT8	sram_save;		/* should be the contents of the on-cartridge SRAM be saved */
+		UINT8	*cartRAM;		/* additional on-cartridge RAM (64KB for Ernie Els Golf) */
+		UINT32	ram_size;		/* size of the on-cartridge RAM */
+		UINT8	ram_page;		/* currently swapped in cartridge RAM */
+	} cartridge[MAX_CARTRIDGES];
+};
 
-/* Data needed for Sports Pad controller */
-static UINT32 last_sports_pad_time_1;
-static UINT32 last_sports_pad_time_2;
-static UINT8 sports_pad_state_1;
-static UINT8 sports_pad_state_2;
-static UINT8 sports_pad_last_data_1;
-static UINT8 sports_pad_last_data_2;
-static UINT8 sports_pad_1_x;
-static UINT8 sports_pad_1_y;
-static UINT8 sports_pad_2_x;
-static UINT8 sports_pad_2_y;
-
-static struct
-{
-	UINT8	*ROM;			/* Pointer to ROM image data */
-	UINT32	size;			/* Size of the ROM image */
-	UINT8	features;		/* on-cartridge special hardware */
-	UINT8	*cartSRAM;		/* on-cartridge SRAM */
-	UINT8	sram_save;		/* should be the contents of the on-cartridge SRAM be saved */
-	UINT8	*cartRAM;		/* additional on-cartridge RAM (64KB for Ernie Els Golf) */
-	UINT32	ram_size;		/* size of the on-cartridge RAM */
-	UINT8	ram_page;		/* currently swapped in cartridge RAM */
-} sms_cartridge[MAX_CARTRIDGES];
-static UINT8	sms_current_cartridge;
+static sms_driver_data sms_state;
 
 static void setup_rom(const address_space *space);
 
 
 static TIMER_CALLBACK( rapid_fire_callback )
 {
-	rapid_fire_state_1 ^= 0xFF;
-	rapid_fire_state_2 ^= 0xFF;
+	sms_state.rapid_fire_state_1 ^= 0xFF;
+	sms_state.rapid_fire_state_2 ^= 0xFF;
 }
 
 
@@ -106,19 +110,19 @@ static WRITE8_HANDLER( sms_input_write )
 		switch( input_port_read_safe(space->machine, "CTRLSEL", 0x00) & 0x0F )
 		{
 		case 0x03:	/* Sports Pad */
-			if ( data != sports_pad_last_data_1 )
+			if ( data != sms_state.sports_pad_last_data_1 )
 			{
 				UINT32 cpu_cycles = cpu_get_total_cycles(space->cpu);
 
-				sports_pad_last_data_1 = data;
-				if ( cpu_cycles - last_sports_pad_time_1 > 512 )
+				sms_state.sports_pad_last_data_1 = data;
+				if ( cpu_cycles - sms_state.last_sports_pad_time_1 > 512 )
 				{
-					sports_pad_state_1 = 3;
-					sports_pad_1_x = input_port_read(space->machine, "SPORT0");
-					sports_pad_1_y = input_port_read(space->machine, "SPORT1");
+					sms_state.sports_pad_state_1 = 3;
+					sms_state.sports_pad_1_x = input_port_read(space->machine, "SPORT0");
+					sms_state.sports_pad_1_y = input_port_read(space->machine, "SPORT1");
 				}
-				last_sports_pad_time_1 = cpu_cycles;
-				sports_pad_state_1 = ( sports_pad_state_1 + 1 ) & 3;
+				sms_state.last_sports_pad_time_1 = cpu_cycles;
+				sms_state.sports_pad_state_1 = ( sms_state.sports_pad_state_1 + 1 ) & 3;
 			}
 			break;
 		}
@@ -128,19 +132,19 @@ static WRITE8_HANDLER( sms_input_write )
 		switch( input_port_read_safe(space->machine, "CTRLSEL", 0x00) >> 4 )
 		{
 		case 0x03:	/* Sports Pad */
-			if ( data != sports_pad_last_data_2 )
+			if ( data != sms_state.sports_pad_last_data_2 )
 			{
 				UINT32 cpu_cycles = cpu_get_total_cycles(space->cpu);
 
-				sports_pad_last_data_2 = data;
-				if ( cpu_cycles - last_sports_pad_time_2 > 2048 )
+				sms_state.sports_pad_last_data_2 = data;
+				if ( cpu_cycles - sms_state.last_sports_pad_time_2 > 2048 )
 				{
-					sports_pad_state_2 = 3;
-					sports_pad_2_x = input_port_read(space->machine, "SPORT2");
-					sports_pad_2_y = input_port_read(space->machine, "SPORT3");
+					sms_state.sports_pad_state_2 = 3;
+					sms_state.sports_pad_2_x = input_port_read(space->machine, "SPORT2");
+					sms_state.sports_pad_2_y = input_port_read(space->machine, "SPORT3");
 				}
-				last_sports_pad_time_2 = cpu_cycles;
-				sports_pad_state_2 = ( sports_pad_state_2 + 1 ) & 3;
+				sms_state.last_sports_pad_time_2 = cpu_cycles;
+				sms_state.sports_pad_state_2 = ( sms_state.sports_pad_state_2 + 1 ) & 3;
 			}
 			break;
 		}
@@ -154,12 +158,12 @@ static void sms_get_inputs(const address_space *space)
 	UINT32 cpu_cycles = cpu_get_total_cycles(space->cpu);
 	running_machine *machine = space->machine;
 
-	sms_input_port0 = 0xFF;
-	sms_input_port1 = 0xFF;
+	sms_state.input_port0 = 0xFF;
+	sms_state.input_port1 = 0xFF;
 
-	if ( cpu_cycles - last_paddle_read_time > 256 ) {
-		paddle_read_state ^= 0xFF;
-		last_paddle_read_time = cpu_cycles;
+	if ( cpu_cycles - sms_state.last_paddle_read_time > 256 ) {
+		sms_state.paddle_read_state ^= 0xFF;
+		sms_state.last_paddle_read_time = cpu_cycles;
 	}
 
 	/* Player 1 */
@@ -170,14 +174,14 @@ static void sms_get_inputs(const address_space *space)
 		/* Rapid Fire setting for Button A */
 		if ( !(data & 0x10 ) && ( input_port_read(machine, "RFU") & 0x01) )
 		{
-			data |= rapid_fire_state_1 & 0x10;
+			data |= sms_state.rapid_fire_state_1 & 0x10;
 		}
 		/* Check Rapid Fire setting for Button B */
 		if ( !(data & 0x20) && (input_port_read(machine, "RFU") & 0x02) )
 		{
-			data |= rapid_fire_state_1 & 0x20;
+			data |= sms_state.rapid_fire_state_1 & 0x20;
 		}
-		sms_input_port0 = ( sms_input_port0 & 0xC0 ) | ( data & 0x3F );
+		sms_state.input_port0 = ( sms_state.input_port0 & 0xC0 ) | ( data & 0x3F );
 		break;
 
 	case 0x01:  /* Light Phaser */
@@ -186,31 +190,31 @@ static void sms_get_inputs(const address_space *space)
 	case 0x02:  /* Paddle Control */
 		/* Get button A state */
 		data = input_port_read(machine, "PADDLE0");
-		if ( paddle_read_state )
+		if ( sms_state.paddle_read_state )
 		{
 			data = data >> 4;
 		}
-		sms_input_port0 = ( sms_input_port0 & 0xC0 ) | ( data & 0x0F ) | ( paddle_read_state & 0x20 )
+		sms_state.input_port0 = ( sms_state.input_port0 & 0xC0 ) | ( data & 0x0F ) | ( sms_state.paddle_read_state & 0x20 )
 		                | ( ( input_port_read(machine, "CTRLIPT") & 0x02 ) << 3 );
 		break;
 
 	case 0x03:	/* Sega Sports Pad */
-		switch( sports_pad_state_1 )
+		switch( sms_state.sports_pad_state_1 )
 		{
 		case 0:
-			data = ( sports_pad_1_x >> 4 ) & 0x0F;
+			data = ( sms_state.sports_pad_1_x >> 4 ) & 0x0F;
 			break;
 		case 1:
-			data = sports_pad_1_x & 0x0F;
+			data = sms_state.sports_pad_1_x & 0x0F;
 			break;
 		case 2:
-			data = ( sports_pad_1_y >> 4 ) & 0x0F;
+			data = ( sms_state.sports_pad_1_y >> 4 ) & 0x0F;
 			break;
 		case 3:
-			data = sports_pad_1_y & 0x0F;
+			data = sms_state.sports_pad_1_y & 0x0F;
 			break;
 		}
-		sms_input_port0 = ( sms_input_port0 & 0xC0 ) | data | ( ( input_port_read(machine, "CTRLIPT") & 0x0C ) << 2 );
+		sms_state.input_port0 = ( sms_state.input_port0 & 0xC0 ) | data | ( ( input_port_read(machine, "CTRLIPT") & 0x0C ) << 2 );
 		break;
 	}
 
@@ -219,17 +223,17 @@ static void sms_get_inputs(const address_space *space)
 	{
 	case 0x00:	/* Joystick */
 		data = input_port_read(machine, "PORT_DC");
-		sms_input_port0 = ( sms_input_port0 & 0x3F ) | ( data & 0xC0 );
+		sms_state.input_port0 = ( sms_state.input_port0 & 0x3F ) | ( data & 0xC0 );
 		data = input_port_read(machine, "PORT_DD");
 		if ( !(data & 0x04) && (input_port_read(machine, "RFU") & 0x04) )
 		{
-			data |= rapid_fire_state_2 & 0x04;
+			data |= sms_state.rapid_fire_state_2 & 0x04;
 		}
 		if ( !(data & 0x08) && (input_port_read(machine, "RFU") & 0x08) )
 		{
-			data |= rapid_fire_state_2 & 0x08;
+			data |= sms_state.rapid_fire_state_2 & 0x08;
 		}
-		sms_input_port1 = ( sms_input_port1 & 0xF0 ) | ( data & 0x0F );
+		sms_state.input_port1 = ( sms_state.input_port1 & 0xF0 ) | ( data & 0x0F );
 		break;
 
 	case 0x01:	/* Light Phaser */
@@ -238,32 +242,32 @@ static void sms_get_inputs(const address_space *space)
 	case 0x02:	/* Paddle Control */
 		/* Get button A state */
 		data = input_port_read(machine, "PADDLE1");
-		if ( paddle_read_state )
+		if ( sms_state.paddle_read_state )
 		{
 			data = data >> 4;
 		}
-		sms_input_port0 = ( sms_input_port0 & 0x3F ) | ( ( data & 0x03 ) << 6 );
-		sms_input_port1 = ( sms_input_port1 & 0xF0 ) | ( ( data & 0x0C ) >> 2 ) | ( paddle_read_state & 0x08 )
+		sms_state.input_port0 = ( sms_state.input_port0 & 0x3F ) | ( ( data & 0x03 ) << 6 );
+		sms_state.input_port1 = ( sms_state.input_port1 & 0xF0 ) | ( ( data & 0x0C ) >> 2 ) | ( sms_state.paddle_read_state & 0x08 )
 		                | ( ( input_port_read(machine, "CTRLIPT") & 0x20 ) >> 3 );
 		break;
 
 	case 0x03:	/* Sega Sports Pad */
-		switch( sports_pad_state_2 )
+		switch( sms_state.sports_pad_state_2 )
 		{
 		case 0:
-			data = sports_pad_2_x & 0x0F;
+			data = sms_state.sports_pad_2_x & 0x0F;
 			break;
 		case 1:
-			data = ( sports_pad_2_x >> 4 ) & 0x0F;
+			data = ( sms_state.sports_pad_2_x >> 4 ) & 0x0F;
 		case 2:
-			data = sports_pad_2_y & 0x0F;
+			data = sms_state.sports_pad_2_y & 0x0F;
 			break;
 		case 3:
-			data = ( sports_pad_2_y >> 4 ) & 0x0F;
+			data = ( sms_state.sports_pad_2_y >> 4 ) & 0x0F;
 			break;
 		}
-		sms_input_port0 = ( sms_input_port0 & 0x3F ) | ( ( data & 0x03 ) << 6 );
-		sms_input_port1 = ( sms_input_port1 & 0xF0 ) | ( data >> 2 ) | ( ( input_port_read(machine, "CTRLIPT") & 0xC0 ) >> 4 );
+		sms_state.input_port0 = ( sms_state.input_port0 & 0x3F ) | ( ( data & 0x03 ) << 6 );
+		sms_state.input_port1 = ( sms_state.input_port1 & 0xF0 ) | ( data >> 2 ) | ( ( input_port_read(machine, "CTRLIPT") & 0xC0 ) >> 4 );
 		break;
 	}
 }
@@ -273,7 +277,7 @@ WRITE8_HANDLER(sms_fm_detect_w)
 {
 	if ( HAS_FM )
 	{
-		smsFMDetect = (data & 0x01);
+		sms_state.FMDetect = (data & 0x01);
 	}
 }
 
@@ -282,18 +286,18 @@ READ8_HANDLER(sms_fm_detect_r)
 {
 	if ( HAS_FM )
 	{
-		return smsFMDetect;
+		return sms_state.FMDetect;
 	}
 	else
 	{
-		if ( biosPort & IO_CHIP )
+		if ( sms_state.biosPort & IO_CHIP )
 		{
 			return 0xFF;
 		}
 		else
 		{
 			sms_get_inputs(space);
-			return sms_input_port0;
+			return sms_state.input_port0;
 		}
 	}
 }
@@ -303,7 +307,7 @@ WRITE8_HANDLER(sms_version_w)
 {
 	if ((data & 0x01) && (data & 0x04))
 	{
-		smsVersion = (data & 0xA0);
+		sms_state.Version = (data & 0xA0);
 	}
 	if ( data & 0x08 )
 	{
@@ -320,13 +324,13 @@ READ8_HANDLER(sms_version_r)
 {
 	UINT8 temp;
 
-	if (biosPort & IO_CHIP)
+	if (sms_state.biosPort & IO_CHIP)
 	{
 		return (0xFF);
 	}
 
 	/* Move bits 7,5 of port 3F into bits 7, 6 */
-	temp = (smsVersion & 0x80) | (smsVersion & 0x20) << 1;
+	temp = (sms_state.Version & 0x80) | (sms_state.Version & 0x20) << 1;
 
 	/* Inverse version detect value for Japanese machines */
 	if ( IS_REGION_JAPAN )
@@ -336,7 +340,7 @@ READ8_HANDLER(sms_version_r)
 
 	/* Merge version data with input port #2 data */
 	sms_get_inputs(space);
-	temp = (temp & 0xC0) | (sms_input_port1 & 0x3F);
+	temp = (temp & 0xC0) | (sms_state.input_port1 & 0x3F);
 
 	return (temp);
 }
@@ -362,33 +366,33 @@ READ8_HANDLER(sms_count_r)
  */
 void sms_check_pause_button(const address_space *space)
 {
-	if ( IS_GAMEGEAR && ! ( sms_cartridge[sms_current_cartridge].features & CF_GG_SMS_MODE ) )
+	if ( IS_GAMEGEAR && ! ( sms_state.cartridge[sms_state.current_cartridge].features & CF_GG_SMS_MODE ) )
 	{
 		return;
 	}
 	if ( ! (input_port_read(space->machine, IS_GAMEGEAR ? "START" : "PAUSE") & 0x80) ) {
-		if ( ! smsPaused ) {
+		if ( ! sms_state.Paused ) {
 			cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE );
 		}
-		smsPaused = 1;
+		sms_state.Paused = 1;
 	}
 	else
 	{
-		smsPaused = 0;
+		sms_state.Paused = 0;
 	}
 }
 
 
 READ8_HANDLER(sms_input_port_0_r)
 {
-	if (biosPort & IO_CHIP)
+	if (sms_state.biosPort & IO_CHIP)
 	{
 		return (0xFF);
 	}
 	else
 	{
 		sms_get_inputs(space);
-		return sms_input_port0;
+		return sms_state.input_port0;
 	}
 }
 
@@ -423,7 +427,7 @@ WRITE8_HANDLER(sms_ym2413_data_port_0_w)
 
  READ8_HANDLER(sms_mapper_r)
 {
-	return sms_mapper[offset];
+	return sms_state.mapper[offset];
 }
 
 
@@ -433,36 +437,36 @@ WRITE8_HANDLER(sms_mapper_w)
 	UINT8 *SOURCE_BIOS;
 	UINT8 *SOURCE_CART;
 	UINT8 *SOURCE;
-	UINT8	rom_page_count = sms_cartridge[sms_current_cartridge].size / 0x4000;
+	UINT8	rom_page_count = sms_state.cartridge[sms_state.current_cartridge].size / 0x4000;
 
 	offset &= 3;
 
-	sms_mapper[offset] = data;
-	sms_mapper_ram[offset] = data;
+	sms_state.mapper[offset] = data;
+	sms_state.mapper_ram[offset] = data;
 
-	if ( sms_cartridge[sms_current_cartridge].ROM )
+	if ( sms_state.cartridge[sms_state.current_cartridge].ROM )
 	{
-		SOURCE_CART = sms_cartridge[sms_current_cartridge].ROM + ( ( rom_page_count > 0) ? data % rom_page_count : 0 ) * 0x4000;
+		SOURCE_CART = sms_state.cartridge[sms_state.current_cartridge].ROM + ( ( rom_page_count > 0) ? data % rom_page_count : 0 ) * 0x4000;
 	}
 	else
 	{
-		SOURCE_CART = sms_banking_none[1];
+		SOURCE_CART = sms_state.banking_none[1];
 	}
-	if ( BIOS )
+	if ( sms_state.BIOS )
 	{
-		SOURCE_BIOS = BIOS + ( (smsBiosPageCount > 0) ? data % smsBiosPageCount : 0 ) * 0x4000;
+		SOURCE_BIOS = sms_state.BIOS + ( (sms_state.BiosPageCount > 0) ? data % sms_state.BiosPageCount : 0 ) * 0x4000;
 	}
 	else
 	{
-		SOURCE_BIOS = sms_banking_none[1];
+		SOURCE_BIOS = sms_state.banking_none[1];
 	}
 
-	if (biosPort & IO_BIOS_ROM || ( IS_GAMEGEAR && BIOS == NULL ) )
+	if (sms_state.biosPort & IO_BIOS_ROM || ( IS_GAMEGEAR && sms_state.BIOS == NULL ) )
 	{
-		if (!(biosPort & IO_CARTRIDGE) || ( IS_GAMEGEAR && BIOS == NULL ) )
+		if (!(sms_state.biosPort & IO_CARTRIDGE) || ( IS_GAMEGEAR && sms_state.BIOS == NULL ) )
 		{
 			page = ( rom_page_count > 0) ? data % rom_page_count : 0;
-			if ( ! sms_cartridge[sms_current_cartridge].ROM )
+			if ( ! sms_state.cartridge[sms_state.current_cartridge].ROM )
 				return;
 			SOURCE = SOURCE_CART;
 		}
@@ -474,8 +478,8 @@ WRITE8_HANDLER(sms_mapper_w)
 	}
 	else
 	{
-		page = (smsBiosPageCount > 0) ? data % smsBiosPageCount : 0;
-		if ( ! BIOS )
+		page = (sms_state.BiosPageCount > 0) ? data % sms_state.BiosPageCount : 0;
+		if ( ! sms_state.BIOS )
 			return;
 		SOURCE = SOURCE_BIOS;
 	}
@@ -486,31 +490,31 @@ WRITE8_HANDLER(sms_mapper_w)
 			/* Is it ram or rom? */
 			if (data & 0x08) /* it's ram */
 			{
-				sms_cartridge[sms_current_cartridge].sram_save = 1;			/* SRAM should be saved on exit. */
+				sms_state.cartridge[sms_state.current_cartridge].sram_save = 1;			/* SRAM should be saved on exit. */
 				if (data & 0x04)
 				{
 					LOG(("ram 1 paged.\n"));
-					SOURCE = sms_cartridge[sms_current_cartridge].cartSRAM + 0x4000;
+					SOURCE = sms_state.cartridge[sms_state.current_cartridge].cartSRAM + 0x4000;
 				}
 				else
 				{
 					LOG(("ram 0 paged.\n"));
-					SOURCE = sms_cartridge[sms_current_cartridge].cartSRAM;
+					SOURCE = sms_state.cartridge[sms_state.current_cartridge].cartSRAM;
 				}
 				memory_set_bankptr(space->machine,  4, SOURCE );
 				memory_set_bankptr(space->machine,  5, SOURCE + 0x2000 );
 			}
 			else /* it's rom */
 			{
-				if ( biosPort & IO_BIOS_ROM || ! HAS_BIOS )
+				if ( sms_state.biosPort & IO_BIOS_ROM || ! HAS_BIOS )
 				{
-					page = ( rom_page_count > 0) ? sms_mapper[3] % rom_page_count : 0;
-					SOURCE = sms_banking_cart[4];
+					page = ( rom_page_count > 0) ? sms_state.mapper[3] % rom_page_count : 0;
+					SOURCE = sms_state.banking_cart[4];
 				}
 				else
 				{
-					page = (smsBiosPageCount > 0) ? sms_mapper[3] % smsBiosPageCount : 0;
-					SOURCE = sms_banking_bios[4];
+					page = (sms_state.BiosPageCount > 0) ? sms_state.mapper[3] % sms_state.BiosPageCount : 0;
+					SOURCE = sms_state.banking_bios[4];
 				}
 				LOG(("rom 2 paged in %x.\n", page));
 				memory_set_bankptr(space->machine,  4, SOURCE );
@@ -520,8 +524,8 @@ WRITE8_HANDLER(sms_mapper_w)
 
 		case 1: /* Select 16k ROM bank for 0400-3FFF */
 			LOG(("rom 0 paged in %x.\n", page));
-			sms_banking_bios[2] = SOURCE_BIOS + 0x0400;
-			sms_banking_cart[2] = SOURCE_CART + 0x0400;
+			sms_state.banking_bios[2] = SOURCE_BIOS + 0x0400;
+			sms_state.banking_cart[2] = SOURCE_CART + 0x0400;
 			if ( IS_GAMEGEAR )
 			{
 				SOURCE = SOURCE_CART;
@@ -531,8 +535,8 @@ WRITE8_HANDLER(sms_mapper_w)
 
 		case 2: /* Select 16k ROM bank for 4000-7FFF */
 			LOG(("rom 1 paged in %x.\n", page));
-			sms_banking_bios[3] = SOURCE_BIOS;
-			sms_banking_cart[3] = SOURCE_CART;
+			sms_state.banking_bios[3] = SOURCE_BIOS;
+			sms_state.banking_cart[3] = SOURCE_CART;
 			if ( IS_GAMEGEAR )
 			{
 				SOURCE = SOURCE_CART;
@@ -541,23 +545,23 @@ WRITE8_HANDLER(sms_mapper_w)
 			break;
 
 		case 3: /* Select 16k ROM bank for 8000-BFFF */
-			sms_banking_bios[4] = SOURCE_BIOS;
+			sms_state.banking_bios[4] = SOURCE_BIOS;
 			if ( IS_GAMEGEAR )
 			{
 				SOURCE = SOURCE_CART;
 			}
-			if ( sms_cartridge[sms_current_cartridge].features & CF_CODEMASTERS_MAPPER )
+			if ( sms_state.cartridge[sms_state.current_cartridge].features & CF_CODEMASTERS_MAPPER )
 			{
 				if ( SOURCE == SOURCE_CART )
 				{
-					SOURCE = sms_banking_cart[4];
+					SOURCE = sms_state.banking_cart[4];
 				}
 			}
 			else
 			{
-				sms_banking_cart[4] = SOURCE_CART;
+				sms_state.banking_cart[4] = SOURCE_CART;
 			}
-			if ( ! ( sms_mapper[0] & 0x08 ) ) /* is RAM disabled? */
+			if ( ! ( sms_state.mapper[0] & 0x08 ) ) /* is RAM disabled? */
 			{
 				LOG(("rom 2 paged in %x.\n", page));
 				memory_set_bankptr(space->machine,  4, SOURCE );
@@ -570,33 +574,33 @@ WRITE8_HANDLER(sms_mapper_w)
 
 static WRITE8_HANDLER(sms_codemasters_page0_w)
 {
-	if ( sms_cartridge[sms_current_cartridge].ROM && sms_cartridge[sms_current_cartridge].features & CF_CODEMASTERS_MAPPER )
+	if ( sms_state.cartridge[sms_state.current_cartridge].ROM && sms_state.cartridge[sms_state.current_cartridge].features & CF_CODEMASTERS_MAPPER )
 	{
-		UINT8 rom_page_count = sms_cartridge[sms_current_cartridge].size / 0x4000;
-		sms_banking_cart[1] = sms_cartridge[sms_current_cartridge].ROM + ( ( rom_page_count > 0) ? data % rom_page_count : 0 ) * 0x4000;
-		sms_banking_cart[2] = sms_banking_cart[1] + 0x0400;
-		memory_set_bankptr(space->machine, 1, sms_banking_cart[1] );
-		memory_set_bankptr(space->machine,  2, sms_banking_cart[2] );
+		UINT8 rom_page_count = sms_state.cartridge[sms_state.current_cartridge].size / 0x4000;
+		sms_state.banking_cart[1] = sms_state.cartridge[sms_state.current_cartridge].ROM + ( ( rom_page_count > 0) ? data % rom_page_count : 0 ) * 0x4000;
+		sms_state.banking_cart[2] = sms_state.banking_cart[1] + 0x0400;
+		memory_set_bankptr(space->machine, 1, sms_state.banking_cart[1] );
+		memory_set_bankptr(space->machine,  2, sms_state.banking_cart[2] );
 	}
 }
 
 
 static WRITE8_HANDLER(sms_codemasters_page1_w)
 {
-	if ( sms_cartridge[sms_current_cartridge].ROM && sms_cartridge[sms_current_cartridge].features & CF_CODEMASTERS_MAPPER )
+	if ( sms_state.cartridge[sms_state.current_cartridge].ROM && sms_state.cartridge[sms_state.current_cartridge].features & CF_CODEMASTERS_MAPPER )
 	{
 		/* Check if we need to switch in some RAM */
 		if ( data & 0x80 )
 		{
-			sms_cartridge[sms_current_cartridge].ram_page = data & 0x07;
-			memory_set_bankptr(space->machine,  5, sms_cartridge[sms_current_cartridge].cartRAM + sms_cartridge[sms_current_cartridge].ram_page * 0x2000 );
+			sms_state.cartridge[sms_state.current_cartridge].ram_page = data & 0x07;
+			memory_set_bankptr(space->machine,  5, sms_state.cartridge[sms_state.current_cartridge].cartRAM + sms_state.cartridge[sms_state.current_cartridge].ram_page * 0x2000 );
 		}
 		else
 		{
-			UINT8 rom_page_count = sms_cartridge[sms_current_cartridge].size / 0x4000;
-			sms_banking_cart[3] = sms_cartridge[sms_current_cartridge].ROM + ( ( rom_page_count > 0) ? data % rom_page_count : 0 ) * 0x4000;
-			memory_set_bankptr(space->machine,  3, sms_banking_cart[3] );
-			memory_set_bankptr(space->machine,  5, sms_banking_cart[4] + 0x2000 );
+			UINT8 rom_page_count = sms_state.cartridge[sms_state.current_cartridge].size / 0x4000;
+			sms_state.banking_cart[3] = sms_state.cartridge[sms_state.current_cartridge].ROM + ( ( rom_page_count > 0) ? data % rom_page_count : 0 ) * 0x4000;
+			memory_set_bankptr(space->machine,  3, sms_state.banking_cart[3] );
+			memory_set_bankptr(space->machine,  5, sms_state.banking_cart[4] + 0x2000 );
 		}
 	}
 }
@@ -604,7 +608,7 @@ static WRITE8_HANDLER(sms_codemasters_page1_w)
 
 WRITE8_HANDLER(sms_bios_w)
 {
-	biosPort = data;
+	sms_state.biosPort = data;
 
 	logerror("bios write %02x, pc: %04x\n", data, cpu_get_pc(space->cpu));
 
@@ -614,31 +618,31 @@ WRITE8_HANDLER(sms_bios_w)
 
 WRITE8_HANDLER(sms_cartram2_w)
 {
-	if (sms_mapper[0] & 0x08)
+	if (sms_state.mapper[0] & 0x08)
 	{
 		logerror("write %02X to cartram at offset #%04X\n", data, offset + 0x2000);
-		if (sms_mapper[0] & 0x04)
+		if (sms_state.mapper[0] & 0x04)
 		{
-			sms_cartridge[sms_current_cartridge].cartSRAM[offset + 0x6000] = data;
+			sms_state.cartridge[sms_state.current_cartridge].cartSRAM[offset + 0x6000] = data;
 		}
 		else
 		{
-			sms_cartridge[sms_current_cartridge].cartSRAM[offset + 0x2000] = data;
+			sms_state.cartridge[sms_state.current_cartridge].cartSRAM[offset + 0x2000] = data;
 		}
 	}
-	if ( sms_cartridge[sms_current_cartridge].features & CF_CODEMASTERS_MAPPER )
+	if ( sms_state.cartridge[sms_state.current_cartridge].features & CF_CODEMASTERS_MAPPER )
 	{
-		sms_cartridge[sms_current_cartridge].cartRAM[sms_cartridge[sms_current_cartridge].ram_page * 0x2000 + offset] = data;
+		sms_state.cartridge[sms_state.current_cartridge].cartRAM[sms_state.cartridge[sms_state.current_cartridge].ram_page * 0x2000 + offset] = data;
 	}
-	if ( sms_cartridge[sms_current_cartridge].features & CF_KOREAN_MAPPER && offset == 0 ) /* Dodgeball King mapper */
+	if ( sms_state.cartridge[sms_state.current_cartridge].features & CF_KOREAN_MAPPER && offset == 0 ) /* Dodgeball King mapper */
 	{
-		UINT8	rom_page_count = sms_cartridge[sms_current_cartridge].size / 0x4000;
+		UINT8	rom_page_count = sms_state.cartridge[sms_state.current_cartridge].size / 0x4000;
 		int		page = (rom_page_count > 0) ? data % rom_page_count : 0;
-		if ( ! sms_cartridge[sms_current_cartridge].ROM )
+		if ( ! sms_state.cartridge[sms_state.current_cartridge].ROM )
 			return;
-		sms_banking_cart[4] = sms_cartridge[sms_current_cartridge].ROM + page * 0x4000;
-		memory_set_bankptr(space->machine,  4, sms_banking_cart[4] );
-		memory_set_bankptr(space->machine,  5, sms_banking_cart[4] + 0x2000 );
+		sms_state.banking_cart[4] = sms_state.cartridge[sms_state.current_cartridge].ROM + page * 0x4000;
+		memory_set_bankptr(space->machine,  4, sms_state.banking_cart[4] );
+		memory_set_bankptr(space->machine,  5, sms_state.banking_cart[4] + 0x2000 );
 		LOG(("rom 2 paged in %x dodgeball king.\n", page));
 	}
 }
@@ -648,34 +652,34 @@ WRITE8_HANDLER(sms_cartram_w)
 {
 	int page;
 
-	if (sms_mapper[0] & 0x08)
+	if (sms_state.mapper[0] & 0x08)
 	{
 		logerror("write %02X to cartram at offset #%04X\n", data, offset);
-		if (sms_mapper[0] & 0x04)
+		if (sms_state.mapper[0] & 0x04)
 		{
-			sms_cartridge[sms_current_cartridge].cartSRAM[offset + 0x4000] = data;
+			sms_state.cartridge[sms_state.current_cartridge].cartSRAM[offset + 0x4000] = data;
 		}
 		else
 		{
-			sms_cartridge[sms_current_cartridge].cartSRAM[offset] = data;
+			sms_state.cartridge[sms_state.current_cartridge].cartSRAM[offset] = data;
 		}
 	}
 	else
 	{
-		if ( sms_cartridge[sms_current_cartridge].features & CF_CODEMASTERS_MAPPER && offset == 0 ) /* Codemasters mapper */
+		if ( sms_state.cartridge[sms_state.current_cartridge].features & CF_CODEMASTERS_MAPPER && offset == 0 ) /* Codemasters mapper */
 		{
-			UINT8	rom_page_count = sms_cartridge[sms_current_cartridge].size / 0x4000;
+			UINT8	rom_page_count = sms_state.cartridge[sms_state.current_cartridge].size / 0x4000;
 			page = (rom_page_count > 0) ? data % rom_page_count : 0;
-			if ( ! sms_cartridge[sms_current_cartridge].ROM )
+			if ( ! sms_state.cartridge[sms_state.current_cartridge].ROM )
 				return;
-			sms_banking_cart[4] = sms_cartridge[sms_current_cartridge].ROM + page * 0x4000;
-			memory_set_bankptr(space->machine,  4, sms_banking_cart[4] );
-			memory_set_bankptr(space->machine,  5, sms_banking_cart[4] + 0x2000 );
+			sms_state.banking_cart[4] = sms_state.cartridge[sms_state.current_cartridge].ROM + page * 0x4000;
+			memory_set_bankptr(space->machine,  4, sms_state.banking_cart[4] );
+			memory_set_bankptr(space->machine,  5, sms_state.banking_cart[4] + 0x2000 );
 			LOG(("rom 2 paged in %x codemasters.\n", page));
 		}
-		else if ( sms_cartridge[sms_current_cartridge].features & CF_ONCART_RAM )
+		else if ( sms_state.cartridge[sms_state.current_cartridge].features & CF_ONCART_RAM )
 		{
-			sms_cartridge[sms_current_cartridge].cartRAM[offset & ( sms_cartridge[sms_current_cartridge].ram_size - 1 ) ] = data;
+			sms_state.cartridge[sms_state.current_cartridge].cartRAM[offset & ( sms_state.cartridge[sms_state.current_cartridge].ram_size - 1 ) ] = data;
 		}
 		else
 		{
@@ -689,7 +693,7 @@ WRITE8_HANDLER(gg_sio_w)
 {
 	logerror("*** write %02X to SIO register #%d\n", data, offset);
 
-	ggSIO[offset & 0x07] = data;
+	sms_state.ggSIO[offset & 0x07] = data;
 	switch(offset & 7)
 	{
 		case 0x00: /* Parallel Data */
@@ -732,7 +736,7 @@ WRITE8_HANDLER(gg_sio_w)
 			break;
 	}
 
-	return ggSIO[offset];
+	return sms_state.ggSIO[offset];
 }
 
 
@@ -761,8 +765,8 @@ WRITE8_HANDLER(gg_psg_w)
 static void sms_machine_stop(running_machine *machine)
 {
 	/* Does the cartridge have SRAM that should be saved? */
-	if ( sms_cartridge[sms_current_cartridge].sram_save )
-		image_battery_save(devtag_get_device(machine, "cart1"), sms_cartridge[sms_current_cartridge].cartSRAM, sizeof(UINT8) * NVRAM_SIZE );
+	if ( sms_state.cartridge[sms_state.current_cartridge].sram_save )
+		image_battery_save(devtag_get_device(machine, "cart1"), sms_state.cartridge[sms_state.current_cartridge].cartSRAM, sizeof(UINT8) * NVRAM_SIZE );
 }
 
 
@@ -771,70 +775,70 @@ static void setup_rom(const address_space *space)
 	running_machine *machine = space->machine;
 
 	/* 1. set up bank pointers to point to nothing */
-	memory_set_bankptr(machine,  1, sms_banking_none[1] );
-	memory_set_bankptr(machine,  2, sms_banking_none[2] );
-	memory_set_bankptr(machine,  3, sms_banking_none[3] );
-	memory_set_bankptr(machine,  4, sms_banking_none[4] );
-	memory_set_bankptr(machine,  5, sms_banking_none[4] + 0x2000 );
+	memory_set_bankptr(machine,  1, sms_state.banking_none[1] );
+	memory_set_bankptr(machine,  2, sms_state.banking_none[2] );
+	memory_set_bankptr(machine,  3, sms_state.banking_none[3] );
+	memory_set_bankptr(machine,  4, sms_state.banking_none[4] );
+	memory_set_bankptr(machine,  5, sms_state.banking_none[4] + 0x2000 );
 
 	/* 2. check and set up expansion port */
-	if (!(biosPort & IO_EXPANSION) && (biosPort & IO_CARTRIDGE) && (biosPort & IO_CARD))
+	if (!(sms_state.biosPort & IO_EXPANSION) && (sms_state.biosPort & IO_CARTRIDGE) && (sms_state.biosPort & IO_CARD))
 	{
 		/* TODO: Implement me */
 		logerror( "Switching to unsupported expansion port.\n" );
 	}
 
 	/* 3. check and set up card rom */
-	if (!(biosPort & IO_CARD) && (biosPort & IO_CARTRIDGE) && (biosPort & IO_EXPANSION))
+	if (!(sms_state.biosPort & IO_CARD) && (sms_state.biosPort & IO_CARTRIDGE) && (sms_state.biosPort & IO_EXPANSION))
 	{
 		/* TODO: Implement me */
 		logerror( "Switching to unsupported card rom port.\n" );
 	}
 
 	/* 4. check and set up cartridge rom */
-	/* if ( ( !(biosPort & IO_CARTRIDGE) && (biosPort & IO_EXPANSION) && (biosPort & IO_CARD) ) || IS_GAMEGEAR ) { */
+	/* if ( ( !(sms_state.biosPort & IO_CARTRIDGE) && (sms_state.biosPort & IO_EXPANSION) && (sms_state.biosPort & IO_CARD) ) || IS_GAMEGEAR ) { */
 	/* Out Run Europa initially writes a value to port 3E where IO_CARTRIDGE, IO_EXPANSION and IO_CARD are reset */
-	if ( ( ! ( biosPort & IO_CARTRIDGE ) ) || IS_GAMEGEAR )
+	if ( ( ! ( sms_state.biosPort & IO_CARTRIDGE ) ) || IS_GAMEGEAR )
 	{
-		memory_set_bankptr(machine,  1, sms_banking_cart[1] );
-		memory_set_bankptr(machine,  2, sms_banking_cart[2] );
-		memory_set_bankptr(machine,  3, sms_banking_cart[3] );
-		memory_set_bankptr(machine,  4, sms_banking_cart[4] );
-		memory_set_bankptr(machine,  5, sms_banking_cart[4] + 0x2000 );
+		memory_set_bankptr(machine,  1, sms_state.banking_cart[1] );
+		memory_set_bankptr(machine,  2, sms_state.banking_cart[2] );
+		memory_set_bankptr(machine,  3, sms_state.banking_cart[3] );
+		memory_set_bankptr(machine,  4, sms_state.banking_cart[4] );
+		memory_set_bankptr(machine,  5, sms_state.banking_cart[4] + 0x2000 );
 		logerror( "Switched in cartridge rom.\n" );
 	}
 
 	/* 5. check and set up bios rom */
-	if ( !(biosPort & IO_BIOS_ROM) )
+	if ( !(sms_state.biosPort & IO_BIOS_ROM) )
 	{
 		/* 0x0400 bioses */
 		if ( HAS_BIOS_0400 )
 		{
-			memory_set_bankptr(machine,  1, sms_banking_bios[1] );
+			memory_set_bankptr(machine,  1, sms_state.banking_bios[1] );
 			logerror( "Switched in 0x0400 bios.\n" );
 		}
 		/* 0x2000 bioses */
 		if ( HAS_BIOS_2000 )
 		{
-			memory_set_bankptr(machine,  1, sms_banking_bios[1] );
-			memory_set_bankptr(machine,  2, sms_banking_bios[2] );
+			memory_set_bankptr(machine,  1, sms_state.banking_bios[1] );
+			memory_set_bankptr(machine,  2, sms_state.banking_bios[2] );
 			logerror( "Switched in 0x2000 bios.\n" );
 		}
 		if ( HAS_BIOS_FULL )
 		{
-			memory_set_bankptr(machine,  1, sms_banking_bios[1] );
-			memory_set_bankptr(machine,  2, sms_banking_bios[2] );
-			memory_set_bankptr(machine,  3, sms_banking_bios[3] );
-			memory_set_bankptr(machine,  4, sms_banking_bios[4] );
-			memory_set_bankptr(machine,  5, sms_banking_bios[4] + 0x2000 );
+			memory_set_bankptr(machine,  1, sms_state.banking_bios[1] );
+			memory_set_bankptr(machine,  2, sms_state.banking_bios[2] );
+			memory_set_bankptr(machine,  3, sms_state.banking_bios[3] );
+			memory_set_bankptr(machine,  4, sms_state.banking_bios[4] );
+			memory_set_bankptr(machine,  5, sms_state.banking_bios[4] + 0x2000 );
 			logerror( "Switched in full bios.\n" );
 		}
 	}
 
-	if ( sms_cartridge[sms_current_cartridge].features & CF_ONCART_RAM )
+	if ( sms_state.cartridge[sms_state.current_cartridge].features & CF_ONCART_RAM )
 	{
-		memory_set_bankptr(machine,  4, sms_cartridge[sms_current_cartridge].cartRAM );
-		memory_set_bankptr(machine,  5, sms_cartridge[sms_current_cartridge].cartRAM );
+		memory_set_bankptr(machine,  4, sms_state.cartridge[sms_state.current_cartridge].cartRAM );
+		memory_set_bankptr(machine,  5, sms_state.cartridge[sms_state.current_cartridge].cartRAM );
 	}
 }
 
@@ -948,22 +952,22 @@ DEVICE_START( sms_cart )
 
 	for ( i = 0; i < MAX_CARTRIDGES; i++ )
 	{
-		sms_cartridge[i].ROM = NULL;
-		sms_cartridge[i].size = 0;
-		sms_cartridge[i].features = 0;
-		sms_cartridge[i].cartSRAM = NULL;
-		sms_cartridge[i].sram_save = 0;
-		sms_cartridge[i].cartRAM = NULL;
-		sms_cartridge[i].ram_size = 0;
-		sms_cartridge[i].ram_page = 0;
+		sms_state.cartridge[i].ROM = NULL;
+		sms_state.cartridge[i].size = 0;
+		sms_state.cartridge[i].features = 0;
+		sms_state.cartridge[i].cartSRAM = NULL;
+		sms_state.cartridge[i].sram_save = 0;
+		sms_state.cartridge[i].cartRAM = NULL;
+		sms_state.cartridge[i].ram_size = 0;
+		sms_state.cartridge[i].ram_page = 0;
 	}
-	sms_current_cartridge = 0;
+	sms_state.current_cartridge = 0;
 
-	biosPort = (IO_EXPANSION | IO_CARTRIDGE | IO_CARD);
+	sms_state.biosPort = (IO_EXPANSION | IO_CARTRIDGE | IO_CARD);
 	if ( ! IS_GAMEGEAR && ! HAS_BIOS )
 	{
-		biosPort &= ~(IO_CARTRIDGE);
-		biosPort |= IO_BIOS_ROM;
+		sms_state.biosPort &= ~(IO_CARTRIDGE);
+		sms_state.biosPort |= IO_BIOS_ROM;
 	}
 }
 
@@ -1011,24 +1015,24 @@ DEVICE_IMAGE_LOAD( sms_cart )
 
 	/* Create a new memory region to hold the ROM. */
 	/* Make sure the region holds only complete (0x4000) rom banks */
-	sms_cartridge[index].size = (size&0x3FFF) ? (((size>>14)+1)<<14) : size;
-	sms_cartridge[index].ROM = auto_alloc_array(image->machine, UINT8, sms_cartridge[index].size );
+	sms_state.cartridge[index].size = (size&0x3FFF) ? (((size>>14)+1)<<14) : size;
+	sms_state.cartridge[index].ROM = auto_alloc_array(image->machine, UINT8, sms_state.cartridge[index].size );
 
-	sms_cartridge[index].cartSRAM = auto_alloc_array(image->machine, UINT8, NVRAM_SIZE );
+	sms_state.cartridge[index].cartSRAM = auto_alloc_array(image->machine, UINT8, NVRAM_SIZE );
 
 	/* Load ROM banks */
-	size = image_fread(image, sms_cartridge[index].ROM, size);
+	size = image_fread(image, sms_state.cartridge[index].ROM, size);
 
 	/* check the image */
 	if ( ! HAS_BIOS )
 	{
-		if (sms_verify_cart(sms_cartridge[index].ROM, size) == IMAGE_VERIFY_FAIL)
+		if (sms_verify_cart(sms_state.cartridge[index].ROM, size) == IMAGE_VERIFY_FAIL)
 		{
 			logerror("Warning loading image: sms_verify_cart failed\n");
 		}
 	}
 
-	sms_cartridge[index].features = 0;
+	sms_state.cartridge[index].features = 0;
 
 	/* Detect special features from the extrainfo field */
 	if ( extrainfo )
@@ -1036,33 +1040,33 @@ DEVICE_IMAGE_LOAD( sms_cart )
 		/* Check for codemasters mapper */
 		if ( strstr( extrainfo, "CODEMASTERS" ) )
 		{
-			sms_cartridge[index].features |= CF_CODEMASTERS_MAPPER;
+			sms_state.cartridge[index].features |= CF_CODEMASTERS_MAPPER;
 		}
 
 		/* Check for korean mapper */
 		if ( strstr( extrainfo, "KOREAN" ) )
 		{
-			sms_cartridge[index].features |= CF_KOREAN_MAPPER;
+			sms_state.cartridge[index].features |= CF_KOREAN_MAPPER;
 		}
 
 		/* Check for special SMS Compatibility mode gamegear cartridges */
 		if ( IS_GAMEGEAR && strstr( extrainfo, "GGSMS" ) )
 		{
-			sms_cartridge[index].features |= CF_GG_SMS_MODE;
+			sms_state.cartridge[index].features |= CF_GG_SMS_MODE;
 		}
 
 		/* Check for 93C46 eeprom */
 		if ( strstr( extrainfo, "93C46" ) )
 		{
-			sms_cartridge[index].features |= CF_93C46_EEPROM;
+			sms_state.cartridge[index].features |= CF_93C46_EEPROM;
 		}
 
 		/* Check for 8KB on-cart RAM */
 		if ( strstr( extrainfo, "8KB_CART_RAM" ) )
 		 {
-			sms_cartridge[index].features |= CF_ONCART_RAM;
-			sms_cartridge[index].ram_size = 0x2000;
-			sms_cartridge[index].cartRAM = auto_alloc_array(image->machine, UINT8, sms_cartridge[index].ram_size );
+			sms_state.cartridge[index].features |= CF_ONCART_RAM;
+			sms_state.cartridge[index].ram_size = 0x2000;
+			sms_state.cartridge[index].cartRAM = auto_alloc_array(image->machine, UINT8, sms_state.cartridge[index].ram_size );
 		}
 	}
 	else
@@ -1072,13 +1076,13 @@ DEVICE_IMAGE_LOAD( sms_cart )
 		if ( size >= 0x8000 )
 		{
 			/* Check for special mappers */
-			if ( detect_codemasters_mapper( sms_cartridge[index].ROM ) )
+			if ( detect_codemasters_mapper( sms_state.cartridge[index].ROM ) )
 			{
-				sms_cartridge[index].features |= CF_CODEMASTERS_MAPPER;
+				sms_state.cartridge[index].features |= CF_CODEMASTERS_MAPPER;
 			}
-			if ( detect_korean_mapper( sms_cartridge[index].ROM ) )
+			if ( detect_korean_mapper( sms_state.cartridge[index].ROM ) )
 			{
-				sms_cartridge[index].features |= CF_KOREAN_MAPPER;
+				sms_state.cartridge[index].features |= CF_KOREAN_MAPPER;
 			}
 		}
 
@@ -1088,20 +1092,20 @@ DEVICE_IMAGE_LOAD( sms_cart )
 			/* Just in case someone passes us an sms file */
 			if ( fname_len > 3 && ! mame_stricmp( fname + fname_len - 3, "sms" ) )
 			{
-				sms_cartridge[index].features |= CF_GG_SMS_MODE;
+				sms_state.cartridge[index].features |= CF_GG_SMS_MODE;
 			}
 		}
 	}
 
-	if ( sms_cartridge[index].features & CF_CODEMASTERS_MAPPER )
+	if ( sms_state.cartridge[index].features & CF_CODEMASTERS_MAPPER )
 	{
-		sms_cartridge[index].ram_size = 0x10000;
-		sms_cartridge[index].cartRAM = auto_alloc_array(image->machine, UINT8, sms_cartridge[index].ram_size );
-		sms_cartridge[index].ram_page = 0;
+		sms_state.cartridge[index].ram_size = 0x10000;
+		sms_state.cartridge[index].cartRAM = auto_alloc_array(image->machine, UINT8, sms_state.cartridge[index].ram_size );
+		sms_state.cartridge[index].ram_page = 0;
 	}
 
 	/* Load battery backed RAM, if available */
-	image_battery_load( image, sms_cartridge[index].cartSRAM, sizeof(UINT8) * NVRAM_SIZE );
+	image_battery_load( image, sms_state.cartridge[index].cartSRAM, sizeof(UINT8) * NVRAM_SIZE );
 
 	return INIT_PASS;
 }
@@ -1109,24 +1113,24 @@ DEVICE_IMAGE_LOAD( sms_cart )
 
 static void setup_cart_banks( void )
 {
-	if ( sms_cartridge[sms_current_cartridge].ROM )
+	if ( sms_state.cartridge[sms_state.current_cartridge].ROM )
 	{
-		UINT8   rom_page_count = sms_cartridge[sms_current_cartridge].size / 0x4000;
-		sms_banking_cart[1] = sms_cartridge[sms_current_cartridge].ROM;
-		sms_banking_cart[2] = sms_cartridge[sms_current_cartridge].ROM + 0x0400;
-		sms_banking_cart[3] = sms_cartridge[sms_current_cartridge].ROM + ( ( 1 < rom_page_count ) ? 0x4000 : 0 );
-		sms_banking_cart[4] = sms_cartridge[sms_current_cartridge].ROM + ( ( 2 < rom_page_count ) ? 0x8000 : 0 );
+		UINT8   rom_page_count = sms_state.cartridge[sms_state.current_cartridge].size / 0x4000;
+		sms_state.banking_cart[1] = sms_state.cartridge[sms_state.current_cartridge].ROM;
+		sms_state.banking_cart[2] = sms_state.cartridge[sms_state.current_cartridge].ROM + 0x0400;
+		sms_state.banking_cart[3] = sms_state.cartridge[sms_state.current_cartridge].ROM + ( ( 1 < rom_page_count ) ? 0x4000 : 0 );
+		sms_state.banking_cart[4] = sms_state.cartridge[sms_state.current_cartridge].ROM + ( ( 2 < rom_page_count ) ? 0x8000 : 0 );
 		/* Codemasters mapper points to bank 0 for page 2 */
-		if ( sms_cartridge[sms_current_cartridge].features & CF_CODEMASTERS_MAPPER ) {
-			sms_banking_cart[4] = sms_cartridge[sms_current_cartridge].ROM;
+		if ( sms_state.cartridge[sms_state.current_cartridge].features & CF_CODEMASTERS_MAPPER ) {
+			sms_state.banking_cart[4] = sms_state.cartridge[sms_state.current_cartridge].ROM;
 		}
 	}
 	else
 	{
-		sms_banking_cart[1] = sms_banking_none[1];
-		sms_banking_cart[2] = sms_banking_none[2];
-		sms_banking_cart[3] = sms_banking_none[3];
-		sms_banking_cart[4] = sms_banking_none[4];
+		sms_state.banking_cart[1] = sms_state.banking_none[1];
+		sms_state.banking_cart[2] = sms_state.banking_none[2];
+		sms_state.banking_cart[3] = sms_state.banking_none[3];
+		sms_state.banking_cart[4] = sms_state.banking_none[4];
 	}
 }
 
@@ -1134,29 +1138,29 @@ static void setup_cart_banks( void )
 static void setup_banks( running_machine *machine )
 {
 	UINT8 *mem = memory_region(machine, "maincpu");
-	sms_banking_bios[1] = sms_banking_cart[1] = sms_banking_none[1] = mem;
-	sms_banking_bios[2] = sms_banking_cart[2] = sms_banking_none[2] = mem;
-	sms_banking_bios[3] = sms_banking_cart[3] = sms_banking_none[3] = mem;
-	sms_banking_bios[4] = sms_banking_cart[4] = sms_banking_none[4] = mem;
+	sms_state.banking_bios[1] = sms_state.banking_cart[1] = sms_state.banking_none[1] = mem;
+	sms_state.banking_bios[2] = sms_state.banking_cart[2] = sms_state.banking_none[2] = mem;
+	sms_state.banking_bios[3] = sms_state.banking_cart[3] = sms_state.banking_none[3] = mem;
+	sms_state.banking_bios[4] = sms_state.banking_cart[4] = sms_state.banking_none[4] = mem;
 
-	BIOS = memory_region(machine, "user1");
+	sms_state.BIOS = memory_region(machine, "user1");
 
-	smsBiosPageCount = ( BIOS ? memory_region_length(machine, "user1") / 0x4000 : 0 );
+	sms_state.BiosPageCount = ( sms_state.BIOS ? memory_region_length(machine, "user1") / 0x4000 : 0 );
 
 	setup_cart_banks();
 
-	if ( BIOS == NULL || BIOS[0] == 0x00 )
+	if ( sms_state.BIOS == NULL || sms_state.BIOS[0] == 0x00 )
 	{
-		BIOS = NULL;
-                biosPort |= IO_BIOS_ROM;
+		sms_state.BIOS = NULL;
+                sms_state.biosPort |= IO_BIOS_ROM;
 	}
 
-	if ( BIOS )
+	if ( sms_state.BIOS )
 	{
-		sms_banking_bios[1] = BIOS;
-		sms_banking_bios[2] = BIOS + 0x0400;
-		sms_banking_bios[3] = BIOS + ( ( 1 < smsBiosPageCount) ? 0x4000 : 0 );
-		sms_banking_bios[4] = BIOS + ( ( 2 < smsBiosPageCount) ? 0x8000 : 0 );
+		sms_state.banking_bios[1] = sms_state.BIOS;
+		sms_state.banking_bios[2] = sms_state.BIOS + 0x0400;
+		sms_state.banking_bios[3] = sms_state.BIOS + ( ( 1 < sms_state.BiosPageCount) ? 0x4000 : 0 );
+		sms_state.banking_bios[4] = sms_state.BIOS + ( ( 2 < sms_state.BiosPageCount) ? 0x8000 : 0 );
 	}
 }
 
@@ -1171,59 +1175,59 @@ MACHINE_RESET(sms)
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
-	smsVersion = 0x00;
+	sms_state.Version = 0x00;
 	if ( HAS_FM )
 	{
-		smsFMDetect = 0x01;
+		sms_state.FMDetect = 0x01;
 	}
 
-	sms_mapper_ram = memory_get_write_ptr( space, 0xDFFC );
+	sms_state.mapper_ram = memory_get_write_ptr( space, 0xDFFC );
 
-	biosPort = 0;
+	sms_state.biosPort = 0;
 
-	if ( sms_cartridge[sms_current_cartridge].features & CF_CODEMASTERS_MAPPER )
+	if ( sms_state.cartridge[sms_state.current_cartridge].features & CF_CODEMASTERS_MAPPER )
 	{
 		/* Install special memory handlers */
 		memory_install_write8_handler(space, 0x0000, 0x0000, 0, 0, sms_codemasters_page0_w );
 		memory_install_write8_handler(space, 0x4000, 0x4000, 0, 0, sms_codemasters_page1_w );
 	}
 
-	if ( sms_cartridge[sms_current_cartridge].features & CF_GG_SMS_MODE )
+	if ( sms_state.cartridge[sms_state.current_cartridge].features & CF_GG_SMS_MODE )
 	{
 		sms_set_ggsmsmode( 1 );
 	}
 
 	/* Initialize SIO stuff for GG */
-	ggSIO[0] = 0x7F;
-	ggSIO[1] = 0xFF;
-	ggSIO[2] = 0x00;
-	ggSIO[3] = 0xFF;
-	ggSIO[4] = 0x00;
+	sms_state.ggSIO[0] = 0x7F;
+	sms_state.ggSIO[1] = 0xFF;
+	sms_state.ggSIO[2] = 0x00;
+	sms_state.ggSIO[3] = 0xFF;
+	sms_state.ggSIO[4] = 0x00;
 
-	sms_store_control = 0;
+	sms_state.store_control = 0;
 
 	setup_banks(machine);
 
 	setup_rom(space);
 
-	rapid_fire_state_1 = 0;
-	rapid_fire_state_2 = 0;
-	rapid_fire_timer = timer_alloc(machine,  rapid_fire_callback , NULL);
-	timer_adjust_periodic(rapid_fire_timer, ATTOTIME_IN_HZ(10), 0, ATTOTIME_IN_HZ(10));
+	sms_state.rapid_fire_state_1 = 0;
+	sms_state.rapid_fire_state_2 = 0;
+	sms_state.rapid_fire_timer = timer_alloc(machine,  rapid_fire_callback , NULL);
+	timer_adjust_periodic(sms_state.rapid_fire_timer, ATTOTIME_IN_HZ(10), 0, ATTOTIME_IN_HZ(10));
 
-	last_paddle_read_time = 0;
-	paddle_read_state = 0;
+	sms_state.last_paddle_read_time = 0;
+	sms_state.paddle_read_state = 0;
 
-	last_sports_pad_time_1 = 0;
-	last_sports_pad_time_2 = 0;
-	sports_pad_state_1 = 0;
-	sports_pad_state_2 = 0;
-	sports_pad_last_data_1 = 0;
-	sports_pad_last_data_2 = 0;
-	sports_pad_1_x = 0;
-	sports_pad_1_y = 0;
-	sports_pad_2_x = 0;
-	sports_pad_2_y = 0;
+	sms_state.last_sports_pad_time_1 = 0;
+	sms_state.last_sports_pad_time_2 = 0;
+	sms_state.sports_pad_state_1 = 0;
+	sms_state.sports_pad_state_2 = 0;
+	sms_state.sports_pad_last_data_1 = 0;
+	sms_state.sports_pad_last_data_2 = 0;
+	sms_state.sports_pad_1_x = 0;
+	sms_state.sports_pad_1_y = 0;
+	sms_state.sports_pad_2_x = 0;
+	sms_state.sports_pad_2_y = 0;
 }
 
 
@@ -1242,10 +1246,10 @@ WRITE8_HANDLER(sms_store_cart_select_w)
 	/* cartridge? slot #0 */
 	if ( slottype == 0 )
 	{
-		sms_current_cartridge = slot;
+		sms_state.current_cartridge = slot;
 	}
 	setup_cart_banks();
-	memory_set_bankptr(space->machine,  10, sms_banking_cart[3] + 0x2000 );
+	memory_set_bankptr(space->machine,  10, sms_state.banking_cart[3] + 0x2000 );
 	setup_rom(space);
 }
 
@@ -1264,7 +1268,7 @@ READ8_HANDLER(sms_store_select2)
 
 READ8_HANDLER(sms_store_control_r)
 {
-	return sms_store_control;
+	return sms_state.store_control;
 }
 
 
@@ -1281,7 +1285,7 @@ WRITE8_HANDLER(sms_store_control_w)
 		cputag_suspend( space->machine, "maincpu", SUSPEND_REASON_HALT, 1 );
 		device_reset(cputag_get_cpu(space->machine, "maincpu"));
 	}
-	sms_store_control = data;
+	sms_state.store_control = data;
 }
 
 
@@ -1293,47 +1297,47 @@ void sms_int_callback( running_machine *machine, int state )
 
 void sms_store_int_callback( running_machine *machine, int state )
 {
-	cputag_set_input_line(machine, "maincpu", sms_store_control & 0x01 ? 1 : 0, state );
+	cputag_set_input_line(machine, "maincpu", sms_state.store_control & 0x01 ? 1 : 0, state );
 }
 
 
 DRIVER_INIT( sg1000m3 )
 {
-	sms_flags = FLAG_REGION_JAPAN | FLAG_FM;
+	sms_state.flags = FLAG_REGION_JAPAN | FLAG_FM;
 }
 
 
 DRIVER_INIT( sms1 )
 {
-	sms_flags = FLAG_BIOS_FULL;
+	sms_state.flags = FLAG_BIOS_FULL;
 }
 
 
 DRIVER_INIT( smsj )
 {
-	sms_flags = FLAG_REGION_JAPAN | FLAG_BIOS_2000 | FLAG_FM;
+	sms_state.flags = FLAG_REGION_JAPAN | FLAG_BIOS_2000 | FLAG_FM;
 }
 
 
 DRIVER_INIT( sms2kr )
 {
-	sms_flags = FLAG_REGION_JAPAN | FLAG_BIOS_FULL | FLAG_FM;
+	sms_state.flags = FLAG_REGION_JAPAN | FLAG_BIOS_FULL | FLAG_FM;
 }
 
 
 DRIVER_INIT( smssdisp )
 {
-	sms_flags = 0;
+	sms_state.flags = 0;
 }
 
 
 DRIVER_INIT( gamegear )
 {
-	sms_flags = FLAG_GAMEGEAR;
+	sms_state.flags = FLAG_GAMEGEAR;
 }
 
 
 DRIVER_INIT( gamegeaj )
 {
-	sms_flags = FLAG_REGION_JAPAN | FLAG_GAMEGEAR | FLAG_BIOS_0400;
+	sms_state.flags = FLAG_REGION_JAPAN | FLAG_GAMEGEAR | FLAG_BIOS_0400;
 }
