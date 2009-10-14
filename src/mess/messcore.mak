@@ -17,6 +17,7 @@ COREDEFS += -DMESS
 CFLAGS += \
 	-I$(SRC)/mame \
 	-I$(SRC)/mame/includes \
+	-I$(SRC)/mess/osd \
 	-I$(SRC)/mess/osd/$(OSD)
 
 
