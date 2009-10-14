@@ -1027,14 +1027,7 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 				cputag_set_input_line(machine, "maincpu", M68K_IRQ_4, ASSERT_LINE);
 			}
 
-			if(!(buffer[22] & 0x80))
-			{
-				timer_adjust_oneshot(cdic_regs.interrupt_timer, ATTOTIME_IN_HZ(75), 0); // 75Hz = 1x CD-ROM speed
-			}
-			else
-			{
-				cdic_regs.command = 0;
-			}
+			timer_adjust_oneshot(cdic_regs.interrupt_timer, ATTOTIME_IN_HZ(75), 0); // 75Hz = 1x CD-ROM speed
 
 			break;
 		}
@@ -2293,12 +2286,8 @@ INLINE UINT8 MCD212_LIM(INT32 in)
     return (UINT8)in;
 }
 
-INLINE UINT8 BYTE_TO_CLUT(int channel, UINT8 byte)
+INLINE UINT8 BYTE_TO_CLUT(int channel, int icm, UINT8 byte)
 {
-	UINT32 icm_mask = channel ? MCD212_ICM_MODE2 : MCD212_ICM_MODE1;
-	UINT32 icm_shift = channel ? MCD212_ICM_MODE2_SHIFT : MCD212_ICM_MODE1_SHIFT;
-	UINT8 icm = (mcd212.channel[0].image_coding_method & icm_mask) >> icm_shift;
-
 	switch(icm)
 	{
 		case 3:
@@ -2307,6 +2296,12 @@ INLINE UINT8 BYTE_TO_CLUT(int channel, UINT8 byte)
 				return 0x80 + (byte & 0x7f);
 			}
 			else
+			{
+				return byte & 0x7f;
+			}
+			break;
+		case 4:
+			if(!channel)
 			{
 				return byte & 0x7f;
 			}
@@ -2557,12 +2552,12 @@ INLINE void mcd212_process_vsr(running_machine *machine, int channel, UINT32 *pi
 						}
 						mcd212_set_vsr(channel, vsr - 1);
 					}
-					else if(icm == 3)
+					else if(icm == 3 || icm == 4)
 					{
 						for(; x < 768; x++)
 						{
-							pixels[x++] = mcd212.channel[0].clut[BYTE_TO_CLUT(channel, byte)];
-							pixels[x] = mcd212.channel[0].clut[BYTE_TO_CLUT(channel, byte)];
+							pixels[x++] = mcd212.channel[0].clut[BYTE_TO_CLUT(channel, icm, byte)];
+							pixels[x] = mcd212.channel[0].clut[BYTE_TO_CLUT(channel, icm, byte)];
 							byte = data[vsr++ ^ 1];
 						}
 						mcd212_set_vsr(channel, vsr - 1);
@@ -2571,8 +2566,8 @@ INLINE void mcd212_process_vsr(running_machine *machine, int channel, UINT32 *pi
 					{
 						for(; x < 768; x++)
 						{
-							pixels[x++] = mcd212.channel[0].clut[BYTE_TO_CLUT(channel, byte >> 4)];
-							pixels[x]   = mcd212.channel[0].clut[BYTE_TO_CLUT(channel, byte)];
+							pixels[x++] = mcd212.channel[0].clut[BYTE_TO_CLUT(channel, icm, byte >> 4)];
+							pixels[x]   = mcd212.channel[0].clut[BYTE_TO_CLUT(channel, icm, byte)];
 							byte = data[vsr++ ^ 1];
 						}
 						mcd212_set_vsr(channel, vsr - 1);
@@ -2605,8 +2600,8 @@ INLINE void mcd212_process_vsr(running_machine *machine, int channel, UINT32 *pi
 							// Go to the end of the line
 							for(; x < 768; x++)
 							{
-								pixels[x++] = mcd212.channel[0].clut[BYTE_TO_CLUT(channel, byte)];
-								pixels[x] = mcd212.channel[0].clut[BYTE_TO_CLUT(channel, byte)];
+								pixels[x++] = mcd212.channel[0].clut[BYTE_TO_CLUT(channel, icm, byte)];
+								pixels[x] = mcd212.channel[0].clut[BYTE_TO_CLUT(channel, icm, byte)];
 							}
 							done = 1;
 							mcd212_set_vsr(channel, vsr);
@@ -2616,8 +2611,8 @@ INLINE void mcd212_process_vsr(running_machine *machine, int channel, UINT32 *pi
 							int end = x + (length * 2);
 							for(; x < end && x < 768; x++)
 							{
-								pixels[x++] = mcd212.channel[0].clut[BYTE_TO_CLUT(channel, byte)];
-								pixels[x] = mcd212.channel[0].clut[BYTE_TO_CLUT(channel, byte)];
+								pixels[x++] = mcd212.channel[0].clut[BYTE_TO_CLUT(channel, icm, byte)];
+								pixels[x] = mcd212.channel[0].clut[BYTE_TO_CLUT(channel, icm, byte)];
 							}
 							if(x >= 768)
 							{
@@ -2629,8 +2624,8 @@ INLINE void mcd212_process_vsr(running_machine *machine, int channel, UINT32 *pi
 					else
 					{
 						// Single pixel
-						pixels[x++] = mcd212.channel[0].clut[BYTE_TO_CLUT(channel, byte)];
-						pixels[x++] = mcd212.channel[0].clut[BYTE_TO_CLUT(channel, byte)];
+						pixels[x++] = mcd212.channel[0].clut[BYTE_TO_CLUT(channel, icm, byte)];
+						pixels[x++] = mcd212.channel[0].clut[BYTE_TO_CLUT(channel, icm, byte)];
 						if(x >= 768)
 						{
 							done = 1;
