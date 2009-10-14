@@ -6,8 +6,8 @@
 
 *********************************************************************/
 
-#ifndef MESS_H
-#define MESS_H
+#ifndef __MESS_H__
+#define __MESS_H__
 
 #include <stdarg.h>
 
@@ -97,9 +97,5 @@ void		ram_dump(const char *filename);
 
 /* --------------------------------------------------------------------------------------------- */
 
-/* dummy read handlers */
-READ8_HANDLER(return8_FE);
-READ8_HANDLER(return8_FF);
-READ16_HANDLER(return16_FFFF);
 
-#endif
+#endif /* __MESS_H__ */

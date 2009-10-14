@@ -187,7 +187,7 @@ WRITE8_HANDLER( laser_bank_select_w )
 			else
 			{
 				logerror("select bank #%d MASKED!\n", offset+1);
-				read_handler = return8_FF;
+				read_handler = SMH_NOP;
 				write_handler = SMH_NOP;
 			}
 		}

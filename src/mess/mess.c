@@ -303,14 +303,3 @@ UINT32 hash_data_extract_crc32(const char *d)
 	}
 	return crc;
 }
-
-
-/***************************************************************************
-
-	Dummy read handlers
-
-***************************************************************************/
-
-READ8_HANDLER( return8_FE )	{ return 0xFE; }
-READ8_HANDLER( return8_FF )	{ return 0xFF; }
-READ16_HANDLER( return16_FFFF ) { return 0xFFFF; }
