@@ -1,4 +1,4 @@
-﻿0.134.1
+0.134.1
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
@@ -59,6 +59,10 @@ System Driver Changes:
 
 - [SMS] Fixed rapid-fire to only fire when buttons are
   pressed. (Bug #1864)  [Enik Land]
+
+- [SMS] Added Light Phaser support. (Bug #1123)  [Enik Land]
+
+- [SMS] Converted SMS VDP to be a device [Fabio Priuli]
 
 - [SPECTRUM] Fixed bug #803 48K SNA load routine bad PC. [Miodrag Milanovic]
 
