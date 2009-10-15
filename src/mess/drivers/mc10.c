@@ -16,6 +16,7 @@
 #include "formats/coco_cas.h"
 #include "devices/messram.h"
 
+
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
@@ -26,6 +27,9 @@ struct _mc10_state
 	const device_config *mc6847;
 	const device_config *dac;
 	const device_config *cassette;
+
+	UINT8 *ram;
+	UINT32 ram_size;
 
 	UINT8 keyboard_strobe;
 };
@@ -122,10 +126,12 @@ static WRITE8_HANDLER( mc10_port2_w )
 
 static READ8_DEVICE_HANDLER( mc10_mc6847_videoram_r )
 {
-	mc6847_inv_w(device, BIT(messram_get_ptr(devtag_get_device(device->machine, "messram"))[offset], 6));
-	mc6847_as_w(device, BIT(messram_get_ptr(devtag_get_device(device->machine, "messram"))[offset], 7));
+	mc10_state *mc10 = device->machine->driver_data;
 
-	return messram_get_ptr(devtag_get_device(device->machine, "messram"))[offset];
+	mc6847_inv_w(device, BIT(mc10->ram[offset], 6));
+	mc6847_as_w(device, BIT(mc10->ram[offset], 7));
+
+	return mc10->ram[offset];
 }
 
 static VIDEO_UPDATE( mc10 )
@@ -153,11 +159,14 @@ DRIVER_INIT( mc10 )
 	mc10->cassette = devtag_get_device(machine, "cassette");
 
 	/* initialize memory */
-	memory_set_bankptr(machine, 1, messram_get_ptr(devtag_get_device(machine, "messram")));
+	mc10->ram = messram_get_ptr(devtag_get_device(machine, "messram"));
+	mc10->ram_size = messram_get_size(devtag_get_device(machine, "messram"));
+
+	memory_set_bankptr(machine, 1, mc10->ram);
 
 	/* initialize memory expansion */
-	if (messram_get_size(devtag_get_device(machine, "messram")) == 20*1024)
-		memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x1000);
+	if (mc10->ram_size == 20*1024)
+		memory_set_bankptr(machine, 2, mc10->ram + 0x1000);
 	else
 		memory_install_readwrite8_handler(prg, 0x5000, 0x8fff, 0, 0, SMH_NOP, SMH_NOP);
 
@@ -415,11 +424,11 @@ static MACHINE_DRIVER_START( mc10 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MDRV_CASSETTE_ADD("cassette", mc10_cassette_config)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("20K")
-	MDRV_RAM_EXTRA_OPTIONS("4K")		
+	MDRV_RAM_EXTRA_OPTIONS("4K")
 MACHINE_DRIVER_END
 
 
