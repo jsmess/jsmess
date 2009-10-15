@@ -66,12 +66,12 @@ struct _sms_driver_data {
 	UINT8 sports_pad_2_y;
 	
 	/* Data needed for Light Phaser */
-	UINT8 lphaser_latch;
-	UINT8 lphaser_1_x;
-	UINT8 lphaser_1_y;
-	UINT8 lphaser_2_x;
-	UINT8 lphaser_2_y;
-	UINT8 lphaser_x_offs;	/* Needed to 'calibrate' lphaser; set at cart loading */
+	UINT16 lphaser_latch;
+	UINT16 lphaser_1_x;
+	UINT16 lphaser_1_y;
+	UINT16 lphaser_2_x;
+	UINT16 lphaser_2_y;
+	int lphaser_x_offs;	/* Needed to 'calibrate' lphaser; set at cart loading */
 
 	/* Cartridge slot info */
 	UINT8 current_cartridge;
@@ -268,7 +268,7 @@ static int lphaser_sensor_is_on( running_machine *machine, int x, int y )
 }
 
 
-static int screen_hpos_nonscaled( const device_config *screen, int scaled_hpos )
+static UINT16 screen_hpos_nonscaled( const device_config *screen, int scaled_hpos )
 {
 	const rectangle *visarea = video_screen_get_visible_area(screen);
 	int offset_x = (scaled_hpos * (visarea->max_x - visarea->min_x)) / 255;
@@ -276,7 +276,7 @@ static int screen_hpos_nonscaled( const device_config *screen, int scaled_hpos )
 }
 
 
-static int screen_vpos_nonscaled( const device_config *screen, int scaled_vpos )
+static UINT16 screen_vpos_nonscaled( const device_config *screen, int scaled_vpos )
 {
 	const rectangle *visarea = video_screen_get_visible_area(screen);
 	int offset_y = (scaled_vpos * (visarea->max_y - visarea->min_y)) / 255;
@@ -1116,7 +1116,7 @@ static int detect_korean_mapper( UINT8 *rom )
 	return 0;
 }
 
-static UINT8 detect_lphaser_xoffset( UINT8 *rom )
+static int detect_lphaser_xoffset( UINT8 *rom )
 {
 	static const UINT8 signatures[6][16] =
 	{
