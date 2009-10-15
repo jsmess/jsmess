@@ -78,6 +78,7 @@ Notes:
 #include "machine/nec765.h"
 #include "sound/sn76496.h"
 #include "video/tms9928a.h"
+#include "devices/messram.h"
 
 /* Terebi Oekaki (TV Draw) */
 
@@ -715,8 +716,8 @@ static MACHINE_START( sf7000 )
 
 	/* configure memory banking */
 	memory_configure_bank(machine, 1, 0, 1, memory_region(machine, Z80_TAG), 0);
-	memory_configure_bank(machine, 1, 1, 1, mess_ram, 0);
-	memory_configure_bank(machine, 2, 0, 1, mess_ram, 0);
+	memory_configure_bank(machine, 1, 1, 1, messram_get_ptr(devtag_get_device(machine, "messram")), 0);
+	memory_configure_bank(machine, 2, 0, 1, messram_get_ptr(devtag_get_device(machine, "messram")), 0);
 
 	/* register for state saving */
 	state_save_register_global(machine, state->keylatch);
@@ -853,6 +854,10 @@ static MACHINE_DRIVER_START( sg1000 )
 	MDRV_CARTSLOT_EXTENSION_LIST("sg,bin")
 	MDRV_CARTSLOT_MANDATORY
 	MDRV_CARTSLOT_LOAD(sg1000_cart)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("1K")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( omv )
@@ -906,6 +911,10 @@ static MACHINE_DRIVER_START( sc3000 )
 	MDRV_CARTSLOT_EXTENSION_LIST("sg,sc,bin")
 	MDRV_CARTSLOT_MANDATORY
 	MDRV_CARTSLOT_LOAD(sc3000_cart)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("2K")
 MACHINE_DRIVER_END
 
 static FLOPPY_OPTIONS_START(sf7000)
@@ -968,6 +977,10 @@ static MACHINE_DRIVER_START( sf7000 )
 	MDRV_NEC765A_ADD(NEC765_TAG, sf7000_nec765_interface)
 
 	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, sf7000_floppy_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("64K")
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -1022,17 +1035,7 @@ static void sf7000_serial_getinfo(const mess_device_class *devclass, UINT32 stat
 		case MESS_DEVINFO_STR_FILE_EXTENSIONS:			strcpy(info->s = device_temp_str(), "txt"); break;
 	}
 }
-
-static SYSTEM_CONFIG_START( sg1000 )
-	CONFIG_RAM_DEFAULT	(1 * 1024)
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START( sc3000 )
-	CONFIG_RAM_DEFAULT	(2 * 1024)
-SYSTEM_CONFIG_END
-
 static SYSTEM_CONFIG_START( sf7000 )
-	CONFIG_RAM_DEFAULT	(64 * 1024)
 	CONFIG_DEVICE(sf7000_serial_getinfo)
 SYSTEM_CONFIG_END
 
@@ -1040,10 +1043,10 @@ SYSTEM_CONFIG_END
 /* System Drivers */
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    CONFIG      COMPANY   FULLNAME */
-CONS( 1983,	sg1000,		0,		0,		sg1000,		sg1000,		0,		sg1000,		"Sega",	"SG-1000", GAME_SUPPORTS_SAVE )
-CONS( 1984,	sg1000m2,	sg1000,	0,		sc3000,		sc3000,		0,		sc3000,		"Sega",	"SG-1000 II", GAME_SUPPORTS_SAVE )
-COMP( 1983,	sc3000,		0,		0,		sc3000,		sc3000,		0,		sc3000,		"Sega",	"SC-3000", GAME_SUPPORTS_SAVE )
-COMP( 1983,	sc3000h,	sc3000,	0,		sc3000,		sc3000,		0,		sc3000,		"Sega",	"SC-3000H", GAME_SUPPORTS_SAVE )
+CONS( 1983,	sg1000,		0,		0,		sg1000,		sg1000,		0,		0,		"Sega",	"SG-1000", GAME_SUPPORTS_SAVE )
+CONS( 1984,	sg1000m2,	sg1000,	0,		sc3000,		sc3000,		0,		0,		"Sega",	"SG-1000 II", GAME_SUPPORTS_SAVE )
+COMP( 1983,	sc3000,		0,		0,		sc3000,		sc3000,		0,		0,		"Sega",	"SC-3000", GAME_SUPPORTS_SAVE )
+COMP( 1983,	sc3000h,	sc3000,	0,		sc3000,		sc3000,		0,		0,		"Sega",	"SC-3000H", GAME_SUPPORTS_SAVE )
 COMP( 1983,	sf7000,		sc3000, 0,		sf7000,		sf7000,		0,		sf7000,		"Sega",	"SC-3000/Super Control Station SF-7000", GAME_SUPPORTS_SAVE )
 CONS( 1984,	omv1000,    sg1000,	0,      omv,        omv,        0,      0,        "Tsukuda Original", "Othello Multivision FG-1000", GAME_NOT_WORKING )
 CONS( 1984,	omv2000,    sg1000,	0,      omv,        omv,        0,      0,        "Tsukuda Original", "Othello Multivision FG-2000", GAME_NOT_WORKING )

@@ -14,7 +14,7 @@
 #include "video/m6847.h"
 #include "devices/cassette.h"
 #include "formats/coco_cas.h"
-
+#include "devices/messram.h"
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -122,10 +122,10 @@ static WRITE8_HANDLER( mc10_port2_w )
 
 static READ8_DEVICE_HANDLER( mc10_mc6847_videoram_r )
 {
-	mc6847_inv_w(device, BIT(mess_ram[offset], 6));
-	mc6847_as_w(device, BIT(mess_ram[offset], 7));
+	mc6847_inv_w(device, BIT(messram_get_ptr(devtag_get_device(device->machine, "messram"))[offset], 6));
+	mc6847_as_w(device, BIT(messram_get_ptr(devtag_get_device(device->machine, "messram"))[offset], 7));
 
-	return mess_ram[offset];
+	return messram_get_ptr(devtag_get_device(device->machine, "messram"))[offset];
 }
 
 static VIDEO_UPDATE( mc10 )
@@ -153,11 +153,11 @@ DRIVER_INIT( mc10 )
 	mc10->cassette = devtag_get_device(machine, "cassette");
 
 	/* initialize memory */
-	memory_set_bankptr(machine, 1, mess_ram);
+	memory_set_bankptr(machine, 1, messram_get_ptr(devtag_get_device(machine, "messram")));
 
 	/* initialize memory expansion */
-	if (mess_ram_size == 20*1024)
-		memory_set_bankptr(machine, 2, mess_ram + 0x1000);
+	if (messram_get_size(devtag_get_device(machine, "messram")) == 20*1024)
+		memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x1000);
 	else
 		memory_install_readwrite8_handler(prg, 0x5000, 0x8fff, 0, 0, SMH_NOP, SMH_NOP);
 
@@ -415,6 +415,11 @@ static MACHINE_DRIVER_START( mc10 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MDRV_CASSETTE_ADD("cassette", mc10_cassette_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("20K")
+	MDRV_RAM_EXTRA_OPTIONS("4K")		
 MACHINE_DRIVER_END
 
 
@@ -434,19 +439,9 @@ ROM_END
 
 
 /***************************************************************************
-    SYSTEM CONFIG
-***************************************************************************/
-
-static SYSTEM_CONFIG_START( mc10 )
-	CONFIG_RAM        (  4 * 1024 )   /* standard */
-	CONFIG_RAM_DEFAULT( 20 * 1024 )   /* with 16K memory expansion */
-SYSTEM_CONFIG_END
-
-
-/***************************************************************************
     GAME DRIVERS
 ***************************************************************************/
 
 /*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  INIT  CONFIG  COMPANY              FULLNAME  FLAGS */
-COMP( 1983, mc10,  0,      0,      mc10,    mc10,  mc10, mc10,   "Tandy Radio Shack", "MC-10",  GAME_SUPPORTS_SAVE )
-COMP( 1983, alice, mc10,   0,      mc10,    alice, mc10, mc10,   "Matra & Hachette",  "Alice",  GAME_SUPPORTS_SAVE )
+COMP( 1983, mc10,  0,      0,      mc10,    mc10,  mc10, 0,   "Tandy Radio Shack", "MC-10",  GAME_SUPPORTS_SAVE )
+COMP( 1983, alice, mc10,   0,      mc10,    alice, mc10, 0,   "Matra & Hachette",  "Alice",  GAME_SUPPORTS_SAVE )

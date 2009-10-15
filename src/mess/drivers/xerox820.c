@@ -36,6 +36,7 @@
 #include "machine/com8116.h"
 #include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
+#include "devices/messram.h"
 
 INLINE const device_config *get_floppy_image(running_machine *machine, int drive)
 {
@@ -745,6 +746,10 @@ static MACHINE_DRIVER_START( xerox820 )
 	MDRV_WD1771_ADD(WD1771_TAG, wd1771_intf)
 	MDRV_FLOPPY_2_DRIVES_ADD(xerox820_floppy_config)
 	MDRV_COM8116_ADD(COM8116_TAG, XTAL_5_0688MHz, com8116_intf)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("64K")	
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( xerox820ii )
@@ -788,13 +793,9 @@ ROM_START( xerox820ii )
 	ROM_LOAD( "x820ii.u58", 0x0000, 0x0800, NO_DUMP )
 ROM_END
 
-/* System Configuration */
-static SYSTEM_CONFIG_START( xerox820 )
-	CONFIG_RAM_DEFAULT	(64 * 1024)
-SYSTEM_CONFIG_END
 /*
 static SYSTEM_CONFIG_START( xerox820ii )
-    CONFIG_RAM_DEFAULT  (64 * 1024)
+    64K
     CONFIG_DEVICE(xerox820ii_floppy_getinfo)
 //  CONFIG_DEVICE(xerox820_harddisk_getinfo) 10MB
 SYSTEM_CONFIG_END
@@ -802,7 +803,7 @@ SYSTEM_CONFIG_END
 /* System Drivers */
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    CONFIG      COMPANY                         FULLNAME        FLAGS */
-COMP( 1981, xerox820,	0,			0,		xerox820,	xerox820,	0,		xerox820,	"Xerox",						"Xerox 820",	0)
+COMP( 1981, xerox820,	0,			0,		xerox820,	xerox820,	0,		0,	"Xerox",						"Xerox 820",	0)
 /*
 COMP( 1980, bigboard,   0,          0,      bigboard,   bigboard,   0,      bigboard,   "Digital Research Computers",   "Big Board",    GAME_NOT_WORKING)
 COMP( 1983, bigbord2,   0,          0,      bigbord2,   bigboard,   0,      bigbord2,   "Digital Research Computers",   "Big Board II", GAME_NOT_WORKING)

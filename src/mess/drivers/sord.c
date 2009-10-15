@@ -625,10 +625,8 @@ ROM_END
 ***************************************************************************/
 /* different ram sizes need to be emulated */
 #ifdef UNUSED_FUNCTION
-static SYSTEM_CONFIG_START( sordm5 )
-	CONFIG_RAM(4 * 1024)
-	CONFIG_RAM_DEFAULT(36 * 1024)
-SYSTEM_CONFIG_END
+	4K
+	36K
 #endif
 
 /***************************************************************************

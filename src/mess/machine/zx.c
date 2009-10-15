@@ -11,6 +11,7 @@
 #include "includes/zx.h"
 #include "devices/cassette.h"
 #include "sound/speaker.h"
+#include "devices/messram.h"
 
 #define video_screen_get_refresh(screen)	(((screen_config *)(screen)->inline_config)->refresh)
 
@@ -51,7 +52,7 @@ DRIVER_INIT ( zx )
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
-	memory_install_readwrite8_handler(space, 0x4000, 0x4000 + mess_ram_size - 1, 0, 0, SMH_BANK(1), zx_ram_w);
+	memory_install_readwrite8_handler(space, 0x4000, 0x4000 + messram_get_size(devtag_get_device(machine, "messram")) - 1, 0, 0, SMH_BANK(1), zx_ram_w);
 	memory_set_bankptr(machine, 1, memory_region(machine, "maincpu") + 0x4000);
 }
 

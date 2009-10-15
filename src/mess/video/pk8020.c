@@ -8,6 +8,7 @@
 
 #include "driver.h"
 #include "includes/pk8020.h"
+#include "devices/messram.h"
 
 VIDEO_START( pk8020 )
 {
@@ -22,13 +23,13 @@ VIDEO_UPDATE( pk8020 )
 	{
 		for (x = 0; x < 64; x++)
 		{
-			UINT8 chr = mess_ram[x +(y*64) + 0x40000];
-			UINT8 attr= mess_ram[x +(y*64) + 0x40400];
+			UINT8 chr = messram_get_ptr(devtag_get_device(screen->machine, "messram"))[x +(y*64) + 0x40000];
+			UINT8 attr= messram_get_ptr(devtag_get_device(screen->machine, "messram"))[x +(y*64) + 0x40400];
 			for (j = 0; j < 16; j++) {
 				UINT32 addr = 0x10000 + x + ((y*16+j)*64) + (pk8020_video_page * 0xC000);
-				UINT8 code1 = mess_ram[addr];
-				UINT8 code2 = mess_ram[addr + 0x4000];
-				UINT8 code3 = mess_ram[addr + 0x8000];
+				UINT8 code1 = messram_get_ptr(devtag_get_device(screen->machine, "messram"))[addr];
+				UINT8 code2 = messram_get_ptr(devtag_get_device(screen->machine, "messram"))[addr + 0x4000];
+				UINT8 code3 = messram_get_ptr(devtag_get_device(screen->machine, "messram"))[addr + 0x8000];
 				UINT8 code4 = gfx[((chr<<4) + j) + (pk8020_font*0x1000)];
 				if(attr) code4 ^= 0xff;
 				for (b = 0; b < 8; b++)

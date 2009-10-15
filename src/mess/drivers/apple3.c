@@ -18,6 +18,7 @@
 #include "formats/ap2_dsk.h"
 #include "machine/6551.h"
 #include "machine/6522via.h"
+#include "devices/messram.h"
 #include "devices/appldriv.h"
 
 static ADDRESS_MAP_START( apple3_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -107,6 +108,10 @@ static MACHINE_DRIVER_START( apple3 )
 	/* via */
 	MDRV_VIA6522_ADD("via6522_0", 1000000, apple3_via_0_intf)
 	MDRV_VIA6522_ADD("via6522_1", 2000000, apple3_via_1_intf)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("512K")
 MACHINE_DRIVER_END
 
 
@@ -195,10 +200,6 @@ ROM_START(apple3)
 	ROM_LOAD( "apple3.rom", 0x0000, 0x1000, CRC(55e8eec9) SHA1(579ee4cd2b208d62915a0aa482ddc2744ff5e967))
 ROM_END
 
-static SYSTEM_CONFIG_START(apple3)
-	CONFIG_RAM_DEFAULT(0x80000)
-SYSTEM_CONFIG_END
-
 /*     YEAR     NAME        PARENT  COMPAT  MACHINE    INPUT    INIT    CONFIG  COMPANY             FULLNAME */
-COMP( 1980,	apple3,		0,		0,		apple3,    apple3,	apple3,	apple3,	"Apple Computer",	"Apple ///", GAME_NOT_WORKING )
+COMP( 1980,	apple3,		0,		0,		apple3,    apple3,	apple3,	0,	"Apple Computer",	"Apple ///", GAME_NOT_WORKING )
 

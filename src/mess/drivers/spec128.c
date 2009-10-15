@@ -154,6 +154,7 @@ http://www.z88forever.org.uk/zxplus3e/
 #include "sound/ay8910.h"
 #include "sound/speaker.h"
 #include "formats/tzx_cas.h"
+#include "devices/messram.h"
 
 static const ay8910_interface spectrum_ay_interface =
 {
@@ -192,11 +193,11 @@ void spectrum_128_update_memory(running_machine *machine)
 
 	if (spectrum_128_port_7ffd_data & 8)
 	{
-			spectrum_screen_location = mess_ram + (7<<14);
+			spectrum_screen_location = messram_get_ptr(devtag_get_device(machine, "messram")) + (7<<14);
 	}
 	else
 	{
-			spectrum_screen_location = mess_ram + (5<<14);
+			spectrum_screen_location = messram_get_ptr(devtag_get_device(machine, "messram")) + (5<<14);
 	}
 
 	/* select ram at 0x0c000-0x0ffff */
@@ -205,7 +206,7 @@ void spectrum_128_update_memory(running_machine *machine)
 			unsigned char *ram_data;
 
 			ram_page = spectrum_128_port_7ffd_data & 0x07;
-			ram_data = mess_ram + (ram_page<<14);
+			ram_data = messram_get_ptr(devtag_get_device(machine, "messram")) + (ram_page<<14);
 
 			memory_set_bankptr(machine, 4, ram_data);
 	}
@@ -245,14 +246,14 @@ ADDRESS_MAP_END
 
 static MACHINE_RESET( spectrum_128 )
 {
-	memset(mess_ram,0,128*1024);
+	memset(messram_get_ptr(devtag_get_device(machine, "messram")),0,128*1024);
 	/* 0x0000-0x3fff always holds ROM */
 
 	/* Bank 5 is always in 0x4000 - 0x7fff */
-	memory_set_bankptr(machine, 2, mess_ram + (5<<14));
+	memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + (5<<14));
 
 	/* Bank 2 is always in 0x8000 - 0xbfff */
-	memory_set_bankptr(machine, 3, mess_ram + (2<<14));
+	memory_set_bankptr(machine, 3, messram_get_ptr(devtag_get_device(machine, "messram")) + (2<<14));
 
 	/* set initial ram config */
 	spectrum_128_port_7ffd_data = 0;
@@ -281,6 +282,10 @@ MACHINE_DRIVER_START( spectrum_128 )
 	MDRV_SOUND_ADD("ay8912", AY8912, 1773400)
 	MDRV_SOUND_CONFIG(spectrum_ay_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("128K")
 MACHINE_DRIVER_END
 
 
@@ -341,12 +346,8 @@ ROM_START(hc2000)
 	ROM_CART_LOAD("cart", 0x10000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
-static SYSTEM_CONFIG_START(spec128)
-	CONFIG_RAM_DEFAULT(128 * 1024)
-SYSTEM_CONFIG_END
-
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT       INIT    CONFIG      COMPANY     FULLNAME */
-COMP( 1986, spec128,  0,	   0,		spectrum_128,	spec_plus,	0,		spec128,	"Sinclair Research",    "ZX Spectrum 128" , 0 )
-COMP( 1986, specpls2, spec128, 0,		spectrum_128,	spec_plus,	0,		spec128,	"Amstrad plc",          "ZX Spectrum +2" , 0 )
-COMP( 1991, hc128,    spec128, 0,		spectrum_128,	spec_plus,	0,		spec128,	"ICE-Felix",			"HC-128" , 0)
-COMP( 1992, hc2000,   spec128, 0,		spectrum_128,	spec_plus,	0,		spec128,	"ICE-Felix",			"HC-2000" , GAME_NOT_WORKING)
+COMP( 1986, spec128,  0,	   0,		spectrum_128,	spec_plus,	0,		0,	"Sinclair Research",    "ZX Spectrum 128" , 0 )
+COMP( 1986, specpls2, spec128, 0,		spectrum_128,	spec_plus,	0,		0,	"Amstrad plc",          "ZX Spectrum +2" , 0 )
+COMP( 1991, hc128,    spec128, 0,		spectrum_128,	spec_plus,	0,		0,	"ICE-Felix",			"HC-128" , 0)
+COMP( 1992, hc2000,   spec128, 0,		spectrum_128,	spec_plus,	0,		0,	"ICE-Felix",			"HC-2000" , GAME_NOT_WORKING)

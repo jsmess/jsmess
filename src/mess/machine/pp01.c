@@ -10,6 +10,7 @@
 #include "driver.h"
 #include "cpu/i8085/i8085.h"
 #include "includes/pp01.h"
+#include "devices/messram.h"
 
 static UINT8 memory_block[16];
 UINT8 pp01_video_scroll;
@@ -23,68 +24,68 @@ WRITE8_HANDLER (pp01_video_write_mode_w)
 /* Driver initialization */
 DRIVER_INIT(pp01)
 {
-	memset(mess_ram, 0, 64 * 1024);
+	memset(messram_get_ptr(devtag_get_device(machine, "messram")), 0, 64 * 1024);
 }
 
 
-static void pp01_video_w(UINT8 block,UINT16 offset,UINT8 data,UINT8 part)
+static void pp01_video_w(running_machine *machine,UINT8 block,UINT16 offset,UINT8 data,UINT8 part)
 {
 	UINT16 addroffset = part ? 0x1000  : 0x0000;
 
 	if (BIT(pp01_video_write_mode,3)) {
 		// Copy mode
 		if(BIT(pp01_video_write_mode,0)) {
-			mess_ram[0x6000+offset+addroffset] = data;
+			messram_get_ptr(devtag_get_device(machine, "messram"))[0x6000+offset+addroffset] = data;
 		} else {
-			mess_ram[0x6000+offset+addroffset] = 0;
+			messram_get_ptr(devtag_get_device(machine, "messram"))[0x6000+offset+addroffset] = 0;
 		}
 		if(BIT(pp01_video_write_mode,1)) {
-			mess_ram[0xa000+offset+addroffset] = data;
+			messram_get_ptr(devtag_get_device(machine, "messram"))[0xa000+offset+addroffset] = data;
 		} else {
-			mess_ram[0xa000+offset+addroffset] = 0;
+			messram_get_ptr(devtag_get_device(machine, "messram"))[0xa000+offset+addroffset] = 0;
 		}
 		if(BIT(pp01_video_write_mode,2)) {
-			mess_ram[0xe000+offset+addroffset] = data;
+			messram_get_ptr(devtag_get_device(machine, "messram"))[0xe000+offset+addroffset] = data;
 		} else {
-			mess_ram[0xe000+offset+addroffset] = 0;
+			messram_get_ptr(devtag_get_device(machine, "messram"))[0xe000+offset+addroffset] = 0;
 		}
 	} else {
 		if (block==0) {
-			mess_ram[0x6000+offset+addroffset] = data;
+			messram_get_ptr(devtag_get_device(machine, "messram"))[0x6000+offset+addroffset] = data;
 		}
 		if (block==1) {
-			mess_ram[0xa000+offset+addroffset] = data;
+			messram_get_ptr(devtag_get_device(machine, "messram"))[0xa000+offset+addroffset] = data;
 		}
 		if (block==2) {
-			mess_ram[0xe000+offset+addroffset] = data;
+			messram_get_ptr(devtag_get_device(machine, "messram"))[0xe000+offset+addroffset] = data;
 		}
 	}
 }
 
 static WRITE8_HANDLER (pp01_video_r_1_w)
 {
-	pp01_video_w(0,offset,data,0);
+	pp01_video_w(space->machine,0,offset,data,0);
 }
 static WRITE8_HANDLER (pp01_video_g_1_w)
 {
-	pp01_video_w(1,offset,data,0);
+	pp01_video_w(space->machine,1,offset,data,0);
 }
 static WRITE8_HANDLER (pp01_video_b_1_w)
 {
-	pp01_video_w(2,offset,data,0);
+	pp01_video_w(space->machine,2,offset,data,0);
 }
 
 static WRITE8_HANDLER (pp01_video_r_2_w)
 {
-	pp01_video_w(0,offset,data,1);
+	pp01_video_w(space->machine,0,offset,data,1);
 }
 static WRITE8_HANDLER (pp01_video_g_2_w)
 {
-	pp01_video_w(1,offset,data,1);
+	pp01_video_w(space->machine,1,offset,data,1);
 }
 static WRITE8_HANDLER (pp01_video_b_2_w)
 {
-	pp01_video_w(2,offset,data,1);
+	pp01_video_w(space->machine,2,offset,data,1);
 }
 
 
@@ -123,7 +124,7 @@ static void pp01_set_memory(running_machine *machine,UINT8 block, UINT8 data)
 					break;
 		}
 
-		memory_set_bankptr(machine, blocknum, mess_ram + (data & 0x0F)* 0x1000);
+		memory_set_bankptr(machine, blocknum, messram_get_ptr(devtag_get_device(machine, "messram")) + (data & 0x0F)* 0x1000);
 	} else if (data>=0xF8) {
 		memory_install_read8_handler (space, startaddr, endaddr, 0, 0, SMH_BANK(blocknum));
 		memory_install_write8_handler(space, startaddr, endaddr, 0, 0, SMH_UNMAP);

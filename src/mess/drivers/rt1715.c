@@ -16,11 +16,12 @@
 #include "devices/cassette.h"
 #include "formats/rk_cas.h"
 #include "includes/rt1715.h"
+#include "devices/messram.h"
 
 static WRITE8_HANDLER (rt1717_set_bank )
 {
-	memory_set_bankptr(space->machine, 1, mess_ram);
-	memory_set_bankptr(space->machine, 3, mess_ram);
+	memory_set_bankptr(space->machine, 1, messram_get_ptr(devtag_get_device(space->machine, "messram")));
+	memory_set_bankptr(space->machine, 3, messram_get_ptr(devtag_get_device(space->machine, "messram")));
 }
 
 /* Address maps */
@@ -59,7 +60,10 @@ static MACHINE_DRIVER_START( rt1715 )
 
 	MDRV_VIDEO_START(generic_bitmapped)
 	MDRV_VIDEO_UPDATE(rt1715)
-
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("64K")
 MACHINE_DRIVER_END
 
 /* ROM definition */
@@ -77,12 +81,8 @@ ROM_START( rt1715w )
 	ROM_LOAD ("s619.bin", 0x0000, 0x0800, CRC(98647763) SHA1(93fba51ed26392ec3eff1037886576fa12443fe5))
 ROM_END
 
-static SYSTEM_CONFIG_START(rt1715)
-	CONFIG_RAM_DEFAULT(64 * 1024)
-SYSTEM_CONFIG_END
-
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( 1986, rt1715, 0,      0, 		rt1715, 	rt1715,rt1715, rt1715,  "Robotron", 	"Robotron 1715",	GAME_NOT_WORKING)
-COMP( 1986, rt1715w,rt1715, 0, 		rt1715, 	rt1715,rt1715, rt1715,  "Robotron", 	"Robotron 1715W",	GAME_NOT_WORKING)
+COMP( 1986, rt1715, 0,      0, 		rt1715, 	rt1715,rt1715, 0,  "Robotron", 	"Robotron 1715",	GAME_NOT_WORKING)
+COMP( 1986, rt1715w,rt1715, 0, 		rt1715, 	rt1715,rt1715, 0,  "Robotron", 	"Robotron 1715W",	GAME_NOT_WORKING)

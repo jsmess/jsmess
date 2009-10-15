@@ -58,7 +58,7 @@ VIDEO_UPDATE( coco );
 /*----------- defined in video/coco3.c -----------*/
 
 int coco3_new_frame(running_machine *machine);
-void coco3_prepare_scanline(int scanline);
+void coco3_prepare_scanline(running_machine *machine,int scanline);
 READ8_DEVICE_HANDLER( coco3_mc6847_videoram_r );
 VIDEO_START( coco3 );
 VIDEO_UPDATE( coco3 );
@@ -108,7 +108,7 @@ READ8_HANDLER ( coco3_mmu_r );
 WRITE8_HANDLER ( coco3_mmu_w );
 READ8_HANDLER ( coco3_gime_r );
 WRITE8_HANDLER ( coco3_gime_w );
-offs_t coco3_mmu_translate(int bank, int offset);
+offs_t coco3_mmu_translate(running_machine *machine,int bank, int offset);
 WRITE8_DEVICE_HANDLER( coco_pia_1_w );
 WRITE_LINE_DEVICE_HANDLER( coco3_hs_w );
 WRITE_LINE_DEVICE_HANDLER( coco3_fs_w );

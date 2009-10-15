@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "devices/messram.h"
 #include "includes/z88.h"
 
 static int frame_number = 0;
@@ -120,13 +121,13 @@ static void z88_vh_render_line(bitmap_t *bitmap, int x, int y,int pen)
 /* convert absolute offset into correct address to get data from */
 static unsigned char *z88_convert_address(running_machine *machine, unsigned long offset)
 {
-//        return mess_ram;
+//        return messram_get_ptr(devtag_get_device(machine, "messram"));
 	if (offset>(32*16384))
 	{
 		unsigned long get_offset;
 		get_offset = offset - (32*16384);
 		get_offset = get_offset & 0x01fffff;
-		return mess_ram + get_offset;
+		return messram_get_ptr(devtag_get_device(machine, "messram")) + get_offset;
 	}
 	else
 	{

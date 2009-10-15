@@ -3,6 +3,7 @@
 
 #include "includes/pocketc.h"
 #include "includes/pc1401.h"
+#include "devices/messram.h"
 
 /* C-CE while reset, program will not be destroyed! */
 
@@ -246,7 +247,7 @@ DRIVER_INIT( pc1401 )
 
 	timer_set(machine, ATTOTIME_IN_SEC(1), NULL, 0, pc1401_power_up);
 
-	/* NPW 28-Jun-2006 - Input ports can't be read at init time! Even then, this should use mess_ram */
+	/* NPW 28-Jun-2006 - Input ports can't be read at init time! Even then, this should use messram_get_ptr(devtag_get_device(machine, "messram")) */
 	if (0 && (input_port_read(machine, "DSW0") & 0xc0) == 0x80)
 	{
 		memory_install_write8_handler(space, 0x2000, 0x3fff, 0, 0, SMH_RAM);

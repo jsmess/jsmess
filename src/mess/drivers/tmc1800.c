@@ -120,6 +120,7 @@ Notes:
 #include "devices/snapquik.h"
 #include "machine/rescap.h"
 #include "sound/beep.h"
+#include "devices/messram.h"
 
 #define TMC2000_BANK_RAM		0
 #define TMC2000_BANK_ROM		1
@@ -197,7 +198,7 @@ static WRITE8_DEVICE_HANDLER( tmc2000_bankswitch_w )
 
 	memory_set_bank(device->machine, 1, TMC2000_BANK_RAM);
 
-	switch (mess_ram_size)
+	switch (messram_get_size(devtag_get_device(device->machine, "messram")))
 	{
 	case 4 * 1024:
 		memory_install_readwrite8_handler(cputag_get_address_space(device->machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM), 0x0000, 0x0fff, 0, 0x7000, SMH_BANK(1), SMH_BANK(1));
@@ -867,6 +868,11 @@ static MACHINE_DRIVER_START( tmc1800 )
 	// devices
 	MDRV_QUICKLOAD_ADD("quickload", tmc1800, "bin", 0)
 	MDRV_CASSETTE_ADD( "cassette", tmc1800_cassette_config )
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("2K")
+	MDRV_RAM_EXTRA_OPTIONS("4K")	
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( osc1000b )
@@ -893,6 +899,11 @@ static MACHINE_DRIVER_START( osc1000b )
 	// devices
 	MDRV_QUICKLOAD_ADD("quickload", tmc1800, "bin", 0)
 	MDRV_CASSETTE_ADD( "cassette", tmc1800_cassette_config )
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("2K")
+	MDRV_RAM_EXTRA_OPTIONS("4K")	
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( tmc2000 )
@@ -913,6 +924,11 @@ static MACHINE_DRIVER_START( tmc2000 )
 	// devices
 	MDRV_QUICKLOAD_ADD("quickload", tmc1800, "bin", 0)
 	MDRV_CASSETTE_ADD( "cassette", tmc1800_cassette_config )
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("4K")
+	MDRV_RAM_EXTRA_OPTIONS("16K,32K")	
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( oscnano )
@@ -933,6 +949,10 @@ static MACHINE_DRIVER_START( oscnano )
 	// devices
 	MDRV_QUICKLOAD_ADD("quickload", tmc1800, "bin", 0)
 	MDRV_CASSETTE_ADD( "cassette", tmc1800_cassette_config )
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("4K")
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -973,7 +993,7 @@ static QUICKLOAD_LOAD( tmc1800 )
 	UINT8 *ptr = memory_region(image->machine, CDP1802_TAG);
 	int size = image_length(image);
 
-	if (size > mess_ram_size)
+	if (size > messram_get_size(devtag_get_device(image->machine, "messram")))
 	{
 		return INIT_FAIL;
 	}
@@ -982,26 +1002,6 @@ static QUICKLOAD_LOAD( tmc1800 )
 
 	return INIT_PASS;
 }
-
-static SYSTEM_CONFIG_START( tmc1800 )
-	CONFIG_RAM_DEFAULT	( 2 * 1024)
-	CONFIG_RAM			( 4 * 1024)
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START( osc1000b )
-	CONFIG_RAM_DEFAULT	( 2 * 1024)
-	CONFIG_RAM			( 4 * 1024)
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START( tmc2000 )
-	CONFIG_RAM_DEFAULT	( 4 * 1024)
-	CONFIG_RAM			(16 * 1024)
-	CONFIG_RAM			(32 * 1024)
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START( oscnano )
-	CONFIG_RAM_DEFAULT	(4 * 1024)
-SYSTEM_CONFIG_END
 
 /* Driver Initialization */
 
@@ -1020,7 +1020,7 @@ static DRIVER_INIT( tmc1800 )
 /* System Drivers */
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        CONFIG      COMPANY         FULLNAME        FLAGS */
-COMP( 1977, tmc1800,    0,      0,      tmc1800,    tmc1800,    tmc1800,    tmc1800,    "Telercas Oy",  "Telmac 1800",  GAME_NOT_WORKING )
-COMP( 1977, osc1000b,   tmc1800,0,      osc1000b,   tmc1800,    tmc1800,    osc1000b,   "OSCOM Oy",		"OSCOM 1000B",  GAME_NOT_WORKING )
-COMP( 1980, tmc2000,    0,      0,      tmc2000,    tmc2000,    0,		    tmc2000,    "Telercas Oy",  "Telmac 2000",  GAME_SUPPORTS_SAVE )
-COMP( 1980, oscnano,	tmc2000,0,		oscnano,	oscnano,	0,			oscnano,	"OSCOM Oy",		"OSCOM Nano",	GAME_SUPPORTS_SAVE )
+COMP( 1977, tmc1800,    0,      0,      tmc1800,    tmc1800,    tmc1800,    0,    "Telercas Oy",  "Telmac 1800",  GAME_NOT_WORKING )
+COMP( 1977, osc1000b,   tmc1800,0,      osc1000b,   tmc1800,    tmc1800,    0,   "OSCOM Oy",		"OSCOM 1000B",  GAME_NOT_WORKING )
+COMP( 1980, tmc2000,    0,      0,      tmc2000,    tmc2000,    0,		    0,    "Telercas Oy",  "Telmac 2000",  GAME_SUPPORTS_SAVE )
+COMP( 1980, oscnano,	tmc2000,0,		oscnano,	oscnano,	0,			0,	"OSCOM Oy",		"OSCOM Nano",	GAME_SUPPORTS_SAVE )

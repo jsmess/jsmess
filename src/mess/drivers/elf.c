@@ -22,6 +22,7 @@
 #include "video/dm9368.h"
 #include "machine/rescap.h"
 #include "elf2.lh"
+#include "devices/messram.h"
 
 #define RUN(_machine)				BIT(input_port_read((_machine), "SPECIAL"), 0)
 #define LOAD(_machine)				BIT(input_port_read((_machine), "SPECIAL"), 1)
@@ -64,12 +65,12 @@ static WRITE8_HANDLER( memory_w )
 		if (MEMORY_PROTECT(space->machine))
 		{
 			/* latch data from memory */
-			data = mess_ram[offset];
+			data = messram_get_ptr(devtag_get_device(space->machine, "messram"))[offset];
 		}
 		else
 		{
 			/* write latched data to memory */
-			mess_ram[offset] = data;
+			messram_get_ptr(devtag_get_device(space->machine, "messram"))[offset] = data;
 		}
 
 		/* write data to 7 segment displays */
@@ -289,7 +290,7 @@ static MACHINE_START( elf2 )
 
 	/* setup memory banking */
 	memory_install_readwrite8_handler(program, 0x0000, 0x00ff, 0, 0, SMH_BANK(1), memory_w);
-	memory_configure_bank(machine, 1, 0, 1, mess_ram, 0);
+	memory_configure_bank(machine, 1, 0, 1, messram_get_ptr(devtag_get_device(machine, "messram")), 0);
 	memory_set_bank(machine, 1, 0);
 
 	/* register for state saving */
@@ -335,6 +336,10 @@ static MACHINE_DRIVER_START( elf2 )
 	/* devices */
 	MDRV_CASSETTE_ADD(CASSETTE_TAG, elf_cassette_config)
 	MDRV_QUICKLOAD_ADD("quickload", elf, "bin", 0)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE(256)
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -349,21 +354,17 @@ static QUICKLOAD_LOAD( elf )
 {
 	int size = image_length(image);
 
-	if (size > mess_ram_size)
+	if (size > messram_get_size(devtag_get_device(image->machine, "messram")))
 	{
 		return INIT_FAIL;
 	}
 
-	image_fread(image, mess_ram, size);
+	image_fread(image, messram_get_ptr(devtag_get_device(image->machine, "messram")), size);
 
 	return INIT_PASS;
 }
 
-static SYSTEM_CONFIG_START( elf2 )
-	CONFIG_RAM_DEFAULT( 256 )
-SYSTEM_CONFIG_END
-
 /* System Drivers */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY         FULLNAME    FLAGS */
-COMP( 1978, elf2,	0,		0,		elf2,	elf2,	0,		elf2,	"Netronics",	"Elf II",	GAME_SUPPORTS_SAVE )
+COMP( 1978, elf2,	0,		0,		elf2,	elf2,	0,		0,	"Netronics",	"Elf II",	GAME_SUPPORTS_SAVE )

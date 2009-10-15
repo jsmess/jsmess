@@ -67,6 +67,7 @@ bus serial (available in all modes), a Fast and a Burst serial bus
 #include "includes/c64.h"
 #include "includes/c65.h"
 
+#include "devices/messram.h"
 
 /*************************************
  *
@@ -247,6 +248,11 @@ static MACHINE_DRIVER_START( c65 )
 	MDRV_IMPORT_FROM(simulated_drive)
 
 	MDRV_IMPORT_FROM(c64_cartslot)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("128K")
+	MDRV_RAM_EXTRA_OPTIONS("640K,4224K")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( c65pal )
@@ -304,16 +310,10 @@ ROM_END
  *  System configuration(s)
  *
  *************************************/
-
-
 static SYSTEM_CONFIG_START( c65 )
 	// to investigate which carts could work in the c65 expansion port!
 	CONFIG_DEVICE(cbmfloppy_device_getinfo)
-	CONFIG_RAM_DEFAULT(128 * 1024)
-	CONFIG_RAM((128 + 512) * 1024)
-	CONFIG_RAM((128 + 4096) * 1024)
 SYSTEM_CONFIG_END
-
 
 /***************************************************************************
 

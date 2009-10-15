@@ -13,7 +13,7 @@
 #include "formats/basicdsk.h"
 #include "devices/cassette.h"
 #include "machine/rescap.h"
-
+#include "devices/messram.h"
 /*
 
     NewBrain
@@ -1508,6 +1508,10 @@ static MACHINE_DRIVER_START( newbrain_a )
 	/* cassette */
 	MDRV_CASSETTE_ADD("cassette1", newbrain_cassette_config)
 	MDRV_CASSETTE_ADD("cassette2", newbrain_cassette_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("32K")
 MACHINE_DRIVER_END
 
 static FLOPPY_OPTIONS_START(newbrain)
@@ -1553,6 +1557,10 @@ static MACHINE_DRIVER_START( newbrain_eim )
 	MDRV_NEC765A_ADD(NEC765_TAG, newbrain_nec765_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(newbrain_floppy_config)
+	
+	/* internal ram */
+	MDRV_RAM_MODIFY("messram")
+	MDRV_RAM_DEFAULT_SIZE("96K")	
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -1691,20 +1699,14 @@ static void newbrain_serial_getinfo(const mess_device_class *devclass, UINT32 st
 	}
 }
 
-static SYSTEM_CONFIG_START( newbrain_a )
-	CONFIG_RAM_DEFAULT	(32 * 1024)
-	CONFIG_DEVICE(newbrain_serial_getinfo)
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START( newbrain_eim )
-	CONFIG_RAM_DEFAULT	(96 * 1024)
+static SYSTEM_CONFIG_START( newbrain )	
 	CONFIG_DEVICE(newbrain_serial_getinfo)
 SYSTEM_CONFIG_END
 
 /* System Drivers */
 
 //    YEAR  NAME        PARENT      COMPAT  MACHINE         INPUT       INIT    CONFIG          COMPANY                         FULLNAME        FLAGS
-COMP( 1981, newbrain,	0,			0,		newbrain_a,		newbrain,   0, 		newbrain_a,		"Grundy Business Systems Ltd.",	"NewBrain AD",	GAME_NOT_WORKING | GAME_NO_SOUND )
-COMP( 1981, newbraie,	newbrain,	0,		newbrain_eim,	newbrain,   0, 		newbrain_eim,	"Grundy Business Systems Ltd.",	"NewBrain AD with Expansion Interface",	GAME_NOT_WORKING | GAME_NO_SOUND )
-COMP( 1981, newbraia,	newbrain,	0,		newbrain_a,		newbrain,   0, 		newbrain_a,		"Grundy Business Systems Ltd.",	"NewBrain A",	GAME_NOT_WORKING | GAME_NO_SOUND )
-COMP( 1981, newbraim,	newbrain,	0,		newbrain_a,		newbrain,   0, 		newbrain_a,		"Grundy Business Systems Ltd.",	"NewBrain MD",	GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1981, newbrain,	0,			0,		newbrain_a,		newbrain,   0, 		newbrain,		"Grundy Business Systems Ltd.",	"NewBrain AD",	GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1981, newbraie,	newbrain,	0,		newbrain_eim,	newbrain,   0, 		newbrain,		"Grundy Business Systems Ltd.",	"NewBrain AD with Expansion Interface",	GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1981, newbraia,	newbrain,	0,		newbrain_a,		newbrain,   0, 		newbrain,		"Grundy Business Systems Ltd.",	"NewBrain A",	GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1981, newbraim,	newbrain,	0,		newbrain_a,		newbrain,   0, 		newbrain,		"Grundy Business Systems Ltd.",	"NewBrain MD",	GAME_NOT_WORKING | GAME_NO_SOUND )

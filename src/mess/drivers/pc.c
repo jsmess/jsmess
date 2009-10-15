@@ -157,7 +157,7 @@ TODO: Which clock signals are available in a PC Jr?
 #include "sound/3812intf.h"
 
 #include "machine/kb_keytro.h"
-
+#include "devices/messram.h"
 
 #define ym3812_StdClock 3579545
 
@@ -1526,6 +1526,10 @@ static MACHINE_DRIVER_START( pcmda )
 	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("640K")
 MACHINE_DRIVER_END
 
 
@@ -1586,6 +1590,10 @@ static MACHINE_DRIVER_START( pcherc )
 	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("640K")
 MACHINE_DRIVER_END
 
 
@@ -1657,6 +1665,10 @@ static MACHINE_DRIVER_START( ibm5150 )
 	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("640K")
 MACHINE_DRIVER_END
 
 
@@ -1716,6 +1728,10 @@ static MACHINE_DRIVER_START( pccga )
 	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("640K")	
 MACHINE_DRIVER_END
 
 
@@ -1766,6 +1782,10 @@ static MACHINE_DRIVER_START( europc )
 	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("640K")	
 MACHINE_DRIVER_END
 
 
@@ -1823,6 +1843,10 @@ static MACHINE_DRIVER_START( ibm5160 )
 	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("640K")	
 MACHINE_DRIVER_END
 
 
@@ -1866,6 +1890,10 @@ static MACHINE_DRIVER_START( pc200 )
 	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("640K")	
 MACHINE_DRIVER_END
 
 
@@ -1915,12 +1943,20 @@ static MACHINE_DRIVER_START( ppc512 )
 	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("512K")	
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ppc640 )
 	MDRV_IMPORT_FROM( ppc512 )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(ppc640_map)
+	
+	/* internal ram */
+	MDRV_RAM_MODIFY("messram")
+	MDRV_RAM_DEFAULT_SIZE("640K")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( pc1512 )
@@ -1965,6 +2001,10 @@ static MACHINE_DRIVER_START( pc1512 )
 	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("640K")
 MACHINE_DRIVER_END
 
 
@@ -2010,6 +2050,10 @@ static MACHINE_DRIVER_START( pc1640 )
 	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("640K")
 MACHINE_DRIVER_END
 
 
@@ -2067,6 +2111,10 @@ static MACHINE_DRIVER_START( xtvga )
 	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("640K")
 MACHINE_DRIVER_END
 
 
@@ -2112,6 +2160,10 @@ static MACHINE_DRIVER_START( t1000hx )
 	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("640K")
 MACHINE_DRIVER_END
 
 
@@ -2157,6 +2209,10 @@ static MACHINE_DRIVER_START( t1000_16 )
 	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("640K")
 MACHINE_DRIVER_END
 
 
@@ -2210,6 +2266,10 @@ static MACHINE_DRIVER_START( ibmpcjr )
 	MDRV_CARTSLOT_EXTENSION_LIST("jrc")
 	MDRV_CARTSLOT_NOT_MANDATORY
 	MDRV_CARTSLOT_LOAD(pcjr_cartridge)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("640K")
 MACHINE_DRIVER_END
 
 #if 0
@@ -2784,24 +2844,6 @@ ROM_START( dgone )
 	ROM_LOAD("14166.bin", 0x0000, 0x2000, CRC(1aea1b53) SHA1(b75b6d4509036406052157bc34159f7039cdc72e))
 ROM_END
 
-static SYSTEM_CONFIG_START(ibm5150)
-	CONFIG_RAM_DEFAULT( 640 * 1024 )
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START(ibm5160)
-	CONFIG_RAM_DEFAULT( 640 * 1024 )
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START(ppc512)
-	CONFIG_RAM_DEFAULT( 512 * 1024 )
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START(pcjr)
-//  CONFIG_RAM( 128 * 1024 )
-	CONFIG_RAM_DEFAULT( 640 * 1024 )
-//  CONFIG_RAM( 768 * 1024 )
-SYSTEM_CONFIG_END
-
 /***************************************************************************
 
   Game driver(s)
@@ -2809,31 +2851,31 @@ SYSTEM_CONFIG_END
 ***************************************************************************/
 
 /*     YEAR     NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        CONFIG   COMPANY     FULLNAME */
-COMP(  1981,	ibm5150,	0,			0,	ibm5150,    ibm5150,    ibm5150,    ibm5150, "International Business Machines",  "IBM PC 5150" , 0)
-COMP(  1984,	dgone,		ibm5150,	0,	pccga,      pccga,	    pccga,	    ibm5160, "Data General",  "Data General/One" , GAME_NOT_WORKING)	/* CGA, 2x 3.5" disk drives */
-COMP(  1985,	bw230,		ibm5150,	0,	pccga,		bondwell,   bondwell,	ibm5160, "Bondwell Holding",  "BW230 (PRO28 Series)", 0 )
-COMP(  1988,	europc,		ibm5150,	0,	europc,     europc,		europc,     ibm5160, "Schneider Rdf. AG",  "EURO PC", GAME_NOT_WORKING)
+COMP(  1981,	ibm5150,	0,			0,	ibm5150,    ibm5150,    ibm5150,    0, "International Business Machines",  "IBM PC 5150" , 0)
+COMP(  1984,	dgone,		ibm5150,	0,	pccga,      pccga,	    pccga,	    0, "Data General",  "Data General/One" , GAME_NOT_WORKING)	/* CGA, 2x 3.5" disk drives */
+COMP(  1985,	bw230,		ibm5150,	0,	pccga,		bondwell,   bondwell,	0, "Bondwell Holding",  "BW230 (PRO28 Series)", 0 )
+COMP(  1988,	europc,		ibm5150,	0,	europc,     europc,		europc,     0, "Schneider Rdf. AG",  "EURO PC", GAME_NOT_WORKING)
 
 // pcjr (better graphics, better sound)
-COMP(  1983,	ibmpcjr,	ibm5150,	0,	ibmpcjr,    tandy1t,	pcjr,       pcjr,    "International Business Machines",  "IBM PC Jr", GAME_NOT_WORKING|GAME_IMPERFECT_COLORS )
+COMP(  1983,	ibmpcjr,	ibm5150,	0,	ibmpcjr,    tandy1t,	pcjr,       0, "International Business Machines",  "IBM PC Jr", GAME_NOT_WORKING|GAME_IMPERFECT_COLORS )
 
 // tandy 1000
-COMP(  1987,	t1000hx,	ibm5150,	0,	t1000hx,    tandy1t,	t1000hx,	ibm5160, "Tandy Radio Shack",  "Tandy 1000HX", 0)
-COMP(  1987,	t1000sx,	ibm5150,	0,	t1000hx,    tandy1t,	t1000hx,	ibm5160, "Tandy Radio Shack",  "Tandy 1000SX", GAME_NOT_WORKING)
-COMP(  1989,    t1000rl,    ibm5150,    0,  t1000_16,   tandy1t,    t1000hx,    ibm5160, "Tandy Radio Shack",  "Tandy 1000RL", GAME_NOT_WORKING )
+COMP(  1987,	t1000hx,	ibm5150,	0,	t1000hx,    tandy1t,	t1000hx,	0, "Tandy Radio Shack",  "Tandy 1000HX", 0)
+COMP(  1987,	t1000sx,	ibm5150,	0,	t1000hx,    tandy1t,	t1000hx,	0, "Tandy Radio Shack",  "Tandy 1000SX", GAME_NOT_WORKING)
+COMP(  1989,    t1000rl,    ibm5150,    0,  t1000_16,   tandy1t,    t1000hx,    0, "Tandy Radio Shack",  "Tandy 1000RL", GAME_NOT_WORKING )
 
 // xt class (pc but 8086)
-COMP(  1982,	ibm5160,	ibm5150,	0,	ibm5160,    ibm5150,	ibm5150,	ibm5160, "International Business Machines",  "IBM XT 5160" , 0)
-COMP(  1988,	pc200,		ibm5150,	0,	pc200,		pc200,		pc200,		ibm5160, "Sinclair Research",  "PC200 Professional Series", GAME_NOT_WORKING)
-COMP(  1988,	pc20,		ibm5150,	0,	pc200,		pc200,		pc200,		ibm5160, "Amstrad plc",  "Amstrad PC20" , GAME_NOT_WORKING)
-COMP(  1987,	ppc512,		ibm5150,	0,	ppc512,		pc200,		ppc512,		ppc512, "Amstrad plc",  "Amstrad PPC512", GAME_NOT_WORKING)
-COMP(  1987,	ppc640,		ibm5150,	0,	ppc640,		pc200,		ppc512,		ibm5160, "Amstrad plc",  "Amstrad PPC640", GAME_NOT_WORKING)
-COMP(  1986,	pc1512,		ibm5150,	0,	pc1512,     pc1512,		pc1512,		ibm5160, "Amstrad plc",  "Amstrad PC1512 (version 1)", GAME_NOT_WORKING)
-COMP(  198?,	pc1512v2,	ibm5150,	0,	pc1512,     pc1512,		pc1512,		ibm5160, "Amstrad plc",  "Amstrad PC1512 (version 2)", GAME_NOT_WORKING)
-COMP(  1987,	pc1640,		ibm5150,	0,	pc1640,     pc1640,		pc1640,		ibm5160, "Amstrad plc",  "Amstrad PC1640 / PC6400 (US)", GAME_NOT_WORKING )
+COMP(  1982,	ibm5160,	ibm5150,	0,	ibm5160,    ibm5150,	ibm5150,	0, "International Business Machines",  "IBM XT 5160" , 0)
+COMP(  1988,	pc200,		ibm5150,	0,	pc200,		pc200,		pc200,		0, "Sinclair Research",  "PC200 Professional Series", GAME_NOT_WORKING)
+COMP(  1988,	pc20,		ibm5150,	0,	pc200,		pc200,		pc200,		0, "Amstrad plc",  "Amstrad PC20" , GAME_NOT_WORKING)
+COMP(  1987,	ppc512,		ibm5150,	0,	ppc512,		pc200,		ppc512,		0, "Amstrad plc",  "Amstrad PPC512", GAME_NOT_WORKING)
+COMP(  1987,	ppc640,		ibm5150,	0,	ppc640,		pc200,		ppc512,		0, "Amstrad plc",  "Amstrad PPC640", GAME_NOT_WORKING)
+COMP(  1986,	pc1512,		ibm5150,	0,	pc1512,     pc1512,		pc1512,		0, "Amstrad plc",  "Amstrad PC1512 (version 1)", GAME_NOT_WORKING)
+COMP(  198?,	pc1512v2,	ibm5150,	0,	pc1512,     pc1512,		pc1512,		0, "Amstrad plc",  "Amstrad PC1512 (version 2)", GAME_NOT_WORKING)
+COMP(  1987,	pc1640,		ibm5150,	0,	pc1640,     pc1640,		pc1640,		0, "Amstrad plc",  "Amstrad PC1640 / PC6400 (US)", GAME_NOT_WORKING )
 // pc2086 pc1512 with vga??
-COMP(  1987,	pc,			ibm5150,	0,	pccga,		pccga,		pccga,		ibm5160, "Generic",  "PC (CGA)" , 0)
-COMP ( 1987,	pcmda,		ibm5150,	0,	pcmda,      pcmda,		ibm5150,    ibm5160, "Generic",  "PC (MDA)" , 0)
-COMP ( 1987,    pcherc,		ibm5150,	0,	pcherc,     pcmda,      ibm5150,	ibm5160, "Generic",  "PC (Hercules)" , 0)
-COMP ( 1987,	xtvga,		ibm5150,	0,	xtvga,      xtvga,		pc_vga,		ibm5160, "",  "PC/XT (VGA, MF2 Keyboard)" , GAME_NOT_WORKING)
+COMP(  1987,	pc,			ibm5150,	0,	pccga,		pccga,		pccga,		0, "Generic",  "PC (CGA)" , 0)
+COMP ( 1987,	pcmda,		ibm5150,	0,	pcmda,      pcmda,		ibm5150,    0, "Generic",  "PC (MDA)" , 0)
+COMP ( 1987,    pcherc,		ibm5150,	0,	pcherc,     pcmda,      ibm5150,	0, "Generic",  "PC (Hercules)" , 0)
+COMP ( 1987,	xtvga,		ibm5150,	0,	xtvga,      xtvga,		pc_vga,		0, "Generic",  "PC/XT (VGA, MF2 Keyboard)" , GAME_NOT_WORKING)
 

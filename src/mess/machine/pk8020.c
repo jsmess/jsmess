@@ -11,6 +11,7 @@
 #include "includes/pk8020.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/wd17xx.h"
+#include "devices/messram.h"
 
 static UINT8 attr = 0;
 static UINT8 text_attr = 0;
@@ -28,7 +29,7 @@ static UINT8 sound_level = 0;
 /* Driver initialization */
 DRIVER_INIT(pk8020)
 {
-	memset(mess_ram,0,(64 + 4*48 + 2)*1024);
+	memset(messram_get_ptr(devtag_get_device(machine, "messram")),0,(64 + 4*48 + 2)*1024);
 }
 
 static READ8_HANDLER(keyboard_r)
@@ -61,7 +62,7 @@ static READ8_HANDLER(keyboard_r)
 
 static READ8_HANDLER(sysreg_r)
 {
-	return mess_ram[offset];
+	return messram_get_ptr(devtag_get_device(space->machine, "messram"))[offset];
 }
 static WRITE8_HANDLER(sysreg_w)
 {
@@ -84,24 +85,24 @@ static WRITE8_HANDLER(sysreg_w)
 
 static READ8_HANDLER(text_r)
 {
-    if (attr == 3) text_attr=mess_ram[0x40400+offset];
-	return mess_ram[0x40000+offset];
+    if (attr == 3) text_attr=messram_get_ptr(devtag_get_device(space->machine, "messram"))[0x40400+offset];
+	return messram_get_ptr(devtag_get_device(space->machine, "messram"))[0x40000+offset];
 }
 
 static WRITE8_HANDLER(text_w)
 {
-	mess_ram[0x40000+offset] = data;
+	messram_get_ptr(devtag_get_device(space->machine, "messram"))[0x40000+offset] = data;
 	switch (attr) {
         case 0: break;
-        case 1: mess_ram[0x40400+offset]=0x01;break;
-        case 2: mess_ram[0x40400+offset]=0x00;break;
-        case 3: mess_ram[0x40400+offset]=text_attr;break;
+        case 1: messram_get_ptr(devtag_get_device(space->machine, "messram"))[0x40400+offset]=0x01;break;
+        case 2: messram_get_ptr(devtag_get_device(space->machine, "messram"))[0x40400+offset]=0x00;break;
+        case 3: messram_get_ptr(devtag_get_device(space->machine, "messram"))[0x40400+offset]=text_attr;break;
     }
 }
 
 static READ8_HANDLER(gzu_r)
 {
-	UINT8 *addr = mess_ram + 0x10000 + (pk8020_video_page_access * 0xC000);
+	UINT8 *addr = messram_get_ptr(devtag_get_device(space->machine, "messram")) + 0x10000 + (pk8020_video_page_access * 0xC000);
 	UINT8 p0 = addr[offset];
 	UINT8 p1 = addr[offset + 0x4000];
 	UINT8 p2 = addr[offset + 0x8000];
@@ -135,7 +136,7 @@ static READ8_HANDLER(gzu_r)
 
 static WRITE8_HANDLER(gzu_w)
 {
-	UINT8 *addr = mess_ram + 0x10000 + (pk8020_video_page_access * 0xC000);
+	UINT8 *addr = messram_get_ptr(devtag_get_device(space->machine, "messram")) + 0x10000 + (pk8020_video_page_access * 0xC000);
 	UINT8 *plane_0 = addr;
 	UINT8 *plane_1 = addr + 0x4000;
 	UINT8 *plane_2 = addr + 0x8000;
@@ -248,11 +249,11 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						memory_install_read8_handler (space, 0x0000, 0x37ff, 0, 0, SMH_BANK(1));
 						memory_install_write8_handler(space, 0x0000, 0x37ff, 0, 0, SMH_BANK(2));
 						memory_set_bankptr(machine, 1, memory_region(machine,"maincpu") + 0x10000);
-						memory_set_bankptr(machine, 2, mess_ram + 0x0000);
+						memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x0000);
 						// Keyboard
 						memory_install_read8_handler (space, 0x3800, 0x39ff, 0, 0, keyboard_r);
 						memory_install_write8_handler(space, 0x3800, 0x39ff, 0, 0, SMH_BANK(3));
-						memory_set_bankptr(machine, 3, mess_ram + 0x3800);
+						memory_set_bankptr(machine, 3, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x3800);
 						// System reg
 						memory_install_read8_handler (space, 0x3a00, 0x3aff, 0, 0, sysreg_r);
 						memory_install_write8_handler(space, 0x3a00, 0x3aff, 0, 0, sysreg_w);
@@ -265,8 +266,8 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						// RAM
 						memory_install_read8_handler (space, 0x4000, 0xffff, 0, 0, SMH_BANK(4));
 						memory_install_write8_handler(space, 0x4000, 0xffff, 0, 0, SMH_BANK(5));
-						memory_set_bankptr(machine, 4, mess_ram + 0x4000);
-						memory_set_bankptr(machine, 5, mess_ram + 0x4000);
+						memory_set_bankptr(machine, 4, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000);
+						memory_set_bankptr(machine, 5, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000);
 					}
 					break;
 		case 0x01 : {
@@ -274,12 +275,12 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						memory_install_read8_handler (space, 0x0000, 0x1fff, 0, 0, SMH_BANK(1));
 						memory_install_write8_handler(space, 0x0000, 0x1fff, 0, 0, SMH_BANK(2));
 						memory_set_bankptr(machine, 1, memory_region(machine,"maincpu") + 0x10000);
-						memory_set_bankptr(machine, 2, mess_ram + 0x0000);
+						memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x0000);
 						// RAM
 						memory_install_read8_handler (space, 0x2000, 0xffff, 0, 0, SMH_BANK(3));
 						memory_install_write8_handler(space, 0x2000, 0xffff, 0, 0, SMH_BANK(4));
-						memory_set_bankptr(machine, 3, mess_ram + 0x2000);
-						memory_set_bankptr(machine, 4, mess_ram + 0x2000);
+						memory_set_bankptr(machine, 3, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x2000);
+						memory_set_bankptr(machine, 4, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x2000);
 					}
 					break;
 		case 0x02 : {
@@ -287,20 +288,20 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						memory_install_read8_handler (space, 0x0000, 0x3fff, 0, 0, SMH_BANK(1));
 						memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_BANK(2));
 						memory_set_bankptr(machine, 1, memory_region(machine,"maincpu") + 0x10000);
-						memory_set_bankptr(machine, 2, mess_ram + 0x0000);
+						memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x0000);
 						// RAM
 						memory_install_read8_handler (space, 0x4000, 0xffff, 0, 0, SMH_BANK(3));
 						memory_install_write8_handler(space, 0x4000, 0xffff, 0, 0, SMH_BANK(4));
-						memory_set_bankptr(machine, 3, mess_ram + 0x4000);
-						memory_set_bankptr(machine, 4, mess_ram + 0x4000);
+						memory_set_bankptr(machine, 3, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000);
+						memory_set_bankptr(machine, 4, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000);
 					}
 					break;
 		case 0x03 : {
 						// RAM
 						memory_install_read8_handler (space, 0x0000, 0xffff, 0, 0, SMH_BANK(1));
 						memory_install_write8_handler(space, 0x0000, 0xffff, 0, 0, SMH_BANK(2));
-						memory_set_bankptr(machine, 1, mess_ram);
-						memory_set_bankptr(machine, 2, mess_ram);
+						memory_set_bankptr(machine, 1, messram_get_ptr(devtag_get_device(machine, "messram")));
+						memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")));
 					}
 					break;
 		case 0x04 :
@@ -310,16 +311,16 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						memory_install_read8_handler (space, 0x0000, 0x1fff, 0, 0, SMH_BANK(1));
 						memory_install_write8_handler(space, 0x0000, 0x1fff, 0, 0, SMH_BANK(2));
 						memory_set_bankptr(machine, 1, memory_region(machine,"maincpu") + 0x10000);
-						memory_set_bankptr(machine, 2, mess_ram + 0x0000);
+						memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x0000);
 						// RAM
 						memory_install_read8_handler (space, 0x2000, 0xf7ff, 0, 0, SMH_BANK(3));
 						memory_install_write8_handler(space, 0x2000, 0xf7ff, 0, 0, SMH_BANK(4));
-						memory_set_bankptr(machine, 3, mess_ram + 0x2000);
-						memory_set_bankptr(machine, 4, mess_ram + 0x2000);
+						memory_set_bankptr(machine, 3, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x2000);
+						memory_set_bankptr(machine, 4, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x2000);
 						// Keyboard
 						memory_install_read8_handler (space, 0xf800, 0xf9ff, 0, 0, keyboard_r);
 						memory_install_write8_handler(space, 0xf800, 0xf9ff, 0, 0, SMH_BANK(5));
-						memory_set_bankptr(machine, 5, mess_ram + 0xf800);
+						memory_set_bankptr(machine, 5, messram_get_ptr(devtag_get_device(machine, "messram")) + 0xf800);
 						// System reg
 						memory_install_read8_handler (space, 0xfa00, 0xfaff, 0, 0, sysreg_r);
 						memory_install_write8_handler(space, 0xfa00, 0xfaff, 0, 0, sysreg_w);
@@ -337,16 +338,16 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						memory_install_read8_handler (space, 0x0000, 0x3fff, 0, 0, SMH_BANK(1));
 						memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_BANK(2));
 						memory_set_bankptr(machine, 1, memory_region(machine,"maincpu") + 0x10000);
-						memory_set_bankptr(machine, 2, mess_ram + 0x0000);
+						memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x0000);
 						// RAM
 						memory_install_read8_handler (space, 0x4000, 0xf7ff, 0, 0, SMH_BANK(3));
 						memory_install_write8_handler(space, 0x4000, 0xf7ff, 0, 0, SMH_BANK(4));
-						memory_set_bankptr(machine, 3, mess_ram + 0x4000);
-						memory_set_bankptr(machine, 4, mess_ram + 0x4000);
+						memory_set_bankptr(machine, 3, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000);
+						memory_set_bankptr(machine, 4, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000);
 						// Keyboard
 						memory_install_read8_handler (space, 0xf800, 0xf9ff, 0, 0, keyboard_r);
 						memory_install_write8_handler(space, 0xf800, 0xf9ff, 0, 0, SMH_BANK(5));
-						memory_set_bankptr(machine, 5, mess_ram + 0xf800);
+						memory_set_bankptr(machine, 5, messram_get_ptr(devtag_get_device(machine, "messram")) + 0xf800);
 						// System reg
 						memory_install_read8_handler (space, 0xfa00, 0xfaff, 0, 0, sysreg_r);
 						memory_install_write8_handler(space, 0xfa00, 0xfaff, 0, 0, sysreg_w);
@@ -363,12 +364,12 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						// RAM
 						memory_install_read8_handler (space, 0x0000, 0xf7ff, 0, 0, SMH_BANK(1));
 						memory_install_write8_handler(space, 0x0000, 0xf7ff, 0, 0, SMH_BANK(2));
-						memory_set_bankptr(machine, 1, mess_ram);
-						memory_set_bankptr(machine, 2, mess_ram);
+						memory_set_bankptr(machine, 1, messram_get_ptr(devtag_get_device(machine, "messram")));
+						memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")));
 						// Keyboard
 						memory_install_read8_handler (space, 0xf800, 0xf9ff, 0, 0, keyboard_r);
 						memory_install_write8_handler(space, 0xf800, 0xf9ff, 0, 0, SMH_BANK(3));
-						memory_set_bankptr(machine, 3, mess_ram + 0xf800);
+						memory_set_bankptr(machine, 3, messram_get_ptr(devtag_get_device(machine, "messram")) + 0xf800);
 						// System reg
 						memory_install_read8_handler (space, 0xfa00, 0xfaff, 0, 0, sysreg_r);
 						memory_install_write8_handler(space, 0xfa00, 0xfaff, 0, 0, sysreg_w);
@@ -386,11 +387,11 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						memory_install_read8_handler (space, 0x0000, 0x3fff, 0, 0, SMH_BANK(1));
 						memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_BANK(2));
 						memory_set_bankptr(machine, 1, memory_region(machine,"maincpu") + 0x10000);
-						memory_set_bankptr(machine, 2, mess_ram + 0x0000);
+						memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x0000);
 						// Keyboard
 						memory_install_read8_handler (space, 0x3800, 0x39ff, 0, 0, keyboard_r);
 						memory_install_write8_handler(space, 0x3800, 0x39ff, 0, 0, SMH_BANK(3));
-						memory_set_bankptr(machine, 3, mess_ram + 0x3800);
+						memory_set_bankptr(machine, 3, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x3800);
 						// System reg
 						memory_install_read8_handler (space, 0x3a00, 0x3aff, 0, 0, sysreg_r);
 						memory_install_write8_handler(space, 0x3a00, 0x3aff, 0, 0, sysreg_w);
@@ -403,8 +404,8 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						// RAM
 						memory_install_read8_handler (space, 0x4000, 0xbfff, 0, 0, SMH_BANK(4));
 						memory_install_write8_handler(space, 0x4000, 0xbfff, 0, 0, SMH_BANK(5));
-						memory_set_bankptr(machine, 4, mess_ram + 0x4000);
-						memory_set_bankptr(machine, 5, mess_ram + 0x4000);
+						memory_set_bankptr(machine, 4, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000);
+						memory_set_bankptr(machine, 5, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000);
 						// Video RAM
 						memory_install_read8_handler (space, 0xc000, 0xffff, 0, 0, gzu_r);
 						memory_install_write8_handler(space, 0xc000, 0xffff, 0, 0, gzu_w);
@@ -417,12 +418,12 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						memory_install_read8_handler (space, 0x0000, 0x1fff, 0, 0, SMH_BANK(1));
 						memory_install_write8_handler(space, 0x0000, 0x1fff, 0, 0, SMH_BANK(2));
 						memory_set_bankptr(machine, 1, memory_region(machine,"maincpu") + 0x10000);
-						memory_set_bankptr(machine, 2, mess_ram + 0x0000);
+						memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x0000);
 						// RAM
 						memory_install_read8_handler (space, 0x2000, 0xbfff, 0, 0, SMH_BANK(3));
 						memory_install_write8_handler(space, 0x2000, 0xbfff, 0, 0, SMH_BANK(4));
-						memory_set_bankptr(machine, 3, mess_ram + 0x2000);
-						memory_set_bankptr(machine, 4, mess_ram + 0x2000);
+						memory_set_bankptr(machine, 3, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x2000);
+						memory_set_bankptr(machine, 4, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x2000);
 						// Video RAM
 						memory_install_read8_handler (space, 0xc000, 0xffff, 0, 0, gzu_r);
 						memory_install_write8_handler(space, 0xc000, 0xffff, 0, 0, gzu_w);
@@ -434,12 +435,12 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						memory_install_read8_handler (space, 0x0000, 0x3fff, 0, 0, SMH_BANK(1));
 						memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_BANK(2));
 						memory_set_bankptr(machine, 1, memory_region(machine,"maincpu") + 0x10000);
-						memory_set_bankptr(machine, 2, mess_ram + 0x0000);
+						memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x0000);
 						// RAM
 						memory_install_read8_handler (space, 0x4000, 0xbfff, 0, 0, SMH_BANK(3));
 						memory_install_write8_handler(space, 0x4000, 0xbfff, 0, 0, SMH_BANK(4));
-						memory_set_bankptr(machine, 3, mess_ram + 0x4000);
-						memory_set_bankptr(machine, 4, mess_ram + 0x4000);
+						memory_set_bankptr(machine, 3, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000);
+						memory_set_bankptr(machine, 4, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000);
 						// Video RAM
 						memory_install_read8_handler (space, 0xc000, 0xffff, 0, 0, gzu_r);
 						memory_install_write8_handler(space, 0xc000, 0xffff, 0, 0, gzu_w);
@@ -450,8 +451,8 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						// RAM
 						memory_install_read8_handler (space, 0x0000, 0xbfff, 0, 0, SMH_BANK(1));
 						memory_install_write8_handler(space, 0x0000, 0xbfff, 0, 0, SMH_BANK(2));
-						memory_set_bankptr(machine, 1, mess_ram + 0x0000);
-						memory_set_bankptr(machine, 2, mess_ram + 0x0000);
+						memory_set_bankptr(machine, 1, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x0000);
+						memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x0000);
 						// Video RAM
 						memory_install_read8_handler (space, 0xc000, 0xffff, 0, 0, gzu_r);
 						memory_install_write8_handler(space, 0xc000, 0xffff, 0, 0, gzu_w);
@@ -464,20 +465,20 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						memory_install_read8_handler (space, 0x0000, 0x1fff, 0, 0, SMH_BANK(1));
 						memory_install_write8_handler(space, 0x0000, 0x1fff, 0, 0, SMH_BANK(2));
 						memory_set_bankptr(machine, 1, memory_region(machine,"maincpu") + 0x10000);
-						memory_set_bankptr(machine, 2, mess_ram + 0x0000);
+						memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x0000);
 						// RAM
 						memory_install_read8_handler (space, 0x2000, 0x3fff, 0, 0, SMH_BANK(3));
 						memory_install_write8_handler(space, 0x2000, 0x3fff, 0, 0, SMH_BANK(4));
-						memory_set_bankptr(machine, 3, mess_ram + 0x2000);
-						memory_set_bankptr(machine, 4, mess_ram + 0x2000);
+						memory_set_bankptr(machine, 3, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x2000);
+						memory_set_bankptr(machine, 4, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x2000);
 						// Video RAM
 						memory_install_read8_handler (space, 0x4000, 0x7fff, 0, 0, gzu_r);
 						memory_install_write8_handler(space, 0x4000, 0x7fff, 0, 0, gzu_w);
 						// RAM
 						memory_install_read8_handler (space, 0x8000, 0xfdff, 0, 0, SMH_BANK(5));
 						memory_install_write8_handler(space, 0x8000, 0xfdff, 0, 0, SMH_BANK(6));
-						memory_set_bankptr(machine, 5, mess_ram + 0x8000);
-						memory_set_bankptr(machine, 6, mess_ram + 0x8000);
+						memory_set_bankptr(machine, 5, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x8000);
+						memory_set_bankptr(machine, 6, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x8000);
 						// Devices
 						memory_install_read8_handler (space, 0xfe00, 0xfeff, 0, 0, devices_r);
 						memory_install_write8_handler(space, 0xfe00, 0xfeff, 0, 0, devices_w);
@@ -492,15 +493,15 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						memory_install_read8_handler (space, 0x0000, 0x3fff, 0, 0, SMH_BANK(1));
 						memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_BANK(2));
 						memory_set_bankptr(machine, 1, memory_region(machine,"maincpu") + 0x10000);
-						memory_set_bankptr(machine, 2, mess_ram + 0x0000);
+						memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x0000);
 						// Video RAM
 						memory_install_read8_handler (space, 0x4000, 0x7fff, 0, 0, gzu_r);
 						memory_install_write8_handler(space, 0x4000, 0x7fff, 0, 0, gzu_w);
 						// RAM
 						memory_install_read8_handler (space, 0x8000, 0xfdff, 0, 0, SMH_BANK(5));
 						memory_install_write8_handler(space, 0x8000, 0xfdff, 0, 0, SMH_BANK(6));
-						memory_set_bankptr(machine, 5, mess_ram + 0x8000);
-						memory_set_bankptr(machine, 6, mess_ram + 0x8000);
+						memory_set_bankptr(machine, 5, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x8000);
+						memory_set_bankptr(machine, 6, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x8000);
 						// Devices
 						memory_install_read8_handler (space, 0xfe00, 0xfeff, 0, 0, devices_r);
 						memory_install_write8_handler(space, 0xfe00, 0xfeff, 0, 0, devices_w);
@@ -514,16 +515,16 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						// RAM
 						memory_install_read8_handler (space, 0x0000, 0x3fff, 0, 0, SMH_BANK(1));
 						memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_BANK(2));
-						memory_set_bankptr(machine, 1, mess_ram + 0x0000);
-						memory_set_bankptr(machine, 2, mess_ram + 0x0000);
+						memory_set_bankptr(machine, 1, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x0000);
+						memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x0000);
 						// Video RAM
 						memory_install_read8_handler (space, 0x4000, 0x7fff, 0, 0, gzu_r);
 						memory_install_write8_handler(space, 0x4000, 0x7fff, 0, 0, gzu_w);
 						// RAM
 						memory_install_read8_handler (space, 0x8000, 0xfdff, 0, 0, SMH_BANK(3));
 						memory_install_write8_handler(space, 0x8000, 0xfdff, 0, 0, SMH_BANK(4));
-						memory_set_bankptr(machine, 3, mess_ram + 0x8000);
-						memory_set_bankptr(machine, 4, mess_ram + 0x8000);
+						memory_set_bankptr(machine, 3, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x8000);
+						memory_set_bankptr(machine, 4, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x8000);
 						// Devices
 						memory_install_read8_handler (space, 0xfe00, 0xfeff, 0, 0, devices_r);
 						memory_install_write8_handler(space, 0xfe00, 0xfeff, 0, 0, devices_w);
@@ -538,16 +539,16 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						memory_install_read8_handler (space, 0x0000, 0x5fff, 0, 0, SMH_BANK(1));
 						memory_install_write8_handler(space, 0x0000, 0x5fff, 0, 0, SMH_BANK(2));
 						memory_set_bankptr(machine, 1, memory_region(machine,"maincpu") + 0x10000);
-						memory_set_bankptr(machine, 2, mess_ram + 0x0000);
+						memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x0000);
 						// RAM
 						memory_install_read8_handler (space, 0x6000, 0xf7ff, 0, 0, SMH_BANK(3));
 						memory_install_write8_handler(space, 0x6000, 0xf7ff, 0, 0, SMH_BANK(4));
-						memory_set_bankptr(machine, 3, mess_ram + 0x6000);
-						memory_set_bankptr(machine, 4, mess_ram + 0x6000);
+						memory_set_bankptr(machine, 3, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x6000);
+						memory_set_bankptr(machine, 4, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x6000);
 						// Keyboard
 						memory_install_read8_handler (space, 0xf800, 0xf9ff, 0, 0, keyboard_r);
 						memory_install_write8_handler(space, 0xf800, 0xf9ff, 0, 0, SMH_BANK(5));
-						memory_set_bankptr(machine, 5, mess_ram + 0xf800);
+						memory_set_bankptr(machine, 5, messram_get_ptr(devtag_get_device(machine, "messram")) + 0xf800);
 						// System reg
 						memory_install_read8_handler (space, 0xfa00, 0xfaff, 0, 0, sysreg_r);
 						memory_install_write8_handler(space, 0xfa00, 0xfaff, 0, 0, sysreg_w);
@@ -565,16 +566,16 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						memory_install_read8_handler (space, 0x0000, 0x1fff, 0, 0, SMH_BANK(1));
 						memory_install_write8_handler(space, 0x0000, 0x1fff, 0, 0, SMH_BANK(2));
 						memory_set_bankptr(machine, 1, memory_region(machine,"maincpu") + 0x10000);
-						memory_set_bankptr(machine, 2, mess_ram + 0x0000);
+						memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x0000);
 						// RAM
 						memory_install_read8_handler (space, 0x2000, 0xf7ff, 0, 0, SMH_BANK(3));
 						memory_install_write8_handler(space, 0x2000, 0xf7ff, 0, 0, SMH_BANK(4));
-						memory_set_bankptr(machine, 3, mess_ram + 0x2000);
-						memory_set_bankptr(machine, 4, mess_ram + 0x2000);
+						memory_set_bankptr(machine, 3, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x2000);
+						memory_set_bankptr(machine, 4, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x2000);
 						// Keyboard
 						memory_install_read8_handler (space, 0xf800, 0xf9ff, 0, 0, keyboard_r);
 						memory_install_write8_handler(space, 0xf800, 0xf9ff, 0, 0, SMH_BANK(5));
-						memory_set_bankptr(machine, 5, mess_ram + 0xf800);
+						memory_set_bankptr(machine, 5, messram_get_ptr(devtag_get_device(machine, "messram")) + 0xf800);
 						// System reg
 						memory_install_read8_handler (space, 0xfa00, 0xfaff, 0, 0, sysreg_r);
 						memory_install_write8_handler(space, 0xfa00, 0xfaff, 0, 0, sysreg_w);
@@ -592,16 +593,16 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						memory_install_read8_handler (space, 0x0000, 0x3fff, 0, 0, SMH_BANK(1));
 						memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_BANK(2));
 						memory_set_bankptr(machine, 1, memory_region(machine,"maincpu") + 0x10000);
-						memory_set_bankptr(machine, 2, mess_ram + 0x0000);
+						memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x0000);
 						// RAM
 						memory_install_read8_handler (space, 0x4000, 0xf7ff, 0, 0, SMH_BANK(3));
 						memory_install_write8_handler(space, 0x4000, 0xf7ff, 0, 0, SMH_BANK(4));
-						memory_set_bankptr(machine, 3, mess_ram + 0x4000);
-						memory_set_bankptr(machine, 4, mess_ram + 0x4000);
+						memory_set_bankptr(machine, 3, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000);
+						memory_set_bankptr(machine, 4, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000);
 						// Keyboard
 						memory_install_read8_handler (space, 0xf800, 0xf9ff, 0, 0, keyboard_r);
 						memory_install_write8_handler(space, 0xf800, 0xf9ff, 0, 0, SMH_BANK(5));
-						memory_set_bankptr(machine, 5, mess_ram + 0xf800);
+						memory_set_bankptr(machine, 5, messram_get_ptr(devtag_get_device(machine, "messram")) + 0xf800);
 						// System reg
 						memory_install_read8_handler (space, 0xfa00, 0xfaff, 0, 0, sysreg_r);
 						memory_install_write8_handler(space, 0xfa00, 0xfaff, 0, 0, sysreg_w);
@@ -618,12 +619,12 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						// RAM
 						memory_install_read8_handler (space, 0x0000, 0xf7ff, 0, 0, SMH_BANK(1));
 						memory_install_write8_handler(space, 0x0000, 0xf7ff, 0, 0, SMH_BANK(2));
-						memory_set_bankptr(machine, 1, mess_ram + 0x0000);
-						memory_set_bankptr(machine, 2, mess_ram + 0x0000);
+						memory_set_bankptr(machine, 1, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x0000);
+						memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x0000);
 						// Keyboard
 						memory_install_read8_handler (space, 0xf800, 0xf9ff, 0, 0, keyboard_r);
 						memory_install_write8_handler(space, 0xf800, 0xf9ff, 0, 0, SMH_BANK(3));
-						memory_set_bankptr(machine, 3, mess_ram + 0xf800);
+						memory_set_bankptr(machine, 3, messram_get_ptr(devtag_get_device(machine, "messram")) + 0xf800);
 						// System reg
 						memory_install_read8_handler (space, 0xfa00, 0xfaff, 0, 0, sysreg_r);
 						memory_install_write8_handler(space, 0xfa00, 0xfaff, 0, 0, sysreg_w);
@@ -641,12 +642,12 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						memory_install_read8_handler (space, 0x0000, 0x5fff, 0, 0, SMH_BANK(1));
 						memory_install_write8_handler(space, 0x0000, 0x5fff, 0, 0, SMH_BANK(2));
 						memory_set_bankptr(machine, 1, memory_region(machine,"maincpu") + 0x10000);
-						memory_set_bankptr(machine, 2, mess_ram + 0x0000);
+						memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x0000);
 						// RAM
 						memory_install_read8_handler (space, 0x6000, 0xfdff, 0, 0, SMH_BANK(3));
 						memory_install_write8_handler(space, 0x6000, 0xfdff, 0, 0, SMH_BANK(4));
-						memory_set_bankptr(machine, 3, mess_ram + 0x6000);
-						memory_set_bankptr(machine, 4, mess_ram + 0x6000);
+						memory_set_bankptr(machine, 3, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x6000);
+						memory_set_bankptr(machine, 4, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x6000);
 						// Devices
 						memory_install_read8_handler (space, 0xfe00, 0xfeff, 0, 0, devices_r);
 						memory_install_write8_handler(space, 0xfe00, 0xfeff, 0, 0, devices_w);
@@ -661,12 +662,12 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						memory_install_read8_handler (space, 0x0000, 0x1fff, 0, 0, SMH_BANK(1));
 						memory_install_write8_handler(space, 0x0000, 0x1fff, 0, 0, SMH_BANK(2));
 						memory_set_bankptr(machine, 1, memory_region(machine,"maincpu") + 0x10000);
-						memory_set_bankptr(machine, 2, mess_ram + 0x0000);
+						memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x0000);
 						// RAM
 						memory_install_read8_handler (space, 0x2000, 0xfdff, 0, 0, SMH_BANK(3));
 						memory_install_write8_handler(space, 0x2000, 0xfdff, 0, 0, SMH_BANK(4));
-						memory_set_bankptr(machine, 3, mess_ram + 0x2000);
-						memory_set_bankptr(machine, 4, mess_ram + 0x2000);
+						memory_set_bankptr(machine, 3, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x2000);
+						memory_set_bankptr(machine, 4, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x2000);
 						// Devices
 						memory_install_read8_handler (space, 0xfe00, 0xfeff, 0, 0, devices_r);
 						memory_install_write8_handler(space, 0xfe00, 0xfeff, 0, 0, devices_w);
@@ -681,12 +682,12 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						memory_install_read8_handler (space, 0x0000, 0x3fff, 0, 0, SMH_BANK(1));
 						memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_BANK(2));
 						memory_set_bankptr(machine, 1, memory_region(machine,"maincpu") + 0x10000);
-						memory_set_bankptr(machine, 2, mess_ram + 0x0000);
+						memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x0000);
 						// RAM
 						memory_install_read8_handler (space, 0x4000, 0xfdff, 0, 0, SMH_BANK(3));
 						memory_install_write8_handler(space, 0x4000, 0xfdff, 0, 0, SMH_BANK(4));
-						memory_set_bankptr(machine, 3, mess_ram + 0x4000);
-						memory_set_bankptr(machine, 4, mess_ram + 0x4000);
+						memory_set_bankptr(machine, 3, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000);
+						memory_set_bankptr(machine, 4, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000);
 						// Devices
 						memory_install_read8_handler (space, 0xfe00, 0xfeff, 0, 0, devices_r);
 						memory_install_write8_handler(space, 0xfe00, 0xfeff, 0, 0, devices_w);
@@ -700,8 +701,8 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						// RAM
 						memory_install_read8_handler (space, 0x0000, 0xfdff, 0, 0, SMH_BANK(1));
 						memory_install_write8_handler(space, 0x0000, 0xfdff, 0, 0, SMH_BANK(2));
-						memory_set_bankptr(machine, 1, mess_ram);
-						memory_set_bankptr(machine, 2, mess_ram);
+						memory_set_bankptr(machine, 1, messram_get_ptr(devtag_get_device(machine, "messram")));
+						memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")));
 						// Devices
 						memory_install_read8_handler (space, 0xfe00, 0xfeff, 0, 0, devices_r);
 						memory_install_write8_handler(space, 0xfe00, 0xfeff, 0, 0, devices_w);
@@ -716,12 +717,12 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						memory_install_read8_handler (space, 0x0000, 0x5fff, 0, 0, SMH_BANK(1));
 						memory_install_write8_handler(space, 0x0000, 0x5fff, 0, 0, SMH_BANK(2));
 						memory_set_bankptr(machine, 1, memory_region(machine,"maincpu") + 0x10000);
-						memory_set_bankptr(machine, 2, mess_ram + 0x0000);
+						memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x0000);
 						// RAM
 						memory_install_read8_handler (space, 0x6000, 0xbeff, 0, 0, SMH_BANK(3));
 						memory_install_write8_handler(space, 0x6000, 0xbeff, 0, 0, SMH_BANK(4));
-						memory_set_bankptr(machine, 3, mess_ram + 0x6000);
-						memory_set_bankptr(machine, 4, mess_ram + 0x6000);
+						memory_set_bankptr(machine, 3, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x6000);
+						memory_set_bankptr(machine, 4, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x6000);
 						// System reg
 						memory_install_read8_handler (space, 0xbf00, 0xbfff, 0, 0, sysreg_r);
 						memory_install_write8_handler(space, 0xbf00, 0xbfff, 0, 0, sysreg_w);
@@ -736,12 +737,12 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						memory_install_read8_handler (space, 0x0000, 0x1fff, 0, 0, SMH_BANK(1));
 						memory_install_write8_handler(space, 0x0000, 0x1fff, 0, 0, SMH_BANK(2));
 						memory_set_bankptr(machine, 1, memory_region(machine,"maincpu") + 0x10000);
-						memory_set_bankptr(machine, 2, mess_ram + 0x0000);
+						memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x0000);
 						// RAM
 						memory_install_read8_handler (space, 0x2000, 0xbeff, 0, 0, SMH_BANK(3));
 						memory_install_write8_handler(space, 0x2000, 0xbeff, 0, 0, SMH_BANK(4));
-						memory_set_bankptr(machine, 3, mess_ram + 0x2000);
-						memory_set_bankptr(machine, 4, mess_ram + 0x2000);
+						memory_set_bankptr(machine, 3, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x2000);
+						memory_set_bankptr(machine, 4, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x2000);
 						// System reg
 						memory_install_read8_handler (space, 0xbf00, 0xbfff, 0, 0, sysreg_r);
 						memory_install_write8_handler(space, 0xbf00, 0xbfff, 0, 0, sysreg_w);
@@ -756,12 +757,12 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						memory_install_read8_handler (space, 0x0000, 0x3fff, 0, 0, SMH_BANK(1));
 						memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_BANK(2));
 						memory_set_bankptr(machine, 1, memory_region(machine,"maincpu") + 0x10000);
-						memory_set_bankptr(machine, 2, mess_ram + 0x0000);
+						memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x0000);
 						// RAM
 						memory_install_read8_handler (space, 0x4000, 0xbeff, 0, 0, SMH_BANK(3));
 						memory_install_write8_handler(space, 0x4000, 0xbeff, 0, 0, SMH_BANK(4));
-						memory_set_bankptr(machine, 3, mess_ram + 0x4000);
-						memory_set_bankptr(machine, 4, mess_ram + 0x4000);
+						memory_set_bankptr(machine, 3, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000);
+						memory_set_bankptr(machine, 4, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000);
 						// System reg
 						memory_install_read8_handler (space, 0xbf00, 0xbfff, 0, 0, sysreg_r);
 						memory_install_write8_handler(space, 0xbf00, 0xbfff, 0, 0, sysreg_w);
@@ -775,8 +776,8 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						// RAM
 						memory_install_read8_handler (space, 0x0000, 0xbeff, 0, 0, SMH_BANK(1));
 						memory_install_write8_handler(space, 0x0000, 0xbeff, 0, 0, SMH_BANK(2));
-						memory_set_bankptr(machine, 1, mess_ram);
-						memory_set_bankptr(machine, 2, mess_ram);
+						memory_set_bankptr(machine, 1, messram_get_ptr(devtag_get_device(machine, "messram")));
+						memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")));
 						// System reg
 						memory_install_read8_handler (space, 0xbf00, 0xbfff, 0, 0, sysreg_r);
 						memory_install_write8_handler(space, 0xbf00, 0xbfff, 0, 0, sysreg_w);
@@ -791,12 +792,12 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						memory_install_read8_handler (space, 0x0000, 0x5fff, 0, 0, SMH_BANK(1));
 						memory_install_write8_handler(space, 0x0000, 0x5fff, 0, 0, SMH_BANK(2));
 						memory_set_bankptr(machine, 1, memory_region(machine,"maincpu") + 0x10000);
-						memory_set_bankptr(machine, 2, mess_ram + 0x0000);
+						memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x0000);
 						// RAM
 						memory_install_read8_handler (space, 0x6000, 0xbfff, 0, 0, SMH_BANK(3));
 						memory_install_write8_handler(space, 0x6000, 0xbfff, 0, 0, SMH_BANK(4));
-						memory_set_bankptr(machine, 3, mess_ram + 0x6000);
-						memory_set_bankptr(machine, 4, mess_ram + 0x6000);
+						memory_set_bankptr(machine, 3, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x6000);
+						memory_set_bankptr(machine, 4, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x6000);
 						// Video RAM
 						memory_install_read8_handler (space, 0xc000, 0xffff, 0, 0, gzu_r);
 						memory_install_write8_handler(space, 0xc000, 0xffff, 0, 0, gzu_w);
@@ -808,12 +809,12 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						memory_install_read8_handler (space, 0x0000, 0x1fff, 0, 0, SMH_BANK(1));
 						memory_install_write8_handler(space, 0x0000, 0x1fff, 0, 0, SMH_BANK(2));
 						memory_set_bankptr(machine, 1, memory_region(machine,"maincpu") + 0x10000);
-						memory_set_bankptr(machine, 2, mess_ram + 0x0000);
+						memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x0000);
 						// RAM
 						memory_install_read8_handler (space, 0x2000, 0xbfff, 0, 0, SMH_BANK(3));
 						memory_install_write8_handler(space, 0x2000, 0xbfff, 0, 0, SMH_BANK(4));
-						memory_set_bankptr(machine, 3, mess_ram + 0x2000);
-						memory_set_bankptr(machine, 4, mess_ram + 0x2000);
+						memory_set_bankptr(machine, 3, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x2000);
+						memory_set_bankptr(machine, 4, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x2000);
 						// Video RAM
 						memory_install_read8_handler (space, 0xc000, 0xffff, 0, 0, gzu_r);
 						memory_install_write8_handler(space, 0xc000, 0xffff, 0, 0, gzu_w);
@@ -825,12 +826,12 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						memory_install_read8_handler (space, 0x0000, 0x3fff, 0, 0, SMH_BANK(1));
 						memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_BANK(2));
 						memory_set_bankptr(machine, 1, memory_region(machine,"maincpu") + 0x10000);
-						memory_set_bankptr(machine, 2, mess_ram + 0x0000);
+						memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x0000);
 						// RAM
 						memory_install_read8_handler (space, 0x4000, 0xbfff, 0, 0, SMH_BANK(3));
 						memory_install_write8_handler(space, 0x4000, 0xbfff, 0, 0, SMH_BANK(4));
-						memory_set_bankptr(machine, 3, mess_ram + 0x4000);
-						memory_set_bankptr(machine, 4, mess_ram + 0x4000);
+						memory_set_bankptr(machine, 3, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000);
+						memory_set_bankptr(machine, 4, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000);
 						// Video RAM
 						memory_install_read8_handler (space, 0xc000, 0xffff, 0, 0, gzu_r);
 						memory_install_write8_handler(space, 0xc000, 0xffff, 0, 0, gzu_w);
@@ -841,8 +842,8 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						// RAM
 						memory_install_read8_handler (space, 0x0000, 0xbfff, 0, 0, SMH_BANK(1));
 						memory_install_write8_handler(space, 0x0000, 0xbfff, 0, 0, SMH_BANK(2));
-						memory_set_bankptr(machine, 1, mess_ram);
-						memory_set_bankptr(machine, 2, mess_ram);
+						memory_set_bankptr(machine, 1, messram_get_ptr(devtag_get_device(machine, "messram")));
+						memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")));
 						// Video RAM
 						memory_install_read8_handler (space, 0xc000, 0xffff, 0, 0, gzu_r);
 						memory_install_write8_handler(space, 0xc000, 0xffff, 0, 0, gzu_w);

@@ -74,7 +74,7 @@
 #include "machine/ctronics.h"
 #include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
-
+#include "devices/messram.h"
 
 /**************************** common *******************************/
 
@@ -387,7 +387,7 @@ static ADDRESS_MAP_START ( to7, ADDRESS_SPACE_PROGRAM, 8 )
 /* 0x10000 - 0x1ffff: 64 KB external ROM cartridge */
 /* 0x20000 - 0x247ff: 18 KB floppy / network ROM controllers */
 
-/* mess_ram mapping:
+/* messram_get_ptr(devtag_get_device(machine, "messram")) mapping:
    0x0000 - 0x3fff: 16 KB video RAM (actually 8 K x 8 bits + 8 K x 6 bits)
    0x4000 - 0x5fff:  8 KB base RAM
    0x6000 - 0x9fff: 16 KB extended RAM
@@ -651,17 +651,6 @@ static SYSTEM_CONFIG_START ( to )
      CONFIG_DEVICE ( thom_serial_getinfo )
 SYSTEM_CONFIG_END
 
-static SYSTEM_CONFIG_START ( to7 )
-     CONFIG_IMPORT_FROM( to )
-     CONFIG_RAM_DEFAULT	( 40 * 1024 ) /* with standard 16 KB memory extension */
-     CONFIG_RAM ( 24 * 1024 )         /* base */
-     CONFIG_RAM ( 48 * 1024 )         /* with standard 16 KB + homebre 8 KB extensions */
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START ( t9000 )
-     CONFIG_IMPORT_FROM ( to7 )
-SYSTEM_CONFIG_END
-
 
 /* ------------ driver ------------ */
 
@@ -735,6 +724,10 @@ static MACHINE_DRIVER_START ( to7 )
      MDRV_CARTSLOT_NOT_MANDATORY
      MDRV_CARTSLOT_LOAD(to7_cartridge)
 
+/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("40K")
+	MDRV_RAM_EXTRA_OPTIONS("24K,48K")	 
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START ( t9000 )
@@ -742,9 +735,9 @@ static MACHINE_DRIVER_START ( t9000 )
 MACHINE_DRIVER_END
 
 
-COMP ( 1982, to7, 0, 0, to7, to7, 0, to7, "Thomson", "TO7", 0 )
+COMP ( 1982, to7, 0, 0, to7, to7, 0, to, "Thomson", "TO7", 0 )
 
-COMP ( 1980, t9000, to7, 0, t9000, t9000, 0, t9000, "Thomson", "T9000", 0 )
+COMP ( 1980, t9000, to7, 0, t9000, t9000, 0, to, "Thomson", "T9000", 0 )
 
 
 /***************************** TO7/70 *********************************
@@ -820,7 +813,7 @@ static ADDRESS_MAP_START ( to770, ADDRESS_SPACE_PROGRAM, 8 )
 /* 0x10000 - 0x1ffff: 64 KB external ROM cartridge */
 /* 0x20000 - 0x247ff: 18 KB floppy / network ROM controllers */
 
-/* mess_ram mapping:
+/* messram_get_ptr(devtag_get_device(machine, "messram")) mapping:
    0x00000 - 0x03fff: 16 KB video RAM
    0x04000 - 0x07fff: 16 KB unbanked base RAM
    0x08000 - 0x1ffff: 6 * 16 KB banked extended RAM
@@ -900,41 +893,33 @@ static INPUT_PORTS_START ( to770a )
 INPUT_PORTS_END
 
 
-/* ------------ config ------------ */
-
-static SYSTEM_CONFIG_START ( to770 )
-     CONFIG_IMPORT_FROM ( to )
-     CONFIG_RAM_DEFAULT	( 128 * 1024 ) /* with 64 KB extension */
-     CONFIG_RAM	( 64 * 1024 )          /* base */
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START ( to770a )
-     CONFIG_IMPORT_FROM ( to770 )
-SYSTEM_CONFIG_END
-
-
 /* ------------ driver ------------ */
 
 static MACHINE_DRIVER_START ( to770 )
-     MDRV_IMPORT_FROM ( to7 )
-     MDRV_MACHINE_START ( to770 )
-     MDRV_MACHINE_RESET ( to770 )
+    MDRV_IMPORT_FROM ( to7 )
+    MDRV_MACHINE_START ( to770 )
+    MDRV_MACHINE_RESET ( to770 )
 
-     MDRV_CPU_MODIFY( "maincpu" )
-     MDRV_CPU_PROGRAM_MAP ( to770)
+    MDRV_CPU_MODIFY( "maincpu" )
+    MDRV_CPU_PROGRAM_MAP ( to770)
 
 	MDRV_PIA6821_MODIFY( THOM_PIA_SYS, to770_pia6821_sys )
 
-     MDRV_MC6846_MODIFY( "mc6846", to770_timer )
+    MDRV_MC6846_MODIFY( "mc6846", to770_timer )
+	 
+	/* internal ram */
+	MDRV_RAM_MODIFY("messram")
+	MDRV_RAM_DEFAULT_SIZE("128K")
+	MDRV_RAM_EXTRA_OPTIONS("64K")	 
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START ( to770a )
      MDRV_IMPORT_FROM ( to770 )
 MACHINE_DRIVER_END
 
-COMP ( 1984, to770, 0, 0, to770, to770, 0, to770, "Thomson", "TO7/70", 0 )
+COMP ( 1984, to770, 0, 0, to770, to770, 0, to, "Thomson", "TO7/70", 0 )
 
-COMP ( 1984, to770a, to770, 0, to770a, to770a, 0, to770a, "Thomson", "TO7/70 arabic", 0 )
+COMP ( 1984, to770a, to770, 0, to770a, to770a, 0, to, "Thomson", "TO7/70 arabic", 0 )
 
 
 /************************* MO5 / MO5E *********************************
@@ -1017,7 +1002,7 @@ static ADDRESS_MAP_START ( mo5, ADDRESS_SPACE_PROGRAM, 8 )
 /* 0x10000 - 0x1ffff: 16 KB integrated BASIC / 64 KB external cartridge */
 /* 0x20000 - 0x247ff: 18 KB floppy / network ROM controllers */
 
-/* mess_ram mapping:
+/* messram_get_ptr(devtag_get_device(machine, "messram")) mapping:
    0x00000 - 0x03fff: 16 KB video RAM
    0x04000 - 0x0bfff: 32 KB unbanked base RAM
    0x0c000 - 0x1bfff: 4 * 16 KB bank extended RAM
@@ -1090,23 +1075,6 @@ static INPUT_PORTS_START ( mo5e )
 
 INPUT_PORTS_END
 
-
-/* ------------ config ------------ */
-
-static SYSTEM_CONFIG_START ( mo )
-     CONFIG_DEVICE ( thom_serial_getinfo )
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START ( mo5 )
-     CONFIG_IMPORT_FROM ( mo )
-     CONFIG_RAM_DEFAULT	( 112 * 1024 ) /* with 64 KB extension */
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START ( mo5e )
-     CONFIG_IMPORT_FROM ( mo5 )
-SYSTEM_CONFIG_END
-
-
 /* ------------ driver ------------ */
 
 static MACHINE_DRIVER_START ( mo5 )
@@ -1126,6 +1094,10 @@ static MACHINE_DRIVER_START ( mo5 )
 	MDRV_CARTSLOT_MODIFY("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("m5,rom")
 	MDRV_CARTSLOT_LOAD(mo5_cartridge)
+	
+	/* internal ram */
+	MDRV_RAM_MODIFY("messram")
+	MDRV_RAM_DEFAULT_SIZE("112K")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START ( mo5e )
@@ -1133,9 +1105,9 @@ static MACHINE_DRIVER_START ( mo5e )
 MACHINE_DRIVER_END
 
 
-COMP ( 1984, mo5, 0, 0, mo5, mo5, 0, mo5, "Thomson", "MO5", 0 )
+COMP ( 1984, mo5, 0, 0, mo5, mo5, 0, to, "Thomson", "MO5", 0 )
 
-COMP ( 1986, mo5e, mo5, 0, mo5e, mo5e, 0, mo5e, "Thomson", "MO5E", 0 )
+COMP ( 1986, mo5e, mo5, 0, mo5e, mo5e, 0, to, "Thomson", "MO5E", 0 )
 
 
 /********************************* TO9 *******************************
@@ -1237,7 +1209,7 @@ static ADDRESS_MAP_START ( to9, ADDRESS_SPACE_PROGRAM, 8 )
 /* 0x20000 - 0x3ffff: 128 KB internal software ROM */
 /* 0x40000 - 0x447ff: 18  KB external floppy / network ROM controllers */
 
-/* mess_ram mapping:
+/* messram_get_ptr(devtag_get_device(machine, "messram")) mapping:
    0x00000 - 0x03fff: 16 KB video RAM
    0x04000 - 0x07fff: 16 KB unbanked base RAM
    0x08000 - 0x2ffff: 10 * 16 KB banked extended RAM
@@ -1444,16 +1416,6 @@ static INPUT_PORTS_START ( to9 )
      PORT_INCLUDE ( to7_mconfig )
 INPUT_PORTS_END
 
-
-/* ------------ config ------------ */
-
-static SYSTEM_CONFIG_START ( to9 )
-     CONFIG_IMPORT_FROM ( to )
-     CONFIG_RAM_DEFAULT	( 192 * 1024 ) /* with 64 KB extension */
-     CONFIG_RAM( 128 * 1024 )          /* base */
-SYSTEM_CONFIG_END
-
-
 /* ------------ driver ------------ */
 
 static MACHINE_DRIVER_START ( to9 )
@@ -1471,10 +1433,15 @@ static MACHINE_DRIVER_START ( to9 )
 	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
 
      MDRV_MC6846_MODIFY( "mc6846", to9_timer )
+	 
+	 /* internal ram */
+	MDRV_RAM_MODIFY("messram")
+	MDRV_RAM_DEFAULT_SIZE("192K")
+	MDRV_RAM_EXTRA_OPTIONS("128K")
 MACHINE_DRIVER_END
 
 
-COMP ( 1985, to9, 0, 0, to9, to9, 0, to9, "Thomson", "TO9", GAME_IMPERFECT_COLORS )
+COMP ( 1985, to9, 0, 0, to9, to9, 0, to, "Thomson", "TO9", GAME_IMPERFECT_COLORS )
 
 
 /******************************** TO8 ********************************
@@ -1569,7 +1536,7 @@ static ADDRESS_MAP_START ( to8, ADDRESS_SPACE_PROGRAM, 8 )
 /* 0x30000 - 0x33fff: 16 KB BIOS ROM */
 /* 0x34000 - 0x387ff: 18 KB external floppy / network ROM controllers */
 
-/* mess_ram mapping: 512 KB flat (including video) */
+/* messram_get_ptr(devtag_get_device(machine, "messram")) mapping: 512 KB flat (including video) */
 
 ADDRESS_MAP_END
 
@@ -1668,20 +1635,6 @@ static INPUT_PORTS_START ( to8d )
      PORT_INCLUDE ( to8 )
 INPUT_PORTS_END
 
-
-/* ------------ config ------------ */
-
-static SYSTEM_CONFIG_START ( to8 )
-     CONFIG_IMPORT_FROM ( to )
-     CONFIG_RAM_DEFAULT ( 512 * 1024 ) /* with 256 KB extension */
-     CONFIG_RAM ( 256 * 1024 )         /* base */
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START ( to8d )
-     CONFIG_IMPORT_FROM ( to8 )
-SYSTEM_CONFIG_END
-
-
 /* ------------ driver ------------ */
 
 static MACHINE_DRIVER_START ( to8 )
@@ -1699,6 +1652,11 @@ static MACHINE_DRIVER_START ( to8 )
 	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
 
      MDRV_MC6846_MODIFY( "mc6846", to8_timer )
+	 
+	 /* internal ram */
+	MDRV_RAM_MODIFY("messram")
+	MDRV_RAM_DEFAULT_SIZE("512K")
+	MDRV_RAM_EXTRA_OPTIONS("256K")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START ( to8d )
@@ -1706,9 +1664,9 @@ static MACHINE_DRIVER_START ( to8d )
 MACHINE_DRIVER_END
 
 
-COMP ( 1986, to8, 0, 0, to8, to8, 0, to8, "Thomson", "TO8", 0 )
+COMP ( 1986, to8, 0, 0, to8, to8, 0, to, "Thomson", "TO8", 0 )
 
-COMP ( 1987, to8d, to8, 0, to8d, to8d, 0, to8d, "Thomson", "TO8D", 0 )
+COMP ( 1987, to8d, to8, 0, to8d, to8d, 0, to, "Thomson", "TO8D", 0 )
 
 
 /******************************** TO9+ *******************************
@@ -1778,7 +1736,7 @@ static ADDRESS_MAP_START ( to9p, ADDRESS_SPACE_PROGRAM, 8 )
 /* 0x30000 - 0x33fff: 16 KB BIOS ROM */
 /* 0x34000 - 0x387ff: 18 KB external floppy / network ROM controllers */
 
-/* mess_ram mapping: 512 KB flat (including video) */
+/* messram_get_ptr(devtag_get_device(machine, "messram")) mapping: 512 KB flat (including video) */
 
 ADDRESS_MAP_END
 
@@ -1828,15 +1786,6 @@ static INPUT_PORTS_START ( to9p )
      PORT_INCLUDE ( to7_mconfig )
 INPUT_PORTS_END
 
-
-/* ------------ config ------------ */
-
-static SYSTEM_CONFIG_START ( to9p )
-     CONFIG_IMPORT_FROM ( to )
-     CONFIG_RAM_DEFAULT ( 512 * 1024 )
-SYSTEM_CONFIG_END
-
-
 /* ------------ driver ------------ */
 
 static MACHINE_DRIVER_START ( to9p )
@@ -1854,9 +1803,13 @@ static MACHINE_DRIVER_START ( to9p )
 	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
 
      MDRV_MC6846_MODIFY( "mc6846", to9p_timer )
+	
+	/* internal ram */
+	MDRV_RAM_MODIFY("messram")
+	MDRV_RAM_DEFAULT_SIZE("512K")
 MACHINE_DRIVER_END
 
-COMP ( 1986, to9p, 0, 0, to9p, to9p, 0, to9p, "Thomson", "TO9+", 0 )
+COMP ( 1986, to9p, 0, 0, to9p, to9p, 0, to, "Thomson", "TO9+", 0 )
 
 
 
@@ -1945,7 +1898,7 @@ static ADDRESS_MAP_START ( mo6, ADDRESS_SPACE_PROGRAM, 8 )
 /* 0x20000 - 0x2ffff: 64 KB BIOS ROM */
 /* 0x30000 - 0x347ff: 16 KB floppy / network ROM controllers */
 
-/* mess_ram mapping: 128 KB flat (including video) */
+/* messram_get_ptr(devtag_get_device(machine, "messram")) mapping: 128 KB flat (including video) */
 
 ADDRESS_MAP_END
 
@@ -2165,18 +2118,6 @@ static INPUT_PORTS_START ( pro128 )
 INPUT_PORTS_END
 
 
-/* ------------ config ------------ */
-
-static SYSTEM_CONFIG_START ( mo6 )
-     CONFIG_IMPORT_FROM ( mo )
-     CONFIG_RAM_DEFAULT	( 128 * 1024 )
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START ( pro128 )
-     CONFIG_IMPORT_FROM ( mo6 )
-SYSTEM_CONFIG_END
-
-
 /* ------------ driver ------------ */
 
 static MACHINE_DRIVER_START ( mo6 )
@@ -2199,15 +2140,19 @@ static MACHINE_DRIVER_START ( mo6 )
 	MDRV_CARTSLOT_MODIFY("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("m5,rom")
 	MDRV_CARTSLOT_LOAD(mo5_cartridge)
+	
+	/* internal ram */
+	MDRV_RAM_MODIFY("messram")
+	MDRV_RAM_DEFAULT_SIZE("128K")	
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START ( pro128 )
      MDRV_IMPORT_FROM ( mo6 )
 MACHINE_DRIVER_END
 
-COMP ( 1986, mo6, 0, 0, mo6, mo6, 0, mo6, "Thomson", "MO6", 0 )
+COMP ( 1986, mo6, 0, 0, mo6, mo6, 0, to, "Thomson", "MO6", 0 )
 
-COMP ( 1986, pro128, mo6, 0, pro128, pro128, 0, pro128, "Olivetti / Thomson", "Prodest PC 128", 0 )
+COMP ( 1986, pro128, mo6, 0, pro128, pro128, 0, to, "Olivetti / Thomson", "Prodest PC 128", 0 )
 
 
 
@@ -2269,7 +2214,7 @@ static ADDRESS_MAP_START ( mo5nr, ADDRESS_SPACE_PROGRAM, 8 )
 /* 0x20000 - 0x2ffff: 64 KB BIOS ROM */
 /* 0x30000 - 0x347ff: 16 KB floppy / network ROM controllers */
 
-/* mess_ram mapping: 128 KB flat (including video) */
+/* messram_get_ptr(devtag_get_device(machine, "messram")) mapping: 128 KB flat (including video) */
 
 ADDRESS_MAP_END
 
@@ -2401,14 +2346,6 @@ static INPUT_PORTS_START ( mo5nr )
 INPUT_PORTS_END
 
 
-/* ------------ config ------------ */
-
-static SYSTEM_CONFIG_START ( mo5nr )
-     CONFIG_IMPORT_FROM ( mo )
-     CONFIG_RAM_DEFAULT	( 128 * 1024 )
-SYSTEM_CONFIG_END
-
-
 /* ------------ driver ------------ */
 
 static MACHINE_DRIVER_START ( mo5nr )
@@ -2431,6 +2368,10 @@ static MACHINE_DRIVER_START ( mo5nr )
 	MDRV_CARTSLOT_MODIFY("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("m5,rom")
 	MDRV_CARTSLOT_LOAD(mo5_cartridge)
+	
+	/* internal ram */
+	MDRV_RAM_MODIFY("messram")
+	MDRV_RAM_DEFAULT_SIZE("128K")	
 MACHINE_DRIVER_END
 
-COMP ( 1986, mo5nr, 0, 0, mo5nr, mo5nr, 0, mo5nr, "Thomson", "MO5 NR", 0 )
+COMP ( 1986, mo5nr, 0, 0, mo5nr, mo5nr, 0, to, "Thomson", "MO5 NR", 0 )

@@ -9,6 +9,7 @@
 
 #include "driver.h"
 #include "includes/ondra.h"
+#include "devices/messram.h"
 
 UINT8 ondra_video_enable;
 
@@ -29,8 +30,8 @@ VIDEO_UPDATE( ondra )
 		{
 			for (y = 127; y >=0; y--)
 			{
-				code1 = mess_ram[0xd700 + Vaddr + 0x80];
-				code2 = mess_ram[0xd700 + Vaddr + 0x00];
+				code1 = messram_get_ptr(devtag_get_device(screen->machine, "messram"))[0xd700 + Vaddr + 0x80];
+				code2 = messram_get_ptr(devtag_get_device(screen->machine, "messram"))[0xd700 + Vaddr + 0x00];
 				for (b = 0; b < 8; b++)
 				{
 					*BITMAP_ADDR16(bitmap, 2*y, x*8+b) =  ((code1 << b) & 0x80) ? 1 : 0;

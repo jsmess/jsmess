@@ -47,6 +47,7 @@ coco3h  1.2 2.0     1.1
 #include "devices/coco_vhd.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
+#include "devices/messram.h"
 #include "coco3.lh"
 
 #define SHOW_FULL_AREA			0
@@ -850,6 +851,11 @@ static MACHINE_DRIVER_START( dragon32 )
 	MDRV_DRAGON_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
 
 	MDRV_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("32K")
+	MDRV_RAM_EXTRA_OPTIONS("64K")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( dragon64 )
@@ -898,6 +904,10 @@ static MACHINE_DRIVER_START( dragon64 )
 	MDRV_DRAGON_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
 
 	MDRV_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("64K")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( d64plus )
@@ -946,6 +956,10 @@ static MACHINE_DRIVER_START( d64plus )
 	MDRV_DRAGON_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
 
 	MDRV_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("128K")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( dgnalpha )
@@ -1001,6 +1015,10 @@ static MACHINE_DRIVER_START( dgnalpha )
 	MDRV_DRAGON_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
 
 	MDRV_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("64K")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( tanodr64 )
@@ -1049,6 +1067,10 @@ static MACHINE_DRIVER_START( tanodr64 )
 	MDRV_DRAGON_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
 
 	MDRV_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("64K")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco )
@@ -1096,6 +1118,11 @@ static MACHINE_DRIVER_START( coco )
 	MDRV_COCO_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
 
 	MDRV_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("16K")
+	MDRV_RAM_EXTRA_OPTIONS("4K,32K,64K")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco2 )
@@ -1143,6 +1170,11 @@ static MACHINE_DRIVER_START( coco2 )
 	MDRV_COCO_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
 
 	MDRV_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("16K")
+	MDRV_RAM_EXTRA_OPTIONS("64K")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco2b )
@@ -1190,6 +1222,11 @@ static MACHINE_DRIVER_START( coco2b )
 	MDRV_COCO_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
 
 	MDRV_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("16K")
+	MDRV_RAM_EXTRA_OPTIONS("64K")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco3 )
@@ -1251,6 +1288,11 @@ static MACHINE_DRIVER_START( coco3 )
 	MDRV_COCO_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
 
 	MDRV_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("512K")
+	MDRV_RAM_EXTRA_OPTIONS("128K,2M,8M")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco3p )
@@ -1269,6 +1311,15 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( coco3h )
 	MDRV_IMPORT_FROM( coco3 )
 	MDRV_CPU_REPLACE( "maincpu", HD6309, COCO_CPU_SPEED_HZ)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( cocoe )
+	MDRV_IMPORT_FROM( coco )
+	
+	/* internal ram */
+	MDRV_RAM_MODIFY("messram")
+	MDRV_RAM_DEFAULT_SIZE("64K")
+	MDRV_RAM_EXTRA_OPTIONS("4K,16K,32K")
 MACHINE_DRIVER_END
 
 /***************************************************************************
@@ -1401,75 +1452,21 @@ ROM_END
 
 #define rom_coco3h	rom_coco3
 
-/*************************************
- *
- *  CoCo sysconfig structures
- *
- *************************************/
-/* ----------------------------------------------------------------------- */
-
 /* I have split up coco and cocoe, as the basic rom in the coco, cannot    */
 /* use 64K rams, and will boot with 4k, if this is selected, so I have     */
 /* split these to avoid confusion -- PHS                                   */
 
-static SYSTEM_CONFIG_START( coco )
-	CONFIG_RAM		(4 * 1024)
-	CONFIG_RAM_DEFAULT	(16 * 1024)
-	CONFIG_RAM		(32 * 1024)
-	CONFIG_RAM		(64 * 1024)
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START( cocoe )
-	CONFIG_RAM		(4 * 1024)
-	CONFIG_RAM		(16 * 1024)
-	CONFIG_RAM		(32 * 1024)
-	CONFIG_RAM_DEFAULT	(64 * 1024)
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START(coco2)
-	CONFIG_RAM			(16 * 1024)
-	CONFIG_RAM_DEFAULT	(64 * 1024)
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START(coco3)
-	CONFIG_RAM			(128 * 1024)
-	CONFIG_RAM_DEFAULT	(512 * 1024)
-	CONFIG_RAM			(2048 * 1024)
-	CONFIG_RAM			(8192 * 1024)
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START(dragon32)
-	CONFIG_RAM_DEFAULT	(32 * 1024)
-	CONFIG_RAM		(64 * 1024)		// Since a fair number of users did this upgrade - phs
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START(dragon64)
-	CONFIG_RAM_DEFAULT	(64 * 1024)
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START(d64plus)
-	CONFIG_RAM_DEFAULT	(128 * 1024)		// 64K normal RAM + 64K on plus board.
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START(tanodr64)
-	CONFIG_RAM_DEFAULT	(64 * 1024)
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START(dgnalpha)
-	CONFIG_RAM_DEFAULT	(64 * 1024)
-SYSTEM_CONFIG_END
-
 /*     YEAR     NAME        PARENT  COMPAT  MACHINE    INPUT        INIT     CONFIG COMPANY                 FULLNAME */
-COMP(  1980,	coco,		0,		0,		coco,		coco,		0,		coco,		"Tandy Radio Shack",	"Color Computer" , 0)
-COMP(  1981,	cocoe,		coco,	0,		coco,		coco,		0,		cocoe,		"Tandy Radio Shack",	"Color Computer (Extended BASIC 1.0)" , 0)
-COMP(  1983,	coco2,		coco,	0,		coco2,		coco,		0,		coco2,		"Tandy Radio Shack",	"Color Computer 2" , 0)
-COMP(  1985?,	coco2b,		coco,	0,		coco2b,		coco,		0,		coco2,		"Tandy Radio Shack",	"Color Computer 2B" , 0)
-COMP(  1986,	coco3,		coco,	0,	 	coco3,		coco3,		0,		coco3,		"Tandy Radio Shack",	"Color Computer 3 (NTSC)" , 0)
-COMP(  1986,	coco3p,		coco, 	0,		coco3p,		coco3,		0,		coco3,		"Tandy Radio Shack",	"Color Computer 3 (PAL)" , 0)
-COMP(  19??,	coco3h,		coco,	0,		coco3h,		coco3,		0,		coco3,		"Tandy Radio Shack",	"Color Computer 3 (NTSC; HD6309)", GAME_COMPUTER_MODIFIED)
-COMP(  1982,	dragon32,	coco,	0,		dragon32,	dragon32,	0,		dragon32,	"Dragon Data Ltd",    "Dragon 32" , 0)
-COMP(  1983,	dragon64,	coco,	0,		dragon64,	dragon32,	0,		dragon64,	"Dragon Data Ltd",    "Dragon 64" , 0)
-COMP(  1983,	d64plus,	coco,	0,	d64plus,	dragon32,	0,	d64plus,	"Dragon Data Ltd",    "Dragon 64 Plus" , 0)
-COMP(  1983,	tanodr64,	coco,	0,	tanodr64,	dragon32,	0,	tanodr64,	"Dragon Data Ltd/Tano Ltd","Tano Dragon 64 (NTSC)" , 0)
-COMP(  1984,	dgnalpha,	coco,	0,		dgnalpha,	dragon32,	0,		dgnalpha,	"Dragon Data Ltd",    "Dragon Alpha Prototype" , 0)
-COMP(  1984,	cp400,		coco, 	0,		coco,		coco,		0,		coco,		"Prologica",          "CP400" , 0)
+COMP(  1980,	coco,		0,		0,		coco,		coco,		0,		0,		"Tandy Radio Shack",	"Color Computer" , 0)
+COMP(  1981,	cocoe,		coco,	0,		cocoe,		coco,		0,		0,		"Tandy Radio Shack",	"Color Computer (Extended BASIC 1.0)" , 0)
+COMP(  1983,	coco2,		coco,	0,		coco2,		coco,		0,		0,		"Tandy Radio Shack",	"Color Computer 2" , 0)
+COMP(  1985?,	coco2b,		coco,	0,		coco2b,		coco,		0,		0,		"Tandy Radio Shack",	"Color Computer 2B" , 0)
+COMP(  1986,	coco3,		coco,	0,	 	coco3,		coco3,		0,		0,		"Tandy Radio Shack",	"Color Computer 3 (NTSC)" , 0)
+COMP(  1986,	coco3p,		coco, 	0,		coco3p,		coco3,		0,		0,		"Tandy Radio Shack",	"Color Computer 3 (PAL)" , 0)
+COMP(  19??,	coco3h,		coco,	0,		coco3h,		coco3,		0,		0,		"Tandy Radio Shack",	"Color Computer 3 (NTSC; HD6309)", GAME_COMPUTER_MODIFIED)
+COMP(  1982,	dragon32,	coco,	0,		dragon32,	dragon32,	0,		0,	"Dragon Data Ltd",    "Dragon 32" , 0)
+COMP(  1983,	dragon64,	coco,	0,		dragon64,	dragon32,	0,		0,	"Dragon Data Ltd",    "Dragon 64" , 0)
+COMP(  1983,	d64plus,	coco,	0,	d64plus,	dragon32,	0,	0,	"Dragon Data Ltd",    "Dragon 64 Plus" , 0)
+COMP(  1983,	tanodr64,	coco,	0,	tanodr64,	dragon32,	0,	0,	"Dragon Data Ltd/Tano Ltd","Tano Dragon 64 (NTSC)" , 0)
+COMP(  1984,	dgnalpha,	coco,	0,		dgnalpha,	dragon32,	0,		0,	"Dragon Data Ltd",    "Dragon Alpha Prototype" , 0)
+COMP(  1984,	cp400,		coco, 	0,		coco,		coco,		0,		0,		"Prologica",          "CP400" , 0)

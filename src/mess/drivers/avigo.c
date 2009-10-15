@@ -45,7 +45,7 @@
 #include "machine/tc8521.h"
 #include "machine/ins8250.h"
 #include "sound/speaker.h"
-
+#include "devices/messram.h"
 
 static UINT8 avigo_key_line;
 /*
@@ -332,7 +332,7 @@ static void avigo_refresh_memory(running_machine *machine)
 		/* %001 */
 		/* ram */
 		case 0x01:
-			addr = mess_ram + ((avigo_ram_bank_l & 0x07)<<14);
+			addr = messram_get_ptr(devtag_get_device(machine, "messram")) + ((avigo_ram_bank_l & 0x07)<<14);
 			avigo_setbank(machine, 2, addr, SMH_BANK(3), SMH_BANK(7));
 			break;
 
@@ -433,14 +433,14 @@ static MACHINE_RESET( avigo )
 	avigo_flash_at_0x8000 = 0;
 
 	/* clear */
-	memset(mess_ram, 0, 128*1024);
+	memset(messram_get_ptr(devtag_get_device(machine, "messram")), 0, 128*1024);
 
 	memory_set_direct_update_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), avigo_opbase_handler);
 
 	addr = (unsigned char *)intelflash_getmemptr(0);
 	avigo_setbank(machine, 0, addr, avigo_flash_0x0000_read_handler, avigo_flash_0x0000_write_handler);
 
-	avigo_setbank(machine, 3, mess_ram, NULL, NULL);
+	avigo_setbank(machine, 3, messram_get_ptr(devtag_get_device(machine, "messram")), NULL, NULL);
 
 	/* 0x08000 is specially banked! */
 	avigo_refresh_memory(machine);
@@ -889,6 +889,10 @@ static MACHINE_DRIVER_START( avigo )
 
 	/* real time clock */
 	MDRV_TC8521_ADD("rtc", avigo_tc8521_interface)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("128K")
 MACHINE_DRIVER_END
 
 
@@ -897,18 +901,11 @@ MACHINE_DRIVER_END
   Game driver(s)
 
 ***************************************************************************/
-
-
 ROM_START(avigo)
 	ROM_REGION(0x210000, "maincpu",0)
 	ROM_LOAD("avigo.rom", 0x010000, 0x0150000, CRC(160ee4a6) SHA1(4d09201a3876de16808bd92989f3d8d7182d72b3))
 ROM_END
 
-static SYSTEM_CONFIG_START( avigo )
-	CONFIG_RAM_DEFAULT		(128*1024)
-SYSTEM_CONFIG_END
-
-
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY   FULLNAME */
-COMP(1997,	avigo,	0,		0,		avigo,	avigo,	0,		avigo,	"Texas Instruments", "TI Avigo 100 PDA",GAME_NOT_WORKING)
+COMP(1997,	avigo,	0,		0,		avigo,	avigo,	0,		0,	"Texas Instruments", "TI Avigo 100 PDA",GAME_NOT_WORKING)
 

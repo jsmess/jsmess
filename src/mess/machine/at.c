@@ -33,6 +33,8 @@
 
 #include "machine/kb_keytro.h"
 
+#include "devices/messram.h"
+
 #define LOG_PORT80	0
 #define LOG_KBDC	0
 
@@ -164,12 +166,12 @@ static void init_at_common(running_machine *machine, const struct kbdc8042_inter
 	soundblaster_config(&soundblaster);
 	kbdc8042_init(machine, at8042);
 
-	if (mess_ram_size > 0x0a0000)
+	if (messram_get_size(devtag_get_device(machine, "messram")) > 0x0a0000)
 	{
-		offs_t ram_limit = 0x100000 + mess_ram_size - 0x0a0000;
+		offs_t ram_limit = 0x100000 + messram_get_size(devtag_get_device(machine, "messram")) - 0x0a0000;
 		memory_install_read_handler(space, 0x100000,  ram_limit - 1, 0, 0, 1);
 		memory_install_write_handler(space, 0x100000,  ram_limit - 1, 0, 0, 1);
-		memory_set_bankptr(machine, 1, mess_ram + 0xa0000);
+		memory_set_bankptr(machine, 1, messram_get_ptr(devtag_get_device(machine, "messram")) + 0xa0000);
 	}
 }
 
@@ -405,8 +407,8 @@ static void at_fdc_interrupt(running_machine *machine, int state)
 {
 	at_state *st = machine->driver_data;
 	pic8259_set_irq_line(st->pic8259_master, 6, state);
-//if ( mess_ram[0x0490] == 0x74 )
-//  mess_ram[0x0490] = 0x54;
+//if ( messram_get_ptr(devtag_get_device(machine, "messram"))[0x0490] == 0x74 )
+//  messram_get_ptr(devtag_get_device(machine, "messram"))[0x0490] = 0x54;
 }
 
 

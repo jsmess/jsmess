@@ -22,6 +22,7 @@
 #include "formats/rk_cas.h"
 #include "formats/smx_dsk.h"
 #include "machine/wd17xx.h"
+#include "devices/messram.h"
 
 /* Address maps */
 static ADDRESS_MAP_START(specialist_mem, ADDRESS_SPACE_PROGRAM, 8)
@@ -478,6 +479,10 @@ static MACHINE_DRIVER_START( specimx )
 	MDRV_WD1793_ADD("wd1793", default_wd17xx_interface_2_drives )
 
 	MDRV_FLOPPY_2_DRIVES_ADD(specimx_floppy_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("128K")	
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( erik )
@@ -514,6 +519,10 @@ static MACHINE_DRIVER_START( erik )
 	MDRV_WD1793_ADD("wd1793", default_wd17xx_interface_2_drives )
 
 	MDRV_FLOPPY_2_DRIVES_ADD(specimx_floppy_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("192K")	
 MACHINE_DRIVER_END
 
 /* ROM definition */
@@ -555,19 +564,11 @@ ROM_START( erik )
     ROM_LOAD( "erik.bin", 0x10000, 0x10000, CRC(6F3208F4) SHA1(41f6e2763ef60d3c7214c98893e580d25346fa2d))
 ROM_END
 
-static SYSTEM_CONFIG_START(specimx)
- 	CONFIG_RAM_DEFAULT(128 * 1024)
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START(erik)
- 	CONFIG_RAM_DEFAULT(192 * 1024)
-SYSTEM_CONFIG_END
-
 /* Driver */
 
 /*    YEAR  NAME        PARENT  COMPAT   MACHINE    INPUT       INIT    CONFIG      COMPANY              FULLNAME       FLAGS */
 COMP( 1985, special,    0,     	0, 		special, 	special, 	special, 0,         "", 				 "Specialist",		0)
 COMP( 1985, specialp,   special,0, 		specialp, 	specialp, 	special, 0,         "", 				 "Specialist + hires graph",		0)
 COMP( 1985, lik,    	special,0, 		special, 	lik,		special, 0,         "", 				 "Lik",		 		0)
-COMP( 1985, specimx,   	special,0, 		specimx, 	specimx, 	specimx, specimx,   "", 				 "Specialist MX", 	0)
-COMP( 1994, erik,   	special,0, 		erik, 		special, 	erik, 	 erik,      "", 				 "Erik", 	0)
+COMP( 1985, specimx,   	special,0, 		specimx, 	specimx, 	specimx, 0,   		"", 				 "Specialist MX", 	0)
+COMP( 1994, erik,   	special,0, 		erik, 		special, 	erik, 	 0,     	"", 				 "Erik", 	0)

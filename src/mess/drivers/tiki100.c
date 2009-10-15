@@ -34,6 +34,7 @@
 #include "machine/z80pio.h"
 #include "machine/wd17xx.h"
 #include "sound/ay8910.h"
+#include "devices/messram.h"
 
 INLINE const device_config *get_floppy_image(running_machine *machine, int drive)
 {
@@ -603,13 +604,13 @@ static MACHINE_START( tiki100 )
 
 	/* setup memory banking */
 	memory_configure_bank(machine, 1, BANK_ROM, 1, memory_region(machine, Z80_TAG), 0);
-	memory_configure_bank(machine, 1, BANK_RAM, 1, mess_ram, 0);
+	memory_configure_bank(machine, 1, BANK_RAM, 1, messram_get_ptr(devtag_get_device(machine, "messram")), 0);
 	memory_configure_bank(machine, 1, BANK_VIDEO_RAM, 1, state->video_ram, 0);
 
-	memory_configure_bank(machine, 2, BANK_RAM, 1, mess_ram + 0x4000, 0);
+	memory_configure_bank(machine, 2, BANK_RAM, 1, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000, 0);
 	memory_configure_bank(machine, 2, BANK_VIDEO_RAM, 1, state->video_ram + 0x4000, 0);
 
-	memory_configure_bank(machine, 3, BANK_RAM, 1, mess_ram + 0x8000, 0);
+	memory_configure_bank(machine, 3, BANK_RAM, 1, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x8000, 0);
 
 	tiki100_bankswitch(machine);
 
@@ -698,6 +699,10 @@ static MACHINE_DRIVER_START( tiki100 )
 	MDRV_SOUND_ADD(AY8912_TAG, AY8912, 2000000)
 	MDRV_SOUND_CONFIG(ay8910_intf)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("64K")
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -717,13 +722,8 @@ ROM_START( tiki100 )
 	ROMX_LOAD( "tikirom-2.03w.u10", 0x0000, 0x2000, CRC(79662476) SHA1(96336633ecaf1b2190c36c43295ac9f785d1f83a), ROM_BIOS(2) )
 ROM_END
 
-/* System Configuration */
-static SYSTEM_CONFIG_START( tiki100 )
-	CONFIG_RAM_DEFAULT( 64 * 1024 )
-SYSTEM_CONFIG_END
-
 /* System Drivers */
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    CONFIG      COMPANY             FULLNAME        FLAGS */
-COMP( 1984, kontiki,	0,			0,		tiki100,	tiki100,	0,		tiki100,	"Kontiki Data A/S",	"KONTIKI 100",	GAME_SUPPORTS_SAVE )
-COMP( 1984, tiki100,	kontiki,	0,		tiki100,	tiki100,	0,		tiki100,	"Tiki Data A/S",	"TIKI 100",		GAME_SUPPORTS_SAVE )
+COMP( 1984, kontiki,	0,			0,		tiki100,	tiki100,	0,		0,	"Kontiki Data A/S",	"KONTIKI 100",	GAME_SUPPORTS_SAVE )
+COMP( 1984, tiki100,	kontiki,	0,		tiki100,	tiki100,	0,		0,	"Tiki Data A/S",	"TIKI 100",		GAME_SUPPORTS_SAVE )

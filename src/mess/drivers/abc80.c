@@ -90,7 +90,7 @@ Notes:
 #include "devices/flopdrv.h"
 #include "devices/cassette.h"
 #include "devices/printer.h"
-
+#include "devices/messram.h"
 /* Read/Write Handlers */
 
 static WRITE8_HANDLER( abc80_sound_w )
@@ -477,10 +477,10 @@ static MACHINE_START( abc80 )
 	abc80_state *state = machine->driver_data;
 
 	/* configure RAM expansion */
-	memory_configure_bank(machine, 1, 0, 1, mess_ram, 0);
+	memory_configure_bank(machine, 1, 0, 1, messram_get_ptr(devtag_get_device(machine, "messram")), 0);
 	memory_set_bank(machine, 1, 0);
 
-	switch (mess_ram_size)
+	switch (messram_get_size(devtag_get_device(machine, "messram")))
 	{
 	case 16*1024:
 		memory_install_readwrite8_handler(cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
@@ -556,6 +556,11 @@ static MACHINE_DRIVER_START( abc80 )
 	MDRV_CASSETTE_ADD("cassette", default_cassette_config)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(abc80_floppy_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("16K")
+	MDRV_RAM_EXTRA_OPTIONS("32K")
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -636,15 +641,8 @@ ROM_START( abc80h )
 	ROM_LOAD( "abc80_13.e7", 0x0000, 0x0080, NO_DUMP ) // "64 40057-01" 82S129 256x4 address decoder
 ROM_END
 
-/* System Configuration */
-
-static SYSTEM_CONFIG_START( abc80 )
-	CONFIG_RAM_DEFAULT(16 * 1024)
-	CONFIG_RAM		  (32 * 1024)
-SYSTEM_CONFIG_END
-
 /* Drivers */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY                             FULLNAME                    FLAGS */
-COMP( 1978, abc80,  0,      0,      abc80,  abc80,  0,      abc80,  "Luxor Datorer AB",					"ABC 80 (Sweden, Finland)",	GAME_SUPPORTS_SAVE )
-COMP( 1978, abc80h, abc80,  0,      abc80,  abc80,  0,      abc80,  "Budapesti Radiotechnikai Gyar",	"ABC 80 (Hungary)",			GAME_SUPPORTS_SAVE )
+COMP( 1978, abc80,  0,      0,      abc80,  abc80,  0,      0,  "Luxor Datorer AB",					"ABC 80 (Sweden, Finland)",	GAME_SUPPORTS_SAVE )
+COMP( 1978, abc80h, abc80,  0,      abc80,  abc80,  0,      0,  "Budapesti Radiotechnikai Gyar",	"ABC 80 (Hungary)",			GAME_SUPPORTS_SAVE )

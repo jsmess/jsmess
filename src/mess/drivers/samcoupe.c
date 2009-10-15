@@ -45,7 +45,7 @@
 #include "formats/tzx_cas.h"
 #include "devices/flopdrv.h"
 #include "formats/coupedsk.h"
-
+#include "devices/messram.h"
 
 /***************************************************************************
     CONSTANTS
@@ -596,6 +596,11 @@ static MACHINE_DRIVER_START( samcoupe )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(samcoupe_floppy_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("512K")
+	MDRV_RAM_EXTRA_OPTIONS("256K,1280K,1536K,2304K,2560K,3328K,3584K,4352K,4608K")
 MACHINE_DRIVER_END
 
 
@@ -640,26 +645,9 @@ ROM_START( samcoupe )
 	ROMX_LOAD( "rom01.z5",  0x0000, 0x8000, CRC(c04acfdf) SHA1(8976ed005c14905eec1215f0a5c28aa686a7dda2), ROM_BIOS(14) )
 ROM_END
 
-
-/***************************************************************************
-    SYSTEM CONFIG
-***************************************************************************/
-static SYSTEM_CONFIG_START( samcoupe )
-	CONFIG_RAM(256 * 1024)
-	CONFIG_RAM_DEFAULT(512 * 1024)
-	CONFIG_RAM(256 * 1024 + 1 * 1024 * 1024)
-	CONFIG_RAM(512 * 1024 + 1 * 1024 * 1024)
-	CONFIG_RAM(256 * 1024 + 2 * 1024 * 1024)
-	CONFIG_RAM(512 * 1024 + 2 * 1024 * 1024)
-	CONFIG_RAM(256 * 1024 + 3 * 1024 * 1024)
-	CONFIG_RAM(512 * 1024 + 3 * 1024 * 1024)
-	CONFIG_RAM(256 * 1024 + 4 * 1024 * 1024)
-	CONFIG_RAM(512 * 1024 + 4 * 1024 * 1024)
-SYSTEM_CONFIG_END
-
 /***************************************************************************
     GAME DRIVERS
 ***************************************************************************/
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     INIT  CONFIG    COMPANY                        FULLNAME     FLAGS */
-COMP( 1989, samcoupe, 0,      0,      samcoupe, samcoupe, 0,    samcoupe, "Miles Gordon Technology plc", "SAM Coupe", 0 )
+COMP( 1989, samcoupe, 0,      0,      samcoupe, samcoupe, 0,    0, "Miles Gordon Technology plc", "SAM Coupe", 0 )

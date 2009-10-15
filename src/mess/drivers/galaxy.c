@@ -29,6 +29,7 @@ Galaksija driver by Krzysztof Strzecha and Miodrag Milanovic
 #include "devices/cassette.h"
 #include "sound/ay8910.h"
 #include "formats/gtp_cas.h"
+#include "devices/messram.h"
 
 static ADDRESS_MAP_START (galaxyp_io, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0x01)
@@ -189,6 +190,11 @@ static MACHINE_DRIVER_START( galaxy )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_CASSETTE_ADD( "cassette", galaxy_cassette_config )
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("6K")
+	MDRV_RAM_EXTRA_OPTIONS("2K,22K,38K,54K")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( galaxyp )
@@ -223,6 +229,10 @@ static MACHINE_DRIVER_START( galaxyp )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MDRV_CASSETTE_ADD( "cassette", galaxy_cassette_config )
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("38K")
 MACHINE_DRIVER_END
 
 ROM_START (galaxy)
@@ -242,19 +252,6 @@ ROM_START (galaxyp)
 	ROM_LOAD ("galchr.bin", 0x0000, 0x0800, CRC(5c3b5bb5) SHA1(19429a61dc5e55ddec3242a8f695e06dd7961f88))
 ROM_END
 
-
-static SYSTEM_CONFIG_START(galaxy)
-	CONFIG_RAM(2 * 1024)
-	CONFIG_RAM_DEFAULT(6 * 1024)
-	CONFIG_RAM((6+16) * 1024)
-	CONFIG_RAM((6+32) * 1024)
-	CONFIG_RAM((6+48) * 1024)
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START(galaxyp)
-	CONFIG_RAM_DEFAULT((6+32) * 1024)
-SYSTEM_CONFIG_END
-
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY FULLNAME */
-COMP(1983,	galaxy,		0,		0,	galaxy,	galaxy,	galaxy,	galaxy,	"Elektronika inzenjering",			"Galaksija", 	  0)
-COMP(1985,	galaxyp,	galaxy,	0,	galaxyp,galaxyp,galaxyp,galaxyp,"Elektronika inzenjering",			"Galaksija plus", 0)
+COMP(1983,	galaxy,		0,		0,	galaxy,	galaxy,	galaxy,	0,	"Elektronika inzenjering",			"Galaksija", 	  0)
+COMP(1985,	galaxyp,	galaxy,	0,	galaxyp,galaxyp,galaxyp,0,"Elektronika inzenjering",			"Galaksija plus", 0)

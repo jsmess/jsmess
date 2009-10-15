@@ -186,6 +186,7 @@ Notes:
 #include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
 #include "devices/cassette.h"
+#include "devices/messram.h"
 
 /* Sound */
 
@@ -675,7 +676,7 @@ static MACHINE_START( osi600 )
 	memory_configure_bank(machine, 1, 0, 1, memory_region(machine, M6502_TAG), 0);
 	memory_set_bank(machine, 1, 0);
 
-	switch (mess_ram_size)
+	switch (messram_get_size(devtag_get_device(machine, "messram")))
 	{
 	case 4*1024:
 		memory_install_readwrite8_handler(program, 0x0000, 0x0fff, 0, 0, SMH_BANK(1), SMH_BANK(1));
@@ -705,7 +706,7 @@ static MACHINE_START( c1p )
 	memory_configure_bank(machine, 1, 0, 1, memory_region(machine, M6502_TAG), 0);
 	memory_set_bank(machine, 1, 0);
 
-	switch (mess_ram_size)
+	switch (messram_get_size(devtag_get_device(machine, "messram")))
 	{
 	case 8*1024:
 		memory_install_readwrite8_handler(program, 0x0000, 0x1fff, 0, 0, SMH_BANK(1), SMH_BANK(1));
@@ -779,6 +780,11 @@ static MACHINE_DRIVER_START( osi600 )
 
 	/* cassette */
 	MDRV_CASSETTE_ADD("cassette", default_cassette_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("4K")
+	MDRV_RAM_EXTRA_OPTIONS("8K")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( uk101 )
@@ -798,6 +804,11 @@ static MACHINE_DRIVER_START( uk101 )
 
 	/* cassette */
 	MDRV_CASSETTE_ADD("cassette", default_cassette_config)
+
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("4K")
+	MDRV_RAM_EXTRA_OPTIONS("8K")	
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( c1p )
@@ -829,6 +840,11 @@ static MACHINE_DRIVER_START( c1p )
 
 	/* cassette */
 	MDRV_CASSETTE_ADD("cassette", default_cassette_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("8K")
+	MDRV_RAM_EXTRA_OPTIONS("20K")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( c1pmf )
@@ -845,6 +861,10 @@ static MACHINE_DRIVER_START( c1pmf )
 	MDRV_ACIA6850_ADD("acia_1", osi470_acia_intf)
 
 	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, osi_floppy_config)
+	
+	/* internal ram */
+	MDRV_RAM_MODIFY("messram")
+	MDRV_RAM_DEFAULT_SIZE("20K")
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -890,32 +910,12 @@ static DRIVER_INIT( c1p )
 	timer_set(machine, attotime_zero, NULL, 0, setup_beep);
 }
 
-/* System Configuration */
-
-static SYSTEM_CONFIG_START( osi600 )
-	CONFIG_RAM_DEFAULT( 4 * 1024 )
-	CONFIG_RAM		  ( 8 * 1024 )
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START( uk101 )
-	CONFIG_RAM_DEFAULT( 4 * 1024 )
-	CONFIG_RAM		  ( 8 * 1024 )
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START( c1p )
-	CONFIG_RAM_DEFAULT( 8 * 1024 )
-	CONFIG_RAM		  (20 * 1024 )
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START( c1pmf )
-	CONFIG_RAM_DEFAULT(20 * 1024 )
-SYSTEM_CONFIG_END
 
 /* System Drivers */
 
 //    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    CONFIG      COMPANY            FULLNAME
-COMP( 1978, sb2m600b,	0,			0,		osi600,		osi600,		0, 		osi600,		"Ohio Scientific", "Superboard II Model 600 (Rev. B)", 0)
-//COMP( 1980, sb2m600c, 0,          0,      osi600c,    osi600,     0,      osi600,     "Ohio Scientific", "Superboard II Model 600 (Rev. C)", 0)
-COMP( 1980, c1p,		sb2m600b,	0,		c1p,		osi600,		c1p,	c1p,		"Ohio Scientific", "Challenger 1P Series 2", GAME_NOT_WORKING)
-COMP( 1980, c1pmf,		sb2m600b,	0,		c1pmf,		osi600,		c1p,	c1pmf,		"Ohio Scientific", "Challenger 1P MF Series 2", GAME_NOT_WORKING)
-COMP( 1979,	uk101,		sb2m600b,	0,		uk101,		uk101,		0, 		uk101,		"Compukit",        "UK101", GAME_NOT_WORKING)
+COMP( 1978, sb2m600b,	0,			0,		osi600,		osi600,		0, 		0,		"Ohio Scientific", "Superboard II Model 600 (Rev. B)", 0)
+//COMP( 1980, sb2m600c, 0,          0,      osi600c,    osi600,     0,      0,     "Ohio Scientific", "Superboard II Model 600 (Rev. C)", 0)
+COMP( 1980, c1p,		sb2m600b,	0,		c1p,		osi600,		c1p,	0,		"Ohio Scientific", "Challenger 1P Series 2", GAME_NOT_WORKING)
+COMP( 1980, c1pmf,		sb2m600b,	0,		c1pmf,		osi600,		c1p,	0,		"Ohio Scientific", "Challenger 1P MF Series 2", GAME_NOT_WORKING)
+COMP( 1979,	uk101,		sb2m600b,	0,		uk101,		uk101,		0, 		0,		"Compukit",        "UK101", GAME_NOT_WORKING)

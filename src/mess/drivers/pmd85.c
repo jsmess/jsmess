@@ -178,6 +178,7 @@ I/O ports
 #include "machine/pit8253.h"
 #include "machine/msm8251.h"
 #include "formats/pmd_pmd.h"
+#include "devices/messram.h"
 
 /* I/O ports */
 
@@ -575,6 +576,10 @@ static MACHINE_DRIVER_START( pmd85 )
 
 	/* uart */
 	MDRV_MSM8251_ADD("uart", default_msm8251_interface)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("64K")	
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( pmd851 )
@@ -697,18 +702,12 @@ ROM_START(c2717)
 	ROM_LOAD("c2717.rom", 0x10000, 0x4000, CRC(da1703b1) SHA1(9fb93e6cae8b551064c7175bf3b4e3113429ce73))
 ROM_END
 
-
-static SYSTEM_CONFIG_START(pmd85)
-	CONFIG_RAM_DEFAULT(64 * 1024)
-SYSTEM_CONFIG_END
-
-
 /*    YEAR  NAME     PARENT  COMPAT MACHINE  INPUT  INIT      CONFIG COMPANY  FULLNAME */
-COMP( 1985, pmd851,  0,      0,		pmd851,  pmd85, pmd851,   pmd85, "Tesla", "PMD-85.1" , 0)
-COMP( 1985, pmd852,  pmd851, 0,		pmd851,  pmd85, pmd851,   pmd85, "Tesla", "PMD-85.2" , 0)
-COMP( 1985, pmd852a, pmd851, 0,		pmd852a, pmd85, pmd852a,  pmd85, "Tesla", "PMD-85.2A" , 0)
-COMP( 1985, pmd852b, pmd851, 0,		pmd852a, pmd85, pmd852a,  pmd85, "Tesla", "PMD-85.2B" , 0)
-COMP( 1988, pmd853,  pmd851, 0,		pmd853,  pmd85, pmd853,   pmd85, "Tesla", "PMD-85.3" , 0)
-COMP( 1986, alfa,    pmd851, 0,		alfa,    alfa,  alfa,     pmd85, "Didaktik", "Alfa" , 0)
-COMP( 1985, mato,    pmd851, 0,		mato,    mato,  mato,     pmd85, "Statny", "Mato" , 0)
-COMP( 1989, c2717,   pmd851, 0,		c2717,   pmd85, c2717,    pmd85, "Zbrojovka Brno", "Consul 2717" , 0)
+COMP( 1985, pmd851,  0,      0,		pmd851,  pmd85, pmd851,   0, "Tesla", "PMD-85.1" , 0)
+COMP( 1985, pmd852,  pmd851, 0,		pmd851,  pmd85, pmd851,   0, "Tesla", "PMD-85.2" , 0)
+COMP( 1985, pmd852a, pmd851, 0,		pmd852a, pmd85, pmd852a,  0, "Tesla", "PMD-85.2A" , 0)
+COMP( 1985, pmd852b, pmd851, 0,		pmd852a, pmd85, pmd852a,  0, "Tesla", "PMD-85.2B" , 0)
+COMP( 1988, pmd853,  pmd851, 0,		pmd853,  pmd85, pmd853,   0, "Tesla", "PMD-85.3" , 0)
+COMP( 1986, alfa,    pmd851, 0,		alfa,    alfa,  alfa,     0, "Didaktik", "Alfa" , 0)
+COMP( 1985, mato,    pmd851, 0,		mato,    mato,  mato,     0, "Statny", "Mato" , 0)
+COMP( 1989, c2717,   pmd851, 0,		c2717,   pmd85, c2717,    0, "Zbrojovka Brno", "Consul 2717" , 0)

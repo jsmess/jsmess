@@ -80,6 +80,7 @@
 #include "machine/msm8251.h"
 #include "video/hd61830.h"
 #include "sound/speaker.h"
+#include "devices/messram.h"
 
 static const device_config *cassette_device_image(running_machine *machine)
 {
@@ -137,7 +138,7 @@ static void pc8201_bankswitch(running_machine *machine, UINT8 data)
 	switch (ram_bank)
 	{
 	case 0:
-		if (mess_ram_size > 16 * 1024)
+		if (messram_get_size(devtag_get_device(machine, "messram")) > 16 * 1024)
 		{
 			memory_install_readwrite8_handler(program, 0x8000, 0xffff, 0, 0, SMH_BANK(2), SMH_BANK(2));
 		}
@@ -153,14 +154,14 @@ static void pc8201_bankswitch(running_machine *machine, UINT8 data)
 		break;
 
 	case 2:
-		if (mess_ram_size > 32 * 1024)
+		if (messram_get_size(devtag_get_device(machine, "messram")) > 32 * 1024)
 			memory_install_readwrite8_handler(program, 0x8000, 0xffff, 0, 0, SMH_BANK(2), SMH_BANK(2));
 		else
 			memory_install_readwrite8_handler(program, 0x8000, 0xffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 		break;
 
 	case 3:
-		if (mess_ram_size > 64 * 1024)
+		if (messram_get_size(devtag_get_device(machine, "messram")) > 64 * 1024)
 			memory_install_readwrite8_handler(program, 0x8000, 0xffff, 0, 0, SMH_BANK(2), SMH_BANK(2));
 		else
 			memory_install_readwrite8_handler(program, 0x8000, 0xffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
@@ -427,7 +428,7 @@ static WRITE8_HANDLER( tandy200_bank_w )
 		memory_set_bank(space->machine, 1, rom_bank);
 	}
 
-	if (mess_ram_size < ((ram_bank + 1) * 24 * 1024))
+	if (messram_get_size(devtag_get_device(space->machine, "messram")) < ((ram_bank + 1) * 24 * 1024))
 	{
 		/* invalid RAM bank */
 		memory_install_readwrite8_handler(program, 0xa000, 0xffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
@@ -1134,7 +1135,7 @@ static MACHINE_START( kc85 )
 	memory_set_bank(machine, 1, 0);
 
 	/* configure RAM banking */
-	switch (mess_ram_size)
+	switch (messram_get_size(devtag_get_device(machine, "messram")))
 	{
 	case 16 * 1024:
 		memory_install_readwrite8_handler(program, 0x8000, 0xbfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
@@ -1146,7 +1147,7 @@ static MACHINE_START( kc85 )
 		break;
 	}
 
-	memory_configure_bank(machine, 2, 0, 1, mess_ram, 0);
+	memory_configure_bank(machine, 2, 0, 1, messram_get_ptr(devtag_get_device(machine, "messram")), 0);
 	memory_set_bank(machine, 2, 0);
 
 	/* register for state saving */
@@ -1174,12 +1175,12 @@ static MACHINE_START( pc8201 )
 	/* configure ROM banking */
 	memory_configure_bank(machine, 1, 0, 1, memory_region(machine, I8085_TAG), 0);
 	memory_configure_bank(machine, 1, 1, 1, memory_region(machine, "option"), 0);
-	memory_configure_bank(machine, 1, 2, 2, mess_ram + 0x8000, 0x8000);
+	memory_configure_bank(machine, 1, 2, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x8000, 0x8000);
 	memory_set_bank(machine, 1, 0);
 
 	/* configure RAM banking */
-	memory_configure_bank(machine, 2, 0, 1, mess_ram, 0);
-	memory_configure_bank(machine, 2, 2, 2, mess_ram + 0x8000, 0x8000);
+	memory_configure_bank(machine, 2, 0, 1, messram_get_ptr(devtag_get_device(machine, "messram")), 0);
+	memory_configure_bank(machine, 2, 2, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x8000, 0x8000);
 	memory_set_bank(machine, 2, 0);
 
 	pc8201_bankswitch(machine, 0);
@@ -1216,7 +1217,7 @@ static MACHINE_START( trsm100 )
 	memory_set_bank(machine, 1, 0);
 
 	/* configure RAM banking */
-	switch (mess_ram_size)
+	switch (messram_get_size(devtag_get_device(machine, "messram")))
 	{
 	case 8 * 1024:
 		memory_install_readwrite8_handler(program, 0x8000, 0xcfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
@@ -1238,7 +1239,7 @@ static MACHINE_START( trsm100 )
 		break;
 	}
 
-	memory_configure_bank(machine, 2, 0, 1, mess_ram, 0);
+	memory_configure_bank(machine, 2, 0, 1, messram_get_ptr(devtag_get_device(machine, "messram")), 0);
 	memory_set_bank(machine, 2, 0);
 
 	/* register for state saving */
@@ -1265,7 +1266,7 @@ static MACHINE_START( tandy200 )
 	memory_set_bank(machine, 1, 0);
 
 	/* configure RAM banking */
-	memory_configure_bank(machine, 2, 0, 3, mess_ram, 0x6000);
+	memory_configure_bank(machine, 2, 0, 3, messram_get_ptr(devtag_get_device(machine, "messram")), 0x6000);
 	memory_set_bank(machine, 2, 0);
 
 	/* register for state saving */
@@ -1343,6 +1344,11 @@ static MACHINE_DRIVER_START( kc85 )
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("rom,bin")
 	MDRV_CARTSLOT_NOT_MANDATORY
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("16K")
+	MDRV_RAM_EXTRA_OPTIONS("32K")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( pc8201 )
@@ -1378,6 +1384,11 @@ static MACHINE_DRIVER_START( pc8201 )
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("rom,bin")
 	MDRV_CARTSLOT_NOT_MANDATORY
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("16K")
+	MDRV_RAM_EXTRA_OPTIONS("32K,64K,96K")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( trsm100 )
@@ -1391,7 +1402,21 @@ static MACHINE_DRIVER_START( trsm100 )
 
 	/* devices */
 //  MDRV_MC14412_ADD(MC14412_TAG, XTAL_1MHz)
+
+	/* internal ram */
+	MDRV_RAM_MODIFY("messram")
+	MDRV_RAM_DEFAULT_SIZE("8K")
+	MDRV_RAM_EXTRA_OPTIONS("16K,24K,32K")
 MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( tandy102 )
+	MDRV_IMPORT_FROM(trsm100)
+
+	MDRV_RAM_MODIFY("messram")
+	MDRV_RAM_DEFAULT_SIZE("24K")
+	MDRV_RAM_EXTRA_OPTIONS("32K")
+MACHINE_DRIVER_END
+
 
 static MACHINE_DRIVER_START( tandy200 )
 	MDRV_DRIVER_DATA(tandy200_state)
@@ -1432,6 +1457,11 @@ static MACHINE_DRIVER_START( tandy200 )
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("rom,bin")
 	MDRV_CARTSLOT_NOT_MANDATORY
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("24K")
+	MDRV_RAM_EXTRA_OPTIONS("48K,72K")
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -1496,48 +1526,14 @@ ROM_START( tandy200 )
 	ROM_CART_LOAD("cart", 0x0000, 0x8000, ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
-/* System Configurations */
-
-static SYSTEM_CONFIG_START( kc85 )
-	CONFIG_RAM_DEFAULT	(16 * 1024)
-	CONFIG_RAM			(32 * 1024)
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START( pc8201 )
-	CONFIG_RAM_DEFAULT	(16 * 1024)
-	CONFIG_RAM			(32 * 1024)
-//  CONFIG_RAM          (48 * 1024)
-	CONFIG_RAM			(64 * 1024)
-	CONFIG_RAM			(96 * 1024)
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START( trsm100 )
-	CONFIG_RAM_DEFAULT	( 8 * 1024)
-	CONFIG_RAM			(16 * 1024)
-	CONFIG_RAM			(24 * 1024)
-	CONFIG_RAM			(32 * 1024)
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START( tandy102 )
-	CONFIG_RAM_DEFAULT	(24 * 1024)
-	CONFIG_RAM			(32 * 1024)
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START( tandy200 )
-	CONFIG_RAM_DEFAULT	(24 * 1024)
-	CONFIG_RAM			(48 * 1024)
-	CONFIG_RAM			(72 * 1024)
-SYSTEM_CONFIG_END
-
 /* System Drivers */
-
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    CONFIG      COMPANY                 FULLNAME */
-COMP( 1983,	kc85,		0,		0,		kc85,		kc85,		0,		kc85,		"Kyosei",				"Kyotronic 85 (Japan)", 0 )
-COMP( 1983, olivm10,	kc85,	0,		kc85,		olivm10,	0,		kc85,		"Olivetti",				"M-10", 0 )
-//COMP( 1983, olivm10m, kc85,   0,      kc85,       olivm10,    0,      kc85,       "Olivetti",             "M-10 Modem (US)", 0 )
-COMP( 1983, trsm100,	0,		0,		trsm100,	kc85,		0,		trsm100,	"Tandy Radio Shack",	"TRS-80 Model 100", 0 )
-COMP( 1986, tandy102,	trsm100,0,		trsm100,	kc85,		0,		tandy102,	"Tandy Radio Shack",	"Tandy 102", 0 )
-//COMP( 1983, npc8201,  0,      0,      pc8201,     pc8201a,    0,      pc8201,     "NEC",                  "PC-8201 (Japan)", 0 )
-COMP( 1983, npc8201a,	0,		0,		pc8201,		pc8201a,	0,		pc8201,		"NEC",					"PC-8201A", 0 )
-//COMP( 1987, npc8300,  npc8201,0,      pc8300,     pc8300,     0,      pc8300,     "NEC",                  "PC-8300", 0 )
-COMP( 1984, tandy200,	0,		0,		tandy200,	kc85,		0,		tandy200,	"Tandy Radio Shack",	"Tandy 200", 0 )
+COMP( 1983,	kc85,		0,		0,		kc85,		kc85,		0,		0,		"Kyosei",				"Kyotronic 85 (Japan)", 0 )
+COMP( 1983, olivm10,	kc85,	0,		kc85,		olivm10,	0,		0,		"Olivetti",				"M-10", 0 )
+//COMP( 1983, olivm10m, kc85,   0,      kc85,       olivm10,    0,      0,       "Olivetti",             "M-10 Modem (US)", 0 )
+COMP( 1983, trsm100,	0,		0,		trsm100,	kc85,		0,		0,	"Tandy Radio Shack",	"TRS-80 Model 100", 0 )
+COMP( 1986, tandy102,	trsm100,0,		tandy102,	kc85,		0,		0,	"Tandy Radio Shack",	"Tandy 102", 0 )
+//COMP( 1983, npc8201,  0,      0,      pc8201,     pc8201a,    0,      0,     "NEC",                  "PC-8201 (Japan)", 0 )
+COMP( 1983, npc8201a,	0,		0,		pc8201,		pc8201a,	0,		0,		"NEC",					"PC-8201A", 0 )
+//COMP( 1987, npc8300,  npc8201,0,      pc8300,     pc8300,     0,      0,     "NEC",                  "PC-8300", 0 )
+COMP( 1984, tandy200,	0,		0,		tandy200,	kc85,		0,		0,	"Tandy Radio Shack",	"Tandy 200", 0 )

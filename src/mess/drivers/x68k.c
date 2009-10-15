@@ -134,6 +134,7 @@
 #include "devices/harddriv.h"
 #include "machine/x68k_hdc.h"
 #include "includes/x68k.h"
+#include "devices/messram.h"
 #include "x68000.lh"
 
 struct x68k_system x68k_sys;
@@ -1510,7 +1511,7 @@ static READ16_HANDLER( x68k_sram_r )
 //  if(offset == 0x5a/2)  // 0x5a should be 0 if no SASI HDs are present.
 //      return 0x0000;
 	if(offset == 0x08/2)
-		return mess_ram_size >> 16;  // RAM size
+		return messram_get_size(devtag_get_device(space->machine, "messram")) >> 16;  // RAM size
 	/*if(offset == 0x46/2)
         return 0x0024;
     if(offset == 0x6e/2)
@@ -1523,7 +1524,7 @@ static READ16_HANDLER( x68k_sram_r )
 static READ32_HANDLER( x68k_sram32_r )
 {
 	if(offset == 0x08/4)
-		return (mess_ram_size & 0xffff0000);  // RAM size
+		return (messram_get_size(devtag_get_device(space->machine, "messram")) & 0xffff0000);  // RAM size
 	/*if(offset == 0x46/2)
         return 0x0024;
     if(offset == 0x6e/2)
@@ -1647,28 +1648,28 @@ static TIMER_CALLBACK(x68k_fake_bus_error)
 		v = 0x09;
 
 	// rather hacky, but this generally works for programs that check for MIDI hardware
-	if(mess_ram[v] != 0x02)  // normal vector for bus errors points to 02FF0540
+	if(messram_get_ptr(devtag_get_device(machine, "messram"))[v] != 0x02)  // normal vector for bus errors points to 02FF0540
 	{
-		int addr = (mess_ram[0x09] << 24) | (mess_ram[0x08] << 16) |(mess_ram[0x0b] << 8) | mess_ram[0x0a];
+		int addr = (messram_get_ptr(devtag_get_device(machine, "messram"))[0x09] << 24) | (messram_get_ptr(devtag_get_device(machine, "messram"))[0x08] << 16) |(messram_get_ptr(devtag_get_device(machine, "messram"))[0x0b] << 8) | messram_get_ptr(devtag_get_device(machine, "messram"))[0x0a];
 		int sp = cpu_get_reg(cputag_get_cpu(machine, "maincpu"), REG_GENSP);
 		int pc = cpu_get_reg(cputag_get_cpu(machine, "maincpu"), REG_GENPC);
 		int sr = cpu_get_reg(cputag_get_cpu(machine, "maincpu"), M68K_SR);
 		//int pda = cpu_get_reg(cputag_get_cpu(machine, "maincpu"), M68K_PREF_DATA);
 		if(strcmp(machine->gamedrv->name,"x68030") == 0)
 		{  // byte order varies on the 68030
-			addr = (mess_ram[0x0b] << 24) | (mess_ram[0x0a] << 16) |(mess_ram[0x09] << 8) | mess_ram[0x08];
+			addr = (messram_get_ptr(devtag_get_device(machine, "messram"))[0x0b] << 24) | (messram_get_ptr(devtag_get_device(machine, "messram"))[0x0a] << 16) |(messram_get_ptr(devtag_get_device(machine, "messram"))[0x09] << 8) | messram_get_ptr(devtag_get_device(machine, "messram"))[0x08];
 		}
 		cpu_set_reg(cputag_get_cpu(machine, "maincpu"), REG_GENSP, sp - 14);
-		mess_ram[sp-11] = (val & 0xff000000) >> 24;
-		mess_ram[sp-12] = (val & 0x00ff0000) >> 16;
-		mess_ram[sp-9] = (val & 0x0000ff00) >> 8;
-		mess_ram[sp-10] = (val & 0x000000ff);  // place address onto the stack
-		mess_ram[sp-3] = (pc & 0xff000000) >> 24;
-		mess_ram[sp-4] = (pc & 0x00ff0000) >> 16;
-		mess_ram[sp-1] = (pc & 0x0000ff00) >> 8;
-		mess_ram[sp-2] = (pc & 0x000000ff);  // place PC onto the stack
-		mess_ram[sp-5] = (sr & 0xff00) >> 8;
-		mess_ram[sp-6] = (sr & 0x00ff);  // place SR onto the stack
+		messram_get_ptr(devtag_get_device(machine, "messram"))[sp-11] = (val & 0xff000000) >> 24;
+		messram_get_ptr(devtag_get_device(machine, "messram"))[sp-12] = (val & 0x00ff0000) >> 16;
+		messram_get_ptr(devtag_get_device(machine, "messram"))[sp-9] = (val & 0x0000ff00) >> 8;
+		messram_get_ptr(devtag_get_device(machine, "messram"))[sp-10] = (val & 0x000000ff);  // place address onto the stack
+		messram_get_ptr(devtag_get_device(machine, "messram"))[sp-3] = (pc & 0xff000000) >> 24;
+		messram_get_ptr(devtag_get_device(machine, "messram"))[sp-4] = (pc & 0x00ff0000) >> 16;
+		messram_get_ptr(devtag_get_device(machine, "messram"))[sp-1] = (pc & 0x0000ff00) >> 8;
+		messram_get_ptr(devtag_get_device(machine, "messram"))[sp-2] = (pc & 0x000000ff);  // place PC onto the stack
+		messram_get_ptr(devtag_get_device(machine, "messram"))[sp-5] = (sr & 0xff00) >> 8;
+		messram_get_ptr(devtag_get_device(machine, "messram"))[sp-6] = (sr & 0x00ff);  // place SR onto the stack
 		cpu_set_reg(cputag_get_cpu(machine, "maincpu"), REG_GENPC, addr);  // real exceptions seem to take too long to be acknowledged
 		popmessage("Expansion access [%08x]: PC jump to %08x", val, addr);
 	}
@@ -2369,8 +2370,8 @@ static MACHINE_RESET( x68000 )
 	UINT8* romdata = memory_region(machine, "user2");
 	attotime irq_time;
 
-	memset(mess_ram,0,mess_ram_size);
-	memcpy(mess_ram,romdata,8);
+	memset(messram_get_ptr(devtag_get_device(machine, "messram")),0,messram_get_size(devtag_get_device(machine, "messram")));
+	memcpy(messram_get_ptr(devtag_get_device(machine, "messram")),romdata,8);
 
 	// init keyboard
 	x68k_sys.keyboard.delay = 500;  // 3*100+200
@@ -2436,9 +2437,9 @@ static MACHINE_START( x68000 )
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	/*  Install RAM handlers  */
 	x68k_spriteram = (UINT16*)memory_region(machine, "user1");
-	memory_install_read16_handler(space,0x000000,mess_ram_size-1,mess_ram_size-1,0,(read16_space_func)1);
-	memory_install_write16_handler(space,0x000000,mess_ram_size-1,mess_ram_size-1,0,(write16_space_func)1);
-	memory_set_bankptr(machine, 1,mess_ram);
+	memory_install_read16_handler(space,0x000000,messram_get_size(devtag_get_device(machine, "messram"))-1,messram_get_size(devtag_get_device(machine, "messram"))-1,0,(read16_space_func)1);
+	memory_install_write16_handler(space,0x000000,messram_get_size(devtag_get_device(machine, "messram"))-1,messram_get_size(devtag_get_device(machine, "messram"))-1,0,(write16_space_func)1);
+	memory_set_bankptr(machine, 1,messram_get_ptr(devtag_get_device(machine, "messram")));
 	memory_install_read16_handler(space,0xc00000,0xdfffff,0x3fffff,0,x68k_gvram_r);
 	memory_install_write16_handler(space,0xc00000,0xdfffff,0x3fffff,0,x68k_gvram_w);
 	memory_set_bankptr(machine, 2,x68k_gvram);  // so that code in VRAM is executable - needed for Terra Cresta
@@ -2465,12 +2466,12 @@ static MACHINE_START( x68030 )
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	/*  Install RAM handlers  */
 	x68k_spriteram = (UINT16*)memory_region(machine, "user1");
-	memory_install_read32_handler(space,0x000000,mess_ram_size-1,mess_ram_size-1,0,(read32_space_func)1);
-	memory_install_write32_handler(space,0x000000,mess_ram_size-1,mess_ram_size-1,0,(write32_space_func)1);
+	memory_install_read32_handler(space,0x000000,messram_get_size(devtag_get_device(machine, "messram"))-1,messram_get_size(devtag_get_device(machine, "messram"))-1,0,(read32_space_func)1);
+	memory_install_write32_handler(space,0x000000,messram_get_size(devtag_get_device(machine, "messram"))-1,messram_get_size(devtag_get_device(machine, "messram"))-1,0,(write32_space_func)1);
 	// mirror? Human68k 3.02 explicitly adds 0x3000000 to some pointers
-	memory_install_read32_handler(space,0x3000000,0x3000000+mess_ram_size-1,mess_ram_size-1,0,(read32_space_func)1);
-	memory_install_write32_handler(space,0x3000000,0x3000000+mess_ram_size-1,mess_ram_size-1,0,(write32_space_func)1);
-	memory_set_bankptr(machine, 1,mess_ram);
+	memory_install_read32_handler(space,0x3000000,0x3000000+messram_get_size(devtag_get_device(machine, "messram"))-1,messram_get_size(devtag_get_device(machine, "messram"))-1,0,(read32_space_func)1);
+	memory_install_write32_handler(space,0x3000000,0x3000000+messram_get_size(devtag_get_device(machine, "messram"))-1,messram_get_size(devtag_get_device(machine, "messram"))-1,0,(write32_space_func)1);
+	memory_set_bankptr(machine, 1,messram_get_ptr(devtag_get_device(machine, "messram")));
 	memory_install_read32_handler(space,0xc00000,0xdfffff,0x3fffff,0,x68k_gvram32_r);
 	memory_install_write32_handler(space,0xc00000,0xdfffff,0x3fffff,0,x68k_gvram32_w);
 	memory_set_bankptr(machine, 2,x68k_gvram);  // so that code in VRAM is executable - needed for Terra Cresta
@@ -2591,6 +2592,11 @@ static MACHINE_DRIVER_START( x68000 )
 
 	MDRV_NEC72065_ADD("nec72065", fdc_interface)
 	MDRV_FLOPPY_4_DRIVES_ADD(x68k_floppy_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("4M")
+	MDRV_RAM_EXTRA_OPTIONS("1M,2M,3M,5M,6M,7M,8M,9M,10M,11M,12M")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( x68kxvi )
@@ -2608,22 +2614,6 @@ static MACHINE_DRIVER_START( x68030 )
 	MDRV_MACHINE_START( x68030 )
 	MDRV_MACHINE_RESET( x68000 )
 MACHINE_DRIVER_END
-
-
-static SYSTEM_CONFIG_START(x68000)
-	CONFIG_RAM(0x100000)
-	CONFIG_RAM(0x200000)
-	CONFIG_RAM(0x300000)
-	CONFIG_RAM_DEFAULT(0x400000)  // 4MB - should be enough for most things
-	CONFIG_RAM(0x500000)
-	CONFIG_RAM(0x600000)
-	CONFIG_RAM(0x700000)
-	CONFIG_RAM(0x800000)
-	CONFIG_RAM(0x900000)
-	CONFIG_RAM(0xa00000)
-	CONFIG_RAM(0xb00000)
-	CONFIG_RAM(0xc00000)  // 12MB - maximum possible
-SYSTEM_CONFIG_END
 
 ROM_START( x68000 )
 	ROM_REGION16_BE(0x1000000, "maincpu", 0)  // 16MB address space
@@ -2685,6 +2675,6 @@ ROM_END
 
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY     FULLNAME        FLAGS */
-COMP( 1987, x68000, 0,      0,      x68000, x68000, x68000, x68000, "Sharp",    "X68000", GAME_IMPERFECT_GRAPHICS )
-COMP( 1991, x68kxvi,x68000, 0,      x68kxvi,x68000, x68000, x68000, "Sharp",    "X68000 XVI", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
-COMP( 1993, x68030, x68000, 0,      x68030, x68000, x68030, x68000, "Sharp",    "X68030", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
+COMP( 1987, x68000, 0,      0,      x68000, x68000, x68000, 0, "Sharp",    "X68000", GAME_IMPERFECT_GRAPHICS )
+COMP( 1991, x68kxvi,x68000, 0,      x68kxvi,x68000, x68000, 0, "Sharp",    "X68000 XVI", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
+COMP( 1993, x68030, x68000, 0,      x68030, x68000, x68030, 0, "Sharp",    "X68030", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )

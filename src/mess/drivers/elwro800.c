@@ -35,6 +35,7 @@
 #include "devices/flopdrv.h"
 #include "devices/cassette.h"
 #include "formats/tzx_cas.h"
+#include "devices/messram.h"
 
 /*************************************
  *
@@ -95,7 +96,7 @@ static void elwro800jr_mmu_w(running_machine *machine, UINT8 data)
 	else
 	{
 		// RAM
-		memory_set_bankptr(machine, 1, mess_ram);
+		memory_set_bankptr(machine, 1, messram_get_ptr(devtag_get_device(machine, "messram")));
 		memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, SMH_BANK(1));
 	}
 
@@ -107,18 +108,18 @@ static void elwro800jr_mmu_w(running_machine *machine, UINT8 data)
 	}
 	else
 	{
-		memory_set_bankptr(machine, 2, mess_ram + 0x2000); /* RAM */
+		memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x2000); /* RAM */
 		memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x2000, 0x3fff, 0, 0, SMH_BANK(2));
 	}
 
 	if (BIT(ls175,2))
 	{
 		// relok
-		spectrum_screen_location = mess_ram + 0xe000;
+		spectrum_screen_location = messram_get_ptr(devtag_get_device(machine, "messram")) + 0xe000;
 	}
 	else
 	{
-		spectrum_screen_location = mess_ram + 0x4000;
+		spectrum_screen_location = messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000;
 	}
 
 	if (BIT(ls175,3))
@@ -453,9 +454,9 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(elwro800)
 {
-	memset(mess_ram, 0, 64*1024);
+	memset(messram_get_ptr(devtag_get_device(machine, "messram")), 0, 64*1024);
 
-	memory_set_bankptr(machine, 3, mess_ram + 0x4000);
+	memory_set_bankptr(machine, 3, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000);
 
 	// this is a reset of ls175 in mmu
 	elwro800jr_mmu_w(machine, 0);
@@ -526,11 +527,11 @@ static MACHINE_DRIVER_START( elwro800 )
 	MDRV_CASSETTE_ADD( "cassette", elwro800jr_cassette_config )
 
 	MDRV_FLOPPY_2_DRIVES_ADD(elwro800jr_floppy_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("64K")	
 MACHINE_DRIVER_END
-
-static SYSTEM_CONFIG_START(elwro800)
-	CONFIG_RAM_DEFAULT(64 * 1024)
-SYSTEM_CONFIG_END
 
 /*************************************
  *
@@ -552,4 +553,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( 1986, elwro800,  0,       0, 	elwro800, 	elwro800, 	 0,  	  elwro800,  	 "Elwro",   "800 Junior",		0)
+COMP( 1986, elwro800,  0,       0, 	elwro800, 	elwro800, 	 0,  	  0,  	 "Elwro",   "800 Junior",		0)

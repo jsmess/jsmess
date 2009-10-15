@@ -12,7 +12,7 @@
 #include "includes/pc1251.h"
 #include "includes/pc1350.h"
 #include "includes/pc1403.h"
-
+#include "devices/messram.h"
 
 /* pc1430 no peek poke operations! */
 
@@ -864,8 +864,12 @@ static MACHINE_DRIVER_START( pc1350 )
 	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 252-1)
 
 	MDRV_VIDEO_UPDATE( pc1350 )
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("4K")
+	MDRV_RAM_EXTRA_OPTIONS("12K,20K")	
 MACHINE_DRIVER_END
-
 
 static const sc61860_cpu_core pc1403_config =
 {
@@ -965,16 +969,6 @@ ROM_END
 #define io_pc1403 io_pc1401
 #define io_pc1403h io_pc1403
 
-static SYSTEM_CONFIG_START(pocketc)
-//  CONFIG_DEVICE_CASSETTE(1, "", mycas_init)
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START(pc1350)
-//  CONFIG_DEVICE_CASSETTE(1, "", mycas_init)
-	CONFIG_RAM_DEFAULT(4 * 1024)
-	CONFIG_RAM(12 * 1024)
-	CONFIG_RAM(20 * 1024)
-SYSTEM_CONFIG_END
 
 /*    YEAR  NAME      PARENT    MACHINE   INPUT     INIT      MONITOR   COMPANY   FULLNAME */
 
@@ -992,21 +986,21 @@ SYSTEM_CONFIG_END
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG      COMPANY     FULLNAME */
 /* cpu sc61860 */
-COMP( 1982, pc1245,	0,		0,	pc1250,	pc1251,	pc1251,	pocketc, "Sharp", "Pocket Computer 1245", GAME_NOT_WORKING )
-COMP( 1982, pc1250,	0,		0,	pc1250,	pc1251,	pc1251,	pocketc, "Sharp", "Pocket Computer 1250", 0 )
-COMP( 1982, pc1251,	pc1250,	0,	pc1251,	pc1251,	pc1251,	pocketc, "Sharp", "Pocket Computer 1251", 0 )
-COMP( 1982, pc1255,	pc1250,	0,	pc1255,	pc1251,	pc1251,	pocketc, "Sharp", "Pocket Computer 1255", 0 )
-COMP( 198?, trs80pc3,pc1250,0,	pc1251,	pc1251,	pc1251,	pocketc, "Tandy", "TRS80 PC-3", 0 )
+COMP( 1982, pc1245,	0,		0,	pc1250,	pc1251,	pc1251,	0, "Sharp", "Pocket Computer 1245", GAME_NOT_WORKING )
+COMP( 1982, pc1250,	0,		0,	pc1250,	pc1251,	pc1251,	0, "Sharp", "Pocket Computer 1250", 0 )
+COMP( 1982, pc1251,	pc1250,	0,	pc1251,	pc1251,	pc1251,	0, "Sharp", "Pocket Computer 1251", 0 )
+COMP( 1982, pc1255,	pc1250,	0,	pc1255,	pc1251,	pc1251,	0, "Sharp", "Pocket Computer 1255", 0 )
+COMP( 198?, trs80pc3,pc1250,0,	pc1251,	pc1251,	pc1251,	0, "Tandy", "TRS80 PC-3", 0 )
 
-COMP( 1982, pc1260,	0,		0,	pc1260,	pc1251,	pc1251,	pocketc, "Sharp", "Pocket Computer 1260", GAME_NOT_WORKING )
-COMP( 1982, pc1261,	pc1260,	0,	pc1261,	pc1251,	pc1251,	pocketc, "Sharp", "Pocket Computer 1261/1262", GAME_NOT_WORKING )
+COMP( 1982, pc1260,	0,		0,	pc1260,	pc1251,	pc1251,	0, "Sharp", "Pocket Computer 1260", GAME_NOT_WORKING )
+COMP( 1982, pc1261,	pc1260,	0,	pc1261,	pc1251,	pc1251,	0, "Sharp", "Pocket Computer 1261/1262", GAME_NOT_WORKING )
 
 /* pc1261/pc1262 */
-COMP( 1984, pc1350,	0,		0,	pc1350,	pc1350,	0,	pc1350,	 "Sharp", "Pocket Computer 1350", 0 )
+COMP( 1984, pc1350,	0,		0,	pc1350,	pc1350,	0,	0,	 "Sharp", "Pocket Computer 1350", 0 )
 
-COMP( 1983, pc1401,	0,		0,	pc1401,	pc1401,	pc1401,	pocketc, "Sharp", "Pocket Computer 1401", 0 )
-COMP( 1984, pc1402,	pc1401,	0,	pc1401,	pc1402,	pc1401,	pocketc, "Sharp", "Pocket Computer 1402", 0 )
+COMP( 1983, pc1401,	0,		0,	pc1401,	pc1401,	pc1401,	0, "Sharp", "Pocket Computer 1401", 0 )
+COMP( 1984, pc1402,	pc1401,	0,	pc1401,	pc1402,	pc1401,	0, "Sharp", "Pocket Computer 1402", 0 )
 
 /* 72kb rom, 32kb ram, cpu? pc1360 */
-COMP( 198?, pc1403,	0,	0,	pc1403,	pc1403,	pc1403,	pocketc, "Sharp", "Pocket Computer 1403", GAME_NOT_WORKING)
-COMP( 198?, pc1403h,	pc1403,	0,	pc1403,	pc1403h,pc1403,	pocketc, "Sharp", "Pocket Computer 1403H", GAME_NOT_WORKING)
+COMP( 198?, pc1403,	0,	0,	pc1403,	pc1403,	pc1403,	0, "Sharp", "Pocket Computer 1403", GAME_NOT_WORKING)
+COMP( 198?, pc1403h,	pc1403,	0,	pc1403,	pc1403h,pc1403,	0, "Sharp", "Pocket Computer 1403H", GAME_NOT_WORKING)

@@ -122,6 +122,7 @@ Notes:
 #include "machine/wd17xx.h"
 #include "video/mc6845.h"
 #include "sound/discrete.h"
+#include "devices/messram.h"
 
 INLINE const device_config *get_floppy_image(running_machine *machine, int drive)
 {
@@ -1122,22 +1123,22 @@ static MACHINE_START( v1050 )
 	cpu_set_irq_callback(cputag_get_cpu(machine, Z80_TAG), v1050_int_ack);
 
 	/* setup memory banking */
-	memory_configure_bank(machine, 1, 0, 2, mess_ram, 0x10000);
-	memory_configure_bank(machine, 1, 2, 1, mess_ram + 0x1c000, 0);
+	memory_configure_bank(machine, 1, 0, 2, messram_get_ptr(devtag_get_device(machine, "messram")), 0x10000);
+	memory_configure_bank(machine, 1, 2, 1, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x1c000, 0);
 	memory_configure_bank(machine, 1, 3, 1, memory_region(machine, Z80_TAG), 0);
 
 	memory_install_readwrite8_handler(program, 0x2000, 0x3fff, 0, 0, SMH_BANK(2), SMH_BANK(2));
-	memory_configure_bank(machine, 2, 0, 2, mess_ram + 0x2000, 0x10000);
-	memory_configure_bank(machine, 2, 2, 1, mess_ram + 0x1e000, 0);
+	memory_configure_bank(machine, 2, 0, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x2000, 0x10000);
+	memory_configure_bank(machine, 2, 2, 1, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x1e000, 0);
 
 	memory_install_readwrite8_handler(program, 0x4000, 0x7fff, 0, 0, SMH_BANK(3), SMH_BANK(3));
-	memory_configure_bank(machine, 3, 0, 2, mess_ram + 0x4000, 0x10000);
+	memory_configure_bank(machine, 3, 0, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000, 0x10000);
 
 	memory_install_readwrite8_handler(program, 0x8000, 0xbfff, 0, 0, SMH_BANK(4), SMH_BANK(4));
-	memory_configure_bank(machine, 4, 0, 2, mess_ram + 0x8000, 0x10000);
+	memory_configure_bank(machine, 4, 0, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x8000, 0x10000);
 
 	memory_install_readwrite8_handler(program, 0xc000, 0xffff, 0, 0, SMH_BANK(5), SMH_BANK(5));
-	memory_configure_bank(machine, 5, 0, 3, mess_ram + 0xc000, 0);
+	memory_configure_bank(machine, 5, 0, 3, messram_get_ptr(devtag_get_device(machine, "messram")) + 0xc000, 0);
 
 	v1050_bankswitch(machine);
 
@@ -1234,6 +1235,10 @@ static MACHINE_DRIVER_START( v1050 )
 
 	/* printer */
 	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("128K")		
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -1250,12 +1255,7 @@ ROM_START( v1050 )
 	ROM_LOAD( "22-02716-074.z6", 0x0000, 0x0800, NO_DUMP )
 ROM_END
 
-/* System Configuration */
-static SYSTEM_CONFIG_START( v1050 )
-	CONFIG_RAM_DEFAULT( 128 * 1024 )
-SYSTEM_CONFIG_END
-
 /* System Drivers */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY                             FULLNAME        FLAGS */
-COMP( 1983, v1050,	0,		0,		v1050,	v1050,	0,		v1050,	"Visual Technology Incorporated",	"Visual 1050",	GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+COMP( 1983, v1050,	0,		0,		v1050,	v1050,	0,		0,	"Visual Technology Incorporated",	"Visual 1050",	GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )

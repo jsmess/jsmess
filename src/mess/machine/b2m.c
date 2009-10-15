@@ -16,6 +16,7 @@
 #include "machine/pic8259.h"
 #include "machine/msm8251.h"
 #include "includes/b2m.h"
+#include "devices/messram.h"
 
 static READ8_HANDLER (b2m_keyboard_r )
 {
@@ -55,10 +56,10 @@ static void b2m_set_bank(running_machine *machine,int bank)
 		case 1 :
 						memory_install_write8_handler(space, 0xe000, 0xffff, 0, 0, SMH_UNMAP);
 
-						memory_set_bankptr(machine, 1, mess_ram);
-						memory_set_bankptr(machine, 2, mess_ram + 0x2800);
-						memory_set_bankptr(machine, 3, mess_ram + 0x3000);
-						memory_set_bankptr(machine, 4, mess_ram + 0x7000);
+						memory_set_bankptr(machine, 1, messram_get_ptr(devtag_get_device(machine, "messram")));
+						memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x2800);
+						memory_set_bankptr(machine, 3, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x3000);
+						memory_set_bankptr(machine, 4, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x7000);
 						memory_set_bankptr(machine, 5, rom + 0x10000);
 						break;
 #if 0
@@ -66,8 +67,8 @@ static void b2m_set_bank(running_machine *machine,int bank)
 						memory_install_write8_handler(space, 0x3000, 0x6fff, 0, 0, SMH_UNMAP);
 						memory_install_write8_handler(space, 0xe000, 0xffff, 0, 0, SMH_UNMAP);
 
-						memory_set_bankptr(machine, 1, mess_ram);
-						memory_set_bankptr(machine, 2, mess_ram + 0x2800);
+						memory_set_bankptr(machine, 1, messram_get_ptr(devtag_get_device(machine, "messram")));
+						memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x2800);
 						memory_set_bankptr(machine, 3, rom + 0x12000);
 						memory_set_bankptr(machine, 4, rom + 0x16000);
 						memory_set_bankptr(machine, 5, rom + 0x10000);
@@ -77,30 +78,30 @@ static void b2m_set_bank(running_machine *machine,int bank)
 						memory_install_write8_handler(space, 0x2800, 0x2fff, 0, 0, SMH_UNMAP);
 						memory_install_write8_handler(space, 0xe000, 0xffff, 0, 0, SMH_UNMAP);
 
-						memory_set_bankptr(machine, 1, mess_ram);
+						memory_set_bankptr(machine, 1, messram_get_ptr(devtag_get_device(machine, "messram")));
 						memory_install_read8_handler(space, 0x2800, 0x2fff, 0, 0, b2m_keyboard_r);
-						memory_set_bankptr(machine, 3, mess_ram + 0x10000);
-						memory_set_bankptr(machine, 4, mess_ram + 0x7000);
+						memory_set_bankptr(machine, 3, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000);
+						memory_set_bankptr(machine, 4, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x7000);
 						memory_set_bankptr(machine, 5, rom + 0x10000);
 						break;
 		case 3 :
 						memory_install_write8_handler(space, 0x2800, 0x2fff, 0, 0, SMH_UNMAP);
 						memory_install_write8_handler(space, 0xe000, 0xffff, 0, 0, SMH_UNMAP);
 
-						memory_set_bankptr(machine, 1, mess_ram);
+						memory_set_bankptr(machine, 1, messram_get_ptr(devtag_get_device(machine, "messram")));
 						memory_install_read8_handler(space, 0x2800, 0x2fff, 0, 0, b2m_keyboard_r);
-						memory_set_bankptr(machine, 3, mess_ram + 0x14000);
-						memory_set_bankptr(machine, 4, mess_ram + 0x7000);
+						memory_set_bankptr(machine, 3, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x14000);
+						memory_set_bankptr(machine, 4, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x7000);
 						memory_set_bankptr(machine, 5, rom + 0x10000);
 						break;
 		case 4 :
 						memory_install_write8_handler(space, 0x2800, 0x2fff, 0, 0, SMH_UNMAP);
 						memory_install_write8_handler(space, 0xe000, 0xffff, 0, 0, SMH_UNMAP);
 
-						memory_set_bankptr(machine, 1, mess_ram);
+						memory_set_bankptr(machine, 1, messram_get_ptr(devtag_get_device(machine, "messram")));
 						memory_install_read8_handler(space, 0x2800, 0x2fff, 0, 0, b2m_keyboard_r);
-						memory_set_bankptr(machine, 3, mess_ram + 0x18000);
-						memory_set_bankptr(machine, 4, mess_ram + 0x7000);
+						memory_set_bankptr(machine, 3, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x18000);
+						memory_set_bankptr(machine, 4, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x7000);
 						memory_set_bankptr(machine, 5, rom + 0x10000);
 
 						break;
@@ -108,19 +109,19 @@ static void b2m_set_bank(running_machine *machine,int bank)
 						memory_install_write8_handler(space, 0x2800, 0x2fff, 0, 0, SMH_UNMAP);
 						memory_install_write8_handler(space, 0xe000, 0xffff, 0, 0, SMH_UNMAP);
 
-						memory_set_bankptr(machine, 1, mess_ram);
+						memory_set_bankptr(machine, 1, messram_get_ptr(devtag_get_device(machine, "messram")));
 						memory_install_read8_handler(space, 0x2800, 0x2fff, 0, 0, b2m_keyboard_r);
-						memory_set_bankptr(machine, 3, mess_ram + 0x1c000);
-						memory_set_bankptr(machine, 4, mess_ram + 0x7000);
+						memory_set_bankptr(machine, 3, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x1c000);
+						memory_set_bankptr(machine, 4, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x7000);
 						memory_set_bankptr(machine, 5, rom + 0x10000);
 
 						break;
 		case 6 :
-						memory_set_bankptr(machine, 1, mess_ram);
-						memory_set_bankptr(machine, 2, mess_ram + 0x2800);
-						memory_set_bankptr(machine, 3, mess_ram + 0x3000);
-						memory_set_bankptr(machine, 4, mess_ram + 0x7000);
-						memory_set_bankptr(machine, 5, mess_ram + 0xe000);
+						memory_set_bankptr(machine, 1, messram_get_ptr(devtag_get_device(machine, "messram")));
+						memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x2800);
+						memory_set_bankptr(machine, 3, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x3000);
+						memory_set_bankptr(machine, 4, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x7000);
+						memory_set_bankptr(machine, 5, messram_get_ptr(devtag_get_device(machine, "messram")) + 0xe000);
 						break;
 		case 7 :
 						memory_install_write8_handler(space, 0x0000, 0x27ff, 0, 0, SMH_UNMAP);
@@ -280,7 +281,7 @@ DRIVER_INIT(b2m)
 {
 	b2m_state *state = machine->driver_data;
 
-	memset(mess_ram,0,128*1024);
+	memset(messram_get_ptr(devtag_get_device(machine, "messram")),0,128*1024);
 	state->vblank_state = 0;
 }
 

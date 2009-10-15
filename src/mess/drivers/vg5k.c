@@ -38,6 +38,7 @@
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
+#include "devices/messram.h"
 
 static ADDRESS_MAP_START( vg5k_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -86,6 +87,10 @@ static MACHINE_DRIVER_START( vg5k )
 
 	MDRV_VIDEO_START(vg5k)
 	MDRV_VIDEO_UPDATE(vg5k)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("24K")	
 MACHINE_DRIVER_END
 
 /* ROM definition */
@@ -100,10 +105,6 @@ ROM_START( vg5k )
 	ROM_LOAD( "charset.rom", 0x0000, 0x2000, BAD_DUMP CRC(b2f49eb3) SHA1(d0ef530be33bfc296314e7152302d95fdf9520fc) )			// from dcvg5k
 ROM_END
 
-static SYSTEM_CONFIG_START( vg5k )
-	CONFIG_RAM_DEFAULT(24 * 1024)
-SYSTEM_CONFIG_END
-
 /* Driver */
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  INIT   CONFIG COMPANY     FULLNAME   FLAGS */
-COMP( 1984, vg5k,   0,      0,      vg5k,    vg5k,  0,     vg5k,  "Philips",  "VG-5000", GAME_NOT_WORKING)
+COMP( 1984, vg5k,   0,      0,      vg5k,    vg5k,  0,     0,  "Philips",  "VG-5000", GAME_NOT_WORKING)

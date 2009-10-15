@@ -22,7 +22,7 @@
 #include "machine/applefdc.h"
 #include "devices/appldriv.h"
 #include "machine/6551.h"
-
+#include "devices/messram.h"
 
 UINT32 apple3_flags;
 
@@ -272,17 +272,17 @@ INTERRUPT_GEN( apple3_interrupt )
 
 
 
-static UINT8 *apple3_bankaddr(UINT16 bank, offs_t offset)
+static UINT8 *apple3_bankaddr(running_machine *machine,UINT16 bank, offs_t offset)
 {
 	if (bank != (UINT16) ~0)
 	{
-		bank %= mess_ram_size / 0x8000;
-		if ((bank + 1) == (mess_ram_size / 0x8000))
+		bank %= messram_get_size(devtag_get_device(machine, "messram")) / 0x8000;
+		if ((bank + 1) == (messram_get_size(devtag_get_device(machine, "messram")) / 0x8000))
 			bank = 0x02;
 	}
 	offset += ((offs_t) bank) * 0x8000;
-	offset %= mess_ram_size;
-	return &mess_ram[offset];
+	offset %= messram_get_size(devtag_get_device(machine, "messram"));
+	return &messram_get_ptr(devtag_get_device(machine, "messram"))[offset];
 }
 
 
@@ -291,45 +291,45 @@ static void apple3_setbank(running_machine *machine,int mame_bank, UINT16 bank, 
 {
 	UINT8 *ptr;
 
-	ptr = apple3_bankaddr(bank, offset);
+	ptr = apple3_bankaddr(machine,bank, offset);
 	memory_set_bankptr(machine, mame_bank, ptr);
 
 	if (LOG_MEMORY)
 	{
 		#ifdef PTR64
-		logerror("\tbank #%d --> %02x/%04x [0x%08lx]\n", mame_bank, (unsigned) bank, (unsigned)offset, ptr - mess_ram);
+		logerror("\tbank #%d --> %02x/%04x [0x%08lx]\n", mame_bank, (unsigned) bank, (unsigned)offset, ptr - messram_get_ptr(devtag_get_device(machine, "messram")));
 		#else
-		logerror("\tbank #%d --> %02x/%04x [0x%08x]\n", mame_bank, (unsigned) bank, (unsigned)offset, ptr - mess_ram);
+		logerror("\tbank #%d --> %02x/%04x [0x%08x]\n", mame_bank, (unsigned) bank, (unsigned)offset, ptr - messram_get_ptr(devtag_get_device(machine, "messram")));
 		#endif
 	}
 }
 
 
 
-static UINT8 *apple3_get_zpa_addr(offs_t offset)
+static UINT8 *apple3_get_zpa_addr(running_machine *machine,offs_t offset)
 {
 	zpa = (((offs_t) via_0_b) * 0x100) + offset;
 
 	if (via_0_b < 0x20)
-		return apple3_bankaddr(~0, zpa);
+		return apple3_bankaddr(machine,~0, zpa);
 	else if (via_0_b > 0x9F)
-		return apple3_bankaddr(~0, zpa - 0x8000);
+		return apple3_bankaddr(machine,~0, zpa - 0x8000);
 	else
-		return apple3_bankaddr(via_1_a, zpa - 0x2000);
+		return apple3_bankaddr(machine,via_1_a, zpa - 0x2000);
 }
 
 
 
 READ8_HANDLER( apple3_00xx_r )
 {
-	return *apple3_get_zpa_addr(offset);
+	return *apple3_get_zpa_addr(space->machine,offset);
 }
 
 
 
 WRITE8_HANDLER( apple3_00xx_w )
 {
-	*apple3_get_zpa_addr(offset) = data;
+	*apple3_get_zpa_addr(space->machine,offset) = data;
 }
 
 
@@ -541,14 +541,14 @@ MACHINE_RESET( apple3 )
 
 
 
-static UINT8 *apple3_get_indexed_addr(offs_t offset)
+static UINT8 *apple3_get_indexed_addr(running_machine *machine,offs_t offset)
 {
 	UINT8 n;
 	UINT8 *result = NULL;
 
 	if ((via_0_b >= 0x18) && (via_0_b <= 0x1F))
 	{
-		n = *apple3_bankaddr(~0, zpa ^ 0x0C00);
+		n = *apple3_bankaddr(machine,~0, zpa ^ 0x0C00);
 
 		if (LOG_INDXADDR)
 		{
@@ -564,39 +564,39 @@ static UINT8 *apple3_get_indexed_addr(offs_t offset)
 		{
 			/* get at that special ram under the VIAs */
 			if ((offset >= 0xFFD0) && (offset <= 0xFFEF))
-				result = apple3_bankaddr(~0, offset & 0x7FFF);
+				result = apple3_bankaddr(machine,~0, offset & 0x7FFF);
 			else if (offset < 0x2000)
-				result = apple3_bankaddr(~0, offset - 0x2000);
+				result = apple3_bankaddr(machine,~0, offset - 0x2000);
 			else if (offset > 0x9FFF)
-				result = apple3_bankaddr(~0, offset - 0x8000);
+				result = apple3_bankaddr(machine,~0, offset - 0x8000);
 			else
-				result = &mess_ram[offset - 0x2000];
+				result = &messram_get_ptr(devtag_get_device(machine, "messram"))[offset - 0x2000];
 		}
 		else if ((n >= 0x80) && (n <= 0x8E))
 		{
 			if (offset < 0x0100)
-				result = apple3_bankaddr(~0, ((offs_t) via_0_b) * 0x100 + offset);
+				result = apple3_bankaddr(machine,~0, ((offs_t) via_0_b) * 0x100 + offset);
 			else
-				result = apple3_bankaddr(n, offset);
+				result = apple3_bankaddr(machine,n, offset);
 		}
 		else if (n == 0xFF)
 		{
 			if (offset < 0x2000)
-				result = apple3_bankaddr(~0, offset - 0x2000);
+				result = apple3_bankaddr(machine,~0, offset - 0x2000);
 			else if (offset < 0xA000)
-				result = apple3_bankaddr(via_1_a, offset - 0x2000);
+				result = apple3_bankaddr(machine,via_1_a, offset - 0x2000);
 			else if (offset < 0xC000)
-				result = apple3_bankaddr(~0, offset - 0x8000);
+				result = apple3_bankaddr(machine,~0, offset - 0x8000);
 			else if (offset < 0xD000)
 				result = NULL;
 			else if (offset < 0xF000)
-				result = apple3_bankaddr(~0, offset - 0x8000);
+				result = apple3_bankaddr(machine,~0, offset - 0x8000);
 			else
 				result = (UINT8 *) ~0;
 		}
 		else if (offset < 0x0100)
 		{
-			result = apple3_bankaddr(~0, ((offs_t) via_0_b) * 0x100 + offset);
+			result = apple3_bankaddr(machine,~0, ((offs_t) via_0_b) * 0x100 + offset);
 		}
 	}
 	else if ((offset >= 0xF000) && (via_0_a & 0x01))
@@ -608,7 +608,7 @@ static UINT8 *apple3_get_indexed_addr(offs_t offset)
          * emulator does not have corresponding code here, though Chris
          * Smolinski does not rule out the possibility
          */
-		result = apple3_bankaddr(~0, offset - 0x8000);
+		result = apple3_bankaddr(machine,~0, offset - 0x8000);
 #endif
 	}
 
@@ -622,7 +622,7 @@ READ8_HANDLER( apple3_indexed_read )
 	UINT8 result;
 	UINT8 *addr;
 
-	addr = apple3_get_indexed_addr(offset);
+	addr = apple3_get_indexed_addr(space->machine,offset);
 	if (!addr)
 		result = memory_read_byte(space, offset);
 	else if (addr != (UINT8 *) ~0)
@@ -638,7 +638,7 @@ WRITE8_HANDLER( apple3_indexed_write )
 {
 	UINT8 *addr;
 
-	addr = apple3_get_indexed_addr(offset);
+	addr = apple3_get_indexed_addr(space->machine,offset);
 	if (!addr)
 		memory_write_byte(space, offset, data);
 	else if (addr != (UINT8 *) ~0)
@@ -653,7 +653,7 @@ static DIRECT_UPDATE_HANDLER( apple3_opbase )
 
 	if ((address & 0xFF00) == 0x0000)
 	{
-		opptr = apple3_get_zpa_addr(address);
+		opptr = apple3_get_zpa_addr(space->machine,address);
 		direct->bytemask = ~0;
 		direct->raw = direct->decrypted = opptr - address;
 		direct->bytestart = address;

@@ -28,7 +28,7 @@
 #include "devices/cartslot.h"
 #include "devices/cassette.h"
 #include "devices/printer.h"
-
+#include "devices/messram.h"
 
 /***************************************************************************
     CONSTANTS
@@ -215,12 +215,12 @@ static WRITE8_HANDLER( floppy_w )
 static DRIVER_INIT( aquarius )
 {
 	/* install expansion memory if available */
-	if (mess_ram_size > 0x1000)
+	if (messram_get_size(devtag_get_device(machine, "messram")) > 0x1000)
 	{
 		const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
-		memory_install_readwrite8_handler(space, 0x4000, 0x4000 + mess_ram_size - 0x1000 - 1, 0, 0, SMH_BANK(1), SMH_BANK(1));
-		memory_set_bankptr(machine, 1, mess_ram);
+		memory_install_readwrite8_handler(space, 0x4000, 0x4000 + messram_get_size(devtag_get_device(machine, "messram")) - 0x1000 - 1, 0, 0, SMH_BANK(1), SMH_BANK(1));
+		memory_set_bankptr(machine, 1, messram_get_ptr(devtag_get_device(machine, "messram")));
 	}
 }
 
@@ -431,6 +431,11 @@ static MACHINE_DRIVER_START( aquarius )
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("bin")
 	MDRV_CARTSLOT_NOT_MANDATORY
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("4K")
+	MDRV_RAM_EXTRA_OPTIONS("8K,20K,36K")	
 MACHINE_DRIVER_END
 
 static FLOPPY_OPTIONS_START(aquarius)
@@ -503,20 +508,10 @@ ROM_END
 
 
 /***************************************************************************
-    SYSTEM CONFIG
-***************************************************************************/
-static SYSTEM_CONFIG_START( aquarius )
-	CONFIG_RAM_DEFAULT( 4 * 1024)
-	CONFIG_RAM		  ( 8 * 1024)
-	CONFIG_RAM		  (20 * 1024)
-	CONFIG_RAM		  (36 * 1024)
-SYSTEM_CONFIG_END
-
-/***************************************************************************
     GAME DRIVERS
 ***************************************************************************/
 
 /*    YEAR  NAME         PARENT    COMPAT  MACHINE      INPUT     INIT      CONFIG       COMPANY   FULLNAME                         FLAGS */
-COMP( 1983, aquarius,    0,        0,      aquarius,    aquarius, aquarius, aquarius,    "Mattel", "Aquarius (NTSC)",               0 )
-COMP( 1983, aquarius_qd, aquarius, 0,      aquarius_qd, aquarius, aquarius, aquarius, "Mattel", "Aquarius w/ Quick Disk (NTSC)", 0 )
-//COMP( 1984,   aquariu2,   aquarius,   0,      aquarius,   aquarius,   0,      aquarius,   "Mattel",   "Aquarius II",  GAME_NOT_WORKING )
+COMP( 1983, aquarius,    0,        0,      aquarius,    aquarius, aquarius, 0,    "Mattel", "Aquarius (NTSC)",               0 )
+COMP( 1983, aquarius_qd, aquarius, 0,      aquarius_qd, aquarius, aquarius, 0, "Mattel", "Aquarius w/ Quick Disk (NTSC)", 0 )
+//COMP( 1984,   aquariu2,   aquarius,   0,      aquarius,   aquarius,   0,      0,   "Mattel",   "Aquarius II",  GAME_NOT_WORKING )

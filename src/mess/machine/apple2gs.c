@@ -116,6 +116,7 @@
 #include "devices/flopdrv.h"
 #include "cpu/g65816/g65816.h"
 #include "sound/es5503.h"
+#include "devices/messram.h"
 
 #define LOG_C0XX			0
 #define LOG_ADB				0
@@ -1235,7 +1236,7 @@ static WRITE8_HANDLER( apple2gs_c0xx_w )
 static WRITE8_HANDLER( apple2gs_main0400_w )
 {
 	offset += 0x000400;
-	mess_ram[offset] = data;
+	messram_get_ptr(devtag_get_device(space->machine, "messram"))[offset] = data;
 
 	if (!(apple2gs_shadow & 0x01))
 	{
@@ -1246,7 +1247,7 @@ static WRITE8_HANDLER( apple2gs_main0400_w )
 static WRITE8_HANDLER( apple2gs_aux0400_w )
 {
 	offset += 0x010400;
-	mess_ram[offset] = data;
+	messram_get_ptr(devtag_get_device(space->machine, "messram"))[offset] = data;
 
 	if (!(apple2gs_shadow & 0x01))
 	{
@@ -1257,7 +1258,7 @@ static WRITE8_HANDLER( apple2gs_aux0400_w )
 static WRITE8_HANDLER( apple2gs_main2000_w )
 {
 	offset += 0x002000;
-	mess_ram[offset] = data;
+	messram_get_ptr(devtag_get_device(space->machine, "messram"))[offset] = data;
 
 	if (!(apple2gs_shadow & 0x02))
 	{
@@ -1268,7 +1269,7 @@ static WRITE8_HANDLER( apple2gs_main2000_w )
 static WRITE8_HANDLER( apple2gs_aux2000_w )
 {
 	offset += 0x012000;
-	mess_ram[offset] = data;
+	messram_get_ptr(devtag_get_device(space->machine, "messram"))[offset] = data;
 
 	if (!(apple2gs_shadow & 0x12) || !(apple2gs_shadow & 0x08))
 	{
@@ -1279,7 +1280,7 @@ static WRITE8_HANDLER( apple2gs_aux2000_w )
 static WRITE8_HANDLER( apple2gs_main4000_w )
 {
 	offset += 0x004000;
-	mess_ram[offset] = data;
+	messram_get_ptr(devtag_get_device(space->machine, "messram"))[offset] = data;
 
 	if ((offset >= 0x004000) && (offset <= 0x005FFF))
 	{
@@ -1291,7 +1292,7 @@ static WRITE8_HANDLER( apple2gs_main4000_w )
 static WRITE8_HANDLER( apple2gs_aux4000_w )
 {
 	offset += 0x014000;
-	mess_ram[offset] = data;
+	messram_get_ptr(devtag_get_device(space->machine, "messram"))[offset] = data;
 
 	if ((offset >= 0x014000) && (offset <= 0x015FFF))
 	{
@@ -1534,7 +1535,7 @@ static UINT8 apple2gs_xxCxxx_r(running_machine *machine, offs_t address)
 
 	if ((apple2gs_shadow & 0x40) && ((address & 0xF00000) == 0x000000))
 	{
-		result = mess_ram[address];
+		result = messram_get_ptr(devtag_get_device(machine, "messram"))[address];
 	}
 	else if ((address & 0x000F00) == 0x000000)
 	{
@@ -1560,7 +1561,7 @@ static void apple2gs_xxCxxx_w(running_machine *machine, offs_t address, UINT8 da
 
 	if ((apple2gs_shadow & 0x40) && ((address & 0xF00000) == 0x000000))
 	{
-		mess_ram[address] = data;
+		messram_get_ptr(devtag_get_device(machine, "messram"))[address] = data;
 	}
 	else if ((address & 0x000F00) == 0x000000)
 	{
@@ -1586,7 +1587,7 @@ static DIRECT_UPDATE_HANDLER( apple2gs_opbase )
 	{
 		if ((apple2gs_shadow & 0x40) && ((address & 0xF00000) == 0x000000))
 		{
-			opptr = &mess_ram[address];
+			opptr = &messram_get_ptr(devtag_get_device(space->machine, "messram"))[address];
 		}
 		else if ((address & 0x000F00) == 0x000000)
 		{
@@ -1663,9 +1664,9 @@ static void apple2gs_setup_memory(running_machine *machine)
 	state_save_register_item_array(machine, "APPLE2GS_SLOWMEM", NULL, 0, apple2gs_slowmem);
 
 	/* install expanded memory */
-	memory_install_read8_handler(space, 0x010000, mess_ram_size - 1, 0, 0, SMH_BANK(1));
-	memory_install_write8_handler(space, 0x010000, mess_ram_size - 1, 0, 0, SMH_BANK(1));
-	memory_set_bankptr(machine,1, mess_ram + 0x010000);
+	memory_install_read8_handler(space, 0x010000, messram_get_size(devtag_get_device(machine, "messram")) - 1, 0, 0, SMH_BANK(1));
+	memory_install_write8_handler(space, 0x010000, messram_get_size(devtag_get_device(machine, "messram")) - 1, 0, 0, SMH_BANK(1));
+	memory_set_bankptr(machine,1, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x010000);
 
 	/* install hi memory */
 	memory_install_read8_handler(space, 0xe00000, 0xe1ffff, 0, 0, SMH_BANK(2));
@@ -1787,7 +1788,7 @@ MACHINE_START( apple2gs )
 	apple2gs_setup_memory(machine);
 
 	/* save state stuff.  note that the driver takes care of docram. */
-	state_save_register_global_array(machine, mess_ram);
+	state_save_register_global_array(machine, messram_get_ptr(devtag_get_device(machine, "messram")));
 
 	state_save_register_item(machine, "NEWVIDEO", NULL, 0, apple2gs_newvideo);
 

@@ -19,7 +19,7 @@
 #include "machine/ctronics.h"
 #include "sound/speaker.h"
 #include "devices/cassette.h"
-
+#include "devices/messram.h"
 
 #ifndef VERBOSE
 #define VERBOSE 1
@@ -173,7 +173,7 @@ READ8_HANDLER( mz800_bank_0_r )
 
 			/* ram from 0xa000 to 0xbfff */
 			memory_install_readwrite8_handler(spc, 0xa000, 0xbfff, 0, 0, SMH_BANK(5), SMH_BANK(5));
-			memory_set_bankptr(space->machine, 5, mess_ram + 0xa000);
+			memory_set_bankptr(space->machine, 5, messram_get_ptr(devtag_get_device(space->machine, "messram")) + 0xa000);
 		}
 	}
 
@@ -185,7 +185,7 @@ WRITE8_HANDLER( mz700_bank_0_w )
 	const address_space *spc = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	memory_install_readwrite8_handler(spc, 0x0000, 0x0fff, 0, 0, SMH_BANK(1), SMH_BANK(1));
-	memory_set_bankptr(space->machine, 1, mess_ram);
+	memory_set_bankptr(space->machine, 1, messram_get_ptr(devtag_get_device(space->machine, "messram")));
 }
 
 WRITE8_HANDLER( mz800_bank_0_w )
@@ -193,7 +193,7 @@ WRITE8_HANDLER( mz800_bank_0_w )
 	const address_space *spc = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	memory_install_readwrite8_handler(spc, 0x0000, 0x7fff, 0, 0, SMH_BANK(1), SMH_BANK(1));
-	memory_set_bankptr(space->machine, 1, mess_ram);
+	memory_set_bankptr(space->machine, 1, messram_get_ptr(devtag_get_device(space->machine, "messram")));
 }
 
 READ8_HANDLER( mz800_bank_1_r )
@@ -203,19 +203,19 @@ READ8_HANDLER( mz800_bank_1_r )
 
 	/* switch in ram from 0x1000 to 0x1fff */
 	memory_install_readwrite8_handler(spc, 0x1000, 0x1fff, 0x1000, 0, SMH_BANK(2), SMH_BANK(2));
-	memory_set_bankptr(space->machine, 2, mess_ram + 0x1000);
+	memory_set_bankptr(space->machine, 2, messram_get_ptr(devtag_get_device(space->machine, "messram")) + 0x1000);
 
 	if (mz->mz700_mode)
 	{
 		/* ram from 0xc000 to 0xcfff */
 		memory_install_readwrite8_handler(spc, 0xc000, 0xcfff, 0, 0, SMH_BANK(6), SMH_BANK(6));
-		memory_set_bankptr(space->machine, 6, mess_ram + 0xc000);
+		memory_set_bankptr(space->machine, 6, messram_get_ptr(devtag_get_device(space->machine, "messram")) + 0xc000);
 	}
 	else
 	{
 		/* ram from 0x8000 to 0xbfff */
 		memory_install_readwrite8_handler(spc, 0x8000, 0xbfff, 0, 0, SMH_BANK(4), SMH_BANK(4));
-		memory_set_bankptr(space->machine, 4, mess_ram + 0x8000);
+		memory_set_bankptr(space->machine, 4, messram_get_ptr(devtag_get_device(space->machine, "messram")) + 0x8000);
 	}
 
 	return 0xff;
@@ -232,7 +232,7 @@ WRITE8_HANDLER( mz_bank_1_w )
 		if (!mz->mz700_ram_lock)
 		{
 			memory_install_readwrite8_handler(spc, 0xd000, 0xffff, 0, 0, SMH_BANK(7), SMH_BANK(7));
-			memory_set_bankptr(space->machine, 7, mess_ram + 0xd000);
+			memory_set_bankptr(space->machine, 7, messram_get_ptr(devtag_get_device(space->machine, "messram")) + 0xd000);
 			mz->mz700_ram_vram = FALSE;
 		}
 	}
@@ -242,7 +242,7 @@ WRITE8_HANDLER( mz_bank_1_w )
 		if (!mz->mz800_ram_lock)
 		{
 			memory_install_readwrite8_handler(spc, 0xe000, 0xffff, 0, 0, SMH_BANK(8), SMH_BANK(8));
-			memory_set_bankptr(space->machine, 8, mess_ram + 0xe000);
+			memory_set_bankptr(space->machine, 8, messram_get_ptr(devtag_get_device(space->machine, "messram")) + 0xe000);
 			mz->mz800_ram_monitor = FALSE;
 		}
 	}
@@ -317,7 +317,7 @@ WRITE8_HANDLER( mz_bank_4_w )
 
 		/* rest is ram is always ram in mz700 mode */
 		memory_install_readwrite8_handler(spc, 0x1000, 0xcfff, 0, 0, SMH_BANK(2), SMH_BANK(2));
-		memory_set_bankptr(space->machine, 2, mess_ram + 0x1000);
+		memory_set_bankptr(space->machine, 2, messram_get_ptr(devtag_get_device(space->machine, "messram")) + 0x1000);
 	}
 	else
 	{
@@ -327,7 +327,7 @@ WRITE8_HANDLER( mz_bank_4_w )
 
 		/* ram from 0x2000 to 0x7fff */
 		memory_install_readwrite8_handler(spc, 0x2000, 0x7fff, 0, 0, SMH_BANK(3), SMH_BANK(3));
-		memory_set_bankptr(space->machine, 3, mess_ram);
+		memory_set_bankptr(space->machine, 3, messram_get_ptr(devtag_get_device(space->machine, "messram")));
 
 		if (mz->hires_mode)
 		{
@@ -343,12 +343,12 @@ WRITE8_HANDLER( mz_bank_4_w )
 
 			/* ram from 0xa000 to 0xbfff */
 			memory_install_readwrite8_handler(spc, 0xa000, 0xbfff, 0, 0, SMH_BANK(5), SMH_BANK(5));
-			memory_set_bankptr(space->machine, 5, mess_ram + 0xa000);
+			memory_set_bankptr(space->machine, 5, messram_get_ptr(devtag_get_device(space->machine, "messram")) + 0xa000);
 		}
 
 		/* ram from 0xc000 to 0xdfff */
 		memory_install_readwrite8_handler(spc, 0xc000, 0xdfff, 0, 0, SMH_BANK(6), SMH_BANK(6));
-		memory_set_bankptr(space->machine, 6, mess_ram + 0xc000);
+		memory_set_bankptr(space->machine, 6, messram_get_ptr(devtag_get_device(space->machine, "messram")) + 0xc000);
 
 		/* mz800 monitor rom from 0xe000 to 0xffff */
 		memory_install_readwrite8_handler(spc, 0xe000, 0xffff, 0, 0, SMH_BANK(8), SMH_NOP);

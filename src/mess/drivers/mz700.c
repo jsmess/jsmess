@@ -75,6 +75,7 @@
 #include "sound/speaker.h"
 #include "sound/wave.h"
 #include "devices/cassette.h"
+#include "devices/messram.h"
 #include "formats/mz_cas.h"
 
 
@@ -373,6 +374,10 @@ static MACHINE_DRIVER_START( mz700 )
 	MDRV_TTL74145_ADD("ls145", default_ttl74145)
 
 	MDRV_CASSETTE_ADD( "cassette", mz700_cassette_config )
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("64K")	
 MACHINE_DRIVER_END
 
 
@@ -473,25 +478,15 @@ ROM_START( mz2500 )
 	ROM_LOAD( "dict.rom", 0x00000, 0x40000, CRC(aa957c2b) SHA1(19a5ba85055f048a84ed4e8d471aaff70fcf0374) )
 ROM_END
 
-
-/***************************************************************************
-    SYSTEM CONFIGS
-***************************************************************************/
-
-static SYSTEM_CONFIG_START( mz700 )
-	CONFIG_RAM_DEFAULT(64 * 1024) /* 64KB RAM */
-SYSTEM_CONFIG_END
-
-
 /***************************************************************************
     GAME DRIVERS
 ***************************************************************************/
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT    CONFIG  COMPANY      FULLNAME */
-COMP( 1982, mz700,    0,        0,      mz700,    mz700,    mz700,  mz700,  "Sharp",     "MZ-700", 0 )
-COMP( 1982, mz700j,   mz700,    0,      mz700,    mz700,    mz700,  mz700,  "Sharp",     "MZ-700 (Japan)", 0 )
-COMP( 1984, mz800,    0,        0,      mz800,    mz800,    mz800,  mz700,  "Sharp",     "MZ-800", GAME_NOT_WORKING )
-COMP( 1984, mz1500,   0,        0,      mz800,    mz800,    mz800,  mz700,  "Sharp",     "MZ-1500", GAME_NOT_WORKING )	// Japanese version of the MZ-800
+COMP( 1982, mz700,    0,        0,      mz700,    mz700,    mz700,  0,  "Sharp",     "MZ-700", 0 )
+COMP( 1982, mz700j,   mz700,    0,      mz700,    mz700,    mz700,  0,  "Sharp",     "MZ-700 (Japan)", 0 )
+COMP( 1984, mz800,    0,        0,      mz800,    mz800,    mz800,  0,  "Sharp",     "MZ-800", GAME_NOT_WORKING )
+COMP( 1984, mz1500,   0,        0,      mz800,    mz800,    mz800,  0,  "Sharp",     "MZ-1500", GAME_NOT_WORKING )	// Japanese version of the MZ-800
 
 // MZ-2500 probably needs a separate driver...
 COMP( 1985, mz2500,   0,        0,      mz2500,   0,        0,      0,      "Sharp",     "MZ-2500", GAME_NOT_WORKING )

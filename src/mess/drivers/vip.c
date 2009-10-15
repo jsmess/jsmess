@@ -229,6 +229,7 @@ Notes:
 #include "video/cdp1861.h"
 #include "video/cdp1862.h"
 #include "machine/rescap.h"
+#include "devices/messram.h"
 
 static QUICKLOAD_LOAD( vip );
 static MACHINE_RESET( vip );
@@ -265,7 +266,7 @@ static WRITE8_HANDLER( bankswitch_w )
 
 	memory_set_bank(space->machine, 1, VIP_BANK_RAM);
 
-	switch (mess_ram_size)
+	switch (messram_get_size(devtag_get_device(space->machine, "messram")))
 	{
 	case 1 * 1024:
 		memory_install_readwrite8_handler(program, 0x0000, 0x03ff, 0, 0x7c00, SMH_BANK(1), SMH_BANK(1));
@@ -637,7 +638,7 @@ static MACHINE_START( vip )
 	memory_set_bank(machine, 2, 0);
 
 	/* randomize RAM contents */
-	for (addr = 0; addr < mess_ram_size; addr++)
+	for (addr = 0; addr < messram_get_size(devtag_get_device(machine, "messram")); addr++)
 	{
 		ram[addr] = mame_rand(machine) & 0xff;
 	}
@@ -781,7 +782,22 @@ static MACHINE_DRIVER_START( vip )
 	/* devices */
 	MDRV_QUICKLOAD_ADD("quickload", vip, "bin,c8,c8x", 0)
 	MDRV_CASSETTE_ADD("cassette", vip_cassette_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("2K")
+	MDRV_RAM_EXTRA_OPTIONS("4K")
 MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( vp111 )
+	MDRV_IMPORT_FROM(vip)
+	
+	/* internal ram */
+	MDRV_RAM_MODIFY("messram")
+	MDRV_RAM_DEFAULT_SIZE("1K")
+	MDRV_RAM_EXTRA_OPTIONS("2K,4K")
+MACHINE_DRIVER_END
+
 
 /* ROMs */
 
@@ -823,7 +839,7 @@ static QUICKLOAD_LOAD( vip )
 		chip8_size = memory_region_length(image->machine, "chip8x");
 	}
 
-	if ((size + chip8_size) > mess_ram_size)
+	if ((size + chip8_size) > messram_get_size(devtag_get_device(image->machine, "messram")))
 	{
 		return INIT_FAIL;
 	}
@@ -840,19 +856,8 @@ static QUICKLOAD_LOAD( vip )
 	return INIT_PASS;
 }
 
-static SYSTEM_CONFIG_START( vp711 )
-	CONFIG_RAM_DEFAULT	( 2 * 1024)
-	CONFIG_RAM			( 4 * 1024)
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START( vp111 )
-	CONFIG_RAM_DEFAULT	( 1 * 1024)
-	CONFIG_RAM			( 2 * 1024)
-	CONFIG_RAM			( 4 * 1024)
-SYSTEM_CONFIG_END
-
 /* System Drivers */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   INIT    CONFIG  COMPANY FULLNAME                FLAGS */
-COMP( 1977, vip,	0,		0,		vip,		vip,	0,		vp711,	"RCA",	"Cosmac VIP (VP-711)",	GAME_SUPPORTS_SAVE | GAME_IMPERFECT_COLORS )
-COMP( 1977, vp111,	vip,	0,		vip,		vip,	0,		vp111,	"RCA",	"Cosmac VIP (VP-111)",	GAME_SUPPORTS_SAVE | GAME_IMPERFECT_COLORS )
+COMP( 1977, vip,	0,		0,		vip,		vip,	0,		0,	"RCA",	"Cosmac VIP (VP-711)",	GAME_SUPPORTS_SAVE | GAME_IMPERFECT_COLORS )
+COMP( 1977, vp111,	vip,	0,		vp111,		vip,	0,		0,	"RCA",	"Cosmac VIP (VP-111)",	GAME_SUPPORTS_SAVE | GAME_IMPERFECT_COLORS )

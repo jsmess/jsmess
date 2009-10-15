@@ -11,6 +11,7 @@
 #include "machine/i8255a.h"
 #include "machine/pit8253.h"
 #include "machine/msm8251.h"
+#include "devices/messram.h"
 
 UINT8 fk1_video_rol;
 /*
@@ -237,8 +238,8 @@ READ8_HANDLER( fk1_bank_ram_r )
 {
 	const address_space *space_mem = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	memory_install_write8_handler(space_mem, 0x0000, 0x3fff, 0, 0, SMH_BANK(1));
-	memory_set_bankptr(space->machine, 1, mess_ram);
-	memory_set_bankptr(space->machine, 2, mess_ram + 0x4000);
+	memory_set_bankptr(space->machine, 1, messram_get_ptr(devtag_get_device(space->machine, "messram")));
+	memory_set_bankptr(space->machine, 2, messram_get_ptr(devtag_get_device(space->machine, "messram")) + 0x4000);
 	return 0;
 }
 
@@ -247,7 +248,7 @@ READ8_HANDLER( fk1_bank_rom_r )
 	const address_space *space_mem = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	memory_install_write8_handler(space_mem, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
 	memory_set_bankptr(space->machine, 1, memory_region(space->machine, "maincpu"));
-	memory_set_bankptr(space->machine, 2, mess_ram + 0x10000);
+	memory_set_bankptr(space->machine, 2, messram_get_ptr(devtag_get_device(space->machine, "messram")) + 0x10000);
 	return 0;
 }
 
@@ -359,9 +360,9 @@ static MACHINE_RESET(fk1)
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
 	memory_set_bankptr(machine, 1, memory_region(machine, "maincpu")); // ROM
-	memory_set_bankptr(machine, 2, mess_ram + 0x10000); // VRAM
-	memory_set_bankptr(machine, 3, mess_ram + 0x8000);
-	memory_set_bankptr(machine, 4, mess_ram + 0xc000);
+	memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000); // VRAM
+	memory_set_bankptr(machine, 3, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x8000);
+	memory_set_bankptr(machine, 4, messram_get_ptr(devtag_get_device(machine, "messram")) + 0xc000);
 
 	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), fk1_irq_callback);
 	timer_pulse(machine, ATTOTIME_IN_HZ(24000), NULL, 0, keyboard_callback);
@@ -381,7 +382,7 @@ static VIDEO_UPDATE( fk1 )
 	{
 		for (y = 0; y < 256; y++)
 		{
-			code = mess_ram[x * 0x100 + ((y + fk1_video_rol) & 0xff) + 0x10000];
+			code = messram_get_ptr(devtag_get_device(screen->machine, "messram"))[x * 0x100 + ((y + fk1_video_rol) & 0xff) + 0x10000];
 			for (b = 0; b < 8; b++)
 			{
 				*BITMAP_ADDR16(bitmap, y, x*8+b) =  ((code << b) & 0x80) ? 1 : 0;
@@ -418,11 +419,11 @@ static MACHINE_DRIVER_START( fk1 )
 	MDRV_I8255A_ADD( "ppi8255_3", fk1_ppi8255_interface_3 )
 	/* uart */
 	MDRV_MSM8251_ADD("uart", default_msm8251_interface)
-MACHINE_DRIVER_END
 
-static SYSTEM_CONFIG_START(fk1)
-	CONFIG_RAM_DEFAULT((64+16) * 1024)
-SYSTEM_CONFIG_END
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("80K") // 64 + 16
+MACHINE_DRIVER_END
 
 /* ROM definition */
 ROM_START( fk1 )
@@ -436,5 +437,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( ????, fk1,  0,       0, 	fk1, 	fk1, 	 0,  	  fk1,  	 "Statni statek Klicany",   "FK-1",		GAME_NOT_WORKING)
+COMP( ????, fk1,  0,       0, 	fk1, 	fk1, 	 0,  	  0,  	 "Statni statek Klicany",   "FK-1",		GAME_NOT_WORKING)
 

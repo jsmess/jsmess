@@ -120,6 +120,7 @@
 #include "machine/wd17xx.h"
 #include "devices/flopdrv.h"
 #include "machine/upd71071.h"
+#include "devices/messram.h"
 
 static UINT8 ftimer;
 static UINT8 nmi_mask;
@@ -649,7 +650,7 @@ static WRITE8_HANDLER( towns_cmos8_w )
 static READ8_HANDLER( towns_cmos_low_r )
 {
 	if(towns_mainmem_enable != 0)
-		return mess_ram[offset + 0xd8000];
+		return messram_get_ptr(devtag_get_device(space->machine, "messram"))[offset + 0xd8000];
 
 	return towns_cmos[offset];
 }
@@ -657,7 +658,7 @@ static READ8_HANDLER( towns_cmos_low_r )
 static WRITE8_HANDLER( towns_cmos_low_w )
 {
 	if(towns_mainmem_enable != 0)
-		mess_ram[offset+0xd8000] = data;
+		messram_get_ptr(devtag_get_device(space->machine, "messram"))[offset+0xd8000] = data;
 	else
 		towns_cmos[offset] = data;
 }
@@ -676,7 +677,7 @@ static WRITE8_HANDLER( towns_gfx_w )
 {
 	if(towns_mainmem_enable != 0)
 	{
-		mess_ram[offset+0xc0000] = data;
+		messram_get_ptr(devtag_get_device(space->machine, "messram"))[offset+0xc0000] = data;
 		return;
 	}
 	if(towns_vram_wplane & 0x01)
@@ -693,7 +694,7 @@ static READ8_HANDLER( towns_video_cff80_r )
 {
 	UINT8* ROM = memory_region(space->machine,"user");
 	if(towns_mainmem_enable != 0)
-		return mess_ram[offset+0xcff80];
+		return messram_get_ptr(devtag_get_device(space->machine, "messram"))[offset+0xcff80];
 
 	switch(offset)
 	{
@@ -721,7 +722,7 @@ static WRITE8_HANDLER( towns_video_cff80_w )
 {
 	if(towns_mainmem_enable != 0)
 	{
-		mess_ram[offset+0xcff80] = data;
+		messram_get_ptr(devtag_get_device(space->machine, "messram"))[offset+0xcff80] = data;
 		return;
 	}
 
@@ -783,20 +784,20 @@ static void towns_update_video_banks(const address_space* space)
 	{
 		ROM = memory_region(space->machine,"user");
 
-		memory_set_bankptr(space->machine,1,mess_ram+0xc0000);
-		memory_set_bankptr(space->machine,2,mess_ram+0xc8000);
-		memory_set_bankptr(space->machine,3,mess_ram+0xc9000);
-		memory_set_bankptr(space->machine,4,mess_ram+0xca000);
-		memory_set_bankptr(space->machine,5,mess_ram+0xca000);
-		memory_set_bankptr(space->machine,10,mess_ram+0xca800);
-		memory_set_bankptr(space->machine,6,mess_ram+0xcb000);
-		memory_set_bankptr(space->machine,7,mess_ram+0xcb000);
-		memory_set_bankptr(space->machine,8,mess_ram+0xcc000);
+		memory_set_bankptr(space->machine,1,messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xc0000);
+		memory_set_bankptr(space->machine,2,messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xc8000);
+		memory_set_bankptr(space->machine,3,messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xc9000);
+		memory_set_bankptr(space->machine,4,messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xca000);
+		memory_set_bankptr(space->machine,5,messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xca000);
+		memory_set_bankptr(space->machine,10,messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xca800);
+		memory_set_bankptr(space->machine,6,messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xcb000);
+		memory_set_bankptr(space->machine,7,messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xcb000);
+		memory_set_bankptr(space->machine,8,messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xcc000);
 		if(towns_system_port & 0x02)
-			memory_set_bankptr(space->machine,11,mess_ram+0xf8000);
+			memory_set_bankptr(space->machine,11,messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xf8000);
 		else
 			memory_set_bankptr(space->machine,11,ROM+0x238000);
-		memory_set_bankptr(space->machine,12,mess_ram+0xf8000);
+		memory_set_bankptr(space->machine,12,messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xf8000);
 		return;
 	}
 	else  // enable I/O ports and VRAM
@@ -805,24 +806,24 @@ static void towns_update_video_banks(const address_space* space)
 
 		memory_set_bankptr(space->machine,1,towns_gfxvram+(towns_vram_rplane*0x8000));
 		memory_set_bankptr(space->machine,2,towns_txtvram);
-		memory_set_bankptr(space->machine,3,mess_ram+0xc9000);
+		memory_set_bankptr(space->machine,3,messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xc9000);
 		if(towns_ankcg_enable == 0)
 			memory_set_bankptr(space->machine,4,ROM+0x180000+0x3d000);  // ANK CG 8x8
 		else
 			memory_set_bankptr(space->machine,4,towns_txtvram+0x2000);
 		memory_set_bankptr(space->machine,5,towns_txtvram+0x2000);
-		memory_set_bankptr(space->machine,10,mess_ram+0xca800);
+		memory_set_bankptr(space->machine,10,messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xca800);
 		if(towns_ankcg_enable == 0)
 			memory_set_bankptr(space->machine,6,ROM+0x180000+0x3d800);  // ANK CG 8x16
 		else
-			memory_set_bankptr(space->machine,6,mess_ram+0xcb000);
-		memory_set_bankptr(space->machine,7,mess_ram+0xcb000);
-		memory_set_bankptr(space->machine,8,mess_ram+0xcc000);
+			memory_set_bankptr(space->machine,6,messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xcb000);
+		memory_set_bankptr(space->machine,7,messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xcb000);
+		memory_set_bankptr(space->machine,8,messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xcc000);
 		if(towns_system_port & 0x02)
-			memory_set_bankptr(space->machine,11,mess_ram+0xf8000);
+			memory_set_bankptr(space->machine,11,messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xf8000);
 		else
 			memory_set_bankptr(space->machine,11,ROM+0x238000);
-		memory_set_bankptr(space->machine,12,mess_ram+0xf8000);
+		memory_set_bankptr(space->machine,12,messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xf8000);
 		return;
 	}
 }
@@ -1270,10 +1271,6 @@ static GFXDECODE_START( towns )
 	GFXDECODE_ENTRY( "user",   0x180000, x1_chars_16x16,  0, 0x100 ) //needs to be checked when the ROM will be redumped
 GFXDECODE_END
 
-static SYSTEM_CONFIG_START(towns)
-	CONFIG_RAM_DEFAULT(0x6000000)  // 6MB will do to start, standard amount for the Marty
-SYSTEM_CONFIG_END
-
 static MACHINE_DRIVER_START( towns )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",I386, 16000000)
@@ -1314,6 +1311,10 @@ static MACHINE_DRIVER_START( towns )
 
     MDRV_VIDEO_START(towns)
     MDRV_VIDEO_UPDATE(towns)
+		
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("6M")
 MACHINE_DRIVER_END
 
 /* ROM definitions */
@@ -1360,8 +1361,8 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT  	MACHINE     INPUT    INIT    CONFIG COMPANY      FULLNAME            FLAGS */
-COMP( 1989, fmtowns,  0,    	0, 		towns, 		towns, 	 towns,  	 towns,  	"Fujitsu",   "FM-Towns",		 GAME_NOT_WORKING)
-COMP( 1989, fmtownsa, fmtowns,	0, 		towns, 		towns, 	 towns,  	 towns,  	"Fujitsu",   "FM-Towns (alternate)", GAME_NOT_WORKING)
-CONS( 1993, fmtmarty, 0,    	0, 		towns, 		towns, 	 marty,  	 towns,  	"Fujitsu",   "FM-Towns Marty",	 GAME_NOT_WORKING)
-CONS( 1994, carmarty, fmtmarty,	0, 		towns, 		towns, 	 towns,  	 towns,  	"Fujitsu",   "FM-Towns Car Marty",	 GAME_NOT_WORKING)
+COMP( 1989, fmtowns,  0,    	0, 		towns, 		towns, 	 towns,  	 0,  	"Fujitsu",   "FM-Towns",		 GAME_NOT_WORKING)
+COMP( 1989, fmtownsa, fmtowns,	0, 		towns, 		towns, 	 towns,  	 0,  	"Fujitsu",   "FM-Towns (alternate)", GAME_NOT_WORKING)
+CONS( 1993, fmtmarty, 0,    	0, 		towns, 		towns, 	 marty,  	 0,  	"Fujitsu",   "FM-Towns Marty",	 GAME_NOT_WORKING)
+CONS( 1994, carmarty, fmtmarty,	0, 		towns, 		towns, 	 towns,  	 0,  	"Fujitsu",   "FM-Towns Car Marty",	 GAME_NOT_WORKING)
 

@@ -13,6 +13,7 @@
 #include "machine/wd17xx.h"
 #include "devices/cassette.h"
 #include "includes/vector06.h"
+#include "devices/messram.h"
 
 UINT8 vector06_keyboard_mask;
 UINT8 vector_color_index;
@@ -21,7 +22,7 @@ UINT8 vector_video_mode;
 /* Driver initialization */
 DRIVER_INIT(vector06)
 {
-	memset(mess_ram,0,64*1024);
+	memset(messram_get_ptr(devtag_get_device(machine, "messram")),0,64*1024);
 }
 
 static READ8_DEVICE_HANDLER (vector06_8255_portb_r )
@@ -163,7 +164,7 @@ static TIMER_CALLBACK(reset_check_callback)
 		device_reset(cputag_get_cpu(machine, "maincpu"));
 	}
 	if ((val & 2)==2) {
-		memory_set_bankptr(machine, 1, mess_ram + 0x0000);
+		memory_set_bankptr(machine, 1, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x0000);
 		device_reset(cputag_get_cpu(machine, "maincpu"));
 	}
 }
@@ -192,9 +193,9 @@ MACHINE_RESET( vector06 )
 	memory_install_write8_handler(space, 0x8000, 0xffff, 0, 0, SMH_BANK(4));
 
 	memory_set_bankptr(machine, 1, memory_region(machine, "maincpu") + 0x10000);
-	memory_set_bankptr(machine, 2, mess_ram + 0x0000);
-	memory_set_bankptr(machine, 3, mess_ram + 0x8000);
-	memory_set_bankptr(machine, 4, mess_ram + 0x8000);
+	memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x0000);
+	memory_set_bankptr(machine, 3, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x8000);
+	memory_set_bankptr(machine, 4, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x8000);
 
 	vector06_keyboard_mask = 0;
 	vector_color_index = 0;

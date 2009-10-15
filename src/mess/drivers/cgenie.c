@@ -36,7 +36,7 @@ NMI
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "formats/cgen_cas.h"
-
+#include "devices/messram.h"
 
 static ADDRESS_MAP_START (cgenie_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
@@ -464,6 +464,11 @@ static MACHINE_DRIVER_START( cgenie )
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("rom")
 	MDRV_CARTSLOT_NOT_MANDATORY
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("16K")
+	MDRV_RAM_EXTRA_OPTIONS("32K")
 MACHINE_DRIVER_END
 
 /***************************************************************************
@@ -624,10 +629,6 @@ DEVICE_IMAGE_LOAD( cgenie_floppy )
     return INIT_PASS;
 }
 */
-static SYSTEM_CONFIG_START(cgenie)
-	CONFIG_RAM_DEFAULT	(16 * 1024)
-	CONFIG_RAM			(32 * 1024)
-SYSTEM_CONFIG_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT      CONFIG     COMPANY    FULLNAME */
-COMP( 1982, cgenie,   0,		0,		cgenie,   cgenie,	0,        cgenie,    "EACA Computers Ltd.",  "Colour Genie EG2000" , 0)
+COMP( 1982, cgenie,   0,		0,		cgenie,   cgenie,	0,        0,    "EACA Computers Ltd.",  "Colour Genie EG2000" , 0)

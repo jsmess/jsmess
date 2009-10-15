@@ -26,6 +26,7 @@
 #include "machine/z80pio.h"
 #include "machine/z80ctc.h"
 #include "sound/speaker.h"
+#include "devices/messram.h"
 #include "lc80.lh"
 
 /* Memory Maps */
@@ -321,7 +322,7 @@ static MACHINE_START( lc80 )
 	memory_install_readwrite8_handler(program, 0x0800, 0x0fff, 0, 0, SMH_BANK(2), SMH_BANK(2));
 	memory_install_readwrite8_handler(program, 0x1000, 0x17ff, 0, 0, SMH_BANK(3), SMH_BANK(3));
 
-	switch (mess_ram_size)
+	switch (messram_get_size(devtag_get_device(machine, "messram")))
 	{
 	case 1*1024:
 		memory_install_readwrite8_handler(program, 0x2000, 0x23ff, 0, 0, SMH_BANK(4), SMH_BANK(4));
@@ -381,6 +382,10 @@ static MACHINE_DRIVER_START( lc80 )
 	MDRV_Z80PIO_ADD(Z80PIO2_TAG, pio2_intf)
 
 	MDRV_CASSETTE_ADD(CASSETTE_TAG, lc80_cassette_config)
+	
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("1K")	
+	MDRV_RAM_EXTRA_OPTIONS("2K,3K,4K")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( lc80_2 )
@@ -407,6 +412,10 @@ static MACHINE_DRIVER_START( lc80_2 )
 	MDRV_Z80PIO_ADD(Z80PIO2_TAG, pio2_intf)
 
 	MDRV_CASSETTE_ADD(CASSETTE_TAG, lc80_cassette_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("4K")	
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( sc80 )
@@ -440,22 +449,9 @@ ROM_START( sc80 )
 	ROM_LOAD( "lc80e-c000-schach.rom", 0xc000, 0x1000, CRC(9c858d9c) SHA1(2f7b3fd046c965185606253f6cd9372da289ca6f) )
 ROM_END
 
-/* System Configuration */
-
-static SYSTEM_CONFIG_START( lc80 )
-	CONFIG_RAM_DEFAULT( 1 * 1024 )
-	CONFIG_RAM		  ( 2 * 1024 )
-	CONFIG_RAM		  ( 3 * 1024 )
-	CONFIG_RAM		  ( 4 * 1024 )
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START( lc80_2 )
-	CONFIG_RAM_DEFAULT( 4 * 1024 )
-SYSTEM_CONFIG_END
-
 /* System Drivers */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY                 FULLNAME                FLAGS */
-COMP( 1984, lc80,	0,		0,		lc80,	lc80,	0,		lc80,	"VEB Mikroelektronik",	"Lerncomputer LC 80",	GAME_SUPPORTS_SAVE )
-COMP( 1984, lc80_2,	lc80,	0,		lc80_2,	lc80,	0,		lc80_2,	"VEB Mikroelektronik",	"Lerncomputer LC 80.2",	GAME_SUPPORTS_SAVE )
-COMP( 1984, sc80,	lc80,	0,		lc80_2,	lc80,	0,		lc80_2,	"VEB Mikroelektronik",	"Schachcomputer SC-80",	GAME_SUPPORTS_SAVE )
+COMP( 1984, lc80,	0,		0,		lc80,	lc80,	0,		0,	"VEB Mikroelektronik",	"Lerncomputer LC 80",	GAME_SUPPORTS_SAVE )
+COMP( 1984, lc80_2,	lc80,	0,		lc80_2,	lc80,	0,		0,	"VEB Mikroelektronik",	"Lerncomputer LC 80.2",	GAME_SUPPORTS_SAVE )
+COMP( 1984, sc80,	lc80,	0,		lc80_2,	lc80,	0,		0,	"VEB Mikroelektronik",	"Schachcomputer SC-80",	GAME_SUPPORTS_SAVE )

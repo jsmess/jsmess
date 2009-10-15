@@ -154,7 +154,7 @@ http://www.z88forever.org.uk/zxplus3e/
 #include "sound/speaker.h"
 #include "formats/tzx_cas.h"
 #include "machine/beta.h"
-
+#include "devices/messram.h"
 
 /****************************************************************************************************/
 /* Zs Scorpion 256 */
@@ -195,14 +195,14 @@ static const device_config* beta;
 static void scorpion_update_memory(running_machine *machine)
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	spectrum_screen_location = mess_ram + ((spectrum_128_port_7ffd_data & 8) ? (7<<14) : (5<<14));
+	spectrum_screen_location = messram_get_ptr(devtag_get_device(machine, "messram")) + ((spectrum_128_port_7ffd_data & 8) ? (7<<14) : (5<<14));
 
-	memory_set_bankptr(machine, 4, mess_ram + (((spectrum_128_port_7ffd_data & 0x07) | ((scorpion_256_port_1ffd_data & 0x10)>>1)) * 0x4000));
+	memory_set_bankptr(machine, 4, messram_get_ptr(devtag_get_device(machine, "messram")) + (((spectrum_128_port_7ffd_data & 0x07) | ((scorpion_256_port_1ffd_data & 0x10)>>1)) * 0x4000));
 
 	if ((scorpion_256_port_1ffd_data & 0x01)==0x01)
 	{
 		memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_BANK(1));
-		memory_set_bankptr(machine, 1, mess_ram+(8<<14));
+		memory_set_bankptr(machine, 1, messram_get_ptr(devtag_get_device(machine, "messram"))+(8<<14));
 		logerror("RAM\n");
 	}
 	else
@@ -310,13 +310,13 @@ static MACHINE_RESET( scorpion )
 
 	memory_set_direct_update_handler(space, scorpion_direct );
 
-	memset(mess_ram,0,256*1024);
+	memset(messram_get_ptr(devtag_get_device(machine, "messram")),0,256*1024);
 
 	/* Bank 5 is always in 0x4000 - 0x7fff */
-	memory_set_bankptr(machine, 2, mess_ram + (5<<14));
+	memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + (5<<14));
 
 	/* Bank 2 is always in 0x8000 - 0xbfff */
-	memory_set_bankptr(machine, 3, mess_ram + (2<<14));
+	memory_set_bankptr(machine, 3, messram_get_ptr(devtag_get_device(machine, "messram")) + (2<<14));
 
 	spectrum_128_port_7ffd_data = 0;
 	scorpion_256_port_1ffd_data = 0;
@@ -333,6 +333,10 @@ static MACHINE_DRIVER_START( scorpion )
 	MDRV_MACHINE_RESET( scorpion )
 
 	MDRV_BETA_DISK_ADD(BETA_DISK_TAG)
+	
+	/* internal ram */
+	MDRV_RAM_MODIFY("messram")
+	MDRV_RAM_DEFAULT_SIZE("256K")
 MACHINE_DRIVER_END
 
 
@@ -412,12 +416,8 @@ ROM_START( kay1024 )
 	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
-static SYSTEM_CONFIG_START(scorpion)
-	CONFIG_RAM_DEFAULT(256 * 1024)
-SYSTEM_CONFIG_END
-
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT       INIT    CONFIG      COMPANY     FULLNAME */
-COMP( ????, scorpion, spec128,	 0,		scorpion,	spec_plus,	0,		scorpion,	"Zonov and Co.",		"Zs Scorpion 256", GAME_NOT_WORKING )
-COMP( ????, profi, 	  spec128,	 0,		scorpion,	spec_plus,	0,		scorpion,	"",		"Profi", GAME_NOT_WORKING )
-COMP( ????, kay1024,  spec128,	 0,		scorpion,	spec_plus,	0,		scorpion,	"",		"Kay 1024", GAME_NOT_WORKING )
-COMP( ????, quorum,   spec128,	 0,		scorpion,	spec_plus,	0,		scorpion,	"",		"Quorum", GAME_NOT_WORKING )
+COMP( ????, scorpion, spec128,	 0,		scorpion,	spec_plus,	0,		0,	"Zonov and Co.",		"Zs Scorpion 256", GAME_NOT_WORKING )
+COMP( ????, profi, 	  spec128,	 0,		scorpion,	spec_plus,	0,		0,	"",		"Profi", GAME_NOT_WORKING )
+COMP( ????, kay1024,  spec128,	 0,		scorpion,	spec_plus,	0,		0,	"",		"Kay 1024", GAME_NOT_WORKING )
+COMP( ????, quorum,   spec128,	 0,		scorpion,	spec_plus,	0,		0,	"",		"Quorum", GAME_NOT_WORKING )

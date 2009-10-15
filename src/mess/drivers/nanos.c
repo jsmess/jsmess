@@ -15,6 +15,7 @@
 #include "machine/nec765.h"
 #include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
+#include "devices/messram.h"
 
 static const UINT8 *FNT;
 
@@ -247,7 +248,7 @@ static VIDEO_UPDATE( nanos )
 			{
 				if (ra < 8)
 				{
-					chr = mess_ram[0xf800+ x];
+					chr = messram_get_ptr(devtag_get_device(screen->machine, "messram"))[0xf800+ x];
 
 					/* get pattern of pixels for that character scanline */
 					gfx = FNT[(chr<<3) | ra ];
@@ -298,7 +299,7 @@ static WRITE8_DEVICE_HANDLER (nanos_port_b_w)
 	if (BIT(data,7)) {
 		memory_set_bankptr(device->machine, 1, memory_region(device->machine, "maincpu"));
 	} else {
-		memory_set_bankptr(device->machine, 1, mess_ram);
+		memory_set_bankptr(device->machine, 1, messram_get_ptr(devtag_get_device(device->machine, "messram")));
 	}
 }
 static UINT8 row_number(UINT8 code) {
@@ -404,8 +405,8 @@ static MACHINE_RESET(nanos)
 	memory_install_write8_handler(space, 0x1000, 0xffff, 0, 0, SMH_BANK(2));
 
 	memory_set_bankptr(machine, 1, memory_region(machine, "maincpu"));
-	memory_set_bankptr(machine, 2, mess_ram + 0x1000);
-	memory_set_bankptr(machine, 3, mess_ram);
+	memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x1000);
+	memory_set_bankptr(machine, 3, messram_get_ptr(devtag_get_device(machine, "messram")));
 
 	floppy_drive_set_motor_state(floppy_get_device(space->machine, 0), 1);
 
@@ -490,11 +491,11 @@ static MACHINE_DRIVER_START( nanos )
 	MDRV_NEC765A_ADD("nec765", nanos_nec765_interface)
 
 	MDRV_FLOPPY_4_DRIVES_ADD(nanos_floppy_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("64K")	
 MACHINE_DRIVER_END
-
-static SYSTEM_CONFIG_START(nanos)
-	CONFIG_RAM_DEFAULT(64 * 1024)
-SYSTEM_CONFIG_END
 
 /* ROM definition */
 ROM_START( nanos )
@@ -510,5 +511,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( ????, nanos,  0,       0, 	nanos, 	nanos, 	 0,  	  nanos,  	 "Ingenieurhochschule fur Seefahrt Warnemunde/Wustrow",   "Nanos",		GAME_NOT_WORKING)
+COMP( ????, nanos,  0,       0, 	nanos, 	nanos, 	 0,  	  0,  	 "Ingenieurhochschule fur Seefahrt Warnemunde/Wustrow",   "Nanos",		GAME_NOT_WORKING)
 

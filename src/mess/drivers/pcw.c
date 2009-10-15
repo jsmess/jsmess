@@ -101,6 +101,7 @@
 #include "includes/pcw.h"
 // pcw/pcw16 beeper
 #include "sound/beep.h"
+#include "devices/messram.h"
 
 #define VERBOSE 1
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
@@ -254,14 +255,14 @@ static void pcw_update_read_memory_block(running_machine *machine, int block, in
 			(read8_space_func) (STATIC_BANK1 + (FPTR)block));
 //      LOG(("MEM: read block %i -> bank %i\n",block,bank));
 	}
-	memory_set_bankptr(machine, block + 1, mess_ram + ((bank * 0x4000) % mess_ram_size));
+	memory_set_bankptr(machine, block + 1, messram_get_ptr(devtag_get_device(machine, "messram")) + ((bank * 0x4000) % messram_get_size(devtag_get_device(machine, "messram"))));
 }
 
 
 
 static void pcw_update_write_memory_block(running_machine *machine, int block, int bank)
 {
-	memory_set_bankptr(machine, block + 5, mess_ram + ((bank * 0x4000) % mess_ram_size));
+	memory_set_bankptr(machine, block + 5, messram_get_ptr(devtag_get_device(machine, "messram")) + ((bank * 0x4000) % messram_get_size(devtag_get_device(machine, "messram"))));
 //  LOG(("MEM: write block %i -> bank %i\n",block,bank));
 }
 
@@ -762,9 +763,9 @@ static DRIVER_INIT(pcw)
 	/* copy boot code into RAM - yes, it's skipping a step,
        but there is no verified dump of the boot sequence */
 
-	memset(mess_ram,0x00,mess_ram_size);
+	memset(messram_get_ptr(devtag_get_device(machine, "messram")),0x00,messram_get_size(devtag_get_device(machine, "messram")));
 	for(x=0;x<256;x++)
-		mess_ram[x+2] = code[x];
+		messram_get_ptr(devtag_get_device(machine, "messram"))[x+2] = code[x];
 
 	/* lower 4 bits are interrupt counter */
 	pcw_system_status = 0x000;
@@ -1017,14 +1018,29 @@ static MACHINE_DRIVER_START( pcw )
 	MDRV_NEC765A_ADD("nec765", pcw_nec765_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(pcw_floppy_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("256K")		
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START(  pcw_512 )
+	MDRV_IMPORT_FROM( pcw )
+
+	/* internal ram */
+	MDRV_RAM_MODIFY("messram")
+	MDRV_RAM_DEFAULT_SIZE("512K")
+MACHINE_DRIVER_END
 
 /* PCW9512, PCW9512+, PCW10 */
 static MACHINE_DRIVER_START( pcw9512 )
 	MDRV_IMPORT_FROM( pcw )
 	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_IO_MAP(pcw9512_io)
+	
+	/* internal ram */
+	MDRV_RAM_MODIFY("messram")
+	MDRV_RAM_DEFAULT_SIZE("512K")
 MACHINE_DRIVER_END
 
 
@@ -1056,19 +1072,11 @@ ROM_PCW(pcw9256)
 ROM_PCW(pcw9512)
 ROM_PCW(pcw10)
 
-static SYSTEM_CONFIG_START(pcw_256k)
-	CONFIG_RAM_DEFAULT(256 * 1024)
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START(pcw_512k)
-	CONFIG_RAM_DEFAULT(512 * 1024)
-SYSTEM_CONFIG_END
-
 /* these are all variants on the pcw design */
 /* major difference is memory configuration and drive type */
 /*     YEAR NAME        PARENT      COMPAT  MACHINE   INPUT INIT    CONFIG      COMPANY        FULLNAME */
-COMP( 1985, pcw8256,   0,			0,		pcw,	  pcw,	pcw,	pcw_256k,	"Amstrad plc", "PCW8256",		GAME_NOT_WORKING)
-COMP( 1985, pcw8512,   pcw8256,	0,		pcw,	  pcw,	pcw,	pcw_512k,	"Amstrad plc", "PCW8512",		GAME_NOT_WORKING)
-COMP( 1987, pcw9256,   pcw8256,	0,		pcw,	  pcw,	pcw,	pcw_256k,	"Amstrad plc", "PCW9256",		GAME_NOT_WORKING)
-COMP( 1987, pcw9512,   pcw8256,	0,		pcw9512,  pcw,	pcw,	pcw_512k,	"Amstrad plc", "PCW9512 (+)",	GAME_NOT_WORKING)
-COMP( 1993, pcw10,	    pcw8256,	0,		pcw9512,  pcw,	pcw,	pcw_512k,	"Amstrad plc", "PCW10",			GAME_NOT_WORKING)
+COMP( 1985, pcw8256,   0,			0,		pcw,	  pcw,	pcw,	0,	"Amstrad plc", "PCW8256",		GAME_NOT_WORKING)
+COMP( 1985, pcw8512,   pcw8256,	0,		pcw_512,	  pcw,	pcw,	0,	"Amstrad plc", "PCW8512",		GAME_NOT_WORKING)
+COMP( 1987, pcw9256,   pcw8256,	0,		pcw,	  pcw,	pcw,	0,	"Amstrad plc", "PCW9256",		GAME_NOT_WORKING)
+COMP( 1987, pcw9512,   pcw8256,	0,		pcw9512,  pcw,	pcw,	0,	"Amstrad plc", "PCW9512 (+)",	GAME_NOT_WORKING)
+COMP( 1993, pcw10,	    pcw8256,	0,		pcw9512,  pcw,	pcw,	0,	"Amstrad plc", "PCW10",			GAME_NOT_WORKING)

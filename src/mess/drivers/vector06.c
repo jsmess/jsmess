@@ -18,6 +18,7 @@
 #include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
 #include "includes/vector06.h"
+#include "devices/messram.h"
 
 /* Address maps */
 static ADDRESS_MAP_START(vector06_mem, ADDRESS_SPACE_PROGRAM, 8)
@@ -198,6 +199,10 @@ static MACHINE_DRIVER_START( vector06 )
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("emr")
 	MDRV_CARTSLOT_NOT_MANDATORY
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("64K")		
 MACHINE_DRIVER_END
 
 /* ROM definition */
@@ -232,13 +237,9 @@ ROM_START( pk6128c )
   	ROM_CART_LOAD("cart", 0x18000, 0x8000, ROM_FILL_FF | ROM_OPTIONAL)
 ROM_END
 
-static SYSTEM_CONFIG_START(vector06)
- 	CONFIG_RAM_DEFAULT(64 * 1024)
-SYSTEM_CONFIG_END
-
 /* Driver */
 
 /*    YEAR  NAME         PARENT  COMPAT  MACHINE     INPUT       INIT     CONFIG COMPANY                  FULLNAME   FLAGS */
-COMP( 1987, vector06, 	 0,  	 	0,	vector06, 	vector06, 	vector06, vector06,  "", 					 "Vector 06c",	 GAME_NOT_WORKING)
-COMP( 1987, vec1200, 	 vector06, 	0,	vector06, 	vector06, 	vector06, vector06,  "", 					 "Vector 1200",	 GAME_NOT_WORKING)
-COMP( 1987, pk6128c, 	 vector06,  0,	vector06, 	vector06, 	vector06, vector06,  "", 					 "PK-6128c",	 GAME_NOT_WORKING)
+COMP( 1987, vector06, 	 0,  	 	0,	vector06, 	vector06, 	vector06, 0,  "", 					 "Vector 06c",	 GAME_NOT_WORKING)
+COMP( 1987, vec1200, 	 vector06, 	0,	vector06, 	vector06, 	vector06, 0,  "", 					 "Vector 1200",	 GAME_NOT_WORKING)
+COMP( 1987, pk6128c, 	 vector06,  0,	vector06, 	vector06, 	vector06, 0,  "", 					 "PK-6128c",	 GAME_NOT_WORKING)

@@ -54,6 +54,7 @@
 #include "sound/dac.h"
 #include "sound/speaker.h"
 #include "sound/saa1099.h"
+#include "devices/messram.h"
 
 #include "memconv.h"
 
@@ -514,6 +515,10 @@ static MACHINE_DRIVER_START( ibm5170 )
 	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(ibmat_floppy_config)
+
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("1664K")
 MACHINE_DRIVER_END
 
 
@@ -580,6 +585,10 @@ static MACHINE_DRIVER_START( ibm5162 )
 	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(ibmat_floppy_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("1664K")
 MACHINE_DRIVER_END
 
 
@@ -648,6 +657,10 @@ static MACHINE_DRIVER_START( ps2m30286 )
 	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(ibmat_floppy_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("1664K")	
 MACHINE_DRIVER_END
 
 
@@ -718,6 +731,10 @@ static MACHINE_DRIVER_START( atvga )
 	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(ibmat_floppy_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("1664K")	
 MACHINE_DRIVER_END
 
 
@@ -785,6 +802,10 @@ static MACHINE_DRIVER_START( at386 )
 	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(ibmat_floppy_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("1664K")
 MACHINE_DRIVER_END
 
 
@@ -1102,11 +1123,7 @@ ROM_START( at586 )
 	ROM_REGION( 0x2000, KEYTRONIC_KB3270PC_CPU, 0 )
 	ROM_LOAD("14166.bin", 0x0000, 0x2000, CRC(1aea1b53) SHA1(b75b6d4509036406052157bc34159f7039cdc72e))
 ROM_END
-
-static SYSTEM_CONFIG_START(ibmat)
-	CONFIG_RAM_DEFAULT( (640+1024) * 1024 )
-SYSTEM_CONFIG_END
-
+	
 /***************************************************************************
 
   Game driver(s)
@@ -1114,13 +1131,13 @@ SYSTEM_CONFIG_END
 ***************************************************************************/
 
 /*     YEAR  NAME      PARENT   COMPAT   MACHINE    INPUT       INIT        CONFIG   COMPANY     FULLNAME */
-COMP ( 1984, ibm5170,  0,       ibm5160, ibm5170,   atcga,	atega,	    ibmat,   "International Business Machines",  "IBM PC/AT 5170", GAME_NOT_WORKING )
-COMP ( 1985, ibm5170a, ibm5170, 0,       ibm5170a,  atcga,      atega,      ibmat,   "International Business Machines",  "IBM PC/AT 5170 8MHz", GAME_NOT_WORKING )
-COMP ( 1985, ibm5162,  ibm5170, 0,       ibm5162,   atcga,      atcga,      ibmat,   "International Business Machines",  "IBM PC/XT-286 5162", GAME_NOT_WORKING )
-COMP ( 1988, i8530286, ibm5170, 0,       ps2m30286, atvga,	ps2m30286,  ibmat,   "International Business Machines",  "IBM PS2 Model 30 286", GAME_NOT_WORKING )
-COMP ( 1987, at,       ibm5170, 0,       ibm5162,  atcga,	atcga,	    ibmat,   "",  "PC/AT (CGA, MF2 Keyboard)", GAME_NOT_WORKING )
-COMP ( 1989, neat,     ibm5170, 0,       ibm5162,  atcga,	atcga,	    ibmat,   "",  "NEAT (CGA, MF2 Keyboard)", GAME_NOT_WORKING )
-COMP ( 1988, at386,    ibm5170, 0,       at386,     atcga,	at386,	    ibmat,   "MITAC INC",  "PC/AT 386(CGA, MF2 Keyboard)", GAME_NOT_WORKING )
-COMP ( 1990, at486,    ibm5170, 0,       at486,     atcga,	at386,	    ibmat,   "",  "PC/AT 486(CGA, MF2 Keyboard)", GAME_NOT_WORKING )
-COMP ( 1990, at586,    ibm5170, 0,       at586,     atcga,	at586,	    ibmat,   "",  "PC/AT 586(CGA, MF2 Keyboard)", GAME_NOT_WORKING )
-COMP ( 1987, atvga,    ibm5170, 0,       atvga,     atvga,	at_vga,     ibmat,   "",  "PC/AT (VGA, MF2 Keyboard)" , GAME_NOT_WORKING )
+COMP ( 1984, ibm5170,  0,       ibm5160, ibm5170,   atcga,	atega,	    0,   "International Business Machines",  "IBM PC/AT 5170", GAME_NOT_WORKING )
+COMP ( 1985, ibm5170a, ibm5170, 0,       ibm5170a,  atcga,  atega,      0,   "International Business Machines",  "IBM PC/AT 5170 8MHz", GAME_NOT_WORKING )
+COMP ( 1985, ibm5162,  ibm5170, 0,       ibm5162,   atcga,  atcga,      0,   "International Business Machines",  "IBM PC/XT-286 5162", GAME_NOT_WORKING )
+COMP ( 1988, i8530286, ibm5170, 0,       ps2m30286, atvga,	ps2m30286,  0,   "International Business Machines",  "IBM PS2 Model 30 286", GAME_NOT_WORKING )
+COMP ( 1987, at,       ibm5170, 0,       ibm5162,  atcga,	atcga,	    0,   "",  "PC/AT (CGA, MF2 Keyboard)", GAME_NOT_WORKING )
+COMP ( 1989, neat,     ibm5170, 0,       ibm5162,  atcga,	atcga,	    0,   "",  "NEAT (CGA, MF2 Keyboard)", GAME_NOT_WORKING )
+COMP ( 1988, at386,    ibm5170, 0,       at386,     atcga,	at386,	    0,   "MITAC INC",  "PC/AT 386(CGA, MF2 Keyboard)", GAME_NOT_WORKING )
+COMP ( 1990, at486,    ibm5170, 0,       at486,     atcga,	at386,	    0,   "",  "PC/AT 486(CGA, MF2 Keyboard)", GAME_NOT_WORKING )
+COMP ( 1990, at586,    ibm5170, 0,       at586,     atcga,	at586,	    0,   "",  "PC/AT 586(CGA, MF2 Keyboard)", GAME_NOT_WORKING )
+COMP ( 1987, atvga,    ibm5170, 0,       atvga,     atvga,	at_vga,     0,   "",  "PC/AT (VGA, MF2 Keyboard)" , GAME_NOT_WORKING )

@@ -26,7 +26,7 @@
 #include "sound/sn76496.h"
 #include "machine/ctronics.h"
 #include "devices/snapquik.h"
-
+#include "devices/messram.h"
 
 
 /*************************************
@@ -309,6 +309,20 @@ static MACHINE_DRIVER_START( mtx512 )
 
 	/* snapshot */
 	MDRV_SNAPSHOT_ADD("snapshot", mtx, "mtb", 0.5)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("64K")
+	MDRV_RAM_EXTRA_OPTIONS("96K,128K,160K,192K,224K,256K,288K,320K,352K,384K,416K,448K,512K")
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( mtx500 )
+	MDRV_IMPORT_FROM(mtx512)
+
+	/* internal ram */
+	MDRV_RAM_MODIFY("messram")
+	MDRV_RAM_DEFAULT_SIZE("32K")
+	MDRV_RAM_EXTRA_OPTIONS("64K,96K,128K,160K,192K,224K,256K,288K,320K,352K,384K,416K,448K,512K")
 MACHINE_DRIVER_END
 
 
@@ -316,6 +330,11 @@ static MACHINE_DRIVER_START( rs128 )
 	MDRV_IMPORT_FROM(mtx512)
 
 	MDRV_Z80DART_ADD("z80dart", MTX_SYSTEM_CLOCK, mtx_dart_intf)
+	
+	/* internal ram */
+	MDRV_RAM_MODIFY("messram")
+	MDRV_RAM_DEFAULT_SIZE("128K")
+	MDRV_RAM_EXTRA_OPTIONS("96K,160K,192K,224K,256K,288K,320K,352K,384K,416K,448K,512K")
 MACHINE_DRIVER_END
 
 
@@ -339,53 +358,6 @@ ROM_END
 #define rom_mtx500  rom_mtx512
 #define rom_rs128   rom_mtx512
 
-
-
-/*************************************
- *
- *  System configs
- *
- *************************************/
-
-static SYSTEM_CONFIG_START( mtx_common )
-	CONFIG_RAM(160 * 1024)
-	CONFIG_RAM(192 * 1024)
-	CONFIG_RAM(224 * 1024)
-	CONFIG_RAM(256 * 1024)
-	CONFIG_RAM(288 * 1024)
-	CONFIG_RAM(320 * 1024)
-	CONFIG_RAM(352 * 1024)
-	CONFIG_RAM(384 * 1024)
-	CONFIG_RAM(416 * 1024)
-	CONFIG_RAM(448 * 1024)
-	CONFIG_RAM(480 * 1024)
-	CONFIG_RAM(512 * 1024)
-SYSTEM_CONFIG_END
-
-
-static SYSTEM_CONFIG_START( mtx512 )
-	CONFIG_IMPORT_FROM(mtx_common)
-	CONFIG_RAM_DEFAULT(64 * 1024)
-	CONFIG_RAM(96 * 1024)
-	CONFIG_RAM(128 * 1024)
-SYSTEM_CONFIG_END
-
-
-static SYSTEM_CONFIG_START( mtx500 )
-	CONFIG_IMPORT_FROM(mtx_common)
-	CONFIG_RAM_DEFAULT(32 * 1024)
-	CONFIG_RAM(64 * 1024)
-	CONFIG_RAM(96 * 1024)
-	CONFIG_RAM(128 * 1024)
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START( rs128 )
-	CONFIG_IMPORT_FROM(mtx_common)
-	CONFIG_RAM_DEFAULT(128 * 1024)
-SYSTEM_CONFIG_END
-
-
-
 /*************************************
  *
  *  Driver definitions
@@ -393,6 +365,6 @@ SYSTEM_CONFIG_END
  *************************************/
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT     CONFIG,  COMPANY          FULLNAME   FLAGS */
-COMP( 1983, mtx512,   0,		0,		mtx512,   mtx512,   mtx512,  mtx512,  "Memotech Ltd.", "MTX 512", 0 )
-COMP( 1983, mtx500,   mtx512,   0,      mtx512,   mtx512,   mtx512,  mtx500,  "Memotech Ltd.", "MTX 500", 0 )
-COMP( 1984, rs128,    mtx512,   0,      rs128,    mtx512,   rs128,   rs128,   "Memotech Ltd.", "RS 128",  0 )
+COMP( 1983, mtx512,   0,		0,		mtx512,   mtx512,   mtx512,  0,  "Memotech Ltd.", "MTX 512", 0 )
+COMP( 1983, mtx500,   mtx512,   0,      mtx500,   mtx512,   mtx512,  0,  "Memotech Ltd.", "MTX 500", 0 )
+COMP( 1984, rs128,    mtx512,   0,      rs128,    mtx512,   rs128,   0,   "Memotech Ltd.", "RS 128",  0 )

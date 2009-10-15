@@ -58,6 +58,7 @@
 #include "machine/8530scc.h"
 #include "sound/ay8910.h"
 #include "sound/speaker.h"
+#include "devices/messram.h"
 
 static const gfx_layout apple2gs_text_layout =
 {
@@ -250,6 +251,10 @@ static MACHINE_DRIVER_START( apple2gs )
 	MDRV_FLOPPY_APPLE_2_DRIVES_REMOVE()
 	MDRV_FLOPPY_APPLE_2_DRIVES_ADD(apple2gs_floppy525_floppy_config,15,16)
 	MDRV_FLOPPY_SONY_2_DRIVES_ADDITIONAL_ADD(apple2gs_floppy35_floppy_config)
+	
+	/* internal ram */
+	MDRV_RAM_MODIFY("messram")
+	MDRV_RAM_DEFAULT_SIZE("2M")
 MACHINE_DRIVER_END
 
 
@@ -327,15 +332,9 @@ static DRIVER_INIT(apple2gs)
 	state_save_register_global_array(machine, apple2gs_docram);
 }
 
-/* ----------------------------------------------------------------------- */
-
-static SYSTEM_CONFIG_START(apple2gs)
-	CONFIG_RAM_DEFAULT			(2 * 1024 * 1024)
-SYSTEM_CONFIG_END
-
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT       INIT      CONFIG      COMPANY            FULLNAME */
-COMP( 1989, apple2gs, 0,        apple2, apple2gs, apple2gs,   apple2gs, apple2gs,	"Apple Computer", "Apple IIgs (ROM03)", 0 )
-COMP( 198?, apple2gsr3p, apple2gs, 0,   apple2gs, apple2gs,   apple2gs, apple2gs,	"Apple Computer", "Apple IIgs (ROM03 prototype)", GAME_NOT_WORKING )
-COMP( 1989, apple2gsr3lp, apple2gs, 0,  apple2gs, apple2gs,   apple2gs, apple2gs,	"Apple Computer", "Apple IIgs (ROM03 late prototype?)", GAME_NOT_WORKING )
-COMP( 1987, apple2gsr1, apple2gs, 0,    apple2gs, apple2gs,   apple2gs, apple2gs,	"Apple Computer", "Apple IIgs (ROM01)", 0 )
-COMP( 1986, apple2gsr0, apple2gs, 0,    apple2gs, apple2gs,   apple2gs, apple2gs,	"Apple Computer", "Apple IIgs (ROM00)", 0 )
+COMP( 1989, apple2gs, 0,        apple2, apple2gs, apple2gs,   apple2gs, 0,	"Apple Computer", "Apple IIgs (ROM03)", 0 )
+COMP( 198?, apple2gsr3p, apple2gs, 0,   apple2gs, apple2gs,   apple2gs, 0,	"Apple Computer", "Apple IIgs (ROM03 prototype)", GAME_NOT_WORKING )
+COMP( 1989, apple2gsr3lp, apple2gs, 0,  apple2gs, apple2gs,   apple2gs, 0,	"Apple Computer", "Apple IIgs (ROM03 late prototype?)", GAME_NOT_WORKING )
+COMP( 1987, apple2gsr1, apple2gs, 0,    apple2gs, apple2gs,   apple2gs, 0,	"Apple Computer", "Apple IIgs (ROM01)", 0 )
+COMP( 1986, apple2gsr0, apple2gs, 0,    apple2gs, apple2gs,   apple2gs, 0,	"Apple Computer", "Apple IIgs (ROM00)", 0 )

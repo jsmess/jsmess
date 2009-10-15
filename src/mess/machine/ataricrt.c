@@ -7,6 +7,7 @@
 #include "driver.h"
 #include "includes/atari.h"
 #include "ataridev.h"
+#include "devices/messram.h"
 
 static int a800_cart_loaded = 0;
 static int a800_cart_is_16k = 0;
@@ -35,12 +36,12 @@ DRIVER_INIT( atari )
 	}
 
 	/* install RAM */
-	ram_top = MIN(mess_ram_size, ram_size) - 1;
+	ram_top = MIN(messram_get_size(devtag_get_device(machine, "messram")), ram_size) - 1;
 	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),
 		0x0000, ram_top, 0, 0, SMH_BANK(2));
 	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),
 		0x0000, ram_top, 0, 0, SMH_BANK(2));
-	memory_set_bankptr(machine, 2, mess_ram);
+	memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")));
 }
 #endif
 
@@ -66,8 +67,8 @@ static void a800_setbank(running_machine *machine, int n)
 			}
 			else
 			{
-				read_addr = &mess_ram[0x08000];
-				write_addr = &mess_ram[0x08000];
+				read_addr = &messram_get_ptr(devtag_get_device(machine, "messram"))[0x08000];
+				write_addr = &messram_get_ptr(devtag_get_device(machine, "messram"))[0x08000];
 			}
 			break;
 	}
@@ -113,12 +114,12 @@ static void ms_atari_machine_start(running_machine *machine, int type, int has_c
 	}
 
 	/* install RAM */
-	ram_top = MIN(mess_ram_size, ram_size) - 1;
+	ram_top = MIN(messram_get_size(devtag_get_device(machine, "messram")), ram_size) - 1;
 	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),
 		0x0000, ram_top, 0, 0, SMH_BANK(2));
 	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),
 		0x0000, ram_top, 0, 0, SMH_BANK(2));
-	memory_set_bankptr(machine, 2, mess_ram);
+	memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")));
 
 	/* cartridge */
 	if (has_cart)

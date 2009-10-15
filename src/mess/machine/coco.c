@@ -100,7 +100,7 @@ easier to manage.
 #include "devices/cococart.h"
 #include "devices/cartslot.h"
 #include "devices/flopdrv.h"
-
+#include "devices/messram.h"
 
 /***************************************************************************
     PARAMETERS
@@ -660,11 +660,11 @@ static int generic_pak_load(const device_config *image, int rambase_index, int r
 	int trailer_load = 0;
 
 	ROM = memory_region(image->machine, "maincpu");
-	rambase = &mess_ram[rambase_index];
+	rambase = &messram_get_ptr(devtag_get_device(image->machine, "messram"))[rambase_index];
 	rombase = &ROM[rombase_index];
 	pakbase = &ROM[pakbase_index];
 
-	if (mess_ram_size < 0x10000)
+	if (messram_get_size(devtag_get_device(image->machine, "messram")) < 0x10000)
 	{
 		if (LOG_PAK)
 			logerror("Cannot load PAK files without at least 64k.\n");
@@ -742,7 +742,7 @@ SNAPSHOT_LOAD ( coco_pak )
 
 SNAPSHOT_LOAD ( coco3_pak )
 {
-	return generic_pak_load(image, (0x70000 % mess_ram_size), 0x0000, 0xc000);
+	return generic_pak_load(image, (0x70000 % messram_get_size(devtag_get_device(image->machine, "messram"))), 0x0000, 0xc000);
 }
 
 /***************************************************************************
@@ -1871,9 +1871,9 @@ static READ8_DEVICE_HANDLER ( d_pia1_pb_r_coco )
        to access 32K of ram, and also allows the cocoe driver to access
        the full 64K, as this uses Color Basic 1.2, which can configure 64K rams */
 
-	if (mess_ram_size > 0x8000)		/* 1 bank of 64K rams */
+	if (messram_get_size(devtag_get_device(device->machine, "messram")) > 0x8000)		/* 1 bank of 64K rams */
 		result = (pia6821_get_output_b(state->pia_0) & 0x80) >> 5;
-	else if (mess_ram_size >= 0x4000)	/* 1 or 2 banks of 16K rams */
+	else if (messram_get_size(devtag_get_device(device->machine, "messram")) >= 0x4000)	/* 1 or 2 banks of 16K rams */
 		result = 0x04;
 	else
 		result = 0x00;			/* 4K Rams */
@@ -1892,7 +1892,7 @@ static READ8_DEVICE_HANDLER ( d_pia1_pb_r_dragon32 )
        as both the 64 and Alpha, always have 64K rams, also the meaning of
        the bit is different with respect to the CoCo 1 */
 
-	if (mess_ram_size > 0x8000)
+	if (messram_get_size(devtag_get_device(device->machine, "messram")) > 0x8000)
 		result = 0x00;		/* 1 bank of 64K, rams */
 	else
 		result = 0x04;		/* 2 banks of 16K rams */
@@ -1909,9 +1909,9 @@ static READ8_DEVICE_HANDLER ( d_pia1_pb_r_coco2 )
      */
 	int result;
 
-	if (mess_ram_size <= 0x1000)
+	if (messram_get_size(devtag_get_device(device->machine, "messram")) <= 0x1000)
 		result = 0x00;					/* 4K: wire pia1_pb2 low */
-	else if (mess_ram_size <= 0x4000)
+	else if (messram_get_size(devtag_get_device(device->machine, "messram")) <= 0x4000)
 		result = 0x04;					/* 16K: wire pia1_pb2 high */
 	else
 		result = (pia6821_get_output_b(state->pia_0) & 0x40) >> 4;		/* 32/64K: wire output of pia0_pb6 to input pia1_pb2  */
@@ -1952,11 +1952,11 @@ WRITE8_HANDLER ( plus_reg_w )
 
 	switch (map)
 	{
-		case 0x00	: bottom_32k=&mess_ram[0x00000]; break;
-		case 0x01	: bottom_32k=&mess_ram[0x10000]; break;
-		case 0x02	: bottom_32k=&mess_ram[0x18000]; break;
-		case 0x03	: bottom_32k=&mess_ram[0x00000]; break;
-		default	: bottom_32k=&mess_ram[0x00000]; break; // Just to shut the compiler up !
+		case 0x00	: bottom_32k=&messram_get_ptr(devtag_get_device(space->machine, "messram"))[0x00000]; break;
+		case 0x01	: bottom_32k=&messram_get_ptr(devtag_get_device(space->machine, "messram"))[0x10000]; break;
+		case 0x02	: bottom_32k=&messram_get_ptr(devtag_get_device(space->machine, "messram"))[0x18000]; break;
+		case 0x03	: bottom_32k=&messram_get_ptr(devtag_get_device(space->machine, "messram"))[0x00000]; break;
+		default	: bottom_32k=&messram_get_ptr(devtag_get_device(space->machine, "messram"))[0x00000]; break; // Just to shut the compiler up !
 	}
 
 	setup_memory_map(space->machine);
@@ -2074,9 +2074,9 @@ static void setup_memory_map(running_machine *machine)
 		/* Lookup the apropreate wbank value dependent on ram size */
 		if (memsize==0)
 			wbank=memmap[block_index].wbank4;
-		else if ((memsize==1) && (mess_ram_size == 0x4000))	/* one bank of 16K rams */
+		else if ((memsize==1) && (messram_get_size(devtag_get_device(machine, "messram")) == 0x4000))	/* one bank of 16K rams */
 			wbank=memmap[block_index].wbank16_1;
-		else if ((memsize==1) && (mess_ram_size == 0x8000))	/* two banks of 16K rams */
+		else if ((memsize==1) && (messram_get_size(devtag_get_device(machine, "messram")) == 0x8000))	/* two banks of 16K rams */
 			wbank=memmap[block_index].wbank16_2;
 		else
 			wbank=memmap[block_index].wbank64;
@@ -2090,7 +2090,7 @@ static void setup_memory_map(running_machine *machine)
 			if(block_index<8)
 				memory_set_bankptr(machine, block_index+1,&bottom_32k[memmap[wbank-1].start]);
 			else
-				memory_set_bankptr(machine, block_index+1,&mess_ram[memmap[wbank-1].start]);
+				memory_set_bankptr(machine, block_index+1,&messram_get_ptr(devtag_get_device(machine, "messram"))[memmap[wbank-1].start]);
 
 			memory_install_read_handler(space, memmap[block_index].start, memmap[block_index].end, 0, 0, block_index+1);
 			memory_install_write_handler(space, memmap[block_index].start, memmap[block_index].end, 0, 0, block_index+1);
@@ -2136,10 +2136,10 @@ static SAM6883_SET_PAGE_ONE_MODE( d_sam_set_pageonemode )
 
 	if (!get_sam_maptype(device))		// Ignored in maptype 1
 	{
-		if((mess_ram_size>0x8000) && val)
-			bottom_32k=&mess_ram[0x8000];
+		if((messram_get_size(devtag_get_device(device->machine, "messram"))>0x8000) && val)
+			bottom_32k=&messram_get_ptr(devtag_get_device(device->machine, "messram"))[0x8000];
 		else
-			bottom_32k=mess_ram;
+			bottom_32k=messram_get_ptr(devtag_get_device(device->machine, "messram"));
 
 		setup_memory_map(device->machine);
 	}
@@ -2272,7 +2272,7 @@ static void coco3_timer_init(running_machine *machine)
 static SAM6883_SET_MAP_TYPE( d_sam_set_maptype )
 {
 	if(val)
-		bottom_32k=mess_ram;	// Always reset, when in maptype 1
+		bottom_32k=messram_get_ptr(devtag_get_device(device->machine, "messram"));	// Always reset, when in maptype 1
 
 	setup_memory_map(device->machine);
 }
@@ -2306,7 +2306,7 @@ static SAM6883_SET_MAP_TYPE( d_sam_set_maptype )
  * this function to use a RAM address, which is used for video since video can
  * never reference ROM.
  */
-offs_t coco3_mmu_translate(int bank, int offset)
+offs_t coco3_mmu_translate(running_machine *machine,int bank, int offset)
 {
 	int forceram;
 	UINT32 block;
@@ -2320,7 +2320,7 @@ offs_t coco3_mmu_translate(int bank, int offset)
 			/* this GIME register fixes logical addresses $FExx to physical
              * addresses $7FExx ($1FExx if 128k */
 			assert(offset < 0x200);
-			return ((mess_ram_size - 0x200) & 0x7ffff) + offset;
+			return ((messram_get_size(devtag_get_device(machine, "messram")) - 0x200) & 0x7ffff) + offset;
 		}
 		bank = 7;
 		offset += 0x1e00;
@@ -2370,7 +2370,7 @@ offs_t coco3_mmu_translate(int bank, int offset)
 	}
 	else
 	{
-		result = ((block * 0x2000) + offset) % mess_ram_size;
+		result = ((block * 0x2000) + offset) % messram_get_size(devtag_get_device(machine, "messram"));
 	}
 	return result;
 }
@@ -2404,7 +2404,7 @@ static void coco3_mmu_update(running_machine *machine, int lowblock, int hiblock
 
 	for (i = lowblock; i <= hiblock; i++)
 	{
-		offset = coco3_mmu_translate(i, 0);
+		offset = coco3_mmu_translate(machine, i, 0);
 		if (offset & 0x80000000)
 		{
 			/* an offset into the CoCo 3 ROM */
@@ -2417,7 +2417,7 @@ static void coco3_mmu_update(running_machine *machine, int lowblock, int hiblock
 		else
 		{
 			/* offset into normal RAM */
-			readbank = &mess_ram[offset];
+			readbank = &messram_get_ptr(devtag_get_device(machine, "messram"))[offset];
 			writebank = i + 1;
 		}
 
@@ -2698,7 +2698,7 @@ static SAM6883_GET_RAMBASE( coco3_sam_get_rambase )
 {
 	UINT32 video_base;
 	video_base = coco3_get_video_base(0xE0, 0x3F);
-	return &mess_ram[video_base % mess_ram_size];
+	return &messram_get_ptr(devtag_get_device(device->machine, "messram"))[video_base % messram_get_size(devtag_get_device(device->machine, "messram"))];
 }
 
 
@@ -2843,7 +2843,7 @@ static void generic_init_machine(running_machine *machine, const machine_init_in
 	bas_rom_bank = coco_rom;
 
 	/* setup default pointer for botom 32K of ram */
-	bottom_32k = mess_ram;
+	bottom_32k = messram_get_ptr(devtag_get_device(machine, "messram"));
 
 	/* setup printer output callback */
 	printer_out = init->printer_out_;
@@ -2859,7 +2859,7 @@ static void generic_init_machine(running_machine *machine, const machine_init_in
 static void generic_coco12_dragon_init(running_machine *machine, const machine_init_interface *init)
 {
 	/* Set default RAM mapping */
-	memory_set_bankptr(machine, 1, &mess_ram[0]);
+	memory_set_bankptr(machine, 1, &messram_get_ptr(devtag_get_device(machine, "messram"))[0]);
 
 	/* Do generic Inits */
 	generic_init_machine(machine, init);

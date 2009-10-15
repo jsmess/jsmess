@@ -34,7 +34,7 @@
 #include "devices/chd_cd.h"
 #include "devices/harddriv.h"
 #include "formats/pc_dsk.h"
-
+#include "devices/messram.h"
 
 static READ8_HANDLER(at_dma8237_1_r)  { return dma8237_r(devtag_get_device(space->machine, "dma8237_2"), offset / 2); }
 static WRITE8_HANDLER(at_dma8237_1_w) { dma8237_w(devtag_get_device(space->machine, "dma8237_2"), offset / 2, data); }
@@ -169,6 +169,11 @@ static MACHINE_DRIVER_START( bebox )
 	MDRV_SMC37C78_ADD("smc37c78", pc_fdc_nec765_connected_1_drive_interface)
 
 	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, bebox_floppy_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("32M")
+	MDRV_RAM_EXTRA_OPTIONS("8M,16M")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( bebox2 )
@@ -195,13 +200,6 @@ ROM_START(bebox2)
 	ROM_LOAD( "bootnub.rom", 0x000000, 0x4000, CRC(5348d09a) SHA1(1b637a3d7a2b072aa128dd5c037bbb440d525c1a) )
 ROM_END
 
-static SYSTEM_CONFIG_START(bebox)
-	CONFIG_RAM(8 * 1024 * 1024)
-	CONFIG_RAM(16 * 1024 * 1024)
-	CONFIG_RAM_DEFAULT(32 * 1024 * 1024)
-SYSTEM_CONFIG_END
-
-
 /*     YEAR   NAME      PARENT  COMPAT  MACHINE   INPUT     INIT    CONFIG  COMPANY             FULLNAME */
-COMP( 1995,  bebox,    0,      0,      bebox,    bebox,    bebox,  bebox,  "Be Incorporated",  "BeBox Dual603-66", GAME_NOT_WORKING )
-COMP( 1996,  bebox2,   bebox,  0,      bebox2,   bebox,    bebox,  bebox,  "Be Incorporated",  "BeBox Dual603-133", GAME_NOT_WORKING )
+COMP( 1995,  bebox,    0,      0,      bebox,    bebox,    bebox,  0,  "Be Incorporated",  "BeBox Dual603-66", GAME_NOT_WORKING )
+COMP( 1996,  bebox2,   bebox,  0,      bebox2,   bebox,    bebox,  0,  "Be Incorporated",  "BeBox Dual603-133", GAME_NOT_WORKING )

@@ -47,6 +47,7 @@ documentation still exists.
 #include "formats/coco_dsk.h"
 #include "devices/flopdrv.h"
 #include "devices/coco_vhd.h"
+#include "devices/messram.h"
 
 /*
  Colour codes are as below acording to os-9 headers, however the presise values
@@ -329,6 +330,16 @@ static MACHINE_DRIVER_START( dgnbeta )
 	MDRV_WD179X_ADD("wd179x", dgnbeta_wd17xx_interface )
 
 	MDRV_FLOPPY_4_DRIVES_ADD(dgnbeta_floppy_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("256K")
+	MDRV_RAM_EXTRA_OPTIONS("128K,384K,512K,640K,768K")
+	/* Ram size can now be configured, since the machine was known as either the Dragon Beta or */
+	/* the Dragon 128, I have added a config for 128K, however, the only working machine known  */
+	/* to exist was fitted with 256K, so I have made this the default. Also available           */
+	/* documentation seems to sugest a maximum of 768K, so I have included configs increasing   */
+	/* in blocks of 128K up to this maximum.                                                    */	
 MACHINE_DRIVER_END
 
 ROM_START(dgnbeta)
@@ -346,19 +357,5 @@ ROM_START(dgnbeta)
 	ROM_LOAD("betachar.rom"	,0x0000	,0x2000	,CRC(ca79d66c) SHA1(8e2090d471dd97a53785a7f44a49d3c8c85b41f2))
 ROM_END
 
-/* Ram size can now be configured, since the machine was known as either the Dragon Beta or */
-/* the Dragon 128, I have added a config for 128K, however, the only working machine known  */
-/* to exist was fitted with 256K, so I have made this the default. Also available           */
-/* documentation seems to sugest a maximum of 768K, so I have included configs increasing   */
-/* in blocks of 128K up to this maximum.                                                    */
-static SYSTEM_CONFIG_START(dgnbeta)
-	CONFIG_RAM(128 * 1024)
-	CONFIG_RAM_DEFAULT(RamSize * 1024)
-	CONFIG_RAM(384 * 1024)
-	CONFIG_RAM(512 * 1024)
-	CONFIG_RAM(640 * 1024)
-	CONFIG_RAM(768 * 1024)
-SYSTEM_CONFIG_END
-
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    CONFIG      COMPANY             FULLNAME                    FLAGS */
-COMP( 1984, dgnbeta,    0,      0,      dgnbeta,    dgnbeta,    0,      dgnbeta,    "Dragon Data Ltd",  "Dragon Beta Prototype",    0 )
+COMP( 1984, dgnbeta,    0,      0,      dgnbeta,    dgnbeta,    0,      0,    "Dragon Data Ltd",  "Dragon Beta Prototype",    0 )

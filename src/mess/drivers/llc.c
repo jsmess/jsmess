@@ -12,6 +12,7 @@
 #include "cpu/z80/z80daisy.h"
 #include "machine/z80pio.h"
 #include "machine/z80ctc.h"
+#include "devices/messram.h"
 #include "includes/llc.h"
 
 /* Address maps */
@@ -328,6 +329,10 @@ static MACHINE_DRIVER_START( llc2 )
 
 	MDRV_Z80PIO_ADD( "z80pio", llc2_z80pio_intf )
 	MDRV_Z80CTC_ADD( "z80ctc", XTAL_3MHz, llc2_ctc_intf )
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("64K")	
 MACHINE_DRIVER_END
 /* ROM definition */
 
@@ -351,12 +356,9 @@ ROM_START( llc2 )
 	ROM_LOAD ("k7659n.bin", 0x0000, 0x0800, CRC(7454bf0a) SHA1(b97e7df93778fa371b96b6f4fb1a5b1c8b89d7ba) )
 ROM_END
 
-static SYSTEM_CONFIG_START(llc2)
-	CONFIG_RAM_DEFAULT(64 * 1024)
-SYSTEM_CONFIG_END
 
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       INIT     CONFIG COMPANY          FULLNAME       FLAGS */
 COMP( 1984, llc1,	0,		0,		llc1, 		llc1, 		llc1, 	 0, 	"",		 "LLC-1",	 	GAME_NOT_WORKING)
-COMP( 1984, llc2,	llc1,	0,		llc2, 		k7659, 		llc2, 	 llc2, 	"",		 "LLC-2",	 	0)
+COMP( 1984, llc2,	llc1,	0,		llc2, 		k7659, 		llc2, 	 0, 	"",		 "LLC-2",	 	0)

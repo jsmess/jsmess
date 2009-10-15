@@ -23,6 +23,7 @@ be written to RAM if RAM was switched in.
 #include "sound/beep.h"
 #include "includes/osborne1.h"
 #include "devices/flopdrv.h"
+#include "devices/messram.h"
 
 #define RAMMODE		(0x01)
 
@@ -56,7 +57,7 @@ WRITE8_HANDLER( osborne1_0000_w )
 	/* Check whether regular RAM is enabled */
 	if ( ! osborne1.bank2_enabled || ( osborne1.in_irq_handler && osborne1.bankswitch == RAMMODE ) )
 	{
-		mess_ram[ offset ] = data;
+		messram_get_ptr(devtag_get_device(space->machine, "messram"))[ offset ] = data;
 	}
 }
 
@@ -66,7 +67,7 @@ WRITE8_HANDLER( osborne1_1000_w )
 	/* Check whether regular RAM is enabled */
 	if ( ! osborne1.bank2_enabled || ( osborne1.in_irq_handler && osborne1.bankswitch == RAMMODE ) )
 	{
-		mess_ram[ 0x1000 + offset ] = data;
+		messram_get_ptr(devtag_get_device(space->machine, "messram"))[ 0x1000 + offset ] = data;
 	}
 }
 
@@ -81,7 +82,7 @@ READ8_HANDLER( osborne1_2000_r )
 	/* Check whether regular RAM is enabled */
 	if ( ! osborne1.bank2_enabled )
 	{
-		data = mess_ram[ 0x2000 + offset ];
+		data = messram_get_ptr(devtag_get_device(space->machine, "messram"))[ 0x2000 + offset ];
 	}
 	else
 	{
@@ -131,13 +132,13 @@ WRITE8_HANDLER( osborne1_2000_w )
 	/* Check whether regular RAM is enabled */
 	if ( ! osborne1.bank2_enabled )
 	{
-		mess_ram[ 0x2000 + offset ] = data;
+		messram_get_ptr(devtag_get_device(space->machine, "messram"))[ 0x2000 + offset ] = data;
 	}
 	else
 	{
 		if ( osborne1.in_irq_handler && osborne1.bankswitch == RAMMODE )
 		{
-			mess_ram[ 0x2000 + offset ] = data;
+			messram_get_ptr(devtag_get_device(space->machine, "messram"))[ 0x2000 + offset ] = data;
 		}
 		/* Handle writes to the I/O area */
 		switch( offset & 0x0F00 )
@@ -163,7 +164,7 @@ WRITE8_HANDLER( osborne1_3000_w )
 	/* Check whether regular RAM is enabled */
 	if ( ! osborne1.bank2_enabled || ( osborne1.in_irq_handler && osborne1.bankswitch == RAMMODE ) )
 	{
-		mess_ram[ 0x3000 + offset ] = data;
+		messram_get_ptr(devtag_get_device(space->machine, "messram"))[ 0x3000 + offset ] = data;
 	}
 }
 
@@ -208,11 +209,11 @@ WRITE8_HANDLER( osborne1_bankswitch_w )
 	}
 	else
 	{
-		memory_set_bankptr(space->machine,1, mess_ram );
-		memory_set_bankptr(space->machine,2, mess_ram + 0x1000 );
-		memory_set_bankptr(space->machine,3, mess_ram + 0x3000 );
+		memory_set_bankptr(space->machine,1, messram_get_ptr(devtag_get_device(space->machine, "messram")) );
+		memory_set_bankptr(space->machine,2, messram_get_ptr(devtag_get_device(space->machine, "messram")) + 0x1000 );
+		memory_set_bankptr(space->machine,3, messram_get_ptr(devtag_get_device(space->machine, "messram")) + 0x3000 );
 	}
-	osborne1.bank4_ptr = mess_ram + ( ( osborne1.bank3_enabled ) ? 0x10000 : 0xF000 );
+	osborne1.bank4_ptr = messram_get_ptr(devtag_get_device(space->machine, "messram")) + ( ( osborne1.bank3_enabled ) ? 0x10000 : 0xF000 );
 	memory_set_bankptr(space->machine,4, osborne1.bank4_ptr );
 	osborne1.bankswitch = offset;
 	osborne1.in_irq_handler = 0;
@@ -226,8 +227,8 @@ static DIRECT_UPDATE_HANDLER( osborne1_opbase )
 		if ( ! osborne1.bank2_enabled )
 		{
 			direct->bytemask = 0x0fff;
-			direct->decrypted = mess_ram + 0x2000;
-			direct->raw = mess_ram + 0x2000;
+			direct->decrypted = messram_get_ptr(devtag_get_device(space->machine, "messram")) + 0x2000;
+			direct->raw = messram_get_ptr(devtag_get_device(space->machine, "messram")) + 0x2000;
 			direct->bytestart = 0x2000;
 			direct->byteend = 0x2fff;
 			return ~0;
@@ -376,9 +377,9 @@ static TIMER_CALLBACK(osborne1_video_callback)
 
 		for ( x = 0; x < 52; x++ )
 		{
-			UINT8	character = mess_ram[ 0xF000 + ( ( address + x ) & 0xFFF ) ];
+			UINT8	character = messram_get_ptr(devtag_get_device(machine, "messram"))[ 0xF000 + ( ( address + x ) & 0xFFF ) ];
 			UINT8	cursor = character & 0x80;
-			UINT8	dim = mess_ram[ 0x10000 + ( ( address + x ) & 0xFFF ) ] & 0x80;
+			UINT8	dim = messram_get_ptr(devtag_get_device(machine, "messram"))[ 0x10000 + ( ( address + x ) & 0xFFF ) ] & 0x80;
 			UINT8	bits = osborne1.charrom[ osborne1.charline * 128 + ( character & 0x7F ) ];
 			int		bit;
 
@@ -463,7 +464,7 @@ MACHINE_RESET( osborne1 )
 
 	osborne1.charrom = memory_region( machine, "gfx1" );
 
-	memset( mess_ram + 0x10000, 0xFF, 0x1000 );
+	memset( messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000, 0xFF, 0x1000 );
 
 	osborne1.video_timer = timer_alloc(machine,  osborne1_video_callback , NULL);
 	timer_adjust_oneshot(osborne1.video_timer, video_screen_get_time_until_pos(machine->primary_screen, 1, 0 ), 0);

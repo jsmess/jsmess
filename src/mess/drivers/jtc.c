@@ -13,6 +13,7 @@
 #include "machine/ctronics.h"
 #include "sound/speaker.h"
 #include "sound/wave.h"
+#include "devices/messram.h"
 
 /* Read/Write Handlers */
 
@@ -670,6 +671,10 @@ static MACHINE_DRIVER_START( jtc )
 
     MDRV_VIDEO_START(jtc)
     MDRV_VIDEO_UPDATE(jtc)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("2K")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( jtces88 )
@@ -678,6 +683,10 @@ static MACHINE_DRIVER_START( jtces88 )
     /* basic machine hardware */
     MDRV_CPU_MODIFY(UB8830D_TAG)
     MDRV_CPU_PROGRAM_MAP(jtc_es1988_mem)
+	
+	/* internal ram */
+	MDRV_RAM_MODIFY("messram")
+	MDRV_RAM_DEFAULT_SIZE("4K")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( jtces23 )
@@ -699,6 +708,10 @@ static MACHINE_DRIVER_START( jtces23 )
 
     MDRV_VIDEO_START(jtc_es23)
     MDRV_VIDEO_UPDATE(jtc_es23)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("4K")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( jtces40 )
@@ -720,6 +733,11 @@ static MACHINE_DRIVER_START( jtces40 )
 
     MDRV_VIDEO_START(jtc_es40)
     MDRV_VIDEO_UPDATE(jtc_es40)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("8K")
+	MDRV_RAM_EXTRA_OPTIONS("16K,32K")
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -750,30 +768,10 @@ ROM_START( jtces40 )
   	ROM_LOAD( "es40_0800.bin", 0x0800, 0x1800, CRC(770c87ce) SHA1(1a5227ba15917f2a572cb6c27642c456f5b32b90) )
 ROM_END
 
-/* System Configuration */
-
-static SYSTEM_CONFIG_START( jtc )
-	CONFIG_RAM_DEFAULT( 2 * 1024 )
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START( jtces88 )
-	CONFIG_RAM_DEFAULT( 4 * 1024 )
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START( jtces23 )
-	CONFIG_RAM_DEFAULT( 4 * 1024 )
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START( jtces40 )
-	CONFIG_RAM_DEFAULT(  8 * 1024 )
-	CONFIG_RAM		  ( 16 * 1024 )
-	CONFIG_RAM		  ( 32 * 1024 )
-SYSTEM_CONFIG_END
-
 /* System Drivers */
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG      COMPANY                 FULLNAME                    FLAGS */
-COMP( 1987, jtc,		0,       0, 	jtc, 	jtc, 	 0,		jtc,	 	  "Jugend+Technik",   "CompJU+TEr",					GAME_NOT_WORKING )
-COMP( 1988, jtces88,	jtc,     0, 	jtces88,jtc, 	 0,		jtces88,  	  "Jugend+Technik",   "CompJU+TEr (EMR-ES 1988)",	GAME_NOT_WORKING )
-COMP( 1989, jtces23,	jtc,     0, 	jtces23,jtces23, 0,		jtces23,  	  "Jugend+Technik",   "CompJU+TEr (ES 2.3)",		GAME_NOT_WORKING )
-COMP( 1990, jtces40,	jtc,     0, 	jtces40,jtces40, 0,		jtces40,  	  "Jugend+Technik",   "CompJU+TEr (ES 4.0)",		GAME_NOT_WORKING )
+COMP( 1987, jtc,		0,       0, 	jtc, 	jtc, 	 0,		0,	 	  "Jugend+Technik",   "CompJU+TEr",					GAME_NOT_WORKING )
+COMP( 1988, jtces88,	jtc,     0, 	jtces88,jtc, 	 0,		0,  	  "Jugend+Technik",   "CompJU+TEr (EMR-ES 1988)",	GAME_NOT_WORKING )
+COMP( 1989, jtces23,	jtc,     0, 	jtces23,jtces23, 0,		0,  	  "Jugend+Technik",   "CompJU+TEr (ES 2.3)",		GAME_NOT_WORKING )
+COMP( 1990, jtces40,	jtc,     0, 	jtces40,jtces40, 0,		0,  	  "Jugend+Technik",   "CompJU+TEr (ES 4.0)",		GAME_NOT_WORKING )

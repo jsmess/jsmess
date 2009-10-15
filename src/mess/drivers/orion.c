@@ -22,6 +22,7 @@
 #include "devices/cartslot.h"
 #include "formats/rk_cas.h"
 #include "includes/orion.h"
+#include "devices/messram.h"
 #include "includes/radio86.h"
 
 /* Address maps */
@@ -151,6 +152,10 @@ static MACHINE_DRIVER_START( orion128 )
 	MDRV_FLOPPY_4_DRIVES_ADD(orion_floppy_config)
 
 	MDRV_CARTSLOT_ADD("cart")
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("256K")		
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( orion128ms )
@@ -211,6 +216,10 @@ static MACHINE_DRIVER_START( orionz80 )
 	MDRV_FLOPPY_4_DRIVES_ADD(orion_floppy_config)
 
 	MDRV_CARTSLOT_ADD("cart")
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("512K")		
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( orionz80ms )
@@ -262,19 +271,11 @@ static MACHINE_DRIVER_START( orionpro )
 	MDRV_FLOPPY_4_DRIVES_ADD(orion_floppy_config)
 
 	MDRV_CARTSLOT_ADD("cart")
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("512K")	
 MACHINE_DRIVER_END
-
-static SYSTEM_CONFIG_START(orion128)
-	CONFIG_RAM_DEFAULT(256 * 1024)
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START(orionz80)
-	CONFIG_RAM_DEFAULT(512 * 1024)
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START(orionpro)
-	CONFIG_RAM_DEFAULT(512 * 1024)
-SYSTEM_CONFIG_END
 
 /* ROM definition */
 
@@ -350,10 +351,10 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT           INIT    CONFIG  COMPANY              FULLNAME   FLAGS */
-COMP( 1990, orion128, 	 0,  		0,		orion128, 	radio86, 	orion128, orion128,  "", 					 "Orion 128",	 0)
-COMP( 1990, orionms, 	 orion128, 	0,		orion128ms,	ms7007, 	orion128, orion128,  "", 					 "Orion 128 (MS7007)",	 0)
-COMP( 1990, orionz80, 	 orion128, 	0,		orionz80, 	radio86,	orion128, orionz80,  "", 					 "Orion 128 + Z80 Card II",	 0)
-COMP( 1990, orionide, 	 orion128, 	0,		orionz80, 	radio86,	orion128, orionz80,  "", 					 "Orion 128 + Z80 Card II + IDE",	 0)
-COMP( 1990, orionzms, 	 orion128, 	0,		orionz80ms,	ms7007, 	orion128, orionz80,  "", 					 "Orion 128 + Z80 Card II (MS7007)",	 0)
-COMP( 1990, orionidm, 	 orion128, 	0,		orionz80ms,	ms7007, 	orion128, orionz80,  "", 					 "Orion 128 + Z80 Card II + IDE (MS7007)",	 0)
-COMP( 1994, orionpro, 	 orion128, 	0,		orionpro, 	radio86, 	orion128, orionpro,  "", 					 "Orion Pro",	 0)
+COMP( 1990, orion128, 	 0,  		0,		orion128, 	radio86, 	orion128, 0,  "", 					 "Orion 128",	 0)
+COMP( 1990, orionms, 	 orion128, 	0,		orion128ms,	ms7007, 	orion128, 0,  "", 					 "Orion 128 (MS7007)",	 0)
+COMP( 1990, orionz80, 	 orion128, 	0,		orionz80, 	radio86,	orion128, 0,  "", 					 "Orion 128 + Z80 Card II",	 0)
+COMP( 1990, orionide, 	 orion128, 	0,		orionz80, 	radio86,	orion128, 0,  "", 					 "Orion 128 + Z80 Card II + IDE",	 0)
+COMP( 1990, orionzms, 	 orion128, 	0,		orionz80ms,	ms7007, 	orion128, 0,  "", 					 "Orion 128 + Z80 Card II (MS7007)",	 0)
+COMP( 1990, orionidm, 	 orion128, 	0,		orionz80ms,	ms7007, 	orion128, 0,  "", 					 "Orion 128 + Z80 Card II + IDE (MS7007)",	 0)
+COMP( 1994, orionpro, 	 orion128, 	0,		orionpro, 	radio86, 	orion128, 0,  "", 					 "Orion Pro",	 0)

@@ -20,6 +20,7 @@
 /* Layout */
 #include "sym1.lh"
 
+#include "devices/messram.h"
 
 
 /* pointers to memory locations */
@@ -140,6 +141,11 @@ static MACHINE_DRIVER_START( sym1 )
 	MDRV_VIA6522_ADD("via6522_0", 0, sym1_via0)
 	MDRV_VIA6522_ADD("via6522_1", 0, sym1_via1)
 	MDRV_VIA6522_ADD("via6522_2", 0, sym1_via2)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("4K")
+	MDRV_RAM_EXTRA_OPTIONS("1K,2K,3K")
 MACHINE_DRIVER_END
 
 
@@ -162,23 +168,7 @@ ROM_START( sym1 )
 ROM_END
 
 /******************************************************************************
- System Config
-******************************************************************************/
-
-
-static SYSTEM_CONFIG_START( sym1 )
-	CONFIG_RAM_DEFAULT(4 * 1024) /* 4KB RAM */
-	CONFIG_RAM        (3 * 1024) /* 3KB RAM */
-	CONFIG_RAM        (2 * 1024) /* 2KB RAM */
-	CONFIG_RAM        (1 * 1024) /* 1KB RAM */
-SYSTEM_CONFIG_END
-
-
-
-/******************************************************************************
  Drivers
 ******************************************************************************/
-
-
 /*    YEAR  NAME  PARENT COMPAT MACHINE INPUT INIT  CONFIG COMPANY                   FULLNAME          FLAGS */
-COMP( 1978, sym1, 0,     0,     sym1,   sym1, sym1, sym1,  "Synertek Systems Corp.", "SYM-1/SY-VIM-1", 0 )
+COMP( 1978, sym1, 0,     0,     sym1,   sym1, sym1, 0,  "Synertek Systems Corp.", "SYM-1/SY-VIM-1", 0 )

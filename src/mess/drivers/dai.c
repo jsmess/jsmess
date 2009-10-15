@@ -66,7 +66,7 @@ Timings:
 #include "machine/pit8253.h"
 #include "machine/tms5501.h"
 #include "devices/cassette.h"
-
+#include "devices/messram.h"
 
 /* I/O ports */
 static ADDRESS_MAP_START( dai_io , ADDRESS_SPACE_IO, 8)
@@ -223,6 +223,10 @@ static MACHINE_DRIVER_START( dai )
 
 	/* tms5501 */
 	MDRV_TMS5501_ADD( "tms5501", dai_tms5501_interface )
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("48K")
 MACHINE_DRIVER_END
 
 #define io_dai		io_NULL
@@ -238,11 +242,5 @@ ROM_START(dai)
 	ROM_LOAD ("nch.bin", 0x0000, 0x1000, CRC(a9f5b30b) SHA1(24119b2984ab4e50dc0dabae1065ff6d6c1f237d))
 ROM_END
 
-
-static SYSTEM_CONFIG_START(dai)
-	CONFIG_RAM_DEFAULT(48 * 1024)
-SYSTEM_CONFIG_END
-
-
 /*    YEAR  NAME PARENT  COMPAT MACHINE INPUT   INIT    CONFIG  COMPANY                FULLNAME */
-COMP( 1978, dai, 0,      0,	dai,	dai,	0,	dai,	"Data Applications International", "DAI Personal Computer", 0)
+COMP( 1978, dai, 0,      0,	dai,	dai,	0,	0,	"Data Applications International", "DAI Personal Computer", 0)

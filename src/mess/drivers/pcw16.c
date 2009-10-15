@@ -104,7 +104,7 @@ TODO:
 /* Devices */
 #include "formats/pc_dsk.h"		/* pc disk images */
 #include "devices/flopdrv.h"
-
+#include "devices/messram.h"
 
 // interrupt counter
 static unsigned long pcw16_interrupt_counter;
@@ -413,7 +413,7 @@ static void pcw16_set_bank_handlers(running_machine *machine, int bank, PCW16_RA
 
 static void pcw16_update_bank(running_machine *machine, int bank)
 {
-	unsigned char *mem_ptr = mess_ram;
+	unsigned char *mem_ptr = messram_get_ptr(devtag_get_device(machine, "messram"));
 	int bank_id = 0;
 	int bank_offs = 0;
 
@@ -450,7 +450,7 @@ static void pcw16_update_bank(running_machine *machine, int bank)
 	{
 		bank_offs = 128;
 		/* dram */
-		mem_ptr = mess_ram;
+		mem_ptr = messram_get_ptr(devtag_get_device(machine, "messram"));
 	}
 
 	mem_ptr = mem_ptr + ((bank_id - bank_offs)<<14);
@@ -1430,6 +1430,10 @@ static MACHINE_DRIVER_START( pcw16 )
 	MDRV_PC_LPT_ADD("lpt", pcw16_lpt_config)
 	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_connected_interface)
 	MDRV_FLOPPY_2_DRIVES_ADD(pcw16_floppy_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("2M")	
 MACHINE_DRIVER_END
 
 
@@ -1453,9 +1457,6 @@ ROM_START(pcw16)
 	ROM_LOAD("pcw045.sys",0x10000, 524288, CRC(c642f498) SHA1(8a5c05de92e7b2c5acdfb038217503ad363285b5))
 ROM_END
 
-static SYSTEM_CONFIG_START(pcw16)
-	CONFIG_RAM_DEFAULT(2048 * 1024)
-SYSTEM_CONFIG_END
 
 /*     YEAR  NAME     PARENT    COMPAT  MACHINE    INPUT     INIT   CONFIG,  COMPANY          FULLNAME */
-COMP( 1995, pcw16,	  0,		0,		pcw16,	   pcw16,    pcw16,	    pcw16,   "Amstrad plc",   "PCW16", GAME_NOT_WORKING )
+COMP( 1995, pcw16,	  0,		0,		pcw16,	   pcw16,    pcw16,	    0,   "Amstrad plc",   "PCW16", GAME_NOT_WORKING )

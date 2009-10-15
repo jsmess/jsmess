@@ -39,7 +39,7 @@
 #include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
 #include "video/msm6255.h"
-
+#include "devices/messram.h"
 
 static const device_config *get_floppy_image(running_machine *machine, int drive)
 {
@@ -74,7 +74,7 @@ static void bw2_set_banks(running_machine *machine, UINT8 data)
 
 	state->bank = data & 0x07;
 
-	switch (mess_ram_size)
+	switch (messram_get_size(devtag_get_device(machine, "messram")))
 	{
 	case 64 * 1024:
 		max_ram_bank = BANK_RAM1;
@@ -155,7 +155,7 @@ static void ramcard_set_banks(running_machine *machine, UINT8 data)
 
 	state->bank = data & 0x07;
 
-	switch (mess_ram_size)
+	switch (messram_get_size(devtag_get_device(machine, "messram")))
 	{
 	case 64 * 1024:
 	case 96 * 1024:
@@ -528,7 +528,7 @@ static DRIVER_INIT( bw2 )
 	bw2_state *state = machine->driver_data;
 
 	/* allocate work memory */
-	state->work_ram = auto_alloc_array(machine, UINT8, mess_ram_size);
+	state->work_ram = auto_alloc_array(machine, UINT8, messram_get_size(devtag_get_device(machine, "messram")));
 
 	/* allocate video memory */
 	state->video_ram = auto_alloc_array(machine, UINT8, BW2_VIDEORAM_SIZE);
@@ -555,7 +555,7 @@ static MACHINE_START( bw2 )
 
 	/* register for state saving */
 	state_save_register_global(machine, state->keyboard_row);
-	state_save_register_global_pointer(machine, state->work_ram, mess_ram_size);
+	state_save_register_global_pointer(machine, state->work_ram, messram_get_size(devtag_get_device(machine, "messram")));
 	state_save_register_global_pointer(machine, state->ramcard_ram, BW2_RAMCARD_SIZE);
 	state_save_register_global(machine, state->bank);
 	state_save_register_global(machine, state->selected_drive);
@@ -842,6 +842,11 @@ static MACHINE_DRIVER_START( bw2 )
 	MDRV_WD179X_ADD("wd179x", bw2_wd17xx_interface )
 
 	MDRV_FLOPPY_2_DRIVES_ADD(bw2_floppy_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("64K")
+	MDRV_RAM_EXTRA_OPTIONS("96K,128K,160K,192K,224K")
 MACHINE_DRIVER_END
 
 /***************************************************************************
@@ -903,12 +908,6 @@ static void bw2_serial_getinfo(const mess_device_class *devclass, UINT32 state, 
 
 static SYSTEM_CONFIG_START( bw2 )
 	CONFIG_DEVICE( bw2_serial_getinfo )
-	CONFIG_RAM_DEFAULT( 64 * 1024 )
-	CONFIG_RAM( 96 * 1024 )
-	CONFIG_RAM( 128 * 1024 )
-	CONFIG_RAM( 160 * 1024 )
-	CONFIG_RAM( 192 * 1024 )
-	CONFIG_RAM( 224 * 1024 )
 SYSTEM_CONFIG_END
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE   INPUT   INIT    CONFIG  COMPANY      FULLNAME  FLAGS */

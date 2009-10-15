@@ -22,6 +22,7 @@
 #include "devices/snapquik.h"
 #include "machine/cdp1871.h"
 #include "machine/wd17xx.h"
+#include "devices/messram.h"
 #include "video/mc6845.h"
 
 /* Memory Maps */
@@ -397,6 +398,10 @@ static MACHINE_DRIVER_START( comx35_pal )
 	MDRV_PRINTER_ADD("printer")
 
 	MDRV_FLOPPY_2_DRIVES_ADD(comx35_floppy_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("32K")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( comx35_ntsc )
@@ -422,6 +427,10 @@ static MACHINE_DRIVER_START( comx35_ntsc )
 	MDRV_PRINTER_ADD("printer")
 
 	MDRV_FLOPPY_2_DRIVES_ADD(comx35_floppy_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("32K")	
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -465,13 +474,8 @@ ROM_END
 
 #define rom_comx35n rom_comx35p
 
-/* System Configuration */
-static SYSTEM_CONFIG_START( comx35 )
-	CONFIG_RAM_DEFAULT	(32 * 1024)
-SYSTEM_CONFIG_END
-
 /* System Drivers */
 
 //    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT     INIT  CONFIG    COMPANY                       FULLNAME            FLAGS
-COMP( 1983, comx35p,	0,		0,		comx35_pal,	comx35,   0, 	comx35,   "Comx World Operations Ltd",	"COMX 35 (PAL)",	GAME_IMPERFECT_SOUND )
-COMP( 1983, comx35n,	comx35p,0,		comx35_ntsc,comx35,   0, 	comx35,   "Comx World Operations Ltd",	"COMX 35 (NTSC)",	GAME_IMPERFECT_SOUND )
+COMP( 1983, comx35p,	0,		0,		comx35_pal,	comx35,   0, 	0,   "Comx World Operations Ltd",	"COMX 35 (PAL)",	GAME_IMPERFECT_SOUND )
+COMP( 1983, comx35n,	comx35p,0,		comx35_ntsc,comx35,   0, 	0,   "Comx World Operations Ltd",	"COMX 35 (NTSC)",	GAME_IMPERFECT_SOUND )

@@ -73,7 +73,7 @@ $F000-$FFFF:    ROM address space
 #include "includes/apple1.h"
 #include "devices/snapquik.h"
 #include "devices/cassette.h"
-
+#include "devices/messram.h"
 
 /* port i/o functions */
 
@@ -253,6 +253,15 @@ static MACHINE_DRIVER_START( apple1 )
 	MDRV_SNAPSHOT_ADD("snapshot", apple1, "snp", 0)
 
 	MDRV_CASSETTE_ADD( "cassette", apple1_cassette_config )
+	
+	/* Note that because we always include 4K of RAM at $E000-$EFFF,
+       the RAM amounts listed here will be 4K below the actual RAM
+       total. */
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("48K")
+	MDRV_RAM_EXTRA_OPTIONS("4K,8K,12K,16K,20K,24K,28K,32K,36K,40K,44K")
+	   
 MACHINE_DRIVER_END
 
 ROM_START(apple1)
@@ -265,23 +274,6 @@ ROM_START(apple1)
 	ROM_LOAD("apple1.vid", 0x0000, 0x0200, CRC(a7e567fc) SHA1(b18aae0a2d4f92f5a7e22640719bbc4652f3f4ee))
 ROM_END
 
-static SYSTEM_CONFIG_START(apple1)
-	/* Note that because we always include 4K of RAM at $E000-$EFFF,
-       the RAM amounts listed here will be 4K below the actual RAM
-       total. */
-	CONFIG_RAM			(0x1000)
-	CONFIG_RAM			(0x2000)
-	CONFIG_RAM			(0x3000)
-	CONFIG_RAM			(0x4000)
-	CONFIG_RAM			(0x5000)
-	CONFIG_RAM			(0x6000)
-	CONFIG_RAM			(0x7000)
-	CONFIG_RAM			(0x8000)
-	CONFIG_RAM			(0x9000)
-	CONFIG_RAM			(0xA000)
-	CONFIG_RAM			(0xB000)
-	CONFIG_RAM_DEFAULT	(0xC000)
-SYSTEM_CONFIG_END
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       INIT    CONFIG  COMPANY             FULLNAME */
-COMP( 1976,	apple1,	0,		0,		apple1,		apple1,		apple1,	apple1,	"Apple Computer",	"Apple I" , 0)
+COMP( 1976,	apple1,	0,		0,		apple1,		apple1,		apple1,	0,	"Apple Computer",	"Apple I" , 0)

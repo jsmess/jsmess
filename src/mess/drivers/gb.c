@@ -439,6 +439,7 @@ space. This mapper uses 32KB sized banks.
 #include "includes/gb.h"
 #include "cpu/lr35902/lr35902.h"
 #include "devices/cartslot.h"
+#include "devices/messram.h"
 #include "rendlay.h"
 
 
@@ -632,11 +633,11 @@ static MACHINE_DRIVER_START( gbcolor )
 
 	MDRV_PALETTE_LENGTH(32768)
 	MDRV_PALETTE_INIT(gbc)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("40K") /* 2 pages of 8KB VRAM, 8 pages of 4KB RAM */
 MACHINE_DRIVER_END
-
-static SYSTEM_CONFIG_START(gb_cgb)
-	CONFIG_RAM_DEFAULT(2 * 8 * 1024 + 8 * 4 * 1024)	/* 2 pages of 8KB VRAM, 8 pages of 4KB RAM */
-SYSTEM_CONFIG_END
 
 static MACHINE_DRIVER_START( megaduck )
 	/* basic machine hardware */
@@ -716,7 +717,7 @@ CONS( 1990, gameboy,  0,       0,		gameboy,  gameboy, 0,    0,			"Nintendo", "Ga
 CONS( 1994, supergb,  gameboy, 0,		supergb,  gameboy, 0,    0,			"Nintendo", "Super Game Boy", 0)
 CONS( 1996, gbpocket, gameboy, 0,		gbpocket, gameboy, 0,    0,			"Nintendo", "Game Boy Pocket", 0)
 CONS( 1997, gblight,  gameboy, 0,		gbpocket, gameboy, 0,    0,			"Nintendo", "Game Boy Light", 0)
-CONS( 1998, gbcolor,  gameboy, 0,		gbcolor,  gameboy, 0,    gb_cgb,	"Nintendo", "Game Boy Color", GAME_IMPERFECT_GRAPHICS)
+CONS( 1998, gbcolor,  gameboy, 0,		gbcolor,  gameboy, 0,    0,	"Nintendo", "Game Boy Color", GAME_IMPERFECT_GRAPHICS)
 
 /* Sound is not 100% yet, it generates some sounds which could be ok. Since we're lacking a real
    system there's no way to verify. Same goes for the colors of the LCD. We are no using the default

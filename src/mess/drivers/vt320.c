@@ -8,6 +8,7 @@
 
 #include "driver.h"
 #include "cpu/mcs51/mcs51.h"
+#include "devices/messram.h"
 /*
 
 Partlist :
@@ -48,7 +49,7 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(vt320)
 {
-	memset(mess_ram,0,16*1024);
+	memset(messram_get_ptr(devtag_get_device(machine, "messram")),0,16*1024);
 }
 
 static VIDEO_START( vt320 )
@@ -81,11 +82,11 @@ static MACHINE_DRIVER_START( vt320 )
 
     MDRV_VIDEO_START(vt320)
     MDRV_VIDEO_UPDATE(vt320)
-MACHINE_DRIVER_END
 
-static SYSTEM_CONFIG_START(vt320)
-	CONFIG_RAM_DEFAULT(16 * 1024)
-SYSTEM_CONFIG_END
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("16K")
+MACHINE_DRIVER_END
 
 /* ROM definition */
 ROM_START( vt320 )
@@ -96,8 +97,8 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( 1987, vt320,  0,       0, 	vt320, 	vt320, 	 0,  	  vt320,  	 "DEC",   "VT320",		GAME_NOT_WORKING)
-//COMP( 1989?, vt330,  0,       0,  vt320,  vt320,   0,       vt320,     "DEC",   "VT330",      GAME_NOT_WORKING)
-//COMP( 1989?, vt340,  0,       0,  vt320,  vt320,   0,       vt320,     "DEC",   "VT340",      GAME_NOT_WORKING)
-//COMP( 1990?, vt340p,  0,       0,     vt320,  vt320,   0,       vt320,     "DEC",   "VT340+",     GAME_NOT_WORKING)
+COMP( 1987, vt320,  0,       0, 	vt320, 	vt320, 	 0,  	  0,  	 "DEC",   "VT320",		GAME_NOT_WORKING)
+//COMP( 1989?, vt330,  0,       0,  vt320,  vt320,   0,       0,     "DEC",   "VT330",      GAME_NOT_WORKING)
+//COMP( 1989?, vt340,  0,       0,  vt320,  vt320,   0,       0,     "DEC",   "VT340",      GAME_NOT_WORKING)
+//COMP( 1990?, vt340p,  0,       0,     vt320,  vt320,   0,       0,     "DEC",   "VT340+",     GAME_NOT_WORKING)
 

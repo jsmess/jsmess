@@ -15,6 +15,7 @@
 #include "sound/speaker.h"
 #include "sound/wave.h"
 #include "includes/pk8000.h"
+#include "devices/messram.h"
 
 static UINT8 keyboard_line;
 
@@ -34,50 +35,50 @@ static void pk8000_set_bank(running_machine *machine,UINT8 data)
 	switch(block1) {
 		case 0:
 				memory_set_bankptr(machine, 1, rom + 0x10000);
-				memory_set_bankptr(machine, 5, mess_ram);
+				memory_set_bankptr(machine, 5, messram_get_ptr(devtag_get_device(machine, "messram")));
 				break;
 		case 1: break;
 		case 2: break;
 		case 3:
-				memory_set_bankptr(machine, 1, mess_ram);
-				memory_set_bankptr(machine, 5, mess_ram);
+				memory_set_bankptr(machine, 1, messram_get_ptr(devtag_get_device(machine, "messram")));
+				memory_set_bankptr(machine, 5, messram_get_ptr(devtag_get_device(machine, "messram")));
 				break;
 	}
 
 	switch(block2) {
 		case 0:
 				memory_set_bankptr(machine, 2, rom + 0x14000);
-				memory_set_bankptr(machine, 6, mess_ram + 0x4000);
+				memory_set_bankptr(machine, 6, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000);
 				break;
 		case 1: break;
 		case 2: break;
 		case 3:
-				memory_set_bankptr(machine, 2, mess_ram + 0x4000);
-				memory_set_bankptr(machine, 6, mess_ram + 0x4000);
+				memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000);
+				memory_set_bankptr(machine, 6, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000);
 				break;
 	}
 	switch(block3) {
 		case 0:
 				memory_set_bankptr(machine, 3, rom + 0x18000);
-				memory_set_bankptr(machine, 7, mess_ram + 0x8000);
+				memory_set_bankptr(machine, 7, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x8000);
 				break;
 		case 1: break;
 		case 2: break;
 		case 3:
-				memory_set_bankptr(machine, 3, mess_ram + 0x8000);
-				memory_set_bankptr(machine, 7, mess_ram + 0x8000);
+				memory_set_bankptr(machine, 3, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x8000);
+				memory_set_bankptr(machine, 7, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x8000);
 				break;
 	}
 	switch(block4) {
 		case 0:
 				memory_set_bankptr(machine, 4, rom + 0x1c000);
-				memory_set_bankptr(machine, 8, mess_ram + 0xc000);
+				memory_set_bankptr(machine, 8, messram_get_ptr(devtag_get_device(machine, "messram")) + 0xc000);
 				break;
 		case 1: break;
 		case 2: break;
 		case 3:
-				memory_set_bankptr(machine, 4, mess_ram + 0xc000);
-				memory_set_bankptr(machine, 8, mess_ram + 0xc000);
+				memory_set_bankptr(machine, 4, messram_get_ptr(devtag_get_device(machine, "messram")) + 0xc000);
+				memory_set_bankptr(machine, 8, messram_get_ptr(devtag_get_device(machine, "messram")) + 0xc000);
 				break;
 	}
 }
@@ -311,7 +312,7 @@ static VIDEO_START( pk8000 )
 
 static VIDEO_UPDATE( pk8000 )
 {
-	return pk8000_video_update(screen, bitmap, cliprect, mess_ram);
+	return pk8000_video_update(screen, bitmap, cliprect, messram_get_ptr(devtag_get_device(screen->machine, "messram")));
 }
 
 /* Machine driver */
@@ -355,11 +356,11 @@ static MACHINE_DRIVER_START( pk8000 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
     MDRV_CASSETTE_ADD( "cassette", pk8000_cassette_config )
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("64K")	
 MACHINE_DRIVER_END
-
-static SYSTEM_CONFIG_START(pk8000)
-	CONFIG_RAM_DEFAULT(64 * 1024)
-SYSTEM_CONFIG_END
 
 /* ROM definition */
 ROM_START( vesta )
@@ -375,6 +376,6 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( 1987, vesta,  0,       0, 	pk8000, 	pk8000, 	 0,  	  pk8000,  	 "BP EVM",   "PK8000 Vesta",		0)
-COMP( 1987, hobby,  vesta,   0, 	pk8000, 	pk8000, 	 0,  	  pk8000,  	 "BP EVM",   "PK8000 Sura/Hobby",	0)
+COMP( 1987, vesta,  0,       0, 	pk8000, 	pk8000, 	 0,  	  0,  	 "BP EVM",   "PK8000 Vesta",		0)
+COMP( 1987, hobby,  vesta,   0, 	pk8000, 	pk8000, 	 0,  	  0,  	 "BP EVM",   "PK8000 Sura/Hobby",	0)
 

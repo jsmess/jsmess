@@ -12,7 +12,7 @@
 #include "sound/wave.h"
 #include "devices/cassette.h"
 #include "includes/pecom.h"
-
+#include "devices/messram.h"
 
 /* Address maps */
 static ADDRESS_MAP_START(pecom64_mem, ADDRESS_SPACE_PROGRAM, 8)
@@ -163,11 +163,6 @@ static INPUT_PORTS_START( pecom )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Break") PORT_CODE(KEYCODE_MINUS)
 INPUT_PORTS_END
 
-
-static SYSTEM_CONFIG_START(pecom64)
-	CONFIG_RAM_DEFAULT(32 * 1024)
-SYSTEM_CONFIG_END
-
 static const cassette_config pecom_cassette_config =
 {
 	cassette_default_formats,
@@ -193,6 +188,10 @@ static MACHINE_DRIVER_START( pecom64 )
 	MDRV_IMPORT_FROM(pecom_video)
 
 	MDRV_CASSETTE_ADD( "cassette", pecom_cassette_config )
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("64K")
 MACHINE_DRIVER_END
 
 /* ROM definition */
@@ -209,4 +208,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME   PARENT  COMPAT       MACHINE     INPUT   INIT    CONFIG   COMPANY  FULLNAME      FLAGS */
-COMP( 1987, pecom64,     0,      0, 	pecom64, 	pecom, 	pecom, pecom64,  "Ei Nis", "Pecom 64",	0)
+COMP( 1987, pecom64,     0,      0, 	pecom64, 	pecom, 	pecom, 0,  "Ei Nis", "Pecom 64",	0)

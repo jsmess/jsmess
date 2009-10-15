@@ -108,7 +108,7 @@
 #include "machine/intelfsh.h"
 #include "machine/8042kbdc.h"
 #include "machine/53c810.h"
-
+#include "devices/messram.h"
 
 #define LOG_CPUIMASK	1
 #define LOG_UART		1
@@ -1119,11 +1119,11 @@ DRIVER_INIT( bebox )
 	intelflash_init(machine, 0, FLASH_FUJITSU_29F016A, memory_region(machine, "user1"));
 
 	/* install MESS managed RAM */
-	memory_install_read64_handler(space_0, 0, mess_ram_size - 1, 0, 0x02000000, SMH_BANK(3));
-	memory_install_write64_handler(space_0, 0, mess_ram_size - 1, 0, 0x02000000, SMH_BANK(3));
-	memory_install_read64_handler(space_1, 0, mess_ram_size - 1, 0, 0x02000000, SMH_BANK(3));
-	memory_install_write64_handler(space_1, 0, mess_ram_size - 1, 0, 0x02000000, SMH_BANK(3));
-	memory_set_bankptr(machine, 3, mess_ram);
+	memory_install_read64_handler(space_0, 0, messram_get_size(devtag_get_device(machine, "messram")) - 1, 0, 0x02000000, SMH_BANK(3));
+	memory_install_write64_handler(space_0, 0, messram_get_size(devtag_get_device(machine, "messram")) - 1, 0, 0x02000000, SMH_BANK(3));
+	memory_install_read64_handler(space_1, 0, messram_get_size(devtag_get_device(machine, "messram")) - 1, 0, 0x02000000, SMH_BANK(3));
+	memory_install_write64_handler(space_1, 0, messram_get_size(devtag_get_device(machine, "messram")) - 1, 0, 0x02000000, SMH_BANK(3));
+	memory_set_bankptr(machine, 3, messram_get_ptr(devtag_get_device(machine, "messram")));
 
 	mc146818_init(machine, MC146818_STANDARD);
 	pc_vga_init(machine, &bebox_vga_interface, &cirrus_svga_interface);

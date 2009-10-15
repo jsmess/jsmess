@@ -63,7 +63,7 @@ Nascom Memory map
 #include "formats/basicdsk.h"
 #include "devices/cartslot.h"
 #include "devices/cassette.h"
-
+#include "devices/messram.h"
 
 
 /*************************************
@@ -304,6 +304,11 @@ static MACHINE_DRIVER_START( nascom1 )
 	MDRV_SNAPSHOT_ADD("snapshot", nascom1, "nas", 0.5)
 
 	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("40K")
+	MDRV_RAM_EXTRA_OPTIONS("1K,16K,32K")	
 MACHINE_DRIVER_END
 
 static FLOPPY_OPTIONS_START(nascom2)
@@ -416,21 +421,6 @@ ROM_END
 //}
 
 
-static SYSTEM_CONFIG_START( nascom1 )
-	CONFIG_RAM(1 * 1024)
-	CONFIG_RAM(16 * 1024)
-	CONFIG_RAM(32 * 1024)
-	CONFIG_RAM_DEFAULT(40 * 1024)
-//  CONFIG_DEVICE(nascom1_cassette_getinfo)
-SYSTEM_CONFIG_END
-
-
-static SYSTEM_CONFIG_START( nascom2 )
-	CONFIG_IMPORT_FROM(nascom1)
-SYSTEM_CONFIG_END
-
-
-
 /*************************************
  *
  *  Driver definitions
@@ -438,5 +428,5 @@ SYSTEM_CONFIG_END
  *************************************/
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT        CONFIG      COMPANY                     FULLNAME        FLAGS */
-COMP( 1978, nascom1,    0,          0,      nascom1,    nascom1,    nascom1,    nascom1,    "Nascom Microcomputers",    "Nascom 1",     0 )
-COMP( 1979, nascom2,    nascom1,    0,      nascom2,    nascom2,    nascom1,    nascom2,    "Nascom Microcomputers",    "Nascom 2",     0 )
+COMP( 1978, nascom1,    0,          0,      nascom1,    nascom1,    nascom1,    0,    "Nascom Microcomputers",    "Nascom 1",     0 )
+COMP( 1979, nascom2,    nascom1,    0,      nascom2,    nascom2,    nascom1,    0,    "Nascom Microcomputers",    "Nascom 2",     0 )

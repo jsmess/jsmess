@@ -40,6 +40,7 @@
 #include "sound/sn76496.h"
 #include "sound/wave.h"
 #include "video/tms9928a.h"
+#include "devices/messram.h"
 
 /* Read/Write Handlers */
 
@@ -601,6 +602,11 @@ static MACHINE_DRIVER_START( wizzard )
 
 	/* printer */
 	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("1K")
+	MDRV_RAM_EXTRA_OPTIONS("17K,33K") // 16K or 32K expansion
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -625,21 +631,13 @@ ROM_END
 #define rom_rameses rom_fnvision
 #define rom_vz2000 rom_fnvision
 
-/* System Configuration */
-
-static SYSTEM_CONFIG_START( wizzard )
-	CONFIG_RAM_DEFAULT	( 1 * 1024)
-	CONFIG_RAM			(17 * 1024) // 16K expansion
-	CONFIG_RAM			(33 * 1024) // 32K expansion
-SYSTEM_CONFIG_END
-
 /* System Drivers */
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT       INIT    CONFIG      COMPANY                     FULLNAME */
 CONS( 1982, crvision, 0,		0,		pal,		crvision,	0,		0,			"Video Technology",			"CreatiVision", 0 )
 CONS( 1982, fnvision, crvision, 0,		pal,		crvision,	0,		0,			"Video Technology",			"FunVision", 0 )
 CONS( 1982, crvisioj, crvision,	0,		ntsc,		crvision,	0,		0,			"Cheryco",					"CreatiVision (Japan)", 0 )
-CONS( 1982, wizzard,  crvision, 0,		wizzard,	crvision,	0,		wizzard,	"Dick Smith Electronics",	"Wizzard (Oceania)", 0 )
+CONS( 1982, wizzard,  crvision, 0,		wizzard,	crvision,	0,		0,	"Dick Smith Electronics",	"Wizzard (Oceania)", 0 )
 CONS( 1982, rameses,  crvision, 0,		pal,		crvision,	0,		0,			"Hanimex",					"Rameses (Oceania)", 0 )
 CONS( 1983, vz2000,   crvision, 0,		pal,		crvision,	0,		0,			"Dick Smith Electronics",	"VZ 2000 (Oceania)", 0 )
 CONS( 1983, crvisio2, crvision, 0,		pal,		crvision,	0,		0,			"Sanyo Video",				"CreatiVision MK-II (Germany)", 0 )

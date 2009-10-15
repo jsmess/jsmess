@@ -61,7 +61,7 @@
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
 #include "rendlay.h"
-
+#include "devices/messram.h"
 
 /***************************************************************************
     CONSTANTS
@@ -440,7 +440,7 @@ static WRITE8_DEVICE_HANDLER( einstein_serial_receive_clock )
 static void einstein_page_rom(running_machine *machine)
 {
 	einstein_state *einstein = machine->driver_data;
-	memory_set_bankptr(machine, 1, einstein->rom_enabled ? memory_region(machine, "bios") : mess_ram);
+	memory_set_bankptr(machine, 1, einstein->rom_enabled ? memory_region(machine, "bios") : messram_get_ptr(devtag_get_device(machine, "messram")));
 }
 
 /* writing to this port is a simple trigger, and switches between RAM and ROM */
@@ -569,8 +569,8 @@ static MACHINE_RESET( einstein )
 	einstein->ctc = devtag_get_device(machine, IC_I058);
 
 	/* initialize memory mapping */
-	memory_set_bankptr(machine, 2, mess_ram);
-	memory_set_bankptr(machine, 3, mess_ram + 0x8000);
+	memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")));
+	memory_set_bankptr(machine, 3, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x8000);
 	einstein->rom_enabled = 1;
 	einstein_page_rom(machine);
 
@@ -938,6 +938,11 @@ static MACHINE_DRIVER_START( einstein )
 	MDRV_WD1770_ADD(IC_I042, default_wd17xx_interface)
 
 	MDRV_FLOPPY_4_DRIVES_ADD(einstein_floppy_config)
+	
+	/* RAM is provided by 8k DRAM ICs i009, i010, i011, i012, i013, i014, i015 and i016 */
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("64K")
 MACHINE_DRIVER_END
 
 
@@ -1010,22 +1015,11 @@ ROM_START( einst256 )
 	ROM_LOAD("tc256.rom", 0x0000, 0x4000, CRC(ef8dad88) SHA1(eb2102d3bef572db7161c26a7c68a5fcf457b4d0) )
 ROM_END
 
-
-
-/***************************************************************************
-    SYSTEM CONFIG
-***************************************************************************/
-static SYSTEM_CONFIG_START( einstein )
-	/* RAM is provided by 8k DRAM ICs i009, i010, i011, i012, i013, i014, i015 and i016 */
-	CONFIG_RAM_DEFAULT(8 * 8 * 1024)
-SYSTEM_CONFIG_END
-
-
 /***************************************************************************
     GAME DRIVERS
 ***************************************************************************/
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT           INIT  CONFIG,   COMPANY   FULLNAME                             FLAGS */
-COMP( 1984, einstein, 0,        0,		einstein, einstein,       0,    einstein, "Tatung", "Einstein TC-01",                    0 )
-COMP( 1984, einstei2, einstein, 0,		einstei2, einstein_80col, 0,    einstein, "Tatung", "Einstein TC-01 + 80 column device", 0 )
-COMP( 1984, einst256, 0,        0,		einstein, einstein,       0,    einstein, "Tatung", "Einstein 256",						 GAME_NOT_WORKING )
+COMP( 1984, einstein, 0,        0,		einstein, einstein,       0,    0, "Tatung", "Einstein TC-01",                    0 )
+COMP( 1984, einstei2, einstein, 0,		einstei2, einstein_80col, 0,    0, "Tatung", "Einstein TC-01 + 80 column device", 0 )
+COMP( 1984, einst256, 0,        0,		einstein, einstein,       0,    0, "Tatung", "Einstein 256",						 GAME_NOT_WORKING )

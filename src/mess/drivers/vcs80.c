@@ -13,6 +13,7 @@
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 #include "machine/z80pio.h"
+#include "devices/messram.h"
 #include "vcs80.lh"
 
 /* Read/Write Handlers */
@@ -209,6 +210,10 @@ static MACHINE_DRIVER_START( vcs80 )
 
 	/* devices */
 	MDRV_Z80PIO_ADD(Z80PIO_TAG, pio_intf)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("1K")	
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -217,12 +222,6 @@ ROM_START( vcs80 )
 	ROM_REGION( 0x10000, Z80_TAG, 0 )
 	ROM_LOAD( "monitor.rom", 0x0000, 0x0200, CRC(44aff4e9) SHA1(3472e5a9357eaba3ed6de65dee2b1c6b29349dd2) )
 ROM_END
-
-/* System Configuration */
-
-static SYSTEM_CONFIG_START( vcs80 )
-	CONFIG_RAM_DEFAULT( 1 * 1024 )
-SYSTEM_CONFIG_END
 
 /* Driver Initialization */
 
@@ -245,4 +244,4 @@ static DRIVER_INIT( vcs80 )
 /* System Drivers */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY             FULLNAME    FLAGS */
-COMP( 1983, vcs80,  0,		0,		vcs80,	vcs80,	vcs80,	vcs80,	"Eckhard Schiller",	"VCS-80",	GAME_SUPPORTS_SAVE )
+COMP( 1983, vcs80,  0,		0,		vcs80,	vcs80,	vcs80,	0,	"Eckhard Schiller",	"VCS-80",	GAME_SUPPORTS_SAVE )

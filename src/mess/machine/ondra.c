@@ -11,12 +11,12 @@
 #include "cpu/z80/z80.h"
 #include "devices/cassette.h"
 #include "includes/ondra.h"
-
+#include "devices/messram.h"
 
 /* Driver initialization */
 DRIVER_INIT(ondra)
 {
-	memset(mess_ram,0,64*1024);
+	memset(messram_get_ptr(devtag_get_device(machine, "messram")),0,64*1024);
 }
 
 static const device_config *cassette_device_image(running_machine *machine)
@@ -52,13 +52,13 @@ static void ondra_update_banks(running_machine *machine)
 		memory_set_bankptr(machine, 1, mem + 0x010000);
 	} else {
 		memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, SMH_BANK(1));
-		memory_set_bankptr(machine, 1, mess_ram + 0x0000);
+		memory_set_bankptr(machine, 1, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x0000);
 	}
-	memory_set_bankptr(machine, 2, mess_ram + 0x4000);
+	memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000);
 	if (ondra_bank2_status==0) {
 		memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xe000, 0xffff, 0, 0, SMH_BANK(3));
 		memory_install_read8_handler (cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xe000, 0xffff, 0, 0, SMH_BANK(3));
-		memory_set_bankptr(machine, 3, mess_ram + 0xe000);
+		memory_set_bankptr(machine, 3, messram_get_ptr(devtag_get_device(machine, "messram")) + 0xe000);
 	} else {
 		memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xe000, 0xffff, 0, 0, SMH_UNMAP);
 		memory_install_read8_handler (cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xe000, 0xffff, 0, 0, ondra_keyboard_r);

@@ -7,6 +7,7 @@
 #include "machine/upd1990a.h"
 #include "video/sed1330.h"
 #include "video/mc6845.h"
+#include "devices/messram.h"
 
 /*
 
@@ -141,7 +142,7 @@ static void pc8401a_bankswitch(running_machine *machine, UINT8 data)
 		break;
 
 	case 3: /* RAM cartridge */
-		if (mess_ram_size > 64)
+		if (messram_get_size(devtag_get_device(machine, "messram")) > 64)
 		{
 			memory_install_readwrite8_handler(program, 0x8000, 0xbfff, 0, 0, SMH_BANK(3), SMH_BANK(3));
 			memory_set_bank(machine, 3, 3); // TODO or 4
@@ -524,20 +525,20 @@ static MACHINE_START( pc8401a )
 
 	/* set up A0/A1 memory banking */
 	memory_configure_bank(machine, 1, 0, 4, memory_region(machine, Z80_TAG), 0x8000);
-	memory_configure_bank(machine, 1, 4, 2, mess_ram, 0x8000);
+	memory_configure_bank(machine, 1, 4, 2, messram_get_ptr(devtag_get_device(machine, "messram")), 0x8000);
 	memory_set_bank(machine, 1, 0);
 
 	/* set up A2 memory banking */
-	memory_configure_bank(machine, 3, 0, 5, mess_ram, 0x4000);
+	memory_configure_bank(machine, 3, 0, 5, messram_get_ptr(devtag_get_device(machine, "messram")), 0x4000);
 	memory_set_bank(machine, 3, 0);
 
 	/* set up A3 memory banking */
-	memory_configure_bank(machine, 4, 0, 1, mess_ram + 0xc000, 0);
+	memory_configure_bank(machine, 4, 0, 1, messram_get_ptr(devtag_get_device(machine, "messram")) + 0xc000, 0);
 	memory_configure_bank(machine, 4, 1, 1, state->crt_ram, 0);
 	memory_set_bank(machine, 4, 0);
 
 	/* set up A4 memory banking */
-	memory_configure_bank(machine, 5, 0, 1, mess_ram + 0xe800, 0);
+	memory_configure_bank(machine, 5, 0, 1, messram_get_ptr(devtag_get_device(machine, "messram")) + 0xe800, 0);
 	memory_set_bank(machine, 5, 0);
 
 	/* bank switch */
@@ -658,6 +659,11 @@ static MACHINE_DRIVER_START( common )
 	MDRV_CARTSLOT_ADD("iocart")
 	MDRV_CARTSLOT_EXTENSION_LIST("rom,bin")
 	MDRV_CARTSLOT_NOT_MANDATORY
+
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("64K")
+	MDRV_RAM_EXTRA_OPTIONS("96K")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( pc8401a )
@@ -676,6 +682,10 @@ static MACHINE_DRIVER_START( pc8500 )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM(pc8500_video)
+	
+	/* internal ram */
+	MDRV_RAM_MODIFY("messram")
+	MDRV_RAM_DEFAULT_SIZE("64K")
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -704,22 +714,11 @@ ROM_START( pc8500 )
 	ROM_CART_LOAD("iocart", 0x00000, 0x40000, ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
-/* System Configurations */
-
-static SYSTEM_CONFIG_START( pc8401a )
-	CONFIG_RAM_DEFAULT	(64 * 1024)
-	CONFIG_RAM			(96 * 1024)
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START( pc8500 )
-	CONFIG_RAM_DEFAULT	(64 * 1024)
-SYSTEM_CONFIG_END
-
 /* System Drivers */
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    CONFIG      COMPANY FULLNAME */
-COMP( 1984,	pc8401a,	0,		0,		pc8401a,	pc8401a,	0,		pc8401a,	"NEC",	"PC-8401A-LS", GAME_NOT_WORKING )
+COMP( 1984,	pc8401a,	0,		0,		pc8401a,	pc8401a,	0,		0,	"NEC",	"PC-8401A-LS", GAME_NOT_WORKING )
 /*
-COMP( 1984, pc8401bd,   pc8401a,0,      pc8401a,    pc8401a,    0,      pc8401a,    "NEC",  "PC-8401BD", GAME_NOT_WORKING )
+COMP( 1984, pc8401bd,   pc8401a,0,      pc8401a,    pc8401a,    0,      0,    "NEC",  "PC-8401BD", GAME_NOT_WORKING )
 */
-COMP( 1985, pc8500,		0,		0,		pc8500,		pc8401a,	0,		pc8500,		"NEC",	"PC-8500", GAME_NOT_WORKING )
+COMP( 1985, pc8500,		0,		0,		pc8500,		pc8401a,	0,		0,		"NEC",	"PC-8500", GAME_NOT_WORKING )

@@ -289,6 +289,7 @@ Timings:
 #include "devices/snapquik.h"
 #include "devices/cassette.h"
 #include "formats/lviv_lvt.h"
+#include "devices/messram.h"
 
 /* I/O ports */
 
@@ -461,6 +462,10 @@ static MACHINE_DRIVER_START( lviv )
 	MDRV_SNAPSHOT_ADD("snapshot", lviv, "sav", 0)
 
 	MDRV_CASSETTE_ADD( "cassette", lviv_cassette_config )
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("64K")
 MACHINE_DRIVER_END
 
 
@@ -474,10 +479,5 @@ ROM_START(lviv)
 	ROMX_LOAD("lvivp.bin", 0x10000, 0x4000, CRC(f171c282) SHA1(c7dc2bdb02400e6b5cdcc50040eb06f506a7ed84), ROM_BIOS(3))
 ROM_END
 
-static SYSTEM_CONFIG_START(lviv)
-	CONFIG_RAM_DEFAULT(64 * 1024)
-SYSTEM_CONFIG_END
-
-
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY         FULLNAME    FLAGS */
-COMP( 1989, lviv,   0,      0,      lviv,   lviv,   0,      lviv,   "V. I. Lenin",  "Lviv" ,    0 )
+COMP( 1989, lviv,   0,      0,      lviv,   lviv,   0,      0,   "V. I. Lenin",  "Lviv" ,    0 )

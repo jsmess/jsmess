@@ -14,6 +14,7 @@
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
 #include "machine/z80ctc.h"
+#include "devices/messram.h"
 
 /* Read/Write Handlers */
 
@@ -232,6 +233,10 @@ static MACHINE_DRIVER_START( huebler )
 	MDRV_Z80SIO_ADD(Z80SIO_TAG, 2500000, sio_intf)
 
 	MDRV_CASSETTE_ADD(CASSETTE_TAG, huebler_cassette_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("59K")	
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -246,13 +251,7 @@ ROM_START( huebler )
 	ROM_LOAD( "hemcfont.bin", 0x0000, 0x0400, CRC(1074d103) SHA1(e558279cff5744acef4eccf30759a9508b7f8750) )
 ROM_END
 
-/* System Configuration */
-
-static SYSTEM_CONFIG_START( huebler )
-	CONFIG_RAM_DEFAULT( 59 * 1024 )
-SYSTEM_CONFIG_END
-
 /* System Drivers */
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    CONFIG      COMPANY                             FULLNAME            FLAGS */
-COMP( 1985, huebler,	0,		0,		huebler,	huebler,	0,		huebler,	"Bernd Hubler, Klaus-Peter Evert",	"Hubler/Everts",	GAME_NOT_WORKING )
+COMP( 1985, huebler,	0,		0,		huebler,	huebler,	0,		0,	"Bernd Hubler, Klaus-Peter Evert",	"Hubler/Everts",	GAME_NOT_WORKING )

@@ -14,6 +14,7 @@
 #include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
 #include "includes/pk8020.h"
+#include "devices/messram.h"
 
 /* Address maps */
 static ADDRESS_MAP_START(pk8020_mem, ADDRESS_SPACE_PROGRAM, 8)
@@ -212,6 +213,10 @@ static MACHINE_DRIVER_START( pk8020 )
 	MDRV_CASSETTE_ADD( "cassette", pk8020_cassette_config )
 
 	MDRV_FLOPPY_4_DRIVES_ADD(pk8020_floppy_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("162K")	//64 + 4*48 + 2
 MACHINE_DRIVER_END
 
 /* ROM definition */
@@ -223,11 +228,7 @@ ROM_START( korvet )
 	ROM_LOAD ( "korvet2.fnt", 0x0000, 0x2000, CRC(FB1CD3D4))
 ROM_END
 
-static SYSTEM_CONFIG_START(pk8020)
- 	CONFIG_RAM_DEFAULT((64 + 4*48 + 2) * 1024) // Text video ram is 1KB but it is 9bit, so we take 2 KB for that
-SYSTEM_CONFIG_END
-
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       INIT     CONFIG COMPANY                  FULLNAME   FLAGS */
-COMP( 1987, korvet, 	 0,  	 0,	pk8020, 	pk8020, 	pk8020, pk8020,  "", 					 "PK8020 Korvet",	 0)
+COMP( 1987, korvet, 	 0,  	 0,	pk8020, 	pk8020, 	pk8020, 0,  "", 					 "PK8020 Korvet",	 0)

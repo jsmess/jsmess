@@ -14,7 +14,7 @@
 #include "includes/mc68328.h"
 #include "sound/dac.h"
 #include "debugger.h"
-
+#include "devices/messram.h"
 
 static CPU_DISASSEMBLE(palm_dasm_override);
 
@@ -92,9 +92,9 @@ static void palm_spim_exchange( const device_config *device )
 static MACHINE_START( palm )
 {
     const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-    memory_install_read16_handler (space, 0x000000, mess_ram_size - 1, mess_ram_size - 1, 0, (read16_space_func)1);
-    memory_install_write16_handler(space, 0x000000, mess_ram_size - 1, mess_ram_size - 1, 0, (write16_space_func)1);
-    memory_set_bankptr(machine, 1, mess_ram);
+    memory_install_read16_handler (space, 0x000000, messram_get_size(devtag_get_device(machine, "messram")) - 1, messram_get_size(devtag_get_device(machine, "messram")) - 1, 0, (read16_space_func)1);
+    memory_install_write16_handler(space, 0x000000, messram_get_size(devtag_get_device(machine, "messram")) - 1, messram_get_size(devtag_get_device(machine, "messram")) - 1, 0, (write16_space_func)1);
+    memory_set_bankptr(machine, 1, messram_get_ptr(devtag_get_device(machine, "messram")));
 
     state_save_register_global(machine, port_f_latch);
     state_save_register_global(machine, spim_data);
@@ -104,8 +104,8 @@ static MACHINE_RESET( palm )
 {
     // Copy boot ROM
     UINT8* bios = memory_region(machine, "bios");
-    memset(mess_ram, 0, mess_ram_size);
-    memcpy(mess_ram, bios, 0x20000);
+    memset(messram_get_ptr(devtag_get_device(machine, "messram")), 0, messram_get_size(devtag_get_device(machine, "messram")));
+    memcpy(messram_get_ptr(devtag_get_device(machine, "messram")), bios, 0x20000);
 
     device_reset(cputag_get_cpu(machine, "maincpu"));
 }
@@ -420,63 +420,76 @@ ROM_START( spt1740 )
 	ROM_RELOAD(0x000000, 0x004000)
 ROM_END
 
-static SYSTEM_CONFIG_START( pilot1k )
-    CONFIG_RAM_DEFAULT  (0x020000)      // 128k
-    CONFIG_RAM      (0x080000)      // 512k
-    CONFIG_RAM      (0x100000)      // 1M
-    CONFIG_RAM      (0x200000)      // 2M
-    CONFIG_RAM      (0x400000)      // 4M
-    CONFIG_RAM      (0x800000)      // 8M
-SYSTEM_CONFIG_END
+static MACHINE_DRIVER_START( pilot1k )
+	MDRV_IMPORT_FROM(palm)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("128K")
+	MDRV_RAM_EXTRA_OPTIONS("512K,1M,2M,4M,8M")
+MACHINE_DRIVER_END
 
-static SYSTEM_CONFIG_START( pilot5k )
-    CONFIG_RAM_DEFAULT      (0x080000)      // 512k
-    CONFIG_RAM      (0x100000)      // 1M
-    CONFIG_RAM      (0x200000)      // 2M
-    CONFIG_RAM      (0x400000)      // 4M
-    CONFIG_RAM      (0x800000)      // 8M
-SYSTEM_CONFIG_END
+static MACHINE_DRIVER_START( pilot5k )
+	MDRV_IMPORT_FROM(palm)
 
-static SYSTEM_CONFIG_START( palmpro )
-    CONFIG_RAM_DEFAULT      (0x100000)      // 1M
-    CONFIG_RAM      (0x200000)      // 2M
-    CONFIG_RAM      (0x400000)      // 4M
-    CONFIG_RAM      (0x800000)      // 8M
-SYSTEM_CONFIG_END
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("512K")
+	MDRV_RAM_EXTRA_OPTIONS("1M,2M,4M,8M")
+MACHINE_DRIVER_END
 
-static SYSTEM_CONFIG_START( palmiii )
-    CONFIG_RAM_DEFAULT  (0x200000)      // 2M
-    CONFIG_RAM      (0x400000)      // 4M
-    CONFIG_RAM      (0x800000)      // 8M
-SYSTEM_CONFIG_END
+static MACHINE_DRIVER_START( palmpro )
+	MDRV_IMPORT_FROM(palm)
+	
+	/* internal ram */	
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("1M")
+	MDRV_RAM_EXTRA_OPTIONS("2M,4M,8M")
+MACHINE_DRIVER_END
 
-static SYSTEM_CONFIG_START( palmv )
-    CONFIG_RAM_DEFAULT  (0x200000)      // 2M
-    CONFIG_RAM      (0x400000)      // 4M
-    CONFIG_RAM      (0x800000)      // 8M
-SYSTEM_CONFIG_END
+static MACHINE_DRIVER_START( palmiii )
+	MDRV_IMPORT_FROM(palm)
 
-static SYSTEM_CONFIG_START( palmvx )
-    CONFIG_RAM_DEFAULT  (0x800000)      // 8M
-SYSTEM_CONFIG_END
+	/* internal ram */	
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("2M")
+	MDRV_RAM_EXTRA_OPTIONS("4M,8M")
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( palmv )
+	MDRV_IMPORT_FROM(palm)
+
+	/* internal ram */	
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("2M")
+	MDRV_RAM_EXTRA_OPTIONS("4M,8M")
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( palmvx )	
+	MDRV_IMPORT_FROM(palm)
+
+	/* internal ram */	
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("8M")
+MACHINE_DRIVER_END
 
 /*    YEAR  NAME      PARENT    COMPAT   MACHINE   INPUT     INIT      CONFIG    COMPANY FULLNAME */
-COMP( 1996, pilot1k,  0,        0,       palm,     palm,     palm,     pilot1k,  "U.S. Robotics", "Pilot 1000", GAME_SUPPORTS_SAVE | GAME_NO_SOUND )
-COMP( 1996, pilot5k,  pilot1k,  0,       palm,     palm,     palm,     pilot5k,  "U.S. Robotics", "Pilot 5000", GAME_SUPPORTS_SAVE | GAME_NO_SOUND )
-COMP( 1997, palmpers, pilot1k,  0,       palm,     palm,     palm,     pilot5k,  "U.S. Robotics", "Palm Pilot Personal", GAME_SUPPORTS_SAVE | GAME_NO_SOUND )
-COMP( 1997, palmpro,  pilot1k,  0,       palm,     palm,     palm,     palmpro,  "U.S. Robotics", "Palm Pilot Pro", GAME_SUPPORTS_SAVE | GAME_NO_SOUND )
-COMP( 1998, palmiii,  pilot1k,  0,       palm,     palm,     palm,     palmiii,  "3Com", "Palm III", GAME_SUPPORTS_SAVE | GAME_NO_SOUND )
-COMP( 1998, palmiiic, pilot1k,  0,       palm,     palm,     palm,     palmiii,  "Palm Inc.", "Palm IIIc", GAME_NOT_WORKING )
-COMP( 2000, palmm100, pilot1k,  0,       palm,     palm,     palm,     palmiii,  "Palm Inc.", "Palm m100", GAME_NOT_WORKING )
-COMP( 2000, palmm130, pilot1k,  0,       palm,     palm,     palm,     palmiii,  "Palm Inc.", "Palm m130", GAME_NOT_WORKING )
-COMP( 2001, palmm505, pilot1k,  0,       palm,     palm,     palm,     palmiii,  "Palm Inc.", "Palm m505", GAME_NOT_WORKING )
-COMP( 2001, palmm515, pilot1k,  0,       palm,     palm,     palm,     palmiii,  "Palm Inc.", "Palm m515", GAME_NOT_WORKING )
-COMP( 1999, palmv,    pilot1k,  0,       palm,     palm,     palm,     palmv,  	 "3Com", "Palm V", GAME_NOT_WORKING )
-COMP( 1999, palmvx,   pilot1k,  0,       palm,     palm,     palm,     palmvx,   "Palm Inc.", "Palm Vx", GAME_NOT_WORKING )
-COMP( 2001, visor,    pilot1k,  0,       palm,     palm,     palm,     palmvx,   "Handspring", "Visor Edge", GAME_NOT_WORKING )
-COMP( 19??, spt1500,  pilot1k,  0,       palm,     palm,     palm,     palmvx,   "Symbol", "SPT 1500", GAME_NOT_WORKING )
-COMP( 19??, spt1700,  pilot1k,  0,       palm,     palm,     palm,     palmvx,   "Symbol", "SPT 1700", GAME_NOT_WORKING )
-COMP( 19??, spt1740,  pilot1k,  0,       palm,     palm,     palm,     palmvx,   "Symbol", "SPT 1740", GAME_NOT_WORKING )
+COMP( 1996, pilot1k,  0,        0,       pilot1k,     palm,     palm,     0,  "U.S. Robotics", "Pilot 1000", GAME_SUPPORTS_SAVE | GAME_NO_SOUND )
+COMP( 1996, pilot5k,  pilot1k,  0,       pilot5k,     palm,     palm,     0,  "U.S. Robotics", "Pilot 5000", GAME_SUPPORTS_SAVE | GAME_NO_SOUND )
+COMP( 1997, palmpers, pilot1k,  0,       pilot5k,     palm,     palm,     0,  "U.S. Robotics", "Palm Pilot Personal", GAME_SUPPORTS_SAVE | GAME_NO_SOUND )
+COMP( 1997, palmpro,  pilot1k,  0,       palmpro,     palm,     palm,     0,  "U.S. Robotics", "Palm Pilot Pro", GAME_SUPPORTS_SAVE | GAME_NO_SOUND )
+COMP( 1998, palmiii,  pilot1k,  0,       palmiii,     palm,     palm,     0,  "3Com", "Palm III", GAME_SUPPORTS_SAVE | GAME_NO_SOUND )
+COMP( 1998, palmiiic, pilot1k,  0,       palmiii,     palm,     palm,     0,  "Palm Inc.", "Palm IIIc", GAME_NOT_WORKING )
+COMP( 2000, palmm100, pilot1k,  0,       palmiii,     palm,     palm,     0,  "Palm Inc.", "Palm m100", GAME_NOT_WORKING )
+COMP( 2000, palmm130, pilot1k,  0,       palmiii,     palm,     palm,     0,  "Palm Inc.", "Palm m130", GAME_NOT_WORKING )
+COMP( 2001, palmm505, pilot1k,  0,       palmiii,     palm,     palm,     0,  "Palm Inc.", "Palm m505", GAME_NOT_WORKING )
+COMP( 2001, palmm515, pilot1k,  0,       palmiii,     palm,     palm,     0,  "Palm Inc.", "Palm m515", GAME_NOT_WORKING )
+COMP( 1999, palmv,    pilot1k,  0,       palmv,       palm,     palm,     0,  	 "3Com", "Palm V", GAME_NOT_WORKING )
+COMP( 1999, palmvx,   pilot1k,  0,       palmvx,      palm,     palm,     0,   "Palm Inc.", "Palm Vx", GAME_NOT_WORKING )
+COMP( 2001, visor,    pilot1k,  0,       palmvx,      palm,     palm,     0,   "Handspring", "Visor Edge", GAME_NOT_WORKING )
+COMP( 19??, spt1500,  pilot1k,  0,       palmvx,      palm,     palm,     0,   "Symbol", "SPT 1500", GAME_NOT_WORKING )
+COMP( 19??, spt1700,  pilot1k,  0,       palmvx,      palm,     palm,     0,   "Symbol", "SPT 1700", GAME_NOT_WORKING )
+COMP( 19??, spt1740,  pilot1k,  0,       palmvx,      palm,     palm,     0,   "Symbol", "SPT 1740", GAME_NOT_WORKING )
 static const char *lookup_trap(UINT16 opcode)
 {
     static const struct

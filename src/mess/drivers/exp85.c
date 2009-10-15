@@ -24,6 +24,7 @@
 #include "machine/i8155.h"
 #include "machine/i8355.h"
 #include "sound/speaker.h"
+#include "devices/messram.h"
 
 /* Memory Maps */
 
@@ -233,6 +234,11 @@ static MACHINE_DRIVER_START( exp85 )
 	MDRV_I8355_ADD(I8355_TAG, XTAL_6_144MHz/2, i8355_intf)
 
 	MDRV_CASSETTE_ADD(CASSETTE_TAG, exp85_cassette_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("256")
+	MDRV_RAM_EXTRA_OPTIONS("4K")
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -257,14 +263,6 @@ ROM_START( exp85 )
     ROMX_LOAD( "hex.u105", 0xf000, 0x0800, NO_DUMP, ROM_BIOS(2) )*/
 ROM_END
 
-/* System Configuration */
-
-static SYSTEM_CONFIG_START( exp85 )
-	CONFIG_RAM_DEFAULT( 256 )
-	CONFIG_RAM		  ( 4 * 1024 )
-SYSTEM_CONFIG_END
-
 /* System Drivers */
-
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY         FULLNAME        FLAGS */
-COMP( 1979, exp85,  0,		0,		exp85,	exp85,	0,		exp85,	"Netronics",	"Explorer/85",	GAME_NOT_WORKING )
+COMP( 1979, exp85,  0,		0,		exp85,	exp85,	0,		0,	"Netronics",	"Explorer/85",	GAME_NOT_WORKING )

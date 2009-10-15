@@ -19,6 +19,7 @@
 #include "formats/basicdsk.h"
 #include "formats/rk_cas.h"
 #include "includes/radio86.h"
+#include "devices/messram.h"
 #include "includes/partner.h"
 
 /* Address maps */
@@ -200,6 +201,10 @@ static MACHINE_DRIVER_START( partner )
 	MDRV_WD1793_ADD("wd1793", partner_wd17xx_interface )
 
 	MDRV_FLOPPY_2_DRIVES_ADD(partner_floppy_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("64K")	
 MACHINE_DRIVER_END
 
 /* ROM definition */
@@ -214,10 +219,6 @@ ROM_START( partner )
 	ROM_LOAD ("partner.fnt", 0x0000, 0x2000, CRC(2705F726) SHA1(3d7b33901ef098a405d7ddad924ba9677f6a9b15))
 ROM_END
 
-static SYSTEM_CONFIG_START(partner)
-	CONFIG_RAM_DEFAULT(64 * 1024)
-SYSTEM_CONFIG_END
-
 /* Driver */
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( 1987, partner, radio86,   0, 	partner, 	partner,partner, partner,  "SAM SKB VM", 	"Partner-01.01",	GAME_NOT_WORKING)
+COMP( 1987, partner, radio86,   0, 	partner, 	partner,partner, 0,  "SAM SKB VM", 	"Partner-01.01",	GAME_NOT_WORKING)

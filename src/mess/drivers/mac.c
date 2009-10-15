@@ -46,6 +46,7 @@
 #include "devices/sonydriv.h"
 #include "devices/harddriv.h"
 #include "formats/ap_dsk35.h"
+#include "devices/messram.h"
 
 UINT32 *se30_vram;
 
@@ -523,6 +524,18 @@ static MACHINE_DRIVER_START( mac512ke )
 	MDRV_SCC8530_ADD("scc")
 	MDRV_SCC8530_ACK(mac_scc_ack)
 	MDRV_VIA6522_ADD("via6522_0", 1000000, mac_via6522_intf)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("512K")
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( mac128k )
+	MDRV_IMPORT_FROM( mac512ke )
+	
+	/* internal ram */
+	MDRV_RAM_MODIFY("messram")
+	MDRV_RAM_DEFAULT_SIZE("128K")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( macplus )
@@ -536,6 +549,11 @@ static MACHINE_DRIVER_START( macplus )
 	MDRV_HARDDISK_ADD( "harddisk2" )
 	
 	MDRV_FLOPPY_SONY_2_DRIVES_MODIFY(mac_floppy_config)
+	
+	/* internal ram */
+	MDRV_RAM_MODIFY("messram")
+	MDRV_RAM_DEFAULT_SIZE("1M")
+	MDRV_RAM_EXTRA_OPTIONS("512K,2M,2560K,4M")
 MACHINE_DRIVER_END
 
 
@@ -544,6 +562,11 @@ static MACHINE_DRIVER_START( macse )
 
 	MDRV_DEVICE_REMOVE("via6522_0")
 	MDRV_VIA6522_ADD("via6522_0", 1000000, mac_via6522_adb_intf)
+	
+	/* internal ram */
+	MDRV_RAM_MODIFY("messram")
+	MDRV_RAM_DEFAULT_SIZE("1M")
+	MDRV_RAM_EXTRA_OPTIONS("2M,2560K,4M")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( mac2fdhd )
@@ -588,6 +611,11 @@ static MACHINE_DRIVER_START( mac2fdhd )
 
 	MDRV_HARDDISK_ADD( "harddisk1" )
 	MDRV_HARDDISK_ADD( "harddisk2" )
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("2M")
+	MDRV_RAM_EXTRA_OPTIONS("4M,6M,8M,10M")	
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( maclc )
@@ -652,6 +680,11 @@ static MACHINE_DRIVER_START( macse30 )
 
 	MDRV_HARDDISK_ADD( "harddisk1" )
 	MDRV_HARDDISK_ADD( "harddisk2" )
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("2M")
+	MDRV_RAM_EXTRA_OPTIONS("2M,6M,8M,10M")		
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( macclas2 )
@@ -662,6 +695,20 @@ static MACHINE_DRIVER_START( macclas2 )
 
 	MDRV_VIDEO_START(maclc)
 	MDRV_VIDEO_UPDATE(maclc)
+	
+	/* internal ram */
+	MDRV_RAM_MODIFY("messram")
+	MDRV_RAM_DEFAULT_SIZE("4M")
+	MDRV_RAM_EXTRA_OPTIONS("6M,8M,10M")	
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( maclc2 )
+	MDRV_IMPORT_FROM( maclc )
+
+	/* internal ram */
+	MDRV_RAM_MODIFY("messram")
+	MDRV_RAM_DEFAULT_SIZE("4M")
+	MDRV_RAM_EXTRA_OPTIONS("6M,8M,10M")	
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( maciici )
@@ -686,6 +733,11 @@ static MACHINE_DRIVER_START( maciisi )
 
 	MDRV_VIDEO_START(maclc)
 	MDRV_VIDEO_UPDATE(macrbv)
+	
+	/* internal ram */
+	MDRV_RAM_MODIFY("messram")
+	MDRV_RAM_DEFAULT_SIZE("4M")
+	MDRV_RAM_EXTRA_OPTIONS("6M,8M,10M")		
 MACHINE_DRIVER_END
 
 static INPUT_PORTS_START( macplus )
@@ -923,58 +975,19 @@ ROM_START( maclc2 )
 	ROM_LOAD( "35c28f5f.rom", 0x000000, 0x080000, CRC(a92145b3) SHA1(d5786182b62a8ffeeb9fd3f80b5511dba70318a0) )
 ROM_END
 
-static SYSTEM_CONFIG_START(mac128k)
-	CONFIG_RAM_DEFAULT(0x020000)
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START(mac512k)
-	CONFIG_RAM_DEFAULT(0x080000)
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START(macplus)
-	CONFIG_RAM			(0x080000)
-	CONFIG_RAM_DEFAULT	(0x100000)
-	CONFIG_RAM			(0x200000)
-	CONFIG_RAM			(0x280000)
-	CONFIG_RAM			(0x400000)
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START(macse)
-	CONFIG_RAM_DEFAULT	(0x100000)
-	CONFIG_RAM			(0x200000)
-	CONFIG_RAM			(0x280000)
-	CONFIG_RAM			(0x400000)
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START(maclc)
-	CONFIG_RAM_DEFAULT	(0x200000)	// 2 MB RAM default
-	CONFIG_RAM			(0x400000)
-	CONFIG_RAM			(0x600000)
-	CONFIG_RAM			(0x800000)
-	CONFIG_RAM			(0xa00000)	// up to 10 MB
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START(macclas2)
-	CONFIG_RAM_DEFAULT		(0x400000)	// 4MB default
-	CONFIG_RAM			(0x600000)
-	CONFIG_RAM			(0x800000)
-	CONFIG_RAM			(0xa00000)	// up to 10 MB
-SYSTEM_CONFIG_END
-
-
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT	 CONFIG		COMPANY			FULLNAME */
-COMP( 1984, mac128k,  0, 	0,	mac512ke, macplus,  mac128k512k, mac128k,	"Apple Computer",	"Macintosh 128k",  GAME_NOT_WORKING )
-COMP( 1984, mac512k,  mac128k,  0,	mac512ke, macplus,  mac128k512k, mac512k,	"Apple Computer",	"Macintosh 512k",  GAME_NOT_WORKING )
-COMP( 1986, mac512ke, macplus,  0,	mac512ke, macplus,  mac512ke,	 mac512k,	"Apple Computer",	"Macintosh 512ke", 0 )
-COMP( 1986, macplus,  0,	0,	macplus,  macplus,  macplus,	 macplus,	"Apple Computer",	"Macintosh Plus",  0 )
-COMP( 1987, macse,    0,	0,	macse,    macplus,  macse,	 macse,		"Apple Computer",	"Macintosh SE",  0 )
-COMP( 1988, mac2fdhd, 0,	0,	mac2fdhd, macplus,  maciifdhd,	 maclc,		"Apple Computer",	"Macintosh II (FDHD)",  GAME_NOT_WORKING )
-COMP( 1988, maciix,   mac2fdhd, 0,	maciix,   macplus,  maciix,	 maclc,		"Apple Computer",	"Macintosh IIx",  GAME_NOT_WORKING )
-COMP( 1989, macse30,  mac2fdhd, 0,	macse30,  macplus,  macse30,	 maclc,		"Apple Computer",	"Macintosh SE/30",  GAME_NOT_WORKING )
-COMP( 1989, maciicx,  mac2fdhd, 0,	maciix,   macplus,  maciicx,	 maclc,		"Apple Computer",	"Macintosh IIcx",  GAME_NOT_WORKING )
-COMP( 1989, maciici,  0,	0,	maciici,  macplus,  maciici,	 macclas2, 	"Apple Computer",	"Macintosh IIci",  GAME_NOT_WORKING )
-COMP( 1990, macclasc, 0,	0,	macse,    macplus,  macclassic,	 macse,		"Apple Computer",	"Macintosh Classic",  GAME_NOT_WORKING )
-COMP( 1990, maclc,    0,	0,	maclc,    macplus,  maclc,	 maclc,		"Apple Computer",	"Macintosh LC",  GAME_NOT_WORKING )
-COMP( 1990, maciisi,  0,	0,	maciisi,  macplus,  maciici,	 macclas2,	"Apple Computer",	"Macintosh IIsi",  GAME_NOT_WORKING )
-COMP( 1991, macclas2, 0,	0,	macclas2, macplus,  macclassic2, macclas2,    	"Apple Computer",	"Macintosh Classic II",  GAME_NOT_WORKING )
-COMP( 1991, maclc2,   0,	0,	maclc,    macplus,  maclc2,	 macclas2,      "Apple Computer",	"Macintosh LC II",  GAME_NOT_WORKING )
+COMP( 1984, mac128k,  0, 		0,	mac128k,  macplus,  mac128k512k, 0,	"Apple Computer",	"Macintosh 128k",  GAME_NOT_WORKING )
+COMP( 1984, mac512k,  mac128k,  0,	mac512ke, macplus,  mac128k512k, 0,	"Apple Computer",	"Macintosh 512k",  GAME_NOT_WORKING )
+COMP( 1986, mac512ke, macplus,  0,	mac512ke, macplus,  mac512ke,	 0,	"Apple Computer",	"Macintosh 512ke", 0 )
+COMP( 1986, macplus,  0,		0,	macplus,  macplus,  macplus,	 0,	"Apple Computer",	"Macintosh Plus",  0 )
+COMP( 1987, macse,    0,		0,	macse,    macplus,  macse,	 	 0,		"Apple Computer",	"Macintosh SE",  0 )
+COMP( 1988, mac2fdhd, 0,		0,	mac2fdhd, macplus,  maciifdhd,	 0,		"Apple Computer",	"Macintosh II (FDHD)",  GAME_NOT_WORKING )
+COMP( 1988, maciix,   mac2fdhd, 0,	maciix,   macplus,  maciix,	 	 0,		"Apple Computer",	"Macintosh IIx",  GAME_NOT_WORKING )
+COMP( 1989, macse30,  mac2fdhd, 0,	macse30,  macplus,  macse30,	 0,		"Apple Computer",	"Macintosh SE/30",  GAME_NOT_WORKING )
+COMP( 1989, maciicx,  mac2fdhd, 0,	maciix,   macplus,  maciicx,	 0,		"Apple Computer",	"Macintosh IIcx",  GAME_NOT_WORKING )
+COMP( 1989, maciici,  0,		0,	maciici,  macplus,  maciici,	 0, 	"Apple Computer",	"Macintosh IIci",  GAME_NOT_WORKING )
+COMP( 1990, macclasc, 0,		0,	macse,    macplus,  macclassic,	 0,		"Apple Computer",	"Macintosh Classic",  GAME_NOT_WORKING )
+COMP( 1990, maclc,    0,		0,	maclc,    macplus,  maclc,	 	 0,		"Apple Computer",	"Macintosh LC",  GAME_NOT_WORKING )
+COMP( 1990, maciisi,  0,		0,	maciisi,  macplus,  maciici,	 0,	"Apple Computer",	"Macintosh IIsi",  GAME_NOT_WORKING )
+COMP( 1991, macclas2, 0,		0,	macclas2, macplus,  macclassic2, 0,    	"Apple Computer",	"Macintosh Classic II",  GAME_NOT_WORKING )
+COMP( 1991, maclc2,   0,		0,	maclc2,   macplus,  maclc2,	 	 0,      "Apple Computer",	"Macintosh LC II",  GAME_NOT_WORKING )

@@ -115,6 +115,7 @@ Notes:
 #include "machine/ctronics.h"
 #include "devices/z80bin.h"
 #include "formats/vt_cas.h"
+#include "devices/messram.h"
 
 static Z80BIN_EXECUTE(vtech1);
 
@@ -389,6 +390,11 @@ static MACHINE_DRIVER_START(laser110)
 	/* cartridge */
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("rom")
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("66K")
+	MDRV_RAM_EXTRA_OPTIONS("2K,18K,4098K")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START(laser200)
@@ -404,6 +410,11 @@ static MACHINE_DRIVER_START(laser210)
     MDRV_CPU_PROGRAM_MAP(laser210_mem)
 
     MDRV_MACHINE_START(laser210)
+	
+	/* internal ram */
+	MDRV_RAM_MODIFY("messram")
+	MDRV_RAM_DEFAULT_SIZE("66K")
+	MDRV_RAM_EXTRA_OPTIONS("6K,22K,4098K")	
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START(laser310)
@@ -412,8 +423,11 @@ static MACHINE_DRIVER_START(laser310)
     MDRV_CPU_PROGRAM_MAP(laser310_mem)
 
     MDRV_MACHINE_START(laser310)
+	/* internal ram */
+	MDRV_RAM_MODIFY("messram")
+	MDRV_RAM_DEFAULT_SIZE("66K")
+	MDRV_RAM_EXTRA_OPTIONS("16K,32K,4098K")
 MACHINE_DRIVER_END
-
 
 /******************************************************************************
  ROM Definitions
@@ -545,26 +559,6 @@ static void vtech1_floppy_getinfo(const mess_device_class *devclass, UINT32 stat
 
 static SYSTEM_CONFIG_START(vtech1)
     CONFIG_DEVICE(vtech1_floppy_getinfo)
-	CONFIG_RAM_DEFAULT (66 * 1024)   /* with 64K memory expansion */
-	CONFIG_RAM         (4098 * 1024) /* with 4MB memory expansion */
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START(laser110)
-	CONFIG_IMPORT_FROM (vtech1)
-	CONFIG_RAM         ( 2 * 1024)   /* standard */
-	CONFIG_RAM         (18 * 1024)   /* with 16K memory expansion */
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START(laser210)
-	CONFIG_IMPORT_FROM (vtech1)
-	CONFIG_RAM         ( 6 * 1024)   /* standard */
-	CONFIG_RAM         (22 * 1024)   /* with 16K memory expansion */
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START(laser310)
-	CONFIG_IMPORT_FROM (vtech1)
-	CONFIG_RAM         (16 * 1024)   /* standard */
-	CONFIG_RAM         (32 * 1024)   /* with 16K memory expansion */
 SYSTEM_CONFIG_END
 
 
@@ -573,17 +567,17 @@ SYSTEM_CONFIG_END
 ******************************************************************************/
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT CONFIG      COMPANY                     FULLNAME                            FLAGS */
-COMP( 1983, laser110,   0,          0,      laser110,   vtech1, 0,   laser110,   "Video Technology",         "Laser 110",                        0 )
-COMP( 1983, las110de,   laser110,   0,      laser110,   vtech1, 0,   laser110,   "Sanyo",                    "Laser 110 (Germany)",              0 )
+COMP( 1983, laser110,   0,          0,      laser110,   vtech1, 0,   vtech1,   "Video Technology",         "Laser 110",                        0 )
+COMP( 1983, las110de,   laser110,   0,      laser110,   vtech1, 0,   vtech1,   "Sanyo",                    "Laser 110 (Germany)",              0 )
 
-COMP( 1983, laser200,   0,          0,      laser200,   vtech1, 0,   laser110,   "Video Technology",         "Laser 200",                        0 )
-COMP( 1983, vz200de,    laser200,   0,      laser200,   vtech1, 0,   laser110,   "Video Technology",         "VZ-200 (Germany & Netherlands)",   GAME_NOT_WORKING )
-COMP( 1983, fellow,     laser200,   0,      laser200,   vtech1, 0,   laser110,   "Salora",                   "Fellow (Finland)",                 0 )
-COMP( 1983, tx8000,     laser200,   0,      laser200,   vtech1, 0,   laser110,   "Texet",                    "TX-8000 (UK)",                     0 )
+COMP( 1983, laser200,   0,          0,      laser200,   vtech1, 0,   vtech1,   "Video Technology",         "Laser 200",                        0 )
+COMP( 1983, vz200de,    laser200,   0,      laser200,   vtech1, 0,   vtech1,   "Video Technology",         "VZ-200 (Germany & Netherlands)",   GAME_NOT_WORKING )
+COMP( 1983, fellow,     laser200,   0,      laser200,   vtech1, 0,   vtech1,   "Salora",                   "Fellow (Finland)",                 0 )
+COMP( 1983, tx8000,     laser200,   0,      laser200,   vtech1, 0,   vtech1,   "Texet",                    "TX-8000 (UK)",                     0 )
 
-COMP( 1984, laser210,   0,          0,      laser210,   vtech1, 0,   laser210,   "Video Technology",         "Laser 210",                        0 )
-COMP( 1984, vz200,      laser210,   0,      laser210,   vtech1, 0,   laser210,   "Dick Smith Electronics",   "VZ-200 (Oceania)",                 0 )
-COMP( 1984, las210de,   laser210,   0,      laser210,   vtech1, 0,   laser210,   "Sanyo",                    "Laser 210 (Germany)",              0 )
+COMP( 1984, laser210,   0,          0,      laser210,   vtech1, 0,   vtech1,   "Video Technology",         "Laser 210",                        0 )
+COMP( 1984, vz200,      laser210,   0,      laser210,   vtech1, 0,   vtech1,   "Dick Smith Electronics",   "VZ-200 (Oceania)",                 0 )
+COMP( 1984, las210de,   laser210,   0,      laser210,   vtech1, 0,   vtech1,   "Sanyo",                    "Laser 210 (Germany)",              0 )
 
-COMP( 1984, laser310,   0,          0,      laser310,   vtech1, 0,   laser310,   "Video Technology",         "Laser 310",                        0 )
-COMP( 1984, vz300,      laser310,   0,      laser310,   vtech1, 0,	 laser310,   "Dick Smith Electronics",   "VZ-300 (Oceania)",                 0 )
+COMP( 1984, laser310,   0,          0,      laser310,   vtech1, 0,   vtech1,   "Video Technology",         "Laser 310",                        0 )
+COMP( 1984, vz300,      laser310,   0,      laser310,   vtech1, 0,	 vtech1,   "Dick Smith Electronics",   "VZ-300 (Oceania)",                 0 )

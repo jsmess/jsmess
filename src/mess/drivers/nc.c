@@ -106,6 +106,7 @@
 #include "formats/pc_dsk.h"		/* for NC200 disk image */
 #include "devices/cartslot.h"
 #include "sound/beep.h"
+#include "devices/messram.h"
 
 
 #define VERBOSE 0
@@ -374,7 +375,7 @@ static void nc_refresh_memory_bank_config(running_machine *machine, int bank)
 
 			mem_bank = mem_bank & nc_membank_internal_ram_mask;
 
-			addr = mess_ram + (mem_bank<<14);
+			addr = messram_get_ptr(devtag_get_device(machine, "messram")) + (mem_bank<<14);
 
 			memory_set_bankptr(machine, bank+1, addr);
 			memory_set_bankptr(machine, bank+5, addr);
@@ -445,7 +446,7 @@ static void nc_refresh_memory_config(running_machine *machine)
 static mame_file *file;
 
 /* restore a block of memory from the nvram file */
-static void nc_common_restore_memory_from_stream(void)
+static void nc_common_restore_memory_from_stream(running_machine *machine)
 {
 	unsigned long stored_size;
 	unsigned long restore_size;
@@ -457,29 +458,30 @@ static void nc_common_restore_memory_from_stream(void)
 	/* get size of memory data stored */
 	mame_fread(file, &stored_size, sizeof(unsigned long));
 
-	if (stored_size > mess_ram_size)
-		restore_size = mess_ram_size;
+	if (stored_size > messram_get_size(devtag_get_device(machine, "messram")))
+		restore_size = messram_get_size(devtag_get_device(machine, "messram"));
 	else
 		restore_size = stored_size;
 
 	/* read as much as will fit into memory */
-	mame_fread(file, mess_ram, restore_size);
+	mame_fread(file, messram_get_ptr(devtag_get_device(machine, "messram")), restore_size);
 	/* seek over remaining data */
 	mame_fseek(file, SEEK_CUR,stored_size - restore_size);
 }
 
 /* store a block of memory to the nvram file */
-static void nc_common_store_memory_to_stream(void)
+static void nc_common_store_memory_to_stream(running_machine *machine)
 {
+	UINT32 size = messram_get_size(devtag_get_device(machine, "messram"));
 	if (!file)
 		return;
 
 	LOG(("storing nc memory\n"));
 	/* write size of memory data */
-	mame_fwrite(file, &mess_ram_size, sizeof(unsigned long));
+	mame_fwrite(file, &size, sizeof(UINT32));
 
 	/* write data block */
-	mame_fwrite(file, mess_ram, mess_ram_size);
+	mame_fwrite(file, messram_get_ptr(devtag_get_device(machine, "messram")), size);
 }
 
 static void nc_common_open_stream_for_reading(running_machine *machine)
@@ -969,7 +971,7 @@ static MACHINE_RESET( nc100 )
 		tc8521_load_stream(rtc, file);
 	}
 
-	nc_common_restore_memory_from_stream();
+	nc_common_restore_memory_from_stream(machine);
 
 	nc_common_close_stream();
 
@@ -984,7 +986,7 @@ static void nc100_machine_stop(running_machine *machine)
 		const device_config *rtc = devtag_get_device(machine, "rtc");
 		tc8521_save_stream(rtc, file);
 	}
-	nc_common_store_memory_to_stream();
+	nc_common_store_memory_to_stream(machine);
 	nc_common_close_stream();
 }
 
@@ -1350,7 +1352,7 @@ static MACHINE_RESET( nc200 )
 	{
 		mc146818_load_stream(file);
 	}
-	nc_common_restore_memory_from_stream();
+	nc_common_restore_memory_from_stream(machine);
 	nc_common_close_stream();
 
 	/* fdc, serial */
@@ -1366,7 +1368,7 @@ static void nc200_machine_stop(running_machine *machine)
 	{
 		mc146818_save_stream(file);
 	}
-	nc_common_store_memory_to_stream();
+	nc_common_store_memory_to_stream(machine);
 	nc_common_close_stream();
 }
 
@@ -1668,6 +1670,10 @@ static MACHINE_DRIVER_START( nc100 )
 	MDRV_CARTSLOT_START(nc_pcmcia_card)
 	MDRV_CARTSLOT_LOAD(nc_pcmcia_card)
 	MDRV_CARTSLOT_UNLOAD(nc_pcmcia_card)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("64K")
 MACHINE_DRIVER_END
 
 static const floppy_config nc200_floppy_config =
@@ -1711,6 +1717,10 @@ static MACHINE_DRIVER_START( nc200 )
 	MDRV_NEC765A_ADD("nec765", nc200_nec765_interface)
 
 	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, nc200_floppy_config)
+	
+	/* internal ram */
+	MDRV_RAM_MODIFY("messram")
+	MDRV_RAM_DEFAULT_SIZE("128K")
 MACHINE_DRIVER_END
 
 
@@ -1766,18 +1776,8 @@ static SYSTEM_CONFIG_START(nc_common)
 	CONFIG_DEVICE(nc_common_serial_getinfo)
 SYSTEM_CONFIG_END
 
-static SYSTEM_CONFIG_START(nc100)
-	CONFIG_IMPORT_FROM(nc_common)
-	CONFIG_RAM_DEFAULT(64 * 1024)
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START(nc200)
-	CONFIG_IMPORT_FROM(nc_common)
-	CONFIG_RAM_DEFAULT(128 * 1024)
-SYSTEM_CONFIG_END
-
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY         FULLNAME    FLAGS */
-COMP( 1992, nc100,  0,      0,      nc100,  nc100,  0,      nc100,  "Amstrad plc",  "NC100",    0 )
-COMP( 1992, nc150,  nc100,  0,      nc100,  nc100,  0,      nc100,  "Amstrad plc",  "NC150",    0 )
-COMP( 1993, nc200,  0,      0,      nc200,  nc200,  0,      nc200,  "Amstrad plc",  "NC200",    0 )
+COMP( 1992, nc100,  0,      0,      nc100,  nc100,  0,      nc_common,  "Amstrad plc",  "NC100",    0 )
+COMP( 1992, nc150,  nc100,  0,      nc100,  nc100,  0,      nc_common,  "Amstrad plc",  "NC150",    0 )
+COMP( 1993, nc200,  0,      0,      nc200,  nc200,  0,      nc_common,  "Amstrad plc",  "NC200",    0 )
 

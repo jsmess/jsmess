@@ -157,7 +157,7 @@ http://www.z88forever.org.uk/zxplus3e/
 /* +3 hardware */
 #include "machine/nec765.h"
 #include "devices/flopdrv.h"
-
+#include "devices/messram.h"
 
 /****************************************************************************************************/
 /* Spectrum + 3 specific functions */
@@ -216,12 +216,12 @@ void spectrum_plus3_update_memory(running_machine *machine)
 	if (spectrum_128_port_7ffd_data & 8)
 	{
 			logerror("+3 SCREEN 1: BLOCK 7\n");
-			spectrum_screen_location = mess_ram + (7 << 14);
+			spectrum_screen_location = messram_get_ptr(devtag_get_device(machine, "messram")) + (7 << 14);
 	}
 	else
 	{
 			logerror("+3 SCREEN 0: BLOCK 5\n");
-			spectrum_screen_location = mess_ram + (5 << 14);
+			spectrum_screen_location = messram_get_ptr(devtag_get_device(machine, "messram")) + (5 << 14);
 	}
 
 	if ((spectrum_plus3_port_1ffd_data & 0x01) == 0)
@@ -235,7 +235,7 @@ void spectrum_plus3_update_memory(running_machine *machine)
 
 			/* select ram at 0x0c000-0x0ffff */
 			ram_page = spectrum_128_port_7ffd_data & 0x07;
-			ram_data = mess_ram + (ram_page<<14);
+			ram_data = messram_get_ptr(devtag_get_device(machine, "messram")) + (ram_page<<14);
 
 			memory_set_bankptr(machine, 4, ram_data);
 
@@ -243,10 +243,10 @@ void spectrum_plus3_update_memory(running_machine *machine)
 
 			/* Reset memory between 0x4000 - 0xbfff in case extended paging was being used */
 			/* Bank 5 in 0x4000 - 0x7fff */
-			memory_set_bankptr(machine, 2, mess_ram + (5 << 14));
+			memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + (5 << 14));
 
 			/* Bank 2 in 0x8000 - 0xbfff */
-			memory_set_bankptr(machine, 3, mess_ram + (2 << 14));
+			memory_set_bankptr(machine, 3, messram_get_ptr(devtag_get_device(machine, "messram")) + (2 << 14));
 
 
 			ROMSelection = ((spectrum_128_port_7ffd_data >> 4) & 0x01) |
@@ -273,18 +273,18 @@ void spectrum_plus3_update_memory(running_machine *machine)
 
 			memory_selection = &spectrum_plus3_memory_selections[(MemorySelection << 2)];
 
-			ram_data = mess_ram + (memory_selection[0] << 14);
+			ram_data = messram_get_ptr(devtag_get_device(machine, "messram")) + (memory_selection[0] << 14);
 			memory_set_bankptr(machine, 1, ram_data);
 			/* allow writes to 0x0000-0x03fff */
 			memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_BANK(1));
 
-			ram_data = mess_ram + (memory_selection[1] << 14);
+			ram_data = messram_get_ptr(devtag_get_device(machine, "messram")) + (memory_selection[1] << 14);
 			memory_set_bankptr(machine, 2, ram_data);
 
-			ram_data = mess_ram + (memory_selection[2] << 14);
+			ram_data = messram_get_ptr(devtag_get_device(machine, "messram")) + (memory_selection[2] << 14);
 			memory_set_bankptr(machine, 3, ram_data);
 
-			ram_data = mess_ram + (memory_selection[3] << 14);
+			ram_data = messram_get_ptr(devtag_get_device(machine, "messram")) + (memory_selection[3] << 14);
 			memory_set_bankptr(machine, 4, ram_data);
 
 			logerror("extended memory paging: %02x\n", MemorySelection);
@@ -349,7 +349,7 @@ ADDRESS_MAP_END
 
 static MACHINE_RESET( spectrum_plus3 )
 {
-	memset(mess_ram,0,128*1024);
+	memset(messram_get_ptr(devtag_get_device(machine, "messram")),0,128*1024);
 
 	/* Initial configuration */
 	spectrum_128_port_7ffd_data = 0;
@@ -460,15 +460,10 @@ ROM_START(sp3eata)
 	ROM_CART_LOAD("cart", 0x10000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
-static SYSTEM_CONFIG_START(specpls3)
-	CONFIG_RAM_DEFAULT(128 * 1024)
-SYSTEM_CONFIG_END
-
-
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE         INPUT       INIT    CONFIG      COMPANY     FULLNAME */
-COMP( 1987, specpl2a, spec128,  0,		spectrum_plus3, spec_plus,	0,		specpls3,	"Amstrad plc",          "ZX Spectrum +2a" , 0 )
-COMP( 1987, specpls3, spec128,  0,		spectrum_plus3, spec_plus,	0,		specpls3,	"Amstrad plc",          "ZX Spectrum +3" , 0 )
-COMP( 2000, specpl3e, spec128,  0,		spectrum_plus3, spec_plus,	0,		specpls3,	"Amstrad plc",          "ZX Spectrum +3e" , GAME_COMPUTER_MODIFIED )
-COMP( 2002, sp3e8bit, spec128,  0,		spectrum_plus3, spec_plus,	0,		specpls3,	"Amstrad plc",          "ZX Spectrum +3e 8bit IDE" , GAME_COMPUTER_MODIFIED )
-COMP( 2002, sp3eata,  spec128,  0,		spectrum_plus3, spec_plus,	0,		specpls3,	"Amstrad plc",          "ZX Spectrum +3e 8bit ZXATASP" , GAME_COMPUTER_MODIFIED )
-COMP( 2002, sp3ezcf,  spec128,  0,		spectrum_plus3, spec_plus,	0,		specpls3,	"Amstrad plc",          "ZX Spectrum +3e 8bit ZXCF" , GAME_COMPUTER_MODIFIED )
+COMP( 1987, specpl2a, spec128,  0,		spectrum_plus3, spec_plus,	0,		0,	"Amstrad plc",          "ZX Spectrum +2a" , 0 )
+COMP( 1987, specpls3, spec128,  0,		spectrum_plus3, spec_plus,	0,		0,	"Amstrad plc",          "ZX Spectrum +3" , 0 )
+COMP( 2000, specpl3e, spec128,  0,		spectrum_plus3, spec_plus,	0,		0,	"Amstrad plc",          "ZX Spectrum +3e" , GAME_COMPUTER_MODIFIED )
+COMP( 2002, sp3e8bit, spec128,  0,		spectrum_plus3, spec_plus,	0,		0,	"Amstrad plc",          "ZX Spectrum +3e 8bit IDE" , GAME_COMPUTER_MODIFIED )
+COMP( 2002, sp3eata,  spec128,  0,		spectrum_plus3, spec_plus,	0,		0,	"Amstrad plc",          "ZX Spectrum +3e 8bit ZXATASP" , GAME_COMPUTER_MODIFIED )
+COMP( 2002, sp3ezcf,  spec128,  0,		spectrum_plus3, spec_plus,	0,		0,	"Amstrad plc",          "ZX Spectrum +3e 8bit ZXCF" , GAME_COMPUTER_MODIFIED )

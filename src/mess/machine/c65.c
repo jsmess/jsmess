@@ -19,6 +19,8 @@
 #include "includes/c65.h"
 #include "includes/c64.h"
 
+#include "devices/messram.h"
+
 #define VERBOSE_LEVEL 0
 #define DBG_LOG( MACHINE, N, M, A ) \
 	do { \
@@ -662,7 +664,7 @@ static struct {
 static READ8_HANDLER( c65_ram_expansion_r )
 {
 	UINT8 data = 0xff;
-	if (mess_ram_size > (128 * 1024))
+	if (messram_get_size(devtag_get_device(space->machine, "messram")) > (128 * 1024))
 		data = expansion_ram.reg;
 	return data;
 }
@@ -672,12 +674,12 @@ static WRITE8_HANDLER( c65_ram_expansion_w )
 	offs_t expansion_ram_begin;
 	offs_t expansion_ram_end;
 
-	if (mess_ram_size > (128 * 1024))
+	if (messram_get_size(devtag_get_device(space->machine, "messram")) > (128 * 1024))
 	{
 		expansion_ram.reg = data;
 
 		expansion_ram_begin = 0x80000;
-		expansion_ram_end = 0x80000 + (mess_ram_size - 128*1024) - 1;
+		expansion_ram_end = 0x80000 + (messram_get_size(devtag_get_device(space->machine, "messram")) - 128*1024) - 1;
 
 		memory_install_read8_handler(space, expansion_ram_begin, expansion_ram_end,
 			0, 0, (data == 0x00) ? SMH_BANK(16) : SMH_NOP);
@@ -685,7 +687,7 @@ static WRITE8_HANDLER( c65_ram_expansion_w )
 			0, 0, (data == 0x00) ? SMH_BANK(16) : SMH_NOP);
 
 		if (data == 0x00)
-			memory_set_bankptr(space->machine, 16, mess_ram + 128*1024);
+			memory_set_bankptr(space->machine, 16, messram_get_ptr(devtag_get_device(space->machine, "messram")) + 128*1024);
 	}
 }
 
@@ -1053,7 +1055,7 @@ DRIVER_INIT( c65pal )
 MACHINE_START( c65 )
 {
 	/* clear upper memory */
-	memset(mess_ram + 128*1024, 0xff, mess_ram_size -  128*1024);
+	memset(messram_get_ptr(devtag_get_device(machine, "messram")) + 128*1024, 0xff, messram_get_size(devtag_get_device(machine, "messram")) -  128*1024);
 
 	cbm_drive_0_config (SERIAL, 10);
 	cbm_drive_1_config (SERIAL, 11);

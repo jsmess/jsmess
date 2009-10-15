@@ -41,6 +41,7 @@
 #include "includes/zx.h"
 #include "devices/cassette.h"
 #include "formats/zx81_p.h"
+#include "devices/messram.h"
 
 /* Memory Maps */
 
@@ -405,6 +406,11 @@ static MACHINE_DRIVER_START( zx80 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MDRV_CASSETTE_ADD( "cassette", zx80_cassette_config )
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("1K")
+	MDRV_RAM_EXTRA_OPTIONS("16K")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( zx81 )
@@ -439,6 +445,10 @@ static MACHINE_DRIVER_START( pc8300 )
 
 //  MDRV_GFXDECODE(pc8300)
 	MDRV_PALETTE_INIT(zx80)
+	
+	/* internal ram */
+	MDRV_RAM_MODIFY("messram")
+	MDRV_RAM_DEFAULT_SIZE("16K")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( pow3000 )
@@ -450,6 +460,11 @@ static MACHINE_DRIVER_START( pow3000 )
 	MDRV_MACHINE_RESET(pow3000)
 //  MDRV_GFXDECODE(pc8300)
 	MDRV_PALETTE_INIT(zx80)
+
+	/* internal ram */
+	MDRV_RAM_MODIFY("messram")
+	MDRV_RAM_DEFAULT_SIZE("2K")
+	MDRV_RAM_EXTRA_OPTIONS("16K")	
 MACHINE_DRIVER_END
 
 
@@ -529,37 +544,16 @@ ROM_START( zx97 )
 	ROM_IGNORE( 0x6000 )	/* Unemulated bankswitched part */
 ROM_END
 
-/* System Configuration */
-
-static SYSTEM_CONFIG_START(zx80)
-	CONFIG_RAM_DEFAULT(1 * 1024)
-	CONFIG_RAM(16 * 1024)
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START(zx81)
-	CONFIG_RAM_DEFAULT(1 * 1024)
-	CONFIG_RAM(16 * 1024)
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START(pc8300)
-	CONFIG_RAM_DEFAULT(16 * 1024)	/* bios hardcoded to only work with 16k */
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START(pow3000)
-	CONFIG_RAM_DEFAULT(2 * 1024)
-	CONFIG_RAM(16 * 1024)
-SYSTEM_CONFIG_END
-
 /* Game Drivers */
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    CONFIG  COMPANY                     FULLNAME                FLAGS */
-COMP( 1980, zx80,       0,      0,      zx80,       zx80,       zx,     zx80,    "Sinclair Research",        "ZX-80",               0 )
-COMP( 1981, zx81,       0,      0,      zx81,       zx81,       zx,     zx81,    "Sinclair Research",        "ZX-81",               0 )
-COMP( 1982, ts1000,     zx81,   0,      ts1000,     zx81,       zx,     zx81,    "Timex Sinclair",           "Timex Sinclair 1000", 0 )
-COMP( 1983, ts1500,     zx81,   0,      ts1000,     zx81,       zx,     pc8300,  "Timex Sinclair",           "Timex Sinclair 1500", 0 )
-COMP( 1983, tk85,     	zx81,   0,      ts1000,     zx81,       zx,     zx81,    "Microdigital",             "TK85",                0 )
-COMP( 1983, ringo470,   zx81,   0,      ts1000,     zx81,       zx,     zx81,    "Ritas do Brasil Ltda",     "Ringo 470", GAME_NOT_WORKING )
-COMP( 1984, pc8300,     zx81,   0,      pc8300,     pc8300,     zx,     pc8300,  "Your Computer",            "PC8300",              0 )
-COMP( 1983, pow3000,    zx81,   0,      pow3000,    pow3000,    zx,     pow3000, "Creon Enterprises",        "Power 3000",          0 )
-COMP( 1982, lambda,     zx81,   0,      pow3000,    pow3000,    zx,     pow3000, "Lambda Electronics Ltd",   "Lambda 8300",         0 )
-COMP( 1997, zx97,       zx81,   0,      zx81,       zx81,    	zx,     zx81,    "Wilf Rigter",		     "ZX97",	  GAME_NOT_WORKING )
+COMP( 1980, zx80,       0,      0,      zx80,       zx80,       zx,     0,    "Sinclair Research",        "ZX-80",               0 )
+COMP( 1981, zx81,       0,      0,      zx81,       zx81,       zx,     0,    "Sinclair Research",        "ZX-81",               0 )
+COMP( 1982, ts1000,     zx81,   0,      ts1000,     zx81,       zx,     0,    "Timex Sinclair",           "Timex Sinclair 1000", 0 )
+COMP( 1983, ts1500,     zx81,   0,      ts1000,     zx81,       zx,     0,    "Timex Sinclair",           "Timex Sinclair 1500", 0 )
+COMP( 1983, tk85,     	zx81,   0,      ts1000,     zx81,       zx,     0,    "Microdigital",             "TK85",                0 )
+COMP( 1983, ringo470,   zx81,   0,      ts1000,     zx81,       zx,     0,    "Ritas do Brasil Ltda",     "Ringo 470", GAME_NOT_WORKING )
+COMP( 1984, pc8300,     zx81,   0,      pc8300,     pc8300,     zx,     0,    "Your Computer",            "PC8300",              0 )
+COMP( 1983, pow3000,    zx81,   0,      pow3000,    pow3000,    zx,     0, 	  "Creon Enterprises",        "Power 3000",          0 )
+COMP( 1982, lambda,     zx81,   0,      pow3000,    pow3000,    zx,     0, 	  "Lambda Electronics Ltd",   "Lambda 8300",         0 )
+COMP( 1997, zx97,       zx81,   0,      zx81,       zx81,    	zx,     0,    "Wilf Rigter",		       "ZX97",	  GAME_NOT_WORKING )

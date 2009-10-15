@@ -25,7 +25,7 @@
 #include "devices/cassette.h"
 #include "video/dm9368.h"
 #include "cosmicos.lh"
-
+#include "devices/messram.h"
 /* Memory Maps */
 
 static ADDRESS_MAP_START( cosmicos_mem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -167,7 +167,7 @@ static MACHINE_START( cosmicos )
 	memory_configure_bank(machine, 1, 0, 1, memory_region(machine, CDP1802_TAG), 0);
 	memory_set_bank(machine, 1, 0);
 
-	switch (mess_ram_size)
+	switch (messram_get_size(devtag_get_device(machine, "messram")))
 	{
 	case 256:
 		memory_install_readwrite8_handler(program, 0x0000, 0x00ff, 0, 0, SMH_BANK(1), SMH_BANK(1));
@@ -214,6 +214,11 @@ static MACHINE_DRIVER_START( cosmicos )
 
 	/* devices */
 	MDRV_CASSETTE_ADD(CASSETTE_TAG, cosmicos_cassette_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("256")
+	MDRV_RAM_EXTRA_OPTIONS("4K,48K")
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -223,15 +228,7 @@ ROM_START( cosmicos )
 	ROM_LOAD( "cosmicos.rom", 0xc000, 0x0800, NO_DUMP )
 ROM_END
 
-/* System Configuration */
-
-static SYSTEM_CONFIG_START( cosmicos )
-	CONFIG_RAM_DEFAULT(       256 )
-	CONFIG_RAM		  (  4 * 1024 )
-	CONFIG_RAM		  ( 48 * 1024 )
-SYSTEM_CONFIG_END
-
 /* System Drivers */
 
 /*    YEAR  NAME		PARENT  COMPAT  MACHINE		INPUT		INIT    CONFIG		COMPANY				FULLNAME    FLAGS */
-COMP( 1979, cosmicos,	0,		0,		cosmicos,	cosmicos,	0,		cosmicos,	"Radio Bulletin",	"Cosmicos",	GAME_NOT_WORKING )
+COMP( 1979, cosmicos,	0,		0,		cosmicos,	cosmicos,	0,		0,	"Radio Bulletin",	"Cosmicos",	GAME_NOT_WORKING )

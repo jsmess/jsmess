@@ -85,15 +85,5 @@ int mess_count_compatible_drivers(const game_driver *drv);
 
 /* --------------------------------------------------------------------------------------------- */
 
-/* RAM configuration calls */
-extern UINT32 mess_ram_size;
-extern UINT8 *mess_ram;
-extern UINT8 mess_ram_default_value;
-
-#define RAM_STRING_BUFLEN 16
-void		ram_dump(const char *filename);
-
-/* --------------------------------------------------------------------------------------------- */
-
 
 #endif /* __MESS_H__ */

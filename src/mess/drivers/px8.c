@@ -11,7 +11,7 @@
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6800/m6800.h"
-
+#include "devices/messram.h"
 
 /***************************************************************************
     CONSTANTS
@@ -101,6 +101,10 @@ static MACHINE_DRIVER_START( px8 )
 
     MDRV_VIDEO_START(px8)
     MDRV_VIDEO_UPDATE(px8)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("64K")
 MACHINE_DRIVER_END
 
 
@@ -124,19 +128,9 @@ ROM_START( px8 )
 	ROM_LOAD("hd6303.bin", 0x0000, 0x1000, NO_DUMP)
 ROM_END
 
-
-/***************************************************************************
-    SYSTEM CONFIG
-***************************************************************************/
-
-static SYSTEM_CONFIG_START( px8 )
-	CONFIG_RAM_DEFAULT(64 * 1024) /* 64KB RAM */
-SYSTEM_CONFIG_END
-
-
 /***************************************************************************
     GAME DRIVERS
 ***************************************************************************/
 
 /*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  INIT  CONFIG  COMPANY  FULLNAME  FLAGS */
-COMP( 1984, px8,  0,      0,      px8,     px8,   0,    px8,    "Epson", "PX-8",   GAME_NOT_WORKING )
+COMP( 1984, px8,  0,      0,      px8,     px8,   0,    0,    "Epson", "PX-8",   GAME_NOT_WORKING )

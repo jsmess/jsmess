@@ -8,7 +8,7 @@
 #include "sound/speaker.h"
 #include "formats/tzx_cas.h"
 #include "machine/beta.h"
-
+#include "devices/messram.h"
 
 static int ROMSelection;
 static const device_config* beta;
@@ -50,9 +50,9 @@ static DIRECT_UPDATE_HANDLER( pentagon_direct )
 
 static void pentagon_update_memory(running_machine *machine)
 {
-	spectrum_screen_location = mess_ram + ((spectrum_128_port_7ffd_data & 8) ? (7<<14) : (5<<14));
+	spectrum_screen_location = messram_get_ptr(devtag_get_device(machine, "messram")) + ((spectrum_128_port_7ffd_data & 8) ? (7<<14) : (5<<14));
 
-	memory_set_bankptr(machine, 4, mess_ram + ((spectrum_128_port_7ffd_data & 0x07) * 0x4000));
+	memory_set_bankptr(machine, 4, messram_get_ptr(devtag_get_device(machine, "messram")) + ((spectrum_128_port_7ffd_data & 0x07) * 0x4000));
 
 	if (beta->started && betadisk_is_active(beta) && !( spectrum_128_port_7ffd_data & 0x10 ) )
 	{
@@ -112,13 +112,13 @@ static MACHINE_RESET( pentagon )
 
 	memory_set_direct_update_handler( space, pentagon_direct );
 
-	memset(mess_ram,0,128*1024);
+	memset(messram_get_ptr(devtag_get_device(machine, "messram")),0,128*1024);
 
 	/* Bank 5 is always in 0x4000 - 0x7fff */
-	memory_set_bankptr(machine, 2, mess_ram + (5<<14));
+	memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + (5<<14));
 
 	/* Bank 2 is always in 0x8000 - 0xbfff */
-	memory_set_bankptr(machine, 3, mess_ram + (2<<14));
+	memory_set_bankptr(machine, 3, messram_get_ptr(devtag_get_device(machine, "messram")) + (2<<14));
 
 	spectrum_128_port_7ffd_data = 0;
 
@@ -134,7 +134,12 @@ static MACHINE_DRIVER_START( pentagon )
 	MDRV_BETA_DISK_ADD(BETA_DISK_TAG)
 MACHINE_DRIVER_END
 
-
+static MACHINE_DRIVER_START( pent1024 )
+	MDRV_IMPORT_FROM( pentagon )
+	/* internal ram */
+	MDRV_RAM_MODIFY("messram")
+	MDRV_RAM_DEFAULT_SIZE("1024K")	
+MACHINE_DRIVER_END
 
 /***************************************************************************
 
@@ -212,14 +217,6 @@ ROM_START(pent1024)
 	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
-static SYSTEM_CONFIG_START(pentagon)
-	CONFIG_RAM_DEFAULT(128 * 1024)
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START(pent1024)
-	CONFIG_RAM_DEFAULT(1024 * 1024)
-SYSTEM_CONFIG_END
-
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT       INIT    CONFIG      COMPANY     FULLNAME */
-COMP( ????, pentagon, spec128,	0,		pentagon,	spec_plus,	0,		pentagon,	"???",		"Pentagon", GAME_NOT_WORKING)
-COMP( ????, pent1024, spec128,	0,		pentagon,	spec_plus,	0,		pent1024,	"???",		"Pentagon 1024", GAME_NOT_WORKING)
+COMP( ????, pentagon, spec128,	0,		pentagon,	spec_plus,	0,		0,	"???",		"Pentagon", GAME_NOT_WORKING)
+COMP( ????, pent1024, spec128,	0,		pent1024,	spec_plus,	0,		0,	"???",		"Pentagon 1024", GAME_NOT_WORKING)

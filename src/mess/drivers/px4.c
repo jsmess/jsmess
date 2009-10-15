@@ -15,7 +15,7 @@
 #include "devices/cassette.h"
 #include "machine/tf20.h"
 #include "px4.lh"
-
+#include "devices/messram.h"
 
 /***************************************************************************
     CONSTANTS

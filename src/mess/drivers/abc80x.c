@@ -83,6 +83,7 @@
 #include "devices/flopdrv.h"
 #include "devices/cassette.h"
 #include "devices/printer.h"
+#include "devices/messram.h"
 
 static const device_config *cassette_device_image(running_machine *machine)
 {
@@ -250,7 +251,7 @@ static void abc806_bankswitch(running_machine *machine)
 {
 	abc806_state *state = machine->driver_data;
 	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
-	UINT32 videoram_mask = mess_ram_size - (32 * 1024) - 1;
+	UINT32 videoram_mask = messram_get_size(devtag_get_device(machine, "messram")) - (32 * 1024) - 1;
 	FPTR bank;
 
 	if (!state->keydtr)
@@ -1070,7 +1071,7 @@ static MACHINE_START( abc802 )
 	abcbus_init(machine, Z80_TAG, abc802_abcbus_config); // TODO: enable floppy
 
 	/* configure memory */
-	memory_configure_bank(machine, 1, 0, 1, mess_ram, 0);
+	memory_configure_bank(machine, 1, 0, 1, messram_get_ptr(devtag_get_device(machine, "messram")), 0);
 	memory_configure_bank(machine, 1, 1, 1, memory_region(machine, Z80_TAG), 0);
 
 	/* register for state saving */
@@ -1106,7 +1107,7 @@ static MACHINE_START( abc806 )
 	abc806_state *state = machine->driver_data;
 
 	UINT8 *mem = memory_region(machine, Z80_TAG);
-	UINT32 videoram_size = mess_ram_size - (32 * 1024);
+	UINT32 videoram_size = messram_get_size(devtag_get_device(machine, "messram")) - (32 * 1024);
 	int bank;
 
 	/* find devices */
@@ -1217,6 +1218,11 @@ static MACHINE_DRIVER_START( abc800m )
 	MDRV_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, USEC(2500))
 
 	MDRV_FLOPPY_2_DRIVES_ADD(abc800_floppy_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("16K")
+	MDRV_RAM_EXTRA_OPTIONS("32K")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( abc800c )
@@ -1254,6 +1260,11 @@ static MACHINE_DRIVER_START( abc800c )
 	MDRV_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, USEC(2500))
 
 	MDRV_FLOPPY_2_DRIVES_ADD(abc800_floppy_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("16K")
+	MDRV_RAM_EXTRA_OPTIONS("32K")	
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( abc802 )
@@ -1291,6 +1302,10 @@ static MACHINE_DRIVER_START( abc802 )
 	MDRV_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, USEC(2500))
 
 	MDRV_FLOPPY_2_DRIVES_ADD(abc800_floppy_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("64K")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( abc806 )
@@ -1326,6 +1341,11 @@ static MACHINE_DRIVER_START( abc806 )
 	MDRV_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, USEC(2500))
 
 	MDRV_FLOPPY_2_DRIVES_ADD(abc800_floppy_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("160K") // 32KB + 128KB
+	MDRV_RAM_EXTRA_OPTIONS("544K") // 32KB + 512KB
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -1493,19 +1513,14 @@ static void abc800_serial_getinfo(const mess_device_class *devclass, UINT32 stat
 }
 
 static SYSTEM_CONFIG_START( abc800 )
-	CONFIG_RAM_DEFAULT(16 * 1024)
-	CONFIG_RAM		  (32 * 1024)
 	CONFIG_DEVICE(abc800_serial_getinfo)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START( abc802 )
-	CONFIG_RAM_DEFAULT(64 * 1024)
 	CONFIG_DEVICE(abc800_serial_getinfo)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START( abc806 )
-	CONFIG_RAM_DEFAULT(160 * 1024) // 32KB + 128KB
-	CONFIG_RAM		  (544 * 1024) // 32KB + 512KB
 	CONFIG_DEVICE(abc800_serial_getinfo)
 SYSTEM_CONFIG_END
 
@@ -1551,7 +1566,7 @@ static DIRECT_UPDATE_HANDLER( abc802_direct_update_handler )
 	}
 	else
 	{
-		direct->raw = direct->decrypted = mess_ram;
+		direct->raw = direct->decrypted = messram_get_ptr(devtag_get_device(space->machine, "messram"));
 		return ~0;
 	}
 

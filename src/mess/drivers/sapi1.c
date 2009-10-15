@@ -10,7 +10,7 @@
 #include "driver.h"
 #include "cpu/i8085/i8085.h"
 #include "includes/sapi1.h"
-
+#include "devices/messram.h"
 
 /* Address maps */
 static ADDRESS_MAP_START(sapi1_mem, ADDRESS_SPACE_PROGRAM, 8)
@@ -106,11 +106,11 @@ static MACHINE_DRIVER_START( sapi1 )
 
 		MDRV_VIDEO_START(sapi1)
     MDRV_VIDEO_UPDATE(sapi1)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("64K")	
 MACHINE_DRIVER_END
-
-static SYSTEM_CONFIG_START(sapi1)
-	CONFIG_RAM_DEFAULT(64 * 1024)
-SYSTEM_CONFIG_END
 
 /* ROM definition */
 
@@ -123,4 +123,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       INIT     CONFIG COMPANY                  FULLNAME   FLAGS */
-COMP( 1985, sapi1, 	0, 	 	0,		sapi1, 		sapi1, 		sapi1, 	 sapi1,  	"Tesla",					 "SAPI-1 ZPS 1",	 0)
+COMP( 1985, sapi1, 	0, 	 	0,		sapi1, 		sapi1, 		sapi1, 	 0,  	"Tesla",					 "SAPI-1 ZPS 1",	 0)

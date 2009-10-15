@@ -13,7 +13,7 @@
 
 #include "driver.h"
 #include "includes/mac.h"
-
+#include "devices/messram.h"
 
 static int screen_buffer;
 
@@ -50,8 +50,8 @@ VIDEO_UPDATE( mac )
 	UINT16 *line;
 	int y, x, b;
 
-	video_base = mess_ram_size - (screen_buffer ? MAC_MAIN_SCREEN_BUF_OFFSET : MAC_ALT_SCREEN_BUF_OFFSET);
-	video_ram = (const UINT16 *) (mess_ram + video_base);
+	video_base = messram_get_size(devtag_get_device(screen->machine, "messram")) - (screen_buffer ? MAC_MAIN_SCREEN_BUF_OFFSET : MAC_ALT_SCREEN_BUF_OFFSET);
+	video_ram = (const UINT16 *) (messram_get_ptr(devtag_get_device(screen->machine, "messram")) + video_base);
 
 	for (y = 0; y < MAC_V_VIS; y++)
 	{

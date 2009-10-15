@@ -12,6 +12,7 @@
 
 /* Devices */
 #include "devices/cassette.h"
+#include "devices/messram.h"
 
 #define KC_DEBUG 1
 #define LOG(x) do { if (KC_DEBUG) logerror x; } while (0)
@@ -112,7 +113,7 @@ QUICKLOAD_LOAD(kc)
 	addr = (header->load_address_l & 0x0ff) | ((header->load_address_h & 0x0ff)<<8);
 
 	for (i=0; i<datasize; i++)
-		mess_ram[(addr+i) & 0x0ffff] = data[i+128];
+		messram_get_ptr(devtag_get_device(image->machine, "messram"))[(addr+i) & 0x0ffff] = data[i+128];
 	return INIT_PASS;
 }
 
@@ -1131,7 +1132,7 @@ static void kc85_4_update_0x08000(running_machine *machine)
 		/* ram8 block chosen */
 		ram8_block = ((kc85_84_data)>>4) & 0x01;
 
-		mem_ptr = mess_ram+0x08000+(ram8_block<<14);
+		mem_ptr = messram_get_ptr(devtag_get_device(machine, "messram"))+0x08000+(ram8_block<<14);
 
 		memory_set_bankptr(machine, 3, mem_ptr);
 		memory_set_bankptr(machine, 4, mem_ptr+0x02800);
@@ -1198,7 +1199,7 @@ static void kc85_4_update_0x00000(running_machine *machine)
 
 		/* yes; set address of bank */
 		memory_install_read8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_BANK(1));
-		memory_set_bankptr(machine, 1, mess_ram);
+		memory_set_bankptr(machine, 1, messram_get_ptr(devtag_get_device(machine, "messram")));
 
 		/* write protect ram? */
 		if ((kc85_pio_data[0] & (1<<3))==0)
@@ -1215,7 +1216,7 @@ static void kc85_4_update_0x00000(running_machine *machine)
 
 			/* ram is enabled and write enabled; and set address of bank */
 			memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_BANK(7));
-			memory_set_bankptr(machine, 7, mess_ram);
+			memory_set_bankptr(machine, 7, messram_get_ptr(devtag_get_device(machine, "messram")));
 		}
 	}
 	else
@@ -1241,7 +1242,7 @@ static void kc85_4_update_0x04000(running_machine *machine)
 	{
 		UINT8 *mem_ptr;
 
-		mem_ptr = mess_ram + 0x04000;
+		mem_ptr = messram_get_ptr(devtag_get_device(machine, "messram")) + 0x04000;
 
 		/* yes */
 		rh = SMH_BANK(2);
@@ -1501,7 +1502,7 @@ static void kc85_3_update_0x00000(running_machine *machine)
 		/* yes */
 		rh = SMH_BANK(1);
 		/* set address of bank */
-		memory_set_bankptr(machine, 1, mess_ram);
+		memory_set_bankptr(machine, 1, messram_get_ptr(devtag_get_device(machine, "messram")));
 
 		/* write protect ram? */
 		if ((kc85_pio_data[0] & (1<<3))==0)
@@ -1519,7 +1520,7 @@ static void kc85_3_update_0x00000(running_machine *machine)
 			/* ram is enabled and write enabled */
 			wh = SMH_BANK(6);
 			/* set address of bank */
-			memory_set_bankptr(machine, 6, mess_ram);
+			memory_set_bankptr(machine, 6, messram_get_ptr(devtag_get_device(machine, "messram")));
 		}
 	}
 	else
@@ -1548,7 +1549,7 @@ static void kc85_3_update_0x08000(running_machine *machine)
     {
         /* IRM enabled */
         LOG(("IRM enabled\n"));
-		ram_page = mess_ram+0x08000;
+		ram_page = messram_get_ptr(devtag_get_device(machine, "messram"))+0x08000;
 
 		memory_set_bankptr(machine, 3, ram_page);
 		memory_set_bankptr(machine, 8, ram_page);
@@ -1560,7 +1561,7 @@ static void kc85_3_update_0x08000(running_machine *machine)
     {
 		/* RAM8 ACCESS */
 		LOG(("RAM8 enabled\n"));
-		ram_page = mess_ram + 0x04000;
+		ram_page = messram_get_ptr(devtag_get_device(machine, "messram")) + 0x04000;
 
 		memory_set_bankptr(machine, 3, ram_page);
 		rh = SMH_BANK(3);
@@ -1892,8 +1893,8 @@ MACHINE_RESET( kc85_3 )
 	kc85_pio_data[0] = 0x0f;
 	kc85_pio_data[1] = 0x0f1;
 
-	memory_set_bankptr(machine, 2,mess_ram+0x0c000);
-	memory_set_bankptr(machine, 7,mess_ram+0x0c000);
+	memory_set_bankptr(machine, 2,messram_get_ptr(devtag_get_device(machine, "messram"))+0x0c000);
+	memory_set_bankptr(machine, 7,messram_get_ptr(devtag_get_device(machine, "messram"))+0x0c000);
 
 	kc85_z80pio = devtag_get_device(machine, "z80pio");
 

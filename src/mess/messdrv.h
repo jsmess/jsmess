@@ -42,36 +42,10 @@ struct SystemConfigurationParamBlock
 #define SYSTEM_CONFIG_END																	\
 	}																						\
 
-#define CONFIG_IMPORT_FROM(name)															\
-		construct_sysconfig_##name(cfg);													\
-
-#define CONFIG_RAM(ram)																		\
-	if (cfg->max_ram_options > 0)															\
-	{																						\
-		assert(cfg->actual_ram_options < cfg->max_ram_options);								\
-		assert(cfg->ram_options);															\
-		cfg->ram_options[cfg->actual_ram_options++] = (ram);								\
-	}																						\
-
-#define CONFIG_RAM_DEFAULT(ram)																\
-	if (cfg->max_ram_options > 0)															\
-	{																						\
-		cfg->default_ram_option = cfg->actual_ram_options;									\
-		CONFIG_RAM(ram);																	\
-	}																						\
-
 #define CONFIG_DEVICE(getinfo)										\
 	if (cfg->device_position < cfg->device_slotcount)				\
 	{																\
 		cfg->device_handlers[cfg->device_position++] = (getinfo);	\
-	}																\
-
-#define CONFIG_DEVICE_COUNT(getinfo, count)							\
-	if (cfg->device_position < cfg->device_slotcount)				\
-	{																\
-		cfg->device_handlers[cfg->device_position] = (getinfo);		\
-		cfg->device_countoverrides[cfg->device_position] = (count);	\
-		cfg->device_position++;										\
 	}																\
 
 #define construct_sysconfig_0	NULL

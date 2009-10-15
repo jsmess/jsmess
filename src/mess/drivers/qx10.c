@@ -25,6 +25,7 @@
 #include "machine/8237dma.h"
 #include "video/i82720.h"
 #include "machine/nec765.h"
+#include "devices/messram.h"
 
 #define MAIN_CLK	15974400
 
@@ -86,7 +87,7 @@ static void update_memory_mapping(running_machine *machine)
 	}
 	else
 	{
-		memory_set_bankptr(machine, 1, mess_ram + drambank*64*1024);
+		memory_set_bankptr(machine, 1, messram_get_ptr(devtag_get_device(machine, "messram")) + drambank*64*1024);
 	}
 	if (state->memcmos)
 	{
@@ -94,7 +95,7 @@ static void update_memory_mapping(running_machine *machine)
 	}
 	else
 	{
-		memory_set_bankptr(machine, 2, mess_ram + drambank*64*1024 + 32*1024);
+		memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + drambank*64*1024 + 32*1024);
 	}
 }
 
@@ -549,11 +550,11 @@ static MACHINE_DRIVER_START( qx10 )
 
     MDRV_VIDEO_START(compis_gdc)
     MDRV_VIDEO_UPDATE(compis_gdc)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("256K")
 MACHINE_DRIVER_END
-
-static SYSTEM_CONFIG_START(qx10)
-	CONFIG_RAM_DEFAULT(256 * 1024)
-SYSTEM_CONFIG_END
 
 /* ROM definition */
 ROM_START( qx10 )
@@ -592,4 +593,4 @@ static DRIVER_INIT(qx10)
 }
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( ????, qx10,  0,       0, 	qx10, 	qx10, 	 qx10,  	  qx10,  	 "Epson",   "QX-10",		GAME_NOT_WORKING)
+COMP( ????, qx10,  0,       0, 	qx10, 	qx10, 	 qx10,  	  0,  	 "Epson",   "QX-10",		GAME_NOT_WORKING)

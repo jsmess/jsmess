@@ -19,6 +19,7 @@
 
 #include "devices/cartslot.h"
 #include "devices/cassette.h"
+#include "devices/messram.h"
 
 #define VERBOSE_LEVEL 0
 #define DBG_LOG( MACHINE, N, M, A ) \
@@ -609,18 +610,18 @@ static void pet_common_driver_init( running_machine *machine )
 	state->superpet = 0;
 	state->cbm8096 = 0;
 
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, mess_ram_size - 1, 0, 0, SMH_BANK(10));
-	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, mess_ram_size - 1, 0, 0, SMH_BANK(10));
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, messram_get_size(devtag_get_device(machine, "messram")) - 1, 0, 0, SMH_BANK(10));
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, messram_get_size(devtag_get_device(machine, "messram")) - 1, 0, 0, SMH_BANK(10));
 	memory_set_bankptr(machine, 10, pet_memory);
 
-	if (mess_ram_size < 0x8000)
+	if (messram_get_size(devtag_get_device(machine, "messram")) < 0x8000)
 	{
-		memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), mess_ram_size, 0x7FFF, 0, 0, SMH_NOP);
-		memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), mess_ram_size, 0x7FFF, 0, 0, SMH_NOP);
+		memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), messram_get_size(devtag_get_device(machine, "messram")), 0x7FFF, 0, 0, SMH_NOP);
+		memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), messram_get_size(devtag_get_device(machine, "messram")), 0x7FFF, 0, 0, SMH_NOP);
 	}
 
 	/* 2114 poweron ? 64 x 0xff, 64x 0, and so on */
-	for (i = 0; i < mess_ram_size; i += 0x40)
+	for (i = 0; i < messram_get_size(devtag_get_device(machine, "messram")); i += 0x40)
 	{
 		memset (pet_memory + i, i & 0x40 ? 0 : 0xff, 0x40);
 	}
@@ -637,7 +638,7 @@ static void pet_common_driver_init( running_machine *machine )
 DRIVER_INIT( pet2001 )
 {
 	pet_state *state = machine->driver_data;
-	pet_memory = mess_ram;
+	pet_memory = messram_get_ptr(devtag_get_device(machine, "messram"));
 	pet_common_driver_init(machine);
 	state->pet_basic1 = 1;
 	pet_vh_init(machine);
@@ -645,7 +646,7 @@ DRIVER_INIT( pet2001 )
 
 DRIVER_INIT( pet )
 {
-	pet_memory = mess_ram;
+	pet_memory = messram_get_ptr(devtag_get_device(machine, "messram"));
 	pet_common_driver_init(machine);
 	pet_vh_init(machine);
 }
@@ -666,7 +667,7 @@ DRIVER_INIT( pet80 )
 DRIVER_INIT( superpet )
 {
 	pet_state *state = machine->driver_data;
-	pet_memory = mess_ram;
+	pet_memory = messram_get_ptr(devtag_get_device(machine, "messram"));
 	pet_common_driver_init(machine);
 	state->superpet = 1;
 

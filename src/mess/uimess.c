@@ -241,12 +241,12 @@ static astring *image_info_astring(running_machine *machine, astring *string)
 
 	astring_printf(string, "%s\n\n", machine->gamedrv->description);
 
-	if (mess_ram_size > 0)
+/*	if (mess_ram_size > 0)
 	{
 		char buf2[RAM_STRING_BUFLEN];
 		astring_catprintf(string, "RAM: %s\n\n", ram_string(buf2, mess_ram_size));
 	}
-
+*/
 	for (img = image_device_first(machine->config); img != NULL; img = image_device_next(img))
 	{
 		const char *name = image_filename(img);

@@ -17,6 +17,8 @@
 #include "cpu/z80/z80.h"
 #include "includes/z88.h"
 #include "sound/speaker.h"
+#include "devices/messram.h"
+#include "devices/messram.h"
 
 struct blink_hw z88_blink;
 
@@ -239,7 +241,7 @@ static void z88_refresh_memory_bank(running_machine *machine, int bank)
 		}
 		else
 		{
-			read_addr = write_addr = mess_ram + (block<<14);
+			read_addr = write_addr = messram_get_ptr(devtag_get_device(machine, "messram")) + (block<<14);
 		}
 	}
 	else
@@ -276,8 +278,8 @@ static void z88_refresh_memory_bank(running_machine *machine, int bank)
 		else
 		{
 			/* ram bank 20 */
-			read_addr = mess_ram;
-			write_addr = mess_ram;
+			read_addr = messram_get_ptr(devtag_get_device(machine, "messram"));
+			write_addr = messram_get_ptr(devtag_get_device(machine, "messram"));
 		}
 
 		z88_install_memory_handler_pair(machine, 0x0000, 0x2000, 9, read_addr, write_addr);
@@ -286,7 +288,7 @@ static void z88_refresh_memory_bank(running_machine *machine, int bank)
 
 static MACHINE_RESET( z88 )
 {
-	memset(mess_ram, 0x0ff, mess_ram_size);
+	memset(messram_get_ptr(devtag_get_device(machine, "messram")), 0x0ff, messram_get_size(devtag_get_device(machine, "messram")));
 
 	timer_pulse(machine, ATTOTIME_IN_MSEC(5), NULL, 0, z88_rtc_timer_callback);
 
@@ -750,6 +752,10 @@ static MACHINE_DRIVER_START( z88 )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("2M")
 MACHINE_DRIVER_END
 
 
@@ -769,10 +775,5 @@ ROM_START(z88)
   	ROMX_LOAD("z88v401fi.rom", 0x010000, 0x020000, CRC(ecd7f3f6) SHA1(bf8d3e083f1959e5a0d7e9c8d2ad0c14abd46381), ROM_BIOS(3) )
 ROM_END
 
-static SYSTEM_CONFIG_START( z88 )
-	CONFIG_RAM_DEFAULT(2048 * 1024)
-SYSTEM_CONFIG_END
-
-
 /*     YEAR     NAME    PARENT  COMPAT  MACHINE     INPUT       INIT    CONFIG  COMPANY                 FULLNAME */
-COMP( 1988,	z88,	0,		0,		z88,		z88,		0,		z88,	"Cambridge Computers",	"Z88",GAME_NOT_WORKING)
+COMP( 1988,	z88,	0,		0,		z88,		z88,		0,		0,	"Cambridge Computers",	"Z88",GAME_NOT_WORKING)

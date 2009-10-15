@@ -75,7 +75,7 @@
 #include "machine/ncr5380.h"
 #include "includes/mac.h"
 #include "debug/debugcpu.h"
-
+#include "devices/messram.h"
 
 #ifdef MAME_DEBUG
 #define LOG_VIA			0
@@ -356,13 +356,13 @@ static void set_memory_overlay(running_machine *machine, int overlay)
 			is_rom = TRUE;
 
 			/* HACK! - copy in the initial reset/stack */
-			memcpy(mess_ram, memory_data, 8);
+			memcpy(messram_get_ptr(devtag_get_device(machine, "messram")), memory_data, 8);
 		}
 		else
 		{
 			/* RAM */
-			memory_size = mess_ram_size;
-			memory_data = mess_ram;
+			memory_size = messram_get_size(devtag_get_device(machine, "messram"));
+			memory_data = messram_get_ptr(devtag_get_device(machine, "messram"));
 			is_rom = FALSE;
 		}
 
@@ -1995,7 +1995,7 @@ MACHINE_RESET(mac)
 		mac_set_sound_buffer(devtag_get_device(machine, "custom"), 1);
 
 		// classic will fail RAM test and try to boot appletalk if RAM is not all zero
-		memset(mess_ram, 0, mess_ram_size);
+		memset(messram_get_ptr(devtag_get_device(machine, "messram")), 0, messram_get_size(devtag_get_device(machine, "messram")));
 	}
 
 	scsi_interrupt = 0;
@@ -2056,7 +2056,7 @@ static void mac_driver_init(running_machine *machine, mac_model_t model)
 	if (model < MODEL_MAC_II)
 	{
 		/* set up RAM mirror at 0x600000-0x6fffff (0x7fffff ???) */
-		mac_install_memory(machine, 0x600000, 0x6fffff, mess_ram_size, mess_ram, FALSE, 2);
+		mac_install_memory(machine, 0x600000, 0x6fffff, messram_get_size(devtag_get_device(machine, "messram")), messram_get_ptr(devtag_get_device(machine, "messram")), FALSE, 2);
 
 		/* set up ROM at 0x400000-0x43ffff (-0x5fffff for mac 128k/512k/512ke) */
 		mac_install_memory(machine, 0x400000, (model >= MODEL_MAC_PLUS) ? 0x43ffff : 0x5fffff,
@@ -2064,11 +2064,11 @@ static void mac_driver_init(running_machine *machine, mac_model_t model)
 	}
 	else if ((model == MODEL_MAC_LC) || (model == MODEL_MAC_LC_II))
 	{
-		mac_install_memory(machine, 0x000000, 0x9fffff, mess_ram_size, mess_ram, FALSE, 2);
+		mac_install_memory(machine, 0x000000, 0x9fffff, messram_get_size(devtag_get_device(machine, "messram")), messram_get_ptr(devtag_get_device(machine, "messram")), FALSE, 2);
 	}
 	else if ((mac_model == MODEL_MAC_CLASSIC_II) || ((mac_model >= MODEL_MAC_II) && (mac_model <= MODEL_MAC_SE30)))
 	{
-		mac_install_memory(machine, 0x00000000, 0x3fffffff, mess_ram_size, mess_ram, FALSE, 2);
+		mac_install_memory(machine, 0x00000000, 0x3fffffff, messram_get_size(devtag_get_device(machine, "messram")), messram_get_ptr(devtag_get_device(machine, "messram")), FALSE, 2);
 	}
 
 	set_memory_overlay(machine, 1);
@@ -2077,7 +2077,7 @@ static void mac_driver_init(running_machine *machine, mac_model_t model)
 	    (model == MODEL_MAC_LC_II) || ((mac_model >= MODEL_MAC_II) && (mac_model <= MODEL_MAC_SE30)))
 	{
 		// classic will fail RAM test and try to boot appletalk if RAM is not all zero
-		memset(mess_ram, 0, mess_ram_size);
+		memset(messram_get_ptr(devtag_get_device(machine, "messram")), 0, messram_get_size(devtag_get_device(machine, "messram")));
 
 		memory_set_direct_update_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), overlay_opbaseoverride);
 		mac_overlay = 1;

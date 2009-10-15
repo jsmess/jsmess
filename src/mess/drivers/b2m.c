@@ -17,6 +17,7 @@
 #include "machine/wd17xx.h"
 #include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
+#include "devices/messram.h"
 #include "includes/b2m.h"
 
 
@@ -242,6 +243,10 @@ static MACHINE_DRIVER_START( b2m )
 	MDRV_WD1793_ADD("wd1793", default_wd17xx_interface_2_drives )
 
 	MDRV_FLOPPY_2_DRIVES_ADD(b2m_floppy_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("128K")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( b2mrom )
@@ -263,12 +268,9 @@ ROM_START( b2mrom )
     ROM_LOAD( "ramdos.sys", 0x12000, 0x60c0, CRC(91ed6df0) SHA1(4fd040f2647a6b7930c330c75560a035027d0606) )
 ROM_END
 
-static SYSTEM_CONFIG_START(b2m)
- 	CONFIG_RAM_DEFAULT(128 * 1024)
-SYSTEM_CONFIG_END
 
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       INIT     CONFIG COMPANY                  FULLNAME   FLAGS */
-COMP( 1989, b2m, 	0, 	 	0,		b2m, 		b2m, 		b2m, 	 b2m,  	"BNPO",					 "Bashkiria-2M",	 GAME_SUPPORTS_SAVE)
-COMP( 1989, b2mrom,	b2m, 	0,		b2mrom,		b2m, 		b2m, 	 b2m,  	"BNPO",					 "Bashkiria-2M ROM-disk",	 GAME_SUPPORTS_SAVE)
+COMP( 1989, b2m, 	0, 	 	0,		b2m, 		b2m, 		b2m, 	 0,  	"BNPO",					 "Bashkiria-2M",	 GAME_SUPPORTS_SAVE)
+COMP( 1989, b2mrom,	b2m, 	0,		b2mrom,		b2m, 		b2m, 	 0,  	"BNPO",					 "Bashkiria-2M ROM-disk",	 GAME_SUPPORTS_SAVE)

@@ -39,7 +39,7 @@
 #include "driver.h"
 #include "coco_vhd.h"
 #include "includes/coco.h"
-
+#include "devices/messram.h"
 
 
 /***************************************************************************
@@ -159,16 +159,16 @@ static void coco_vhd_readwrite(const device_config *device, UINT8 data)
 		}
 	}
 
-	phyOffset = coco3_mmu_translate( (nBA >> 12 ) / 2, nBA % 8192 );
+	phyOffset = coco3_mmu_translate(device->machine, (nBA >> 12 ) / 2, nBA % 8192 );
 
 	switch(data)
 	{
 		case VHDCMD_READ: /* Read sector */
-			memset(&mess_ram[phyOffset], 0, 256);
+			memset(&messram_get_ptr(devtag_get_device(device->machine, "messram"))[phyOffset], 0, 256);
 			if (total_size > seek_position)
 			{
 				bytes_to_read = (UINT32) MIN((UINT64) 256, total_size - seek_position);
-				result = image_fread(device, &mess_ram[phyOffset], bytes_to_read);
+				result = image_fread(device, &messram_get_ptr(devtag_get_device(device->machine, "messram"))[phyOffset], bytes_to_read);
 				if (result != bytes_to_read)
 				{
 					vhd->status = VHDSTATUS_ACCESS_DENIED;
@@ -180,7 +180,7 @@ static void coco_vhd_readwrite(const device_config *device, UINT8 data)
 			break;
 
 		case VHDCMD_WRITE: /* Write Sector */
-			result = image_fwrite(device, &(mess_ram[phyOffset]), 256);
+			result = image_fwrite(device, &(messram_get_ptr(devtag_get_device(device->machine, "messram"))[phyOffset]), 256);
 
 			if (result != 256)
 			{

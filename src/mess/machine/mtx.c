@@ -15,7 +15,7 @@
 #include "video/tms9928a.h"
 #include "machine/ctronics.h"
 #include "devices/snapquik.h"
-
+#include "devices/messram.h"
 
 
 /*************************************
@@ -218,12 +218,12 @@ WRITE8_HANDLER( mtx_bankswitch_w )
 	memory_set_bank(space->machine, 2, rom_page);
 
 	/* set ram bank, for invalid pages a nop-handler will be installed */
-	if (ram_page >= mess_ram_size/0x8000)
+	if (ram_page >= messram_get_size(devtag_get_device(space->machine, "messram"))/0x8000)
 	{
 		memory_install_readwrite8_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4000, 0x7fff, 0, 0, SMH_NOP, SMH_NOP);
 		memory_install_readwrite8_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0, SMH_NOP, SMH_NOP);
 	}
-	else if (ram_page + 1 == mess_ram_size/0x8000)
+	else if (ram_page + 1 == messram_get_size(devtag_get_device(space->machine, "messram"))/0x8000)
 	{
 		memory_install_readwrite8_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4000, 0x7fff, 0, 0, SMH_NOP, SMH_NOP);
 		memory_install_readwrite8_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0, SMH_BANK(4), SMH_BANK(4));
@@ -251,8 +251,8 @@ DRIVER_INIT( mtx512 )
 	/* configure memory */
 	memory_set_bankptr(machine, 1, memory_region(machine, "user1"));
 	memory_configure_bank(machine, 2, 0, 8, memory_region(machine, "user2"), 0x2000);
-	memory_configure_bank(machine, 3, 0, mess_ram_size/0x4000/2, mess_ram, 0x4000);
-	memory_configure_bank(machine, 4, 0, mess_ram_size/0x4000/2, mess_ram + mess_ram_size/2, 0x4000);
+	memory_configure_bank(machine, 3, 0, messram_get_size(devtag_get_device(machine, "messram"))/0x4000/2, messram_get_ptr(devtag_get_device(machine, "messram")), 0x4000);
+	memory_configure_bank(machine, 4, 0, messram_get_size(devtag_get_device(machine, "messram"))/0x4000/2, messram_get_ptr(devtag_get_device(machine, "messram")) + messram_get_size(devtag_get_device(machine, "messram"))/2, 0x4000);
 
 	/* setup tms9928a */
 	TMS9928A_configure(&tms9928a_interface);

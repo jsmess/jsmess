@@ -9,7 +9,7 @@
 #include "driver.h"
 #include "includes/mac.h"
 #include "streams.h"
-
+#include "devices/messram.h"
 
 /***************************************************************************
     MACROS / CONSTANTS
@@ -129,9 +129,9 @@ void mac_set_sound_buffer(const device_config *device, int buffer)
 	mac_sound *token = get_token(device);
 
 	if (buffer)
-		token->mac_snd_buf_ptr = (UINT16 *) (mess_ram + mess_ram_size - MAC_MAIN_SND_BUF_OFFSET);
+		token->mac_snd_buf_ptr = (UINT16 *) (messram_get_ptr(devtag_get_device(device->machine, "messram")) + messram_get_size(devtag_get_device(device->machine, "messram")) - MAC_MAIN_SND_BUF_OFFSET);
 	else
-		token->mac_snd_buf_ptr = (UINT16 *) (mess_ram + mess_ram_size - MAC_ALT_SND_BUF_OFFSET);
+		token->mac_snd_buf_ptr = (UINT16 *) (messram_get_ptr(devtag_get_device(device->machine, "messram")) + messram_get_size(devtag_get_device(device->machine, "messram")) - MAC_ALT_SND_BUF_OFFSET);
 }
 
 

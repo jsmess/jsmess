@@ -15,7 +15,7 @@
 
 #include "driver.h"
 #include "epnick.h"
-
+#include "devices/messram.h"
 
 /* given a colour index in range 0..255 gives the Red component */
 #define NICK_GET_RED8(x) \
@@ -131,9 +131,9 @@ static NICK_STATE Nick;
 
 // MESS specific
 /* fetch a byte from "video ram" at Addr specified */
-static char Nick_FetchByte(unsigned long Addr)
+static char Nick_FetchByte(running_machine *machine,unsigned long Addr)
 {
-   return mess_ram[Addr & 0x0ffff];
+   return messram_get_ptr(devtag_get_device(machine, "messram"))[Addr & 0x0ffff];
 }
 
 // MESS specific
@@ -658,17 +658,17 @@ static void Nick_WritePixelsLPIXEL(unsigned char DataByte, unsigned char CharInd
 }
 
 
-static void Nick_DoPixel(int ClocksVisible)
+static void Nick_DoPixel(running_machine *machine,int ClocksVisible)
 {
 	int i;
 	unsigned char Buf1, Buf2;
 
 	for (i=0; i<ClocksVisible; i++)
 	{
-		Buf1 =  Nick_FetchByte(Nick.LD1);
+		Buf1 =  Nick_FetchByte(machine,Nick.LD1);
 		Nick.LD1++;
 
-		Buf2 = Nick_FetchByte(Nick.LD1);
+		Buf2 = Nick_FetchByte(machine,Nick.LD1);
 		Nick.LD1++;
 
 		Nick_WritePixels(Buf1,Buf1);
@@ -678,31 +678,31 @@ static void Nick_DoPixel(int ClocksVisible)
 }
 
 
-static void Nick_DoLPixel(int ClocksVisible)
+static void Nick_DoLPixel(running_machine *machine,int ClocksVisible)
 {
 	int i;
 	unsigned char Buf1;
 
 	for (i=0; i<ClocksVisible; i++)
 	{
-		Buf1 =  Nick_FetchByte(Nick.LD1);
+		Buf1 =  Nick_FetchByte(machine,Nick.LD1);
 		Nick.LD1++;
 
 		Nick_WritePixelsLPIXEL(Buf1,Buf1);
 	}
 }
 
-static void Nick_DoAttr(int ClocksVisible)
+static void Nick_DoAttr(running_machine *machine,int ClocksVisible)
 {
 	int i;
 	unsigned char Buf1, Buf2;
 
 	for (i=0; i<ClocksVisible; i++)
 	{
-		Buf1 = Nick_FetchByte(Nick.LD1);
+		Buf1 = Nick_FetchByte(machine,Nick.LD1);
 		Nick.LD1++;
 
-		Buf2 = Nick_FetchByte(Nick.LD2);
+		Buf2 = Nick_FetchByte(machine,Nick.LD2);
 		Nick.LD2++;
 
 		{
@@ -714,53 +714,53 @@ static void Nick_DoAttr(int ClocksVisible)
 	}
 }
 
-static void Nick_DoCh256(int ClocksVisible)
+static void Nick_DoCh256(running_machine *machine,int ClocksVisible)
 {
 	int i;
 	unsigned char Buf1, Buf2;
 
 	for (i=0; i<ClocksVisible; i++)
 	{
-		Buf1 = Nick_FetchByte(Nick.LD1);
+		Buf1 = Nick_FetchByte(machine,Nick.LD1);
 		Nick.LD1++;
-		Buf2 = Nick_FetchByte(ADDR_CH256(Nick.LD2, Buf1));
+		Buf2 = Nick_FetchByte(machine,ADDR_CH256(Nick.LD2, Buf1));
 
 		Nick_WritePixelsLPIXEL(Buf2,Buf1);
 	}
 }
 
-static void Nick_DoCh128(int ClocksVisible)
+static void Nick_DoCh128(running_machine *machine,int ClocksVisible)
 {
 	int i;
 	unsigned char Buf1, Buf2;
 
 	for (i=0; i<ClocksVisible; i++)
 	{
-		Buf1 = Nick_FetchByte(Nick.LD1);
+		Buf1 = Nick_FetchByte(machine,Nick.LD1);
 		Nick.LD1++;
-		Buf2 = Nick_FetchByte(ADDR_CH128(Nick.LD2, Buf1));
+		Buf2 = Nick_FetchByte(machine,ADDR_CH128(Nick.LD2, Buf1));
 
 		Nick_WritePixelsLPIXEL(Buf2,Buf1);
 	}
 }
 
-static void Nick_DoCh64(int ClocksVisible)
+static void Nick_DoCh64(running_machine *machine,int ClocksVisible)
 {
 	int i;
 	unsigned char Buf1, Buf2;
 
 	for (i=0; i<ClocksVisible; i++)
 	{
-		Buf1 = Nick_FetchByte(Nick.LD1);
+		Buf1 = Nick_FetchByte(machine,Nick.LD1);
 		Nick.LD1++;
-		Buf2 = Nick_FetchByte(ADDR_CH64(Nick.LD2, Buf1));
+		Buf2 = Nick_FetchByte(machine,ADDR_CH64(Nick.LD2, Buf1));
 
 		Nick_WritePixelsLPIXEL(Buf2,Buf1);
 	}
 }
 
 
-static void Nick_DoDisplay(LPT_ENTRY *pLPT)
+static void Nick_DoDisplay(running_machine *machine,LPT_ENTRY *pLPT)
 {
 	unsigned char ClocksVisible;
 	unsigned char RightMargin, LeftMargin;
@@ -826,40 +826,40 @@ static void Nick_DoDisplay(LPT_ENTRY *pLPT)
 		{
 			case NICK_PIXEL_MODE:
 			{
-                            Nick_DoPixel(ClocksVisible);
+                            Nick_DoPixel(machine,ClocksVisible);
 			}
 			break;
 
 			case NICK_ATTR_MODE:
 			{
 				//mame_printf_info("attr mode\r\n");
-                            Nick_DoAttr( ClocksVisible);
+                            Nick_DoAttr( machine,ClocksVisible);
 			}
 			break;
 
 			case NICK_CH256_MODE:
 			{
 				//mame_printf_info("ch256 mode\r\n");
-				Nick_DoCh256(ClocksVisible);
+				Nick_DoCh256(machine,ClocksVisible);
 			}
 			break;
 
 			case NICK_CH128_MODE:
 			{
-				Nick_DoCh128(ClocksVisible);
+				Nick_DoCh128(machine,ClocksVisible);
 			}
 			break;
 
 			case NICK_CH64_MODE:
 			{
 				//mame_printf_info("ch64 mode\r\n");
-				Nick_DoCh64(ClocksVisible);
+				Nick_DoCh64(machine,ClocksVisible);
 			}
 			break;
 
 			case NICK_LPIXEL_MODE:
 			{
-				Nick_DoLPixel(ClocksVisible);
+				Nick_DoLPixel(machine,ClocksVisible);
 			}
 			break;
 
@@ -880,7 +880,7 @@ static void	Nick_UpdateLPT(void)
 }
 
 
-static void	Nick_ReloadLPT(void)
+static void	Nick_ReloadLPT(running_machine *machine)
 {
 	unsigned long LPT_Addr;
 
@@ -888,26 +888,26 @@ static void	Nick_ReloadLPT(void)
 		LPT_Addr = ((Nick.LPL & 0x0ff)<<4) | ((Nick.LPH & 0x0f)<<(8+4));
 
 		/* update internal LPT state */
-		Nick.LPT.SC = Nick_FetchByte(LPT_Addr);
-		Nick.LPT.MB = Nick_FetchByte(LPT_Addr+1);
-		Nick.LPT.LM = Nick_FetchByte(LPT_Addr+2);
-		Nick.LPT.RM = Nick_FetchByte(LPT_Addr+3);
-		Nick.LPT.LD1L = Nick_FetchByte(LPT_Addr+4);
-		Nick.LPT.LD1H = Nick_FetchByte(LPT_Addr+5);
-		Nick.LPT.LD2L = Nick_FetchByte(LPT_Addr+6);
-		Nick.LPT.LD2H = Nick_FetchByte(LPT_Addr+7);
-		Nick.LPT.COL[0] = Nick_FetchByte(LPT_Addr+8);
-		Nick.LPT.COL[1] = Nick_FetchByte(LPT_Addr+9);
-		Nick.LPT.COL[2] = Nick_FetchByte(LPT_Addr+10);
-		Nick.LPT.COL[3] = Nick_FetchByte(LPT_Addr+11);
-		Nick.LPT.COL[4] = Nick_FetchByte(LPT_Addr+12);
-		Nick.LPT.COL[5] = Nick_FetchByte(LPT_Addr+13);
-		Nick.LPT.COL[6] = Nick_FetchByte(LPT_Addr+14);
-		Nick.LPT.COL[7] = Nick_FetchByte(LPT_Addr+15);
+		Nick.LPT.SC = Nick_FetchByte(machine,LPT_Addr);
+		Nick.LPT.MB = Nick_FetchByte(machine,LPT_Addr+1);
+		Nick.LPT.LM = Nick_FetchByte(machine,LPT_Addr+2);
+		Nick.LPT.RM = Nick_FetchByte(machine,LPT_Addr+3);
+		Nick.LPT.LD1L = Nick_FetchByte(machine,LPT_Addr+4);
+		Nick.LPT.LD1H = Nick_FetchByte(machine,LPT_Addr+5);
+		Nick.LPT.LD2L = Nick_FetchByte(machine,LPT_Addr+6);
+		Nick.LPT.LD2H = Nick_FetchByte(machine,LPT_Addr+7);
+		Nick.LPT.COL[0] = Nick_FetchByte(machine,LPT_Addr+8);
+		Nick.LPT.COL[1] = Nick_FetchByte(machine,LPT_Addr+9);
+		Nick.LPT.COL[2] = Nick_FetchByte(machine,LPT_Addr+10);
+		Nick.LPT.COL[3] = Nick_FetchByte(machine,LPT_Addr+11);
+		Nick.LPT.COL[4] = Nick_FetchByte(machine,LPT_Addr+12);
+		Nick.LPT.COL[5] = Nick_FetchByte(machine,LPT_Addr+13);
+		Nick.LPT.COL[6] = Nick_FetchByte(machine,LPT_Addr+14);
+		Nick.LPT.COL[7] = Nick_FetchByte(machine,LPT_Addr+15);
 }
 
 /* call here to render a line of graphics */
-static void	Nick_DoLine(void)
+static void	Nick_DoLine(running_machine *machine)
 {
 	unsigned char ScanLineCount;
 
@@ -918,14 +918,14 @@ static void	Nick_DoLine(void)
 		Nick.LPL = Nick.Reg[2];
 		Nick.LPH = Nick.Reg[3];
 
-		Nick_ReloadLPT();
+		Nick_ReloadLPT(machine);
 	}
 
 		/* left border */
 		Nick_DoLeftMargin(&Nick.LPT);
 
 		/* do visible part */
-		Nick_DoDisplay(&Nick.LPT);
+		Nick_DoDisplay(machine,&Nick.LPT);
 
 		/* right border */
 		Nick_DoRightMargin(&Nick.LPT);
@@ -948,7 +948,7 @@ static void	Nick_DoLine(void)
 		Nick.ScanLineCount = 0;
 
 		Nick_UpdateLPT();
-		Nick_ReloadLPT();
+		Nick_ReloadLPT(machine);
 
 
 	}
@@ -988,7 +988,7 @@ WRITE8_HANDLER( Nick_reg_w )
       Nick.LPL = Nick.Reg[2];
       Nick.LPH = Nick.Reg[3];
 
-	Nick_ReloadLPT();
+	Nick_ReloadLPT(space->machine);
     }
   }
 
@@ -1003,7 +1003,7 @@ WRITE8_HANDLER( Nick_reg_w )
   }
 }
 
-static void    Nick_DoScreen(bitmap_t *bm)
+static void    Nick_DoScreen(running_machine *machine,bitmap_t *bm)
 {
   int line = 0;
 
@@ -1016,7 +1016,7 @@ static void    Nick_DoScreen(bitmap_t *bm)
 	Nick.dest_max_pos = bm->width;
 
     /* write line */
-    Nick_DoLine();
+    Nick_DoLine(machine);
 
     /* next line */
     line++;
@@ -1035,6 +1035,6 @@ VIDEO_START( nick )
 
 VIDEO_UPDATE( nick )
 {
-	Nick_DoScreen(tmpbitmap);
+	Nick_DoScreen(screen->machine,tmpbitmap);
 	return VIDEO_UPDATE_CALL(generic_bitmapped);
 }

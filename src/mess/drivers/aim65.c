@@ -20,6 +20,7 @@ ToDo:
 #include "machine/6532riot.h"
 #include "machine/6821pia.h"
 #include "devices/cartslot.h"
+#include "devices/messram.h"
 #include "aim65.lh"
 
 
@@ -219,6 +220,11 @@ static MACHINE_DRIVER_START( aim65 )
 	MDRV_CARTSLOT_ADD("cart3")
 	MDRV_CARTSLOT_EXTENSION_LIST("z24")
 	MDRV_CARTSLOT_NOT_MANDATORY
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("4K")
+	MDRV_RAM_EXTRA_OPTIONS("1K,2K,3K")	
 MACHINE_DRIVER_END
 
 
@@ -266,23 +272,10 @@ ROM_END
  *
  */
 
-
-/***************************************************************************
-    SYSTEM CONFIG
-***************************************************************************/
-
-static SYSTEM_CONFIG_START( aim65 )
-	CONFIG_RAM_DEFAULT(4 * 1024) /* 4KB RAM */
-	CONFIG_RAM        (3 * 1024) /* 3KB RAM */
-	CONFIG_RAM        (2 * 1024) /* 2KB RAM */
-	CONFIG_RAM        (1 * 1024) /* 1KB RAM */
-SYSTEM_CONFIG_END
-
-
 /***************************************************************************
     GAME DRIVERS
 ***************************************************************************/
 
 /*   YEAR  NAME         PARENT  COMPAT  MACHINE  INPUT   INIT    CONFIG  COMPANY     FULLNAME  FLAGS */
-COMP(1977, aim65,		0,      0,      aim65,   aim65,  0,      aim65,  "Rockwell", "AIM 65", 0)
-COMP(1981, aim65_40,	aim65,  0,      aim65,	 aim65,  0,      aim65,  "Rockwell", "AIM 65/40", GAME_NOT_WORKING)
+COMP(1977, aim65,		0,      0,      aim65,   aim65,  0,      0,  "Rockwell", "AIM 65", 0)
+COMP(1981, aim65_40,	aim65,  0,      aim65,	 aim65,  0,      0,  "Rockwell", "AIM 65/40", GAME_NOT_WORKING)

@@ -51,6 +51,7 @@
 #include "sound/speaker.h"
 #include "video/zx8301.h"
 #include "machine/zx8302.h"
+#include "devices/messram.h"
 
 static QUICKLOAD_LOAD( ql );
 
@@ -472,12 +473,12 @@ INPUT_PORTS_END
 
 static READ8_HANDLER( ql_ram_r )
 {
-	return mess_ram[offset];
+	return messram_get_ptr(devtag_get_device(space->machine, "messram"))[offset];
 }
 
 static WRITE8_HANDLER( ql_ram_w )
 {
-	mess_ram[offset] = data;
+	messram_get_ptr(devtag_get_device(space->machine, "messram"))[offset] = data;
 }
 
 static ZX8301_INTERFACE( ql_zx8301_intf )
@@ -540,7 +541,7 @@ static MACHINE_START( ql )
 
 	/* configure RAM */
 
-	switch (mess_ram_size)
+	switch (messram_get_size(devtag_get_device(machine, "messram")))
 	{
 	case 128*1024:
 		memory_install_readwrite8_handler(program, 0x040000, 0x0fffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
@@ -703,21 +704,12 @@ static MACHINE_DRIVER_START( ql )
 	MDRV_CARTSLOT_LOAD(ql_cart)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(ql_floppy_config)
-MACHINE_DRIVER_END
-
-static MACHINE_DRIVER_START( opd )
-	MDRV_DRIVER_DATA(ql_state)
-
-	// basic machine hardware
-	MDRV_CPU_ADD(M68008_TAG, M68008, 7500000)
-	MDRV_CPU_PROGRAM_MAP(ql_map)
-
-	MDRV_CPU_ADD(I8051_TAG, I8051, X4)
-	MDRV_CPU_IO_MAP(ipc_io_map)
-
-	MDRV_DEVICE_REMOVE("cart")
-
-	MDRV_FLOPPY_2_DRIVES_REMOVE()
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("128K")
+	MDRV_RAM_EXTRA_OPTIONS("192K,256K,384K,640K,896K")
+	
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ql_ntsc )
@@ -727,6 +719,23 @@ static MACHINE_DRIVER_START( ql_ntsc )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_SIZE(960, 262)
 	MDRV_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( opd )
+	MDRV_IMPORT_FROM(ql)
+	
+	/* internal ram */
+	MDRV_RAM_MODIFY("messram")
+	MDRV_RAM_DEFAULT_SIZE("128K")
+	MDRV_RAM_EXTRA_OPTIONS("256K")		
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( megaopd )
+	MDRV_IMPORT_FROM(ql)
+
+	/* internal ram */
+	MDRV_RAM_MODIFY("messram")
+	MDRV_RAM_DEFAULT_SIZE("256K")	
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -894,7 +903,7 @@ ROM_END
 
 static QUICKLOAD_LOAD( ql )
 {
-	image_fread(image, mess_ram, 128*1024);
+	image_fread(image, messram_get_ptr(devtag_get_device(image->machine, "messram")), 128*1024);
 
 	return INIT_PASS;
 }
@@ -919,22 +928,7 @@ static void ql_serial_getinfo(const mess_device_class *devclass, UINT32 state, u
 }
 
 static SYSTEM_CONFIG_START( ql )
-	CONFIG_RAM_DEFAULT	(128 * 1024)
-	CONFIG_RAM			(192 * 1024) // 64K expansion
-	CONFIG_RAM			(256 * 1024) // 128K expansion
-	CONFIG_RAM			(384 * 1024) // 256K expansion
-	CONFIG_RAM			(640 * 1024) // 512K expansion
-	CONFIG_RAM			(896 * 1024) // Trump Card
 	CONFIG_DEVICE(ql_serial_getinfo)
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START( opd )
-	CONFIG_RAM_DEFAULT	(128 * 1024)
-	CONFIG_RAM			(256 * 1024) // 128K expansion
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START( megaopd )
-	CONFIG_RAM_DEFAULT	(256 * 1024)
 SYSTEM_CONFIG_END
 
 /* Computer Drivers */
@@ -949,5 +943,5 @@ COMP( 1985, ql_it,  ql,     0,      ql,         ql_it,  0,      ql,     "Sinclai
 COMP( 1985, ql_se,  ql,     0,      ql,         ql_se,  0,      ql,     "Sinclair Research Ltd",    "QL (Sweden)",  GAME_SUPPORTS_SAVE )
 COMP( 1985, ql_dk,  ql,     0,      ql,         ql_dk,  0,      ql,     "Sinclair Research Ltd",    "QL (Denmark)", GAME_NOT_WORKING )
 COMP( 1985, ql_gr,  ql,     0,      ql,         ql,     0,      ql,     "Sinclair Research Ltd",    "QL (Greece)",  GAME_SUPPORTS_SAVE )
-COMP( 1984, tonto,  0,		0,		ql,			ql,		0,		opd,	"British Telecom Business Systems", "Merlin M1800 Tonto", GAME_NOT_WORKING )
-COMP( 1986, megaopd,tonto,	0,		ql,			ql,		0,		megaopd,"International Computer Limited", "MegaOPD (USA)", GAME_NOT_WORKING )
+COMP( 1984, tonto,  0,		0,		opd,		ql,		0,		0,		"British Telecom Business Systems", "Merlin M1800 Tonto", GAME_NOT_WORKING )
+COMP( 1986, megaopd,tonto,	0,		megaopd,	ql,		0,		0,		"International Computer Limited", "MegaOPD (USA)", GAME_NOT_WORKING )

@@ -18,6 +18,7 @@
 /* M6502 main CPU */
 #include "cpu/m6502/m6502.h"
 
+#include "devices/messram.h"
 
 
 /******************************************************************************
@@ -171,11 +172,11 @@ MACHINE_START( aim65 )
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* Init RAM */
-	memory_install_readwrite8_handler(space, 0, mess_ram_size - 1, 0, 0, SMH_BANK(1), SMH_BANK(1));
-	memory_set_bankptr(machine, 1, mess_ram);
+	memory_install_readwrite8_handler(space, 0, messram_get_size(devtag_get_device(machine, "messram")) - 1, 0, 0, SMH_BANK(1), SMH_BANK(1));
+	memory_set_bankptr(machine, 1, messram_get_ptr(devtag_get_device(machine, "messram")));
 
-	if (mess_ram_size < 4 * 1024)
-		memory_install_readwrite8_handler(space, mess_ram_size, 0x0fff, 0, 0, SMH_NOP, SMH_NOP);
+	if (messram_get_size(devtag_get_device(machine, "messram")) < 4 * 1024)
+		memory_install_readwrite8_handler(space, messram_get_size(devtag_get_device(machine, "messram")), 0x0fff, 0, 0, SMH_NOP, SMH_NOP);
 
 	via_cb1_w(via_0, 1, 1);
 	via_ca1_w(via_0, 1, 0);

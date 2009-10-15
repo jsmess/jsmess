@@ -28,6 +28,7 @@
 #include "sound/ay8910.h"
 #include "machine/ctronics.h"
 #include "machine/rescap.h"
+#include "devices/messram.h"
 
 /* Memory Banking */
 
@@ -40,7 +41,7 @@ static void mc1000_bankswitch(running_machine *machine)
 	memory_set_bank(machine, 2, state->mc6845_bank);
 
 	/* extended RAM */
-	if (mess_ram_size > 16*1024)
+	if (messram_get_size(devtag_get_device(machine, "messram")) > 16*1024)
 	{
 		memory_install_readwrite8_handler(program, 0x4000, 0x7fff, 0, 0, SMH_BANK(3), SMH_BANK(3));
 	}
@@ -52,7 +53,7 @@ static void mc1000_bankswitch(running_machine *machine)
 	/* MC6847 video RAM */
 	if (state->mc6847_bank)
 	{
-		if (mess_ram_size > 16*1024)
+		if (messram_get_size(devtag_get_device(machine, "messram")) > 16*1024)
 		{
 			memory_install_readwrite8_handler(program, 0x8000, 0x97ff, 0, 0, SMH_BANK(4), SMH_BANK(4));
 		}
@@ -69,7 +70,7 @@ static void mc1000_bankswitch(running_machine *machine)
 	memory_set_bank(machine, 4, state->mc6847_bank);
 
 	/* extended RAM */
-	if (mess_ram_size > 16*1024)
+	if (messram_get_size(devtag_get_device(machine, "messram")) > 16*1024)
 	{
 		memory_install_readwrite8_handler(program, 0x9800, 0xbfff, 0, 0, SMH_BANK(5), SMH_BANK(5));
 	}
@@ -447,6 +448,11 @@ static MACHINE_DRIVER_START( mc1000 )
 	/* devices */
 	MDRV_CASSETTE_ADD(CASSETTE_TAG, mc1000_cassette_config)
 	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("16K")
+	MDRV_RAM_EXTRA_OPTIONS("48K")	
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -457,12 +463,6 @@ ROM_START( mc1000 )
 	ROM_LOAD( "mc1000.ic12", 0xe000, 0x2000, CRC(750c95f0) SHA1(fd766f5ea4481ef7fd4df92cf7d8397cc2b5a6c4) )
 ROM_END
 
-/* System Configuration */
-
-static SYSTEM_CONFIG_START( mc1000 )
-	CONFIG_RAM_DEFAULT( 16 * 1024 )
-	CONFIG_RAM		  ( 48 * 1024 )
-SYSTEM_CONFIG_END
 
 /* Driver Initialization */
 
@@ -490,4 +490,4 @@ static DRIVER_INIT( mc1000 )
 /* System Drivers */
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT        CONFIG      COMPANY             FULLNAME        FLAGS */
-COMP( 1985,	mc1000,		0,			0,		mc1000,		mc1000,		mc1000,		mc1000,		"CCE",				"MC-1000",		GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+COMP( 1985,	mc1000,		0,			0,		mc1000,		mc1000,		mc1000,		0,		"CCE",				"MC-1000",		GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )

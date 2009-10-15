@@ -124,7 +124,7 @@ Notes:
 #include "includes/comx35.h"
 #include "machine/rescap.h"
 #include "devices/flopdrv.h"
-
+#include "devices/messram.h"
 
 enum
 {
@@ -628,7 +628,7 @@ MACHINE_START( comx35p )
 	memory_configure_bank(machine, 1, BANK_PRINTER_THERMAL, 1, memory_region(machine, "thermal"), 0);
 	memory_configure_bank(machine, 1, BANK_JOYCARD, 1, memory_region(machine, CDP1802_TAG), 0);
 	memory_configure_bank(machine, 1, BANK_80_COLUMNS, 1, memory_region(machine, "80column"), 0);
-	memory_configure_bank(machine, 1, BANK_RAMCARD, 4, mess_ram, 0x2000);
+	memory_configure_bank(machine, 1, BANK_RAMCARD, 4, messram_get_ptr(devtag_get_device(machine, "messram")), 0x2000);
 
 	memory_set_bank(machine, 1, 0);
 
@@ -714,7 +714,7 @@ QUICKLOAD_LOAD( comx35 )
 	UINT8 header[16] = {0};
 	int size = image_length(image);
 
-	if (size > mess_ram_size)
+	if (size > messram_get_size(devtag_get_device(image->machine, "messram")))
 	{
 		return INIT_FAIL;
 	}

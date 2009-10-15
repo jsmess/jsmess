@@ -11,6 +11,7 @@
 #include "cpu/z80/z80.h"
 #include "includes/galaxy.h"
 #include "devices/cassette.h"
+#include "devices/messram.h"
 
 /***************************************************************************
   I/O devices
@@ -93,7 +94,7 @@ static void galaxy_setup_snapshot (running_machine *machine, const UINT8 * data,
 			cpu_set_reg(cpu, Z80_I,    data[0x40]);
 			cpu_set_reg(cpu, Z80_R,    (data[0x44] & 0x7f) | (data[0x48] & 0x80));
 
-			memcpy (mess_ram, data + 0x084c, (mess_ram_size < 0x1800) ? mess_ram_size : 0x1800);
+			memcpy (messram_get_ptr(devtag_get_device(machine, "messram")), data + 0x084c, (messram_get_size(devtag_get_device(machine, "messram")) < 0x1800) ? messram_get_size(devtag_get_device(machine, "messram")) : 0x1800);
 
 			break;
 		case GALAXY_SNAPSHOT_V2_SIZE:
@@ -120,7 +121,7 @@ static void galaxy_setup_snapshot (running_machine *machine, const UINT8 * data,
 			cpu_set_reg(cpu, Z80_I,    data[0x19]);
 			cpu_set_reg(cpu, Z80_R,    data[0x1a]);
 
-			memcpy (mess_ram, data + 0x0834, (mess_ram_size < 0x1800) ? mess_ram_size : 0x1800);
+			memcpy (messram_get_ptr(devtag_get_device(machine, "messram")), data + 0x0834, (messram_get_size(devtag_get_device(machine, "messram")) < 0x1800) ? messram_get_size(devtag_get_device(machine, "messram")) : 0x1800);
 
 			break;
 	}
@@ -158,14 +159,14 @@ SNAPSHOT_LOAD( galaxy )
 DRIVER_INIT( galaxy )
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	memory_install_read8_handler( space, 0x2800, 0x2800 + mess_ram_size - 1, 0, 0, SMH_BANK(1));
-	memory_install_write8_handler(space, 0x2800, 0x2800 + mess_ram_size - 1, 0, 0, SMH_BANK(1));
-	memory_set_bankptr(machine, 1, mess_ram);
+	memory_install_read8_handler( space, 0x2800, 0x2800 + messram_get_size(devtag_get_device(machine, "messram")) - 1, 0, 0, SMH_BANK(1));
+	memory_install_write8_handler(space, 0x2800, 0x2800 + messram_get_size(devtag_get_device(machine, "messram")) - 1, 0, 0, SMH_BANK(1));
+	memory_set_bankptr(machine, 1, messram_get_ptr(devtag_get_device(machine, "messram")));
 
-	if (mess_ram_size < (6 + 48) * 1024)
+	if (messram_get_size(devtag_get_device(machine, "messram")) < (6 + 48) * 1024)
 	{
-		memory_install_read8_handler( space, 0x2800 + mess_ram_size, 0xffff, 0, 0, SMH_NOP);
-		memory_install_write8_handler(space, 0x2800 + mess_ram_size, 0xffff, 0, 0, SMH_NOP);
+		memory_install_read8_handler( space, 0x2800 + messram_get_size(devtag_get_device(machine, "messram")), 0xffff, 0, 0, SMH_NOP);
+		memory_install_write8_handler(space, 0x2800 + messram_get_size(devtag_get_device(machine, "messram")), 0xffff, 0, 0, SMH_NOP);
 	}
 }
 

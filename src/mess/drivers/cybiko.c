@@ -21,7 +21,7 @@
 #include "machine/pcf8593.h"
 #include "machine/at45dbxx.h"
 #include "machine/sst39vfx.h"
-
+#include "devices/messram.h"
 
 /* Until support for the H8Sxxxx variants used by cybiko is added, we use H8_3002 (even if opcodes differ) */
 #define CPU_H8S2241   CPU_H83002
@@ -263,6 +263,11 @@ static MACHINE_DRIVER_START( cybikov1 )
 	/* rtc */
 	MDRV_PCF8593_ADD("rtc")
 	MDRV_AT45DB041_ADD("flash1")
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("512K")
+	MDRV_RAM_EXTRA_OPTIONS("1M")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( cybikov2 )
@@ -278,6 +283,11 @@ static MACHINE_DRIVER_START( cybikov2 )
 	// non-volatile ram
 //  MDRV_NVRAM_HANDLER(cybikov2)
 	MDRV_SST39VF020_ADD("flash2", 16, ENDIANNESS_BIG)
+	
+	/* internal ram */
+	MDRV_RAM_MODIFY("messram")
+	MDRV_RAM_DEFAULT_SIZE("256K")
+	MDRV_RAM_EXTRA_OPTIONS("512K,1M")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( cybikoxt )
@@ -297,6 +307,10 @@ static MACHINE_DRIVER_START( cybikoxt )
 //  MDRV_NVRAM_HANDLER(cybikoxt)
 	MDRV_DEVICE_REMOVE("flash1")
 	MDRV_SST39VF020_ADD("flash2", 16, ENDIANNESS_BIG)
+	
+	/* internal ram */
+	MDRV_RAM_MODIFY("messram")
+	MDRV_RAM_DEFAULT_SIZE("2M")
 MACHINE_DRIVER_END
 
 
@@ -319,31 +333,11 @@ ROM_START( cybikoxt )
 	ROM_LOAD( "cyrom150.bin", 0, 0x8000, CRC(18b9b21f) SHA1(28868d6174eb198a6cec6c3c70b6e494517229b9) )
 ROM_END
 
-///////////////////
-// SYSTEM CONFIG //
-///////////////////
-
-static SYSTEM_CONFIG_START( cybikov1 )
-	CONFIG_RAM_DEFAULT( 512 * 1024 )
-	CONFIG_RAM( 1024 * 1024 )
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START( cybikov2 )
-	CONFIG_RAM_DEFAULT( 256 * 1024 )
-	CONFIG_RAM(  512 * 1024 )
-	CONFIG_RAM( 1024 * 1024 )
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START( cybikoxt )
-	CONFIG_RAM_DEFAULT( 2048 * 1024 )
-SYSTEM_CONFIG_END
-
-
 //////////////
 // DRIVERS  //
 //////////////
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT        CONFIG      COMPANY         FULLNAME                FLAGS */
-COMP( 2000, cybikov1,   0,          0,      cybikov1,   cybiko, cybikov1,   cybikov1,   "Cybiko, Inc.", "Cybiko Classic (V1)",  GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-COMP( 2000, cybikov2,   cybikov1,   0,      cybikov2,   cybiko, cybikov2,   cybikov2,   "Cybiko, Inc.", "Cybiko Classic (V2)",  GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-COMP( 2001, cybikoxt,   cybikov1,   0,      cybikoxt,   cybiko, cybikoxt,   cybikoxt,   "Cybiko, Inc.", "Cybiko Xtreme",        GAME_NO_SOUND | GAME_NOT_WORKING )
+COMP( 2000, cybikov1,   0,          0,      cybikov1,   cybiko, cybikov1,   0,   "Cybiko, Inc.", "Cybiko Classic (V1)",  GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+COMP( 2000, cybikov2,   cybikov1,   0,      cybikov2,   cybiko, cybikov2,   0,   "Cybiko, Inc.", "Cybiko Classic (V2)",  GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+COMP( 2001, cybikoxt,   cybikov1,   0,      cybikoxt,   cybiko, cybikoxt,   0,   "Cybiko, Inc.", "Cybiko Xtreme",        GAME_NO_SOUND | GAME_NOT_WORKING )

@@ -21,6 +21,7 @@
 #include "devices/cartslot.h"
 #include "machine/6532riot.h"
 #include "sound/speaker.h"
+#include "devices/messram.h"
 #include "beta.lh"
 
 /* Memory Maps */
@@ -277,6 +278,10 @@ static MACHINE_DRIVER_START( beta )
 	MDRV_CARTSLOT_EXTENSION_LIST("bin,rom")
 	MDRV_CARTSLOT_NOT_MANDATORY
 	MDRV_CARTSLOT_UNLOAD(beta_eprom)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("256")
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -289,13 +294,8 @@ ROM_START( beta )
 	ROM_CART_LOAD( EPROM_TAG, 0x0000, 0x0800, ROM_FULLSIZE )
 ROM_END
 
-/* System Configuration */
-
-static SYSTEM_CONFIG_START( beta )
-	CONFIG_RAM_DEFAULT( 256 )
-SYSTEM_CONFIG_END
 
 /* System Drivers */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY         FULLNAME    FLAGS */
-COMP( 1984, beta,	0,		0,		beta,	beta,	0,		beta,	"Pitronics",	"Beta",		GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+COMP( 1984, beta,	0,		0,		beta,	beta,	0,		0,	"Pitronics",	"Beta",		GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )

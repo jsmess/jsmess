@@ -28,6 +28,7 @@
 #include "driver.h"
 #include "includes/x68k.h"
 #include "machine/68901mfp.h"
+#include "devices/messram.h"
 
 UINT16* x68k_gvram;  // Graphic VRAM
 UINT16* x68k_tvram;  // Text VRAM
@@ -1269,7 +1270,7 @@ VIDEO_UPDATE( x68000 )
 //  popmessage("Graphic layer scroll - %i, %i - %i, %i - %i, %i - %i, %i",
 //      x68k_sys.crtc.reg[12],x68k_sys.crtc.reg[13],x68k_sys.crtc.reg[14],x68k_sys.crtc.reg[15],x68k_sys.crtc.reg[16],x68k_sys.crtc.reg[17],x68k_sys.crtc.reg[18],x68k_sys.crtc.reg[19]);
 //  popmessage("IOC IRQ status - %02x",x68k_sys.ioc.irqstatus);
-//  popmessage("RAM: mouse data - %02x %02x %02x %02x",mess_ram[0x931],mess_ram[0x930],mess_ram[0x933],mess_ram[0x932]);
+//  popmessage("RAM: mouse data - %02x %02x %02x %02x",messram_get_ptr(devtag_get_device(machine, "messram"))[0x931],messram_get_ptr(devtag_get_device(machine, "messram"))[0x930],messram_get_ptr(devtag_get_device(machine, "messram"))[0x933],messram_get_ptr(devtag_get_device(machine, "messram"))[0x932]);
 #endif
 	return 0;
 }

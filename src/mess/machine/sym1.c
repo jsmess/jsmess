@@ -19,6 +19,7 @@
 #include "machine/6532riot.h"
 #include "machine/74145.h"
 #include "sound/speaker.h"
+#include "devices/messram.h"
 
 #define LED_REFRESH_DELAY  ATTOTIME_IN_USEC(70)
 
@@ -269,10 +270,10 @@ const via6522_interface sym1_via2 =
 DRIVER_INIT( sym1 )
 {
 	/* wipe expansion memory banks that are not installed */
-	if (mess_ram_size < 4*1024)
+	if (messram_get_size(devtag_get_device(machine, "messram")) < 4*1024)
 	{
 		memory_install_readwrite8_handler(cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM ),
-			mess_ram_size, 0x0fff, 0, 0, SMH_NOP, SMH_NOP);
+			messram_get_size(devtag_get_device(machine, "messram")), 0x0fff, 0, 0, SMH_NOP, SMH_NOP);
 	}
 
 	/* allocate a timer to refresh the led display */

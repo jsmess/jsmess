@@ -13,6 +13,7 @@
 #include "sound/ay8910.h"
 #include "sound/wave.h"
 #include "devices/cassette.h"
+#include "devices/messram.h"
 
 static UINT8 IPLK;
 static UINT8 *spc1000_video_ram;
@@ -31,8 +32,8 @@ static WRITE8_HANDLER(spc1000_iplk_w)
 		memory_set_bankptr(space->machine, 1, memory_region(space->machine, "maincpu"));
 		memory_set_bankptr(space->machine, 3, memory_region(space->machine, "maincpu"));
 	} else {
-		memory_set_bankptr(space->machine, 1, mess_ram);
-		memory_set_bankptr(space->machine, 3, mess_ram + 0x8000);
+		memory_set_bankptr(space->machine, 1, messram_get_ptr(devtag_get_device(space->machine, "messram")));
+		memory_set_bankptr(space->machine, 3, messram_get_ptr(devtag_get_device(space->machine, "messram")) + 0x8000);
 	}
 }
 
@@ -43,8 +44,8 @@ static READ8_HANDLER(spc1000_iplk_r)
 		memory_set_bankptr(space->machine, 1, memory_region(space->machine, "maincpu"));
 		memory_set_bankptr(space->machine, 3, memory_region(space->machine, "maincpu"));
 	} else {
-		memory_set_bankptr(space->machine, 1, mess_ram);
-		memory_set_bankptr(space->machine, 3, mess_ram + 0x8000);
+		memory_set_bankptr(space->machine, 1, messram_get_ptr(devtag_get_device(space->machine, "messram")));
+		memory_set_bankptr(space->machine, 3, messram_get_ptr(devtag_get_device(space->machine, "messram")) + 0x8000);
 	}
 	return 0;
 }
@@ -199,9 +200,9 @@ static MACHINE_RESET(spc1000)
 	memory_install_write8_handler(space, 0x8000, 0xffff, 0, 0, SMH_BANK(4));
 
 	memory_set_bankptr(machine, 1, memory_region(machine, "maincpu"));
-	memory_set_bankptr(machine, 2, mess_ram);
+	memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")));
 	memory_set_bankptr(machine, 3, memory_region(machine, "maincpu"));
-	memory_set_bankptr(machine, 4, mess_ram + 0x8000);
+	memory_set_bankptr(machine, 4, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x8000);
 
 	IPLK = 1;
 }
@@ -284,11 +285,11 @@ static MACHINE_DRIVER_START( spc1000 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MDRV_CASSETTE_ADD( "cassette", spc1000_cassette_config )
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("64K")		
 MACHINE_DRIVER_END
-
-static SYSTEM_CONFIG_START(spc1000)
-	CONFIG_RAM(64 * 1024)
-SYSTEM_CONFIG_END
 
 /* ROM definition */
 ROM_START( spc1000 )
@@ -299,4 +300,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( 1982, spc1000,  0,       0, 	spc1000, 	spc1000, 	 0,  	  spc1000,  	 "Samsung",   "SPC-1000",		GAME_NOT_WORKING)
+COMP( 1982, spc1000,  0,       0, 	spc1000, 	spc1000, 	 0,  	  0,  	 "Samsung",   "SPC-1000",		GAME_NOT_WORKING)

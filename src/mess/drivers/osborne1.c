@@ -42,6 +42,7 @@ TODO:
 #include "formats/basicdsk.h"
 #include "machine/wd17xx.h"
 #include "machine/6821pia.h"
+#include "devices/messram.h"
 #include "includes/osborne1.h"
 
 
@@ -247,6 +248,10 @@ static MACHINE_DRIVER_START( osborne1 )
 	MDRV_MB8877_ADD("mb8877", default_wd17xx_interface_2_drives )
 
 	MDRV_FLOPPY_2_DRIVES_ADD(osborne1_floppy_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("68K")	/* 64KB Main RAM and 4Kbit video attribute RAM */
 MACHINE_DRIVER_END
 
 
@@ -270,11 +275,5 @@ ROM_START( osborne1 )
 	ROM_LOAD( "osbchr.bin", 0x0000, 0x800, BAD_DUMP CRC(6c1eab0d) SHA1(b04459d377a70abc9155a5486003cb795342c801) )
 ROM_END
 
-/* System Configuration */
-static SYSTEM_CONFIG_START( osborne1 )
-	CONFIG_RAM_DEFAULT( 68 * 1024 )		/* 64KB Main RAM and 4Kbit video attribute RAM */
-SYSTEM_CONFIG_END
-
-
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        CONFIG      COMPANY     FULLNAME        FLAGS */
-COMP( 1981, osborne1,   0,      0,      osborne1,   osborne1,   osborne1,   osborne1,   "Osborne",  "Osborne-1",    0 )
+COMP( 1981, osborne1,   0,      0,      osborne1,   osborne1,   osborne1,   0,   "Osborne",  "Osborne-1",    0 )

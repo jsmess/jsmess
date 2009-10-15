@@ -502,9 +502,6 @@ static void pdp1_cylinder_getinfo(const mess_device_class *devclass, UINT32 stat
 }
 
 static SYSTEM_CONFIG_START(pdp1)
-	/*CONFIG_RAM_DEFAULT(4 * 1024)
-    CONFIG_RAM(32 * 1024)
-    CONFIG_RAM(64 * 1024)*/
 	CONFIG_DEVICE(pdp1_punchtape_getinfo)
 	CONFIG_DEVICE(pdp1_printer_getinfo)
 	CONFIG_DEVICE(pdp1_cylinder_getinfo)

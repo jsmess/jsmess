@@ -194,7 +194,7 @@ Apple 3.5 and Apple 5.25 drives - up to three devices
 #include "machine/mockngbd.h"
 #include "sound/ay8910.h"
 #include "sound/speaker.h"
-
+#include "devices/messram.h"
 
 
 /***************************************************************************
@@ -634,11 +634,26 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( apple2 )
 	MDRV_IMPORT_FROM( apple2_common )
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("64K")	
+	MDRV_RAM_EXTRA_OPTIONS("4K,8K,12K,20K,24K,32K,36K,48K,64K")	
+	/* At the moment the RAM bank $C000-$FFFF is available only if you choose   */
+	/* default configuration: on real machine is present also in configurations */
+	/* with less memory, provided that the language card is installed           */
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( apple2p )
-	MDRV_IMPORT_FROM( apple2_common )
+	MDRV_IMPORT_FROM( apple2_common )	
 	MDRV_VIDEO_START(apple2p)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("64K")	
+	MDRV_RAM_EXTRA_OPTIONS("16K,32K,48K")
+	/* At the moment the RAM bank $C000-$FFFF is available only if you choose   */
+	/* default configuration: on real machine is present also in configurations */
+	/* with less memory, provided that the language card is installed           */	
 MACHINE_DRIVER_END
 
 ROM_START(las3000)
@@ -653,6 +668,18 @@ ROM_END
 MACHINE_DRIVER_START( apple2e )
 	MDRV_IMPORT_FROM( apple2_common )
 	MDRV_VIDEO_START(apple2e)
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("128K")	
+	MDRV_RAM_EXTRA_OPTIONS("64K")
+MACHINE_DRIVER_END
+
+MACHINE_DRIVER_START( mprof3 )
+	MDRV_IMPORT_FROM( apple2e )	
+	
+	/* internal ram */
+	MDRV_RAM_MODIFY("messram")
+	MDRV_RAM_DEFAULT_SIZE("128K")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( apple2ee )
@@ -927,60 +954,26 @@ ROM_START(ivelultr)
 	ROM_LOAD ( "341-0027-a.rom", 0x4500, 0x0100, CRC(ce7144f6) SHA1(d4181c9f046aafc3fb326b381baac809d9e38d16)) /* Disk II ROM - DOS 3.3 version */
 ROM_END
 
-static SYSTEM_CONFIG_START(apple2)
-	CONFIG_RAM				(4  * 1024)
-	CONFIG_RAM				(8  * 1024)
-	CONFIG_RAM				(12 * 1024)
-	CONFIG_RAM				(16 * 1024)
-	CONFIG_RAM				(20 * 1024)
-	CONFIG_RAM				(24 * 1024)
-	CONFIG_RAM				(32 * 1024)
-	CONFIG_RAM				(36 * 1024)
-	CONFIG_RAM				(48 * 1024)
-	CONFIG_RAM_DEFAULT		(64 * 1024)	/* At the moment the RAM bank $C000-$FFFF is available only if you choose   */
-										/* default configuration: on real machine is present also in configurations */
-										/* with less memory, provided that the language card is installed           */
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START(apple2p)
-	CONFIG_RAM				(16 * 1024)
-	CONFIG_RAM				(32 * 1024)
-	CONFIG_RAM				(48 * 1024)
-	CONFIG_RAM_DEFAULT		(64 * 1024)	/* At the moment the RAM bank $C000-$FFFF is available only if you choose   */
-										/* default configuration: on real machine is present also in configurations */
-										/* with less memory, provided that the language card is installed           */
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START(apple2e)
-	CONFIG_RAM				(64  * 1024)
-	CONFIG_RAM_DEFAULT		(128 * 1024)
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START(mprof3)
-	CONFIG_RAM_DEFAULT		(128 * 1024)
-SYSTEM_CONFIG_END
-
-
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT     INIT CONFIG     COMPANY            FULLNAME */
-COMP( 1977, apple2,   0,        0,	apple2,		apple2,   0,   apple2,	"Apple Computer", "Apple ][" , 0)
-COMP( 1979, apple2p,  apple2,   0,	apple2p,	apple2p,  0,   apple2p,	"Apple Computer", "Apple ][+" , 0)
-COMP( 1982, prav82,   apple2,   0,	apple2p,	apple2p,  0,   apple2p,	"Pravetz", "Pravetz 82" , 0)
-COMP( 1985, prav8m,   apple2,   0,	apple2p,	apple2p,  0,   apple2p,	"Pravetz", "Pravetz 8M" , 0)
-COMP( 1980, apple2jp, apple2,   0,	apple2p,	apple2p,  0,   apple2p,	"Apple Computer", "Apple ][j+" , 0)
-COMP( 1982, ace100,   apple2,   0,	apple2,		apple2e,  0,   apple2,	"Franklin Computer", "Franklin Ace 100" , 0)
-COMP( 1983, apple2e,  0,        apple2,	apple2e,	apple2e,  0,   apple2e,	"Apple Computer", "Apple //e" , 0)
-COMP( 1983, mprof3,   apple2e,  0,	apple2ee,	apple2e,  0,   mprof3,	"Multitech", "Microprofessor III" , 0)
-COMP( 1985, apple2ee, apple2e,  0,	apple2ee,	apple2e,  0,   apple2e,	"Apple Computer", "Apple //e (enhanced)" , 0)
-COMP( 1987, apple2ep, apple2e,  0,	apple2ee,	apple2ep, 0,   apple2e,	"Apple Computer", "Apple //e (Platinum)" , 0)
-COMP( 1984, apple2c,  0,        apple2,	apple2c,	apple2e,  0,   apple2e,	"Apple Computer", "Apple //c" , 0)
-COMP( 1989, prav8c,   apple2c,  0,	apple2c,	apple2e,  0,   apple2e,	"Pravetz", "Pravetz 8C" , 0)
-COMP( 1983, las3000,  apple2,   0,	apple2p,	apple2p,  0,   apple2p,	"Video Technology", "Laser 3000",		GAME_NOT_WORKING )
-COMP( 1987, laser128, apple2c,  0,	apple2c,	apple2e,  0,   apple2e,	"Video Technology", "Laser 128 (rev 4)",		GAME_NOT_WORKING )
-COMP( 1987, las128ex, apple2c,  0,	apple2c,	apple2e,  0,   apple2e,	"Video Technology", "Laser 128ex (rev 4a)",		GAME_NOT_WORKING )
-COMP( 1985, apple2c0, apple2c,  0,	apple2c_iwm,	apple2e,  0,   apple2e,	"Apple Computer", "Apple //c (UniDisk 3.5)" , 0)
-COMP( 1986, apple2c3, apple2c,  0,	apple2c_iwm,	apple2e,  0,   apple2e,	"Apple Computer", "Apple //c (Original Memory Expansion)" , 0)
-COMP( 1986, apple2c4, apple2c,  0,	apple2c_iwm,	apple2e,  0,   apple2e,	"Apple Computer", "Apple //c (rev 4)" , GAME_NOT_WORKING )
-COMP( 1988, apple2cp, apple2c,  0,	apple2c_iwm,	apple2e,  0,   apple2e,	"Apple Computer", "Apple //c Plus" , 0)
-COMP( 1984, ivelultr, apple2,   0,	apple2p,	apple2p,  0,   apple2p,	"Ivasim", "Ivel Ultra" , 0)
-COMP( 1983, agat7, apple2,   0,	apple2p,	apple2p,  0,   apple2p,	"Agat", "Agat-7" , GAME_NOT_WORKING)
-COMP( 1984, agat9, apple2,   0,	apple2p,	apple2p,  0,   apple2p,	"Agat", "Agat-9" , GAME_NOT_WORKING)
+COMP( 1977, apple2,   0,        0,	apple2,		apple2,   0,   0,	"Apple Computer", "Apple ][" , 0)
+COMP( 1979, apple2p,  apple2,   0,	apple2p,	apple2p,  0,   0,	"Apple Computer", "Apple ][+" , 0)
+COMP( 1982, prav82,   apple2,   0,	apple2p,	apple2p,  0,   0,	"Pravetz", "Pravetz 82" , 0)
+COMP( 1985, prav8m,   apple2,   0,	apple2p,	apple2p,  0,   0,	"Pravetz", "Pravetz 8M" , 0)
+COMP( 1980, apple2jp, apple2,   0,	apple2p,	apple2p,  0,   0,	"Apple Computer", "Apple ][j+" , 0)
+COMP( 1982, ace100,   apple2,   0,	apple2,		apple2e,  0,   0,	"Franklin Computer", "Franklin Ace 100" , 0)
+COMP( 1983, apple2e,  0,        apple2,	apple2e,	apple2e,  0,   0,	"Apple Computer", "Apple //e" , 0)
+COMP( 1983, mprof3,   apple2e,  0,	mprof3,	apple2e,  0,   0,	"Multitech", "Microprofessor III" , 0)
+COMP( 1985, apple2ee, apple2e,  0,	apple2ee,	apple2e,  0,   0,	"Apple Computer", "Apple //e (enhanced)" , 0)
+COMP( 1987, apple2ep, apple2e,  0,	apple2ee,	apple2ep, 0,   0,	"Apple Computer", "Apple //e (Platinum)" , 0)
+COMP( 1984, apple2c,  0,        apple2,	apple2c,	apple2e,  0,   0,	"Apple Computer", "Apple //c" , 0)
+COMP( 1989, prav8c,   apple2c,  0,	apple2c,	apple2e,  0,   0,	"Pravetz", "Pravetz 8C" , 0)
+COMP( 1983, las3000,  apple2,   0,	apple2p,	apple2p,  0,   0,	"Video Technology", "Laser 3000",		GAME_NOT_WORKING )
+COMP( 1987, laser128, apple2c,  0,	apple2c,	apple2e,  0,   0,	"Video Technology", "Laser 128 (rev 4)",		GAME_NOT_WORKING )
+COMP( 1987, las128ex, apple2c,  0,	apple2c,	apple2e,  0,   0,	"Video Technology", "Laser 128ex (rev 4a)",		GAME_NOT_WORKING )
+COMP( 1985, apple2c0, apple2c,  0,	apple2c_iwm,	apple2e,  0,   0,	"Apple Computer", "Apple //c (UniDisk 3.5)" , 0)
+COMP( 1986, apple2c3, apple2c,  0,	apple2c_iwm,	apple2e,  0,   0,	"Apple Computer", "Apple //c (Original Memory Expansion)" , 0)
+COMP( 1986, apple2c4, apple2c,  0,	apple2c_iwm,	apple2e,  0,   0,	"Apple Computer", "Apple //c (rev 4)" , GAME_NOT_WORKING )
+COMP( 1988, apple2cp, apple2c,  0,	apple2c_iwm,	apple2e,  0,   0,	"Apple Computer", "Apple //c Plus" , 0)
+COMP( 1984, ivelultr, apple2,   0,	apple2p,	apple2p,  0,   0,	"Ivasim", "Ivel Ultra" , 0)
+COMP( 1983, agat7, apple2,   0,	apple2p,	apple2p,  0,   0,	"Agat", "Agat-7" , GAME_NOT_WORKING)
+COMP( 1984, agat9, apple2,   0,	apple2p,	apple2p,  0,   0,	"Agat", "Agat-9" , GAME_NOT_WORKING)

@@ -17,6 +17,7 @@
 #include "includes/dai.h"
 #include "machine/pit8253.h"
 #include "machine/tms5501.h"
+#include "devices/messram.h"
 
 #define DEBUG_DAI_PORTS	0
 
@@ -147,7 +148,7 @@ MACHINE_START( dai )
 
 MACHINE_RESET( dai )
 {
-	memory_set_bankptr(machine, 1, mess_ram);
+	memory_set_bankptr(machine, 1, messram_get_ptr(devtag_get_device(machine, "messram")));
 	timer_set(machine, attotime_zero, NULL, 0, dai_bootstrap_callback);
 	timer_pulse(machine, ATTOTIME_IN_HZ(100),NULL,0,dai_timer);	/* timer for tms5501 */
 }

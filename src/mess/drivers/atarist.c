@@ -15,6 +15,7 @@
 #include "sound/ay8910.h"
 #include "audio/lmc1992.h"
 #include "includes/atarist.h"
+#include "devices/messram.h"
 
 /*
 
@@ -1447,7 +1448,7 @@ static void atarist_configure_memory(running_machine *machine)
 	const address_space *program = cputag_get_address_space(machine, M68000_TAG, ADDRESS_SPACE_PROGRAM);
 	UINT8 *RAM = memory_region(machine, M68000_TAG);
 
-	switch (mess_ram_size)
+	switch (messram_get_size(devtag_get_device(machine, "messram")))
 	{
 	case 256 * 1024:
 		memory_install_readwrite16_handler(program, 0x000008, 0x03ffff, 0, 0, SMH_BANK(1), SMH_BANK(1));
@@ -1641,7 +1642,7 @@ static void stbook_configure_memory(running_machine *machine)
 	const address_space *program = cputag_get_address_space(machine, M68000_TAG, ADDRESS_SPACE_PROGRAM);
 	UINT8 *RAM = memory_region(machine, M68000_TAG);
 
-	switch (mess_ram_size)
+	switch (messram_get_size(devtag_get_device(machine, "messram")))
 	{
 	case 1024 * 1024:
 		memory_install_readwrite16_handler(program, 0x000008, 0x07ffff, 0, 0x080000, SMH_BANK(1), SMH_BANK(1));
@@ -1854,8 +1855,13 @@ static MACHINE_DRIVER_START( atarist )
 	MDRV_WD1772_ADD(WD1772_TAG, atarist_wd17xx_interface )
 
 	MDRV_FLOPPY_2_DRIVES_ADD(atarist_floppy_config)
-
+	
 	MDRV_IMPORT_FROM(atarist_cartslot)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("1024K")  // 1040ST
+	MDRV_RAM_EXTRA_OPTIONS("512K,256K") //  520ST ,260ST	
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( megast )
@@ -1866,6 +1872,11 @@ static MACHINE_DRIVER_START( megast )
 	MDRV_RP5C15_ADD("rp5c15", rtc_intf)
 
 	MDRV_MACHINE_START(megast)
+	
+	/* internal ram */
+	MDRV_RAM_MODIFY("messram")
+	MDRV_RAM_DEFAULT_SIZE("4M")  //  Mega ST 4
+	MDRV_RAM_EXTRA_OPTIONS("2M,1M") //  Mega ST 2 ,Mega ST 1
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( atariste )
@@ -1920,6 +1931,11 @@ static MACHINE_DRIVER_START( atariste )
 	MDRV_FLOPPY_2_DRIVES_ADD(atarist_floppy_config)
 
 	MDRV_IMPORT_FROM(atarist_cartslot)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("1024K")  // 1040STe
+	MDRV_RAM_EXTRA_OPTIONS("512K") //  520STe	
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( megaste )
@@ -1930,6 +1946,11 @@ static MACHINE_DRIVER_START( megaste )
 	MDRV_RP5C15_ADD("rp5c15", rtc_intf)
 
 	MDRV_MACHINE_START(megaste)
+
+	/* internal ram */
+	MDRV_RAM_MODIFY("messram")
+	MDRV_RAM_DEFAULT_SIZE("4M")  //  Mega STe 4
+	MDRV_RAM_EXTRA_OPTIONS("2M,1M") //  Mega STe 2 ,Mega STe 1
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( stbook )
@@ -1978,6 +1999,11 @@ static MACHINE_DRIVER_START( stbook )
 	MDRV_FLOPPY_2_DRIVES_ADD(atarist_floppy_config)
 
 	MDRV_IMPORT_FROM(atarist_cartslot)
+
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("4M")
+	MDRV_RAM_EXTRA_OPTIONS("1M")
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -2176,40 +2202,27 @@ static void megaste_serial_getinfo(const mess_device_class *devclass, UINT32 sta
 }
 
 static SYSTEM_CONFIG_START( atarist )
-	CONFIG_RAM_DEFAULT(1024 * 1024) // 1040ST
-	CONFIG_RAM		  ( 512 * 1024) //  520ST
-	CONFIG_RAM		  ( 256 * 1024) //  260ST
 	CONFIG_DEVICE(atarist_serial_getinfo)
 	// MIDI
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START( megast )
-	CONFIG_RAM_DEFAULT(4096 * 1024) // Mega ST 4
-	CONFIG_RAM		  (2048 * 1024) // Mega ST 2
-	CONFIG_RAM		  (1024 * 1024) // Mega ST 1
 	CONFIG_DEVICE(atarist_serial_getinfo)
 	// MIDI
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START( atariste )
-	CONFIG_RAM_DEFAULT(1024 * 1024) // 1040STe
-	CONFIG_RAM		  ( 512 * 1024) //  520STe
 	CONFIG_DEVICE(atarist_serial_getinfo)
 	// MIDI
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START( megaste )
-	CONFIG_RAM_DEFAULT(4096 * 1024) // Mega STe 4
-	CONFIG_RAM		  (2048 * 1024) // Mega STe 2
-	CONFIG_RAM		  (1024 * 1024) // Mega STe 1
 	CONFIG_DEVICE(megaste_serial_getinfo)
 	// MIDI
 	// LAN
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START( stbook )
-	CONFIG_RAM_DEFAULT(4096 * 1024)
-	CONFIG_RAM		  (1024 * 1024)
 	CONFIG_DEVICE(megaste_serial_getinfo)
 	// MIDI
 	// IDE Hard Disk

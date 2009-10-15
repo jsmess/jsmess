@@ -96,7 +96,7 @@ interface; no special expansion modules like ieee488 interface
 #include "includes/cbmdrive.h"
 #include "includes/vc1541.h"
 #include "includes/cbmieeeb.h"
-
+#include "devices/messram.h"
 #include "includes/vc20.h"
 
 
@@ -302,6 +302,11 @@ static MACHINE_DRIVER_START( vic20 )
 	MDRV_VIA6522_ADD("via6522_3", 0, vc20_via3)
 
 	MDRV_IMPORT_FROM(vic20_cartslot)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("5K")
+	MDRV_RAM_EXTRA_OPTIONS("8K,16K,24K,32K")	
 MACHINE_DRIVER_END
 
 
@@ -456,20 +461,11 @@ ROM_END
 
 static SYSTEM_CONFIG_START(vic20)
 	CONFIG_DEVICE(cbmfloppy_device_getinfo)
-	CONFIG_RAM_DEFAULT(5 * 1024)
-	CONFIG_RAM(8 * 1024)
-	CONFIG_RAM(16 * 1024)
-	CONFIG_RAM(24 * 1024)
-	CONFIG_RAM(32 * 1024)
+
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(vic20v)
 	CONFIG_DEVICE(vc1541_device_getinfo)
-	CONFIG_RAM_DEFAULT(5 * 1024)
-	CONFIG_RAM(8 * 1024)
-	CONFIG_RAM(16 * 1024)
-	CONFIG_RAM(24 * 1024)
-	CONFIG_RAM(32 * 1024)
 SYSTEM_CONFIG_END
 
 

@@ -7,7 +7,7 @@
 #include "driver.h"
 #include "includes/samcoupe.h"
 #include "machine/msm6242.h"
-
+#include "devices/messram.h"
 
 /***************************************************************************
     CONSTANTS
@@ -45,16 +45,16 @@ static void samcoupe_install_ext_mem(const address_space *space)
 	UINT8 *mem;
 
 	/* bank 3 */
-	if (asic->lext >> 6 < mess_ram_size >> 20)
-		mem = &mess_ram[(mess_ram_size & 0xfffff) + (asic->lext >> 6) * 0x100000 + (asic->lext & 0x3f) * 0x4000];
+	if (asic->lext >> 6 < messram_get_size(devtag_get_device(space->machine, "messram")) >> 20)
+		mem = &messram_get_ptr(devtag_get_device(space->machine, "messram"))[(messram_get_size(devtag_get_device(space->machine, "messram")) & 0xfffff) + (asic->lext >> 6) * 0x100000 + (asic->lext & 0x3f) * 0x4000];
 	else
 		mem = NULL;
 
 	samcoupe_update_bank(space, 3, mem, FALSE);
 
 	/* bank 4 */
-	if (asic->hext >> 6 < mess_ram_size >> 20)
-		mem = &mess_ram[(mess_ram_size & 0xfffff) + (asic->hext >> 6) * 0x100000 + (asic->hext & 0x3f) * 0x4000];
+	if (asic->hext >> 6 < messram_get_size(devtag_get_device(space->machine, "messram")) >> 20)
+		mem = &messram_get_ptr(devtag_get_device(space->machine, "messram"))[(messram_get_size(devtag_get_device(space->machine, "messram")) & 0xfffff) + (asic->hext >> 6) * 0x100000 + (asic->hext & 0x3f) * 0x4000];
 	else
 		mem = NULL;
 
@@ -65,7 +65,7 @@ static void samcoupe_install_ext_mem(const address_space *space)
 void samcoupe_update_memory(const address_space *space)
 {
 	coupe_asic *asic = space->machine->driver_data;
-	const int PAGE_MASK = ((mess_ram_size & 0xfffff) / 0x4000) - 1;
+	const int PAGE_MASK = ((messram_get_size(devtag_get_device(space->machine, "messram")) & 0xfffff) / 0x4000) - 1;
 	UINT8 *rom = memory_region(space->machine, "maincpu");
 	UINT8 *memory;
 	int is_readonly;
@@ -74,7 +74,7 @@ void samcoupe_update_memory(const address_space *space)
     if (asic->lmpr & LMPR_RAM0)   /* Is ram paged in at bank 1 */
 	{
 		if ((asic->lmpr & 0x1F) <= PAGE_MASK)
-			memory = &mess_ram[(asic->lmpr & PAGE_MASK) * 0x4000];
+			memory = &messram_get_ptr(devtag_get_device(space->machine, "messram"))[(asic->lmpr & PAGE_MASK) * 0x4000];
 		else
 			memory = NULL;	/* Attempt to page in non existant ram region */
 		is_readonly = FALSE;
@@ -89,7 +89,7 @@ void samcoupe_update_memory(const address_space *space)
 
 	/* BANK2 */
 	if (((asic->lmpr + 1) & 0x1f) <= PAGE_MASK)
-		memory = &mess_ram[((asic->lmpr + 1) & PAGE_MASK) * 0x4000];
+		memory = &messram_get_ptr(devtag_get_device(space->machine, "messram"))[((asic->lmpr + 1) & PAGE_MASK) * 0x4000];
 	else
 		memory = NULL;	/* Attempt to page in non existant ram region */
 	samcoupe_update_bank(space, 2, memory, FALSE);
@@ -103,7 +103,7 @@ void samcoupe_update_memory(const address_space *space)
 	{
 		/* BANK3 */
 		if ((asic->hmpr & 0x1F) <= PAGE_MASK )
-			memory = &mess_ram[(asic->hmpr & PAGE_MASK)*0x4000];
+			memory = &messram_get_ptr(devtag_get_device(space->machine, "messram"))[(asic->hmpr & PAGE_MASK)*0x4000];
 		else
 			memory = NULL;	/* Attempt to page in non existant ram region */
 		samcoupe_update_bank(space, 3, memory, FALSE);
@@ -118,7 +118,7 @@ void samcoupe_update_memory(const address_space *space)
 		else
 		{
 			if (((asic->hmpr + 1) & 0x1f) <= PAGE_MASK)
-				memory = &mess_ram[((asic->hmpr + 1) & PAGE_MASK) * 0x4000];
+				memory = &messram_get_ptr(devtag_get_device(space->machine, "messram"))[((asic->hmpr + 1) & PAGE_MASK) * 0x4000];
 			else
 				memory = NULL;	/* Attempt to page in non existant ram region */
 			is_readonly = FALSE;
@@ -128,9 +128,9 @@ void samcoupe_update_memory(const address_space *space)
 
 	/* video memory location */
 	if (asic->vmpr & 0x40)	/* if bit set in 2 bank screen mode */
-		videoram = &mess_ram[((asic->vmpr & 0x1e) & PAGE_MASK) * 0x4000];
+		videoram = &messram_get_ptr(devtag_get_device(space->machine, "messram"))[((asic->vmpr & 0x1e) & PAGE_MASK) * 0x4000];
 	else
-		videoram = &mess_ram[((asic->vmpr & 0x1f) & PAGE_MASK) * 0x4000];
+		videoram = &messram_get_ptr(devtag_get_device(space->machine, "messram"))[((asic->vmpr & 0x1f) & PAGE_MASK) * 0x4000];
 }
 
 

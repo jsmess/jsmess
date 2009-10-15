@@ -53,6 +53,7 @@ Todo:
 #include "machine/ctronics.h"
 #include "cpu/z80/z80.h"
 #include "sound/speaker.h"
+#include "devices/messram.h"
 
 #define LOG_VTECH1_LATCH 0
 #define LOG_VTECH1_FDC   0
@@ -84,18 +85,18 @@ static int vtech1_fdc_latch = 0;
 static void common_init_machine(running_machine *machine, int base)
 {
 	/* internal ram */
-	memory_configure_bank(machine, 1, 0, 1, mess_ram, 0);
+	memory_configure_bank(machine, 1, 0, 1, messram_get_ptr(devtag_get_device(machine, "messram")), 0);
 	memory_set_bank(machine, 1, 0);
 
 	/* expansion memory configuration */
-	switch (mess_ram_size) {
+	switch (messram_get_size(devtag_get_device(machine, "messram"))) {
 		case 18 * 1024:
 		case 22 * 1024:
 		case 32 * 1024:
 			/* install 16KB memory expansion */
 			memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), base, base + 0x3fff, 0, 0, SMH_BANK(2));
 			memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), base, base + 0x3fff, 0, 0, SMH_BANK(2));
-			memory_configure_bank(machine, 2, 0, 1, mess_ram + base - 0x7800, 0);
+			memory_configure_bank(machine, 2, 0, 1, messram_get_ptr(devtag_get_device(machine, "messram")) + base - 0x7800, 0);
 			memory_set_bank(machine, 2, 0);
 
 			memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), base + 0x4000, 0xffff, 0, 0, SMH_NOP);
@@ -109,13 +110,13 @@ static void common_init_machine(running_machine *machine, int base)
 			/* install fixed first bank */
 			memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0, SMH_BANK(2));
 			memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0, SMH_BANK(2));
-			memory_configure_bank(machine, 2, 0, 1, mess_ram + 0x800, 0);
+			memory_configure_bank(machine, 2, 0, 1, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x800, 0);
 			memory_set_bank(machine, 2, 0);
 
 			/* install the others, dynamically banked in */
 			memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xffff, 0, 0, SMH_BANK(3));
 			memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xffff, 0, 0, SMH_BANK(3));
-			memory_configure_bank(machine, 3, 0, (mess_ram_size - 0x4800) / 0x4000, mess_ram + 0x4800, 0x4000);
+			memory_configure_bank(machine, 3, 0, (messram_get_size(devtag_get_device(machine, "messram")) - 0x4800) / 0x4000, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4800, 0x4000);
 			memory_set_bank(machine, 3, 0);
 			break;
 
@@ -155,7 +156,7 @@ WRITE8_HANDLER (vtech1_memory_bank_w)
 	logerror("vtech1_memory_bank_w $%02X\n", data);
 
 	if (data >= 1)
-		if ((data <= 3 && (mess_ram_size == (66 * 1024))) || (mess_ram_size == (4098 * 1024)))
+		if ((data <= 3 && (messram_get_size(devtag_get_device(space->machine, "messram")) == (66 * 1024))) || (messram_get_size(devtag_get_device(space->machine, "messram")) == (4098 * 1024)))
 			memory_set_bank(space->machine, 3, data - 1);
 }
 
@@ -192,7 +193,7 @@ SNAPSHOT_LOAD(vtech1)
 	size = end - start;
 
 	/* check if we have enough ram */
-	if (mess_ram_size < size)
+	if (messram_get_size(devtag_get_device(image->machine, "messram")) < size)
 	{
 		char message[256];
 		snprintf(message, ARRAY_LENGTH(message), "SNAPLOAD: %s\nInsufficient RAM - need %04X",pgmname,size);
@@ -202,7 +203,7 @@ SNAPSHOT_LOAD(vtech1)
 	}
 
 	/* write it to ram */
-	image_fread(image, &mess_ram[start - 0x7800], size);
+	image_fread(image, &messram_get_ptr(devtag_get_device(image->machine, "messram"))[start - 0x7800], size);
 
 	/* patch variables depending on snapshot type */
 	switch (header[21])

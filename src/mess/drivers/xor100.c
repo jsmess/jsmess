@@ -49,6 +49,7 @@
 #include "machine/msm8251.h"
 #include "machine/wd17xx.h"
 #include "machine/z80ctc.h"
+#include "devices/messram.h"
 
 /* Read/Write Handlers */
 
@@ -268,15 +269,15 @@ static MACHINE_START( xor100 )
 	memory_install_readwrite8_handler(program, 0xf800, 0xffff, 0, 0, SMH_BANK(3), SMH_BANK(4));
 
 	memory_configure_bank(machine, 1, 0, 1, memory_region(machine, Z80_TAG) + 0xf800, 0);
-	memory_configure_bank(machine, 1, 1, 1, mess_ram, 0);
+	memory_configure_bank(machine, 1, 1, 1, messram_get_ptr(devtag_get_device(machine, "messram")), 0);
 
-	memory_configure_bank(machine, 2, 0, 1, mess_ram, 0);
+	memory_configure_bank(machine, 2, 0, 1, messram_get_ptr(devtag_get_device(machine, "messram")), 0);
 	memory_set_bank(machine, 2, 0);
 
 	memory_configure_bank(machine, 3, 0, 1, memory_region(machine, Z80_TAG) + 0xf800, 0);
-	memory_configure_bank(machine, 3, 1, 1, mess_ram + 0xf800, 0);
+	memory_configure_bank(machine, 3, 1, 1, messram_get_ptr(devtag_get_device(machine, "messram")) + 0xf800, 0);
 
-	memory_configure_bank(machine, 4, 0, 1, mess_ram + 0xf800, 0);
+	memory_configure_bank(machine, 4, 0, 1, messram_get_ptr(devtag_get_device(machine, "messram")) + 0xf800, 0);
 	memory_set_bank(machine, 4, 0);
 }
 
@@ -354,6 +355,10 @@ static MACHINE_DRIVER_START( xor100 )
 	MDRV_FLOPPY_2_DRIVES_ADD(xor100_floppy_config)
 
 	MDRV_CASSETTE_ADD(CASSETTE_TAG, xor100_cassette_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("64K")	
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -363,13 +368,8 @@ ROM_START( xor100 )
 	ROM_LOAD( "xp 185.8b", 0xf800, 0x0800, CRC(0d0bda8d) SHA1(11c83f7cd7e6a570641b44a2f2cc5737a7dd8ae3) )
 ROM_END
 
-/* System Configuration */
-
-static SYSTEM_CONFIG_START( xor100 )
-	CONFIG_RAM_DEFAULT( 64 * 1024 )
-SYSTEM_CONFIG_END
 
 /* System Drivers */
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    CONFIG      COMPANY                 FULLNAME        FLAGS */
-COMP( 1982, xor100,		0,		0,		xor100,		xor100,		0,		xor100,		"Xor Data Science",		"XOR S-100-12",	GAME_NOT_WORKING )
+COMP( 1982, xor100,		0,		0,		xor100,		xor100,		0,		0,		"Xor Data Science",		"XOR S-100-12",	GAME_NOT_WORKING )

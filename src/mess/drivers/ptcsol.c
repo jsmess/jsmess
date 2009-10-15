@@ -26,6 +26,7 @@
 
 #include "driver.h"
 #include "cpu/i8085/i8085.h"
+#include "devices/messram.h"
 
 static ADDRESS_MAP_START( sol20_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -74,6 +75,11 @@ static MACHINE_DRIVER_START( sol20 )
 
 	MDRV_VIDEO_START(sol20)
 	MDRV_VIDEO_UPDATE(sol20)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("8K")
+	MDRV_RAM_EXTRA_OPTIONS("16K,32K")
 MACHINE_DRIVER_END
 
 /* ROM definition */
@@ -82,12 +88,6 @@ ROM_START( sol20 )
 	ROM_LOAD( "solos.rom", 0xc000, 0x0800, BAD_DUMP CRC(4d0af383) SHA1(ac4510c3380ed4a31ccf4f538af3cb66b76701ef) )	// from solace emu
 ROM_END
 
-static SYSTEM_CONFIG_START( sol20 )
-	CONFIG_RAM_DEFAULT(8 * 1024)
-	CONFIG_RAM(16 * 1024)
-	CONFIG_RAM(32 * 1024)
-SYSTEM_CONFIG_END
-
 /* Driver */
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  INIT   CONFIG COMPANY     FULLNAME   FLAGS */
-COMP( 1976, sol20,  0,      0,      sol20,   sol20, 0,     sol20, "Processor Technology Corporation",  "SOL-20", GAME_NOT_WORKING)
+COMP( 1976, sol20,  0,      0,      sol20,   sol20, 0,     0, "Processor Technology Corporation",  "SOL-20", GAME_NOT_WORKING)

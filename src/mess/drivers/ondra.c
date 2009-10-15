@@ -11,6 +11,7 @@
 #include "cpu/z80/z80.h"
 #include "sound/wave.h"
 #include "devices/cassette.h"
+#include "devices/messram.h"
 #include "includes/ondra.h"
 
 /* Address maps */
@@ -146,11 +147,11 @@ static MACHINE_DRIVER_START( ondra )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MDRV_CASSETTE_ADD( "cassette", ondra_cassette_config )
-MACHINE_DRIVER_END
 
-static SYSTEM_CONFIG_START(ondra)
-	CONFIG_RAM_DEFAULT(64 * 1024)
-SYSTEM_CONFIG_END
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("64K")
+MACHINE_DRIVER_END
 
 /* ROM definition */
 
@@ -181,6 +182,6 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       INIT     CONFIG COMPANY          FULLNAME       FLAGS */
-COMP( 1989, ondrat, 0, 		0,		ondra, 		ondra, 		ondra, 	 ondra, "Tesla",		 "Ondra",	 	0)
-COMP( 1989, ondrav, ondrat,	0,		ondra, 		ondra, 		ondra, 	 ondra, "ViLi",		 	 "Ondra ViLi",	0)
+COMP( 1989, ondrat, 0, 		0,		ondra, 		ondra, 		ondra, 	 0, "Tesla",		 "Ondra",	 	0)
+COMP( 1989, ondrav, ondrat,	0,		ondra, 		ondra, 		ondra, 	 0, "ViLi",		 	 "Ondra ViLi",	0)
 

@@ -22,6 +22,7 @@
 #include "machine/wd17xx.h"
 #include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
+#include "devices/messram.h"
 
 #define ENTERPRISE_XTAL_X1	XTAL_8MHz
 
@@ -72,10 +73,10 @@ static void enterprise_update_memory_page(const address_space *space, offs_t pag
 	case 0xfa:
 	case 0xfb:
 		/* additional 64k ram */
-		if (mess_ram_size == 128*1024)
+		if (messram_get_size(devtag_get_device(space->machine, "messram")) == 128*1024)
 		{
 			memory_install_readwrite8_handler(space, start, end, 0, 0, SMH_BANK((FPTR)page), SMH_BANK((FPTR)page));
-			memory_set_bankptr(space->machine, page, mess_ram + (index - 0xf4) * 0x4000);
+			memory_set_bankptr(space->machine, page, messram_get_ptr(devtag_get_device(space->machine, "messram")) + (index - 0xf4) * 0x4000);
 		}
 		else
 		{
@@ -89,7 +90,7 @@ static void enterprise_update_memory_page(const address_space *space, offs_t pag
 	case 0xff:
 		/* basic 64k ram */
 		memory_install_readwrite8_handler(space, start, end, 0, 0, SMH_BANK((FPTR)page), SMH_BANK((FPTR)page));
-		memory_set_bankptr(space->machine, page, mess_ram + (index - 0xfc) * 0x4000);
+		memory_set_bankptr(space->machine, page, messram_get_ptr(devtag_get_device(space->machine, "messram")) + (index - 0xfc) * 0x4000);
 		break;
 
 	default:
@@ -479,6 +480,17 @@ static MACHINE_DRIVER_START( ep64 )
 	MDRV_WD1770_ADD("wd1770", enterp_wd1770_interface )
 
 	MDRV_FLOPPY_4_DRIVES_ADD(enterprise_floppy_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("64K") 	
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( ep128 )
+	MDRV_IMPORT_FROM(ep64)
+	/* internal ram */
+	MDRV_RAM_MODIFY("messram")
+	MDRV_RAM_DEFAULT_SIZE("128K") 	
 MACHINE_DRIVER_END
 
 
@@ -534,24 +546,11 @@ ROM_START( phc64 )
 	ROM_LOAD("exdos13.rom", 0x0000, 0x8000, CRC(d1d7e157) SHA1(31c8be089526aa8aa019c380cdf51ddd3ee76454))
 ROM_END
 
-
-/***************************************************************************
-    SYSTEM CONFIG
-***************************************************************************/
-static SYSTEM_CONFIG_START(ep64)
-	CONFIG_RAM_DEFAULT(64*1024)
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START(ep128)
-	CONFIG_RAM_DEFAULT(128*1024)
-SYSTEM_CONFIG_END
-
-
 /***************************************************************************
     GAME DRIVERS
 ***************************************************************************/
 
 /*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  INIT  CONFIG  COMPANY                 FULLNAME */
-COMP( 1985, ep64,  0,      0,      ep64,    ep64, 0,    ep64,   "Intelligent Software", "Enterprise 64", GAME_IMPERFECT_SOUND )
-COMP( 1985, ep128, ep64,   0,      ep64,    ep64, 0,    ep128,  "Intelligent Software", "Enterprise 128", GAME_IMPERFECT_SOUND )
-COMP( 1985, phc64, ep64,   0,      ep64,    ep64, 0,    ep64,   "Hegener & Glaser",     "Mephisto PHC 64", GAME_IMPERFECT_SOUND )
+COMP( 1985, ep64,  0,      0,      ep64,    ep64, 0,    0,   "Intelligent Software", "Enterprise 64", GAME_IMPERFECT_SOUND )
+COMP( 1985, ep128, ep64,   0,      ep128,   ep64, 0,    0,  "Intelligent Software", "Enterprise 128", GAME_IMPERFECT_SOUND )
+COMP( 1985, phc64, ep64,   0,      ep64,    ep64, 0,    0,   "Hegener & Glaser",     "Mephisto PHC 64", GAME_IMPERFECT_SOUND )

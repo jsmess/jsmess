@@ -107,6 +107,7 @@ Some bugs left :
 #include "devices/cassette.h"
 #include "formats/tzx_cas.h"
 
+#include "devices/messram.h"
 
 #define MANUFACTURER_NAME 0x07
 #define TV_REFRESH_RATE 0x10
@@ -913,6 +914,10 @@ static MACHINE_DRIVER_START( amstrad )
 	MDRV_NEC765A_ADD("nec765", amstrad_nec765_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(cpc6128_floppy_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("128K")
 MACHINE_DRIVER_END
 
 
@@ -973,6 +978,10 @@ static MACHINE_DRIVER_START( cpcplus )
 	MDRV_IMPORT_FROM(cpcplus_cartslot)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(cpc6128_floppy_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("128K")	
 MACHINE_DRIVER_END
 
 
@@ -1011,6 +1020,10 @@ static MACHINE_DRIVER_START( gx4000 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MDRV_IMPORT_FROM(cpcplus_cartslot)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("64K")	
 MACHINE_DRIVER_END
 
 
@@ -1027,6 +1040,10 @@ static MACHINE_DRIVER_START( aleste )
 	MDRV_NEC765A_MODIFY("nec765", aleste_8272_interface)
 
 	MDRV_FLOPPY_2_DRIVES_MODIFY(aleste_floppy_config)
+	
+	/* internal ram */
+	MDRV_RAM_MODIFY("messram")
+	MDRV_RAM_DEFAULT_SIZE("2M")
 MACHINE_DRIVER_END
 
 
@@ -1142,29 +1159,6 @@ ROM_START( al520ex )
 	ROM_LOAD("romram.bin", 0x00, 0x100, CRC(b3ea95d7) SHA1(1252390737a7ead4ecec988c873181798fbc291b))
 ROM_END
 
-
-
-/*************************************
- *
- *  System configs
- *
- *************************************/
-static SYSTEM_CONFIG_START( cpc6128 )
-	CONFIG_RAM_DEFAULT(128 * 1024)
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START( cpcplus )
-	CONFIG_IMPORT_FROM(cpc6128)
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START( gx4000 )
-	CONFIG_RAM_DEFAULT(64 * 1024)  // has 64k RAM
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START( aleste )
-	CONFIG_RAM_DEFAULT(2048 * 1024)  // has 2048k RAM
-SYSTEM_CONFIG_END
-
 /*************************************
  *
  *  Driver definitions
@@ -1172,13 +1166,13 @@ SYSTEM_CONFIG_END
  *************************************/
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE  INPUT     INIT     CONFIG   COMPANY                FULLNAME                                     FLAGS */
-COMP( 1984, cpc464,   0,        0,      amstrad, cpc464,   0,       cpc6128, "Amstrad plc",         "Amstrad CPC464",                            0 )
-COMP( 1985, cpc664,   cpc464,   0,      amstrad, cpc664,   0,       cpc6128, "Amstrad plc",         "Amstrad CPC664",                            0 )
-COMP( 1985, cpc6128,  cpc464,   0,      amstrad, cpc6128,  0,       cpc6128, "Amstrad plc",         "Amstrad CPC6128",                           0 )
-COMP( 1985, cpc6128f, cpc464,   0,      amstrad, cpc6128f, 0,       cpc6128, "Amstrad plc",         "Amstrad CPC6128 (France, AZERTY Keyboard)", 0 )
-COMP( 1985, cpc6128s, cpc464,   0,      amstrad, cpc6128s, 0,       cpc6128, "Amstrad plc",         "Amstrad CPC6128 (Sweden/Finland)",			 0 )
-COMP( 1990, cpc464p,  0,        0,      cpcplus, plus,     0,       cpcplus, "Amstrad plc",         "Amstrad CPC464+",                           0 )
-COMP( 1990, cpc6128p, 0,        0,      cpcplus, plus,     0,       cpcplus, "Amstrad plc",         "Amstrad CPC6128+",                          0 )
-CONS( 1990, gx4000,   0,        0,      gx4000,  gx4000,   0,       gx4000,  "Amstrad plc",         "Amstrad GX4000",                            0 )
-COMP( 1989, kccomp,   cpc464,   0,      kccomp,  kccomp,   0,       cpc6128, "VEB Mikroelektronik", "KC Compact",                                0 )
-COMP( 1993, al520ex,  cpc464,   0,      aleste,  aleste,   aleste,  aleste,  "Patisonic",           "Aleste 520EX",                              GAME_IMPERFECT_SOUND )
+COMP( 1984, cpc464,   0,        0,      amstrad, cpc464,   0,       0, "Amstrad plc",         "Amstrad CPC464",                            0 )
+COMP( 1985, cpc664,   cpc464,   0,      amstrad, cpc664,   0,       0, "Amstrad plc",         "Amstrad CPC664",                            0 )
+COMP( 1985, cpc6128,  cpc464,   0,      amstrad, cpc6128,  0,       0, "Amstrad plc",         "Amstrad CPC6128",                           0 )
+COMP( 1985, cpc6128f, cpc464,   0,      amstrad, cpc6128f, 0,       0, "Amstrad plc",         "Amstrad CPC6128 (France, AZERTY Keyboard)", 0 )
+COMP( 1985, cpc6128s, cpc464,   0,      amstrad, cpc6128s, 0,       0, "Amstrad plc",         "Amstrad CPC6128 (Sweden/Finland)",			 0 )
+COMP( 1990, cpc464p,  0,        0,      cpcplus, plus,     0,       0, "Amstrad plc",         "Amstrad CPC464+",                           0 )
+COMP( 1990, cpc6128p, 0,        0,      cpcplus, plus,     0,       0, "Amstrad plc",         "Amstrad CPC6128+",                          0 )
+CONS( 1990, gx4000,   0,        0,      gx4000,  gx4000,   0,       0,  "Amstrad plc",         "Amstrad GX4000",                            0 )
+COMP( 1989, kccomp,   cpc464,   0,      kccomp,  kccomp,   0,       0, "VEB Mikroelektronik", "KC Compact",                                0 )
+COMP( 1993, al520ex,  cpc464,   0,      aleste,  aleste,   aleste,  0,  "Patisonic",           "Aleste 520EX",                              GAME_IMPERFECT_SOUND )

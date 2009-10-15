@@ -95,6 +95,7 @@
 #include "devices/flopdrv.h"
 #include "devices/cassette.h"
 #include "formats/z80ne_dsk.h"
+#include "devices/messram.h"
 
 /* peripheral chips */
 #include "machine/ay31015.h"
@@ -477,6 +478,10 @@ static MACHINE_DRIVER_START( z80ne )
 	MDRV_CASSETTE_ADD( "cassetteb", z80ne_cassetteb_config )
 
 	MDRV_DEFAULT_LAYOUT(layout_z80ne)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("32K")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( z80net )
@@ -505,6 +510,11 @@ static MACHINE_DRIVER_START( z80net )
 	MDRV_MC6847_PALETTE(lx388palette)
 
 	MDRV_DEFAULT_LAYOUT(layout_z80net)
+	
+	/* internal ram */
+	MDRV_RAM_MODIFY("messram")
+	MDRV_RAM_DEFAULT_SIZE("32K")
+	MDRV_RAM_EXTRA_OPTIONS("1K")	
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( z80netb )
@@ -536,6 +546,11 @@ static MACHINE_DRIVER_START( z80netb )
 	MDRV_MC6847_ADD("mc6847", z80net_mc6847_intf)
 	MDRV_MC6847_TYPE(M6847_VERSION_ORIGINAL_PAL)
 	MDRV_MC6847_PALETTE(lx388palette)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("32K")
+	MDRV_RAM_EXTRA_OPTIONS("1K")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( z80netf )
@@ -571,6 +586,10 @@ static MACHINE_DRIVER_START( z80netf )
 	MDRV_FLOPPY_4_DRIVES_ADD(z80netf_floppy_config)
 
 	MDRV_DEFAULT_LAYOUT(layout_z80netf)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("56K")
 MACHINE_DRIVER_END
 
 /******************************************************************************
@@ -626,32 +645,8 @@ ROM_START( z80netf )
 	ROM_LOAD( "ep2390.ic6", 0x14C00, 0x0400, CRC(28d28eee) SHA1(b80f75c1ac4905ae369ecbc9b9ce120cc85502ed) )
 ROM_END
 
-
-/******************************************************************************
- System Config
-******************************************************************************/
-
-
-static SYSTEM_CONFIG_START( z80ne )
-	CONFIG_RAM_DEFAULT( 32 * 1024 )
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START( z80net )
-	CONFIG_RAM_DEFAULT( 32 * 1024 )
-	CONFIG_RAM( 1 * 1024 )
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START( z80netb )
-	CONFIG_RAM_DEFAULT( 32 * 1024 )
-	CONFIG_RAM( 1 * 1024 )
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START( z80netf )
-	CONFIG_RAM_DEFAULT( 56 * 1024 )
-SYSTEM_CONFIG_END
-
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT     CONFIG   COMPANY               FULLNAME                      FLAGS */
-COMP( 1980,	z80ne,    0,        0,      z80ne,    z80ne,    z80ne,   z80ne,   "Nuova Elettronica",	"Z80NE",                      GAME_NO_SOUND | GAME_COMPUTER)
-COMP( 1980,	z80net,   z80ne,    0,      z80net,   z80net,   z80net,  z80net,  "Nuova Elettronica",	"Z80NE + LX.388",             GAME_NO_SOUND | GAME_COMPUTER)
-COMP( 1980,	z80netb,  z80ne,    0,      z80netb,  z80net,   z80netb, z80netb, "Nuova Elettronica",	"Z80NE + LX.388 + Basic 16k", GAME_NO_SOUND | GAME_COMPUTER)
-COMP( 1980,	z80netf,  z80ne,    0,      z80netf,  z80netf,  z80netf, z80netf, "Nuova Elettronica",	"Z80NE + LX.388 + LX.390",    GAME_NO_SOUND | GAME_COMPUTER)
+COMP( 1980,	z80ne,    0,        0,      z80ne,    z80ne,    z80ne,   0, "Nuova Elettronica",	"Z80NE",                      GAME_NO_SOUND | GAME_COMPUTER)
+COMP( 1980,	z80net,   z80ne,    0,      z80net,   z80net,   z80net,  0, "Nuova Elettronica",	"Z80NE + LX.388",             GAME_NO_SOUND | GAME_COMPUTER)
+COMP( 1980,	z80netb,  z80ne,    0,      z80netb,  z80net,   z80netb, 0, "Nuova Elettronica",	"Z80NE + LX.388 + Basic 16k", GAME_NO_SOUND | GAME_COMPUTER)
+COMP( 1980,	z80netf,  z80ne,    0,      z80netf,  z80netf,  z80netf, 0, "Nuova Elettronica",	"Z80NE + LX.388 + LX.390",    GAME_NO_SOUND | GAME_COMPUTER)

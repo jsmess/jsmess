@@ -7,6 +7,7 @@
 ****************************************************************************/
 
 #include "driver.h"
+#include "devices/messram.h"
 #include "cpu/mcs51/mcs51.h"
 
 static ADDRESS_MAP_START(vt520_mem, ADDRESS_SPACE_PROGRAM, 8)
@@ -73,13 +74,13 @@ static MACHINE_DRIVER_START( vt520 )
 
     MDRV_VIDEO_START(vt520)
     MDRV_VIDEO_UPDATE(vt520)
-MACHINE_DRIVER_END
-
-static SYSTEM_CONFIG_START(vt520)
+	
 	// On the board there are two M5M44256BJ-7 chips
 	// Which are DRAM 256K x 4bit
-	CONFIG_RAM_DEFAULT(256 * 1024)
-SYSTEM_CONFIG_END
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("256K")
+MACHINE_DRIVER_END
 
 /* ROM definition */
 ROM_START( vt520 )
@@ -90,6 +91,6 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-//COMP( 1993, vt510,  0,       0,   vt520,  vt520,   0,       vt520,     "DEC",   "VT510",      GAME_NOT_WORKING)
-COMP( 1994, vt520,  0,       0, 	vt520, 	vt520, 	 0,  	  vt520,  	 "DEC",   "VT520",		GAME_NOT_WORKING)
-//COMP( 1994, vt525,  0,       0,   vt520,  vt520,   0,       vt520,     "DEC",   "VT525",      GAME_NOT_WORKING)
+//COMP( 1993, vt510,  0,       0,   vt520,  vt520,   0,       0,     "DEC",   "VT510",      GAME_NOT_WORKING)
+COMP( 1994, vt520,  0,       0, 	vt520, 	vt520, 	 0,  	  0,  	 "DEC",   "VT520",		GAME_NOT_WORKING)
+//COMP( 1994, vt525,  0,       0,   vt520,  vt520,   0,       0,     "DEC",   "VT525",      GAME_NOT_WORKING)

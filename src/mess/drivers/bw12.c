@@ -37,7 +37,7 @@
 #include "machine/kb3600.h"
 #include "video/mc6845.h"
 #include "sound/dac.h"
-
+#include "devices/messram.h"
 /*
 
     TODO:
@@ -70,7 +70,7 @@ static void bw12_bankswitch(running_machine *machine)
 
 	case 2: /* BK1 */
 	case 3: /* BK2 */
-		if (mess_ram_size > 64*1024)
+		if (messram_get_size(devtag_get_device(machine, "messram")) > 64*1024)
 		{
 			memory_install_readwrite8_handler(program, 0x0000, 0x7fff, 0, 0, SMH_BANK(1), SMH_BANK(1));
 		}
@@ -692,8 +692,8 @@ static MACHINE_START( bw12 )
 
 	/* setup memory banking */
 	memory_configure_bank(machine, 1, 0, 1, memory_region(machine, Z80_TAG), 0);
-	memory_configure_bank(machine, 1, 1, 1, mess_ram, 0);
-	memory_configure_bank(machine, 1, 2, 2, mess_ram + 0x10000, 0x8000);
+	memory_configure_bank(machine, 1, 1, 1, messram_get_ptr(devtag_get_device(machine, "messram")), 0);
+	memory_configure_bank(machine, 1, 2, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000, 0x8000);
 
 	/* register for state saving */
 	state_save_register_global(machine, state->bank);
@@ -808,6 +808,18 @@ static MACHINE_DRIVER_START( bw12 )
 	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, bw12_centronics_intf)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(bw12_floppy_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("64K")
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( bw14 )
+	MDRV_IMPORT_FROM(bw12)
+	
+	/* internal ram */
+	MDRV_RAM_MODIFY("messram")
+	MDRV_RAM_DEFAULT_SIZE("128K")
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -822,17 +834,8 @@ ROM_END
 
 #define rom_bw14 rom_bw12
 
-/* System Configurations */
-static SYSTEM_CONFIG_START( bw12 )
-	CONFIG_RAM_DEFAULT( 64 * 1024 )
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START( bw14 )
-	CONFIG_RAM_DEFAULT( 128 * 1024 )
-SYSTEM_CONFIG_END
-
 /* System Drivers */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY                             FULLNAME        FLAGS */
-COMP( 1984,	bw12,	0,		0,		bw12, 	bw12,	0,		bw12,	"Bondwell International Limited",   "Bondwell 12",	GAME_SUPPORTS_SAVE )
-COMP( 1984,	bw14,	bw12,	0,		bw12,	bw12,	0,		bw14,	"Bondwell International Limited",   "Bondwell 14",	GAME_SUPPORTS_SAVE )
+COMP( 1984,	bw12,	0,		0,		bw12, 	bw12,	0,		0,	"Bondwell International Limited",   "Bondwell 12",	GAME_SUPPORTS_SAVE )
+COMP( 1984,	bw14,	bw12,	0,		bw12,	bw12,	0,		0,	"Bondwell International Limited",   "Bondwell 14",	GAME_SUPPORTS_SAVE )

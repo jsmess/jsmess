@@ -15,6 +15,7 @@
 #include "devices/cassette.h"
 #include "machine/z80pio.h"
 #include "machine/z80ctc.h"
+#include "devices/messram.h"
 #include "poly880.lh"
 
 /*
@@ -307,6 +308,10 @@ static MACHINE_DRIVER_START( poly880 )
 	MDRV_Z80PIO_ADD(Z80PIO2_TAG, pio2_intf)
 
 	MDRV_CASSETTE_ADD(CASSETTE_TAG, poly880_cassette_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("1K")	
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -317,13 +322,7 @@ ROM_START( poly880 )
 	ROM_LOAD( "poly880.i6", 0x1000, 0x0400, CRC(9efddf5b) SHA1(6ffa2f80b2c6f8ec9e22834f739c82f9754272b8) )
 ROM_END
 
-/* System Configuration */
-
-static SYSTEM_CONFIG_START( poly880 )
-	CONFIG_RAM_DEFAULT( 1 * 1024 )
-SYSTEM_CONFIG_END
-
 /* System Drivers */
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    CONFIG      COMPANY             FULLNAME                FLAGS */
-COMP( 1983, poly880,	0,		0,		poly880,	poly880,	0,		poly880,	"VEB Polytechnik",	"Poly-Computer 880",	GAME_SUPPORTS_SAVE )
+COMP( 1983, poly880,	0,		0,		poly880,	poly880,	0,		0,	"VEB Polytechnik",	"Poly-Computer 880",	GAME_SUPPORTS_SAVE )

@@ -9,6 +9,7 @@
 
 #include "driver.h"
 #include "includes/vector06.h"
+#include "devices/messram.h"
 
 VIDEO_START( vector06 )
 {
@@ -32,10 +33,10 @@ VIDEO_UPDATE( vector06 )
 		{
 			// port A form 8255 also used as scroll
 			draw_y = ((255-y-vector06_keyboard_mask) & 0xff) +32;
-			code1 = mess_ram[0x8000 + x*256 + y];
-			code2 = mess_ram[0xa000 + x*256 + y];
-			code3 = mess_ram[0xc000 + x*256 + y];
-			code4 = mess_ram[0xe000 + x*256 + y];
+			code1 = messram_get_ptr(devtag_get_device(screen->machine, "messram"))[0x8000 + x*256 + y];
+			code2 = messram_get_ptr(devtag_get_device(screen->machine, "messram"))[0xa000 + x*256 + y];
+			code3 = messram_get_ptr(devtag_get_device(screen->machine, "messram"))[0xc000 + x*256 + y];
+			code4 = messram_get_ptr(devtag_get_device(screen->machine, "messram"))[0xe000 + x*256 + y];
 			for (b = 0; b < 8; b++)
 			{
 				col = ((code1 >> b) & 0x01) * 8 + ((code2 >> b) & 0x01) * 4 + ((code3 >> b) & 0x01)* 2+ ((code4 >> b) & 0x01);

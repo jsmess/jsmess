@@ -39,6 +39,7 @@
 #include "includes/gb.h"
 #include "cpu/lr35902/lr35902.h"
 #include "devices/cartslot.h"
+#include "devices/messram.h"
 #include "image.h"
 
 /* Memory bank controller types */
@@ -61,7 +62,7 @@ enum {
 	MBC_UNKNOWN,	/* Unknown mapper                                */
 };
 
-/* mess_ram layout defines */
+/* messram_get_ptr(devtag_get_device(machine, "messram")) layout defines */
 #define CGB_START_VRAM_BANKS	0x0000
 #define CGB_START_RAM_BANKS	( 2 * 8 * 1024 )
 
@@ -392,7 +393,7 @@ MACHINE_RESET( gbc )
 	/* Allocate memory for internal ram */
 	for( ii = 0; ii < 8; ii++ )
 	{
-		gb_driver_data.GBC_RAMMap[ii] = mess_ram + CGB_START_RAM_BANKS + ii * 0x1000;
+		gb_driver_data.GBC_RAMMap[ii] = messram_get_ptr(devtag_get_device(machine, "messram")) + CGB_START_RAM_BANKS + ii * 0x1000;
 		memset (gb_driver_data.GBC_RAMMap[ii], 0, 0x1000);
 	}
 }

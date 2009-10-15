@@ -9,6 +9,7 @@
 
 #include "driver.h"
 #include "cpu/i8085/i8085.h"
+#include "devices/messram.h"
 #include "includes/pp01.h"
 
 
@@ -219,11 +220,11 @@ static MACHINE_DRIVER_START( pp01 )
 	MDRV_PIT8253_ADD( "pit8253", pp01_pit8253_intf )
 
 	MDRV_I8255A_ADD( "ppi8255", pp01_ppi8255_interface )
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("64K")		
 MACHINE_DRIVER_END
-
-static SYSTEM_CONFIG_START(pp01)
-	CONFIG_RAM_DEFAULT(64 * 1024)
-SYSTEM_CONFIG_END
 
 /* ROM definition */
 
@@ -252,4 +253,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       INIT     CONFIG COMPANY                  FULLNAME   FLAGS */
-COMP( 198?, pp01, 	0, 	 	0,		pp01, 		pp01, 		pp01, 	 pp01,  	"ZVT",					 "PP-01",	 GAME_NOT_WORKING)
+COMP( 198?, pp01, 	0, 	 	0,		pp01, 		pp01, 		pp01, 	 0,  	"ZVT",					 "PP-01",	 GAME_NOT_WORKING)

@@ -12,6 +12,7 @@
 #include "cpu/z80/z80daisy.h"
 #include "machine/z80pio.h"
 #include "devices/cassette.h"
+#include "devices/messram.h"
 #include "c80.lh"
 
 /* Memory Maps */
@@ -264,6 +265,10 @@ static MACHINE_DRIVER_START( c80 )
 	MDRV_Z80PIO_ADD(Z80PIO1_TAG, pio1_intf)
 	MDRV_Z80PIO_ADD(Z80PIO2_TAG, pio2_intf)
 	MDRV_CASSETTE_ADD(CASSETTE_TAG, c80_cassette_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("1K")
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -273,13 +278,8 @@ ROM_START( c80 )
 	ROM_LOAD( "c80.d3", 0x0000, 0x0400, CRC(ad2b3296) SHA1(14f72cb73a4068b7a5d763cc0e254639c251ce2e) )
 ROM_END
 
-/* System Configuration */
-
-static SYSTEM_CONFIG_START( c80 )
-	CONFIG_RAM_DEFAULT( 1 * 1024 )
-SYSTEM_CONFIG_END
 
 /* System Drivers */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY             FULLNAME    FLAGS */
-COMP( 1986, c80,	0,		0,		c80,	c80,	0,		c80,	"Joachim Czepa",	"C-80",		GAME_SUPPORTS_SAVE )
+COMP( 1986, c80,	0,		0,		c80,	c80,	0,		0,	"Joachim Czepa",	"C-80",		GAME_SUPPORTS_SAVE )

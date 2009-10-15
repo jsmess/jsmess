@@ -8,6 +8,7 @@
 #include "sound/speaker.h"
 #include "machine/wd17xx.h"
 #include "machine/beta.h"
+#include "devices/messram.h"
 
 static int ROMSelection;
 static const device_config* beta;
@@ -48,9 +49,9 @@ static DIRECT_UPDATE_HANDLER( atm_direct )
 
 static void atm_update_memory(running_machine *machine)
 {
-	spectrum_screen_location = mess_ram + ((spectrum_128_port_7ffd_data & 8) ? (7<<14) : (5<<14));
+	spectrum_screen_location = messram_get_ptr(devtag_get_device(machine, "messram")) + ((spectrum_128_port_7ffd_data & 8) ? (7<<14) : (5<<14));
 
-	memory_set_bankptr(machine, 4, mess_ram + ((spectrum_128_port_7ffd_data & 0x07) * 0x4000));
+	memory_set_bankptr(machine, 4, messram_get_ptr(devtag_get_device(machine, "messram")) + ((spectrum_128_port_7ffd_data & 0x07) * 0x4000));
 
 	if (beta->started && betadisk_is_active(beta) && !( spectrum_128_port_7ffd_data & 0x10 ) )
 	{
@@ -105,13 +106,13 @@ static MACHINE_RESET( atm )
 
 	memory_set_direct_update_handler( space, atm_direct );
 
-	memset(mess_ram,0,128*1024);
+	memset(messram_get_ptr(devtag_get_device(machine, "messram")),0,128*1024);
 
 	/* Bank 5 is always in 0x4000 - 0x7fff */
-	memory_set_bankptr(machine, 2, mess_ram + (5<<14));
+	memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + (5<<14));
 
 	/* Bank 2 is always in 0x8000 - 0xbfff */
-	memory_set_bankptr(machine, 3, mess_ram + (2<<14));
+	memory_set_bankptr(machine, 3, messram_get_ptr(devtag_get_device(machine, "messram")) + (2<<14));
 
 	spectrum_128_port_7ffd_data = 0;
 
@@ -175,11 +176,6 @@ ROM_START(atm2)
 	ROM_LOAD( "sgen.rom", 0x0000, 0x0800, CRC(1f4387d6) SHA1(93b3774dc8a486643a1bdd48c606b0c84fa0e22b))
 ROM_END
 
-static SYSTEM_CONFIG_START(atm)
-	CONFIG_RAM_DEFAULT(128 * 1024)
-SYSTEM_CONFIG_END
-
-
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT       INIT    CONFIG      COMPANY     FULLNAME */
-COMP( ????, atm, 	spec128,	0,		atm,	spec_plus,	0,		atm,	"MicroArt",		"ATM", GAME_NOT_WORKING)
-COMP( ????, atm2, 	spec128,	0,		atm,	spec_plus,	0,		atm,	"MicroArt",		"ATM Turbo 2", GAME_NOT_WORKING)
+COMP( ????, atm, 	spec128,	0,		atm,	spec_plus,	0,		0,	"MicroArt",		"ATM", GAME_NOT_WORKING)
+COMP( ????, atm2, 	spec128,	0,		atm,	spec_plus,	0,		0,	"MicroArt",		"ATM Turbo 2", GAME_NOT_WORKING)

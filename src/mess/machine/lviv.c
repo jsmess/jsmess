@@ -16,7 +16,7 @@
 #include "machine/i8255a.h"
 #include "includes/lviv.h"
 #include "sound/speaker.h"
-
+#include "devices/messram.h"
 
 #define LVIV_SNAPSHOT_SIZE	82219
 
@@ -31,13 +31,13 @@ static void lviv_update_memory (running_machine *machine)
 {
 	if (lviv_ppi_port_outputs[0][2] & 0x02)
 	{
-		memory_set_bankptr(machine,1, mess_ram);
-		memory_set_bankptr(machine,2, mess_ram + 0x4000);
+		memory_set_bankptr(machine,1, messram_get_ptr(devtag_get_device(machine, "messram")));
+		memory_set_bankptr(machine,2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000);
 	}
 	else
 	{
-		memory_set_bankptr(machine,1, mess_ram + 0x8000);
-		memory_set_bankptr(machine,2, mess_ram + 0xc000);
+		memory_set_bankptr(machine,1, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x8000);
+		memory_set_bankptr(machine,2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0xc000);
 	}
 }
 
@@ -173,9 +173,9 @@ WRITE8_HANDLER ( lviv_io_w )
 		memory_install_write8_handler(cpuspace, 0x8000, 0xbfff, 0, 0, SMH_BANK(3));
 		memory_install_write8_handler(cpuspace, 0xC000, 0xffff, 0, 0, SMH_UNMAP);
 
-		memory_set_bankptr(space->machine,1, mess_ram);
-		memory_set_bankptr(space->machine,2, mess_ram + 0x4000);
-		memory_set_bankptr(space->machine,3, mess_ram + 0x8000);
+		memory_set_bankptr(space->machine,1, messram_get_ptr(devtag_get_device(space->machine, "messram")));
+		memory_set_bankptr(space->machine,2, messram_get_ptr(devtag_get_device(space->machine, "messram")) + 0x4000);
+		memory_set_bankptr(space->machine,3, messram_get_ptr(devtag_get_device(space->machine, "messram")) + 0x8000);
 		memory_set_bankptr(space->machine,4, memory_region(space->machine, "maincpu") + 0x010000);
 	}
 	else
@@ -224,7 +224,7 @@ MACHINE_RESET( lviv )
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	memory_set_direct_update_handler(space, lviv_directoverride);
 
-	lviv_video_ram = mess_ram + 0xc000;
+	lviv_video_ram = messram_get_ptr(devtag_get_device(machine, "messram")) + 0xc000;
 
 	startup_mem_map = 1;
 
@@ -240,7 +240,7 @@ MACHINE_RESET( lviv )
 
 	/*timer_pulse(machine, TIME_IN_NSEC(200), NULL, 0, lviv_draw_pixel);*/
 
-	/*memset(mess_ram, 0, sizeof(unsigned char)*0xffff);*/
+	/*memset(messram_get_ptr(devtag_get_device(machine, "messram")), 0, sizeof(unsigned char)*0xffff);*/
 }
 
 
@@ -284,8 +284,8 @@ static void lviv_setup_snapshot (running_machine *machine,UINT8 * data)
 	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), I8085_PC, (hi << 8) | lo);
 
 	/* Memory dump */
-	memcpy (mess_ram, data+0x0011, 0xc000);
-	memcpy (mess_ram+0xc000, data+0x10011, 0x4000);
+	memcpy (messram_get_ptr(devtag_get_device(machine, "messram")), data+0x0011, 0xc000);
+	memcpy (messram_get_ptr(devtag_get_device(machine, "messram"))+0xc000, data+0x10011, 0x4000);
 
 	/* Ports */
 	lviv_ppi_port_outputs[0][0] = data[0x14011+0xc0];

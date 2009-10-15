@@ -50,6 +50,7 @@
 #include "cpu/m6502/m6502.h"
 #include "image.h"
 #include "devices/cassette.h"
+#include "devices/messram.h"
 
 static TIMER_CALLBACK(apple1_kbd_poll);
 static TIMER_CALLBACK(apple1_kbd_strobe_end);
@@ -147,10 +148,10 @@ DRIVER_INIT( apple1 )
 	const address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	/* Set up the handlers for MESS's dynamically-sized RAM. */
 	memory_install_read8_handler(space,
-								 0x0000, mess_ram_size - 1, 0, 0, SMH_BANK(1));
+								 0x0000, messram_get_size(devtag_get_device(machine, "messram")) - 1, 0, 0, SMH_BANK(1));
 	memory_install_write8_handler(space,
-								  0x0000, mess_ram_size - 1, 0, 0, SMH_BANK(1));
-	memory_set_bankptr(machine,1, mess_ram);
+								  0x0000, messram_get_size(devtag_get_device(machine, "messram")) - 1, 0, 0, SMH_BANK(1));
+	memory_set_bankptr(machine,1, messram_get_ptr(devtag_get_device(machine, "messram")));
 
 	/* Poll the keyboard input ports periodically.  These include both
        ordinary keys and the RESET and CLEAR SCREEN pushbutton
@@ -247,7 +248,7 @@ SNAPSHOT_LOAD(apple1)
 
 	end_addr = start_addr + datasize - 1;
 
-	if ((start_addr < 0xE000 && end_addr > mess_ram_size - 1)
+	if ((start_addr < 0xE000 && end_addr > messram_get_size(devtag_get_device(image->machine, "messram")) - 1)
 		|| end_addr > 0xEFFF)
 	{
 		logerror("apple1 - Snapshot won't fit in this memory configuration;\n"

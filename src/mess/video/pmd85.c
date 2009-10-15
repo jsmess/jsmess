@@ -10,6 +10,7 @@
 
 #include "driver.h"
 #include "includes/pmd85.h"
+#include "devices/messram.h"
 
 const unsigned char pmd85_palette[3*3] =
 {
@@ -31,7 +32,7 @@ VIDEO_START( pmd85 )
 {
 }
 
-static void pmd85_draw_scanline(bitmap_t *bitmap, int pmd85_scanline)
+static void pmd85_draw_scanline(running_machine *machine,bitmap_t *bitmap, int pmd85_scanline)
 {
 	int x, i;
 	int pen0, pen1;
@@ -41,7 +42,7 @@ static void pmd85_draw_scanline(bitmap_t *bitmap, int pmd85_scanline)
 	UINT16 *scanline = BITMAP_ADDR16(bitmap, pmd85_scanline, 0);
 
 	/* address of current line in PMD-85 video memory */
-	UINT8* pmd85_video_ram_line = mess_ram + 0xc000 + 0x40*pmd85_scanline;
+	UINT8* pmd85_video_ram_line = messram_get_ptr(devtag_get_device(machine, "messram")) + 0xc000 + 0x40*pmd85_scanline;
 
 	for (x=0; x<288; x+=6)
 	{
@@ -60,6 +61,6 @@ VIDEO_UPDATE( pmd85 )
 	int pmd85_scanline;
 
 	for (pmd85_scanline=0; pmd85_scanline<256; pmd85_scanline++)
-		pmd85_draw_scanline (bitmap, pmd85_scanline);
+		pmd85_draw_scanline (screen->machine,bitmap, pmd85_scanline);
 	return 0;
 }

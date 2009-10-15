@@ -28,7 +28,7 @@
 
 #include "devices/cassette.h"
 #include "devices/cartslot.h"
-
+#include "devices/messram.h"
 
 #define VERBOSE_LEVEL 0
 #define DBG_LOG(MACHINE, N, M, A) \
@@ -513,33 +513,33 @@ int vic6560_dma_read( running_machine *machine, int offset )
 
 WRITE8_HANDLER( vc20_0400_w )
 {
-	if (mess_ram_size >= 8 * 1024)
+	if (messram_get_size(devtag_get_device(space->machine, "messram")) >= 8 * 1024)
 	{
-		mess_ram[0x0400 + offset] = data;
+		messram_get_ptr(devtag_get_device(space->machine, "messram"))[0x0400 + offset] = data;
 	}
 }
 
 WRITE8_HANDLER( vc20_2000_w )
 {
-	if ((mess_ram_size >= 16 * 1024) && vc20_rom_2000 == NULL)
+	if ((messram_get_size(devtag_get_device(space->machine, "messram")) >= 16 * 1024) && vc20_rom_2000 == NULL)
 	{
-		mess_ram[0x2000 + offset] = data;
+		messram_get_ptr(devtag_get_device(space->machine, "messram"))[0x2000 + offset] = data;
 	}
 }
 
 WRITE8_HANDLER( vc20_4000_w )
 {
-	if ((mess_ram_size >= 24 * 1024) && vc20_rom_4000 == NULL)
+	if ((messram_get_size(devtag_get_device(space->machine, "messram")) >= 24 * 1024) && vc20_rom_4000 == NULL)
 	{
-		mess_ram[0x4000 + offset] = data;
+		messram_get_ptr(devtag_get_device(space->machine, "messram"))[0x4000 + offset] = data;
 	}
 }
 
 WRITE8_HANDLER( vc20_6000_w )
 {
-	if ((mess_ram_size >= 32 * 1024) && vc20_rom_6000 == NULL)
+	if ((messram_get_size(devtag_get_device(space->machine, "messram")) >= 32 * 1024) && vc20_rom_6000 == NULL)
 	{
-		mess_ram[0x6000 + offset] = data;
+		messram_get_ptr(devtag_get_device(space->machine, "messram"))[0x6000 + offset] = data;
 	}
 }
 
@@ -673,10 +673,10 @@ MACHINE_RESET( vic20 )
 	via_ca1_w(via_0, 0, vc20_via0_read_ca1(via_0, 0));
 
 	/* Set up memory banks */
-	memory_set_bankptr(machine,  1, ( ( mess_ram_size >=  8 * 1024 ) ? mess_ram : memory_region(machine, "maincpu") ) + 0x0400 );
-	memory_set_bankptr(machine,  2, vc20_rom_2000 ? vc20_rom_2000 : ( ( ( mess_ram_size >= 16 * 1024 ) ? mess_ram : memory_region(machine, "maincpu") ) + 0x2000 ) );
-	memory_set_bankptr(machine,  3, vc20_rom_4000 ? vc20_rom_4000 : ( ( ( mess_ram_size >= 24 * 1024 ) ? mess_ram : memory_region(machine, "maincpu") ) + 0x4000 ) );
-	memory_set_bankptr(machine,  4, vc20_rom_6000 ? vc20_rom_6000 : ( ( ( mess_ram_size >= 32 * 1024 ) ? mess_ram : memory_region(machine, "maincpu") ) + 0x6000 ) );
+	memory_set_bankptr(machine,  1, ( ( messram_get_size(devtag_get_device(machine, "messram")) >=  8 * 1024 ) ? messram_get_ptr(devtag_get_device(machine, "messram")) : memory_region(machine, "maincpu") ) + 0x0400 );
+	memory_set_bankptr(machine,  2, vc20_rom_2000 ? vc20_rom_2000 : ( ( ( messram_get_size(devtag_get_device(machine, "messram")) >= 16 * 1024 ) ? messram_get_ptr(devtag_get_device(machine, "messram")) : memory_region(machine, "maincpu") ) + 0x2000 ) );
+	memory_set_bankptr(machine,  3, vc20_rom_4000 ? vc20_rom_4000 : ( ( ( messram_get_size(devtag_get_device(machine, "messram")) >= 24 * 1024 ) ? messram_get_ptr(devtag_get_device(machine, "messram")) : memory_region(machine, "maincpu") ) + 0x4000 ) );
+	memory_set_bankptr(machine,  4, vc20_rom_6000 ? vc20_rom_6000 : ( ( ( messram_get_size(devtag_get_device(machine, "messram")) >= 32 * 1024 ) ? messram_get_ptr(devtag_get_device(machine, "messram")) : memory_region(machine, "maincpu") ) + 0x6000 ) );
 	memory_set_bankptr(machine,  5, vc20_rom_a000 ? vc20_rom_a000 : ( memory_region(machine, "maincpu") + 0xa000 ) );
 }
 

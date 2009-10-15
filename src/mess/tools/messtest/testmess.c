@@ -842,12 +842,6 @@ static void command_verify_memory(running_machine *machine)
 		target_data = memory_region(machine, region);
 		target_data_size = memory_region_length(machine, region);
 	}
-	else
-	{
-		/* we're validating mess_ram */
-		target_data = mess_ram;
-		target_data_size = mess_ram_size;
-	}
 
 	/* sanity check the ranges */
 	if (!verify_data || (verify_data_size <= 0))

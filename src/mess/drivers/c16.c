@@ -125,6 +125,7 @@ printers and other devices; most expansion modules; userport; rs232/v.24 interfa
 #include "includes/vc1541.h"
 #include "machine/cbmipt.h"
 #include "video/ted7360.h"
+#include "devices/messram.h"
 
 /* devices config */
 #include "includes/cbm.h"
@@ -456,6 +457,11 @@ static MACHINE_DRIVER_START( c16 )
 	MDRV_TPI6525_ADD("tpi6535_tpi_3", c16_tpi6525_tpi_3_intf)
 
 	MDRV_IMPORT_FROM(c16_cartslot)
+
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("64K")
+	MDRV_RAM_EXTRA_OPTIONS("16K,32K")
 MACHINE_DRIVER_END
 
 
@@ -506,6 +512,10 @@ static MACHINE_DRIVER_START( plus4 )
 	MDRV_SCREEN_REFRESH_RATE(TED7360NTSC_VRETRACERATE)
 
 	MDRV_SOUND_REPLACE("sid", SID8580, TED7360NTSC_CLOCK/4)
+	
+	/* internal ram */
+	MDRV_RAM_MODIFY("messram")
+	MDRV_RAM_DEFAULT_SIZE("64K")
 MACHINE_DRIVER_END
 
 
@@ -561,7 +571,12 @@ static MACHINE_DRIVER_START( c364 )
 	MDRV_CPU_PROGRAM_MAP(c364_map)
 MACHINE_DRIVER_END
 
-
+static MACHINE_DRIVER_START( c264 )
+	MDRV_IMPORT_FROM( c16 )
+	/* internal ram */
+	MDRV_RAM_MODIFY("messram")
+	MDRV_RAM_DEFAULT_SIZE("64K")
+MACHINE_DRIVER_END	
 
 
 /*************************************
@@ -684,38 +699,26 @@ ROM_END
 
 static SYSTEM_CONFIG_START(c16)
 	CONFIG_DEVICE(cbmfloppy_device_getinfo)
-	CONFIG_RAM(16 * 1024)
-	CONFIG_RAM(32 * 1024)
-	CONFIG_RAM_DEFAULT(64 * 1024)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(c16c)
 	CONFIG_DEVICE(c1551_device_getinfo)
-	CONFIG_RAM(16 * 1024)
-	CONFIG_RAM(32 * 1024)
-	CONFIG_RAM_DEFAULT(64 * 1024)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(c16v)
 	CONFIG_DEVICE(vc1541_device_getinfo)
-	CONFIG_RAM(16 * 1024)
-	CONFIG_RAM(32 * 1024)
-	CONFIG_RAM_DEFAULT(64 * 1024)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(plus)
 	CONFIG_DEVICE(cbmfloppy_device_getinfo)
-	CONFIG_RAM_DEFAULT(64 * 1024)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(plusc)
 	CONFIG_DEVICE(c1551_device_getinfo)
-	CONFIG_RAM_DEFAULT(64 * 1024)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(plusv)
 	CONFIG_DEVICE(vc1541_device_getinfo)
-	CONFIG_RAM_DEFAULT(64 * 1024)
 SYSTEM_CONFIG_END
 
 /***************************************************************************
@@ -740,5 +743,5 @@ COMP( 1984, plus4c,  c16,   0,  plus4c, plus4,  c16c,   plusc,   "Commodore Busi
 COMP( 1984, plus4v,  c16,   0,  plus4v, plus4,  c16v,   plusv,   "Commodore Business Machines Co.",  "Commodore Plus/4 (NTSC, VC1541)", GAME_NOT_WORKING)
 
 COMP( 1984, c232,    c16,   0,  c16,    c16,    c16,    c16,     "Commodore Business Machines Co.",  "Commodore 232 (Prototype)", 0)
-COMP( 1984, c264,    c16,   0,  c16,    plus4,  c16,    plus,    "Commodore Business Machines Co.",  "Commodore 264 (Prototype)", 0)
+COMP( 1984, c264,    c16,   0,  c264,   plus4,  c16,    plus,    "Commodore Business Machines Co.",  "Commodore 264 (Prototype)", 0)
 COMP( 1984, c364,    c16,   0,  c364,   plus4,  c16,    plus,    "Commodore Business Machines Co.",  "Commodore V364 (Prototype)", GAME_IMPERFECT_SOUND)

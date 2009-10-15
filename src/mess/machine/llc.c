@@ -10,6 +10,7 @@
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "includes/llc.h"
+#include "devices/messram.h"
 
 UINT8 code = 0;
 
@@ -108,7 +109,7 @@ MACHINE_START(llc1)
 
 DRIVER_INIT(llc2)
 {
-	llc_video_ram = mess_ram + 0xc000;
+	llc_video_ram = messram_get_ptr(devtag_get_device(machine, "messram")) + 0xc000;
 }
 
 MACHINE_RESET( llc2 )
@@ -125,7 +126,7 @@ MACHINE_RESET( llc2 )
 	memory_set_bankptr(machine, 3, memory_region(machine, "maincpu") + 0x6000);
 
 	memory_install_write8_handler(space, 0xc000, 0xffff, 0, 0, SMH_BANK(4));
-	memory_set_bankptr(machine, 4, mess_ram + 0xc000);
+	memory_set_bankptr(machine, 4, messram_get_ptr(devtag_get_device(machine, "messram")) + 0xc000);
 
 }
 
@@ -134,16 +135,16 @@ WRITE8_HANDLER( llc2_rom_disable_w )
 	const address_space *mem_space = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	memory_install_write8_handler(mem_space, 0x0000, 0xbfff, 0, 0, SMH_BANK(1));
-	memory_set_bankptr(space->machine, 1, mess_ram);
+	memory_set_bankptr(space->machine, 1, messram_get_ptr(devtag_get_device(space->machine, "messram")));
 
 	memory_install_write8_handler(mem_space, 0x4000, 0x5fff, 0, 0, SMH_BANK(2));
-	memory_set_bankptr(space->machine, 2, mess_ram + 0x4000);
+	memory_set_bankptr(space->machine, 2, messram_get_ptr(devtag_get_device(space->machine, "messram")) + 0x4000);
 
 	memory_install_write8_handler(mem_space, 0x6000, 0xbfff, 0, 0, SMH_BANK(3));
-	memory_set_bankptr(space->machine, 3, mess_ram + 0x6000);
+	memory_set_bankptr(space->machine, 3, messram_get_ptr(devtag_get_device(space->machine, "messram")) + 0x6000);
 
 	memory_install_write8_handler(mem_space, 0xc000, 0xffff, 0, 0, SMH_BANK(4));
-	memory_set_bankptr(space->machine, 4, mess_ram + 0xc000);
+	memory_set_bankptr(space->machine, 4, messram_get_ptr(devtag_get_device(space->machine, "messram")) + 0xc000);
 
 }
 
@@ -156,7 +157,7 @@ WRITE8_HANDLER( llc2_basic_enable_w )
 		memory_set_bankptr(space->machine, 2, memory_region(space->machine, "maincpu") + 0x10000);
 	} else {
 		memory_install_write8_handler(mem_space, 0x4000, 0x5fff, 0, 0, SMH_BANK(2));
-		memory_set_bankptr(space->machine, 2, mess_ram + 0x4000);
+		memory_set_bankptr(space->machine, 2, messram_get_ptr(devtag_get_device(space->machine, "messram")) + 0x4000);
 	}
 
 }

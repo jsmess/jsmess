@@ -41,7 +41,7 @@
 #include "machine/rescap.h"
 #include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
-
+#include "devices/messram.h"
 
 INLINE const device_config *get_floppy_image(running_machine *machine, int drive)
 {
@@ -1240,6 +1240,10 @@ static MACHINE_DRIVER_START( prof80 )
 	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
 
 	MDRV_FLOPPY_4_DRIVES_ADD(prof80_floppy_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("128K")	
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -1272,12 +1276,7 @@ ROM_START( prof80 )
 	ROM_LOAD( "grip562.z2", 0x0000, 0x8000, CRC(74be0455) SHA1(1c423ecca6363345a8690ddc45dbafdf277490d3) )
 ROM_END
 
-/* System Configurations */
-static SYSTEM_CONFIG_START( prof80 )
-	CONFIG_RAM_DEFAULT	(128 * 1024)
-SYSTEM_CONFIG_END
-
 /* System Drivers */
 
 /*    YEAR  NAME   PARENT  COMPAT  MACHINE INPUT   INIT  CONFIG COMPANY  FULLNAME   FLAGS */
-COMP( 1984, prof80,     0,      0, prof80, prof80, 0, prof80,  "Conitec Datensysteme", "PROF-80", GAME_NO_SOUND | GAME_NOT_WORKING)
+COMP( 1984, prof80,     0,      0, prof80, prof80, 0, 0,  "Conitec Datensysteme", "PROF-80", GAME_NO_SOUND | GAME_NOT_WORKING)

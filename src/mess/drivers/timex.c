@@ -155,7 +155,7 @@ http://www.z88forever.org.uk/zxplus3e/
 #include "sound/ay8910.h"
 #include "formats/tzx_cas.h"
 #include "machine/beta.h"
-
+#include "devices/messram.h"
 
 static const ay8910_interface spectrum_ay_interface =
 {
@@ -337,8 +337,8 @@ void ts2068_update_memory(running_machine *machine)
 	}
 	else
 	{
-		memory_set_bankptr(machine, 3, mess_ram);
-		memory_set_bankptr(machine, 11, mess_ram);
+		memory_set_bankptr(machine, 3, messram_get_ptr(devtag_get_device(machine, "messram")));
+		memory_set_bankptr(machine, 11, messram_get_ptr(devtag_get_device(machine, "messram")));
 		rh = SMH_BANK(3);
 		wh = SMH_BANK(11);
 		logerror("4000-5fff RAM\n");
@@ -376,8 +376,8 @@ void ts2068_update_memory(running_machine *machine)
 	}
 	else
 	{
-		memory_set_bankptr(machine, 4, mess_ram + 0x2000);
-		memory_set_bankptr(machine, 12, mess_ram + 0x2000);
+		memory_set_bankptr(machine, 4, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x2000);
+		memory_set_bankptr(machine, 12, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x2000);
 		rh = SMH_BANK(4);
 		wh = SMH_BANK(12);
 		logerror("6000-7fff RAM\n");
@@ -415,8 +415,8 @@ void ts2068_update_memory(running_machine *machine)
 	}
 	else
 	{
-		memory_set_bankptr(machine, 5, mess_ram + 0x4000);
-		memory_set_bankptr(machine, 13, mess_ram + 0x4000);
+		memory_set_bankptr(machine, 5, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000);
+		memory_set_bankptr(machine, 13, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000);
 		rh = SMH_BANK(5);
 		wh = SMH_BANK(13);
 		logerror("8000-9fff RAM\n");
@@ -454,8 +454,8 @@ void ts2068_update_memory(running_machine *machine)
 	}
 	else
 	{
-		memory_set_bankptr(machine, 6, mess_ram + 0x6000);
-		memory_set_bankptr(machine, 14, mess_ram + 0x6000);
+		memory_set_bankptr(machine, 6, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x6000);
+		memory_set_bankptr(machine, 14, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x6000);
 		rh = SMH_BANK(6);
 		wh = SMH_BANK(14);
 		logerror("a000-bfff RAM\n");
@@ -493,8 +493,8 @@ void ts2068_update_memory(running_machine *machine)
 	}
 	else
 	{
-		memory_set_bankptr(machine, 7, mess_ram + 0x8000);
-		memory_set_bankptr(machine, 15, mess_ram + 0x8000);
+		memory_set_bankptr(machine, 7, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x8000);
+		memory_set_bankptr(machine, 15, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x8000);
 		rh = SMH_BANK(7);
 		wh = SMH_BANK(15);
 		logerror("c000-dfff RAM\n");
@@ -532,8 +532,8 @@ void ts2068_update_memory(running_machine *machine)
 	}
 	else
 	{
-		memory_set_bankptr(machine, 8, mess_ram + 0xa000);
-		memory_set_bankptr(machine, 16, mess_ram + 0xa000);
+		memory_set_bankptr(machine, 8, messram_get_ptr(devtag_get_device(machine, "messram")) + 0xa000);
+		memory_set_bankptr(machine, 16, messram_get_ptr(devtag_get_device(machine, "messram")) + 0xa000);
 		rh = SMH_BANK(8);
 		wh = SMH_BANK(16);
 		logerror("e000-ffff RAM\n");
@@ -600,8 +600,8 @@ ADDRESS_MAP_END
 
 static MACHINE_RESET( tc2048 )
 {
-	memory_set_bankptr(machine, 1, mess_ram);
-	memory_set_bankptr(machine, 2, mess_ram);
+	memory_set_bankptr(machine, 1, messram_get_ptr(devtag_get_device(machine, "messram")));
+	memory_set_bankptr(machine, 2, messram_get_ptr(devtag_get_device(machine, "messram")));
 	ts2068_port_ff_data = 0;
 
 	MACHINE_RESET_CALL(spectrum);
@@ -636,6 +636,10 @@ static MACHINE_DRIVER_START( ts2068 )
 	MDRV_CARTSLOT_NOT_MANDATORY
 	MDRV_CARTSLOT_LOAD(timex_cart)
 	MDRV_CARTSLOT_UNLOAD(timex_cart)
+	
+	/* internal ram */
+	MDRV_RAM_MODIFY("messram")
+	MDRV_RAM_DEFAULT_SIZE("48K")		
 MACHINE_DRIVER_END
 
 
@@ -664,6 +668,10 @@ static MACHINE_DRIVER_START( tc2048 )
 
 	MDRV_VIDEO_START( spectrum_128 )
 	MDRV_VIDEO_UPDATE( tc2048 )
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("48K")
 MACHINE_DRIVER_END
 
 
@@ -692,15 +700,7 @@ ROM_START(uk2086)
 	ROM_LOAD("ts2068_x.rom",0x14000,0x2000, CRC(ae16233a) SHA1(7e265a2c1f621ed365ea23bdcafdedbc79c1299c))
 ROM_END
 
-static SYSTEM_CONFIG_START(ts2068)
-	CONFIG_RAM_DEFAULT(48 * 1024)
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START(tc2048)
-	CONFIG_RAM_DEFAULT(48 * 1024)
-SYSTEM_CONFIG_END
-
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT       INIT    CONFIG      COMPANY     FULLNAME */
-COMP( 1984, tc2048,   spectrum, 0,		tc2048,		spectrum,	0,		tc2048,		"Timex of Portugal",	"TC-2048" , 0)
-COMP( 1983, ts2068,   spectrum, 0,		ts2068,		spectrum,	0,		ts2068,		"Timex Sinclair",		"TS-2068" , 0)
-COMP( 1986, uk2086,   spectrum, 0,		uk2086,		spectrum,	0,		ts2068,		"Unipolbrit",			"UK-2086 ver. 1.2" , 0)
+COMP( 1984, tc2048,   spectrum, 0,		tc2048,		spectrum,	0,		0,		"Timex of Portugal",	"TC-2048" , 0)
+COMP( 1983, ts2068,   spectrum, 0,		ts2068,		spectrum,	0,		0,		"Timex Sinclair",		"TS-2068" , 0)
+COMP( 1986, uk2086,   spectrum, 0,		uk2086,		spectrum,	0,		0,		"Unipolbrit",			"UK-2086 ver. 1.2" , 0)

@@ -11,6 +11,7 @@
 #include "video/i8275.h"
 #include "video/upd7220.h"
 #include "sound/speaker.h"
+#include "devices/messram.h"
 
 /*
 
@@ -718,7 +719,7 @@ static MACHINE_START( mm1 )
 	/* setup memory banking */
 	memory_install_readwrite8_handler(program, 0x0000, 0x0fff, 0, 0, SMH_BANK(1), SMH_UNMAP);
 	memory_configure_bank(machine, 1, 0, 1, memory_region(machine, "bios"), 0);
-	memory_configure_bank(machine, 1, 1, 1, mess_ram, 0);
+	memory_configure_bank(machine, 1, 1, 1, messram_get_ptr(devtag_get_device(machine, "messram")), 0);
 	memory_set_bank(machine, 1, 0);
 
 	/* register for state saving */
@@ -794,6 +795,10 @@ static MACHINE_DRIVER_START( mm1 )
 	MDRV_UPD7201_ADD(UPD7201_TAG, XTAL_6_144MHz/2, mm1_upd7201_intf)
 	
 	MDRV_FLOPPY_2_DRIVES_ADD(mm1_floppy_config)
+	
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("64K")		
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( mm1m6 )
@@ -839,18 +844,8 @@ ROM_END
 
 #define rom_mm1m7 rom_mm1m6
 
-/* System Configuration */
-static SYSTEM_CONFIG_START( mm1m6 )
-	CONFIG_RAM_DEFAULT	(64 * 1024)
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START( mm1m7 )
-	CONFIG_RAM_DEFAULT	(64 * 1024)
-	// 5MB Winchester
-SYSTEM_CONFIG_END
-
 /* System Drivers */
 
 //    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    CONFIG    COMPANY           FULLNAME                FLAGS
-COMP( 1981, mm1m6,		0,		0,		mm1m6,		mm1,		0, 		mm1m6,	  "Nokia Data",		"MikroMikko 1 M6",		GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-COMP( 1981, mm1m7,		mm1m6,	0,		mm1m6,		mm1,		0, 		mm1m7,	  "Nokia Data",		"MikroMikko 1 M7",		GAME_NOT_WORKING )
+COMP( 1981, mm1m6,		0,		0,		mm1m6,		mm1,		0, 		0,	  "Nokia Data",		"MikroMikko 1 M6",		GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+COMP( 1981, mm1m7,		mm1m6,	0,		mm1m6,		mm1,		0, 		0,	  "Nokia Data",		"MikroMikko 1 M7",		GAME_NOT_WORKING )

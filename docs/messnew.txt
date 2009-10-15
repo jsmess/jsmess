@@ -87,13 +87,13 @@ Source Changes:
 - The core is based on MAME 0.134u3.  This incorporates all features of the
   update to this core.  [MAME team]
 
-- Moved implementation to device.  [Miodrag Milanovic]
+- Moved floppy implementation to device.  [Miodrag Milanovic]
 
 - Floppy support for TD0, IMD and CQM. [Miodrag Milanovic]
 
 - Cleanups to use more *_NAME and *_CALL macros.  [Atari Ace]
 
-
+- Converted all drivers to use messram device.  [Miodrag Milanovic]
 
 0.134
 
