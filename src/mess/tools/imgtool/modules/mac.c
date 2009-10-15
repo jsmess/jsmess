@@ -93,6 +93,7 @@
 #include <limits.h>
 #include <stddef.h>
 
+#include "utils.h"
 #include "osdepend.h"
 #include "imgtoolx.h"
 #include "macutil.h"

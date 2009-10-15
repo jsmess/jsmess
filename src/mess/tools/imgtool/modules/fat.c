@@ -136,6 +136,7 @@
 #include <ctype.h>
 
 #include "imgtool.h"
+#include "utils.h"
 #include "unicode.h"
 #include "fat.h"
 

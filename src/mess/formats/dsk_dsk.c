@@ -7,7 +7,9 @@
 *********************************************************************/
 
 #include <string.h>
+
 #include "driver.h"
+#include "utils.h"
 #include "formats/flopimg.h"
 #include "devices/flopdrv.h"
 

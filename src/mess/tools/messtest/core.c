@@ -14,6 +14,7 @@
 #include <windows.h>
 #endif /* WIN32 */
 
+#include "utils.h"
 #include "core.h"
 #include "testmess.h"
 #include "testimgt.h"

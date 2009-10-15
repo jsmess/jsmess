@@ -7,6 +7,7 @@
 ****************************************************************************/
 
 #include "imgtool.h"
+#include "utils.h"
 #include "formats/pc_dsk.h"
 #include "fat.h"
 #include "iflopimg.h"

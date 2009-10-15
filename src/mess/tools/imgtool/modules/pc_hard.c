@@ -49,6 +49,7 @@
 ****************************************************************************/
 
 #include "imgtool.h"
+#include "utils.h"
 #include "imghd.h"
 
 #define FAT_SECLEN	512

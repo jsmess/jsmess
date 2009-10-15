@@ -7,9 +7,11 @@
 *********************************************************************/
 
 #include <string.h>
+
+#include "driver.h"
+#include "utils.h"
 #include "formats/oric_dsk.h"
 #include "formats/basicdsk.h"
-#include "driver.h"
 #include "devices/flopdrv.h"
 
 

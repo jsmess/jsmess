@@ -47,12 +47,13 @@ Todo:
 
 
 #include "driver.h"
-#include "video/m6847.h"
+#include "utils.h"
 #include "includes/vtech1.h"
-#include "devices/cassette.h"
-#include "machine/ctronics.h"
 #include "cpu/z80/z80.h"
+#include "video/m6847.h"
 #include "sound/speaker.h"
+#include "machine/ctronics.h"
+#include "devices/cassette.h"
 #include "devices/messram.h"
 
 #define LOG_VTECH1_LATCH 0
