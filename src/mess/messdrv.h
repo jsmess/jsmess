@@ -19,12 +19,6 @@
 
 struct SystemConfigurationParamBlock
 {
-	/* for RAM options */
-	int max_ram_options;
-	int actual_ram_options;
-	int default_ram_option;
-	UINT32 *ram_options;
-
 	/* device specification */
 	int device_slotcount;
 	device_getinfo_handler *device_handlers;

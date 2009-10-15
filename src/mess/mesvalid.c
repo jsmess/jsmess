@@ -293,9 +293,6 @@ int mess_validitychecks(void)
 
 		/* check compatibility chain */
 		error = validate_compatibility_chain(drivers[i]) || error;
-
-		/* check system config */
-		ram_option_count(drivers[i]);
 	}
 
 	/* call other validity checks */

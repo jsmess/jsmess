@@ -14,6 +14,7 @@
 #include "hash.h"
 #include "xmlfile.h"
 #include "infomess.h"
+#include "devices/messram.h"
 
 /*************************************
  *
@@ -107,28 +108,39 @@ void print_game_device(FILE *out, const game_driver *game, const machine_config 
 	}
 }
 
-
+/* device iteration helpers */
+#define ram_first(config)				device_list_first((config)->devicelist, MESSRAM)
+#define ram_next(previous)				((previous)->typenext)
 
 /*-------------------------------------------------
     print_game_ramoptions - prints out all RAM
 	options for this system
 -------------------------------------------------*/
-
 void print_game_ramoptions(FILE *out, const game_driver *game, const machine_config *config)
 {
-	int i, count;
-	UINT32 ram;
-	UINT32 default_ram;
-
-	count = ram_option_count(game);
-	default_ram = ram_default(game);
-
-	for (i = 0; i < count; i++)
+	const device_config *device;
+	
+	for (device = ram_first(config); device != NULL; device = ram_next(device))
 	{
-		ram = ram_option(game, i);
-		if (ram == default_ram)
-			fprintf(out, "\t\t<ramoption default=\"1\">%u</ramoption>\n", ram);
-		else
-			fprintf(out, "\t\t<ramoption>%u</ramoption>\n", ram);
+		ram_config *config = device->inline_config;	
+		fprintf(out, "\t\t<ramoption default=\"1\">%u</ramoption>\n",  ram_parse_string(config->default_size));
+		if (config->extra_options != NULL)
+		{
+			const char *s;
+
+			astring *buffer = astring_alloc();
+			astring_cpyc(buffer, config->extra_options);
+			astring_replacechr(buffer, ',', 0);
+
+			s = astring_c(buffer);
+
+			/* try to parse each option */
+			while(*s != '\0')
+			{
+				fprintf(out, "\t\t<ramoption>%u</ramoption>\n",  ram_parse_string(s));
+				s += strlen(s) + 1;
+			}
+			astring_free(buffer);
+		}	
 	}
 }

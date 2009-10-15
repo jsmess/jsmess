@@ -339,7 +339,7 @@ static MACHINE_DRIVER_START( elf2 )
 	
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE(256)
+	MDRV_RAM_DEFAULT_SIZE("256")
 MACHINE_DRIVER_END
 
 /* ROMs */

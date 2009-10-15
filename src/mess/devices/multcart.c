@@ -12,8 +12,8 @@
 #include "corestr.h"
 #include "xmlfile.h"
 #include "driver.h"
-#include "compcfg.h"
 #include "hash.h"
+#include "messram.h"
 
 /***************************************************************************
     TYPE DEFINITIONS

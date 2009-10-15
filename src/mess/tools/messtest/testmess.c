@@ -18,7 +18,7 @@
 #include "video/generic.h"
 #include "render.h"
 #include "messopts.h"
-
+#include "devices/messram.h"
 #include "debug/debugcpu.h"
 
 

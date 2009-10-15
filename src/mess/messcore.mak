@@ -85,7 +85,6 @@ EMUOBJS += \
 	$(MESSOBJ)/uimess.o		\
 	$(MESSOBJ)/filemngr.o	\
 	$(MESSOBJ)/tapectrl.o	\
-	$(MESSOBJ)/compcfg.o	\
 	$(MESSOBJ)/utils.o		\
 	$(MESSOBJ)/eventlst.o	\
 	$(MESSOBJ)/mslegacy.o	\

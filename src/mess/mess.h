@@ -16,7 +16,6 @@ struct SystemConfigurationParamBlock;
 #include "image.h"
 #include "artworkx.h"
 #include "memory.h"
-#include "compcfg.h"
 #include "configms.h"
 #include "messopts.h"
 

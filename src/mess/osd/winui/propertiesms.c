@@ -32,6 +32,7 @@
 #include "messopts.h"
 #include "strconv.h"
 #include "winutf8.h"
+#include "devices\messram.h"
 
 static BOOL SoftwareDirectories_OnInsertBrowse(HWND hDlg, BOOL bBrowse, LPCTSTR lpItem);
 static BOOL SoftwareDirectories_OnDelete(HWND hDlg);
@@ -208,7 +209,7 @@ static BOOL SoftwareDirectories_OnEndLabelEdit(HWND hDlg, NMHDR* pNMHDR)
 
 BOOL PropSheetFilter_Config(const machine_config *drv, const game_driver *gamedrv)
 {
-	return (ram_option_count(gamedrv) > 0) || DriverHasDevice(gamedrv, IO_PRINTER);
+	return (device_list_first(drv->devicelist, MESSRAM)!=NULL) || DriverHasDevice(gamedrv, IO_PRINTER);
 }
 
 
@@ -382,12 +383,13 @@ static BOOL DirListPopulateControl(datamap *map, HWND dialog, HWND control, core
 
 static BOOL RamPopulateControl(datamap *map, HWND dialog, HWND control, core_options *opts, const char *option_name)
 {
-	int count, i, current_index, driver_index;
+	int i, current_index, driver_index;
 	const game_driver *gamedrv;
-	UINT32 ram, current_ram;
-	char buffer[64];
+	UINT32 ram, current_ram;	
 	const char *this_ram_string;
 	TCHAR* t_ramstring;
+	machine_config *cfg;
+	const device_config *device;
 
 	// identify the driver
 	driver_index = PropertiesCurrentGame(dialog);
@@ -396,43 +398,72 @@ static BOOL RamPopulateControl(datamap *map, HWND dialog, HWND control, core_opt
 	// clear out the combo box
 	(void)ComboBox_ResetContent(control);
 
+	// allocate the machine config
+	cfg = machine_config_alloc_with_mess_devices(gamedrv);
+	
 	// identify how many options that we have
-	count = ram_option_count(gamedrv);
-	EnableWindow(control, count > 0);
-
+	device = device_list_first(cfg->devicelist, MESSRAM);
+	
+	EnableWindow(control, (device != NULL)); 
+	i = 0;
 	// we can only do something meaningful if there is more than one option
-	if (count > 0)
+	if (device != NULL)
 	{
+		ram_config *config = device->inline_config;						
+		
 		// identify the current amount of RAM
 		this_ram_string = options_get_string(opts, OPTION_RAMSIZE);
 		current_ram = (this_ram_string != NULL) ? ram_parse_string(this_ram_string) : 0;
 		if (current_ram == 0)
-			current_ram = ram_default(gamedrv);
+			current_ram = ram_parse_string(config->default_size);
 
 		// by default, assume index 0
 		current_index = 0;
 
-		// loop through all options
-		for (i = 0; i < count; i++)
 		{
-			// identify this option
-			ram = ram_option(gamedrv, i);
-			this_ram_string = ram_string(buffer, ram);
-
-			t_ramstring = tstring_from_utf8(this_ram_string);
+			t_ramstring = tstring_from_utf8(config->default_size);
 			if( !t_ramstring )
 				return FALSE;
 
-			// add this option to the combo box
 			(void)ComboBox_InsertString(control, i, win_tstring_strdup(t_ramstring));
-			(void)ComboBox_SetItemData(control, i, ram);
-
-			free(t_ramstring);
-
-			// is this the current option?  record the index if so
-			if (ram == current_ram)
-				current_index = i;
+			(void)ComboBox_SetItemData(control, i, ram);			
 		}
+		if (config->extra_options != NULL)
+		{
+			const char *s;
+
+			astring *buffer = astring_alloc();
+			astring_cpyc(buffer, config->extra_options);
+			astring_replacechr(buffer, ',', 0);
+
+			s = astring_c(buffer);
+
+			/* try to parse each option */
+			while(*s != '\0')
+			{				
+				i++;
+				// identify this option
+				ram = ram_parse_string(s);
+				this_ram_string = s;
+
+				t_ramstring = tstring_from_utf8(this_ram_string);
+				if( !t_ramstring )
+					return FALSE;
+
+				// add this option to the combo box
+				(void)ComboBox_InsertString(control, i, win_tstring_strdup(t_ramstring));
+				(void)ComboBox_SetItemData(control, i, ram);
+
+				free(t_ramstring);
+
+				// is this the current option?  record the index if so
+				if (ram == current_ram)
+					current_index = i;								
+				
+				s += strlen(s) + 1;						
+			}
+			astring_free(buffer);
+		}	
 
 		// set the combo box
 		(void)ComboBox_SetCurSel(control, current_index);
