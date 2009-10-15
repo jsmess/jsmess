@@ -195,11 +195,13 @@ static UINT8 sms_vdp_hcount( running_machine *machine )
 	UINT64 calc_cycles;
 	attotime time_end;
 	const device_config *screen = video_screen_first(machine->config);
+
+	//int hpos = video_screen_get_hpos(screen);
 	int vpos = video_screen_get_vpos(screen);
 	int width = video_screen_get_width(screen);
 	
 	/* this is simpler and independent of other clocks */
-	//tmp = ( (hpos - 46) >> 1 ) & 0xFF;
+	//tmp = ((hpos - 46) >> 1) & 0xff;
 	
 	/* ... but this is closer to the behavior described by Flubba */
 	/* and makes use of his equation posted at SMSPower forum.    */
