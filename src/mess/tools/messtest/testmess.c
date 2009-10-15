@@ -822,8 +822,8 @@ static void command_verify_memory(running_machine *machine)
 	offs_t offset, offset_start, offset_end;
 	const UINT8 *verify_data;
 	size_t verify_data_size;
-	const UINT8 *target_data;
-	size_t target_data_size;
+	const UINT8 *target_data = NULL;
+	size_t target_data_size = 0;
 	const char *region;
 
 	offset_start = current_command->u.verify_args.start;
