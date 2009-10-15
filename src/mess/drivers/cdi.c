@@ -962,11 +962,30 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 				(msf & 0x000f0000) >> 16,
 				(msf & 0x00f00000) >> 20
 			};
-			nybbles[2] -= 2;
-			if(nybbles[2] > 9)
+			if(nybbles[2] >= 2)
 			{
-				nybbles[2] += 10;
-				nybbles[3]--;
+				nybbles[2] -= 2;
+			}
+			else
+			{
+				nybbles[2] = 8 + nybbles[2];
+				if(nybbles[3] > 0)
+				{
+					nybbles[3]--;
+				}
+				else
+				{
+					nybbles[3] = 5;
+					if(nybbles[4] > 0)
+					{
+						nybbles[4]--;
+					}
+					else
+					{
+						nybbles[4] = 9;
+						nybbles[5]--;
+					}
+				}
 			}
 			lba = nybbles[0] + nybbles[1]*10 + ((nybbles[2] + nybbles[3]*10)*75) + ((nybbles[4] + nybbles[5]*10)*75*60);
 
@@ -996,16 +1015,16 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 				{
 					cdic_regs.time &= 0xfff0ffff;
 					cdic_regs.time += 0x00100000;
-					if((cdic_regs.time & 0x00f00000) == 0x00a00000)
-					{
-						cdic_regs.time &= 0xff0fffff;
-						cdic_regs.time += 0x01000000;
-						if((cdic_regs.time & 0x0f000000) == 0x0a000000)
-						{
-							cdic_regs.time &= 0xf0ffffff;
-							cdic_regs.time += 0x10000000;
-						}
-					}
+				}
+			}
+			if((cdic_regs.time & 0x00ff0000) == 0x00600000)
+			{
+				cdic_regs.time &= 0xff00ffff;
+				cdic_regs.time += 0x01000000;
+				if((cdic_regs.time & 0x0f000000) == 0x0a000000)
+				{
+					cdic_regs.time &= 0xf0ffffff;
+					cdic_regs.time += 0x10000000;
 				}
 			}
 
@@ -1025,12 +1044,7 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 			}
 			else if((buffer[CDIC_SECTOR_SUBMODE2] & (CDIC_SUBMODE_DATA | CDIC_SUBMODE_AUDIO | CDIC_SUBMODE_VIDEO)) == 0x00)
 			{
-				// Ignore the audio sector for now.
-				if(!(buffer[CDIC_SECTOR_SUBMODE2] & CDIC_SUBMODE_TRIG))
-				{
-					verboselog(machine, 0, "Message sector, ignored\n" );
-				}
-				else
+				if(buffer[CDIC_SECTOR_SUBMODE2] & CDIC_SUBMODE_TRIG)
 				{
 					cdic_regs.x_buffer |= 0x8000;
 
@@ -1042,8 +1056,12 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 					cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), M68K_IRQ_4, 128);
 					cputag_set_input_line(machine, "maincpu", M68K_IRQ_4, ASSERT_LINE);
 				}
+				else
+				{
+					verboselog(machine, 0, "Message sector, ignored\n" );
+				}
 			}
-			else
+			else /*if(buffer[CDIC_SECTOR_SUBMODE2] & (CDIC_SUBMODE_DATA | CDIC_SUBMODE_VIDEO))*/
 			{
 				cdic_regs.x_buffer |= 0x8000;
 
@@ -2983,6 +3001,12 @@ static void mcd212_mix_lines(running_machine *machine, UINT8 *plane_a_r, UINT8 *
 					plane_enable_b = 1;
 					break;
 			}
+			plane_a_r_cur = (plane_a_r_cur * mcd212.channel[0].weight_factor_a[x]) >> 6;
+			plane_a_g_cur = (plane_a_g_cur * mcd212.channel[0].weight_factor_a[x]) >> 6;
+			plane_a_b_cur = (plane_a_b_cur * mcd212.channel[0].weight_factor_a[x]) >> 6;
+			plane_b_r_cur = (plane_b_r_cur * mcd212.channel[1].weight_factor_b[x]) >> 6;
+			plane_b_g_cur = (plane_b_g_cur * mcd212.channel[1].weight_factor_b[x]) >> 6;
+			plane_b_b_cur = (plane_b_b_cur * mcd212.channel[1].weight_factor_b[x]) >> 6;
 			switch(mcd212.channel[0].plane_order)
 			{
 				case MCD212_POR_AB:
