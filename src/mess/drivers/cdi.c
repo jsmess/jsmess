@@ -1113,10 +1113,10 @@ static void cdic_decode_audio_sector(const unsigned char *xa)
 	switch(channels)
 	{
 		case 1:
-			cdic_decode_xa_mono(xa, samples);
+			cdic_decode_xa_mono(hdr, samples);
 			break;
 		case 2:
-			cdic_decode_xa_stereo(xa, samples);
+			cdic_decode_xa_stereo(hdr, samples);
 			break;
 	}
 
@@ -1215,7 +1215,7 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 			{
 				//if(!(buffer[CDIC_SECTOR_SUBMODE2] & CDIC_SUBMODE_TRIG))
 				//{
-					verboselog(machine, 0, "Audio sector\n" );
+			 		verboselog(machine, 0, "Audio sector\n" );
 				//}
 				//else
 				//{
