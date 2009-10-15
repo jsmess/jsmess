@@ -3001,12 +3001,12 @@ static void mcd212_mix_lines(running_machine *machine, UINT8 *plane_a_r, UINT8 *
 					plane_enable_b = 1;
 					break;
 			}
-			plane_a_r_cur = (plane_a_r_cur * mcd212.channel[0].weight_factor_a[x]) >> 6;
-			plane_a_g_cur = (plane_a_g_cur * mcd212.channel[0].weight_factor_a[x]) >> 6;
-			plane_a_b_cur = (plane_a_b_cur * mcd212.channel[0].weight_factor_a[x]) >> 6;
-			plane_b_r_cur = (plane_b_r_cur * mcd212.channel[1].weight_factor_b[x]) >> 6;
-			plane_b_g_cur = (plane_b_g_cur * mcd212.channel[1].weight_factor_b[x]) >> 6;
-			plane_b_b_cur = (plane_b_b_cur * mcd212.channel[1].weight_factor_b[x]) >> 6;
+			plane_a_r_cur = MCD212_LIM(((MCD212_LIM((INT32)plane_a_r_cur - 16) * mcd212.channel[0].weight_factor_a[x]) >> 6) + 16);
+			plane_a_g_cur = MCD212_LIM(((MCD212_LIM((INT32)plane_a_g_cur - 16) * mcd212.channel[0].weight_factor_a[x]) >> 6) + 16);
+			plane_a_b_cur = MCD212_LIM(((MCD212_LIM((INT32)plane_a_b_cur - 16) * mcd212.channel[0].weight_factor_a[x]) >> 6) + 16);
+			plane_b_r_cur = MCD212_LIM(((MCD212_LIM((INT32)plane_b_r_cur - 16) * mcd212.channel[1].weight_factor_b[x]) >> 6) + 16);
+			plane_b_g_cur = MCD212_LIM(((MCD212_LIM((INT32)plane_b_g_cur - 16) * mcd212.channel[1].weight_factor_b[x]) >> 6) + 16);
+			plane_b_b_cur = MCD212_LIM(((MCD212_LIM((INT32)plane_b_b_cur - 16) * mcd212.channel[1].weight_factor_b[x]) >> 6) + 16);
 			switch(mcd212.channel[0].plane_order)
 			{
 				case MCD212_POR_AB:
