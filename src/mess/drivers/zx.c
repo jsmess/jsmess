@@ -290,35 +290,6 @@ static INPUT_PORTS_START( pow3000 )
 	PORT_CONFSETTING(    0x01, "PAL")
 INPUT_PORTS_END
 
-/* Graphics Layouts */
-#if 0
-static const gfx_layout zx_char_layout =
-{
-	8, 8,							   /* 8x8 pixels */
-	64,								   /* 64 codes */
-	1,								   /* 1 bit per pixel */
-	{0},							   /* no bitplanes */
-	/* x offsets */
-	{0, 1, 2, 3, 4, 5, 6, 7},
-	/* y offsets */
-	{0 * 8, 1 * 8, 2 * 8, 3 * 8, 4 * 8, 5 * 8, 6 * 8, 7 * 8},
-	8 * 8							   /* eight bytes per code */
-};
-
-/* Graphics Decode Information */
-
-static GFXDECODE_START( zx80 )
-	GFXDECODE_ENTRY( "maincpu", 0x0e00, zx_char_layout, 0, 2 )
-GFXDECODE_END
-
-static GFXDECODE_START( zx81 )
-	GFXDECODE_ENTRY( "maincpu", 0x1e00, zx_char_layout, 0, 2 )
-GFXDECODE_END
-
-static GFXDECODE_START( pc8300 )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, zx_char_layout, 0, 2 )
-GFXDECODE_END
-#endif
 
 /* Palette Initialization */
 
@@ -390,7 +361,7 @@ static MACHINE_DRIVER_START( zx80 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(ZX81_PIXELS_PER_SCANLINE, ZX81_PAL_SCANLINES)
 	MDRV_SCREEN_VISIBLE_AREA(0, ZX81_PIXELS_PER_SCANLINE-1, 0, ZX81_PAL_SCANLINES-1)
-//  MDRV_GFXDECODE(zx80)
+
 	MDRV_PALETTE_LENGTH(4)
 	MDRV_PALETTE_INIT(zx80)
 
@@ -419,8 +390,6 @@ static MACHINE_DRIVER_START( zx81 )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(zx81_io_map)
 
-//  MDRV_GFXDECODE(zx81)
-
 	MDRV_CASSETTE_MODIFY( "cassette", zx81_cassette_config )
 MACHINE_DRIVER_END
 
@@ -428,6 +397,14 @@ static MACHINE_DRIVER_START( ts1000 )
 	MDRV_IMPORT_FROM(zx81)
 
 	MDRV_PALETTE_INIT(ts1000)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( ts1500 )
+	MDRV_IMPORT_FROM(ts1000)
+
+	/* internal ram */
+	MDRV_RAM_MODIFY("messram")
+	MDRV_RAM_DEFAULT_SIZE("16K")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( pc8300 )
@@ -443,7 +420,6 @@ static MACHINE_DRIVER_START( pc8300 )
 	MDRV_SCREEN_SIZE(ZX81_PIXELS_PER_SCANLINE, ZX81_NTSC_SCANLINES)
 	MDRV_SCREEN_VISIBLE_AREA(0, ZX81_PIXELS_PER_SCANLINE-1, 0, ZX81_NTSC_SCANLINES-1)
 
-//  MDRV_GFXDECODE(pc8300)
 	MDRV_PALETTE_INIT(zx80)
 	
 	/* internal ram */
@@ -458,7 +434,7 @@ static MACHINE_DRIVER_START( pow3000 )
 	MDRV_CPU_IO_MAP(pow3000_io_map)
 
 	MDRV_MACHINE_RESET(pow3000)
-//  MDRV_GFXDECODE(pc8300)
+
 	MDRV_PALETTE_INIT(zx80)
 
 	/* internal ram */
@@ -550,7 +526,7 @@ ROM_END
 COMP( 1980, zx80,       0,      0,      zx80,       zx80,       zx,     0,    "Sinclair Research",        "ZX-80",               0 )
 COMP( 1981, zx81,       0,      0,      zx81,       zx81,       zx,     0,    "Sinclair Research",        "ZX-81",               0 )
 COMP( 1982, ts1000,     zx81,   0,      ts1000,     zx81,       zx,     0,    "Timex Sinclair",           "Timex Sinclair 1000", 0 )
-COMP( 1983, ts1500,     zx81,   0,      ts1000,     zx81,       zx,     0,    "Timex Sinclair",           "Timex Sinclair 1500", 0 )
+COMP( 1983, ts1500,     zx81,   0,      ts1500,     zx81,       zx,     0,    "Timex Sinclair",           "Timex Sinclair 1500", 0 )
 COMP( 1983, tk85,     	zx81,   0,      ts1000,     zx81,       zx,     0,    "Microdigital",             "TK85",                0 )
 COMP( 1983, ringo470,   zx81,   0,      ts1000,     zx81,       zx,     0,    "Ritas do Brasil Ltda",     "Ringo 470", GAME_NOT_WORKING )
 COMP( 1984, pc8300,     zx81,   0,      pc8300,     pc8300,     zx,     0,    "Your Computer",            "PC8300",              0 )
