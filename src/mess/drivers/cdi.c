@@ -1031,16 +1031,23 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 			if(((buffer[CDIC_SECTOR_SUBMODE2] & (CDIC_SUBMODE_FORM | CDIC_SUBMODE_DATA | CDIC_SUBMODE_AUDIO | CDIC_SUBMODE_VIDEO)) == (CDIC_SUBMODE_FORM | CDIC_SUBMODE_AUDIO)) &&
 			   (cdic_regs.channel & cdic_regs.audio_channel & (1 << buffer[CDIC_SECTOR_CHAN2])))
 			{
-				// Ignore the audio sector for now.
-				cdic_regs.x_buffer |= 0x8000;
+				//if(!(buffer[CDIC_SECTOR_SUBMODE2] & CDIC_SUBMODE_TRIG))
+				//{
+				//	verboselog(machine, 0, "Audio sector, ignored\n" );
+				//}
+				//else
+				//{
+					// Ignore the audio sector for now.
+					cdic_regs.x_buffer |= 0x8000;
 
-				cdic_regs.data_buffer |= 0x4000;
-				cdic_regs.data_buffer &= 0x7fff;
+					cdic_regs.data_buffer |= 0x4000;
+					cdic_regs.data_buffer &= 0x7fff;
 
-				//printf( "Setting CDIC interrupt line\n" );
-				verboselog(machine, 0, "Setting CDIC interrupt line\n" );
-				cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), M68K_IRQ_4, 128);
-				cputag_set_input_line(machine, "maincpu", M68K_IRQ_4, ASSERT_LINE);
+					//printf( "Setting CDIC interrupt line\n" );
+					verboselog(machine, 0, "Setting CDIC interrupt line\n" );
+					cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), M68K_IRQ_4, 128);
+					cputag_set_input_line(machine, "maincpu", M68K_IRQ_4, ASSERT_LINE);
+				//}
 			}
 			else if((buffer[CDIC_SECTOR_SUBMODE2] & (CDIC_SUBMODE_DATA | CDIC_SUBMODE_AUDIO | CDIC_SUBMODE_VIDEO)) == 0x00)
 			{
@@ -1222,7 +1229,7 @@ static WRITE16_HANDLER( cdic_w )
 						cdic_regs.data_buffer &= 0xfffe;
 						break;
 					default:
-						fatalerror( "Unknown CDIC command: %02x\n", cdic_regs.command );
+						verboselog(space->machine, 0, "Unknown CDIC command: %02x\n", cdic_regs.command );
 						break;
 				}
 			}
@@ -2383,6 +2390,13 @@ INLINE UINT8 BYTE_TO_CLUT(int channel, int icm, UINT8 byte)
 static void mcd212_update_region_arrays(running_machine *machine)
 {
 	int x = 0;
+
+	static int latched_rf0 = 0;
+	static int latched_rf1 = 0;
+	static int latched_wfa = 0;
+	static int latched_wfb = 0;
+	latched_wfa = mcd212.channel[0].weight_factor_a[0];
+	latched_wfb = mcd212.channel[1].weight_factor_b[0];
 	for(x = 0; x < 768; x++)
 	{
 		if(mcd212.channel[0].image_coding_method & MCD212_ICM_NR)
@@ -2390,17 +2404,13 @@ static void mcd212_update_region_arrays(running_machine *machine)
 			int reg = 0;
 			int flag = 0;
 
-			for(flag = 0; flag < 2; flag++)
+			for(reg = 0; reg < 4; reg++)
 			{
-				for(reg = 0; reg < 4; reg++)
+				for(flag = 0; flag < 2; flag++)
 				{
-					if(x > (mcd212.channel[0].region_control[flag*4 + reg] & MCD212_RC_X))
-					{
-						break;
-					}
 					if(x == (mcd212.channel[0].region_control[flag*4 + reg] & MCD212_RC_X))
 					{
-						switch(mcd212.channel[0].region_control[flag*4 + reg] & MCD212_RC_OP)
+						switch((mcd212.channel[0].region_control[flag*4 + reg] & MCD212_RC_OP) >> MCD212_RC_OP_SHIFT)
 						{
 							case 0: // End of region control for line
 								break;
@@ -2409,80 +2419,80 @@ static void mcd212_update_region_arrays(running_machine *machine)
 							case 3: // Not used
 								break;
 							case 4: // Change weight of plane A
-								mcd212.channel[0].weight_factor_a[x] = (mcd212.channel[0].region_control[flag*4 + reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
+								latched_wfa = (mcd212.channel[0].region_control[flag*4 + reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
 								break;
 							case 5:	// Not used
 								break;
 							case 6: // Change weight of plane B
-								mcd212.channel[1].weight_factor_b[x] = (mcd212.channel[0].region_control[flag*4 + reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
+								latched_wfb = (mcd212.channel[0].region_control[flag*4 + reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
 								break;
 							case 7:	// Not used
 								break;
 							case 8: // Reset region flag
 								if(flag)
 								{
-									mcd212.region_flag_1[x] = 0;
+									latched_rf1 = 0;
 								}
 								else
 								{
-									mcd212.region_flag_0[x] = 0;
+									latched_rf0 = 0;
 								}
 								break;
 							case 9: // Set region flag
 								if(flag)
 								{
-									mcd212.region_flag_1[x] = 1;
+									latched_rf1 = 1;
 								}
 								else
 								{
-									mcd212.region_flag_0[x] = 1;
+									latched_rf0 = 1;
 								}
 								break;
 							case 10:	// Not used
 							case 11:	// Not used
 								break;
 							case 12: // Reset region flag and change weight of plane A
-								mcd212.channel[0].weight_factor_a[x] = (mcd212.channel[0].region_control[flag*4 + reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
+								latched_wfa = (mcd212.channel[0].region_control[flag*4 + reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
 								if(flag)
 								{
-									mcd212.region_flag_1[x] = 0;
+									latched_rf1 = 0;
 								}
 								else
 								{
-									mcd212.region_flag_0[x] = 0;
+									latched_rf0 = 0;
 								}
 								break;
 							case 13: // Set region flag and change weight of plane A
-								mcd212.channel[0].weight_factor_a[x] = (mcd212.channel[0].region_control[flag*4 + reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
+								latched_wfa = (mcd212.channel[0].region_control[flag*4 + reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
 								if(flag)
 								{
-									mcd212.region_flag_1[x] = 1;
+									latched_rf1 = 1;
 								}
 								else
 								{
-									mcd212.region_flag_0[x] = 1;
+									latched_rf0 = 1;
 								}
 								break;
 							case 14: // Reset region flag and change weight of plane B
-								mcd212.channel[1].weight_factor_b[x] = (mcd212.channel[0].region_control[flag*4 + reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
+								latched_wfb = (mcd212.channel[0].region_control[flag*4 + reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
 								if(flag)
 								{
-									mcd212.region_flag_1[x] = 0;
+									latched_rf1 = 0;
 								}
 								else
 								{
-									mcd212.region_flag_0[x] = 0;
+									latched_rf0 = 0;
 								}
 								break;
 							case 15: // Set region flag and change weight of plane B
-								mcd212.channel[1].weight_factor_b[x] = (mcd212.channel[0].region_control[flag*4 + reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
+								latched_wfb = (mcd212.channel[0].region_control[flag*4 + reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
 								if(flag)
 								{
-									mcd212.region_flag_1[x] = 1;
+									latched_rf1 = 1;
 								}
 								else
 								{
-									mcd212.region_flag_0[x] = 1;
+									latched_rf0 = 1;
 								}
 								break;
 						}
@@ -2498,7 +2508,7 @@ static void mcd212_update_region_arrays(running_machine *machine)
 				int flag = (mcd212.channel[0].region_control[reg] & MCD212_RC_RF) >> MCD212_RC_RF_SHIFT;
 				if(x > (mcd212.channel[0].region_control[reg] & MCD212_RC_X))
 				{
-					return;
+					break;
 				}
 				if(x == (mcd212.channel[0].region_control[reg] & MCD212_RC_X))
 				{
@@ -2511,88 +2521,91 @@ static void mcd212_update_region_arrays(running_machine *machine)
 						case 3: // Not used
 							break;
 						case 4: // Change weight of plane A
-							mcd212.channel[0].weight_factor_a[x] = (mcd212.channel[0].region_control[reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
-							verboselog(machine, 0, "New weight factor A: %d\n", mcd212.channel[0].weight_factor_a[x]);
+							latched_wfa = (mcd212.channel[0].region_control[reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
 							break;
 						case 5:	// Not used
 							break;
 						case 6: // Change weight of plane B
-							mcd212.channel[1].weight_factor_b[x] = (mcd212.channel[0].region_control[reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
-							verboselog(machine, 0, "New weight factor B: %d\n", mcd212.channel[1].weight_factor_b[x]);
+							latched_wfb = (mcd212.channel[0].region_control[reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
 							break;
 						case 7:	// Not used
 							break;
 						case 8: // Reset region flag
 							if(flag)
 							{
-								mcd212.region_flag_1[x] = 0;
+								latched_rf1 = 0;
 							}
 							else
 							{
-								mcd212.region_flag_0[x] = 0;
+								latched_rf0 = 0;
 							}
 							break;
 						case 9: // Set region flag
 							if(flag)
 							{
-								mcd212.region_flag_1[x] = 1;
+								latched_rf1 = 1;
 							}
 							else
 							{
-								mcd212.region_flag_0[x] = 1;
+								latched_rf0 = 1;
 							}
 							break;
 						case 10:	// Not used
 						case 11:	// Not used
 							break;
 						case 12: // Reset region flag and change weight of plane A
-							mcd212.channel[0].weight_factor_a[x] = (mcd212.channel[0].region_control[reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
+							latched_wfa = (mcd212.channel[0].region_control[reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
 							if(flag)
 							{
-								mcd212.region_flag_1[x] = 0;
+								latched_rf1 = 0;
 							}
 							else
 							{
-								mcd212.region_flag_0[x] = 0;
+								latched_rf0 = 0;
 							}
 							break;
 						case 13: // Set region flag and change weight of plane A
-							mcd212.channel[0].weight_factor_a[x] = (mcd212.channel[0].region_control[reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
+							latched_wfa = (mcd212.channel[0].region_control[reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
 							if(flag)
 							{
-								mcd212.region_flag_1[x] = 1;
+								latched_rf1 = 1;
 							}
 							else
 							{
-								mcd212.region_flag_0[x] = 1;
+								latched_rf0 = 1;
 							}
 							break;
 						case 14: // Reset region flag and change weight of plane B
-							mcd212.channel[1].weight_factor_b[x] = (mcd212.channel[0].region_control[reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
+							latched_wfb = (mcd212.channel[0].region_control[reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
 							if(flag)
 							{
-								mcd212.region_flag_1[x] = 0;
+								latched_rf1 = 0;
 							}
 							else
 							{
-								mcd212.region_flag_0[x] = 0;
+								latched_rf0 = 0;
 							}
 							break;
 						case 15: // Set region flag and change weight of plane B
-							mcd212.channel[1].weight_factor_b[x] = (mcd212.channel[0].region_control[reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
+							latched_wfb = (mcd212.channel[0].region_control[reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
 							if(flag)
 							{
-								mcd212.region_flag_1[x] = 1;
+								latched_rf1 = 1;
 							}
 							else
 							{
-								mcd212.region_flag_0[x] = 1;
+								latched_rf0 = 1;
 							}
 							break;
 					}
+					break;
 				}
 			}
 		}
+		mcd212.channel[0].weight_factor_a[x] = latched_wfa;
+		mcd212.channel[1].weight_factor_b[x] = latched_wfb;
+		mcd212.region_flag_0[x] = latched_rf0;
+		mcd212.region_flag_1[x] = latched_rf1;
 	}
 }
 
