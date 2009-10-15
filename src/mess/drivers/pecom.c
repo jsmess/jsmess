@@ -191,7 +191,7 @@ static MACHINE_DRIVER_START( pecom64 )
 	
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("64K")
+	MDRV_RAM_DEFAULT_SIZE("32K")
 MACHINE_DRIVER_END
 
 /* ROM definition */

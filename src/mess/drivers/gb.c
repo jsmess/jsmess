@@ -636,7 +636,7 @@ static MACHINE_DRIVER_START( gbcolor )
 	
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("40K") /* 2 pages of 8KB VRAM, 8 pages of 4KB RAM */
+	MDRV_RAM_DEFAULT_SIZE("48K") /* 2 pages of 8KB VRAM, 8 pages of 4KB RAM */
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( megaduck )

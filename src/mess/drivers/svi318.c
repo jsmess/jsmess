@@ -352,6 +352,24 @@ static MACHINE_DRIVER_START( svi318n )
 	MDRV_MACHINE_RESET( svi318 )
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( svi328 )
+	MDRV_IMPORT_FROM( svi318 )
+
+	/* internal ram */
+	MDRV_RAM_MODIFY("messram")
+	MDRV_RAM_DEFAULT_SIZE("64K")
+	MDRV_RAM_EXTRA_OPTIONS("96K,160K")
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( svi328n )
+	MDRV_IMPORT_FROM( svi318n )
+
+	/* internal ram */
+	MDRV_RAM_MODIFY("messram")
+	MDRV_RAM_DEFAULT_SIZE("64K")
+	MDRV_RAM_EXTRA_OPTIONS("96K,160K")
+MACHINE_DRIVER_END
+
 static const mc6845_interface svi806_crtc6845_interface =
 {
 	"svi806",
@@ -509,7 +527,7 @@ ROM_END
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT   INIT    CONFIG  COMPANY         FULLNAME                    FLAGS */
 COMP( 1983, svi318,     0,      0,      svi318,     svi318, svi318, 0, "Spectravideo", "SVI-318 (PAL)",            0 )
 COMP( 1983, svi318n,    svi318, 0,      svi318n,    svi318, svi318, 0, "Spectravideo", "SVI-318 (NTSC)",           0 )
-COMP( 1983, svi328,     svi318, 0,      svi318,     svi328, svi318, 0, "Spectravideo", "SVI-328 (PAL)",            0 )
-COMP( 1983, svi328n,    svi318, 0,      svi318n,    svi328, svi318, 0, "Spectravideo", "SVI-328 (NTSC)",           0 )
+COMP( 1983, svi328,     svi318, 0,      svi328,     svi328, svi318, 0, "Spectravideo", "SVI-328 (PAL)",            0 )
+COMP( 1983, svi328n,    svi318, 0,      svi328n,    svi328, svi318, 0, "Spectravideo", "SVI-328 (NTSC)",           0 )
 COMP( 1983, sv328p80,   svi318, 0,      svi328_806,    svi328, svi318, 0, "Spectravideo", "SVI-328 (PAL) + SVI-806 80 column card", 0 )
 COMP( 1983, sv328n80,   svi318, 0,      svi328n_806,   svi328, svi318, 0, "Spectravideo", "SVI-328 (NTSC) + SVI-806 80 column card", 0 )

@@ -49,7 +49,8 @@ struct _ram_config
 	MDRV_DEVICE_REMOVE(_tag)
 
 #define MDRV_RAM_MODIFY(_tag) \
-	MDRV_DEVICE_MODIFY(_tag)
+	MDRV_DEVICE_MODIFY(_tag)	\
+	MDRV_DEVICE_CONFIG_DATAPTR(ram_config, extra_options, NULL)
 
 #define MDRV_RAM_DEFAULT_SIZE(_default_size) \
 	MDRV_DEVICE_CONFIG_DATAPTR(ram_config, default_size, _default_size)

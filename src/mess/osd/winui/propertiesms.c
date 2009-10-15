@@ -32,7 +32,7 @@
 #include "messopts.h"
 #include "strconv.h"
 #include "winutf8.h"
-#include "devices\messram.h"
+#include "devices/messram.h"
 
 static BOOL SoftwareDirectories_OnInsertBrowse(HWND hDlg, BOOL bBrowse, LPCTSTR lpItem);
 static BOOL SoftwareDirectories_OnDelete(HWND hDlg);

@@ -216,7 +216,7 @@ static MACHINE_DRIVER_START( pk8020 )
 	
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("162K")	//64 + 4*48 + 2
+	MDRV_RAM_DEFAULT_SIZE("258K")	//64 + 4*48 + 2
 MACHINE_DRIVER_END
 
 /* ROM definition */
