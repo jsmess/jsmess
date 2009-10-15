@@ -421,6 +421,7 @@ static BOOL RamPopulateControl(datamap *map, HWND dialog, HWND control, core_opt
 		current_index = 0;
 
 		{
+			ram = ram_parse_string(config->default_size);
 			t_ramstring = tstring_from_utf8(config->default_size);
 			if( !t_ramstring )
 				return FALSE;
