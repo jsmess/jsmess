@@ -72,7 +72,7 @@ Notes:
 #include "devices/cassette.h"
 #include "devices/printer.h"
 #include "machine/ctronics.h"
-#include "includes/serial.h"
+#include "machine/serial.h"
 #include "machine/msm8251.h"
 #include "machine/i8255a.h"
 #include "machine/nec765.h"

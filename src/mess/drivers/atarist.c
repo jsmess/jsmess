@@ -6,7 +6,7 @@
 #include "devices/flopdrv.h"
 #include "devices/cartslot.h"
 #include "machine/ctronics.h"
-#include "includes/serial.h"
+#include "machine/serial.h"
 #include "machine/6850acia.h"
 #include "machine/68901mfp.h"
 #include "machine/8530scc.h"

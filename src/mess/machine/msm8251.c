@@ -8,7 +8,7 @@
 
 #include "driver.h"
 #include "msm8251.h"
-#include "includes/serial.h"
+#include "machine/serial.h"
 
 
 /***************************************************************************

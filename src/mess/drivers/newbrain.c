@@ -8,7 +8,7 @@
 #include "machine/z80ctc.h"
 #include "machine/z80sio.h"
 #include "includes/newbrain.h"
-#include "includes/serial.h"
+#include "machine/serial.h"
 #include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
 #include "devices/cassette.h"

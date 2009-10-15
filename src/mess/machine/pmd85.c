@@ -16,7 +16,7 @@
 #include "includes/pmd85.h"
 #include "machine/msm8251.h"
 #include "machine/pit8253.h"
-#include "includes/serial.h"
+#include "machine/serial.h"
 #include "devices/messram.h"
 
 static UINT8 pmd85_rom_module_present = 0;

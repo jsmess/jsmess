@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- * includes/serial.h
+ * machine/serial.h
  *
  * internal serial transmission
  *

@@ -14,7 +14,7 @@
 
 #include "driver.h"
 #include "6551.h"
-#include "includes/serial.h"
+#include "machine/serial.h"
 
 
 /***************************************************************************

@@ -6,7 +6,7 @@
 
 #include "driver.h"
 #include "includes/nc.h"
-#include "includes/serial.h"
+#include "machine/serial.h"
 #include "machine/msm8251.h"
 #include "image.h"
 

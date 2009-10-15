@@ -10,7 +10,7 @@
 #include "includes/poly88.h"
 #include "cpu/i8085/i8085.h"
 #include "devices/cassette.h"
-#include "includes/serial.h"
+#include "machine/serial.h"
 
 static UINT8 intr = 0;
 static UINT8 last_code = 0;

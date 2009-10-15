@@ -30,7 +30,7 @@
 #include "driver.h"
 #include "includes/bw2.h"
 #include "cpu/z80/z80.h"
-#include "includes/serial.h"
+#include "machine/serial.h"
 #include "machine/i8255a.h"
 #include "machine/ctronics.h"
 #include "machine/msm8251.h"

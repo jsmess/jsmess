@@ -9,7 +9,7 @@
 #ifndef __MSM8251_H__
 #define __MSM8251_H__
 
-#include "includes/serial.h"
+#include "machine/serial.h"
 
 
 /***************************************************************************

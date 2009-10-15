@@ -68,7 +68,7 @@
 /* Components */
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
-#include "includes/serial.h"
+#include "machine/serial.h"
 #include "machine/z80ctc.h"
 #include "machine/z80sio.h"
 #include "machine/z80dart.h"

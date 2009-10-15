@@ -19,7 +19,7 @@
 #include "audio/mea8000.h"
 #include "machine/ctronics.h"
 #include "devices/cartslot.h"
-#include "includes/serial.h"
+#include "machine/serial.h"
 #include "devices/cassette.h"
 #include "machine/mc6843.h"
 #include "machine/mc6846.h"

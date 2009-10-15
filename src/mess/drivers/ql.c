@@ -47,7 +47,7 @@
 #include "devices/cartslot.h"
 #include "devices/microdrv.h"
 #include "devices/snapquik.h"
-#include "includes/serial.h"
+#include "machine/serial.h"
 #include "sound/speaker.h"
 #include "video/zx8301.h"
 #include "machine/zx8302.h"
