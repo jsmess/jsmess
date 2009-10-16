@@ -14,6 +14,16 @@
 #include "options.h"
 #include "devintrf.h"
 
+
+enum
+{
+	OSD_FOPEN_READ,
+	OSD_FOPEN_WRITE,
+	OSD_FOPEN_RW,
+	OSD_FOPEN_RW_CREATE
+};
+
+
 struct _mame_file;
 
 

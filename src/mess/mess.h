@@ -66,13 +66,6 @@ int mess_validitychecks(void);
 void mess_predevice_init(running_machine *machine);
 void mess_postdevice_init(running_machine *machine);
 
-enum
-{
-	OSD_FOPEN_READ,
-	OSD_FOPEN_WRITE,
-	OSD_FOPEN_RW,
-	OSD_FOPEN_RW_CREATE
-};
 
 /* --------------------------------------------------------------------------------------------- */
 
