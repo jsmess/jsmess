@@ -1505,8 +1505,8 @@ WRITE8_HANDLER( sms_store_control_w )
 	else
 	{
 		/* Pull reset line of CPU #0 low */
-		cputag_suspend(space->machine, "maincpu", SUSPEND_REASON_HALT, 1);
 		device_reset(cputag_get_cpu(space->machine, "maincpu"));
+		cputag_suspend(space->machine, "maincpu", SUSPEND_REASON_HALT, 1);
 	}
 	sms_state.store_control = data;
 }
