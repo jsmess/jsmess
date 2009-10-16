@@ -1197,15 +1197,34 @@ DEVICE_IMAGE_LOAD( sms_cart )
 
 	if (strcmp(image->tag,"cart2") == 0)
 		index = 1;
-
 	if (strcmp(image->tag,"cart3") == 0)
 		index = 2;
-
 	if (strcmp(image->tag,"cart4") == 0)
 		index = 3;
-
 	if (strcmp(image->tag,"cart5") == 0)
 		index = 4;
+	if (strcmp(image->tag,"cart6") == 0)
+		index = 5;
+	if (strcmp(image->tag,"cart7") == 0)
+		index = 6;
+	if (strcmp(image->tag,"cart8") == 0)
+		index = 7;
+	if (strcmp(image->tag,"cart9") == 0)
+		index = 8;
+	if (strcmp(image->tag,"cart10") == 0)
+		index = 9;
+	if (strcmp(image->tag,"cart11") == 0)
+		index = 10;
+	if (strcmp(image->tag,"cart12") == 0)
+		index = 11;
+	if (strcmp(image->tag,"cart13") == 0)
+		index = 12;
+	if (strcmp(image->tag,"cart14") == 0)
+		index = 13;
+	if (strcmp(image->tag,"cart15") == 0)
+		index = 14;
+	if (strcmp(image->tag,"cart16") == 0)
+		index = 15;
 
 	/* Check for 512-byte header */
 	if ((size / 512) & 1)
@@ -1494,13 +1513,13 @@ WRITE8_HANDLER( sms_store_control_w )
 
 void sms_store_int_callback( running_machine *machine, int state )
 {
-	cputag_set_input_line(machine, "maincpu", sms_state.store_control & 0x01 ? 1 : 0, state);
+	cputag_set_input_line(machine, sms_state.store_control & 0x01 ? "control" : "maincpu", 0, state);
 }
 
 
 static void sms_set_zero_flag( void )
 {
-sms_state.is_gamegear = 0;
+	sms_state.is_gamegear = 0;
 	sms_state.is_region_japan = 0;
 	sms_state.has_bios_0400 = 0;
 	sms_state.has_bios_2000 = 0;
