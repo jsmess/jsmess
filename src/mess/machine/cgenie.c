@@ -595,3 +595,16 @@ INTERRUPT_GEN( cgenie_frame_interrupt )
 		cgenie_port_ff_w(cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0, port_ff ^ FF_BGD0);
 	}
 }
+
+static UINT8 control_port;
+
+READ8_DEVICE_HANDLER( cgenie_sh_control_port_r )
+{
+	return control_port;
+}
+
+WRITE8_DEVICE_HANDLER( cgenie_sh_control_port_w )
+{
+	control_port = data;
+	ay8910_address_w(device, offset, data);
+}

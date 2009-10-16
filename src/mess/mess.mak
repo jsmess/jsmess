@@ -795,7 +795,6 @@ $(MESSOBJ)/drc.a:				\
 $(MESSOBJ)/eaca.a:				\
 	$(MESS_DRIVERS)/cgenie.o	\
 	$(MESS_VIDEO)/cgenie.o		\
-	$(MESS_AUDIO)/cgenie.o		\
 	$(MESS_MACHINE)/cgenie.o	\
 	$(MESS_FORMATS)/cgen_cas.o	\
 
