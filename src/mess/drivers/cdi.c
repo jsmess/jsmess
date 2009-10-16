@@ -32,12 +32,14 @@ TODO:
 
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
-#include "sound/2413intf.h"
+#include "sound/dmadac.h"
 #include "devices/chd_cd.h"
 
 static UINT16 *planea;
 static UINT16 *planeb;
 static UINT16 *cdram;
+
+static const device_config *dmadac[2];
 
 emu_timer *test_timer;
 
@@ -1072,15 +1074,18 @@ static void cdic_decode_xa_stereo(const unsigned char *xa, unsigned char *ptr)
 	cdic_xa_last[3]=l3;
 }
 
-static void cdic_decode_audio_sector(const unsigned char *xa)
+static void cdic_decode_audio_sector(running_machine *machine, const unsigned char *xa)
 {
 	// Get XA format from sector header
 
 	const unsigned char *hdr = xa + 4;
-	float freq;
+	double freq;
 	int channels;
 	UINT8 samples[18*28*8*2];
 	//FILE* temp_adpcm = fopen("temp_adpcm.bin","ab");
+
+	dmadac[0] = devtag_get_device(machine, "dac1");
+	dmadac[1] = devtag_get_device(machine, "dac2");
 
 	//fseek(temp_adpcm, 0, SEEK_END);
 	switch(hdr[2] & 0x3f)	// ignore emphasis and reserved bits
@@ -1106,9 +1111,12 @@ static void cdic_decode_audio_sector(const unsigned char *xa)
 			break;
 
 		default:
-			printf("play_xa: unhandled xa mode %08x\n",hdr[2]);
+			fatalerror("play_xa: unhandled xa mode %08x\n",hdr[2]);
 			return;
 	}
+
+	dmadac_set_frequency(&dmadac[0], 2, freq);
+	dmadac_enable(&dmadac[0], 2, 1);
 
 	switch(channels)
 	{
@@ -1120,7 +1128,9 @@ static void cdic_decode_audio_sector(const unsigned char *xa)
 			break;
 	}
 
-	//fwrite(samples, 18*28*8*2, 1, temp_adpcm);
+    dmadac_transfer(&dmadac[0], 2, 2, 2, 18*28*4, (INT16*)samples);
+
+	//fwrite(samples, 1, 18*28*8*2, temp_adpcm);
 	//fclose(temp_adpcm);
 }
 
@@ -1219,7 +1229,7 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 				//}
 				//else
 				//{
-					cdic_decode_audio_sector((UINT8*)cdram + ((cdic_regs.data_buffer & 5) * 0xa00 + 4));
+					cdic_decode_audio_sector(machine, ((UINT8*)cdram) + ((cdic_regs.data_buffer & 5) * 0xa00 + 4));
 					// Ignore the audio sector for now.
 					cdic_regs.x_buffer |= 0x8000;
 
@@ -3472,6 +3482,14 @@ static MACHINE_DRIVER_START( cdimono1 )
 	MDRV_MACHINE_RESET(cdi)
 
 	MDRV_CDROM_ADD( "cdrom" )
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MDRV_SOUND_ADD("dac1", DMADAC, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MDRV_SOUND_ADD("dac2", DMADAC, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 /*************************
