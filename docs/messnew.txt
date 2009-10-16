@@ -68,6 +68,9 @@ System Driver Changes:
 
 - [TRS80] Model 4 and 4P can boot from floppy disk. [Robbbert]
 
+- [VTECH1] Added support for the SHRG (super hires graphics)
+  modification.  [Dirk Best]
+
 
 
 User Interface Changes:

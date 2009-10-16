@@ -590,6 +590,13 @@ static WRITE8_HANDLER( vtech1_latch_w )
 	if (LOG_VTECH1_LATCH)
 		logerror("vtech1_latch_w $%02X\n", data);
 
+	/* bit 1, SHRG mod (if installed) */
+	if (videoram_size == 0x2000)
+	{
+		mc6847_gm0_w(vtech1->mc6847, BIT(data, 1));
+		mc6847_gm2_w(vtech1->mc6847, BIT(data, 1));
+	}
+
 	/* bit 2, cassette out */
 	cassette_output(vtech1->cassette, BIT(data, 2) ? +1.0 : -1.0);
 
@@ -615,6 +622,12 @@ static WRITE8_HANDLER( vtech1_memory_bank_w )
 	if (data >= 1)
 		if ((data <= 3 && vtech1->ram_size == 66*1024) || (vtech1->ram_size == 4098*1024))
 			memory_set_bank(space->machine, 3, data - 1);
+}
+
+static WRITE8_HANDLER( vtech1_video_bank_w )
+{
+	logerror("vtech1_video_bank_w $%02X\n", data);
+	memory_set_bank(space->machine, 4, data & 0x03);
 }
 
 
@@ -695,6 +708,21 @@ static DRIVER_INIT( vtech1 )
 	vtech1->fdc_latch = 0;
 }
 
+static DRIVER_INIT( vtech1h )
+{
+	const address_space *prg = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+
+	DRIVER_INIT_CALL(vtech1);
+
+	/* the SHRG mod replaces the standard videoram chip with an 8k chip */
+	videoram_size = 0x2000;
+	videoram = auto_alloc_array(machine, UINT8, videoram_size);
+
+	memory_install_readwrite8_handler(prg, 0x7000, 0x77ff, 0, 0, SMH_BANK(4), SMH_BANK(4));
+	memory_configure_bank(machine, 4, 0, 4, videoram, 0x800);
+	memory_set_bank(machine, 4, 0);
+}
+
 
 /***************************************************************************
     ADDRESS MAPS
@@ -743,6 +771,11 @@ static ADDRESS_MAP_START( vtech1_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x30, 0x3f) AM_READWRITE(vtech1_serial_r, vtech1_serial_w)
 	AM_RANGE(0x40, 0x4f) AM_READ(vtech1_lightpen_r)
 	AM_RANGE(0x70, 0x7f) AM_WRITE(vtech1_memory_bank_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( vtech1_shrg_io, ADDRESS_SPACE_IO, 8 )
+	AM_IMPORT_FROM(vtech1_io)
+	AM_RANGE(0xd0, 0xdf) AM_WRITE(vtech1_video_bank_w)
 ADDRESS_MAP_END
 
 
@@ -920,6 +953,22 @@ static const mc6847_interface vtech1_mc6847_intf =
 	DEVCB_NULL,
 };
 
+static const mc6847_interface vtech1_shrg_mc6847_intf =
+{
+	DEVCB_HANDLER(vtech1_mc6847_videoram_r),
+	DEVCB_NULL,
+	DEVCB_LINE_VCC,
+	DEVCB_NULL,
+	DEVCB_LINE_GND,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_CPU_INPUT_LINE("maincpu", 0),
+	DEVCB_NULL,
+	DEVCB_NULL,
+};
+
 static MACHINE_DRIVER_START( laser110 )
 	MDRV_DRIVER_DATA(vtech1_state)
 
@@ -997,6 +1046,17 @@ static MACHINE_DRIVER_START( laser310 )
 	MDRV_RAM_EXTRA_OPTIONS("16K,32K,4098K")
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( laser310h )
+    MDRV_IMPORT_FROM(laser310)
+
+    MDRV_CPU_MODIFY("maincpu")
+    MDRV_CPU_IO_MAP(vtech1_shrg_io)
+
+    MDRV_DEVICE_REMOVE("mc6847")
+    MDRV_MC6847_ADD("mc6847", vtech1_shrg_mc6847_intf)
+	MDRV_MC6847_TYPE(M6847_VERSION_ORIGINAL_PAL)
+MACHINE_DRIVER_END
+
 
 /***************************************************************************
     ROM DEFINITIONS
@@ -1046,6 +1106,7 @@ ROM_START( laser310 )
 ROM_END
 
 #define rom_vz300       rom_laser310
+#define rom_laser310h   rom_laser310
 
 
 /***************************************************************************
@@ -1080,15 +1141,16 @@ SYSTEM_CONFIG_END
     GAME DRIVERS
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT   INIT    CONFIG  COMPANY                   FULLNAME                          FLAGS */
-COMP( 1983, laser110, 0,        0,      laser110, vtech1, vtech1, vtech1, "Video Technology",       "Laser 110",                      0 )
-COMP( 1983, las110de, laser110, 0,      laser110, vtech1, vtech1, vtech1, "Sanyo",                  "Laser 110 (Germany)",            0 )
-COMP( 1983, laser200, 0,        0,      laser200, vtech1, vtech1, vtech1, "Video Technology",       "Laser 200",                      0 )
-COMP( 1983, vz200de,  laser200, 0,      laser200, vtech1, vtech1, vtech1, "Video Technology",       "VZ-200 (Germany & Netherlands)", 0 )
-COMP( 1983, fellow,   laser200, 0,      laser200, vtech1, vtech1, vtech1, "Salora",                 "Fellow (Finland)",               0 )
-COMP( 1983, tx8000,   laser200, 0,      laser200, vtech1, vtech1, vtech1, "Texet",                  "TX-8000 (UK)",                   0 )
-COMP( 1984, laser210, 0,        0,      laser210, vtech1, vtech1, vtech1, "Video Technology",       "Laser 210",                      0 )
-COMP( 1984, vz200,    laser210, 0,      laser210, vtech1, vtech1, vtech1, "Dick Smith Electronics", "VZ-200 (Oceania)",               0 )
-COMP( 1984, las210de, laser210, 0,      laser210, vtech1, vtech1, vtech1, "Sanyo",                  "Laser 210 (Germany)",            0 )
-COMP( 1984, laser310, 0,        0,      laser310, vtech1, vtech1, vtech1, "Video Technology",       "Laser 310",                      0 )
-COMP( 1984, vz300,    laser310, 0,      laser310, vtech1, vtech1, vtech1, "Dick Smith Electronics", "VZ-300 (Oceania)",               0 )
+/*    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT   INIT     CONFIG  COMPANY                   FULLNAME                          FLAGS */
+COMP( 1983, laser110,  0,        0,      laser110,  vtech1, vtech1,  vtech1, "Video Technology",       "Laser 110",                      0 )
+COMP( 1983, las110de,  laser110, 0,      laser110,  vtech1, vtech1,  vtech1, "Sanyo",                  "Laser 110 (Germany)",            0 )
+COMP( 1983, laser200,  0,        0,      laser200,  vtech1, vtech1,  vtech1, "Video Technology",       "Laser 200",                      0 )
+COMP( 1983, vz200de,   laser200, 0,      laser200,  vtech1, vtech1,  vtech1, "Video Technology",       "VZ-200 (Germany & Netherlands)", 0 )
+COMP( 1983, fellow,    laser200, 0,      laser200,  vtech1, vtech1,  vtech1, "Salora",                 "Fellow (Finland)",               0 )
+COMP( 1983, tx8000,    laser200, 0,      laser200,  vtech1, vtech1,  vtech1, "Texet",                  "TX-8000 (UK)",                   0 )
+COMP( 1984, laser210,  0,        0,      laser210,  vtech1, vtech1,  vtech1, "Video Technology",       "Laser 210",                      0 )
+COMP( 1984, vz200,     laser210, 0,      laser210,  vtech1, vtech1,  vtech1, "Dick Smith Electronics", "VZ-200 (Oceania)",               0 )
+COMP( 1984, las210de,  laser210, 0,      laser210,  vtech1, vtech1,  vtech1, "Sanyo",                  "Laser 210 (Germany)",            0 )
+COMP( 1984, laser310,  0,        0,      laser310,  vtech1, vtech1,  vtech1, "Video Technology",       "Laser 310",                      0 )
+COMP( 1984, vz300,     laser310, 0,      laser310,  vtech1, vtech1,  vtech1, "Dick Smith Electronics", "VZ-300 (Oceania)",               0 )
+COMP( 1984, laser310h, laser310, 0,      laser310h, vtech1, vtech1h, vtech1, "Video Technology",       "Laser 310 (SHRG)",               GAME_COMPUTER_MODIFIED )

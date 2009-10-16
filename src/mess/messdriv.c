@@ -810,6 +810,7 @@ const game_driver * const drivers[] =
     DRIVER( las210de )  /* 1984 Sanyo Laser 210 (Germany)                   */
     DRIVER( vz200 )     /* 1984 Dick Smith Electronics VZ-200               */
     DRIVER( laser310 )  /* 1984 Laser 310 (210 with diff. keyboard and RAM) */
+    DRIVER( laser310h ) /* 1984 Laser 310 with SHRG mod                     */
     DRIVER( vz300 )     /* 1984 Dick Smith Electronics VZ-300               */
     DRIVER( laser350 )  /* 1984? Laser 350                                  */
     DRIVER( laser500 )  /* 1984? Laser 500                                  */
