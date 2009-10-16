@@ -1458,7 +1458,6 @@ $(MESSOBJ)/votrax.a:			\
 	$(MESS_DRIVERS)/votrtnt.o	\
 
 $(MESSOBJ)/vtech.a:				\
-	$(MESS_MACHINE)/vtech1.o	\
 	$(MESS_DRIVERS)/vtech1.o	\
 	$(MESS_VIDEO)/vtech2.o		\
 	$(MESS_MACHINE)/vtech2.o	\
