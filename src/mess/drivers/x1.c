@@ -1554,32 +1554,34 @@ static const z80dma_interface x1_dma =
  *
  *************************************/
 
+static INPUT_CHANGED( ipl_reset )
+{
+	const address_space *space = cputag_get_address_space(field->port->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	UINT8 *ROM = memory_region(space->machine, "maincpu");
+
+	cputag_set_input_line(field->port->machine, "maincpu", INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
+	memory_set_bankptr(space->machine, 1, &ROM[0x00000]);
+
+	//anything else?
+}
+
+/* Apparently most games doesn't support this (not even the Konami ones!), one that does is...177 :o */
+static INPUT_CHANGED( nmi_reset )
+{
+	cputag_set_input_line(field->port->machine, "maincpu", INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+}
+
 static INPUT_PORTS_START( x1 )
+	PORT_START("FP_SYS") //front panel buttons, hard-wired with the soft reset/NMI lines
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CHANGED(ipl_reset,0) PORT_NAME("IPL reset")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CHANGED(nmi_reset,0) PORT_NAME("NMI reset")
+
 	PORT_START("SYSTEM")
-	PORT_DIPNAME( 0x01, 0x01, "SYSTEM" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x10, 0x10, "unk" )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
 
-	PORT_START("IOSYS")
+	PORT_START("IOSYS") //TODO: implement front-panel DIP-SW here
 	PORT_DIPNAME( 0x01, 0x01, "IOSYS" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
