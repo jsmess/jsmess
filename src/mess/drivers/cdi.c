@@ -891,6 +891,8 @@ static READ16_HANDLER( uart_loopback_enable )
 }
 #endif
 
+#define CDIC_BUFFERED_SECTORS	2
+
 typedef struct
 {
 	UINT16 busy_clear_countdown;
@@ -911,6 +913,14 @@ typedef struct
 
 	emu_timer *interrupt_timer;
 	cdrom_file *cd;
+
+	emu_timer *audio_stream_timer;
+	INT16 audio_stream_samples[18*28*16*CDIC_BUFFERED_SECTORS];
+	INT32 audio_stream_queued;
+	INT32 audio_stream_index;
+	INT32 audio_stream_end;
+	INT32 audio_stream_playing;
+
 } cdic_regs_t;
 
 #define CDIC_SECTOR_SYNC		0
@@ -1101,7 +1111,6 @@ static void cdic_decode_xa_stereo(const unsigned char *xa, signed short *dp)
 	cdic_xa_last[3]=l3;
 }
 
-// Something is seriously wrong somewhere with this
 static void cdic_decode_xa_stereo8(const unsigned char *xa, signed short *dp)
 {
 	int l0=cdic_xa_last[0],
@@ -1113,15 +1122,14 @@ static void cdic_decode_xa_stereo8(const unsigned char *xa, signed short *dp)
 
 	for (b=0; b<18; b++)
 	{
-		for (s=0; s<4; s++)
+		for (s=0; s<4; s += 2)
 		{
 			unsigned char flags0=xa[(4+s)^1],
 										shift0=flags0&0xf,
 										filter0=flags0>>4,
-										flags1=xa[(5+(s<<1))^1],
+										flags1=xa[(5+s)^1],
 										shift1=flags1&0xf,
 										filter1=flags1>>4;
-
 			int f0=cdic_adpcm_filter_coef[filter0][0],
 					f1=cdic_adpcm_filter_coef[filter0][1],
 					f2=cdic_adpcm_filter_coef[filter1][0],
@@ -1130,13 +1138,18 @@ static void cdic_decode_xa_stereo8(const unsigned char *xa, signed short *dp)
 
 			for (i=0; i<28; i++)
 			{
-				short d0=(xa[(16+(i<<2)+s)^1]<<8);
-				short d1=(xa[(16+(i<<2)+s)^1]<<8);
-				*dp++=clamp((d0>>shift0)+(((l0*f0)+(l1*f1)+32)>>6));
+				//short d0=(xa[(16+((i+0)<<2)+s)^1]<<8);
+				//short d1=(xa[(16+((i+1)<<2)+s)^1]<<8);
+				short d0=(xa[(16+(i<<2)+s+0)^1]<<8);
+				short d1=(xa[(16+(i<<2)+s+1)^1]<<8);
+
+				d0=clamp((d0>>shift0)+(((l0*f0)+(l1*f1)+32)>>6));
+				*dp++=d0;
 				l1=l0;
 				l0=d0;
 
-				*dp++=clamp((d1>>shift1)+(((l2*f2)+(l3*f3)+32)>>6));
+				d1=clamp((d1>>shift1)+(((l2*f2)+(l3*f3)+32)>>6));
+				*dp++=d1;
 				l3=l2;
 				l2=d1;
 			}
@@ -1172,44 +1185,43 @@ static void cdic_decode_audio_sector(running_machine *machine, const unsigned ch
 			channels=1;
 			freq=37800.0f;	//18900.0f;
 			bits=4;
-			size=2;
+			size=4;
 			break;
 
 		case 1:
 			channels=2;
 			freq=37800.0f;
 			bits=4;
-			size=1;
+			size=2;
 			break;
 
 		case 4:
 			channels=1;
 			freq=18900.0f;	///2.0f;
 			bits=4;
-			size=2;
+			size=4;
 			break;
 
 		case 5:
 			channels=2;
 			freq=18900.0f;	//37800.0f/2.0f;
 			bits=4;
-			size=1;
+			size=2;
 			break;
 
 		case 16:
 			channels=1;
 			freq=37800.0f;
 			bits=8;
-			size=1;
+			size=2;
 			break;
 
-		// Something is seriously wrong somewhere with this
-		//case 17:
-			//channels=2;
-			//freq=37800.0f;
-			//bits=8;
-			//size=1;
-			//break;
+		case 17:
+			channels=2;
+			freq=37800.0f;
+			bits=8;
+			size=1;
+			break;
 
 		default:
 			fatalerror("play_xa: unhandled xa mode %08x\n",hdr[2]);
@@ -1248,21 +1260,16 @@ static void cdic_decode_audio_sector(running_machine *machine, const unsigned ch
 			{
 				case 4:
 					cdic_decode_xa_stereo(hdr + 4, samples);
+					fwrite(samples, 1, 18*28*16, temp_adpcm);
 					break;
 				case 8:
-					// Something is seriously wrong somewhere with this
 					cdic_decode_xa_stereo8(hdr + 4, samples);
-					for(index = 18*28*8 - 1; index >= 0; index--)
-					{
-						samples[index*2 + 1] = samples[index];
-						samples[index*2 + 0] = samples[index];
-					}
 					break;
 			}
 			break;
 	}
 
-    dmadac_transfer(&dmadac[0], 2, 2, 2, 18*28*4 * size, samples);
+    dmadac_transfer(&dmadac[0], 2, 2, 2, 18*28*2 * size, samples);
 
 	fclose(temp_adpcm);
 }
@@ -3599,6 +3606,15 @@ static MACHINE_RESET( cdi )
 
 	cdic_regs.interrupt_timer = timer_alloc(machine, cdic_trigger_readback_int, 0);
 	timer_adjust_oneshot(cdic_regs.interrupt_timer, attotime_never, 0);
+
+	cdic_regs.audio_stream_timer = timer_alloc(machine, cdic_trigger_readback_int, 0);
+	timer_adjust_oneshot(cdic_regs.audio_stream_timer, attotime_never, 0);
+
+	memset(cdic_regs.audio_stream_samples, 0, 18*28*16*CDIC_BUFFERED_SECTORS * sizeof(INT16));
+	cdic_regs.audio_stream_queued = 0;
+	cdic_regs.audio_stream_index = 0;
+	cdic_regs.audio_stream_end = 0;
+	cdic_regs.audio_stream_playing = 0;
 
 	if( cdrom_dev )
 	{
