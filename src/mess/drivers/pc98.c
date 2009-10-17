@@ -6,6 +6,10 @@
 
 	Reminder: tests A20 line feature, afaik it's NOT supported by the i386 core (along with protected mode / MMU)
 
+	TODO:
+	- remove the A20 line hack
+	- Understand what's going on at bp f9064 (memo: bp f9064, do eip=1182)
+
 ========================================================================================
 
     This series features a huge number of models released between 1982 and 1997. They
