@@ -964,10 +964,8 @@ INLINE INT16 clamp(INT16 in)
 	return in;
 }
 
-static void cdic_decode_xa_mono(const unsigned char *xa, unsigned char *ptr)
+static void cdic_decode_xa_mono(const unsigned char *xa, signed short *dp)
 {
-	signed short *dp=(signed short *)ptr;
-
 	int l0=cdic_xa_last[0],
 			l1=cdic_xa_last[1];
 	int b=0;
@@ -1020,10 +1018,8 @@ static void cdic_decode_xa_mono(const unsigned char *xa, unsigned char *ptr)
 //
 //
 
-static void cdic_decode_xa_stereo(const unsigned char *xa, unsigned char *ptr)
+static void cdic_decode_xa_stereo(const unsigned char *xa, signed short *dp)
 {
-	signed short *dp=(signed short *)ptr;
-
 	int l0=cdic_xa_last[0],
 			l1=cdic_xa_last[1],
 			l2=cdic_xa_last[2],
@@ -1053,12 +1049,12 @@ static void cdic_decode_xa_stereo(const unsigned char *xa, unsigned char *ptr)
 				short d=xa[(16+(i<<2)+s)^1],
 						 	d0=(d&0xf)<<12,
 						 	d1=(d>>4)<<12;
-				d0=clamp((int)(d0>>shift0)+(((l0*f0)+(l1*f1)+32)>>6));
+				d0=clamp((d0>>shift0)+(((l0*f0)+(l1*f1)+32)>>6));
 				*dp++=d0;
 				l1=l0;
 				l0=d0;
 
-				d1=clamp((int)(d1>>shift1)+(((l2*f2)+(l3*f3)+32)>>6));
+				d1=clamp((d1>>shift1)+(((l2*f2)+(l3*f3)+32)>>6));
 				*dp++=d1;
 				l3=l2;
 				l2=d1;
@@ -1081,11 +1077,9 @@ static void cdic_decode_audio_sector(running_machine *machine, const unsigned ch
 	const unsigned char *hdr = xa + 4;
 	double freq;
 	int channels;
-	UINT8 samples[18*28*8*2];
+	int index;
+	INT16 samples[18*28*16];
 	//FILE* temp_adpcm = fopen("temp_adpcm.bin","ab");
-
-	dmadac[0] = devtag_get_device(machine, "dac1");
-	dmadac[1] = devtag_get_device(machine, "dac2");
 
 	//fseek(temp_adpcm, 0, SEEK_END);
 	switch(hdr[2] & 0x3f)	// ignore emphasis and reserved bits
@@ -1122,13 +1116,18 @@ static void cdic_decode_audio_sector(running_machine *machine, const unsigned ch
 	{
 		case 1:
 			cdic_decode_xa_mono(hdr, samples);
+			for(index = 18*28*8 - 1; index >= 0; index--)
+			{
+				samples[index*2 + 1] = samples[index];
+				samples[index*2 + 0] = samples[index];
+			}
 			break;
 		case 2:
 			cdic_decode_xa_stereo(hdr, samples);
 			break;
 	}
 
-    dmadac_transfer(&dmadac[0], 2, 2, 2, 18*28*4, (INT16*)samples);
+    dmadac_transfer(&dmadac[0], 2, 2, 2, 18*28*4 * (3 - channels), samples);
 
 	//fwrite(samples, 1, 18*28*8*2, temp_adpcm);
 	//fclose(temp_adpcm);
@@ -1415,6 +1414,7 @@ static WRITE16_HANDLER( cdic_w )
 					case 0x2e: // Abort
 						timer_adjust_oneshot(cdic_regs.interrupt_timer, attotime_never, 0);
 						cdic_regs.data_buffer &= 0x3fff;
+						dmadac_enable(&dmadac[0], 2, 0);
 						break;
 					case 0x29: // Read Mode 1
 					case 0x2a: // Read Mode 2
@@ -3453,6 +3453,9 @@ static MACHINE_RESET( cdi )
 
 	cdic_regs.z_buffer = 0;
 	cdic_regs.channel = 0xffffffff;
+
+	dmadac[0] = devtag_get_device(machine, "dac1");
+	dmadac[1] = devtag_get_device(machine, "dac2");
 
 	slave_regs.real_mouse_x = 0xffff;
 	slave_regs.real_mouse_y = 0xffff;
