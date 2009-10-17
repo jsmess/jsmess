@@ -1023,7 +1023,7 @@ static void cdic_decode_xa_mono8(const unsigned char *xa, signed short *dp)
 
 	for (b=0; b<18; b++)
 	{
-		for (s=0; s<3; s++)
+		for (s=0; s<4; s++)
 		{
 			unsigned char flags=xa[(4+s)^1],
 										shift=flags&0xf,
@@ -1034,7 +1034,7 @@ static void cdic_decode_xa_mono8(const unsigned char *xa, signed short *dp)
 
 			for (i=0; i<28; i++)
 			{
-				short d=(xa[(16+(i<<2)+s)^1])<<8;
+				short d=(xa[(16+(i<<2)+s)^1]<<8);
 				d=clamp((d>>shift)+(((l0*f0)+(l1*f1)+32)>>6));
 				*dp++=d;
 				l1=l0;
@@ -1116,9 +1116,9 @@ static void cdic_decode_audio_sector(running_machine *machine, const unsigned ch
 	int index = 0;
 	int size = 2;
 	INT16 samples[18*28*16];
-	//FILE* temp_adpcm = fopen("temp_adpcm.bin","ab");
+	FILE* temp_adpcm = fopen("temp_adpcm.bin","ab");
 
-	//fseek(temp_adpcm, 0, SEEK_END);
+	fseek(temp_adpcm, 0, SEEK_END);
 	printf( "%02x\n", hdr[2] & 0x3f );
 	switch(hdr[2] & 0x3f)	// ignore emphasis and reserved bits
 	{
@@ -1154,7 +1154,7 @@ static void cdic_decode_audio_sector(running_machine *machine, const unsigned ch
 			channels=1;
 			freq=37800.0f;
 			bits=8;
-			size=2;
+			size=1;
 			break;
 
 		default:
@@ -1180,11 +1180,7 @@ static void cdic_decode_audio_sector(running_machine *machine, const unsigned ch
 					break;
 				case 8:
 					cdic_decode_xa_mono8(hdr, samples);
-					for(index = 18*28*8 - 1; index >= 0; index--)
-					{
-						samples[index*2 + 1] = samples[index];
-						samples[index*2 + 0] = samples[index];
-					}
+					fwrite(samples, 1, 18*28*4, temp_adpcm);
 					for(index = 18*28*8 - 1; index >= 0; index--)
 					{
 						samples[index*2 + 1] = samples[index];
@@ -1200,8 +1196,7 @@ static void cdic_decode_audio_sector(running_machine *machine, const unsigned ch
 
     dmadac_transfer(&dmadac[0], 2, 2, 2, 18*28*4 * size, samples);
 
-	//fwrite(samples, 1, 18*28*8*2, temp_adpcm);
-	//fclose(temp_adpcm);
+	fclose(temp_adpcm);
 }
 
 static TIMER_CALLBACK( cdic_trigger_readback_int )
