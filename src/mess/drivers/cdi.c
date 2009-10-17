@@ -328,7 +328,7 @@ static void scc68070_set_timer_callback(int channel)
 	{
 		case 0:
 			compare = 0x10000 - scc68070_regs.timers.timer0;
-			period = attotime_mul(ATTOTIME_IN_HZ(CLOCK_A/30), compare);
+			period = attotime_mul(ATTOTIME_IN_HZ(CLOCK_A/150), compare);
             timer_adjust_oneshot(scc68070_regs.timers.timer0_timer, period, 0);
 			break;
 		default:
@@ -1317,14 +1317,8 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 			//printf( "Reading Mode %d sector from MSF location %06x\n", cdic_regs.command - 0x28, cdic_regs.time | 2 );
 			verboselog(machine, 0, "Reading Mode %d sector from MSF location %06x\n", cdic_regs.command - 0x28, cdic_regs.time | 2 );
 
-			cdic_regs.z_buffer ^= 0x0001;
-			cdic_regs.data_buffer ^= 0x0001;
 
 			cdrom_read_data(cdic_regs.cd, lba, buffer, CD_TRACK_RAW_DONTCARE);
-			for(index = 6; index < 2352/2; index++)
-			{
-				cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + (index - 6)] = (buffer[index*2] << 8) | buffer[index*2 + 1];
-			}
 
 			cdic_regs.time += 0x100;
 			if((cdic_regs.time & 0x00000f00) == 0x00000a00)
@@ -1362,6 +1356,13 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 				//}
 				//else
 				//{
+					cdic_regs.data_buffer |= 0x0004;
+					cdic_regs.data_buffer ^= 0x0001;
+					for(index = 6; index < 2352/2; index++)
+					{
+						cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + (index - 6)] = (buffer[index*2] << 8) | buffer[index*2 + 1];
+					}
+
 					cdic_decode_audio_sector(machine, ((UINT8*)cdram) + ((cdic_regs.data_buffer & 5) * 0xa00 + 4));
 					// Ignore the audio sector for now.
 					cdic_regs.x_buffer |= 0x8000;
@@ -1377,6 +1378,12 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 			}
 			else if((buffer[CDIC_SECTOR_SUBMODE2] & (CDIC_SUBMODE_DATA | CDIC_SUBMODE_AUDIO | CDIC_SUBMODE_VIDEO)) == 0x00)
 			{
+				cdic_regs.data_buffer ^= 0x0001;
+				for(index = 6; index < 2352/2; index++)
+				{
+					cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + (index - 6)] = (buffer[index*2] << 8) | buffer[index*2 + 1];
+				}
+
 				if(buffer[CDIC_SECTOR_SUBMODE2] & CDIC_SUBMODE_TRIG)
 				{
 					cdic_regs.x_buffer |= 0x8000;
@@ -1401,20 +1408,27 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 				cdic_regs.data_buffer |= 0x4000;
 				cdic_regs.data_buffer &= 0x7fff;
 
+				cdic_regs.data_buffer &= ~0x0004;
+				cdic_regs.data_buffer ^= 0x0001;
+				for(index = 6; index < 2352/2; index++)
+				{
+					cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + (index - 6)] = (buffer[index*2] << 8) | buffer[index*2 + 1];
+				}
+
 				//printf( "Setting CDIC interrupt line\n" );
 				verboselog(machine, 0, "Setting CDIC interrupt line\n" );
 				cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), M68K_IRQ_4, 128);
 				cputag_set_input_line(machine, "maincpu", M68K_IRQ_4, ASSERT_LINE);
 			}
 
-			if(!(buffer[CDIC_SECTOR_SUBMODE2] & CDIC_SUBMODE_EOF))
-			{
+			//if(!(buffer[CDIC_SECTOR_SUBMODE2] & CDIC_SUBMODE_EOF))
+			//{
 				timer_adjust_oneshot(cdic_regs.interrupt_timer, ATTOTIME_IN_HZ(75), 0); // 75Hz = 1x CD-ROM speed
-			}
-			else
-			{
-				cdic_regs.command = 0;
-			}
+			//}
+			//else
+			//{
+				//cdic_regs.command = 0;
+			//}
 
 			break;
 		}
