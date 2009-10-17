@@ -1014,6 +1014,41 @@ static void cdic_decode_xa_mono(const unsigned char *xa, signed short *dp)
 	cdic_xa_last[1]=l1;
 }
 
+static void cdic_decode_xa_mono8(const unsigned char *xa, signed short *dp)
+{
+	int l0=cdic_xa_last[0],
+			l1=cdic_xa_last[1];
+	int b=0;
+	int s=0;
+
+	for (b=0; b<18; b++)
+	{
+		for (s=0; s<3; s++)
+		{
+			unsigned char flags=xa[(4+s)^1],
+										shift=flags&0xf,
+										filter=flags>>4;
+			int f0=cdic_adpcm_filter_coef[filter][0],
+					f1=cdic_adpcm_filter_coef[filter][1];
+			int i=0;
+
+			for (i=0; i<28; i++)
+			{
+				short d=(xa[(16+(i<<2)+s)^1])<<8;
+				d=clamp((d>>shift)+(((l0*f0)+(l1*f1)+32)>>6));
+				*dp++=d;
+				l1=l0;
+				l0=d;
+			}
+		}
+
+		xa+=128;
+	}
+
+	cdic_xa_last[0]=l0;
+	cdic_xa_last[1]=l1;
+}
+
 //
 //
 //
@@ -1077,31 +1112,49 @@ static void cdic_decode_audio_sector(running_machine *machine, const unsigned ch
 	const unsigned char *hdr = xa + 4;
 	double freq;
 	int channels;
-	int index;
+	int bits = 4;
+	int index = 0;
+	int size = 2;
 	INT16 samples[18*28*16];
 	//FILE* temp_adpcm = fopen("temp_adpcm.bin","ab");
 
 	//fseek(temp_adpcm, 0, SEEK_END);
+	printf( "%02x\n", hdr[2] & 0x3f );
 	switch(hdr[2] & 0x3f)	// ignore emphasis and reserved bits
 	{
 		case 0:
 			channels=1;
 			freq=37800.0f;	//18900.0f;
+			bits=4;
+			size=2;
 			break;
 
 		case 1:
 			channels=2;
 			freq=37800.0f;
+			bits=4;
+			size=1;
 			break;
 
 		case 4:
 			channels=1;
 			freq=18900.0f;	///2.0f;
+			bits=4;
+			size=2;
 			break;
 
 		case 5:
 			channels=2;
 			freq=18900.0f;	//37800.0f/2.0f;
+			bits=4;
+			size=1;
+			break;
+
+		case 16:
+			channels=1;
+			freq=37800.0f;
+			bits=8;
+			size=2;
 			break;
 
 		default:
@@ -1115,11 +1168,29 @@ static void cdic_decode_audio_sector(running_machine *machine, const unsigned ch
 	switch(channels)
 	{
 		case 1:
-			cdic_decode_xa_mono(hdr, samples);
-			for(index = 18*28*8 - 1; index >= 0; index--)
+			switch(bits)
 			{
-				samples[index*2 + 1] = samples[index];
-				samples[index*2 + 0] = samples[index];
+				case 4:
+					cdic_decode_xa_mono(hdr, samples);
+					for(index = 18*28*8 - 1; index >= 0; index--)
+					{
+						samples[index*2 + 1] = samples[index];
+						samples[index*2 + 0] = samples[index];
+					}
+					break;
+				case 8:
+					cdic_decode_xa_mono8(hdr, samples);
+					for(index = 18*28*8 - 1; index >= 0; index--)
+					{
+						samples[index*2 + 1] = samples[index];
+						samples[index*2 + 0] = samples[index];
+					}
+					for(index = 18*28*8 - 1; index >= 0; index--)
+					{
+						samples[index*2 + 1] = samples[index];
+						samples[index*2 + 0] = samples[index];
+					}
+					break;
 			}
 			break;
 		case 2:
@@ -1127,7 +1198,7 @@ static void cdic_decode_audio_sector(running_machine *machine, const unsigned ch
 			break;
 	}
 
-    dmadac_transfer(&dmadac[0], 2, 2, 2, 18*28*4 * (3 - channels), samples);
+    dmadac_transfer(&dmadac[0], 2, 2, 2, 18*28*4 * size, samples);
 
 	//fwrite(samples, 1, 18*28*8*2, temp_adpcm);
 	//fclose(temp_adpcm);
@@ -1277,6 +1348,10 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 			{
 				timer_adjust_oneshot(cdic_regs.interrupt_timer, ATTOTIME_IN_HZ(75), 0); // 75Hz = 1x CD-ROM speed
 			}
+			else
+			{
+				cdic_regs.command = 0;
+			}
 
 			break;
 		}
@@ -1418,7 +1493,6 @@ static WRITE16_HANDLER( cdic_w )
 						break;
 					case 0x29: // Read Mode 1
 					case 0x2a: // Read Mode 2
-						cdic_xa_last[0] = cdic_xa_last[1] = cdic_xa_last[2] = cdic_xa_last[3] = 0;
 						timer_adjust_oneshot(cdic_regs.interrupt_timer, ATTOTIME_IN_HZ(75), 0); // 75Hz = 1x CD-ROM speed
 						cdic_regs.data_buffer &= 0xfffe;
 						break;
