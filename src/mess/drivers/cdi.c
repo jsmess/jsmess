@@ -1049,10 +1049,6 @@ static void cdic_decode_xa_mono8(const unsigned char *xa, signed short *dp)
 	cdic_xa_last[1]=l1;
 }
 
-//
-//
-//
-
 static void cdic_decode_xa_stereo(const unsigned char *xa, signed short *dp)
 {
 	int l0=cdic_xa_last[0],
@@ -1091,6 +1087,56 @@ static void cdic_decode_xa_stereo(const unsigned char *xa, signed short *dp)
 
 				d1=clamp((d1>>shift1)+(((l2*f2)+(l3*f3)+32)>>6));
 				*dp++=d1;
+				l3=l2;
+				l2=d1;
+			}
+		}
+
+		xa+=128;
+	}
+
+	cdic_xa_last[0]=l0;
+	cdic_xa_last[1]=l1;
+	cdic_xa_last[2]=l2;
+	cdic_xa_last[3]=l3;
+}
+
+// Something is seriously wrong somewhere with this
+static void cdic_decode_xa_stereo8(const unsigned char *xa, signed short *dp)
+{
+	int l0=cdic_xa_last[0],
+			l1=cdic_xa_last[1],
+			l2=cdic_xa_last[2],
+			l3=cdic_xa_last[3];
+	int b=0;
+	int s=0;
+
+	for (b=0; b<18; b++)
+	{
+		for (s=0; s<4; s++)
+		{
+			unsigned char flags0=xa[(4+s)^1],
+										shift0=flags0&0xf,
+										filter0=flags0>>4,
+										flags1=xa[(5+(s<<1))^1],
+										shift1=flags1&0xf,
+										filter1=flags1>>4;
+
+			int f0=cdic_adpcm_filter_coef[filter0][0],
+					f1=cdic_adpcm_filter_coef[filter0][1],
+					f2=cdic_adpcm_filter_coef[filter1][0],
+					f3=cdic_adpcm_filter_coef[filter1][1];
+			int i=0;
+
+			for (i=0; i<28; i++)
+			{
+				short d0=(xa[(16+(i<<2)+s)^1]<<8);
+				short d1=(xa[(16+(i<<2)+s)^1]<<8);
+				*dp++=clamp((d0>>shift0)+(((l0*f0)+(l1*f1)+32)>>6));
+				l1=l0;
+				l0=d0;
+
+				*dp++=clamp((d1>>shift1)+(((l2*f2)+(l3*f3)+32)>>6));
 				l3=l2;
 				l2=d1;
 			}
@@ -1157,6 +1203,14 @@ static void cdic_decode_audio_sector(running_machine *machine, const unsigned ch
 			size=1;
 			break;
 
+		// Something is seriously wrong somewhere with this
+		//case 17:
+			//channels=2;
+			//freq=37800.0f;
+			//bits=8;
+			//size=1;
+			//break;
+
 		default:
 			fatalerror("play_xa: unhandled xa mode %08x\n",hdr[2]);
 			return;
@@ -1180,7 +1234,7 @@ static void cdic_decode_audio_sector(running_machine *machine, const unsigned ch
 					break;
 				case 8:
 					cdic_decode_xa_mono8(hdr, samples);
-					fwrite(samples, 1, 18*28*4, temp_adpcm);
+					//fwrite(samples, 1, 18*28*4, temp_adpcm);
 					for(index = 18*28*8 - 1; index >= 0; index--)
 					{
 						samples[index*2 + 1] = samples[index];
@@ -1190,7 +1244,21 @@ static void cdic_decode_audio_sector(running_machine *machine, const unsigned ch
 			}
 			break;
 		case 2:
-			cdic_decode_xa_stereo(hdr, samples);
+			switch(bits)
+			{
+				case 4:
+					cdic_decode_xa_stereo(hdr, samples);
+					break;
+				case 8:
+					// Something is seriously wrong somewhere with this
+					cdic_decode_xa_stereo8(hdr, samples);
+					for(index = 18*28*8 - 1; index >= 0; index--)
+					{
+						samples[index*2 + 1] = samples[index];
+						samples[index*2 + 0] = samples[index];
+					}
+					break;
+			}
 			break;
 	}
 
@@ -2212,9 +2280,9 @@ static void mcd212_set_register(running_machine *machine, int channel, UINT8 reg
 		case 0xb0: case 0xb1: case 0xb2: case 0xb3: case 0xb4: case 0xb5: case 0xb6: case 0xb7:
 		case 0xb8: case 0xb9: case 0xba: case 0xbb: case 0xbc: case 0xbd: case 0xbe: case 0xbf:
 			verboselog(machine, 11, "          %04xxxxx: %d: CLUT[%d] = %08x\n", channel * 0x20, channel, mcd212.channel[channel].clut_bank * 0x40 + (reg - 0x80), value );
-			mcd212.channel[0].clut_r[mcd212.channel[channel].clut_bank * 0x40 + (reg - 0x80)] = (UINT8)(value >> 16);
-			mcd212.channel[0].clut_g[mcd212.channel[channel].clut_bank * 0x40 + (reg - 0x80)] = (UINT8)(value >>  8);
-			mcd212.channel[0].clut_b[mcd212.channel[channel].clut_bank * 0x40 + (reg - 0x80)] = (UINT8)(value >>  0);
+			mcd212.channel[0].clut_r[mcd212.channel[channel].clut_bank * 0x40 + (reg - 0x80)] = (UINT8)(value >> 16) & 0xfc;
+			mcd212.channel[0].clut_g[mcd212.channel[channel].clut_bank * 0x40 + (reg - 0x80)] = (UINT8)(value >>  8) & 0xfc;
+			mcd212.channel[0].clut_b[mcd212.channel[channel].clut_bank * 0x40 + (reg - 0x80)] = (UINT8)(value >>  0) & 0xfc;
 			break;
 		case 0xc0: // Image Coding Method
 			if(channel == 0)
@@ -2245,28 +2313,28 @@ static void mcd212_set_register(running_machine *machine, int channel, UINT8 reg
 			if(channel == 0)
 			{
 				verboselog(machine, 6, "          %04xxxxx: %d: Transparent Color A = %08x\n", channel * 0x20, channel, value );
-				mcd212.channel[channel].transparent_color_a = value;
+				mcd212.channel[channel].transparent_color_a = value & 0xfcfcfc;
 			}
 			break;
 		case 0xc6: // Transparent Color B
 			if(channel == 1)
 			{
 				verboselog(machine, 6, "          %04xxxxx: %d: Transparent Color B = %08x\n", channel * 0x20, channel, value );
-				mcd212.channel[channel].transparent_color_b = value;
+				mcd212.channel[channel].transparent_color_b = value & 0xfcfcfc;
 			}
 			break;
 		case 0xc7: // Mask Color A
 			if(channel == 0)
 			{
 				verboselog(machine, 6, "          %04xxxxx: %d: Mask Color A = %08x\n", channel * 0x20, channel, value );
-				mcd212.channel[channel].mask_color_a = value;
+				mcd212.channel[channel].mask_color_a = value & 0xfcfcfc;
 			}
 			break;
 		case 0xc9: // Mask Color B
 			if(channel == 1)
 			{
 				verboselog(machine, 6, "          %04xxxxx: %d: Mask Color B = %08x\n", channel * 0x20, channel, value );
-				mcd212.channel[channel].mask_color_b = value;
+				mcd212.channel[channel].mask_color_b = value & 0xfcfcfc;
 			}
 			break;
 		case 0xca: // Delta YUV Absolute Start Value A
@@ -2667,10 +2735,14 @@ static void mcd212_update_region_arrays(running_machine *machine)
 			int reg = 0;
 			int flag = 0;
 
-			for(reg = 0; reg < 4; reg++)
+			for(flag = 0; flag < 2; flag++)
 			{
-				for(flag = 0; flag < 2; flag++)
+				for(reg = 0; reg < 4; reg++)
 				{
+					if(mcd212.channel[0].region_control[reg] == 0)
+					{
+						break;
+					}
 					if(x == (mcd212.channel[0].region_control[flag*4 + reg] & MCD212_RC_X))
 					{
 						switch((mcd212.channel[0].region_control[flag*4 + reg] & MCD212_RC_OP) >> MCD212_RC_OP_SHIFT)
@@ -2769,7 +2841,7 @@ static void mcd212_update_region_arrays(running_machine *machine)
 			for(reg = 0; reg < 8; reg++)
 			{
 				int flag = (mcd212.channel[0].region_control[reg] & MCD212_RC_RF) >> MCD212_RC_RF_SHIFT;
-				if(x > (mcd212.channel[0].region_control[reg] & MCD212_RC_X))
+				if(mcd212.channel[0].region_control[reg] == 0)
 				{
 					break;
 				}
