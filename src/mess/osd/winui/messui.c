@@ -36,6 +36,7 @@
 #include "messui.h"
 #include "winutf8.h"
 #include "swconfig.h"
+#include "zippath.h"
 
 
 //============================================================
@@ -65,7 +66,6 @@ struct _device_entry
 	const char *icon_name;
 	const char *dlgname;
 };
-
 
 
 
@@ -723,7 +723,7 @@ static BOOL CommonFileImageDialog(LPTSTR the_last_directory, common_file_dialog_
     of.nMaxFile = MAX_PATH;
     of.lpstrFileTitle = NULL;
     of.nMaxFileTitle = 0;
-    of.lpstrInitialDir = last_directory;
+    of.lpstrInitialDir = the_last_directory;
     of.lpstrTitle = NULL;
     of.Flags = OFN_EXPLORER | OFN_NOCHANGEDIR | OFN_PATHMUSTEXIST | OFN_HIDEREADONLY;
     of.nFileOffset = 0;
@@ -845,37 +845,76 @@ static void MessCreateDevice(const device_config *dev)
 }
 
 
+/* This is used to Mount an image in the device view of MESSUI. The directory in the dialog box is not
+	set, and is thus random.
+	2009-10-17 Robbbert:
+	I've attempted to set the directory properly. Since the emulation is not running at this time,
+	we cannot do the same as the NEWUI does, that is, "initial_dir = image_working_directory(dev);"
+	because a crash occurs (the image system isn't set up yet). So, if an image is already mounted
+	we can use the directory it is in. Otherwise, we can use the "software" folder assuming that
+	the user has set one up. If this fails, then the previous random behaviour will occur. */
 
-static BOOL DevView_GetOpenFileName(HWND hwndDevView, const machine_config *config, const device_config *dev, LPTSTR pszFilename, UINT nFilenameLength)
+static BOOL DevView_GetOpenFileName(HWND hwndDevView, const machine_config *conf, const device_config *dev, LPTSTR pszFilename, UINT nFilenameLength)
 {
 	BOOL bResult;
+	char *s;
+	int i;
 	mess_image_type imagetypes[64];
-	HWND hwndList;
-	//int gamenum;
+	HWND hwndList = GetDlgItem(GetMainWindow(), IDC_LIST);
+	int drvindex = Picker_GetSelectedItem(hwndList);
+	astring *as = astring_alloc();
 
-	hwndList = GetDlgItem(GetMainWindow(), IDC_LIST);
-	/*gamenum = */Picker_GetSelectedItem(hwndList);
+	/* Get the path to the currently mounted image */
+	zippath_parent(as, GetSelectedSoftware(drvindex, conf, dev));
 
-	SetupImageTypes(config, imagetypes, sizeof(imagetypes) / sizeof(imagetypes[0]), TRUE, dev);
-	bResult = CommonFileImageDialog(last_directory, GetOpenFileName, pszFilename, config, imagetypes);
+	/* See if a path returned (blank means no image was loaded) */
+	if (astring_chr(as, 0, ':') == -1)
+	{
+		/* Get the path from the software tab */
+		astring_cpyc(as, GetExtraSoftwarePaths(drvindex));
+
+		/* We only want the first path; throw out the rest */
+		i = astring_chr(as, 0, ';');
+		if (i > 0) astring_substr(as, 0, i);
+	}
+	
+	s = (char*)astring_c(as);
+	astring_free(as);
+	SetupImageTypes(conf, imagetypes, sizeof(imagetypes) / sizeof(imagetypes[0]), TRUE, dev);
+	bResult = CommonFileImageDialog(s, GetOpenFileName, pszFilename, conf, imagetypes);
 
 	return bResult;
 }
 
 
+/* This is used to Create an image in the device view of MESSUI. The directory in the dialog box is not
+	set, and is thus random.
+	2009-10-17 Robbbert:
+	If the user has set up a "software" folder, this will be used. If this fails, then the previous
+	random behaviour will occur. */
 
 static BOOL DevView_GetCreateFileName(HWND hwndDevView, const machine_config *config, const device_config *dev, LPTSTR pszFilename, UINT nFilenameLength)
 {
 	BOOL bResult;
+	char *s;
+	int i;
 	mess_image_type imagetypes[64];
-	HWND hwndList;
-	//int gamenum;
+	HWND hwndList = GetDlgItem(GetMainWindow(), IDC_LIST);
+	int drvindex = Picker_GetSelectedItem(hwndList);
+	astring *as = astring_alloc();
 
-	hwndList = GetDlgItem(GetMainWindow(), IDC_LIST);
-	/*gamenum = */Picker_GetSelectedItem(hwndList);
+	/* Get the path from the software tab */
+	astring_cpyc(as, GetExtraSoftwarePaths(drvindex));
+
+	/* We only want the first path; throw out the rest */
+	i = astring_chr(as, 0, ';');
+	if (i > 0) astring_substr(as, 0, i);
+	
+	s = (char*)astring_c(as);
+	astring_free(as);
 
 	SetupImageTypes(config, imagetypes, sizeof(imagetypes) / sizeof(imagetypes[0]), TRUE, dev);
-	bResult = CommonFileImageDialog(last_directory, GetSaveFileName, pszFilename, config, imagetypes);
+	bResult = CommonFileImageDialog(s, GetSaveFileName, pszFilename, config, imagetypes);
 
 	return bResult;
 }
