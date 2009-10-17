@@ -45,9 +45,9 @@ emu_timer *test_timer;
 
 #define ENABLE_UART_PRINTING (0)
 
-#define VERBOSE_LEVEL	(11)
+#define VERBOSE_LEVEL	(6)
 
-#define ENABLE_VERBOSE_LOG (0)
+#define ENABLE_VERBOSE_LOG (1)
 
 #if ENABLE_VERBOSE_LOG
 INLINE void verboselog(running_machine *machine, int n_level, const char *s_fmt, ...)
@@ -2701,6 +2701,8 @@ INLINE UINT8 BYTE_TO_CLUT(int channel, int icm, UINT8 byte)
 {
 	switch(icm)
 	{
+		case 1:
+			return byte;
 		case 3:
 			if(channel)
 			{
@@ -2710,7 +2712,6 @@ INLINE UINT8 BYTE_TO_CLUT(int channel, int icm, UINT8 byte)
 			{
 				return byte & 0x7f;
 			}
-			break;
 		case 4:
 			if(!channel)
 			{
@@ -2726,7 +2727,6 @@ INLINE UINT8 BYTE_TO_CLUT(int channel, int icm, UINT8 byte)
 			{
 				return byte & 0x0f;
 			}
-			break;
 		default:
 			break;
 	}
@@ -3063,7 +3063,7 @@ static void mcd212_process_vsr(running_machine *machine, int channel, UINT8 *pix
 						}
 						mcd212_set_vsr(channel, (vsr - 1) & 0x0007ffff);
 					}
-					else if(icm == 3 || icm == 4)
+					else if(icm == 1 || icm == 3 || icm == 4)
 					{
 						for(; x < 768; x += 2)
 						{
