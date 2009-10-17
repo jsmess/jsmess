@@ -45,9 +45,9 @@ emu_timer *test_timer;
 
 #define ENABLE_UART_PRINTING (0)
 
-#define VERBOSE_LEVEL	(6)
+#define VERBOSE_LEVEL	(11)
 
-#define ENABLE_VERBOSE_LOG (1)
+#define ENABLE_VERBOSE_LOG (0)
 
 #if ENABLE_VERBOSE_LOG
 INLINE void verboselog(running_machine *machine, int n_level, const char *s_fmt, ...)
@@ -1165,7 +1165,7 @@ static void cdic_decode_audio_sector(running_machine *machine, const unsigned ch
 	FILE* temp_adpcm = fopen("temp_adpcm.bin","ab");
 
 	fseek(temp_adpcm, 0, SEEK_END);
-	printf( "%02x\n", hdr[2] & 0x3f );
+	//printf( "%02x\n", hdr[2] & 0x3f );
 	switch(hdr[2] & 0x3f)	// ignore emphasis and reserved bits
 	{
 		case 0:
@@ -1225,7 +1225,7 @@ static void cdic_decode_audio_sector(running_machine *machine, const unsigned ch
 			switch(bits)
 			{
 				case 4:
-					cdic_decode_xa_mono(hdr, samples);
+					cdic_decode_xa_mono(hdr + 4, samples);
 					for(index = 18*28*8 - 1; index >= 0; index--)
 					{
 						samples[index*2 + 1] = samples[index];
@@ -1233,7 +1233,7 @@ static void cdic_decode_audio_sector(running_machine *machine, const unsigned ch
 					}
 					break;
 				case 8:
-					cdic_decode_xa_mono8(hdr, samples);
+					cdic_decode_xa_mono8(hdr + 4, samples);
 					//fwrite(samples, 1, 18*28*4, temp_adpcm);
 					for(index = 18*28*8 - 1; index >= 0; index--)
 					{
@@ -1247,11 +1247,11 @@ static void cdic_decode_audio_sector(running_machine *machine, const unsigned ch
 			switch(bits)
 			{
 				case 4:
-					cdic_decode_xa_stereo(hdr, samples);
+					cdic_decode_xa_stereo(hdr + 4, samples);
 					break;
 				case 8:
 					// Something is seriously wrong somewhere with this
-					cdic_decode_xa_stereo8(hdr, samples);
+					cdic_decode_xa_stereo8(hdr + 4, samples);
 					for(index = 18*28*8 - 1; index >= 0; index--)
 					{
 						samples[index*2 + 1] = samples[index];
@@ -1347,6 +1347,7 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 				}
 			}
 
+			//printf( "%02x\n", buffer[CDIC_SECTOR_SUBMODE2] );
 			if(((buffer[CDIC_SECTOR_SUBMODE2] & (CDIC_SUBMODE_FORM | CDIC_SUBMODE_DATA | CDIC_SUBMODE_AUDIO | CDIC_SUBMODE_VIDEO)) == (CDIC_SUBMODE_FORM | CDIC_SUBMODE_AUDIO)) &&
 			   (cdic_regs.channel & cdic_regs.audio_channel & (1 << buffer[CDIC_SECTOR_CHAN2])))
 			{
@@ -1421,14 +1422,14 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 				cputag_set_input_line(machine, "maincpu", M68K_IRQ_4, ASSERT_LINE);
 			}
 
-			//if(!(buffer[CDIC_SECTOR_SUBMODE2] & CDIC_SUBMODE_EOF))
-			//{
+			if(!(buffer[CDIC_SECTOR_SUBMODE2] & CDIC_SUBMODE_EOF))
+			{
 				timer_adjust_oneshot(cdic_regs.interrupt_timer, ATTOTIME_IN_HZ(75), 0); // 75Hz = 1x CD-ROM speed
-			//}
-			//else
-			//{
-				//cdic_regs.command = 0;
-			//}
+			}
+			else
+			{
+				cdic_regs.command = 0;
+			}
 
 			break;
 		}
