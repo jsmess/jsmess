@@ -1174,7 +1174,7 @@ static void cdic_decode_audio_sector(running_machine *machine, const unsigned ch
 	int bits = 4;
 	int index = 0;
 	int size = 2;
-	INT16 samples[18*28*16];
+	INT16 samples[18*28*16+16];
 	FILE* temp_adpcm = fopen("temp_adpcm.bin","ab");
 
 	fseek(temp_adpcm, 0, SEEK_END);
@@ -1243,6 +1243,8 @@ static void cdic_decode_audio_sector(running_machine *machine, const unsigned ch
 						samples[index*2 + 1] = samples[index];
 						samples[index*2 + 0] = samples[index];
 					}
+					samples[18*28*16 + 0] = samples[18*28*16 + 2] = samples[18*28*16 + 4] = samples[18*28*16 + 6] = samples[18*28*16 + 8] = samples[18*28*16 + 10] = samples[18*28*16 + 12] = samples[18*28*16 + 14] = samples[18*28*16 - 2];
+					samples[18*28*16 + 1] = samples[18*28*16 + 3] = samples[18*28*16 + 5] = samples[18*28*16 + 7] = samples[18*28*16 + 9] = samples[18*28*16 + 11] = samples[18*28*16 + 13] = samples[18*28*16 + 15] = samples[18*28*16 - 1];
 					break;
 				case 8:
 					cdic_decode_xa_mono8(hdr + 4, samples);
@@ -1252,6 +1254,8 @@ static void cdic_decode_audio_sector(running_machine *machine, const unsigned ch
 						samples[index*2 + 1] = samples[index];
 						samples[index*2 + 0] = samples[index];
 					}
+					samples[18*28*16 + 0] = samples[18*28*16 + 2] = samples[18*28*16 + 4] = samples[18*28*16 + 6] = samples[18*28*16 + 8] = samples[18*28*16 + 10] = samples[18*28*16 + 12] = samples[18*28*16 + 14] = samples[18*28*16 - 2];
+					samples[18*28*16 + 1] = samples[18*28*16 + 3] = samples[18*28*16 + 5] = samples[18*28*16 + 7] = samples[18*28*16 + 9] = samples[18*28*16 + 11] = samples[18*28*16 + 13] = samples[18*28*16 + 15] = samples[18*28*16 - 1];
 					break;
 			}
 			break;
@@ -1260,10 +1264,13 @@ static void cdic_decode_audio_sector(running_machine *machine, const unsigned ch
 			{
 				case 4:
 					cdic_decode_xa_stereo(hdr + 4, samples);
-					fwrite(samples, 1, 18*28*16, temp_adpcm);
+					samples[18*28*8 + 0] = samples[18*28*8 + 2] = samples[18*28*8 + 4] = samples[18*28*8 + 6] = samples[18*28*8 + 8] = samples[18*28*8 + 10] = samples[18*28*8 + 12] = samples[18*28*8 + 14] = samples[18*28*8 - 2];
+					samples[18*28*8 + 1] = samples[18*28*8 + 3] = samples[18*28*8 + 5] = samples[18*28*8 + 7] = samples[18*28*8 + 9] = samples[18*28*8 + 11] = samples[18*28*8 + 13] = samples[18*28*8 + 15] = samples[18*28*8 - 1];
 					break;
 				case 8:
 					cdic_decode_xa_stereo8(hdr + 4, samples);
+					samples[18*28*4 + 0] = samples[18*28*4 + 2] = samples[18*28*4 + 4] = samples[18*28*4 + 6] = samples[18*28*4 + 8] = samples[18*28*4 + 10] = samples[18*28*4 + 12] = samples[18*28*4 + 14] = samples[18*28*4 - 2];
+					samples[18*28*4 + 1] = samples[18*28*4 + 3] = samples[18*28*4 + 5] = samples[18*28*4 + 7] = samples[18*28*4 + 9] = samples[18*28*4 + 11] = samples[18*28*4 + 13] = samples[18*28*4 + 15] = samples[18*28*4 - 1];
 					break;
 			}
 			break;
