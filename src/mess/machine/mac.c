@@ -87,7 +87,7 @@
 #else
 #define LOG_VIA			0
 #define LOG_RTC			0
-#define LOG_MAC_IWM		1
+#define LOG_MAC_IWM		0
 #define LOG_GENERAL		0
 #define LOG_KEYBOARD	0
 #define LOG_MEMORY		0
@@ -175,7 +175,7 @@ static int has_adb(void)
 // handle disk enable lines
 void mac_fdc_set_enable_lines(const device_config *device,int enable_mask)
 {
-	if (mac_model < MODEL_MAC_SE)
+	if (mac_model != MODEL_MAC_SE)
 	{
 		sony_set_enable_lines(device,enable_mask);
 	}
@@ -875,7 +875,7 @@ WRITE16_HANDLER ( macplus_scsi_w )
 {
 	int reg = (offset>>3) & 0xf;
 
-	logerror("macplus_scsi_w: data %x offset %x mask %x\n", data, offset, mem_mask);
+//	logerror("macplus_scsi_w: data %x offset %x mask %x\n", data, offset, mem_mask);
 
 	if ((reg == 0) && (offset == 0x100))
 	{
@@ -889,7 +889,7 @@ WRITE16_HANDLER ( macii_scsi_w )
 {
 	int reg = (offset>>3) & 0xf;
 
-//	logerror("macplus_scsi_w: data %x offset %x mask %x\n", data, offset, mem_mask);
+//	logerror("macplus_scsi_w: data %x offset %x mask %x (PC=%x)\n", data, offset, mem_mask, cpu_get_pc(space->cpu));
 
 	if ((reg == 0) && (offset == 0x100))
 	{

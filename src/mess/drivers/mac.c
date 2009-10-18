@@ -47,6 +47,7 @@
 #include "devices/harddriv.h"
 #include "formats/ap_dsk35.h"
 #include "devices/messram.h"
+#include "sound/dmadac.h"
 
 UINT32 *se30_vram;
 
@@ -59,11 +60,15 @@ UINT32 *se30_vram;
 	Verified to be only 8 bits wide by Apple documentation.
 
 	Registers:
-	0x800: CONTROL
-	0x801: ENABLE
-	0x802: MODE
+	0x800: VERSION
+	0x801: MODE
+	0x802: CONTROL
+	0x803: FIFO MODE (bit 0 = half, bit 1 = full?)
+	0x804: FIFO IRQ STATUS
+	0x805: WAVETABLE CONTROL
 	0x806: VOLUME
-	0x807: CHAN
+	0x807: CLOCK RATE (0 = 22 kHz)
+	0x80a: PLAY REC A
 */
 
 static UINT8 mac_asc_regs[0x2000];
@@ -72,14 +77,60 @@ static READ8_HANDLER(mac_asc_r)
 {
 //	logerror("ASC: Read @ %x (PC %x)\n", offset, cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")));
 
+	switch (offset)
+	{
+		case 0:	// VERSION
+			return 0;	// original ASC
+			break;
+
+		default:
+			break;
+	}
+
 	return mac_asc_regs[offset];
 }
 
+static INT16 xfersamples[0x800];
+
 static WRITE8_HANDLER(mac_asc_w)
 {
+	static const device_config *dacs[2];
+	INT32 i;
+
 //	logerror("ASC: %02x to %x (PC %x)\n", data, offset, cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")));
 
 	mac_asc_regs[offset] = data;
+
+	switch (offset)
+	{
+		case 0x801:	// CONTROL
+			dacs[0] = devtag_get_device(space->machine, "ascal");
+			dacs[1] = devtag_get_device(space->machine, "ascar");
+
+			if (data == 2)	// boot ROM uses this mode
+			{
+				dmadac_set_frequency(&dacs[0], 1, 22255*2);
+				dmadac_set_frequency(&dacs[1], 1, 22255*2);
+				dmadac_enable(&dacs[0], 1, 1);
+				dmadac_enable(&dacs[1], 1, 1);
+			}
+			else if (data == 0) // stop
+			{
+				dmadac_enable(&dacs[0], 1, 0);
+				dmadac_enable(&dacs[1], 1, 0);
+			}
+			break;
+
+		case 0x7ff:
+			for (i = 0; i < 0x200; i++)
+			{
+				xfersamples[i] = (INT16)mac_asc_regs[i]<<8;
+			}
+
+			dmadac_transfer(&dacs[0], 1, 1, 1, 0x200, xfersamples);
+			dmadac_transfer(&dacs[1], 1, 1, 1, 0x200, xfersamples);
+			break;
+	}
 }
 
 static READ32_HANDLER(mac_swim_r)
@@ -104,16 +155,6 @@ static VIDEO_UPDATE( cb264 )
 {
 	UINT32 *scanline, *base;
 	int x, y;
-
-	if (input_code_pressed(screen->machine, KEYCODE_G))
-	{
-		FILE *f;
-
-		f = fopen("vram.bin", "wb");
-		fwrite(cb264_vram, 0x300000, 1, f);
-		fclose(f);
-		printf("Dumped CB264 VRAM\n");
-	}
 
 	if (cb264_mode == 0)
 	{
@@ -347,7 +388,8 @@ static ADDRESS_MAP_START(macii_map, ADDRESS_SPACE_PROGRAM, 32)
 	AM_RANGE(0x50f10000, 0x50f11fff) AM_READWRITE16(macplus_scsi_r, macii_scsi_w, 0xffffffff)
 	AM_RANGE(0x50f12060, 0x50f12063) AM_READ(macii_scsi_drq_r)
 	AM_RANGE(0x50f14000, 0x50f15fff) AM_READ8(mac_asc_r, 0xffffffff) AM_WRITE8(mac_asc_w, 0xffffffff)
-	AM_RANGE(0x50f16000, 0x50f17fff) AM_READ(mac_swim_r) AM_WRITENOP
+//	AM_RANGE(0x50f16000, 0x50f17fff) AM_READ(mac_swim_r) AM_WRITENOP
+	AM_RANGE(0x50f16000, 0x50f17fff) AM_READWRITE16(mac_iwm_r, mac_iwm_w, 0xffffffff)
 
 	AM_RANGE(0x50f40000, 0x50f41fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff)	// mirror
 
@@ -403,6 +445,7 @@ static ADDRESS_MAP_START(macse30_map, ADDRESS_SPACE_PROGRAM, 32)
 	AM_RANGE(0x50f00000, 0x50f01fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff)
 	AM_RANGE(0x50f02000, 0x50f03fff) AM_READWRITE16(mac_via2_r, mac_via2_w, 0xffffffff)
 	AM_RANGE(0x50f04000, 0x50f05fff) AM_READWRITE16(mac_scc_r, mac_scc_2_w, 0xffffffff)
+	AM_RANGE(0x50f06060, 0x50f06063) AM_READ(macii_scsi_drq_r)
 
 	AM_RANGE(0x50f10000, 0x50f11fff) AM_READWRITE16(macplus_scsi_r, macii_scsi_w, 0xffffffff)
 	AM_RANGE(0x50f12060, 0x50f12063) AM_READ(macii_scsi_drq_r)
@@ -552,7 +595,7 @@ static MACHINE_DRIVER_START( macplus )
 	
 	/* internal ram */
 	MDRV_RAM_MODIFY("messram")
-	MDRV_RAM_DEFAULT_SIZE("1M")
+	MDRV_RAM_DEFAULT_SIZE("4M")
 	MDRV_RAM_EXTRA_OPTIONS("512K,2M,2560K,4M")
 MACHINE_DRIVER_END
 
@@ -565,7 +608,7 @@ static MACHINE_DRIVER_START( macse )
 	
 	/* internal ram */
 	MDRV_RAM_MODIFY("messram")
-	MDRV_RAM_DEFAULT_SIZE("1M")
+	MDRV_RAM_DEFAULT_SIZE("4M")
 	MDRV_RAM_EXTRA_OPTIONS("2M,2560K,4M")
 MACHINE_DRIVER_END
 
@@ -593,6 +636,14 @@ static MACHINE_DRIVER_START( mac2fdhd )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MDRV_SOUND_ADD("ascal", DMADAC, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MDRV_SOUND_ADD("ascar", DMADAC, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MDRV_SOUND_ADD("ascbl", DMADAC, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MDRV_SOUND_ADD("ascbr", DMADAC, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	/* nvram */
 	MDRV_NVRAM_HANDLER(mac)
@@ -662,6 +713,14 @@ static MACHINE_DRIVER_START( macse30 )
 				 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MDRV_SOUND_ADD("ascal", DMADAC, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MDRV_SOUND_ADD("ascar", DMADAC, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MDRV_SOUND_ADD("ascbl", DMADAC, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MDRV_SOUND_ADD("ascbr", DMADAC, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	/* nvram */
 	MDRV_NVRAM_HANDLER(mac)
@@ -981,17 +1040,17 @@ ROM_START( maclc2 )
 ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT	 CONFIG		COMPANY			FULLNAME */
-COMP( 1984, mac128k,  0, 		0,	mac128k,  macplus,  mac128k512k, 0,	"Apple Computer",	"Macintosh 128k",  GAME_NOT_WORKING )
-COMP( 1984, mac512k,  mac128k,  0,	mac512ke, macplus,  mac128k512k, 0,	"Apple Computer",	"Macintosh 512k",  GAME_NOT_WORKING )
-COMP( 1986, mac512ke, macplus,  0,	mac512ke, macplus,  mac512ke,	 0,	"Apple Computer",	"Macintosh 512ke", 0 )
-COMP( 1986, macplus,  0,		0,	macplus,  macplus,  macplus,	 0,	"Apple Computer",	"Macintosh Plus",  0 )
-COMP( 1987, macse,    0,		0,	macse,    macplus,  macse,	 	 0,		"Apple Computer",	"Macintosh SE",  0 )
-COMP( 1988, mac2fdhd, 0,		0,	mac2fdhd, macplus,  maciifdhd,	 0,		"Apple Computer",	"Macintosh II (FDHD)",  GAME_NOT_WORKING )
-COMP( 1988, maciix,   mac2fdhd, 0,	maciix,   macplus,  maciix,	 	 0,		"Apple Computer",	"Macintosh IIx",  GAME_NOT_WORKING )
+COMP( 1984, mac128k,  0, 	0,	mac128k,  macplus,  mac128k512k, 0,		"Apple Computer",	"Macintosh 128k",  GAME_NOT_WORKING )
+COMP( 1984, mac512k,  mac128k,  0,	mac512ke, macplus,  mac128k512k, 0,		"Apple Computer",	"Macintosh 512k",  GAME_NOT_WORKING )
+COMP( 1986, mac512ke, macplus,  0,	mac512ke, macplus,  mac512ke,	 0,		"Apple Computer",	"Macintosh 512ke", 0 )
+COMP( 1986, macplus,  0,	0,	macplus,  macplus,  macplus,	 0,		"Apple Computer",	"Macintosh Plus",  0 )
+COMP( 1987, macse,    0,	0,	macse,    macplus,  macse,	 0,		"Apple Computer",	"Macintosh SE",  0 )
+COMP( 1988, mac2fdhd, 0,	0,	mac2fdhd, macplus,  maciifdhd,	 0,		"Apple Computer",	"Macintosh II (FDHD)",  GAME_NOT_WORKING )
+COMP( 1988, maciix,   mac2fdhd, 0,	maciix,   macplus,  maciix,	 0,		"Apple Computer",	"Macintosh IIx",  GAME_NOT_WORKING )
 COMP( 1989, macse30,  mac2fdhd, 0,	macse30,  macplus,  macse30,	 0,		"Apple Computer",	"Macintosh SE/30",  GAME_NOT_WORKING )
 COMP( 1989, maciicx,  mac2fdhd, 0,	maciix,   macplus,  maciicx,	 0,		"Apple Computer",	"Macintosh IIcx",  GAME_NOT_WORKING )
 COMP( 1989, maciici,  0,		0,	maciici,  macplus,  maciici,	 0, 	"Apple Computer",	"Macintosh IIci",  GAME_NOT_WORKING )
-COMP( 1990, macclasc, 0,		0,	macse,    macplus,  macclassic,	 0,		"Apple Computer",	"Macintosh Classic",  GAME_NOT_WORKING )
+COMP( 1990, macclasc, 0,		0,	macse,    macplus,  macclassic,	 0,	"Apple Computer",	"Macintosh Classic",  GAME_NOT_WORKING )
 COMP( 1990, maclc,    0,		0,	maclc,    macplus,  maclc,	 	 0,		"Apple Computer",	"Macintosh LC",  GAME_NOT_WORKING )
 COMP( 1990, maciisi,  0,		0,	maciisi,  macplus,  maciici,	 0,	"Apple Computer",	"Macintosh IIsi",  GAME_NOT_WORKING )
 COMP( 1991, macclas2, 0,		0,	macclas2, macplus,  macclassic2, 0,    	"Apple Computer",	"Macintosh Classic II",  GAME_NOT_WORKING )
