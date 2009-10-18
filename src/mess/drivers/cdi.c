@@ -1399,7 +1399,7 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 					cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + (index - 6)] = (buffer[index*2] << 8) | buffer[index*2 + 1];
 				}
 
-				if(buffer[CDIC_SECTOR_SUBMODE2] & CDIC_SUBMODE_TRIG)
+				if(buffer[CDIC_SECTOR_SUBMODE2] & (CDIC_SUBMODE_EOF || CDIC_SUBMODE_TRIG || CDIC_SUBMODE_EOR))
 				{
 					cdic_regs.x_buffer |= 0x8000;
 
@@ -1447,9 +1447,11 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 
 			break;
 		}
+		case 0x23: // Mode 1 Reset
+		case 0x24: // Mode 2 Reset
 		case 0x2e: // Abort
 			timer_adjust_oneshot(cdic_regs.interrupt_timer, ATTOTIME_IN_HZ(75), 0); // 75Hz = 1x CD-ROM speed
-			cdic_regs.data_buffer &= 0x3fff;
+			cdic_regs.data_buffer &= 0x3ffe;
 			break;
 	}
 }
@@ -1473,7 +1475,7 @@ static READ16_HANDLER( cdic_r )
 			return cdic_regs.audio_channel;
 		case 0x3ff4/2:
 			verboselog(space->machine, 0, "cdic_r: Audio Buffer Register = %04x & %04x\n", cdic_regs.audio_buffer, mem_mask);
-			return cdic_regs.audio_buffer;
+			return cdic_regs.audio_buffer | 0x8000;
 		case 0x3ff6/2:
 		{
 			UINT16 temp = cdic_regs.x_buffer;
@@ -1507,6 +1509,7 @@ static WRITE16_HANDLER( cdic_w )
 		case 0x3c00/2: // Command register
 			verboselog(space->machine, 0, "cdic_w: Command Register = %04x & %04x\n", data, mem_mask);
 			COMBINE_DATA(&cdic_regs.command);
+			//printf( "cdic command: %04x\n", cdic_regs.command );
 			break;
 		case 0x3c02/2: // Time register (MSW)
 			cdic_regs.time &= ~(mem_mask << 16);
@@ -1541,7 +1544,7 @@ static WRITE16_HANDLER( cdic_w )
 			UINT32 start = scc68070_regs.dma.channel[0].memory_address_counter;
 			UINT32 count = scc68070_regs.dma.channel[0].transfer_counter;
 			UINT32 index = 0;
-			UINT32 src_index = (data & 0x7fff) >> 1;
+			UINT32 device_index = (data & 0x7fff) >> 1;
 			UINT16 *memory = planea;
 			verboselog(space->machine, 0, "memory address counter: %08x\n", scc68070_regs.dma.channel[0].memory_address_counter);
 			verboselog(space->machine, 0, "cdic_w: DMA Control Register = %04x & %04x\n", data, mem_mask);
@@ -1554,8 +1557,22 @@ static WRITE16_HANDLER( cdic_w )
 			}
 			for(index = start / 2; index < (start / 2 + count); index++)
 			{
-				memory[index] = cdram[src_index++];
+				if(scc68070_regs.dma.channel[0].operation_control & OCR_D)
+				{
+					memory[index] = cdram[device_index++];
+				}
+				else
+				{
+					cdram[device_index++] = memory[index];
+					//printf( "%04x ", memory[index] );
+				}
 			}
+			/*
+			if(!(scc68070_regs.dma.channel[0].operation_control & OCR_D))
+			{
+				printf( "\n" );
+			}
+			*/
 			scc68070_regs.dma.channel[0].memory_address_counter += scc68070_regs.dma.channel[0].transfer_counter * 2;
 			break;
 		}
@@ -1579,8 +1596,8 @@ static WRITE16_HANDLER( cdic_w )
 					case 0x23: // Reset Mode 1
 					case 0x24: // Reset Mode 2
 					case 0x2e: // Abort
-						timer_adjust_oneshot(cdic_regs.interrupt_timer, attotime_never, 0);
-						cdic_regs.data_buffer &= 0x3fff;
+						timer_adjust_oneshot(cdic_regs.interrupt_timer, ATTOTIME_IN_HZ(75), 0); // 75Hz = 1x CD-ROM speed
+						//timer_adjust_oneshot(cdic_regs.interrupt_timer, attotime_never, 0);
 						dmadac_enable(&dmadac[0], 2, 0);
 						break;
 					case 0x29: // Read Mode 1
