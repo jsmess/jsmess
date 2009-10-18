@@ -41,7 +41,6 @@ struct _coco_state
 	const device_config *pia_0;
 	const device_config *pia_1;
 	const device_config *pia_2;
-	const device_config *mc6847;
 };
 
 
@@ -51,16 +50,17 @@ struct _coco_state
 
 /*----------- defined in video/coco.c -----------*/
 
-READ8_DEVICE_HANDLER( coco_mc6847_videoram_r );
-VIDEO_UPDATE( coco );
+ATTR_CONST UINT8 coco_get_attributes(running_machine *machine, UINT8 c,int scanline, int pos);
+
+VIDEO_START( dragon );
+VIDEO_START( coco );
+VIDEO_START( coco2b );
 
 
 /*----------- defined in video/coco3.c -----------*/
 
-int coco3_new_frame(running_machine *machine);
-void coco3_prepare_scanline(running_machine *machine,int scanline);
-READ8_DEVICE_HANDLER( coco3_mc6847_videoram_r );
 VIDEO_START( coco3 );
+VIDEO_START( coco3p );
 VIDEO_UPDATE( coco3 );
 WRITE8_HANDLER ( coco3_palette_w );
 UINT32 coco3_get_video_base(UINT8 ff9d_mask, UINT8 ff9e_mask);
@@ -110,8 +110,8 @@ READ8_HANDLER ( coco3_gime_r );
 WRITE8_HANDLER ( coco3_gime_w );
 offs_t coco3_mmu_translate(running_machine *machine,int bank, int offset);
 WRITE8_DEVICE_HANDLER( coco_pia_1_w );
-WRITE_LINE_DEVICE_HANDLER( coco3_hs_w );
-WRITE_LINE_DEVICE_HANDLER( coco3_fs_w );
+void coco3_horizontal_sync_callback(running_machine *machine,int data);
+void coco3_field_sync_callback(running_machine *machine,int data);
 void coco3_gime_field_sync_callback(running_machine *machine);
 
 void coco_cart_w(const device_config *device, int data);

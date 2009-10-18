@@ -89,7 +89,7 @@ easier to manage.
 #include "includes/cococart.h"
 #include "machine/6883sam.h"
 #include "machine/6551.h"
-#include "video/m6847.h"
+#include "video/coco6847.h"
 #include "formats/cocopak.h"
 #include "devices/bitbngr.h"
 #include "devices/printer.h"
@@ -126,7 +126,6 @@ static emu_timer *mux_sel2_timer;
 static UINT8 mux_sel1, mux_sel2;
 
 static WRITE8_DEVICE_HANDLER ( d_pia1_pb_w );
-static WRITE8_DEVICE_HANDLER( d_pia1_pb_w_coco2 );
 static WRITE8_DEVICE_HANDLER ( d_pia1_pa_w );
 static READ8_DEVICE_HANDLER ( d_pia1_pa_r );
 static WRITE8_DEVICE_HANDLER ( d_pia0_pa_w );
@@ -334,7 +333,7 @@ const pia6821_interface coco2_pia_intf_1 =
 	DEVCB_NULL,
 	/*outputs: A/B,CA/B2       */
 	DEVCB_HANDLER(d_pia1_pa_w),
-	DEVCB_HANDLER(d_pia1_pb_w_coco2),
+	DEVCB_HANDLER(d_pia1_pb_w),
 	DEVCB_HANDLER(d_pia1_ca2_w),
 	DEVCB_HANDLER(d_pia1_cb2_w),
 	/*irqs   : A/B             */
@@ -1034,18 +1033,19 @@ static void coco3_raise_interrupt(running_machine *machine, UINT8 mask, int stat
 
 
 
-WRITE_LINE_DEVICE_HANDLER( coco3_hs_w )
+void coco3_horizontal_sync_callback(running_machine *machine,int data)
 {
-	coco_state *coco = device->machine->driver_data;
-	pia6821_ca1_w(coco->pia_0, 0, state);
-	coco3_raise_interrupt(device->machine, COCO3_INT_HBORD, state);
+	coco_state *state = machine->driver_data;
+	pia6821_ca1_w(state->pia_0, 0, data);
+	coco3_raise_interrupt(machine, COCO3_INT_HBORD, data);
 }
 
 
-WRITE_LINE_DEVICE_HANDLER( coco3_fs_w )
+
+void coco3_field_sync_callback(running_machine *machine,int data)
 {
-	coco_state *coco = device->machine->driver_data;
-	pia6821_cb1_w(coco->pia_0, 0, state);
+	coco_state *state = machine->driver_data;
+	pia6821_cb1_w(state->pia_0, 0, data);
 }
 
 void coco3_gime_field_sync_callback(running_machine *machine)
@@ -1627,40 +1627,14 @@ static WRITE8_DEVICE_HANDLER ( d_pia1_pa_w )
 
 static WRITE8_DEVICE_HANDLER( d_pia1_pb_w )
 {
-	coco_state *state = device->machine->driver_data;
-
-	mc6847_css_w(state->mc6847, BIT(data, 3));
-	mc6847_gm0_w(state->mc6847, BIT(data, 4));
-	mc6847_intext_w(state->mc6847, BIT(data, 4));
-	mc6847_gm1_w(state->mc6847, BIT(data, 5));
-	mc6847_gm2_w(state->mc6847, BIT(data, 6));
-	mc6847_ag_w(state->mc6847, BIT(data, 7));
+	coco6847_video_changed();
 
 	/* PB1 will drive the sound output.  This is a rarely
-     * used single bit sound mode. It is always connected thus
-     * cannot be disabled.
-     *
-     * Source:  Page 31 of the Tandy Color Computer Service Manual
-     */
-	coco_sound_update(device->machine);
-}
-
-static WRITE8_DEVICE_HANDLER( d_pia1_pb_w_coco2 )
-{
-	coco_state *state = device->machine->driver_data;
-
-	mc6847_css_w(state->mc6847, BIT(data, 3));
-	mc6847_gm0_w(state->mc6847, BIT(data, 4));
-	mc6847_gm1_w(state->mc6847, BIT(data, 5));
-	mc6847_gm2_w(state->mc6847, BIT(data, 6));
-	mc6847_ag_w(state->mc6847, BIT(data, 7));
-
-	/* PB1 will drive the sound output.  This is a rarely
-     * used single bit sound mode. It is always connected thus
-     * cannot be disabled.
-     *
-     * Source:  Page 31 of the Tandy Color Computer Serice Manual
-     */
+	 * used single bit sound mode. It is always connected thus
+	 * cannot be disabled.
+	 *
+	 * Source:  Page 31 of the Tandy Color Computer Serice Manual
+	 */
 	coco_sound_update(device->machine);
 }
 
@@ -2200,8 +2174,6 @@ static emu_timer *coco3_gime_timer;
 
 static void coco3_timer_reset(running_machine *machine)
 {
-	coco_state *state = machine->driver_data;
-
 	/* reset the timer; take the value stored in $FF94-5 and start the timer ticking */
 	UINT64 current_time;
 	UINT16 timer_value;
@@ -2223,10 +2195,10 @@ static void coco3_timer_reset(running_machine *machine)
 		timing = (coco3_gimereg[1] & 0x20) ? M6847_CLOCK : M6847_HSYNC;
 
 		/* determine the current time */
-		current_time = m6847_time(state->mc6847, timing);
+		current_time = coco6847_time(machine, timing);
 
 		/* calculate the time */
-		target_time = m6847_time_until(state->mc6847, timing, current_time + timer_value);
+		target_time = coco6847_time_until(machine, timing, current_time + timer_value);
 		if (LOG_TIMER)
 			logerror("coco3_reset_timer(): target_time=%g\n", attotime_to_double(target_time));
 
@@ -2818,7 +2790,6 @@ static void generic_init_machine(running_machine *machine, const machine_init_in
 	state->pia_0			= devtag_get_device(machine, "pia_0");
 	state->pia_1			= devtag_get_device(machine, "pia_1");
 	state->pia_2			= devtag_get_device(machine, "pia_2");
-	state->mc6847			= devtag_get_device(machine, "mc6847");
 
 	/* clear static variables */
 	coco_hiresjoy_ca = 1;
