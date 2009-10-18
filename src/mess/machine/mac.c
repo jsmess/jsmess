@@ -2002,6 +2002,8 @@ MACHINE_RESET(mac)
 
 	mac_scanline_timer = timer_alloc(machine, mac_scanline_tick, NULL);
 	timer_adjust_oneshot(mac_scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
+
+	debug_cpu_set_dasm_override(cputag_get_cpu(machine, "maincpu"), CPU_DISASSEMBLE_NAME(mac_dasm_override));
 }
 
 
@@ -2087,8 +2089,6 @@ static void mac_driver_init(running_machine *machine, mac_model_t model)
 	keyboard_init();
 
 	inquiry_timeout = timer_alloc(machine, inquiry_timeout_func, NULL);
-
-	debug_cpu_set_dasm_override(cputag_get_cpu(machine, "maincpu"), CPU_DISASSEMBLE_NAME(mac_dasm_override));
 
 	/* save state stuff */
 	state_save_register_global(machine, mac_overlay);
@@ -3117,7 +3117,8 @@ static CPU_DISASSEMBLE(mac_dasm_override)
 	unsigned result = 0;
 	const char *trap;
 
-	opcode = *((UINT16 *) oprom);
+	opcode = oprom[0]<<8 | oprom[1];
+	printf("%04x\n", opcode);
 	if ((opcode & 0xF000) == 0xA000)
 	{
 		trap = lookup_trap(opcode);
