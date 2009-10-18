@@ -3118,7 +3118,6 @@ static CPU_DISASSEMBLE(mac_dasm_override)
 	const char *trap;
 
 	opcode = oprom[0]<<8 | oprom[1];
-	printf("%04x\n", opcode);
 	if ((opcode & 0xF000) == 0xA000)
 	{
 		trap = lookup_trap(opcode);
