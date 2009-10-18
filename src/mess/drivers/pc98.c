@@ -8,7 +8,7 @@
 
 	TODO:
 	- remove the A20 line hack
-	- Understand what's going on at bp f9064 (memo: bp f9064, do eip=1182)
+	- Understand what's going on at bp f8dfa (memo: bp f8dfa, do eip=dff)
 
 ========================================================================================
 
@@ -401,6 +401,8 @@ static WRITE8_HANDLER( port_a0_w )
 		crtc_cmd_w(space,0,data);
 }
 
+static UINT8 rom_bank;
+
 static WRITE8_HANDLER( ems_sel_w )
 {
 //	printf("%02x %02x\n",offset,data);
@@ -410,10 +412,16 @@ static WRITE8_HANDLER( ems_sel_w )
 		UINT8 *ROM = memory_region(space->machine, "cpudata");
 
 		if(data == 0x00 || data == 0x10)
+		{
+			rom_bank = 1;
 			memory_set_bankptr(space->machine, 1, &ROM[0x20000]);
+		}
 
 		if(data == 0x02 || data == 0x12)
+		{
+			rom_bank = 0;
 			memory_set_bankptr(space->machine, 1, &ROM[0x00000]);
+		}
 	}
 
 	if(offset == 3)
@@ -424,6 +432,17 @@ static WRITE8_HANDLER( ems_sel_w )
 			ems_bank = 0;
 		//printf("%02x %02x\n",offset,data);
 	}
+}
+
+static WRITE8_HANDLER( rom_bank_w )
+{
+	UINT8 *ROM = memory_region(space->machine, "cpudata");
+
+//	printf("%08x %04x %08x\n",ROM[offset+(rom_bank*0x20000/4)],offset+(rom_bank*0x20000/4),data);
+
+	/* NOP any attempt to write on ROM (TODO: why it's overwriting here anyway? Doesn't make sense...) */
+	if((rom_bank == 0 && offset < 0x8000) || (rom_bank == 1 && offset < 0x18000))
+		ROM[offset+(rom_bank*0x20000)] = data;
 }
 
 static READ8_HANDLER( port_70_r )
@@ -543,10 +562,11 @@ static ADDRESS_MAP_START( pc9801_mem, ADDRESS_SPACE_PROGRAM, 32)
 	AM_RANGE(0x00080000, 0x0009ffff) AM_READWRITE(wram_bank_r,wram_bank_w)
 	AM_RANGE(0x000a0000, 0x000a3fff) AM_RAM AM_BASE(&pc9801_vram) //vram + attr
 	AM_RANGE(0x000a4000, 0x000a4fff) AM_RAM //cg window
+	AM_RANGE(0x000a5000, 0x000a7fff) AM_RAM //??? (presumably another work ram bank)
 	AM_RANGE(0x000a8000, 0x000bffff) AM_READWRITE(gfx_bitmap_ram_r,gfx_bitmap_ram_w)
 	AM_RANGE(0x000c0000, 0x000dffff) AM_READWRITE(wram_ide_r,wram_ide_w)
-	AM_RANGE(0x000e0000, 0x000fffff) AM_ROMBANK(1)
-	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROMBANK(1)
+	AM_RANGE(0x000e0000, 0x000fffff) AM_ROMBANK(1) AM_WRITE8(rom_bank_w,0xffffffff)
+	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROMBANK(1) AM_WRITE8(rom_bank_w,0xffffffff)
 ADDRESS_MAP_END
 
 
@@ -619,6 +639,7 @@ static MACHINE_RESET(pc9801)
 	memory_set_bankptr(machine, 1, &ROM[0x20000]);
 
 	wram_bank = 0;
+	rom_bank = 1;
 }
 
 static MACHINE_RESET(pc9821)
@@ -634,6 +655,7 @@ static MACHINE_RESET(pc9821)
 	memory_set_bankptr(machine, 1, &ROM[0x20000]);
 
 	wram_bank = 0;
+	rom_bank = 1;
 }
 
 /*************************************************************
@@ -736,11 +758,31 @@ static const ppi8255_interface ppi8255_intf =
 	DEVCB_HANDLER(pc98_portc_w)						/* Port C write */
 };
 
+
+static READ8_DEVICE_HANDLER( printer_porta_r )
+{
+	printf("PPI2 Port A read\n");
+	return 0x00;
+}
+
+static READ8_DEVICE_HANDLER( printer_portb_r )
+{
+//	printf("PPI2 Port B read\n");
+	return 0xb4;
+}
+
+static READ8_DEVICE_HANDLER( printer_portc_r )
+{
+	printf("PPI2 Port C read\n");
+	return 0x00;
+}
+
+
 static const ppi8255_interface printer_intf =
 {
-	DEVCB_NULL,					/* Port A read */
-	DEVCB_NULL,					/* Port B read */
-	DEVCB_NULL,					/* Port C read */
+	DEVCB_HANDLER(printer_porta_r),					/* Port A read */
+	DEVCB_HANDLER(printer_portb_r),					/* Port B read */
+	DEVCB_HANDLER(printer_portc_r),					/* Port C read */
 	DEVCB_NULL,					/* Port A write */
 	DEVCB_NULL,					/* Port B write */
 	DEVCB_NULL					/* Port C write */
