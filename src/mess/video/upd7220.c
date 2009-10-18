@@ -11,6 +11,7 @@
 
 	TODO:
 
+	- implement FIFO as ring buffer
 	- drawing modes
 		- character
 		- mixed
@@ -30,7 +31,6 @@
 	- honor visible area
 	- wide mode (32-bit access)
 	- light pen
-	- FIFO overflow?
 
 */
 
@@ -1161,7 +1161,7 @@ DEVICE_GET_INFO( upd7220 )
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(upd7220_t);						break;
 		case DEVINFO_INT_DATABUS_WIDTH_0:				info->i = 16;										break;
 		case DEVINFO_INT_ADDRBUS_WIDTH_0:				info->i = 18;										break;
-		case DEVINFO_INT_ADDRBUS_SHIFT_0:				info->i = 0;										break;
+		case DEVINFO_INT_ADDRBUS_SHIFT_0:				info->i = -1;										break;
 		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;					break;
 
 		/* --- the following bits of info are returned as pointers --- */
