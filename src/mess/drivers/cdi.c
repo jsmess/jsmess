@@ -1254,8 +1254,8 @@ static void cdic_decode_audio_sector(running_machine *machine, const unsigned ch
 						samples[index*2 + 1] = samples[index];
 						samples[index*2 + 0] = samples[index];
 					}
-					samples[18*28*16 + 0] = samples[18*28*16 + 2] = samples[18*28*16 + 4] = samples[18*28*16 + 6] = samples[18*28*16 + 8] = samples[18*28*16 + 10] = samples[18*28*16 + 12] = samples[18*28*16 + 14] = samples[18*28*16 - 2];
-					samples[18*28*16 + 1] = samples[18*28*16 + 3] = samples[18*28*16 + 5] = samples[18*28*16 + 7] = samples[18*28*16 + 9] = samples[18*28*16 + 11] = samples[18*28*16 + 13] = samples[18*28*16 + 15] = samples[18*28*16 - 1];
+					samples[18*28*8 + 0] = samples[18*28*8 + 2] = samples[18*28*8 + 4] = samples[18*28*8 + 6] = samples[18*28*8 + 8] = samples[18*28*8 + 10] = samples[18*28*8 + 12] = samples[18*28*8 + 14] = samples[18*28*8 - 2];
+					samples[18*28*8 + 1] = samples[18*28*8 + 3] = samples[18*28*8 + 5] = samples[18*28*8 + 7] = samples[18*28*8 + 9] = samples[18*28*8 + 11] = samples[18*28*8 + 13] = samples[18*28*8 + 15] = samples[18*28*8 - 1];
 					break;
 			}
 			break;
@@ -1276,7 +1276,7 @@ static void cdic_decode_audio_sector(running_machine *machine, const unsigned ch
 			break;
 	}
 
-    dmadac_transfer(&dmadac[0], 2, 2, 2, 18*28*2 * size, samples);
+    dmadac_transfer(&dmadac[0], 2, 2, 2, 18*28*2*size, samples);
 
 	fclose(temp_adpcm);
 }
