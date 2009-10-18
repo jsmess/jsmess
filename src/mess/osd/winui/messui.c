@@ -850,10 +850,14 @@ static void MessCreateDevice(const device_config *dev)
 	2009-10-18 Robbbert:
 	I've attempted to set the directory properly. Since the emulation is not running at this time,
 	we cannot do the same as the NEWUI does, that is, "initial_dir = image_working_directory(dev);"
-	because a crash occurs (the image system isn't set up yet). So, if an image is already mounted
-	we can use the directory it is in. Otherwise, we can use the "software" folder assuming that
-	the user has set one up. If this fails, use the mess software directory if it exists. Otherwise
-	use the mess root directory. */
+	because a crash occurs (the image system isn't set up yet).
+
+	Order of priority:
+	1. Directory where existing image is already loaded from
+	2. First directory specified in game-specific software tab
+	3. First directory specified in the system-wide software directories
+	4. mess-folder\software
+	5. mess-folder */
 
 static BOOL DevView_GetOpenFileName(HWND hwndDevView, const machine_config *config, const device_config *dev, LPTSTR pszFilename, UINT nFilenameLength)
 {
@@ -883,14 +887,26 @@ static BOOL DevView_GetOpenFileName(HWND hwndDevView, const machine_config *conf
 		/* Make sure a folder was specified in the tab, and that it exists */
 		if ((!osd_opendir(astring_c(as))) || (astring_chr(as, 0, ':') == -1))
 		{
-			/* Default to emu directory */
-			char mess_directory[1024];
-			osd_get_emulator_directory(mess_directory, ARRAY_LENGTH(mess_directory));
-			s = mess_directory;
+			/* Get the path from the system-wide software setting in the drop-down directory setup */
+			astring_cpyc(as, GetSoftwareDirs());
 
-			/* If software folder exists, use it instead - TODO: do properly when bug 1709 gets done */
-			zippath_combine(as, mess_directory, "software");
-			if (osd_opendir(astring_c(as))) s = (char*)astring_c(as);
+			/* We only want the first path; throw out the rest */
+			i = astring_chr(as, 0, ';');
+			if (i > 0) astring_substr(as, 0, i);
+			s = (char*)astring_c(as);
+
+			/* Make sure a folder was specified in the tab, and that it exists */
+			if ((!osd_opendir(astring_c(as))) || (astring_chr(as, 0, ':') == -1))
+			{
+				/* Default to emu directory */
+				char mess_directory[1024];
+				osd_get_emulator_directory(mess_directory, ARRAY_LENGTH(mess_directory));
+				s = mess_directory;
+
+				/* If software folder exists, use it instead */
+				zippath_combine(as, mess_directory, "software");
+				if (osd_opendir(astring_c(as))) s = (char*)astring_c(as);
+			}
 		}
 	}
 
@@ -904,9 +920,12 @@ static BOOL DevView_GetOpenFileName(HWND hwndDevView, const machine_config *conf
 
 /* This is used to Create an image in the device view of MESSUI. The directory in the dialog box is not
 	set, and is thus random.
-	2009-10-18 Robbbert:
-	If the user has set up a "software" folder, this will be used. If this fails, we can use the
-	mess software directory if it exists. Otherwise use the mess root directory. */
+
+	Order of priority:
+	1. First directory specified in game-specific software tab
+	2. First directory specified in the system-wide software directories
+	3. mess-folder\software
+	4. mess-folder */
 
 static BOOL DevView_GetCreateFileName(HWND hwndDevView, const machine_config *config, const device_config *dev, LPTSTR pszFilename, UINT nFilenameLength)
 {
@@ -929,14 +948,26 @@ static BOOL DevView_GetCreateFileName(HWND hwndDevView, const machine_config *co
 	/* Make sure a folder was specified in the tab, and that it exists */
 	if ((!osd_opendir(astring_c(as))) || (astring_chr(as, 0, ':') == -1))
 	{
-		/* Default to emu directory */
-		char mess_directory[1024];
-		osd_get_emulator_directory(mess_directory, ARRAY_LENGTH(mess_directory));
-		s = mess_directory;
+		/* Get the path from the system-wide software setting in the drop-down directory setup */
+		astring_cpyc(as, GetSoftwareDirs());
 
-		/* If software folder exists, use it instead - TODO: do properly when bug 1709 gets done */
-		zippath_combine(as, mess_directory, "software");
-		if (osd_opendir(astring_c(as))) s = (char*)astring_c(as);
+		/* We only want the first path; throw out the rest */
+		i = astring_chr(as, 0, ';');
+		if (i > 0) astring_substr(as, 0, i);
+		s = (char*)astring_c(as);
+
+		/* Make sure a folder was specified in the tab, and that it exists */
+		if ((!osd_opendir(astring_c(as))) || (astring_chr(as, 0, ':') == -1))
+		{
+			/* Default to emu directory */
+			char mess_directory[1024];
+			osd_get_emulator_directory(mess_directory, ARRAY_LENGTH(mess_directory));
+			s = mess_directory;
+
+			/* If software folder exists, use it instead */
+			zippath_combine(as, mess_directory, "software");
+			if (osd_opendir(astring_c(as))) s = (char*)astring_c(as);
+		}
 	}
 
 	astring_free(as);
