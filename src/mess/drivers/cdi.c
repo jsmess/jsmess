@@ -3289,6 +3289,10 @@ static void mcd212_mix_lines(running_machine *machine, UINT8 *plane_a_r, UINT8 *
 	UINT8 transparent_color_b_r = (UINT8)(mcd212.channel[1].transparent_color_b >> 16);
 	UINT8 transparent_color_b_g = (UINT8)(mcd212.channel[1].transparent_color_b >>  8);
 	UINT8 transparent_color_b_b = (UINT8)(mcd212.channel[1].transparent_color_b >>  0);
+	UINT8 mosaic_enable_a = (mcd212.channel[0].mosaic_hold_a & 0x800000) >> 23;
+	UINT8 mosaic_enable_b = (mcd212.channel[1].mosaic_hold_b & 0x800000) >> 23;
+	UINT8 mosaic_count_a = (mcd212.channel[0].mosaic_hold_a & 0x0000ff) << 1;
+	UINT8 mosaic_count_b = (mcd212.channel[1].mosaic_hold_b & 0x0000ff) << 1;
 	for(x = 0; x < 768; x++)
 	{
 		out[x] = backdrop;
@@ -3303,12 +3307,12 @@ static void mcd212_mix_lines(running_machine *machine, UINT8 *plane_a_r, UINT8 *
 		{
 			UINT8 plane_enable_a = 0;
 			UINT8 plane_enable_b = 0;
-			UINT8 plane_a_r_cur = plane_a_r[x];
-			UINT8 plane_a_g_cur = plane_a_g[x];
-			UINT8 plane_a_b_cur = plane_a_b[x];
-			UINT8 plane_b_r_cur = plane_b_r[x];
-			UINT8 plane_b_g_cur = plane_b_g[x];
-			UINT8 plane_b_b_cur = plane_b_b[x];
+			UINT8 plane_a_r_cur = mosaic_enable_a ? plane_a_r[x - (x % mosaic_count_a)] : plane_a_r[x];
+			UINT8 plane_a_g_cur = mosaic_enable_a ? plane_a_g[x - (x % mosaic_count_a)] : plane_a_g[x];
+			UINT8 plane_a_b_cur = mosaic_enable_a ? plane_a_b[x - (x % mosaic_count_a)] : plane_a_b[x];
+			UINT8 plane_b_r_cur = mosaic_enable_b ? plane_b_r[x - (x % mosaic_count_b)] : plane_b_r[x];
+			UINT8 plane_b_g_cur = mosaic_enable_b ? plane_b_g[x - (x % mosaic_count_b)] : plane_b_g[x];
+			UINT8 plane_b_b_cur = mosaic_enable_b ? plane_b_b[x - (x % mosaic_count_b)] : plane_b_b[x];
 			switch(transparency_mode_a)
 			{
 				case 0:
