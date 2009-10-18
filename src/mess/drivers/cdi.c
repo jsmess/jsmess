@@ -914,12 +914,9 @@ typedef struct
 	emu_timer *interrupt_timer;
 	cdrom_file *cd;
 
-	emu_timer *audio_stream_timer;
-	INT16 audio_stream_samples[18*28*16*CDIC_BUFFERED_SECTORS];
-	INT32 audio_stream_queued;
-	INT32 audio_stream_index;
-	INT32 audio_stream_end;
-	INT32 audio_stream_playing;
+	emu_timer *audio_sample_timer;
+	INT32 audio_sample_freq;
+	INT32 audio_sample_size;
 
 } cdic_regs_t;
 
@@ -1169,11 +1166,9 @@ static void cdic_decode_audio_sector(running_machine *machine, const unsigned ch
 	// Get XA format from sector header
 
 	const unsigned char *hdr = xa + 4;
-	double freq;
 	int channels;
 	int bits = 4;
 	int index = 0;
-	int size = 2;
 	INT16 samples[18*28*16+16];
 	FILE* temp_adpcm = fopen("temp_adpcm.bin","ab");
 
@@ -1183,44 +1178,44 @@ static void cdic_decode_audio_sector(running_machine *machine, const unsigned ch
 	{
 		case 0:
 			channels=1;
-			freq=37800.0f;	//18900.0f;
+			cdic_regs.audio_sample_freq=37800.0f;	//18900.0f;
 			bits=4;
-			size=4;
+			cdic_regs.audio_sample_size=4;
 			break;
 
 		case 1:
 			channels=2;
-			freq=37800.0f;
+			cdic_regs.audio_sample_freq=37800.0f;
 			bits=4;
-			size=2;
+			cdic_regs.audio_sample_size=2;
 			break;
 
 		case 4:
 			channels=1;
-			freq=18900.0f;	///2.0f;
+			cdic_regs.audio_sample_freq=18900.0f;	///2.0f;
 			bits=4;
-			size=4;
+			cdic_regs.audio_sample_size=4;
 			break;
 
 		case 5:
 			channels=2;
-			freq=18900.0f;	//37800.0f/2.0f;
+			cdic_regs.audio_sample_freq=18900.0f;	//37800.0f/2.0f;
 			bits=4;
-			size=2;
+			cdic_regs.audio_sample_size=2;
 			break;
 
 		case 16:
 			channels=1;
-			freq=37800.0f;
+			cdic_regs.audio_sample_freq=37800.0f;
 			bits=8;
-			size=2;
+			cdic_regs.audio_sample_size=2;
 			break;
 
 		case 17:
 			channels=2;
-			freq=37800.0f;
+			cdic_regs.audio_sample_freq=37800.0f;
 			bits=8;
-			size=1;
+			cdic_regs.audio_sample_size=1;
 			break;
 
 		default:
@@ -1228,8 +1223,8 @@ static void cdic_decode_audio_sector(running_machine *machine, const unsigned ch
 			return;
 	}
 
-	dmadac_set_frequency(&dmadac[0], 2, freq);
 	dmadac_enable(&dmadac[0], 2, 1);
+	dmadac_set_frequency(&dmadac[0], 2, cdic_regs.audio_sample_freq);
 
 	switch(channels)
 	{
@@ -1276,9 +1271,17 @@ static void cdic_decode_audio_sector(running_machine *machine, const unsigned ch
 			break;
 	}
 
-    dmadac_transfer(&dmadac[0], 2, 2, 2, 18*28*2*size, samples);
+    dmadac_transfer(&dmadac[0], 2, 2, 2, 18*28*2*cdic_regs.audio_sample_size, samples);
 
 	fclose(temp_adpcm);
+}
+
+static TIMER_CALLBACK( audio_sample_trigger )
+{
+	cdic_regs.z_buffer += 0xa00;
+	cdic_decode_audio_sector(machine, ((UINT8*)cdram) + cdic_regs.z_buffer + 4);
+	timer_adjust_oneshot(cdic_regs.audio_sample_timer, attotime_never, 0);
+	//dmadac_enable(&dmadac[0], 2, 0);
 }
 
 static TIMER_CALLBACK( cdic_trigger_readback_int )
@@ -1393,13 +1396,14 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 			}
 			else if((buffer[CDIC_SECTOR_SUBMODE2] & (CDIC_SUBMODE_DATA | CDIC_SUBMODE_AUDIO | CDIC_SUBMODE_VIDEO)) == 0x00)
 			{
+				cdic_regs.data_buffer &= ~0x0004;
 				cdic_regs.data_buffer ^= 0x0001;
 				for(index = 6; index < 2352/2; index++)
 				{
 					cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + (index - 6)] = (buffer[index*2] << 8) | buffer[index*2 + 1];
 				}
 
-				if(buffer[CDIC_SECTOR_SUBMODE2] & (CDIC_SUBMODE_EOF || CDIC_SUBMODE_TRIG || CDIC_SUBMODE_EOR))
+				if((buffer[CDIC_SECTOR_SUBMODE2] & CDIC_SUBMODE_TRIG) == CDIC_SUBMODE_TRIG || (buffer[CDIC_SECTOR_SUBMODE2] & (CDIC_SUBMODE_EOR | CDIC_SUBMODE_FORM)) == (CDIC_SUBMODE_EOR | CDIC_SUBMODE_FORM))
 				{
 					cdic_regs.x_buffer |= 0x8000;
 
@@ -1451,7 +1455,7 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 		case 0x24: // Mode 2 Reset
 		case 0x2e: // Abort
 			timer_adjust_oneshot(cdic_regs.interrupt_timer, ATTOTIME_IN_HZ(75), 0); // 75Hz = 1x CD-ROM speed
-			cdic_regs.data_buffer &= 0x3ffe;
+			cdic_regs.data_buffer &= 0x3fff;
 			break;
 	}
 }
@@ -1544,7 +1548,7 @@ static WRITE16_HANDLER( cdic_w )
 			UINT32 start = scc68070_regs.dma.channel[0].memory_address_counter;
 			UINT32 count = scc68070_regs.dma.channel[0].transfer_counter;
 			UINT32 index = 0;
-			UINT32 device_index = (data & 0x7fff) >> 1;
+			UINT32 device_index = (data & 0x3fff) >> 1;
 			UINT16 *memory = planea;
 			verboselog(space->machine, 0, "memory address counter: %08x\n", scc68070_regs.dma.channel[0].memory_address_counter);
 			verboselog(space->machine, 0, "cdic_w: DMA Control Register = %04x & %04x\n", data, mem_mask);
@@ -1564,21 +1568,21 @@ static WRITE16_HANDLER( cdic_w )
 				else
 				{
 					cdram[device_index++] = memory[index];
-					//printf( "%04x ", memory[index] );
 				}
 			}
-			/*
-			if(!(scc68070_regs.dma.channel[0].operation_control & OCR_D))
-			{
-				printf( "\n" );
-			}
-			*/
 			scc68070_regs.dma.channel[0].memory_address_counter += scc68070_regs.dma.channel[0].transfer_counter * 2;
 			break;
 		}
 		case 0x3ffa/2:
 			verboselog(space->machine, 0, "cdic_w: Z-Buffer Register = %04x & %04x\n", data, mem_mask);
 			COMBINE_DATA(&cdic_regs.z_buffer);
+			if(cdic_regs.z_buffer & 0x2000)
+			{
+				// Broken.
+				//attotime period = attotime_mul(ATTOTIME_IN_HZ(cdic_regs.audio_sample_freq), 18*28*4*cdic_regs.audio_sample_size);
+				//timer_adjust_oneshot(cdic_regs.audio_sample_timer, period, 0);
+				//cdic_decode_audio_sector(space->machine, ((UINT8*)cdram) + cdic_regs.z_buffer + 4);
+			}
 			break;
 		case 0x3ffc/2:
 			verboselog(space->machine, 0, "cdic_w: Interrupt Vector Register = %04x & %04x\n", data, mem_mask);
@@ -1596,8 +1600,9 @@ static WRITE16_HANDLER( cdic_w )
 					case 0x23: // Reset Mode 1
 					case 0x24: // Reset Mode 2
 					case 0x2e: // Abort
-						timer_adjust_oneshot(cdic_regs.interrupt_timer, ATTOTIME_IN_HZ(75), 0); // 75Hz = 1x CD-ROM speed
-						//timer_adjust_oneshot(cdic_regs.interrupt_timer, attotime_never, 0);
+						//timer_adjust_oneshot(cdic_regs.interrupt_timer, ATTOTIME_IN_HZ(75), 0); // 75Hz = 1x CD-ROM speed
+						timer_adjust_oneshot(cdic_regs.interrupt_timer, attotime_never, 0);
+						cdic_regs.data_buffer &= 0x3fff;
 						dmadac_enable(&dmadac[0], 2, 0);
 						break;
 					case 0x29: // Read Mode 1
@@ -1887,6 +1892,18 @@ static WRITE16_HANDLER( slave_w )
 				slave_regs.in_index++;
 				switch(data & 0x00ff)
 				{
+					case 0x82: // Mute audio
+						verboselog(space->machine, 0, "slave_w: Channel %d: Mute Audio (0x82)\n", offset );
+						dmadac_enable(&dmadac[0], 2, 0);
+						slave_regs.in_index = 0;
+						slave_regs.in_count = 0;
+						break;
+					case 0x83: // Unmute audio
+						verboselog(space->machine, 0, "slave_w: Channel %d: Unmute Audio (0x83)\n", offset );
+						dmadac_enable(&dmadac[0], 2, 1);
+						slave_regs.in_index = 0;
+						slave_regs.in_count = 0;
+						break;
 					case 0xf0: // Set Front Panel LCD
 						verboselog(space->machine, 0, "slave_w: Channel %d: Set Front Panel LCD (0xf0)\n", offset );
 						slave_regs.in_count = 17;
@@ -3635,14 +3652,16 @@ static MACHINE_RESET( cdi )
 	cdic_regs.interrupt_timer = timer_alloc(machine, cdic_trigger_readback_int, 0);
 	timer_adjust_oneshot(cdic_regs.interrupt_timer, attotime_never, 0);
 
-	cdic_regs.audio_stream_timer = timer_alloc(machine, cdic_trigger_readback_int, 0);
-	timer_adjust_oneshot(cdic_regs.audio_stream_timer, attotime_never, 0);
+	cdic_regs.audio_sample_timer = timer_alloc(machine, audio_sample_trigger, 0);
+	timer_adjust_oneshot(cdic_regs.audio_sample_timer, attotime_never, 0);
 
+	/*
 	memset(cdic_regs.audio_stream_samples, 0, 18*28*16*CDIC_BUFFERED_SECTORS * sizeof(INT16));
 	cdic_regs.audio_stream_queued = 0;
 	cdic_regs.audio_stream_index = 0;
 	cdic_regs.audio_stream_end = 0;
 	cdic_regs.audio_stream_playing = 0;
+	*/
 
 	if( cdrom_dev )
 	{
