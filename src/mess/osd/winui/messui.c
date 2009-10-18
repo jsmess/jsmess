@@ -847,14 +847,15 @@ static void MessCreateDevice(const device_config *dev)
 
 /* This is used to Mount an image in the device view of MESSUI. The directory in the dialog box is not
 	set, and is thus random.
-	2009-10-17 Robbbert:
+	2009-10-18 Robbbert:
 	I've attempted to set the directory properly. Since the emulation is not running at this time,
 	we cannot do the same as the NEWUI does, that is, "initial_dir = image_working_directory(dev);"
 	because a crash occurs (the image system isn't set up yet). So, if an image is already mounted
 	we can use the directory it is in. Otherwise, we can use the "software" folder assuming that
-	the user has set one up. If this fails, then the previous random behaviour will occur. */
+	the user has set one up. If this fails, use the mess software directory if it exists. Otherwise
+	use the mess root directory. */
 
-static BOOL DevView_GetOpenFileName(HWND hwndDevView, const machine_config *conf, const device_config *dev, LPTSTR pszFilename, UINT nFilenameLength)
+static BOOL DevView_GetOpenFileName(HWND hwndDevView, const machine_config *config, const device_config *dev, LPTSTR pszFilename, UINT nFilenameLength)
 {
 	BOOL bResult;
 	char *s;
@@ -865,10 +866,11 @@ static BOOL DevView_GetOpenFileName(HWND hwndDevView, const machine_config *conf
 	astring *as = astring_alloc();
 
 	/* Get the path to the currently mounted image */
-	zippath_parent(as, GetSelectedSoftware(drvindex, conf, dev));
+	zippath_parent(as, GetSelectedSoftware(drvindex, config, dev));
+	s = (char*)astring_c(as);
 
-	/* See if a path returned (blank means no image was loaded) */
-	if (astring_chr(as, 0, ':') == -1)
+	/* See if an image was loaded, and that the path still exists */
+	if ((!osd_opendir(astring_c(as))) || (astring_chr(as, 0, ':') == -1))
 	{
 		/* Get the path from the software tab */
 		astring_cpyc(as, GetExtraSoftwarePaths(drvindex));
@@ -876,12 +878,25 @@ static BOOL DevView_GetOpenFileName(HWND hwndDevView, const machine_config *conf
 		/* We only want the first path; throw out the rest */
 		i = astring_chr(as, 0, ';');
 		if (i > 0) astring_substr(as, 0, i);
+		s = (char*)astring_c(as);
+
+		/* Make sure a folder was specified in the tab, and that it exists */
+		if ((!osd_opendir(astring_c(as))) || (astring_chr(as, 0, ':') == -1))
+		{
+			/* Default to emu directory */
+			char mess_directory[1024];
+			osd_get_emulator_directory(mess_directory, ARRAY_LENGTH(mess_directory));
+			s = mess_directory;
+
+			/* If software folder exists, use it instead - TODO: do properly when bug 1709 gets done */
+			zippath_combine(as, mess_directory, "software");
+			if (osd_opendir(astring_c(as))) s = (char*)astring_c(as);
+		}
 	}
-	
-	s = (char*)astring_c(as);
+
 	astring_free(as);
-	SetupImageTypes(conf, imagetypes, sizeof(imagetypes) / sizeof(imagetypes[0]), TRUE, dev);
-	bResult = CommonFileImageDialog(s, GetOpenFileName, pszFilename, conf, imagetypes);
+	SetupImageTypes(config, imagetypes, sizeof(imagetypes) / sizeof(imagetypes[0]), TRUE, dev);
+	bResult = CommonFileImageDialog(s, GetOpenFileName, pszFilename, config, imagetypes);
 
 	return bResult;
 }
@@ -889,9 +904,9 @@ static BOOL DevView_GetOpenFileName(HWND hwndDevView, const machine_config *conf
 
 /* This is used to Create an image in the device view of MESSUI. The directory in the dialog box is not
 	set, and is thus random.
-	2009-10-17 Robbbert:
-	If the user has set up a "software" folder, this will be used. If this fails, then the previous
-	random behaviour will occur. */
+	2009-10-18 Robbbert:
+	If the user has set up a "software" folder, this will be used. If this fails, we can use the
+	mess software directory if it exists. Otherwise use the mess root directory. */
 
 static BOOL DevView_GetCreateFileName(HWND hwndDevView, const machine_config *config, const device_config *dev, LPTSTR pszFilename, UINT nFilenameLength)
 {
@@ -909,8 +924,21 @@ static BOOL DevView_GetCreateFileName(HWND hwndDevView, const machine_config *co
 	/* We only want the first path; throw out the rest */
 	i = astring_chr(as, 0, ';');
 	if (i > 0) astring_substr(as, 0, i);
-	
 	s = (char*)astring_c(as);
+
+	/* Make sure a folder was specified in the tab, and that it exists */
+	if ((!osd_opendir(astring_c(as))) || (astring_chr(as, 0, ':') == -1))
+	{
+		/* Default to emu directory */
+		char mess_directory[1024];
+		osd_get_emulator_directory(mess_directory, ARRAY_LENGTH(mess_directory));
+		s = mess_directory;
+
+		/* If software folder exists, use it instead - TODO: do properly when bug 1709 gets done */
+		zippath_combine(as, mess_directory, "software");
+		if (osd_opendir(astring_c(as))) s = (char*)astring_c(as);
+	}
+
 	astring_free(as);
 
 	SetupImageTypes(config, imagetypes, sizeof(imagetypes) / sizeof(imagetypes[0]), TRUE, dev);
