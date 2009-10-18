@@ -715,7 +715,7 @@ GFXDECODE_END
 static READ8_DEVICE_HANDLER( pc98_porta_r )
 {
 	//printf("PPI Port A read\n");
-	return 0x00;
+	return 0x73; //bit 2 is interlace apparently
 }
 
 static READ8_DEVICE_HANDLER( pc98_portb_r )
@@ -990,7 +990,7 @@ ROM_START( pc9801 )
 ROM_END
 
 ROM_START( pc9821 )
-	ROM_REGION( 0x60000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x60000, "cpudata", ROMREGION_ERASEFF )
 	ROM_LOAD( "bios.rom", 0x08000, 0x18000, CRC(34a19a59) SHA1(2e92346727b0355bc1ec9a7ded1b444a4917f2b9) )
 	ROM_LOAD( "itf.rom",  0x38000, 0x08000, CRC(dd4c7bb8) SHA1(cf3aa193df2722899066246bccbed03f2e79a74a) )
 
@@ -1004,4 +1004,4 @@ ROM_END
 
 /*    YEAR  NAME      PARENT   COMPAT MACHINE   INPUT     INIT    CONFIG     COMPANY                        FULLNAME    FLAGS */
 COMP( 1981, pc9801,   0,       0,     pc9801,   pc9801,   0,      0,    "Nippon Electronic Company",   "PC-9801",  GAME_NOT_WORKING )
-COMP( 1993, pc9821,   0,       0,     pc9821,   pc9801,   0,      0,    "Nippon Electronic Company",   "PC-9821 (98MATE)",  GAME_NOT_WORKING )
+COMP( 1993, pc9821,   0,       0,     pc9801,   pc9801,   0,      0,    "Nippon Electronic Company",   "PC-9821 (98MATE)",  GAME_NOT_WORKING )
