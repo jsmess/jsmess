@@ -47,7 +47,7 @@ emu_timer *test_timer;
 
 #define VERBOSE_LEVEL	(6)
 
-#define ENABLE_VERBOSE_LOG (1)
+#define ENABLE_VERBOSE_LOG (0)
 
 #if ENABLE_VERBOSE_LOG
 INLINE void verboselog(running_machine *machine, int n_level, const char *s_fmt, ...)
@@ -328,7 +328,7 @@ static void scc68070_set_timer_callback(int channel)
 	{
 		case 0:
 			compare = 0x10000 - scc68070_regs.timers.timer0;
-			period = attotime_mul(ATTOTIME_IN_HZ(CLOCK_A/150), compare);
+			period = attotime_mul(ATTOTIME_IN_HZ(CLOCK_A/192), compare);
             timer_adjust_oneshot(scc68070_regs.timers.timer0_timer, period, 0);
 			break;
 		default:
@@ -1161,7 +1161,7 @@ static void cdic_decode_xa_stereo8(const unsigned char *xa, signed short *dp)
 	cdic_xa_last[3]=l3;
 }
 
-static void cdic_decode_audio_sector(running_machine *machine, const unsigned char *xa)
+static void cdic_decode_audio_sector(running_machine *machine, const unsigned char *xa, int triggered)
 {
 	// Get XA format from sector header
 
@@ -1170,9 +1170,16 @@ static void cdic_decode_audio_sector(running_machine *machine, const unsigned ch
 	int bits = 4;
 	int index = 0;
 	INT16 samples[18*28*16+16];
-	FILE* temp_adpcm = fopen("temp_adpcm.bin","ab");
+	//FILE* temp_adpcm = fopen("temp_adpcm.bin","ab");
 
-	fseek(temp_adpcm, 0, SEEK_END);
+	if(hdr[2] == 0xff && triggered == 1)
+	{
+		// Stop playing
+		timer_adjust_oneshot(cdic_regs.audio_sample_timer, attotime_never, 0);
+		return;
+	}
+
+	//fseek(temp_adpcm, 0, SEEK_END);
 	//printf( "%02x\n", hdr[2] & 0x3f );
 	switch(hdr[2] & 0x3f)	// ignore emphasis and reserved bits
 	{
@@ -1273,14 +1280,34 @@ static void cdic_decode_audio_sector(running_machine *machine, const unsigned ch
 
     dmadac_transfer(&dmadac[0], 2, 2, 2, 18*28*2*cdic_regs.audio_sample_size, samples);
 
-	fclose(temp_adpcm);
+	//fclose(temp_adpcm);
 }
 
+// After an appropriate delay for decoding to take place...
 static TIMER_CALLBACK( audio_sample_trigger )
 {
-	cdic_regs.z_buffer += 0xa00;
-	cdic_decode_audio_sector(machine, ((UINT8*)cdram) + cdic_regs.z_buffer + 4);
-	timer_adjust_oneshot(cdic_regs.audio_sample_timer, attotime_never, 0);
+	attotime period;
+
+	// Decode the data at Z+4, the same offset as a normal CD sector.
+	cdic_decode_audio_sector(machine, ((UINT8*)cdram) + cdic_regs.z_buffer + 4, 1);
+
+	// Swap buffer positions to indicate our new buffer position at the next read
+	cdic_regs.z_buffer = (cdic_regs.z_buffer == 0x2800) ? 0x3200 : 0x2800;
+
+	//// Delay for Frequency * (18*28*2*size in bytes)
+	period = attotime_mul(ATTOTIME_IN_HZ(cdic_regs.audio_sample_freq), 18*28*2*cdic_regs.audio_sample_size);
+
+	// Indicate that data has been decoded
+	cdic_regs.audio_buffer |= 0x8000;
+
+	// Set the CDIC interrupt line
+	//printf( "Setting CDIC interrupt line\n" );
+	verboselog(machine, 0, "Setting CDIC interrupt line\n" );
+	cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), M68K_IRQ_4, 128);
+	cputag_set_input_line(machine, "maincpu", M68K_IRQ_4, ASSERT_LINE);
+
+	// Request more data as necessary
+	timer_adjust_oneshot(cdic_regs.audio_sample_timer, period, 0);
 	//dmadac_enable(&dmadac[0], 2, 0);
 }
 
@@ -1381,7 +1408,7 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 						cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + (index - 6)] = (buffer[index*2] << 8) | buffer[index*2 + 1];
 					}
 
-					cdic_decode_audio_sector(machine, ((UINT8*)cdram) + ((cdic_regs.data_buffer & 5) * 0xa00 + 4));
+					cdic_decode_audio_sector(machine, ((UINT8*)cdram) + ((cdic_regs.data_buffer & 5) * 0xa00 + 4), 0);
 					// Ignore the audio sector for now.
 					cdic_regs.x_buffer |= 0x8000;
 
@@ -1460,6 +1487,58 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 	}
 }
 
+INLINE int CDIC_IS_VALID_SAMPLE_BUF(UINT16 addr)
+{
+	UINT8 *cdram8 = ((UINT8*)cdram) + addr + 4;
+	if(cdram8[2] != 0xff)
+	{
+		return 1;
+	}
+	return 0;
+}
+
+INLINE double CDIC_SAMPLE_BUF_FREQ(UINT16 addr)
+{
+	UINT8 *cdram8 = ((UINT8*)cdram) + addr + 4;
+	switch(cdram8[2] & 0x3f)
+	{
+		case 0:
+		case 1:
+		case 16:
+		case 17:
+			return 37800.0f;
+
+		case 4:
+		case 5:
+			return 18900.0f;
+
+		default:
+			return 18900.0f;
+	}
+}
+
+INLINE int CDIC_SAMPLE_BUF_SIZE(UINT16 addr)
+{
+	UINT8 *cdram8 = ((UINT8*)cdram) + addr + 4;
+	switch(cdram8[2] & 0x3f)
+	{
+		case 0:
+		case 4:
+			return 4;
+
+		case 1:
+		case 5:
+		case 16:
+			return 2;
+
+		case 17:
+			return 1;
+
+		default:
+			return 2;
+	}
+}
+
 static READ16_HANDLER( cdic_r )
 {
 	offset += 0x3c00/2;
@@ -1478,8 +1557,18 @@ static READ16_HANDLER( cdic_r )
 			verboselog(space->machine, 0, "cdic_r: Audio Channel Register = %04x & %04x\n", cdic_regs.audio_channel, mem_mask);
 			return cdic_regs.audio_channel;
 		case 0x3ff4/2:
-			verboselog(space->machine, 0, "cdic_r: Audio Buffer Register = %04x & %04x\n", cdic_regs.audio_buffer, mem_mask);
-			return cdic_regs.audio_buffer | 0x8000;
+		{
+			UINT16 temp = cdic_regs.audio_buffer;
+			if(cdic_regs.audio_buffer & 0x8000)
+			{
+				cputag_set_input_line(space->machine, "maincpu", M68K_IRQ_4, CLEAR_LINE);
+				verboselog(space->machine, 0, "Clearing CDIC interrupt line\n" );
+				//printf("Clearing CDIC interrupt line\n" );
+			}
+			cdic_regs.audio_buffer &= 0x7fff;
+			verboselog(space->machine, 0, "cdic_r: Audio Buffer Register = %04x & %04x\n", temp, mem_mask);
+			return temp;
+		}
 		case 0x3ff6/2:
 		{
 			UINT16 temp = cdic_regs.x_buffer;
@@ -1493,10 +1582,14 @@ static READ16_HANDLER( cdic_r )
 		case 0x3ffe/2:
 		{
 			UINT16 temp = cdic_regs.data_buffer;
-			cputag_set_input_line(space->machine, "maincpu", M68K_IRQ_4, CLEAR_LINE);
 			verboselog(space->machine, 0, "cdic_r: Data buffer Register = %04x & %04x\n", temp, mem_mask);
-			verboselog(space->machine, 0, "Clearing CDIC interrupt line\n" );
-			//printf("Clearing CDIC interrupt line\n" );
+			if(cdic_regs.data_buffer & 0x4000)
+			{
+				cputag_set_input_line(space->machine, "maincpu", M68K_IRQ_4, CLEAR_LINE);
+				verboselog(space->machine, 0, "Clearing CDIC interrupt line\n" );
+				//printf("Clearing CDIC interrupt line\n" );
+			}
+			cdic_regs.data_buffer &= ~0x4000;
 			return temp;
 		}
 		default:
@@ -1576,13 +1669,20 @@ static WRITE16_HANDLER( cdic_w )
 		case 0x3ffa/2:
 			verboselog(space->machine, 0, "cdic_w: Z-Buffer Register = %04x & %04x\n", data, mem_mask);
 			COMBINE_DATA(&cdic_regs.z_buffer);
+			/*
 			if(cdic_regs.z_buffer & 0x2000)
 			{
-				// Broken.
-				//attotime period = attotime_mul(ATTOTIME_IN_HZ(cdic_regs.audio_sample_freq), 18*28*4*cdic_regs.audio_sample_size);
-				//timer_adjust_oneshot(cdic_regs.audio_sample_timer, period, 0);
-				//cdic_decode_audio_sector(space->machine, ((UINT8*)cdram) + cdic_regs.z_buffer + 4);
+				if(CDIC_IS_VALID_SAMPLE_BUF(cdic_regs.z_buffer))
+				{
+					attotime period = attotime_mul(ATTOTIME_IN_HZ(CDIC_SAMPLE_BUF_FREQ(cdic_regs.z_buffer)), 18*28*4*CDIC_SAMPLE_BUF_SIZE(cdic_regs.z_buffer));
+					timer_adjust_oneshot(cdic_regs.audio_sample_timer, period, 0);
+				}
 			}
+			else
+			{
+				timer_adjust_oneshot(cdic_regs.audio_sample_timer, attotime_never, 0);
+			}
+			*/
 			break;
 		case 0x3ffc/2:
 			verboselog(space->machine, 0, "cdic_w: Interrupt Vector Register = %04x & %04x\n", data, mem_mask);
@@ -1897,6 +1997,7 @@ static WRITE16_HANDLER( slave_w )
 						dmadac_enable(&dmadac[0], 2, 0);
 						slave_regs.in_index = 0;
 						slave_regs.in_count = 0;
+						timer_adjust_oneshot(cdic_regs.audio_sample_timer, attotime_never, 0);
 						break;
 					case 0x83: // Unmute audio
 						verboselog(space->machine, 0, "slave_w: Channel %d: Unmute Audio (0x83)\n", offset );
@@ -3685,7 +3786,7 @@ static MACHINE_RESET( cdi )
 *************************/
 
 static MACHINE_DRIVER_START( cdimono1 )
-	MDRV_CPU_ADD("maincpu", SCC68070, CLOCK_A/3)
+	MDRV_CPU_ADD("maincpu", SCC68070, CLOCK_A/2)
 	MDRV_CPU_PROGRAM_MAP(cdimono1_mem)
 
 	MDRV_SCREEN_ADD("screen", RASTER)
