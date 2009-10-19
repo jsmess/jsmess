@@ -142,15 +142,11 @@ WRITE_LINE_DEVICE_HANDLER( floppy_ds2_w );
 WRITE_LINE_DEVICE_HANDLER( floppy_ds3_w );
 WRITE8_DEVICE_HANDLER( floppy_ds_w );
 
-READ_LINE_DEVICE_HANDLER( floppy_idx_r );
-WRITE_LINE_DEVICE_HANDLER( floppy_mon_w );
 WRITE_LINE_DEVICE_HANDLER( floppy_drtn_w );
 WRITE_LINE_DEVICE_HANDLER( floppy_stp_w );
 WRITE_LINE_DEVICE_HANDLER( floppy_wtd_w );
 WRITE_LINE_DEVICE_HANDLER( floppy_wtg_w );
-READ_LINE_DEVICE_HANDLER( floppy_tk00_r );
 READ_LINE_DEVICE_HANDLER( floppy_wpt_r );
-READ_LINE_DEVICE_HANDLER( floppy_rdy_r );
 
 #define FLOPPY	DEVICE_GET_INFO_NAME(floppy)
 DEVICE_GET_INFO(floppy);

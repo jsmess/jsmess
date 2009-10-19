@@ -523,7 +523,7 @@ static WRITE32_HANDLER( atapi_w )
 	 }
 }
 
-void dreamcast_atapi_exit(running_machine* machine)
+static void dreamcast_atapi_exit(running_machine* machine)
 {
 	if (gdrom_device != NULL)
 	{

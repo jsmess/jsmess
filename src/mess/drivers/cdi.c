@@ -41,7 +41,7 @@ static UINT16 *cdram;
 
 static const device_config *dmadac[2];
 
-emu_timer *test_timer;
+static emu_timer *test_timer;
 
 #define ENABLE_UART_PRINTING (0)
 
@@ -111,11 +111,11 @@ static void mcd212_process_vsr(running_machine *machine, int channel, UINT8 *pix
 static void mcd212_draw_cursor(running_machine *machine, UINT32 *scanline, int y);
 static void mcd212_mix_lines(running_machine *machine, UINT8 *plane_a_r, UINT8 *plane_a_g, UINT8 *plane_a_b, UINT8 *plane_b_r, UINT8 *plane_b_g, UINT8 *plane_b_b, UINT32 *out);
 static void mcd212_draw_scanline(running_machine *machine, int y);
-TIMER_CALLBACK( mcd212_perform_scan );
+static TIMER_CALLBACK( mcd212_perform_scan );
 static VIDEO_START(cdi);
 
 // Miscellaneous
-TIMER_CALLBACK( test_timer_callback );
+static TIMER_CALLBACK( test_timer_callback );
 
 /***********************
 * On-board peripherals *
@@ -955,7 +955,7 @@ typedef struct
 
 static cdic_regs_t cdic_regs;
 
-const INT32 cdic_adpcm_filter_coef[5][2] =
+static const INT32 cdic_adpcm_filter_coef[5][2] =
 {
 	{ 0,0 },
 	{ 60,0 },
@@ -964,7 +964,7 @@ const INT32 cdic_adpcm_filter_coef[5][2] =
 	{ 122,-60 },
 };
 
-int cdic_xa_last[4] = { 0, 0, 0, 0 };
+static int cdic_xa_last[4] = { 0, 0, 0, 0 };
 
 INLINE INT16 clamp(INT16 in)
 {
@@ -2105,7 +2105,7 @@ typedef struct
 	emu_timer *clock;
 } m48t08_regs_t;
 
-m48t08_regs_t m48t08;
+static m48t08_regs_t m48t08;
 
 static READ16_HANDLER( m48t08_r )
 {
@@ -2214,7 +2214,7 @@ typedef struct
 	UINT8 region_flag_1[768];
 } mcd212_t;
 
-mcd212_t mcd212;
+static mcd212_t mcd212;
 
 #define MCD212_CURCNT_COLOR			0x00000f	// Cursor color
 #define MCD212_CURCNT_CUW			0x008000	// Cursor width
@@ -2810,28 +2810,28 @@ typedef INT16 SWORD68K;
 static BYTE68K mcd212_abDelta[16] = { 0, 1, 4, 9, 16, 27, 44, 79, 128, 177, 212, 229, 240, 247, 252, 255 };
 
 //* Color limit array.
-BYTE68K mcd212_abLimit[3 * BYTE68K_MAX];
+static BYTE68K mcd212_abLimit[3 * BYTE68K_MAX];
 
 //* Color clamp array.
-BYTE68K mcd212_abClamp[3 * BYTE68K_MAX];
+static BYTE68K mcd212_abClamp[3 * BYTE68K_MAX];
 
 //* U-to-B matrix array.
-SWORD68K mcd212_abMatrixUB[BYTE68K_MAX + 1];
+static SWORD68K mcd212_abMatrixUB[BYTE68K_MAX + 1];
 
 //* U-to-G matrix array.
-SWORD68K mcd212_abMatrixUG[BYTE68K_MAX + 1];
+static SWORD68K mcd212_abMatrixUG[BYTE68K_MAX + 1];
 
 //* V-to-G matrix array.
-SWORD68K mcd212_abMatrixVG[BYTE68K_MAX + 1];
+static SWORD68K mcd212_abMatrixVG[BYTE68K_MAX + 1];
 
 //* V-to-R matrix array.
-SWORD68K mcd212_abMatrixVR[BYTE68K_MAX + 1];
+static SWORD68K mcd212_abMatrixVR[BYTE68K_MAX + 1];
 
 //* Delta-Y decoding array.
-BYTE68K mcd212_abDeltaY[BYTE68K_MAX + 1];
+static BYTE68K mcd212_abDeltaY[BYTE68K_MAX + 1];
 
 //* Delta-U/V decoding array.
-BYTE68K mcd212_abDeltaUV[BYTE68K_MAX + 1];
+static BYTE68K mcd212_abDeltaUV[BYTE68K_MAX + 1];
 
 INLINE UINT8 MCD212_LIM(INT32 in)
 {
@@ -3568,7 +3568,7 @@ static void mcd212_draw_scanline(running_machine *machine, int y)
 	mcd212_draw_cursor(machine, scanline, y);
 }
 
-TIMER_CALLBACK( mcd212_perform_scan )
+static TIMER_CALLBACK( mcd212_perform_scan )
 {
 	int scanline = video_screen_get_vpos(machine->primary_screen);
 	if(/*mcd212.channel[0].dcr & MCD212_DCR_DE*/1)
@@ -3661,7 +3661,7 @@ static VIDEO_START(cdi)
 	timer_adjust_oneshot(mcd212.scan_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 }
 
-TIMER_CALLBACK( test_timer_callback )
+static TIMER_CALLBACK( test_timer_callback )
 {
 	// This function manually triggers interrupt requests as a test.
 	static UINT8 set = 0;

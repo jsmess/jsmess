@@ -2067,7 +2067,7 @@ static PALETTE_INIT(x1)
 	}
 }
 
-FLOPPY_OPTIONS_START( x1 )
+static FLOPPY_OPTIONS_START( x1 )
 	FLOPPY_OPTION( img2d, "2d", "2D disk image", basicdsk_identify_default, basicdsk_construct_default,
 		HEADS([2])
 		TRACKS([40])

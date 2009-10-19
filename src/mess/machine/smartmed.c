@@ -113,7 +113,7 @@ INLINE smartmedia_t *get_safe_token(const device_config *device)
 /*
     Init a SmartMedia image
 */
-DEVICE_START( smartmedia )
+static DEVICE_START( smartmedia )
 {
 	smartmedia_t *sm = get_safe_token(device);
 
@@ -136,7 +136,7 @@ DEVICE_START( smartmedia )
 /*
     Load a SmartMedia image
 */
-DEVICE_IMAGE_LOAD( smartmedia )
+static DEVICE_IMAGE_LOAD( smartmedia )
 {
 	smartmedia_t *sm = get_safe_token(image);
 	disk_image_header custom_header;
@@ -180,7 +180,7 @@ DEVICE_IMAGE_LOAD( smartmedia )
 /*
     Unload a SmartMedia image
 */
-DEVICE_IMAGE_UNLOAD( smartmedia )
+static DEVICE_IMAGE_UNLOAD( smartmedia )
 {
 	smartmedia_t *sm = get_safe_token(image);
 

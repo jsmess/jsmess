@@ -91,7 +91,7 @@ static void gba_request_irq(running_machine *machine, UINT32 int_type)
 	}
 }
 
-TIMER_CALLBACK( dma_complete )
+static TIMER_CALLBACK( dma_complete )
 {
 	int ctrl;
 	FPTR ch;
@@ -486,7 +486,7 @@ static TIMER_CALLBACK(timer_expire)
 	}
 }
 
-TIMER_CALLBACK(handle_irq)
+static TIMER_CALLBACK(handle_irq)
 {
 	gba_state *gba_state = machine->driver_data;
 
@@ -1901,7 +1901,7 @@ static ADDRESS_MAP_START( gbadvance_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x0c000000, 0x0cffffff) AM_ROM AM_REGION("cartridge", 0)	// final mirror
 ADDRESS_MAP_END
 
-INPUT_PORTS_START( gbadv )
+static INPUT_PORTS_START( gbadv )
 	PORT_START("IN0")
 	PORT_BIT( 0xfc00, IP_ACTIVE_HIGH, IPT_BUTTON6) PORT_UNUSED
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("P1 R") PORT_PLAYER(1)	// R
@@ -1916,7 +1916,7 @@ INPUT_PORTS_START( gbadv )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("A") PORT_PLAYER(1)	// A
 INPUT_PORTS_END
 
-TIMER_CALLBACK( perform_hbl )
+static TIMER_CALLBACK( perform_hbl )
 {
 	int ch, ctrl;
 	gba_state *gba_state = machine->driver_data;
@@ -1947,7 +1947,7 @@ TIMER_CALLBACK( perform_hbl )
 	timer_adjust_oneshot(gba_state->hbl_timer, attotime_never, 0);
 }
 
-TIMER_CALLBACK( perform_scan )
+static TIMER_CALLBACK( perform_scan )
 {
 	int scanline;
 	gba_state *gba_state = machine->driver_data;

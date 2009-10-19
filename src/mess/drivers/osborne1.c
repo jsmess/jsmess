@@ -175,7 +175,7 @@ static const z80_daisy_chain osborne1_daisy_chain[] =
  * - DEC 1820 double density: 40 tracks, 9 sectors per track, 512-byte sectors (180 KByte)
  *
  */
-FLOPPY_OPTIONS_START(osborne1 )
+static FLOPPY_OPTIONS_START(osborne1 )
 	FLOPPY_OPTION( osd, "img", "Osborne single density", basicdsk_identify_default, basicdsk_construct_default,
 		HEADS([1])
 		TRACKS([40])

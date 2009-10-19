@@ -151,12 +151,12 @@ static WRITE16_DEVICE_HANDLER( at16_388_w )
 	}
 }
 
-READ32_HANDLER( at_kbdc8042_32le_r )
+static READ32_HANDLER( at_kbdc8042_32le_r )
 {
 	return read32le_with_read8_handler(at_kbdc8042_r, space, offset, mem_mask);
 }
 
-WRITE32_HANDLER( at_kbdc8042_32le_w )
+static WRITE32_HANDLER( at_kbdc8042_32le_w )
 {
 	write32le_with_write8_handler(at_kbdc8042_w, space, offset, data, mem_mask);
 }

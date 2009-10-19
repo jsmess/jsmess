@@ -234,7 +234,7 @@ const struct io_procs mess_ioprocs =
 	image_fsize_thunk
 };
 
-void floppy_drive_set_geometry_absolute(const device_config *img, int tracks, int sides)
+static void floppy_drive_set_geometry_absolute(const device_config *img, int tracks, int sides)
 {
 	floppy_drive *pDrive = get_safe_token( img );
 	pDrive->max_track = tracks;
@@ -266,7 +266,7 @@ void floppy_drive_set_geometry(const device_config *img, floppy_type type)
 static TIMER_CALLBACK(floppy_drive_index_callback);
 
 /* this is called on device init */
-void floppy_drive_init(const device_config *img)
+static void floppy_drive_init(const device_config *img)
 {
 	floppy_drive *pDrive = get_safe_token( img );
 

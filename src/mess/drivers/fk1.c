@@ -13,7 +13,7 @@
 #include "machine/msm8251.h"
 #include "devices/messram.h"
 
-UINT8 fk1_video_rol;
+static UINT8 fk1_video_rol;
 /*
 Port A:
         Printer
@@ -62,7 +62,7 @@ static READ8_DEVICE_HANDLER (fk1_ppi_1_c_r )
 //  logerror("fk1_ppi_1_c_r\n");
 	return 0;
 }
-I8255A_INTERFACE( fk1_ppi8255_interface_1 )
+static I8255A_INTERFACE( fk1_ppi8255_interface_1 )
 {
 	DEVCB_HANDLER(fk1_ppi_1_a_r),
 	DEVCB_HANDLER(fk1_ppi_1_b_r),
@@ -112,7 +112,7 @@ static READ8_DEVICE_HANDLER (fk1_ppi_2_c_r )
 //  logerror("fk1_ppi_2_c_r\n");
 	return 0;
 }
-I8255A_INTERFACE( fk1_ppi8255_interface_2 )
+static I8255A_INTERFACE( fk1_ppi8255_interface_2 )
 {
 	DEVCB_NULL,
 	DEVCB_HANDLER(fk1_ppi_2_b_r),
@@ -175,7 +175,7 @@ static READ8_DEVICE_HANDLER (fk1_ppi_3_c_r )
 //  logerror("fk1_ppi_3_c_r\n");
 	return 0;
 }
-I8255A_INTERFACE( fk1_ppi8255_interface_3 )
+static I8255A_INTERFACE( fk1_ppi8255_interface_3 )
 {
 	DEVCB_HANDLER(fk1_ppi_3_a_r),
 	DEVCB_HANDLER(fk1_ppi_3_b_r),
@@ -204,7 +204,7 @@ static PIT8253_OUTPUT_CHANGED(fk1_pit_out2)
 }
 
 
-const struct pit8253_config fk1_pit8253_intf =
+static const struct pit8253_config fk1_pit8253_intf =
 {
 	{
 		{
@@ -229,12 +229,12 @@ const struct pit8253_config fk1_pit8253_intf =
     8 any interruption allowed.
 */
 
-WRITE8_HANDLER( fk1_intr_w )
+static WRITE8_HANDLER( fk1_intr_w )
 {
 	logerror("fk1_intr_w %02x\n",data);
 }
 
-READ8_HANDLER( fk1_bank_ram_r )
+static READ8_HANDLER( fk1_bank_ram_r )
 {
 	const address_space *space_mem = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	memory_install_write8_handler(space_mem, 0x0000, 0x3fff, 0, 0, SMH_BANK(1));
@@ -243,7 +243,7 @@ READ8_HANDLER( fk1_bank_ram_r )
 	return 0;
 }
 
-READ8_HANDLER( fk1_bank_rom_r )
+static READ8_HANDLER( fk1_bank_rom_r )
 {
 	const address_space *space_mem = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	memory_install_write8_handler(space_mem, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
@@ -260,7 +260,7 @@ READ8_HANDLER( fk1_bank_rom_r )
     0 - READ
     Functions are allowed in one.
 */
-WRITE8_HANDLER( fk1_disk_w )
+static WRITE8_HANDLER( fk1_disk_w )
 {
 //  logerror("fk1_disk_w %02x\n",data);
 }
@@ -274,7 +274,7 @@ WRITE8_HANDLER( fk1_disk_w )
 1 - / BX, X-axis
 0 - / AX, X-axis
 */
-READ8_HANDLER( fk1_mouse_r )
+static READ8_HANDLER( fk1_mouse_r )
 {
 //  logerror("fk1_mouse_r\n");
 	return 0;
@@ -282,7 +282,7 @@ READ8_HANDLER( fk1_mouse_r )
 
 /*Write to port 70 resets the interrupt from the system clock of 50 Hz. */
 
-WRITE8_HANDLER( fk1_reset_int_w )
+static WRITE8_HANDLER( fk1_reset_int_w )
 {
 	logerror("fk1_reset_int_w\n");
 }
@@ -321,7 +321,7 @@ static INPUT_PORTS_START( fk1 )
 		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('\'')
 INPUT_PORTS_END
 
-UINT8 int_vector;
+static UINT8 int_vector;
 
 static TIMER_CALLBACK(keyboard_callback)
 {

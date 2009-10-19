@@ -196,7 +196,7 @@ static DEVICE_START(upd71071)
 	dmac->selected_channel = 0;
 }
 
-READ8_DEVICE_HANDLER(upd71071_read)
+static READ8_DEVICE_HANDLER(upd71071_read)
 {
 	upd71071_t* dmac = device->token;
 	UINT8 ret = 0;
@@ -267,7 +267,7 @@ READ8_DEVICE_HANDLER(upd71071_read)
 	return ret; 
 }
 
-WRITE8_DEVICE_HANDLER(upd71071_write)
+static WRITE8_DEVICE_HANDLER(upd71071_write)
 {
 	upd71071_t* dmac = device->token;
 

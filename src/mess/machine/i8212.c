@@ -89,6 +89,7 @@ WRITE8_DEVICE_HANDLER( i8212_w )
     i8212_md_w - mode write
 -------------------------------------------------*/
 
+#ifdef UNUSED_FUNCTION
 WRITE_LINE_DEVICE_HANDLER( i8212_md_w )
 {
 	i8212_t *i8212 = get_safe_token(device);
@@ -97,6 +98,7 @@ WRITE_LINE_DEVICE_HANDLER( i8212_md_w )
 
 	i8212->md = state;
 }
+#endif
 
 /*-------------------------------------------------
     i8212_stb_w - strobe write

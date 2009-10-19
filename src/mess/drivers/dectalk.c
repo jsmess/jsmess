@@ -314,14 +314,14 @@ static void dectalk_reset(const device_config *device)
 	dectalk.duart_outport = 0;
 }
 
-MACHINE_RESET( dectalk )
+static MACHINE_RESET( dectalk )
 {
 	/* hook the RESET line, which resets a slew of other components */
 	m68k_set_reset_callback(cputag_get_cpu(machine, "maincpu"), dectalk_reset);
 }
 
 /* Begin 68k i/o handlers */
-READ8_HANDLER( nvram_read ) // read from x2212 nvram chip and possibly do recall
+static READ8_HANDLER( nvram_read ) // read from x2212 nvram chip and possibly do recall
 {
 	UINT8 data = 0xFF;
 	data = dectalk.nvram_local[offset&0xff]; // TODO: should this be before or after a possible /RECALL? I'm guessing before.
@@ -333,7 +333,7 @@ READ8_HANDLER( nvram_read ) // read from x2212 nvram chip and possibly do recall
 	return data;
 }
 
-WRITE8_HANDLER( led_write )
+static WRITE8_HANDLER( led_write )
 {
 	dectalk.statusLED = data&0xFF;
 	popmessage("LED status: %02X\n", data&0xFF);
@@ -343,7 +343,7 @@ WRITE8_HANDLER( led_write )
 	//popmessage("LED status: %x %x %x %x %x %x %x %x\n", data&0x80, data&0x40, data&0x20, data&0x10, data&0x8, data&0x4, data&0x2, data&0x1);
 }
 
-WRITE8_HANDLER( nvram_write ) // write to X2212 NVRAM chip and possibly do store
+static WRITE8_HANDLER( nvram_write ) // write to X2212 NVRAM chip and possibly do store
 {
 #ifdef NVRAM_LOG
 	logerror("m68k: nvram write at %08X: %02X\n", offset, data&0x0f);
@@ -353,7 +353,7 @@ WRITE8_HANDLER( nvram_write ) // write to X2212 NVRAM chip and possibly do store
 	dectalk_x2212_store(space->machine);
 }
 
-WRITE16_HANDLER( m68k_infifo_w ) // 68k write to the speech input fifo
+static WRITE16_HANDLER( m68k_infifo_w ) // 68k write to the speech input fifo
 {
 #ifdef USE_LOOSE_TIMING
 	cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(25));
@@ -374,7 +374,7 @@ WRITE16_HANDLER( m68k_infifo_w ) // 68k write to the speech input fifo
 	dectalk.infifo_head_ptr&=0x1F;
 }
 
-READ16_HANDLER( m68k_spcflags_r ) // 68k read from the speech flags
+static READ16_HANDLER( m68k_spcflags_r ) // 68k read from the speech flags
 {
 	UINT8 data = 0;
 	data |= dectalk.m68k_spcflags_latch; // bits 0 and 6
@@ -386,7 +386,7 @@ READ16_HANDLER( m68k_spcflags_r ) // 68k read from the speech flags
 	return data;
 }
 
-WRITE16_HANDLER( m68k_spcflags_w ) // 68k write to the speech flags (only 3 bits do anything)
+static WRITE16_HANDLER( m68k_spcflags_w ) // 68k write to the speech flags (only 3 bits do anything)
 {
 #ifdef USE_LOOSE_TIMING
 	cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(25));
@@ -445,7 +445,7 @@ WRITE16_HANDLER( m68k_spcflags_w ) // 68k write to the speech flags (only 3 bits
 	}
 }
 
-READ16_HANDLER( m68k_tlcflags_r ) // dtmf flags read
+static READ16_HANDLER( m68k_tlcflags_r ) // dtmf flags read
 {
 	UINT16 data = 0;
 	data |= dectalk.m68k_tlcflags_latch; // bits 6, 8, 14;
@@ -457,7 +457,7 @@ READ16_HANDLER( m68k_tlcflags_r ) // dtmf flags read
 	return data;
 }
 
-WRITE16_HANDLER( m68k_tlcflags_w ) // dtmf flags write
+static WRITE16_HANDLER( m68k_tlcflags_w ) // dtmf flags write
 {
 #ifdef TLC_LOG
 	logerror("m68k: TLC flags written with %04X, only storing %04X\n",data, data&0x4140);
@@ -519,7 +519,7 @@ WRITE16_HANDLER( m68k_tlcflags_w ) // dtmf flags write
 	}
 }
 
-READ16_HANDLER( m68k_tlc_dtmf_r ) // dtmf chip read
+static READ16_HANDLER( m68k_tlc_dtmf_r ) // dtmf chip read
 {
 	UINT16 data = 0xFFFF;
 	data = dectalk.tlc_dtmf&0xF;
@@ -531,7 +531,7 @@ READ16_HANDLER( m68k_tlc_dtmf_r ) // dtmf chip read
 /* End 68k i/o handlers */
 
 /* Begin tms32010 i/o handlers */
-WRITE16_HANDLER( spc_latch_outfifo_error_stats ) // latch 74ls74 @ E64 upper and lower halves with d0 and 1 respectively
+static WRITE16_HANDLER( spc_latch_outfifo_error_stats ) // latch 74ls74 @ E64 upper and lower halves with d0 and 1 respectively
 {
 #ifdef USE_LOOSE_TIMING
 	cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(25));
@@ -543,7 +543,7 @@ WRITE16_HANDLER( spc_latch_outfifo_error_stats ) // latch 74ls74 @ E64 upper and
 	dectalk.spc_error_latch = (data&1);
 }
 
-READ16_HANDLER( spc_infifo_data_r )
+static READ16_HANDLER( spc_infifo_data_r )
 {
 	UINT16 data = 0xFFFF;
 	data = dectalk.infifo[dectalk.infifo_tail_ptr];
@@ -557,7 +557,7 @@ READ16_HANDLER( spc_infifo_data_r )
 	return data;
 }
 
-WRITE16_HANDLER( spc_outfifo_data_w )
+static WRITE16_HANDLER( spc_outfifo_data_w )
 {
 	// the low 4 data bits are thrown out on the real unit due to use of a 12 bit dac (and to save use of another 16x4 fifo chip), though technically they're probably valid, and with suitable hacking a dtc-01 could probably output full 16 bit samples at 10khz.
 #ifdef SPC_LOG_DSP
@@ -578,7 +578,7 @@ WRITE16_HANDLER( spc_outfifo_data_w )
 	//dectalk_outfifo_check(space->machine); // commented to allow int to clear
 }
 
-READ16_HANDLER( spc_semaphore_r ) // Return state of d-latch 74ls74 @ E64 'lower half' in d0 which indicates whether infifo is readable
+static READ16_HANDLER( spc_semaphore_r ) // Return state of d-latch 74ls74 @ E64 'lower half' in d0 which indicates whether infifo is readable
 {
 #ifdef SPC_LOG_DSP
 	//logerror("dsp: read infifo semaphore, returned %d\n", dectalk.infifo_semaphore); // commented due to extreme annoyance factor
@@ -687,7 +687,7 @@ static TIMER_CALLBACK( simulate_input_cb )
 }
 
 /* Driver init: stuff that needs setting up which isn't directly affected by reset */
-DRIVER_INIT( dectalk )
+static DRIVER_INIT( dectalk )
 {
 	dectalk_clear_all_fifos(machine);
 	dectalk.simulate_outfifo_error = 0;

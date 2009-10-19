@@ -201,7 +201,7 @@ static UINT8 MMC1_regs[4];
 
 static UINT8 MMC2_regs[4];	// these replace bank0/bank0_hi/bank1/bank1_hi
 
-UINT8* extended_ntram;
+static UINT8* extended_ntram;
 
 
 static int MMC5_rom_bank_mode;

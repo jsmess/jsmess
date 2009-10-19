@@ -53,20 +53,6 @@ void osd_free_executable(void *ptr, size_t size)
 
 
 
-//============================================================
-//  osd_is_bad_read_ptr
-//============================================================
-
-int osd_is_bad_read_ptr(const void *ptr, size_t size)
-{
-#ifdef WIN32
-	return IsBadReadPtr(ptr, size);
-#else
-	return !ptr;
-#endif
-}
-
-
 void osd_get_emulator_directory(char *dir, size_t dir_size)
 {
 }

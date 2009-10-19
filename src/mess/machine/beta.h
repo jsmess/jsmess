@@ -16,8 +16,6 @@ void betadisk_enable(const device_config *device);
 void betadisk_disable(const device_config *device);
 void betadisk_clear_status(const device_config *device);
 
-void beta_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);
-
 #define BETA_DISK_TAG	"beta"
 
 #define BETA_DISK DEVICE_GET_INFO_NAME( beta_disk )

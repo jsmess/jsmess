@@ -145,7 +145,7 @@ static VIDEO_UPDATE( mc10 )
     DRIVER INIT
 ***************************************************************************/
 
-DRIVER_INIT( mc10 )
+static DRIVER_INIT( mc10 )
 {
 	mc10_state *mc10 = machine->driver_data;
 	const address_space *prg = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);

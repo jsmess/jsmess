@@ -31,7 +31,6 @@
 
 // things from mess/machine/dc.c
 void dreamcast_atapi_init(running_machine *machine);
-void dreamcast_atapi_exit(running_machine *machine);
 void dreamcast_atapi_reset(running_machine *machine);
 extern READ64_HANDLER( dc_mess_gdrom_r );
 extern WRITE64_HANDLER( dc_mess_gdrom_w );

@@ -72,7 +72,7 @@ static READ8_HANDLER (vdisk_data_r)
 	return retVal;
 }
 
-UINT8 selectedline(UINT16 data)
+static UINT8 selectedline(UINT16 data)
 {
 	UINT8 i;
 	for(i = 0; i < 16; i++)
@@ -155,7 +155,7 @@ static NEC765_GET_IMAGE( pyldin_nec765_get_image )
 {
 	return get_floppy_image(device->machine, (floppy_index & 1)^1);
 }
-UINT8 floppy_ctrl = 0;
+static UINT8 floppy_ctrl = 0;
 static WRITE8_HANDLER (floppy_w)
 {
 	// bit 0 is reset (if zero)
@@ -457,7 +457,7 @@ static DRIVER_INIT(pyl601)
 	memset(messram_get_ptr(devtag_get_device(machine, "messram")), 0, 64 * 1024);
 }
 
-INTERRUPT_GEN( pyl601_interrupt )
+static INTERRUPT_GEN( pyl601_interrupt )
 {
 	tick50_mark = 0x80;
 	cpu_set_input_line(device, 0, HOLD_LINE);

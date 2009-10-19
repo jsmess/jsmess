@@ -807,7 +807,7 @@ static INPUT_PORTS_START( einstein )
 	PORT_CONFSETTING(0x08, "Double sided")
 INPUT_PORTS_END
 
-INPUT_PORTS_START( einstein_80col )
+static INPUT_PORTS_START( einstein_80col )
 	PORT_INCLUDE(einstein)
 
 	/* dip switches on the 80 column card */

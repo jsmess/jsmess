@@ -671,7 +671,7 @@ static MACHINE_START( xerox820 )
 	state_save_register_global(machine, state->dsdd);
 }
 
-FLOPPY_OPTIONS_START(xerox820 )
+static FLOPPY_OPTIONS_START(xerox820 )
 	FLOPPY_OPTION( sssd8, "dsk", "8\" SSSD", basicdsk_identify_default, basicdsk_construct_default,
 		HEADS([1])
 		TRACKS([77])

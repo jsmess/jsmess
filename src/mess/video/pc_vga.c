@@ -1162,13 +1162,13 @@ WRITE16_HANDLER( vga_port16le_03c0_w ) { write16le_with_write8_handler(vga_port_
 WRITE16_HANDLER( vga_port16le_03d0_w ) { write16le_with_write8_handler(vga_port_03d0_w, space, offset, data, mem_mask); }
 
 /* 32 bit */
-READ32_HANDLER( vga_port32le_03b0_r ) { return read32le_with_read8_handler(vga_port_03b0_r, space, offset, mem_mask); }
-READ32_HANDLER( vga_port32le_03c0_r ) { return read32le_with_read8_handler(vga_port_03c0_r, space, offset, mem_mask); }
-READ32_HANDLER( vga_port32le_03d0_r ) { return read32le_with_read8_handler(vga_port_03d0_r, space, offset, mem_mask); }
+static READ32_HANDLER( vga_port32le_03b0_r ) { return read32le_with_read8_handler(vga_port_03b0_r, space, offset, mem_mask); }
+static READ32_HANDLER( vga_port32le_03c0_r ) { return read32le_with_read8_handler(vga_port_03c0_r, space, offset, mem_mask); }
+static READ32_HANDLER( vga_port32le_03d0_r ) { return read32le_with_read8_handler(vga_port_03d0_r, space, offset, mem_mask); }
 
-WRITE32_HANDLER( vga_port32le_03b0_w ) { write32le_with_write8_handler(vga_port_03b0_w, space, offset, data, mem_mask); }
-WRITE32_HANDLER( vga_port32le_03c0_w ) { write32le_with_write8_handler(vga_port_03c0_w, space, offset, data, mem_mask); }
-WRITE32_HANDLER( vga_port32le_03d0_w ) { write32le_with_write8_handler(vga_port_03d0_w, space, offset, data, mem_mask); }
+static WRITE32_HANDLER( vga_port32le_03b0_w ) { write32le_with_write8_handler(vga_port_03b0_w, space, offset, data, mem_mask); }
+static WRITE32_HANDLER( vga_port32le_03c0_w ) { write32le_with_write8_handler(vga_port_03c0_w, space, offset, data, mem_mask); }
+static WRITE32_HANDLER( vga_port32le_03d0_w ) { write32le_with_write8_handler(vga_port_03d0_w, space, offset, data, mem_mask); }
 
 /* 64 bit */
 static READ64_HANDLER( vga_port64be_03b0_r ) { return read64be_with_read8_handler(vga_port_03b0_r, space, offset, mem_mask); }

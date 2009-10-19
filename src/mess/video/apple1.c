@@ -194,7 +194,7 @@ static void terminal_clear(struct terminal *terminal)
 	terminal_fill(terminal, terminal->blank_char);
 }
 
-struct terminal *terminal_create(
+static struct terminal *terminal_create(
 	running_machine *machine,
 	int gfx, int blank_char, int char_bits,
 	int (*getcursorcode)(int original_code),

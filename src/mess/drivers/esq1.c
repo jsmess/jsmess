@@ -60,7 +60,7 @@ TODO:
 static UINT8 uart_regs[0x10];
 static UINT8 uart_outputport;
 
-void esq1_doc_irq(const device_config *device, int state)
+static void esq1_doc_irq(const device_config *device, int state)
 {
 }
 

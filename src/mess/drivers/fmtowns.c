@@ -151,7 +151,7 @@ static UINT8 towns_srom_reset;
 static UINT8 towns_rtc_select;
 static UINT8 towns_rtc_data;
 static UINT8 towns_rtc_reg[16];
-emu_timer* towns_rtc_timer;
+static emu_timer* towns_rtc_timer;
 static UINT8 towns_timer_mask;
 static UINT8 towns_crtc_mix;
 static UINT16 towns_machine_id;  // default is 0x0101
@@ -444,13 +444,13 @@ static WRITE8_HANDLER(towns_floppy_w)
 	}
 }
 
-UINT16 towns_fdc_dma_r(running_machine* machine)
+static UINT16 towns_fdc_dma_r(running_machine* machine)
 {
 	const device_config* fdc = devtag_get_device(machine,"fdc");
 	return wd17xx_data_r(fdc,0);
 }
 
-void towns_fdc_dma_w(running_machine* machine, UINT16 data)
+static void towns_fdc_dma_w(running_machine* machine, UINT16 data)
 {
 	const device_config* fdc = devtag_get_device(machine,"fdc");
 	wd17xx_data_w(fdc,0,data);
@@ -1225,7 +1225,7 @@ static const wd17xx_interface towns_mb8877a_interface =
 	{FLOPPY_0,FLOPPY_1,FLOPPY_2,FLOPPY_3}
 };
 
-FLOPPY_OPTIONS_START( towns )
+static FLOPPY_OPTIONS_START( towns )
 	FLOPPY_OPTION( fmt_bin, "bin", "BIN disk image", basicdsk_identify_default, basicdsk_construct_default,
 		HEADS([2])
 		TRACKS([77])

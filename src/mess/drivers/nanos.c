@@ -272,9 +272,9 @@ static VIDEO_UPDATE( nanos )
 	return 0;
 }
 
-UINT8 key_command;
-UINT8 last_code = 0;
-UINT8 key_pressed = 0xff;
+static UINT8 key_command;
+static UINT8 last_code = 0;
+static UINT8 key_pressed = 0xff;
 static READ8_DEVICE_HANDLER (nanos_port_a_r)
 {
 	UINT8 retVal;

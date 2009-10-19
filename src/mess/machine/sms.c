@@ -179,7 +179,7 @@ static TIMER_CALLBACK( lightgun_tick )
 
 /* FIXME: this function is a hack. For Light Phaser X pos sms_vdp_hcount_latch
  function should be used instead, but emulation (timming?) needs to improve. */
-void sms_vdp_hcount_lphaser( running_machine *machine, int hpos)
+static void sms_vdp_hcount_lphaser( running_machine *machine, int hpos)
 {
 	UINT8 tmp = ((hpos - 46) >> 1) & 0xff;
 	const device_config *smsvdp = devtag_get_device(machine, "sms_vdp");

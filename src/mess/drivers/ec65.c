@@ -22,7 +22,7 @@
 #define VIA6522_1_TAG "via6522_1"
 #define MC6845_TAG "mc6845"
 
-UINT8 *video_ram;
+static UINT8 *video_ram;
 
 static ADDRESS_MAP_START(ec65_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -93,7 +93,7 @@ static WRITE8_DEVICE_HANDLER( ec65_via_write_b )
 {
 }
 
-const via6522_interface ec65_via_1_intf=
+static const via6522_interface ec65_via_1_intf=
 {
 	DEVCB_NULL,   /* in_a_func */
 	DEVCB_HANDLER(ec65_via_read_b),   /* in_b_func */
@@ -110,7 +110,7 @@ const via6522_interface ec65_via_1_intf=
 	DEVCB_NULL,                       /* irq_func */
 };
 
-const via6522_interface ec65_via_0_intf=
+static const via6522_interface ec65_via_0_intf=
 {
 	DEVCB_HANDLER(ec65_via_read_a),      /* in_a_func */
 	DEVCB_NULL,      /* in_b_func */
@@ -128,7 +128,7 @@ const via6522_interface ec65_via_0_intf=
 };
 
 /* Input ports */
-INPUT_PORTS_START( ec65 )
+static INPUT_PORTS_START( ec65 )
 
 INPUT_PORTS_END
 

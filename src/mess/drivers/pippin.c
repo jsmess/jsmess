@@ -30,7 +30,7 @@ static ADDRESS_MAP_START( pippin_mem, ADDRESS_SPACE_PROGRAM, 64 )
 ADDRESS_MAP_END
 
 /* Input ports */
-INPUT_PORTS_START( pippin )
+static INPUT_PORTS_START( pippin )
 INPUT_PORTS_END
 
 

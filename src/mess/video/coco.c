@@ -29,7 +29,7 @@
  *
  *************************************/
 
-ATTR_CONST UINT8 coco_get_attributes_2(running_machine *machine, UINT8 c, int scanline, int pos)
+static ATTR_CONST UINT8 coco_get_attributes_2(running_machine *machine, UINT8 c, int scanline, int pos)
 {
 	coco_state *state = machine->driver_data;
 	UINT8 result = 0x00;

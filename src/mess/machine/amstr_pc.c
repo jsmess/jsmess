@@ -212,7 +212,7 @@ READ8_HANDLER( pc200_port378_r )
 	return data;
 }
 
-READ8_HANDLER( pc200_port278_r )
+static READ8_HANDLER( pc200_port278_r )
 {
 	const device_config *lpt = devtag_get_device(space->machine, "lpt_2");
 	UINT8 data = pc_lpt_r(lpt, offset);

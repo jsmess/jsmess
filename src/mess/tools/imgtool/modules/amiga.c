@@ -292,7 +292,7 @@ static int hash_name(const char *name, int intl)
 
 
 /* Returns TRUE if year is a leap year */
-int is_leap(int year)
+static int is_leap(int year)
 {
    return ((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0);
 }
@@ -339,7 +339,7 @@ static time_t amiga_crack_time(amiga_date *date)
 
 
 /* convert standard time to amiga time */
-void amiga_setup_time(time_t time, amiga_date *dest)
+static void amiga_setup_time(time_t time, amiga_date *dest)
 {
 	struct tm t = *localtime(&time);
 	int year;
@@ -358,7 +358,7 @@ void amiga_setup_time(time_t time, amiga_date *dest)
 
 
 /* convert flags to human readable form */
-void amiga_decode_flags(UINT32 flags, char *dest)
+static void amiga_decode_flags(UINT32 flags, char *dest)
 {
 	/* test for flags */
 	dest[0] = (flags & 0x80) ? 'h' : '-';
@@ -373,7 +373,7 @@ void amiga_decode_flags(UINT32 flags, char *dest)
 }
 
 
-void copy_integer_array_be(UINT32 *dest, const UINT32 *source, int size)
+static void copy_integer_array_be(UINT32 *dest, const UINT32 *source, int size)
 {
 	int i;
 
@@ -385,7 +385,7 @@ void copy_integer_array_be(UINT32 *dest, const UINT32 *source, int size)
 
 
 /* This function converts an array of UINT32s to an amiga_date */
-void copy_date_be(amiga_date *dest, const UINT32 *source)
+static void copy_date_be(amiga_date *dest, const UINT32 *source)
 {
 	dest->days  = BIG_ENDIANIZE_INT32(source[0]);
 	dest->mins  = BIG_ENDIANIZE_INT32(source[1]);
@@ -394,7 +394,7 @@ void copy_date_be(amiga_date *dest, const UINT32 *source)
 
 
 /* Calculate the block checksum of a byte array */
-UINT32 block_checksum(UINT8 *buffer, int length)
+static UINT32 block_checksum(UINT8 *buffer, int length)
 {
 	UINT32 chksum = 0;
 	int i;
@@ -2337,7 +2337,7 @@ static imgtoolerr_t amiga_image_suggesttransfer(imgtool_partition *partition, co
 *****************************************************************************/
 
 
-OPTION_GUIDE_START(amiga_createimage_optionguide)
+static OPTION_GUIDE_START(amiga_createimage_optionguide)
 	OPTION_STRING( 'N', "name", "Volume name" )
 	OPTION_ENUM_START( 'S', "density", "Density" )
 		OPTION_ENUM( 0, "dd", "Double Density" )

@@ -519,7 +519,7 @@ static const cassette_config samcoupe_cassette_config =
 };
 
 
-FLOPPY_OPTIONS_START( samcoupe )
+static FLOPPY_OPTIONS_START( samcoupe )
 	FLOPPY_OPTION
 	(
 		coupe_mgt, "mgt,dsk,sad", "SAM Coupe MGT disk image", coupe_mgt_identify, coupe_mgt_construct,

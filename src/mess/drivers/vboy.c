@@ -645,7 +645,7 @@ static const rgb_t vboy_palette[18] = {
 	MAKE_RGB(0x00, 0x00, 0x00)  // 3
 };
 
-PALETTE_INIT( vboy )
+static PALETTE_INIT( vboy )
 {
 	palette_set_colors(machine, 0, vboy_palette, ARRAY_LENGTH(vboy_palette));
 }

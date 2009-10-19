@@ -469,7 +469,7 @@ static void coco3_set_dirty(void)
 
 
 
-int coco3_new_frame(running_machine *machine)
+static int coco3_new_frame(running_machine *machine)
 {
 	int gime_field_sync = 0;
 

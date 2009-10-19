@@ -2337,7 +2337,7 @@ static void x68k_unload_proc(const device_config *image)
 	x68k_sys.fdc.disk_inserted[floppy_get_drive(image)] = 0;
 }
 
-FLOPPY_OPTIONS_START( x68k )
+static FLOPPY_OPTIONS_START( x68k )
 	FLOPPY_OPTION( dim, "dim",		"DIM floppy disk image",	dim_dsk_identify, dim_dsk_construct, NULL)
 	FLOPPY_OPTION( img2d, "xdf,hdm,2hd", "XDF disk image", basicdsk_identify_default, basicdsk_construct_default,
 		HEADS([2])

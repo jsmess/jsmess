@@ -26,7 +26,6 @@
 #define COCO_CARTRIDGE_PCB_PAK_BANKED16K			DEVICE_GET_INFO_NAME(coco_cartridge_pcb_pak_banked16k)
 #define COCO_CARTRIDGE_PCB_ORCH90					DEVICE_GET_INFO_NAME(coco_cartridge_pcb_orch90)
 #define COCO_CARTRIDGE_PCB_RS232					DEVICE_GET_INFO_NAME(coco_cartridge_pcb_rs232)
-#define COCO_CARTRIDGE_PCB_SSC						DEVICE_GET_INFO_NAME(coco_cartridge_pcb_speechsound)
 
 enum
 {
@@ -85,7 +84,6 @@ DEVICE_GET_INFO(coco_cartridge_pcb_pak);
 DEVICE_GET_INFO(coco_cartridge_pcb_pak_banked16k);
 DEVICE_GET_INFO(coco_cartridge_pcb_orch90);
 DEVICE_GET_INFO(coco_cartridge_pcb_rs232);
-DEVICE_GET_INFO(coco_cartridge_pcb_speechsound);
 
 /* sets a cartridge line */
 void coco_cartridge_set_line(const device_config *device, cococart_line line, cococart_line_value value);

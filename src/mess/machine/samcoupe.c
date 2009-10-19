@@ -172,7 +172,7 @@ static WRITE8_DEVICE_HANDLER( samcoupe_rtc_w )
     MOUSE
 ***************************************************************************/
 
-TIMER_CALLBACK( samcoupe_mouse_reset )
+static TIMER_CALLBACK( samcoupe_mouse_reset )
 {
 	coupe_asic *asic = machine->driver_data;
 	asic->mouse_index = 0;

@@ -294,7 +294,7 @@ static WRITE32_HANDLER( rbv_ramdac_w )
 
 
 static UINT32 rbv_toggle = 0;
-READ16_HANDLER ( mac_rbv_r )
+static READ16_HANDLER ( mac_rbv_r )
 {
 	int data;
 	const device_config *via_1 = devtag_get_device(space->machine, "via6522_1");
@@ -324,7 +324,7 @@ READ16_HANDLER ( mac_rbv_r )
 	return (data & 0xff) | (data << 8);
 }
 
-WRITE16_HANDLER ( mac_rbv_w )
+static WRITE16_HANDLER ( mac_rbv_w )
 {
 	const device_config *via_1 = devtag_get_device(space->machine, "via6522_1");
 
@@ -476,11 +476,11 @@ static ADDRESS_MAP_START(macclas2_map, ADDRESS_SPACE_PROGRAM, 32)
 	AM_RANGE(0xfeff8000, 0xfeffffff) AM_ROM AM_REGION("user1", 0x78000)
 ADDRESS_MAP_END
 
-VIDEO_START( maclc )
+static VIDEO_START( maclc )
 {
 }
 
-VIDEO_UPDATE( maclc )
+static VIDEO_UPDATE( maclc )
 {
 	return 0;
 }

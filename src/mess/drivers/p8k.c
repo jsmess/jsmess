@@ -171,7 +171,7 @@ ADDRESS_MAP_END
 
 
 /* Input ports */
-INPUT_PORTS_START( p8k )
+static INPUT_PORTS_START( p8k )
 INPUT_PORTS_END
 
 

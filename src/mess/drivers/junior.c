@@ -34,7 +34,7 @@ static INPUT_CHANGED( junior_reset )
 
 
 /* Input ports */
-INPUT_PORTS_START( junior )
+static INPUT_PORTS_START( junior )
 PORT_START("LINE0")			/* IN0 keys row 0 */
 	PORT_BIT( 0x80, 0x00, IPT_UNUSED )
 	PORT_BIT( 0x40, 0x40, IPT_KEYBOARD ) PORT_NAME("0.6: 0") PORT_CODE(KEYCODE_0)
@@ -111,7 +111,7 @@ static READ8_DEVICE_HANDLER(junior_riot_b_r)
 }
 
 
-WRITE8_DEVICE_HANDLER(junior_riot_a_w)
+static WRITE8_DEVICE_HANDLER(junior_riot_a_w)
 {
 	UINT8 idx = ( junior_port_b >> 1 ) & 0x0f;
 
@@ -125,7 +125,7 @@ WRITE8_DEVICE_HANDLER(junior_riot_a_w)
 }
 
 
-WRITE8_DEVICE_HANDLER(junior_riot_b_w)
+static WRITE8_DEVICE_HANDLER(junior_riot_b_w)
 {
 	UINT8 newdata = data;
 	UINT8 idx = ( newdata >> 1 ) & 0x0f;

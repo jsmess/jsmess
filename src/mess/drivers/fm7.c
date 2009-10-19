@@ -52,18 +52,18 @@
 
 UINT8* fm7_video_ram;
 UINT8* shared_ram;
-UINT8* fm7_boot_ram;  // Boot RAM (AV only)
+static UINT8* fm7_boot_ram;  // Boot RAM (AV only)
 UINT8 fm7_type;
 static UINT8 irq_flags;  // active IRQ flags
 static UINT8 irq_mask;  // IRQ mask
-emu_timer* fm7_timer;  // main timer, triggered every 2.0345ms
-emu_timer* fm7_subtimer;  // sub-CPU timer, triggered every 20ms
-emu_timer* fm7_keyboard_timer;
+static emu_timer* fm7_timer;  // main timer, triggered every 2.0345ms
+static emu_timer* fm7_subtimer;  // sub-CPU timer, triggered every 20ms
+static emu_timer* fm7_keyboard_timer;
 emu_timer* fm77av_vsync_timer;
 static UINT8 basic_rom_en;
 static UINT8 init_rom_en;  // AV only
-unsigned int key_delay;
-unsigned int key_repeat;
+static unsigned int key_delay;
+static unsigned int key_repeat;
 static UINT16 current_scancode;
 static UINT32 key_data[4];
 static UINT32 mod_data;
@@ -80,7 +80,7 @@ static UINT8 speaker_active;
 static UINT16 fm7_kanji_address;
 
 
-struct key_encoder
+static struct key_encoder
 {
 	UINT8 buffer[12];
 	UINT8 tx_count;
@@ -92,7 +92,7 @@ struct key_encoder
 	UINT8 position;
 } fm7_encoder;
 
-struct mmr
+static struct mmr
 {
 	UINT8 bank_addr[8][16];
 	UINT8 segment;
@@ -421,7 +421,7 @@ static WRITE8_HANDLER( fm7_rom_en_w )
  *  Port is write-only.  Initiate ROM is on by default.
  *
  */
-WRITE8_HANDLER( fm7_init_en_w )
+static WRITE8_HANDLER( fm7_init_en_w )
 {
 	if(data & 0x02)
 	{
@@ -843,7 +843,7 @@ static WRITE8_HANDLER( fm7_cassette_printer_w )
  *  Main CPU: 0xfd0b
  *   - bit 0: Boot mode: 0=BASIC, 1=DOS
  */
-READ8_HANDLER( fm77av_boot_mode_r )
+static READ8_HANDLER( fm77av_boot_mode_r )
 {
 	UINT8 ret = 0xff;
 
@@ -1370,7 +1370,7 @@ static IRQ_CALLBACK(fm7_sub_irq_ack)
 	return -1;
 }
 
-void fm77av_fmirq(const device_config* device,int irq)
+static void fm77av_fmirq(const device_config* device,int irq)
 {
 	if(irq == 1)
 	{

@@ -10,7 +10,7 @@
 
 struct fm7_video_flags fm7_video;
 
-struct fm7_alu_flags
+static struct fm7_alu_flags
 {
 	UINT8 command;
 	UINT8 lcolour;
@@ -733,7 +733,7 @@ WRITE8_HANDLER( fm7_vram_w )
 }
 
 // not pretty, but it should work.
-WRITE8_HANDLER( fm7_vram_banked_w )
+static WRITE8_HANDLER( fm7_vram_banked_w )
 {
 	int offs;
 	UINT16 page = 0x0000;

@@ -289,7 +289,7 @@ static INPUT_PORTS_START( pk8000 )
 		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
-INTERRUPT_GEN( pk8000_interrupt )
+static INTERRUPT_GEN( pk8000_interrupt )
 {
 	cpu_set_input_line(device, 0, HOLD_LINE);
 }

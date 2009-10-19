@@ -426,7 +426,7 @@ static TMS9902_XMIT_CALLBACK( xmit_callback_1 )
 	if (rs232_fp)
 		image_fwrite(rs232_fp, &buf, 1);
 }
-const tms9902_interface tms9902_params_0 =
+static const tms9902_interface tms9902_params_0 =
 {
 	3000000.,				/* clock rate (3MHz) */
 	int_callback_0,			/* called when interrupt pin state changes */
@@ -435,7 +435,7 @@ const tms9902_interface tms9902_params_0 =
 	xmit_callback_0			/* called when a character is transmitted */
 };
 
-const tms9902_interface tms9902_params_1 =
+static const tms9902_interface tms9902_params_1 =
 {
 	3000000.,				/* clock rate (3MHz) */
 	int_callback_1,			/* called when interrupt pin state changes */
@@ -444,7 +444,7 @@ const tms9902_interface tms9902_params_1 =
 	xmit_callback_1			/* called when a character is transmitted */
 };
 
-DEVICE_GET_INFO( ti99_4_rs232 )
+static DEVICE_GET_INFO( ti99_4_rs232 )
 {
 	switch ( state )
 	{
@@ -469,7 +469,7 @@ DEVICE_GET_INFO( ti99_4_rs232 )
 	}
 }
 
-DEVICE_GET_INFO( ti99_4_rs232 );
+static DEVICE_GET_INFO( ti99_4_rs232 );
 
 #define TI99_4_RS232	DEVICE_GET_INFO_NAME(ti99_4_rs232)
 

@@ -49,7 +49,7 @@ INLINE UINT32 decrease_brightness(UINT32 color, int coeff);
 #include "gbamode2.c"
 #include "gbam345.c"
 
-void (*gba_draw_scanline_modes[8][3])(running_machine *machine, gba_state *gba_state, int y, UINT32* line0, UINT32* line1, UINT32* line2, UINT32* line3, UINT32* lineOBJ, UINT32* lineOBJWin, UINT32* lineMix, int aux) =
+static void (*const gba_draw_scanline_modes[8][3])(running_machine *machine, gba_state *gba_state, int y, UINT32* line0, UINT32* line1, UINT32* line2, UINT32* line3, UINT32* lineOBJ, UINT32* lineOBJWin, UINT32* lineMix, int aux) =
 {
 	/* All modes have three sub-modes: No effects, effects, and windowed effects. */
 	{	/* Mode 0: 4 non-rotatable tilemaps and 1 OAM layer */

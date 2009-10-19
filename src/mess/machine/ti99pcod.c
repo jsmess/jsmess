@@ -81,10 +81,10 @@ static int bank_select; // 0 or 1
     Pointer to the pcode ROM data. We have three sections of the ROM
     code: 4K from one chip, 2 banks with 4K each from the second chip.
 */
-UINT8 *ti99_pcode_rom0;
-UINT8 *ti99_pcode_rom1;
-UINT8 *ti99_pcode_rom2;
-UINT8 *ti99_pcode_grom;
+static UINT8 *ti99_pcode_rom0;
+static UINT8 *ti99_pcode_rom1;
+static UINT8 *ti99_pcode_rom2;
+static UINT8 *ti99_pcode_grom;
 
 static READ8_HANDLER(pcode_mem_r);
 static WRITE8_HANDLER(pcode_mem_w);

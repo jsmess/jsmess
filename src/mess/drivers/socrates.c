@@ -171,7 +171,7 @@ static void socrates_check_kb_latch( running_machine *machine ) // if kb[1] is f
 	}
 }
 
-MACHINE_RESET( socrates )
+static MACHINE_RESET( socrates )
 {
  socrates.rom_bank = 0xF3; // actually set semi-randomly on real console but we need to initialize it somewhere...
  socrates_set_rom_bank( machine );
@@ -193,7 +193,7 @@ MACHINE_RESET( socrates )
  socrates.speech_load_settings_count = 0;
 }
 
-DRIVER_INIT( socrates )
+static DRIVER_INIT( socrates )
 {
 	UINT8 *gfx = memory_region(machine, "vram");
 	int i;
@@ -204,43 +204,43 @@ DRIVER_INIT( socrates )
     cpu_set_clockscale(cputag_get_cpu(machine, "maincpu"), 0.45f); /* RAM access waitstates etc. aren't emulated - slow the CPU to compensate */
 }
 
-READ8_HANDLER( socrates_rom_bank_r )
+static READ8_HANDLER( socrates_rom_bank_r )
 {
  UINT8 data = 0xFF;
  data = socrates.rom_bank;
  return data;
 }
 
-WRITE8_HANDLER( socrates_rom_bank_w )
+static WRITE8_HANDLER( socrates_rom_bank_w )
 {
  socrates.rom_bank = data;
  socrates_set_rom_bank( space->machine );
 }
 
-READ8_HANDLER( socrates_ram_bank_r )
+static READ8_HANDLER( socrates_ram_bank_r )
 {
  UINT8 data = 0xFF;
  data = socrates.ram_bank;
  return data;
 }
 
-WRITE8_HANDLER( socrates_ram_bank_w )
+static WRITE8_HANDLER( socrates_ram_bank_w )
 {
  socrates.ram_bank = data&0xF;
  socrates_set_ram_bank( space->machine );
 }
 
-READ8_HANDLER( read_f3 ) // used for read-only i/o ports as mame/mess doesn't have a way to set the unmapped area to read as 0xF3
+static READ8_HANDLER( read_f3 ) // used for read-only i/o ports as mame/mess doesn't have a way to set the unmapped area to read as 0xF3
 {
  return 0xF3;
 }
 
-WRITE8_HANDLER( unknownlatch_30 ) // writes to i/o 0x3x do SOMETHING, possibly waitstate related (may halt cpu until vblank start?) or involve status reg bit 6
+static WRITE8_HANDLER( unknownlatch_30 ) // writes to i/o 0x3x do SOMETHING, possibly waitstate related (may halt cpu until vblank start?) or involve status reg bit 6
 {
 //logerror("write to i/o 0x30, data %x\n", data); // too annoying to leave enabled
 }
 
-READ8_HANDLER( status_and_speech ) // read 0x4x, some sort of status reg
+static READ8_HANDLER( status_and_speech ) // read 0x4x, some sort of status reg
 {
 // bit 7 - speech status: high when speech is playing, low when it is not (or when speech cart is not present)
 // bit 6 - unknown, usually set, may involve the writes to 0x30, possibly some sort of fixed-length timer?
@@ -293,7 +293,7 @@ static TIMER_CALLBACK( clear_speech_cb )
 	socrates.speech_load_settings_count = 0;
 }
 
-WRITE8_HANDLER( speech_command ) // write 0x4x, some sort of bitfield; speech chip is probably hitachi hd38880 related but not exact, w/4 bit interface
+static WRITE8_HANDLER( speech_command ) // write 0x4x, some sort of bitfield; speech chip is probably hitachi hd38880 related but not exact, w/4 bit interface
 {
 	logerror("write to i/o 0x4x of %x\n", data);
 /*
@@ -400,21 +400,21 @@ end hd38880 info.*/
 	socrates.io40_latch = data;
 }
 
-READ8_HANDLER( socrates_keyboard_low_r ) // keyboard code low
+static READ8_HANDLER( socrates_keyboard_low_r ) // keyboard code low
 {
  socrates_update_kb( space->machine );
  socrates_check_kb_latch( space->machine );
  return socrates.kb_latch_low[0];
 }
 
-READ8_HANDLER( socrates_keyboard_high_r ) // keyboard code high
+static READ8_HANDLER( socrates_keyboard_high_r ) // keyboard code high
 {
  socrates_update_kb( space->machine );
  socrates_check_kb_latch( space->machine );
  return socrates.kb_latch_high[0];
 }
 
-WRITE8_HANDLER( socrates_keyboard_clear ) // keyboard latch shift/clear
+static WRITE8_HANDLER( socrates_keyboard_clear ) // keyboard latch shift/clear
 {
 	socrates.kb_latch_low[0] = socrates.kb_latch_low[1];
 	socrates.kb_latch_high[0] = socrates.kb_latch_high[1];
@@ -422,7 +422,7 @@ WRITE8_HANDLER( socrates_keyboard_clear ) // keyboard latch shift/clear
 	socrates.kb_latch_high[1] = 1;
 }
 
-WRITE8_HANDLER( reset_speech ) // i/o 60: reset speech synth
+static WRITE8_HANDLER( reset_speech ) // i/o 60: reset speech synth
 {
  socrates.speech_running = 0;
  socrates.speech_address = 0;
@@ -436,7 +436,7 @@ logerror("write to i/o 0x60 of %x\n",data);
 
 /* stuff below belongs in video/socrates.c */
 
-WRITE8_HANDLER( socrates_scroll_w )
+static WRITE8_HANDLER( socrates_scroll_w )
 {
  if (offset == 0)
  socrates.scroll_offset = (socrates.scroll_offset&0x100) | data;
@@ -549,7 +549,7 @@ return composedcolor;
 
 static rgb_t socrates_palette[256];
 
-PALETTE_INIT( socrates )
+static PALETTE_INIT( socrates )
 {
 	int i; // iterator
 	for (i = 0; i < 256; i++)

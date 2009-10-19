@@ -70,4 +70,17 @@ READ8_HANDLER( fds_r );
 WRITE8_HANDLER( fds_w );
 WRITE8_HANDLER( mapper50_add_w );
 
+//TEMPORARY PPU STUFF
+
+/* mirroring types */
+#define PPU_MIRROR_NONE		0
+#define PPU_MIRROR_VERT		1
+#define PPU_MIRROR_HORZ		2
+#define PPU_MIRROR_HIGH		3
+#define PPU_MIRROR_LOW		4
+#define PPU_MIRROR_4SCREEN	5	// Same effect as NONE, but signals that we should never mirror
+
+void set_nt_mirroring(int mirroring);
+
+
 #endif

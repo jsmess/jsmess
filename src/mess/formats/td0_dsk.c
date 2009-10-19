@@ -254,7 +254,7 @@ static floperr_t td0_get_indexed_sector_info(floppy_image *floppy, int head, int
 static floppy_image *floppy_file;
 static UINT64 floppy_file_offset;
 
-int data_read(UINT8 *buf,UINT16 size)
+static int data_read(UINT8 *buf,UINT16 size)
 {
 	if (floppy_file_offset + size > floppy_image_size(floppy_file) ) {
 		size = floppy_image_size(floppy_file)- floppy_file_offset;
@@ -378,10 +378,10 @@ static UINT16 freq[T + 1];    /* cumulative freq table */
  * pointing parent nodes.
  * area [T..(T + N_CHAR - 1)] are pointers for leaves
  */
-INT16 prnt[T + N_CHAR];
+static INT16 prnt[T + N_CHAR];
 
 /* pointing children nodes (son[], son[] + 1)*/
-INT16 son[T];
+static INT16 son[T];
 
 static UINT16 getbuf;
 static UINT8 getlen;

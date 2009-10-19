@@ -98,7 +98,12 @@ Source Changes:
 
 - Cleanups to use more *_NAME and *_CALL macros.  [Atari Ace]
 
+- Cleanups to add static/const qualifiers, and to remove dead prototypes and
+  code.  [Atari Ace]
+
 - Converted all drivers to use messram device.  [Miodrag Milanovic]
+
+
 
 0.134
 
