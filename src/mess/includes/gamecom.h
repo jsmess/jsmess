@@ -150,6 +150,7 @@ enum
 
 extern MACHINE_RESET( gamecom );
 extern DEVICE_START( gamecom_cart );
+extern DRIVER_INIT( gamecom );
 extern DEVICE_IMAGE_LOAD( gamecom_cart );
 
 extern WRITE8_HANDLER( gamecom_internal_w );

@@ -50,7 +50,6 @@ UINT8 gamecom_vram[16*1024];
 static UINT8 *cartridge1 = NULL;
 static UINT8 *cartridge2 = NULL;
 static UINT8 *cartridge = NULL;
-static UINT8 *dummy_bank = NULL;
 
 static emu_timer *gamecom_clock_timer = NULL;
 static GAMECOM_DMA gamecom_dma;
@@ -79,12 +78,6 @@ MACHINE_RESET( gamecom )
 	/* should possibly go in a DRIVER_INIT piece? */
 	gamecom_clock_timer = timer_alloc(machine,  gamecom_clock_timer_callback , NULL);
 
-	/* intialize the empty dummy bank */
-	if ( dummy_bank == NULL )
-	{
-		dummy_bank = auto_alloc_array(machine, UINT8, 8 * 1024 );
-	}
-	memset( dummy_bank, 0xff, 8 * 1024 );
 	cartridge = NULL;
 	/* disable DMA and timer */
 	gamecom_dma.enabled = 0;
@@ -97,7 +90,7 @@ MACHINE_RESET( gamecom )
 
 static void gamecom_set_mmu( running_machine *machine, int mmu, UINT8 data )
 {
-	if ( data < 32 )
+	if ( data < 0x20 )
 	{
 		/* select internal ROM bank */
 		memory_set_bankptr( machine, mmu, memory_region(machine, "user1") + (data << 13) );
@@ -105,14 +98,8 @@ static void gamecom_set_mmu( running_machine *machine, int mmu, UINT8 data )
 	else
 	{
 		/* select cartridge bank */
-		if ( cartridge == NULL )
-		{
-			memory_set_bankptr( machine, mmu, dummy_bank );
-		}
-		else
-		{
+		if ( cartridge )
 			memory_set_bankptr( machine, mmu, cartridge + ( data << 13 ) );
-		}
 	}
 }
 
@@ -256,11 +243,6 @@ WRITE8_HANDLER( gamecom_internal_w )
 				case 0x80: cartridge = cartridge2; break;
 				default:   cartridge = NULL;       break;
 				}
-				/* update banks to reflect possible change of cartridge slot */
-				gamecom_set_mmu( space->machine, 1, gamecom_internal_registers[SM8521_MMU1] );
-				gamecom_set_mmu( space->machine, 2, gamecom_internal_registers[SM8521_MMU2] );
-				gamecom_set_mmu( space->machine, 3, gamecom_internal_registers[SM8521_MMU3] );
-				gamecom_set_mmu( space->machine, 4, gamecom_internal_registers[SM8521_MMU4] );
 				return;
 	case SM8521_SYS:	cpu_set_reg( cputag_get_cpu(space->machine, "maincpu"), SM8500_SYS, data ); return;
 	case SM8521_CKC:	cpu_set_reg( cputag_get_cpu(space->machine, "maincpu"), SM8500_CKC, data ); return;
@@ -649,21 +631,19 @@ READ8_HANDLER( gamecom_vram_r )
 	return gamecom_vram[offset];
 }
 
-DEVICE_START( gamecom_cart )
+DRIVER_INIT( gamecom )
 {
-	internal_ram = devtag_get_info_ptr(device->machine, "maincpu", CPUINFO_PTR_SM8500_INTERNAL_RAM);
+	internal_ram = devtag_get_info_ptr(machine, "maincpu", CPUINFO_PTR_SM8500_INTERNAL_RAM);
 }
 
 DEVICE_IMAGE_LOAD( gamecom_cart )
 {
-	int filesize;
-	int load_offset = 0;
+	UINT32 filesize;
+	UINT32 load_offset = 0;
+	UINT32 bytes_read;
 
-	/* allocate memory on first load of a cartridge */
-	if ( cartridge1 == NULL )
-	{
-		cartridge1 = auto_alloc_array(image->machine, UINT8, 2048 * 1024 );
-	}
+	cartridge1 = memory_region(image->machine, "user2");
+
 	filesize = image_length( image );
 	switch( filesize )
 	{
@@ -674,12 +654,15 @@ DEVICE_IMAGE_LOAD( gamecom_cart )
 	case 0x1c0000: load_offset = 0x040000; break;  /* 1.8MB */
 	case 0x200000: load_offset = 0;        break;  /* 2  MB */
 	default:                                       /* otherwise */
-		logerror( "Error loading cartridge: Invalid file size.\n" );
+		logerror( "Error loading cartridge: Invalid file size 0x%X\n",filesize );
+		image_seterror( image, IMAGE_ERROR_UNSPECIFIED, "Unhandled cart size" );
 		return INIT_FAIL;
 	}
-	if ( image_fread( image, cartridge1 + load_offset, filesize ) != filesize )
+	bytes_read = image_fread( image, cartridge1 + load_offset, filesize );
+	if (bytes_read  != filesize )
 	{
-		logerror( "Error loading cartridge: Unable to read from file: %s.\n", image_filename(image) );
+		logerror( "Error loading cartridge: Read 0x%X, should have been 0x%X\n",bytes_read,filesize );
+		image_seterror( image, IMAGE_ERROR_UNSPECIFIED, "Unable to load all of the cart" );
 		return INIT_FAIL;
 	}
 	if ( filesize < 0x010000 ) { memcpy( cartridge1 + 0x008000, cartridge1, 0x008000 ); } /* ->64KB */

@@ -33,9 +33,6 @@ static ADDRESS_MAP_START(gamecom_mem_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0xE000, 0xFFFF )  AM_RAM                                                 /* Extended I/O, Extended RAM */
 ADDRESS_MAP_END
 
-static GFXDECODE_START( gamecom )
-GFXDECODE_END
-
 static const SM8500_CONFIG gamecom_cpu_config = {
 	gamecom_handle_dma,
 	gamecom_update_timers
@@ -109,7 +106,6 @@ static MACHINE_DRIVER_START( gamecom )
 	MDRV_SCREEN_SIZE( 200, 200 )
 	MDRV_SCREEN_VISIBLE_AREA( 0, 199, 0, 159 )
 	MDRV_DEFAULT_LAYOUT(layout_lcd)
-	MDRV_GFXDECODE( gamecom )
 	MDRV_PALETTE_LENGTH( GAMECOM_PALETTE_LENGTH )
 	MDRV_PALETTE_INIT( gamecom )
 
@@ -126,7 +122,6 @@ static MACHINE_DRIVER_START( gamecom )
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("bin,tgc")
 	MDRV_CARTSLOT_NOT_MANDATORY
-	MDRV_CARTSLOT_START(gamecom_cart)
 	MDRV_CARTSLOT_LOAD(gamecom_cart)
 MACHINE_DRIVER_END
 
@@ -135,9 +130,10 @@ ROM_START( gamecom )
 	ROM_LOAD( "internal.bin", 0x1000,  0x1000, CRC(a0cec361) SHA1(03368237e8fed4a8724f3b4a1596cf4b17c96d33) )
 	ROM_REGION( 0x40000, "user1", 0 )
 	ROM_LOAD( "external.bin", 0x00000, 0x40000, CRC(e235a589) SHA1(97f782e72d738f4d7b861363266bf46b438d9b50) )
+	ROM_REGION( 0x200000, "user2", ROMREGION_ERASEFF )
 ROM_END
 
 /*    YEAR  NAME     PARENT COMPAT MACHINE  INPUT    INIT CONFIG   COMPANY  FULLNAME */
-CONS( 1997, gamecom, 0,     0,     gamecom, gamecom, 0,   0, "Tiger", "Game.com", GAME_NOT_WORKING )
+CONS( 1997, gamecom, 0,     0,     gamecom, gamecom, gamecom,   0, "Tiger", "Game.com", GAME_NOT_WORKING )
 
 
