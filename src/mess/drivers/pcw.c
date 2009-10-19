@@ -738,6 +738,8 @@ static MACHINE_START( pcw )
 
 static MACHINE_RESET( pcw )
 {
+	UINT8* code = memory_region(machine,"bootcode");
+	int x;
 	/* ram paging is actually undefined at power-on */
 	pcw_bank_force = 0x00;
 
@@ -750,22 +752,21 @@ static MACHINE_RESET( pcw )
 	pcw_update_mem(machine, 1, pcw_banks[1]);
 	pcw_update_mem(machine, 2, pcw_banks[2]);
 	pcw_update_mem(machine, 3, pcw_banks[3]);
-}
-
-static DRIVER_INIT(pcw)
-{
-	UINT8* code = memory_region(machine,"bootcode");
-	int x;
-	pcw_boot = 0;
-
-	cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), 0, 0x0ff);
-
 	/* copy boot code into RAM - yes, it's skipping a step,
        but there is no verified dump of the boot sequence */
 
 	memset(messram_get_ptr(devtag_get_device(machine, "messram")),0x00,messram_get_size(devtag_get_device(machine, "messram")));
 	for(x=0;x<256;x++)
 		messram_get_ptr(devtag_get_device(machine, "messram"))[x+2] = code[x];
+
+}
+
+static DRIVER_INIT(pcw)
+{
+	pcw_boot = 0;
+
+	cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), 0, 0x0ff);
+
 
 	/* lower 4 bits are interrupt counter */
 	pcw_system_status = 0x000;
