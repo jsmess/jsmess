@@ -11,15 +11,21 @@
     Version information:
 
     Basic   Extended Basic  Disk Extended
-coco    1.0 -       -
-cocoe   1.1 1.0     1.0
-coco2   1.2 1.1     1.1
-coco2b  1.3 1.1     1.1
-coco3   1.2 2.0     1.1
-coco3p  1.2 2.0     1.1
-coco3h  1.2 2.0     1.1
+    coco    1.0 -           -
+    cocoe   1.1 1.0         1.0
+    coco2   1.2 1.1         1.1
+    coco2b  1.3 1.1         1.1
+    coco3   1.2 2.0         1.1
+    coco3p  1.2 2.0         1.1
+    coco3h  1.2 2.0         1.1
 
 
+    Input-related note (FP, 2009-10): currently, button inputs are shared 
+    by the various controllers. This makes life easier when trying to 
+    re-configure buttons (a single change modifies all the controllers), 
+    but it has the undesired side effect of making the buttons available 
+    for remapping also when no device is connected to the input port.
+    We should probably move buttons to separate INPUT_PORTS.
 
 ***************************************************************************/
 
@@ -319,16 +325,16 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( coco_joystick_buttons )
 	PORT_START("joystick_buttons")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Right Button") PORT_CHANGED(coco_keyboard_changed, NULL) PORT_CODE(KEYCODE_0_PAD) PORT_CODE(JOYCODE_BUTTON1) PORT_CODE(MOUSECODE_BUTTON1) PORT_PLAYER(1) PORT_CATEGORY(11)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Left Button")  PORT_CHANGED(coco_keyboard_changed, NULL) PORT_CODE(KEYCODE_0_PAD) PORT_CODE(JOYCODE_BUTTON1) PORT_CODE(MOUSECODE_BUTTON1) PORT_PLAYER(2) PORT_CATEGORY(21)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Right Button") PORT_CHANGED(coco_keyboard_changed, NULL) PORT_CODE(KEYCODE_0_PAD) PORT_CODE(JOYCODE_BUTTON1) PORT_CODE(MOUSECODE_BUTTON1) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Left Button")  PORT_CHANGED(coco_keyboard_changed, NULL) PORT_CODE(KEYCODE_0_PAD) PORT_CODE(JOYCODE_BUTTON1) PORT_CODE(MOUSECODE_BUTTON1) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( coco3_joystick_buttons )
 	PORT_START("joystick_buttons")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Right Button 1") PORT_CHANGED(coco_keyboard_changed, NULL) PORT_CODE(KEYCODE_0_PAD) PORT_CODE(JOYCODE_BUTTON1) PORT_CODE(MOUSECODE_BUTTON1) PORT_PLAYER(1) PORT_CATEGORY(11)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Right Button 2") PORT_CHANGED(coco_keyboard_changed, NULL) PORT_CODE(KEYCODE_DEL_PAD) PORT_CODE(JOYCODE_BUTTON2) PORT_CODE(MOUSECODE_BUTTON2) PORT_PLAYER(1) PORT_CATEGORY(11)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Left Button 1")  PORT_CHANGED(coco_keyboard_changed, NULL) PORT_CODE(KEYCODE_0_PAD) PORT_CODE(JOYCODE_BUTTON1) PORT_CODE(MOUSECODE_BUTTON1) PORT_PLAYER(2) PORT_CATEGORY(21)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Left Button 2")  PORT_CHANGED(coco_keyboard_changed, NULL) PORT_CODE(KEYCODE_DEL_PAD) PORT_CODE(JOYCODE_BUTTON2) PORT_CODE(MOUSECODE_BUTTON2) PORT_PLAYER(2) PORT_CATEGORY(21)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Right Button 1") PORT_CHANGED(coco_keyboard_changed, NULL) PORT_CODE(KEYCODE_0_PAD) PORT_CODE(JOYCODE_BUTTON1) PORT_CODE(MOUSECODE_BUTTON1) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Right Button 2") PORT_CHANGED(coco_keyboard_changed, NULL) PORT_CODE(KEYCODE_DEL_PAD) PORT_CODE(JOYCODE_BUTTON2) PORT_CODE(MOUSECODE_BUTTON2) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Left Button 1")  PORT_CHANGED(coco_keyboard_changed, NULL) PORT_CODE(KEYCODE_0_PAD) PORT_CODE(JOYCODE_BUTTON1) PORT_CODE(MOUSECODE_BUTTON1) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Left Button 2")  PORT_CHANGED(coco_keyboard_changed, NULL) PORT_CODE(KEYCODE_DEL_PAD) PORT_CODE(JOYCODE_BUTTON2) PORT_CODE(MOUSECODE_BUTTON2) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( coco_rat_mouse )
