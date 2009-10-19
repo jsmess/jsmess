@@ -1063,7 +1063,7 @@ is banked. */
 		ROM_FILL(0x0000,0x10000,0x00)											\
 /*      ROM_LOAD("pcwboot.bin", 0x010000, 608, BAD_DUMP CRC(679b0287) SHA1(5dde974304e3376ace00850d6b4c8ec3b674199e))*/	\
 		ROM_REGION(256,"bootcode",0)								\
-		ROM_LOAD("8256boot.bin", 0, 256, NO_DUMP CRC(d55925bd) SHA1(bca6a47d657557be99cb8580d4bf90968d8dde4a))	\
+		ROM_LOAD("8256boot.bin", 0, 256, BAD_DUMP CRC(d55925bd) SHA1(bca6a47d657557be99cb8580d4bf90968d8dde4a))	\
 	ROM_END															\
 
 ROM_PCW(pcw8256)
