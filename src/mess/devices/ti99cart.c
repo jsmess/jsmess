@@ -39,11 +39,11 @@ typedef enum _legacy_cart_t
 struct _ti99_multicart_t
 {
 	/* Reserves space for all cartridges. This is also used in the legacy
-       cartridge system, but only for slot 0. */
+	cartridge system, but only for slot 0. */
 	cartridge_t cartridge[NUMBER_OF_CARTRIDGE_SLOTS];
 
 	/* Determines which slot is currently active. This value is changed when there
-    are accesses to other GROM base addresses. */
+	are accesses to other GROM base addresses. */
 	int active_slot;
 
 	/* Used in order to enforce a special slot. This value is retrieved
@@ -886,32 +886,32 @@ static READ8_DEVICE_HANDLER( read_cart_cru )
         int reply = 0;
 
 	/* ram_page contains the bank number. We have a maximum of
-       4 banks; the Super Space II manual says:
-
-    Banks are selected by writing a bit pattern to CRU address >0800:
-
-    Bank #   Value
-    0        >02  = 0000 0010
-    1        >08  = 0000 1000
-    2        >20  = 0010 0000
-    3        >80  = 1000 0000
-
-    With the bank number (0, 1, 2, or 3) in R0:
-
-    BNKSW   LI    R12,>0800   Set CRU address
-        LI    R1,2        Load Shift Bit
-        SLA   R0,1        Align Bank Number
-        JEQ   BNKS1       Skip shift if Bank 0
-        SLA   R1,0        Align Shift Bit
-    BNKS1   LDCR  R1,0        Switch Banks
-        SRL   R0,1        Restore Bank Number (optional)
-        RT
-    */
+	4 banks; the Super Space II manual says:
+	
+	Banks are selected by writing a bit pattern to CRU address >0800:
+	
+	Bank #   Value
+	0        >02  = 0000 0010
+	1        >08  = 0000 1000
+	2        >20  = 0010 0000
+	3        >80  = 1000 0000
+	
+	With the bank number (0, 1, 2, or 3) in R0:
+	
+	BNKSW   LI    R12,>0800   Set CRU address
+		LI    R1,2        Load Shift Bit
+		SLA   R0,1        Align Bank Number
+		JEQ   BNKS1       Skip shift if Bank 0
+		SLA   R1,0        Align Shift Bit
+	BNKS1   LDCR  R1,0        Switch Banks
+		SRL   R0,1        Restore Bank Number (optional)
+		RT
+	*/
 	if ((offset & 1) == 0 || offset > 7)
 		reply = 0;
 
 	/* CRU addresses are only 1 bit wide. Bytes are transferred from LSB
-       to MSB. That is, 8 bit are eight consecutive addresses. */
+	to MSB. That is, 8 bit are eight consecutive addresses. */
 	reply = (cartridge->ram_page == (offset-1)/2);
 
 	return reply;
@@ -1170,6 +1170,348 @@ static int assemble_mbx(const device_config *image)
 	return INIT_PASS;
 }
 
+/*****************************************************************************
+  Cartridge type: paged379i
+    This cartridge consists of one 16 KiB, 32 KiB, or 64 KiB EEPROM which is
+    organised in 2, 4, or 8 pages of 8 KiB each. We assume there is only one
+    dump file of the respective size.
+    The pages are selected by writing a value to some memory locations. Due to
+    using the inverted outputs of the LS379 latch, setting the inputs of the 
+    latch to all 0 selects the highest bank, while setting to all 1 selects the 
+    lowest.There are some cartridges (16 KiB) which are using this scheme, and 
+    there are new hardware developments mainly relying on this scheme.
+    
+    Writing to       selects page (16K/32K/64K) 
+    >6000            1 / 3 / 7
+    >6002            0 / 2 / 6
+    >6004            1 / 1 / 5
+    >6006            0 / 0 / 4
+    >6008            1 / 3 / 3
+    >600A            0 / 2 / 2
+    >600C            1 / 1 / 1
+    >600E            0 / 0 / 0
+
+******************************************************************************/
+
+static DEVICE_START(ti99_pcb_paged379i)
+{
+	/* device is ti99_cartslot:cartridge:pcb */
+//  printf("DEVICE_START(ti99_pcb_paged379i), tag of device=%s\n", device->tag);
+	set_pointers(device, get_index_from_tagname(device->owner)-1);
+}
+
+/*
+    Read handler for the CPU address space of the cartridge
+    Images for this area are found in the rom_sockets.
+*/
+static READ16_DEVICE_HANDLER( read_cart_paged379i )
+{
+	/* device is pcb, owner is cartslot */
+	UINT16 value;
+	ti99_pcb_t *pcb = (ti99_pcb_t *)device->token;
+	cartridge_t *cartridge = pcb->cartridge;
+	offs_t boffset;
+
+	if (cartridge->rom_ptr==NULL)
+	{
+		//      printf("No cartridge ROM in rompage=%d of bank %d\n", rompage, cartslots->active_slot);
+		//      printf("Cartridge address = %lx\n", (long)pcb->cartridge);
+		value = 0;
+	}
+	else
+	{
+		// rom_page is the stored latch value
+		// 16bit access -> multiply by 0x1000
+		boffset = cartridge->rom_page * 0x1000 + offset;
+		value = ((UINT16 *)cartridge->rom_ptr)[boffset];
+		//      printf("stdcart/read: %4x = %4x\n", 0x6000 + 2*offset, value);
+	}
+//	  printf("accessed cartridge rom[%02x:%04x] = %04x\n", cartridge->rom_page, 0x6000+offset*2, value);
+	return value;
+}
+
+static void set_paged379i_bank(cartridge_t *cartridge, int rompage)
+{
+	int mask = 0;
+	if (cartridge->rom_size > 16384)
+	{
+		if (cartridge->rom_size > 32768)
+			mask = 7;
+		else
+			mask = 3;
+	}		
+	else
+		mask = 1;
+	
+	cartridge->rom_page = rompage & mask;	
+//	printf("setting rompage to %d\n", cartridge->rom_page);	
+}
+
+/*
+	Handle paging. We use a LS379 latch for storing the page number. On this
+	PCB, the inverted output of the latch is used, so the order of pages
+	is reversed. (No problem as long as the memory dump is kept exactly 
+	in the way it is stored in the EPROM.)
+	The latch can store a value of 4 bits. We adjust the number of 
+	significant bits by the size of the memory dump (16K, 32K, 64K).
+*/
+static WRITE16_DEVICE_HANDLER( write_cart_paged379i )
+{
+	ti99_pcb_t *pcb = (ti99_pcb_t *)device->token;
+	cartridge_t *cartridge = pcb->cartridge;
+/*
+	>6000            1 / 3 / 7
+	>6002            0 / 2 / 6
+	>6004            1 / 1 / 5
+	>6006            0 / 0 / 4
+	>6008            1 / 3 / 3
+	>600A            0 / 2 / 2
+	>600C            1 / 1 / 1
+	>600E            0 / 0 / 0
+	
+	Bits: 011x xxxx xxxx bbbx
+	x = don't care, bbb = bank
+	16bit access -> drop rightmost bit
+*/
+	set_paged379i_bank(cartridge, 7 - (offset & 7));
+}
+
+/*
+    TI-99/8 support:
+    Read handler for the CPU address space of the cartridge.
+    Images for this area are found in the rom_sockets.
+*/
+static READ8_DEVICE_HANDLER( read_cart_paged379i8 )
+{
+	UINT8 value;
+	ti99_pcb_t *pcb = (ti99_pcb_t *)device->token;
+	cartridge_t *cartridge = pcb->cartridge;
+	offs_t boffset;
+	
+	if (cartridge->rom_ptr==NULL)
+	{
+		//      printf("No cartridge ROM in rompage=%d of bank %d\n", rompage, cartslots->active_slot);
+		//      printf("Cartridge address = %lx\n", (long)pcb->cartridge);
+		value = 0;
+	}
+	else
+	{
+		// rom_page is the stored latch value
+		// 8bit access -> multiply by 0x2000
+		boffset = cartridge->rom_page * 0x2000 + offset;
+		value = ((UINT8 *)cartridge->rom_ptr)[boffset];
+		//      printf("stdcart/read: %4x = %4x\n", 0x6000 + 2*offset, value);
+	}
+	//  printf("accessed cartridge rom[%02x:%04x] = %04x\n", cartridge->rom_page, 0x6000+offset*2, value);
+	return value;
+
+}
+
+/*
+    TI-99/8 support: Handle paging. 
+*/
+static WRITE8_DEVICE_HANDLER( write_cart_paged379i8 )
+{
+	ti99_pcb_t *pcb = (ti99_pcb_t *)device->token;
+	cartridge_t *cartridge = pcb->cartridge;
+/*
+	>6000            1 / 3 / 7
+	>6002            0 / 2 / 6
+	>6004            1 / 1 / 5
+	>6006            0 / 0 / 4
+	>6008            1 / 3 / 3
+	>600A            0 / 2 / 2
+	>600C            1 / 1 / 1
+	>600E            0 / 0 / 0
+	
+	Bits: 011x xxxx xxxx bbbx
+	x = don't care, bbb = bank
+	16bit access -> drop rightmost bit
+*/
+	set_paged379i_bank(cartridge, 7 - ((offset>>1) & 7));
+}
+
+/*
+    Paged379i modules have one EPROM dump.
+*/
+static int assemble_paged379i(const device_config *image)
+{
+	cartridge_t *cart;
+
+//  printf("assemble_paged379i, %s\n", image->tag);
+	cart = assemble_common(image);
+	if (cart->rom_ptr==NULL)
+	{
+		logerror("Missing ROM for paged cartridge");
+		return INIT_FAIL;
+	}
+	set_paged379i_bank(cart, 15);
+	return INIT_PASS;
+}
+
+/*****************************************************************************
+  Cartridge type: pagedcru
+    This cartridge consists of one 16 KiB, 32 KiB, or 64 KiB EEPROM which is
+    organised in 2, 4, or 8 pages of 8 KiB each. We assume there is only one
+    dump file of the respective size.
+    The pages are selected by writing a value to the CRU. This scheme is 
+    similar to the one used for the SuperSpace cartridge, with the exception 
+    that we are using ROM only, and we can have up to 8 pages.
+    
+      Bank     Value written to CRU>0800
+	0      >0002  = 0000 0000 0000 0010
+	1      >0008  = 0000 0000 0000 1000
+	2      >0020  = 0000 0000 0010 0000
+	3      >0080  = 0000 0000 1000 0000
+	4      >0200  = 0000 0010 0000 0000
+	5      >0800  = 0000 1000 0000 0000
+	6      >2000  = 0010 0000 0000 0000
+	7      >8000  = 1000 0000 0000 0000
+
+******************************************************************************/
+
+static DEVICE_START(ti99_pcb_pagedcru)
+{
+	/* device is ti99_cartslot:cartridge:pcb */
+//  printf("DEVICE_START(ti99_pcb_paged379i), tag of device=%s\n", device->tag);
+	set_pointers(device, get_index_from_tagname(device->owner)-1);
+}
+
+/*
+    Read handler for the CPU address space of the cartridge
+    Images for this area are found in the rom_sockets.
+*/
+static READ16_DEVICE_HANDLER( read_cart_pagedcru )
+{
+	/* device is pcb, owner is cartslot */
+	UINT16 value;
+	ti99_pcb_t *pcb = (ti99_pcb_t *)device->token;
+	cartridge_t *cartridge = pcb->cartridge;
+	offs_t boffset;
+
+	if (cartridge->rom_ptr==NULL)
+	{
+		//      printf("No cartridge ROM in rompage=%d of bank %d\n", rompage, cartslots->active_slot);
+		//      printf("Cartridge address = %lx\n", (long)pcb->cartridge);
+		value = 0;
+	}
+	else
+	{
+		// rom_page is the stored latch value
+		// 16bit access -> multiply by 0x1000
+		boffset = cartridge->rom_page * 0x1000 + offset;
+		value = ((UINT16 *)cartridge->rom_ptr)[boffset];
+		//      printf("stdcart/read: %4x = %4x\n", 0x6000 + 2*offset, value);
+	}
+//	  printf("accessed cartridge rom[%02x:%04x] = %04x\n", cartridge->rom_page, 0x6000+offset*2, value);
+	return value;
+}
+
+/*
+	This type of cartridge does not support writing to the EPROM address
+	space.
+*/
+static WRITE16_DEVICE_HANDLER( write_cart_pagedcru )
+{
+	return;
+}
+
+/*
+    TI-99/8 support:
+    Read handler for the CPU address space of the cartridge.
+    Images for this area are found in the rom_sockets.
+*/
+static READ8_DEVICE_HANDLER( read_cart_pagedcru8 )
+{
+	UINT8 value;
+	ti99_pcb_t *pcb = (ti99_pcb_t *)device->token;
+	cartridge_t *cartridge = pcb->cartridge;
+	offs_t boffset;
+	
+	if (cartridge->rom_ptr==NULL)
+	{
+		//      printf("No cartridge ROM in rompage=%d of bank %d\n", rompage, cartslots->active_slot);
+		//      printf("Cartridge address = %lx\n", (long)pcb->cartridge);
+		value = 0;
+	}
+	else
+	{
+		// rom_page is the stored latch value
+		// 8bit access -> multiply by 0x2000
+		boffset = cartridge->rom_page * 0x2000 + offset;
+		value = ((UINT8 *)cartridge->rom_ptr)[boffset];
+		//      printf("stdcart/read: %4x = %4x\n", 0x6000 + 2*offset, value);
+	}
+	//  printf("accessed cartridge rom[%02x:%04x] = %04x\n", cartridge->rom_page, 0x6000+offset*2, value);
+	return value;
+
+}
+
+/*
+    TI-99/8 support: This type of cartridge does not support writing to the 
+    EPROM address space. 
+*/
+static WRITE8_DEVICE_HANDLER( write_cart_pagedcru8 )
+{
+	return;
+}
+
+/*
+    The CRU read handler. The CRU is a serial interface in the console.
+    Using the CRU we can switch the banks in the SuperSpace cartridge.
+    For documentation see the corresponding cru function above. Note we are
+    using rom_page here.
+*/
+static READ8_DEVICE_HANDLER( read_cart_cru_paged )
+{
+	ti99_pcb_t *pcb = (ti99_pcb_t *)device->token;
+	cartridge_t *cartridge = pcb->cartridge;
+        int reply = 0;
+
+	if ((offset & 1) == 0 || offset > 15)
+		reply = 0;
+
+	reply = (cartridge->rom_page == (offset-1)/2);
+
+	return reply;
+}
+
+static WRITE8_DEVICE_HANDLER( write_cart_cru_paged )
+{
+	ti99_pcb_t *pcb = (ti99_pcb_t *)device->token;
+	cartridge_t *cartridge = pcb->cartridge;
+	// data is bit
+	// offset is address
+	/* Note that CRU >0F00 also gets in here ... should check
+	whether it is intended to go somewhere else */
+        if (offset < 16)
+	{
+		if (data != 0)
+		{
+			cartridge->rom_page = (offset-1)/2;
+			printf("Setting bit %4x of CRU base >0800\n", offset);
+		}
+	}
+//	printf("setting rompage to %d\n", cartridge->rom_page);		
+}
+
+/*
+    Pagedcru modules have one EPROM dump.
+*/
+static int assemble_pagedcru(const device_config *image)
+{
+	cartridge_t *cart;
+
+//  printf("assemble_paged379i, %s\n", image->tag);
+	cart = assemble_common(image);
+	if (cart->rom_ptr==NULL)
+	{
+		logerror("Missing ROM for pagedcru cartridge");
+		return INIT_FAIL;
+	}
+	cart->rom_page = 0;
+	return INIT_PASS;
+}
 
 /*****************************************************************************
   Device metadata
@@ -1416,6 +1758,87 @@ DEVICE_GET_INFO(ti99_cartridge_pcb_mbx)
 	}
 }
 
+static DEVICE_GET_INFO(ti99_cartridge_pcb_paged379i)
+{
+	switch(state)
+	{
+		case DEVINFO_FCT_START:
+			info->start = DEVICE_START_NAME(ti99_pcb_paged379i);
+			break;
+
+		case TI99CART_FCT_ASSM:
+			info->f = (genf *) assemble_paged379i; break;
+
+		case TI99CARTINFO_FCT_6000_R:
+			info->f = (genf *) read_cart_paged379i;
+			break;
+
+		case TI99CARTINFO_FCT_6000_W:
+			info->f = (genf *) write_cart_paged379i;
+			break;
+
+		case TI99CARTINFO_FCT_6000_R8:
+			info->f = (genf *) read_cart_paged379i8;
+			break;
+
+		case TI99CARTINFO_FCT_6000_W8:
+			info->f = (genf *) write_cart_paged379i8;
+			break;
+
+		case DEVINFO_STR_NAME:
+			strcpy(info->s, "TI99 paged379i cartridge pcb");
+			break;
+
+		default:
+			DEVICE_GET_INFO_CALL(ti99_cart_common);
+			break;
+	}
+}
+
+static DEVICE_GET_INFO(ti99_cartridge_pcb_pagedcru)
+{
+	switch(state)
+	{
+		case DEVINFO_FCT_START:
+			info->start = DEVICE_START_NAME(ti99_pcb_pagedcru);
+			break;
+
+		case TI99CART_FCT_ASSM:
+			info->f = (genf *) assemble_pagedcru; 
+			break;
+
+		case TI99CARTINFO_FCT_6000_R:
+			info->f = (genf *) read_cart_pagedcru;
+			break;
+
+		case TI99CARTINFO_FCT_6000_W:
+			info->f = (genf *) write_cart_pagedcru;
+			break;
+
+		case TI99CARTINFO_FCT_6000_R8:
+			info->f = (genf *) read_cart_pagedcru8;
+			break;
+
+		case TI99CARTINFO_FCT_6000_W8:
+			info->f = (genf *) write_cart_pagedcru8;
+			break;
+
+		case TI99CARTINFO_FCT_CRU_R:
+			info->f = (genf *) read_cart_cru_paged;
+			break;
+		case TI99CARTINFO_FCT_CRU_W:
+			info->f = (genf *) write_cart_cru_paged;
+			break;
+			
+		case DEVINFO_STR_NAME:
+			strcpy(info->s, "TI99 pagedcru cartridge pcb");
+			break;
+
+		default:
+			DEVICE_GET_INFO_CALL(ti99_cart_common);
+			break;
+	}
+}
 
 /*****************************************************************************
   The cartridge handling of the multi-cartridge system.
@@ -1464,21 +1887,21 @@ static DEVICE_IMAGE_LOAD( ti99_cartridge )
 
 			/* try opening this as a multicart */
 			/* This line requires that cartslot_t be included in cartslot.h,
-            otherwise one cannot make use of multicart handling within such a
-            custom LOAD function. */
+			otherwise one cannot make use of multicart handling within such a
+			custom LOAD function. */
 			multicart_open_error me = multicart_open(image_filename(image), image->machine->gamedrv->name, MULTICART_FLAGS_LOAD_RESOURCES, &cart->mc);
 
 			/* Now that we have loaded the image files, let the PCB put them all
-            together. This means we put the images in a structure which allows
-            for a quick access by the memory handlers. Every PCB defines an
-            own assembly method. */
+			together. This means we put the images in a structure which allows
+			for a quick access by the memory handlers. Every PCB defines an
+			own assembly method. */
 			if (me == MCERR_NONE)
 				result = pcb->assemble(image);
 			else
 				fatalerror("Error loading multicart: %s\n", mc_error_text(me));
 
 			/* This is for legacy support. If we have no multicart left
-            but there are still legacy dumps, we switch to legacy mode. */
+			but there are still legacy dumps, we switch to legacy mode. */
 			if (result != INIT_FAIL)
 				cartslots->multi_slots++;
 		}
@@ -1502,9 +1925,8 @@ static DEVICE_IMAGE_UNLOAD( ti99_cartridge )
 	if (image->token == NULL)
 	{
 		/* This means something went wrong during the pcb
-           identification (e.g. one of the cartridge files was not
-           found). We do not need to (and cannot) unload
-           the cartridge. */
+		identification (e.g. one of the cartridge files was not
+		found). We do not need to (and cannot) unload the cartridge. */
 		return;
 	}
 	pcbdev = cartslot_get_pcb(image);
@@ -1521,7 +1943,7 @@ static DEVICE_IMAGE_UNLOAD( ti99_cartridge )
 			pcb->disassemble(image);
 
 			/* Close the multicart; all RAM resources will be
-               written to disk */
+			written to disk */
 			multicart_close(cart->mc);
 			cart->mc = NULL;
 
@@ -1577,7 +1999,7 @@ static UINT8 cartridge_grom_read_legacy(const device_config *cartsys, int cart_o
 	if (cartridge->grom_size>0)
 	{
 		/* This is the reason why we need the image size: Read
-        access beyond the image size must be detected. */
+		access beyond the image size must be detected. */
 		if (cart_offset > cartridge->grom_size)
 			return 0;
 
@@ -1635,7 +2057,8 @@ static READ16_DEVICE_HANDLER( ti99_cart_r_legacy )
 		else
 			return (((UINT16 *)cartslots->cartridge[slotrom].rom_ptr)[offset]);
 	}
-	/* Super Space is not supported in legacy mode. */
+	/* SuperSpace, paged379i, and pagedcru are not supported in 
+	legacy mode. */
 }
 
 static WRITE16_DEVICE_HANDLER( ti99_cart_w_legacy )
@@ -1729,7 +2152,8 @@ static READ8_DEVICE_HANDLER( ti99_cart_r_legacy8 )
 		else
 			return (((UINT8 *)cartslots->cartridge[slotrom].rom_ptr)[offset]);
 	}
-	/* Super Space is not supported in legacy mode. */
+	/* Super Space, paged379i, and pagedcru are not supported in 
+	legacy mode. */
 }
 
 /*
@@ -1793,8 +2217,8 @@ static int load_legacy(const device_config *image)
 	/* Some comments originally in machine/ti99_4x.c */
 
 	/* We identify file types according to their extension */
-	/* Note that if we do not recognize the extension, we revert to the slot location <-> type
-    scheme. */
+	/* Note that if we do not recognize the extension, we revert to the 
+	slot location <-> type scheme. */
 	int id = 0;
 	int i;
 	int filesize;
@@ -1817,14 +2241,14 @@ static int load_legacy(const device_config *image)
 	type = SLOTC_EMPTY;
 
 	/* There is a circuitry in TI99/4(a) that resets the console when a
-    cartridge is inserted or removed.  We emulate this instead of resetting the
-    emulator (which is the default in MESS). */
+	cartridge is inserted or removed.  We emulate this instead of resetting 
+	the emulator (which is the default in MESS). */
 	/*cpu_set_input_line(machine->firstcpu, INPUT_LINE_RESET, PULSE_LINE);
-    tms9901_reset(0);
-    if (! has_evpc)
-        TMS9928A_reset();
-    if (has_evpc)
-        v9938_reset(0);*/
+	tms9901_reset(0);
+	if (! has_evpc)
+		TMS9928A_reset();
+	if (has_evpc)
+		v9938_reset(0);*/
 
 	ch = strrchr(name, '.');
 	ch2 = (ch-1 >= name) ? ch-1 : "";
@@ -1888,17 +2312,18 @@ static int load_legacy(const device_config *image)
 			maxrom = 0x2000;
 			if (cartslots->legacy_slotnumber[SLOTC_MINIMEM] != -1)
 			{
-				/* This means the NVRAM has already been loaded. So we just
-                load 4K of ROM to avoid overwriting the NVRAM. */
+				/* This means the NVRAM has already been loaded. 
+				So we just load 4K of ROM to avoid overwriting 
+				the NVRAM. */
 				maxrom = 0x1000;
 			}
 
 			if (cartslots->legacy_slotnumber[SLOTC_MBX] != -1)
 			{
 				/* This means the NVRAM has already been loaded.
-                We need to temporarily save the RAM contents and
-                write them back because the RAM overrides the
-                ROM in an intermediate area. */
+				We need to temporarily save the RAM contents and
+				write them back because the RAM overrides the
+				ROM in an intermediate area. */
 				savembx = TRUE;
 			}
 
@@ -1941,7 +2366,7 @@ static int load_legacy(const device_config *image)
 
 		case SLOTC_MINIMEM:
 			/* Load the NVRAM. Need to BIG_ENDIANIZE it.
-            MiniMemory has only one cartridge page. */
+			MiniMemory has only one cartridge page. */
 			if (is_99_8())
 			{
 				// printf("** is 99/8\n");
@@ -2039,8 +2464,8 @@ static void unload_legacy(const device_config *image)
 			}
 			else
 			{
-				/* We BIG_ENDIANIZE before saving. This is consistent
-                with the cartridge save format. */
+				/* We BIG_ENDIANIZE before saving. This is 
+				consistent with the cartridge save format. */
 				UINT16 *ramcont = (UINT16 *)cartslots->cartridge[slot].ram_ptr;
 				for (i = 0; i < 0x0800; i++)
 					ramcont[i] = BIG_ENDIANIZE_INT16(ramcont[i]);
@@ -2057,8 +2482,8 @@ static void unload_legacy(const device_config *image)
 			}
 			else
 			{
-				/* We BIG_ENDIANIZE before saving. This is consistent
-                with the cartridge save format. */
+				/* We BIG_ENDIANIZE before saving. This is 
+				consistent with the cartridge save format. */
 				UINT16 *ramcont = (UINT16 *)cartslots->cartridge[slot].ram_ptr;
 				for (i = 0; i < 0x0200; i++)
 					ramcont[i] = BIG_ENDIANIZE_INT16(ramcont[i]);
@@ -2104,9 +2529,6 @@ static DEVICE_START(ti99_multicart)
 //  printf("DEVICE_START(ti99_multicart)\n");
 	ti99_multicart_t *cartslots = (ti99_multicart_t *)device->token;
 
-	/* Save this in the shortcut; we don't want to look for it each time
-       that we have a memory access. And currently we do not plan for
-       multiple multicart instances. */
 	cartslots->active_slot = 0;
 	cartslots->next_free_slot = 0;
 
@@ -2134,15 +2556,24 @@ static DEVICE_STOP(ti99_multicart)
 {
 //  printf("DEVICE_STOP(ti99_multicart)\n");
 }
+
+static DEVICE_RESET(ti99_multicart)
+{
+	/* Consider to propagate RESET to cartridges. 
+	   However, schematics do not reveal any pin for resetting a cartridge;
+	   the reset line is an input used when plugging in a cartridge. */
+//    printf("DEVICE_RESET(ti99_multicart)\n");
+}
+
 /*
-    Accesses the ROM regions of the cartridge for reading.
-    This is the area from 0x6000 to 0x7fff. Each cartridge is reponsible
-    for all kinds of magic which is done inside this area, like swapping
-    banks or doing other control actions. These activities beyond simple
-    reading are cartridge-specific. Each kind of cartridge requires a
-    new type.
-    The currently set GROM bank determines which cartridge is actually
-    accessed, also for ROM reads.
+	Accesses the ROM regions of the cartridge for reading.
+	This is the area from 0x6000 to 0x7fff. Each cartridge is reponsible
+	for all kinds of magic which is done inside this area, like swapping
+	banks or doing other control actions. These activities beyond simple
+	reading are cartridge-specific. Each kind of cartridge requires a
+	new type.
+	The currently set GROM bank determines which cartridge is actually
+	accessed, also for ROM reads.
 */
 READ16_DEVICE_HANDLER( ti99_multicart_r )
 {
@@ -2196,14 +2627,14 @@ READ16_DEVICE_HANDLER( ti99_multicart_r )
 }
 
 /*
-    Accesses the ROM regions of the cartridge for writing.
-    This is the area from 0x6000 to 0x7fff. Each cartridge is reponsible
-    for all kinds of magic which is done inside this area. Specifically,
-    writing is often used to swap banks for subsequent reads. The actual
-    effect of writing (beyond setting values in a RAM chip) are
-    cartridge-specific and must be handled within the cartridge pcb.
-    The currently set GROM bank determines which cartridge is actually
-    accessed, also for ROM reads.
+	Accesses the ROM regions of the cartridge for writing.
+	This is the area from 0x6000 to 0x7fff. Each cartridge is reponsible
+	for all kinds of magic which is done inside this area. Specifically,
+	writing is often used to swap banks for subsequent reads. The actual
+	effect of writing (beyond setting values in a RAM chip) are
+	cartridge-specific and must be handled within the cartridge pcb.
+	The currently set GROM bank determines which cartridge is actually
+	accessed, also for ROM reads.
 */
 WRITE16_DEVICE_HANDLER( ti99_multicart_w )
 {
@@ -2242,7 +2673,8 @@ WRITE16_DEVICE_HANDLER( ti99_multicart_w )
 }
 
 /*
-        CRU interface to cartridges, used only by SuperSpace-style cartridges.
+	CRU interface to cartridges, used only by SuperSpace and Pagedcru 
+	style cartridges.
         The SuperSpace has a CRU-based memory mapper. It is accessed via the
         cartridge slot on CRU base >0800.
 */
@@ -2273,7 +2705,7 @@ READ8_DEVICE_HANDLER( ti99_multicart_cru_r )
 }
 
 /*
-        Write cartridge mapper CRU interface (SuperSpace)
+        Write cartridge mapper CRU interface (SuperSpace, Pagedcru)
 */
 WRITE8_DEVICE_HANDLER( ti99_multicart_cru_w )
 {
@@ -2387,6 +2819,8 @@ static MACHINE_DRIVER_START(ti99_multicart)
 	MDRV_CARTSLOT_PCBTYPE(3, "minimem", TI99_CARTRIDGE_PCB_MINIMEM)
 	MDRV_CARTSLOT_PCBTYPE(4, "super", TI99_CARTRIDGE_PCB_SUPER)
 	MDRV_CARTSLOT_PCBTYPE(5, "mbx", TI99_CARTRIDGE_PCB_MBX)
+	MDRV_CARTSLOT_PCBTYPE(6, "paged379i", TI99_CARTRIDGE_PCB_PAGED379I)
+	MDRV_CARTSLOT_PCBTYPE(7, "pagedcru", TI99_CARTRIDGE_PCB_PAGEDCRU)
 
 	MDRV_CARTSLOT_START(ti99_cartridge)
 	MDRV_CARTSLOT_LOAD(ti99_cartridge)
@@ -2400,6 +2834,8 @@ static MACHINE_DRIVER_START(ti99_multicart)
 	MDRV_CARTSLOT_PCBTYPE(3, "minimem", TI99_CARTRIDGE_PCB_MINIMEM)
 	MDRV_CARTSLOT_PCBTYPE(4, "super", TI99_CARTRIDGE_PCB_SUPER)
 	MDRV_CARTSLOT_PCBTYPE(5, "mbx", TI99_CARTRIDGE_PCB_MBX)
+	MDRV_CARTSLOT_PCBTYPE(6, "paged379i", TI99_CARTRIDGE_PCB_PAGED379I)
+	MDRV_CARTSLOT_PCBTYPE(7, "pagedcru", TI99_CARTRIDGE_PCB_PAGEDCRU)
 
 	MDRV_CARTSLOT_START(ti99_cartridge)
 	MDRV_CARTSLOT_LOAD(ti99_cartridge)
@@ -2413,6 +2849,8 @@ static MACHINE_DRIVER_START(ti99_multicart)
 	MDRV_CARTSLOT_PCBTYPE(3, "minimem", TI99_CARTRIDGE_PCB_MINIMEM)
 	MDRV_CARTSLOT_PCBTYPE(4, "super", TI99_CARTRIDGE_PCB_SUPER)
 	MDRV_CARTSLOT_PCBTYPE(5, "mbx", TI99_CARTRIDGE_PCB_MBX)
+	MDRV_CARTSLOT_PCBTYPE(6, "paged379i", TI99_CARTRIDGE_PCB_PAGED379I)
+	MDRV_CARTSLOT_PCBTYPE(7, "pagedcru", TI99_CARTRIDGE_PCB_PAGEDCRU)
 
 	MDRV_CARTSLOT_START(ti99_cartridge)
 	MDRV_CARTSLOT_LOAD(ti99_cartridge)
@@ -2426,6 +2864,8 @@ static MACHINE_DRIVER_START(ti99_multicart)
 	MDRV_CARTSLOT_PCBTYPE(3, "minimem", TI99_CARTRIDGE_PCB_MINIMEM)
 	MDRV_CARTSLOT_PCBTYPE(4, "super", TI99_CARTRIDGE_PCB_SUPER)
 	MDRV_CARTSLOT_PCBTYPE(5, "mbx", TI99_CARTRIDGE_PCB_MBX)
+	MDRV_CARTSLOT_PCBTYPE(6, "paged379i", TI99_CARTRIDGE_PCB_PAGED379I)
+	MDRV_CARTSLOT_PCBTYPE(7, "pagedcru", TI99_CARTRIDGE_PCB_PAGEDCRU)
 
 	MDRV_CARTSLOT_START(ti99_cartridge)
 	MDRV_CARTSLOT_LOAD(ti99_cartridge)
@@ -2470,7 +2910,7 @@ DEVICE_GET_INFO(ti99_multicart)
 			info->stop = DEVICE_STOP_NAME(ti99_multicart);
 			break;
 		case DEVINFO_FCT_RESET:
-			/* Nothing */
+			info->reset = DEVICE_RESET_NAME(ti99_multicart);
 			break;
 	}
 }

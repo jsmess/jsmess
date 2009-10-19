@@ -66,6 +66,8 @@ System Driver Changes:
 
 - [SPECTRUM] Fixed bug #803 48K SNA load routine bad PC. [Miodrag Milanovic]
 
+- [TI99] Added support for two new cartridge types.  [Michael Zapf]
+
 - [TRS80] Model 4 and 4P can boot from floppy disk. [Robbbert]
 
 - [VTECH1] Added support for the SHRG (super hires graphics)

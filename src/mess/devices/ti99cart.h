@@ -20,6 +20,8 @@
 #define TI99_CARTRIDGE_PCB_MINIMEM	DEVICE_GET_INFO_NAME(ti99_cartridge_pcb_minimem)
 #define TI99_CARTRIDGE_PCB_SUPER	DEVICE_GET_INFO_NAME(ti99_cartridge_pcb_super)
 #define TI99_CARTRIDGE_PCB_MBX		DEVICE_GET_INFO_NAME(ti99_cartridge_pcb_mbx)
+#define TI99_CARTRIDGE_PCB_PAGED379I	DEVICE_GET_INFO_NAME(ti99_cartridge_pcb_paged379i)
+#define TI99_CARTRIDGE_PCB_PAGEDCRU	DEVICE_GET_INFO_NAME(ti99_cartridge_pcb_pagedcru)
 
 /* We set the number of slots to 8, although we may have up to 16. From a
    logical point of view we could have 256, but the operating system only checks
@@ -88,11 +90,6 @@ UINT8  cartridge_grom_read(const device_config *cartsys, int offset);
 
 DEVICE_GET_INFO(ti99_multicart);
 
-/* cartridge PCB types */
-DEVICE_GET_INFO(ti99_cartridge_pcb_std);
-DEVICE_GET_INFO(ti99_cartridge_pcb_minimem);
-DEVICE_GET_INFO(ti99_cartridge_pcb_mbx);
-
 READ16_DEVICE_HANDLER(ti99_multicart_r);
 WRITE16_DEVICE_HANDLER(ti99_multicart_w);
 
@@ -100,7 +97,7 @@ WRITE16_DEVICE_HANDLER(ti99_multicart_w);
 READ8_DEVICE_HANDLER(ti99_multicart8_r);
 WRITE8_DEVICE_HANDLER(ti99_multicart8_w);
 
-/* CRU handlers for SuperSpace cartridge */
+/* CRU handlers for SuperSpace and Pagedcru cartridge */
 READ8_DEVICE_HANDLER( ti99_multicart_cru_r );
 WRITE8_DEVICE_HANDLER( ti99_multicart_cru_w );
 
