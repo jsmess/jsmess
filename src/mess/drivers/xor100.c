@@ -217,30 +217,25 @@ static I8255A_INTERFACE( printer_8255_intf )
 
 /* Z80-CTC Interface */
 
-static void z80daisy_interrupt(const device_config *device, int state)
-{
-	cputag_set_input_line(device->machine, Z80_TAG, INPUT_LINE_IRQ0, state);
-}
-
-static WRITE8_DEVICE_HANDLER( ctc_z0_w )
+static WRITE_LINE_DEVICE_HANDLER( ctc_z0_w )
 {
 }
 
-static WRITE8_DEVICE_HANDLER( ctc_z1_w )
+static WRITE_LINE_DEVICE_HANDLER( ctc_z1_w )
 {
 }
 
-static WRITE8_DEVICE_HANDLER( ctc_z2_w )
+static WRITE_LINE_DEVICE_HANDLER( ctc_z2_w )
 {
 }
 
-static const z80ctc_interface ctc_intf =
+static Z80CTC_INTERFACE( ctc_intf )
 {
 	0,              	/* timer disables */
-	z80daisy_interrupt,	/* interrupt handler */
-	ctc_z0_w,			/* ZC/TO0 callback */
-	ctc_z1_w,			/* ZC/TO1 callback */
-	ctc_z2_w    		/* ZC/TO2 callback */
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* interrupt handler */
+	DEVCB_LINE(ctc_z0_w),			/* ZC/TO0 callback */
+	DEVCB_LINE(ctc_z1_w),			/* ZC/TO1 callback */
+	DEVCB_LINE(ctc_z2_w)    		/* ZC/TO2 callback */
 };
 
 /* WD1795-02 Interface */

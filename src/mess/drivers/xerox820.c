@@ -315,11 +315,6 @@ INPUT_PORTS_END
 
 /* Z80 PIO */
 
-static WRITE_LINE_DEVICE_HANDLER( z80daisy_interrupt )
-{
-	cputag_set_input_line(device->machine, Z80_TAG, INPUT_LINE_IRQ0, state);
-}
-
 static WRITE_LINE_DEVICE_HANDLER( xerox820_pio_pbrdy_w )
 {
 	xerox820_state *driver_state = device->machine->driver_data;
@@ -414,7 +409,7 @@ static READ8_DEVICE_HANDLER( xerox820_pio_port_b_r )
 
 static const z80pio_interface kbpio_intf =
 {
-	DEVCB_LINE(z80daisy_interrupt),				/* callback when change interrupt status */
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* callback when change interrupt status */
 	DEVCB_HANDLER(xerox820_pio_port_a_r),		/* port A read callback */
 	DEVCB_HANDLER(xerox820_pio_port_b_r),		/* port B read callback */
 	DEVCB_HANDLER(xerox820_pio_port_a_w),		/* port A write callback */
@@ -425,7 +420,7 @@ static const z80pio_interface kbpio_intf =
 
 static const z80pio_interface gppio_intf =
 {
-	DEVCB_LINE(z80daisy_interrupt),	/* callback when change interrupt status */
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* callback when change interrupt status */
 	DEVCB_NULL,		/* port A read callback */
 	DEVCB_NULL,		/* port B read callback */
 	DEVCB_NULL,		/* port A write callback */
@@ -435,6 +430,11 @@ static const z80pio_interface gppio_intf =
 };
 
 /* Z80 SIO */
+
+static WRITE_LINE_DEVICE_HANDLER( z80daisy_interrupt )
+{
+	cputag_set_input_line(device->machine, Z80_TAG, INPUT_LINE_IRQ0, state);
+}
 
 static const z80sio_interface sio_intf =
 {
@@ -452,32 +452,27 @@ static TIMER_DEVICE_CALLBACK( ctc_tick )
 {
 	xerox820_state *state = timer->machine->driver_data;
 
-	z80ctc_trg_w(state->z80ctc, 0, 1);
-	z80ctc_trg_w(state->z80ctc, 0, 0);
+	z80ctc_trg0_w(state->z80ctc, 1);
+	z80ctc_trg0_w(state->z80ctc, 0);
 }
 
-static WRITE8_DEVICE_HANDLER( ctc_z0_w )
+static WRITE_LINE_DEVICE_HANDLER( ctc_z0_w )
 {
-//  z80ctc_trg_w(device, 1, data);
+//  z80ctc_trg1_w(device, state);
 }
 
-static WRITE8_DEVICE_HANDLER( ctc_z1_w )
+static WRITE_LINE_DEVICE_HANDLER( ctc_z2_w )
 {
-	z80ctc_trg_w(device, 2, data);
+//  z80ctc_trg3_w(device, state);
 }
 
-static WRITE8_DEVICE_HANDLER( ctc_z2_w )
+static Z80CTC_INTERFACE( ctc_intf )
 {
-//  z80ctc_trg_w(device, 3, data);
-}
-
-static const z80ctc_interface ctc_intf =
-{
-	0,              	/* timer disables */
-	z80daisy_interrupt,	/* interrupt handler */
-	ctc_z0_w,			/* ZC/TO0 callback */
-	ctc_z1_w,			/* ZC/TO1 callback */
-	ctc_z2_w    		/* ZC/TO2 callback */
+	0,              			/* timer disables */
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* interrupt handler */
+	DEVCB_LINE(ctc_z0_w),		/* ZC/TO0 callback */
+	DEVCB_LINE(z80ctc_trg2_w),	/* ZC/TO1 callback */
+	DEVCB_LINE(ctc_z2_w)  		/* ZC/TO2 callback */
 };
 
 /* Z80 Daisy Chain */

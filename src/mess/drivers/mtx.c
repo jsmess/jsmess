@@ -224,25 +224,19 @@ static TIMER_DEVICE_CALLBACK( ctc_c0_tick )
 {
 	const device_config *z80ctc = devtag_get_device(timer->machine, "z80ctc");
 
-	z80ctc_trg_w(z80ctc, 0, 1);
-	z80ctc_trg_w(z80ctc, 0, 0);
+	z80ctc_trg0_w(z80ctc, 1);
+	z80ctc_trg0_w(z80ctc, 0);
 }
 
 static TIMER_DEVICE_CALLBACK( ctc_c1_c2_tick )
 {
 	const device_config *z80ctc = devtag_get_device(timer->machine, "z80ctc");
 
-	z80ctc_trg_w(z80ctc, 1, 1);
-	z80ctc_trg_w(z80ctc, 1, 0);
-	z80ctc_trg_w(z80ctc, 2, 1);
-	z80ctc_trg_w(z80ctc, 2, 0);
+	z80ctc_trg1_w(z80ctc, 1);
+	z80ctc_trg1_w(z80ctc, 0);
+	z80ctc_trg2_w(z80ctc, 1);
+	z80ctc_trg2_w(z80ctc, 0);
 }
-
-static void mtx_ctc_interrupt(const device_config *device, int state)
-{
-	cputag_set_input_line(device->machine, "maincpu", 0, state);
-}
-
 
 
 /*************************************
@@ -251,13 +245,13 @@ static void mtx_ctc_interrupt(const device_config *device, int state)
  *
  *************************************/
 
-static const z80ctc_interface mtx_ctc_intf =
+static Z80CTC_INTERFACE( mtx_ctc_intf )
 {
 	0,
-	mtx_ctc_interrupt,
-	0,
-	0,
-	0
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static Z80DART_INTERFACE( mtx_dart_intf )
@@ -278,7 +272,7 @@ static Z80DART_INTERFACE( mtx_dart_intf )
 	DEVCB_NULL,
 	DEVCB_NULL,
 
-	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static MACHINE_DRIVER_START( mtx512 )

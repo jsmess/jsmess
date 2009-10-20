@@ -46,27 +46,22 @@ static READ8_DEVICE_HANDLER (llc1_port_a_r)
 }
 
 
-static void llc1_ctc_interrupt(const device_config *device, int state)
-{
-	cputag_set_input_line(device->machine, "maincpu", 0, state);
-}
-
-const z80ctc_interface llc1_ctc_intf =
+Z80CTC_INTERFACE( llc1_ctc_intf )
 {
 	0,
-	llc1_ctc_interrupt,
-	0,
-	0,
-	0
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
-const z80ctc_interface llc2_ctc_intf =
+Z80CTC_INTERFACE( llc2_ctc_intf )
 {
 	0,
-	0,
-	0,
-	0,
-	0
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static TIMER_CALLBACK(keyboard_callback)

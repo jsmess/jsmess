@@ -233,13 +233,13 @@ static const z80dma_interface p8k_dma_intf =
 // manual states the callbacks should go to
 // Baud Gen 3, FDC, System-Kanal
 
-static const z80ctc_interface p8k_ctc_0_intf =
+static Z80CTC_INTERFACE( p8k_ctc_0_intf )
 {
 	0,			/* timer disables */
-	p8k_daisy_interrupt,	/* interrupt handler */
-	NULL,			/* ZC/TO0 callback */
-	NULL,			/* ZC/TO1 callback */
-	NULL    		/* ZC/TO2 callback */
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),	/* interrupt handler */
+	DEVCB_NULL,			/* ZC/TO0 callback */
+	DEVCB_NULL,			/* ZC/TO1 callback */
+	DEVCB_NULL    		/* ZC/TO2 callback */
 };
 
 /* Z80 CTC 1 */
@@ -247,20 +247,20 @@ static const z80ctc_interface p8k_ctc_0_intf =
 // manual states the callbacks should go to
 // Baud Gen 0, Baud Gen 1, Baud Gen 2,
 
-static const z80ctc_interface p8k_ctc_1_intf =
+static Z80CTC_INTERFACE( p8k_ctc_1_intf )
 {
 	0,			/* timer disables */
-	p8k_daisy_interrupt,	/* interrupt handler */
-	NULL,			/* ZC/TO0 callback */
-	NULL,			/* ZC/TO1 callback */
-	NULL,			/* ZC/TO2 callback */
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),	/* interrupt handler */
+	DEVCB_NULL,			/* ZC/TO0 callback */
+	DEVCB_NULL,			/* ZC/TO1 callback */
+	DEVCB_NULL,			/* ZC/TO2 callback */
 };
 
 /* Z80 PIO 0 */
 
 static const z80pio_interface p8k_pio_0_intf =
 {
-	DEVCB_LINE(p8k_daisy_interrupt),
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -273,7 +273,7 @@ static const z80pio_interface p8k_pio_0_intf =
 
 static const z80pio_interface p8k_pio_1_intf =
 {
-	DEVCB_LINE(p8k_daisy_interrupt),
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -286,7 +286,7 @@ static const z80pio_interface p8k_pio_1_intf =
 
 static const z80pio_interface p8k_pio_2_intf =
 {
-	DEVCB_LINE(p8k_daisy_interrupt),
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -359,24 +359,24 @@ static void p8k_16_daisy_interrupt(const device_config *device, int state)
 
 /* Z80 CTC 0 */
 
-static const z80ctc_interface p8k_16_ctc_0_intf =
+static Z80CTC_INTERFACE( p8k_16_ctc_0_intf )
 {
 	0,				/* timer disables */
-	p8k_16_daisy_interrupt,	/* interrupt handler */
-	NULL,				/* ZC/TO0 callback */
-	NULL,				/* ZC/TO1 callback */
-	NULL    			/* ZC/TO2 callback */
+	DEVCB_LINE(p8k_16_daisy_interrupt),	/* interrupt handler */
+	DEVCB_NULL,				/* ZC/TO0 callback */
+	DEVCB_NULL,				/* ZC/TO1 callback */
+	DEVCB_NULL    			/* ZC/TO2 callback */
 };
 
 /* Z80 CTC 1 */
 
-static const z80ctc_interface p8k_16_ctc_1_intf =
+static Z80CTC_INTERFACE( p8k_16_ctc_1_intf )
 {
 	0,				/* timer disables */
-	p8k_16_daisy_interrupt,	/* interrupt handler */
-	NULL,				/* ZC/TO0 callback */
-	NULL,				/* ZC/TO1 callback */
-	NULL,				/* ZC/TO2 callback */
+	DEVCB_LINE(p8k_16_daisy_interrupt),	/* interrupt handler */
+	DEVCB_NULL,				/* ZC/TO0 callback */
+	DEVCB_NULL,				/* ZC/TO1 callback */
+	DEVCB_NULL				/* ZC/TO2 callback */
 };
 
 /* Z80 PIO 0 */

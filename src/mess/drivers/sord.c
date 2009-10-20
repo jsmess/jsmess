@@ -285,18 +285,12 @@ static const ppi8255_interface sord_ppi8255_interface =
     MACHINE EMULATION
 ***************************************************************************/
 
-static void sord_m5_ctc_interrupt(const device_config *device, int state)
-{
-	logerror("interrupting ctc %02x\n", state);
-	cputag_set_input_line(device->machine, "maincpu", 0, state);
-}
-
 static void sordm5_video_interrupt_callback(running_machine *machine, int state)
 {
 	if (state)
 	{
-		z80ctc_trg3_w(devtag_get_device(machine, "z80ctc"), 0, 1);
-		z80ctc_trg3_w(devtag_get_device(machine, "z80ctc"), 0, 0);
+		z80ctc_trg3_w(devtag_get_device(machine, "z80ctc"), 1);
+		z80ctc_trg3_w(devtag_get_device(machine, "z80ctc"), 0);
 	}
 }
 
@@ -486,13 +480,13 @@ static const z80_daisy_chain sord_m5_daisy_chain[] =
 	{ NULL }
 };
 
-static const z80ctc_interface sord_m5_ctc_intf =
+static Z80CTC_INTERFACE( sord_m5_ctc_intf )
 {
 	0,
-	sord_m5_ctc_interrupt,
-	0,
-	0,
-	0
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static const cassette_config sordm5_cassette_config =

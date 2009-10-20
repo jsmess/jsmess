@@ -37,7 +37,7 @@ static UINT8 key_sense;
 
 static void mtx_tms9929a_interrupt(running_machine *machine, int data)
 {
-	z80ctc_trg0_w(devtag_get_device(machine, "z80ctc"), 0, data ? 0 : 1);
+	z80ctc_trg0_w(devtag_get_device(machine, "z80ctc"), data ? 0 : 1);
 }
 
 static const TMS9928a_interface tms9928a_interface =

@@ -1305,46 +1305,46 @@ static const nec765_interface newbrain_nec765_interface =
 	{FLOPPY_0,FLOPPY_1, NULL, NULL}
 };
 
-static WRITE8_DEVICE_HANDLER( ctc_z0_w )
+static WRITE_LINE_DEVICE_HANDLER( ctc_z0_w )
 {
-	newbrain_state *state = device->machine->driver_data;
+	newbrain_state *driver_state = device->machine->driver_data;
 
 	/* connected to the ACIA receive clock */
-	if (data) acia6850_rx_clock_in(state->mc6850);
+	if (state) acia6850_rx_clock_in(driver_state->mc6850);
 }
 
-static WRITE8_DEVICE_HANDLER( ctc_z1_w )
+static WRITE_LINE_DEVICE_HANDLER( ctc_z1_w )
 {
-	newbrain_state *state = device->machine->driver_data;
+	newbrain_state *driver_state = device->machine->driver_data;
 
 	/* connected to the ACIA transmit clock */
-	if (data) acia6850_tx_clock_in(state->mc6850);
+	if (state) acia6850_tx_clock_in(driver_state->mc6850);
 }
 
-static WRITE8_DEVICE_HANDLER( ctc_z2_w )
+static WRITE_LINE_DEVICE_HANDLER( ctc_z2_w )
 {
-	newbrain_state *state = device->machine->driver_data;
+	newbrain_state *driver_state = device->machine->driver_data;
 
 	/* connected to CTC channel 0/1 clock inputs */
-	z80ctc_trg_w(state->z80ctc, 0, data);
-	z80ctc_trg_w(state->z80ctc, 1, data);
+	z80ctc_trg0_w(driver_state->z80ctc, state);
+	z80ctc_trg1_w(driver_state->z80ctc, state);
 }
 
-static const z80ctc_interface newbrain_ctc_intf =
+static Z80CTC_INTERFACE( newbrain_ctc_intf )
 {
 	0,              		/* timer disables */
-	NULL,			  		/* interrupt handler */
-	ctc_z0_w,				/* ZC/TO0 callback */
-	ctc_z1_w,             	/* ZC/TO1 callback */
-	ctc_z2_w				/* ZC/TO2 callback */
+	DEVCB_NULL,			 	/* interrupt handler */
+	DEVCB_LINE(ctc_z0_w),	/* ZC/TO0 callback */
+	DEVCB_LINE(ctc_z1_w),  	/* ZC/TO1 callback */
+	DEVCB_LINE(ctc_z2_w)	/* ZC/TO2 callback */
 };
 
 static TIMER_DEVICE_CALLBACK( ctc_c2_tick )
 {
 	newbrain_state *state = timer->machine->driver_data;
 
-	z80ctc_trg_w(state->z80ctc, 2, 1);
-	z80ctc_trg_w(state->z80ctc, 2, 0);
+	z80ctc_trg2_w(state->z80ctc, 1);
+	z80ctc_trg2_w(state->z80ctc, 0);
 }
 
 INLINE int get_reset_t(void)

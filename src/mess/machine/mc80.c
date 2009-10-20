@@ -25,33 +25,28 @@ MACHINE_RESET(mc8020)
 	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), mc8020_irq_callback);
 }
 
-static void mc8020_ctc_interrupt(const device_config *device, int state)
-{
-	cputag_set_input_line(device->machine, "maincpu", 0, state);
-}
-
-static WRITE8_DEVICE_HANDLER( ctc_z0_w )
+static WRITE_LINE_DEVICE_HANDLER( ctc_z0_w )
 {
 }
 
-static WRITE8_DEVICE_HANDLER( ctc_z1_w )
+static WRITE_LINE_DEVICE_HANDLER( ctc_z1_w )
 {
 }
 
-static WRITE8_DEVICE_HANDLER( ctc_z2_w )
+static WRITE_LINE_DEVICE_HANDLER( ctc_z2_w )
 {
-	z80ctc_trg_w(device, 0, data);
-	z80ctc_trg_w(device, 1, data);
+	z80ctc_trg0_w(device, state);
+	z80ctc_trg1_w(device, state);
 
 }
 
-const z80ctc_interface mc8020_ctc_intf =
+Z80CTC_INTERFACE( mc8020_ctc_intf )
 {
 	0,
-	mc8020_ctc_interrupt,
-	ctc_z0_w,
-	ctc_z1_w,
-	ctc_z2_w
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
+	DEVCB_LINE(ctc_z0_w),
+	DEVCB_LINE(ctc_z1_w),
+	DEVCB_LINE(ctc_z2_w)
 };
 
 
@@ -185,22 +180,22 @@ const z80pio_interface asp_z80pio_intf =
 	DEVCB_NULL
 };
 
-const z80ctc_interface zve_z80ctc_intf =
+Z80CTC_INTERFACE( zve_z80ctc_intf )
 {
 	0,
-	0,
-	0,
-	0,
-	0
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
-const z80ctc_interface asp_z80ctc_intf =
+Z80CTC_INTERFACE( asp_z80ctc_intf )
 {
 	0,
-	0,
-	0,
-	0,
-	0
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 const z80sio_interface asp_z80sio_intf =

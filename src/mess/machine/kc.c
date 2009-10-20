@@ -1730,11 +1730,6 @@ static void kc85_pio_interrupt(const device_config *device, int state)
 	cputag_set_input_line(device->machine, "maincpu", 0, state);
 }
 
-static void kc85_ctc_interrupt(const device_config *device, int state)
-{
-	cputag_set_input_line(device->machine, "maincpu", 1, state);
-}
-
 /* callback for ardy output from PIO */
 /* used in KC85/4 & KC85/3 cassette interface */
 static void kc85_pio_ardy_callback(const device_config *device, int state)
@@ -1772,14 +1767,14 @@ const z80pio_interface kc85_pio_intf =
 
 
 /* used in cassette write -> K0 */
-static WRITE8_DEVICE_HANDLER(kc85_zc0_callback)
+static WRITE_LINE_DEVICE_HANDLER(kc85_zc0_callback)
 {
 
 
 }
 
 /* used in cassette write -> K1 */
-static WRITE8_DEVICE_HANDLER(kc85_zc1_callback)
+static WRITE_LINE_DEVICE_HANDLER(kc85_zc1_callback)
 {
 
 }
@@ -1793,8 +1788,8 @@ static TIMER_CALLBACK(kc85_15khz_timer_callback)
 	kc85_15khz_state^=1;
 
 	/* set clock input for channel 2 and 3 to ctc */
-	z80ctc_trg0_w(device, 0,kc85_15khz_state);
-	z80ctc_trg1_w(device, 0,kc85_15khz_state);
+	z80ctc_trg0_w(device, kc85_15khz_state);
+	z80ctc_trg1_w(device, kc85_15khz_state);
 
 	kc85_15khz_count++;
 
@@ -1806,30 +1801,30 @@ static TIMER_CALLBACK(kc85_15khz_timer_callback)
 		kc85_50hz_state^=1;
 
 		/* set clock input for channel 2 and 3 to ctc */
-		z80ctc_trg2_w(device, 0, kc85_50hz_state);
-		z80ctc_trg3_w(device, 0, kc85_50hz_state);
+		z80ctc_trg2_w(device, kc85_50hz_state);
+		z80ctc_trg3_w(device, kc85_50hz_state);
 	}
 }
 
 /* video blink */
-static WRITE8_DEVICE_HANDLER(kc85_zc2_callback)
+static WRITE_LINE_DEVICE_HANDLER( kc85_zc2_callback )
 {
 	/* is blink enabled? */
 	if (kc85_pio_data[1] & (1<<7))
 	{
 		/* yes */
 		/* toggle state of blink to video hardware */
-		kc85_video_set_blink_state(device->machine, data);
+		kc85_video_set_blink_state(device->machine, state);
 	}
 }
 
-const z80ctc_interface	kc85_ctc_intf =
+Z80CTC_INTERFACE( kc85_ctc_intf )
 {
 	0,
-    kc85_ctc_interrupt,
-	kc85_zc0_callback,
-	kc85_zc1_callback,
-    kc85_zc2_callback
+    DEVCB_CPU_INPUT_LINE("maincpu", 1),
+	DEVCB_LINE(kc85_zc0_callback),
+	DEVCB_LINE(kc85_zc1_callback),
+    DEVCB_LINE(kc85_zc2_callback)
 };
 
 static void	kc85_common_init(running_machine *machine)

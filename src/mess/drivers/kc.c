@@ -319,13 +319,13 @@ static const z80_daisy_chain kc85_daisy_chain[] =
 /********************/
 /** DISC INTERFACE **/
 
-static const z80ctc_interface kc85_disc_ctc_intf =
+static Z80CTC_INTERFACE( kc85_disc_ctc_intf )
 {
 	0,				/* timer disablers */
-	NULL,			/* interrupt callback */
-	NULL,			/* ZC/TO0 callback */
-	NULL,			/* ZC/TO1 callback */
-	NULL			/* ZC/TO2 callback */
+	DEVCB_NULL,			/* interrupt callback */
+	DEVCB_NULL,			/* ZC/TO0 callback */
+	DEVCB_NULL,			/* ZC/TO1 callback */
+	DEVCB_NULL			/* ZC/TO2 callback */
 };
 
 

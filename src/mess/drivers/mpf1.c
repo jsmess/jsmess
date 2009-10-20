@@ -319,13 +319,13 @@ static I8255A_INTERFACE( ppi8255_intf )
 	DEVCB_HANDLER(mpf1_portc_w),
 };
 
-static const z80ctc_interface mpf1_ctc_intf =
+static Z80CTC_INTERFACE( mpf1_ctc_intf )
 {
 	0,
-	0,
-	0,
-	0,
-	0
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static const z80pio_interface mpf1_pio_intf =

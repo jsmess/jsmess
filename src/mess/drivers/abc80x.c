@@ -763,22 +763,17 @@ static TIMER_DEVICE_CALLBACK( ctc_tick )
 {
 	const device_config *z80ctc = devtag_get_device(timer->machine, Z80CTC_TAG);
 
-	z80ctc_trg_w(z80ctc, 0, 1);
-	z80ctc_trg_w(z80ctc, 0, 0);
+	z80ctc_trg0_w(z80ctc, 1);
+	z80ctc_trg0_w(z80ctc, 0);
 
-	z80ctc_trg_w(z80ctc, 1, 1);
-	z80ctc_trg_w(z80ctc, 1, 0);
+	z80ctc_trg1_w(z80ctc, 1);
+	z80ctc_trg1_w(z80ctc, 0);
 
-	z80ctc_trg_w(z80ctc, 2, 1);
-	z80ctc_trg_w(z80ctc, 2, 0);
+	z80ctc_trg2_w(z80ctc, 1);
+	z80ctc_trg2_w(z80ctc, 0);
 }
 
-static void ctc_interrupt(const device_config *device, int state)
-{
-	cputag_set_input_line(device->machine, Z80_TAG, INPUT_LINE_IRQ0, state);
-}
-
-static WRITE8_DEVICE_HANDLER( ctc_z0_w )
+static WRITE_LINE_DEVICE_HANDLER( ctc_z0_w )
 {
 	//const device_config *z80sio = devtag_get_device(device->machine, Z80SIO_TAG);
 
@@ -787,8 +782,8 @@ static WRITE8_DEVICE_HANDLER( ctc_z0_w )
 	if (BIT(sb, 2))
 	{
 		/* connected to SIO/2 TxCA, CTC CLK/TRG3 */
-		//z80sio_txca_w(z80sio, data);
-		z80ctc_trg_w(device, 3, data);
+		//z80sio_txca_w(z80sio, state);
+		z80ctc_trg3_w(device, state);
 	}
 
 	/* connected to SIO/2 RxCB through a thingy */
@@ -800,7 +795,7 @@ static WRITE8_DEVICE_HANDLER( ctc_z0_w )
 	//z80sio_txcb_w(z80sio, z80sio_txcb);
 }
 
-static WRITE8_DEVICE_HANDLER( ctc_z1_w )
+static WRITE_LINE_DEVICE_HANDLER( ctc_z1_w )
 {
 	//const device_config *z80sio = devtag_get_device(device->machine, Z80SIO_TAG);
 
@@ -809,33 +804,33 @@ static WRITE8_DEVICE_HANDLER( ctc_z1_w )
 	if (BIT(sb, 3))
 	{
 		/* connected to SIO/2 RxCA */
-		//z80sio_rxca_w(z80sio, data);
+		//z80sio_rxca_w(z80sio, state);
 	}
 
 	if (BIT(sb, 4))
 	{
 		/* connected to SIO/2 TxCA, CTC CLK/TRG3 */
-		//z80sio_txca_w(z80sio, data);
-		z80ctc_trg_w(device, 3, data);
+		//z80sio_txca_w(z80sio, state);
+		z80ctc_trg3_w(device, state);
 	}
 }
 
-static WRITE8_DEVICE_HANDLER( ctc_z2_w )
+static WRITE_LINE_DEVICE_HANDLER( ctc_z2_w )
 {
 	const device_config *z80dart = devtag_get_device(device->machine, Z80DART_TAG);
 
 	/* connected to DART channel A clock inputs */
-	z80dart_rxca_w(z80dart, data);
-	z80dart_txca_w(z80dart, data);
+	z80dart_rxca_w(z80dart, state);
+	z80dart_txca_w(z80dart, state);
 }
 
-static const z80ctc_interface ctc_intf =
+static Z80CTC_INTERFACE( ctc_intf )
 {
-	0,              	/* timer disables */
-	ctc_interrupt,		/* interrupt handler */
-	ctc_z0_w,			/* ZC/TO0 callback */
-	ctc_z1_w,			/* ZC/TO1 callback */
-	ctc_z2_w    		/* ZC/TO2 callback */
+	0,              				/* timer disables */
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* interrupt handler */
+	DEVCB_LINE(ctc_z0_w),			/* ZC/TO0 callback */
+	DEVCB_LINE(ctc_z1_w),			/* ZC/TO1 callback */
+	DEVCB_LINE(ctc_z2_w)    		/* ZC/TO2 callback */
 };
 
 /* Z80 SIO/2 */

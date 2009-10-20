@@ -511,43 +511,28 @@ static const z80pio_interface pio_intf =
 
 /* Z80-CTC Interface */
 
-static WRITE_LINE_DEVICE_HANDLER( tiki100_interrupt )
-{
-	cputag_set_input_line(device->machine, Z80_TAG, INPUT_LINE_IRQ0, state);
-}
-
 static TIMER_DEVICE_CALLBACK( ctc_tick )
 {
 	tiki100_state *state = timer->machine->driver_data;
 
-	z80ctc_trg_w(state->z80ctc, 0, 1);
-	z80ctc_trg_w(state->z80ctc, 0, 0);
+	z80ctc_trg0_w(state->z80ctc, 1);
+	z80ctc_trg0_w(state->z80ctc, 0);
 
-	z80ctc_trg_w(state->z80ctc, 1, 1);
-	z80ctc_trg_w(state->z80ctc, 1, 0);
+	z80ctc_trg1_w(state->z80ctc, 1);
+	z80ctc_trg1_w(state->z80ctc, 0);
 }
 
-static WRITE8_DEVICE_HANDLER( ctc_z0_w )
-{
-	z80ctc_trg_w(device, 2, data);
-}
-
-static WRITE8_DEVICE_HANDLER( ctc_z1_w )
+static WRITE_LINE_DEVICE_HANDLER( ctc_z1_w )
 {
 }
 
-static WRITE8_DEVICE_HANDLER( ctc_z2_w )
+static Z80CTC_INTERFACE( ctc_intf )
 {
-	z80ctc_trg_w(device, 3, data);
-}
-
-static const z80ctc_interface ctc_intf =
-{
-	0,              	/* timer disables */
-	tiki100_interrupt,	/* interrupt handler */
-	ctc_z0_w,			/* ZC/TO0 callback */
-	ctc_z1_w,			/* ZC/TO1 callback */
-	ctc_z2_w    		/* ZC/TO2 callback */
+	0,              			/* timer disables */
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* interrupt handler */
+	DEVCB_LINE(z80ctc_trg2_w),	/* ZC/TO0 callback */
+	DEVCB_LINE(ctc_z1_w),		/* ZC/TO1 callback */
+	DEVCB_LINE(z80ctc_trg3_w)	/* ZC/TO2 callback */
 };
 
 /* FD1797 Interface */
@@ -664,6 +649,7 @@ static const floppy_config tiki100_floppy_config =
 };
 
 /* Machine Driver */
+
 static MACHINE_DRIVER_START( tiki100 )
 	MDRV_DRIVER_DATA(tiki100_state)
 
@@ -694,6 +680,7 @@ static MACHINE_DRIVER_START( tiki100 )
 	MDRV_TIMER_ADD_PERIODIC("ctc", ctc_tick, HZ(2000000))
 	MDRV_WD179X_ADD(FD1797_TAG, tiki100_wd17xx_interface) // FD1767PL-02 or FD1797-PL
 	MDRV_FLOPPY_2_DRIVES_ADD(tiki100_floppy_config)
+	
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(AY8912_TAG, AY8912, 2000000)

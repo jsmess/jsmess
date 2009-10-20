@@ -411,8 +411,8 @@ static TIMER_DEVICE_CALLBACK( einstein_ctc_trigger_callback )
 	/* toggle line status */
 	einstein->ctc_trigger ^= 1;
 
-	z80ctc_trg0_w(einstein->ctc, 0, einstein->ctc_trigger);
-	z80ctc_trg1_w(einstein->ctc, 0, einstein->ctc_trigger);
+	z80ctc_trg0_w(einstein->ctc, einstein->ctc_trigger);
+	z80ctc_trg1_w(einstein->ctc, einstein->ctc_trigger);
 }
 
 
@@ -420,13 +420,13 @@ static TIMER_DEVICE_CALLBACK( einstein_ctc_trigger_callback )
     UART
 ***************************************************************************/
 
-static WRITE8_DEVICE_HANDLER( einstein_serial_transmit_clock )
+static WRITE_LINE_DEVICE_HANDLER( einstein_serial_transmit_clock )
 {
 	const device_config *uart = devtag_get_device(device->machine, IC_I060);
 	msm8251_transmit_clock(uart);
 }
 
-static WRITE8_DEVICE_HANDLER( einstein_serial_receive_clock )
+static WRITE_LINE_DEVICE_HANDLER( einstein_serial_receive_clock )
 {
 	const device_config *uart = devtag_get_device(device->machine, IC_I060);
 	msm8251_receive_clock(uart);
@@ -825,13 +825,13 @@ INPUT_PORTS_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-static const z80ctc_interface einstein_ctc_intf =
+static Z80CTC_INTERFACE( einstein_ctc_intf )
 {
 	0,
-	0,
-	einstein_serial_transmit_clock,
-	einstein_serial_receive_clock,
-	z80ctc_trg3_w
+	DEVCB_NULL,
+	DEVCB_LINE(einstein_serial_transmit_clock),
+	DEVCB_LINE(einstein_serial_receive_clock),
+	DEVCB_LINE(z80ctc_trg3_w)
 };
 
 
