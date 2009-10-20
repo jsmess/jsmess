@@ -1810,6 +1810,8 @@ static WRITE_LINE_DEVICE_HANDLER( mfp_irq_callback )
 	static int prev;
 	if(prev == CLEAR_LINE && state == CLEAR_LINE)  // eliminate unnecessary calls to set the IRQ line for speed reasons
 		return;
+	if(state != CLEAR_LINE)
+		state = HOLD_LINE;  // to get around erroneous spurious interrupt
 //  if((x68k_sys.ioc.irqstatus & 0xc0) != 0)  // if the FDC is busy, then we don't want to miss that IRQ
 //      return;
 	cputag_set_input_line(device->machine, "maincpu", 6, state);
