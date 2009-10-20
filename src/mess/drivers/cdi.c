@@ -2353,6 +2353,12 @@ static mcd212_t mcd212;
 #define MCD212_DDR_FT_BMP2			0x0100	// Bitmap (alt.)
 #define MCD212_DDR_FT_RLE			0x0200	// Run-Length Encoded
 #define MCD212_DDR_FT_MOSAIC		0x0300	// Mosaic
+#define MCD212_DDR_MT				0x0c00	// Mosaic File Type
+#define MCD212_DDR_MT_2				0x0000	// 2x1
+#define MCD212_DDR_MT_4				0x0400	// 4x1
+#define MCD212_DDR_MT_8				0x0800	// 8x1
+#define MCD212_DDR_MT_16			0x0c00	// 16x1
+#define MCD212_DDR_MT_SHIFT			10
 
 static const UINT16 cdi220_lcd_char[20*22] =
 {
@@ -3196,6 +3202,9 @@ static void mcd212_process_vsr(running_machine *machine, int channel, UINT8 *pix
 	UINT8 *clut_r = mcd212.channel[0].clut_r;
 	UINT8 *clut_g = mcd212.channel[0].clut_g;
 	UINT8 *clut_b = mcd212.channel[0].clut_b;
+	UINT8 mosaic_enable = ((mcd212.channel[channel].ddr & MCD212_DDR_FT) == MCD212_DDR_FT_MOSAIC);
+	UINT8 mosaic_factor = 1 << (((mcd212.channel[channel].ddr & MCD212_DDR_MT) >> MCD212_DDR_MT_SHIFT) + 1);
+	int mosaic_index = 0;
 
 	//printf( "vsr before: %08x: ", vsr );
 	//fflush(stdout);
@@ -3216,6 +3225,7 @@ static void mcd212_process_vsr(running_machine *machine, int channel, UINT8 *pix
 		{
 			case MCD212_DDR_FT_BMP:
 			case MCD212_DDR_FT_BMP2:
+			case MCD212_DDR_FT_MOSAIC:
 				if(mcd212.channel[channel].dcr & MCD212_DCR_CM)
 				{
 					// 4-bit Bitmap
@@ -3245,7 +3255,7 @@ static void mcd212_process_vsr(running_machine *machine, int channel, UINT8 *pix
 								bY = bU = bV = 0x80;
 								break;
 						}
-						for(; x < 768; x += 4)
+						for(; x < 768; x += 2)
 						{
             				BYTE68K b0 = byte;
             				BYTE68K bU1 = bU + mcd212_abDeltaUV[b0];
@@ -3272,15 +3282,47 @@ static void mcd212_process_vsr(running_machine *machine, int channel, UINT8 *pix
             				pixels_g[x + 0] = pixels_g[x + 1] = pbLimit[mcd212_abMatrixUG[bU] + mcd212_abMatrixVG[bV]];
             				pixels_b[x + 0] = pixels_b[x + 1] = pbLimit[mcd212_abMatrixUB[bU]];
 
-            				bY = bY1;
+							if(mosaic_enable)
+							{
+								for(mosaic_index = 0; mosaic_index < mosaic_factor; mosaic_index++)
+								{
+									pixels_r[x + 0 + mosaic_index*2] = pixels_r[x + 0];
+									pixels_g[x + 0 + mosaic_index*2] = pixels_g[x + 0];
+									pixels_b[x + 0 + mosaic_index*2] = pixels_b[x + 0];
+									pixels_r[x + 1 + mosaic_index*2] = pixels_r[x + 1];
+									pixels_g[x + 1 + mosaic_index*2] = pixels_g[x + 1];
+									pixels_b[x + 1 + mosaic_index*2] = pixels_b[x + 1];
+								}
+								x += mosaic_factor * 2;
+							}
+							else
+							{
+								x += 2;
+							}
+
+							bY = bY1;
             				bU = bU1;
             				bV = bV1;
 
             				pbLimit = mcd212_abLimit + bY + BYTE68K_MAX;
 
-            				pixels_r[x + 2] = pixels_r[x + 3] = pbLimit[mcd212_abMatrixVR[bV]];
-            				pixels_g[x + 2] = pixels_g[x + 3] = pbLimit[mcd212_abMatrixUG[bU] + mcd212_abMatrixVG[bV]];
-            				pixels_b[x + 2] = pixels_b[x + 3] = pbLimit[mcd212_abMatrixUB[bU]];
+            				pixels_r[x + 0] = pixels_r[x + 1] = pbLimit[mcd212_abMatrixVR[bV]];
+            				pixels_g[x + 0] = pixels_g[x + 1] = pbLimit[mcd212_abMatrixUG[bU] + mcd212_abMatrixVG[bV]];
+            				pixels_b[x + 0] = pixels_b[x + 1] = pbLimit[mcd212_abMatrixUB[bU]];
+
+							if(mosaic_enable)
+							{
+								for(mosaic_index = 0; mosaic_index < mosaic_factor; mosaic_index++)
+								{
+									pixels_r[x + 0 + mosaic_index*2] = pixels_r[x + 0];
+									pixels_g[x + 0 + mosaic_index*2] = pixels_g[x + 0];
+									pixels_b[x + 0 + mosaic_index*2] = pixels_b[x + 0];
+									pixels_r[x + 1 + mosaic_index*2] = pixels_r[x + 1];
+									pixels_g[x + 1 + mosaic_index*2] = pixels_g[x + 1];
+									pixels_b[x + 1 + mosaic_index*2] = pixels_b[x + 1];
+								}
+								x += (mosaic_factor * 2) - 2;
+							}
 
             				byte = data[(vsr & 0x0007ffff) ^ 1];
 
@@ -3299,6 +3341,19 @@ static void mcd212_process_vsr(running_machine *machine, int channel, UINT8 *pix
 							pixels_r[x + 1] = clut_r[clut_entry];
 							pixels_g[x + 1] = clut_g[clut_entry];
 							pixels_b[x + 1] = clut_b[clut_entry];
+							if(mosaic_enable)
+							{
+								for(mosaic_index = 0; mosaic_index < mosaic_factor; mosaic_index++)
+								{
+									pixels_r[x + 0 + mosaic_index*2] = pixels_r[x + 0];
+									pixels_g[x + 0 + mosaic_index*2] = pixels_g[x + 0];
+									pixels_b[x + 0 + mosaic_index*2] = pixels_b[x + 0];
+									pixels_r[x + 1 + mosaic_index*2] = pixels_r[x + 1];
+									pixels_g[x + 1 + mosaic_index*2] = pixels_g[x + 1];
+									pixels_b[x + 1 + mosaic_index*2] = pixels_b[x + 1];
+								}
+								x += (mosaic_factor * 2) - 2;
+							}
 							byte = data[(vsr & 0x0007ffff) ^ 1];
 							vsr++;
 						}
@@ -3310,12 +3365,31 @@ static void mcd212_process_vsr(running_machine *machine, int channel, UINT8 *pix
 						{
 							UINT8 even_entry = BYTE_TO_CLUT(channel, icm, byte >> 4);
 							UINT8 odd_entry = BYTE_TO_CLUT(channel, icm, byte);
-							pixels_r[x + 0] = clut_r[even_entry];
-							pixels_g[x + 0] = clut_g[even_entry];
-							pixels_b[x + 0] = clut_b[even_entry];
-							pixels_r[x + 1] = clut_r[odd_entry];
-							pixels_g[x + 1] = clut_g[odd_entry];
-							pixels_b[x + 1] = clut_b[odd_entry];
+							if(mosaic_enable)
+							{
+								for(mosaic_index = 0; mosaic_index < mosaic_factor; mosaic_index++)
+								{
+									pixels_r[x + mosaic_index] = clut_r[even_entry];
+									pixels_g[x + mosaic_index] = clut_g[even_entry];
+									pixels_b[x + mosaic_index] = clut_b[even_entry];
+								}
+								for(mosaic_index = 0; mosaic_index < mosaic_factor; mosaic_index++)
+								{
+									pixels_r[x + mosaic_factor + mosaic_index] = clut_r[odd_entry];
+									pixels_g[x + mosaic_factor + mosaic_index] = clut_g[odd_entry];
+									pixels_b[x + mosaic_factor + mosaic_index] = clut_b[odd_entry];
+								}
+								x += (mosaic_factor * 2) - 2;
+							}
+							else
+							{
+								pixels_r[x + 0] = clut_r[even_entry];
+								pixels_g[x + 0] = clut_g[even_entry];
+								pixels_b[x + 0] = clut_b[even_entry];
+								pixels_r[x + 1] = clut_r[odd_entry];
+								pixels_g[x + 1] = clut_g[odd_entry];
+								pixels_b[x + 1] = clut_b[odd_entry];
+							}
 							byte = data[(vsr & 0x0007ffff) ^ 1];
 							vsr++;
 						}
@@ -3408,10 +3482,6 @@ static void mcd212_process_vsr(running_machine *machine, int channel, UINT8 *pix
 						}
 					}
 				}
-				break;
-			case MCD212_DDR_FT_MOSAIC:
-				verboselog(machine, 0, "Unsupported display mode: Mosaic\n" );
-				done = 1;
 				break;
 		}
 	}
