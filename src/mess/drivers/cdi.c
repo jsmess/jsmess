@@ -45,7 +45,7 @@ static emu_timer *test_timer;
 
 #define ENABLE_UART_PRINTING (0)
 
-#define VERBOSE_LEVEL	(5)
+#define VERBOSE_LEVEL	(11)
 
 #define ENABLE_VERBOSE_LOG (0)
 
@@ -1353,16 +1353,16 @@ static TIMER_CALLBACK( audio_sample_trigger )
 		cdic_regs.audio_buffer |= 0x8000;
 	}
 
-	// Set the CDIC interrupt line
-	verboselog(machine, 0, "Setting CDIC interrupt line for soundmap decode\n" );
-	cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), M68K_IRQ_4, 128);
-	cputag_set_input_line(machine, "maincpu", M68K_IRQ_4, ASSERT_LINE);
-
 	if(CDIC_IS_VALID_SAMPLE_BUF(cdic_regs.z_buffer & 0x3ffe))
 	{
 		attotime period;
 
 		verboselog(machine, 0, "Hit audio_sample_trigger, with cdic_regs.z_buffer == %04x, calling cdic_decode_audio_sector\n", cdic_regs.z_buffer );
+
+		// Set the CDIC interrupt line
+		verboselog(machine, 0, "Setting CDIC interrupt line for soundmap decode\n" );
+		cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), M68K_IRQ_4, 128);
+		cputag_set_input_line(machine, "maincpu", M68K_IRQ_4, ASSERT_LINE);
 
 		// Decode the data at Z+4, the same offset as a normal CD sector.
 		cdic_decode_audio_sector(machine, ((UINT8*)cdram) + (cdic_regs.z_buffer & 0x3ffe) + 4, 1);
@@ -1385,6 +1385,14 @@ static TIMER_CALLBACK( audio_sample_trigger )
 	}
 	else
 	{
+		// Swap buffer positions to indicate our new buffer position at the next read
+		cdic_regs.z_buffer &= 0xfffe;
+		cdic_regs.z_buffer += 0xa00;
+		if(cdic_regs.z_buffer == 0x3c00)
+		{
+			cdic_regs.z_buffer = 0x2800;
+		}
+
 		cdic_regs.z_buffer &= 0xfffe;
 		verboselog(machine, 0, "Data is not valid, stopping playback\n" );
 		timer_adjust_oneshot(cdic_regs.audio_sample_timer, attotime_never, 0);
@@ -1647,6 +1655,13 @@ static READ16_HANDLER( cdic_r )
 				//printf("Clearing CDIC interrupt line\n" );
 			}
 			cdic_regs.data_buffer &= ~0x4000;
+			if(cdic_regs.data_buffer & 0x8000)
+			{
+				if(cdic_regs.command == 0x2c)
+				{
+					cdic_regs.data_buffer &= ~0x8000;
+				}
+			}
 			return temp;
 		}
 		default:
@@ -1776,7 +1791,6 @@ static WRITE16_HANDLER( cdic_w )
 						break;
 					case 0x2c: // Seek
 						cdic_regs.data_buffer &= 0x7fff;
-						//cdic_regs.x_buffer |= 0x8000;
 						break;
 					default:
 						verboselog(space->machine, 0, "Unknown CDIC command: %02x\n", cdic_regs.command );
@@ -2954,8 +2968,8 @@ static void mcd212_update_region_arrays(running_machine *machine)
 {
 	int x = 0;
 
-	static int latched_rf0 = 1;
-	static int latched_rf1 = 1;
+	static int latched_rf0 = 0;
+	static int latched_rf1 = 0;
 	static int latched_wfa = 0;
 	static int latched_wfb = 0;
 	latched_wfa = mcd212.channel[0].weight_factor_a[0];
@@ -3514,10 +3528,10 @@ static void mcd212_mix_lines(running_machine *machine, UINT8 *plane_a_r, UINT8 *
 					plane_enable_a = mcd212.region_flag_1[x];
 					break;
 				case 5:
-					plane_enable_a = (plane_a_r_cur != transparent_color_a_r || plane_a_g_cur != transparent_color_a_g || plane_a_b_cur != transparent_color_a_b || mcd212.region_flag_0[x] == 0);
+					plane_enable_a = (plane_a_r_cur != transparent_color_a_r || plane_a_g_cur != transparent_color_a_g || plane_a_b_cur != transparent_color_a_b || mcd212.region_flag_0[x] == 1);
 					break;
 				case 6:
-					plane_enable_a = (plane_a_r_cur != transparent_color_a_r || plane_a_g_cur != transparent_color_a_g || plane_a_b_cur != transparent_color_a_b || mcd212.region_flag_1[x] == 1);
+					plane_enable_a = (plane_a_r_cur != transparent_color_a_r || plane_a_g_cur != transparent_color_a_g || plane_a_b_cur != transparent_color_a_b || mcd212.region_flag_1[x] == 0);
 					break;
 				case 8:
 					plane_enable_a = 1;
