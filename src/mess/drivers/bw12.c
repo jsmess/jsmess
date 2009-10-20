@@ -718,27 +718,15 @@ static MACHINE_RESET( bw12 )
 	}
 }
 
-static FLOPPY_OPTIONS_START(bw12)
+static FLOPPY_OPTIONS_START( bw12 )
 	FLOPPY_OPTION(bw12, "dsk", "180KB BW 12 SSDD", basicdsk_identify_default, basicdsk_construct_default,
 		HEADS([1])
 		TRACKS([40])
 		SECTORS([18])
 		SECTOR_LENGTH([256])
 		FIRST_SECTOR_ID([0]))
-	FLOPPY_OPTION(bw12, "dsk", "360KB BW 14 DSDD", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([2])
-		TRACKS([40])
-		SECTORS([18])
-		SECTOR_LENGTH([256])
-		FIRST_SECTOR_ID([0]))
 	FLOPPY_OPTION(bw12, "dsk", "SVI-328 SSDD", basicdsk_identify_default, basicdsk_construct_default,
 		HEADS([1])
-		TRACKS([40])
-		SECTORS([17])
-		SECTOR_LENGTH([256])
-		FIRST_SECTOR_ID([0]))
-	FLOPPY_OPTION(bw12, "dsk", "SVI-328 DSDD", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([2])
 		TRACKS([40])
 		SECTORS([17])
 		SECTOR_LENGTH([256])
@@ -758,13 +746,59 @@ static const floppy_config bw12_floppy_config =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	FLOPPY_DRIVE_DS_80,
+	FLOPPY_DRIVE_SS_80,
 	FLOPPY_OPTIONS_NAME(bw12),
 	DO_NOT_KEEP_GEOMETRY
 };
 
+static FLOPPY_OPTIONS_START( bw14 )
+	FLOPPY_OPTION(bw14, "dsk", "180KB BW 12 SSDD", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([1])
+		TRACKS([40])
+		SECTORS([18])
+		SECTOR_LENGTH([256])
+		FIRST_SECTOR_ID([0]))
+	FLOPPY_OPTION(bw14, "dsk", "360KB BW 14 DSDD", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([40])
+		SECTORS([18])
+		SECTOR_LENGTH([256])
+		FIRST_SECTOR_ID([0]))
+	FLOPPY_OPTION(bw14, "dsk", "SVI-328 SSDD", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([1])
+		TRACKS([40])
+		SECTORS([17])
+		SECTOR_LENGTH([256])
+		FIRST_SECTOR_ID([0]))
+	FLOPPY_OPTION(bw14, "dsk", "SVI-328 DSDD", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([40])
+		SECTORS([17])
+		SECTOR_LENGTH([256])
+		FIRST_SECTOR_ID([0]))
+	FLOPPY_OPTION(bw14, "dsk", "Kaypro II SSDD", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([1])
+		TRACKS([40])
+		SECTORS([10])
+		SECTOR_LENGTH([512])
+		FIRST_SECTOR_ID([0]))
+FLOPPY_OPTIONS_END
+
+
+static const floppy_config bw14_floppy_config =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(bw14),
+	DO_NOT_KEEP_GEOMETRY
+};
+
 /* Machine Driver */
-static MACHINE_DRIVER_START( bw12 )
+static MACHINE_DRIVER_START( common )
 	MDRV_DRIVER_DATA(bw12_state)
 
 	/* basic machine hardware */
@@ -806,19 +840,27 @@ static MACHINE_DRIVER_START( bw12 )
 
 	/* printer */
 	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, bw12_centronics_intf)
+MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( bw12 )
+	MDRV_IMPORT_FROM(common)
+
+	/* floppy drives */
 	MDRV_FLOPPY_2_DRIVES_ADD(bw12_floppy_config)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("64K")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( bw14 )
-	MDRV_IMPORT_FROM(bw12)
-	
+	MDRV_IMPORT_FROM(common)
+
+	/* floppy drives */
+	MDRV_FLOPPY_2_DRIVES_ADD(bw14_floppy_config)
+
 	/* internal ram */
-	MDRV_RAM_MODIFY("messram")
+	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("128K")
 MACHINE_DRIVER_END
 

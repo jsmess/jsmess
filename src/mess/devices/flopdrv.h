@@ -20,6 +20,8 @@
 typedef enum
 {
 	FLOPPY_DRIVE_SS_40,
+	FLOPPY_DRIVE_DS_40,
+	FLOPPY_DRIVE_SS_80,
 	FLOPPY_DRIVE_DS_80
 } floppy_type;
 

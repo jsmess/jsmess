@@ -251,7 +251,17 @@ void floppy_drive_set_geometry(const device_config *img, floppy_type type)
 		num_sides = 1;
 		break;
 
-	case FLOPPY_DRIVE_DS_80:
+	case FLOPPY_DRIVE_DS_40:	/* double sided, 40 track drive */
+		max_track = 42;
+		num_sides = 2;
+		break;
+
+	case FLOPPY_DRIVE_SS_80:	/* single sided, 80 track drive */
+		max_track = 83;
+		num_sides = 1;
+		break;
+
+	case FLOPPY_DRIVE_DS_80:	/* double sided, 80 track drive */
 		max_track = 83;
 		num_sides = 2;
 		break;
