@@ -437,5 +437,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( ????, fk1,  0,       0, 	fk1, 	fk1, 	 0,  	  0,  	 "Statni statek Klicany",   "FK-1",		GAME_NOT_WORKING)
+COMP( 1989, fk1,  0,       0, 	fk1, 	fk1, 	 0,  	  0,  	 "Statni statek Klicany",   "FK-1",		GAME_NOT_WORKING)
 

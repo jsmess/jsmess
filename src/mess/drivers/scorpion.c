@@ -417,7 +417,7 @@ ROM_START( kay1024 )
 ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT       INIT    CONFIG      COMPANY     FULLNAME */
-COMP( ????, scorpion, spec128,	 0,		scorpion,	spec_plus,	0,		0,	"Zonov and Co.",		"Zs Scorpion 256", GAME_NOT_WORKING )
-COMP( ????, profi, 	  spec128,	 0,		scorpion,	spec_plus,	0,		0,	"",		"Profi", GAME_NOT_WORKING )
-COMP( ????, kay1024,  spec128,	 0,		scorpion,	spec_plus,	0,		0,	"",		"Kay 1024", GAME_NOT_WORKING )
+COMP( 1994, scorpion, spec128,	 0,		scorpion,	spec_plus,	0,		0,	"Zonov and Co.",		"Scorpion ZS-256", GAME_NOT_WORKING )
+COMP( 1991, profi, 	  spec128,	 0,		scorpion,	spec_plus,	0,		0,	"Kondor and Kramis",		"Profi", GAME_NOT_WORKING )
+COMP( 1998, kay1024,  spec128,	 0,		scorpion,	spec_plus,	0,		0,	"NEMO",		"Kay 1024", GAME_NOT_WORKING )
 COMP( ????, quorum,   spec128,	 0,		scorpion,	spec_plus,	0,		0,	"",		"Quorum", GAME_NOT_WORKING )

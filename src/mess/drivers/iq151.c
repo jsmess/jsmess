@@ -77,5 +77,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( ????, iq151,  0,       0, 	iq151, 	iq151, 	 0,  	  0,  	 "ZPA Novy Bor",   "IQ-151",		GAME_NOT_WORKING)
+COMP( 198?, iq151,  0,       0, 	iq151, 	iq151, 	 0,  	  0,  	 "ZPA Novy Bor",   "IQ-151",		GAME_NOT_WORKING)
 

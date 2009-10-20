@@ -560,11 +560,16 @@ MACHINE_DRIVER_END
 ROM_START( qx10 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "qx10boot.bin", 0x0000, 0x0800, CRC(f8dfcba5) SHA1(a7608f8aa7da355dcaf257ee28b66ded8974ce3a))
+	
+	/* This is probably the i8039 program ROM for the Q10MF Multifont card, and the actual font ROMs are missing (6 * HM43128) */
 	/* The first part of this rom looks like code for an embedded controller?
         From 8300 on, looks like a characters generator */
-	ROM_LOAD( "mfboard.bin", 0x8000, 0x0800, CRC(fa27f333) SHA1(73d27084ca7b002d5f370220d8da6623a6e82132))
+	ROM_REGION( 0x800, "i8039", 0 )
+	ROM_LOAD( "m12020a.3e", 0x0000, 0x0800, CRC(fa27f333) SHA1(73d27084ca7b002d5f370220d8da6623a6e82132))
+	
 	/* This rom looks like a character generator */
-	ROM_LOAD( "qge.bin", 0x8800, 0x0800, CRC(ed93cb81) SHA1(579e68bde3f4184ded7d89b72c6936824f48d10b))
+	ROM_REGION( 0x800, "chargen", 0 )
+	ROM_LOAD( "qge.2e", 0x0000, 0x0800, CRC(ed93cb81) SHA1(579e68bde3f4184ded7d89b72c6936824f48d10b))
 ROM_END
 
 /* Driver */
@@ -593,4 +598,4 @@ static DRIVER_INIT(qx10)
 }
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( ????, qx10,  0,       0, 	qx10, 	qx10, 	 qx10,  	  0,  	 "Epson",   "QX-10",		GAME_NOT_WORKING)
+COMP( 1983, qx10,  0,       0, 	qx10, 	qx10, 	 qx10,  	  0,  	 "Epson",   "QX-10",		GAME_NOT_WORKING)

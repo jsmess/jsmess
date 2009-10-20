@@ -568,5 +568,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( ????, pyl601,  0,       0, 	pyl601, 	pyl601, pyl601,  	  0,  	 "Mikroelektronika",   "Pyldin-601",		GAME_NOT_WORKING)
-COMP( ????, pyl601a, pyl601,  0, 	pyl601a, 	pyl601, pyl601,  	  0,  	 "Mikroelektronika",   "Pyldin-601A",		GAME_NOT_WORKING)
+COMP( 1989, pyl601,  0,       0, 	pyl601, 	pyl601, pyl601,  	  0,  	 "Mikroelektronika",   "Pyldin-601",		GAME_NOT_WORKING)
+COMP( 1989, pyl601a, pyl601,  0, 	pyl601a, 	pyl601, pyl601,  	  0,  	 "Mikroelektronika",   "Pyldin-601A",		GAME_NOT_WORKING)

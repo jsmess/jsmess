@@ -159,6 +159,6 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( ????, mc8020, 0,       0, 		mc8020, mc80, 	 0,  	  0,  	 "VEB Elektronik Gera",   "MC-80.21/22",		GAME_NOT_WORKING)
-COMP( ????, mc8030, mc8020,  0, 		mc8030,	mc80, 	 0,  	  0,  	 "VEB Elektronik Gera",   "MC-80.30/31",		GAME_NOT_WORKING)
+COMP( 198?, mc8020, 0,       0, 		mc8020, mc80, 	 0,  	  0,  	 "VEB Elektronik Gera",   "MC-80.21/22",		GAME_NOT_WORKING)
+COMP( 198?, mc8030, mc8020,  0, 		mc8030,	mc80, 	 0,  	  0,  	 "VEB Elektronik Gera",   "MC-80.30/31",		GAME_NOT_WORKING)
 
