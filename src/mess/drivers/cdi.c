@@ -45,7 +45,7 @@ static emu_timer *test_timer;
 
 #define ENABLE_UART_PRINTING (0)
 
-#define VERBOSE_LEVEL	(11)
+#define VERBOSE_LEVEL	(6)
 
 #define ENABLE_VERBOSE_LOG (0)
 
@@ -1491,7 +1491,10 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 				//}
 				//else
 				//{
-					//cdic_regs.data_buffer |= 0x0004;
+					if(cdic_regs.audio_channel & (1 << buffer[CDIC_SECTOR_CHAN2]))
+					{
+						cdic_regs.data_buffer |= 0x0004;
+					}
 					cdic_regs.data_buffer ^= 0x0001;
 					for(index = 6; index < 2352/2; index++)
 					{
@@ -2364,6 +2367,12 @@ static mcd212_t mcd212;
 #define MCD212_DDR_FT_BMP2			0x0100	// Bitmap (alt.)
 #define MCD212_DDR_FT_RLE			0x0200	// Run-Length Encoded
 #define MCD212_DDR_FT_MOSAIC		0x0300	// Mosaic
+#define MCD212_DDR_MT				0x0c00	// Mosaic File Type
+#define MCD212_DDR_MT_2				0x0000	// 2x1
+#define MCD212_DDR_MT_4				0x0400	// 4x1
+#define MCD212_DDR_MT_8				0x0800	// 8x1
+#define MCD212_DDR_MT_16			0x0c00	// 16x1
+#define MCD212_DDR_MT_SHIFT			10
 
 static const UINT16 cdi220_lcd_char[20*22] =
 {
@@ -3202,6 +3211,9 @@ static void mcd212_process_vsr(running_machine *machine, int channel, UINT8 *pix
 	UINT8 *clut_r = mcd212.channel[0].clut_r;
 	UINT8 *clut_g = mcd212.channel[0].clut_g;
 	UINT8 *clut_b = mcd212.channel[0].clut_b;
+	UINT8 mosaic_enable = ((mcd212.channel[channel].ddr & MCD212_DDR_FT) == MCD212_DDR_FT_MOSAIC);
+	UINT8 mosaic_factor = 1 << (((mcd212.channel[channel].ddr & MCD212_DDR_MT) >> MCD212_DDR_MT_SHIFT) + 1);
+	int mosaic_index = 0;
 
 	//printf( "vsr before: %08x: ", vsr );
 	//fflush(stdout);
@@ -3222,6 +3234,7 @@ static void mcd212_process_vsr(running_machine *machine, int channel, UINT8 *pix
 		{
 			case MCD212_DDR_FT_BMP:
 			case MCD212_DDR_FT_BMP2:
+			case MCD212_DDR_FT_MOSAIC:
 				if(mcd212.channel[channel].dcr & MCD212_DCR_CM)
 				{
 					// 4-bit Bitmap
@@ -3251,7 +3264,7 @@ static void mcd212_process_vsr(running_machine *machine, int channel, UINT8 *pix
 								bY = bU = bV = 0x80;
 								break;
 						}
-						for(; x < 768; x += 4)
+						for(; x < 768; x += 2)
 						{
             				BYTE68K b0 = byte;
             				BYTE68K bU1 = bU + mcd212_abDeltaUV[b0];
@@ -3278,15 +3291,47 @@ static void mcd212_process_vsr(running_machine *machine, int channel, UINT8 *pix
             				pixels_g[x + 0] = pixels_g[x + 1] = pbLimit[mcd212_abMatrixUG[bU] + mcd212_abMatrixVG[bV]];
             				pixels_b[x + 0] = pixels_b[x + 1] = pbLimit[mcd212_abMatrixUB[bU]];
 
+							if(mosaic_enable)
+							{
+								for(mosaic_index = 0; mosaic_index < mosaic_factor; mosaic_index++)
+								{
+									pixels_r[x + 0 + mosaic_index*2] = pixels_r[x + 0];
+									pixels_g[x + 0 + mosaic_index*2] = pixels_g[x + 0];
+									pixels_b[x + 0 + mosaic_index*2] = pixels_b[x + 0];
+									pixels_r[x + 1 + mosaic_index*2] = pixels_r[x + 1];
+									pixels_g[x + 1 + mosaic_index*2] = pixels_g[x + 1];
+									pixels_b[x + 1 + mosaic_index*2] = pixels_b[x + 1];
+								}
+								x += mosaic_factor * 2;
+							}
+							else
+							{
+								x += 2;
+							}
+
             				bY = bY1;
             				bU = bU1;
             				bV = bV1;
 
             				pbLimit = mcd212_abLimit + bY + BYTE68K_MAX;
 
-            				pixels_r[x + 2] = pixels_r[x + 3] = pbLimit[mcd212_abMatrixVR[bV]];
-            				pixels_g[x + 2] = pixels_g[x + 3] = pbLimit[mcd212_abMatrixUG[bU] + mcd212_abMatrixVG[bV]];
-            				pixels_b[x + 2] = pixels_b[x + 3] = pbLimit[mcd212_abMatrixUB[bU]];
+            				pixels_r[x + 0] = pixels_r[x + 1] = pbLimit[mcd212_abMatrixVR[bV]];
+            				pixels_g[x + 0] = pixels_g[x + 1] = pbLimit[mcd212_abMatrixUG[bU] + mcd212_abMatrixVG[bV]];
+            				pixels_b[x + 0] = pixels_b[x + 1] = pbLimit[mcd212_abMatrixUB[bU]];
+
+							if(mosaic_enable)
+							{
+								for(mosaic_index = 0; mosaic_index < mosaic_factor; mosaic_index++)
+								{
+									pixels_r[x + 0 + mosaic_index*2] = pixels_r[x + 0];
+									pixels_g[x + 0 + mosaic_index*2] = pixels_g[x + 0];
+									pixels_b[x + 0 + mosaic_index*2] = pixels_b[x + 0];
+									pixels_r[x + 1 + mosaic_index*2] = pixels_r[x + 1];
+									pixels_g[x + 1 + mosaic_index*2] = pixels_g[x + 1];
+									pixels_b[x + 1 + mosaic_index*2] = pixels_b[x + 1];
+								}
+								x += (mosaic_factor * 2) - 2;
+							}
 
             				byte = data[(vsr & 0x0007ffff) ^ 1];
 
@@ -3305,6 +3350,19 @@ static void mcd212_process_vsr(running_machine *machine, int channel, UINT8 *pix
 							pixels_r[x + 1] = clut_r[clut_entry];
 							pixels_g[x + 1] = clut_g[clut_entry];
 							pixels_b[x + 1] = clut_b[clut_entry];
+							if(mosaic_enable)
+							{
+								for(mosaic_index = 0; mosaic_index < mosaic_factor; mosaic_index++)
+								{
+									pixels_r[x + 0 + mosaic_index*2] = pixels_r[x + 0];
+									pixels_g[x + 0 + mosaic_index*2] = pixels_g[x + 0];
+									pixels_b[x + 0 + mosaic_index*2] = pixels_b[x + 0];
+									pixels_r[x + 1 + mosaic_index*2] = pixels_r[x + 1];
+									pixels_g[x + 1 + mosaic_index*2] = pixels_g[x + 1];
+									pixels_b[x + 1 + mosaic_index*2] = pixels_b[x + 1];
+								}
+								x += (mosaic_factor * 2) - 2;
+							}
 							byte = data[(vsr & 0x0007ffff) ^ 1];
 							vsr++;
 						}
@@ -3316,12 +3374,31 @@ static void mcd212_process_vsr(running_machine *machine, int channel, UINT8 *pix
 						{
 							UINT8 even_entry = BYTE_TO_CLUT(channel, icm, byte >> 4);
 							UINT8 odd_entry = BYTE_TO_CLUT(channel, icm, byte);
-							pixels_r[x + 0] = clut_r[even_entry];
-							pixels_g[x + 0] = clut_g[even_entry];
-							pixels_b[x + 0] = clut_b[even_entry];
-							pixels_r[x + 1] = clut_r[odd_entry];
-							pixels_g[x + 1] = clut_g[odd_entry];
-							pixels_b[x + 1] = clut_b[odd_entry];
+							if(mosaic_enable)
+							{
+								for(mosaic_index = 0; mosaic_index < mosaic_factor; mosaic_index++)
+								{
+									pixels_r[x + mosaic_index] = clut_r[even_entry];
+									pixels_g[x + mosaic_index] = clut_g[even_entry];
+									pixels_b[x + mosaic_index] = clut_b[even_entry];
+								}
+								for(mosaic_index = 0; mosaic_index < mosaic_factor; mosaic_index++)
+								{
+									pixels_r[x + mosaic_factor + mosaic_index] = clut_r[odd_entry];
+									pixels_g[x + mosaic_factor + mosaic_index] = clut_g[odd_entry];
+									pixels_b[x + mosaic_factor + mosaic_index] = clut_b[odd_entry];
+								}
+								x += (mosaic_factor * 2) - 2;
+							}
+							else
+							{
+								pixels_r[x + 0] = clut_r[even_entry];
+								pixels_g[x + 0] = clut_g[even_entry];
+								pixels_b[x + 0] = clut_b[even_entry];
+								pixels_r[x + 1] = clut_r[odd_entry];
+								pixels_g[x + 1] = clut_g[odd_entry];
+								pixels_b[x + 1] = clut_b[odd_entry];
+							}
 							byte = data[(vsr & 0x0007ffff) ^ 1];
 							vsr++;
 						}
@@ -3415,10 +3492,14 @@ static void mcd212_process_vsr(running_machine *machine, int channel, UINT8 *pix
 					}
 				}
 				break;
-			case MCD212_DDR_FT_MOSAIC:
+				/*
 				verboselog(machine, 0, "Unsupported display mode: Mosaic\n" );
+				memset(pixels_r, 0x10, 768);
+				memset(pixels_g, 0x10, 768);
+				memset(pixels_b, 0x10, 768);
 				done = 1;
 				break;
+				*/
 		}
 	}
 
@@ -3489,6 +3570,8 @@ static void mcd212_mix_lines(running_machine *machine, UINT8 *plane_a_r, UINT8 *
 	UINT8 transparent_color_b_r = (UINT8)(mcd212.channel[1].transparent_color_b >> 16);
 	UINT8 transparent_color_b_g = (UINT8)(mcd212.channel[1].transparent_color_b >>  8);
 	UINT8 transparent_color_b_b = (UINT8)(mcd212.channel[1].transparent_color_b >>  0);
+	UINT8 dyuv_enable_a = (mcd212.channel[0].image_coding_method & 0x0000000f) == 5;
+	UINT8 dyuv_enable_b = ((mcd212.channel[0].image_coding_method >> 8) & 0x0000000f) == 5;
 	UINT8 mosaic_enable_a = (mcd212.channel[0].mosaic_hold_a & 0x800000) >> 23;
 	UINT8 mosaic_enable_b = (mcd212.channel[1].mosaic_hold_b & 0x800000) >> 23;
 	UINT8 mosaic_count_a = (mcd212.channel[0].mosaic_hold_a & 0x0000ff) << 1;
@@ -3519,7 +3602,7 @@ static void mcd212_mix_lines(running_machine *machine, UINT8 *plane_a_r, UINT8 *
 					plane_enable_a = 0;
 					break;
 				case 1:
-					plane_enable_a = (plane_a_r_cur != transparent_color_a_r || plane_a_g_cur != transparent_color_a_g || plane_a_b_cur != transparent_color_a_b);
+					plane_enable_a = (plane_a_r_cur != transparent_color_a_r || plane_a_g_cur != transparent_color_a_g || plane_a_b_cur != transparent_color_a_b) || dyuv_enable_a;
 					break;
 				case 3:
 					plane_enable_a = mcd212.region_flag_0[x];
@@ -3528,16 +3611,16 @@ static void mcd212_mix_lines(running_machine *machine, UINT8 *plane_a_r, UINT8 *
 					plane_enable_a = mcd212.region_flag_1[x];
 					break;
 				case 5:
-					plane_enable_a = (plane_a_r_cur != transparent_color_a_r || plane_a_g_cur != transparent_color_a_g || plane_a_b_cur != transparent_color_a_b || mcd212.region_flag_0[x] == 1);
+					plane_enable_a = (plane_a_r_cur != transparent_color_a_r || plane_a_g_cur != transparent_color_a_g || plane_a_b_cur != transparent_color_a_b || dyuv_enable_a || mcd212.region_flag_0[x] == 1);
 					break;
 				case 6:
-					plane_enable_a = (plane_a_r_cur != transparent_color_a_r || plane_a_g_cur != transparent_color_a_g || plane_a_b_cur != transparent_color_a_b || mcd212.region_flag_1[x] == 0);
+					plane_enable_a = (plane_a_r_cur != transparent_color_a_r || plane_a_g_cur != transparent_color_a_g || plane_a_b_cur != transparent_color_a_b || dyuv_enable_a || mcd212.region_flag_1[x] == 1);
 					break;
 				case 8:
 					plane_enable_a = 1;
 					break;
 				case 9:
-					plane_enable_a = (plane_a_r_cur == transparent_color_a_r && plane_a_g_cur == transparent_color_a_g && plane_a_b_cur == transparent_color_a_b);
+					plane_enable_a = (plane_a_r_cur == transparent_color_a_r && plane_a_g_cur == transparent_color_a_g && plane_a_b_cur == transparent_color_a_b) || dyuv_enable_a;
 					break;
 				case 11:
 					plane_enable_a = !mcd212.region_flag_0[x];
@@ -3546,10 +3629,10 @@ static void mcd212_mix_lines(running_machine *machine, UINT8 *plane_a_r, UINT8 *
 					plane_enable_a = !mcd212.region_flag_1[x];
 					break;
 				case 13:
-					plane_enable_a = (plane_a_r_cur == transparent_color_a_r && plane_a_g_cur == transparent_color_a_g && plane_a_b_cur == transparent_color_a_b && mcd212.region_flag_0[x] == 0);
+					plane_enable_a = (plane_a_r_cur == transparent_color_a_r && plane_a_g_cur == transparent_color_a_g && plane_a_b_cur == transparent_color_a_b) || dyuv_enable_a || mcd212.region_flag_0[x] == 0;
 					break;
 				case 14:
-					plane_enable_a = (plane_a_r_cur == transparent_color_a_r && plane_a_g_cur == transparent_color_a_g && plane_a_b_cur == transparent_color_a_b && mcd212.region_flag_1[x] == 0);
+					plane_enable_a = (plane_a_r_cur == transparent_color_a_r && plane_a_g_cur == transparent_color_a_g && plane_a_b_cur == transparent_color_a_b) || dyuv_enable_a || mcd212.region_flag_1[x] == 0;
 					break;
 				default:
 					verboselog(machine, 0, "Unhandled transparency mode for plane A: %d\n", transparency_mode_a);
@@ -3562,7 +3645,7 @@ static void mcd212_mix_lines(running_machine *machine, UINT8 *plane_a_r, UINT8 *
 					plane_enable_b = 0;
 					break;
 				case 1:
-					plane_enable_b = (plane_b_r_cur != transparent_color_b_r || plane_b_g_cur != transparent_color_b_g || plane_b_b_cur != transparent_color_b_b);
+					plane_enable_b = (plane_b_r_cur != transparent_color_b_r || plane_b_g_cur != transparent_color_b_g || plane_b_b_cur != transparent_color_b_b) || dyuv_enable_b;
 					break;
 				case 3:
 					plane_enable_b = mcd212.region_flag_0[x];
@@ -3571,16 +3654,16 @@ static void mcd212_mix_lines(running_machine *machine, UINT8 *plane_a_r, UINT8 *
 					plane_enable_b = mcd212.region_flag_1[x];
 					break;
 				case 5:
-					plane_enable_b = (plane_b_r_cur != transparent_color_b_r || plane_b_g_cur != transparent_color_b_g || plane_b_b_cur != transparent_color_b_b || mcd212.region_flag_0[x] == 1);
+					plane_enable_b = (plane_b_r_cur != transparent_color_b_r || plane_b_g_cur != transparent_color_b_g || plane_b_b_cur != transparent_color_b_b || dyuv_enable_b || mcd212.region_flag_0[x] == 1);
 					break;
 				case 6:
-					plane_enable_b = (plane_b_r_cur != transparent_color_b_r || plane_b_g_cur != transparent_color_b_g || plane_b_b_cur != transparent_color_b_b || mcd212.region_flag_1[x] == 1);
+					plane_enable_b = (plane_b_r_cur != transparent_color_b_r || plane_b_g_cur != transparent_color_b_g || plane_b_b_cur != transparent_color_b_b || dyuv_enable_b || mcd212.region_flag_1[x] == 1);
 					break;
 				case 8:
 					plane_enable_b = 1;
 					break;
 				case 9:
-					plane_enable_b = (plane_b_r_cur == transparent_color_b_r && plane_b_g_cur == transparent_color_b_g && plane_b_b_cur == transparent_color_b_b);
+					plane_enable_b = (plane_b_r_cur == transparent_color_b_r && plane_b_g_cur == transparent_color_b_g && plane_b_b_cur == transparent_color_b_b) || dyuv_enable_b;
 					break;
 				case 11:
 					plane_enable_b = !mcd212.region_flag_0[x];
@@ -3589,10 +3672,10 @@ static void mcd212_mix_lines(running_machine *machine, UINT8 *plane_a_r, UINT8 *
 					plane_enable_b = !mcd212.region_flag_1[x];
 					break;
 				case 13:
-					plane_enable_b = (plane_b_r_cur == transparent_color_b_r && plane_b_g_cur == transparent_color_b_g && plane_b_b_cur == transparent_color_b_b && mcd212.region_flag_0[x] == 0);
+					plane_enable_b = (plane_b_r_cur == transparent_color_b_r && plane_b_g_cur == transparent_color_b_g && plane_b_b_cur == transparent_color_b_b) || dyuv_enable_b || mcd212.region_flag_0[x] == 0;
 					break;
 				case 14:
-					plane_enable_b = (plane_b_r_cur == transparent_color_b_r && plane_b_g_cur == transparent_color_b_g && plane_b_b_cur == transparent_color_b_b && mcd212.region_flag_1[x] == 0);
+					plane_enable_b = (plane_b_r_cur == transparent_color_b_r && plane_b_g_cur == transparent_color_b_g && plane_b_b_cur == transparent_color_b_b) || dyuv_enable_b || mcd212.region_flag_1[x] == 0;
 					break;
 				default:
 					verboselog(machine, 0, "Unhandled transparency mode for plane B: %d\n", transparency_mode_b);
