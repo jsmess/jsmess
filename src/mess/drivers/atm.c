@@ -136,7 +136,7 @@ MACHINE_DRIVER_END
 
 ***************************************************************************/
 
-ROM_START(atm)
+ROM_START( atm )
 	ROM_REGION(0x020000, "maincpu", ROMREGION_ERASEFF)
 	ROM_SYSTEM_BIOS(0, "v1", "v.1.03")
 	ROMX_LOAD( "atm103.rom", 0x010000, 0x10000, CRC(4912e249) SHA1(a4adff05bb215dd126c47201b36956115b8fed76), ROM_BIOS(1))
@@ -153,7 +153,7 @@ ROM_START(atm)
   	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
-ROM_START(atm2)
+ROM_START( atmtb2 )
 	ROM_REGION(0x020000, "maincpu", ROMREGION_ERASEFF)
 	ROM_SYSTEM_BIOS(0, "v1", "v.1.07.12 joined")
 	ROMX_LOAD( "atmtb2.rom",   0x010000, 0x10000,CRC(05218c26) SHA1(71ed9864e7aa85131de97cf1e53dc152e7c79488), ROM_BIOS(1))
@@ -177,5 +177,7 @@ ROM_START(atm2)
 ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT       INIT    CONFIG      COMPANY     FULLNAME */
-COMP( ????, atm, 	spec128,	0,		atm,	spec_plus,	0,		0,	"MicroArt",		"ATM", GAME_NOT_WORKING)
-COMP( ????, atm2, 	spec128,	0,		atm,	spec_plus,	0,		0,	"MicroArt",		"ATM Turbo 2", GAME_NOT_WORKING)
+COMP( 1991, atm, 	spec128,	0,		atm,	spec_plus,	0,		0,	"MicroART",		"ATM", GAME_NOT_WORKING)
+//COMP( 1991, atmtb1, 	spec128,	0,		atm,	spec_plus,	0,		0,	"MicroART",		"ATM-turbo1", GAME_NOT_WORKING)
+COMP( 1993, atmtb2, spec128,	0,		atm,	spec_plus,	0,		0,	"MicroART",		"ATM-turbo2", GAME_NOT_WORKING)
+//COMP( 1994, turbo2, spec128,	0,		atm,	spec_plus,	0,		0,	"MicroART",		"TURBO 2+", GAME_NOT_WORKING)

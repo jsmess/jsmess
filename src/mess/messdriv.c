@@ -589,7 +589,7 @@ const game_driver * const drivers[] =
     DRIVER( pentagon )
     DRIVER( pent1024 )
     DRIVER( atm )
-    DRIVER( atm2 )
+    DRIVER( atmtb2 )
 
     DRIVER( ql )        /* 1984 Sinclair QL (UK)                            */
     DRIVER( ql_us )     /* 1984 Sinclair QL (USA)                           */
