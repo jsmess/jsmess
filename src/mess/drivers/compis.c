@@ -33,6 +33,7 @@
 
 #include "driver.h"
 #include "cpu/i86/i86.h"
+#include "cpu/mcs48/mcs48.h"
 #include "machine/i8255a.h"
 #include "machine/ctronics.h"
 #include "includes/compis.h"
@@ -99,6 +100,13 @@ static ADDRESS_MAP_START( compis_io, ADDRESS_SPACE_IO, 16 )
 //{ 0x0370, 0x037e, compis_null_r },    /* J9 CS1 (8-bit)       */
 //{ 0x0371, 0x037f, compis_null_r },    /* J9 CS1 (8-bit)       */
 //{ 0xff20, 0xffff, compis_null_r },    /* CPU 80186            */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( keyboard_io, ADDRESS_SPACE_IO, 8 )
+//	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) 
+//	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) 
+//	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) 
+//	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) 
 ADDRESS_MAP_END
 
 /* COMPIS Keyboard */
@@ -267,6 +275,9 @@ static MACHINE_DRIVER_START( compis )
 	MDRV_CPU_IO_MAP(compis_io)
 	MDRV_CPU_VBLANK_INT("screen", compis_vblank_int)
 	MDRV_CPU_CONFIG(i86_address_mask)
+
+	MDRV_CPU_ADD("i8749", I8749, 1000000)
+	MDRV_CPU_IO_MAP(keyboard_io)
 
 	MDRV_QUANTUM_TIME(HZ(60))
 
