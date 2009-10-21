@@ -1,33 +1,29 @@
 /*
-    This 1980s computer was manufactured by Vtech of Hong Kong.
-    known as: creatiVision, Dick Smith Wizzard, Funvision, Hanimex Ramses, Laser2001 and possibly others.
+	This 1980s computer was manufactured by Vtech of Hong Kong.
+	known as: CreatiVision, Dick Smith Wizzard, Funvision, Rameses, VZ 2000 and possibly others.
 
-    There is also a CreatiVision Mk 2, possibly also known as the Laser 500. This was a proper computer,
-    containing a CreatiVision cartridge slot.
+	There is also a CreatiVision Mk 2, possibly also known as the Laser 500. This was a hardware variant,
+	sort of "evolved" hardware made compatible for the scheduled "ColecoVision expansion module", which
+	never actually shipped for CreatiVision, but for the Laser 2001 home computer (successor to
+	CreatiVision).
 
-    NOTE:
+	NOTE:
 
-    If you find that the keys R,D,F,G are not working while using the BASIC cartridge,
-    please remap the Joystick 2 keys to somewhere else. By default they overlap those keys.
+	If you find that the keys R,D,F,G are not working while using the BASIC cartridge,
+	please remap the Joystick 2 keys to somewhere else. By default they overlap those keys.
 
     TODO:
 
-    - BASIC v1,v2 numbers are invisible
-    - proper keyboard emulation, need keyboard schematics
-    - memory expansion 16K/32K, can be chained
-    - centronics control/status port
-    - convert to use new cartridge system
-    - non-working cartridges:
-        * Deep Sea Adventure (6K)
-        * Locomotive (10K)
-        * Planet Defender (6K)
-        * Tennis (Dick Smith 6K)
-        * Tennis (Wimbledon 6K)
-    - homebrew roms with graphics issues:
-        * Christmas Demo 1.0
-        * Titanic Frogger Demo 1.0
-        * Titanic Frogger Demo 1.1
-
+	- fix Diagnostic A (video) sprites generator test
+	- proper keyboard emulation, need keyboard schematics
+	- memory expansion 16K, can be chained
+	- centronics control/status port
+	- non-working cartridges:
+		* Diagnostic B (keyboard)
+	- homebrew roms with graphics issues:
+		* Christmas Demo 1.0
+		* Titanic Frogger Demo 1.0
+		* Titanic Frogger Demo 1.1
 */
 
 #include "driver.h"
@@ -61,7 +57,7 @@ static WRITE8_DEVICE_HANDLER( centronics_ctrl_w )
 /* Memory Map */
 
 static ADDRESS_MAP_START( crvision_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x0c00) AM_RAM
+	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x0c00) AM_RAM 
 	AM_RANGE(0x1000, 0x1003) AM_MIRROR(0x0ffc) AM_DEVREADWRITE(PIA6821_TAG, pia6821_r, pia6821_w)
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0ffe) AM_READ(TMS9928A_vram_r)
 	AM_RANGE(0x2001, 0x2001) AM_MIRROR(0x0ffe) AM_READ(TMS9928A_register_r)
@@ -69,22 +65,10 @@ static ADDRESS_MAP_START( crvision_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3001, 0x3001) AM_MIRROR(0x0ffe) AM_WRITE(TMS9928A_register_w)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(BANK_ROM2)
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(BANK_ROM1)
-	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x3800) AM_ROM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( wizzard_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x0c00) AM_RAM
-	AM_RANGE(0x1000, 0x1003) AM_MIRROR(0x0ffc) AM_DEVREADWRITE(PIA6821_TAG, pia6821_r, pia6821_w)
-	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0ffe) AM_READ(TMS9928A_vram_r)
-	AM_RANGE(0x2001, 0x2001) AM_MIRROR(0x0ffe) AM_READ(TMS9928A_register_r)
-	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x0ffe) AM_WRITE(TMS9928A_vram_w)
-	AM_RANGE(0x3001, 0x3001) AM_MIRROR(0x0ffe) AM_WRITE(TMS9928A_register_w)
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(BANK_ROM2)
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(BANK_ROM1)
-//  AM_RANGE(0xc000, 0xe7ff) AM_RAMBANK(3)
+//	AM_RANGE(0xc000, 0xe7ff) AM_RAMBANK(3)
 	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE(CENTRONICS_TAG, centronics_data_w)
 	AM_RANGE(0xe801, 0xe801) AM_DEVREADWRITE(CENTRONICS_TAG, centronics_status_r, centronics_ctrl_w)
-//  AM_RANGE(0xf000, 0xf7ff) AM_RAMBANK(4)
+//	AM_RANGE(0xe802, 0xf7ff) AM_RAMBANK(4)
 	AM_RANGE(0xf800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -264,7 +248,7 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( crvision_int )
 {
-    TMS9928A_interrupt(device->machine);
+	TMS9928A_interrupt(device->machine);
 }
 
 static void crvision_vdp_interrupt(running_machine *machine, int state)
@@ -475,48 +459,73 @@ static DEVICE_IMAGE_LOAD( crvision_cart )
 	switch (size)
 	{
 	case 0x1000: // 4K
-		image_fread(image, mem + 0x9000, 0x1000);
-		memory_install_read8_handler(program, 0x8000, 0x9fff, 0, 0x2000, SMH_BANK(BANK_ROM1));
+		image_fread(image, mem + 0x9000, 0x1000);			// load 4KB at 0x9000
+		memcpy(mem + 0xb000, mem + 0x9000, 0x1000);			// mirror 4KB at 0xb000
+		memory_install_read8_handler(program, 0x8000, 0xbfff, 0, 0x2000, SMH_BANK(BANK_ROM1));
 		break;
 
 	case 0x1800: // 6K
-		image_fread(image, mem + 0x9000, 0x1000);
-		image_fread(image, mem + 0x8800, 0x0800);
-		memory_install_read8_handler(program, 0x8000, 0x9fff, 0, 0x2000, SMH_BANK(BANK_ROM1));
+		image_fread(image, mem + 0x9000, 0x1000);			// load lower 4KB at 0x9000
+		memcpy(mem + 0xb000, mem + 0x9000, 0x1000);			// mirror lower 4KB at 0xb000
+		image_fread(image, mem + 0x8000, 0x0800);			// load higher 2KB at 0x8000
+		memcpy(mem + 0x8800, mem + 0x8000, 0x0800);			// mirror higher 2KB at 0x8800
+		memcpy(mem + 0xa000, mem + 0x8000, 0x0800);			// mirror higher 2KB at 0xa000
+		memcpy(mem + 0xa800, mem + 0x8000, 0x0800);			// mirror higher 2KB at 0xa800
+		memory_install_read8_handler(program, 0x8000, 0xbfff, 0, 0x2000, SMH_BANK(BANK_ROM1));
 		break;
 
 	case 0x2000: // 8K
-		image_fread(image, mem + 0x8000, 0x2000);
-		memory_install_read8_handler(program, 0x8000, 0x9fff, 0, 0x2000, SMH_BANK(BANK_ROM1));
+		image_fread(image, mem + 0x8000, 0x2000);			// load 8KB at 0x8000
+		memcpy(mem + 0xa000, mem + 0x8000, 0x2000);			// mirror 8KB at 0xa000
+		memory_install_read8_handler(program, 0x8000, 0xbfff, 0, 0x2000, SMH_BANK(BANK_ROM1));
 		break;
 
 	case 0x2800: // 10K
-		image_fread(image, mem + 0x8000, 0x2000);
-		image_fread(image, mem + 0x5800, 0x0800);
-		memory_install_read8_handler(program, 0x8000, 0x9fff, 0, 0x2000, SMH_BANK(BANK_ROM1));
-		memory_install_read8_handler(program, 0x4000, 0x5fff, 0, 0x2000, SMH_BANK(BANK_ROM2));
+		image_fread(image, mem + 0x8000, 0x2000);			// load lower 8KB at 0x8000
+		memcpy(mem + 0xa000, mem + 0x8000, 0x2000);			// mirror lower 8KB at 0xa000
+		image_fread(image, mem + 0x4000, 0x0800);			// load higher 2KB at 0x4000
+		memcpy(mem + 0x4800, mem + 0x4000, 0x0800);			// mirror higher 2KB at 0x4800
+		memcpy(mem + 0x5000, mem + 0x4000, 0x0800);			// mirror higher 2KB at 0x5000
+		memcpy(mem + 0x5800, mem + 0x4000, 0x0800);			// mirror higher 2KB at 0x5800
+		memcpy(mem + 0x6000, mem + 0x4000, 0x0800);			// mirror higher 2KB at 0x6000
+		memcpy(mem + 0x6800, mem + 0x4000, 0x0800);			// mirror higher 2KB at 0x6800
+		memcpy(mem + 0x7000, mem + 0x4000, 0x0800);			// mirror higher 2KB at 0x7000
+		memcpy(mem + 0x7800, mem + 0x4000, 0x0800);			// mirror higher 2KB at 0x7800
+		memory_install_read8_handler(program, 0x8000, 0xbfff, 0, 0, SMH_BANK(BANK_ROM1));
+		memory_install_read8_handler(program, 0x4000, 0x7fff, 0, 0, SMH_BANK(BANK_ROM2));
 		break;
 
 	case 0x3000: // 12K
-		image_fread(image, mem + 0x8000, 0x2000);
-		image_fread(image, mem + 0x5000, 0x1000);
-		memory_install_read8_handler(program, 0x8000, 0x9fff, 0, 0x2000, SMH_BANK(BANK_ROM1));
-		memory_install_read8_handler(program, 0x4000, 0x5fff, 0, 0x2000, SMH_BANK(BANK_ROM2));
+		image_fread(image, mem + 0x8000, 0x2000);			// load lower 8KB at 0x8000
+		memcpy(mem + 0xa000, mem + 0x8000, 0x2000);			// mirror lower 8KB at 0xa000
+		image_fread(image, mem + 0x4000, 0x1000);			// load higher 4KB at 0x4000
+		memcpy(mem + 0x5000, mem + 0x4000, 0x1000);			// mirror higher 4KB at 0x5000
+		memcpy(mem + 0x6000, mem + 0x4000, 0x1000);			// mirror higher 4KB at 0x6000
+		memcpy(mem + 0x7000, mem + 0x4000, 0x1000);			// mirror higher 4KB at 0x7000
+		memory_install_read8_handler(program, 0x8000, 0xbfff, 0, 0, SMH_BANK(BANK_ROM1));
+		memory_install_read8_handler(program, 0x4000, 0x7fff, 0, 0, SMH_BANK(BANK_ROM2));
 		break;
 
 	case 0x4000: // 16K
-		image_fread(image, mem + 0xa000, 0x2000);
-		image_fread(image, mem + 0x8000, 0x2000);
+		image_fread(image, mem + 0xa000, 0x2000);			// load lower 8KB at 0xa000
+		image_fread(image, mem + 0x8000, 0x2000);			// load higher 8KB at 0x8000
 		memory_install_read8_handler(program, 0x8000, 0xbfff, 0, 0, SMH_BANK(BANK_ROM1));
 		memory_install_read8_handler(program, 0x4000, 0x7fff, 0, 0, SMH_BANK(BANK_ROM2));
 		break;
 
 	case 0x4800: // 18K
-		image_fread(image, mem + 0xa000, 0x2000);
-		image_fread(image, mem + 0x8000, 0x2000);
-		image_fread(image, mem + 0x4800, 0x0800);
-		memory_install_read8_handler(program, 0x8000, 0x8fff, 0, 0, SMH_BANK(BANK_ROM1));
-		memory_install_read8_handler(program, 0x4000, 0x4fff, 0, 0x3000, SMH_BANK(BANK_ROM2));
+		image_fread(image, mem + 0xa000, 0x2000);			// load lower 8KB at 0xa000
+		image_fread(image, mem + 0x8000, 0x2000);			// load higher 8KB at 0x8000
+		image_fread(image, mem + 0x4000, 0x0800);			// load higher 2KB at 0x4000
+		memcpy(mem + 0x4800, mem + 0x4000, 0x0800);			// mirror higher 2KB at 0x4800
+		memcpy(mem + 0x5000, mem + 0x4000, 0x0800);			// mirror higher 2KB at 0x5000
+		memcpy(mem + 0x5800, mem + 0x4000, 0x0800);			// mirror higher 2KB at 0x5800
+		memcpy(mem + 0x6000, mem + 0x4000, 0x0800);			// mirror higher 2KB at 0x6000
+		memcpy(mem + 0x6800, mem + 0x4000, 0x0800);			// mirror higher 2KB at 0x6800
+		memcpy(mem + 0x7000, mem + 0x4000, 0x0800);			// mirror higher 2KB at 0x7000
+		memcpy(mem + 0x7800, mem + 0x4000, 0x0800);			// mirror higher 2KB at 0x7800
+		memory_install_read8_handler(program, 0x8000, 0xbfff, 0, 0, SMH_BANK(BANK_ROM1));
+		memory_install_read8_handler(program, 0x4000, 0x7fff, 0, 0, SMH_BANK(BANK_ROM2));
 		break;
 
 	default:
@@ -568,6 +577,14 @@ static MACHINE_DRIVER_START( creativision )
 
 	/* cassette */
 	MDRV_CASSETTE_ADD(CASSETTE_TAG, crvision_cassette_config)
+
+	/* printer */
+	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
+
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("1K")	// MAIN RAM
+	MDRV_RAM_EXTRA_OPTIONS("15K") // 16K expansion (lower 14K available only, upper 2K shared with BIOS ROM)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ntsc )
@@ -594,38 +611,19 @@ static MACHINE_DRIVER_START( pal )
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( wizzard )
-	MDRV_IMPORT_FROM(pal)
-
-	MDRV_CPU_MODIFY(M6502_TAG)
-	MDRV_CPU_PROGRAM_MAP(wizzard_map)
-
-	/* printer */
-	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
-	
-	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("1K")
-	MDRV_RAM_EXTRA_OPTIONS("17K,33K") // 16K or 32K expansion
-MACHINE_DRIVER_END
-
 /* ROMs */
 
 ROM_START( crvision )
     ROM_REGION( 0x10000, M6502_TAG, 0 )
-    ROM_LOAD( "crvision.u20", 0xc000, 0x0800, CRC(c3c590c6) SHA1(5ac620c529e4965efb5560fe824854a44c983757) )
-ROM_END
-
-ROM_START( wizzard )
-    ROM_REGION( 0x10000, M6502_TAG, 0 )
-    ROM_LOAD( "wizzard.u20",  0xf800, 0x0800, CRC(c3c590c6) SHA1(5ac620c529e4965efb5560fe824854a44c983757) )
+    ROM_LOAD( "crvision.u20", 0xf800, 0x0800, CRC(c3c590c6) SHA1(5ac620c529e4965efb5560fe824854a44c983757) )
 ROM_END
 
 ROM_START( fnvision )
     ROM_REGION( 0x10000, M6502_TAG, 0 )
-    ROM_LOAD( "funboot.rom",  0xc000, 0x0800, CRC(05602697) SHA1(c280b20c8074ba9abb4be4338b538361dfae517f) )
+    ROM_LOAD( "funboot.rom",  0xf800, 0x0800, CRC(05602697) SHA1(c280b20c8074ba9abb4be4338b538361dfae517f) )
 ROM_END
 
+#define rom_wizzard rom_crvision
 #define rom_crvisioj rom_crvision
 #define rom_crvisio2 rom_crvision
 #define rom_rameses rom_fnvision
@@ -633,16 +631,16 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT       INIT    CONFIG      COMPANY                     FULLNAME */
-CONS( 1982, crvision, 0,		0,		pal,		crvision,	0,		0,			"Video Technology",			"CreatiVision", 0 )
-CONS( 1982, fnvision, crvision, 0,		pal,		crvision,	0,		0,			"Video Technology",			"FunVision", 0 )
-CONS( 1982, crvisioj, crvision,	0,		ntsc,		crvision,	0,		0,			"Cheryco",					"CreatiVision (Japan)", 0 )
-CONS( 1982, wizzard,  crvision, 0,		wizzard,	crvision,	0,		0,	"Dick Smith Electronics",	"Wizzard (Oceania)", 0 )
-CONS( 1982, rameses,  crvision, 0,		pal,		crvision,	0,		0,			"Hanimex",					"Rameses (Oceania)", 0 )
-CONS( 1983, vz2000,   crvision, 0,		pal,		crvision,	0,		0,			"Dick Smith Electronics",	"VZ 2000 (Oceania)", 0 )
-CONS( 1983, crvisio2, crvision, 0,		pal,		crvision,	0,		0,			"Sanyo Video",				"CreatiVision MK-II (Germany)", 0 )
+/*    YEAR  NAME        PARENT    COMPAT  MACHINE     INPUT       INIT  CONFIG  COMPANY                   FULLNAME */
+CONS(	1982,	crvision,   0,          0,    pal,        crvision,	0,    0,      "Video Technology",       "CreatiVision", 0 )
+CONS(	1982,	fnvision,   crvision,   0,    pal,        crvision,	0,    0,      "Video Technology",       "FunVision", 0 )
+CONS(	1982,	crvisioj,   crvision,   0,    ntsc,       crvision,	0,    0,      "Cheryco",                "CreatiVision (Japan)", 0 )
+CONS(	1982,	wizzard,    crvision,   0,    pal,        crvision,	0,    0,      "Dick Smith Electronics", "Wizzard (Oceania)", 0 )
+CONS(	1982,	rameses,    crvision,   0,    pal,        crvision,	0,    0,      "Hanimex",                "Rameses (Oceania)", 0 )
+CONS(	1983,	vz2000,     crvision,   0,    pal,        crvision,	0,    0,      "Dick Smith Electronics", "VZ 2000 (Oceania)", 0 )
+CONS(	1983,	crvisio2,   crvision,   0,    pal,        crvision,	0,    0,      "Video Technology",       "CreatiVision MK-II (Europe)", 0 )
 /*
-COMP( 1983, lasr2001, 0,        0,      lasr2001,   lasr2001,   0,      lasr2001,   "Video Technology",         "Laser 2001", GAME_NOT_WORKING )
-COMP( 1983, vz2001,   lasr2001, 0,      lasr2001,   lasr2001,   0,      lasr2001,   "Dick Smith Electronics",   "VZ 2001 (Oceania)", GAME_NOT_WORKING )
-COMP( 1983, manager,  lasr2001, 0,      lasr2001,   lasr2001,   0,      lasr2001,   "Salora",                   "Manager (Finland)", GAME_NOT_WORKING )
+COMP(	1983,	lasr2001,   0,          0,    lasr2001,   lasr2001,	0,    0,      "Video Technology",       "Laser 2001", GAME_NOT_WORKING )
+COMP(	1983,	vz2001,     lasr2001,   0,    lasr2001,   lasr2001,	0,    0,      "Dick Smith Electronics", "VZ 2001 (Oceania)", GAME_NOT_WORKING )
+COMP(	1983,	manager,    lasr2001,   0,    lasr2001,   lasr2001,	0,    0,      "Salora",                 "Manager (Finland)", GAME_NOT_WORKING )
 */
