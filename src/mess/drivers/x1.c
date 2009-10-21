@@ -138,6 +138,37 @@
     BASIC has to be loaded from external media (tape or disk), the
     computer only has an Initial Program Loader (IPL)
 
+=================================================================================================
+
+	x1turbo specs (courtesy of Yasuhiro Ogawa):
+
+	upper board: Z80A-CPU
+	             Z80A-DMA
+	             Z80A-SIO(O)
+	             Z80A-CTC
+	             uPD8255AC
+	             LH5357(28pin mask ROM. for IPL?)
+	             YM2149F
+	             16.000MHz(X1)
+
+	lower board: IX0526CE(HN61364) (28pin mask ROM. for ANK font?)
+	             MB83256x4 (Kanji ROMs)
+	             HD46505SP (VDP)
+	             M80C49-277 (MCU)
+	             uPD8255AC
+	             uPD1990 (RTC) + battery
+	             6.000MHz(X2)
+	             42.9545MHz(X3)
+
+	FDD I/O board: MB8877A (FDC)
+	               MB4107 (VFO)
+
+	RAM banks:
+	upper board: MB8265A-15 x8 (main memory)
+	lower board: MB8416A-12 x3 (VRAM)
+				 MB8416A-15 x3 (PCG RAM)
+				 MB81416-10 x12 (GRAM)
+
 ************************************************************************************************/
 
 #include "driver.h"
@@ -158,7 +189,11 @@
 #include "formats/flopimg.h"
 #include "formats/basicdsk.h"
 #include "formats/x1_tap.h"
-#include <ctype.h>
+//#include <ctype.h>
+
+#define MAIN_CLOCK XTAL_16MHz
+#define VDP_CLOCK  XTAL_42_9545MHz
+#define MCU_CLOCK  XTAL_6MHz
 
 static UINT8 hres_320,io_switch,io_sys,vsync,vdisp;
 static UINT8 io_bank_mode;
@@ -1869,13 +1904,19 @@ GFXDECODE_END
  *
  *************************************/
 
-static Z80CTC_INTERFACE( ctc_intf )
+static void ctc0_interrupt(const device_config *device, int state)
+{
+	cputag_set_input_line(device->machine,"maincpu",INPUT_LINE_IRQ0,state);
+}
+
+
+static const z80ctc_interface ctc_intf =
 {
 	0,					// timer disables
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),	// interrupt handler
-	DEVCB_LINE(z80ctc_trg3_w),		// ZC/TO0 callback
-	DEVCB_LINE(z80ctc_trg1_w),		// ZC/TO1 callback
-	DEVCB_LINE(z80ctc_trg2_w)		// ZC/TO2 callback
+	ctc0_interrupt,		// interrupt handler
+	z80ctc_trg3_w,		// ZC/TO0 callback
+	z80ctc_trg1_w,		// ZC/TO1 callback
+	z80ctc_trg2_w,		// ZC/TO2 callback
 };
 
 static const z80sio_interface sio_intf =
@@ -2061,7 +2102,7 @@ static PALETTE_INIT(x1)
 	}
 }
 
-static FLOPPY_OPTIONS_START( x1 )
+FLOPPY_OPTIONS_START( x1 )
 	FLOPPY_OPTION( img2d, "2d", "2D disk image", basicdsk_identify_default, basicdsk_construct_default,
 		HEADS([2])
 		TRACKS([40])
@@ -2084,13 +2125,13 @@ static const floppy_config x1_floppy_config =
 
 static MACHINE_DRIVER_START( x1 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, XTAL_4MHz)
+	MDRV_CPU_ADD("maincpu", Z80, MAIN_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(x1_mem)
 	MDRV_CPU_IO_MAP(x1_io)
 	MDRV_CPU_VBLANK_INT("screen", x1_vbl)
 	MDRV_CPU_CONFIG(x1_daisy)
 
-	MDRV_Z80CTC_ADD( "ctc", XTAL_4MHz , ctc_intf )
+	MDRV_Z80CTC_ADD( "ctc", MAIN_CLOCK/4 , ctc_intf )
 
 	MDRV_DEVICE_ADD("x1kb", DEVICE_GET_INFO_NAME(x1_keyboard_getinfo), 0)
 
@@ -2105,10 +2146,9 @@ static MACHINE_DRIVER_START( x1 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(640, 480)
 	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MDRV_MC6845_ADD("crtc", H46505, (VDP_CLOCK/48), mc6845_intf) //unknown divider
 	MDRV_PALETTE_LENGTH(0x300)
 	MDRV_PALETTE_INIT(x1)
-
-	MDRV_MC6845_ADD("crtc", MC6845, XTAL_3_579545MHz/4, mc6845_intf)	/* unknown type and clock / divider, hand tuned to get ~60 fps */
 
 	MDRV_GFXDECODE(x1)
 
@@ -2120,7 +2160,7 @@ static MACHINE_DRIVER_START( x1 )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay", AY8910, XTAL_4MHz/2) //unknown clock / divider
+	MDRV_SOUND_ADD("ay", AY8910, MAIN_CLOCK/8)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MDRV_SOUND_WAVE_ADD("wave","cass")
@@ -2138,10 +2178,10 @@ static MACHINE_DRIVER_START( x1turbo )
 	MDRV_CPU_IO_MAP(x1turbo_io)
 	MDRV_CPU_CONFIG(x1turbo_daisy)
 
-	MDRV_Z80SIO_ADD( "sio", XTAL_4MHz , sio_intf )
-	MDRV_Z80DMA_ADD( "dma", XTAL_4MHz , x1_dma )
+	MDRV_Z80SIO_ADD( "sio", MAIN_CLOCK/4 , sio_intf )
+	MDRV_Z80DMA_ADD( "dma", MAIN_CLOCK/4 , x1_dma )
 
-	MDRV_SOUND_ADD("ym", YM2151, XTAL_4MHz) //unknown clock / divider
+	MDRV_SOUND_ADD("ym", YM2151, MAIN_CLOCK/8) //option board
 //  MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
