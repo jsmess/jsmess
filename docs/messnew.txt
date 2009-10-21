@@ -2,6 +2,7 @@
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
+- Fujitsu FM Towns Car Marty (not working)  [Barry Rodewald]
 - Macintosh II (FDHD), IIx, IIcx, IIci, IIsi, LC, LC II, and 
   Classic II (not working) [R. Belmont]
 - P8000 (not working) [Matt Knoth, Fabio Priuli]
@@ -73,6 +74,17 @@ System Driver Changes:
   [RObbbert]
 
 - [EXIDY] Added preliminary floppy support, not working. [Robbbert]
+
+- [FMTOWNS] Various updates: [Barry Rodewald]
+  * Fixed up CMOS access
+  * Added Kanji I/O ports
+  * Hooked up MB8877A FDC
+  * Fixed palette
+  * Added serial ROM, uses fake ROM data (except for the Car Marty)
+  * Created basic uPD71071 DMA core, hooked up DMA channel 0 to FDC
+  * Hooked up PIT timer 0 interrupt
+  * Added simple RTC
+  * Hooked up slave PIC
 
 - [GAMECOM] Fixed error and crashes when loading a cart: you can now
   reach title screens in some 1MB and 2MB carts. [Robbbert]
