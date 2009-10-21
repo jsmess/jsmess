@@ -71,16 +71,13 @@ static void MMC1_set_chr( running_machine *machine )
 {
 	UINT8 chr_mode = MMC1_regs[0] & 0x10;
 
-	if (nes.chr_chunks)
+	if (chr_mode)
 	{
-		if (chr_mode)
-		{
-			chr4_0(machine, MMC1_regs[1] & 0x1f, CHRROM);
-			chr4_4(machine, MMC1_regs[2] & 0x1f, CHRROM);
-		}
-		else
-			chr8(machine, (MMC1_regs[1] & 0x1f) >> 1, CHRROM);
+		chr4_0(machine, MMC1_regs[1] & 0x1f, mmc_chr_source);
+		chr4_4(machine, MMC1_regs[2] & 0x1f, mmc_chr_source);
 	}
+	else
+		chr8(machine, (MMC1_regs[1] & 0x1f) >> 1, mmc_chr_source);
 }
 
 static WRITE8_HANDLER( mapper1_w )
@@ -2596,12 +2593,70 @@ static WRITE8_HANDLER( mapper34_w )
 
     Mapper 35
 
-    Known Boards: Undocumented / Unused ?!?
-    Games: ----------
+    Known Boards: SC-127 Board
+    Games: Wario World II (Kirby Hack)
 
-    In MESS: ----------
+    In MESS: Supported
 
 *************************************************************/
+
+static void mapper35_irq( const device_config *device, int scanline, int vblank, int blanked )
+{
+	if (scanline < PPU_BOTTOM_VISIBLE_SCANLINE && IRQ_enable)
+	{
+		IRQ_count--;
+
+		if (!blanked && (IRQ_count == 0))
+		{
+			LOG_MMC(("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline,
+					video_screen_get_vpos(device->machine->primary_screen), video_screen_get_hpos(device->machine->primary_screen)));
+			cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
+			IRQ_enable = 0;
+		}
+	}
+}
+
+static WRITE8_HANDLER( mapper35_w )
+{
+	LOG_MMC(("mapper35_w, offset: %04x, data: %02x\n", offset, data));
+
+	switch (offset)
+	{
+	case 0x0000:
+		prg8_89(space->machine, data);
+		break;
+	case 0x0001:
+		prg8_ab(space->machine, data);
+		break;
+	case 0x0002:
+//      prg_bank[offset & 0x02] = data;
+		prg8_cd(space->machine, data);
+		break;
+	case 0x1000:
+	case 0x1001:
+	case 0x1002:
+	case 0x1003:
+	case 0x1004:
+	case 0x1005:
+	case 0x1006:
+	case 0x1007:
+//      vrom_bank[offset & 0x07] = data;
+		chr1_x(space->machine, offset & 0x07, data, CHRROM);
+		break;
+	case 0x4002:
+		IRQ_enable = 0;
+		break;
+	case 0x4003:
+		IRQ_enable = 1;
+		break;
+	case 0x4005:
+		IRQ_count = data;
+		break;
+	case 0x5001:
+		set_nt_mirroring(data & 0x01 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+		break;
+	}
+}
 
 /*************************************************************
 
@@ -3267,11 +3322,22 @@ static WRITE8_HANDLER( mapper52_m_w )
     Mapper 54
 
     Known Boards: Unknown Multigame Bootleg Board
-    Games: [no games in nes.hsi]
+    Games: I only found 'Novel Diamond 999999-in-1.unf' using
+        this mapper (hence the code is used for BMC_NOVELDIAMOND
+        board). The code is included here in case a mapper 54
+        dump arises.
 
-    In MESS: Unsupported.
+    In MESS: Partial Support.
 
 *************************************************************/
+
+static WRITE8_HANDLER( mapper54_w )
+{
+	LOG_MMC(("mapper54_w, offset: %04x, data: %02x\n", offset, data));
+
+	prg32(space->machine, offset & 0x03);
+	chr8(space->machine, offset & 0x07, CHRROM);
+}
 
 /*************************************************************
 
@@ -4037,8 +4103,9 @@ static WRITE8_HANDLER( mapper70_w )
     Games: Linus Spacehead's Cosmic Crusade, Micro Machines,
           Mig-29, Stunt Kids
 
-    We currently do not emulate NT mirroring for BF9097 board
-    (missing in BF9093). As a result Fire Hawk is broken.
+    To emulate NT mirroring for BF9097 board (missing in BF9093)
+    we use crc_hack, however Fire Hawk is broken (but without
+    mirroring there would be no helicopter graphics).
 
     In MESS: Partially Supported.
 
@@ -10379,6 +10446,7 @@ static const mmc mmc_list[] =
 	{ 32, "Irem G-101",                NULL, NULL, NULL, mapper32_w, NULL, NULL, NULL },
 	{ 33, "Taito TC0190FMC",           NULL, NULL, NULL, mapper33_w, NULL, NULL, NULL },
 	{ 34, "Nina-001",                  NULL, NULL, mapper34_m_w, mapper34_w, NULL, NULL, NULL },
+	{ 35, "SC-127",                    NULL, NULL, NULL, mapper35_w, NULL, NULL, mapper35_irq },
 // 35 Unused
 	{ 36, "TXC Policeman",             NULL, NULL, NULL, mapper36_w, NULL, NULL, NULL },
 	{ 37, "ZZ Board",                  NULL, NULL, mapper37_m_w, mapper4_w, NULL, NULL, mapper4_irq },
@@ -10398,7 +10466,7 @@ static const mmc mmc_list[] =
 	{ 51, "Ballgames 11-in-1",         NULL, NULL, mapper51_m_w, mapper51_w, NULL, NULL, NULL },
 	{ 52, "Mario 7-in-1",              NULL, NULL, mapper52_m_w, mapper4_w, NULL, NULL, mapper4_irq },
 // 53 Supervision 16-in-1
-// 54 Novel Diamond X-in-1
+	{ 54, "Novel Diamond X-in-1",      NULL, NULL, NULL, mapper54_w, NULL, NULL, NULL },
 // 55 Genius SMB
 // 56 Kaiser KS202
 	{ 57, "GKA 6-in-1",                NULL, NULL, NULL, mapper57_w, NULL, NULL, NULL },

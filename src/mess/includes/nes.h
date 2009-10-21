@@ -43,8 +43,8 @@ struct nes_struct
 	/* load-time cart variables which remain constant */
 	UINT8 trainer;
 	UINT8 battery;
-	UINT8 prg_chunks;
-	UINT8 chr_chunks;
+	UINT16 prg_chunks;	// a recently dumped multigame cart has 256 chunks of both PRG & CHR!
+	UINT16 chr_chunks;
 
 	UINT8 format;	// 1 = iNES, 2 = UNIF
 
