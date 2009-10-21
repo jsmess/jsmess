@@ -10,11 +10,10 @@
 
 	TODO:
 
-	- cdp1802 mode
-	- quickload
+	- enter
+	- single step
 	- ascii monitor
 	- cassette led
-	- switches
 	- PPI 8255
 	- Floppy WD1793
 	- COM8017 UART to printer
@@ -27,6 +26,7 @@
 #include "cpu/cdp1802/cdp1802.h"
 #include "devices/cassette.h"
 #include "devices/messram.h"
+#include "devices/snapquik.h"
 #include "machine/rescap.h"
 #include "sound/cdp1864.h"
 #include "video/dm9368.h"
@@ -126,12 +126,26 @@ static WRITE8_HANDLER( segment_w )
 	}
 }
 
+static READ8_HANDLER( data_r )
+{
+	cosmicos_state *state = space->machine->driver_data;
+
+	return state->data;
+}
+
+static WRITE8_HANDLER( display_w )
+{
+	cosmicos_state *state = space->machine->driver_data;
+
+	state->segment = data;
+}
+
 /* Memory Maps */
 
 static ADDRESS_MAP_START( cosmicos_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_RAMBANK(1)
 	AM_RANGE(0xc000, 0xcfff) AM_ROM
-	AM_RANGE(0xff00, 0xffff) AM_RAM
+	AM_RANGE(0xff00, 0xffff) AM_RAMBANK(2)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cosmicos_io, ADDRESS_SPACE_IO, 8 )
@@ -142,30 +156,124 @@ static ADDRESS_MAP_START( cosmicos_io, ADDRESS_SPACE_IO, 8 )
 //	AM_RANGE(0x04, 0x04)
 	AM_RANGE(0x05, 0x05) AM_READWRITE(hex_keyboard_r, hex_keylatch_w)
 	AM_RANGE(0x06, 0x06) AM_READWRITE(reset_counter_r, segment_w)
-//	AM_RANGE(0x07, 0x07) AM_READWRITE(data_r, display_w)
+	AM_RANGE(0x07, 0x07) AM_READWRITE(data_r, display_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
 
+static INPUT_CHANGED( data )
+{
+	cosmicos_state *state = field->port->machine->driver_data;
+	UINT8 data = input_port_read(field->port->machine, "DATA");
+	int i;
+
+	for (i = 0; i < 8; i++)
+	{
+		if (!BIT(data, i))
+		{
+			state->data |= (1 << i);
+			output_set_led_value(LED_D0 - i, 1);
+		}
+	}
+}
+
+static INPUT_CHANGED( enter )
+{
+}
+
+static INPUT_CHANGED( single_step )
+{
+}
+
+static void set_cdp1802_mode(running_machine *machine, cdp1802_control_mode mode)
+{
+	cosmicos_state *state = machine->driver_data;
+
+	state->cdp1802_mode = mode;
+	
+	output_set_led_value(LED_RUN, 0);
+	output_set_led_value(LED_LOAD, 0);
+	output_set_led_value(LED_PAUSE, 0);
+	output_set_led_value(LED_RESET, 0);
+
+	switch (mode)
+	{
+	case CDP1802_MODE_RUN:
+		output_set_led_value(LED_RUN, 1);
+		break;
+
+	case CDP1802_MODE_LOAD:
+		output_set_led_value(LED_LOAD, 1);
+		break;
+
+	case CDP1802_MODE_PAUSE:
+		output_set_led_value(LED_PAUSE, 1);
+		break;
+
+	case CDP1802_MODE_RESET:
+		state->boot = 1;
+		output_set_led_value(LED_RESET, 1);
+		break;
+	}
+}
+
+static INPUT_CHANGED( run )   { if (!newval) set_cdp1802_mode(field->port->machine, CDP1802_MODE_RUN); }
+static INPUT_CHANGED( load )  { if (!newval) set_cdp1802_mode(field->port->machine, CDP1802_MODE_LOAD); }
+static INPUT_CHANGED( pause ) {	if (!newval) set_cdp1802_mode(field->port->machine, CDP1802_MODE_PAUSE); }
+static INPUT_CHANGED( reset ) {	if (!newval) set_cdp1802_mode(field->port->machine, CDP1802_MODE_RESET); }
+
+static void clear_input_data(running_machine *machine)
+{
+	cosmicos_state *state = machine->driver_data;
+	int i;
+
+	state->data = 0;
+
+	for (i = 0; i < 8; i++)
+	{
+		output_set_led_value(LED_D0 - i, 0);
+	}
+}
+
+static INPUT_CHANGED( clear_data )
+{
+	clear_input_data(field->port->machine);
+}
+
+static INPUT_CHANGED( memory_protect )
+{
+	const address_space *program = cputag_get_address_space(field->port->machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM);
+
+	if (newval)
+	{
+		memory_install_readwrite8_handler(program, 0xff00, 0xffff, 0, 0, SMH_BANK(2), SMH_UNMAP);
+	}
+	else
+	{
+		memory_install_readwrite8_handler(program, 0xff00, 0xffff, 0, 0, SMH_BANK(2), SMH_BANK(2));
+	}
+}
+
 static INPUT_PORTS_START( cosmicos )
 	PORT_START("DATA")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CHAR('0')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4')
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CHAR('5')
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CHAR('6')
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("D0") PORT_CODE(KEYCODE_0_PAD) PORT_CHAR('0') PORT_CHANGED(data, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("D1") PORT_CODE(KEYCODE_1_PAD) PORT_CHAR('1') PORT_CHANGED(data, 0)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("D2") PORT_CODE(KEYCODE_2_PAD) PORT_CHAR('2') PORT_CHANGED(data, 0)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("D3") PORT_CODE(KEYCODE_3_PAD) PORT_CHAR('3') PORT_CHANGED(data, 0)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("D4") PORT_CODE(KEYCODE_4_PAD) PORT_CHAR('4') PORT_CHANGED(data, 0)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("D5") PORT_CODE(KEYCODE_5_PAD) PORT_CHAR('5') PORT_CHANGED(data, 0)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("D6") PORT_CODE(KEYCODE_6_PAD) PORT_CHAR('6') PORT_CHANGED(data, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("D7") PORT_CODE(KEYCODE_7_PAD) PORT_CHAR('7') PORT_CHANGED(data, 0)
 
 	PORT_START("BUTTONS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("ENTER")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SINGLE STEP")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RUN")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LOAD")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("PAUSE")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RESET")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("MEMORY PROTECT") PORT_TOGGLE
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Enter") PORT_CHANGED(enter, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SPACE) PORT_NAME("Single Step") PORT_CHANGED(single_step, 0)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_NAME("Run") PORT_CHANGED(run, 0)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_NAME("Load") PORT_CHANGED(load, 0)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_NAME(DEF_STR( Pause )) PORT_CHANGED(pause, 0)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_NAME("Reset") PORT_CHANGED(reset, 0)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME("Clear Data") PORT_CHANGED(clear_data, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_NAME("Memory Protect") PORT_CHANGED(memory_protect, 0) PORT_TOGGLE
 
 	PORT_START("ROW1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CHAR('0')
@@ -199,6 +307,15 @@ static INPUT_PORTS_START( cosmicos )
 INPUT_PORTS_END
 
 /* Video */
+
+static TIMER_DEVICE_CALLBACK( segment_tick )
+{
+	cosmicos_state *state = timer->machine->driver_data;
+
+	state->digit = !state->digit;
+
+	output_set_digit_value(state->digit, state->segment);
+}
 
 static WRITE_LINE_DEVICE_HANDLER( cosmicos_dmaout_w )
 {
@@ -244,9 +361,9 @@ static VIDEO_UPDATE( cosmicos )
 
 static CDP1802_MODE_READ( cosmicos_mode_r )
 {
-	cdp1802_control_mode mode = CDP1802_MODE_RUN;
+	cosmicos_state *state = device->machine->driver_data;
 
-	return mode;
+	return state->cdp1802_mode;
 }
 
 static CDP1802_EF_READ( cosmicos_ef_r )
@@ -270,6 +387,14 @@ static CDP1802_EF_READ( cosmicos_ef_r )
 
 static CDP1802_SC_WRITE( cosmicos_sc_w )
 {
+	cosmicos_state *driver_state = device->machine->driver_data;
+
+	if (driver_state->sc1 && !sc1)
+	{
+		clear_input_data(device->machine);
+	}
+	
+	driver_state->sc1 = sc1;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( cosmicos_q_w )
@@ -288,13 +413,20 @@ static WRITE_LINE_DEVICE_HANDLER( cosmicos_q_w )
 	driver_state->q = state;
 }
 
+static READ8_DEVICE_HANDLER( cosmicos_dma_r )
+{
+	cosmicos_state *state = device->machine->driver_data;
+
+	return state->data;
+}
+
 static CDP1802_INTERFACE( cosmicos_config )
 {
 	cosmicos_mode_r,
 	cosmicos_ef_r,
 	cosmicos_sc_w,
 	DEVCB_LINE(cosmicos_q_w),
-	DEVCB_NULL,
+	DEVCB_HANDLER(cosmicos_dma_r),
 	DEVCB_NULL
 };
 
@@ -310,9 +442,6 @@ static MACHINE_START( cosmicos )
 	state->cdp1864 = devtag_get_device(machine, CDP1864_TAG);
 	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
 
-	/* set initial values */
-	state->boot = 1;
-
 	/* initialize LED display */
 	dm9368_rbi_w(state->dm9368, 1);
 
@@ -320,11 +449,13 @@ static MACHINE_START( cosmicos )
 	memory_configure_bank(machine, 1, 0, 1, memory_region(machine, CDP1802_TAG), 0);
 	memory_set_bank(machine, 1, 0);
 
+	memory_configure_bank(machine, 2, 0, 1, memory_region(machine, CDP1802_TAG) + 0xff00, 0);
+	memory_set_bank(machine, 2, 0);
+
 	switch (messram_get_size(devtag_get_device(machine, "messram")))
 	{
 	case 256:
-		//memory_install_readwrite8_handler(program, 0x0000, 0x00ff, 0, 0, SMH_BANK(1), SMH_BANK(1));
-		//memory_install_readwrite8_handler(program, 0x0100, 0xbfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_install_readwrite8_handler(program, 0x0000, 0xbfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 		break;
 
 	case 4*1024:
@@ -337,8 +468,28 @@ static MACHINE_START( cosmicos )
 		break;
 	}
 
+	memory_install_readwrite8_handler(program, 0xff00, 0xffff, 0, 0, SMH_BANK(2), SMH_BANK(2));
+
 	/* register for state saving */
 //	state_save_register_global(machine, state->);
+}
+
+static MACHINE_RESET( cosmicos )
+{
+	set_cdp1802_mode(machine, CDP1802_MODE_RESET);
+}
+
+/* Quickload */
+
+static QUICKLOAD_LOAD( cosmicos )
+{
+	UINT8 *ptr = memory_region(image->machine, CDP1802_TAG);
+	int size = image_length(image);
+
+	/* load image to RAM */
+	image_fread(image, ptr, size);
+
+	return INIT_PASS;
 }
 
 /* Machine Driver */
@@ -360,10 +511,12 @@ static MACHINE_DRIVER_START( cosmicos )
 	MDRV_CPU_CONFIG(cosmicos_config)
 
     MDRV_MACHINE_START(cosmicos)
+    MDRV_MACHINE_RESET(cosmicos)
 
     /* video hardware */
 	MDRV_DEFAULT_LAYOUT( layout_cosmicos )
 	MDRV_DM9368_ADD(DM9368_TAG, 0, NULL)
+	MDRV_TIMER_ADD_PERIODIC("segment", segment_tick, HZ(100))
 
 	MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -378,6 +531,7 @@ static MACHINE_DRIVER_START( cosmicos )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
+	MDRV_QUICKLOAD_ADD("quickload", cosmicos, "bin", 0)
 	MDRV_CASSETTE_ADD(CASSETTE_TAG, cosmicos_cassette_config)
 	
 	/* internal ram */
