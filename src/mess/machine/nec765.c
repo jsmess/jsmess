@@ -50,7 +50,7 @@ typedef enum
 
 
 /* uncomment the following line for verbose information */
-#define LOG_VERBOSE		0
+#define LOG_VERBOSE		1
 #define LOG_COMMAND		1
 #define LOG_EXTRA		0
 #define LOG_INTERRUPT	0
@@ -505,6 +505,8 @@ static void nec765_seek_setup(const device_config *device, int is_recalibrate)
 
 	fdc->FDC_main |= (1<<fdc->drive);
 	fdc->FDC_main |= 0x20;  // execution phase
+	fdc->FDC_main &= ~0x10;  // not busy, can send another seek/recalibrate 
+	                         // for a different drive, or sense int status
 
 	/* recalibrate command? */
 	if (is_recalibrate)
