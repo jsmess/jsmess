@@ -4,17 +4,28 @@
 
 	http://retro.hansotten.nl/index.php?page=1802-cosmicos
 
+
+	HEX-monitor
+
+	0 - start user program
+	1 - inspect and/or change memory
+	2 - write memory block to cassette
+	3 - read memory block from cassette
+	4 - move memory block
+	5 - write memory block to EPROM
+	C - start user program from address 0000
+
 */
 
 /*
 
 	TODO:
 
+	- display interface INH
 	- 2 segment display
 	- memory disable
 	- single step
 	- ascii monitor
-	- cassette led
 	- PPI 8255
 	- Floppy WD1793
 	- COM8017 UART to printer
@@ -30,6 +41,7 @@
 #include "devices/snapquik.h"
 #include "machine/rescap.h"
 #include "sound/cdp1864.h"
+#include "sound/speaker.h"
 #include "video/dm9368.h"
 #include "cosmicos.lh"
 
@@ -123,7 +135,7 @@ static WRITE8_HANDLER( segment_w )
 
 	if ((state->counter > 0) && (state->counter < 9))
 	{
-		output_set_digit_value(state->counter + 2, data);
+		output_set_digit_value(8 - state->counter, data);
 	}
 }
 
@@ -218,7 +230,11 @@ static void set_cdp1802_mode(running_machine *machine, cdp1802_control_mode mode
 		break;
 
 	case CDP1802_MODE_RESET:
+		cputag_set_input_line(machine, CDP1802_TAG, CDP1802_INPUT_LINE_INT, CLEAR_LINE);
+		cputag_set_input_line(machine, CDP1802_TAG, CDP1802_INPUT_LINE_DMAIN, CLEAR_LINE);
+
 		state->boot = 1;
+
 		output_set_led_value(LED_RESET, 1);
 		break;
 	}
@@ -261,6 +277,10 @@ static INPUT_CHANGED( memory_protect )
 	}
 }
 
+static INPUT_CHANGED( memory_disable )
+{
+}
+
 static INPUT_PORTS_START( cosmicos )
 	PORT_START("DATA")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("D0") PORT_CODE(KEYCODE_0_PAD) PORT_CHAR('0') PORT_CHANGED(data, 0)
@@ -273,14 +293,15 @@ static INPUT_PORTS_START( cosmicos )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("D7") PORT_CODE(KEYCODE_7_PAD) PORT_CHAR('7') PORT_CHANGED(data, 0)
 
 	PORT_START("BUTTONS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Enter") PORT_CHANGED(enter, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SPACE) PORT_NAME("Single Step") PORT_CHANGED(single_step, 0)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_NAME("Run") PORT_CHANGED(run, 0)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_NAME("Load") PORT_CHANGED(load, 0)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_NAME(DEF_STR( Pause )) PORT_CHANGED(pause, 0)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_NAME("Reset") PORT_CHANGED(reset, 0)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME("Clear Data") PORT_CHANGED(clear_data, 0)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_NAME("Memory Protect") PORT_CHANGED(memory_protect, 0) PORT_TOGGLE
+	PORT_BIT( 0x001, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Enter") PORT_CHANGED(enter, 0)
+	PORT_BIT( 0x002, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SPACE) PORT_NAME("Single Step") PORT_CHANGED(single_step, 0)
+	PORT_BIT( 0x004, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_NAME("Run") PORT_CHANGED(run, 0)
+	PORT_BIT( 0x008, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_NAME("Load") PORT_CHANGED(load, 0)
+	PORT_BIT( 0x010, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_NAME(DEF_STR( Pause )) PORT_CHANGED(pause, 0)
+	PORT_BIT( 0x020, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_NAME("Reset") PORT_CHANGED(reset, 0)
+	PORT_BIT( 0x040, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME("Clear Data") PORT_CHANGED(clear_data, 0)
+	PORT_BIT( 0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_NAME("Memory Protect") PORT_CHANGED(memory_protect, 0) PORT_TOGGLE
+	PORT_BIT( 0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N) PORT_NAME("Memory Disable") PORT_CHANGED(memory_disable, 0) PORT_TOGGLE
 
 	PORT_START("ROW1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CHAR('0')
@@ -476,6 +497,7 @@ static MACHINE_START( cosmicos )
 	state->dm9368 = devtag_get_device(machine, DM9368_TAG);
 	state->cdp1864 = devtag_get_device(machine, CDP1864_TAG);
 	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
+	state->speaker = devtag_get_device(machine, SPEAKER_TAG);
 
 	/* initialize LED display */
 	dm9368_rbi_w(state->dm9368, 1);
@@ -563,6 +585,10 @@ static MACHINE_DRIVER_START( cosmicos )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD(SPEAKER_TAG, SPEAKER, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
 	MDRV_CDP1864_ADD(CDP1864_TAG, XTAL_1_75MHz, cosmicos_cdp1864_intf)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 

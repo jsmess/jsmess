@@ -8,6 +8,7 @@
 #define DM9368_TAG		"ic10"
 #define CASSETTE_TAG	"cassette"
 #define SCREEN_TAG		"screen"
+#define SPEAKER_TAG		"speaker"
 
 enum
 {
@@ -54,6 +55,7 @@ struct _cosmicos_state
 	const device_config *dm9368;
 	const device_config *cdp1864;
 	const device_config *cassette;
+	const device_config *speaker;
 };
 
 #endif
