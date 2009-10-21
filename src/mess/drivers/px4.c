@@ -14,8 +14,9 @@
 #include "devices/cartslot.h"
 #include "devices/cassette.h"
 #include "machine/tf20.h"
-#include "px4.lh"
 #include "devices/messram.h"
+#include "px4.lh"
+
 
 /***************************************************************************
     CONSTANTS
@@ -34,6 +35,31 @@
 #define UPD7508_INT_7508_RESET	0x08
 #define UPD7508_INT_Z80_RESET	0x10
 #define UPD7508_INT_ONE_SECOND	0x20
+
+/* art (asynchronous receiver transmitter) */
+#define ART_TXRDY	0x01	/* output buffer empty */
+#define ART_RXRDY	0x02	/* data byte received */
+#define ART_TXEMPTY	0x04	/* transmit buffer empty */
+#define ART_PE		0x08	/* parity error */
+#define ART_OE		0x10	/* overrun error */
+#define ART_FE		0x20	/* framing error */
+
+/* art baud rates */
+static const int transmit_rate[] = { 2112, 1536, 768, 384, 192, 96, 48, 24, 192, 3072, 12, 6, 1152 };
+static const int receive_rate[] = { 2112, 1536, 768, 384, 192, 96, 48, 24, 3072, 192, 12, 6, 1152 };
+
+
+/***************************************************************************
+    MACROS
+***************************************************************************/
+
+#define ART_TX_ENABLED	(BIT(px4->artcr, 0))
+#define ART_RX_ENABLED	(BIT(px4->artcr, 2))
+
+#define ART_DATA		(BIT(px4->artmr, 2))	/* number of data bits, 7 or 8 */
+#define ART_PEN			(BIT(px4->artmr, 4))	/* parity enabled */
+#define ART_EVEN		(BIT(px4->artmr, 5))	/* even or odd parity */
+#define ART_STOP		(BIT(px4->artmr, 7))	/* number of stop bits, 1 or 2 */
 
 
 /***************************************************************************
@@ -63,6 +89,16 @@ struct _px4_state
 	UINT8 vadr;
 	UINT8 yoff;
 
+	/* gapnio */
+	emu_timer *receive_timer;
+	emu_timer *transmit_timer;
+	UINT8 artdir;
+	UINT8 artdor;
+	UINT8 artsr;
+	UINT8 artmr;
+	UINT8 artcr;
+	UINT8 swr;
+
 	/* 7508 internal */
 	int one_sec_int_enabled;
 	int alarm_int_enabled;
@@ -70,6 +106,9 @@ struct _px4_state
 
 	UINT8 key_status;
 	UINT8 interrupt_status;
+
+	/* centronics printer */
+	const device_config *printer;
 
 	/* external ramdisk */
 	offs_t ramdisk_address;
@@ -79,7 +118,102 @@ struct _px4_state
 	const device_config *ext_cas;
 	emu_timer *ext_cas_timer;
 	int ear_last_state;
+
+	/* external devices */
+	const device_config *sio_device;
+	const device_config *rs232c_device;
 };
+
+
+/***************************************************************************
+    SERIAL PORT
+***************************************************************************/
+
+/* The floppy is connected to this port */
+
+static WRITE_LINE_DEVICE_HANDLER( px4_sio_txd )
+{
+	logerror("px4_sio_txd: %d\n", state);
+
+	if (device != NULL)
+		tf20_txs_w(device, state);
+}
+
+static READ_LINE_DEVICE_HANDLER( px4_sio_rxd )
+{
+	logerror("px4_sio_rxd\n");
+
+	if (device != NULL)
+		return tf20_rxs_r(device);
+	else
+		return ASSERT_LINE;
+}
+
+static READ_LINE_DEVICE_HANDLER( px4_sio_pin )
+{
+	logerror("px4_sio_pin\n");
+
+	if (device != NULL)
+		return tf20_pins_r(device);
+	else
+		return ASSERT_LINE;
+}
+
+static WRITE_LINE_DEVICE_HANDLER( px4_sio_pout )
+{
+	logerror("px4_sio_pout: %d\n", state);
+
+	if (device != NULL)
+		tf20_pouts_w(device, state);
+}
+
+
+/***************************************************************************
+    RS232C PORT
+***************************************************************************/
+
+/* Currently nothing is connected to this port */
+
+static WRITE_LINE_DEVICE_HANDLER( px4_rs232c_txd )
+{
+	logerror("px4_rs232c_txd: %d\n", state);
+}
+
+#ifdef UNUSED_FUNCTION
+static READ_LINE_DEVICE_HANDLER( px4_rs232c_rxd )
+{
+	logerror("px4_rs232c_rxd\n");
+	return ASSERT_LINE;
+}
+#endif
+
+static WRITE_LINE_DEVICE_HANDLER( px4_rs232c_rts )
+{
+	logerror("px4_rs232c_rts: %d\n", state);
+}
+
+static READ_LINE_DEVICE_HANDLER( px4_rs232c_cts )
+{
+	logerror("px4_rs232c_cts\n");
+	return ASSERT_LINE;
+}
+
+static READ_LINE_DEVICE_HANDLER( px4_rs232c_dsr )
+{
+	logerror("px4_rs232c_dsr\n");
+	return ASSERT_LINE;
+}
+
+static WRITE_LINE_DEVICE_HANDLER( px4_rs232c_dtr )
+{
+	logerror("px4_rs232c_dtr: %d\n", state);
+}
+
+static READ_LINE_DEVICE_HANDLER( px4_rs232c_dcd )
+{
+	logerror("px4_rs232c_dcd\n");
+	return ASSERT_LINE;
+}
 
 
 /***************************************************************************
@@ -178,8 +312,18 @@ static READ8_HANDLER( px4_icrlc_r )
 static WRITE8_HANDLER( px4_ctrl1_w )
 {
 	px4_state *px4 = space->machine->driver_data;
+	int baud;
 
 	logerror("%s: px4_ctrl1_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
+
+	/* baudrate generator */
+	baud = data >> 4;
+
+	if (baud <= 12)
+	{
+		timer_adjust_periodic(px4->transmit_timer, attotime_zero, 0, ATTOTIME_IN_HZ(XTAL_7_3728MHz/2/transmit_rate[baud]));
+		timer_adjust_periodic(px4->receive_timer, attotime_zero, 0, ATTOTIME_IN_HZ(XTAL_7_3728MHz/2/receive_rate[baud]));
+	}
 
 	px4->ctrl1 = data;
 }
@@ -282,20 +426,11 @@ static READ8_HANDLER( px4_str_r )
 
 	logerror("%s: px4_str_r\n", cpuexec_describe_context(space->machine));
 
-	/* bit 0, EAR, cassette input */
 	result |= cassette_input(px4->ext_cas) > 0 ? 1 : 0;
-
-	/* bit 1, BCRD, barcode reader input */
-	result |= 1 << 1;
-
-	/* bit 2, RDY signal from 7805 */
-	result |= 1 << 2;
-
-	/* bit 3, RDYSIO, enable access to the 7805 */
-	result |= 1 << 3;
-
-	/* bit 4-7, BANK, memory bank */
-	result |= px4->bankr & 0xf0;
+	result |= 1 << 1;	/* BCRD, barcode reader input */
+	result |= 1 << 2;	/* RDY signal from 7805 */
+	result |= 1 << 3;	/* RDYSIO, enable access to the 7805 */
+	result |= px4->bankr & 0xf0;	/* bit 4-7, BANK - memory bank */
 
 	return result;
 }
@@ -475,7 +610,7 @@ static WRITE8_HANDLER( px4_sior_w )
 
 
 /***************************************************************************
-    GAPNDI
+    GAPNDL
 ***************************************************************************/
 
 /* vram start address register */
@@ -510,8 +645,28 @@ static WRITE8_HANDLER( px4_spur_w )
 
 
 /***************************************************************************
-    GAPNDL
+    GAPNIO
 ***************************************************************************/
+
+static TIMER_CALLBACK( transmit_data )
+{
+	px4_state *px4 = machine->driver_data;
+
+	if (ART_TX_ENABLED)
+	{
+
+	}
+}
+
+static TIMER_CALLBACK( receive_data )
+{
+	px4_state *px4 = machine->driver_data;
+
+	if (ART_RX_ENABLED)
+	{
+
+	}
+}
 
 /* cartridge interface */
 static READ8_HANDLER( px4_ctgif_r )
@@ -529,43 +684,59 @@ static WRITE8_HANDLER( px4_ctgif_w )
 /* art data input register */
 static READ8_HANDLER( px4_artdir_r )
 {
+	px4_state *px4 = space->machine->driver_data;
 	logerror("%s: px4_artdir_r\n", cpuexec_describe_context(space->machine));
-	return 0xff;
+
+	return px4->artdir;
 }
 
 /* art data output register */
 static WRITE8_HANDLER( px4_artdor_w )
 {
+	px4_state *px4 = space->machine->driver_data;
 	logerror("%s: px4_artdor_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
+
+	px4->artdor = data;
 }
 
 /* art status register */
 static READ8_HANDLER( px4_artsr_r )
 {
+	px4_state *px4 = space->machine->driver_data;
+	UINT8 result = 0;
+
 	logerror("%s: px4_artsr_r\n", cpuexec_describe_context(space->machine));
-	return 0x05;
+
+	result |= px4_rs232c_dsr(px4->rs232c_device) << 7;
+
+	return result | px4->artsr;
 }
 
 /* art mode register */
 static WRITE8_HANDLER( px4_artmr_w )
 {
+	px4_state *px4 = space->machine->driver_data;
 	logerror("%s: px4_artmr_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
+
+	px4->artmr = data;
 }
 
 /* io status register */
 static READ8_HANDLER( px4_iostr_r )
 {
-	const device_config *printer = devtag_get_device(space->machine, "centronics");
-	int result = 0;
+	px4_state *px4 = space->machine->driver_data;
+	UINT8 result = 0;
 
 	logerror("%s: px4_iostr_r\n", cpuexec_describe_context(space->machine));
 
-	/* centronics status */
-	result |= centronics_busy_r(printer);
-	result |= !centronics_pe_r(printer) << 1;
-
-	/* cartridge option select signal, set to 'other mode' */
-	result |= 0x40;
+	result |= centronics_busy_r(px4->printer) << 0;
+	result |= !centronics_pe_r(px4->printer) << 1;
+	result |= px4_sio_pin(px4->sio_device) << 2;
+	result |= px4_sio_rxd(px4->sio_device) << 3;
+	result |= px4_rs232c_dcd(px4->rs232c_device) << 4;
+	result |= px4_rs232c_cts(px4->rs232c_device) << 5;
+	result |= 1 << 6;	/* bit 6, csel, cartridge option select signal, set to 'other mode' */
+	result |= 0 << 7;	/* bit 7, caud - audio input from cartridge */
 
 	return result;
 }
@@ -573,30 +744,63 @@ static READ8_HANDLER( px4_iostr_r )
 /* art command register */
 static WRITE8_HANDLER( px4_artcr_w )
 {
+	px4_state *px4 = space->machine->driver_data;
 	logerror("%s: px4_artcr_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
+
+	px4->artcr = data;
+
+	/* bit 0, txe - transmit enable */
+	if (!ART_TX_ENABLED)
+	{
+		/* force high when disabled */
+		px4_sio_txd(px4->sio_device, ASSERT_LINE);
+		px4_rs232c_txd(px4->rs232c_device, ASSERT_LINE);
+	}
+
+	/* bit 3, sbrk - break output */
+	if (ART_TX_ENABLED && BIT(data, 3))
+	{
+		/* force low when enabled and transmit enabled */
+		px4_sio_txd(px4->sio_device, CLEAR_LINE);
+		px4_rs232c_txd(px4->rs232c_device, CLEAR_LINE);
+	}
+
+	/* error reset */
+	if (BIT(data, 4))
+		px4->artsr &= ~(ART_PE | ART_OE | ART_FE);
+
+	px4_rs232c_dtr(px4->rs232c_device, BIT(data, 1));
+	px4_rs232c_rts(px4->rs232c_device, BIT(data, 5));
 }
 
 /* switch register */
 static WRITE8_HANDLER( px4_swr_w )
 {
+	px4_state *px4 = space->machine->driver_data;
 	logerror("%s: px4_swr_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
+
+	px4->swr = data;
 }
 
 /* io control register */
 static WRITE8_HANDLER( px4_ioctlr_w )
 {
-	const device_config *printer = devtag_get_device(space->machine, "centronics");
+	px4_state *px4 = space->machine->driver_data;
 
 	logerror("%s: px4_ioctlr_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
 
-	/* centronics strobe and reset */
-	centronics_strobe_w(printer, !BIT(data, 0));
-	centronics_prime_w(printer, BIT(data, 1));
+	centronics_strobe_w(px4->printer, !BIT(data, 0));
+	centronics_prime_w(px4->printer, BIT(data, 1));
 
-	/* status leds */
+	px4_sio_pout(px4->sio_device, BIT(data, 2));
+
+	/* bit 3, cartridge reset */
+
 	output_set_value("led_0", BIT(data, 4)); /* caps lock */
 	output_set_value("led_1", BIT(data, 5)); /* num lock */
-	output_set_value("led_2", BIT(data, 6));
+	output_set_value("led_2", BIT(data, 6)); /* "led 2" */
+
+	/* bit 7, sp - speaker */
 }
 
 
@@ -787,10 +991,21 @@ static DRIVER_INIT( px4 )
 	px4->key_int_enabled = TRUE;
 	px4->alarm_int_enabled = TRUE;
 
+	/* art */
+	px4->receive_timer = timer_alloc(machine, receive_data, NULL);
+	px4->transmit_timer = timer_alloc(machine, transmit_data, NULL);
+
+	/* printer */
+	px4->printer = devtag_get_device(machine, "centronics");
+
 	/* external cassette or barcode reader */
 	px4->ext_cas_timer = timer_alloc(machine, ext_cassette_read, NULL);
 	px4->ext_cas = devtag_get_device(machine, "extcas");
 	px4->ear_last_state = 0;
+
+	/* external devices */
+	px4->sio_device = devtag_get_device(machine, "floppy");
+	px4->rs232c_device = NULL;
 
 	/* map os rom and last half of memory */
 	memory_set_bankptr(machine, 1, memory_region(machine, "os"));
@@ -807,6 +1022,13 @@ static DRIVER_INIT( px4p )
 	px4->ramdisk = auto_alloc_array(machine, UINT8, 0x20000);
 }
 
+static MACHINE_RESET( px4 )
+{
+	px4_state *px4 = machine->driver_data;
+
+	px4->artsr = ART_TXRDY | ART_TXEMPTY;
+}
+
 
 /***************************************************************************
     ADDRESS MAPS
@@ -820,6 +1042,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( px4_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	/* gapnit, 0x00-0x07 */
 	AM_RANGE(0x00, 0x00) AM_READWRITE(px4_icrlc_r, px4_ctrl1_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(px4_icrhc_r, px4_cmdr_w)
 	AM_RANGE(0x02, 0x02) AM_READWRITE(px4_icrlb_r, px4_ctrl2_w)
@@ -828,11 +1051,13 @@ static ADDRESS_MAP_START( px4_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x05, 0x05) AM_READWRITE(px4_str_r, px4_bankr_w)
 	AM_RANGE(0x06, 0x06) AM_READWRITE(px4_sior_r, px4_sior_w)
 	AM_RANGE(0x07, 0x07) AM_NOP
+	/* gapndl, 0x08-0x0f */
 	AM_RANGE(0x08, 0x08) AM_WRITE(px4_vadr_w)
 	AM_RANGE(0x09, 0x09) AM_WRITE(px4_yoff_w)
 	AM_RANGE(0x0a, 0x0a) AM_WRITE(px4_fr_w)
 	AM_RANGE(0x0b, 0x0b) AM_WRITE(px4_spur_w)
 	AM_RANGE(0x0c, 0x0f) AM_NOP
+	/* gapnio, 0x10-0x1f */
 	AM_RANGE(0x10, 0x13) AM_READWRITE(px4_ctgif_r, px4_ctgif_w)
 	AM_RANGE(0x14, 0x14) AM_READWRITE(px4_artdir_r, px4_artdor_w)
 	AM_RANGE(0x15, 0x15) AM_READWRITE(px4_artsr_r, px4_artmr_w)
@@ -1032,16 +1257,18 @@ static const cassette_config px4_cassette_config =
 };
 
 static MACHINE_DRIVER_START( px4 )
+	MDRV_DRIVER_DATA(px4_state)
+
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, XTAL_7_3728MHz/2)	/* uPD70008 */
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_7_3728MHz / 2)	/* uPD70008 */
 	MDRV_CPU_PROGRAM_MAP(px4_mem)
 	MDRV_CPU_IO_MAP(px4_io)
 
-	MDRV_DRIVER_DATA(px4_state)
+	MDRV_MACHINE_RESET(px4)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", LCD)
-	MDRV_SCREEN_REFRESH_RATE(44)
+	MDRV_SCREEN_REFRESH_RATE(72)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(240, 64)
 	MDRV_SCREEN_VISIBLE_AREA(0, 239, 0, 63)
@@ -1054,7 +1281,7 @@ static MACHINE_DRIVER_START( px4 )
 	MDRV_VIDEO_UPDATE(px4)
 
 	MDRV_TIMER_ADD_PERIODIC("one_sec", upd7508_1sec_callback, SEC(1))
-	MDRV_TIMER_ADD_PERIODIC("frc", frc_tick, NSEC(1628))
+	MDRV_TIMER_ADD_PERIODIC("frc", frc_tick, HZ(XTAL_7_3728MHz / 2 / 6))
 
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
@@ -1073,7 +1300,7 @@ static MACHINE_DRIVER_START( px4 )
 	MDRV_CARTSLOT_NOT_MANDATORY
 
 	/* tf20 floppy drive */
-//	MDRV_TF20_ADD("tf20")
+//	MDRV_TF20_ADD("floppy")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( px4p )
@@ -1094,6 +1321,8 @@ MACHINE_DRIVER_END
 /***************************************************************************
     ROM DEFINITIONS
 ***************************************************************************/
+
+/* Note: We are missing "Kana OS V1.0" and "Kana OS V2.0" (Japanese version) */
 
 ROM_START( px4 )
     ROM_REGION(0x8000, "os", 0)
