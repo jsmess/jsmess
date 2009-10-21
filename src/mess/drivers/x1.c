@@ -1904,19 +1904,13 @@ GFXDECODE_END
  *
  *************************************/
 
-static void ctc0_interrupt(const device_config *device, int state)
-{
-	cputag_set_input_line(device->machine,"maincpu",INPUT_LINE_IRQ0,state);
-}
-
-
-static const z80ctc_interface ctc_intf =
+static Z80CTC_INTERFACE( ctc_intf ) 
 {
 	0,					// timer disables
-	ctc0_interrupt,		// interrupt handler
-	z80ctc_trg3_w,		// ZC/TO0 callback
-	z80ctc_trg1_w,		// ZC/TO1 callback
-	z80ctc_trg2_w,		// ZC/TO2 callback
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),		// interrupt handler
+	DEVCB_LINE(z80ctc_trg3_w),		// ZC/TO0 callback
+	DEVCB_LINE(z80ctc_trg1_w),		// ZC/TO1 callback
+	DEVCB_LINE(z80ctc_trg2_w),		// ZC/TO2 callback
 };
 
 static const z80sio_interface sio_intf =
