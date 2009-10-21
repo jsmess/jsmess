@@ -10,7 +10,8 @@
 
 	TODO:
 
-	- enter
+	- 2 segment display
+	- memory disable
 	- single step
 	- ascii monitor
 	- cassette led
@@ -179,6 +180,12 @@ static INPUT_CHANGED( data )
 
 static INPUT_CHANGED( enter )
 {
+	cosmicos_state *state = field->port->machine->driver_data;
+
+	if (!newval && (state->cdp1802_mode == CDP1802_MODE_LOAD))
+	{
+		cputag_set_input_line(field->port->machine, CDP1802_TAG, CDP1802_INPUT_LINE_DMAIN, ASSERT_LINE);
+	}
 }
 
 static INPUT_CHANGED( single_step )
@@ -300,10 +307,10 @@ static INPUT_PORTS_START( cosmicos )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F')
 
 	PORT_START("SPECIAL")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("RET") PORT_CODE(KEYCODE_F1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("DEC") PORT_CODE(KEYCODE_F2)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("REQ") PORT_CODE(KEYCODE_F3)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("SEQ") PORT_CODE(KEYCODE_F4)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RET") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("DEC") PORT_CODE(KEYCODE_F2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("REQ") PORT_CODE(KEYCODE_F3)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SEQ") PORT_CODE(KEYCODE_F4)
 INPUT_PORTS_END
 
 /* Video */
@@ -315,6 +322,11 @@ static TIMER_DEVICE_CALLBACK( segment_tick )
 	state->digit = !state->digit;
 
 	output_set_digit_value(state->digit, state->segment);
+}
+
+static TIMER_DEVICE_CALLBACK( int_tick )
+{
+	cputag_set_input_line(timer->machine, CDP1802_TAG, CDP1802_INPUT_LINE_INT, ASSERT_LINE);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( cosmicos_dmaout_w )
@@ -372,15 +384,32 @@ static CDP1802_EF_READ( cosmicos_ef_r )
         EF1     
         EF2		cassette input
         EF3
-        EF4     
+        EF4     ENTER
     */
 
 	cosmicos_state *state = device->machine->driver_data;
-
+	UINT8 special = input_port_read(device->machine, "SPECIAL");
 	UINT8 flags = 0x0f;
 
 	/* cassette input */
-	if (cassette_input(state->cassette) < 0.0) flags -= EF2;
+	if (cassette_input(state->cassette) < 0.0)
+	{
+		output_set_led_value(LED_CASSETTE, 1);
+		flags &= ~EF2;
+	}
+	else
+	{
+		output_set_led_value(LED_CASSETTE, 0);
+	}
+
+	/* ENTER */
+	if (!BIT(input_port_read(device->machine, "BUTTONS"), 0)) flags &= ~EF4;
+
+	/* hexadecimal keypad */
+	if (!BIT(special, 0)) flags &= ~EF1;
+	if (!BIT(special, 1)) flags &= ~EF2;
+	if (!BIT(special, 2)) flags &= ~EF3;
+	if (!BIT(special, 3)) flags &= ~(EF2 | EF3);
 
 	return flags;
 }
@@ -392,6 +421,12 @@ static CDP1802_SC_WRITE( cosmicos_sc_w )
 	if (driver_state->sc1 && !sc1)
 	{
 		clear_input_data(device->machine);
+	}
+
+	if (sc1)
+	{
+		cpu_set_input_line(device, CDP1802_INPUT_LINE_INT, CLEAR_LINE);
+		cpu_set_input_line(device, CDP1802_INPUT_LINE_DMAIN, CLEAR_LINE);
 	}
 	
 	driver_state->sc1 = sc1;
@@ -517,6 +552,7 @@ static MACHINE_DRIVER_START( cosmicos )
 	MDRV_DEFAULT_LAYOUT( layout_cosmicos )
 	MDRV_DM9368_ADD(DM9368_TAG, 0, NULL)
 	MDRV_TIMER_ADD_PERIODIC("segment", segment_tick, HZ(100))
+	MDRV_TIMER_ADD_PERIODIC("interrupt", int_tick, HZ(1000))
 
 	MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

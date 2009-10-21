@@ -23,7 +23,8 @@ enum
 	LED_D2,
 	LED_D1,
 	LED_D0,
-	LED_Q
+	LED_Q,
+	LED_CASSETTE
 };
 
 typedef struct _cosmicos_state cosmicos_state;
