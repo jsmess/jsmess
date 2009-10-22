@@ -51,6 +51,11 @@ System Driver Changes:
 - [CBM] Fixed old regression in sx64 and c16c when trying to start 
   emulation with a floppy inserted [Fabio Priuli]
 
+- [COCO/COCO3/DRAGON] Converted inputs to use PORT_CATEGORY (i.e. you 
+  now select controller type in the Categories submenu). When Joystick 
+  is selected in either Right or Left Controller Port, Hi-Res Interface
+  becomes available in the Driver Configuration submenu. [Fabio Priuli]
+
 - [COMPIS] Added proper ROM dumps. [Curt Coder]
 
 - [CPC family] Fixed screen dimensions. [Wilbert Pol]
@@ -66,6 +71,8 @@ System Driver Changes:
 
 - [DGONE] Added proper CGA char dump. Now the system shows correct output. 
   [Miodrag Milanovic]
+
+- [DRAGON] Added same input devices as CoCo. [Fabio Priuli]
 
 - [EINSTEIN] Made it possible to select single or double sided disk 
   drives.  [Dirk Best]

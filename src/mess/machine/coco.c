@@ -1093,21 +1093,17 @@ static int coco_hiresjoy_ca = 1;
 static attotime coco_hiresjoy_xtransitiontime;
 static attotime coco_hiresjoy_ytransitiontime;
 
-static attotime coco_hiresjoy_computetransitiontime(running_machine *machine, UINT8 port, UINT8 axis)
+static attotime coco_hiresjoy_computetransitiontime( running_machine *machine, UINT8 port, UINT8 axis )
 {
 	double val;
-	UINT8 ctrl = input_port_read_safe(machine, "ctrl_sel", 0x00);
-	/* this function gets only called for hi-res joystick. hence, ctrl can only take values
-       0x04, 0x40 (hi-res) or 0x05, 0x50 (hi-res coco3max) */
-	UINT8 coco3max = ((ctrl & 0x0f) == 0x05 || (ctrl & 0xf0) == 0x50) ? 1 : 0;
+	UINT8 hires = input_port_read_safe(machine, "hires_intf", 0x00);
+	/* this function gets only called for hi-res joystick. hence, hires can only take values
+       0x01, 0x03 (hi-res) or 0x02, 0x04 (hi-res coco3max) */
+	UINT8 coco3max = (hires == 0x02 || hires == 0x04) ? 1 : 0;
 
-	static const char *const port_tags[2][4] =
-			{
-				{"joystick_hires_rx", "joystick_hires_ry", "joystick_hires_max_rx", "joystick_hires_max_ry"},	/* right ports */
-				{"joystick_hires_lx", "joystick_hires_ly", "joystick_hires_max_lx", "joystick_hires_max_ly" }	/* left ports */
-			};
+	static const char *const port_tags[4] = {"joystick_rx", "joystick_ry", "joystick_lx", "joystick_ly"};
 
-	val = input_port_read_safe(machine, port_tags[port][axis + 2 * coco3max], 0) / 255.0;
+	val = input_port_read_safe(machine, port_tags[axis + 2 * port], 0) / 255.0;
 
 	if (coco3max)
 	{
@@ -1123,7 +1119,7 @@ static attotime coco_hiresjoy_computetransitiontime(running_machine *machine, UI
 	return attotime_add(timer_get_time(machine), attotime_mul(COCO_CPU_SPEED, val));
 }
 
-static void coco_hiresjoy_w(running_machine *machine, int data, UINT8 port)
+static void coco_hiresjoy_w( running_machine *machine, int data, UINT8 port )
 {
 	if (!data && coco_hiresjoy_ca)
 	{
@@ -1141,17 +1137,17 @@ static void coco_hiresjoy_w(running_machine *machine, int data, UINT8 port)
 	(*update_keyboard)(machine);
 }
 
-static int coco_hiresjoy_readone(running_machine *machine, attotime transitiontime)
+static int coco_hiresjoy_readone( running_machine *machine, attotime transitiontime )
 {
 	return attotime_compare(timer_get_time(machine), transitiontime) >= 0;
 }
 
-static int coco_hiresjoy_rx(running_machine *machine)
+static int coco_hiresjoy_rx( running_machine *machine )
 {
 	return coco_hiresjoy_readone(machine, coco_hiresjoy_xtransitiontime);
 }
 
-static int coco_hiresjoy_ry(running_machine *machine)
+static int coco_hiresjoy_ry( running_machine *machine )
 {
 	return coco_hiresjoy_readone(machine, coco_hiresjoy_ytransitiontime);
 }
@@ -1284,7 +1280,7 @@ READ8_HANDLER ( dgnalpha_psg_porta_read )
 	return 0;
 }
 
-WRITE8_HANDLER ( dgnalpha_psg_porta_write )
+WRITE8_HANDLER( dgnalpha_psg_porta_write )
 {
 	const device_config *fdc = devtag_get_device(space->machine, "wd2797");
 	/* Bits 0..3 are the drive select lines for the internal floppy interface */
@@ -1318,24 +1314,24 @@ WRITE8_HANDLER ( dgnalpha_psg_porta_write )
   PIA0 CB2      - SEL2 (Used by sound mux and joystick)
 ***************************************************************************/
 
-static WRITE8_DEVICE_HANDLER ( d_pia0_ca2_w )
+static WRITE8_DEVICE_HANDLER( d_pia0_ca2_w )
 {
 	timer_adjust_oneshot(mux_sel1_timer, JOYSTICK_MUX_DELAY, data);
 }
 
-static TIMER_CALLBACK(coco_update_sel1_timerproc)
+static TIMER_CALLBACK( coco_update_sel1_timerproc )
 {
 	mux_sel1 = param;
 	(*update_keyboard)(machine);
 	soundmux_update(machine);
 }
 
-static WRITE8_DEVICE_HANDLER ( d_pia0_cb2_w )
+static WRITE8_DEVICE_HANDLER( d_pia0_cb2_w )
 {
 	timer_adjust_oneshot(mux_sel2_timer, JOYSTICK_MUX_DELAY, data);
 }
 
-static TIMER_CALLBACK(coco_update_sel2_timerproc)
+static TIMER_CALLBACK( coco_update_sel2_timerproc )
 {
 	mux_sel2 = param;
 	(*update_keyboard)(machine);
@@ -1343,7 +1339,7 @@ static TIMER_CALLBACK(coco_update_sel2_timerproc)
 }
 
 
-static attotime get_relative_time(running_machine *machine, attotime absolute_time)
+static attotime get_relative_time( running_machine *machine, attotime absolute_time )
 {
 	attotime result;
 	attotime now = timer_get_time(machine);
@@ -1357,7 +1353,7 @@ static attotime get_relative_time(running_machine *machine, attotime absolute_ti
 
 
 
-static UINT8 coco_update_keyboard(running_machine *machine)
+static UINT8 coco_update_keyboard( running_machine *machine )
 {
 	coco_state *state = machine->driver_data;
 	UINT8 porta = 0x7f, port_za = 0x7f;
@@ -1367,22 +1363,30 @@ static UINT8 coco_update_keyboard(running_machine *machine)
 	attotime dclg_time = attotime_zero;
 	UINT8 pia0_pb;
 	UINT8 dac = pia6821_get_output_a(state->pia_1) & 0xfc;
-	int joystick_axis, joystick, joy_mask, joy_shift, ctrl;
+	UINT8 hires = input_port_read_safe(machine, "hires_intf", 0x00);
+	int joystick_axis, joystick, joy_mask, joy_shift, ctrl, hires_val, ccm3_val;
 
-	static const char *const portnames[2][6][2] =
+	static const char *const portnames[2][4][2] =
 			{
-				{ {0}, {"joystick_rx", "joystick_ry"}, {"rat_mouse_rx", "rat_mouse_ry"}, {"dclg_rx", "dclg_ry"},
-					{"joystick_hires_rx", "joystick_hires_ry"}, {"joystick_hires_max_rx", "joystick_hires_max_ry"} },	/* right ports */
-				{ {0}, {"joystick_lx", "joystick_ly"}, {"rat_mouse_lx", "rat_mouse_ly"}, {"dclg_lx", "dclg_ly"},
-					{"joystick_hires_lx", "joystick_hires_ly"}, {"joystick_hires_max_lx", "joystick_hires_max_ly"} },	/* left ports */
+				{ {0}, {"joystick_rx", "joystick_ry"}, {"rat_mouse_rx", "rat_mouse_ry"}, {"dclg_rx", "dclg_ry"} },	/* right ports */
+				{ {0}, {"joystick_lx", "joystick_ly"}, {"rat_mouse_lx", "rat_mouse_ly"}, {"dclg_lx", "dclg_ly"} },	/* left ports */
 			};
+	static const char *const button_names[4] = { "empty", "joystick_buttons", "rat_mouse_buttons", "dclg_triggers" };
+
+
 
 	pia0_pb = pia6821_get_output_b(state->pia_0);
 	joystick_axis = mux_sel1;
 	joystick = mux_sel2;
+
+	/* which kind of controller is selected? */
 	joy_mask = joystick ? 0xf0 : 0x0f;
 	joy_shift = joystick ? 4 : 0;
 	ctrl = (input_port_read_safe(machine, "ctrl_sel", 0x00) & joy_mask) >> joy_shift;
+
+	/* is any Hi-Res Interface turned on? prepare masks to check it */
+	hires_val = joystick ? 0x03 : 0x01;
+	ccm3_val = joystick ? 0x04 : 0x02;
 
 	/* poll keyboard keys */
 	if ((input_port_read(machine, "row0") | pia0_pb) != 0xff) porta &= ~0x01;
@@ -1404,15 +1408,18 @@ static UINT8 coco_update_keyboard(running_machine *machine)
 	switch (ctrl)
 	{
 		case 0x01: /* Joystick */
-			joyval = input_port_read_safe(machine, portnames[joystick][ctrl][joystick_axis], 0x00);
-			if (dac <= joyval)
-				porta |= 0x80;
-			break;
-
-		case 0x04: /* Hi-Res Joystick */
-		case 0x05: /* Hi-Res CC3Max Joystick */
-			if (joystick_axis ? coco_hiresjoy_ry(machine) : coco_hiresjoy_rx(machine))
-				porta |= 0x80;
+			if (hires == hires_val || hires == ccm3_val)
+			{
+				/* Hi-Res Joystick or Hi-Res CoCo3Max Joystick */
+				if (joystick_axis ? coco_hiresjoy_ry(machine) : coco_hiresjoy_rx(machine))
+					porta |= 0x80;
+			}
+			else
+			{
+				joyval = input_port_read_safe(machine, portnames[joystick][ctrl][joystick_axis], 0x00);
+				if (dac <= joyval)
+					porta |= 0x80;
+			}
 			break;
 
 		case 0x02: /* Rat Mouse */
@@ -1422,17 +1429,17 @@ static UINT8 coco_update_keyboard(running_machine *machine)
 			break;
 
 		case 0x03: /* Diecom Light Gun */
-			if( (video_screen_get_vpos(machine->primary_screen) == input_port_read_safe(machine, portnames[joystick][ctrl][1], 0)) )
+			if ((video_screen_get_vpos(machine->primary_screen) == input_port_read_safe(machine, portnames[joystick][ctrl][1], 0)))
 			{
 				/* If gun is pointing at the current scan line, set hit bit and cache horizontal timer value */
 				dclg_output_h |= 0x02;
 				dclg_timer = input_port_read_safe(machine, portnames[joystick][ctrl][0], 0) << 1;
 			}
 
-			if ( (dac >> 2) <= dclg_table[(joystick_axis ? dclg_output_h : dclg_output_v) & 0x03])
+			if ((dac >> 2) <= dclg_table[(joystick_axis ? dclg_output_h : dclg_output_v) & 0x03])
 				porta |= 0x80;
 
-			if( (dclg_state == 7) )
+			if ((dclg_state == 7))
 			{
 				/* While in state 7, prepare to chech next video frame for a hit */
 				dclg_time = video_screen_get_time_until_pos(machine->primary_screen, input_port_read_safe(machine, portnames[joystick][ctrl][1], 0), 0);
@@ -1444,10 +1451,10 @@ static UINT8 coco_update_keyboard(running_machine *machine)
 			break;
 	}
 
-	if( attotime_compare(dclg_time, attotime_zero) )
+	if (attotime_compare(dclg_time, attotime_zero))
 	{
 		/* schedule lightgun events */
-		timer_reset(update_keyboard_timer, dclg_time );
+		timer_reset(update_keyboard_timer, dclg_time);
 	}
 	else
 	{
@@ -1460,8 +1467,8 @@ static UINT8 coco_update_keyboard(running_machine *machine)
 	}
 
 	/* sample joystick buttons */
-	porta &= ~input_port_read_safe(machine, "joystick_buttons", 0);
-	port_za &= ~input_port_read_safe(machine, "joystick_buttons", 0);
+	porta &= ~input_port_read_safe(machine, button_names[ctrl], 0);
+	port_za &= ~input_port_read_safe(machine, button_names[ctrl], 0);
 
 	pia6821_set_input_a(state->pia_0, porta, port_za);
 	return porta;
@@ -1469,31 +1476,32 @@ static UINT8 coco_update_keyboard(running_machine *machine)
 
 
 
-static UINT8 coco3_update_keyboard(running_machine *machine)
+static UINT8 coco3_update_keyboard( running_machine *machine )
 {
 	/* the CoCo 3 keyboard update routine must also check for the GIME EI1 interrupt */
-	UINT8 porta;
-	porta = coco_update_keyboard(machine);
-	coco3_raise_interrupt(machine, COCO3_INT_EI1, ((porta & 0x7F) == 0x7F) ? CLEAR_LINE : ASSERT_LINE);
+	UINT8 porta = coco_update_keyboard(machine);
+	coco3_raise_interrupt(machine, COCO3_INT_EI1, ((porta & 0x7f) == 0x7f) ? CLEAR_LINE : ASSERT_LINE);
 	return porta;
 }
 
 
 
 /* three functions that update the keyboard in varying ways */
-static WRITE8_DEVICE_HANDLER ( d_pia0_pb_w )					{ (*update_keyboard)(device->machine); }
-INPUT_CHANGED(coco_keyboard_changed)					{ (*update_keyboard)(field->port->machine); }
-static TIMER_CALLBACK(coco_update_keyboard_timerproc)	{ (*update_keyboard)(machine); }
+static WRITE8_DEVICE_HANDLER( d_pia0_pb_w )            { (*update_keyboard)(device->machine); }
+INPUT_CHANGED( coco_keyboard_changed )                 { (*update_keyboard)(field->port->machine); }
+static TIMER_CALLBACK( coco_update_keyboard_timerproc) { (*update_keyboard)(machine); }
 
-static WRITE8_DEVICE_HANDLER ( d_pia0_pa_w )
+static WRITE8_DEVICE_HANDLER( d_pia0_pa_w )
 {
+	UINT8 ctrl = input_port_read_safe(device->machine, "ctrl_sel", 0x00);
+	UINT8 hires = input_port_read_safe(device->machine, "hires_intf", 0x00);
+
 	/* Hi-Res CC3Max Joystick (either in Left or in Right Port) writes here */
-	if ((input_port_read_safe(device->machine, "ctrl_sel", 0x00) & 0x0f) == 0x05)
+	if ((ctrl & 0x0f) == 0x01 && hires == 0x02)
 		coco_hiresjoy_w(device->machine, data & 0x04, 0);
-	else if ((input_port_read_safe(device->machine, "ctrl_sel", 0x00) & 0xf0) == 0x50)
+	else if ((ctrl & 0xf0) == 0x10 && hires == 0x04)
 		coco_hiresjoy_w(device->machine, data & 0x04, 1);
 }
-
 
 
 /***************************************************************************
@@ -1551,20 +1559,21 @@ static WRITE8_DEVICE_HANDLER ( d_pia1_pa_w )
      *  7-2:    DAC to speaker or cassette
      *    1:    Serial out (CoCo), Printer strobe (Dragon)
      */
-	UINT8 dac = pia6821_get_output_a(device) & 0xFC;
+	UINT8 dac = pia6821_get_output_a(device) & 0xfc;
 	static int dclg_previous_bit;
+	UINT8 ctrl = input_port_read_safe(device->machine, "ctrl_sel", 0x00);
+	UINT8 hires = input_port_read_safe(device->machine, "hires_intf", 0x00);
 
 	coco_sound_update(device->machine);
 
 	/* Diecom Light Gun (either in Left or in Right Port) writes here */
-	if ((input_port_read_safe(device->machine, "ctrl_sel", 0x00) & 0x0f) == 0x03 ||
-		(input_port_read_safe(device->machine, "ctrl_sel", 0x00) & 0xf0) == 0x30)
+	if ((ctrl & 0x0f) == 0x03 || (ctrl & 0xf0) == 0x30)
 	{
 		int dclg_this_bit = ((data & 2) >> 1);
 
-		if( dclg_previous_bit == 1 )
+		if (dclg_previous_bit == 1)
 		{
-			if( dclg_this_bit == 0 )
+			if (dclg_this_bit == 0)
 			{
 				/* Clock Diecom Light gun interface on a high to low transistion */
 				dclg_state++;
@@ -1573,23 +1582,23 @@ static WRITE8_DEVICE_HANDLER ( d_pia1_pa_w )
 				/* Clear hit bit for every transistion */
 				dclg_output_h &= ~0x02;
 
-				if( dclg_state > 7 )
+				if (dclg_state > 7)
 				{
 					/* Bit shift timer data on state 8 thru 15 */
-					if (((dclg_timer >> (dclg_state-8+1)) & 0x01) == 1)
+					if (((dclg_timer >> (dclg_state - 8 + 1)) & 0x01) == 1)
 						dclg_output_v |= 0x01;
 					else
 						dclg_output_v &= ~0x01;
 
 					/* Bit 9 of timer is only avaiable if state == 8*/
-					if (dclg_state == 8 && (((dclg_timer >> 9) & 0x01) == 1) )
+					if (dclg_state == 8 && (((dclg_timer >> 9) & 0x01) == 1))
 						dclg_output_v |= 0x02;
 					else
 						dclg_output_v &= ~0x02;
 				}
 
 				/* During state 15, this bit is high. */
-				if( dclg_state == 15 )
+				if (dclg_state == 15)
 					dclg_output_h |= 0x01;
 				else
 					dclg_output_h &= ~0x01;
@@ -1607,13 +1616,12 @@ static WRITE8_DEVICE_HANDLER ( d_pia1_pa_w )
 	(*update_keyboard)(device->machine);
 
 	/* Hi-Res Joystick (either in Left or in Right Port) writes here */
-	if ((input_port_read_safe(device->machine, "ctrl_sel", 0x00) & 0x0f) == 0x04)
+	if ((ctrl & 0x0f) == 0x04 && hires == 0x01)
 		coco_hiresjoy_w(device->machine, dac >= 0x80, 0);
-	else if ((input_port_read_safe(device->machine, "ctrl_sel", 0x00) & 0xf0) == 0x40)
+	else if ((ctrl & 0xf0) == 0x40 && hires == 0x03)
 		coco_hiresjoy_w(device->machine, dac >= 0x80, 1);
 
 	/* Handle printer output, serial for CoCos, parallel for Dragons */
-
 	printer_out(device->machine, data);
 }
 
@@ -2944,11 +2952,11 @@ static STATE_POSTLOAD( coco3_state_postload )
 	coco3_mmu_update(machine, 0, 8);
 }
 
-static void update_lightgun(running_machine *machine)
+static void update_lightgun( running_machine *machine )
 {
 	/* is there a Diecom Light Gun either in Left or in Right Port? */
-	int is_lightgun = ((input_port_read_safe(machine, "ctrl_sel", 0x00) & 0x0f) == 0x03 ||
-					(input_port_read_safe(machine, "ctrl_sel", 0x00) & 0xf0) == 0x30) ? 1 :0;
+	UINT8 ctrl = input_port_read_safe(machine, "ctrl_sel", 0x00);
+	int is_lightgun = ((ctrl & 0x0f) == 0x03 || (ctrl & 0xf0) == 0x30) ? 1 :0;
 
 	crosshair_set_screen(machine, 0, is_lightgun ? CROSSHAIR_SCREEN_ALL : CROSSHAIR_SCREEN_NONE);
 }
