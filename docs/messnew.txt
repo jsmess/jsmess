@@ -92,6 +92,7 @@ System Driver Changes:
   * Hooked up PIT timer 0 interrupt
   * Added simple RTC
   * Hooked up slave PIC
+  * Hooked up linear VRAM access at 0x80000000
 
 - [GAMECOM] Fixed error and crashes when loading a cart: you can now
   reach title screens in some 1MB and 2MB carts. [Robbbert]

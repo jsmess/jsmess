@@ -828,6 +828,16 @@ static void towns_update_video_banks(const address_space* space)
 	}
 }
 
+static READ8_HANDLER( towns_gfx_high_r )
+{
+	return towns_gfxvram[offset];
+}
+
+static WRITE8_HANDLER( towns_gfx_high_w )
+{
+	towns_gfxvram[offset] = data;
+}
+
 static READ8_HANDLER( towns_sys480_r )
 {
 	if(towns_system_port & 0x02)
@@ -1053,7 +1063,7 @@ static ADDRESS_MAP_START(towns_mem, ADDRESS_SPACE_PROGRAM, 32)
   AM_RANGE(0x000f0000, 0x000f7fff) AM_RAM //READWRITE(SMH_BANK(12),SMH_BANK(12))
   AM_RANGE(0x000f8000, 0x000fffff) AM_READWRITE(SMH_BANK(11),SMH_BANK(12))
   AM_RANGE(0x00100000, 0x005fffff) AM_RAM  // some extra RAM - seems to be needed to boot
-  AM_RANGE(0x80000000, 0x8003ffff) AM_RAM AM_MIRROR(0x1c0000) AM_BASE(&towns_vram) // VRAM
+  AM_RANGE(0x80000000, 0x8003ffff) AM_READWRITE8(towns_gfx_high_r,towns_gfx_high_w,0xffffffff) AM_MIRROR(0x1c0000) // VRAM
   AM_RANGE(0x81000000, 0x8101ffff) AM_RAM  // Sprite RAM
   AM_RANGE(0xc2000000, 0xc207ffff) AM_ROM AM_REGION("user",0x000000)  // OS ROM
   AM_RANGE(0xc2080000, 0xc20fffff) AM_ROM AM_REGION("user",0x100000)  // DIC ROM
@@ -1126,7 +1136,7 @@ static DRIVER_INIT( towns )
 {
 	towns_vram = auto_alloc_array(machine,UINT32,0x20000);
 	towns_cmos = auto_alloc_array(machine,UINT8,0x2000);
-	towns_gfxvram = auto_alloc_array(machine,UINT8,0x200000);
+	towns_gfxvram = auto_alloc_array(machine,UINT8,0x40000);
 	towns_txtvram = auto_alloc_array(machine,UINT8,0x8000);
 	towns_serial_rom = auto_alloc_array(machine,UINT8,256/8);
 	towns_init_serial_rom(machine);
