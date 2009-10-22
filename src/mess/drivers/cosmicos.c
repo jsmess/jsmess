@@ -135,7 +135,7 @@ static WRITE8_HANDLER( segment_w )
 
 	if ((state->counter > 0) && (state->counter < 9))
 	{
-		output_set_digit_value(8 - state->counter, data);
+		output_set_digit_value(10 - state->counter, data);
 	}
 }
 
@@ -336,7 +336,7 @@ INPUT_PORTS_END
 
 /* Video */
 
-static TIMER_DEVICE_CALLBACK( segment_tick )
+static TIMER_DEVICE_CALLBACK( digit_tick )
 {
 	cosmicos_state *state = timer->machine->driver_data;
 
@@ -573,12 +573,10 @@ static MACHINE_DRIVER_START( cosmicos )
     /* video hardware */
 	MDRV_DEFAULT_LAYOUT( layout_cosmicos )
 	MDRV_DM9368_ADD(DM9368_TAG, 0, NULL)
-	MDRV_TIMER_ADD_PERIODIC("segment", segment_tick, HZ(100))
+	MDRV_TIMER_ADD_PERIODIC("digit", digit_tick, HZ(100))
 	MDRV_TIMER_ADD_PERIODIC("interrupt", int_tick, HZ(1000))
 
-	MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(XTAL_1_75MHz, CDP1864_SCREEN_WIDTH, CDP1864_HBLANK_END, CDP1864_HBLANK_START, CDP1864_TOTAL_SCANLINES, CDP1864_SCANLINE_VBLANK_END, CDP1864_SCANLINE_VBLANK_START)
+	MDRV_CDP1864_SCREEN_ADD(SCREEN_TAG, XTAL_1_75MHz)
 
 	MDRV_PALETTE_LENGTH(8+8)
 	MDRV_VIDEO_UPDATE(cosmicos)
