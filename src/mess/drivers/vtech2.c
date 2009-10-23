@@ -70,6 +70,7 @@
 #include "includes/vtech2.h"
 #include "devices/cartslot.h"
 #include "devices/cassette.h"
+#include "devices/flopdrv.h"
 #include "formats/vt_cas.h"
 
 static ADDRESS_MAP_START(vtech2_mem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -409,6 +410,18 @@ static const cassette_config laser_cassette_config =
 	CASSETTE_PLAY
 };
 
+static const floppy_config vtech2_floppy_config =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	FLOPPY_DRIVE_SS_40,
+	FLOPPY_OPTIONS_NAME(default),
+	DO_NOT_KEEP_GEOMETRY
+};
+
 static MACHINE_DRIVER_START( laser350 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3694700)        /* 3.694700 MHz */
@@ -448,6 +461,9 @@ static MACHINE_DRIVER_START( laser350 )
 	MDRV_CARTSLOT_NOT_MANDATORY
 	MDRV_CARTSLOT_LOAD(laser_cart)
 	MDRV_CARTSLOT_UNLOAD(laser_cart)
+
+	/* 5.25" Floppy drive */
+	MDRV_FLOPPY_DRIVE_ADD( FLOPPY_0, vtech2_floppy_config )
 MACHINE_DRIVER_END
 
 
@@ -460,6 +476,9 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( laser700 )
 	MDRV_IMPORT_FROM( laser350 )
 	MDRV_MACHINE_RESET( laser700 )
+
+	/* Second 5.25" floppy drive */
+	MDRV_FLOPPY_DRIVE_ADD( FLOPPY_1, vtech2_floppy_config )
 MACHINE_DRIVER_END
 
 
@@ -499,31 +518,7 @@ ROM_END
 
 ***************************************************************************/
 
-static void laser_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* floppy */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_TYPE:							info->i = IO_FLOPPY; break;
-		case MESS_DEVINFO_INT_READABLE:						info->i = 1; break;
-		case MESS_DEVINFO_INT_WRITEABLE:						info->i = 0; break;
-		case MESS_DEVINFO_INT_CREATABLE:						info->i = 0; break;
-		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(laser_floppy); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "dsk"); break;
-	}
-}
-
-static SYSTEM_CONFIG_START(laser)
-	CONFIG_DEVICE(laser_floppy_getinfo)
-SYSTEM_CONFIG_END
-
 /*    YEAR   NAME      PARENT    COMPAT MACHINE   INPUT     INIT      CONFIG    COMPANY              FULLNAME */
-COMP( 1984?, laser350, 0,		 0,		laser350, laser350, laser,    laser,	"Video Technology",  "Laser 350" , 0)
-COMP( 1984?, laser500, laser350, 0,		laser500, laser500, laser,    laser,	"Video Technology",  "Laser 500" , 0)
-COMP( 1984?, laser700, laser350, 0,		laser700, laser500, laser,    laser,	"Video Technology",  "Laser 700" , 0)
+COMP( 1984?, laser350, 0,		 0,		laser350, laser350, laser,    0,		"Video Technology",  "Laser 350" , 0)
+COMP( 1984?, laser500, laser350, 0,		laser500, laser500, laser,    0,		"Video Technology",  "Laser 500" , 0)
+COMP( 1984?, laser700, laser350, 0,		laser700, laser500, laser,    0,		"Video Technology",  "Laser 700" , 0)
