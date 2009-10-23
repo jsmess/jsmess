@@ -2204,38 +2204,22 @@ static SYSTEM_CONFIG_START( atarist )
 	// MIDI
 SYSTEM_CONFIG_END
 
-static SYSTEM_CONFIG_START( megast )
-	CONFIG_DEVICE(atarist_serial_getinfo)
-	// MIDI
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START( atariste )
-	CONFIG_DEVICE(atarist_serial_getinfo)
-	// MIDI
-SYSTEM_CONFIG_END
-
 static SYSTEM_CONFIG_START( megaste )
 	CONFIG_DEVICE(megaste_serial_getinfo)
-	// MIDI
-	// LAN
 SYSTEM_CONFIG_END
 
-static SYSTEM_CONFIG_START( stbook )
-	CONFIG_DEVICE(megaste_serial_getinfo)
-	// MIDI
-	// IDE Hard Disk
-SYSTEM_CONFIG_END
+
 
 /* System Drivers */
 
 /*     YEAR  NAME    PARENT    COMPAT   MACHINE   INPUT     INIT    CONFIG   COMPANY    FULLNAME */
 COMP( 1985, atarist,  0,        0,		atarist,  atarist,  0,     atarist,  "Atari", "Atari ST", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-COMP( 1987, megast,   atarist,  0,		megast,   atarist,  0,     megast,   "Atari", "Atari Mega ST", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE  )
+COMP( 1987, megast,   atarist,  0,		megast,   atarist,  0,     atarist,   "Atari", "Atari Mega ST", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE  )
 /*
-COMP( 1989, stacy,    atarist,  0,      stacy,    stacy,    0,     stacy,    "Atari", "Atari Stacy", GAME_NOT_WORKING )
+COMP( 1989, stacy,    atarist,  0,      stacy,    stacy,    0,     atarist,    "Atari", "Atari Stacy", GAME_NOT_WORKING )
 */
-COMP( 1989, atariste, 0,		0,		atariste, atariste, 0,     atariste, "Atari", "Atari STE", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE  )
-COMP( 1990, stbook,   atariste, 0,		stbook,   stbook,   0,     stbook,	 "Atari", "Atari STBook", GAME_NOT_WORKING )
+COMP( 1989, atariste, 0,		0,		atariste, atariste, 0,     atarist, "Atari", "Atari STE", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE  )
+COMP( 1990, stbook,   atariste, 0,		stbook,   stbook,   0,     megaste,	 "Atari", "Atari STBook", GAME_NOT_WORKING )
 COMP( 1991, megaste,  atariste, 0,		megaste,  atarist,  0,     megaste,  "Atari", "Atari Mega STE", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE  )
 /*
 COMP( 1991, stpad,    atariste, 0,      stpad,    stpad,    0,     stpad,    "Atari", "Atari STPad (prototype)", GAME_NOT_WORKING )

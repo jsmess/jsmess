@@ -1509,14 +1509,6 @@ static SYSTEM_CONFIG_START( abc800 )
 	CONFIG_DEVICE(abc800_serial_getinfo)
 SYSTEM_CONFIG_END
 
-static SYSTEM_CONFIG_START( abc802 )
-	CONFIG_DEVICE(abc800_serial_getinfo)
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START( abc806 )
-	CONFIG_DEVICE(abc800_serial_getinfo)
-SYSTEM_CONFIG_END
-
 /* Driver Initialization */
 
 static DIRECT_UPDATE_HANDLER( abc800_direct_update_handler )
@@ -1612,5 +1604,5 @@ static DRIVER_INIT( abc806 )
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT    CONFIG  COMPANY             FULLNAME        FLAGS */
 COMP( 1981, abc800m,    0,			0,      abc800m,    abc800, abc800, abc800, "Luxor Datorer AB", "ABC 800 M/HR", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 COMP( 1981, abc800c,    abc800m,    0,      abc800c,    abc800, abc800, abc800, "Luxor Datorer AB", "ABC 800 C/HR", GAME_NOT_WORKING )
-COMP( 1983, abc802,     0,          0,      abc802,     abc802, abc802, abc802, "Luxor Datorer AB", "ABC 802",		GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-COMP( 1983, abc806,     0,          0,      abc806,     abc806, abc806, abc806, "Luxor Datorer AB", "ABC 806",		GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+COMP( 1983, abc802,     0,          0,      abc802,     abc802, abc802, abc800, "Luxor Datorer AB", "ABC 802",		GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+COMP( 1983, abc806,     0,          0,      abc806,     abc806, abc806, abc800, "Luxor Datorer AB", "ABC 806",		GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )

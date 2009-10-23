@@ -1565,11 +1565,7 @@ ROM_START( ip244415 )
 	ROM_LOAD( "ip244415.bin", 0x000000, 0x080000, CRC(2f37825a) SHA1(0d48c573b53a307478820b85aacb57b868297ca3) )
 ROM_END
 
-static SYSTEM_CONFIG_START( ip225015 )
-//  CONFIG_DEVICE(ip22_harddisk_getinfo)
-SYSTEM_CONFIG_END
-
 /*     YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     INIT      CONFIG    COMPANY   FULLNAME */
-COMP( 1993, ip225015, 0,        0,        ip225015, ip225015, ip225015, ip225015, "Silicon Graphics, Inc", "Indy (R5000, 150MHz)", GAME_NOT_WORKING )
-COMP( 1993, ip224613, 0,        0,        ip224613, ip225015, ip225015, ip225015, "Silicon Graphics, Inc", "Indy (R4600, 133MHz)", GAME_NOT_WORKING )
-COMP( 1994, ip244415, 0,        0,        ip244415, ip225015, ip225015, ip225015, "Silicon Graphics, Inc", "Indigo2 (R4400, 150MHz)", GAME_NOT_WORKING )
+COMP( 1993, ip225015, 0,        0,        ip225015, ip225015, ip225015, 0, "Silicon Graphics, Inc", "Indy (R5000, 150MHz)", GAME_NOT_WORKING )
+COMP( 1993, ip224613, 0,        0,        ip224613, ip225015, ip225015, 0, "Silicon Graphics, Inc", "Indy (R4600, 133MHz)", GAME_NOT_WORKING )
+COMP( 1994, ip244415, 0,        0,        ip244415, ip225015, ip225015, 0, "Silicon Graphics, Inc", "Indigo2 (R4400, 150MHz)", GAME_NOT_WORKING )

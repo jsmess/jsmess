@@ -300,9 +300,6 @@ ROM_START(comquest)
 	ROM_LOAD("comquest.bin", 0x00000, 0x80000, CRC(2bf4b1a8) SHA1(8d1821cbde37cca2055b18df001438f7d138a8c1))
 ROM_END
 
-static SYSTEM_CONFIG_START(comquest)
-	/*CONFIG_DEVICE_CARTSLOT_REQ( 1, "bin", a2600_load_rom, NULL, NULL)*/
-SYSTEM_CONFIG_END
 
 /***************************************************************************
 
@@ -311,4 +308,4 @@ SYSTEM_CONFIG_END
 ***************************************************************************/
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT    CONFIG      MONITOR COMPANY   FULLNAME */
-CONS( 1995, comquest, 0, 		0,		comquest, comquest, 0,		comquest,	"Data Concepts",  "ComQuest Plus (German)", GAME_NOT_WORKING )
+CONS( 1995, comquest, 0, 		0,		comquest, comquest, 0,		0,	"Data Concepts",  "ComQuest Plus (German)", GAME_NOT_WORKING )

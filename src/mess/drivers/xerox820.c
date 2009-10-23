@@ -788,13 +788,6 @@ ROM_START( xerox820ii )
 	ROM_LOAD( "x820ii.u58", 0x0000, 0x0800, NO_DUMP )
 ROM_END
 
-/*
-static SYSTEM_CONFIG_START( xerox820ii )
-    64K
-    CONFIG_DEVICE(xerox820ii_floppy_getinfo)
-//  CONFIG_DEVICE(xerox820_harddisk_getinfo) 10MB
-SYSTEM_CONFIG_END
-*/
 /* System Drivers */
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    CONFIG      COMPANY                         FULLNAME        FLAGS */

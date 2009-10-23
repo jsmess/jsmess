@@ -614,10 +614,6 @@ ROM_START(exeltel)
 	ROM_LOAD("exeltel14.bin", 0x0000, 0x10000, CRC(52a80dd4) SHA1(2cb4c784fba3aec52770999bb99a9a303269bf89))	/* system ROM */
 ROM_END
 
-static SYSTEM_CONFIG_START(exelv)
-	/* cartridge port is not emulated */
-SYSTEM_CONFIG_END
-
 /*      YEAR    NAME    PARENT      COMPAT  MACHINE     INPUT   INIT    CONFIG      COMPANY         FULLNAME */
-COMP(	1984,	exl100, 0,          0,      exelv,      exelv,  0,		exelv,      "Exelvision",   "EXL 100" , GAME_NOT_WORKING)
-COMP(	1986,	exeltel,exl100,     0,		exelv,		exelv,	0,		exelv,		"Exelvision",	"Exeltel" , GAME_NOT_WORKING)
+COMP(	1984,	exl100, 0,          0,      exelv,      exelv,  0,		0,      "Exelvision",   "EXL 100" , GAME_NOT_WORKING)
+COMP(	1986,	exeltel,exl100,     0,		exelv,		exelv,	0,		0,		"Exelvision",	"Exeltel" , GAME_NOT_WORKING)
