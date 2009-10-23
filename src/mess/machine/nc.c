@@ -156,8 +156,6 @@ DEVICE_IMAGE_LOAD( nc_serial )
 		/* connect serial chip to serial device */
 		msm8251_connect_to_serial_device(uart, image);
 
-		serial_device_set_protocol(image, SERIAL_PROTOCOL_NONE);
-
 		/* and start transmit */
 		serial_device_set_transmit_state(image,1);
 

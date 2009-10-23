@@ -265,7 +265,8 @@ Source Changes:
 
 - Converted all drivers to use messram device.  [Miodrag Milanovic]
 
-
+- Removed XMODEM implementation from serial, was not used, and it should be 
+  implemented inside machine software not a MESS code [Miodrag Milanovic]
 
 
 0.134

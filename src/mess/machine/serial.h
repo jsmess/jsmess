@@ -75,16 +75,6 @@
 /* TX = Transmit data. (OUTPUT) */
 #define SERIAL_STATE_TX_DATA	0x00020
 
-/* protocol selections */
-
-/* all data is transmitted with a start bit, data bits, optional parity bit,
-and stop bits. These are programmable. */
-enum
-{
-	SERIAL_PROTOCOL_NONE,		/* no protocol applied */
-	SERIAL_PROTOCOL_XMODEM		/* transfer data using xmodem protocol */
-};
-
 /* parity selections */
 /* if all the bits are added in a byte, if the result is:
     even -> parity is even
@@ -251,15 +241,6 @@ struct data_stream
 	unsigned long ByteCount;
 };
 
-/* an internal interface used by serial device */
-struct serial_protocol_interface
-{
-	/* callback executed when character has been received */
-	void (*character_received_callback)(int id,unsigned char ch);
-	/* callback executed when character has been transmitted, ready to transmit a new char */
-	void (*character_sent_callback)(int id);
-};
-
 /* a serial device */
 struct serial_device
 {
@@ -280,15 +261,12 @@ struct serial_device
 	struct data_form data_form;
 
 	int transmit_state;
-	int protocol;
 
 	/* baud rate */
 	unsigned long BaudRate;
 
 	/* baud rate timer */
 	void	*timer;
-
-	struct serial_protocol_interface protocol_interface;
 };
 
 unsigned long serial_device_get_state(int id);
@@ -305,24 +283,7 @@ DEVICE_IMAGE_UNLOAD(serial_device);
 
 void serial_device_setup(const device_config *image, int baud_rate, int num_data_bits, int stop_bit_count, int parity_code);
 
-/* get name of protocol identified by specified id */
-const char *serial_device_get_protocol_name(int protocol_id);
-
-/* set the protocol to be used by the serial device */
-void serial_device_set_protocol(const device_config *image, int protocol_id);
 /* set the transmit state of the serial device */
 void serial_device_set_transmit_state(const device_config *image, int state);
-
-/***********************************************************************************************/
-/* XModem protocol */
-
-#define XMODEM_CRC_NAK	67 /* begins a xmodem-crc transfer */
-#define XMODEM_SOH		1	/* id of a 256 byte block */
-#define XMODEM_EOT		4
-#define XMODEM_ACK		6
-#define XMODEM_NAK		21	/* begins a xmodem transfer */
-#define XMODEM_CAN		24
-#define XMODEM_STX		2	/* id start of a 1k block */
-
 
 #endif /* SERIAL_H_ */

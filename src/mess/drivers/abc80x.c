@@ -1477,8 +1477,6 @@ static DEVICE_IMAGE_LOAD( abc800_serial )
 		/* setup transmit parameters */
 		serial_device_setup(image, 9600 >> input_port_read(image->machine, "BAUD"), 8, 1, SERIAL_PARITY_NONE);
 
-		serial_device_set_protocol(image, SERIAL_PROTOCOL_NONE);
-
 		/* and start transmit */
 		serial_device_set_transmit_state(image, 1);
 

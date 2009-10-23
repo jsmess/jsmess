@@ -247,8 +247,6 @@ static DEVICE_IMAGE_LOAD( bw2_serial )
 		/* connect serial chip to serial device */
 		msm8251_connect_to_serial_device(state->msm8251, image);
 
-		serial_device_set_protocol(image, SERIAL_PROTOCOL_NONE);
-
 		/* and start transmit */
 		serial_device_set_transmit_state(image, 1);
 

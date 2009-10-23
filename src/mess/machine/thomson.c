@@ -406,7 +406,6 @@ DEVICE_START( thom_serial )
 	}
 
 	serial_device_setup( device, 2400, 7, 2, SERIAL_PARITY_NONE ); /* default */
-	serial_device_set_protocol( device, SERIAL_PROTOCOL_NONE );
 	serial_device_set_transmit_state( device, 1 );
 }
 
