@@ -548,6 +548,12 @@ static WRITE8_HANDLER( wram_sel_w )
 	//printf("%02x\n",wram_bank);
 }
 
+static READ8_HANDLER( pc98_mouse_r )
+{
+	//TODO: 0x7fd8 bit 6 controls testing of bank 3 (0x80000-0x9ffff), afaik the mouse ppi is at odd addresses...
+	return 0xff;
+}
+
 static READ32_HANDLER( gfx_bitmap_ram_r ) { return gfx_bitmap_ram[offset+ems_bank*0x18000/4]; }
 static WRITE32_HANDLER( gfx_bitmap_ram_w ) { COMBINE_DATA(&gfx_bitmap_ram[offset+ems_bank*0x18000/4]); }
 
@@ -568,8 +574,6 @@ static ADDRESS_MAP_START( pc9801_mem, ADDRESS_SPACE_PROGRAM, 32)
 	AM_RANGE(0x000e0000, 0x000fffff) AM_ROMBANK(1) AM_WRITE8(rom_bank_w,0xffffffff)
 	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROMBANK(1) AM_WRITE8(rom_bank_w,0xffffffff)
 ADDRESS_MAP_END
-
-
 
 static ADDRESS_MAP_START( pc9801_io, ADDRESS_SPACE_IO, 32)
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE8(port_00_r,port_00_w,0xffffffff) // pic8259 (even ports) / dma (odd ports)
@@ -596,6 +600,7 @@ static ADDRESS_MAP_START( pc9801_io, ADDRESS_SPACE_IO, 32)
 	AM_RANGE(0x00f0, 0x00ff) AM_READWRITE8(port_f0_r,port_f0_w,0xffffffff)
 	AM_RANGE(0x043c, 0x043f) AM_WRITE8(ems_sel_w,0xffffffff)
 	AM_RANGE(0x0460, 0x0463) AM_READWRITE8(wram_sel_r,wram_sel_w,0xffffffff)
+	AM_RANGE(0x7fd8, 0x7fdf) AM_READ8(pc98_mouse_r,0xffffffff)
 
 //	(and many more...)
 ADDRESS_MAP_END
