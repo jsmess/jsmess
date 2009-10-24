@@ -426,4 +426,14 @@ INLINE attotime attotime_max(attotime _time1, attotime _time2)
 }
 
 
+/*-------------------------------------------------
+    attotime_is_never - return whether or not an
+    attotime is attotime_never
+-------------------------------------------------*/
+
+INLINE int attotime_is_never(attotime _time)
+{
+	return (attotime_to_double(_time) == (double)ATTOTIME_MAX_SECONDS);
+}
+
 #endif	/* __ATTOTIME_H__ */
