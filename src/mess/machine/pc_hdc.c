@@ -84,20 +84,20 @@
 #define CTL_PIO 		0x00
 #define CTL_DMA 		0x01
 
-static int idx = 0; 							/* contoller * 2 + drive */
+static int idx = 0; 				/* controller * 2 + drive */
 static int drv = 0; 							/* 0 master, 1 slave drive */
-static int cylinders[MAX_HARD] = {612,612,};    /* number of cylinders */
-static int rwc[MAX_HARD] = {613,613,};			/* recduced write current from cyl */
-static int wp[MAX_HARD] = {613,613,};			/* write precompensation from cyl */
-static int heads[MAX_HARD] = {4,4,};			/* heads */
-static int ecc[MAX_HARD] = {11,11,};			/* ECC bytes */
+static int cylinders[MAX_HARD];		/* number of cylinders */
+static int rwc[MAX_HARD];			/* reduced write current from cyl */
+static int wp[MAX_HARD];			/* write precompensation from cyl */
+static int heads[MAX_HARD];			/* heads */
+static int ecc[MAX_HARD];			/* ECC bytes */
 
 /* indexes */
-static int cylinder[MAX_HARD] = {0,};			/* current cylinder */
-static int head[MAX_HARD] = {0,};				/* current head */
-static int sector[MAX_HARD] = {0,}; 			/* current sector */
-static int sector_cnt[MAX_HARD] = {0,};         /* sector count */
-static int control[MAX_HARD] = {0,};            /* control */
+static int cylinder[MAX_HARD];			/* current cylinder */
+static int head[MAX_HARD];				/* current head */
+static int sector[MAX_HARD]; 			/* current sector */
+static int sector_cnt[MAX_HARD];		/* sector count */
+static int control[MAX_HARD];			/* control */
 
 static int csb[MAX_BOARD];				/* command status byte */
 static int status[MAX_BOARD];			/* drive status */
@@ -185,6 +185,22 @@ int pc_hdc_setup(running_machine *machine, void (*hdc_set_irq_func)(running_mach
 	hdc_set_irq = hdc_set_irq_func;
 
 	buffer = auto_alloc_array(machine, UINT8, 17*4*512);
+
+	for (i = 0; i < MAX_HARD; i++)
+	{
+		cylinders[i] = 612;
+		rwc[i] = 613;
+		wp[i] = 613;
+		heads[i] = 4;
+		ecc[i] = 11;
+
+		/* indexes */
+		cylinder[i] = 0;
+		head[i] = 0;
+		sector[i] = 0;
+		sector_cnt[i] = 0;
+		control[i] = 0;
+	}
 
 	/* init for all boards */
 	for (i = 0; i < MAX_BOARD; i++)

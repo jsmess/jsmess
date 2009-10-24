@@ -71,10 +71,10 @@ static DWORD filterExclusion[NUM_EXCLUSIONS] =
 	IDC_FILTER_HORIZONTAL,  IDC_FILTER_VERTICAL
 };
 
-static void DisableFilterControls(HWND hWnd, LPFOLDERDATA lpFilterRecord,
-								  LPFILTER_ITEM lpFilterItem, DWORD dwFlags);
+static void DisableFilterControls(HWND hWnd, LPCFOLDERDATA lpFilterRecord,
+								  LPCFILTER_ITEM lpFilterItem, DWORD dwFlags);
 static void EnableFilterExclusions(HWND hWnd, DWORD dwCtrlID);
-static DWORD ValidateFilters(LPFOLDERDATA lpFilterRecord, DWORD dwFlags);
+static DWORD ValidateFilters(LPCFOLDERDATA lpFilterRecord, DWORD dwFlags);
 static void OnHScroll(HWND hWnd, HWND hwndCtl, UINT code, int pos);
 
 /***************************************************************************/
@@ -401,7 +401,7 @@ INT_PTR CALLBACK FilterDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPa
 {
 	static DWORD			dwFilters;
 	static DWORD			dwpFilters;
-	static LPFOLDERDATA		lpFilterRecord;
+	static LPCFOLDERDATA	lpFilterRecord;
 	char 					strText[250];
 	int 					i;
 
@@ -411,7 +411,7 @@ INT_PTR CALLBACK FilterDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPa
 	{
 		LPTREEFOLDER folder = GetCurrentFolder();
 		LPTREEFOLDER lpParent = NULL;
-		LPFILTER_ITEM g_lpFilterList = GetFilterList();
+		LPCFILTER_ITEM g_lpFilterList = GetFilterList();
 
 		dwFilters = 0;
 
@@ -558,7 +558,7 @@ INT_PTR CALLBACK FilterDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPa
 		WORD wID		 = GET_WM_COMMAND_ID(wParam, lParam);
 		WORD wNotifyCode = GET_WM_COMMAND_CMD(wParam, lParam);
 		LPTREEFOLDER folder = GetCurrentFolder();
-		LPFILTER_ITEM g_lpFilterList = GetFilterList();
+		LPCFILTER_ITEM g_lpFilterList = GetFilterList();
 
 		switch (wID)
 		{
@@ -783,8 +783,8 @@ INT_PTR CALLBACK DirectXDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lP
     private functions
  ***************************************************************************/
 
-static void DisableFilterControls(HWND hWnd, LPFOLDERDATA lpFilterRecord,
-								  LPFILTER_ITEM lpFilterItem, DWORD dwFlags)
+static void DisableFilterControls(HWND hWnd, LPCFOLDERDATA lpFilterRecord,
+								  LPCFILTER_ITEM lpFilterItem, DWORD dwFlags)
 {
 	HWND  hWndCtrl = GetDlgItem(hWnd, lpFilterItem->m_dwCtrlID);
 	DWORD dwFilterType = lpFilterItem->m_dwFilterType;
@@ -844,7 +844,7 @@ static void EnableFilterExclusions(HWND hWnd, DWORD dwCtrlID)
 }
 
 // Validate filter setting, mask out inappropriate filters for this folder
-static DWORD ValidateFilters(LPFOLDERDATA lpFilterRecord, DWORD dwFlags)
+static DWORD ValidateFilters(LPCFOLDERDATA lpFilterRecord, DWORD dwFlags)
 {
 	DWORD dwFilters;
 

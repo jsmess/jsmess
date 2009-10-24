@@ -46,7 +46,7 @@
 
 static BOOL FilterAvailable(int driver_index);
 
-FOLDERDATA g_folderData[] =
+const FOLDERDATA g_folderData[] =
 {
 	{"All Games",       "allgames",          FOLDER_ALLGAMES,     IDI_FOLDER,				0,             0,            NULL,                       NULL,                    TRUE },
 	{"Available",       "available",         FOLDER_AVAILABLE,    IDI_FOLDER_AVAILABLE,     F_AVAILABLE,   0,            NULL,                       FilterAvailable,         TRUE },
@@ -80,7 +80,7 @@ FOLDERDATA g_folderData[] =
 };
 
 /* list of filter/control Id pairs */
-FILTER_ITEM g_filterList[] =
+const FILTER_ITEM g_filterList[] =
 {
 	{ F_CLONES,       IDC_FILTER_CLONES,      DriverIsClone, TRUE },
 	{ F_NONWORKING,   IDC_FILTER_NONWORKING,  DriverIsBroken, TRUE },
@@ -95,7 +95,7 @@ FILTER_ITEM g_filterList[] =
 	{ 0 }
 };
 
-DIRECTORYINFO g_directoryInfo[] =
+const DIRECTORYINFO g_directoryInfo[] =
 {
 	{ "ROMs",                  GetRomDirs,      SetRomDirs,      TRUE,  DIRDLG_ROMS },
 	{ "Samples",               GetSampleDirs,   SetSampleDirs,   TRUE,  DIRDLG_SAMPLES },

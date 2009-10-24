@@ -13,7 +13,7 @@
 
 #define KEYBOARD_BUFFER_SIZE	256
 
-static int kbd_index[4] = { 0, 1, 2, 3 };
+static int kbd_index[4];
 static UINT8 *key_buf = NULL;
 static int key_buf_pos = 0;
 static int key_cur_pos = 0;
@@ -100,6 +100,11 @@ static INPUT_CHANGED( kbd_update )
 
 void amigakbd_init( running_machine *machine )
 {
+	int i;
+
+	for (i=0; i<ARRAY_LENGTH(kbd_index); i++)
+		kbd_index[i] = i;
+
 	/* allocate a keyboard buffer */
 	key_buf = auto_alloc_array(machine, UINT8, KEYBOARD_BUFFER_SIZE );
 	key_buf_pos = 0;

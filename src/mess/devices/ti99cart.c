@@ -1607,7 +1607,7 @@ static DEVICE_GET_INFO(ti99_cartridge_pcb_none)
 	}
 }
 
-DEVICE_GET_INFO(ti99_cartridge_pcb_std)
+static DEVICE_GET_INFO(ti99_cartridge_pcb_std)
 {
 	DEVICE_GET_INFO_CALL(ti99_cart_common);
 }
@@ -1649,7 +1649,7 @@ static DEVICE_GET_INFO(ti99_cartridge_pcb_paged)
 	}
 }
 
-DEVICE_GET_INFO(ti99_cartridge_pcb_minimem)
+static DEVICE_GET_INFO(ti99_cartridge_pcb_minimem)
 {
 	switch(state)
 	{
@@ -1723,7 +1723,7 @@ static DEVICE_GET_INFO(ti99_cartridge_pcb_super)
 	}
 }
 
-DEVICE_GET_INFO(ti99_cartridge_pcb_mbx)
+static DEVICE_GET_INFO(ti99_cartridge_pcb_mbx)
 {
 	switch(state)
 	{

@@ -29,7 +29,7 @@ enum {
 *********************************************************************/
 
 unsigned char vectrex_via_out[2];
-rgb_t vectrex_beam_color = RGB_WHITE;      /* the color of the vectrex beam */
+rgb_t vectrex_beam_color;      /* the color of the vectrex beam */
 int vectrex_imager_status = 0;     /* 0 = off, 1 = right eye, 2 = left eye */
 double vectrex_imager_freq;
 emu_timer *vectrex_imager_timer;
@@ -44,10 +44,7 @@ int vectrex_reset_refresh;
 *********************************************************************/
 
 /* Colors for right and left eye */
-static rgb_t imager_colors[6] =
-{
-	RGB_WHITE, RGB_WHITE, RGB_WHITE, RGB_WHITE, RGB_WHITE, RGB_WHITE
-};
+static rgb_t imager_colors[6];
 
 /* Starting points of the three colors */
 /* Values taken from J. Nelson's drawings*/
@@ -353,6 +350,12 @@ WRITE8_HANDLER(vectrex_psg_port_w)
 
 DRIVER_INIT(vectrex)
 {
+	int i;
+
+	vectrex_beam_color = RGB_WHITE;
+	for (i=0; i<ARRAY_LENGTH(imager_colors); i++)
+		imager_colors[i] = RGB_WHITE;
+
 	/*
      * Uninitialized RAM needs to return 0xff. Otherwise the mines in
      * the first level of Minestorm are not evenly distributed.

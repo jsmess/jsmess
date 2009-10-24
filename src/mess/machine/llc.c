@@ -12,7 +12,7 @@
 #include "includes/llc.h"
 #include "devices/messram.h"
 
-UINT8 code = 0;
+static UINT8 code = 0;
 
 static UINT8 llc1_key_state = 0;
 

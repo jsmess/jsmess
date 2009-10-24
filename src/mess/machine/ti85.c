@@ -1452,7 +1452,7 @@ static void ti85_receive_variables (running_machine *machine)
 {
 	static UINT8* var_data = NULL;
 	static UINT32 var_file_number = 0;
-	static char var_file_name[] = "00000000.85g";
+	char var_file_name[16];
 	static int variable_number = 0;
 	mame_file * var_file;
 	static UINT8* var_file_data = NULL;

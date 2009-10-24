@@ -116,8 +116,8 @@ static int          numExtraIcons = 0;
 static char         *ExtraFolderIcons[MAX_EXTRA_FOLDERS];
 
 // built in folders and filters
-static LPFOLDERDATA  g_lpFolderData;
-static LPFILTER_ITEM g_lpFilterList;	
+static LPCFOLDERDATA  g_lpFolderData;
+static LPCFILTER_ITEM g_lpFilterList;
 
 /***************************************************************************
     private function prototypes
@@ -214,7 +214,7 @@ void ResetFilters(void)
 	}
 }
 
-void InitTree(LPFOLDERDATA lpFolderData, LPFILTER_ITEM lpFilterList)
+void InitTree(LPCFOLDERDATA lpFolderData, LPCFILTER_ITEM lpFilterList)
 {
 	LONG_PTR l;
 	
@@ -428,7 +428,7 @@ BOOL GetParentFound(int nGame)
 	return FALSE;
 }
 
-LPFILTER_ITEM GetFilterList(void)
+LPCFILTER_ITEM GetFilterList(void)
 {
 	return g_lpFilterList;
 }
@@ -1285,7 +1285,7 @@ void CreateAllChildFolders(void)
 	for (i = 0; i < num_top_level_folders; i++)
 	{
 		LPTREEFOLDER lpFolder = treeFolders[i];
-		LPFOLDERDATA lpFolderData = NULL;
+		LPCFOLDERDATA lpFolderData = NULL;
 
 		for (j = 0; g_lpFolderData[j].m_lpTitle; j++)
 		{
@@ -1554,7 +1554,7 @@ BOOL InitFolders(void)
 {
 	int 			i = 0;
 	DWORD			dwFolderFlags;
-	LPFOLDERDATA	fData = 0;
+	LPCFOLDERDATA	fData = 0;
 
 	if (treeFolders != NULL)
 	{
@@ -1827,7 +1827,7 @@ static LRESULT CALLBACK TreeWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 	{
 		switch (uMsg)
 		{	
-	    case WM_MOUSEMOVE:
+		case WM_MOUSEMOVE:
 		{
 			if (MouseHasBeenMoved())
 				ShowCursor(TRUE);
@@ -1866,7 +1866,7 @@ static LRESULT CALLBACK TreeWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
  */
 
 /* find a FOLDERDATA by folderID */
-LPFOLDERDATA FindFilter(DWORD folderID)
+LPCFOLDERDATA FindFilter(DWORD folderID)
 {
 	int i;
 

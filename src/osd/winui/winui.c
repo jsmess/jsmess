@@ -712,7 +712,7 @@ static HIMAGELIST   hSmall = NULL;
 static HIMAGELIST   hHeaderImages = NULL;
 static int          *icon_index = NULL; /* for custom per-game icons */
 
-static TBBUTTON tbb[] =
+static const TBBUTTON tbb[] =
 {
 	{0, ID_VIEW_FOLDERS,    TBSTATE_ENABLED, TBSTYLE_CHECK,      {0, 0}, 0, 0},
 	{1, ID_VIEW_PICTURE_AREA,TBSTATE_ENABLED, TBSTYLE_CHECK,      {0, 0}, 0, 1},
@@ -1697,8 +1697,8 @@ static BOOL Win32UI_init(HINSTANCE hInstance, LPSTR lpCmdLine, int nCmdShow)
 	WNDCLASS	wndclass;
 	RECT		rect;
 	int i, nSplitterCount;
-	extern FOLDERDATA g_folderData[];
-	extern FILTER_ITEM g_filterList[];
+	extern const FOLDERDATA g_folderData[];
+	extern const FILTER_ITEM g_filterList[];
 	extern const char *history_filename;
 	extern const char *mameinfo_filename;
 	LONG common_control_version = GetCommonControlVersion();
@@ -1803,7 +1803,7 @@ static BOOL Win32UI_init(HINSTANCE hInstance, LPSTR lpCmdLine, int nCmdShow)
 	{
 		struct TabViewOptions opts;
 
-		static struct TabViewCallbacks s_tabviewCallbacks =
+		static const struct TabViewCallbacks s_tabviewCallbacks =
 		{
 			GetShowTabCtrl,			// pfnGetShowTabCtrl
 			SetCurrentTab,			// pfnSetCurrentTab
@@ -4511,11 +4511,12 @@ static BOOL MameCommand(HWND hwnd,int id, HWND hwndCtl, UINT codeNotify)
 	case ID_OPTIONS_BG:
 		{
 			OPENFILENAME OpenFileName;
-			static TCHAR szFile[MAX_PATH] = TEXT("\0");
+			TCHAR szFile[MAX_PATH];
 			TCHAR*       t_bgdir = tstring_from_utf8(GetBgDir());
 			if( !t_bgdir )
 				return FALSE;
 
+			szFile[0] = 0;
 			OpenFileName.lStructSize       = sizeof(OPENFILENAME);
 			OpenFileName.hwndOwner         = hMain;
 			OpenFileName.hInstance         = 0;
@@ -6339,7 +6340,7 @@ void InitTreeContextMenu(HMENU hTreeMenu)
 	MENUITEMINFO mii;
 	HMENU hMenu;
 	int i;
-	extern FOLDERDATA g_folderData[];
+	extern const FOLDERDATA g_folderData[];
 
 	ZeroMemory(&mii,sizeof(mii));
 	mii.cbSize = sizeof(mii);

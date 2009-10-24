@@ -871,7 +871,7 @@ BOOL GetShowFolderList(void)
 static void GetsShowFolderFlags(LPBITS bits)
 {
 	char s[2000];
-	extern FOLDERDATA g_folderData[];
+	extern const FOLDERDATA g_folderData[];
 	char *token;
 
 	snprintf(s, ARRAY_LENGTH(s), "%s", options_get_string(settings, MUIOPTION_HIDE_FOLDERS));
@@ -911,7 +911,7 @@ void SetShowFolder(int folder,BOOL show)
 	int i;
 	int num_saved = 0;
 	char str[10000];
-	extern FOLDERDATA g_folderData[];
+	extern const FOLDERDATA g_folderData[];
 
 	GetsShowFolderFlags(show_folder_flags);
 
@@ -2325,7 +2325,7 @@ static void LoadOptionsAndSettings(void)
 const char * GetFolderNameByID(UINT nID)
 {
 	UINT i;
-	extern FOLDERDATA g_folderData[];
+	extern const FOLDERDATA g_folderData[];
 	extern LPEXFOLDERDATA ExtraFolderData[];
 
 	for (i = 0; i < MAX_EXTRA_FOLDERS * MAX_EXTRA_SUBFOLDERS; i++)

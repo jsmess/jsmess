@@ -258,7 +258,8 @@ Source Changes:
 
 - Floppy support for TD0, IMD and CQM. [Miodrag Milanovic]
 
-- Cleanups to use more *_NAME and *_CALL macros.  [Atari Ace]
+- Cleanups to use more *_NAME and *_CALL macros, headers and const correctness.
+  [Atari Ace]
 
 - Cleanups to add static/const qualifiers, and to remove dead prototypes and
   code.  [Atari Ace]

@@ -54,6 +54,16 @@ struct fm7_video_flags
 	UINT8 vsync_flag;
 };
 
+/*----------- defined in drivers/fm7.c -----------*/
+
+READ8_HANDLER( fm7_sub_keyboard_r );
+READ8_HANDLER( fm77av_key_encoder_r );
+WRITE8_HANDLER( fm77av_key_encoder_w );
+READ8_HANDLER( fm7_sub_beeper_r );
+
+
+/*----------- defined in video/fm7.c -----------*/
+
 void fm7_mmr_refresh(const address_space*);
 
 TIMER_CALLBACK( fm77av_vsync );
@@ -65,7 +75,6 @@ WRITE8_HANDLER( fm7_sub_busyflag_w );
 READ8_HANDLER( fm77av_sub_modestatus_r );
 WRITE8_HANDLER( fm77av_sub_modestatus_w );
 WRITE8_HANDLER( fm77av_sub_bank_w );
-READ8_HANDLER( fm7_sub_beeper_r );
 
 READ8_HANDLER( fm7_cancel_ack );
 READ8_HANDLER( fm7_attn_irq_r );
@@ -86,10 +95,6 @@ WRITE8_HANDLER( fm77av_analog_palette_w );
 WRITE8_HANDLER( fm7_multipage_w );
 READ8_HANDLER( fm7_palette_r );
 WRITE8_HANDLER( fm7_palette_w );
-
-READ8_HANDLER( fm7_sub_keyboard_r );
-READ8_HANDLER( fm77av_key_encoder_r );
-WRITE8_HANDLER( fm77av_key_encoder_w );
 
 READ8_HANDLER( fm7_vram0_r );
 READ8_HANDLER( fm7_vram1_r );

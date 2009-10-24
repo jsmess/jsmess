@@ -1,8 +1,7 @@
 #include "video/mc6845.h"
 #include "machine/z80pio.h"
 
-/*----- super80 ----------*/
-
+/*----------- defined in video/super80.c -----------*/
 
 PALETTE_INIT( super80m );
 VIDEO_UPDATE( super80 );
@@ -11,8 +10,6 @@ VIDEO_UPDATE( super80e );
 VIDEO_UPDATE( super80m );
 VIDEO_START( super80 );
 VIDEO_EOF( super80m );
-
-/*----- Super80V ---------*/
 
 READ8_HANDLER( super80v_low_r );
 READ8_HANDLER( super80v_high_r );
@@ -27,7 +24,7 @@ MC6845_UPDATE_ROW( super80v_update_row );
 
 extern UINT8 *pcgram;
 
-/*------- machine -------*/
+/*----------- defined in machine/super80.c -----------*/
 
 READ8_HANDLER( super80_dc_r );
 READ8_HANDLER( super80_f2_r );

@@ -1005,7 +1005,7 @@ static WRITE_LINE_DEVICE_HANDLER( kb_8251_rxrdy_w )
 	v1050_set_int(device->machine, INT_KEYBOARD, state);
 }
 
-static msm8251_interface kb_8251_intf =
+static const msm8251_interface kb_8251_intf =
 {
 	NULL,
 	NULL,
@@ -1040,7 +1040,7 @@ static WRITE_LINE_DEVICE_HANDLER( sio_8251_txrdy_w )
 	v1050_set_int(device->machine, INT_RS_232, driver_state->rxrdy | driver_state->txrdy);
 }
 
-static msm8251_interface sio_8251_intf =
+static const msm8251_interface sio_8251_intf =
 {
 	sio_8251_txrdy_w,
 	NULL,

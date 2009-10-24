@@ -427,7 +427,7 @@ void	transmit_register_send_bit(running_machine *machine, struct serial_transmit
 	serial_connection_out(machine, connection);
 }
 
-void serial_protocol_none_sent_char(int id)
+static void serial_protocol_none_sent_char(int id)
 {
 	int i;
 	int bit;

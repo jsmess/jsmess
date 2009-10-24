@@ -37,19 +37,19 @@ static struct {
 	UINT8 reg[0x100];
 } pc1403_lcd;
 
-static const struct { int x, y; } pos[]={
-    { 152,67 }, // pc1403
-    { 155,69 } // pc1403h
-};
-
-static int DOWN=67, RIGHT=152;
+static int DOWN, RIGHT;
 
 VIDEO_START( pc1403 )
 {
 	if (strcmp(machine->gamedrv->name, "pc1403h") == 0)
 	{
-		DOWN = pos[1].y;
-		RIGHT = pos[1].x;
+		DOWN = 69;
+		RIGHT = 155;
+	}
+	else
+	{
+		DOWN = 67;
+		RIGHT = 152;
 	}
 
     VIDEO_START_CALL(pocketc);

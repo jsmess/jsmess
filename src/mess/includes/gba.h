@@ -209,7 +209,8 @@ typedef struct
 	UINT8 fifo_a[20], fifo_b[20];
 } gba_state;
 
-// defined in video/gba.c
+/*----------- defined in video/gba.c -----------*/
+
 void gba_draw_scanline(running_machine *machine, int y);
 void gba_video_start(running_machine *machine);
 

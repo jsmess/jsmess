@@ -20,7 +20,6 @@ extern UINT8 ti82_video_buffer[0x300];
 
 MACHINE_START( ti81 );
 MACHINE_START( ti82 );
-MACHINE_START( ti83 );
 MACHINE_START( ti85 );
 MACHINE_START( ti83p );
 MACHINE_START( ti86 );

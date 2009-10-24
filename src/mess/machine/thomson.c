@@ -37,6 +37,13 @@
 /* It must be set accordingly in formats/thom_cas.c */
 #define K7_SPEED_HACK 0
 
+/* bank logging */
+static int old_cart_bank;
+static int old_ram_bank;
+static int old_floppy_bank;
+
+
+
 /********************* common cassette code ***************************/
 
 INLINE const device_config* thom_cassette_img( running_machine *machine )
@@ -506,7 +513,6 @@ DEVICE_IMAGE_LOAD( to7_cartridge )
 static void to7_update_cart_bank(running_machine *machine)
 {
 	const address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	static int old_bank = -1;
 	int bank = 0;
 	if ( thom_cart_nb_banks )
 	{
@@ -514,11 +520,11 @@ static void to7_update_cart_bank(running_machine *machine)
 		memory_install_read8_handler(space, 0x0000, 0x0003, 0, 0, to7_cartridge_r );
 	}
 
-	if ( bank != old_bank )
+	if ( bank != old_cart_bank )
 		LOG_BANK(( "to7_update_cart_bank: CART is cartridge bank %i\n", bank ));
 
 	memory_set_bank( machine, THOM_CART_BANK, bank );
-	old_bank = bank;
+	old_cart_bank = bank;
 }
 
 
@@ -1518,6 +1524,7 @@ MACHINE_RESET ( to7 )
 	pia6821_cb1_w( sys_pia, 0, 0 );
 
 	/* memory */
+	old_cart_bank = -1;
 	to7_update_cart_bank(machine);
 	/* thom_cart_bank not reset */
 
@@ -1610,7 +1617,6 @@ static void to770_update_ram_bank(running_machine *machine)
 	const device_config *sys_pia = devtag_get_device( machine, THOM_PIA_SYS );
 	const address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 portb = pia6821_get_port_b_z_mask( sys_pia );
-	static int old_bank = -1;
 	int bank;
 
 	switch (portb & 0xf8)
@@ -1633,7 +1639,7 @@ static void to770_update_ram_bank(running_machine *machine)
 		return;
 	}
 
-	if ( bank != old_bank )
+	if ( bank != old_ram_bank )
 		LOG_BANK(( "to770_update_ram_bank: RAM bank change %i\n", bank ));
 
 	if ( messram_get_size(devtag_get_device(machine, "messram")) == 128*1024 || bank < 2 )
@@ -1646,7 +1652,7 @@ static void to770_update_ram_bank(running_machine *machine)
 		memory_install_write8_handler(space, 0xa000, 0xdfff, 0, 0, SMH_UNMAP );
 	}
 
-	old_bank = bank;
+	old_ram_bank = bank;
 }
 
 
@@ -1772,6 +1778,8 @@ MACHINE_RESET( to770 )
 	pia6821_cb1_w( sys_pia, 0, 0 );
 
 	/* memory */
+	old_ram_bank = -1;
+	old_cart_bank = -1;
 	to7_update_cart_bank(machine);
 	to770_update_ram_bank(machine);
 	/* thom_cart_bank not reset */
@@ -2030,7 +2038,6 @@ DEVICE_IMAGE_LOAD( mo5_cartridge )
 static void mo5_update_cart_bank(running_machine *machine)
 {
 	const address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	static int old_bank = -1;
 	int rom_is_ram = mo5_reg_cart & 4;
 	int bank = 0;
 
@@ -2041,7 +2048,7 @@ static void mo5_update_cart_bank(running_machine *machine)
 		/* 64 KB ROM from "JANE" cartridge */
 		memory_install_write8_handler( space, 0xb000, 0xefff, 0, 0, SMH_NOP );
 		bank = mo5_reg_cart & 3;
-		if ( bank != old_bank )
+		if ( bank != old_cart_bank )
 			LOG_BANK(( "mo5_update_cart_bank: CART is cartridge bank %i (A7CB style)\n", bank ));
 	}
 	else if ( rom_is_ram )
@@ -2050,7 +2057,7 @@ static void mo5_update_cart_bank(running_machine *machine)
 		int write_enable = mo5_reg_cart & 8;
 		bank = 4 + ( mo5_reg_cart & 3 );
 		memory_install_write8_handler( space, 0xb000, 0xefff, 0, 0, write_enable ? (write8_space_func)(STATIC_BANK1 + THOM_CART_BANK - 1) :  SMH_NOP );
-		if ( bank != old_bank )
+		if ( bank != old_cart_bank )
 			LOG_BANK(( "mo5_update_cart_bank: CART is nanonetwork RAM bank %i (write-enable=%i)\n", mo5_reg_cart & 3, write_enable ? 1 : 0 ));
 	}
 	else
@@ -2062,11 +2069,11 @@ static void mo5_update_cart_bank(running_machine *machine)
 			bank = thom_cart_bank % thom_cart_nb_banks;
 			memory_install_read8_handler( space, 0xbffc, 0xbfff, 0, 0, mo5_cartridge_r );
 		}
-		if ( bank != old_bank )
+		if ( bank != old_cart_bank )
 			LOG_BANK(( "mo5_update_cart_bank: CART is internal / cartridge bank %i\n", thom_cart_bank ));
 	}
 	memory_set_bank( machine, THOM_CART_BANK, bank );
-	old_bank = bank;
+	old_cart_bank = bank;
 }
 
 
@@ -2139,6 +2146,7 @@ MACHINE_RESET( mo5 )
 	pia6821_ca1_w( sys_pia, 0, 0 );
 
 	/* memory */
+	old_cart_bank = -1;
 	mo5_update_cart_bank(machine);
 	/* mo5_reg_cart not reset */
 	/* thom_cart_bank not reset */
@@ -2391,7 +2399,6 @@ static UINT8 to9_soft_bank;
 static void to9_update_cart_bank(running_machine *machine)
 {
 	const address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	static int old_bank = -1;
 	int bank = 0;
 	int slot = ( mc6846_get_output_port(devtag_get_device(machine, "mc6846")) >> 4 ) & 3; /* bits 4-5: ROM bank */
 
@@ -2403,19 +2410,19 @@ static void to9_update_cart_bank(running_machine *machine)
 	case 0:
 		/* BASIC (64 KB) */
 		bank = 4 + to9_soft_bank;
-		if ( bank != old_bank )
+		if ( bank != old_cart_bank )
 			LOG_BANK(( "to9_update_cart_bank: CART is BASIC bank %i\n", to9_soft_bank ));
 		break;
 	case 1:
 		/* software 1 (32 KB) */
 		bank = 8 + (to9_soft_bank & 1);
-		if ( bank != old_bank )
+		if ( bank != old_cart_bank )
 			LOG_BANK(( "to9_update_cart_bank: CART is software 1 bank %i\n", to9_soft_bank ));
 		break;
 	case 2:
 		/* software 2 (32 KB) */
 		bank = 10 + (to9_soft_bank & 1);
-		if ( bank != old_bank )
+		if ( bank != old_cart_bank )
 			LOG_BANK(( "to9_update_cart_bank: CART is software 2 bank %i\n", to9_soft_bank ));
 		break;
 	case 3:
@@ -2425,13 +2432,13 @@ static void to9_update_cart_bank(running_machine *machine)
 			bank = thom_cart_bank % thom_cart_nb_banks;
 			memory_install_read8_handler( space, 0x0000, 0x0003, 0, 0, to7_cartridge_r );
 		}
-		if ( bank != old_bank )
+		if ( bank != old_cart_bank )
 			LOG_BANK(( "to9_update_cart_bank: CART is cartridge bank %i\n",  thom_cart_bank ));
 		break;
 	}
 
 	memory_set_bank( machine, THOM_CART_BANK, bank );
-	old_bank = bank;
+	old_cart_bank = bank;
 }
 
 
@@ -2476,7 +2483,6 @@ static void to9_update_ram_bank (running_machine *machine)
 {
 	const device_config *sys_pia = devtag_get_device( machine, THOM_PIA_SYS );
 	const address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	static int old_bank = -1;
 	UINT8 port = mc6846_get_output_port(devtag_get_device(machine, "mc6846"));
 	UINT8 portb = pia6821_get_port_b_z_mask( sys_pia );
 	UINT8 disk = ((port >> 2) & 1) | ((port >> 5) & 2); /* bits 6,2: RAM bank */
@@ -2503,7 +2509,7 @@ static void to9_update_ram_bank (running_machine *machine)
 		return;
 	}
 
-	if ( old_bank != bank )
+	if ( old_ram_bank != bank )
 		LOG_BANK(( "to9_update_ram_bank: bank %i selected (pia=$%02X disk=%i)\n", bank, portb & 0xf8, disk ));
 
 	if ( messram_get_size(devtag_get_device(machine, "messram")) == 192*1024 || bank < 6 )
@@ -2516,7 +2522,7 @@ static void to9_update_ram_bank (running_machine *machine)
 		memory_install_write8_handler( space, 0xa000, 0xdfff, 0, 0, SMH_NOP );
 	}
 
-	old_bank = bank;
+	old_ram_bank = bank;
 }
 
 
@@ -3098,6 +3104,8 @@ MACHINE_RESET ( to9 )
 	pia6821_cb1_w( sys_pia, 0, 0 );
 
 	/* memory */
+	old_ram_bank = -1;
+	old_cart_bank = -1;
 	to9_soft_bank = 0;
 	to9_update_cart_bank(machine);
 	to9_update_ram_bank(machine);
@@ -3502,15 +3510,14 @@ static UINT8  to8_bios_bank;
 
 static void to8_update_floppy_bank( running_machine *machine )
 {
-	static int old_bank = -1;
 	int bank = (to8_reg_sys1 & 0x80) ? to7_floppy_bank : (to8_bios_bank + TO7_NB_FLOP_BANK);
 
-	if ( bank != old_bank )
+	if ( bank != old_floppy_bank )
 		LOG_BANK(( "to8_update_floppy_bank: floppy ROM is %s bank %i\n",
 			  (to8_reg_sys1 & 0x80) ? "external" : "internal",
 			  bank % TO7_NB_FLOP_BANK ));
 	memory_set_bank( machine, THOM_FLOP_BANK, bank );
-	old_bank = bank;
+	old_floppy_bank = bank;
 }
 
 
@@ -3590,7 +3597,6 @@ static STATE_POSTLOAD( to8_update_ram_bank_postload )
 static void to8_update_cart_bank (running_machine *machine)
 {
 	const address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	static int old_bank = -1;
 	int bank = 0;
 
 	/* reset bank switch */
@@ -3606,7 +3612,7 @@ static void to8_update_cart_bank (running_machine *machine)
 					       (to8_cart_vpage <= 4) ? to8_vcart_w :
 					       (write8_space_func)(STATIC_BANK1 + THOM_CART_BANK - 1) :
 					       SMH_NOP );
-		if ( bank != old_bank )
+		if ( bank != old_cart_bank )
 			LOG_BANK(( "to8_update_cart_bank: CART is RAM bank %i (write-enable=%i)\n", to8_cart_vpage, (to8_reg_cart & 0x40) ? 1 : 0 ));
 	}
 	else
@@ -3616,7 +3622,7 @@ static void to8_update_cart_bank (running_machine *machine)
 		{
 			/* internal software ROM space */
 			bank = 4 + to8_soft_bank;
-			if ( bank != old_bank )
+			if ( bank != old_cart_bank )
 				LOG_BANK(( "to8_update_cart_bank: CART is internal bank %i\n",
 					  to8_soft_bank ));
 		}
@@ -3630,7 +3636,7 @@ static void to8_update_cart_bank (running_machine *machine)
 
 			}
 
-			if ( bank != old_bank )
+			if ( bank != old_cart_bank )
 				LOG_BANK(( "to8_update_cart_bank: CART is external cartridge bank %i\n", thom_cart_bank ));
 		}
 	}
@@ -3640,7 +3646,7 @@ static void to8_update_cart_bank (running_machine *machine)
 		memory_set_bank( machine, THOM_CART_BANK, bank );
 	}
 
-	old_bank = bank;
+	old_cart_bank = bank;
 }
 
 
@@ -4074,6 +4080,9 @@ MACHINE_RESET ( to8 )
 	pia6821_cb1_w( sys_pia, 0, 0 );
 
 	/* memory */
+	old_ram_bank = -1;
+	old_cart_bank = -1;
+	old_floppy_bank = -1;
 	to8_cart_vpage = 0;
 	to8_data_vpage = 0;
 	to8_soft_bank = 0;
@@ -4241,6 +4250,9 @@ MACHINE_RESET ( to9p )
 	pia6821_cb1_w( sys_pia, 0, 0 );
 
 	/* memory */
+	old_ram_bank = -1;
+	old_cart_bank = -1;
+	old_floppy_bank = -1;
 	to8_cart_vpage = 0;
 	to8_data_vpage = 0;
 	to8_soft_bank = 0;
@@ -4348,7 +4360,6 @@ static void mo6_update_cart_bank (running_machine *machine)
 	const device_config *sys_pia = devtag_get_device( machine, THOM_PIA_SYS );
 	const address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int b = (pia6821_get_output_a( sys_pia ) >> 5) & 1;
-	static int old_bank = -1;
 	int bank = 0;
 
 	memory_install_read8_handler( space, 0xb000, 0xefff, 0, 0, (read8_space_func)(STATIC_BANK1 + THOM_CART_BANK - 1) );
@@ -4364,7 +4375,7 @@ static void mo6_update_cart_bank (running_machine *machine)
 			memory_install_write8_handler( space, 0xb000, 0xefff, 0, 0,
 						       (to8_reg_cart & 0x40) ? (to8_cart_vpage <= 4) ? to8_vcart_w :
 						       (write8_space_func)(STATIC_BANK1 + THOM_CART_BANK - 1) : SMH_NOP );
-			if ( bank != old_bank )
+			if ( bank != old_cart_bank )
 				LOG_BANK(( "mo6_update_cart_bank: CART is RAM bank %i (write-enable=%i)\n", to8_cart_vpage, (to8_reg_cart & 0x40) ? 1 : 0 ));
 		}
 		else if ( thom_cart_nb_banks == 4 )
@@ -4372,7 +4383,7 @@ static void mo6_update_cart_bank (running_machine *machine)
 			/* "JANE"-style cartridge bank switching */
 			memory_install_write8_handler( space, 0xb000, 0xefff, 0, 0, SMH_NOP );
 			bank = mo5_reg_cart & 3;
-			if ( bank != old_bank )
+			if ( bank != old_cart_bank )
 				LOG_BANK(( "mo6_update_cart_bank: CART is external cartridge bank %i (A7CB style)\n", bank ));
 		}
 		else
@@ -4383,7 +4394,7 @@ static void mo6_update_cart_bank (running_machine *machine)
 			bank = 8 + to8_cart_vpage;
 			memory_install_write8_handler( space, 0xb000, 0xefff, 0, 0, write_enable ?
 						       (write8_space_func)(STATIC_BANK1 + THOM_CART_BANK - 1) :  SMH_NOP );
-			if ( bank != old_bank )
+			if ( bank != old_cart_bank )
 				LOG_BANK(( "mo6_update_cart_bank: CART is RAM bank %i (write-enable=%i) (MO5 compat.)\n", to8_cart_vpage, write_enable ? 1 : 0 ));
 		}
 	}
@@ -4398,7 +4409,7 @@ static void mo6_update_cart_bank (running_machine *machine)
 				bank = b + 6; /* BASIC 128 */
 			else
 				bank = b + 4;                      /* BASIC 1 */
-			if ( bank != old_bank )
+			if ( bank != old_cart_bank )
 				LOG_BANK(( "mo6_update_cart_bank: CART is internal ROM bank %i\n", b ));
 		}
 		else
@@ -4410,12 +4421,12 @@ static void mo6_update_cart_bank (running_machine *machine)
 				bank = thom_cart_bank % thom_cart_nb_banks;
 				memory_install_read8_handler( space, 0xbffc, 0xbfff, 0, 0, mo6_cartridge_r );
 			}
-			if ( bank != old_bank )
+			if ( bank != old_cart_bank )
 				LOG_BANK(( "mo6_update_cart_bank: CART is external cartridge bank %i\n", bank ));
 		}
 	}
 
-	old_bank = bank;
+	old_cart_bank = bank;
 	memory_set_bank( machine, THOM_CART_BANK, bank );
 	memory_set_bank( machine, TO8_BIOS_BANK, b );
 }
@@ -4855,6 +4866,8 @@ MACHINE_RESET ( mo6 )
 	pia6821_ca1_w( sys_pia, 0, 0 );
 
 	/* memory */
+	old_ram_bank = -1;
+	old_cart_bank = -1;
 	to8_cart_vpage = 0;
 	to8_data_vpage = 0;
 	mo6_update_ram_bank(machine);
@@ -5111,6 +5124,8 @@ MACHINE_RESET ( mo5nr )
 	pia6821_ca1_w( sys_pia, 0, 0 );
 
 	/* memory */
+	old_ram_bank = -1;
+	old_cart_bank = -1;
 	to8_cart_vpage = 0;
 	to8_data_vpage = 0;
 	mo6_update_ram_bank(machine);

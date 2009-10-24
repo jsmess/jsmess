@@ -618,7 +618,7 @@ void InitPropertyPageToPage(HINSTANCE hInst, HWND hWnd, HICON hIcon, OPTIONS_TYP
 /* Build CPU info string */
 static char *GameInfoCPU(UINT nIndex)
 {
-	static char buf[1024] = "";
+	static char buf[1024];
 	machine_config *config = machine_config_alloc(drivers[nIndex]->machine_config);
 	const device_config *cpu;
 
