@@ -3812,7 +3812,7 @@ static VIDEO_START(cdi)
 	mcd212.channel[0].clut_bank = 0;
 	mcd212.channel[1].clut_bank = 0;
 	mcd212.scan_timer = timer_alloc(machine, mcd212_perform_scan, 0);
-	timer_adjust_oneshot(mcd212.scan_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
+	timer_adjust_oneshot(mcd212.scan_timer, video_screen_get_time_until_pos(machine->primary_screen, 22, 0), 0);
 }
 
 static TIMER_CALLBACK( test_timer_callback )
@@ -3947,7 +3947,7 @@ static MACHINE_DRIVER_START( cdimono1 )
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(768, 262)
-	MDRV_SCREEN_VISIBLE_AREA(0, 768-1, 0, 262-1) //dynamic resolution,TODO
+	MDRV_SCREEN_VISIBLE_AREA(0, 768-1, 22, 262-1) //dynamic resolution,TODO
 
 	MDRV_PALETTE_LENGTH(0x100)
 
