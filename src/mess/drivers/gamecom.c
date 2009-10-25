@@ -20,6 +20,7 @@ Todo:
 #include "cpu/sm8500/sm8500.h"
 #include "devices/cartslot.h"
 
+UINT8 *gamecom_vram;
 
 static ADDRESS_MAP_START(gamecom_mem_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x03FF )  AM_READWRITE( gamecom_internal_r, gamecom_internal_w ) /* CPU internal register file and RAM */
@@ -29,7 +30,7 @@ static ADDRESS_MAP_START(gamecom_mem_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x4000, 0x5FFF )  AM_ROMBANK(2)                                          /* External ROM/Flash. Controlled by MMU2 */
 	AM_RANGE( 0x6000, 0x7FFF )  AM_ROMBANK(3)                                          /* External ROM/Flash. Controlled by MMU3 */
 	AM_RANGE( 0x8000, 0x9FFF )  AM_ROMBANK(4)                                          /* External ROM/Flash. Controlled by MMU4 */
-	AM_RANGE( 0xA000, 0xDFFF )  AM_READWRITE( gamecom_vram_r, gamecom_vram_w )         /* VRAM */
+	AM_RANGE( 0xA000, 0xDFFF )  AM_RAM AM_BASE(&gamecom_vram)			   /* VRAM */
 	AM_RANGE( 0xE000, 0xFFFF )  AM_RAM                                                 /* Extended I/O, Extended RAM */
 ADDRESS_MAP_END
 

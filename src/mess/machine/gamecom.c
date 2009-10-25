@@ -46,7 +46,6 @@ typedef struct {
 
 static UINT8 *internal_ram;
 UINT8 gamecom_internal_registers[0x80];
-UINT8 gamecom_vram[16*1024];
 static UINT8 *cartridge1 = NULL;
 static UINT8 *cartridge2 = NULL;
 static UINT8 *cartridge = NULL;
@@ -457,15 +456,15 @@ static void gamecom_dma_init(running_machine *machine)
 		/* ROM->VRAM */
 //      logerror( "DMA DMBR = %X\n", gamecom_internal_registers[SM8521_DMBR] );
 		gamecom_dma.source_width = 64;
+		gamecom_dma.source_mask = 0x3FFF;
 		if ( gamecom_internal_registers[SM8521_DMBR] < 16 )
 		{
 			gamecom_dma.source_bank = memory_region(machine, "user1") + (gamecom_internal_registers[SM8521_DMBR] << 14);
-			gamecom_dma.source_mask = 0x3FFF;
 		}
 		else
 		{
-			logerror( "TODO: Reading from external ROMs not supported yet\n" );
-			gamecom_dma.source_bank = memory_region(machine, "user1");
+//			logerror( "TODO: Reading from external ROMs not supported yet\n" );
+			gamecom_dma.source_bank = memory_region(machine, "user2") + (gamecom_internal_registers[SM8521_DMBR] << 14);
 		}
 		gamecom_dma.dest_bank = &gamecom_vram[(gamecom_internal_registers[SM8521_DMVP] & 0x02) ? 0x2000 : 0x0000];
 		break;
@@ -619,16 +618,6 @@ void gamecom_update_timers( const device_config *device, int cycles )
 			}
 		}
 	}
-}
-
-WRITE8_HANDLER( gamecom_vram_w )
-{
-	gamecom_vram[offset] = data;
-}
-
-READ8_HANDLER( gamecom_vram_r )
-{
-	return gamecom_vram[offset];
 }
 
 DRIVER_INIT( gamecom )

@@ -156,14 +156,11 @@ extern DEVICE_IMAGE_LOAD( gamecom_cart );
 extern WRITE8_HANDLER( gamecom_internal_w );
 extern READ8_HANDLER( gamecom_internal_r );
 
-extern WRITE8_HANDLER( gamecom_vram_w );
-extern READ8_HANDLER( gamecom_vram_r );
-
 extern void gamecom_handle_dma( const device_config *device, int cycles );
 extern void gamecom_update_timers( const device_config *device, int cycles );
 
 extern UINT8 gamecom_internal_registers[];
-extern UINT8 gamecom_vram[];
+extern UINT8 *gamecom_vram;
 
 
 /*----------- defined in video/gamecom.c -----------*/
