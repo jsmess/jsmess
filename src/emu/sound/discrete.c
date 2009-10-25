@@ -89,7 +89,7 @@ static DEVICE_RESET( discrete );
 static STREAM_UPDATE( discrete_stream_update );
 static STREAM_UPDATE( buffer_stream_update );
 
-static int profiling = DISCRETE_PROFILING;
+static int profiling = 0;
 
 /*************************************
  *
@@ -286,6 +286,7 @@ static const discrete_module module_list[] =
 	{ DST_SALLEN_KEY  ,"DST_SALLEN_KEY"  , 1 ,sizeof(struct dss_filter2_context)     ,dst_sallen_key_reset  ,dst_sallen_key_step  ,NULL                  ,NULL                 },
 	{ DST_CRFILTER    ,"DST_CRFILTER"    , 1 ,sizeof(struct dst_rcfilter_context)    ,dst_crfilter_reset    ,dst_crfilter_step    ,NULL                  ,NULL                 },
 	{ DST_OP_AMP_FILT ,"DST_OP_AMP_FILT" , 1 ,sizeof(struct dst_op_amp_filt_context) ,dst_op_amp_filt_reset ,dst_op_amp_filt_step ,NULL                  ,NULL                 },
+	{ DST_RC_CIRCUIT_1,"DST_RC_CIRCUIT_1", 1 ,sizeof(struct dst_rc_circuit_1_context),dst_rc_circuit_1_reset,dst_rc_circuit_1_step,NULL                  ,NULL                 },
 	{ DST_RCDISC      ,"DST_RCDISC"      , 1 ,sizeof(struct dst_rcdisc_context)      ,dst_rcdisc_reset      ,dst_rcdisc_step      ,NULL                  ,NULL                 },
 	{ DST_RCDISC2     ,"DST_RCDISC2"     , 1 ,sizeof(struct dst_rcdisc_context)      ,dst_rcdisc2_reset     ,dst_rcdisc2_step     ,NULL                  ,NULL                 },
 	{ DST_RCDISC3     ,"DST_RCDISC3"     , 1 ,sizeof(struct dst_rcdisc_context)      ,dst_rcdisc3_reset     ,dst_rcdisc3_step     ,NULL                  ,NULL                 },
@@ -310,6 +311,7 @@ static const discrete_module module_list[] =
 	{ DSD_555_VCO1    ,"DSD_555_VCO1"    , 1 ,sizeof(struct dsd_555_vco1_context)    ,dsd_555_vco1_reset    ,dsd_555_vco1_step    ,NULL                  ,NULL                 },
 	{ DSD_566         ,"DSD_566"         , 1 ,sizeof(struct dsd_566_context)         ,dsd_566_reset         ,dsd_566_step         ,NULL                  ,NULL                 },
 	{ DSD_LS624       ,"DSD_LS624"       , 1 ,sizeof(struct dsd_ls624_context)       ,dsd_ls624_reset       ,dsd_ls624_step       ,NULL                  ,NULL                 },
+	{ DSD_LS629       ,"DSD_LS629"       , 1 ,sizeof(struct dsd_ls629_context)       ,dsd_ls629_reset       ,dsd_ls629_step       ,NULL                  ,NULL                 },
 	/* must be the last one */
 	{ DSS_NULL        ,"DSS_NULL"        , 0 ,0                                      ,NULL                  ,NULL                 ,NULL                  ,NULL                 }
 };
@@ -498,6 +500,10 @@ static DEVICE_START( discrete )
 	sprintf(name, "discrete%s.log", device->tag);
 	if (DISCRETE_DEBUGLOG)
 		info->disclogfile = fopen(name, "w");
+
+	/* enable profiling */
+	if (getenv("DISCRETE_PROFILING"))
+		profiling = atoi(getenv("DISCRETE_PROFILING"));
 
 	/* Build the final block list */
 	info->block_list = NULL;
@@ -692,11 +698,13 @@ static void *task_callback(void *param, int threadid)
 					int avail;
 
 					avail = sn->task->ptr[sn->output_node] - sn->ptr;
+					assert_always(avail >= 0, "task_callback: available samples are negative");
 					if (avail < samples)
 						samples = avail;
 				}
 
 				task->samples -= samples;
+				assert_always(task->samples >=0, "task_callback: task_samples got negative");
 				while (samples > 0)
 				{
 					/* step */

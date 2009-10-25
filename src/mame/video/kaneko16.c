@@ -35,7 +35,7 @@
 #include "kaneko16.h"
 #include "kan_pand.h"
 
-static UINT16 kaneko16_disp_enable = 1; // default enabled for games not using it
+static UINT16 kaneko16_disp_enable;
 
 
 static tilemap *kaneko16_tmap_0, *kaneko16_tmap_1;
@@ -50,7 +50,7 @@ UINT16* galsnew_fg_pixram;
 
 int kaneko16_sprite_type;
 int kaneko16_sprite_fliptype;
-static int kaneko16_keep_sprites = 0; // default disabled for games not using it
+static int kaneko16_keep_sprites;
 UINT16 kaneko16_sprite_xoffs, kaneko16_sprite_flipx;
 UINT16 kaneko16_sprite_yoffs, kaneko16_sprite_flipy;
 UINT16 *kaneko16_sprites_regs;
@@ -125,12 +125,18 @@ KANEKO16_LAYER(3)
 
 VIDEO_START( kaneko16_sprites )
 {
+	kaneko16_disp_enable = 1;	// default enabled for games not using it
+	kaneko16_keep_sprites = 0;	// default disabled for games not using it
+
 	/* 0x400 sprites max */
 	spritelist.first_sprite = auto_alloc_array(machine, struct tempsprite, 0x400);
 }
 
 VIDEO_START( kaneko16_1xVIEW2_tilemaps )
 {
+	kaneko16_disp_enable = 1; // default enabled for games not using it
+	kaneko16_keep_sprites = 0;	// default disabled for games not using it
+
 	kaneko16_tmap_0 = tilemap_create(	machine, get_tile_info_0, tilemap_scan_rows,
 										 16,16, 0x20,0x20	);
 	kaneko16_tmap_1 = tilemap_create(	machine, get_tile_info_1, tilemap_scan_rows,
@@ -537,7 +543,7 @@ void kaneko16_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rec
 {
 	/* Sprites *must* be parsed from the first in RAM to the last,
        because of the multisprite feature. But they *must* be drawn
-       from the last in RAM (frontmost) to the firtst in order to
+       from the last in RAM (frontmost) to the first in order to
        cope with priorities using pdrawgfx.
 
        Hence we parse them from first to last and put the result

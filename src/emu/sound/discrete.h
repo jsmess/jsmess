@@ -56,9 +56,10 @@
  *
  * You may also access nodes with a macros:
  *
- *     NODE_XXX = NODE_SUB(XXX, 0)
+ *     NODE_XXX = NODE_SUB(NODE_XXX, 0)
+ *     NODE_XXX = NODE_XXX_00
  *     NODE_XXX = NODE(XXX)
- *     NODE_XXX_YY = NODE_SUB(XXX, YY) with YY != 00
+ *     NODE_XXX_YY = NODE_SUB(NODE_XXX, YY)
  *
  * One node point may feed a number of inputs, for example you could
  * connect the output of a DISCRETE_SINEWAVE to the AMPLITUDE input
@@ -200,7 +201,7 @@
  * DISCRETE_INPUT_STREAM(NODE, NUM)
  * DISCRETE_INPUTX_STREAM(NODE,NUM, GAIN,OFFSET)
  *
- * DISCRETE_COUNTER(NODE,ENAB,RESET,CLK,MAX,DIR,INIT0,CLKTYPE)
+ * DISCRETE_COUNTER(NODE,ENAB,RESET,CLK,MIN,MAX,DIR,INIT0,CLKTYPE)
  * DISCRETE_COUNTER_7492(NODE,ENAB,RESET,CLK,CLKTYPE)
  * DISCRETE_LFSR_NOISE(NODE,ENAB,RESET,CLK,AMPL,FEED,BIAS,LFSRTB)
  * DISCRETE_NOISE(NODE,ENAB,FREQ,AMP,BIAS)
@@ -221,7 +222,7 @@
  * DISCRETE_ADDER2(NODE,ENAB,IN0,IN1)
  * DISCRETE_ADDER3(NODE,ENAB,IN0,IN1,IN2)
  * DISCRETE_ADDER4(NODE,ENAB,IN0,IN1,IN2,IN3)
- * DISCRETE_CLAMP(NODE,ENAB,IN0,MIN,MAX,CLAMP)
+ * DISCRETE_CLAMP(NODE,IN0,MIN,MAX)
  * DISCRETE_DIVIDE(NODE,ENAB,IN0,IN1)
  * DISCRETE_GAIN(NODE,IN0,GAIN)
  * DISCRETE_INVERT(NODE,IN0)
@@ -288,6 +289,7 @@
  * DISCRETE_CRFILTER(NODE,IN0,RVAL,CVAL)
  * DISCRETE_CRFILTER_VREF(NODE,IN0,RVAL,CVAL,VREF)
  * DISCRETE_OP_AMP_FILTER(NODE,ENAB,INP0,INP1,TYPE,INFO)
+ * DISCRETE_RC_CIRCUIT_1(NODE,INP0,INP1,RVAL,CVAL)
  * DISCRETE_RCDISC(NODE,ENAB,IN0,RVAL,CVAL)
  * DISCRETE_RCDISC2(NODE,SWITCH,INP0,RVAL0,INP1,RVAL1,CVAL)
  * DISCRETE_RCDISC3(NODE,ENAB,INP0,RVAL0,RVAL1,CVAL, DJV)
@@ -306,6 +308,7 @@
  * DISCRETE_555_VCO1_CV(NODE,RESET,VIN,CTRLV,OPTIONS)
  * DISCRETE_566(NODE,VMOD,R,C,VPOS,VNEG,VCHARGE,OPTIONS)
  * DISCRETE_74LS624(NODE,VMOD,VRNG,C,OUTTYPE)
+ * DISCRETE_74LS629(NODE,ENAB,VMOD,VRNG,C,R_FREQ_IN,OUTTYPE)
  *
  * DISCRETE_CUSTOM1(NODE,IN0,INFO)
  * DISCRETE_CUSTOM2(NODE,IN0,IN1,INFO)
@@ -458,7 +461,7 @@
  *
  * DISCRETE_COUNTER     - up/down counter.
  *
- *  This counter counts up/down from 0 to MAX.  When the enable is low, the output
+ *  This counter counts up/down from MIN to MAX.  When the enable is low, the output
  *  is held at it's last value.  When reset is high, the reset value is loaded
  *  into the output.  The counter can be clocked internally or externally.  It also
  *  supports x_time used by the clock modules to pass on anti-aliasing info.
@@ -488,6 +491,7 @@
  *                      enable node or static value,
  *                      reset node or static value, (reset when TRUE)
  *                      clock node or static value,
+ *                      min count static value,
  *                      max count static value,
  *                      direction node or static value,
  *                      reset value node or static value,
@@ -820,24 +824,25 @@
  *     DISC_OP_AMP_OSCILLATOR_1 | DISC_OP_AMP_IS_NORTON
  *          Basic Norton Op Amp Oscillator circuit.
  *
- *  vP >-.
- *       |         c
- *       Z     .---||----+---------------------------> DISC_OP_AMP_OSCILLATOR_OUT_CAP
- *       Z r1  |         |
- *       Z     |   |\    |
- *       |     |   | \   |            |\
- *       '-----+---|- \  |     r3     | \
- *                 |   >-+----ZZZZ----|- \
- *                 |+ /               |   >--+-------> DISC_OP_AMP_OSCILLATOR_OUT_SQW
- *             .---| /             .--|+ /   |
- *             |   |/        r5    |  | /    |
- *             |      vP >--ZZZZ---+  |/     |
- *             Z                   |         |
- *             Z r2                |   r4    |
- *             Z                   '--ZZZZ---+
- *             |                             |
- *             |                             |
- *             '-----------------------------'
+ *              vP >-.
+ *                   |         c
+ *                   Z     .---||----+-------------------------> DISC_OP_AMP_OSCILLATOR_OUT_CAP
+ *                   Z r1  |         |
+ *                   Z     |   |\    |
+ *                   |     |   | \   |            |\
+ *                   '-----+---|- \  |     r3     | \
+ *                             |   >-+----ZZZZ----|- \
+ *                             |+ /               |   >--+-----> DISC_OP_AMP_OSCILLATOR_OUT_SQW
+ *                         .---| /             .--|+ /   |
+ *                         |   |/        r5    |  | /    |
+ *           vP >-.        |      vP >--ZZZZ---+  |/     |
+ *                |        Z                   |         |
+ *                Z        Z r2                |   r4    |
+ *                Z 1k     Z                   '--ZZZZ---+
+ *                Z        |                             |
+ *            |\  |  r6    |                             |
+ * Enable >---| >-+-ZZZZ---+-----------------------------'
+ *            |/ O.C.
  *
  * Note: R1 - R5 can be nodes.
  *
@@ -852,6 +857,12 @@
  *       |
  *       |       r1
  *       +------ZZZZ-----.
+ *       |               |
+ *       |   r5          |
+ *       +--ZZZZ---|>|---.
+ *       |               |
+ *       |   r6          |
+ *       +--ZZZZ---|<|---.
  *       |               |
  *       |         |\    |
  *       |    r2   | \   |
@@ -873,7 +884,7 @@
  *
  * Note: All values are static.
  *
- * EXAMPLES: see Space Walk
+ * EXAMPLES: see Space Walk, Blue Shark
  *
  ***********************************************************************
  *
@@ -994,15 +1005,16 @@
  *              r6    |             |+ /               |   >--+-------> DISC_OP_AMP_OSCILLATOR_OUT_SQW
  *    vMod2 >--ZZZZ---'         .---| /             .--|+ /   |
  *                              |   |/        r5    |  | /    |
- *                              |      vP >--ZZZZ---+  |/     |
- *                              Z                   |         |
- *                              Z r2                |   r4    |
- *                              Z                   '--ZZZZ---+
- *                              |                             |
- *                              |                             |
- *                              '-----------------------------'
+ *                vP >-.        |      vP >--ZZZZ---+  |/     |
+ *                     |        Z                   |         |
+ *                     Z        Z r2                |   r4    |
+ *                     Z 1k     Z                   '--ZZZZ---+
+ *                     Z        |                             |
+ *                 |\  |  r8    |                             |
+ *      Enable >---| >-+-ZZZZ---+-----------------------------'
+ *                 |/ O.C.
  *
- * EXAMPLES: see Space Encounter
+ * EXAMPLES: see Space Encounter, Blue Shark
  *
  ***********************************************************************
  *
@@ -2300,8 +2312,8 @@
  *  vRef >-----------------------'  |/
  *
  *          --------------------------------------------------
-  *
- *     DISC_OP_AMP_FILTER_IS_LOW_PASS_1M
+ *
+ *     DISC_OP_AMP_FILTER_IS_LOW_PASS_1_A
  *          First Order Low Pass Filter
  *
  *                              c1
@@ -2475,8 +2487,44 @@
  *      http://en.wikipedia.org/wiki/Sallen_Key_filter
  ***********************************************************************
  *
+ * DISCRETE_RC_CIRCUIT_1 - RC charge/discharge circuit
+ *
+ *  Declaration syntax
+ *
+ *     DISCRETE_RC_CIRCUIT_1(name of node,
+ *                           In0 (Logic) node,
+ *                           In1 (Logic) node,
+ *                           R static value,
+ *                           C static value)
+ *
+ *              5V
+ *               v
+ *               |
+ *           .-------.
+ *           |  4066 |
+ *   In0 >---|c      |
+ *           '-------'
+ *               |
+ *               +------------.
+ *               |            |
+ *           .-------.       --- C
+ *           |  4066 |       ---
+ *   In1 >---|c      |        |
+ *           '-------'       gnd
+ *               |
+ *               +----> Node Output
+ *               |
+ *               Z
+ *               Z R
+ *               Z
+ *               |
+ *              gnd
+ *
+ * EXAMPLES: see Sky Raider, Battlezone
+ *
+ ************************************************************************
+ *
  * DISCRETE_RCDISC - Simple single pole RC discharge network
- * DISCRETE_RCFILTER_VREF - Same but refrenced to vRef not 0V
  *
  *                        .------------.
  *                        |            |
@@ -2496,12 +2544,6 @@
  *                       input node (or value),
  *                       resistor value in OHMS,
  *                       capacitor value in FARADS)
- *
- *     DISCRETE_RCFILTER_VREF(name of node,
- *                            input node (or value)
- *                            resistor value in OHMS
- *                            capacitor value in FARADS,
- *                            vRef node or static value)
  *
  *  Example config line
  *
@@ -3230,6 +3272,7 @@
  *
  *  Waveform Types:
  *     DISC_566_OUT_SQUARE   - Pin 3 Square Wave Output (DEFAULT)
+ *     DISC_566_OUT_ENERGY   - Pin 3 anti-alaised Square Wave Output
  *     DISC_566_OUT_TRIANGLE - Pin 4 Triangle Wave Output
  *     DISC_566_OUT_LOGIC    - Internal Flip/Flop Output
  *     DISC_566_COUNT_F      - # of falling edges
@@ -3569,7 +3612,7 @@ enum
 #define DISC_OP_AMP_FILTER_IS_BAND_PASS_1M	0x30
 #define DISC_OP_AMP_FILTER_IS_HIGH_PASS_0	0x40
 #define DISC_OP_AMP_FILTER_IS_BAND_PASS_0	0x50
-#define DISC_OP_AMP_FILTER_IS_LOW_PASS_1M	0x60
+#define DISC_OP_AMP_FILTER_IS_LOW_PASS_1_A	0x60
 
 #define DISC_OP_AMP_FILTER_TYPE_MASK		(0xf0 | DISC_OP_AMP_IS_NORTON)	// Used only internally.
 
@@ -3634,23 +3677,27 @@ enum
 
 /* 566 output flags */
 #define DISC_566_OUT_DC						0x00
-#define DISC_566_OUT_AC						0x01
+#define DISC_566_OUT_AC						0x10
 
 #define DISC_566_OUT_SQUARE					0x00	/* Squarewave */
-#define DISC_566_OUT_TRIANGLE				0x10	/* Triangle waveform */
-#define DISC_566_OUT_LOGIC					0x20	/* 0/1 logic output */
-#define DISC_566_OUT_COUNT_F				0x30
-#define DISC_566_OUT_COUNT_R				0x40
-#define DISC_566_OUT_COUNT_F_X				0x50
-#define DISC_566_OUT_COUNT_R_X				0x60
-#define DISC_566_OUT_MASK					0x70	/* Bits that define output type.
+#define DISC_566_OUT_ENERGY					0x01	/* anti-alaised Squarewave */
+#define DISC_566_OUT_TRIANGLE				0x02	/* Triangle waveform */
+#define DISC_566_OUT_LOGIC					0x03	/* 0/1 logic output */
+#define DISC_566_OUT_COUNT_F				0x04
+#define DISC_566_OUT_COUNT_R				0x05
+#define DISC_566_OUT_COUNT_F_X				0x06
+#define DISC_566_OUT_COUNT_R_X				0x07
+#define DISC_566_OUT_MASK					0x07	/* Bits that define output type.
                                                      * Used only internally in module. */
 
 /* LS624 output flags */
-#define DISC_LS624_OUT_ENERGY				0x01
-#define DISC_LS624_OUT_LOGIC				0x02
-#define DISC_LS624_OUT_COUNT_F				0x03
-#define DISC_LS624_OUT_COUNT_R				0x04
+#define DISC_LS624_OUT_SQUARE				0x01
+#define DISC_LS624_OUT_ENERGY				0x02
+#define DISC_LS624_OUT_LOGIC				0x03
+#define DISC_LS624_OUT_COUNT_F				0x04
+#define DISC_LS624_OUT_COUNT_R				0x05
+#define DISC_LS624_OUT_COUNT_F_X			0x06
+#define DISC_LS624_OUT_COUNT_R_X			0x07
 
 /* Oneshot types */
 #define DISC_ONESHOT_FEDGE					0x00
@@ -4116,11 +4163,11 @@ struct _discrete_inverter_osc_desc
  *************************************/
 
 #define NODE0_DEF(_x) NODE_ ## 0 ## _x = (0x40000000 + (_x) * DISCRETE_MAX_OUTPUTS), \
-	NODE_ ## 0 ## _x ## _01, NODE_ ## 0 ## _x ## _02, NODE_ ## 0 ## _x ## _03, NODE_ ## 0 ## _x ## _04, \
-	NODE_ ## 0 ## _x ## _05, NODE_ ## 0 ## _x ## _06, NODE_ ## 0 ## _x ## _07
+	NODE_ ## 0 ## _x ## _00 = NODE_ ## 0 ## _x, NODE_ ## 0 ## _x ## _01, NODE_ ## 0 ## _x ## _02, NODE_ ## 0 ## _x ## _03, \
+	NODE_ ## 0 ## _x ## _04, NODE_ ## 0 ## _x ## _05, NODE_ ## 0 ## _x ## _06, NODE_ ## 0 ## _x ## _07
 #define NODE_DEF(_x) NODE_ ## _x = (0x40000000 + (_x) * DISCRETE_MAX_OUTPUTS), \
-	NODE_ ## _x ## _01, NODE_ ## _x ## _02, NODE_ ## _x ## _03, NODE_ ## _x ## _04, \
-	NODE_ ## _x ## _05, NODE_ ## _x ## _06, NODE_ ## _x ## _07
+	NODE_ ## _x ## _00 = NODE_ ## _x, NODE_ ## _x ## _01, NODE_ ## _x ## _02, NODE_ ## _x ## _03, \
+	NODE_ ## _x ## _04, NODE_ ## _x ## _05, NODE_ ## _x ## _06, NODE_ ## _x ## _07
 
 enum {
 	NODE0_DEF(0), NODE0_DEF(1), NODE0_DEF(2), NODE0_DEF(3), NODE0_DEF(4), NODE0_DEF(5), NODE0_DEF(6), NODE0_DEF(7), NODE0_DEF(8), NODE0_DEF(9),
@@ -4158,7 +4205,7 @@ enum {
 /* Some Pre-defined nodes for convenience */
 
 #define NODE(_x)	(NODE_00 + (_x) * DISCRETE_MAX_OUTPUTS)
-#define NODE_SUB(_x, _y) (NODE(_x) + (_y))
+#define NODE_SUB(_x, _y) ((_x) + (_y))
 
 #if DISCRETE_MAX_OUTPUTS == 8
 #define NODE_CHILD_NODE_NUM(_x)		((int)(_x) & 7)
@@ -4264,7 +4311,6 @@ enum
 	DST_OP_AMP_1SHT,	/* Op Amp One Shot */
 	DST_TVCA_OP_AMP,	/* Triggered Op Amp Voltage controlled  amplifier circuits */
 	DST_VCA,			/* IC Voltage controlled  amplifiers */
-//  DST_DELAY,          /* Phase shift/Delay line */
 
 	/* from disc_flt.c */
 	/* generic modules */
@@ -4274,6 +4320,7 @@ enum
 	DST_SALLEN_KEY,		/* Sallen key filters */
 	DST_CRFILTER,		/* RC Bypass Filter (High Pass) */
 	DST_OP_AMP_FILT,	/* Op Amp filters */
+	DST_RC_CIRCUIT_1,
 	DST_RCDISC,			/* Simple RC discharge */
 	DST_RCDISC2,		/* Switched 2 Input RC discharge */
 	DST_RCDISC3,		/* Charge/discharge with diode */
@@ -4296,6 +4343,7 @@ enum
 	DSD_555_VCO1,		/* Op-Amp linear ramp based 555 VCO */
 	DSD_566,			/* NE566 Emulation */
 	DSD_LS624,			/* 74LS624 Emulation */
+	DSD_LS629,			/* 74LS624 Emulation - new */
 
 	/* Custom */
 	DST_CUSTOM,			/* whatever you want */
@@ -4356,8 +4404,8 @@ enum
 
 /* from disc_wav.c */
 /* generic modules */
-#define DISCRETE_COUNTER(NODE,ENAB,RESET,CLK,MAX,DIR,INIT0,CLKTYPE)     { NODE, DSS_COUNTER     , 7, { ENAB,RESET,CLK,NODE_NC,DIR,INIT0,NODE_NC }, { ENAB,RESET,CLK,MAX,DIR,INIT0,CLKTYPE }, NULL, "DISCRETE_COUNTER" },
-#define DISCRETE_COUNTER_7492(NODE,ENAB,RESET,CLK,CLKTYPE)              { NODE, DSS_COUNTER     , 7, { ENAB,RESET,CLK,NODE_NC,NODE_NC,NODE_NC,NODE_NC }, { ENAB,RESET,CLK,CLKTYPE,1,0,DISC_COUNTER_IS_7492 }, NULL, "DISCRETE_COUNTER_7492" },
+#define DISCRETE_COUNTER(NODE,ENAB,RESET,CLK,MIN,MAX,DIR,INIT0,CLKTYPE) { NODE, DSS_COUNTER     , 8, { ENAB,RESET,CLK,NODE_NC,NODE_NC,DIR,INIT0,NODE_NC }, { ENAB,RESET,CLK,MIN,MAX,DIR,INIT0,CLKTYPE }, NULL, "DISCRETE_COUNTER" },
+#define DISCRETE_COUNTER_7492(NODE,ENAB,RESET,CLK,CLKTYPE)              { NODE, DSS_COUNTER     , 8, { ENAB,RESET,CLK,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC }, { ENAB,RESET,CLK,CLKTYPE,0,1,0,DISC_COUNTER_IS_7492 }, NULL, "DISCRETE_COUNTER_7492" },
 #define DISCRETE_LFSR_NOISE(NODE,ENAB,RESET,CLK,AMPL,FEED,BIAS,LFSRTB)  { NODE, DSS_LFSR_NOISE  , 6, { ENAB,RESET,CLK,AMPL,FEED,BIAS }, { ENAB,RESET,CLK,AMPL,FEED,BIAS }, LFSRTB, "DISCRETE_LFSR_NOISE" },
 #define DISCRETE_NOISE(NODE,ENAB,FREQ,AMPL,BIAS)                        { NODE, DSS_NOISE       , 4, { ENAB,FREQ,AMPL,BIAS }, { ENAB,FREQ,AMPL,BIAS }, NULL, "DISCRETE_NOISE" },
 #define DISCRETE_NOTE(NODE,ENAB,CLK,DATA,MAX1,MAX2,CLKTYPE)             { NODE, DSS_NOTE        , 6, { ENAB,CLK,DATA,NODE_NC,NODE_NC,NODE_NC }, { ENAB,CLK,DATA,MAX1,MAX2,CLKTYPE }, NULL, "DISCRETE_NOTE" },
@@ -4452,6 +4500,7 @@ enum
 #define DISCRETE_CRFILTER(NODE,INP0,RVAL,CVAL)                          { NODE, DST_CRFILTER    , 4, { INP0,RVAL,CVAL }, { INP0,RVAL,CVAL }, NULL, "DISCRETE_CRFILTER" },
 #define DISCRETE_CRFILTER_VREF(NODE,INP0,RVAL,CVAL,VREF)                { NODE, DST_CRFILTER    , 5, { INP0,RVAL,CVAL,VREF }, { INP0,RVAL,CVAL,VREF }, NULL, "DISCRETE_CRFILTER_VREF" },
 #define DISCRETE_OP_AMP_FILTER(NODE,ENAB,INP0,INP1,TYPE,INFO)           { NODE, DST_OP_AMP_FILT , 4, { ENAB,INP0,INP1,NODE_NC }, { ENAB,INP0,INP1,TYPE }, INFO, "DISCRETE_OP_AMP_FILTER" },
+#define DISCRETE_RC_CIRCUIT_1(NODE,INP0,INP1,RVAL,CVAL)                 { NODE, DST_RC_CIRCUIT_1, 4, { INP0,INP1,NODE_NC,NODE_NC }, { INP0,INP1,RVAL,CVAL }, NULL, "DISCRETE_RC_CIRCUIT_1" },
 #define DISCRETE_RCDISC(NODE,ENAB,INP0,RVAL,CVAL)                       { NODE, DST_RCDISC      , 4, { ENAB,INP0,NODE_NC,NODE_NC }, { ENAB,INP0,RVAL,CVAL }, NULL, "DISCRETE_RCDISC" },
 #define DISCRETE_RCDISC2(NODE,SWITCH,INP0,RVAL0,INP1,RVAL1,CVAL)        { NODE, DST_RCDISC2     , 6, { SWITCH,INP0,NODE_NC,INP1,NODE_NC,NODE_NC }, { SWITCH,INP0,RVAL0,INP1,RVAL1,CVAL }, NULL, "DISCRETE_RCDISC2" },
 #define DISCRETE_RCDISC3(NODE,ENAB,INP0,RVAL0,RVAL1,CVAL,DJV)           { NODE, DST_RCDISC3     , 6, { ENAB,INP0,NODE_NC,NODE_NC,NODE_NC,NODE_NC }, { ENAB,INP0,RVAL0,RVAL1,CVAL,DJV }, NULL, "DISCRETE_RCDISC3" },
@@ -4487,6 +4536,7 @@ enum
 #define DISCRETE_555_VCO1_CV(NODE,RESET,VIN,CTRLV,OPTIONS)              { NODE, DSD_555_VCO1    , 3, { RESET,VIN,CTRLV }, { RESET,VIN,CTRLV }, OPTIONS, "DISCRETE_555_VCO1_CV" },
 #define DISCRETE_566(NODE,VMOD,R,C,VPOS,VNEG,VCHARGE,OPTIONS)           { NODE, DSD_566         , 7, { VMOD,R,C,NODE_NC,NODE_NC,VCHARGE,NODE_NC }, { VMOD,R,C,VPOS,VNEG,VCHARGE,OPTIONS }, NULL, "DISCRETE_566" },
 #define DISCRETE_74LS624(NODE,VMOD,VRNG,C,OUTTYPE)                      { NODE, DSD_LS624       , 4, { VMOD,NODE_NC,NODE_NC,NODE_NC }, { VMOD,VRNG,C,OUTTYPE }, NULL, "DISCRETE_74LS624" },
+#define DISCRETE_74LS629(NODE,ENAB,VMOD,VRNG,C,R_FREQ_IN,OUTTYPE)       { NODE, DSD_LS629       , 6, { ENAB,VMOD,NODE_NC,NODE_NC,NODE_NC,NODE_NC }, { ENAB,VMOD,VRNG,C,R_FREQ_IN,OUTTYPE }, NULL, "DISCRETE_74LS629" },
 
 /* NOP */
 #define DISCRETE_NOP(NODE)                                              { NODE, DSS_NOP         , 0, { 0 }, { 0 }, NULL, "DISCRETE_NOP" },

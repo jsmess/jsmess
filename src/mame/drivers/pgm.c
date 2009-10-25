@@ -823,7 +823,7 @@ static ADDRESS_MAP_START( kovsh_mem, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x500000, 0x500005) AM_READWRITE(kovsh_68k_protlatch_r, kovsh_68k_protlatch_w) /* ARM7 Latch */
 ADDRESS_MAP_END
 
-static UINT32 kovsh_counter=1;
+static UINT32 kovsh_counter;
 
 static READ32_HANDLER( kovsh_arm7_unk_r )
 {
@@ -1457,6 +1457,7 @@ static void pgm_basic_init(running_machine *machine)
 	pgm_bg_videoram = &pgm_videoram[0];
 	pgm_tx_videoram = &pgm_videoram[0x4000/2];
 	pgm_rowscrollram = &pgm_videoram[0x7000/2];
+	kovsh_counter = 1;
 }
 
 static DRIVER_INIT( pgm )
@@ -3533,7 +3534,7 @@ Some logic IC's, resistors, caps etc.
 ROM_START( ddp2 )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_WORD_SWAP( "pgm_p01s.rom", 0x000000, 0x020000, CRC(e42b166e) SHA1(2a9df9ec746b14b74fae48b1a438da14973702ea) )  // (BIOS)
-	ROM_LOAD16_WORD_SWAP( "ddp2_v102.u8", 0x100000, 0x200000, CRC(5a9ea040) SHA1(51eaec46c368f7cfc5245e64896092f52b1193e0) )
+	ROM_LOAD16_WORD_SWAP( "v100.u8", 0x100000, 0x200000, CRC(0c8aa8ea) SHA1(57e33224622607a1df8daabf26ba063cf8a6d3fc) )
 
 	/* CPU2 = Z80, romless, code uploaded by 68k */
 
@@ -3565,7 +3566,7 @@ ROM_END
 ROM_START( ddp2a )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_WORD_SWAP( "pgm_p01s.rom", 0x000000, 0x020000, CRC(e42b166e) SHA1(2a9df9ec746b14b74fae48b1a438da14973702ea) )  // (BIOS)
-	ROM_LOAD16_WORD_SWAP( "v100.u8",    0x100000, 0x200000, CRC(0c8aa8ea) SHA1(57e33224622607a1df8daabf26ba063cf8a6d3fc) )
+	ROM_LOAD16_WORD_SWAP( "v102.u8", 0x100000, 0x200000, CRC(5a9ea040) SHA1(51eaec46c368f7cfc5245e64896092f52b1193e0) )
 
 	/* CPU2 = Z80, romless, code uploaded by 68k */
 

@@ -229,7 +229,7 @@ static const struct x_offset *global_offsets;
 
 void seta_coin_lockout_w(running_machine *machine, int data)
 {
-	static int seta_coin_lockout = 1;
+	static int seta_coin_lockout;
 	static const game_driver *seta_driver = NULL;
 	static const char *const seta_nolockout[8] = { "blandia", "gundhara", "kamenrid", "zingzip", "eightfrc", "extdwnhl", "sokonuke", "zombraid"};
 
@@ -636,6 +636,14 @@ PALETTE_INIT( inttoote )
 		int data = (color_prom[x*2] <<8) | color_prom[x*2+1];
 		palette_set_color_rgb(machine, x, pal5bit(data >> 10),pal5bit(data >> 5),pal5bit(data >> 0));
 	}
+}
+
+PALETTE_INIT( setaroul )
+{
+	machine->gfx[0]->color_granularity=16;
+	machine->gfx[1]->color_granularity=16;
+
+	PALETTE_INIT_CALL(inttoote);
 }
 
 PALETTE_INIT( usclssic )

@@ -176,6 +176,7 @@ Atomiswave ROM board specs from Cah4e3 @ http://cah4e3.wordpress.com/2009/07/26/
 #include "machine/eeprom.h"
 #include "machine/x76f100.h"
 #include "cdrom.h"
+#include "includes/naomi.h"
 #include "naomibd.h"
 
 #define NAOMIBD_FLAG_AUTO_ADVANCE	(8)	// address auto-advances on read
@@ -183,15 +184,6 @@ Atomiswave ROM board specs from Cah4e3 @ http://cah4e3.wordpress.com/2009/07/26/
 #define NAOMIBD_FLAG_ADDRESS_SHUFFLE	(2)	// 0 to let protection chip en/decrypt, 1 for normal
 
 #define NAOMIBD_PRINTF_PROTECTION	(0)	// 1 to printf protection access details
-
-/*************************************
- *
- *  Prototypes
- *
- *************************************/
-
-extern void naomi_game_decrypt(running_machine* machine, UINT64 key, UINT8* region, int length);
-
 
 /*************************************
  *
@@ -294,6 +286,9 @@ static const naomibd_config_table naomibd_translate_tbl[] =
 			  0x2924, 0, 0x080000, 0x3222, 0, 0x090000, 0x7954, 0, 0x0a0000, 0x5acd, 0, 0x0b0000,
 			  0xdd19, 0, 0x0c0000, 0x2428, 0, 0x0d0000, 0x3329, 0, 0x0e0000, 0x2142, 0, 0x0f0000,
 		          0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "crzytaxi", 0,{ 0x0219, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "jambo",    0,{ 0x0223, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "18wheelr", 0,{ 0x1502, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
 };
 
 /***************************************************************************
@@ -1087,7 +1082,13 @@ static DEVICE_RESET( naomibd )
 static DEVICE_NVRAM( naomibd )
 {
 	//naomibd_state *v = get_safe_token(device);
-	static UINT8 eeprom_romboard[20+48] = {0x19,0x00,0xaa,0x55,0,0,0,0,0,0,0,0,0x69,0x79,0x68,0x6b,0x74,0x6d,0x68,0x6d};
+	static const UINT8 eeprom_romboard[20+48] =
+	{
+		0x19,0x00,0xaa,0x55,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x69,0x79,0x68,0x6b,0x74,0x6d,0x68,0x6d,
+		0xa1,0x09,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,
+		0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,
+		0x30,0x30,0x30,0x30,0x30,0x30,0x30,0x30,0x30,0x30,0x30,0x30,0x30,0x30,0x30,0x30
+	};
 	UINT8 *games_contents;
 
 	if (read_or_write)
@@ -1105,8 +1106,9 @@ static DEVICE_NVRAM( naomibd )
 		}
 		else
 		{
-			x76f100_init( device->machine, 0, eeprom_romboard );
-			memcpy(eeprom_romboard+20,"\241\011                              0000000000000000",48);
+			UINT8 *eeprom = auto_alloc_array_clear(device->machine, UINT8, 0x84);
+			memcpy(eeprom, eeprom_romboard, sizeof(eeprom_romboard));
+			x76f100_init( device->machine, 0, eeprom );
 		}
 
 	}

@@ -138,14 +138,12 @@ VIDEO_START( combascb );
 WRITE8_HANDLER( combascb_bankselect_w );
 WRITE8_HANDLER( combasc_bankselect_w );
 MACHINE_RESET( combasc );
-MACHINE_RESET( combascb );
 WRITE8_HANDLER( combasc_pf_control_w );
 READ8_HANDLER( combasc_scrollram_r );
 WRITE8_HANDLER( combasc_scrollram_w );
 
 VIDEO_UPDATE( combascb );
 VIDEO_UPDATE( combasc );
-WRITE8_HANDLER( combasc_io_w );
 WRITE8_HANDLER( combasc_vreg_w );
 
 
@@ -242,11 +240,11 @@ static WRITE8_DEVICE_HANDLER( combasc_portA_w )
 	/* unknown. always write 0 */
 }
 
+static int boost;
 static emu_timer *combasc_interleave_timer;
 
 static READ8_DEVICE_HANDLER ( combasc_ym2203_r )
 {
-	static int boost = 1;
 	int status = ym2203_r(device,offset);
 
 	if (cpu_get_pc(cputag_get_cpu(device->machine, "audiocpu")) == 0x334)
@@ -790,6 +788,7 @@ ROM_END
 
 static void combasc_init_common(running_machine *machine)
 {
+	boost = 1;
 	combasc_interleave_timer = timer_alloc(machine, NULL, NULL);
 }
 

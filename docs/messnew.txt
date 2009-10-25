@@ -239,6 +239,7 @@ System Driver Changes:
 - [XTVGA] Fixed bus problem. [Miodrag Milanovic]
 
 
+
 User Interface Changes:
 -----------------------
 - [NEWUI] Fixed file extension filter for floppies. [Robbbert]
@@ -247,6 +248,7 @@ User Interface Changes:
 
 - Fixed Tape UI display for systems with multiple cassettes (bug #1677)
   [Dirk Best]
+  
 
 
 Imgtool Changes:
@@ -257,7 +259,7 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
-- The core is based on MAME 0.134u3.  This incorporates all features of the
+- The core is based on MAME 0.134u4.  This incorporates all features of the
   update to this core.  [MAME team]
 
 - Moved floppy implementation to device.  [Miodrag Milanovic]

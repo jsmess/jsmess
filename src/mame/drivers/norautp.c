@@ -23,6 +23,8 @@
    * Draw Poker Hi-Lo,             1983,  M. Kramer Manufacturing.
    * Draw Poker Hi-Lo (alt),       1983,  Unknown.
    * GTI Poker,                    1983,  GTI Inc.
+   * Draw Poker Hi-Lo (Japanese),  198?,  Unknown.
+   * Hi-Lo Double Up Joker Poker,  1983,  SMS Manufacturing Corp.
    * Turbo Poker 2,                1993,  Micro Manufacturing, Inc.
 
 
@@ -607,6 +609,137 @@
 *******************************************************************************
 
 
+  Hardware Layout (SMS Hi-Lo Double Up Joker Poker):
+
+  - CPU:             1x AMD P8080A
+  - RAM:             2x 2111A-2: Static Random Access Memory 256 x 4 bit.
+  - RAM:             2x NEC D5101LC-1: 256x4 static CMOS RAM.
+  - I/O:             3x 8255: Peripeheral Interface Adapter.
+  - Prg ROMs:        2x 2732: U12,U18: Eprom.
+  - Gfx ROMs:        1x 2716: U31: Eprom.
+  - Sound:           Discrete.
+  - Crystal:         1x 18.000 MHz.
+  - PROM             1x 82S129: Bipolar PROM: U51.
+                     1x 3.6 Vcc Battery.
+
+  Frequency on CPU P8080A (pins 15 & 22) = 2.00032 MHz.
+
+
+  PCB MARKED:
+
+  Solderside:
+  PCB silksceened: SMS Manufacturing Corporation.
+
+  Component side:
+  PCB silksceened: REV 2.
+  PCB Engraved: "1350" "10-83".
+
+
+  PCB Layout (SMS Hi-Lo Double Up Joker Poker):                                             Edge Connector 36x2
+   ____________________________________________________________________________________________________________
+  |  _________                            _________    _________    _____        .........     _________       |
+  | |HCF4093BE|         NO IC            | 74174PC |  | 82S129N |  |NE555|       .........    |ULN2003A |      |
+  | |_________|                          |_________|  |_________|  |_____|      916C471X2PE   |_________|      |
+  |    U54               U53                 U52          U51        U50            U49          U48           |
+  | ____________________                                                                                       |
+  || 3.6v NI-CD BATTERY |                                                                                      |
+  ||____________________|                                                                                      |
+  | _________          _________          _________                 _________    _________     _________       |
+  ||CD4040BE |        | 74123PC |        | 74157PC |     NO IC     | 74161   |  |  7486   |   |ULN2003A |      |
+  ||_________|        |_________|        |_________|               |_________|  |_________|   |_________|      |
+  |    U47                U46                U45          U44          U43          U42           U41          |
+  |                                                                                                            |
+  |                                                                                                            | 36
+  | _________       _________             _________   MDP1601 471G  _________                  _________       |___
+  ||D5101LC-1|     |  7404   |           |SN74166J |   .........   | 74161N  |     NO IC      |ULN2003A |       ___|
+  ||_________|     |_________|           |_________|   .........   |_________|                |_________|       ___|
+  |    U40             U39                   U38          U37          U36          U35           U34           ___|
+  |                                                                                          ________________   ___|
+  |                             _____________    _______________    _________    _________  |                |  ___|
+  | _________                  |             |  |1|2|3|4|5|6|7|8|  | 74161   |  | 74157   | |   D8255AC-5    |  ___|
+  ||D5101LC-1|       NO IC     |    2716     |  |_|_|_|_|_|_|_|_|  |_________|  |_________| |________________|  ___|
+  ||_________|                 |_____________|         U30             U29          U28            U27          ___|
+  |    U33            U32            U31            DIP SW x 8                                                  ___|
+  |                                                                                          ________________   ___|
+  |                                                                                         |                |  ___|
+  |                                 _________       _________       _________    _________  |    D8255AC-5   |  ___|
+  |   NO IC          NO IC         | 2111A-2 |     | 2111A-2 |     | 74161   |  | 74157   | |________________|  ___|
+  |                                |_________|     |_________|     |_________|  |_________|        U20          ___|
+  |    U26            U25              U24             U23             U22          U21                         ___|
+  |                                                                                                             ___|
+  |                ______________       ________________                                                        ___|
+  |               |              |     |                |           _________    _________    MDP1601 471G      ___|
+  |   NO IC       |     2732     |     |   D8255AC-5    |          | 74161   |  | 74157   |     .........       ___|
+  |               |______________|     |________________|          |_________|  |_________|     .........       ___|
+  |    U19              U18                   U17                      U16          U15            U14          ___|
+  |                                                                                                            |
+  |                ______________         ____________       _________       _________        _________        | 01
+  | _________     |              |       |            |     | 74161N  |     |  7486   |      |  7404   |       |
+  ||74LS 541F|    |     2732     |       | NEC B8228  |     |_________|     |_________|      |_________|       |
+  ||_________|    |______________|       |____________|         U10             U9               U8            |
+  |    U13              U12                   U11           XTAL                                               |
+  |                                                        .----. 18Mhz                                        |
+  | _________      ____________________     __________      _________    _________    _________    _________   |
+  ||  7405   |    |                    |   | SN74155N |    |UPB 8224 |  | 74157   |  |  7411   |  |  7474   |  |
+  ||_________|    |    AMD   P8080A    |   |__________|    |_________|  |_________|  |_________|  |_________|  |
+  |    U7         |____________________|        U5              U4           U3           U2           U1      |
+  |                        U6                                                                                  |
+  |____________________________________________________________________________________________________________|
+
+
+
+  SMS Hi-Lo Double Up Joker Poker discrete audio circuitry:
+  --------------------------------------------------------
+
+  3x ULN2003A (Darlington transistor array)
+  1x NE555P   (Timer)
+  1x PN2222   (Transistor)
+
+
+  .------.                              .------------.              .-------.
+  |  U17 |                              |   NE555P   |              |PN2222 |
+  |      |                             4|            |3     R3      |       |
+  |   PC7|------------------------------|RST      OUT|-----ZZZZ-----|B     E|-------> Audio Out.
+  |   PC6|----------.                  6|            |8             |   C   |
+  |   PC5|-----.    |3-in         .-----|THR      VCC|-----------.  '---+---'  .----> Audio Out.
+  |   PC4|--.  |  .-+------.      |    5|            |7          |      |      |
+  |      |  |  |  |ULN2003A|      |  .--|CVOLT   DISC|--.        |      |      |
+  |      |  |  |  '-+------'      |  |  |            |  |        +------'    --+--
+  |      |  |  |    |3-out   C1   |  |  |    GND     |  |        |            GND
+  | 8255 |  |  |    '--------||---+  |  '-----+------'  |        |             -
+  |      |  |  '--.               |  |        |1        |        |             '
+  |      |  |     |2-in           |  |        |         |        |
+  '------'  |  .--+-----.         |  |   C5   |         |        |
+            |  |ULN2003A|         |  '---||---+         |        |   +5V
+            |  '--+-----'         |           |         |        |   -+-
+            |     |2-out     C2   |      C4   |         |    C6  |    |
+            |     '----------||---+------||---+-------. | .--||--+----'
+            |2-in                 |           |       | | |      |
+          .-+------.              |         --+--      '-'       |
+          |ULN2003A|              |          GND        |        |
+          '-+------'              |           -         |        |
+            |2-out           C3   |     R1    '         |   R2   |
+            '----------------||---+----ZZZZ-------------+--ZZZZ--'
+
+
+
+  R1 = 120 K ; Tolerance +/- 5%
+  R2 = 1 K   ; Tolerance +/- 5%
+  R3 = 1 K   ; Tolerance +/- 5%
+
+  C1 = 103K = 10000 pF  =  10 nF = 0.01 uF
+  C2 = .022 Z
+  C3 = .05M
+  C4 = .01 Z
+  C5 = .01 Z
+  C6 = .1 Z
+
+  Similar circuitry and component values than DPHL PCB.
+
+
+*******************************************************************************
+
+
   Hardware Layout (Turbo Poker 2 by Micro MFG):
 
 
@@ -875,10 +1008,20 @@
     This allow to remove the hacks per set needed to boot the games.
 
 
+  [2009-10-13]
+
+  - Added Draw Poker Hi-Lo (japanese), based on 8080A CPU.
+  - Merged the gtipoker memory map and machine driver with dphl.
+  - Created a base machine driver and then derivatives by hardware.
+  - Splitted the regular RAM and NVRAM systems.
+  - Added 'Hi-Lo Double Up Joker Poker' from SMS Manufacturing.
+  - Added smshilo hardware details and PCB layout.
+  - Added smshilo discrete sound circuitry scheme/documentation.
+
+
   TODO:
 
   - Analize PPI-2 at 0xc0-0xc3. OBF handshake line (PC7) doesn't seems to work properly.
-  - Discrete sound to DPHL sets.
   - Find if wide chars are hardcoded or tied to a bit.
   - Save support.
 
@@ -1054,20 +1197,12 @@ static WRITE8_DEVICE_HANDLER( counterlamps_w )
 
 //static READ8_DEVICE_HANDLER( ppi2_portc_r )
 //{
-//  UINT8 ppi2_pcmix = 0;
-//  UINT8 hndshk = 0x80;    /* simulating the handshake lines (bits 3-7) */
-//  ppi2_pcmix = (hndshk | (input_port_read(device->machine, "IN2") & 0x07));
-//  popmessage("portc read: %02x", ppi2_pcmix);
-
-//  return ppi2_pcmix;
-
-//  return (devtag_get_device(device->machine, "ppi8255_2") || (input_port_read(device->machine, "IN2") & 0x07));
+//  return;
 //}
 
 //static WRITE8_DEVICE_HANDLER( ppi2_portc_w )
 //{
 //  /* PC0-PC2 don't seems to be connected to any output */
-//  popmessage("portc write: %02x", data);
 //}
 
 
@@ -1137,6 +1272,10 @@ static READ8_HANDLER( test2_r )
   +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
   | pma      |   Z80   |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
   +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
+  | dphljp   |  8080A  |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
+  +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
+  | smshilo  |  8080A  |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
+  +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
   | tpoker2  |  8080A  |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
   +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
 
@@ -1192,20 +1331,20 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dphl_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)	/* A15 not connected */
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x0000, 0x2fff) AM_ROM
+	AM_RANGE(0x5000, 0x53ff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( dphlnv_map, ADDRESS_SPACE_PROGRAM, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0x7fff)	/* A15 not connected */
+	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dphla_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( gtipoker_map, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)	/* similar to DPHL */
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x2000, 0x23ff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dphltest_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -1491,15 +1630,12 @@ static I8255A_INTERFACE (ppi8255_intf_1)
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_DRIVER_START( norautp )
+static MACHINE_DRIVER_START( noraut_base )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, NORAUT_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(norautp_map)
 	MDRV_CPU_IO_MAP(norautp_portmap)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
-
-	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	/* 3x 8255 */
 	MDRV_I8255A_ADD( "ppi8255_0", ppi8255_intf_0 )
@@ -1528,88 +1664,92 @@ static MACHINE_DRIVER_START( norautp )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( norautxp )
-	MDRV_IMPORT_FROM(norautp)
+static MACHINE_DRIVER_START( norautp )
+	MDRV_IMPORT_FROM(noraut_base)
 
+	/* basic machine hardware */
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+
+	MDRV_NVRAM_HANDLER(generic_0fill)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( norautxp )
+	MDRV_IMPORT_FROM(noraut_base)
+
+	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(norautxp_map)
-	MDRV_CPU_IO_MAP(norautp_portmap)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
+	MDRV_NVRAM_HANDLER(generic_0fill)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( nortest1 )
-	MDRV_IMPORT_FROM(norautp)
+	MDRV_IMPORT_FROM(noraut_base)
 
+	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(nortest1_map)
-	MDRV_CPU_IO_MAP(norautp_portmap)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
+	MDRV_NVRAM_HANDLER(generic_0fill)
 MACHINE_DRIVER_END
 
 
 /**** 8080A based ****/
 
+
 static MACHINE_DRIVER_START( dphl )
+	MDRV_IMPORT_FROM(noraut_base)
+
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", 8080, DPHL_CPU_CLOCK)
+	MDRV_CPU_REPLACE("maincpu", 8080, DPHL_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(dphl_map)
-	MDRV_CPU_IO_MAP(norautp_portmap)
-
-	/* 3x 8255 */
-	MDRV_I8255A_ADD( "ppi8255_0", ppi8255_intf_0 )
-	MDRV_I8255A_ADD( "ppi8255_1", ppi8255_intf_1 )
-//  MDRV_I8255A_ADD( "ppi8255_2", ppi8255_intf_2 )
-
-	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*16, 32*16)
-	MDRV_SCREEN_VISIBLE_AREA(3*16, 31*16-1, (0*16) + 8, 16*16-1)
-
-	MDRV_GFXDECODE(norautp)
-
-	MDRV_PALETTE_INIT(norautp)
-	MDRV_PALETTE_LENGTH(8)
-	MDRV_VIDEO_START(norautp)
-	MDRV_VIDEO_UPDATE(norautp)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG_DISCRETE(norautp)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
-
-static MACHINE_DRIVER_START( gtipoker )
-	MDRV_IMPORT_FROM(dphl)
-
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(gtipoker_map)
-	MDRV_CPU_IO_MAP(norautp_portmap)
-//  MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
-
+	MDRV_SOUND_MODIFY("discrete")
+	MDRV_SOUND_CONFIG_DISCRETE(dphl)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( dphla )
-	MDRV_IMPORT_FROM(dphl)
+	MDRV_IMPORT_FROM(noraut_base)
 
-	MDRV_CPU_MODIFY("maincpu")
+	/* basic machine hardware */
+	MDRV_CPU_REPLACE("maincpu", 8080, DPHL_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(dphla_map)
-	MDRV_CPU_IO_MAP(norautp_portmap)
 
+	/* sound hardware */
+	MDRV_SOUND_MODIFY("discrete")
+	MDRV_SOUND_CONFIG_DISCRETE(dphl)
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( dphltest )
-	MDRV_IMPORT_FROM(dphl)
+static MACHINE_DRIVER_START( dphlnv )
+	MDRV_IMPORT_FROM(noraut_base)
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(dphltest_map)
-	MDRV_CPU_IO_MAP(norautp_portmap)
+	/* basic machine hardware */
+	MDRV_CPU_REPLACE("maincpu", 8080, DPHL_CPU_CLOCK)
+	MDRV_CPU_PROGRAM_MAP(dphlnv_map)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
+	/* sound hardware */
+	MDRV_SOUND_MODIFY("discrete")
+	MDRV_SOUND_CONFIG_DISCRETE(dphl)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( dphltest )
+	MDRV_IMPORT_FROM(noraut_base)
+
+	/* basic machine hardware */
+	MDRV_CPU_REPLACE("maincpu", 8080, DPHL_CPU_CLOCK)
+	MDRV_CPU_PROGRAM_MAP(dphltest_map)
+
+	MDRV_NVRAM_HANDLER(generic_0fill)
+
+	/* sound hardware */
+	MDRV_SOUND_MODIFY("discrete")
+	MDRV_SOUND_CONFIG_DISCRETE(dphl)
 MACHINE_DRIVER_END
 
 
@@ -1870,6 +2010,29 @@ ROM_END
 
 /*
 
+Hi-Lo Double Up Joker Poker
+SMS Manufacturing Corp., 1983.
+
+almost identical to DPHL.
+Only one different program rom.
+Seems to be patched with 2 extra subroutines.
+
+*/
+ROM_START( smshilo )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "u12.bin", 0x0000, 0x1000, CRC(bd9acce8) SHA1(33e7e1805c03a704f9c8785b8e858310bfdc8b10) )
+	ROM_LOAD( "u18.bin", 0x1000, 0x1000, CRC(06cf6789) SHA1(587d883c399348b518e3be4d1dc2581824055328) )
+
+	ROM_REGION( 0x1000,  "gfx", 0 )
+	ROM_FILL(            0x0000, 0x0800, 0xff )
+	ROM_LOAD( "u31.bin", 0x0800, 0x0800, CRC(412fc492) SHA1(094ea0ffd0c22274cfe164f07c009ffe022331fd) )
+
+	ROM_REGION( 0x0100,  "proms", 0 )
+	ROM_LOAD( "u51.bin", 0x0000, 0x0100, CRC(812dc1f1) SHA1(b2af33ff36f2eca2f782bc2239bc9e54c2564f6a) )
+ROM_END
+
+/*
+
   Turbo Poker 2 by Micro MFG.
 
   - CPU:             1x NEC D8080AFC-1 (U42).
@@ -1897,6 +2060,47 @@ ROM_START( tpoker2 )
 
 	ROM_REGION( 0x0034,  "plds", 0 )
 	ROM_LOAD( "tp2_pld.u37",  0x0000, 0x0034, CRC(25651948) SHA1(62cd4d73c6ca8ea5d4beb9ae262d1383f8149462) )
+ROM_END
+
+/*
+
+Etched on top of board in copper: "MADE IN JAPAN".
+Stickered on top: "Serial No. 10147".
+
+Orange dot sticker dot near pin 1.
+White dot sticker at other end of connector.
+
+.u18    MB8516  read as 2716    stickered   13.
+.u19    MB8516  read as 2716    stickered   11.
+.u12    MB8516  read as 2716    stickered   12.
+.u31    MB8516  read as 2716    stickered   10.
+.u51    6301    read as 82s129
+
+1x 18.000 Crystal
+1x 8080
+3x 8255
+2x 5101
+1x 8228
+2x 2114
+1x 8 DIP Switches bank.
+
+Mini daughterboard attached.
+
+*/
+ROM_START( dphljp )	/* close to GTI Poker */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "japan_12.u12", 0x0000, 0x0800, CRC(086a2303) SHA1(900c7241c33a38fb1a791b311e50f7d7f43bb955) )
+	ROM_RELOAD(	              0x0800, 0x0800 )
+	ROM_LOAD( "japan_13.u18", 0x1000, 0x0800, CRC(ccaad5cb) SHA1(5f6ca497ccb7c535714a6e24df00f2831a7840c1) )
+	ROM_RELOAD(	              0x1800, 0x0800 )
+	ROM_LOAD( "japan_11.u19", 0x2000, 0x0800, CRC(9f9c67d5) SHA1(cd11849b245406821af7ac3554805c9dd89645b2) )	// ???
+
+	ROM_REGION( 0x1000,  "gfx", 0 )
+	ROM_FILL(                 0x0000, 0x0800, 0xff )
+	ROM_LOAD( "japan_10.u31", 0x0800, 0x0800, CRC(412fc492) SHA1(094ea0ffd0c22274cfe164f07c009ffe022331fd) )
+
+	ROM_REGION( 0x0100,  "proms", 0 )
+	ROM_LOAD( "japan_6301.u51", 0x0000, 0x0100, CRC(88302127) SHA1(aed1273974917673405f1234ab64e6f8b3856c34) )
 ROM_END
 
 
@@ -1966,7 +2170,7 @@ static DRIVER_INIT( dphla )
 *      Game Drivers      *
 *************************/
 
-/*     YEAR  NAME      PARENT   MACHINE   INPUT     INIT      ROT    COMPANY                      FULLNAME                       FLAGS                              LAYOUT */
+/*     YEAR  NAME      PARENT   MACHINE   INPUT     INIT      ROT    COMPANY                      FULLNAME                       FLAGS                  LAYOUT */
 GAMEL( 1988, norautp,  0,       norautp,  norautp,  0,        ROT0, "Noraut Ltd.",               "Noraut Poker",                 0,                     layout_noraut11 )
 GAMEL( 1988, norautjp, norautp, norautp,  norautp,  0,        ROT0, "Noraut Ltd.",               "Noraut Joker Poker",           0,                     layout_noraut11 )
 GAMEL( 1988, norautrh, 0,       norautp,  norautrh, norautrh, ROT0, "Noraut Ltd.",               "Noraut Red Hot Joker Poker",   0,                     layout_noraut12 )
@@ -1979,7 +2183,9 @@ GAMEL( 198?, norautpn, norautp, norautp,  norautpn, norautpn, ROT0, "bootleg?", 
 
 /* The following ones are 'Draw Poker Hi-Lo', running in a i8080a based hardware */
 GAME(  1983, dphl,     0,       dphl,     norautp,  dphl,     ROT0, "M. Kramer Manufacturing.",  "Draw Poker Hi-Lo (M.Kramer)",  GAME_NOT_WORKING )
-GAME(  1983, dphla,    0,       dphla,    norautp,  dphla,    ROT0, "Unknown",                   "Draw Poker Hi-Lo (alt)",       GAME_NOT_WORKING )
+GAME(  1983, dphla,    0,       dphla,    norautp,  dphla,    ROT0, "Unknown",                   "Draw Poker Hi-Lo (Alt)",       GAME_NOT_WORKING )
 
-GAME(  1983, gtipoker, 0,       gtipoker, norautpn, gtipoker, ROT0, "GTI Inc",                   "GTI Poker",                    GAME_NOT_WORKING )
+GAME(  1983, gtipoker, 0,       dphl,     norautp,  gtipoker, ROT0, "GTI Inc",                   "GTI Poker",                    GAME_NOT_WORKING )
+GAME(  1983, dphljp,   0,       dphl,     norautp,  0,        ROT0, "Unknown",                   "Draw Poker Hi-Lo (Japanese)",  GAME_NOT_WORKING )
+GAME(  1983, smshilo,  0,       dphlnv,   norautp,  0,        ROT0, "SMS Manufacturing Corp.",   "Hi-Lo Double Up Joker Poker ", GAME_NOT_WORKING )
 GAME(  1993, tpoker2,  0,       dphltest, norautp,  0,        ROT0, "Micro Manufacturing, Inc.", "Turbo Poker 2",                GAME_NOT_WORKING )
