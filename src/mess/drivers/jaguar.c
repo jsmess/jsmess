@@ -347,7 +347,7 @@ static WRITE32_HANDLER( dspctrl_w )
 static READ32_HANDLER( joystick_r )
 {
 	UINT16 joystick_result = 0xfffe;
-	UINT16 joybuts_result = 0xfffb;
+	UINT16 joybuts_result = 0xffef;
 	int i;
 	static const char *const keynames[2][8] =
 			{
@@ -381,7 +381,7 @@ static READ32_HANDLER( joystick_r )
 	}
 
 	joystick_result |= eeprom_read_bit();
-	joybuts_result |= (input_port_read(space->machine, "CONFIG") & 4);
+	joybuts_result |= (input_port_read(space->machine, "CONFIG") & 0x10);
 
 	return (joystick_result << 16) | joybuts_result;
 }
@@ -594,9 +594,9 @@ static INPUT_PORTS_START( jaguar )
 //  PORT_CONFNAME( 0x02, 0x02, "Show Logo")
 //  PORT_CONFSETTING(    0x00, "Yes")
 //  PORT_CONFSETTING(    0x02, "No")
-	PORT_CONFNAME( 0x04, 0x04, "TV System")
+	PORT_CONFNAME( 0x10, 0x10, "TV System")
 	PORT_CONFSETTING(    0x00, "PAL")
-	PORT_CONFSETTING(    0x04, "NTSC")
+	PORT_CONFSETTING(    0x10, "NTSC")
 INPUT_PORTS_END
 
 
