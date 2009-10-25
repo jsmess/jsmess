@@ -474,7 +474,10 @@ static READ8_HANDLER( port_00_r )
 	if(!(offset & 1))
 	{
 		logerror("pic8259 port $00 R access %02x\n",offset >> 1);
-		return pic8259_r(devtag_get_device(space->machine, "pic8259_master"), (offset & 6) >> 1);
+		if((offset>>1) >= 4)
+			return pic8259_r(devtag_get_device(space->machine, "pic8259_slave"), (offset & 2) >> 1);
+		else
+			return pic8259_r(devtag_get_device(space->machine, "pic8259_master"), (offset & 2) >> 1);
 	}
 
 	//logerror("DMA port $00 R access %02x\n",offset >> 1);
@@ -486,7 +489,10 @@ static WRITE8_HANDLER( port_00_w )
 	if(!(offset & 1))
 	{
 		logerror("pic8259 port $00 W access %02x %02x\n",offset >> 1,data);
-		pic8259_w(devtag_get_device(space->machine, "pic8259_master"), (offset & 6) >> 1, data);
+		if((offset>>1) >= 4)
+			pic8259_w(devtag_get_device(space->machine, "pic8259_slave"), (offset & 2) >> 1, data);
+		else
+			pic8259_w(devtag_get_device(space->machine, "pic8259_master"), (offset & 2) >> 1, data);
 	}
 	else
 	{
@@ -618,10 +624,10 @@ INPUT_PORTS_END
 static IRQ_CALLBACK(irq_callback)
 {
 	int r = 0;
-	//r = pic8259_acknowledge( devtag_get_device( machine, "pic8259_slave" ));
-	//if (r==0)
+	r = pic8259_acknowledge( devtag_get_device( device->machine, "pic8259_slave" ));
+	if (r==0)
 	{
-		r = pic8259_acknowledge( devtag_get_device( device->machine, "pic8259_master" ))/2; //Explictly needs 0x10/2 on POST?
+		r = pic8259_acknowledge( devtag_get_device( device->machine, "pic8259_master" ));
 		//printf("%02x ACK\n",r);
 	}
 	return r;
@@ -675,9 +681,9 @@ static PIC8259_SET_INT_LINE( pc98_master_set_int_line ) {
 }
 
 
-//static PIC8259_SET_INT_LINE( pc98_slave_set_int_line ) {
-//	pic8259_set_irq_line( devtag_get_device( machine, "pic8259_master" ), 2, interrupt);
-//}
+static PIC8259_SET_INT_LINE( pc98_slave_set_int_line ) {
+	pic8259_set_irq_line( devtag_get_device( device->machine, "pic8259_master" ), 2, interrupt);
+}
 
 
 static const struct pic8259_interface pic8259_master_config = {
@@ -685,9 +691,9 @@ static const struct pic8259_interface pic8259_master_config = {
 };
 
 
-//static const struct pic8259_interface pic8259_slave_config = {
-//	pc98_slave_set_int_line
-//};
+static const struct pic8259_interface pic8259_slave_config = {
+	pc98_slave_set_int_line
+};
 
 static VIDEO_START( pc9821 )
 {
@@ -928,7 +934,7 @@ static MACHINE_DRIVER_START( pc9801 )
 	MDRV_PIT8253_ADD( "pit8253", pit8253_config )
 	MDRV_DMA8237_ADD( "dma8237_1", dma8237_1_config )
 	MDRV_PIC8259_ADD( "pic8259_master", pic8259_master_config )
-//	MDRV_PIC8259_ADD( "pic8259_slave", pic8259_slave_config )
+	MDRV_PIC8259_ADD( "pic8259_slave", pic8259_slave_config )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
