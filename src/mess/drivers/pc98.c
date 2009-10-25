@@ -300,6 +300,9 @@ static VIDEO_UPDATE( pc9801 )
 
 static READ8_HANDLER( sys_port_r )
 {
+	if(cpu_get_pc(space->cpu) == 0xf9088)
+		return 0x18; //FIXME: kludge to get over a probable PPI bug.
+
 	if(offset & 1)
 		return ppi8255_r(devtag_get_device(space->machine, "ppi8255_0"), (offset & 6) >> 1);
 
@@ -450,7 +453,6 @@ static READ8_HANDLER( port_70_r )
 	if(offset & 1)
 	{
 		logerror("pit port $70 R access %02x\n",offset >> 1);
-		/* FIXME */
 		return pit8253_r(devtag_get_device(space->machine, "pit8253"), (offset & 6) >> 1);
 	}
 
@@ -474,10 +476,7 @@ static READ8_HANDLER( port_00_r )
 	if(!(offset & 1))
 	{
 		logerror("pic8259 port $00 R access %02x\n",offset >> 1);
-		if((offset>>1) >= 4)
-			return pic8259_r(devtag_get_device(space->machine, "pic8259_slave"), (offset & 2) >> 1);
-		else
-			return pic8259_r(devtag_get_device(space->machine, "pic8259_master"), (offset & 2) >> 1);
+		return pic8259_r(devtag_get_device(space->machine, (offset & 8) ? "pic8259_slave" : "pic8259_master"), (offset & 2) >> 1);
 	}
 
 	//logerror("DMA port $00 R access %02x\n",offset >> 1);
@@ -489,10 +488,7 @@ static WRITE8_HANDLER( port_00_w )
 	if(!(offset & 1))
 	{
 		logerror("pic8259 port $00 W access %02x %02x\n",offset >> 1,data);
-		if((offset>>1) >= 4)
-			pic8259_w(devtag_get_device(space->machine, "pic8259_slave"), (offset & 2) >> 1, data);
-		else
-			pic8259_w(devtag_get_device(space->machine, "pic8259_master"), (offset & 2) >> 1, data);
+		pic8259_w(devtag_get_device(space->machine, (offset & 8) ? "pic8259_slave" : "pic8259_master"), (offset & 2) >> 1, data);
 	}
 	else
 	{
@@ -704,10 +700,10 @@ static VIDEO_UPDATE( pc9821 )
 	return 0;
 }
 
-static const gfx_layout charset =
+static const gfx_layout charset_8x8 =
 {
 	8,8,
-	RGN_FRAC(1,1),
+	256,
 	1,
 	{ 0 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
@@ -715,8 +711,20 @@ static const gfx_layout charset =
 	8*8
 };
 
+static const gfx_layout charset_8x16 =
+{
+	8,16,
+	RGN_FRAC(1,1),
+	1,
+	{ 0 },
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	8*16
+};
+
 static GFXDECODE_START( pc9801 )
-	GFXDECODE_ENTRY( "gfx1",   0x00000, charset,    0x000, 0x01 )
+	GFXDECODE_ENTRY( "gfx1",   0x00000, charset_8x8,    0x000, 0x01 )
+	GFXDECODE_ENTRY( "gfx1",   0x00800, charset_8x16,   0x000, 0x01 )
 GFXDECODE_END
 
 /*
@@ -735,7 +743,7 @@ static READ8_DEVICE_HANDLER( pc98_portb_r )
 
 	tmp ^= 1; //<- actually related to the RTC somehow
 	//printf("PPI Port B read\n");
-	return 0xf8 | tmp;
+	return 0xf8 | tmp; //bit 2 seems used for error stuff (returns parity error or ems error on different spots), don't know the real use of it...
 }
 
 static READ8_DEVICE_HANDLER( pc98_portc_r )
