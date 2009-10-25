@@ -17,6 +17,7 @@ Systems Promoted from GAME_NOT_WORKING:
 - Beta [Curt Coder]
 - Microbee 56k [Robbbert]
 - Nokia MikroMikko 1 M6 [Curt Coder, Kara Trace]
+- TRS-80 Model 4 [Robbbert]
 - TRS-80 Model 4P [Robbbert]
 
 
@@ -241,6 +242,8 @@ System Driver Changes:
 User Interface Changes:
 -----------------------
 - [NEWUI] Fixed file extension filter for floppies. [Robbbert]
+
+- [MESSUI] Fixed default folders when using Device View. [Robbbert]
 
 - Fixed Tape UI display for systems with multiple cassettes (bug #1677)
   [Dirk Best]
