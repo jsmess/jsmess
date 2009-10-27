@@ -1905,8 +1905,8 @@ static WRITE16_HANDLER( cdic_w )
 						timer_adjust_oneshot(cdic_regs.interrupt_timer, ATTOTIME_IN_HZ(75), 0); // 75Hz = 1x CD-ROM speed
 						break;
 					case 0x28: // Play CDDA
-						timer_adjust_oneshot(cdic_regs.interrupt_timer, attotime_zero, 0);
-						cdic_regs.data_buffer &= 0x3fff;
+						//timer_adjust_oneshot(cdic_regs.interrupt_timer, attotime_zero, 0);
+						//cdic_regs.data_buffer &= 0x3fff;
 						break;
 					case 0x2b: // Stop CDDA
 						cdda_stop_audio(devtag_get_device(space->machine, "cdda"));
