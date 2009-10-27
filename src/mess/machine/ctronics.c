@@ -87,7 +87,6 @@ static DEVICE_START( centronics )
 {
 	centronics_state *centronics = get_safe_token(device);
 	const centronics_interface *intf = device->static_config;
-	astring *tempstring = astring_alloc();
 
 	/* validate some basic stuff */
 	assert(device->static_config != NULL);
@@ -99,16 +98,7 @@ static DEVICE_START( centronics )
 	centronics->strobe = TRUE;
 
 	/* get printer device */
-	centronics->printer = devtag_get_device(device->machine, device_build_tag(tempstring, device, "printer"));
-	assert(centronics->printer != NULL);
-
-	/* make sure it's running */
-	if (!centronics->printer->started)
-	{
-		device_delay_init(device);
-		astring_free(tempstring);
-		return;
-	}
+	centronics->printer = device_find_child_by_tag(device, "printer");
 
 	/* resolve callbacks */
 	devcb_resolve_write_line(&centronics->out_ack_func, &intf->out_ack_func, device);
@@ -121,8 +111,6 @@ static DEVICE_START( centronics )
 	state_save_register_device_item(device, 0, centronics->busy);
 	state_save_register_device_item(device, 0, centronics->ack);
 	state_save_register_device_item(device, 0, centronics->data);
-
-	astring_free(tempstring);
 }
 
 static DEVICE_RESET( centronics )
