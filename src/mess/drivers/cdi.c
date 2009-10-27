@@ -34,6 +34,8 @@ TODO:
 #include "cpu/m68000/m68000.h"
 #include "sound/dmadac.h"
 #include "devices/chd_cd.h"
+#include "machine/timekpr.h"
+#include "sound/cdda.h"
 
 static UINT16 *planea;
 static UINT16 *planeb;
@@ -45,7 +47,7 @@ static emu_timer *test_timer;
 
 #define ENABLE_UART_PRINTING (0)
 
-#define VERBOSE_LEVEL	(0)
+#define VERBOSE_LEVEL	(5)
 
 #define ENABLE_VERBOSE_LOG (0)
 
@@ -87,10 +89,6 @@ static void perform_mouse_update(running_machine *machine);
 static INPUT_CHANGED( mouse_update );
 static READ16_HANDLER( slave_r );
 static WRITE16_HANDLER( slave_w );
-
-// RTC
-static READ16_HANDLER( m48t08_r );
-static WRITE16_HANDLER( m48t08_w );
 
 // Platform-specific
 static void cdi220_draw_lcd(running_machine *machine, int y);
@@ -1380,9 +1378,41 @@ static TIMER_CALLBACK( audio_sample_trigger )
 	}
 	else
 	{
+		// Swap buffer positions to indicate our new buffer position at the next read
+		cdic_regs.z_buffer ^= 0x1a00;
 		verboselog(machine, 0, "Data is not valid, stopping playback\n" );
 		timer_adjust_oneshot(cdic_regs.audio_sample_timer, attotime_never, 0);
 	}
+}
+
+static UINT32 increment_cdda_bcd(UINT32 bcd)
+{
+	UINT8 nybbles[6] =
+	{
+		 bcd & 0x0000000f,
+		(bcd & 0x000000f0) >> 4,
+		(bcd & 0x00000f00) >> 8,
+		(bcd & 0x0000f000) >> 12,
+		(bcd & 0x000f0000) >> 16,
+		(bcd & 0x00f00000) >> 20
+	};
+	nybbles[2]++;
+	if(nybbles[2] == 10)
+	{
+		nybbles[3]++;
+		nybbles[2] = 0;
+	}
+	if(nybbles[3] == 6)
+	{
+		nybbles[4]++;
+		nybbles[3] = 0;
+	}
+	if(nybbles[4] == 10)
+	{
+		nybbles[5]++;
+		nybbles[4] = 0;
+	}
+	return (nybbles[5] << 20) | (nybbles[4] << 16) | (nybbles[3] << 12) | (nybbles[2] << 8) | (nybbles[1] << 4) | nybbles[0];
 }
 
 static TIMER_CALLBACK( cdic_trigger_readback_int )
@@ -1563,6 +1593,102 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 		case 0x2e: // Abort
 			timer_adjust_oneshot(cdic_regs.interrupt_timer, ATTOTIME_IN_HZ(75), 0); // 75Hz = 1x CD-ROM speed
 			break;
+		case 0x28: // Play CDDA audio
+		{
+			UINT32 msf = (cdic_regs.time & 0xffff0000) >> 8;
+			UINT32 next_msf = increment_cdda_bcd((cdic_regs.time & 0xffff0000) >> 8);
+			UINT32 lba = 0;
+			UINT32 next_lba = 0;
+			UINT8 nybbles[6] =
+			{
+				 msf & 0x0000000f,
+				(msf & 0x000000f0) >> 4,
+				(msf & 0x00000f00) >> 8,
+				(msf & 0x0000f000) >> 12,
+				(msf & 0x000f0000) >> 16,
+				(msf & 0x00f00000) >> 20
+			};
+			UINT8 next_nybbles[6] =
+			{
+				 next_msf & 0x0000000f,
+				(next_msf & 0x000000f0) >> 4,
+				(next_msf & 0x00000f00) >> 8,
+				(next_msf & 0x0000f000) >> 12,
+				(next_msf & 0x000f0000) >> 16,
+				(next_msf & 0x00f00000) >> 20
+			};
+			cdic_regs.time = next_msf << 8;
+			if(msf & 0x000080)
+			{
+				msf &= 0xffff00;
+				nybbles[0] = 0;
+				nybbles[1] = 0;
+			}
+			if(nybbles[2] >= 2)
+			{
+				nybbles[2] -= 2;
+			}
+			else
+			{
+				nybbles[2] = 8 + nybbles[2];
+				if(nybbles[3] > 0)
+				{
+					nybbles[3]--;
+				}
+				else
+				{
+					nybbles[3] = 5;
+					if(nybbles[4] > 0)
+					{
+						nybbles[4]--;
+					}
+					else
+					{
+						nybbles[4] = 9;
+						nybbles[5]--;
+					}
+				}
+			}
+			lba = nybbles[0] + nybbles[1]*10 + ((nybbles[2] + nybbles[3]*10)*75) + ((nybbles[4] + nybbles[5]*10)*75*60);
+			if(next_nybbles[2] >= 2)
+			{
+				next_nybbles[2] -= 2;
+			}
+			else
+			{
+				next_nybbles[2] = 8 + next_nybbles[2];
+				if(next_nybbles[3] > 0)
+				{
+					next_nybbles[3]--;
+				}
+				else
+				{
+					next_nybbles[3] = 5;
+					if(next_nybbles[4] > 0)
+					{
+						next_nybbles[4]--;
+					}
+					else
+					{
+						next_nybbles[4] = 9;
+						next_nybbles[5]--;
+					}
+				}
+			}
+
+			next_lba = next_nybbles[0] + next_nybbles[1]*10 + ((next_nybbles[2] + next_nybbles[3]*10)*75) + ((next_nybbles[4] + next_nybbles[5]*10)*75*60);
+
+			verboselog(machine, 0, "Playing CDDA sector from MSF location %06x\n", cdic_regs.time | 2 );
+
+			cdda_start_audio(devtag_get_device(machine, "cdda"), lba, next_lba);
+
+			timer_adjust_oneshot(cdic_regs.interrupt_timer, ATTOTIME_IN_HZ(1), 0);
+
+			verboselog(machine, 0, "Setting CDIC interrupt line for CDDA sector\n" );
+			cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), M68K_IRQ_4, 128);
+			cputag_set_input_line(machine, "maincpu", M68K_IRQ_4, ASSERT_LINE);
+			break;
+		}
 	}
 }
 
@@ -1740,7 +1866,7 @@ static WRITE16_HANDLER( cdic_w )
 			COMBINE_DATA(&cdic_regs.z_buffer);
 			if(cdic_regs.z_buffer & 0x2000)
 			{
-				attotime period = timer_timeleft(cdic_regs.audio_sample_timer);
+				attotime period = timer_timeleft(cdic_regs.interrupt_timer);
 				if(!attotime_is_never(period))
 				{
 					timer_adjust_oneshot(cdic_regs.audio_sample_timer, period, 0);
@@ -1778,11 +1904,15 @@ static WRITE16_HANDLER( cdic_w )
 					case 0x2a: // Read Mode 2
 						timer_adjust_oneshot(cdic_regs.interrupt_timer, ATTOTIME_IN_HZ(75), 0); // 75Hz = 1x CD-ROM speed
 						break;
+					case 0x28: // Play CDDA
+						timer_adjust_oneshot(cdic_regs.interrupt_timer, attotime_zero, 0);
+						cdic_regs.data_buffer &= 0x3fff;
+						break;
+					case 0x2b: // Stop CDDA
+						cdda_stop_audio(devtag_get_device(space->machine, "cdda"));
+						timer_adjust_oneshot(cdic_regs.interrupt_timer, attotime_never, 0);
+						break;
 					case 0x2c: // Seek
-						if(cdic_regs.time & 0x00008000)
-						{
-							cdic_regs.time &= 0xffff0000;
-						}
 						break;
 					default:
 						verboselog(space->machine, 0, "Unknown CDIC command: %02x\n", cdic_regs.command );
@@ -2174,73 +2304,6 @@ static WRITE16_HANDLER( slave_w )
 	}
 }
 
-typedef struct
-{
-	UINT8 nvram[0x2000];
-	emu_timer *clock;
-} m48t08_regs_t;
-
-static m48t08_regs_t m48t08;
-
-static READ16_HANDLER( m48t08_r )
-{
-	verboselog(space->machine, 11, "m48t08_r: %04x = %02x & %04x\n", offset, m48t08.nvram[offset], mem_mask );
-	return m48t08.nvram[offset] << 8;
-}
-
-static WRITE16_HANDLER( m48t08_w )
-{
-	verboselog(space->machine, 11, "m48t08_w: %04x = %02x\n", offset, data >> 8);
-	switch(offset)
-	{
-		case 0x1ff9:
-			if(m48t08.nvram[0x1ff8] & 0x80)
-			{
-				m48t08.nvram[0x1ff9] = (data >> 8) & 0x00ff;
-			}
-			break;
-		case 0x1ffa:
-			if(m48t08.nvram[0x1ff8] & 0x80)
-			{
-				m48t08.nvram[0x1ffa] = (data >> 8) & 0x7f;
-			}
-			break;
-		case 0x1ffb:
-			if(m48t08.nvram[0x1ff8] & 0x80)
-			{
-				m48t08.nvram[0x1ffb] = (data >> 8) & 0x003f;
-			}
-			break;
-		case 0x1ffc:
-			if(m48t08.nvram[0x1ff8] & 0x80)
-			{
-				m48t08.nvram[0x1ffc] = (data >> 8) & 0x0047;
-			}
-			break;
-		case 0x1ffd:
-			if(m48t08.nvram[0x1ff8] & 0x80)
-			{
-				m48t08.nvram[0x1ffd] = (data >> 8) & 0x003f;
-			}
-			break;
-		case 0x1ffe:
-			if(m48t08.nvram[0x1ff8] & 0x80)
-			{
-				m48t08.nvram[0x1ffe] = (data >> 8) & 0x001f;
-			}
-			break;
-		case 0x1fff:
-			if(m48t08.nvram[0x1ff8] & 0x80)
-			{
-				m48t08.nvram[0x1fff] = (data >> 8) & 0x00ff;
-			}
-			break;
-		default:
-			m48t08.nvram[offset] = (data & mem_mask) >> 8;
-			break;
-	}
-}
-
 /*************************
 *     Video Hardware     *
 *************************/
@@ -2411,7 +2474,7 @@ static void cdi220_draw_lcd(running_machine *machine, int y)
 			}
 		}
 	}
-	for(x = 8*24; x < 768; x++)
+	for(x = 8*24; x < 384; x++)
 	{
 		scanline[x] = 0;
 	}
@@ -3517,10 +3580,10 @@ static void mcd212_draw_cursor(running_machine *machine, UINT32 *scanline, int y
 				{
 					if(mcd212.channel[0].cursor_pattern[y] & (1 << (15 - ((x - curx) >> 2))))
 					{
-						scanline[x++] = color;
-						scanline[x++] = color;
-						scanline[x++] = color;
-						scanline[x] = color;
+						scanline[(x++)/2] = color;
+						scanline[(x++)/2] = color;
+						scanline[(x++)/2] = color;
+						scanline[(x/2)] = color;
 					}
 					else
 					{
@@ -3533,8 +3596,8 @@ static void mcd212_draw_cursor(running_machine *machine, UINT32 *scanline, int y
 				{
 					if(mcd212.channel[0].cursor_pattern[y] & (1 << (15 - ((x - curx) >> 1))))
 					{
-						scanline[x++] = color;
-						scanline[x] = color;
+						scanline[(x++)/2] = color;
+						scanline[x/2] = color;
 					}
 					else
 					{
@@ -3715,9 +3778,11 @@ static void mcd212_draw_scanline(running_machine *machine, int y)
 	mcd212_process_vsr(machine, 0, plane_a_r, plane_a_g, plane_a_b);
 	mcd212_process_vsr(machine, 1, plane_b_r, plane_b_g, plane_b_b);
 	mcd212_mix_lines(machine, plane_a_r, plane_a_g, plane_a_b, plane_b_r, plane_b_g, plane_b_b, out);
-	for(x = 0; x < 768; x++)
+	for(x = 0; x < 384; x++)
 	{
-		scanline[x] = out[x];
+		scanline[x] = out[x*2];
+		//scanline[x] = (plane_a_r[x*2] << 16) | (plane_a_g[x*2] << 8) | plane_a_b[x*2];
+		//scanline[x+384] = (plane_b_r[x*2] << 16) | (plane_b_g[x*2] << 8) | plane_b_b[x*2];
 	}
 	mcd212_draw_cursor(machine, scanline, y);
 }
@@ -3812,7 +3877,7 @@ static VIDEO_START(cdi)
 	mcd212.channel[0].clut_bank = 0;
 	mcd212.channel[1].clut_bank = 0;
 	mcd212.scan_timer = timer_alloc(machine, mcd212_perform_scan, 0);
-	timer_adjust_oneshot(mcd212.scan_timer, video_screen_get_time_until_pos(machine->primary_screen, 22, 0), 0);
+	timer_adjust_oneshot(mcd212.scan_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 }
 
 static TIMER_CALLBACK( test_timer_callback )
@@ -3861,11 +3926,12 @@ static ADDRESS_MAP_START( cdimono1_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00303c00, 0x00303fff) AM_READWRITE(cdic_r, cdic_w)
 	AM_RANGE(0x00310000, 0x00317fff) AM_READWRITE(slave_r, slave_w)
 	//AM_RANGE(0x00318000, 0x0031ffff) AM_NOP
-	AM_RANGE(0x00320000, 0x00323fff) AM_READWRITE(m48t08_r, m48t08_w) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x00320000, 0x00323fff) AM_DEVREADWRITE8("mk48t08", timekeeper_r, timekeeper_w, 0xff00)	/* nvram (only low bytes used) */
 	AM_RANGE(0x00400000, 0x0047ffff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x004fffe0, 0x004fffff) AM_READWRITE(mcd212_r, mcd212_w)
 	AM_RANGE(0x00500000, 0x0057ffff) AM_RAM
 	AM_RANGE(0x00580000, 0x00ffffff) AM_NOP
+	AM_RANGE(0x00e00000, 0x00efffff) AM_RAM // DVC
 	AM_RANGE(0x80000000, 0x8000807f) AM_READWRITE(scc68070_periphs_r, scc68070_periphs_w)
 ADDRESS_MAP_END
 
@@ -3883,7 +3949,8 @@ static INPUT_PORTS_START( cdi )
 	PORT_START("MOUSEBTN")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_CODE(MOUSECODE_BUTTON1) PORT_NAME("Mouse Button 1") PORT_CHANGED(mouse_update, 0)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_CODE(MOUSECODE_BUTTON2) PORT_NAME("Mouse Button 2") PORT_CHANGED(mouse_update, 0)
-	PORT_BIT(0xfc, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_CODE(MOUSECODE_BUTTON3) PORT_NAME("Mouse Button 3") PORT_CHANGED(mouse_update, 0)
+	PORT_BIT(0xf8, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
 static MACHINE_RESET( cdi )
@@ -3919,6 +3986,7 @@ static MACHINE_RESET( cdi )
 	if( cdrom_dev )
 	{
 		cdic_regs.cd = mess_cd_get_cdrom_file(cdrom_dev);
+		cdda_set_cdrom(devtag_get_device(machine, "cdda"), cdic_regs.cd);
 	}
 
 	device_reset(cputag_get_cpu(machine, "maincpu"));
@@ -3946,12 +4014,11 @@ static MACHINE_DRIVER_START( cdimono1 )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(768, 262)
-	MDRV_SCREEN_VISIBLE_AREA(0, 768-1, 22, 262-1) //dynamic resolution,TODO
+	MDRV_SCREEN_SIZE(384, 262)
+	MDRV_SCREEN_VISIBLE_AREA(0, 384-1, 0, 262-1) //dynamic resolution,TODO
 
 	MDRV_PALETTE_LENGTH(0x100)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
 	MDRV_VIDEO_START(cdi)
 	MDRV_VIDEO_UPDATE(generic_bitmapped)
 
@@ -3962,11 +4029,17 @@ static MACHINE_DRIVER_START( cdimono1 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("dac1", DMADAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MDRV_SOUND_ADD( "dac1", DMADAC, 0 )
+	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "lspeaker", 1.0 )
 
-	MDRV_SOUND_ADD("dac2", DMADAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MDRV_SOUND_ADD( "dac2", DMADAC, 0 )
+	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "rspeaker", 1.0 )
+
+	MDRV_SOUND_ADD( "cdda", CDDA, 0 )
+	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "lspeaker", 1.0 )
+	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "rspeaker", 1.0 )
+
+	MDRV_MK48T08_ADD( "mk48t08" )
 MACHINE_DRIVER_END
 
 /*************************
