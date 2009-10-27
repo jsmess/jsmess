@@ -166,7 +166,7 @@ static MACHINE_DRIVER_START( bebox )
 	MDRV_PCI_BUS_DEVICE(1, NULL, cirrus5430_pci_read, cirrus5430_pci_write)
 	/*MDRV_PCI_BUS_DEVICE(12, NULL, scsi53c810_pci_read, scsi53c810_pci_write)*/
 
-	MDRV_SMC37C78_ADD("smc37c78", pc_fdc_nec765_connected_1_drive_interface)
+	MDRV_SMC37C78_ADD("smc37c78", pc_fdc_upd765_connected_1_drive_interface)
 
 	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, bebox_floppy_config)
 	

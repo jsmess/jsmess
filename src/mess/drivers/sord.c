@@ -42,7 +42,7 @@
 #include "machine/8255ppi.h"
 #include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
-#include "machine/nec765.h"
+#include "machine/upd765.h"
 
 
 #define SORD_DEBUG 1
@@ -53,8 +53,8 @@
 /* - Z80 CPU */
 /* - 27128 ROM (16K) */
 /* - 2x6116 RAM */
-/* - Intel8272/NEC765 */
-/* - IRQ of NEC765 is connected to INT of Z80 */
+/* - Intel8272/UPD765 */
+/* - IRQ of UPD765 is connected to INT of Z80 */
 /* PI-5 interface is required. mode 2 of the 8255 is used to communicate with the FD-5 */
 
 
@@ -138,9 +138,9 @@ static WRITE8_HANDLER(fd5_drive_control_w)
 
 static WRITE8_HANDLER(fd5_tc_w)
 {
-	const device_config *fdc = devtag_get_device(space->machine, "nec765");
-	nec765_tc_w(fdc, 1);
-	nec765_tc_w(fdc, 0);
+	const device_config *fdc = devtag_get_device(space->machine, "upd765");
+	upd765_tc_w(fdc, 1);
+	upd765_tc_w(fdc, 0);
 }
 
 /* 0x020 fd5 writes to this port to communicate with m5 */
@@ -149,8 +149,8 @@ static WRITE8_HANDLER(fd5_tc_w)
 /* 0x040 */
 /* 0x050 */
 static ADDRESS_MAP_START(sord_fd5_io, ADDRESS_SPACE_IO, 8)
-	AM_RANGE(0x000, 0x000) AM_DEVREAD( "nec765", nec765_status_r)
-	AM_RANGE(0x001, 0x001) AM_DEVREADWRITE("nec765", nec765_data_r, nec765_data_w)
+	AM_RANGE(0x000, 0x000) AM_DEVREAD( "upd765", upd765_status_r)
+	AM_RANGE(0x001, 0x001) AM_DEVREADWRITE("upd765", upd765_data_r, upd765_data_w)
 	AM_RANGE(0x010, 0x010) AM_READWRITE(fd5_data_r, fd5_data_w)
 	AM_RANGE(0x020, 0x020) AM_WRITE(fd5_communication_w)
 	AM_RANGE(0x030, 0x030) AM_READ(fd5_communication_r)
@@ -158,18 +158,18 @@ static ADDRESS_MAP_START(sord_fd5_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x050, 0x050) AM_WRITE(fd5_tc_w)
 ADDRESS_MAP_END
 
-/* nec765 data request is connected to interrupt of z80 inside fd5 interface */
+/* upd765 data request is connected to interrupt of z80 inside fd5 interface */
 static WRITE_LINE_DEVICE_HANDLER( sord_fd5_fdc_interrupt )
 {
 	cputag_set_input_line(device->machine, "floppy", 0, state? HOLD_LINE : CLEAR_LINE);
 }
 
-static const struct nec765_interface sord_fd5_nec765_interface=
+static const struct upd765_interface sord_fd5_upd765_interface=
 {
 	DEVCB_LINE(sord_fd5_fdc_interrupt),
 	NULL,
 	NULL,
-	NEC765_RDY_PIN_CONNECTED,
+	UPD765_RDY_PIN_CONNECTED,
 	{FLOPPY_0, FLOPPY_1, NULL, NULL}
 };
 
@@ -585,7 +585,7 @@ static MACHINE_DRIVER_START( sord_m5_fd5 )
 	MDRV_CPU_IO_MAP(sord_fd5_io)
 
 	MDRV_PPI8255_ADD("ppi8255", sord_ppi8255_interface)
-	MDRV_NEC765A_ADD("nec765", sord_fd5_nec765_interface)
+	MDRV_UPD765A_ADD("upd765", sord_fd5_upd765_interface)
 
 	MDRV_QUANTUM_TIME(HZ(1200))
 	MDRV_MACHINE_RESET(sord_m5_fd5)

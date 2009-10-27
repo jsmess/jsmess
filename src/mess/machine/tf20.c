@@ -13,7 +13,7 @@
 #include "cpu/z80/z80.h"
 #include "devices/messram.h"
 #include "machine/upd7201.h"
-#include "machine/nec765.h"
+#include "machine/upd765.h"
 #include "devices/flopdrv.h"
 
 
@@ -151,8 +151,8 @@ static ADDRESS_MAP_START( tf20_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xf6, 0xf6) AM_READ(tf20_rom_disable)
 	AM_RANGE(0xf7, 0xf7) AM_READ(tf20_dip_r)
 	AM_RANGE(0xf8, 0xf8) AM_WRITE(tf20_fdc_control_w)
-	AM_RANGE(0xfa, 0xfa) AM_DEVREAD("5a", nec765_status_r)
-	AM_RANGE(0xfb, 0xfb) AM_DEVREADWRITE("5a", nec765_data_r, nec765_data_w)
+	AM_RANGE(0xfa, 0xfa) AM_DEVREAD("5a", upd765_status_r)
+	AM_RANGE(0xfb, 0xfb) AM_DEVREADWRITE("5a", upd765_data_r, upd765_data_w)
 ADDRESS_MAP_END
 
 
@@ -194,12 +194,12 @@ static UPD7201_INTERFACE( tf20_upd7201_intf )
 	}
 };
 
-static const nec765_interface tf20_nec765a_intf =
+static const upd765_interface tf20_upd765a_intf =
 {
 	DEVCB_CPU_INPUT_LINE("tf20", INPUT_LINE_IRQ0),
 	NULL,
 	NULL,
-	NEC765_RDY_PIN_CONNECTED,
+	UPD765_RDY_PIN_CONNECTED,
 	{FLOPPY_0, FLOPPY_1, NULL, NULL}
 };
 
@@ -225,7 +225,7 @@ static MACHINE_DRIVER_START( tf20 )
 	MDRV_RAM_DEFAULT_SIZE("64k")
 
 	/* upd765a floppy controller */
-	MDRV_NEC765A_ADD("5a", tf20_nec765a_intf)
+	MDRV_UPD765A_ADD("5a", tf20_upd765a_intf)
 
 	/* upd7201 serial interface */
 	MDRV_UPD7201_ADD("3a", XTAL_CR1 / 2, tf20_upd7201_intf)

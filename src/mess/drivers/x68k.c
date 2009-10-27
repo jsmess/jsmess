@@ -122,7 +122,7 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/68901mfp.h"
 #include "machine/i8255a.h"
-#include "machine/nec765.h"
+#include "machine/upd765.h"
 #include "sound/2151intf.h"
 #include "sound/okim6258.h"
 #include "machine/8530scc.h"
@@ -959,13 +959,13 @@ static WRITE8_DEVICE_HANDLER( ppi_port_c_w )
 // NEC uPD72065 at 0xe94000
 static WRITE16_HANDLER( x68k_fdc_w )
 {
-	const device_config *fdc = devtag_get_device(space->machine, "nec72065");
+	const device_config *fdc = devtag_get_device(space->machine, "upd72065");
 	unsigned int drive, x;
 	switch(offset)
 	{
 	case 0x00:
 	case 0x01:
-		nec765_data_w(fdc, 0,data);
+		upd765_data_w(fdc, 0,data);
 		break;
 	case 0x02:  // drive option signal control
 		x = data & 0x0f;
@@ -1037,14 +1037,14 @@ static READ16_HANDLER( x68k_fdc_r )
 {
 	unsigned int ret;
 	int x;
-	const device_config *fdc = devtag_get_device(space->machine, "nec72065");
+	const device_config *fdc = devtag_get_device(space->machine, "upd72065");
 
 	switch(offset)
 	{
 	case 0x00:
-		return nec765_status_r(fdc, 0);
+		return upd765_status_r(fdc, 0);
 	case 0x01:
-		return nec765_data_r(fdc, 0);
+		return upd765_data_r(fdc, 0);
 	case 0x02:
 		ret = 0x00;
 		for(x=0;x<4;x++)
@@ -1086,21 +1086,21 @@ static WRITE_LINE_DEVICE_HANDLER( fdc_irq )
 static int x68k_fdc_read_byte(running_machine *machine,int addr)
 {
 	int data = -1;
-	const device_config *fdc = devtag_get_device(machine, "nec72065");
+	const device_config *fdc = devtag_get_device(machine, "upd72065");
 
 	if(x68k_sys.fdc.drq_state != 0)
-		data = nec765_dack_r(fdc, 0);
+		data = upd765_dack_r(fdc, 0);
 //  logerror("FDC: DACK reading\n");
 	return data;
 }
 
 static void x68k_fdc_write_byte(running_machine *machine,int addr, int data)
 {
-	const device_config *fdc = devtag_get_device(machine, "nec72065");
-	nec765_dack_w(fdc, 0, data);
+	const device_config *fdc = devtag_get_device(machine, "upd72065");
+	upd765_dack_w(fdc, 0, data);
 }
 
-static NEC765_DMA_REQUEST ( fdc_drq )
+static UPD765_DMA_REQUEST ( fdc_drq )
 {
 	x68k_sys.fdc.drq_state = state;
 }
@@ -1126,13 +1126,13 @@ static READ16_HANDLER( x68k_fm_r )
 
 static WRITE8_DEVICE_HANDLER( x68k_ct_w )
 {
-	const device_config *fdc = devtag_get_device(device->machine, "nec72065");
+	const device_config *fdc = devtag_get_device(device->machine, "upd72065");
 	const device_config *okim = devtag_get_device(device->machine, "okim6258");
 
 	// CT1 and CT2 bits from YM2151 port 0x1b
 	// CT1 - ADPCM clock - 0 = 8MHz, 1 = 4MHz
 	// CT2 - 1 = Set ready state of FDC
-	nec765_ready_w(fdc,data & 0x01);
+	upd765_ready_w(fdc,data & 0x01);
 	x68k_sys.adpcm.clock = data & 0x02;
 	x68k_set_adpcm(device->machine);
 	okim6258_set_clock(okim, data & 0x02 ? 4000000 : 8000000);
@@ -1980,12 +1980,12 @@ static const hd63450_intf dmac_interface =
 //  { 0, 0, 0, 0 }
 };
 
-static const nec765_interface fdc_interface =
+static const upd765_interface fdc_interface =
 {
 	DEVCB_LINE(fdc_irq),
 	fdc_drq,
 	NULL,
-	NEC765_RDY_PIN_CONNECTED,
+	UPD765_RDY_PIN_CONNECTED,
 	{FLOPPY_0,FLOPPY_1,FLOPPY_2,FLOPPY_3}
 };
 
@@ -2592,7 +2592,7 @@ static MACHINE_DRIVER_START( x68000 )
 
 	MDRV_NVRAM_HANDLER( generic_0fill )
 
-	MDRV_NEC72065_ADD("nec72065", fdc_interface)
+	MDRV_UPD72065_ADD("upd72065", fdc_interface)
 	MDRV_FLOPPY_4_DRIVES_ADD(x68k_floppy_config)
 	
 	/* internal ram */

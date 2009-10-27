@@ -5,7 +5,7 @@
 #include "cpu/i8085/i8085.h"
 #include "machine/8237dma.h"
 #include "machine/i8212.h"
-#include "machine/nec765.h"
+#include "machine/upd765.h"
 #include "machine/pit8253.h"
 #include "machine/upd7201.h"
 #include "video/i8275.h"
@@ -89,7 +89,7 @@ static WRITE8_HANDLER( ls259_w )
 	case 1: /* RECALL */
 		//logerror("RECALL %u\n", d);
 		state->recall = d;
-		nec765_reset_w(state->upd765, d);
+		upd765_reset_w(state->upd765, d);
 		break;
 
 	case 2: /* _RV28/RX21 */
@@ -120,7 +120,7 @@ static WRITE8_HANDLER( ls259_w )
 		floppy_drive_set_motor_state(floppy_get_device(space->machine, 1), d);
 		floppy_drive_set_ready_state(floppy_get_device(space->machine, 1), d, 1);
 
-		if (input_port_read(space->machine, "T5")) nec765_ready_w(state->upd765, d);
+		if (input_port_read(space->machine, "T5")) upd765_ready_w(state->upd765, d);
 		break;
 	}
 }
@@ -135,8 +135,8 @@ static ADDRESS_MAP_START( mm1_map, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0xff20, 0xff21) AM_MIRROR(0x8e) AM_DEVREADWRITE(I8275_TAG, i8275_r, i8275_w)
 	AM_RANGE(0xff30, 0xff33) AM_MIRROR(0x8c) AM_DEVREADWRITE(I8253_TAG, pit8253_r, pit8253_w)
 	AM_RANGE(0xff40, 0xff40) AM_MIRROR(0x8f) AM_DEVREADWRITE(I8212_TAG, i8212_r, i8212_w)
-	AM_RANGE(0xff50, 0xff50) AM_MIRROR(0x8e) AM_DEVREAD(UPD765_TAG, nec765_status_r)
-	AM_RANGE(0xff51, 0xff51) AM_MIRROR(0x8e) AM_DEVREADWRITE(UPD765_TAG, nec765_data_r, nec765_data_w)
+	AM_RANGE(0xff50, 0xff50) AM_MIRROR(0x8e) AM_DEVREAD(UPD765_TAG, upd765_status_r)
+	AM_RANGE(0xff51, 0xff51) AM_MIRROR(0x8e) AM_DEVREADWRITE(UPD765_TAG, upd765_data_r, upd765_data_w)
 	AM_RANGE(0xff60, 0xff67) AM_MIRROR(0x88) AM_WRITE(ls259_w)
 ADDRESS_MAP_END
 
@@ -448,14 +448,14 @@ static DMA8237_CHANNEL_READ( fdc_dack_r )
 {
 	mm1_state *state = device->machine->driver_data;
 	
-	return nec765_dack_r(state->upd765, 0);
+	return upd765_dack_r(state->upd765, 0);
 }
 
 static DMA8237_CHANNEL_WRITE( fdc_dack_w )
 {
 	mm1_state *state = device->machine->driver_data;
 
-	nec765_dack_w(state->upd765, 0, data);
+	upd765_dack_w(state->upd765, 0, data);
 }
 
 static DMA8237_OUT_EOP( tc_w )
@@ -463,7 +463,7 @@ static DMA8237_OUT_EOP( tc_w )
 	mm1_state *driver_state = device->machine->driver_data;
 
 	/* floppy terminal count */
-	nec765_tc_w(driver_state->upd765, !state);
+	upd765_tc_w(driver_state->upd765, !state);
 
 	cputag_set_input_line(device->machine, I8085A_TAG, I8085_RST75_LINE, state);
 }
@@ -481,19 +481,19 @@ static const struct dma8237_interface mm1_dma8237_intf =
 
 /* uPD765 Interface */
 
-static NEC765_DMA_REQUEST( drq_w )
+static UPD765_DMA_REQUEST( drq_w )
 {
 	mm1_state *driver_state = device->machine->driver_data;
 
 	dma8237_drq_write(driver_state->i8237, DMA_FDC, state);
 }
 
-static const nec765_interface mm1_nec765_intf =
+static const upd765_interface mm1_upd765_intf =
 {
 	DEVCB_CPU_INPUT_LINE(I8085A_TAG, I8085_RST55_LINE),
 	drq_w,
 	NULL,
-	NEC765_RDY_PIN_NOT_CONNECTED,
+	UPD765_RDY_PIN_NOT_CONNECTED,
 	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
 };
 
@@ -743,11 +743,11 @@ static MACHINE_RESET( mm1 )
 	for (i = 0; i < 8; i++) ls259_w(program, i, 0);
 
 	/* set FDC ready */
-	if (!input_port_read(machine, "T5")) nec765_ready_w(state->upd765, 1);
+	if (!input_port_read(machine, "T5")) upd765_ready_w(state->upd765, 1);
 
 	/* reset FDC */
-	nec765_reset_w(state->upd765, 1);
-	nec765_reset_w(state->upd765, 0);
+	upd765_reset_w(state->upd765, 1);
+	upd765_reset_w(state->upd765, 0);
 }
 
 /* Machine Drivers */
@@ -791,7 +791,7 @@ static MACHINE_DRIVER_START( mm1 )
 	MDRV_I8212_ADD(I8212_TAG, mm1_i8212_intf)
 	MDRV_DMA8237_ADD(I8237_TAG, /* XTAL_6_144MHz/2, */ mm1_dma8237_intf)
 	MDRV_PIT8253_ADD(I8253_TAG, mm1_pit8253_intf)
-	MDRV_NEC765A_ADD(UPD765_TAG, /* XTAL_16MHz/2/2, */ mm1_nec765_intf)
+	MDRV_UPD765A_ADD(UPD765_TAG, /* XTAL_16MHz/2/2, */ mm1_upd765_intf)
 	MDRV_UPD7201_ADD(UPD7201_TAG, XTAL_6_144MHz/2, mm1_upd7201_intf)
 	
 	MDRV_FLOPPY_2_DRIVES_ADD(mm1_floppy_config)

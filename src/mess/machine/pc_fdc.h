@@ -8,7 +8,7 @@
 #define PC_FDC_H
 
 #include "driver.h"
-#include "machine/nec765.h"
+#include "machine/upd765.h"
 
 /* interface has been seperated, so that it can be used in the super i/o chip */
 
@@ -32,9 +32,9 @@ struct pc_fdc_interface
 	const device_config *(*get_device)(running_machine*);
 };
 
-extern const nec765_interface pc_fdc_nec765_connected_interface;
-extern const nec765_interface pc_fdc_nec765_not_connected_interface;
-extern const nec765_interface pc_fdc_nec765_connected_1_drive_interface;
+extern const upd765_interface pc_fdc_upd765_connected_interface;
+extern const upd765_interface pc_fdc_upd765_not_connected_interface;
+extern const upd765_interface pc_fdc_upd765_connected_1_drive_interface;
 
 void pc_fdc_init(running_machine *machine, const struct pc_fdc_interface *iface);
 void pc_fdc_set_tc_state(running_machine *machine, int state);

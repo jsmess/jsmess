@@ -1265,7 +1265,7 @@ VIDEO_UPDATE( x68000 )
 //  popmessage("Keyboard buffer position = %i",x68k_sys.keyboard.headpos);
 //  popmessage("IERA = 0x%02x, IERB = 0x%02x",x68k_sys.mfp.iera,x68k_sys.mfp.ierb);
 //  popmessage("IPRA = 0x%02x, IPRB = 0x%02x",x68k_sys.mfp.ipra,x68k_sys.mfp.iprb);
-//  popmessage("uPD72065 status = %02x",nec765_status_r(machine, 0));
+//  popmessage("uPD72065 status = %02x",upd765_status_r(machine, 0));
 //  popmessage("Layer enable - 0x%02x",x68k_sys.video.reg[2] & 0xff);
 //  popmessage("Graphic layer scroll - %i, %i - %i, %i - %i, %i - %i, %i",
 //      x68k_sys.crtc.reg[12],x68k_sys.crtc.reg[13],x68k_sys.crtc.reg[14],x68k_sys.crtc.reg[15],x68k_sys.crtc.reg[16],x68k_sys.crtc.reg[17],x68k_sys.crtc.reg[18],x68k_sys.crtc.reg[19]);

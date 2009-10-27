@@ -75,7 +75,7 @@ Notes:
 #include "machine/serial.h"
 #include "machine/msm8251.h"
 #include "machine/i8255a.h"
-#include "machine/nec765.h"
+#include "machine/upd765.h"
 #include "sound/sn76496.h"
 #include "video/tms9928a.h"
 #include "devices/messram.h"
@@ -192,8 +192,8 @@ static ADDRESS_MAP_START( sf7000_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xbe, 0xbe) AM_READWRITE(TMS9928A_vram_r, TMS9928A_vram_w)
 	AM_RANGE(0xbf, 0xbf) AM_READWRITE(TMS9928A_register_r, TMS9928A_register_w)
 	AM_RANGE(0xdc, 0xdf) AM_DEVREADWRITE("ppi8255_0", i8255a_r, i8255a_w)
-	AM_RANGE(0xe0, 0xe0) AM_DEVREAD(NEC765_TAG, nec765_status_r)
-	AM_RANGE(0xe1, 0xe1) AM_DEVREADWRITE(NEC765_TAG, nec765_data_r, nec765_data_w)
+	AM_RANGE(0xe0, 0xe0) AM_DEVREAD(UPD765_TAG, upd765_status_r)
+	AM_RANGE(0xe1, 0xe1) AM_DEVREADWRITE(UPD765_TAG, upd765_data_r, upd765_data_w)
 	AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE("ppi8255_1", i8255a_r, i8255a_w)
 	AM_RANGE(0xe8, 0xe8) AM_DEVREADWRITE("uart", msm8251_data_r, msm8251_data_w)
 	AM_RANGE(0xe9, 0xe9) AM_DEVREADWRITE("uart", msm8251_status_r, msm8251_control_w)
@@ -622,7 +622,7 @@ static READ8_DEVICE_HANDLER( sf7000_ppi8255_a_r )
 
 static WRITE8_DEVICE_HANDLER( sf7000_ppi8255_c_w )
 {
-	const device_config *fdc = devtag_get_device(device->machine, NEC765_TAG);
+	const device_config *fdc = devtag_get_device(device->machine, UPD765_TAG);
 	const device_config *printer = devtag_get_device(device->machine, CENTRONICS_TAG);
 	/*
         Signal  Description
@@ -642,12 +642,12 @@ static WRITE8_DEVICE_HANDLER( sf7000_ppi8255_c_w )
 	floppy_drive_set_ready_state(floppy_get_device(device->machine, 0), 1, 0);
 
 	/* FDC terminal count */
-	nec765_tc_w(fdc, data & 0x04);
+	upd765_tc_w(fdc, data & 0x04);
 
 	/* FDC reset */
 	if (data & 0x08)
 	{
-		nec765_reset(fdc, 0);
+		upd765_reset(fdc, 0);
 	}
 
 	/* ROM selection */
@@ -691,12 +691,12 @@ static void sf7000_fdc_index_callback(const device_config *controller, const dev
 	driver_state->fdc_index = state;
 }
 
-static const struct nec765_interface sf7000_nec765_interface =
+static const struct upd765_interface sf7000_upd765_interface =
 {
 	DEVCB_LINE(sf7000_fdc_interrupt),
 	NULL,
 	NULL,
-	NEC765_RDY_PIN_CONNECTED,
+	UPD765_RDY_PIN_CONNECTED,
 	{FLOPPY_0, NULL, NULL, NULL }
 };
 
@@ -974,7 +974,7 @@ static MACHINE_DRIVER_START( sf7000 )
 	/* uart */
 	MDRV_MSM8251_ADD("uart", default_msm8251_interface)
 
-	MDRV_NEC765A_ADD(NEC765_TAG, sf7000_nec765_interface)
+	MDRV_UPD765A_ADD(UPD765_TAG, sf7000_upd765_interface)
 
 	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, sf7000_floppy_config)
 	

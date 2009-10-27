@@ -24,7 +24,7 @@
 
 /* Components */
 #include "cpu/z80/z80.h"
-#include "machine/nec765.h"	/* for floppy disc controller */
+#include "machine/upd765.h"	/* for floppy disc controller */
 #include "machine/i8255a.h"
 #include "sound/speaker.h"
 #include "sound/wave.h"
@@ -39,31 +39,31 @@
 
 /*************************************
  *
- *  NEC765/Floppy drive
+ *  UPD765/Floppy drive
  *
  *************************************/
 
-static const struct nec765_interface elwro800jr_nec765_interface =
+static const struct upd765_interface elwro800jr_upd765_interface =
 {
 	DEVCB_NULL,
 	NULL,
 	NULL,
-	NEC765_RDY_PIN_CONNECTED,
+	UPD765_RDY_PIN_CONNECTED,
 	{FLOPPY_0,FLOPPY_1, NULL, NULL}
 };
 
 static WRITE8_HANDLER(elwro800jr_fdc_control_w)
 {
-	const device_config *fdc = devtag_get_device(space->machine, "nec765");
+	const device_config *fdc = devtag_get_device(space->machine, "upd765");
 
 	floppy_drive_set_motor_state(floppy_get_device(space->machine, 0), (data & 0x01));
 	floppy_drive_set_motor_state(floppy_get_device(space->machine, 1), (data & 0x02));
 	floppy_drive_set_ready_state(floppy_get_device(space->machine, 0), 1,1);
 	floppy_drive_set_ready_state(floppy_get_device(space->machine, 1), 1,1);
 
-	nec765_tc_w(fdc, data & 0x04);
+	upd765_tc_w(fdc, data & 0x04);
 
-	nec765_reset_w(fdc, !(data & 0x08));
+	upd765_reset_w(fdc, !(data & 0x08));
 }
 
 /*************************************
@@ -242,14 +242,14 @@ static READ8_HANDLER(elwro800jr_io_r)
 	else if (!BIT(cs,3))
 	{
 		// CSFDC
-		const device_config *fdc = devtag_get_device(space->machine, "nec765");
+		const device_config *fdc = devtag_get_device(space->machine, "upd765");
 		if (offset & 1)
 		{
-			return nec765_data_r(fdc,0);
+			return upd765_data_r(fdc,0);
 		}
 		else
 		{
-			return nec765_status_r(fdc,0);
+			return upd765_status_r(fdc,0);
 		}
 	}
 	else if (!BIT(cs,4))
@@ -301,10 +301,10 @@ static WRITE8_HANDLER(elwro800jr_io_w)
 	else if (!BIT(cs,3))
 	{
 		// CSFDC
-		const device_config *fdc = devtag_get_device(space->machine, "nec765");
+		const device_config *fdc = devtag_get_device(space->machine, "upd765");
 		if (offset & 1)
 		{
-			nec765_data_w(fdc, 0, data);
+			upd765_data_w(fdc, 0, data);
 		}
 	}
 	else if (!BIT(cs,4))
@@ -509,7 +509,7 @@ static MACHINE_DRIVER_START( elwro800 )
 	MDRV_VIDEO_UPDATE( spectrum )
 	MDRV_VIDEO_EOF( spectrum )
 
-	MDRV_NEC765A_ADD("nec765", elwro800jr_nec765_interface)
+	MDRV_UPD765A_ADD("upd765", elwro800jr_upd765_interface)
     MDRV_I8255A_ADD( "ppi8255", elwro800jr_ppi8255_interface)
 
 	/* printer */

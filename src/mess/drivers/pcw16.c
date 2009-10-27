@@ -1204,7 +1204,7 @@ static void	pcw16_fdc_interrupt(running_machine *machine, int state)
 
 static const device_config * pcw16_get_device(running_machine *machine)
 {
-	return devtag_get_device(machine, "nec765");
+	return devtag_get_device(machine, "upd765");
 }
 
 static const struct pc_fdc_interface pcw16_fdc_interface=
@@ -1428,7 +1428,7 @@ static MACHINE_DRIVER_START( pcw16 )
 
 	/* printer */
 	MDRV_PC_LPT_ADD("lpt", pcw16_lpt_config)
-	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_connected_interface)
+	MDRV_UPD765A_ADD("upd765", pc_fdc_upd765_connected_interface)
 	MDRV_FLOPPY_2_DRIVES_ADD(pcw16_floppy_config)
 	
 	/* internal ram */

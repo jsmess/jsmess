@@ -420,7 +420,7 @@ static void at_fdc_dma_drq(running_machine *machine, int state, int read_)
 
 static const device_config *at_get_device(running_machine *machine)
 {
-	return devtag_get_device(machine, "nec765");
+	return devtag_get_device(machine, "upd765");
 }
 
 static const struct pc_fdc_interface fdc_interface =

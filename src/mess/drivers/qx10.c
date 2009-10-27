@@ -10,7 +10,7 @@
 
 	Done:
 	- preliminary memory map
-	- floppy (nec765)
+	- floppy (upd765)
 	- DMA
 	- Interrupts (pic8295)
 ****************************************************************************/
@@ -24,7 +24,7 @@
 #include "machine/i8255a.h"
 #include "machine/8237dma.h"
 #include "video/i82720.h"
-#include "machine/nec765.h"
+#include "machine/upd765.h"
 #include "devices/messram.h"
 
 #define MAIN_CLK	15974400
@@ -53,7 +53,7 @@ struct _qx10_state
 	const device_config *pic8259_master;
 	const device_config *pic8259_slave;
 	const device_config *dma8237_1;
-	const device_config *nec765;
+	const device_config *upd765;
 };
 
 /*
@@ -136,29 +136,29 @@ static const floppy_config qx10_floppy_config =
 	DO_NOT_KEEP_GEOMETRY
 };
 
-static WRITE_LINE_DEVICE_HANDLER(qx10_nec765_interrupt)
+static WRITE_LINE_DEVICE_HANDLER(qx10_upd765_interrupt)
 {
 	qx10_state *driver_state = device->machine->driver_data;
 	driver_state->fdcint = state;
 
-	//logerror("Interrupt from nec765: %d\n", state);
+	//logerror("Interrupt from upd765: %d\n", state);
 	// signal interrupt
 	pic8259_set_irq_line(driver_state->pic8259_master, 6, state);
 };
 
-static NEC765_DMA_REQUEST( drq_w )
+static UPD765_DMA_REQUEST( drq_w )
 {
 	qx10_state *driver_state = device->machine->driver_data;
-	//logerror("DMA Request from nec765: %d\n", state);
+	//logerror("DMA Request from upd765: %d\n", state);
 	dma8237_drq_write(driver_state->dma8237_1, 0, !state);
 }
 
-static const struct nec765_interface qx10_nec765_interface =
+static const struct upd765_interface qx10_upd765_interface =
 {
-	DEVCB_LINE(qx10_nec765_interrupt),
+	DEVCB_LINE(qx10_upd765_interrupt),
 	drq_w,
 	NULL,
-	NEC765_RDY_PIN_CONNECTED,
+	UPD765_RDY_PIN_CONNECTED,
 	{FLOPPY_0,NULL, NULL, NULL}
 };
 
@@ -217,7 +217,7 @@ static DMA8237_CHANNEL_WRITE( gdc_dack_w )
 static DMA8237_CHANNEL_READ( fdc_dack_r )
 {
 	qx10_state *state = device->machine->driver_data;
-	UINT8 data = nec765_dack_r(state->nec765, 0);
+	UINT8 data = upd765_dack_r(state->upd765, 0);
 	//logerror("FDC DACK read %02x\n", data);
 	return data;
 }
@@ -227,7 +227,7 @@ static DMA8237_CHANNEL_WRITE( fdc_dack_w )
 	qx10_state *state = device->machine->driver_data;
 	//logerror("FDC DACK write %02x\n", data);
 
-	nec765_dack_w(state->nec765, 0, data);
+	upd765_dack_w(state->upd765, 0, data);
 }
 
 static DMA8237_OUT_EOP( tc_w )
@@ -235,7 +235,7 @@ static DMA8237_OUT_EOP( tc_w )
 	qx10_state *driver_state = device->machine->driver_data;
 
 	/* floppy terminal count */
-	nec765_tc_w(driver_state->nec765, !state);
+	upd765_tc_w(driver_state->upd765, !state);
 }
 
 /*
@@ -460,8 +460,8 @@ static ADDRESS_MAP_START( qx10_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x20, 0x20) AM_WRITE(cmos_sel_w)
 	AM_RANGE(0x2c, 0x2c) AM_READ_PORT("CONFIG")
 	AM_RANGE(0x30, 0x30) AM_READWRITE(qx10_30_r, fdd_motor_w)
-	AM_RANGE(0x34, 0x34) AM_DEVREAD("nec765", nec765_status_r)
-	AM_RANGE(0x35, 0x35) AM_DEVREADWRITE("nec765", nec765_data_r, nec765_data_w)
+	AM_RANGE(0x34, 0x34) AM_DEVREAD("upd765", upd765_status_r)
+	AM_RANGE(0x35, 0x35) AM_DEVREADWRITE("upd765", upd765_data_r, upd765_data_w)
 	AM_RANGE(0x38, 0x39) AM_READWRITE(compis_gdc_r, compis_gdc_w)
 	AM_RANGE(0x3c, 0x3c) AM_READWRITE(mc146818_data_r, mc146818_data_w)
 	AM_RANGE(0x3d, 0x3d) AM_WRITE(mc146818_offset_w)
@@ -500,7 +500,7 @@ static MACHINE_START(qx10)
 	state->pic8259_master = devtag_get_device(machine, "pic8259_master");
 	state->pic8259_slave = devtag_get_device(machine, "pic8259_slave");
 	state->dma8237_1 = devtag_get_device(machine, "8237dma_1");
-	state->nec765 = devtag_get_device(machine, "nec765");
+	state->upd765 = devtag_get_device(machine, "upd765");
 
 }
 
@@ -533,7 +533,7 @@ static MACHINE_DRIVER_START( qx10 )
 	MDRV_I8255A_ADD("i8255", qx10_i8255_interface)
 	MDRV_DMA8237_ADD("8237dma_1", qx10_dma8237_1_interface)
 	MDRV_DMA8237_ADD("8237dma_2", qx10_dma8237_2_interface)
-	MDRV_NEC765A_ADD("nec765", qx10_nec765_interface)
+	MDRV_UPD765A_ADD("upd765", qx10_upd765_interface)
 	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, qx10_floppy_config)
 
 	MDRV_DRIVER_DATA(qx10_state)

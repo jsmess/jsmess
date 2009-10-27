@@ -7,7 +7,7 @@
 #ifndef AMSTRAD_H_
 #define AMSTRAD_H_
 
-#include "machine/nec765.h"
+#include "machine/upd765.h"
 #include "video/mc6845.h"
 #include "devices/snapquik.h"
 

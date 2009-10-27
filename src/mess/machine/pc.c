@@ -33,7 +33,7 @@
 #include "machine/pc_lpt.h"
 #include "machine/pc_fdc.h"
 #include "machine/pc_hdc.h"
-#include "machine/nec765.h"
+#include "machine/upd765.h"
 #include "includes/amstr_pc.h"
 #include "includes/europc.h"
 #include "includes/ibmpc.h"
@@ -1101,7 +1101,7 @@ static void pc_fdc_dma_drq(running_machine *machine, int state, int read_)
 
 static const device_config * pc_get_device(running_machine *machine )
 {
-	return devtag_get_device(machine, "nec765");
+	return devtag_get_device(machine, "upd765");
 }
 
 static const struct pc_fdc_interface fdc_interface_nc =

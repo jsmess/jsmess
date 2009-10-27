@@ -23,7 +23,7 @@
 #include "cpu/z80/z80daisy.h"
 #include "sound/speaker.h"
 #include "sound/wave.h"
-#include "machine/nec765.h"
+#include "machine/upd765.h"
 
 /* Devices */
 #include "devices/cassette.h"
@@ -334,9 +334,9 @@ static ADDRESS_MAP_START(kc85_disc_hw_mem, ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(kc85_disc_hw_io, ADDRESS_SPACE_IO, 8)
-	AM_RANGE(0x0f0, 0x0f0) AM_DEVREAD("nec765", nec765_status_r)
-	AM_RANGE(0x0f1, 0x0f1) AM_DEVREADWRITE("nec765", nec765_data_r, nec765_data_w)
-	AM_RANGE(0x0f2, 0x0f3) AM_DEVREADWRITE("nec765", nec765_dack_r, nec765_dack_w)
+	AM_RANGE(0x0f0, 0x0f0) AM_DEVREAD("upd765", upd765_status_r)
+	AM_RANGE(0x0f1, 0x0f1) AM_DEVREADWRITE("upd765", upd765_data_r, upd765_data_w)
+	AM_RANGE(0x0f2, 0x0f3) AM_DEVREADWRITE("upd765", upd765_dack_r, upd765_dack_w)
 	AM_RANGE(0x0f4, 0x0f5) AM_READ(kc85_disc_hw_input_gate_r)
 	/*{0x0f6, 0x0f7, SMH_NOP},*/		/* for controller */
 	AM_RANGE(0x0f8, 0x0f9) AM_WRITE( kc85_disc_hw_terminal_count_w) /* terminal count */
@@ -374,7 +374,7 @@ static MACHINE_DRIVER_START( cpu_kc_disc )
 	//FIX: put right clock value for CTC
 	MDRV_Z80CTC_ADD( "z80ctc_1", KC85_4_CLOCK, kc85_disc_ctc_intf )
 
-	MDRV_NEC765A_ADD("nec765", kc_fdc_interface)
+	MDRV_UPD765A_ADD("upd765", kc_fdc_interface)
 MACHINE_DRIVER_END
 
 

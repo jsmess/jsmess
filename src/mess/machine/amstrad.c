@@ -39,7 +39,7 @@ This gives a total of 19968 NOPs per frame.
 #include "cpu/z80/z80.h"
 #include "machine/i8255a.h"
 #include "machine/mc146818.h"
-#include "machine/nec765.h"
+#include "machine/upd765.h"
 #include "machine/ctronics.h"
 #include "devices/cassette.h"
 #include "devices/snapquik.h"
@@ -2293,7 +2293,7 @@ Expansion Peripherals Read/Write -   -   -   -   -   0   -   -   -   -   -   -  
 
 READ8_HANDLER ( amstrad_cpc_io_r )
 {
-	const device_config *fdc = devtag_get_device(space->machine, "nec765");
+	const device_config *fdc = devtag_get_device(space->machine, "upd765");
 	const device_config *mc6845 = devtag_get_device(space->machine, "mc6845" );
 
 	unsigned char data = 0xFF;
@@ -2385,10 +2385,10 @@ The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which
 				switch (b8b0)
 				{
   				case 0x02:
-  					data = nec765_status_r(fdc, 0);
+  					data = upd765_status_r(fdc, 0);
   					break;
   				case 0x03:
-  					data = nec765_data_r(fdc, 0);
+  					data = upd765_data_r(fdc, 0);
   					break;
   				default:
   					break;
@@ -2430,7 +2430,7 @@ static void amstrad_plus_seqcheck(int data)
 /* Offset handler for write */
 WRITE8_HANDLER ( amstrad_cpc_io_w )
 {
-	const device_config *fdc = devtag_get_device(space->machine, "nec765");
+	const device_config *fdc = devtag_get_device(space->machine, "upd765");
 	const device_config *mc6845 = devtag_get_device(space->machine, "mc6845");
 
 	static int printer_bit8_selected = FALSE;
@@ -2560,7 +2560,7 @@ The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which
 				  break;
 
 				case 0x03: /* Write Data register of FDC */
-					nec765_data_w(fdc, 0,data);
+					upd765_data_w(fdc, 0,data);
 					break;
 
 				default:

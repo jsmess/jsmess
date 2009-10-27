@@ -155,7 +155,7 @@ http://www.z88forever.org.uk/zxplus3e/
 #include "formats/tzx_cas.h"
 
 /* +3 hardware */
-#include "machine/nec765.h"
+#include "machine/upd765.h"
 #include "devices/flopdrv.h"
 #include "devices/messram.h"
 
@@ -167,12 +167,12 @@ but with a disc drive */
 int spectrum_plus3_port_1ffd_data = -1;
 
 
-static const nec765_interface spectrum_plus3_nec765_interface =
+static const upd765_interface spectrum_plus3_upd765_interface =
 {
 	DEVCB_NULL,
 	NULL,
 	NULL,
-	NEC765_RDY_PIN_CONNECTED,
+	UPD765_RDY_PIN_CONNECTED,
 	{FLOPPY_0,FLOPPY_1, NULL, NULL}
 };
 
@@ -188,7 +188,7 @@ static const int spectrum_plus3_memory_selections[]=
 static WRITE8_HANDLER(spectrum_plus3_port_3ffd_w)
 {
 	if (~input_port_read(space->machine, "CONFIG") & 0x20)
-		nec765_data_w(devtag_get_device(space->machine, "nec765"), 0,data);
+		upd765_data_w(devtag_get_device(space->machine, "upd765"), 0,data);
 }
 
 static  READ8_HANDLER(spectrum_plus3_port_3ffd_r)
@@ -196,7 +196,7 @@ static  READ8_HANDLER(spectrum_plus3_port_3ffd_r)
 	if (input_port_read(space->machine, "CONFIG") & 0x20)
 		return 0xff;
 	else
-		return nec765_data_r(devtag_get_device(space->machine, "nec765"), 0);
+		return upd765_data_r(devtag_get_device(space->machine, "upd765"), 0);
 }
 
 
@@ -205,7 +205,7 @@ static  READ8_HANDLER(spectrum_plus3_port_2ffd_r)
 		if (input_port_read(space->machine, "CONFIG") & 0x20)
 				return 0xff;
 		else
-				return nec765_status_r(devtag_get_device(space->machine, "nec765"), 0);
+				return upd765_status_r(devtag_get_device(space->machine, "upd765"), 0);
 }
 
 
@@ -380,7 +380,7 @@ static MACHINE_DRIVER_START( spectrum_plus3 )
 
 	MDRV_MACHINE_RESET( spectrum_plus3 )
 
-	MDRV_NEC765A_ADD("nec765", spectrum_plus3_nec765_interface)
+	MDRV_UPD765A_ADD("upd765", spectrum_plus3_upd765_interface)
 	MDRV_FLOPPY_2_DRIVES_ADD(specpls3_floppy_config)
 MACHINE_DRIVER_END
 

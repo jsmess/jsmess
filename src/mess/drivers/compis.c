@@ -42,7 +42,7 @@
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
 #include "machine/mm58274c.h"
-#include "machine/nec765.h"
+#include "machine/upd765.h"
 #include "formats/cpis_dsk.h"
 
 static READ8_DEVICE_HANDLER( compis_ppi_r )
@@ -316,7 +316,7 @@ static MACHINE_DRIVER_START( compis )
 	/* rtc */
 	MDRV_MM58274C_ADD("mm58274c", compis_mm58274c_interface)
 
-	MDRV_NEC765A_ADD("nec765", compis_fdc_interface)
+	MDRV_UPD765A_ADD("upd765", compis_fdc_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(compis_floppy_config)
 MACHINE_DRIVER_END

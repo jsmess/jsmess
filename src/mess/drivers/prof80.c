@@ -34,7 +34,7 @@
 #include "cpu/z80/z80daisy.h"
 #include "video/mc6845.h"
 #include "machine/i8255a.h"
-#include "machine/nec765.h"
+#include "machine/upd765.h"
 #include "machine/upd1990a.h"
 #include "machine/z80sti.h"
 #include "machine/ctronics.h"
@@ -261,7 +261,7 @@ static void ls259_w(running_machine *machine, int fa, int sa, int fb, int sb)
 	switch (sb)
 	{
 	case 0: /* RESF */
-		if (fb) nec765_reset(state->nec765, 0);
+		if (fb) upd765_reset(state->upd765, 0);
 		break;
 
 	case 1: /* MINI */
@@ -536,8 +536,8 @@ static ADDRESS_MAP_START( prof80_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xd8, 0xd8) AM_MIRROR(0xff00) AM_WRITE(flr_w)
 	AM_RANGE(0xda, 0xda) AM_MIRROR(0xff00) AM_READ(status_r)
 	AM_RANGE(0xdb, 0xdb) AM_MIRROR(0xff00) AM_READ(status2_r)
-	AM_RANGE(0xdc, 0xdc) AM_MIRROR(0xff00) AM_DEVREAD(NEC765_TAG, nec765_status_r)
-	AM_RANGE(0xdd, 0xdd) AM_MIRROR(0xff00) AM_DEVREADWRITE(NEC765_TAG, nec765_data_r, nec765_data_w)
+	AM_RANGE(0xdc, 0xdc) AM_MIRROR(0xff00) AM_DEVREAD(UPD765_TAG, upd765_status_r)
+	AM_RANGE(0xdd, 0xdd) AM_MIRROR(0xff00) AM_DEVREADWRITE(UPD765_TAG, upd765_data_r, upd765_data_w)
 	AM_RANGE(0xde, 0xde) AM_MIRROR(0xff01) AM_MASK(0xff00) AM_WRITE(mmu_w)
 ADDRESS_MAP_END
 
@@ -923,7 +923,7 @@ static UPD1990A_INTERFACE( prof80_upd1990a_intf )
 	DEVCB_NULL
 };
 
-/* NEC765 Interface */
+/* UPD765 Interface */
 
 static void prof80_fdc_index_callback(const device_config *controller, const device_config *img, int state)
 {
@@ -932,12 +932,12 @@ static void prof80_fdc_index_callback(const device_config *controller, const dev
 	driver_state->fdc_index = state;
 }
 
-static const struct nec765_interface prof80_nec765_interface =
+static const struct upd765_interface prof80_upd765_interface =
 {
 	DEVCB_NULL,
 	NULL,
 	NULL,
-	NEC765_RDY_PIN_CONNECTED,
+	UPD765_RDY_PIN_CONNECTED,
 	{FLOPPY_0,FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 
@@ -1116,7 +1116,7 @@ static MACHINE_START( prof80 )
 	int bank;
 
 	/* find devices */
-	state->nec765 = devtag_get_device(machine, NEC765_TAG);
+	state->upd765 = devtag_get_device(machine, UPD765_TAG);
 	state->upd1990a = devtag_get_device(machine, UPD1990A_TAG);
 	state->mc6845 = devtag_get_device(machine, MC6845_TAG);
 	state->ppi8255 = devtag_get_device(machine, I8255A_TAG);
@@ -1232,7 +1232,7 @@ static MACHINE_DRIVER_START( prof80 )
 
 	/* devices */
 	MDRV_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, prof80_upd1990a_intf)
-	MDRV_NEC765A_ADD(NEC765_TAG, prof80_nec765_interface)
+	MDRV_UPD765A_ADD(UPD765_TAG, prof80_upd765_interface)
 	MDRV_I8255A_ADD(I8255A_TAG, grip_ppi8255_interface)
 	MDRV_Z80STI_ADD(Z80STI_TAG, XTAL_16MHz/4, grip_z80sti_interface)
 

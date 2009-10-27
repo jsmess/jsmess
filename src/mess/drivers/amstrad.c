@@ -9,7 +9,7 @@
                 and some PCB links
             - 6845 (either HD6845S, UM6845R or M6845) crtc graphics display
               controller
-            - NEC765 floppy disc controller (CPC664,CPC6128)
+            - UPD765 floppy disc controller (CPC664,CPC6128)
             - Z80 CPU running at 4 MHz (slowed by wait states on memory
               access)
             - custom ASIC "Gate Array" controlling rom paging, ram paging,
@@ -91,7 +91,7 @@ Some bugs left :
 #include "machine/i8255a.h"	/* for 8255 ppi */
 #include "cpu/z80/z80.h"		/* for cycle tables */
 #include "video/mc6845.h"		/* CRTC */
-#include "machine/nec765.h"	/* for floppy disc controller */
+#include "machine/upd765.h"	/* for floppy disc controller */
 #include "sound/ay8910.h"
 #include "sound/wave.h"
 #include "machine/mc146818.h"  /* Aleste RTC */
@@ -132,23 +132,23 @@ static I8255A_INTERFACE( amstrad_ppi8255_interface )
 };
 
 
-/* Amstrad NEC765 interface doesn't use interrupts or DMA! */
-static const nec765_interface amstrad_nec765_interface =
+/* Amstrad UPD765 interface doesn't use interrupts or DMA! */
+static const upd765_interface amstrad_upd765_interface =
 {
 	DEVCB_NULL,
 	NULL,
 	NULL,
-	NEC765_RDY_PIN_CONNECTED,
+	UPD765_RDY_PIN_CONNECTED,
 	{FLOPPY_0,FLOPPY_1, NULL, NULL}
 };
 
 /* Aleste uses an 8272A, with the interrupt flag visible on PPI port B */
-static const nec765_interface aleste_8272_interface =
+static const upd765_interface aleste_8272_interface =
 {
 	DEVCB_LINE(aleste_interrupt),
 	NULL,
 	NULL,
-	NEC765_RDY_PIN_CONNECTED,
+	UPD765_RDY_PIN_CONNECTED,
 	{FLOPPY_0,FLOPPY_1, NULL, NULL}
 };
 
@@ -911,7 +911,7 @@ static MACHINE_DRIVER_START( amstrad )
 
 	MDRV_CASSETTE_ADD( "cassette", amstrad_cassette_config )
 
-	MDRV_NEC765A_ADD("nec765", amstrad_nec765_interface)
+	MDRV_UPD765A_ADD("upd765", amstrad_upd765_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(cpc6128_floppy_config)
 	
@@ -973,7 +973,7 @@ static MACHINE_DRIVER_START( cpcplus )
 
 	MDRV_CASSETTE_ADD( "cassette", amstrad_cassette_config )
 
-	MDRV_NEC765A_ADD("nec765", amstrad_nec765_interface)
+	MDRV_UPD765A_ADD("upd765", amstrad_upd765_interface)
 
 	MDRV_IMPORT_FROM(cpcplus_cartslot)
 
@@ -1037,7 +1037,7 @@ static MACHINE_DRIVER_START( aleste )
 	MDRV_PALETTE_LENGTH(32+64)
 	MDRV_PALETTE_INIT(aleste)
 	MDRV_NVRAM_HANDLER(mc146818)
-	MDRV_NEC765A_MODIFY("nec765", aleste_8272_interface)
+	MDRV_UPD765A_MODIFY("upd765", aleste_8272_interface)
 
 	MDRV_FLOPPY_2_DRIVES_MODIFY(aleste_floppy_config)
 	

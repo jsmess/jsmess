@@ -4,7 +4,7 @@
 #define SCREEN_TAG				"screen"
 
 #define Z80_TAG					"z1"
-#define NEC765_TAG				"z38"
+#define UPD765_TAG				"z38"
 #define UPD1990A_TAG			"z43"
 #define MC6845_TAG				"z30"
 #define I8255A_TAG				"z6"
@@ -50,7 +50,7 @@ struct _prof80_state
 	UINT8 gripc;			/* GRIP status */
 
 	/* devices */
-	const device_config *nec765;
+	const device_config *upd765;
 	const device_config *upd1990a;
 	const device_config *mc6845;
 	const device_config *ppi8255;

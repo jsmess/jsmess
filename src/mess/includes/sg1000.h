@@ -4,7 +4,7 @@
 #define SCREEN_TAG		"screen"
 #define Z80_TAG			"z80"
 #define SN76489A_TAG	"sn76489a"
-#define NEC765_TAG		"nec765"
+#define UPD765_TAG		"upd765"
 #define CASSETTE_TAG	"cassette"
 #define CENTRONICS_TAG	"centronics"
 

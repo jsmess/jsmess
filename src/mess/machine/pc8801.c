@@ -18,7 +18,7 @@
 #include "driver.h"
 #include "machine/8255ppi.h"
 #include "includes/pc8801.h"
-#include "machine/nec765.h"
+#include "machine/upd765.h"
 #include "sound/beep.h"
 
 
@@ -794,11 +794,11 @@ const ppi8255_interface pc8801_8255_config_1 =
 	DEVCB_NULL
 };
 
-READ8_HANDLER(pc8801fd_nec765_tc)
+READ8_HANDLER(pc8801fd_upd765_tc)
 {
-  const device_config *fdc = devtag_get_device(space->machine, "nec765");
-  nec765_tc_w(fdc, 1);
-  nec765_tc_w(fdc, 0);
+  const device_config *fdc = devtag_get_device(space->machine, "upd765");
+  upd765_tc_w(fdc, 1);
+  upd765_tc_w(fdc, 0);
   return 0;
 }
 
@@ -809,16 +809,16 @@ static WRITE_LINE_DEVICE_HANDLER( pc8801_fdc_interrupt )
 }
 
 /* callback for /DRQ output from FDC */
-static NEC765_DMA_REQUEST( pc8801_fdc_dma_drq )
+static UPD765_DMA_REQUEST( pc8801_fdc_dma_drq )
 {
 }
 
-const nec765_interface pc8801_fdc_interface=
+const upd765_interface pc8801_fdc_interface=
 {
 	DEVCB_LINE(pc8801_fdc_interrupt),
 	pc8801_fdc_dma_drq,
 	NULL,
-	NEC765_RDY_PIN_CONNECTED,
+	UPD765_RDY_PIN_CONNECTED,
 	{FLOPPY_0, FLOPPY_1, NULL, NULL}
 };
 

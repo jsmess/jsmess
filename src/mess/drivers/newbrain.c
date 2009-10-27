@@ -2,7 +2,7 @@
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 #include "cpu/cop400/cop400.h"
-#include "machine/nec765.h"
+#include "machine/upd765.h"
 #include "machine/6850acia.h"
 #include "machine/adc080x.h"
 #include "machine/z80ctc.h"
@@ -659,9 +659,9 @@ static WRITE8_HANDLER( fdc_auxiliary_w )
 	floppy_drive_set_motor_state(floppy_get_device(space->machine, 0), BIT(data, 0));
 	floppy_drive_set_ready_state(floppy_get_device(space->machine, 0), 1, 0);
 
-	nec765_reset_w(state->nec765, BIT(data, 1));
+	upd765_reset_w(state->upd765, BIT(data, 1));
 
-	nec765_tc_w(state->nec765, BIT(data, 2));
+	upd765_tc_w(state->upd765, BIT(data, 2));
 }
 
 static READ8_HANDLER( fdc_control_r )
@@ -1148,8 +1148,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( newbrain_fdc_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREAD(NEC765_TAG, nec765_status_r)
-	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(NEC765_TAG, nec765_data_r, nec765_data_w)
+	AM_RANGE(0x00, 0x00) AM_DEVREAD(UPD765_TAG, upd765_status_r)
+	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(UPD765_TAG, upd765_data_r, upd765_data_w)
 	AM_RANGE(0x20, 0x20) AM_WRITE(fdc_auxiliary_w)
 	AM_RANGE(0x40, 0x40) AM_READ(fdc_control_r)
 ADDRESS_MAP_END
@@ -1296,12 +1296,12 @@ static WRITE_LINE_DEVICE_HANDLER( newbrain_fdc_interrupt )
 	driver_state->fdc_int = state;
 }
 
-static const nec765_interface newbrain_nec765_interface =
+static const upd765_interface newbrain_upd765_interface =
 {
 	DEVCB_LINE(newbrain_fdc_interrupt),
 	NULL,
 	NULL,
-	NEC765_RDY_PIN_NOT_CONNECTED,
+	UPD765_RDY_PIN_NOT_CONNECTED,
 	{FLOPPY_0,FLOPPY_1, NULL, NULL}
 };
 
@@ -1441,7 +1441,7 @@ static MACHINE_START( newbrain_eim )
 	/* find devices */
 	state->z80ctc = devtag_get_device(machine, Z80CTC_TAG);
 	state->mc6850 = devtag_get_device(machine, MC6850_TAG);
-	state->nec765 = devtag_get_device(machine, NEC765_TAG);
+	state->upd765 = devtag_get_device(machine, UPD765_TAG);
 
 	/* register for state saving */
 	state_save_register_global_pointer(machine, state->eim_ram, NEWBRAIN_EIM_RAM_SIZE);
@@ -1553,8 +1553,8 @@ static MACHINE_DRIVER_START( newbrain_eim )
 	/* MC6850 */
 	MDRV_ACIA6850_ADD(MC6850_TAG, newbrain_acia_intf)
 
-	/* NEC765 */
-	MDRV_NEC765A_ADD(NEC765_TAG, newbrain_nec765_interface)
+	/* UPD765 */
+	MDRV_UPD765A_ADD(UPD765_TAG, newbrain_upd765_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(newbrain_floppy_config)
 	

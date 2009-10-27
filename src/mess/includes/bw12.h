@@ -4,7 +4,7 @@
 #define SCREEN_TAG		"screen"
 #define Z80_TAG			"ic35"
 #define MC6845_TAG		"ic14"
-#define NEC765_TAG		"ic45"
+#define UPD765_TAG		"ic45"
 #define Z80SIO_TAG		"ic15"
 #define PIT8253_TAG		"ic34"
 #define PIA6821_TAG		"ic16"
@@ -43,7 +43,7 @@ struct _bw12_state
 	/* devices */
 	const device_config *pia6821;
 	const device_config *mc6845;
-	const device_config *nec765;
+	const device_config *upd765;
 	const device_config *centronics;
 
 	/* timers */

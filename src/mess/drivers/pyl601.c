@@ -11,7 +11,7 @@
 #include "video/mc6845.h"
 #include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
-#include "machine/nec765.h"
+#include "machine/upd765.h"
 #include "devices/messram.h"
 
 static UINT8 rom_page;
@@ -151,7 +151,7 @@ INLINE const device_config *get_floppy_image(running_machine *machine, int drive
 	return floppy_get_device(machine, drive);
 }
 
-static NEC765_GET_IMAGE( pyldin_nec765_get_image )
+static UPD765_GET_IMAGE( pyldin_upd765_get_image )
 {
 	return get_floppy_image(device->machine, (floppy_index & 1)^1);
 }
@@ -162,16 +162,16 @@ static WRITE8_HANDLER (floppy_w)
 	// bit 1 is TC state
 	// bit 2 is drive selected
 	// bit 3 is motor state
-	const device_config *floppy = devtag_get_device(space->machine, "nec765");
+	const device_config *floppy = devtag_get_device(space->machine, "upd765");
 	if (BIT(data,0)==0) {
 		//reset
-		nec765_reset(floppy,0);
+		upd765_reset(floppy,0);
 	}
 	floppy_drive_set_motor_state(get_floppy_image(space->machine, BIT(data,2)), BIT(data,3));
 
 	floppy_drive_set_ready_state(get_floppy_image(space->machine, 0), BIT(data,2), 0);
 
-	nec765_tc_w(floppy, BIT(data,1));
+	upd765_tc_w(floppy, BIT(data,1));
 
 	floppy_ctrl = data;
 }
@@ -180,12 +180,12 @@ static READ8_HANDLER (floppy_r)
 	return floppy_ctrl;
 }
 
-static const struct nec765_interface pyldin_nec765_interface =
+static const struct upd765_interface pyldin_upd765_interface =
 {
 	DEVCB_NULL,						/* interrupt */
 	NULL,						/* DMA request */
-	pyldin_nec765_get_image,	/* image lookup */
-	NEC765_RDY_PIN_CONNECTED,	/* ready pin */
+	pyldin_upd765_get_image,	/* image lookup */
+	UPD765_RDY_PIN_CONNECTED,	/* ready pin */
 	{FLOPPY_0,FLOPPY_1, NULL, NULL}
 };
 
@@ -209,8 +209,8 @@ static ADDRESS_MAP_START(pyl601_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0xe682, 0xe682 ) AM_WRITE(vdisk_l_w)
 	AM_RANGE( 0xe683, 0xe683 ) AM_READWRITE(vdisk_data_r,vdisk_data_w)
 	AM_RANGE( 0xe6c0, 0xe6c0 ) AM_READWRITE(floppy_r, floppy_w)
-	AM_RANGE( 0xe6d0, 0xe6d0 ) AM_DEVREAD("nec765", nec765_status_r)
-	AM_RANGE( 0xe6d1, 0xe6d1 ) AM_DEVREADWRITE("nec765", nec765_data_r, nec765_data_w)
+	AM_RANGE( 0xe6d0, 0xe6d0 ) AM_DEVREAD("upd765", upd765_status_r)
+	AM_RANGE( 0xe6d1, 0xe6d1 ) AM_DEVREADWRITE("upd765", upd765_data_r, upd765_data_w)
 	AM_RANGE( 0xe6f0, 0xe6f0 ) AM_READWRITE(rom_page_r, rom_page_w)
 	AM_RANGE( 0xe700, 0xefff ) AM_RAMBANK(4)
 	AM_RANGE( 0xf000, 0xffff ) AM_READWRITE(SMH_BANK(5), SMH_BANK(6))
@@ -507,7 +507,7 @@ static MACHINE_DRIVER_START( pyl601 )
 	MDRV_VIDEO_START( pyl601 )
 	MDRV_VIDEO_UPDATE( pyl601 )
 
-	MDRV_NEC765A_ADD("nec765", pyldin_nec765_interface)
+	MDRV_UPD765A_ADD("upd765", pyldin_upd765_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(pyldin_floppy_config)
 	

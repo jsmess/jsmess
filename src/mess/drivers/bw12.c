@@ -7,7 +7,7 @@
     - Z80A CPU 4MHz
     - 64KB RAM (BW 12), 128KB RAM (BW 14)
     - 4KB ROM System
-    - NEC765A Floppy controller
+    - UPD765A Floppy controller
     - 2 x 5.25" Floppy drives 48 tpi SSDD (BW 12), DSDD (BW 14)
     - MC6845 Video controller
     - 2KB RAM Video buffer
@@ -30,7 +30,7 @@
 #include "formats/basicdsk.h"
 #include "machine/6821pia.h"
 #include "machine/ctronics.h"
-#include "machine/nec765.h"
+#include "machine/upd765.h"
 #include "machine/pit8253.h"
 #include "machine/rescap.h"
 #include "machine/z80sio.h"
@@ -169,7 +169,7 @@ static void ls259_w(running_machine *machine, int address, int data)
 		break;
 
 	case 7: /* FDC TC */
-		nec765_tc_w(state->nec765, data);
+		upd765_tc_w(state->upd765, data);
 		break;
 	}
 }
@@ -202,8 +202,8 @@ static ADDRESS_MAP_START( bw12_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x0f) AM_READWRITE(bw12_ls259_r, bw12_ls259_w)
 	AM_RANGE(0x10, 0x10) AM_MIRROR(0x0e) AM_DEVWRITE(MC6845_TAG, mc6845_address_w)
 	AM_RANGE(0x11, 0x11) AM_MIRROR(0x0e) AM_DEVREADWRITE(MC6845_TAG, mc6845_register_r, mc6845_register_w)
-	AM_RANGE(0x20, 0x20) AM_MIRROR(0x0e) AM_DEVREAD(NEC765_TAG, nec765_status_r)
-	AM_RANGE(0x21, 0x21) AM_MIRROR(0x0e) AM_DEVREADWRITE(NEC765_TAG, nec765_data_r, nec765_data_w)
+	AM_RANGE(0x20, 0x20) AM_MIRROR(0x0e) AM_DEVREAD(UPD765_TAG, upd765_status_r)
+	AM_RANGE(0x21, 0x21) AM_MIRROR(0x0e) AM_DEVREADWRITE(UPD765_TAG, upd765_data_r, upd765_data_w)
 	AM_RANGE(0x30, 0x33) AM_MIRROR(0x0c) AM_DEVREADWRITE(PIA6821_TAG, pia6821_r, pia6821_w)
 	AM_RANGE(0x40, 0x40) AM_MIRROR(0x0c) AM_DEVREADWRITE(Z80SIO_TAG, z80sio_d_r, z80sio_d_w)
 	AM_RANGE(0x41, 0x41) AM_MIRROR(0x0c) AM_DEVREADWRITE(Z80SIO_TAG, z80sio_c_r, z80sio_c_w)
@@ -422,16 +422,16 @@ static VIDEO_UPDATE( bw12 )
 	return 0;
 }
 
-/* NEC765 Interface */
+/* UPD765 Interface */
 
-static WRITE_LINE_DEVICE_HANDLER( bw12_nec765_interrupt )
+static WRITE_LINE_DEVICE_HANDLER( bw12_upd765_interrupt )
 {
 	bw12_state *driver_state = device->machine->driver_data;
 
 	driver_state->fdcint = state;
 }
 
-static NEC765_GET_IMAGE( bw12_nec765_get_image )
+static UPD765_GET_IMAGE( bw12_upd765_get_image )
 {
 	switch (floppy_index)
 	{
@@ -446,12 +446,12 @@ static NEC765_GET_IMAGE( bw12_nec765_get_image )
 	}
 }
 
-static const struct nec765_interface bw12_nec765_interface =
+static const struct upd765_interface bw12_upd765_interface =
 {
-	DEVCB_LINE(bw12_nec765_interrupt),		/* interrupt */
+	DEVCB_LINE(bw12_upd765_interrupt),		/* interrupt */
 	NULL,						/* DMA request */
-	bw12_nec765_get_image,		/* image lookup */
-	NEC765_RDY_PIN_CONNECTED,	/* ready pin */
+	bw12_upd765_get_image,		/* image lookup */
+	UPD765_RDY_PIN_CONNECTED,	/* ready pin */
 	{FLOPPY_0,FLOPPY_1, NULL, NULL}
 };
 
@@ -684,7 +684,7 @@ static MACHINE_START( bw12 )
 
 	/* find devices */
 	state->pia6821 = devtag_get_device(machine, PIA6821_TAG);
-	state->nec765 = devtag_get_device(machine, NEC765_TAG);
+	state->upd765 = devtag_get_device(machine, UPD765_TAG);
 	state->centronics = devtag_get_device(machine, CENTRONICS_TAG);
 
 	/* allocate floppy motor off timer */
@@ -832,7 +832,7 @@ static MACHINE_DRIVER_START( common )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-	MDRV_NEC765A_ADD(NEC765_TAG, bw12_nec765_interface)
+	MDRV_UPD765A_ADD(UPD765_TAG, bw12_upd765_interface)
 	MDRV_PIA6821_ADD(PIA6821_TAG, bw12_pia_config)
 	MDRV_Z80SIO_ADD(Z80SIO_TAG, XTAL_16MHz/4, bw12_z80sio_intf) /* Z80-SIO/0 */
 	MDRV_PIT8253_ADD(PIT8253_TAG, bw12_pit8253_intf)

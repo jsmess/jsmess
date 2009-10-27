@@ -450,7 +450,7 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/mpc105.o	\
 	$(MESS_MACHINE)/msm58321.o	\
 	$(MESS_MACHINE)/msm8251.o	\
-	$(MESS_MACHINE)/nec765.o	\
+	$(MESS_MACHINE)/upd765.o	\
 	$(MESS_MACHINE)/ncr5380.o	\
 	$(MESS_MACHINE)/pc_lpt.o	\
 	$(MESS_MACHINE)/pc_mouse.o	\

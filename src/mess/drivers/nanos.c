@@ -12,7 +12,7 @@
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
 #include "machine/z80ctc.h"
-#include "machine/nec765.h"
+#include "machine/upd765.h"
 #include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
 #include "devices/messram.h"
@@ -26,8 +26,8 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER(nanos_tc_w)
 {
-	const device_config *fdc = devtag_get_device(space->machine, "nec765");
-	nec765_tc_w(fdc, BIT(data,1));
+	const device_config *fdc = devtag_get_device(space->machine, "upd765");
+	upd765_tc_w(fdc, BIT(data,1));
 }
 
 
@@ -125,8 +125,8 @@ static ADDRESS_MAP_START( nanos_io , ADDRESS_SPACE_IO, 8)
 
 	/* FDC card */
 	AM_RANGE(0x92, 0x92) AM_WRITE(nanos_tc_w)
-	AM_RANGE(0x94, 0x94) AM_DEVREAD("nec765", nec765_status_r)
-	AM_RANGE(0x95, 0x95) AM_DEVREADWRITE("nec765", nec765_data_r, nec765_data_w)
+	AM_RANGE(0x94, 0x94) AM_DEVREAD("upd765", upd765_status_r)
+	AM_RANGE(0x95, 0x95) AM_DEVREADWRITE("upd765", upd765_data_r, upd765_data_w)
 	/* V24+IFSS card */
 	AM_RANGE(0xA0, 0xA0) AM_DEVREADWRITE("z80sio_1", z80sio_d_r, z80sio_d_w)
 	AM_RANGE(0xA1, 0xA1) AM_DEVREADWRITE("z80sio_1", z80sio_c_r, z80sio_c_w)
@@ -426,12 +426,12 @@ static const z80pio_interface nanos_z80pio_intf =
 };
 
 
-static const nec765_interface nanos_nec765_interface =
+static const upd765_interface nanos_upd765_interface =
 {
 	DEVCB_NULL,
 	NULL,
 	NULL,
-	NEC765_RDY_PIN_NOT_CONNECTED,
+	UPD765_RDY_PIN_NOT_CONNECTED,
 	{FLOPPY_0,FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 
@@ -487,8 +487,8 @@ static MACHINE_DRIVER_START( nanos )
 	MDRV_Z80SIO_ADD( "z80sio_0", XTAL_4MHz, sio_intf)
 	MDRV_Z80SIO_ADD( "z80sio_1", XTAL_4MHz, sio_intf)
 	MDRV_Z80PIO_ADD( "z80pio", nanos_z80pio_intf )
-	/* NEC765 */
-	MDRV_NEC765A_ADD("nec765", nanos_nec765_interface)
+	/* UPD765 */
+	MDRV_UPD765A_ADD("upd765", nanos_upd765_interface)
 
 	MDRV_FLOPPY_4_DRIVES_ADD(nanos_floppy_config)
 	

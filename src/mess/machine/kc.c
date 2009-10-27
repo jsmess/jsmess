@@ -7,7 +7,7 @@
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
 #include "cpu/z80/z80.h"
-#include "machine/nec765.h"
+#include "machine/upd765.h"
 #include "sound/speaker.h"
 
 /* Devices */
@@ -126,7 +126,7 @@ QUICKLOAD_LOAD(kc)
 - Z80 at 4 MHz
 - Z80 CTC
 - 1k ram
-- NEC765 floppy disc controller
+- UPD765 floppy disc controller
 */
 
 /* bit 7: DMA Request (DRQ from FDC) */
@@ -191,9 +191,9 @@ WRITE8_HANDLER(kc85_disc_interface_latch_w)
 
 WRITE8_HANDLER(kc85_disc_hw_terminal_count_w)
 {
-	const device_config *fdc = devtag_get_device(space->machine, "nec765");
+	const device_config *fdc = devtag_get_device(space->machine, "upd765");
 	logerror("kc85 disc hw tc w: %02x\n",data);
-	nec765_tc_w(fdc, data & 0x01);
+	upd765_tc_w(fdc, data & 0x01);
 }
 
 
@@ -206,19 +206,19 @@ static WRITE_LINE_DEVICE_HANDLER( kc85_fdc_interrupt )
 }
 
 /* callback for /DRQ output from FDC */
-static NEC765_DMA_REQUEST( kc85_fdc_dma_drq )
+static UPD765_DMA_REQUEST( kc85_fdc_dma_drq )
 {
 	kc85_disc_hw_input_gate &=~(1<<7);
 	if (state)
 		kc85_disc_hw_input_gate |=(1<<7);
 }
 
-const nec765_interface kc_fdc_interface=
+const upd765_interface kc_fdc_interface=
 {
 	DEVCB_LINE(kc85_fdc_interrupt),
 	kc85_fdc_dma_drq,
 	NULL,
-	NEC765_RDY_PIN_CONNECTED,
+	UPD765_RDY_PIN_CONNECTED,
 	{FLOPPY_0, FLOPPY_1, NULL, NULL}
 };
 

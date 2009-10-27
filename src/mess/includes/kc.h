@@ -11,7 +11,7 @@
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "devices/snapquik.h"
-#include "machine/nec765.h"
+#include "machine/upd765.h"
 
 #define KC85_4_CLOCK 1750000
 #define KC85_3_CLOCK 1750000
@@ -43,7 +43,7 @@ unsigned char *kc85_4_get_video_ram_base(int bank, int colour);
 
 /*----------- defined in machine/kc.c -----------*/
 
-extern const nec765_interface kc_fdc_interface;
+extern const upd765_interface kc_fdc_interface;
 extern QUICKLOAD_LOAD( kc );
 
 MACHINE_RESET( kc85_3 );
@@ -106,7 +106,7 @@ READ8_DEVICE_HANDLER(kc85_disk_hw_ctc_r);
 WRITE8_DEVICE_HANDLER(kc85_disk_hw_ctc_w);
 /* 4-bit input latch: DMA Data Request, FDC Int, FDD Ready.. */
 READ8_HANDLER(kc85_disc_hw_input_gate_r);
-/* output port to set NEC765 terminal count input */
+/* output port to set UPD765 terminal count input */
 WRITE8_HANDLER(kc85_disc_hw_terminal_count_w);
 
 /* these are used by the kc85 to control the disc interface */

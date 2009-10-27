@@ -1523,7 +1523,7 @@ static MACHINE_DRIVER_START( pcmda )
 	/* harddisk */
 	MDRV_IMPORT_FROM( pc_hdc )
 
-	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
+	MDRV_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
 	
@@ -1587,7 +1587,7 @@ static MACHINE_DRIVER_START( pcherc )
 	/* harddisk */
 	MDRV_IMPORT_FROM( pc_hdc )
 
-	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
+	MDRV_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
 	
@@ -1662,7 +1662,7 @@ static MACHINE_DRIVER_START( ibm5150 )
 
 	MDRV_CASSETTE_ADD( "cassette", ibm5150_cassette_config )
 
-	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
+	MDRV_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
 	
@@ -1725,7 +1725,7 @@ static MACHINE_DRIVER_START( pccga )
 	/* harddisk */
 	MDRV_IMPORT_FROM( pc_hdc )
 
-	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
+	MDRV_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
 	
@@ -1779,7 +1779,7 @@ static MACHINE_DRIVER_START( europc )
 	/* harddisk */
 	MDRV_IMPORT_FROM( pc_hdc )
 
-	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
+	MDRV_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
 	
@@ -1840,7 +1840,7 @@ static MACHINE_DRIVER_START( ibm5160 )
 	/* harddisk */
 	MDRV_IMPORT_FROM( pc_hdc )
 
-	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
+	MDRV_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
 	
@@ -1887,7 +1887,7 @@ static MACHINE_DRIVER_START( pc200 )
 	/* harddisk */
 	MDRV_IMPORT_FROM( pc_hdc )
 
-	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
+	MDRV_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
 	
@@ -1940,7 +1940,7 @@ static MACHINE_DRIVER_START( ppc512 )
 	/* harddisk */
 	MDRV_IMPORT_FROM( pc_hdc )
 
-	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
+	MDRV_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
 	
@@ -1998,7 +1998,7 @@ static MACHINE_DRIVER_START( pc1512 )
 	/* harddisk */
 	MDRV_IMPORT_FROM( pc_hdc )
 
-	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
+	MDRV_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
 	
@@ -2047,7 +2047,7 @@ static MACHINE_DRIVER_START( pc1640 )
 	/* harddisk */
 	MDRV_IMPORT_FROM( pc_hdc )
 
-	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
+	MDRV_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
 	
@@ -2108,7 +2108,7 @@ static MACHINE_DRIVER_START( xtvga )
 	/* harddisk */
 	MDRV_IMPORT_FROM( pc_hdc )
 
-	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
+	MDRV_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
 	
@@ -2157,7 +2157,7 @@ static MACHINE_DRIVER_START( t1000hx )
 	/* harddisk */
 	MDRV_IMPORT_FROM( pc_hdc )
 
-	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
+	MDRV_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
 	
@@ -2206,7 +2206,7 @@ static MACHINE_DRIVER_START( t1000_16 )
 	/* harddisk */
 	MDRV_IMPORT_FROM( pc_hdc )
 
-	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
+	MDRV_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
 	
@@ -2253,7 +2253,7 @@ static MACHINE_DRIVER_START( ibmpcjr )
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", ibm5150_cassette_config )
 
-	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
+	MDRV_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
 

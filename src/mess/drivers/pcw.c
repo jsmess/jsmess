@@ -53,7 +53,7 @@
 
     The hardware:
        - Z80 CPU running at 3.4 MHz
-       - NEC765 FDC
+       - UPD765 FDC
        - mono display
        - beep (a fixed Hz tone which can be turned on/off)
        - 720x256 (PAL) bitmapped display, 720x200 (NTSC) bitmapped display
@@ -94,8 +94,8 @@
  ******************************************************************************/
 #include "driver.h"
 #include "cpu/z80/z80.h"
-// nec765 interface
-#include "machine/nec765.h"
+// upd765 interface
+#include "machine/upd765.h"
 #include "devices/flopdrv.h"
 // pcw video hardware
 #include "includes/pcw.h"
@@ -137,14 +137,14 @@ static void pcw_update_interrupt_counter(void)
 	pcw_interrupt_counter++;
 }
 
-/* PCW uses NEC765 in NON-DMA mode. FDC Ints are connected to /INT or
+/* PCW uses UPD765 in NON-DMA mode. FDC Ints are connected to /INT or
 /NMI depending on choice (see system control below) */
-static const nec765_interface pcw_nec765_interface =
+static const upd765_interface pcw_upd765_interface =
 {
 	DEVCB_LINE(pcw_fdc_interrupt),
 	NULL,
 	NULL,
-	NEC765_RDY_PIN_CONNECTED,
+	UPD765_RDY_PIN_CONNECTED,
 	{FLOPPY_0,FLOPPY_1, NULL, NULL}
 };
 
@@ -415,7 +415,7 @@ static WRITE8_HANDLER(pcw_vdu_video_control_register_w)
 
 static WRITE8_HANDLER(pcw_system_control_w)
 {
-	const device_config *fdc = devtag_get_device(space->machine, "nec765");
+	const device_config *fdc = devtag_get_device(space->machine, "upd765");
 	const device_config *speaker = devtag_get_device(space->machine, "beep");
 	LOG(("SYSTEM CONTROL: %d\n",data));
 
@@ -502,14 +502,14 @@ static WRITE8_HANDLER(pcw_system_control_w)
 		/* set fdc terminal count */
 		case 5:
 		{
-			nec765_tc_w(fdc, 1);
+			upd765_tc_w(fdc, 1);
 		}
 		break;
 
 		/* clear fdc terminal count */
 		case 6:
 		{
-			nec765_tc_w(fdc, 0);
+			upd765_tc_w(fdc, 0);
 		}
 		break;
 
@@ -634,23 +634,23 @@ static WRITE8_HANDLER(pcw_expansion_w)
 
 static READ8_HANDLER(pcw_fdc_r)
 {
-	const device_config *fdc = devtag_get_device(space->machine, "nec765");
+	const device_config *fdc = devtag_get_device(space->machine, "upd765");
 	/* from Jacob Nevins docs. FDC I/O is not fully decoded */
 	if (offset & 1)
 	{
-		return nec765_data_r(fdc, 0);
+		return upd765_data_r(fdc, 0);
 	}
 
-	return nec765_status_r(fdc, 0);
+	return upd765_status_r(fdc, 0);
 }
 
 static WRITE8_HANDLER(pcw_fdc_w)
 {
-	const device_config *fdc = devtag_get_device(space->machine, "nec765");
+	const device_config *fdc = devtag_get_device(space->machine, "upd765");
 	/* from Jacob Nevins docs. FDC I/O is not fully decoded */
 	if (offset & 1)
 	{
-		nec765_data_w(fdc, 0,data);
+		upd765_data_w(fdc, 0,data);
 	}
 }
 
@@ -1016,7 +1016,7 @@ static MACHINE_DRIVER_START( pcw )
 	MDRV_SOUND_ADD("beep", BEEP, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MDRV_NEC765A_ADD("nec765", pcw_nec765_interface)
+	MDRV_UPD765A_ADD("upd765", pcw_upd765_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(pcw_floppy_config)
 	

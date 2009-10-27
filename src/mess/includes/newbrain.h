@@ -9,7 +9,7 @@
 #define DAC0808_TAG		"461"
 #define Z80CTC_TAG		"458"
 #define FDC_Z80_TAG		"416"
-#define NEC765_TAG		"418"
+#define UPD765_TAG		"418"
 #define CASSETTE1_TAG	"cassette1"
 #define CASSETTE2_TAG	"cassette2"
 
@@ -96,7 +96,7 @@ struct _newbrain_state
 	/* devices */
 	const device_config *mc6850;
 	const device_config *z80ctc;
-	const device_config *nec765;
+	const device_config *upd765;
 	const device_config *cassette1;
 	const device_config *cassette2;
 };

@@ -7,14 +7,14 @@
 #ifndef PC8801_H_
 #define PC8801_H_
 
-#include "machine/nec765.h"
+#include "machine/upd765.h"
 #include "machine/8255ppi.h"
 
 /*----------- defined in machine/pc8801.c -----------*/
 
 extern const ppi8255_interface pc8801_8255_config_0;
 extern const ppi8255_interface pc8801_8255_config_1;
-extern const nec765_interface pc8801_fdc_interface;
+extern const upd765_interface pc8801_fdc_interface;
 
 WRITE8_HANDLER(pc8801_write_interrupt_level);
 WRITE8_HANDLER(pc8801_write_interrupt_mask);
@@ -39,7 +39,7 @@ extern MACHINE_RESET( pc88srh );
 void pc8801_update_bank(running_machine *machine);
 extern unsigned char *pc8801_mainRAM;
 extern int pc88sr_is_highspeed;
-READ8_HANDLER(pc8801fd_nec765_tc);
+READ8_HANDLER(pc8801fd_upd765_tc);
 void pc88sr_sound_interupt(const device_config *device, int irq);
 WRITE8_HANDLER(pc8801_write_kanji1);
 READ8_HANDLER(pc8801_read_kanji1);

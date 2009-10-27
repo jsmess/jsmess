@@ -40,7 +40,7 @@
         Hardware:
             - Z80 CPU
             - Intel 8251 compatible uart
-            - nec765 compatible floppy disc controller
+            - upd765 compatible floppy disc controller
             - mc146818 real time clock?
             - 720k floppy disc drive (compatible with MS-DOS)
             (disc drive can be not ready).
@@ -101,7 +101,7 @@
 #include "machine/msm8251.h"	/* for NC100 uart */
 #include "machine/mc146818.h"	/* for NC200 real time clock */
 #include "machine/tc8521.h"	/* for NC100 real time clock */
-#include "machine/nec765.h"		/* for NC200 disk drive interface */
+#include "machine/upd765.h"		/* for NC200 disk drive interface */
 #include "devices/flopdrv.h"	/* for NC200 disk image */
 #include "formats/pc_dsk.h"		/* for NC200 disk image */
 #include "devices/cartslot.h"
@@ -260,7 +260,7 @@ static void nc200_machine_stop(running_machine *machine);
         bit 7: nc200 power on/off: 1 = on, 0=off
         bit 2: backlight: 1=off, 0=on
         bit 1: disk motor: 1=off, 0=disk motor???
-        bit 0: nec765 terminal count input
+        bit 0: upd765 terminal count input
 */
 
 
@@ -1313,12 +1313,12 @@ static WRITE_LINE_DEVICE_HANDLER( nc200_fdc_interrupt )
     nc_update_interrupts(device->machine);
 }
 
-static const nec765_interface nc200_nec765_interface=
+static const upd765_interface nc200_upd765_interface=
 {
     DEVCB_LINE(nc200_fdc_interrupt),
     NULL,
     NULL,
-    NEC765_RDY_PIN_CONNECTED,
+    UPD765_RDY_PIN_CONNECTED,
 	{FLOPPY_0, NULL, NULL, NULL }
 };
 
@@ -1466,17 +1466,17 @@ static WRITE8_HANDLER(nc200_uart_control_w)
 
 /* bit 7: nc200 power control: 1=on, 0=off */
 /* bit 1: disk motor??  */
-/* bit 0: NEC765 Terminal Count input */
+/* bit 0: UPD765 Terminal Count input */
 
 static WRITE8_HANDLER(nc200_memory_card_wait_state_w)
 {
-	const device_config *fdc = devtag_get_device(space->machine, "nec765");
+	const device_config *fdc = devtag_get_device(space->machine, "upd765");
 	LOG_DEBUG(("nc200 memory card wait state: PC: %04x %02x\n", cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")), data));
 #if 0
 	floppy_drive_set_motor_state(0, 1);
 	floppy_drive_set_ready_state(0, 1, 1);
 #endif
-	nec765_tc_w(fdc, (data & 0x01));
+	upd765_tc_w(fdc, (data & 0x01));
 }
 
 /* bit 2: backlight: 1=off, 0=on */
@@ -1506,8 +1506,8 @@ static ADDRESS_MAP_START(nc200_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0xc0, 0xc0) AM_DEVREADWRITE("uart", msm8251_data_r, msm8251_data_w)
 	AM_RANGE(0xc1, 0xc1) AM_DEVREADWRITE("uart", msm8251_status_r, msm8251_control_w)
 	AM_RANGE(0xd0, 0xd1) AM_READWRITE(mc146818_port_r, mc146818_port_w)
-	AM_RANGE(0xe0, 0xe0) AM_DEVREAD("nec765", nec765_status_r)
-	AM_RANGE(0xe1, 0xe1) AM_DEVREADWRITE("nec765",nec765_data_r, nec765_data_w)
+	AM_RANGE(0xe0, 0xe0) AM_DEVREAD("upd765", upd765_status_r)
+	AM_RANGE(0xe1, 0xe1) AM_DEVREADWRITE("upd765",upd765_data_r, upd765_data_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START(nc200)
@@ -1714,7 +1714,7 @@ static MACHINE_DRIVER_START( nc200 )
 	/* no rtc */
 	MDRV_DEVICE_REMOVE("rtc")
 
-	MDRV_NEC765A_ADD("nec765", nc200_nec765_interface)
+	MDRV_UPD765A_ADD("upd765", nc200_upd765_interface)
 
 	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, nc200_floppy_config)
 	

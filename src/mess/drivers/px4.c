@@ -696,6 +696,9 @@ static WRITE8_HANDLER( px4_artdor_w )
 	px4_state *px4 = space->machine->driver_data;
 	logerror("%s: px4_artdor_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
 
+	/* clear ready */
+	px4->artsr &= ~ART_TXRDY;
+
 	px4->artdor = data;
 }
 

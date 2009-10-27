@@ -13,7 +13,7 @@
 
 #include "driver.h"
 #include "machine/pc_fdc.h"
-#include "machine/nec765.h"
+#include "machine/upd765.h"
 #include "memconv.h"
 
 
@@ -57,34 +57,34 @@ static struct pc_fdc *fdc;
 static TIMER_CALLBACK( watchdog_timeout );
 
 static WRITE_LINE_DEVICE_HANDLER(  pc_fdc_hw_interrupt );
-static NEC765_DMA_REQUEST(pc_fdc_hw_dma_drq);
-static NEC765_GET_IMAGE ( pc_fdc_get_image);
+static UPD765_DMA_REQUEST(pc_fdc_hw_dma_drq);
+static UPD765_GET_IMAGE ( pc_fdc_get_image);
 
-const nec765_interface pc_fdc_nec765_connected_interface =
+const upd765_interface pc_fdc_upd765_connected_interface =
 {
 	DEVCB_LINE(pc_fdc_hw_interrupt),
 	pc_fdc_hw_dma_drq,
 	pc_fdc_get_image,
-	NEC765_RDY_PIN_CONNECTED,
+	UPD765_RDY_PIN_CONNECTED,
 	{FLOPPY_0, FLOPPY_1, NULL, NULL}
 };
 
-const nec765_interface pc_fdc_nec765_connected_1_drive_interface =
+const upd765_interface pc_fdc_upd765_connected_1_drive_interface =
 {
 	DEVCB_LINE(pc_fdc_hw_interrupt),
 	pc_fdc_hw_dma_drq,
 	pc_fdc_get_image,
-	NEC765_RDY_PIN_CONNECTED,
+	UPD765_RDY_PIN_CONNECTED,
 	{FLOPPY_0, NULL, NULL, NULL}
 };
 
 
-const nec765_interface pc_fdc_nec765_not_connected_interface =
+const upd765_interface pc_fdc_upd765_not_connected_interface =
 {
 	DEVCB_LINE(pc_fdc_hw_interrupt),
 	pc_fdc_hw_dma_drq,
 	pc_fdc_get_image,
-	NEC765_RDY_PIN_NOT_CONNECTED,
+	UPD765_RDY_PIN_NOT_CONNECTED,
 	{FLOPPY_0, FLOPPY_1, NULL, NULL}
 };
 
@@ -102,10 +102,10 @@ static void pc_fdc_reset(running_machine *machine)
 	/* bit 7 is disk change */
 	fdc->digital_input_register = 0x07f;
 
-	nec765_reset(pc_get_device(machine),0);
+	upd765_reset(pc_get_device(machine),0);
 
 	/* set FDC at reset */
-	nec765_reset_w(pc_get_device(machine), 1);
+	upd765_reset_w(pc_get_device(machine), 1);
 }
 
 
@@ -126,7 +126,7 @@ void pc_fdc_init(running_machine *machine, const struct pc_fdc_interface *iface)
 
 
 
-static NEC765_GET_IMAGE ( pc_fdc_get_image )
+static UPD765_GET_IMAGE ( pc_fdc_get_image )
 {
 	const device_config *image = NULL;
 
@@ -151,7 +151,7 @@ void pc_fdc_set_tc_state(running_machine *machine, int state)
 	/* if dma is not enabled, tc's are not acknowledged */
 	if ((fdc->digital_output_register & PC_FDC_FLAGS_DOR_DMA_ENABLED)!=0)
 	{
-		nec765_tc_w(pc_get_device(machine), state);
+		upd765_tc_w(pc_get_device(machine), state);
 	}
 }
 
@@ -182,7 +182,7 @@ int	pc_fdc_dack_r(running_machine *machine)
 	/* if dma is not enabled, dacks are not acknowledged */
 	if ((fdc->digital_output_register & PC_FDC_FLAGS_DOR_DMA_ENABLED)!=0)
 	{
-		data = nec765_dack_r(pc_get_device(machine), 0);
+		data = upd765_dack_r(pc_get_device(machine), 0);
 	}
 
 	return data;
@@ -196,13 +196,13 @@ void pc_fdc_dack_w(running_machine *machine, int data)
 	if ((fdc->digital_output_register & PC_FDC_FLAGS_DOR_DMA_ENABLED)!=0)
 	{
 		/* dma acknowledge - and send byte to fdc */
-		nec765_dack_w(pc_get_device(machine), 0,data);
+		upd765_dack_w(pc_get_device(machine), 0,data);
 	}
 }
 
 
 
-static NEC765_DMA_REQUEST( pc_fdc_hw_dma_drq )
+static UPD765_DMA_REQUEST( pc_fdc_hw_dma_drq )
 {
 	fdc->dma_state = state;
 	fdc->dma_read = read_write;
@@ -222,11 +222,11 @@ static void pc_fdc_data_rate_w(running_machine *machine, UINT8 data)
 	if ((data & 0x080)!=0)
 	{
 		/* set ready state */
-		nec765_ready_w(pc_get_device(machine),1);
+		upd765_ready_w(pc_get_device(machine),1);
 
 		/* toggle reset state */
-		nec765_reset_w(pc_get_device(machine), 1);
- 		nec765_reset_w(pc_get_device(machine), 0);
+		upd765_reset_w(pc_get_device(machine), 1);
+ 		upd765_reset_w(pc_get_device(machine), 0);
 
 		/* bit is self-clearing */
 		data &= ~0x080;
@@ -315,17 +315,17 @@ static void pc_fdc_dor_w(running_machine *machine, UINT8 data)
         what is not yet clear is if this is a result of the drives ready state
         changing...
         */
-			nec765_ready_w(pc_get_device(machine),1);
+			upd765_ready_w(pc_get_device(machine),1);
 
 		/* set FDC at reset */
-		nec765_reset_w(pc_get_device(machine), 1);
+		upd765_reset_w(pc_get_device(machine), 1);
 	}
 	else
 	{
 		pc_fdc_set_tc_state(machine, 0);
 
 		/* release reset on fdc */
-		nec765_reset_w(pc_get_device(machine), 0);
+		upd765_reset_w(pc_get_device(machine), 0);
 	}
 }
 
@@ -411,17 +411,17 @@ static void pcjr_fdc_dor_w(running_machine *machine, UINT8 data)
         what is not yet clear is if this is a result of the drives ready state
         changing...
         */
-			nec765_ready_w(pc_get_device(machine),1);
+			upd765_ready_w(pc_get_device(machine),1);
 
 		/* set FDC at reset */
-		nec765_reset_w(pc_get_device(machine), 1);
+		upd765_reset_w(pc_get_device(machine), 1);
 	}
 	else
 	{
 		pc_fdc_set_tc_state(machine, 0);
 
 		/* release reset on fdc */
-		nec765_reset_w(pc_get_device(machine), 0);
+		upd765_reset_w(pc_get_device(machine), 0);
 	}
 
 	logerror("pcjr_fdc_dor_w: changing dor from %02x to %02x\n", fdc->digital_output_register, data);
@@ -445,10 +445,10 @@ READ8_HANDLER ( pc_fdc_r )
 		case 3: /* tape drive select? */
 			break;
 		case 4:
-			data = nec765_status_r(pc_get_device(space->machine), 0);
+			data = upd765_status_r(pc_get_device(space->machine), 0);
 			break;
 		case 5:
-			data = nec765_data_r(pc_get_device(space->machine), offset);
+			data = upd765_data_r(pc_get_device(space->machine), offset);
 			break;
 		case 6: /* FDC reserved */
 			break;
@@ -484,7 +484,7 @@ WRITE8_HANDLER ( pc_fdc_w )
 			pc_fdc_data_rate_w(space->machine, data);
 			break;
 		case 5:
-			nec765_data_w(pc_get_device(space->machine), 0, data);
+			upd765_data_w(pc_get_device(space->machine), 0, data);
 			break;
 		case 6:
 			/* FDC reserved */

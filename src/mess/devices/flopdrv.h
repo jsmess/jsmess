@@ -1,5 +1,5 @@
 /* flopdrv provides simple emulation of a disc drive */
-/* the 8271, nec765 and wd179x use this */
+/* the 8271, upd765 and wd179x use this */
 
 #ifndef __FLOPDRV_H__
 #define __FLOPDRV_H__
