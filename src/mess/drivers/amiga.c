@@ -514,7 +514,9 @@ static WRITE8_DEVICE_HANDLER( amiga_cia_0_portA_w )
 		/* overlay disabled, map RAM on 0x000000 */
 		memory_install_write16_handler(cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x000000, amiga_chip_ram_size - 1, 0, mirror_mask, SMH_BANK(1));
 
-		amiga_cart_check_overlay(device->machine);
+		/* if there is a cart region, check for cart overlay */
+		if (memory_region(device->machine, "user2") != NULL)
+			amiga_cart_check_overlay(device->machine);
 	}
 	else
 		/* overlay enabled, map Amiga system ROM on 0x000000 */
