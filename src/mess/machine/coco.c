@@ -1500,7 +1500,7 @@ static WRITE8_DEVICE_HANDLER( d_pia0_pa_w )
 	if ((ctrl & 0x0f) == 0x01 && hires == 0x02)
 		coco_hiresjoy_w(device->machine, data & 0x04, 0);
 	else if ((ctrl & 0xf0) == 0x10 && hires == 0x04)
-		coco_hiresjoy_w(device->machine, data & 0x04, 1);
+		coco_hiresjoy_w(device->machine, data & 0x08, 1);
 }
 
 
