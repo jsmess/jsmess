@@ -55,7 +55,7 @@ static const struct NCR5380interface *intf;
 static UINT8 n5380_Registers[8];
 static UINT8 last_id;
 static UINT8 n5380_Command[32];
-static INT32 cmd_ptr, d_ptr, d_limit;
+static INT32 cmd_ptr, d_ptr, d_limit, next_req_flag;
 static UINT8 n5380_Data[512];
 
 #if NCR5380_DEVICE_CONVERSION
@@ -181,7 +181,7 @@ WRITE8_HANDLER(ncr5380_w)
 					if (get_cmd_len(n5380_Command[0]) == cmd_ptr)
 					{
 						if (VERBOSE)
-							logerror("NCR5380: Command (to ID %d): %x %x %x %x %x %x\n", last_id, n5380_Command[0], n5380_Command[1], n5380_Command[2], n5380_Command[3], n5380_Command[4], n5380_Command[5]);
+							logerror("NCR5380: Command (to ID %d): %x %x %x %x %x %x %x %x %x %x (PC %x)\n", last_id, n5380_Command[0], n5380_Command[1], n5380_Command[2], n5380_Command[3], n5380_Command[4], n5380_Command[5], n5380_Command[6], n5380_Command[7], n5380_Command[8], n5380_Command[9], cpu_get_pc(space->cpu));
 
 						SCSISetCommand(devices[last_id], &n5380_Command[0], 16);
 						SCSIExecCommand(devices[last_id], &d_limit);
@@ -329,6 +329,8 @@ READ8_HANDLER(ncr5380_r)
 						d_limit -= 512;
 						d_ptr = 0;
 
+						next_req_flag = 1;
+
 						// don't issue a "false" read
 						if (d_limit > 0)
 						{
@@ -341,6 +343,12 @@ READ8_HANDLER(ncr5380_r)
 							{
 								n5380_Registers[R5380_BUSSTATUS] |= 0x80;
 							}
+
+							// drop /REQ
+							n5380_Registers[R5380_BUSSTATUS] &= ~0x20;
+
+							// clear phase match
+							n5380_Registers[R5380_BUSANDSTAT] &= ~0x08;
 						}
 					}
 				}
@@ -350,6 +358,13 @@ READ8_HANDLER(ncr5380_r)
 
 		default:
 			rv = n5380_Registers[reg];
+
+			// temporarily drop /REQ
+			if ((reg == R5380_BUSSTATUS) && (next_req_flag))
+			{
+				rv &= ~0x20;
+				next_req_flag = 0;
+			}
 			break;
 	}
 
@@ -369,6 +384,8 @@ void ncr5380_init( running_machine *machine, const struct NCR5380interface *inte
 	memset(n5380_Registers, 0, sizeof(n5380_Registers));
 	memset(devices, 0, sizeof(devices));
 
+	next_req_flag = 0;
+
 	// try to open the devices
 	for (i = 0; i < interface->scsidevs->devs_present; i++)
 	{
@@ -382,6 +399,7 @@ void ncr5380_init( running_machine *machine, const struct NCR5380interface *inte
 	state_save_register_item(machine, "ncr5380", NULL, 0, cmd_ptr);
 	state_save_register_item(machine, "ncr5380", NULL, 0, d_ptr);
 	state_save_register_item(machine, "ncr5380", NULL, 0, d_limit);
+	state_save_register_item(machine, "ncr5380", NULL, 0, next_req_flag);
 }
 
 void ncr5380_exit( const struct NCR5380interface *interface )
