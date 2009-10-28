@@ -92,6 +92,13 @@ struct _z80dart_interface
     PROTOTYPES
 ***************************************************************************/
 
+/* register access */
+READ8_DEVICE_HANDLER( z80dart_cd_ba_r );
+WRITE8_DEVICE_HANDLER( z80dart_cd_ba_w );
+
+READ8_DEVICE_HANDLER( z80dart_ba_cd_r );
+WRITE8_DEVICE_HANDLER( z80dart_ba_cd_w );
+
 /* control register access */
 WRITE8_DEVICE_HANDLER( z80dart_c_w );
 READ8_DEVICE_HANDLER( z80dart_c_r );
@@ -100,28 +107,25 @@ READ8_DEVICE_HANDLER( z80dart_c_r );
 WRITE8_DEVICE_HANDLER( z80dart_d_w );
 READ8_DEVICE_HANDLER( z80dart_d_r );
 
-void z80dart_rxca_w(const device_config *device, int state);
-void z80dart_txca_w(const device_config *device, int state);
-void z80dart_ria_w(const device_config *device, int state);
-void z80dart_dcda_w(const device_config *device, int state);
-void z80dart_ctsa_w(const device_config *device, int state);
+/* serial clocks */
+WRITE_LINE_DEVICE_HANDLER( z80dart_rxca_w );
+WRITE_LINE_DEVICE_HANDLER( z80dart_txca_w );
+WRITE_LINE_DEVICE_HANDLER( z80dart_rxtxcb_w );
 
-void z80dart_rxtxcb_w(const device_config *device, int state);
-void z80dart_rib_w(const device_config *device, int state);
-void z80dart_dcdb_w(const device_config *device, int state);
-void z80dart_ctsb_w(const device_config *device, int state);
+/* ring indicator */
+WRITE_LINE_DEVICE_HANDLER( z80dart_ria_w );
+WRITE_LINE_DEVICE_HANDLER( z80dart_rib_w );
 
+/* data carrier detected */
+WRITE_LINE_DEVICE_HANDLER( z80dart_dcda_w );
+WRITE_LINE_DEVICE_HANDLER( z80dart_dcdb_w );
+
+/* clear to send */
+WRITE_LINE_DEVICE_HANDLER( z80dart_ctsa_w );
+WRITE_LINE_DEVICE_HANDLER( z80dart_ctsb_w );
+
+/* receive data byte HACK */
 void z80dart_receive_data(const device_config *device, int channel, UINT8 data);
-
-/* A0 = B/A
-   A1 = C/D */
-READ8_DEVICE_HANDLER( z80dart_r );
-WRITE8_DEVICE_HANDLER( z80dart_w );
-
-/* A0 = C/D
-   A1 = B/A */
-READ8_DEVICE_HANDLER( z80dart_alt_r );
-WRITE8_DEVICE_HANDLER( z80dart_alt_w );
 
 DEVICE_GET_INFO( z80dart );
 

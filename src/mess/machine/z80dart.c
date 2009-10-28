@@ -1005,7 +1005,7 @@ static void cts_w(const device_config *device, int channel, int state)
     z80dart_ctsa_w - clear to send (channel A)
 -------------------------------------------------*/
 
-void z80dart_ctsa_w(const device_config *device, int state)
+WRITE_LINE_DEVICE_HANDLER( z80dart_ctsa_w )
 {
 	cts_w(device, Z80DART_CH_A, state);
 }
@@ -1014,7 +1014,7 @@ void z80dart_ctsa_w(const device_config *device, int state)
     z80dart_ctsb_w - clear to send (channel B)
 -------------------------------------------------*/
 
-void z80dart_ctsb_w(const device_config *device, int state)
+WRITE_LINE_DEVICE_HANDLER( z80dart_ctsb_w )
 {
 	cts_w(device, Z80DART_CH_B, state);
 }
@@ -1064,7 +1064,7 @@ static void dcd_w(const device_config *device, int channel, int state)
     (channel A)
 -------------------------------------------------*/
 
-void z80dart_dcda_w(const device_config *device, int state)
+WRITE_LINE_DEVICE_HANDLER( z80dart_dcda_w )
 {
 	dcd_w(device, Z80DART_CH_A, state);
 }
@@ -1074,7 +1074,7 @@ void z80dart_dcda_w(const device_config *device, int state)
     (channel B)
 -------------------------------------------------*/
 
-void z80dart_dcdb_w(const device_config *device, int state)
+WRITE_LINE_DEVICE_HANDLER( z80dart_dcdb_w )
 {
 	dcd_w(device, Z80DART_CH_B, state);
 }
@@ -1118,7 +1118,7 @@ static void ri_w(const device_config *device, int channel, int state)
     z80dart_ria_w - ring indicator (channel A)
 -------------------------------------------------*/
 
-void z80dart_ria_w(const device_config *device, int state)
+WRITE_LINE_DEVICE_HANDLER( z80dart_ria_w )
 {
 	ri_w(device, Z80DART_CH_A, state);
 }
@@ -1127,7 +1127,7 @@ void z80dart_ria_w(const device_config *device, int state)
     z80dart_rib_w - ring indicator (channel B)
 -------------------------------------------------*/
 
-void z80dart_rib_w(const device_config *device, int state)
+WRITE_LINE_DEVICE_HANDLER( z80dart_rib_w )
 {
 	ri_w(device, Z80DART_CH_B, state);
 }
@@ -1136,7 +1136,7 @@ void z80dart_rib_w(const device_config *device, int state)
     z80dart_rxca_w - receive clock (channel A)
 -------------------------------------------------*/
 
-void z80dart_rxca_w(const device_config *device, int state)
+WRITE_LINE_DEVICE_HANDLER( z80dart_rxca_w )
 {
 	z80dart_t *z80dart = get_safe_token(device);
 	dart_channel *ch = &z80dart->channel[Z80DART_CH_A];
@@ -1162,7 +1162,7 @@ void z80dart_rxca_w(const device_config *device, int state)
     z80dart_txca_w - transmit clock (channel A)
 -------------------------------------------------*/
 
-void z80dart_txca_w(const device_config *device, int state)
+WRITE_LINE_DEVICE_HANDLER( z80dart_txca_w )
 {
 	z80dart_t *z80dart = get_safe_token(device);
 	dart_channel *ch = &z80dart->channel[Z80DART_CH_A];
@@ -1189,7 +1189,7 @@ void z80dart_txca_w(const device_config *device, int state)
     (channel B)
 -------------------------------------------------*/
 
-void z80dart_rxtxcb_w(const device_config *device, int state)
+WRITE_LINE_DEVICE_HANDLER( z80dart_rxtxcb_w )
 {
 	z80dart_t *z80dart = get_safe_token(device);
 	dart_channel *ch = &z80dart->channel[Z80DART_CH_B];
@@ -1333,19 +1333,19 @@ static void z80dart_irq_reti(const device_config *device)
 }
 
 /*-------------------------------------------------
-    z80dart_r - register read
+    z80dart_cd_ba_r - register read
 -------------------------------------------------*/
 
-READ8_DEVICE_HANDLER( z80dart_r )
+READ8_DEVICE_HANDLER( z80dart_cd_ba_r )
 {
 	return (offset & 2) ? z80dart_c_r(device, offset & 1) : z80dart_d_r(device, offset & 1);
 }
 
 /*-------------------------------------------------
-    z80dart_w - register write
+    z80dart_cd_ba_w - register write
 -------------------------------------------------*/
 
-WRITE8_DEVICE_HANDLER( z80dart_w )
+WRITE8_DEVICE_HANDLER( z80dart_cd_ba_w )
 {
 	if (offset & 2)
 		z80dart_c_w(device, offset & 1, data);
@@ -1354,10 +1354,10 @@ WRITE8_DEVICE_HANDLER( z80dart_w )
 }
 
 /*-------------------------------------------------
-    z80dart_alt_r - alternate register read
+    z80dart_ba_cd_r - register read
 -------------------------------------------------*/
 
-READ8_DEVICE_HANDLER( z80dart_alt_r )
+READ8_DEVICE_HANDLER( z80dart_ba_cd_r )
 {
 	int channel = BIT(offset, 1);
 
@@ -1365,10 +1365,10 @@ READ8_DEVICE_HANDLER( z80dart_alt_r )
 }
 
 /*-------------------------------------------------
-    z80dart_alt_w - alternate register write
+    z80dart_ba_cd_w - register write
 -------------------------------------------------*/
 
-WRITE8_DEVICE_HANDLER( z80dart_alt_w )
+WRITE8_DEVICE_HANDLER( z80dart_ba_cd_w )
 {
 	int channel = BIT(offset, 1);
 
