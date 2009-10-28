@@ -1364,7 +1364,7 @@ static UINT8 coco_update_keyboard( running_machine *machine )
 	UINT8 pia0_pb;
 	UINT8 dac = pia6821_get_output_a(state->pia_1) & 0xfc;
 	UINT8 hires = input_port_read_safe(machine, "hires_intf", 0x00);
-	int joystick_axis, joystick, joy_mask, joy_shift, ctrl, hires_val, ccm3_val;
+	int joystick_axis, joystick, joy_mask, joy_shift, ctrl, hires_val, cc3m_val;
 
 	static const char *const portnames[2][4][2] =
 			{
@@ -1386,7 +1386,7 @@ static UINT8 coco_update_keyboard( running_machine *machine )
 
 	/* is any Hi-Res Interface turned on? prepare masks to check it */
 	hires_val = joystick ? 0x03 : 0x01;
-	ccm3_val = joystick ? 0x04 : 0x02;
+	cc3m_val = joystick ? 0x04 : 0x02;
 
 	/* poll keyboard keys */
 	if ((input_port_read(machine, "row0") | pia0_pb) != 0xff) porta &= ~0x01;
@@ -1408,7 +1408,7 @@ static UINT8 coco_update_keyboard( running_machine *machine )
 	switch (ctrl)
 	{
 		case 0x01: /* Joystick */
-			if (hires == hires_val || hires == ccm3_val)
+			if (hires == hires_val || hires == cc3m_val)
 			{
 				/* Hi-Res Joystick or Hi-Res CoCo3Max Joystick */
 				if (joystick_axis ? coco_hiresjoy_ry(machine) : coco_hiresjoy_rx(machine))
@@ -1616,9 +1616,9 @@ static WRITE8_DEVICE_HANDLER ( d_pia1_pa_w )
 	(*update_keyboard)(device->machine);
 
 	/* Hi-Res Joystick (either in Left or in Right Port) writes here */
-	if ((ctrl & 0x0f) == 0x04 && hires == 0x01)
+	if ((ctrl & 0x0f) == 0x01 && hires == 0x01)
 		coco_hiresjoy_w(device->machine, dac >= 0x80, 0);
-	else if ((ctrl & 0xf0) == 0x40 && hires == 0x03)
+	else if ((ctrl & 0xf0) == 0x10 && hires == 0x03)
 		coco_hiresjoy_w(device->machine, dac >= 0x80, 1);
 
 	/* Handle printer output, serial for CoCos, parallel for Dragons */
