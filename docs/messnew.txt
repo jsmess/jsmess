@@ -55,12 +55,16 @@ System Driver Changes:
 
 - [CDI] Implemented support for a Mono-I class CD-i player. [Harmony]
 
+- [CDTV] Added workaround for crash due to CDDA failing initialization 
+  (more work needed to properly fix this) and fixed CIA0 problem which 
+  was crashing MESS with some games (e.g. Turrican). [Fabio Priuli]
+
 - [COCO/COCO3/DRAGON] Converted inputs to use PORT_CATEGORY (i.e. you 
   now select controller type in the Categories submenu). When Joystick 
   is selected in either Right or Left Controller Port, Hi-Res Interface
   becomes available in the Driver Configuration submenu. [Fabio Priuli]
 
-- [COMPIS] Added proper ROM dumps. [Curt Coder]
+- [COMPIS] Added proper ROM dumps and keyboard CPU. [Curt Coder]
 
 - [CPC family] Fixed screen dimensions. [Wilbert Pol]
 
@@ -101,6 +105,9 @@ System Driver Changes:
 - [GAMECOM] Fixed error and crashes when loading a cart: you can now
   reach title screens in some 1MB and 2MB carts. [Robbbert]
 
+- [GAMECOM] Added some DMA for carts, added crosshairs and mouseclick 
+  for stylus touch. Now some games are working. [Robbbert]
+
 - [GBCOLOR] Added BIOS. [Wilbert Pol]
 
 - [GBCOLOR] RAM bank #0 cannot be selected at d000-dfff. This fixes many 
@@ -110,6 +117,9 @@ System Driver Changes:
 
 - [I386] Implemented SLDT & STR opcodes (needed by PC98 as well) [Angelo
   Salese]
+
+- [IP22] Fixed crash in Indy driver: boot tune works, and you can get in 
+  the boot menus. [Harmony]
 
 - [JR200] Various progresses: [Roberto Zandona']
   * Hooked up text mode.
@@ -123,12 +133,23 @@ System Driver Changes:
 - [MAC] Various minor tweeks plus preliminary boot tone from models with 
   the Apple Sound Chip. [R. Belmont]
 
+- [MAC] Many updates: [R. Belmont]
+  * Fixed ID readbacks for all models.
+  * Fixed SCSI handshake on Mac II and later machines.
+  * Fixed ADB timing to specs; prevents hangs of System >6.0.3 on 
+    ADB systems and improves mouse pointer smoothness.
+  * Complete emulation of SE/30 on-board video and RasterOps 
+    264 ColorBoard.
+
 - [MC10] Reorganized and cleaned up the driver. [Dirk Best]
 
 - [MIKROMIK] Added proper ROM dumps, fixed keyboard and added drive 
   B: motor. [Curt Coder, Kara Trace]
 
 - [MPF1] Cleaned up, added cassette support.  [Dirk Best]
+
+- [N64] Ported numerous fixes over from Mupen64's software rasterizer 
+  et al, some games appear considerably improved. [Harmony]
 
 - [NES] Various progresses: [Fabio Priuli]
   * Fixed crash of MMC3 games with no CHR-ROM (bug #1860). [with Rob Bohms]
@@ -220,6 +241,8 @@ System Driver Changes:
 - [TS1500] Fixed memory size regression, it can boot now. [Robbbert]
 
 - [TUTOR] Added centronics interface. [Miodrag Milanovic]
+
+- [TVC] Added keyboard and fixed memory mapping. [Miodrag Milanovic]
 
 - [VTECH1] Added support for the SHRG (super hires graphics)
   modification.  [Dirk Best]
