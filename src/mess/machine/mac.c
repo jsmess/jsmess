@@ -52,7 +52,7 @@
             LC 55x, LC 57x, LC 58x, Quadra 630, Quadra 660AV, Quadra 840AV, PowerMac 6100/7100/8100,
             IIcx, IIci, and PowerMac 5200.
 
-    TODO:
+`    TODO:
         - Mac Portable and PowerBook 100 are similar to this hardware, but we need ROMs!
         - Call the RTC timer
         - SE FDHD and Classic require SWIM support.  SWIM is IWM compatible with 800k drives, but
@@ -60,7 +60,6 @@
         - Check that 0x600000-0x6fffff still address RAM when overlay bit is off
           (IM-III seems to say it does not on Mac 128k, 512k, and 512ke).
         - What on earth are 0x700000-0x7fffff mapped to ?
-
 
 ****************************************************************************/
 
@@ -165,6 +164,7 @@ static int mac_drive_select = 0;
 static int mac_scsiirq_enable = 0;
 
 static UINT32 mac_via2_vbl = 0, mac_se30_vbl_enable = 0;
+static UINT8 mac_nubus_irq_state, via2_ca1 = 0;
 
 // returns non-zero if this Mac has ADB
 static int has_adb(void)
@@ -849,7 +849,6 @@ Note:  Asserting the DACK signal applies only to write operations to
   scsiRd+sBSR         $580050    Bus and Status Register
   scsiRd+sIDR         $580060    Input Data Register
   scsiRd+sRESET       $580070    Reset Parity/Interrupt
-
              */
 
 READ16_HANDLER ( macplus_scsi_r )
@@ -868,7 +867,22 @@ READ16_HANDLER ( macplus_scsi_r )
 
 READ32_HANDLER (macii_scsi_drq_r)
 {
-	return ncr5380_r(space, R5380_CURDATA_DTACK)<<24;
+	switch (mem_mask)
+	{
+		case 0xff000000:
+			return ncr5380_r(space, R5380_CURDATA_DTACK)<<24;
+
+		case 0xffff0000:
+			return (ncr5380_r(space, R5380_CURDATA_DTACK)<<24) | (ncr5380_r(space, R5380_CURDATA_DTACK)<<16);
+
+		case 0xffffffff:
+			return (ncr5380_r(space, R5380_CURDATA_DTACK)<<24) | (ncr5380_r(space, R5380_CURDATA_DTACK)<<16) | (ncr5380_r(space, R5380_CURDATA_DTACK)<<8) | ncr5380_r(space, R5380_CURDATA_DTACK);
+
+		default:
+			logerror("macii_scsi_drq_r: unknown mem_mask %08x\n", mem_mask);
+	}
+
+	return 0;
 }
 
 WRITE16_HANDLER ( macplus_scsi_w )
@@ -1147,7 +1161,7 @@ static void rtc_execute_cmd(int data)
 		case 0: case 1: case 2: case 3:	/* seconds register */
 		case 4: case 5: case 6: case 7:	/* ??? (not described in IM III) */
 			/* after various tries, I assumed rtc_seconds[4+i] is mapped to rtc_seconds[i] */
-			if (LOG_RTC)
+ 			if (LOG_RTC)
 				logerror("RTC clock write, address = %X, data = %X\n", i, (int) rtc_data_byte);
 			rtc_seconds[i & 3] = rtc_data_byte;
 			break;
@@ -1562,7 +1576,7 @@ static TIMER_CALLBACK(mac_adb_tick)
 	}
 	else
 	{
-		timer_adjust_oneshot(mac_adb_timer, attotime_make(0, DOUBLE_TO_ATTOSECONDS(0.001)), 0);
+		timer_adjust_oneshot(mac_adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(200)), 0);
 	}
 }
 
@@ -1635,7 +1649,7 @@ static void mac_adb_newaction(int state)
 		}
 
 		// no matter what, generate 8 clocks (should this happen on IDLE?)
-		timer_adjust_oneshot(mac_adb_timer, attotime_make(0, DOUBLE_TO_ATTOSECONDS(0.001)), 0);
+		timer_adjust_oneshot(mac_adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
 	}
 }
 
@@ -1708,26 +1722,45 @@ static void adb_reset(void)
  *
  */
 
+#define PA6 0x40
+#define PA4 0x10
+#define PA2 0x04
+#define PA1 0x02
+
 static READ8_DEVICE_HANDLER(mac_via_in_a)
 {
 //	printf("VIA1 IN_A (PC %x)\n", cpu_get_pc(cputag_get_cpu(device->machine, "maincpu")));
 
-	if ((mac_model == MODEL_MAC_CLASSIC) || (mac_model == MODEL_MAC_LC) || 
+	if ((mac_model == MODEL_MAC_CLASSIC) ||
 	    (mac_model == MODEL_MAC_LC_II) || (mac_model == MODEL_MAC_II) || 
-	    (mac_model == MODEL_MAC_II_FDHD) || (mac_model == MODEL_MAC_IIX) || 
-	    (mac_model == MODEL_MAC_SE30))
+	    (mac_model == MODEL_MAC_II_FDHD) || (mac_model == MODEL_MAC_IIX))
 	{
 		return 0x81;		// bit 0 must be set to avoid attempting to boot from AppleTalk
 	}
 
+	if (mac_model == MODEL_MAC_SE30)
+	{
+		return 0x81 | PA6;
+	}
+
+	if (mac_model == MODEL_MAC_LC)
+	{
+		return 0x81 | PA6 | PA4 | PA2;
+	}
+
 	if (mac_model == MODEL_MAC_IICI)
 	{
-		return 0xc7;	// 0x40 = IIcx/IIci/IIfx | 0x06 = IIci
+		return 0xc7;	// 0x40 = IIcx/IIci/IIfx/SE30 | 0x06 = IIci
+	}
+
+	if (mac_model == MODEL_MAC_IISI)
+	{
+		return 0x81 | PA4 | PA2 | PA1;
 	}
 
 	if (mac_model == MODEL_MAC_IIFX)
 	{
-		return 0xc3;	// 0x40 = IIcx/IIci/IIfx | 0x02 = IIfx
+		return 0xc3;	// 0x40 = IIcx/IIci/IIfx/SE30 | 0x02 = IIfx
 	}
 
 	if (mac_model == MODEL_MAC_IICX)
@@ -1827,6 +1860,12 @@ static WRITE8_DEVICE_HANDLER(mac_via_out_b)
 	{
 		// 0x40 = 0 means enable vblank on SE/30		
 		mac_se30_vbl_enable = (data & 0x40) ? 0 : 1;
+
+		// clear the interrupt if we disabled it
+		if (!mac_se30_vbl_enable)
+		{
+		 	mac_nubus_slot_interrupt(device->machine, 0xe, 0);
+		}
 	}
 
 	rtc_write_rTCEnb(data & 0x04);
@@ -1905,7 +1944,7 @@ WRITE16_HANDLER ( mac_via2_w )
 	const device_config *via_1 = devtag_get_device(space->machine, "via6522_1");
 
 	offset >>= 8;
-	offset &= 0x0f;
+	offset &= 0x0f;	 
 
 	if (LOG_VIA)
 		logerror("mac_via2_w: offset=0x%02x data=0x%08x\n", offset, data);
@@ -1917,18 +1956,11 @@ WRITE16_HANDLER ( mac_via2_w )
 
 static READ8_DEVICE_HANDLER(mac_via2_in_a)
 {
-	UINT8 result = 0xff;
-
-//	logerror("VIA2 IN A (PC %x)\n", cpu_get_pc(cputag_get_cpu(device->machine, "maincpu")));
+	UINT8 result = 0xc0 | mac_nubus_irq_state;
 
 	if ((mac_model == MODEL_MAC_IICI) || (mac_model == MODEL_MAC_IISI))
 	{
 		result &= ~0x40;	// RBV wants this clear to boot
-	}
-
-	if (mac_via2_vbl)
-	{
-		result &= ~0x20;	// indicate slot interrupt
 	}
 
 	return result;
@@ -1938,7 +1970,12 @@ static READ8_DEVICE_HANDLER(mac_via2_in_b)
 {
 //	logerror("VIA2 IN B (PC %x)\n", cpu_get_pc(cputag_get_cpu(device->machine, "maincpu")));
 
-	return 0xff;
+	if (mac_model == MODEL_MAC_SE30)
+	{
+		return 0x87;	// bits 3 and 6 are tied low on SE/30
+	}
+
+	return 0xcf;		// indicate no NuBus transaction error
 }
 
 static WRITE8_DEVICE_HANDLER(mac_via2_out_a)
@@ -1953,10 +1990,7 @@ static WRITE8_DEVICE_HANDLER(mac_via2_out_b)
 //	logerror("VIA2 OUT B: %02x (PC %x)\n", data, cpu_get_pc(cputag_get_cpu(device->machine, "maincpu")));
 
 	// chain 60.15 Hz to VIA1
-	if ((mac_model != MODEL_MAC_IICI) && (mac_model != MODEL_MAC_IISI))
-	{
-		via_ca1_w(via_0, 0, data>>7);
-	}
+	via_ca1_w(via_0, 0, data>>7);
 }
 
 /* *************************************************************************
@@ -1999,6 +2033,8 @@ MACHINE_RESET(mac)
 	}
 
 	scsi_interrupt = 0;
+	via2_ca1 = 0;
+	mac_nubus_irq_state = 0xff;
 
 	mac_scanline_timer = timer_alloc(machine, mac_scanline_tick, NULL);
 	timer_adjust_oneshot(mac_scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
@@ -2107,13 +2143,13 @@ DRIVER_INIT(mac512ke)
 
 static const SCSIConfigTable dev_table =
 {
-	1,                                      /* 2 SCSI devices */
+	2,                                      /* 2 SCSI devices */
 	{
-	 { SCSI_ID_5, "harddisk1", SCSI_DEVICE_HARDDISK },  /* SCSI ID 5, using CHD 1, and it's a harddisk */
-//	 { SCSI_ID_6, "harddisk2", SCSI_DEVICE_HARDDISK }   /* SCSI ID 6, using CHD 0, and it's a harddisk */
+	 { SCSI_ID_6, "harddisk1", SCSI_DEVICE_HARDDISK },  /* SCSI ID 6, using disk1, and it's a harddisk */
+	 { SCSI_ID_5, "harddisk2", SCSI_DEVICE_HARDDISK }   /* SCSI ID 5, using disk2, and it's a harddisk */
 	}
 };
-				       // 41a868        41a5ac = data copy
+				       
 static const struct NCR5380interface macplus_5380intf =
 {
 	&dev_table,	// SCSI device table
@@ -2157,18 +2193,31 @@ DRIVER_INIT(maclc2)
 	mac_driver_init(machine, MODEL_MAC_LC_II);
 }
 
+// make the appletalk init fail instead of hanging on the II FDHD/IIx/IIcx/SE30 ROM
+void patch_appletalk_iix(running_machine *machine)
+{
+	UINT32 *ROM = (UINT32 *)memory_region(machine, "user1");
+
+	ROM[0x2cc94/4] = 0x6bbe709e;	// bmi 82cc54 moveq #-$62, d0
+	ROM[0x370c/4] = 0x4e714e71;	// nop nop - disable ROM checksum
+	ROM[0x3710/4] = 0x4e714ed6;	// nop jmp (a6) - disable ROM checksum
+}
+
 DRIVER_INIT(maciicx)
 {
+	patch_appletalk_iix(machine);
 	mac_driver_init(machine, MODEL_MAC_IICX);
 }
 
 DRIVER_INIT(maciifdhd)
 {
+	patch_appletalk_iix(machine);
 	mac_driver_init(machine, MODEL_MAC_II_FDHD);
 }
 
 DRIVER_INIT(maciix)
 {
+	patch_appletalk_iix(machine);
 	mac_driver_init(machine, MODEL_MAC_IIX);
 }
 
@@ -2184,12 +2233,40 @@ DRIVER_INIT(maciisi)
 
 DRIVER_INIT(macse30)
 {
+	patch_appletalk_iix(machine);
 	mac_driver_init(machine, MODEL_MAC_SE30);
 }
 
 DRIVER_INIT(macclassic2)
 {
 	mac_driver_init(machine, MODEL_MAC_CLASSIC_II);
+}
+
+void mac_nubus_slot_interrupt(running_machine *machine, UINT8 slot, UINT32 state)
+{
+	UINT8 masks[6] = { 0x1, 0x2, 0x4, 0x8, 0x10, 0x20 };
+
+	// NuBus slot must be 9 through E
+	assert((slot < 9) || (slot > 0xe));
+
+	slot -= 9;
+
+	if (state)
+	{
+		mac_nubus_irq_state &= ~masks[slot];
+	}
+	else
+	{
+		mac_nubus_irq_state |= masks[slot];
+	}
+
+	if ((mac_nubus_irq_state & 0x3f) != 0x3f)
+	{
+		const device_config *via_1 = devtag_get_device(machine, "via6522_1");
+
+		via2_ca1 ^= 1;
+		via_ca1_w(via_1, 0, via2_ca1);
+	}
 }
 
 static void mac_vblank_irq(running_machine *machine)
@@ -2220,7 +2297,7 @@ static void mac_vblank_irq(running_machine *machine)
 	}
 
 	/* signal VBlank on CA1 input on the VIA */
-	if ((mac_model < MODEL_MAC_II) || (mac_model == MODEL_MAC_IICI) || (mac_model != MODEL_MAC_IISI))
+	if (mac_model < MODEL_MAC_II)
 	{
 		ca1_data ^= 1;
 		via_ca1_w(via_0, 0, ca1_data);
@@ -2237,28 +2314,19 @@ static void mac_vblank_irq(running_machine *machine)
 		rtc_incticks();
 	}
 
-	// try generating a slot interrupt every frame too
-	if (mac_model >= MODEL_MAC_II)
+	// handle SE/30 vblank IRQ
+	if (mac_model == MODEL_MAC_SE30)
 	{
-		const device_config *via_1 = devtag_get_device(machine, "via6522_1");
-		
-		if (mac_model == MODEL_MAC_SE30)
-		{
-			if (mac_se30_vbl_enable)
-			{
-				mac_via2_vbl ^= 1;
-				via_ca1_w(via_1, 0, mac_via2_vbl);
-			}
-		}
-		else if ((mac_model != MODEL_MAC_IICI) && (mac_model != MODEL_MAC_IISI))
+		if (mac_se30_vbl_enable)
 		{
 			mac_via2_vbl ^= 1;
-			via_ca1_w(via_1, 0, mac_via2_vbl);
+			if (!mac_via2_vbl)
+			{
+				mac_nubus_slot_interrupt(machine, 0xe, 1);
+			}
 		}
 	}
 }
-
-
 
 static TIMER_CALLBACK(mac_scanline_tick)
 {

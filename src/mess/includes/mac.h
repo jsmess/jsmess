@@ -15,11 +15,10 @@
 /* tells which model is being emulated (set by macxxx_init) */
 typedef enum
 {
-	MODEL_MAC_128K512K,
+	MODEL_MAC_128K512K,	// 68000 machines
 	MODEL_MAC_512KE,
 	MODEL_MAC_PLUS,
 	MODEL_MAC_SE,
-	MODEL_MAC_SE_FDHD,
 	MODEL_MAC_CLASSIC,
 	MODEL_MAC_PORTABLE,
 	MODEL_MAC_PB100,
@@ -40,7 +39,7 @@ typedef enum
 	MODEL_MAC_COLOR_CLASSIC
 } mac_model_t;
 
-// video parameters
+// video parameters for classic Macs
 #define MAC_H_VIS	(512)
 #define MAC_V_VIS	(342)
 #define MAC_H_TOTAL	(704)		// (512+192)
@@ -94,6 +93,7 @@ void mac_scc_ack(const device_config *device);
 void mac_scc_mouse_irq( running_machine *machine, int x, int y );
 void mac_fdc_set_enable_lines(const device_config *device, int enable_mask);
 
+void mac_nubus_slot_interrupt(running_machine *machine, UINT8 slot, UINT32 state);
 
 /*----------- defined in video/mac.c -----------*/
 
@@ -104,6 +104,13 @@ PALETTE_INIT( mac );
 
 void mac_set_screen_buffer( int buffer );
 
+extern UINT32 *mac_cb264_vram;
+VIDEO_START( mac_cb264 );
+VIDEO_UPDATE( mac_cb264 );
+READ32_HANDLER( mac_cb264_r );
+WRITE32_HANDLER( mac_cb264_w );
+WRITE32_HANDLER( mac_cb264_ramdac_w );
+INTERRUPT_GEN( mac_cb264_vbl );
 
 /*----------- defined in audio/mac.c -----------*/
 
@@ -119,3 +126,5 @@ void mac_sh_updatebuffer(const device_config *device);
 
 
 #endif /* MAC_H_ */
+
+

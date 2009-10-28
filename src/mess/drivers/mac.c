@@ -35,6 +35,8 @@
 	        PB_EXT  from mouse Y circuitry
 	        PA_EXT  from mouse X circuitry
 
+RBV @ 43f80, alt 48000
+
 ****************************************************************************/
 
 #include "driver.h"
@@ -138,105 +140,10 @@ static READ32_HANDLER(mac_swim_r)
 	return 0x17171717;
 }
 
-/*
-	RasterOps ColorBoard 264: fixed resolution 640x480 NuBus video card, 1/4/8/16/24 bit color
-	1.5? MB of VRAM (tests up to 0x1fffff), Bt473 RAMDAC, and two custom gate arrays.
-*/
-
-static UINT32 *cb264_vram;
-static UINT32 cb264_mode = 0; 	// 0 = true color, 2 = 1bpp monochrome, others unknown
-static UINT32 cb264_palette[256];
-
-static VIDEO_START( cb264 )
-{
-}
-
-static VIDEO_UPDATE( cb264 )
-{
-	UINT32 *scanline, *base;
-	int x, y;
-
-	if (cb264_mode == 0)
-	{
-		for (y = 0; y < 480; y++)
-		{
-			scanline = BITMAP_ADDR32(bitmap, y, 0);
-			base = &cb264_vram[y * 1024];
-			for (x = 0; x < 640; x++)
-			{
-				*scanline++ = *base++;
-			}
-		}
-	}
-	else if (cb264_mode == 2)
-	{
-		UINT8 *vram8 = (UINT8 *)cb264_vram; //, *base8;
-		UINT8 pixels;
-
-		for (y = 0; y < 480; y++)
-		{
-			scanline = BITMAP_ADDR32(bitmap, y, 0);
-			for (x = 0; x < 640; x+=8)
-			{
-				pixels = vram8[(y * 1024) + ((x/8)^3)];
-
-				*scanline++ = cb264_palette[(pixels>>7)^1];
-				*scanline++ = cb264_palette[((pixels>>6)&1)^1];
-				*scanline++ = cb264_palette[((pixels>>5)&1)^1];
-				*scanline++ = cb264_palette[((pixels>>4)&1)^1];
-				*scanline++ = cb264_palette[((pixels>>3)&1)^1];
-				*scanline++ = cb264_palette[((pixels>>2)&1)^1];
-				*scanline++ = cb264_palette[((pixels>>1)&1)^1];
-				*scanline++ = cb264_palette[(pixels&1)^1];
-			}
-		}
-	}
-	else
-	{
-		fatalerror("cb264: unknown video mode %d\n", cb264_mode);
-	}
-
-	return 0;
-}
-
-static WRITE32_HANDLER( cb264_mode_w )
-{
-	cb264_mode = data;
-}
-
-static UINT32 cb264_toggle = 0;
-static READ32_HANDLER( cb264_status_r )
-{
-	cb264_toggle ^= 1;
-	return cb264_toggle;	// probably bit 0 is vblank
-}
-
-static UINT32 cb264_colors[3], cb264_count, cb264_clutoffs;
-static WRITE32_HANDLER( cb264_ramdac_w )
-{
-	if (!offset)
-	{
-		cb264_clutoffs = data>>24;
-		cb264_count = 0;
-	}
-	else
-	{
-		cb264_colors[cb264_count++] = data>>24;
-
-		if (cb264_count == 3)
-		{
-			cb264_count = 0;
-			cb264_clutoffs++;
-			palette_set_color(space->machine, cb264_clutoffs, MAKE_RGB(cb264_colors[0], cb264_colors[1], cb264_colors[2]));
-			cb264_palette[cb264_clutoffs] = MAKE_RGB(cb264_colors[0], cb264_colors[1], cb264_colors[2]);
-		}
-	}
-}
-
 // IIci/IIsi RAM-Based Video (RBV)
 
-// 512x384x1 framebuffer at fb008000
-// 640x480x1 framebuffer at fee00000
+// 512x384x1 framebuffer at fb008000?
+// 640x480x1 framebuffer at fee00000?
 
 static UINT32 *rbv_vram;
 
@@ -299,7 +206,7 @@ static READ16_HANDLER ( mac_rbv_r )
 	int data;
 	const device_config *via_1 = devtag_get_device(space->machine, "via6522_1");
 
-//	logerror("rbv_r: %x, mask %x\n", offset, mem_mask);
+	logerror("rbv_r: %x, mask %x\n", offset, mem_mask);
 
 	if (offset == 1)
 	{
@@ -328,7 +235,7 @@ static WRITE16_HANDLER ( mac_rbv_w )
 {
 	const device_config *via_1 = devtag_get_device(space->machine, "via6522_1");
 
-//	logerror("rbv_w: %x to offset %x, mask %x\n", data, offset, mem_mask);
+	logerror("rbv_w: %x to offset %x, mask %x\n", data, offset, mem_mask);
 
 	offset >>= 8;
 	offset &= 0x0f;
@@ -384,6 +291,7 @@ static ADDRESS_MAP_START(macii_map, ADDRESS_SPACE_PROGRAM, 32)
 	AM_RANGE(0x50f00000, 0x50f01fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff)
 	AM_RANGE(0x50f02000, 0x50f03fff) AM_READWRITE16(mac_via2_r, mac_via2_w, 0xffffffff)
 	AM_RANGE(0x50f04000, 0x50f05fff) AM_READWRITE16(mac_scc_r, mac_scc_2_w, 0xffffffff)
+	AM_RANGE(0x50f06060, 0x50f06063) AM_READ(macii_scsi_drq_r)
 
 	AM_RANGE(0x50f10000, 0x50f11fff) AM_READWRITE16(macplus_scsi_r, macii_scsi_w, 0xffffffff)
 	AM_RANGE(0x50f12060, 0x50f12063) AM_READ(macii_scsi_drq_r)
@@ -394,10 +302,9 @@ static ADDRESS_MAP_START(macii_map, ADDRESS_SPACE_PROGRAM, 32)
 	AM_RANGE(0x50f40000, 0x50f41fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff)	// mirror
 
 	// RasterOps 264 640x480 fixed-res color video card (8, 16, or 24 bit)
-	AM_RANGE(0xfe000000, 0xfe1fffff) AM_RAM	AM_BASE(&cb264_vram) // supposed to be 1.5 megs of VRAM, but every other word?
-	AM_RANGE(0xfeff6018, 0xfeff601b) AM_WRITE( cb264_mode_w )
-	AM_RANGE(0xfeff6034, 0xfeff6037) AM_READ( cb264_status_r )
-	AM_RANGE(0xfeff7000, 0xfeff7007) AM_WRITE( cb264_ramdac_w )
+	AM_RANGE(0xfe000000, 0xfe1fffff) AM_RAM	AM_BASE(&mac_cb264_vram) // supposed to be 1.5 megs of VRAM, but every other word?
+	AM_RANGE(0xfeff6000, 0xfeff60ff) AM_READWRITE( mac_cb264_r, mac_cb264_w )
+  	AM_RANGE(0xfeff7000, 0xfeff7fff) AM_WRITE( mac_cb264_ramdac_w )
 	AM_RANGE(0xfeff8000, 0xfeffffff) AM_ROM AM_REGION("rops264", 0)
 ADDRESS_MAP_END
 
@@ -422,6 +329,7 @@ static ADDRESS_MAP_START(maciici_map, ADDRESS_SPACE_PROGRAM, 32)
 
 	AM_RANGE(0x50f00000, 0x50f01fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff)
 	AM_RANGE(0x50f04000, 0x50f05fff) AM_READWRITE16(mac_scc_r, mac_scc_2_w, 0xffffffff)
+	AM_RANGE(0x50f06060, 0x50f06063) AM_READ(macii_scsi_drq_r)
 
 	AM_RANGE(0x50f10000, 0x50f11fff) AM_READWRITE16(macplus_scsi_r, macii_scsi_w, 0xffffffff)
 	AM_RANGE(0x50f12060, 0x50f12063) AM_READ(macii_scsi_drq_r)
@@ -436,7 +344,7 @@ static ADDRESS_MAP_START(maciici_map, ADDRESS_SPACE_PROGRAM, 32)
 
 	// mirror video declaration ROM
 	AM_RANGE(0xfee00000, 0xfee7ffff) AM_RAM AM_BASE(&rbv_vram)
-	AM_RANGE(0xfeff8000, 0xfeffffff) AM_ROM AM_REGION("user1", 0x78000)
+//	AM_RANGE(0xfeff8000, 0xfeffffff) AM_ROM AM_REGION("user1", 0x78000)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(macse30_map, ADDRESS_SPACE_PROGRAM, 32)
@@ -450,7 +358,7 @@ static ADDRESS_MAP_START(macse30_map, ADDRESS_SPACE_PROGRAM, 32)
 	AM_RANGE(0x50f10000, 0x50f11fff) AM_READWRITE16(macplus_scsi_r, macii_scsi_w, 0xffffffff)
 	AM_RANGE(0x50f12060, 0x50f12063) AM_READ(macii_scsi_drq_r)
 	AM_RANGE(0x50f14000, 0x50f15fff) AM_READ8(mac_asc_r, 0xffffffff) AM_WRITE8(mac_asc_w, 0xffffffff)
-	AM_RANGE(0x50f16000, 0x50f17fff) AM_READ(mac_swim_r) AM_WRITENOP
+	AM_RANGE(0x50f16000, 0x50f17fff) AM_READWRITE16(mac_iwm_r, mac_iwm_w, 0xffffffff)
 
 	AM_RANGE(0x50f40000, 0x50f41fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff)	// mirror
 
@@ -616,10 +524,11 @@ static MACHINE_DRIVER_START( mac2fdhd )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68020_68851, 7833600*2)
 	MDRV_CPU_PROGRAM_MAP(macii_map)
+	MDRV_CPU_VBLANK_INT("screen", mac_cb264_vbl)
+
 	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60.15)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1260))
-	MDRV_QUANTUM_TIME(HZ(60))
+	// dot clock, htotal, hstart, hend, vtotal, vstart, vend
+	MDRV_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
 
 	MDRV_MACHINE_START(macscsi)
 	MDRV_MACHINE_RESET( mac )
@@ -631,8 +540,8 @@ static MACHINE_DRIVER_START( mac2fdhd )
 	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MDRV_PALETTE_LENGTH(256)
 
-	MDRV_VIDEO_START(cb264)
-	MDRV_VIDEO_UPDATE(cb264)
+	MDRV_VIDEO_START(mac_cb264)
+	MDRV_VIDEO_UPDATE(mac_cb264)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
