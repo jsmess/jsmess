@@ -54,7 +54,7 @@
 #include "machine/wd33c93.h"
 #include "devices/harddriv.h"
 #include "devices/chd_cd.h"
-#include "sound/dmadac.h"
+#include "sound/dac.h"
 
 #define VERBOSE_LEVEL ( 0 )
 
@@ -1025,22 +1025,18 @@ static UINT32 nPBUS_DMA_DescPtr;
 static UINT32 nPBUS_DMA_NextPtr;
 static UINT32 nPBUS_DMA_WordsLeft;
 
-static const device_config *dmadac[1];
-
 static TIMER_CALLBACK(ip22_dma)
 {
-	dmadac[0] = devtag_get_device(machine, "dmadac");
 	if( nPBUS_DMA_Active )
 	{
-		INT16 temp16;
-//      mame_printf_info( "nPBUS_DMA_CurPtr - 0x08000000/4 = %08x\n", (nPBUS_DMA_CurPtr - 0x08000000)/4 );
-//      verboselog(machine, 0, "nPBUS_DMA_CurPtr - 0x08000000/4 = %08x\n", (nPBUS_DMA_CurPtr - 0x08000000)/4 );
-		temp16 = ( ip22_mainram[(nPBUS_DMA_CurPtr - 0x08000000)/4] & 0xffff0000 ) >> 16;
-		temp16 = ( ( temp16 & 0xff00 ) >> 8 ) | ( ( temp16 & 0x00ff ) << 8 );
-		dmadac_transfer(&dmadac[0], 1, 1, 1, 1, &temp16);
-		nPBUS_DMA_CurPtr += 4;
-		nPBUS_DMA_WordsLeft -= 4;
+		UINT16 temp16 = ( ip22_mainram[(nPBUS_DMA_CurPtr - 0x08000000)/4] & 0xffff0000 ) >> 16;
+		INT16 stemp16 = (INT16)((temp16 >> 8) | (temp16 << 8));
 
+		dac_signed_data_16_w(devtag_get_device(machine, "dac"), stemp16 ^ 0x8000);
+
+		nPBUS_DMA_CurPtr += 4;
+
+		nPBUS_DMA_WordsLeft -= 4;
 		if( nPBUS_DMA_WordsLeft == 0 )
 		{
 			if( nPBUS_DMA_NextPtr != 0 )
@@ -1162,7 +1158,6 @@ static TIMER_CALLBACK(ip22_timer)
 
 static MACHINE_RESET( ip225015 )
 {
-	dmadac[0] = devtag_get_device(machine, "dmadac");
 	mc_init(machine);
 	nHPC3_enetr_nbdp = 0x80000000;
 	nHPC3_enetr_cbp = 0x80000000;
@@ -1176,9 +1171,6 @@ static MACHINE_RESET( ip225015 )
 	memory_set_bankptr(machine, 1, ip22_mainram);
 
 	nPBUS_DMA_Active = 0;
-
-	dmadac_set_frequency(&dmadac[0], 1, 44100);
-	dmadac_enable(&dmadac[0], 1, 1);
 }
 
 static void dump_chain(const address_space *space, UINT32 ch_base)
@@ -1530,12 +1522,14 @@ static MACHINE_DRIVER_START( ip225015 )
 
 	MDRV_PC_LPT_ADD("lpt_0", ip22_lpt_config)
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD( "dmadac", DMADAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MDRV_SOUND_ADD( "dac", DAC, 0 )
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5)
+
 	MDRV_SOUND_ADD( "cdda",  CDDA, 0 )
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	MDRV_CDROM_ADD( "cdrom" )
 MACHINE_DRIVER_END
