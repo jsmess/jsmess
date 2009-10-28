@@ -23,13 +23,11 @@
 
 	- display interface INH
 	- 2 segment display
-	- memory disable
 	- single step
 	- ascii monitor
 	- PPI 8255
 	- Floppy WD1793
 	- COM8017 UART to printer
-	- save state
 
 */
 
@@ -202,6 +200,7 @@ static INPUT_CHANGED( enter )
 
 static INPUT_CHANGED( single_step )
 {
+	// if in PAUSE mode, set RUN mode until TPB=active
 }
 
 static void set_cdp1802_mode(running_machine *machine, cdp1802_control_mode mode)
@@ -263,22 +262,44 @@ static INPUT_CHANGED( clear_data )
 	clear_input_data(field->port->machine);
 }
 
-static INPUT_CHANGED( memory_protect )
+static void set_ram_mode(running_machine *machine)
 {
-	const address_space *program = cputag_get_address_space(field->port->machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM);
+	cosmicos_state *state = machine->driver_data;
+	const address_space *program = cputag_get_address_space(machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM);
 
-	if (newval)
+	if (state->ram_disable)
 	{
-		memory_install_readwrite8_handler(program, 0xff00, 0xffff, 0, 0, SMH_BANK(2), SMH_UNMAP);
+		memory_install_readwrite8_handler(program, 0xff00, 0xffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 	}
 	else
 	{
-		memory_install_readwrite8_handler(program, 0xff00, 0xffff, 0, 0, SMH_BANK(2), SMH_BANK(2));
+		if (state->ram_protect)
+		{
+			memory_install_readwrite8_handler(program, 0xff00, 0xffff, 0, 0, SMH_BANK(2), SMH_UNMAP);
+		}
+		else
+		{
+			memory_install_readwrite8_handler(program, 0xff00, 0xffff, 0, 0, SMH_BANK(2), SMH_BANK(2));
+		}
 	}
+}
+
+static INPUT_CHANGED( memory_protect )
+{
+	cosmicos_state *state = field->port->machine->driver_data;
+
+	state->ram_protect = newval;
+
+	set_ram_mode(field->port->machine);
 }
 
 static INPUT_CHANGED( memory_disable )
 {
+	cosmicos_state *state = field->port->machine->driver_data;
+
+	state->ram_disable = newval;
+
+	set_ram_mode(field->port->machine);
 }
 
 static INPUT_PORTS_START( cosmicos )
@@ -528,7 +549,20 @@ static MACHINE_START( cosmicos )
 	memory_install_readwrite8_handler(program, 0xff00, 0xffff, 0, 0, SMH_BANK(2), SMH_BANK(2));
 
 	/* register for state saving */
-//	state_save_register_global(machine, state->);
+	state_save_register_global(machine, state->cdp1802_mode);
+	state_save_register_global(machine, state->sc1);
+	state_save_register_global(machine, state->data);
+	state_save_register_global(machine, state->boot);
+	state_save_register_global(machine, state->ram_protect);
+	state_save_register_global(machine, state->ram_disable);
+	state_save_register_global(machine, state->keylatch);
+	state_save_register_global(machine, state->segment);
+	state_save_register_global(machine, state->digit);
+	state_save_register_global(machine, state->counter);
+	state_save_register_global(machine, state->q);
+	state_save_register_global(machine, state->dmaout);
+	state_save_register_global(machine, state->efx);
+	state_save_register_global(machine, state->video_on);
 }
 
 static MACHINE_RESET( cosmicos )
@@ -635,4 +669,4 @@ static DRIVER_INIT( cosmicos )
 }
 
 /*    YEAR  NAME		PARENT  COMPAT  MACHINE		INPUT		INIT		CONFIG		COMPANY				FULLNAME    FLAGS */
-COMP( 1979, cosmicos,	0,		0,		cosmicos,	cosmicos,	cosmicos,	0,			"Radio Bulletin",	"Cosmicos",	GAME_NOT_WORKING )
+COMP( 1979, cosmicos,	0,		0,		cosmicos,	cosmicos,	cosmicos,	0,			"Radio Bulletin",	"Cosmicos",	GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )

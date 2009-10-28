@@ -38,6 +38,8 @@ struct _cosmicos_state
 	/* memory state */
 	UINT8 data;
 	int boot;
+	int ram_protect;
+	int ram_disable;
 
 	/* keyboard state */
 	UINT8 keylatch;

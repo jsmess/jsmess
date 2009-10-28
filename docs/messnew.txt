@@ -15,6 +15,7 @@ Systems Promoted from GAME_NOT_WORKING:
 ---------------------------------------
 - Atari 800XL [Mariusz Wojcieszek]
 - Beta [Curt Coder]
+- Cosmicos [Curt Coder]
 - Microbee 56k [Robbbert]
 - Nokia MikroMikko 1 M6 [Curt Coder, Kara Trace]
 - TRS-80 Model 4 [Robbbert]
@@ -65,6 +66,8 @@ System Driver Changes:
   becomes available in the Driver Configuration submenu. [Fabio Priuli]
 
 - [COMPIS] Added proper ROM dumps and keyboard CPU. [Curt Coder]
+
+- [COSMICOS] Promoted driver to working. [Curt Coder]
 
 - [CPC family] Fixed screen dimensions. [Wilbert Pol]
 
