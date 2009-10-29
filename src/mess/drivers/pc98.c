@@ -8,7 +8,14 @@
 
 	TODO:
 	- remove the A20 line hack
-	- Understand what's going on at bp f8dfa (memo: bp f8dfa, do eip=dff)
+
+	Debug tricks list (aka list of things that should be fixed):
+	- run a first time without doing anything;
+	- call the debugger then soft reset (the debugger will be called after the reset because the CPU is into an halt state);
+	- wpiset 35,1,r -> do eip=90 -> bpset f926c -> do eip=128d -> run until HALT
+	- soft reset -> wpiset 35,1,r -> do eip=90 again -> run until HALT
+	- soft reset -> modify I/O $43d with a 0x02 (should bankswitch with the basic ROM) -> run
+	- modify memory 0x53c from 0xc4 to 0x84 two times
 
 ========================================================================================
 
@@ -274,6 +281,9 @@ static VIDEO_UPDATE( pc9801 )
 
 					color = pen[2]<<2|pen[1]<<1|pen[0]<<0;
 
+					if(attr & 4)
+						color^=7;
+
 					if(((x*2+1)*8+xi)<video_screen_get_visible_area(screen->machine->primary_screen)->max_x && (y*8+yi)<video_screen_get_visible_area(screen->machine->primary_screen)->max_y)
 						*BITMAP_ADDR16(bitmap, y*8+yi, (x*2+1)*8+xi) = screen->machine->pens[color];
 
@@ -287,6 +297,9 @@ static VIDEO_UPDATE( pc9801 )
 					pen[2] = gfx_data[(tile*8)+yi]>>(7-xi) & (pen_mask & 4)>>2;
 
 					color = pen[2]<<2|pen[1]<<1|pen[0]<<0;
+
+					if(attr & 4)
+						color^=7;
 
 					if(((x*2+0)*8+xi)<video_screen_get_visible_area(screen->machine->primary_screen)->max_x && (y*8+yi)<video_screen_get_visible_area(screen->machine->primary_screen)->max_y)
 						*BITMAP_ADDR16(bitmap, y*8+yi, (x*2+0)*8+xi) = screen->machine->pens[color];
