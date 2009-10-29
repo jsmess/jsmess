@@ -644,6 +644,20 @@ WRITE8_HANDLER(at_kbdc8042_w)
  **********************************************************/
 
 
+static READ8_HANDLER( input_port_0_r ) { return input_port_read(space->machine, "IN0"); }
+
+static const struct pc_vga_interface vga_interface =
+{
+	1,
+	NULL, //at_map_vga_memory,
+
+	input_port_0_r,
+
+	ADDRESS_SPACE_IO,
+	0x0000
+};
+
+
 DRIVER_INIT( atcga )
 {
 	static const struct kbdc8042_interface at8042 =
@@ -690,6 +704,7 @@ DRIVER_INIT( at386 )
 		KBDC8042_STANDARD, at_set_gate_a20, at_keyboard_interrupt, at_get_out2
 	};
 	init_at_common(machine, &at8042);
+	pc_vga_init(machine, &vga_interface, NULL);
 
 	/* Attach keyboard to the keyboard controller */
 	at_kbdc8042_set_keyboard_interface( machine, kb_keytronic_set_clock_signal, kb_keytronic_set_data_signal );
@@ -724,19 +739,6 @@ static void at_map_vga_memory(running_machine *machine, offs_t begin, offs_t end
 }
 
 */
-
-static READ8_HANDLER( input_port_0_r ) { return input_port_read(space->machine, "IN0"); }
-
-static const struct pc_vga_interface vga_interface =
-{
-	1,
-	NULL, //at_map_vga_memory,
-
-	input_port_0_r,
-
-	ADDRESS_SPACE_IO,
-	0x0000
-};
 
 
 
