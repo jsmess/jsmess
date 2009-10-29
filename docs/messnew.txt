@@ -278,6 +278,10 @@ User Interface Changes:
 - Fixed Tape UI display for systems with multiple cassettes (bug #1677)
   [Dirk Best]
   
+- Fixed assert in newui when trying to configure an emulated controller 
+  and no controller has been connected (through PORT_CATEGORY) to the 
+  emulated system (bug #1878) [Fabio Priuli]
+
 
 
 Imgtool Changes:

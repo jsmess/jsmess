@@ -1951,7 +1951,8 @@ static int invoke_command(HWND wnd, UINT command)
 							section = setting->name;
 						}
 					}
-					customize_categorizedinput(window->machine, wnd, section, category);
+					if (category)
+						customize_categorizedinput(window->machine, wnd, section, category);
 				}
 				else
 				{
