@@ -56,6 +56,17 @@ INLINE tf20_state *get_safe_token(const device_config *device)
     IMPLEMENTATION
 ***************************************************************************/
 
+/* serial clock, 38400 baud by default */
+static TIMER_DEVICE_CALLBACK( serial_clock )
+{
+	tf20_state *tf20 = get_safe_token(timer->owner);
+
+	upd7201_rxca_w(tf20->upd7201, ASSERT_LINE);
+	upd7201_txca_w(tf20->upd7201, ASSERT_LINE);
+	upd7201_rxcb_w(tf20->upd7201, ASSERT_LINE);
+	upd7201_txcb_w(tf20->upd7201, ASSERT_LINE);
+}
+
 /* a read from this location disables the rom */
 static READ8_HANDLER( tf20_rom_disable )
 {
@@ -82,56 +93,77 @@ static WRITE8_HANDLER( tf20_fdc_control_w )
 	/* bit 0, motor on signal */
 }
 
+
+/***************************************************************************
+    EXTERNAL INTERFACE
+***************************************************************************/
+
 /* serial output signal (to the host computer) */
 READ_LINE_DEVICE_HANDLER( tf20_rxs_r )
 {
+	tf20_state *tf20 = get_safe_token(device);
 	logerror("%s: tf20_rxs_r\n", cpuexec_describe_context(device->machine));
 
-	return 0;
+	return upd7201_txda_r(tf20->upd7201);
 }
 
 READ_LINE_DEVICE_HANDLER( tf20_pins_r )
 {
+	tf20_state *tf20 = get_safe_token(device);
 	logerror("%s: tf20_pins_r\n", cpuexec_describe_context(device->machine));
 
-	return 0;
+	return upd7201_dtra_r(tf20->upd7201);
 }
 
 /* serial input signal (from host computer) */
 WRITE_LINE_DEVICE_HANDLER( tf20_txs_w )
 {
+	tf20_state *tf20 = get_safe_token(device);
 	logerror("%s: tf20_rxd1_w %u\n", cpuexec_describe_context(device->machine), state);
+
+	upd7201_rxda_w(tf20->upd7201, state);
 }
 
 WRITE_LINE_DEVICE_HANDLER( tf20_pouts_w )
 {
+	tf20_state *tf20 = get_safe_token(device);
 	logerror("%s: tf20_pouts_w %u\n", cpuexec_describe_context(device->machine), state);
+
+	upd7201_ctsa_w(tf20->upd7201, state);
 }
 
 /* serial output signal (to another terminal) */
-READ_LINE_DEVICE_HANDLER( tf20_txc_r )
+WRITE_LINE_DEVICE_HANDLER( tf20_txc_w )
 {
-	logerror("%s: tf20_txc_r\n", cpuexec_describe_context(device->machine));
+	tf20_state *tf20 = get_safe_token(device);
+	logerror("%s: tf20_txc_w %u\n", cpuexec_describe_context(device->machine), state);
 
-	return 0;
+	upd7201_rxda_w(tf20->upd7201, state);
 }
 
 /* serial input signal (from another terminal) */
-WRITE_LINE_DEVICE_HANDLER( tf20_rxc_w )
+READ_LINE_DEVICE_HANDLER( tf20_rxc_r )
 {
-	logerror("%s: tf20_rxc_w %u\n", cpuexec_describe_context(device->machine), state);
+	tf20_state *tf20 = get_safe_token(device);
+	logerror("%s: tf20_rxc_r\n", cpuexec_describe_context(device->machine));
+
+	return upd7201_txda_r(tf20->upd7201);
 }
 
-READ_LINE_DEVICE_HANDLER( tf20_poutc_r )
+WRITE_LINE_DEVICE_HANDLER( tf20_poutc_w )
 {
-	logerror("%s: tf20_poutc_r\n", cpuexec_describe_context(device->machine));
+	tf20_state *tf20 = get_safe_token(device);
+	logerror("%s: tf20_poutc_w %u\n", cpuexec_describe_context(device->machine), state);
 
-	return 0;
+	upd7201_ctsa_w(tf20->upd7201, state);
 }
 
-WRITE_LINE_DEVICE_HANDLER( tf20_pinc_w )
+READ_LINE_DEVICE_HANDLER( tf20_pinc_r )
 {
-	logerror("%s: tf20_pinc_w %u\n", cpuexec_describe_context(device->machine), state);
+	tf20_state *tf20 = get_safe_token(device);
+	logerror("%s: tf20_pinc_r\n", cpuexec_describe_context(device->machine));
+
+	return upd7201_dtra_r(tf20->upd7201);
 }
 
 
@@ -229,6 +261,7 @@ static MACHINE_DRIVER_START( tf20 )
 
 	/* upd7201 serial interface */
 	MDRV_UPD7201_ADD("3a", XTAL_CR1 / 2, tf20_upd7201_intf)
+	MDRV_TIMER_ADD_PERIODIC("serial_timer", serial_clock, HZ(XTAL_CR2 / 128))
 
 	/* 2 floppy drives */
 	MDRV_FLOPPY_2_DRIVES_ADD(tf20_floppy_config)
@@ -253,8 +286,17 @@ static DEVICE_START( tf20 )
 {
 	tf20_state *tf20 = get_safe_token(device);
 
-	/* locate child devices */
+	/* ram device */
 	tf20->ram = device_find_child_by_tag(device, "ram");
+
+	/* make sure its already running */
+	if (!tf20->ram->started)
+	{
+		device_delay_init(device);
+		return;
+	}
+
+	/* locate child devices */
 	tf20->upd765a = device_find_child_by_tag(device, "5a");
 	tf20->upd7201 = device_find_child_by_tag(device, "3a");
 

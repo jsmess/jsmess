@@ -31,16 +31,16 @@ struct _tf20_interface
 DEVICE_GET_INFO( tf20 );
 
 /* serial interface in (to the host computer) */
-READ_LINE_DEVICE_HANDLER( tf20_rxs_r );
-READ_LINE_DEVICE_HANDLER( tf20_pins_r );
 WRITE_LINE_DEVICE_HANDLER( tf20_txs_w );
+READ_LINE_DEVICE_HANDLER( tf20_rxs_r );
 WRITE_LINE_DEVICE_HANDLER( tf20_pouts_w );
+READ_LINE_DEVICE_HANDLER( tf20_pins_r );
 
 /* serial interface out (to another terminal) */
-READ_LINE_DEVICE_HANDLER( tf20_txc_r );
-WRITE_LINE_DEVICE_HANDLER( tf20_rxc_w );
-READ_LINE_DEVICE_HANDLER( tf20_poutc_r );
-WRITE_LINE_DEVICE_HANDLER( tf20_pinc_w );
+WRITE_LINE_DEVICE_HANDLER( tf20_txc_r );
+READ_LINE_DEVICE_HANDLER( tf20_rxc_w );
+WRITE_LINE_DEVICE_HANDLER( tf20_poutc_r );
+READ_LINE_DEVICE_HANDLER( tf20_pinc_w );
 
 
 /***************************************************************************

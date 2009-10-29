@@ -1,6 +1,6 @@
 /**********************************************************************
 
-    NEC ?PD7201 Multiprotocol Serial Communications Controller emulation
+    NEC µPD7201 Multiprotocol Serial Communications Controller
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -30,8 +30,8 @@
 
 **********************************************************************/
 
-#ifndef __UPD7201__
-#define __UPD7201__
+#ifndef __UPD7201_H__
+#define __UPD7201_H__
 
 #include "devcb.h"
 
@@ -93,10 +93,6 @@ WRITE8_DEVICE_HANDLER( upd7201_cd_ba_w );
 READ8_DEVICE_HANDLER( upd7201_ba_cd_r );
 WRITE8_DEVICE_HANDLER( upd7201_ba_cd_w );
 
-/* hold acknowledge input */
-READ8_DEVICE_HANDLER( upd7201_hai_r );
-WRITE8_DEVICE_HANDLER( upd7201_hai_w );
-
 /* interrupt acknowledge */
 READ8_DEVICE_HANDLER( upd7201_intak_r );
 
@@ -104,10 +100,26 @@ READ8_DEVICE_HANDLER( upd7201_intak_r );
 WRITE_LINE_DEVICE_HANDLER( upd7201_synca_w );
 WRITE_LINE_DEVICE_HANDLER( upd7201_syncb_w );
 
+/* clear to send */
+WRITE_LINE_DEVICE_HANDLER( upd7201_ctsa_w );
+WRITE_LINE_DEVICE_HANDLER( upd7201_ctsb_w );
+
+/* data terminal ready, hold acknowledge */
+READ_LINE_DEVICE_HANDLER( upd7201_dtra_r );
+READ_LINE_DEVICE_HANDLER( upd7201_dtrb_r );
+WRITE_LINE_DEVICE_HANDLER( upd7201_hoi_w );
+
+/* serial data */
+WRITE_LINE_DEVICE_HANDLER( upd7201_rxda_w );
+READ_LINE_DEVICE_HANDLER( upd7201_txda_r );
+WRITE_LINE_DEVICE_HANDLER( upd7201_rxdb_w );
+READ_LINE_DEVICE_HANDLER( upd7201_txdb_r );
+
 /* clock inputs */
 WRITE_LINE_DEVICE_HANDLER( upd7201_rxca_w );
 WRITE_LINE_DEVICE_HANDLER( upd7201_rxcb_w );
 WRITE_LINE_DEVICE_HANDLER( upd7201_txca_w );
 WRITE_LINE_DEVICE_HANDLER( upd7201_txcb_w );
 
-#endif
+
+#endif	/* __UPD7201_H__ */
