@@ -1365,7 +1365,7 @@ static int adb_listenreg, adb_listenaddr;
 
 // ADB mouse state
 static int adb_mouseaddr = 3;
-static int adb_lastmousex, adb_lastmousey, adb_mouse_wanted_srq, adb_mouse_initialized;
+static int adb_lastmousex, adb_lastmousey, adb_lastbutton, adb_mouse_wanted_srq, adb_mouse_initialized;
 
 // ADB keyboard state
 static int adb_keybaddr = 2;
@@ -1377,12 +1377,13 @@ static const char *const adb_statenames[4] = { "NEW", "EVEN", "ODD", "IDLE" };
 
 static void mac_adb_pollmouse(running_machine *machine)
 {
-	int NewX, NewY;
+	int NewX, NewY, NewButton;
 
+	NewButton = input_port_read(machine, "MOUSE0") & 0x01;
 	NewX = input_port_read(machine, "MOUSE2");
 	NewY = input_port_read(machine, "MOUSE1");
 
-	if ((NewX != adb_lastmousex) || (NewY != adb_lastmousey))
+	if ((NewX != adb_lastmousex) || (NewY != adb_lastmousey) || (NewButton != adb_lastbutton))
 	{
 		adb_mouse_wanted_srq = 1;
 	}
@@ -1426,6 +1427,8 @@ static void mac_adb_accummouse( running_machine *machine, UINT8 *MouseX, UINT8 *
 		adb_lastmousey = NewY;
 	}
 
+	adb_lastbutton = input_port_read(machine, "MOUSE0") & 0x01;
+
 	adb_mouse_wanted_srq = 0;
 
 	*MouseX = (UINT8)MouseCountX;
@@ -1439,10 +1442,12 @@ static void mac_adb_talk(running_machine *machine)
 	addr = (adb_command>>4);
 	reg = (adb_command & 3);
 
-//  printf("Mac sent %x\n", adb_command);
+//	printf("Mac sent %x (cmd %d addr %d reg %d mr %d kr %d)\n", adb_command, (adb_command>>2)&3, addr, reg, adb_mouseaddr, adb_keybaddr);
 
 	if (adb_waiting_cmd)
 	{
+		const device_config *via_0 = devtag_get_device(machine, "via6522_0");
+
 		switch ((adb_command>>2)&3)
 		{
 			case 0:
@@ -1457,6 +1462,15 @@ static void mac_adb_talk(running_machine *machine)
 					case ADB_CMD_FLUSH:
 						adb_direction = 0;
 						adb_send = 0;
+
+						adb_buffer[0] = 0xff;
+						adb_datasize = 1;
+
+						// it's not documented how to respond, but yanking SRQ seems to work
+						adb_extclock ^= 1;
+						via_cb1_w(via_0, 0, adb_extclock);
+						adb_extclock ^= 1;
+						via_cb1_w(via_0, 0, adb_extclock);
 						break;
 
 					default:	// reserved/unused
@@ -1537,6 +1551,12 @@ static void mac_adb_talk(running_machine *machine)
 							break;
 					}
 				}
+				else
+				{
+//					printf("talking to unconnected device\n");
+					adb_buffer[0] = adb_buffer[1] = 0xff;
+					adb_datasize = 0;
+				}
 
 				// if the mouse has new data and it's not what we're polling, yank SRQ
 				if ((addr != adb_mouseaddr) && (adb_mouse_initialized))
@@ -1587,7 +1607,7 @@ static READ8_DEVICE_HANDLER(mac_adb_via_in_cb2)
 	ret = (adb_send & 0x80)>>7;
 	adb_send <<= 1;
 
-//  printf("IN CB2 = %x\n", ret);
+//	printf("IN CB2 = %x\n", ret);
 
 	return ret;
 }
@@ -1616,6 +1636,7 @@ static void mac_adb_newaction(int state)
 				adb_command = adb_send = 0;
 				adb_direction = 1;	// Mac is shifting us a command
 				adb_waiting_cmd = 1;	// we're going to get a command
+				timer_adjust_oneshot(mac_adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
 				break;
 
 			case ADB_STATE_XFER_EVEN:
@@ -1640,16 +1661,18 @@ static void mac_adb_newaction(int state)
 				}
 				else
 				{
-					adb_send = 0;
+					adb_send = 0xff;	// try pulling up?
 				}
+				timer_adjust_oneshot(mac_adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
 				break;
 
 			case ADB_STATE_IDLE:
+				adb_send = 0xff;
 				break;
 		}
 
 		// no matter what, generate 8 clocks (should this happen on IDLE?)
-		timer_adjust_oneshot(mac_adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
+//		timer_adjust_oneshot(mac_adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
 	}
 }
 
@@ -1659,11 +1682,20 @@ static void adb_vblank(running_machine *machine)
 	// (no need to actually generate an IRQ, the Mac will see it)
 	if ((adb_mouse_wanted_srq) || (adb_keyb_wanted_srq))
 	{
+//		printf("ADB IRQ: kb %d ms %d\n", adb_keyb_wanted_srq, adb_mouse_wanted_srq);
 		adb_irq_pending = 1;
 	}
 	else
 	{
 		adb_irq_pending = 0;
+		mac_adb_pollmouse(machine);
+
+		if ((adb_state == ADB_STATE_IDLE) && (adb_mouse_wanted_srq))
+		{
+			adb_timer_ticks = 8;
+			timer_adjust_oneshot(mac_adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
+			adb_mouse_wanted_srq = 0;
+		}
 	}
 }
 
@@ -1681,7 +1713,7 @@ static void adb_reset(void)
 
 	// mouse
 	adb_mouseaddr = 3;
-	adb_lastmousex = adb_lastmousey = 0;
+	adb_lastmousex = adb_lastmousey = adb_lastbutton = 0;
 	adb_mouse_wanted_srq = 0;
 	adb_mouse_initialized = 0;
 
