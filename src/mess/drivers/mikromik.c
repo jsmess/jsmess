@@ -51,7 +51,7 @@
 	2164-6P (64Kx1 DRAM)*8 = 64KB Work RAM
 
 	DMA channels:
-	
+
 	0	CRT
 	1	MPSC transmit
 	2	MPSC receive
@@ -293,7 +293,7 @@ static I8275_DISPLAY_PIXELS( crtc_display_pixels )
 	int i;
 
 	UINT8 data = (romdata << 1) | (d7 & d0);
-	
+
 	for (i = 0; i < 8; i++)
 	{
 		int qh = BIT(data, i);
@@ -430,15 +430,15 @@ static DMA8237_CHANNEL_READ( mpsc_dack_r )
 
 	/* clear data request */
 	dma8237_drq_write(state->i8237, DMA_MPSC_RX, CLEAR_LINE);
-	
-	return upd7201_hai_r(state->upd7201, 0);
+
+	return upd7201_dtra_r(state->upd7201);
 }
 
 static DMA8237_CHANNEL_WRITE( mpsc_dack_w )
 {
 	mm1_state *state = device->machine->driver_data;
 
-	upd7201_hai_w(state->upd7201, 0, data);
+	upd7201_hai_w(state->upd7201, data);
 
 	/* clear data request */
 	dma8237_drq_write(state->i8237, DMA_MPSC_TX, CLEAR_LINE);
@@ -447,7 +447,7 @@ static DMA8237_CHANNEL_WRITE( mpsc_dack_w )
 static DMA8237_CHANNEL_READ( fdc_dack_r )
 {
 	mm1_state *state = device->machine->driver_data;
-	
+
 	return upd765_dack_r(state->upd765, 0);
 }
 
@@ -626,7 +626,7 @@ static TIMER_DEVICE_CALLBACK( kbclk_tick )
 		/* get key data from PROM */
 		keydata = state->key_rom[(ctrl << 8) | (shift << 7) | (state->drive << 3) | (state->sense)];
 	}
-	
+
 	if (state->keydata != keydata)
 	{
 		/* latch key data */
@@ -793,12 +793,12 @@ static MACHINE_DRIVER_START( mm1 )
 	MDRV_PIT8253_ADD(I8253_TAG, mm1_pit8253_intf)
 	MDRV_UPD765A_ADD(UPD765_TAG, /* XTAL_16MHz/2/2, */ mm1_upd765_intf)
 	MDRV_UPD7201_ADD(UPD7201_TAG, XTAL_6_144MHz/2, mm1_upd7201_intf)
-	
+
 	MDRV_FLOPPY_2_DRIVES_ADD(mm1_floppy_config)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("64K")		
+	MDRV_RAM_DEFAULT_SIZE("64K")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( mm1m6 )

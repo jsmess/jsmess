@@ -63,15 +63,6 @@ WRITE8_DEVICE_HANDLER( upd7201_ba_cd_w )
 {
 }
 
-READ8_DEVICE_HANDLER( upd7201_hai_r )
-{
-	return 0;
-}
-
-WRITE8_DEVICE_HANDLER( upd7201_hai_w )
-{
-}
-
 READ8_DEVICE_HANDLER( upd7201_intak_r )
 {
 	return 0;
@@ -108,7 +99,7 @@ READ_LINE_DEVICE_HANDLER( upd7201_dtrb_r )
 }
 
 /* hold acknowledge input (same pin as dtrb) */
-WRITE_LINE_DEVICE_HANDLER( upd7201_hoi_w )
+WRITE_LINE_DEVICE_HANDLER( upd7201_hai_w )
 {
 
 }

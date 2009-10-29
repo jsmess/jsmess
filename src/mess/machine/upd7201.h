@@ -107,7 +107,7 @@ WRITE_LINE_DEVICE_HANDLER( upd7201_ctsb_w );
 /* data terminal ready, hold acknowledge */
 READ_LINE_DEVICE_HANDLER( upd7201_dtra_r );
 READ_LINE_DEVICE_HANDLER( upd7201_dtrb_r );
-WRITE_LINE_DEVICE_HANDLER( upd7201_hoi_w );
+WRITE_LINE_DEVICE_HANDLER( upd7201_hai_w );
 
 /* serial data */
 WRITE_LINE_DEVICE_HANDLER( upd7201_rxda_w );
