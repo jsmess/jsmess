@@ -1070,9 +1070,9 @@ ROM_END
 
 ROM_START( at386 )
     ROM_REGION(0x1000000,"maincpu", 0)
-    ROM_LOAD("et4000.bin", 0xc0000, 0x8000, CRC(f01e4be0) SHA1(95d75ff41bcb765e50bd87a8da01835fd0aa01d5))
-    ROM_LOAD("wdbios.rom", 0xc8000,  0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))
-    ROM_LOAD("at386.bin", 0xf0000, 0x10000, CRC(3df9732a) SHA1(def71567dee373dc67063f204ef44ffab9453ead))
+    ROM_LOAD("et4000.bin", 0xc0000, 0x08000, CRC(f01e4be0) SHA1(95d75ff41bcb765e50bd87a8da01835fd0aa01d5))
+    ROM_LOAD("wdbios.rom", 0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))
+    ROM_LOAD("at386.bin",  0xf0000, 0x10000, CRC(3df9732a) SHA1(def71567dee373dc67063f204ef44ffab9453ead))
 	ROM_RELOAD(0xff0000,0x10000)
 
 	/* 8042 keyboard controller */
@@ -1087,7 +1087,7 @@ ROM_END
 
 ROM_START( at486 )
 	ROM_REGION(0x1000000, "maincpu", 0)
-	ROM_LOAD("et4000.bin", 0xc0000, 0x8000, CRC(f01e4be0) SHA1(95d75ff41bcb765e50bd87a8da01835fd0aa01d5))
+	ROM_LOAD("et4000.bin", 0xc0000, 0x08000, CRC(f01e4be0) SHA1(95d75ff41bcb765e50bd87a8da01835fd0aa01d5))
 	ROM_LOAD("wdbios.rom", 0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))
 
 	ROM_SYSTEM_BIOS(0, "at486", "PC/AT 486")	\
@@ -1110,11 +1110,9 @@ ROM_END
 
 ROM_START( at586 )
 	ROM_REGION32_LE(0x40000, "user1", 0)
+	ROM_LOAD("et4000.bin",  0x00000, 0x08000, CRC(f01e4be0) SHA1(95d75ff41bcb765e50bd87a8da01835fd0aa01d5))
     ROM_LOAD("wdbios.rom",  0x08000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))
     ROM_LOAD("at586.bin",   0x20000, 0x20000, CRC(717037f5) SHA1(1d49d1b7a4a40d07d1a897b7f8c827754d76f824))
-
-	ROM_REGION(0x08100, "gfx1", 0)
-    ROM_LOAD("cga.chr",     0x00000, 0x01000, CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd))
 
 	/* 8042 keyboard controller */
 	ROM_REGION( 0x0800, "kbdc8042", 0 )
@@ -1140,5 +1138,5 @@ COMP ( 1987, at,       ibm5170, 0,       ibm5162,  atcga,	atcga,	    0,   "",  "
 COMP ( 1989, neat,     ibm5170, 0,       ibm5162,  atcga,	atcga,	    0,   "",  "NEAT (CGA, MF2 Keyboard)", GAME_NOT_WORKING )
 COMP ( 1988, at386,    ibm5170, 0,       at386,     atvga,	at386,	    0,   "MITAC INC",  "PC/AT 386 (VGA, MF2 Keyboard)", GAME_NOT_WORKING )
 COMP ( 1990, at486,    ibm5170, 0,       at486,     atvga,	at386,	    0,   "",  "PC/AT 486 (VGA, MF2 Keyboard)", GAME_NOT_WORKING )
-COMP ( 1990, at586,    ibm5170, 0,       at586,     atcga,	at586,	    0,   "",  "PC/AT 586 (CGA, MF2 Keyboard)", GAME_NOT_WORKING )
+COMP ( 1990, at586,    ibm5170, 0,       at586,     atvga,	at586,	    0,   "",  "PC/AT 586 (VGA, MF2 Keyboard)", GAME_NOT_WORKING )
 COMP ( 1987, atvga,    ibm5170, 0,       atvga,     atvga,	at_vga,     0,   "",  "PC/AT (VGA, MF2 Keyboard)" , GAME_NOT_WORKING )

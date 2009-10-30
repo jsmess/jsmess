@@ -38,8 +38,8 @@ System Driver Changes:
 
 - [AT] Fixed display for PC/AT and NEAT. [Miodrag Milanovic]
 
-- [AT] Hooked up VGA to at386 and at486 (only the latter shows anything
-  currently). [Justin Kerk]
+- [AT] Changed the display for the 386-class drivers from CGA to VGA.
+  [Justin Kerk]
 
 - [ATARIXL] TRIG3 GTIA register handling is fixed, so more games boot 
   and work properly [Mariusz Wojcieszek]
