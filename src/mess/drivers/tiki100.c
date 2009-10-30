@@ -541,7 +541,7 @@ static const wd17xx_interface tiki100_wd17xx_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
-	{FLOPPY_0, FLOPPY_1, NULL, NULL}
+	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
 };
 
 /* AY-3-8912 Interface */
@@ -551,7 +551,6 @@ static WRITE8_DEVICE_HANDLER( video_scroll_w )
 	tiki100_state *state = device->machine->driver_data;
 
 	state->scroll = data;
-	logerror("SCROLL %02x\n", data);
 }
 
 static const ay8910_interface ay8910_intf =
@@ -662,7 +661,7 @@ static MACHINE_DRIVER_START( tiki100 )
     MDRV_MACHINE_START(tiki100)
 
     /* video hardware */
-    MDRV_SCREEN_ADD("screen", RASTER)
+    MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
     MDRV_SCREEN_REFRESH_RATE(50)
     MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
     MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
