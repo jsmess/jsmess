@@ -35,6 +35,8 @@ struct _tf20_state
 	const device_config *ram;
 	const device_config *upd765a;
 	const device_config *upd7201;
+	const device_config *floppy_0;
+	const device_config *floppy_1;
 };
 
 
@@ -86,11 +88,34 @@ static READ8_HANDLER( tf20_dip_r )
 	return 0xff;
 }
 
+static READ8_DEVICE_HANDLER( tf20_upd765_tc_r )
+{
+	logerror("%s: tf20_upd765_tc_r\n", cpuexec_describe_context(device->machine));
+
+	/* set tc on read */
+	upd765_tc_w(device, ASSERT_LINE);
+
+	return 0xff;
+}
+
 static WRITE8_HANDLER( tf20_fdc_control_w )
 {
+	tf20_state *tf20 = get_safe_token(space->cpu->owner);
 	logerror("%s: tf20_fdc_control_w %02x\n", cpuexec_describe_context(space->machine), data);
 
 	/* bit 0, motor on signal */
+	floppy_drive_set_motor_state(tf20->floppy_0, BIT(data, 0));
+	floppy_drive_set_ready_state(tf20->floppy_0, BIT(data, 0), 1);
+	floppy_drive_set_motor_state(tf20->floppy_1, BIT(data, 0));
+	floppy_drive_set_ready_state(tf20->floppy_1, BIT(data, 0), 1);
+
+	/* clear tc on write */
+	upd765_tc_w(tf20->upd765a, CLEAR_LINE);
+}
+
+static IRQ_CALLBACK( tf20_irq_ack )
+{
+	return 0x00;
 }
 
 
@@ -119,7 +144,7 @@ READ_LINE_DEVICE_HANDLER( tf20_pins_r )
 WRITE_LINE_DEVICE_HANDLER( tf20_txs_w )
 {
 	tf20_state *tf20 = get_safe_token(device);
-	logerror("%s: tf20_rxd1_w %u\n", cpuexec_describe_context(device->machine), state);
+	logerror("%s: tf20_txs_w %u\n", cpuexec_describe_context(device->machine), state);
 
 	upd7201_rxda_w(tf20->upd7201, state);
 }
@@ -182,7 +207,7 @@ static ADDRESS_MAP_START( tf20_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE("3a", upd7201_ba_cd_r, upd7201_ba_cd_w)
 	AM_RANGE(0xf6, 0xf6) AM_READ(tf20_rom_disable)
 	AM_RANGE(0xf7, 0xf7) AM_READ(tf20_dip_r)
-	AM_RANGE(0xf8, 0xf8) AM_WRITE(tf20_fdc_control_w)
+	AM_RANGE(0xf8, 0xf8) AM_DEVREAD("5a", tf20_upd765_tc_r) AM_WRITE(tf20_fdc_control_w)
 	AM_RANGE(0xfa, 0xfa) AM_DEVREAD("5a", upd765_status_r)
 	AM_RANGE(0xfb, 0xfb) AM_DEVREADWRITE("5a", upd765_data_r, upd765_data_w)
 ADDRESS_MAP_END
@@ -231,7 +256,7 @@ static const upd765_interface tf20_upd765a_intf =
 	DEVCB_CPU_INPUT_LINE("tf20", INPUT_LINE_IRQ0),
 	NULL,
 	NULL,
-	UPD765_RDY_PIN_CONNECTED,
+	UPD765_RDY_PIN_NOT_CONNECTED,
 	{FLOPPY_0, FLOPPY_1, NULL, NULL}
 };
 
@@ -285,6 +310,9 @@ ROM_END
 static DEVICE_START( tf20 )
 {
 	tf20_state *tf20 = get_safe_token(device);
+	const device_config *cpu = device_find_child_by_tag(device, "tf20");
+
+	cpu_set_irq_callback(cpu, tf20_irq_ack);
 
 	/* ram device */
 	tf20->ram = device_find_child_by_tag(device, "ram");
@@ -299,6 +327,8 @@ static DEVICE_START( tf20 )
 	/* locate child devices */
 	tf20->upd765a = device_find_child_by_tag(device, "5a");
 	tf20->upd7201 = device_find_child_by_tag(device, "3a");
+	tf20->floppy_0 = device_find_child_by_tag(device, FLOPPY_0);
+	tf20->floppy_1 = device_find_child_by_tag(device, FLOPPY_1);
 
 	/* enable second half of ram */
 	memory_set_bankptr(device->machine, 22, messram_get_ptr(tf20->ram) + 0x8000);
