@@ -28,9 +28,6 @@
 
     TODO:
 
-    -   --- memory leak warning ---
-        allocation #004834, 256 bytes (src/lib/util/astring.c:127)
-        a total of 256 bytes were not free()'d
     - un-Y2K-hack tandy200
     - keyboard is unresponsive for couple of seconds after boot
     - soft power on/off
@@ -78,6 +75,7 @@
 #include "machine/i8155.h"
 #include "machine/rp5c01a.h"
 #include "machine/msm8251.h"
+#include "video/hd44102.h"
 #include "video/hd61830.h"
 #include "sound/speaker.h"
 #include "devices/messram.h"
@@ -473,6 +471,32 @@ static WRITE8_HANDLER( tandy200_stbk_w )
 	cassette_change_state(state->cassette, BIT(data, 1) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 }
 
+static READ8_HANDLER( lcd_r )
+{
+	kc85_state *state = space->machine->driver_data;
+
+	UINT8 data = 0;
+	int i;
+
+	for (i = 0; i < 10; i++)
+	{
+		data |= hd44102_r(state->hd44102[i], offset);
+	}
+
+	return data;
+}
+
+static WRITE8_HANDLER( lcd_w )
+{
+	kc85_state *state = space->machine->driver_data;
+	int i;
+
+	for (i = 0; i < 10; i++)
+	{
+		hd44102_w(state->hd44102[i], offset, data);
+	}
+}
+
 /* Memory Maps */
 
 static ADDRESS_MAP_START( kc85_mem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -504,8 +528,7 @@ static ADDRESS_MAP_START( kc85_io, ADDRESS_SPACE_IO, 8 )
 //  AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x0f) AM_DEVREADWRITE(IM6402_TAG, im6402_data_r, im6402_data_w)
 	AM_RANGE(0xd0, 0xd0) AM_MIRROR(0x0f) AM_READWRITE(uart_status_r, uart_ctrl_w)
 	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x0f) AM_READWRITE(keyboard_r, kc85_ctrl_w)
-	AM_RANGE(0xf0, 0xf0) AM_MIRROR(0x0e) AM_READWRITE(kc85_lcd_status_r, kc85_lcd_command_w)
-	AM_RANGE(0xf1, 0xf1) AM_MIRROR(0x0e) AM_READWRITE(kc85_lcd_data_r, kc85_lcd_data_w)
+	AM_RANGE(0xf0, 0xf1) AM_MIRROR(0x0e) AM_READWRITE(lcd_r, lcd_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( trsm100_io, ADDRESS_SPACE_IO, 8 )
@@ -518,8 +541,7 @@ static ADDRESS_MAP_START( trsm100_io, ADDRESS_SPACE_IO, 8 )
 //  AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x0f) AM_DEVREADWRITE(IM6402_TAG, im6402_data_r, im6402_data_w)
 	AM_RANGE(0xd0, 0xd0) AM_MIRROR(0x0f) AM_READWRITE(uart_status_r, uart_ctrl_w)
 	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x0f) AM_READWRITE(keyboard_r, kc85_ctrl_w)
-	AM_RANGE(0xf0, 0xf0) AM_MIRROR(0x0e) AM_READWRITE(kc85_lcd_status_r, kc85_lcd_command_w)
-	AM_RANGE(0xf1, 0xf1) AM_MIRROR(0x0e) AM_READWRITE(kc85_lcd_data_r, kc85_lcd_data_w)
+	AM_RANGE(0xf0, 0xf1) AM_MIRROR(0x0e) AM_READWRITE(lcd_r, lcd_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc8201_io, ADDRESS_SPACE_IO, 8 )
@@ -532,8 +554,7 @@ static ADDRESS_MAP_START( pc8201_io, ADDRESS_SPACE_IO, 8 )
 //  AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x0f) AM_DEVREADWRITE(IM6402_TAG, im6402_data_r, im6402_data_w)
 	AM_RANGE(0xd0, 0xd0) AM_MIRROR(0x0f) AM_READWRITE(pc8201_uart_status_r, uart_ctrl_w)
 	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x0f) AM_READ(keyboard_r)
-	AM_RANGE(0xf0, 0xf0) AM_MIRROR(0x0e) AM_READWRITE(kc85_lcd_status_r, kc85_lcd_command_w)
-	AM_RANGE(0xf1, 0xf1) AM_MIRROR(0x0e) AM_READWRITE(kc85_lcd_data_r, kc85_lcd_data_w)
+	AM_RANGE(0xf0, 0xf1) AM_MIRROR(0x0e) AM_READWRITE(lcd_r, lcd_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tandy200_io, ADDRESS_SPACE_IO, 8 )
@@ -545,8 +566,7 @@ static ADDRESS_MAP_START( tandy200_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xc1, 0xc1) AM_MIRROR(0x0e) AM_DEVREADWRITE(MSM8251_TAG, msm8251_status_r, msm8251_control_w)
 	AM_RANGE(0xd0, 0xd0) AM_MIRROR(0x0f) AM_READWRITE(tandy200_bank_r, tandy200_bank_w)
 	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x0f) AM_READWRITE(tandy200_stbk_r, tandy200_stbk_w)
-	AM_RANGE(0xf0, 0xf0) AM_MIRROR(0x0e) AM_DEVREADWRITE(HD61830_TAG, hd61830_data_r, hd61830_data_w)
-	AM_RANGE(0xf1, 0xf1) AM_MIRROR(0x0e) AM_DEVREADWRITE(HD61830_TAG, hd61830_status_r, hd61830_control_w)
+	AM_RANGE(0xf0, 0xf1) AM_MIRROR(0x0e) AM_DEVREADWRITE(HD61830_TAG, hd61830_r, hd61830_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -862,14 +882,14 @@ static WRITE8_DEVICE_HANDLER( kc85_8155_port_a_w )
 	state->keylatch = (state->keylatch & 0x100) | data;
 
 	/* LCD */
-	state->lcd_cs2[0] = BIT(data, 0);
-	state->lcd_cs2[1] = BIT(data, 1);
-	state->lcd_cs2[2] = BIT(data, 2);
-	state->lcd_cs2[3] = BIT(data, 3);
-	state->lcd_cs2[4] = BIT(data, 4);
-	state->lcd_cs2[5] = BIT(data, 5);
-	state->lcd_cs2[6] = BIT(data, 6);
-	state->lcd_cs2[7] = BIT(data, 7);
+	hd44102_cs2_w(state->hd44102[0], BIT(data, 0));
+	hd44102_cs2_w(state->hd44102[1], BIT(data, 1));
+	hd44102_cs2_w(state->hd44102[2], BIT(data, 2));
+	hd44102_cs2_w(state->hd44102[3], BIT(data, 3));
+	hd44102_cs2_w(state->hd44102[4], BIT(data, 4));
+	hd44102_cs2_w(state->hd44102[5], BIT(data, 5));
+	hd44102_cs2_w(state->hd44102[6], BIT(data, 6));
+	hd44102_cs2_w(state->hd44102[7], BIT(data, 7));
 
 	/* RTC */
 	upd1990a_c0_w(state->upd1990a, BIT(data, 0));
@@ -902,8 +922,8 @@ static WRITE8_DEVICE_HANDLER( kc85_8155_port_b_w )
 	state->keylatch = (BIT(data, 0) << 8) | (state->keylatch & 0xff);
 
 	/* LCD */
-	state->lcd_cs2[8] = BIT(data, 0);
-	state->lcd_cs2[9] = BIT(data, 1);
+	hd44102_cs2_w(state->hd44102[8], BIT(data, 0));
+	hd44102_cs2_w(state->hd44102[9], BIT(data, 1));
 
 	/* beeper */
 	state->buzzer = BIT(data, 2);
@@ -982,8 +1002,8 @@ static WRITE8_DEVICE_HANDLER( pc8201_8155_port_b_w )
 	state->keylatch = (BIT(data, 0) << 8) | (state->keylatch & 0xff);
 
 	/* LCD */
-	state->lcd_cs2[8] = BIT(data, 0);
-	state->lcd_cs2[9] = BIT(data, 1);
+	hd44102_cs2_w(state->hd44102[8], BIT(data, 0));
+	hd44102_cs2_w(state->hd44102[9], BIT(data, 1));
 
 	/* beeper */
 	state->buzzer = BIT(data, 2);
@@ -1497,7 +1517,7 @@ ROM_START( trsm100 )
 	ROM_CART_LOAD("cart", 0x0000, 0x8000, ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
-ROM_START( olivm10 )
+ROM_START( m10 )
 	// 3256C02-4B3/I        Italian
 	ROM_REGION( 0x8010, I8085_TAG, 0 )
 	ROM_LOAD( "m10rom.m12", 0x0000, 0x8000, CRC(f0e8447a) SHA1(d58867276213116a79f7074109b7d7ce02e8a3af) )
@@ -1528,12 +1548,12 @@ ROM_END
 
 /* System Drivers */
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    CONFIG      COMPANY                 FULLNAME */
-COMP( 1983,	kc85,		0,		0,		kc85,		kc85,		0,		0,		"Kyosei",				"Kyotronic 85 (Japan)", 0 )
-COMP( 1983, olivm10,	kc85,	0,		kc85,		olivm10,	0,		0,		"Olivetti",				"M-10", 0 )
-//COMP( 1983, olivm10m, kc85,   0,      kc85,       olivm10,    0,      0,       "Olivetti",             "M-10 Modem (US)", 0 )
-COMP( 1983, trsm100,	0,		0,		trsm100,	kc85,		0,		0,	"Tandy Radio Shack",	"TRS-80 Model 100", 0 )
-COMP( 1986, tandy102,	trsm100,0,		tandy102,	kc85,		0,		0,	"Tandy Radio Shack",	"Tandy 102", 0 )
-//COMP( 1983, npc8201,  0,      0,      pc8201,     pc8201a,    0,      0,     "NEC",                  "PC-8201 (Japan)", 0 )
-COMP( 1983, npc8201a,	0,		0,		pc8201,		pc8201a,	0,		0,		"NEC",					"PC-8201A", 0 )
-//COMP( 1987, npc8300,  npc8201,0,      pc8300,     pc8300,     0,      0,     "NEC",                  "PC-8300", 0 )
-COMP( 1984, tandy200,	0,		0,		tandy200,	kc85,		0,		0,	"Tandy Radio Shack",	"Tandy 200", 0 )
+COMP( 1983,	kc85,		0,		0,		kc85,		kc85,		0,		0,			"Kyosei",				"Kyotronic 85 (Japan)", 0 )
+COMP( 1983, m10,		kc85,	0,		kc85,		olivm10,	0,		0,			"Olivetti",				"M-10", 0 )
+//COMP( 1983, m10m,     kc85,   0,      kc85,       olivm10,    0,      0,			"Olivetti",             "M-10 Modem (US)", 0 )
+COMP( 1983, trsm100,	0,		0,		trsm100,	kc85,		0,		0,			"Tandy Radio Shack",	"TRS-80 Model 100", 0 )
+COMP( 1986, tandy102,	trsm100,0,		tandy102,	kc85,		0,		0,			"Tandy Radio Shack",	"Tandy 102", 0 )
+//COMP( 1983, npc8201,  0,      0,      pc8201,     pc8201a,    0,      0,			"NEC",                  "PC-8201 (Japan)", 0 )
+COMP( 1983, npc8201a,	0,		0,		pc8201,		pc8201a,	0,		0,			"NEC",					"PC-8201A", 0 )
+//COMP( 1987, npc8300,  npc8201,0,      pc8300,     pc8300,     0,      0,			"NEC",                  "PC-8300", 0 )
+COMP( 1984, tandy200,	0,		0,		tandy200,	kc85,		0,		0,			"Tandy Radio Shack",	"Tandy 200", 0 )

@@ -45,13 +45,12 @@ struct _hd44102_config
 /* device interface */
 DEVICE_GET_INFO( hd44102 );
 
-/* register access */
-READ8_DEVICE_HANDLER( hd44102_status_r );
-WRITE8_DEVICE_HANDLER( hd44102_control_w );
+/* chip select */
+WRITE_LINE_DEVICE_HANDLER( hd44102_cs2_w );
 
-/* memory access */
-READ8_DEVICE_HANDLER( hd44102_data_r );
-WRITE8_DEVICE_HANDLER( hd44102_data_w );
+/* register access */
+READ8_DEVICE_HANDLER( hd44102_r );
+WRITE8_DEVICE_HANDLER( hd44102_w );
 
 /* screen update */
 void hd44102_update(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect);

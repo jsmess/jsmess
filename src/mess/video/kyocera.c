@@ -3,70 +3,6 @@
 #include "video/hd44102.h"
 #include "video/hd61830.h"
 
-
-READ8_HANDLER( kc85_lcd_status_r )
-{
-	kc85_state *state = space->machine->driver_data;
-
-	UINT8 data = 0;
-	int i;
-
-	for (i = 0; i < 10; i++)
-	{
-		if (state->lcd_cs2[i])
-		{
-			data |= hd44102_status_r(state->hd44102[i], 0);
-		}
-	}
-
-	return data;
-}
-
-READ8_HANDLER( kc85_lcd_data_r )
-{
-	kc85_state *state = space->machine->driver_data;
-	UINT8 data = 0;
-	int i;
-
-	for (i = 0; i < 10; i++)
-	{
-		if (state->lcd_cs2[i])
-		{
-			data |= hd44102_data_r(state->hd44102[i], 0);
-		}
-	}
-
-	return data;
-}
-
-WRITE8_HANDLER( kc85_lcd_command_w )
-{
-	kc85_state *state = space->machine->driver_data;
-	int i;
-
-	for (i = 0; i < 10; i++)
-	{
-		if (state->lcd_cs2[i])
-		{
-			hd44102_control_w(state->hd44102[i], 0, data);
-		}
-	}
-}
-
-WRITE8_HANDLER( kc85_lcd_data_w )
-{
-	kc85_state *state = space->machine->driver_data;
-	int i;
-
-	for (i = 0; i < 10; i++)
-	{
-		if (state->lcd_cs2[i])
-		{
-			hd44102_data_w(state->hd44102[i], 0, data);
-		}
-	}
-}
-
 static PALETTE_INIT( kc85 )
 {
 	palette_set_color(machine, 0, MAKE_RGB(138, 146, 148));
@@ -88,15 +24,11 @@ static VIDEO_START( kc85 )
 	state->hd44102[7] = devtag_get_device(machine, "m8");
 	state->hd44102[8] = devtag_get_device(machine, "m9");
 	state->hd44102[9] = devtag_get_device(machine, "m10");
-
-	/* register for state saving */
-	state_save_register_global_array(machine, state->lcd_cs2);
 }
 
 static VIDEO_UPDATE( kc85 )
 {
 	kc85_state *state = screen->machine->driver_data;
-
 	int i;
 
 	for (i = 0; i < 10; i++)
@@ -113,12 +45,6 @@ static VIDEO_START( tandy200 )
 
 	/* find devices */
 	state->hd61830 = devtag_get_device(machine, HD61830_TAG);
-
-	/* allocate video memory */
-	state->video_ram = auto_alloc_array(machine, UINT8, TANDY200_VIDEORAM_SIZE);
-
-	/* register for state saving */
-	state_save_register_global_pointer(machine, state->video_ram, TANDY200_VIDEORAM_SIZE);
 }
 
 static VIDEO_UPDATE( tandy200 )
@@ -129,27 +55,6 @@ static VIDEO_UPDATE( tandy200 )
 
 	return 0;
 }
-
-static READ8_HANDLER( tandy200_rd_r )
-{
-	tandy200_state *state = space->machine->driver_data;
-
-	return state->video_ram[offset & TANDY200_VIDEORAM_MASK];
-}
-
-static WRITE8_HANDLER( tandy200_rd_w )
-{
-	tandy200_state *state = space->machine->driver_data;
-
-	state->video_ram[offset & TANDY200_VIDEORAM_MASK] = data;
-}
-
-static HD61830_INTERFACE( tandy200_hd61830_intf )
-{
-	SCREEN_TAG,
-	DEVCB_MEMORY_HANDLER(I8085_TAG, PROGRAM, tandy200_rd_r),
-	DEVCB_MEMORY_HANDLER(I8085_TAG, PROGRAM, tandy200_rd_w)
-};
 
 MACHINE_DRIVER_START( kc85_video )
 	MDRV_SCREEN_ADD(SCREEN_TAG, LCD)
@@ -196,5 +101,5 @@ MACHINE_DRIVER_START( tandy200_video )
 	MDRV_VIDEO_START(tandy200)
 	MDRV_VIDEO_UPDATE(tandy200)
 
-	MDRV_HD61830_ADD(HD61830_TAG, XTAL_4_9152MHz/2/2, tandy200_hd61830_intf)
+	MDRV_HD61830_ADD(HD61830_TAG, XTAL_4_9152MHz/2/2, SCREEN_TAG)
 MACHINE_DRIVER_END

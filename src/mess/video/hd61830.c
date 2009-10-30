@@ -11,6 +11,7 @@
 
     TODO:
 
+	- external ROM
     - text mode
 
 */
@@ -59,9 +60,6 @@ static const int HD61830_CYCLES[] = {
 typedef struct _hd61830_t hd61830_t;
 struct _hd61830_t
 {
-	devcb_resolved_read8		in_rd_func;
-	devcb_resolved_write8		out_rd_func;
-
 	int bf;						/* busy flag */
 
 	UINT8 ir;					/* instruction register */
@@ -95,11 +93,11 @@ INLINE hd61830_t *get_safe_token(const device_config *device)
 	return (hd61830_t *)device->token;
 }
 
-INLINE const hd61830_interface *get_interface(const device_config *device)
+INLINE hd61830_config *get_safe_config(const device_config *device)
 {
 	assert(device != NULL);
-	assert((device->type == HD61830));
-	return (const hd61830_interface *) device->static_config;
+	assert(device->type == HD61830);
+	return (hd61830_config *)device->inline_config;
 }
 
 /***************************************************************************
@@ -137,7 +135,7 @@ static void set_busy_flag(hd61830_t *hd61830, int period)
     hd61830_status_r - status read
 -------------------------------------------------*/
 
-READ8_DEVICE_HANDLER( hd61830_status_r )
+static READ8_DEVICE_HANDLER( hd61830_status_r )
 {
 	hd61830_t *hd61830 = get_safe_token(device);
 
@@ -150,7 +148,7 @@ READ8_DEVICE_HANDLER( hd61830_status_r )
     hd61830_control_w - control write
 -------------------------------------------------*/
 
-WRITE8_DEVICE_HANDLER( hd61830_control_w )
+static WRITE8_DEVICE_HANDLER( hd61830_control_w )
 {
 	hd61830_t *hd61830 = get_safe_token(device);
 
@@ -161,7 +159,7 @@ WRITE8_DEVICE_HANDLER( hd61830_control_w )
     hd61830_data_r - data read
 -------------------------------------------------*/
 
-READ8_DEVICE_HANDLER( hd61830_data_r )
+static READ8_DEVICE_HANDLER( hd61830_data_r )
 {
 	hd61830_t *hd61830 = get_safe_token(device);
 
@@ -169,7 +167,7 @@ READ8_DEVICE_HANDLER( hd61830_data_r )
 
 	if (LOG) logerror("HD61380 '%s' Display Data Read %02x\n", device->tag, hd61830->dor);
 
-	hd61830->dor = devcb_call_read8(&hd61830->in_rd_func, hd61830->cac);
+	hd61830->dor = memory_read_byte(device->space[0], hd61830->cac);
 
 	hd61830->cac++;
 
@@ -180,7 +178,7 @@ READ8_DEVICE_HANDLER( hd61830_data_r )
     hd61830_data_w - data write
 -------------------------------------------------*/
 
-WRITE8_DEVICE_HANDLER( hd61830_data_w )
+static WRITE8_DEVICE_HANDLER( hd61830_data_w )
 {
 	hd61830_t *hd61830 = get_safe_token(device);
 
@@ -258,7 +256,7 @@ WRITE8_DEVICE_HANDLER( hd61830_data_w )
 		break;
 
 	case HD61830_INSTRUCTION_DISPLAY_DATA_WRITE:
-		devcb_call_write8(&hd61830->out_rd_func, hd61830->cac, data);
+		memory_write_byte(device->space[0], hd61830->cac, data);
 
 		if (LOG) logerror("HD61380 '%s' Display Data Write %02x -> %04x row %u col %u\n", device->tag, data, hd61830->cac, hd61830->cac / 40, hd61830->cac % 40);
 
@@ -268,13 +266,13 @@ WRITE8_DEVICE_HANDLER( hd61830_data_w )
 	case HD61830_INSTRUCTION_CLEAR_BIT:
 		{
 		int nb = data & 0x07;
-		UINT8 data = devcb_call_read8(&hd61830->in_rd_func, hd61830->cac);
+		UINT8 data = memory_read_byte(device->space[0], hd61830->cac);
 
 		data &= ~(2 << nb);
 
 		if (LOG) logerror("HD61380 '%s' Clear Bit %u at %04x\n", device->tag, nb + 1, hd61830->cac);
 
-		devcb_call_write8(&hd61830->out_rd_func, hd61830->cac, data);
+		memory_write_byte(device->space[0], hd61830->cac, data);
 
 		hd61830->cac++;
 		}
@@ -283,13 +281,13 @@ WRITE8_DEVICE_HANDLER( hd61830_data_w )
 	case HD61830_INSTRUCTION_SET_BIT:
 		{
 		int nb = data & 0x07;
-		UINT8 data = devcb_call_read8(&hd61830->in_rd_func, hd61830->cac);
+		UINT8 data = memory_read_byte(device->space[0], hd61830->cac);
 
 		data |= 2 << nb;
 
 		if (LOG) logerror("HD61380 '%s' Set Bit %u at %04x\n", device->tag, nb + 1, hd61830->cac);
 
-		devcb_call_write8(&hd61830->out_rd_func, hd61830->cac, data);
+		memory_write_byte(device->space[0], hd61830->cac, data);
 
 		hd61830->cac++;
 		}
@@ -308,13 +306,14 @@ WRITE8_DEVICE_HANDLER( hd61830_data_w )
     draw_scanline - draw one scanline
 -------------------------------------------------*/
 
-static void draw_scanline(hd61830_t *hd61830, bitmap_t *bitmap, const rectangle *cliprect, int y, UINT16 ra)
+static void draw_scanline(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, int y, UINT16 ra)
 {
+	hd61830_t *hd61830 = get_safe_token(device);
 	int sx, x;
 
 	for (sx = 0; sx < hd61830->hn; sx++)
 	{
-		UINT8 data = devcb_call_read8(&hd61830->in_rd_func, ra++);
+		UINT8 data = memory_read_byte(device->space[0], ra++);
 
 		for (x = 0; x < hd61830->hp; x++)
 		{
@@ -328,8 +327,9 @@ static void draw_scanline(hd61830_t *hd61830, bitmap_t *bitmap, const rectangle 
     update_graphics - draw graphics mode screen
 -------------------------------------------------*/
 
-static void update_graphics(hd61830_t *hd61830, bitmap_t *bitmap, const rectangle *cliprect)
+static void update_graphics(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	hd61830_t *hd61830 = get_safe_token(device);
 	int y;
 
 	for (y = 0; y < hd61830->nx; y++)
@@ -338,10 +338,10 @@ static void update_graphics(hd61830_t *hd61830, bitmap_t *bitmap, const rectangl
 		UINT16 rac2 = rac1 + (hd61830->nx * hd61830->hn);
 
 		/* draw upper half scanline */
-		draw_scanline(hd61830, bitmap, cliprect, y, rac1);
+		draw_scanline(device, bitmap, cliprect, y, rac1);
 
 		/* draw lower half scanline */
-		draw_scanline(hd61830, bitmap, cliprect, y + hd61830->nx, rac2);
+		draw_scanline(device, bitmap, cliprect, y + hd61830->nx, rac2);
 	}
 }
 
@@ -355,9 +355,48 @@ void hd61830_update(const device_config *device, bitmap_t *bitmap, const rectang
 
 	if (hd61830->mcr & HD61830_MODE_GRAPHIC)
 	{
-		update_graphics(hd61830, bitmap, cliprect);
+		update_graphics(device, bitmap, cliprect);
+	}
+	else
+	{
+		logerror("HD61830 text mode not supported!\n");
 	}
 }
+
+/*-------------------------------------------------
+    hd61830_r - register read
+-------------------------------------------------*/
+
+READ8_DEVICE_HANDLER( hd61830_r )
+{
+	return (offset & 0x01) ? hd61830_status_r(device, offset) : hd61830_data_r(device, offset);
+}
+
+/*-------------------------------------------------
+    hd61830_w - register write
+-------------------------------------------------*/
+
+WRITE8_DEVICE_HANDLER( hd61830_w )
+{
+	(offset & 0x01) ? hd61830_control_w(device, offset, data) : hd61830_data_w(device, offset, data);
+}
+
+/*-------------------------------------------------
+    ROM( hd61830 )
+-------------------------------------------------*/
+
+ROM_START( hd61830 )
+	ROM_REGION( 0x398, "hd61830", ROMREGION_LOADBYNAME )
+	ROM_LOAD( "hd61830.bin", 0x000, 0x398, NO_DUMP ) /* internal 7360-bit chargen ROM */
+ROM_END
+
+/*-------------------------------------------------
+    ADDRESS_MAP( hd61830 )
+-------------------------------------------------*/
+
+static ADDRESS_MAP_START( hd61380, 0, 8 )
+	AM_RANGE(0x0000, 0xffff) AM_RAM
+ADDRESS_MAP_END
 
 /*-------------------------------------------------
     DEVICE_START( hd61830 )
@@ -366,14 +405,10 @@ void hd61830_update(const device_config *device, bitmap_t *bitmap, const rectang
 static DEVICE_START( hd61830 )
 {
 	hd61830_t *hd61830 = get_safe_token(device);
-	const hd61830_interface *intf = get_interface(device);
-
-	/* resolve callbacks */
-	devcb_resolve_read8(&hd61830->in_rd_func, &intf->in_rd_func, device);
-	devcb_resolve_write8(&hd61830->out_rd_func, &intf->out_rd_func, device);
+	const hd61830_config *config = get_safe_config(device);
 
 	/* get the screen device */
-	hd61830->screen = devtag_get_device(device->machine, intf->screen_tag);
+	hd61830->screen = devtag_get_device(device->machine, config->screen_tag);
 	assert(hd61830->screen != NULL);
 
 	/* create the busy timer */
@@ -415,10 +450,19 @@ DEVICE_GET_INFO( hd61830 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(hd61830_t);						break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;										break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = sizeof(hd61830_config);					break;
+		case DEVINFO_INT_DATABUS_WIDTH_0:				info->i = 8;										break;
+		case DEVINFO_INT_ADDRBUS_WIDTH_0:				info->i = 16;										break;
+		case DEVINFO_INT_ADDRBUS_SHIFT_0:				info->i = 0;										break;
 		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;					break;
 
-		/* --- the following bits of info are returned as pointers to data or functions --- */
+		/* --- the following bits of info are returned as pointers --- */
+		case DEVINFO_PTR_ROM_REGION:					info->romregion = ROM_NAME(hd61830);				break;
+
+		/* --- the following bits of info are returned as pointers to data --- */
+		case DEVINFO_PTR_DEFAULT_MEMORY_MAP_0:			info->default_map8 = ADDRESS_MAP_NAME(hd61380);		break;
+		
+		/* --- the following bits of info are returned as pointers to functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(hd61830);			break;
 		case DEVINFO_FCT_STOP:							/* Nothing */										break;
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(hd61830);			break;

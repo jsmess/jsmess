@@ -1334,8 +1334,8 @@ const game_driver * const drivers[] =
 
     /* Kyocera (and clones) */
     DRIVER( kc85 )
-    DRIVER( olivm10 )
-//  DRIVER( olivm10m )
+    DRIVER( m10 )
+//  DRIVER( m10m )
     DRIVER( trsm100 )
     DRIVER( tandy102 )
     DRIVER( tandy200 )

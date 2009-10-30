@@ -19,24 +19,18 @@
 
 #define HD61830 DEVICE_GET_INFO_NAME( hd61830 )
 
-#define MDRV_HD61830_ADD(_tag, _clock, _config) \
+#define MDRV_HD61830_ADD(_tag, _clock, _screen) \
 	MDRV_DEVICE_ADD(_tag, HD61830, _clock) \
-	MDRV_DEVICE_CONFIG(_config)
-
-#define HD61830_INTERFACE(name) \
-	const hd61830_interface (name) =
+	MDRV_DEVICE_CONFIG_DATAPTR(hd61830_config, screen_tag, _screen)
 
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _hd61830_interface hd61830_interface;
-struct _hd61830_interface
+typedef struct _hd61830_config hd61830_config;
+struct _hd61830_config
 {
 	const char *screen_tag;		/* screen we are acting on */
-
-	devcb_read8				in_rd_func;
-	devcb_write8			out_rd_func;
 };
 
 /***************************************************************************
@@ -47,12 +41,8 @@ struct _hd61830_interface
 DEVICE_GET_INFO( hd61830 );
 
 /* register access */
-READ8_DEVICE_HANDLER( hd61830_status_r );
-WRITE8_DEVICE_HANDLER( hd61830_control_w );
-
-/* memory access */
-READ8_DEVICE_HANDLER( hd61830_data_r );
-WRITE8_DEVICE_HANDLER( hd61830_data_w );
+READ8_DEVICE_HANDLER( hd61830_r );
+WRITE8_DEVICE_HANDLER( hd61830_w );
 
 /* screen update */
 void hd61830_update(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect);

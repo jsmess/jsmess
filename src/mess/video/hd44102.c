@@ -53,6 +53,7 @@ struct _hd44102_t
 	UINT8 status;					/* status register */
 	UINT8 output;					/* output register */
 
+	int cs2;						/* chip select */
 	int page;						/* display start page */
 	int x;							/* X address */
 	int y;							/* Y address */
@@ -84,7 +85,7 @@ INLINE hd44102_config *get_safe_config(const device_config *device)
     hd44102_status_r - status read
 -------------------------------------------------*/
 
-READ8_DEVICE_HANDLER( hd44102_status_r )
+static READ8_DEVICE_HANDLER( hd44102_status_r )
 {
 	hd44102_t *hd44102 = get_safe_token(device);
 
@@ -95,7 +96,7 @@ READ8_DEVICE_HANDLER( hd44102_status_r )
     hd44102_control_w - control write
 -------------------------------------------------*/
 
-WRITE8_DEVICE_HANDLER( hd44102_control_w )
+static WRITE8_DEVICE_HANDLER( hd44102_control_w )
 {
 	hd44102_t *hd44102 = get_safe_token(device);
 
@@ -173,7 +174,7 @@ static void count_up_or_down(hd44102_t *hd44102)
     hd44102_data_r - data read
 -------------------------------------------------*/
 
-READ8_DEVICE_HANDLER( hd44102_data_r )
+static READ8_DEVICE_HANDLER( hd44102_data_r )
 {
 	hd44102_t *hd44102 = get_safe_token(device);
 
@@ -190,7 +191,7 @@ READ8_DEVICE_HANDLER( hd44102_data_r )
     hd44102_data_w - data write
 -------------------------------------------------*/
 
-WRITE8_DEVICE_HANDLER( hd44102_data_w )
+static WRITE8_DEVICE_HANDLER( hd44102_data_w )
 {
 	hd44102_t *hd44102 = get_safe_token(device);
 
@@ -235,6 +236,48 @@ void hd44102_update(const device_config *device, bitmap_t *bitmap, const rectang
 }
 
 /*-------------------------------------------------
+    hd44102_cs2_w - chip select write
+-------------------------------------------------*/
+
+WRITE_LINE_DEVICE_HANDLER( hd44102_cs2_w )
+{
+	hd44102_t *hd44102 = get_safe_token(device);
+
+	hd44102->cs2 = state;
+}
+
+/*-------------------------------------------------
+    hd44102_r - register read
+-------------------------------------------------*/
+
+READ8_DEVICE_HANDLER( hd44102_r )
+{
+	hd44102_t *hd44102 = get_safe_token(device);
+	UINT8 data = 0;
+
+	if (hd44102->cs2)
+	{
+		data = (offset & 0x01) ? hd44102_data_r(device, offset) : hd44102_status_r(device, offset);
+	}
+
+	return data;
+}
+
+/*-------------------------------------------------
+    hd44102_w - register write
+-------------------------------------------------*/
+
+WRITE8_DEVICE_HANDLER( hd44102_w )
+{
+	hd44102_t *hd44102 = get_safe_token(device);
+
+	if (hd44102->cs2)
+	{
+		(offset & 0x01) ? hd44102_data_w(device, offset, data) : hd44102_control_w(device, offset, data);
+	}
+}
+
+/*-------------------------------------------------
     DEVICE_START( hd44102 )
 -------------------------------------------------*/
 
@@ -248,6 +291,7 @@ static DEVICE_START( hd44102 )
 	assert(hd44102->screen != NULL);
 
 	/* register for state saving */
+	state_save_register_device_item(device, 0, hd44102->cs2);
 	state_save_register_device_item(device, 0, hd44102->status);
 	state_save_register_device_item(device, 0, hd44102->output);
 	state_save_register_device_item(device, 0, hd44102->page);

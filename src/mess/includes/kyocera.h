@@ -11,15 +11,12 @@
 #define CENTRONICS_TAG	"centronics"
 
 //#define I8085_TAG     "m19"
-//#define I8155_TAG "m12"
+//#define I8155_TAG		"m12"
 //#define MC14412_TAG   "m8"
 #define RP5C01A_TAG		"m301"
 #define TCM5089_TAG		"m11"
 #define HD61830_TAG		"m18"
 #define MSM8251_TAG		"m20"
-
-#define TANDY200_VIDEORAM_SIZE	0x2000
-#define TANDY200_VIDEORAM_MASK	0x1fff
 
 typedef struct _kc85_state kc85_state;
 struct _kc85_state
@@ -31,10 +28,7 @@ struct _kc85_state
 	int upd1990a_data;		/* RTC data output */
 
 	/* keyboard state */
-	UINT16 keylatch;
-
-	/* video state */
-	int lcd_cs2[10];		/* LCD driver chip select */
+	UINT16 keylatch;		/* keyboard latch */
 
 	/* sound state */
 	int buzzer;				/* buzzer select */
@@ -59,11 +53,8 @@ struct _tandy200_state
 	UINT8 bank;				/* memory bank selection */
 
 	/* keyboard state */
-	UINT16 keylatch;
+	UINT16 keylatch;		/* keyboard latch */
 	int tp;					/* timing pulse */
-
-	/* video state */
-	UINT8 *video_ram;		/* video RAM */
 
 	/* sound state */
 	int buzzer;				/* buzzer select */
@@ -79,11 +70,6 @@ struct _tandy200_state
 };
 
 /* ---------- defined in video/kyocera.c ---------- */
-
-READ8_HANDLER( kc85_lcd_status_r );
-READ8_HANDLER( kc85_lcd_data_r );
-WRITE8_HANDLER( kc85_lcd_command_w );
-WRITE8_HANDLER( kc85_lcd_data_w );
 
 MACHINE_DRIVER_EXTERN( kc85_video );
 MACHINE_DRIVER_EXTERN( tandy200_video );
