@@ -295,13 +295,10 @@ static void upd765_seek_complete(const device_config *device)
 	const device_config *img = current_image(device);
 	upd765_t *fdc = get_safe_token(device);
 
-	if (!img)
-		return;
-
 	fdc->pcn[fdc->drive] = fdc->ncn;
 
 	/* drive ready? */
-	if (floppy_drive_get_flag_state(img, FLOPPY_DRIVE_READY))
+	if (img != NULL && floppy_drive_get_flag_state(img, FLOPPY_DRIVE_READY))
 	{
 		/* yes */
 
@@ -505,7 +502,7 @@ static void upd765_seek_setup(const device_config *device, int is_recalibrate)
 
 	fdc->FDC_main |= (1<<fdc->drive);
 	fdc->FDC_main |= 0x20;  // execution phase
-	fdc->FDC_main &= ~0x10;  // not busy, can send another seek/recalibrate 
+	fdc->FDC_main &= ~0x10;  // not busy, can send another seek/recalibrate
 	                         // for a different drive, or sense int status
 
 	/* recalibrate command? */
@@ -516,8 +513,7 @@ static void upd765_seek_setup(const device_config *device, int is_recalibrate)
 		fdc->ncn = 0;
 
 		/* if drive is already at track 0, or drive is not ready */
-		if (
-			floppy_drive_get_flag_state(img, FLOPPY_DRIVE_HEAD_AT_TRACK_0) ||
+		if (img == NULL || floppy_drive_get_flag_state(img, FLOPPY_DRIVE_HEAD_AT_TRACK_0) ||
 			(!floppy_drive_get_flag_state(img, FLOPPY_DRIVE_READY))
 			)
 		{
@@ -572,7 +568,7 @@ static void upd765_seek_setup(const device_config *device, int is_recalibrate)
 		signed_tracks = fdc->ncn - fdc->pcn[fdc->drive];
 
 		/* if no tracks to seek, or drive is not ready, seek is complete */
-		if ((signed_tracks==0) || (!floppy_drive_get_flag_state(img, FLOPPY_DRIVE_READY)))
+		if (img == NULL || (signed_tracks==0) || (!floppy_drive_get_flag_state(img, FLOPPY_DRIVE_READY)))
 		{
 			upd765_seek_complete(device);
 		}
@@ -782,11 +778,11 @@ WRITE_LINE_DEVICE_HANDLER( upd765_tc_w )
 	}
 }
 
-READ8_DEVICE_HANDLER(upd765_status_r)
+READ8_DEVICE_HANDLER( upd765_status_r )
 {
 	upd765_t *fdc = get_safe_token(device);
 	if (LOG_EXTRA)
-		logerror("upd765 status r: %02x\n",fdc->FDC_main);
+		logerror("%s: upd765_status_r: %02x\n", cpuexec_describe_context(device->machine), fdc->FDC_main);
 	return fdc->FDC_main;
 }
 
@@ -1679,7 +1675,7 @@ void upd765_update_state(const device_config *device)
 		fdc->FDC_main |= 0x10;                      /* set BUSY */
 
 		if (LOG_VERBOSE)
-			logerror("upd765(): pc=0x%08x command=0x%02x\n", cpu_get_pc(device->machine->firstcpu), fdc->upd765_data_reg);
+			logerror("%s: upd765(): command=0x%02x\n", cpuexec_describe_context(device->machine), fdc->upd765_data_reg);
 
 		/* seek in progress? */
 		if (fdc->upd765_flags & UPD765_SEEK_ACTIVE)
@@ -1711,7 +1707,7 @@ void upd765_update_state(const device_config *device)
 
     case UPD765_COMMAND_PHASE_BYTES:
 		if (LOG_VERBOSE)
-			logerror("upd765(): pc=0x%08x command=0x%02x\n", cpu_get_pc(device->machine->firstcpu), fdc->upd765_data_reg);
+			logerror("%s: upd765(): command=0x%02x\n", cpuexec_describe_context(device->machine), fdc->upd765_data_reg);
 
 		fdc->upd765_command_bytes[fdc->upd765_transfer_bytes_count] = fdc->upd765_data_reg;
 		fdc->upd765_transfer_bytes_count++;
