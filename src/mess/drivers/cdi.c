@@ -1545,20 +1545,18 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 				}
 			}
 
-			cdic_regs.data_buffer ^= 0x0001;
-
 			//printf( "%02x\n", buffer[CDIC_SECTOR_SUBMODE2] );
 			if((buffer[CDIC_SECTOR_FILE2] << 8) == cdic_regs.file)
 			{
-				if(cdic_regs.channel & (1 << buffer[CDIC_SECTOR_CHAN2]))
+				//if((1 << buffer[CDIC_SECTOR_CHAN2]))
 				{
 					if(((buffer[CDIC_SECTOR_SUBMODE2] & (CDIC_SUBMODE_FORM | CDIC_SUBMODE_DATA | CDIC_SUBMODE_AUDIO | CDIC_SUBMODE_VIDEO)) == (CDIC_SUBMODE_FORM | CDIC_SUBMODE_AUDIO)) &&
-					   (cdic_regs.audio_channel & (1 << buffer[CDIC_SECTOR_CHAN2])))
+					   (cdic_regs.channel & cdic_regs.audio_channel & (1 << buffer[CDIC_SECTOR_CHAN2])))
 					{
 						{
 					 		verboselog(machine, 0, "Audio sector\n" );
 
-							//cdic_regs.data_buffer ^= 0x0001;
+							cdic_regs.data_buffer ^= 0x0001;
 
 							cdic_regs.x_buffer |= 0x8000;
 							cdic_regs.data_buffer |= 0x4000;
@@ -1579,21 +1577,21 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 					}
 					else if((buffer[CDIC_SECTOR_SUBMODE2] & (CDIC_SUBMODE_DATA | CDIC_SUBMODE_AUDIO | CDIC_SUBMODE_VIDEO)) == 0x00)
 					{
-						//cdic_regs.data_buffer ^= 0x0001;
+						cdic_regs.data_buffer ^= 0x0001;
+
+						cdic_regs.data_buffer &= ~0x0004;
+						cdic_regs.x_buffer |= 0x8000;
+						cdic_regs.data_buffer |= 0x4000;
+
+						for(index = 6; index < 2352/2; index++)
+						{
+							cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + (index - 6)] = (buffer[index*2] << 8) | buffer[index*2 + 1];
+						}
 
 						if((buffer[CDIC_SECTOR_SUBMODE2] & CDIC_SUBMODE_TRIG) == CDIC_SUBMODE_TRIG ||
 						   (buffer[CDIC_SECTOR_SUBMODE2] & CDIC_SUBMODE_EOR) == CDIC_SUBMODE_EOR ||
 						   (buffer[CDIC_SECTOR_SUBMODE2] & CDIC_SUBMODE_EOF) == CDIC_SUBMODE_EOF)
 						{
-							cdic_regs.data_buffer &= ~0x0004;
-							cdic_regs.x_buffer |= 0x8000;
-							cdic_regs.data_buffer |= 0x4000;
-
-							for(index = 6; index < 2352/2; index++)
-							{
-								cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + (index - 6)] = (buffer[index*2] << 8) | buffer[index*2 + 1];
-							}
-
 							//printf( "Setting CDIC interrupt line\n" );
 							verboselog(machine, 0, "Setting CDIC interrupt line for message sector\n" );
 							cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), M68K_IRQ_4, 128);
@@ -1606,7 +1604,7 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 					}
 					else /*if(buffer[CDIC_SECTOR_SUBMODE2] & (CDIC_SUBMODE_DATA | CDIC_SUBMODE_VIDEO))*/
 					{
-						//cdic_regs.data_buffer ^= 0x0001;
+						cdic_regs.data_buffer ^= 0x0001;
 
 						cdic_regs.data_buffer &= ~0x0004;
 						cdic_regs.x_buffer |= 0x8000;
