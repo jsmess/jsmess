@@ -54,7 +54,7 @@ struct _elwro800_state
  * (note that in CP/J mode address 66 is used for FCB)
  *
  *************************************/
-
+/*
 static DIRECT_UPDATE_HANDLER(elwro800_direct_handler)
 {
 	elwro800_state *state = space->machine->driver_data;
@@ -66,7 +66,7 @@ static DIRECT_UPDATE_HANDLER(elwro800_direct_handler)
 	}
 	return address;
 }
-
+*/
 /*************************************
  *
  *  UPD765/Floppy drive
