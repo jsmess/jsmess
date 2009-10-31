@@ -1708,6 +1708,39 @@ static WRITE16_HANDLER( x68k_rom0_w )
 	}
 }
 
+static READ16_HANDLER( x68k_emptyram_r )
+{
+	/* this location is unused RAM, access here causes a bus error 
+	   Often a method for detecting amount of installed RAM, is to read or write at 1MB intervals, until a bus error occurs */
+	current_vector[2] = 0x02;  // bus error
+	current_irq_line = 2;
+//  cputag_set_input_line_and_vector(space->machine, "maincpu",2,ASSERT_LINE,current_vector[2]);
+	if(input_port_read(space->machine, "options") & 0x02)
+	{
+		offset *= 2;
+		if(ACCESSING_BITS_0_7)
+			offset++;
+		timer_set(space->machine, cputag_clocks_to_attotime(space->machine, "maincpu", 4), NULL, offset,x68k_fake_bus_error);
+	}
+	return 0xff;
+}
+
+static WRITE16_HANDLER( x68k_emptyram_w )
+{
+	/* this location is unused RAM, access here causes a bus error 
+	   Often a method for detecting amount of installed RAM, is to read or write at 1MB intervals, until a bus error occurs */
+	current_vector[2] = 0x02;  // bus error
+	current_irq_line = 2;
+//  cputag_set_input_line_and_vector(space->machine, "maincpu",2,ASSERT_LINE,current_vector[2]);
+	if(input_port_read(space->machine, "options") & 0x02)
+	{
+		offset *= 2;
+		if(ACCESSING_BITS_0_7)
+			offset++;
+		timer_set(space->machine, cputag_clocks_to_attotime(space->machine, "maincpu", 4), NULL, offset,x68k_fake_bus_error);
+	}
+}
+
 static READ16_HANDLER( x68k_exp_r )
 {
 	/* These are expansion devices, if not present, they cause a bus error */
@@ -1896,7 +1929,7 @@ static ADDRESS_MAP_START(x68k_map, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0xed0000, 0xed3fff) AM_RAMBANK(4) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0xed4000, 0xefffff) AM_NOP
 	AM_RANGE(0xf00000, 0xfbffff) AM_ROM
-	AM_RANGE(0xfc0000, 0xfdffff) AM_READWRITE(x68k_rom0_r, x68k_rom0_w)
+//	AM_RANGE(0xfc0000, 0xfdffff) AM_READWRITE(x68k_rom0_r, x68k_rom0_w)
 	AM_RANGE(0xfe0000, 0xffffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -1931,7 +1964,7 @@ static ADDRESS_MAP_START(x68030_map, ADDRESS_SPACE_PROGRAM, 32)
 	AM_RANGE(0xed0000, 0xed3fff) AM_RAMBANK(4) AM_BASE(&generic_nvram32) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0xed4000, 0xefffff) AM_NOP
 	AM_RANGE(0xf00000, 0xfbffff) AM_ROM
-	AM_RANGE(0xfc0000, 0xfdffff) AM_READWRITE16(x68k_rom0_r, x68k_rom0_w,0xffffffff)
+//	AM_RANGE(0xfc0000, 0xfdffff) AM_READWRITE16(x68k_rom0_r, x68k_rom0_w,0xffffffff)
 	AM_RANGE(0xfe0000, 0xffffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -2439,17 +2472,19 @@ static MACHINE_START( x68000 )
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	/*  Install RAM handlers  */
 	x68k_spriteram = (UINT16*)memory_region(machine, "user1");
-	memory_install_read16_handler(space,0x000000,messram_get_size(devtag_get_device(machine, "messram"))-1,messram_get_size(devtag_get_device(machine, "messram"))-1,0,(read16_space_func)1);
-	memory_install_write16_handler(space,0x000000,messram_get_size(devtag_get_device(machine, "messram"))-1,messram_get_size(devtag_get_device(machine, "messram"))-1,0,(write16_space_func)1);
+	memory_install_read16_handler(space,0x000000,0xbffffb,0xffffffff,0,(read16_space_func)x68k_emptyram_r);
+	memory_install_write16_handler(space,0x000000,0xbffffb,0xffffffff,0,(write16_space_func)x68k_emptyram_w);
+	memory_install_read16_handler(space,0x000000,messram_get_size(devtag_get_device(machine, "messram"))-1,0xffffffff,0,(read16_space_func)1);
+	memory_install_write16_handler(space,0x000000,messram_get_size(devtag_get_device(machine, "messram"))-1,0xffffffff,0,(write16_space_func)1);
 	memory_set_bankptr(machine, 1,messram_get_ptr(devtag_get_device(machine, "messram")));
-	memory_install_read16_handler(space,0xc00000,0xdfffff,0x3fffff,0,x68k_gvram_r);
-	memory_install_write16_handler(space,0xc00000,0xdfffff,0x3fffff,0,x68k_gvram_w);
+	memory_install_read16_handler(space,0xc00000,0xdfffff,0xffffffff,0,x68k_gvram_r);
+	memory_install_write16_handler(space,0xc00000,0xdfffff,0xffffffff,0,x68k_gvram_w);
 	memory_set_bankptr(machine, 2,x68k_gvram);  // so that code in VRAM is executable - needed for Terra Cresta
-	memory_install_read16_handler(space,0xe00000,0xe7ffff,0x07ffff,0,x68k_tvram_r);
-	memory_install_write16_handler(space,0xe00000,0xe7ffff,0x07ffff,0,x68k_tvram_w);
+	memory_install_read16_handler(space,0xe00000,0xe7ffff,0xffffffff,0,x68k_tvram_r);
+	memory_install_write16_handler(space,0xe00000,0xe7ffff,0xffffffff,0,x68k_tvram_w);
 	memory_set_bankptr(machine, 3,x68k_tvram);  // so that code in VRAM is executable - needed for Terra Cresta
-	memory_install_read16_handler(space,0xed0000,0xed3fff,0x003fff,0,x68k_sram_r);
-	memory_install_write16_handler(space,0xed0000,0xed3fff,0x003fff,0,x68k_sram_w);
+	memory_install_read16_handler(space,0xed0000,0xed3fff,0xffffffff,0,x68k_sram_r);
+	memory_install_write16_handler(space,0xed0000,0xed3fff,0xffffffff,0,x68k_sram_w);
 	memory_set_bankptr(machine, 4,generic_nvram16);  // so that code in SRAM is executable, there is an option for booting from SRAM
 
 	// start keyboard timer
@@ -2468,20 +2503,22 @@ static MACHINE_START( x68030 )
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	/*  Install RAM handlers  */
 	x68k_spriteram = (UINT16*)memory_region(machine, "user1");
-	memory_install_read32_handler(space,0x000000,messram_get_size(devtag_get_device(machine, "messram"))-1,messram_get_size(devtag_get_device(machine, "messram"))-1,0,(read32_space_func)1);
-	memory_install_write32_handler(space,0x000000,messram_get_size(devtag_get_device(machine, "messram"))-1,messram_get_size(devtag_get_device(machine, "messram"))-1,0,(write32_space_func)1);
+	memory_install_read32_handler(space,0x000000,0xbffffb,0xffffffff,0,(read32_space_func)x68k_rom0_r);
+	memory_install_write32_handler(space,0x000000,0xbffffb,0xffffffff,0,(write32_space_func)x68k_rom0_w);
+	memory_install_read32_handler(space,0x000000,messram_get_size(devtag_get_device(machine, "messram"))-1,0xffffffff,0,(read32_space_func)1);
+	memory_install_write32_handler(space,0x000000,messram_get_size(devtag_get_device(machine, "messram"))-1,0xffffffff,0,(write32_space_func)1);
 	// mirror? Human68k 3.02 explicitly adds 0x3000000 to some pointers
-	memory_install_read32_handler(space,0x3000000,0x3000000+messram_get_size(devtag_get_device(machine, "messram"))-1,messram_get_size(devtag_get_device(machine, "messram"))-1,0,(read32_space_func)1);
-	memory_install_write32_handler(space,0x3000000,0x3000000+messram_get_size(devtag_get_device(machine, "messram"))-1,messram_get_size(devtag_get_device(machine, "messram"))-1,0,(write32_space_func)1);
+	memory_install_read32_handler(space,0x3000000,0x3000000+messram_get_size(devtag_get_device(machine, "messram"))-1,0xffffffff,0,(read32_space_func)1);
+	memory_install_write32_handler(space,0x3000000,0x3000000+messram_get_size(devtag_get_device(machine, "messram"))-1,0xffffffff,0,(write32_space_func)1);
 	memory_set_bankptr(machine, 1,messram_get_ptr(devtag_get_device(machine, "messram")));
-	memory_install_read32_handler(space,0xc00000,0xdfffff,0x3fffff,0,x68k_gvram32_r);
-	memory_install_write32_handler(space,0xc00000,0xdfffff,0x3fffff,0,x68k_gvram32_w);
+	memory_install_read32_handler(space,0xc00000,0xdfffff,0xffffffff,0,x68k_gvram32_r);
+	memory_install_write32_handler(space,0xc00000,0xdfffff,0xffffffff,0,x68k_gvram32_w);
 	memory_set_bankptr(machine, 2,x68k_gvram);  // so that code in VRAM is executable - needed for Terra Cresta
-	memory_install_read32_handler(space,0xe00000,0xe7ffff,0x07ffff,0,x68k_tvram32_r);
-	memory_install_write32_handler(space,0xe00000,0xe7ffff,0x07ffff,0,x68k_tvram32_w);
+	memory_install_read32_handler(space,0xe00000,0xe7ffff,0xffffffff,0,x68k_tvram32_r);
+	memory_install_write32_handler(space,0xe00000,0xe7ffff,0xffffffff,0,x68k_tvram32_w);
 	memory_set_bankptr(machine, 3,x68k_tvram);  // so that code in VRAM is executable - needed for Terra Cresta
-	memory_install_read32_handler(space,0xed0000,0xed3fff,0x003fff,0,x68k_sram32_r);
-	memory_install_write32_handler(space,0xed0000,0xed3fff,0x003fff,0,x68k_sram32_w);
+	memory_install_read32_handler(space,0xed0000,0xed3fff,0xffffffff,0,x68k_sram32_r);
+	memory_install_write32_handler(space,0xed0000,0xed3fff,0xffffffff,0,x68k_sram32_w);
 	memory_set_bankptr(machine, 4,generic_nvram32);  // so that code in SRAM is executable, there is an option for booting from SRAM
 
 	// start keyboard timer
