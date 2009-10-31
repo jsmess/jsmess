@@ -91,6 +91,12 @@ System Driver Changes:
 - [EINSTEIN] Made it possible to select single or double sided disk 
   drives.  [Dirk Best]
 
+- [ELWRO800] Update :
+	* reworked keyboard mapping, added keys with Polish characters
+	* added network id
+	* added support for NMI firing (not used yet, as Junet is not working)
+	[Mariusz Wojcieszek]
+
 - [EXIDY] Added SNP support for the 6 games commonly found on the net. 
   [RObbbert]
 
