@@ -1562,6 +1562,18 @@ static int upd765_get_command_byte_count(const device_config *device)
     }
 	else
 	{
+		if (fdc->version==TYPE_UPD72065)
+		{
+			switch(fdc->upd765_command_bytes[0])
+			{
+				case 0x34: // Reset Standby
+				case 0x35: // Set Standby
+				case 0x36: // Software Reset
+					return 1;
+				default:
+					return upd765_cmd_size[fdc->command];
+			}
+		}
 		if (fdc->version==TYPE_SMC37C78)
 		{
 			switch (fdc->command)
@@ -2110,7 +2122,6 @@ static void upd765_setup_command(const device_config *device)
 			switch (fdc->version)
 			{
 				case TYPE_UPD765A:
-				case TYPE_UPD72065:
 					upd765_setup_invalid(device);
 					break;
 
@@ -2122,6 +2133,21 @@ static void upd765_setup_command(const device_config *device)
 						fdc->upd765_status[0] = 0x090;
 						fdc->upd765_result_bytes[0] = fdc->upd765_status[0];
 						upd765_setup_result_phase(device,1);
+					}
+					break;
+
+				case TYPE_UPD72065:
+					switch(fdc->upd765_command_bytes[0] & 0x3f)
+					{
+						case 0x36:  // Software Reset
+							upd765_reset(device,0);
+							upd765_idle(device);
+							if(LOG_COMMAND)
+								logerror("upd72065: command - Software Reset\n");
+							break;
+						default:
+							upd765_setup_invalid(device);
+							break;
 					}
 					break;
 
