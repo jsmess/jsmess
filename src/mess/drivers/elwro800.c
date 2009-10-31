@@ -35,7 +35,7 @@
  *  State/Globals
  *
  *************************************/
-//static UINT8 elwro800_df_on_databus = 0xdf;
+static UINT8 elwro800_df_on_databus = 0xdf;
 
 typedef struct _elwro800_state elwro800_state;
 struct _elwro800_state
@@ -54,7 +54,6 @@ struct _elwro800_state
  * (note that in CP/J mode address 66 is used for FCB)
  *
  *************************************/
-/*
 static DIRECT_UPDATE_HANDLER(elwro800_direct_handler)
 {
 	elwro800_state *state = space->machine->driver_data;
@@ -66,7 +65,7 @@ static DIRECT_UPDATE_HANDLER(elwro800_direct_handler)
 	}
 	return address;
 }
-*/
+
 /*************************************
  *
  *  UPD765/Floppy drive
@@ -514,6 +513,8 @@ static MACHINE_RESET(elwro800)
 
 	// this is a reset of ls175 in mmu
 	elwro800jr_mmu_w(machine, 0);
+	
+	memory_set_direct_update_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), elwro800_direct_handler);
 }
 
 static const cassette_config elwro800jr_cassette_config =
