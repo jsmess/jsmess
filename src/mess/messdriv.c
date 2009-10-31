@@ -638,6 +638,7 @@ const game_driver * const drivers[] =
     DRIVER( x68030 )    /* Sharp X68030 (1993)                              */
 
     /* Silicon Graphics */
+    DRIVER( sgi_ip6 )   /* IP6: 4D/PI, R2000, 20MHz                         */
     DRIVER( ip204415 )  /* IP20: Indigo 1, R4400, 150MHz                    */
     DRIVER( ip225015 )  /* IP22: Indy, R5000, 150MHz						*/
     DRIVER( ip224613 )	/* IP22: Indy, R4600, 133MHz						*/

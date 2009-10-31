@@ -4,6 +4,7 @@
     Driver by Ville Linde
     Reformatted to share hardware by R. Belmont
     Additional work by Ryan Holtz
+    Porting from Mupen64 by Harmony
 */
 
 #include "driver.h"
@@ -58,7 +59,7 @@ static INPUT_PORTS_START( n64 )
 		PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_PLAYER(1)
 
 	PORT_START("P1_ANALOG_Y")
-		PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0xff,0x00) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_PLAYER(1)
+		PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_PLAYER(1) PORT_REVERSE
 INPUT_PORTS_END
 
 /* ?? */
