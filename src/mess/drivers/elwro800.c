@@ -35,7 +35,7 @@
  *  State/Globals
  *
  *************************************/
-static UINT8 elwro800_df_on_databus = 0xdf;
+//static UINT8 elwro800_df_on_databus = 0xdf;
 
 typedef struct _elwro800_state elwro800_state;
 struct _elwro800_state
