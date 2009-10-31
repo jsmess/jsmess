@@ -1464,6 +1464,7 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 		case 0x23: // Reset Mode 1
 		case 0x29: // Read Mode 1
 		case 0x2a: // Read Mode 2
+		//case 0x2c: // Seek
 		{
 			UINT8 buffer[2560] = { 0 };
 			UINT32 msf = cdic_regs.time >> 8;
@@ -1638,15 +1639,6 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 
 			break;
 		}
-		case 0x2c: // Seek
-			timer_adjust_oneshot(cdic_regs.interrupt_timer, attotime_never, 0);
-
-			cdic_regs.data_buffer &= ~4;
-
-			verboselog(machine, 0, "Setting CDIC interrupt line for data sector\n" );
-			cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), M68K_IRQ_4, 128);
-			cputag_set_input_line(machine, "maincpu", M68K_IRQ_4, ASSERT_LINE);
-			break;
 		case 0x24: // Mode 2 Reset
 		case 0x2e: // Abort
 			timer_adjust_oneshot(cdic_regs.interrupt_timer, attotime_never, 0);
@@ -1705,6 +1697,57 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 			}
 
 			verboselog(machine, 0, "Setting CDIC interrupt line for CDDA sector\n" );
+			cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), M68K_IRQ_4, 128);
+			cputag_set_input_line(machine, "maincpu", M68K_IRQ_4, ASSERT_LINE);
+			break;
+		}
+		case 0x2c: // Seek
+		{
+			UINT8 buffer[2560] = { 0 };
+			int index = 0;
+			UINT32 msf = (cdic_regs.time & 0xffff7f00) >> 8;
+			UINT32 next_msf = increment_cdda_frame_bcd((cdic_regs.time & 0xffff7f00) >> 8);
+			UINT32 lba = 0;
+			UINT8 nybbles[6] =
+			{
+				 msf & 0x0000000f,
+				(msf & 0x000000f0) >> 4,
+				(msf & 0x00000f00) >> 8,
+				(msf & 0x0000f000) >> 12,
+				(msf & 0x000f0000) >> 16,
+				(msf & 0x00f00000) >> 20
+			};
+			lba = nybbles[0] + nybbles[1]*10 + ((nybbles[2] + nybbles[3]*10)*75) + ((nybbles[4] + nybbles[5]*10)*75*60);
+
+			timer_adjust_oneshot(cdic_regs.interrupt_timer, ATTOTIME_IN_HZ(75), 0);
+
+			cdrom_read_data(cdic_regs.cd, lba, buffer, CD_TRACK_RAW_DONTCARE);
+
+			cdic_regs.data_buffer ^= 0x0001;
+			cdic_regs.x_buffer |= 0x8000;
+			cdic_regs.data_buffer |= 0x4000;
+
+			for(index = 6; index < 2352/2; index++)
+			{
+				cdram[(cdic_regs.data_buffer & 5) * (0xa00/2) + (index - 6)] = (buffer[index*2] << 8) | buffer[index*2 + 1];
+			}
+
+			cdram[0x924/2] = 0x0041;								//	CTRL
+			cdram[0x926/2] = 0x0001; 								//  TRACK
+			cdram[0x928/2] = 0x0000;								// 	INDEX
+			cdram[0x92a/2] = (cdic_regs.time >> 24) & 0x000000ff;	// 	MIN
+			cdram[0x92c/2] = (cdic_regs.time >> 16) & 0x000000ff;	// 	SEC
+			cdram[0x92e/2] = (cdic_regs.time >>  8) & 0x0000007f;	// 	FRAC
+			cdram[0x930/2] = 0x0000;								//  ZERO
+			cdram[0x932/2] = (cdic_regs.time >> 24) & 0x000000ff;	// 	AMIN
+			cdram[0x934/2] = (cdic_regs.time >> 16) & 0x000000ff;	// 	ASEC
+			cdram[0x936/2] = (cdic_regs.time >>  8) & 0x0000007f;	// 	AFRAC
+			cdram[0x938/2] = 0x0000;								//  CRC1
+			cdram[0x93a/2] = 0x0000;								//  CRC2
+
+			cdic_regs.time = next_msf << 8;
+
+			verboselog(machine, 0, "Setting CDIC interrupt line for Seek sector\n" );
 			cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), M68K_IRQ_4, 128);
 			cputag_set_input_line(machine, "maincpu", M68K_IRQ_4, ASSERT_LINE);
 			break;
@@ -1933,6 +1976,10 @@ static WRITE16_HANDLER( cdic_w )
 					case 0x2c: // Seek
 					{
 						attotime period = timer_timeleft(cdic_regs.interrupt_timer);
+						//if(cdic_regs.command == 0x2c)
+						//{
+						//	cdic_regs.time &= 0xffff0000;
+						//}
 						if(!attotime_is_never(period))
 						{
 							timer_adjust_oneshot(cdic_regs.interrupt_timer, period, 0);
