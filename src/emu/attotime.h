@@ -433,7 +433,8 @@ INLINE attotime attotime_max(attotime _time1, attotime _time2)
 
 INLINE int attotime_is_never(attotime _time)
 {
-	return (attotime_to_double(_time) == (double)ATTOTIME_MAX_SECONDS);
+	return (_time.seconds >= ATTOTIME_MAX_SECONDS);
 }
+
 
 #endif	/* __ATTOTIME_H__ */

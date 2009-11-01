@@ -4,10 +4,38 @@
 
     Generic MAME disassembler.
 
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
+****************************************************************************
 
-***************************************************************************/
+    Copyright Aaron Giles
+    All rights reserved.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are
+    met:
+
+        * Redistributions of source code must retain the above copyright
+          notice, this list of conditions and the following disclaimer.
+        * Redistributions in binary form must reproduce the above copyright
+          notice, this list of conditions and the following disclaimer in
+          the documentation and/or other materials provided with the
+          distribution.
+        * Neither the name 'MAME' nor the names of its contributors may be
+          used to endorse or promote products derived from this software
+          without specific prior written permission.
+
+    THIS SOFTWARE IS PROVIDED BY AARON GILES ''AS IS'' AND ANY EXPRESS OR
+    IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+    DISCLAIMED. IN NO EVENT SHALL AARON GILES BE LIABLE FOR ANY DIRECT,
+    INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+    SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+    HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+    STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+
+****************************************************************************/
 
 #include "cpuintrf.h"
 #include <ctype.h>
@@ -53,6 +81,7 @@ struct _options
 	UINT8					norawbytes;
 	UINT8					lower;
 	UINT8					upper;
+	UINT8					flipped;
 	int						mode;
 	const dasm_table_entry *dasm;
 };
@@ -351,6 +380,8 @@ static int parse_options(int argc, char *argv[], options *opts)
 				pending_arch = TRUE;
 			else if (tolower((UINT8)curarg[1]) == 'b')
 				pending_base = TRUE;
+			else if (tolower((UINT8)curarg[1]) == 'f')
+				opts->flipped = TRUE;
 			else if (tolower((UINT8)curarg[1]) == 'l')
 				opts->lower = TRUE;
 			else if (tolower((UINT8)curarg[1]) == 'm')
@@ -417,7 +448,8 @@ static int parse_options(int argc, char *argv[], options *opts)
 	return 0;
 
 usage:
-	printf("Usage: %s <filename> -arch <architecture> [-basepc <pc>] [-mode <n>] [-norawbytes] [-upper] [-lower]\n", argv[0]);
+	printf("Usage: %s <filename> -arch <architecture> [-basepc <pc>] \n", argv[0]);
+	printf("   [-mode <n>] [-norawbytes] [-flipped] [-upper] [-lower]\n");
 	printf("\n");
 	printf("Supported architectures:");
 	numrows = (ARRAY_LENGTH(dasm_table) + 6) / 7;
@@ -487,33 +519,7 @@ int main(int argc, char *argv[])
 		else
 			numbytes = pcdelta >> opts.dasm->pcshift;
 
-		// round to the nearest display chunk
-		numbytes = ((numbytes + displaychunk - 1) / displaychunk) * displaychunk;
-		if (numbytes == 0)
-			numbytes = displaychunk;
-		numchunks = numbytes / displaychunk;
-
-		// output the address
-		printf("%08X: ", curpc);
-
-		// output the raw bytes
-		if (!opts.norawbytes)
-		{
-			int firstchunks = (numchunks < maxchunks) ? numchunks : maxchunks;
-			int chunknum, bytenum;
-			for (chunknum = 0; chunknum < firstchunks; chunknum++)
-			{
-				for (bytenum = 0; bytenum < displaychunk; bytenum++)
-					printf("%02X", oprom[displayendian ? (displaychunk - 1 - bytenum) : bytenum]);
-				printf(" ");
-				oprom += displaychunk;
-			}
-			for ( ; chunknum < maxchunks; chunknum++)
-				printf("%*s ", displaychunk * 2, "");
-			printf(" ");
-		}
-
-		// output the disassembly
+		// force upper or lower
 		if (opts.lower)
 		{
 			for (p = buffer; *p != 0; p++)
@@ -524,16 +530,24 @@ int main(int argc, char *argv[])
 			for (p = buffer; *p != 0; p++)
 				*p = toupper((UINT8)*p);
 		}
-		printf("%s\n", buffer);
 
-		// output additional raw bytes
-		if (!opts.norawbytes && numchunks > maxchunks)
+		// round to the nearest display chunk
+		numbytes = ((numbytes + displaychunk - 1) / displaychunk) * displaychunk;
+		if (numbytes == 0)
+			numbytes = displaychunk;
+		numchunks = numbytes / displaychunk;
+
+		// non-flipped case
+		if (!opts.flipped)
 		{
-			for (numchunks -= maxchunks; numchunks > 0; numchunks -= maxchunks)
+			// output the address
+			printf("%08X: ", curpc);
+
+			// output the raw bytes
+			if (!opts.norawbytes)
 			{
 				int firstchunks = (numchunks < maxchunks) ? numchunks : maxchunks;
 				int chunknum, bytenum;
-				printf("          ");
 				for (chunknum = 0; chunknum < firstchunks; chunknum++)
 				{
 					for (bytenum = 0; bytenum < displaychunk; bytenum++)
@@ -541,8 +555,54 @@ int main(int argc, char *argv[])
 					printf(" ");
 					oprom += displaychunk;
 				}
-				printf("\n");
+				for ( ; chunknum < maxchunks; chunknum++)
+					printf("%*s ", displaychunk * 2, "");
+				printf(" ");
 			}
+
+			// output the disassembly
+			printf("%s\n", buffer);
+
+			// output additional raw bytes
+			if (!opts.norawbytes && numchunks > maxchunks)
+			{
+				for (numchunks -= maxchunks; numchunks > 0; numchunks -= maxchunks)
+				{
+					int firstchunks = (numchunks < maxchunks) ? numchunks : maxchunks;
+					int chunknum, bytenum;
+					printf("          ");
+					for (chunknum = 0; chunknum < firstchunks; chunknum++)
+					{
+						for (bytenum = 0; bytenum < displaychunk; bytenum++)
+							printf("%02X", oprom[displayendian ? (displaychunk - 1 - bytenum) : bytenum]);
+						printf(" ");
+						oprom += displaychunk;
+					}
+					printf("\n");
+				}
+			}
+		}
+
+		// flipped case
+		else
+		{
+			// output the disassembly and address
+			printf("\t%-40s ; %08X", buffer, curpc);
+
+			// output the raw bytes
+			if (!opts.norawbytes)
+			{
+				int chunknum, bytenum;
+				printf(": ");
+				for (chunknum = 0; chunknum < numchunks; chunknum++)
+				{
+					for (bytenum = 0; bytenum < displaychunk; bytenum++)
+						printf("%02X", oprom[displayendian ? (displaychunk - 1 - bytenum) : bytenum]);
+					printf(" ");
+					oprom += displaychunk;
+				}
+			}
+			printf("\n");
 		}
 
 		// advance

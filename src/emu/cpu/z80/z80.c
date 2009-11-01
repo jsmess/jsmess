@@ -3316,34 +3316,26 @@ static void take_interrupt(z80_state *z80)
 		/* if neither of these were found we assume a 1 byte opcode */
 		/* was placed on the databus                                */
 		LOG(("Z80 '%s' IM0 $%04x\n", z80->device->tag, irq_vector));
-
-		/* check for nop */
-		if (irq_vector != 0)
+		switch (irq_vector & 0xff0000)
 		{
-			switch (irq_vector & 0xff0000)
-			{
-				case 0xcd0000:	/* call */
-					PUSH(z80, pc);
-					z80->PCD = irq_vector & 0xffff;
-					 /* CALL $xxxx cycles */
-					z80->icount -= z80->cc_op[0xcd];
-					break;
-				case 0xc30000:	/* jump */
-					z80->PCD = irq_vector & 0xffff;
-					/* JP $xxxx cycles */
-					z80->icount -= z80->cc_op[0xc3];
-					break;
-				default:		/* rst (or other opcodes?) */
-					PUSH(z80, pc);
-					z80->PCD = irq_vector & 0x0038;
-					/* RST $xx cycles */
-					z80->icount -= z80->cc_op[0xff];
-					break;
-			}
+			case 0xcd0000:	/* call */
+				PUSH(z80, pc);
+				z80->PCD = irq_vector & 0xffff;
+				 /* CALL $xxxx + 'interrupt latency' cycles */
+				z80->icount -= z80->cc_op[0xcd] + z80->cc_ex[0xff];
+				break;
+			case 0xc30000:	/* jump */
+				z80->PCD = irq_vector & 0xffff;
+				/* JP $xxxx + 2 cycles */
+				z80->icount -= z80->cc_op[0xc3] + z80->cc_ex[0xff];
+				break;
+			default:		/* rst (or other opcodes?) */
+				PUSH(z80, pc);
+				z80->PCD = irq_vector & 0x0038;
+				/* RST $xx + 2 cycles */
+				z80->icount -= z80->cc_op[0xff] + z80->cc_ex[0xff];
+				break;
 		}
-
-		/* 'interrupt latency' cycles */
-		z80->icount -= z80->cc_ex[0xff];
 	}
 	z80->WZ=z80->PCD;
 }

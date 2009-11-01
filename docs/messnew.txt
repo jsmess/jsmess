@@ -1,4 +1,4 @@
-0.134.1
+0.135
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
@@ -298,7 +298,7 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
-- The core is based on MAME 0.134u4.  This incorporates all features of the
+- The core is based on MAME 0.135.  This incorporates all features of the
   update to this core.  [MAME team]
 
 - Moved floppy implementation to device.  [Miodrag Milanovic]
@@ -315,6 +315,7 @@ Source Changes:
 
 - Removed XMODEM implementation from serial, was not used, and it should be 
   implemented inside machine software not a MESS code [Miodrag Milanovic]
+
 
 
 0.134
