@@ -595,9 +595,14 @@ ROM_START (ti81)
 	ROM_DEFAULT_BIOS("v18")
 	ROM_SYSTEM_BIOS( 0, "v18", "V 1.8K" )
 	ROMX_LOAD( "ti81v18k.bin", 0x10000, 0x8000, CRC(94ac58e2) SHA1(ba915cfe2fe50a452ef8287db8f2244e29056d54), ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS( 1, "v20", "V 2.0V" )
-	ROMX_LOAD( "ti81v20v.bin", 0x10000, 0x8000, CRC(cfbd12da) SHA1(d2a923526d98f1046fcb583e46951939ba66bdb9), ROM_BIOS(2) )
 	//No dumps 1.0, 1.6K (?) and 2.0 from ticalc.org, less sure about 1.6K
+ROM_END
+
+ROM_START (ti81v2)
+	ROM_REGION (0x18000, "maincpu",0)
+	ROM_DEFAULT_BIOS("v20")
+	ROM_SYSTEM_BIOS( 0, "v20", "V 2.0V" )
+	ROMX_LOAD( "ti81v20v.bin", 0x10000, 0x8000, CRC(cfbd12da) SHA1(d2a923526d98f1046fcb583e46951939ba66bdb9), ROM_BIOS(1) )
 ROM_END
 
 ROM_START (ti82)
@@ -722,12 +727,12 @@ static void ti85_serial_getinfo(const mess_device_class *devclass, UINT32 state,
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case MESS_DEVINFO_INT_TYPE:							info->i = IO_SERIAL; break;
 		case MESS_DEVINFO_INT_READABLE:						info->i = 1; break;
-		case MESS_DEVINFO_INT_WRITEABLE:						info->i = 0; break;
-		case MESS_DEVINFO_INT_CREATABLE:						info->i = 0; break;
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
+		case MESS_DEVINFO_INT_WRITEABLE:					info->i = 0; break;
+		case MESS_DEVINFO_INT_CREATABLE:					info->i = 0; break;
+		case MESS_DEVINFO_INT_COUNT:						info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_START:							info->start = DEVICE_START_NAME(ti85_serial); break;
+		case MESS_DEVINFO_PTR_START:						info->start = DEVICE_START_NAME(ti85_serial); break;
 		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(ti85_serial); break;
 		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(ti85_serial); break;
 
@@ -748,12 +753,12 @@ static void ti86_serial_getinfo(const mess_device_class *devclass, UINT32 state,
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case MESS_DEVINFO_INT_TYPE:							info->i = IO_SERIAL; break;
 		case MESS_DEVINFO_INT_READABLE:						info->i = 1; break;
-		case MESS_DEVINFO_INT_WRITEABLE:						info->i = 0; break;
-		case MESS_DEVINFO_INT_CREATABLE:						info->i = 0; break;
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
+		case MESS_DEVINFO_INT_WRITEABLE:					info->i = 0; break;
+		case MESS_DEVINFO_INT_CREATABLE:					info->i = 0; break;
+		case MESS_DEVINFO_INT_COUNT:						info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_START:							info->start = DEVICE_START_NAME(ti85_serial); break;
+		case MESS_DEVINFO_PTR_START:						info->start = DEVICE_START_NAME(ti85_serial); break;
 		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(ti85_serial); break;
 		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(ti85_serial); break;
 
@@ -767,13 +772,14 @@ static SYSTEM_CONFIG_START(ti86)
 SYSTEM_CONFIG_END
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY                 FULLNAME                        FLAGS */
-COMP( 1998, ti73,       0,      0,      ti83p,  ti82,   0,      0,   "Texas Instruments",    "TI-73",                        GAME_NOT_WORKING )
-COMP( 1990, ti81,       0,      0,      ti81,   ti81,   0,      0,   "Texas Instruments",    "TI-81",                        0 )
+COMP( 1990, ti81,       0,      0,      ti81,   ti81,   0,      0,		"Texas Instruments",    "TI-81",                        0 )
 COMP( 1992, ti85,       0,      0,      ti85d,  ti85,   0,      ti85,   "Texas Instruments",    "TI-85",                        0 )
-COMP( 1993, ti82,       0,      0,      ti82,   ti82,   0,      0,   "Texas Instruments",    "TI-82",                        0 )
-COMP( 1996, ti83,       0,      0,      ti83,   ti83,   0,      0,   "Texas Instruments",    "TI-83",                        0 )
+COMP( 1993, ti82,       0,      0,      ti82,   ti82,   0,      0,		"Texas Instruments",    "TI-82",                        0 )
+COMP( 1994, ti81v2,     ti81,   0,      ti82,   ti81,   0,      0,		"Texas Instruments",    "TI-81 v2.0",                   0 )
+COMP( 1996, ti83,       0,      0,      ti83,   ti83,   0,      0,		"Texas Instruments",    "TI-83",                        0 )
 COMP( 1997, ti86,       0,      0,      ti86d,  ti85,   0,      ti86,   "Texas Instruments",    "TI-86",                        0 )
-COMP( 1999, ti83p,      0,      0,      ti83p,  ti82,   0,      0,   "Texas Instruments",    "TI-83 Plus",                   0 )
-COMP( 2001, ti83pse,    0,      0,      ti85,   ti85,   0,      0,   "Texas Instruments",    "TI-83 Plus Silver Edition",    GAME_NOT_WORKING )
+COMP( 1998, ti73,       0,      0,      ti83p,  ti82,   0,      0,		"Texas Instruments",    "TI-73",                        GAME_NOT_WORKING )
+COMP( 1999, ti83p,      0,      0,      ti83p,  ti82,   0,      0,		"Texas Instruments",    "TI-83 Plus",                   0 )
+COMP( 2001, ti83pse,    0,      0,      ti85,   ti85,   0,      0,		"Texas Instruments",    "TI-83 Plus Silver Edition",    GAME_NOT_WORKING )
 //COMP( 2004, ti84p,      0,      0,      ti85,   ti85,   0,      0,   "Texas Instruments",    "TI-84 Plus",                   GAME_NOT_WORKING )
-COMP( 2004, ti84pse,    0,      0,      ti85,   ti85,   0,      0,   "Texas Instruments",    "TI-84 Plus Silver Edition",    GAME_NOT_WORKING )
+COMP( 2004, ti84pse,    0,      0,      ti85,   ti85,   0,      0,		"Texas Instruments",    "TI-84 Plus Silver Edition",    GAME_NOT_WORKING )

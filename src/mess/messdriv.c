@@ -671,6 +671,7 @@ const game_driver * const drivers[] =
     /* Texas Instruments Calculators */
     DRIVER( ti73 )      /* 1990 TI-73                                       */
     DRIVER( ti81 )      /* 1990 TI-81 (Z80 2 MHz)                           */
+    DRIVER( ti81v2 )    /* 1990 TI-81 (Z80 2 MHz)                           */
     DRIVER( ti85 )      /* 1992 TI-85 (Z80 6 MHz)                           */
     DRIVER( ti82 )      /* 1993 TI-82 (Z80 6 MHz)                           */
     DRIVER( ti83 )      /* 1996 TI-83 (Z80 6 MHz)                           */
