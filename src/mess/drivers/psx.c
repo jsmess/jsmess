@@ -15,11 +15,13 @@
 #include "driver.h"
 #include "cpu/mips/psx.h"
 #include "devices/snapquik.h"
+#include "devices/chd_cd.h"
 #include "includes/psx.h"
 #include "sound/psx.h"
 #include "debugger.h"
 #include "zlib.h"
 
+static cdrom_file *psx_cdrom;
 static UINT8 *exe_buffer;
 static int exe_size;
 
@@ -815,7 +817,7 @@ static READ32_HANDLER( psx_cd_r )
 {
 	UINT32 result = 0;
 
-	if( mem_mask == 0xffffff00 )
+	if( ACCESSING_BITS_0_7 )
 	{
 		logerror( "%08x cd0 read\n", cpu_get_pc(space->cpu) );
 
@@ -832,7 +834,7 @@ static READ32_HANDLER( psx_cd_r )
 		/* NPW 21-May-2003 - Seems to expect this on boot */
 		result |= 0x0f;
 	}
-	else if( mem_mask == 0xffff00ff )
+	else if( ACCESSING_BITS_8_15 )
 	{
 		logerror( "%08x cd1 read\n", cpu_get_pc(space->cpu) );
 
@@ -846,11 +848,11 @@ static READ32_HANDLER( psx_cd_r )
 				cd_result_ready = 0;
 		}
 	}
-	else if( mem_mask == 0xff00ffff )
+	else if( ACCESSING_BITS_16_23 )
 	{
 		logerror( "%08x cd2 read\n", cpu_get_pc(space->cpu) );
 	}
-	else if( mem_mask == 0x00ffffff )
+	else if( ACCESSING_BITS_24_31 )
 	{
 		logerror( "%08x cd3 read\n", cpu_get_pc(space->cpu) );
 
@@ -867,7 +869,7 @@ static WRITE32_HANDLER( psx_cd_w )
 {
 	void (*psx_cdcmd)(void);
 
-	if( mem_mask == 0xffffff00 )
+	if( ACCESSING_BITS_0_7 )
 	{
 		/* write to CD register 0 */
 		data = (data >> 0) & 0xff;
@@ -886,7 +888,7 @@ static WRITE32_HANDLER( psx_cd_w )
 				cd_reset = 1;
 		}
 	}
-	else if( mem_mask == 0xffff00ff )
+	else if( ACCESSING_BITS_8_15 )
 	{
 		/* write to CD register 1 */
 		data = (data >> 8) & 0xff;
@@ -902,7 +904,7 @@ static WRITE32_HANDLER( psx_cd_w )
 
 		psx_irq_set(space->machine, 0x0004);
 	}
-	else if( mem_mask == 0xff00ffff )
+	else if( ACCESSING_BITS_16_23 )
 	{
 		/* write to CD register 2 */
 		data = (data >> 16) & 0xff;
@@ -930,7 +932,7 @@ static WRITE32_HANDLER( psx_cd_w )
 				cd_param_p++;
 		}
 	}
-	else if( mem_mask == 0x00ffffff )
+	else if( ACCESSING_BITS_24_31 )
 	{
 		/* write to CD register 3 */
 		data = (data >> 24) & 0xff;
@@ -982,6 +984,12 @@ ADDRESS_MAP_END
 
 static MACHINE_RESET( psx )
 {
+	const device_config *cdrom_dev = devtag_get_device(machine, "cdrom");
+	if( cdrom_dev )
+	{
+		psx_cdrom = mess_cd_get_cdrom_file(cdrom_dev);
+	}
+
 	psx_machine_init(machine);
 	psx_sio_install_handler( 0, psx_sio0 );
 }
@@ -1077,6 +1085,8 @@ static MACHINE_DRIVER_START( psxntsc )
 
 	/* quickload */
 	MDRV_QUICKLOAD_ADD("quickload", psx_exe_load, "cpe,exe,psf,psx", 0)
+
+	MDRV_CDROM_ADD("cdrom")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( psxpal )
@@ -1110,6 +1120,8 @@ static MACHINE_DRIVER_START( psxpal )
 
 	/* quickload */
 	MDRV_QUICKLOAD_ADD("quickload", psx_exe_load, "cpe,exe,psf,psx", 0)
+
+	MDRV_CDROM_ADD("cdrom")
 MACHINE_DRIVER_END
 
 ROM_START( psj )
