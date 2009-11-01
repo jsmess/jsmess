@@ -161,6 +161,7 @@ extern void gamecom_update_timers( const device_config *device, int cycles );
 
 extern UINT8 gamecom_internal_registers[];
 extern UINT8 *gamecom_vram;
+extern UINT8 *gamecom_iram;
 
 
 /*----------- defined in video/gamecom.c -----------*/
